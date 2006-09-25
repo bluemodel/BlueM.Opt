@@ -1,7 +1,7 @@
 <VisualStudioProject>
     <VisualBasic
         ProjectType = "Local"
-        ProductVersion = "7.10.3077"
+        ProductVersion = "7.10.6030"
         SchemaVersion = "2.0"
         ProjectGuid = "{FF1D5494-1205-4F3E-BD65-ADB8C6BD04D4}"
     >
@@ -98,20 +98,19 @@
                     WrapperTool = "primary"
                 />
                 <Reference
-                    Name = "TeeChart1"
+                    Name = "EvoForm"
+                    AssemblyName = "EvoForm"
+                    HintPath = "..\EVO_FORM\EvoForm.dll"
+                />
+                <Reference
+                    Name = "dmevodll"
+                    AssemblyName = "dmevodll"
+                    HintPath = "dmevodll.dll"
+                />
+                <Reference
+                    Name = "TeeChart"
                     AssemblyName = "TeeChart"
-                    HintPath = "C:\Programme\TeeChart for .NET v2 Evaluation\TeeChart.dll"
-                    AssemblyFolderKey = "hklm\dn\teechart"
-                />
-                <Reference
-                    Name = "EVO_Kern"
-                    Project = "{58356A07-425E-4C91-ACB8-17B9286C9417}"
-                    Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
-                />
-                <Reference
-                    Name = "EVO_Form"
-                    Project = "{64F462D3-9702-4709-9D90-4874A1D9A52B}"
-                    Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
+                    HintPath = "TeeChart.dll"
                 />
             </References>
             <Imports>
