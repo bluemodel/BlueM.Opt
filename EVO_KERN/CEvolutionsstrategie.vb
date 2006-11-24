@@ -662,7 +662,7 @@ ES_GET_SCHRITTWEITE_ERROR:
 
         esGetSekundärePopulation = False
 
-        'Notwendig, falls auch die Variablenwerte für eine spätere Datensatzerstellung ausgelesen werden sollen (Dirk)
+        ''Notwendig, falls auch die Variablenwerte für eine spätere Datensatzerstellung ausgelesen werden sollen (Dirk)
 
         '    ReDim Population(UBound(SekundärQb), Property.varanz, Property.NPenalty + 1)
         '    For i = 1 To UBound(SekundärQb)
@@ -1415,7 +1415,7 @@ ES_MUTATION_ERROR:
         End If
 
         'Falls die Qualität des aktuellen Population besser ist (Penaltyfunktion geringer)
-        'als die schlechteste im Bestwertspeicher, wird diese ersetz
+        'als die schlechteste im Bestwertspeicher, wird diese ersetzt
         If Not Eigenschaft.isMultiObjective Then
             If h1 < Qbpop(i, 1) Then
                 Qbpop(i, 1) = h1

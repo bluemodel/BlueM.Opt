@@ -1115,13 +1115,13 @@ Friend Class Form1
 
     Private Sub Form1_Load(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles MyBase.Load
         Combo1.Items.Add("Sinus-Funktion")
-        'Combo1.AddItem "Beale-Problem"
+        'Combo1.Items.Add("Beale-Problem")
         Combo1.Items.Add("Schwefel 2.4-Problem")
-        'Combo1.AddItem "Deb 1"
-        'Combo1.AddItem "Zitzler/Deb T1"
-        'Combo1.AddItem "Zitzler/Deb T2"
-        'Combo1.AddItem "Zitzler/Deb T3"
-        'Combo1.AddItem "Zitzler/Deb T4"
+        'Combo1.Items.Add("Deb 1")
+        'Combo1.Items.Add("Zitzler/Deb T1")
+        'Combo1.Items.Add("Zitzler/Deb T2")
+        'Combo1.Items.Add("Zitzler/Deb T3")
+        'Combo1.Items.Add("Zitzler/Deb T4")
         Combo1.SelectedIndex = 0
         TeeCommander1.Chart = TChart1
     End Sub
