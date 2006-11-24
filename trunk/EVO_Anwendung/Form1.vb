@@ -898,6 +898,7 @@ Friend Class Form1
             Case 1
                 Combo1.Items.Clear()
                 Combo1.Items.Add("Sinus-Funktion")
+                Combo1.Items.Add("Beale-Problem")
                 Combo1.Items.Add("Schwefel 2.4-Problem")
                 Combo1.SelectedIndex = 0
             Case 2
@@ -922,7 +923,7 @@ Friend Class Form1
         Combo1.Items.Add("Sinus-Funktion")
         Combo1.Items.Add("Beale-Problem")
         Combo1.Items.Add("Schwefel 2.4-Problem")
-        'Combo1.Items.Add("Deb 1")
+        Combo1.Items.Add("Deb 1")
         'Combo1.Items.Add("Zitzler/Deb T1")
         'Combo1.Items.Add("Zitzler/Deb T2")
         'Combo1.Items.Add("Zitzler/Deb T3")
@@ -1534,8 +1535,8 @@ ErrCode_ES_STARTEN:
 
     Private Sub Ausgangswert_Beale()
         Dim Ausgangsergebnis As Double
-
         Dim Anzahl_Kalkulationen As Short
+        Dim Populationen As Short
         Dim i As Short
 
 
@@ -1563,14 +1564,26 @@ ErrCode_ES_STARTEN:
             .Chart.Axes.Bottom.Title.Caption = "Berechnungsschritt"
             .Aspect.View3D = False
             .Legend.Visible = False
+
+            'Linie zeichen
             Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
             Line1.Add(array_x, array_y)
             Line1.Brush.Color = System.Drawing.Color.Red
             Line1.ClickableLine = True
-            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point1.Pointer.HorizSize = 3
-            Point1.Pointer.VertSize = 3
+
+            'Punkt einfügen
+            Populationen = 1
+            If EVO_Einstellungen1.isPOPUL Then
+                Populationen = EVO_Einstellungen1.NPopul
+            End If
+            For i = 1 To Populationen
+                Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
+                Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+                Point1.Pointer.HorizSize = 3
+                Point1.Pointer.VertSize = 3
+            Next
+
+            'Axen Formatieren
             .Chart.Axes.Bottom.Automatic = False
             .Chart.Axes.Bottom.Maximum = Anzahl_Kalkulationen
             .Chart.Axes.Bottom.Minimum = 0
@@ -1675,36 +1688,56 @@ ErrCode_ES_STARTEN:
             .Header.Text = "Deb D1 - MO-konvex"
             .Aspect.View3D = False
             .Legend.Visible = False
+
+            'Punkt einfügen
+            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point1.Pointer.HorizSize = 3
+            Point1.Pointer.VertSize = 3
             '.AddSeries(TeeChart.ESeriesClass.scPoint)
             '.Series(0).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
             '.Series(0).asPoint.Pointer.HorizontalSize = 3
             '.Series(0).asPoint.Pointer.VerticalSize = 3
-            'For i = 1 To Populationen
-            '    .AddSeries(TeeChart.ESeriesClass.scPoint)
-            '    .Series(i).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
-            '    .Series(i).asPoint.Pointer.HorizontalSize = 1
-            '    .Series(i).asPoint.Pointer.VerticalSize = 1
-            'Next i
+
+            For i = 1 To Populationen
+                Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
+                Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+                Point2.Pointer.HorizSize = 3
+                Point2.Pointer.VertSize = 3
+                '    .AddSeries(TeeChart.ESeriesClass.scPoint)
+                '    .Series(i).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
+                '    .Series(i).asPoint.Pointer.HorizontalSize = 1
+                '    .Series(i).asPoint.Pointer.VerticalSize = 1
+            Next i
+
+            Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
             '.AddSeries(TeeChart.ESeriesClass.scLine)
             '.AddSeries(TeeChart.ESeriesClass.scLine)
-            'For j = 0 To 100
-            '    ArrayX(j) = 0.1 + j * 0.009
-            '    ArrayY(j) = 1 / ArrayX(j)
-            'Next j
+
+            For j = 0 To 100
+                ArrayX(j) = 0.1 + j * 0.009
+                ArrayY(j) = 1 / ArrayX(j)
+            Next j
+
+            Line1.Add(ArrayX, ArrayY)
             '.Series(Populationen + 1).AddArray(100, ArrayY, ArrayX)
-            'For j = 0 To 100
-            '    ArrayY(j) = (1 + 5) / ArrayX(j)
-            'Next j
+            Line1.Brush.Color = System.Drawing.Color.Red
+            Line1.ClickableLine = True
+            For j = 0 To 100
+                ArrayY(j) = (1 + 5) / ArrayX(j)
+            Next j
+
+            Line1.Add(ArrayX, ArrayY)
             '.Series(Populationen + 2).AddArray(100, ArrayY, ArrayX)
 
-            '.Axis.Bottom.Automatic = False
-            '.Axis.Bottom.Maximum = 1
-            '.Axis.Bottom.Minimum = 0.1
-            '.Axis.Bottom.Increment = 0.1
-            '.Axis.Left.Automatic = False
-            '.Axis.Left.Maximum = 10
-            '.Axis.Left.Minimum = 0
-            '.Axis.Left.Increment = 2
+            .Chart.Axes.Bottom.Automatic = False
+            .Chart.Axes.Bottom.Maximum = 1
+            .Chart.Axes.Bottom.Minimum = 0.1
+            .Chart.Axes.Bottom.Increment = 0.1
+            .Chart.Axes.Left.Automatic = False
+            .Chart.Axes.Left.Maximum = 10
+            .Chart.Axes.Left.Minimum = 0
+            .Chart.Axes.Left.Increment = 2
 
         End With
 
