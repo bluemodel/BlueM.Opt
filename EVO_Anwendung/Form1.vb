@@ -920,7 +920,7 @@ Friend Class Form1
 
     Private Sub Form1_Load(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles MyBase.Load
         Combo1.Items.Add("Sinus-Funktion")
-        'Combo1.Items.Add("Beale-Problem")
+        Combo1.Items.Add("Beale-Problem")
         Combo1.Items.Add("Schwefel 2.4-Problem")
         'Combo1.Items.Add("Deb 1")
         'Combo1.Items.Add("Zitzler/Deb T1")
@@ -1559,25 +1559,25 @@ ErrCode_ES_STARTEN:
         With TChart1
             .Clear()
             .Header.Text = "Beale-Problem-Funktionswerte"
-            '.Axis.Left.Title.Caption = "Funktionswert"
-            '.Axis.Bottom.Title.Caption = "Berechnungsschritt"
+            .Chart.Axes.Left.Title.Caption = "Funktionswert"
+            .Chart.Axes.Bottom.Title.Caption = "Berechnungsschritt"
             .Aspect.View3D = False
             .Legend.Visible = False
-            '.AddSeries(TeeChart.ESeriesClass.scLine)
-            '.AddSeries(TeeChart.ESeriesClass.scPoint)
-            '.Series(0).AddArray(UBound(array_y), array_y, array_x)
-            '.Series(0).asLine.Brush.Color = System.Convert.ToUInt32(System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Red))
-            '.Series(0).asLine.ClickableLine = True
-            '.Series(1).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
-            '.Series(1).asPoint.Pointer.HorizontalSize = 3
-            '.Series(1).asPoint.Pointer.VerticalSize = 3
-            '.Axis.Bottom.Automatic = False
-            '.Axis.Bottom.Maximum = Anzahl_Kalkulationen
-            '.Axis.Bottom.Minimum = 0
-            '.Axis.Left.Automatic = False
-            '.Axis.Left.Maximum = Ausgangsergebnis * 1.3
-            '.Axis.Left.Minimum = 0
-            '.Axis.Left.Logarithmic = False
+            Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
+            Line1.Add(array_x, array_y)
+            Line1.Brush.Color = System.Drawing.Color.Red
+            Line1.ClickableLine = True
+            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point1.Pointer.HorizSize = 3
+            Point1.Pointer.VertSize = 3
+            .Chart.Axes.Bottom.Automatic = False
+            .Chart.Axes.Bottom.Maximum = Anzahl_Kalkulationen
+            .Chart.Axes.Bottom.Minimum = 0
+            .Chart.Axes.Left.Automatic = False
+            .Chart.Axes.Left.Maximum = Ausgangsergebnis * 1.3
+            .Chart.Axes.Left.Minimum = 0
+            .Chart.Axes.Left.Logarithmic = False
         End With
 
     End Sub
