@@ -129,362 +129,167 @@ Friend Class Form1
         Me.SuspendLayout()
         '
         'TChart1
-        '
-        '
         'TChart1.Aspect
-        '
         Me.TChart1.Aspect.ElevationFloat = 345
         Me.TChart1.Aspect.RotationFloat = 345
-        '
         'TChart1.Axes
-        '
-        '
         'TChart1.Axes.Bottom
-        '
         Me.TChart1.Axes.Bottom.Automatic = True
-        '
         'TChart1.Axes.Bottom.Grid
-        '
         Me.TChart1.Axes.Bottom.Grid.ZPosition = 0
-        '
         'TChart1.Axes.Bottom.Labels
-        '
-        '
         'TChart1.Axes.Bottom.Labels.Font
-        '
-        '
         'TChart1.Axes.Bottom.Labels.Font.Shadow
-        '
         Me.TChart1.Axes.Bottom.Labels.Font.Shadow.Visible = False
-        '
         'TChart1.Axes.Bottom.Labels.Shadow
-        '
         Me.TChart1.Axes.Bottom.Labels.Shadow.Visible = False
-        '
         'TChart1.Axes.Bottom.Title
-        '
-        '
         'TChart1.Axes.Bottom.Title.Font
-        '
-        '
         'TChart1.Axes.Bottom.Title.Font.Shadow
-        '
         Me.TChart1.Axes.Bottom.Title.Font.Shadow.Visible = False
-        '
         'TChart1.Axes.Bottom.Title.Shadow
-        '
         Me.TChart1.Axes.Bottom.Title.Shadow.Visible = False
-        '
         'TChart1.Axes.Depth
-        '
         Me.TChart1.Axes.Depth.Automatic = True
-        '
         'TChart1.Axes.Depth.Grid
-        '
         Me.TChart1.Axes.Depth.Grid.ZPosition = 0
-        '
         'TChart1.Axes.Depth.Labels
-        '
-        '
         'TChart1.Axes.Depth.Labels.Font
-        '
-        '
         'TChart1.Axes.Depth.Labels.Font.Shadow
-        '
         Me.TChart1.Axes.Depth.Labels.Font.Shadow.Visible = False
-        '
         'TChart1.Axes.Depth.Labels.Shadow
-        '
         Me.TChart1.Axes.Depth.Labels.Shadow.Visible = False
-        '
         'TChart1.Axes.Depth.Title
-        '
-        '
         'TChart1.Axes.Depth.Title.Font
-        '
-        '
         'TChart1.Axes.Depth.Title.Font.Shadow
-        '
         Me.TChart1.Axes.Depth.Title.Font.Shadow.Visible = False
-        '
         'TChart1.Axes.Depth.Title.Shadow
-        '
         Me.TChart1.Axes.Depth.Title.Shadow.Visible = False
-        '
         'TChart1.Axes.DepthTop
-        '
         Me.TChart1.Axes.DepthTop.Automatic = True
-        '
         'TChart1.Axes.DepthTop.Grid
-        '
         Me.TChart1.Axes.DepthTop.Grid.ZPosition = 0
-        '
         'TChart1.Axes.DepthTop.Labels
-        '
-        '
         'TChart1.Axes.DepthTop.Labels.Font
-        '
-        '
         'TChart1.Axes.DepthTop.Labels.Font.Shadow
-        '
         Me.TChart1.Axes.DepthTop.Labels.Font.Shadow.Visible = False
-        '
         'TChart1.Axes.DepthTop.Labels.Shadow
-        '
         Me.TChart1.Axes.DepthTop.Labels.Shadow.Visible = False
-        '
         'TChart1.Axes.DepthTop.Title
-        '
-        '
         'TChart1.Axes.DepthTop.Title.Font
-        '
-        '
         'TChart1.Axes.DepthTop.Title.Font.Shadow
-        '
         Me.TChart1.Axes.DepthTop.Title.Font.Shadow.Visible = False
-        '
         'TChart1.Axes.DepthTop.Title.Shadow
-        '
         Me.TChart1.Axes.DepthTop.Title.Shadow.Visible = False
-        '
         'TChart1.Axes.Left
-        '
         Me.TChart1.Axes.Left.Automatic = True
-        '
         'TChart1.Axes.Left.Grid
-        '
         Me.TChart1.Axes.Left.Grid.ZPosition = 0
-        '
         'TChart1.Axes.Left.Labels
-        '
-        '
         'TChart1.Axes.Left.Labels.Font
-        '
-        '
         'TChart1.Axes.Left.Labels.Font.Shadow
-        '
         Me.TChart1.Axes.Left.Labels.Font.Shadow.Visible = False
-        '
         'TChart1.Axes.Left.Labels.Shadow
-        '
         Me.TChart1.Axes.Left.Labels.Shadow.Visible = False
-        '
         'TChart1.Axes.Left.Title
-        '
-        '
         'TChart1.Axes.Left.Title.Font
-        '
-        '
         'TChart1.Axes.Left.Title.Font.Shadow
-        '
         Me.TChart1.Axes.Left.Title.Font.Shadow.Visible = False
-        '
         'TChart1.Axes.Left.Title.Shadow
-        '
         Me.TChart1.Axes.Left.Title.Shadow.Visible = False
-        '
         'TChart1.Axes.Right
-        '
         Me.TChart1.Axes.Right.Automatic = True
-        '
         'TChart1.Axes.Right.Grid
-        '
         Me.TChart1.Axes.Right.Grid.ZPosition = 0
-        '
         'TChart1.Axes.Right.Labels
-        '
-        '
         'TChart1.Axes.Right.Labels.Font
-        '
-        '
         'TChart1.Axes.Right.Labels.Font.Shadow
-        '
         Me.TChart1.Axes.Right.Labels.Font.Shadow.Visible = False
-        '
         'TChart1.Axes.Right.Labels.Shadow
-        '
         Me.TChart1.Axes.Right.Labels.Shadow.Visible = False
-        '
         'TChart1.Axes.Right.Title
-        '
-        '
         'TChart1.Axes.Right.Title.Font
-        '
-        '
         'TChart1.Axes.Right.Title.Font.Shadow
-        '
         Me.TChart1.Axes.Right.Title.Font.Shadow.Visible = False
-        '
         'TChart1.Axes.Right.Title.Shadow
-        '
         Me.TChart1.Axes.Right.Title.Shadow.Visible = False
-        '
         'TChart1.Axes.Top
-        '
         Me.TChart1.Axes.Top.Automatic = True
-        '
         'TChart1.Axes.Top.Grid
-        '
         Me.TChart1.Axes.Top.Grid.ZPosition = 0
-        '
         'TChart1.Axes.Top.Labels
-        '
-        '
         'TChart1.Axes.Top.Labels.Font
-        '
-        '
         'TChart1.Axes.Top.Labels.Font.Shadow
-        '
         Me.TChart1.Axes.Top.Labels.Font.Shadow.Visible = False
-        '
         'TChart1.Axes.Top.Labels.Shadow
-        '
         Me.TChart1.Axes.Top.Labels.Shadow.Visible = False
-        '
         'TChart1.Axes.Top.Title
-        '
-        '
         'TChart1.Axes.Top.Title.Font
-        '
-        '
         'TChart1.Axes.Top.Title.Font.Shadow
-        '
         Me.TChart1.Axes.Top.Title.Font.Shadow.Visible = False
-        '
         'TChart1.Axes.Top.Title.Shadow
-        '
         Me.TChart1.Axes.Top.Title.Shadow.Visible = False
-        '
         'TChart1.Footer
-        '
-        '
         'TChart1.Footer.Font
-        '
-        '
         'TChart1.Footer.Font.Shadow
-        '
         Me.TChart1.Footer.Font.Shadow.Visible = False
-        '
         'TChart1.Footer.Shadow
-        '
         Me.TChart1.Footer.Shadow.Visible = False
-        '
         'TChart1.Header
-        '
-        '
         'TChart1.Header.Font
-        '
-        '
         'TChart1.Header.Font.Shadow
-        '
         Me.TChart1.Header.Font.Shadow.Visible = False
         Me.TChart1.Header.Lines = New String() {"TeeChart"}
-        '
         'TChart1.Header.Shadow
-        '
         Me.TChart1.Header.Shadow.Visible = False
-        '
         'TChart1.Legend
-        '
-        '
         'TChart1.Legend.Font
-        '
-        '
         'TChart1.Legend.Font.Shadow
-        '
         Me.TChart1.Legend.Font.Shadow.Visible = False
-        '
         'TChart1.Legend.Title
-        '
-        '
         'TChart1.Legend.Title.Font
-        '
         Me.TChart1.Legend.Title.Font.Bold = True
-        '
         'TChart1.Legend.Title.Font.Shadow
-        '
         Me.TChart1.Legend.Title.Font.Shadow.Visible = False
-        '
         'TChart1.Legend.Title.Pen
-        '
         Me.TChart1.Legend.Title.Pen.Visible = False
-        '
         'TChart1.Legend.Title.Shadow
-        '
         Me.TChart1.Legend.Title.Shadow.Visible = False
         Me.TChart1.Location = New System.Drawing.Point(232, 0)
         Me.TChart1.Name = "TChart1"
-        '
         'TChart1.Panel
-        '
-        '
         'TChart1.Panel.Shadow
-        '
         Me.TChart1.Panel.Shadow.Visible = False
         Me.TChart1.Size = New System.Drawing.Size(465, 584)
-        '
         'TChart1.SubFooter
-        '
-        '
         'TChart1.SubFooter.Font
-        '
-        '
         'TChart1.SubFooter.Font.Shadow
-        '
         Me.TChart1.SubFooter.Font.Shadow.Visible = False
-        '
         'TChart1.SubFooter.Shadow
-        '
         Me.TChart1.SubFooter.Shadow.Visible = False
-        '
         'TChart1.SubHeader
-        '
-        '
         'TChart1.SubHeader.Font
-        '
-        '
         'TChart1.SubHeader.Font.Shadow
-        '
         Me.TChart1.SubHeader.Font.Shadow.Visible = False
-        '
         'TChart1.SubHeader.Shadow
-        '
         Me.TChart1.SubHeader.Shadow.Visible = False
         Me.TChart1.TabIndex = 29
-        '
         'TChart1.Walls
-        '
-        '
         'TChart1.Walls.Back
-        '
         Me.TChart1.Walls.Back.AutoHide = False
-        '
         'TChart1.Walls.Back.Shadow
-        '
         Me.TChart1.Walls.Back.Shadow.Visible = False
-        '
         'TChart1.Walls.Bottom
-        '
         Me.TChart1.Walls.Bottom.AutoHide = False
-        '
         'TChart1.Walls.Bottom.Shadow
-        '
         Me.TChart1.Walls.Bottom.Shadow.Visible = False
-        '
         'TChart1.Walls.Left
-        '
         Me.TChart1.Walls.Left.AutoHide = False
-        '
         'TChart1.Walls.Left.Shadow
-        '
         Me.TChart1.Walls.Left.Shadow.Visible = False
-        '
         'TChart1.Walls.Right
-        '
         Me.TChart1.Walls.Right.AutoHide = False
-        '
         'TChart1.Walls.Right.Shadow
-        '
         Me.TChart1.Walls.Right.Shadow.Visible = False
         '
         'EVO_Opt_Verlauf1
