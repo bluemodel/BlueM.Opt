@@ -75,7 +75,6 @@ Friend Class Form1
     Public WithEvents TeeCommander1 As Steema.TeeChart.Commander
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(Form1))
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.TChart1 = New Steema.TeeChart.TChart
         Me.EVO_Opt_Verlauf1 = New EvoForm.EVO_Opt_Verlauf
@@ -111,8 +110,6 @@ Friend Class Form1
         Me.Label6 = New System.Windows.Forms.Label
         Me.Frame_Problem = New Microsoft.VisualBasic.Compatibility.VB6.GroupBoxArray(Me.components)
         Me.TeeCommander1 = New Steema.TeeChart.Commander
-        'CType(Me.EVO_Opt_Verlauf1, System.ComponentModel.ISupportInitialize).BeginInit()
-        'CType(Me.EVO_Einstellungen1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me._Frame_Problem_10.SuspendLayout()
         Me._Frame_Problem_9.SuspendLayout()
         Me._Frame_Problem_8.SuspendLayout()
@@ -129,184 +126,397 @@ Friend Class Form1
         Me.SuspendLayout()
         '
         'TChart1
+        '
+        '
         'TChart1.Aspect
+        '
         Me.TChart1.Aspect.ElevationFloat = 345
         Me.TChart1.Aspect.RotationFloat = 345
+        '
         'TChart1.Axes
+        '
+        '
         'TChart1.Axes.Bottom
+        '
         Me.TChart1.Axes.Bottom.Automatic = True
+        '
         'TChart1.Axes.Bottom.Grid
+        '
         Me.TChart1.Axes.Bottom.Grid.ZPosition = 0
+        '
         'TChart1.Axes.Bottom.Labels
+        '
+        '
         'TChart1.Axes.Bottom.Labels.Font
+        '
+        '
         'TChart1.Axes.Bottom.Labels.Font.Shadow
+        '
         Me.TChart1.Axes.Bottom.Labels.Font.Shadow.Visible = False
+        Me.TChart1.Axes.Bottom.Labels.Font.Unit = System.Drawing.GraphicsUnit.World
+        '
         'TChart1.Axes.Bottom.Labels.Shadow
+        '
         Me.TChart1.Axes.Bottom.Labels.Shadow.Visible = False
+        '
         'TChart1.Axes.Bottom.Title
+        '
+        '
         'TChart1.Axes.Bottom.Title.Font
+        '
+        '
         'TChart1.Axes.Bottom.Title.Font.Shadow
+        '
         Me.TChart1.Axes.Bottom.Title.Font.Shadow.Visible = False
+        Me.TChart1.Axes.Bottom.Title.Font.Unit = System.Drawing.GraphicsUnit.World
+        '
         'TChart1.Axes.Bottom.Title.Shadow
+        '
         Me.TChart1.Axes.Bottom.Title.Shadow.Visible = False
+        '
         'TChart1.Axes.Depth
+        '
         Me.TChart1.Axes.Depth.Automatic = True
+        '
         'TChart1.Axes.Depth.Grid
+        '
         Me.TChart1.Axes.Depth.Grid.ZPosition = 0
+        '
         'TChart1.Axes.Depth.Labels
+        '
+        '
         'TChart1.Axes.Depth.Labels.Font
+        '
+        '
         'TChart1.Axes.Depth.Labels.Font.Shadow
+        '
         Me.TChart1.Axes.Depth.Labels.Font.Shadow.Visible = False
+        Me.TChart1.Axes.Depth.Labels.Font.Unit = System.Drawing.GraphicsUnit.World
+        '
         'TChart1.Axes.Depth.Labels.Shadow
+        '
         Me.TChart1.Axes.Depth.Labels.Shadow.Visible = False
+        '
         'TChart1.Axes.Depth.Title
+        '
+        '
         'TChart1.Axes.Depth.Title.Font
+        '
+        '
         'TChart1.Axes.Depth.Title.Font.Shadow
+        '
         Me.TChart1.Axes.Depth.Title.Font.Shadow.Visible = False
+        Me.TChart1.Axes.Depth.Title.Font.Unit = System.Drawing.GraphicsUnit.World
+        '
         'TChart1.Axes.Depth.Title.Shadow
+        '
         Me.TChart1.Axes.Depth.Title.Shadow.Visible = False
+        '
         'TChart1.Axes.DepthTop
+        '
         Me.TChart1.Axes.DepthTop.Automatic = True
+        '
         'TChart1.Axes.DepthTop.Grid
+        '
         Me.TChart1.Axes.DepthTop.Grid.ZPosition = 0
+        '
         'TChart1.Axes.DepthTop.Labels
+        '
+        '
         'TChart1.Axes.DepthTop.Labels.Font
+        '
+        '
         'TChart1.Axes.DepthTop.Labels.Font.Shadow
+        '
         Me.TChart1.Axes.DepthTop.Labels.Font.Shadow.Visible = False
+        Me.TChart1.Axes.DepthTop.Labels.Font.Unit = System.Drawing.GraphicsUnit.World
+        '
         'TChart1.Axes.DepthTop.Labels.Shadow
+        '
         Me.TChart1.Axes.DepthTop.Labels.Shadow.Visible = False
+        '
         'TChart1.Axes.DepthTop.Title
+        '
+        '
         'TChart1.Axes.DepthTop.Title.Font
+        '
+        '
         'TChart1.Axes.DepthTop.Title.Font.Shadow
+        '
         Me.TChart1.Axes.DepthTop.Title.Font.Shadow.Visible = False
+        Me.TChart1.Axes.DepthTop.Title.Font.Unit = System.Drawing.GraphicsUnit.World
+        '
         'TChart1.Axes.DepthTop.Title.Shadow
+        '
         Me.TChart1.Axes.DepthTop.Title.Shadow.Visible = False
+        '
         'TChart1.Axes.Left
+        '
         Me.TChart1.Axes.Left.Automatic = True
+        '
         'TChart1.Axes.Left.Grid
+        '
         Me.TChart1.Axes.Left.Grid.ZPosition = 0
+        '
         'TChart1.Axes.Left.Labels
+        '
+        '
         'TChart1.Axes.Left.Labels.Font
+        '
+        '
         'TChart1.Axes.Left.Labels.Font.Shadow
+        '
         Me.TChart1.Axes.Left.Labels.Font.Shadow.Visible = False
+        Me.TChart1.Axes.Left.Labels.Font.Unit = System.Drawing.GraphicsUnit.World
+        '
         'TChart1.Axes.Left.Labels.Shadow
+        '
         Me.TChart1.Axes.Left.Labels.Shadow.Visible = False
+        '
         'TChart1.Axes.Left.Title
+        '
+        '
         'TChart1.Axes.Left.Title.Font
+        '
+        '
         'TChart1.Axes.Left.Title.Font.Shadow
+        '
         Me.TChart1.Axes.Left.Title.Font.Shadow.Visible = False
+        Me.TChart1.Axes.Left.Title.Font.Unit = System.Drawing.GraphicsUnit.World
+        '
         'TChart1.Axes.Left.Title.Shadow
+        '
         Me.TChart1.Axes.Left.Title.Shadow.Visible = False
+        '
         'TChart1.Axes.Right
+        '
         Me.TChart1.Axes.Right.Automatic = True
+        '
         'TChart1.Axes.Right.Grid
+        '
         Me.TChart1.Axes.Right.Grid.ZPosition = 0
+        '
         'TChart1.Axes.Right.Labels
+        '
+        '
         'TChart1.Axes.Right.Labels.Font
+        '
+        '
         'TChart1.Axes.Right.Labels.Font.Shadow
+        '
         Me.TChart1.Axes.Right.Labels.Font.Shadow.Visible = False
+        Me.TChart1.Axes.Right.Labels.Font.Unit = System.Drawing.GraphicsUnit.World
+        '
         'TChart1.Axes.Right.Labels.Shadow
+        '
         Me.TChart1.Axes.Right.Labels.Shadow.Visible = False
+        '
         'TChart1.Axes.Right.Title
+        '
+        '
         'TChart1.Axes.Right.Title.Font
+        '
+        '
         'TChart1.Axes.Right.Title.Font.Shadow
+        '
         Me.TChart1.Axes.Right.Title.Font.Shadow.Visible = False
+        Me.TChart1.Axes.Right.Title.Font.Unit = System.Drawing.GraphicsUnit.World
+        '
         'TChart1.Axes.Right.Title.Shadow
+        '
         Me.TChart1.Axes.Right.Title.Shadow.Visible = False
+        '
         'TChart1.Axes.Top
+        '
         Me.TChart1.Axes.Top.Automatic = True
+        '
         'TChart1.Axes.Top.Grid
+        '
         Me.TChart1.Axes.Top.Grid.ZPosition = 0
+        '
         'TChart1.Axes.Top.Labels
+        '
+        '
         'TChart1.Axes.Top.Labels.Font
+        '
+        '
         'TChart1.Axes.Top.Labels.Font.Shadow
+        '
         Me.TChart1.Axes.Top.Labels.Font.Shadow.Visible = False
+        Me.TChart1.Axes.Top.Labels.Font.Unit = System.Drawing.GraphicsUnit.World
+        '
         'TChart1.Axes.Top.Labels.Shadow
+        '
         Me.TChart1.Axes.Top.Labels.Shadow.Visible = False
+        '
         'TChart1.Axes.Top.Title
+        '
+        '
         'TChart1.Axes.Top.Title.Font
+        '
+        '
         'TChart1.Axes.Top.Title.Font.Shadow
+        '
         Me.TChart1.Axes.Top.Title.Font.Shadow.Visible = False
+        Me.TChart1.Axes.Top.Title.Font.Unit = System.Drawing.GraphicsUnit.World
+        '
         'TChart1.Axes.Top.Title.Shadow
+        '
         Me.TChart1.Axes.Top.Title.Shadow.Visible = False
+        '
         'TChart1.Footer
+        '
+        '
         'TChart1.Footer.Font
+        '
+        '
         'TChart1.Footer.Font.Shadow
+        '
         Me.TChart1.Footer.Font.Shadow.Visible = False
+        Me.TChart1.Footer.Font.Unit = System.Drawing.GraphicsUnit.World
+        '
         'TChart1.Footer.Shadow
+        '
         Me.TChart1.Footer.Shadow.Visible = False
+        '
         'TChart1.Header
+        '
+        '
         'TChart1.Header.Font
+        '
+        '
         'TChart1.Header.Font.Shadow
+        '
         Me.TChart1.Header.Font.Shadow.Visible = False
+        Me.TChart1.Header.Font.Unit = System.Drawing.GraphicsUnit.World
         Me.TChart1.Header.Lines = New String() {"TeeChart"}
+        '
         'TChart1.Header.Shadow
+        '
         Me.TChart1.Header.Shadow.Visible = False
+        '
         'TChart1.Legend
+        '
+        '
         'TChart1.Legend.Font
+        '
+        '
         'TChart1.Legend.Font.Shadow
+        '
         Me.TChart1.Legend.Font.Shadow.Visible = False
+        Me.TChart1.Legend.Font.Unit = System.Drawing.GraphicsUnit.World
+        '
         'TChart1.Legend.Title
+        '
+        '
         'TChart1.Legend.Title.Font
+        '
         Me.TChart1.Legend.Title.Font.Bold = True
+        '
         'TChart1.Legend.Title.Font.Shadow
+        '
         Me.TChart1.Legend.Title.Font.Shadow.Visible = False
+        Me.TChart1.Legend.Title.Font.Unit = System.Drawing.GraphicsUnit.World
+        '
         'TChart1.Legend.Title.Pen
+        '
         Me.TChart1.Legend.Title.Pen.Visible = False
+        '
         'TChart1.Legend.Title.Shadow
+        '
         Me.TChart1.Legend.Title.Shadow.Visible = False
         Me.TChart1.Location = New System.Drawing.Point(232, 0)
         Me.TChart1.Name = "TChart1"
+        '
         'TChart1.Panel
+        '
+        '
         'TChart1.Panel.Shadow
+        '
         Me.TChart1.Panel.Shadow.Visible = False
         Me.TChart1.Size = New System.Drawing.Size(465, 584)
+        '
         'TChart1.SubFooter
+        '
+        '
         'TChart1.SubFooter.Font
+        '
+        '
         'TChart1.SubFooter.Font.Shadow
+        '
         Me.TChart1.SubFooter.Font.Shadow.Visible = False
+        Me.TChart1.SubFooter.Font.Unit = System.Drawing.GraphicsUnit.World
+        '
         'TChart1.SubFooter.Shadow
+        '
         Me.TChart1.SubFooter.Shadow.Visible = False
+        '
         'TChart1.SubHeader
+        '
+        '
         'TChart1.SubHeader.Font
+        '
+        '
         'TChart1.SubHeader.Font.Shadow
+        '
         Me.TChart1.SubHeader.Font.Shadow.Visible = False
+        Me.TChart1.SubHeader.Font.Unit = System.Drawing.GraphicsUnit.World
+        '
         'TChart1.SubHeader.Shadow
+        '
         Me.TChart1.SubHeader.Shadow.Visible = False
         Me.TChart1.TabIndex = 29
+        '
         'TChart1.Walls
+        '
+        '
         'TChart1.Walls.Back
+        '
         Me.TChart1.Walls.Back.AutoHide = False
+        '
         'TChart1.Walls.Back.Shadow
+        '
         Me.TChart1.Walls.Back.Shadow.Visible = False
+        '
         'TChart1.Walls.Bottom
+        '
         Me.TChart1.Walls.Bottom.AutoHide = False
+        '
         'TChart1.Walls.Bottom.Shadow
+        '
         Me.TChart1.Walls.Bottom.Shadow.Visible = False
+        '
         'TChart1.Walls.Left
+        '
         Me.TChart1.Walls.Left.AutoHide = False
+        '
         'TChart1.Walls.Left.Shadow
+        '
         Me.TChart1.Walls.Left.Shadow.Visible = False
+        '
         'TChart1.Walls.Right
+        '
         Me.TChart1.Walls.Right.AutoHide = False
+        '
         'TChart1.Walls.Right.Shadow
+        '
         Me.TChart1.Walls.Right.Shadow.Visible = False
         '
         'EVO_Opt_Verlauf1
         '
-        Me.EVO_Opt_Verlauf1.Enabled = True
         Me.EVO_Opt_Verlauf1.Location = New System.Drawing.Point(232, 640)
         Me.EVO_Opt_Verlauf1.Name = "EVO_Opt_Verlauf1"
-        'Me.EVO_Opt_Verlauf1.OcxState = CType(resources.GetObject("EVO_Opt_Verlauf1.OcxState"), System.Windows.Forms.AxHost.State)
+        Me.EVO_Opt_Verlauf1.NGen = CType(0, Short)
+        Me.EVO_Opt_Verlauf1.NNachf = CType(0, Short)
+        Me.EVO_Opt_Verlauf1.NPopul = CType(0, Short)
+        Me.EVO_Opt_Verlauf1.NRunden = CType(0, Short)
         Me.EVO_Opt_Verlauf1.Size = New System.Drawing.Size(489, 73)
         Me.EVO_Opt_Verlauf1.TabIndex = 32
         '
         'EVO_Einstellungen1
         '
-        Me.EVO_Einstellungen1.Enabled = True
         Me.EVO_Einstellungen1.Location = New System.Drawing.Point(0, 0)
         Me.EVO_Einstellungen1.Name = "EVO_Einstellungen1"
-        'Me.EVO_Einstellungen1.OcxState = CType(resources.GetObject("EVO_Einstellungen1.OcxState"), System.Windows.Forms.AxHost.State)
         Me.EVO_Einstellungen1.Size = New System.Drawing.Size(225, 585)
         Me.EVO_Einstellungen1.TabIndex = 31
         '
@@ -799,8 +1009,6 @@ Friend Class Form1
         Me.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.StartPosition = System.Windows.Forms.FormStartPosition.Manual
         Me.Text = "Evolutionsstrategie"
-        'CType(Me.EVO_Opt_Verlauf1, System.ComponentModel.ISupportInitialize).EndInit()
-        'CType(Me.EVO_Einstellungen1, System.ComponentModel.ISupportInitialize).EndInit()
         Me._Frame_Problem_10.ResumeLayout(False)
         Me._Frame_Problem_9.ResumeLayout(False)
         Me._Frame_Problem_8.ResumeLayout(False)
@@ -1386,12 +1594,12 @@ ErrCode_ES_STARTEN:
                     QN(1) = QN(1) + ((X(1) - X(i) ^ 2) ^ 2 + (X(i) - 1) ^ 2)
                 Next i
                 Call Zielfunktion_zeichnen2(QN(1), durchlauf, ipop)
-
             Case "Deb 1" 'Deb 2000, D1 (Konvexe Pareto-Front)
                 f1 = Par(1, 1) * (9 / 10) + 0.1
                 f2 = (1 + 5 * Par(2, 1)) / (Par(1, 1) * (9 / 10) + 0.1)
                 QN(1) = f1
                 QN(2) = f2
+                Call Zielfunktion_zeichnen3(f1, f2, ipop)
             Case "Zitzler/Deb T1" 'Zitzler/Deb/Thiele 2000, T1 (Konvexe Pareto-Front)
                 f1 = Par(1, 1)
                 f2 = 0
@@ -1402,7 +1610,7 @@ ErrCode_ES_STARTEN:
                 f2 = f2 * (1 - System.Math.Sqrt(f1 / f2))
                 QN(1) = f1
                 QN(2) = f2
-                'Call Zielfunktion_zeichnen3(f1, f2, ipop)
+                Call Zielfunktion_zeichnen3(f1, f2, ipop)
             Case "Zitzler/Deb T2" 'Zitzler/Deb/Thiele 2000, T2 (Non-Konvexe Pareto-Front)
                 f1 = Par(1, 1)
                 f2 = 0
@@ -1670,9 +1878,7 @@ ErrCode_ES_STARTEN:
             .Chart.Axes.Left.Maximum = Ausgangsergebnis * 1.2
             .Chart.Axes.Left.Minimum = -1
             .Chart.Axes.Left.Logarithmic = False
-
         End With
-
     End Sub
 
     Private Sub Ausgangswert_D1()
@@ -1702,8 +1908,8 @@ ErrCode_ES_STARTEN:
             For i = 1 To Populationen
                 Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
                 Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-                Point2.Pointer.HorizSize = 3
-                Point2.Pointer.VertSize = 3
+                Point2.Pointer.HorizSize = 1
+                Point2.Pointer.VertSize = 1
                 '    .AddSeries(TeeChart.ESeriesClass.scPoint)
                 '    .Series(i).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
                 '    .Series(i).asPoint.Pointer.HorizontalSize = 1
@@ -1711,6 +1917,7 @@ ErrCode_ES_STARTEN:
             Next i
 
             Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
+            Dim Line2 As New Steema.TeeChart.Styles.Line(.Chart)
             '.AddSeries(TeeChart.ESeriesClass.scLine)
             '.AddSeries(TeeChart.ESeriesClass.scLine)
 
@@ -1723,12 +1930,14 @@ ErrCode_ES_STARTEN:
             '.Series(Populationen + 1).AddArray(100, ArrayY, ArrayX)
             Line1.Brush.Color = System.Drawing.Color.Red
             Line1.ClickableLine = True
+
             For j = 0 To 100
                 ArrayY(j) = (1 + 5) / ArrayX(j)
             Next j
-
-            Line1.Add(ArrayX, ArrayY)
+            Line2.Add(ArrayX, ArrayY)
             '.Series(Populationen + 2).AddArray(100, ArrayY, ArrayX)
+            Line1.Brush.Color = System.Drawing.Color.Blue
+            Line1.ClickableLine = True
 
             .Chart.Axes.Bottom.Automatic = False
             .Chart.Axes.Bottom.Maximum = 1
@@ -1759,40 +1968,58 @@ ErrCode_ES_STARTEN:
             .Header.Text = "Zitzler/Deb/Theile T1"
             .Aspect.View3D = False
             .Legend.Visible = False
+            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
             '.AddSeries(TeeChart.ESeriesClass.scPoint)
+            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point1.Pointer.HorizSize = 1
+            Point1.Pointer.VertSize = 1
             '.Series(0).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
             '.Series(0).asPoint.Pointer.HorizontalSize = 1
             '.Series(0).asPoint.Pointer.VerticalSize = 1
-            'For i = 1 To Populationen
-            '    .AddSeries(TeeChart.ESeriesClass.scPoint)
-            '    .Series(i).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
-            '    .Series(i).asPoint.Pointer.HorizontalSize = 3
-            '    .Series(i).asPoint.Pointer.VerticalSize = 3
-            'Next i
+
+            For i = 1 To Populationen
+                Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
+                Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+                Point2.Pointer.HorizSize = 3
+                Point2.Pointer.VertSize = 3
+                '    .AddSeries(TeeChart.ESeriesClass.scPoint)
+                '    .Series(i).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
+                '    .Series(i).asPoint.Pointer.HorizontalSize = 3
+                '    .Series(i).asPoint.Pointer.VerticalSize = 3
+            Next i
+            Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
             '.AddSeries(TeeChart.ESeriesClass.scLine)
+            Line1.LinePen.Width = 2
+            Line1.Color = System.Drawing.Color.Blue
             '.Series(Populationen + 1).asLine.LinePen.Width = 2
             '.Series(Populationen + 1).Color = System.Convert.ToUInt32(System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Blue))
 
-            'For j = 0 To 1000
-            '    ArrayX(j) = j / 1000
-            '    ArrayY(j) = 1 - System.Math.Sqrt(ArrayX(j))
-            'Next j
+            For j = 0 To 1000
+                ArrayX(j) = j / 1000
+                ArrayY(j) = 1 - System.Math.Sqrt(ArrayX(j))
+            Next j
+            Line1.Add(ArrayX, ArrayY)
             '.Series(Populationen + 1).AddArray(1000, ArrayY, ArrayX)
 
+            Dim Point3 As New Steema.TeeChart.Styles.Points
             '.AddSeries(TeeChart.ESeriesClass.scPoint)
+            Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point3.Pointer.HorizSize = 3
+            Point3.Pointer.VertSize = 3
+            Line1.Color = System.Drawing.Color.Red
             '.Series(Populationen + 2).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
             '.Series(Populationen + 2).asPoint.Pointer.HorizontalSize = 2
             '.Series(Populationen + 2).asPoint.Pointer.VerticalSize = 2
             '.Series(Populationen + 2).Color = System.Convert.ToUInt32(System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Red))
 
-            '.Axis.Bottom.Automatic = False
-            '.Axis.Bottom.Maximum = 1
-            '.Axis.Bottom.Minimum = 0
-            '.Axis.Bottom.Increment = 0.2
-            '.Axis.Left.Automatic = False
-            '.Axis.Left.Maximum = 4
-            '.Axis.Left.Minimum = 0
-            '.Axis.Left.Increment = 0.5
+            .Chart.Axes.Bottom.Automatic = False
+            .Chart.Axes.Bottom.Maximum = 1
+            .Chart.Axes.Bottom.Minimum = 0
+            .Chart.Axes.Bottom.Increment = 0.2
+            .Chart.Axes.Left.Automatic = False
+            .Chart.Axes.Left.Maximum = 4
+            .Chart.Axes.Left.Minimum = 0
+            .Chart.Axes.Left.Increment = 0.5
         End With
 
     End Sub
@@ -2185,7 +2412,6 @@ ErrCode_ES_STARTEN:
         Dim Datenmenge As Short
         Dim Unterteilung_X As Double
 
-
         Unterteilung_X = 2 * 3.141592654 / (AnzPar - 1)
         ReDim array_x(AnzPar - 1) '$$ jetzt richtig?
         ReDim array_y(AnzPar - 1) '$$ jetzt richtig?
@@ -2198,11 +2424,7 @@ ErrCode_ES_STARTEN:
             .Series(ipop).Clear()
             .Series(ipop).Add(array_x, array_y)
         End With
-
-
     End Sub
-
-
     Private Sub Zielfunktion_zeichnen2(ByRef Wert As Double, ByRef durchlauf As Integer, ByRef ipop As Short)
         Dim i As Short
         Dim x1, x2 As Double
@@ -2210,14 +2432,11 @@ ErrCode_ES_STARTEN:
         Dim Datenmenge As Short
         Dim Unterteilung_X As Double
 
-
         With TChart1
             .Series(ipop).Add(durchlauf, Wert, "")
         End With
 
-
     End Sub
-
     Private Sub Zielfunktion_zeichnen3(ByRef f1 As Double, ByRef f2 As Double, ByRef ipop As Short)
 
         With TChart1
@@ -2235,7 +2454,6 @@ ErrCode_ES_STARTEN:
 
     Private Sub Bestwertzeichnen_Pareto(ByRef Bestwert(,) As Double, ByRef ipop As Short)
         Dim i As Short
-
         With TChart1
             .Series(ipop).Clear()
             If UBound(Bestwert, 2) = 2 Then
@@ -2271,8 +2489,6 @@ ErrCode_ES_STARTEN:
             End If
         End With
     End Sub
-
-
 
     Private Sub Par_Sinus_KeyPress(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.KeyPressEventArgs) Handles Par_Sinus.KeyPress
         Dim KeyAscii As Short = Asc(eventArgs.KeyChar)

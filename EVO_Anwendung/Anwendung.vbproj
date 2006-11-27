@@ -143,6 +143,10 @@
                     BuildAction = "EmbeddedResource"
                 />
                 <File
+                    RelPath = "licenses.licx"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
                     RelPath = "Module1.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
