@@ -1110,7 +1110,6 @@ Friend Class Form1
                 Combo1.Items.Add("Schwefel 2.4-Problem")
                 Combo1.SelectedIndex = 0
             Case 2
-            Case 3
                 Combo1.Items.Clear()
                 Combo1.Items.Add("Zitzler/Deb T1")
                 Combo1.Items.Add("Zitzler/Deb T2")
@@ -1119,19 +1118,16 @@ Friend Class Form1
                 Combo1.Items.Add("CONSTR")
                 Combo1.Items.Add("TNK")
                 Combo1.Items.Add("Box")
+                Combo1.Items.Add("Deb 1")
                 Combo1.SelectedIndex = 0
         End Select
-    End Sub
-
-    Private Sub EVO_Einstellungen1_Click()
-
     End Sub
 
     Private Sub Form1_Load(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles MyBase.Load
         Combo1.Items.Add("Sinus-Funktion")
         Combo1.Items.Add("Beale-Problem")
         Combo1.Items.Add("Schwefel 2.4-Problem")
-        Combo1.Items.Add("Deb 1")
+        'Combo1.Items.Add("Deb 1")
         'Combo1.Items.Add("Zitzler/Deb T1")
         'Combo1.Items.Add("Zitzler/Deb T2")
         'Combo1.Items.Add("Zitzler/Deb T3")
@@ -1928,7 +1924,7 @@ ErrCode_ES_STARTEN:
 
             Line1.Add(ArrayX, ArrayY)
             '.Series(Populationen + 1).AddArray(100, ArrayY, ArrayX)
-            Line1.Brush.Color = System.Drawing.Color.Red
+            'Line1.Brush.Color = System.Drawing.Color.Red
             Line1.ClickableLine = True
 
             For j = 0 To 100
@@ -1936,8 +1932,8 @@ ErrCode_ES_STARTEN:
             Next j
             Line2.Add(ArrayX, ArrayY)
             '.Series(Populationen + 2).AddArray(100, ArrayY, ArrayX)
-            Line1.Brush.Color = System.Drawing.Color.Blue
-            Line1.ClickableLine = True
+            Line2.Brush.Color = System.Drawing.Color.Blue
+            Line2.ClickableLine = True
 
             .Chart.Axes.Bottom.Automatic = False
             .Chart.Axes.Bottom.Maximum = 1
@@ -1968,14 +1964,16 @@ ErrCode_ES_STARTEN:
             .Header.Text = "Zitzler/Deb/Theile T1"
             .Aspect.View3D = False
             .Legend.Visible = False
-            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
-            '.AddSeries(TeeChart.ESeriesClass.scPoint)
-            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point1.Pointer.HorizSize = 1
-            Point1.Pointer.VertSize = 1
-            '.Series(0).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
-            '.Series(0).asPoint.Pointer.HorizontalSize = 1
-            '.Series(0).asPoint.Pointer.VerticalSize = 1
+
+            'Für was soll das gut sein?
+            'Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
+            ''.AddSeries(TeeChart.ESeriesClass.scPoint)
+            'Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            'Point1.Pointer.HorizSize = 1
+            'Point1.Pointer.VertSize = 1
+            ''.Series(0).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
+            ''.Series(0).asPoint.Pointer.HorizontalSize = 1
+            ''.Series(0).asPoint.Pointer.VerticalSize = 1
 
             For i = 1 To Populationen
                 Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)

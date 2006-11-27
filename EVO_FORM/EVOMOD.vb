@@ -36,6 +36,5 @@ Module EVOMOD
 	Public Const EVO_POP_PENALTY_SPANNWEITE As Short = 2
 	'Modus der Optimierung
 	Public Const EVO_MODUS_SINGEL_OBJECTIVE As Short = 1
-	Public Const EVO_MODUS_MULTIOBJECTIVE As Short = 2
-	Public Const EVO_MODUS_MULTIOBJECTIVE_PARETO As Short = 3
+    Public Const EVO_MODUS_MULTIOBJECTIVE_PARETO As Short = 2
 End Module
