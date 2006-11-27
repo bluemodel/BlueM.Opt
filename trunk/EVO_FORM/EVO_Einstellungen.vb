@@ -772,37 +772,11 @@ Me.ResumeLayout(False)
 				LabelNMemberSecondPop.Enabled = False
 				TextNMemberSecondPop.Enabled = False
 				
-			Case EVO_MODUS_MULTIOBJECTIVE
-				'Vorgaben und Anzeige
-				TextAnzGen.Text = CStr(1)
-				TextAnzEltern.Text = CStr(3)
-				TextAnzNachf.Text = CStr(10)
-				FramePop.Enabled = True
-				TextAnzRunden.Enabled = True
-				TextAnzRunden.Text = CStr(50)
-				TextAnzPop.Enabled = True
-				TextAnzPopEltern.Enabled = True
-				ComboOptPopEltern.Enabled = True
-				ComboPopStrategie.Enabled = True
-				ComboPopPenalty.Enabled = True
-				For i = 1 To 6
-					LabelFramePop(i).Enabled = True
-				Next i
-				
-				'Setzen der Modusabhängigen Vorgaben
-				isParetoOptimierung = False
-				isMultiObjectiveOptimierung = True
-				CheckisPopul.CheckState = System.Windows.Forms.CheckState.Checked
-				LabelInteract.Enabled = False
-				TextInteract.Enabled = False
-				LabelNMemberSecondPop.Enabled = False
-				TextNMemberSecondPop.Enabled = False
-				
 			Case EVO_MODUS_MULTIOBJECTIVE_PARETO
 				'Vorgaben und Anzeige
-				TextAnzGen.Text = CStr(250)
-				TextAnzEltern.Text = CStr(25)
-				TextAnzNachf.Text = CStr(75)
+                TextAnzGen.Text = CStr(25)
+                TextAnzEltern.Text = CStr(3)
+                TextAnzNachf.Text = CStr(7)
 				FramePop.Enabled = False
 				TextAnzRunden.Enabled = False
 				TextAnzRunden.Text = CStr(10)
@@ -931,34 +905,31 @@ Me.ResumeLayout(False)
 	'UPGRADE_WARNING: Das Ereignis CheckisPopul.CheckStateChanged kann ausgelöst werden, wenn das Formular initialisiert wird. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup2075"'
 	Private Sub CheckisPopul_CheckStateChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles CheckisPopul.CheckStateChanged
 		Dim i As Short
-		
-		If VB6.GetItemData(ComboModus, ComboModus.SelectedIndex) = EVO_MODUS_MULTIOBJECTIVE Then
-			CheckisPopul.CheckState = System.Windows.Forms.CheckState.Checked
-		End If
-		If CheckisPopul.CheckState = System.Windows.Forms.CheckState.Checked Then
-			FramePop.Enabled = True
-			TextAnzRunden.Enabled = True
-			TextAnzPop.Enabled = True
-			TextAnzPopEltern.Enabled = True
-			ComboOptPopEltern.Enabled = True
-			ComboPopStrategie.Enabled = True
-			ComboPopPenalty.Enabled = True
-			
-			For i = 1 To 6
-				LabelFramePop(i).Enabled = True
-			Next i
-		Else
-			FramePop.Enabled = False
-			TextAnzRunden.Enabled = False
-			TextAnzPop.Enabled = False
-			TextAnzPopEltern.Enabled = False
-			ComboOptPopEltern.Enabled = False
-			ComboPopStrategie.Enabled = False
-			ComboPopPenalty.Enabled = False
-			For i = 1 To 6
-				LabelFramePop(i).Enabled = False
-			Next i
-		End If
+
+        If CheckisPopul.CheckState = System.Windows.Forms.CheckState.Checked Then
+            FramePop.Enabled = True
+            TextAnzRunden.Enabled = True
+            TextAnzPop.Enabled = True
+            TextAnzPopEltern.Enabled = True
+            ComboOptPopEltern.Enabled = True
+            ComboPopStrategie.Enabled = True
+            ComboPopPenalty.Enabled = True
+
+            For i = 1 To 6
+                LabelFramePop(i).Enabled = True
+            Next i
+        Else
+            FramePop.Enabled = False
+            TextAnzRunden.Enabled = False
+            TextAnzPop.Enabled = False
+            TextAnzPopEltern.Enabled = False
+            ComboOptPopEltern.Enabled = False
+            ComboPopStrategie.Enabled = False
+            ComboPopPenalty.Enabled = False
+            For i = 1 To 6
+                LabelFramePop(i).Enabled = False
+            Next i
+        End If
 	End Sub
 	
 	
@@ -977,9 +948,8 @@ Me.ResumeLayout(False)
 	
 	Private Sub FILLCOMBO_MODUS(ByRef Cntrl As System.Windows.Forms.ComboBox)
 		Cntrl.Items.Add(New VB6.ListBoxItem("Single-Objective", EVO_MODUS_SINGEL_OBJECTIVE))
-		Cntrl.Items.Add(New VB6.ListBoxItem("Multi_Objective", EVO_MODUS_MULTIOBJECTIVE))
-		Cntrl.Items.Add(New VB6.ListBoxItem("Multi_Objective Pareto", EVO_MODUS_MULTIOBJECTIVE_PARETO))
-		Cntrl.SelectedIndex = 0
+        Cntrl.Items.Add(New VB6.ListBoxItem("Multi Object Pareto", EVO_MODUS_MULTIOBJECTIVE_PARETO))
+        Cntrl.SelectedIndex = 0
 	End Sub
 	
 	Private Sub FILLCOMBO_OPTELTERN(ByRef Cntrl As System.Windows.Forms.ComboBox)
@@ -1005,10 +975,6 @@ Me.ResumeLayout(False)
 		Cntrl.Items.Clear()
 		Select Case VB6.GetItemData(ComboModus, ComboModus.SelectedIndex)
 			Case EVO_MODUS_SINGEL_OBJECTIVE
-				Cntrl.Items.Add(New VB6.ListBoxItem("Mittelwert", EVO_POP_PENALTY_MITTELWERT))
-				Cntrl.Items.Add(New VB6.ListBoxItem("Schlechtester", EVO_POP_PENALTY_SCHLECHTESTER))
-				Cntrl.SelectedIndex = 0
-			Case EVO_MODUS_MULTIOBJECTIVE
 				Cntrl.Items.Add(New VB6.ListBoxItem("Mittelwert", EVO_POP_PENALTY_MITTELWERT))
 				Cntrl.Items.Add(New VB6.ListBoxItem("Schlechtester", EVO_POP_PENALTY_SCHLECHTESTER))
 				Cntrl.SelectedIndex = 0
