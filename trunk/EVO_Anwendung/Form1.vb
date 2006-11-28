@@ -1080,10 +1080,8 @@ Friend Class Form1
                     Frame_Problem(7).BringToFront()
                 Case "CONSTR"
                     Frame_Problem(8).BringToFront()
-                Case "TNK"
-                    Frame_Problem(9).BringToFront()
                 Case "Box"
-                    Frame_Problem(10).BringToFront()
+                    Frame_Problem(9).BringToFront()
             End Select
         End If
     End Sub
@@ -1111,14 +1109,13 @@ Friend Class Form1
                 Combo1.SelectedIndex = 0
             Case 2
                 Combo1.Items.Clear()
+                Combo1.Items.Add("Deb 1")
                 Combo1.Items.Add("Zitzler/Deb T1")
                 Combo1.Items.Add("Zitzler/Deb T2")
                 Combo1.Items.Add("Zitzler/Deb T3")
                 Combo1.Items.Add("Zitzler/Deb T4")
                 Combo1.Items.Add("CONSTR")
-                Combo1.Items.Add("TNK")
                 Combo1.Items.Add("Box")
-                Combo1.Items.Add("Deb 1")
                 Combo1.SelectedIndex = 0
         End Select
     End Sub
@@ -1132,6 +1129,8 @@ Friend Class Form1
         'Combo1.Items.Add("Zitzler/Deb T2")
         'Combo1.Items.Add("Zitzler/Deb T3")
         'Combo1.Items.Add("Zitzler/Deb T4")
+        'Combo1.Items.Add("CONSTR")
+        'Combo1.Items.Add("Box")
         Combo1.SelectedIndex = 0
         TeeCommander1.Chart = TChart1
     End Sub
@@ -1293,15 +1292,6 @@ Friend Class Form1
                 mypara(1, 1) = Rnd()
                 mypara(2, 1) = Rnd()
                 Call Ausgangswert_CONSTR()
-            Case "TNK" 'x1 = [0;PI], x2=[0;PI]
-                globalAnzPar = 2
-                globalAnzZiel = 2
-                globalAnzRand = 2
-                ReDim mypara(globalAnzPar, 1)
-                Randomize()
-                mypara(1, 1) = Rnd()
-                mypara(2, 1) = Rnd()
-                Call Ausgangswert_TNK()
             Case "Box"
                 globalAnzPar = 3
                 globalAnzZiel = 3
@@ -1653,23 +1643,10 @@ ErrCode_ES_STARTEN:
                 RN(1) = g1
                 RN(2) = g2
                 Call Zielfunktion_zeichnen3(f1, f2, ipop)
-            Case "TNK"
-                f1 = Par(1, 1) * PI
-                f2 = Par(2, 1) * PI
-
-                g1 = Par(1, 1) * PI * Par(1, 1) * PI + Par(2, 1) * PI * Par(2, 1) * PI - 1 - 0.1 * System.Math.Cos(16 * (1 / System.Math.Tan(Par(1, 1) / Par(2, 1))))
-
-                g2 = 0.5 - (Par(1, 1) * PI - 0.5) * (Par(1, 1) * PI - 0.5) - (Par(2, 1) * PI - 0.5) * (Par(2, 1) * PI - 0.5)
-
-                QN(1) = f1
-                QN(2) = f2
-                RN(1) = g1
-                RN(2) = g2
             Case "Box"
                 f1 = Par(1, 1) ^ 2
                 f2 = Par(2, 1) ^ 2
                 f3 = Par(3, 1) ^ 2
-                '
                 g1 = Par(1, 1) + Par(3, 1) - 0.5
                 g2 = Par(1, 1) + Par(2, 1) + Par(3, 1) - 0.8
 
@@ -1688,6 +1665,7 @@ ErrCode_ES_STARTEN:
                 'Call Zielfunktion_zeichnen4(f1, f2, f3)
         End Select
     End Function
+
     Private Sub Sinuskurve()
         Dim i As Short
         Dim Datenmenge As Short
@@ -1943,10 +1921,9 @@ ErrCode_ES_STARTEN:
             .Chart.Axes.Left.Maximum = 10
             .Chart.Axes.Left.Minimum = 0
             .Chart.Axes.Left.Increment = 2
-
         End With
-
     End Sub
+
     Private Sub Ausgangswert_T1()
         Dim Populationen As Short
         Dim i, j As Short
@@ -2071,7 +2048,6 @@ ErrCode_ES_STARTEN:
             '.Axis.Left.Maximum = 4
             '.Axis.Left.Minimum = 0
         End With
-
     End Sub
 
     Private Sub Ausgangswert_T3()
@@ -2257,96 +2233,6 @@ ErrCode_ES_STARTEN:
             '.Axis.Left.Minimum = 0
             '.Axis.Left.Increment = 2
         End With
-
-    End Sub
-
-    Private Sub Ausgangswert_TNK()
-        Dim Populationen As Short
-        Dim i, j As Short
-        Dim ArrayX() As Double
-        Dim ArrayY() As Double
-
-        ReDim ArrayX(100)
-        ReDim ArrayY(100)
-
-        If EVO_Einstellungen1.isPOPUL Then
-            Populationen = EVO_Einstellungen1.NPopul
-        Else
-            Populationen = 1
-        End If
-
-        With TChart1
-            .Clear()
-            .Header.Text = "CONSTR"
-            .Aspect.View3D = False
-            .Legend.Visible = False
-            '.AddSeries(TeeChart.ESeriesClass.scPoint)
-            '.Series(0).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
-            '.Series(0).asPoint.Pointer.HorizontalSize = 1
-            '.Series(0).asPoint.Pointer.VerticalSize = 1
-            'For i = 1 To Populationen
-            '    .AddSeries(TeeChart.ESeriesClass.scPoint)
-            '    .Series(i).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
-            '    .Series(i).asPoint.Pointer.HorizontalSize = 3
-            '    .Series(i).asPoint.Pointer.VerticalSize = 3
-            'Next i
-
-            '.AddSeries(TeeChart.ESeriesClass.scLine)
-            '.Series(Populationen + 1).asLine.LinePen.Width = 2
-            '.Series(Populationen + 1).Color = System.Convert.ToUInt32(System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Blue))
-            'For j = 0 To 100
-            '    ArrayX(j) = j / 100 * PI
-            '    ArrayY(j) = System.Math.Sqrt(0.5 - (ArrayX(j) - 0.5) ^ 2) + 0.5
-            'Next j
-            '.Series(Populationen + 1).AddArray(100, ArrayY, ArrayX)
-
-
-            '.AddSeries(TeeChart.ESeriesClass.scPoint)
-            '.Series(Populationen + 2).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
-            '.Series(Populationen + 2).asPoint.Pointer.HorizontalSize = 2
-            '.Series(Populationen + 2).asPoint.Pointer.VerticalSize = 2
-            '.Series(Populationen + 2).Color = System.Convert.ToUInt32(System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Red))
-
-            '        .AddSeries scLine
-            '        .Series(Populationen + 3).asLine.LinePen.Width = 2
-            '        .Series(Populationen + 3).Color = vbBlue
-            '        For j = 0 To 100
-            '            ArrayY(j) = (1 + 5) / ArrayX(j)
-            '        Next j
-            '        .Series(Populationen + 3).AddArray 100, ArrayY(), ArrayX()
-            '
-            '        .AddSeries scLine
-            '        .Series(Populationen + 4).asLine.LinePen.Width = 1
-            '        .Series(Populationen + 4).Color = vbBlack
-            '        ReDim ArrayX(61)
-            '        ReDim ArrayY(61)
-            '        For j = 0 To 61
-            '            ArrayX(j) = 0.1 + (j + 2) * 0.009
-            '            ArrayY(j) = (7 - 9 * ArrayX(j)) / ArrayX(j)
-            '        Next j
-            '        .Series(Populationen + 4).AddArray 61, ArrayY(), ArrayX()
-            '
-            '        .AddSeries scLine
-            '        .Series(Populationen + 5).asLine.LinePen.Width = 1
-            '        .Series(Populationen + 5).Color = vbBlack
-            '        ReDim ArrayX(61)
-            '        ReDim ArrayY(61)
-            '        For j = 0 To 61
-            '            ArrayX(j) = 0.1 + (j + 2) * 0.009
-            '            ArrayY(j) = (9 * ArrayX(j)) / ArrayX(j)
-            '        Next j
-            '        .Series(Populationen + 5).AddArray 61, ArrayY(), ArrayX()
-
-            '.Axis.Bottom.Automatic = False
-            '.Axis.Bottom.Maximum = 1.4
-            '.Axis.Bottom.Minimum = 0
-            '.Axis.Bottom.Increment = 0.2
-            '.Axis.Left.Automatic = False
-            '.Axis.Left.Maximum = 1.4
-            '.Axis.Left.Minimum = 0
-            '.Axis.Left.Increment = 0.2
-        End With
-
     End Sub
 
     Private Sub Ausgangswert_Box()
@@ -2401,7 +2287,6 @@ ErrCode_ES_STARTEN:
             '.Axis.Depth.Minimum = 0
             '.Axis.Depth.Increment = 0.2
         End With
-
     End Sub
     Private Sub Zielfunktion_zeichnen(ByRef AnzPar As Short, ByRef Par(,) As Double, ByRef durchlauf As Integer, ByRef ipop As Short)
         Dim i As Short
