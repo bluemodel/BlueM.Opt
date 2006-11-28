@@ -1397,11 +1397,8 @@ Friend Class Form1
         durchlauf = 0
 
 Start_Evolutionsrunden:
-
         'Cursor setzen
-        'UPGRADE_WARNING: Screen Eigenschaft Screen.MousePointer hat ein neues Verhalten. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup2065"'
-        'DONE
-        System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+        'System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
         '***********************************************************************************************
         'Loop über alle Runden
         '***********************************************************************************************
@@ -1522,17 +1519,13 @@ Start_Evolutionsrunden:
         '***************************************************************************************************
         '***************************************************************************************************
         'UPGRADE_NOTE: Das Objekt evolutionsstrategie kann erst dann gelöscht werden, wenn die Garbagecollection durchgeführt wurde. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1029"'
+        '$$Ersetzen durch dispose funzt net
         evolutionsstrategie = Nothing
-
         ES_STARTEN = True
 
 EXIT_ES_STARTEN:
         'Cursor setzen
-        'UPGRADE_ISSUE: Die Konstante Default wurde nicht aktualisiert. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup2070"'
-        'UPGRADE_ISSUE: Die Screen-Eigenschaft Screen.MousePointer unterstützt keine benutzerdefinierten Mauszeiger. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup2036"'
-        'UPGRADE_WARNING: Screen Eigenschaft Screen.MousePointer hat ein neues Verhalten. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup2065"'
-        'DONE
-        System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+        'System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
         Exit Function
         'xxxxxxxxxxxxxxxxxxxxxxxxxx
 Err_ES_STARTEN:
@@ -2288,6 +2281,7 @@ ErrCode_ES_STARTEN:
             '.Axis.Depth.Increment = 0.2
         End With
     End Sub
+
     Private Sub Zielfunktion_zeichnen(ByRef AnzPar As Short, ByRef Par(,) As Double, ByRef durchlauf As Integer, ByRef ipop As Short)
         Dim i As Short
         Dim x1, x2 As Double
@@ -2308,6 +2302,7 @@ ErrCode_ES_STARTEN:
             .Series(ipop).Add(array_x, array_y)
         End With
     End Sub
+
     Private Sub Zielfunktion_zeichnen2(ByRef Wert As Double, ByRef durchlauf As Integer, ByRef ipop As Short)
         Dim i As Short
         Dim x1, x2 As Double
@@ -2318,8 +2313,8 @@ ErrCode_ES_STARTEN:
         With TChart1
             .Series(ipop).Add(durchlauf, Wert, "")
         End With
-
     End Sub
+
     Private Sub Zielfunktion_zeichnen3(ByRef f1 As Double, ByRef f2 As Double, ByRef ipop As Short)
 
         With TChart1
@@ -2327,6 +2322,7 @@ ErrCode_ES_STARTEN:
         End With
 
     End Sub
+
     Private Sub Zielfunktion_zeichnen4(ByRef f1 As Double, ByRef f2 As Double, ByRef f3 As Double)
 
         With TChart1
@@ -2373,6 +2369,7 @@ ErrCode_ES_STARTEN:
         End With
     End Sub
 
+    '$$ Welchen zweck hat das?
     Private Sub Par_Sinus_KeyPress(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.KeyPressEventArgs) Handles Par_Sinus.KeyPress
         Dim KeyAscii As Short = Asc(eventArgs.KeyChar)
         'UPGRADE_ISSUE: Zuweisung wird nicht unterstützt: KeyAscii an Nicht-Null-Wert Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1058"'
