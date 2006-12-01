@@ -1838,7 +1838,7 @@ ErrCode_ES_STARTEN:
         End With
     End Sub
 
-    Private Sub Ausgangswert_D1() 'hier stimmt noch was nicht
+    Private Sub Ausgangswert_D1()
         Dim Populationen As Short
         Dim i, j As Short
         Dim ArrayX(100) As Double
@@ -1852,48 +1852,49 @@ ErrCode_ES_STARTEN:
             .Aspect.View3D = False
             .Legend.Visible = False
 
-            'Grenze rechts oben Berechnen
+            'Punkt einfügen
+            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point1.Pointer.HorizSize = 3
+            Point1.Pointer.VertSize = 3
+            '.AddSeries(TeeChart.ESeriesClass.scPoint)
+            '.Series(0).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
+            '.Series(0).asPoint.Pointer.HorizontalSize = 3
+            '.Series(0).asPoint.Pointer.VerticalSize = 3
+
+            For i = 1 To Populationen
+                Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
+                Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+                Point2.Pointer.HorizSize = 1
+                Point2.Pointer.VertSize = 1
+                '    .AddSeries(TeeChart.ESeriesClass.scPoint)
+                '    .Series(i).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
+                '    .Series(i).asPoint.Pointer.HorizontalSize = 1
+                '    .Series(i).asPoint.Pointer.VerticalSize = 1
+            Next i
+
+            Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
+            Dim Line2 As New Steema.TeeChart.Styles.Line(.Chart)
+            '.AddSeries(TeeChart.ESeriesClass.scLine)
+            '.AddSeries(TeeChart.ESeriesClass.scLine)
+
             For j = 0 To 100
                 ArrayX(j) = 0.1 + j * 0.009
                 ArrayY(j) = 1 / ArrayX(j)
             Next j
 
-            'Linie Serie 0
-            Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-            Line1.Brush.Color = System.Drawing.Color.Green
+            Line1.Add(ArrayX, ArrayY)
+            '.Series(Populationen + 1).AddArray(100, ArrayY, ArrayX)
+            'Line1.Brush.Color = System.Drawing.Color.Red
             Line1.ClickableLine = True
-            .Series(0).Add(ArrayX, ArrayY)
 
-            'Series für Populationen, nur für Konsistenz, nicht nötig für MultObjective
-            For i = 1 To Populationen
-                Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
-                Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-                Point2.Pointer.HorizSize = 3
-                Point2.Pointer.VertSize = 3
-            Next i
-
-            'Punkte für Bestwertspeicher Series (Populationen + 1)
-            Dim Line0 As New Steema.TeeChart.Styles.Line(.Chart)
-            Line0.Brush.Color = System.Drawing.Color.Green
-            Line0.ClickableLine = True
-            .Series(Populationen + 1).FillSampleValues(10)
-
-            'Punkte für Sekundäre Population Series (Populationen + 2)
-            Dim Line2 As New Steema.TeeChart.Styles.Line(.Chart)
-            Line2.Brush.Color = System.Drawing.Color.Green
-            Line2.ClickableLine = True
-            .Series(Populationen + 2).FillSampleValues(10)
-
-            'Neuberechnung Linie
             For j = 0 To 100
                 ArrayY(j) = (1 + 5) / ArrayX(j)
             Next j
-
-            'Linie rechts oben
-            Dim Line3 As New Steema.TeeChart.Styles.Line(.Chart)
-            Line3.Brush.Color = System.Drawing.Color.Red
-            Line3.ClickableLine = True
-            .Series(Populationen + 3).Add(ArrayX, ArrayY)
+            Line2.Add(ArrayX, ArrayY)
+            '.Series(Populationen + 2).AddArray(100, ArrayY, ArrayX)
+            Line2.Brush.Color = System.Drawing.Color.Blue
+            Line2.ClickableLine = True
 
             .Chart.Axes.Bottom.Automatic = False
             .Chart.Axes.Bottom.Maximum = 1
@@ -1925,19 +1926,17 @@ ErrCode_ES_STARTEN:
             .Legend.Visible = False
 
             'Für was soll das gut sein?
-            'Für die Sekundärepopulation
-            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)             'Series(0)
-            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Cross
-            Point1.Pointer.HorizSize = 1
-            Point1.Pointer.VertSize = 1
-            '.AddSeries(TeeChart.ESeriesClass.scPoint)
-            '.Series(0).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
-            '.Series(0).asPoint.Pointer.HorizontalSize = 1
-            '.Series(0).asPoint.Pointer.VerticalSize = 1
+            'Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
+            ''.AddSeries(TeeChart.ESeriesClass.scPoint)
+            'Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            'Point1.Pointer.HorizSize = 1
+            'Point1.Pointer.VertSize = 1
+            ''.Series(0).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
+            ''.Series(0).asPoint.Pointer.HorizontalSize = 1
+            ''.Series(0).asPoint.Pointer.VerticalSize = 1
 
-            'Für jede Population eine Series funzt!!!
             For i = 1 To Populationen
-                Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)         'Series(1 bis Population)
+                Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
                 Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
                 Point2.Pointer.HorizSize = 3
                 Point2.Pointer.VertSize = 3
@@ -1946,39 +1945,31 @@ ErrCode_ES_STARTEN:
                 '    .Series(i).asPoint.Pointer.HorizontalSize = 3
                 '    .Series(i).asPoint.Pointer.VerticalSize = 3
             Next i
-
-            'Linie für die Paretofront
-            Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)                'Series(Population + 1)
+            Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
+            '.AddSeries(TeeChart.ESeriesClass.scLine)
             Line1.LinePen.Width = 2
             Line1.Color = System.Drawing.Color.Blue
-            '.AddSeries(TeeChart.ESeriesClass.scLine)
             '.Series(Populationen + 1).asLine.LinePen.Width = 2
             '.Series(Populationen + 1).Color = System.Convert.ToUInt32(System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Blue))
 
-            'Linie für die Bestwerte? Könnte man auch noch machen
-
-            '????????
             For j = 0 To 1000
                 ArrayX(j) = j / 1000
                 ArrayY(j) = 1 - System.Math.Sqrt(ArrayX(j))
             Next j
-
             Line1.Add(ArrayX, ArrayY)
             '.Series(Populationen + 1).AddArray(1000, ArrayY, ArrayX)
 
-            'Soll die Series für die sekundäre Population sein
-            Dim Point3 As New Steema.TeeChart.Styles.Points                     'Series(Population + 2)
-            Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Star
-            Point3.Pointer.HorizSize = 6
-            Point3.Pointer.VertSize = 6
-            Point3.Color = System.Drawing.Color.Red
+            Dim Point3 As New Steema.TeeChart.Styles.Points
             '.AddSeries(TeeChart.ESeriesClass.scPoint)
+            Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point3.Pointer.HorizSize = 3
+            Point3.Pointer.VertSize = 3
+            Line1.Color = System.Drawing.Color.Red
             '.Series(Populationen + 2).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
             '.Series(Populationen + 2).asPoint.Pointer.HorizontalSize = 2
             '.Series(Populationen + 2).asPoint.Pointer.VerticalSize = 2
             '.Series(Populationen + 2).Color = System.Convert.ToUInt32(System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Red))
 
-            '+++++++++++++++++++++++++++++++++++++++++
             .Chart.Axes.Bottom.Automatic = False
             .Chart.Axes.Bottom.Maximum = 1
             .Chart.Axes.Bottom.Minimum = 0
@@ -2325,20 +2316,13 @@ ErrCode_ES_STARTEN:
 
     End Sub
 
-    Private Sub Bestwertzeichnen_Pareto(ByRef Population(,) As Double, ByRef Bestwert(,) As Double, ByRef ipop As Short)
+    Private Sub Bestwertzeichnen_Pareto(ByRef Bestwert(,) As Double, ByRef ipop As Short)
         Dim i As Short
-        Dim Datenreihe As Short
-
         With TChart1
-            If EVO_Einstellungen1.isPOPUL Then
-                Datenreihe = EVO_Einstellungen1.NPopul + 1
-            Else
-                Datenreihe = 2
-            End If
-            .Series(Datenreihe).Clear()
+            .Series(ipop).Clear()
             If UBound(Bestwert, 2) = 2 Then
                 For i = 1 To UBound(Bestwert, 1)
-                    .Series(Datenreihe).Add(Bestwert(i, 1), Bestwert(i, 2), "")
+                    .Series(ipop).Add(Bestwert(i, 1), Bestwert(i, 2), "")
                 Next i
             ElseIf UBound(Bestwert, 2) = 3 Then
                 For i = 1 To UBound(Bestwert, 1)
@@ -2351,7 +2335,6 @@ ErrCode_ES_STARTEN:
     Private Sub SekundärePopulationZeichnen(ByRef Population(,) As Double)
         Dim i As Short
         Dim Datenreihe As Short
-
         With TChart1
             If EVO_Einstellungen1.isPOPUL Then
                 Datenreihe = EVO_Einstellungen1.NPopul + 2
@@ -2371,6 +2354,7 @@ ErrCode_ES_STARTEN:
         End With
     End Sub
 
+    '$$ Welchen zweck hat das?
     Private Sub Par_Sinus_KeyPress(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.KeyPressEventArgs) Handles Par_Sinus.KeyPress
         Dim KeyAscii As Short = Asc(eventArgs.KeyChar)
         'UPGRADE_ISSUE: Zuweisung wird nicht unterstützt: KeyAscii an Nicht-Null-Wert Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1058"'
