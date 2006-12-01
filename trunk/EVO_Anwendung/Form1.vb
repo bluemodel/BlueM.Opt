@@ -1946,7 +1946,6 @@ ErrCode_ES_STARTEN:
                 ArrayX(j) = j / 1000
                 ArrayY(j) = 1 - System.Math.Sqrt(ArrayX(j))
             Next j
-
             Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
             Line1.Brush.Color = System.Drawing.Color.Green
             Line1.ClickableLine = True
@@ -1981,37 +1980,44 @@ ErrCode_ES_STARTEN:
             .Header.Text = "Zitzler/Deb/Theile T2"
             .Aspect.View3D = False
             .Legend.Visible = False
-            '.AddSeries(TeeChart.ESeriesClass.scPoint)
-            '.Series(0).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
-            '.Series(0).asPoint.Pointer.HorizontalSize = 1
-            '.Series(0).asPoint.Pointer.VerticalSize = 1
-            'For i = 1 To Populationen
-            '    .AddSeries(TeeChart.ESeriesClass.scPoint)
-            '    .Series(i).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
-            '    .Series(i).asPoint.Pointer.HorizontalSize = 3
-            '    .Series(i).asPoint.Pointer.VerticalSize = 3
-            'Next i
-            '.AddSeries(TeeChart.ESeriesClass.scLine)
-            'For j = 0 To 100
-            '    ArrayX(j) = j / 100
-            '    ArrayY(j) = 1 - (ArrayX(j) * ArrayX(j))
-            'Next j
-            '.Series(Populationen + 1).AddArray(100, ArrayY, ArrayX)
 
-            '.AddSeries(TeeChart.ESeriesClass.scPoint)
-            '.Series(Populationen + 2).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
-            '.Series(Populationen + 2).asPoint.Pointer.HorizontalSize = 2
-            '.Series(Populationen + 2).asPoint.Pointer.VerticalSize = 2
-            '.Series(Populationen + 2).Color = System.Convert.ToUInt32(System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Red))
+            'S0: Punkt einfügen dient nur dazu um die Series 0 zu besetzen
+            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point1.Pointer.HorizSize = 3
+            Point1.Pointer.VertSize = 3
 
-            '.Axis.Bottom.Automatic = False
-            '.Axis.Bottom.Maximum = 1
-            '.Axis.Bottom.Minimum = 0
-            '.Axis.Bottom.Increment = 0.2
-            ''        .Axis.Left.Automatic = True
-            '.Axis.Left.Automatic = False
-            '.Axis.Left.Maximum = 4
-            '.Axis.Left.Minimum = 0
+            'S1: Hier wird nur eine Population gezeichnet.
+            Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point2.Color = System.Drawing.Color.Orange
+            Point2.Pointer.HorizSize = 2
+            Point2.Pointer.VertSize = 2
+
+            'S2: Series für die Sekundäre Population
+            Dim Point3 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point3.Color = System.Drawing.Color.Blue
+            Point3.Pointer.HorizSize = 3
+            Point3.Pointer.VertSize = 3
+
+            'S3: Serie für die Grenze
+            For j = 0 To 100
+                ArrayX(j) = j / 100
+                ArrayY(j) = 1 - (ArrayX(j) * ArrayX(j))
+            Next j
+            Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
+            Line1.Brush.Color = System.Drawing.Color.Green
+            Line1.ClickableLine = True
+            .Series(3).Add(ArrayX, ArrayY)
+
+            .Chart.Axes.Bottom.Automatic = False
+            .Chart.Axes.Bottom.Maximum = 1
+            .Chart.Axes.Bottom.Minimum = 0
+            .Chart.Axes.Bottom.Increment = 0.2
+            .Chart.Axes.Left.Automatic = False
+            .Chart.Axes.Left.Maximum = 4
+            .Chart.Axes.Left.Minimum = 0
         End With
     End Sub
 
@@ -2028,6 +2034,38 @@ ErrCode_ES_STARTEN:
             .Header.Text = "Zitzler/Deb/Theile T3"
             .Aspect.View3D = False
             .Legend.Visible = False
+
+            'S0: Punkt einfügen dient nur dazu um die Series 0 zu besetzen
+            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point1.Pointer.HorizSize = 3
+            Point1.Pointer.VertSize = 3
+
+            'S1: Hier wird nur eine Population gezeichnet.
+            Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point2.Color = System.Drawing.Color.Orange
+            Point2.Pointer.HorizSize = 2
+            Point2.Pointer.VertSize = 2
+
+            'S2: Series für die Sekundäre Population
+            Dim Point3 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point3.Color = System.Drawing.Color.Blue
+            Point3.Pointer.HorizSize = 3
+            Point3.Pointer.VertSize = 3
+
+            'S3: Serie für die Grenze
+            For j = 0 To 100
+                ArrayX(j) = j / 100
+                ArrayY(j) = 1 - System.Math.Sqrt(ArrayX(j)) - ArrayX(j) * System.Math.Sin(10 * 3.14159265358979 * ArrayX(j))
+            Next j
+            Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
+            Line1.Brush.Color = System.Drawing.Color.Green
+            Line1.ClickableLine = True
+            .Series(3).Add(ArrayX, ArrayY)
+
+
             '.AddSeries(TeeChart.ESeriesClass.scPoint)
             '.Series(0).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
             '.Series(0).asPoint.Pointer.HorizontalSize = 1
@@ -2051,14 +2089,14 @@ ErrCode_ES_STARTEN:
             '.Series(Populationen + 2).asPoint.Pointer.VerticalSize = 2
             '.Series(Populationen + 2).Color = System.Convert.ToUInt32(System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Red))
 
-            '.Axis.Bottom.Automatic = False
-            '.Axis.Bottom.Maximum = 1
-            '.Axis.Bottom.Minimum = 0
-            '.Axis.Bottom.Increment = 0.2
-            '.Axis.Left.Automatic = True
-            '        .Axis.Left.Maximum = 2
-            '        .Axis.Left.Minimum = -1
-            '        .Axis.Left.Increment = 0.5
+            .Chart.Axes.Bottom.Automatic = False
+            .Chart.Axes.Bottom.Maximum = 1
+            .Chart.Axes.Bottom.Minimum = 0
+            .Chart.Axes.Bottom.Increment = 0.2
+            .Chart.Axes.Left.Automatic = True
+            .Chart.Axes.Left.Maximum = 2
+            .Chart.Axes.Left.Minimum = -1
+            .Chart.Axes.Left.Increment = 0.5
         End With
 
     End Sub
