@@ -1841,8 +1841,11 @@ ErrCode_ES_STARTEN:
     Private Sub Ausgangswert_D1()
         Dim Populationen As Short
         Dim i, j As Short
-        Dim ArrayX(100) As Double
-        Dim ArrayY(100) As Double
+        Dim Array1X(100) As Double
+        Dim Array1Y(100) As Double
+        Dim Array2X(100) As Double
+        Dim Array2Y(100) As Double
+
 
         Populationen = EVO_Einstellungen1.NPopul
 
@@ -1875,28 +1878,29 @@ ErrCode_ES_STARTEN:
             'Hier muss ein Fehler in der Rechnung sein. die beiden Linien liegen aufeinander.
             'S3: Linie 1 wird errechnet und gezeichnet
             For j = 0 To 100
-                ArrayX(j) = 0.1 + j * 0.009
-                ArrayY(j) = 1 / ArrayX(j)
+                Array1X(j) = 0.1 + j * 0.009
+                Array1Y(j) = 1 / Array1X(j)
             Next j
             Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
             Line1.Brush.Color = System.Drawing.Color.Green
             Line1.ClickableLine = True
-            .Series(3).Add(ArrayX, ArrayY)
+            .Series(3).Add(Array1X, Array1Y)
 
             'S4: Linie 2 wird errechnet und gezeichnet
             For j = 0 To 100
-                ArrayY(j) = (1 + 5) / ArrayX(j)
+                Array2X(j) = 0.1 + j * 0.009
+                Array2Y(j) = (1 + 5) / Array2X(j)
             Next j
             Dim Line2 As New Steema.TeeChart.Styles.Line(.Chart)
             Line2.Brush.Color = System.Drawing.Color.Red
             Line2.ClickableLine = True
-            .Series(4).Add(ArrayX, ArrayY)
+            .Series(4).Add(Array2X, Array2Y)
 
             .Chart.Axes.Bottom.Automatic = False
             .Chart.Axes.Bottom.Maximum = 1
             .Chart.Axes.Bottom.Minimum = 0.1
             .Chart.Axes.Bottom.Increment = 0.1
-            .Chart.Axes.Left.Automatic = False
+            .Chart.Axes.Left.Automatic = True
             .Chart.Axes.Left.Maximum = 10
             .Chart.Axes.Left.Minimum = 0
             .Chart.Axes.Left.Increment = 2
@@ -2080,8 +2084,8 @@ ErrCode_ES_STARTEN:
     Private Sub Ausgangswert_T4()
         Dim Populationen As Short
         Dim i, j As Short
-        Dim ArrayX(1000) As Double
-        Dim ArrayY(1000) As Double
+        Dim ArrayX(13, 101) As Double
+        Dim ArrayY(13, 101) As Double
 
         Populationen = EVO_Einstellungen1.NPopul
 
@@ -2114,13 +2118,13 @@ ErrCode_ES_STARTEN:
             'S3: Serie für die Grenze
             For i = 3 To 13
                 For j = 0 To 100
-                    ArrayX(j) = j / 100
-                    ArrayY(j) = 1 - System.Math.Sqrt(ArrayX(j)) - ArrayX(j) * System.Math.Sin(10 * 3.14159265358979 * ArrayX(j))
+                    ArrayX(i, j) = j / 100
+                    ArrayY(i, j) = 1 - System.Math.Sqrt(ArrayX(i, j)) - ArrayX(i, j) * System.Math.Sin(10 * 3.14159265358979 * ArrayX(i, j))
                 Next j
                 Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
                 'Line1.Brush.Color = System.Drawing.Color.Green
                 Line1.ClickableLine = True
-                .Series(i).Add(ArrayX, ArrayY)
+                .Series(i).Add(ArrayX(i, j), ArrayY(i, j))
             Next i
 
             '.AddSeries(TeeChart.ESeriesClass.scPoint)
@@ -2161,11 +2165,14 @@ ErrCode_ES_STARTEN:
     Private Sub Ausgangswert_CONSTR()
         Dim Populationen As Short
         Dim i, j As Short
-        Dim ArrayX() As Double
-        Dim ArrayY() As Double
-
-        ReDim ArrayX(100)
-        ReDim ArrayY(100)
+        Dim Array1X(100) As Double
+        Dim Array1Y(100) As Double
+        Dim Array2X(100) As Double
+        Dim Array2Y(100) As Double
+        Dim Array3X(61) As Double
+        Dim Array3Y(61) As Double
+        Dim Array4X(61) As Double
+        Dim Array4Y(61) As Double
 
         If EVO_Einstellungen1.isPOPUL Then
             Populationen = EVO_Einstellungen1.NPopul
@@ -2201,104 +2208,47 @@ ErrCode_ES_STARTEN:
 
             'S3: Serie für die Grenze 1
             For j = 0 To 100
-                ArrayX(j) = 0.1 + j * 0.009
-                ArrayY(j) = 1 / ArrayX(j)
+                Array1X(j) = 0.1 + j * 0.009
+                Array1Y(j) = 1 / Array1X(j)
             Next j
             Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-            Line1.Brush.Color = System.Drawing.Color.Green
+            Line1.Brush.Color = System.Drawing.Color.Red
             Line1.ClickableLine = True
-            .Series(3).Add(ArrayX, ArrayY)
+            .Series(3).Add(Array1X, Array1Y)
 
             'S4: Serie für die Grenze 2
             For j = 0 To 100
-                ArrayX(j) = ArrayX(j)
-                ArrayY(j) = (1 + 5) / ArrayX(j)
+                Array2X(j) = 0.1 + j * 0.009
+                Array2Y(j) = (1 + 5) / Array2X(j)
             Next j
             Dim Line2 As New Steema.TeeChart.Styles.Line(.Chart)
-            Line2.Brush.Color = System.Drawing.Color.OrangeRed
+            Line2.Brush.Color = System.Drawing.Color.Red
             Line2.ClickableLine = True
-            .Series(4).Add(ArrayX, ArrayY)
+            .Series(4).Add(Array2X, Array2Y)
 
             'S5: Serie für die Grenze 3
-            ReDim ArrayX(61)
-            ReDim ArrayY(61)
+            ReDim Array3X(61)
+            ReDim Array3Y(61)
             For j = 0 To 61
-                ArrayX(j) = 0.1 + (j + 2) * 0.009
-                ArrayY(j) = (7 - 9 * ArrayX(j)) / ArrayX(j)
+                Array3X(j) = 0.1 + (j + 2) * 0.009
+                Array3Y(j) = (7 - 9 * Array3X(j)) / Array3X(j)
             Next j
             Dim Line3 As New Steema.TeeChart.Styles.Line(.Chart)
-            Line3.Brush.Color = System.Drawing.Color.Olive
+            Line3.Brush.Color = System.Drawing.Color.Blue
             Line3.ClickableLine = True
-            .Series(5).Add(ArrayX, ArrayY)
+            .Series(5).Add(Array3X, Array3Y)
 
             'S6: Serie für die Grenze 4
-            ReDim ArrayX(61)
-            ReDim ArrayY(61)
+            ReDim Array4X(61)
+            ReDim Array4Y(61)
             For j = 0 To 61
-                ArrayX(j) = 0.1 + (j + 2) * 0.009
-                ArrayY(j) = (9 * ArrayX(j)) / ArrayX(j)
+                Array4X(j) = 0.1 + (j + 2) * 0.009
+                Array4Y(j) = (9 * Array4X(j)) / Array4X(j)
             Next j
             Dim Line4 As New Steema.TeeChart.Styles.Line(.Chart)
-            Line4.Brush.Color = System.Drawing.Color.Olive
+            Line4.Brush.Color = System.Drawing.Color.Red
             Line4.ClickableLine = True
-            .Series(6).Add(ArrayX, ArrayY)
-
-            '.AddSeries(TeeChart.ESeriesClass.scPoint)
-            '.Series(0).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
-            '.Series(0).asPoint.Pointer.HorizontalSize = 1
-            '.Series(0).asPoint.Pointer.VerticalSize = 1
-            'For i = 1 To Populationen
-            '    .AddSeries(TeeChart.ESeriesClass.scPoint)
-            '    .Series(i).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
-            '    .Series(i).asPoint.Pointer.HorizontalSize = 3
-            '    .Series(i).asPoint.Pointer.VerticalSize = 3
-            'Next i
-
-            '.AddSeries(TeeChart.ESeriesClass.scLine)
-            '.Series(Populationen + 1).asLine.LinePen.Width = 2
-            '.Series(Populationen + 1).Color = System.Convert.ToUInt32(System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Blue))
-            'For j = 0 To 100
-            '    ArrayX(j) = 0.1 + j * 0.009
-            '    ArrayY(j) = 1 / ArrayX(j)
-            'Next j
-            '.Series(Populationen + 1).AddArray(100, ArrayY, ArrayX)
-
-
-            '.AddSeries(TeeChart.ESeriesClass.scPoint)
-            '.Series(Populationen + 2).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
-            '.Series(Populationen + 2).asPoint.Pointer.HorizontalSize = 2
-            '.Series(Populationen + 2).asPoint.Pointer.VerticalSize = 2
-            '.Series(Populationen + 2).Color = System.Convert.ToUInt32(System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Red))
-
-            '.AddSeries(TeeChart.ESeriesClass.scLine)
-            '.Series(Populationen + 3).asLine.LinePen.Width = 2
-            '.Series(Populationen + 3).Color = System.Convert.ToUInt32(System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Blue))
-            'For j = 0 To 100
-            '    ArrayY(j) = (1 + 5) / ArrayX(j)
-            'Next j
-            '.Series(Populationen + 3).AddArray(100, ArrayY, ArrayX)
-
-            '.AddSeries(TeeChart.ESeriesClass.scLine)
-            '.Series(Populationen + 4).asLine.LinePen.Width = 1
-            '.Series(Populationen + 4).Color = System.Convert.ToUInt32(System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Black))
-            'ReDim ArrayX(61)
-            'ReDim ArrayY(61)
-            'For j = 0 To 61
-            '    ArrayX(j) = 0.1 + (j + 2) * 0.009
-            '    ArrayY(j) = (7 - 9 * ArrayX(j)) / ArrayX(j)
-            'Next j
-            '.Series(Populationen + 4).AddArray(61, ArrayY, ArrayX)
-
-            '.AddSeries(TeeChart.ESeriesClass.scLine)
-            '.Series(Populationen + 5).asLine.LinePen.Width = 1
-            '.Series(Populationen + 5).Color = System.Convert.ToUInt32(System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Black))
-            'ReDim ArrayX(61)
-            'ReDim ArrayY(61)
-            'For j = 0 To 61
-            '    ArrayX(j) = 0.1 + (j + 2) * 0.009
-            '    ArrayY(j) = (9 * ArrayX(j)) / ArrayX(j)
-            'Next j
-            '.Series(Populationen + 5).AddArray(61, ArrayY, ArrayX)
+            .Series(6).Add(Array4X, Array4Y)
 
             .Chart.Axes.Bottom.Automatic = False
             .Chart.Axes.Bottom.Maximum = 1
