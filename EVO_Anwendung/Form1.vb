@@ -1857,14 +1857,13 @@ ErrCode_ES_STARTEN:
             Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
             Point1.Pointer.HorizSize = 3
             Point1.Pointer.VertSize = 3
-            '.Series(0).FillSampleValues(10)
 
-            'S1: Hier wird nur eine Population gezeichnet. Schleife könnte man eigentlich entfernen
+            'S1: Hier wird nur eine Population gezeichnet.
             Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
             Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point2.Color = System.Drawing.Color.Red
-            Point2.Pointer.HorizSize = 3
-            Point2.Pointer.VertSize = 3
+            Point2.Color = System.Drawing.Color.Orange
+            Point2.Pointer.HorizSize = 2
+            Point2.Pointer.VertSize = 2
 
             'S2: Series für die Sekundäre Population
             Dim Point3 As New Steema.TeeChart.Styles.Points(.Chart)
@@ -1922,50 +1921,36 @@ ErrCode_ES_STARTEN:
             .Aspect.View3D = False
             .Legend.Visible = False
 
-            'Für was soll das gut sein?
-            'Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
-            ''.AddSeries(TeeChart.ESeriesClass.scPoint)
-            'Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            'Point1.Pointer.HorizSize = 1
-            'Point1.Pointer.VertSize = 1
-            ''.Series(0).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
-            ''.Series(0).asPoint.Pointer.HorizontalSize = 1
-            ''.Series(0).asPoint.Pointer.VerticalSize = 1
+            'S0: Punkt einfügen dient nur dazu um die Series 0 zu besetzen
+            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point1.Pointer.HorizSize = 3
+            Point1.Pointer.VertSize = 3
 
-            For i = 1 To Populationen
-                Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
-                Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-                Point2.Pointer.HorizSize = 3
-                Point2.Pointer.VertSize = 3
-                '    .AddSeries(TeeChart.ESeriesClass.scPoint)
-                '    .Series(i).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
-                '    .Series(i).asPoint.Pointer.HorizontalSize = 3
-                '    .Series(i).asPoint.Pointer.VerticalSize = 3
-            Next i
-            Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-            '.AddSeries(TeeChart.ESeriesClass.scLine)
-            Line1.LinePen.Width = 2
-            Line1.Color = System.Drawing.Color.Blue
-            '.Series(Populationen + 1).asLine.LinePen.Width = 2
-            '.Series(Populationen + 1).Color = System.Convert.ToUInt32(System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Blue))
+            'S1: Hier wird nur eine Population gezeichnet.
+            Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point2.Color = System.Drawing.Color.Orange
+            Point2.Pointer.HorizSize = 2
+            Point2.Pointer.VertSize = 2
 
+            'S2: Series für die Sekundäre Population
+            Dim Point3 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point3.Color = System.Drawing.Color.Blue
+            Point3.Pointer.HorizSize = 3
+            Point3.Pointer.VertSize = 3
+
+            'S3: Serie für die Grenze
             For j = 0 To 1000
                 ArrayX(j) = j / 1000
                 ArrayY(j) = 1 - System.Math.Sqrt(ArrayX(j))
             Next j
-            Line1.Add(ArrayX, ArrayY)
-            '.Series(Populationen + 1).AddArray(1000, ArrayY, ArrayX)
 
-            Dim Point3 As New Steema.TeeChart.Styles.Points
-            '.AddSeries(TeeChart.ESeriesClass.scPoint)
-            Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point3.Pointer.HorizSize = 3
-            Point3.Pointer.VertSize = 3
-            Line1.Color = System.Drawing.Color.Red
-            '.Series(Populationen + 2).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
-            '.Series(Populationen + 2).asPoint.Pointer.HorizontalSize = 2
-            '.Series(Populationen + 2).asPoint.Pointer.VerticalSize = 2
-            '.Series(Populationen + 2).Color = System.Convert.ToUInt32(System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Red))
+            Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
+            Line1.Brush.Color = System.Drawing.Color.Green
+            Line1.ClickableLine = True
+            .Series(3).Add(ArrayX, ArrayY)
 
             .Chart.Axes.Bottom.Automatic = False
             .Chart.Axes.Bottom.Maximum = 1
