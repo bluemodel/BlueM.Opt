@@ -775,8 +775,8 @@ Me.ResumeLayout(False)
 			Case EVO_MODUS_MULTIOBJECTIVE_PARETO
 				'Vorgaben und Anzeige
                 TextAnzGen.Text = CStr(25)
-                TextAnzEltern.Text = CStr(3)
-                TextAnzNachf.Text = CStr(7)
+                TextAnzEltern.Text = CStr(25)
+                TextAnzNachf.Text = CStr(75)
 				FramePop.Enabled = False
 				TextAnzRunden.Enabled = False
 				TextAnzRunden.Text = CStr(10)
