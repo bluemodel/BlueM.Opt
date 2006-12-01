@@ -1852,49 +1852,46 @@ ErrCode_ES_STARTEN:
             .Aspect.View3D = False
             .Legend.Visible = False
 
-            'Punkt einfügen
+            'S0: Punkt einfügen dient nur dazu um die Series 0 zu besetzen
             Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
             Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
             Point1.Pointer.HorizSize = 3
             Point1.Pointer.VertSize = 3
-            '.AddSeries(TeeChart.ESeriesClass.scPoint)
-            '.Series(0).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
-            '.Series(0).asPoint.Pointer.HorizontalSize = 3
-            '.Series(0).asPoint.Pointer.VerticalSize = 3
+            '.Series(0).FillSampleValues(10)
 
-            For i = 1 To Populationen
-                Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
-                Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-                Point2.Pointer.HorizSize = 1
-                Point2.Pointer.VertSize = 1
-                '    .AddSeries(TeeChart.ESeriesClass.scPoint)
-                '    .Series(i).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
-                '    .Series(i).asPoint.Pointer.HorizontalSize = 1
-                '    .Series(i).asPoint.Pointer.VerticalSize = 1
-            Next i
+            'S1: Hier wird nur eine Population gezeichnet. Schleife könnte man eigentlich entfernen
+            Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point2.Color = System.Drawing.Color.Red
+            Point2.Pointer.HorizSize = 3
+            Point2.Pointer.VertSize = 3
 
-            Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-            Dim Line2 As New Steema.TeeChart.Styles.Line(.Chart)
-            '.AddSeries(TeeChart.ESeriesClass.scLine)
-            '.AddSeries(TeeChart.ESeriesClass.scLine)
+            'S2: Series für die Sekundäre Population
+            Dim Point3 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point3.Color = System.Drawing.Color.Blue
+            Point3.Pointer.HorizSize = 3
+            Point3.Pointer.VertSize = 3
 
+            'Hier muss ein Fehler in der Rechnung sein. die beiden Linien liegen aufeinander.
+            'S3: Linie 1 wird errechnet und gezeichnet
             For j = 0 To 100
                 ArrayX(j) = 0.1 + j * 0.009
                 ArrayY(j) = 1 / ArrayX(j)
             Next j
-
-            Line1.Add(ArrayX, ArrayY)
-            '.Series(Populationen + 1).AddArray(100, ArrayY, ArrayX)
-            'Line1.Brush.Color = System.Drawing.Color.Red
+            Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
+            Line1.Brush.Color = System.Drawing.Color.Green
             Line1.ClickableLine = True
+            .Series(3).Add(ArrayX, ArrayY)
 
+            'S4: Linie 2 wird errechnet und gezeichnet
             For j = 0 To 100
                 ArrayY(j) = (1 + 5) / ArrayX(j)
             Next j
-            Line2.Add(ArrayX, ArrayY)
-            '.Series(Populationen + 2).AddArray(100, ArrayY, ArrayX)
-            Line2.Brush.Color = System.Drawing.Color.Blue
+            Dim Line2 As New Steema.TeeChart.Styles.Line(.Chart)
+            Line2.Brush.Color = System.Drawing.Color.Red
             Line2.ClickableLine = True
+            .Series(4).Add(ArrayX, ArrayY)
 
             .Chart.Axes.Bottom.Automatic = False
             .Chart.Axes.Bottom.Maximum = 1
@@ -2306,7 +2303,7 @@ ErrCode_ES_STARTEN:
 
     Private Sub Zielfunktion_zeichnen3(ByRef f1 As Double, ByRef f2 As Double, ByRef ipop As Short)
 
-        TChart1.Series(ipop).Add(f1, f2, "")
+        TChart1.Series(1).Add(f1, f2, "")
 
     End Sub
 
@@ -2339,7 +2336,7 @@ ErrCode_ES_STARTEN:
             If EVO_Einstellungen1.isPOPUL Then
                 Datenreihe = EVO_Einstellungen1.NPopul + 2
             Else
-                Datenreihe = 3
+                Datenreihe = 2
             End If
             .Series(Datenreihe).Clear()
             If UBound(Population, 2) = 2 Then
