@@ -1108,7 +1108,6 @@ Friend Class Form1
                 Combo1.Items.Add("Schwefel 2.4-Problem")
                 Combo1.SelectedIndex = 0
             Case 2
-
                 Combo1.Items.Clear()
                 Combo1.Items.Add("Deb 1")
                 Combo1.Items.Add("Zitzler/Deb T1")
@@ -1164,7 +1163,6 @@ Friend Class Form1
         Dim isInteract As Boolean
         Dim NMemberSecondPop As Short
 
-
         '--------------------------
         Dim ipop As Short
         Dim igen As Short
@@ -1174,7 +1172,6 @@ Friend Class Form1
         Dim RN() As Double
         Dim Versuch As Short
         '--------------------------
-
 
         'On Error GoTo Err_ES_STARTEN
 
@@ -1330,8 +1327,6 @@ Friend Class Form1
             GoTo ErrCode_ES_STARTEN
         End If
 
-
-
         '***************************************************************************************************
         'CEvolutionsstrategie, 1. Schritt
         '***************************************************************************************************
@@ -1382,7 +1377,6 @@ Friend Class Form1
         '***************************************************************************************************
         '***************************************************************************************************
         myIsOK = evolutionsstrategie.EsStartvalues
-
 
         '***************************************************************************************************
         '***************************************************************************************************
@@ -1670,7 +1664,7 @@ ErrCode_ES_STARTEN:
                 QN(3) = f3
                 RN(1) = g1
                 RN(2) = g2
-                'Call Zielfunktion_zeichnen4(f1, f2, f3)
+                Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, f3)
         End Select
     End Function
 
@@ -1725,10 +1719,9 @@ ErrCode_ES_STARTEN:
 
     Private Sub Ausgangswert_Beale()
         Dim Ausgangsergebnis As Double
-        Dim Anzahl_Kalkulationen As Short
+        Dim Anzahl_Kalkulationen As Integer
         Dim Populationen As Short
         Dim i As Short
-
 
         If EVO_Einstellungen1.isPOPUL Then
             Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden
@@ -1788,9 +1781,9 @@ ErrCode_ES_STARTEN:
 
     Private Sub Ausgangswert_Schwefel24()
         Dim Ausgangsergebnis As Double
+        Dim Anzahl_Kalkulationen As Integer
         Dim Populationen As Short
 
-        Dim Anzahl_Kalkulationen As Integer
         Dim i As Short
         Dim X() As Double
 
@@ -1875,7 +1868,7 @@ ErrCode_ES_STARTEN:
             Point1.Pointer.HorizSize = 3
             Point1.Pointer.VertSize = 3
 
-            'S1: Hier wird nur eine Population gezeichnet.
+            'S1: Series für die Population.
             Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
             Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
             Point2.Color = System.Drawing.Color.Orange
@@ -1944,7 +1937,7 @@ ErrCode_ES_STARTEN:
             Point1.Pointer.HorizSize = 3
             Point1.Pointer.VertSize = 3
 
-            'S1: Hier wird nur eine Population gezeichnet.
+            'S1: Series für die Population.
             Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
             Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
             Point2.Color = System.Drawing.Color.Orange
@@ -2004,7 +1997,7 @@ ErrCode_ES_STARTEN:
             Point1.Pointer.HorizSize = 3
             Point1.Pointer.VertSize = 3
 
-            'S1: Hier wird nur eine Population gezeichnet.
+            'S1: Series für die Population.
             Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
             Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
             Point2.Color = System.Drawing.Color.Orange
@@ -2058,7 +2051,7 @@ ErrCode_ES_STARTEN:
             Point1.Pointer.HorizSize = 3
             Point1.Pointer.VertSize = 3
 
-            'S1: Hier wird nur eine Population gezeichnet.
+            'S1: Series für die Population.
             Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
             Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
             Point2.Color = System.Drawing.Color.Orange
@@ -2114,7 +2107,7 @@ ErrCode_ES_STARTEN:
             Point1.Pointer.HorizSize = 3
             Point1.Pointer.VertSize = 3
 
-            'S1: Hier wird nur eine Population gezeichnet.
+            'S1: Series für die Population.
             Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
             Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
             Point2.Color = System.Drawing.Color.Orange
@@ -2204,7 +2197,7 @@ ErrCode_ES_STARTEN:
             Point1.Pointer.HorizSize = 3
             Point1.Pointer.VertSize = 3
 
-            'S1: Hier wird nur eine Population gezeichnet.
+            'S1: Hier wird nur eine Population.
             Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
             Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
             Point2.Color = System.Drawing.Color.Orange
@@ -2360,7 +2353,7 @@ ErrCode_ES_STARTEN:
 
     End Sub
 
-    Private Sub Zielfunktion_zeichnen4(ByRef f1 As Double, ByRef f2 As Double, ByRef f3 As Double)
+    Private Sub Zielfunktion_zeichnen_MultiObPar_3D(ByRef f1 As Double, ByRef f2 As Double, ByRef f3 As Double)
 
         'TChart1.Series(0).Add(f1, f2, f3, "") '$$$ 3D-Reihe!
 
