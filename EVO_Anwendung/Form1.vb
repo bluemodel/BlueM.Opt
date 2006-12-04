@@ -1108,6 +1108,7 @@ Friend Class Form1
                 Combo1.Items.Add("Schwefel 2.4-Problem")
                 Combo1.SelectedIndex = 0
             Case 2
+
                 Combo1.Items.Clear()
                 Combo1.Items.Add("Deb 1")
                 Combo1.Items.Add("Zitzler/Deb T1")
@@ -1547,6 +1548,8 @@ ErrCode_ES_STARTEN:
         Dim g1, g2 As Double
 
         Select Case Combo1.Text
+
+            'Single-Objective Problemstellungen
             Case "Sinus-Funktion" 'Fehlerquadrate zur Sinusfunktion |0-2pi|
                 Unterteilung_X = 2 * 3.1415926535898 / (AnzPar - 1)
                 QN(1) = 0
@@ -1554,15 +1557,14 @@ ErrCode_ES_STARTEN:
                     QN(1) = QN(1) + (System.Math.Sin((i - 1) * Unterteilung_X) - (-1 + (Par(i, 1) * 2))) * (System.Math.Sin((i - 1) * Unterteilung_X) - (-1 + Par(i, 1) * 2))
                 Next i
                 'If durchlauf Mod 25 = 0 Then
-                Call Zielfunktion_zeichnen(AnzPar, Par, durchlauf, ipop)
+                Call Zielfunktion_zeichnen_Sinus(AnzPar, Par, durchlauf, ipop)
                 'End If
             Case "Beale-Problem" 'Beale-Problem
                 x1 = -5 + (Par(1, 1) * 10)
                 x2 = -2 + (Par(2, 1) * 4)
 
                 QN(1) = (1.5 - x1 * (1 - x2)) ^ 2 + (2.25 - x1 * (1 - x2) ^ 2) ^ 2 + (2.625 - x1 * (1 - x2) ^ 3) ^ 2
-
-                Call Zielfunktion_zeichnen2(QN(1), durchlauf, ipop)
+                Call Zielfunktion_zeichnen_SingleOb(QN(1), durchlauf, ipop)
             Case "Schwefel 2.4-Problem" 'Schwefel 2.4 S. 329
                 ReDim X(globalAnzPar)
                 For i = 1 To globalAnzPar
@@ -1572,14 +1574,19 @@ ErrCode_ES_STARTEN:
                 For i = 1 To globalAnzPar
                     QN(1) = QN(1) + ((X(1) - X(i) ^ 2) ^ 2 + (X(i) - 1) ^ 2)
                 Next i
-                Call Zielfunktion_zeichnen2(QN(1), durchlauf, ipop)
-            Case "Deb 1" 'Deb 2000, D1 (Konvexe Pareto-Front)
+                Call Zielfunktion_zeichnen_SingleOb(QN(1), durchlauf, ipop)
+
+                'Multi-Objective Problemstellungen
+                'Deb 2000, D1 (Konvexe Pareto-Front)
+            Case "Deb 1"
                 f1 = Par(1, 1) * (9 / 10) + 0.1
                 f2 = (1 + 5 * Par(2, 1)) / (Par(1, 1) * (9 / 10) + 0.1)
                 QN(1) = f1
                 QN(2) = f2
-                Call Zielfunktion_zeichnen3(f1, f2, ipop)
-            Case "Zitzler/Deb T1" 'Zitzler/Deb/Thiele 2000, T1 (Konvexe Pareto-Front)
+                Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, ipop)
+
+                'Zitzler/Deb/Thiele 2000, T1 (Konvexe Pareto-Front)
+            Case "Zitzler/Deb T1"
                 f1 = Par(1, 1)
                 f2 = 0
                 For i = 2 To globalAnzPar
@@ -1589,8 +1596,10 @@ ErrCode_ES_STARTEN:
                 f2 = f2 * (1 - System.Math.Sqrt(f1 / f2))
                 QN(1) = f1
                 QN(2) = f2
-                Call Zielfunktion_zeichnen3(f1, f2, ipop)
-            Case "Zitzler/Deb T2" 'Zitzler/Deb/Thiele 2000, T2 (Non-Konvexe Pareto-Front)
+                Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, ipop)
+
+                'Zitzler/Deb/Thiele 2000, T2 (Non-Konvexe Pareto-Front)
+            Case "Zitzler/Deb T2"
                 f1 = Par(1, 1)
                 f2 = 0
                 For i = 2 To globalAnzPar
@@ -1600,8 +1609,10 @@ ErrCode_ES_STARTEN:
                 f2 = f2 * (1 - (f1 / f2) * (f1 / f2))
                 QN(1) = f1
                 QN(2) = f2
-                'Call Zielfunktion_zeichnen3(f1, f2, ipop)
-            Case "Zitzler/Deb T3" 'Zitzler/Deb/Thiele 2000, T3 (disconected Pareto-Front)
+                Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, ipop)
+
+                'Zitzler/Deb/Thiele 2000, T3 (disconected Pareto-Front)
+            Case "Zitzler/Deb T3"
                 f1 = Par(1, 1)
                 f2 = 0
                 For i = 2 To globalAnzPar
@@ -1611,8 +1622,10 @@ ErrCode_ES_STARTEN:
                 f2 = f2 * (1 - System.Math.Sqrt(f1 / f2) - (f1 / f2) * System.Math.Sin(10 * 3.14159265358979 * f1))
                 QN(1) = f1
                 QN(2) = f2
-                Call Zielfunktion_zeichnen3(f1, f2, ipop)
-            Case "Zitzler/Deb T4" 'Zitzler/Deb/Thiele 2000, T4 (local/global Pareto-Fronts)
+                Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, ipop)
+
+                'Zitzler/Deb/Thiele 2000, T4 (local/global Pareto-Fronts)
+            Case "Zitzler/Deb T4"
                 f1 = Par(1, 1)
                 f2 = 0
                 For i = 2 To globalAnzPar
@@ -1624,6 +1637,7 @@ ErrCode_ES_STARTEN:
                 QN(1) = f1
                 QN(2) = f2
                 'Call Zielfunktion_zeichnen3(f1, f2, ipop)
+
             Case "CONSTR"
                 f1 = Par(1, 1) * (9 / 10) + 0.1
                 f2 = (1 + 5 * Par(2, 1)) / (Par(1, 1) * (9 / 10) + 0.1)
@@ -1635,7 +1649,8 @@ ErrCode_ES_STARTEN:
                 QN(2) = f2
                 RN(1) = g1
                 RN(2) = g2
-                Call Zielfunktion_zeichnen3(f1, f2, ipop)
+                Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, ipop)
+
             Case "Box"
                 f1 = Par(1, 1) ^ 2
                 f2 = Par(2, 1) ^ 2
@@ -1846,7 +1861,6 @@ ErrCode_ES_STARTEN:
         Dim Array2X(100) As Double
         Dim Array2Y(100) As Double
 
-
         Populationen = EVO_Einstellungen1.NPopul
 
         With TChart1
@@ -1875,7 +1889,6 @@ ErrCode_ES_STARTEN:
             Point3.Pointer.HorizSize = 3
             Point3.Pointer.VertSize = 3
 
-            'Hier muss ein Fehler in der Rechnung sein. die beiden Linien liegen aufeinander.
             'S3: Linie 1 wird errechnet und gezeichnet
             For j = 0 To 100
                 Array1X(j) = 0.1 + j * 0.009
@@ -2084,8 +2097,8 @@ ErrCode_ES_STARTEN:
     Private Sub Ausgangswert_T4()
         Dim Populationen As Short
         Dim i, j As Short
-        Dim ArrayX(13, 101) As Double
-        Dim ArrayY(13, 101) As Double
+        Dim ArrayX(10, 101) As Double
+        Dim ArrayY(10, 101) As Double
 
         Populationen = EVO_Einstellungen1.NPopul
 
@@ -2115,16 +2128,16 @@ ErrCode_ES_STARTEN:
             Point3.Pointer.HorizSize = 3
             Point3.Pointer.VertSize = 3
 
-            'S3: Serie für die Grenze
-            For i = 3 To 13
-                For j = 0 To 100
+            'S3 bis S13: Serie für die Grenze $$funzt net!
+            For i = 1 To 10
+                For j = 1 To 100
                     ArrayX(i, j) = j / 100
                     ArrayY(i, j) = 1 - System.Math.Sqrt(ArrayX(i, j)) - ArrayX(i, j) * System.Math.Sin(10 * 3.14159265358979 * ArrayX(i, j))
                 Next j
                 Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
                 'Line1.Brush.Color = System.Drawing.Color.Green
                 Line1.ClickableLine = True
-                .Series(i).Add(ArrayX(i, j), ArrayY(i, j))
+                .Series(i + 2).Add(ArrayX(i, j), ArrayY(i, j))
             Next i
 
             '.AddSeries(TeeChart.ESeriesClass.scPoint)
@@ -2138,7 +2151,6 @@ ErrCode_ES_STARTEN:
             '    .Series(i).asPoint.Pointer.VerticalSize = 3
             'Next i
 
-
             'For i = 1 To 10
             '    .AddSeries(TeeChart.ESeriesClass.scLine)
             '    .Series(Populationen + i).asLine.LinePen.Width = 2
@@ -2150,11 +2162,11 @@ ErrCode_ES_STARTEN:
             '    .Series(Populationen + i).AddArray(1000, ArrayY, ArrayX)
             'Next i
 
-            .Chart.Axes.Bottom.Automatic = False
+            .Chart.Axes.Bottom.Automatic = True
             .Chart.Axes.Bottom.Maximum = 1
             .Chart.Axes.Bottom.Minimum = 0
             .Chart.Axes.Bottom.Increment = 0.2
-            .Chart.Axes.Left.Automatic = False
+            .Chart.Axes.Left.Automatic = True
             .Chart.Axes.Left.Maximum = 7
             .Chart.Axes.Left.Minimum = 0
             .Chart.Axes.Left.Increment = 0.5
@@ -2315,7 +2327,7 @@ ErrCode_ES_STARTEN:
         End With
     End Sub
 
-    Private Sub Zielfunktion_zeichnen(ByRef AnzPar As Short, ByRef Par(,) As Double, ByRef durchlauf As Integer, ByRef ipop As Short)
+    Private Sub Zielfunktion_zeichnen_Sinus(ByRef AnzPar As Short, ByRef Par(,) As Double, ByRef durchlauf As Integer, ByRef ipop As Short)
         Dim i As Short
         Dim x1, x2 As Double
         Dim Zielfunktion As Double
@@ -2336,18 +2348,13 @@ ErrCode_ES_STARTEN:
         End With
     End Sub
 
-    Private Sub Zielfunktion_zeichnen2(ByRef Wert As Double, ByRef durchlauf As Integer, ByRef ipop As Short)
-        Dim i As Short
-        Dim x1, x2 As Double
-        Dim Zielfunktion As Double
-        Dim Datenmenge As Short
-        Dim Unterteilung_X As Double
+    Private Sub Zielfunktion_zeichnen_SingleOb(ByRef Wert As Double, ByRef durchlauf As Integer, ByRef ipop As Short)
 
         TChart1.Series(ipop).Add(durchlauf, Wert, "")
 
     End Sub
 
-    Private Sub Zielfunktion_zeichnen3(ByRef f1 As Double, ByRef f2 As Double, ByRef ipop As Short)
+    Private Sub Zielfunktion_zeichnen_MultiObPar_2D(ByRef f1 As Double, ByRef f2 As Double, ByRef ipop As Short)
 
         TChart1.Series(1).Add(f1, f2, "")
 
@@ -2397,7 +2404,7 @@ ErrCode_ES_STARTEN:
         End With
     End Sub
 
-    '$$ Welchen zweck hat das?
+    '$$ Welchen Zweck hat das?
     Private Sub Par_Sinus_KeyPress(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.KeyPressEventArgs) Handles Par_Sinus.KeyPress
         Dim KeyAscii As Short = Asc(eventArgs.KeyChar)
         'UPGRADE_ISSUE: Zuweisung wird nicht unterstützt: KeyAscii an Nicht-Null-Wert Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1058"'
