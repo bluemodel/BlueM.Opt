@@ -1240,7 +1240,7 @@ Friend Class Form1
                 Randomize()
                 mypara(1, 1) = Rnd()
                 mypara(2, 1) = Rnd()
-                Call Ausgangswert_D1()
+                Call Ausgangswert_MultiObPareto()
             Case "Zitzler/Deb T1" 'xi = [0,1]
                 globalAnzPar = 30
                 globalAnzZiel = 2
@@ -1250,7 +1250,7 @@ Friend Class Form1
                 For i = 1 To globalAnzPar
                     mypara(i, 1) = Rnd()
                 Next i
-                Call Ausgangswert_T1()
+                Call Ausgangswert_MultiObPareto()
             Case "Zitzler/Deb T2" 'xi = [0,1]
                 globalAnzPar = 30
                 globalAnzZiel = 2
@@ -1260,7 +1260,7 @@ Friend Class Form1
                 For i = 1 To globalAnzPar
                     mypara(i, 1) = Rnd()
                 Next i
-                Call Ausgangswert_T2()
+                Call Ausgangswert_MultiObPareto()
             Case "Zitzler/Deb T3" 'xi = [0,1]
                 globalAnzPar = 15
                 globalAnzZiel = 2
@@ -1270,7 +1270,7 @@ Friend Class Form1
                 For i = 1 To globalAnzPar
                     mypara(i, 1) = Rnd()
                 Next i
-                Call Ausgangswert_T3()
+                Call Ausgangswert_MultiObPareto()
             Case "Zitzler/Deb T4" 'x1 = [0,1], xi=[-5,5]
                 globalAnzPar = 10
                 globalAnzZiel = 2
@@ -1280,7 +1280,7 @@ Friend Class Form1
                 For i = 1 To globalAnzPar
                     mypara(i, 1) = Rnd()
                 Next i
-                Call Ausgangswert_T4()
+                Call Ausgangswert_MultiObPareto()
             Case "CONSTR" 'x1 = [0.1;1], x2=[0;5]
                 globalAnzPar = 2
                 globalAnzZiel = 2
@@ -1783,7 +1783,6 @@ ErrCode_ES_STARTEN:
         Dim Ausgangsergebnis As Double
         Dim Anzahl_Kalkulationen As Integer
         Dim Populationen As Short
-
         Dim i As Short
         Dim X() As Double
 
@@ -1846,325 +1845,160 @@ ErrCode_ES_STARTEN:
         End With
     End Sub
 
-    Private Sub Ausgangswert_D1()
+    Private Sub Ausgangswert_MultiObPareto()
         Dim Populationen As Short
         Dim i, j As Short
-        Dim Array1X(100) As Double
-        Dim Array1Y(100) As Double
-        Dim Array2X(100) As Double
-        Dim Array2Y(100) As Double
 
         Populationen = EVO_Einstellungen1.NPopul
 
         With TChart1
             .Clear()
-            .Header.Text = "Deb D1 - MO-konvex"
             .Aspect.View3D = False
             .Legend.Visible = False
-
-            'S0: Punkt einfügen dient nur dazu um die Series 0 zu besetzen
-            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point1.Pointer.HorizSize = 3
-            Point1.Pointer.VertSize = 3
-
-            'S1: Series für die Population.
-            Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point2.Color = System.Drawing.Color.Orange
-            Point2.Pointer.HorizSize = 2
-            Point2.Pointer.VertSize = 2
-
-            'S2: Series für die Sekundäre Population
-            Dim Point3 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point3.Color = System.Drawing.Color.Blue
-            Point3.Pointer.HorizSize = 3
-            Point3.Pointer.VertSize = 3
-
-            'S3: Linie 1 wird errechnet und gezeichnet
-            For j = 0 To 100
-                Array1X(j) = 0.1 + j * 0.009
-                Array1Y(j) = 1 / Array1X(j)
-            Next j
-            Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-            Line1.Brush.Color = System.Drawing.Color.Green
-            Line1.ClickableLine = True
-            .Series(3).Add(Array1X, Array1Y)
-
-            'S4: Linie 2 wird errechnet und gezeichnet
-            For j = 0 To 100
-                Array2X(j) = 0.1 + j * 0.009
-                Array2Y(j) = (1 + 5) / Array2X(j)
-            Next j
-            Dim Line2 As New Steema.TeeChart.Styles.Line(.Chart)
-            Line2.Brush.Color = System.Drawing.Color.Red
-            Line2.ClickableLine = True
-            .Series(4).Add(Array2X, Array2Y)
-
             .Chart.Axes.Bottom.Automatic = False
             .Chart.Axes.Bottom.Maximum = 1
-            .Chart.Axes.Bottom.Minimum = 0.1
+            .Chart.Axes.Bottom.Minimum = 0
             .Chart.Axes.Bottom.Increment = 0.1
-            .Chart.Axes.Left.Automatic = True
+            .Chart.Axes.Left.Automatic = False
             .Chart.Axes.Left.Maximum = 10
             .Chart.Axes.Left.Minimum = 0
             .Chart.Axes.Left.Increment = 2
-        End With
-    End Sub
 
-    Private Sub Ausgangswert_T1()
-        Dim Populationen As Short
-        Dim i, j As Short
-        Dim ArrayX(1000) As Double
-        Dim ArrayY(1000) As Double
-
-        If EVO_Einstellungen1.isPOPUL Then
-            Populationen = EVO_Einstellungen1.NPopul
-        Else
-            Populationen = 1
-        End If
-
-        With TChart1
-            .Clear()
-            .Header.Text = "Zitzler/Deb/Theile T1"
-            .Aspect.View3D = False
-            .Legend.Visible = False
-
-            'S0: Punkt einfügen dient nur dazu um die Series 0 zu besetzen
+            'S0: Series für die Population.
             Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
             Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point1.Pointer.HorizSize = 3
-            Point1.Pointer.VertSize = 3
+            Point1.Color = System.Drawing.Color.Orange
+            Point1.Pointer.HorizSize = 2
+            Point1.Pointer.VertSize = 2
 
-            'S1: Series für die Population.
+            'S1: Series für die Sekundäre Population
             Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
             Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point2.Color = System.Drawing.Color.Orange
-            Point2.Pointer.HorizSize = 2
-            Point2.Pointer.VertSize = 2
+            Point2.Color = System.Drawing.Color.Blue
+            Point2.Pointer.HorizSize = 3
+            Point2.Pointer.VertSize = 3
 
-            'S2: Series für die Sekundäre Population
+            'S2: Series für Bestwert
             Dim Point3 As New Steema.TeeChart.Styles.Points(.Chart)
             Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point3.Color = System.Drawing.Color.Blue
+            Point3.Color = System.Drawing.Color.Green
             Point3.Pointer.HorizSize = 3
             Point3.Pointer.VertSize = 3
 
-            'S3: Serie für die Grenze
-            For j = 0 To 1000
-                ArrayX(j) = j / 1000
-                ArrayY(j) = 1 - System.Math.Sqrt(ArrayX(j))
-            Next j
-            Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-            Line1.Brush.Color = System.Drawing.Color.Green
-            Line1.ClickableLine = True
-            .Series(3).Add(ArrayX, ArrayY)
+            Select Case Combo1.Text
 
-            .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Maximum = 1
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Bottom.Increment = 0.2
-            .Chart.Axes.Left.Automatic = False
-            .Chart.Axes.Left.Maximum = 7
-            .Chart.Axes.Left.Minimum = 0
-            .Chart.Axes.Left.Increment = 0.5
+                Case "Deb 1"
+                    Dim Array1X(100) As Double
+                    Dim Array1Y(100) As Double
+                    Dim Array2X(100) As Double
+                    Dim Array2Y(100) As Double
+                    .Header.Text = "Deb D1 - MO-konvex"
+
+                    'S3: Linie 1 wird errechnet und gezeichnet
+                    For j = 0 To 100
+                        Array1X(j) = 0.1 + j * 0.009
+                        Array1Y(j) = 1 / Array1X(j)
+                    Next j
+                    Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
+                    Line1.Brush.Color = System.Drawing.Color.Green
+                    Line1.ClickableLine = True
+                    .Series(3).Add(Array1X, Array1Y)
+
+                    'S4: Linie 2 wird errechnet und gezeichnet
+                    For j = 0 To 100
+                        Array2X(j) = 0.1 + j * 0.009
+                        Array2Y(j) = (1 + 5) / Array2X(j)
+                    Next j
+                    Dim Line2 As New Steema.TeeChart.Styles.Line(.Chart)
+                    Line2.Brush.Color = System.Drawing.Color.Red
+                    Line2.ClickableLine = True
+                    .Series(4).Add(Array2X, Array2Y)
+
+                Case "Zitzler/Deb T1"
+                    Dim ArrayX(1000) As Double
+                    Dim ArrayY(1000) As Double
+                    .Header.Text = "Zitzler/Deb/Theile T1"
+                    .Chart.Axes.Left.Maximum = 7
+                    .Chart.Axes.Left.Increment = 0.5
+
+                    'S3: Serie für die Grenze
+                    For j = 0 To 1000
+                        ArrayX(j) = j / 1000
+                        ArrayY(j) = 1 - System.Math.Sqrt(ArrayX(j))
+                    Next j
+                    Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
+                    Line1.Brush.Color = System.Drawing.Color.Green
+                    Line1.ClickableLine = True
+                    .Series(3).Add(ArrayX, ArrayY)
+
+                Case "Zitzler/Deb T2"
+                    Dim ArrayX(100) As Double
+                    Dim ArrayY(100) As Double
+                    .Header.Text = "Zitzler/Deb/Theile T2"
+                    .Chart.Axes.Left.Maximum = 7
+
+                    'S3: Serie für die Grenze
+                    For j = 0 To 100
+                        ArrayX(j) = j / 100
+                        ArrayY(j) = 1 - (ArrayX(j) * ArrayX(j))
+                    Next j
+                    Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
+                    Line1.Brush.Color = System.Drawing.Color.Green
+                    Line1.ClickableLine = True
+                    .Series(3).Add(ArrayX, ArrayY)
+
+                Case "Zitzler/Deb T3"
+                    Dim ArrayX(100) As Double
+                    Dim ArrayY(100) As Double
+                    .Header.Text = "Zitzler/Deb/Theile T3"
+                    .Chart.Axes.Bottom.Increment = 0.2
+                    .Chart.Axes.Left.Maximum = 7
+                    .Chart.Axes.Left.Minimum = -1
+                    .Chart.Axes.Left.Increment = 0.5
+
+                    'S3: Serie für die Grenze
+                    For j = 0 To 100
+                        ArrayX(j) = j / 100
+                        ArrayY(j) = 1 - System.Math.Sqrt(ArrayX(j)) - ArrayX(j) * System.Math.Sin(10 * 3.14159265358979 * ArrayX(j))
+                    Next j
+                    Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
+                    Line1.Brush.Color = System.Drawing.Color.Green
+                    Line1.ClickableLine = True
+                    .Series(3).Add(ArrayX, ArrayY)
+
+                Case "Zitzler/Deb T4"
+                    Dim ArrayX(10, 101) As Double
+                    Dim ArrayY(10, 101) As Double
+                    .Header.Text = "Zitzler/Deb/Theile T1"
+                    .Chart.Axes.Bottom.Increment = 0.2
+                    .Chart.Axes.Left.Maximum = 7
+                    .Chart.Axes.Left.Increment = 0.5
+
+                    'S3 bis S13: Serie für die Grenze $$funzt net!
+                    For i = 1 To 10
+                        For j = 1 To 100
+                            ArrayX(i, j) = j / 100
+                            ArrayY(i, j) = 1 - System.Math.Sqrt(ArrayX(i, j)) - ArrayX(i, j) * System.Math.Sin(10 * 3.14159265358979 * ArrayX(i, j))
+                        Next j
+                        Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
+                        'Line1.Brush.Color = System.Drawing.Color.Green
+                        Line1.ClickableLine = True
+                        .Series(i + 2).Add(ArrayX(i, j), ArrayY(i, j))
+                    Next i
+
+                    'For i = 1 To 10
+                    '    .AddSeries(TeeChart.ESeriesClass.scLine)
+                    '    .Series(Populationen + i).asLine.LinePen.Width = 2
+                    '    .Series(Populationen + i).Color = System.Convert.ToUInt32(System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Blue))
+                    '    For j = 0 To 1000
+                    '        ArrayX(j) = j / 1000
+                    '        ArrayY(j) = (1 + (i - 1) / 4) * (1 - System.Math.Sqrt(ArrayX(j) / (1 + (i - 1) / 4)))
+                    '    Next j
+                    '    .Series(Populationen + i).AddArray(1000, ArrayY, ArrayX)
+                    'Next i
+
+            End Select
         End With
-
-    End Sub
-
-    Private Sub Ausgangswert_T2()
-        Dim Populationen As Short
-        Dim i, j As Short
-        Dim ArrayX(100) As Double
-        Dim ArrayY(100) As Double
-
-        If EVO_Einstellungen1.isPOPUL Then
-            Populationen = EVO_Einstellungen1.NPopul
-        Else
-            Populationen = 1
-        End If
-
-        With TChart1
-            .Clear()
-            .Header.Text = "Zitzler/Deb/Theile T2"
-            .Aspect.View3D = False
-            .Legend.Visible = False
-
-            'S0: Punkt einfügen dient nur dazu um die Series 0 zu besetzen
-            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point1.Pointer.HorizSize = 3
-            Point1.Pointer.VertSize = 3
-
-            'S1: Series für die Population.
-            Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point2.Color = System.Drawing.Color.Orange
-            Point2.Pointer.HorizSize = 2
-            Point2.Pointer.VertSize = 2
-
-            'S2: Series für die Sekundäre Population
-            Dim Point3 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point3.Color = System.Drawing.Color.Blue
-            Point3.Pointer.HorizSize = 3
-            Point3.Pointer.VertSize = 3
-
-            'S3: Serie für die Grenze
-            For j = 0 To 100
-                ArrayX(j) = j / 100
-                ArrayY(j) = 1 - (ArrayX(j) * ArrayX(j))
-            Next j
-            Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-            Line1.Brush.Color = System.Drawing.Color.Green
-            Line1.ClickableLine = True
-            .Series(3).Add(ArrayX, ArrayY)
-
-            .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Maximum = 1
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Bottom.Increment = 0.2
-            .Chart.Axes.Left.Automatic = False
-            .Chart.Axes.Left.Maximum = 7
-            .Chart.Axes.Left.Minimum = 0
-        End With
-    End Sub
-
-    Private Sub Ausgangswert_T3()
-        Dim Populationen As Short
-        Dim i, j As Short
-        Dim ArrayX(100) As Double
-        Dim ArrayY(100) As Double
-
-        Populationen = EVO_Einstellungen1.NPopul
-
-        With TChart1
-            .Clear()
-            .Header.Text = "Zitzler/Deb/Theile T3"
-            .Aspect.View3D = False
-            .Legend.Visible = False
-
-            'S0: Punkt einfügen dient nur dazu um die Series 0 zu besetzen
-            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point1.Pointer.HorizSize = 3
-            Point1.Pointer.VertSize = 3
-
-            'S1: Series für die Population.
-            Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point2.Color = System.Drawing.Color.Orange
-            Point2.Pointer.HorizSize = 2
-            Point2.Pointer.VertSize = 2
-
-            'S2: Series für die Sekundäre Population
-            Dim Point3 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point3.Color = System.Drawing.Color.Blue
-            Point3.Pointer.HorizSize = 3
-            Point3.Pointer.VertSize = 3
-
-            'S3: Serie für die Grenze
-            For j = 0 To 100
-                ArrayX(j) = j / 100
-                ArrayY(j) = 1 - System.Math.Sqrt(ArrayX(j)) - ArrayX(j) * System.Math.Sin(10 * 3.14159265358979 * ArrayX(j))
-            Next j
-            Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-            Line1.Brush.Color = System.Drawing.Color.Green
-            Line1.ClickableLine = True
-            .Series(3).Add(ArrayX, ArrayY)
-
-            .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Maximum = 1
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Bottom.Increment = 0.2
-            .Chart.Axes.Left.Automatic = True
-            .Chart.Axes.Left.Maximum = 7
-            .Chart.Axes.Left.Minimum = -1
-            .Chart.Axes.Left.Increment = 0.5
-        End With
-
-    End Sub
-
-    Private Sub Ausgangswert_T4()
-        Dim Populationen As Short
-        Dim i, j As Short
-        Dim ArrayX(10, 101) As Double
-        Dim ArrayY(10, 101) As Double
-
-        Populationen = EVO_Einstellungen1.NPopul
-
-        With TChart1
-            .Clear()
-            .Header.Text = "Zitzler/Deb/Theile T1"
-            .Aspect.View3D = False
-            .Legend.Visible = False
-
-            'S0: Punkt einfügen dient nur dazu um die Series 0 zu besetzen
-            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point1.Pointer.HorizSize = 3
-            Point1.Pointer.VertSize = 3
-
-            'S1: Series für die Population.
-            Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point2.Color = System.Drawing.Color.Orange
-            Point2.Pointer.HorizSize = 2
-            Point2.Pointer.VertSize = 2
-
-            'S2: Series für die Sekundäre Population
-            Dim Point3 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point3.Color = System.Drawing.Color.Blue
-            Point3.Pointer.HorizSize = 3
-            Point3.Pointer.VertSize = 3
-
-            'S3 bis S13: Serie für die Grenze $$funzt net!
-            For i = 1 To 10
-                For j = 1 To 100
-                    ArrayX(i, j) = j / 100
-                    ArrayY(i, j) = 1 - System.Math.Sqrt(ArrayX(i, j)) - ArrayX(i, j) * System.Math.Sin(10 * 3.14159265358979 * ArrayX(i, j))
-                Next j
-                Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-                'Line1.Brush.Color = System.Drawing.Color.Green
-                Line1.ClickableLine = True
-                .Series(i + 2).Add(ArrayX(i, j), ArrayY(i, j))
-            Next i
-
-            '.AddSeries(TeeChart.ESeriesClass.scPoint)
-            '.Series(0).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
-            '.Series(0).asPoint.Pointer.HorizontalSize = 1
-            '.Series(0).asPoint.Pointer.VerticalSize = 1
-            'For i = 1 To Populationen
-            '    .AddSeries(TeeChart.ESeriesClass.scPoint)
-            '    .Series(i).asPoint.Pointer.Style = TeeChart.EPointerStyle.psCircle
-            '    .Series(i).asPoint.Pointer.HorizontalSize = 3
-            '    .Series(i).asPoint.Pointer.VerticalSize = 3
-            'Next i
-
-            'For i = 1 To 10
-            '    .AddSeries(TeeChart.ESeriesClass.scLine)
-            '    .Series(Populationen + i).asLine.LinePen.Width = 2
-            '    .Series(Populationen + i).Color = System.Convert.ToUInt32(System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Blue))
-            '    For j = 0 To 1000
-            '        ArrayX(j) = j / 1000
-            '        ArrayY(j) = (1 + (i - 1) / 4) * (1 - System.Math.Sqrt(ArrayX(j) / (1 + (i - 1) / 4)))
-            '    Next j
-            '    .Series(Populationen + i).AddArray(1000, ArrayY, ArrayX)
-            'Next i
-
-            .Chart.Axes.Bottom.Automatic = True
-            .Chart.Axes.Bottom.Maximum = 1
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Bottom.Increment = 0.2
-            .Chart.Axes.Left.Automatic = True
-            .Chart.Axes.Left.Maximum = 7
-            .Chart.Axes.Left.Minimum = 0
-            .Chart.Axes.Left.Increment = 0.5
-        End With
-
     End Sub
 
     Private Sub Ausgangswert_CONSTR()
@@ -2191,23 +2025,24 @@ ErrCode_ES_STARTEN:
             .Aspect.View3D = False
             .Legend.Visible = False
 
-            'S0: Punkt einfügen dient nur dazu um die Series 0 zu besetzen
+            'S0: Hier wird nur eine Population.
             Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
             Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point1.Pointer.HorizSize = 3
-            Point1.Pointer.VertSize = 3
+            Point1.Color = System.Drawing.Color.Orange
+            Point1.Pointer.HorizSize = 2
+            Point1.Pointer.VertSize = 2
 
-            'S1: Hier wird nur eine Population.
+            'S1: Series für die Sekundäre Population
             Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
             Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point2.Color = System.Drawing.Color.Orange
-            Point2.Pointer.HorizSize = 2
-            Point2.Pointer.VertSize = 2
+            Point2.Color = System.Drawing.Color.Blue
+            Point2.Pointer.HorizSize = 3
+            Point2.Pointer.VertSize = 3
 
             'S2: Series für die Sekundäre Population
             Dim Point3 As New Steema.TeeChart.Styles.Points(.Chart)
             Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point3.Color = System.Drawing.Color.Blue
+            Point3.Color = System.Drawing.Color.Green
             Point3.Pointer.HorizSize = 3
             Point3.Pointer.VertSize = 3
 
@@ -2349,7 +2184,7 @@ ErrCode_ES_STARTEN:
 
     Private Sub Zielfunktion_zeichnen_MultiObPar_2D(ByRef f1 As Double, ByRef f2 As Double, ByRef ipop As Short)
 
-        TChart1.Series(1).Add(f1, f2, "")
+        TChart1.Series(0).Add(f1, f2, "")
 
     End Sub
 
@@ -2380,9 +2215,9 @@ ErrCode_ES_STARTEN:
         Dim Datenreihe As Short
         With TChart1
             If EVO_Einstellungen1.isPOPUL Then
-                Datenreihe = EVO_Einstellungen1.NPopul + 2
+                Datenreihe = EVO_Einstellungen1.NPopul + 1
             Else
-                Datenreihe = 2
+                Datenreihe = 1
             End If
             .Series(Datenreihe).Clear()
             If UBound(Population, 2) = 2 Then
