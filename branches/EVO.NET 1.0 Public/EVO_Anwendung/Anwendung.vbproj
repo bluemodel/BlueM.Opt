@@ -105,7 +105,7 @@
                 <Reference
                     Name = "dmevodll"
                     AssemblyName = "dmevodll"
-                    HintPath = "dmevodll.dll"
+                    HintPath = "..\EVO_KERN\dmevodll.dll"
                 />
                 <Reference
                     Name = "TeeChart"

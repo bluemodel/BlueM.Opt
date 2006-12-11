@@ -1503,6 +1503,16 @@
             Sets Font sizing (in points) for text.
             </summary>
         </member>
+        <member name="P:Steema.TeeChart.Drawing.ChartFont.SizeFloat">
+            <summary>
+            Sets Font sizing as em-size float for text to enable use of Font.Unit
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.Drawing.ChartFont.Unit">
+            <summary>
+            Gets the unit of measure for this Font
+            </summary>
+        </member>
         <member name="P:Steema.TeeChart.Drawing.ChartFont.Bold">
             <summary>
             Sets Font bold for text.
@@ -1919,9 +1929,9 @@
         </member>
         <member name="M:Steema.TeeChart.Drawing.Graphics3DVec.AddToStream(System.String)">
             <summary>
-            Adds line to internal stream
+            Adds canvas instruction to stream.
             </summary>
-            <param name="text">Text to be added to stream</param>
+            <param name="text">Instructions to be added to stream.</param>
         </member>
         <member name="M:Steema.TeeChart.Drawing.Graphics3DVec.Pie(System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Double,System.Double,System.Boolean,System.Boolean,System.Int32,System.Boolean)">
             <summary>
@@ -2148,12 +2158,6 @@
             <summary>
             The Adobe Portable Format (PDF) canvas.
             </summary>
-        </member>
-        <member name="M:Steema.TeeChart.Drawing.Graphics3DPDF.AddToStream(System.String)">
-            <summary>
-            Adds line to internal stream
-            </summary>
-            <param name="text">Text to be added to stream</param>
         </member>
         <member name="M:Steema.TeeChart.Drawing.Graphics3DPDF.DrawPath(System.Drawing.Pen,System.Drawing.Drawing2D.GraphicsPath)">
             <summary>
@@ -3104,6 +3108,250 @@
             Internal Chart class used to display at Gallery panel.
             </summary>
         </member>
+        <member name="T:Steema.TeeChart.TChart">
+            <summary>
+            Principle Chart class for Windows based forms
+            </summary>
+        </member>
+        <member name="T:Steema.TeeChart.IChart">
+            <summary>
+            Common Chart characteristics interface
+            </summary>
+        </member>
+        <member name="F:Steema.TeeChart.TChart.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:Steema.TeeChart.TChart.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+        </member>
+        <member name="M:Steema.TeeChart.TChart.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify 
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="M:Steema.TeeChart.TChart.AddSeries(Steema.TeeChart.Styles.Series)">
+            <summary>
+            Adds a new Series into Chart.
+            </summary>
+        </member>
+        <member name="M:Steema.TeeChart.TChart.Clear">
+            <summary>
+            Reset the Chart to its default values.
+            </summary>
+        </member>
+        <member name="M:Steema.TeeChart.TChart.Draw(System.Drawing.Graphics)">
+            <summary>
+             Paints the Chart in your preferred Canvas and region.
+            </summary>
+        </member>
+        <member name="M:Steema.TeeChart.TChart.Steema#TeeChart#IChart#DoGetLegendPos(System.Object,System.Int32,System.Int32@,System.Int32@,System.Int32@)">
+            <summary>
+            Triggers GetLegendPos event.
+            </summary>
+        </member>
+        <member name="M:Steema.TeeChart.TChart.ShowEditor(System.ComponentModel.ITypeDescriptorContext)">
+            <summary>
+            Shows the TeeChart editor dialog.
+            </summary>
+        </member>
+        <member name="M:Steema.TeeChart.TChart.ShowEditor">
+            <summary>
+            Shows the TeeChart editor dialog.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.Printing">
+            <summary>
+            Determines when Chart is being printed.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.Metafiling">
+            <summary>
+            True when the Chart is internally drawing into a Metafile image.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.BackColor">
+            <summary>
+            Sets the color the Chart rectangle is filled with.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.AutoRepaint">
+            <summary>
+            Enables/Disables Repainting of Chart when points are added.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.TimerEnabled">
+            <summary>
+            Obsolete. Enables or disables the internal timer used to auto-repaint Chart.
+            Use a standard Timer component to call tChart1.Invalidate() instead.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.Bitmap">
+            <summary>
+            Returns a Bitmap image filled with Chart.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.Metafile">
+            <summary>
+            Returns a Metafile image filled with Chart.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.TimerInterval">
+            <summary>
+            Obsolete. Gets or sets the interval in milliseconds used to auto-repaint Chart.
+            Use a standard Timer component to call tChart1.Invalidate() instead.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.Frame">
+            <summary>
+            Obsolete. Determines properties of frame around chart back wall.
+            Use tChart1.Walls.Back.Pen property instead.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.SeriesCount">
+            <summary>
+            Obsolete. Returns number of Series in Chart.
+            Use tChart1.Series.Count property instead.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.Site">
+            <summary>
+            Gets or sets the site of the TChart control.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.Chart">
+            <summary>
+            Defines the Chart to display. 
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.Text">
+            <summary>
+            Sets the text for the Footer, Header, SubFooter and SubHeader.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.Panel">
+            <summary>
+            Background visible attributes.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.Printer">
+            <summary>
+            Printing related properties.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.Page">
+            <summary>
+            Accesses multiple page characteristics of the Chart.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.Legend">
+            <summary>Legend characteristics</summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.Header">
+            <summary>
+            Defines Text shown at top of the Chart.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.SubHeader">
+            <summary>
+            Defines Text shown directly below Header.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.Font">
+            <summary>
+            Determines Font characteristics.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.ForeColor">
+            <summary>
+            Gets the foreground color of the TChart object.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.Footer">
+            <summary>
+            Defines Text shown at the bottom of the Chart.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.Zoom">
+            <summary>
+            Accesses the Zoom characteristics of the Chart.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.Panning">
+            <summary>
+            Accesses Panning characteristics.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.SubFooter">
+            <summary>
+            Defines Text shown directly above Footer.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.Aspect">
+            <summary>
+            Accesses view characteristics of the Chart.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.Canvas">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.Graphics3D">
+            <summary>
+            Use the Graphics3D property to access TeeChart Draw properties and methods.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.Series">
+            <summary>
+            Collection of Series contained in this Chart.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.Tools">
+            <summary>
+            Collection of Tool components contained in this Chart.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.Walls">
+            <summary>
+            Accesses left, bottom and back wall characteristics of the Chart.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.Axes">
+            <summary>
+            Collection of predefined and custom axis objects.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.Export">
+            <summary>
+            Accesses Chart export properties and methods.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.Import">
+            <summary>
+            Accesses Chart import properties and methods.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.TChart.Item(System.Int32)">
+            <summary>
+            Default indexer ( Example: tChart1[0].Color=Color.Blue; is equivalent to tChart1.Series[0].Color=Color.Blue; )
+            </summary>
+        </member>
+        <member name="T:Steema.TeeChart.TChart.AllowScrollEventArgs">
+            <summary>
+            Event arguments class used by AllowScroll chart event.
+            </summary>
+        </member>
+        <member name="T:Steema.TeeChart.TChart.SeriesEventHandler">
+            <summary>Common Series event handler</summary>
+        </member>
+        <member name="T:Steema.TeeChart.TChart.AllowScrollEventHandler">
+            <summary>Scroll event handler</summary>
+        </member>
         <member name="F:Steema.TeeChart.GalleryPanel.GalleryChart.GalleryColor">
             <summary>
             The color used to change selected Chart's Gradient.
@@ -3123,6 +3371,11 @@
         <member name="T:Steema.TeeChart.Editors.Series.AreaSeries">
             <summary>
             AreaSeries editor.
+            </summary>
+        </member>
+        <member name="T:Steema.TeeChart.Editors.Series.BaseSeriesForm">
+            <summary>
+            Summary description for BaseSeriesForm.
             </summary>
         </member>
         <member name="F:Steema.TeeChart.Editors.Series.AreaSeries.components">
@@ -8989,6 +9242,11 @@
             Draws a Line between the last and first PolarSeries point coordinates.
             </summary>
         </member>
+        <member name="P:Steema.TeeChart.Styles.CustomPolar.LabelsMargin">
+            <summary>
+            Defines the distance between the CustomPolar circle and the labels.
+            </summary>
+        </member>
         <member name="P:Steema.TeeChart.Styles.CustomPolar.Pen">
             <summary>
             Determines Pen used to draw the Line connecting PolarSeries points.
@@ -10485,6 +10743,12 @@
             <summary>
             Adds a new High and Low value to a HighLow series with label and color.
             </summary>
+        </member>
+        <member name="M:Steema.TeeChart.Styles.HighLow.Clicked(System.Int32,System.Int32)">
+            <summary>
+            Calculates if any point is at XY position.
+            </summary>
+            <returns>Point index</returns>
         </member>
         <member name="M:Steema.TeeChart.Styles.HighLow.DrawValue(System.Int32)">
             <summary>
@@ -13194,11 +13458,6 @@
             WebChart control.
             </summary>
         </member>
-        <member name="T:Steema.TeeChart.IChart">
-            <summary>
-            Common Chart characteristics interface
-            </summary>
-        </member>
         <member name="M:Steema.TeeChart.Web.WebChart.Steema#TeeChart#IChart#DoBeforeDrawAxes">
             <summary>
             Checks for presence of BeforeDrawAxes event
@@ -13497,6 +13756,11 @@
         <member name="M:Steema.TeeChart.AxisLabels.LabelValue(System.Double)">
             <summary>
             Returns the corresponding text representation of the Value parameter.
+            </summary>
+        </member>
+        <member name="P:Steema.TeeChart.AxisLabels.LabelsAsLocalTime">
+            <summary>
+            When true, displays DateTime Labels in Local Time rather than UTC.
             </summary>
         </member>
         <member name="P:Steema.TeeChart.AxisLabels.ExactDateTime">
@@ -15755,245 +16019,6 @@
         </member>
         <member name="T:Steema.TeeChart.SerializeEventHandler">
             <summary>Serialize Type event handler</summary>
-        </member>
-        <member name="T:Steema.TeeChart.TChart">
-            <summary>
-            Principle Chart class for Windows based forms
-            </summary>
-        </member>
-        <member name="F:Steema.TeeChart.TChart.components">
-            <summary>
-            Required designer variable.
-            </summary>
-        </member>
-        <member name="M:Steema.TeeChart.TChart.Dispose(System.Boolean)">
-            <summary>
-            Clean up any resources being used.
-            </summary>
-        </member>
-        <member name="M:Steema.TeeChart.TChart.InitializeComponent">
-            <summary>
-            Required method for Designer support - do not modify 
-            the contents of this method with the code editor.
-            </summary>
-        </member>
-        <member name="M:Steema.TeeChart.TChart.AddSeries(Steema.TeeChart.Styles.Series)">
-            <summary>
-            Adds a new Series into Chart.
-            </summary>
-        </member>
-        <member name="M:Steema.TeeChart.TChart.Clear">
-            <summary>
-            Reset the Chart to its default values.
-            </summary>
-        </member>
-        <member name="M:Steema.TeeChart.TChart.Draw(System.Drawing.Graphics)">
-            <summary>
-             Paints the Chart in your preferred Canvas and region.
-            </summary>
-        </member>
-        <member name="M:Steema.TeeChart.TChart.Steema#TeeChart#IChart#DoGetLegendPos(System.Object,System.Int32,System.Int32@,System.Int32@,System.Int32@)">
-            <summary>
-            Triggers GetLegendPos event.
-            </summary>
-        </member>
-        <member name="M:Steema.TeeChart.TChart.ShowEditor(System.ComponentModel.ITypeDescriptorContext)">
-            <summary>
-            Shows the TeeChart editor dialog.
-            </summary>
-        </member>
-        <member name="M:Steema.TeeChart.TChart.ShowEditor">
-            <summary>
-            Shows the TeeChart editor dialog.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.Printing">
-            <summary>
-            Determines when Chart is being printed.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.Metafiling">
-            <summary>
-            True when the Chart is internally drawing into a Metafile image.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.BackColor">
-            <summary>
-            Sets the color the Chart rectangle is filled with.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.AutoRepaint">
-            <summary>
-            Enables/Disables Repainting of Chart when points are added.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.TimerEnabled">
-            <summary>
-            Obsolete. Enables or disables the internal timer used to auto-repaint Chart.
-            Use a standard Timer component to call tChart1.Invalidate() instead.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.Bitmap">
-            <summary>
-            Returns a Bitmap image filled with Chart.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.Metafile">
-            <summary>
-            Returns a Metafile image filled with Chart.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.TimerInterval">
-            <summary>
-            Obsolete. Gets or sets the interval in milliseconds used to auto-repaint Chart.
-            Use a standard Timer component to call tChart1.Invalidate() instead.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.Frame">
-            <summary>
-            Obsolete. Determines properties of frame around chart back wall.
-            Use tChart1.Walls.Back.Pen property instead.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.SeriesCount">
-            <summary>
-            Obsolete. Returns number of Series in Chart.
-            Use tChart1.Series.Count property instead.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.Site">
-            <summary>
-            Gets or sets the site of the TChart control.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.Chart">
-            <summary>
-            Defines the Chart to display. 
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.Text">
-            <summary>
-            Sets the text for the Footer, Header, SubFooter and SubHeader.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.Panel">
-            <summary>
-            Background visible attributes.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.Printer">
-            <summary>
-            Printing related properties.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.Page">
-            <summary>
-            Accesses multiple page characteristics of the Chart.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.Legend">
-            <summary>Legend characteristics</summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.Header">
-            <summary>
-            Defines Text shown at top of the Chart.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.SubHeader">
-            <summary>
-            Defines Text shown directly below Header.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.Font">
-            <summary>
-            Determines Font characteristics.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.ForeColor">
-            <summary>
-            Gets the foreground color of the TChart object.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.Footer">
-            <summary>
-            Defines Text shown at the bottom of the Chart.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.Zoom">
-            <summary>
-            Accesses the Zoom characteristics of the Chart.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.Panning">
-            <summary>
-            Accesses Panning characteristics.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.SubFooter">
-            <summary>
-            Defines Text shown directly above Footer.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.Aspect">
-            <summary>
-            Accesses view characteristics of the Chart.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.Canvas">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.Graphics3D">
-            <summary>
-            Use the Graphics3D property to access TeeChart Draw properties and methods.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.Series">
-            <summary>
-            Collection of Series contained in this Chart.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.Tools">
-            <summary>
-            Collection of Tool components contained in this Chart.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.Walls">
-            <summary>
-            Accesses left, bottom and back wall characteristics of the Chart.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.Axes">
-            <summary>
-            Collection of predefined and custom axis objects.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.Export">
-            <summary>
-            Accesses Chart export properties and methods.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.Import">
-            <summary>
-            Accesses Chart import properties and methods.
-            </summary>
-        </member>
-        <member name="P:Steema.TeeChart.TChart.Item(System.Int32)">
-            <summary>
-            Default indexer ( Example: tChart1[0].Color=Color.Blue; is equivalent to tChart1.Series[0].Color=Color.Blue; )
-            </summary>
-        </member>
-        <member name="T:Steema.TeeChart.TChart.AllowScrollEventArgs">
-            <summary>
-            Event arguments class used by AllowScroll chart event.
-            </summary>
-        </member>
-        <member name="T:Steema.TeeChart.TChart.SeriesEventHandler">
-            <summary>Common Series event handler</summary>
-        </member>
-        <member name="T:Steema.TeeChart.TChart.AllowScrollEventHandler">
-            <summary>Scroll event handler</summary>
         </member>
         <member name="T:Steema.TeeChart.SerializeEventArgs">
             <summary>
