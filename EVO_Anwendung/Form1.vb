@@ -101,7 +101,6 @@ Friend Class Form1
         '==========================
         Dim isOK As Boolean
         Dim i As Integer
-        Dim j As Short
         Dim Txt As String
         '--------------------------
         Dim durchlauf As Integer
@@ -114,11 +113,10 @@ Friend Class Form1
         Dim NPopEltern, NRunden, NPopul, iOptPopEltern As Integer
         Dim iOptEltern, iPopPenalty As Integer
         Dim NEltern As Integer
-        Dim NRekomb, NRekombXY As Integer
+        Dim NRekombXY As Integer
         Dim rDeltaStart As Single
         Dim iStartPar As Integer
-        Dim isMUTREKOMB As Boolean
-        Dim isdnvektor, isINIVARIA, isPareto As Boolean
+        Dim isdnvektor, isPareto As Boolean
         Dim isPareto3D As Boolean
         Dim NGen, NNachf As Integer
         Dim Interact As Short
@@ -132,7 +130,6 @@ Friend Class Form1
         Dim irunde As Short
         Dim QN() As Double
         Dim RN() As Double
-        Dim Versuch As Short
         '--------------------------
 
         'TODO: On Error GoTo Err_ES_STARTEN
@@ -1068,7 +1065,7 @@ ErrCode_ES_STARTEN:
 
     Private Sub Ausgangswert_CONSTR()
         Dim Populationen As Short
-        Dim i, j As Short
+        Dim j As Short
         Dim Array1X(100) As Double
         Dim Array1Y(100) As Double
         Dim Array2X(100) As Double
@@ -1168,7 +1165,7 @@ ErrCode_ES_STARTEN:
 
     Private Sub Ausgangswert_Box()
         Dim Populationen As Short
-        Dim i, j As Short
+        'Dim i, j As Short
         Dim ArrayX(100) As Double
         Dim ArrayY(100) As Double
 
@@ -1222,9 +1219,6 @@ ErrCode_ES_STARTEN:
 
     Private Sub Zielfunktion_zeichnen_Sinus(ByRef AnzPar As Short, ByRef Par(,) As Double, ByRef durchlauf As Integer, ByRef ipop As Short)
         Dim i As Short
-        Dim x1, x2 As Double
-        Dim Zielfunktion As Double
-        Dim Datenmenge As Short
         Dim Unterteilung_X As Double
 
         Unterteilung_X = 2 * 3.141592654 / (AnzPar - 1)

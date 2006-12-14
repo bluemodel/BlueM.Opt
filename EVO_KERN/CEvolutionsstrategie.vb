@@ -658,7 +658,7 @@ ES_GET_SCHRITTWEITE_ERROR:
 
     Public Function esGetSekundärePopulation(ByRef Population(,) As Double) As Boolean
 
-        Dim j, i, k As Short
+        Dim j, i As Short
 
         esGetSekundärePopulation = False
 
@@ -2025,7 +2025,7 @@ ES_ELTERN_ERROR:
     '*******************************************************************************
 
     Private Function Non_Dominated_Count_and_Sort(ByRef NDSorting() As NDSortingType) As Short
-        Dim j, i, v As Short
+        Dim i As Short
         Dim Temp() As NDSortingType
         Dim counter As Short
 
@@ -2066,7 +2066,7 @@ ES_ELTERN_ERROR:
     '*******************************************************************************
 
     Private Function Non_Dominated_Count_and_Sort_Sekundäre_Population(ByRef NDSorting() As NDSortingType) As Short
-        Dim j, i, v As Short
+        Dim i As Short
         Dim Temp() As NDSortingType
         Dim counter As Short
 
@@ -2206,7 +2206,6 @@ ES_ELTERN_ERROR:
         Dim i As Short
         Dim j As Short
         Dim k As Short
-        Dim Min As Double
         Dim TempDistance() As Double
         Dim PenaltyDistance(,) As Double
 
