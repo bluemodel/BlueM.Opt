@@ -1,6 +1,27 @@
 Imports System.IO
 Module BlauesModell
 
+    Public Sub Anfangsparameter_auslesen()
+
+        'Select Case ComboXY_Text
+        '    Case "Auto_Kalibrierung"
+
+        '    Case "HW_Optimierung"
+
+        'End Select
+
+    End Sub
+
+    Public Sub Messung_einlesen()
+
+    End Sub
+
+    Public Sub Parameter_schreiben()
+
+        'Too Parameter müssen vor der Simulation geschrieben werden
+
+    End Sub
+
     Public Sub launchBM(ByVal Exe As String, ByVal Pfad As String, ByVal Datensatz As String)
         'starte Programm mit neuen Parametern
         Dim ProcID As Integer
@@ -17,6 +38,22 @@ Module BlauesModell
         ChDrive(currentDir)
         ChDir(currentDir)
     End Sub
+
+    'Hier wird die Ergebnisdatei nach jeder Simulation ausgelesen
+    Public Sub Ergebisdatei_auslesen()
+
+        'ToDo: lesen der Ergebnisdatei
+
+    End Sub
+
+    'Der Qualitätswert wird durch Vergleich von Calculation Berechnet.
+    'ToDo: Evtl. Cases für die Verschiedenen Berechnungsarten einbauen
+    Public Function Qualitaetswert() As Double
+
+        'ToDo: Berechnen des Qualitätswertes
+
+    End Function
+
 
 
     'Public Sub modifyCN()
