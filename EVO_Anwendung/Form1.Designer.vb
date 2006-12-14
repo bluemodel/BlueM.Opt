@@ -543,10 +543,10 @@ Partial Class Form1
         Me.Problem_TKNFunktion.Controls.Add(Me.Text_TKNFunktion)
         Me.Problem_TKNFunktion.ForeColor = System.Drawing.SystemColors.ControlText
         Me.Frame_Problem.SetIndex(Me.Problem_TKNFunktion, CType(9, Short))
-        Me.Problem_TKNFunktion.Location = New System.Drawing.Point(10, 686)
+        Me.Problem_TKNFunktion.Location = New System.Drawing.Point(0, 43)
         Me.Problem_TKNFunktion.Name = "Problem_TKNFunktion"
         Me.Problem_TKNFunktion.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.Problem_TKNFunktion.Size = New System.Drawing.Size(217, 73)
+        Me.Problem_TKNFunktion.Size = New System.Drawing.Size(217, 70)
         Me.Problem_TKNFunktion.TabIndex = 25
         Me.Problem_TKNFunktion.TabStop = False
         Me.Problem_TKNFunktion.Text = "TKN-Funktion"
@@ -574,10 +574,10 @@ Partial Class Form1
         Me.Problem_CONSTRFunktion.Controls.Add(Me.Text_CONSTRFunktion)
         Me.Problem_CONSTRFunktion.ForeColor = System.Drawing.SystemColors.ControlText
         Me.Frame_Problem.SetIndex(Me.Problem_CONSTRFunktion, CType(8, Short))
-        Me.Problem_CONSTRFunktion.Location = New System.Drawing.Point(10, 686)
+        Me.Problem_CONSTRFunktion.Location = New System.Drawing.Point(0, 43)
         Me.Problem_CONSTRFunktion.Name = "Problem_CONSTRFunktion"
         Me.Problem_CONSTRFunktion.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.Problem_CONSTRFunktion.Size = New System.Drawing.Size(217, 73)
+        Me.Problem_CONSTRFunktion.Size = New System.Drawing.Size(217, 70)
         Me.Problem_CONSTRFunktion.TabIndex = 23
         Me.Problem_CONSTRFunktion.TabStop = False
         Me.Problem_CONSTRFunktion.Text = "CONSTR-Funktion"
@@ -605,10 +605,10 @@ Partial Class Form1
         Me.Problem_T4Funktion.Controls.Add(Me.Text_T4Funktion)
         Me.Problem_T4Funktion.ForeColor = System.Drawing.SystemColors.ControlText
         Me.Frame_Problem.SetIndex(Me.Problem_T4Funktion, CType(7, Short))
-        Me.Problem_T4Funktion.Location = New System.Drawing.Point(10, 686)
+        Me.Problem_T4Funktion.Location = New System.Drawing.Point(0, 43)
         Me.Problem_T4Funktion.Name = "Problem_T4Funktion"
         Me.Problem_T4Funktion.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.Problem_T4Funktion.Size = New System.Drawing.Size(217, 73)
+        Me.Problem_T4Funktion.Size = New System.Drawing.Size(217, 70)
         Me.Problem_T4Funktion.TabIndex = 21
         Me.Problem_T4Funktion.TabStop = False
         Me.Problem_T4Funktion.Text = "T4-Funktion"
@@ -634,6 +634,16 @@ Partial Class Form1
         '
         Me.GroupBox_Testproblem.BackColor = System.Drawing.SystemColors.Control
         Me.GroupBox_Testproblem.Controls.Add(Me.Combo_Testproblem)
+        Me.GroupBox_Testproblem.Controls.Add(Me.Problem_SinusFunktion)
+        Me.GroupBox_Testproblem.Controls.Add(Me.Problem_BealeProblem)
+        Me.GroupBox_Testproblem.Controls.Add(Me.Problem_Schwefel24)
+        Me.GroupBox_Testproblem.Controls.Add(Me.Problem_D1Funktion)
+        Me.GroupBox_Testproblem.Controls.Add(Me.Problem_T1Funktion)
+        Me.GroupBox_Testproblem.Controls.Add(Me.Problem_T2Funktion)
+        Me.GroupBox_Testproblem.Controls.Add(Me.Problem_T3Funktion)
+        Me.GroupBox_Testproblem.Controls.Add(Me.Problem_T4Funktion)
+        Me.GroupBox_Testproblem.Controls.Add(Me.Problem_CONSTRFunktion)
+        Me.GroupBox_Testproblem.Controls.Add(Me.Problem_TKNFunktion)
         Me.GroupBox_Testproblem.Enabled = False
         Me.GroupBox_Testproblem.ForeColor = System.Drawing.SystemColors.ControlText
         Me.Frame_Problem.SetIndex(Me.GroupBox_Testproblem, CType(11, Short))
@@ -663,10 +673,10 @@ Partial Class Form1
         Me.Problem_T3Funktion.Controls.Add(Me.Text_T3Funktion)
         Me.Problem_T3Funktion.ForeColor = System.Drawing.SystemColors.ControlText
         Me.Frame_Problem.SetIndex(Me.Problem_T3Funktion, CType(6, Short))
-        Me.Problem_T3Funktion.Location = New System.Drawing.Point(10, 686)
+        Me.Problem_T3Funktion.Location = New System.Drawing.Point(0, 43)
         Me.Problem_T3Funktion.Name = "Problem_T3Funktion"
         Me.Problem_T3Funktion.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.Problem_T3Funktion.Size = New System.Drawing.Size(217, 73)
+        Me.Problem_T3Funktion.Size = New System.Drawing.Size(217, 70)
         Me.Problem_T3Funktion.TabIndex = 19
         Me.Problem_T3Funktion.TabStop = False
         Me.Problem_T3Funktion.Text = "T3-Funktion"
@@ -694,10 +704,10 @@ Partial Class Form1
         Me.Problem_T2Funktion.Controls.Add(Me.Text_T2Funktion)
         Me.Problem_T2Funktion.ForeColor = System.Drawing.SystemColors.ControlText
         Me.Frame_Problem.SetIndex(Me.Problem_T2Funktion, CType(5, Short))
-        Me.Problem_T2Funktion.Location = New System.Drawing.Point(10, 686)
+        Me.Problem_T2Funktion.Location = New System.Drawing.Point(0, 43)
         Me.Problem_T2Funktion.Name = "Problem_T2Funktion"
         Me.Problem_T2Funktion.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.Problem_T2Funktion.Size = New System.Drawing.Size(217, 73)
+        Me.Problem_T2Funktion.Size = New System.Drawing.Size(217, 70)
         Me.Problem_T2Funktion.TabIndex = 17
         Me.Problem_T2Funktion.TabStop = False
         Me.Problem_T2Funktion.Text = "T2-Funktion"
@@ -725,10 +735,10 @@ Partial Class Form1
         Me.Problem_T1Funktion.Controls.Add(Me.Text_T1Funktion)
         Me.Problem_T1Funktion.ForeColor = System.Drawing.SystemColors.ControlText
         Me.Frame_Problem.SetIndex(Me.Problem_T1Funktion, CType(4, Short))
-        Me.Problem_T1Funktion.Location = New System.Drawing.Point(10, 686)
+        Me.Problem_T1Funktion.Location = New System.Drawing.Point(0, 43)
         Me.Problem_T1Funktion.Name = "Problem_T1Funktion"
         Me.Problem_T1Funktion.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.Problem_T1Funktion.Size = New System.Drawing.Size(217, 73)
+        Me.Problem_T1Funktion.Size = New System.Drawing.Size(217, 70)
         Me.Problem_T1Funktion.TabIndex = 15
         Me.Problem_T1Funktion.TabStop = False
         Me.Problem_T1Funktion.Text = "T1-Funktion"
@@ -756,10 +766,10 @@ Partial Class Form1
         Me.Problem_D1Funktion.Controls.Add(Me.Text_D1Funktion)
         Me.Problem_D1Funktion.ForeColor = System.Drawing.SystemColors.ControlText
         Me.Frame_Problem.SetIndex(Me.Problem_D1Funktion, CType(3, Short))
-        Me.Problem_D1Funktion.Location = New System.Drawing.Point(10, 686)
+        Me.Problem_D1Funktion.Location = New System.Drawing.Point(0, 43)
         Me.Problem_D1Funktion.Name = "Problem_D1Funktion"
         Me.Problem_D1Funktion.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.Problem_D1Funktion.Size = New System.Drawing.Size(217, 73)
+        Me.Problem_D1Funktion.Size = New System.Drawing.Size(217, 70)
         Me.Problem_D1Funktion.TabIndex = 13
         Me.Problem_D1Funktion.TabStop = False
         Me.Problem_D1Funktion.Text = "D1-Funktion"
@@ -790,10 +800,10 @@ Partial Class Form1
         Me.Problem_SinusFunktion.Enabled = False
         Me.Problem_SinusFunktion.ForeColor = System.Drawing.SystemColors.ControlText
         Me.Frame_Problem.SetIndex(Me.Problem_SinusFunktion, CType(0, Short))
-        Me.Problem_SinusFunktion.Location = New System.Drawing.Point(10, 686)
+        Me.Problem_SinusFunktion.Location = New System.Drawing.Point(0, 43)
         Me.Problem_SinusFunktion.Name = "Problem_SinusFunktion"
         Me.Problem_SinusFunktion.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.Problem_SinusFunktion.Size = New System.Drawing.Size(217, 73)
+        Me.Problem_SinusFunktion.Size = New System.Drawing.Size(217, 70)
         Me.Problem_SinusFunktion.TabIndex = 1
         Me.Problem_SinusFunktion.TabStop = False
         Me.Problem_SinusFunktion.Text = "Sinus-Funktion"
@@ -847,10 +857,10 @@ Partial Class Form1
         Me.Problem_BealeProblem.Controls.Add(Me.Text_BealeProblem)
         Me.Problem_BealeProblem.ForeColor = System.Drawing.SystemColors.ControlText
         Me.Frame_Problem.SetIndex(Me.Problem_BealeProblem, CType(1, Short))
-        Me.Problem_BealeProblem.Location = New System.Drawing.Point(10, 686)
+        Me.Problem_BealeProblem.Location = New System.Drawing.Point(0, 43)
         Me.Problem_BealeProblem.Name = "Problem_BealeProblem"
         Me.Problem_BealeProblem.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.Problem_BealeProblem.Size = New System.Drawing.Size(217, 73)
+        Me.Problem_BealeProblem.Size = New System.Drawing.Size(217, 70)
         Me.Problem_BealeProblem.TabIndex = 5
         Me.Problem_BealeProblem.TabStop = False
         Me.Problem_BealeProblem.Text = "Beale-Problem"
@@ -880,10 +890,10 @@ Partial Class Form1
         Me.Problem_Schwefel24.Controls.Add(Me.Label_Schwefel24)
         Me.Problem_Schwefel24.ForeColor = System.Drawing.SystemColors.ControlText
         Me.Frame_Problem.SetIndex(Me.Problem_Schwefel24, CType(2, Short))
-        Me.Problem_Schwefel24.Location = New System.Drawing.Point(10, 686)
+        Me.Problem_Schwefel24.Location = New System.Drawing.Point(0, 43)
         Me.Problem_Schwefel24.Name = "Problem_Schwefel24"
         Me.Problem_Schwefel24.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.Problem_Schwefel24.Size = New System.Drawing.Size(217, 73)
+        Me.Problem_Schwefel24.Size = New System.Drawing.Size(217, 70)
         Me.Problem_Schwefel24.TabIndex = 7
         Me.Problem_Schwefel24.TabStop = False
         Me.Problem_Schwefel24.Text = "Schwefel 2.4"
@@ -1082,16 +1092,6 @@ Partial Class Form1
         Me.Controls.Add(Me.TChart1)
         Me.Controls.Add(Me.EVO_Opt_Verlauf1)
         Me.Controls.Add(Me.EVO_Einstellungen1)
-        Me.Controls.Add(Me.Problem_SinusFunktion)
-        Me.Controls.Add(Me.Problem_TKNFunktion)
-        Me.Controls.Add(Me.Problem_CONSTRFunktion)
-        Me.Controls.Add(Me.Problem_T4Funktion)
-        Me.Controls.Add(Me.Problem_T3Funktion)
-        Me.Controls.Add(Me.Problem_T2Funktion)
-        Me.Controls.Add(Me.Problem_T1Funktion)
-        Me.Controls.Add(Me.Problem_BealeProblem)
-        Me.Controls.Add(Me.Problem_Schwefel24)
-        Me.Controls.Add(Me.Problem_D1Funktion)
         Me.Controls.Add(Me.Button_Start)
         Me.Controls.Add(Me.GroupBox_Testproblem)
         Me.Cursor = System.Windows.Forms.Cursors.Default

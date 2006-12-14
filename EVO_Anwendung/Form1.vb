@@ -82,11 +82,10 @@ Friend Class Form1
     End Sub
 
     Private Sub Form1_Load(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles MyBase.Load
-        Me.Width = 707
+        Me.Width = 720
         Combo_Testproblem.Items.Add("Sinus-Funktion")
         Combo_Testproblem.Items.Add("Beale-Problem")
         Combo_Testproblem.Items.Add("Schwefel 2.4-Problem")
-        Combo_Testproblem.Items.Add("BlauesModell")
         Combo_Testproblem.SelectedIndex = 0
         TeeCommander1.Chart = TChart1
     End Sub
