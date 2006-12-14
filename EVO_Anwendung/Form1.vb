@@ -16,10 +16,7 @@ Friend Class Form1
     Dim array_y() As Double
     Dim Bestwert(,) As Double
     Dim Population(,) As Double
-    Public mypara(,) As Double
-    'Variablen für das Blaue Modell
-    Public Datensatz As String
-    Public Pfad As String
+    Dim mypara(,) As Double
 
     Private Sub Combo1_SelectedIndexChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Combo1.SelectedIndexChanged
         If Form1.DefInstance.IsInitializing = True Then
@@ -641,17 +638,19 @@ ErrCode_ES_STARTEN:
                 RN(2) = g2
                 Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, f3)
             Case "BlauesModell"
+                'Pfad zur EXE
+                Dim Exe As String = Me.TextBox_EXE.Text
                 'Dateiname auslesen
-                Datensatz = Me.textbox_Datensatz.Text.Substring(Me.textbox_Datensatz.Text.LastIndexOf("\") + 1)
+                Dim Datensatz As String = Me.TextBox_Datensatz.Text.Substring(Me.TextBox_Datensatz.Text.LastIndexOf("\") + 1)
                 'Dateiendung entfernen
                 Datensatz = Datensatz.Substring(0, Datensatz.Length - 4)
-                Pfad = Me.textbox_Datensatz.Text.Substring(0, Me.textbox_Datensatz.Text.LastIndexOf("\") + 1)
+                Dim Pfad As String = Me.TextBox_Datensatz.Text.Substring(0, Me.TextBox_Datensatz.Text.LastIndexOf("\") + 1)
 
                 'modifyCN()
                 'modifyBOF()
                 'modifyBOA()
 
-                BlauesModell.launchBM(Pfad, Datensatz)
+                BlauesModell.launchBM(Exe, Pfad, Datensatz)
 
                 'readAmmel2002()
 
@@ -1312,9 +1311,14 @@ ErrCode_ES_STARTEN:
     End Sub
 
     Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
-        Me.OpenFileDialog1.ShowDialog()
-        Me.textbox_Datensatz.Clear()
-        Me.textbox_Datensatz.AppendText(Me.OpenFileDialog1.FileName)
+        Me.OpenFile_Datensatz.ShowDialog()
+        Me.TextBox_Datensatz.Clear()
+        Me.TextBox_Datensatz.AppendText(Me.OpenFile_Datensatz.FileName)
     End Sub
 
+    Private Sub Button2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button2.Click
+        Me.OpenFile_EXE.ShowDialog()
+        Me.TextBox_EXE.Clear()
+        Me.TextBox_EXE.AppendText(Me.OpenFile_EXE.FileName)
+    End Sub
 End Class
