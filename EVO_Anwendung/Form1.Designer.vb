@@ -141,6 +141,7 @@ Partial Class Form1
         '
         Me.TChart1.Aspect.ElevationFloat = 345
         Me.TChart1.Aspect.RotationFloat = 345
+        Me.TChart1.Aspect.View3D = False
         '
         '
         '
