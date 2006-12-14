@@ -810,13 +810,13 @@ Option Explicit On
 	Private Sub ComboOptEltern_SelectedIndexChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles ComboOptEltern.SelectedIndexChanged
 		Select Case VB6.GetItemData(ComboOptEltern, ComboOptEltern.SelectedIndex)
 			Case EVO_ELTERN_XY_DISKRET, EVO_ELTERN_XY_MITTELN, EVO_ELTERN_Neighbourhood
-				LabelRekombxy1.Visible = True
-                LabelRekombxy3.Visible = True
-				TextRekombxy.Visible = True
+                LabelRekombxy1.Enabled = True
+                LabelRekombxy3.Enabled = True
+                TextRekombxy.Enabled = True
 			Case Else
-				LabelRekombxy1.Visible = False
-                LabelRekombxy3.Visible = False
-				TextRekombxy.Visible = False
+                LabelRekombxy1.Enabled = False
+                LabelRekombxy3.Enabled = False
+                TextRekombxy.Enabled = False
 		End Select
 	End Sub
 	
