@@ -18,40 +18,36 @@ Friend Class Form1
     Dim Population(,) As Double
     Dim mypara(,) As Double
 
-    Private Sub Combo1_SelectedIndexChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Combo1.SelectedIndexChanged
-        If Form1.DefInstance.IsInitializing = True Then
+    Private Sub Combo1_SelectedIndexChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Combo_Testproblem.SelectedIndexChanged
+        If Me.IsInitializing = True Then
             Exit Sub
         Else
-            Select Case Combo1.Text
+            Select Case Combo_Testproblem.Text
                 Case "Sinus-Funktion"
-                    Frame_Problem(0).BringToFront()
+                    Problem_SinusFunktion.BringToFront()
                 Case "Beale-Problem"
-                    Frame_Problem(1).BringToFront()
+                    Problem_BealeProblem.BringToFront()
                 Case "Schwefel 2.4-Problem"
-                    Frame_Problem(2).BringToFront()
-                Case "DEB 1"
-                    Frame_Problem(3).BringToFront()
+                    Problem_Schwefel24.BringToFront()
+                Case "Deb 1"
+                    Problem_D1Funktion.BringToFront()
                 Case "Zitzler/Deb T1"
-                    Frame_Problem(4).BringToFront()
+                    Problem_T1Funktion.BringToFront()
                 Case "Zitzler/Deb T2"
-                    Frame_Problem(5).BringToFront()
+                    Problem_T2Funktion.BringToFront()
                 Case "Zitzler/Deb T3"
-                    Frame_Problem(6).BringToFront()
+                    Problem_T3Funktion.BringToFront()
                 Case "Zitzler/Deb T4"
-                    Frame_Problem(7).BringToFront()
+                    Problem_T4Funktion.BringToFront()
                 Case "CONSTR"
-                    Frame_Problem(8).BringToFront()
+                    Problem_CONSTRFunktion.BringToFront()
                 Case "Box"
-                    Frame_Problem(9).BringToFront()
-                Case "BlauesModell"
-                    Frame_Problem(10).BringToFront()
-                    Me.Width = 1000
-                    Me.GroupBox1.Show()
+                    Problem_TKNFunktion.BringToFront()
             End Select
         End If
     End Sub
 
-    Private Sub Command1_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Command1.Click
+    Private Sub Button_Start_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Button_Start.Click
         myisrun = True
         myIsOK = ES_STARTEN()
     End Sub
@@ -67,33 +63,31 @@ Friend Class Form1
         OptimierungsModus = EVO_Einstellungen1.OptModus
         Select Case OptimierungsModus
             Case 1
-                Combo1.Items.Clear()
-                Combo1.Items.Add("Sinus-Funktion")
-                Combo1.Items.Add("Beale-Problem")
-                Combo1.Items.Add("Schwefel 2.4-Problem")
-                Combo1.Items.Add("BlauesModell")
-                Combo1.SelectedIndex = 0
+                Combo_Testproblem.Items.Clear()
+                Combo_Testproblem.Items.Add("Sinus-Funktion")
+                Combo_Testproblem.Items.Add("Beale-Problem")
+                Combo_Testproblem.Items.Add("Schwefel 2.4-Problem")
+                Combo_Testproblem.SelectedIndex = 0
             Case 2
-                Combo1.Items.Clear()
-                Combo1.Items.Add("Deb 1")
-                Combo1.Items.Add("Zitzler/Deb T1")
-                Combo1.Items.Add("Zitzler/Deb T2")
-                Combo1.Items.Add("Zitzler/Deb T3")
-                Combo1.Items.Add("Zitzler/Deb T4")
-                Combo1.Items.Add("CONSTR")
-                Combo1.Items.Add("Box")
-                Combo1.Items.Add("BlauesModell")
-                Combo1.SelectedIndex = 0
+                Combo_Testproblem.Items.Clear()
+                Combo_Testproblem.Items.Add("Deb 1")
+                Combo_Testproblem.Items.Add("Zitzler/Deb T1")
+                Combo_Testproblem.Items.Add("Zitzler/Deb T2")
+                Combo_Testproblem.Items.Add("Zitzler/Deb T3")
+                Combo_Testproblem.Items.Add("Zitzler/Deb T4")
+                Combo_Testproblem.Items.Add("CONSTR")
+                Combo_Testproblem.Items.Add("Box")
+                Combo_Testproblem.SelectedIndex = 0
         End Select
     End Sub
 
     Private Sub Form1_Load(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles MyBase.Load
         Me.Width = 707
-        Combo1.Items.Add("Sinus-Funktion")
-        Combo1.Items.Add("Beale-Problem")
-        Combo1.Items.Add("Schwefel 2.4-Problem")
-        Combo1.Items.Add("BlauesModell")
-        Combo1.SelectedIndex = 0
+        Combo_Testproblem.Items.Add("Sinus-Funktion")
+        Combo_Testproblem.Items.Add("Beale-Problem")
+        Combo_Testproblem.Items.Add("Schwefel 2.4-Problem")
+        Combo_Testproblem.Items.Add("BlauesModell")
+        Combo_Testproblem.SelectedIndex = 0
         TeeCommander1.Chart = TChart1
     End Sub
 
@@ -164,9 +158,9 @@ Friend Class Form1
         isInteract = EVO_Einstellungen1.isInteract
         NMemberSecondPop = EVO_Einstellungen1.NMemberSecondPop
 
-        Select Case Combo1.Text
+        Select Case Combo_Testproblem.Text
             Case "Sinus-Funktion"
-                globalAnzPar = CShort(Par_Sinus.Text)
+                globalAnzPar = CShort(Text_Sinusfunktion_Par.Text)
                 globalAnzZiel = 1
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar, 1)
@@ -183,7 +177,7 @@ Friend Class Form1
                 mypara(2, 1) = 0.5
                 Call Ausgangswert_Beale()
             Case "Schwefel 2.4-Problem" 'xi = [-10,10]
-                globalAnzPar = CShort(Par_Schwefel.Text)
+                globalAnzPar = CShort(Text_Schwefel24_Par.Text)
                 globalAnzZiel = 1
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar, 1)
@@ -510,7 +504,7 @@ ErrCode_ES_STARTEN:
         Dim f2, f1, f3 As Double
         Dim g1, g2 As Double
 
-        Select Case Combo1.Text
+        Select Case Combo_Testproblem.Text
 
             'Single-Objective Problemstellungen
             Case "Sinus-Funktion" 'Fehlerquadrate zur Sinusfunktion |0-2pi|
@@ -634,32 +628,6 @@ ErrCode_ES_STARTEN:
                 RN(1) = g1
                 RN(2) = g2
                 Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, f3)
-            Case "BlauesModell"
-                'Pfad zur EXE
-                Dim Exe As String = Me.TextBox_EXE.Text
-                'Dateiname auslesen
-                Dim Datensatz As String = Me.TextBox_Datensatz.Text.Substring(Me.TextBox_Datensatz.Text.LastIndexOf("\") + 1)
-                'Dateiendung entfernen
-                Datensatz = Datensatz.Substring(0, Datensatz.Length - 4)
-                Dim Pfad As String = Me.TextBox_Datensatz.Text.Substring(0, Me.TextBox_Datensatz.Text.LastIndexOf("\") + 1)
-
-                'modifyCN()
-                'modifyBOF()
-                'modifyBOA()
-
-                BlauesModell.launchBM(Exe, Pfad, Datensatz)
-
-                'readAmmel2002()
-
-                'readWel()
-
-                'Fehlerquadrate 
-                'QN(1) = 0
-                'For i = 1 To 336
-                '    QN(1) = QN(1) + (Math.Abs(Form2.QsimAmmel(i) - Form2.QbeobAmmel(i))) ^ 2
-                'Next i
-
-                'Console.Out.WriteLine(QN(1))
         End Select
     End Function
 
@@ -670,7 +638,7 @@ ErrCode_ES_STARTEN:
         Dim Anzahl_Kalkulationen As Integer
         Dim Populationen As Short
 
-        Datenmenge = CShort(Par_Sinus.Text)
+        Datenmenge = CShort(Text_Sinusfunktion_Par.Text)
         If EVO_Einstellungen1.isPOPUL Then
             Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden
         Else
@@ -946,7 +914,7 @@ ErrCode_ES_STARTEN:
             Point3.Pointer.HorizSize = 3
             Point3.Pointer.VertSize = 3
 
-            Select Case Combo1.Text
+            Select Case Combo_Testproblem.Text
 
                 Case "Deb 1"
                     Dim Array1X(100) As Double
@@ -1295,7 +1263,7 @@ ErrCode_ES_STARTEN:
     End Sub
 
     'TODO: Welchen Zweck hat das?
-    Private Sub Par_Sinus_KeyPress(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.KeyPressEventArgs) Handles Par_Sinus.KeyPress
+    Private Sub Par_Sinus_KeyPress(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.KeyPressEventArgs) Handles Text_Sinusfunktion_Par.KeyPress
         Dim KeyAscii As Short = Asc(eventArgs.KeyChar)
         'TODO: UPGRADE_ISSUE: Zuweisung wird nicht unterstützt: KeyAscii an Nicht-Null-Wert Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1058"'
         KeyAscii = KEYOK(KeyAscii, AllowIntegerOnly)
@@ -1304,15 +1272,34 @@ ErrCode_ES_STARTEN:
         End If
     End Sub
 
-    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
+    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Datensatz.Click
         Me.OpenFile_Datensatz.ShowDialog()
         Me.TextBox_Datensatz.Clear()
         Me.TextBox_Datensatz.AppendText(Me.OpenFile_Datensatz.FileName)
     End Sub
 
-    Private Sub Button2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button2.Click
+    Private Sub Button2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Exe.Click
         Me.OpenFile_EXE.ShowDialog()
         Me.TextBox_EXE.Clear()
         Me.TextBox_EXE.AppendText(Me.OpenFile_EXE.FileName)
+    End Sub
+
+    Private Sub Radio_Testproblem_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Radio_Testproblem.CheckedChanged
+        If (Me.Radio_Testproblem.Checked = True) Then
+            Me.GroupBox_Testproblem.Enabled = True
+            Me.Problem_SinusFunktion.Enabled = True
+        Else
+            Me.GroupBox_Testproblem.Enabled = False
+        End If
+    End Sub
+
+    Private Sub Radio_BM_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Radio_BM.CheckedChanged
+        If (Me.Radio_BM.Checked = True) Then
+            Me.Width = 1020
+            Me.GroupBox_BM.Enabled = True
+        Else
+            Me.GroupBox_BM.Enabled = False
+            Me.Width = 720
+        End If
     End Sub
 End Class
