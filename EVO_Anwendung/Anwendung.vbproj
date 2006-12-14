@@ -85,7 +85,10 @@
     <Reference Include="System.Xml">
       <Name>System.XML</Name>
     </Reference>
-    <Reference Include="TeeChart, Version=2.0.2469.25745, Culture=neutral, PublicKeyToken=9c8126276c77bdb7, processorArchitecture=MSIL" />
+    <Reference Include="TeeChart, Version=2.0.2469.25744, Culture=neutral, PublicKeyToken=9c8126276c77bdb7">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\TeeChart.dll</HintPath>
+    </Reference>
     <COMReference Include="Scripting">
       <Guid>{420B2830-E718-11CF-893D-00A0C9054228}</Guid>
       <VersionMajor>1</VersionMajor>
