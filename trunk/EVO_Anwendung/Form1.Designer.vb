@@ -110,10 +110,14 @@ Partial Class Form1
         Me.Frame_Problem = New Microsoft.VisualBasic.Compatibility.VB6.GroupBoxArray(Me.components)
         Me.TeeCommander1 = New Steema.TeeChart.Commander
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
+        Me.Label2 = New System.Windows.Forms.Label
+        Me.TextBox_EXE = New System.Windows.Forms.TextBox
+        Me.Button2 = New System.Windows.Forms.Button
         Me.Button1 = New System.Windows.Forms.Button
         Me.Label1 = New System.Windows.Forms.Label
-        Me.textbox_Datensatz = New System.Windows.Forms.TextBox
-        Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog
+        Me.TextBox_Datensatz = New System.Windows.Forms.TextBox
+        Me.OpenFile_Datensatz = New System.Windows.Forms.OpenFileDialog
+        Me.OpenFile_EXE = New System.Windows.Forms.OpenFileDialog
         Me._Frame_Problem_10.SuspendLayout()
         Me._Frame_Problem_9.SuspendLayout()
         Me._Frame_Problem_8.SuspendLayout()
@@ -982,9 +986,12 @@ Partial Class Form1
         '
         'GroupBox1
         '
+        Me.GroupBox1.Controls.Add(Me.Label2)
+        Me.GroupBox1.Controls.Add(Me.TextBox_EXE)
+        Me.GroupBox1.Controls.Add(Me.Button2)
         Me.GroupBox1.Controls.Add(Me.Button1)
         Me.GroupBox1.Controls.Add(Me.Label1)
-        Me.GroupBox1.Controls.Add(Me.textbox_Datensatz)
+        Me.GroupBox1.Controls.Add(Me.TextBox_Datensatz)
         Me.GroupBox1.Location = New System.Drawing.Point(703, 0)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(285, 310)
@@ -993,9 +1000,35 @@ Partial Class Form1
         Me.GroupBox1.Text = "BlauesModell"
         Me.GroupBox1.Visible = False
         '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(6, 28)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(41, 13)
+        Me.Label2.TabIndex = 29
+        Me.Label2.Text = "Modell:"
+        '
+        'TextBox_EXE
+        '
+        Me.TextBox_EXE.Location = New System.Drawing.Point(70, 21)
+        Me.TextBox_EXE.Name = "TextBox_EXE"
+        Me.TextBox_EXE.Size = New System.Drawing.Size(179, 20)
+        Me.TextBox_EXE.TabIndex = 28
+        '
+        'Button2
+        '
+        Me.Button2.Location = New System.Drawing.Point(255, 19)
+        Me.Button2.Name = "Button2"
+        Me.Button2.RightToLeft = System.Windows.Forms.RightToLeft.Yes
+        Me.Button2.Size = New System.Drawing.Size(24, 23)
+        Me.Button2.TabIndex = 27
+        Me.Button2.Text = "..."
+        Me.Button2.UseVisualStyleBackColor = True
+        '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(255, 26)
+        Me.Button1.Location = New System.Drawing.Point(255, 43)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(24, 23)
         Me.Button1.TabIndex = 26
@@ -1005,24 +1038,31 @@ Partial Class Form1
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(6, 31)
+        Me.Label1.Location = New System.Drawing.Point(6, 48)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(58, 13)
         Me.Label1.TabIndex = 25
         Me.Label1.Text = "Datensatz:"
         '
-        'textbox_Datensatz
+        'TextBox_Datensatz
         '
-        Me.textbox_Datensatz.Location = New System.Drawing.Point(70, 28)
-        Me.textbox_Datensatz.Name = "textbox_Datensatz"
-        Me.textbox_Datensatz.Size = New System.Drawing.Size(179, 20)
-        Me.textbox_Datensatz.TabIndex = 24
-        Me.textbox_Datensatz.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.TextBox_Datensatz.Location = New System.Drawing.Point(70, 45)
+        Me.TextBox_Datensatz.Name = "TextBox_Datensatz"
+        Me.TextBox_Datensatz.Size = New System.Drawing.Size(179, 20)
+        Me.TextBox_Datensatz.TabIndex = 24
+        Me.TextBox_Datensatz.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
-        'OpenFileDialog1
+        'OpenFile_Datensatz
         '
-        Me.OpenFileDialog1.Filter = "ALL-Dateien|*.ALL"
-        Me.OpenFileDialog1.Title = "Datensatz auswählen"
+        Me.OpenFile_Datensatz.Filter = "ALL-Dateien|*.ALL"
+        Me.OpenFile_Datensatz.Title = "Datensatz auswählen"
+        '
+        'OpenFile_EXE
+        '
+        Me.OpenFile_EXE.DereferenceLinks = False
+        Me.OpenFile_EXE.FileName = "BlauesModell.exe"
+        Me.OpenFile_EXE.Filter = "Anwendung|*.exe"
+        Me.OpenFile_EXE.Title = "Modell exe auswählen"
         '
         'Form1
         '
@@ -1090,8 +1130,12 @@ Partial Class Form1
     Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
     Friend WithEvents Button1 As System.Windows.Forms.Button
     Friend WithEvents Label1 As System.Windows.Forms.Label
-    Friend WithEvents textbox_Datensatz As System.Windows.Forms.TextBox
-    Friend WithEvents OpenFileDialog1 As System.Windows.Forms.OpenFileDialog
+    Friend WithEvents TextBox_Datensatz As System.Windows.Forms.TextBox
+    Friend WithEvents OpenFile_Datensatz As System.Windows.Forms.OpenFileDialog
+    Friend WithEvents Label2 As System.Windows.Forms.Label
+    Friend WithEvents TextBox_EXE As System.Windows.Forms.TextBox
+    Friend WithEvents Button2 As System.Windows.Forms.Button
+    Friend WithEvents OpenFile_EXE As System.Windows.Forms.OpenFileDialog
     Public Shared Property DefInstance() As Form1
         Get
             If m_vb6FormDefInstance Is Nothing OrElse m_vb6FormDefInstance.IsDisposed Then
