@@ -166,7 +166,7 @@ Friend Class Form1
                 For i = 1 To globalAnzPar
                     mypara(i, 1) = 0
                 Next
-                Call Sinuskurve()
+                Call Ausgangswert_Sinuskurve()
             Case "Beale-Problem" 'x1 = [-5;5], x2=[-2;2]
                 globalAnzPar = 2
                 globalAnzZiel = 1
@@ -254,13 +254,21 @@ Friend Class Form1
                 Call Ausgangswert_Box()
             Case "BlauesModell"
                 globalAnzPar = 3
-                globalAnzZiel = 3
+                globalAnzZiel = 1
                 globalAnzRand = 2
                 ReDim mypara(globalAnzPar, 1)
                 Randomize()
                 mypara(1, 1) = Rnd()
                 mypara(2, 1) = Rnd()
                 mypara(3, 1) = Rnd()
+
+                'ToDo:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                'For i = 1 To globalAnzPar
+                '    mypara(i, 1) = 0
+                'Next
+                'Parameter müssen aus dem Datensatz ausgelesen werden
+                BlauesModell.Anfangsparameter_auslesen()
+
                 Call Ausgangswert_BlauesModell()
         End Select
 
@@ -290,7 +298,7 @@ Friend Class Form1
         End If
 
         '***************************************************************************************************
-        'CEvolutionsstrategie, 1. Schritt
+        '1. Schritt: CEvolutionsstrategie
         '***************************************************************************************************
         'Objekt der Klasse CEvolutionsstrategie wird erzeugen
         '***************************************************************************************************
@@ -298,7 +306,7 @@ Friend Class Form1
         evolutionsstrategie = New dmevodll.CEvolutionsstrategie
 
         '***************************************************************************************************
-        'CEvolutionsstrategie - ES_INI, 2. Schritt
+        '2. Schritt: CEvolutionsstrategie - ES_INI
         '***************************************************************************************************
         'Die öffentlichen dynamischen Arrays werden initialisiert (Dn, An, Xn, Xmin, Xmax)
         'und die Anzahl der Zuielfunktionen wird festgelegt
@@ -307,7 +315,7 @@ Friend Class Form1
         isOK = evolutionsstrategie.EsIni(globalAnzPar, globalAnzZiel, globalAnzRand)
 
         '***************************************************************************************************
-        'CEvolutionsstrategie - ES_OPTIONS, 3. Schritt
+        '3. Schritt: CEvolutionsstrategie - ES_OPTIONS
         '***************************************************************************************************
         'Optionen der Evolutionsstrategie werden übergeben
         '***************************************************************************************************
@@ -315,7 +323,7 @@ Friend Class Form1
         isOK = evolutionsstrategie.EsOptions(iEvoTyp, iPopEvoTyp, isPOPUL, NRunden, NPopul, NPopEltern, iOptPopEltern, iOptEltern, iPopPenalty, NGen, NEltern, NNachf, NRekombXY, rDeltaStart, iStartPar, isdnvektor, isMultiObjective, isPareto, isPareto3D, Interact, isInteract, NMemberSecondPop)
 
         '***************************************************************************************************
-        'CEvolutionsstrategie - ES_ES_LET_PARAMETER, 4. Schritt
+        '4. Schritt: CEvolutionsstrategie - ES_ES_LET_PARAMETER
         '***************************************************************************************************
         'Ausgangsparameter werden übergeben
         '***************************************************************************************************
@@ -325,7 +333,7 @@ Friend Class Form1
         Next i
 
         '***************************************************************************************************
-        'CEvolutionsstrategie - ES_PREPARE, 5. Schritt
+        '5. Schritt: CEvolutionsstrategie - ES_PREPARE
         '***************************************************************************************************
         'Interne Variablen werden initialisiert, Zufallsgenerator wird initialisiert
         '***************************************************************************************************
@@ -333,7 +341,7 @@ Friend Class Form1
         myIsOK = evolutionsstrategie.EsPrepare
 
         '***************************************************************************************************
-        'CEvolutionsstrategie - ES_STARTVALUES, 6. Schritt
+        '6. Schritt: CEvolutionsstrategie - ES_STARTVALUES
         '***************************************************************************************************
         'Startwerte werden zugewiesen
         '***************************************************************************************************
@@ -412,7 +420,7 @@ Start_Evolutionsrunden:
                             myIsOK = evolutionsstrategie.EsGetBestwert(Bestwert)
                         End If
 
-                        'Bestimmen der Qualitätsfunktion
+                        'Bestimmen der Zielfunktion bzw. Start der Simulation
                         myIsOK = Zielfunktion(globalAnzPar, mypara, durchlauf, Bestwert, ipop, QN, RN)
 
                         'Einordnen der Qualitätsfunktion im Bestwertspeicher
@@ -504,8 +512,9 @@ ErrCode_ES_STARTEN:
         Dim g1, g2 As Double
 
         Select Case Combo_Testproblem.Text
-
-            'Single-Objective Problemstellungen
+            '**************************************
+            '* Single-Objective Problemstellungen *
+            '**************************************
             Case "Sinus-Funktion" 'Fehlerquadrate zur Sinusfunktion |0-2pi|
                 Unterteilung_X = 2 * 3.1415926535898 / (AnzPar - 1)
                 QN(1) = 0
@@ -531,8 +540,9 @@ ErrCode_ES_STARTEN:
                     QN(1) = QN(1) + ((X(1) - X(i) ^ 2) ^ 2 + (X(i) - 1) ^ 2)
                 Next i
                 Call Zielfunktion_zeichnen_SingleOb(QN(1), durchlauf, ipop)
-
-                'Multi-Objective Problemstellungen
+                '*************************************
+                '* Multi-Objective Problemstellungen *
+                '*************************************
                 'Deb 2000, D1 (Konvexe Pareto-Front)
             Case "Deb 1"
                 f1 = Par(1, 1) * (9 / 10) + 0.1
@@ -592,7 +602,7 @@ ErrCode_ES_STARTEN:
                 f2 = f2 * (1 - System.Math.Sqrt(f1 / f2))
                 QN(1) = f1
                 QN(2) = f2
-                'Call Zielfunktion_zeichnen3(f1, f2, ipop)
+                Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, ipop)
 
             Case "CONSTR"
                 f1 = Par(1, 1) * (9 / 10) + 0.1
@@ -627,10 +637,66 @@ ErrCode_ES_STARTEN:
                 RN(1) = g1
                 RN(2) = g2
                 Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, f3)
+
+                '*************************************
+                '*          Blaues Modell            *
+                '*************************************
+
+            Case "BlauesModell"
+                'Pfad zur EXE
+                Dim Exe As String = Me.TextBox_EXE.Text
+                'Dateiname auslesen
+                Dim Datensatz As String = Me.TextBox_Datensatz.Text.Substring(Me.TextBox_Datensatz.Text.LastIndexOf("\") + 1)
+                'Dateiendung entfernen
+                Datensatz = Datensatz.Substring(0, Datensatz.Length - 4)
+                Dim Pfad As String = Me.TextBox_Datensatz.Text.Substring(0, Me.TextBox_Datensatz.Text.LastIndexOf("\") + 1)
+
+                'Mutierte Parameter schreiben
+                BlauesModell.Parameter_schreiben()
+
+                'Modell Starten
+                BlauesModell.launchBM(Exe, Pfad, Datensatz)
+
+                'Ergebnis der Berechnung auslesen
+                BlauesModell.Ergebisdatei_auslesen()
+
+                'Qualitätswert berechen
+                f1 = BlauesModell.Qualitaetswert
+                QN(1) = f1
+
+                'Zielfunktion im TeeChart zeichnen
+                If ipop = 1 Then
+                    Zielfunktion_zeichnen_SingleOb(QN(1), durchlauf, ipop)
+
+                ElseIf ipop = 2 Then
+                    Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, ipop)
+
+                ElseIf ipop = 3 Then
+                    Zielfunktion_zeichnen_MultiObPar_3D(f1, f2, f3)
+
+                Else
+                    Zielfunktion_zeichnen_MultiObPar_XD()
+
+                End If
+
+                'modifyCN()
+                'modifyBOF()
+                'modifyBOA()
+                'readAmmel2002()
+
+                'readWel()
+
+                'Fehlerquadrate 
+                'QN(1) = 0
+                'For i = 1 To 336
+                '    QN(1) = QN(1) + (Math.Abs(Form2.QsimAmmel(i) - Form2.QbeobAmmel(i))) ^ 2
+                'Next i
+
+                'Console.Out.WriteLine(QN(1))
         End Select
     End Function
 
-    Private Sub Sinuskurve()
+    Private Sub Ausgangswert_Sinuskurve()
         Dim i As Short
         Dim Datenmenge As Short
         Dim Unterteilung_X As Double
@@ -774,72 +840,6 @@ ErrCode_ES_STARTEN:
         With TChart1
             .Clear()
             .Header.Text = "Schwefel-Problem 2.4"
-            .Aspect.View3D = False
-            .Legend.Visible = False
-
-            'Linie der Anfangswerte 
-            Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-            Line1.Add(array_x, array_y)
-            Line1.Color = System.Drawing.Color.Red
-
-            'Anzahl Populationen
-            Populationen = 1
-            If EVO_Einstellungen1.isPOPUL Then
-                Populationen = EVO_Einstellungen1.NPopul
-            End If
-
-            'Für jede Population eine Series
-            For i = 1 To Populationen
-                Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
-                Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-                Point1.Pointer.HorizSize = 3
-                Point1.Pointer.VertSize = 3
-            Next i
-
-            'Formatierung der Axen
-            .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Maximum = Anzahl_Kalkulationen
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Left.Automatic = False
-            .Chart.Axes.Left.Maximum = Ausgangsergebnis * 1.2
-            .Chart.Axes.Left.Minimum = -1
-            .Chart.Axes.Left.Logarithmic = False
-        End With
-    End Sub
-
-    Private Sub Ausgangswert_BlauesModell()
-        Dim Ausgangsergebnis As Double
-        Dim Anzahl_Kalkulationen As Integer
-        Dim Populationen As Short
-        Dim i As Short
-        Dim X() As Double
-
-        If EVO_Einstellungen1.isPOPUL Then
-            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden
-        Else
-            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
-        End If
-
-        ReDim X(globalAnzPar)
-        For i = 1 To globalAnzPar
-            X(i) = 10
-        Next i
-
-        Ausgangsergebnis = 0
-        For i = 1 To globalAnzPar
-            Ausgangsergebnis = Ausgangsergebnis + ((X(1) - X(i) ^ 2) ^ 2 + (X(i) - 1) ^ 2)
-        Next i
-
-        ReDim array_y(Anzahl_Kalkulationen - 1)
-        ReDim array_x(Anzahl_Kalkulationen - 1)
-        For i = 0 To Anzahl_Kalkulationen - 1
-            array_y(i) = Ausgangsergebnis
-            array_x(i) = i + 1
-        Next i
-
-        With TChart1
-            .Clear()
-            .Header.Text = "BlauesModell"
             .Aspect.View3D = False
             .Legend.Visible = False
 
@@ -1031,6 +1031,7 @@ ErrCode_ES_STARTEN:
     End Sub
 
     Private Sub Ausgangswert_CONSTR()
+        'ToDo: Constr funzt nur wenn es eine eigene Ausgangswertfunktion hat. Soll eigentlich mit oben in Ausgangswert_MultiObPareto()
         Dim Populationen As Short
         Dim j As Short
         Dim Array1X(100) As Double
@@ -1131,8 +1132,8 @@ ErrCode_ES_STARTEN:
     End Sub
 
     Private Sub Ausgangswert_Box()
+        'ToDo: Zeichnen muss auf 3D erweitert werden. Hier 3D Testproblem.
         Dim Populationen As Short
-        'Dim i, j As Short
         Dim ArrayX(100) As Double
         Dim ArrayY(100) As Double
 
@@ -1184,6 +1185,72 @@ ErrCode_ES_STARTEN:
         End With
     End Sub
 
+    Private Sub Ausgangswert_BlauesModell()
+        Dim Ausgangsergebnis As Double
+        Dim Anzahl_Kalkulationen As Integer
+        Dim Populationen As Short
+        Dim i As Short
+        Dim X() As Double
+
+        If EVO_Einstellungen1.isPOPUL Then
+            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden
+        Else
+            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
+        End If
+
+        ReDim X(globalAnzPar)
+        For i = 1 To globalAnzPar
+            X(i) = 10
+        Next i
+
+        Ausgangsergebnis = 0
+        For i = 1 To globalAnzPar
+            Ausgangsergebnis = Ausgangsergebnis + ((X(1) - X(i) ^ 2) ^ 2 + (X(i) - 1) ^ 2)
+        Next i
+
+        ReDim array_y(Anzahl_Kalkulationen - 1)
+        ReDim array_x(Anzahl_Kalkulationen - 1)
+        For i = 0 To Anzahl_Kalkulationen - 1
+            array_y(i) = Ausgangsergebnis
+            array_x(i) = i + 1
+        Next i
+
+        With TChart1
+            .Clear()
+            .Header.Text = "BlauesModell"
+            .Aspect.View3D = False
+            .Legend.Visible = False
+
+            'Linie der Anfangswerte 
+            Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
+            Line1.Add(array_x, array_y)
+            Line1.Color = System.Drawing.Color.Red
+
+            'Anzahl Populationen
+            Populationen = 1
+            If EVO_Einstellungen1.isPOPUL Then
+                Populationen = EVO_Einstellungen1.NPopul
+            End If
+
+            'Für jede Population eine Series
+            For i = 1 To Populationen
+                Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
+                Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+                Point1.Pointer.HorizSize = 3
+                Point1.Pointer.VertSize = 3
+            Next i
+
+            'Formatierung der Axen
+            .Chart.Axes.Bottom.Automatic = False
+            .Chart.Axes.Bottom.Maximum = Anzahl_Kalkulationen
+            .Chart.Axes.Bottom.Minimum = 0
+            .Chart.Axes.Left.Automatic = False
+            .Chart.Axes.Left.Maximum = Ausgangsergebnis * 1.2
+            .Chart.Axes.Left.Minimum = -1
+            .Chart.Axes.Left.Logarithmic = False
+        End With
+    End Sub
+
     Private Sub Zielfunktion_zeichnen_Sinus(ByRef AnzPar As Short, ByRef Par(,) As Double, ByRef durchlauf As Integer, ByRef ipop As Short)
         Dim i As Short
         Dim Unterteilung_X As Double
@@ -1207,7 +1274,7 @@ ErrCode_ES_STARTEN:
         TChart1.Series(ipop).Add(durchlauf, Wert, "")
 
     End Sub
-
+    'ToDo: ipop muss hier nicht übergeben werden das es bei Parato nur eine Population gibt
     Private Sub Zielfunktion_zeichnen_MultiObPar_2D(ByRef f1 As Double, ByRef f2 As Double, ByRef ipop As Short)
 
         TChart1.Series(0).Add(f1, f2, "")
@@ -1218,6 +1285,12 @@ ErrCode_ES_STARTEN:
 
         'TODO: Hier muss eine 3D-Reihe angezeigt werden
         'TChart1.Series(0).Add(f1, f2, f3, "")
+
+    End Sub
+
+    Private Sub Zielfunktion_zeichnen_MultiObPar_XD()
+
+        'ToDo Projektion der XD Information auf 2D
 
     End Sub
 
@@ -1289,6 +1362,7 @@ ErrCode_ES_STARTEN:
             Me.Problem_SinusFunktion.Enabled = True
         Else
             Me.GroupBox_Testproblem.Enabled = False
+            Me.Problem_SinusFunktion.Enabled = False
         End If
     End Sub
 
