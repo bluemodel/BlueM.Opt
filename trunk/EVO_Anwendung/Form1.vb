@@ -56,8 +56,6 @@ Friend Class Form1
         myisrun = False
     End Sub
 
-
-
     Private Sub EVO_Einstellungen1_ModusChanges(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles EVO_Einstellungen1.ModusChanges
         Dim OptimierungsModus As Integer
         OptimierungsModus = EVO_Einstellungen1.OptModus
@@ -124,6 +122,13 @@ Friend Class Form1
         Dim QN() As Double
         Dim RN() As Double
         '--------------------------
+        'HACK: nur vorübergehender Behelfsparametersatz
+        Dim TestPara(4, 1) As Double
+        TestPara(1, 1) = 0
+        TestPara(2, 1) = 0.1
+        TestPara(3, 1) = 0.1
+        TestPara(3, 1) = 0.1
+        '---------------------------
 
         'TODO: On Error GoTo Err_ES_STARTEN
 
@@ -157,120 +162,136 @@ Friend Class Form1
         isInteract = EVO_Einstellungen1.isInteract
         NMemberSecondPop = EVO_Einstellungen1.NMemberSecondPop
 
-        Select Case Combo_Testproblem.Text
-            Case "Sinus-Funktion"
-                globalAnzPar = CShort(Text_Sinusfunktion_Par.Text)
-                globalAnzZiel = 1
-                globalAnzRand = 0
-                ReDim mypara(globalAnzPar, 1)
-                For i = 1 To globalAnzPar
-                    mypara(i, 1) = 0
-                Next
-                Call Ausgangswert_Sinuskurve()
-            Case "Beale-Problem" 'x1 = [-5;5], x2=[-2;2]
-                globalAnzPar = 2
-                globalAnzZiel = 1
-                globalAnzRand = 0
-                ReDim mypara(globalAnzPar, 1)
-                mypara(1, 1) = 0.5
-                mypara(2, 1) = 0.5
-                Call Ausgangswert_Beale()
-            Case "Schwefel 2.4-Problem" 'xi = [-10,10]
-                globalAnzPar = CShort(Text_Schwefel24_Par.Text)
-                globalAnzZiel = 1
-                globalAnzRand = 0
-                ReDim mypara(globalAnzPar, 1)
-                For i = 1 To globalAnzPar
-                    mypara(i, 1) = 1
-                Next i
-                Call Ausgangswert_Schwefel24()
-            Case "Deb 1" 'x1 = [0.1;1], x2=[0;5]
-                globalAnzPar = 2
-                globalAnzZiel = 2
-                globalAnzRand = 0
-                ReDim mypara(globalAnzPar, 1)
-                Randomize()
-                mypara(1, 1) = Rnd()
-                mypara(2, 1) = Rnd()
-                Call Ausgangswert_MultiObPareto()
-            Case "Zitzler/Deb T1" 'xi = [0,1]
-                globalAnzPar = 30
-                globalAnzZiel = 2
-                globalAnzRand = 0
-                ReDim mypara(globalAnzPar, 1)
-                Randomize()
-                For i = 1 To globalAnzPar
-                    mypara(i, 1) = Rnd()
-                Next i
-                Call Ausgangswert_MultiObPareto()
-            Case "Zitzler/Deb T2" 'xi = [0,1]
-                globalAnzPar = 30
-                globalAnzZiel = 2
-                globalAnzRand = 0
-                ReDim mypara(globalAnzPar, 1)
-                Randomize()
-                For i = 1 To globalAnzPar
-                    mypara(i, 1) = Rnd()
-                Next i
-                Call Ausgangswert_MultiObPareto()
-            Case "Zitzler/Deb T3" 'xi = [0,1]
-                globalAnzPar = 15
-                globalAnzZiel = 2
-                globalAnzRand = 0
-                ReDim mypara(globalAnzPar, 1)
-                Randomize()
-                For i = 1 To globalAnzPar
-                    mypara(i, 1) = Rnd()
-                Next i
-                Call Ausgangswert_MultiObPareto()
-            Case "Zitzler/Deb T4" 'x1 = [0,1], xi=[-5,5]
-                globalAnzPar = 10
-                globalAnzZiel = 2
-                globalAnzRand = 0
-                ReDim mypara(globalAnzPar, 1)
-                Randomize()
-                For i = 1 To globalAnzPar
-                    mypara(i, 1) = Rnd()
-                Next i
-                Call Ausgangswert_MultiObPareto()
-            Case "CONSTR" 'x1 = [0.1;1], x2=[0;5]
-                globalAnzPar = 2
-                globalAnzZiel = 2
-                globalAnzRand = 2
-                ReDim mypara(globalAnzPar, 1)
-                Randomize()
-                mypara(1, 1) = Rnd()
-                mypara(2, 1) = Rnd()
-                Call Ausgangswert_CONSTR()
-            Case "Box"
-                globalAnzPar = 3
-                globalAnzZiel = 3
-                globalAnzRand = 2
-                ReDim mypara(globalAnzPar, 1)
-                Randomize()
-                mypara(1, 1) = Rnd()
-                mypara(2, 1) = Rnd()
-                mypara(3, 1) = Rnd()
-                Call Ausgangswert_Box()
-            Case "BlauesModell"
-                globalAnzPar = 3
-                globalAnzZiel = 1
-                globalAnzRand = 2
-                ReDim mypara(globalAnzPar, 1)
-                Randomize()
-                mypara(1, 1) = Rnd()
-                mypara(2, 1) = Rnd()
-                mypara(3, 1) = Rnd()
 
-                'ToDo:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-                'For i = 1 To globalAnzPar
-                '    mypara(i, 1) = 0
-                'Next
-                'Parameter müssen aus dem Datensatz ausgelesen werden
-                Call BM_Form1.Anfangsparameter_auslesen()
+        If (Me.Radio_Testproblem.Checked = True) Then
 
-                Call Ausgangswert_BlauesModell()
-        End Select
+            '*************************************
+            '*          Testprobleme             *
+            '*************************************
+
+            Select Case Combo_Testproblem.Text
+                Case "Sinus-Funktion"
+                    globalAnzPar = CShort(Text_Sinusfunktion_Par.Text)
+                    globalAnzZiel = 1
+                    globalAnzRand = 0
+                    ReDim mypara(globalAnzPar, 1)
+                    For i = 1 To globalAnzPar
+                        mypara(i, 1) = 0
+                    Next
+                    Call Ausgangswert_Sinuskurve()
+                Case "Beale-Problem" 'x1 = [-5;5], x2=[-2;2]
+                    globalAnzPar = 2
+                    globalAnzZiel = 1
+                    globalAnzRand = 0
+                    ReDim mypara(globalAnzPar, 1)
+                    mypara(1, 1) = 0.5
+                    mypara(2, 1) = 0.5
+                    Call Ausgangswert_Beale()
+                Case "Schwefel 2.4-Problem" 'xi = [-10,10]
+                    globalAnzPar = CShort(Text_Schwefel24_Par.Text)
+                    globalAnzZiel = 1
+                    globalAnzRand = 0
+                    ReDim mypara(globalAnzPar, 1)
+                    For i = 1 To globalAnzPar
+                        mypara(i, 1) = 1
+                    Next i
+                    Call Ausgangswert_Schwefel24()
+                Case "Deb 1" 'x1 = [0.1;1], x2=[0;5]
+                    globalAnzPar = 2
+                    globalAnzZiel = 2
+                    globalAnzRand = 0
+                    ReDim mypara(globalAnzPar, 1)
+                    Randomize()
+                    mypara(1, 1) = Rnd()
+                    mypara(2, 1) = Rnd()
+                    Call Ausgangswert_MultiObPareto()
+                Case "Zitzler/Deb T1" 'xi = [0,1]
+                    globalAnzPar = 30
+                    globalAnzZiel = 2
+                    globalAnzRand = 0
+                    ReDim mypara(globalAnzPar, 1)
+                    Randomize()
+                    For i = 1 To globalAnzPar
+                        mypara(i, 1) = Rnd()
+                    Next i
+                    Call Ausgangswert_MultiObPareto()
+                Case "Zitzler/Deb T2" 'xi = [0,1]
+                    globalAnzPar = 30
+                    globalAnzZiel = 2
+                    globalAnzRand = 0
+                    ReDim mypara(globalAnzPar, 1)
+                    Randomize()
+                    For i = 1 To globalAnzPar
+                        mypara(i, 1) = Rnd()
+                    Next i
+                    Call Ausgangswert_MultiObPareto()
+                Case "Zitzler/Deb T3" 'xi = [0,1]
+                    globalAnzPar = 15
+                    globalAnzZiel = 2
+                    globalAnzRand = 0
+                    ReDim mypara(globalAnzPar, 1)
+                    Randomize()
+                    For i = 1 To globalAnzPar
+                        mypara(i, 1) = Rnd()
+                    Next i
+                    Call Ausgangswert_MultiObPareto()
+                Case "Zitzler/Deb T4" 'x1 = [0,1], xi=[-5,5]
+                    globalAnzPar = 10
+                    globalAnzZiel = 2
+                    globalAnzRand = 0
+                    ReDim mypara(globalAnzPar, 1)
+                    Randomize()
+                    For i = 1 To globalAnzPar
+                        mypara(i, 1) = Rnd()
+                    Next i
+                    Call Ausgangswert_MultiObPareto()
+                Case "CONSTR" 'x1 = [0.1;1], x2=[0;5]
+                    globalAnzPar = 2
+                    globalAnzZiel = 2
+                    globalAnzRand = 2
+                    ReDim mypara(globalAnzPar, 1)
+                    Randomize()
+                    mypara(1, 1) = Rnd()
+                    mypara(2, 1) = Rnd()
+                    Call Ausgangswert_CONSTR()
+                Case "Box"
+                    globalAnzPar = 3
+                    globalAnzZiel = 3
+                    globalAnzRand = 2
+                    ReDim mypara(globalAnzPar, 1)
+                    Randomize()
+                    mypara(1, 1) = Rnd()
+                    mypara(2, 1) = Rnd()
+                    mypara(3, 1) = Rnd()
+                    Call Ausgangswert_Box()
+            End Select
+
+
+        ElseIf (Me.Radio_BM.Checked = True) Then
+
+            '*******************************
+            '*        BlauesModell         *
+            '*******************************
+
+            globalAnzPar = 3
+            globalAnzZiel = 1
+            globalAnzRand = 2
+            ReDim mypara(globalAnzPar, 1)
+            Randomize()
+            mypara(1, 1) = Rnd()
+            mypara(2, 1) = Rnd()
+            mypara(3, 1) = Rnd()
+
+            'ToDo:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+            'For i = 1 To globalAnzPar
+            '    mypara(i, 1) = 0
+            'Next
+            'Parameter müssen aus dem Datensatz ausgelesen werden
+
+            Call BM_Form1.Anfangsparameter_auslesen()
+            Call Ausgangswert_BlauesModell()
+
+        End If
 
         ReDim QN(globalAnzZiel)
         ReDim RN(globalAnzRand)
@@ -685,21 +706,6 @@ ErrCode_ES_STARTEN:
 
             End If
 
-            'modifyCN()
-            'modifyBOF()
-            'modifyBOA()
-            'readAmmel2002()
-
-            'readWel()
-
-            'Fehlerquadrate 
-            'QN(1) = 0
-            'For i = 1 To 336
-            '    QN(1) = QN(1) + (Math.Abs(Form2.QsimAmmel(i) - Form2.QbeobAmmel(i))) ^ 2
-            'Next i
-
-            'Console.Out.WriteLine(QN(1))
-            'End Select
         End If
 
     End Function
