@@ -502,6 +502,7 @@ ErrCode_ES_STARTEN:
         MsgBox("ES_STARTEN: " & Txt, MsgBoxStyle.Information)
         GoTo EXIT_ES_STARTEN
     End Function
+
     'Private Function Zielfunktion(AnzPar As Integer, Par() As Double, durchlauf As Long, Bestwert() As Double, ipop As Integer, Optional QN2 As Double) As double
     Private Function Zielfunktion(ByRef AnzPar As Short, ByRef Par(,) As Double, ByRef durchlauf As Integer, ByRef Bestwert(,) As Double, ByRef ipop As Short, ByRef QN() As Double, ByRef RN() As Double) As Boolean
         Dim i As Short
@@ -511,189 +512,199 @@ ErrCode_ES_STARTEN:
         Dim f2, f1, f3 As Double
         Dim g1, g2 As Double
 
-        Select Case Combo_Testproblem.Text
-            '**************************************
-            '* Single-Objective Problemstellungen *
-            '**************************************
-            Case "Sinus-Funktion" 'Fehlerquadrate zur Sinusfunktion |0-2pi|
-                Unterteilung_X = 2 * 3.1415926535898 / (AnzPar - 1)
-                QN(1) = 0
-                For i = 1 To AnzPar
-                    QN(1) = QN(1) + (System.Math.Sin((i - 1) * Unterteilung_X) - (-1 + (Par(i, 1) * 2))) * (System.Math.Sin((i - 1) * Unterteilung_X) - (-1 + Par(i, 1) * 2))
-                Next i
-                'If durchlauf Mod 25 = 0 Then
-                Call Zielfunktion_zeichnen_Sinus(AnzPar, Par, durchlauf, ipop)
-                'End If
-            Case "Beale-Problem" 'Beale-Problem
-                x1 = -5 + (Par(1, 1) * 10)
-                x2 = -2 + (Par(2, 1) * 4)
+        If (Me.Radio_Testproblem.Checked = True) Then
 
-                QN(1) = (1.5 - x1 * (1 - x2)) ^ 2 + (2.25 - x1 * (1 - x2) ^ 2) ^ 2 + (2.625 - x1 * (1 - x2) ^ 3) ^ 2
-                Call Zielfunktion_zeichnen_SingleOb(QN(1), durchlauf, ipop)
-            Case "Schwefel 2.4-Problem" 'Schwefel 2.4 S. 329
-                ReDim X(globalAnzPar)
-                For i = 1 To globalAnzPar
-                    X(i) = -10 + Par(i, 1) * 20
-                Next i
-                QN(1) = 0
-                For i = 1 To globalAnzPar
-                    QN(1) = QN(1) + ((X(1) - X(i) ^ 2) ^ 2 + (X(i) - 1) ^ 2)
-                Next i
-                Call Zielfunktion_zeichnen_SingleOb(QN(1), durchlauf, ipop)
-                '*************************************
-                '* Multi-Objective Problemstellungen *
-                '*************************************
-                'Deb 2000, D1 (Konvexe Pareto-Front)
-            Case "Deb 1"
-                f1 = Par(1, 1) * (9 / 10) + 0.1
-                f2 = (1 + 5 * Par(2, 1)) / (Par(1, 1) * (9 / 10) + 0.1)
-                QN(1) = f1
-                QN(2) = f2
-                Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, ipop)
+            '*************************************
+            '*          Testprobleme             *
+            '*************************************
 
-                'Zitzler/Deb/Thiele 2000, T1 (Konvexe Pareto-Front)
-            Case "Zitzler/Deb T1"
-                f1 = Par(1, 1)
-                f2 = 0
-                For i = 2 To globalAnzPar
-                    f2 = f2 + Par(i, 1)
-                Next i
-                f2 = 1 + 9 / (globalAnzPar - 1) * f2
-                f2 = f2 * (1 - System.Math.Sqrt(f1 / f2))
-                QN(1) = f1
-                QN(2) = f2
-                Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, ipop)
+            Select Case Combo_Testproblem.Text
+                '**************************************
+                '* Single-Objective Problemstellungen *
+                '**************************************
+                Case "Sinus-Funktion" 'Fehlerquadrate zur Sinusfunktion |0-2pi|
+                    Unterteilung_X = 2 * 3.1415926535898 / (AnzPar - 1)
+                    QN(1) = 0
+                    For i = 1 To AnzPar
+                        QN(1) = QN(1) + (System.Math.Sin((i - 1) * Unterteilung_X) - (-1 + (Par(i, 1) * 2))) * (System.Math.Sin((i - 1) * Unterteilung_X) - (-1 + Par(i, 1) * 2))
+                    Next i
+                    'If durchlauf Mod 25 = 0 Then
+                    Call Zielfunktion_zeichnen_Sinus(AnzPar, Par, durchlauf, ipop)
+                    'End If
+                Case "Beale-Problem" 'Beale-Problem
+                    x1 = -5 + (Par(1, 1) * 10)
+                    x2 = -2 + (Par(2, 1) * 4)
 
-                'Zitzler/Deb/Thiele 2000, T2 (Non-Konvexe Pareto-Front)
-            Case "Zitzler/Deb T2"
-                f1 = Par(1, 1)
-                f2 = 0
-                For i = 2 To globalAnzPar
-                    f2 = f2 + Par(i, 1)
-                Next i
-                f2 = 1 + 9 / (globalAnzPar - 1) * f2
-                f2 = f2 * (1 - (f1 / f2) * (f1 / f2))
-                QN(1) = f1
-                QN(2) = f2
-                Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, ipop)
+                    QN(1) = (1.5 - x1 * (1 - x2)) ^ 2 + (2.25 - x1 * (1 - x2) ^ 2) ^ 2 + (2.625 - x1 * (1 - x2) ^ 3) ^ 2
+                    Call Zielfunktion_zeichnen_SingleOb(QN(1), durchlauf, ipop)
+                Case "Schwefel 2.4-Problem" 'Schwefel 2.4 S. 329
+                    ReDim X(globalAnzPar)
+                    For i = 1 To globalAnzPar
+                        X(i) = -10 + Par(i, 1) * 20
+                    Next i
+                    QN(1) = 0
+                    For i = 1 To globalAnzPar
+                        QN(1) = QN(1) + ((X(1) - X(i) ^ 2) ^ 2 + (X(i) - 1) ^ 2)
+                    Next i
+                    Call Zielfunktion_zeichnen_SingleOb(QN(1), durchlauf, ipop)
+                    '*************************************
+                    '* Multi-Objective Problemstellungen *
+                    '*************************************
+                    'Deb 2000, D1 (Konvexe Pareto-Front)
+                Case "Deb 1"
+                    f1 = Par(1, 1) * (9 / 10) + 0.1
+                    f2 = (1 + 5 * Par(2, 1)) / (Par(1, 1) * (9 / 10) + 0.1)
+                    QN(1) = f1
+                    QN(2) = f2
+                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, ipop)
 
-                'Zitzler/Deb/Thiele 2000, T3 (disconected Pareto-Front)
-            Case "Zitzler/Deb T3"
-                f1 = Par(1, 1)
-                f2 = 0
-                For i = 2 To globalAnzPar
-                    f2 = f2 + Par(i, 1)
-                Next i
-                f2 = 1 + 9 / (globalAnzPar - 1) * f2
-                f2 = f2 * (1 - System.Math.Sqrt(f1 / f2) - (f1 / f2) * System.Math.Sin(10 * 3.14159265358979 * f1))
-                QN(1) = f1
-                QN(2) = f2
-                Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, ipop)
+                    'Zitzler/Deb/Thiele 2000, T1 (Konvexe Pareto-Front)
+                Case "Zitzler/Deb T1"
+                    f1 = Par(1, 1)
+                    f2 = 0
+                    For i = 2 To globalAnzPar
+                        f2 = f2 + Par(i, 1)
+                    Next i
+                    f2 = 1 + 9 / (globalAnzPar - 1) * f2
+                    f2 = f2 * (1 - System.Math.Sqrt(f1 / f2))
+                    QN(1) = f1
+                    QN(2) = f2
+                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, ipop)
 
-                'Zitzler/Deb/Thiele 2000, T4 (local/global Pareto-Fronts)
-            Case "Zitzler/Deb T4"
-                f1 = Par(1, 1)
-                f2 = 0
-                For i = 2 To globalAnzPar
-                    x2 = -5 + (Par(i, 1) * 10)
-                    f2 = f2 + (x2 * x2 - 10 * System.Math.Cos(4 * 3.14159265358979 * x2))
-                Next i
-                f2 = 1 + 10 * (globalAnzPar - 1) + f2
-                f2 = f2 * (1 - System.Math.Sqrt(f1 / f2))
-                QN(1) = f1
-                QN(2) = f2
-                Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, ipop)
+                    'Zitzler/Deb/Thiele 2000, T2 (Non-Konvexe Pareto-Front)
+                Case "Zitzler/Deb T2"
+                    f1 = Par(1, 1)
+                    f2 = 0
+                    For i = 2 To globalAnzPar
+                        f2 = f2 + Par(i, 1)
+                    Next i
+                    f2 = 1 + 9 / (globalAnzPar - 1) * f2
+                    f2 = f2 * (1 - (f1 / f2) * (f1 / f2))
+                    QN(1) = f1
+                    QN(2) = f2
+                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, ipop)
 
-            Case "CONSTR"
-                f1 = Par(1, 1) * (9 / 10) + 0.1
-                f2 = (1 + 5 * Par(2, 1)) / (Par(1, 1) * (9 / 10) + 0.1)
+                    'Zitzler/Deb/Thiele 2000, T3 (disconected Pareto-Front)
+                Case "Zitzler/Deb T3"
+                    f1 = Par(1, 1)
+                    f2 = 0
+                    For i = 2 To globalAnzPar
+                        f2 = f2 + Par(i, 1)
+                    Next i
+                    f2 = 1 + 9 / (globalAnzPar - 1) * f2
+                    f2 = f2 * (1 - System.Math.Sqrt(f1 / f2) - (f1 / f2) * System.Math.Sin(10 * 3.14159265358979 * f1))
+                    QN(1) = f1
+                    QN(2) = f2
+                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, ipop)
 
-                g1 = (5 * Par(2, 1)) + 9 * (Par(1, 1) * (9 / 10) + 0.1) - 6
-                g2 = (-1) * (5 * Par(2, 1)) + 9 * (Par(1, 1) * (9 / 10) + 0.1) - 1
+                    'Zitzler/Deb/Thiele 2000, T4 (local/global Pareto-Fronts)
+                Case "Zitzler/Deb T4"
+                    f1 = Par(1, 1)
+                    f2 = 0
+                    For i = 2 To globalAnzPar
+                        x2 = -5 + (Par(i, 1) * 10)
+                        f2 = f2 + (x2 * x2 - 10 * System.Math.Cos(4 * 3.14159265358979 * x2))
+                    Next i
+                    f2 = 1 + 10 * (globalAnzPar - 1) + f2
+                    f2 = f2 * (1 - System.Math.Sqrt(f1 / f2))
+                    QN(1) = f1
+                    QN(2) = f2
+                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, ipop)
 
-                QN(1) = f1
-                QN(2) = f2
-                RN(1) = g1
-                RN(2) = g2
-                Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, ipop)
+                Case "CONSTR"
+                    f1 = Par(1, 1) * (9 / 10) + 0.1
+                    f2 = (1 + 5 * Par(2, 1)) / (Par(1, 1) * (9 / 10) + 0.1)
 
-            Case "Box"
-                f1 = Par(1, 1) ^ 2
-                f2 = Par(2, 1) ^ 2
-                f3 = Par(3, 1) ^ 2
-                g1 = Par(1, 1) + Par(3, 1) - 0.5
-                g2 = Par(1, 1) + Par(2, 1) + Par(3, 1) - 0.8
+                    g1 = (5 * Par(2, 1)) + 9 * (Par(1, 1) * (9 / 10) + 0.1) - 6
+                    g2 = (-1) * (5 * Par(2, 1)) + 9 * (Par(1, 1) * (9 / 10) + 0.1) - 1
 
-                '                f1 = 1 + (1 - Par(1, 1)) ^ 5
-                '                f2 = Par(2, 1)
-                '                f3 = Par(3, 1)
-                '
-                '                g1 = Par(1, 1) ^ 2 + Par(3, 1) ^ 2 - 0.5
-                '                g2 = Par(2, 1) ^ 2 + Par(3, 1) ^ 2 - 0.5
+                    QN(1) = f1
+                    QN(2) = f2
+                    RN(1) = g1
+                    RN(2) = g2
+                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, ipop)
 
-                QN(1) = f1
-                QN(2) = f2
-                QN(3) = f3
-                RN(1) = g1
-                RN(2) = g2
-                Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, f3)
+                Case "Box"
+                    f1 = Par(1, 1) ^ 2
+                    f2 = Par(2, 1) ^ 2
+                    f3 = Par(3, 1) ^ 2
+                    g1 = Par(1, 1) + Par(3, 1) - 0.5
+                    g2 = Par(1, 1) + Par(2, 1) + Par(3, 1) - 0.8
 
-                '*************************************
-                '*          Blaues Modell            *
-                '*************************************
+                    '                f1 = 1 + (1 - Par(1, 1)) ^ 5
+                    '                f2 = Par(2, 1)
+                    '                f3 = Par(3, 1)
+                    '
+                    '                g1 = Par(1, 1) ^ 2 + Par(3, 1) ^ 2 - 0.5
+                    '                g2 = Par(2, 1) ^ 2 + Par(3, 1) ^ 2 - 0.5
 
-            Case "BlauesModell"
-                'Pfad zur EXE
-                Dim Exe As String = Me.TextBox_EXE.Text
-                'Dateiname auslesen
-                Dim Datensatz As String = Me.TextBox_Datensatz.Text.Substring(Me.TextBox_Datensatz.Text.LastIndexOf("\") + 1)
-                'Dateiendung entfernen
-                Datensatz = Datensatz.Substring(0, Datensatz.Length - 4)
-                Dim Pfad As String = Me.TextBox_Datensatz.Text.Substring(0, Me.TextBox_Datensatz.Text.LastIndexOf("\") + 1)
+                    QN(1) = f1
+                    QN(2) = f2
+                    QN(3) = f3
+                    RN(1) = g1
+                    RN(2) = g2
+                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, f3)
+            End Select
 
-                'Mutierte Parameter schreiben
-                BlauesModell.Parameter_schreiben()
+        ElseIf (Me.Radio_BM.Checked = True) Then
 
-                'Modell Starten
-                BlauesModell.launchBM(Exe, Pfad, Datensatz)
+            '*************************************
+            '*          Blaues Modell            *
+            '*************************************
 
-                'Ergebnis der Berechnung auslesen
-                BlauesModell.Ergebisdatei_auslesen()
+            'Pfad zur EXE
+            Dim Exe As String = Me.TextBox_EXE.Text
+            'Dateiname auslesen
+            Dim Datensatz As String = Me.TextBox_Datensatz.Text.Substring(Me.TextBox_Datensatz.Text.LastIndexOf("\") + 1)
+            'Dateiendung entfernen
+            Datensatz = Datensatz.Substring(0, Datensatz.Length - 4)
+            Dim Pfad As String = Me.TextBox_Datensatz.Text.Substring(0, Me.TextBox_Datensatz.Text.LastIndexOf("\") + 1)
 
-                'Qualitätswert berechen
-                f1 = BlauesModell.Qualitaetswert
-                QN(1) = f1
+            'Mutierte Parameter schreiben
+            BlauesModell.Parameter_schreiben()
 
-                'Zielfunktion im TeeChart zeichnen
-                If ipop = 1 Then
-                    Zielfunktion_zeichnen_SingleOb(QN(1), durchlauf, ipop)
+            'Modell Starten
+            BlauesModell.launchBM(Exe, Pfad, Datensatz)
 
-                ElseIf ipop = 2 Then
-                    Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, ipop)
+            'Ergebnis der Berechnung auslesen
+            BlauesModell.Ergebnisdatei_auslesen()
 
-                ElseIf ipop = 3 Then
-                    Zielfunktion_zeichnen_MultiObPar_3D(f1, f2, f3)
+            'Qualitätswert berechnen
+            f1 = BlauesModell.Qualitaetswert
+            QN(1) = f1
 
-                Else
-                    Zielfunktion_zeichnen_MultiObPar_XD()
+            'Zielfunktion im TeeChart zeichnen
+            If ipop = 1 Then
+                Zielfunktion_zeichnen_SingleOb(QN(1), durchlauf, ipop)
 
-                End If
+            ElseIf ipop = 2 Then
+                Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, ipop)
 
-                'modifyCN()
-                'modifyBOF()
-                'modifyBOA()
-                'readAmmel2002()
+            ElseIf ipop = 3 Then
+                Zielfunktion_zeichnen_MultiObPar_3D(f1, f2, f3)
 
-                'readWel()
+            Else
+                Zielfunktion_zeichnen_MultiObPar_XD()
 
-                'Fehlerquadrate 
-                'QN(1) = 0
-                'For i = 1 To 336
-                '    QN(1) = QN(1) + (Math.Abs(Form2.QsimAmmel(i) - Form2.QbeobAmmel(i))) ^ 2
-                'Next i
+            End If
 
-                'Console.Out.WriteLine(QN(1))
-        End Select
+            'modifyCN()
+            'modifyBOF()
+            'modifyBOA()
+            'readAmmel2002()
+
+            'readWel()
+
+            'Fehlerquadrate 
+            'QN(1) = 0
+            'For i = 1 To 336
+            '    QN(1) = QN(1) + (Math.Abs(Form2.QsimAmmel(i) - Form2.QbeobAmmel(i))) ^ 2
+            'Next i
+
+            'Console.Out.WriteLine(QN(1))
+            'End Select
+        End If
+
     End Function
 
     Private Sub Ausgangswert_Sinuskurve()
@@ -1359,10 +1370,8 @@ ErrCode_ES_STARTEN:
     Private Sub Radio_Testproblem_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Radio_Testproblem.CheckedChanged
         If (Me.Radio_Testproblem.Checked = True) Then
             Me.GroupBox_Testproblem.Enabled = True
-            Me.Problem_SinusFunktion.Enabled = True
         Else
             Me.GroupBox_Testproblem.Enabled = False
-            Me.Problem_SinusFunktion.Enabled = False
         End If
     End Sub
 

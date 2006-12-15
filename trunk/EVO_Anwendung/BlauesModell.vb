@@ -18,7 +18,7 @@ Module BlauesModell
 
     Public Sub Parameter_schreiben()
 
-        'Too Parameter müssen vor der Simulation geschrieben werden
+        'Todo: Parameter müssen vor der Simulation geschrieben werden
 
     End Sub
 
@@ -40,7 +40,7 @@ Module BlauesModell
     End Sub
 
     'Hier wird die Ergebnisdatei nach jeder Simulation ausgelesen
-    Public Sub Ergebisdatei_auslesen()
+    Public Sub Ergebnisdatei_auslesen()
 
         'ToDo: lesen der Ergebnisdatei
 

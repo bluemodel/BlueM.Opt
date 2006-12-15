@@ -85,14 +85,6 @@ Partial Class Form1
         Me.Text_T4Funktion = New System.Windows.Forms.TextBox
         Me.GroupBox_Testproblem = New System.Windows.Forms.GroupBox
         Me.Combo_Testproblem = New System.Windows.Forms.ComboBox
-        Me.Problem_T3Funktion = New System.Windows.Forms.GroupBox
-        Me.Text_T3Funktion = New System.Windows.Forms.TextBox
-        Me.Problem_T2Funktion = New System.Windows.Forms.GroupBox
-        Me.Text_T2Funktion = New System.Windows.Forms.TextBox
-        Me.Problem_T1Funktion = New System.Windows.Forms.GroupBox
-        Me.Text_T1Funktion = New System.Windows.Forms.TextBox
-        Me.Problem_D1Funktion = New System.Windows.Forms.GroupBox
-        Me.Text_D1Funktion = New System.Windows.Forms.TextBox
         Me.Problem_SinusFunktion = New System.Windows.Forms.GroupBox
         Me.Text_Sinusfunktion_Par = New System.Windows.Forms.TextBox
         Me.Text_Sinusfunktion = New System.Windows.Forms.TextBox
@@ -103,6 +95,14 @@ Partial Class Form1
         Me.Text_Schwefel24 = New System.Windows.Forms.TextBox
         Me.Text_Schwefel24_Par = New System.Windows.Forms.TextBox
         Me.Label_Schwefel24 = New System.Windows.Forms.Label
+        Me.Problem_D1Funktion = New System.Windows.Forms.GroupBox
+        Me.Text_D1Funktion = New System.Windows.Forms.TextBox
+        Me.Problem_T1Funktion = New System.Windows.Forms.GroupBox
+        Me.Text_T1Funktion = New System.Windows.Forms.TextBox
+        Me.Problem_T2Funktion = New System.Windows.Forms.GroupBox
+        Me.Text_T2Funktion = New System.Windows.Forms.TextBox
+        Me.Problem_T3Funktion = New System.Windows.Forms.GroupBox
+        Me.Text_T3Funktion = New System.Windows.Forms.TextBox
         Me.Button_Start = New System.Windows.Forms.Button
         Me.Frame_Problem = New Microsoft.VisualBasic.Compatibility.VB6.GroupBoxArray(Me.components)
         Me.TeeCommander1 = New Steema.TeeChart.Commander
@@ -122,13 +122,13 @@ Partial Class Form1
         Me.Problem_CONSTRFunktion.SuspendLayout()
         Me.Problem_T4Funktion.SuspendLayout()
         Me.GroupBox_Testproblem.SuspendLayout()
-        Me.Problem_T3Funktion.SuspendLayout()
-        Me.Problem_T2Funktion.SuspendLayout()
-        Me.Problem_T1Funktion.SuspendLayout()
-        Me.Problem_D1Funktion.SuspendLayout()
         Me.Problem_SinusFunktion.SuspendLayout()
         Me.Problem_BealeProblem.SuspendLayout()
         Me.Problem_Schwefel24.SuspendLayout()
+        Me.Problem_D1Funktion.SuspendLayout()
+        Me.Problem_T1Funktion.SuspendLayout()
+        Me.Problem_T2Funktion.SuspendLayout()
+        Me.Problem_T3Funktion.SuspendLayout()
         CType(Me.Frame_Problem, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox_BM.SuspendLayout()
         Me.GroupBox_Modus.SuspendLayout()
@@ -667,137 +667,12 @@ Partial Class Form1
         Me.Combo_Testproblem.Size = New System.Drawing.Size(201, 21)
         Me.Combo_Testproblem.TabIndex = 12
         '
-        'Problem_T3Funktion
-        '
-        Me.Problem_T3Funktion.BackColor = System.Drawing.SystemColors.Control
-        Me.Problem_T3Funktion.Controls.Add(Me.Text_T3Funktion)
-        Me.Problem_T3Funktion.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.Frame_Problem.SetIndex(Me.Problem_T3Funktion, CType(6, Short))
-        Me.Problem_T3Funktion.Location = New System.Drawing.Point(0, 43)
-        Me.Problem_T3Funktion.Name = "Problem_T3Funktion"
-        Me.Problem_T3Funktion.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.Problem_T3Funktion.Size = New System.Drawing.Size(217, 70)
-        Me.Problem_T3Funktion.TabIndex = 19
-        Me.Problem_T3Funktion.TabStop = False
-        Me.Problem_T3Funktion.Text = "T3-Funktion"
-        '
-        'Text_T3Funktion
-        '
-        Me.Text_T3Funktion.AcceptsReturn = True
-        Me.Text_T3Funktion.BackColor = System.Drawing.SystemColors.Control
-        Me.Text_T3Funktion.BorderStyle = System.Windows.Forms.BorderStyle.None
-        Me.Text_T3Funktion.Cursor = System.Windows.Forms.Cursors.IBeam
-        Me.Text_T3Funktion.ForeColor = System.Drawing.Color.Red
-        Me.Text_T3Funktion.Location = New System.Drawing.Point(8, 16)
-        Me.Text_T3Funktion.MaxLength = 0
-        Me.Text_T3Funktion.Multiline = True
-        Me.Text_T3Funktion.Name = "Text_T3Funktion"
-        Me.Text_T3Funktion.ReadOnly = True
-        Me.Text_T3Funktion.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.Text_T3Funktion.Size = New System.Drawing.Size(177, 45)
-        Me.Text_T3Funktion.TabIndex = 20
-        Me.Text_T3Funktion.Text = "Multikriterielles Testproblem (Konvex, " & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "nicht stetig)" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10)
-        '
-        'Problem_T2Funktion
-        '
-        Me.Problem_T2Funktion.BackColor = System.Drawing.SystemColors.Control
-        Me.Problem_T2Funktion.Controls.Add(Me.Text_T2Funktion)
-        Me.Problem_T2Funktion.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.Frame_Problem.SetIndex(Me.Problem_T2Funktion, CType(5, Short))
-        Me.Problem_T2Funktion.Location = New System.Drawing.Point(0, 43)
-        Me.Problem_T2Funktion.Name = "Problem_T2Funktion"
-        Me.Problem_T2Funktion.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.Problem_T2Funktion.Size = New System.Drawing.Size(217, 70)
-        Me.Problem_T2Funktion.TabIndex = 17
-        Me.Problem_T2Funktion.TabStop = False
-        Me.Problem_T2Funktion.Text = "T2-Funktion"
-        '
-        'Text_T2Funktion
-        '
-        Me.Text_T2Funktion.AcceptsReturn = True
-        Me.Text_T2Funktion.BackColor = System.Drawing.SystemColors.Control
-        Me.Text_T2Funktion.BorderStyle = System.Windows.Forms.BorderStyle.None
-        Me.Text_T2Funktion.Cursor = System.Windows.Forms.Cursors.IBeam
-        Me.Text_T2Funktion.ForeColor = System.Drawing.Color.Red
-        Me.Text_T2Funktion.Location = New System.Drawing.Point(8, 16)
-        Me.Text_T2Funktion.MaxLength = 0
-        Me.Text_T2Funktion.Multiline = True
-        Me.Text_T2Funktion.Name = "Text_T2Funktion"
-        Me.Text_T2Funktion.ReadOnly = True
-        Me.Text_T2Funktion.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.Text_T2Funktion.Size = New System.Drawing.Size(177, 25)
-        Me.Text_T2Funktion.TabIndex = 18
-        Me.Text_T2Funktion.Text = "Multikriterielles Testproblem (Konkav)" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10)
-        '
-        'Problem_T1Funktion
-        '
-        Me.Problem_T1Funktion.BackColor = System.Drawing.SystemColors.Control
-        Me.Problem_T1Funktion.Controls.Add(Me.Text_T1Funktion)
-        Me.Problem_T1Funktion.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.Frame_Problem.SetIndex(Me.Problem_T1Funktion, CType(4, Short))
-        Me.Problem_T1Funktion.Location = New System.Drawing.Point(0, 43)
-        Me.Problem_T1Funktion.Name = "Problem_T1Funktion"
-        Me.Problem_T1Funktion.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.Problem_T1Funktion.Size = New System.Drawing.Size(217, 70)
-        Me.Problem_T1Funktion.TabIndex = 15
-        Me.Problem_T1Funktion.TabStop = False
-        Me.Problem_T1Funktion.Text = "T1-Funktion"
-        '
-        'Text_T1Funktion
-        '
-        Me.Text_T1Funktion.AcceptsReturn = True
-        Me.Text_T1Funktion.BackColor = System.Drawing.SystemColors.Control
-        Me.Text_T1Funktion.BorderStyle = System.Windows.Forms.BorderStyle.None
-        Me.Text_T1Funktion.Cursor = System.Windows.Forms.Cursors.IBeam
-        Me.Text_T1Funktion.ForeColor = System.Drawing.Color.Red
-        Me.Text_T1Funktion.Location = New System.Drawing.Point(8, 16)
-        Me.Text_T1Funktion.MaxLength = 0
-        Me.Text_T1Funktion.Multiline = True
-        Me.Text_T1Funktion.Name = "Text_T1Funktion"
-        Me.Text_T1Funktion.ReadOnly = True
-        Me.Text_T1Funktion.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.Text_T1Funktion.Size = New System.Drawing.Size(177, 25)
-        Me.Text_T1Funktion.TabIndex = 16
-        Me.Text_T1Funktion.Text = "Multikriterielles Testproblem (Konvex)" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10)
-        '
-        'Problem_D1Funktion
-        '
-        Me.Problem_D1Funktion.BackColor = System.Drawing.SystemColors.Control
-        Me.Problem_D1Funktion.Controls.Add(Me.Text_D1Funktion)
-        Me.Problem_D1Funktion.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.Frame_Problem.SetIndex(Me.Problem_D1Funktion, CType(3, Short))
-        Me.Problem_D1Funktion.Location = New System.Drawing.Point(0, 43)
-        Me.Problem_D1Funktion.Name = "Problem_D1Funktion"
-        Me.Problem_D1Funktion.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.Problem_D1Funktion.Size = New System.Drawing.Size(217, 70)
-        Me.Problem_D1Funktion.TabIndex = 13
-        Me.Problem_D1Funktion.TabStop = False
-        Me.Problem_D1Funktion.Text = "D1-Funktion"
-        '
-        'Text_D1Funktion
-        '
-        Me.Text_D1Funktion.AcceptsReturn = True
-        Me.Text_D1Funktion.BackColor = System.Drawing.SystemColors.Control
-        Me.Text_D1Funktion.BorderStyle = System.Windows.Forms.BorderStyle.None
-        Me.Text_D1Funktion.Cursor = System.Windows.Forms.Cursors.IBeam
-        Me.Text_D1Funktion.ForeColor = System.Drawing.Color.Red
-        Me.Text_D1Funktion.Location = New System.Drawing.Point(8, 16)
-        Me.Text_D1Funktion.MaxLength = 0
-        Me.Text_D1Funktion.Multiline = True
-        Me.Text_D1Funktion.Name = "Text_D1Funktion"
-        Me.Text_D1Funktion.ReadOnly = True
-        Me.Text_D1Funktion.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.Text_D1Funktion.Size = New System.Drawing.Size(185, 49)
-        Me.Text_D1Funktion.TabIndex = 14
-        Me.Text_D1Funktion.Text = "Multikriterielles Testproblem (Konvex)" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10)
-        '
         'Problem_SinusFunktion
         '
         Me.Problem_SinusFunktion.BackColor = System.Drawing.SystemColors.Control
         Me.Problem_SinusFunktion.Controls.Add(Me.Text_Sinusfunktion_Par)
         Me.Problem_SinusFunktion.Controls.Add(Me.Text_Sinusfunktion)
         Me.Problem_SinusFunktion.Controls.Add(Me.Label_Sinusfunktion)
-        Me.Problem_SinusFunktion.Enabled = False
         Me.Problem_SinusFunktion.ForeColor = System.Drawing.SystemColors.ControlText
         Me.Frame_Problem.SetIndex(Me.Problem_SinusFunktion, CType(0, Short))
         Me.Problem_SinusFunktion.Location = New System.Drawing.Point(0, 43)
@@ -940,6 +815,130 @@ Partial Class Form1
         Me.Label_Schwefel24.Size = New System.Drawing.Size(121, 17)
         Me.Label_Schwefel24.TabIndex = 10
         Me.Label_Schwefel24.Text = " Anzahl der Parameter"
+        '
+        'Problem_D1Funktion
+        '
+        Me.Problem_D1Funktion.BackColor = System.Drawing.SystemColors.Control
+        Me.Problem_D1Funktion.Controls.Add(Me.Text_D1Funktion)
+        Me.Problem_D1Funktion.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.Frame_Problem.SetIndex(Me.Problem_D1Funktion, CType(3, Short))
+        Me.Problem_D1Funktion.Location = New System.Drawing.Point(0, 43)
+        Me.Problem_D1Funktion.Name = "Problem_D1Funktion"
+        Me.Problem_D1Funktion.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.Problem_D1Funktion.Size = New System.Drawing.Size(217, 70)
+        Me.Problem_D1Funktion.TabIndex = 13
+        Me.Problem_D1Funktion.TabStop = False
+        Me.Problem_D1Funktion.Text = "D1-Funktion"
+        '
+        'Text_D1Funktion
+        '
+        Me.Text_D1Funktion.AcceptsReturn = True
+        Me.Text_D1Funktion.BackColor = System.Drawing.SystemColors.Control
+        Me.Text_D1Funktion.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.Text_D1Funktion.Cursor = System.Windows.Forms.Cursors.IBeam
+        Me.Text_D1Funktion.ForeColor = System.Drawing.Color.Red
+        Me.Text_D1Funktion.Location = New System.Drawing.Point(8, 16)
+        Me.Text_D1Funktion.MaxLength = 0
+        Me.Text_D1Funktion.Multiline = True
+        Me.Text_D1Funktion.Name = "Text_D1Funktion"
+        Me.Text_D1Funktion.ReadOnly = True
+        Me.Text_D1Funktion.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.Text_D1Funktion.Size = New System.Drawing.Size(185, 49)
+        Me.Text_D1Funktion.TabIndex = 14
+        Me.Text_D1Funktion.Text = "Multikriterielles Testproblem (Konvex)" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10)
+        '
+        'Problem_T1Funktion
+        '
+        Me.Problem_T1Funktion.BackColor = System.Drawing.SystemColors.Control
+        Me.Problem_T1Funktion.Controls.Add(Me.Text_T1Funktion)
+        Me.Problem_T1Funktion.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.Frame_Problem.SetIndex(Me.Problem_T1Funktion, CType(4, Short))
+        Me.Problem_T1Funktion.Location = New System.Drawing.Point(0, 43)
+        Me.Problem_T1Funktion.Name = "Problem_T1Funktion"
+        Me.Problem_T1Funktion.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.Problem_T1Funktion.Size = New System.Drawing.Size(217, 70)
+        Me.Problem_T1Funktion.TabIndex = 15
+        Me.Problem_T1Funktion.TabStop = False
+        Me.Problem_T1Funktion.Text = "T1-Funktion"
+        '
+        'Text_T1Funktion
+        '
+        Me.Text_T1Funktion.AcceptsReturn = True
+        Me.Text_T1Funktion.BackColor = System.Drawing.SystemColors.Control
+        Me.Text_T1Funktion.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.Text_T1Funktion.Cursor = System.Windows.Forms.Cursors.IBeam
+        Me.Text_T1Funktion.ForeColor = System.Drawing.Color.Red
+        Me.Text_T1Funktion.Location = New System.Drawing.Point(8, 16)
+        Me.Text_T1Funktion.MaxLength = 0
+        Me.Text_T1Funktion.Multiline = True
+        Me.Text_T1Funktion.Name = "Text_T1Funktion"
+        Me.Text_T1Funktion.ReadOnly = True
+        Me.Text_T1Funktion.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.Text_T1Funktion.Size = New System.Drawing.Size(177, 25)
+        Me.Text_T1Funktion.TabIndex = 16
+        Me.Text_T1Funktion.Text = "Multikriterielles Testproblem (Konvex)" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10)
+        '
+        'Problem_T2Funktion
+        '
+        Me.Problem_T2Funktion.BackColor = System.Drawing.SystemColors.Control
+        Me.Problem_T2Funktion.Controls.Add(Me.Text_T2Funktion)
+        Me.Problem_T2Funktion.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.Frame_Problem.SetIndex(Me.Problem_T2Funktion, CType(5, Short))
+        Me.Problem_T2Funktion.Location = New System.Drawing.Point(0, 43)
+        Me.Problem_T2Funktion.Name = "Problem_T2Funktion"
+        Me.Problem_T2Funktion.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.Problem_T2Funktion.Size = New System.Drawing.Size(217, 70)
+        Me.Problem_T2Funktion.TabIndex = 17
+        Me.Problem_T2Funktion.TabStop = False
+        Me.Problem_T2Funktion.Text = "T2-Funktion"
+        '
+        'Text_T2Funktion
+        '
+        Me.Text_T2Funktion.AcceptsReturn = True
+        Me.Text_T2Funktion.BackColor = System.Drawing.SystemColors.Control
+        Me.Text_T2Funktion.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.Text_T2Funktion.Cursor = System.Windows.Forms.Cursors.IBeam
+        Me.Text_T2Funktion.ForeColor = System.Drawing.Color.Red
+        Me.Text_T2Funktion.Location = New System.Drawing.Point(8, 16)
+        Me.Text_T2Funktion.MaxLength = 0
+        Me.Text_T2Funktion.Multiline = True
+        Me.Text_T2Funktion.Name = "Text_T2Funktion"
+        Me.Text_T2Funktion.ReadOnly = True
+        Me.Text_T2Funktion.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.Text_T2Funktion.Size = New System.Drawing.Size(177, 25)
+        Me.Text_T2Funktion.TabIndex = 18
+        Me.Text_T2Funktion.Text = "Multikriterielles Testproblem (Konkav)" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10)
+        '
+        'Problem_T3Funktion
+        '
+        Me.Problem_T3Funktion.BackColor = System.Drawing.SystemColors.Control
+        Me.Problem_T3Funktion.Controls.Add(Me.Text_T3Funktion)
+        Me.Problem_T3Funktion.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.Frame_Problem.SetIndex(Me.Problem_T3Funktion, CType(6, Short))
+        Me.Problem_T3Funktion.Location = New System.Drawing.Point(0, 43)
+        Me.Problem_T3Funktion.Name = "Problem_T3Funktion"
+        Me.Problem_T3Funktion.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.Problem_T3Funktion.Size = New System.Drawing.Size(217, 70)
+        Me.Problem_T3Funktion.TabIndex = 19
+        Me.Problem_T3Funktion.TabStop = False
+        Me.Problem_T3Funktion.Text = "T3-Funktion"
+        '
+        'Text_T3Funktion
+        '
+        Me.Text_T3Funktion.AcceptsReturn = True
+        Me.Text_T3Funktion.BackColor = System.Drawing.SystemColors.Control
+        Me.Text_T3Funktion.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.Text_T3Funktion.Cursor = System.Windows.Forms.Cursors.IBeam
+        Me.Text_T3Funktion.ForeColor = System.Drawing.Color.Red
+        Me.Text_T3Funktion.Location = New System.Drawing.Point(8, 16)
+        Me.Text_T3Funktion.MaxLength = 0
+        Me.Text_T3Funktion.Multiline = True
+        Me.Text_T3Funktion.Name = "Text_T3Funktion"
+        Me.Text_T3Funktion.ReadOnly = True
+        Me.Text_T3Funktion.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.Text_T3Funktion.Size = New System.Drawing.Size(177, 45)
+        Me.Text_T3Funktion.TabIndex = 20
+        Me.Text_T3Funktion.Text = "Multikriterielles Testproblem (Konvex, " & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "nicht stetig)" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10)
         '
         'Button_Start
         '
@@ -1106,20 +1105,20 @@ Partial Class Form1
         Me.Problem_T4Funktion.ResumeLayout(False)
         Me.Problem_T4Funktion.PerformLayout()
         Me.GroupBox_Testproblem.ResumeLayout(False)
-        Me.Problem_T3Funktion.ResumeLayout(False)
-        Me.Problem_T3Funktion.PerformLayout()
-        Me.Problem_T2Funktion.ResumeLayout(False)
-        Me.Problem_T2Funktion.PerformLayout()
-        Me.Problem_T1Funktion.ResumeLayout(False)
-        Me.Problem_T1Funktion.PerformLayout()
-        Me.Problem_D1Funktion.ResumeLayout(False)
-        Me.Problem_D1Funktion.PerformLayout()
         Me.Problem_SinusFunktion.ResumeLayout(False)
         Me.Problem_SinusFunktion.PerformLayout()
         Me.Problem_BealeProblem.ResumeLayout(False)
         Me.Problem_BealeProblem.PerformLayout()
         Me.Problem_Schwefel24.ResumeLayout(False)
         Me.Problem_Schwefel24.PerformLayout()
+        Me.Problem_D1Funktion.ResumeLayout(False)
+        Me.Problem_D1Funktion.PerformLayout()
+        Me.Problem_T1Funktion.ResumeLayout(False)
+        Me.Problem_T1Funktion.PerformLayout()
+        Me.Problem_T2Funktion.ResumeLayout(False)
+        Me.Problem_T2Funktion.PerformLayout()
+        Me.Problem_T3Funktion.ResumeLayout(False)
+        Me.Problem_T3Funktion.PerformLayout()
         CType(Me.Frame_Problem, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox_BM.ResumeLayout(False)
         Me.GroupBox_BM.PerformLayout()
