@@ -267,7 +267,7 @@ Friend Class Form1
                 '    mypara(i, 1) = 0
                 'Next
                 'Parameter müssen aus dem Datensatz ausgelesen werden
-                BlauesModell.Anfangsparameter_auslesen()
+                EVO_BM.BlauesModell.Anfangsparameter_auslesen()
 
                 Call Ausgangswert_BlauesModell()
         End Select
@@ -653,24 +653,24 @@ ErrCode_ES_STARTEN:
             '*************************************
 
             'Pfad zur EXE
-            Dim Exe As String = Me.TextBox_EXE.Text
+            Dim Exe As String = BM_Form1.Exe
             'Dateiname auslesen
-            Dim Datensatz As String = Me.TextBox_Datensatz.Text.Substring(Me.TextBox_Datensatz.Text.LastIndexOf("\") + 1)
+            Dim Datensatz As String = BM_Form1.Datensatz.Substring(BM_Form1.Datensatz.LastIndexOf("\") + 1)
             'Dateiendung entfernen
             Datensatz = Datensatz.Substring(0, Datensatz.Length - 4)
-            Dim Pfad As String = Me.TextBox_Datensatz.Text.Substring(0, Me.TextBox_Datensatz.Text.LastIndexOf("\") + 1)
+            Dim Pfad As String = BM_Form1.Datensatz.Substring(0, BM_Form1.Datensatz.LastIndexOf("\") + 1)
 
             'Mutierte Parameter schreiben
-            BlauesModell.Parameter_schreiben()
+            EVO_BM.BlauesModell.Parameter_schreiben()
 
             'Modell Starten
-            BlauesModell.launchBM(Exe, Pfad, Datensatz)
+            EVO_BM.BlauesModell.launchBM(Exe, Pfad, Datensatz)
 
             'Ergebnis der Berechnung auslesen
-            BlauesModell.Ergebnisdatei_auslesen()
+            EVO_BM.BlauesModell.Ergebnisdatei_auslesen()
 
             'Qualitätswert berechnen
-            f1 = BlauesModell.Qualitaetswert
+            f1 = EVO_BM.BlauesModell.Qualitaetswert
             QN(1) = f1
 
             'Zielfunktion im TeeChart zeichnen
@@ -1355,18 +1355,6 @@ ErrCode_ES_STARTEN:
         End If
     End Sub
 
-    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Datensatz.Click
-        Me.OpenFile_Datensatz.ShowDialog()
-        Me.TextBox_Datensatz.Clear()
-        Me.TextBox_Datensatz.AppendText(Me.OpenFile_Datensatz.FileName)
-    End Sub
-
-    Private Sub Button2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Exe.Click
-        Me.OpenFile_EXE.ShowDialog()
-        Me.TextBox_EXE.Clear()
-        Me.TextBox_EXE.AppendText(Me.OpenFile_EXE.FileName)
-    End Sub
-
     Private Sub Radio_Testproblem_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Radio_Testproblem.CheckedChanged
         If (Me.Radio_Testproblem.Checked = True) Then
             Me.GroupBox_Testproblem.Enabled = True
@@ -1378,9 +1366,7 @@ ErrCode_ES_STARTEN:
     Private Sub Radio_BM_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Radio_BM.CheckedChanged
         If (Me.Radio_BM.Checked = True) Then
             Me.Width = 1020
-            Me.GroupBox_BM.Enabled = True
         Else
-            Me.GroupBox_BM.Enabled = False
             Me.Width = 720
         End If
     End Sub

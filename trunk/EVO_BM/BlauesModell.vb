@@ -1,5 +1,5 @@
 Imports System.IO
-Module BlauesModell
+Public Module BlauesModell
 
     Public Sub Anfangsparameter_auslesen()
 
