@@ -990,6 +990,7 @@ Partial Class Form1
         Me.Radio_Testproblem.TabStop = True
         Me.Radio_Testproblem.Text = "Testprobleme"
         Me.Radio_Testproblem.UseVisualStyleBackColor = True
+        Me.Radio_Testproblem.Checked = True
         '
         'BM_Form1
         '
