@@ -118,6 +118,7 @@
     </Compile>
     <EmbeddedResource Include="EVO_Einstellungen.resX">
       <DependentUpon>EVO_Einstellungen.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="EVO_Opt_Verlauf.resX">
       <DependentUpon>EVO_Opt_Verlauf.vb</DependentUpon>

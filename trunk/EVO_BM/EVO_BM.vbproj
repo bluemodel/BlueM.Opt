@@ -52,7 +52,6 @@
     <Service Include="{94E38DFF-614B-4cbd-B67C-F211BB35CE8B}" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BlauesModell.vb" />
     <Compile Include="BM_Form.Designer.vb">
       <DependentUpon>BM_Form.vb</DependentUpon>
     </Compile>

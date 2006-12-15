@@ -267,7 +267,7 @@ Friend Class Form1
                 '    mypara(i, 1) = 0
                 'Next
                 'Parameter müssen aus dem Datensatz ausgelesen werden
-                EVO_BM.BlauesModell.Anfangsparameter_auslesen()
+                Call BM_Form1.Anfangsparameter_auslesen()
 
                 Call Ausgangswert_BlauesModell()
         End Select
@@ -652,25 +652,22 @@ ErrCode_ES_STARTEN:
             '*          Blaues Modell            *
             '*************************************
 
-            'Pfad zur EXE
+            'Variablen aus BM_Form übernehmen
             Dim Exe As String = BM_Form1.Exe
-            'Dateiname auslesen
-            Dim Datensatz As String = BM_Form1.Datensatz.Substring(BM_Form1.Datensatz.LastIndexOf("\") + 1)
-            'Dateiendung entfernen
-            Datensatz = Datensatz.Substring(0, Datensatz.Length - 4)
-            Dim Pfad As String = BM_Form1.Datensatz.Substring(0, BM_Form1.Datensatz.LastIndexOf("\") + 1)
+            Dim Datensatz As String = BM_Form1.Datensatz
+            Dim WorkDir As String = BM_Form1.WorkDir
 
             'Mutierte Parameter schreiben
-            EVO_BM.BlauesModell.Parameter_schreiben()
+            BM_Form1.Parameter_schreiben()
 
             'Modell Starten
-            EVO_BM.BlauesModell.launchBM(Exe, Pfad, Datensatz)
+            BM_Form1.launchBM()
 
             'Ergebnis der Berechnung auslesen
-            EVO_BM.BlauesModell.Ergebnisdatei_auslesen()
+            BM_Form1.Ergebnisdatei_auslesen()
 
             'Qualitätswert berechnen
-            f1 = EVO_BM.BlauesModell.Qualitaetswert
+            f1 = BM_Form1.Qualitaetswert()
             QN(1) = f1
 
             'Zielfunktion im TeeChart zeichnen
