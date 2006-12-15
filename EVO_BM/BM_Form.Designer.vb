@@ -20,6 +20,10 @@ Partial Class BM_Form
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.GroupBox_BM = New System.Windows.Forms.GroupBox
+        Me.GroupBox_Parameter = New System.Windows.Forms.GroupBox
+        Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel
+        Me.Label_Parameter = New System.Windows.Forms.Label
+        Me.Button_Parameter = New System.Windows.Forms.Button
         Me.GroupBox_OptModus = New System.Windows.Forms.GroupBox
         Me.Label_Pegel = New System.Windows.Forms.Label
         Me.Radio_Optimierung = New System.Windows.Forms.RadioButton
@@ -35,8 +39,8 @@ Partial Class BM_Form
         Me.OpenFile_Datensatz = New System.Windows.Forms.OpenFileDialog
         Me.OpenFile_EXE = New System.Windows.Forms.OpenFileDialog
         Me.OpenFile_Pegel = New System.Windows.Forms.OpenFileDialog
-        Me.GroupBox_Parameter = New System.Windows.Forms.GroupBox
         Me.GroupBox_BM.SuspendLayout()
+        Me.GroupBox_Parameter.SuspendLayout()
         Me.GroupBox_OptModus.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -52,10 +56,53 @@ Partial Class BM_Form
         Me.GroupBox_BM.Controls.Add(Me.TextBox_Datensatz)
         Me.GroupBox_BM.Location = New System.Drawing.Point(3, 0)
         Me.GroupBox_BM.Name = "GroupBox_BM"
-        Me.GroupBox_BM.Size = New System.Drawing.Size(288, 298)
+        Me.GroupBox_BM.Size = New System.Drawing.Size(288, 429)
         Me.GroupBox_BM.TabIndex = 35
         Me.GroupBox_BM.TabStop = False
         Me.GroupBox_BM.Text = "BlauesModell"
+        '
+        'GroupBox_Parameter
+        '
+        Me.GroupBox_Parameter.Controls.Add(Me.TableLayoutPanel1)
+        Me.GroupBox_Parameter.Controls.Add(Me.Label_Parameter)
+        Me.GroupBox_Parameter.Controls.Add(Me.Button_Parameter)
+        Me.GroupBox_Parameter.Location = New System.Drawing.Point(7, 162)
+        Me.GroupBox_Parameter.Name = "GroupBox_Parameter"
+        Me.GroupBox_Parameter.Size = New System.Drawing.Size(275, 242)
+        Me.GroupBox_Parameter.TabIndex = 31
+        Me.GroupBox_Parameter.TabStop = False
+        Me.GroupBox_Parameter.Text = "Parameter"
+        '
+        'TableLayoutPanel1
+        '
+        Me.TableLayoutPanel1.ColumnCount = 2
+        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+        Me.TableLayoutPanel1.Location = New System.Drawing.Point(12, 47)
+        Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
+        Me.TableLayoutPanel1.RowCount = 2
+        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+        Me.TableLayoutPanel1.Size = New System.Drawing.Size(255, 37)
+        Me.TableLayoutPanel1.TabIndex = 2
+        '
+        'Label_Parameter
+        '
+        Me.Label_Parameter.AutoSize = True
+        Me.Label_Parameter.Location = New System.Drawing.Point(9, 20)
+        Me.Label_Parameter.Name = "Label_Parameter"
+        Me.Label_Parameter.Size = New System.Drawing.Size(58, 13)
+        Me.Label_Parameter.TabIndex = 1
+        Me.Label_Parameter.Text = "Parameter:"
+        '
+        'Button_Parameter
+        '
+        Me.Button_Parameter.Location = New System.Drawing.Point(73, 15)
+        Me.Button_Parameter.Name = "Button_Parameter"
+        Me.Button_Parameter.Size = New System.Drawing.Size(75, 23)
+        Me.Button_Parameter.TabIndex = 0
+        Me.Button_Parameter.Text = "bearbeiten"
+        Me.Button_Parameter.UseVisualStyleBackColor = True
         '
         'GroupBox_OptModus
         '
@@ -190,15 +237,6 @@ Partial Class BM_Form
         Me.OpenFile_Pegel.Filter = "ZRE-Dateien|*.zre"
         Me.OpenFile_Pegel.Title = "Zeitreihe auswählen"
         '
-        'GroupBox_Parameter
-        '
-        Me.GroupBox_Parameter.Location = New System.Drawing.Point(7, 162)
-        Me.GroupBox_Parameter.Name = "GroupBox_Parameter"
-        Me.GroupBox_Parameter.Size = New System.Drawing.Size(275, 100)
-        Me.GroupBox_Parameter.TabIndex = 31
-        Me.GroupBox_Parameter.TabStop = False
-        Me.GroupBox_Parameter.Text = "Parameter"
-        '
         'BM_Form
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -208,6 +246,8 @@ Partial Class BM_Form
         Me.Size = New System.Drawing.Size(297, 472)
         Me.GroupBox_BM.ResumeLayout(False)
         Me.GroupBox_BM.PerformLayout()
+        Me.GroupBox_Parameter.ResumeLayout(False)
+        Me.GroupBox_Parameter.PerformLayout()
         Me.GroupBox_OptModus.ResumeLayout(False)
         Me.GroupBox_OptModus.PerformLayout()
         Me.ResumeLayout(False)
@@ -230,5 +270,8 @@ Partial Class BM_Form
     Friend WithEvents Button_Pegel As System.Windows.Forms.Button
     Friend WithEvents OpenFile_Pegel As System.Windows.Forms.OpenFileDialog
     Friend WithEvents GroupBox_Parameter As System.Windows.Forms.GroupBox
+    Friend WithEvents Label_Parameter As System.Windows.Forms.Label
+    Friend WithEvents Button_Parameter As System.Windows.Forms.Button
+    Friend WithEvents TableLayoutPanel1 As System.Windows.Forms.TableLayoutPanel
 
 End Class

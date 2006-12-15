@@ -1,13 +1,24 @@
+Imports System.IO
 Public Class BM_Form
 
     'Public Properties
-    '-----------------
-    Public Datensatz As String
-    Public WorkDir As String
-    Public Exe As String 'Pfad zu BlauesMOdell.exe
+    '------------------
+    Public Datensatz As String      'Name des zu simulierenden Datensatzes
+    Public WorkDir As String        'Arbeitsverzeichnis für das Blaue Modell
+    Public Exe As String            'Pfad zu BlauesModell.exe
+    Public Elemente(,) As String    'Array mit allen im Datensatz enthaltenen Elementen (Beschreibung, Kennung)
+
+    'Private Properties
+    '-------------------
+    Dim Zeitreihe As String         'Pfad zur ZRE-Zeitreihe (für Autokalibrierung)
 
     'Private Methoden
     '----------------
+
+    'Initialisierung
+    Private Sub BM_Form_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+
+    End Sub
 
     'Exe-Datei
     Private Sub Button_Exe_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Exe.Click
@@ -43,7 +54,7 @@ Public Class BM_Form
         'Arbeitsverzeichnis bestimmen
         WorkDir = Datensatz_tmp.Substring(0, Datensatz_tmp.LastIndexOf("\") + 1)
 
-        'Datensatz einlesen aufrufen
+        'Datensatz einlesen
         Call ReadSys()
     End Sub
 
@@ -53,8 +64,11 @@ Public Class BM_Form
     End Sub
 
     Private Sub OpenFile_Pegel_FileOk(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles OpenFile_Pegel.FileOk
+        'Pfad zur Zeitreihe auslesen
+        Me.Zeitreihe = Me.OpenFile_Pegel.FileName
+        'Pfad in Textbox schreiben
         Me.TextBox_Pegel.Clear()
-        Me.TextBox_Pegel.AppendText(Me.OpenFile_Pegel.FileName)
+        Me.TextBox_Pegel.AppendText(Me.Zeitreihe)
     End Sub
 
     'Optimierungsmodus
@@ -125,10 +139,58 @@ Public Class BM_Form
     End Function
 
     Public Sub ReadSys()
-        Dim sysFile = WorkDir & Datensatz & ".SYS"
+        Dim SysFile = WorkDir & Datensatz & ".SYS"
         'TODO: SYS-Datei einlesen
+        Dim FiStr As FileStream = New FileStream(SysFile, FileMode.Open, FileAccess.Read)
+        Dim StrRe As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+        Dim Text As String
+        Dim i As Integer = 0
+
+        'Anzahl Elemente feststellen
+        Do
+            Text = StrRe.ReadLine.ToString
+            If (Text.StartsWith("*") = False) Then
+                i += 1
+            End If
+        Loop Until StrRe.Peek() = -1
+
+        'Array neu dimensionieren
+        ReDim Elemente(i - 1, 1)
+
+        'auf Dateianfang zurücksetzen
+        FiStr.Seek(0, SeekOrigin.Begin)
+
+        i = 0
+
+        Do
+            Text = StrRe.ReadLine.ToString
+            If (Text.StartsWith("*") = False) Then
+                Elemente(i, 0) = Text.Substring(2, 23).Trim()
+                Elemente(i, 1) = Text.Substring(28, 4).Trim()
+                i += 1
+            End If
+        Loop Until StrRe.Peek() = -1
+
+        StrRe.Close()
+        FiStr.Close()
     End Sub
 
+    Private Sub Button_Parameter_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Parameter.Click
+
+        'Elemente in ComboBox schreiben
+        BM_Parameter.ComboBox_Elemente.BeginUpdate()
+
+        Dim i As Integer
+        For i = Elemente.GetLowerBound(0) To Elemente.GetUpperBound(0)
+            BM_Parameter.ComboBox_Elemente.Items.Add(Elemente(i, 1))
+        Next i
+
+        BM_Parameter.ComboBox_Elemente.EndUpdate()
+
+        'Dialog anzeigen
+        BM_Parameter.ShowDialog()
+    End Sub
 
 
     'Public Sub modifyCN()
@@ -313,5 +375,6 @@ Public Class BM_Form
 
 
     'End Sub
+
 
 End Class
