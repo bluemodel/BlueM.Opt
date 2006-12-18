@@ -98,7 +98,17 @@ Public Class BM_Form
 
     End Sub
 
+    Public Sub Anfangsparameter_skalieren()
+        'ToDo: Hier müssen die Anfangsparameter einmal Skaliert werden
+
+    End Sub
+
+    Public Sub Parameter_deskalieren()
+        'ToDo: Hier müssen die Parameter vor jeder Simulation deskaliert werden
+
+    End Sub
     Public Sub Messung_einlesen()
+        'ToDo: Hier muss die Vergleichzeitreihe für die Messung eingelesen werden
 
     End Sub
 

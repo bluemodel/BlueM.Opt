@@ -277,9 +277,10 @@ Friend Class Form1
             TestPara(1, 1) = 1
             TestPara(2, 1) = 1
             TestPara(3, 1) = 1
-
             '----------------------------------------------
-            'Call BM_Form1.Anfangsparameter_auslesen()
+            Call BM_Form1.Anfangsparameter_auslesen()
+            Call BM_Form1.Anfangsparameter_skalieren()
+            '----------------------------------------------
 
             mypara(1, 1) = TestPara(1, 1)
             mypara(2, 1) = TestPara(2, 1)
@@ -676,6 +677,9 @@ ErrCode_ES_STARTEN:
             Dim WorkDir As String = BM_Form1.WorkDir
             Dim Wert As Single
 
+            'Mutierte Parameter deskalieren
+            BM_Form1.Parameter_deskalieren()
+
             'Mutierte Parameter schreiben
             BM_Form1.Mutierte_Parameter_schreiben(Par)
 
@@ -689,7 +693,7 @@ ErrCode_ES_STARTEN:
             f1 = BM_Form1.Qualitaetswert(Wert)
             QN(1) = f1
 
-            'Zielfunktion im TeeChart zeichnen
+            'Qualitätswert im TeeChart zeichnen
             If Not isPareto Then
                 Zielfunktion_zeichnen_SingleOb(f1, durchlauf, ipop)
             Else
