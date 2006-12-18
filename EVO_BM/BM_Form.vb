@@ -102,25 +102,20 @@ Public Class BM_Form
 
     End Sub
 
+    'Die vom Optimierungsalgorithmus mutierten Parameter werden geschrieben
     Public Sub Mutierte_Parameter_schreiben(ByRef Par(,) As Double)
-        'Todo: Parameter müssen vor der Simulation geschrieben werden
-        'Dim MyPara() As Double
         Dim Parameter As String
-        Dim i As Integer = 0
+        Dim AnzZeil As Integer = 0
         Dim j As Integer = 0
-        Dim Zeile1, Zeile2, Zeile3 As String
-        Zeile1 = ""
-        Zeile2 = ""
-        Zeile3 = ""
+        Dim Datei() As String
         Dim Text As String
         Dim StrLeft As String
         Dim StrRight As String
-        Dim Datei() As String
 
         '---------------------------------------------------------------------
         'HACK: Zum schnelleren Arbeiten
         WorkDir = "D:\-03- AtWork #\BlauesModell_cons\Workfolder Speicher\"
-        Exe = "D:\-03- AtWork #\BlauesModell_cons\Debug\blauesmodell_cons.exe"
+        Exe = "D:\-03- AtWork #\BlauesModell_cons\Release\BlauesModell_cons.exe"
         Datensatz = "TSIM"
         '---------------------------------------------------------------------
 
@@ -131,13 +126,13 @@ Public Class BM_Form
             'Anzahl der Zeilen feststellen
             Do
                 Text = StrRead.ReadLine.ToString
-                i += 1
+                AnzZeil += 1
             Loop Until StrRead.Peek() = -1
 
             'Auf Anfang setzen und lesen
             FiStr.Seek(0, SeekOrigin.Begin)
-            ReDim Datei(i)
-            For j = 1 To i
+            ReDim Datei(AnzZeil)
+            For j = 1 To AnzZeil
                 Datei(j) = StrRead.ReadLine.ToString
             Next
             StrRead.Close()
@@ -154,7 +149,7 @@ Public Class BM_Form
 
             'Alle Zeilen in Datei schreiben
             Dim StrWrite As StreamWriter = New StreamWriter(WorkDir + Datensatz + ".fkt", False, System.Text.Encoding.GetEncoding("iso8859-1"))
-            For j = 1 To i
+            For j = 1 To AnzZeil
                 StrWrite.WriteLine(Datei(j))
             Next
             StrWrite.Close()
@@ -174,24 +169,54 @@ Public Class BM_Form
         ChDrive(WorkDir) 'nur nötig falls Arbeitsverzeichnis und aktuelles Verzeichnis auf verschiedenen Laufwerken sind
         ChDir(WorkDir)
         'EXE aufrufen
-        ProcID = Shell("""" & Exe & """ " & Datensatz, AppWinStyle.NormalFocus, True)
+        ProcID = Shell("""" & Exe & """ " & Datensatz, AppWinStyle.MinimizedNoFocus, True)
         'Arbeitsverzeichnis wieder zurücksetzen (optional)
         ChDrive(currentDir)
         ChDir(currentDir)
     End Sub
 
     'Hier wird die Ergebnisdatei nach jeder Simulation ausgelesen
-    Public Sub Ergebnisdatei_auslesen()
+    Public Function Ergebnis() As Single
 
-        'ToDo: lesen der Ergebnisdatei
+        Dim AnzZeil As Integer = 0
+        Dim j As Integer = 0
+        Dim Datei() As String
+        Dim Text As String
 
-    End Sub
+        Try
+            Dim FiStr As FileStream = New FileStream(WorkDir + Datensatz + ".wel", FileMode.Open, IO.FileAccess.ReadWrite)
+            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+            'Anzahl der Zeilen feststellen
+            Do
+                Text = StrRead.ReadLine.ToString
+                AnzZeil += 1
+            Loop Until StrRead.Peek() = -1
+
+            'Auf Anfang setzen und lesen
+            FiStr.Seek(0, SeekOrigin.Begin)
+            ReDim Datei(AnzZeil)
+            For j = 1 To AnzZeil
+                Datei(j) = StrRead.ReadLine.ToString
+            Next
+
+            StrRead.Close()
+            FiStr.Close()
+
+            'Wert auslesen
+            Ergebnis = Mid(Datei(100), 333, 5)
+
+        Catch except As Exception
+            MsgBox(except.Message, "Fehler beim lesen der .wel Datei", MsgBoxStyle.Exclamation)
+        End Try
+
+    End Function
 
     'Der Qualitätswert wird durch Vergleich von Calculation Berechnet.
     'ToDo: Evtl. Cases für die Verschiedenen Berechnungsarten einbauen
-    Public Function Qualitaetswert() As Double
-
-        'ToDo: Berechnen des Qualitätswertes
+    Public Function Qualitaetswert(ByVal Ergebnis As Single) As Double
+        Dim Ziel As Single = 0.333
+        Qualitaetswert = (Ziel - Ergebnis) * (Ziel - Ergebnis)
 
     End Function
 

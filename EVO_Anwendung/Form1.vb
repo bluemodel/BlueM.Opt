@@ -274,9 +274,9 @@ Friend Class Form1
             '----------------------------------------------
             'HACK: nur vorübergehender Behelfsparametersatz
             Dim TestPara(3, 1) As Double
-            TestPara(1, 1) = 0.1
-            TestPara(2, 1) = 0.1
-            TestPara(3, 1) = 0.1
+            TestPara(1, 1) = 1
+            TestPara(2, 1) = 1
+            TestPara(3, 1) = 1
 
             '----------------------------------------------
             'Call BM_Form1.Anfangsparameter_auslesen()
@@ -674,6 +674,7 @@ ErrCode_ES_STARTEN:
             Dim Exe As String = BM_Form1.Exe
             Dim Datensatz As String = BM_Form1.Datensatz
             Dim WorkDir As String = BM_Form1.WorkDir
+            Dim Wert As Single
 
             'Mutierte Parameter schreiben
             BM_Form1.Mutierte_Parameter_schreiben(Par)
@@ -682,10 +683,10 @@ ErrCode_ES_STARTEN:
             BM_Form1.launchBM()
 
             'Ergebnis der Berechnung auslesen
-            BM_Form1.Ergebnisdatei_auslesen()
+            Wert = BM_Form1.Ergebnis()
 
             'Qualitätswert berechnen
-            f1 = BM_Form1.Qualitaetswert()
+            f1 = BM_Form1.Qualitaetswert(Wert)
             QN(1) = f1
 
             'Zielfunktion im TeeChart zeichnen
@@ -1256,8 +1257,8 @@ ErrCode_ES_STARTEN:
             .Chart.Axes.Bottom.Maximum = Anzahl_Kalkulationen
             .Chart.Axes.Bottom.Minimum = 0
             .Chart.Axes.Left.Automatic = False
-            .Chart.Axes.Left.Maximum = Ausgangsergebnis * 1.2
-            .Chart.Axes.Left.Minimum = -1
+            .Chart.Axes.Left.Maximum = 1
+            .Chart.Axes.Left.Minimum = 0
             .Chart.Axes.Left.Logarithmic = False
         End With
     End Sub
