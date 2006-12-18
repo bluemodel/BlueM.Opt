@@ -102,9 +102,67 @@ Public Class BM_Form
 
     End Sub
 
-    Public Sub Parameter_schreiben()
-
+    Public Sub Mutierte_Parameter_schreiben(ByRef Par(,) As Double)
         'Todo: Parameter müssen vor der Simulation geschrieben werden
+        'Dim MyPara() As Double
+        Dim Parameter As String
+        Dim i As Integer = 0
+        Dim j As Integer = 0
+        Dim Zeile1, Zeile2, Zeile3 As String
+        Zeile1 = ""
+        Zeile2 = ""
+        Zeile3 = ""
+        Dim Text As String
+        Dim StrLeft As String
+        Dim StrRight As String
+        Dim Datei() As String
+
+        '---------------------------------------------------------------------
+        'HACK: Zum schnelleren Arbeiten
+        WorkDir = "D:\-03- AtWork #\BlauesModell_cons\Workfolder Speicher\"
+        Exe = "D:\-03- AtWork #\BlauesModell_cons\Debug\blauesmodell_cons.exe"
+        Datensatz = "TSIM"
+        '---------------------------------------------------------------------
+
+        Try
+            Dim FiStr As FileStream = New FileStream(WorkDir + Datensatz + ".fkt", FileMode.Open, IO.FileAccess.ReadWrite)
+            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+            'Anzahl der Zeilen feststellen
+            Do
+                Text = StrRead.ReadLine.ToString
+                i += 1
+            Loop Until StrRead.Peek() = -1
+
+            'Auf Anfang setzen und lesen
+            FiStr.Seek(0, SeekOrigin.Begin)
+            ReDim Datei(i)
+            For j = 1 To i
+                Datei(j) = StrRead.ReadLine.ToString
+            Next
+
+            StrRead.Close()
+            FiStr.Close()
+
+            'Zeile im Datei Array ändern
+            For j = 1 To 3
+                StrLeft = Microsoft.VisualBasic.Left(Datei(j + 26), 60)
+                StrRight = Microsoft.VisualBasic.Right(Datei(j + 26), 19)
+                Parameter = (Par(j, 1)).ToString
+                Parameter = Microsoft.VisualBasic.Left(Parameter, 8)
+                Datei(j + 26) = StrLeft + Parameter + StrRight
+            Next
+
+            'Alle Zeilen in Datei schreiben
+            Dim StrWrite As StreamWriter = New StreamWriter(WorkDir + Datensatz + ".fkt", False, System.Text.Encoding.GetEncoding("iso8859-1"))
+            For j = 1 To i
+                StrWrite.WriteLine(Datei(j))
+            Next
+            StrWrite.Close()
+
+        Catch except As Exception
+            MsgBox(except.Message, "Fehler beim Schreiben der Mutierten Parameter", MsgBoxStyle.Exclamation)
+        End Try
 
     End Sub
 
