@@ -113,7 +113,6 @@ Friend Class Form1
         Dim Interact As Short
         Dim isInteract As Boolean
         Dim NMemberSecondPop As Short
-
         '--------------------------
         Dim ipop As Short
         Dim igen As Short
@@ -122,13 +121,6 @@ Friend Class Form1
         Dim QN() As Double
         Dim RN() As Double
         '--------------------------
-        'HACK: nur vorübergehender Behelfsparametersatz
-        Dim TestPara(4, 1) As Double
-        TestPara(1, 1) = 0
-        TestPara(2, 1) = 0.1
-        TestPara(3, 1) = 0.1
-        TestPara(3, 1) = 0.1
-        '---------------------------
 
         'TODO: On Error GoTo Err_ES_STARTEN
 
@@ -275,20 +267,24 @@ Friend Class Form1
 
             globalAnzPar = 3
             globalAnzZiel = 1
+            'ToDo: Was bedeuted das für das Blaue Modell?
             globalAnzRand = 2
-            ReDim mypara(globalAnzPar, 1)
-            Randomize()
-            mypara(1, 1) = Rnd()
-            mypara(2, 1) = Rnd()
-            mypara(3, 1) = Rnd()
+            ReDim mypara(3, 1)
 
-            'ToDo:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-            'For i = 1 To globalAnzPar
-            '    mypara(i, 1) = 0
-            'Next
-            'Parameter müssen aus dem Datensatz ausgelesen werden
+            '----------------------------------------------
+            'HACK: nur vorübergehender Behelfsparametersatz
+            Dim TestPara(3, 1) As Double
+            TestPara(1, 1) = 0.1
+            TestPara(2, 1) = 0.1
+            TestPara(3, 1) = 0.1
 
-            Call BM_Form1.Anfangsparameter_auslesen()
+            '----------------------------------------------
+            'Call BM_Form1.Anfangsparameter_auslesen()
+
+            mypara(1, 1) = TestPara(1, 1)
+            mypara(2, 1) = TestPara(2, 1)
+            mypara(3, 1) = TestPara(3, 1)
+
             Call Ausgangswert_BlauesModell()
 
         End If
@@ -351,6 +347,7 @@ Friend Class Form1
         '***************************************************************************************************
         For i = 1 To globalAnzPar
             myIsOK = evolutionsstrategie.EsLetParameter(i, mypara(i, 1))
+
         Next i
 
         '***************************************************************************************************
@@ -679,7 +676,8 @@ ErrCode_ES_STARTEN:
             Dim WorkDir As String = BM_Form1.WorkDir
 
             'Mutierte Parameter schreiben
-            BM_Form1.Parameter_schreiben()
+            BM_Form1.Mutierte_Parameter_schreiben(Par)
+            'mypara()
 
             'Modell Starten
             BM_Form1.launchBM()
