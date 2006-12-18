@@ -439,7 +439,7 @@ Start_Evolutionsrunden:
                         End If
 
                         'Bestimmen der Zielfunktion bzw. Start der Simulation
-                        myIsOK = Zielfunktion(globalAnzPar, mypara, durchlauf, Bestwert, ipop, QN, RN)
+                        myIsOK = Zielfunktion(globalAnzPar, mypara, durchlauf, Bestwert, ipop, QN, RN, evolutionsstrategie.isMultiObjective)
 
                         'Einordnen der Qualitätsfunktion im Bestwertspeicher
                         myIsOK = evolutionsstrategie.EsBest(QN, RN)
@@ -522,7 +522,7 @@ ErrCode_ES_STARTEN:
     End Function
 
     'Private Function Zielfunktion(AnzPar As Integer, Par() As Double, durchlauf As Long, Bestwert() As Double, ipop As Integer, Optional QN2 As Double) As double
-    Private Function Zielfunktion(ByRef AnzPar As Short, ByRef Par(,) As Double, ByRef durchlauf As Integer, ByRef Bestwert(,) As Double, ByRef ipop As Short, ByRef QN() As Double, ByRef RN() As Double) As Boolean
+    Private Function Zielfunktion(ByRef AnzPar As Short, ByRef Par(,) As Double, ByRef durchlauf As Integer, ByRef Bestwert(,) As Double, ByRef ipop As Short, ByRef QN() As Double, ByRef RN() As Double, ByVal isPareto As Boolean) As Boolean
         Dim i As Short
         Dim Unterteilung_X As Double
         Dim x1, x2 As Double
@@ -690,22 +690,13 @@ ErrCode_ES_STARTEN:
             QN(1) = f1
 
             'Zielfunktion im TeeChart zeichnen
-            If ipop = 1 Then
-                Zielfunktion_zeichnen_SingleOb(QN(1), durchlauf, ipop)
-
-            ElseIf ipop = 2 Then
-                Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, ipop)
-
-            ElseIf ipop = 3 Then
-                Zielfunktion_zeichnen_MultiObPar_3D(f1, f2, f3)
-
+            If Not isPareto Then
+                Zielfunktion_zeichnen_SingleOb(f1, durchlauf, ipop)
             Else
-                Zielfunktion_zeichnen_MultiObPar_XD()
 
             End If
 
         End If
-
     End Function
 
     Private Sub Ausgangswert_Sinuskurve()
