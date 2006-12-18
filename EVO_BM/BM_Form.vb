@@ -169,7 +169,7 @@ Public Class BM_Form
         ChDrive(WorkDir) 'nur nötig falls Arbeitsverzeichnis und aktuelles Verzeichnis auf verschiedenen Laufwerken sind
         ChDir(WorkDir)
         'EXE aufrufen
-        ProcID = Shell("""" & Exe & """ " & Datensatz, AppWinStyle.MinimizedNoFocus, True)
+        ProcID = Shell("""" & Exe & """ " & Datensatz, AppWinStyle.Hide, True)
         'Arbeitsverzeichnis wieder zurücksetzen (optional)
         ChDrive(currentDir)
         ChDir(currentDir)
