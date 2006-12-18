@@ -677,7 +677,6 @@ ErrCode_ES_STARTEN:
 
             'Mutierte Parameter schreiben
             BM_Form1.Mutierte_Parameter_schreiben(Par)
-            'mypara()
 
             'Modell Starten
             BM_Form1.launchBM()
