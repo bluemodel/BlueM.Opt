@@ -7,6 +7,8 @@ Public Class BM_Form
     Public WorkDir As String        'Arbeitsverzeichnis für das Blaue Modell
     Public Exe As String            'Pfad zu BlauesModell.exe
     Public Elemente(,) As String    'Array mit allen im Datensatz enthaltenen Elementen (Beschreibung, Kennung)
+    Public Messung() As Single      'Array mit den gemessenen Werten
+    Public Ergebnis() As Single     'Array mit den berechneten Werten
 
     'Private Properties
     '-------------------
@@ -109,6 +111,40 @@ Public Class BM_Form
     End Sub
     Public Sub Messung_einlesen()
         'ToDo: Hier muss die Vergleichzeitreihe für die Messung eingelesen werden
+        Dim AnzZeil As Integer = 0
+        Dim j As Integer = 0
+        Dim Datei() As String
+        Dim Text As String
+
+        Try
+            Dim FiStr As FileStream = New FileStream("D:\-03- AtWork #\Die Zieldatei\Messung.wel", FileMode.Open, IO.FileAccess.ReadWrite)
+            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+            'Anzahl der Zeilen feststellen
+            Do
+                Text = StrRead.ReadLine.ToString
+                AnzZeil += 1
+            Loop Until StrRead.Peek() = -1
+
+            'Auf Anfang setzen und lesen
+            FiStr.Seek(0, SeekOrigin.Begin)
+            ReDim Datei(AnzZeil)
+            For j = 1 To AnzZeil
+                Datei(j) = StrRead.ReadLine.ToString
+            Next
+
+            StrRead.Close()
+            FiStr.Close()
+
+            'Werte an Messung übergeben
+            ReDim Messung(AnzZeil - 3)
+            For j = 1 To AnzZeil - 3
+                Messung(j) = Mid(Datei(j + 3), 333, 5)
+            Next
+
+        Catch except As Exception
+            MsgBox(except.Message, "Fehler beim lesen der gemessenen Datei", MsgBoxStyle.Exclamation)
+        End Try
 
     End Sub
 
@@ -179,15 +215,14 @@ Public Class BM_Form
         ChDrive(WorkDir) 'nur nötig falls Arbeitsverzeichnis und aktuelles Verzeichnis auf verschiedenen Laufwerken sind
         ChDir(WorkDir)
         'EXE aufrufen
-        ProcID = Shell("""" & Exe & """ " & Datensatz, AppWinStyle.Hide, True)
+        ProcID = Shell("""" & Exe & """ " & Datensatz, AppWinStyle.MinimizedNoFocus, True)
         'Arbeitsverzeichnis wieder zurücksetzen (optional)
         ChDrive(currentDir)
         ChDir(currentDir)
     End Sub
 
     'Hier wird die Ergebnisdatei nach jeder Simulation ausgelesen
-    Public Function Ergebnis() As Single
-
+    Public Sub Ergebnis_lesen()
         Dim AnzZeil As Integer = 0
         Dim j As Integer = 0
         Dim Datei() As String
@@ -213,20 +248,35 @@ Public Class BM_Form
             StrRead.Close()
             FiStr.Close()
 
-            'Wert auslesen
-            Ergebnis = Mid(Datei(100), 333, 5)
+            'Werte an Ergebnis übergeben
+            ReDim Ergebnis(AnzZeil - 3)
+            For j = 1 To AnzZeil - 3
+                Ergebnis(j) = Mid(Datei(j + 3), 333, 5)
+            Next
 
         Catch except As Exception
             MsgBox(except.Message, "Fehler beim lesen der .wel Datei", MsgBoxStyle.Exclamation)
         End Try
 
-    End Function
+    End Sub
 
     'Der Qualitätswert wird durch Vergleich von Calculation Berechnet.
-    'ToDo: Evtl. Cases für die Verschiedenen Berechnungsarten einbauen
-    Public Function Qualitaetswert(ByVal Ergebnis As Single) As Double
-        Dim Ziel As Single = 0.333
-        Qualitaetswert = (Ziel - Ergebnis) * (Ziel - Ergebnis)
+    Public Function Qualitaetswert() As Double
+        Dim CalcTyp As String = "Fehlerquadrate"
+        Dim i As Integer
+
+        If Messung.Length = Ergebnis.Length Then
+            Select Case CalcTyp
+                Case "Fehlerquadrate"
+                    For i = 1 To Messung.Length - 1
+                        Qualitaetswert = (Messung(i) - Ergebnis(i)) * (Messung(i) - Ergebnis(i))
+                    Next
+                Case "Letzter_Wert"
+                    Qualitaetswert = (Messung(Messung.Length - 1) - Ergebnis(Messung.Length - 1)) * (Messung(Messung.Length - 1) - Ergebnis(Messung.Length - 1))
+            End Select
+        Else
+            'MsgBox(except.Message, "Die Anzahl der Zeitschritte zwischen Messung und Ergebnis stimmt nicht überein", MsgBoxStyle.Exclamation)
+        End If
 
     End Function
 
