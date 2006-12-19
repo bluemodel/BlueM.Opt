@@ -274,10 +274,11 @@ Friend Class Form1
             '----------------------------------------------
             'HACK: nur vorübergehender Behelfsparametersatz
             Dim TestPara(3, 1) As Double
-            TestPara(1, 1) = 1
-            TestPara(2, 1) = 1
-            TestPara(3, 1) = 1
+            TestPara(1, 1) = 0.1
+            TestPara(2, 1) = 0.1
+            TestPara(3, 1) = 0.1
             '----------------------------------------------
+            Call BM_Form1.Messung_einlesen()
             Call BM_Form1.Anfangsparameter_auslesen()
             Call BM_Form1.Anfangsparameter_skalieren()
             '----------------------------------------------
@@ -678,19 +679,21 @@ ErrCode_ES_STARTEN:
             Dim Wert As Single
 
             'Mutierte Parameter deskalieren
-            BM_Form1.Parameter_deskalieren()
+            Call BM_Form1.Parameter_deskalieren()
 
             'Mutierte Parameter schreiben
-            BM_Form1.Mutierte_Parameter_schreiben(Par)
+            Call BM_Form1.Mutierte_Parameter_schreiben(Par)
 
             'Modell Starten
-            BM_Form1.launchBM()
+            Call BM_Form1.launchBM()
 
             'Ergebnis der Berechnung auslesen
-            Wert = BM_Form1.Ergebnis()
+            Call BM_Form1.Ergebnis_lesen()
 
             'Qualitätswert berechnen
-            f1 = BM_Form1.Qualitaetswert(Wert)
+            f1 = BM_Form1.Qualitaetswert
+
+            'Rückgabe des Qualitätswertes an den OptiAlgo
             QN(1) = f1
 
             'Qualitätswert im TeeChart zeichnen
