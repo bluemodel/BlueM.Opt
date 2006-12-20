@@ -12,7 +12,7 @@ Public Class BM_Form
 
     'Private Properties
     '-------------------
-    Dim Pfad_Optimierungsziele As String         'Pfad zur gemessenen Zeitreihe (ZRE oder WEL-Format)
+    Dim OptZiele_Pfad As String         'Pfad zur gemessenen Zeitreihe (ZRE oder WEL-Format)
 
     'Private Methoden
     '----------------
@@ -62,9 +62,9 @@ Public Class BM_Form
                             'Arbeitsverzeichnis bestimmen
                             WorkDir = Configs(i, 1).Substring(0, Configs(i, 1).LastIndexOf("\") + 1)
                             Me.TextBox_Datensatz.Text = Configs(i, 1)
-                        Case "Optimierungsziele"
-                            Pfad_Optimierungsziele = Configs(i, 1)
-                            Me.TextBox_Pfad_Optimierungsziele.Text = Me.Pfad_Optimierungsziele
+                        Case "OptZiele"
+                            OptZiele_Pfad = Configs(i, 1)
+                            Me.TextBox_OptZiele_Pfad.Text = Me.OptZiele_Pfad
                         Case Else
                             'nix
                     End Select
@@ -115,18 +115,18 @@ Public Class BM_Form
     End Sub
 
     'Pegeldaten
-    Private Sub Button_Optimierungsziele_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Optimierungsziele.Click
-        Me.OpenFile_Optimierungsziele.ShowDialog()
+    Private Sub Button_OptZiele_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_OptZiele.Click
+        Me.OpenFile_OptZiele.ShowDialog()
     End Sub
 
-    Private Sub OpenFile_Optimierungsziele_FileOk(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles OpenFile_Optimierungsziele.FileOk
+    Private Sub OpenFile_OptZiele_FileOk(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles OpenFile_OptZiele.FileOk
 
         'Pfad zur Zeitreihe auslesen
-        Me.Pfad_Optimierungsziele = Me.OpenFile_Optimierungsziele.FileName
+        Me.OptZiele_Pfad = Me.OpenFile_OptZiele.FileName
 
         'Pfad in Textbox schreiben
-        Me.TextBox_Pfad_Optimierungsziele.Clear()
-        Me.TextBox_Pfad_Optimierungsziele.AppendText(Me.Pfad_Optimierungsziele)
+        Me.TextBox_OptZiele_Pfad.Clear()
+        Me.TextBox_OptZiele_Pfad.AppendText(Me.OptZiele_Pfad)
 
     End Sub
 
