@@ -12,7 +12,7 @@ Public Class BM_Form
 
     'Private Properties
     '-------------------
-    Dim OptZiele_Pfad As String         'Pfad zur gemessenen Zeitreihe (ZRE oder WEL-Format)
+    Dim OptZiel_Pfad As String         'Pfad zur gemessenen Zeitreihe (ZRE oder WEL-Format)
 
     'Private Methoden
     '----------------
@@ -62,9 +62,9 @@ Public Class BM_Form
                             'Arbeitsverzeichnis bestimmen
                             WorkDir = Configs(i, 1).Substring(0, Configs(i, 1).LastIndexOf("\") + 1)
                             Me.TextBox_Datensatz.Text = Configs(i, 1)
-                        Case "OptZiele"
-                            OptZiele_Pfad = Configs(i, 1)
-                            Me.TextBox_OptZiele_Pfad.Text = Me.OptZiele_Pfad
+                        Case "OptZiel"
+                            OptZiel_Pfad = Configs(i, 1)
+                            Me.TextBox_OptZiel_Pfad.Text = Me.OptZiel_Pfad
                         Case Else
                             'nix
                     End Select
@@ -115,18 +115,18 @@ Public Class BM_Form
     End Sub
 
     'Pegeldaten
-    Private Sub Button_OptZiele_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_OptZiele.Click
-        Me.OpenFile_OptZiele.ShowDialog()
+    Private Sub Button_OptZiel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_OptZiel.Click
+        Me.OpenFile_OptZiel.ShowDialog()
     End Sub
 
-    Private Sub OpenFile_OptZiele_FileOk(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles OpenFile_OptZiele.FileOk
+    Private Sub OpenFile_OptZiel_FileOk(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles OpenFile_OptZiel.FileOk
 
         'Pfad zur Zeitreihe auslesen
-        Me.OptZiele_Pfad = Me.OpenFile_OptZiele.FileName
+        Me.OptZiel_Pfad = Me.OpenFile_OptZiel.FileName
 
         'Pfad in Textbox schreiben
-        Me.TextBox_OptZiele_Pfad.Clear()
-        Me.TextBox_OptZiele_Pfad.AppendText(Me.OptZiele_Pfad)
+        Me.TextBox_OptZiel_Pfad.Clear()
+        Me.TextBox_OptZiel_Pfad.AppendText(Me.OptZiel_Pfad)
 
     End Sub
 
