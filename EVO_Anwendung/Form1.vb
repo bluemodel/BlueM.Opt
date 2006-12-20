@@ -164,6 +164,7 @@ Friend Class Form1
             '*          Testprobleme             *
             '*************************************
 
+            'BUG: Bug 57: Für alle Testprobleme ReDim mypara(globalAnzPar - 1, 0) ! (wegen Array-Anfang bei 0)
             Select Case Combo_Testproblem.Text
                 Case "Sinus-Funktion"
                     globalAnzPar = CShort(Text_Sinusfunktion_Par.Text)
@@ -268,27 +269,31 @@ Friend Class Form1
             '*        BlauesModell         *
             '*******************************
 
-            globalAnzPar = 3
+            'Optimierungsparameter
+            'ACHTUNG: OptParameter fängt bei 0 an!
+            Call BM_Form1.ReadOptParameter()
+
+            globalAnzPar = BM_Form1.OptParameter.GetUpperBound(0) + 1
+            ReDim mypara(globalAnzPar, 1)
+
+            'Parameterwerte normieren und übergeben
+            Dim Min As Double
+            Dim Max As Double
+            Dim Param As Double
+            For i = 0 To globalAnzPar - 1
+                Param = Convert.ToDouble(BM_Form1.OptParameter(i, 6))
+                Min = Convert.ToDouble(BM_Form1.OptParameter(i, 7))
+                Max = Convert.ToDouble(BM_Form1.OptParameter(i, 8))
+                mypara(i + 1, 1) = (Param - Min) / (Max - Min)
+            Next
+
+            'TODO: Zielfunktionen
             globalAnzZiel = 1
-            'ToDo: Was bedeuted das für das Blaue Modell?
+
+            'TODO: Randbedingungen
             globalAnzRand = 2
-            ReDim mypara(3, 1)
 
             '----------------------------------------------
-            'HACK: nur vorübergehender Behelfsparametersatz
-            Dim TestPara(3, 1) As Double
-            TestPara(1, 1) = 0.1
-            TestPara(2, 1) = 0.1
-            TestPara(3, 1) = 0.1
-            '----------------------------------------------
-            'Call BM_Form1.Messung_einlesen()
-            Call BM_Form1.Anfangsparameter_auslesen()
-            Call BM_Form1.Anfangsparameter_skalieren()
-            '----------------------------------------------
-
-            mypara(1, 1) = TestPara(1, 1)
-            mypara(2, 1) = TestPara(2, 1)
-            mypara(3, 1) = TestPara(3, 1)
 
             Call Ausgangswert_BlauesModell()
 
@@ -674,6 +679,8 @@ ErrCode_ES_STARTEN:
             '*************************************
             '*          Blaues Modell            *
             '*************************************
+
+
 
             'Mutierte Parameter deskalieren
             Call BM_Form1.Parameter_deskalieren()

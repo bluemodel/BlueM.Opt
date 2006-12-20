@@ -3,16 +3,17 @@ Public Class BM_Form
 
     'Public Properties
     '------------------
-    Public Datensatz As String      'Name des zu simulierenden Datensatzes
-    Public WorkDir As String        'Arbeitsverzeichnis für das Blaue Modell
-    Public BM_Exe As String         'Pfad zu BlauesModell.exe
-    Public Elemente(,) As String    'Array mit allen im Systemplan des Datensatzes enthaltenen Elementen (Beschreibung, Kennung)
-    Public Messung(,) As String     'Array mit den gemessenen Werten (Datum, Wert)
-    Public Ergebnis() As Single     'Array mit den berechneten Werten
+    Public Datensatz As String          'Name des zu simulierenden Datensatzes
+    Public WorkDir As String            'Arbeitsverzeichnis für das Blaue Modell
+    Public BM_Exe As String             'Pfad zu BlauesModell.exe
+    Public Messung(,) As String         'Array mit den gemessenen Werten (Datum, Wert)
+    Public Ergebnis() As Single         'Array mit den berechneten Werten
+    Public OptParameter(,) As String    'Array mit den Optimierungsparametern
 
     'Private Properties
     '-------------------
-    Dim OptZiel_Pfad As String         'Pfad zur gemessenen Zeitreihe (ZRE oder WEL-Format)
+    Dim OptParameter_Pfad As String     'Pfad zur Datei mit den Optimierungsparametern (*.OPT)
+    Dim OptZiel_Pfad As String          'Pfad zur Datei mit den Zielfunktionen (*.ZIE)
 
     'Private Methoden
     '----------------
@@ -53,7 +54,7 @@ Public Class BM_Form
                     Select Case Configs(i, 0)
                         Case "BM_Exe"
                             BM_Exe = Configs(i, 1)
-                            Me.TextBox_EXE.Text = Me.BM_Exe
+                            TextBox_EXE.Text = BM_Exe
                         Case "Datensatz"
                             'Dateiname vom Ende abtrennen
                             Datensatz = Configs(i, 1).Substring(Configs(i, 1).LastIndexOf("\") + 1)
@@ -61,7 +62,10 @@ Public Class BM_Form
                             Datensatz = Datensatz.Substring(0, Datensatz.Length - 4)
                             'Arbeitsverzeichnis bestimmen
                             WorkDir = Configs(i, 1).Substring(0, Configs(i, 1).LastIndexOf("\") + 1)
-                            Me.TextBox_Datensatz.Text = Configs(i, 1)
+                            TextBox_Datensatz.Text = Configs(i, 1)
+                        Case "OptParameter"
+                            OptParameter_Pfad = Configs(i, 1)
+                            TextBox_OptParameter_Pfad.Text = OptParameter_Pfad
                         Case "OptZiel"
                             OptZiel_Pfad = Configs(i, 1)
                             Me.TextBox_OptZiel_Pfad.Text = Me.OptZiel_Pfad
@@ -76,7 +80,6 @@ Public Class BM_Form
         End If
 
     End Sub
-
 
     'Exe-Datei
     Private Sub Button_Exe_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Exe.Click
@@ -102,8 +105,7 @@ Public Class BM_Form
         Dim Datensatz_tmp As String = Me.OpenFile_Datensatz.FileName
 
         'Pfad in Textbox schreiben
-        Me.TextBox_Datensatz.Clear()
-        Me.TextBox_Datensatz.AppendText(Datensatz_tmp)
+        Me.TextBox_Datensatz.Text = Datensatz_tmp
 
         'Dateiname vom Ende abtrennen
         Datensatz = Datensatz_tmp.Substring(Datensatz_tmp.LastIndexOf("\") + 1)
@@ -114,7 +116,17 @@ Public Class BM_Form
 
     End Sub
 
-    'Pegeldaten
+    'Optimierungsparameter
+    Private Sub Button_OptParameter_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_OptParameter.Click
+        Me.OpenFile_OptParameter.ShowDialog()
+    End Sub
+
+    Private Sub OpenFile_OptParameter_FileOk(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles OpenFile_OptParameter.FileOk
+        OptParameter_Pfad = OpenFile_OptParameter.FileName()
+        TextBox_OptParameter_Pfad.Text = OptParameter_Pfad
+    End Sub
+
+    'Zeitreihe
     Private Sub Button_OptZiel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_OptZiel.Click
         Me.OpenFile_OptZiel.ShowDialog()
     End Sub
@@ -133,20 +145,45 @@ Public Class BM_Form
     'Public Methoden
     '-------------------------------------
 
-    Public Sub Anfangsparameter_auslesen()
+    'Optimierungsparameter einlesen (*.OPT-Datei)
+    Public Sub ReadOptParameter()
+        Try
+            Dim FiStr As FileStream = New FileStream(OptParameter_Pfad, FileMode.Open, IO.FileAccess.ReadWrite)
+            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-        'Select Case ComboXY_Text
-        '    Case "Auto_Kalibrierung"
+            Dim Zeile As String
+            Dim AnzParam As Integer = 0
 
-        '    Case "HW_Optimierung"
+            'Anzahl der Parameter feststellen
+            Do
+                Zeile = StrRead.ReadLine.ToString()
+                If (Zeile.StartsWith("*") = False) Then
+                    AnzParam += 1
+                End If
+            Loop Until StrRead.Peek() = -1
 
-        'End Select
+            ReDim OptParameter(AnzParam - 1, 8)
 
-    End Sub
+            'Zurück zum Dateianfang und lesen
+            FiStr.Seek(0, SeekOrigin.Begin)
 
-    Public Sub Anfangsparameter_skalieren()
-        'ToDo: Hier müssen die Anfangsparameter einmal Skaliert werden
+            Dim Parameter(8) As String
+            Dim i As Integer = 0
+            Dim j As Integer
+            Do
+                Zeile = StrRead.ReadLine.ToString()
+                If (Zeile.StartsWith("*") = False) Then
+                    Parameter = Zeile.Split("|")
+                    For j = 0 To 8
+                        OptParameter(i, j) = Parameter(j + 1)
+                    Next
+                    i += 1
+                End If
+            Loop Until StrRead.Peek() = -1
 
+        Catch except As Exception
+            MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim Lesen der Optimierungsparameter")
+        End Try
     End Sub
 
     Public Sub Parameter_deskalieren()
@@ -369,21 +406,5 @@ Public Class BM_Form
         End If
 
     End Function
-
-    Private Sub Button_Parameter_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Parameter.Click
-
-        'Elemente in ComboBox von BM_Parameter schreiben
-        BM_Parameter.ComboBox_Elemente.BeginUpdate()
-
-        Dim i As Integer
-        For i = Elemente.GetLowerBound(0) To Elemente.GetUpperBound(0)
-            BM_Parameter.ComboBox_Elemente.Items.Add(Elemente(i, 1) & " - " & Elemente(i, 0))
-        Next i
-
-        BM_Parameter.ComboBox_Elemente.EndUpdate()
-
-        'Dialog anzeigen
-        BM_Parameter.ShowDialog()
-    End Sub
 
 End Class
