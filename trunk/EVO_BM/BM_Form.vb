@@ -5,8 +5,8 @@ Public Class BM_Form
     '------------------
     Public Datensatz As String      'Name des zu simulierenden Datensatzes
     Public WorkDir As String        'Arbeitsverzeichnis für das Blaue Modell
-    Public Exe As String            'Pfad zu BlauesModell.exe
-    Public Elemente(,) As String    'Array mit allen im Datensatz enthaltenen Elementen (Beschreibung, Kennung)
+    Public BM_Exe As String         'Pfad zu BlauesModell.exe
+    Public Elemente(,) As String    'Array mit allen im Systemplan des Datensatzes enthaltenen Elementen (Beschreibung, Kennung)
     Public Messung() As Single      'Array mit den gemessenen Werten
     Public Ergebnis() As Single     'Array mit den berechneten Werten
 
@@ -19,8 +19,64 @@ Public Class BM_Form
 
     'Initialisierung
     Private Sub BM_Form_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        'EVO.ini lesen
+        Call ReadEVOIni()
+    End Sub
+
+    'EVO.ini Datei einlesen
+    Private Sub ReadEVOIni()
+        If File.Exists("EVO.ini") Then
+            Try
+                'Datei einlesen
+                Dim FiStr As FileStream = New FileStream("EVO.ini", FileMode.Open, IO.FileAccess.Read)
+                Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+                Dim Configs(9, 1) As String
+                Dim Line As String
+                Dim Pairs() As String
+                Dim i As Integer = 0
+                Do
+                    Line = StrRead.ReadLine.ToString()
+                    If (Line.StartsWith("[") = False And Line.StartsWith(";") = False) Then
+                        Pairs = Line.Split("=")
+                        Configs(i, 0) = Pairs(0)
+                        Configs(i, 1) = Pairs(1)
+                        i += 1
+                    End If
+                Loop Until StrRead.Peek() = -1
+
+                StrRead.Close()
+                FiStr.Close()
+
+                'Default-Werte setzen
+                For i = 0 To Configs.GetUpperBound(0)
+                    Select Case Configs(i, 0)
+                        Case "BM_Exe"
+                            BM_Exe = Configs(i, 1)
+                            Me.TextBox_EXE.Text = Me.BM_Exe
+                        Case "Datensatz"
+                            'Dateiname vom Ende abtrennen
+                            Datensatz = Configs(i, 1).Substring(Configs(i, 1).LastIndexOf("\") + 1)
+                            'Dateiendung entfernen
+                            Datensatz = Datensatz.Substring(0, Datensatz.Length - 4)
+                            'Arbeitsverzeichnis bestimmen
+                            WorkDir = Configs(i, 1).Substring(0, Configs(i, 1).LastIndexOf("\") + 1)
+                            Me.TextBox_Datensatz.Text = Configs(i, 1)
+                        Case "Zeitreihe"
+                            Zeitreihe = Configs(i, 1)
+                            Me.TextBox_Pegel.Text = Me.Zeitreihe
+                        Case Else
+                            'nix
+                    End Select
+                Next
+
+            Catch except As Exception
+                MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim lesen der EVO.ini Datei")
+            End Try
+        End If
 
     End Sub
+
 
     'Exe-Datei
     Private Sub Button_Exe_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Exe.Click
@@ -29,10 +85,10 @@ Public Class BM_Form
 
     Private Sub OpenFile_EXE_FileOk(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles OpenFile_EXE.FileOk
         'Pfad zur Exe auslesen
-        Me.Exe = Me.OpenFile_EXE.FileName
+        Me.BM_Exe = Me.OpenFile_EXE.FileName
         'Pfad in Textbox schreiben
         Me.TextBox_EXE.Clear()
-        Me.TextBox_EXE.AppendText(Me.Exe)
+        Me.TextBox_EXE.AppendText(Me.BM_Exe)
     End Sub
 
     'Datensatz
@@ -56,21 +112,11 @@ Public Class BM_Form
         'Arbeitsverzeichnis bestimmen
         WorkDir = Datensatz_tmp.Substring(0, Datensatz_tmp.LastIndexOf("\") + 1)
 
-        'Datensatz einlesen
-        Call ReadSys()
     End Sub
 
     'Pegeldaten
     Private Sub Button_Pegel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Pegel.Click
         Me.OpenFile_Pegel.ShowDialog()
-    End Sub
-
-    Private Sub OpenFile_Pegel_FileOk(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles OpenFile_Pegel.FileOk
-        'Pfad zur Zeitreihe auslesen
-        Me.Zeitreihe = Me.OpenFile_Pegel.FileName
-        'Pfad in Textbox schreiben
-        Me.TextBox_Pegel.Clear()
-        Me.TextBox_Pegel.AppendText(Me.Zeitreihe)
     End Sub
 
     'Optimierungsmodus
@@ -84,6 +130,23 @@ Public Class BM_Form
         Me.Label_Pegel.Enabled = False
         Me.TextBox_Pegel.Enabled = False
         Me.Button_Pegel.Enabled = False
+    End Sub
+
+    Private Sub OpenFile_Pegel_FileOk(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles OpenFile_Pegel.FileOk
+
+        'Pfad zur Zeitreihe auslesen
+        Me.Zeitreihe = Me.OpenFile_Pegel.FileName
+
+        'Pfad in Textbox schreiben
+        Me.TextBox_Pegel.Clear()
+        Me.TextBox_Pegel.AppendText(Me.Zeitreihe)
+
+        'Zeitreihe einlesen
+        Call ReadZRE()
+    End Sub
+
+    Private Sub ReadZRE()
+
     End Sub
 
     'Public Methoden
@@ -109,6 +172,7 @@ Public Class BM_Form
         'ToDo: Hier müssen die Parameter vor jeder Simulation deskaliert werden
 
     End Sub
+
     Public Sub Messung_einlesen()
         'ToDo: Hier muss die Vergleichzeitreihe für die Messung eingelesen werden
         Dim AnzZeil As Integer = 0
@@ -158,13 +222,6 @@ Public Class BM_Form
         Dim StrLeft As String
         Dim StrRight As String
 
-        '---------------------------------------------------------------------
-        'HACK: Zum schnelleren Arbeiten
-        WorkDir = "D:\-03- AtWork #\BlauesModell_cons\Workfolder Speicher\"
-        Exe = "D:\-03- AtWork #\BlauesModell_cons\Release\BlauesModell_cons.exe"
-        Datensatz = "TSIM"
-        '---------------------------------------------------------------------
-
         Try
             Dim FiStr As FileStream = New FileStream(WorkDir + Datensatz + ".fkt", FileMode.Open, IO.FileAccess.ReadWrite)
             Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -201,7 +258,7 @@ Public Class BM_Form
             StrWrite.Close()
 
         Catch except As Exception
-            MsgBox(except.Message, "Fehler beim Schreiben der Mutierten Parameter", MsgBoxStyle.Exclamation)
+            MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim Schreiben der Mutierten Parameter")
         End Try
 
     End Sub
@@ -215,7 +272,7 @@ Public Class BM_Form
         ChDrive(WorkDir) 'nur nötig falls Arbeitsverzeichnis und aktuelles Verzeichnis auf verschiedenen Laufwerken sind
         ChDir(WorkDir)
         'EXE aufrufen
-        ProcID = Shell("""" & Exe & """ " & Datensatz, AppWinStyle.MinimizedNoFocus, True)
+        ProcID = Shell("""" & BM_Exe & """ " & Datensatz, AppWinStyle.MinimizedNoFocus, True)
         'Arbeitsverzeichnis wieder zurücksetzen (optional)
         ChDrive(currentDir)
         ChDir(currentDir)
@@ -255,7 +312,7 @@ Public Class BM_Form
             Next
 
         Catch except As Exception
-            MsgBox(except.Message, "Fehler beim lesen der .wel Datei", MsgBoxStyle.Exclamation)
+            MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim lesen der .WEL Datei")
         End Try
 
     End Sub
@@ -280,52 +337,77 @@ Public Class BM_Form
 
     End Function
 
+    'Lesen der SYS-Datei
+    Private Sub Button_ReadSys_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_ReadSys.Click
+        If (Datensatz IsNot "") Then
+            Call ReadSys()
+        Else
+            MsgBox("Bitte zuerst einen Datensatz angeben!", MsgBoxStyle.Exclamation, "Fehler beim Lesen der SYS-Datei")
+        End If
+    End Sub
+
     Public Sub ReadSys()
-        Dim SysFile = WorkDir & Datensatz & ".SYS"
-        'TODO: SYS-Datei einlesen
-        Dim FiStr As FileStream = New FileStream(SysFile, FileMode.Open, FileAccess.Read)
-        Dim StrRe As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-        Dim Text As String
-        Dim i As Integer = 0
+        Try
+            Dim SysFile = WorkDir & Datensatz & ".SYS"
 
-        'Anzahl Elemente feststellen
-        Do
-            Text = StrRe.ReadLine.ToString
-            If (Text.StartsWith("*") = False) Then
-                i += 1
-            End If
-        Loop Until StrRe.Peek() = -1
+            Dim FiStr As FileStream = New FileStream(SysFile, FileMode.Open, FileAccess.Read)
+            Dim StrRe As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-        'Array neu dimensionieren
-        ReDim Elemente(i - 1, 1)
+            Dim Text As String
+            Dim i As Integer = 0
 
-        'auf Dateianfang zurücksetzen
-        FiStr.Seek(0, SeekOrigin.Begin)
+            'Anzahl Elemente feststellen
+            Do
+                Text = StrRe.ReadLine.ToString
+                If (Text.StartsWith("*") = False) Then
+                    i += 1
+                End If
+            Loop Until StrRe.Peek() = -1
 
-        i = 0
+            'Array neu dimensionieren
+            ReDim Elemente(i - 1, 1)
 
-        Do
-            Text = StrRe.ReadLine.ToString
-            If (Text.StartsWith("*") = False) Then
-                Elemente(i, 0) = Text.Substring(2, 23).Trim()
-                Elemente(i, 1) = Text.Substring(28, 4).Trim()
-                i += 1
-            End If
-        Loop Until StrRe.Peek() = -1
+            'auf Dateianfang zurücksetzen
+            FiStr.Seek(0, SeekOrigin.Begin)
 
-        StrRe.Close()
-        FiStr.Close()
+            i = 0
+
+            Do
+                Text = StrRe.ReadLine.ToString
+                If (Text.StartsWith("*") = False) Then
+                    Elemente(i, 0) = Text.Substring(2, 23).Trim()
+                    Elemente(i, 1) = Text.Substring(28, 4).Trim()
+                    i += 1
+                End If
+            Loop Until StrRe.Peek() = -1
+
+            StrRe.Close()
+            FiStr.Close()
+
+        Catch except As Exception
+            MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim Lesen der SYS-Datei")
+        End Try
+
+        'Ergebnis ausgeben
+        If (Elemente.Length > 0) Then
+            Me.Label_ReadSysResult.ForeColor = Color.Green
+            Me.Label_ReadSysResult.Text = (Elemente.Length / 2).ToString & " Elemente eingelesen"
+        Else
+            Me.Label_ReadSysResult.ForeColor = Color.Red
+            Me.Label_ReadSysResult.Text = "Keine Elemente gefunden!"
+        End If
+
     End Sub
 
     Private Sub Button_Parameter_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Parameter.Click
 
-        'Elemente in ComboBox schreiben
+        'Elemente in ComboBox von BM_Parameter schreiben
         BM_Parameter.ComboBox_Elemente.BeginUpdate()
 
         Dim i As Integer
         For i = Elemente.GetLowerBound(0) To Elemente.GetUpperBound(0)
-            BM_Parameter.ComboBox_Elemente.Items.Add(Elemente(i, 1))
+            BM_Parameter.ComboBox_Elemente.Items.Add(Elemente(i, 1) & " - " & Elemente(i, 0))
         Next i
 
         BM_Parameter.ComboBox_Elemente.EndUpdate()

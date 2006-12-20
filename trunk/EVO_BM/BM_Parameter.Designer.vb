@@ -28,7 +28,7 @@ Partial Class BM_Parameter
         Me.ComboBox_Elemente.FormattingEnabled = True
         Me.ComboBox_Elemente.Location = New System.Drawing.Point(67, 10)
         Me.ComboBox_Elemente.Name = "ComboBox_Elemente"
-        Me.ComboBox_Elemente.Size = New System.Drawing.Size(121, 21)
+        Me.ComboBox_Elemente.Size = New System.Drawing.Size(200, 21)
         Me.ComboBox_Elemente.TabIndex = 0
         '
         'Label_Elemente

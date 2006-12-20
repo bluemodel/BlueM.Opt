@@ -80,11 +80,14 @@ Friend Class Form1
     End Sub
 
     Private Sub Form1_Load(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles MyBase.Load
+        'Fenstergröße klein (ohne BM)
         Me.Width = 720
+        'Testprobleme für Single-Objective in ComboBox schreiben
         Combo_Testproblem.Items.Add("Sinus-Funktion")
         Combo_Testproblem.Items.Add("Beale-Problem")
         Combo_Testproblem.Items.Add("Schwefel 2.4-Problem")
         Combo_Testproblem.SelectedIndex = 0
+        'TeeChart intialisieren
         TeeCommander1.Chart = TChart1
     End Sub
 
@@ -672,10 +675,6 @@ ErrCode_ES_STARTEN:
             '*          Blaues Modell            *
             '*************************************
 
-            'Variablen aus BM_Form übernehmen
-            Dim Exe As String = BM_Form1.Exe
-            Dim Datensatz As String = BM_Form1.Datensatz
-            Dim WorkDir As String = BM_Form1.WorkDir
             Dim Wert As Single
 
             'Mutierte Parameter deskalieren
@@ -1369,4 +1368,5 @@ ErrCode_ES_STARTEN:
             Me.Width = 720
         End If
     End Sub
+
 End Class
