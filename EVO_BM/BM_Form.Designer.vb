@@ -25,9 +25,9 @@ Partial Class BM_Form
         Me.Label_Parameter = New System.Windows.Forms.Label
         Me.Button_Parameter = New System.Windows.Forms.Button
         Me.GroupBox_Ziel = New System.Windows.Forms.GroupBox
-        Me.Label_Optimierungsziele = New System.Windows.Forms.Label
-        Me.TextBox_Pfad_Optimierungsziele = New System.Windows.Forms.TextBox
-        Me.Button_Optimierungsziele = New System.Windows.Forms.Button
+        Me.Label_OptZiele = New System.Windows.Forms.Label
+        Me.TextBox_OptZiele_Pfad = New System.Windows.Forms.TextBox
+        Me.Button_OptZiele = New System.Windows.Forms.Button
         Me.Label_EXE = New System.Windows.Forms.Label
         Me.TextBox_EXE = New System.Windows.Forms.TextBox
         Me.Button_Exe = New System.Windows.Forms.Button
@@ -36,7 +36,7 @@ Partial Class BM_Form
         Me.TextBox_Datensatz = New System.Windows.Forms.TextBox
         Me.OpenFile_Datensatz = New System.Windows.Forms.OpenFileDialog
         Me.OpenFile_EXE = New System.Windows.Forms.OpenFileDialog
-        Me.OpenFile_Optimierungsziele = New System.Windows.Forms.OpenFileDialog
+        Me.OpenFile_OptZiele = New System.Windows.Forms.OpenFileDialog
         Me.GroupBox_BM.SuspendLayout()
         Me.GroupBox_Parameter.SuspendLayout()
         Me.GroupBox_Ziel.SuspendLayout()
@@ -104,9 +104,9 @@ Partial Class BM_Form
         '
         'GroupBox_Ziel
         '
-        Me.GroupBox_Ziel.Controls.Add(Me.Label_Optimierungsziele)
-        Me.GroupBox_Ziel.Controls.Add(Me.TextBox_Pfad_Optimierungsziele)
-        Me.GroupBox_Ziel.Controls.Add(Me.Button_Optimierungsziele)
+        Me.GroupBox_Ziel.Controls.Add(Me.Label_OptZiele)
+        Me.GroupBox_Ziel.Controls.Add(Me.TextBox_OptZiele_Pfad)
+        Me.GroupBox_Ziel.Controls.Add(Me.Button_OptZiele)
         Me.GroupBox_Ziel.Location = New System.Drawing.Point(7, 180)
         Me.GroupBox_Ziel.Name = "GroupBox_Ziel"
         Me.GroupBox_Ziel.Size = New System.Drawing.Size(275, 57)
@@ -114,31 +114,31 @@ Partial Class BM_Form
         Me.GroupBox_Ziel.TabStop = False
         Me.GroupBox_Ziel.Text = "Ziel"
         '
-        'Label_Optimierungsziele
+        'Label_OptZiele
         '
-        Me.Label_Optimierungsziele.AutoSize = True
-        Me.Label_Optimierungsziele.Location = New System.Drawing.Point(6, 25)
-        Me.Label_Optimierungsziele.Name = "Label_Optimierungsziele"
-        Me.Label_Optimierungsziele.Size = New System.Drawing.Size(56, 13)
-        Me.Label_Optimierungsziele.TabIndex = 2
-        Me.Label_Optimierungsziele.Text = "Opt. Ziele:"
+        Me.Label_OptZiele.AutoSize = True
+        Me.Label_OptZiele.Location = New System.Drawing.Point(6, 25)
+        Me.Label_OptZiele.Name = "Label_OptZiele"
+        Me.Label_OptZiele.Size = New System.Drawing.Size(56, 13)
+        Me.Label_OptZiele.TabIndex = 2
+        Me.Label_OptZiele.Text = "Opt. Ziele:"
         '
-        'TextBox_Pfad_Optimierungsziele
+        'TextBox_OptZiele_Pfad
         '
-        Me.TextBox_Pfad_Optimierungsziele.Location = New System.Drawing.Point(63, 22)
-        Me.TextBox_Pfad_Optimierungsziele.Name = "TextBox_Pfad_Optimierungsziele"
-        Me.TextBox_Pfad_Optimierungsziele.Size = New System.Drawing.Size(174, 20)
-        Me.TextBox_Pfad_Optimierungsziele.TabIndex = 24
-        Me.TextBox_Pfad_Optimierungsziele.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.TextBox_OptZiele_Pfad.Location = New System.Drawing.Point(63, 22)
+        Me.TextBox_OptZiele_Pfad.Name = "TextBox_OptZiele_Pfad"
+        Me.TextBox_OptZiele_Pfad.Size = New System.Drawing.Size(174, 20)
+        Me.TextBox_OptZiele_Pfad.TabIndex = 24
+        Me.TextBox_OptZiele_Pfad.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
-        'Button_Optimierungsziele
+        'Button_OptZiele
         '
-        Me.Button_Optimierungsziele.Location = New System.Drawing.Point(243, 20)
-        Me.Button_Optimierungsziele.Name = "Button_Optimierungsziele"
-        Me.Button_Optimierungsziele.Size = New System.Drawing.Size(24, 23)
-        Me.Button_Optimierungsziele.TabIndex = 26
-        Me.Button_Optimierungsziele.Text = "..."
-        Me.Button_Optimierungsziele.UseVisualStyleBackColor = True
+        Me.Button_OptZiele.Location = New System.Drawing.Point(243, 20)
+        Me.Button_OptZiele.Name = "Button_OptZiele"
+        Me.Button_OptZiele.Size = New System.Drawing.Size(24, 23)
+        Me.Button_OptZiele.TabIndex = 26
+        Me.Button_OptZiele.Text = "..."
+        Me.Button_OptZiele.UseVisualStyleBackColor = True
         '
         'Label_EXE
         '
@@ -203,10 +203,10 @@ Partial Class BM_Form
         Me.OpenFile_EXE.Filter = "Anwendung|*.exe"
         Me.OpenFile_EXE.Title = "BlauesModell.exe auswählen"
         '
-        'OpenFile_Optimierungsziele
+        'OpenFile_OptZiele
         '
-        Me.OpenFile_Optimierungsziele.Filter = "ZIE-Dateien|*.zie"
-        Me.OpenFile_Optimierungsziele.Title = "Optimierungsziele auswählen"
+        Me.OpenFile_OptZiele.Filter = "ZIE-Dateien|*.zie"
+        Me.OpenFile_OptZiele.Title = "OptZiele auswählen"
         '
         'BM_Form
         '
@@ -234,10 +234,10 @@ Partial Class BM_Form
     Friend WithEvents OpenFile_Datensatz As System.Windows.Forms.OpenFileDialog
     Friend WithEvents OpenFile_EXE As System.Windows.Forms.OpenFileDialog
     Friend WithEvents GroupBox_Ziel As System.Windows.Forms.GroupBox
-    Friend WithEvents Label_Optimierungsziele As System.Windows.Forms.Label
-    Friend WithEvents TextBox_Pfad_Optimierungsziele As System.Windows.Forms.TextBox
-    Friend WithEvents Button_Optimierungsziele As System.Windows.Forms.Button
-    Friend WithEvents OpenFile_Optimierungsziele As System.Windows.Forms.OpenFileDialog
+    Friend WithEvents Label_OptZiele As System.Windows.Forms.Label
+    Friend WithEvents TextBox_OptZiele_Pfad As System.Windows.Forms.TextBox
+    Friend WithEvents Button_OptZiele As System.Windows.Forms.Button
+    Friend WithEvents OpenFile_OptZiele As System.Windows.Forms.OpenFileDialog
     Friend WithEvents GroupBox_Parameter As System.Windows.Forms.GroupBox
     Friend WithEvents Label_Parameter As System.Windows.Forms.Label
     Friend WithEvents Button_Parameter As System.Windows.Forms.Button
