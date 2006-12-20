@@ -20,6 +20,7 @@ Partial Class BM_Form
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.GroupBox_BM = New System.Windows.Forms.GroupBox
+        Me.Label_ReadSysResult = New System.Windows.Forms.Label
         Me.GroupBox_Parameter = New System.Windows.Forms.GroupBox
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel
         Me.Label_Parameter = New System.Windows.Forms.Label
@@ -39,6 +40,7 @@ Partial Class BM_Form
         Me.OpenFile_Datensatz = New System.Windows.Forms.OpenFileDialog
         Me.OpenFile_EXE = New System.Windows.Forms.OpenFileDialog
         Me.OpenFile_Pegel = New System.Windows.Forms.OpenFileDialog
+        Me.Button_ReadSys = New System.Windows.Forms.Button
         Me.GroupBox_BM.SuspendLayout()
         Me.GroupBox_Parameter.SuspendLayout()
         Me.GroupBox_OptModus.SuspendLayout()
@@ -46,6 +48,8 @@ Partial Class BM_Form
         '
         'GroupBox_BM
         '
+        Me.GroupBox_BM.Controls.Add(Me.Button_ReadSys)
+        Me.GroupBox_BM.Controls.Add(Me.Label_ReadSysResult)
         Me.GroupBox_BM.Controls.Add(Me.GroupBox_Parameter)
         Me.GroupBox_BM.Controls.Add(Me.GroupBox_OptModus)
         Me.GroupBox_BM.Controls.Add(Me.Label_EXE)
@@ -61,12 +65,21 @@ Partial Class BM_Form
         Me.GroupBox_BM.TabStop = False
         Me.GroupBox_BM.Text = "BlauesModell"
         '
+        'Label_ReadSysResult
+        '
+        Me.Label_ReadSysResult.AutoSize = True
+        Me.Label_ReadSysResult.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.Label_ReadSysResult.Location = New System.Drawing.Point(96, 77)
+        Me.Label_ReadSysResult.Name = "Label_ReadSysResult"
+        Me.Label_ReadSysResult.Size = New System.Drawing.Size(0, 13)
+        Me.Label_ReadSysResult.TabIndex = 32
+        '
         'GroupBox_Parameter
         '
         Me.GroupBox_Parameter.Controls.Add(Me.TableLayoutPanel1)
         Me.GroupBox_Parameter.Controls.Add(Me.Label_Parameter)
         Me.GroupBox_Parameter.Controls.Add(Me.Button_Parameter)
-        Me.GroupBox_Parameter.Location = New System.Drawing.Point(7, 162)
+        Me.GroupBox_Parameter.Location = New System.Drawing.Point(7, 188)
         Me.GroupBox_Parameter.Name = "GroupBox_Parameter"
         Me.GroupBox_Parameter.Size = New System.Drawing.Size(275, 242)
         Me.GroupBox_Parameter.TabIndex = 31
@@ -111,7 +124,7 @@ Partial Class BM_Form
         Me.GroupBox_OptModus.Controls.Add(Me.Radio_Autokalibrierung)
         Me.GroupBox_OptModus.Controls.Add(Me.TextBox_Pegel)
         Me.GroupBox_OptModus.Controls.Add(Me.Button_Pegel)
-        Me.GroupBox_OptModus.Location = New System.Drawing.Point(7, 75)
+        Me.GroupBox_OptModus.Location = New System.Drawing.Point(7, 101)
         Me.GroupBox_OptModus.Name = "GroupBox_OptModus"
         Me.GroupBox_OptModus.Size = New System.Drawing.Size(275, 80)
         Me.GroupBox_OptModus.TabIndex = 30
@@ -237,6 +250,15 @@ Partial Class BM_Form
         Me.OpenFile_Pegel.Filter = "ZRE-Dateien|*.zre"
         Me.OpenFile_Pegel.Title = "Zeitreihe auswählen"
         '
+        'Button_ReadSys
+        '
+        Me.Button_ReadSys.Location = New System.Drawing.Point(10, 72)
+        Me.Button_ReadSys.Name = "Button_ReadSys"
+        Me.Button_ReadSys.Size = New System.Drawing.Size(75, 23)
+        Me.Button_ReadSys.TabIndex = 33
+        Me.Button_ReadSys.Text = "SYS lesen"
+        Me.Button_ReadSys.UseVisualStyleBackColor = True
+        '
         'BM_Form
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -273,5 +295,7 @@ Partial Class BM_Form
     Friend WithEvents Label_Parameter As System.Windows.Forms.Label
     Friend WithEvents Button_Parameter As System.Windows.Forms.Button
     Friend WithEvents TableLayoutPanel1 As System.Windows.Forms.TableLayoutPanel
+    Friend WithEvents Label_ReadSysResult As System.Windows.Forms.Label
+    Friend WithEvents Button_ReadSys As System.Windows.Forms.Button
 
 End Class

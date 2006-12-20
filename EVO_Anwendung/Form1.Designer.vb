@@ -995,7 +995,7 @@ Partial Class Form1
         'BM_Form1
         '
         Me.BM_Form1.Datensatz = ""
-        Me.BM_Form1.Exe = ""
+        Me.BM_Form1.BM_Exe = ""
         Me.BM_Form1.Location = New System.Drawing.Point(710, 12)
         Me.BM_Form1.Name = "BM_Form1"
         Me.BM_Form1.Size = New System.Drawing.Size(297, 472)
