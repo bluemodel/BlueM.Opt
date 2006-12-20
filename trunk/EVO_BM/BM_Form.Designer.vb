@@ -23,7 +23,8 @@ Partial Class BM_Form
         Me.GroupBox_Parameter = New System.Windows.Forms.GroupBox
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel
         Me.Label_Parameter = New System.Windows.Forms.Label
-        Me.Button_Parameter = New System.Windows.Forms.Button
+        Me.TextBox_OptParameter_Pfad = New System.Windows.Forms.TextBox
+        Me.Button_OptParameter = New System.Windows.Forms.Button
         Me.GroupBox_Ziel = New System.Windows.Forms.GroupBox
         Me.Label_OptZiel = New System.Windows.Forms.Label
         Me.TextBox_OptZiel_Pfad = New System.Windows.Forms.TextBox
@@ -37,6 +38,7 @@ Partial Class BM_Form
         Me.OpenFile_Datensatz = New System.Windows.Forms.OpenFileDialog
         Me.OpenFile_EXE = New System.Windows.Forms.OpenFileDialog
         Me.OpenFile_OptZiel = New System.Windows.Forms.OpenFileDialog
+        Me.OpenFile_OptParameter = New System.Windows.Forms.OpenFileDialog
         Me.GroupBox_BM.SuspendLayout()
         Me.GroupBox_Parameter.SuspendLayout()
         Me.GroupBox_Ziel.SuspendLayout()
@@ -63,7 +65,8 @@ Partial Class BM_Form
         '
         Me.GroupBox_Parameter.Controls.Add(Me.TableLayoutPanel1)
         Me.GroupBox_Parameter.Controls.Add(Me.Label_Parameter)
-        Me.GroupBox_Parameter.Controls.Add(Me.Button_Parameter)
+        Me.GroupBox_Parameter.Controls.Add(Me.TextBox_OptParameter_Pfad)
+        Me.GroupBox_Parameter.Controls.Add(Me.Button_OptParameter)
         Me.GroupBox_Parameter.Location = New System.Drawing.Point(9, 72)
         Me.GroupBox_Parameter.Name = "GroupBox_Parameter"
         Me.GroupBox_Parameter.Size = New System.Drawing.Size(275, 102)
@@ -76,7 +79,7 @@ Partial Class BM_Form
         Me.TableLayoutPanel1.ColumnCount = 2
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.TableLayoutPanel1.Location = New System.Drawing.Point(12, 47)
+        Me.TableLayoutPanel1.Location = New System.Drawing.Point(12, 44)
         Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
         Me.TableLayoutPanel1.RowCount = 2
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
@@ -93,14 +96,22 @@ Partial Class BM_Form
         Me.Label_Parameter.TabIndex = 1
         Me.Label_Parameter.Text = "Parameter:"
         '
-        'Button_Parameter
+        'TextBox_OptParameter_Pfad
         '
-        Me.Button_Parameter.Location = New System.Drawing.Point(73, 15)
-        Me.Button_Parameter.Name = "Button_Parameter"
-        Me.Button_Parameter.Size = New System.Drawing.Size(75, 23)
-        Me.Button_Parameter.TabIndex = 0
-        Me.Button_Parameter.Text = "bearbeiten"
-        Me.Button_Parameter.UseVisualStyleBackColor = True
+        Me.TextBox_OptParameter_Pfad.Location = New System.Drawing.Point(73, 17)
+        Me.TextBox_OptParameter_Pfad.Name = "TextBox_OptParameter_Pfad"
+        Me.TextBox_OptParameter_Pfad.Size = New System.Drawing.Size(166, 20)
+        Me.TextBox_OptParameter_Pfad.TabIndex = 24
+        Me.TextBox_OptParameter_Pfad.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'Button_OptParameter
+        '
+        Me.Button_OptParameter.Location = New System.Drawing.Point(245, 14)
+        Me.Button_OptParameter.Name = "Button_OptParameter"
+        Me.Button_OptParameter.Size = New System.Drawing.Size(24, 23)
+        Me.Button_OptParameter.TabIndex = 26
+        Me.Button_OptParameter.Text = "..."
+        Me.Button_OptParameter.UseVisualStyleBackColor = True
         '
         'GroupBox_Ziel
         '
@@ -208,6 +219,10 @@ Partial Class BM_Form
         Me.OpenFile_OptZiel.Filter = "ZIE-Dateien|*.zie"
         Me.OpenFile_OptZiel.Title = "OptZiel auswählen"
         '
+        'OpenFile_OptParameter
+        '
+        Me.OpenFile_OptParameter.Filter = "Optimierungs-Parameter|*.opt"
+        '
         'BM_Form
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -240,7 +255,9 @@ Partial Class BM_Form
     Friend WithEvents OpenFile_OptZiel As System.Windows.Forms.OpenFileDialog
     Friend WithEvents GroupBox_Parameter As System.Windows.Forms.GroupBox
     Friend WithEvents Label_Parameter As System.Windows.Forms.Label
-    Friend WithEvents Button_Parameter As System.Windows.Forms.Button
     Friend WithEvents TableLayoutPanel1 As System.Windows.Forms.TableLayoutPanel
+    Friend WithEvents TextBox_OptParameter_Pfad As System.Windows.Forms.TextBox
+    Friend WithEvents Button_OptParameter As System.Windows.Forms.Button
+    Friend WithEvents OpenFile_OptParameter As System.Windows.Forms.OpenFileDialog
 
 End Class
