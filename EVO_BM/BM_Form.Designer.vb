@@ -25,11 +25,9 @@ Partial Class BM_Form
         Me.Label_Parameter = New System.Windows.Forms.Label
         Me.Button_Parameter = New System.Windows.Forms.Button
         Me.GroupBox_Ziel = New System.Windows.Forms.GroupBox
-        Me.Label_Pegel = New System.Windows.Forms.Label
-        Me.Radio_Wert = New System.Windows.Forms.RadioButton
-        Me.Radio_Zeitreihe = New System.Windows.Forms.RadioButton
-        Me.TextBox_Zeitreihe = New System.Windows.Forms.TextBox
-        Me.Button_ZRE = New System.Windows.Forms.Button
+        Me.Label_Optimierungsziele = New System.Windows.Forms.Label
+        Me.TextBox_Pfad_Optimierungsziele = New System.Windows.Forms.TextBox
+        Me.Button_Optimierungsziele = New System.Windows.Forms.Button
         Me.Label_EXE = New System.Windows.Forms.Label
         Me.TextBox_EXE = New System.Windows.Forms.TextBox
         Me.Button_Exe = New System.Windows.Forms.Button
@@ -38,7 +36,7 @@ Partial Class BM_Form
         Me.TextBox_Datensatz = New System.Windows.Forms.TextBox
         Me.OpenFile_Datensatz = New System.Windows.Forms.OpenFileDialog
         Me.OpenFile_EXE = New System.Windows.Forms.OpenFileDialog
-        Me.OpenFile_ZRE = New System.Windows.Forms.OpenFileDialog
+        Me.OpenFile_Optimierungsziele = New System.Windows.Forms.OpenFileDialog
         Me.GroupBox_BM.SuspendLayout()
         Me.GroupBox_Parameter.SuspendLayout()
         Me.GroupBox_Ziel.SuspendLayout()
@@ -106,68 +104,41 @@ Partial Class BM_Form
         '
         'GroupBox_Ziel
         '
-        Me.GroupBox_Ziel.Controls.Add(Me.Label_Pegel)
-        Me.GroupBox_Ziel.Controls.Add(Me.Radio_Wert)
-        Me.GroupBox_Ziel.Controls.Add(Me.Radio_Zeitreihe)
-        Me.GroupBox_Ziel.Controls.Add(Me.TextBox_Zeitreihe)
-        Me.GroupBox_Ziel.Controls.Add(Me.Button_ZRE)
+        Me.GroupBox_Ziel.Controls.Add(Me.Label_Optimierungsziele)
+        Me.GroupBox_Ziel.Controls.Add(Me.TextBox_Pfad_Optimierungsziele)
+        Me.GroupBox_Ziel.Controls.Add(Me.Button_Optimierungsziele)
         Me.GroupBox_Ziel.Location = New System.Drawing.Point(7, 180)
         Me.GroupBox_Ziel.Name = "GroupBox_Ziel"
-        Me.GroupBox_Ziel.Size = New System.Drawing.Size(275, 80)
+        Me.GroupBox_Ziel.Size = New System.Drawing.Size(275, 57)
         Me.GroupBox_Ziel.TabIndex = 30
         Me.GroupBox_Ziel.TabStop = False
         Me.GroupBox_Ziel.Text = "Ziel"
         '
-        'Label_Pegel
+        'Label_Optimierungsziele
         '
-        Me.Label_Pegel.AutoSize = True
-        Me.Label_Pegel.Enabled = False
-        Me.Label_Pegel.Location = New System.Drawing.Point(6, 50)
-        Me.Label_Pegel.Name = "Label_Pegel"
-        Me.Label_Pegel.Size = New System.Drawing.Size(51, 13)
-        Me.Label_Pegel.TabIndex = 2
-        Me.Label_Pegel.Text = "Zeitreihe:"
+        Me.Label_Optimierungsziele.AutoSize = True
+        Me.Label_Optimierungsziele.Location = New System.Drawing.Point(6, 25)
+        Me.Label_Optimierungsziele.Name = "Label_Optimierungsziele"
+        Me.Label_Optimierungsziele.Size = New System.Drawing.Size(56, 13)
+        Me.Label_Optimierungsziele.TabIndex = 2
+        Me.Label_Optimierungsziele.Text = "Opt. Ziele:"
         '
-        'Radio_Wert
+        'TextBox_Pfad_Optimierungsziele
         '
-        Me.Radio_Wert.AutoSize = True
-        Me.Radio_Wert.Location = New System.Drawing.Point(149, 19)
-        Me.Radio_Wert.Name = "Radio_Wert"
-        Me.Radio_Wert.Size = New System.Drawing.Size(48, 17)
-        Me.Radio_Wert.TabIndex = 1
-        Me.Radio_Wert.TabStop = True
-        Me.Radio_Wert.Text = "Wert"
-        Me.Radio_Wert.UseVisualStyleBackColor = True
+        Me.TextBox_Pfad_Optimierungsziele.Location = New System.Drawing.Point(63, 22)
+        Me.TextBox_Pfad_Optimierungsziele.Name = "TextBox_Pfad_Optimierungsziele"
+        Me.TextBox_Pfad_Optimierungsziele.Size = New System.Drawing.Size(174, 20)
+        Me.TextBox_Pfad_Optimierungsziele.TabIndex = 24
+        Me.TextBox_Pfad_Optimierungsziele.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
-        'Radio_Zeitreihe
+        'Button_Optimierungsziele
         '
-        Me.Radio_Zeitreihe.AutoSize = True
-        Me.Radio_Zeitreihe.Location = New System.Drawing.Point(41, 19)
-        Me.Radio_Zeitreihe.Name = "Radio_Zeitreihe"
-        Me.Radio_Zeitreihe.Size = New System.Drawing.Size(66, 17)
-        Me.Radio_Zeitreihe.TabIndex = 0
-        Me.Radio_Zeitreihe.TabStop = True
-        Me.Radio_Zeitreihe.Text = "Zeitreihe"
-        Me.Radio_Zeitreihe.UseVisualStyleBackColor = True
-        '
-        'TextBox_Zeitreihe
-        '
-        Me.TextBox_Zeitreihe.Enabled = False
-        Me.TextBox_Zeitreihe.Location = New System.Drawing.Point(63, 47)
-        Me.TextBox_Zeitreihe.Name = "TextBox_Zeitreihe"
-        Me.TextBox_Zeitreihe.Size = New System.Drawing.Size(174, 20)
-        Me.TextBox_Zeitreihe.TabIndex = 24
-        Me.TextBox_Zeitreihe.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        '
-        'Button_ZRE
-        '
-        Me.Button_ZRE.Enabled = False
-        Me.Button_ZRE.Location = New System.Drawing.Point(243, 45)
-        Me.Button_ZRE.Name = "Button_ZRE"
-        Me.Button_ZRE.Size = New System.Drawing.Size(24, 23)
-        Me.Button_ZRE.TabIndex = 26
-        Me.Button_ZRE.Text = "..."
-        Me.Button_ZRE.UseVisualStyleBackColor = True
+        Me.Button_Optimierungsziele.Location = New System.Drawing.Point(243, 20)
+        Me.Button_Optimierungsziele.Name = "Button_Optimierungsziele"
+        Me.Button_Optimierungsziele.Size = New System.Drawing.Size(24, 23)
+        Me.Button_Optimierungsziele.TabIndex = 26
+        Me.Button_Optimierungsziele.Text = "..."
+        Me.Button_Optimierungsziele.UseVisualStyleBackColor = True
         '
         'Label_EXE
         '
@@ -232,10 +203,10 @@ Partial Class BM_Form
         Me.OpenFile_EXE.Filter = "Anwendung|*.exe"
         Me.OpenFile_EXE.Title = "BlauesModell.exe auswählen"
         '
-        'OpenFile_ZRE
+        'OpenFile_Optimierungsziele
         '
-        Me.OpenFile_ZRE.Filter = "WEL-Dateien|*.wel|ZRE-Dateien|*.zre"
-        Me.OpenFile_ZRE.Title = "Zeitreihe auswählen"
+        Me.OpenFile_Optimierungsziele.Filter = "ZIE-Dateien|*.zie"
+        Me.OpenFile_Optimierungsziele.Title = "Optimierungsziele auswählen"
         '
         'BM_Form
         '
@@ -263,12 +234,10 @@ Partial Class BM_Form
     Friend WithEvents OpenFile_Datensatz As System.Windows.Forms.OpenFileDialog
     Friend WithEvents OpenFile_EXE As System.Windows.Forms.OpenFileDialog
     Friend WithEvents GroupBox_Ziel As System.Windows.Forms.GroupBox
-    Friend WithEvents Label_Pegel As System.Windows.Forms.Label
-    Friend WithEvents Radio_Wert As System.Windows.Forms.RadioButton
-    Friend WithEvents Radio_Zeitreihe As System.Windows.Forms.RadioButton
-    Friend WithEvents TextBox_Zeitreihe As System.Windows.Forms.TextBox
-    Friend WithEvents Button_ZRE As System.Windows.Forms.Button
-    Friend WithEvents OpenFile_ZRE As System.Windows.Forms.OpenFileDialog
+    Friend WithEvents Label_Optimierungsziele As System.Windows.Forms.Label
+    Friend WithEvents TextBox_Pfad_Optimierungsziele As System.Windows.Forms.TextBox
+    Friend WithEvents Button_Optimierungsziele As System.Windows.Forms.Button
+    Friend WithEvents OpenFile_Optimierungsziele As System.Windows.Forms.OpenFileDialog
     Friend WithEvents GroupBox_Parameter As System.Windows.Forms.GroupBox
     Friend WithEvents Label_Parameter As System.Windows.Forms.Label
     Friend WithEvents Button_Parameter As System.Windows.Forms.Button

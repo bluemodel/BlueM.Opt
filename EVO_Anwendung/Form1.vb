@@ -281,7 +281,7 @@ Friend Class Form1
             TestPara(2, 1) = 0.1
             TestPara(3, 1) = 0.1
             '----------------------------------------------
-            Call BM_Form1.Messung_einlesen()
+            'Call BM_Form1.Messung_einlesen()
             Call BM_Form1.Anfangsparameter_auslesen()
             Call BM_Form1.Anfangsparameter_skalieren()
             '----------------------------------------------
