@@ -379,69 +379,6 @@ Public Class BM_Form
 
     End Function
 
-    'Lesen der SYS-Datei
-    Private Sub Button_ReadSys_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_ReadSys.Click
-        If (Datensatz IsNot "") Then
-            Call ReadSys()
-        Else
-            MsgBox("Bitte zuerst einen Datensatz angeben!", MsgBoxStyle.Exclamation, "Fehler beim Lesen der SYS-Datei")
-        End If
-    End Sub
-
-    Public Sub ReadSys()
-
-        Try
-            Dim SysFile = WorkDir & Datensatz & ".SYS"
-
-            Dim FiStr As FileStream = New FileStream(SysFile, FileMode.Open, FileAccess.Read)
-            Dim StrRe As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-
-            Dim Text As String
-            Dim i As Integer = 0
-
-            'Anzahl Elemente feststellen
-            Do
-                Text = StrRe.ReadLine.ToString
-                If (Text.StartsWith("*") = False) Then
-                    i += 1
-                End If
-            Loop Until StrRe.Peek() = -1
-
-            'Array neu dimensionieren
-            ReDim Elemente(i - 1, 1)
-
-            'auf Dateianfang zurücksetzen
-            FiStr.Seek(0, SeekOrigin.Begin)
-
-            i = 0
-
-            Do
-                Text = StrRe.ReadLine.ToString
-                If (Text.StartsWith("*") = False) Then
-                    Elemente(i, 0) = Text.Substring(2, 23).Trim()
-                    Elemente(i, 1) = Text.Substring(28, 4).Trim()
-                    i += 1
-                End If
-            Loop Until StrRe.Peek() = -1
-
-            StrRe.Close()
-            FiStr.Close()
-
-        Catch except As Exception
-            MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim Lesen der SYS-Datei")
-        End Try
-
-        'Ergebnis ausgeben
-        If (Elemente.Length > 0) Then
-            Me.Label_ReadSysResult.ForeColor = Color.Green
-            Me.Label_ReadSysResult.Text = (Elemente.Length / 2).ToString & " Elemente eingelesen"
-        Else
-            Me.Label_ReadSysResult.ForeColor = Color.Red
-            Me.Label_ReadSysResult.Text = "Keine Elemente gefunden!"
-        End If
-
-    End Sub
-
     Private Sub Button_Parameter_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Parameter.Click
 
         'Elemente in ComboBox von BM_Parameter schreiben
