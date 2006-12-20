@@ -207,7 +207,7 @@ Public Class BM_Form
             Next
 
         Catch except As Exception
-            MsgBox(except.Message, "Fehler beim lesen der gemessenen Datei", MsgBoxStyle.Exclamation)
+            MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim lesen der gemessenen Datei")
         End Try
 
     End Sub
@@ -332,7 +332,7 @@ Public Class BM_Form
                     Qualitaetswert = (Messung(Messung.Length - 1) - Ergebnis(Messung.Length - 1)) * (Messung(Messung.Length - 1) - Ergebnis(Messung.Length - 1))
             End Select
         Else
-            'MsgBox(except.Message, "Die Anzahl der Zeitschritte zwischen Messung und Ergebnis stimmt nicht überein", MsgBoxStyle.Exclamation)
+            MessageBox.Show("Die Anzahl der Zeitschritte zwischen Messung und Ergebnis stimmt nicht überein", "Zeitreihenfehler", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
         End If
 
     End Function
