@@ -20,17 +20,18 @@ Partial Class BM_Form
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.GroupBox_BM = New System.Windows.Forms.GroupBox
+        Me.Button_ReadSys = New System.Windows.Forms.Button
         Me.Label_ReadSysResult = New System.Windows.Forms.Label
         Me.GroupBox_Parameter = New System.Windows.Forms.GroupBox
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel
         Me.Label_Parameter = New System.Windows.Forms.Label
         Me.Button_Parameter = New System.Windows.Forms.Button
-        Me.GroupBox_OptModus = New System.Windows.Forms.GroupBox
+        Me.GroupBox_Ziel = New System.Windows.Forms.GroupBox
         Me.Label_Pegel = New System.Windows.Forms.Label
-        Me.Radio_Optimierung = New System.Windows.Forms.RadioButton
-        Me.Radio_Autokalibrierung = New System.Windows.Forms.RadioButton
-        Me.TextBox_Pegel = New System.Windows.Forms.TextBox
-        Me.Button_Pegel = New System.Windows.Forms.Button
+        Me.Radio_Wert = New System.Windows.Forms.RadioButton
+        Me.Radio_Zeitreihe = New System.Windows.Forms.RadioButton
+        Me.TextBox_Zeitreihe = New System.Windows.Forms.TextBox
+        Me.Button_ZRE = New System.Windows.Forms.Button
         Me.Label_EXE = New System.Windows.Forms.Label
         Me.TextBox_EXE = New System.Windows.Forms.TextBox
         Me.Button_Exe = New System.Windows.Forms.Button
@@ -39,11 +40,10 @@ Partial Class BM_Form
         Me.TextBox_Datensatz = New System.Windows.Forms.TextBox
         Me.OpenFile_Datensatz = New System.Windows.Forms.OpenFileDialog
         Me.OpenFile_EXE = New System.Windows.Forms.OpenFileDialog
-        Me.OpenFile_Pegel = New System.Windows.Forms.OpenFileDialog
-        Me.Button_ReadSys = New System.Windows.Forms.Button
+        Me.OpenFile_ZRE = New System.Windows.Forms.OpenFileDialog
         Me.GroupBox_BM.SuspendLayout()
         Me.GroupBox_Parameter.SuspendLayout()
-        Me.GroupBox_OptModus.SuspendLayout()
+        Me.GroupBox_Ziel.SuspendLayout()
         Me.SuspendLayout()
         '
         'GroupBox_BM
@@ -51,7 +51,7 @@ Partial Class BM_Form
         Me.GroupBox_BM.Controls.Add(Me.Button_ReadSys)
         Me.GroupBox_BM.Controls.Add(Me.Label_ReadSysResult)
         Me.GroupBox_BM.Controls.Add(Me.GroupBox_Parameter)
-        Me.GroupBox_BM.Controls.Add(Me.GroupBox_OptModus)
+        Me.GroupBox_BM.Controls.Add(Me.GroupBox_Ziel)
         Me.GroupBox_BM.Controls.Add(Me.Label_EXE)
         Me.GroupBox_BM.Controls.Add(Me.TextBox_EXE)
         Me.GroupBox_BM.Controls.Add(Me.Button_Exe)
@@ -64,6 +64,15 @@ Partial Class BM_Form
         Me.GroupBox_BM.TabIndex = 35
         Me.GroupBox_BM.TabStop = False
         Me.GroupBox_BM.Text = "BlauesModell"
+        '
+        'Button_ReadSys
+        '
+        Me.Button_ReadSys.Location = New System.Drawing.Point(10, 72)
+        Me.Button_ReadSys.Name = "Button_ReadSys"
+        Me.Button_ReadSys.Size = New System.Drawing.Size(75, 23)
+        Me.Button_ReadSys.TabIndex = 33
+        Me.Button_ReadSys.Text = "SYS lesen"
+        Me.Button_ReadSys.UseVisualStyleBackColor = True
         '
         'Label_ReadSysResult
         '
@@ -79,12 +88,12 @@ Partial Class BM_Form
         Me.GroupBox_Parameter.Controls.Add(Me.TableLayoutPanel1)
         Me.GroupBox_Parameter.Controls.Add(Me.Label_Parameter)
         Me.GroupBox_Parameter.Controls.Add(Me.Button_Parameter)
-        Me.GroupBox_Parameter.Location = New System.Drawing.Point(7, 188)
+        Me.GroupBox_Parameter.Location = New System.Drawing.Point(9, 101)
         Me.GroupBox_Parameter.Name = "GroupBox_Parameter"
-        Me.GroupBox_Parameter.Size = New System.Drawing.Size(275, 242)
+        Me.GroupBox_Parameter.Size = New System.Drawing.Size(275, 102)
         Me.GroupBox_Parameter.TabIndex = 31
         Me.GroupBox_Parameter.TabStop = False
-        Me.GroupBox_Parameter.Text = "Parameter"
+        Me.GroupBox_Parameter.Text = "Optimierungsparameter"
         '
         'TableLayoutPanel1
         '
@@ -117,19 +126,19 @@ Partial Class BM_Form
         Me.Button_Parameter.Text = "bearbeiten"
         Me.Button_Parameter.UseVisualStyleBackColor = True
         '
-        'GroupBox_OptModus
+        'GroupBox_Ziel
         '
-        Me.GroupBox_OptModus.Controls.Add(Me.Label_Pegel)
-        Me.GroupBox_OptModus.Controls.Add(Me.Radio_Optimierung)
-        Me.GroupBox_OptModus.Controls.Add(Me.Radio_Autokalibrierung)
-        Me.GroupBox_OptModus.Controls.Add(Me.TextBox_Pegel)
-        Me.GroupBox_OptModus.Controls.Add(Me.Button_Pegel)
-        Me.GroupBox_OptModus.Location = New System.Drawing.Point(7, 101)
-        Me.GroupBox_OptModus.Name = "GroupBox_OptModus"
-        Me.GroupBox_OptModus.Size = New System.Drawing.Size(275, 80)
-        Me.GroupBox_OptModus.TabIndex = 30
-        Me.GroupBox_OptModus.TabStop = False
-        Me.GroupBox_OptModus.Text = "Optimierungsmodus"
+        Me.GroupBox_Ziel.Controls.Add(Me.Label_Pegel)
+        Me.GroupBox_Ziel.Controls.Add(Me.Radio_Wert)
+        Me.GroupBox_Ziel.Controls.Add(Me.Radio_Zeitreihe)
+        Me.GroupBox_Ziel.Controls.Add(Me.TextBox_Zeitreihe)
+        Me.GroupBox_Ziel.Controls.Add(Me.Button_ZRE)
+        Me.GroupBox_Ziel.Location = New System.Drawing.Point(6, 209)
+        Me.GroupBox_Ziel.Name = "GroupBox_Ziel"
+        Me.GroupBox_Ziel.Size = New System.Drawing.Size(275, 80)
+        Me.GroupBox_Ziel.TabIndex = 30
+        Me.GroupBox_Ziel.TabStop = False
+        Me.GroupBox_Ziel.Text = "Ziel"
         '
         'Label_Pegel
         '
@@ -141,46 +150,46 @@ Partial Class BM_Form
         Me.Label_Pegel.TabIndex = 2
         Me.Label_Pegel.Text = "Zeitreihe:"
         '
-        'Radio_Optimierung
+        'Radio_Wert
         '
-        Me.Radio_Optimierung.AutoSize = True
-        Me.Radio_Optimierung.Location = New System.Drawing.Point(149, 19)
-        Me.Radio_Optimierung.Name = "Radio_Optimierung"
-        Me.Radio_Optimierung.Size = New System.Drawing.Size(81, 17)
-        Me.Radio_Optimierung.TabIndex = 1
-        Me.Radio_Optimierung.TabStop = True
-        Me.Radio_Optimierung.Text = "Optimierung"
-        Me.Radio_Optimierung.UseVisualStyleBackColor = True
+        Me.Radio_Wert.AutoSize = True
+        Me.Radio_Wert.Location = New System.Drawing.Point(149, 19)
+        Me.Radio_Wert.Name = "Radio_Wert"
+        Me.Radio_Wert.Size = New System.Drawing.Size(48, 17)
+        Me.Radio_Wert.TabIndex = 1
+        Me.Radio_Wert.TabStop = True
+        Me.Radio_Wert.Text = "Wert"
+        Me.Radio_Wert.UseVisualStyleBackColor = True
         '
-        'Radio_Autokalibrierung
+        'Radio_Zeitreihe
         '
-        Me.Radio_Autokalibrierung.AutoSize = True
-        Me.Radio_Autokalibrierung.Location = New System.Drawing.Point(41, 19)
-        Me.Radio_Autokalibrierung.Name = "Radio_Autokalibrierung"
-        Me.Radio_Autokalibrierung.Size = New System.Drawing.Size(101, 17)
-        Me.Radio_Autokalibrierung.TabIndex = 0
-        Me.Radio_Autokalibrierung.TabStop = True
-        Me.Radio_Autokalibrierung.Text = "Autokalibrierung"
-        Me.Radio_Autokalibrierung.UseVisualStyleBackColor = True
+        Me.Radio_Zeitreihe.AutoSize = True
+        Me.Radio_Zeitreihe.Location = New System.Drawing.Point(41, 19)
+        Me.Radio_Zeitreihe.Name = "Radio_Zeitreihe"
+        Me.Radio_Zeitreihe.Size = New System.Drawing.Size(66, 17)
+        Me.Radio_Zeitreihe.TabIndex = 0
+        Me.Radio_Zeitreihe.TabStop = True
+        Me.Radio_Zeitreihe.Text = "Zeitreihe"
+        Me.Radio_Zeitreihe.UseVisualStyleBackColor = True
         '
-        'TextBox_Pegel
+        'TextBox_Zeitreihe
         '
-        Me.TextBox_Pegel.Enabled = False
-        Me.TextBox_Pegel.Location = New System.Drawing.Point(63, 47)
-        Me.TextBox_Pegel.Name = "TextBox_Pegel"
-        Me.TextBox_Pegel.Size = New System.Drawing.Size(174, 20)
-        Me.TextBox_Pegel.TabIndex = 24
-        Me.TextBox_Pegel.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.TextBox_Zeitreihe.Enabled = False
+        Me.TextBox_Zeitreihe.Location = New System.Drawing.Point(63, 47)
+        Me.TextBox_Zeitreihe.Name = "TextBox_Zeitreihe"
+        Me.TextBox_Zeitreihe.Size = New System.Drawing.Size(174, 20)
+        Me.TextBox_Zeitreihe.TabIndex = 24
+        Me.TextBox_Zeitreihe.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
-        'Button_Pegel
+        'Button_ZRE
         '
-        Me.Button_Pegel.Enabled = False
-        Me.Button_Pegel.Location = New System.Drawing.Point(243, 45)
-        Me.Button_Pegel.Name = "Button_Pegel"
-        Me.Button_Pegel.Size = New System.Drawing.Size(24, 23)
-        Me.Button_Pegel.TabIndex = 26
-        Me.Button_Pegel.Text = "..."
-        Me.Button_Pegel.UseVisualStyleBackColor = True
+        Me.Button_ZRE.Enabled = False
+        Me.Button_ZRE.Location = New System.Drawing.Point(243, 45)
+        Me.Button_ZRE.Name = "Button_ZRE"
+        Me.Button_ZRE.Size = New System.Drawing.Size(24, 23)
+        Me.Button_ZRE.TabIndex = 26
+        Me.Button_ZRE.Text = "..."
+        Me.Button_ZRE.UseVisualStyleBackColor = True
         '
         'Label_EXE
         '
@@ -245,19 +254,10 @@ Partial Class BM_Form
         Me.OpenFile_EXE.Filter = "Anwendung|*.exe"
         Me.OpenFile_EXE.Title = "BlauesModell.exe auswählen"
         '
-        'OpenFile_Pegel
+        'OpenFile_ZRE
         '
-        Me.OpenFile_Pegel.Filter = "ZRE-Dateien|*.zre"
-        Me.OpenFile_Pegel.Title = "Zeitreihe auswählen"
-        '
-        'Button_ReadSys
-        '
-        Me.Button_ReadSys.Location = New System.Drawing.Point(10, 72)
-        Me.Button_ReadSys.Name = "Button_ReadSys"
-        Me.Button_ReadSys.Size = New System.Drawing.Size(75, 23)
-        Me.Button_ReadSys.TabIndex = 33
-        Me.Button_ReadSys.Text = "SYS lesen"
-        Me.Button_ReadSys.UseVisualStyleBackColor = True
+        Me.OpenFile_ZRE.Filter = "WEL-Dateien|*.wel|ZRE-Dateien|*.zre"
+        Me.OpenFile_ZRE.Title = "Zeitreihe auswählen"
         '
         'BM_Form
         '
@@ -270,8 +270,8 @@ Partial Class BM_Form
         Me.GroupBox_BM.PerformLayout()
         Me.GroupBox_Parameter.ResumeLayout(False)
         Me.GroupBox_Parameter.PerformLayout()
-        Me.GroupBox_OptModus.ResumeLayout(False)
-        Me.GroupBox_OptModus.PerformLayout()
+        Me.GroupBox_Ziel.ResumeLayout(False)
+        Me.GroupBox_Ziel.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -284,13 +284,13 @@ Partial Class BM_Form
     Friend WithEvents TextBox_Datensatz As System.Windows.Forms.TextBox
     Friend WithEvents OpenFile_Datensatz As System.Windows.Forms.OpenFileDialog
     Friend WithEvents OpenFile_EXE As System.Windows.Forms.OpenFileDialog
-    Friend WithEvents GroupBox_OptModus As System.Windows.Forms.GroupBox
+    Friend WithEvents GroupBox_Ziel As System.Windows.Forms.GroupBox
     Friend WithEvents Label_Pegel As System.Windows.Forms.Label
-    Friend WithEvents Radio_Optimierung As System.Windows.Forms.RadioButton
-    Friend WithEvents Radio_Autokalibrierung As System.Windows.Forms.RadioButton
-    Friend WithEvents TextBox_Pegel As System.Windows.Forms.TextBox
-    Friend WithEvents Button_Pegel As System.Windows.Forms.Button
-    Friend WithEvents OpenFile_Pegel As System.Windows.Forms.OpenFileDialog
+    Friend WithEvents Radio_Wert As System.Windows.Forms.RadioButton
+    Friend WithEvents Radio_Zeitreihe As System.Windows.Forms.RadioButton
+    Friend WithEvents TextBox_Zeitreihe As System.Windows.Forms.TextBox
+    Friend WithEvents Button_ZRE As System.Windows.Forms.Button
+    Friend WithEvents OpenFile_ZRE As System.Windows.Forms.OpenFileDialog
     Friend WithEvents GroupBox_Parameter As System.Windows.Forms.GroupBox
     Friend WithEvents Label_Parameter As System.Windows.Forms.Label
     Friend WithEvents Button_Parameter As System.Windows.Forms.Button

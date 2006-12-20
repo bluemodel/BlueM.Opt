@@ -2,23 +2,8 @@
 Partial Class Form1
     Inherits System.Windows.Forms.Form
 
-#Region "Vom Windows Form-Designer generierter Code "
     Public Sub New()
         MyBase.New()
-        'TODO: dieser Abschnitt scheint überflüssig zu sein
-        'If m_vb6FormDefInstance Is Nothing Then
-        '    If m_InitializingDefInstance Then
-        '        m_vb6FormDefInstance = Me
-        '    Else
-        '        Try
-        '            'Für das Startformular ist die zuerst erstellte Instanz die Standardinstanz.
-        '            If System.Reflection.Assembly.GetExecutingAssembly.EntryPoint.DeclaringType Is Me.GetType Then
-        '                m_vb6FormDefInstance = Me
-        '            End If
-        '        Catch
-        '        End Try
-        '    End If
-        'End If
         'Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         IsInitializing = True
         InitializeComponent()
@@ -1047,27 +1032,9 @@ Partial Class Form1
         Me.PerformLayout()
 
     End Sub
-#End Region
-#Region "Aktualisierungssupport "
-    'Private Shared m_vb6FormDefInstance As Form1
-    'Private Shared m_InitializingDefInstance As Boolean
+
     Friend WithEvents GroupBox_Modus As System.Windows.Forms.GroupBox
     Friend WithEvents Radio_BM As System.Windows.Forms.RadioButton
     Friend WithEvents Radio_Testproblem As System.Windows.Forms.RadioButton
     Friend WithEvents BM_Form1 As EVO_BM.BM_Form
-    'TODO: Dieser Bereich scheint überflüssig zu sein
-    'Public Shared Property DefInstance() As Form1
-    '    Get
-    '        If m_vb6FormDefInstance Is Nothing OrElse m_vb6FormDefInstance.IsDisposed Then
-    '            m_InitializingDefInstance = True
-    '            m_vb6FormDefInstance = New Form1()
-    '            m_InitializingDefInstance = False
-    '        End If
-    '        DefInstance = m_vb6FormDefInstance
-    '    End Get
-    '    Set(ByVal value As Form1)
-    '        m_vb6FormDefInstance = value
-    '    End Set
-    'End Property
-#End Region
 End Class

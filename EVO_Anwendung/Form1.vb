@@ -675,8 +675,6 @@ ErrCode_ES_STARTEN:
             '*          Blaues Modell            *
             '*************************************
 
-            Dim Wert As Single
-
             'Mutierte Parameter deskalieren
             Call BM_Form1.Parameter_deskalieren()
 
