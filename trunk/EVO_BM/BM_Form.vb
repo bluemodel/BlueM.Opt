@@ -7,12 +7,12 @@ Public Class BM_Form
     Public WorkDir As String        'Arbeitsverzeichnis für das Blaue Modell
     Public BM_Exe As String         'Pfad zu BlauesModell.exe
     Public Elemente(,) As String    'Array mit allen im Systemplan des Datensatzes enthaltenen Elementen (Beschreibung, Kennung)
-    Public Messung() As Single      'Array mit den gemessenen Werten
+    Public Messung(,) As String     'Array mit den gemessenen Werten (Datum, Wert)
     Public Ergebnis() As Single     'Array mit den berechneten Werten
 
     'Private Properties
     '-------------------
-    Dim Zeitreihe As String         'Pfad zur ZRE-Zeitreihe (für Autokalibrierung)
+    Dim Zeitreihe As String         'Pfad zur gemessenen Zeitreihe (ZRE oder WEL-Format)
 
     'Private Methoden
     '----------------
@@ -64,7 +64,10 @@ Public Class BM_Form
                             Me.TextBox_Datensatz.Text = Configs(i, 1)
                         Case "Zeitreihe"
                             Zeitreihe = Configs(i, 1)
-                            Me.TextBox_Pegel.Text = Me.Zeitreihe
+                            Me.Radio_Zeitreihe.Checked = True
+                            Me.Label_Pegel.Enabled = True
+                            Me.TextBox_Zeitreihe.Enabled = True
+                            Me.TextBox_Zeitreihe.Text = Me.Zeitreihe
                         Case Else
                             'nix
                     End Select
@@ -115,37 +118,31 @@ Public Class BM_Form
     End Sub
 
     'Pegeldaten
-    Private Sub Button_Pegel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Pegel.Click
-        Me.OpenFile_Pegel.ShowDialog()
+    Private Sub Button_Pegel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_ZRE.Click
+        Me.OpenFile_ZRE.ShowDialog()
     End Sub
 
     'Optimierungsmodus
-    Private Sub Radio_Autokalibrierung_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Radio_Autokalibrierung.CheckedChanged
+    Private Sub Radio_Autokalibrierung_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Radio_Zeitreihe.CheckedChanged
         Me.Label_Pegel.Enabled = True
-        Me.TextBox_Pegel.Enabled = True
-        Me.Button_Pegel.Enabled = True
+        Me.TextBox_Zeitreihe.Enabled = True
+        Me.Button_ZRE.Enabled = True
     End Sub
 
-    Private Sub Radio_Optimierung_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Radio_Optimierung.CheckedChanged
+    Private Sub Radio_Optimierung_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Radio_Wert.CheckedChanged
         Me.Label_Pegel.Enabled = False
-        Me.TextBox_Pegel.Enabled = False
-        Me.Button_Pegel.Enabled = False
+        Me.TextBox_Zeitreihe.Enabled = False
+        Me.Button_ZRE.Enabled = False
     End Sub
 
-    Private Sub OpenFile_Pegel_FileOk(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles OpenFile_Pegel.FileOk
+    Private Sub OpenFile_Pegel_FileOk(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles OpenFile_ZRE.FileOk
 
         'Pfad zur Zeitreihe auslesen
-        Me.Zeitreihe = Me.OpenFile_Pegel.FileName
+        Me.Zeitreihe = Me.OpenFile_ZRE.FileName
 
         'Pfad in Textbox schreiben
-        Me.TextBox_Pegel.Clear()
-        Me.TextBox_Pegel.AppendText(Me.Zeitreihe)
-
-        'Zeitreihe einlesen
-        Call ReadZRE()
-    End Sub
-
-    Private Sub ReadZRE()
+        Me.TextBox_Zeitreihe.Clear()
+        Me.TextBox_Zeitreihe.AppendText(Me.Zeitreihe)
 
     End Sub
 
@@ -177,38 +174,82 @@ Public Class BM_Form
         'ToDo: Hier muss die Vergleichzeitreihe für die Messung eingelesen werden
         Dim AnzZeil As Integer = 0
         Dim j As Integer = 0
-        Dim Datei() As String
-        Dim Text As String
+        Dim Datei() As String           'Array mit allen Zeilen der Datei
+        Dim Zeile As String
 
-        Try
-            Dim FiStr As FileStream = New FileStream("D:\-03- AtWork #\Die Zieldatei\Messung.wel", FileMode.Open, IO.FileAccess.ReadWrite)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Dim FileExt As String = Zeitreihe.Substring(Zeitreihe.LastIndexOf(".") + 1)
 
-            'Anzahl der Zeilen feststellen
-            Do
-                Text = StrRead.ReadLine.ToString
-                AnzZeil += 1
-            Loop Until StrRead.Peek() = -1
+        Select Case FileExt
+            Case "zre"
+                'Lesen einer ZRE-Datei
+                Try
+                    Dim FiStr As FileStream = New FileStream(Zeitreihe, FileMode.Open, IO.FileAccess.ReadWrite)
+                    Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-            'Auf Anfang setzen und lesen
-            FiStr.Seek(0, SeekOrigin.Begin)
-            ReDim Datei(AnzZeil)
-            For j = 1 To AnzZeil
-                Datei(j) = StrRead.ReadLine.ToString
-            Next
+                    'Anzahl der Zeilen feststellen
+                    Do
+                        Zeile = StrRead.ReadLine.ToString()
+                        AnzZeil += 1
+                    Loop Until StrRead.Peek() = -1
 
-            StrRead.Close()
-            FiStr.Close()
+                    ReDim Messung(AnzZeil - 5, 1) 'Die ersten 4 Zeilen der ZRE-Datei gehören zum Header
 
-            'Werte an Messung übergeben
-            ReDim Messung(AnzZeil - 3)
-            For j = 1 To AnzZeil - 3
-                Messung(j) = Mid(Datei(j + 3), 333, 5)
-            Next
+                    'Zurück zum Dateianfang und lesen
+                    FiStr.Seek(0, SeekOrigin.Begin)
 
-        Catch except As Exception
-            MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim lesen der gemessenen Datei")
-        End Try
+                    For j = 0 To AnzZeil - 1
+                        Zeile = StrRead.ReadLine.ToString()
+                        If (j >= 4) Then
+                            Messung(j - 4, 0) = Zeile.Substring(0, 14)          'Datum
+                            Messung(j - 4, 1) = Zeile.Substring(15, 14).Trim()  'Wert
+                        End If
+                    Next
+
+                    StrRead.Close()
+                    FiStr.Close()
+
+                Catch except As Exception
+                    MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim lesen der ZRE-Datei")
+                End Try
+
+            Case "wel"
+                'Lesen einer WEL-Datei
+                'TODO: WEL-Datei lesen: zu lesende Spalte über UI (und/oder EVO.ini) definieren 
+                Try
+                    Dim FiStr As FileStream = New FileStream(Zeitreihe, FileMode.Open, IO.FileAccess.ReadWrite)
+                    Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+                    'Anzahl der Zeilen feststellen
+                    Do
+                        Zeile = StrRead.ReadLine.ToString
+                        AnzZeil += 1
+                    Loop Until StrRead.Peek() = -1
+
+                    'Auf Anfang setzen und lesen
+                    FiStr.Seek(0, SeekOrigin.Begin)
+                    ReDim Datei(AnzZeil)
+                    For j = 1 To AnzZeil
+                        Datei(j) = StrRead.ReadLine.ToString
+                    Next
+
+                    StrRead.Close()
+                    FiStr.Close()
+
+                    'Werte an Messung übergeben
+                    ReDim Messung(AnzZeil - 3, 1)
+                    For j = 1 To AnzZeil - 3
+                        'TODO: Datum in Messung(j, 0) speichern
+                        Messung(j, 1) = Mid(Datei(j + 3), 333, 5)
+                    Next
+
+                Catch except As Exception
+                    MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim lesen der WEL-Datei")
+                End Try
+
+            Case Else
+                'Zeitreihe ist weder WEL noch ZRE Datei
+                MsgBox("Die Zeitreihe hat ein ungültiges Format", MsgBoxStyle.Exclamation, "Fehler beim Lesen der Zeitreihe")
+        End Select
 
     End Sub
 
@@ -318,6 +359,7 @@ Public Class BM_Form
     End Sub
 
     'Der Qualitätswert wird durch Vergleich von Calculation Berechnet.
+    'TODO: Array Messung ist vom Typ String - für Berechnung Konvertierung zu Double erforderlich!
     Public Function Qualitaetswert() As Double
         Dim CalcTyp As String = "Fehlerquadrate"
         Dim i As Integer
@@ -326,10 +368,10 @@ Public Class BM_Form
             Select Case CalcTyp
                 Case "Fehlerquadrate"
                     For i = 1 To Messung.Length - 1
-                        Qualitaetswert = (Messung(i) - Ergebnis(i)) * (Messung(i) - Ergebnis(i))
+                        Qualitaetswert = (Messung(i, 1) - Ergebnis(i)) * (Messung(i, 1) - Ergebnis(i))
                     Next
                 Case "Letzter_Wert"
-                    Qualitaetswert = (Messung(Messung.Length - 1) - Ergebnis(Messung.Length - 1)) * (Messung(Messung.Length - 1) - Ergebnis(Messung.Length - 1))
+                    Qualitaetswert = (Messung(Messung.Length - 1, 1) - Ergebnis(Messung.Length - 1)) * (Messung(Messung.Length - 1, 1) - Ergebnis(Messung.Length - 1))
             End Select
         Else
             MessageBox.Show("Die Anzahl der Zeitschritte zwischen Messung und Ergebnis stimmt nicht überein", "Zeitreihenfehler", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
