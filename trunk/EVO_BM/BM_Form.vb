@@ -6,8 +6,8 @@ Public Class BM_Form
     Public Datensatz As String          'Name des zu simulierenden Datensatzes
     Public WorkDir As String            'Arbeitsverzeichnis für das Blaue Modell
     Public BM_Exe As String             'Pfad zu BlauesModell.exe
-    Public Messung(,) As String         'Array mit den gemessenen Werten (Datum, Wert)
     Public Ergebnis() As Single         'Array mit den berechneten Werten
+
     'Optimierungsparameter
     Public OptParameter(,) As Object            'Array mit den Optimierungsparametern
     Public Const OPTPARA_BEZ As Integer = 0         'Bezeichnung
@@ -21,6 +21,10 @@ Public Class BM_Form
     Public Const OPTPARA_MAX As Integer = 8         'Maximum
     Public Const OPTPARA_SKWERT As Integer = 9      'Skalierter Wert
     Public Const OPTPARA_LEN As Integer = 10    'Anzahl der für jeden Parameter gespeicherten Variablen
+
+    'Zielfunktionsparameter
+    Public OptZielWert(,) As Object
+    Public OptZielReihe(,,) As Object
 
     'Private Properties
     '-------------------
@@ -232,6 +236,51 @@ Public Class BM_Form
         Next
     End Sub
 
+    'Optimierungsziele einlesen (*.zie-Datei)
+    Public Sub OptZielWerte_einlesen()
+
+        Try
+            Dim FiStr As FileStream = New FileStream(OptZiel_Pfad, FileMode.Open, IO.FileAccess.ReadWrite)
+            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+            Dim Zeile As String = ""
+            Dim AnzZiele As Integer = 0
+
+            'Anzahl der Zielfunktionen feststellen
+            Do
+                Zeile = StrRead.ReadLine.ToString()
+                If (Zeile.StartsWith("*") = False) Then
+                    AnzZiele += 1
+                End If
+            Loop Until StrRead.Peek() = -1
+
+            ReDim OptZielWert(AnzZiele - 1, 4)
+
+            'Zurück zum Dateianfang und lesen
+            FiStr.Seek(0, SeekOrigin.Begin)
+
+            'Einlesen der Zeile und übergeben an das OptZiel Array
+            Dim ZeilenArray(4) As String
+            Dim i As Integer = 0
+            Dim j As Integer = 0
+
+            Do
+                Zeile = StrRead.ReadLine.ToString()
+                If (Zeile.StartsWith("*") = False) Then
+                    ZeilenArray = Zeile.Split("|")
+                    For j = 0 To 4
+                        OptZielWert(i, j) = ZeilenArray(j).Trim
+                    Next
+                    i += 1
+                End If
+            Loop Until StrRead.Peek() = -1
+
+        Catch except As Exception
+            MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim lesen der OptZiel-Datei")
+        End Try
+    End Sub
+
+
     'Die vom Optimierungsalgorithmus mutierten Parameter werden geschrieben
     Public Sub Mutierte_Parameter_schreiben()
         Dim Parameter As String
@@ -348,31 +397,57 @@ Public Class BM_Form
 
     'Der Qualitätswert wird durch Vergleich von Calculation Berechnet.
     'TODO: Array Messung ist vom Typ String - für Berechnung Konvertierung zu Double erforderlich!
-    Public Function Qualitaetswert() As Double
+    Public Function QualitaetswertWerte(ByVal ZielNr As Integer) As Double
         Dim CalcTyp As String = "Fehlerquadrate"
         Dim i As Integer
+        Dim SimReihe(,) As Object = {}
+        Dim SimWert As Single
+        Dim IsOK As Boolean
 
-        If Messung.GetUpperBound(0) = Ergebnis.GetUpperBound(0) Then
-            Select Case CalcTyp
-                Case "Fehlerquadrate"
-                    For i = 1 To Messung.Length - 1
-                        Qualitaetswert = (Messung(i, 1) - Ergebnis(i)) * (Messung(i, 1) - Ergebnis(i))
-                    Next
-                Case "Letzter_Wert"
-                    Qualitaetswert = (Messung(Messung.Length - 1, 1) - Ergebnis(Messung.Length - 1)) * (Messung(Messung.Length - 1, 1) - Ergebnis(Messung.Length - 1))
+        IsOK = ReadWEL(WorkDir & Datensatz & ".wel", OptZielWert(ZielNr, 0), SimReihe)
 
-                Case "Maximaler_Wert"
+        Select Case OptZielWert(ZielNr, 1)
+            Case "MaxWert"
+                SimWert = 0
+                For i = 0 To SimReihe.GetUpperBound(0)
+                    If SimReihe(i, 1) > SimWert Then
+                        SimWert = SimReihe(i, 1)
+                    End If
+                Next
+            Case "MinWert"
+                SimWert = 999999999999999999
+                For i = 0 To SimReihe.GetUpperBound(0)
+                    If SimReihe(i, 1) < SimWert Then
+                        SimWert = SimReihe(i, 1)
+                    End If
+                Next
+            Case "Average"
+                SimWert = 0
+                For i = 0 To SimReihe.GetUpperBound(0)
+                    SimWert += SimReihe(i, 1)
+                Next
+                SimWert = SimWert / SimReihe.GetLength(0)
+            Case "AnfWert"
+                SimWert = SimReihe(0, 1)
+            Case "EndWert"
+                SimWert = SimReihe(SimReihe.GetUpperBound(0), 1)
+        End Select
 
-                Case "Quadratischer_Maximaler_Wert"
+        Select Case OptZielWert(ZielNr, 2)
+            Case "AbQuad"
+                QualitaetswertWerte = (OptZielWert(ZielNr, 4) - SimWert) * (OptZielWert(ZielNr, 4) - SimWert)
+            Case "Diff"
+                QualitaetswertWerte = Math.Abs(OptZielWert(ZielNr, 4) - SimWert)
+            Case "Volf"
 
-                Case ""
-
-            End Select
-        Else
-            MessageBox.Show("Die Anzahl der Zeitschritte zwischen Messung und Ergebnis stimmt nicht überein", "Zeitreihenfehler", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
-        End If
+        End Select
 
     End Function
+
+    Public Function QualitaetswertReihe(ByVal ZielNummer As Integer) As Double
+
+    End Function
+
 
     Public Function ReadZRE(ByVal DateiPfad As String, ByRef ZRE(,) As Object) As Boolean
 
@@ -459,7 +534,9 @@ Public Class BM_Form
             End If
 
             'Auf Anfang setzen und lesen
+            StrRead.ReadToEnd()
             FiStr.Seek(0, SeekOrigin.Begin)
+
             For j = 0 To AnzZeil - 1
                 Werte = StrRead.ReadLine.ToString.Split(";")
                 If (j >= WELHeaderLen) Then

@@ -273,7 +273,7 @@ Friend Class Form1
             'ACHTUNG: OptParameter fängt bei 0 an!
             Call BM_Form1.ReadOptParameter()
 
-            globalAnzPar = BM_Form1.OptParameter.GetUpperBound(0) + 1           '+1 weil OptParameter bei 0 anfängt
+            globalAnzPar = BM_Form1.OptParameter.GetLength(0)
             ReDim mypara(globalAnzPar, 1)
 
             'Parameterwerte skalieren
@@ -284,8 +284,13 @@ Friend Class Form1
                 mypara(i, 1) = BM_Form1.OptParameter(i - 1, EVO_BM.BM_Form.OPTPARA_SKWERT)
             Next
 
-            'TODO: Zielfunktionen
-            globalAnzZiel = 1
+            '----------------------------------------------
+
+            'Zielfunktionen werden eingelesen und die Anzahl wird übergeben
+            'CHECK: Dadurch wird definiert Ob SO oder Pareto laufen soll, das überschreibt die Evo_Einstellungen
+            Call BM_Form1.OptZielWerte_einlesen()
+            'Call BM_Form1.OptZielReiehen_einlesen()
+            globalAnzZiel = BM_Form1.OptZielWert.GetLength(0) '+ BM_Form1.OptZielReihe.GetLength(0)
 
             'TODO: Randbedingungen
             globalAnzRand = 2
@@ -533,7 +538,7 @@ ErrCode_ES_STARTEN:
         Dim Unterteilung_X As Double
         Dim x1, x2 As Double
         Dim X() As Double
-        Dim f2, f1, f3 As Double
+        Dim f2, f1, f3, f4 As Double
         Dim g1, g2 As Double
 
         If (Me.Radio_Testproblem.Checked = True) Then
@@ -694,10 +699,16 @@ ErrCode_ES_STARTEN:
             Call BM_Form1.Ergebnis_lesen()
 
             'Qualitätswert berechnen
-            f1 = BM_Form1.Qualitaetswert
+
+            f1 = BM_Form1.QualitaetswertWerte(0)
+            'f2 = BM_Form1.QualitaetswertWerte(1)
+            'f3 = BM_Form1.QualitaetswertWerte(2)
+            'f4 = BM_Form1.QualitaetswertWerte(3)
 
             'Rückgabe des Qualitätswertes an den OptiAlgo
             QN(1) = f1
+            'QN(2) = f2
+            'QN(3) = f3
 
             'Qualitätswert im TeeChart zeichnen
             If Not isPareto Then
@@ -1044,7 +1055,7 @@ ErrCode_ES_STARTEN:
     End Sub
 
     Private Sub Ausgangswert_CONSTR()
-        'ToDo: Constr funzt nur wenn es eine eigene Ausgangswertfunktion hat. Soll eigentlich mit oben in Ausgangswert_MultiObPareto()
+        'TODO: Constr funzt nur wenn es eine eigene Ausgangswertfunktion hat. Soll eigentlich mit oben in Ausgangswert_MultiObPareto()
         Dim Populationen As Short
         Dim j As Short
         Dim Array1X(100) As Double
@@ -1145,7 +1156,7 @@ ErrCode_ES_STARTEN:
     End Sub
 
     Private Sub Ausgangswert_Box()
-        'ToDo: Zeichnen muss auf 3D erweitert werden. Hier 3D Testproblem.
+        'TODO: Zeichnen muss auf 3D erweitert werden. Hier 3D Testproblem.
         Dim Populationen As Short
         Dim ArrayX(100) As Double
         Dim ArrayY(100) As Double
@@ -1259,7 +1270,7 @@ ErrCode_ES_STARTEN:
             .Chart.Axes.Bottom.Maximum = Anzahl_Kalkulationen
             .Chart.Axes.Bottom.Minimum = 0
             .Chart.Axes.Left.Automatic = False
-            .Chart.Axes.Left.Maximum = 1
+            .Chart.Axes.Left.Maximum = 100
             .Chart.Axes.Left.Minimum = 0
             .Chart.Axes.Left.Logarithmic = False
         End With
@@ -1288,7 +1299,7 @@ ErrCode_ES_STARTEN:
         TChart1.Series(ipop).Add(durchlauf, Wert, "")
 
     End Sub
-    'ToDo: ipop muss hier nicht übergeben werden das es bei Parato nur eine Population gibt
+    'TODO: ipop muss hier nicht übergeben werden das es bei Parato nur eine Population gibt
     Private Sub Zielfunktion_zeichnen_MultiObPar_2D(ByRef f1 As Double, ByRef f2 As Double, ByRef ipop As Short)
 
         TChart1.Series(0).Add(f1, f2, "")
@@ -1304,7 +1315,7 @@ ErrCode_ES_STARTEN:
 
     Private Sub Zielfunktion_zeichnen_MultiObPar_XD()
 
-        'ToDo Projektion der XD Information auf 2D
+        'TODO Projektion der XD Information auf 2D
 
     End Sub
 
