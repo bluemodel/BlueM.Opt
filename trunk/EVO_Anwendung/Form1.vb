@@ -281,7 +281,7 @@ Friend Class Form1
 
             'Parameterwerte übergeben
             For i = 1 To globalAnzPar
-                mypara(i, 1) = Convert.ToDouble(BM_Form1.OptParameter(i - 1, EVO_BM.BM_Form.OPT_SKWERT))
+                mypara(i, 1) = BM_Form1.OptParameter(i - 1, EVO_BM.BM_Form.OPTPARA_SKWERT)
             Next
 
             'TODO: Zielfunktionen
@@ -678,7 +678,7 @@ ErrCode_ES_STARTEN:
 
             'Mutierte Parameter an OptParameter übergeben
             For i = 1 To AnzPar
-                BM_Form1.OptParameter(i - 1, EVO_BM.BM_Form.OPT_SKWERT) = Par(i, 1)     'OptParameter(i-1,*) weil Array bei 0 anfängt!
+                BM_Form1.OptParameter(i - 1, EVO_BM.BM_Form.OPTPARA_SKWERT) = Par(i, 1)     'OptParameter(i-1,*) weil Array bei 0 anfängt!
             Next
 
             'Mutierte Parameter deskalieren
