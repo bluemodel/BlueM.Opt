@@ -273,18 +273,15 @@ Friend Class Form1
             'ACHTUNG: OptParameter fängt bei 0 an!
             Call BM_Form1.ReadOptParameter()
 
-            globalAnzPar = BM_Form1.OptParameter.GetUpperBound(0) + 1
+            globalAnzPar = BM_Form1.OptParameter.GetUpperBound(0) + 1           '+1 weil OptParameter bei 0 anfängt
             ReDim mypara(globalAnzPar, 1)
 
-            'Parameterwerte normieren und übergeben
-            Dim Min As Double
-            Dim Max As Double
-            Dim Param As Double
-            For i = 0 To globalAnzPar - 1
-                Param = Convert.ToDouble(BM_Form1.OptParameter(i, 6))
-                Min = Convert.ToDouble(BM_Form1.OptParameter(i, 7))
-                Max = Convert.ToDouble(BM_Form1.OptParameter(i, 8))
-                mypara(i + 1, 1) = (Param - Min) / (Max - Min)
+            'Parameterwerte skalieren
+            Call BM_Form1.OptParameter_skalieren()
+
+            'Parameterwerte übergeben
+            For i = 1 To globalAnzPar
+                mypara(i, 1) = Convert.ToDouble(BM_Form1.OptParameter(i - 1, EVO_BM.BM_Form.OPT_SKWERT))
             Next
 
             'TODO: Zielfunktionen
@@ -336,7 +333,7 @@ Friend Class Form1
         '2. Schritt: CEvolutionsstrategie - ES_INI
         '***************************************************************************************************
         'Die öffentlichen dynamischen Arrays werden initialisiert (Dn, An, Xn, Xmin, Xmax)
-        'und die Anzahl der Zuielfunktionen wird festgelegt
+        'und die Anzahl der Zielfunktionen wird festgelegt
         '***************************************************************************************************
         '***************************************************************************************************
         isOK = evolutionsstrategie.EsIni(globalAnzPar, globalAnzZiel, globalAnzRand)
@@ -350,14 +347,13 @@ Friend Class Form1
         isOK = evolutionsstrategie.EsOptions(iEvoTyp, iPopEvoTyp, isPOPUL, NRunden, NPopul, NPopEltern, iOptPopEltern, iOptEltern, iPopPenalty, NGen, NEltern, NNachf, NRekombXY, rDeltaStart, iStartPar, isdnvektor, isMultiObjective, isPareto, isPareto3D, Interact, isInteract, NMemberSecondPop)
 
         '***************************************************************************************************
-        '4. Schritt: CEvolutionsstrategie - ES_ES_LET_PARAMETER
+        '4. Schritt: CEvolutionsstrategie - ES_LET_PARAMETER
         '***************************************************************************************************
         'Ausgangsparameter werden übergeben
         '***************************************************************************************************
         '***************************************************************************************************
         For i = 1 To globalAnzPar
             myIsOK = evolutionsstrategie.EsLetParameter(i, mypara(i, 1))
-
         Next i
 
         '***************************************************************************************************
@@ -366,7 +362,7 @@ Friend Class Form1
         'Interne Variablen werden initialisiert, Zufallsgenerator wird initialisiert
         '***************************************************************************************************
         '***************************************************************************************************
-        myIsOK = evolutionsstrategie.EsPrepare
+        myIsOK = evolutionsstrategie.EsPrepare()
 
         '***************************************************************************************************
         '6. Schritt: CEvolutionsstrategie - ES_STARTVALUES
@@ -374,7 +370,7 @@ Friend Class Form1
         'Startwerte werden zugewiesen
         '***************************************************************************************************
         '***************************************************************************************************
-        myIsOK = evolutionsstrategie.EsStartvalues
+        myIsOK = evolutionsstrategie.EsStartvalues()
 
         '***************************************************************************************************
         '***************************************************************************************************
@@ -680,13 +676,16 @@ ErrCode_ES_STARTEN:
             '*          Blaues Modell            *
             '*************************************
 
-
+            'Mutierte Parameter an OptParameter übergeben
+            For i = 1 To AnzPar
+                BM_Form1.OptParameter(i - 1, EVO_BM.BM_Form.OPT_SKWERT) = Par(i, 1)     'OptParameter(i-1,*) weil Array bei 0 anfängt!
+            Next
 
             'Mutierte Parameter deskalieren
-            Call BM_Form1.Parameter_deskalieren()
+            Call BM_Form1.OptParameter_deskalieren()
 
             'Mutierte Parameter schreiben
-            Call BM_Form1.Mutierte_Parameter_schreiben(Par)
+            Call BM_Form1.Mutierte_Parameter_schreiben()
 
             'Modell Starten
             Call BM_Form1.launchBM()
@@ -1255,6 +1254,7 @@ ErrCode_ES_STARTEN:
             Next i
 
             'Formatierung der Axen
+            'TODO: Axenbeschriftung = Zielfunktionen
             .Chart.Axes.Bottom.Automatic = False
             .Chart.Axes.Bottom.Maximum = Anzahl_Kalkulationen
             .Chart.Axes.Bottom.Minimum = 0
