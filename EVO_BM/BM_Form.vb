@@ -9,18 +9,18 @@ Public Class BM_Form
     Public Messung(,) As String         'Array mit den gemessenen Werten (Datum, Wert)
     Public Ergebnis() As Single         'Array mit den berechneten Werten
     'Optimierungsparameter
-    Public OptParameter(,) As String    'Array mit den Optimierungsparametern
-    Public Const OPT_BEZ As Integer = 0         'Bezeichnung
-    Public Const OPT_EINH As Integer = 1        'Einheit
-    Public Const OPT_DATEI As Integer = 2       'Datei
-    Public Const OPT_ZEILE As Integer = 3       'Zeile
-    Public Const OPT_SP1 As Integer = 4         'Anfangsspalte
-    Public Const OPT_SP2 As Integer = 5         'Endspalte
-    Public Const OPT_AWERT As Integer = 6       'Anfangswert
-    Public Const OPT_MIN As Integer = 7         'Minimum
-    Public Const OPT_MAX As Integer = 8         'Maximum
-    Public Const OPT_SKWERT As Integer = 9      'Skalierter Wert
-    Public Const OPT_LEN As Integer = 10    'Anzahl der für jeden Parameter gespeicherten Variablen
+    Public OptParameter(,) As Object            'Array mit den Optimierungsparametern
+    Public Const OPTPARA_BEZ As Integer = 0         'Bezeichnung
+    Public Const OPTPARA_EINH As Integer = 1        'Einheit
+    Public Const OPTPARA_DATEI As Integer = 2       'Datei
+    Public Const OPTPARA_ZEILE As Integer = 3       'Zeile
+    Public Const OPTPARA_SP1 As Integer = 4         'Anfangsspalte
+    Public Const OPTPARA_SP2 As Integer = 5         'Endspalte
+    Public Const OPTPARA_AWERT As Integer = 6       'Anfangswert
+    Public Const OPTPARA_MIN As Integer = 7         'Minimum
+    Public Const OPTPARA_MAX As Integer = 8         'Maximum
+    Public Const OPTPARA_SKWERT As Integer = 9      'Skalierter Wert
+    Public Const OPTPARA_LEN As Integer = 10    'Anzahl der für jeden Parameter gespeicherten Variablen
 
     'Private Properties
     '-------------------
@@ -174,21 +174,28 @@ Public Class BM_Form
                 End If
             Loop Until StrRead.Peek() = -1
 
-            ReDim OptParameter(AnzParam - 1, OPT_LEN - 1)
+            ReDim OptParameter(AnzParam - 1, OPTPARA_LEN - 1)
 
             'Zurück zum Dateianfang und lesen
             FiStr.Seek(0, SeekOrigin.Begin)
 
-            Dim Parameter(OPT_LEN) As String
+            Dim Parameter(OPTPARA_LEN) As String
             Dim i As Integer = 0
             Dim j As Integer
             Do
                 Zeile = StrRead.ReadLine.ToString()
                 If (Zeile.StartsWith("*") = False) Then
                     Parameter = Zeile.Split("|")
-                    For j = 0 To OPT_LEN - 1
+                    For j = 0 To OPTPARA_LEN - 1
                         OptParameter(i, j) = Parameter(j + 1).Trim()
                     Next
+                    'Typen verändern
+                    OptParameter(i, OPTPARA_ZEILE) = Convert.ToInt16(OptParameter(i, OPTPARA_ZEILE))
+                    OptParameter(i, OPTPARA_SP1) = Convert.ToInt16(OptParameter(i, OPTPARA_SP1))
+                    OptParameter(i, OPTPARA_SP2) = Convert.ToInt16(OptParameter(i, OPTPARA_SP2))
+                    OptParameter(i, OPTPARA_AWERT) = Convert.ToDouble(OptParameter(i, OPTPARA_AWERT))
+                    OptParameter(i, OPTPARA_MIN) = Convert.ToDouble(OptParameter(i, OPTPARA_MIN))
+                    OptParameter(i, OPTPARA_MAX) = Convert.ToDouble(OptParameter(i, OPTPARA_MAX))
                     i += 1
                 End If
             Loop Until StrRead.Peek() = -1
@@ -205,10 +212,10 @@ Public Class BM_Form
         Dim Param As Double
         'Schleife über alle Parameter
         For i As Integer = 0 To OptParameter.GetUpperBound(0)
-            Param = Convert.ToDouble(OptParameter(i, OPT_AWERT))
-            Min = Convert.ToDouble(OptParameter(i, OPT_MIN))
-            Max = Convert.ToDouble(OptParameter(i, OPT_MAX))
-            OptParameter(i, OPT_SKWERT) = Convert.ToString((Param - Min) / (Max - Min))
+            Param = OptParameter(i, OPTPARA_AWERT)
+            Min = OptParameter(i, OPTPARA_MIN)
+            Max = OptParameter(i, OPTPARA_MAX)
+            OptParameter(i, OPTPARA_SKWERT) = (Param - Min) / (Max - Min)
         Next
     End Sub
 
@@ -218,12 +225,10 @@ Public Class BM_Form
         Dim Max As Double
         Dim Param As Double
         For i As Integer = 0 To OptParameter.GetUpperBound(0)
-            Param = Convert.ToDouble(OptParameter(i, OPT_SKWERT))
-            Min = Convert.ToDouble(OptParameter(i, OPT_MIN))
-            Max = Convert.ToDouble(OptParameter(i, OPT_MAX))
-            'TODO: Länge des zu schreibenden Strings (Anzahl Nachkommastellen) an Platzverhältnisse anpassen
-            'Problem: je nach Parameter ist unterschiedlich viel Platz in der Eingabedatei da und ist eine andere Genauigkeit gefordert!
-            OptParameter(i, OPT_AWERT) = (Param * (Max - Min) + Min).ToString("F3")
+            Param = OptParameter(i, OPTPARA_SKWERT)
+            Min = OptParameter(i, OPTPARA_MIN)
+            Max = OptParameter(i, OPTPARA_MAX)
+            OptParameter(i, OPTPARA_AWERT) = Param * (Max - Min) + Min
         Next
     End Sub
 
@@ -324,7 +329,7 @@ Public Class BM_Form
         For i As Integer = 0 To OptParameter.GetUpperBound(0)
             Try
                 'Datei öffnen
-                Dim FiStr As FileStream = New FileStream(WorkDir + Datensatz + "." + OptParameter(i, OPT_DATEI), FileMode.Open, IO.FileAccess.ReadWrite)
+                Dim FiStr As FileStream = New FileStream(WorkDir + Datensatz + "." + OptParameter(i, OPTPARA_DATEI), FileMode.Open, IO.FileAccess.ReadWrite)
                 Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
                 'Anzahl der Zeilen feststellen
@@ -345,14 +350,15 @@ Public Class BM_Form
                 FiStr.Close()
 
                 'Zeile ändern
-                Zeile = Datei(OptParameter(i, OPT_ZEILE) - 1)
-                StrLeft = Microsoft.VisualBasic.Left(Zeile, OptParameter(i, OPT_SP1) - 1)
-                StrRight = Microsoft.VisualBasic.Right(Zeile, Len(Zeile) - OptParameter(i, OPT_SP2) + 1)
-                Parameter = OptParameter(i, OPT_AWERT).PadLeft(OptParameter(i, OPT_SP2) - OptParameter(i, OPT_SP1))
-                Datei(OptParameter(i, OPT_ZEILE)) = StrLeft + Parameter + StrRight
+                Zeile = Datei(OptParameter(i, OPTPARA_ZEILE) - 1)
+                Dim Length As Short = OptParameter(i, OPTPARA_SP2) - OptParameter(i, OPTPARA_SP1)
+                StrLeft = Microsoft.VisualBasic.Left(Zeile, OptParameter(i, OPTPARA_SP1) - 1)
+                StrRight = Microsoft.VisualBasic.Right(Zeile, Len(Zeile) - OptParameter(i, OPTPARA_SP2) + 1)
+                Parameter = OptParameter(i, OPTPARA_AWERT).ToString.Substring(0, Length)
+                Datei(OptParameter(i, OPTPARA_ZEILE)) = StrLeft + Parameter + StrRight
 
                 'Alle Zeilen wieder in Datei schreiben
-                Dim StrWrite As StreamWriter = New StreamWriter(WorkDir + Datensatz + "." + OptParameter(i, OPT_DATEI), False, System.Text.Encoding.GetEncoding("iso8859-1"))
+                Dim StrWrite As StreamWriter = New StreamWriter(WorkDir + Datensatz + "." + OptParameter(i, OPTPARA_DATEI), False, System.Text.Encoding.GetEncoding("iso8859-1"))
                 For j = 0 To AnzZeil - 1
                     StrWrite.WriteLine(Datei(j))
                 Next
