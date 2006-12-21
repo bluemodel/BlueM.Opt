@@ -720,7 +720,7 @@ ES_GET_SCHRITTWEITE_ERROR:
     'Function ES_PREPARE initialisiert alle internen Arrays und setzt den
     'Bestwertspeicher auf sehr großen Wert (Strategie minimiert in dieser
     'Umsetzung)
-    '$ Für Paretooptimierung noch nicht fertig!!!!
+    'TODO: ESPrepare Für Paretooptimierung noch nicht fertig!!!!
 
     Public Function EsPrepare() As Boolean
         Dim m, n, l As Short

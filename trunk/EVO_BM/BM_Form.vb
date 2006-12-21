@@ -8,7 +8,19 @@ Public Class BM_Form
     Public BM_Exe As String             'Pfad zu BlauesModell.exe
     Public Messung(,) As String         'Array mit den gemessenen Werten (Datum, Wert)
     Public Ergebnis() As Single         'Array mit den berechneten Werten
+    'Optimierungsparameter
     Public OptParameter(,) As String    'Array mit den Optimierungsparametern
+    Public Const OPT_BEZ As Integer = 0         'Bezeichnung
+    Public Const OPT_EINH As Integer = 1        'Einheit
+    Public Const OPT_DATEI As Integer = 2       'Datei
+    Public Const OPT_ZEILE As Integer = 3       'Zeile
+    Public Const OPT_SP1 As Integer = 4         'Anfangsspalte
+    Public Const OPT_SP2 As Integer = 5         'Endspalte
+    Public Const OPT_AWERT As Integer = 6       'Anfangswert
+    Public Const OPT_MIN As Integer = 7         'Minimum
+    Public Const OPT_MAX As Integer = 8         'Maximum
+    Public Const OPT_SKWERT As Integer = 9      'Skalierter Wert
+    Public Const OPT_LEN As Integer = 10    'Anzahl der für jeden Parameter gespeicherten Variablen
 
     'Private Properties
     '-------------------
@@ -162,20 +174,20 @@ Public Class BM_Form
                 End If
             Loop Until StrRead.Peek() = -1
 
-            ReDim OptParameter(AnzParam - 1, 8)
+            ReDim OptParameter(AnzParam - 1, OPT_LEN - 1)
 
             'Zurück zum Dateianfang und lesen
             FiStr.Seek(0, SeekOrigin.Begin)
 
-            Dim Parameter(8) As String
+            Dim Parameter(OPT_LEN) As String
             Dim i As Integer = 0
             Dim j As Integer
             Do
                 Zeile = StrRead.ReadLine.ToString()
                 If (Zeile.StartsWith("*") = False) Then
                     Parameter = Zeile.Split("|")
-                    For j = 0 To 8
-                        OptParameter(i, j) = Parameter(j + 1)
+                    For j = 0 To OPT_LEN - 1
+                        OptParameter(i, j) = Parameter(j + 1).Trim()
                     Next
                     i += 1
                 End If
@@ -186,9 +198,33 @@ Public Class BM_Form
         End Try
     End Sub
 
-    Public Sub Parameter_deskalieren()
-        'ToDo: Hier müssen die Parameter vor jeder Simulation deskaliert werden
+    'skaliert AWERT und schreibt ihn in SKWERT
+    Public Sub OptParameter_skalieren()
+        Dim Min As Double
+        Dim Max As Double
+        Dim Param As Double
+        'Schleife über alle Parameter
+        For i As Integer = 0 To OptParameter.GetUpperBound(0)
+            Param = Convert.ToDouble(OptParameter(i, OPT_AWERT))
+            Min = Convert.ToDouble(OptParameter(i, OPT_MIN))
+            Max = Convert.ToDouble(OptParameter(i, OPT_MAX))
+            OptParameter(i, OPT_SKWERT) = Convert.ToString((Param - Min) / (Max - Min))
+        Next
+    End Sub
 
+    'deskaliert SKWERT und schreibt ihn in AWERT
+    Public Sub OptParameter_deskalieren()
+        Dim Min As Double
+        Dim Max As Double
+        Dim Param As Double
+        For i As Integer = 0 To OptParameter.GetUpperBound(0)
+            Param = Convert.ToDouble(OptParameter(i, OPT_SKWERT))
+            Min = Convert.ToDouble(OptParameter(i, OPT_MIN))
+            Max = Convert.ToDouble(OptParameter(i, OPT_MAX))
+            'TODO: Länge des zu schreibenden Strings (Anzahl Nachkommastellen) an Platzverhältnisse anpassen
+            'Problem: je nach Parameter ist unterschiedlich viel Platz in der Eingabedatei da und ist eine andere Genauigkeit gefordert!
+            OptParameter(i, OPT_AWERT) = (Param * (Max - Min) + Min).ToString("F3")
+        Next
     End Sub
 
     'Public Sub Messung_einlesen()
@@ -275,53 +311,57 @@ Public Class BM_Form
     'End Sub
 
     'Die vom Optimierungsalgorithmus mutierten Parameter werden geschrieben
-    Public Sub Mutierte_Parameter_schreiben(ByRef Par(,) As Double)
+    Public Sub Mutierte_Parameter_schreiben()
         Dim Parameter As String
         Dim AnzZeil As Integer = 0
-        Dim j As Integer = 0
+        Dim j As Integer
         Dim Datei() As String
-        Dim Text As String
+        Dim Zeile As String
         Dim StrLeft As String
         Dim StrRight As String
 
-        Try
-            Dim FiStr As FileStream = New FileStream(WorkDir + Datensatz + ".fkt", FileMode.Open, IO.FileAccess.ReadWrite)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        'Alle Parameter durchlaufen
+        For i As Integer = 0 To OptParameter.GetUpperBound(0)
+            Try
+                'Datei öffnen
+                Dim FiStr As FileStream = New FileStream(WorkDir + Datensatz + "." + OptParameter(i, OPT_DATEI), FileMode.Open, IO.FileAccess.ReadWrite)
+                Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-            'Anzahl der Zeilen feststellen
-            Do
-                Text = StrRead.ReadLine.ToString
-                AnzZeil += 1
-            Loop Until StrRead.Peek() = -1
+                'Anzahl der Zeilen feststellen
+                Do
+                    Zeile = StrRead.ReadLine.ToString
+                    AnzZeil += 1
+                Loop Until StrRead.Peek() = -1
 
-            'Auf Anfang setzen und lesen
-            FiStr.Seek(0, SeekOrigin.Begin)
-            ReDim Datei(AnzZeil)
-            For j = 1 To AnzZeil
-                Datei(j) = StrRead.ReadLine.ToString
-            Next
-            StrRead.Close()
-            FiStr.Close()
+                ReDim Datei(AnzZeil - 1)
 
-            'Zeile im Datei Array ändern
-            For j = 1 To 3
-                StrLeft = Microsoft.VisualBasic.Left(Datei(j + 26), 60)
-                StrRight = Microsoft.VisualBasic.Right(Datei(j + 26), 19)
-                Parameter = (Par(j, 1)).ToString
-                Parameter = Microsoft.VisualBasic.Left(Parameter, 8)
-                Datei(j + 26) = StrLeft + Parameter + StrRight
-            Next
+                'Datei komplett einlesen
+                FiStr.Seek(0, SeekOrigin.Begin)
+                For j = 0 To AnzZeil - 1
+                    Datei(j) = StrRead.ReadLine.ToString
+                Next
 
-            'Alle Zeilen in Datei schreiben
-            Dim StrWrite As StreamWriter = New StreamWriter(WorkDir + Datensatz + ".fkt", False, System.Text.Encoding.GetEncoding("iso8859-1"))
-            For j = 1 To AnzZeil
-                StrWrite.WriteLine(Datei(j))
-            Next
-            StrWrite.Close()
+                StrRead.Close()
+                FiStr.Close()
 
-        Catch except As Exception
-            MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim Schreiben der Mutierten Parameter")
-        End Try
+                'Zeile ändern
+                Zeile = Datei(OptParameter(i, OPT_ZEILE) - 1)
+                StrLeft = Microsoft.VisualBasic.Left(Zeile, OptParameter(i, OPT_SP1) - 1)
+                StrRight = Microsoft.VisualBasic.Right(Zeile, Len(Zeile) - OptParameter(i, OPT_SP2) + 1)
+                Parameter = OptParameter(i, OPT_AWERT).PadLeft(OptParameter(i, OPT_SP2) - OptParameter(i, OPT_SP1))
+                Datei(OptParameter(i, OPT_ZEILE)) = StrLeft + Parameter + StrRight
+
+                'Alle Zeilen wieder in Datei schreiben
+                Dim StrWrite As StreamWriter = New StreamWriter(WorkDir + Datensatz + "." + OptParameter(i, OPT_DATEI), False, System.Text.Encoding.GetEncoding("iso8859-1"))
+                For j = 0 To AnzZeil - 1
+                    StrWrite.WriteLine(Datei(j))
+                Next
+                StrWrite.Close()
+
+            Catch except As Exception
+                MsgBox("Fehler beim Schreiben der Mutierten Parameter" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
+            End Try
+        Next
 
     End Sub
 
