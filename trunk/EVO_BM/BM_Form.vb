@@ -232,89 +232,6 @@ Public Class BM_Form
         Next
     End Sub
 
-    'Public Sub Messung_einlesen()
-    '    'ToDo: Hier muss die Vergleichzeitreihe für die Messung eingelesen werden
-    '    Dim AnzZeil As Integer = 0
-    '    Dim j As Integer = 0
-    '    Dim Datei() As String           'Array mit allen Zeilen der Datei
-    '    Dim Zeile As String
-
-    '    Dim FileExt As String = Zeitreihe.Substring(Zeitreihe.LastIndexOf(".") + 1)
-
-    '    Select Case FileExt
-    '        Case "zre"
-    '            'Lesen einer ZRE-Datei
-    '            Try
-    '                Dim FiStr As FileStream = New FileStream(Zeitreihe, FileMode.Open, IO.FileAccess.ReadWrite)
-    '                Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-
-    '                'Anzahl der Zeilen feststellen
-    '                Do
-    '                    Zeile = StrRead.ReadLine.ToString()
-    '                    AnzZeil += 1
-    '                Loop Until StrRead.Peek() = -1
-
-    '                ReDim Messung(AnzZeil - 5, 1) 'Die ersten 4 Zeilen der ZRE-Datei gehören zum Header
-
-    '                'Zurück zum Dateianfang und lesen
-    '                FiStr.Seek(0, SeekOrigin.Begin)
-
-    '                For j = 0 To AnzZeil - 1
-    '                    Zeile = StrRead.ReadLine.ToString()
-    '                    If (j >= 4) Then
-    '                        Messung(j - 4, 0) = Zeile.Substring(0, 14)          'Datum
-    '                        Messung(j - 4, 1) = Zeile.Substring(15, 14).Trim()  'Wert
-    '                    End If
-    '                Next
-
-    '                StrRead.Close()
-    '                FiStr.Close()
-
-    '            Catch except As Exception
-    '                MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim lesen der ZRE-Datei")
-    '            End Try
-
-    '        Case "wel"
-    '            'Lesen einer WEL-Datei
-    '            'TODO: WEL-Datei lesen: zu lesende Spalte über UI (und/oder EVO.ini) definieren 
-    '            Try
-    '                Dim FiStr As FileStream = New FileStream(Zeitreihe, FileMode.Open, IO.FileAccess.ReadWrite)
-    '                Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-
-    '                'Anzahl der Zeilen feststellen
-    '                Do
-    '                    Zeile = StrRead.ReadLine.ToString
-    '                    AnzZeil += 1
-    '                Loop Until StrRead.Peek() = -1
-
-    '                'Auf Anfang setzen und lesen
-    '                FiStr.Seek(0, SeekOrigin.Begin)
-    '                ReDim Datei(AnzZeil)
-    '                For j = 1 To AnzZeil
-    '                    Datei(j) = StrRead.ReadLine.ToString
-    '                Next
-
-    '                StrRead.Close()
-    '                FiStr.Close()
-
-    '                'Werte an Messung übergeben
-    '                ReDim Messung(AnzZeil - 3, 1)
-    '                For j = 1 To AnzZeil - 3
-    '                    'TODO: Datum in Messung(j, 0) speichern
-    '                    Messung(j, 1) = Mid(Datei(j + 3), 333, 5)
-    '                Next
-
-    '            Catch except As Exception
-    '                MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim lesen der WEL-Datei")
-    '            End Try
-
-    '        Case Else
-    '            'Zeitreihe ist weder WEL noch ZRE Datei
-    '            MsgBox("Die Zeitreihe hat ein ungültiges Format", MsgBoxStyle.Exclamation, "Fehler beim Lesen der Zeitreihe")
-    '    End Select
-
-    'End Sub
-
     'Die vom Optimierungsalgorithmus mutierten Parameter werden geschrieben
     Public Sub Mutierte_Parameter_schreiben()
         Dim Parameter As String
@@ -452,5 +369,104 @@ Public Class BM_Form
         End If
 
     End Function
+
+    Public Function ReadZRE(ByVal DateiPfad As String, ByRef ZRE(,) As Object) As Boolean
+
+        'Lesen einer ZRE-Datei
+        Dim AnzZeil As Integer = 0
+        Dim j As Integer = 0
+        Dim Zeile As String
+        Const ZREHEaderLen As Integer = 4     'Die ersten 4 Zeilen der ZRE-Datei gehören zum Header
+        ReadZRE = True
+
+        Try
+            Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
+            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+            'Anzahl der Zeilen feststellen
+            Do
+                Zeile = StrRead.ReadLine.ToString()
+                AnzZeil += 1
+            Loop Until StrRead.Peek() = -1
+
+            ReDim ZRE(AnzZeil - ZREHEaderLen - 1, 1)
+
+            'Zurück zum Dateianfang und lesen
+            FiStr.Seek(0, SeekOrigin.Begin)
+
+            For j = 0 To AnzZeil - 1
+                Zeile = StrRead.ReadLine.ToString()
+                If (j >= ZREHEaderLen) Then
+                    ZRE(j - ZREHEaderLen, 0) = Zeile.Substring(0, 14)                       'Datum
+                    ZRE(j - ZREHEaderLen, 1) = Convert.ToDouble(Zeile.Substring(15, 14))    'Wert
+                End If
+            Next
+
+            StrRead.Close()
+            FiStr.Close()
+
+        Catch except As Exception
+            MsgBox("Fehler beim lesen der ZRE-Datei" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
+            ReadZRE = False
+        End Try
+
+    End Function
+
+    Public Function ReadWEL(ByVal Dateipfad As String, ByVal Spalte As String, ByRef WEL(,) As Object) As Boolean
+
+        'Lesen einer WEL-Datei (muss im CSV-Format mit Semikola vorliegen)
+        Dim AnzZeil As Integer = 0
+        Dim j As Integer = 0
+        Dim Zeile As String
+        Dim Werte() As String
+        Dim SpalteNr As Integer
+        Const WELHeaderLen As Integer = 3       'Die ersten 3 Zeilen der WEL-Datei gehören zum Header
+        ReadWEL = True
+
+        Try
+            Dim FiStr As FileStream = New FileStream(Dateipfad, FileMode.Open, IO.FileAccess.ReadWrite)
+            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+            'Anzahl der Zeilen feststellen
+            Do
+                Zeile = StrRead.ReadLine.ToString
+                AnzZeil += 1
+            Loop Until StrRead.Peek() = -1
+
+            ReDim WEL(AnzZeil - WELHeaderLen - 1, 1)
+
+            'Position der zu lesenden Spalte bestimmen
+            FiStr.Seek(0, SeekOrigin.Begin)
+            ' Zeile mit den Spaltenüberschriften auslesen
+            For j = 0 To 1
+                Werte = StrRead.ReadLine.ToString.Split(";")
+            Next
+            ' Spaltenüberschriften vergleichen
+            For j = 0 To Werte.GetUpperBound(0)
+                If (Werte(j).Trim() = Spalte) Then
+                    SpalteNr = j
+                End If
+            Next
+
+            'Auf Anfang setzen und lesen
+            FiStr.Seek(0, SeekOrigin.Begin)
+            For j = 0 To AnzZeil - 1
+                Werte = StrRead.ReadLine.ToString.Split(";")
+                If (j >= WELHeaderLen) Then
+                    WEL(j - WELHeaderLen, 0) = Werte(1)                             'Datum
+                    WEL(j - WELHeaderLen, 1) = Convert.ToDouble(Werte(SpalteNr))    'Wert
+                End If
+            Next
+
+            StrRead.Close()
+            FiStr.Close()
+
+        Catch except As Exception
+            MsgBox("Fehler beim lesen der WEL-Datei" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
+            ReadWEL = False
+        End Try
+
+    End Function
+
 
 End Class
