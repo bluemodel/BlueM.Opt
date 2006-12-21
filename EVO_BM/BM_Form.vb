@@ -235,21 +235,24 @@ Public Class BM_Form
     'Die vom Optimierungsalgorithmus mutierten Parameter werden geschrieben
     Public Sub Mutierte_Parameter_schreiben()
         Dim Parameter As String
-        Dim AnzZeil As Integer = 0
+        Dim AnzZeil As Integer
         Dim j As Integer
         Dim Datei() As String
         Dim Zeile As String
         Dim StrLeft As String
         Dim StrRight As String
+        Dim DateiPfad As String
 
         'Alle Parameter durchlaufen
         For i As Integer = 0 To OptParameter.GetUpperBound(0)
             Try
+                DateiPfad = WorkDir & Datensatz & "." & OptParameter(i, OPTPARA_DATEI)
                 'Datei öffnen
-                Dim FiStr As FileStream = New FileStream(WorkDir + Datensatz + "." + OptParameter(i, OPTPARA_DATEI), FileMode.Open, IO.FileAccess.ReadWrite)
+                Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.Read)
                 Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
                 'Anzahl der Zeilen feststellen
+                AnzZeil = 0
                 Do
                     Zeile = StrRead.ReadLine.ToString
                     AnzZeil += 1
@@ -272,13 +275,14 @@ Public Class BM_Form
                 StrLeft = Microsoft.VisualBasic.Left(Zeile, OptParameter(i, OPTPARA_SP1) - 1)
                 StrRight = Microsoft.VisualBasic.Right(Zeile, Len(Zeile) - OptParameter(i, OPTPARA_SP2) + 1)
                 Parameter = OptParameter(i, OPTPARA_AWERT).ToString.Substring(0, Length)
-                Datei(OptParameter(i, OPTPARA_ZEILE)) = StrLeft + Parameter + StrRight
+                Datei(OptParameter(i, OPTPARA_ZEILE) - 1) = StrLeft & Parameter & StrRight
 
                 'Alle Zeilen wieder in Datei schreiben
-                Dim StrWrite As StreamWriter = New StreamWriter(WorkDir + Datensatz + "." + OptParameter(i, OPTPARA_DATEI), False, System.Text.Encoding.GetEncoding("iso8859-1"))
+                Dim StrWrite As StreamWriter = New StreamWriter(DateiPfad, False, System.Text.Encoding.GetEncoding("iso8859-1"))
                 For j = 0 To AnzZeil - 1
                     StrWrite.WriteLine(Datei(j))
                 Next
+
                 StrWrite.Close()
 
             Catch except As Exception
