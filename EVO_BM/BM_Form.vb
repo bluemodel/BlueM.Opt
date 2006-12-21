@@ -422,8 +422,8 @@ Public Class BM_Form
         Dim AnzZeil As Integer = 0
         Dim j As Integer = 0
         Dim Zeile As String
-        Dim Werte() As String
-        Dim SpalteNr As Integer
+        Dim Werte() As String = {}
+        Dim SpalteNr As Integer = -1
         Const WELHeaderLen As Integer = 3       'Die ersten 3 Zeilen der WEL-Datei gehören zum Header
         ReadWEL = True
 
@@ -445,12 +445,18 @@ Public Class BM_Form
             For j = 0 To 1
                 Werte = StrRead.ReadLine.ToString.Split(";")
             Next
+            StrRead.ReadToEnd()
             ' Spaltenüberschriften vergleichen
             For j = 0 To Werte.GetUpperBound(0)
                 If (Werte(j).Trim() = Spalte) Then
                     SpalteNr = j
                 End If
             Next
+            If (SpalteNr = -1) Then
+                ReadWEL = False
+                MsgBox("Konnte die Spalte """ & Spalte & """ in der WEL-Datei nicht finden!", MsgBoxStyle.Exclamation, "Fehler")
+                Exit Function
+            End If
 
             'Auf Anfang setzen und lesen
             FiStr.Seek(0, SeekOrigin.Begin)
