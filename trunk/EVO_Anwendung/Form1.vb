@@ -695,11 +695,7 @@ ErrCode_ES_STARTEN:
             'Modell Starten
             Call BM_Form1.launchBM()
 
-            'Ergebnis der Berechnung auslesen
-            Call BM_Form1.Ergebnis_lesen()
-
             'Qualitätswert berechnen
-
             f1 = BM_Form1.QualitaetswertWerte(0)
             'f2 = BM_Form1.QualitaetswertWerte(1)
             'f3 = BM_Form1.QualitaetswertWerte(2)
