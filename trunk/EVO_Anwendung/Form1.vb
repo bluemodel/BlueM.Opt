@@ -289,8 +289,8 @@ Friend Class Form1
             'Zielfunktionen werden eingelesen und die Anzahl wird übergeben
             'CHECK: Dadurch wird definiert Ob SO oder Pareto laufen soll, das überschreibt die Evo_Einstellungen
             Call BM_Form1.OptZielWerte_einlesen()
-            'Call BM_Form1.OptZielReihen_einlesen()
-            globalAnzZiel = BM_Form1.OptZielWert.GetLength(0) '+ BM_Form1.OptZielReihe.GetLength(0)
+            Call BM_Form1.OptZielReihe_einlesen()
+            globalAnzZiel = BM_Form1.OptZielWert.GetLength(0) + BM_Form1.OptZielReihe.GetLength(0)
 
             'TODO: Randbedingungen
             globalAnzRand = 2
@@ -693,7 +693,9 @@ ErrCode_ES_STARTEN:
             Call BM_Form1.launchBM()
 
             'Qualitätswert berechnen
-            f1 = BM_Form1.QualitaetswertWerte(0)
+            'f1 = BM_Form1.QualitaetswertWerte(0)
+            f1 = BM_Form1.QualitaetswertReihe(0)
+
             'f2 = BM_Form1.QualitaetswertWerte(1)
             'f3 = BM_Form1.QualitaetswertWerte(2)
             'f4 = BM_Form1.QualitaetswertWerte(3)
