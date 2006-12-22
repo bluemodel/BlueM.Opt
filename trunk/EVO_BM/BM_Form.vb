@@ -29,7 +29,7 @@ Public Class BM_Form
     'Private Properties
     '-------------------
     Dim OptParameter_Pfad As String     'Pfad zur Datei mit den Optimierungsparametern (*.OPT)
-    Dim OptZiel_Pfad As String          'Pfad zur Datei mit den Zielfunktionen (*.ZIE)
+    Dim OptZielWert_Pfad As String          'Pfad zur Datei mit den Zielfunktionen (*.ZIE)
 
     'Private Methoden
     '----------------
@@ -82,9 +82,9 @@ Public Class BM_Form
                         Case "OptParameter"
                             OptParameter_Pfad = Configs(i, 1)
                             TextBox_OptParameter_Pfad.Text = OptParameter_Pfad
-                        Case "OptZiel"
-                            OptZiel_Pfad = Configs(i, 1)
-                            Me.TextBox_OptZiel_Pfad.Text = Me.OptZiel_Pfad
+                        Case "OptZielWert"
+                            OptZielWert_Pfad = Configs(i, 1)
+                            Me.TextBox_OptZielWert_Pfad.Text = Me.OptZielWert_Pfad
                         Case Else
                             'nix
                     End Select
@@ -143,18 +143,18 @@ Public Class BM_Form
     End Sub
 
     'Zeitreihe
-    Private Sub Button_OptZiel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_OptZiel.Click
-        Me.OpenFile_OptZiel.ShowDialog()
+    Private Sub Button_OptZiel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_OptZielWert.Click
+        Me.OpenFile_OptZielWert.ShowDialog()
     End Sub
 
-    Private Sub OpenFile_OptZiel_FileOk(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles OpenFile_OptZiel.FileOk
+    Private Sub OpenFile_OptZiel_FileOk(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles OpenFile_OptZielWert.FileOk
 
         'Pfad zur Zeitreihe auslesen
-        Me.OptZiel_Pfad = Me.OpenFile_OptZiel.FileName
+        Me.OptZielWert_Pfad = Me.OpenFile_OptZielWert.FileName
 
         'Pfad in Textbox schreiben
-        Me.TextBox_OptZiel_Pfad.Clear()
-        Me.TextBox_OptZiel_Pfad.AppendText(Me.OptZiel_Pfad)
+        Me.TextBox_OptZielWert_Pfad.Clear()
+        Me.TextBox_OptZielWert_Pfad.AppendText(Me.OptZielWert_Pfad)
 
     End Sub
 
@@ -240,7 +240,7 @@ Public Class BM_Form
     Public Sub OptZielWerte_einlesen()
 
         Try
-            Dim FiStr As FileStream = New FileStream(OptZiel_Pfad, FileMode.Open, IO.FileAccess.ReadWrite)
+            Dim FiStr As FileStream = New FileStream(OptZielWert_Pfad, FileMode.Open, IO.FileAccess.ReadWrite)
             Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
             Dim Zeile As String = ""
@@ -554,6 +554,5 @@ Public Class BM_Form
         End Try
 
     End Function
-
 
 End Class
