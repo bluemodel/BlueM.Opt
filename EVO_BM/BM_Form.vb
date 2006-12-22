@@ -286,14 +286,14 @@ Public Class BM_Form
                 If (Zeile.StartsWith("*") = False) Then
                     ZeilenArray = Zeile.Split("|")
                     For j = 0 To 4
-                        OptZielWert(i, j) = ZeilenArray(j).Trim
+                        OptZielWert(i, j) = ZeilenArray(j).Trim()
                     Next
                     i += 1
                 End If
             Loop Until StrRead.Peek() = -1
 
         Catch except As Exception
-            MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim lesen der OptZiel-Datei")
+            MsgBox("Fehler beim lesen der Optimierungsziel-Datei (Werte)" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
         End Try
     End Sub
 
@@ -384,6 +384,10 @@ Public Class BM_Form
 
         IsOK = ReadWEL(WorkDir & Datensatz & ".wel", OptZielWert(ZielNr, 0), SimReihe)
 
+        If (IsOK = False) Then
+            'TODO: Fehlerbehandlung
+        End If
+
         Select Case OptZielWert(ZielNr, 1)
             Case "MaxWert"
                 SimWert = 0
@@ -409,6 +413,8 @@ Public Class BM_Form
                 SimWert = SimReihe(0, 1)
             Case "EndWert"
                 SimWert = SimReihe(SimReihe.GetUpperBound(0), 1)
+            Case Else
+                'TODO: Fehlerbehandlung
         End Select
 
         Select Case OptZielWert(ZielNr, 2)
@@ -417,7 +423,9 @@ Public Class BM_Form
             Case "Diff"
                 QualitaetswertWerte = Math.Abs(OptZielWert(ZielNr, 4) - SimWert)
             Case "Volf"
-
+                'TODO: Volumenfehler
+            Case Else
+                'TODO: Fehlerbehandlung
         End Select
 
     End Function
