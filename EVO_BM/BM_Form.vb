@@ -29,7 +29,8 @@ Public Class BM_Form
     'Private Properties
     '-------------------
     Dim OptParameter_Pfad As String     'Pfad zur Datei mit den Optimierungsparametern (*.OPT)
-    Dim OptZielWert_Pfad As String          'Pfad zur Datei mit den Zielfunktionen (*.ZIE)
+    Dim OptZielWert_Pfad As String      'Pfad zur Datei mit Einzelwerten für die Zielfunktionen (*.ZIE)
+    Dim OptZielReihe_Pfad As String     'Pfad zur Datei mit Reihen für die Zielfunktionen (*.ZIE)
 
     'Private Methoden
     '----------------
@@ -85,6 +86,9 @@ Public Class BM_Form
                         Case "OptZielWert"
                             OptZielWert_Pfad = Configs(i, 1)
                             Me.TextBox_OptZielWert_Pfad.Text = Me.OptZielWert_Pfad
+                        Case "OptZielReihe"
+                            OptZielReihe_Pfad = Configs(i, 1)
+                            Me.TextBox_OptZielReihe_Pfad.Text = Me.OptZielReihe_Pfad
                         Case Else
                             'nix
                     End Select
