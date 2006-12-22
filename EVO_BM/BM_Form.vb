@@ -146,19 +146,32 @@ Public Class BM_Form
         TextBox_OptParameter_Pfad.Text = OptParameter_Pfad
     End Sub
 
-    'Zeitreihe
-    Private Sub Button_OptZiel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_OptZielWert.Click
+    'Optimierungsziele
+    Private Sub Button_OptZielWert_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_OptZielWert.Click
         Me.OpenFile_OptZielWert.ShowDialog()
     End Sub
 
-    Private Sub OpenFile_OptZiel_FileOk(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles OpenFile_OptZielWert.FileOk
+    Private Sub OpenFile_OptZielWert_FileOk(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles OpenFile_OptZielWert.FileOk
 
-        'Pfad zur Zeitreihe auslesen
+        'Pfad zur Datei auslesen
         Me.OptZielWert_Pfad = Me.OpenFile_OptZielWert.FileName
 
         'Pfad in Textbox schreiben
-        Me.TextBox_OptZielWert_Pfad.Clear()
-        Me.TextBox_OptZielWert_Pfad.AppendText(Me.OptZielWert_Pfad)
+        Me.TextBox_OptZielWert_Pfad.Text = Me.OptZielWert_Pfad
+
+    End Sub
+
+    Private Sub Button_OptZielReihe_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_OptZielReihe.Click
+        Me.OpenFile_OptZielReihe.ShowDialog()
+    End Sub
+
+    Private Sub OpenFile_OptZielReihe_FileOk(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles OpenFile_OptZielReihe.FileOk
+
+        'Pfad zur Datei auslesen
+        Me.OptZielReihe_Pfad = Me.OpenFile_OptZielReihe.FileName
+
+        'Pfad in Textbox schreiben
+        Me.TextBox_OptZielReihe_Pfad.Text = Me.OptZielReihe_Pfad
 
     End Sub
 
@@ -327,6 +340,7 @@ Public Class BM_Form
                 Dim Length As Short = OptParameter(i, OPTPARA_SP2) - OptParameter(i, OPTPARA_SP1)
                 StrLeft = Microsoft.VisualBasic.Left(Zeile, OptParameter(i, OPTPARA_SP1) - 1)
                 StrRight = Microsoft.VisualBasic.Right(Zeile, Len(Zeile) - OptParameter(i, OPTPARA_SP2) + 1)
+                'TODO: Parameter wird für erforderliche Stringlänge einfach abgeschnitten, sollte aber gerundet werden!
                 Parameter = OptParameter(i, OPTPARA_AWERT).ToString.Substring(0, Length)
                 Datei(OptParameter(i, OPTPARA_ZEILE) - 1) = StrLeft & Parameter & StrRight
 
@@ -360,47 +374,7 @@ Public Class BM_Form
         ChDir(currentDir)
     End Sub
 
-    'Hier wird die Ergebnisdatei nach jeder Simulation ausgelesen
-    Public Sub Ergebnis_lesen()
-        Dim AnzZeil As Integer = 0
-        Dim j As Integer = 0
-        Dim Datei() As String
-        Dim Text As String
-
-        Try
-            Dim FiStr As FileStream = New FileStream(WorkDir + Datensatz + ".wel", FileMode.Open, IO.FileAccess.ReadWrite)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-
-            'Anzahl der Zeilen feststellen
-            Do
-                Text = StrRead.ReadLine.ToString
-                AnzZeil += 1
-            Loop Until StrRead.Peek() = -1
-
-            'Auf Anfang setzen und lesen
-            FiStr.Seek(0, SeekOrigin.Begin)
-            ReDim Datei(AnzZeil)
-            For j = 1 To AnzZeil
-                Datei(j) = StrRead.ReadLine.ToString
-            Next
-
-            StrRead.Close()
-            FiStr.Close()
-
-            'Werte an Ergebnis übergeben
-            ReDim Ergebnis(AnzZeil - 3)
-            For j = 1 To AnzZeil - 3
-                Ergebnis(j) = Mid(Datei(j + 3), 333, 5)
-            Next
-
-        Catch except As Exception
-            MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim lesen der .WEL Datei")
-        End Try
-
-    End Sub
-
     'Der Qualitätswert wird durch Vergleich von Calculation Berechnet.
-    'TODO: Array Messung ist vom Typ String - für Berechnung Konvertierung zu Double erforderlich!
     Public Function QualitaetswertWerte(ByVal ZielNr As Integer) As Double
         Dim CalcTyp As String = "Fehlerquadrate"
         Dim i As Integer
@@ -538,7 +512,6 @@ Public Class BM_Form
             End If
 
             'Auf Anfang setzen und lesen
-            StrRead.ReadToEnd()
             FiStr.Seek(0, SeekOrigin.Begin)
 
             For j = 0 To AnzZeil - 1

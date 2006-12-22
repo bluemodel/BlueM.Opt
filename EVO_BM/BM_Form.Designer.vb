@@ -21,11 +21,12 @@ Partial Class BM_Form
     Private Sub InitializeComponent()
         Me.GroupBox_BM = New System.Windows.Forms.GroupBox
         Me.GroupBox_Parameter = New System.Windows.Forms.GroupBox
-        Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel
         Me.Label_Parameter = New System.Windows.Forms.Label
         Me.TextBox_OptParameter_Pfad = New System.Windows.Forms.TextBox
         Me.Button_OptParameter = New System.Windows.Forms.Button
-        Me.GroupBox_Ziel = New System.Windows.Forms.GroupBox
+        Me.GroupBox_OptZiele = New System.Windows.Forms.GroupBox
+        Me.Button_OptZielReihe = New System.Windows.Forms.Button
+        Me.TextBox_OptZielReihe_Pfad = New System.Windows.Forms.MaskedTextBox
         Me.Label_OptZielReihe = New System.Windows.Forms.Label
         Me.Label_OptZielWert = New System.Windows.Forms.Label
         Me.TextBox_OptZielWert_Pfad = New System.Windows.Forms.TextBox
@@ -40,18 +41,16 @@ Partial Class BM_Form
         Me.OpenFile_EXE = New System.Windows.Forms.OpenFileDialog
         Me.OpenFile_OptZielWert = New System.Windows.Forms.OpenFileDialog
         Me.OpenFile_OptParameter = New System.Windows.Forms.OpenFileDialog
-        Me.TextBox_OptZielReihe_Pfad = New System.Windows.Forms.MaskedTextBox
-        Me.Button_OptZielReihe = New System.Windows.Forms.Button
         Me.OpenFile_OptZielReihe = New System.Windows.Forms.OpenFileDialog
         Me.GroupBox_BM.SuspendLayout()
         Me.GroupBox_Parameter.SuspendLayout()
-        Me.GroupBox_Ziel.SuspendLayout()
+        Me.GroupBox_OptZiele.SuspendLayout()
         Me.SuspendLayout()
         '
         'GroupBox_BM
         '
         Me.GroupBox_BM.Controls.Add(Me.GroupBox_Parameter)
-        Me.GroupBox_BM.Controls.Add(Me.GroupBox_Ziel)
+        Me.GroupBox_BM.Controls.Add(Me.GroupBox_OptZiele)
         Me.GroupBox_BM.Controls.Add(Me.Label_EXE)
         Me.GroupBox_BM.Controls.Add(Me.TextBox_EXE)
         Me.GroupBox_BM.Controls.Add(Me.Button_Exe)
@@ -67,29 +66,15 @@ Partial Class BM_Form
         '
         'GroupBox_Parameter
         '
-        Me.GroupBox_Parameter.Controls.Add(Me.TableLayoutPanel1)
         Me.GroupBox_Parameter.Controls.Add(Me.Label_Parameter)
         Me.GroupBox_Parameter.Controls.Add(Me.TextBox_OptParameter_Pfad)
         Me.GroupBox_Parameter.Controls.Add(Me.Button_OptParameter)
         Me.GroupBox_Parameter.Location = New System.Drawing.Point(9, 72)
         Me.GroupBox_Parameter.Name = "GroupBox_Parameter"
-        Me.GroupBox_Parameter.Size = New System.Drawing.Size(275, 102)
+        Me.GroupBox_Parameter.Size = New System.Drawing.Size(275, 47)
         Me.GroupBox_Parameter.TabIndex = 31
         Me.GroupBox_Parameter.TabStop = False
         Me.GroupBox_Parameter.Text = "Optimierungsparameter"
-        '
-        'TableLayoutPanel1
-        '
-        Me.TableLayoutPanel1.ColumnCount = 2
-        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.TableLayoutPanel1.Location = New System.Drawing.Point(12, 44)
-        Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
-        Me.TableLayoutPanel1.RowCount = 2
-        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.TableLayoutPanel1.Size = New System.Drawing.Size(255, 37)
-        Me.TableLayoutPanel1.TabIndex = 2
         '
         'Label_Parameter
         '
@@ -117,44 +102,61 @@ Partial Class BM_Form
         Me.Button_OptParameter.Text = "..."
         Me.Button_OptParameter.UseVisualStyleBackColor = True
         '
-        'GroupBox_Ziel
+        'GroupBox_OptZiele
         '
-        Me.GroupBox_Ziel.Controls.Add(Me.Button_OptZielReihe)
-        Me.GroupBox_Ziel.Controls.Add(Me.TextBox_OptZielReihe_Pfad)
-        Me.GroupBox_Ziel.Controls.Add(Me.Label_OptZielReihe)
-        Me.GroupBox_Ziel.Controls.Add(Me.Label_OptZielWert)
-        Me.GroupBox_Ziel.Controls.Add(Me.TextBox_OptZielWert_Pfad)
-        Me.GroupBox_Ziel.Controls.Add(Me.Button_OptZielWert)
-        Me.GroupBox_Ziel.Location = New System.Drawing.Point(7, 180)
-        Me.GroupBox_Ziel.Name = "GroupBox_Ziel"
-        Me.GroupBox_Ziel.Size = New System.Drawing.Size(275, 73)
-        Me.GroupBox_Ziel.TabIndex = 30
-        Me.GroupBox_Ziel.TabStop = False
-        Me.GroupBox_Ziel.Text = "Ziel"
+        Me.GroupBox_OptZiele.Controls.Add(Me.Button_OptZielReihe)
+        Me.GroupBox_OptZiele.Controls.Add(Me.TextBox_OptZielReihe_Pfad)
+        Me.GroupBox_OptZiele.Controls.Add(Me.Label_OptZielReihe)
+        Me.GroupBox_OptZiele.Controls.Add(Me.Label_OptZielWert)
+        Me.GroupBox_OptZiele.Controls.Add(Me.TextBox_OptZielWert_Pfad)
+        Me.GroupBox_OptZiele.Controls.Add(Me.Button_OptZielWert)
+        Me.GroupBox_OptZiele.Location = New System.Drawing.Point(7, 125)
+        Me.GroupBox_OptZiele.Name = "GroupBox_OptZiele"
+        Me.GroupBox_OptZiele.Size = New System.Drawing.Size(275, 73)
+        Me.GroupBox_OptZiele.TabIndex = 30
+        Me.GroupBox_OptZiele.TabStop = False
+        Me.GroupBox_OptZiele.Text = "Optimierungsziele"
+        '
+        'Button_OptZielReihe
+        '
+        Me.Button_OptZielReihe.Location = New System.Drawing.Point(243, 44)
+        Me.Button_OptZielReihe.Name = "Button_OptZielReihe"
+        Me.Button_OptZielReihe.Size = New System.Drawing.Size(24, 22)
+        Me.Button_OptZielReihe.TabIndex = 29
+        Me.Button_OptZielReihe.Text = "..."
+        Me.Button_OptZielReihe.UseVisualStyleBackColor = True
+        '
+        'TextBox_OptZielReihe_Pfad
+        '
+        Me.TextBox_OptZielReihe_Pfad.Location = New System.Drawing.Point(63, 46)
+        Me.TextBox_OptZielReihe_Pfad.Name = "TextBox_OptZielReihe_Pfad"
+        Me.TextBox_OptZielReihe_Pfad.Size = New System.Drawing.Size(174, 20)
+        Me.TextBox_OptZielReihe_Pfad.TabIndex = 28
+        Me.TextBox_OptZielReihe_Pfad.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'Label_OptZielReihe
         '
         Me.Label_OptZielReihe.AutoSize = True
         Me.Label_OptZielReihe.Location = New System.Drawing.Point(6, 49)
         Me.Label_OptZielReihe.Name = "Label_OptZielReihe"
-        Me.Label_OptZielReihe.Size = New System.Drawing.Size(72, 13)
+        Me.Label_OptZielReihe.Size = New System.Drawing.Size(44, 13)
         Me.Label_OptZielReihe.TabIndex = 27
-        Me.Label_OptZielReihe.Text = "OptZielReihe:"
+        Me.Label_OptZielReihe.Text = "Reihen:"
         '
         'Label_OptZielWert
         '
         Me.Label_OptZielWert.AutoSize = True
         Me.Label_OptZielWert.Location = New System.Drawing.Point(6, 25)
         Me.Label_OptZielWert.Name = "Label_OptZielWert"
-        Me.Label_OptZielWert.Size = New System.Drawing.Size(67, 13)
+        Me.Label_OptZielWert.Size = New System.Drawing.Size(39, 13)
         Me.Label_OptZielWert.TabIndex = 2
-        Me.Label_OptZielWert.Text = "OptZielWert:"
+        Me.Label_OptZielWert.Text = "Werte:"
         '
         'TextBox_OptZielWert_Pfad
         '
-        Me.TextBox_OptZielWert_Pfad.Location = New System.Drawing.Point(79, 22)
+        Me.TextBox_OptZielWert_Pfad.Location = New System.Drawing.Point(63, 22)
         Me.TextBox_OptZielWert_Pfad.Name = "TextBox_OptZielWert_Pfad"
-        Me.TextBox_OptZielWert_Pfad.Size = New System.Drawing.Size(158, 20)
+        Me.TextBox_OptZielWert_Pfad.Size = New System.Drawing.Size(174, 20)
         Me.TextBox_OptZielWert_Pfad.TabIndex = 24
         Me.TextBox_OptZielWert_Pfad.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
@@ -233,33 +235,16 @@ Partial Class BM_Form
         'OpenFile_OptZielWert
         '
         Me.OpenFile_OptZielWert.Filter = "ZIE-Dateien|*.zie"
-        Me.OpenFile_OptZielWert.Title = "OptZielWert auswählen"
+        Me.OpenFile_OptZielWert.Title = "Zielfunktionsdatei auswählen"
         '
         'OpenFile_OptParameter
         '
         Me.OpenFile_OptParameter.Filter = "Optimierungs-Parameter|*.opt"
         '
-        'TextBox_OptZielReihe_Pfad
-        '
-        Me.TextBox_OptZielReihe_Pfad.Location = New System.Drawing.Point(79, 46)
-        Me.TextBox_OptZielReihe_Pfad.Name = "TextBox_OptZielReihe_Pfad"
-        Me.TextBox_OptZielReihe_Pfad.Size = New System.Drawing.Size(158, 20)
-        Me.TextBox_OptZielReihe_Pfad.TabIndex = 28
-        Me.TextBox_OptZielReihe_Pfad.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        '
-        'Button_OptZielReihe
-        '
-        Me.Button_OptZielReihe.Location = New System.Drawing.Point(243, 44)
-        Me.Button_OptZielReihe.Name = "Button_OptZielReihe"
-        Me.Button_OptZielReihe.Size = New System.Drawing.Size(24, 22)
-        Me.Button_OptZielReihe.TabIndex = 29
-        Me.Button_OptZielReihe.Text = "..."
-        Me.Button_OptZielReihe.UseVisualStyleBackColor = True
-        '
         'OpenFile_OptZielReihe
         '
         Me.OpenFile_OptZielReihe.Filter = "ZIE-Dateien|*.zie"
-        Me.OpenFile_OptZielReihe.Title = "OptZielReihe auswählen"
+        Me.OpenFile_OptZielReihe.Title = "Zielfunktionsdatei auswählen"
         '
         'BM_Form
         '
@@ -272,8 +257,8 @@ Partial Class BM_Form
         Me.GroupBox_BM.PerformLayout()
         Me.GroupBox_Parameter.ResumeLayout(False)
         Me.GroupBox_Parameter.PerformLayout()
-        Me.GroupBox_Ziel.ResumeLayout(False)
-        Me.GroupBox_Ziel.PerformLayout()
+        Me.GroupBox_OptZiele.ResumeLayout(False)
+        Me.GroupBox_OptZiele.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -286,14 +271,13 @@ Partial Class BM_Form
     Friend WithEvents TextBox_Datensatz As System.Windows.Forms.TextBox
     Friend WithEvents OpenFile_Datensatz As System.Windows.Forms.OpenFileDialog
     Friend WithEvents OpenFile_EXE As System.Windows.Forms.OpenFileDialog
-    Friend WithEvents GroupBox_Ziel As System.Windows.Forms.GroupBox
+    Friend WithEvents GroupBox_OptZiele As System.Windows.Forms.GroupBox
     Friend WithEvents Label_OptZielWert As System.Windows.Forms.Label
     Friend WithEvents TextBox_OptZielWert_Pfad As System.Windows.Forms.TextBox
     Friend WithEvents Button_OptZielWert As System.Windows.Forms.Button
     Friend WithEvents OpenFile_OptZielWert As System.Windows.Forms.OpenFileDialog
     Friend WithEvents GroupBox_Parameter As System.Windows.Forms.GroupBox
     Friend WithEvents Label_Parameter As System.Windows.Forms.Label
-    Friend WithEvents TableLayoutPanel1 As System.Windows.Forms.TableLayoutPanel
     Friend WithEvents TextBox_OptParameter_Pfad As System.Windows.Forms.TextBox
     Friend WithEvents Button_OptParameter As System.Windows.Forms.Button
     Friend WithEvents OpenFile_OptParameter As System.Windows.Forms.OpenFileDialog
