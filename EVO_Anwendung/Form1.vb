@@ -538,7 +538,7 @@ ErrCode_ES_STARTEN:
         Dim Unterteilung_X As Double
         Dim x1, x2 As Double
         Dim X() As Double
-        Dim f2, f1, f3, f4 As Double
+        Dim f2, f1, f3 As Double
         Dim g1, g2 As Double
 
         If (Me.Radio_Testproblem.Checked = True) Then
