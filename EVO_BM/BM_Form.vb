@@ -24,7 +24,8 @@ Public Class BM_Form
 
     'Zielfunktionsparameter
     Public OptZielWert(,) As Object
-    Public OptZielReihe(,,) As Object
+    Public OptZielReihe(,) As Object
+    Public Zielreihe(,,) As Object
 
     'Private Properties
     '-------------------
@@ -255,7 +256,6 @@ Public Class BM_Form
 
     'Optimierungsziele einlesen (*.zie-Datei)
     Public Sub OptZielWerte_einlesen()
-
         Try
             Dim FiStr As FileStream = New FileStream(OptZielWert_Pfad, FileMode.Open, IO.FileAccess.ReadWrite)
             Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -295,6 +295,78 @@ Public Class BM_Form
         Catch except As Exception
             MsgBox("Fehler beim lesen der Optimierungsziel-Datei (Werte)" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
         End Try
+
+    End Sub
+
+    Public Sub OptZielReihe_einlesen()
+        Dim i As Integer = 0
+        Dim j As Integer = 0
+        Dim tmpstr As String
+        Dim isOK As Boolean
+        Try
+            Dim FiStr As FileStream = New FileStream(OptZielReihe_Pfad, FileMode.Open, IO.FileAccess.ReadWrite)
+            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+            Dim Zeile As String = ""
+            Dim AnzZiele As Integer = 0
+
+            'Anzahl der Zielfunktionen feststellen
+            Do
+                Zeile = StrRead.ReadLine.ToString()
+                If (Zeile.StartsWith("*") = False) Then
+                    AnzZiele += 1
+                End If
+            Loop Until StrRead.Peek() = -1
+
+            ReDim OptZielReihe(AnzZiele - 1, 4)
+
+            'Zurück zum Dateianfang und lesen
+            FiStr.Seek(0, SeekOrigin.Begin)
+
+            'Einlesen der Zeile und übergeben an das OptZiel Array
+            Dim ZeilenArray(4) As String
+
+            Do
+                Zeile = StrRead.ReadLine.ToString()
+                If (Zeile.StartsWith("*") = False) Then
+                    ZeilenArray = Zeile.Split("|")
+                    For j = 0 To 4
+                        OptZielReihe(i, j) = ZeilenArray(j).Trim
+                    Next
+                    i += 1
+                End If
+            Loop Until StrRead.Peek() = -1
+
+        Catch except As Exception
+            MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim lesen der OptZielReihe-Datei")
+        End Try
+
+        Try
+            Dim tmpReihe(,) As Object = {}
+            Dim x, y As Integer
+            For j = 0 To OptZielReihe.GetUpperBound(0)
+                tmpstr = OptZielReihe(j, 4).ToString.Substring(OptZielReihe(j, 4).ToString.LastIndexOf(".") + 1)
+                If tmpstr = "wel" Then
+                    isOK = ReadWEL(OptZielReihe(j, 4).ToString, OptZielReihe(j, 3), tmpReihe)
+
+                    'Zielreihe(j, )
+                ElseIf tmpstr = "zre" Then
+                    isOK = ReadZRE(OptZielReihe(j, 4).ToString, tmpReihe)
+                Else
+
+                End If
+                ReDim Zielreihe(OptZielReihe.GetUpperBound(0), tmpReihe.GetUpperBound(0), tmpReihe.GetUpperBound(1))
+
+                For x = 0 To tmpReihe.GetUpperBound(0)
+                    For y = 0 To tmpReihe.GetUpperBound(1)
+                        Zielreihe(j, x, y) = tmpReihe(x, y)
+                    Next
+                Next
+            Next
+        Catch exception As Exception
+
+        End Try
+
     End Sub
 
 
@@ -376,7 +448,6 @@ Public Class BM_Form
 
     'Der Qualitätswert wird durch Vergleich von Calculation Berechnet.
     Public Function QualitaetswertWerte(ByVal ZielNr As Integer) As Double
-        Dim CalcTyp As String = "Fehlerquadrate"
         Dim i As Integer
         Dim SimReihe(,) As Object = {}
         Dim SimWert As Single
@@ -427,11 +498,28 @@ Public Class BM_Form
             Case Else
                 'TODO: Fehlerbehandlung
         End Select
-
     End Function
 
-    Public Function QualitaetswertReihe(ByVal ZielNummer As Integer) As Double
+    Public Function QualitaetswertReihe(ByVal ZielNr As Integer) As Double
+        Dim i As Integer
+        Dim SimReihe(,) As Object = {}
+        Dim IsOK As Boolean
 
+        IsOK = ReadWEL(WorkDir & Datensatz & ".wel", OptZielReihe(ZielNr, 0), SimReihe)
+
+        Select Case OptZielReihe(ZielNr, 1)
+            Case "AbQuad"
+                For i = 0 To Zielreihe.GetUpperBound(1)
+                    QualitaetswertReihe = (Zielreihe(ZielNr, i, 1) - SimReihe(i, 1)) * (Zielreihe(ZielNr, i, 1) - SimReihe(i, 1))
+                Next
+
+            Case "Diff"
+                For i = 0 To Zielreihe.GetUpperBound(1)
+                    QualitaetswertReihe = Math.Abs(Zielreihe(ZielNr, i, 1) - SimReihe(i, 1))
+                Next
+            Case "Volf"
+
+        End Select
     End Function
 
 
