@@ -289,7 +289,7 @@ Friend Class Form1
             'Zielfunktionen werden eingelesen und die Anzahl wird übergeben
             'CHECK: Dadurch wird definiert Ob SO oder Pareto laufen soll, das überschreibt die Evo_Einstellungen
             Call BM_Form1.OptZielWerte_einlesen()
-            'Call BM_Form1.OptZielReiehen_einlesen()
+            'Call BM_Form1.OptZielReihen_einlesen()
             globalAnzZiel = BM_Form1.OptZielWert.GetLength(0) '+ BM_Form1.OptZielReihe.GetLength(0)
 
             'TODO: Randbedingungen
@@ -466,14 +466,11 @@ Start_Evolutionsrunden:
                     'Die neuen Eltern werden generiert
                     myIsOK = evolutionsstrategie.EsEltern()
 
+                    'Bestwerte und sekundäre Population
                     If evolutionsstrategie.isMultiObjective Then
                         myIsOK = evolutionsstrategie.EsGetBestwert(Bestwert)
-                        myIsOK = evolutionsstrategie.esGetSekundärePopulation(Population)
-                    End If
-
-                    'Bestwerte und sekundäre Population werden gezeichnet
-                    If evolutionsstrategie.isMultiObjective Then
                         'TODO: Call Bestwertzeichnen_Pareto(Bestwert, ipop)
+                        myIsOK = evolutionsstrategie.esGetSekundärePopulation(Population)
                         Call SekundärePopulationZeichnen(Population)
                     End If
 
@@ -710,7 +707,7 @@ ErrCode_ES_STARTEN:
             If Not isPareto Then
                 Zielfunktion_zeichnen_SingleOb(f1, durchlauf, ipop)
             Else
-
+                'TODO: Zielfunktion_zeichnen_Multiob()
             End If
 
         End If
