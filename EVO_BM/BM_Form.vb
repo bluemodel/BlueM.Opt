@@ -1,4 +1,5 @@
 Imports System.IO
+Imports System.Data.OleDb
 Public Class BM_Form
 
     'Public Properties
@@ -32,6 +33,9 @@ Public Class BM_Form
     Dim OptParameter_Pfad As String     'Pfad zur Datei mit den Optimierungsparametern (*.OPT)
     Dim OptZielWert_Pfad As String      'Pfad zur Datei mit Einzelwerten für die Zielfunktionen (*.ZIE)
     Dim OptZielReihe_Pfad As String     'Pfad zur Datei mit Reihen für die Zielfunktionen (*.ZIE)
+
+    'DB
+    Dim db As OleDb.OleDbConnection
 
     'Private Methoden
     '----------------
@@ -179,8 +183,37 @@ Public Class BM_Form
     'Public Methoden
     '-------------------------------------
 
+    'Optimierung initialisieren
+    Public Sub Initialisierung()
+        'Leere/Neue Ergebnisdatenbank in Arbeitsverzeichnis kopieren
+
+        Dim ZielDatei As String = WorkDir & Datensatz & "_EVO.mdb"
+        Dim overwrite As Boolean = True
+
+        'bei bestehender Ergebnisdatenbank nachfragen, ob überschrieben werden soll
+        If (File.Exists(ZielDatei)) Then
+            Dim response As MsgBoxResult
+            response = MsgBox("Bestehende Ergebnisdatenbank """ & ZielDatei & """ überschreiben?", MsgBoxStyle.YesNo, "Ergebnisdatenbank")
+            If (response = MsgBoxResult.No) Then
+                overwrite = False
+            End If
+        End If
+
+        'Ergebnisdatenbank kopieren
+        If (File.Exists(ZielDatei) = False Or overwrite = True) Then
+            Try
+                Dim currentDir As String = CurDir()     'sollte das /bin Verzeichnis von EVO_Anwendung sein
+                ChDir("../../EVO_BM")                   'wechselt in das /EVO_BM Verzeichnis 
+                My.Computer.FileSystem.CopyFile("EVO.mdb", ZielDatei, overwrite)
+                ChDir(currentDir)                       'zurück in das Ausgangsverzeichnis wechseln
+            Catch except As Exception
+                MsgBox("Ergebnisdatenbank konnte nicht ins Arbeitsverzeichnis kopiert werden:" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
+            End Try
+        End If
+    End Sub
+
     'Optimierungsparameter einlesen (*.OPT-Datei)
-    Public Sub ReadOptParameter()
+    Public Sub OptParameter_einlesen()
         Try
             Dim FiStr As FileStream = New FileStream(OptParameter_Pfad, FileMode.Open, IO.FileAccess.ReadWrite)
             Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -254,124 +287,141 @@ Public Class BM_Form
         Next
     End Sub
 
-    'Optimierungsziele einlesen (*.zie-Datei)
+    'Optimierungsziele - Werte - einlesen (*.zie-Datei)
     Public Sub OptZielWerte_einlesen()
-        Try
-            Dim FiStr As FileStream = New FileStream(OptZielWert_Pfad, FileMode.Open, IO.FileAccess.ReadWrite)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-            Dim Zeile As String = ""
-            Dim AnzZiele As Integer = 0
+        If OptZielWert_Pfad Is Nothing Then
+            ReDim OptZielWert(0, 0)
+            Exit Sub
+        Else
 
-            'Anzahl der Zielfunktionen feststellen
-            Do
-                Zeile = StrRead.ReadLine.ToString()
-                If (Zeile.StartsWith("*") = False) Then
-                    AnzZiele += 1
-                End If
-            Loop Until StrRead.Peek() = -1
+            Try
+                Dim FiStr As FileStream = New FileStream(OptZielWert_Pfad, FileMode.Open, IO.FileAccess.ReadWrite)
+                Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-            ReDim OptZielWert(AnzZiele - 1, 4)
+                Dim Zeile As String = ""
+                Dim AnzZiele As Integer = 0
 
-            'Zurück zum Dateianfang und lesen
-            FiStr.Seek(0, SeekOrigin.Begin)
+                'Anzahl der Zielfunktionen feststellen
+                Do
+                    Zeile = StrRead.ReadLine.ToString()
+                    If (Zeile.StartsWith("*") = False) Then
+                        AnzZiele += 1
+                    End If
+                Loop Until StrRead.Peek() = -1
 
-            'Einlesen der Zeile und übergeben an das OptZiel Array
-            Dim ZeilenArray(4) As String
-            Dim i As Integer = 0
-            Dim j As Integer = 0
+                ReDim OptZielWert(AnzZiele - 1, 4)
 
-            Do
-                Zeile = StrRead.ReadLine.ToString()
-                If (Zeile.StartsWith("*") = False) Then
-                    ZeilenArray = Zeile.Split("|")
-                    For j = 0 To 4
-                        OptZielWert(i, j) = ZeilenArray(j).Trim()
-                    Next
-                    i += 1
-                End If
-            Loop Until StrRead.Peek() = -1
+                'Zurück zum Dateianfang und lesen
+                FiStr.Seek(0, SeekOrigin.Begin)
 
-        Catch except As Exception
-            MsgBox("Fehler beim lesen der Optimierungsziel-Datei (Werte)" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
-        End Try
+                'Einlesen der Zeile und übergeben an das OptZiel Array
+                Dim ZeilenArray(4) As String
+                Dim i As Integer = 0
+                Dim j As Integer = 0
+
+                Do
+                    Zeile = StrRead.ReadLine.ToString()
+                    If (Zeile.StartsWith("*") = False) Then
+                        ZeilenArray = Zeile.Split("|")
+                        For j = 0 To 4
+                            OptZielWert(i, j) = ZeilenArray(j).Trim()
+                        Next
+                        i += 1
+                    End If
+                Loop Until StrRead.Peek() = -1
+
+            Catch except As Exception
+                MsgBox("Fehler beim lesen der Optimierungsziel-Datei (Werte)" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
+            End Try
+
+        End If
 
     End Sub
 
+    'Optimierungsziele - Reihen - einlesen (*.zie-Datei)
     Public Sub OptZielReihe_einlesen()
         Dim i As Integer = 0
         Dim j As Integer = 0
         Dim tmpstr As String
         Dim isOK As Boolean
-        Try
-            Dim FiStr As FileStream = New FileStream(OptZielReihe_Pfad, FileMode.Open, IO.FileAccess.ReadWrite)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-            Dim Zeile As String = ""
-            Dim AnzZiele As Integer = 0
+        If OptZielReihe_Pfad Is Nothing Then
+            ReDim OptZielReihe(0, 0)
+            Exit Sub
+        Else
 
-            'Anzahl der Zielfunktionen feststellen
-            Do
-                Zeile = StrRead.ReadLine.ToString()
-                If (Zeile.StartsWith("*") = False) Then
-                    AnzZiele += 1
-                End If
-            Loop Until StrRead.Peek() = -1
+            Try
+                Dim FiStr As FileStream = New FileStream(OptZielReihe_Pfad, FileMode.Open, IO.FileAccess.ReadWrite)
+                Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-            ReDim OptZielReihe(AnzZiele - 1, 4)
+                Dim Zeile As String = ""
+                Dim AnzZiele As Integer = 0
 
-            'Zurück zum Dateianfang und lesen
-            FiStr.Seek(0, SeekOrigin.Begin)
+                'Anzahl der Zielfunktionen feststellen
+                Do
+                    Zeile = StrRead.ReadLine.ToString()
+                    If (Zeile.StartsWith("*") = False) Then
+                        AnzZiele += 1
+                    End If
+                Loop Until StrRead.Peek() = -1
 
-            'Einlesen der Zeile und übergeben an das OptZiel Array
-            Dim ZeilenArray(4) As String
+                ReDim OptZielReihe(AnzZiele - 1, 4)
 
-            Do
-                Zeile = StrRead.ReadLine.ToString()
-                If (Zeile.StartsWith("*") = False) Then
-                    ZeilenArray = Zeile.Split("|")
-                    For j = 0 To 4
-                        OptZielReihe(i, j) = ZeilenArray(j).Trim
-                    Next
-                    i += 1
-                End If
-            Loop Until StrRead.Peek() = -1
+                'Zurück zum Dateianfang und lesen
+                FiStr.Seek(0, SeekOrigin.Begin)
 
-        Catch except As Exception
-            MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim lesen der OptZielReihe-Datei")
-        End Try
+                'Einlesen der Zeile und übergeben an das OptZiel Array
+                Dim ZeilenArray(4) As String
 
-        Try
-            Dim tmpReihe(,) As Object = {}
-            Dim x, y As Integer
-            For j = 0 To OptZielReihe.GetUpperBound(0)
-                tmpstr = OptZielReihe(j, 4).ToString.Substring(OptZielReihe(j, 4).ToString.LastIndexOf(".") + 1)
-                If tmpstr = "wel" Then
-                    isOK = ReadWEL(OptZielReihe(j, 4).ToString, OptZielReihe(j, 3), tmpReihe)
+                Do
+                    Zeile = StrRead.ReadLine.ToString()
+                    If (Zeile.StartsWith("*") = False) Then
+                        ZeilenArray = Zeile.Split("|")
+                        For j = 0 To 4
+                            OptZielReihe(i, j) = ZeilenArray(j).Trim
+                        Next
+                        i += 1
+                    End If
+                Loop Until StrRead.Peek() = -1
 
-                    'Zielreihe(j, )
-                ElseIf tmpstr = "zre" Then
-                    isOK = ReadZRE(OptZielReihe(j, 4).ToString, tmpReihe)
-                Else
+            Catch except As Exception
+                MsgBox("Fehler beim lesen der OptZielReihe-Datei" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
+            End Try
 
-                End If
-                ReDim Zielreihe(OptZielReihe.GetUpperBound(0), tmpReihe.GetUpperBound(0), tmpReihe.GetUpperBound(1))
+            Try
+                Dim tmpReihe(,) As Object = {}
+                Dim x, y As Integer
+                For j = 0 To OptZielReihe.GetUpperBound(0)
+                    tmpstr = OptZielReihe(j, 4).ToString.Substring(OptZielReihe(j, 4).ToString.LastIndexOf(".") + 1)
+                    If tmpstr = "wel" Then
+                        isOK = ReadWEL(OptZielReihe(j, 4).ToString, OptZielReihe(j, 3), tmpReihe)
 
-                For x = 0 To tmpReihe.GetUpperBound(0)
-                    For y = 0 To tmpReihe.GetUpperBound(1)
-                        Zielreihe(j, x, y) = tmpReihe(x, y)
+                        'Zielreihe(j, )
+                    ElseIf tmpstr = "zre" Then
+                        isOK = ReadZRE(OptZielReihe(j, 4).ToString, tmpReihe)
+                    Else
+
+                    End If
+                    ReDim Zielreihe(OptZielReihe.GetUpperBound(0), tmpReihe.GetUpperBound(0), tmpReihe.GetUpperBound(1))
+
+                    For x = 0 To tmpReihe.GetUpperBound(0)
+                        For y = 0 To tmpReihe.GetUpperBound(1)
+                            Zielreihe(j, x, y) = tmpReihe(x, y)
+                        Next
                     Next
                 Next
-            Next
-        Catch exception As Exception
+            Catch exception As Exception
+                'TODO: MsgBox
+            End Try
 
-        End Try
+        End If
 
     End Sub
 
 
-    'Die vom Optimierungsalgorithmus mutierten Parameter werden geschrieben
-    Public Sub Mutierte_Parameter_schreiben()
+    'Die Optimierungparameter in die BM-Eingabedateien schreiben
+    Public Sub OptParameter_schreiben()
         Dim Parameter As String
         Dim AnzZeil As Integer
         Dim j As Integer
@@ -446,7 +496,7 @@ Public Class BM_Form
         ChDir(currentDir)
     End Sub
 
-    'Der Qualitätswert wird durch Vergleich von Calculation Berechnet.
+    'Berechnung des Qualitätswerts (Zielwert)
     Public Function QualitaetswertWerte(ByVal ZielNr As Integer) As Double
         Dim i As Integer
         Dim SimReihe(,) As Object = {}
@@ -500,28 +550,34 @@ Public Class BM_Form
         End Select
     End Function
 
+    'Berechnung des Qualitätswerts (Zielreihe)
     Public Function QualitaetswertReihe(ByVal ZielNr As Integer) As Double
         Dim i As Integer
         Dim SimReihe(,) As Object = {}
         Dim IsOK As Boolean
 
+        'Simulationsergebnis lesen
         IsOK = ReadWEL(WorkDir & Datensatz & ".wel", OptZielReihe(ZielNr, 0), SimReihe)
 
+        'Qualitätswert berechnen
+        QualitaetswertReihe = 0
         Select Case OptZielReihe(ZielNr, 1)
             Case "AbQuad"
-                For i = 0 To Zielreihe.GetUpperBound(1)
-                    QualitaetswertReihe = (Zielreihe(ZielNr, i, 1) - SimReihe(i, 1)) * (Zielreihe(ZielNr, i, 1) - SimReihe(i, 1))
+                'Summe der Fehlerquadrate
+                For i = 0 To SimReihe.GetUpperBound(0)
+                    QualitaetswertReihe += (Zielreihe(ZielNr, i, 1) - SimReihe(i, 1)) * (Zielreihe(ZielNr, i, 1) - SimReihe(i, 1))
                 Next
-
             Case "Diff"
-                For i = 0 To Zielreihe.GetUpperBound(1)
-                    QualitaetswertReihe = Math.Abs(Zielreihe(ZielNr, i, 1) - SimReihe(i, 1))
+                'Summe der Fehler
+                For i = 0 To SimReihe.GetUpperBound(0)
+                    QualitaetswertReihe += Math.Abs(Zielreihe(ZielNr, i, 1) - SimReihe(i, 1))
                 Next
             Case "Volf"
-
+                'TODO: Volumenfehler
+            Case Else
+                'TODO: Fehlerbehandlung
         End Select
     End Function
-
 
     Public Function ReadZRE(ByVal DateiPfad As String, ByRef ZRE(,) As Object) As Boolean
 
@@ -627,5 +683,42 @@ Public Class BM_Form
         End Try
 
     End Function
+
+    'Update der DB mit QWerten und OptParametern
+    Public Function db_update(ByVal QWert_Bez As String, ByVal QWert As Double, ByVal durchlauf As Integer, ByVal ipop As Short) As Boolean
+        Call db_connect()
+
+        Try
+            Dim command As OleDbCommand = New OleDbCommand("", db)
+            'QWert schreiben 
+            'TODO: mehrere QWerte bei multikriterieller Optimierung
+            command.CommandText = "INSERT INTO QWerte (Bezeichnung, durchlauf, ipop, Qwert) VALUES ('" & QWert_Bez & "', " & durchlauf & ", " & ipop & ", " & QWert & ")"
+            command.ExecuteNonQuery()
+            'ID des zuletzt geschriebenen QWerts holen
+            command.CommandText = "SELECT @@IDENTITY AS id"
+            Dim QWert_ID As Integer = command.ExecuteScalar()
+
+            'Zugehörige OptParameter schreiben
+            Dim i As Integer
+            For i = 0 To OptParameter.GetUpperBound(0)
+                command.CommandText = "INSERT INTO OptParameter (Bezeichnung, Wert, QWert_ID) VALUES ('" & OptParameter(i, OPTPARA_BEZ) & "', " & OptParameter(i, OPTPARA_AWERT) & ", " & QWert_ID & ")"
+                command.ExecuteNonQuery()
+            Next
+        Catch except As Exception
+            MsgBox("Fehler beim aktualisieren der Ergebnisdatenbank" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
+        End Try
+
+        Call db_disconnect()
+    End Function
+
+    Private Sub db_connect()
+        Dim ConnectionString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & WorkDir & Datensatz & "_EVO.mdb"
+        db = New OleDb.OleDbConnection(ConnectionString)
+        db.Open()
+    End Sub
+
+    Private Sub db_disconnect()
+        db.Close()
+    End Sub
 
 End Class
