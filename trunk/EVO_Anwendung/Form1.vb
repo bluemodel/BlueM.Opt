@@ -4,7 +4,6 @@ Friend Class Form1
 
     Inherits System.Windows.Forms.Form
     Private IsInitializing As Boolean
-    'option Base 1O
 
     Dim myIsOK As Boolean
     Dim myisrun As Boolean
@@ -137,6 +136,7 @@ Friend Class Form1
         iEvoTyp = EVO_Einstellungen1.iEvoTyp
         iPopEvoTyp = EVO_Einstellungen1.iPopEvoTyp
         isPOPUL = EVO_Einstellungen1.isPOPUL
+        'TODO: isMultiObjective bei BM abhängig von Anzahl Zielfunktionen
         isMultiObjective = EVO_Einstellungen1.isMultiObjective
         NRunden = EVO_Einstellungen1.NRunden
         NPopul = EVO_Einstellungen1.NPopul
@@ -269,9 +269,12 @@ Friend Class Form1
             '*        BlauesModell         *
             '*******************************
 
+            'Initialisierung
+            Call BM_Form1.Initialisierung()
+
             'Optimierungsparameter
             'ACHTUNG: OptParameter fängt bei 0 an!
-            Call BM_Form1.ReadOptParameter()
+            Call BM_Form1.OptParameter_einlesen()
 
             globalAnzPar = BM_Form1.OptParameter.GetLength(0)
             ReDim mypara(globalAnzPar, 1)
@@ -522,7 +525,7 @@ EXIT_ES_STARTEN:
 Err_ES_STARTEN:
         Beep()
         MsgBox("ES_STARTEN: " & ErrorToString(), MsgBoxStyle.Critical)
-        Resume EXIT_ES_STARTEN
+        GoTo EXIT_ES_STARTEN
 ErrCode_ES_STARTEN:
         Beep()
         MsgBox("ES_STARTEN: " & Txt, MsgBoxStyle.Information)
@@ -686,13 +689,14 @@ ErrCode_ES_STARTEN:
             'Mutierte Parameter deskalieren
             Call BM_Form1.OptParameter_deskalieren()
 
-            'Mutierte Parameter schreiben
-            Call BM_Form1.Mutierte_Parameter_schreiben()
+            'Mutierte Parameter in Eingabedateien schreiben
+            Call BM_Form1.OptParameter_schreiben()
 
             'Modell Starten
             Call BM_Form1.launchBM()
 
             'Qualitätswert berechnen
+            'TODO: Anzahl Qualitätswerte hängt von Zielfunktionen ab
             'f1 = BM_Form1.QualitaetswertWerte(0)
             f1 = BM_Form1.QualitaetswertReihe(0)
 
@@ -707,10 +711,14 @@ ErrCode_ES_STARTEN:
 
             'Qualitätswert im TeeChart zeichnen
             If Not isPareto Then
-                Zielfunktion_zeichnen_SingleOb(f1, durchlauf, ipop)
+                Call Zielfunktion_zeichnen_SingleOb(f1, durchlauf, ipop)
             Else
                 'TODO: Zielfunktion_zeichnen_Multiob()
             End If
+
+            'Qualitätswert und OptParameter in DB speichern
+            'TODO: Bezeichnung des Qualitätswerts übergeben
+            Call BM_Form1.db_update("QWert_Bez", f1, durchlauf, ipop)
 
         End If
     End Function
@@ -1209,7 +1217,6 @@ ErrCode_ES_STARTEN:
         Dim Anzahl_Kalkulationen As Integer
         Dim Populationen As Short
         Dim i As Short
-        Dim X() As Double
 
         If EVO_Einstellungen1.isPOPUL Then
             Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden
@@ -1217,15 +1224,29 @@ ErrCode_ES_STARTEN:
             Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
         End If
 
-        ReDim X(globalAnzPar)
-        For i = 1 To globalAnzPar
-            X(i) = 10
-        Next i
+        'HACK: von Funktion Zielfunktion() hierher kopiert, 
+        'um Ausgangswert zu bekommen - eigene Funktion nötig!
+        '--------------------------------------------------------
 
-        Ausgangsergebnis = 0
-        For i = 1 To globalAnzPar
-            Ausgangsergebnis = Ausgangsergebnis + ((X(1) - X(i) ^ 2) ^ 2 + (X(i) - 1) ^ 2)
-        Next i
+        'Call BM_Form1.OptParameter_schreiben() 'geht an dieser Stelle nicht - d.h. es werden noch die in den Eingabedateien bestehenden Parameter für die Bestimmung des Anfangswerts verwendet
+
+        Dim f1, f2, f3 As Double
+        'Modell Starten
+        Call BM_Form1.launchBM()
+
+        'Qualitätswert berechnen
+        'TODO: Anzahl Qualitätswerte hängt von Zielfunktionen ab
+        'f1 = BM_Form1.QualitaetswertWerte(0)
+        f1 = BM_Form1.QualitaetswertReihe(0)
+
+        'f2 = BM_Form1.QualitaetswertWerte(1)
+        'f3 = BM_Form1.QualitaetswertWerte(2)
+        'f4 = BM_Form1.QualitaetswertWerte(3)
+
+        '---------------------------------------
+        'ENDE HACK
+
+        Ausgangsergebnis = f1
 
         ReDim array_y(Anzahl_Kalkulationen - 1)
         ReDim array_x(Anzahl_Kalkulationen - 1)
@@ -1264,9 +1285,9 @@ ErrCode_ES_STARTEN:
             .Chart.Axes.Bottom.Automatic = False
             .Chart.Axes.Bottom.Maximum = Anzahl_Kalkulationen
             .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Left.Automatic = False
-            .Chart.Axes.Left.Maximum = 100
-            .Chart.Axes.Left.Minimum = 0
+            .Chart.Axes.Left.Automatic = True
+            '.Chart.Axes.Left.Maximum = 100
+            '.Chart.Axes.Left.Minimum = 0
             .Chart.Axes.Left.Logarithmic = False
         End With
     End Sub
