@@ -7,7 +7,8 @@ Option Explicit On
 		MyBase.New()
 		'Dieser Aufruf ist für den Windows Form-Designer erforderlich.
 		InitializeComponent()
-		UserControl_Initialize()
+        UserControl_Initialize()
+        System.Windows.Forms.Application.EnableVisualStyles()
 	End Sub
 	'Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
 	Protected Overloads Overrides Sub Dispose(ByVal Disposing As Boolean)
