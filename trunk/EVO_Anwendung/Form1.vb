@@ -79,6 +79,7 @@ Friend Class Form1
     End Sub
 
     Private Sub Form1_Load(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles MyBase.Load
+        System.Windows.Forms.Application.EnableVisualStyles()
         'Fenstergröße klein (ohne BM)
         Me.Width = 720
         'Testprobleme für Single-Objective in ComboBox schreiben
