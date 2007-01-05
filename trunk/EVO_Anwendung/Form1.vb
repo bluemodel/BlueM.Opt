@@ -136,8 +136,7 @@ Friend Class Form1
         iEvoTyp = EVO_Einstellungen1.iEvoTyp
         iPopEvoTyp = EVO_Einstellungen1.iPopEvoTyp
         isPOPUL = EVO_Einstellungen1.isPOPUL
-        'TODO: isMultiObjective bei BM abhängig von Anzahl Zielfunktionen
-        isMultiObjective = EVO_Einstellungen1.isMultiObjective
+        isMultiObjective = EVO_Einstellungen1.isMultiObjective  'wird bei BM abhängig von Anzahl Zielfunktionen überschrieben
         NRunden = EVO_Einstellungen1.NRunden
         NPopul = EVO_Einstellungen1.NPopul
         NPopEltern = EVO_Einstellungen1.NPopEltern
@@ -294,6 +293,9 @@ Friend Class Form1
             Call BM_Form1.OptZielWerte_einlesen()
             Call BM_Form1.OptZielReihe_einlesen()
             globalAnzZiel = BM_Form1.OptZielWert.GetLength(0) + BM_Form1.OptZielReihe.GetLength(0)
+            If (globalAnzZiel > 1) Then
+                isMultiObjective = True
+            End If
 
             'TODO: Randbedingungen
             globalAnzRand = 2
@@ -487,7 +489,7 @@ Start_Evolutionsrunden:
                 System.Windows.Forms.Application.DoEvents()
 
                 'Einordnen der Qualitätsfunktion im PopulationsBestwertspeicher
-                myIsOK = evolutionsstrategie.EsPopBest
+                myIsOK = evolutionsstrategie.EsPopBest()
 
                 '***********************************************************************************************
                 'Ende Loop über alle Populationen
@@ -682,7 +684,7 @@ ErrCode_ES_STARTEN:
             '*************************************
 
             'Mutierte Parameter an OptParameter übergeben
-            For i = 1 To AnzPar
+            For i = 1 To AnzPar 'BUG 57
                 BM_Form1.OptParameter(i - 1, EVO_BM.BM_Form.OPTPARA_SKWERT) = Par(i, 1)     'OptParameter(i-1,*) weil Array bei 0 anfängt!
             Next
 
@@ -695,30 +697,41 @@ ErrCode_ES_STARTEN:
             'Modell Starten
             Call BM_Form1.launchBM()
 
-            'Qualitätswert berechnen
-            'TODO: Anzahl Qualitätswerte hängt von Zielfunktionen ab
-            'f1 = BM_Form1.QualitaetswertWerte(0)
-            f1 = BM_Form1.QualitaetswertReihe(0)
+            'Qualitätswerte berechnen
+            'BUG 57 im ganzen folgenden Block
+            Dim f() As Double
+            ReDim f(globalAnzZiel)
+            'QualitätswertReihen
+            Dim AnzQWReihen As Integer = BM_Form1.OptZielReihe.GetLength(0)
+            For i = 1 To AnzQWReihen
+                f(i) = BM_Form1.QualitaetswertReihe(i - 1)
+            Next
+            'QualitätswertWerte
+            Dim AnzQWWerte As Integer = BM_Form1.OptZielWert.GetLength(0)
+            For i = 1 To AnzQWWerte
+                f(AnzQWReihen + i) = BM_Form1.QualitaetswertWerte(i - 1)
+            Next
 
-            'f2 = BM_Form1.QualitaetswertWerte(1)
-            'f3 = BM_Form1.QualitaetswertWerte(2)
-            'f4 = BM_Form1.QualitaetswertWerte(3)
+            'Rückgabe der Qualitätswerte an den OptiAlgo
+            For i = 1 To globalAnzZiel 'BUG 57
+                QN(i) = f(i)
+            Next
 
-            'Rückgabe des Qualitätswertes an den OptiAlgo
-            QN(1) = f1
-            'QN(2) = f2
-            'QN(3) = f3
+            'Qualitätswerte im TeeChart zeichnen
+            Select Case globalAnzZiel
+                Case 1
+                    Call Zielfunktion_zeichnen_SingleOb(f(1), durchlauf, ipop)
+                Case 2
+                    Call Zielfunktion_zeichnen_MultiObPar_2D(f(1), f(2), ipop)
+                Case 3
+                    Call Zielfunktion_zeichnen_MultiObPar_3D(f(1), f(2), f(3))
+                Case Else
+                    'TODO: Call Zielfunktion_zeichnen_MultiObPar_XD()
+            End Select
 
-            'Qualitätswert im TeeChart zeichnen
-            If Not isPareto Then
-                Call Zielfunktion_zeichnen_SingleOb(f1, durchlauf, ipop)
-            Else
-                'TODO: Zielfunktion_zeichnen_Multiob()
-            End If
-
-            'Qualitätswert und OptParameter in DB speichern
-            'TODO: Bezeichnung des Qualitätswerts übergeben
-            Call BM_Form1.db_update("QWert_Bez", f1, durchlauf, ipop)
+            'Qualitätswerte und OptParameter in DB speichern
+            'TODO: Bezeichnungen der Qualitätswerte übergeben
+            Call BM_Form1.db_update("QWert_Bez", f, durchlauf, ipop)
 
         End If
     End Function
@@ -1281,14 +1294,16 @@ ErrCode_ES_STARTEN:
             Next i
 
             'Formatierung der Axen
-            'TODO: Axenbeschriftung = Zielfunktionen
-            .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Maximum = Anzahl_Kalkulationen
-            .Chart.Axes.Bottom.Minimum = 0
+            'TODO: Axenbeschriftung = Bezeichnung der Zielfunktionen
+            .Chart.Axes.Bottom.Title.Caption = "f1"
+            .Chart.Axes.Bottom.Automatic = True
+            '.Chart.Axes.Bottom.Maximum = Anzahl_Kalkulationen
+            '.Chart.Axes.Bottom.Minimum = 0
+            .Chart.Axes.Left.Title.Caption = "f2"
             .Chart.Axes.Left.Automatic = True
             '.Chart.Axes.Left.Maximum = 100
             '.Chart.Axes.Left.Minimum = 0
-            .Chart.Axes.Left.Logarithmic = False
+            '.Chart.Axes.Left.Logarithmic = False
         End With
     End Sub
 
@@ -1312,13 +1327,13 @@ ErrCode_ES_STARTEN:
 
     Private Sub Zielfunktion_zeichnen_SingleOb(ByRef Wert As Double, ByRef durchlauf As Integer, ByRef ipop As Short)
 
-        TChart1.Series(ipop).Add(durchlauf, Wert, "")
+        TChart1.Series(ipop).Add(durchlauf, Wert)
 
     End Sub
-    'TODO: ipop muss hier nicht übergeben werden das es bei Parato nur eine Population gibt
+    'TODO: ipop muss hier nicht übergeben werden das es bei Pareto nur eine Population gibt
     Private Sub Zielfunktion_zeichnen_MultiObPar_2D(ByRef f1 As Double, ByRef f2 As Double, ByRef ipop As Short)
 
-        TChart1.Series(0).Add(f1, f2, "")
+        TChart1.Series(1).Add(f1, f2)
 
     End Sub
 
@@ -1378,7 +1393,7 @@ ErrCode_ES_STARTEN:
     'TODO: Welchen Zweck hat das?
     Private Sub Par_Sinus_KeyPress(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.KeyPressEventArgs) Handles Text_Sinusfunktion_Par.KeyPress
         Dim KeyAscii As Short = Asc(eventArgs.KeyChar)
-        'TODO: UPGRADE_ISSUE: Zuweisung wird nicht unterstützt: KeyAscii an Nicht-Null-Wert Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1058"'
+        'UPGRADE_ISSUE: Zuweisung wird nicht unterstützt: KeyAscii an Nicht-Null-Wert Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1058"'
         KeyAscii = KEYOK(KeyAscii, AllowIntegerOnly)
         If KeyAscii = 0 Then
             eventArgs.Handled = True
