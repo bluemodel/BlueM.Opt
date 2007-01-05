@@ -382,7 +382,6 @@ Me.ResumeLayout(False)
         Dim NNachf As Short
     End Structure
 
-    'UPGRADE_NOTE: Property wurde aktualisiert auf Eigenschaft. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1061"'
     Dim Eigenschaft As EigenschaftTyp
 
     '********************************************************************

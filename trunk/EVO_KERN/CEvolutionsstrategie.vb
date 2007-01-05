@@ -664,15 +664,15 @@ ES_GET_SCHRITTWEITE_ERROR:
 
         ''Notwendig, falls auch die Variablenwerte für eine spätere Datensatzerstellung ausgelesen werden sollen (Dirk)
 
-        '    ReDim Population(UBound(SekundärQb), Property.varanz, Property.NPenalty + 1)
-        '    For i = 1 To UBound(SekundärQb)
-        '        For j = 1 To Property.varanz
-        '            Population(i, j, 1) = SekundärQb(i).X(j)
-        '            For k = 1 To Property.NPenalty
-        '                Population(i, j, k + 1) = SekundärQb(i).penalty(k)
-        '            Next k
-        '        Next j
-        '    Next i
+        'ReDim Population(UBound(SekundärQb), Eigenschaft.varanz, Eigenschaft.NPenalty + 1)
+        'For i = 1 To UBound(SekundärQb)
+        '    For j = 1 To Eigenschaft.varanz
+        '        Population(i, j, 1) = SekundärQb(i).X(j)
+        '        For k = 1 To Eigenschaft.NPenalty
+        '            Population(i, j, k + 1) = SekundärQb(i).penalty(k)
+        '        Next k
+        '    Next j
+        'Next i
 
         ReDim Population(UBound(SekundärQb), Eigenschaft.NPenalty)
         For i = 1 To UBound(SekundärQb)
@@ -1188,15 +1188,15 @@ ES_POP_VARIA_ERROR:
 
                     Call Neighbourhood_Eltern(PenaltyDistance, Elter, Eigenschaft.NRekombXY, IndexEltern)
                     For v = 1 To Eigenschaft.varanz
-                        '                    Do
-                        '                        Faktor = Rnd
-                        '                        Faktor = (-1) * Property.d + Faktor * (1 + Property.d)
-                        '                        'Selektion der Schrittweite
-                        '                        Property.Dn(v) = De(v, IndexEltern(1), Property.iaktuellePopulation) * Faktor + _
-                        ''                                         De(v, IndexEltern(2), Property.iaktuellePopulation) * (1 - Faktor)
-                        '                        Property.Xn(v) = Xe(v, IndexEltern(1), Property.iaktuellePopulation) * Faktor + _
-                        ''                                         Xe(v, IndexEltern(2), Property.iaktuellePopulation) * (1 - Faktor)
-                        '                    Loop While (Property.Xn(v) <= Property.Xmin(v) Or Property.Xn(v) > Property.Xmax(v))
+                        'Do
+                        '    Faktor = Rnd
+                        '    Faktor = (-1) * Eigenschaft.d + Faktor * (1 + Eigenschaft.d)
+                        '    'Selektion der Schrittweite
+                        '    Eigenschaft.Dn(v) = De(v, IndexEltern(1), Eigenschaft.iaktuellePopulation) * Faktor + _
+                        '                     De(v, IndexEltern(2), Eigenschaft.iaktuellePopulation) * (1 - Faktor)
+                        '    Eigenschaft.Xn(v) = Xe(v, IndexEltern(1), Eigenschaft.iaktuellePopulation) * Faktor + _
+                        '                     Xe(v, IndexEltern(2), Eigenschaft.iaktuellePopulation) * (1 - Faktor)
+                        'Loop While (Eigenschaft.Xn(v) <= Eigenschaft.Xmin(v) Or Eigenschaft.Xn(v) > Eigenschaft.Xmax(v))
 
                         R = Int(Eigenschaft.NRekombXY * Rnd() + 1)
                         'Selektion der Schrittweite
@@ -1875,7 +1875,6 @@ ES_POP_ELTERN_ERROR:
             End If
 
             For i = Member_Sekundärefront + 1 To Member_Sekundärefront + NFrontMember_aktuell
-                'UPGRADE_WARNING: Die Standardeigenschaft des Objekts SekundärQb(i) konnte nicht aufgelöst werden. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
                 SekundärQb(i) = NDSResult(i - Member_Sekundärefront)
             Next i
 
@@ -2042,7 +2041,6 @@ ES_ELTERN_ERROR:
         For i = 1 To UBound(NDSorting)
             If NDSorting(i).dominated = True Then
                 counter = counter + 1
-                'UPGRADE_WARNING: Die Standardeigenschaft des Objekts Temp(counter) konnte nicht aufgelöst werden. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
                 Temp(counter) = NDSorting(i)
             End If
         Next i
@@ -2052,7 +2050,6 @@ ES_ELTERN_ERROR:
         For i = 1 To UBound(NDSorting)
             If NDSorting(i).dominated = False Then
                 counter = counter + 1
-                'UPGRADE_WARNING: Die Standardeigenschaft des Objekts Temp(counter) konnte nicht aufgelöst werden. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
                 Temp(counter) = NDSorting(i)
             End If
         Next i
@@ -2083,7 +2080,6 @@ ES_ELTERN_ERROR:
         For i = 1 To UBound(NDSorting)
             If NDSorting(i).dominated = False Then
                 counter = counter + 1
-                'UPGRADE_WARNING: Die Standardeigenschaft des Objekts Temp(counter) konnte nicht aufgelöst werden. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
                 Temp(counter) = NDSorting(i)
             End If
         Next i
@@ -2093,7 +2089,6 @@ ES_ELTERN_ERROR:
         For i = 1 To UBound(NDSorting)
             If NDSorting(i).dominated = True Then
                 counter = counter + 1
-                'UPGRADE_WARNING: Die Standardeigenschaft des Objekts Temp(counter) konnte nicht aufgelöst werden. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
                 Temp(counter) = NDSorting(i)
             End If
         Next i
@@ -2114,7 +2109,6 @@ ES_ELTERN_ERROR:
         Position = NFrontMember_gesamt - NFrontMember_aktuell + 1
 
         For i = UBound(Temp) + 1 - NFrontMember_aktuell To UBound(Temp)
-            'UPGRADE_WARNING: Die Standardeigenschaft des Objekts NDSResult(Position) konnte nicht aufgelöst werden. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
             NDSResult(Position) = Temp(i)
             Position = Position + 1
         Next i
@@ -2160,11 +2154,8 @@ ES_ELTERN_ERROR:
             For i = start To ende
                 For j = start To ende
                     If NDSorting(i).penalty(k) < NDSorting(j).penalty(k) Then
-                        'UPGRADE_WARNING: Die Standardeigenschaft des Objekts swap konnte nicht aufgelöst werden. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
                         swap = NDSorting(i)
-                        'UPGRADE_WARNING: Die Standardeigenschaft des Objekts NDSorting(i) konnte nicht aufgelöst werden. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
                         NDSorting(i) = NDSorting(j)
-                        'UPGRADE_WARNING: Die Standardeigenschaft des Objekts NDSorting(j) konnte nicht aufgelöst werden. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
                         NDSorting(j) = swap
                     End If
                 Next j
@@ -2184,11 +2175,8 @@ ES_ELTERN_ERROR:
         For i = start To ende
             For j = start To ende
                 If NDSorting(i).distance > NDSorting(j).distance Then
-                    'UPGRADE_WARNING: Die Standardeigenschaft des Objekts swap konnte nicht aufgelöst werden. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
                     swap = NDSorting(i)
-                    'UPGRADE_WARNING: Die Standardeigenschaft des Objekts NDSorting(i) konnte nicht aufgelöst werden. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
                     NDSorting(i) = NDSorting(j)
-                    'UPGRADE_WARNING: Die Standardeigenschaft des Objekts NDSorting(j) konnte nicht aufgelöst werden. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
                     NDSorting(j) = swap
                 End If
             Next j
@@ -2358,11 +2346,8 @@ ES_ELTERN_ERROR:
         For i = 1 To UBound(Nachbarn)
             For j = i To UBound(Nachbarn)
                 If Nachbarn(i).distance > Nachbarn(j).distance Then
-                    'UPGRADE_WARNING: Die Standardeigenschaft des Objekts swap konnte nicht aufgelöst werden. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
                     swap = Nachbarn(i)
-                    'UPGRADE_WARNING: Die Standardeigenschaft des Objekts Nachbarn(i) konnte nicht aufgelöst werden. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
                     Nachbarn(i) = Nachbarn(j)
-                    'UPGRADE_WARNING: Die Standardeigenschaft des Objekts Nachbarn(j) konnte nicht aufgelöst werden. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
                     Nachbarn(j) = swap
                 End If
             Next
