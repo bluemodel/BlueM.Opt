@@ -24,9 +24,9 @@ Public Class BM_Form
     Public Const OPTPARA_LEN As Integer = 10    'Anzahl der für jeden Parameter gespeicherten Variablen
 
     'Zielfunktionsparameter
-    Public OptZielWert(,) As Object
-    Public OptZielReihe(,) As Object
-    Public Zielreihe(,,) As Object
+    Public OptZielWert(,) As Object = {}
+    Public OptZielReihe(,) As Object = {}
+    Public Zielreihe(,,) As Object = {}
 
     'Private Properties
     '-------------------
@@ -291,7 +291,6 @@ Public Class BM_Form
     Public Sub OptZielWerte_einlesen()
 
         If OptZielWert_Pfad Is Nothing Then
-            ReDim OptZielWert(0, 0)
             Exit Sub
         Else
 
@@ -347,7 +346,6 @@ Public Class BM_Form
         Dim isOK As Boolean
 
         If OptZielReihe_Pfad Is Nothing Then
-            ReDim OptZielReihe(0, 0)
             Exit Sub
         Else
 
@@ -573,9 +571,17 @@ Public Class BM_Form
                     QualitaetswertReihe += Math.Abs(Zielreihe(ZielNr, i, 1) - SimReihe(i, 1))
                 Next
             Case "Volf"
-                'TODO: Volumenfehler
+                'Volumenfehler
+                'TODO: Volumenfehler rechnet noch nicht echtes Volumen, dazu ist Zeitschrittweite notwendig
+                Dim VolSim As Double = 0
+                Dim VolZiel As Double = 0
+                For i = 0 To SimReihe.GetUpperBound(0)
+                    VolSim += SimReihe(i, 1)
+                    VolZiel += Zielreihe(ZielNr, i, 1)
+                Next
+                QualitaetswertReihe = Math.Abs(VolZiel - VolSim)
             Case Else
-                'TODO: Fehlerbehandlung
+                'TODO: Fehlerbehandlung MsgBox
         End Select
     End Function
 
@@ -685,24 +691,26 @@ Public Class BM_Form
     End Function
 
     'Update der DB mit QWerten und OptParametern
-    Public Function db_update(ByVal QWert_Bez As String, ByVal QWert As Double, ByVal durchlauf As Integer, ByVal ipop As Short) As Boolean
+    Public Function db_update(ByVal QWert_Bez As String, ByVal QWert() As Double, ByVal durchlauf As Integer, ByVal ipop As Short) As Boolean
         Call db_connect()
+
+        Dim i, j As Integer
 
         Try
             Dim command As OleDbCommand = New OleDbCommand("", db)
-            'QWert schreiben 
-            'TODO: mehrere QWerte bei multikriterieller Optimierung
-            command.CommandText = "INSERT INTO QWerte (Bezeichnung, durchlauf, ipop, Qwert) VALUES ('" & QWert_Bez & "', " & durchlauf & ", " & ipop & ", " & QWert & ")"
-            command.ExecuteNonQuery()
-            'ID des zuletzt geschriebenen QWerts holen
-            command.CommandText = "SELECT @@IDENTITY AS id"
-            Dim QWert_ID As Integer = command.ExecuteScalar()
-
-            'Zugehörige OptParameter schreiben
-            Dim i As Integer
-            For i = 0 To OptParameter.GetUpperBound(0)
-                command.CommandText = "INSERT INTO OptParameter (Bezeichnung, Wert, QWert_ID) VALUES ('" & OptParameter(i, OPTPARA_BEZ) & "', " & OptParameter(i, OPTPARA_AWERT) & ", " & QWert_ID & ")"
+            For i = 1 To QWert.GetUpperBound(0)
+                'QWert schreiben 
+                command.CommandText = "INSERT INTO QWerte (Bezeichnung, durchlauf, ipop, Qwert) VALUES ('" & QWert_Bez & "', " & durchlauf & ", " & ipop & ", " & QWert(i) & ")"
                 command.ExecuteNonQuery()
+                'ID des zuletzt geschriebenen QWerts holen
+                command.CommandText = "SELECT @@IDENTITY AS id"
+                Dim QWert_ID As Integer = command.ExecuteScalar()
+
+                'Zugehörige OptParameter schreiben
+                For j = 0 To OptParameter.GetUpperBound(0)
+                    command.CommandText = "INSERT INTO OptParameter (Bezeichnung, Wert, QWert_ID) VALUES ('" & OptParameter(j, OPTPARA_BEZ) & "', " & OptParameter(j, OPTPARA_AWERT) & ", " & QWert_ID & ")"
+                    command.ExecuteNonQuery()
+                Next
             Next
         Catch except As Exception
             MsgBox("Fehler beim aktualisieren der Ergebnisdatenbank" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
