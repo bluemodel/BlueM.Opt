@@ -291,9 +291,9 @@ Friend Class Form1
 
             'Zielfunktionen werden eingelesen und die Anzahl wird übergeben
             'CHECK: Dadurch wird definiert Ob SO oder Pareto laufen soll, das überschreibt die Evo_Einstellungen
-            Call BM_Form1.OptZielWerte_einlesen()
-            Call BM_Form1.OptZielReihe_einlesen()
-            globalAnzZiel = BM_Form1.OptZielWert.GetLength(0) + BM_Form1.OptZielReihe.GetLength(0)
+            Call BM_Form1.OptimierungsZiele_einlesen()
+            'Call BM_Form1.OptZielReihe_einlesen()
+            globalAnzZiel = BM_Form1.OptZieleListe.GetLength(0)
             If (globalAnzZiel > 1) Then
                 isMultiObjective = True
             End If
@@ -702,15 +702,11 @@ ErrCode_ES_STARTEN:
             'BUG 57 im ganzen folgenden Block
             Dim f() As Double
             ReDim f(globalAnzZiel)
-            'QualitätswertReihen
-            Dim AnzQWReihen As Integer = BM_Form1.OptZielReihe.GetLength(0)
-            For i = 1 To AnzQWReihen
-                f(i) = BM_Form1.QualitaetswertReihe(i - 1)
-            Next
-            'QualitätswertWerte
-            Dim AnzQWWerte As Integer = BM_Form1.OptZielWert.GetLength(0)
-            For i = 1 To AnzQWWerte
-                f(AnzQWReihen + i) = BM_Form1.QualitaetswertWerte(i - 1)
+
+            'QualitätswerteBerechnen
+            Dim AnzQualWerte As Integer = BM_Form1.OptZieleListe.GetLongLength(0)
+            For i = 1 To AnzQualWerte
+                f(i) = BM_Form1.QualitaetsWert(i - 1)
             Next
 
             'Rückgabe der Qualitätswerte an den OptiAlgo
@@ -1238,29 +1234,30 @@ ErrCode_ES_STARTEN:
             Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
         End If
 
-        'HACK: von Funktion Zielfunktion() hierher kopiert, 
-        'um Ausgangswert zu bekommen - eigene Funktion nötig!
-        '--------------------------------------------------------
+        ''HACK: von Funktion Zielfunktion() hierher kopiert, 
+        ''um Ausgangswert zu bekommen - eigene Funktion nötig!
+        ''--------------------------------------------------------
 
-        'Call BM_Form1.OptParameter_schreiben() 'geht an dieser Stelle nicht - d.h. es werden noch die in den Eingabedateien bestehenden Parameter für die Bestimmung des Anfangswerts verwendet
+        ''Call BM_Form1.OptParameter_schreiben() 'geht an dieser Stelle nicht - d.h. es werden noch die in den Eingabedateien bestehenden Parameter für die Bestimmung des Anfangswerts verwendet
 
-        Dim f1, f2, f3 As Double
-        'Modell Starten
-        Call BM_Form1.launchBM()
+        'Dim f1 As Double
+        ''Dim f2, f3 As Double
+        ''Modell Starten
+        'Call BM_Form1.launchBM()
 
-        'Qualitätswert berechnen
-        'TODO: Anzahl Qualitätswerte hängt von Zielfunktionen ab
-        'f1 = BM_Form1.QualitaetswertWerte(0)
-        f1 = BM_Form1.QualitaetswertReihe(0)
+        ''Qualitätswert berechnen
+        ''TODO: Anzahl Qualitätswerte hängt von Zielfunktionen ab
+        ''f1 = BM_Form1.QualitaetswertWerte(0)
+        'f1 = BM_Form1.QualitaetsWert(0)
 
-        'f2 = BM_Form1.QualitaetswertWerte(1)
-        'f3 = BM_Form1.QualitaetswertWerte(2)
-        'f4 = BM_Form1.QualitaetswertWerte(3)
+        ''f2 = BM_Form1.QualitaetswertWerte(1)
+        ''f3 = BM_Form1.QualitaetswertWerte(2)
+        ''f4 = BM_Form1.QualitaetswertWerte(3)
 
-        '---------------------------------------
-        'ENDE HACK
+        ''---------------------------------------
+        ''ENDE HACK
 
-        Ausgangsergebnis = f1
+        'Ausgangsergebnis = f1
 
         ReDim array_y(Anzahl_Kalkulationen - 1)
         ReDim array_x(Anzahl_Kalkulationen - 1)
