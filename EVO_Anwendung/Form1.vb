@@ -276,7 +276,7 @@ Friend Class Form1
             'ACHTUNG: OptParameter fängt bei 0 an!
             Call BM_Form1.OptParameter_einlesen()
 
-            globalAnzPar = BM_Form1.OptParameter.GetLength(0)
+            globalAnzPar = BM_Form1.OptParameterListe.GetLength(0)
             ReDim mypara(globalAnzPar, 1)
 
             'Parameterwerte skalieren
@@ -284,7 +284,7 @@ Friend Class Form1
 
             'Parameterwerte übergeben
             For i = 1 To globalAnzPar
-                mypara(i, 1) = BM_Form1.OptParameter(i - 1, EVO_BM.BM_Form.OPTPARA_SKWERT)
+                mypara(i, 1) = BM_Form1.OptParameterListe(i - 1).SKWert
             Next
 
             '----------------------------------------------
@@ -686,7 +686,7 @@ ErrCode_ES_STARTEN:
 
             'Mutierte Parameter an OptParameter übergeben
             For i = 1 To AnzPar 'BUG 57
-                BM_Form1.OptParameter(i - 1, EVO_BM.BM_Form.OPTPARA_SKWERT) = Par(i, 1)     'OptParameter(i-1,*) weil Array bei 0 anfängt!
+                BM_Form1.OptParameterListe(i - 1).SKWert = Par(i, 1)     'OptParameterListe(i-1,*) weil Array bei 0 anfängt!
             Next
 
             'Mutierte Parameter deskalieren
@@ -1313,8 +1313,8 @@ ErrCode_ES_STARTEN:
         Dim Unterteilung_X As Double
 
         Unterteilung_X = 2 * 3.141592654 / (AnzPar - 1)
-        ReDim array_x(AnzPar - 1) 'TODO: jetzt richtig?
-        ReDim array_y(AnzPar - 1) 'TODO: jetzt richtig?
+        ReDim array_x(AnzPar - 1)
+        ReDim array_y(AnzPar - 1)
         For i = 0 To AnzPar - 1
             array_x(i) = System.Math.Round((i) * Unterteilung_X, 2)
             array_y(i) = (-1 + Par(i + 1, 1) * 2)

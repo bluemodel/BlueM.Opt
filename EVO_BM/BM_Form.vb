@@ -4,24 +4,31 @@ Public Class BM_Form
 
     'Public Properties
     '------------------
-    Public Datensatz As String          'Name des zu simulierenden Datensatzes
-    Public WorkDir As String            'Arbeitsverzeichnis für das Blaue Modell
-    Public BM_Exe As String             'Pfad zu BlauesModell.exe
-    Public Ergebnis() As Single         'Array mit den berechneten Werten
+    Public Datensatz As String                      'Name des zu simulierenden Datensatzes
+    Public WorkDir As String                        'Arbeitsverzeichnis für das Blaue Modell
+    Public BM_Exe As String                         'Pfad zu BlauesModell.exe
 
     'Optimierungsparameter
-    Public OptParameter(,) As Object            'Array mit den Optimierungsparametern
-    Public Const OPTPARA_BEZ As Integer = 0         'Bezeichnung
-    Public Const OPTPARA_EINH As Integer = 1        'Einheit
-    Public Const OPTPARA_DATEI As Integer = 2       'Datei
-    Public Const OPTPARA_ZEILE As Integer = 3       'Zeile
-    Public Const OPTPARA_SP1 As Integer = 4         'Anfangsspalte
-    Public Const OPTPARA_SP2 As Integer = 5         'Endspalte
-    Public Const OPTPARA_AWERT As Integer = 6       'Anfangswert
-    Public Const OPTPARA_MIN As Integer = 7         'Minimum
-    Public Const OPTPARA_MAX As Integer = 8         'Maximum
-    Public Const OPTPARA_SKWERT As Integer = 9      'Skalierter Wert
-    Public Const OPTPARA_LEN As Integer = 10    'Anzahl der für jeden Parameter gespeicherten Variablen
+    Public Structure OptParameter       
+        Public Bezeichnung As String                'Bezeichnung
+        Public Einheit As String                    'Einheit
+        Public Datei As String                      'Dateiendung der BM-Eingabedatei
+        Public ZeileNr As Short                     'Zeile
+        Public Sp1 As Short                         'Anfangsspalte
+        Public Sp2 As Short                         'Endspalte
+        Public Wert As Double                       'Parameterwert
+        Public Min As Double                        'Minimum
+        Public Max As Double                        'Maximum
+        Public SKWert As Double                     'Skalierter Wert
+        Public Sub deskalieren()                    'deskaliert SKWert und schreibt ihn in Wert
+            Wert = SKWert * (Max - Min) + Min
+        End Sub
+        Public Sub skalieren()                      'skaliert Wert und schreibt ihn in SKWert
+            SKWert = (Wert - Min) / (Max - Min)
+        End Sub
+    End Structure
+
+    Public OptParameterListe() As OptParameter = {} 'Liste der Optimierungsparameter
 
     'Zielfunktionsparameter
     Public OptZielWert(,) As Object = {}
@@ -229,28 +236,27 @@ Public Class BM_Form
                 End If
             Loop Until StrRead.Peek() = -1
 
-            ReDim OptParameter(AnzParam - 1, OPTPARA_LEN - 1)
+            ReDim OptParameterListe(AnzParam - 1)
 
             'Zurück zum Dateianfang und lesen
             FiStr.Seek(0, SeekOrigin.Begin)
 
-            Dim Parameter(OPTPARA_LEN) As String
+            Dim array() As String
             Dim i As Integer = 0
-            Dim j As Integer
             Do
                 Zeile = StrRead.ReadLine.ToString()
                 If (Zeile.StartsWith("*") = False) Then
-                    Parameter = Zeile.Split("|")
-                    For j = 0 To OPTPARA_LEN - 1
-                        OptParameter(i, j) = Parameter(j + 1).Trim()
-                    Next
-                    'Typen verändern
-                    OptParameter(i, OPTPARA_ZEILE) = Convert.ToInt16(OptParameter(i, OPTPARA_ZEILE))
-                    OptParameter(i, OPTPARA_SP1) = Convert.ToInt16(OptParameter(i, OPTPARA_SP1))
-                    OptParameter(i, OPTPARA_SP2) = Convert.ToInt16(OptParameter(i, OPTPARA_SP2))
-                    OptParameter(i, OPTPARA_AWERT) = Convert.ToDouble(OptParameter(i, OPTPARA_AWERT))
-                    OptParameter(i, OPTPARA_MIN) = Convert.ToDouble(OptParameter(i, OPTPARA_MIN))
-                    OptParameter(i, OPTPARA_MAX) = Convert.ToDouble(OptParameter(i, OPTPARA_MAX))
+                    array = Zeile.Split("|")
+                    'Werte zuweisen
+                    OptParameterListe(i).Bezeichnung = array(1).Trim()
+                    OptParameterListe(i).Einheit = array(2).Trim()
+                    OptParameterListe(i).Datei = array(3).Trim()
+                    OptParameterListe(i).ZeileNr = Convert.ToInt16(array(4).Trim())
+                    OptParameterListe(i).Sp1 = Convert.ToInt16(array(5).Trim())
+                    OptParameterListe(i).Sp2 = Convert.ToInt16(array(6).Trim())
+                    OptParameterListe(i).Wert = Convert.ToDouble(array(7).Trim())
+                    OptParameterListe(i).Min = Convert.ToDouble(array(8).Trim())
+                    OptParameterListe(i).Max = Convert.ToDouble(array(9).Trim())
                     i += 1
                 End If
             Loop Until StrRead.Peek() = -1
@@ -260,30 +266,19 @@ Public Class BM_Form
         End Try
     End Sub
 
-    'skaliert AWERT und schreibt ihn in SKWERT
+    'skaliert alle OptParameter.Wert und schreibt sie in OptParameter.SKWert
     Public Sub OptParameter_skalieren()
-        Dim Min As Double
-        Dim Max As Double
-        Dim Param As Double
         'Schleife über alle Parameter
-        For i As Integer = 0 To OptParameter.GetUpperBound(0)
-            Param = OptParameter(i, OPTPARA_AWERT)
-            Min = OptParameter(i, OPTPARA_MIN)
-            Max = OptParameter(i, OPTPARA_MAX)
-            OptParameter(i, OPTPARA_SKWERT) = (Param - Min) / (Max - Min)
+        For i As Integer = 0 To OptParameterListe.GetUpperBound(0)
+            Call OptParameterListe(i).skalieren()
         Next
     End Sub
 
-    'deskaliert SKWERT und schreibt ihn in AWERT
+    'deskaliert alle OptParameter.SKWert und schreibt sie in OptParameter.Wert
     Public Sub OptParameter_deskalieren()
-        Dim Min As Double
-        Dim Max As Double
-        Dim Param As Double
-        For i As Integer = 0 To OptParameter.GetUpperBound(0)
-            Param = OptParameter(i, OPTPARA_SKWERT)
-            Min = OptParameter(i, OPTPARA_MIN)
-            Max = OptParameter(i, OPTPARA_MAX)
-            OptParameter(i, OPTPARA_AWERT) = Param * (Max - Min) + Min
+        'Schleife über alle Parameter
+        For i As Integer = 0 To OptParameterListe.GetUpperBound(0)
+            Call OptParameterListe(i).deskalieren()
         Next
     End Sub
 
@@ -420,19 +415,19 @@ Public Class BM_Form
 
     'Die Optimierungparameter in die BM-Eingabedateien schreiben
     Public Sub OptParameter_schreiben()
-        Dim Parameter As String
+        Dim Wert As String
         Dim AnzZeil As Integer
         Dim j As Integer
-        Dim Datei() As String
+        Dim Zeilenarray() As String
         Dim Zeile As String
         Dim StrLeft As String
         Dim StrRight As String
         Dim DateiPfad As String
 
-        'Alle Parameter durchlaufen
-        For i As Integer = 0 To OptParameter.GetUpperBound(0)
+        'Alle OptParameter durchlaufen
+        For i As Integer = 0 To OptParameterListe.GetUpperBound(0)
             Try
-                DateiPfad = WorkDir & Datensatz & "." & OptParameter(i, OPTPARA_DATEI)
+                DateiPfad = WorkDir & Datensatz & "." & OptParameterListe(i).Datei
                 'Datei öffnen
                 Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.Read)
                 Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -444,30 +439,30 @@ Public Class BM_Form
                     AnzZeil += 1
                 Loop Until StrRead.Peek() = -1
 
-                ReDim Datei(AnzZeil - 1)
+                ReDim Zeilenarray(AnzZeil - 1)
 
                 'Datei komplett einlesen
                 FiStr.Seek(0, SeekOrigin.Begin)
                 For j = 0 To AnzZeil - 1
-                    Datei(j) = StrRead.ReadLine.ToString
+                    Zeilenarray(j) = StrRead.ReadLine.ToString
                 Next
 
                 StrRead.Close()
                 FiStr.Close()
 
                 'Zeile ändern
-                Zeile = Datei(OptParameter(i, OPTPARA_ZEILE) - 1)
-                Dim Length As Short = OptParameter(i, OPTPARA_SP2) - OptParameter(i, OPTPARA_SP1)
-                StrLeft = Microsoft.VisualBasic.Left(Zeile, OptParameter(i, OPTPARA_SP1) - 1)
-                StrRight = Microsoft.VisualBasic.Right(Zeile, Len(Zeile) - OptParameter(i, OPTPARA_SP2) + 1)
+                Zeile = Zeilenarray(OptParameterListe(i).ZeileNr - 1)
+                Dim Length As Short = OptParameterListe(i).Sp2 - OptParameterListe(i).Sp1
+                StrLeft = Microsoft.VisualBasic.Left(Zeile, OptParameterListe(i).Sp1 - 1)
+                StrRight = Microsoft.VisualBasic.Right(Zeile, Len(Zeile) - OptParameterListe(i).Sp2 + 1)
                 'TODO: Parameter wird für erforderliche Stringlänge einfach abgeschnitten, sollte aber gerundet werden!
-                Parameter = OptParameter(i, OPTPARA_AWERT).ToString.Substring(0, Length)
-                Datei(OptParameter(i, OPTPARA_ZEILE) - 1) = StrLeft & Parameter & StrRight
+                Wert = OptParameterListe(i).Wert.ToString.Substring(0, Length)
+                Zeilenarray(OptParameterListe(i).ZeileNr - 1) = StrLeft & Wert & StrRight
 
                 'Alle Zeilen wieder in Datei schreiben
                 Dim StrWrite As StreamWriter = New StreamWriter(DateiPfad, False, System.Text.Encoding.GetEncoding("iso8859-1"))
                 For j = 0 To AnzZeil - 1
-                    StrWrite.WriteLine(Datei(j))
+                    StrWrite.WriteLine(Zeilenarray(j))
                 Next
 
                 StrWrite.Close()
@@ -707,8 +702,8 @@ Public Class BM_Form
                 Dim QWert_ID As Integer = command.ExecuteScalar()
 
                 'Zugehörige OptParameter schreiben
-                For j = 0 To OptParameter.GetUpperBound(0)
-                    command.CommandText = "INSERT INTO OptParameter (Bezeichnung, Wert, QWert_ID) VALUES ('" & OptParameter(j, OPTPARA_BEZ) & "', " & OptParameter(j, OPTPARA_AWERT) & ", " & QWert_ID & ")"
+                For j = 0 To OptParameterListe.GetUpperBound(0)
+                    command.CommandText = "INSERT INTO OptParameter (Bezeichnung, Wert, QWert_ID) VALUES ('" & OptParameterListe(j).Bezeichnung & "', " & OptParameterListe(j).Wert & ", " & QWert_ID & ")"
                     command.ExecuteNonQuery()
                 Next
             Next
