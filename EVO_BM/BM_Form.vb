@@ -30,15 +30,25 @@ Public Class BM_Form
 
     Public OptParameterListe() As OptParameter = {} 'Liste der Optimierungsparameter
 
-    'Zielfunktionsparameter
-    Public OptZielWert(,) As Object = {}
-    Public OptZielReihe(,) As Object = {}
-    Public Zielreihe(,,) As Object = {}
+    'Optimierungsziele
+    Public Structure OptZiele
+        Public Bezeichnung As String                'Bezeichnung
+        Public ZielTyp As String                    'Gibt an ob es sich um einen Wert oder um eine Reihe handelt
+        Public SpalteWel As String                  'Spalte der .wel Datei, die mit dem Ziel verglichen werden soll
+        Public ZielFkt As String                    'Zielfunktion
+        Public WertTyp As String                    'Gibt an welcher Wert aus der angegeben Spalte in der .wel Datei gewählt oder berechnet werden soll
+        Public ZielWert As String                   'Der vorgegeben Zielwert
+        Public SpalteZiel As String                 'Spalte der .wel Datei falls WelDatei
+        Public ZielReihePfad As String              'Der Pfad zur Zielreihe
+        Public ZielReihe(,) As Object               'Die Zielreihe
+    End Structure
+
+    Public OptZieleListe() As OptZiele = {}         'Liste der Zielfunktionnen
 
     'Private Properties
     '-------------------
     Dim OptParameter_Pfad As String     'Pfad zur Datei mit den Optimierungsparametern (*.OPT)
-    Dim OptZielWert_Pfad As String      'Pfad zur Datei mit Einzelwerten für die Zielfunktionen (*.ZIE)
+    Dim OptZiele_Pfad As String      'Pfad zur Datei mit Einzelwerten für die Zielfunktionen (*.ZIE)
     Dim OptZielReihe_Pfad As String     'Pfad zur Datei mit Reihen für die Zielfunktionen (*.ZIE)
 
     'DB
@@ -95,12 +105,9 @@ Public Class BM_Form
                         Case "OptParameter"
                             OptParameter_Pfad = Configs(i, 1)
                             TextBox_OptParameter_Pfad.Text = OptParameter_Pfad
-                        Case "OptZielWert"
-                            OptZielWert_Pfad = Configs(i, 1)
-                            Me.TextBox_OptZielWert_Pfad.Text = Me.OptZielWert_Pfad
-                        Case "OptZielReihe"
-                            OptZielReihe_Pfad = Configs(i, 1)
-                            Me.TextBox_OptZielReihe_Pfad.Text = Me.OptZielReihe_Pfad
+                        Case "OptZiele"
+                            OptZiele_Pfad = Configs(i, 1)
+                            Me.TextBox_OptZiele_Pfad.Text = Me.OptZiele_Pfad
                         Case Else
                             'nix
                     End Select
@@ -160,32 +167,19 @@ Public Class BM_Form
 
     'Optimierungsziele
     Private Sub Button_OptZielWert_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_OptZielWert.Click
-        Me.OpenFile_OptZielWert.ShowDialog()
+        Me.OpenFile_OptZiele.ShowDialog()
     End Sub
 
-    Private Sub OpenFile_OptZielWert_FileOk(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles OpenFile_OptZielWert.FileOk
+    Private Sub OpenFile_OptZielWert_FileOk(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles OpenFile_OptZiele.FileOk
 
         'Pfad zur Datei auslesen
-        Me.OptZielWert_Pfad = Me.OpenFile_OptZielWert.FileName
+        Me.OptZiele_Pfad = Me.OpenFile_OptZiele.FileName
 
         'Pfad in Textbox schreiben
-        Me.TextBox_OptZielWert_Pfad.Text = Me.OptZielWert_Pfad
+        Me.TextBox_OptZiele_Pfad.Text = Me.OptZiele_Pfad
 
     End Sub
 
-    Private Sub Button_OptZielReihe_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_OptZielReihe.Click
-        Me.OpenFile_OptZielReihe.ShowDialog()
-    End Sub
-
-    Private Sub OpenFile_OptZielReihe_FileOk(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles OpenFile_OptZielReihe.FileOk
-
-        'Pfad zur Datei auslesen
-        Me.OptZielReihe_Pfad = Me.OpenFile_OptZielReihe.FileName
-
-        'Pfad in Textbox schreiben
-        Me.TextBox_OptZielReihe_Pfad.Text = Me.OptZielReihe_Pfad
-
-    End Sub
 
     'Public Methoden
     '-------------------------------------
@@ -276,25 +270,30 @@ Public Class BM_Form
 
     'deskaliert alle OptParameter.SKWert und schreibt sie in OptParameter.Wert
     Public Sub OptParameter_deskalieren()
-        'Schleife über alle Parameter
+        'Schleife über alle ParametDim tmpstr As Stringer
         For i As Integer = 0 To OptParameterListe.GetUpperBound(0)
             Call OptParameterListe(i).deskalieren()
         Next
     End Sub
 
     'Optimierungsziele - Werte - einlesen (*.zie-Datei)
-    Public Sub OptZielWerte_einlesen()
+    Public Sub OptimierungsZiele_einlesen()
+        Dim AnzZiele As Integer = 0
+        Dim IsOK As Boolean
+        Dim tmpstr As String
+        Dim i As Integer = 0
+        Dim j As Integer = 0
 
-        If OptZielWert_Pfad Is Nothing Then
+        'Einlesen der Zielfunktionsdatei
+        If OptZiele_Pfad Is Nothing Then
             Exit Sub
         Else
 
             Try
-                Dim FiStr As FileStream = New FileStream(OptZielWert_Pfad, FileMode.Open, IO.FileAccess.ReadWrite)
+                Dim FiStr As FileStream = New FileStream(OptZiele_Pfad, FileMode.Open, IO.FileAccess.ReadWrite)
                 Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
                 Dim Zeile As String = ""
-                Dim AnzZiele As Integer = 0
 
                 'Anzahl der Zielfunktionen feststellen
                 Do
@@ -304,23 +303,27 @@ Public Class BM_Form
                     End If
                 Loop Until StrRead.Peek() = -1
 
-                ReDim OptZielWert(AnzZiele - 1, 4)
+                ReDim OptZieleListe(AnzZiele - 1)
 
                 'Zurück zum Dateianfang und lesen
                 FiStr.Seek(0, SeekOrigin.Begin)
 
-                'Einlesen der Zeile und übergeben an das OptZiel Array
-                Dim ZeilenArray(4) As String
-                Dim i As Integer = 0
-                Dim j As Integer = 0
+                'Einlesen der Zeile und übergeben an die OptimierungsZiele Liste
+                Dim ZeilenArray(7) As String
 
                 Do
                     Zeile = StrRead.ReadLine.ToString()
                     If (Zeile.StartsWith("*") = False) Then
                         ZeilenArray = Zeile.Split("|")
-                        For j = 0 To 4
-                            OptZielWert(i, j) = ZeilenArray(j).Trim()
-                        Next
+                        'Werte zuweisen
+                        OptZieleListe(i).Bezeichnung = ZeilenArray(0).Trim()
+                        OptZieleListe(i).ZielTyp = ZeilenArray(1).Trim()
+                        OptZieleListe(i).SpalteWel = ZeilenArray(2).Trim()
+                        OptZieleListe(i).ZielFkt = ZeilenArray(3).Trim()
+                        OptZieleListe(i).WertTyp = ZeilenArray(4).Trim()
+                        OptZieleListe(i).ZielWert = ZeilenArray(5).Trim()
+                        OptZieleListe(i).SpalteZiel = ZeilenArray(6).Trim()
+                        OptZieleListe(i).ZielReihePfad = ZeilenArray(7).Trim()
                         i += 1
                     End If
                 Loop Until StrRead.Peek() = -1
@@ -328,90 +331,26 @@ Public Class BM_Form
             Catch except As Exception
                 MsgBox("Fehler beim lesen der Optimierungsziel-Datei (Werte)" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
             End Try
-
         End If
 
+        'Falls mit Reihen verglichen werden soll werden hier die Reihen eingelesen
+        For i = 0 To AnzZiele - 1
+            If OptZieleListe(i).ZielTyp = "Reihe" Then
+
+                tmpstr = OptZieleListe(i).ZielReihePfad.ToString.Substring(OptZieleListe(i).ZielReihePfad.ToString.LastIndexOf(".") + 1)
+                If tmpstr = "wel" Then
+                    IsOK = ReadWEL(OptZieleListe(i).ZielReihePfad.ToString, OptZieleListe(i).SpalteZiel, OptZieleListe(i).ZielReihe)
+                ElseIf tmpstr = "zre" Then
+                    IsOK = ReadZRE(OptZieleListe(i).ZielReihePfad.ToString, OptZieleListe(i).ZielReihe)
+                End If
+
+                If (IsOK = False) Then
+                    'TODO: Fehlerbehandlung
+                End If
+
+            End If
+        Next
     End Sub
-
-    'Optimierungsziele - Reihen - einlesen (*.zie-Datei)
-    Public Sub OptZielReihe_einlesen()
-        Dim i As Integer = 0
-        Dim j As Integer = 0
-        Dim tmpstr As String
-        Dim isOK As Boolean
-
-        If OptZielReihe_Pfad Is Nothing Then
-            Exit Sub
-        Else
-
-            Try
-                Dim FiStr As FileStream = New FileStream(OptZielReihe_Pfad, FileMode.Open, IO.FileAccess.ReadWrite)
-                Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-
-                Dim Zeile As String = ""
-                Dim AnzZiele As Integer = 0
-
-                'Anzahl der Zielfunktionen feststellen
-                Do
-                    Zeile = StrRead.ReadLine.ToString()
-                    If (Zeile.StartsWith("*") = False) Then
-                        AnzZiele += 1
-                    End If
-                Loop Until StrRead.Peek() = -1
-
-                ReDim OptZielReihe(AnzZiele - 1, 4)
-
-                'Zurück zum Dateianfang und lesen
-                FiStr.Seek(0, SeekOrigin.Begin)
-
-                'Einlesen der Zeile und übergeben an das OptZiel Array
-                Dim ZeilenArray(4) As String
-
-                Do
-                    Zeile = StrRead.ReadLine.ToString()
-                    If (Zeile.StartsWith("*") = False) Then
-                        ZeilenArray = Zeile.Split("|")
-                        For j = 0 To 4
-                            OptZielReihe(i, j) = ZeilenArray(j).Trim
-                        Next
-                        i += 1
-                    End If
-                Loop Until StrRead.Peek() = -1
-
-            Catch except As Exception
-                MsgBox("Fehler beim lesen der OptZielReihe-Datei" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
-            End Try
-
-            Try
-                Dim tmpReihe(,) As Object = {}
-                Dim x, y As Integer
-                For j = 0 To OptZielReihe.GetUpperBound(0)
-                    tmpstr = OptZielReihe(j, 4).ToString.Substring(OptZielReihe(j, 4).ToString.LastIndexOf(".") + 1)
-                    If tmpstr = "wel" Then
-                        isOK = ReadWEL(OptZielReihe(j, 4).ToString, OptZielReihe(j, 3), tmpReihe)
-
-                        'Zielreihe(j, )
-                    ElseIf tmpstr = "zre" Then
-                        isOK = ReadZRE(OptZielReihe(j, 4).ToString, tmpReihe)
-                    Else
-
-                    End If
-                    ReDim Zielreihe(OptZielReihe.GetUpperBound(0), tmpReihe.GetUpperBound(0), tmpReihe.GetUpperBound(1))
-
-                    For x = 0 To tmpReihe.GetUpperBound(0)
-                        For y = 0 To tmpReihe.GetUpperBound(1)
-                            Zielreihe(j, x, y) = tmpReihe(x, y)
-                        Next
-                    Next
-                Next
-            Catch exception As Exception
-                'TODO: MsgBox
-            End Try
-
-        End If
-
-    End Sub
-
 
     'Die Optimierungparameter in die BM-Eingabedateien schreiben
     Public Sub OptParameter_schreiben()
@@ -490,94 +429,91 @@ Public Class BM_Form
     End Sub
 
     'Berechnung des Qualitätswerts (Zielwert)
-    Public Function QualitaetswertWerte(ByVal ZielNr As Integer) As Double
+    Public Function QualitaetsWert(ByVal ZielNr As Integer) As Double
         Dim i As Integer
         Dim SimReihe(,) As Object = {}
         Dim SimWert As Single
+
         Dim IsOK As Boolean
-
-        IsOK = ReadWEL(WorkDir & Datensatz & ".wel", OptZielWert(ZielNr, 0), SimReihe)
-
+        IsOK = ReadWEL(WorkDir & Datensatz & ".wel", OptZieleListe(ZielNr).SpalteWel, SimReihe)
         If (IsOK = False) Then
             'TODO: Fehlerbehandlung
         End If
 
-        Select Case OptZielWert(ZielNr, 1)
-            Case "MaxWert"
-                SimWert = 0
-                For i = 0 To SimReihe.GetUpperBound(0)
-                    If SimReihe(i, 1) > SimWert Then
-                        SimWert = SimReihe(i, 1)
-                    End If
-                Next
-            Case "MinWert"
-                SimWert = 999999999999999999
-                For i = 0 To SimReihe.GetUpperBound(0)
-                    If SimReihe(i, 1) < SimWert Then
-                        SimWert = SimReihe(i, 1)
-                    End If
-                Next
-            Case "Average"
-                SimWert = 0
-                For i = 0 To SimReihe.GetUpperBound(0)
-                    SimWert += SimReihe(i, 1)
-                Next
-                SimWert = SimWert / SimReihe.GetLength(0)
-            Case "AnfWert"
-                SimWert = SimReihe(0, 1)
-            Case "EndWert"
-                SimWert = SimReihe(SimReihe.GetUpperBound(0), 1)
-            Case Else
-                'TODO: Fehlerbehandlung
-        End Select
+        '------------------------------------------
+        'Ermittlung des Wertes Fall ZielTyp Reihe -
+        '------------------------------------------
 
-        Select Case OptZielWert(ZielNr, 2)
-            Case "AbQuad"
-                QualitaetswertWerte = (OptZielWert(ZielNr, 4) - SimWert) * (OptZielWert(ZielNr, 4) - SimWert)
-            Case "Diff"
-                QualitaetswertWerte = Math.Abs(OptZielWert(ZielNr, 4) - SimWert)
-            Case "Volf"
-                'TODO: Volumenfehler
-            Case Else
-                'TODO: Fehlerbehandlung
-        End Select
-    End Function
+        If (OptZieleListe(ZielNr).ZielTyp = "Wert") Then
+            Select Case OptZieleListe(ZielNr).WertTyp
+                Case "MaxWert"
+                    SimWert = 0
+                    For i = 0 To SimReihe.GetUpperBound(0)
+                        If SimReihe(i, 1) > SimWert Then
+                            SimWert = SimReihe(i, 1)
+                        End If
+                    Next
+                Case "MinWert"
+                    SimWert = 999999999999999999
+                    For i = 0 To SimReihe.GetUpperBound(0)
+                        If SimReihe(i, 1) < SimWert Then
+                            SimWert = SimReihe(i, 1)
+                        End If
+                    Next
+                Case "Average"
+                    SimWert = 0
+                    For i = 0 To SimReihe.GetUpperBound(0)
+                        SimWert += SimReihe(i, 1)
+                    Next
+                    SimWert = SimWert / SimReihe.GetLength(0)
+                Case "AnfWert"
+                    SimWert = SimReihe(0, 1)
+                Case "EndWert"
+                    SimWert = SimReihe(SimReihe.GetUpperBound(0), 1)
+                Case Else
+                    'TODO: Fehlerbehandlung
+            End Select
+        End If
 
-    'Berechnung des Qualitätswerts (Zielreihe)
-    Public Function QualitaetswertReihe(ByVal ZielNr As Integer) As Double
-        Dim i As Integer
-        Dim SimReihe(,) As Object = {}
-        Dim IsOK As Boolean
+        '--------------------------------------------------------
+        'Berechnung der Zielfunktionen entweder Wert oder Reihe -
+        '--------------------------------------------------------
 
-        'Simulationsergebnis lesen
-        IsOK = ReadWEL(WorkDir & Datensatz & ".wel", OptZielReihe(ZielNr, 0), SimReihe)
+        'Summe der Fehlerquadrate
+        '----------------------------
+        If OptZieleListe(ZielNr).ZielFkt = "AbQuad" And OptZieleListe(ZielNr).ZielTyp = "Wert" Then
+            QualitaetsWert = (OptZieleListe(ZielNr).ZielWert - SimWert) * (OptZieleListe(ZielNr).ZielWert - SimWert)
+        ElseIf OptZieleListe(ZielNr).ZielFkt = "AbQuad" And OptZieleListe(ZielNr).ZielTyp = "Reihe" Then
+            For i = 0 To SimReihe.GetUpperBound(0)
+                QualitaetsWert += (OptZieleListe(ZielNr).ZielReihe(i, 1) - SimReihe(i, 1)) * (OptZieleListe(ZielNr).ZielReihe(i, 1) - SimReihe(i, 1))
+            Next
 
-        'Qualitätswert berechnen
-        QualitaetswertReihe = 0
-        Select Case OptZielReihe(ZielNr, 1)
-            Case "AbQuad"
-                'Summe der Fehlerquadrate
-                For i = 0 To SimReihe.GetUpperBound(0)
-                    QualitaetswertReihe += (Zielreihe(ZielNr, i, 1) - SimReihe(i, 1)) * (Zielreihe(ZielNr, i, 1) - SimReihe(i, 1))
-                Next
-            Case "Diff"
-                'Summe der Fehler
-                For i = 0 To SimReihe.GetUpperBound(0)
-                    QualitaetswertReihe += Math.Abs(Zielreihe(ZielNr, i, 1) - SimReihe(i, 1))
-                Next
-            Case "Volf"
-                'Volumenfehler
-                'TODO: Volumenfehler rechnet noch nicht echtes Volumen, dazu ist Zeitschrittweite notwendig
-                Dim VolSim As Double = 0
-                Dim VolZiel As Double = 0
-                For i = 0 To SimReihe.GetUpperBound(0)
-                    VolSim += SimReihe(i, 1)
-                    VolZiel += Zielreihe(ZielNr, i, 1)
-                Next
-                QualitaetswertReihe = Math.Abs(VolZiel - VolSim)
-            Case Else
-                'TODO: Fehlerbehandlung MsgBox
-        End Select
+            'Summe der Fehler
+            '--------------------------            
+        ElseIf OptZieleListe(ZielNr).ZielFkt = "Diff" And OptZieleListe(ZielNr).ZielTyp = "Wert" Then
+            QualitaetsWert = Math.Abs(OptZieleListe(ZielNr).ZielWert - SimWert)
+        ElseIf OptZieleListe(ZielNr).ZielFkt = "Diff" And OptZieleListe(ZielNr).ZielTyp = "Reihe" Then
+            For i = 0 To SimReihe.GetUpperBound(0)
+                QualitaetsWert += Math.Abs(OptZieleListe(ZielNr).ZielReihe(i, 1) - SimReihe(i, 1))
+            Next
+
+            'Volumenfehler
+            '--------------------------
+        ElseIf OptZieleListe(ZielNr).ZielFkt = "Volf" And OptZieleListe(ZielNr).ZielTyp = "Wert" Then
+            'TODO MSGBox Fehler in der Zielfunktionsdatei: Volumenfehler kann nicht mit einzelnen Werten gerechnet werden
+        ElseIf OptZieleListe(ZielNr).ZielFkt = "Volf" And OptZieleListe(ZielNr).ZielTyp = "Reihe" Then
+            'TODO: Volumenfehler rechnet noch nicht echtes Volumen, dazu ist Zeitschrittweite notwendig
+            Dim VolSim As Double = 0
+            Dim VolZiel As Double = 0
+            For i = 0 To SimReihe.GetUpperBound(0)
+                VolSim += SimReihe(i, 1)
+                VolZiel += OptZieleListe(ZielNr).ZielReihe(i, 1)
+            Next
+            QualitaetsWert = Math.Abs(VolZiel - VolSim)
+        Else
+            'TODO:MsgBox Fehler in der Zielfunktionsdatei
+        End If
+
     End Function
 
     Public Function ReadZRE(ByVal DateiPfad As String, ByRef ZRE(,) As Object) As Boolean
@@ -723,5 +659,4 @@ Public Class BM_Form
     Private Sub db_disconnect()
         db.Close()
     End Sub
-
 End Class
