@@ -10,7 +10,6 @@ Friend Class Form1
     Dim globalAnzPar As Short
     Dim globalAnzZiel As Short
     Dim globalAnzRand As Short
-    Dim OptErg() As Double
     Dim array_x() As Double
     Dim array_y() As Double
     Dim Bestwert(,) As Double
@@ -174,7 +173,7 @@ Friend Class Form1
                     For i = 1 To globalAnzPar
                         mypara(i, 1) = 0
                     Next
-                    Call TeeChartInitialise_SO_Sinuskurve()
+                    Call TeeChartInitialise_So()
                 Case "Beale-Problem" 'x1 = [-5;5], x2=[-2;2]
                     globalAnzPar = 2
                     globalAnzZiel = 1
@@ -182,7 +181,7 @@ Friend Class Form1
                     ReDim mypara(globalAnzPar, 1)
                     mypara(1, 1) = 0.5
                     mypara(2, 1) = 0.5
-                    Call TeeChartInitialise_SO_Beale()
+                    Call TeeChartInitialise_So()
                 Case "Schwefel 2.4-Problem" 'xi = [-10,10]
                     globalAnzPar = CShort(Text_Schwefel24_Par.Text)
                     globalAnzZiel = 1
@@ -191,7 +190,7 @@ Friend Class Form1
                     For i = 1 To globalAnzPar
                         mypara(i, 1) = 1
                     Next i
-                    Call TeeChartInitialise_SO_Schwefel24()
+                    Call TeeChartInitialise_So()
                 Case "Deb 1" 'x1 = [0.1;1], x2=[0;5]
                     globalAnzPar = 2
                     globalAnzZiel = 2
@@ -736,60 +735,16 @@ ErrCode_ES_STARTEN:
         End If
     End Function
 
-    Private Sub TeeChartInitialise_SO_Sinuskurve()
-        Dim i As Short
-        Dim Datenmenge As Short
-        Dim Unterteilung_X As Double
-        Dim Anzahl_Kalkulationen As Integer
-        Dim Populationen As Short
 
-        Datenmenge = CShort(Text_Sinusfunktion_Par.Text)
-        If EVO_Einstellungen1.isPOPUL Then
-            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden
-        Else
-            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
-        End If
-
-        Unterteilung_X = 2 * 3.141592654 / (Datenmenge - 1)
-
-        ReDim array_x(Datenmenge - 1)
-        ReDim array_y(Datenmenge - 1)
-
-        For i = 0 To Datenmenge - 1
-            array_x(i) = System.Math.Round((i) * Unterteilung_X, 2)
-            array_y(i) = System.Math.Sin((i) * Unterteilung_X)
-        Next i
-
-        With TChart1
-            .Clear()
-            .Header.Text = "Anpassung an Sinus-Kurve"
-            .Chart.Axes.Left.Title.Caption = "Funktionswert"
-            .Chart.Axes.Bottom.Title.Caption = "Stützstelle"
-            .Aspect.View3D = False
-            .Legend.Visible = False
-            Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-            Line1.Add(array_x, array_y)
-            Populationen = 1
-            If EVO_Einstellungen1.isPOPUL Then
-                Populationen = EVO_Einstellungen1.NPopul
-            End If
-            For i = 1 To Populationen
-                Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)   '$ Variablenname Point1 wird in der Schleife mehrmals verwendet!
-            Next i
-            .Chart.Axes.Bottom.Automatic = True
-            .Chart.Axes.Left.Automatic = False
-            .Chart.Axes.Left.Minimum = -1
-            .Chart.Axes.Left.Maximum = 1
-            .Chart.Axes.Left.Increment = 0.2
-        End With
-
-    End Sub
-
-    Private Sub TeeChartInitialise_SO_Beale()
+    Private Sub TeeChartInitialise_So()
         Dim Ausgangsergebnis As Double
         Dim Anzahl_Kalkulationen As Integer
         Dim Populationen As Short
         Dim i As Short
+        Dim Datenmenge As Short
+        Dim Unterteilung_X As Double
+        Dim OptErg() As Double
+        Dim X() As Double
 
         If EVO_Einstellungen1.isPOPUL Then
             Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden
@@ -797,20 +752,46 @@ ErrCode_ES_STARTEN:
             Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
         End If
 
-        ReDim OptErg(Anzahl_Kalkulationen)
+        Select Case Combo_Testproblem.Text
+            Case "Sinus-Funktion"
+                Datenmenge = CShort(Text_Sinusfunktion_Par.Text)
+                Unterteilung_X = 2 * 3.141592654 / (Datenmenge - 1)
 
-        Ausgangsergebnis = (1.5 - 0.5 * (1 - 0.5)) ^ 2 + (2.25 - 0.5 * (1 - 0.5) ^ 2) ^ 2 + (2.625 - 0.5 * (1 - 0.5) ^ 3) ^ 2
+            Case "Beale-Problem"
+                ReDim OptErg(Anzahl_Kalkulationen)
+                Ausgangsergebnis = (1.5 - 0.5 * (1 - 0.5)) ^ 2 + (2.25 - 0.5 * (1 - 0.5) ^ 2) ^ 2 + (2.625 - 0.5 * (1 - 0.5) ^ 3) ^ 2
+            Case "Schwefel 2.4-Problem"
+                ReDim X(globalAnzPar)
+                For i = 1 To globalAnzPar
+                    X(i) = 10
+                Next i
+                Ausgangsergebnis = 0
+                For i = 1 To globalAnzPar
+                    Ausgangsergebnis = Ausgangsergebnis + ((X(1) - X(i) ^ 2) ^ 2 + (X(i) - 1) ^ 2)
+                Next i
+        End Select
 
-        ReDim array_y(Anzahl_Kalkulationen - 1)
-        ReDim array_x(Anzahl_Kalkulationen - 1)
-        For i = 0 To Anzahl_Kalkulationen - 1
-            array_y(i) = Ausgangsergebnis
-            array_x(i) = i + 1
-        Next i
+        Select Case Combo_Testproblem.Text
+            Case "Sinus-Funktion"
+                ReDim array_x(Datenmenge - 1)
+                ReDim array_y(Datenmenge - 1)
+
+                For i = 0 To Datenmenge - 1
+                    array_x(i) = System.Math.Round((i) * Unterteilung_X, 2)
+                    array_y(i) = System.Math.Sin((i) * Unterteilung_X)
+                Next i
+            Case "Beale-Problem", "Schwefel 2.4-Problem"
+                ReDim array_y(Anzahl_Kalkulationen - 1)
+                ReDim array_x(Anzahl_Kalkulationen - 1)
+                For i = 0 To Anzahl_Kalkulationen - 1
+                    array_y(i) = Ausgangsergebnis
+                    array_x(i) = i + 1
+                Next i
+        End Select
 
         With TChart1
             .Clear()
-            .Header.Text = "Beale-Problem-Funktionswerte"
+            .Header.Text = Combo_Testproblem.Text
             .Chart.Axes.Left.Title.Caption = "Funktionswert"
             .Chart.Axes.Bottom.Title.Caption = "Berechnungsschritt"
             .Aspect.View3D = False
@@ -843,73 +824,14 @@ ErrCode_ES_STARTEN:
             .Chart.Axes.Left.Maximum = Ausgangsergebnis * 1.3
             .Chart.Axes.Left.Minimum = 0
             .Chart.Axes.Left.Logarithmic = False
-        End With
 
-    End Sub
-
-    Private Sub TeeChartInitialise_SO_Schwefel24()
-        Dim Ausgangsergebnis As Double
-        Dim Anzahl_Kalkulationen As Integer
-        Dim Populationen As Short
-        Dim i As Short
-        Dim X() As Double
-
-        If EVO_Einstellungen1.isPOPUL Then
-            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden
-        Else
-            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
-        End If
-
-        ReDim X(globalAnzPar)
-        For i = 1 To globalAnzPar
-            X(i) = 10
-        Next i
-
-        Ausgangsergebnis = 0
-        For i = 1 To globalAnzPar
-            Ausgangsergebnis = Ausgangsergebnis + ((X(1) - X(i) ^ 2) ^ 2 + (X(i) - 1) ^ 2)
-        Next i
-
-        ReDim array_y(Anzahl_Kalkulationen - 1)
-        ReDim array_x(Anzahl_Kalkulationen - 1)
-        For i = 0 To Anzahl_Kalkulationen - 1
-            array_y(i) = Ausgangsergebnis
-            array_x(i) = i + 1
-        Next i
-
-        With TChart1
-            .Clear()
-            .Header.Text = "Schwefel-Problem 2.4"
-            .Aspect.View3D = False
-            .Legend.Visible = False
-
-            'Linie der Anfangswerte 
-            Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-            Line1.Add(array_x, array_y)
-            Line1.Color = System.Drawing.Color.Red
-
-            'Anzahl Populationen
-            Populationen = 1
-            If EVO_Einstellungen1.isPOPUL Then
-                Populationen = EVO_Einstellungen1.NPopul
+            If Combo_Testproblem.Text = "Sinus-Funktion" Then
+                .Chart.Axes.Bottom.Automatic = True
+                .Chart.Axes.Left.Automatic = False
+                .Chart.Axes.Left.Minimum = -1
+                .Chart.Axes.Left.Maximum = 1
+                .Chart.Axes.Left.Increment = 0.2
             End If
-
-            'Für jede Population eine Series
-            For i = 1 To Populationen
-                Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
-                Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-                Point1.Pointer.HorizSize = 3
-                Point1.Pointer.VertSize = 3
-            Next i
-
-            'Formatierung der Axen
-            .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Maximum = Anzahl_Kalkulationen
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Left.Automatic = False
-            .Chart.Axes.Left.Maximum = Ausgangsergebnis * 1.2
-            .Chart.Axes.Left.Minimum = -1
-            .Chart.Axes.Left.Logarithmic = False
         End With
     End Sub
 
@@ -1243,29 +1165,6 @@ ErrCode_ES_STARTEN:
         For i = 1 To globalAnzPar
             X(i) = 10
         Next i
-
-        ''HACK: von Funktion Zielfunktion() hierher kopiert, 
-        ''um Ausgangswert zu bekommen - eigene Funktion nötig!
-        ''--------------------------------------------------------
-
-        ''Call BM_Form1.OptParameter_schreiben() 'geht an dieser Stelle nicht - d.h. es werden noch die in den Eingabedateien bestehenden Parameter für die Bestimmung des Anfangswerts verwendet
-
-        'Dim f1 As Double
-        ''Dim f2, f3 As Double
-        ''Modell Starten
-        'Call BM_Form1.launchBM()
-
-        ''Qualitätswert berechnen
-        ''TODO: Anzahl Qualitätswerte hängt von Zielfunktionen ab
-        ''f1 = BM_Form1.QualitaetswertWerte(0)
-        'f1 = BM_Form1.QualitaetsWert(0)
-
-        ''f2 = BM_Form1.QualitaetswertWerte(1)
-        ''f3 = BM_Form1.QualitaetswertWerte(2)
-        ''f4 = BM_Form1.QualitaetswertWerte(3)
-
-        ''---------------------------------------
-        ''ENDE HACK
 
         Ausgangsergebnis = 0
 
