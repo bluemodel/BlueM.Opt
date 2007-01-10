@@ -560,9 +560,7 @@ ErrCode_ES_STARTEN:
                     For i = 1 To AnzPar
                         QN(1) = QN(1) + (System.Math.Sin((i - 1) * Unterteilung_X) - (-1 + (Par(i, 1) * 2))) * (System.Math.Sin((i - 1) * Unterteilung_X) - (-1 + Par(i, 1) * 2))
                     Next i
-                    'If durchlauf Mod 25 = 0 Then
                     Call Zielfunktion_zeichnen_Sinus(AnzPar, Par, durchlauf, ipop)
-                    'End If
                 Case "Beale-Problem" 'Beale-Problem
                     x1 = -5 + (Par(1, 1) * 10)
                     x2 = -2 + (Par(2, 1) * 4)
@@ -675,7 +673,7 @@ ErrCode_ES_STARTEN:
                     QN(3) = f3
                     RN(1) = g1
                     RN(2) = g2
-                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2)
+                    Call Zielfunktion_zeichnen_MultiObPar_3D(f1, f2, f3)
             End Select
 
         ElseIf (Me.Radio_BM.Checked = True) Then
@@ -801,13 +799,13 @@ ErrCode_ES_STARTEN:
             .Aspect.View3D = False
             .Legend.Visible = False
 
-            'Die ausgangs oder Ziellinien
+            'S0: Die Ausgangs- oder Ziellinien
             Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
             Line1.Add(array_x, array_y)
             Line1.Brush.Color = System.Drawing.Color.Red
             Line1.ClickableLine = True
 
-            'Generieren der Series für die Populationen
+            'S1: Generieren der Series für die Populationen
             Populationen = 1
             If EVO_Einstellungen1.isPOPUL Then
                 Populationen = EVO_Einstellungen1.NPopul
@@ -1064,13 +1062,49 @@ ErrCode_ES_STARTEN:
             .Clear()
             .Header.Text = "Box"
             .Aspect.View3D = True
-            .Aspect.Chart3DPercent = 60
+            .Aspect.Chart3DPercent = 100
             .Legend.Visible = False
+            .Chart.Aspect.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality
+            .Chart.Axes.Bottom.Automatic = True
+            .Chart.Axes.Bottom.Visible = True
+            .Chart.Aspect.Zoom = 86
+            '.Chart.Axes.Bottom.Maximum = 1
+            '.Chart.Axes.Bottom.Minimum = 0
+            '.Chart.Axes.Bottom.Increment = 0.2
+            .Chart.Axes.Left.Automatic = True
+            .Chart.Axes.Left.Visible = True
+            '.Chart.Axes.Left.Maximum = 1
+            '.Chart.Axes.Left.Minimum = 0
+            '.Chart.Axes.Left.Increment = 0.2
+            .Chart.Axes.Depth.Automatic = True
+            .Chart.Axes.Depth.Visible = True
+            '.Chart.Axes.Depth.Maximum = 1
+            '.Chart.Axes.Depth.Minimum = 0
+            '.Chart.Axes.Depth.Increment = 0.2
+            '---------------------------------------------------------------
+            'SO: Series für die Population
+            Dim Point3D_0 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point3D_0.FillSampleValues(100)
+            Point3D_0.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point3D_0.LinePen.Visible = False
+            Point3D_0.Pointer.HorizSize = 1
+            Point3D_0.Pointer.VertSize = 1
+
+            'S1: Series für die Sekundäre Population
+            Dim Point3D_1 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point3D_1.FillSampleValues(100)
+            Point3D_1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point3D_1.LinePen.Visible = False
+            Point3D_1.Pointer.HorizSize = 1
+            Point3D_1.Pointer.VertSize = 1
+
             '.AddSeries(TeeChart.ESeriesClass.scPoint3D)
             '.Series(0).asPoint3D.Pointer.Style = TeeChart.EPointerStyle.psCircle
             '.Series(0).asPoint3D.LinePen.Visible = False
             '.Series(0).asPoint3D.Pointer.HorizontalSize = 1
             '.Series(0).asPoint3D.Pointer.VerticalSize = 1
+
+
             'For i = 1 To Populationen
             '    .AddSeries(TeeChart.ESeriesClass.scPoint3D)
             '    .Series(i).asPoint3D.Pointer.Style = TeeChart.EPointerStyle.psCircle
@@ -1078,6 +1112,7 @@ ErrCode_ES_STARTEN:
             '    .Series(i).asPoint3D.Pointer.HorizontalSize = 3
             '    .Series(i).asPoint3D.Pointer.VerticalSize = 3
             'Next i
+
             '.AddSeries(TeeChart.ESeriesClass.scPoint3D)
             '.AddSeries(TeeChart.ESeriesClass.scPoint3D)
             '.Series(Populationen + 2).asPoint3D.Pointer.Style = TeeChart.EPointerStyle.psCircle
@@ -1085,20 +1120,6 @@ ErrCode_ES_STARTEN:
             '.Series(Populationen + 2).asPoint3D.Pointer.HorizontalSize = 2
             '.Series(Populationen + 2).asPoint3D.Pointer.VerticalSize = 2
             '.Series(Populationen + 2).Color = System.Convert.ToUInt32(System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Red))
-
-            '.Axis.Bottom.Automatic = False
-            '.Axis.Bottom.Maximum = 1
-            '.Axis.Bottom.Minimum = 0
-            '.Axis.Bottom.Increment = 0.2
-            '.Axis.Left.Automatic = False
-            '.Axis.Left.Maximum = 1
-            '.Axis.Left.Minimum = 0
-            '.Axis.Left.Increment = 0.2
-            '.Axis.Depth.Automatic = False
-            '.Axis.Depth.Visible = True
-            '.Axis.Depth.Maximum = 1
-            '.Axis.Depth.Minimum = 0
-            '.Axis.Depth.Increment = 0.2
         End With
     End Sub
 
@@ -1213,7 +1234,6 @@ ErrCode_ES_STARTEN:
         End With
     End Sub
 
-
     Private Sub Zielfunktion_zeichnen_Sinus(ByRef AnzPar As Short, ByRef Par(,) As Double, ByRef durchlauf As Integer, ByRef ipop As Short)
         Dim i As Short
         Dim Unterteilung_X As Double
@@ -1247,7 +1267,14 @@ ErrCode_ES_STARTEN:
     Private Sub Zielfunktion_zeichnen_MultiObPar_3D(ByRef f1 As Double, ByRef f2 As Double, ByRef f3 As Double)
 
         'TODO: Hier muss eine 3D-Reihe angezeigt werden
-        'TChart1.Series(0).Add(f1, f2, f3, "")
+
+        'TChart1.Series(0).Add(f1, f2, "", f3)
+        'TChart1.Series(0).FillSampleValues(100)
+        'Steema.TeeChart.
+        'Point3D_0.FillSampleValues()
+        'Point3D_1.FillSampleValues()
+        TChart1.Series(0).FillSampleValues()
+        TChart1.Series(1).FillSampleValues()
 
     End Sub
 
