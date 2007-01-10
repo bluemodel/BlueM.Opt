@@ -95,7 +95,7 @@ Option Explicit On
     Private Qb(,,) As Double                'Bestwertspeicher Generationsebene
     Private Rb(,,) As Double                'Restriktionen auf Generationsebene
     '---------------------
-    Private SekundärQb() As NDSortingType   'Sekundäre Population
+    Private SekundärQb() As NDSortingType = {}   'Sekundäre Population
     Private expo As Short                   'Exponent für Schrittweite (+/-1)
     Private DnTemp As Double                'Temporäre Schrittweite für Nachkomme
     Private XnTemp As Double                'Temporärer Parameterwert für Nachkomme
@@ -675,6 +675,8 @@ ES_GET_SCHRITTWEITE_ERROR:
         'Next i
 
         ReDim Population(UBound(SekundärQb), Eigenschaft.NPenalty)
+        '!Wenn Fehler hier "SekundäreQb = Nothing" auftritt wurde TeeChart mit der falschen Serie bzw. zu wenig Serien gestartet!!!
+
         For i = 1 To UBound(SekundärQb)
             For j = 1 To Eigenschaft.NPenalty
                 Population(i, j) = SekundärQb(i).penalty(j)

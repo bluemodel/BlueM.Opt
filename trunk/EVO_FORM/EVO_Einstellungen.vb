@@ -790,9 +790,9 @@ Option Explicit On
 				For i = 1 To 6
 					LabelFramePop(i).Enabled = False
 				Next i
-				'Setzen der Modusabhängigen Vorgaben
-				isParetoOptimierung = True
-				isMultiObjectiveOptimierung = True
+                'Setzen der Modusabhängigen Vorgaben
+                isMultiObjectiveOptimierung = True
+                isParetoOptimierung = True
                 'CheckisPopul.CheckState = CheckState.Unchecked
                 CheckisPopul.Enabled = False
 				LabelInteract.Enabled = True
