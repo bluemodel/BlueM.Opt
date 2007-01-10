@@ -248,7 +248,7 @@ Friend Class Form1
                     Randomize()
                     mypara(1, 1) = Rnd()
                     mypara(2, 1) = Rnd()
-                    Call TeeChartInitialise_MO_CONSTR()
+                    Call TeeChartInitialise_MO_MultiTestProb()
                 Case "Box"
                     globalAnzPar = 3
                     globalAnzZiel = 3
@@ -258,7 +258,7 @@ Friend Class Form1
                     mypara(1, 1) = Rnd()
                     mypara(2, 1) = Rnd()
                     mypara(3, 1) = Rnd()
-                    Call TeeChartInitialise_MO_Box()
+                    Call TeeChartInitialise_MO_3D_Box()
             End Select
 
 
@@ -961,26 +961,26 @@ ErrCode_ES_STARTEN:
                     .Series(3).Add(ArrayX, ArrayY)
 
                 Case "Zitzler/Deb T4"
-                    Dim ArrayX(10, 101) As Double
-                    Dim ArrayY(10, 101) As Double
-                    .Header.Text = "Zitzler/Deb/Theile T1"
-                    .Chart.Axes.Bottom.Increment = 0.2
-                    .Chart.Axes.Left.Maximum = 7
-                    .Chart.Axes.Left.Increment = 0.5
+                    Dim ArrayX(1000) As Double
+                    Dim ArrayY(1000) As Double
+                    .Header.Text = "Zitzler/Deb/Theile T4"
+                    .Chart.Axes.Bottom.Automatic = True
+                    .Chart.Axes.Left.Automatic = True
 
-                    'TODO: funzt net!
                     'S3 bis S13: Serie für die Grenze
+                    'Sieht nach einer schwachsinnigen Berechnung für ArrayY aus
                     For i = 1 To 10
-                        For j = 1 To 100
-                            ArrayX(i, j) = j / 100
-                            ArrayY(i, j) = 1 - System.Math.Sqrt(ArrayX(i, j)) - ArrayX(i, j) * System.Math.Sin(10 * 3.14159265358979 * ArrayX(i, j))
-                        Next j
                         Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-                        'Line1.Brush.Color = System.Drawing.Color.Green
+                        Line1.Brush.Color = System.Drawing.Color.Green
                         Line1.ClickableLine = True
-                        .Series(i + 2).Add(ArrayX(i, j), ArrayY(i, j))
-                    Next i
+                        For j = 0 To 1000
+                            ArrayX(j) = j / 1000
+                            ArrayY(j) = (1 + (i - 1) / 4) * (1 - System.Math.Sqrt(ArrayX(j) / (1 + (i - 1) / 4)))
+                        Next
+                        .Series(2 + i).Add(ArrayX, ArrayY)
+                    Next
 
+                    ''Original Code
                     'For i = 1 To 10
                     '    .AddSeries(TeeChart.ESeriesClass.scLine)
                     '    .Series(Populationen + i).asLine.LinePen.Width = 2
@@ -991,113 +991,64 @@ ErrCode_ES_STARTEN:
                     '    Next j
                     '    .Series(Populationen + i).AddArray(1000, ArrayY, ArrayX)
                     'Next i
+                Case "CONSTR"
+                    Dim Array1X(100) As Double
+                    Dim Array1Y(100) As Double
+                    Dim Array2X(100) As Double
+                    Dim Array2Y(100) As Double
+                    Dim Array3X(61) As Double
+                    Dim Array3Y(61) As Double
+                    Dim Array4X(61) As Double
+                    Dim Array4Y(61) As Double
+                    .Header.Text = "CONSTR"
+                    'S3: Serie für die Grenze 1
+                    For j = 0 To 100
+                        Array1X(j) = 0.1 + j * 0.009
+                        Array1Y(j) = 1 / Array1X(j)
+                    Next j
+                    Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
+                    Line1.Brush.Color = System.Drawing.Color.Red
+                    Line1.ClickableLine = True
+                    .Series(3).Add(Array1X, Array1Y)
 
+                    'S4: Serie für die Grenze 2
+                    For j = 0 To 100
+                        Array2X(j) = 0.1 + j * 0.009
+                        Array2Y(j) = (1 + 5) / Array2X(j)
+                    Next j
+                    Dim Line2 As New Steema.TeeChart.Styles.Line(.Chart)
+                    Line2.Brush.Color = System.Drawing.Color.Red
+                    Line2.ClickableLine = True
+                    .Series(4).Add(Array2X, Array2Y)
+
+                    'S5: Serie für die Grenze 3
+                    ReDim Array3X(61)
+                    ReDim Array3Y(61)
+                    For j = 0 To 61
+                        Array3X(j) = 0.1 + (j + 2) * 0.009
+                        Array3Y(j) = (7 - 9 * Array3X(j)) / Array3X(j)
+                    Next j
+                    Dim Line3 As New Steema.TeeChart.Styles.Line(.Chart)
+                    Line3.Brush.Color = System.Drawing.Color.Blue
+                    Line3.ClickableLine = True
+                    .Series(5).Add(Array3X, Array3Y)
+
+                    'S6: Serie für die Grenze 4
+                    ReDim Array4X(61)
+                    ReDim Array4Y(61)
+                    For j = 0 To 61
+                        Array4X(j) = 0.1 + (j + 2) * 0.009
+                        Array4Y(j) = (9 * Array4X(j)) / Array4X(j)
+                    Next j
+                    Dim Line4 As New Steema.TeeChart.Styles.Line(.Chart)
+                    Line4.Brush.Color = System.Drawing.Color.Red
+                    Line4.ClickableLine = True
+                    .Series(6).Add(Array4X, Array4Y)
             End Select
         End With
     End Sub
 
-    Private Sub TeeChartInitialise_MO_CONSTR()
-        'TODO: Constr funzt nur wenn es eine eigene Ausgangswertfunktion hat. Soll eigentlich mit oben in Ausgangswert_MultiObPareto()
-        Dim Populationen As Short
-        Dim j As Short
-        Dim Array1X(100) As Double
-        Dim Array1Y(100) As Double
-        Dim Array2X(100) As Double
-        Dim Array2Y(100) As Double
-        Dim Array3X(61) As Double
-        Dim Array3Y(61) As Double
-        Dim Array4X(61) As Double
-        Dim Array4Y(61) As Double
-
-        If EVO_Einstellungen1.isPOPUL Then
-            Populationen = EVO_Einstellungen1.NPopul
-        Else
-            Populationen = 1
-        End If
-
-        With TChart1
-            .Clear()
-            .Header.Text = "CONSTR"
-            .Aspect.View3D = False
-            .Legend.Visible = False
-
-            'S0: Hier wird nur eine Population.
-            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point1.Color = System.Drawing.Color.Orange
-            Point1.Pointer.HorizSize = 2
-            Point1.Pointer.VertSize = 2
-
-            'S1: Series für die Sekundäre Population
-            Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point2.Color = System.Drawing.Color.Blue
-            Point2.Pointer.HorizSize = 3
-            Point2.Pointer.VertSize = 3
-
-            'S2: Series für die Sekundäre Population
-            Dim Point3 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point3.Color = System.Drawing.Color.Green
-            Point3.Pointer.HorizSize = 3
-            Point3.Pointer.VertSize = 3
-
-            'S3: Serie für die Grenze 1
-            For j = 0 To 100
-                Array1X(j) = 0.1 + j * 0.009
-                Array1Y(j) = 1 / Array1X(j)
-            Next j
-            Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-            Line1.Brush.Color = System.Drawing.Color.Red
-            Line1.ClickableLine = True
-            .Series(3).Add(Array1X, Array1Y)
-
-            'S4: Serie für die Grenze 2
-            For j = 0 To 100
-                Array2X(j) = 0.1 + j * 0.009
-                Array2Y(j) = (1 + 5) / Array2X(j)
-            Next j
-            Dim Line2 As New Steema.TeeChart.Styles.Line(.Chart)
-            Line2.Brush.Color = System.Drawing.Color.Red
-            Line2.ClickableLine = True
-            .Series(4).Add(Array2X, Array2Y)
-
-            'S5: Serie für die Grenze 3
-            ReDim Array3X(61)
-            ReDim Array3Y(61)
-            For j = 0 To 61
-                Array3X(j) = 0.1 + (j + 2) * 0.009
-                Array3Y(j) = (7 - 9 * Array3X(j)) / Array3X(j)
-            Next j
-            Dim Line3 As New Steema.TeeChart.Styles.Line(.Chart)
-            Line3.Brush.Color = System.Drawing.Color.Blue
-            Line3.ClickableLine = True
-            .Series(5).Add(Array3X, Array3Y)
-
-            'S6: Serie für die Grenze 4
-            ReDim Array4X(61)
-            ReDim Array4Y(61)
-            For j = 0 To 61
-                Array4X(j) = 0.1 + (j + 2) * 0.009
-                Array4Y(j) = (9 * Array4X(j)) / Array4X(j)
-            Next j
-            Dim Line4 As New Steema.TeeChart.Styles.Line(.Chart)
-            Line4.Brush.Color = System.Drawing.Color.Red
-            Line4.ClickableLine = True
-            .Series(6).Add(Array4X, Array4Y)
-
-            .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Maximum = 1
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Bottom.Increment = 0.2
-            .Chart.Axes.Left.Automatic = False
-            .Chart.Axes.Left.Maximum = 10
-            .Chart.Axes.Left.Minimum = 0
-            .Chart.Axes.Left.Increment = 2
-        End With
-    End Sub
-
-    Private Sub TeeChartInitialise_MO_Box()
+    Private Sub TeeChartInitialise_MO_3D_Box()
         'TODO: Zeichnen muss auf 3D erweitert werden. Hier 3D Testproblem.
         Dim Populationen As Short
         Dim ArrayX(100) As Double
