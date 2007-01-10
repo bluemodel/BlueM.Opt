@@ -103,15 +103,15 @@ Friend Class Form1
         '--------------------------
         'Variablen für Optionen Evostrategie
         Dim iEvoTyp, iPopEvoTyp As Integer
-        Dim isPOPUL, isMultiObjective As Boolean
+        Dim isPOPUL As Boolean
+        Dim isMultiObjective, isPareto, isPareto3D As Boolean
         Dim NPopEltern, NRunden, NPopul, iOptPopEltern As Integer
         Dim iOptEltern, iPopPenalty As Integer
         Dim NEltern As Integer
         Dim NRekombXY As Integer
         Dim rDeltaStart As Single
         Dim iStartPar As Integer
-        Dim isdnvektor, isPareto As Boolean
-        Dim isPareto3D As Boolean
+        Dim isdnvektor As Boolean
         Dim NGen, NNachf As Integer
         Dim Interact As Short
         Dim isInteract As Boolean
@@ -138,6 +138,8 @@ Friend Class Form1
         iPopEvoTyp = EVO_Einstellungen1.iPopEvoTyp
         isPOPUL = EVO_Einstellungen1.isPOPUL
         isMultiObjective = EVO_Einstellungen1.isMultiObjective  'wird bei BM abhängig von Anzahl Zielfunktionen überschrieben
+        isPareto = EVO_Einstellungen1.isPareto                  'wird bei BM abhängig von Anzahl Zielfunktionen überschrieben
+        isPareto3D = False
         NRunden = EVO_Einstellungen1.NRunden
         NPopul = EVO_Einstellungen1.NPopul
         NPopEltern = EVO_Einstellungen1.NPopEltern
@@ -151,8 +153,6 @@ Friend Class Form1
         rDeltaStart = EVO_Einstellungen1.rDeltaStart
         isdnvektor = EVO_Einstellungen1.isDnVektor
         iStartPar = EVO_Einstellungen1.globalOPTVORGABE
-        isPareto = EVO_Einstellungen1.isPareto
-        isPareto3D = False
         Interact = EVO_Einstellungen1.Interact
         isInteract = EVO_Einstellungen1.isInteract
         NMemberSecondPop = EVO_Einstellungen1.NMemberSecondPop
@@ -174,7 +174,7 @@ Friend Class Form1
                     For i = 1 To globalAnzPar
                         mypara(i, 1) = 0
                     Next
-                    Call Ausgangswert_Sinuskurve()
+                    Call TeeChartInitialise_SO_Sinuskurve()
                 Case "Beale-Problem" 'x1 = [-5;5], x2=[-2;2]
                     globalAnzPar = 2
                     globalAnzZiel = 1
@@ -182,7 +182,7 @@ Friend Class Form1
                     ReDim mypara(globalAnzPar, 1)
                     mypara(1, 1) = 0.5
                     mypara(2, 1) = 0.5
-                    Call Ausgangswert_Beale()
+                    Call TeeChartInitialise_SO_Beale()
                 Case "Schwefel 2.4-Problem" 'xi = [-10,10]
                     globalAnzPar = CShort(Text_Schwefel24_Par.Text)
                     globalAnzZiel = 1
@@ -191,7 +191,7 @@ Friend Class Form1
                     For i = 1 To globalAnzPar
                         mypara(i, 1) = 1
                     Next i
-                    Call Ausgangswert_Schwefel24()
+                    Call TeeChartInitialise_SO_Schwefel24()
                 Case "Deb 1" 'x1 = [0.1;1], x2=[0;5]
                     globalAnzPar = 2
                     globalAnzZiel = 2
@@ -200,7 +200,7 @@ Friend Class Form1
                     Randomize()
                     mypara(1, 1) = Rnd()
                     mypara(2, 1) = Rnd()
-                    Call Ausgangswert_MultiObPareto()
+                    Call TeeChartInitialise_MO_MultiTestProb()
                 Case "Zitzler/Deb T1" 'xi = [0,1]
                     globalAnzPar = 30
                     globalAnzZiel = 2
@@ -210,7 +210,7 @@ Friend Class Form1
                     For i = 1 To globalAnzPar
                         mypara(i, 1) = Rnd()
                     Next i
-                    Call Ausgangswert_MultiObPareto()
+                    Call TeeChartInitialise_MO_MultiTestProb()
                 Case "Zitzler/Deb T2" 'xi = [0,1]
                     globalAnzPar = 30
                     globalAnzZiel = 2
@@ -220,7 +220,7 @@ Friend Class Form1
                     For i = 1 To globalAnzPar
                         mypara(i, 1) = Rnd()
                     Next i
-                    Call Ausgangswert_MultiObPareto()
+                    Call TeeChartInitialise_MO_MultiTestProb()
                 Case "Zitzler/Deb T3" 'xi = [0,1]
                     globalAnzPar = 15
                     globalAnzZiel = 2
@@ -230,7 +230,7 @@ Friend Class Form1
                     For i = 1 To globalAnzPar
                         mypara(i, 1) = Rnd()
                     Next i
-                    Call Ausgangswert_MultiObPareto()
+                    Call TeeChartInitialise_MO_MultiTestProb()
                 Case "Zitzler/Deb T4" 'x1 = [0,1], xi=[-5,5]
                     globalAnzPar = 10
                     globalAnzZiel = 2
@@ -240,7 +240,7 @@ Friend Class Form1
                     For i = 1 To globalAnzPar
                         mypara(i, 1) = Rnd()
                     Next i
-                    Call Ausgangswert_MultiObPareto()
+                    Call TeeChartInitialise_MO_MultiTestProb()
                 Case "CONSTR" 'x1 = [0.1;1], x2=[0;5]
                     globalAnzPar = 2
                     globalAnzZiel = 2
@@ -249,7 +249,7 @@ Friend Class Form1
                     Randomize()
                     mypara(1, 1) = Rnd()
                     mypara(2, 1) = Rnd()
-                    Call Ausgangswert_CONSTR()
+                    Call TeeChartInitialise_MO_CONSTR()
                 Case "Box"
                     globalAnzPar = 3
                     globalAnzZiel = 3
@@ -259,7 +259,7 @@ Friend Class Form1
                     mypara(1, 1) = Rnd()
                     mypara(2, 1) = Rnd()
                     mypara(3, 1) = Rnd()
-                    Call Ausgangswert_Box()
+                    Call TeeChartInitialise_MO_Box()
             End Select
 
 
@@ -287,23 +287,24 @@ Friend Class Form1
                 mypara(i, 1) = BM_Form1.OptParameterListe(i - 1).SKWert
             Next
 
-            '----------------------------------------------
-
             'Zielfunktionen werden eingelesen und die Anzahl wird übergeben
             'CHECK: Dadurch wird definiert Ob SO oder Pareto laufen soll, das überschreibt die Evo_Einstellungen
             Call BM_Form1.OptZiele_einlesen()
-            'Call BM_Form1.OptZielReihe_einlesen()
             globalAnzZiel = BM_Form1.OptZieleListe.GetLength(0)
             If (globalAnzZiel > 1) Then
                 isMultiObjective = True
+                isPareto = True
             End If
 
             'TODO: Randbedingungen
             globalAnzRand = 2
 
-            '----------------------------------------------
-
-            Call Ausgangswert_BlauesModell()
+            'Initialisierung der TeeChart Serien je nach SO oder MO
+            If (isMultiObjective) = False Then
+                Call TeeChartInitialise_SO_BlauesModell()
+            Else
+                Call TeeChartInitialise_MO_BlauesModell()
+            End If
 
         End If
 
@@ -588,7 +589,7 @@ ErrCode_ES_STARTEN:
                     f2 = (1 + 5 * Par(2, 1)) / (Par(1, 1) * (9 / 10) + 0.1)
                     QN(1) = f1
                     QN(2) = f2
-                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, ipop)
+                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2)
 
                     'Zitzler/Deb/Thiele 2000, T1 (Konvexe Pareto-Front)
                 Case "Zitzler/Deb T1"
@@ -601,7 +602,7 @@ ErrCode_ES_STARTEN:
                     f2 = f2 * (1 - System.Math.Sqrt(f1 / f2))
                     QN(1) = f1
                     QN(2) = f2
-                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, ipop)
+                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2)
 
                     'Zitzler/Deb/Thiele 2000, T2 (Non-Konvexe Pareto-Front)
                 Case "Zitzler/Deb T2"
@@ -614,7 +615,7 @@ ErrCode_ES_STARTEN:
                     f2 = f2 * (1 - (f1 / f2) * (f1 / f2))
                     QN(1) = f1
                     QN(2) = f2
-                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, ipop)
+                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2)
 
                     'Zitzler/Deb/Thiele 2000, T3 (disconected Pareto-Front)
                 Case "Zitzler/Deb T3"
@@ -627,7 +628,7 @@ ErrCode_ES_STARTEN:
                     f2 = f2 * (1 - System.Math.Sqrt(f1 / f2) - (f1 / f2) * System.Math.Sin(10 * 3.14159265358979 * f1))
                     QN(1) = f1
                     QN(2) = f2
-                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, ipop)
+                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2)
 
                     'Zitzler/Deb/Thiele 2000, T4 (local/global Pareto-Fronts)
                 Case "Zitzler/Deb T4"
@@ -641,7 +642,7 @@ ErrCode_ES_STARTEN:
                     f2 = f2 * (1 - System.Math.Sqrt(f1 / f2))
                     QN(1) = f1
                     QN(2) = f2
-                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, ipop)
+                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2)
 
                 Case "CONSTR"
                     f1 = Par(1, 1) * (9 / 10) + 0.1
@@ -654,7 +655,7 @@ ErrCode_ES_STARTEN:
                     QN(2) = f2
                     RN(1) = g1
                     RN(2) = g2
-                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, ipop)
+                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2)
 
                 Case "Box"
                     f1 = Par(1, 1) ^ 2
@@ -675,7 +676,7 @@ ErrCode_ES_STARTEN:
                     QN(3) = f3
                     RN(1) = g1
                     RN(2) = g2
-                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2, f3)
+                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2)
             End Select
 
         ElseIf (Me.Radio_BM.Checked = True) Then
@@ -719,10 +720,12 @@ ErrCode_ES_STARTEN:
                 Case 1
                     Call Zielfunktion_zeichnen_SingleOb(f(1), durchlauf, ipop)
                 Case 2
-                    Call Zielfunktion_zeichnen_MultiObPar_2D(f(1), f(2), ipop)
+                    Call Zielfunktion_zeichnen_MultiObPar_2D(f(1), f(2))
                 Case 3
+                    'TODO MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
                     Call Zielfunktion_zeichnen_MultiObPar_3D(f(1), f(2), f(3))
                 Case Else
+                    'TODO MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
                     'TODO: Call Zielfunktion_zeichnen_MultiObPar_XD()
             End Select
 
@@ -733,7 +736,7 @@ ErrCode_ES_STARTEN:
         End If
     End Function
 
-    Private Sub Ausgangswert_Sinuskurve()
+    Private Sub TeeChartInitialise_SO_Sinuskurve()
         Dim i As Short
         Dim Datenmenge As Short
         Dim Unterteilung_X As Double
@@ -782,7 +785,7 @@ ErrCode_ES_STARTEN:
 
     End Sub
 
-    Private Sub Ausgangswert_Beale()
+    Private Sub TeeChartInitialise_SO_Beale()
         Dim Ausgangsergebnis As Double
         Dim Anzahl_Kalkulationen As Integer
         Dim Populationen As Short
@@ -844,7 +847,7 @@ ErrCode_ES_STARTEN:
 
     End Sub
 
-    Private Sub Ausgangswert_Schwefel24()
+    Private Sub TeeChartInitialise_SO_Schwefel24()
         Dim Ausgangsergebnis As Double
         Dim Anzahl_Kalkulationen As Integer
         Dim Populationen As Short
@@ -910,7 +913,7 @@ ErrCode_ES_STARTEN:
         End With
     End Sub
 
-    Private Sub Ausgangswert_MultiObPareto()
+    Private Sub TeeChartInitialise_MO_MultiTestProb()
         Dim Populationen As Short
         Dim i, j As Short
 
@@ -1067,7 +1070,7 @@ ErrCode_ES_STARTEN:
         End With
     End Sub
 
-    Private Sub Ausgangswert_CONSTR()
+    Private Sub TeeChartInitialise_MO_CONSTR()
         'TODO: Constr funzt nur wenn es eine eigene Ausgangswertfunktion hat. Soll eigentlich mit oben in Ausgangswert_MultiObPareto()
         Dim Populationen As Short
         Dim j As Short
@@ -1168,7 +1171,7 @@ ErrCode_ES_STARTEN:
         End With
     End Sub
 
-    Private Sub Ausgangswert_Box()
+    Private Sub TeeChartInitialise_MO_Box()
         'TODO: Zeichnen muss auf 3D erweitert werden. Hier 3D Testproblem.
         Dim Populationen As Short
         Dim ArrayX(100) As Double
@@ -1222,17 +1225,24 @@ ErrCode_ES_STARTEN:
         End With
     End Sub
 
-    Private Sub Ausgangswert_BlauesModell()
+    Private Sub TeeChartInitialise_SO_BlauesModell()
         Dim Ausgangsergebnis As Double
         Dim Anzahl_Kalkulationen As Integer
         Dim Populationen As Short
         Dim i As Short
+        Dim X() As Double
 
         If EVO_Einstellungen1.isPOPUL Then
             Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden
         Else
             Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
         End If
+
+
+        ReDim X(globalAnzPar)
+        For i = 1 To globalAnzPar
+            X(i) = 10
+        Next i
 
         ''HACK: von Funktion Zielfunktion() hierher kopiert, 
         ''um Ausgangswert zu bekommen - eigene Funktion nötig!
@@ -1257,7 +1267,11 @@ ErrCode_ES_STARTEN:
         ''---------------------------------------
         ''ENDE HACK
 
-        'Ausgangsergebnis = f1
+        Ausgangsergebnis = 0
+
+        For i = 1 To globalAnzPar
+            Ausgangsergebnis = Ausgangsergebnis + ((X(1) - X(i) ^ 2) ^ 2 + (X(i) - 1) ^ 2)
+        Next i
 
         ReDim array_y(Anzahl_Kalkulationen - 1)
         ReDim array_x(Anzahl_Kalkulationen - 1)
@@ -1296,14 +1310,55 @@ ErrCode_ES_STARTEN:
             .Chart.Axes.Bottom.Title.Caption = "f1"
             .Chart.Axes.Bottom.Automatic = True
             '.Chart.Axes.Bottom.Maximum = Anzahl_Kalkulationen
-            '.Chart.Axes.Bottom.Minimum = 0
+            .Chart.Axes.Bottom.Minimum = 0
             .Chart.Axes.Left.Title.Caption = "f2"
             .Chart.Axes.Left.Automatic = True
             '.Chart.Axes.Left.Maximum = 100
-            '.Chart.Axes.Left.Minimum = 0
+            .Chart.Axes.Left.Minimum = 0
             '.Chart.Axes.Left.Logarithmic = False
         End With
     End Sub
+
+    Private Sub TeeChartInitialise_MO_BlauesModell()
+        Dim Populationen As Short
+
+        Populationen = EVO_Einstellungen1.NPopul
+
+        With TChart1
+            .Clear()
+            .Aspect.View3D = False
+            .Legend.Visible = False
+            .Chart.Axes.Bottom.Automatic = True
+            '.Chart.Axes.Bottom.Maximum = 1
+            .Chart.Axes.Bottom.Minimum = 0
+            .Chart.Axes.Left.Automatic = True
+            '.Chart.Axes.Left.Maximum = 10
+            .Chart.Axes.Left.Minimum = 0
+
+            'S0: Series für die Population.
+            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point1.Color = System.Drawing.Color.Orange
+            Point1.Pointer.HorizSize = 2
+            Point1.Pointer.VertSize = 2
+
+            'S1: Series für die Sekundäre Population
+            Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point2.Color = System.Drawing.Color.Blue
+            Point2.Pointer.HorizSize = 3
+            Point2.Pointer.VertSize = 3
+
+            'S2: Series für Bestwert
+            Dim Point3 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point3.Color = System.Drawing.Color.Green
+            Point3.Pointer.HorizSize = 3
+            Point3.Pointer.VertSize = 3
+
+        End With
+    End Sub
+
 
     Private Sub Zielfunktion_zeichnen_Sinus(ByRef AnzPar As Short, ByRef Par(,) As Double, ByRef durchlauf As Integer, ByRef ipop As Short)
         Dim i As Short
@@ -1329,9 +1384,9 @@ ErrCode_ES_STARTEN:
 
     End Sub
     'TODO: ipop muss hier nicht übergeben werden das es bei Pareto nur eine Population gibt
-    Private Sub Zielfunktion_zeichnen_MultiObPar_2D(ByRef f1 As Double, ByRef f2 As Double, ByRef ipop As Short)
+    Private Sub Zielfunktion_zeichnen_MultiObPar_2D(ByRef f1 As Double, ByRef f2 As Double)
 
-        TChart1.Series(1).Add(f1, f2)
+        TChart1.Series(0).Add(f1, f2, "")
 
     End Sub
 
