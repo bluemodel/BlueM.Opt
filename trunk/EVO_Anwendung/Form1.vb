@@ -735,7 +735,8 @@ ErrCode_ES_STARTEN:
         End If
     End Function
 
-
+    'Alle Series für TeeChart werden initialisiert
+    'Teilweise werden die Ziel bzw. Ausgangslinien berechnet und gezeichnet
     Private Sub TeeChartInitialise_So()
         Dim Ausgangsergebnis As Double
         Dim Anzahl_Kalkulationen As Integer
@@ -752,6 +753,7 @@ ErrCode_ES_STARTEN:
             Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
         End If
 
+        'Ausgengsergebnisse für die Linien im TeeChart Rechnen
         Select Case Combo_Testproblem.Text
             Case "Sinus-Funktion"
                 Datenmenge = CShort(Text_Sinusfunktion_Par.Text)
@@ -771,6 +773,7 @@ ErrCode_ES_STARTEN:
                 Next i
         End Select
 
+        'Linien für die Ausgangsergebnisse im TeeChart zeichnen
         Select Case Combo_Testproblem.Text
             Case "Sinus-Funktion"
                 ReDim array_x(Datenmenge - 1)
@@ -789,6 +792,7 @@ ErrCode_ES_STARTEN:
                 Next i
         End Select
 
+        'TeeChart Einrichten und Series generieren
         With TChart1
             .Clear()
             .Header.Text = Combo_Testproblem.Text
@@ -797,18 +801,17 @@ ErrCode_ES_STARTEN:
             .Aspect.View3D = False
             .Legend.Visible = False
 
-            'Linie zeichen
+            'Die ausgangs oder Ziellinien
             Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
             Line1.Add(array_x, array_y)
             Line1.Brush.Color = System.Drawing.Color.Red
             Line1.ClickableLine = True
 
-            'Punkt einfügen
+            'Generieren der Series für die Populationen
             Populationen = 1
             If EVO_Einstellungen1.isPOPUL Then
                 Populationen = EVO_Einstellungen1.NPopul
             End If
-
             For i = 1 To Populationen
                 Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
                 Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
@@ -816,7 +819,7 @@ ErrCode_ES_STARTEN:
                 Point1.Pointer.VertSize = 3
             Next
 
-            'Axen Formatieren
+            'Axen Formatieren für Beale und Deb
             .Chart.Axes.Bottom.Automatic = False
             .Chart.Axes.Bottom.Maximum = Anzahl_Kalkulationen
             .Chart.Axes.Bottom.Minimum = 0
@@ -825,6 +828,7 @@ ErrCode_ES_STARTEN:
             .Chart.Axes.Left.Minimum = 0
             .Chart.Axes.Left.Logarithmic = False
 
+            'Spezialformatierung für Sinuskurve
             If Combo_Testproblem.Text = "Sinus-Funktion" Then
                 .Chart.Axes.Bottom.Automatic = True
                 .Chart.Axes.Left.Automatic = False
