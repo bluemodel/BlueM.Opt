@@ -291,7 +291,7 @@ Friend Class Form1
 
             'Zielfunktionen werden eingelesen und die Anzahl wird übergeben
             'CHECK: Dadurch wird definiert Ob SO oder Pareto laufen soll, das überschreibt die Evo_Einstellungen
-            Call BM_Form1.OptimierungsZiele_einlesen()
+            Call BM_Form1.OptZiele_einlesen()
             'Call BM_Form1.OptZielReihe_einlesen()
             globalAnzZiel = BM_Form1.OptZieleListe.GetLength(0)
             If (globalAnzZiel > 1) Then

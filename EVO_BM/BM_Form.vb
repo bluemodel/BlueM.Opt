@@ -48,8 +48,8 @@ Public Class BM_Form
     'Private Properties
     '-------------------
     Dim OptParameter_Pfad As String     'Pfad zur Datei mit den Optimierungsparametern (*.OPT)
-    Dim OptZiele_Pfad As String      'Pfad zur Datei mit Einzelwerten für die Zielfunktionen (*.ZIE)
-    Dim OptZielReihe_Pfad As String     'Pfad zur Datei mit Reihen für die Zielfunktionen (*.ZIE)
+    Dim OptZiele_Pfad As String         'Pfad zur Datei mit Einzelwerten für die Zielfunktionen (*.ZIE)
+    'Dim OptZielReihe_Pfad As String     'Pfad zur Datei mit Reihen für die Zielfunktionen (*.ZIE)
 
     'DB
     Dim db As OleDb.OleDbConnection
@@ -277,7 +277,7 @@ Public Class BM_Form
     End Sub
 
     'Optimierungsziele - Werte - einlesen (*.zie-Datei)
-    Public Sub OptimierungsZiele_einlesen()
+    Public Sub OptZiele_einlesen()
         Dim AnzZiele As Integer = 0
         Dim IsOK As Boolean
         Dim tmpstr As String
