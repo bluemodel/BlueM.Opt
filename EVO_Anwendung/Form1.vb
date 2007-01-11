@@ -305,6 +305,8 @@ Friend Class Form1
                 Call TeeChartInitialise_MO_BlauesModell()
             End If
 
+            'call zielfunktion(
+
         End If
 
         ReDim QN(globalAnzZiel)
@@ -696,31 +698,27 @@ ErrCode_ES_STARTEN:
             'Modell Starten
             Call BM_Form1.launchBM()
 
-            'Qualitätswerte berechnen
+            'QualitätswerteBerechnen und Rückgabe an den OptiAlgo
             'BUG 57 im ganzen folgenden Block
-            Dim f() As Double
-            ReDim f(globalAnzZiel)
+            Dim f() As Double = {}
+            'ReDim f(globalAnzZiel)
 
-            'QualitätswerteBerechnen
-            Dim AnzQualWerte As Integer = BM_Form1.OptZieleListe.GetLongLength(0)
-            For i = 1 To AnzQualWerte
-                f(i) = BM_Form1.QualitaetsWert(i - 1)
-            Next
-
-            'Rückgabe der Qualitätswerte an den OptiAlgo
-            For i = 1 To globalAnzZiel 'BUG 57
-                QN(i) = f(i)
+            Dim AnzQualWerte As Integer = BM_Form1.OptZieleListe.GetLength(0)
+            For i = 0 To AnzQualWerte - 1
+                'f(i) = BM_Form1.QualitaetsWert(i)
+                BM_Form1.OptZieleListe(i).TmpQualWert = BM_Form1.QualitaetsWert(i)
+                QN(i + 1) = BM_Form1.OptZieleListe(i).TmpQualWert
             Next
 
             'Qualitätswerte im TeeChart zeichnen
             Select Case globalAnzZiel
                 Case 1
-                    Call Zielfunktion_zeichnen_SingleOb(f(1), durchlauf, ipop)
+                    Call Zielfunktion_zeichnen_SingleOb(BM_Form1.OptZieleListe(0).TmpQualWert, durchlauf, ipop)
                 Case 2
-                    Call Zielfunktion_zeichnen_MultiObPar_2D(f(1), f(2))
+                    Call Zielfunktion_zeichnen_MultiObPar_2D(BM_Form1.OptZieleListe(0).TmpQualWert, BM_Form1.OptZieleListe(1).TmpQualWert)
                 Case 3
                     'TODO MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
-                    Call Zielfunktion_zeichnen_MultiObPar_3D(f(1), f(2), f(3))
+                    Call Zielfunktion_zeichnen_MultiObPar_3D(BM_Form1.OptZieleListe(0).TmpQualWert, BM_Form1.OptZieleListe(1).TmpQualWert, BM_Form1.OptZieleListe(2).TmpQualWert)
                 Case Else
                     'TODO MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
                     'TODO: Call Zielfunktion_zeichnen_MultiObPar_XD()
