@@ -12,7 +12,7 @@ Friend Class Form1
     Dim globalAnzRand As Short
     Dim array_x() As Double
     Dim array_y() As Double
-    Dim Bestwert(,) As Double
+    Dim Bestwert(,) As Double = {}
     Dim Population(,) As Double
     Dim mypara(,) As Double
 
@@ -116,12 +116,12 @@ Friend Class Form1
         Dim isInteract As Boolean
         Dim NMemberSecondPop As Short
         '--------------------------
-        Dim ipop As Short
+        Dim ipop As Short = 0
         Dim igen As Short
         Dim inachf As Short
         Dim irunde As Short
-        Dim QN() As Double
-        Dim RN() As Double
+        Dim QN() As Double = {}
+        Dim RN() As Double = {}
         '--------------------------
 
         'TODO: On Error GoTo Err_ES_STARTEN
@@ -272,7 +272,7 @@ Friend Class Form1
             Call BM_Form1.Initialisierung()
 
             'Optimierungsparameter
-            'ACHTUNG: OptParameter fängt bei 0 an!
+            'BUG 57: mypara() fängt bei 1 an!
             Call BM_Form1.OptParameter_einlesen()
 
             globalAnzPar = BM_Form1.OptParameterListe.GetLength(0)
@@ -305,7 +305,12 @@ Friend Class Form1
                 Call TeeChartInitialise_MO_BlauesModell()
             End If
 
-            'call zielfunktion(
+            'HACK: Redim hier erforderlich, wird aber nach der if-Schleife nochmal ausgeführt
+            ReDim QN(globalAnzZiel)
+            ReDim RN(globalAnzRand)
+
+            'Zielfunktion für Anfangswerte berechnen
+            myIsOK = Zielfunktion(globalAnzPar, mypara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
 
         End If
 
@@ -685,7 +690,7 @@ ErrCode_ES_STARTEN:
             '*************************************
 
             'Mutierte Parameter an OptParameter übergeben
-            For i = 1 To AnzPar 'BUG 57
+            For i = 1 To AnzPar 'BUG 57: Par(,) fängt bei 1 an!
                 BM_Form1.OptParameterListe(i - 1).SKWert = Par(i, 1)     'OptParameterListe(i-1,*) weil Array bei 0 anfängt!
             Next
 
@@ -698,35 +703,30 @@ ErrCode_ES_STARTEN:
             'Modell Starten
             Call BM_Form1.launchBM()
 
-            'QualitätswerteBerechnen und Rückgabe an den OptiAlgo
-            'BUG 57 im ganzen folgenden Block
-            Dim f() As Double = {}
-            'ReDim f(globalAnzZiel)
-
-            Dim AnzQualWerte As Integer = BM_Form1.OptZieleListe.GetLength(0)
-            For i = 0 To AnzQualWerte - 1
-                'f(i) = BM_Form1.QualitaetsWert(i)
-                BM_Form1.OptZieleListe(i).TmpQualWert = BM_Form1.QualitaetsWert(i)
-                QN(i + 1) = BM_Form1.OptZieleListe(i).TmpQualWert
+            'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
+            'BUG 57: QN() fängt bei 1 an!
+            'Dim AnzQualWerte As Integer = BM_Form1.OptZieleListe.GetLength(0)
+            For i = 0 To globalAnzZiel - 1
+                BM_Form1.OptZieleListe(i).QWertTmp = BM_Form1.QualitaetsWert(i)
+                QN(i + 1) = BM_Form1.OptZieleListe(i).QWertTmp
             Next
 
             'Qualitätswerte im TeeChart zeichnen
             Select Case globalAnzZiel
                 Case 1
-                    Call Zielfunktion_zeichnen_SingleOb(BM_Form1.OptZieleListe(0).TmpQualWert, durchlauf, ipop)
+                    Call Zielfunktion_zeichnen_SingleOb(BM_Form1.OptZieleListe(0).QWertTmp, durchlauf, ipop)
                 Case 2
-                    Call Zielfunktion_zeichnen_MultiObPar_2D(BM_Form1.OptZieleListe(0).TmpQualWert, BM_Form1.OptZieleListe(1).TmpQualWert)
+                    Call Zielfunktion_zeichnen_MultiObPar_2D(BM_Form1.OptZieleListe(0).QWertTmp, BM_Form1.OptZieleListe(1).QWertTmp)
                 Case 3
                     'TODO MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
-                    Call Zielfunktion_zeichnen_MultiObPar_3D(BM_Form1.OptZieleListe(0).TmpQualWert, BM_Form1.OptZieleListe(1).TmpQualWert, BM_Form1.OptZieleListe(2).TmpQualWert)
+                    Call Zielfunktion_zeichnen_MultiObPar_3D(BM_Form1.OptZieleListe(0).QWertTmp, BM_Form1.OptZieleListe(1).QWertTmp, BM_Form1.OptZieleListe(2).QWertTmp)
                 Case Else
                     'TODO MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
                     'TODO: Call Zielfunktion_zeichnen_MultiObPar_XD()
             End Select
 
             'Qualitätswerte und OptParameter in DB speichern
-            'TODO: Bezeichnungen der Qualitätswerte übergeben
-            Call BM_Form1.db_update("QWert_Bez", f, durchlauf, ipop)
+            Call BM_Form1.db_update(durchlauf, ipop)
 
         End If
     End Function
@@ -1122,11 +1122,9 @@ ErrCode_ES_STARTEN:
     End Sub
 
     Private Sub TeeChartInitialise_SO_BlauesModell()
-        Dim Ausgangsergebnis As Double
         Dim Anzahl_Kalkulationen As Integer
         Dim Populationen As Short
         Dim i As Short
-        Dim X() As Double
 
         If EVO_Einstellungen1.isPOPUL Then
             Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden
@@ -1134,35 +1132,18 @@ ErrCode_ES_STARTEN:
             Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
         End If
 
-
-        ReDim X(globalAnzPar)
-        For i = 1 To globalAnzPar
-            X(i) = 10
-        Next i
-
-        Ausgangsergebnis = 0
-
-        For i = 1 To globalAnzPar
-            Ausgangsergebnis = Ausgangsergebnis + ((X(1) - X(i) ^ 2) ^ 2 + (X(i) - 1) ^ 2)
-        Next i
-
-        ReDim array_y(Anzahl_Kalkulationen - 1)
-        ReDim array_x(Anzahl_Kalkulationen - 1)
-        For i = 0 To Anzahl_Kalkulationen - 1
-            array_y(i) = Ausgangsergebnis
-            array_x(i) = i + 1
-        Next i
-
         With TChart1
             .Clear()
             .Header.Text = "BlauesModell"
             .Aspect.View3D = False
             .Legend.Visible = False
 
-            'Linie der Anfangswerte 
-            Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-            Line1.Add(array_x, array_y)
-            Line1.Color = System.Drawing.Color.Red
+            'Series(0): Anfangswert
+            Dim Point0 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point0.Color = System.Drawing.Color.Red
+            Point0.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point0.Pointer.HorizSize = 3
+            Point0.Pointer.VertSize = 3
 
             'Anzahl Populationen
             Populationen = 1
@@ -1170,8 +1151,8 @@ ErrCode_ES_STARTEN:
                 Populationen = EVO_Einstellungen1.NPopul
             End If
 
-            'Für jede Population eine Series
-            For i = 1 To Populationen
+            'Series(1 bis n): Für jede Population eine Series 'TODO: es würde auch eine Series für alle reichen!
+            For i = 0 To Populationen
                 Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
                 Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
                 Point1.Pointer.HorizSize = 3
@@ -1179,16 +1160,11 @@ ErrCode_ES_STARTEN:
             Next i
 
             'Formatierung der Axen
-            'TODO: Axenbeschriftung = Bezeichnung der Zielfunktionen
-            .Chart.Axes.Bottom.Title.Caption = "f1"
-            .Chart.Axes.Bottom.Automatic = True
-            '.Chart.Axes.Bottom.Maximum = Anzahl_Kalkulationen
+            .Chart.Axes.Bottom.Title.Caption = "Simulation"
+            .Chart.Axes.Bottom.Maximum = Anzahl_Kalkulationen
             .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Left.Title.Caption = "f2"
+            .Chart.Axes.Left.Title.Caption = BM_Form1.OptZieleListe(0).Bezeichnung
             .Chart.Axes.Left.Automatic = True
-            '.Chart.Axes.Left.Maximum = 100
-            .Chart.Axes.Left.Minimum = 0
-            '.Chart.Axes.Left.Logarithmic = False
         End With
     End Sub
 
@@ -1199,30 +1175,31 @@ ErrCode_ES_STARTEN:
 
         With TChart1
             .Clear()
+            .Header.Text = "BlauesModell"
             .Aspect.View3D = False
             .Legend.Visible = False
-            .Chart.Axes.Bottom.Automatic = True
-            '.Chart.Axes.Bottom.Maximum = 1
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Left.Automatic = True
-            '.Chart.Axes.Left.Maximum = 10
-            .Chart.Axes.Left.Minimum = 0
 
-            'S0: Series für die Population.
+            'Formatierung der Axen
+            .Chart.Axes.Bottom.Title.Caption = BM_Form1.OptZieleListe(0).Bezeichnung 'HACK: Beschriftung der Axen
+            .Chart.Axes.Bottom.Automatic = True
+            .Chart.Axes.Bottom.Title.Caption = BM_Form1.OptZieleListe(1).Bezeichnung 'HACK: Beschriftung der Axen
+            .Chart.Axes.Left.Automatic = True
+
+            'Series(0): Series für die Population.
             Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
             Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
             Point1.Color = System.Drawing.Color.Orange
             Point1.Pointer.HorizSize = 2
             Point1.Pointer.VertSize = 2
 
-            'S1: Series für die Sekundäre Population
+            'Series(1): Series für die Sekundäre Population
             Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
             Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
             Point2.Color = System.Drawing.Color.Blue
             Point2.Pointer.HorizSize = 3
             Point2.Pointer.VertSize = 3
 
-            'S2: Series für Bestwert
+            'Series(2): Series für Bestwert
             Dim Point3 As New Steema.TeeChart.Styles.Points(.Chart)
             Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
             Point3.Color = System.Drawing.Color.Green
@@ -1255,7 +1232,7 @@ ErrCode_ES_STARTEN:
         TChart1.Series(ipop).Add(durchlauf, Wert)
 
     End Sub
-    'TODO: ipop muss hier nicht übergeben werden das es bei Pareto nur eine Population gibt
+
     Private Sub Zielfunktion_zeichnen_MultiObPar_2D(ByRef f1 As Double, ByRef f2 As Double)
 
         TChart1.Series(0).Add(f1, f2, "")
@@ -1278,7 +1255,7 @@ ErrCode_ES_STARTEN:
 
     Private Sub Zielfunktion_zeichnen_MultiObPar_XD()
 
-        'TODO Projektion der XD Information auf 2D
+        'TODO: Projektion der XD Information auf 2D
 
     End Sub
 
@@ -1322,7 +1299,7 @@ ErrCode_ES_STARTEN:
         End With
     End Sub
 
-    'TODO: Welchen Zweck hat das?
+    'Überprüfung der Eingabe von "Anzahl Parameter" bei Sinus-Funktion
     Private Sub Par_Sinus_KeyPress(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.KeyPressEventArgs) Handles Text_Sinusfunktion_Par.KeyPress
         Dim KeyAscii As Short = Asc(eventArgs.KeyChar)
         'UPGRADE_ISSUE: Zuweisung wird nicht unterstützt: KeyAscii an Nicht-Null-Wert Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1058"'
