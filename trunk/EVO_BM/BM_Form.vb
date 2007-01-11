@@ -41,6 +41,7 @@ Public Class BM_Form
         Public SpalteZiel As String                 'Spalte der .wel Datei falls WelDatei
         Public ZielReihePfad As String              'Der Pfad zur Zielreihe
         Public ZielReihe(,) As Object               'Die Zielreihe
+        Public TmpQualWert As Double                'Qualitätswerte der letzten Simulation werden hier zwischengespeichert 
     End Structure
 
     Public OptZieleListe() As OptZiele = {}         'Liste der Zielfunktionnen
