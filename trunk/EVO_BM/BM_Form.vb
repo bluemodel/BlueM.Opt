@@ -38,19 +38,18 @@ Public Class BM_Form
         Public ZielFkt As String                    'Zielfunktion
         Public WertTyp As String                    'Gibt an welcher Wert aus der angegeben Spalte in der .wel Datei gewählt oder berechnet werden soll
         Public ZielWert As String                   'Der vorgegeben Zielwert
-        Public SpalteZiel As String                 'Spalte der .wel Datei falls WelDatei
         Public ZielReihePfad As String              'Der Pfad zur Zielreihe
+        Public SpalteZiel As String                 'Spalte der .wel Datei falls ZielReihe .wel Datei ist
         Public ZielReihe(,) As Object               'Die Zielreihe
-        Public TmpQualWert As Double                'Qualitätswerte der letzten Simulation werden hier zwischengespeichert 
+        Public QWertTmp As Double                   'Qualitätswert der letzten Simulation wird hier zwischengespeichert 
     End Structure
 
     Public OptZieleListe() As OptZiele = {}         'Liste der Zielfunktionnen
 
     'Private Properties
     '-------------------
-    Dim OptParameter_Pfad As String     'Pfad zur Datei mit den Optimierungsparametern (*.OPT)
-    Dim OptZiele_Pfad As String         'Pfad zur Datei mit Einzelwerten für die Zielfunktionen (*.ZIE)
-    'Dim OptZielReihe_Pfad As String     'Pfad zur Datei mit Reihen für die Zielfunktionen (*.ZIE)
+    Dim OptParameter_Pfad As String                 'Pfad zur Datei mit den Optimierungsparametern (*.OPT)
+    Dim OptZiele_Pfad As String                     'Pfad zur Datei mit Einzelwerten für die Zielfunktionen (*.ZIE)
 
     'DB
     Dim db As OleDb.OleDbConnection
@@ -271,7 +270,7 @@ Public Class BM_Form
 
     'deskaliert alle OptParameter.SKWert und schreibt sie in OptParameter.Wert
     Public Sub OptParameter_deskalieren()
-        'Schleife über alle ParametDim tmpstr As Stringer
+        'Schleife über alle Parameter
         For i As Integer = 0 To OptParameterListe.GetUpperBound(0)
             Call OptParameterListe(i).deskalieren()
         Next
@@ -395,8 +394,13 @@ Public Class BM_Form
                 Dim Length As Short = OptParameterListe(i).Sp2 - OptParameterListe(i).Sp1
                 StrLeft = Microsoft.VisualBasic.Left(Zeile, OptParameterListe(i).Sp1 - 1)
                 StrRight = Microsoft.VisualBasic.Right(Zeile, Len(Zeile) - OptParameterListe(i).Sp2 + 1)
-                'TODO: Parameter wird für erforderliche Stringlänge einfach abgeschnitten, sollte aber gerundet werden!
-                Wert = OptParameterListe(i).Wert.ToString.Substring(0, Length)
+                Wert = OptParameterListe(i).Wert.ToString()
+                If (Wert.Length > Length) Then
+                    'TODO: Parameter wird für erforderliche Stringlänge einfach abgeschnitten, sollte aber gerundet werden!
+                    Wert = Wert.Substring(0, Length)
+                Else
+                    Wert = Wert.PadLeft(Length)
+                End If
                 Zeilenarray(OptParameterListe(i).ZeileNr - 1) = StrLeft & Wert & StrRight
 
                 'Alle Zeilen wieder in Datei schreiben
@@ -434,19 +438,21 @@ Public Class BM_Form
         Dim i As Integer
         Dim SimReihe(,) As Object = {}
         Dim SimWert As Single
-
         Dim IsOK As Boolean
+
+        'Simulationsergebnis auslesen
         IsOK = ReadWEL(WorkDir & Datensatz & ".wel", OptZieleListe(ZielNr).SpalteWel, SimReihe)
         If (IsOK = False) Then
             'TODO: Fehlerbehandlung
         End If
 
-        '------------------------------------------
-        'Ermittlung des Wertes Fall ZielTyp Reihe -
-        '------------------------------------------
-
+        '--------------------------------------------------------
+        'bei Werten zuerst Wert aus Simulationsergebnis berechnen
+        '--------------------------------------------------------
         If (OptZieleListe(ZielNr).ZielTyp = "Wert") Then
+
             Select Case OptZieleListe(ZielNr).WertTyp
+
                 Case "MaxWert"
                     SimWert = 0
                     For i = 0 To SimReihe.GetUpperBound(0)
@@ -454,6 +460,7 @@ Public Class BM_Form
                             SimWert = SimReihe(i, 1)
                         End If
                     Next
+
                 Case "MinWert"
                     SimWert = 999999999999999999
                     For i = 0 To SimReihe.GetUpperBound(0)
@@ -461,59 +468,82 @@ Public Class BM_Form
                             SimWert = SimReihe(i, 1)
                         End If
                     Next
+
                 Case "Average"
                     SimWert = 0
                     For i = 0 To SimReihe.GetUpperBound(0)
                         SimWert += SimReihe(i, 1)
                     Next
                     SimWert = SimWert / SimReihe.GetLength(0)
+
                 Case "AnfWert"
                     SimWert = SimReihe(0, 1)
+
                 Case "EndWert"
                     SimWert = SimReihe(SimReihe.GetUpperBound(0), 1)
+
                 Case Else
                     'TODO: Fehlerbehandlung
             End Select
+
         End If
 
         '--------------------------------------------------------
-        'Berechnung der Zielfunktionen entweder Wert oder Reihe -
+        'Berechnung des Qualitätswerts
         '--------------------------------------------------------
+        Select Case OptZieleListe(ZielNr).ZielFkt
 
-        'Summe der Fehlerquadrate
-        '----------------------------
-        If OptZieleListe(ZielNr).ZielFkt = "AbQuad" And OptZieleListe(ZielNr).ZielTyp = "Wert" Then
-            QualitaetsWert = (OptZieleListe(ZielNr).ZielWert - SimWert) * (OptZieleListe(ZielNr).ZielWert - SimWert)
-        ElseIf OptZieleListe(ZielNr).ZielFkt = "AbQuad" And OptZieleListe(ZielNr).ZielTyp = "Reihe" Then
-            For i = 0 To SimReihe.GetUpperBound(0)
-                QualitaetsWert += (OptZieleListe(ZielNr).ZielReihe(i, 1) - SimReihe(i, 1)) * (OptZieleListe(ZielNr).ZielReihe(i, 1) - SimReihe(i, 1))
-            Next
+            Case "AbQuad"
+                'Summe der Fehlerquadrate
+                '------------------------
+                Select Case OptZieleListe(ZielNr).ZielTyp
+                    Case "Wert"
+                        QualitaetsWert = (OptZieleListe(ZielNr).ZielWert - SimWert) * (OptZieleListe(ZielNr).ZielWert - SimWert)
 
-            'Summe der Fehler
-            '--------------------------            
-        ElseIf OptZieleListe(ZielNr).ZielFkt = "Diff" And OptZieleListe(ZielNr).ZielTyp = "Wert" Then
-            QualitaetsWert = Math.Abs(OptZieleListe(ZielNr).ZielWert - SimWert)
-        ElseIf OptZieleListe(ZielNr).ZielFkt = "Diff" And OptZieleListe(ZielNr).ZielTyp = "Reihe" Then
-            For i = 0 To SimReihe.GetUpperBound(0)
-                QualitaetsWert += Math.Abs(OptZieleListe(ZielNr).ZielReihe(i, 1) - SimReihe(i, 1))
-            Next
+                    Case "Reihe"
+                        For i = 0 To SimReihe.GetUpperBound(0)
+                            QualitaetsWert += (OptZieleListe(ZielNr).ZielReihe(i, 1) - SimReihe(i, 1)) * (OptZieleListe(ZielNr).ZielReihe(i, 1) - SimReihe(i, 1))
+                        Next
+                End Select
+                '------------------------
 
-            'Volumenfehler
-            '--------------------------
-        ElseIf OptZieleListe(ZielNr).ZielFkt = "Volf" And OptZieleListe(ZielNr).ZielTyp = "Wert" Then
-            'TODO MSGBox Fehler in der Zielfunktionsdatei: Volumenfehler kann nicht mit einzelnen Werten gerechnet werden
-        ElseIf OptZieleListe(ZielNr).ZielFkt = "Volf" And OptZieleListe(ZielNr).ZielTyp = "Reihe" Then
-            'TODO: Volumenfehler rechnet noch nicht echtes Volumen, dazu ist Zeitschrittweite notwendig
-            Dim VolSim As Double = 0
-            Dim VolZiel As Double = 0
-            For i = 0 To SimReihe.GetUpperBound(0)
-                VolSim += SimReihe(i, 1)
-                VolZiel += OptZieleListe(ZielNr).ZielReihe(i, 1)
-            Next
-            QualitaetsWert = Math.Abs(VolZiel - VolSim)
-        Else
-            'TODO:MsgBox Fehler in der Zielfunktionsdatei
-        End If
+            Case "Diff"
+                'Summe der Fehler
+                '------------------------
+                Select Case OptZieleListe(ZielNr).ZielTyp
+                    Case "Wert"
+                        QualitaetsWert = Math.Abs(OptZieleListe(ZielNr).ZielWert - SimWert)
+
+                    Case "Reihe"
+                        For i = 0 To SimReihe.GetUpperBound(0)
+                            QualitaetsWert += Math.Abs(OptZieleListe(ZielNr).ZielReihe(i, 1) - SimReihe(i, 1))
+                        Next
+                End Select
+                '------------------------
+
+            Case "Volf"
+                'Volumenfehler
+                '--------------------------
+                Select Case OptZieleListe(ZielNr).ZielTyp
+                    Case "Wert"
+                        'TODO: MSGBox Fehler in der Zielfunktionsdatei: Volumenfehler kann nicht mit einzelnen Werten gerechnet werden
+
+                    Case "Reihe"
+                        'TODO: Volumenfehler rechnet noch nicht echtes Volumen, dazu ist Zeitschrittweite notwendig
+                        Dim VolSim As Double = 0
+                        Dim VolZiel As Double = 0
+                        For i = 0 To SimReihe.GetUpperBound(0)
+                            VolSim += SimReihe(i, 1)
+                            VolZiel += OptZieleListe(ZielNr).ZielReihe(i, 1)
+                        Next
+                        QualitaetsWert = Math.Abs(VolZiel - VolSim)
+                End Select
+                '------------------------
+
+            Case Else
+                'TODO: MsgBox Fehler in der Zielfunktionsdatei
+
+        End Select
 
     End Function
 
@@ -623,16 +653,17 @@ Public Class BM_Form
     End Function
 
     'Update der DB mit QWerten und OptParametern
-    Public Function db_update(ByVal QWert_Bez As String, ByVal QWert() As Double, ByVal durchlauf As Integer, ByVal ipop As Short) As Boolean
+    Public Function db_update(ByVal durchlauf As Integer, ByVal ipop As Short) As Boolean
         Call db_connect()
 
         Dim i, j As Integer
 
         Try
             Dim command As OleDbCommand = New OleDbCommand("", db)
-            For i = 1 To QWert.GetUpperBound(0)
+            'Schleife über alle OptZiele
+            For i = 0 To OptZieleListe.GetUpperBound(0)
                 'QWert schreiben 
-                command.CommandText = "INSERT INTO QWerte (Bezeichnung, durchlauf, ipop, Qwert) VALUES ('" & QWert_Bez & "', " & durchlauf & ", " & ipop & ", " & QWert(i) & ")"
+                command.CommandText = "INSERT INTO QWerte (Bezeichnung, durchlauf, ipop, Qwert) VALUES ('" & OptZieleListe(i).Bezeichnung & "', " & durchlauf & ", " & ipop & ", " & OptZieleListe(i).QWertTmp & ")"
                 command.ExecuteNonQuery()
                 'ID des zuletzt geschriebenen QWerts holen
                 command.CommandText = "SELECT @@IDENTITY AS id"
