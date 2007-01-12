@@ -431,6 +431,29 @@ Public Class BM_Form
         'Arbeitsverzeichnis wieder zurücksetzen (optional)
         ChDrive(currentDir)
         ChDir(currentDir)
+
+        'überprüfen, ob Simulation erfolgreich
+        If (File.Exists(WorkDir & "$FEHL.TMP")) Then
+
+            'Fehler aufgetreten
+            Dim DateiInhalt As String = ""
+
+            Try
+                Dim FiStr As FileStream = New FileStream(WorkDir & "$fehl.tmp", FileMode.Open, IO.FileAccess.Read)
+                Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+                Do
+                    DateiInhalt = DateiInhalt & Chr(13) & Chr(10) & StrRead.ReadLine.ToString
+                Loop Until StrRead.Peek() = -1
+
+                MsgBox("Das BlaueModell hat einen Fehler zurückgegeben:" & Chr(13) & Chr(10) & DateiInhalt, MsgBoxStyle.Exclamation, "Simulationsfehler")
+
+            Catch except As Exception
+                MsgBox("Konnte Datei ""$FEHL.TMP"" nicht lesen!" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
+            End Try
+
+        End If
+
     End Sub
 
     'Berechnung des Qualitätswerts (Zielwert)
