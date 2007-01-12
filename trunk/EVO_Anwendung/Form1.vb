@@ -1182,7 +1182,7 @@ ErrCode_ES_STARTEN:
             'Formatierung der Axen
             .Chart.Axes.Bottom.Title.Caption = BM_Form1.OptZieleListe(0).Bezeichnung 'HACK: Beschriftung der Axen
             .Chart.Axes.Bottom.Automatic = True
-            .Chart.Axes.Bottom.Title.Caption = BM_Form1.OptZieleListe(1).Bezeichnung 'HACK: Beschriftung der Axen
+            .Chart.Axes.Left.Title.Caption = BM_Form1.OptZieleListe(1).Bezeichnung 'HACK: Beschriftung der Axen
             .Chart.Axes.Left.Automatic = True
 
             'Series(0): Series für die Population.
