@@ -1,9 +1,17 @@
 Option Strict Off ' Off ist Default
 Option Explicit On
+Imports System.IO
 Friend Class Form1
 
     Inherits System.Windows.Forms.Form
     Private IsInitializing As Boolean
+
+    Dim Anwendung As String                'zu optimierende Anwendung
+    Private Const ANW_TESTPROBLEME As String = "Test-Probleme"
+    Private Const ANW_BLAUESMODELL As String = "Blaues Modell"
+
+    'BM_Form deklarieren
+    Dim BM_Form1 As New EVO_BM.BM_Form
 
     Dim myIsOK As Boolean
     Dim myisrun As Boolean
@@ -15,6 +23,63 @@ Friend Class Form1
     Dim Bestwert(,) As Double = {}
     Dim Population(,) As Double
     Dim mypara(,) As Double
+
+    'EVO.ini Datei einlesen
+    Private Sub ReadEVOIni()
+        If File.Exists("EVO.ini") Then
+            Try
+                'Datei einlesen
+                Dim FiStr As FileStream = New FileStream("EVO.ini", FileMode.Open, IO.FileAccess.Read)
+                Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+                Dim Configs(9, 1) As String
+                Dim Line As String
+                Dim Pairs() As String
+                Dim i As Integer = 0
+                Do
+                    Line = StrRead.ReadLine.ToString()
+                    If (Line.StartsWith("[") = False And Line.StartsWith(";") = False) Then
+                        Pairs = Line.Split("=")
+                        Configs(i, 0) = Pairs(0)
+                        Configs(i, 1) = Pairs(1)
+                        i += 1
+                    End If
+                Loop Until StrRead.Peek() = -1
+
+                StrRead.Close()
+                FiStr.Close()
+
+                'Default-Werte setzen
+                For i = 0 To Configs.GetUpperBound(0)
+                    Select Case Configs(i, 0)
+                        Case "BM_Exe"
+                            BM_Form1.BM_Exe = Configs(i, 1)
+                            BM_Form1.TextBox_EXE.Text = BM_Form1.BM_Exe
+                        Case "Datensatz"
+                            'Dateiname vom Ende abtrennen
+                            BM_Form1.Datensatz = Configs(i, 1).Substring(Configs(i, 1).LastIndexOf("\") + 1)
+                            'Dateiendung entfernen
+                            BM_Form1.Datensatz = BM_Form1.Datensatz.Substring(0, BM_Form1.Datensatz.Length - 4)
+                            'Arbeitsverzeichnis bestimmen
+                            BM_Form1.WorkDir = Configs(i, 1).Substring(0, Configs(i, 1).LastIndexOf("\") + 1)
+                            BM_Form1.TextBox_Datensatz.Text = Configs(i, 1)
+                        Case "OptParameter"
+                            BM_Form1.OptParameter_Pfad = Configs(i, 1)
+                            BM_Form1.TextBox_OptParameter_Pfad.Text = BM_Form1.OptParameter_Pfad
+                        Case "OptZiele"
+                            BM_Form1.OptZiele_Pfad = Configs(i, 1)
+                            BM_Form1.TextBox_OptZiele_Pfad.Text = BM_Form1.OptZiele_Pfad
+                        Case Else
+                            'nix
+                    End Select
+                Next
+
+            Catch except As Exception
+                MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim lesen der EVO.ini Datei")
+            End Try
+        End If
+
+    End Sub
 
     Private Sub Combo1_SelectedIndexChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Combo_Testproblem.SelectedIndexChanged
         If Me.IsInitializing = True Then
@@ -78,9 +143,18 @@ Friend Class Form1
     End Sub
 
     Private Sub Form1_Load(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles MyBase.Load
+
+        'XP-look
         System.Windows.Forms.Application.EnableVisualStyles()
-        'Fenstergröße klein (ohne BM)
-        Me.Width = 720
+
+        'Voreinstellungen lesen
+        Call ReadEVOIni()
+
+        'Liste der Anwendungen in ComboBox schreiben und Anfangseinstellung wählen
+        ComboBox_Anwendung.Items.AddRange(New Object() {ANW_TESTPROBLEME, ANW_BLAUESMODELL})
+        ComboBox_Anwendung.SelectedItem = ANW_TESTPROBLEME
+        Anwendung = ComboBox_Anwendung.SelectedItem
+
         'Testprobleme für Single-Objective in ComboBox schreiben
         Combo_Testproblem.Items.Add("Sinus-Funktion")
         Combo_Testproblem.Items.Add("Beale-Problem")
@@ -88,6 +162,7 @@ Friend Class Form1
         Combo_Testproblem.SelectedIndex = 0
         'TeeChart intialisieren
         TeeCommander1.Chart = TChart1
+
     End Sub
 
     Private Function ES_STARTEN() As Boolean
@@ -157,7 +232,7 @@ Friend Class Form1
         NMemberSecondPop = EVO_Einstellungen1.NMemberSecondPop
 
 
-        If (Me.Radio_Testproblem.Checked = True) Then
+        If (Anwendung = ANW_TESTPROBLEME) Then
 
             '*************************************
             '*          Testprobleme             *
@@ -262,37 +337,29 @@ Friend Class Form1
             End Select
 
 
-        ElseIf (Me.Radio_BM.Checked = True) Then
+        ElseIf (Anwendung = ANW_BLAUESMODELL) Then
 
             '*******************************
             '*        BlauesModell         *
             '*******************************
 
-            'Initialisierung
-            Call BM_Form1.Initialisierung()
-
-            'Optimierungsparameter
-            'BUG 57: mypara() fängt bei 1 an!
-            Call BM_Form1.OptParameter_einlesen()
-
+            'Anzahl Optimierungsparameter übergeben
             globalAnzPar = BM_Form1.OptParameterListe.GetLength(0)
-            ReDim mypara(globalAnzPar, 1)
-
-            'Parameterwerte skalieren
-            Call BM_Form1.OptParameter_skalieren()
 
             'Parameterwerte übergeben
+            'BUG 57: mypara() fängt bei 1 an!
+            ReDim mypara(globalAnzPar, 1)
             For i = 1 To globalAnzPar
                 mypara(i, 1) = BM_Form1.OptParameterListe(i - 1).SKWert
             Next
 
-            'Zielfunktionen werden eingelesen und die Anzahl wird übergeben
+            'Anzahl Zielfunktionen übergeben
             'CHECK: Dadurch wird definiert Ob SO oder Pareto laufen soll, das überschreibt die Evo_Einstellungen
-            Call BM_Form1.OptZiele_einlesen()
             globalAnzZiel = BM_Form1.OptZieleListe.GetLength(0)
             If (globalAnzZiel > 1) Then
                 isMultiObjective = True
                 isPareto = True
+                'TODO: EVO_Einstellungen1.OptModus überschreiben
             End If
 
             'TODO: Randbedingungen
@@ -551,7 +618,7 @@ ErrCode_ES_STARTEN:
         Dim f2, f1, f3 As Double
         Dim g1, g2 As Double
 
-        If (Me.Radio_Testproblem.Checked = True) Then
+        If (Anwendung = ANW_TESTPROBLEME) Then
 
             '*************************************
             '*          Testprobleme             *
@@ -683,7 +750,7 @@ ErrCode_ES_STARTEN:
                     Call Zielfunktion_zeichnen_MultiObPar_3D(f1, f2, f3)
             End Select
 
-        ElseIf (Me.Radio_BM.Checked = True) Then
+        ElseIf (Anwendung = ANW_BLAUESMODELL) Then
 
             '*************************************
             '*          Blaues Modell            *
@@ -1309,20 +1376,23 @@ ErrCode_ES_STARTEN:
         End If
     End Sub
 
-    Private Sub Radio_Testproblem_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Radio_Testproblem.CheckedChanged
-        If (Me.Radio_Testproblem.Checked = True) Then
-            Me.GroupBox_Testproblem.Enabled = True
-        Else
-            Me.GroupBox_Testproblem.Enabled = False
-        End If
-    End Sub
+    'Auswahl der zu optimierenden Anwendung geändert
+    Private Sub ComboBox_Anwendung_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Anwendung.SelectedIndexChanged
 
-    Private Sub Radio_BM_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Radio_BM.CheckedChanged
-        If (Me.Radio_BM.Checked = True) Then
-            Me.Width = 1020
-        Else
-            Me.Width = 720
-        End If
-    End Sub
+        Anwendung = ComboBox_Anwendung.SelectedItem
 
+        Select Case Anwendung
+
+            Case ANW_TESTPROBLEME
+                'Test-Probleme einschalten
+                Me.GroupBox_Testproblem.Enabled = True
+
+            Case ANW_BLAUESMODELL
+                'Testprobleme ausschalten
+                Me.GroupBox_Testproblem.Enabled = False
+                'BM_Form anzeigen
+                BM_Form1.ShowDialog()
+        End Select
+
+    End Sub
 End Class
