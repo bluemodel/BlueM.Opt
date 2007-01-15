@@ -2,14 +2,19 @@ Imports System.IO
 Imports System.Data.OleDb
 Public Class BM_Form
 
+    Inherits System.Windows.Forms.Form
+
     'Public Properties
     '------------------
     Public Datensatz As String                      'Name des zu simulierenden Datensatzes
     Public WorkDir As String                        'Arbeitsverzeichnis für das Blaue Modell
     Public BM_Exe As String                         'Pfad zu BlauesModell.exe
 
+    Public OptParameter_Pfad As String                 'Pfad zur Datei mit den Optimierungsparametern (*.OPT)
+    Public OptZiele_Pfad As String                     'Pfad zur Datei mit den Zielfunktionen (*.ZIE)
+
     'Optimierungsparameter
-    Public Structure OptParameter       
+    Public Structure OptParameter
         Public Bezeichnung As String                'Bezeichnung
         Public Einheit As String                    'Einheit
         Public Datei As String                      'Dateiendung der BM-Eingabedatei
@@ -48,77 +53,12 @@ Public Class BM_Form
 
     'Private Properties
     '-------------------
-    Dim OptParameter_Pfad As String                 'Pfad zur Datei mit den Optimierungsparametern (*.OPT)
-    Dim OptZiele_Pfad As String                     'Pfad zur Datei mit Einzelwerten für die Zielfunktionen (*.ZIE)
 
     'DB
     Dim db As OleDb.OleDbConnection
 
     'Private Methoden
     '----------------
-
-    'Initialisierung
-    Private Sub BM_Form_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
-        'EVO.ini lesen
-        Call ReadEVOIni()
-    End Sub
-
-    'EVO.ini Datei einlesen
-    Private Sub ReadEVOIni()
-        If File.Exists("EVO.ini") Then
-            Try
-                'Datei einlesen
-                Dim FiStr As FileStream = New FileStream("EVO.ini", FileMode.Open, IO.FileAccess.Read)
-                Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-
-                Dim Configs(9, 1) As String
-                Dim Line As String
-                Dim Pairs() As String
-                Dim i As Integer = 0
-                Do
-                    Line = StrRead.ReadLine.ToString()
-                    If (Line.StartsWith("[") = False And Line.StartsWith(";") = False) Then
-                        Pairs = Line.Split("=")
-                        Configs(i, 0) = Pairs(0)
-                        Configs(i, 1) = Pairs(1)
-                        i += 1
-                    End If
-                Loop Until StrRead.Peek() = -1
-
-                StrRead.Close()
-                FiStr.Close()
-
-                'Default-Werte setzen
-                For i = 0 To Configs.GetUpperBound(0)
-                    Select Case Configs(i, 0)
-                        Case "BM_Exe"
-                            BM_Exe = Configs(i, 1)
-                            TextBox_EXE.Text = BM_Exe
-                        Case "Datensatz"
-                            'Dateiname vom Ende abtrennen
-                            Datensatz = Configs(i, 1).Substring(Configs(i, 1).LastIndexOf("\") + 1)
-                            'Dateiendung entfernen
-                            Datensatz = Datensatz.Substring(0, Datensatz.Length - 4)
-                            'Arbeitsverzeichnis bestimmen
-                            WorkDir = Configs(i, 1).Substring(0, Configs(i, 1).LastIndexOf("\") + 1)
-                            TextBox_Datensatz.Text = Configs(i, 1)
-                        Case "OptParameter"
-                            OptParameter_Pfad = Configs(i, 1)
-                            TextBox_OptParameter_Pfad.Text = OptParameter_Pfad
-                        Case "OptZiele"
-                            OptZiele_Pfad = Configs(i, 1)
-                            Me.TextBox_OptZiele_Pfad.Text = Me.OptZiele_Pfad
-                        Case Else
-                            'nix
-                    End Select
-                Next
-
-            Catch except As Exception
-                MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim lesen der EVO.ini Datei")
-            End Try
-        End If
-
-    End Sub
 
     'Exe-Datei
     Private Sub Button_Exe_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Exe.Click
@@ -180,12 +120,27 @@ Public Class BM_Form
 
     End Sub
 
+    'BM-Einstellungen anwenden
+    Private Sub Button_OK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_OK.Click
 
-    'Public Methoden
-    '-------------------------------------
+        Me.Close()
 
-    'Optimierung initialisieren
-    Public Sub Initialisierung()
+        'Initialisierung
+        Call db_prepare()
+
+        'Optimierungsparameter einlesen
+        Call OptParameter_einlesen()
+
+        'Parameterwerte zum ersten Mal skalieren
+        Call OptParameter_skalieren()
+
+        'Zielfunktionen einlesen
+        Call OptZiele_einlesen()
+
+    End Sub
+
+    'Ergebnisdatenbank vorbereiten
+    Private Sub db_prepare()
         'Leere/Neue Ergebnisdatenbank in Arbeitsverzeichnis kopieren
 
         Dim ZielDatei As String = WorkDir & Datensatz & "_EVO.mdb"
@@ -214,7 +169,7 @@ Public Class BM_Form
     End Sub
 
     'Optimierungsparameter einlesen (*.OPT-Datei)
-    Public Sub OptParameter_einlesen()
+    Private Sub OptParameter_einlesen()
         Try
             Dim FiStr As FileStream = New FileStream(OptParameter_Pfad, FileMode.Open, IO.FileAccess.ReadWrite)
             Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -260,24 +215,8 @@ Public Class BM_Form
         End Try
     End Sub
 
-    'skaliert alle OptParameter.Wert und schreibt sie in OptParameter.SKWert
-    Public Sub OptParameter_skalieren()
-        'Schleife über alle Parameter
-        For i As Integer = 0 To OptParameterListe.GetUpperBound(0)
-            Call OptParameterListe(i).skalieren()
-        Next
-    End Sub
-
-    'deskaliert alle OptParameter.SKWert und schreibt sie in OptParameter.Wert
-    Public Sub OptParameter_deskalieren()
-        'Schleife über alle Parameter
-        For i As Integer = 0 To OptParameterListe.GetUpperBound(0)
-            Call OptParameterListe(i).deskalieren()
-        Next
-    End Sub
-
-    'Optimierungsziele - Werte - einlesen (*.zie-Datei)
-    Public Sub OptZiele_einlesen()
+    'Optimierungsziele einlesen (*.zie-Datei)
+    Private Sub OptZiele_einlesen()
         Dim AnzZiele As Integer = 0
         Dim IsOK As Boolean
         Dim tmpstr As String
@@ -328,6 +267,9 @@ Public Class BM_Form
                     End If
                 Loop Until StrRead.Peek() = -1
 
+                StrRead.Close()
+                FiStr.Close()
+
             Catch except As Exception
                 MsgBox("Fehler beim lesen der Optimierungsziel-Datei (Werte)" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
             End Try
@@ -349,6 +291,35 @@ Public Class BM_Form
                 End If
 
             End If
+        Next
+    End Sub
+
+    Private Sub db_connect()
+        Dim ConnectionString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & WorkDir & Datensatz & "_EVO.mdb"
+        db = New OleDb.OleDbConnection(ConnectionString)
+        db.Open()
+    End Sub
+
+    Private Sub db_disconnect()
+        db.Close()
+    End Sub
+
+    'Public Methoden
+    '-------------------------------------
+
+    'skaliert alle OptParameter.Wert und schreibt sie in OptParameter.SKWert
+    Public Sub OptParameter_skalieren()
+        'Schleife über alle Parameter
+        For i As Integer = 0 To OptParameterListe.GetUpperBound(0)
+            Call OptParameterListe(i).skalieren()
+        Next
+    End Sub
+
+    'deskaliert alle OptParameter.SKWert und schreibt sie in OptParameter.Wert
+    Public Sub OptParameter_deskalieren()
+        'Schleife über alle Parameter
+        For i As Integer = 0 To OptParameterListe.GetUpperBound(0)
+            Call OptParameterListe(i).deskalieren()
         Next
     End Sub
 
@@ -705,13 +676,4 @@ Public Class BM_Form
         Call db_disconnect()
     End Function
 
-    Private Sub db_connect()
-        Dim ConnectionString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & WorkDir & Datensatz & "_EVO.mdb"
-        db = New OleDb.OleDbConnection(ConnectionString)
-        db.Open()
-    End Sub
-
-    Private Sub db_disconnect()
-        db.Close()
-    End Sub
 End Class

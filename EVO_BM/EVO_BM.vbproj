@@ -56,7 +56,7 @@
       <DependentUpon>BM_Form.vb</DependentUpon>
     </Compile>
     <Compile Include="BM_Form.vb">
-      <SubType>UserControl</SubType>
+      <SubType>Form</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
