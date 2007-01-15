@@ -107,6 +107,9 @@
     <Compile Include="EVOMOD.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="EVO_Einstellungen.Designer.vb">
+      <DependentUpon>EVO_Einstellungen.vb</DependentUpon>
+    </Compile>
     <Compile Include="EVO_Einstellungen.vb">
       <SubType>UserControl</SubType>
     </Compile>
