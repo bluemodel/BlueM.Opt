@@ -428,7 +428,7 @@ Public Class BM_Form
     End Sub
 
     'Berechnung des Qualitätswerts (Zielwert)
-    Public Function QualitaetsWert(ByVal ZielNr As Integer) As Double
+    Public Function QualitaetsWert_berechnen(ByVal ZielNr As Integer) As Double
         Dim i As Integer
         Dim SimReihe(,) As Object = {}
         Dim SimWert As Single
@@ -492,11 +492,11 @@ Public Class BM_Form
                 '------------------------
                 Select Case OptZieleListe(ZielNr).ZielTyp
                     Case "Wert"
-                        QualitaetsWert = (OptZieleListe(ZielNr).ZielWert - SimWert) * (OptZieleListe(ZielNr).ZielWert - SimWert)
+                        QualitaetsWert_berechnen = (OptZieleListe(ZielNr).ZielWert - SimWert) * (OptZieleListe(ZielNr).ZielWert - SimWert)
 
                     Case "Reihe"
                         For i = 0 To SimReihe.GetUpperBound(0)
-                            QualitaetsWert += (OptZieleListe(ZielNr).ZielReihe(i, 1) - SimReihe(i, 1)) * (OptZieleListe(ZielNr).ZielReihe(i, 1) - SimReihe(i, 1))
+                            QualitaetsWert_berechnen += (OptZieleListe(ZielNr).ZielReihe(i, 1) - SimReihe(i, 1)) * (OptZieleListe(ZielNr).ZielReihe(i, 1) - SimReihe(i, 1))
                         Next
                 End Select
                 '------------------------
@@ -506,11 +506,11 @@ Public Class BM_Form
                 '------------------------
                 Select Case OptZieleListe(ZielNr).ZielTyp
                     Case "Wert"
-                        QualitaetsWert = Math.Abs(OptZieleListe(ZielNr).ZielWert - SimWert)
+                        QualitaetsWert_berechnen = Math.Abs(OptZieleListe(ZielNr).ZielWert - SimWert)
 
                     Case "Reihe"
                         For i = 0 To SimReihe.GetUpperBound(0)
-                            QualitaetsWert += Math.Abs(OptZieleListe(ZielNr).ZielReihe(i, 1) - SimReihe(i, 1))
+                            QualitaetsWert_berechnen += Math.Abs(OptZieleListe(ZielNr).ZielReihe(i, 1) - SimReihe(i, 1))
                         Next
                 End Select
                 '------------------------
@@ -530,7 +530,7 @@ Public Class BM_Form
                             VolSim += SimReihe(i, 1)
                             VolZiel += OptZieleListe(ZielNr).ZielReihe(i, 1)
                         Next
-                        QualitaetsWert = Math.Abs(VolZiel - VolSim)
+                        QualitaetsWert_berechnen = Math.Abs(VolZiel - VolSim)
                 End Select
                 '------------------------
 
