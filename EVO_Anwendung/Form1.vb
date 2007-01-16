@@ -66,6 +66,9 @@ Friend Class Form1
                         Case "OptParameter"
                             BM_Form1.OptParameter_Pfad = Configs(i, 1)
                             BM_Form1.TextBox_OptParameter_Pfad.Text = BM_Form1.OptParameter_Pfad
+                        Case "ModellParameter"
+                            BM_Form1.ModellParameter_Pfad = Configs(i, 1)
+                            BM_Form1.TextBox_ModellParameter_Pfad.Text = BM_Form1.ModellParameter_Pfad
                         Case "OptZiele"
                             BM_Form1.OptZiele_Pfad = Configs(i, 1)
                             BM_Form1.TextBox_OptZiele_Pfad.Text = BM_Form1.OptZiele_Pfad
@@ -344,8 +347,9 @@ Friend Class Form1
             '*******************************
 
             'Anzahl Optimierungsparameter übergeben
+            '-----------------------------------------------------
             globalAnzPar = BM_Form1.OptParameterListe.GetLength(0)
-
+           
             'Parameterwerte übergeben
             'BUG 57: mypara() fängt bei 1 an!
             ReDim mypara(globalAnzPar, 1)
@@ -379,8 +383,7 @@ Friend Class Form1
             'Zielfunktion für Anfangswerte berechnen
             myIsOK = Zielfunktion(globalAnzPar, mypara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
 
-            '----------------------------------------------------
-            'HACK: Zielfunktionen für Min und Max Werte berechnen
+            'HACK: Zielfunktionen für Min und Max Werte berechnen -----------------------------------
             Dim minPara(globalAnzPar, 1) As Double
             Dim maxPara(globalAnzPar, 1) As Double
             For i = 1 To globalAnzPar
@@ -389,8 +392,8 @@ Friend Class Form1
             Next
             myIsOK = Zielfunktion(globalAnzPar, minPara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
             myIsOK = Zielfunktion(globalAnzPar, maxPara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
-            'Ende Hack
-            '----------------------------------------------------
+            'Ende Hack ------------------------------------------------------------------------------
+
 
         End If
 
@@ -777,8 +780,11 @@ ErrCode_ES_STARTEN:
             'Mutierte Parameter deskalieren
             Call BM_Form1.OptParameter_deskalieren()
 
+            'ModellParameter aus ModellParametern kalkulieren()
+            Call BM_Form1.OptParameter_to_ModellParameter()
+
             'Mutierte Parameter in Eingabedateien schreiben
-            Call BM_Form1.OptParameter_schreiben()
+            Call BM_Form1.ModellParameter_schreiben()
 
             'Modell Starten
             Call BM_Form1.launchBM()
@@ -1241,11 +1247,12 @@ ErrCode_ES_STARTEN:
 
             'Formatierung der Axen
             .Chart.Axes.Bottom.Title.Caption = "Simulation"
-            .Chart.Axes.Left.Automatic = False
+            .Chart.Axes.Bottom.Automatic = False
             .Chart.Axes.Bottom.Maximum = Anzahl_Kalkulationen
             .Chart.Axes.Bottom.Minimum = 0
             .Chart.Axes.Left.Title.Caption = BM_Form1.OptZieleListe(0).Bezeichnung
             .Chart.Axes.Left.Automatic = True
+            .Chart.Axes.Left.Minimum = 0
         End With
     End Sub
 
@@ -1394,9 +1401,7 @@ ErrCode_ES_STARTEN:
     Private Sub ComboBox_Anwendung_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Anwendung.SelectedIndexChanged
 
         Anwendung = ComboBox_Anwendung.SelectedItem
-
         Select Case Anwendung
-
             Case ANW_TESTPROBLEME
                 'Test-Probleme einschalten
                 Me.GroupBox_Testproblem.Enabled = True

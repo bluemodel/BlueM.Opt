@@ -28,7 +28,7 @@ Partial Class BM_Form
         Me.Label_Datensatz = New System.Windows.Forms.Label
         Me.TextBox_Datensatz = New System.Windows.Forms.TextBox
         Me.GroupBox_Parameter = New System.Windows.Forms.GroupBox
-        Me.Label_Parameter = New System.Windows.Forms.Label
+        Me.Label_OptParameter = New System.Windows.Forms.Label
         Me.TextBox_OptParameter_Pfad = New System.Windows.Forms.TextBox
         Me.Button_OptParameter = New System.Windows.Forms.Button
         Me.GroupBox_OptZiele = New System.Windows.Forms.GroupBox
@@ -40,6 +40,10 @@ Partial Class BM_Form
         Me.OpenFile_OptZiele = New System.Windows.Forms.OpenFileDialog
         Me.OpenFile_OptParameter = New System.Windows.Forms.OpenFileDialog
         Me.Button_OK = New System.Windows.Forms.Button
+        Me.Label_ModellParameter = New System.Windows.Forms.Label
+        Me.TextBox_ModellParameter_Pfad = New System.Windows.Forms.TextBox
+        Me.Button_ModellParameter = New System.Windows.Forms.Button
+        Me.OpenFile_ModellParameter = New System.Windows.Forms.OpenFileDialog
         Me.GroupBox_BM.SuspendLayout()
         Me.GroupBox_Parameter.SuspendLayout()
         Me.GroupBox_OptZiele.SuspendLayout()
@@ -114,24 +118,27 @@ Partial Class BM_Form
         '
         'GroupBox_Parameter
         '
-        Me.GroupBox_Parameter.Controls.Add(Me.Label_Parameter)
+        Me.GroupBox_Parameter.Controls.Add(Me.Button_ModellParameter)
+        Me.GroupBox_Parameter.Controls.Add(Me.TextBox_ModellParameter_Pfad)
+        Me.GroupBox_Parameter.Controls.Add(Me.Label_ModellParameter)
+        Me.GroupBox_Parameter.Controls.Add(Me.Label_OptParameter)
         Me.GroupBox_Parameter.Controls.Add(Me.TextBox_OptParameter_Pfad)
         Me.GroupBox_Parameter.Controls.Add(Me.Button_OptParameter)
         Me.GroupBox_Parameter.Location = New System.Drawing.Point(12, 97)
         Me.GroupBox_Parameter.Name = "GroupBox_Parameter"
-        Me.GroupBox_Parameter.Size = New System.Drawing.Size(368, 47)
+        Me.GroupBox_Parameter.Size = New System.Drawing.Size(368, 81)
         Me.GroupBox_Parameter.TabIndex = 31
         Me.GroupBox_Parameter.TabStop = False
         Me.GroupBox_Parameter.Text = "Optimierungsparameter"
         '
-        'Label_Parameter
+        'Label_OptParameter
         '
-        Me.Label_Parameter.AutoSize = True
-        Me.Label_Parameter.Location = New System.Drawing.Point(4, 20)
-        Me.Label_Parameter.Name = "Label_Parameter"
-        Me.Label_Parameter.Size = New System.Drawing.Size(60, 13)
-        Me.Label_Parameter.TabIndex = 1
-        Me.Label_Parameter.Text = "OPT-Datei:"
+        Me.Label_OptParameter.AutoSize = True
+        Me.Label_OptParameter.Location = New System.Drawing.Point(6, 20)
+        Me.Label_OptParameter.Name = "Label_OptParameter"
+        Me.Label_OptParameter.Size = New System.Drawing.Size(49, 13)
+        Me.Label_OptParameter.TabIndex = 1
+        Me.Label_OptParameter.Text = "OptPara:"
         '
         'TextBox_OptParameter_Pfad
         '
@@ -155,9 +162,9 @@ Partial Class BM_Form
         Me.GroupBox_OptZiele.Controls.Add(Me.Label_OptZiele)
         Me.GroupBox_OptZiele.Controls.Add(Me.TextBox_OptZiele_Pfad)
         Me.GroupBox_OptZiele.Controls.Add(Me.Button_OptZielWert)
-        Me.GroupBox_OptZiele.Location = New System.Drawing.Point(12, 150)
+        Me.GroupBox_OptZiele.Location = New System.Drawing.Point(12, 184)
         Me.GroupBox_OptZiele.Name = "GroupBox_OptZiele"
-        Me.GroupBox_OptZiele.Size = New System.Drawing.Size(368, 58)
+        Me.GroupBox_OptZiele.Size = New System.Drawing.Size(368, 51)
         Me.GroupBox_OptZiele.TabIndex = 30
         Me.GroupBox_OptZiele.TabStop = False
         Me.GroupBox_OptZiele.Text = "Optimierungsziele"
@@ -165,7 +172,7 @@ Partial Class BM_Form
         'Label_OptZiele
         '
         Me.Label_OptZiele.AutoSize = True
-        Me.Label_OptZiele.Location = New System.Drawing.Point(6, 25)
+        Me.Label_OptZiele.Location = New System.Drawing.Point(6, 22)
         Me.Label_OptZiele.Name = "Label_OptZiele"
         Me.Label_OptZiele.Size = New System.Drawing.Size(55, 13)
         Me.Label_OptZiele.TabIndex = 2
@@ -173,7 +180,7 @@ Partial Class BM_Form
         '
         'TextBox_OptZiele_Pfad
         '
-        Me.TextBox_OptZiele_Pfad.Location = New System.Drawing.Point(70, 22)
+        Me.TextBox_OptZiele_Pfad.Location = New System.Drawing.Point(70, 19)
         Me.TextBox_OptZiele_Pfad.Name = "TextBox_OptZiele_Pfad"
         Me.TextBox_OptZiele_Pfad.Size = New System.Drawing.Size(262, 20)
         Me.TextBox_OptZiele_Pfad.TabIndex = 24
@@ -181,7 +188,7 @@ Partial Class BM_Form
         '
         'Button_OptZielWert
         '
-        Me.Button_OptZielWert.Location = New System.Drawing.Point(338, 20)
+        Me.Button_OptZielWert.Location = New System.Drawing.Point(338, 17)
         Me.Button_OptZielWert.Name = "Button_OptZielWert"
         Me.Button_OptZielWert.Size = New System.Drawing.Size(24, 23)
         Me.Button_OptZielWert.TabIndex = 26
@@ -216,6 +223,36 @@ Partial Class BM_Form
         Me.Button_OK.TabIndex = 36
         Me.Button_OK.Text = "OK"
         Me.Button_OK.UseVisualStyleBackColor = True
+        '
+        'Label_ModellParameter
+        '
+        Me.Label_ModellParameter.AutoSize = True
+        Me.Label_ModellParameter.Location = New System.Drawing.Point(6, 46)
+        Me.Label_ModellParameter.Name = "Label_ModellParameter"
+        Me.Label_ModellParameter.Size = New System.Drawing.Size(63, 13)
+        Me.Label_ModellParameter.TabIndex = 27
+        Me.Label_ModellParameter.Text = "ModellPara:"
+        '
+        'TextBox_ModellParameter_Pfad
+        '
+        Me.TextBox_ModellParameter_Pfad.Location = New System.Drawing.Point(68, 43)
+        Me.TextBox_ModellParameter_Pfad.Name = "TextBox_ModellParameter_Pfad"
+        Me.TextBox_ModellParameter_Pfad.Size = New System.Drawing.Size(264, 20)
+        Me.TextBox_ModellParameter_Pfad.TabIndex = 24
+        Me.TextBox_ModellParameter_Pfad.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'Button_ModellParameter
+        '
+        Me.Button_ModellParameter.Location = New System.Drawing.Point(338, 40)
+        Me.Button_ModellParameter.Name = "Button_ModellParameter"
+        Me.Button_ModellParameter.Size = New System.Drawing.Size(24, 23)
+        Me.Button_ModellParameter.TabIndex = 29
+        Me.Button_ModellParameter.Text = "..."
+        Me.Button_ModellParameter.UseVisualStyleBackColor = True
+        '
+        'OpenFile_ModellParameter
+        '
+        Me.OpenFile_ModellParameter.Filter = "Modell-Parameter|*.opt"
         '
         'BM_Form
         '
@@ -256,7 +293,7 @@ Partial Class BM_Form
     Friend WithEvents Button_OptZielWert As System.Windows.Forms.Button
     Friend WithEvents OpenFile_OptZiele As System.Windows.Forms.OpenFileDialog
     Friend WithEvents GroupBox_Parameter As System.Windows.Forms.GroupBox
-    Friend WithEvents Label_Parameter As System.Windows.Forms.Label
+    Friend WithEvents Label_OptParameter As System.Windows.Forms.Label
     Friend WithEvents Button_OptParameter As System.Windows.Forms.Button
     Friend WithEvents OpenFile_OptParameter As System.Windows.Forms.OpenFileDialog
     Friend WithEvents Button_OK As System.Windows.Forms.Button
@@ -264,5 +301,9 @@ Partial Class BM_Form
     Public WithEvents TextBox_Datensatz As System.Windows.Forms.TextBox
     Public WithEvents TextBox_OptZiele_Pfad As System.Windows.Forms.TextBox
     Public WithEvents TextBox_OptParameter_Pfad As System.Windows.Forms.TextBox
+    Friend WithEvents Button_ModellParameter As System.Windows.Forms.Button
+    Friend WithEvents Label_ModellParameter As System.Windows.Forms.Label
+    Public WithEvents TextBox_ModellParameter_Pfad As System.Windows.Forms.TextBox
+    Friend WithEvents OpenFile_ModellParameter As System.Windows.Forms.OpenFileDialog
 
 End Class

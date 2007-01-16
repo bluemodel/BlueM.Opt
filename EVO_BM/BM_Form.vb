@@ -11,16 +11,15 @@ Public Class BM_Form
     Public BM_Exe As String                         'Pfad zu BlauesModell.exe
 
     Public OptParameter_Pfad As String                 'Pfad zur Datei mit den Optimierungsparametern (*.OPT)
+    Public ModellParameter_Pfad As String
     Public OptZiele_Pfad As String                     'Pfad zur Datei mit den Zielfunktionen (*.ZIE)
-
+    '---------------------------------------------------------------------------------
     'Optimierungsparameter
     Public Structure OptParameter
+        '*| Bezeichnung  | Einh. | ParGr | Anfangsw. |  Min   |  Max   |
         Public Bezeichnung As String                'Bezeichnung
         Public Einheit As String                    'Einheit
-        Public Datei As String                      'Dateiendung der BM-Eingabedatei
-        Public ZeileNr As Short                     'Zeile
-        Public Sp1 As Short                         'Anfangsspalte
-        Public Sp2 As Short                         'Endspalte
+        Public Gruppe As String               'ParameterGruppe
         Public Wert As Double                       'Parameterwert
         Public Min As Double                        'Minimum
         Public Max As Double                        'Maximum
@@ -32,8 +31,22 @@ Public Class BM_Form
             SKWert = (Wert - Min) / (Max - Min)
         End Sub
     End Structure
-
     Public OptParameterListe() As OptParameter = {} 'Liste der Optimierungsparameter
+
+    'ModellParameter
+    Public Structure ModellParameter
+        '*| Bezeichnung  | Einh. | Datei | Zeile | von | bis | ParID | Faktor|
+        Public Bezeichnung As String                'Bezeichnung
+        Public Einheit As String                    'Einheit
+        Public Datei As String                      'Dateiendung der BM-Eingabedatei
+        Public ZeileNr As Short                     'Zeile
+        Public SpVon As Short                       'Anfangsspalte
+        Public SpBis As Short                       'Endspalte
+        Public Gruppe As String                     'Gruppe zu welcher dieser Parameter gehört
+        Public Faktor As Double                     'Faktor fuer das Umrechnen zwischen OptParameter und ModellParameter
+        Public Wert As Double                       'Aus OptParameter errechneter Wert
+    End Structure
+    Public ModellParameterListe() As ModellParameter = {} 'Liste der Optimierungsparameter
 
     'Optimierungsziele
     Public Structure OptZiele
@@ -95,48 +108,52 @@ Public Class BM_Form
 
     End Sub
 
-    'Optimierungsparameter
+    'OptimierungsParameter
     Private Sub Button_OptParameter_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_OptParameter.Click
         Me.OpenFile_OptParameter.ShowDialog()
     End Sub
-
     Private Sub OpenFile_OptParameter_FileOk(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles OpenFile_OptParameter.FileOk
-        OptParameter_Pfad = OpenFile_OptParameter.FileName()
-        TextBox_OptParameter_Pfad.Text = OptParameter_Pfad
+        'Pfad zur Datei auslesen
+        Me.OptParameter_Pfad = OpenFile_OptParameter.FileName()
+        'Pfad in Textbox schreiben
+        Me.TextBox_OptParameter_Pfad.Text = OptParameter_Pfad
+    End Sub
+
+    'ModellParameter
+    Private Sub Button_ModellParameter_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_ModellParameter.Click
+        Me.OpenFile_ModellParameter.ShowDialog()
+    End Sub
+    Private Sub OpenFile_ModellParameter_FileOk(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles OpenFile_ModellParameter.FileOk
+        'Pfad zur Datei auslesen
+        Me.ModellParameter_Pfad = OpenFile_ModellParameter.FileName()
+        'Pfad in Textbox schreiben
+        Me.TextBox_ModellParameter_Pfad.Text = ModellParameter_Pfad
     End Sub
 
     'Optimierungsziele
     Private Sub Button_OptZielWert_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_OptZielWert.Click
         Me.OpenFile_OptZiele.ShowDialog()
     End Sub
-
     Private Sub OpenFile_OptZielWert_FileOk(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles OpenFile_OptZiele.FileOk
-
         'Pfad zur Datei auslesen
         Me.OptZiele_Pfad = Me.OpenFile_OptZiele.FileName
-
         'Pfad in Textbox schreiben
         Me.TextBox_OptZiele_Pfad.Text = Me.OptZiele_Pfad
-
     End Sub
 
     'BM-Einstellungen anwenden
     Private Sub Button_OK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_OK.Click
-
         Me.Close()
-
         'Initialisierung
         Call db_prepare()
-
         'Optimierungsparameter einlesen
         Call OptParameter_einlesen()
-
         'Parameterwerte zum ersten Mal skalieren
         Call OptParameter_skalieren()
-
+        'ModellParameter einlesen
+        Call ModellParameter_einlesen()
         'Zielfunktionen einlesen
         Call OptZiele_einlesen()
-
     End Sub
 
     'Ergebnisdatenbank vorbereiten
@@ -199,13 +216,10 @@ Public Class BM_Form
                     'Werte zuweisen
                     OptParameterListe(i).Bezeichnung = array(1).Trim()
                     OptParameterListe(i).Einheit = array(2).Trim()
-                    OptParameterListe(i).Datei = array(3).Trim()
-                    OptParameterListe(i).ZeileNr = Convert.ToInt16(array(4).Trim())
-                    OptParameterListe(i).Sp1 = Convert.ToInt16(array(5).Trim())
-                    OptParameterListe(i).Sp2 = Convert.ToInt16(array(6).Trim())
-                    OptParameterListe(i).Wert = Convert.ToDouble(array(7).Trim())
-                    OptParameterListe(i).Min = Convert.ToDouble(array(8).Trim())
-                    OptParameterListe(i).Max = Convert.ToDouble(array(9).Trim())
+                    OptParameterListe(i).Gruppe = array(3).Trim()
+                    OptParameterListe(i).Wert = Convert.ToDouble(array(4).Trim())
+                    OptParameterListe(i).Min = Convert.ToDouble(array(5).Trim())
+                    OptParameterListe(i).Max = Convert.ToDouble(array(6).Trim())
                     i += 1
                 End If
             Loop Until StrRead.Peek() = -1
@@ -213,6 +227,51 @@ Public Class BM_Form
         Catch except As Exception
             MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim Lesen der Optimierungsparameter")
         End Try
+    End Sub
+    Private Sub ModellParameter_einlesen()
+        Try
+            Dim FiStr As FileStream = New FileStream(ModellParameter_Pfad, FileMode.Open, IO.FileAccess.ReadWrite)
+            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+            Dim Zeile As String
+            Dim AnzParam As Integer = 0
+
+            'Anzahl der Parameter feststellen
+            Do
+                Zeile = StrRead.ReadLine.ToString()
+                If (Zeile.StartsWith("*") = False) Then
+                    AnzParam += 1
+                End If
+            Loop Until StrRead.Peek() = -1
+
+            ReDim ModellParameterListe(AnzParam - 1)
+
+            'Zurück zum Dateianfang und lesen
+            FiStr.Seek(0, SeekOrigin.Begin)
+
+            Dim array() As String
+            Dim i As Integer = 0
+            Do
+                Zeile = StrRead.ReadLine.ToString()
+                If (Zeile.StartsWith("*") = False) Then
+                    array = Zeile.Split("|")
+                    'Werte zuweisen
+                    ModellParameterListe(i).Bezeichnung = array(1).Trim()
+                    ModellParameterListe(i).Einheit = array(2).Trim()
+                    ModellParameterListe(i).Datei = array(3).Trim()
+                    ModellParameterListe(i).ZeileNr = Convert.ToInt16(array(4).Trim())
+                    ModellParameterListe(i).SpVon = Convert.ToInt16(array(5).Trim())
+                    ModellParameterListe(i).SpBis = Convert.ToInt16(array(6).Trim())
+                    ModellParameterListe(i).Gruppe = array(7).Trim()
+                    ModellParameterListe(i).Faktor = Convert.ToDouble(array(8).Trim())
+                    i += 1
+                End If
+            Loop Until StrRead.Peek() = -1
+
+        Catch except As Exception
+            MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim Lesen der Optimierungsparameter")
+        End Try
+
     End Sub
 
     'Optimierungsziele einlesen (*.zie-Datei)
@@ -323,8 +382,21 @@ Public Class BM_Form
         Next
     End Sub
 
+    'ModellParameter werden aus OptParametern errechnet
+    Public Sub OptParameter_to_ModellParameter()
+        Dim i As Integer
+        Dim j As Integer
+        For i = 0 To ModellParameterListe.GetUpperBound(0)
+            For j = 0 To OptParameterListe.GetUpperBound(0)
+                If ModellParameterListe(i).Gruppe = OptParameterListe(j).Gruppe Then
+                    ModellParameterListe(i).Wert = OptParameterListe(j).Wert * ModellParameterListe(i).Faktor
+                End If
+            Next
+        Next
+    End Sub
+
     'Die Optimierungparameter in die BM-Eingabedateien schreiben
-    Public Sub OptParameter_schreiben()
+    Public Sub ModellParameter_schreiben()
         Dim Wert As String
         Dim AnzZeil As Integer
         Dim j As Integer
@@ -334,10 +406,10 @@ Public Class BM_Form
         Dim StrRight As String
         Dim DateiPfad As String
 
-        'Alle OptParameter durchlaufen
-        For i As Integer = 0 To OptParameterListe.GetUpperBound(0)
+        'Alle ModellParameter durchlaufen
+        For i As Integer = 0 To ModellParameterListe.GetUpperBound(0)
             Try
-                DateiPfad = WorkDir & Datensatz & "." & OptParameterListe(i).Datei
+                DateiPfad = WorkDir & Datensatz & "." & ModellParameterListe(i).Datei
                 'Datei öffnen
                 Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.Read)
                 Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -361,18 +433,19 @@ Public Class BM_Form
                 FiStr.Close()
 
                 'Zeile ändern
-                Zeile = Zeilenarray(OptParameterListe(i).ZeileNr - 1)
-                Dim Length As Short = OptParameterListe(i).Sp2 - OptParameterListe(i).Sp1
-                StrLeft = Microsoft.VisualBasic.Left(Zeile, OptParameterListe(i).Sp1 - 1)
-                StrRight = Microsoft.VisualBasic.Right(Zeile, Len(Zeile) - OptParameterListe(i).Sp2 + 1)
-                Wert = OptParameterListe(i).Wert.ToString()
+                Zeile = Zeilenarray(ModellParameterListe(i).ZeileNr - 1)
+                Dim Length As Short = ModellParameterListe(i).SpBis - ModellParameterListe(i).SpVon
+                StrLeft = Microsoft.VisualBasic.Left(Zeile, ModellParameterListe(i).SpVon - 1)
+                StrRight = Microsoft.VisualBasic.Right(Zeile, Len(Zeile) - ModellParameterListe(i).SpBis + 1)
+
+                Wert = ModellParameterListe(i).Wert.ToString()
                 If (Wert.Length > Length) Then
                     'TODO: Parameter wird für erforderliche Stringlänge einfach abgeschnitten, sollte aber gerundet werden!
                     Wert = Wert.Substring(0, Length)
                 Else
                     Wert = Wert.PadLeft(Length)
                 End If
-                Zeilenarray(OptParameterListe(i).ZeileNr - 1) = StrLeft & Wert & StrRight
+                Zeilenarray(ModellParameterListe(i).ZeileNr - 1) = StrLeft & Wert & StrRight
 
                 'Alle Zeilen wieder in Datei schreiben
                 Dim StrWrite As StreamWriter = New StreamWriter(DateiPfad, False, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -675,5 +748,4 @@ Public Class BM_Form
 
         Call db_disconnect()
     End Function
-
 End Class
