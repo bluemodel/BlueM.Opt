@@ -379,6 +379,19 @@ Friend Class Form1
             'Zielfunktion für Anfangswerte berechnen
             myIsOK = Zielfunktion(globalAnzPar, mypara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
 
+            '----------------------------------------------------
+            'HACK: Zielfunktionen für Min und Max Werte berechnen
+            Dim minPara(globalAnzPar, 1) As Double
+            Dim maxPara(globalAnzPar, 1) As Double
+            For i = 1 To globalAnzPar
+                minPara(i, 1) = 0
+                maxPara(i, 1) = 1
+            Next
+            myIsOK = Zielfunktion(globalAnzPar, minPara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
+            myIsOK = Zielfunktion(globalAnzPar, maxPara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
+            'Ende Hack
+            '----------------------------------------------------
+
         End If
 
         ReDim QN(globalAnzZiel)
@@ -774,7 +787,7 @@ ErrCode_ES_STARTEN:
             'BUG 57: QN() fängt bei 1 an!
             'Dim AnzQualWerte As Integer = BM_Form1.OptZieleListe.GetLength(0)
             For i = 0 To globalAnzZiel - 1
-                BM_Form1.OptZieleListe(i).QWertTmp = BM_Form1.QualitaetsWert(i)
+                BM_Form1.OptZieleListe(i).QWertTmp = BM_Form1.QualitaetsWert_berechnen(i)
                 QN(i + 1) = BM_Form1.OptZieleListe(i).QWertTmp
             Next
 
@@ -1228,6 +1241,7 @@ ErrCode_ES_STARTEN:
 
             'Formatierung der Axen
             .Chart.Axes.Bottom.Title.Caption = "Simulation"
+            .Chart.Axes.Left.Automatic = False
             .Chart.Axes.Bottom.Maximum = Anzahl_Kalkulationen
             .Chart.Axes.Bottom.Minimum = 0
             .Chart.Axes.Left.Title.Caption = BM_Form1.OptZieleListe(0).Bezeichnung
