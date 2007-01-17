@@ -381,7 +381,7 @@ Friend Class Form1
             ReDim RN(globalAnzRand)
 
             'Zielfunktion für Anfangswerte berechnen
-            myIsOK = Zielfunktion(globalAnzPar, mypara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
+            myIsOK = Simulieren(globalAnzPar, mypara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
 
             'HACK: Zielfunktionen für Min und Max Werte berechnen -----------------------------------
             Dim minPara(globalAnzPar, 1) As Double
@@ -390,8 +390,8 @@ Friend Class Form1
                 minPara(i, 1) = 0
                 maxPara(i, 1) = 1
             Next
-            myIsOK = Zielfunktion(globalAnzPar, minPara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
-            myIsOK = Zielfunktion(globalAnzPar, maxPara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
+            myIsOK = Simulieren(globalAnzPar, minPara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
+            myIsOK = Simulieren(globalAnzPar, maxPara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
             'Ende Hack ------------------------------------------------------------------------------
 
 
@@ -546,7 +546,7 @@ Start_Evolutionsrunden:
                         End If
 
                         'Bestimmen der Zielfunktion bzw. Start der Simulation
-                        myIsOK = Zielfunktion(globalAnzPar, mypara, durchlauf, Bestwert, ipop, QN, RN, evolutionsstrategie.isMultiObjective)
+                        myIsOK = Simulieren(globalAnzPar, mypara, durchlauf, Bestwert, ipop, QN, RN, evolutionsstrategie.isMultiObjective)
 
                         'Einordnen der Qualitätsfunktion im Bestwertspeicher
                         myIsOK = evolutionsstrategie.EsBest(QN, RN)
@@ -625,8 +625,8 @@ ErrCode_ES_STARTEN:
         GoTo EXIT_ES_STARTEN
     End Function
 
-    'Private Function Zielfunktion(AnzPar As Integer, Par() As Double, durchlauf As Long, Bestwert() As Double, ipop As Integer, Optional QN2 As Double) As double
-    Private Function Zielfunktion(ByRef AnzPar As Short, ByRef Par(,) As Double, ByRef durchlauf As Integer, ByRef Bestwert(,) As Double, ByRef ipop As Short, ByRef QN() As Double, ByRef RN() As Double, ByVal isPareto As Boolean) As Boolean
+    '
+    Private Function Simulieren(ByRef AnzPar As Short, ByRef Par(,) As Double, ByRef durchlauf As Integer, ByRef Bestwert(,) As Double, ByRef ipop As Short, ByRef QN() As Double, ByRef RN() As Double, ByVal isPareto As Boolean) As Boolean
         Dim i As Short
         Dim Unterteilung_X As Double
         Dim x1, x2 As Double
