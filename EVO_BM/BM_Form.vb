@@ -314,14 +314,14 @@ Public Class BM_Form
                     If (Zeile.StartsWith("*") = False) Then
                         ZeilenArray = Zeile.Split("|")
                         'Werte zuweisen
-                        OptZieleListe(i).Bezeichnung = ZeilenArray(0).Trim()
-                        OptZieleListe(i).ZielTyp = ZeilenArray(1).Trim()
-                        OptZieleListe(i).SpalteWel = ZeilenArray(2).Trim()
-                        OptZieleListe(i).ZielFkt = ZeilenArray(3).Trim()
-                        OptZieleListe(i).WertTyp = ZeilenArray(4).Trim()
-                        OptZieleListe(i).ZielWert = ZeilenArray(5).Trim()
-                        OptZieleListe(i).SpalteZiel = ZeilenArray(6).Trim()
-                        OptZieleListe(i).ZielReihePfad = ZeilenArray(7).Trim()
+                        OptZieleListe(i).Bezeichnung = ZeilenArray(1).Trim()
+                        OptZieleListe(i).ZielTyp = ZeilenArray(2).Trim()
+                        OptZieleListe(i).SpalteWel = ZeilenArray(3).Trim()
+                        OptZieleListe(i).ZielFkt = ZeilenArray(4).Trim()
+                        OptZieleListe(i).WertTyp = ZeilenArray(5).Trim()
+                        OptZieleListe(i).ZielWert = ZeilenArray(6).Trim()
+                        OptZieleListe(i).SpalteZiel = ZeilenArray(7).Trim()
+                        OptZieleListe(i).ZielReihePfad = ZeilenArray(8).Trim()
                         i += 1
                     End If
                 Loop Until StrRead.Peek() = -1
