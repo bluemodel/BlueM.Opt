@@ -22,14 +22,17 @@ Public Class BM_Form
         Public Wert As Double                       'Parameterwert
         Public Min As Double                        'Minimum
         Public Max As Double                        'Maximum
-        Public SKWert As Double                     'Skalierter Wert
-        Public Sub deskalieren()                    'deskaliert SKWert und schreibt ihn in Wert
-            Wert = SKWert * (Max - Min) + Min
-        End Sub
-        Public Sub skalieren()                      'skaliert Wert und schreibt ihn in SKWert
-            SKWert = (Wert - Min) / (Max - Min)
-        End Sub
+        Public Property SKWert() As Double          'skalierter Wert (0 bis 1)
+            Get
+                SKWert = (Wert - Min) / (Max - Min)
+                Exit Property
+            End Get
+            Set(ByVal value As Double)
+                Wert = value * (Max - Min) + Min
+            End Set
+        End Property
     End Structure
+
     Public OptParameterListe() As OptParameter = {} 'Liste der Optimierungsparameter
 
     'ModellParameter
@@ -45,6 +48,7 @@ Public Class BM_Form
         Public Faktor As Double                     'Faktor fuer das Umrechnen zwischen OptParameter und ModellParameter
         Public Wert As Double                       'Aus OptParameter errechneter Wert
     End Structure
+
     Public ModellParameterListe() As ModellParameter = {} 'Liste der Modellparameter
 
     'Optimierungsziele
@@ -147,8 +151,6 @@ Public Class BM_Form
         Call db_prepare()
         'Optimierungsparameter einlesen
         Call OptParameter_einlesen()
-        'Parameterwerte zum ersten Mal skalieren
-        Call OptParameter_skalieren()
         'ModellParameter einlesen
         Call ModellParameter_einlesen()
         'Zielfunktionen einlesen
@@ -226,6 +228,8 @@ Public Class BM_Form
             MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim Lesen der Optimierungsparameter")
         End Try
     End Sub
+
+    'Modellparameter einlesen (*.OPT-Datei)
     Private Sub ModellParameter_einlesen()
         Try
             Dim FiStr As FileStream = New FileStream(ModellParameter_Pfad, FileMode.Open, IO.FileAccess.ReadWrite)
@@ -363,22 +367,6 @@ Public Class BM_Form
 
     'Public Methoden
     '-------------------------------------
-
-    'skaliert alle OptParameter.Wert und schreibt sie in OptParameter.SKWert
-    Public Sub OptParameter_skalieren()
-        'Schleife über alle Parameter
-        For i As Integer = 0 To OptParameterListe.GetUpperBound(0)
-            Call OptParameterListe(i).skalieren()
-        Next
-    End Sub
-
-    'deskaliert alle OptParameter.SKWert und schreibt sie in OptParameter.Wert
-    Public Sub OptParameter_deskalieren()
-        'Schleife über alle Parameter
-        For i As Integer = 0 To OptParameterListe.GetUpperBound(0)
-            Call OptParameterListe(i).deskalieren()
-        Next
-    End Sub
 
     'ModellParameter werden aus OptParametern errechnet
     Public Sub OptParameter_to_ModellParameter()
