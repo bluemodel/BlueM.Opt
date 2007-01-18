@@ -777,9 +777,6 @@ ErrCode_ES_STARTEN:
                 BM_Form1.OptParameterListe(i - 1).SKWert = Par(i, 1)     'OptParameterListe(i-1,*) weil Array bei 0 anfängt!
             Next
 
-            'Mutierte Parameter deskalieren
-            Call BM_Form1.OptParameter_deskalieren()
-
             'Mutierte Parameter in Eingabedateien schreiben
             Call BM_Form1.ModellParameter_schreiben()
 
@@ -788,7 +785,6 @@ ErrCode_ES_STARTEN:
 
             'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
             'BUG 57: QN() fängt bei 1 an!
-            'Dim AnzQualWerte As Integer = BM_Form1.OptZieleListe.GetLength(0)
             For i = 0 To globalAnzZiel - 1
                 BM_Form1.OptZieleListe(i).QWertTmp = BM_Form1.QualitaetsWert_berechnen(i)
                 QN(i + 1) = BM_Form1.OptZieleListe(i).QWertTmp
