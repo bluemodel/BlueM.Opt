@@ -381,7 +381,7 @@ Friend Class Form1
             ReDim RN(globalAnzRand)
 
             'Zielfunktion für Anfangswerte berechnen
-            myIsOK = Zielfunktion(globalAnzPar, mypara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
+            myIsOK = Simulieren(globalAnzPar, mypara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
 
             'HACK: Zielfunktionen für Min und Max Werte berechnen -----------------------------------
             Dim minPara(globalAnzPar, 1) As Double
@@ -390,8 +390,8 @@ Friend Class Form1
                 minPara(i, 1) = 0
                 maxPara(i, 1) = 1
             Next
-            myIsOK = Zielfunktion(globalAnzPar, minPara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
-            myIsOK = Zielfunktion(globalAnzPar, maxPara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
+            myIsOK = Simulieren(globalAnzPar, minPara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
+            myIsOK = Simulieren(globalAnzPar, maxPara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
             'Ende Hack ------------------------------------------------------------------------------
 
 
@@ -546,7 +546,7 @@ Start_Evolutionsrunden:
                         End If
 
                         'Bestimmen der Zielfunktion bzw. Start der Simulation
-                        myIsOK = Zielfunktion(globalAnzPar, mypara, durchlauf, Bestwert, ipop, QN, RN, evolutionsstrategie.isMultiObjective)
+                        myIsOK = Simulieren(globalAnzPar, mypara, durchlauf, Bestwert, ipop, QN, RN, evolutionsstrategie.isMultiObjective)
 
                         'Einordnen der Qualitätsfunktion im Bestwertspeicher
                         myIsOK = evolutionsstrategie.EsBest(QN, RN)
@@ -625,8 +625,8 @@ ErrCode_ES_STARTEN:
         GoTo EXIT_ES_STARTEN
     End Function
 
-    'Private Function Zielfunktion(AnzPar As Integer, Par() As Double, durchlauf As Long, Bestwert() As Double, ipop As Integer, Optional QN2 As Double) As double
-    Private Function Zielfunktion(ByRef AnzPar As Short, ByRef Par(,) As Double, ByRef durchlauf As Integer, ByRef Bestwert(,) As Double, ByRef ipop As Short, ByRef QN() As Double, ByRef RN() As Double, ByVal isPareto As Boolean) As Boolean
+    '
+    Private Function Simulieren(ByRef AnzPar As Short, ByRef Par(,) As Double, ByRef durchlauf As Integer, ByRef Bestwert(,) As Double, ByRef ipop As Short, ByRef QN() As Double, ByRef RN() As Double, ByVal isPareto As Boolean) As Boolean
         Dim i As Short
         Dim Unterteilung_X As Double
         Dim x1, x2 As Double
@@ -777,12 +777,6 @@ ErrCode_ES_STARTEN:
                 BM_Form1.OptParameterListe(i - 1).SKWert = Par(i, 1)     'OptParameterListe(i-1,*) weil Array bei 0 anfängt!
             Next
 
-            'Mutierte Parameter deskalieren
-            Call BM_Form1.OptParameter_deskalieren()
-
-            'ModellParameter aus ModellParametern kalkulieren()
-            Call BM_Form1.OptParameter_to_ModellParameter()
-
             'Mutierte Parameter in Eingabedateien schreiben
             Call BM_Form1.ModellParameter_schreiben()
 
@@ -791,7 +785,6 @@ ErrCode_ES_STARTEN:
 
             'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
             'BUG 57: QN() fängt bei 1 an!
-            'Dim AnzQualWerte As Integer = BM_Form1.OptZieleListe.GetLength(0)
             For i = 0 To globalAnzZiel - 1
                 BM_Form1.OptZieleListe(i).QWertTmp = BM_Form1.QualitaetsWert_berechnen(i)
                 QN(i + 1) = BM_Form1.OptZieleListe(i).QWertTmp

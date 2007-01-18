@@ -10,43 +10,46 @@ Public Class BM_Form
     Public WorkDir As String                        'Arbeitsverzeichnis für das Blaue Modell
     Public BM_Exe As String                         'Pfad zu BlauesModell.exe
 
-    Public OptParameter_Pfad As String                 'Pfad zur Datei mit den Optimierungsparametern (*.OPT)
+    Public OptParameter_Pfad As String              'Pfad zur Datei mit den Optimierungsparametern (*.OPT)
     Public ModellParameter_Pfad As String
-    Public OptZiele_Pfad As String                     'Pfad zur Datei mit den Zielfunktionen (*.ZIE)
+    Public OptZiele_Pfad As String                  'Pfad zur Datei mit den Zielfunktionen (*.ZIE)
     '---------------------------------------------------------------------------------
     'Optimierungsparameter
     Public Structure OptParameter
-        '*| Bezeichnung  | Einh. | ParGr | Anfangsw. |  Min   |  Max   |
+        '*| Bezeichnung | Einh. | Anfangsw. | Min | Max |
         Public Bezeichnung As String                'Bezeichnung
         Public Einheit As String                    'Einheit
-        Public Gruppe As String               'ParameterGruppe
         Public Wert As Double                       'Parameterwert
         Public Min As Double                        'Minimum
         Public Max As Double                        'Maximum
-        Public SKWert As Double                     'Skalierter Wert
-        Public Sub deskalieren()                    'deskaliert SKWert und schreibt ihn in Wert
-            Wert = SKWert * (Max - Min) + Min
-        End Sub
-        Public Sub skalieren()                      'skaliert Wert und schreibt ihn in SKWert
-            SKWert = (Wert - Min) / (Max - Min)
-        End Sub
+        Public Property SKWert() As Double          'skalierter Wert (0 bis 1)
+            Get
+                SKWert = (Wert - Min) / (Max - Min)
+                Exit Property
+            End Get
+            Set(ByVal value As Double)
+                Wert = value * (Max - Min) + Min
+            End Set
+        End Property
     End Structure
+
     Public OptParameterListe() As OptParameter = {} 'Liste der Optimierungsparameter
 
     'ModellParameter
     Public Structure ModellParameter
-        '*| Bezeichnung  | Einh. | Datei | Zeile | von | bis | ParID | Faktor|
+        '*| OptParameter | Bezeichnung  | Einh. | Datei | Zeile | von | bis | Faktor |
+        Public OptParameter As String               'Optimierungsparameter, aus dem dieser Modellparameter errechnet wird
         Public Bezeichnung As String                'Bezeichnung
         Public Einheit As String                    'Einheit
         Public Datei As String                      'Dateiendung der BM-Eingabedatei
         Public ZeileNr As Short                     'Zeile
         Public SpVon As Short                       'Anfangsspalte
         Public SpBis As Short                       'Endspalte
-        Public Gruppe As String                     'Gruppe zu welcher dieser Parameter gehört
         Public Faktor As Double                     'Faktor fuer das Umrechnen zwischen OptParameter und ModellParameter
         Public Wert As Double                       'Aus OptParameter errechneter Wert
     End Structure
-    Public ModellParameterListe() As ModellParameter = {} 'Liste der Optimierungsparameter
+
+    Public ModellParameterListe() As ModellParameter = {} 'Liste der Modellparameter
 
     'Optimierungsziele
     Public Structure OptZiele
@@ -148,8 +151,6 @@ Public Class BM_Form
         Call db_prepare()
         'Optimierungsparameter einlesen
         Call OptParameter_einlesen()
-        'Parameterwerte zum ersten Mal skalieren
-        Call OptParameter_skalieren()
         'ModellParameter einlesen
         Call ModellParameter_einlesen()
         'Zielfunktionen einlesen
@@ -216,10 +217,9 @@ Public Class BM_Form
                     'Werte zuweisen
                     OptParameterListe(i).Bezeichnung = array(1).Trim()
                     OptParameterListe(i).Einheit = array(2).Trim()
-                    OptParameterListe(i).Gruppe = array(3).Trim()
-                    OptParameterListe(i).Wert = Convert.ToDouble(array(4).Trim())
-                    OptParameterListe(i).Min = Convert.ToDouble(array(5).Trim())
-                    OptParameterListe(i).Max = Convert.ToDouble(array(6).Trim())
+                    OptParameterListe(i).Wert = Convert.ToDouble(array(3).Trim())
+                    OptParameterListe(i).Min = Convert.ToDouble(array(4).Trim())
+                    OptParameterListe(i).Max = Convert.ToDouble(array(5).Trim())
                     i += 1
                 End If
             Loop Until StrRead.Peek() = -1
@@ -228,6 +228,8 @@ Public Class BM_Form
             MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim Lesen der Optimierungsparameter")
         End Try
     End Sub
+
+    'Modellparameter einlesen (*.OPT-Datei)
     Private Sub ModellParameter_einlesen()
         Try
             Dim FiStr As FileStream = New FileStream(ModellParameter_Pfad, FileMode.Open, IO.FileAccess.ReadWrite)
@@ -256,13 +258,13 @@ Public Class BM_Form
                 If (Zeile.StartsWith("*") = False) Then
                     array = Zeile.Split("|")
                     'Werte zuweisen
-                    ModellParameterListe(i).Bezeichnung = array(1).Trim()
-                    ModellParameterListe(i).Einheit = array(2).Trim()
-                    ModellParameterListe(i).Datei = array(3).Trim()
-                    ModellParameterListe(i).ZeileNr = Convert.ToInt16(array(4).Trim())
-                    ModellParameterListe(i).SpVon = Convert.ToInt16(array(5).Trim())
-                    ModellParameterListe(i).SpBis = Convert.ToInt16(array(6).Trim())
-                    ModellParameterListe(i).Gruppe = array(7).Trim()
+                    ModellParameterListe(i).OptParameter = array(1).Trim()
+                    ModellParameterListe(i).Bezeichnung = array(2).Trim()
+                    ModellParameterListe(i).Einheit = array(3).Trim()
+                    ModellParameterListe(i).Datei = array(4).Trim()
+                    ModellParameterListe(i).ZeileNr = Convert.ToInt16(array(5).Trim())
+                    ModellParameterListe(i).SpVon = Convert.ToInt16(array(6).Trim())
+                    ModellParameterListe(i).SpBis = Convert.ToInt16(array(7).Trim())
                     ModellParameterListe(i).Faktor = Convert.ToDouble(array(8).Trim())
                     i += 1
                 End If
@@ -366,36 +368,20 @@ Public Class BM_Form
     'Public Methoden
     '-------------------------------------
 
-    'skaliert alle OptParameter.Wert und schreibt sie in OptParameter.SKWert
-    Public Sub OptParameter_skalieren()
-        'Schleife über alle Parameter
-        For i As Integer = 0 To OptParameterListe.GetUpperBound(0)
-            Call OptParameterListe(i).skalieren()
-        Next
-    End Sub
-
-    'deskaliert alle OptParameter.SKWert und schreibt sie in OptParameter.Wert
-    Public Sub OptParameter_deskalieren()
-        'Schleife über alle Parameter
-        For i As Integer = 0 To OptParameterListe.GetUpperBound(0)
-            Call OptParameterListe(i).deskalieren()
-        Next
-    End Sub
-
     'ModellParameter werden aus OptParametern errechnet
     Public Sub OptParameter_to_ModellParameter()
         Dim i As Integer
         Dim j As Integer
         For i = 0 To ModellParameterListe.GetUpperBound(0)
             For j = 0 To OptParameterListe.GetUpperBound(0)
-                If ModellParameterListe(i).Gruppe = OptParameterListe(j).Gruppe Then
+                If ModellParameterListe(i).OptParameter = OptParameterListe(j).Bezeichnung Then
                     ModellParameterListe(i).Wert = OptParameterListe(j).Wert * ModellParameterListe(i).Faktor
                 End If
             Next
         Next
     End Sub
 
-    'Die Optimierungparameter in die BM-Eingabedateien schreiben
+    'Die ModellParameter in die BM-Eingabedateien schreiben
     Public Sub ModellParameter_schreiben()
         Dim Wert As String
         Dim AnzZeil As Integer
@@ -405,6 +391,9 @@ Public Class BM_Form
         Dim StrLeft As String
         Dim StrRight As String
         Dim DateiPfad As String
+
+        'ModellParameter aus OptParametern kalkulieren()
+        Call OptParameter_to_ModellParameter()
 
         'Alle ModellParameter durchlaufen
         For i As Integer = 0 To ModellParameterListe.GetUpperBound(0)
