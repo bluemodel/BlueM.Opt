@@ -2,7 +2,7 @@
 Partial Class BM_Form
     Inherits System.Windows.Forms.Form
 
-    'UserControl überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
+    'Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
     <System.Diagnostics.DebuggerNonUserCode()> _
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         If disposing AndAlso components IsNot Nothing Then
