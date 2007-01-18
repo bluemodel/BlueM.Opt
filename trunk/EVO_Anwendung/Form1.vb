@@ -780,9 +780,6 @@ ErrCode_ES_STARTEN:
             'Mutierte Parameter deskalieren
             Call BM_Form1.OptParameter_deskalieren()
 
-            'ModellParameter aus ModellParametern kalkulieren()
-            Call BM_Form1.OptParameter_to_ModellParameter()
-
             'Mutierte Parameter in Eingabedateien schreiben
             Call BM_Form1.ModellParameter_schreiben()
 
