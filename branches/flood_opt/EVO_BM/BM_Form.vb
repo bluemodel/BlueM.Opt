@@ -491,116 +491,125 @@ Public Class BM_Form
 
     'Berechnung des Qualitätswerts (Zielwert)
     Public Function QualitaetsWert_berechnen(ByVal ZielNr As Integer) As Double
-        Dim i As Integer
-        Dim SimReihe(,) As Object = {}
-        Dim SimWert As Single
-        Dim IsOK As Boolean
+        If (OptZieleListe(ZielNr).ZielTyp = "EcoFlood") Then
+            Dim i As Integer
+            'QualitaetsWert_berechnen = 0
+            For i = 0 To OptParameterListe.GetUpperBound(0)
+                QualitaetsWert_berechnen = QualitaetsWert_berechnen + (OptParameterListe(i).Wert * OptParameterListe(i).Wert)
+            Next
+            'QualitaetsWert_berechnen = (1 / QualitaetsWert_berechnen) * 100
+        Else
 
-        'Simulationsergebnis auslesen
-        IsOK = ReadWEL(WorkDir & Datensatz & ".wel", OptZieleListe(ZielNr).SpalteWel, SimReihe)
-        If (IsOK = False) Then
-            'TODO: Fehlerbehandlung
-        End If
+            Dim i As Integer
+            Dim SimReihe(,) As Object = {}
+            Dim SimWert As Single
+            Dim IsOK As Boolean
 
-        '--------------------------------------------------------
-        'bei Werten zuerst Wert aus Simulationsergebnis berechnen
-        '--------------------------------------------------------
-        If (OptZieleListe(ZielNr).ZielTyp = "Wert") Then
+            'Simulationsergebnis auslesen
+            IsOK = ReadWEL(WorkDir & Datensatz & ".wel", OptZieleListe(ZielNr).SpalteWel, SimReihe)
+            If (IsOK = False) Then
+                'TODO: Fehlerbehandlung
+            End If
 
-            Select Case OptZieleListe(ZielNr).WertTyp
+            '--------------------------------------------------------
+            'bei Werten zuerst Wert aus Simulationsergebnis berechnen
+            '--------------------------------------------------------
+            If (OptZieleListe(ZielNr).ZielTyp = "Wert") Then
 
-                Case "MaxWert"
-                    SimWert = 0
-                    For i = 0 To SimReihe.GetUpperBound(0)
-                        If SimReihe(i, 1) > SimWert Then
-                            SimWert = SimReihe(i, 1)
-                        End If
-                    Next
+                Select Case OptZieleListe(ZielNr).WertTyp
 
-                Case "MinWert"
-                    SimWert = 999999999999999999
-                    For i = 0 To SimReihe.GetUpperBound(0)
-                        If SimReihe(i, 1) < SimWert Then
-                            SimWert = SimReihe(i, 1)
-                        End If
-                    Next
+                    Case "MaxWert"
+                        SimWert = 0
+                        For i = 0 To SimReihe.GetUpperBound(0)
+                            If SimReihe(i, 1) > SimWert Then
+                                SimWert = SimReihe(i, 1)
+                            End If
+                        Next
 
-                Case "Average"
-                    SimWert = 0
-                    For i = 0 To SimReihe.GetUpperBound(0)
-                        SimWert += SimReihe(i, 1)
-                    Next
-                    SimWert = SimWert / SimReihe.GetLength(0)
+                    Case "MinWert"
+                        SimWert = 999999999999999999
+                        For i = 0 To SimReihe.GetUpperBound(0)
+                            If SimReihe(i, 1) < SimWert Then
+                                SimWert = SimReihe(i, 1)
+                            End If
+                        Next
 
-                Case "AnfWert"
-                    SimWert = SimReihe(0, 1)
+                    Case "Average"
+                        SimWert = 0
+                        For i = 0 To SimReihe.GetUpperBound(0)
+                            SimWert += SimReihe(i, 1)
+                        Next
+                        SimWert = SimWert / SimReihe.GetLength(0)
 
-                Case "EndWert"
-                    SimWert = SimReihe(SimReihe.GetUpperBound(0), 1)
+                    Case "AnfWert"
+                        SimWert = SimReihe(0, 1)
+
+                    Case "EndWert"
+                        SimWert = SimReihe(SimReihe.GetUpperBound(0), 1)
+
+                    Case Else
+                        'TODO: Fehlerbehandlung
+                End Select
+
+            End If
+
+            '--------------------------------------------------------
+            'Berechnung des Qualitätswerts
+            '--------------------------------------------------------
+            Select Case OptZieleListe(ZielNr).ZielFkt
+
+                Case "AbQuad"
+                    'Summe der Fehlerquadrate
+                    '------------------------
+                    Select Case OptZieleListe(ZielNr).ZielTyp
+                        Case "Wert"
+                            QualitaetsWert_berechnen = (OptZieleListe(ZielNr).ZielWert - SimWert) * (OptZieleListe(ZielNr).ZielWert - SimWert)
+
+                        Case "Reihe"
+                            For i = 0 To SimReihe.GetUpperBound(0)
+                                QualitaetsWert_berechnen += (OptZieleListe(ZielNr).ZielReihe(i, 1) - SimReihe(i, 1)) * (OptZieleListe(ZielNr).ZielReihe(i, 1) - SimReihe(i, 1))
+                            Next
+                    End Select
+                    '------------------------
+
+                Case "Diff"
+                    'Summe der Fehler
+                    '------------------------
+                    Select Case OptZieleListe(ZielNr).ZielTyp
+                        Case "Wert"
+                            QualitaetsWert_berechnen = Math.Abs(OptZieleListe(ZielNr).ZielWert - SimWert)
+
+                        Case "Reihe"
+                            For i = 0 To SimReihe.GetUpperBound(0)
+                                QualitaetsWert_berechnen += Math.Abs(OptZieleListe(ZielNr).ZielReihe(i, 1) - SimReihe(i, 1))
+                            Next
+                    End Select
+                    '------------------------
+
+                Case "Volf"
+                    'Volumenfehler
+                    '--------------------------
+                    Select Case OptZieleListe(ZielNr).ZielTyp
+                        Case "Wert"
+                            'TODO: MSGBox Fehler in der Zielfunktionsdatei: Volumenfehler kann nicht mit einzelnen Werten gerechnet werden
+
+                        Case "Reihe"
+                            'TODO: Volumenfehler rechnet noch nicht echtes Volumen, dazu ist Zeitschrittweite notwendig
+                            Dim VolSim As Double = 0
+                            Dim VolZiel As Double = 0
+                            For i = 0 To SimReihe.GetUpperBound(0)
+                                VolSim += SimReihe(i, 1)
+                                VolZiel += OptZieleListe(ZielNr).ZielReihe(i, 1)
+                            Next
+                            QualitaetsWert_berechnen = Math.Abs(VolZiel - VolSim)
+                    End Select
+                    '------------------------
 
                 Case Else
-                    'TODO: Fehlerbehandlung
+                    'TODO: MsgBox Fehler in der Zielfunktionsdatei
+
             End Select
-
         End If
-
-        '--------------------------------------------------------
-        'Berechnung des Qualitätswerts
-        '--------------------------------------------------------
-        Select Case OptZieleListe(ZielNr).ZielFkt
-
-            Case "AbQuad"
-                'Summe der Fehlerquadrate
-                '------------------------
-                Select Case OptZieleListe(ZielNr).ZielTyp
-                    Case "Wert"
-                        QualitaetsWert_berechnen = (OptZieleListe(ZielNr).ZielWert - SimWert) * (OptZieleListe(ZielNr).ZielWert - SimWert)
-
-                    Case "Reihe"
-                        For i = 0 To SimReihe.GetUpperBound(0)
-                            QualitaetsWert_berechnen += (OptZieleListe(ZielNr).ZielReihe(i, 1) - SimReihe(i, 1)) * (OptZieleListe(ZielNr).ZielReihe(i, 1) - SimReihe(i, 1))
-                        Next
-                End Select
-                '------------------------
-
-            Case "Diff"
-                'Summe der Fehler
-                '------------------------
-                Select Case OptZieleListe(ZielNr).ZielTyp
-                    Case "Wert"
-                        QualitaetsWert_berechnen = Math.Abs(OptZieleListe(ZielNr).ZielWert - SimWert)
-
-                    Case "Reihe"
-                        For i = 0 To SimReihe.GetUpperBound(0)
-                            QualitaetsWert_berechnen += Math.Abs(OptZieleListe(ZielNr).ZielReihe(i, 1) - SimReihe(i, 1))
-                        Next
-                End Select
-                '------------------------
-
-            Case "Volf"
-                'Volumenfehler
-                '--------------------------
-                Select Case OptZieleListe(ZielNr).ZielTyp
-                    Case "Wert"
-                        'TODO: MSGBox Fehler in der Zielfunktionsdatei: Volumenfehler kann nicht mit einzelnen Werten gerechnet werden
-
-                    Case "Reihe"
-                        'TODO: Volumenfehler rechnet noch nicht echtes Volumen, dazu ist Zeitschrittweite notwendig
-                        Dim VolSim As Double = 0
-                        Dim VolZiel As Double = 0
-                        For i = 0 To SimReihe.GetUpperBound(0)
-                            VolSim += SimReihe(i, 1)
-                            VolZiel += OptZieleListe(ZielNr).ZielReihe(i, 1)
-                        Next
-                        QualitaetsWert_berechnen = Math.Abs(VolZiel - VolSim)
-                End Select
-                '------------------------
-
-            Case Else
-                'TODO: MsgBox Fehler in der Zielfunktionsdatei
-
-        End Select
-
     End Function
 
     Public Function ReadZRE(ByVal DateiPfad As String, ByRef ZRE(,) As Object) As Boolean

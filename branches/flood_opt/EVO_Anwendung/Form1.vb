@@ -380,19 +380,19 @@ Friend Class Form1
             ReDim QN(globalAnzZiel)
             ReDim RN(globalAnzRand)
 
-            'Zielfunktion für Anfangswerte berechnen
-            myIsOK = Simulieren(globalAnzPar, mypara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
+            ''Zielfunktion für Anfangswerte berechnen
+            'myIsOK = Simulieren(globalAnzPar, mypara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
 
-            'HACK: Zielfunktionen für Min und Max Werte berechnen -----------------------------------
-            Dim minPara(globalAnzPar, 1) As Double
-            Dim maxPara(globalAnzPar, 1) As Double
-            For i = 1 To globalAnzPar
-                minPara(i, 1) = 0
-                maxPara(i, 1) = 1
-            Next
-            myIsOK = Simulieren(globalAnzPar, minPara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
-            myIsOK = Simulieren(globalAnzPar, maxPara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
-            'Ende Hack ------------------------------------------------------------------------------
+            ''HACK: Zielfunktionen für Min und Max Werte berechnen -----------------------------------
+            'Dim minPara(globalAnzPar, 1) As Double
+            'Dim maxPara(globalAnzPar, 1) As Double
+            'For i = 1 To globalAnzPar
+            '    minPara(i, 1) = 0
+            '    maxPara(i, 1) = 1
+            'Next
+            'myIsOK = Simulieren(globalAnzPar, minPara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
+            'myIsOK = Simulieren(globalAnzPar, maxPara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
+            ''Ende Hack ------------------------------------------------------------------------------
 
 
         End If
