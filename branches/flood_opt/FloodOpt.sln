@@ -4,15 +4,12 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "EVO_Kern", "EVO_KERN\EVO_Ke
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Anwendung", "EVO_Anwendung\Anwendung.vbproj", "{FF1D5494-1205-4F3E-BD65-ADB8C6BD04D4}"
 	ProjectSection(ProjectDependencies) = postProject
-		{5E14B355-00BC-4B66-8DFD-EB2A306E76AA} = {5E14B355-00BC-4B66-8DFD-EB2A306E76AA}
 		{64F462D3-9702-4709-9D90-4874A1D9A52B} = {64F462D3-9702-4709-9D90-4874A1D9A52B}
 	EndProjectSection
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "EVO_Form", "EVO_FORM\EVO_Form.vbproj", "{64F462D3-9702-4709-9D90-4874A1D9A52B}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "EVO_BM", "EVO_BM\EVO_BM.vbproj", "{62B1C1E7-26DE-418A-AAEE-102E02A50DF6}"
-EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "EcoFlood", "EcoFlood\EcoFlood.vbproj", "{5E14B355-00BC-4B66-8DFD-EB2A306E76AA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,10 +33,6 @@ Global
 		{62B1C1E7-26DE-418A-AAEE-102E02A50DF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{62B1C1E7-26DE-418A-AAEE-102E02A50DF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{62B1C1E7-26DE-418A-AAEE-102E02A50DF6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5E14B355-00BC-4B66-8DFD-EB2A306E76AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5E14B355-00BC-4B66-8DFD-EB2A306E76AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5E14B355-00BC-4B66-8DFD-EB2A306E76AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5E14B355-00BC-4B66-8DFD-EB2A306E76AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
