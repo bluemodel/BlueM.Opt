@@ -260,7 +260,6 @@ Public Class EVO_Einstellungen
         Call FILLCOMBO_OPTELTERN(ComboOptEltern)
         Call FILLCOMBO_OPTVORGABE(ComboOptVorgabe)
         Call FILLCOMBO_POPPENALTY(ComboPopPenalty)
-
     End Sub
 
     '********************************************************************
@@ -280,10 +279,14 @@ Public Class EVO_Einstellungen
         End Get
     End Property
 
-    Public ReadOnly Property OptModus() As Integer
+	'Dieses Property nicht ReadOnly weil die Anzahl der Zielfunktionen durch OptZiele bestimmt werden kann
+    Public Property OptModus() As Integer
         Get
             OptModus = VB6.GetItemData(ComboModus, ComboModus.SelectedIndex)
         End Get
+        Set(ByVal Index As Integer)
+            ComboModus.SelectedIndex = Index
+        End Set
     End Property
 
     Public ReadOnly Property rDeltaStart() As Single
