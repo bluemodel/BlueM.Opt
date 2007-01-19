@@ -214,8 +214,8 @@ Friend Class Form1
         iEvoTyp = EVO_Einstellungen1.iEvoTyp
         iPopEvoTyp = EVO_Einstellungen1.iPopEvoTyp
         isPOPUL = EVO_Einstellungen1.isPOPUL
-        isMultiObjective = EVO_Einstellungen1.isMultiObjective  'wird bei BM abhängig von Anzahl Zielfunktionen überschrieben
-        isPareto = EVO_Einstellungen1.isPareto                  'wird bei BM abhängig von Anzahl Zielfunktionen überschrieben
+        isMultiObjective = EVO_Einstellungen1.isMultiObjective
+        isPareto = EVO_Einstellungen1.isPareto
         isPareto3D = False
         NRunden = EVO_Einstellungen1.NRunden
         NPopul = EVO_Einstellungen1.NPopul
@@ -356,15 +356,6 @@ Friend Class Form1
             For i = 1 To globalAnzPar
                 mypara(i, 1) = BM_Form1.OptParameterListe(i - 1).SKWert
             Next
-
-            'Anzahl Zielfunktionen übergeben
-            'CHECK: Dadurch wird definiert Ob SO oder Pareto laufen soll, das überschreibt die Evo_Einstellungen
-            globalAnzZiel = BM_Form1.OptZieleListe.GetLength(0)
-            If (globalAnzZiel > 1) Then
-                isMultiObjective = True
-                isPareto = True
-                'TODO: EVO_Einstellungen1.OptModus überschreiben
-            End If
 
             'TODO: Randbedingungen
             globalAnzRand = 2
@@ -1404,6 +1395,12 @@ ErrCode_ES_STARTEN:
                 Me.GroupBox_Testproblem.Enabled = False
                 'BM_Form anzeigen
                 BM_Form1.ShowDialog()
+                'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
+                If BM_Form1.OptZieleListe.GetLength(0) = 1 Then
+                    EVO_Einstellungen1.OptModus = 0
+                ElseIf BM_Form1.OptZieleListe.GetLength(0) > 1 Then
+                    EVO_Einstellungen1.OptModus = 1
+                End If
         End Select
 
     End Sub
