@@ -3,6 +3,10 @@ Option Explicit On
 Imports System.IO
 Friend Class Form1
 
+    '************************************************************************************
+    ' Form1 wird initialisiert bzw. geladen; BM_Form1 und SensiPlot1 werden deklariert  *
+    '************************************************************************************
+
     Inherits System.Windows.Forms.Form
     Private IsInitializing As Boolean
 
@@ -33,9 +37,6 @@ Friend Class Form1
         'XP-look
         System.Windows.Forms.Application.EnableVisualStyles()
 
-        'Voreinstellungen lesen
-        Call ReadEVOIni()
-
         'Liste der Anwendungen in ComboBox schreiben und Anfangseinstellung wählen
         ComboBox_Anwendung.Items.AddRange(New Object() {ANW_TESTPROBLEME, ANW_BLAUESMODELL, ANW_SENSIPLOT_MODPARA})
         ComboBox_Anwendung.SelectedItem = ANW_TESTPROBLEME
@@ -45,11 +46,102 @@ Friend Class Form1
         Combo_Testproblem.Items.Add("Sinus-Funktion")
         Combo_Testproblem.Items.Add("Beale-Problem")
         Combo_Testproblem.Items.Add("Schwefel 2.4-Problem")
+
+        'TODO: Muss man das hier aufrufen oder kann man es auch gleich auf Index = 0 setzen
         Combo_Testproblem.SelectedIndex = 0
         'TeeChart intialisieren
         TeeCommander1.Chart = TChart1
 
     End Sub
+
+    '************************************************************************************
+    '           Die Anwendung wurde ausgewählt und wird jetzt initialisiert             *
+    '************************************************************************************
+
+    'Auswahl der zu optimierenden Anwendung geändert
+    Private Sub ComboBox_Anwendung_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Anwendung.SelectedIndexChanged
+
+        Anwendung = ComboBox_Anwendung.SelectedItem
+        Select Case Anwendung
+            Case ANW_TESTPROBLEME
+                'Test-Probleme einschalten
+                Me.GroupBox_Testproblem.Enabled = True
+
+            Case ANW_BLAUESMODELL
+                'Voreinstellungen lesen EVO.INI
+                Call ReadEVOIni()
+                'Testprobleme ausschalten
+                Me.GroupBox_Testproblem.Enabled = False
+                'BM_Form anzeigen
+                BM_Form1.ShowDialog()
+                'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
+                If BM_Form1.OptZieleListe.GetLength(0) = 1 Then
+                    EVO_Einstellungen1.OptModus = 0
+                ElseIf BM_Form1.OptZieleListe.GetLength(0) > 1 Then
+                    EVO_Einstellungen1.OptModus = 1
+                End If
+
+            Case ANW_SENSIPLOT_MODPARA
+                'Voreinstellungen lesen EVO.INI
+                Call ReadEVOIni()
+                'Testprobleme ausschalten
+                Me.GroupBox_Testproblem.Enabled = False
+                'Initialisierung
+                Call BM_Form1.db_prepare()
+                'Optimierungsparameter einlesen
+                Call BM_Form1.OptParameter_einlesen()
+                'ModellParameter einlesen
+                Call BM_Form1.ModellParameter_einlesen()
+                'Zielfunktionen einlesen
+                Call BM_Form1.OptZiele_einlesen()
+
+                'Sensi Plot Dialog starten und List_Boxen füllen
+                Dim i As Integer
+                Dim IsOK As Boolean
+
+                For i = 0 To BM_Form1.OptParameterListe.GetUpperBound(0)
+                    IsOK = SensiPlot1.ListBox_OptParameter_add(BM_Form1.OptParameterListe(i).Bezeichnung)
+                Next
+                For i = 0 To BM_Form1.OptZieleListe.GetUpperBound(0)
+                    IsOK = SensiPlot1.ListBox_OptZiele_add(BM_Form1.OptZieleListe(i).Bezeichnung)
+                Next
+
+                Call SensiPlot1.ShowDialog()
+        End Select
+    End Sub
+
+    Private Sub Combo1_SelectedIndexChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Combo_Testproblem.SelectedIndexChanged
+        If Me.IsInitializing = True Then
+            Exit Sub
+        Else
+            Select Case Combo_Testproblem.Text
+                Case "Sinus-Funktion"
+                    Problem_SinusFunktion.BringToFront()
+                Case "Beale-Problem"
+                    Problem_BealeProblem.BringToFront()
+                Case "Schwefel 2.4-Problem"
+                    Problem_Schwefel24.BringToFront()
+                Case "Deb 1"
+                    Problem_D1Funktion.BringToFront()
+                Case "Zitzler/Deb T1"
+                    Problem_T1Funktion.BringToFront()
+                Case "Zitzler/Deb T2"
+                    Problem_T2Funktion.BringToFront()
+                Case "Zitzler/Deb T3"
+                    Problem_T3Funktion.BringToFront()
+                Case "Zitzler/Deb T4"
+                    Problem_T4Funktion.BringToFront()
+                Case "CONSTR"
+                    Problem_CONSTRFunktion.BringToFront()
+                Case "Box"
+                    Problem_TKNFunktion.BringToFront()
+            End Select
+        End If
+    End Sub
+
+    '************************************************************************************
+    '     Vorbereitung Anwendungen "ANW_TESTPROBLEME" und "ANW_BLAUESMODELL"            *
+    '************************************************************************************
 
     'EVO.ini Datei einlesen
     'TODO: ReadEVO.ini müsste hier raus nach BM_FORM und "Read_Model_OptConfig" heißen ***************************
@@ -112,34 +204,9 @@ Friend Class Form1
 
     End Sub
 
-    Private Sub Combo1_SelectedIndexChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Combo_Testproblem.SelectedIndexChanged
-        If Me.IsInitializing = True Then
-            Exit Sub
-        Else
-            Select Case Combo_Testproblem.Text
-                Case "Sinus-Funktion"
-                    Problem_SinusFunktion.BringToFront()
-                Case "Beale-Problem"
-                    Problem_BealeProblem.BringToFront()
-                Case "Schwefel 2.4-Problem"
-                    Problem_Schwefel24.BringToFront()
-                Case "Deb 1"
-                    Problem_D1Funktion.BringToFront()
-                Case "Zitzler/Deb T1"
-                    Problem_T1Funktion.BringToFront()
-                Case "Zitzler/Deb T2"
-                    Problem_T2Funktion.BringToFront()
-                Case "Zitzler/Deb T3"
-                    Problem_T3Funktion.BringToFront()
-                Case "Zitzler/Deb T4"
-                    Problem_T4Funktion.BringToFront()
-                Case "CONSTR"
-                    Problem_CONSTRFunktion.BringToFront()
-                Case "Box"
-                    Problem_TKNFunktion.BringToFront()
-            End Select
-        End If
-    End Sub
+    '************************************************************************************
+    '                          Start BUTTON wurde pressed                               *
+    '************************************************************************************
 
     Private Sub Button_Start_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Button_Start.Click
         myisrun = True
@@ -181,94 +248,9 @@ Friend Class Form1
         End Select
     End Sub
 
-    Private Function SensiPlot_STARTEN(ByRef Selected_OptParameter As String, ByRef Selected_OptZiel As String, ByRef Selected_SensiType As String, ByRef Anz_Sim As Integer) As Boolean
-        SensiPlot_STARTEN = False
-
-        globalAnzZiel = 2
-        globalAnzRand = 0
-
-        'Anpassung der Arrays für "Call BM_Form1.ModellParameter_schreiben()"
-        'TODO: Sehr kompliziert, ModellParameter_schreiben und weitere Funktionen sollten pro Prameter funzen.
-
-        Dim i As Integer
-        Dim j As Integer
-        Dim AnzModPara As Integer = 0
-
-        Dim OptParameterListeOrig() As EVO_BM.BM_Form.OptParameter = {}
-        Dim ModellParameterListeOrig() As EVO_BM.BM_Form.ModellParameter = {}
-        Dim OptZieleListeOrig() As EVO_BM.BM_Form.OptZiele = {}
-
-        OptParameterListeOrig = BM_Form1.OptParameterListe
-        ModellParameterListeOrig = BM_Form1.ModellParameterListe
-        OptZieleListeOrig = BM_Form1.OptZieleListe
-
-        For i = 0 To ModellParameterListeOrig.GetUpperBound(0)
-            If ModellParameterListeOrig(i).OptParameter = Selected_OptParameter Then
-                AnzModPara += 1
-            End If
-        Next
-
-        ReDim BM_Form1.OptParameterListe(0)
-        ReDim BM_Form1.ModellParameterListe(AnzModPara - 1)
-        ReDim BM_Form1.OptZieleListe(0)
-
-        For i = 0 To OptParameterListeOrig.GetUpperBound(0)
-            If OptParameterListeOrig(i).Bezeichnung = Selected_OptParameter Then
-                BM_Form1.OptParameterListe(0) = OptParameterListeOrig(i)
-            End If
-        Next
-
-        For j = 0 To AnzModPara - 1
-            For i = 0 To ModellParameterListeOrig.GetUpperBound(0)
-                If ModellParameterListeOrig(i).OptParameter = Selected_OptParameter Then
-                    BM_Form1.ModellParameterListe(j) = ModellParameterListeOrig(i)
-                    j += 1
-                End If
-            Next
-        Next
-
-        For i = 0 To OptZieleListeOrig.GetUpperBound(0)
-            If OptZieleListeOrig(i).Bezeichnung = Selected_OptZiel Then
-                BM_Form1.OptZieleListe(0) = OptZieleListeOrig(i)
-            End If
-        Next
-
-        Dim globalAnzPar As Integer = 1
-        Dim durchlauf As Integer = 1
-        Dim ipop As Integer = 1
-
-        'TODO: Das hier muss neuer TeeChartInitialise_Werden
-        'TODO: TeeChart Initialise muss generalisiert werden
-        Call TeeChartInitialise_SensiPlot()
-
-        Randomize()
-
-        For i = 0 To Anz_Sim
-
-            Select Case Selected_SensiType
-                Case "Gleichverteilt"
-                    BM_Form1.OptParameterListe(0).SKWert = Rnd()
-                Case "Diskret"
-                    BM_Form1.OptParameterListe(0).SKWert = i / Anz_Sim
-            End Select
-
-            Call BM_Form1.ModellParameter_schreiben()
-            Call BM_Form1.launchBM()
-            BM_Form1.OptZieleListe(0).QWertTmp = BM_Form1.QualitaetsWert_berechnen(0)
-            Call Zielfunktion_zeichnen_MultiObPar_2D(BM_Form1.OptZieleListe(0).QWertTmp, BM_Form1.OptParameterListe(0).Wert)
-            Call BM_Form1.db_update(durchlauf, ipop)
-            durchlauf += 1
-            System.Windows.Forms.Application.DoEvents()
-
-        Next
-
-        BM_Form1.OptParameterListe = OptParameterListeOrig
-        BM_Form1.ModellParameterListe = ModellParameterListeOrig
-        BM_Form1.OptZieleListe = OptZieleListeOrig
-
-        SensiPlot_STARTEN = True
-    End Function
-
+    '************************************************************************************
+    '        Anwendung Testprobleme und Blaues Model mit Evolutionsstrategie            *
+    '************************************************************************************
 
     Private Function ES_STARTEN() As Boolean
         '==========================
@@ -1388,6 +1370,98 @@ ErrCode_ES_STARTEN:
         End With
     End Sub
 
+    '************************************************************************************
+    '              Anwendung SensiPlot; läuft ohne Evolutionsstrategie                  *
+    '************************************************************************************
+
+    Private Function SensiPlot_STARTEN(ByRef Selected_OptParameter As String, ByRef Selected_OptZiel As String, ByRef Selected_SensiType As String, ByRef Anz_Sim As Integer) As Boolean
+        SensiPlot_STARTEN = False
+
+        globalAnzZiel = 2
+        globalAnzRand = 0
+
+        'Anpassung der Arrays für "Call BM_Form1.ModellParameter_schreiben()"
+        'TODO: Sehr kompliziert, ModellParameter_schreiben und weitere Funktionen sollten pro Prameter funzen.
+
+        Dim i As Integer
+        Dim j As Integer
+        Dim AnzModPara As Integer = 0
+
+        Dim OptParameterListeOrig() As EVO_BM.BM_Form.OptParameter = {}
+        Dim ModellParameterListeOrig() As EVO_BM.BM_Form.ModellParameter = {}
+        Dim OptZieleListeOrig() As EVO_BM.BM_Form.OptZiele = {}
+
+        OptParameterListeOrig = BM_Form1.OptParameterListe
+        ModellParameterListeOrig = BM_Form1.ModellParameterListe
+        OptZieleListeOrig = BM_Form1.OptZieleListe
+
+        For i = 0 To ModellParameterListeOrig.GetUpperBound(0)
+            If ModellParameterListeOrig(i).OptParameter = Selected_OptParameter Then
+                AnzModPara += 1
+            End If
+        Next
+
+        ReDim BM_Form1.OptParameterListe(0)
+        ReDim BM_Form1.ModellParameterListe(AnzModPara - 1)
+        ReDim BM_Form1.OptZieleListe(0)
+
+        For i = 0 To OptParameterListeOrig.GetUpperBound(0)
+            If OptParameterListeOrig(i).Bezeichnung = Selected_OptParameter Then
+                BM_Form1.OptParameterListe(0) = OptParameterListeOrig(i)
+            End If
+        Next
+
+        For j = 0 To AnzModPara - 1
+            For i = 0 To ModellParameterListeOrig.GetUpperBound(0)
+                If ModellParameterListeOrig(i).OptParameter = Selected_OptParameter Then
+                    BM_Form1.ModellParameterListe(j) = ModellParameterListeOrig(i)
+                    j += 1
+                End If
+            Next
+        Next
+
+        For i = 0 To OptZieleListeOrig.GetUpperBound(0)
+            If OptZieleListeOrig(i).Bezeichnung = Selected_OptZiel Then
+                BM_Form1.OptZieleListe(0) = OptZieleListeOrig(i)
+            End If
+        Next
+
+        Dim globalAnzPar As Integer = 1
+        Dim durchlauf As Integer = 1
+        Dim ipop As Integer = 1
+
+        'TODO: Das hier muss neuer TeeChartInitialise_Werden
+        'TODO: TeeChart Initialise muss generalisiert werden
+        Call TeeChartInitialise_SensiPlot()
+
+        Randomize()
+
+        For i = 0 To Anz_Sim
+
+            Select Case Selected_SensiType
+                Case "Gleichverteilt"
+                    BM_Form1.OptParameterListe(0).SKWert = Rnd()
+                Case "Diskret"
+                    BM_Form1.OptParameterListe(0).SKWert = i / Anz_Sim
+            End Select
+
+            Call BM_Form1.ModellParameter_schreiben()
+            Call BM_Form1.launchBM()
+            BM_Form1.OptZieleListe(0).QWertTmp = BM_Form1.QualitaetsWert_berechnen(0)
+            Call Zielfunktion_zeichnen_MultiObPar_2D(BM_Form1.OptZieleListe(0).QWertTmp, BM_Form1.OptParameterListe(0).Wert)
+            Call BM_Form1.db_update(durchlauf, ipop)
+            durchlauf += 1
+            System.Windows.Forms.Application.DoEvents()
+
+        Next
+
+        BM_Form1.OptParameterListe = OptParameterListeOrig
+        BM_Form1.ModellParameterListe = ModellParameterListeOrig
+        BM_Form1.OptZieleListe = OptZieleListeOrig
+
+        SensiPlot_STARTEN = True
+    End Function
+
     Private Sub TeeChartInitialise_SensiPlot()
         Dim Populationen As Short
 
@@ -1528,57 +1602,6 @@ ErrCode_ES_STARTEN:
         If KeyAscii = 0 Then
             eventArgs.Handled = True
         End If
-    End Sub
-
-    'Auswahl der zu optimierenden Anwendung geändert
-    Private Sub ComboBox_Anwendung_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Anwendung.SelectedIndexChanged
-
-        Anwendung = ComboBox_Anwendung.SelectedItem
-        Select Case Anwendung
-            Case ANW_TESTPROBLEME
-                'Test-Probleme einschalten
-                Me.GroupBox_Testproblem.Enabled = True
-
-            Case ANW_BLAUESMODELL
-                'Testprobleme ausschalten
-                Me.GroupBox_Testproblem.Enabled = False
-                'BM_Form anzeigen
-                BM_Form1.ShowDialog()
-                'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
-                If BM_Form1.OptZieleListe.GetLength(0) = 1 Then
-                    EVO_Einstellungen1.OptModus = 0
-                ElseIf BM_Form1.OptZieleListe.GetLength(0) > 1 Then
-                    EVO_Einstellungen1.OptModus = 1
-                End If
-
-            Case ANW_SENSIPLOT_MODPARA
-                'Testprobleme ausschalten
-                Me.GroupBox_Testproblem.Enabled = False
-
-                'Initialisierung
-                Call BM_Form1.db_prepare()
-                'Optimierungsparameter einlesen
-                Call BM_Form1.OptParameter_einlesen()
-                'ModellParameter einlesen
-                Call BM_Form1.ModellParameter_einlesen()
-                'Zielfunktionen einlesen
-                Call BM_Form1.OptZiele_einlesen()
-
-                'Sensi Plot Dialog starten und List_Boxen füllen
-                Dim i As Integer
-                Dim IsOK As Boolean
-
-                For i = 0 To BM_Form1.OptParameterListe.GetUpperBound(0)
-                    IsOK = SensiPlot1.ListBox_OptParameter_add(BM_Form1.OptParameterListe(i).Bezeichnung)
-                Next
-                For i = 0 To BM_Form1.OptZieleListe.GetUpperBound(0)
-                    IsOK = SensiPlot1.ListBox_OptZiele_add(BM_Form1.OptZieleListe(i).Bezeichnung)
-                Next
-
-                Call SensiPlot1.ShowDialog()
-                'Call SensiPlot1.Hide()
-        End Select
-
     End Sub
 
 End Class
