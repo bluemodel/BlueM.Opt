@@ -357,6 +357,9 @@ Friend Class Form1
                 mypara(i, 1) = BM_Form1.OptParameterListe(i - 1).SKWert
             Next
 
+            'globale Anzahl der Ziele muss hier auf Länge der Zielliste gesetzt werden
+            globalAnzZiel = BM_Form1.OptZieleListe.GetLength(0)
+
             'TODO: Randbedingungen
             globalAnzRand = 2
 
