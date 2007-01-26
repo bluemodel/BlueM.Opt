@@ -28,6 +28,9 @@ Partial Class BM_Form
         Me.Label_Datensatz = New System.Windows.Forms.Label
         Me.TextBox_Datensatz = New System.Windows.Forms.TextBox
         Me.GroupBox_Parameter = New System.Windows.Forms.GroupBox
+        Me.Button_ModellParameter = New System.Windows.Forms.Button
+        Me.TextBox_ModellParameter_Pfad = New System.Windows.Forms.TextBox
+        Me.Label_ModellParameter = New System.Windows.Forms.Label
         Me.Label_OptParameter = New System.Windows.Forms.Label
         Me.TextBox_OptParameter_Pfad = New System.Windows.Forms.TextBox
         Me.Button_OptParameter = New System.Windows.Forms.Button
@@ -40,9 +43,6 @@ Partial Class BM_Form
         Me.OpenFile_OptZiele = New System.Windows.Forms.OpenFileDialog
         Me.OpenFile_OptParameter = New System.Windows.Forms.OpenFileDialog
         Me.Button_OK = New System.Windows.Forms.Button
-        Me.Label_ModellParameter = New System.Windows.Forms.Label
-        Me.TextBox_ModellParameter_Pfad = New System.Windows.Forms.TextBox
-        Me.Button_ModellParameter = New System.Windows.Forms.Button
         Me.OpenFile_ModellParameter = New System.Windows.Forms.OpenFileDialog
         Me.GroupBox_BM.SuspendLayout()
         Me.GroupBox_Parameter.SuspendLayout()
@@ -67,7 +67,7 @@ Partial Class BM_Form
         'Label_EXE
         '
         Me.Label_EXE.AutoSize = True
-        Me.Label_EXE.Location = New System.Drawing.Point(6, 24)
+        Me.Label_EXE.Location = New System.Drawing.Point(6, 19)
         Me.Label_EXE.Name = "Label_EXE"
         Me.Label_EXE.Size = New System.Drawing.Size(46, 13)
         Me.Label_EXE.TabIndex = 29
@@ -130,6 +130,32 @@ Partial Class BM_Form
         Me.GroupBox_Parameter.TabIndex = 31
         Me.GroupBox_Parameter.TabStop = False
         Me.GroupBox_Parameter.Text = "Optimierungsparameter"
+        '
+        'Button_ModellParameter
+        '
+        Me.Button_ModellParameter.Location = New System.Drawing.Point(338, 40)
+        Me.Button_ModellParameter.Name = "Button_ModellParameter"
+        Me.Button_ModellParameter.Size = New System.Drawing.Size(24, 23)
+        Me.Button_ModellParameter.TabIndex = 29
+        Me.Button_ModellParameter.Text = "..."
+        Me.Button_ModellParameter.UseVisualStyleBackColor = True
+        '
+        'TextBox_ModellParameter_Pfad
+        '
+        Me.TextBox_ModellParameter_Pfad.Location = New System.Drawing.Point(68, 43)
+        Me.TextBox_ModellParameter_Pfad.Name = "TextBox_ModellParameter_Pfad"
+        Me.TextBox_ModellParameter_Pfad.Size = New System.Drawing.Size(264, 20)
+        Me.TextBox_ModellParameter_Pfad.TabIndex = 24
+        Me.TextBox_ModellParameter_Pfad.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'Label_ModellParameter
+        '
+        Me.Label_ModellParameter.AutoSize = True
+        Me.Label_ModellParameter.Location = New System.Drawing.Point(6, 46)
+        Me.Label_ModellParameter.Name = "Label_ModellParameter"
+        Me.Label_ModellParameter.Size = New System.Drawing.Size(63, 13)
+        Me.Label_ModellParameter.TabIndex = 27
+        Me.Label_ModellParameter.Text = "ModellPara:"
         '
         'Label_OptParameter
         '
@@ -223,32 +249,6 @@ Partial Class BM_Form
         Me.Button_OK.TabIndex = 36
         Me.Button_OK.Text = "OK"
         Me.Button_OK.UseVisualStyleBackColor = True
-        '
-        'Label_ModellParameter
-        '
-        Me.Label_ModellParameter.AutoSize = True
-        Me.Label_ModellParameter.Location = New System.Drawing.Point(6, 46)
-        Me.Label_ModellParameter.Name = "Label_ModellParameter"
-        Me.Label_ModellParameter.Size = New System.Drawing.Size(63, 13)
-        Me.Label_ModellParameter.TabIndex = 27
-        Me.Label_ModellParameter.Text = "ModellPara:"
-        '
-        'TextBox_ModellParameter_Pfad
-        '
-        Me.TextBox_ModellParameter_Pfad.Location = New System.Drawing.Point(68, 43)
-        Me.TextBox_ModellParameter_Pfad.Name = "TextBox_ModellParameter_Pfad"
-        Me.TextBox_ModellParameter_Pfad.Size = New System.Drawing.Size(264, 20)
-        Me.TextBox_ModellParameter_Pfad.TabIndex = 24
-        Me.TextBox_ModellParameter_Pfad.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        '
-        'Button_ModellParameter
-        '
-        Me.Button_ModellParameter.Location = New System.Drawing.Point(338, 40)
-        Me.Button_ModellParameter.Name = "Button_ModellParameter"
-        Me.Button_ModellParameter.Size = New System.Drawing.Size(24, 23)
-        Me.Button_ModellParameter.TabIndex = 29
-        Me.Button_ModellParameter.Text = "..."
-        Me.Button_ModellParameter.UseVisualStyleBackColor = True
         '
         'OpenFile_ModellParameter
         '

@@ -58,11 +58,21 @@
     <Compile Include="BM_Form.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="SensiPlot.Designer.vb">
+      <DependentUpon>SensiPlot.vb</DependentUpon>
+    </Compile>
+    <Compile Include="SensiPlot.vb">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="BM_Form.resx">
       <SubType>Designer</SubType>
       <DependentUpon>BM_Form.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SensiPlot.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>SensiPlot.vb</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
