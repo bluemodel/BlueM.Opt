@@ -914,7 +914,7 @@ Partial Class Form1
         Me.Button_Start.Size = New System.Drawing.Size(112, 33)
         Me.Button_Start.TabIndex = 0
         Me.Button_Start.Text = ">"
-        Me.Button_Start.UseVisualStyleBackColor = False
+        Me.Button_Start.UseVisualStyleBackColor = True
         '
         'TeeCommander1
         '
