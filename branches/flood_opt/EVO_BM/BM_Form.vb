@@ -158,7 +158,7 @@ Public Class BM_Form
     End Sub
 
     'Ergebnisdatenbank vorbereiten
-    Private Sub db_prepare()
+    Public Sub db_prepare()
         'Leere/Neue Ergebnisdatenbank in Arbeitsverzeichnis kopieren
 
         Dim ZielDatei As String = WorkDir & Datensatz & "_EVO.mdb"
@@ -187,7 +187,7 @@ Public Class BM_Form
     End Sub
 
     'Optimierungsparameter einlesen (*.OPT-Datei)
-    Private Sub OptParameter_einlesen()
+    Public Sub OptParameter_einlesen()
         Try
             Dim FiStr As FileStream = New FileStream(OptParameter_Pfad, FileMode.Open, IO.FileAccess.ReadWrite)
             Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -230,7 +230,7 @@ Public Class BM_Form
     End Sub
 
     'Modellparameter einlesen (*.OPT-Datei)
-    Private Sub ModellParameter_einlesen()
+    Public Sub ModellParameter_einlesen()
         Try
             Dim FiStr As FileStream = New FileStream(ModellParameter_Pfad, FileMode.Open, IO.FileAccess.ReadWrite)
             Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -277,7 +277,7 @@ Public Class BM_Form
     End Sub
 
     'Optimierungsziele einlesen (*.zie-Datei)
-    Private Sub OptZiele_einlesen()
+    Public Sub OptZiele_einlesen()
         Dim AnzZiele As Integer = 0
         Dim IsOK As Boolean
         Dim tmpstr As String
@@ -746,4 +746,5 @@ Public Class BM_Form
 
         Call db_disconnect()
     End Function
+
 End Class
