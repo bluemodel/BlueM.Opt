@@ -495,7 +495,7 @@ Public Class BM_Form
             Dim i As Integer
             'QualitaetsWert_berechnen = 0
             For i = 0 To OptParameterListe.GetUpperBound(0)
-                QualitaetsWert_berechnen = QualitaetsWert_berechnen + (OptParameterListe(i).Wert * OptParameterListe(i).Wert)
+                QualitaetsWert_berechnen = QualitaetsWert_berechnen + (OptParameterListe(i).Wert * OptParameterListe(i).Wert) / 1000
             Next
             'QualitaetsWert_berechnen = (1 / QualitaetsWert_berechnen) * 100
         Else

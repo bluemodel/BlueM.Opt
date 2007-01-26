@@ -346,6 +346,8 @@ Friend Class Form1
             '*        BlauesModell         *
             '*******************************
 
+            globalAnzZiel = BM_Form1.OptZieleListe.GetLength(0)
+
             'Anzahl Optimierungsparameter übergeben
             '-----------------------------------------------------
             globalAnzPar = BM_Form1.OptParameterListe.GetLength(0)
