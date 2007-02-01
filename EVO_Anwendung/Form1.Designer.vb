@@ -81,6 +81,7 @@ Partial Class Form1
         Me.Frame_Problem = New Microsoft.VisualBasic.Compatibility.VB6.GroupBoxArray(Me.components)
         Me.TeeCommander1 = New Steema.TeeChart.Commander
         Me.GroupBox_Anwendung = New System.Windows.Forms.GroupBox
+        Me.Button_IniApp = New System.Windows.Forms.Button
         Me.Label_Anwendung = New System.Windows.Forms.Label
         Me.ComboBox_Anwendung = New System.Windows.Forms.ComboBox
         Me.Problem_TKNFunktion.SuspendLayout()
@@ -933,6 +934,7 @@ Partial Class Form1
         'GroupBox_Anwendung
         '
         Me.GroupBox_Anwendung.BackColor = System.Drawing.SystemColors.Control
+        Me.GroupBox_Anwendung.Controls.Add(Me.Button_IniApp)
         Me.GroupBox_Anwendung.Controls.Add(Me.Label_Anwendung)
         Me.GroupBox_Anwendung.Controls.Add(Me.ComboBox_Anwendung)
         Me.GroupBox_Anwendung.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -943,24 +945,33 @@ Partial Class Form1
         Me.GroupBox_Anwendung.TabStop = False
         Me.GroupBox_Anwendung.Text = "Anwendung"
         '
+        'Button_IniApp
+        '
+        Me.Button_IniApp.Location = New System.Drawing.Point(176, 19)
+        Me.Button_IniApp.Name = "Button_IniApp"
+        Me.Button_IniApp.Size = New System.Drawing.Size(35, 21)
+        Me.Button_IniApp.TabIndex = 4
+        Me.Button_IniApp.Text = "Ini"
+        Me.Button_IniApp.UseVisualStyleBackColor = True
+        '
         'Label_Anwendung
         '
         Me.Label_Anwendung.AutoSize = True
         Me.Label_Anwendung.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
         Me.Label_Anwendung.Location = New System.Drawing.Point(6, 22)
         Me.Label_Anwendung.Name = "Label_Anwendung"
-        Me.Label_Anwendung.Size = New System.Drawing.Size(67, 13)
+        Me.Label_Anwendung.Size = New System.Drawing.Size(34, 13)
         Me.Label_Anwendung.TabIndex = 3
-        Me.Label_Anwendung.Text = "Anwendung:"
+        Me.Label_Anwendung.Text = "Apps:"
         '
         'ComboBox_Anwendung
         '
         Me.ComboBox_Anwendung.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox_Anwendung.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
         Me.ComboBox_Anwendung.FormattingEnabled = True
-        Me.ComboBox_Anwendung.Location = New System.Drawing.Point(89, 19)
+        Me.ComboBox_Anwendung.Location = New System.Drawing.Point(46, 19)
         Me.ComboBox_Anwendung.Name = "ComboBox_Anwendung"
-        Me.ComboBox_Anwendung.Size = New System.Drawing.Size(122, 21)
+        Me.ComboBox_Anwendung.Size = New System.Drawing.Size(124, 21)
         Me.ComboBox_Anwendung.TabIndex = 2
         '
         'Form1
@@ -1024,4 +1035,5 @@ Partial Class Form1
     Friend WithEvents Problem_D1Funktion As System.Windows.Forms.GroupBox
     Friend WithEvents Problem_BealeProblem As System.Windows.Forms.GroupBox
     Friend WithEvents Problem_Schwefel24 As System.Windows.Forms.GroupBox
+    Friend WithEvents Button_IniApp As System.Windows.Forms.Button
 End Class
