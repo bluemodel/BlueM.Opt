@@ -14,6 +14,7 @@ Friend Class Form1
     Private Const ANW_TESTPROBLEME As String = "Test-Probleme"
     Private Const ANW_BLAUESMODELL As String = "Blaues Modell"
     Private Const ANW_SENSIPLOT_MODPARA As String = "SensiPlot ModPara"
+    Private AppIniOK As Boolean = False
 
     'BM_Form deklarieren
     Public BM_Form1 As New EVO_BM.BM_Form
@@ -59,17 +60,21 @@ Friend Class Form1
     '************************************************************************************
 
     'Auswahl der zu optimierenden Anwendung geändert
-    Private Sub ComboBox_Anwendung_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Anwendung.SelectedIndexChanged
-
+    Private Sub Button_IniApp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_IniApp.Click
+        AppIniOK = True
         Anwendung = ComboBox_Anwendung.SelectedItem
+
         Select Case Anwendung
             Case ANW_TESTPROBLEME
-                'Test-Probleme einschalten
+                'Test-Probleme und Evo aktivieren
                 Me.GroupBox_Testproblem.Enabled = True
+                EVO_Einstellungen1.Enabled = True
 
             Case ANW_BLAUESMODELL
                 'Voreinstellungen lesen EVO.INI
                 Call ReadEVOIni()
+                'Evo aktivieren
+                EVO_Einstellungen1.Enabled = True
                 'Testprobleme ausschalten
                 Me.GroupBox_Testproblem.Enabled = False
                 'BM_Form anzeigen
@@ -84,8 +89,9 @@ Friend Class Form1
             Case ANW_SENSIPLOT_MODPARA
                 'Voreinstellungen lesen EVO.INI
                 Call ReadEVOIni()
-                'Testprobleme ausschalten
+                'Testprobleme und Evo Deaktivieren
                 Me.GroupBox_Testproblem.Enabled = False
+                EVO_Einstellungen1.Enabled = False
                 'Initialisierung
                 Call BM_Form1.db_prepare()
                 'Optimierungsparameter einlesen
@@ -209,6 +215,10 @@ Friend Class Form1
     '************************************************************************************
 
     Private Sub Button_Start_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Button_Start.Click
+        If Not AppIniOK Then
+            MsgBox("Bitte zuerst Anwendung Initialisieren", MsgBoxStyle.Exclamation, "Fehler")
+        End If
+        AppIniOK = False
         myisrun = True
         Select Case Anwendung
             Case ANW_TESTPROBLEME
@@ -1501,6 +1511,9 @@ ErrCode_ES_STARTEN:
         End With
     End Sub
 
+    '************************************************************************************
+    '                          Zeichenfunktionen                                        *
+    '************************************************************************************
 
     Private Sub Zielfunktion_zeichnen_Sinus(ByRef AnzPar As Short, ByRef Par(,) As Double, ByRef durchlauf As Integer, ByRef ipop As Short)
         Dim i As Short
@@ -1601,5 +1614,4 @@ ErrCode_ES_STARTEN:
             eventArgs.Handled = True
         End If
     End Sub
-
 End Class
