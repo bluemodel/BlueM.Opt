@@ -117,47 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="OpenFile_Datensatz.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>7, 7</value>
-  </metadata>
-  <metadata name="OpenFile_EXE.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>157, 7</value>
-  </metadata>
-  <metadata name="OpenFile_OptZiele.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>620, 7</value>
-  </metadata>
-  <metadata name="OpenFile_OptParameter.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>264, 7</value>
-  </metadata>
-  <metadata name="OpenFile_ModellParameter.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>435, 7</value>
-  </metadata>
-  <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>30</value>
-  </metadata>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAAAABMLAAATCwAAAAAAAAAA
-        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-        AAAAAAAAAAAAAL0iFv+9Ihb/vSIW/70iFv+9Ihb/vSIW/70iFv+9Ihb/vSIW/70iFv8AAAAAAAAAAAAA
-        AAAAAAAAAAAAAAAAAAC9Ihb/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC9Ihb/vSIW/wAA
-        AAAAAAAAAAAAAAAAAAAAAAAAvSIW/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAvSIW/wAA
-        AAC9Ihb/AAAAAAAAAAAAAAAAAAAAAL0iFv8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAL0i
-        Fv8AAAAAAAAAAL0iFv8AAAAAAAAAAAAAAAC9Ihb/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-        AAC9Ihb/AAAAAAAAAAC9Ihb/AAAAAAAAAAAAAAAAvSIW/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-        AAAAAAAAvSIW/wAAAAAAAAAAvSIW/wAAAAAAAAAAAAAAAL0iFv8AAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-        AAAAAAAAAAAAAL0iFv8AAAAAAAAAAL0iFv8AAAAAAAAAAAAAAAC9Ihb/AAAAAAAAAAAAAAAAAAAAAAAA
-        AAAAAAAAAAAAAAAAAAC9Ihb/AAAAAAAAAAC9Ihb/AAAAAAAAAAAAAAAAvSIW/wAAAAAAAAAAAAAAAAAA
-        AAAAAAAAAAAAAAAAAAAAAAAAvSIW/wAAAAAAAAAAvSIW/wAAAAAAAAAAAAAAAL0iFv8AAAAAAAAAAAAA
-        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAL0iFv8AAAAAAAAAAL0iFv8AAAAAAAAAAAAAAAC9Ihb/vSIW/70i
-        Fv+9Ihb/vSIW/70iFv+9Ihb/vSIW/70iFv+9Ihb/AAAAAAAAAAC9Ihb/AAAAAAAAAAAAAAAAAAAAAL0i
-        Fv8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAL0iFv8AAAAAvSIW/wAAAAAAAAAAAAAAAAAA
-        AAAAAAAAvSIW/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAvSIW/70iFv8AAAAAAAAAAAAA
-        AAAAAAAAAAAAAAAAAAC9Ihb/vSIW/70iFv+9Ihb/vSIW/70iFv+9Ihb/vSIW/70iFv+9Ihb/AAAAAAAA
-        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-        AAAAAAAA/////4Af//+/z///v9f//7/b//+/2///v9v//7/b//+/2///v9v//7/b//+AG///3+v//+/z
-        ///wA////////w==
-</value>
-  </data>
 </root>

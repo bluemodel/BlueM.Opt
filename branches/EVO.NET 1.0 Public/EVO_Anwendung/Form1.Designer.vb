@@ -25,32 +25,21 @@ Partial Class Form1
     Public WithEvents EVO_Opt_Verlauf1 As EvoForm.EVO_Opt_Verlauf
     Public WithEvents EVO_Einstellungen1 As EvoForm.EVO_Einstellungen
     Public WithEvents Text_TKNFunktion As System.Windows.Forms.TextBox
-    Public WithEvents Problem_TKNFunktion As System.Windows.Forms.GroupBox
     Public WithEvents Text_CONSTRFunktion As System.Windows.Forms.TextBox
-    Public WithEvents Problem_CONSTRFunktion As System.Windows.Forms.GroupBox
     Public WithEvents Text_T4Funktion As System.Windows.Forms.TextBox
-    Public WithEvents Problem_T4Funktion As System.Windows.Forms.GroupBox
     Public WithEvents Text_T3Funktion As System.Windows.Forms.TextBox
-    Public WithEvents Problem_T3Funktion As System.Windows.Forms.GroupBox
     Public WithEvents Text_T2Funktion As System.Windows.Forms.TextBox
-    Public WithEvents Problem_T2Funktion As System.Windows.Forms.GroupBox
     Public WithEvents Text_T1Funktion As System.Windows.Forms.TextBox
-    Public WithEvents Problem_T1Funktion As System.Windows.Forms.GroupBox
     Public WithEvents Text_D1Funktion As System.Windows.Forms.TextBox
-    Public WithEvents Problem_D1Funktion As System.Windows.Forms.GroupBox
     Public WithEvents Combo_Testproblem As System.Windows.Forms.ComboBox
-    Public WithEvents GroupBox_Testproblem As System.Windows.Forms.GroupBox
     Public WithEvents Text_Sinusfunktion_Par As System.Windows.Forms.TextBox
     Public WithEvents Text_Sinusfunktion As System.Windows.Forms.TextBox
     Public WithEvents Label_Sinusfunktion As System.Windows.Forms.Label
-    Public WithEvents Problem_SinusFunktion As System.Windows.Forms.GroupBox
     Public WithEvents Button_Start As System.Windows.Forms.Button
     Public WithEvents Text_BealeProblem As System.Windows.Forms.TextBox
-    Public WithEvents Problem_BealeProblem As System.Windows.Forms.GroupBox
     Public WithEvents Text_Schwefel24 As System.Windows.Forms.TextBox
     Public WithEvents Text_Schwefel24_Par As System.Windows.Forms.TextBox
     Public WithEvents Label_Schwefel24 As System.Windows.Forms.Label
-    Public WithEvents Problem_Schwefel24 As System.Windows.Forms.GroupBox
     Public WithEvents Frame_Problem As Microsoft.VisualBasic.Compatibility.VB6.GroupBoxArray
     'Hinweis: Die folgende Prozedur wird vom Windows Form-Designer benötigt.
     'Das Verändern mit dem Windows Form-Designer ist nicht möglich.
@@ -91,10 +80,10 @@ Partial Class Form1
         Me.Button_Start = New System.Windows.Forms.Button
         Me.Frame_Problem = New Microsoft.VisualBasic.Compatibility.VB6.GroupBoxArray(Me.components)
         Me.TeeCommander1 = New Steema.TeeChart.Commander
-        Me.GroupBox_Modus = New System.Windows.Forms.GroupBox
-        Me.Radio_BM = New System.Windows.Forms.RadioButton
-        Me.Radio_Testproblem = New System.Windows.Forms.RadioButton
-        Me.BM_Form1 = New EVO_BM.BM_Form
+        Me.GroupBox_Anwendung = New System.Windows.Forms.GroupBox
+        Me.Button_IniApp = New System.Windows.Forms.Button
+        Me.Label_Anwendung = New System.Windows.Forms.Label
+        Me.ComboBox_Anwendung = New System.Windows.Forms.ComboBox
         Me.Problem_TKNFunktion.SuspendLayout()
         Me.Problem_CONSTRFunktion.SuspendLayout()
         Me.Problem_T4Funktion.SuspendLayout()
@@ -107,7 +96,7 @@ Partial Class Form1
         Me.Problem_T2Funktion.SuspendLayout()
         Me.Problem_T3Funktion.SuspendLayout()
         CType(Me.Frame_Problem, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.GroupBox_Modus.SuspendLayout()
+        Me.GroupBox_Anwendung.SuspendLayout()
         Me.SuspendLayout()
         '
         'TChart1
@@ -427,7 +416,7 @@ Partial Class Form1
         '
         '
         Me.TChart1.Panel.Shadow.Visible = False
-        Me.TChart1.Size = New System.Drawing.Size(465, 627)
+        Me.TChart1.Size = New System.Drawing.Size(465, 640)
         '
         '
         '
@@ -497,7 +486,7 @@ Partial Class Form1
         '
         'EVO_Opt_Verlauf1
         '
-        Me.EVO_Opt_Verlauf1.Location = New System.Drawing.Point(233, 686)
+        Me.EVO_Opt_Verlauf1.Location = New System.Drawing.Point(233, 698)
         Me.EVO_Opt_Verlauf1.Name = "EVO_Opt_Verlauf1"
         Me.EVO_Opt_Verlauf1.NGen = CType(0, Short)
         Me.EVO_Opt_Verlauf1.NNachf = CType(0, Short)
@@ -508,7 +497,7 @@ Partial Class Form1
         '
         'EVO_Einstellungen1
         '
-        Me.EVO_Einstellungen1.Location = New System.Drawing.Point(10, 55)
+        Me.EVO_Einstellungen1.Location = New System.Drawing.Point(8, 187)
         Me.EVO_Einstellungen1.Name = "EVO_Einstellungen1"
         Me.EVO_Einstellungen1.Size = New System.Drawing.Size(225, 585)
         Me.EVO_Einstellungen1.TabIndex = 31
@@ -620,10 +609,9 @@ Partial Class Form1
         Me.GroupBox_Testproblem.Controls.Add(Me.Problem_T4Funktion)
         Me.GroupBox_Testproblem.Controls.Add(Me.Problem_CONSTRFunktion)
         Me.GroupBox_Testproblem.Controls.Add(Me.Problem_TKNFunktion)
-        Me.GroupBox_Testproblem.Enabled = False
         Me.GroupBox_Testproblem.ForeColor = System.Drawing.SystemColors.ControlText
         Me.Frame_Problem.SetIndex(Me.GroupBox_Testproblem, CType(11, Short))
-        Me.GroupBox_Testproblem.Location = New System.Drawing.Point(10, 646)
+        Me.GroupBox_Testproblem.Location = New System.Drawing.Point(10, 68)
         Me.GroupBox_Testproblem.Name = "GroupBox_Testproblem"
         Me.GroupBox_Testproblem.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.GroupBox_Testproblem.Size = New System.Drawing.Size(217, 113)
@@ -921,13 +909,13 @@ Partial Class Form1
         Me.Button_Start.BackColor = System.Drawing.SystemColors.Control
         Me.Button_Start.Cursor = System.Windows.Forms.Cursors.Default
         Me.Button_Start.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.Button_Start.Location = New System.Drawing.Point(584, 646)
+        Me.Button_Start.Location = New System.Drawing.Point(584, 658)
         Me.Button_Start.Name = "Button_Start"
         Me.Button_Start.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.Button_Start.Size = New System.Drawing.Size(112, 33)
         Me.Button_Start.TabIndex = 0
         Me.Button_Start.Text = ">"
-        Me.Button_Start.UseVisualStyleBackColor = False
+        Me.Button_Start.UseVisualStyleBackColor = True
         '
         'TeeCommander1
         '
@@ -937,62 +925,62 @@ Partial Class Form1
         Me.TeeCommander1.Dock = System.Windows.Forms.DockStyle.None
         Me.TeeCommander1.DropDownArrows = True
         Me.TeeCommander1.LabelValues = True
-        Me.TeeCommander1.Location = New System.Drawing.Point(239, 645)
+        Me.TeeCommander1.Location = New System.Drawing.Point(239, 657)
         Me.TeeCommander1.Name = "TeeCommander1"
         Me.TeeCommander1.ShowToolTips = True
         Me.TeeCommander1.Size = New System.Drawing.Size(344, 35)
         Me.TeeCommander1.TabIndex = 33
         '
-        'GroupBox_Modus
+        'GroupBox_Anwendung
         '
-        Me.GroupBox_Modus.Controls.Add(Me.Radio_BM)
-        Me.GroupBox_Modus.Controls.Add(Me.Radio_Testproblem)
-        Me.GroupBox_Modus.Location = New System.Drawing.Point(10, 12)
-        Me.GroupBox_Modus.Name = "GroupBox_Modus"
-        Me.GroupBox_Modus.Size = New System.Drawing.Size(217, 37)
-        Me.GroupBox_Modus.TabIndex = 35
-        Me.GroupBox_Modus.TabStop = False
-        Me.GroupBox_Modus.Text = "Modus"
+        Me.GroupBox_Anwendung.BackColor = System.Drawing.SystemColors.Control
+        Me.GroupBox_Anwendung.Controls.Add(Me.Button_IniApp)
+        Me.GroupBox_Anwendung.Controls.Add(Me.Label_Anwendung)
+        Me.GroupBox_Anwendung.Controls.Add(Me.ComboBox_Anwendung)
+        Me.GroupBox_Anwendung.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.GroupBox_Anwendung.Location = New System.Drawing.Point(10, 12)
+        Me.GroupBox_Anwendung.Name = "GroupBox_Anwendung"
+        Me.GroupBox_Anwendung.Size = New System.Drawing.Size(217, 50)
+        Me.GroupBox_Anwendung.TabIndex = 35
+        Me.GroupBox_Anwendung.TabStop = False
+        Me.GroupBox_Anwendung.Text = "Anwendung"
         '
-        'Radio_BM
+        'Button_IniApp
         '
-        Me.Radio_BM.AutoSize = True
-        Me.Radio_BM.Location = New System.Drawing.Point(118, 14)
-        Me.Radio_BM.Name = "Radio_BM"
-        Me.Radio_BM.Size = New System.Drawing.Size(91, 17)
-        Me.Radio_BM.TabIndex = 1
-        Me.Radio_BM.TabStop = True
-        Me.Radio_BM.Text = "Blaues Modell"
-        Me.Radio_BM.UseVisualStyleBackColor = True
+        Me.Button_IniApp.Location = New System.Drawing.Point(176, 19)
+        Me.Button_IniApp.Name = "Button_IniApp"
+        Me.Button_IniApp.Size = New System.Drawing.Size(35, 21)
+        Me.Button_IniApp.TabIndex = 4
+        Me.Button_IniApp.Text = "Ini"
+        Me.Button_IniApp.UseVisualStyleBackColor = True
         '
-        'Radio_Testproblem
+        'Label_Anwendung
         '
-        Me.Radio_Testproblem.AutoSize = True
-        Me.Radio_Testproblem.Location = New System.Drawing.Point(7, 14)
-        Me.Radio_Testproblem.Name = "Radio_Testproblem"
-        Me.Radio_Testproblem.Size = New System.Drawing.Size(89, 17)
-        Me.Radio_Testproblem.TabIndex = 0
-        Me.Radio_Testproblem.TabStop = True
-        Me.Radio_Testproblem.Text = "Testprobleme"
-        Me.Radio_Testproblem.UseVisualStyleBackColor = True
-        Me.Radio_Testproblem.Checked = True
+        Me.Label_Anwendung.AutoSize = True
+        Me.Label_Anwendung.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.Label_Anwendung.Location = New System.Drawing.Point(6, 22)
+        Me.Label_Anwendung.Name = "Label_Anwendung"
+        Me.Label_Anwendung.Size = New System.Drawing.Size(34, 13)
+        Me.Label_Anwendung.TabIndex = 3
+        Me.Label_Anwendung.Text = "Apps:"
         '
-        'BM_Form1
+        'ComboBox_Anwendung
         '
-        Me.BM_Form1.Datensatz = ""
-        Me.BM_Form1.BM_Exe = ""
-        Me.BM_Form1.Location = New System.Drawing.Point(710, 12)
-        Me.BM_Form1.Name = "BM_Form1"
-        Me.BM_Form1.Size = New System.Drawing.Size(297, 472)
-        Me.BM_Form1.TabIndex = 36
+        Me.ComboBox_Anwendung.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboBox_Anwendung.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.ComboBox_Anwendung.FormattingEnabled = True
+        Me.ComboBox_Anwendung.Location = New System.Drawing.Point(46, 19)
+        Me.ComboBox_Anwendung.Name = "ComboBox_Anwendung"
+        Me.ComboBox_Anwendung.Size = New System.Drawing.Size(124, 21)
+        Me.ComboBox_Anwendung.TabIndex = 2
         '
         'Form1
         '
+        Me.AcceptButton = Me.Button_Start
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.BackColor = System.Drawing.SystemColors.Control
-        Me.ClientSize = New System.Drawing.Size(1012, 769)
-        Me.Controls.Add(Me.BM_Form1)
-        Me.Controls.Add(Me.GroupBox_Modus)
+        Me.ClientSize = New System.Drawing.Size(712, 780)
+        Me.Controls.Add(Me.GroupBox_Anwendung)
         Me.Controls.Add(Me.TeeCommander1)
         Me.Controls.Add(Me.TChart1)
         Me.Controls.Add(Me.EVO_Opt_Verlauf1)
@@ -1002,7 +990,7 @@ Partial Class Form1
         Me.Cursor = System.Windows.Forms.Cursors.Default
         Me.Location = New System.Drawing.Point(100, 100)
         Me.Name = "Form1"
-        Me.StartPosition = System.Windows.Forms.FormStartPosition.Manual
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Evolutionsstrategie"
         Me.Problem_TKNFunktion.ResumeLayout(False)
         Me.Problem_TKNFunktion.PerformLayout()
@@ -1026,15 +1014,26 @@ Partial Class Form1
         Me.Problem_T3Funktion.ResumeLayout(False)
         Me.Problem_T3Funktion.PerformLayout()
         CType(Me.Frame_Problem, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.GroupBox_Modus.ResumeLayout(False)
-        Me.GroupBox_Modus.PerformLayout()
+        Me.GroupBox_Anwendung.ResumeLayout(False)
+        Me.GroupBox_Anwendung.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
     End Sub
 
-    Friend WithEvents GroupBox_Modus As System.Windows.Forms.GroupBox
-    Friend WithEvents Radio_BM As System.Windows.Forms.RadioButton
-    Friend WithEvents Radio_Testproblem As System.Windows.Forms.RadioButton
-    Friend WithEvents BM_Form1 As EVO_BM.BM_Form
+    Friend WithEvents GroupBox_Anwendung As System.Windows.Forms.GroupBox
+    Friend WithEvents ComboBox_Anwendung As System.Windows.Forms.ComboBox
+    Friend WithEvents Label_Anwendung As System.Windows.Forms.Label
+    Friend WithEvents GroupBox_Testproblem As System.Windows.Forms.GroupBox
+    Friend WithEvents Problem_SinusFunktion As System.Windows.Forms.GroupBox
+    Friend WithEvents Problem_TKNFunktion As System.Windows.Forms.GroupBox
+    Friend WithEvents Problem_CONSTRFunktion As System.Windows.Forms.GroupBox
+    Friend WithEvents Problem_T4Funktion As System.Windows.Forms.GroupBox
+    Friend WithEvents Problem_T3Funktion As System.Windows.Forms.GroupBox
+    Friend WithEvents Problem_T2Funktion As System.Windows.Forms.GroupBox
+    Friend WithEvents Problem_T1Funktion As System.Windows.Forms.GroupBox
+    Friend WithEvents Problem_D1Funktion As System.Windows.Forms.GroupBox
+    Friend WithEvents Problem_BealeProblem As System.Windows.Forms.GroupBox
+    Friend WithEvents Problem_Schwefel24 As System.Windows.Forms.GroupBox
+    Friend WithEvents Button_IniApp As System.Windows.Forms.Button
 End Class
