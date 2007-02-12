@@ -86,13 +86,12 @@ Friend Class Form1
                 'Testprobleme und Evo Deaktivieren
                 Me.GroupBox_Testproblem.Enabled = False
                 EVO_Einstellungen1.Enabled = False
-                'Initialisierung
-                Call BM_Form1.db_prepare()
                 'Einlesen OptPara, ModellPara, Zielfunktionen
                 Call BM_Form1.OptParameter_einlesen()
                 Call BM_Form1.ModellParameter_einlesen()
                 Call BM_Form1.OptZiele_einlesen()
-
+                ''Datenbank vorbereiten
+                'Call BM_Form1.db_prepare()
                 'Sensi Plot Dialog starten und List_Boxen füllen
                 Dim i As Integer
                 Dim IsOK As Boolean
@@ -371,7 +370,7 @@ Friend Class Form1
 
             BM_Form1.OptZieleListe(0).QWertTmp = BM_Form1.QualitaetsWert_berechnen(0)
             Call Zielfunktion_zeichnen_MultiObPar_2D(BM_Form1.OptZieleListe(0).QWertTmp, BM_Form1.OptParameterListe(0).Wert)
-            Call BM_Form1.db_update(durchlauf, ipop)
+            'Call BM_Form1.db_update(durchlauf, ipop)
             durchlauf += 1
             System.Windows.Forms.Application.DoEvents()
 
@@ -383,9 +382,8 @@ Friend Class Form1
 
         Call Wave1.TeeChart_initialise()
         Call Wave1.TeeChart_draw()
-
-        System.Windows.Forms.Application.DoEvents()
         Call Wave1.ShowDialog()
+        System.Windows.Forms.Application.DoEvents()
 
         SensiPlot_STARTEN = True
     End Function
