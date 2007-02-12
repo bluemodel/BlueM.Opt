@@ -18,11 +18,10 @@ Friend Class Form1
 
     Private AppIniOK As Boolean = False
 
-    'BM_Form deklarieren
+    'Deklarationen der Module
     Public BM_Form1 As New EVO_BM.BM_Form
-
-    'SensiPlot deklarieren
     Public SensiPlot1 As New EVO_BM.SensiPlot
+    Public Wave1 As New EVO_BM.Wave
 
     Dim myIsOK As Boolean
     Dim myisrun As Boolean
@@ -344,6 +343,9 @@ Friend Class Form1
         'TODO: TeeChart Initialise muss generalisiert werden
         Call TeeChartInitialise_SensiPlot()
 
+        ReDim Wave1.WaveList(Anz_Sim + 1)
+        BM_Form1.ReadWEL(BM_Form1.WorkDir & BM_Form1.Datensatz & ".wel", "S201_1ZU", Wave1.WaveList(0).Wave)
+
         Randomize()
 
         For i = 0 To Anz_Sim
@@ -357,6 +359,16 @@ Friend Class Form1
 
             Call BM_Form1.ModellParameter_schreiben()
             Call BM_Form1.launchBM()
+
+            'Speichern der ersten und letzten Wave
+            Wave1.WaveList(i).Bezeichnung = BM_Form1.OptZieleListe(0).SpalteWel
+            'Wave1.WaveList(1).Bezeichnung = BM_Form1.OptZieleListe(0).SpalteWel
+            'If i = 0 Then
+            BM_Form1.ReadWEL(BM_Form1.WorkDir & BM_Form1.Datensatz & ".wel", BM_Form1.OptZieleListe(0).SpalteWel, Wave1.WaveList(i + 1).Wave)
+            'ElseIf i = Anz_Sim Then
+            'BM_Form1.ReadWEL(BM_Form1.WorkDir & BM_Form1.Datensatz & ".wel", BM_Form1.OptZieleListe(0).SpalteWel, Wave1.WaveList(1).Wave)
+            'End If
+
             BM_Form1.OptZieleListe(0).QWertTmp = BM_Form1.QualitaetsWert_berechnen(0)
             Call Zielfunktion_zeichnen_MultiObPar_2D(BM_Form1.OptZieleListe(0).QWertTmp, BM_Form1.OptParameterListe(0).Wert)
             Call BM_Form1.db_update(durchlauf, ipop)
@@ -368,6 +380,12 @@ Friend Class Form1
         BM_Form1.OptParameterListe = OptParameterListeOrig
         BM_Form1.ModellParameterListe = ModellParameterListeOrig
         BM_Form1.OptZieleListe = OptZieleListeOrig
+
+        Call Wave1.TeeChart_initialise()
+        Call Wave1.TeeChart_draw()
+
+        System.Windows.Forms.Application.DoEvents()
+        Call Wave1.ShowDialog()
 
         SensiPlot_STARTEN = True
     End Function
