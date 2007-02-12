@@ -82,7 +82,6 @@
       <SubType>Designer</SubType>
       <DependentUpon>BM_Form.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="My Project\licenses.licx" />
     <EmbeddedResource Include="SensiPlot.resx">
       <SubType>Designer</SubType>
       <DependentUpon>SensiPlot.vb</DependentUpon>
