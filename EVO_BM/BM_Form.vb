@@ -147,20 +147,19 @@ Public Class BM_Form
     'BM-Einstellungen anwenden
     Private Sub Button_OK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_OK.Click
         Me.Close()
-        'Initialisierung
-        Call db_prepare()
         'Optimierungsparameter einlesen
         Call OptParameter_einlesen()
         'ModellParameter einlesen
         Call ModellParameter_einlesen()
         'Zielfunktionen einlesen
         Call OptZiele_einlesen()
+        'Datenbank vorbereiten
+        Call db_prepare()
     End Sub
 
     'Ergebnisdatenbank vorbereiten
     Public Sub db_prepare()
         'Leere/Neue Ergebnisdatenbank in Arbeitsverzeichnis kopieren
-
         Dim ZielDatei As String = WorkDir & Datensatz & "_EVO.mdb"
         Dim overwrite As Boolean = True
 
@@ -184,6 +183,42 @@ Public Class BM_Form
                 MsgBox("Ergebnisdatenbank konnte nicht ins Arbeitsverzeichnis kopiert werden:" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
             End Try
         End If
+
+        'Tabellen anpassen
+        Dim i As Integer
+        Try
+            Call db_connect()
+            Dim command As OleDbCommand = New OleDbCommand("", db)
+            'Tabelle 'QWerte'
+            'Spalten festlegen:
+            Dim fieldnames As String = ""
+            For i = 0 To OptZieleListe.GetUpperBound(0)
+                If (i > 0) Then
+                    fieldnames &= ", "
+                End If
+                fieldnames &= OptZieleListe(i).Bezeichnung & " DOUBLE"
+            Next
+            'Tabelle anlegen
+            command.CommandText = "ALTER TABLE QWerte ADD COLUMN " & fieldnames
+            command.ExecuteNonQuery()
+
+            'Tabelle 'OptParameter'
+            'Spalten festlegen:
+            fieldnames = ""
+            For i = 0 To OptParameterListe.GetUpperBound(0)
+                If (i > 0) Then
+                    fieldnames &= ", "
+                End If
+                fieldnames &= OptParameterListe(i).Bezeichnung & " DOUBLE"
+            Next
+            'Tabelle anlegen
+            command.CommandText = "ALTER TABLE OptParameter ADD COLUMN " & fieldnames
+            command.ExecuteNonQuery()
+            Call db_disconnect()
+        Catch except As Exception
+            MsgBox("Konnte Tabellen nicht anpassen:" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
+        End Try
+
     End Sub
 
     'Optimierungsparameter einlesen (*.OPT-Datei)
@@ -712,27 +747,35 @@ Public Class BM_Form
     Public Function db_update(ByVal durchlauf As Integer, ByVal ipop As Short) As Boolean
         Call db_connect()
 
-        Dim i, j As Integer
+        Dim i As Integer
 
         Try
             Dim command As OleDbCommand = New OleDbCommand("", db)
-            'Schleife über alle OptZiele
+            'QWert schreiben 
+            'Spalten der Tabelle 'Qwerte' bestimmen:
+            Dim fieldnames As String = ""
+            Dim fieldvalues As String = ""
             For i = 0 To OptZieleListe.GetUpperBound(0)
-                'QWert schreiben 
-                command.CommandText = "INSERT INTO QWerte (Bezeichnung, durchlauf, ipop, Qwert) VALUES ('" & OptZieleListe(i).Bezeichnung & "', " & durchlauf & ", " & ipop & ", " & OptZieleListe(i).QWertTmp & ")"
-                command.ExecuteNonQuery()
-                'ID des zuletzt geschriebenen QWerts holen
-                command.CommandText = "SELECT @@IDENTITY AS id"
-                Dim QWert_ID As Integer = command.ExecuteScalar()
-
-                'Zugehörige OptParameter schreiben
-                For j = 0 To OptParameterListe.GetUpperBound(0)
-                    command.CommandText = "INSERT INTO OptParameter (Bezeichnung, Wert, QWert_ID) VALUES ('" & OptParameterListe(j).Bezeichnung & "', " & OptParameterListe(j).Wert & ", " & QWert_ID & ")"
-                    command.ExecuteNonQuery()
-                Next
+                fieldnames &= ", " & OptZieleListe(i).Bezeichnung
+                fieldvalues &= ", " & OptZieleListe(i).QWertTmp
             Next
+            command.CommandText = "INSERT INTO QWerte (durchlauf, ipop " & fieldnames & ") VALUES (" & durchlauf & ", " & ipop & fieldvalues & ")"
+            command.ExecuteNonQuery()
+            'ID des zuletzt geschriebenen QWerts holen
+            command.CommandText = "SELECT @@IDENTITY AS ID"
+            Dim QWert_ID As Integer = command.ExecuteScalar()
+
+            'Zugehörige OptParameter schreiben
+            fieldnames = ""
+            fieldvalues = ""
+            For i = 0 To OptParameterListe.GetUpperBound(0)
+                fieldnames &= ", " & OptParameterListe(i).Bezeichnung
+                fieldvalues &= ", " & OptParameterListe(i).Wert
+            Next
+            command.CommandText = "INSERT INTO OptParameter (QWert_ID" & fieldnames & ") VALUES (" & QWert_ID & fieldvalues & ")"
+            command.ExecuteNonQuery()
         Catch except As Exception
-            MsgBox("Fehler beim aktualisieren der Ergebnisdatenbank" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
+            MsgBox("Fehler beim schreiben in die Ergebnisdatenbank" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
         End Try
 
         Call db_disconnect()

@@ -92,14 +92,14 @@ Friend Class Form1
                 'Testprobleme und Evo Deaktivieren
                 Me.GroupBox_Testproblem.Enabled = False
                 EVO_Einstellungen1.Enabled = False
-                'Initialisierung
-                Call BM_Form1.db_prepare()
                 'Optimierungsparameter einlesen
                 Call BM_Form1.OptParameter_einlesen()
                 'ModellParameter einlesen
                 Call BM_Form1.ModellParameter_einlesen()
                 'Zielfunktionen einlesen
                 Call BM_Form1.OptZiele_einlesen()
+                'Datenbank vorbereiten
+                Call BM_Form1.db_prepare()
 
                 'Sensi Plot Dialog starten und List_Boxen füllen
                 Dim i As Integer
