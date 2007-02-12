@@ -24,8 +24,6 @@ Public Class Wave
             Point1.Pointer.HorizSize = 3
             Point1.Pointer.VertSize = 3
 
-
-
             'Series(0 bis n)
             For i = 0 To WaveList.GetUpperBound(0)
                 Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
