@@ -122,72 +122,12 @@ Partial Class Form1
         '
         '
         '
-        '
-        '
-        '
-        '
-        '
-        '
-        Me.TChart1.Axes.Bottom.Labels.Font.Shadow.Visible = False
-        Me.TChart1.Axes.Bottom.Labels.Font.Unit = System.Drawing.GraphicsUnit.World
-        '
-        '
-        '
-        Me.TChart1.Axes.Bottom.Labels.Shadow.Visible = False
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        Me.TChart1.Axes.Bottom.Title.Font.Shadow.Visible = False
-        Me.TChart1.Axes.Bottom.Title.Font.Unit = System.Drawing.GraphicsUnit.World
-        '
-        '
-        '
-        Me.TChart1.Axes.Bottom.Title.Shadow.Visible = False
-        '
-        '
-        '
         Me.TChart1.Axes.Depth.Automatic = True
         '
         '
         '
         Me.TChart1.Axes.Depth.Grid.Style = System.Drawing.Drawing2D.DashStyle.Dash
         Me.TChart1.Axes.Depth.Grid.ZPosition = 0
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        Me.TChart1.Axes.Depth.Labels.Font.Shadow.Visible = False
-        Me.TChart1.Axes.Depth.Labels.Font.Unit = System.Drawing.GraphicsUnit.World
-        '
-        '
-        '
-        Me.TChart1.Axes.Depth.Labels.Shadow.Visible = False
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        Me.TChart1.Axes.Depth.Title.Font.Shadow.Visible = False
-        Me.TChart1.Axes.Depth.Title.Font.Unit = System.Drawing.GraphicsUnit.World
-        '
-        '
-        '
-        Me.TChart1.Axes.Depth.Title.Shadow.Visible = False
         '
         '
         '
@@ -200,72 +140,12 @@ Partial Class Form1
         '
         '
         '
-        '
-        '
-        '
-        '
-        '
-        '
-        Me.TChart1.Axes.DepthTop.Labels.Font.Shadow.Visible = False
-        Me.TChart1.Axes.DepthTop.Labels.Font.Unit = System.Drawing.GraphicsUnit.World
-        '
-        '
-        '
-        Me.TChart1.Axes.DepthTop.Labels.Shadow.Visible = False
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        Me.TChart1.Axes.DepthTop.Title.Font.Shadow.Visible = False
-        Me.TChart1.Axes.DepthTop.Title.Font.Unit = System.Drawing.GraphicsUnit.World
-        '
-        '
-        '
-        Me.TChart1.Axes.DepthTop.Title.Shadow.Visible = False
-        '
-        '
-        '
         Me.TChart1.Axes.Left.Automatic = True
         '
         '
         '
         Me.TChart1.Axes.Left.Grid.Style = System.Drawing.Drawing2D.DashStyle.Dash
         Me.TChart1.Axes.Left.Grid.ZPosition = 0
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        Me.TChart1.Axes.Left.Labels.Font.Shadow.Visible = False
-        Me.TChart1.Axes.Left.Labels.Font.Unit = System.Drawing.GraphicsUnit.World
-        '
-        '
-        '
-        Me.TChart1.Axes.Left.Labels.Shadow.Visible = False
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        Me.TChart1.Axes.Left.Title.Font.Shadow.Visible = False
-        Me.TChart1.Axes.Left.Title.Font.Unit = System.Drawing.GraphicsUnit.World
-        '
-        '
-        '
-        Me.TChart1.Axes.Left.Title.Shadow.Visible = False
         '
         '
         '
@@ -278,115 +158,24 @@ Partial Class Form1
         '
         '
         '
-        '
-        '
-        '
-        '
-        '
-        '
-        Me.TChart1.Axes.Right.Labels.Font.Shadow.Visible = False
-        Me.TChart1.Axes.Right.Labels.Font.Unit = System.Drawing.GraphicsUnit.World
-        '
-        '
-        '
-        Me.TChart1.Axes.Right.Labels.Shadow.Visible = False
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        Me.TChart1.Axes.Right.Title.Font.Shadow.Visible = False
-        Me.TChart1.Axes.Right.Title.Font.Unit = System.Drawing.GraphicsUnit.World
-        '
-        '
-        '
-        Me.TChart1.Axes.Right.Title.Shadow.Visible = False
-        '
-        '
-        '
         Me.TChart1.Axes.Top.Automatic = True
         '
         '
         '
         Me.TChart1.Axes.Top.Grid.Style = System.Drawing.Drawing2D.DashStyle.Dash
         Me.TChart1.Axes.Top.Grid.ZPosition = 0
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        Me.TChart1.Axes.Top.Labels.Font.Shadow.Visible = False
-        Me.TChart1.Axes.Top.Labels.Font.Unit = System.Drawing.GraphicsUnit.World
-        '
-        '
-        '
-        Me.TChart1.Axes.Top.Labels.Shadow.Visible = False
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        Me.TChart1.Axes.Top.Title.Font.Shadow.Visible = False
-        Me.TChart1.Axes.Top.Title.Font.Unit = System.Drawing.GraphicsUnit.World
-        '
-        '
-        '
-        Me.TChart1.Axes.Top.Title.Shadow.Visible = False
         Me.TChart1.Cursor = System.Windows.Forms.Cursors.Default
         '
         '
         '
-        '
-        '
-        '
-        '
-        '
-        '
-        Me.TChart1.Footer.Font.Shadow.Visible = False
-        Me.TChart1.Footer.Font.Unit = System.Drawing.GraphicsUnit.World
-        '
-        '
-        '
-        Me.TChart1.Footer.Shadow.Visible = False
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        Me.TChart1.Header.Font.Shadow.Visible = False
-        Me.TChart1.Header.Font.Unit = System.Drawing.GraphicsUnit.World
         Me.TChart1.Header.Lines = New String() {"TeeChart"}
         '
         '
         '
-        Me.TChart1.Header.Shadow.Visible = False
         '
         '
         '
-        '
-        '
-        '
-        '
-        '
-        '
-        Me.TChart1.Legend.Font.Shadow.Visible = False
-        Me.TChart1.Legend.Font.Unit = System.Drawing.GraphicsUnit.World
+        Me.TChart1.Legend.Shadow.Visible = True
         '
         '
         '
@@ -397,56 +186,10 @@ Partial Class Form1
         '
         '
         '
-        Me.TChart1.Legend.Title.Font.Shadow.Visible = False
-        Me.TChart1.Legend.Title.Font.Unit = System.Drawing.GraphicsUnit.World
-        '
-        '
-        '
         Me.TChart1.Legend.Title.Pen.Visible = False
-        '
-        '
-        '
-        Me.TChart1.Legend.Title.Shadow.Visible = False
         Me.TChart1.Location = New System.Drawing.Point(233, 12)
         Me.TChart1.Name = "TChart1"
-        '
-        '
-        '
-        '
-        '
-        '
-        Me.TChart1.Panel.Shadow.Visible = False
         Me.TChart1.Size = New System.Drawing.Size(465, 640)
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        Me.TChart1.SubFooter.Font.Shadow.Visible = False
-        Me.TChart1.SubFooter.Font.Unit = System.Drawing.GraphicsUnit.World
-        '
-        '
-        '
-        Me.TChart1.SubFooter.Shadow.Visible = False
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        Me.TChart1.SubHeader.Font.Shadow.Visible = False
-        Me.TChart1.SubHeader.Font.Unit = System.Drawing.GraphicsUnit.World
-        '
-        '
-        '
-        Me.TChart1.SubHeader.Shadow.Visible = False
         Me.TChart1.TabIndex = 29
         '
         '
@@ -458,15 +201,7 @@ Partial Class Form1
         '
         '
         '
-        Me.TChart1.Walls.Back.Shadow.Visible = False
-        '
-        '
-        '
         Me.TChart1.Walls.Bottom.AutoHide = False
-        '
-        '
-        '
-        Me.TChart1.Walls.Bottom.Shadow.Visible = False
         '
         '
         '
@@ -474,15 +209,7 @@ Partial Class Form1
         '
         '
         '
-        Me.TChart1.Walls.Left.Shadow.Visible = False
-        '
-        '
-        '
         Me.TChart1.Walls.Right.AutoHide = False
-        '
-        '
-        '
-        Me.TChart1.Walls.Right.Shadow.Visible = False
         '
         'EVO_Opt_Verlauf1
         '
