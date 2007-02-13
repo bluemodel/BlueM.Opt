@@ -125,6 +125,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="EVO_Opt_Verlauf.resX">
       <DependentUpon>EVO_Opt_Verlauf.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
