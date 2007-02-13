@@ -51,8 +51,6 @@ Friend Class Form1
 
         'TODO: Muss man das hier aufrufen oder kann man es auch gleich auf Index = 0 setzen
         Combo_Testproblem.SelectedIndex = 0
-        'TeeChart intialisieren
-        TeeCommander1.Chart = TChart1
 
     End Sub
 
@@ -408,6 +406,7 @@ Friend Class Form1
 
             'Series(0): Series für die Population.
             Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point1.Title = "Population"
             Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
             Point1.Color = System.Drawing.Color.Orange
             Point1.Pointer.HorizSize = 2
@@ -415,6 +414,7 @@ Friend Class Form1
 
             'Series(1): Series für die Sekundäre Population
             Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point2.Title = "Sekundäre Population"
             Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
             Point2.Color = System.Drawing.Color.Blue
             Point2.Pointer.HorizSize = 3
@@ -422,6 +422,7 @@ Friend Class Form1
 
             'Series(2): Series für Bestwert
             Dim Point3 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point3.Title = "Bestwerte"
             Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
             Point3.Color = System.Drawing.Color.Green
             Point3.Pointer.HorizSize = 3
@@ -517,7 +518,7 @@ Friend Class Form1
                     For i = 1 To globalAnzPar
                         mypara(i, 1) = 0
                     Next
-                    Call TeeChartInitialise_So()
+                    Call TeeChartInitialise_SO()
                 Case "Beale-Problem" 'x1 = [-5;5], x2=[-2;2]
                     globalAnzPar = 2
                     globalAnzZiel = 1
@@ -525,7 +526,7 @@ Friend Class Form1
                     ReDim mypara(globalAnzPar, 1)
                     mypara(1, 1) = 0.5
                     mypara(2, 1) = 0.5
-                    Call TeeChartInitialise_So()
+                    Call TeeChartInitialise_SO()
                 Case "Schwefel 2.4-Problem" 'xi = [-10,10]
                     globalAnzPar = CShort(Text_Schwefel24_Par.Text)
                     globalAnzZiel = 1
@@ -534,7 +535,7 @@ Friend Class Form1
                     For i = 1 To globalAnzPar
                         mypara(i, 1) = 1
                     Next i
-                    Call TeeChartInitialise_So()
+                    Call TeeChartInitialise_SO()
                 Case "Deb 1" 'x1 = [0.1;1], x2=[0;5]
                     globalAnzPar = 2
                     globalAnzZiel = 2
@@ -1072,7 +1073,7 @@ ErrCode_ES_STARTEN:
 
     'Alle Series für TeeChart werden initialisiert
     'Teilweise werden die Ziel bzw. Ausgangslinien berechnet und gezeichnet
-    Private Sub TeeChartInitialise_So()
+    Private Sub TeeChartInitialise_SO()
         Dim Ausgangsergebnis As Double
         Dim Anzahl_Kalkulationen As Integer
         Dim Populationen As Short
@@ -1138,6 +1139,7 @@ ErrCode_ES_STARTEN:
 
             'S0: Die Ausgangs- oder Ziellinien
             Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
+            Line1.Title = "Ausgangs-/Ziellinie"
             Line1.Add(array_x, array_y)
             Line1.Brush.Color = System.Drawing.Color.Red
             Line1.ClickableLine = True
@@ -1149,6 +1151,7 @@ ErrCode_ES_STARTEN:
             End If
             For i = 1 To Populationen
                 Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
+                Point1.Title = "Population " & i.ToString()
                 Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
                 Point1.Pointer.HorizSize = 3
                 Point1.Pointer.VertSize = 3
@@ -1195,6 +1198,7 @@ ErrCode_ES_STARTEN:
 
             'S0: Series für die Population.
             Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point1.Title = "Population"
             Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
             Point1.Color = System.Drawing.Color.Orange
             Point1.Pointer.HorizSize = 2
@@ -1202,6 +1206,7 @@ ErrCode_ES_STARTEN:
 
             'S1: Series für die Sekundäre Population
             Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point2.Title = "Sekundäre Population"
             Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
             Point2.Color = System.Drawing.Color.Blue
             Point2.Pointer.HorizSize = 3
@@ -1209,6 +1214,7 @@ ErrCode_ES_STARTEN:
 
             'S2: Series für Bestwert
             Dim Point3 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point3.Title = "Bestwerte"
             Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
             Point3.Color = System.Drawing.Color.Green
             Point3.Pointer.HorizSize = 3
@@ -1217,6 +1223,7 @@ ErrCode_ES_STARTEN:
             Select Case Combo_Testproblem.Text
 
                 Case "Deb 1"
+                    'TODO: Titel der Serien (für Export)
                     Dim Array1X(100) As Double
                     Dim Array1Y(100) As Double
                     Dim Array2X(100) As Double
@@ -1244,6 +1251,7 @@ ErrCode_ES_STARTEN:
                     .Series(4).Add(Array2X, Array2Y)
 
                 Case "Zitzler/Deb T1"
+                    'TODO: Titel der Serien (für Export)
                     Dim ArrayX(1000) As Double
                     Dim ArrayY(1000) As Double
                     .Header.Text = "Zitzler/Deb/Theile T1"
@@ -1261,6 +1269,7 @@ ErrCode_ES_STARTEN:
                     .Series(3).Add(ArrayX, ArrayY)
 
                 Case "Zitzler/Deb T2"
+                    'TODO: Titel der Serien (für Export)
                     Dim ArrayX(100) As Double
                     Dim ArrayY(100) As Double
                     .Header.Text = "Zitzler/Deb/Theile T2"
@@ -1277,6 +1286,7 @@ ErrCode_ES_STARTEN:
                     .Series(3).Add(ArrayX, ArrayY)
 
                 Case "Zitzler/Deb T3"
+                    'TODO: Titel der Serien (für Export)
                     Dim ArrayX(100) As Double
                     Dim ArrayY(100) As Double
                     .Header.Text = "Zitzler/Deb/Theile T3"
@@ -1296,6 +1306,7 @@ ErrCode_ES_STARTEN:
                     .Series(3).Add(ArrayX, ArrayY)
 
                 Case "Zitzler/Deb T4"
+                    'TODO: Titel der Serien (für Export)
                     Dim ArrayX(1000) As Double
                     Dim ArrayY(1000) As Double
                     .Header.Text = "Zitzler/Deb/Theile T4"
@@ -1327,6 +1338,7 @@ ErrCode_ES_STARTEN:
                     '    .Series(Populationen + i).AddArray(1000, ArrayY, ArrayX)
                     'Next i
                 Case "CONSTR"
+                    'TODO: Titel der Serien (für Export)
                     Dim Array1X(100) As Double
                     Dim Array1Y(100) As Double
                     Dim Array2X(100) As Double
@@ -1421,6 +1433,7 @@ ErrCode_ES_STARTEN:
             '---------------------------------------------------------------
             'SO: Series für die Population
             Dim Point3D_0 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point3D_0.Title = "Population"
             Point3D_0.FillSampleValues(100)
             Point3D_0.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
             Point3D_0.LinePen.Visible = False
@@ -1429,6 +1442,7 @@ ErrCode_ES_STARTEN:
 
             'S1: Series für die Sekundäre Population
             Dim Point3D_1 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point3D_1.Title = "Sekundäre Population"
             Point3D_1.FillSampleValues(100)
             Point3D_1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
             Point3D_1.LinePen.Visible = False
@@ -1479,6 +1493,7 @@ ErrCode_ES_STARTEN:
 
             'Series(0): Anfangswert
             Dim Point0 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point0.Title = "Anfangswert"
             Point0.Color = System.Drawing.Color.Red
             Point0.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
             Point0.Pointer.HorizSize = 3
@@ -1493,6 +1508,7 @@ ErrCode_ES_STARTEN:
             'Series(1 bis n): Für jede Population eine Series 'TODO: es würde auch eine Series für alle reichen!
             For i = 0 To Populationen
                 Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
+                Point1.Title = "Population " & i.ToString()
                 Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
                 Point1.Pointer.HorizSize = 3
                 Point1.Pointer.VertSize = 3
@@ -1528,6 +1544,7 @@ ErrCode_ES_STARTEN:
 
             'Series(0): Series für die Population.
             Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point1.Title = "Population"
             Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
             Point1.Color = System.Drawing.Color.Orange
             Point1.Pointer.HorizSize = 2
@@ -1535,6 +1552,7 @@ ErrCode_ES_STARTEN:
 
             'Series(1): Series für die Sekundäre Population
             Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point2.Title = "Sekundäre Population"
             Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
             Point2.Color = System.Drawing.Color.Blue
             Point2.Pointer.HorizSize = 3
@@ -1542,6 +1560,7 @@ ErrCode_ES_STARTEN:
 
             'Series(2): Series für Bestwert
             Dim Point3 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point3.Title = "Bestwerte"
             Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
             Point3.Color = System.Drawing.Color.Green
             Point3.Pointer.HorizSize = 3
@@ -1654,4 +1673,48 @@ ErrCode_ES_STARTEN:
         End If
     End Sub
 
+    'TChart Funktionen:
+    '------------------
+
+    'Chart bearbeiten
+    Private Sub TChartEdit(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_TChartEdit.Click
+        TChart1.ShowEditor()
+    End Sub
+
+    'Chart nach Excel exportieren
+    Private Sub TChart2Excel(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_TChart2Excel.Click
+        SaveFileDialog1.DefaultExt = TChart1.Export.Data.Excel.FileExtension
+        SaveFileDialog1.FileName = TChart1.Name + "." + SaveFileDialog1.DefaultExt
+        SaveFileDialog1.Filter = "Excel-Dateien (*.xls)|*.xls"
+        If (Me.SaveFileDialog1.ShowDialog() = System.Windows.Forms.DialogResult.OK) Then
+            TChart1.Export.Data.Excel.Series = Nothing 'export all series
+            TChart1.Export.Data.Excel.IncludeLabels = True
+            TChart1.Export.Data.Excel.IncludeIndex = True
+            TChart1.Export.Data.Excel.IncludeHeader = True
+            TChart1.Export.Data.Excel.IncludeSeriesTitle = True
+            TChart1.Export.Data.Excel.Save(Me.SaveFileDialog1.FileName)
+        End If
+    End Sub
+
+    'Chart als PNG exportieren
+    Private Sub TChart2PNG(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_TChart2PNG.Click
+        SaveFileDialog1.DefaultExt = TChart1.Export.Image.PNG.FileExtension
+        SaveFileDialog1.FileName = TChart1.Name + "." + SaveFileDialog1.DefaultExt
+        SaveFileDialog1.Filter = "PNG-Dateien (*.png)|*.png"
+        If (Me.SaveFileDialog1.ShowDialog() = System.Windows.Forms.DialogResult.OK) Then
+            TChart1.Export.Image.PNG.GrayScale = False
+            TChart1.Export.Image.PNG.Save(Me.SaveFileDialog1.FileName)
+        End If
+    End Sub
+
+    'Chart in nativem TeeChart-Format abspeichern
+    Private Sub TChartSave(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_TChartSave.Click
+        SaveFileDialog1.DefaultExt = TChart1.Export.Template.FileExtension
+        SaveFileDialog1.FileName = TChart1.Name + "." + SaveFileDialog1.DefaultExt
+        SaveFileDialog1.Filter = "TeeChart-Dateien (*.ten)|*.ten"
+        If (Me.SaveFileDialog1.ShowDialog() = System.Windows.Forms.DialogResult.OK) Then
+            TChart1.Export.Template.IncludeData = True
+            TChart1.Export.Template.Save(Me.SaveFileDialog1.FileName)
+        End If
+    End Sub
 End Class
