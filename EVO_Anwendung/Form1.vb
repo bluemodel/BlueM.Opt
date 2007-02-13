@@ -253,13 +253,13 @@ Friend Class Form1
         Dim OptimierungsModus As Integer
         OptimierungsModus = EVO_Einstellungen1.OptModus
         Select Case OptimierungsModus
-            Case 1
+            Case 0
                 Combo_Testproblem.Items.Clear()
                 Combo_Testproblem.Items.Add("Sinus-Funktion")
                 Combo_Testproblem.Items.Add("Beale-Problem")
                 Combo_Testproblem.Items.Add("Schwefel 2.4-Problem")
                 Combo_Testproblem.SelectedIndex = 0
-            Case 2
+            Case 1
                 Combo_Testproblem.Items.Clear()
                 Combo_Testproblem.Items.Add("Deb 1")
                 Combo_Testproblem.Items.Add("Zitzler/Deb T1")
