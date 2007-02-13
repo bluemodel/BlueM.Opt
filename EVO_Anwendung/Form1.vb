@@ -61,7 +61,7 @@ Friend Class Form1
     '************************************************************************************
 
     'Auswahl der zu optimierenden Anwendung geändert
-    Private Sub Button_IniApp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_IniApp.Click
+    Private Sub IniApp(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_IniApp.Click, ComboBox_Anwendung.SelectedIndexChanged
         AppIniOK = True
         Anwendung = ComboBox_Anwendung.SelectedItem
 
@@ -229,6 +229,7 @@ Friend Class Form1
     Private Sub Button_Start_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Button_Start.Click
         If Not AppIniOK Then
             MsgBox("Bitte zuerst Anwendung Initialisieren", MsgBoxStyle.Exclamation, "Fehler")
+            Exit Sub
         End If
         AppIniOK = False
         myisrun = True
@@ -1652,4 +1653,5 @@ ErrCode_ES_STARTEN:
             eventArgs.Handled = True
         End If
     End Sub
+
 End Class
