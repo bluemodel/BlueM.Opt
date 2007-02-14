@@ -10,7 +10,7 @@ Public Class EVO_Einstellungen
     Private Sub ComboModus_SelectedIndexChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles ComboModus.SelectedIndexChanged
         Dim i As Short
 
-        Select Case VB6.GetItemData(ComboModus, ComboModus.SelectedIndex)
+        Select Case ComboModus.SelectedIndex
 
             Case EVO_MODUS_SINGEL_OBJECTIVE
                 'Vorgaben und Anzeige
@@ -214,8 +214,8 @@ Public Class EVO_Einstellungen
     End Sub
 
     Private Sub FILLCOMBO_MODUS(ByRef Cntrl As System.Windows.Forms.ComboBox)
-        Cntrl.Items.Add(New VB6.ListBoxItem("Single-Objective", EVO_MODUS_SINGEL_OBJECTIVE))
-        Cntrl.Items.Add(New VB6.ListBoxItem("Multi Object Pareto", EVO_MODUS_MULTIOBJECTIVE_PARETO))
+        Cntrl.Items.Add("Single Objective")
+        Cntrl.Items.Add("Multi-Objective Pareto")
         Cntrl.SelectedIndex = 0
     End Sub
 
@@ -226,7 +226,7 @@ Public Class EVO_Einstellungen
         Cntrl.Items.Add(New VB6.ListBoxItem("Rekomb x/x, mitteln", EVO_ELTERN_XX_MITTELN))
         Cntrl.Items.Add(New VB6.ListBoxItem("Rekomb x/y, diskret", EVO_ELTERN_XY_DISKRET))
         Cntrl.Items.Add(New VB6.ListBoxItem("Rekomb x/y, mitteln", EVO_ELTERN_XY_MITTELN))
-        If VB6.GetItemData(ComboModus, ComboModus.SelectedIndex) = EVO_MODUS_MULTIOBJECTIVE_PARETO Then
+        If (ComboModus.SelectedIndex = EVO_MODUS_MULTIOBJECTIVE_PARETO) Then
             Cntrl.Items.Add(New VB6.ListBoxItem("Neighbourhood", EVO_ELTERN_Neighbourhood))
         End If
         Cntrl.SelectedIndex = 1
@@ -240,7 +240,7 @@ Public Class EVO_Einstellungen
 
     Private Sub FILLCOMBO_POPPENALTY(ByRef Cntrl As System.Windows.Forms.ComboBox)
         Cntrl.Items.Clear()
-        Select Case VB6.GetItemData(ComboModus, ComboModus.SelectedIndex)
+        Select Case ComboModus.SelectedIndex
             Case EVO_MODUS_SINGEL_OBJECTIVE
                 Cntrl.Items.Add(New VB6.ListBoxItem("Mittelwert", EVO_POP_PENALTY_MITTELWERT))
                 Cntrl.Items.Add(New VB6.ListBoxItem("Schlechtester", EVO_POP_PENALTY_SCHLECHTESTER))
@@ -282,7 +282,7 @@ Public Class EVO_Einstellungen
 	'Dieses Property nicht ReadOnly weil die Anzahl der Zielfunktionen durch OptZiele bestimmt werden kann
     Public Property OptModus() As Integer
         Get
-            OptModus = VB6.GetItemData(ComboModus, ComboModus.SelectedIndex)
+            OptModus = ComboModus.SelectedIndex
         End Get
         Set(ByVal Index As Integer)
             ComboModus.SelectedIndex = Index
