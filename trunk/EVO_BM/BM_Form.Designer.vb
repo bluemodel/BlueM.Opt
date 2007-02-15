@@ -59,7 +59,7 @@ Partial Class BM_Form
         Me.GroupBox_BM.Controls.Add(Me.TextBox_Datensatz)
         Me.GroupBox_BM.Location = New System.Drawing.Point(12, 12)
         Me.GroupBox_BM.Name = "GroupBox_BM"
-        Me.GroupBox_BM.Size = New System.Drawing.Size(368, 79)
+        Me.GroupBox_BM.Size = New System.Drawing.Size(586, 79)
         Me.GroupBox_BM.TabIndex = 35
         Me.GroupBox_BM.TabStop = False
         Me.GroupBox_BM.Text = "BlauesModell"
@@ -77,12 +77,12 @@ Partial Class BM_Form
         '
         Me.TextBox_EXE.Location = New System.Drawing.Point(70, 21)
         Me.TextBox_EXE.Name = "TextBox_EXE"
-        Me.TextBox_EXE.Size = New System.Drawing.Size(262, 20)
+        Me.TextBox_EXE.Size = New System.Drawing.Size(480, 20)
         Me.TextBox_EXE.TabIndex = 28
         '
         'Button_Exe
         '
-        Me.Button_Exe.Location = New System.Drawing.Point(338, 19)
+        Me.Button_Exe.Location = New System.Drawing.Point(556, 19)
         Me.Button_Exe.Name = "Button_Exe"
         Me.Button_Exe.RightToLeft = System.Windows.Forms.RightToLeft.Yes
         Me.Button_Exe.Size = New System.Drawing.Size(24, 23)
@@ -92,7 +92,7 @@ Partial Class BM_Form
         '
         'Button_Datensatz
         '
-        Me.Button_Datensatz.Location = New System.Drawing.Point(338, 43)
+        Me.Button_Datensatz.Location = New System.Drawing.Point(556, 43)
         Me.Button_Datensatz.Name = "Button_Datensatz"
         Me.Button_Datensatz.Size = New System.Drawing.Size(24, 23)
         Me.Button_Datensatz.TabIndex = 26
@@ -112,9 +112,8 @@ Partial Class BM_Form
         '
         Me.TextBox_Datensatz.Location = New System.Drawing.Point(70, 45)
         Me.TextBox_Datensatz.Name = "TextBox_Datensatz"
-        Me.TextBox_Datensatz.Size = New System.Drawing.Size(262, 20)
+        Me.TextBox_Datensatz.Size = New System.Drawing.Size(480, 20)
         Me.TextBox_Datensatz.TabIndex = 24
-        Me.TextBox_Datensatz.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'GroupBox_Parameter
         '
@@ -126,14 +125,14 @@ Partial Class BM_Form
         Me.GroupBox_Parameter.Controls.Add(Me.Button_OptParameter)
         Me.GroupBox_Parameter.Location = New System.Drawing.Point(12, 97)
         Me.GroupBox_Parameter.Name = "GroupBox_Parameter"
-        Me.GroupBox_Parameter.Size = New System.Drawing.Size(368, 81)
+        Me.GroupBox_Parameter.Size = New System.Drawing.Size(586, 81)
         Me.GroupBox_Parameter.TabIndex = 31
         Me.GroupBox_Parameter.TabStop = False
         Me.GroupBox_Parameter.Text = "Optimierungsparameter"
         '
         'Button_ModellParameter
         '
-        Me.Button_ModellParameter.Location = New System.Drawing.Point(338, 40)
+        Me.Button_ModellParameter.Location = New System.Drawing.Point(556, 40)
         Me.Button_ModellParameter.Name = "Button_ModellParameter"
         Me.Button_ModellParameter.Size = New System.Drawing.Size(24, 23)
         Me.Button_ModellParameter.TabIndex = 29
@@ -144,9 +143,8 @@ Partial Class BM_Form
         '
         Me.TextBox_ModellParameter_Pfad.Location = New System.Drawing.Point(68, 43)
         Me.TextBox_ModellParameter_Pfad.Name = "TextBox_ModellParameter_Pfad"
-        Me.TextBox_ModellParameter_Pfad.Size = New System.Drawing.Size(264, 20)
+        Me.TextBox_ModellParameter_Pfad.Size = New System.Drawing.Size(482, 20)
         Me.TextBox_ModellParameter_Pfad.TabIndex = 24
-        Me.TextBox_ModellParameter_Pfad.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'Label_ModellParameter
         '
@@ -170,13 +168,12 @@ Partial Class BM_Form
         '
         Me.TextBox_OptParameter_Pfad.Location = New System.Drawing.Point(68, 17)
         Me.TextBox_OptParameter_Pfad.Name = "TextBox_OptParameter_Pfad"
-        Me.TextBox_OptParameter_Pfad.Size = New System.Drawing.Size(264, 20)
+        Me.TextBox_OptParameter_Pfad.Size = New System.Drawing.Size(482, 20)
         Me.TextBox_OptParameter_Pfad.TabIndex = 24
-        Me.TextBox_OptParameter_Pfad.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'Button_OptParameter
         '
-        Me.Button_OptParameter.Location = New System.Drawing.Point(338, 15)
+        Me.Button_OptParameter.Location = New System.Drawing.Point(556, 15)
         Me.Button_OptParameter.Name = "Button_OptParameter"
         Me.Button_OptParameter.Size = New System.Drawing.Size(24, 23)
         Me.Button_OptParameter.TabIndex = 26
@@ -190,7 +187,7 @@ Partial Class BM_Form
         Me.GroupBox_OptZiele.Controls.Add(Me.Button_OptZielWert)
         Me.GroupBox_OptZiele.Location = New System.Drawing.Point(12, 184)
         Me.GroupBox_OptZiele.Name = "GroupBox_OptZiele"
-        Me.GroupBox_OptZiele.Size = New System.Drawing.Size(368, 51)
+        Me.GroupBox_OptZiele.Size = New System.Drawing.Size(586, 51)
         Me.GroupBox_OptZiele.TabIndex = 30
         Me.GroupBox_OptZiele.TabStop = False
         Me.GroupBox_OptZiele.Text = "Optimierungsziele"
@@ -208,13 +205,12 @@ Partial Class BM_Form
         '
         Me.TextBox_OptZiele_Pfad.Location = New System.Drawing.Point(70, 19)
         Me.TextBox_OptZiele_Pfad.Name = "TextBox_OptZiele_Pfad"
-        Me.TextBox_OptZiele_Pfad.Size = New System.Drawing.Size(262, 20)
+        Me.TextBox_OptZiele_Pfad.Size = New System.Drawing.Size(480, 20)
         Me.TextBox_OptZiele_Pfad.TabIndex = 24
-        Me.TextBox_OptZiele_Pfad.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'Button_OptZielWert
         '
-        Me.Button_OptZielWert.Location = New System.Drawing.Point(338, 17)
+        Me.Button_OptZielWert.Location = New System.Drawing.Point(556, 17)
         Me.Button_OptZielWert.Name = "Button_OptZielWert"
         Me.Button_OptZielWert.Size = New System.Drawing.Size(24, 23)
         Me.Button_OptZielWert.TabIndex = 26
@@ -243,7 +239,7 @@ Partial Class BM_Form
         '
         'Button_OK
         '
-        Me.Button_OK.Location = New System.Drawing.Point(305, 331)
+        Me.Button_OK.Location = New System.Drawing.Point(472, 331)
         Me.Button_OK.Name = "Button_OK"
         Me.Button_OK.Size = New System.Drawing.Size(75, 23)
         Me.Button_OK.TabIndex = 36
@@ -256,10 +252,9 @@ Partial Class BM_Form
         '
         'BM_Form
         '
-        Me.AcceptButton = Me.Button_OK
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(392, 366)
+        Me.ClientSize = New System.Drawing.Size(610, 366)
         Me.Controls.Add(Me.Button_OK)
         Me.Controls.Add(Me.GroupBox_OptZiele)
         Me.Controls.Add(Me.GroupBox_Parameter)
