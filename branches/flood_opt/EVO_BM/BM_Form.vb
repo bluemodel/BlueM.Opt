@@ -196,7 +196,7 @@ Public Class BM_Form
                 If (i > 0) Then
                     fieldnames &= ", "
                 End If
-                fieldnames &= OptZieleListe(i).Bezeichnung & " DOUBLE"
+                fieldnames &= "'" & OptZieleListe(i).Bezeichnung & "' DOUBLE"
             Next
             'Tabelle anlegen
             command.CommandText = "ALTER TABLE QWerte ADD COLUMN " & fieldnames
@@ -209,7 +209,7 @@ Public Class BM_Form
                 If (i > 0) Then
                     fieldnames &= ", "
                 End If
-                fieldnames &= OptParameterListe(i).Bezeichnung & " DOUBLE"
+                fieldnames &= "'" & OptParameterListe(i).Bezeichnung & "' DOUBLE"
             Next
             'Tabelle anlegen
             command.CommandText = "ALTER TABLE OptParameter ADD COLUMN " & fieldnames
@@ -765,7 +765,7 @@ Public Class BM_Form
             Dim fieldnames As String = ""
             Dim fieldvalues As String = ""
             For i = 0 To OptZieleListe.GetUpperBound(0)
-                fieldnames &= ", " & OptZieleListe(i).Bezeichnung
+                fieldnames &= ", '" & OptZieleListe(i).Bezeichnung & "'"
                 fieldvalues &= ", " & OptZieleListe(i).QWertTmp
             Next
             command.CommandText = "INSERT INTO QWerte (durchlauf, ipop " & fieldnames & ") VALUES (" & durchlauf & ", " & ipop & fieldvalues & ")"
@@ -778,7 +778,7 @@ Public Class BM_Form
             fieldnames = ""
             fieldvalues = ""
             For i = 0 To OptParameterListe.GetUpperBound(0)
-                fieldnames &= ", " & OptParameterListe(i).Bezeichnung
+                fieldnames &= ", '" & OptParameterListe(i).Bezeichnung & "'"
                 fieldvalues &= ", " & OptParameterListe(i).Wert
             Next
             command.CommandText = "INSERT INTO OptParameter (QWert_ID" & fieldnames & ") VALUES (" & QWert_ID & fieldvalues & ")"

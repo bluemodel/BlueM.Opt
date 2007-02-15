@@ -108,9 +108,9 @@ Partial Class SensiPlot
         Me.TextBox_AnzSim.Name = "TextBox_AnzSim"
         Me.TextBox_AnzSim.Size = New System.Drawing.Size(67, 20)
         Me.TextBox_AnzSim.TabIndex = 7
+        Me.TextBox_AnzSim.Text = "7"
         Me.TextBox_AnzSim.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         Me.TextBox_AnzSim.ValidatingType = GetType(Integer)
-        Me.TextBox_AnzSim.Text = 20
         '
         'Label_AnzSim
         '
