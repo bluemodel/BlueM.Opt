@@ -7,7 +7,6 @@ Partial Class Form1
         'Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         IsInitializing = True
         InitializeComponent()
-        IsInitializing = False
     End Sub
     'Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
     Protected Overloads Overrides Sub Dispose(ByVal Disposing As Boolean)

@@ -52,6 +52,9 @@ Friend Class Form1
         'TODO: Muss man das hier aufrufen oder kann man es auch gleich auf Index = 0 setzen
         Combo_Testproblem.SelectedIndex = 0
 
+        'Ende der Initialisierung
+        IsInitializing = False
+
     End Sub
 
     '************************************************************************************
@@ -60,70 +63,73 @@ Friend Class Form1
 
     'Auswahl der zu optimierenden Anwendung geändert
     Private Sub IniApp(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_IniApp.Click, ComboBox_Anwendung.SelectedIndexChanged
-        AppIniOK = True
-        Anwendung = ComboBox_Anwendung.SelectedItem
+        If Me.IsInitializing = True Then
+            Exit Sub
+        Else
+            AppIniOK = True
+            Anwendung = ComboBox_Anwendung.SelectedItem
 
-        Select Case Anwendung
-            Case ANW_RESETPARA_RUNBM
-                'Voreinstellungen lesen EVO.INI
-                Call ReadEVOIni()
-                'Testprobleme und Evo Deaktivieren
-                Me.GroupBox_Testproblem.Enabled = False
-                EVO_Einstellungen1.Enabled = False
-                'Einlesen OptPara, ModellPara, Zielfunktionen
-                Call BM_Form1.OptParameter_einlesen()
-                Call BM_Form1.ModellParameter_einlesen()
-                Call BM_Form1.OptZiele_einlesen()
+            Select Case Anwendung
+                Case ANW_RESETPARA_RUNBM
+                    'Voreinstellungen lesen EVO.INI
+                    Call ReadEVOIni()
+                    'Testprobleme und Evo Deaktivieren
+                    Me.GroupBox_Testproblem.Enabled = False
+                    EVO_Einstellungen1.Enabled = False
+                    'Einlesen OptPara, ModellPara, Zielfunktionen
+                    Call BM_Form1.OptParameter_einlesen()
+                    Call BM_Form1.ModellParameter_einlesen()
+                    Call BM_Form1.OptZiele_einlesen()
 
-                'Original ModellParameter werden geschrieben
-                Call BM_Form1.ModellParameter_schreiben()
+                    'Original ModellParameter werden geschrieben
+                    Call BM_Form1.ModellParameter_schreiben()
 
-            Case ANW_SENSIPLOT_MODPARA
-                'Voreinstellungen lesen EVO.INI
-                Call ReadEVOIni()
-                'Testprobleme und Evo Deaktivieren
-                Me.GroupBox_Testproblem.Enabled = False
-                EVO_Einstellungen1.Enabled = False
-                'Einlesen OptPara, ModellPara, Zielfunktionen
-                Call BM_Form1.OptParameter_einlesen()
-                Call BM_Form1.ModellParameter_einlesen()
-                Call BM_Form1.OptZiele_einlesen()
-                ''Datenbank vorbereiten
-                'Call BM_Form1.db_prepare()
-                'Sensi Plot Dialog starten und List_Boxen füllen
-                Dim i As Integer
-                Dim IsOK As Boolean
+                Case ANW_SENSIPLOT_MODPARA
+                    'Voreinstellungen lesen EVO.INI
+                    Call ReadEVOIni()
+                    'Testprobleme und Evo Deaktivieren
+                    Me.GroupBox_Testproblem.Enabled = False
+                    EVO_Einstellungen1.Enabled = False
+                    'Einlesen OptPara, ModellPara, Zielfunktionen
+                    Call BM_Form1.OptParameter_einlesen()
+                    Call BM_Form1.ModellParameter_einlesen()
+                    Call BM_Form1.OptZiele_einlesen()
+                    ''Datenbank vorbereiten
+                    'Call BM_Form1.db_prepare()
+                    'Sensi Plot Dialog starten und List_Boxen füllen
+                    Dim i As Integer
+                    Dim IsOK As Boolean
 
-                For i = 0 To BM_Form1.OptParameterListe.GetUpperBound(0)
-                    IsOK = SensiPlot1.ListBox_OptParameter_add(BM_Form1.OptParameterListe(i).Bezeichnung)
-                Next
-                For i = 0 To BM_Form1.OptZieleListe.GetUpperBound(0)
-                    IsOK = SensiPlot1.ListBox_OptZiele_add(BM_Form1.OptZieleListe(i).Bezeichnung)
-                Next
-                Call SensiPlot1.ShowDialog()
+                    For i = 0 To BM_Form1.OptParameterListe.GetUpperBound(0)
+                        IsOK = SensiPlot1.ListBox_OptParameter_add(BM_Form1.OptParameterListe(i).Bezeichnung)
+                    Next
+                    For i = 0 To BM_Form1.OptZieleListe.GetUpperBound(0)
+                        IsOK = SensiPlot1.ListBox_OptZiele_add(BM_Form1.OptZieleListe(i).Bezeichnung)
+                    Next
+                    Call SensiPlot1.ShowDialog()
 
-            Case ANW_BLAUESMODELL
-                'Voreinstellungen lesen EVO.INI
-                Call ReadEVOIni()
-                'Evo aktivieren
-                EVO_Einstellungen1.Enabled = True
-                'Testprobleme ausschalten
-                Me.GroupBox_Testproblem.Enabled = False
-                'BM_Form anzeigen
-                BM_Form1.ShowDialog()
-                'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
-                If BM_Form1.OptZieleListe.GetLength(0) = 1 Then
-                    EVO_Einstellungen1.OptModus = 0
-                ElseIf BM_Form1.OptZieleListe.GetLength(0) > 1 Then
-                    EVO_Einstellungen1.OptModus = 1
-                End If
+                Case ANW_BLAUESMODELL
+                    'Voreinstellungen lesen EVO.INI
+                    Call ReadEVOIni()
+                    'Evo aktivieren
+                    EVO_Einstellungen1.Enabled = True
+                    'Testprobleme ausschalten
+                    Me.GroupBox_Testproblem.Enabled = False
+                    'BM_Form anzeigen
+                    BM_Form1.ShowDialog()
+                    'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
+                    If BM_Form1.OptZieleListe.GetLength(0) = 1 Then
+                        EVO_Einstellungen1.OptModus = 0
+                    ElseIf BM_Form1.OptZieleListe.GetLength(0) > 1 Then
+                        EVO_Einstellungen1.OptModus = 1
+                    End If
 
-            Case ANW_TESTPROBLEME
-                'Test-Probleme und Evo aktivieren
-                Me.GroupBox_Testproblem.Enabled = True
-                EVO_Einstellungen1.Enabled = True
-
-        End Select
+                Case ANW_TESTPROBLEME
+                    'Test-Probleme und Evo aktivieren
+                    Me.GroupBox_Testproblem.Enabled = True
+                    EVO_Einstellungen1.Enabled = True
+            End Select
+        End If
     End Sub
 
     Private Sub Combo1_SelectedIndexChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Combo_Testproblem.SelectedIndexChanged
@@ -214,7 +220,7 @@ Friend Class Form1
                 Next
 
             Catch except As Exception
-                MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim lesen der EVO.ini Datei")
+                MsgBox("Fehler beim lesen der EVO.ini Datei:" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
             End Try
         End If
 
