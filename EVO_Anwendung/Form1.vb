@@ -44,10 +44,17 @@ Friend Class Form1
         ComboBox_Anwendung.SelectedItem = ANW_RESETPARA_RUNBM
         Anwendung = ComboBox_Anwendung.SelectedItem
 
-        'Testprobleme für Single-Objective in ComboBox schreiben
+        'Testprobleme in ComboBox schreiben
         Combo_Testproblem.Items.Add("Sinus-Funktion")
         Combo_Testproblem.Items.Add("Beale-Problem")
         Combo_Testproblem.Items.Add("Schwefel 2.4-Problem")
+        Combo_Testproblem.Items.Add("Deb 1")
+        Combo_Testproblem.Items.Add("Zitzler/Deb T1")
+        Combo_Testproblem.Items.Add("Zitzler/Deb T2")
+        Combo_Testproblem.Items.Add("Zitzler/Deb T3")
+        Combo_Testproblem.Items.Add("Zitzler/Deb T4")
+        Combo_Testproblem.Items.Add("CONSTR")
+        Combo_Testproblem.Items.Add("Box")
 
         'TODO: Muss man das hier aufrufen oder kann man es auch gleich auf Index = 0 setzen
         Combo_Testproblem.SelectedIndex = 0
@@ -139,24 +146,34 @@ Friend Class Form1
             Select Case Combo_Testproblem.Text
                 Case "Sinus-Funktion"
                     Problem_SinusFunktion.BringToFront()
+                    EVO_Einstellungen1.OptModus = 0
                 Case "Beale-Problem"
                     Problem_BealeProblem.BringToFront()
+                    EVO_Einstellungen1.OptModus = 0
                 Case "Schwefel 2.4-Problem"
                     Problem_Schwefel24.BringToFront()
+                    EVO_Einstellungen1.OptModus = 0
                 Case "Deb 1"
                     Problem_D1Funktion.BringToFront()
+                    EVO_Einstellungen1.OptModus = 1
                 Case "Zitzler/Deb T1"
                     Problem_T1Funktion.BringToFront()
+                    EVO_Einstellungen1.OptModus = 1
                 Case "Zitzler/Deb T2"
                     Problem_T2Funktion.BringToFront()
+                    EVO_Einstellungen1.OptModus = 1
                 Case "Zitzler/Deb T3"
                     Problem_T3Funktion.BringToFront()
+                    EVO_Einstellungen1.OptModus = 1
                 Case "Zitzler/Deb T4"
                     Problem_T4Funktion.BringToFront()
+                    EVO_Einstellungen1.OptModus = 1
                 Case "CONSTR"
                     Problem_CONSTRFunktion.BringToFront()
+                    EVO_Einstellungen1.OptModus = 1
                 Case "Box"
                     Problem_TKNFunktion.BringToFront()
+                    EVO_Einstellungen1.OptModus = 1
             End Select
         End If
     End Sub
@@ -254,28 +271,6 @@ Friend Class Form1
         myisrun = False
     End Sub
 
-    Private Sub EVO_Einstellungen1_ModusChanges(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles EVO_Einstellungen1.ModusChanges
-        Dim OptimierungsModus As Integer
-        OptimierungsModus = EVO_Einstellungen1.OptModus
-        Select Case OptimierungsModus
-            Case 0
-                Combo_Testproblem.Items.Clear()
-                Combo_Testproblem.Items.Add("Sinus-Funktion")
-                Combo_Testproblem.Items.Add("Beale-Problem")
-                Combo_Testproblem.Items.Add("Schwefel 2.4-Problem")
-                Combo_Testproblem.SelectedIndex = 0
-            Case 1
-                Combo_Testproblem.Items.Clear()
-                Combo_Testproblem.Items.Add("Deb 1")
-                Combo_Testproblem.Items.Add("Zitzler/Deb T1")
-                Combo_Testproblem.Items.Add("Zitzler/Deb T2")
-                Combo_Testproblem.Items.Add("Zitzler/Deb T3")
-                Combo_Testproblem.Items.Add("Zitzler/Deb T4")
-                Combo_Testproblem.Items.Add("CONSTR")
-                Combo_Testproblem.Items.Add("Box")
-                Combo_Testproblem.SelectedIndex = 0
-        End Select
-    End Sub
 
     '************************************************************************************
     '              Anwendung Reset Parameter and RuneOnce Blaues Modell                 *
