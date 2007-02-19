@@ -15,6 +15,7 @@ Friend Class Form1
     Private Const ANW_SENSIPLOT_MODPARA As String = "SensiPlot ModPara"
     Private Const ANW_BLAUESMODELL As String = "Blaues Modell"
     Private Const ANW_TESTPROBLEME As String = "Test-Probleme"
+    Private Const ANW_TSP As String = "TS-Problem"
 
     Private AppIniOK As Boolean = False
 
@@ -22,6 +23,7 @@ Friend Class Form1
     Public BM_Form1 As New EVO_BM.BM_Form
     Public SensiPlot1 As New EVO_BM.SensiPlot
     Public Wave1 As New EVO_BM.Wave
+    Public CombES1 As New dmevodll.CombES
 
     Dim myIsOK As Boolean
     Dim myisrun As Boolean
@@ -40,7 +42,7 @@ Friend Class Form1
         System.Windows.Forms.Application.EnableVisualStyles()
 
         'Liste der Anwendungen in ComboBox schreiben und Anfangseinstellung wählen
-        ComboBox_Anwendung.Items.AddRange(New Object() {ANW_RESETPARA_RUNBM, ANW_SENSIPLOT_MODPARA, ANW_BLAUESMODELL, ANW_TESTPROBLEME})
+        ComboBox_Anwendung.Items.AddRange(New Object() {ANW_RESETPARA_RUNBM, ANW_SENSIPLOT_MODPARA, ANW_BLAUESMODELL, ANW_TESTPROBLEME, ANW_TSP})
         ComboBox_Anwendung.SelectedItem = ANW_RESETPARA_RUNBM
         Anwendung = ComboBox_Anwendung.SelectedItem
 
@@ -65,7 +67,7 @@ Friend Class Form1
     End Sub
 
     '************************************************************************************
-    '           Die Anwendung wurde ausgewählt und wird jetzt initialisiert             *
+    '*********** Die Anwendung wurde ausgewählt und wird jetzt initialisiert ************
     '************************************************************************************
 
     'Auswahl der zu optimierenden Anwendung geändert
@@ -135,6 +137,8 @@ Friend Class Form1
                     'Test-Probleme und Evo aktivieren
                     Me.GroupBox_Testproblem.Enabled = True
                     EVO_Einstellungen1.Enabled = True
+                Case ANW_TSP
+                    Call TSP_Initialize()
             End Select
         End If
     End Sub
@@ -179,7 +183,7 @@ Friend Class Form1
     End Sub
 
     '************************************************************************************
-    '     Vorbereitung der meisten Anwendung                                            *
+    '*************** Vorbereitung der meisten Anwendung *********************************
     '************************************************************************************
 
     'EVO.ini Datei einlesen
@@ -244,7 +248,82 @@ Friend Class Form1
     End Sub
 
     '************************************************************************************
-    '                          Start BUTTON wurde pressed                               *
+    '        Anwendung "Traveling Salesman Problem"                                     *
+    '************************************************************************************
+
+    Private Function TSP_Initialize() As Boolean
+        TSP_Initialize = False
+        Dim i As Integer
+        CombES1.NoOfCities = 7
+        ReDim CombES1.ListOfCities(CombES1.NoOfCities - 1, 1)
+
+        Randomize()
+        TeeChart_Initialise_TSP(CombES1.NoOfCities)
+
+        For i = 0 To CombES1.NoOfCities - 1
+            CombES1.ListOfCities(i, 0) = Math.Round(Rnd() * 100)
+            CombES1.ListOfCities(i, 1) = Math.Round(Rnd() * 100)
+            TChart1.Series(0).Add(CombES1.ListOfCities(i, 0), CombES1.ListOfCities(i, 1), "")
+        Next
+
+        Call TeeChart_Zeichnen_TSP(CombES1.NoOfCities, CombES1.ListOfCities)
+        TSP_Initialize = True
+    End Function
+
+    Private Sub TeeChart_Initialise_TSP(ByVal no As Integer)
+        Dim i As Integer
+
+        With TChart1
+            .Clear()
+            .Header.Text = "Traveling Salesman Problem"
+            .Aspect.View3D = False
+            .Legend.Visible = False
+
+            'Formatierung der Axen
+            '.Chart.Axes.Bottom.Title.Caption = BM_Form1.OptZieleListe(0).Bezeichnung 'HACK: Beschriftung der Axen
+            .Chart.Axes.Bottom.Automatic = False
+            .Chart.Axes.Bottom.Minimum = 0
+            .Chart.Axes.Bottom.Maximum = 100
+            '.Chart.Axes.Left.Title.Caption = BM_Form1.OptParameterListe(0).Bezeichnung 'HACK: Beschriftung der Axen
+            .Chart.Axes.Left.Automatic = False
+            .Chart.Axes.Left.Minimum = 0
+            .Chart.Axes.Left.Maximum = 100
+
+            'Series(0): Series für die Sädte.
+            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point1.Title = "Städte"
+            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point1.Color = System.Drawing.Color.Orange
+            Point1.Pointer.HorizSize = 2
+            Point1.Pointer.VertSize = 2
+
+            'Series(n): für die Reisen
+            For i = 1 To no
+                Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
+                Line1.Title = "Reisen"
+                Line1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+                Line1.Color = System.Drawing.Color.Blue
+                Line1.Pointer.HorizSize = 3
+                Line1.Pointer.VertSize = 3
+            Next
+
+        End With
+    End Sub
+    Private Sub TeeChart_Zeichnen_TSP(ByRef NoC As Integer, ByVal TmpListOfCities(,) As Double)
+
+        Dim i As Integer
+        TChart1.Series(1).Add(TmpListOfCities(0, 0), TmpListOfCities(0, 1), "")
+        TChart1.Series(NoC).Add(TmpListOfCities(0, 0), TmpListOfCities(0, 1), "")
+
+        For i = 0 To NoC - 2
+            TChart1.Series(i + 1).Add(TmpListOfCities(i + 1, 0), TmpListOfCities(i + 1, 1), "")
+            TChart1.Series(i + 2).Add(TmpListOfCities(i + 1, 0), TmpListOfCities(i + 1, 1), "")
+        Next
+
+    End Sub
+
+    '************************************************************************************
+    '************************* Start BUTTON wurde pressed *******************************
     '************************************************************************************
 
     Private Sub Button_Start_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Button_Start.Click
@@ -263,6 +342,8 @@ Friend Class Form1
                 myIsOK = ES_STARTEN()
             Case ANW_TESTPROBLEME
                 myIsOK = ES_STARTEN()
+            Case ANW_TSP
+                myIsOK = TSP_STARTEN()
         End Select
     End Sub
 
@@ -340,7 +421,7 @@ Friend Class Form1
 
         'TODO: Das hier muss neuer TeeChartInitialise_Werden
         'TODO: TeeChart Initialise muss generalisiert werden
-        Call TeeChartInitialise_SensiPlot()
+        Call TeeChart_Initialise_SensiPlot()
 
         ReDim Wave1.WaveList(Anz_Sim + 1)
         BM_Form1.ReadWEL(BM_Form1.WorkDir & BM_Form1.Datensatz & ".wel", "S201_1ZU", Wave1.WaveList(0).Wave)
@@ -388,7 +469,7 @@ Friend Class Form1
         SensiPlot_STARTEN = True
     End Function
 
-    Private Sub TeeChartInitialise_SensiPlot()
+    Private Sub TeeChart_Initialise_SensiPlot()
         Dim Populationen As Short
 
         Populationen = EVO_Einstellungen1.NPopul
@@ -431,6 +512,68 @@ Friend Class Form1
 
         End With
     End Sub
+
+
+    '************************************************************************************
+    '                          Anwendung Traveling Salesman                             *
+    '************************************************************************************
+
+    Private Function TSP_STARTEN() As Boolean
+        Dim i As Integer
+        Dim j As Integer
+        Dim AnzGen As Integer = 20
+        Dim NoParent As Integer = 3
+        Dim NoChilds As Integer = 10
+        Dim NoC As Integer = CombES1.ListOfCities.GetLength(0)
+
+        ReDim CombES1.ParentList(NoParent - 1)
+        ReDim CombES1.ChildList(NoChilds - 1)
+
+        Dim TmpPath(CombES1.ListOfCities.GetUpperBound(0)) As Integer
+
+        'Zufällige Kinderpfade werden generiert
+        For i = 0 To NoChilds - 1
+            ReDim CombES1.ChildList(i).Path(NoC - 1)
+            Call CombES1.Generate_Child(CombES1.ChildList(i).Path)
+        Next i
+
+        For i = 0 To NoChilds - 1
+            ReDim CombES1.ChildList(i).CityList(NoC - 1, 1)
+            For j = 0 To NoC - 1
+                CombES1.ChildList(i).CityList(j, 0) = CombES1.ListOfCities(CombES1.ChildList(i).Path(j), 0)
+                CombES1.ChildList(i).CityList(j, 1) = CombES1.ListOfCities(CombES1.ChildList(i).Path(j), 1)
+            Next
+        Next i
+
+        Dim distance As Double
+        Dim distanceX As Double
+        Dim distanceY As Double
+
+        For i = 0 To NoChilds - 1
+            distance = 0
+            distanceX = 0
+            distanceY = 0
+
+            For j = 0 To NoC - 2
+                CombES1.ChildList(i).Quality = 999999999999999999
+                distanceX = (CombES1.ChildList(i).CityList(j, 0) - CombES1.ChildList(i).CityList(j + 1, 0))
+                distanceX = distanceX * distanceX
+                distanceY = (CombES1.ChildList(i).CityList(j, 1) - CombES1.ChildList(i).CityList(j + 1, 1))
+                distanceY = distanceY * distanceY
+                distance = distance + Math.Sqrt(distanceX + distanceY)
+            Next j
+            distanceX = (CombES1.ChildList(i).CityList(0, 0) - CombES1.ChildList(i).CityList(NoC - 1, 0))
+            distanceX = distanceX * distanceX
+            distanceY = (CombES1.ChildList(i).CityList(0, 1) - CombES1.ChildList(i).CityList(NoC - 1, 1))
+            distanceY = distanceY * distanceY
+            distance = distance + Math.Sqrt(distanceX + distanceY)
+            CombES1.ChildList(i).Quality = distance
+        Next i
+
+
+
+
+    End Function
 
     '************************************************************************************
     '        Anwendung Testprobleme und Blaues Model mit Evolutionsstrategie            *

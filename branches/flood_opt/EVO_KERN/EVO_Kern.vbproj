@@ -133,6 +133,7 @@
     <Compile Include="CEvolutionsstrategie.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="CombES.vb" />
     <Compile Include="Module_dll.vb">
       <SubType>Code</SubType>
     </Compile>
