@@ -254,16 +254,17 @@ Friend Class Form1
     Private Function TSP_Initialize() As Boolean
         TSP_Initialize = False
         Dim i As Integer
-        CombES1.NoOfCities = 7
-        ReDim CombES1.ListOfCities(CombES1.NoOfCities - 1, 1)
+        CombES1.NoOfCities = 8
+        ReDim CombES1.ListOfCities(CombES1.NoOfCities - 1, 2)
 
         Randomize()
         TeeChart_Initialise_TSP(CombES1.NoOfCities)
 
         For i = 0 To CombES1.NoOfCities - 1
-            CombES1.ListOfCities(i, 0) = Math.Round(Rnd() * 100)
+            CombES1.ListOfCities(i, 0) = i + 1
             CombES1.ListOfCities(i, 1) = Math.Round(Rnd() * 100)
-            TChart1.Series(0).Add(CombES1.ListOfCities(i, 0), CombES1.ListOfCities(i, 1), "")
+            CombES1.ListOfCities(i, 2) = Math.Round(Rnd() * 100)
+            TChart1.Series(0).Add(CombES1.ListOfCities(i, 1), CombES1.ListOfCities(i, 2), "")
         Next
 
         Call TeeChart_Zeichnen_TSP(CombES1.NoOfCities, CombES1.ListOfCities)
@@ -309,15 +310,17 @@ Friend Class Form1
 
         End With
     End Sub
-    Private Sub TeeChart_Zeichnen_TSP(ByRef NoC As Integer, ByVal TmpListOfCities(,) As Double)
+    Private Sub TeeChart_Zeichnen_TSP(ByVal NoC As Integer, ByVal TmpListOfCities(,) As Double)
+        'Städte wurden Oben schon gezeichnet
+
+        'Zeichnen der Verbindung von der erstejn zu letzten Stadt
+        TChart1.Series(1).Add(TmpListOfCities(0, 1), TmpListOfCities(0, 2), "")
+        TChart1.Series(NoC).Add(TmpListOfCities(0, 1), TmpListOfCities(0, 2), "")
 
         Dim i As Integer
-        TChart1.Series(1).Add(TmpListOfCities(0, 0), TmpListOfCities(0, 1), "")
-        TChart1.Series(NoC).Add(TmpListOfCities(0, 0), TmpListOfCities(0, 1), "")
-
-        For i = 0 To NoC - 2
-            TChart1.Series(i + 1).Add(TmpListOfCities(i + 1, 0), TmpListOfCities(i + 1, 1), "")
-            TChart1.Series(i + 2).Add(TmpListOfCities(i + 1, 0), TmpListOfCities(i + 1, 1), "")
+        For i = 1 To NoC - 1
+            TChart1.Series(i).Add(TmpListOfCities(i, 1), TmpListOfCities(i, 2), "")
+            TChart1.Series(i + 1).Add(TmpListOfCities(i, 1), TmpListOfCities(i, 2), "")
         Next
 
     End Sub
@@ -521,6 +524,8 @@ Friend Class Form1
     Private Function TSP_STARTEN() As Boolean
         Dim i As Integer
         Dim j As Integer
+        Dim x As Integer
+        Dim y As Integer
         Dim AnzGen As Integer = 20
         Dim NoParent As Integer = 3
         Dim NoChilds As Integer = 10
@@ -533,18 +538,20 @@ Friend Class Form1
 
         'Zufällige Kinderpfade werden generiert
         For i = 0 To NoChilds - 1
-            ReDim CombES1.ChildList(i).Path(NoC - 1)
-            Call CombES1.Generate_Child(CombES1.ChildList(i).Path)
+            ReDim CombES1.ChildList(i).ChildPath(NoC - 1)
+            Call CombES1.Generate_Path(CombES1.ChildList(i).ChildPath)
         Next i
 
+        'Den Kindern werden die Städte Ihres Pfades entsprechend zugewiesen
         For i = 0 To NoChilds - 1
             ReDim CombES1.ChildList(i).CityList(NoC - 1, 1)
             For j = 0 To NoC - 1
-                CombES1.ChildList(i).CityList(j, 0) = CombES1.ListOfCities(CombES1.ChildList(i).Path(j), 0)
-                CombES1.ChildList(i).CityList(j, 1) = CombES1.ListOfCities(CombES1.ChildList(i).Path(j), 1)
+                CombES1.ChildList(i).CityList(j, 0) = CombES1.ListOfCities(CombES1.ChildList(i).ChildPath(j) - 1, 1)
+                CombES1.ChildList(i).CityList(j, 1) = CombES1.ListOfCities(CombES1.ChildList(i).ChildPath(j) - 1, 2)
             Next
         Next i
 
+        'Bestimmung des der Qualität
         Dim distance As Double
         Dim distanceX As Double
         Dim distanceY As Double
@@ -555,7 +562,7 @@ Friend Class Form1
             distanceY = 0
 
             For j = 0 To NoC - 2
-                CombES1.ChildList(i).Quality = 999999999999999999
+                CombES1.ChildList(i).Distance = 999999999999999999
                 distanceX = (CombES1.ChildList(i).CityList(j, 0) - CombES1.ChildList(i).CityList(j + 1, 0))
                 distanceX = distanceX * distanceX
                 distanceY = (CombES1.ChildList(i).CityList(j, 1) - CombES1.ChildList(i).CityList(j + 1, 1))
@@ -567,11 +574,49 @@ Friend Class Form1
             distanceY = (CombES1.ChildList(i).CityList(0, 1) - CombES1.ChildList(i).CityList(NoC - 1, 1))
             distanceY = distanceY * distanceY
             distance = distance + Math.Sqrt(distanceX + distanceY)
-            CombES1.ChildList(i).Quality = distance
+            CombES1.ChildList(i).Distance = distance
         Next i
 
+        'Sortieren der Kinden anhand der Qualität
+        Dim swap As dmevodll.CombES.Child
+        For i = 0 To CombES1.ChildList.GetUpperBound(0)
+            For j = 0 To CombES1.ChildList.GetUpperBound(0)
+                If CombES1.ChildList(i).Distance < CombES1.ChildList(j).Distance Then
+                    swap = CombES1.ChildList(i)
+                    CombES1.ChildList(i) = CombES1.ChildList(j)
+                    CombES1.ChildList(j) = swap
+                End If
+            Next j
+        Next i
 
+        'Übergabe der besten Kinder
+        For i = 0 To NoParent - 1
+            CombES1.ParentList(i).No = i + 1
+            CombES1.ParentList(i).CityList = CombES1.ChildList(i).CityList
+            CombES1.ParentList(i).Distance = CombES1.ChildList(i).Distance
+            CombES1.ParentList(i).Path = CombES1.ChildList(i).ChildPath
+        Next i
 
+        'TODO: City List wird nicht gelöscht
+        For i = 0 To NoChilds - 1
+            Array.Clear(CombES1.ChildList(i).ChildPath, 0, CombES1.ChildList(i).ChildPath.GetLength(0))
+            Array.Clear(CombES1.ChildList(i).CityList, 0, CombES1.ChildList(i).CityList.GetLength(0))
+            Array.Clear(CombES1.ChildList(i).CityList, 1, CombES1.ChildList(i).CityList.GetLength(1))
+            CombES1.ChildList(i).Distance = 999999999999999999
+        Next
+        x = 0
+        y = 1
+        For i = 0 To NoChilds - 1 Step 2
+            Call CombES1.Operator_Order_Crossover(CombES1.ParentList(x).Path, CombES1.ParentList(y).Path, CombES1.ChildList(i).ChildPath, CombES1.ChildList(i + 1).ChildPath)
+            x += 1
+            y += 1
+            If x = NoParent - 1 Then x = 0
+            If y = NoParent - 1 Then y = 0
+        Next i
+
+        For i = 1 To 3
+
+        Next
 
     End Function
 
