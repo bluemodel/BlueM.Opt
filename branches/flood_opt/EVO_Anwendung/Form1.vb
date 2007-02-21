@@ -248,13 +248,12 @@ Friend Class Form1
     End Sub
 
     '************************************************************************************
-    '        Anwendung "Traveling Salesman Problem"                                     *
+    '        Anwendung "Traveling Salesman Problem" - INI                               *
     '************************************************************************************
 
-    Private Function TSP_Initialize() As Boolean
-        TSP_Initialize = False
+    Private Sub TSP_Initialize()
         Dim i As Integer
-        CombES1.NoOfCities = 100
+        CombES1.NoOfCities = 10
         ReDim CombES1.ListOfCities(CombES1.NoOfCities - 1, 2)
 
         Randomize()
@@ -264,12 +263,12 @@ Friend Class Form1
             CombES1.ListOfCities(i, 0) = i + 1
             CombES1.ListOfCities(i, 1) = Math.Round(Rnd() * 100)
             CombES1.ListOfCities(i, 2) = Math.Round(Rnd() * 100)
-            TChart1.Series(0).Add(CombES1.ListOfCities(i, 1), CombES1.ListOfCities(i, 2), "")
+            'TChart1.Series(0).Add(CombES1.ListOfCities(i, 1), CombES1.ListOfCities(i, 2), "")
         Next
 
         Call TeeChart_Zeichnen_TSP(CombES1.NoOfCities, CombES1.ListOfCities)
-        TSP_Initialize = True
-    End Function
+
+    End Sub
 
     Private Sub TeeChart_Initialise_TSP(ByVal no As Integer)
         Dim i As Integer
@@ -314,11 +313,15 @@ Friend Class Form1
         'Städte wurden Oben schon gezeichnet
 
         Dim i As Integer
-        For i = 1 To NoC - 1
+        For i = 0 To NoC - 1
             TChart1.Series(i).Clear()
         Next
 
-        'Zeichnen der Verbindung von der erstejn zu letzten Stadt
+        For i = 0 To NoC - 1
+            TChart1.Series(0).Add(CombES1.ListOfCities(i, 1), CombES1.ListOfCities(i, 2), "")
+        Next
+
+        'Zeichnen der Verbindung von der ersten zu letzten Stadt
         TChart1.Series(1).Add(TmpListOfCities(0, 1), TmpListOfCities(0, 2), "")
         TChart1.Series(NoC).Add(TmpListOfCities(0, 1), TmpListOfCities(0, 2), "")
 
@@ -524,7 +527,7 @@ Friend Class Form1
 
 
     '************************************************************************************
-    '                          Anwendung Traveling Salesman                             *
+    '                      Anwendung Traveling Salesman - Start                         *
     '************************************************************************************
 
     Private Function TSP_STARTEN() As Boolean
@@ -533,9 +536,12 @@ Friend Class Form1
         Dim x As Integer
         Dim y As Integer
         Dim g As Integer
-        Dim AnzGen As Integer = 1000
+        Dim ReprodOperator As String = "Order_Crossover_OX"                     'NoReprod
+        Dim MutOperator As String = "Inversion"                         '"Order_Crossover_OX" "Order_Crossover_OX"
+        Dim AnzGen As Integer = 100
         Dim NoParents As Integer = 3
         Dim NoChilds As Integer = 10
+        Dim Strategy As String = "minus"                    '"plus" oder "minus" Strategie
         Dim NoC As Integer = CombES1.ListOfCities.GetLength(0)
 
         'TODO: Alle REDIMS nach vorne ziehen !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -543,6 +549,7 @@ Friend Class Form1
         ReDim CombES1.ParentList(NoParents - 1)
         ReDim CombES1.ChildList(NoChilds - 1)
 
+        'Array werden Dimensioniert
         For i = 0 To NoParents - 1
             CombES1.ParentList(i).Distance = 999999999999999999
             ReDim CombES1.ParentList(i).CityList(NoC - 1, 2)
@@ -597,48 +604,62 @@ Friend Class Form1
             Next i
 
             'Sortieren der Kinden anhand der Qualität
-            Dim swap As dmevodll.CombES.Faksimile
-            For i = 0 To CombES1.ChildList.GetUpperBound(0)
-                For j = 0 To CombES1.ChildList.GetUpperBound(0)
-                    If CombES1.ChildList(i).Distance < CombES1.ChildList(j).Distance Then
-                        swap = CombES1.ChildList(i)
-                        CombES1.ChildList(i) = CombES1.ChildList(j)
-                        CombES1.ChildList(j) = swap
-                    End If
-                Next j
-            Next i
 
-            'Übergabe der besten Kinder
-            j = 0
-            For i = 0 To NoParents - 1
-                CombES1.ParentList(i).No = i
-                If CombES1.ParentList(i).Distance > CombES1.ChildList(i).Distance Then
+            Call CombES1.Sort_Faksimile(CombES1.ChildList)
+
+            'Übergabe der Kinder an die Eltern
+            If Strategy = "minus" Then
+                For i = 0 To NoParents - 1
                     CombES1.ParentList(i).Distance = CombES1.ChildList(i).Distance
-                    Array.Copy(CombES1.ChildList(j).CityList, CombES1.ParentList(i).CityList, CombES1.ChildList(j).CityList.Length)
-                    Array.Copy(CombES1.ChildList(j).Path, CombES1.ParentList(i).Path, CombES1.ChildList(j).Path.Length)
+                    Array.Copy(CombES1.ChildList(i).CityList, CombES1.ParentList(i).CityList, CombES1.ChildList(i).CityList.Length)
+                    Array.Copy(CombES1.ChildList(i).Path, CombES1.ParentList(i).Path, CombES1.ChildList(i).Path.Length)
+                Next i
+
+            ElseIf Strategy = "plus" Then
+                j = 0
+                For i = 0 To NoParents - 1
+                    If CombES1.ParentList(i).Distance < CombES1.ChildList(j).Distance Then
+                        j -= 1
+                    Else
+                        CombES1.ParentList(i).Distance = CombES1.ChildList(j).Distance
+                        Array.Copy(CombES1.ChildList(j).CityList, CombES1.ParentList(i).CityList, CombES1.ChildList(j).CityList.Length)
+                        Array.Copy(CombES1.ChildList(j).Path, CombES1.ParentList(i).Path, CombES1.ChildList(j).Path.Length)
+                    End If
                     j += 1
-                End If
-            Next i
+                Next i
+            End If
 
             Call TeeChart_Zeichnen_TSP(NoC, CombES1.ParentList(0).CityList)
 
-            'TODO: City List wird nicht gelöscht!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            'Kinder werden Hier vollständig gelöscht
             For i = 0 To NoChilds - 1
-                Array.Clear(CombES1.ChildList(i).Path, 0, CombES1.ChildList(i).Path.GetLength(0))
-                Array.Clear(CombES1.ChildList(i).CityList, 0, CombES1.ChildList(i).CityList.GetLength(0))
+                CombES1.ChildList(i).No = 0
                 CombES1.ChildList(i).Distance = 999999999999999999
+                Array.Clear(CombES1.ChildList(i).Path, 0, CombES1.ChildList(i).Path.GetLength(0))
+                ReDim CombES1.ChildList(i).CityList(NoC, 2)
             Next
 
-            x = 0
-            y = 1
-            For i = 0 To NoChilds - 1 Step 2
-                Call CombES1.Operator_Order_Crossover(CombES1.ParentList(x).Path, CombES1.ParentList(y).Path, CombES1.ChildList(i).Path, CombES1.ChildList(i + 1).Path)
-                x += 1
-                y += 1
-                If x = NoParents - 1 Then x = 0
-                If y = NoParents - 1 Then y = 0
-            Next i
+            'Reproductionsoperatoren
+            Select Case ReprodOperator
+                Case "Order_Crossover_OX"
+                    x = 0
+                    y = 1
+                    For i = 0 To NoChilds - 1 Step 2
+                        Call CombES1.ReprodOp_Order_Crossover(CombES1.ParentList(x).Path, CombES1.ParentList(y).Path, CombES1.ChildList(i).Path, CombES1.ChildList(i + 1).Path)
+                        x += 1
+                        y += 1
+                        If x = NoParents - 1 Then x = 0
+                        If y = NoParents - 1 Then y = 0
+                    Next i
+            End Select
 
+            'Mutationsoperatoren
+            Select Case MutOperator
+                Case "Inversion"
+                    For i = 0 To NoChilds - 1
+                        Call CombES1.MutOp_Inversion(CombES1.ChildList(i).Path)
+                    Next
+            End Select
         Next g
 
     End Function
