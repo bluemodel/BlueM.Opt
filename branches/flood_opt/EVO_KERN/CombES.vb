@@ -4,22 +4,15 @@ Public Class CombES
     Public ChildPaths(,) As Integer
     Public ParentPaths(,) As Integer
 
-    Public Structure Child
-        Dim ChildNo As Integer
-        Dim ChildPath() As Integer
-        Dim Distance As Double
-        Dim CityList(,) As Double
-    End Structure
-
-    Public Structure Parent
+    Public Structure Faksimile
         Dim No As Integer
         Dim Path() As Integer
         Dim Distance As Double
         Dim CityList(,) As Double
     End Structure
 
-    Public ChildList() As Child = {}
-    Public ParentList() As Parent = {}
+    Public ChildList() As Faksimile = {}
+    Public ParentList() As Faksimile = {}
 
     'Generiert eine zufälligen Path
     Public Sub Generate_Path(ByRef Path() As Integer)

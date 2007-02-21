@@ -254,7 +254,7 @@ Friend Class Form1
     Private Function TSP_Initialize() As Boolean
         TSP_Initialize = False
         Dim i As Integer
-        CombES1.NoOfCities = 8
+        CombES1.NoOfCities = 100
         ReDim CombES1.ListOfCities(CombES1.NoOfCities - 1, 2)
 
         Randomize()
@@ -313,15 +313,21 @@ Friend Class Form1
     Private Sub TeeChart_Zeichnen_TSP(ByVal NoC As Integer, ByVal TmpListOfCities(,) As Double)
         'Städte wurden Oben schon gezeichnet
 
+        Dim i As Integer
+        For i = 1 To NoC - 1
+            TChart1.Series(i).Clear()
+        Next
+
         'Zeichnen der Verbindung von der erstejn zu letzten Stadt
         TChart1.Series(1).Add(TmpListOfCities(0, 1), TmpListOfCities(0, 2), "")
         TChart1.Series(NoC).Add(TmpListOfCities(0, 1), TmpListOfCities(0, 2), "")
 
-        Dim i As Integer
         For i = 1 To NoC - 1
             TChart1.Series(i).Add(TmpListOfCities(i, 1), TmpListOfCities(i, 2), "")
             TChart1.Series(i + 1).Add(TmpListOfCities(i, 1), TmpListOfCities(i, 2), "")
         Next
+
+        System.Windows.Forms.Application.DoEvents()
 
     End Sub
 
@@ -526,97 +532,114 @@ Friend Class Form1
         Dim j As Integer
         Dim x As Integer
         Dim y As Integer
-        Dim AnzGen As Integer = 20
-        Dim NoParent As Integer = 3
+        Dim g As Integer
+        Dim AnzGen As Integer = 1000
+        Dim NoParents As Integer = 3
         Dim NoChilds As Integer = 10
         Dim NoC As Integer = CombES1.ListOfCities.GetLength(0)
 
-        ReDim CombES1.ParentList(NoParent - 1)
+        'TODO: Alle REDIMS nach vorne ziehen !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+        ReDim CombES1.ParentList(NoParents - 1)
         ReDim CombES1.ChildList(NoChilds - 1)
 
-        Dim TmpPath(CombES1.ListOfCities.GetUpperBound(0)) As Integer
+        For i = 0 To NoParents - 1
+            CombES1.ParentList(i).Distance = 999999999999999999
+            ReDim CombES1.ParentList(i).CityList(NoC - 1, 2)
+            ReDim CombES1.ParentList(i).Path(NoC - 1)
+        Next
 
         'Zufällige Kinderpfade werden generiert
         For i = 0 To NoChilds - 1
-            ReDim CombES1.ChildList(i).ChildPath(NoC - 1)
-            Call CombES1.Generate_Path(CombES1.ChildList(i).ChildPath)
+            ReDim CombES1.ChildList(i).Path(NoC - 1)
+            Call CombES1.Generate_Path(CombES1.ChildList(i).Path)
         Next i
 
-        'Den Kindern werden die Städte Ihres Pfades entsprechend zugewiesen
-        For i = 0 To NoChilds - 1
-            ReDim CombES1.ChildList(i).CityList(NoC - 1, 1)
-            For j = 0 To NoC - 1
-                CombES1.ChildList(i).CityList(j, 0) = CombES1.ListOfCities(CombES1.ChildList(i).ChildPath(j) - 1, 1)
-                CombES1.ChildList(i).CityList(j, 1) = CombES1.ListOfCities(CombES1.ChildList(i).ChildPath(j) - 1, 2)
-            Next
-        Next i
+        'Generationsschleife
+        For g = 1 To AnzGen
 
-        'Bestimmung des der Qualität
-        Dim distance As Double
-        Dim distanceX As Double
-        Dim distanceY As Double
+            'Den Kindern werden die Städte Ihres Pfades entsprechend zugewiesen
+            For i = 0 To NoChilds - 1
+                ReDim CombES1.ChildList(i).CityList(NoC - 1, 2)
+                For j = 0 To NoC - 1
+                    CombES1.ChildList(i).CityList(j, 0) = CombES1.ListOfCities(CombES1.ChildList(i).Path(j) - 1, 0)
+                    CombES1.ChildList(i).CityList(j, 1) = CombES1.ListOfCities(CombES1.ChildList(i).Path(j) - 1, 1)
+                    CombES1.ChildList(i).CityList(j, 2) = CombES1.ListOfCities(CombES1.ChildList(i).Path(j) - 1, 2)
+                Next
+            Next i
 
-        For i = 0 To NoChilds - 1
-            distance = 0
-            distanceX = 0
-            distanceY = 0
+            Call TeeChart_Zeichnen_TSP(CombES1.NoOfCities, CombES1.ListOfCities)
 
-            For j = 0 To NoC - 2
-                CombES1.ChildList(i).Distance = 999999999999999999
-                distanceX = (CombES1.ChildList(i).CityList(j, 0) - CombES1.ChildList(i).CityList(j + 1, 0))
+            'Bestimmung des der Qualität
+            Dim distance As Double
+            Dim distanceX As Double
+            Dim distanceY As Double
+
+            For i = 0 To NoChilds - 1
+                distance = 0
+                distanceX = 0
+                distanceY = 0
+
+                For j = 0 To NoC - 2
+                    CombES1.ChildList(i).Distance = 999999999999999999
+                    distanceX = (CombES1.ChildList(i).CityList(j, 1) - CombES1.ChildList(i).CityList(j + 1, 1))
+                    distanceX = distanceX * distanceX
+                    distanceY = (CombES1.ChildList(i).CityList(j, 2) - CombES1.ChildList(i).CityList(j + 1, 2))
+                    distanceY = distanceY * distanceY
+                    distance = distance + Math.Sqrt(distanceX + distanceY)
+                Next j
+                distanceX = (CombES1.ChildList(i).CityList(0, 1) - CombES1.ChildList(i).CityList(NoC - 1, 1))
                 distanceX = distanceX * distanceX
-                distanceY = (CombES1.ChildList(i).CityList(j, 1) - CombES1.ChildList(i).CityList(j + 1, 1))
+                distanceY = (CombES1.ChildList(i).CityList(0, 2) - CombES1.ChildList(i).CityList(NoC - 1, 2))
                 distanceY = distanceY * distanceY
                 distance = distance + Math.Sqrt(distanceX + distanceY)
-            Next j
-            distanceX = (CombES1.ChildList(i).CityList(0, 0) - CombES1.ChildList(i).CityList(NoC - 1, 0))
-            distanceX = distanceX * distanceX
-            distanceY = (CombES1.ChildList(i).CityList(0, 1) - CombES1.ChildList(i).CityList(NoC - 1, 1))
-            distanceY = distanceY * distanceY
-            distance = distance + Math.Sqrt(distanceX + distanceY)
-            CombES1.ChildList(i).Distance = distance
-        Next i
+                CombES1.ChildList(i).Distance = distance
+            Next i
 
-        'Sortieren der Kinden anhand der Qualität
-        Dim swap As dmevodll.CombES.Child
-        For i = 0 To CombES1.ChildList.GetUpperBound(0)
-            For j = 0 To CombES1.ChildList.GetUpperBound(0)
-                If CombES1.ChildList(i).Distance < CombES1.ChildList(j).Distance Then
-                    swap = CombES1.ChildList(i)
-                    CombES1.ChildList(i) = CombES1.ChildList(j)
-                    CombES1.ChildList(j) = swap
+            'Sortieren der Kinden anhand der Qualität
+            Dim swap As dmevodll.CombES.Faksimile
+            For i = 0 To CombES1.ChildList.GetUpperBound(0)
+                For j = 0 To CombES1.ChildList.GetUpperBound(0)
+                    If CombES1.ChildList(i).Distance < CombES1.ChildList(j).Distance Then
+                        swap = CombES1.ChildList(i)
+                        CombES1.ChildList(i) = CombES1.ChildList(j)
+                        CombES1.ChildList(j) = swap
+                    End If
+                Next j
+            Next i
+
+            'Übergabe der besten Kinder
+            j = 0
+            For i = 0 To NoParents - 1
+                CombES1.ParentList(i).No = i
+                If CombES1.ParentList(i).Distance > CombES1.ChildList(i).Distance Then
+                    CombES1.ParentList(i).Distance = CombES1.ChildList(i).Distance
+                    Array.Copy(CombES1.ChildList(j).CityList, CombES1.ParentList(i).CityList, CombES1.ChildList(j).CityList.Length)
+                    Array.Copy(CombES1.ChildList(j).Path, CombES1.ParentList(i).Path, CombES1.ChildList(j).Path.Length)
+                    j += 1
                 End If
-            Next j
-        Next i
+            Next i
 
-        'Übergabe der besten Kinder
-        For i = 0 To NoParent - 1
-            CombES1.ParentList(i).No = i + 1
-            CombES1.ParentList(i).CityList = CombES1.ChildList(i).CityList
-            CombES1.ParentList(i).Distance = CombES1.ChildList(i).Distance
-            CombES1.ParentList(i).Path = CombES1.ChildList(i).ChildPath
-        Next i
+            Call TeeChart_Zeichnen_TSP(NoC, CombES1.ParentList(0).CityList)
 
-        'TODO: City List wird nicht gelöscht
-        For i = 0 To NoChilds - 1
-            Array.Clear(CombES1.ChildList(i).ChildPath, 0, CombES1.ChildList(i).ChildPath.GetLength(0))
-            Array.Clear(CombES1.ChildList(i).CityList, 0, CombES1.ChildList(i).CityList.GetLength(0))
-            Array.Clear(CombES1.ChildList(i).CityList, 1, CombES1.ChildList(i).CityList.GetLength(1))
-            CombES1.ChildList(i).Distance = 999999999999999999
-        Next
-        x = 0
-        y = 1
-        For i = 0 To NoChilds - 1 Step 2
-            Call CombES1.Operator_Order_Crossover(CombES1.ParentList(x).Path, CombES1.ParentList(y).Path, CombES1.ChildList(i).ChildPath, CombES1.ChildList(i + 1).ChildPath)
-            x += 1
-            y += 1
-            If x = NoParent - 1 Then x = 0
-            If y = NoParent - 1 Then y = 0
-        Next i
+            'TODO: City List wird nicht gelöscht!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            For i = 0 To NoChilds - 1
+                Array.Clear(CombES1.ChildList(i).Path, 0, CombES1.ChildList(i).Path.GetLength(0))
+                Array.Clear(CombES1.ChildList(i).CityList, 0, CombES1.ChildList(i).CityList.GetLength(0))
+                CombES1.ChildList(i).Distance = 999999999999999999
+            Next
 
-        For i = 1 To 3
+            x = 0
+            y = 1
+            For i = 0 To NoChilds - 1 Step 2
+                Call CombES1.Operator_Order_Crossover(CombES1.ParentList(x).Path, CombES1.ParentList(y).Path, CombES1.ChildList(i).Path, CombES1.ChildList(i + 1).Path)
+                x += 1
+                y += 1
+                If x = NoParents - 1 Then x = 0
+                If y = NoParents - 1 Then y = 0
+            Next i
 
-        Next
+        Next g
 
     End Function
 
