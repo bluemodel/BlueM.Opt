@@ -253,11 +253,11 @@ Friend Class Form1
 
     Private Sub TSP_Initialize()
         Dim i As Integer
-        CombES1.NoOfCities = 10
+        CombES1.NoOfCities = 40
         ReDim CombES1.ListOfCities(CombES1.NoOfCities - 1, 2)
 
         Randomize()
-        TeeChart_Initialise_TSP(CombES1.NoOfCities)
+        Call TeeChart_Initialise_TSP(CombES1.NoOfCities)
 
         For i = 0 To CombES1.NoOfCities - 1
             CombES1.ListOfCities(i, 0) = i + 1
@@ -313,16 +313,16 @@ Friend Class Form1
         'Städte wurden Oben schon gezeichnet
 
         Dim i As Integer
-        For i = 0 To NoC - 1
-            TChart1.Series.Clear()
-        Next
-        System.Windows.Forms.Application.DoEvents()
+        'For i = 0 To NoC - 1
+        '    TChart1.Series(i).Clear()
+        'Next
 
+        'Zeichnene der Punkte für die Städte
         For i = 0 To NoC - 1
             TChart1.Series(0).Add(CombES1.ListOfCities(i, 1), CombES1.ListOfCities(i, 2), "")
         Next
 
-        'Zeichnen der Verbindung von der ersten zu letzten Stadt
+        'Zeichnen der Verbindung von der ersten bis zur letzten Stadt
         TChart1.Series(1).Add(TmpListOfCities(0, 1), TmpListOfCities(0, 2), "")
         TChart1.Series(NoC).Add(TmpListOfCities(0, 1), TmpListOfCities(0, 2), "")
 
@@ -331,7 +331,7 @@ Friend Class Form1
             TChart1.Series(i + 1).Add(TmpListOfCities(i, 1), TmpListOfCities(i, 2), "")
         Next
 
-        System.Windows.Forms.Application.DoEvents()
+        'System.Windows.Forms.Application.DoEvents()
 
     End Sub
 
@@ -539,13 +539,14 @@ Friend Class Form1
         Dim g As Integer
         Dim ReprodOperator As String = "Order_Crossover_OX"                     'NoReprod
         Dim MutOperator As String = "Inversion"                         '"Order_Crossover_OX" "Order_Crossover_OX"
-        Dim AnzGen As Integer = 100
+        Dim AnzGen As Integer = 10000
         Dim NoParents As Integer = 3
         Dim NoChilds As Integer = 10
-        Dim Strategy As String = "minus"                    '"plus" oder "minus" Strategie
+        Dim Strategy As String = "plus"                    '"plus" oder "minus" Strategie
         Dim NoC As Integer = CombES1.ListOfCities.GetLength(0)
 
         'TODO: Alle REDIMS nach vorne ziehen !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        Call TeeChart_Initialise_TSP(CombES1.NoOfCities)
 
         ReDim CombES1.ParentList(NoParents - 1)
         ReDim CombES1.ChildList(NoChilds - 1)
@@ -576,8 +577,6 @@ Friend Class Form1
                 Next
             Next i
 
-            Call TeeChart_Zeichnen_TSP(CombES1.NoOfCities, CombES1.ListOfCities)
-
             'Bestimmung des der Qualität
             Dim distance As Double
             Dim distanceX As Double
@@ -596,11 +595,11 @@ Friend Class Form1
                     distanceY = distanceY * distanceY
                     distance = distance + Math.Sqrt(distanceX + distanceY)
                 Next j
-                distanceX = (CombES1.ChildList(i).CityList(0, 1) - CombES1.ChildList(i).CityList(NoC - 1, 1))
-                distanceX = distanceX * distanceX
-                distanceY = (CombES1.ChildList(i).CityList(0, 2) - CombES1.ChildList(i).CityList(NoC - 1, 2))
-                distanceY = distanceY * distanceY
-                distance = distance + Math.Sqrt(distanceX + distanceY)
+                'distanceX = (CombES1.ChildList(i).CityList(0, 1) - CombES1.ChildList(i).CityList(NoC - 1, 1))
+                'distanceX = distanceX * distanceX
+                'distanceY = (CombES1.ChildList(i).CityList(0, 2) - CombES1.ChildList(i).CityList(NoC - 1, 2))
+                'distanceY = distanceY * distanceY
+                'distance = distance + Math.Sqrt(distanceX + distanceY)
                 CombES1.ChildList(i).Distance = distance
             Next i
 
@@ -630,7 +629,10 @@ Friend Class Form1
                 Next i
             End If
 
-            Call TeeChart_Zeichnen_TSP(NoC, CombES1.ParentList(0).CityList)
+            If g = AnzGen Then
+                Call TeeChart_Zeichnen_TSP(NoC, CombES1.ParentList(0).CityList)
+            End If
+
 
             'Kinder werden Hier vollständig gelöscht
             For i = 0 To NoChilds - 1
