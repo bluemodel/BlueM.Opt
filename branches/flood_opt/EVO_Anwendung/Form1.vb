@@ -314,8 +314,9 @@ Friend Class Form1
 
         Dim i As Integer
         For i = 0 To NoC - 1
-            TChart1.Series(i).Clear()
+            TChart1.Series.Clear()
         Next
+        System.Windows.Forms.Application.DoEvents()
 
         For i = 0 To NoC - 1
             TChart1.Series(0).Add(CombES1.ListOfCities(i, 1), CombES1.ListOfCities(i, 2), "")
