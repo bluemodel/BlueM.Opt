@@ -133,10 +133,13 @@
     <Compile Include="CEvolutionsstrategie.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="CombES.vb" />
+    <Compile Include="CES.vb" />
     <Compile Include="Module_dll.vb">
       <SubType>Code</SubType>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="My Project\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
