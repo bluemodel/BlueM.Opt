@@ -239,10 +239,12 @@ Public Class CES
             Case "Inversion"
                 For i = 0 To n_Childs - 1
                     Call MutOp_Inversion(ChildList(i).Path)
+                    'If PathValid(ChildList(i).Path) = False Then MsgBox("Fehler im Path", MsgBoxStyle.Information, "Fehler")
                 Next i
             Case "Translocation"
                 For i = 0 To n_Childs - 1
                     Call MutOp_Translocation(ChildList(i).Path)
+                    'If PathValid(ChildList(i).Path) = False Then MsgBox("Fehler im Path", MsgBoxStyle.Information, "Fehler")
                 Next i
             Case "Transposition"
                 For i = 0 To n_Childs - 1
@@ -280,54 +282,69 @@ Public Class CES
 
 
     'Mutationsoperator "Translocation"
+    'Vertauscht zufällig 3 Abschnitte aus dem String und verwendet Bernoulli verteilt die Inverse
+    'ToDo: Jetzt werden immer 3 Translocation durchgeführt könnte man auf n-Ausbauen
     Private Sub MutOp_Translocation(ByVal Path() As Integer)
         Dim i, j As Integer
         Dim x As Integer
+        Dim tmp As Integer
+        Dim SwapPath(2) As Integer
         Dim CutPoint(1) As Integer
         Call Create_n_Cutpoints(CutPoint)
 
-        Dim SubPath1(CutPoint(0) - 1) As Integer
-        Dim SubPath2(CutPoint(1) - CutPoint(0) - 1) As Integer
-        Dim SubPath3(n_Cities - CutPoint(1) - 1) As Integer
+        Dim SubPath(2)() As Integer
+        ReDim SubPath(0)(CutPoint(0) - 1)
+        ReDim SubPath(1)(CutPoint(1) - CutPoint(0) - 1)
+        ReDim SubPath(2)(n_Cities - CutPoint(1) - 1)
 
-        j = SubPath1.GetLength(0) + SubPath2.GetLength(0) + SubPath3.GetLength(0)
+
+        'Dim SubPath1(CutPoint(0) - 1) As Integer
+        'Dim SubPath2(CutPoint(1) - CutPoint(0) - 1) As Integer
+        'Dim SubPath3(n_Cities - CutPoint(1) - 1) As Integer
+
+        j = SubPath(0).GetLength(0) + SubPath(1).GetLength(0) + SubPath(2).GetLength(0)
 
         'Kopieren der Substrings
         x = 0
         For i = 0 To CutPoint(0) - 1
-            SubPath1(x) = Path(i)
+            SubPath(0)(x) = Path(i)
             x += 1
         Next
         x = 0
         For i = CutPoint(0) To CutPoint(1) - 1
-            SubPath2(x) = Path(i)
+            SubPath(1)(x) = Path(i)
             x += 1
         Next
         x = 0
         For i = CutPoint(1) To n_Cities - 1
-            SubPath3(x) = Path(i)
+            SubPath(2)(x) = Path(i)
             x += 1
         Next
 
-        'Einfügen des Substrings
-        x = 0
-        For i = 0 To CutPoint(0) - 1
-            x += 1
-            Path(i) = SubPath1(x)
+        'Bernloulli Verteilte Inversion der Subpaths
+        If Bernoulli() = True Then Array.Reverse(SubPath(0))
+        If Bernoulli() = True Then Array.Reverse(SubPath(1))
+        If Bernoulli() = True Then Array.Reverse(SubPath(2))
+
+        'Generieren der neuen Reihenfolge
+        For i = 0 To 2
+            Do
+                tmp = CInt(Int(3 * Rnd() + 1))
+            Loop While Is_No_OK(tmp, SwapPath) = False
+            SwapPath(i) = tmp
         Next
-        x = 0
-        For i = CutPoint(0) To CutPoint(1) - 1
-            x += 1
-            Path(i) = SubPath1(x)
-        Next
-        x = 0
-        For i = CutPoint(1) To n_Cities - 1
-            x += 1
-            Path(i) = SubPath1(x)
+        For i = 0 To 2
+            SwapPath(i) -= 1
         Next
 
-        'ToDo: Zufällig Invertieren
-        'Zufälligen einfügepfad generiern evtl. mit obigen path generator
+        'Übertragen der Substrings in den Path
+        x = 0
+        For i = 0 To 2
+            For j = 0 To SubPath(SwapPath(i)).GetUpperBound(0)
+                Path(x) = SubPath(SwapPath(i))(j)
+                x += 1
+            Next
+        Next
 
     End Sub
 
@@ -355,6 +372,19 @@ Public Class CES
         Next
 
     End Sub
+
+    'Hilfsfunktion: Validierung der Paths
+    'ToDo:Option zum ein und Ausschalten dieser Function
+    Public Function PathValid(ByVal Path() As Integer) As Boolean
+        Dim i As Integer
+        Array.Sort(Path)
+        For i = 0 To Path.GetUpperBound(0)
+            If Path(i) <> i + 1 Then
+                Exit Function
+            End If
+        Next
+        PathValid = True
+    End Function
 
     'Hilfsfunktion um zu Prüfen ob eine Zahl bereits in einem Array vorhanden ist oder nicht
     Public Function Is_No_OK(ByVal No As Integer, ByVal Path() As Integer) As Boolean
@@ -401,6 +431,13 @@ Public Class CES
         Next i
 
     End Sub
+
+    'Hilffunktion generiert Bernoulli verteilte Zufallszahl
+    Public Function Bernoulli() As Boolean
+        Dim lowerb As Integer = 0
+        Dim upperbo As Integer = 1
+        Bernoulli = CInt(Int(2 * Rnd()))
+    End Function
 
 End Class
 
