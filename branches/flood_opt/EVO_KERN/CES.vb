@@ -1,7 +1,7 @@
 Public Class CES
 
     'Public Variablen
-    Public n_Cities As Integer = 40
+    Public n_Cities As Integer = 50
     Public ListOfCities(,) As Double
     Public AnzGen As Integer = 10000
 
@@ -68,6 +68,8 @@ Public Class CES
         Next i
 
     End Sub
+
+    '*************************** Functionen innerhalb der Generationsschleife ****************************
 
     'Weist den KinderPfaden die Städte zu
     Public Sub Cities_according_ChildPath()
@@ -153,6 +155,8 @@ Public Class CES
 
     End Sub
 
+    '**************************************** Reproductionsfunktionen ****************************************
+
     'Steuerung der Reproduktionsoperatoren
     Public Sub Reproduction_Operations()
         Dim i As Integer
@@ -230,6 +234,8 @@ Public Class CES
             End If
         Next
     End Sub
+
+    '****************************************** Mutationsfunktionen ****************************************
 
     'Steuerung der Mutationsoperatoren
     Public Sub Mutation_Operations()
@@ -386,6 +392,8 @@ Public Class CES
         PathValid = True
     End Function
 
+    '******************************************* Hilfsfunktionen *******************************************
+
     'Hilfsfunktion um zu Prüfen ob eine Zahl bereits in einem Array vorhanden ist oder nicht
     Public Function Is_No_OK(ByVal No As Integer, ByVal Path() As Integer) As Boolean
         Is_No_OK = True
@@ -416,8 +424,8 @@ Public Class CES
 
     End Sub
 
-    'Hilfsfunktion zum generieren von zwei zufälligen Schnittpunkten innerhalb eines Pfades
-    'ToDo: bisher werden die CutPoints asymetrisch gewählt, man könnte auch mal von rechts starten
+    'Hilfsfunktion zum generieren von zufälligen Schnittpunkten innerhalb eines Pfades
+    'Mit Bernoulli Verteilung mal von rechts mal von links
     'ToDo: mann sollte den Range mit upper and lower Bound übergeben übergeben
     Public Sub Create_n_Cutpoints(ByRef CutPoint() As Integer)
         'Generiert zwei CutPoints
@@ -425,10 +433,18 @@ Public Class CES
         Dim lowerb As Integer = 1
         Dim upperbo As Integer = n_Cities - 2
 
-        For i = 0 To CutPoint.GetUpperBound(0)
-            CutPoint(i) = CInt(Int((upperbo - lowerb + 1) * Rnd() + lowerb))
-            lowerb = CutPoint(i) + 1
-        Next i
+        'wird zufällig entweder von Link oder von Rechts geschnitten
+        If Bernoulli() = True Then
+            For i = 0 To CutPoint.GetUpperBound(0)
+                CutPoint(i) = CInt(Int((upperbo - lowerb + 1) * Rnd() + lowerb))
+                lowerb = CutPoint(i) + 1
+            Next i
+        Else
+            For i = CutPoint.GetUpperBound(0) To 0 Step -1
+                CutPoint(i) = CInt(Int((upperbo - lowerb + 1) * Rnd() + lowerb))
+                upperbo = CutPoint(i) - 1
+            Next i
+        End If
 
     End Sub
 
