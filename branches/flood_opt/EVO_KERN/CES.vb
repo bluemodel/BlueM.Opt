@@ -1,15 +1,15 @@
 Public Class CES
 
     'Public Variablen
-    Public n_Cities As Integer = 50
+    Public n_Cities As Integer = 80
     Public ListOfCities(,) As Double
     Public AnzGen As Integer = 10000
 
     'Private Variablen
     Private ReprodOperator As String = "Order_Crossover_OX"
     Private MutOperator As String = "Translocation"
-    Private n_Parents As Integer = 3
-    Private n_Childs As Integer = 12
+    Private n_Parents As Integer = 5
+    Private n_Childs As Integer = 15
     Private Strategy As String = "plus"                                 '"plus" oder "minus" Strategie
 
     Public Structure Faksimile
@@ -161,18 +161,24 @@ Public Class CES
     Public Sub Reproduction_Operations()
         Dim i As Integer
         Dim x, y As Integer
+        Dim Einzelkind(n_Cities - 1) As Integer
 
         Select Case ReprodOperator
+            'ToDo: Eltern werden nicht zufällig gewählt sondern immer in Top Down Reihenfolge
             Case "Order_Crossover_OX"
                 x = 0
                 y = 1
-                For i = 0 To n_Childs - 1 Step 2
+                For i = 0 To n_Childs - 2 Step 2
                     Call ReprodOp_Order_Crossover(ParentList(x).Path, ParentList(y).Path, ChildList(i).Path, ChildList(i + 1).Path)
                     x += 1
                     y += 1
                     If x = n_Parents - 1 Then x = 0
                     If y = n_Parents - 1 Then y = 0
                 Next i
+                If Even_Number(n_Childs) = False Then
+                    Call ReprodOp_Order_Crossover(ParentList(x).Path, ParentList(y).Path, ChildList(n_Childs - 1).Path, Einzelkind)
+                End If
+
         End Select
 
     End Sub
@@ -196,42 +202,38 @@ Public Class CES
         For i = CutPoint(1) To n_Cities - 1
             If Is_No_OK(ParPath2(x), ChildPath1) Then
                 ChildPath1(i) = ParPath2(x)
-                x += 1
             Else
-                x += 1
                 i -= 1
             End If
+            x += 1
         Next
 
         y = 0
         For i = CutPoint(1) To n_Cities - 1
             If Is_No_OK(ParPath1(y), ChildPath2) Then
                 ChildPath2(i) = ParPath1(y)
-                y += 1
             Else
-                y += 1
                 i -= 1
             End If
+            y += 1
         Next
 
         For i = 0 To CutPoint(0) - 1
             If Is_No_OK(ParPath2(x), ChildPath1) Then
                 ChildPath1(i) = ParPath2(x)
-                x += 1
             Else
-                x += 1
                 i -= 1
             End If
+            x += 1
         Next
 
         For i = 0 To CutPoint(0) - 1
             If Is_No_OK(ParPath1(y), ChildPath2) Then
                 ChildPath2(i) = ParPath1(y)
-                y += 1
             Else
-                y += 1
                 i -= 1
             End If
+            y += 1
         Next
     End Sub
 
@@ -453,6 +455,17 @@ Public Class CES
         Dim lowerb As Integer = 0
         Dim upperbo As Integer = 1
         Bernoulli = CInt(Int(2 * Rnd()))
+    End Function
+
+    'Hilfsfunktion: Gerade oder Ungerade Zahl
+    Public Function Even_Number(ByVal Number As Integer) As Boolean
+        Dim tmp_a As Double
+        Dim tmp_b As Double
+        Dim tmp_c As Double
+        tmp_a = Number / 2
+        tmp_b = Math.Ceiling(tmp_a)
+        tmp_c = tmp_a - tmp_b
+        If tmp_c = 0 Then Even_Number = True
     End Function
 
 End Class
