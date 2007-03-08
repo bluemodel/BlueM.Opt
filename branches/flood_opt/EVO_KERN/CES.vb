@@ -1,5 +1,27 @@
 Public Class CES
 
+    '*******************************************************************************
+    '*******************************************************************************
+    '**** Klasse CES Kombinatorische Evolutionsstrategie                        ****
+    '****                                                                       ****
+    '**** Christoph Hübner                                                      ****
+    '****                                                                       ****
+    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
+    '**** TU Darmstadt                                                          ****
+    '****                                                                       ****
+    '**** Februar 2007                                                          ****
+    '****                                                                       ****
+    '**** Letzte Änderung: März 2007                                            ****
+    '*******************************************************************************
+    '*******************************************************************************
+
+
+    'Konvention:
+    'Cities:      1 2 3 4 5 6 7
+    'Pathindex:   0 1 2 3 4 5 6
+    'CutPoint:     1 2 3 4 5 6
+    'LB + UB n=2   x         x
+
     'Public Variablen
     Public n_Cities As Integer = 80
     Public ListOfCities(,) As Double
@@ -179,13 +201,28 @@ Public Class CES
                     Call ReprodOp_Order_Crossover(ParentList(x).Path, ParentList(y).Path, ChildList(n_Childs - 1).Path, Einzelkind)
                 End If
 
+            Case "Partially_Mapped_Crossover"
+                x = 0
+                y = 1
+                For i = 0 To n_Childs - 2 Step 2
+                    Call ReprodOp_Part_Mapped_Crossover(ParentList(x).Path, ParentList(y).Path, ChildList(i).Path, ChildList(i + 1).Path)
+                    x += 1
+                    y += 1
+                    If x = n_Parents - 1 Then x = 0
+                    If y = n_Parents - 1 Then y = 0
+                Next i
+                If Even_Number(n_Childs) = False Then
+                    Call ReprodOp_Part_Mapped_Crossover(ParentList(x).Path, ParentList(y).Path, ChildList(n_Childs - 1).Path, Einzelkind)
+                End If
+
         End Select
 
     End Sub
 
-    'TODO: funzt nur wenn Anzahl der Kinder Gerade, sollte man verbessern
-    'Reproductionsoperator "Order_Crossover"
-    Private Sub ReprodOp_Order_Crossover(ByVal ParPath1() As Integer, ByVal ParPath2() As Integer, ByRef ChildPath1() As Integer, ByRef ChildPath2() As Integer)
+    'Reproductionsoperator "Order_Crossover (CX)"
+    'Kopiert den mittleren Teil des einen Elter und füllt den Rest aus der Reihenfolge des anderen Elter auf
+    'ToDo: Es wird immer nur der mittlere Teil Kopiert, könnte auch mal ein einderer sein
+    Private Sub ReprodOp_Order_Crossover(ByVal ParPath_A() As Integer, ByVal ParPath_B() As Integer, ByRef ChildPath_A() As Integer, ByRef ChildPath_B() As Integer)
 
         Dim i As Integer
         Dim x, y As Integer
@@ -193,47 +230,124 @@ Public Class CES
         Dim CutPoint(1) As Integer
         Call Create_n_Cutpoints(CutPoint)
 
-        For i = (CutPoint(0)) To CutPoint(1) - 1
-            ChildPath1(i) = ParPath1(i)
-            ChildPath2(i) = ParPath2(i)
+        'Kopieren des mittleren Paths
+        For i = CutPoint(0) + 1 To CutPoint(1)
+            ChildPath_A(i) = ParPath_A(i)
+            ChildPath_B(i) = ParPath_B(i)
         Next
-
+        'Auffüllen des Paths Teil 3 des Childs A mit dem anderen Elter beginnend bei 0
         x = 0
-        For i = CutPoint(1) To n_Cities - 1
-            If Is_No_OK(ParPath2(x), ChildPath1) Then
-                ChildPath1(i) = ParPath2(x)
+        For i = CutPoint(1) + 1 To n_Cities - 1
+            If Is_No_OK(ParPath_B(x), ChildPath_A) Then
+                ChildPath_A(i) = ParPath_B(x)
             Else
                 i -= 1
             End If
             x += 1
         Next
-
+        'Auffüllen des Paths Teil 3 des Childs B mit dem anderen Elter beginnend bei 0
         y = 0
-        For i = CutPoint(1) To n_Cities - 1
-            If Is_No_OK(ParPath1(y), ChildPath2) Then
-                ChildPath2(i) = ParPath1(y)
+        For i = CutPoint(1) + 1 To n_Cities - 1
+            If Is_No_OK(ParPath_A(y), ChildPath_B) Then
+                ChildPath_B(i) = ParPath_A(y)
             Else
                 i -= 1
             End If
             y += 1
         Next
-
-        For i = 0 To CutPoint(0) - 1
-            If Is_No_OK(ParPath2(x), ChildPath1) Then
-                ChildPath1(i) = ParPath2(x)
+        'Auffüllen des Paths Teil 1 des Childs A mit dem anderen Elter beginnend bei 0
+        For i = 0 To CutPoint(0)
+            If Is_No_OK(ParPath_B(x), ChildPath_A) Then
+                ChildPath_A(i) = ParPath_B(x)
             Else
                 i -= 1
             End If
             x += 1
         Next
-
-        For i = 0 To CutPoint(0) - 1
-            If Is_No_OK(ParPath1(y), ChildPath2) Then
-                ChildPath2(i) = ParPath1(y)
+        'Auffüllen des Paths Teil 1 des Childs B mit dem anderen Elter beginnend bei 0
+        For i = 0 To CutPoint(0)
+            If Is_No_OK(ParPath_A(y), ChildPath_B) Then
+                ChildPath_B(i) = ParPath_A(y)
             Else
                 i -= 1
             End If
             y += 1
+        Next
+    End Sub
+
+    'Reproductionsoperator: "Partially_Mapped_Crossover (PMX)"
+    'Kopiert den mittleren Teil des anderen Elter und füllt den Rest mit dem eigenen auf. Falls Doppelt wird gemaped.
+    Public Sub ReprodOp_Part_Mapped_Crossover(ByVal ParPath_A() As Integer, ByVal ParPath_B() As Integer, ByRef ChildPath_A() As Integer, ByRef ChildPath_B() As Integer)
+        Dim i, j As Integer
+        Dim x, y As Integer
+        Dim Index As Integer
+        Dim mapper As Integer
+
+        Dim CutPoint(1) As Integer
+        For i = 0 To 10
+            Call Create_n_Cutpoints(CutPoint)
+        Next
+
+        'Kopieren des mittleren Paths und füllen des Mappers
+        x = 0
+        For i = CutPoint(0) + 1 To CutPoint(1)
+            ChildPath_B(i) = ParPath_A(i)
+            ChildPath_A(i) = ParPath_B(i)
+            x += 1
+        Next
+
+        'Auffüllen des Paths Teil 1 des Childs A und B mit dem anderen Elter beginnend bei 0
+        For i = 0 To CutPoint(0)
+            'für Child A
+            If Is_No_OK(ParPath_A(i), ChildPath_A) Then
+                ChildPath_A(i) = ParPath_A(i)
+            Else
+                mapper = ParPath_A(i)
+                Do Until (Is_No_OK(mapper, ChildPath_A) = True)
+                    Index = Array.IndexOf(ParPath_B, mapper)
+                    mapper = ParPath_A(Index)
+                Loop
+                ChildPath_A(i) = mapper
+            End If
+
+            'für Child B
+            If Is_No_OK(ParPath_B(i), ChildPath_B) Then
+                ChildPath_B(i) = ParPath_B(i)
+            Else
+                mapper = ParPath_B(i)
+                Do Until (Is_No_OK(mapper, ChildPath_B) = True)
+                    Index = Array.IndexOf(ParPath_A, mapper)
+                    mapper = ParPath_B(Index)
+                Loop
+                ChildPath_B(i) = mapper
+            End If
+        Next i
+
+        'Auffüllen des Paths Teil 3 des Childs A und B mit dem anderen Elter beginnend bei 0
+        For i = CutPoint(1) + 1 To n_Cities - 1
+            'für Child A
+            If Is_No_OK(ParPath_A(i), ChildPath_A) Then
+                ChildPath_A(i) = ParPath_A(i)
+            Else
+                mapper = ParPath_A(i)
+                Do Until (Is_No_OK(mapper, ChildPath_A) = True)
+                    Index = Array.IndexOf(ParPath_B, mapper)
+                    mapper = ParPath_A(Index)
+                Loop
+                ChildPath_A(i) = mapper
+            End If
+
+            'für Child B
+            If Is_No_OK(ParPath_B(i), ChildPath_B) Then
+                ChildPath_B(i) = ParPath_B(i)
+            Else
+                mapper = ParPath_B(i)
+                Do Until (Is_No_OK(mapper, ChildPath_B) = True)
+                    Index = Array.IndexOf(ParPath_A, mapper)
+                    mapper = ParPath_B(Index)
+                Loop
+                ChildPath_B(i) = mapper
+            End If
         Next
     End Sub
 
@@ -264,6 +378,7 @@ Public Class CES
 
     'Mutationsoperator "Inversion"
     'Schneidet ein Segment aus dem Path heraus und fügt es invers wieder ein
+    'ToDo: Wird bis jetzt nur auf den mittleren Teil angewendet
     Private Sub MutOp_Inversion(ByVal Path() As Integer)
         Dim i As Integer
         Dim x As Integer
@@ -275,13 +390,13 @@ Public Class CES
 
         'Kopieren des Substrings
         x = 0
-        For i = CutPoint(0) To CutPoint(1) - 1
+        For i = CutPoint(0) + 1 To CutPoint(1)
             SubPath(x) = Path(i)
             x += 1
         Next
 
         'Invertiertes einfügen
-        For i = CutPoint(0) To CutPoint(1) - 1
+        For i = CutPoint(0) + 1 To CutPoint(1)
             x -= 1
             Path(i) = SubPath(x)
         Next
@@ -301,30 +416,25 @@ Public Class CES
         Call Create_n_Cutpoints(CutPoint)
 
         Dim SubPath(2)() As Integer
-        ReDim SubPath(0)(CutPoint(0) - 1)
+        ReDim SubPath(0)(CutPoint(0))
         ReDim SubPath(1)(CutPoint(1) - CutPoint(0) - 1)
-        ReDim SubPath(2)(n_Cities - CutPoint(1) - 1)
-
-
-        'Dim SubPath1(CutPoint(0) - 1) As Integer
-        'Dim SubPath2(CutPoint(1) - CutPoint(0) - 1) As Integer
-        'Dim SubPath3(n_Cities - CutPoint(1) - 1) As Integer
+        ReDim SubPath(2)(n_Cities - CutPoint(1) - 2)
 
         j = SubPath(0).GetLength(0) + SubPath(1).GetLength(0) + SubPath(2).GetLength(0)
 
         'Kopieren der Substrings
         x = 0
-        For i = 0 To CutPoint(0) - 1
+        For i = 0 To CutPoint(0)
             SubPath(0)(x) = Path(i)
             x += 1
         Next
         x = 0
-        For i = CutPoint(0) To CutPoint(1) - 1
+        For i = CutPoint(0) + 1 To CutPoint(1)
             SubPath(1)(x) = Path(i)
             x += 1
         Next
         x = 0
-        For i = CutPoint(1) To n_Cities - 1
+        For i = CutPoint(1) + 1 To n_Cities - 1
             SubPath(2)(x) = Path(i)
             x += 1
         Next
@@ -381,6 +491,8 @@ Public Class CES
 
     End Sub
 
+    '******************************************* Hilfsfunktionen *******************************************
+
     'Hilfsfunktion: Validierung der Paths
     'ToDo:Option zum ein und Ausschalten dieser Function
     Public Function PathValid(ByVal Path() As Integer) As Boolean
@@ -393,8 +505,6 @@ Public Class CES
         Next
         PathValid = True
     End Function
-
-    '******************************************* Hilfsfunktionen *******************************************
 
     'Hilfsfunktion um zu Prüfen ob eine Zahl bereits in einem Array vorhanden ist oder nicht
     Public Function Is_No_OK(ByVal No As Integer, ByVal Path() As Integer) As Boolean
@@ -428,23 +538,26 @@ Public Class CES
 
     'Hilfsfunktion zum generieren von zufälligen Schnittpunkten innerhalb eines Pfades
     'Mit Bernoulli Verteilung mal von rechts mal von links
-    'ToDo: mann sollte den Range mit upper and lower Bound übergeben übergeben
     Public Sub Create_n_Cutpoints(ByRef CutPoint() As Integer)
         'Generiert zwei CutPoints
         Dim i As Integer
-        Dim lowerb As Integer = 1
-        Dim upperbo As Integer = n_Cities - 2
+        Dim lowerb As Integer
+        Dim upperb As Integer
 
         'wird zufällig entweder von Link oder von Rechts geschnitten
         If Bernoulli() = True Then
+            lowerb = 0
             For i = 0 To CutPoint.GetUpperBound(0)
-                CutPoint(i) = CInt(Int((upperbo - lowerb + 1) * Rnd() + lowerb))
+                upperb = n_Cities - CutPoint.GetLength(0) - 1 + i
+                CutPoint(i) = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
                 lowerb = CutPoint(i) + 1
             Next i
         Else
+            upperb = n_Cities - 2
             For i = CutPoint.GetUpperBound(0) To 0 Step -1
-                CutPoint(i) = CInt(Int((upperbo - lowerb + 1) * Rnd() + lowerb))
-                upperbo = CutPoint(i) - 1
+                lowerb = i
+                CutPoint(i) = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
+                upperb = CutPoint(i) - 1
             Next i
         End If
 
