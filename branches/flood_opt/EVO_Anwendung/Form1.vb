@@ -341,7 +341,7 @@ Friend Class Form1
 
         'TODO: Das hier muss neuer TeeChartInitialise_Werden
         'TODO: TeeChart Initialise muss generalisiert werden
-        Call TeeChart_Initialise_SensiPlot()
+        Call SensiPlot1.TeeChart_Ini_SensiPlot(TChart1, EVO_Einstellungen1.NPopul, BM_Form1.OptZieleListe(0).Bezeichnung, BM_Form1.OptParameterListe(0).Bezeichnung)
 
         ReDim Wave1.WaveList(Anz_Sim + 1)
         BM_Form1.ReadWEL(BM_Form1.WorkDir & BM_Form1.Datensatz & ".wel", "S201_1ZU", Wave1.WaveList(0).Wave)
@@ -389,49 +389,6 @@ Friend Class Form1
         SensiPlot_STARTEN = True
     End Function
 
-    Private Sub TeeChart_Initialise_SensiPlot()
-        Dim Populationen As Short
-
-        Populationen = EVO_Einstellungen1.NPopul
-
-        With TChart1
-            .Clear()
-            .Header.Text = "BlauesModell"
-            .Aspect.View3D = False
-            .Legend.Visible = False
-
-            'Formatierung der Axen
-            .Chart.Axes.Bottom.Title.Caption = BM_Form1.OptZieleListe(0).Bezeichnung 'HACK: Beschriftung der Axen
-            .Chart.Axes.Bottom.Automatic = True
-            .Chart.Axes.Left.Title.Caption = BM_Form1.OptParameterListe(0).Bezeichnung 'HACK: Beschriftung der Axen
-            .Chart.Axes.Left.Automatic = True
-
-            'Series(0): Series für die Population.
-            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point1.Title = "Population"
-            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point1.Color = System.Drawing.Color.Orange
-            Point1.Pointer.HorizSize = 2
-            Point1.Pointer.VertSize = 2
-
-            'Series(1): Series für die Sekundäre Population
-            Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point2.Title = "Sekundäre Population"
-            Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point2.Color = System.Drawing.Color.Blue
-            Point2.Pointer.HorizSize = 3
-            Point2.Pointer.VertSize = 3
-
-            'Series(2): Series für Bestwert
-            Dim Point3 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point3.Title = "Bestwerte"
-            Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point3.Color = System.Drawing.Color.Green
-            Point3.Pointer.HorizSize = 3
-            Point3.Pointer.VertSize = 3
-
-        End With
-    End Sub
 
     '************************************************************************************
     '                      Anwendung Traveling Salesman - Start                         *
@@ -860,7 +817,7 @@ Start_Evolutionsrunden:
                         End If
 
                         'Bestimmen der Zielfunktion bzw. Start der Simulation
-                        myIsOK = Simulieren(globalAnzPar, mypara, durchlauf, Bestwert, ipop, QN, RN, evolutionsstrategie.isMultiObjective)
+                        myIsOK = Evaluieren(globalAnzPar, mypara, durchlauf, Bestwert, ipop, QN, RN, evolutionsstrategie.isMultiObjective)
 
                         'Einordnen der Qualitätsfunktion im Bestwertspeicher
                         myIsOK = evolutionsstrategie.EsBest(QN, RN)
@@ -940,7 +897,7 @@ ErrCode_ES_STARTEN:
     End Function
 
     '
-    Private Function Simulieren(ByRef AnzPar As Short, ByRef Par(,) As Double, ByRef durchlauf As Integer, ByRef Bestwert(,) As Double, ByRef ipop As Short, ByRef QN() As Double, ByRef RN() As Double, ByVal isPareto As Boolean) As Boolean
+    Private Function Evaluieren(ByRef AnzPar As Short, ByRef Par(,) As Double, ByRef durchlauf As Integer, ByRef Bestwert(,) As Double, ByRef ipop As Short, ByRef QN() As Double, ByRef RN() As Double, ByVal isPareto As Boolean) As Boolean
         Dim i As Short
         Dim Unterteilung_X As Double
         Dim x1, x2 As Double
