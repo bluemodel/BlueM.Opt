@@ -38,4 +38,7 @@ Public Class SensiPlot
         Me.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.Close()
     End Sub
+
+    '************************ TeeChart Funktionen ***************************************
+
 End Class

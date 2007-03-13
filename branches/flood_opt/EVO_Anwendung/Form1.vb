@@ -20,6 +20,7 @@ Friend Class Form1
     Private AppIniOK As Boolean = False
 
     'Deklarationen der Module
+    Public TestProb1 As New Testprobleme
     Public BM_Form1 As New EVO_BM.BM_Form
     Public SensiPlot1 As New EVO_BM.SensiPlot
     Public Wave1 As New EVO_BM.Wave
@@ -138,7 +139,7 @@ Friend Class Form1
                     Me.GroupBox_Testproblem.Enabled = True
                     EVO_Einstellungen1.Enabled = True
                 Case ANW_TSP
-                    Call TSP_Initialize()
+                    Call CES1.TSP_Initialize(TChart1)
             End Select
         End If
     End Sub
@@ -248,88 +249,6 @@ Friend Class Form1
     End Sub
 
     '************************************************************************************
-    '        Anwendung "Traveling Salesman Problem" - INI                               *
-    '************************************************************************************
-
-    Private Sub TSP_Initialize()
-
-        Dim i As Integer
-        ReDim CES1.ListOfCities(CES1.n_Cities - 1, 2)
-
-        Randomize()
-        Call TeeChart_Initialise_TSP(CES1.n_Cities)
-
-        For i = 0 To CES1.n_Cities - 1
-            CES1.ListOfCities(i, 0) = i + 1
-            CES1.ListOfCities(i, 1) = Math.Round(Rnd() * 100)
-            CES1.ListOfCities(i, 2) = Math.Round(Rnd() * 100)
-        Next
-
-        Call TeeChart_Zeichnen_TSP(CES1.n_Cities, CES1.ListOfCities)
-
-    End Sub
-
-    Private Sub TeeChart_Initialise_TSP(ByVal no As Integer)
-        Dim i As Integer
-
-        With TChart1
-            .Clear()
-            .Header.Text = "Traveling Salesman Problem"
-            .Aspect.View3D = False
-            .Legend.Visible = False
-
-            'Formatierung der Axen
-            '.Chart.Axes.Bottom.Title.Caption = BM_Form1.OptZieleListe(0).Bezeichnung 'HACK: Beschriftung der Axen
-            .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Bottom.Maximum = 100
-            '.Chart.Axes.Left.Title.Caption = BM_Form1.OptParameterListe(0).Bezeichnung 'HACK: Beschriftung der Axen
-            .Chart.Axes.Left.Automatic = False
-            .Chart.Axes.Left.Minimum = 0
-            .Chart.Axes.Left.Maximum = 100
-
-            'Series(0): Series für die Sädte.
-            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point1.Title = "Städte"
-            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point1.Color = System.Drawing.Color.Orange
-            Point1.Pointer.HorizSize = 2
-            Point1.Pointer.VertSize = 2
-
-            'Series(n): für die Reisen
-            For i = 1 To no
-                Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-                Line1.Title = "Reisen"
-                Line1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-                Line1.Color = System.Drawing.Color.Blue
-                Line1.Pointer.HorizSize = 3
-                Line1.Pointer.VertSize = 3
-            Next
-
-        End With
-    End Sub
-
-    Private Sub TeeChart_Zeichnen_TSP(ByVal NoC As Integer, ByVal TmpListOfCities(,) As Double)
-
-        Dim i As Integer
-
-        'Zeichnene der Punkte für die Städte
-        For i = 0 To NoC - 1
-            TChart1.Series(0).Add(CES1.ListOfCities(i, 1), CES1.ListOfCities(i, 2), "")
-        Next
-
-        'Zeichnen der Verbindung von der ersten bis zur letzten Stadt
-        TChart1.Series(1).Add(TmpListOfCities(0, 1), TmpListOfCities(0, 2), "")
-        TChart1.Series(NoC).Add(TmpListOfCities(0, 1), TmpListOfCities(0, 2), "")
-
-        For i = 1 To NoC - 1
-            TChart1.Series(i).Add(TmpListOfCities(i, 1), TmpListOfCities(i, 2), "")
-            TChart1.Series(i + 1).Add(TmpListOfCities(i, 1), TmpListOfCities(i, 2), "")
-        Next
-
-    End Sub
-
-    '************************************************************************************
     '************************* Start BUTTON wurde pressed *******************************
     '************************************************************************************
 
@@ -358,12 +277,6 @@ Friend Class Form1
     Private Sub Command2_Click()
         myisrun = False
     End Sub
-
-
-    '************************************************************************************
-    '              Anwendung Reset Parameter and RuneOnce Blaues Modell                 *
-    '************************************************************************************
-
 
 
     '************************************************************************************
@@ -457,7 +370,7 @@ Friend Class Form1
             'End If
 
             BM_Form1.OptZieleListe(0).QWertTmp = BM_Form1.QualitaetsWert_berechnen(0)
-            Call Zielfunktion_zeichnen_MultiObPar_2D(BM_Form1.OptZieleListe(0).QWertTmp, BM_Form1.OptParameterListe(0).Wert)
+            TChart1.Series(0).Add(BM_Form1.OptZieleListe(0).QWertTmp, BM_Form1.OptParameterListe(0).Wert, "")
             'Call BM_Form1.db_update(durchlauf, ipop)
             durchlauf += 1
             System.Windows.Forms.Application.DoEvents()
@@ -528,7 +441,7 @@ Friend Class Form1
         Dim g As Integer
 
         'ToDo: nochmal Prüfen wie das mit den Kids REDIMS ist.
-        Call TeeChart_Initialise_TSP(CES1.n_Cities)
+        Call CES1.TeeChart_Initialise_TSP(TChart1)
 
         'Arrays werden Dimensioniert
         Call CES1.Dim_Parents()
@@ -555,7 +468,7 @@ Friend Class Form1
             'Zeichnen des besten Elter
             'TODO: funzt nur, wenn ganz am ende gezeichnet wird
             If g = CES1.AnzGen Then
-                Call TeeChart_Zeichnen_TSP(CES1.n_Cities, CES1.ParentList(0).CityList)
+                Call CES1.TeeChart_Zeichnen_TSP(TChart1, CES1.ParentList(0).CityList)
             End If
 
             'Kinder werden Hier vollständig gelöscht
@@ -658,7 +571,7 @@ Friend Class Form1
                     For i = 1 To globalAnzPar
                         mypara(i, 1) = 0
                     Next
-                    Call TeeChartInitialise_SO()
+                    Call TestProb1.TeeChartIni_SinusFunktion(TChart1, EVO_Einstellungen1, globalAnzPar, Text_Sinusfunktion_Par.Text)
                 Case "Beale-Problem" 'x1 = [-5;5], x2=[-2;2]
                     globalAnzPar = 2
                     globalAnzZiel = 1
@@ -666,7 +579,7 @@ Friend Class Form1
                     ReDim mypara(globalAnzPar, 1)
                     mypara(1, 1) = 0.5
                     mypara(2, 1) = 0.5
-                    Call TeeChartInitialise_SO()
+                    Call TestProb1.TeeChartIni_BealeProblem(TChart1, EVO_Einstellungen1, globalAnzPar)
                 Case "Schwefel 2.4-Problem" 'xi = [-10,10]
                     globalAnzPar = CShort(Text_Schwefel24_Par.Text)
                     globalAnzZiel = 1
@@ -675,7 +588,7 @@ Friend Class Form1
                     For i = 1 To globalAnzPar
                         mypara(i, 1) = 1
                     Next i
-                    Call TeeChartInitialise_SO()
+                    Call TestProb1.TeeChartIni_SchwefelProblem(TChart1, EVO_Einstellungen1, globalAnzPar)
                 Case "Deb 1" 'x1 = [0.1;1], x2=[0;5]
                     globalAnzPar = 2
                     globalAnzZiel = 2
@@ -684,7 +597,7 @@ Friend Class Form1
                     Randomize()
                     mypara(1, 1) = Rnd()
                     mypara(2, 1) = Rnd()
-                    Call TeeChartInitialise_MO_MultiTestProb()
+                    Call TestProb1.TeeChartIni_MultiTestProb(TChart1, NPopul, Combo_Testproblem.Text)
                 Case "Zitzler/Deb T1" 'xi = [0,1]
                     globalAnzPar = 30
                     globalAnzZiel = 2
@@ -694,7 +607,7 @@ Friend Class Form1
                     For i = 1 To globalAnzPar
                         mypara(i, 1) = Rnd()
                     Next i
-                    Call TeeChartInitialise_MO_MultiTestProb()
+                    Call TestProb1.TeeChartIni_MultiTestProb(TChart1, NPopul, Combo_Testproblem.Text)
                 Case "Zitzler/Deb T2" 'xi = [0,1]
                     globalAnzPar = 30
                     globalAnzZiel = 2
@@ -704,7 +617,7 @@ Friend Class Form1
                     For i = 1 To globalAnzPar
                         mypara(i, 1) = Rnd()
                     Next i
-                    Call TeeChartInitialise_MO_MultiTestProb()
+                    Call TestProb1.TeeChartIni_MultiTestProb(TChart1, NPopul, Combo_Testproblem.Text)
                 Case "Zitzler/Deb T3" 'xi = [0,1]
                     globalAnzPar = 15
                     globalAnzZiel = 2
@@ -714,7 +627,7 @@ Friend Class Form1
                     For i = 1 To globalAnzPar
                         mypara(i, 1) = Rnd()
                     Next i
-                    Call TeeChartInitialise_MO_MultiTestProb()
+                    Call TestProb1.TeeChartIni_MultiTestProb(TChart1, NPopul, Combo_Testproblem.Text)
                 Case "Zitzler/Deb T4" 'x1 = [0,1], xi=[-5,5]
                     globalAnzPar = 10
                     globalAnzZiel = 2
@@ -724,7 +637,7 @@ Friend Class Form1
                     For i = 1 To globalAnzPar
                         mypara(i, 1) = Rnd()
                     Next i
-                    Call TeeChartInitialise_MO_MultiTestProb()
+                    Call TestProb1.TeeChartIni_MultiTestProb(TChart1, NPopul, Combo_Testproblem.Text)
                 Case "CONSTR" 'x1 = [0.1;1], x2=[0;5]
                     globalAnzPar = 2
                     globalAnzZiel = 2
@@ -733,7 +646,7 @@ Friend Class Form1
                     Randomize()
                     mypara(1, 1) = Rnd()
                     mypara(2, 1) = Rnd()
-                    Call TeeChartInitialise_MO_MultiTestProb()
+                    Call TestProb1.TeeChartIni_MultiTestProb(TChart1, NPopul, Combo_Testproblem.Text)
                 Case "Box"
                     globalAnzPar = 3
                     globalAnzZiel = 3
@@ -743,7 +656,7 @@ Friend Class Form1
                     mypara(1, 1) = Rnd()
                     mypara(2, 1) = Rnd()
                     mypara(3, 1) = Rnd()
-                    Call TeeChartInitialise_MO_3D_Box()
+                    Call TestProb1.TeeChartIni_3D_Box(TChart1, EVO_Einstellungen1.isPOPUL, EVO_Einstellungen1.NPopul)
             End Select
 
 
@@ -1051,13 +964,13 @@ ErrCode_ES_STARTEN:
                     For i = 1 To AnzPar
                         QN(1) = QN(1) + (System.Math.Sin((i - 1) * Unterteilung_X) - (-1 + (Par(i, 1) * 2))) * (System.Math.Sin((i - 1) * Unterteilung_X) - (-1 + Par(i, 1) * 2))
                     Next i
-                    Call Zielfunktion_zeichnen_Sinus(AnzPar, Par, durchlauf, ipop)
+                    Call TestProb1.Zielfunktion_zeichnen_Sinus(TChart1, AnzPar, Par, durchlauf, ipop)
                 Case "Beale-Problem" 'Beale-Problem
                     x1 = -5 + (Par(1, 1) * 10)
                     x2 = -2 + (Par(2, 1) * 4)
 
                     QN(1) = (1.5 - x1 * (1 - x2)) ^ 2 + (2.25 - x1 * (1 - x2) ^ 2) ^ 2 + (2.625 - x1 * (1 - x2) ^ 3) ^ 2
-                    Call Zielfunktion_zeichnen_SingleOb(QN(1), durchlauf, ipop)
+                    TChart1.Series(ipop).Add(durchlauf, QN(1))
                 Case "Schwefel 2.4-Problem" 'Schwefel 2.4 S. 329
                     ReDim X(globalAnzPar)
                     For i = 1 To globalAnzPar
@@ -1067,7 +980,7 @@ ErrCode_ES_STARTEN:
                     For i = 1 To globalAnzPar
                         QN(1) = QN(1) + ((X(1) - X(i) ^ 2) ^ 2 + (X(i) - 1) ^ 2)
                     Next i
-                    Call Zielfunktion_zeichnen_SingleOb(QN(1), durchlauf, ipop)
+                    TChart1.Series(ipop).Add(durchlauf, QN(1))
                     '*************************************
                     '* Multi-Objective Problemstellungen *
                     '*************************************
@@ -1077,7 +990,7 @@ ErrCode_ES_STARTEN:
                     f2 = (1 + 5 * Par(2, 1)) / (Par(1, 1) * (9 / 10) + 0.1)
                     QN(1) = f1
                     QN(2) = f2
-                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2)
+                    TChart1.Series(0).Add(f1, f2, "")
 
                     'Zitzler/Deb/Thiele 2000, T1 (Konvexe Pareto-Front)
                 Case "Zitzler/Deb T1"
@@ -1090,7 +1003,7 @@ ErrCode_ES_STARTEN:
                     f2 = f2 * (1 - System.Math.Sqrt(f1 / f2))
                     QN(1) = f1
                     QN(2) = f2
-                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2)
+                    TChart1.Series(0).Add(f1, f2, "")
 
                     'Zitzler/Deb/Thiele 2000, T2 (Non-Konvexe Pareto-Front)
                 Case "Zitzler/Deb T2"
@@ -1103,7 +1016,7 @@ ErrCode_ES_STARTEN:
                     f2 = f2 * (1 - (f1 / f2) * (f1 / f2))
                     QN(1) = f1
                     QN(2) = f2
-                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2)
+                    TChart1.Series(0).Add(f1, f2, "")
 
                     'Zitzler/Deb/Thiele 2000, T3 (disconected Pareto-Front)
                 Case "Zitzler/Deb T3"
@@ -1116,7 +1029,7 @@ ErrCode_ES_STARTEN:
                     f2 = f2 * (1 - System.Math.Sqrt(f1 / f2) - (f1 / f2) * System.Math.Sin(10 * 3.14159265358979 * f1))
                     QN(1) = f1
                     QN(2) = f2
-                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2)
+                    TChart1.Series(0).Add(f1, f2, "")
 
                     'Zitzler/Deb/Thiele 2000, T4 (local/global Pareto-Fronts)
                 Case "Zitzler/Deb T4"
@@ -1130,7 +1043,7 @@ ErrCode_ES_STARTEN:
                     f2 = f2 * (1 - System.Math.Sqrt(f1 / f2))
                     QN(1) = f1
                     QN(2) = f2
-                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2)
+                    TChart1.Series(0).Add(f1, f2, "")
 
                 Case "CONSTR"
                     f1 = Par(1, 1) * (9 / 10) + 0.1
@@ -1143,7 +1056,7 @@ ErrCode_ES_STARTEN:
                     QN(2) = f2
                     RN(1) = g1
                     RN(2) = g2
-                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2)
+                    TChart1.Series(0).Add(f1, f2, "")
 
                 Case "Box"
                     f1 = Par(1, 1) ^ 2
@@ -1194,9 +1107,9 @@ ErrCode_ES_STARTEN:
             'Qualitätswerte im TeeChart zeichnen
             Select Case globalAnzZiel
                 Case 1
-                    Call Zielfunktion_zeichnen_SingleOb(BM_Form1.OptZieleListe(0).QWertTmp, durchlauf, ipop)
+                    TChart1.Series(ipop).Add(durchlauf, BM_Form1.OptZieleListe(0).QWertTmp)
                 Case 2
-                    Call Zielfunktion_zeichnen_MultiObPar_2D(BM_Form1.OptZieleListe(0).QWertTmp, BM_Form1.OptZieleListe(1).QWertTmp)
+                    TChart1.Series(0).Add(BM_Form1.OptZieleListe(0).QWertTmp, BM_Form1.OptZieleListe(1).QWertTmp, "")
                 Case 3
                     'TODO MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
                     Call Zielfunktion_zeichnen_MultiObPar_3D(BM_Form1.OptZieleListe(0).QWertTmp, BM_Form1.OptZieleListe(1).QWertTmp, BM_Form1.OptZieleListe(2).QWertTmp)
@@ -1211,408 +1124,6 @@ ErrCode_ES_STARTEN:
         End If
     End Function
 
-    'Alle Series für TeeChart werden initialisiert
-    'Teilweise werden die Ziel bzw. Ausgangslinien berechnet und gezeichnet
-    Private Sub TeeChartInitialise_SO()
-        Dim Ausgangsergebnis As Double
-        Dim Anzahl_Kalkulationen As Integer
-        Dim Populationen As Short
-        Dim i As Short
-        Dim Datenmenge As Short
-        Dim Unterteilung_X As Double
-        Dim OptErg() As Double
-        Dim X() As Double
-
-        If EVO_Einstellungen1.isPOPUL Then
-            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden
-        Else
-            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
-        End If
-
-        'Ausgengsergebnisse für die Linien im TeeChart Rechnen
-        Select Case Combo_Testproblem.Text
-            Case "Sinus-Funktion"
-                Datenmenge = CShort(Text_Sinusfunktion_Par.Text)
-                Unterteilung_X = 2 * 3.141592654 / (Datenmenge - 1)
-
-            Case "Beale-Problem"
-                ReDim OptErg(Anzahl_Kalkulationen)
-                Ausgangsergebnis = (1.5 - 0.5 * (1 - 0.5)) ^ 2 + (2.25 - 0.5 * (1 - 0.5) ^ 2) ^ 2 + (2.625 - 0.5 * (1 - 0.5) ^ 3) ^ 2
-            Case "Schwefel 2.4-Problem"
-                ReDim X(globalAnzPar)
-                For i = 1 To globalAnzPar
-                    X(i) = 10
-                Next i
-                Ausgangsergebnis = 0
-                For i = 1 To globalAnzPar
-                    Ausgangsergebnis = Ausgangsergebnis + ((X(1) - X(i) ^ 2) ^ 2 + (X(i) - 1) ^ 2)
-                Next i
-        End Select
-
-        'Linien für die Ausgangsergebnisse im TeeChart zeichnen
-        Select Case Combo_Testproblem.Text
-            Case "Sinus-Funktion"
-                ReDim array_x(Datenmenge - 1)
-                ReDim array_y(Datenmenge - 1)
-
-                For i = 0 To Datenmenge - 1
-                    array_x(i) = System.Math.Round((i) * Unterteilung_X, 2)
-                    array_y(i) = System.Math.Sin((i) * Unterteilung_X)
-                Next i
-            Case "Beale-Problem", "Schwefel 2.4-Problem"
-                ReDim array_y(Anzahl_Kalkulationen - 1)
-                ReDim array_x(Anzahl_Kalkulationen - 1)
-                For i = 0 To Anzahl_Kalkulationen - 1
-                    array_y(i) = Ausgangsergebnis
-                    array_x(i) = i + 1
-                Next i
-        End Select
-
-        'TeeChart Einrichten und Series generieren
-        With TChart1
-            .Clear()
-            .Header.Text = Combo_Testproblem.Text
-            .Chart.Axes.Left.Title.Caption = "Funktionswert"
-            .Chart.Axes.Bottom.Title.Caption = "Berechnungsschritt"
-            .Aspect.View3D = False
-            .Legend.Visible = False
-
-            'S0: Die Ausgangs- oder Ziellinien
-            Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-            Line1.Title = "Ausgangs-/Ziellinie"
-            Line1.Add(array_x, array_y)
-            Line1.Brush.Color = System.Drawing.Color.Red
-            Line1.ClickableLine = True
-
-            'S1: Generieren der Series für die Populationen
-            Populationen = 1
-            If EVO_Einstellungen1.isPOPUL Then
-                Populationen = EVO_Einstellungen1.NPopul
-            End If
-            For i = 1 To Populationen
-                Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
-                Point1.Title = "Population " & i.ToString()
-                Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-                Point1.Pointer.HorizSize = 3
-                Point1.Pointer.VertSize = 3
-            Next
-
-            'Axen Formatieren für Beale und Deb
-            .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Maximum = Anzahl_Kalkulationen
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Left.Automatic = False
-            .Chart.Axes.Left.Maximum = Ausgangsergebnis * 1.3
-            .Chart.Axes.Left.Minimum = 0
-            .Chart.Axes.Left.Logarithmic = False
-
-            'Spezialformatierung für Sinuskurve
-            If Combo_Testproblem.Text = "Sinus-Funktion" Then
-                .Chart.Axes.Bottom.Automatic = True
-                .Chart.Axes.Left.Automatic = False
-                .Chart.Axes.Left.Minimum = -1
-                .Chart.Axes.Left.Maximum = 1
-                .Chart.Axes.Left.Increment = 0.2
-            End If
-        End With
-    End Sub
-
-    Private Sub TeeChartInitialise_MO_MultiTestProb()
-        Dim Populationen As Short
-        Dim i, j As Short
-
-        Populationen = EVO_Einstellungen1.NPopul
-
-        With TChart1
-            .Clear()
-            .Aspect.View3D = False
-            .Legend.Visible = False
-            .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Maximum = 1
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Bottom.Increment = 0.1
-            .Chart.Axes.Left.Automatic = False
-            .Chart.Axes.Left.Maximum = 10
-            .Chart.Axes.Left.Minimum = 0
-            .Chart.Axes.Left.Increment = 2
-
-            'S0: Series für die Population.
-            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point1.Title = "Population"
-            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point1.Color = System.Drawing.Color.Orange
-            Point1.Pointer.HorizSize = 2
-            Point1.Pointer.VertSize = 2
-
-            'S1: Series für die Sekundäre Population
-            Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point2.Title = "Sekundäre Population"
-            Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point2.Color = System.Drawing.Color.Blue
-            Point2.Pointer.HorizSize = 3
-            Point2.Pointer.VertSize = 3
-
-            'S2: Series für Bestwert
-            Dim Point3 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point3.Title = "Bestwerte"
-            Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point3.Color = System.Drawing.Color.Green
-            Point3.Pointer.HorizSize = 3
-            Point3.Pointer.VertSize = 3
-
-            Select Case Combo_Testproblem.Text
-
-                Case "Deb 1"
-                    'TODO: Titel der Serien (für Export)
-                    Dim Array1X(100) As Double
-                    Dim Array1Y(100) As Double
-                    Dim Array2X(100) As Double
-                    Dim Array2Y(100) As Double
-                    .Header.Text = "Deb D1 - MO-konvex"
-
-                    'S3: Linie 1 wird errechnet und gezeichnet
-                    For j = 0 To 100
-                        Array1X(j) = 0.1 + j * 0.009
-                        Array1Y(j) = 1 / Array1X(j)
-                    Next j
-                    Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-                    Line1.Brush.Color = System.Drawing.Color.Green
-                    Line1.ClickableLine = True
-                    .Series(3).Add(Array1X, Array1Y)
-
-                    'S4: Linie 2 wird errechnet und gezeichnet
-                    For j = 0 To 100
-                        Array2X(j) = 0.1 + j * 0.009
-                        Array2Y(j) = (1 + 5) / Array2X(j)
-                    Next j
-                    Dim Line2 As New Steema.TeeChart.Styles.Line(.Chart)
-                    Line2.Brush.Color = System.Drawing.Color.Red
-                    Line2.ClickableLine = True
-                    .Series(4).Add(Array2X, Array2Y)
-
-                Case "Zitzler/Deb T1"
-                    'TODO: Titel der Serien (für Export)
-                    Dim ArrayX(1000) As Double
-                    Dim ArrayY(1000) As Double
-                    .Header.Text = "Zitzler/Deb/Theile T1"
-                    .Chart.Axes.Left.Maximum = 7
-                    .Chart.Axes.Left.Increment = 0.5
-
-                    'S3: Serie für die Grenze
-                    For j = 0 To 1000
-                        ArrayX(j) = j / 1000
-                        ArrayY(j) = 1 - System.Math.Sqrt(ArrayX(j))
-                    Next j
-                    Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-                    Line1.Brush.Color = System.Drawing.Color.Green
-                    Line1.ClickableLine = True
-                    .Series(3).Add(ArrayX, ArrayY)
-
-                Case "Zitzler/Deb T2"
-                    'TODO: Titel der Serien (für Export)
-                    Dim ArrayX(100) As Double
-                    Dim ArrayY(100) As Double
-                    .Header.Text = "Zitzler/Deb/Theile T2"
-                    .Chart.Axes.Left.Maximum = 7
-
-                    'S3: Serie für die Grenze
-                    For j = 0 To 100
-                        ArrayX(j) = j / 100
-                        ArrayY(j) = 1 - (ArrayX(j) * ArrayX(j))
-                    Next j
-                    Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-                    Line1.Brush.Color = System.Drawing.Color.Green
-                    Line1.ClickableLine = True
-                    .Series(3).Add(ArrayX, ArrayY)
-
-                Case "Zitzler/Deb T3"
-                    'TODO: Titel der Serien (für Export)
-                    Dim ArrayX(100) As Double
-                    Dim ArrayY(100) As Double
-                    .Header.Text = "Zitzler/Deb/Theile T3"
-                    .Chart.Axes.Bottom.Increment = 0.2
-                    .Chart.Axes.Left.Maximum = 7
-                    .Chart.Axes.Left.Minimum = -1
-                    .Chart.Axes.Left.Increment = 0.5
-
-                    'S3: Serie für die Grenze
-                    For j = 0 To 100
-                        ArrayX(j) = j / 100
-                        ArrayY(j) = 1 - System.Math.Sqrt(ArrayX(j)) - ArrayX(j) * System.Math.Sin(10 * 3.14159265358979 * ArrayX(j))
-                    Next j
-                    Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-                    Line1.Brush.Color = System.Drawing.Color.Green
-                    Line1.ClickableLine = True
-                    .Series(3).Add(ArrayX, ArrayY)
-
-                Case "Zitzler/Deb T4"
-                    'TODO: Titel der Serien (für Export)
-                    Dim ArrayX(1000) As Double
-                    Dim ArrayY(1000) As Double
-                    .Header.Text = "Zitzler/Deb/Theile T4"
-                    .Chart.Axes.Bottom.Automatic = True
-                    .Chart.Axes.Left.Automatic = True
-
-                    'S3 bis S13: Serie für die Grenze
-                    'Sieht nach einer schwachsinnigen Berechnung für ArrayY aus
-                    For i = 1 To 10
-                        Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-                        Line1.Brush.Color = System.Drawing.Color.Green
-                        Line1.ClickableLine = True
-                        For j = 0 To 1000
-                            ArrayX(j) = j / 1000
-                            ArrayY(j) = (1 + (i - 1) / 4) * (1 - System.Math.Sqrt(ArrayX(j) / (1 + (i - 1) / 4)))
-                        Next
-                        .Series(2 + i).Add(ArrayX, ArrayY)
-                    Next
-
-                    ''Original Code
-                    'For i = 1 To 10
-                    '    .AddSeries(TeeChart.ESeriesClass.scLine)
-                    '    .Series(Populationen + i).asLine.LinePen.Width = 2
-                    '    .Series(Populationen + i).Color = System.Convert.ToUInt32(System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Blue))
-                    '    For j = 0 To 1000
-                    '        ArrayX(j) = j / 1000
-                    '        ArrayY(j) = (1 + (i - 1) / 4) * (1 - System.Math.Sqrt(ArrayX(j) / (1 + (i - 1) / 4)))
-                    '    Next j
-                    '    .Series(Populationen + i).AddArray(1000, ArrayY, ArrayX)
-                    'Next i
-                Case "CONSTR"
-                    'TODO: Titel der Serien (für Export)
-                    Dim Array1X(100) As Double
-                    Dim Array1Y(100) As Double
-                    Dim Array2X(100) As Double
-                    Dim Array2Y(100) As Double
-                    Dim Array3X(61) As Double
-                    Dim Array3Y(61) As Double
-                    Dim Array4X(61) As Double
-                    Dim Array4Y(61) As Double
-                    .Header.Text = "CONSTR"
-                    'S3: Serie für die Grenze 1
-                    For j = 0 To 100
-                        Array1X(j) = 0.1 + j * 0.009
-                        Array1Y(j) = 1 / Array1X(j)
-                    Next j
-                    Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-                    Line1.Brush.Color = System.Drawing.Color.Red
-                    Line1.ClickableLine = True
-                    .Series(3).Add(Array1X, Array1Y)
-
-                    'S4: Serie für die Grenze 2
-                    For j = 0 To 100
-                        Array2X(j) = 0.1 + j * 0.009
-                        Array2Y(j) = (1 + 5) / Array2X(j)
-                    Next j
-                    Dim Line2 As New Steema.TeeChart.Styles.Line(.Chart)
-                    Line2.Brush.Color = System.Drawing.Color.Red
-                    Line2.ClickableLine = True
-                    .Series(4).Add(Array2X, Array2Y)
-
-                    'S5: Serie für die Grenze 3
-                    ReDim Array3X(61)
-                    ReDim Array3Y(61)
-                    For j = 0 To 61
-                        Array3X(j) = 0.1 + (j + 2) * 0.009
-                        Array3Y(j) = (7 - 9 * Array3X(j)) / Array3X(j)
-                    Next j
-                    Dim Line3 As New Steema.TeeChart.Styles.Line(.Chart)
-                    Line3.Brush.Color = System.Drawing.Color.Blue
-                    Line3.ClickableLine = True
-                    .Series(5).Add(Array3X, Array3Y)
-
-                    'S6: Serie für die Grenze 4
-                    ReDim Array4X(61)
-                    ReDim Array4Y(61)
-                    For j = 0 To 61
-                        Array4X(j) = 0.1 + (j + 2) * 0.009
-                        Array4Y(j) = (9 * Array4X(j)) / Array4X(j)
-                    Next j
-                    Dim Line4 As New Steema.TeeChart.Styles.Line(.Chart)
-                    Line4.Brush.Color = System.Drawing.Color.Red
-                    Line4.ClickableLine = True
-                    .Series(6).Add(Array4X, Array4Y)
-            End Select
-        End With
-    End Sub
-
-    Private Sub TeeChartInitialise_MO_3D_Box()
-        'TODO: Zeichnen muss auf 3D erweitert werden. Hier 3D Testproblem.
-        Dim Populationen As Short
-        Dim ArrayX(100) As Double
-        Dim ArrayY(100) As Double
-
-        If EVO_Einstellungen1.isPOPUL Then
-            Populationen = EVO_Einstellungen1.NPopul
-        Else
-            Populationen = 1
-        End If
-
-        With TChart1
-            .Clear()
-            .Header.Text = "Box"
-            .Aspect.View3D = True
-            .Aspect.Chart3DPercent = 100
-            .Legend.Visible = False
-            .Chart.Aspect.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality
-            .Chart.Axes.Bottom.Automatic = True
-            .Chart.Axes.Bottom.Visible = True
-            .Chart.Aspect.Zoom = 86
-            '.Chart.Axes.Bottom.Maximum = 1
-            '.Chart.Axes.Bottom.Minimum = 0
-            '.Chart.Axes.Bottom.Increment = 0.2
-            .Chart.Axes.Left.Automatic = True
-            .Chart.Axes.Left.Visible = True
-            '.Chart.Axes.Left.Maximum = 1
-            '.Chart.Axes.Left.Minimum = 0
-            '.Chart.Axes.Left.Increment = 0.2
-            .Chart.Axes.Depth.Automatic = True
-            .Chart.Axes.Depth.Visible = True
-            '.Chart.Axes.Depth.Maximum = 1
-            '.Chart.Axes.Depth.Minimum = 0
-            '.Chart.Axes.Depth.Increment = 0.2
-            '---------------------------------------------------------------
-            'SO: Series für die Population
-            Dim Point3D_0 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point3D_0.Title = "Population"
-            Point3D_0.FillSampleValues(100)
-            Point3D_0.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point3D_0.LinePen.Visible = False
-            Point3D_0.Pointer.HorizSize = 1
-            Point3D_0.Pointer.VertSize = 1
-
-            'S1: Series für die Sekundäre Population
-            Dim Point3D_1 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point3D_1.Title = "Sekundäre Population"
-            Point3D_1.FillSampleValues(100)
-            Point3D_1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point3D_1.LinePen.Visible = False
-            Point3D_1.Pointer.HorizSize = 1
-            Point3D_1.Pointer.VertSize = 1
-
-            '.AddSeries(TeeChart.ESeriesClass.scPoint3D)
-            '.Series(0).asPoint3D.Pointer.Style = TeeChart.EPointerStyle.psCircle
-            '.Series(0).asPoint3D.LinePen.Visible = False
-            '.Series(0).asPoint3D.Pointer.HorizontalSize = 1
-            '.Series(0).asPoint3D.Pointer.VerticalSize = 1
-
-
-            'For i = 1 To Populationen
-            '    .AddSeries(TeeChart.ESeriesClass.scPoint3D)
-            '    .Series(i).asPoint3D.Pointer.Style = TeeChart.EPointerStyle.psCircle
-            '    .Series(i).asPoint3D.LinePen.Visible = False
-            '    .Series(i).asPoint3D.Pointer.HorizontalSize = 3
-            '    .Series(i).asPoint3D.Pointer.VerticalSize = 3
-            'Next i
-
-            '.AddSeries(TeeChart.ESeriesClass.scPoint3D)
-            '.AddSeries(TeeChart.ESeriesClass.scPoint3D)
-            '.Series(Populationen + 2).asPoint3D.Pointer.Style = TeeChart.EPointerStyle.psCircle
-            '.Series(Populationen + 2).asPoint3D.LinePen.Visible = False
-            '.Series(Populationen + 2).asPoint3D.Pointer.HorizontalSize = 2
-            '.Series(Populationen + 2).asPoint3D.Pointer.VerticalSize = 2
-            '.Series(Populationen + 2).Color = System.Convert.ToUInt32(System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Red))
-        End With
-    End Sub
 
     Private Sub TeeChartInitialise_SO_BlauesModell()
         Dim Anzahl_Kalkulationen As Integer
@@ -1713,54 +1224,9 @@ ErrCode_ES_STARTEN:
     '                          Zeichenfunktionen                                        *
     '************************************************************************************
 
-    Private Sub Zielfunktion_zeichnen_Sinus(ByRef AnzPar As Short, ByRef Par(,) As Double, ByRef durchlauf As Integer, ByRef ipop As Short)
-        Dim i As Short
-        Dim Unterteilung_X As Double
-
-        Unterteilung_X = 2 * 3.141592654 / (AnzPar - 1)
-        ReDim array_x(AnzPar - 1)
-        ReDim array_y(AnzPar - 1)
-        For i = 0 To AnzPar - 1
-            array_x(i) = System.Math.Round((i) * Unterteilung_X, 2)
-            array_y(i) = (-1 + Par(i + 1, 1) * 2)
-        Next i
-
-        With TChart1
-            .Series(ipop).Clear()
-            .Series(ipop).Add(array_x, array_y)
-        End With
-    End Sub
-
-    Private Sub Zielfunktion_zeichnen_SingleOb(ByRef Wert As Double, ByRef durchlauf As Integer, ByRef ipop As Short)
-
-        TChart1.Series(ipop).Add(durchlauf, Wert)
-
-    End Sub
-
-    Private Sub Zielfunktion_zeichnen_MultiObPar_2D(ByRef f1 As Double, ByRef f2 As Double)
-
-        TChart1.Series(0).Add(f1, f2, "")
-
-    End Sub
-
     Private Sub Zielfunktion_zeichnen_MultiObPar_3D(ByRef f1 As Double, ByRef f2 As Double, ByRef f3 As Double)
-
-        'TODO: Hier muss eine 3D-Reihe angezeigt werden
-
-        'TChart1.Series(0).Add(f1, f2, "", f3)
-        'TChart1.Series(0).FillSampleValues(100)
-        'Steema.TeeChart.
-        'Point3D_0.FillSampleValues()
-        'Point3D_1.FillSampleValues()
         TChart1.Series(0).FillSampleValues()
         TChart1.Series(1).FillSampleValues()
-
-    End Sub
-
-    Private Sub Zielfunktion_zeichnen_MultiObPar_XD()
-
-        'TODO: Projektion der XD Information auf 2D
-
     End Sub
 
     Private Sub Bestwertzeichnen_Pareto(ByRef Bestwert(,) As Double, ByRef ipop As Short)

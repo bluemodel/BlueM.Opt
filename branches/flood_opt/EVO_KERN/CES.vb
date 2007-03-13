@@ -15,8 +15,7 @@ Public Class CES
     '*******************************************************************************
     '*******************************************************************************
 
-
-    'Konvention:
+    '********************************************* Konvention *****************************
     'Cities:      1 2 3 4 5 6 7
     'Pathindex:   0 1 2 3 4 5 6
     'CutPoint:     1 2 3 4 5 6
@@ -34,6 +33,7 @@ Public Class CES
     Private n_Childs As Integer = 15
     Private Strategy As String = "plus"                                 '"plus" oder "minus" Strategie
 
+    '********************************************* Strukturen *****************************
     Public Structure Faksimile
         Dim No As Integer
         Dim Path() As Integer
@@ -43,6 +43,29 @@ Public Class CES
 
     Public ChildList() As Faksimile = {}
     Public ParentList() As Faksimile = {}
+
+
+    '******************************** Initialisierung *************************************
+
+    Public Sub TSP_Initialize(ByRef TChart1 As Steema.TeeChart.TChart)
+
+        Dim i As Integer
+        ReDim ListOfCities(n_Cities - 1, 2)
+
+        Randomize()
+        Call TeeChart_Initialise_TSP(Tchart1)
+
+        For i = 0 To n_Cities - 1
+            ListOfCities(i, 0) = i + 1
+            ListOfCities(i, 1) = Math.Round(Rnd() * 100)
+            ListOfCities(i, 2) = Math.Round(Rnd() * 100)
+        Next
+
+        Call TeeChart_Zeichnen_TSP(Tchart1, ListOfCities)
+
+    End Sub
+
+    '*********************************** Programm ******************************************
 
     'Dimensionieren des ParentStructs
     Public Sub Dim_Parents()
@@ -278,8 +301,8 @@ Public Class CES
     'Reproductionsoperator: "Partially_Mapped_Crossover (PMX)"
     'Kopiert den mittleren Teil des anderen Elter und füllt den Rest mit dem eigenen auf. Falls Doppelt wird gemaped.
     Public Sub ReprodOp_Part_Mapped_Crossover(ByVal ParPath_A() As Integer, ByVal ParPath_B() As Integer, ByRef ChildPath_A() As Integer, ByRef ChildPath_B() As Integer)
-        Dim i, j As Integer
-        Dim x, y As Integer
+        Dim i As Integer
+        Dim x As Integer
         Dim Index As Integer
         Dim mapper As Integer
 
@@ -580,6 +603,68 @@ Public Class CES
         tmp_c = tmp_a - tmp_b
         If tmp_c = 0 Then Even_Number = True
     End Function
+
+    '******************************************* TeeChart Funktionen **********************************
+
+    Public Sub TeeChart_Initialise_TSP(ByRef TChart1 As Steema.TeeChart.TChart)
+        Dim i As Integer
+
+        With TChart1
+            .Clear()
+            .Header.Text = "Traveling Salesman Problem"
+            .Aspect.View3D = False
+            .Legend.Visible = False
+
+            'Formatierung der Axen
+            '.Chart.Axes.Bottom.Title.Caption = BM_Form1.OptZieleListe(0).Bezeichnung 'HACK: Beschriftung der Axen
+            .Chart.Axes.Bottom.Automatic = False
+            .Chart.Axes.Bottom.Minimum = 0
+            .Chart.Axes.Bottom.Maximum = 100
+            '.Chart.Axes.Left.Title.Caption = BM_Form1.OptParameterListe(0).Bezeichnung 'HACK: Beschriftung der Axen
+            .Chart.Axes.Left.Automatic = False
+            .Chart.Axes.Left.Minimum = 0
+            .Chart.Axes.Left.Maximum = 100
+
+            'Series(0): Series für die Sädte.
+            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point1.Title = "Städte"
+            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point1.Color = System.Drawing.Color.Orange
+            Point1.Pointer.HorizSize = 2
+            Point1.Pointer.VertSize = 2
+
+            'Series(n): für die Reisen
+            For i = 1 To n_Cities
+                Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
+                Line1.Title = "Reisen"
+                Line1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+                Line1.Color = System.Drawing.Color.Blue
+                Line1.Pointer.HorizSize = 3
+                Line1.Pointer.VertSize = 3
+            Next
+
+        End With
+    End Sub
+
+    Public Sub TeeChart_Zeichnen_TSP(ByRef TChart1 As Steema.TeeChart.TChart, ByVal TmpListOfCities(,) As Double)
+
+        Dim i As Integer
+
+        'Zeichnene der Punkte für die Städte
+        For i = 0 To n_Cities - 1
+            TChart1.Series(0).Add(TmpListOfCities(i, 1), TmpListOfCities(i, 2), "")
+        Next
+
+        'Zeichnen der Verbindung von der ersten bis zur letzten Stadt
+        TChart1.Series(1).Add(TmpListOfCities(0, 1), TmpListOfCities(0, 2), "")
+        TChart1.Series(n_Cities).Add(TmpListOfCities(0, 1), TmpListOfCities(0, 2), "")
+
+        For i = 1 To n_Cities - 1
+            TChart1.Series(i).Add(TmpListOfCities(i, 1), TmpListOfCities(i, 2), "")
+            TChart1.Series(i + 1).Add(TmpListOfCities(i, 1), TmpListOfCities(i, 2), "")
+        Next
+
+    End Sub
 
 End Class
 
