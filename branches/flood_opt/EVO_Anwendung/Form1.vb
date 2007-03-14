@@ -14,6 +14,7 @@ Friend Class Form1
     Private Const ANW_RESETPARA_RUNBM As String = "ResetPara & RunBM"
     Private Const ANW_SENSIPLOT_MODPARA As String = "SensiPlot ModPara"
     Private Const ANW_BLAUESMODELL As String = "Blaues Modell"
+    Private Const ANW_CombiBM As String = "BM Combinatorics"
     Private Const ANW_TESTPROBLEME As String = "Test-Probleme"
     Private Const ANW_TSP As String = "TS-Problem"
 
@@ -43,7 +44,7 @@ Friend Class Form1
         System.Windows.Forms.Application.EnableVisualStyles()
 
         'Liste der Anwendungen in ComboBox schreiben und Anfangseinstellung wählen
-        ComboBox_Anwendung.Items.AddRange(New Object() {ANW_RESETPARA_RUNBM, ANW_SENSIPLOT_MODPARA, ANW_BLAUESMODELL, ANW_TESTPROBLEME, ANW_TSP})
+        ComboBox_Anwendung.Items.AddRange(New Object() {ANW_RESETPARA_RUNBM, ANW_SENSIPLOT_MODPARA, ANW_BLAUESMODELL, ANW_CombiBM, ANW_TESTPROBLEME, ANW_TSP})
         ComboBox_Anwendung.SelectedItem = ANW_RESETPARA_RUNBM
         Anwendung = ComboBox_Anwendung.SelectedItem
 
@@ -134,10 +135,22 @@ Friend Class Form1
                         EVO_Einstellungen1.OptModus = 1
                     End If
 
+                Case ANW_CombiBM
+                    'Voreinstellungen lesen EVO.INI
+                    Call ReadEVOIni()
+                    'Testprobleme ausschalten
+                    Me.GroupBox_Testproblem.Enabled = False
+                    'Einlesen OptPara, ModellPara, Zielfunktionen
+                    Call BM_Form1.OptParameter_einlesen()
+                    Call BM_Form1.ModellParameter_einlesen()
+                    Call BM_Form1.OptZiele_einlesen()
+
+
                 Case ANW_TESTPROBLEME
                     'Test-Probleme und Evo aktivieren
                     Me.GroupBox_Testproblem.Enabled = True
                     EVO_Einstellungen1.Enabled = True
+
                 Case ANW_TSP
                     Call CES1.TSP_Initialize(TChart1)
             End Select
