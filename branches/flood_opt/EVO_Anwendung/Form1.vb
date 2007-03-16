@@ -4,13 +4,13 @@ Imports System.IO
 Friend Class Form1
 
     '************************************************************************************
-    ' Form1 wird initialisiert bzw. geladen; BM_Form1 und SensiPlot1 werden deklariert  *
+    ' Form1 wird initialisiert bzw. geladen; weitere Module werden deklariert           *
     '************************************************************************************
 
     Inherits System.Windows.Forms.Form
     Private IsInitializing As Boolean
 
-    Dim Anwendung As String                'zu optimierende Anwendung
+    Private Anwendung As String                'zu optimierende Anwendung
     Private Const ANW_RESETPARA_RUNBM As String = "ResetPara & RunBM"
     Private Const ANW_SENSIPLOT_MODPARA As String = "SensiPlot ModPara"
     Private Const ANW_BLAUESMODELL As String = "Blaues Modell"
@@ -73,7 +73,7 @@ Friend Class Form1
     '************************************************************************************
 
     'Auswahl der zu optimierenden Anwendung geändert
-    Private Sub IniApp(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_IniApp.Click, ComboBox_Anwendung.SelectedIndexChanged
+    Private Sub IniApp(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_IniApp.Click, ComboBox_Anwendung.SelectedIndexChanged, Combo_Testproblem.SelectedIndexChanged
         If Me.IsInitializing = True Then
             Exit Sub
         Else
@@ -134,6 +134,7 @@ Friend Class Form1
                     ElseIf BM_Form1.OptZieleListe.GetLength(0) > 1 Then
                         EVO_Einstellungen1.OptModus = 1
                     End If
+                    Call Initialisierung_BlauesModell()
 
                 Case ANW_COMBIBM
                     'Voreinstellungen lesen EVO.INI
@@ -150,6 +151,7 @@ Friend Class Form1
                     'Test-Probleme und Evo aktivieren
                     Me.GroupBox_Testproblem.Enabled = True
                     EVO_Einstellungen1.Enabled = True
+                    Call Testprobleme_Initialisierung()
 
                 Case ANW_TSP
                     Call CES1.TSP_Initialize(TChart1)
@@ -157,6 +159,7 @@ Friend Class Form1
         End If
     End Sub
 
+    'Steuerung des TestproblemForms auf dem Form1
     Private Sub Combo1_SelectedIndexChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Combo_Testproblem.SelectedIndexChanged
         If Me.IsInitializing = True Then
             Exit Sub
@@ -197,11 +200,32 @@ Friend Class Form1
     End Sub
 
     '************************************************************************************
-    '*************** Vorbereitung der meisten Anwendung *********************************
+    '*************** Initialisierung der meisten Anwendung ******************************
     '************************************************************************************
 
-    'EVO.ini Datei einlesen
-    'TODO: ReadEVO.ini müsste hier raus nach BM_FORM und "Read_Model_OptConfig" heißen ***************************
+    '******************* Initialisierung der Testprobleme *******************************
+
+    Private Sub Testprobleme_Initialisierung()
+
+        'BUG: Bug 57: Für alle Testprobleme ReDim mypara(globalAnzPar - 1, 0) ! (wegen Array-Anfang bei 0)
+        'Globale Parameter werden gesetzt
+        Call TestProb1.Parameter_Uebergabe(Combo_Testproblem.Text, Text_Sinusfunktion_Par.Text, Text_Schwefel24_Par.Text, globalAnzPar, globalAnzZiel, globalAnzRand, mypara)
+
+        Select Case Combo_Testproblem.Text
+            Case "Sinus-Funktion"
+                Call TestProb1.TeeChartIni_SinusFunktion(EVO_Einstellungen1, globalAnzPar, Text_Sinusfunktion_Par.Text, TChart1)
+            Case "Beale-Problem" 'x1 = [-5;5], x2=[-2;2]
+                Call TestProb1.TeeChartIni_BealeProblem(EVO_Einstellungen1, globalAnzPar, TChart1)
+            Case "Schwefel 2.4-Problem" 'xi = [-10,10]
+                Call TestProb1.TeeChartIni_SchwefelProblem(EVO_Einstellungen1, globalAnzPar, TChart1)
+            Case Else
+                Call TestProb1.TeeChartIni_MultiTestProb(EVO_Einstellungen1, Combo_Testproblem.Text, TChart1)
+        End Select
+    End Sub
+
+    '*************************** EVO.ini Datei einlesen *********************************
+
+    'TODO: ReadEVO.ini müsste hier raus nach BM_FORM und "Read_Model_OptConfig" heißen **
     Private Sub ReadEVOIni()
         If File.Exists("EVO.ini") Then
             Try
@@ -261,6 +285,40 @@ Friend Class Form1
 
     End Sub
 
+    '***************************** Des Blauen Modells ***********************************
+
+    Private Sub Initialisierung_BlauesModell()
+        Dim i As Integer
+        Dim isMultiObjective As Boolean
+
+        isMultiObjective = EVO_Einstellungen1.isMultiObjective
+
+        'Anzahl Optimierungsparameter übergeben
+        '-----------------------------------------------------
+        globalAnzPar = BM_Form1.OptParameterListe.GetLength(0)
+
+        'Parameterwerte übergeben
+        'BUG 57: mypara() fängt bei 1 an!
+        ReDim mypara(globalAnzPar, 1)
+        For i = 1 To globalAnzPar
+            mypara(i, 1) = BM_Form1.OptParameterListe(i - 1).SKWert
+        Next
+
+        'globale Anzahl der Ziele muss hier auf Länge der Zielliste gesetzt werden
+        globalAnzZiel = BM_Form1.OptZieleListe.GetLength(0)
+
+        'TODO: Randbedingungen
+        globalAnzRand = 2
+
+        'Initialisierung der TeeChart Serien je nach SO oder MO
+        If (isMultiObjective) = False Then
+            Call TeeChartInitialise_SO_BlauesModell()
+        Else
+            Call TeeChartInitialise_MO_BlauesModell()
+        End If
+
+    End Sub
+
     '************************************************************************************
     '************************* Start BUTTON wurde pressed *******************************
     '************************************************************************************
@@ -293,7 +351,7 @@ Friend Class Form1
 
 
     '************************************************************************************
-    '              Anwendung SensiPlot; läuft ohne Evolutionsstrategie                  *
+    '            Anwendung SensiPlot START; läuft ohne Evolutionsstrategie              *
     '************************************************************************************
 
     Private Function SensiPlot_STARTEN(ByRef Selected_OptParameter As String, ByRef Selected_OptZiel As String, ByRef Selected_SensiType As String, ByRef Anz_Sim As Integer) As Boolean
@@ -455,7 +513,7 @@ Friend Class Form1
     End Function
 
     '************************************************************************************
-    '        Anwendung Testprobleme und Blaues Model mit Evolutionsstrategie            *
+    '        Ablaufsteuerung der Evolutionsstrategie für Parameter Optimierung          *
     '************************************************************************************
 
     Private Function ES_STARTEN() As Boolean
@@ -525,78 +583,56 @@ Friend Class Form1
         NMemberSecondPop = EVO_Einstellungen1.NMemberSecondPop
 
 
-        If (Anwendung = ANW_TESTPROBLEME) Then
+        'If (Anwendung = ANW_BLAUESMODELL) Then
 
-            '*************************************
-            '*          Testprobleme             *
-            '*************************************
+        '    '*******************************
+        '    '*        BlauesModell         *
+        '    '*******************************
 
-            'BUG: Bug 57: Für alle Testprobleme ReDim mypara(globalAnzPar - 1, 0) ! (wegen Array-Anfang bei 0)
-            'Globale Parameter werden gesetzt
-            Call TestProb1.Parameter_Uebergabe(Combo_Testproblem.Text, Text_Sinusfunktion_Par.Text, Text_Schwefel24_Par.Text, globalAnzPar, globalAnzZiel, globalAnzRand, mypara)
+        '    'Anzahl Optimierungsparameter übergeben
+        '    '-----------------------------------------------------
+        '    globalAnzPar = BM_Form1.OptParameterListe.GetLength(0)
 
-            Select Case Combo_Testproblem.Text
-                Case "Sinus-Funktion"
-                    Call TestProb1.TeeChartIni_SinusFunktion(EVO_Einstellungen1, globalAnzPar, Text_Sinusfunktion_Par.Text, TChart1)
-                Case "Beale-Problem" 'x1 = [-5;5], x2=[-2;2]
-                    Call TestProb1.TeeChartIni_BealeProblem(EVO_Einstellungen1, globalAnzPar, TChart1)
-                Case "Schwefel 2.4-Problem" 'xi = [-10,10]
-                    Call TestProb1.TeeChartIni_SchwefelProblem(EVO_Einstellungen1, globalAnzPar, TChart1)
-                Case Else
-                    Call TestProb1.TeeChartIni_MultiTestProb(NPopul, Combo_Testproblem.Text, TChart1)
-            End Select
+        '    'Parameterwerte übergeben
+        '    'BUG 57: mypara() fängt bei 1 an!
+        '    ReDim mypara(globalAnzPar, 1)
+        '    For i = 1 To globalAnzPar
+        '        mypara(i, 1) = BM_Form1.OptParameterListe(i - 1).SKWert
+        '    Next
 
+        '    'globale Anzahl der Ziele muss hier auf Länge der Zielliste gesetzt werden
+        '    globalAnzZiel = BM_Form1.OptZieleListe.GetLength(0)
 
-        ElseIf (Anwendung = ANW_BLAUESMODELL) Then
+        '    'TODO: Randbedingungen
+        '    globalAnzRand = 2
 
-            '*******************************
-            '*        BlauesModell         *
-            '*******************************
+        '    'Initialisierung der TeeChart Serien je nach SO oder MO
+        '    If (isMultiObjective) = False Then
+        '        Call TeeChartInitialise_SO_BlauesModell()
+        '    Else
+        '        Call TeeChartInitialise_MO_BlauesModell()
+        '    End If
 
-            'Anzahl Optimierungsparameter übergeben
-            '-----------------------------------------------------
-            globalAnzPar = BM_Form1.OptParameterListe.GetLength(0)
+        '    'HACK: Redim hier erforderlich, wird aber nach der if-Schleife nochmal ausgeführt
+        '    ReDim QN(globalAnzZiel)
+        '    ReDim RN(globalAnzRand)
 
-            'Parameterwerte übergeben
-            'BUG 57: mypara() fängt bei 1 an!
-            ReDim mypara(globalAnzPar, 1)
-            For i = 1 To globalAnzPar
-                mypara(i, 1) = BM_Form1.OptParameterListe(i - 1).SKWert
-            Next
+        '    ''Zielfunktion für Anfangswerte berechnen
+        '    'myIsOK = Simulieren(globalAnzPar, mypara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
 
-            'globale Anzahl der Ziele muss hier auf Länge der Zielliste gesetzt werden
-            globalAnzZiel = BM_Form1.OptZieleListe.GetLength(0)
-
-            'TODO: Randbedingungen
-            globalAnzRand = 2
-
-            'Initialisierung der TeeChart Serien je nach SO oder MO
-            If (isMultiObjective) = False Then
-                Call TeeChartInitialise_SO_BlauesModell()
-            Else
-                Call TeeChartInitialise_MO_BlauesModell()
-            End If
-
-            'HACK: Redim hier erforderlich, wird aber nach der if-Schleife nochmal ausgeführt
-            ReDim QN(globalAnzZiel)
-            ReDim RN(globalAnzRand)
-
-            ''Zielfunktion für Anfangswerte berechnen
-            'myIsOK = Simulieren(globalAnzPar, mypara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
-
-            ''HACK: Zielfunktionen für Min und Max Werte berechnen -----------------------------------
-            'Dim minPara(globalAnzPar, 1) As Double
-            'Dim maxPara(globalAnzPar, 1) As Double
-            'For i = 1 To globalAnzPar
-            '    minPara(i, 1) = 0
-            '    maxPara(i, 1) = 1
-            'Next
-            'myIsOK = Simulieren(globalAnzPar, minPara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
-            'myIsOK = Simulieren(globalAnzPar, maxPara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
-            ''Ende Hack ------------------------------------------------------------------------------
+        '    ''HACK: Zielfunktionen für Min und Max Werte berechnen -----------------------------------
+        '    'Dim minPara(globalAnzPar, 1) As Double
+        '    'Dim maxPara(globalAnzPar, 1) As Double
+        '    'For i = 1 To globalAnzPar
+        '    '    minPara(i, 1) = 0
+        '    '    maxPara(i, 1) = 1
+        '    'Next
+        '    'myIsOK = Simulieren(globalAnzPar, minPara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
+        '    'myIsOK = Simulieren(globalAnzPar, maxPara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
+        '    ''Ende Hack ------------------------------------------------------------------------------
 
 
-        End If
+        'End If
 
         ReDim QN(globalAnzZiel)
         ReDim RN(globalAnzRand)
@@ -746,8 +782,17 @@ Start_Evolutionsrunden:
                             myIsOK = evolutionsstrategie.EsGetBestwert(Bestwert)
                         End If
 
-                        'Bestimmen der Zielfunktion bzw. Start der Simulation
-                        myIsOK = Evaluieren(globalAnzPar, mypara, durchlauf, Bestwert, ipop, QN, RN, evolutionsstrategie.isMultiObjective)
+                        '************************************************************************************
+                        '******************* Ansteuerung der zu optimierenden Anwendung *********************
+                        '************************************************************************************
+                        Select Case Anwendung
+                            Case ANW_TESTPROBLEME
+                                myIsOK = TestProb1.Evaluierung_TestProbleme(Combo_Testproblem.Text, globalAnzPar, mypara, durchlauf, ipop, QN, RN, TChart1)
+                            Case ANW_BLAUESMODELL
+                                myIsOK = Evaluierung_BlauesModell(globalAnzPar, mypara, durchlauf, Bestwert, ipop, QN, RN, evolutionsstrategie.isMultiObjective)
+                        End Select
+
+                        '************************************************************************************
 
                         'Einordnen der Qualitätsfunktion im Bestwertspeicher
                         myIsOK = evolutionsstrategie.EsBest(QN, RN)
@@ -826,189 +871,48 @@ ErrCode_ES_STARTEN:
         GoTo EXIT_ES_STARTEN
     End Function
 
-    '
-    Private Function Evaluieren(ByRef AnzPar As Short, ByRef Par(,) As Double, ByRef durchlauf As Integer, ByRef Bestwert(,) As Double, ByRef ipop As Short, ByRef QN() As Double, ByRef RN() As Double, ByVal isPareto As Boolean) As Boolean
+    Private Function Evaluierung_BlauesModell(ByRef AnzPar As Short, ByRef Par(,) As Double, ByRef durchlauf As Integer, ByRef Bestwert(,) As Double, ByRef ipop As Short, ByRef QN() As Double, ByRef RN() As Double, ByVal isPareto As Boolean) As Boolean
         Dim i As Short
-        Dim Unterteilung_X As Double
-        Dim x1, x2 As Double
-        Dim X() As Double
-        Dim f2, f1, f3 As Double
-        Dim g1, g2 As Double
 
-        If (Anwendung = ANW_TESTPROBLEME) Then
+        '*************************************
+        '*          Blaues Modell            *
+        '*************************************
 
-            '*************************************
-            '*          Testprobleme             *
-            '*************************************
+        'Mutierte Parameter an OptParameter übergeben
+        For i = 1 To AnzPar 'BUG 57: Par(,) fängt bei 1 an!
+            BM_Form1.OptParameterListe(i - 1).SKWert = Par(i, 1)     'OptParameterListe(i-1,*) weil Array bei 0 anfängt!
+        Next
 
-            Select Case Combo_Testproblem.Text
-                '**************************************
-                '* Single-Objective Problemstellungen *
-                '**************************************
-                Case "Sinus-Funktion" 'Fehlerquadrate zur Sinusfunktion |0-2pi|
-                    Unterteilung_X = 2 * 3.1415926535898 / (AnzPar - 1)
-                    QN(1) = 0
-                    For i = 1 To AnzPar
-                        QN(1) = QN(1) + (System.Math.Sin((i - 1) * Unterteilung_X) - (-1 + (Par(i, 1) * 2))) * (System.Math.Sin((i - 1) * Unterteilung_X) - (-1 + Par(i, 1) * 2))
-                    Next i
-                    Call TestProb1.Zielfunktion_zeichnen_Sinus(TChart1, AnzPar, Par, durchlauf, ipop)
-                Case "Beale-Problem" 'Beale-Problem
-                    x1 = -5 + (Par(1, 1) * 10)
-                    x2 = -2 + (Par(2, 1) * 4)
+        'Mutierte Parameter in Eingabedateien schreiben
+        Call BM_Form1.ModellParameter_schreiben()
 
-                    QN(1) = (1.5 - x1 * (1 - x2)) ^ 2 + (2.25 - x1 * (1 - x2) ^ 2) ^ 2 + (2.625 - x1 * (1 - x2) ^ 3) ^ 2
-                    TChart1.Series(ipop).Add(durchlauf, QN(1))
-                Case "Schwefel 2.4-Problem" 'Schwefel 2.4 S. 329
-                    ReDim X(globalAnzPar)
-                    For i = 1 To globalAnzPar
-                        X(i) = -10 + Par(i, 1) * 20
-                    Next i
-                    QN(1) = 0
-                    For i = 1 To globalAnzPar
-                        QN(1) = QN(1) + ((X(1) - X(i) ^ 2) ^ 2 + (X(i) - 1) ^ 2)
-                    Next i
-                    TChart1.Series(ipop).Add(durchlauf, QN(1))
-                    '*************************************
-                    '* Multi-Objective Problemstellungen *
-                    '*************************************
-                    'Deb 2000, D1 (Konvexe Pareto-Front)
-                Case "Deb 1"
-                    f1 = Par(1, 1) * (9 / 10) + 0.1
-                    f2 = (1 + 5 * Par(2, 1)) / (Par(1, 1) * (9 / 10) + 0.1)
-                    QN(1) = f1
-                    QN(2) = f2
-                    TChart1.Series(0).Add(f1, f2, "")
+        'Modell Starten
+        Call BM_Form1.launchBM()
 
-                    'Zitzler/Deb/Thiele 2000, T1 (Konvexe Pareto-Front)
-                Case "Zitzler/Deb T1"
-                    f1 = Par(1, 1)
-                    f2 = 0
-                    For i = 2 To globalAnzPar
-                        f2 = f2 + Par(i, 1)
-                    Next i
-                    f2 = 1 + 9 / (globalAnzPar - 1) * f2
-                    f2 = f2 * (1 - System.Math.Sqrt(f1 / f2))
-                    QN(1) = f1
-                    QN(2) = f2
-                    TChart1.Series(0).Add(f1, f2, "")
+        'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
+        'BUG 57: QN() fängt bei 1 an!
+        For i = 0 To globalAnzZiel - 1
+            BM_Form1.OptZieleListe(i).QWertTmp = BM_Form1.QualitaetsWert_berechnen(i)
+            QN(i + 1) = BM_Form1.OptZieleListe(i).QWertTmp
+        Next
 
-                    'Zitzler/Deb/Thiele 2000, T2 (Non-Konvexe Pareto-Front)
-                Case "Zitzler/Deb T2"
-                    f1 = Par(1, 1)
-                    f2 = 0
-                    For i = 2 To globalAnzPar
-                        f2 = f2 + Par(i, 1)
-                    Next i
-                    f2 = 1 + 9 / (globalAnzPar - 1) * f2
-                    f2 = f2 * (1 - (f1 / f2) * (f1 / f2))
-                    QN(1) = f1
-                    QN(2) = f2
-                    TChart1.Series(0).Add(f1, f2, "")
+        'Qualitätswerte im TeeChart zeichnen
+        Select Case globalAnzZiel
+            Case 1
+                TChart1.Series(ipop).Add(durchlauf, BM_Form1.OptZieleListe(0).QWertTmp)
+            Case 2
+                TChart1.Series(0).Add(BM_Form1.OptZieleListe(0).QWertTmp, BM_Form1.OptZieleListe(1).QWertTmp, "")
+            Case 3
+                'TODO MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
+                'Call Zielfunktion_zeichnen_MultiObPar_3D(BM_Form1.OptZieleListe(0).QWertTmp, BM_Form1.OptZieleListe(1).QWertTmp, BM_Form1.OptZieleListe(2).QWertTmp)
+            Case Else
+                'TODO MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
+                'TODO: Call Zielfunktion_zeichnen_MultiObPar_XD()
+        End Select
 
-                    'Zitzler/Deb/Thiele 2000, T3 (disconected Pareto-Front)
-                Case "Zitzler/Deb T3"
-                    f1 = Par(1, 1)
-                    f2 = 0
-                    For i = 2 To globalAnzPar
-                        f2 = f2 + Par(i, 1)
-                    Next i
-                    f2 = 1 + 9 / (globalAnzPar - 1) * f2
-                    f2 = f2 * (1 - System.Math.Sqrt(f1 / f2) - (f1 / f2) * System.Math.Sin(10 * 3.14159265358979 * f1))
-                    QN(1) = f1
-                    QN(2) = f2
-                    TChart1.Series(0).Add(f1, f2, "")
+        'Qualitätswerte und OptParameter in DB speichern
+        Call BM_Form1.db_update(durchlauf, ipop)
 
-                    'Zitzler/Deb/Thiele 2000, T4 (local/global Pareto-Fronts)
-                Case "Zitzler/Deb T4"
-                    f1 = Par(1, 1)
-                    f2 = 0
-                    For i = 2 To globalAnzPar
-                        x2 = -5 + (Par(i, 1) * 10)
-                        f2 = f2 + (x2 * x2 - 10 * System.Math.Cos(4 * 3.14159265358979 * x2))
-                    Next i
-                    f2 = 1 + 10 * (globalAnzPar - 1) + f2
-                    f2 = f2 * (1 - System.Math.Sqrt(f1 / f2))
-                    QN(1) = f1
-                    QN(2) = f2
-                    TChart1.Series(0).Add(f1, f2, "")
-
-                Case "CONSTR"
-                    f1 = Par(1, 1) * (9 / 10) + 0.1
-                    f2 = (1 + 5 * Par(2, 1)) / (Par(1, 1) * (9 / 10) + 0.1)
-
-                    g1 = (5 * Par(2, 1)) + 9 * (Par(1, 1) * (9 / 10) + 0.1) - 6
-                    g2 = (-1) * (5 * Par(2, 1)) + 9 * (Par(1, 1) * (9 / 10) + 0.1) - 1
-
-                    QN(1) = f1
-                    QN(2) = f2
-                    RN(1) = g1
-                    RN(2) = g2
-                    TChart1.Series(0).Add(f1, f2, "")
-
-                Case "Box"
-                    f1 = Par(1, 1) ^ 2
-                    f2 = Par(2, 1) ^ 2
-                    f3 = Par(3, 1) ^ 2
-                    g1 = Par(1, 1) + Par(3, 1) - 0.5
-                    g2 = Par(1, 1) + Par(2, 1) + Par(3, 1) - 0.8
-
-                    '                f1 = 1 + (1 - Par(1, 1)) ^ 5
-                    '                f2 = Par(2, 1)
-                    '                f3 = Par(3, 1)
-                    '
-                    '                g1 = Par(1, 1) ^ 2 + Par(3, 1) ^ 2 - 0.5
-                    '                g2 = Par(2, 1) ^ 2 + Par(3, 1) ^ 2 - 0.5
-
-                    QN(1) = f1
-                    QN(2) = f2
-                    QN(3) = f3
-                    RN(1) = g1
-                    RN(2) = g2
-                    Call Zielfunktion_zeichnen_MultiObPar_3D(f1, f2, f3)
-            End Select
-
-        ElseIf (Anwendung = ANW_BLAUESMODELL) Then
-
-            '*************************************
-            '*          Blaues Modell            *
-            '*************************************
-
-            'Mutierte Parameter an OptParameter übergeben
-            For i = 1 To AnzPar 'BUG 57: Par(,) fängt bei 1 an!
-                BM_Form1.OptParameterListe(i - 1).SKWert = Par(i, 1)     'OptParameterListe(i-1,*) weil Array bei 0 anfängt!
-            Next
-
-            'Mutierte Parameter in Eingabedateien schreiben
-            Call BM_Form1.ModellParameter_schreiben()
-
-            'Modell Starten
-            Call BM_Form1.launchBM()
-
-            'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
-            'BUG 57: QN() fängt bei 1 an!
-            For i = 0 To globalAnzZiel - 1
-                BM_Form1.OptZieleListe(i).QWertTmp = BM_Form1.QualitaetsWert_berechnen(i)
-                QN(i + 1) = BM_Form1.OptZieleListe(i).QWertTmp
-            Next
-
-            'Qualitätswerte im TeeChart zeichnen
-            Select Case globalAnzZiel
-                Case 1
-                    TChart1.Series(ipop).Add(durchlauf, BM_Form1.OptZieleListe(0).QWertTmp)
-                Case 2
-                    TChart1.Series(0).Add(BM_Form1.OptZieleListe(0).QWertTmp, BM_Form1.OptZieleListe(1).QWertTmp, "")
-                Case 3
-                    'TODO MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
-                    Call Zielfunktion_zeichnen_MultiObPar_3D(BM_Form1.OptZieleListe(0).QWertTmp, BM_Form1.OptZieleListe(1).QWertTmp, BM_Form1.OptZieleListe(2).QWertTmp)
-                Case Else
-                    'TODO MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
-                    'TODO: Call Zielfunktion_zeichnen_MultiObPar_XD()
-            End Select
-
-            'Qualitätswerte und OptParameter in DB speichern
-            Call BM_Form1.db_update(durchlauf, ipop)
-
-        End If
     End Function
 
 
@@ -1110,11 +1014,6 @@ ErrCode_ES_STARTEN:
     '************************************************************************************
     '                          Zeichenfunktionen                                        *
     '************************************************************************************
-
-    Private Sub Zielfunktion_zeichnen_MultiObPar_3D(ByRef f1 As Double, ByRef f2 As Double, ByRef f3 As Double)
-        TChart1.Series(0).FillSampleValues()
-        TChart1.Series(1).FillSampleValues()
-    End Sub
 
     Private Sub Bestwertzeichnen_Pareto(ByRef Bestwert(,) As Double, ByRef ipop As Short)
         Dim i As Short
