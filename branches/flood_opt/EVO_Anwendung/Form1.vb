@@ -14,14 +14,14 @@ Friend Class Form1
     Private Const ANW_RESETPARA_RUNBM As String = "ResetPara & RunBM"
     Private Const ANW_SENSIPLOT_MODPARA As String = "SensiPlot ModPara"
     Private Const ANW_BLAUESMODELL As String = "Blaues Modell"
-    Private Const ANW_CombiBM As String = "BM Combinatorics"
+    Private Const ANW_COMBIBM As String = "BM Combinatorics"
     Private Const ANW_TESTPROBLEME As String = "Test-Probleme"
     Private Const ANW_TSP As String = "TS-Problem"
 
     Private AppIniOK As Boolean = False
 
     'Deklarationen der Module
-    Public TestProb1 As New Testprobleme
+    Public TestProb1 As New Testproblem
     Public BM_Form1 As New EVO_BM.BM_Form
     Public SensiPlot1 As New EVO_BM.SensiPlot
     Public Wave1 As New EVO_BM.Wave
@@ -44,7 +44,7 @@ Friend Class Form1
         System.Windows.Forms.Application.EnableVisualStyles()
 
         'Liste der Anwendungen in ComboBox schreiben und Anfangseinstellung wählen
-        ComboBox_Anwendung.Items.AddRange(New Object() {ANW_RESETPARA_RUNBM, ANW_SENSIPLOT_MODPARA, ANW_BLAUESMODELL, ANW_CombiBM, ANW_TESTPROBLEME, ANW_TSP})
+        ComboBox_Anwendung.Items.AddRange(New Object() {ANW_RESETPARA_RUNBM, ANW_SENSIPLOT_MODPARA, ANW_BLAUESMODELL, ANW_COMBIBM, ANW_TESTPROBLEME, ANW_TSP})
         ComboBox_Anwendung.SelectedItem = ANW_RESETPARA_RUNBM
         Anwendung = ComboBox_Anwendung.SelectedItem
 
@@ -135,7 +135,7 @@ Friend Class Form1
                         EVO_Einstellungen1.OptModus = 1
                     End If
 
-                Case ANW_CombiBM
+                Case ANW_COMBIBM
                     'Voreinstellungen lesen EVO.INI
                     Call ReadEVOIni()
                     'Testprobleme ausschalten
@@ -532,101 +532,18 @@ Friend Class Form1
             '*************************************
 
             'BUG: Bug 57: Für alle Testprobleme ReDim mypara(globalAnzPar - 1, 0) ! (wegen Array-Anfang bei 0)
+            'Globale Parameter werden gesetzt
+            Call TestProb1.Parameter_Uebergabe(Combo_Testproblem.Text, Text_Sinusfunktion_Par.Text, Text_Schwefel24_Par.Text, globalAnzPar, globalAnzZiel, globalAnzRand, mypara)
+
             Select Case Combo_Testproblem.Text
                 Case "Sinus-Funktion"
-                    globalAnzPar = CShort(Text_Sinusfunktion_Par.Text)
-                    globalAnzZiel = 1
-                    globalAnzRand = 0
-                    ReDim mypara(globalAnzPar, 1)
-                    For i = 1 To globalAnzPar
-                        mypara(i, 1) = 0
-                    Next
-                    Call TestProb1.TeeChartIni_SinusFunktion(TChart1, EVO_Einstellungen1, globalAnzPar, Text_Sinusfunktion_Par.Text)
+                    Call TestProb1.TeeChartIni_SinusFunktion(EVO_Einstellungen1, globalAnzPar, Text_Sinusfunktion_Par.Text, TChart1)
                 Case "Beale-Problem" 'x1 = [-5;5], x2=[-2;2]
-                    globalAnzPar = 2
-                    globalAnzZiel = 1
-                    globalAnzRand = 0
-                    ReDim mypara(globalAnzPar, 1)
-                    mypara(1, 1) = 0.5
-                    mypara(2, 1) = 0.5
-                    Call TestProb1.TeeChartIni_BealeProblem(TChart1, EVO_Einstellungen1, globalAnzPar)
+                    Call TestProb1.TeeChartIni_BealeProblem(EVO_Einstellungen1, globalAnzPar, TChart1)
                 Case "Schwefel 2.4-Problem" 'xi = [-10,10]
-                    globalAnzPar = CShort(Text_Schwefel24_Par.Text)
-                    globalAnzZiel = 1
-                    globalAnzRand = 0
-                    ReDim mypara(globalAnzPar, 1)
-                    For i = 1 To globalAnzPar
-                        mypara(i, 1) = 1
-                    Next i
-                    Call TestProb1.TeeChartIni_SchwefelProblem(TChart1, EVO_Einstellungen1, globalAnzPar)
-                Case "Deb 1" 'x1 = [0.1;1], x2=[0;5]
-                    globalAnzPar = 2
-                    globalAnzZiel = 2
-                    globalAnzRand = 0
-                    ReDim mypara(globalAnzPar, 1)
-                    Randomize()
-                    mypara(1, 1) = Rnd()
-                    mypara(2, 1) = Rnd()
-                    Call TestProb1.TeeChartIni_MultiTestProb(TChart1, NPopul, Combo_Testproblem.Text)
-                Case "Zitzler/Deb T1" 'xi = [0,1]
-                    globalAnzPar = 30
-                    globalAnzZiel = 2
-                    globalAnzRand = 0
-                    ReDim mypara(globalAnzPar, 1)
-                    Randomize()
-                    For i = 1 To globalAnzPar
-                        mypara(i, 1) = Rnd()
-                    Next i
-                    Call TestProb1.TeeChartIni_MultiTestProb(TChart1, NPopul, Combo_Testproblem.Text)
-                Case "Zitzler/Deb T2" 'xi = [0,1]
-                    globalAnzPar = 30
-                    globalAnzZiel = 2
-                    globalAnzRand = 0
-                    ReDim mypara(globalAnzPar, 1)
-                    Randomize()
-                    For i = 1 To globalAnzPar
-                        mypara(i, 1) = Rnd()
-                    Next i
-                    Call TestProb1.TeeChartIni_MultiTestProb(TChart1, NPopul, Combo_Testproblem.Text)
-                Case "Zitzler/Deb T3" 'xi = [0,1]
-                    globalAnzPar = 15
-                    globalAnzZiel = 2
-                    globalAnzRand = 0
-                    ReDim mypara(globalAnzPar, 1)
-                    Randomize()
-                    For i = 1 To globalAnzPar
-                        mypara(i, 1) = Rnd()
-                    Next i
-                    Call TestProb1.TeeChartIni_MultiTestProb(TChart1, NPopul, Combo_Testproblem.Text)
-                Case "Zitzler/Deb T4" 'x1 = [0,1], xi=[-5,5]
-                    globalAnzPar = 10
-                    globalAnzZiel = 2
-                    globalAnzRand = 0
-                    ReDim mypara(globalAnzPar, 1)
-                    Randomize()
-                    For i = 1 To globalAnzPar
-                        mypara(i, 1) = Rnd()
-                    Next i
-                    Call TestProb1.TeeChartIni_MultiTestProb(TChart1, NPopul, Combo_Testproblem.Text)
-                Case "CONSTR" 'x1 = [0.1;1], x2=[0;5]
-                    globalAnzPar = 2
-                    globalAnzZiel = 2
-                    globalAnzRand = 2
-                    ReDim mypara(globalAnzPar, 1)
-                    Randomize()
-                    mypara(1, 1) = Rnd()
-                    mypara(2, 1) = Rnd()
-                    Call TestProb1.TeeChartIni_MultiTestProb(TChart1, NPopul, Combo_Testproblem.Text)
-                Case "Box"
-                    globalAnzPar = 3
-                    globalAnzZiel = 3
-                    globalAnzRand = 2
-                    ReDim mypara(globalAnzPar, 1)
-                    Randomize()
-                    mypara(1, 1) = Rnd()
-                    mypara(2, 1) = Rnd()
-                    mypara(3, 1) = Rnd()
-                    Call TestProb1.TeeChartIni_3D_Box(TChart1, EVO_Einstellungen1.isPOPUL, EVO_Einstellungen1.NPopul)
+                    Call TestProb1.TeeChartIni_SchwefelProblem(EVO_Einstellungen1, globalAnzPar, TChart1)
+                Case Else
+                    Call TestProb1.TeeChartIni_MultiTestProb(NPopul, Combo_Testproblem.Text, TChart1)
             End Select
 
 

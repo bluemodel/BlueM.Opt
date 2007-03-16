@@ -1,4 +1,98 @@
-Public Class Testprobleme
+Public Class Testproblem
+
+    'Startparameter werden festgesetzt
+    Public Sub Parameter_Uebergabe(ByVal Testproblem As String, ByVal globAnzPar_Sin As String, ByVal globAnzPar_Schw As String, ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara(,) As Double)
+
+        Dim i As Integer
+
+        Select Case Testproblem
+            Case "Sinus-Funktion"
+                globalAnzPar = CShort(globAnzPar_Sin)
+                globalAnzZiel = 1
+                globalAnzRand = 0
+                ReDim mypara(globalAnzPar, 1)
+                For i = 1 To globalAnzPar
+                    mypara(i, 1) = 0
+                Next
+            Case "Beale-Problem" 'x1 = [-5;5], x2=[-2;2]
+                globalAnzPar = 2
+                globalAnzZiel = 1
+                globalAnzRand = 0
+                ReDim mypara(globalAnzPar, 1)
+                mypara(1, 1) = 0.5
+                mypara(2, 1) = 0.5
+            Case "Schwefel 2.4-Problem" 'xi = [-10,10]
+                globalAnzPar = CShort(globAnzPar_Schw)
+                globalAnzZiel = 1
+                globalAnzRand = 0
+                ReDim mypara(globalAnzPar, 1)
+                For i = 1 To globalAnzPar
+                    mypara(i, 1) = 1
+                Next i
+            Case "Deb 1" 'x1 = [0.1;1], x2=[0;5]
+                globalAnzPar = 2
+                globalAnzZiel = 2
+                globalAnzRand = 0
+                ReDim mypara(globalAnzPar, 1)
+                Randomize()
+                mypara(1, 1) = Rnd()
+                mypara(2, 1) = Rnd()
+            Case "Zitzler/Deb T1" 'xi = [0,1]
+                globalAnzPar = 30
+                globalAnzZiel = 2
+                globalAnzRand = 0
+                ReDim mypara(globalAnzPar, 1)
+                Randomize()
+                For i = 1 To globalAnzPar
+                    mypara(i, 1) = Rnd()
+                Next i
+            Case "Zitzler/Deb T2" 'xi = [0,1]
+                globalAnzPar = 30
+                globalAnzZiel = 2
+                globalAnzRand = 0
+                ReDim mypara(globalAnzPar, 1)
+                Randomize()
+                For i = 1 To globalAnzPar
+                    mypara(i, 1) = Rnd()
+                Next i
+            Case "Zitzler/Deb T3" 'xi = [0,1]
+                globalAnzPar = 15
+                globalAnzZiel = 2
+                globalAnzRand = 0
+                ReDim mypara(globalAnzPar, 1)
+                Randomize()
+                For i = 1 To globalAnzPar
+                    mypara(i, 1) = Rnd()
+                Next i
+            Case "Zitzler/Deb T4" 'x1 = [0,1], xi=[-5,5]
+                globalAnzPar = 10
+                globalAnzZiel = 2
+                globalAnzRand = 0
+                ReDim mypara(globalAnzPar, 1)
+                Randomize()
+                For i = 1 To globalAnzPar
+                    mypara(i, 1) = Rnd()
+                Next i
+            Case "CONSTR" 'x1 = [0.1;1], x2=[0;5]
+                globalAnzPar = 2
+                globalAnzZiel = 2
+                globalAnzRand = 2
+                ReDim mypara(globalAnzPar, 1)
+                Randomize()
+                mypara(1, 1) = Rnd()
+                mypara(2, 1) = Rnd()
+            Case "Box"
+                globalAnzPar = 3
+                globalAnzZiel = 3
+                globalAnzRand = 2
+                ReDim mypara(globalAnzPar, 1)
+                Randomize()
+                mypara(1, 1) = Rnd()
+                mypara(2, 1) = Rnd()
+                mypara(3, 1) = Rnd()
+        End Select
+    End Sub
+
 
     '************************************************************************************
     '                        Initialisierung der TCharts                                *
@@ -6,7 +100,7 @@ Public Class Testprobleme
 
     'Alle Series für TeeChart werden initialisiert
     'Teilweise werden die Ziel bzw. Ausgangslinien berechnet und gezeichnet
-    Public Sub TeeChartIni_SinusFunktion(ByRef TChart1 As Steema.TeeChart.TChart, ByVal EVO_Einstellungen1 As EvoForm.EVO_Einstellungen, ByVal globalAnzPar As Short, ByVal AnzPara As Integer)
+    Public Sub TeeChartIni_SinusFunktion(ByVal EVO_Einstellungen1 As EvoForm.EVO_Einstellungen, ByVal globalAnzPar As Short, ByVal AnzPara As Integer, ByRef TChart1 As Steema.TeeChart.TChart)
         Dim array_x() As Double = {}
         Dim array_y() As Double = {}
         Dim Ausgangsergebnis As Double
@@ -81,7 +175,7 @@ Public Class Testprobleme
         End With
     End Sub
 
-    Public Sub TeeChartIni_BealeProblem(ByRef TChart1 As Steema.TeeChart.TChart, ByVal EVO_Einstellungen1 As EvoForm.EVO_Einstellungen, ByVal globalAnzPar As Short)
+    Public Sub TeeChartIni_BealeProblem(ByVal EVO_Einstellungen1 As EvoForm.EVO_Einstellungen, ByVal globalAnzPar As Short, ByRef TChart1 As Steema.TeeChart.TChart)
         Dim array_x() As Double = {}
         Dim array_y() As Double = {}
         Dim Ausgangsergebnis As Double
@@ -149,7 +243,7 @@ Public Class Testprobleme
         End With
     End Sub
 
-    Public Sub TeeChartIni_SchwefelProblem(ByRef TChart1 As Steema.TeeChart.TChart, ByVal EVO_Einstellungen1 As EvoForm.EVO_Einstellungen, ByVal globalAnzPar As Short)
+    Public Sub TeeChartIni_SchwefelProblem(ByVal EVO_Einstellungen1 As EvoForm.EVO_Einstellungen, ByVal globalAnzPar As Short, ByRef TChart1 As Steema.TeeChart.TChart)
         Dim array_x() As Double = {}
         Dim array_y() As Double = {}
         Dim Ausgangsergebnis As Double
@@ -222,7 +316,7 @@ Public Class Testprobleme
         End With
     End Sub
 
-    Public Sub TeeChartIni_MultiTestProb(ByRef TChart1 As Steema.TeeChart.TChart, ByVal NPopul As Short, ByRef Testproblem As String)
+    Public Sub TeeChartIni_MultiTestProb(ByVal NPopul As Short, ByVal Testproblem As String, ByRef TChart1 As Steema.TeeChart.TChart)
         Dim Populationen As Short
         Dim i, j As Short
 
