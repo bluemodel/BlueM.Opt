@@ -790,4 +790,130 @@ Public Class BM_Form
         Call db_disconnect()
     End Function
 
+    '********************* TeeChart Initialisierung für das BlaueModell *****************
+
+    Public Sub TeeChartInitialise_SO_BlauesModell(ByVal n_Populationen As Integer, ByVal n_Kalkulationen As Integer, ByRef TChart1 As Steema.TeeChart.TChart)
+        'Dim Anzahl_Kalkulationen As Integer
+        'Dim Populationen As Short
+        Dim i As Short
+
+        With TChart1
+            .Clear()
+            .Header.Text = "BlauesModell"
+            .Aspect.View3D = False
+            .Legend.Visible = False
+
+            'Series(0): Anfangswert
+            Dim Point0 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point0.Title = "Anfangswert"
+            Point0.Color = System.Drawing.Color.Red
+            Point0.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point0.Pointer.HorizSize = 3
+            Point0.Pointer.VertSize = 3
+
+            'Series(1 bis n): Für jede Population eine Series 'TODO: es würde auch eine Series für alle reichen!
+            For i = 0 To n_Populationen
+                Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
+                Point1.Title = "Population " & i.ToString()
+                Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+                Point1.Pointer.HorizSize = 3
+                Point1.Pointer.VertSize = 3
+            Next i
+
+            'Formatierung der Axen
+            .Chart.Axes.Bottom.Title.Caption = "Simulation"
+            .Chart.Axes.Bottom.Automatic = False
+            .Chart.Axes.Bottom.Maximum = n_Kalkulationen
+            .Chart.Axes.Bottom.Minimum = 0
+            .Chart.Axes.Left.Title.Caption = OptZieleListe(0).Bezeichnung
+            .Chart.Axes.Left.Automatic = True
+            .Chart.Axes.Left.Minimum = 0
+        End With
+    End Sub
+
+    Public Sub TeeChartInitialise_MO_BlauesModell(ByRef TChart1 As Steema.TeeChart.TChart)
+
+        With TChart1
+            .Clear()
+            .Header.Text = "BlauesModell"
+            .Aspect.View3D = False
+            .Legend.Visible = False
+
+            'Formatierung der Axen
+            .Chart.Axes.Bottom.Title.Caption = OptZieleListe(0).Bezeichnung 'HACK: Beschriftung der Axen
+            .Chart.Axes.Bottom.Automatic = True
+            .Chart.Axes.Left.Title.Caption = OptZieleListe(1).Bezeichnung 'HACK: Beschriftung der Axen
+            .Chart.Axes.Left.Automatic = True
+
+            'Series(0): Series für die Population.
+            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point1.Title = "Population"
+            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point1.Color = System.Drawing.Color.Orange
+            Point1.Pointer.HorizSize = 2
+            Point1.Pointer.VertSize = 2
+
+            'Series(1): Series für die Sekundäre Population
+            Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point2.Title = "Sekundäre Population"
+            Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point2.Color = System.Drawing.Color.Blue
+            Point2.Pointer.HorizSize = 3
+            Point2.Pointer.VertSize = 3
+
+            'Series(2): Series für Bestwert
+            Dim Point3 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point3.Title = "Bestwerte"
+            Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point3.Color = System.Drawing.Color.Green
+            Point3.Pointer.HorizSize = 3
+            Point3.Pointer.VertSize = 3
+
+        End With
+    End Sub
+
+    '*****************************************************************'******************
+    '                      Evaluierung des Blauen Modells                               *
+    '************************************************************************************
+
+    Public Function Evaluierung_BlauesModell(ByVal GlobalAnzPar As Short, ByVal GlobalAnzZiel As Short, ByVal mypara As Double(,), ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN As Double(), ByRef TChart1 As Steema.TeeChart.TChart) As Boolean
+        Dim i As Short
+
+        'Mutierte Parameter an OptParameter übergeben
+        For i = 1 To GlobalAnzPar 'BUG 57: Par(,) fängt bei 1 an!
+            OptParameterListe(i - 1).SKWert = mypara(i, 1)     'OptParameterListe(i-1,*) weil Array bei 0 anfängt!
+        Next
+
+        'Mutierte Parameter in Eingabedateien schreiben
+        Call ModellParameter_schreiben()
+
+        'Modell Starten
+        Call launchBM()
+
+        'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
+        'BUG 57: QN() fängt bei 1 an!
+        For i = 0 To GlobalAnzZiel - 1
+            OptZieleListe(i).QWertTmp = QualitaetsWert_berechnen(i)
+            QN(i + 1) = OptZieleListe(i).QWertTmp
+        Next
+
+        'Qualitätswerte im TeeChart zeichnen
+        Select Case GlobalAnzZiel
+            Case 1
+                TChart1.Series(ipop).Add(durchlauf, OptZieleListe(0).QWertTmp)
+            Case 2
+                TChart1.Series(0).Add(OptZieleListe(0).QWertTmp, OptZieleListe(1).QWertTmp, "")
+            Case 3
+                'TODO MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
+                'Call Zielfunktion_zeichnen_MultiObPar_3D(BM_Form1.OptZieleListe(0).QWertTmp, BM_Form1.OptZieleListe(1).QWertTmp, BM_Form1.OptZieleListe(2).QWertTmp)
+            Case Else
+                'TODO MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
+                'TODO: Call Zielfunktion_zeichnen_MultiObPar_XD()
+        End Select
+
+        'Qualitätswerte und OptParameter in DB speichern
+        Call db_update(durchlauf, ipop)
+
+    End Function
+
 End Class

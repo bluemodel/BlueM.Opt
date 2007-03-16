@@ -200,7 +200,7 @@ Friend Class Form1
     End Sub
 
     '************************************************************************************
-    '*************** Initialisierung der meisten Anwendung ******************************
+    '*************** Initialisierung der Anwendung **************************************
     '************************************************************************************
 
     '******************* Initialisierung der Testprobleme *******************************
@@ -285,11 +285,13 @@ Friend Class Form1
 
     End Sub
 
-    '***************************** Des Blauen Modells ***********************************
+    '************************* Initialisierung es Blauen Modells ************************
 
     Private Sub Initialisierung_BlauesModell()
         Dim i As Integer
         Dim isMultiObjective As Boolean
+        Dim n_Kalkulationen As Integer
+        Dim n_Populationen As Integer
 
         isMultiObjective = EVO_Einstellungen1.isMultiObjective
 
@@ -310,11 +312,26 @@ Friend Class Form1
         'TODO: Randbedingungen
         globalAnzRand = 2
 
+        'Anzahl Kalkulationen
+        'Ob das hier die richtige Stelle ist?
+        If EVO_Einstellungen1.isPOPUL Then
+            n_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden
+        Else
+            n_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
+        End If
+
+        'Anzahl Populationen
+        'Ob das hier die richtige Stelle ist?
+        n_Populationen = 1
+        If EVO_Einstellungen1.isPOPUL Then
+            n_Populationen = EVO_Einstellungen1.NPopul
+        End If
+
         'Initialisierung der TeeChart Serien je nach SO oder MO
         If (isMultiObjective) = False Then
-            Call TeeChartInitialise_SO_BlauesModell()
+            Call BM_Form1.TeeChartInitialise_SO_BlauesModell(n_Populationen, n_Kalkulationen, TChart1)
         Else
-            Call TeeChartInitialise_MO_BlauesModell()
+            Call BM_Form1.TeeChartInitialise_MO_BlauesModell(TChart1)
         End If
 
     End Sub
@@ -582,58 +599,6 @@ Friend Class Form1
         isInteract = EVO_Einstellungen1.isInteract
         NMemberSecondPop = EVO_Einstellungen1.NMemberSecondPop
 
-
-        'If (Anwendung = ANW_BLAUESMODELL) Then
-
-        '    '*******************************
-        '    '*        BlauesModell         *
-        '    '*******************************
-
-        '    'Anzahl Optimierungsparameter übergeben
-        '    '-----------------------------------------------------
-        '    globalAnzPar = BM_Form1.OptParameterListe.GetLength(0)
-
-        '    'Parameterwerte übergeben
-        '    'BUG 57: mypara() fängt bei 1 an!
-        '    ReDim mypara(globalAnzPar, 1)
-        '    For i = 1 To globalAnzPar
-        '        mypara(i, 1) = BM_Form1.OptParameterListe(i - 1).SKWert
-        '    Next
-
-        '    'globale Anzahl der Ziele muss hier auf Länge der Zielliste gesetzt werden
-        '    globalAnzZiel = BM_Form1.OptZieleListe.GetLength(0)
-
-        '    'TODO: Randbedingungen
-        '    globalAnzRand = 2
-
-        '    'Initialisierung der TeeChart Serien je nach SO oder MO
-        '    If (isMultiObjective) = False Then
-        '        Call TeeChartInitialise_SO_BlauesModell()
-        '    Else
-        '        Call TeeChartInitialise_MO_BlauesModell()
-        '    End If
-
-        '    'HACK: Redim hier erforderlich, wird aber nach der if-Schleife nochmal ausgeführt
-        '    ReDim QN(globalAnzZiel)
-        '    ReDim RN(globalAnzRand)
-
-        '    ''Zielfunktion für Anfangswerte berechnen
-        '    'myIsOK = Simulieren(globalAnzPar, mypara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
-
-        '    ''HACK: Zielfunktionen für Min und Max Werte berechnen -----------------------------------
-        '    'Dim minPara(globalAnzPar, 1) As Double
-        '    'Dim maxPara(globalAnzPar, 1) As Double
-        '    'For i = 1 To globalAnzPar
-        '    '    minPara(i, 1) = 0
-        '    '    maxPara(i, 1) = 1
-        '    'Next
-        '    'myIsOK = Simulieren(globalAnzPar, minPara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
-        '    'myIsOK = Simulieren(globalAnzPar, maxPara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
-        '    ''Ende Hack ------------------------------------------------------------------------------
-
-
-        'End If
-
         ReDim QN(globalAnzZiel)
         ReDim RN(globalAnzRand)
 
@@ -789,7 +754,7 @@ Start_Evolutionsrunden:
                             Case ANW_TESTPROBLEME
                                 myIsOK = TestProb1.Evaluierung_TestProbleme(Combo_Testproblem.Text, globalAnzPar, mypara, durchlauf, ipop, QN, RN, TChart1)
                             Case ANW_BLAUESMODELL
-                                myIsOK = Evaluierung_BlauesModell(globalAnzPar, mypara, durchlauf, Bestwert, ipop, QN, RN, evolutionsstrategie.isMultiObjective)
+                                myIsOK = BM_Form1.Evaluierung_BlauesModell(globalAnzPar, globalAnzZiel, mypara, durchlauf, ipop, QN, TChart1)
                         End Select
 
                         '************************************************************************************
@@ -871,145 +836,6 @@ ErrCode_ES_STARTEN:
         GoTo EXIT_ES_STARTEN
     End Function
 
-    Private Function Evaluierung_BlauesModell(ByRef AnzPar As Short, ByRef Par(,) As Double, ByRef durchlauf As Integer, ByRef Bestwert(,) As Double, ByRef ipop As Short, ByRef QN() As Double, ByRef RN() As Double, ByVal isPareto As Boolean) As Boolean
-        Dim i As Short
-
-        '*************************************
-        '*          Blaues Modell            *
-        '*************************************
-
-        'Mutierte Parameter an OptParameter übergeben
-        For i = 1 To AnzPar 'BUG 57: Par(,) fängt bei 1 an!
-            BM_Form1.OptParameterListe(i - 1).SKWert = Par(i, 1)     'OptParameterListe(i-1,*) weil Array bei 0 anfängt!
-        Next
-
-        'Mutierte Parameter in Eingabedateien schreiben
-        Call BM_Form1.ModellParameter_schreiben()
-
-        'Modell Starten
-        Call BM_Form1.launchBM()
-
-        'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
-        'BUG 57: QN() fängt bei 1 an!
-        For i = 0 To globalAnzZiel - 1
-            BM_Form1.OptZieleListe(i).QWertTmp = BM_Form1.QualitaetsWert_berechnen(i)
-            QN(i + 1) = BM_Form1.OptZieleListe(i).QWertTmp
-        Next
-
-        'Qualitätswerte im TeeChart zeichnen
-        Select Case globalAnzZiel
-            Case 1
-                TChart1.Series(ipop).Add(durchlauf, BM_Form1.OptZieleListe(0).QWertTmp)
-            Case 2
-                TChart1.Series(0).Add(BM_Form1.OptZieleListe(0).QWertTmp, BM_Form1.OptZieleListe(1).QWertTmp, "")
-            Case 3
-                'TODO MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
-                'Call Zielfunktion_zeichnen_MultiObPar_3D(BM_Form1.OptZieleListe(0).QWertTmp, BM_Form1.OptZieleListe(1).QWertTmp, BM_Form1.OptZieleListe(2).QWertTmp)
-            Case Else
-                'TODO MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
-                'TODO: Call Zielfunktion_zeichnen_MultiObPar_XD()
-        End Select
-
-        'Qualitätswerte und OptParameter in DB speichern
-        Call BM_Form1.db_update(durchlauf, ipop)
-
-    End Function
-
-
-    Private Sub TeeChartInitialise_SO_BlauesModell()
-        Dim Anzahl_Kalkulationen As Integer
-        Dim Populationen As Short
-        Dim i As Short
-
-        If EVO_Einstellungen1.isPOPUL Then
-            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden
-        Else
-            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
-        End If
-
-        With TChart1
-            .Clear()
-            .Header.Text = "BlauesModell"
-            .Aspect.View3D = False
-            .Legend.Visible = False
-
-            'Series(0): Anfangswert
-            Dim Point0 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point0.Title = "Anfangswert"
-            Point0.Color = System.Drawing.Color.Red
-            Point0.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point0.Pointer.HorizSize = 3
-            Point0.Pointer.VertSize = 3
-
-            'Anzahl Populationen
-            Populationen = 1
-            If EVO_Einstellungen1.isPOPUL Then
-                Populationen = EVO_Einstellungen1.NPopul
-            End If
-
-            'Series(1 bis n): Für jede Population eine Series 'TODO: es würde auch eine Series für alle reichen!
-            For i = 0 To Populationen
-                Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
-                Point1.Title = "Population " & i.ToString()
-                Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-                Point1.Pointer.HorizSize = 3
-                Point1.Pointer.VertSize = 3
-            Next i
-
-            'Formatierung der Axen
-            .Chart.Axes.Bottom.Title.Caption = "Simulation"
-            .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Maximum = Anzahl_Kalkulationen
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Left.Title.Caption = BM_Form1.OptZieleListe(0).Bezeichnung
-            .Chart.Axes.Left.Automatic = True
-            .Chart.Axes.Left.Minimum = 0
-        End With
-    End Sub
-
-    Private Sub TeeChartInitialise_MO_BlauesModell()
-        Dim Populationen As Short
-
-        Populationen = EVO_Einstellungen1.NPopul
-
-        With TChart1
-            .Clear()
-            .Header.Text = "BlauesModell"
-            .Aspect.View3D = False
-            .Legend.Visible = False
-
-            'Formatierung der Axen
-            .Chart.Axes.Bottom.Title.Caption = BM_Form1.OptZieleListe(0).Bezeichnung 'HACK: Beschriftung der Axen
-            .Chart.Axes.Bottom.Automatic = True
-            .Chart.Axes.Left.Title.Caption = BM_Form1.OptZieleListe(1).Bezeichnung 'HACK: Beschriftung der Axen
-            .Chart.Axes.Left.Automatic = True
-
-            'Series(0): Series für die Population.
-            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point1.Title = "Population"
-            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point1.Color = System.Drawing.Color.Orange
-            Point1.Pointer.HorizSize = 2
-            Point1.Pointer.VertSize = 2
-
-            'Series(1): Series für die Sekundäre Population
-            Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point2.Title = "Sekundäre Population"
-            Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point2.Color = System.Drawing.Color.Blue
-            Point2.Pointer.HorizSize = 3
-            Point2.Pointer.VertSize = 3
-
-            'Series(2): Series für Bestwert
-            Dim Point3 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point3.Title = "Bestwerte"
-            Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point3.Color = System.Drawing.Color.Green
-            Point3.Pointer.HorizSize = 3
-            Point3.Pointer.VertSize = 3
-
-        End With
-    End Sub
 
     '************************************************************************************
     '                          Zeichenfunktionen                                        *
