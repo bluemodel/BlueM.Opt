@@ -1,6 +1,27 @@
 Imports System.IO
 Imports System.Data.OleDb
+
+'*******************************************************************************
+'*******************************************************************************
+'**** Klasse BM_Form                                                        ****
+'****                                                                       ****
+'**** Funktionen zur Kontrolle des BlauenModells                            ****
+'****                                                                       ****
+'**** Christoph Huebner, Felix Froehlich                                    ****
+'****                                                                       ****
+'**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
+'**** TU Darmstadt                                                          ****
+'****                                                       Dezember 2006   ****
+'****                                                                       ****
+'**** Letzte Änderung: März 2007                                            ****
+'*******************************************************************************
+'*******************************************************************************
+
 Public Class BM_Form
+
+
+    '************************** Funktionen für ParaOpt **********************************
+    '************************************************************************************
 
     Inherits System.Windows.Forms.Form
 
@@ -11,8 +32,10 @@ Public Class BM_Form
     Public BM_Exe As String                         'Pfad zu BlauesModell.exe
 
     Public OptParameter_Pfad As String              'Pfad zur Datei mit den Optimierungsparametern (*.OPT)
-    Public ModellParameter_Pfad As String
+    Public ModellParameter_Pfad As String           'Pfad zur Datei mit den Modellparametern (*.OPT)
     Public OptZiele_Pfad As String                  'Pfad zur Datei mit den Zielfunktionen (*.ZIE)
+    Public Combi_Pfad As String              'Pfad zur Datei mit der Kombinatorik  (*.OPT)
+
     '---------------------------------------------------------------------------------
     'Optimierungsparameter
     Public Structure OptParameter
@@ -66,6 +89,11 @@ Public Class BM_Form
     End Structure
 
     Public OptZieleListe() As OptZiele = {}         'Liste der Zielfunktionnen
+
+    ''Kombinatorik **************************************
+    'Public Schaltung(2, 1) As Object
+    'Public Maßnahme As Collection
+    'Public Kombinatorik As Collection
 
     'Private Properties
     '-------------------
@@ -134,7 +162,7 @@ Public Class BM_Form
     End Sub
 
     'Optimierungsziele
-    Private Sub Button_OptZielWert_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_OptZielWert.Click
+    Private Sub Button_OptZielWert_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_OptZielWert.Click, Button_Kombi.Click
         Me.OpenFile_OptZiele.ShowDialog()
     End Sub
     Private Sub OpenFile_OptZielWert_FileOk(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles OpenFile_OptZiele.FileOk
@@ -872,8 +900,7 @@ Public Class BM_Form
         End With
     End Sub
 
-    '*****************************************************************'******************
-    '                      Evaluierung des Blauen Modells                               *
+    '             Evaluierung des Blauen Modells - Steuerungseinheit
     '************************************************************************************
 
     Public Function Evaluierung_BlauesModell(ByVal GlobalAnzPar As Short, ByVal GlobalAnzZiel As Short, ByVal mypara As Double(,), ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN As Double(), ByRef TChart1 As Steema.TeeChart.TChart) As Boolean
@@ -915,5 +942,86 @@ Public Class BM_Form
         Call db_update(durchlauf, ipop)
 
     End Function
+
+    '************************** Funktionen für CombiOpt *********************************
+    '************************************************************************************
+
+    'Kombinatorik **************************************
+    Public Structure Massnahme
+        Public Name As String
+        Public Name_Verz_1 As String
+        Public Verz_1_ONOFF As Boolean
+        Public Name_Verz_2 As String
+        Public Verz_2_ONOFF As Boolean
+        Public Name_Verz_3 As String
+        Public Verz_3_ONOFF As Boolean
+    End Structure
+
+    Public MassnahmenListe() As Massnahme
+
+    Public Kombinatorik As Collection
+
+
+    'Kombinatorik einlesen (*.OPT-Datei)
+    Public Sub Kombinatorik_einlesen()
+        Try
+            Dim FiStr As FileStream = New FileStream(Combi_Pfad, FileMode.Open, IO.FileAccess.ReadWrite)
+            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+            Dim Zeile As String
+            Dim Anz As Integer = 0
+
+            'Anzahl der Parameter feststellen
+            Do
+                Zeile = StrRead.ReadLine.ToString()
+                If (Zeile.StartsWith("*") = False) Then
+                    Anz += 1
+                End If
+            Loop Until StrRead.Peek() = -1
+
+            ReDim OptParameterListe(Anz - 1)
+
+            'Zurück zum Dateianfang und lesen
+            FiStr.Seek(0, SeekOrigin.Begin)
+
+            Dim array() As String
+            Dim i As Integer = 0
+            Do
+                Zeile = StrRead.ReadLine.ToString()
+                If (Zeile.StartsWith("*") = False) Then
+                    array = Zeile.Split("|")
+                    'Werte zuweisen
+
+                    MassnahmenListe(i).Name = array(2).Trim()
+                    MassnahmenListe(i).Name_Verz_1 = array(3).Trim()
+                    MassnahmenListe(i).Verz_1_ONOFF = Convert.ToBoolean(array(4).Trim())
+                    MassnahmenListe(i).Name_Verz_2 = array(5).Trim()
+                    MassnahmenListe(i).Verz_2_ONOFF = Convert.ToBoolean(array(6).Trim())
+                    MassnahmenListe(i).Name_Verz_3 = array(6).Trim()
+                    MassnahmenListe(i).Verz_3_ONOFF = Convert.ToBoolean(array(7).Trim())
+
+
+
+
+
+                    OptParameterListe(i).Bezeichnung = array(1).Trim()
+                    OptParameterListe(i).Einheit = array(2).Trim()
+                    OptParameterListe(i).Wert = Convert.ToDouble(array(3).Trim())
+                    OptParameterListe(i).Min = Convert.ToDouble(array(4).Trim())
+                    OptParameterListe(i).Max = Convert.ToDouble(array(5).Trim())
+                    i += 1
+                End If
+            Loop Until StrRead.Peek() = -1
+
+        Catch except As Exception
+            MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim Lesen der Kombinatorik")
+        End Try
+
+
+
+    End Sub
+
+    '***************************** Basis Funktionen *************************************
+    '************************************************************************************
 
 End Class

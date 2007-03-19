@@ -44,9 +44,15 @@ Partial Class BM_Form
         Me.OpenFile_OptParameter = New System.Windows.Forms.OpenFileDialog
         Me.Button_OK = New System.Windows.Forms.Button
         Me.OpenFile_ModellParameter = New System.Windows.Forms.OpenFileDialog
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox
+        Me.Label1 = New System.Windows.Forms.Label
+        Me.TextBox_Combi_Pfad = New System.Windows.Forms.TextBox
+        Me.Button_Kombi = New System.Windows.Forms.Button
+        Me.OpenFile_Combi = New System.Windows.Forms.OpenFileDialog
         Me.GroupBox_BM.SuspendLayout()
         Me.GroupBox_Parameter.SuspendLayout()
         Me.GroupBox_OptZiele.SuspendLayout()
+        Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
         'GroupBox_BM
@@ -250,12 +256,55 @@ Partial Class BM_Form
         '
         Me.OpenFile_ModellParameter.Filter = "Modell-Parameter|*.opt"
         '
+        'GroupBox1
+        '
+        Me.GroupBox1.Controls.Add(Me.Label1)
+        Me.GroupBox1.Controls.Add(Me.TextBox_Combi_Pfad)
+        Me.GroupBox1.Controls.Add(Me.Button_Kombi)
+        Me.GroupBox1.Location = New System.Drawing.Point(12, 241)
+        Me.GroupBox1.Name = "GroupBox1"
+        Me.GroupBox1.Size = New System.Drawing.Size(586, 51)
+        Me.GroupBox1.TabIndex = 30
+        Me.GroupBox1.TabStop = False
+        Me.GroupBox1.Text = "Kombinatorik"
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(6, 22)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(39, 13)
+        Me.Label1.TabIndex = 2
+        Me.Label1.Text = "Combi:"
+        '
+        'TextBox_Combi_Pfad
+        '
+        Me.TextBox_Combi_Pfad.Location = New System.Drawing.Point(70, 19)
+        Me.TextBox_Combi_Pfad.Name = "TextBox_Combi_Pfad"
+        Me.TextBox_Combi_Pfad.Size = New System.Drawing.Size(480, 20)
+        Me.TextBox_Combi_Pfad.TabIndex = 24
+        '
+        'Button_Kombi
+        '
+        Me.Button_Kombi.Location = New System.Drawing.Point(556, 17)
+        Me.Button_Kombi.Name = "Button_Kombi"
+        Me.Button_Kombi.Size = New System.Drawing.Size(24, 23)
+        Me.Button_Kombi.TabIndex = 26
+        Me.Button_Kombi.Text = "..."
+        Me.Button_Kombi.UseVisualStyleBackColor = True
+        '
+        'OpenFile_Combi
+        '
+        Me.OpenFile_Combi.Filter = "Kombinatorik|*.opt"
+        Me.OpenFile_Combi.Title = "Kombinatorik auswählen"
+        '
         'BM_Form
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(610, 366)
         Me.Controls.Add(Me.Button_OK)
+        Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.GroupBox_OptZiele)
         Me.Controls.Add(Me.GroupBox_Parameter)
         Me.Controls.Add(Me.GroupBox_BM)
@@ -273,6 +322,8 @@ Partial Class BM_Form
         Me.GroupBox_Parameter.PerformLayout()
         Me.GroupBox_OptZiele.ResumeLayout(False)
         Me.GroupBox_OptZiele.PerformLayout()
+        Me.GroupBox1.ResumeLayout(False)
+        Me.GroupBox1.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -300,5 +351,10 @@ Partial Class BM_Form
     Friend WithEvents Label_ModellParameter As System.Windows.Forms.Label
     Public WithEvents TextBox_ModellParameter_Pfad As System.Windows.Forms.TextBox
     Friend WithEvents OpenFile_ModellParameter As System.Windows.Forms.OpenFileDialog
+    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
+    Friend WithEvents Label1 As System.Windows.Forms.Label
+    Public WithEvents TextBox_Combi_Pfad As System.Windows.Forms.TextBox
+    Friend WithEvents Button_Kombi As System.Windows.Forms.Button
+    Friend WithEvents OpenFile_Combi As System.Windows.Forms.OpenFileDialog
 
 End Class

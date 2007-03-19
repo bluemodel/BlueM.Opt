@@ -1,10 +1,26 @@
 Option Strict Off ' Off ist Default
 Option Explicit On
 Imports System.IO
+
+'*******************************************************************************
+'*******************************************************************************
+'**** ihwb Optimierung                                                      ****
+'****                                                                       ****
+'**** Dirk Muschalla, Christoph Huebner, Felix Froehlich                    ****
+'****                                                                       ****
+'**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
+'**** TU Darmstadt                               Dezember 2006              ****
+'****                                                                       ****
+'**** Dezember 2003                                                         ****
+'****                                                                       ****
+'**** Letzte Änderung: März 2007                                            ****
+'*******************************************************************************
+'*******************************************************************************
+
 Friend Class Form1
 
     '************************************************************************************
-    ' Form1 wird initialisiert bzw. geladen; weitere Module werden deklariert           *
+    '****** Form1 wird initialisiert bzw. geladen; weitere Module werden deklariert *****
     '************************************************************************************
 
     Inherits System.Windows.Forms.Form
@@ -20,7 +36,7 @@ Friend Class Form1
 
     Private AppIniOK As Boolean = False
 
-    'Deklarationen der Module
+    '**** Deklarationen der Module *****
     Public TestProb1 As New Testproblem
     Public BM_Form1 As New EVO_BM.BM_Form
     Public SensiPlot1 As New EVO_BM.SensiPlot
@@ -141,11 +157,18 @@ Friend Class Form1
                     Call ReadEVOIni()
                     'Testprobleme ausschalten
                     Me.GroupBox_Testproblem.Enabled = False
-                    'Einlesen OptPara, ModellPara, Zielfunktionen
-                    Call BM_Form1.OptParameter_einlesen()
-                    Call BM_Form1.ModellParameter_einlesen()
-                    Call BM_Form1.OptZiele_einlesen()
+                    ''Einlesen OptPara, ModellPara, Zielfunktionen
+                    'Call BM_Form1.OptParameter_einlesen()
+                    'Call BM_Form1.ModellParameter_einlesen()
+                    'Call BM_Form1.OptZiele_einlesen()
 
+                    'Einlesen der CombiOpt Datei
+                    Call BM_Form1.Kombinatorik_einlesen()
+
+
+                    ''BM_Form anzeigen
+                    'Normalerweise werden hier die Daten eingelesen
+                    'BM_Form1.ShowDialog()
 
                 Case ANW_TESTPROBLEME
                     'Test-Probleme und Evo aktivieren
@@ -159,7 +182,7 @@ Friend Class Form1
         End If
     End Sub
 
-    'Steuerung des TestproblemForms auf dem Form1
+    'Steuerung des Testproblem Forms auf dem Form1
     Private Sub Combo1_SelectedIndexChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Combo_Testproblem.SelectedIndexChanged
         If Me.IsInitializing = True Then
             Exit Sub
@@ -199,8 +222,7 @@ Friend Class Form1
         End If
     End Sub
 
-    '************************************************************************************
-    '*************** Initialisierung der Anwendung **************************************
+    '******************** Initialisierung der Anwendung *********************************
     '************************************************************************************
 
     '******************* Initialisierung der Testprobleme *******************************
@@ -273,6 +295,9 @@ Friend Class Form1
                         Case "OptZiele"
                             BM_Form1.OptZiele_Pfad = Configs(i, 1)
                             BM_Form1.TextBox_OptZiele_Pfad.Text = BM_Form1.OptZiele_Pfad
+                        Case "CombiOpt"
+                            BM_Form1.Combi_Pfad = Configs(i, 1)
+                            BM_Form1.TextBox_Combi_Pfad.Text = BM_Form1.Combi_Pfad
                         Case Else
                             'nix
                     End Select
@@ -285,7 +310,7 @@ Friend Class Form1
 
     End Sub
 
-    '************************* Initialisierung es Blauen Modells ************************
+    '************************* Initialisierung es BlauenModells *************************
 
     Private Sub Initialisierung_BlauesModell()
         Dim i As Integer
@@ -367,8 +392,7 @@ Friend Class Form1
     End Sub
 
 
-    '************************************************************************************
-    '            Anwendung SensiPlot START; läuft ohne Evolutionsstrategie              *
+    '           Anwendung SensiPlot - START; läuft ohne Evolutionsstrategie             
     '************************************************************************************
 
     Private Function SensiPlot_STARTEN(ByRef Selected_OptParameter As String, ByRef Selected_OptZiel As String, ByRef Selected_SensiType As String, ByRef Anz_Sim As Integer) As Boolean
@@ -478,8 +502,7 @@ Friend Class Form1
     End Function
 
 
-    '************************************************************************************
-    '                      Anwendung Traveling Salesman - Start                         *
+    '                      Anwendung Traveling Salesman - Start                         
     '************************************************************************************
 
     Private Function TSP_STARTEN() As Boolean
@@ -529,8 +552,7 @@ Friend Class Form1
 
     End Function
 
-    '************************************************************************************
-    '        Ablaufsteuerung der Evolutionsstrategie für Parameter Optimierung          *
+    '     Anwendung Evolutionsstrategie für Parameter Optimierung - hier Steuerung       
     '************************************************************************************
 
     Private Function ES_STARTEN() As Boolean
@@ -624,62 +646,41 @@ Friend Class Form1
             GoTo ErrCode_ES_STARTEN
         End If
 
-        '***************************************************************************************************
         '1. Schritt: CEvolutionsstrategie
-        '***************************************************************************************************
         'Objekt der Klasse CEvolutionsstrategie wird erzeugen
-        '***************************************************************************************************
-        '***************************************************************************************************
+        '******************************************************************************************
         evolutionsstrategie = New dmevodll.CEvolutionsstrategie
 
-        '***************************************************************************************************
         '2. Schritt: CEvolutionsstrategie - ES_INI
-        '***************************************************************************************************
         'Die öffentlichen dynamischen Arrays werden initialisiert (Dn, An, Xn, Xmin, Xmax)
         'und die Anzahl der Zielfunktionen wird festgelegt
-        '***************************************************************************************************
-        '***************************************************************************************************
+        '******************************************************************************************
         isOK = evolutionsstrategie.EsIni(globalAnzPar, globalAnzZiel, globalAnzRand)
 
-        '***************************************************************************************************
         '3. Schritt: CEvolutionsstrategie - ES_OPTIONS
-        '***************************************************************************************************
         'Optionen der Evolutionsstrategie werden übergeben
-        '***************************************************************************************************
-        '***************************************************************************************************
+        '******************************************************************************************
         isOK = evolutionsstrategie.EsOptions(iEvoTyp, iPopEvoTyp, isPOPUL, NRunden, NPopul, NPopEltern, iOptPopEltern, iOptEltern, iPopPenalty, NGen, NEltern, NNachf, NRekombXY, rDeltaStart, iStartPar, isdnvektor, isMultiObjective, isPareto, isPareto3D, Interact, isInteract, NMemberSecondPop)
 
-        '***************************************************************************************************
         '4. Schritt: CEvolutionsstrategie - ES_LET_PARAMETER
-        '***************************************************************************************************
         'Ausgangsparameter werden übergeben
-        '***************************************************************************************************
-        '***************************************************************************************************
+        '******************************************************************************************
         For i = 1 To globalAnzPar
             myIsOK = evolutionsstrategie.EsLetParameter(i, mypara(i, 1))
         Next i
 
-        '***************************************************************************************************
         '5. Schritt: CEvolutionsstrategie - ES_PREPARE
-        '***************************************************************************************************
         'Interne Variablen werden initialisiert, Zufallsgenerator wird initialisiert
-        '***************************************************************************************************
-        '***************************************************************************************************
+        '******************************************************************************************
         myIsOK = evolutionsstrategie.EsPrepare()
 
-        '***************************************************************************************************
         '6. Schritt: CEvolutionsstrategie - ES_STARTVALUES
-        '***************************************************************************************************
         'Startwerte werden zugewiesen
-        '***************************************************************************************************
-        '***************************************************************************************************
+        '******************************************************************************************
         myIsOK = evolutionsstrategie.EsStartvalues()
 
-        '***************************************************************************************************
-        '***************************************************************************************************
         'Startwerte werden der Bedienoberfläche zugewiesen
-        '***************************************************************************************************
-        '***************************************************************************************************
+        '******************************************************************************************
         EVO_Opt_Verlauf1.NRunden = evolutionsstrategie.NRunden
         EVO_Opt_Verlauf1.NPopul = evolutionsstrategie.NPopul
         EVO_Opt_Verlauf1.NGen = evolutionsstrategie.NGen
@@ -691,16 +692,14 @@ Friend Class Form1
 Start_Evolutionsrunden:
         'Cursor setzen
         'System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
-        '***********************************************************************************************
         'Loop über alle Runden
-        '***********************************************************************************************
+        '*******************************************************************************************
         Do While (evolutionsstrategie.EsIsNextRunde)
 
             irunde = evolutionsstrategie.iaktuelleRunde
             Call EVO_Opt_Verlauf1.Runden(irunde)
 
             myIsOK = evolutionsstrategie.EsPopBestwertspeicher()
-            '***********************************************************************************************
             'Loop über alle Populationen
             '***********************************************************************************************
             Do While (evolutionsstrategie.EsIsNextPop)
@@ -714,7 +713,6 @@ Start_Evolutionsrunden:
 
                 durchlauf = NGen * NNachf * (irunde - 1)
 
-                '***********************************************************************************************
                 'Loop über alle Generationen
                 '***********************************************************************************************
                 Do While (evolutionsstrategie.EsIsNextGen)
@@ -723,9 +721,9 @@ Start_Evolutionsrunden:
                     Call EVO_Opt_Verlauf1.Generation(igen)
 
                     myIsOK = evolutionsstrategie.EsBestwertspeicher()
-                    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
                     'Loop über alle Nachkommen
-                    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                    '********************************************************************
                     Do While (evolutionsstrategie.EsIsNextNachf)
 
                         inachf = evolutionsstrategie.iaktuellerNachfahre
@@ -757,16 +755,14 @@ Start_Evolutionsrunden:
                                 myIsOK = BM_Form1.Evaluierung_BlauesModell(globalAnzPar, globalAnzZiel, mypara, durchlauf, ipop, QN, TChart1)
                         End Select
 
-                        '************************************************************************************
-
                         'Einordnen der Qualitätsfunktion im Bestwertspeicher
+                        '**************************************************************************
                         myIsOK = evolutionsstrategie.EsBest(QN, RN)
 
                         System.Windows.Forms.Application.DoEvents()
 
-                        '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                         'Ende Loop über alle Nachkommen
-                        '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                        '**************************************************************************
                     Loop
 
 
@@ -783,7 +779,6 @@ Start_Evolutionsrunden:
 
                     System.Windows.Forms.Application.DoEvents()
 
-                    '***********************************************************************************************
                     'Ende Loop über alle Generationen
                     '***********************************************************************************************
                 Loop 'Schleife über alle Generationen
@@ -793,7 +788,6 @@ Start_Evolutionsrunden:
                 'Einordnen der Qualitätsfunktion im PopulationsBestwertspeicher
                 myIsOK = evolutionsstrategie.EsPopBest()
 
-                '***********************************************************************************************
                 'Ende Loop über alle Populationen
                 '***********************************************************************************************
             Loop 'Schleife über alle Populationen
@@ -805,16 +799,12 @@ Start_Evolutionsrunden:
 
             System.Windows.Forms.Application.DoEvents()
 
-            '***********************************************************************************************
             'Ende Loop über alle Runden
             '***********************************************************************************************
         Loop 'Schleife über alle Runden
 
-        '***************************************************************************************************
         'CEvolutionsstrategie, letzter. Schritt
-        '***************************************************************************************************
         'Objekt der Klasse CEvolutionsstrategie wird vernichtet
-        '***************************************************************************************************
         '***************************************************************************************************
         'UPGRADE_NOTE: Das Objekt evolutionsstrategie kann erst dann gelöscht werden, wenn die Garbagecollection durchgeführt wurde. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1029"'
         'TODO: Ersetzen durch dispose funzt net
@@ -891,8 +881,8 @@ ErrCode_ES_STARTEN:
         End If
     End Sub
 
-    'TChart Funktionen:
-    '------------------
+    '******************************** TChart Funktionen *******************************************
+    '**********************************************************************************************
 
     'Chart bearbeiten
     Private Sub TChartEdit(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_TChartEdit.Click
