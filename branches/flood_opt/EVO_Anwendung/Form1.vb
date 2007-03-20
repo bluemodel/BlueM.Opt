@@ -171,7 +171,7 @@ Friend Class Form1
                     isOK = BM_Form1.Kombinatorik_is_Valid
 
                     'Einlesen der Verbraucher Datei
-                    Call BM_Form1.Verbraucher_Read()
+                    Call BM_Form1.Verzweigung_Read()
 
                     ''BM_Form anzeigen
                     'Normalerweise werden hier die Daten eingelesen
@@ -513,7 +513,7 @@ Friend Class Form1
     '************************************************************************************
 
     Private Function TSP_STARTEN() As Boolean
-        Dim g As Integer
+        Dim gen As Integer              'Laufvariable für die Generationen
 
         'ToDo: nochmal Prüfen wie das mit den Kids REDIMS ist.
         Call CES1.TeeChart_Initialise_TSP(TChart1)
@@ -526,7 +526,7 @@ Friend Class Form1
         Call CES1.Generate_Random_Path()
 
         'Generationsschleife
-        For g = 1 To CES1.AnzGen
+        For gen = 1 To CES1.AnzGen
 
             'Den Kindern werden die Städte Ihres Pfades entsprechend zugewiesen
             Call CES1.Cities_according_ChildPath()
@@ -542,7 +542,7 @@ Friend Class Form1
 
             'Zeichnen des besten Elter
             'TODO: funzt nur, wenn ganz am ende gezeichnet wird
-            If g = CES1.AnzGen Then
+            If gen = CES1.AnzGen Then
                 Call CES1.TeeChart_Zeichnen_TSP(TChart1, CES1.ParentList(0).CityList)
             End If
 
@@ -555,9 +555,26 @@ Friend Class Form1
             'Mutationsoperatoren
             Call CES1.Mutation_Operations()
 
-        Next g
+        Next gen
 
     End Function
+
+    '           Anwendung CombiBM - START; läuft ohne Evolutionsstrategie             
+    '************************************************************************************
+
+    Private Function Combi_BM_STARTEN() As Boolean
+        Dim gen As Integer               'Laufvariable für die Generationen
+
+        'TeeChart initialisieren
+        Call BM_Form1.TeeChartInitialise_SO_BlauesModell(1, gen, TChart1)
+
+        'Arrays werden Dimensioniert
+        Call CES1.Dim_Parents()
+        Call CES1.Dim_Childs()
+
+
+    End Function
+
 
     '     Anwendung Evolutionsstrategie für Parameter Optimierung - hier Steuerung       
     '************************************************************************************

@@ -666,5 +666,10 @@ Public Class CES
 
     End Sub
 
+
+    '                          Funktionen für CombiBM
+    '********************************************************************************
+
+
 End Class
 

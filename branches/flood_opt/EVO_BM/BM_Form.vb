@@ -946,7 +946,7 @@ Public Class BM_Form
     '************************** Funktionen für CombiOpt *********************************
     '************************************************************************************
 
-    'Kombinatorik **************************************
+    'Kombinatorik Struktur **************************************
 
     Public Structure Massnahme
         Public Name As String
@@ -959,6 +959,8 @@ Public Class BM_Form
     End Structure
 
     Public Kombinatorik() As Lokation
+
+    'Kombinatorik Funktionen **************************************
 
     'Kombinatorik einlesen (*.OPT-Datei)
     Public Sub Kombinatorik_einlesen()
@@ -1019,7 +1021,6 @@ Public Class BM_Form
 
     End Sub
 
-
     'Validierungsfunktion der Kombinatorik Prüft ob Verbraucher an zwei Standorten Dopp vorhanden sind
     Public Function Kombinatorik_is_Valid() As Boolean
         Kombinatorik_is_Valid = True
@@ -1047,10 +1048,10 @@ Public Class BM_Form
                 Next
             Next
         Next
-
     End Function
 
-    Public Sub Verbraucher_Read()
+    'Liest den Verbraucher aus dem BModel in eine Array ein
+    Public Sub Verzweigung_Read()
         Dim i As Integer
         Dim Ver_array() As String
 
@@ -1087,6 +1088,10 @@ Public Class BM_Form
         Catch except As Exception
             MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim Lesen der Kombinatorik")
         End Try
+    End Sub
+
+    Public Sub Verzweigung_Write()
+
 
     End Sub
 
