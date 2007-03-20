@@ -7,8 +7,8 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{62B1C1E7-26DE-418A-AAEE-102E02A50DF6}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>EVO_BM</RootNamespace>
-    <AssemblyName>EVO_BM</AssemblyName>
+    <RootNamespace>Apps</RootNamespace>
+    <AssemblyName>Apps</AssemblyName>
     <MyType>Windows</MyType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -17,7 +17,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>EVO_BM.xml</DocumentationFile>
+    <DocumentationFile>Apps.xml</DocumentationFile>
     <DefineConstants>_MYFORMS=True</DefineConstants>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
@@ -27,7 +27,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>EVO_BM.xml</DocumentationFile>
+    <DocumentationFile>Apps.xml</DocumentationFile>
     <DefineConstants>_MYFORMS=True</DefineConstants>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
@@ -70,6 +70,7 @@
     <Compile Include="SensiPlot.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Testprobleme.vb" />
     <Compile Include="Wave.Designer.vb">
       <DependentUpon>Wave.vb</DependentUpon>
     </Compile>
@@ -90,6 +91,15 @@
       <SubType>Designer</SubType>
       <DependentUpon>Wave.vb</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EVO_FORM\EVO_Form.vbproj">
+      <Project>{64F462D3-9702-4709-9D90-4874A1D9A52B}</Project>
+      <Name>EVO_Form</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="My Project\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

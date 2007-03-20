@@ -37,11 +37,11 @@ Friend Class Form1
     Private AppIniOK As Boolean = False
 
     '**** Deklarationen der Module *****
-    Public TestProb1 As New Testproblem
-    Public BM_Form1 As New EVO_BM.BM_Form
-    Public SensiPlot1 As New EVO_BM.SensiPlot
-    Public Wave1 As New EVO_BM.Wave
-    Public CES1 As New dmevodll.CES
+    Public TestProb1 As New Apps.Testproblem
+    Public BM_Form1 As New Apps.BM_Form
+    Public SensiPlot1 As New Apps.SensiPlot
+    Public Wave1 As New Apps.Wave
+    Public CES1 As New EvoKern.CES
 
     Dim myIsOK As Boolean
     Dim myisrun As Boolean
@@ -415,9 +415,9 @@ Friend Class Form1
         Dim j As Integer
         Dim AnzModPara As Integer = 0
 
-        Dim OptParameterListeOrig() As EVO_BM.BM_Form.OptParameter = {}
-        Dim ModellParameterListeOrig() As EVO_BM.BM_Form.ModellParameter = {}
-        Dim OptZieleListeOrig() As EVO_BM.BM_Form.OptZiele = {}
+        Dim OptParameterListeOrig() As Apps.BM_Form.OptParameter = {}
+        Dim ModellParameterListeOrig() As Apps.BM_Form.ModellParameter = {}
+        Dim OptZieleListeOrig() As Apps.BM_Form.OptZiele = {}
 
         OptParameterListeOrig = BM_Form1.OptParameterListe
         ModellParameterListeOrig = BM_Form1.ModellParameterListe
@@ -587,7 +587,7 @@ Friend Class Form1
         '--------------------------
         Dim durchlauf As Integer
         '--------------------------
-        Dim evolutionsstrategie As dmevodll.CEvolutionsstrategie
+        Dim evolutionsstrategie As EvoKern.CEvolutionsstrategie
         '--------------------------
         'Variablen für Optionen Evostrategie
         Dim iEvoTyp, iPopEvoTyp As Integer
@@ -673,7 +673,7 @@ Friend Class Form1
         '1. Schritt: CEvolutionsstrategie
         'Objekt der Klasse CEvolutionsstrategie wird erzeugen
         '******************************************************************************************
-        evolutionsstrategie = New dmevodll.CEvolutionsstrategie
+        evolutionsstrategie = New EvoKern.CEvolutionsstrategie
 
         '2. Schritt: CEvolutionsstrategie - ES_INI
         'Die öffentlichen dynamischen Arrays werden initialisiert (Dn, An, Xn, Xmin, Xmax)
