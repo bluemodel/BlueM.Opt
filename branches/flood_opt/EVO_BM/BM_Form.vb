@@ -947,17 +947,6 @@ Public Class BM_Form
     '************************************************************************************
 
     'Kombinatorik **************************************
-    Public Structure MassnahmeX
-        Public Name As String
-        Public Name_Verz_1 As String
-        Public Verz_1_ONOFF As Boolean
-        Public Name_Verz_2 As String
-        Public Verz_2_ONOFF As Boolean
-        Public Name_Verz_3 As String
-        Public Verz_3_ONOFF As Boolean
-    End Structure
-
-    Public MassnahmenListe() As MassnahmeX
 
     Public Structure Massnahme
         Public Name As String
@@ -987,9 +976,6 @@ Public Class BM_Form
                     Anz += 1
                 End If
             Loop Until StrRead.Peek() = -1
-
-            ReDim OptParameterListe(Anz - 1)
-
 
             Dim i As Integer = -1
             Dim j As Integer = 0
@@ -1033,11 +1019,82 @@ Public Class BM_Form
 
     End Sub
 
-    '***************************** Basis Funktionen *************************************
+
+    'Validierungsfunktion der Kombinatorik Prüft ob Verbraucher an zwei Standorten Dopp vorhanden sind
+    Public Function Kombinatorik_is_Valid() As Boolean
+        Kombinatorik_is_Valid = True
+        Dim i As Integer = 0
+        Dim j As Integer = 0
+        Dim x As Integer = 0
+        Dim y As Integer = 0
+        Dim m As Integer = 0
+        Dim n As Integer = 0
+
+        For i = 0 To Kombinatorik.GetUpperBound(0)
+            For j = 1 To Kombinatorik.GetUpperBound(0)
+                For x = 0 To Kombinatorik(i).MassnahmeListe.GetUpperBound(0)
+                    For y = 0 To Kombinatorik(j).MassnahmeListe.GetUpperBound(0)
+                        For m = 0 To 2
+                            For n = 0 To 2
+                                If Not Kombinatorik(i).MassnahmeListe(x).Schaltung(m, 0) = "X" And Kombinatorik(j).MassnahmeListe(y).Schaltung(n, 0) = "X" Then
+                                    If Kombinatorik(i).MassnahmeListe(x).Schaltung(m, 0) = Kombinatorik(j).MassnahmeListe(y).Schaltung(n, 0) Then
+                                        Kombinatorik_is_Valid = False
+                                    End If
+                                End If
+                            Next
+                        Next
+                    Next
+                Next
+            Next
+        Next
+
+    End Function
+
+    Public Sub Verbraucher_Read()
+        Dim i As Integer
+        Dim Ver_array() As String
+
+        Try
+            Dim FiStr As FileStream = New FileStream(WorkDir & Datensatz & ".ver", FileMode.Open, IO.FileAccess.ReadWrite)
+            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+            'Anzahl der Parameter feststellen
+            Dim Zeile As String
+            Dim Anz As Integer = 0
+
+            Do
+                Zeile = StrRead.ReadLine.ToString()
+                If (Zeile.StartsWith("*") = False) Then
+                    Anz += 1
+                End If
+            Loop Until StrRead.Peek() = -1
+            ReDim Ver_array(Anz - 1)
+
+            'Zurück zum Dateianfang und lesen
+            FiStr.Seek(0, SeekOrigin.Begin)
+
+            Do
+                Zeile = StrRead.ReadLine.ToString()
+                If (Zeile.StartsWith("*") = False) Then
+
+                    'Verbraucher Array füllen
+                    Ver_array(i) = Zeile
+                    i += 1
+                End If
+
+            Loop Until StrRead.Peek() = -1
+
+        Catch except As Exception
+            MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim Lesen der Kombinatorik")
+        End Try
+
+    End Sub
+
+    '***************************** Hilfs Funktionen *************************************
     '************************************************************************************
 
     'Hilfsfunktion um zu Prüfen ob der Name bereits vorhanden ist oder nicht
-    Public Function Is_Name_IN(ByVal Name As String, ByVal Array() As Lokation) As Boolean
+    Private Function Is_Name_IN(ByVal Name As String, ByVal Array() As Lokation) As Boolean
         Is_Name_IN = False
         Dim i As Integer
         For i = 0 To Array.GetUpperBound(0)

@@ -153,6 +153,7 @@ Friend Class Form1
                     Call Initialisierung_BlauesModell()
 
                 Case ANW_COMBIBM
+                    Dim isOK As Boolean
                     'Voreinstellungen lesen EVO.INI
                     Call ReadEVOIni()
                     'Testprobleme ausschalten
@@ -165,6 +166,12 @@ Friend Class Form1
                     'Einlesen der CombiOpt Datei
                     Call BM_Form1.Kombinatorik_einlesen()
 
+                    'Überprüfen der Kombinatorik
+                    'ToDo: Hier Message Box einbauen
+                    isOK = BM_Form1.Kombinatorik_is_Valid
+
+                    'Einlesen der Verbraucher Datei
+                    Call BM_Form1.Verbraucher_Read()
 
                     ''BM_Form anzeigen
                     'Normalerweise werden hier die Daten eingelesen
