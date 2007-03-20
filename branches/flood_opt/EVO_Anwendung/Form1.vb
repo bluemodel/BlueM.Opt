@@ -535,7 +535,7 @@ Friend Class Form1
             Call CES1.Evaluate_child_Quality()
 
             'Sortieren der Kinden anhand der Qualität
-            Call CES1.Sort_Faksimile(CES1.ChildList)
+            Call CES1.Sort_Faksimile(CES1.ChildList_TSP)
 
             'Selections Prozess (Übergabe der Kinder an die Eltern je nach Strategie)
             Call CES1.Selection_Process()
@@ -543,7 +543,7 @@ Friend Class Form1
             'Zeichnen des besten Elter
             'TODO: funzt nur, wenn ganz am ende gezeichnet wird
             If gen = CES1.AnzGen Then
-                Call CES1.TeeChart_Zeichnen_TSP(TChart1, CES1.ParentList(0).CityList)
+                Call CES1.TeeChart_Zeichnen_TSP(TChart1, CES1.ParentList_TSP(0).CityList)
             End If
 
             'Kinder werden Hier vollständig gelöscht

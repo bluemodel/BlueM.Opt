@@ -34,15 +34,15 @@ Public Class CES
     Private Strategy As String = "plus"                                 '"plus" oder "minus" Strategie
 
     '********************************************* Strukturen *****************************
-    Public Structure Faksimile
+    Public Structure Faksimile_TSP
         Dim No As Integer
         Dim Path() As Integer
         Dim Distance As Double
         Dim CityList(,) As Double
     End Structure
 
-    Public ChildList() As Faksimile = {}
-    Public ParentList() As Faksimile = {}
+    Public ChildList_TSP() As Faksimile_TSP = {}
+    Public ParentList_TSP() As Faksimile_TSP = {}
 
 
     '******************************** Initialisierung *************************************
@@ -71,12 +71,12 @@ Public Class CES
     Public Sub Dim_Parents()
         Dim i As Integer
 
-        ReDim ParentList(n_Parents - 1)
+        ReDim ParentList_TSP(n_Parents - 1)
 
         For i = 0 To n_Parents - 1
-            ParentList(i).Distance = 999999999999999999
-            ReDim ParentList(i).CityList(n_Cities - 1, 2)
-            ReDim ParentList(i).Path(n_Cities - 1)
+            ParentList_TSP(i).Distance = 999999999999999999
+            ReDim ParentList_TSP(i).CityList(n_Cities - 1, 2)
+            ReDim ParentList_TSP(i).Path(n_Cities - 1)
         Next
 
     End Sub
@@ -84,12 +84,12 @@ Public Class CES
     'Dimensionieren des ChildStructs
     Public Sub Dim_Childs()
         Dim i As Integer
-        ReDim ChildList(n_Childs - 1)
+        ReDim ChildList_TSP(n_Childs - 1)
 
         For i = 0 To n_Childs - 1
-            ChildList(i).Distance = 999999999999999999
-            ReDim ChildList(i).CityList(n_Cities - 1, 2)
-            ReDim ChildList(i).Path(n_Cities - 1)
+            ChildList_TSP(i).Distance = 999999999999999999
+            ReDim ChildList_TSP(i).CityList(n_Cities - 1, 2)
+            ReDim ChildList_TSP(i).Path(n_Cities - 1)
         Next
 
     End Sub
@@ -103,12 +103,12 @@ Public Class CES
         Randomize()
 
         For i = 0 To n_Childs - 1
-            ReDim ChildList(i).Path(n_Cities - 1)
-            For j = 0 To ChildList(i).Path.GetUpperBound(0)
+            ReDim ChildList_TSP(i).Path(n_Cities - 1)
+            For j = 0 To ChildList_TSP(i).Path.GetUpperBound(0)
                 Do
                     tmp = CInt(Int((upperbo - lowerb + 1) * Rnd() + lowerb))
-                Loop While Is_No_OK(tmp, ChildList(i).Path) = False
-                ChildList(i).Path(j) = tmp
+                Loop While Is_No_OK(tmp, ChildList_TSP(i).Path) = False
+                ChildList_TSP(i).Path(j) = tmp
             Next
         Next i
 
@@ -121,11 +121,11 @@ Public Class CES
         Dim i, j As Integer
 
         For i = 0 To n_Childs - 1
-            ReDim ChildList(i).CityList(n_Cities - 1, 2)
+            ReDim ChildList_TSP(i).CityList(n_Cities - 1, 2)
             For j = 0 To n_Cities - 1
-                ChildList(i).CityList(j, 0) = ListOfCities(ChildList(i).Path(j) - 1, 0)
-                ChildList(i).CityList(j, 1) = ListOfCities(ChildList(i).Path(j) - 1, 1)
-                ChildList(i).CityList(j, 2) = ListOfCities(ChildList(i).Path(j) - 1, 2)
+                ChildList_TSP(i).CityList(j, 0) = ListOfCities(ChildList_TSP(i).Path(j) - 1, 0)
+                ChildList_TSP(i).CityList(j, 1) = ListOfCities(ChildList_TSP(i).Path(j) - 1, 1)
+                ChildList_TSP(i).CityList(j, 2) = ListOfCities(ChildList_TSP(i).Path(j) - 1, 2)
             Next
         Next i
 
@@ -143,19 +143,19 @@ Public Class CES
             distanceX = 0
             distanceY = 0
             For j = 0 To n_Cities - 2
-                ChildList(i).Distance = 999999999999999999
-                distanceX = (ChildList(i).CityList(j, 1) - ChildList(i).CityList(j + 1, 1))
+                ChildList_TSP(i).Distance = 999999999999999999
+                distanceX = (ChildList_TSP(i).CityList(j, 1) - ChildList_TSP(i).CityList(j + 1, 1))
                 distanceX = distanceX * distanceX
-                distanceY = (ChildList(i).CityList(j, 2) - ChildList(i).CityList(j + 1, 2))
+                distanceY = (ChildList_TSP(i).CityList(j, 2) - ChildList_TSP(i).CityList(j + 1, 2))
                 distanceY = distanceY * distanceY
                 distance = distance + Math.Sqrt(distanceX + distanceY)
             Next j
-            distanceX = (ChildList(i).CityList(0, 1) - ChildList(i).CityList(n_Cities - 1, 1))
+            distanceX = (ChildList_TSP(i).CityList(0, 1) - ChildList_TSP(i).CityList(n_Cities - 1, 1))
             distanceX = distanceX * distanceX
-            distanceY = (ChildList(i).CityList(0, 2) - ChildList(i).CityList(n_Cities - 1, 2))
+            distanceY = (ChildList_TSP(i).CityList(0, 2) - ChildList_TSP(i).CityList(n_Cities - 1, 2))
             distanceY = distanceY * distanceY
             distance = distance + Math.Sqrt(distanceX + distanceY)
-            ChildList(i).Distance = distance
+            ChildList_TSP(i).Distance = distance
         Next i
 
     End Sub
@@ -166,20 +166,20 @@ Public Class CES
 
         If Strategy = "minus" Then
             For i = 0 To n_Parents - 1
-                ParentList(i).Distance = ChildList(i).Distance
-                Array.Copy(ChildList(i).CityList, ParentList(i).CityList, ChildList(i).CityList.Length)
-                Array.Copy(ChildList(i).Path, ParentList(i).Path, ChildList(i).Path.Length)
+                ParentList_TSP(i).Distance = ChildList_TSP(i).Distance
+                Array.Copy(ChildList_TSP(i).CityList, ParentList_TSP(i).CityList, ChildList_TSP(i).CityList.Length)
+                Array.Copy(ChildList_TSP(i).Path, ParentList_TSP(i).Path, ChildList_TSP(i).Path.Length)
             Next i
 
         ElseIf Strategy = "plus" Then
             j = 0
             For i = 0 To n_Parents - 1
-                If ParentList(i).Distance < ChildList(j).Distance Then
+                If ParentList_TSP(i).Distance < ChildList_TSP(j).Distance Then
                     j -= 1
                 Else
-                    ParentList(i).Distance = ChildList(j).Distance
-                    Array.Copy(ChildList(j).CityList, ParentList(i).CityList, ChildList(j).CityList.Length)
-                    Array.Copy(ChildList(j).Path, ParentList(i).Path, ChildList(j).Path.Length)
+                    ParentList_TSP(i).Distance = ChildList_TSP(j).Distance
+                    Array.Copy(ChildList_TSP(j).CityList, ParentList_TSP(i).CityList, ChildList_TSP(j).CityList.Length)
+                    Array.Copy(ChildList_TSP(j).Path, ParentList_TSP(i).Path, ChildList_TSP(j).Path.Length)
                 End If
                 j += 1
             Next i
@@ -192,10 +192,10 @@ Public Class CES
         Dim i As Integer
 
         For i = 0 To n_Childs - 1
-            ChildList(i).No = 0
-            ChildList(i).Distance = 999999999999999999
-            Array.Clear(ChildList(i).Path, 0, ChildList(i).Path.GetLength(0))
-            ReDim ChildList(i).CityList(n_Cities, 2)
+            ChildList_TSP(i).No = 0
+            ChildList_TSP(i).Distance = 999999999999999999
+            Array.Clear(ChildList_TSP(i).Path, 0, ChildList_TSP(i).Path.GetLength(0))
+            ReDim ChildList_TSP(i).CityList(n_Cities, 2)
         Next
 
     End Sub
@@ -214,28 +214,28 @@ Public Class CES
                 x = 0
                 y = 1
                 For i = 0 To n_Childs - 2 Step 2
-                    Call ReprodOp_Order_Crossover(ParentList(x).Path, ParentList(y).Path, ChildList(i).Path, ChildList(i + 1).Path)
+                    Call ReprodOp_Order_Crossover(ParentList_TSP(x).Path, ParentList_TSP(y).Path, ChildList_TSP(i).Path, ChildList_TSP(i + 1).Path)
                     x += 1
                     y += 1
                     If x = n_Parents - 1 Then x = 0
                     If y = n_Parents - 1 Then y = 0
                 Next i
                 If Even_Number(n_Childs) = False Then
-                    Call ReprodOp_Order_Crossover(ParentList(x).Path, ParentList(y).Path, ChildList(n_Childs - 1).Path, Einzelkind)
+                    Call ReprodOp_Order_Crossover(ParentList_TSP(x).Path, ParentList_TSP(y).Path, ChildList_TSP(n_Childs - 1).Path, Einzelkind)
                 End If
 
             Case "Partially_Mapped_Crossover"
                 x = 0
                 y = 1
                 For i = 0 To n_Childs - 2 Step 2
-                    Call ReprodOp_Part_Mapped_Crossover(ParentList(x).Path, ParentList(y).Path, ChildList(i).Path, ChildList(i + 1).Path)
+                    Call ReprodOp_Part_Mapped_Crossover(ParentList_TSP(x).Path, ParentList_TSP(y).Path, ChildList_TSP(i).Path, ChildList_TSP(i + 1).Path)
                     x += 1
                     y += 1
                     If x = n_Parents - 1 Then x = 0
                     If y = n_Parents - 1 Then y = 0
                 Next i
                 If Even_Number(n_Childs) = False Then
-                    Call ReprodOp_Part_Mapped_Crossover(ParentList(x).Path, ParentList(y).Path, ChildList(n_Childs - 1).Path, Einzelkind)
+                    Call ReprodOp_Part_Mapped_Crossover(ParentList_TSP(x).Path, ParentList_TSP(y).Path, ChildList_TSP(n_Childs - 1).Path, Einzelkind)
                 End If
 
         End Select
@@ -383,17 +383,17 @@ Public Class CES
         Select Case MutOperator
             Case "Inversion"
                 For i = 0 To n_Childs - 1
-                    Call MutOp_Inversion(ChildList(i).Path)
+                    Call MutOp_Inversion(ChildList_TSP(i).Path)
                     'If PathValid(ChildList(i).Path) = False Then MsgBox("Fehler im Path", MsgBoxStyle.Information, "Fehler")
                 Next i
             Case "Translocation"
                 For i = 0 To n_Childs - 1
-                    Call MutOp_Translocation(ChildList(i).Path)
+                    Call MutOp_Translocation(ChildList_TSP(i).Path)
                     'If PathValid(ChildList(i).Path) = False Then MsgBox("Fehler im Path", MsgBoxStyle.Information, "Fehler")
                 Next i
             Case "Transposition"
                 For i = 0 To n_Childs - 1
-                    Call MutOp_Transposition(ChildList(i).Path)
+                    Call MutOp_Transposition(ChildList_TSP(i).Path)
                 Next
         End Select
 
@@ -542,10 +542,10 @@ Public Class CES
     End Function
 
     'Hilfsfunktion zum sortieren der Faksimile
-    Public Sub Sort_Faksimile(ByRef FaksimileList() As Faksimile)
+    Public Sub Sort_Faksimile(ByRef FaksimileList() As Faksimile_TSP)
         'Sortiert die Fiksimile anhand des Abstandes
         Dim i, j As Integer
-        Dim swap As dmevodll.CES.Faksimile
+        Dim swap As dmevodll.CES.Faksimile_TSP
 
         For i = 0 To FaksimileList.GetUpperBound(0)
             For j = 0 To FaksimileList.GetUpperBound(0)
