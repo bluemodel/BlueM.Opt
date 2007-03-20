@@ -39,9 +39,9 @@
     <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="TeeChart, Version=2.0.2469.25744, Culture=neutral, PublicKeyToken=9c8126276c77bdb7">
+    <Reference Include="TeeChart, Version=2.0.2586.24039, Culture=neutral, PublicKeyToken=9c8126276c77bdb7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\EVO_Anwendung\TeeChart.dll</HintPath>
+      <HintPath>..\_Main\TeeChart.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
