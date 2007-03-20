@@ -2,14 +2,14 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "EVO_Kern", "EVO_KERN\EVO_Kern.vbproj", "{58356A07-425E-4C91-ACB8-17B9286C9417}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Anwendung", "EVO_Anwendung\Anwendung.vbproj", "{FF1D5494-1205-4F3E-BD65-ADB8C6BD04D4}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Anwendung", "_Main\Anwendung.vbproj", "{FF1D5494-1205-4F3E-BD65-ADB8C6BD04D4}"
 	ProjectSection(ProjectDependencies) = postProject
 		{64F462D3-9702-4709-9D90-4874A1D9A52B} = {64F462D3-9702-4709-9D90-4874A1D9A52B}
 	EndProjectSection
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "EVO_Form", "EVO_FORM\EVO_Form.vbproj", "{64F462D3-9702-4709-9D90-4874A1D9A52B}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "EVO_BM", "EVO_BM\EVO_BM.vbproj", "{62B1C1E7-26DE-418A-AAEE-102E02A50DF6}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "EVO_BM", "Anwendung\EVO_BM.vbproj", "{62B1C1E7-26DE-418A-AAEE-102E02A50DF6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

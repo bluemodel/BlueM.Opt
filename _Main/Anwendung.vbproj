@@ -103,7 +103,7 @@
       <Lcid>0</Lcid>
       <WrapperTool>primary</WrapperTool>
     </COMReference>
-    <ProjectReference Include="..\EVO_BM\EVO_BM.vbproj">
+    <ProjectReference Include="..\Anwendung\EVO_BM.vbproj">
       <Project>{62B1C1E7-26DE-418A-AAEE-102E02A50DF6}</Project>
       <Name>EVO_BM</Name>
     </ProjectReference>
