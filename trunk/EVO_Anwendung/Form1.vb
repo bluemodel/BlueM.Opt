@@ -1,27 +1,47 @@
 Option Strict Off ' Off ist Default
 Option Explicit On
 Imports System.IO
+
+'*******************************************************************************
+'*******************************************************************************
+'**** ihwb Optimierung                                                      ****
+'****                                                                       ****
+'**** Dirk Muschalla, Christoph Huebner, Felix Froehlich                    ****
+'****                                                                       ****
+'**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
+'**** TU Darmstadt                               Dezember 2006              ****
+'****                                                                       ****
+'**** Dezember 2003                                                         ****
+'****                                                                       ****
+'**** Letzte Änderung: März 2007                                            ****
+'*******************************************************************************
+'*******************************************************************************
+
 Friend Class Form1
 
     '************************************************************************************
-    ' Form1 wird initialisiert bzw. geladen; BM_Form1 und SensiPlot1 werden deklariert  *
+    '****** Form1 wird initialisiert bzw. geladen; weitere Module werden deklariert *****
     '************************************************************************************
 
     Inherits System.Windows.Forms.Form
     Private IsInitializing As Boolean
 
-    Dim Anwendung As String                'zu optimierende Anwendung
+    Private Anwendung As String                'zu optimierende Anwendung
     Private Const ANW_RESETPARA_RUNBM As String = "ResetPara & RunBM"
     Private Const ANW_SENSIPLOT_MODPARA As String = "SensiPlot ModPara"
     Private Const ANW_BLAUESMODELL As String = "Blaues Modell"
+    Private Const ANW_COMBIBM As String = "BM Combinatorics"
     Private Const ANW_TESTPROBLEME As String = "Test-Probleme"
+    Private Const ANW_TSP As String = "TS-Problem"
 
     Private AppIniOK As Boolean = False
 
-    'Deklarationen der Module
+    '**** Deklarationen der Module *****
+    Public TestProb1 As New Testproblem
     Public BM_Form1 As New EVO_BM.BM_Form
     Public SensiPlot1 As New EVO_BM.SensiPlot
     Public Wave1 As New EVO_BM.Wave
+    Public CES1 As New dmevodll.CES
 
     Dim myIsOK As Boolean
     Dim myisrun As Boolean
@@ -40,7 +60,7 @@ Friend Class Form1
         System.Windows.Forms.Application.EnableVisualStyles()
 
         'Liste der Anwendungen in ComboBox schreiben und Anfangseinstellung wählen
-        ComboBox_Anwendung.Items.AddRange(New Object() {ANW_RESETPARA_RUNBM, ANW_SENSIPLOT_MODPARA, ANW_BLAUESMODELL, ANW_TESTPROBLEME})
+        ComboBox_Anwendung.Items.AddRange(New Object() {ANW_RESETPARA_RUNBM, ANW_SENSIPLOT_MODPARA, ANW_BLAUESMODELL, ANW_COMBIBM, ANW_TESTPROBLEME, ANW_TSP})
         ComboBox_Anwendung.SelectedItem = ANW_RESETPARA_RUNBM
         Anwendung = ComboBox_Anwendung.SelectedItem
 
@@ -65,11 +85,11 @@ Friend Class Form1
     End Sub
 
     '************************************************************************************
-    '           Die Anwendung wurde ausgewählt und wird jetzt initialisiert             *
+    '*********** Die Anwendung wurde ausgewählt und wird jetzt initialisiert ************
     '************************************************************************************
 
     'Auswahl der zu optimierenden Anwendung geändert
-    Private Sub IniApp(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_IniApp.Click, ComboBox_Anwendung.SelectedIndexChanged
+    Private Sub IniApp(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_IniApp.Click, ComboBox_Anwendung.SelectedIndexChanged, Combo_Testproblem.SelectedIndexChanged
         If Me.IsInitializing = True Then
             Exit Sub
         Else
@@ -130,15 +150,46 @@ Friend Class Form1
                     ElseIf BM_Form1.OptZieleListe.GetLength(0) > 1 Then
                         EVO_Einstellungen1.OptModus = 1
                     End If
+                    Call Initialisierung_BlauesModell()
+
+                Case ANW_COMBIBM
+                    Dim isOK As Boolean
+                    'Voreinstellungen lesen EVO.INI
+                    Call ReadEVOIni()
+                    'Testprobleme ausschalten
+                    Me.GroupBox_Testproblem.Enabled = False
+                    ''Einlesen OptPara, ModellPara, Zielfunktionen
+                    'Call BM_Form1.OptParameter_einlesen()
+                    'Call BM_Form1.ModellParameter_einlesen()
+                    'Call BM_Form1.OptZiele_einlesen()
+
+                    'Einlesen der CombiOpt Datei
+                    Call BM_Form1.Kombinatorik_einlesen()
+
+                    'Überprüfen der Kombinatorik
+                    'ToDo: Hier Message Box einbauen
+                    isOK = BM_Form1.Kombinatorik_is_Valid
+
+                    'Einlesen der Verbraucher Datei
+                    Call BM_Form1.Verzweigung_Read()
+
+                    ''BM_Form anzeigen
+                    'Normalerweise werden hier die Daten eingelesen
+                    'BM_Form1.ShowDialog()
 
                 Case ANW_TESTPROBLEME
                     'Test-Probleme und Evo aktivieren
                     Me.GroupBox_Testproblem.Enabled = True
                     EVO_Einstellungen1.Enabled = True
+                    Call Testprobleme_Initialisierung()
+
+                Case ANW_TSP
+                    Call CES1.TSP_Initialize(TChart1)
             End Select
         End If
     End Sub
 
+    'Steuerung des Testproblem Forms auf dem Form1
     Private Sub Combo1_SelectedIndexChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Combo_Testproblem.SelectedIndexChanged
         If Me.IsInitializing = True Then
             Exit Sub
@@ -178,12 +229,32 @@ Friend Class Form1
         End If
     End Sub
 
-    '************************************************************************************
-    '     Vorbereitung der meisten Anwendung                                            *
+    '******************** Initialisierung der Anwendung *********************************
     '************************************************************************************
 
-    'EVO.ini Datei einlesen
-    'TODO: ReadEVO.ini müsste hier raus nach BM_FORM und "Read_Model_OptConfig" heißen ***************************
+    '******************* Initialisierung der Testprobleme *******************************
+
+    Private Sub Testprobleme_Initialisierung()
+
+        'BUG: Bug 57: Für alle Testprobleme ReDim mypara(globalAnzPar - 1, 0) ! (wegen Array-Anfang bei 0)
+        'Globale Parameter werden gesetzt
+        Call TestProb1.Parameter_Uebergabe(Combo_Testproblem.Text, Text_Sinusfunktion_Par.Text, Text_Schwefel24_Par.Text, globalAnzPar, globalAnzZiel, globalAnzRand, mypara)
+
+        Select Case Combo_Testproblem.Text
+            Case "Sinus-Funktion"
+                Call TestProb1.TeeChartIni_SinusFunktion(EVO_Einstellungen1, globalAnzPar, Text_Sinusfunktion_Par.Text, TChart1)
+            Case "Beale-Problem" 'x1 = [-5;5], x2=[-2;2]
+                Call TestProb1.TeeChartIni_BealeProblem(EVO_Einstellungen1, globalAnzPar, TChart1)
+            Case "Schwefel 2.4-Problem" 'xi = [-10,10]
+                Call TestProb1.TeeChartIni_SchwefelProblem(EVO_Einstellungen1, globalAnzPar, TChart1)
+            Case Else
+                Call TestProb1.TeeChartIni_MultiTestProb(EVO_Einstellungen1, Combo_Testproblem.Text, TChart1)
+        End Select
+    End Sub
+
+    '*************************** EVO.ini Datei einlesen *********************************
+
+    'TODO: ReadEVO.ini müsste hier raus nach BM_FORM und "Read_Model_OptConfig" heißen **
     Private Sub ReadEVOIni()
         If File.Exists("EVO.ini") Then
             Try
@@ -231,6 +302,9 @@ Friend Class Form1
                         Case "OptZiele"
                             BM_Form1.OptZiele_Pfad = Configs(i, 1)
                             BM_Form1.TextBox_OptZiele_Pfad.Text = BM_Form1.OptZiele_Pfad
+                        Case "CombiOpt"
+                            BM_Form1.Combi_Pfad = Configs(i, 1)
+                            BM_Form1.TextBox_Combi_Pfad.Text = BM_Form1.Combi_Pfad
                         Case Else
                             'nix
                     End Select
@@ -243,8 +317,59 @@ Friend Class Form1
 
     End Sub
 
+    '************************* Initialisierung es BlauenModells *************************
+
+    Private Sub Initialisierung_BlauesModell()
+        Dim i As Integer
+        Dim isMultiObjective As Boolean
+        Dim n_Kalkulationen As Integer
+        Dim n_Populationen As Integer
+
+        isMultiObjective = EVO_Einstellungen1.isMultiObjective
+
+        'Anzahl Optimierungsparameter übergeben
+        '-----------------------------------------------------
+        globalAnzPar = BM_Form1.OptParameterListe.GetLength(0)
+
+        'Parameterwerte übergeben
+        'BUG 57: mypara() fängt bei 1 an!
+        ReDim mypara(globalAnzPar, 1)
+        For i = 1 To globalAnzPar
+            mypara(i, 1) = BM_Form1.OptParameterListe(i - 1).SKWert
+        Next
+
+        'globale Anzahl der Ziele muss hier auf Länge der Zielliste gesetzt werden
+        globalAnzZiel = BM_Form1.OptZieleListe.GetLength(0)
+
+        'TODO: Randbedingungen
+        globalAnzRand = 2
+
+        'Anzahl Kalkulationen
+        'Ob das hier die richtige Stelle ist?
+        If EVO_Einstellungen1.isPOPUL Then
+            n_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden
+        Else
+            n_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
+        End If
+
+        'Anzahl Populationen
+        'Ob das hier die richtige Stelle ist?
+        n_Populationen = 1
+        If EVO_Einstellungen1.isPOPUL Then
+            n_Populationen = EVO_Einstellungen1.NPopul
+        End If
+
+        'Initialisierung der TeeChart Serien je nach SO oder MO
+        If (isMultiObjective) = False Then
+            Call BM_Form1.TeeChartInitialise_SO_BlauesModell(n_Populationen, n_Kalkulationen, TChart1)
+        Else
+            Call BM_Form1.TeeChartInitialise_MO_BlauesModell(TChart1)
+        End If
+
+    End Sub
+
     '************************************************************************************
-    '                          Start BUTTON wurde pressed                               *
+    '************************* Start BUTTON wurde pressed *******************************
     '************************************************************************************
 
     Private Sub Button_Start_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Button_Start.Click
@@ -263,6 +388,8 @@ Friend Class Form1
                 myIsOK = ES_STARTEN()
             Case ANW_TESTPROBLEME
                 myIsOK = ES_STARTEN()
+            Case ANW_TSP
+                myIsOK = TSP_STARTEN()
         End Select
     End Sub
 
@@ -272,14 +399,7 @@ Friend Class Form1
     End Sub
 
 
-    '************************************************************************************
-    '              Anwendung Reset Parameter and RuneOnce Blaues Modell                 *
-    '************************************************************************************
-
-
-
-    '************************************************************************************
-    '              Anwendung SensiPlot; läuft ohne Evolutionsstrategie                  *
+    '           Anwendung SensiPlot - START; läuft ohne Evolutionsstrategie             
     '************************************************************************************
 
     Private Function SensiPlot_STARTEN(ByRef Selected_OptParameter As String, ByRef Selected_OptZiel As String, ByRef Selected_SensiType As String, ByRef Anz_Sim As Integer) As Boolean
@@ -340,7 +460,7 @@ Friend Class Form1
 
         'TODO: Das hier muss neuer TeeChartInitialise_Werden
         'TODO: TeeChart Initialise muss generalisiert werden
-        Call TeeChartInitialise_SensiPlot()
+        Call SensiPlot1.TeeChart_Ini_SensiPlot(TChart1, EVO_Einstellungen1.NPopul, BM_Form1.OptZieleListe(0).Bezeichnung, BM_Form1.OptParameterListe(0).Bezeichnung)
 
         ReDim Wave1.WaveList(Anz_Sim + 1)
         BM_Form1.ReadWEL(BM_Form1.WorkDir & BM_Form1.Datensatz & ".wel", "S201_1ZU", Wave1.WaveList(0).Wave)
@@ -369,7 +489,7 @@ Friend Class Form1
             'End If
 
             BM_Form1.OptZieleListe(0).QWertTmp = BM_Form1.QualitaetsWert_berechnen(0)
-            Call Zielfunktion_zeichnen_MultiObPar_2D(BM_Form1.OptZieleListe(0).QWertTmp, BM_Form1.OptParameterListe(0).Wert)
+            TChart1.Series(0).Add(BM_Form1.OptZieleListe(0).QWertTmp, BM_Form1.OptParameterListe(0).Wert, "")
             'Call BM_Form1.db_update(durchlauf, ipop)
             durchlauf += 1
             System.Windows.Forms.Application.DoEvents()
@@ -388,52 +508,75 @@ Friend Class Form1
         SensiPlot_STARTEN = True
     End Function
 
-    Private Sub TeeChartInitialise_SensiPlot()
-        Dim Populationen As Short
 
-        Populationen = EVO_Einstellungen1.NPopul
-
-        With TChart1
-            .Clear()
-            .Header.Text = "BlauesModell"
-            .Aspect.View3D = False
-            .Legend.Visible = False
-
-            'Formatierung der Axen
-            .Chart.Axes.Bottom.Title.Caption = BM_Form1.OptZieleListe(0).Bezeichnung 'HACK: Beschriftung der Axen
-            .Chart.Axes.Bottom.Automatic = True
-            .Chart.Axes.Left.Title.Caption = BM_Form1.OptParameterListe(0).Bezeichnung 'HACK: Beschriftung der Axen
-            .Chart.Axes.Left.Automatic = True
-
-            'Series(0): Series für die Population.
-            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point1.Title = "Population"
-            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point1.Color = System.Drawing.Color.Orange
-            Point1.Pointer.HorizSize = 2
-            Point1.Pointer.VertSize = 2
-
-            'Series(1): Series für die Sekundäre Population
-            Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point2.Title = "Sekundäre Population"
-            Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point2.Color = System.Drawing.Color.Blue
-            Point2.Pointer.HorizSize = 3
-            Point2.Pointer.VertSize = 3
-
-            'Series(2): Series für Bestwert
-            Dim Point3 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point3.Title = "Bestwerte"
-            Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point3.Color = System.Drawing.Color.Green
-            Point3.Pointer.HorizSize = 3
-            Point3.Pointer.VertSize = 3
-
-        End With
-    End Sub
-
+    '                      Anwendung Traveling Salesman - Start                         
     '************************************************************************************
-    '        Anwendung Testprobleme und Blaues Model mit Evolutionsstrategie            *
+
+    Private Function TSP_STARTEN() As Boolean
+        Dim gen As Integer              'Laufvariable für die Generationen
+
+        'ToDo: nochmal Prüfen wie das mit den Kids REDIMS ist.
+        Call CES1.TeeChart_Initialise_TSP(TChart1)
+
+        'Arrays werden Dimensioniert
+        Call CES1.Dim_Parents()
+        Call CES1.Dim_Childs()
+
+        'Zufällige Kinderpfade werden generiert
+        Call CES1.Generate_Random_Path()
+
+        'Generationsschleife
+        For gen = 1 To CES1.AnzGen
+
+            'Den Kindern werden die Städte Ihres Pfades entsprechend zugewiesen
+            Call CES1.Cities_according_ChildPath()
+
+            'Bestimmung des der Qualität der Kinder
+            Call CES1.Evaluate_child_Quality()
+
+            'Sortieren der Kinden anhand der Qualität
+            Call CES1.Sort_Faksimile(CES1.ChildList_TSP)
+
+            'Selections Prozess (Übergabe der Kinder an die Eltern je nach Strategie)
+            Call CES1.Selection_Process()
+
+            'Zeichnen des besten Elter
+            'TODO: funzt nur, wenn ganz am ende gezeichnet wird
+            If gen = CES1.AnzGen Then
+                Call CES1.TeeChart_Zeichnen_TSP(TChart1, CES1.ParentList_TSP(0).CityList)
+            End If
+
+            'Kinder werden Hier vollständig gelöscht
+            Call CES1.Reset_Childs()
+
+            'Reproductionsoperatoren, hier gehts dezent zur Sache
+            Call CES1.Reproduction_Operations()
+
+            'Mutationsoperatoren
+            Call CES1.Mutation_Operations()
+
+        Next gen
+
+    End Function
+
+    '           Anwendung CombiBM - START; läuft ohne Evolutionsstrategie             
+    '************************************************************************************
+
+    Private Function Combi_BM_STARTEN() As Boolean
+        Dim gen As Integer               'Laufvariable für die Generationen
+
+        'TeeChart initialisieren
+        Call BM_Form1.TeeChartInitialise_SO_BlauesModell(1, gen, TChart1)
+
+        'Arrays werden Dimensioniert
+        Call CES1.Dim_Parents()
+        Call CES1.Dim_Childs()
+
+
+    End Function
+
+
+    '     Anwendung Evolutionsstrategie für Parameter Optimierung - hier Steuerung       
     '************************************************************************************
 
     Private Function ES_STARTEN() As Boolean
@@ -502,163 +645,6 @@ Friend Class Form1
         isInteract = EVO_Einstellungen1.isInteract
         NMemberSecondPop = EVO_Einstellungen1.NMemberSecondPop
 
-
-        If (Anwendung = ANW_TESTPROBLEME) Then
-
-            '*************************************
-            '*          Testprobleme             *
-            '*************************************
-
-            'BUG: Bug 57: Für alle Testprobleme ReDim mypara(globalAnzPar - 1, 0) ! (wegen Array-Anfang bei 0)
-            Select Case Combo_Testproblem.Text
-                Case "Sinus-Funktion"
-                    globalAnzPar = CShort(Text_Sinusfunktion_Par.Text)
-                    globalAnzZiel = 1
-                    globalAnzRand = 0
-                    ReDim mypara(globalAnzPar, 1)
-                    For i = 1 To globalAnzPar
-                        mypara(i, 1) = 0
-                    Next
-                    Call TeeChartInitialise_SO()
-                Case "Beale-Problem" 'x1 = [-5;5], x2=[-2;2]
-                    globalAnzPar = 2
-                    globalAnzZiel = 1
-                    globalAnzRand = 0
-                    ReDim mypara(globalAnzPar, 1)
-                    mypara(1, 1) = 0.5
-                    mypara(2, 1) = 0.5
-                    Call TeeChartInitialise_SO()
-                Case "Schwefel 2.4-Problem" 'xi = [-10,10]
-                    globalAnzPar = CShort(Text_Schwefel24_Par.Text)
-                    globalAnzZiel = 1
-                    globalAnzRand = 0
-                    ReDim mypara(globalAnzPar, 1)
-                    For i = 1 To globalAnzPar
-                        mypara(i, 1) = 1
-                    Next i
-                    Call TeeChartInitialise_SO()
-                Case "Deb 1" 'x1 = [0.1;1], x2=[0;5]
-                    globalAnzPar = 2
-                    globalAnzZiel = 2
-                    globalAnzRand = 0
-                    ReDim mypara(globalAnzPar, 1)
-                    Randomize()
-                    mypara(1, 1) = Rnd()
-                    mypara(2, 1) = Rnd()
-                    Call TeeChartInitialise_MO_MultiTestProb()
-                Case "Zitzler/Deb T1" 'xi = [0,1]
-                    globalAnzPar = 30
-                    globalAnzZiel = 2
-                    globalAnzRand = 0
-                    ReDim mypara(globalAnzPar, 1)
-                    Randomize()
-                    For i = 1 To globalAnzPar
-                        mypara(i, 1) = Rnd()
-                    Next i
-                    Call TeeChartInitialise_MO_MultiTestProb()
-                Case "Zitzler/Deb T2" 'xi = [0,1]
-                    globalAnzPar = 30
-                    globalAnzZiel = 2
-                    globalAnzRand = 0
-                    ReDim mypara(globalAnzPar, 1)
-                    Randomize()
-                    For i = 1 To globalAnzPar
-                        mypara(i, 1) = Rnd()
-                    Next i
-                    Call TeeChartInitialise_MO_MultiTestProb()
-                Case "Zitzler/Deb T3" 'xi = [0,1]
-                    globalAnzPar = 15
-                    globalAnzZiel = 2
-                    globalAnzRand = 0
-                    ReDim mypara(globalAnzPar, 1)
-                    Randomize()
-                    For i = 1 To globalAnzPar
-                        mypara(i, 1) = Rnd()
-                    Next i
-                    Call TeeChartInitialise_MO_MultiTestProb()
-                Case "Zitzler/Deb T4" 'x1 = [0,1], xi=[-5,5]
-                    globalAnzPar = 10
-                    globalAnzZiel = 2
-                    globalAnzRand = 0
-                    ReDim mypara(globalAnzPar, 1)
-                    Randomize()
-                    For i = 1 To globalAnzPar
-                        mypara(i, 1) = Rnd()
-                    Next i
-                    Call TeeChartInitialise_MO_MultiTestProb()
-                Case "CONSTR" 'x1 = [0.1;1], x2=[0;5]
-                    globalAnzPar = 2
-                    globalAnzZiel = 2
-                    globalAnzRand = 2
-                    ReDim mypara(globalAnzPar, 1)
-                    Randomize()
-                    mypara(1, 1) = Rnd()
-                    mypara(2, 1) = Rnd()
-                    Call TeeChartInitialise_MO_MultiTestProb()
-                Case "Box"
-                    globalAnzPar = 3
-                    globalAnzZiel = 3
-                    globalAnzRand = 2
-                    ReDim mypara(globalAnzPar, 1)
-                    Randomize()
-                    mypara(1, 1) = Rnd()
-                    mypara(2, 1) = Rnd()
-                    mypara(3, 1) = Rnd()
-                    Call TeeChartInitialise_MO_3D_Box()
-            End Select
-
-
-        ElseIf (Anwendung = ANW_BLAUESMODELL) Then
-
-            '*******************************
-            '*        BlauesModell         *
-            '*******************************
-
-            'Anzahl Optimierungsparameter übergeben
-            '-----------------------------------------------------
-            globalAnzPar = BM_Form1.OptParameterListe.GetLength(0)
-
-            'Parameterwerte übergeben
-            'BUG 57: mypara() fängt bei 1 an!
-            ReDim mypara(globalAnzPar, 1)
-            For i = 1 To globalAnzPar
-                mypara(i, 1) = BM_Form1.OptParameterListe(i - 1).SKWert
-            Next
-
-            'globale Anzahl der Ziele muss hier auf Länge der Zielliste gesetzt werden
-            globalAnzZiel = BM_Form1.OptZieleListe.GetLength(0)
-
-            'TODO: Randbedingungen
-            globalAnzRand = 2
-
-            'Initialisierung der TeeChart Serien je nach SO oder MO
-            If (isMultiObjective) = False Then
-                Call TeeChartInitialise_SO_BlauesModell()
-            Else
-                Call TeeChartInitialise_MO_BlauesModell()
-            End If
-
-            'HACK: Redim hier erforderlich, wird aber nach der if-Schleife nochmal ausgeführt
-            ReDim QN(globalAnzZiel)
-            ReDim RN(globalAnzRand)
-
-            'Zielfunktion für Anfangswerte berechnen
-            myIsOK = Simulieren(globalAnzPar, mypara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
-
-            'HACK: Zielfunktionen für Min und Max Werte berechnen -----------------------------------
-            Dim minPara(globalAnzPar, 1) As Double
-            Dim maxPara(globalAnzPar, 1) As Double
-            For i = 1 To globalAnzPar
-                minPara(i, 1) = 0
-                maxPara(i, 1) = 1
-            Next
-            myIsOK = Simulieren(globalAnzPar, minPara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
-            myIsOK = Simulieren(globalAnzPar, maxPara, durchlauf, Bestwert, ipop, QN, RN, isPareto)
-            'Ende Hack ------------------------------------------------------------------------------
-
-
-        End If
-
         ReDim QN(globalAnzZiel)
         ReDim RN(globalAnzRand)
 
@@ -684,62 +670,41 @@ Friend Class Form1
             GoTo ErrCode_ES_STARTEN
         End If
 
-        '***************************************************************************************************
         '1. Schritt: CEvolutionsstrategie
-        '***************************************************************************************************
         'Objekt der Klasse CEvolutionsstrategie wird erzeugen
-        '***************************************************************************************************
-        '***************************************************************************************************
+        '******************************************************************************************
         evolutionsstrategie = New dmevodll.CEvolutionsstrategie
 
-        '***************************************************************************************************
         '2. Schritt: CEvolutionsstrategie - ES_INI
-        '***************************************************************************************************
         'Die öffentlichen dynamischen Arrays werden initialisiert (Dn, An, Xn, Xmin, Xmax)
         'und die Anzahl der Zielfunktionen wird festgelegt
-        '***************************************************************************************************
-        '***************************************************************************************************
+        '******************************************************************************************
         isOK = evolutionsstrategie.EsIni(globalAnzPar, globalAnzZiel, globalAnzRand)
 
-        '***************************************************************************************************
         '3. Schritt: CEvolutionsstrategie - ES_OPTIONS
-        '***************************************************************************************************
         'Optionen der Evolutionsstrategie werden übergeben
-        '***************************************************************************************************
-        '***************************************************************************************************
+        '******************************************************************************************
         isOK = evolutionsstrategie.EsOptions(iEvoTyp, iPopEvoTyp, isPOPUL, NRunden, NPopul, NPopEltern, iOptPopEltern, iOptEltern, iPopPenalty, NGen, NEltern, NNachf, NRekombXY, rDeltaStart, iStartPar, isdnvektor, isMultiObjective, isPareto, isPareto3D, Interact, isInteract, NMemberSecondPop)
 
-        '***************************************************************************************************
         '4. Schritt: CEvolutionsstrategie - ES_LET_PARAMETER
-        '***************************************************************************************************
         'Ausgangsparameter werden übergeben
-        '***************************************************************************************************
-        '***************************************************************************************************
+        '******************************************************************************************
         For i = 1 To globalAnzPar
             myIsOK = evolutionsstrategie.EsLetParameter(i, mypara(i, 1))
         Next i
 
-        '***************************************************************************************************
         '5. Schritt: CEvolutionsstrategie - ES_PREPARE
-        '***************************************************************************************************
         'Interne Variablen werden initialisiert, Zufallsgenerator wird initialisiert
-        '***************************************************************************************************
-        '***************************************************************************************************
+        '******************************************************************************************
         myIsOK = evolutionsstrategie.EsPrepare()
 
-        '***************************************************************************************************
         '6. Schritt: CEvolutionsstrategie - ES_STARTVALUES
-        '***************************************************************************************************
         'Startwerte werden zugewiesen
-        '***************************************************************************************************
-        '***************************************************************************************************
+        '******************************************************************************************
         myIsOK = evolutionsstrategie.EsStartvalues()
 
-        '***************************************************************************************************
-        '***************************************************************************************************
         'Startwerte werden der Bedienoberfläche zugewiesen
-        '***************************************************************************************************
-        '***************************************************************************************************
+        '******************************************************************************************
         EVO_Opt_Verlauf1.NRunden = evolutionsstrategie.NRunden
         EVO_Opt_Verlauf1.NPopul = evolutionsstrategie.NPopul
         EVO_Opt_Verlauf1.NGen = evolutionsstrategie.NGen
@@ -751,16 +716,14 @@ Friend Class Form1
 Start_Evolutionsrunden:
         'Cursor setzen
         'System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
-        '***********************************************************************************************
         'Loop über alle Runden
-        '***********************************************************************************************
+        '*******************************************************************************************
         Do While (evolutionsstrategie.EsIsNextRunde)
 
             irunde = evolutionsstrategie.iaktuelleRunde
             Call EVO_Opt_Verlauf1.Runden(irunde)
 
             myIsOK = evolutionsstrategie.EsPopBestwertspeicher()
-            '***********************************************************************************************
             'Loop über alle Populationen
             '***********************************************************************************************
             Do While (evolutionsstrategie.EsIsNextPop)
@@ -774,7 +737,6 @@ Start_Evolutionsrunden:
 
                 durchlauf = NGen * NNachf * (irunde - 1)
 
-                '***********************************************************************************************
                 'Loop über alle Generationen
                 '***********************************************************************************************
                 Do While (evolutionsstrategie.EsIsNextGen)
@@ -783,9 +745,9 @@ Start_Evolutionsrunden:
                     Call EVO_Opt_Verlauf1.Generation(igen)
 
                     myIsOK = evolutionsstrategie.EsBestwertspeicher()
-                    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
                     'Loop über alle Nachkommen
-                    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                    '********************************************************************
                     Do While (evolutionsstrategie.EsIsNextNachf)
 
                         inachf = evolutionsstrategie.iaktuellerNachfahre
@@ -807,17 +769,24 @@ Start_Evolutionsrunden:
                             myIsOK = evolutionsstrategie.EsGetBestwert(Bestwert)
                         End If
 
-                        'Bestimmen der Zielfunktion bzw. Start der Simulation
-                        myIsOK = Simulieren(globalAnzPar, mypara, durchlauf, Bestwert, ipop, QN, RN, evolutionsstrategie.isMultiObjective)
+                        '************************************************************************************
+                        '******************* Ansteuerung der zu optimierenden Anwendung *********************
+                        '************************************************************************************
+                        Select Case Anwendung
+                            Case ANW_TESTPROBLEME
+                                myIsOK = TestProb1.Evaluierung_TestProbleme(Combo_Testproblem.Text, globalAnzPar, mypara, durchlauf, ipop, QN, RN, TChart1)
+                            Case ANW_BLAUESMODELL
+                                myIsOK = BM_Form1.Evaluierung_BlauesModell(globalAnzPar, globalAnzZiel, mypara, durchlauf, ipop, QN, TChart1)
+                        End Select
 
                         'Einordnen der Qualitätsfunktion im Bestwertspeicher
+                        '**************************************************************************
                         myIsOK = evolutionsstrategie.EsBest(QN, RN)
 
                         System.Windows.Forms.Application.DoEvents()
 
-                        '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                         'Ende Loop über alle Nachkommen
-                        '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                        '**************************************************************************
                     Loop
 
 
@@ -834,7 +803,6 @@ Start_Evolutionsrunden:
 
                     System.Windows.Forms.Application.DoEvents()
 
-                    '***********************************************************************************************
                     'Ende Loop über alle Generationen
                     '***********************************************************************************************
                 Loop 'Schleife über alle Generationen
@@ -844,7 +812,6 @@ Start_Evolutionsrunden:
                 'Einordnen der Qualitätsfunktion im PopulationsBestwertspeicher
                 myIsOK = evolutionsstrategie.EsPopBest()
 
-                '***********************************************************************************************
                 'Ende Loop über alle Populationen
                 '***********************************************************************************************
             Loop 'Schleife über alle Populationen
@@ -856,16 +823,12 @@ Start_Evolutionsrunden:
 
             System.Windows.Forms.Application.DoEvents()
 
-            '***********************************************************************************************
             'Ende Loop über alle Runden
             '***********************************************************************************************
         Loop 'Schleife über alle Runden
 
-        '***************************************************************************************************
         'CEvolutionsstrategie, letzter. Schritt
-        '***************************************************************************************************
         'Objekt der Klasse CEvolutionsstrategie wird vernichtet
-        '***************************************************************************************************
         '***************************************************************************************************
         'UPGRADE_NOTE: Das Objekt evolutionsstrategie kann erst dann gelöscht werden, wenn die Garbagecollection durchgeführt wurde. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1029"'
         'TODO: Ersetzen durch dispose funzt net
@@ -887,742 +850,10 @@ ErrCode_ES_STARTEN:
         GoTo EXIT_ES_STARTEN
     End Function
 
-    '
-    Private Function Simulieren(ByRef AnzPar As Short, ByRef Par(,) As Double, ByRef durchlauf As Integer, ByRef Bestwert(,) As Double, ByRef ipop As Short, ByRef QN() As Double, ByRef RN() As Double, ByVal isPareto As Boolean) As Boolean
-        Dim i As Short
-        Dim Unterteilung_X As Double
-        Dim x1, x2 As Double
-        Dim X() As Double
-        Dim f2, f1, f3 As Double
-        Dim g1, g2 As Double
-
-        If (Anwendung = ANW_TESTPROBLEME) Then
-
-            '*************************************
-            '*          Testprobleme             *
-            '*************************************
-
-            Select Case Combo_Testproblem.Text
-                '**************************************
-                '* Single-Objective Problemstellungen *
-                '**************************************
-                Case "Sinus-Funktion" 'Fehlerquadrate zur Sinusfunktion |0-2pi|
-                    Unterteilung_X = 2 * 3.1415926535898 / (AnzPar - 1)
-                    QN(1) = 0
-                    For i = 1 To AnzPar
-                        QN(1) = QN(1) + (System.Math.Sin((i - 1) * Unterteilung_X) - (-1 + (Par(i, 1) * 2))) * (System.Math.Sin((i - 1) * Unterteilung_X) - (-1 + Par(i, 1) * 2))
-                    Next i
-                    Call Zielfunktion_zeichnen_Sinus(AnzPar, Par, durchlauf, ipop)
-                Case "Beale-Problem" 'Beale-Problem
-                    x1 = -5 + (Par(1, 1) * 10)
-                    x2 = -2 + (Par(2, 1) * 4)
-
-                    QN(1) = (1.5 - x1 * (1 - x2)) ^ 2 + (2.25 - x1 * (1 - x2) ^ 2) ^ 2 + (2.625 - x1 * (1 - x2) ^ 3) ^ 2
-                    Call Zielfunktion_zeichnen_SingleOb(QN(1), durchlauf, ipop)
-                Case "Schwefel 2.4-Problem" 'Schwefel 2.4 S. 329
-                    ReDim X(globalAnzPar)
-                    For i = 1 To globalAnzPar
-                        X(i) = -10 + Par(i, 1) * 20
-                    Next i
-                    QN(1) = 0
-                    For i = 1 To globalAnzPar
-                        QN(1) = QN(1) + ((X(1) - X(i) ^ 2) ^ 2 + (X(i) - 1) ^ 2)
-                    Next i
-                    Call Zielfunktion_zeichnen_SingleOb(QN(1), durchlauf, ipop)
-                    '*************************************
-                    '* Multi-Objective Problemstellungen *
-                    '*************************************
-                    'Deb 2000, D1 (Konvexe Pareto-Front)
-                Case "Deb 1"
-                    f1 = Par(1, 1) * (9 / 10) + 0.1
-                    f2 = (1 + 5 * Par(2, 1)) / (Par(1, 1) * (9 / 10) + 0.1)
-                    QN(1) = f1
-                    QN(2) = f2
-                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2)
-
-                    'Zitzler/Deb/Thiele 2000, T1 (Konvexe Pareto-Front)
-                Case "Zitzler/Deb T1"
-                    f1 = Par(1, 1)
-                    f2 = 0
-                    For i = 2 To globalAnzPar
-                        f2 = f2 + Par(i, 1)
-                    Next i
-                    f2 = 1 + 9 / (globalAnzPar - 1) * f2
-                    f2 = f2 * (1 - System.Math.Sqrt(f1 / f2))
-                    QN(1) = f1
-                    QN(2) = f2
-                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2)
-
-                    'Zitzler/Deb/Thiele 2000, T2 (Non-Konvexe Pareto-Front)
-                Case "Zitzler/Deb T2"
-                    f1 = Par(1, 1)
-                    f2 = 0
-                    For i = 2 To globalAnzPar
-                        f2 = f2 + Par(i, 1)
-                    Next i
-                    f2 = 1 + 9 / (globalAnzPar - 1) * f2
-                    f2 = f2 * (1 - (f1 / f2) * (f1 / f2))
-                    QN(1) = f1
-                    QN(2) = f2
-                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2)
-
-                    'Zitzler/Deb/Thiele 2000, T3 (disconected Pareto-Front)
-                Case "Zitzler/Deb T3"
-                    f1 = Par(1, 1)
-                    f2 = 0
-                    For i = 2 To globalAnzPar
-                        f2 = f2 + Par(i, 1)
-                    Next i
-                    f2 = 1 + 9 / (globalAnzPar - 1) * f2
-                    f2 = f2 * (1 - System.Math.Sqrt(f1 / f2) - (f1 / f2) * System.Math.Sin(10 * 3.14159265358979 * f1))
-                    QN(1) = f1
-                    QN(2) = f2
-                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2)
-
-                    'Zitzler/Deb/Thiele 2000, T4 (local/global Pareto-Fronts)
-                Case "Zitzler/Deb T4"
-                    f1 = Par(1, 1)
-                    f2 = 0
-                    For i = 2 To globalAnzPar
-                        x2 = -5 + (Par(i, 1) * 10)
-                        f2 = f2 + (x2 * x2 - 10 * System.Math.Cos(4 * 3.14159265358979 * x2))
-                    Next i
-                    f2 = 1 + 10 * (globalAnzPar - 1) + f2
-                    f2 = f2 * (1 - System.Math.Sqrt(f1 / f2))
-                    QN(1) = f1
-                    QN(2) = f2
-                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2)
-
-                Case "CONSTR"
-                    f1 = Par(1, 1) * (9 / 10) + 0.1
-                    f2 = (1 + 5 * Par(2, 1)) / (Par(1, 1) * (9 / 10) + 0.1)
-
-                    g1 = (5 * Par(2, 1)) + 9 * (Par(1, 1) * (9 / 10) + 0.1) - 6
-                    g2 = (-1) * (5 * Par(2, 1)) + 9 * (Par(1, 1) * (9 / 10) + 0.1) - 1
-
-                    QN(1) = f1
-                    QN(2) = f2
-                    RN(1) = g1
-                    RN(2) = g2
-                    Call Zielfunktion_zeichnen_MultiObPar_2D(f1, f2)
-
-                Case "Box"
-                    f1 = Par(1, 1) ^ 2
-                    f2 = Par(2, 1) ^ 2
-                    f3 = Par(3, 1) ^ 2
-                    g1 = Par(1, 1) + Par(3, 1) - 0.5
-                    g2 = Par(1, 1) + Par(2, 1) + Par(3, 1) - 0.8
-
-                    '                f1 = 1 + (1 - Par(1, 1)) ^ 5
-                    '                f2 = Par(2, 1)
-                    '                f3 = Par(3, 1)
-                    '
-                    '                g1 = Par(1, 1) ^ 2 + Par(3, 1) ^ 2 - 0.5
-                    '                g2 = Par(2, 1) ^ 2 + Par(3, 1) ^ 2 - 0.5
-
-                    QN(1) = f1
-                    QN(2) = f2
-                    QN(3) = f3
-                    RN(1) = g1
-                    RN(2) = g2
-                    Call Zielfunktion_zeichnen_MultiObPar_3D(f1, f2, f3)
-            End Select
-
-        ElseIf (Anwendung = ANW_BLAUESMODELL) Then
-
-            '*************************************
-            '*          Blaues Modell            *
-            '*************************************
-
-            'Mutierte Parameter an OptParameter übergeben
-            For i = 1 To AnzPar 'BUG 57: Par(,) fängt bei 1 an!
-                BM_Form1.OptParameterListe(i - 1).SKWert = Par(i, 1)     'OptParameterListe(i-1,*) weil Array bei 0 anfängt!
-            Next
-
-            'Mutierte Parameter in Eingabedateien schreiben
-            Call BM_Form1.ModellParameter_schreiben()
-
-            'Modell Starten
-            Call BM_Form1.launchBM()
-
-            'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
-            'BUG 57: QN() fängt bei 1 an!
-            For i = 0 To globalAnzZiel - 1
-                BM_Form1.OptZieleListe(i).QWertTmp = BM_Form1.QualitaetsWert_berechnen(i)
-                QN(i + 1) = BM_Form1.OptZieleListe(i).QWertTmp
-            Next
-
-            'Qualitätswerte im TeeChart zeichnen
-            Select Case globalAnzZiel
-                Case 1
-                    Call Zielfunktion_zeichnen_SingleOb(BM_Form1.OptZieleListe(0).QWertTmp, durchlauf, ipop)
-                Case 2
-                    Call Zielfunktion_zeichnen_MultiObPar_2D(BM_Form1.OptZieleListe(0).QWertTmp, BM_Form1.OptZieleListe(1).QWertTmp)
-                Case 3
-                    'TODO MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
-                    Call Zielfunktion_zeichnen_MultiObPar_3D(BM_Form1.OptZieleListe(0).QWertTmp, BM_Form1.OptZieleListe(1).QWertTmp, BM_Form1.OptZieleListe(2).QWertTmp)
-                Case Else
-                    'TODO MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
-                    'TODO: Call Zielfunktion_zeichnen_MultiObPar_XD()
-            End Select
-
-            'Qualitätswerte und OptParameter in DB speichern
-            Call BM_Form1.db_update(durchlauf, ipop)
-
-        End If
-    End Function
-
-    'Alle Series für TeeChart werden initialisiert
-    'Teilweise werden die Ziel bzw. Ausgangslinien berechnet und gezeichnet
-    Private Sub TeeChartInitialise_SO()
-        Dim Ausgangsergebnis As Double
-        Dim Anzahl_Kalkulationen As Integer
-        Dim Populationen As Short
-        Dim i As Short
-        Dim Datenmenge As Short
-        Dim Unterteilung_X As Double
-        Dim OptErg() As Double
-        Dim X() As Double
-
-        If EVO_Einstellungen1.isPOPUL Then
-            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden
-        Else
-            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
-        End If
-
-        'Ausgengsergebnisse für die Linien im TeeChart Rechnen
-        Select Case Combo_Testproblem.Text
-            Case "Sinus-Funktion"
-                Datenmenge = CShort(Text_Sinusfunktion_Par.Text)
-                Unterteilung_X = 2 * 3.141592654 / (Datenmenge - 1)
-
-            Case "Beale-Problem"
-                ReDim OptErg(Anzahl_Kalkulationen)
-                Ausgangsergebnis = (1.5 - 0.5 * (1 - 0.5)) ^ 2 + (2.25 - 0.5 * (1 - 0.5) ^ 2) ^ 2 + (2.625 - 0.5 * (1 - 0.5) ^ 3) ^ 2
-            Case "Schwefel 2.4-Problem"
-                ReDim X(globalAnzPar)
-                For i = 1 To globalAnzPar
-                    X(i) = 10
-                Next i
-                Ausgangsergebnis = 0
-                For i = 1 To globalAnzPar
-                    Ausgangsergebnis = Ausgangsergebnis + ((X(1) - X(i) ^ 2) ^ 2 + (X(i) - 1) ^ 2)
-                Next i
-        End Select
-
-        'Linien für die Ausgangsergebnisse im TeeChart zeichnen
-        Select Case Combo_Testproblem.Text
-            Case "Sinus-Funktion"
-                ReDim array_x(Datenmenge - 1)
-                ReDim array_y(Datenmenge - 1)
-
-                For i = 0 To Datenmenge - 1
-                    array_x(i) = System.Math.Round((i) * Unterteilung_X, 2)
-                    array_y(i) = System.Math.Sin((i) * Unterteilung_X)
-                Next i
-            Case "Beale-Problem", "Schwefel 2.4-Problem"
-                ReDim array_y(Anzahl_Kalkulationen - 1)
-                ReDim array_x(Anzahl_Kalkulationen - 1)
-                For i = 0 To Anzahl_Kalkulationen - 1
-                    array_y(i) = Ausgangsergebnis
-                    array_x(i) = i + 1
-                Next i
-        End Select
-
-        'TeeChart Einrichten und Series generieren
-        With TChart1
-            .Clear()
-            .Header.Text = Combo_Testproblem.Text
-            .Chart.Axes.Left.Title.Caption = "Funktionswert"
-            .Chart.Axes.Bottom.Title.Caption = "Berechnungsschritt"
-            .Aspect.View3D = False
-            .Legend.Visible = False
-
-            'S0: Die Ausgangs- oder Ziellinien
-            Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-            Line1.Title = "Ausgangs-/Ziellinie"
-            Line1.Add(array_x, array_y)
-            Line1.Brush.Color = System.Drawing.Color.Red
-            Line1.ClickableLine = True
-
-            'S1: Generieren der Series für die Populationen
-            Populationen = 1
-            If EVO_Einstellungen1.isPOPUL Then
-                Populationen = EVO_Einstellungen1.NPopul
-            End If
-            For i = 1 To Populationen
-                Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
-                Point1.Title = "Population " & i.ToString()
-                Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-                Point1.Pointer.HorizSize = 3
-                Point1.Pointer.VertSize = 3
-            Next
-
-            'Axen Formatieren für Beale und Deb
-            .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Maximum = Anzahl_Kalkulationen
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Left.Automatic = False
-            .Chart.Axes.Left.Maximum = Ausgangsergebnis * 1.3
-            .Chart.Axes.Left.Minimum = 0
-            .Chart.Axes.Left.Logarithmic = False
-
-            'Spezialformatierung für Sinuskurve
-            If Combo_Testproblem.Text = "Sinus-Funktion" Then
-                .Chart.Axes.Bottom.Automatic = True
-                .Chart.Axes.Left.Automatic = False
-                .Chart.Axes.Left.Minimum = -1
-                .Chart.Axes.Left.Maximum = 1
-                .Chart.Axes.Left.Increment = 0.2
-            End If
-        End With
-    End Sub
-
-    Private Sub TeeChartInitialise_MO_MultiTestProb()
-        Dim Populationen As Short
-        Dim i, j As Short
-
-        Populationen = EVO_Einstellungen1.NPopul
-
-        With TChart1
-            .Clear()
-            .Aspect.View3D = False
-            .Legend.Visible = False
-            .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Maximum = 1
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Bottom.Increment = 0.1
-            .Chart.Axes.Left.Automatic = False
-            .Chart.Axes.Left.Maximum = 10
-            .Chart.Axes.Left.Minimum = 0
-            .Chart.Axes.Left.Increment = 2
-
-            'S0: Series für die Population.
-            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point1.Title = "Population"
-            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point1.Color = System.Drawing.Color.Orange
-            Point1.Pointer.HorizSize = 2
-            Point1.Pointer.VertSize = 2
-
-            'S1: Series für die Sekundäre Population
-            Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point2.Title = "Sekundäre Population"
-            Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point2.Color = System.Drawing.Color.Blue
-            Point2.Pointer.HorizSize = 3
-            Point2.Pointer.VertSize = 3
-
-            'S2: Series für Bestwert
-            Dim Point3 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point3.Title = "Bestwerte"
-            Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point3.Color = System.Drawing.Color.Green
-            Point3.Pointer.HorizSize = 3
-            Point3.Pointer.VertSize = 3
-
-            Select Case Combo_Testproblem.Text
-
-                Case "Deb 1"
-                    'TODO: Titel der Serien (für Export)
-                    Dim Array1X(100) As Double
-                    Dim Array1Y(100) As Double
-                    Dim Array2X(100) As Double
-                    Dim Array2Y(100) As Double
-                    .Header.Text = "Deb D1 - MO-konvex"
-
-                    'S3: Linie 1 wird errechnet und gezeichnet
-                    For j = 0 To 100
-                        Array1X(j) = 0.1 + j * 0.009
-                        Array1Y(j) = 1 / Array1X(j)
-                    Next j
-                    Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-                    Line1.Brush.Color = System.Drawing.Color.Green
-                    Line1.ClickableLine = True
-                    .Series(3).Add(Array1X, Array1Y)
-
-                    'S4: Linie 2 wird errechnet und gezeichnet
-                    For j = 0 To 100
-                        Array2X(j) = 0.1 + j * 0.009
-                        Array2Y(j) = (1 + 5) / Array2X(j)
-                    Next j
-                    Dim Line2 As New Steema.TeeChart.Styles.Line(.Chart)
-                    Line2.Brush.Color = System.Drawing.Color.Red
-                    Line2.ClickableLine = True
-                    .Series(4).Add(Array2X, Array2Y)
-
-                Case "Zitzler/Deb T1"
-                    'TODO: Titel der Serien (für Export)
-                    Dim ArrayX(1000) As Double
-                    Dim ArrayY(1000) As Double
-                    .Header.Text = "Zitzler/Deb/Theile T1"
-                    .Chart.Axes.Left.Maximum = 7
-                    .Chart.Axes.Left.Increment = 0.5
-
-                    'S3: Serie für die Grenze
-                    For j = 0 To 1000
-                        ArrayX(j) = j / 1000
-                        ArrayY(j) = 1 - System.Math.Sqrt(ArrayX(j))
-                    Next j
-                    Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-                    Line1.Brush.Color = System.Drawing.Color.Green
-                    Line1.ClickableLine = True
-                    .Series(3).Add(ArrayX, ArrayY)
-
-                Case "Zitzler/Deb T2"
-                    'TODO: Titel der Serien (für Export)
-                    Dim ArrayX(100) As Double
-                    Dim ArrayY(100) As Double
-                    .Header.Text = "Zitzler/Deb/Theile T2"
-                    .Chart.Axes.Left.Maximum = 7
-
-                    'S3: Serie für die Grenze
-                    For j = 0 To 100
-                        ArrayX(j) = j / 100
-                        ArrayY(j) = 1 - (ArrayX(j) * ArrayX(j))
-                    Next j
-                    Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-                    Line1.Brush.Color = System.Drawing.Color.Green
-                    Line1.ClickableLine = True
-                    .Series(3).Add(ArrayX, ArrayY)
-
-                Case "Zitzler/Deb T3"
-                    'TODO: Titel der Serien (für Export)
-                    Dim ArrayX(100) As Double
-                    Dim ArrayY(100) As Double
-                    .Header.Text = "Zitzler/Deb/Theile T3"
-                    .Chart.Axes.Bottom.Increment = 0.2
-                    .Chart.Axes.Left.Maximum = 7
-                    .Chart.Axes.Left.Minimum = -1
-                    .Chart.Axes.Left.Increment = 0.5
-
-                    'S3: Serie für die Grenze
-                    For j = 0 To 100
-                        ArrayX(j) = j / 100
-                        ArrayY(j) = 1 - System.Math.Sqrt(ArrayX(j)) - ArrayX(j) * System.Math.Sin(10 * 3.14159265358979 * ArrayX(j))
-                    Next j
-                    Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-                    Line1.Brush.Color = System.Drawing.Color.Green
-                    Line1.ClickableLine = True
-                    .Series(3).Add(ArrayX, ArrayY)
-
-                Case "Zitzler/Deb T4"
-                    'TODO: Titel der Serien (für Export)
-                    Dim ArrayX(1000) As Double
-                    Dim ArrayY(1000) As Double
-                    .Header.Text = "Zitzler/Deb/Theile T4"
-                    .Chart.Axes.Bottom.Automatic = True
-                    .Chart.Axes.Left.Automatic = True
-
-                    'S3 bis S13: Serie für die Grenze
-                    'Sieht nach einer schwachsinnigen Berechnung für ArrayY aus
-                    For i = 1 To 10
-                        Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-                        Line1.Brush.Color = System.Drawing.Color.Green
-                        Line1.ClickableLine = True
-                        For j = 0 To 1000
-                            ArrayX(j) = j / 1000
-                            ArrayY(j) = (1 + (i - 1) / 4) * (1 - System.Math.Sqrt(ArrayX(j) / (1 + (i - 1) / 4)))
-                        Next
-                        .Series(2 + i).Add(ArrayX, ArrayY)
-                    Next
-
-                    ''Original Code
-                    'For i = 1 To 10
-                    '    .AddSeries(TeeChart.ESeriesClass.scLine)
-                    '    .Series(Populationen + i).asLine.LinePen.Width = 2
-                    '    .Series(Populationen + i).Color = System.Convert.ToUInt32(System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Blue))
-                    '    For j = 0 To 1000
-                    '        ArrayX(j) = j / 1000
-                    '        ArrayY(j) = (1 + (i - 1) / 4) * (1 - System.Math.Sqrt(ArrayX(j) / (1 + (i - 1) / 4)))
-                    '    Next j
-                    '    .Series(Populationen + i).AddArray(1000, ArrayY, ArrayX)
-                    'Next i
-                Case "CONSTR"
-                    'TODO: Titel der Serien (für Export)
-                    Dim Array1X(100) As Double
-                    Dim Array1Y(100) As Double
-                    Dim Array2X(100) As Double
-                    Dim Array2Y(100) As Double
-                    Dim Array3X(61) As Double
-                    Dim Array3Y(61) As Double
-                    Dim Array4X(61) As Double
-                    Dim Array4Y(61) As Double
-                    .Header.Text = "CONSTR"
-                    'S3: Serie für die Grenze 1
-                    For j = 0 To 100
-                        Array1X(j) = 0.1 + j * 0.009
-                        Array1Y(j) = 1 / Array1X(j)
-                    Next j
-                    Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-                    Line1.Brush.Color = System.Drawing.Color.Red
-                    Line1.ClickableLine = True
-                    .Series(3).Add(Array1X, Array1Y)
-
-                    'S4: Serie für die Grenze 2
-                    For j = 0 To 100
-                        Array2X(j) = 0.1 + j * 0.009
-                        Array2Y(j) = (1 + 5) / Array2X(j)
-                    Next j
-                    Dim Line2 As New Steema.TeeChart.Styles.Line(.Chart)
-                    Line2.Brush.Color = System.Drawing.Color.Red
-                    Line2.ClickableLine = True
-                    .Series(4).Add(Array2X, Array2Y)
-
-                    'S5: Serie für die Grenze 3
-                    ReDim Array3X(61)
-                    ReDim Array3Y(61)
-                    For j = 0 To 61
-                        Array3X(j) = 0.1 + (j + 2) * 0.009
-                        Array3Y(j) = (7 - 9 * Array3X(j)) / Array3X(j)
-                    Next j
-                    Dim Line3 As New Steema.TeeChart.Styles.Line(.Chart)
-                    Line3.Brush.Color = System.Drawing.Color.Blue
-                    Line3.ClickableLine = True
-                    .Series(5).Add(Array3X, Array3Y)
-
-                    'S6: Serie für die Grenze 4
-                    ReDim Array4X(61)
-                    ReDim Array4Y(61)
-                    For j = 0 To 61
-                        Array4X(j) = 0.1 + (j + 2) * 0.009
-                        Array4Y(j) = (9 * Array4X(j)) / Array4X(j)
-                    Next j
-                    Dim Line4 As New Steema.TeeChart.Styles.Line(.Chart)
-                    Line4.Brush.Color = System.Drawing.Color.Red
-                    Line4.ClickableLine = True
-                    .Series(6).Add(Array4X, Array4Y)
-            End Select
-        End With
-    End Sub
-
-    Private Sub TeeChartInitialise_MO_3D_Box()
-        'TODO: Zeichnen muss auf 3D erweitert werden. Hier 3D Testproblem.
-        Dim Populationen As Short
-        Dim ArrayX(100) As Double
-        Dim ArrayY(100) As Double
-
-        If EVO_Einstellungen1.isPOPUL Then
-            Populationen = EVO_Einstellungen1.NPopul
-        Else
-            Populationen = 1
-        End If
-
-        With TChart1
-            .Clear()
-            .Header.Text = "Box"
-            .Aspect.View3D = True
-            .Aspect.Chart3DPercent = 100
-            .Legend.Visible = False
-            .Chart.Aspect.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality
-            .Chart.Axes.Bottom.Automatic = True
-            .Chart.Axes.Bottom.Visible = True
-            .Chart.Aspect.Zoom = 86
-            '.Chart.Axes.Bottom.Maximum = 1
-            '.Chart.Axes.Bottom.Minimum = 0
-            '.Chart.Axes.Bottom.Increment = 0.2
-            .Chart.Axes.Left.Automatic = True
-            .Chart.Axes.Left.Visible = True
-            '.Chart.Axes.Left.Maximum = 1
-            '.Chart.Axes.Left.Minimum = 0
-            '.Chart.Axes.Left.Increment = 0.2
-            .Chart.Axes.Depth.Automatic = True
-            .Chart.Axes.Depth.Visible = True
-            '.Chart.Axes.Depth.Maximum = 1
-            '.Chart.Axes.Depth.Minimum = 0
-            '.Chart.Axes.Depth.Increment = 0.2
-            '---------------------------------------------------------------
-            'SO: Series für die Population
-            Dim Point3D_0 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point3D_0.Title = "Population"
-            Point3D_0.FillSampleValues(100)
-            Point3D_0.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point3D_0.LinePen.Visible = False
-            Point3D_0.Pointer.HorizSize = 1
-            Point3D_0.Pointer.VertSize = 1
-
-            'S1: Series für die Sekundäre Population
-            Dim Point3D_1 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point3D_1.Title = "Sekundäre Population"
-            Point3D_1.FillSampleValues(100)
-            Point3D_1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point3D_1.LinePen.Visible = False
-            Point3D_1.Pointer.HorizSize = 1
-            Point3D_1.Pointer.VertSize = 1
-
-            '.AddSeries(TeeChart.ESeriesClass.scPoint3D)
-            '.Series(0).asPoint3D.Pointer.Style = TeeChart.EPointerStyle.psCircle
-            '.Series(0).asPoint3D.LinePen.Visible = False
-            '.Series(0).asPoint3D.Pointer.HorizontalSize = 1
-            '.Series(0).asPoint3D.Pointer.VerticalSize = 1
-
-
-            'For i = 1 To Populationen
-            '    .AddSeries(TeeChart.ESeriesClass.scPoint3D)
-            '    .Series(i).asPoint3D.Pointer.Style = TeeChart.EPointerStyle.psCircle
-            '    .Series(i).asPoint3D.LinePen.Visible = False
-            '    .Series(i).asPoint3D.Pointer.HorizontalSize = 3
-            '    .Series(i).asPoint3D.Pointer.VerticalSize = 3
-            'Next i
-
-            '.AddSeries(TeeChart.ESeriesClass.scPoint3D)
-            '.AddSeries(TeeChart.ESeriesClass.scPoint3D)
-            '.Series(Populationen + 2).asPoint3D.Pointer.Style = TeeChart.EPointerStyle.psCircle
-            '.Series(Populationen + 2).asPoint3D.LinePen.Visible = False
-            '.Series(Populationen + 2).asPoint3D.Pointer.HorizontalSize = 2
-            '.Series(Populationen + 2).asPoint3D.Pointer.VerticalSize = 2
-            '.Series(Populationen + 2).Color = System.Convert.ToUInt32(System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Red))
-        End With
-    End Sub
-
-    Private Sub TeeChartInitialise_SO_BlauesModell()
-        Dim Anzahl_Kalkulationen As Integer
-        Dim Populationen As Short
-        Dim i As Short
-
-        If EVO_Einstellungen1.isPOPUL Then
-            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden
-        Else
-            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
-        End If
-
-        With TChart1
-            .Clear()
-            .Header.Text = "BlauesModell"
-            .Aspect.View3D = False
-            .Legend.Visible = False
-
-            'Series(0): Anfangswert
-            Dim Point0 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point0.Title = "Anfangswert"
-            Point0.Color = System.Drawing.Color.Red
-            Point0.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point0.Pointer.HorizSize = 3
-            Point0.Pointer.VertSize = 3
-
-            'Anzahl Populationen
-            Populationen = 1
-            If EVO_Einstellungen1.isPOPUL Then
-                Populationen = EVO_Einstellungen1.NPopul
-            End If
-
-            'Series(1 bis n): Für jede Population eine Series 'TODO: es würde auch eine Series für alle reichen!
-            For i = 0 To Populationen
-                Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
-                Point1.Title = "Population " & i.ToString()
-                Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-                Point1.Pointer.HorizSize = 3
-                Point1.Pointer.VertSize = 3
-            Next i
-
-            'Formatierung der Axen
-            .Chart.Axes.Bottom.Title.Caption = "Simulation"
-            .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Maximum = Anzahl_Kalkulationen
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Left.Title.Caption = BM_Form1.OptZieleListe(0).Bezeichnung
-            .Chart.Axes.Left.Automatic = True
-            .Chart.Axes.Left.Minimum = 0
-        End With
-    End Sub
-
-    Private Sub TeeChartInitialise_MO_BlauesModell()
-        Dim Populationen As Short
-
-        Populationen = EVO_Einstellungen1.NPopul
-
-        With TChart1
-            .Clear()
-            .Header.Text = "BlauesModell"
-            .Aspect.View3D = False
-            .Legend.Visible = False
-
-            'Formatierung der Axen
-            .Chart.Axes.Bottom.Title.Caption = BM_Form1.OptZieleListe(0).Bezeichnung 'HACK: Beschriftung der Axen
-            .Chart.Axes.Bottom.Automatic = True
-            .Chart.Axes.Left.Title.Caption = BM_Form1.OptZieleListe(1).Bezeichnung 'HACK: Beschriftung der Axen
-            .Chart.Axes.Left.Automatic = True
-
-            'Series(0): Series für die Population.
-            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point1.Title = "Population"
-            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point1.Color = System.Drawing.Color.Orange
-            Point1.Pointer.HorizSize = 2
-            Point1.Pointer.VertSize = 2
-
-            'Series(1): Series für die Sekundäre Population
-            Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point2.Title = "Sekundäre Population"
-            Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point2.Color = System.Drawing.Color.Blue
-            Point2.Pointer.HorizSize = 3
-            Point2.Pointer.VertSize = 3
-
-            'Series(2): Series für Bestwert
-            Dim Point3 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point3.Title = "Bestwerte"
-            Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point3.Color = System.Drawing.Color.Green
-            Point3.Pointer.HorizSize = 3
-            Point3.Pointer.VertSize = 3
-
-        End With
-    End Sub
 
     '************************************************************************************
     '                          Zeichenfunktionen                                        *
     '************************************************************************************
-
-    Private Sub Zielfunktion_zeichnen_Sinus(ByRef AnzPar As Short, ByRef Par(,) As Double, ByRef durchlauf As Integer, ByRef ipop As Short)
-        Dim i As Short
-        Dim Unterteilung_X As Double
-
-        Unterteilung_X = 2 * 3.141592654 / (AnzPar - 1)
-        ReDim array_x(AnzPar - 1)
-        ReDim array_y(AnzPar - 1)
-        For i = 0 To AnzPar - 1
-            array_x(i) = System.Math.Round((i) * Unterteilung_X, 2)
-            array_y(i) = (-1 + Par(i + 1, 1) * 2)
-        Next i
-
-        With TChart1
-            .Series(ipop).Clear()
-            .Series(ipop).Add(array_x, array_y)
-        End With
-    End Sub
-
-    Private Sub Zielfunktion_zeichnen_SingleOb(ByRef Wert As Double, ByRef durchlauf As Integer, ByRef ipop As Short)
-
-        TChart1.Series(ipop).Add(durchlauf, Wert)
-
-    End Sub
-
-    Private Sub Zielfunktion_zeichnen_MultiObPar_2D(ByRef f1 As Double, ByRef f2 As Double)
-
-        TChart1.Series(0).Add(f1, f2, "")
-
-    End Sub
-
-    Private Sub Zielfunktion_zeichnen_MultiObPar_3D(ByRef f1 As Double, ByRef f2 As Double, ByRef f3 As Double)
-
-        'TODO: Hier muss eine 3D-Reihe angezeigt werden
-
-        'TChart1.Series(0).Add(f1, f2, "", f3)
-        'TChart1.Series(0).FillSampleValues(100)
-        'Steema.TeeChart.
-        'Point3D_0.FillSampleValues()
-        'Point3D_1.FillSampleValues()
-        TChart1.Series(0).FillSampleValues()
-        TChart1.Series(1).FillSampleValues()
-
-    End Sub
-
-    Private Sub Zielfunktion_zeichnen_MultiObPar_XD()
-
-        'TODO: Projektion der XD Information auf 2D
-
-    End Sub
 
     Private Sub Bestwertzeichnen_Pareto(ByRef Bestwert(,) As Double, ByRef ipop As Short)
         Dim i As Short
@@ -1674,8 +905,8 @@ ErrCode_ES_STARTEN:
         End If
     End Sub
 
-    'TChart Funktionen:
-    '------------------
+    '******************************** TChart Funktionen *******************************************
+    '**********************************************************************************************
 
     'Chart bearbeiten
     Private Sub TChartEdit(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_TChartEdit.Click

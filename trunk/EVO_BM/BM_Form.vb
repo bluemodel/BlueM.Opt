@@ -1,6 +1,27 @@
 Imports System.IO
 Imports System.Data.OleDb
+
+'*******************************************************************************
+'*******************************************************************************
+'**** Klasse BM_Form                                                        ****
+'****                                                                       ****
+'**** Funktionen zur Kontrolle des BlauenModells                            ****
+'****                                                                       ****
+'**** Christoph Huebner, Felix Froehlich                                    ****
+'****                                                                       ****
+'**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
+'**** TU Darmstadt                                                          ****
+'****                                                       Dezember 2006   ****
+'****                                                                       ****
+'**** Letzte Änderung: März 2007                                            ****
+'*******************************************************************************
+'*******************************************************************************
+
 Public Class BM_Form
+
+
+    '************************** Funktionen für ParaOpt **********************************
+    '************************************************************************************
 
     Inherits System.Windows.Forms.Form
 
@@ -11,8 +32,10 @@ Public Class BM_Form
     Public BM_Exe As String                         'Pfad zu BlauesModell.exe
 
     Public OptParameter_Pfad As String              'Pfad zur Datei mit den Optimierungsparametern (*.OPT)
-    Public ModellParameter_Pfad As String
+    Public ModellParameter_Pfad As String           'Pfad zur Datei mit den Modellparametern (*.OPT)
     Public OptZiele_Pfad As String                  'Pfad zur Datei mit den Zielfunktionen (*.ZIE)
+    Public Combi_Pfad As String              'Pfad zur Datei mit der Kombinatorik  (*.OPT)
+
     '---------------------------------------------------------------------------------
     'Optimierungsparameter
     Public Structure OptParameter
@@ -66,6 +89,11 @@ Public Class BM_Form
     End Structure
 
     Public OptZieleListe() As OptZiele = {}         'Liste der Zielfunktionnen
+
+    ''Kombinatorik **************************************
+    'Public Schaltung(2, 1) As Object
+    'Public Maßnahme As Collection
+    'Public Kombinatorik As Collection
 
     'Private Properties
     '-------------------
@@ -134,7 +162,7 @@ Public Class BM_Form
     End Sub
 
     'Optimierungsziele
-    Private Sub Button_OptZielWert_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_OptZielWert.Click
+    Private Sub Button_OptZielWert_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_OptZielWert.Click, Button_Kombi.Click
         Me.OpenFile_OptZiele.ShowDialog()
     End Sub
     Private Sub OpenFile_OptZielWert_FileOk(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles OpenFile_OptZiele.FileOk
@@ -526,6 +554,14 @@ Public Class BM_Form
 
     'Berechnung des Qualitätswerts (Zielwert)
     Public Function QualitaetsWert_berechnen(ByVal ZielNr As Integer) As Double
+        If (OptZieleListe(ZielNr).ZielTyp = "EcoFlood") Then
+            Dim i As Integer
+            'QualitaetsWert_berechnen = 0
+            For i = 0 To OptParameterListe.GetUpperBound(0)
+                QualitaetsWert_berechnen = QualitaetsWert_berechnen + (OptParameterListe(i).Wert * OptParameterListe(i).Wert) / 1000
+            Next
+            'QualitaetsWert_berechnen = (1 / QualitaetsWert_berechnen) * 100
+        Else
         Dim i As Integer
         Dim SimReihe(,) As Object = {}
         Dim SimWert As Single
@@ -635,7 +671,7 @@ Public Class BM_Form
                 'TODO: MsgBox Fehler in der Zielfunktionsdatei
 
         End Select
-
+        End If
     End Function
 
     Public Function ReadZRE(ByVal DateiPfad As String, ByRef ZRE(,) As Object) As Boolean
@@ -779,6 +815,298 @@ Public Class BM_Form
         End Try
 
         Call db_disconnect()
+    End Function
+
+    '********************* TeeChart Initialisierung für das BlaueModell *****************
+
+    Public Sub TeeChartInitialise_SO_BlauesModell(ByVal n_Populationen As Integer, ByVal n_Kalkulationen As Integer, ByRef TChart1 As Steema.TeeChart.TChart)
+        'Dim Anzahl_Kalkulationen As Integer
+        'Dim Populationen As Short
+        Dim i As Short
+
+        With TChart1
+            .Clear()
+            .Header.Text = "BlauesModell"
+            .Aspect.View3D = False
+            .Legend.Visible = False
+
+            'Series(0): Anfangswert
+            Dim Point0 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point0.Title = "Anfangswert"
+            Point0.Color = System.Drawing.Color.Red
+            Point0.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point0.Pointer.HorizSize = 3
+            Point0.Pointer.VertSize = 3
+
+            'Series(1 bis n): Für jede Population eine Series 'TODO: es würde auch eine Series für alle reichen!
+            For i = 0 To n_Populationen
+                Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
+                Point1.Title = "Population " & i.ToString()
+                Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+                Point1.Pointer.HorizSize = 3
+                Point1.Pointer.VertSize = 3
+            Next i
+
+            'Formatierung der Axen
+            .Chart.Axes.Bottom.Title.Caption = "Simulation"
+            .Chart.Axes.Bottom.Automatic = False
+            .Chart.Axes.Bottom.Maximum = n_Kalkulationen
+            .Chart.Axes.Bottom.Minimum = 0
+            .Chart.Axes.Left.Title.Caption = OptZieleListe(0).Bezeichnung
+            .Chart.Axes.Left.Automatic = True
+            .Chart.Axes.Left.Minimum = 0
+        End With
+    End Sub
+
+    Public Sub TeeChartInitialise_MO_BlauesModell(ByRef TChart1 As Steema.TeeChart.TChart)
+
+        With TChart1
+            .Clear()
+            .Header.Text = "BlauesModell"
+            .Aspect.View3D = False
+            .Legend.Visible = False
+
+            'Formatierung der Axen
+            .Chart.Axes.Bottom.Title.Caption = OptZieleListe(0).Bezeichnung 'HACK: Beschriftung der Axen
+            .Chart.Axes.Bottom.Automatic = True
+            .Chart.Axes.Left.Title.Caption = OptZieleListe(1).Bezeichnung 'HACK: Beschriftung der Axen
+            .Chart.Axes.Left.Automatic = True
+
+            'Series(0): Series für die Population.
+            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point1.Title = "Population"
+            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point1.Color = System.Drawing.Color.Orange
+            Point1.Pointer.HorizSize = 2
+            Point1.Pointer.VertSize = 2
+
+            'Series(1): Series für die Sekundäre Population
+            Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point2.Title = "Sekundäre Population"
+            Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point2.Color = System.Drawing.Color.Blue
+            Point2.Pointer.HorizSize = 3
+            Point2.Pointer.VertSize = 3
+
+            'Series(2): Series für Bestwert
+            Dim Point3 As New Steema.TeeChart.Styles.Points(.Chart)
+            Point3.Title = "Bestwerte"
+            Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Point3.Color = System.Drawing.Color.Green
+            Point3.Pointer.HorizSize = 3
+            Point3.Pointer.VertSize = 3
+
+        End With
+    End Sub
+
+    '             Evaluierung des Blauen Modells - Steuerungseinheit
+    '************************************************************************************
+
+    Public Function Evaluierung_BlauesModell(ByVal GlobalAnzPar As Short, ByVal GlobalAnzZiel As Short, ByVal mypara As Double(,), ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN As Double(), ByRef TChart1 As Steema.TeeChart.TChart) As Boolean
+        Dim i As Short
+
+        'Mutierte Parameter an OptParameter übergeben
+        For i = 1 To GlobalAnzPar 'BUG 57: Par(,) fängt bei 1 an!
+            OptParameterListe(i - 1).SKWert = mypara(i, 1)     'OptParameterListe(i-1,*) weil Array bei 0 anfängt!
+        Next
+
+        'Mutierte Parameter in Eingabedateien schreiben
+        Call ModellParameter_schreiben()
+
+        'Modell Starten
+        Call launchBM()
+
+        'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
+        'BUG 57: QN() fängt bei 1 an!
+        For i = 0 To GlobalAnzZiel - 1
+            OptZieleListe(i).QWertTmp = QualitaetsWert_berechnen(i)
+            QN(i + 1) = OptZieleListe(i).QWertTmp
+        Next
+
+        'Qualitätswerte im TeeChart zeichnen
+        Select Case GlobalAnzZiel
+            Case 1
+                TChart1.Series(ipop).Add(durchlauf, OptZieleListe(0).QWertTmp)
+            Case 2
+                TChart1.Series(0).Add(OptZieleListe(0).QWertTmp, OptZieleListe(1).QWertTmp, "")
+            Case 3
+                'TODO MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
+                'Call Zielfunktion_zeichnen_MultiObPar_3D(BM_Form1.OptZieleListe(0).QWertTmp, BM_Form1.OptZieleListe(1).QWertTmp, BM_Form1.OptZieleListe(2).QWertTmp)
+            Case Else
+                'TODO MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
+                'TODO: Call Zielfunktion_zeichnen_MultiObPar_XD()
+        End Select
+
+        'Qualitätswerte und OptParameter in DB speichern
+        Call db_update(durchlauf, ipop)
+
+    End Function
+
+    '************************** Funktionen für CombiOpt *********************************
+    '************************************************************************************
+
+    'Kombinatorik Struktur **************************************
+
+    Public Structure Massnahme
+        Public Name As String
+        Public Schaltung(,) As Object
+    End Structure
+
+    Public Structure Lokation
+        Public Name As String
+        Public MassnahmeListe() As Massnahme
+    End Structure
+
+    Public Kombinatorik() As Lokation
+
+    'Kombinatorik Funktionen **************************************
+
+    'Kombinatorik einlesen (*.OPT-Datei)
+    Public Sub Kombinatorik_einlesen()
+        Try
+            Dim FiStr As FileStream = New FileStream(Combi_Pfad, FileMode.Open, IO.FileAccess.ReadWrite)
+            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+            Dim Zeile As String
+            Dim Anz As Integer = 0
+
+            'Anzahl der Parameter feststellen
+            Do
+                Zeile = StrRead.ReadLine.ToString()
+                If (Zeile.StartsWith("*") = False) Then
+                    Anz += 1
+                End If
+            Loop Until StrRead.Peek() = -1
+
+            Dim i As Integer = -1
+            Dim j As Integer = 0
+            ReDim Kombinatorik(0)
+            ReDim Kombinatorik(0).MassnahmeListe(0)
+
+            'Zurück zum Dateianfang und lesen
+            FiStr.Seek(0, SeekOrigin.Begin)
+
+            Dim array() As String
+            Do
+                Zeile = StrRead.ReadLine.ToString()
+                If (Zeile.StartsWith("*") = False) Then
+                    array = Zeile.Split("|")
+                    'Werte zuweisen
+
+                    If Not Is_Name_IN(array(1).Trim(), Kombinatorik) Then
+                        i += 1
+                        j = 0
+                        System.Array.Resize(Kombinatorik, i + 1)
+                        Kombinatorik(i).Name = array(1).Trim()
+                    End If
+                    System.Array.Resize(Kombinatorik(i).MassnahmeListe, j + 1)
+                    ReDim Kombinatorik(i).MassnahmeListe(j).Schaltung(2, 1)
+                    Kombinatorik(i).MassnahmeListe(j).Name = array(2).Trim()
+                    Kombinatorik(i).MassnahmeListe(j).Schaltung(0, 0) = array(3).Trim()
+                    Kombinatorik(i).MassnahmeListe(j).Schaltung(0, 1) = array(4).Trim()
+                    Kombinatorik(i).MassnahmeListe(j).Schaltung(1, 0) = array(5).Trim()
+                    Kombinatorik(i).MassnahmeListe(j).Schaltung(1, 1) = array(6).Trim()
+                    Kombinatorik(i).MassnahmeListe(j).Schaltung(2, 0) = array(7).Trim()
+                    Kombinatorik(i).MassnahmeListe(j).Schaltung(2, 1) = array(8).Trim()
+                    'i += 1
+                    j += 1
+                End If
+
+            Loop Until StrRead.Peek() = -1
+
+        Catch except As Exception
+            MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim Lesen der Kombinatorik")
+        End Try
+
+    End Sub
+
+    'Validierungsfunktion der Kombinatorik Prüft ob Verbraucher an zwei Standorten Dopp vorhanden sind
+    Public Function Kombinatorik_is_Valid() As Boolean
+        Kombinatorik_is_Valid = True
+        Dim i As Integer = 0
+        Dim j As Integer = 0
+        Dim x As Integer = 0
+        Dim y As Integer = 0
+        Dim m As Integer = 0
+        Dim n As Integer = 0
+
+        For i = 0 To Kombinatorik.GetUpperBound(0)
+            For j = 1 To Kombinatorik.GetUpperBound(0)
+                For x = 0 To Kombinatorik(i).MassnahmeListe.GetUpperBound(0)
+                    For y = 0 To Kombinatorik(j).MassnahmeListe.GetUpperBound(0)
+                        For m = 0 To 2
+                            For n = 0 To 2
+                                If Not Kombinatorik(i).MassnahmeListe(x).Schaltung(m, 0) = "X" And Kombinatorik(j).MassnahmeListe(y).Schaltung(n, 0) = "X" Then
+                                    If Kombinatorik(i).MassnahmeListe(x).Schaltung(m, 0) = Kombinatorik(j).MassnahmeListe(y).Schaltung(n, 0) Then
+                                        Kombinatorik_is_Valid = False
+                                    End If
+                                End If
+                            Next
+                        Next
+                    Next
+                Next
+            Next
+        Next
+    End Function
+
+    'Liest den Verbraucher aus dem BModel in eine Array ein
+    Public Sub Verzweigung_Read()
+        Dim i As Integer
+        Dim Ver_array() As String
+
+        Try
+            Dim FiStr As FileStream = New FileStream(WorkDir & Datensatz & ".ver", FileMode.Open, IO.FileAccess.ReadWrite)
+            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+            'Anzahl der Parameter feststellen
+            Dim Zeile As String
+            Dim Anz As Integer = 0
+
+            Do
+                Zeile = StrRead.ReadLine.ToString()
+                If (Zeile.StartsWith("*") = False) Then
+                    Anz += 1
+                End If
+            Loop Until StrRead.Peek() = -1
+            ReDim Ver_array(Anz - 1)
+
+            'Zurück zum Dateianfang und lesen
+            FiStr.Seek(0, SeekOrigin.Begin)
+
+            Do
+                Zeile = StrRead.ReadLine.ToString()
+                If (Zeile.StartsWith("*") = False) Then
+
+                    'Verbraucher Array füllen
+                    Ver_array(i) = Zeile
+                    i += 1
+                End If
+
+            Loop Until StrRead.Peek() = -1
+
+        Catch except As Exception
+            MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim Lesen der Kombinatorik")
+        End Try
+    End Sub
+
+    Public Sub Verzweigung_Write()
+
+
+    End Sub
+
+    '***************************** Hilfs Funktionen *************************************
+    '************************************************************************************
+
+    'Hilfsfunktion um zu Prüfen ob der Name bereits vorhanden ist oder nicht
+    Private Function Is_Name_IN(ByVal Name As String, ByVal Array() As Lokation) As Boolean
+        Is_Name_IN = False
+        Dim i As Integer
+        For i = 0 To Array.GetUpperBound(0)
+            If Name = Array(i).Name Then
+                Is_Name_IN = True
+                Exit Function
+            End If
+        Next
     End Function
 
 End Class
