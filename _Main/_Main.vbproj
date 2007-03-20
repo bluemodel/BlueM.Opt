@@ -10,7 +10,7 @@
     </ApplicationIcon>
     <AssemblyKeyContainerName>
     </AssemblyKeyContainerName>
-    <AssemblyName>Evolutionsstrategie_Anwendung</AssemblyName>
+    <AssemblyName>Evo</AssemblyName>
     <AssemblyOriginatorKeyFile>
     </AssemblyOriginatorKeyFile>
     <AssemblyOriginatorKeyMode>None</AssemblyOriginatorKeyMode>
@@ -22,8 +22,8 @@
     <OptionCompare>Binary</OptionCompare>
     <OptionExplicit>On</OptionExplicit>
     <OptionStrict>Off</OptionStrict>
-    <RootNamespace>Evolutionsstrategie_Anwendung</RootNamespace>
-    <StartupObject>Evolutionsstrategie_Anwendung.Form1</StartupObject>
+    <RootNamespace>Main</RootNamespace>
+    <StartupObject>Main.Form1</StartupObject>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <MyType>WindowsFormsWithCustomSubMain</MyType>
@@ -32,7 +32,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\</OutputPath>
-    <DocumentationFile>Evolutionsstrategie_Anwendung.xml</DocumentationFile>
+    <DocumentationFile>Evo.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
@@ -50,7 +50,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\</OutputPath>
-    <DocumentationFile>Evolutionsstrategie_Anwendung.xml</DocumentationFile>
+    <DocumentationFile>Evo.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
@@ -103,9 +103,9 @@
       <Lcid>0</Lcid>
       <WrapperTool>primary</WrapperTool>
     </COMReference>
-    <ProjectReference Include="..\Anwendung\EVO_BM.vbproj">
+    <ProjectReference Include="..\Anwendung\Apps.vbproj">
       <Project>{62B1C1E7-26DE-418A-AAEE-102E02A50DF6}</Project>
-      <Name>EVO_BM</Name>
+      <Name>Apps</Name>
     </ProjectReference>
     <ProjectReference Include="..\EVO_FORM\EVO_Form.vbproj">
       <Name>EVO_Form</Name>
@@ -146,7 +146,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Testprobleme.vb" />
     <EmbeddedResource Include="Form1.resX">
       <DependentUpon>Form1.vb</DependentUpon>
       <SubType>Designer</SubType>

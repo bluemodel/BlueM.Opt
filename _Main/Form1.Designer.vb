@@ -105,7 +105,7 @@ Partial Class Form1
         '
         'Button_TChartSave
         '
-        Me.Button_TChartSave.Image = Global.Evolutionsstrategie_Anwendung.My.Resources.Resources.icon_teechart
+        Me.Button_TChartSave.Image = Global.Main.My.Resources.Resources.icon_teechart
         Me.Button_TChartSave.Location = New System.Drawing.Point(80, 19)
         Me.Button_TChartSave.Name = "Button_TChartSave"
         Me.Button_TChartSave.Size = New System.Drawing.Size(25, 25)
@@ -116,7 +116,7 @@ Partial Class Form1
         'Button_TChart2Excel
         '
         Me.Button_TChart2Excel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
-        Me.Button_TChart2Excel.Image = Global.Evolutionsstrategie_Anwendung.My.Resources.Resources.icon_excel
+        Me.Button_TChart2Excel.Image = Global.Main.My.Resources.Resources.icon_excel
         Me.Button_TChart2Excel.Location = New System.Drawing.Point(49, 19)
         Me.Button_TChart2Excel.Name = "Button_TChart2Excel"
         Me.Button_TChart2Excel.Size = New System.Drawing.Size(25, 25)
@@ -126,7 +126,7 @@ Partial Class Form1
         '
         'Button_TChart2PNG
         '
-        Me.Button_TChart2PNG.Image = Global.Evolutionsstrategie_Anwendung.My.Resources.Resources.icon_png
+        Me.Button_TChart2PNG.Image = Global.Main.My.Resources.Resources.icon_png
         Me.Button_TChart2PNG.Location = New System.Drawing.Point(111, 19)
         Me.Button_TChart2PNG.Name = "Button_TChart2PNG"
         Me.Button_TChart2PNG.Size = New System.Drawing.Size(25, 25)
@@ -160,7 +160,7 @@ Partial Class Form1
         '
         'Button_TChartEdit
         '
-        Me.Button_TChartEdit.Image = Global.Evolutionsstrategie_Anwendung.My.Resources.Resources.icon_edit
+        Me.Button_TChartEdit.Image = Global.Main.My.Resources.Resources.icon_edit
         Me.Button_TChartEdit.Location = New System.Drawing.Point(6, 19)
         Me.Button_TChartEdit.Name = "Button_TChartEdit"
         Me.Button_TChartEdit.Size = New System.Drawing.Size(25, 25)
