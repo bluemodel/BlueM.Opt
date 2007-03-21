@@ -143,14 +143,16 @@ Friend Class Form1
                     'Testprobleme ausschalten
                     Me.GroupBox_Testproblem.Enabled = False
                     'BM_Form anzeigen
-                    BM_Form1.ShowDialog()
-                    'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
-                    If BM_Form1.OptZieleListe.GetLength(0) = 1 Then
-                        EVO_Einstellungen1.OptModus = 0
-                    ElseIf BM_Form1.OptZieleListe.GetLength(0) > 1 Then
-                        EVO_Einstellungen1.OptModus = 1
+                    Dim BM_OK As DialogResult = BM_Form1.ShowDialog()
+                    If (BM_OK = Windows.Forms.DialogResult.OK) Then
+                        'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
+                        If BM_Form1.OptZieleListe.GetLength(0) = 1 Then
+                            EVO_Einstellungen1.OptModus = 0
+                        ElseIf BM_Form1.OptZieleListe.GetLength(0) > 1 Then
+                            EVO_Einstellungen1.OptModus = 1
+                        End If
+                        Call Initialisierung_BlauesModell()
                     End If
-                    Call Initialisierung_BlauesModell()
 
                 Case ANW_COMBIBM
                     Dim isOK As Boolean
