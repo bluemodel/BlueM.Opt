@@ -75,20 +75,22 @@ Public Class BM_Form
     Public ModellParameterListe() As ModellParameter = {} 'Liste der Modellparameter
 
     'Optimierungsziele
-    Public Structure OptZiele
+    '*| Bezeichnung   | ZielTyp  | Datei |  SimGröße | ZielFkt  | WertTyp  | ZielWert | ZielGröße  | PfadReihe
+    Public Structure OptZiel
         Public Bezeichnung As String                'Bezeichnung
         Public ZielTyp As String                    'Gibt an ob es sich um einen Wert oder um eine Reihe handelt
-        Public SpalteWel As String                  'Spalte der .wel Datei, die mit dem Ziel verglichen werden soll
+        Public Datei As String                      'Die Ergebnisdatei, aus der das Simulationsergebnis ausgelesen werden soll [WEL, BIL, PRB]
+        Public SimGr As String                      'Die Simulationsgröße, auf dessen Basis der Qualitätswert berechnet werden soll
         Public ZielFkt As String                    'Zielfunktion
-        Public WertTyp As String                    'Gibt an welcher Wert aus der angegeben Spalte in der .wel Datei gewählt oder berechnet werden soll
+        Public WertTyp As String                    'Gibt an wie der Wert, der mit dem Zielwert verglichen werden soll, aus dem Simulationsergebnis berechnet werden soll.
         Public ZielWert As String                   'Der vorgegeben Zielwert
         Public ZielReihePfad As String              'Der Pfad zur Zielreihe
-        Public SpalteZiel As String                 'Spalte der .wel Datei falls ZielReihe .wel Datei ist
+        Public ZielGr As String                     'Spalte der .wel Datei falls ZielReihe .wel Datei ist
         Public ZielReihe(,) As Object               'Die Zielreihe
         Public QWertTmp As Double                   'Qualitätswert der letzten Simulation wird hier zwischengespeichert 
     End Structure
 
-    Public OptZieleListe() As OptZiele = {}         'Liste der Zielfunktionnen
+    Public OptZieleListe() As OptZiel = {}         'Liste der Zielfunktionnen
 
     ''Kombinatorik **************************************
     'Public Schaltung(2, 1) As Object
@@ -343,7 +345,7 @@ Public Class BM_Form
     Public Sub OptZiele_einlesen()
         Dim AnzZiele As Integer = 0
         Dim IsOK As Boolean
-        Dim tmpstr As String
+        Dim ext As String
         Dim i As Integer = 0
         Dim j As Integer = 0
 
@@ -372,7 +374,7 @@ Public Class BM_Form
                 FiStr.Seek(0, SeekOrigin.Begin)
 
                 'Einlesen der Zeile und übergeben an die OptimierungsZiele Liste
-                Dim ZeilenArray(7) As String
+                Dim ZeilenArray(9) As String
 
                 Do
                     Zeile = StrRead.ReadLine.ToString()
@@ -381,12 +383,13 @@ Public Class BM_Form
                         'Werte zuweisen
                         OptZieleListe(i).Bezeichnung = ZeilenArray(1).Trim()
                         OptZieleListe(i).ZielTyp = ZeilenArray(2).Trim()
-                        OptZieleListe(i).SpalteWel = ZeilenArray(3).Trim()
-                        OptZieleListe(i).ZielFkt = ZeilenArray(4).Trim()
-                        OptZieleListe(i).WertTyp = ZeilenArray(5).Trim()
-                        OptZieleListe(i).ZielWert = ZeilenArray(6).Trim()
-                        OptZieleListe(i).SpalteZiel = ZeilenArray(7).Trim()
-                        OptZieleListe(i).ZielReihePfad = ZeilenArray(8).Trim()
+                        OptZieleListe(i).Datei = ZeilenArray(3).Trim()
+                        OptZieleListe(i).SimGr = ZeilenArray(4).Trim()
+                        OptZieleListe(i).ZielFkt = ZeilenArray(5).Trim()
+                        OptZieleListe(i).WertTyp = ZeilenArray(6).Trim()
+                        OptZieleListe(i).ZielWert = ZeilenArray(7).Trim()
+                        OptZieleListe(i).ZielGr = ZeilenArray(8).Trim()
+                        OptZieleListe(i).ZielReihePfad = ZeilenArray(9).Trim()
                         i += 1
                     End If
                 Loop Until StrRead.Peek() = -1
@@ -395,7 +398,7 @@ Public Class BM_Form
                 FiStr.Close()
 
             Catch except As Exception
-                MsgBox("Fehler beim lesen der Optimierungsziel-Datei (Werte)" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
+                MsgBox("Fehler beim lesen der Optimierungsziel-Datei:" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
             End Try
         End If
 
@@ -403,15 +406,21 @@ Public Class BM_Form
         For i = 0 To AnzZiele - 1
             If OptZieleListe(i).ZielTyp = "Reihe" Then
 
-                tmpstr = OptZieleListe(i).ZielReihePfad.ToString.Substring(OptZieleListe(i).ZielReihePfad.ToString.LastIndexOf(".") + 1)
-                If tmpstr = "wel" Then
-                    IsOK = ReadWEL(OptZieleListe(i).ZielReihePfad.ToString, OptZieleListe(i).SpalteZiel, OptZieleListe(i).ZielReihe)
-                ElseIf tmpstr = "zre" Then
-                    IsOK = ReadZRE(OptZieleListe(i).ZielReihePfad.ToString, OptZieleListe(i).ZielReihe)
-                End If
+                'Dateiendung der Zielreihe bestimmen
+                ext = OptZieleListe(i).ZielReihePfad.Substring(OptZieleListe(i).ZielReihePfad.LastIndexOf(".") + 1)
+                Select Case (ext.ToUpper)
+                    Case "WEL"
+                        IsOK = ReadWEL(OptZieleListe(i).ZielReihePfad, OptZieleListe(i).ZielGr, OptZieleListe(i).ZielReihe)
+                    Case "ZRE"
+                        IsOK = ReadZRE(OptZieleListe(i).ZielReihePfad, OptZieleListe(i).ZielReihe)
+                    Case "PRB"
+                        IsOK = ReadPRB(OptZieleListe(i).ZielReihePfad, OptZieleListe(i).ZielGr, OptZieleListe(i).ZielReihe)
+                    Case Else
+                        IsOK = False
+                End Select
 
                 If (IsOK = False) Then
-                    'TODO: Fehlerbehandlung
+                    MsgBox("Fehler beim einlesen der Zielreihe '" & OptZieleListe(i).ZielReihePfad & "'", MsgBoxStyle.Exclamation, "Fehler")
                 End If
 
             End If
@@ -554,124 +563,199 @@ Public Class BM_Form
 
     'Berechnung des Qualitätswerts (Zielwert)
     Public Function QualitaetsWert_berechnen(ByVal ZielNr As Integer) As Double
-        If (OptZieleListe(ZielNr).ZielTyp = "EcoFlood") Then
+
+        Dim QWert As Double = 0
+        Dim OptZiel As OptZiel = OptZieleListe(ZielNr)
+
+        If (OptZiel.ZielTyp = "EcoFlood") Then
             Dim i As Integer
             'QualitaetsWert_berechnen = 0
             For i = 0 To OptParameterListe.GetUpperBound(0)
-                QualitaetsWert_berechnen = QualitaetsWert_berechnen + (OptParameterListe(i).Wert * OptParameterListe(i).Wert) / 1000
+                QWert = QWert + (OptParameterListe(i).Wert * OptParameterListe(i).Wert) / 1000
             Next
-            'QualitaetsWert_berechnen = (1 / QualitaetsWert_berechnen) * 100
+            'QWert = (1 / QWert) * 100
         Else
-        Dim i As Integer
-        Dim SimReihe(,) As Object = {}
-        Dim SimWert As Single
-        Dim IsOK As Boolean
 
-        'Simulationsergebnis auslesen
-        IsOK = ReadWEL(WorkDir & Datensatz & ".wel", OptZieleListe(ZielNr).SpalteWel, SimReihe)
-        If (IsOK = False) Then
-            'TODO: Fehlerbehandlung
-        End If
+            Dim i As Integer
+            Dim SimReihe(,) As Object = {}
+            Dim SimWert As Single
+            Dim IsOK As Boolean
 
-        '--------------------------------------------------------
-        'bei Werten zuerst Wert aus Simulationsergebnis berechnen
-        '--------------------------------------------------------
-        If (OptZieleListe(ZielNr).ZielTyp = "Wert") Then
+            Select Case OptZiel.Datei
+                Case "WEL"
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                    'Qualitätswert aus WEL-Datei
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-            Select Case OptZieleListe(ZielNr).WertTyp
+                    'Simulationsergebnis auslesen
+                    IsOK = ReadWEL(WorkDir & Datensatz & ".wel", OptZiel.SimGr, SimReihe)
 
-                Case "MaxWert"
-                    SimWert = 0
+                    '--------------------------------------------------------
+                    'bei Werten zuerst Wert aus Simulationsergebnis berechnen
+                    '--------------------------------------------------------
+                    If (OptZiel.ZielTyp = "Wert") Then
+
+                        Select Case OptZiel.WertTyp
+
+                            Case "MaxWert"
+                                SimWert = 0
+                                For i = 0 To SimReihe.GetUpperBound(0)
+                                    If SimReihe(i, 1) > SimWert Then
+                                        SimWert = SimReihe(i, 1)
+                                    End If
+                                Next
+
+                            Case "MinWert"
+                                SimWert = 999999999999999999
+                                For i = 0 To SimReihe.GetUpperBound(0)
+                                    If SimReihe(i, 1) < SimWert Then
+                                        SimWert = SimReihe(i, 1)
+                                    End If
+                                Next
+
+                            Case "Average"
+                                SimWert = 0
+                                For i = 0 To SimReihe.GetUpperBound(0)
+                                    SimWert += SimReihe(i, 1)
+                                Next
+                                SimWert = SimWert / SimReihe.GetLength(0)
+
+                            Case "AnfWert"
+                                SimWert = SimReihe(0, 1)
+
+                            Case "EndWert"
+                                SimWert = SimReihe(SimReihe.GetUpperBound(0), 1)
+
+                            Case Else
+                                'TODO: Fehlerbehandlung
+                        End Select
+
+                    End If
+
+                    '--------------------------------------------------------
+                    'Berechnung des Qualitätswerts
+                    '--------------------------------------------------------
+                    Select Case OptZiel.ZielFkt
+
+                        Case "AbQuad"
+                            'Summe der Fehlerquadrate
+                            '------------------------
+                            Select Case OptZiel.ZielTyp
+                                Case "Wert"
+                                    QWert = (OptZiel.ZielWert - SimWert) * (OptZiel.ZielWert - SimWert)
+
+                                Case "Reihe"
+                                    For i = 0 To SimReihe.GetUpperBound(0)
+                                        QWert += (OptZiel.ZielReihe(i, 1) - SimReihe(i, 1)) * (OptZiel.ZielReihe(i, 1) - SimReihe(i, 1))
+                                    Next
+                            End Select
+                            '------------------------
+
+                        Case "Diff"
+                            'Summe der Fehler
+                            '------------------------
+                            Select Case OptZiel.ZielTyp
+                                Case "Wert"
+                                    QWert = Math.Abs(OptZiel.ZielWert - SimWert)
+
+                                Case "Reihe"
+                                    For i = 0 To SimReihe.GetUpperBound(0)
+                                        QWert += Math.Abs(OptZiel.ZielReihe(i, 1) - SimReihe(i, 1))
+                                    Next
+                            End Select
+                            '------------------------
+
+                        Case "Volf"
+                            'Volumenfehler
+                            '--------------------------
+                            Select Case OptZiel.ZielTyp
+                                Case "Wert"
+                                    'TODO: MSGBox Fehler in der Zielfunktionsdatei: Volumenfehler kann nicht mit einzelnen Werten gerechnet werden
+
+                                Case "Reihe"
+                                    'TODO: Volumenfehler rechnet noch nicht echtes Volumen, dazu ist Zeitschrittweite notwendig
+                                    Dim VolSim As Double = 0
+                                    Dim VolZiel As Double = 0
+                                    For i = 0 To SimReihe.GetUpperBound(0)
+                                        VolSim += SimReihe(i, 1)
+                                        VolZiel += OptZiel.ZielReihe(i, 1)
+                                    Next
+                                    QWert = Math.Abs(VolZiel - VolSim)
+                            End Select
+                            '------------------------
+
+                        Case Else
+                            'TODO: MsgBox Fehler in der Zielfunktionsdatei
+                    End Select
+
+                Case "PRB"
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                    'Qualitätswert aus PRB-Datei
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'Simulationsergebnis auslesen
+                    IsOK = ReadPRB(WorkDir & Datensatz & ".PRB", OptZiel.SimGr, SimReihe)
+
+                    '--------------------------------------------------------
+                    'Berechnung des Qualitätswerts
+                    '--------------------------------------------------------
+                    'Diff
+                    '----
+                    'Überflüssige Stützstellen (P) entfernen
+                    'Anzahl Stützstellen bestimmen
+                    Dim stuetz As Integer = 0
+                    Dim P_vorher As Double = -99
                     For i = 0 To SimReihe.GetUpperBound(0)
-                        If SimReihe(i, 1) > SimWert Then
-                            SimWert = SimReihe(i, 1)
+                        If (i = 0 Or Not SimReihe(i, 1) = P_vorher) Then
+                            stuetz += 1
+                            P_vorher = SimReihe(i, 1)
                         End If
                     Next
-
-                Case "MinWert"
-                    SimWert = 999999999999999999
+                    'Werte in neues Array schreiben
+                    Dim PRBtmp(stuetz, 1) As Object
+                    stuetz = 0
                     For i = 0 To SimReihe.GetUpperBound(0)
-                        If SimReihe(i, 1) < SimWert Then
-                            SimWert = SimReihe(i, 1)
+                        If (i = 0 Or Not SimReihe(i, 1) = P_vorher) Then
+                            PRBtmp(stuetz, 0) = SimReihe(i, 0)
+                            PRBtmp(stuetz, 1) = SimReihe(i, 1)
+                            P_vorher = SimReihe(i, 1)
+                            stuetz += 1
                         End If
                     Next
+                    'Reihe um eine Stützstelle erweitern
+                    'PRBtmp(stuetz, 0) = PRBtmp(stuetz - 1, 0)
+                    'PRBtmp(stuetz, 1) = PRBtmp(stuetz - 1, 1)
 
-                Case "Average"
-                    SimWert = 0
-                    For i = 0 To SimReihe.GetUpperBound(0)
-                        SimWert += SimReihe(i, 1)
+                    'An Stützstellen der ZielReihe interpolieren
+                    Dim PRBintp(OptZiel.ZielReihe.GetUpperBound(0), 1) As Object
+                    Dim j As Integer
+                    For i = 0 To OptZiel.ZielReihe.GetUpperBound(0)
+                        'zugehörige Lamelle in SimReihe finden
+                        j = 0
+                        Do While (PRBtmp(j, 1) < OptZiel.ZielReihe(i, 1))
+                            j += 1
+                        Loop
+                        'interpolieren
+                        PRBintp(i, 0) = (PRBtmp(j + 1, 0) - PRBtmp(j, 0)) / (PRBtmp(j + 1, 1) - PRBtmp(j, 1)) * (OptZiel.ZielReihe(i, 1) - PRBtmp(j, 1)) + PRBtmp(j, 0)
+                        PRBintp(i, 1) = OptZiel.ZielReihe(i, 1)
                     Next
-                    SimWert = SimWert / SimReihe.GetLength(0)
 
-                Case "AnfWert"
-                    SimWert = SimReihe(0, 1)
-
-                Case "EndWert"
-                    SimWert = SimReihe(SimReihe.GetUpperBound(0), 1)
+                    For i = 0 To OptZiel.ZielReihe.GetUpperBound(0)
+                        QWert += Math.Abs(OptZiel.ZielReihe(i, 0) - PRBintp(i, 0))
+                    Next
 
                 Case Else
-                    'TODO: Fehlerbehandlung
+                    IsOK = False
             End Select
 
+            If (IsOK = False) Then
+                'TODO: Fehlerbehandlung
+            End If
+
         End If
 
-        '--------------------------------------------------------
-        'Berechnung des Qualitätswerts
-        '--------------------------------------------------------
-        Select Case OptZieleListe(ZielNr).ZielFkt
+        QualitaetsWert_berechnen = QWert
 
-            Case "AbQuad"
-                'Summe der Fehlerquadrate
-                '------------------------
-                Select Case OptZieleListe(ZielNr).ZielTyp
-                    Case "Wert"
-                        QualitaetsWert_berechnen = (OptZieleListe(ZielNr).ZielWert - SimWert) * (OptZieleListe(ZielNr).ZielWert - SimWert)
-
-                    Case "Reihe"
-                        For i = 0 To SimReihe.GetUpperBound(0)
-                            QualitaetsWert_berechnen += (OptZieleListe(ZielNr).ZielReihe(i, 1) - SimReihe(i, 1)) * (OptZieleListe(ZielNr).ZielReihe(i, 1) - SimReihe(i, 1))
-                        Next
-                End Select
-                '------------------------
-
-            Case "Diff"
-                'Summe der Fehler
-                '------------------------
-                Select Case OptZieleListe(ZielNr).ZielTyp
-                    Case "Wert"
-                        QualitaetsWert_berechnen = Math.Abs(OptZieleListe(ZielNr).ZielWert - SimWert)
-
-                    Case "Reihe"
-                        For i = 0 To SimReihe.GetUpperBound(0)
-                            QualitaetsWert_berechnen += Math.Abs(OptZieleListe(ZielNr).ZielReihe(i, 1) - SimReihe(i, 1))
-                        Next
-                End Select
-                '------------------------
-
-            Case "Volf"
-                'Volumenfehler
-                '--------------------------
-                Select Case OptZieleListe(ZielNr).ZielTyp
-                    Case "Wert"
-                        'TODO: MSGBox Fehler in der Zielfunktionsdatei: Volumenfehler kann nicht mit einzelnen Werten gerechnet werden
-
-                    Case "Reihe"
-                        'TODO: Volumenfehler rechnet noch nicht echtes Volumen, dazu ist Zeitschrittweite notwendig
-                        Dim VolSim As Double = 0
-                        Dim VolZiel As Double = 0
-                        For i = 0 To SimReihe.GetUpperBound(0)
-                            VolSim += SimReihe(i, 1)
-                            VolZiel += OptZieleListe(ZielNr).ZielReihe(i, 1)
-                        Next
-                        QualitaetsWert_berechnen = Math.Abs(VolZiel - VolSim)
-                End Select
-                '------------------------
-
-            Case Else
-                'TODO: MsgBox Fehler in der Zielfunktionsdatei
-
-        End Select
-        End If
     End Function
 
     Public Function ReadZRE(ByVal DateiPfad As String, ByRef ZRE(,) As Object) As Boolean
@@ -775,6 +859,72 @@ Public Class BM_Form
         Catch except As Exception
             MsgBox("Fehler beim lesen der WEL-Datei" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
             ReadWEL = False
+        End Try
+
+    End Function
+
+    Public Function ReadPRB(ByVal DateiPfad As String, ByVal ZielGr As String, ByRef PRB(,) As Object) As Boolean
+
+        'Lesen einer PRB-Datei
+        Dim ZeileStart As Integer = 0
+        Dim AnzZeil = 26                   'Anzahl der Zeilen ist immer 26, definiert durch MAXSTZ in BM
+        Dim j As Integer = 0
+        Dim Zeile As String
+        ReadPRB = True
+
+        Try
+            Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
+            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+            'Array redimensionieren
+            ReDim PRB(AnzZeil - 1, 1)
+
+            'Anfangszeile suchen
+            Do
+                Zeile = StrRead.ReadLine.ToString
+                If (Zeile.Contains("+ Wahrscheinlichkeitskeitsverteilung: " & ZielGr)) Then
+                    Exit Do
+                End If
+            Loop Until StrRead.Peek() = -1
+
+            'Zeile mit Spaltenüberschriften überspringen
+            Zeile = StrRead.ReadLine.ToString
+
+            For j = 0 To AnzZeil - 1
+                Zeile = StrRead.ReadLine.ToString()
+                PRB(j, 0) = Convert.ToDouble(Zeile.Substring(2, 10))        'X-Wert
+                PRB(j, 1) = Convert.ToDouble(Zeile.Substring(13, 8))        'P(Jahr)
+            Next
+
+            StrRead.Close()
+            FiStr.Close()
+
+            'Überflüssige Stützstellen (P) entfernen
+            'Anzahl Stützstellen bestimmen
+            Dim stuetz As Integer = 0
+            Dim P_vorher As Double = -99
+            For j = 0 To PRB.GetUpperBound(0)
+                If (j = 0 Or Not PRB(j, 1) = P_vorher) Then
+                    stuetz += 1
+                    P_vorher = PRB(j, 1)
+                End If
+            Next
+            'Werte in neues Array schreiben
+            Dim PRBtmp(stuetz - 1, 1) As Object
+            stuetz = 0
+            For j = 0 To PRB.GetUpperBound(0)
+                If (j = 0 Or Not PRB(j, 1) = P_vorher) Then
+                    PRBtmp(stuetz, 0) = PRB(j, 0)
+                    PRBtmp(stuetz, 1) = PRB(j, 1)
+                    P_vorher = PRB(j, 1)
+                    stuetz += 1
+                End If
+            Next
+            PRB = PRBtmp
+
+        Catch except As Exception
+            MsgBox("Fehler beim lesen der PRB-Datei:" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
+            ReadPRB = False
         End Try
 
     End Function
@@ -1049,7 +1199,7 @@ Public Class BM_Form
         Next
     End Function
 
-    'Liest den Verbraucher aus dem BModel in eine Array ein
+    'Liest die Verzweigungen aus dem BModel in ein Array ein
     Public Sub Verzweigung_Read()
         Dim i As Integer
         Dim Ver_array() As String

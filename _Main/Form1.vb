@@ -417,7 +417,7 @@ Friend Class Form1
 
         Dim OptParameterListeOrig() As Apps.BM_Form.OptParameter = {}
         Dim ModellParameterListeOrig() As Apps.BM_Form.ModellParameter = {}
-        Dim OptZieleListeOrig() As Apps.BM_Form.OptZiele = {}
+        Dim OptZieleListeOrig() As Apps.BM_Form.OptZiel = {}
 
         OptParameterListeOrig = BM_Form1.OptParameterListe
         ModellParameterListeOrig = BM_Form1.ModellParameterListe
@@ -463,6 +463,7 @@ Friend Class Form1
         Call SensiPlot1.TeeChart_Ini_SensiPlot(TChart1, EVO_Einstellungen1.NPopul, BM_Form1.OptZieleListe(0).Bezeichnung, BM_Form1.OptParameterListe(0).Bezeichnung)
 
         ReDim Wave1.WaveList(Anz_Sim + 1)
+        'HACK: Die Spalte der WEL-Datei ist hartvercodet!
         BM_Form1.ReadWEL(BM_Form1.WorkDir & BM_Form1.Datensatz & ".wel", "S201_1ZU", Wave1.WaveList(0).Wave)
 
         Randomize()
@@ -480,10 +481,10 @@ Friend Class Form1
             Call BM_Form1.launchBM()
 
             'Speichern der ersten und letzten Wave
-            Wave1.WaveList(i).Bezeichnung = BM_Form1.OptZieleListe(0).SpalteWel
+            Wave1.WaveList(i).Bezeichnung = BM_Form1.OptZieleListe(0).SimGr
             'Wave1.WaveList(1).Bezeichnung = BM_Form1.OptZieleListe(0).SpalteWel
             'If i = 0 Then
-            BM_Form1.ReadWEL(BM_Form1.WorkDir & BM_Form1.Datensatz & ".wel", BM_Form1.OptZieleListe(0).SpalteWel, Wave1.WaveList(i + 1).Wave)
+            BM_Form1.ReadWEL(BM_Form1.WorkDir & BM_Form1.Datensatz & ".wel", BM_Form1.OptZieleListe(0).SimGr, Wave1.WaveList(i + 1).Wave)
             'ElseIf i = Anz_Sim Then
             'BM_Form1.ReadWEL(BM_Form1.WorkDir & BM_Form1.Datensatz & ".wel", BM_Form1.OptZieleListe(0).SpalteWel, Wave1.WaveList(1).Wave)
             'End If
