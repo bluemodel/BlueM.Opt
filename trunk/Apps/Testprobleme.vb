@@ -3,7 +3,7 @@ Public Class Testprobleme
 
     Private IsInitializing As Boolean
     Public OptModus As Short
-    Event Testproblem_Changed(ByVal sender As System.Object, ByVal e As System.EventArgs)
+    Event Testproblem_Changed(ByVal sender As Object, ByVal e As System.EventArgs)
 
 
     Private Sub Testprobleme_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
@@ -26,7 +26,7 @@ Public Class Testprobleme
     End Sub
 
     'Steuerung des Testproblem Forms auf dem Form1
-    Private Sub Combo_Testproblem_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Combo_Testproblem.SelectedIndexChanged
+    Private Sub Combo_Testproblem_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles Combo_Testproblem.SelectedIndexChanged
 
         If IsInitializing = True Then
             Exit Sub

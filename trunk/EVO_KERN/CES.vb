@@ -21,10 +21,17 @@ Public Class CES
     'CutPoint:     1 2 3 4 5 6
     'LB + UB n=2   x         x
 
+    'BM_Form wird kopiert, achtung kein Zeiger
+    Public BM_Form1 As Apps.BM_Form
+
+    'Modus: Unterscheidet zwischen BM und TSP
+    Public CES_Modus As String
+
     'Public Variablen
     Public n_Cities As Integer = 80
     Public ListOfCities(,) As Double
-    Public AnzGen As Integer = 10000
+    Public n_Gen As Integer = 10000
+    Public n_Ziele As Integer
 
     'Private Variablen
     Private ReprodOperator As String = "Order_Crossover_OX"
@@ -33,17 +40,28 @@ Public Class CES
     Private n_Childs As Integer = 15
     Private Strategy As String = "plus"                                 '"plus" oder "minus" Strategie
 
-    '********************************************* Strukturen *****************************
+    '************************************* TSP Struktur *****************************
     Public Structure Faksimile_TSP
-        Dim No As Integer
+        Dim No As Short
         Dim Path() As Integer
-        Dim Distance As Double
+        Dim Quality As Double
         Dim CityList(,) As Double
     End Structure
 
     Public ChildList_TSP() As Faksimile_TSP = {}
     Public ParentList_TSP() As Faksimile_TSP = {}
 
+    '************************************* BM Struktur ******************************
+
+    Public Structure Faksimile_BM
+        Public No As Short
+        Public Path() As String
+        Public Quality() As Double
+        Public ON_OFF_Array(,) As String
+    End Structure
+
+    Public ChildList_BM() As Faksimile_BM
+    Public ParentList_BM() As Faksimile_BM
 
     '******************************** Initialisierung *************************************
 
@@ -67,46 +85,78 @@ Public Class CES
 
     '*********************************** Programm ******************************************
 
-    'Dimensionieren des ParentStructs
-    Public Sub Dim_Parents()
+    'Dimensionieren des ParentStructs TSP Problem
+    Public Sub Dim_Parents_TSP()
         Dim i As Integer
 
         ReDim ParentList_TSP(n_Parents - 1)
 
         For i = 0 To n_Parents - 1
-            ParentList_TSP(i).Distance = 999999999999999999
+            ParentList_TSP(i).Quality = 999999999999999999
             ReDim ParentList_TSP(i).CityList(n_Cities - 1, 2)
             ReDim ParentList_TSP(i).Path(n_Cities - 1)
         Next
 
     End Sub
 
-    'Dimensionieren des ChildStructs
-    Public Sub Dim_Childs()
+    'Dimensionieren des ParentStructs BM Problem
+    Public Sub Dim_Parents_BM()
+        Dim i, j As Integer
+
+        ReDim ParentList_BM(n_Parents - 1)
+
+        For i = 0 To n_Parents - 1
+            ParentList_BM(i).No = i + 1
+            For j = 0 To ParentList_BM(i).Quality.GetUpperBound(0)
+                ParentList_BM(i).Quality(j) = 999999999999999999
+            Next
+            ReDim ParentList_BM(i).Path(BM_Form1.LocationList.GetUpperBound(0))
+            ReDim ParentList_BM(i).ON_OFF_Array(BM_Form1.VerzweigungsDatei.GetUpperBound(0), 1)
+        Next
+
+    End Sub
+
+    'Dimensionieren des ChildStructs TSP Problem
+    Public Sub Dim_Childs_TSP()
         Dim i As Integer
         ReDim ChildList_TSP(n_Childs - 1)
 
         For i = 0 To n_Childs - 1
-            ChildList_TSP(i).Distance = 999999999999999999
+            ChildList_TSP(i).Quality = 999999999999999999
             ReDim ChildList_TSP(i).CityList(n_Cities - 1, 2)
             ReDim ChildList_TSP(i).Path(n_Cities - 1)
         Next
 
     End Sub
 
-    'Generiert einen zufällige Paths für alle Kinder
-    Public Sub Generate_Random_Path()
+    'Dimensionieren des ChildStructs BM Problem
+    Public Sub Dim_Childs_BM()
+        Dim i, j As Integer
+        ReDim ChildList_BM(n_Childs - 1)
+
+        For i = 0 To n_Childs - 1
+            ChildList_BM(i).No = i + 1
+            For j = 0 To ParentList_BM(i).Quality.GetUpperBound(0)
+                ParentList_BM(i).Quality(j) = 999999999999999999
+            Next
+            ReDim ChildList_BM(i).Path(BM_Form1.LocationList.GetUpperBound(0))
+            ReDim ChildList_BM(i).ON_OFF_Array(BM_Form1.VerzweigungsDatei.GetUpperBound(0), 1)
+        Next
+
+    End Sub
+
+    'Generiert zufällige Paths für alle Kinder TSP Problem
+    Public Sub Generate_Random_Path_TSP()
         Dim i, j As Integer
         Dim tmp As Integer
         Dim lowerb As Integer = 1
-        Dim upperbo As Integer = n_Cities
+        Dim upperb As Integer = n_Cities
         Randomize()
 
         For i = 0 To n_Childs - 1
-            ReDim ChildList_TSP(i).Path(n_Cities - 1)
             For j = 0 To ChildList_TSP(i).Path.GetUpperBound(0)
                 Do
-                    tmp = CInt(Int((upperbo - lowerb + 1) * Rnd() + lowerb))
+                    tmp = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
                 Loop While Is_No_OK(tmp, ChildList_TSP(i).Path) = False
                 ChildList_TSP(i).Path(j) = tmp
             Next
@@ -114,10 +164,27 @@ Public Class CES
 
     End Sub
 
+    'Generiert zufällige Paths für alle Kinder BM Problem
+    Public Sub Generate_Random_Path_BM()
+        Dim i, j As Integer
+        Dim tmp As Integer
+        Dim lowerb As Integer = 0
+        Dim upperb As Integer
+
+        For i = 0 To n_Childs - 1
+            For j = 0 To ChildList_BM(i).Path.GetUpperBound(0)
+                upperb = BM_Form1.LocationList(j).MassnahmeListe.GetUpperBound(0)
+                tmp = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
+                ChildList_BM(i).Path(j) = tmp
+            Next
+        Next
+
+    End Sub
+
     '*************************** Functionen innerhalb der Generationsschleife ****************************
 
-    'Weist den KinderPfaden die Städte zu
-    Public Sub Cities_according_ChildPath()
+    'Weist den KinderPfaden die Städte zu für TSP
+    Public Sub Cities_according_ChildPath_TSP()
         Dim i, j As Integer
 
         For i = 0 To n_Childs - 1
@@ -131,8 +198,8 @@ Public Class CES
 
     End Sub
 
-    'Ermittelt die Qualität bzw. die Länge des Weges
-    Public Sub Evaluate_child_Quality()
+    'Ermittelt die Qualität bzw. die Länge des Weges Für TSP
+    Public Sub Evaluate_child_Quality_TSP()
         Dim i, j As Integer
         Dim distance As Double
         Dim distanceX As Double
@@ -143,7 +210,7 @@ Public Class CES
             distanceX = 0
             distanceY = 0
             For j = 0 To n_Cities - 2
-                ChildList_TSP(i).Distance = 999999999999999999
+                ChildList_TSP(i).Quality = 999999999999999999
                 distanceX = (ChildList_TSP(i).CityList(j, 1) - ChildList_TSP(i).CityList(j + 1, 1))
                 distanceX = distanceX * distanceX
                 distanceY = (ChildList_TSP(i).CityList(j, 2) - ChildList_TSP(i).CityList(j + 1, 2))
@@ -155,8 +222,15 @@ Public Class CES
             distanceY = (ChildList_TSP(i).CityList(0, 2) - ChildList_TSP(i).CityList(n_Cities - 1, 2))
             distanceY = distanceY * distanceY
             distance = distance + Math.Sqrt(distanceX + distanceY)
-            ChildList_TSP(i).Distance = distance
+            ChildList_TSP(i).Quality = distance
         Next i
+
+    End Sub
+
+    'Ermittelt die Qualität der Kinder mit dem BlueM
+    'Achtung! dies Funktionen liegen jetzt im BM_Form
+    Public Sub Evaluate_Child_Quality_BM()
+
 
     End Sub
 
@@ -166,7 +240,7 @@ Public Class CES
 
         If Strategy = "minus" Then
             For i = 0 To n_Parents - 1
-                ParentList_TSP(i).Distance = ChildList_TSP(i).Distance
+                ParentList_TSP(i).Quality = ChildList_TSP(i).Quality
                 Array.Copy(ChildList_TSP(i).CityList, ParentList_TSP(i).CityList, ChildList_TSP(i).CityList.Length)
                 Array.Copy(ChildList_TSP(i).Path, ParentList_TSP(i).Path, ChildList_TSP(i).Path.Length)
             Next i
@@ -174,10 +248,10 @@ Public Class CES
         ElseIf Strategy = "plus" Then
             j = 0
             For i = 0 To n_Parents - 1
-                If ParentList_TSP(i).Distance < ChildList_TSP(j).Distance Then
+                If ParentList_TSP(i).Quality < ChildList_TSP(j).Quality Then
                     j -= 1
                 Else
-                    ParentList_TSP(i).Distance = ChildList_TSP(j).Distance
+                    ParentList_TSP(i).Quality = ChildList_TSP(j).Quality
                     Array.Copy(ChildList_TSP(j).CityList, ParentList_TSP(i).CityList, ChildList_TSP(j).CityList.Length)
                     Array.Copy(ChildList_TSP(j).Path, ParentList_TSP(i).Path, ChildList_TSP(j).Path.Length)
                 End If
@@ -193,7 +267,7 @@ Public Class CES
 
         For i = 0 To n_Childs - 1
             ChildList_TSP(i).No = 0
-            ChildList_TSP(i).Distance = 999999999999999999
+            ChildList_TSP(i).Quality = 999999999999999999
             Array.Clear(ChildList_TSP(i).Path, 0, ChildList_TSP(i).Path.GetLength(0))
             ReDim ChildList_TSP(i).CityList(n_Cities, 2)
         Next
@@ -549,7 +623,7 @@ Public Class CES
 
         For i = 0 To FaksimileList.GetUpperBound(0)
             For j = 0 To FaksimileList.GetUpperBound(0)
-                If FaksimileList(i).Distance < FaksimileList(j).Distance Then
+                If FaksimileList(i).Quality < FaksimileList(j).Quality Then
                     swap = FaksimileList(i)
                     FaksimileList(i) = FaksimileList(j)
                     FaksimileList(j) = swap
@@ -666,10 +740,34 @@ Public Class CES
 
     End Sub
 
-
     '                          Funktionen für CombiBM
     '********************************************************************************
 
+    'Ermittelt des Erforderlichen Zustands für die Verzweigungen
+    Public Sub Verzweigung_ON_OFF()
+        Dim i, j, x, y, z As Integer
+        Dim No As Short
+
+        'Schreibt alle Verzweigungen ins Array
+        'kann man auch früher machen!!!!
+        For i = 0 To n_Childs - 1
+            For j = 0 To ChildList_BM(i).ON_OFF_Array.GetUpperBound(0)
+                ChildList_BM(i).ON_OFF_Array(j, 0) = BM_Form1.VerzweigungsDatei(j, 0)
+            Next
+            For x = 0 To ChildList_BM(i).Path.GetUpperBound(0)
+                No = ChildList_BM(i).Path(x)
+                For y = 0 To BM_Form1.LocationList(x).MassnahmeListe(No).Schaltung.GetUpperBound(0)
+                    For z = 0 To ChildList_BM(i).ON_OFF_Array.GetUpperBound(0)
+                        If BM_Form1.LocationList(x).MassnahmeListe(No).Schaltung(y, 0) = ChildList_BM(i).ON_OFF_Array(z, 0) Then
+                            ChildList_BM(i).ON_OFF_Array(z, 1) = BM_Form1.LocationList(x).MassnahmeListe(No).Schaltung(y, 1)
+                        End If
+                    Next
+                Next
+            Next
+        Next
+    End Sub
+
 
 End Class
+
 

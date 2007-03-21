@@ -42,16 +42,18 @@ Friend Class Form1
     Public Wave1 As New Apps.Wave
     Public CES1 As New EvoKern.CES
 
+    '**** Globale Parameter Parameter Optimierung ****
     Dim myIsOK As Boolean
     Dim myisrun As Boolean
     Dim globalAnzPar As Short
-    Dim globalAnzZiel As Short
+    Dim globalAnzZiel_ParaOpt As Short
     Dim globalAnzRand As Short
     Dim array_x() As Double
     Dim array_y() As Double
     Dim Bestwert(,) As Double = {}
     Dim Population(,) As Double
     Dim mypara(,) As Double
+
 
     Private Sub Form1_Load(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles MyBase.Load
 
@@ -136,6 +138,7 @@ Friend Class Form1
                     Testprobleme1.Enabled = False
                     'BM_Form anzeigen
                     Dim BM_OK As DialogResult = BM_Form1.ShowDialog()
+
                     If (BM_OK = Windows.Forms.DialogResult.OK) Then
                         'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
                         If BM_Form1.OptZieleListe.GetLength(0) = 1 Then
@@ -143,33 +146,50 @@ Friend Class Form1
                         ElseIf BM_Form1.OptZieleListe.GetLength(0) > 1 Then
                             EVO_Einstellungen1.OptModus = 1
                         End If
-                        Call Initialisierung_BlauesModell()
+                        Call Initialisierung_BlauesModell_ParaOpt()
                     End If
 
                 Case ANW_COMBIBM
                     Dim isOK As Boolean
                     'Voreinstellungen lesen EVO.INI
                     Call ReadEVOIni()
+                    'Evo deaktiviern
+                    EVO_Einstellungen1.Enabled = False
                     'Testprobleme ausschalten
                     Testprobleme1.Enabled = False
-                    ''Einlesen OptPara, ModellPara, Zielfunktionen
-                    'Call BM_Form1.OptParameter_einlesen()
-                    'Call BM_Form1.ModellParameter_einlesen()
-                    'Call BM_Form1.OptZiele_einlesen()
+
+                    'BM_Form anzeigen
+                    'Dim BM_OK As DialogResult = BM_Form1.ShowDialog()
+
+                    'Einlesen OptPara, ModellPara, Zielfunktionen, Ersatz für Dialog
+                    Call BM_Form1.OptZiele_einlesen()
+
+                    CES1.n_Ziele = BM_Form1.OptZieleListe.GetLength(0)
+
+                    'If (BM_OK = Windows.Forms.DialogResult.OK) Then
+                    '    'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
+                    '    If BM_Form1.OptZieleListe.GetLength(0) = 1 Then
+                    '        EVO_Einstellungen1.OptModus = 0
+                    '    ElseIf BM_Form1.OptZieleListe.GetLength(0) > 1 Then
+                    '        EVO_Einstellungen1.OptModus = 1
+                    '    End If
+                    'End If
 
                     'Einlesen der CombiOpt Datei
                     Call BM_Form1.Kombinatorik_einlesen()
 
                     'Überprüfen der Kombinatorik
                     'ToDo: Hier Message Box einbauen
-                    isOK = BM_Form1.Kombinatorik_is_Valid
+                    isOK = BM_Form1.Combinatoric_is_Valid
 
                     'Einlesen der Verbraucher Datei
                     Call BM_Form1.Verzweigung_Read()
 
-                    ''BM_Form anzeigen
-                    'Normalerweise werden hier die Daten eingelesen
-                    'BM_Form1.ShowDialog()
+                    'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
+                    'ToDo: Hier Message Box einbauen
+                    isOK = BM_Form1.Combinatoric_fits_to_Verzweisungsdatei()
+
+                    'Call Initialisierung_BlauesModell_CombiOpt()
 
                 Case ANW_TESTPROBLEME
                     'Test-Probleme und Evo aktivieren
@@ -183,7 +203,7 @@ Friend Class Form1
         End If
     End Sub
 
-    
+
 
     '******************** Initialisierung der Anwendung *********************************
     '************************************************************************************
@@ -197,7 +217,7 @@ Friend Class Form1
 
         'BUG: Bug 57: Für alle Testprobleme ReDim mypara(globalAnzPar - 1, 0) ! (wegen Array-Anfang bei 0)
         'Globale Parameter werden gesetzt
-        Call Testprobleme1.Parameter_Uebergabe(Testprobleme1.Combo_Testproblem.Text, Testprobleme1.Text_Sinusfunktion_Par.Text, Testprobleme1.Text_Schwefel24_Par.Text, globalAnzPar, globalAnzZiel, globalAnzRand, mypara)
+        Call Testprobleme1.Parameter_Uebergabe(Testprobleme1.Combo_Testproblem.Text, Testprobleme1.Text_Sinusfunktion_Par.Text, Testprobleme1.Text_Schwefel24_Par.Text, globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
 
         Select Case Testprobleme1.Combo_Testproblem.Text
             Case "Sinus-Funktion"
@@ -276,9 +296,9 @@ Friend Class Form1
 
     End Sub
 
-    '************************* Initialisierung es BlauenModells *************************
+    '************************* Initialisierung des BlauenModells Für ParameterOptimierung *************************
 
-    Private Sub Initialisierung_BlauesModell()
+    Private Sub Initialisierung_BlauesModell_ParaOpt()
         Dim i As Integer
         Dim isMultiObjective As Boolean
         Dim n_Kalkulationen As Integer
@@ -298,7 +318,7 @@ Friend Class Form1
         Next
 
         'globale Anzahl der Ziele muss hier auf Länge der Zielliste gesetzt werden
-        globalAnzZiel = BM_Form1.OptZieleListe.GetLength(0)
+        globalAnzZiel_ParaOpt = BM_Form1.OptZieleListe.GetLength(0)
 
         'TODO: Randbedingungen
         globalAnzRand = 2
@@ -327,6 +347,7 @@ Friend Class Form1
 
     End Sub
 
+
     '************************************************************************************
     '************************* Start BUTTON wurde pressed *******************************
     '************************************************************************************
@@ -345,6 +366,8 @@ Friend Class Form1
                 myIsOK = SensiPlot_STARTEN(SensiPlot1.Selected_OptParameter, SensiPlot1.Selected_OptZiel, SensiPlot1.Selected_SensiType, SensiPlot1.Anz_Sim)
             Case ANW_BLAUESMODELL
                 myIsOK = ES_STARTEN()
+            Case ANW_COMBIBM
+                myIsOK = CombiBM_STARTEN()
             Case ANW_TESTPROBLEME
                 myIsOK = ES_STARTEN()
             Case ANW_TSP
@@ -364,7 +387,7 @@ Friend Class Form1
     Private Function SensiPlot_STARTEN(ByRef Selected_OptParameter As String, ByRef Selected_OptZiel As String, ByRef Selected_SensiType As String, ByRef Anz_Sim As Integer) As Boolean
         SensiPlot_STARTEN = False
 
-        globalAnzZiel = 2
+        globalAnzZiel_ParaOpt = 2
         globalAnzRand = 0
 
         'Anpassung der Arrays für "Call BM_Form1.ModellParameter_schreiben()"
@@ -473,26 +496,28 @@ Friend Class Form1
     '************************************************************************************
 
     Private Function TSP_STARTEN() As Boolean
-        Dim gen As Integer              'Laufvariable für die Generationen
+
+        'Laufvariable für die Generationen
+        Dim gen As Integer
 
         'ToDo: nochmal Prüfen wie das mit den Kids REDIMS ist.
         Call CES1.TeeChart_Initialise_TSP(TChart1)
 
         'Arrays werden Dimensioniert
-        Call CES1.Dim_Parents()
-        Call CES1.Dim_Childs()
+        Call CES1.Dim_Parents_TSP()
+        Call CES1.Dim_Childs_TSP()
 
         'Zufällige Kinderpfade werden generiert
-        Call CES1.Generate_Random_Path()
+        Call CES1.Generate_Random_Path_TSP()
 
         'Generationsschleife
-        For gen = 1 To CES1.AnzGen
+        For gen = 1 To CES1.n_Gen
 
             'Den Kindern werden die Städte Ihres Pfades entsprechend zugewiesen
-            Call CES1.Cities_according_ChildPath()
+            Call CES1.Cities_according_ChildPath_TSP()
 
             'Bestimmung des der Qualität der Kinder
-            Call CES1.Evaluate_child_Quality()
+            Call CES1.Evaluate_child_Quality_TSP()
 
             'Sortieren der Kinden anhand der Qualität
             Call CES1.Sort_Faksimile(CES1.ChildList_TSP)
@@ -502,7 +527,7 @@ Friend Class Form1
 
             'Zeichnen des besten Elter
             'TODO: funzt nur, wenn ganz am ende gezeichnet wird
-            If gen = CES1.AnzGen Then
+            If gen = CES1.n_Gen Then
                 Call CES1.TeeChart_Zeichnen_TSP(TChart1, CES1.ParentList_TSP(0).CityList)
             End If
 
@@ -522,16 +547,43 @@ Friend Class Form1
     '           Anwendung CombiBM - START; läuft ohne Evolutionsstrategie             
     '************************************************************************************
 
-    Private Function Combi_BM_STARTEN() As Boolean
-        Dim gen As Integer               'Laufvariable für die Generationen
+    Private Function CombiBM_STARTEN() As Boolean
+
+        Dim durchlauf As Integer = 0
+
+        'BM_Form wird an CES übergeben um Zugriff auf alle Objekte zu haben
+        CES1.BM_Form1 = BM_Form1
+
+        'Laufvariable für die Generationen
+        Dim gen As Integer
+        Dim i As Integer
 
         'TeeChart initialisieren
         Call BM_Form1.TeeChartInitialise_SO_BlauesModell(1, gen, TChart1)
 
         'Arrays werden Dimensioniert
-        Call CES1.Dim_Parents()
-        Call CES1.Dim_Childs()
+        Call CES1.Dim_Parents_BM()
+        Call CES1.Dim_Childs_BM()
 
+        'Zufällige Kinderpfade werden generiert
+        Call CES1.Generate_Random_Path_BM()
+
+        'Generationsschleife
+        For gen = 1 To CES1.n_Gen
+
+            'Ermittelt Verzweigung ON_OFF
+            Call CES1.Verzweigung_ON_OFF()
+
+            For i = 0 To CES1.ChildList_BM.GetUpperBound(0)
+                durchlauf += 1
+
+                'Schreibt die neuen Verzweigungen
+                Call BM_Form1.Verzweigung_Write(CES1.ChildList_BM(i).ON_OFF_Array)
+                Call BM_Form1.Evaluierung_BlauesModell_CombiOpt(CES1.n_Ziele, durchlauf, 1, CES1.ChildList_BM(i).Quality, TChart1)
+            Next
+            'Ermittelt die Qualität der Kinder mit dem BlueM
+            'Call CES1.Evaluate_Child_Quality_BM()
+        Next
 
     End Function
 
@@ -605,7 +657,7 @@ Friend Class Form1
         isInteract = EVO_Einstellungen1.isInteract
         NMemberSecondPop = EVO_Einstellungen1.NMemberSecondPop
 
-        ReDim QN(globalAnzZiel)
+        ReDim QN(globalAnzZiel_ParaOpt)
         ReDim RN(globalAnzRand)
 
         'Kontrolle der Variablen
@@ -639,7 +691,7 @@ Friend Class Form1
         'Die öffentlichen dynamischen Arrays werden initialisiert (Dn, An, Xn, Xmin, Xmax)
         'und die Anzahl der Zielfunktionen wird festgelegt
         '******************************************************************************************
-        isOK = evolutionsstrategie.EsIni(globalAnzPar, globalAnzZiel, globalAnzRand)
+        isOK = evolutionsstrategie.EsIni(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand)
 
         '3. Schritt: CEvolutionsstrategie - ES_OPTIONS
         'Optionen der Evolutionsstrategie werden übergeben
@@ -695,6 +747,7 @@ Start_Evolutionsrunden:
 
                 myIsOK = evolutionsstrategie.EsPopMutation
 
+                'ToDo: Scheint mir Schwachsinnig an dieser Stelle Weil es überschrieben wird
                 durchlauf = NGen * NNachf * (irunde - 1)
 
                 'Loop über alle Generationen
@@ -736,7 +789,7 @@ Start_Evolutionsrunden:
                             Case ANW_TESTPROBLEME
                                 myIsOK = Testprobleme1.Evaluierung_TestProbleme(Testprobleme1.Combo_Testproblem.Text, globalAnzPar, mypara, durchlauf, ipop, QN, RN, TChart1)
                             Case ANW_BLAUESMODELL
-                                myIsOK = BM_Form1.Evaluierung_BlauesModell(globalAnzPar, globalAnzZiel, mypara, durchlauf, ipop, QN, TChart1)
+                                myIsOK = BM_Form1.Evaluierung_BlauesModell_ParaOpt(globalAnzPar, globalAnzZiel_ParaOpt, mypara, durchlauf, ipop, QN, TChart1)
                         End Select
 
                         'Einordnen der Qualitätsfunktion im Bestwertspeicher
