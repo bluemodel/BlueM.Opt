@@ -289,6 +289,9 @@ Public Class BM_Form
                 End If
             Loop Until StrRead.Peek() = -1
 
+            StrRead.Close()
+            FiStr.Close()
+
         Catch except As Exception
             MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim Lesen der Optimierungsparameter")
         End Try
@@ -334,6 +337,9 @@ Public Class BM_Form
                     i += 1
                 End If
             Loop Until StrRead.Peek() = -1
+
+            StrRead.Close()
+            FiStr.Close()
 
         Catch except As Exception
             MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim Lesen der Optimierungsparameter")
@@ -515,6 +521,7 @@ Public Class BM_Form
                 Next
 
                 StrWrite.Close()
+                FiStr.Close()
 
             Catch except As Exception
                 MsgBox("Fehler beim Schreiben der Mutierten Parameter" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
@@ -832,7 +839,7 @@ Public Class BM_Form
             StrRead.ReadToEnd()
             ' Spaltenüberschriften vergleichen
             For j = 0 To Werte.GetUpperBound(0)
-                If (Werte(j).Trim() = Spalte) Then
+                If Werte(j).Trim() = Spalte Then
                     SpalteNr = j
                 End If
             Next
@@ -1002,7 +1009,7 @@ Public Class BM_Form
             .Chart.Axes.Bottom.Automatic = False
             .Chart.Axes.Bottom.Maximum = n_Kalkulationen
             .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Left.Title.Caption = OptZieleListe(0).Bezeichnung
+            '.Chart.Axes.Left.Title.Caption = OptZieleListe(0).Bezeichnung
             .Chart.Axes.Left.Automatic = True
             .Chart.Axes.Left.Minimum = 0
         End With
@@ -1049,10 +1056,10 @@ Public Class BM_Form
         End With
     End Sub
 
-    '             Evaluierung des Blauen Modells - Steuerungseinheit
+    '    Evaluierung des Blauen Modells für Parameter Optimierung - Steuerungseinheit
     '************************************************************************************
 
-    Public Function Evaluierung_BlauesModell(ByVal GlobalAnzPar As Short, ByVal GlobalAnzZiel As Short, ByVal mypara As Double(,), ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN As Double(), ByRef TChart1 As Steema.TeeChart.TChart) As Boolean
+    Public Function Evaluierung_BlauesModell_ParaOpt(ByVal GlobalAnzPar As Short, ByVal GlobalAnzZiel As Short, ByVal mypara As Double(,), ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN As Double(), ByRef TChart1 As Steema.TeeChart.TChart) As Boolean
         Dim i As Short
 
         'Mutierte Parameter an OptParameter übergeben
@@ -1095,11 +1102,47 @@ Public Class BM_Form
     '************************** Funktionen für CombiOpt *********************************
     '************************************************************************************
 
+
+    '    Evaluierung des Blauen Modells für Parameter Optimierung - Steuerungseinheit
+    '************************************************************************************
+
+    Public Function Evaluierung_BlauesModell_CombiOpt(ByVal n_Ziele As Short, ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN As Double(), ByRef TChart1 As Steema.TeeChart.TChart) As Boolean
+        Dim i As Short
+
+        'Modell Starten
+        Call launchBM()
+
+        'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
+        'BUG 57: QN() fängt bei 1 an!
+        For i = 0 To n_Ziele - 1
+            OptZieleListe(i).QWertTmp = QualitaetsWert_berechnen(i)
+            QN(i + 1) = OptZieleListe(i).QWertTmp
+        Next
+
+        'Qualitätswerte im TeeChart zeichnen
+        Select Case n_Ziele
+            Case 1
+                TChart1.Series(ipop).Add(durchlauf, OptZieleListe(0).QWertTmp)
+            Case 2
+                TChart1.Series(0).Add(OptZieleListe(0).QWertTmp, OptZieleListe(1).QWertTmp, "")
+            Case 3
+                'TODO MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
+                'Call Zielfunktion_zeichnen_MultiObPar_3D(BM_Form1.OptZieleListe(0).QWertTmp, BM_Form1.OptZieleListe(1).QWertTmp, BM_Form1.OptZieleListe(2).QWertTmp)
+            Case Else
+                'TODO MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
+                'TODO: Call Zielfunktion_zeichnen_MultiObPar_XD()
+        End Select
+
+        'Qualitätswerte und OptParameter in DB speichern
+        Call db_update(durchlauf, ipop)
+
+    End Function
+
     'Kombinatorik Struktur **************************************
 
     Public Structure Massnahme
         Public Name As String
-        Public Schaltung(,) As Object
+        Public Schaltung(,) As String
     End Structure
 
     Public Structure Lokation
@@ -1107,7 +1150,9 @@ Public Class BM_Form
         Public MassnahmeListe() As Massnahme
     End Structure
 
-    Public Kombinatorik() As Lokation
+    Public LocationList() As Lokation
+
+    Public VerzweigungsDatei(,) As String
 
     'Kombinatorik Funktionen **************************************
 
@@ -1130,8 +1175,8 @@ Public Class BM_Form
 
             Dim i As Integer = -1
             Dim j As Integer = 0
-            ReDim Kombinatorik(0)
-            ReDim Kombinatorik(0).MassnahmeListe(0)
+            ReDim LocationList(0)
+            ReDim LocationList(0).MassnahmeListe(0)
 
             'Zurück zum Dateianfang und lesen
             FiStr.Seek(0, SeekOrigin.Begin)
@@ -1143,26 +1188,29 @@ Public Class BM_Form
                     array = Zeile.Split("|")
                     'Werte zuweisen
 
-                    If Not Is_Name_IN(array(1).Trim(), Kombinatorik) Then
+                    If Not Is_Name_IN(array(1).Trim(), LocationList) Then
                         i += 1
                         j = 0
-                        System.Array.Resize(Kombinatorik, i + 1)
-                        Kombinatorik(i).Name = array(1).Trim()
+                        System.Array.Resize(LocationList, i + 1)
+                        LocationList(i).Name = array(1).Trim()
                     End If
-                    System.Array.Resize(Kombinatorik(i).MassnahmeListe, j + 1)
-                    ReDim Kombinatorik(i).MassnahmeListe(j).Schaltung(2, 1)
-                    Kombinatorik(i).MassnahmeListe(j).Name = array(2).Trim()
-                    Kombinatorik(i).MassnahmeListe(j).Schaltung(0, 0) = array(3).Trim()
-                    Kombinatorik(i).MassnahmeListe(j).Schaltung(0, 1) = array(4).Trim()
-                    Kombinatorik(i).MassnahmeListe(j).Schaltung(1, 0) = array(5).Trim()
-                    Kombinatorik(i).MassnahmeListe(j).Schaltung(1, 1) = array(6).Trim()
-                    Kombinatorik(i).MassnahmeListe(j).Schaltung(2, 0) = array(7).Trim()
-                    Kombinatorik(i).MassnahmeListe(j).Schaltung(2, 1) = array(8).Trim()
+                    System.Array.Resize(LocationList(i).MassnahmeListe, j + 1)
+                    ReDim LocationList(i).MassnahmeListe(j).Schaltung(2, 1)
+                    LocationList(i).MassnahmeListe(j).Name = array(2).Trim()
+                    LocationList(i).MassnahmeListe(j).Schaltung(0, 0) = array(3).Trim()
+                    LocationList(i).MassnahmeListe(j).Schaltung(0, 1) = array(4).Trim()
+                    LocationList(i).MassnahmeListe(j).Schaltung(1, 0) = array(5).Trim()
+                    LocationList(i).MassnahmeListe(j).Schaltung(1, 1) = array(6).Trim()
+                    LocationList(i).MassnahmeListe(j).Schaltung(2, 0) = array(7).Trim()
+                    LocationList(i).MassnahmeListe(j).Schaltung(2, 1) = array(8).Trim()
                     'i += 1
                     j += 1
                 End If
 
             Loop Until StrRead.Peek() = -1
+
+            StrRead.Close()
+            FiStr.Close()
 
         Catch except As Exception
             MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim Lesen der Kombinatorik")
@@ -1171,24 +1219,19 @@ Public Class BM_Form
     End Sub
 
     'Validierungsfunktion der Kombinatorik Prüft ob Verbraucher an zwei Standorten Dopp vorhanden sind
-    Public Function Kombinatorik_is_Valid() As Boolean
-        Kombinatorik_is_Valid = True
-        Dim i As Integer = 0
-        Dim j As Integer = 0
-        Dim x As Integer = 0
-        Dim y As Integer = 0
-        Dim m As Integer = 0
-        Dim n As Integer = 0
+    Public Function Combinatoric_is_Valid() As Boolean
+        Combinatoric_is_Valid = True
+        Dim i, j, x, y, m, n As Integer
 
-        For i = 0 To Kombinatorik.GetUpperBound(0)
-            For j = 1 To Kombinatorik.GetUpperBound(0)
-                For x = 0 To Kombinatorik(i).MassnahmeListe.GetUpperBound(0)
-                    For y = 0 To Kombinatorik(j).MassnahmeListe.GetUpperBound(0)
+        For i = 0 To LocationList.GetUpperBound(0)
+            For j = 1 To LocationList.GetUpperBound(0)
+                For x = 0 To LocationList(i).MassnahmeListe.GetUpperBound(0)
+                    For y = 0 To LocationList(j).MassnahmeListe.GetUpperBound(0)
                         For m = 0 To 2
                             For n = 0 To 2
-                                If Not Kombinatorik(i).MassnahmeListe(x).Schaltung(m, 0) = "X" And Kombinatorik(j).MassnahmeListe(y).Schaltung(n, 0) = "X" Then
-                                    If Kombinatorik(i).MassnahmeListe(x).Schaltung(m, 0) = Kombinatorik(j).MassnahmeListe(y).Schaltung(n, 0) Then
-                                        Kombinatorik_is_Valid = False
+                                If Not LocationList(i).MassnahmeListe(x).Schaltung(m, 0) = "X" And LocationList(j).MassnahmeListe(y).Schaltung(n, 0) = "X" Then
+                                    If LocationList(i).MassnahmeListe(x).Schaltung(m, 0) = LocationList(j).MassnahmeListe(y).Schaltung(n, 0) Then
+                                        Combinatoric_is_Valid = False
                                     End If
                                 End If
                             Next
@@ -1202,7 +1245,6 @@ Public Class BM_Form
     'Liest die Verzweigungen aus dem BModel in ein Array ein
     Public Sub Verzweigung_Read()
         Dim i As Integer
-        Dim Ver_array() As String
 
         Try
             Dim FiStr As FileStream = New FileStream(WorkDir & Datensatz & ".ver", FileMode.Open, IO.FileAccess.ReadWrite)
@@ -1218,29 +1260,167 @@ Public Class BM_Form
                     Anz += 1
                 End If
             Loop Until StrRead.Peek() = -1
-            ReDim Ver_array(Anz - 1)
+            ReDim VerzweigungsDatei(Anz - 1, 3)
 
             'Zurück zum Dateianfang und lesen
             FiStr.Seek(0, SeekOrigin.Begin)
 
+            'Einlesen der Zeile und übergeben an das Verzweidungsarray
+            Dim ZeilenArray() As String
+
             Do
                 Zeile = StrRead.ReadLine.ToString()
                 If (Zeile.StartsWith("*") = False) Then
-
+                    ZeilenArray = Zeile.Split("|")
                     'Verbraucher Array füllen
-                    Ver_array(i) = Zeile
+                    VerzweigungsDatei(i, 0) = ZeilenArray(1).Trim
+                    VerzweigungsDatei(i, 1) = ZeilenArray(2).Trim
+                    VerzweigungsDatei(i, 2) = ZeilenArray(3).Trim
+                    VerzweigungsDatei(i, 3) = ZeilenArray(4).Trim
                     i += 1
                 End If
 
             Loop Until StrRead.Peek() = -1
 
+            StrRead.Close()
+            FiStr.Close()
+
         Catch except As Exception
             MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim Lesen der Kombinatorik")
         End Try
     End Sub
+    Public Function Combinatoric_fits_to_Verzweisungsdatei() As Boolean
+        Combinatoric_fits_to_Verzweisungsdatei = True
+        Dim i As Integer = 0
+        Dim j As Integer = 0
+        Dim x As Integer = 0
+        Dim y As Integer = 0
 
-    Public Sub Verzweigung_Write()
+        Dim FoundA(VerzweigungsDatei.GetUpperBound(0)) As Boolean
 
+        'Prüft ob jede Verzweigung einmal in der LocationList vorkommt
+        For i = 0 To VerzweigungsDatei.GetUpperBound(0)
+            For j = 0 To LocationList.GetUpperBound(0)
+                For x = 0 To LocationList(j).MassnahmeListe.GetUpperBound(0)
+                    For y = 0 To LocationList(j).MassnahmeListe(x).Schaltung.GetUpperBound(0)
+                        If VerzweigungsDatei(i, 0) = LocationList(j).MassnahmeListe(x).Schaltung(y, 0) And VerzweigungsDatei(i, 1) = "2" Then
+                            FoundA(i) = True
+                        End If
+                    Next
+                Next
+            Next
+        Next
+
+        'Prüft ob die nicht vorkommenden Verzweigungen Verzweigungen anderer Art sind
+        For i = 0 To VerzweigungsDatei.GetUpperBound(0)
+            If Not VerzweigungsDatei(i, 1) = "2" And FoundA(i) = False Then
+                FoundA(i) = True
+            End If
+        Next
+
+        Dim FoundB As Boolean = True
+        Dim TmpBool As Boolean = False
+
+        'Prüft ob alle in der LocationList Vorkommenden Verzweigungen auch in der Verzweigungsdatei sind
+        For j = 0 To LocationList.GetUpperBound(0)
+            For x = 0 To LocationList(j).MassnahmeListe.GetUpperBound(0)
+                For y = 0 To LocationList(j).MassnahmeListe(x).Schaltung.GetUpperBound(0)
+                    If Not LocationList(j).MassnahmeListe(x).Schaltung(y, 0) = "X" Then
+                        TmpBool = False
+                        For i = 0 To VerzweigungsDatei.GetUpperBound(0)
+                            If VerzweigungsDatei(i, 0) = LocationList(j).MassnahmeListe(x).Schaltung(y, 0) And VerzweigungsDatei(i, 1) = "2" Then
+                                TmpBool = True
+                            End If
+                        Next
+                        If Not TmpBool Then
+                            FoundB = False
+                        End If
+                    End If
+
+                Next
+            Next
+        Next
+
+        'Übergabe
+        If FoundB = False Then
+            Combinatoric_fits_to_Verzweisungsdatei = False
+        Else
+            For i = 0 To FoundA.GetUpperBound(0)
+                If FoundA(i) = False Then
+                    Combinatoric_fits_to_Verzweisungsdatei = False
+                End If
+            Next
+        End If
+
+    End Function
+
+    'Schreibt die neuen Verzweigungen
+    Public Sub Verzweigung_Write(ByVal SchaltArray(,))
+
+        Dim AnzZeil As Integer
+        Dim i, j As Integer
+        Dim Zeilenarray() As String
+        Dim Zeile As String
+        Dim StrLeft As String
+        Dim StrRight As String
+        Dim DateiPfad As String
+        Dim SplitZeile() As String
+
+        Try
+            DateiPfad = WorkDir & Datensatz & ".ver"
+            'Datei öffnen
+            Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.Read)
+            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+            'Anzahl der Zeilen feststellen
+            AnzZeil = 0
+            Do
+                Zeile = StrRead.ReadLine.ToString
+                AnzZeil += 1
+            Loop Until StrRead.Peek() = -1
+
+            ReDim Zeilenarray(AnzZeil - 1)
+
+            'Datei komplett einlesen
+            FiStr.Seek(0, SeekOrigin.Begin)
+            For j = 0 To AnzZeil - 1
+                Zeilenarray(j) = StrRead.ReadLine.ToString
+            Next
+
+            StrRead.Close()
+            FiStr.Close()
+
+            'ZeilenArray wird zu neuer Datei zusammen gebaut
+            For i = 0 To SchaltArray.GetUpperBound(0)
+                If Not SchaltArray(i, 1) = Nothing Then
+                    For j = 0 To Zeilenarray.GetUpperBound(0)
+                        If Not Zeilenarray(j).StartsWith("*") Then
+                            SplitZeile = Zeilenarray(j).Split("|")
+                            If SchaltArray(i, 0) = SplitZeile(1).Trim Then
+                                StrLeft = Microsoft.VisualBasic.Left(Zeilenarray(j), 31)
+                                StrRight = Microsoft.VisualBasic.Right(Zeilenarray(j), 49)
+                                If SchaltArray(i, 1) = "1" Then
+                                    Zeilenarray(j) = StrLeft & "      100     " & StrRight
+                                ElseIf (SchaltArray(i, 1) = "0") Then
+                                    Zeilenarray(j) = StrLeft & "        0     " & StrRight
+                                End If
+                            End If
+                        End If
+                    Next
+                End If
+            Next
+
+            'Alle Zeilen wieder in Datei schreiben
+            Dim StrWrite As StreamWriter = New StreamWriter(DateiPfad, False, System.Text.Encoding.GetEncoding("iso8859-1"))
+            For j = 0 To AnzZeil - 1
+                StrWrite.WriteLine(Zeilenarray(j))
+            Next
+
+            StrWrite.Close()
+
+        Catch except As Exception
+            MsgBox("Fehler beim Schreiben der Mutierten Parameter" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
+        End Try
 
     End Sub
 
