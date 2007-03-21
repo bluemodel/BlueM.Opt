@@ -1,4 +1,73 @@
-Public Class Testproblem
+Public Class Testprobleme
+    Inherits System.Windows.Forms.UserControl
+
+    Private IsInitializing As Boolean
+    Public OptModus As Short
+    Event Testproblem_Changed(ByVal sender As System.Object, ByVal e As System.EventArgs)
+
+
+    Private Sub Testprobleme_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        'Combobox füllen
+        Combo_Testproblem.Items.Add("Sinus-Funktion")
+        Combo_Testproblem.Items.Add("Beale-Problem")
+        Combo_Testproblem.Items.Add("Schwefel 2.4-Problem")
+        Combo_Testproblem.Items.Add("Deb 1")
+        Combo_Testproblem.Items.Add("Zitzler/Deb T1")
+        Combo_Testproblem.Items.Add("Zitzler/Deb T2")
+        Combo_Testproblem.Items.Add("Zitzler/Deb T3")
+        Combo_Testproblem.Items.Add("Zitzler/Deb T4")
+        Combo_Testproblem.Items.Add("CONSTR")
+        Combo_Testproblem.Items.Add("Box")
+
+        Combo_Testproblem.SelectedIndex = 0
+
+        'Ende der Initialisierung
+        IsInitializing = False
+    End Sub
+
+    'Steuerung des Testproblem Forms auf dem Form1
+    Private Sub Combo_Testproblem_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Combo_Testproblem.SelectedIndexChanged
+
+        If IsInitializing = True Then
+            Exit Sub
+        Else
+            Select Case Combo_Testproblem.Text
+                Case "Sinus-Funktion"
+                    Problem_SinusFunktion.BringToFront()
+                    OptModus = 0
+                Case "Beale-Problem"
+                    Problem_BealeProblem.BringToFront()
+                    OptModus = 0
+                Case "Schwefel 2.4-Problem"
+                    Problem_Schwefel24.BringToFront()
+                    OptModus = 0
+                Case "Deb 1"
+                    Problem_D1Funktion.BringToFront()
+                    OptModus = 1
+                Case "Zitzler/Deb T1"
+                    Problem_T1Funktion.BringToFront()
+                    OptModus = 1
+                Case "Zitzler/Deb T2"
+                    Problem_T2Funktion.BringToFront()
+                    OptModus = 1
+                Case "Zitzler/Deb T3"
+                    Problem_T3Funktion.BringToFront()
+                    OptModus = 1
+                Case "Zitzler/Deb T4"
+                    Problem_T4Funktion.BringToFront()
+                    OptModus = 1
+                Case "CONSTR"
+                    Problem_CONSTRFunktion.BringToFront()
+                    OptModus = 1
+                Case "Box"
+                    Problem_TKNFunktion.BringToFront()
+                    OptModus = 1
+            End Select
+
+            RaiseEvent Testproblem_Changed(sender, e) 'wird in Form1 von IniApp() verarbeitet
+
+        End If
+    End Sub
 
     '************************************************************************************
     '                        Setzen der Anfangsparameter                                *

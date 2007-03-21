@@ -70,7 +70,12 @@
     <Compile Include="SensiPlot.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Testprobleme.vb" />
+    <Compile Include="Testprobleme.Designer.vb">
+      <DependentUpon>Testprobleme.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Testprobleme.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="Wave.Designer.vb">
       <DependentUpon>Wave.vb</DependentUpon>
     </Compile>
@@ -86,6 +91,10 @@
     <EmbeddedResource Include="SensiPlot.resx">
       <SubType>Designer</SubType>
       <DependentUpon>SensiPlot.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Testprobleme.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>Testprobleme.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Wave.resx">
       <SubType>Designer</SubType>

@@ -37,7 +37,6 @@ Friend Class Form1
     Private AppIniOK As Boolean = False
 
     '**** Deklarationen der Module *****
-    Public TestProb1 As New Apps.Testproblem
     Public BM_Form1 As New Apps.BM_Form
     Public SensiPlot1 As New Apps.SensiPlot
     Public Wave1 As New Apps.Wave
@@ -60,24 +59,9 @@ Friend Class Form1
         System.Windows.Forms.Application.EnableVisualStyles()
 
         'Liste der Anwendungen in ComboBox schreiben und Anfangseinstellung wählen
-        ComboBox_Anwendung.Items.AddRange(New Object() {ANW_RESETPARA_RUNBM, ANW_SENSIPLOT_MODPARA, ANW_BLAUESMODELL, ANW_COMBIBM, ANW_TESTPROBLEME, ANW_TSP})
-        ComboBox_Anwendung.SelectedItem = ANW_RESETPARA_RUNBM
-        Anwendung = ComboBox_Anwendung.SelectedItem
+        ComboBox_Anwendung.Items.AddRange(New Object() {"", ANW_RESETPARA_RUNBM, ANW_SENSIPLOT_MODPARA, ANW_BLAUESMODELL, ANW_COMBIBM, ANW_TESTPROBLEME, ANW_TSP})
+        ComboBox_Anwendung.SelectedIndex = 0
 
-        'Testprobleme in ComboBox schreiben
-        Combo_Testproblem.Items.Add("Sinus-Funktion")
-        Combo_Testproblem.Items.Add("Beale-Problem")
-        Combo_Testproblem.Items.Add("Schwefel 2.4-Problem")
-        Combo_Testproblem.Items.Add("Deb 1")
-        Combo_Testproblem.Items.Add("Zitzler/Deb T1")
-        Combo_Testproblem.Items.Add("Zitzler/Deb T2")
-        Combo_Testproblem.Items.Add("Zitzler/Deb T3")
-        Combo_Testproblem.Items.Add("Zitzler/Deb T4")
-        Combo_Testproblem.Items.Add("CONSTR")
-        Combo_Testproblem.Items.Add("Box")
-
-        'TODO: Muss man das hier aufrufen oder kann man es auch gleich auf Index = 0 setzen
-        Combo_Testproblem.SelectedIndex = 0
 
         'Ende der Initialisierung
         IsInitializing = False
@@ -89,19 +73,27 @@ Friend Class Form1
     '************************************************************************************
 
     'Auswahl der zu optimierenden Anwendung geändert
-    Private Sub IniApp(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_IniApp.Click, ComboBox_Anwendung.SelectedIndexChanged, Combo_Testproblem.SelectedIndexChanged
+    Private Sub IniApp(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_IniApp.Click, ComboBox_Anwendung.SelectedIndexChanged, Testprobleme1.Testproblem_Changed
         If Me.IsInitializing = True Then
+            'Testprobleme und Evo Deaktivieren
+            Testprobleme1.Enabled = False
+            EVO_Einstellungen1.Enabled = False
             Exit Sub
         Else
             AppIniOK = True
             Anwendung = ComboBox_Anwendung.SelectedItem
 
             Select Case Anwendung
+                Case ""
+                    'Testprobleme und Evo Deaktivieren
+                    Testprobleme1.Enabled = False
+                    EVO_Einstellungen1.Enabled = False
+
                 Case ANW_RESETPARA_RUNBM
                     'Voreinstellungen lesen EVO.INI
                     Call ReadEVOIni()
                     'Testprobleme und Evo Deaktivieren
-                    Me.GroupBox_Testproblem.Enabled = False
+                    Testprobleme1.Enabled = False
                     EVO_Einstellungen1.Enabled = False
                     'Einlesen OptPara, ModellPara, Zielfunktionen
                     Call BM_Form1.OptParameter_einlesen()
@@ -115,7 +107,7 @@ Friend Class Form1
                     'Voreinstellungen lesen EVO.INI
                     Call ReadEVOIni()
                     'Testprobleme und Evo Deaktivieren
-                    Me.GroupBox_Testproblem.Enabled = False
+                    Testprobleme1.Enabled = False
                     EVO_Einstellungen1.Enabled = False
                     'Einlesen OptPara, ModellPara, Zielfunktionen
                     Call BM_Form1.OptParameter_einlesen()
@@ -141,7 +133,7 @@ Friend Class Form1
                     'Evo aktivieren
                     EVO_Einstellungen1.Enabled = True
                     'Testprobleme ausschalten
-                    Me.GroupBox_Testproblem.Enabled = False
+                    Testprobleme1.Enabled = False
                     'BM_Form anzeigen
                     Dim BM_OK As DialogResult = BM_Form1.ShowDialog()
                     If (BM_OK = Windows.Forms.DialogResult.OK) Then
@@ -159,7 +151,7 @@ Friend Class Form1
                     'Voreinstellungen lesen EVO.INI
                     Call ReadEVOIni()
                     'Testprobleme ausschalten
-                    Me.GroupBox_Testproblem.Enabled = False
+                    Testprobleme1.Enabled = False
                     ''Einlesen OptPara, ModellPara, Zielfunktionen
                     'Call BM_Form1.OptParameter_einlesen()
                     'Call BM_Form1.ModellParameter_einlesen()
@@ -181,7 +173,7 @@ Friend Class Form1
 
                 Case ANW_TESTPROBLEME
                     'Test-Probleme und Evo aktivieren
-                    Me.GroupBox_Testproblem.Enabled = True
+                    Testprobleme1.Enabled = True
                     EVO_Einstellungen1.Enabled = True
                     Call Testprobleme_Initialisierung()
 
@@ -191,45 +183,7 @@ Friend Class Form1
         End If
     End Sub
 
-    'Steuerung des Testproblem Forms auf dem Form1
-    Private Sub Combo1_SelectedIndexChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Combo_Testproblem.SelectedIndexChanged
-        If Me.IsInitializing = True Then
-            Exit Sub
-        Else
-            Select Case Combo_Testproblem.Text
-                Case "Sinus-Funktion"
-                    Problem_SinusFunktion.BringToFront()
-                    EVO_Einstellungen1.OptModus = 0
-                Case "Beale-Problem"
-                    Problem_BealeProblem.BringToFront()
-                    EVO_Einstellungen1.OptModus = 0
-                Case "Schwefel 2.4-Problem"
-                    Problem_Schwefel24.BringToFront()
-                    EVO_Einstellungen1.OptModus = 0
-                Case "Deb 1"
-                    Problem_D1Funktion.BringToFront()
-                    EVO_Einstellungen1.OptModus = 1
-                Case "Zitzler/Deb T1"
-                    Problem_T1Funktion.BringToFront()
-                    EVO_Einstellungen1.OptModus = 1
-                Case "Zitzler/Deb T2"
-                    Problem_T2Funktion.BringToFront()
-                    EVO_Einstellungen1.OptModus = 1
-                Case "Zitzler/Deb T3"
-                    Problem_T3Funktion.BringToFront()
-                    EVO_Einstellungen1.OptModus = 1
-                Case "Zitzler/Deb T4"
-                    Problem_T4Funktion.BringToFront()
-                    EVO_Einstellungen1.OptModus = 1
-                Case "CONSTR"
-                    Problem_CONSTRFunktion.BringToFront()
-                    EVO_Einstellungen1.OptModus = 1
-                Case "Box"
-                    Problem_TKNFunktion.BringToFront()
-                    EVO_Einstellungen1.OptModus = 1
-            End Select
-        End If
-    End Sub
+    
 
     '******************** Initialisierung der Anwendung *********************************
     '************************************************************************************
@@ -238,19 +192,22 @@ Friend Class Form1
 
     Private Sub Testprobleme_Initialisierung()
 
+        'OptModus wird festgelegt um die richtigen EVO.Einstellungen anzuzeigen
+        EVO_Einstellungen1.OptModus = Testprobleme1.OptModus
+
         'BUG: Bug 57: Für alle Testprobleme ReDim mypara(globalAnzPar - 1, 0) ! (wegen Array-Anfang bei 0)
         'Globale Parameter werden gesetzt
-        Call TestProb1.Parameter_Uebergabe(Combo_Testproblem.Text, Text_Sinusfunktion_Par.Text, Text_Schwefel24_Par.Text, globalAnzPar, globalAnzZiel, globalAnzRand, mypara)
+        Call Testprobleme1.Parameter_Uebergabe(Testprobleme1.Combo_Testproblem.Text, Testprobleme1.Text_Sinusfunktion_Par.Text, Testprobleme1.Text_Schwefel24_Par.Text, globalAnzPar, globalAnzZiel, globalAnzRand, mypara)
 
-        Select Case Combo_Testproblem.Text
+        Select Case Testprobleme1.Combo_Testproblem.Text
             Case "Sinus-Funktion"
-                Call TestProb1.TeeChartIni_SinusFunktion(EVO_Einstellungen1, globalAnzPar, Text_Sinusfunktion_Par.Text, TChart1)
+                Call Testprobleme1.TeeChartIni_SinusFunktion(EVO_Einstellungen1, globalAnzPar, Testprobleme1.Text_Sinusfunktion_Par.Text, TChart1)
             Case "Beale-Problem" 'x1 = [-5;5], x2=[-2;2]
-                Call TestProb1.TeeChartIni_BealeProblem(EVO_Einstellungen1, globalAnzPar, TChart1)
+                Call Testprobleme1.TeeChartIni_BealeProblem(EVO_Einstellungen1, globalAnzPar, TChart1)
             Case "Schwefel 2.4-Problem" 'xi = [-10,10]
-                Call TestProb1.TeeChartIni_SchwefelProblem(EVO_Einstellungen1, globalAnzPar, TChart1)
+                Call Testprobleme1.TeeChartIni_SchwefelProblem(EVO_Einstellungen1, globalAnzPar, TChart1)
             Case Else
-                Call TestProb1.TeeChartIni_MultiTestProb(EVO_Einstellungen1, Combo_Testproblem.Text, TChart1)
+                Call Testprobleme1.TeeChartIni_MultiTestProb(EVO_Einstellungen1, Testprobleme1.Combo_Testproblem.Text, TChart1)
         End Select
     End Sub
 
@@ -777,7 +734,7 @@ Start_Evolutionsrunden:
                         '************************************************************************************
                         Select Case Anwendung
                             Case ANW_TESTPROBLEME
-                                myIsOK = TestProb1.Evaluierung_TestProbleme(Combo_Testproblem.Text, globalAnzPar, mypara, durchlauf, ipop, QN, RN, TChart1)
+                                myIsOK = Testprobleme1.Evaluierung_TestProbleme(Testprobleme1.Combo_Testproblem.Text, globalAnzPar, mypara, durchlauf, ipop, QN, RN, TChart1)
                             Case ANW_BLAUESMODELL
                                 myIsOK = BM_Form1.Evaluierung_BlauesModell(globalAnzPar, globalAnzZiel, mypara, durchlauf, ipop, QN, TChart1)
                         End Select
@@ -899,7 +856,7 @@ ErrCode_ES_STARTEN:
     End Sub
 
     'Überprüfung der Eingabe von "Anzahl Parameter" bei Sinus-Funktion
-    Private Sub Par_Sinus_KeyPress(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.KeyPressEventArgs) Handles Text_Sinusfunktion_Par.KeyPress
+    Private Sub Par_Sinus_KeyPress(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.KeyPressEventArgs)
         Dim KeyAscii As Short = Asc(eventArgs.KeyChar)
         'UPGRADE_ISSUE: Zuweisung wird nicht unterstützt: KeyAscii an Nicht-Null-Wert Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1058"'
         KeyAscii = KEYOK(KeyAscii, AllowIntegerOnly)
