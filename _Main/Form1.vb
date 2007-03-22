@@ -194,6 +194,9 @@ Friend Class Form1
 
                     'Call Initialisierung_BlauesModell_CombiOpt()
 
+                    'CES MOdus setzen -> "TSP" oder "BM" Optimierung
+                    CES1.CES_Modus = "BM"
+
                 Case ANW_TESTPROBLEME
                     'Test-Probleme und Evo aktivieren
                     Testprobleme1.Enabled = True
@@ -202,6 +205,9 @@ Friend Class Form1
 
                 Case ANW_TSP
                     Call CES1.TSP_Initialize(TChart1)
+
+                    'CES MOdus setzen -> "TSP" oder "BM" Optimierung
+                    CES1.CES_Modus = "TSP"
             End Select
         End If
     End Sub
@@ -523,10 +529,10 @@ Friend Class Form1
             Call CES1.Evaluate_child_Quality_TSP()
 
             'Sortieren der Kinden anhand der Qualität
-            Call CES1.Sort_Faksimile(CES1.ChildList_TSP)
+            Call CES1.Sort_Faksimile_TSP(CES1.ChildList_TSP)
 
             'Selections Prozess (Übergabe der Kinder an die Eltern je nach Strategie)
-            Call CES1.Selection_Process()
+            Call CES1.Selection_Process_TSP()
 
             'Zeichnen des besten Elter
             'TODO: funzt nur, wenn ganz am ende gezeichnet wird
@@ -535,13 +541,13 @@ Friend Class Form1
             End If
 
             'Kinder werden Hier vollständig gelöscht
-            Call CES1.Reset_Childs()
+            Call CES1.Reset_Childs_TSP()
 
-            'Reproductionsoperatoren, hier gehts dezent zur Sache
-            Call CES1.Reproduction_Operations()
+            'Reproduktionsoperatoren, hier gehts dezent zur Sache
+            Call CES1.Reproduction_Operations_TSP()
 
             'Mutationsoperatoren
-            Call CES1.Mutation_Operations()
+            Call CES1.Mutation_Operations_TSP()
 
         Next gen
 
@@ -561,12 +567,14 @@ Friend Class Form1
         Dim gen As Integer
         Dim i As Integer
 
-        'TeeChart initialisieren
-        Call BM_Form1.TeeChartInitialise_SO_BlauesModell(1, gen, TChart1)
-
         'Arrays werden Dimensioniert
         Call CES1.Dim_Parents_BM()
         Call CES1.Dim_Childs_BM()
+
+        'TeeChart initialisieren
+        Dim Tmp As Integer
+        Tmp = CES1.n_Gen * CES1.ChildList_BM.GetUpperBound(0)
+        Call BM_Form1.TeeChartInitialise_SO_BlauesModell(1, Tmp, TChart1)
 
         'Zufällige Kinderpfade werden generiert
         Call CES1.Generate_Random_Path_BM()
@@ -581,11 +589,39 @@ Friend Class Form1
                 durchlauf += 1
 
                 'Schreibt die neuen Verzweigungen
+                'Dieser Teil steht im Moment im BM Form muss aber ins CES!
                 Call BM_Form1.Verzweigung_Write(CES1.ChildList_BM(i).ON_OFF_Array)
-                Call BM_Form1.Evaluierung_BlauesModell_CombiOpt(CES1.n_Ziele, durchlauf, 1, CES1.ChildList_BM(i).Quality, TChart1)
+                Call BM_Form1.Evaluierung_BlauesModell_CombiOpt(CES1.n_Ziele, durchlauf, 1, CES1.ChildList_BM(i).Quality_MO, TChart1)
+
+                'HACK zur Reduzierung auf eine Zielfunktion
+                Call CES1.MO_TO_SO(CES1.ChildList_BM(i))
+
+                'Zeichnen der Kinder
+                Call TChart1.Series(0).Add(durchlauf, CES1.ChildList_BM(i).Quality_SO)
+                System.Windows.Forms.Application.DoEvents()
             Next
-            'Ermittelt die Qualität der Kinder mit dem BlueM
-            'Call CES1.Evaluate_Child_Quality_BM()
+
+            'Sortieren der Kinden anhand der Qualität
+            Call CES1.Sort_Faksimile_BM(CES1.ChildList_BM)
+
+            'Selectionsprozess je nach "plus" oder "minus" Strategie
+            Call CES1.Selection_Process_BM()
+
+            ''Zeichnen des besten Elter
+            ''TODO: funzt nur, wenn ganz am ende gezeichnet wird
+            'If gen = CES1.n_Gen Then
+            '    Call TChart1.Series(1).Add(durchlauf, OptZieleListe(0).QWertTmp)
+            'End If
+
+            'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
+            Call CES1.Reset_Childs_BM()
+
+            'Reproduktionsoperatoren, hier gehts dezent zur Sache
+            Call CES1.Reproduction_Operations_BM()
+
+            'Mutationsoperatoren
+            Call CES1.Mutation_Operations_BM()
+
         Next
 
     End Function
