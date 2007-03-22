@@ -30,14 +30,14 @@ Public Class CES
     'Public Variablen
     Public n_Cities As Integer = 80
     Public ListOfCities(,) As Double
-    Public n_Gen As Integer = 10000
+    Public n_Gen As Integer = 10
     Public n_Ziele As Integer
 
     'Private Variablen
     Private ReprodOperator As String = "Order_Crossover_OX"
     Private MutOperator As String = "Translocation"
-    Private n_Parents As Integer = 5
-    Private n_Childs As Integer = 15
+    Private n_Parents As Integer = 3
+    Private n_Childs As Integer = 5
     Private Strategy As String = "plus"                                 '"plus" oder "minus" Strategie
 
     '************************************* TSP Struktur *****************************
@@ -107,6 +107,7 @@ Public Class CES
 
         For i = 0 To n_Parents - 1
             ParentList_BM(i).No = i + 1
+            ReDim ParentList_BM(i).Quality(n_Ziele - 1)
             For j = 0 To ParentList_BM(i).Quality.GetUpperBound(0)
                 ParentList_BM(i).Quality(j) = 999999999999999999
             Next
@@ -136,8 +137,9 @@ Public Class CES
 
         For i = 0 To n_Childs - 1
             ChildList_BM(i).No = i + 1
-            For j = 0 To ParentList_BM(i).Quality.GetUpperBound(0)
-                ParentList_BM(i).Quality(j) = 999999999999999999
+            ReDim ChildList_BM(i).Quality(n_Ziele - 1)
+            For j = 0 To ChildList_BM(i).Quality.GetUpperBound(0)
+                ChildList_BM(i).Quality(j) = 999999999999999999
             Next
             ReDim ChildList_BM(i).Path(BM_Form1.LocationList.GetUpperBound(0))
             ReDim ChildList_BM(i).ON_OFF_Array(BM_Form1.VerzweigungsDatei.GetUpperBound(0), 1)
