@@ -205,8 +205,8 @@ Public Class BM_Form
         'Ergebnisdatenbank kopieren
         If (File.Exists(ZielDatei) = False Or overwrite = True) Then
             Try
-                Dim currentDir As String = CurDir()     'sollte das /bin Verzeichnis von EVO_Anwendung sein
-                ChDir("../../EVO_BM")                   'wechselt in das /EVO_BM Verzeichnis 
+                Dim currentDir As String = CurDir()     'sollte das /bin Verzeichnis von _Main sein
+                ChDir("../../Apps")                     'wechselt in das /Apps Verzeichnis 
                 My.Computer.FileSystem.CopyFile("EVO.mdb", ZielDatei, overwrite)
                 ChDir(currentDir)                       'zurück in das Ausgangsverzeichnis wechseln
             Catch except As Exception
@@ -1133,8 +1133,8 @@ Public Class BM_Form
                 'TODO: Call Zielfunktion_zeichnen_MultiObPar_XD()
         End Select
 
-        'Qualitätswerte und OptParameter in DB speichern
-        Call db_update(durchlauf, ipop)
+        ''Qualitätswerte und OptParameter in DB speichern
+        'Call db_update(durchlauf, ipop)
 
     End Function
 

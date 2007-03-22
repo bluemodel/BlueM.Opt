@@ -164,6 +164,9 @@ Friend Class Form1
                     'Einlesen OptPara, ModellPara, Zielfunktionen, Ersatz für Dialog
                     Call BM_Form1.OptZiele_einlesen()
 
+                    ''Datenbank vorbereiten
+                    'Call BM_Form1.db_prepare()
+
                     CES1.n_Ziele = BM_Form1.OptZieleListe.GetLength(0)
 
                     'If (BM_OK = Windows.Forms.DialogResult.OK) Then
