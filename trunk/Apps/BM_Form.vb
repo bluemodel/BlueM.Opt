@@ -293,7 +293,7 @@ Public Class BM_Form
             FiStr.Close()
 
         Catch except As Exception
-            MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim Lesen der Optimierungsparameter")
+            MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim Lesen der Optimierungsparameter" & Chr(13) & Chr(10) & "Ein Fehler könnten Leerzeichen in der letzten Zeile der Datei sein.")
         End Try
     End Sub
 
@@ -342,7 +342,7 @@ Public Class BM_Form
             FiStr.Close()
 
         Catch except As Exception
-            MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim Lesen der Optimierungsparameter")
+            MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim Lesen der Optimierungsparameter" & Chr(13) & Chr(10) & "Ein Fehler könnten Leerzeichen in der letzten Zeile der Datei sein")
         End Try
 
     End Sub
@@ -404,7 +404,7 @@ Public Class BM_Form
                 FiStr.Close()
 
             Catch except As Exception
-                MsgBox("Fehler beim lesen der Optimierungsziel-Datei:" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
+                MsgBox("Fehler beim lesen der Optimierungsziel-Datei:" & Chr(13) & Chr(10) & except.Message & Chr(13) & Chr(10) & "Ein Fehler könnten Leerzeichen in der letzten Zeile der Datei sein", MsgBoxStyle.Exclamation, "Fehler")
             End Try
         End If
 
@@ -426,7 +426,7 @@ Public Class BM_Form
                 End Select
 
                 If (IsOK = False) Then
-                    MsgBox("Fehler beim einlesen der Zielreihe '" & OptZieleListe(i).ZielReihePfad & "'", MsgBoxStyle.Exclamation, "Fehler")
+                    MsgBox("Fehler beim einlesen der Zielreihe '" & OptZieleListe(i).ZielReihePfad & "'" & Chr(13) & Chr(10) & "Ein Fehler könnten Leerzeichen in der letzten Zeile der Datei sein", MsgBoxStyle.Exclamation, "Fehler")
                 End If
 
             End If
@@ -1106,7 +1106,7 @@ Public Class BM_Form
     '    Evaluierung des Blauen Modells für Parameter Optimierung - Steuerungseinheit
     '************************************************************************************
 
-    Public Function Evaluierung_BlauesModell_CombiOpt(ByVal n_Ziele As Short, ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN As Double(), ByRef TChart1 As Steema.TeeChart.TChart) As Boolean
+    Public Function Evaluierung_BlauesModell_CombiOpt(ByVal n_Ziele As Short, ByVal durchlauf As Integer, ByVal ipop As Short, ByRef Quality As Double(), ByRef TChart1 As Steema.TeeChart.TChart) As Boolean
         Dim i As Short
 
         'Modell Starten
@@ -1116,7 +1116,7 @@ Public Class BM_Form
         'BUG 57: QN() fängt bei 1 an!
         For i = 0 To n_Ziele - 1
             OptZieleListe(i).QWertTmp = QualitaetsWert_berechnen(i)
-            QN(i + 1) = OptZieleListe(i).QWertTmp
+            Quality(i) = OptZieleListe(i).QWertTmp
         Next
 
         'Qualitätswerte im TeeChart zeichnen
