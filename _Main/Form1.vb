@@ -579,6 +579,9 @@ Friend Class Form1
         'Zufällige Kinderpfade werden generiert
         Call CES1.Generate_Random_Path_BM()
 
+        'Funktion zum manuellen Testen der Paths in der ersten Generation
+        Call CES1.Generate_Test_Path_BM()
+
         'Generationsschleife
         For gen = 1 To CES1.n_Gen
 
