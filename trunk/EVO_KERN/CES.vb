@@ -22,10 +22,10 @@ Public Class CES
     'LB + UB n=2   x         x
 
     'BM_Form wird kopiert, achtung kein Zeiger
-    Public BM_Form1 As Apps.BM_Form             '"TSP" oder "BM" Optimierung
+    Public BM_Form1 As Apps.BM_Form
 
     'Modus: Unterscheidet zwischen BM und TSP
-    Public CES_Modus As String
+    Public CES_Modus As String           '"TSP" oder "BM" Optimierung
 
     'Public Variablen
     Public n_Cities As Integer = 80
@@ -189,6 +189,25 @@ Public Class CES
                 'Randomize() nicht vergessen
                 tmp = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
                 ChildList_BM(i).Path(j) = tmp
+            Next
+        Next
+
+    End Sub
+
+    'Funktion zum manuellen Testen der Paths in der ersten Generation
+    Public Sub Generate_Test_Path_BM()
+        Dim i, j As Integer
+        Dim Grenze As Integer
+
+        'Achtung n_Childs sollte Größer als die Möglichen Kombinationen an einer Stelle sein
+        For i = 0 To n_Childs - 1
+            For j = 0 To ChildList_BM(i).Path.GetUpperBound(0)
+                Grenze = BM_Form1.LocationList(j).MassnahmeListe.GetUpperBound(0)
+                If i <= Grenze Then
+                    ChildList_BM(i).Path(j) = i
+                Else
+                    ChildList_BM(i).Path(j) = 0
+                End If
             Next
         Next
 
