@@ -191,28 +191,15 @@ Public Class BM_Form
     Public Sub db_prepare()
         'Leere/Neue Ergebnisdatenbank in Arbeitsverzeichnis kopieren
         Dim ZielDatei As String = WorkDir & Datensatz & "_EVO.mdb"
-        Dim overwrite As Boolean = True
 
-        'bei bestehender Ergebnisdatenbank nachfragen, ob überschrieben werden soll
-        If (File.Exists(ZielDatei)) Then
-            Dim response As MsgBoxResult
-            response = MsgBox("Bestehende Ergebnisdatenbank """ & ZielDatei & """ überschreiben?", MsgBoxStyle.YesNo, "Ergebnisdatenbank")
-            If (response = MsgBoxResult.No) Then
-                overwrite = False
-            End If
-        End If
-
-        'Ergebnisdatenbank kopieren
-        If (File.Exists(ZielDatei) = False Or overwrite = True) Then
-            Try
-                Dim currentDir As String = CurDir()     'sollte das /bin Verzeichnis von _Main sein
-                ChDir("../../Apps")                     'wechselt in das /Apps Verzeichnis 
-                My.Computer.FileSystem.CopyFile("EVO.mdb", ZielDatei, overwrite)
-                ChDir(currentDir)                       'zurück in das Ausgangsverzeichnis wechseln
-            Catch except As Exception
-                MsgBox("Ergebnisdatenbank konnte nicht ins Arbeitsverzeichnis kopiert werden:" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
-            End Try
-        End If
+        Try
+            Dim currentDir As String = CurDir()     'sollte das /bin Verzeichnis von _Main sein
+            ChDir("../../Apps")                     'wechselt in das /Apps Verzeichnis 
+            My.Computer.FileSystem.CopyFile("EVO.mdb", ZielDatei, True)
+            ChDir(currentDir)                       'zurück in das Ausgangsverzeichnis wechseln
+        Catch except As Exception
+            MsgBox("Ergebnisdatenbank konnte nicht ins Arbeitsverzeichnis kopiert werden:" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
+        End Try
 
         'Tabellen anpassen
         Dim i As Integer
