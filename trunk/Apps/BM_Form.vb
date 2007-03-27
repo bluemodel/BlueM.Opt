@@ -779,8 +779,10 @@ Public Class BM_Form
             For j = 0 To AnzZeil - 1
                 Zeile = StrRead.ReadLine.ToString()
                 If (j >= ZREHEaderLen) Then
-                    ZRE(j - ZREHEaderLen, 0) = Zeile.Substring(0, 14)                       'Datum
-                    ZRE(j - ZREHEaderLen, 1) = Convert.ToDouble(Zeile.Substring(15, 14))    'Wert
+                    'Datum
+                    ZRE(j - ZREHEaderLen, 0) = New System.DateTime(Zeile.Substring(0, 4), Zeile.Substring(4, 2), Zeile.Substring(6, 2), Zeile.Substring(9, 2), Zeile.Substring(12, 2), 0, New System.Globalization.GregorianCalendar())
+                    'Wert
+                    ZRE(j - ZREHEaderLen, 1) = Convert.ToDouble(Zeile.Substring(15, 14))
                 End If
             Next
 
@@ -842,8 +844,10 @@ Public Class BM_Form
             For j = 0 To AnzZeil - 1
                 Werte = StrRead.ReadLine.ToString.Split(";")
                 If (j >= WELHeaderLen) Then
-                    WEL(j - WELHeaderLen, 0) = Werte(1)                             'Datum
-                    WEL(j - WELHeaderLen, 1) = Convert.ToDouble(Werte(SpalteNr))    'Wert
+                    'Datum
+                    WEL(j - WELHeaderLen, 0) = New System.DateTime(Werte(1).Substring(6, 4), Werte(1).Substring(3, 2), Werte(1).Substring(0, 2), Werte(1).Substring(11, 2), Werte(1).Substring(14, 2), 0, New System.Globalization.GregorianCalendar())
+                    'Wert
+                    WEL(j - WELHeaderLen, 1) = Convert.ToDouble(Werte(SpalteNr))
                 End If
             Next
 
