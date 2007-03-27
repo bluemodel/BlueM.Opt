@@ -49,6 +49,7 @@ Partial Class BM_Form
         Me.TextBox_Combi_Pfad = New System.Windows.Forms.TextBox
         Me.Button_Kombi = New System.Windows.Forms.Button
         Me.OpenFile_Combi = New System.Windows.Forms.OpenFileDialog
+        Me.Button_Cancel = New System.Windows.Forms.Button
         Me.GroupBox_BM.SuspendLayout()
         Me.GroupBox_Parameter.SuspendLayout()
         Me.GroupBox_OptZiele.SuspendLayout()
@@ -245,7 +246,8 @@ Partial Class BM_Form
         '
         'Button_OK
         '
-        Me.Button_OK.Location = New System.Drawing.Point(472, 331)
+        Me.Button_OK.DialogResult = System.Windows.Forms.DialogResult.OK
+        Me.Button_OK.Location = New System.Drawing.Point(442, 331)
         Me.Button_OK.Name = "Button_OK"
         Me.Button_OK.Size = New System.Drawing.Size(75, 23)
         Me.Button_OK.TabIndex = 36
@@ -298,11 +300,22 @@ Partial Class BM_Form
         Me.OpenFile_Combi.Filter = "Kombinatorik|*.opt"
         Me.OpenFile_Combi.Title = "Kombinatorik auswählen"
         '
+        'Button_Cancel
+        '
+        Me.Button_Cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.Button_Cancel.Location = New System.Drawing.Point(523, 331)
+        Me.Button_Cancel.Name = "Button_Cancel"
+        Me.Button_Cancel.Size = New System.Drawing.Size(75, 23)
+        Me.Button_Cancel.TabIndex = 37
+        Me.Button_Cancel.Text = "Abbrechen"
+        Me.Button_Cancel.UseVisualStyleBackColor = True
+        '
         'BM_Form
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(610, 366)
+        Me.Controls.Add(Me.Button_Cancel)
         Me.Controls.Add(Me.Button_OK)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.GroupBox_OptZiele)
@@ -356,5 +369,6 @@ Partial Class BM_Form
     Public WithEvents TextBox_Combi_Pfad As System.Windows.Forms.TextBox
     Friend WithEvents Button_Kombi As System.Windows.Forms.Button
     Friend WithEvents OpenFile_Combi As System.Windows.Forms.OpenFileDialog
+    Friend WithEvents Button_Cancel As System.Windows.Forms.Button
 
 End Class
