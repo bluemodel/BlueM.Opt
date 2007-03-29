@@ -21,8 +21,8 @@ Public Class CES
     'CutPoint:     1 2 3 4 5 6
     'LB + UB n=2   x         x
 
-    'BM_Form wird kopiert, achtung kein Zeiger
-    Public BM_Form1 As Apps.BM_Form
+    'BlueM wird kopiert, achtung kein Zeiger
+    Public BlueM1 As Apps.BlueM
 
     'Modus: Unterscheidet zwischen BM und TSP
     Public CES_Modus As String           '"TSP" oder "BM" Optimierung
@@ -115,8 +115,8 @@ Public Class CES
             For j = 0 To ChildList_BM(i).Quality_MO.GetUpperBound(0)
                 ChildList_BM(i).Quality_MO(j) = 999999999999999999
             Next
-            ReDim ChildList_BM(i).Path(BM_Form1.LocationList.GetUpperBound(0))
-            ReDim ChildList_BM(i).ON_OFF_Array(BM_Form1.VerzweigungsDatei.GetUpperBound(0), 1)
+            ReDim ChildList_BM(i).Path(BlueM1.LocationList.GetUpperBound(0))
+            ReDim ChildList_BM(i).ON_OFF_Array(BlueM1.VerzweigungsDatei.GetUpperBound(0), 1)
         Next
 
     End Sub
@@ -149,8 +149,8 @@ Public Class CES
             For j = 0 To ParentList_BM(i).Quality_MO.GetUpperBound(0)
                 ParentList_BM(i).Quality_MO(j) = 999999999999999999
             Next
-            ReDim ParentList_BM(i).Path(BM_Form1.LocationList.GetUpperBound(0))
-            ReDim ParentList_BM(i).ON_OFF_Array(BM_Form1.VerzweigungsDatei.GetUpperBound(0), 1)
+            ReDim ParentList_BM(i).Path(BlueM1.LocationList.GetUpperBound(0))
+            ReDim ParentList_BM(i).ON_OFF_Array(BlueM1.VerzweigungsDatei.GetUpperBound(0), 1)
         Next
 
     End Sub
@@ -185,7 +185,7 @@ Public Class CES
 
         For i = 0 To n_Childs - 1
             For j = 0 To ChildList_BM(i).Path.GetUpperBound(0)
-                upperb = BM_Form1.LocationList(j).MassnahmeListe.GetUpperBound(0)
+                upperb = BlueM1.LocationList(j).MassnahmeListe.GetUpperBound(0)
                 'Randomize() nicht vergessen
                 tmp = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
                 ChildList_BM(i).Path(j) = tmp
@@ -202,7 +202,7 @@ Public Class CES
         'Achtung n_Childs sollte Größer als die Möglichen Kombinationen an einer Stelle sein
         For i = 0 To n_Childs - 1
             For j = 0 To ChildList_BM(i).Path.GetUpperBound(0)
-                Grenze = BM_Form1.LocationList(j).MassnahmeListe.GetUpperBound(0)
+                Grenze = BlueM1.LocationList(j).MassnahmeListe.GetUpperBound(0)
                 If i <= Grenze Then
                     ChildList_BM(i).Path(j) = i
                 Else
@@ -260,7 +260,7 @@ Public Class CES
     End Sub
 
     'Ermittelt die Qualität der Kinder mit dem BlueM
-    'Achtung! dies Funktionen liegen jetzt im BM_Form
+    'Achtung! dies Funktionen liegen jetzt im BlueM
     Public Sub Evaluate_Child_Quality_BM()
 
 
@@ -347,7 +347,7 @@ Public Class CES
                 ChildList_BM(i).Quality_MO(j) = 999999999999999999
             Next
             Array.Clear(ChildList_BM(i).Path, 0, ChildList_BM(i).Path.GetLength(0))
-            ReDim ChildList_BM(i).ON_OFF_Array(BM_Form1.VerzweigungsDatei.GetUpperBound(0), 1)
+            ReDim ChildList_BM(i).ON_OFF_Array(BlueM1.VerzweigungsDatei.GetUpperBound(0), 1)
         Next
 
     End Sub
@@ -398,7 +398,7 @@ Public Class CES
     Public Sub Reproduction_Operations_BM()
         Dim i As Integer
         Dim x, y As Integer
-        Dim Einzelkind(BM_Form1.LocationList.GetUpperBound(0)) As Integer
+        Dim Einzelkind(BlueM1.LocationList.GetUpperBound(0)) As Integer
 
         Select Case ReprodOperator_BM
             'ToDo: Eltern werden nicht zufällig gewählt sondern immer in Top Down Reihenfolge
@@ -744,7 +744,7 @@ Public Class CES
         For i = 0 To Path.GetUpperBound(0)
             Tmp_a = CInt(Int((upperb_a - lowerb_a + 1) * Rnd() + lowerb_a))
             If Tmp_a = 3 Then
-                upperb_b = BM_Form1.LocationList(i).MassnahmeListe.GetUpperBound(0)
+                upperb_b = BlueM1.LocationList(i).MassnahmeListe.GetUpperBound(0)
                 'Randomize() nicht vergessen
                 Tmp_b = CInt(Int((upperb_b - lowerb_b + 1) * Rnd() + lowerb_b))
                 Path(i) = Tmp_b
@@ -884,11 +884,11 @@ Public Class CES
             .Legend.Visible = False
 
             'Formatierung der Axen
-            '.Chart.Axes.Bottom.Title.Caption = BM_Form1.OptZieleListe(0).Bezeichnung 'HACK: Beschriftung der Axen
+            '.Chart.Axes.Bottom.Title.Caption = BlueM1.OptZieleListe(0).Bezeichnung 'HACK: Beschriftung der Axen
             .Chart.Axes.Bottom.Automatic = False
             .Chart.Axes.Bottom.Minimum = 0
             .Chart.Axes.Bottom.Maximum = 100
-            '.Chart.Axes.Left.Title.Caption = BM_Form1.OptParameterListe(0).Bezeichnung 'HACK: Beschriftung der Axen
+            '.Chart.Axes.Left.Title.Caption = BlueM1.OptParameterListe(0).Bezeichnung 'HACK: Beschriftung der Axen
             .Chart.Axes.Left.Automatic = False
             .Chart.Axes.Left.Minimum = 0
             .Chart.Axes.Left.Maximum = 100
@@ -946,14 +946,14 @@ Public Class CES
         'kann man auch früher machen!!!!
         For i = 0 To n_Childs - 1
             For j = 0 To ChildList_BM(i).ON_OFF_Array.GetUpperBound(0)
-                ChildList_BM(i).ON_OFF_Array(j, 0) = BM_Form1.VerzweigungsDatei(j, 0)
+                ChildList_BM(i).ON_OFF_Array(j, 0) = BlueM1.VerzweigungsDatei(j, 0)
             Next
             For x = 0 To ChildList_BM(i).Path.GetUpperBound(0)
                 No = ChildList_BM(i).Path(x)
-                For y = 0 To BM_Form1.LocationList(x).MassnahmeListe(No).Schaltung.GetUpperBound(0)
+                For y = 0 To BlueM1.LocationList(x).MassnahmeListe(No).Schaltung.GetUpperBound(0)
                     For z = 0 To ChildList_BM(i).ON_OFF_Array.GetUpperBound(0)
-                        If BM_Form1.LocationList(x).MassnahmeListe(No).Schaltung(y, 0) = ChildList_BM(i).ON_OFF_Array(z, 0) Then
-                            ChildList_BM(i).ON_OFF_Array(z, 1) = BM_Form1.LocationList(x).MassnahmeListe(No).Schaltung(y, 1)
+                        If BlueM1.LocationList(x).MassnahmeListe(No).Schaltung(y, 0) = ChildList_BM(i).ON_OFF_Array(z, 0) Then
+                            ChildList_BM(i).ON_OFF_Array(z, 1) = BlueM1.LocationList(x).MassnahmeListe(No).Schaltung(y, 1)
                         End If
                     Next
                 Next

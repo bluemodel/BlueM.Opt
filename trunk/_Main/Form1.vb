@@ -37,7 +37,7 @@ Friend Class Form1
     Private AppIniOK As Boolean = False
 
     '**** Deklarationen der Module *****
-    Public BM_Form1 As New Apps.BM_Form
+    Public BlueM1 As New Apps.BlueM
     Public SensiPlot1 As New Apps.SensiPlot
     Public Wave1 As New Apps.Wave
     Public CES1 As New EvoKern.CES
@@ -98,12 +98,12 @@ Friend Class Form1
                     Testprobleme1.Enabled = False
                     EVO_Einstellungen1.Enabled = False
                     'Einlesen OptPara, ModellPara, Zielfunktionen
-                    Call BM_Form1.OptParameter_einlesen()
-                    Call BM_Form1.ModellParameter_einlesen()
-                    Call BM_Form1.OptZiele_einlesen()
+                    Call BlueM1.OptParameter_einlesen()
+                    Call BlueM1.ModellParameter_einlesen()
+                    Call BlueM1.OptZiele_einlesen()
 
                     'Original ModellParameter werden geschrieben
-                    Call BM_Form1.ModellParameter_schreiben()
+                    Call BlueM1.ModellParameter_schreiben()
 
                 Case ANW_SENSIPLOT_MODPARA
                     'Voreinstellungen lesen EVO.INI
@@ -112,20 +112,20 @@ Friend Class Form1
                     Testprobleme1.Enabled = False
                     EVO_Einstellungen1.Enabled = False
                     'Einlesen OptPara, ModellPara, Zielfunktionen
-                    Call BM_Form1.OptParameter_einlesen()
-                    Call BM_Form1.ModellParameter_einlesen()
-                    Call BM_Form1.OptZiele_einlesen()
+                    Call BlueM1.OptParameter_einlesen()
+                    Call BlueM1.ModellParameter_einlesen()
+                    Call BlueM1.OptZiele_einlesen()
                     ''Datenbank vorbereiten
-                    'Call BM_Form1.db_prepare()
+                    'Call BlueM1.db_prepare()
                     'Sensi Plot Dialog starten und List_Boxen füllen
                     Dim i As Integer
                     Dim IsOK As Boolean
 
-                    For i = 0 To BM_Form1.OptParameterListe.GetUpperBound(0)
-                        IsOK = SensiPlot1.ListBox_OptParameter_add(BM_Form1.OptParameterListe(i).Bezeichnung)
+                    For i = 0 To BlueM1.OptParameterListe.GetUpperBound(0)
+                        IsOK = SensiPlot1.ListBox_OptParameter_add(BlueM1.OptParameterListe(i).Bezeichnung)
                     Next
-                    For i = 0 To BM_Form1.OptZieleListe.GetUpperBound(0)
-                        IsOK = SensiPlot1.ListBox_OptZiele_add(BM_Form1.OptZieleListe(i).Bezeichnung)
+                    For i = 0 To BlueM1.OptZieleListe.GetUpperBound(0)
+                        IsOK = SensiPlot1.ListBox_OptZiele_add(BlueM1.OptZieleListe(i).Bezeichnung)
                     Next
                     Call SensiPlot1.ShowDialog()
 
@@ -136,18 +136,15 @@ Friend Class Form1
                     EVO_Einstellungen1.Enabled = True
                     'Testprobleme ausschalten
                     Testprobleme1.Enabled = False
-                    'BM_Form anzeigen
-                    Dim BM_OK As DialogResult = BM_Form1.ShowDialog()
-
-                    If (BM_OK = Windows.Forms.DialogResult.OK) Then
-                        'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
-                        If BM_Form1.OptZieleListe.GetLength(0) = 1 Then
-                            EVO_Einstellungen1.OptModus = 0
-                        ElseIf BM_Form1.OptZieleListe.GetLength(0) > 1 Then
-                            EVO_Einstellungen1.OptModus = 1
-                        End If
-                        Call Initialisierung_BlauesModell_ParaOpt()
+                    'BM-Einstellungen initialisieren 
+                    Call BlueM1.BM_Ini()
+                    'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
+                    If BlueM1.OptZieleListe.GetLength(0) = 1 Then
+                        EVO_Einstellungen1.OptModus = 0
+                    ElseIf BlueM1.OptZieleListe.GetLength(0) > 1 Then
+                        EVO_Einstellungen1.OptModus = 1
                     End If
+                    Call Initialisierung_BlauesModell_ParaOpt()
 
                 Case ANW_COMBIBM
                     Dim isOK As Boolean
@@ -158,39 +155,36 @@ Friend Class Form1
                     'Testprobleme ausschalten
                     Testprobleme1.Enabled = False
 
-                    'BM_Form anzeigen
-                    'Dim BM_OK As DialogResult = BM_Form1.ShowDialog()
-
                     'Einlesen OptPara, ModellPara, Zielfunktionen, Ersatz für Dialog
-                    Call BM_Form1.OptZiele_einlesen()
+                    Call BlueM1.OptZiele_einlesen()
 
                     ''Datenbank vorbereiten
-                    'Call BM_Form1.db_prepare()
+                    'Call BlueM1.db_prepare()
 
-                    CES1.n_Ziele = BM_Form1.OptZieleListe.GetLength(0)
+                    CES1.n_Ziele = BlueM1.OptZieleListe.GetLength(0)
 
                     'If (BM_OK = Windows.Forms.DialogResult.OK) Then
                     '    'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
-                    '    If BM_Form1.OptZieleListe.GetLength(0) = 1 Then
+                    '    If BlueM1.OptZieleListe.GetLength(0) = 1 Then
                     '        EVO_Einstellungen1.OptModus = 0
-                    '    ElseIf BM_Form1.OptZieleListe.GetLength(0) > 1 Then
+                    '    ElseIf BlueM1.OptZieleListe.GetLength(0) > 1 Then
                     '        EVO_Einstellungen1.OptModus = 1
                     '    End If
                     'End If
 
                     'Einlesen der CombiOpt Datei
-                    Call BM_Form1.Kombinatorik_einlesen()
+                    Call BlueM1.Kombinatorik_einlesen()
 
                     'Überprüfen der Kombinatorik
                     'ToDo: Hier Message Box einbauen
-                    isOK = BM_Form1.Combinatoric_is_Valid
+                    isOK = BlueM1.Combinatoric_is_Valid
 
                     'Einlesen der Verbraucher Datei
-                    Call BM_Form1.Verzweigung_Read()
+                    Call BlueM1.Verzweigung_Read()
 
                     'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
                     'ToDo: Hier Message Box einbauen
-                    isOK = BM_Form1.Combinatoric_fits_to_Verzweisungsdatei()
+                    isOK = BlueM1.Combinatoric_fits_to_Verzweisungsdatei()
 
                     'Call Initialisierung_BlauesModell_CombiOpt()
 
@@ -242,7 +236,7 @@ Friend Class Form1
 
     '*************************** EVO.ini Datei einlesen *********************************
 
-    'TODO: ReadEVO.ini müsste hier raus nach BM_FORM und "Read_Model_OptConfig" heißen **
+    'TODO: ReadEVO.ini müsste hier raus nach BlueM und "Read_Model_OptConfig" heißen **
     Private Sub ReadEVOIni()
         If File.Exists("EVO.ini") Then
             Try
@@ -271,30 +265,16 @@ Friend Class Form1
                 For i = 0 To Configs.GetUpperBound(0)
                     Select Case Configs(i, 0)
                         Case "BM_Exe"
-                            BM_Form1.BM_Exe = Configs(i, 1)
-                            BM_Form1.TextBox_EXE.Text = BM_Form1.BM_Exe
+                            BlueM1.BM_Exe = Configs(i, 1)
                         Case "Datensatz"
                             'Dateiname vom Ende abtrennen
-                            BM_Form1.Datensatz = Configs(i, 1).Substring(Configs(i, 1).LastIndexOf("\") + 1)
+                            BlueM1.Datensatz = Configs(i, 1).Substring(Configs(i, 1).LastIndexOf("\") + 1)
                             'Dateiendung entfernen
-                            BM_Form1.Datensatz = BM_Form1.Datensatz.Substring(0, BM_Form1.Datensatz.Length - 4)
+                            BlueM1.Datensatz = BlueM1.Datensatz.Substring(0, BlueM1.Datensatz.Length - 4)
                             'Arbeitsverzeichnis bestimmen
-                            BM_Form1.WorkDir = Configs(i, 1).Substring(0, Configs(i, 1).LastIndexOf("\") + 1)
-                            BM_Form1.TextBox_Datensatz.Text = Configs(i, 1)
-                        Case "OptParameter"
-                            BM_Form1.OptParameter_Pfad = Configs(i, 1)
-                            BM_Form1.TextBox_OptParameter_Pfad.Text = BM_Form1.OptParameter_Pfad
-                        Case "ModellParameter"
-                            BM_Form1.ModellParameter_Pfad = Configs(i, 1)
-                            BM_Form1.TextBox_ModellParameter_Pfad.Text = BM_Form1.ModellParameter_Pfad
-                        Case "OptZiele"
-                            BM_Form1.OptZiele_Pfad = Configs(i, 1)
-                            BM_Form1.TextBox_OptZiele_Pfad.Text = BM_Form1.OptZiele_Pfad
-                        Case "CombiOpt"
-                            BM_Form1.Combi_Pfad = Configs(i, 1)
-                            BM_Form1.TextBox_Combi_Pfad.Text = BM_Form1.Combi_Pfad
+                            BlueM1.WorkDir = Configs(i, 1).Substring(0, Configs(i, 1).LastIndexOf("\") + 1)
                         Case Else
-                            'nix
+                            'weitere Voreinstellungen
                     End Select
                 Next
 
@@ -317,17 +297,17 @@ Friend Class Form1
 
         'Anzahl Optimierungsparameter übergeben
         '-----------------------------------------------------
-        globalAnzPar = BM_Form1.OptParameterListe.GetLength(0)
+        globalAnzPar = BlueM1.OptParameterListe.GetLength(0)
 
         'Parameterwerte übergeben
         'BUG 57: mypara() fängt bei 1 an!
         ReDim mypara(globalAnzPar, 1)
         For i = 1 To globalAnzPar
-            mypara(i, 1) = BM_Form1.OptParameterListe(i - 1).SKWert
+            mypara(i, 1) = BlueM1.OptParameterListe(i - 1).SKWert
         Next
 
         'globale Anzahl der Ziele muss hier auf Länge der Zielliste gesetzt werden
-        globalAnzZiel_ParaOpt = BM_Form1.OptZieleListe.GetLength(0)
+        globalAnzZiel_ParaOpt = BlueM1.OptZieleListe.GetLength(0)
 
         'TODO: Randbedingungen
         globalAnzRand = 2
@@ -349,9 +329,9 @@ Friend Class Form1
 
         'Initialisierung der TeeChart Serien je nach SO oder MO
         If (isMultiObjective) = False Then
-            Call BM_Form1.TeeChartInitialise_SO_BlauesModell(n_Populationen, n_Kalkulationen, TChart1)
+            Call BlueM1.TeeChartInitialise_SO_BlauesModell(n_Populationen, n_Kalkulationen, TChart1)
         Else
-            Call BM_Form1.TeeChartInitialise_MO_BlauesModell(TChart1)
+            Call BlueM1.TeeChartInitialise_MO_BlauesModell(TChart1)
         End If
 
     End Sub
@@ -370,7 +350,7 @@ Friend Class Form1
         myisrun = True
         Select Case Anwendung
             Case ANW_RESETPARA_RUNBM
-                Call BM_Form1.launchBM()
+                Call BlueM1.launchBM()
             Case ANW_SENSIPLOT_MODPARA
                 myIsOK = SensiPlot_STARTEN(SensiPlot1.Selected_OptParameter, SensiPlot1.Selected_OptZiel, SensiPlot1.Selected_SensiType, SensiPlot1.Anz_Sim)
             Case ANW_BLAUESMODELL
@@ -399,20 +379,20 @@ Friend Class Form1
         globalAnzZiel_ParaOpt = 2
         globalAnzRand = 0
 
-        'Anpassung der Arrays für "Call BM_Form1.ModellParameter_schreiben()"
+        'Anpassung der Arrays für "Call BlueM1.ModellParameter_schreiben()"
         'TODO: Sehr kompliziert, ModellParameter_schreiben und weitere Funktionen sollten pro Prameter funzen.
 
         Dim i As Integer
         Dim j As Integer
         Dim AnzModPara As Integer = 0
 
-        Dim OptParameterListeOrig() As Apps.BM_Form.OptParameter = {}
-        Dim ModellParameterListeOrig() As Apps.BM_Form.ModellParameter = {}
-        Dim OptZieleListeOrig() As Apps.BM_Form.OptZiel = {}
+        Dim OptParameterListeOrig() As Apps.BlueM.OptParameter = {}
+        Dim ModellParameterListeOrig() As Apps.BlueM.ModellParameter = {}
+        Dim OptZieleListeOrig() As Apps.BlueM.OptZiel = {}
 
-        OptParameterListeOrig = BM_Form1.OptParameterListe
-        ModellParameterListeOrig = BM_Form1.ModellParameterListe
-        OptZieleListeOrig = BM_Form1.OptZieleListe
+        OptParameterListeOrig = BlueM1.OptParameterListe
+        ModellParameterListeOrig = BlueM1.ModellParameterListe
+        OptZieleListeOrig = BlueM1.OptZieleListe
 
         For i = 0 To ModellParameterListeOrig.GetUpperBound(0)
             If ModellParameterListeOrig(i).OptParameter = Selected_OptParameter Then
@@ -420,20 +400,20 @@ Friend Class Form1
             End If
         Next
 
-        ReDim BM_Form1.OptParameterListe(0)
-        ReDim BM_Form1.ModellParameterListe(AnzModPara - 1)
-        ReDim BM_Form1.OptZieleListe(0)
+        ReDim BlueM1.OptParameterListe(0)
+        ReDim BlueM1.ModellParameterListe(AnzModPara - 1)
+        ReDim BlueM1.OptZieleListe(0)
 
         For i = 0 To OptParameterListeOrig.GetUpperBound(0)
             If OptParameterListeOrig(i).Bezeichnung = Selected_OptParameter Then
-                BM_Form1.OptParameterListe(0) = OptParameterListeOrig(i)
+                BlueM1.OptParameterListe(0) = OptParameterListeOrig(i)
             End If
         Next
 
         For j = 0 To AnzModPara - 1
             For i = 0 To ModellParameterListeOrig.GetUpperBound(0)
                 If ModellParameterListeOrig(i).OptParameter = Selected_OptParameter Then
-                    BM_Form1.ModellParameterListe(j) = ModellParameterListeOrig(i)
+                    BlueM1.ModellParameterListe(j) = ModellParameterListeOrig(i)
                     j += 1
                 End If
             Next
@@ -441,7 +421,7 @@ Friend Class Form1
 
         For i = 0 To OptZieleListeOrig.GetUpperBound(0)
             If OptZieleListeOrig(i).Bezeichnung = Selected_OptZiel Then
-                BM_Form1.OptZieleListe(0) = OptZieleListeOrig(i)
+                BlueM1.OptZieleListe(0) = OptZieleListeOrig(i)
             End If
         Next
 
@@ -451,11 +431,11 @@ Friend Class Form1
 
         'TODO: Das hier muss neuer TeeChartInitialise_Werden
         'TODO: TeeChart Initialise muss generalisiert werden
-        Call SensiPlot1.TeeChart_Ini_SensiPlot(TChart1, EVO_Einstellungen1.NPopul, BM_Form1.OptZieleListe(0).Bezeichnung, BM_Form1.OptParameterListe(0).Bezeichnung)
+        Call SensiPlot1.TeeChart_Ini_SensiPlot(TChart1, EVO_Einstellungen1.NPopul, BlueM1.OptZieleListe(0).Bezeichnung, BlueM1.OptParameterListe(0).Bezeichnung)
 
         ReDim Wave1.WaveList(Anz_Sim + 1)
         'HACK: Die Spalte der WEL-Datei ist hartvercodet!
-        BM_Form1.ReadWEL(BM_Form1.WorkDir & BM_Form1.Datensatz & ".wel", "S201_1ZU", Wave1.WaveList(0).Wave)
+        BlueM1.ReadWEL(BlueM1.WorkDir & BlueM1.Datensatz & ".wel", "S201_1ZU", Wave1.WaveList(0).Wave)
 
         Randomize()
 
@@ -463,34 +443,34 @@ Friend Class Form1
 
             Select Case Selected_SensiType
                 Case "Gleichverteilt"
-                    BM_Form1.OptParameterListe(0).SKWert = Rnd()
+                    BlueM1.OptParameterListe(0).SKWert = Rnd()
                 Case "Diskret"
-                    BM_Form1.OptParameterListe(0).SKWert = i / Anz_Sim
+                    BlueM1.OptParameterListe(0).SKWert = i / Anz_Sim
             End Select
 
-            Call BM_Form1.ModellParameter_schreiben()
-            Call BM_Form1.launchBM()
+            Call BlueM1.ModellParameter_schreiben()
+            Call BlueM1.launchBM()
 
             'Speichern der ersten und letzten Wave
-            Wave1.WaveList(i).Bezeichnung = BM_Form1.OptZieleListe(0).SimGr
-            'Wave1.WaveList(1).Bezeichnung = BM_Form1.OptZieleListe(0).SpalteWel
+            Wave1.WaveList(i).Bezeichnung = BlueM1.OptZieleListe(0).SimGr
+            'Wave1.WaveList(1).Bezeichnung = BlueM1.OptZieleListe(0).SpalteWel
             'If i = 0 Then
-            BM_Form1.ReadWEL(BM_Form1.WorkDir & BM_Form1.Datensatz & ".wel", BM_Form1.OptZieleListe(0).SimGr, Wave1.WaveList(i + 1).Wave)
+            BlueM1.ReadWEL(BlueM1.WorkDir & BlueM1.Datensatz & ".wel", BlueM1.OptZieleListe(0).SimGr, Wave1.WaveList(i + 1).Wave)
             'ElseIf i = Anz_Sim Then
-            'BM_Form1.ReadWEL(BM_Form1.WorkDir & BM_Form1.Datensatz & ".wel", BM_Form1.OptZieleListe(0).SpalteWel, Wave1.WaveList(1).Wave)
+            'BlueM1.ReadWEL(BlueM1.WorkDir & BlueM1.Datensatz & ".wel", BlueM1.OptZieleListe(0).SpalteWel, Wave1.WaveList(1).Wave)
             'End If
 
-            BM_Form1.OptZieleListe(0).QWertTmp = BM_Form1.QualitaetsWert_berechnen(0)
-            TChart1.Series(0).Add(BM_Form1.OptZieleListe(0).QWertTmp, BM_Form1.OptParameterListe(0).Wert, "")
-            'Call BM_Form1.db_update(durchlauf, ipop)
+            BlueM1.OptZieleListe(0).QWertTmp = BlueM1.QualitaetsWert_berechnen(0)
+            TChart1.Series(0).Add(BlueM1.OptZieleListe(0).QWertTmp, BlueM1.OptParameterListe(0).Wert, "")
+            'Call BlueM1.db_update(durchlauf, ipop)
             durchlauf += 1
             System.Windows.Forms.Application.DoEvents()
 
         Next
 
-        BM_Form1.OptParameterListe = OptParameterListeOrig
-        BM_Form1.ModellParameterListe = ModellParameterListeOrig
-        BM_Form1.OptZieleListe = OptZieleListeOrig
+        BlueM1.OptParameterListe = OptParameterListeOrig
+        BlueM1.ModellParameterListe = ModellParameterListeOrig
+        BlueM1.OptZieleListe = OptZieleListeOrig
 
         Call Wave1.TeeChart_initialise()
         Call Wave1.TeeChart_draw()
@@ -560,8 +540,8 @@ Friend Class Form1
 
         Dim durchlauf As Integer = 0
 
-        'BM_Form wird an CES übergeben um Zugriff auf alle Objekte zu haben
-        CES1.BM_Form1 = BM_Form1
+        'BlueM wird an CES übergeben um Zugriff auf alle Objekte zu haben
+        CES1.BlueM1 = BlueM1
 
         'Laufvariable für die Generationen
         Dim gen As Integer
@@ -574,7 +554,7 @@ Friend Class Form1
         'TeeChart initialisieren
         Dim Tmp As Integer
         Tmp = CES1.n_Gen * CES1.ChildList_BM.GetUpperBound(0)
-        Call BM_Form1.TeeChartInitialise_SO_BlauesModell(1, Tmp, TChart1)
+        Call BlueM1.TeeChartInitialise_SO_BlauesModell(1, Tmp, TChart1)
 
         'Zufällige Kinderpfade werden generiert
         Call CES1.Generate_Random_Path_BM()
@@ -593,8 +573,8 @@ Friend Class Form1
 
                 'Schreibt die neuen Verzweigungen
                 'Dieser Teil steht im Moment im BM Form muss aber ins CES!
-                Call BM_Form1.Verzweigung_Write(CES1.ChildList_BM(i).ON_OFF_Array)
-                Call BM_Form1.Evaluierung_BlauesModell_CombiOpt(CES1.n_Ziele, durchlauf, 1, CES1.ChildList_BM(i).Quality_MO, TChart1)
+                Call BlueM1.Verzweigung_Write(CES1.ChildList_BM(i).ON_OFF_Array)
+                Call BlueM1.Evaluierung_BlauesModell_CombiOpt(CES1.n_Ziele, durchlauf, 1, CES1.ChildList_BM(i).Quality_MO, TChart1)
 
                 'HACK zur Reduzierung auf eine Zielfunktion
                 Call CES1.MO_TO_SO(CES1.ChildList_BM(i))
@@ -831,7 +811,7 @@ Start_Evolutionsrunden:
                             Case ANW_TESTPROBLEME
                                 myIsOK = Testprobleme1.Evaluierung_TestProbleme(Testprobleme1.Combo_Testproblem.Text, globalAnzPar, mypara, durchlauf, ipop, QN, RN, TChart1)
                             Case ANW_BLAUESMODELL
-                                myIsOK = BM_Form1.Evaluierung_BlauesModell_ParaOpt(globalAnzPar, globalAnzZiel_ParaOpt, mypara, durchlauf, ipop, QN, TChart1)
+                                myIsOK = BlueM1.Evaluierung_BlauesModell_ParaOpt(globalAnzPar, globalAnzZiel_ParaOpt, mypara, durchlauf, ipop, QN, TChart1)
                         End Select
 
                         'Einordnen der Qualitätsfunktion im Bestwertspeicher
