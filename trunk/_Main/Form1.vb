@@ -97,6 +97,9 @@ Friend Class Form1
                     'Testprobleme und Evo Deaktivieren
                     Testprobleme1.Enabled = False
                     EVO_Einstellungen1.Enabled = False
+
+                    'Ergebnisdatenbank ausschalten
+                    BlueM1.Ergebnisdb = False
                     'Einlesen OptPara, ModellPara, Zielfunktionen
                     Call BlueM1.OptParameter_einlesen()
                     Call BlueM1.ModellParameter_einlesen()
@@ -111,12 +114,11 @@ Friend Class Form1
                     'Testprobleme und Evo Deaktivieren
                     Testprobleme1.Enabled = False
                     EVO_Einstellungen1.Enabled = False
-                    'Einlesen OptPara, ModellPara, Zielfunktionen
-                    Call BlueM1.OptParameter_einlesen()
-                    Call BlueM1.ModellParameter_einlesen()
-                    Call BlueM1.OptZiele_einlesen()
-                    ''Datenbank vorbereiten
-                    'Call BlueM1.db_prepare()
+
+                    'Ergebnisdatenbank ausschalten
+                    BlueM1.Ergebnisdb = False
+                    'BM-Einstellungen initialisieren 
+                    Call BlueM1.BM_Ini()
                     'Sensi Plot Dialog starten und List_Boxen füllen
                     Dim i As Integer
                     Dim IsOK As Boolean
@@ -136,8 +138,10 @@ Friend Class Form1
                     EVO_Einstellungen1.Enabled = True
                     'Testprobleme ausschalten
                     Testprobleme1.Enabled = False
+
                     'BM-Einstellungen initialisieren 
                     Call BlueM1.BM_Ini()
+
                     'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
                     If BlueM1.OptZieleListe.GetLength(0) = 1 Then
                         EVO_Einstellungen1.OptModus = 0
@@ -155,11 +159,10 @@ Friend Class Form1
                     'Testprobleme ausschalten
                     Testprobleme1.Enabled = False
 
-                    'Einlesen OptPara, ModellPara, Zielfunktionen, Ersatz für Dialog
-                    Call BlueM1.OptZiele_einlesen()
-
-                    ''Datenbank vorbereiten
-                    'Call BlueM1.db_prepare()
+                    'Ergebnisdatenbank ausschalten
+                    BlueM1.Ergebnisdb = False
+                    'BM-Einstellungen initialisieren 
+                    Call BlueM1.BM_Ini()
 
                     CES1.n_Ziele = BlueM1.OptZieleListe.GetLength(0)
 
