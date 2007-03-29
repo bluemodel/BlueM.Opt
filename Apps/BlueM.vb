@@ -3,7 +3,7 @@ Imports System.Data.OleDb
 
 '*******************************************************************************
 '*******************************************************************************
-'**** Klasse BM_Form                                                        ****
+'**** Klasse BlueM                                                        ****
 '****                                                                       ****
 '**** Funktionen zur Kontrolle des BlauenModells                            ****
 '****                                                                       ****
@@ -17,24 +17,20 @@ Imports System.Data.OleDb
 '*******************************************************************************
 '*******************************************************************************
 
-Public Class BM_Form
+Public Class BlueM
 
 
     '************************** Funktionen für ParaOpt **********************************
     '************************************************************************************
 
-    Inherits System.Windows.Forms.Form
+    Public Datensatz As String                           'Name des zu simulierenden Datensatzes
+    Public WorkDir As String                             'Arbeitsverzeichnis für das Blaue Modell
+    Public BM_Exe As String                              'Pfad zu BlauesModell.exe
 
-    'Public Properties
-    '------------------
-    Public Datensatz As String                      'Name des zu simulierenden Datensatzes
-    Public WorkDir As String                        'Arbeitsverzeichnis für das Blaue Modell
-    Public BM_Exe As String                         'Pfad zu BlauesModell.exe
-
-    Public OptParameter_Pfad As String              'Pfad zur Datei mit den Optimierungsparametern (*.OPT)
-    Public ModellParameter_Pfad As String           'Pfad zur Datei mit den Modellparametern (*.OPT)
-    Public OptZiele_Pfad As String                  'Pfad zur Datei mit den Zielfunktionen (*.ZIE)
-    Public Combi_Pfad As String              'Pfad zur Datei mit der Kombinatorik  (*.OPT)
+    Public Const OptParameter_Ext As String = "OPT"      'Erweiterung der Datei mit den Optimierungsparametern (*.OPT)
+    Public Const ModParameter_Ext As String = "MOD"      'Erweiterung der Datei mit den Modellparametern (*.MOD)
+    Public Const OptZiele_Ext As String = "ZIE"          'Erweiterung der Datei mit den Zielfunktionen (*.ZIE)
+    Public Const Combi_Ext As String = "CES"             'Erweiterung der Datei mit der Kombinatorik  (*.CES)
 
     '---------------------------------------------------------------------------------
     'Optimierungsparameter
@@ -97,86 +93,11 @@ Public Class BM_Form
     'Public Maßnahme As Collection
     'Public Kombinatorik As Collection
 
-    'Private Properties
-    '-------------------
-
     'DB
     Dim db As OleDb.OleDbConnection
 
-    'Private Methoden
-    '----------------
-
-    'Exe-Datei
-    Private Sub Button_Exe_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Exe.Click
-        Me.OpenFile_EXE.ShowDialog()
-    End Sub
-
-    Private Sub OpenFile_EXE_FileOk(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles OpenFile_EXE.FileOk
-        'Pfad zur Exe auslesen
-        Me.BM_Exe = Me.OpenFile_EXE.FileName
-        'Pfad in Textbox schreiben
-        Me.TextBox_EXE.Clear()
-        Me.TextBox_EXE.AppendText(Me.BM_Exe)
-    End Sub
-
-    'Datensatz
-    Private Sub Button_Datensatz_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Datensatz.Click
-        Me.OpenFile_Datensatz.ShowDialog()
-    End Sub
-
-    Private Sub OpenFile_Datensatz_FileOk(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles OpenFile_Datensatz.FileOk
-
-        'kompletten Pfad zur ALL-Datei auslesen
-        Dim Datensatz_tmp As String = Me.OpenFile_Datensatz.FileName
-
-        'Pfad in Textbox schreiben
-        Me.TextBox_Datensatz.Text = Datensatz_tmp
-
-        'Dateiname vom Ende abtrennen
-        Datensatz = Datensatz_tmp.Substring(Datensatz_tmp.LastIndexOf("\") + 1)
-        'Dateiendung entfernen
-        Datensatz = Datensatz.Substring(0, Datensatz.Length - 4)
-        'Arbeitsverzeichnis bestimmen
-        WorkDir = Datensatz_tmp.Substring(0, Datensatz_tmp.LastIndexOf("\") + 1)
-
-    End Sub
-
-    'OptimierungsParameter
-    Private Sub Button_OptParameter_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_OptParameter.Click
-        Me.OpenFile_OptParameter.ShowDialog()
-    End Sub
-    Private Sub OpenFile_OptParameter_FileOk(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles OpenFile_OptParameter.FileOk
-        'Pfad zur Datei auslesen
-        Me.OptParameter_Pfad = OpenFile_OptParameter.FileName()
-        'Pfad in Textbox schreiben
-        Me.TextBox_OptParameter_Pfad.Text = OptParameter_Pfad
-    End Sub
-
-    'ModellParameter
-    Private Sub Button_ModellParameter_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_ModellParameter.Click
-        Me.OpenFile_ModellParameter.ShowDialog()
-    End Sub
-    Private Sub OpenFile_ModellParameter_FileOk(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles OpenFile_ModellParameter.FileOk
-        'Pfad zur Datei auslesen
-        Me.ModellParameter_Pfad = OpenFile_ModellParameter.FileName()
-        'Pfad in Textbox schreiben
-        Me.TextBox_ModellParameter_Pfad.Text = ModellParameter_Pfad
-    End Sub
-
-    'Optimierungsziele
-    Private Sub Button_OptZielWert_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_OptZielWert.Click, Button_Kombi.Click
-        Me.OpenFile_OptZiele.ShowDialog()
-    End Sub
-    Private Sub OpenFile_OptZielWert_FileOk(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles OpenFile_OptZiele.FileOk
-        'Pfad zur Datei auslesen
-        Me.OptZiele_Pfad = Me.OpenFile_OptZiele.FileName
-        'Pfad in Textbox schreiben
-        Me.TextBox_OptZiele_Pfad.Text = Me.OptZiele_Pfad
-    End Sub
-
-    'BM-Einstellungen anwenden
-    Private Sub Button_OK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_OK.Click
-        Me.Close()
+    'BM-Einstellungen initialisieren
+    Public Sub BM_Ini()
         'Optimierungsparameter einlesen
         Call OptParameter_einlesen()
         'ModellParameter einlesen
@@ -238,10 +159,13 @@ Public Class BM_Form
 
     End Sub
 
-    'Optimierungsparameter einlesen (*.OPT-Datei)
+    'Optimierungsparameter einlesen
     Public Sub OptParameter_einlesen()
+
         Try
-            Dim FiStr As FileStream = New FileStream(OptParameter_Pfad, FileMode.Open, IO.FileAccess.ReadWrite)
+            Dim Datei As String = WorkDir & Datensatz & "." & OptParameter_Ext
+
+            Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
             Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
             Dim Zeile As String
@@ -280,14 +204,16 @@ Public Class BM_Form
             FiStr.Close()
 
         Catch except As Exception
-            MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim Lesen der Optimierungsparameter" & Chr(13) & Chr(10) & "Ein Fehler könnten Leerzeichen in der letzten Zeile der Datei sein.")
+            MsgBox("Fehler beim Lesen der Optimierungsparameter:" & Chr(13) & Chr(10) & except.Message & Chr(13) & Chr(10) & "Ein Fehler könnten Leerzeichen in der letzten Zeile der Datei sein.", MsgBoxStyle.Exclamation, "Fehler")
         End Try
     End Sub
 
-    'Modellparameter einlesen (*.OPT-Datei)
+    'Modellparameter einlesen
     Public Sub ModellParameter_einlesen()
         Try
-            Dim FiStr As FileStream = New FileStream(ModellParameter_Pfad, FileMode.Open, IO.FileAccess.ReadWrite)
+            Dim Datei As String = WorkDir & Datensatz & "." & ModParameter_Ext
+
+            Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
             Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
             Dim Zeile As String
@@ -334,7 +260,7 @@ Public Class BM_Form
 
     End Sub
 
-    'Optimierungsziele einlesen (*.zie-Datei)
+    'Optimierungsziele einlesen
     Public Sub OptZiele_einlesen()
         Dim AnzZiele As Integer = 0
         Dim IsOK As Boolean
@@ -342,58 +268,54 @@ Public Class BM_Form
         Dim i As Integer = 0
         Dim j As Integer = 0
 
-        'Einlesen der Zielfunktionsdatei
-        If OptZiele_Pfad Is Nothing Then
-            Exit Sub
-        Else
+        Try
+            Dim Datei As String = WorkDir & Datensatz & "." & OptZiele_Ext
 
-            Try
-                Dim FiStr As FileStream = New FileStream(OptZiele_Pfad, FileMode.Open, IO.FileAccess.ReadWrite)
-                Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+            Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
+            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-                Dim Zeile As String = ""
+            Dim Zeile As String = ""
 
-                'Anzahl der Zielfunktionen feststellen
-                Do
-                    Zeile = StrRead.ReadLine.ToString()
-                    If (Zeile.StartsWith("*") = False) Then
-                        AnzZiele += 1
-                    End If
-                Loop Until StrRead.Peek() = -1
+            'Anzahl der Zielfunktionen feststellen
+            Do
+                Zeile = StrRead.ReadLine.ToString()
+                If (Zeile.StartsWith("*") = False) Then
+                    AnzZiele += 1
+                End If
+            Loop Until StrRead.Peek() = -1
 
-                ReDim OptZieleListe(AnzZiele - 1)
+            ReDim OptZieleListe(AnzZiele - 1)
 
-                'Zurück zum Dateianfang und lesen
-                FiStr.Seek(0, SeekOrigin.Begin)
+            'Zurück zum Dateianfang und lesen
+            FiStr.Seek(0, SeekOrigin.Begin)
 
-                'Einlesen der Zeile und übergeben an die OptimierungsZiele Liste
-                Dim ZeilenArray(9) As String
+            'Einlesen der Zeile und übergeben an die OptimierungsZiele Liste
+            Dim ZeilenArray(9) As String
 
-                Do
-                    Zeile = StrRead.ReadLine.ToString()
-                    If (Zeile.StartsWith("*") = False) Then
-                        ZeilenArray = Zeile.Split("|")
-                        'Werte zuweisen
-                        OptZieleListe(i).Bezeichnung = ZeilenArray(1).Trim()
-                        OptZieleListe(i).ZielTyp = ZeilenArray(2).Trim()
-                        OptZieleListe(i).Datei = ZeilenArray(3).Trim()
-                        OptZieleListe(i).SimGr = ZeilenArray(4).Trim()
-                        OptZieleListe(i).ZielFkt = ZeilenArray(5).Trim()
-                        OptZieleListe(i).WertTyp = ZeilenArray(6).Trim()
-                        OptZieleListe(i).ZielWert = ZeilenArray(7).Trim()
-                        OptZieleListe(i).ZielGr = ZeilenArray(8).Trim()
-                        OptZieleListe(i).ZielReihePfad = ZeilenArray(9).Trim()
-                        i += 1
-                    End If
-                Loop Until StrRead.Peek() = -1
+            Do
+                Zeile = StrRead.ReadLine.ToString()
+                If (Zeile.StartsWith("*") = False) Then
+                    ZeilenArray = Zeile.Split("|")
+                    'Werte zuweisen
+                    OptZieleListe(i).Bezeichnung = ZeilenArray(1).Trim()
+                    OptZieleListe(i).ZielTyp = ZeilenArray(2).Trim()
+                    OptZieleListe(i).Datei = ZeilenArray(3).Trim()
+                    OptZieleListe(i).SimGr = ZeilenArray(4).Trim()
+                    OptZieleListe(i).ZielFkt = ZeilenArray(5).Trim()
+                    OptZieleListe(i).WertTyp = ZeilenArray(6).Trim()
+                    OptZieleListe(i).ZielWert = ZeilenArray(7).Trim()
+                    OptZieleListe(i).ZielGr = ZeilenArray(8).Trim()
+                    OptZieleListe(i).ZielReihePfad = ZeilenArray(9).Trim()
+                    i += 1
+                End If
+            Loop Until StrRead.Peek() = -1
 
-                StrRead.Close()
-                FiStr.Close()
+            StrRead.Close()
+            FiStr.Close()
 
-            Catch except As Exception
-                MsgBox("Fehler beim lesen der Optimierungsziel-Datei:" & Chr(13) & Chr(10) & except.Message & Chr(13) & Chr(10) & "Ein Fehler könnten Leerzeichen in der letzten Zeile der Datei sein", MsgBoxStyle.Exclamation, "Fehler")
-            End Try
-        End If
+        Catch except As Exception
+            MsgBox("Fehler beim lesen der Optimierungsziel-Datei:" & Chr(13) & Chr(10) & except.Message & Chr(13) & Chr(10) & "Ein Fehler könnten Leerzeichen in der letzten Zeile der Datei sein", MsgBoxStyle.Exclamation, "Fehler")
+        End Try
 
         'Falls mit Reihen verglichen werden soll werden hier die Reihen eingelesen
         For i = 0 To AnzZiele - 1
@@ -429,9 +351,6 @@ Public Class BM_Form
     Private Sub db_disconnect()
         db.Close()
     End Sub
-
-    'Public Methoden
-    '-------------------------------------
 
     'ModellParameter werden aus OptParametern errechnet
     Public Sub OptParameter_to_ModellParameter()
@@ -1079,7 +998,7 @@ Public Class BM_Form
                 TChart1.Series(0).Add(OptZieleListe(0).QWertTmp, OptZieleListe(1).QWertTmp, "")
             Case 3
                 'TODO MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
-                'Call Zielfunktion_zeichnen_MultiObPar_3D(BM_Form1.OptZieleListe(0).QWertTmp, BM_Form1.OptZieleListe(1).QWertTmp, BM_Form1.OptZieleListe(2).QWertTmp)
+                'Call Zielfunktion_zeichnen_MultiObPar_3D(BlueM1.OptZieleListe(0).QWertTmp, BlueM1.OptZieleListe(1).QWertTmp, BlueM1.OptZieleListe(2).QWertTmp)
             Case Else
                 'TODO MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
                 'TODO: Call Zielfunktion_zeichnen_MultiObPar_XD()
@@ -1094,7 +1013,7 @@ Public Class BM_Form
     '************************************************************************************
 
 
-    '    Evaluierung des Blauen Modells für Parameter Optimierung - Steuerungseinheit
+    '    Evaluierung des Blauen Modells für Kombinatorik Optimierung - Steuerungseinheit
     '************************************************************************************
 
     Public Function Evaluierung_BlauesModell_CombiOpt(ByVal n_Ziele As Short, ByVal durchlauf As Integer, ByVal ipop As Short, ByRef Quality As Double(), ByRef TChart1 As Steema.TeeChart.TChart) As Boolean
@@ -1118,7 +1037,7 @@ Public Class BM_Form
                 TChart1.Series(0).Add(OptZieleListe(0).QWertTmp, OptZieleListe(1).QWertTmp, "")
             Case 3
                 'TODO MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
-                'Call Zielfunktion_zeichnen_MultiObPar_3D(BM_Form1.OptZieleListe(0).QWertTmp, BM_Form1.OptZieleListe(1).QWertTmp, BM_Form1.OptZieleListe(2).QWertTmp)
+                'Call Zielfunktion_zeichnen_MultiObPar_3D(BlueM1.OptZieleListe(0).QWertTmp, BlueM1.OptZieleListe(1).QWertTmp, BlueM1.OptZieleListe(2).QWertTmp)
             Case Else
                 'TODO MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
                 'TODO: Call Zielfunktion_zeichnen_MultiObPar_XD()
@@ -1147,10 +1066,12 @@ Public Class BM_Form
 
     'Kombinatorik Funktionen **************************************
 
-    'Kombinatorik einlesen (*.OPT-Datei)
+    'Kombinatorik einlesen
     Public Sub Kombinatorik_einlesen()
         Try
-            Dim FiStr As FileStream = New FileStream(Combi_Pfad, FileMode.Open, IO.FileAccess.ReadWrite)
+            Dim Datei As String = WorkDir & Datensatz & "." & Combi_Ext
+
+            Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
             Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
             Dim Zeile As String
