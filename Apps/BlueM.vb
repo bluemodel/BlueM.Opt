@@ -26,6 +26,7 @@ Public Class BlueM
     Public Datensatz As String                           'Name des zu simulierenden Datensatzes
     Public WorkDir As String                             'Arbeitsverzeichnis für das Blaue Modell
     Public BM_Exe As String                              'Pfad zu BlauesModell.exe
+    Public Ergebnisdb As Boolean = True                  'Gibt an, ob die Ergebnisdatenbank geschrieben werden soll
 
     Public Const OptParameter_Ext As String = "OPT"      'Erweiterung der Datei mit den Optimierungsparametern (*.OPT)
     Public Const ModParameter_Ext As String = "MOD"      'Erweiterung der Datei mit den Modellparametern (*.MOD)
@@ -105,7 +106,9 @@ Public Class BlueM
         'Zielfunktionen einlesen
         Call OptZiele_einlesen()
         'Datenbank vorbereiten
-        Call db_prepare()
+        If (Ergebnisdb = True) Then
+            Call db_prepare()
+        End If
     End Sub
 
     'Ergebnisdatenbank vorbereiten
