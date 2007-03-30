@@ -520,7 +520,7 @@ Friend Class Form1
             'Zeichnen des besten Elter
             'TODO: funzt nur, wenn ganz am ende gezeichnet wird
             If gen = CES1.n_Gen Then
-                Call CES1.TeeChart_Zeichnen_TSP(TChart1, CES1.ParentList_TSP(0).CityList)
+                Call CES1.TeeChart_Zeichnen_TSP(TChart1, CES1.ParentList_TSP(0).Image)
             End If
 
             'Kinder werden Hier vollständig gelöscht
@@ -576,7 +576,7 @@ Friend Class Form1
 
                 'Schreibt die neuen Verzweigungen
                 'Dieser Teil steht im Moment im BM Form muss aber ins CES!
-                Call BlueM1.Verzweigung_Write(CES1.ChildList_BM(i).ON_OFF_Array)
+                Call BlueM1.Verzweigung_Write(CES1.ChildList_BM(i).Image)
                 Call BlueM1.Evaluierung_BlauesModell_CombiOpt(CES1.n_Ziele, durchlauf, 1, CES1.ChildList_BM(i).Quality_MO, TChart1)
 
                 'HACK zur Reduzierung auf eine Zielfunktion
