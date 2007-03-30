@@ -29,8 +29,8 @@ Public Class CES
 
     'Public Variablen
     Public n_Cities As Integer = 80
-    Public ListOfCities(,) As Double
-    Public n_Gen As Integer = 10
+    Public ListOfCities(,) As Object
+    Public n_Gen As Integer = 10   
     Public n_Ziele As Integer
 
     'Private Variablen
@@ -44,28 +44,21 @@ Public Class CES
     Private MutRate As Integer = 3              'Definiert die Wahrscheinlichkeit mit beim Rnd Swich Mutiert wird
 
     '************************************* TSP Struktur *****************************
-    Public Structure Faksimile_TSP
+    Public Structure Faksimile
         Dim No As Short
         Dim Path() As Integer
-        Dim Quality As Double
-        Dim CityList(,) As Double
+        Dim Quality_SO As Double    'HACK zum Ausgleich von MO und SO
+        Dim Quality_MO() As Double
+        Dim Image(,) As Object
     End Structure
 
-    Public ChildList_TSP() As Faksimile_TSP = {}
-    Public ParentList_TSP() As Faksimile_TSP = {}
+    Public ChildList_TSP() As Faksimile = {}
+    Public ParentList_TSP() As Faksimile = {}
 
-    '************************************* BM Struktur ******************************
+    '************************************* BM Listen ******************************
 
-    Public Structure Faksimile_BM
-        Public No As Short
-        Public Path() As Integer
-        Public Quality_SO As Double    'HACK zum Ausgleich von MO und SO
-        Public Quality_MO() As Double
-        Public ON_OFF_Array(,) As String
-    End Structure
-
-    Public ChildList_BM() As Faksimile_BM
-    Public ParentList_BM() As Faksimile_BM
+    Public ChildList_BM() As Faksimile
+    Public ParentList_BM() As Faksimile
 
     '******************************** Initialisierung *************************************
 
@@ -96,8 +89,8 @@ Public Class CES
 
         For i = 0 To n_Childs - 1
             ChildList_TSP(i).No = i + 1
-            ChildList_TSP(i).Quality = 999999999999999999
-            ReDim ChildList_TSP(i).CityList(n_Cities - 1, 2)
+            ChildList_TSP(i).Quality_SO = 999999999999999999
+            ReDim ChildList_TSP(i).Image(n_Cities - 1, 2)
             ReDim ChildList_TSP(i).Path(n_Cities - 1)
         Next
 
@@ -111,12 +104,13 @@ Public Class CES
         For i = 0 To n_Childs - 1
             ChildList_BM(i).No = i + 1
             ChildList_BM(i).Quality_SO = 999999999999999999
+
             ReDim ChildList_BM(i).Quality_MO(n_Ziele - 1)
             For j = 0 To ChildList_BM(i).Quality_MO.GetUpperBound(0)
                 ChildList_BM(i).Quality_MO(j) = 999999999999999999
             Next
             ReDim ChildList_BM(i).Path(BlueM1.LocationList.GetUpperBound(0))
-            ReDim ChildList_BM(i).ON_OFF_Array(BlueM1.VerzweigungsDatei.GetUpperBound(0), 1)
+            ReDim ChildList_BM(i).Image(BlueM1.VerzweigungsDatei.GetUpperBound(0), 1)
         Next
 
     End Sub
@@ -129,8 +123,8 @@ Public Class CES
 
         For i = 0 To n_Parents - 1
             ParentList_TSP(i).No = i + 1
-            ParentList_TSP(i).Quality = 999999999999999999
-            ReDim ParentList_TSP(i).CityList(n_Cities - 1, 2)
+            ParentList_TSP(i).Quality_SO = 999999999999999999
+            ReDim ParentList_TSP(i).Image(n_Cities - 1, 2)
             ReDim ParentList_TSP(i).Path(n_Cities - 1)
         Next
 
@@ -150,7 +144,7 @@ Public Class CES
                 ParentList_BM(i).Quality_MO(j) = 999999999999999999
             Next
             ReDim ParentList_BM(i).Path(BlueM1.LocationList.GetUpperBound(0))
-            ReDim ParentList_BM(i).ON_OFF_Array(BlueM1.VerzweigungsDatei.GetUpperBound(0), 1)
+            ReDim ParentList_BM(i).Image(BlueM1.VerzweigungsDatei.GetUpperBound(0), 1)
         Next
 
     End Sub
@@ -220,11 +214,11 @@ Public Class CES
         Dim i, j As Integer
 
         For i = 0 To n_Childs - 1
-            ReDim ChildList_TSP(i).CityList(n_Cities - 1, 2)
+            ReDim ChildList_TSP(i).Image(n_Cities - 1, 2)
             For j = 0 To n_Cities - 1
-                ChildList_TSP(i).CityList(j, 0) = ListOfCities(ChildList_TSP(i).Path(j) - 1, 0)
-                ChildList_TSP(i).CityList(j, 1) = ListOfCities(ChildList_TSP(i).Path(j) - 1, 1)
-                ChildList_TSP(i).CityList(j, 2) = ListOfCities(ChildList_TSP(i).Path(j) - 1, 2)
+                ChildList_TSP(i).Image(j, 0) = ListOfCities(ChildList_TSP(i).Path(j) - 1, 0)
+                ChildList_TSP(i).Image(j, 1) = ListOfCities(ChildList_TSP(i).Path(j) - 1, 1)
+                ChildList_TSP(i).Image(j, 2) = ListOfCities(ChildList_TSP(i).Path(j) - 1, 2)
             Next
         Next i
 
@@ -242,19 +236,19 @@ Public Class CES
             distanceX = 0
             distanceY = 0
             For j = 0 To n_Cities - 2
-                ChildList_TSP(i).Quality = 999999999999999999
-                distanceX = (ChildList_TSP(i).CityList(j, 1) - ChildList_TSP(i).CityList(j + 1, 1))
+                ChildList_TSP(i).Quality_SO = 999999999999999999
+                distanceX = (ChildList_TSP(i).Image(j, 1) - ChildList_TSP(i).Image(j + 1, 1))
                 distanceX = distanceX * distanceX
-                distanceY = (ChildList_TSP(i).CityList(j, 2) - ChildList_TSP(i).CityList(j + 1, 2))
+                distanceY = (ChildList_TSP(i).Image(j, 2) - ChildList_TSP(i).Image(j + 1, 2))
                 distanceY = distanceY * distanceY
                 distance = distance + Math.Sqrt(distanceX + distanceY)
             Next j
-            distanceX = (ChildList_TSP(i).CityList(0, 1) - ChildList_TSP(i).CityList(n_Cities - 1, 1))
+            distanceX = (ChildList_TSP(i).Image(0, 1) - ChildList_TSP(i).Image(n_Cities - 1, 1))
             distanceX = distanceX * distanceX
-            distanceY = (ChildList_TSP(i).CityList(0, 2) - ChildList_TSP(i).CityList(n_Cities - 1, 2))
+            distanceY = (ChildList_TSP(i).Image(0, 2) - ChildList_TSP(i).Image(n_Cities - 1, 2))
             distanceY = distanceY * distanceY
             distance = distance + Math.Sqrt(distanceX + distanceY)
-            ChildList_TSP(i).Quality = distance
+            ChildList_TSP(i).Quality_SO = distance
         Next i
 
     End Sub
@@ -272,19 +266,19 @@ Public Class CES
 
         If Strategy = "minus" Then
             For i = 0 To n_Parents - 1
-                ParentList_TSP(i).Quality = ChildList_TSP(i).Quality
-                Array.Copy(ChildList_TSP(i).CityList, ParentList_TSP(i).CityList, ChildList_TSP(i).CityList.Length)
+                ParentList_TSP(i).Quality_SO = ChildList_TSP(i).Quality_SO
+                Array.Copy(ChildList_TSP(i).Image, ParentList_TSP(i).Image, ChildList_TSP(i).Image.Length)
                 Array.Copy(ChildList_TSP(i).Path, ParentList_TSP(i).Path, ChildList_TSP(i).Path.Length)
             Next i
 
         ElseIf Strategy = "plus" Then
             j = 0
             For i = 0 To n_Parents - 1
-                If ParentList_TSP(i).Quality < ChildList_TSP(j).Quality Then
+                If ParentList_TSP(i).Quality_SO < ChildList_TSP(j).Quality_SO Then
                     j -= 1
                 Else
-                    ParentList_TSP(i).Quality = ChildList_TSP(j).Quality
-                    Array.Copy(ChildList_TSP(j).CityList, ParentList_TSP(i).CityList, ChildList_TSP(j).CityList.Length)
+                    ParentList_TSP(i).Quality_SO = ChildList_TSP(j).Quality_SO
+                    Array.Copy(ChildList_TSP(j).Image, ParentList_TSP(i).Image, ChildList_TSP(j).Image.Length)
                     Array.Copy(ChildList_TSP(j).Path, ParentList_TSP(i).Path, ChildList_TSP(j).Path.Length)
                 End If
                 j += 1
@@ -302,7 +296,7 @@ Public Class CES
         If Strategy = "minus" Then
             For i = 0 To n_Parents - 1
                 ParentList_BM(i).Quality_SO = ChildList_BM(i).Quality_SO
-                Array.Copy(ChildList_BM(i).ON_OFF_Array, ParentList_BM(i).ON_OFF_Array, ChildList_BM(i).ON_OFF_Array.Length)
+                Array.Copy(ChildList_BM(i).Image, ParentList_BM(i).Image, ChildList_BM(i).Image.Length)
                 Array.Copy(ChildList_BM(i).Path, ParentList_BM(i).Path, ChildList_BM(i).Path.Length)
             Next i
 
@@ -314,7 +308,7 @@ Public Class CES
                 Else
                     ParentList_BM(i).Quality_SO = ChildList_BM(j).Quality_SO
                     ParentList_BM(i).Quality_MO = ChildList_BM(j).Quality_MO 'HACK: hier Qualität Doppelt
-                    Array.Copy(ChildList_BM(j).ON_OFF_Array, ParentList_BM(i).ON_OFF_Array, ChildList_BM(j).ON_OFF_Array.Length)
+                    Array.Copy(ChildList_BM(j).Image, ParentList_BM(i).Image, ChildList_BM(j).Image.Length)
                     Array.Copy(ChildList_BM(j).Path, ParentList_BM(i).Path, ChildList_BM(j).Path.Length)
                 End If
                 j += 1
@@ -329,9 +323,9 @@ Public Class CES
 
         For i = 0 To n_Childs - 1
             ChildList_TSP(i).No = i + 1
-            ChildList_TSP(i).Quality = 999999999999999999
+            ChildList_TSP(i).Quality_SO = 999999999999999999
             Array.Clear(ChildList_TSP(i).Path, 0, ChildList_TSP(i).Path.GetLength(0))
-            ReDim ChildList_TSP(i).CityList(n_Cities, 2)
+            ReDim ChildList_TSP(i).Image(n_Cities, 2)
         Next
 
     End Sub
@@ -347,7 +341,7 @@ Public Class CES
                 ChildList_BM(i).Quality_MO(j) = 999999999999999999
             Next
             Array.Clear(ChildList_BM(i).Path, 0, ChildList_BM(i).Path.GetLength(0))
-            ReDim ChildList_BM(i).ON_OFF_Array(BlueM1.VerzweigungsDatei.GetUpperBound(0), 1)
+            ReDim ChildList_BM(i).Image(BlueM1.VerzweigungsDatei.GetUpperBound(0), 1)
         Next
 
     End Sub
@@ -781,14 +775,14 @@ Public Class CES
     End Function
 
     'Hilfsfunktion zum sortieren der Faksimile
-    Public Sub Sort_Faksimile_TSP(ByRef FaksimileList() As Faksimile_TSP)
+    Public Sub Sort_Faksimile_TSP(ByRef FaksimileList() As Faksimile)
         'Sortiert die Fiksimile anhand des Abstandes
         Dim i, j As Integer
-        Dim swap As EvoKern.CES.Faksimile_TSP
+        Dim swap As EvoKern.CES.Faksimile
 
         For i = 0 To FaksimileList.GetUpperBound(0)
             For j = 0 To FaksimileList.GetUpperBound(0)
-                If FaksimileList(i).Quality < FaksimileList(j).Quality Then
+                If FaksimileList(i).Quality_SO < FaksimileList(j).Quality_SO Then
                     swap = FaksimileList(i)
                     FaksimileList(i) = FaksimileList(j)
                     FaksimileList(j) = swap
@@ -799,10 +793,10 @@ Public Class CES
     End Sub
 
     'Hilfsfunktion zum sortieren der Faksimile
-    Public Sub Sort_Faksimile_BM(ByRef FaksimileList() As Faksimile_BM)
+    Public Sub Sort_Faksimile_BM(ByRef FaksimileList() As Faksimile)
         'Sortiert die Fiksimile anhand des Abstandes
         Dim i, j As Integer
-        Dim swap As EvoKern.CES.Faksimile_BM
+        Dim swap As EvoKern.CES.Faksimile
 
         For i = 0 To FaksimileList.GetUpperBound(0)
             For j = 0 To FaksimileList.GetUpperBound(0)
@@ -862,7 +856,7 @@ Public Class CES
     End Function
 
     'HACK zur Reduzierung auf eine Zielfunktion
-    Public Sub MO_TO_SO(ByRef FaksimileList As Faksimile_BM)
+    Public Sub MO_TO_SO(ByRef FaksimileList As Faksimile)
         Dim x As Integer
         FaksimileList.Quality_SO = 0
         For x = 0 To FaksimileList.Quality_MO.GetUpperBound(0)
@@ -914,7 +908,7 @@ Public Class CES
         End With
     End Sub
 
-    Public Sub TeeChart_Zeichnen_TSP(ByRef TChart1 As Steema.TeeChart.TChart, ByVal TmpListOfCities(,) As Double)
+    Public Sub TeeChart_Zeichnen_TSP(ByRef TChart1 As Steema.TeeChart.TChart, ByVal TmpListOfCities(,) As Object)
 
         Dim i As Integer
 
@@ -945,15 +939,15 @@ Public Class CES
         'Schreibt alle Verzweigungen ins Array
         'kann man auch früher machen!!!!
         For i = 0 To n_Childs - 1
-            For j = 0 To ChildList_BM(i).ON_OFF_Array.GetUpperBound(0)
-                ChildList_BM(i).ON_OFF_Array(j, 0) = BlueM1.VerzweigungsDatei(j, 0)
+            For j = 0 To ChildList_BM(i).Image.GetUpperBound(0)
+                ChildList_BM(i).Image(j, 0) = BlueM1.VerzweigungsDatei(j, 0)
             Next
             For x = 0 To ChildList_BM(i).Path.GetUpperBound(0)
                 No = ChildList_BM(i).Path(x)
                 For y = 0 To BlueM1.LocationList(x).MassnahmeListe(No).Schaltung.GetUpperBound(0)
-                    For z = 0 To ChildList_BM(i).ON_OFF_Array.GetUpperBound(0)
-                        If BlueM1.LocationList(x).MassnahmeListe(No).Schaltung(y, 0) = ChildList_BM(i).ON_OFF_Array(z, 0) Then
-                            ChildList_BM(i).ON_OFF_Array(z, 1) = BlueM1.LocationList(x).MassnahmeListe(No).Schaltung(y, 1)
+                    For z = 0 To ChildList_BM(i).Image.GetUpperBound(0)
+                        If BlueM1.LocationList(x).MassnahmeListe(No).Schaltung(y, 0) = ChildList_BM(i).Image(z, 0) Then
+                            ChildList_BM(i).Image(z, 1) = BlueM1.LocationList(x).MassnahmeListe(No).Schaltung(y, 1)
                         End If
                     Next
                 Next
