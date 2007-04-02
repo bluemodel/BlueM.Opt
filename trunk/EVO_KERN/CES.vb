@@ -41,7 +41,7 @@ Public Class CES
     Private n_Parents As Integer = 3
     Private n_Childs As Integer = 5
     Private Strategy As String = "plus"         '"plus" oder "minus" Strategie
-    Private MutRate As Integer = 3              'Definiert die Wahrscheinlichkeit mit beim Rnd Swich Mutiert wird
+    Private MutRate As Integer = 30              'Definiert die Wahrscheinlichkeit der Mutationsrate in %
 
     '************************************* TSP Struktur *****************************
     Public Structure Faksimile
@@ -730,14 +730,14 @@ Public Class CES
         Dim Tmp_a As Integer
         Dim Tmp_b As Integer
         Dim lowerb_a As Integer = 1
-        Dim upperb_a As Integer = MutRate
+        Dim upperb_a As Integer = 100
         Dim lowerb_b As Integer = 0
         Dim upperb_b As Integer
         Randomize()
 
         For i = 0 To Path.GetUpperBound(0)
             Tmp_a = CInt(Int((upperb_a - lowerb_a + 1) * Rnd() + lowerb_a))
-            If Tmp_a = 3 Then
+            If Tmp_a <= MutRate Then
                 upperb_b = BlueM1.LocationList(i).MassnahmeListe.GetUpperBound(0)
                 'Randomize() nicht vergessen
                 Tmp_b = CInt(Int((upperb_b - lowerb_b + 1) * Rnd() + lowerb_b))

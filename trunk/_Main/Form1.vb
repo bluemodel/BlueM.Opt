@@ -19,6 +19,7 @@ Imports System.IO
 
 Friend Class Form1
 
+#Region "Initialisierung der Anwendungen"
     '************************************************************************************
     '****** Form1 wird initialisiert bzw. geladen; weitere Module werden deklariert *****
     '************************************************************************************
@@ -339,6 +340,9 @@ Friend Class Form1
 
     End Sub
 
+#End Region
+
+#Region "Start Button Pressed"
 
     '************************************************************************************
     '************************* Start BUTTON wurde pressed *******************************
@@ -556,11 +560,11 @@ Friend Class Form1
 
         'TeeChart initialisieren
         Dim Tmp As Integer
-        Tmp = CES1.n_Gen * CES1.ChildList_BM.GetUpperBound(0)
+        Tmp = CES1.n_Gen * (CES1.ChildList_BM.GetLength(0) + CES1.ParentList_BM.GetLength(0))
         Call BlueM1.TeeChartInitialise_SO_BlauesModell(1, Tmp, TChart1)
 
         'Zufällige Kinderpfade werden generiert
-        Call CES1.Generate_Random_Path_BM()
+        'Call CES1.Generate_Random_Path_BM()
 
         'Funktion zum manuellen Testen der Paths in der ersten Generation
         Call CES1.Generate_Test_Path_BM()
@@ -571,6 +575,7 @@ Friend Class Form1
             'Ermittelt Verzweigung ON_OFF
             Call CES1.Verzweigung_ON_OFF()
 
+            'Child Schleife
             For i = 0 To CES1.ChildList_BM.GetUpperBound(0)
                 durchlauf += 1
 
@@ -593,11 +598,11 @@ Friend Class Form1
             'Selectionsprozess je nach "plus" oder "minus" Strategie
             Call CES1.Selection_Process_BM()
 
-            ''Zeichnen des besten Elter
-            ''TODO: funzt nur, wenn ganz am ende gezeichnet wird
-            'If gen = CES1.n_Gen Then
-            '    Call TChart1.Series(1).Add(durchlauf, OptZieleListe(0).QWertTmp)
-            'End If
+            'Zeichnen des besten Elter
+            For i = 0 To CES1.ParentList_BM.GetUpperBound(0)
+                durchlauf += 1
+                Call TChart1.Series(1).Add(durchlauf, CES1.ParentList_BM(i).Quality_SO)
+            Next
 
             'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
             Call CES1.Reset_Childs_BM()
@@ -987,4 +992,7 @@ ErrCode_ES_STARTEN:
             TChart1.Export.Template.Save(Me.SaveFileDialog1.FileName)
         End If
     End Sub
+
+#End Region
+
 End Class
