@@ -30,6 +30,8 @@ Public Class BlueM
     Public WorkDir As String                             'Arbeitsverzeichnis für das Blaue Modell
     Public BM_Exe As String                              'Pfad zu BlauesModell.exe
     Public Ergebnisdb As Boolean = True                  'Gibt an, ob die Ergebnisdatenbank geschrieben werden soll
+    Public SimStart As DateTime                          'Anfangsdatum der Simulation
+    Public SimEnde As DateTime                           'Enddatum der Simulation
 
     'Konstanten
     '----------
@@ -144,6 +146,45 @@ Public Class BlueM
         If (Ergebnisdb = True) Then
             Call db_prepare()
         End If
+        'Simulationsdaten einlesen
+        Call SimParameter_einlesen()
+    End Sub
+
+    'Simulationsparameter einlesen
+    '*****************************
+    Private Sub SimParameter_einlesen()
+
+        Dim SimStart_str As String = ""
+        Dim SimEnde_str As String = ""
+
+        'ALL-Datei öffnen
+        '----------------
+        Try
+            Dim Datei As String = Me.WorkDir & Me.Datensatz & ".ALL"
+
+            Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
+            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+            'Alle Zeilen durchlaufen
+            Dim Zeile As String
+            Do
+                Zeile = StrRead.ReadLine.ToString()
+                'Simulationszeitraum auslesen
+                If (Zeile.StartsWith(" SimBeginn - SimEnde ............:") = True) Then
+                    SimStart_str = Zeile.Substring(35, 16)
+                    SimEnde_str = Zeile.Substring(54, 16)
+                End If
+            Loop Until StrRead.Peek() = -1
+
+            'SimStart und SimEnde in echtes Datum konvertieren
+            Me.SimStart = New DateTime(SimStart_str.Substring(6, 4), SimStart_str.Substring(3, 2), SimStart_str.Substring(0, 2), SimStart_str.Substring(11, 2), SimStart_str.Substring(14, 2), 0)
+            Me.SimEnde = New DateTime(SimEnde_str.Substring(6, 4), SimEnde_str.Substring(3, 2), SimEnde_str.Substring(0, 2), SimEnde_str.Substring(11, 2), SimEnde_str.Substring(14, 2), 0)
+
+        Catch except As Exception
+            MsgBox("Fehler beim einlesen der BlueM-Simulationsparameter:" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Critical, "Fehler")
+            Exit Sub
+        End Try
+
     End Sub
 
     'Ergebnisdatenbank vorbereiten
