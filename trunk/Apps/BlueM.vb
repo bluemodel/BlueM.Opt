@@ -89,6 +89,9 @@ Public Class BlueM
 
     Public OptZieleListe() As OptZiel = {}         'Liste der Zielfunktionnen
 
+    'IHA
+    Public IHA1 As New IHA()
+
     ''Kombinatorik **************************************
     'Public Schaltung(2, 1) As Object
     'Public Maßnahme As Collection
@@ -123,6 +126,7 @@ Public Class BlueM
             ChDir(currentDir)                       'zurück in das Ausgangsverzeichnis wechseln
         Catch except As Exception
             MsgBox("Ergebnisdatenbank konnte nicht ins Arbeitsverzeichnis kopiert werden:" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
+            Exit Sub
         End Try
 
         'Tabellen anpassen
@@ -139,7 +143,7 @@ Public Class BlueM
                 End If
                 fieldnames &= "'" & OptZieleListe(i).Bezeichnung & "' DOUBLE"
             Next
-            'Tabelle anlegen
+            'Tabelle anpassen
             command.CommandText = "ALTER TABLE QWerte ADD COLUMN " & fieldnames
             command.ExecuteNonQuery()
 
@@ -152,12 +156,13 @@ Public Class BlueM
                 End If
                 fieldnames &= "'" & OptParameterListe(i).Bezeichnung & "' DOUBLE"
             Next
-            'Tabelle anlegen
+            'Tabelle anpassen
             command.CommandText = "ALTER TABLE OptParameter ADD COLUMN " & fieldnames
             command.ExecuteNonQuery()
             Call db_disconnect()
         Catch except As Exception
             MsgBox("Konnte Tabellen nicht anpassen:" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
+            Exit Sub
         End Try
 
     End Sub
@@ -318,6 +323,7 @@ Public Class BlueM
 
         Catch except As Exception
             MsgBox("Fehler beim lesen der Optimierungsziel-Datei:" & Chr(13) & Chr(10) & except.Message & Chr(13) & Chr(10) & "Ein Fehler könnten Leerzeichen in der letzten Zeile der Datei sein", MsgBoxStyle.Exclamation, "Fehler")
+            Exit Sub
         End Try
 
         'Falls mit Reihen verglichen werden soll werden hier die Reihen eingelesen
@@ -339,6 +345,16 @@ Public Class BlueM
 
                 If (IsOK = False) Then
                     MsgBox("Fehler beim einlesen der Zielreihe '" & OptZieleListe(i).ZielReihePfad & "'" & Chr(13) & Chr(10) & "Ein Fehler könnten Leerzeichen in der letzten Zeile der Datei sein", MsgBoxStyle.Exclamation, "Fehler")
+                    Exit Sub
+                End If
+
+                'Weiterverarbeitung von ZielReihen:
+                '----------------------------------
+
+                'IHA
+                If (OptZieleListe(i).ZielFkt = "IHA") Then
+                    'IHA-Berechnung vorbereiten
+                    Call IHA1.IHA_prepare(Me)
                 End If
 
             End If
@@ -430,7 +446,6 @@ Public Class BlueM
                 Next
 
                 StrWrite.Close()
-                FiStr.Close()
 
             Catch except As Exception
                 MsgBox("Fehler beim Schreiben der Mutierten Parameter" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
@@ -484,12 +499,21 @@ Public Class BlueM
         Dim OptZiel As OptZiel = OptZieleListe(ZielNr)
 
         If (OptZiel.ZielTyp = "EcoFlood") Then
+            'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+            'Qualitätswert EcoFlood
+            'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
             Dim i As Integer
             'QualitaetsWert_berechnen = 0
             For i = 0 To OptParameterListe.GetUpperBound(0)
                 QWert = QWert + (OptParameterListe(i).Wert * OptParameterListe(i).Wert) / 1000
             Next
             'QWert = (1 / QWert) * 100
+        ElseIf (OptZiel.ZielTyp = "IHA") Then
+            'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+            'Qualitätswert aus IHA
+            'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+
         Else
 
             Dim i As Integer
