@@ -3,7 +3,7 @@ Imports System.Data.OleDb
 
 '*******************************************************************************
 '*******************************************************************************
-'**** Klasse BlueM                                                        ****
+'**** Klasse BlueM                                                          ****
 '****                                                                       ****
 '**** Funktionen zur Kontrolle des BlauenModells                            ****
 '****                                                                       ****
@@ -13,28 +13,33 @@ Imports System.Data.OleDb
 '**** TU Darmstadt                                                          ****
 '****                                                       Dezember 2006   ****
 '****                                                                       ****
-'**** Letzte Änderung: März 2007                                            ****
+'**** Letzte Änderung: April 2007                                           ****
 '*******************************************************************************
 '*******************************************************************************
 
 Public Class BlueM
 
+#Region "Eigenschaften"
 
-    '************************** Funktionen für ParaOpt **********************************
-    '************************************************************************************
+    'Eigenschaften
+    '#############
 
+    'Generelle Eigenschaften
+    '-----------------------
     Public Datensatz As String                           'Name des zu simulierenden Datensatzes
     Public WorkDir As String                             'Arbeitsverzeichnis für das Blaue Modell
     Public BM_Exe As String                              'Pfad zu BlauesModell.exe
     Public Ergebnisdb As Boolean = True                  'Gibt an, ob die Ergebnisdatenbank geschrieben werden soll
 
+    'Konstanten
+    '----------
     Public Const OptParameter_Ext As String = "OPT"      'Erweiterung der Datei mit den Optimierungsparametern (*.OPT)
     Public Const ModParameter_Ext As String = "MOD"      'Erweiterung der Datei mit den Modellparametern (*.MOD)
     Public Const OptZiele_Ext As String = "ZIE"          'Erweiterung der Datei mit den Zielfunktionen (*.ZIE)
     Public Const Combi_Ext As String = "CES"             'Erweiterung der Datei mit der Kombinatorik  (*.CES)
 
-    '---------------------------------------------------------------------------------
     'Optimierungsparameter
+    '---------------------
     Public Structure OptParameter
         '*| Bezeichnung | Einh. | Anfangsw. | Min | Max |
         Public Bezeichnung As String                'Bezeichnung
@@ -56,6 +61,7 @@ Public Class BlueM
     Public OptParameterListe() As OptParameter = {} 'Liste der Optimierungsparameter
 
     'ModellParameter
+    '---------------
     Public Structure ModellParameter
         '*| OptParameter | Bezeichnung  | Einh. | Datei | Zeile | von | bis | Faktor |
         Public OptParameter As String               'Optimierungsparameter, aus dem dieser Modellparameter errechnet wird
@@ -72,6 +78,7 @@ Public Class BlueM
     Public ModellParameterListe() As ModellParameter = {} 'Liste der Modellparameter
 
     'Optimierungsziele
+    '-----------------
     '*| Bezeichnung   | ZielTyp  | Datei |  SimGröße | ZielFkt  | WertTyp  | ZielWert | ZielGröße  | PfadReihe
     Public Structure OptZiel
         Public Bezeichnung As String                'Bezeichnung
@@ -90,17 +97,42 @@ Public Class BlueM
     Public OptZieleListe() As OptZiel = {}         'Liste der Zielfunktionnen
 
     'IHA
+    '---
     Public IHA1 As New IHA()
 
-    ''Kombinatorik **************************************
+    'Kombinatorik
+    '------------
+    Public Structure Massnahme
+        Public Name As String
+        Public Schaltung(,) As String
+    End Structure
+
+    Public Structure Lokation
+        Public Name As String
+        Public MassnahmeListe() As Massnahme
+    End Structure
+
+    Public LocationList() As Lokation
+
+    Public VerzweigungsDatei(,) As String
+
     'Public Schaltung(2, 1) As Object
     'Public Maßnahme As Collection
     'Public Kombinatorik As Collection
 
     'DB
+    '--
     Dim db As OleDb.OleDbConnection
 
+#End Region 'Eigenschaften
+
+#Region "Methoden"
+
+    'Methoden
+    '########
+
     'BM-Einstellungen initialisieren
+    '*******************************
     Public Sub BM_Ini()
         'Optimierungsparameter einlesen
         Call OptParameter_einlesen()
@@ -115,8 +147,11 @@ Public Class BlueM
     End Sub
 
     'Ergebnisdatenbank vorbereiten
+    '*****************************
     Public Sub db_prepare()
+
         'Leere/Neue Ergebnisdatenbank in Arbeitsverzeichnis kopieren
+        '-----------------------------------------------------------
         Dim ZielDatei As String = WorkDir & Datensatz & "_EVO.mdb"
 
         Try
@@ -130,6 +165,7 @@ Public Class BlueM
         End Try
 
         'Tabellen anpassen
+        '-----------------
         Dim i As Integer
         Try
             Call db_connect()
@@ -168,6 +204,7 @@ Public Class BlueM
     End Sub
 
     'Optimierungsparameter einlesen
+    '******************************
     Public Sub OptParameter_einlesen()
 
         Try
@@ -217,6 +254,7 @@ Public Class BlueM
     End Sub
 
     'Modellparameter einlesen
+    '************************
     Public Sub ModellParameter_einlesen()
         Try
             Dim Datei As String = WorkDir & Datensatz & "." & ModParameter_Ext
@@ -269,6 +307,7 @@ Public Class BlueM
     End Sub
 
     'Optimierungsziele einlesen
+    '**************************
     Public Sub OptZiele_einlesen()
         Dim AnzZiele As Integer = 0
         Dim IsOK As Boolean
@@ -361,17 +400,22 @@ Public Class BlueM
         Next
     End Sub
 
+    'Mit Ergebnisdatenbank verbinden
+    '*******************************
     Private Sub db_connect()
         Dim ConnectionString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & WorkDir & Datensatz & "_EVO.mdb"
         db = New OleDb.OleDbConnection(ConnectionString)
         db.Open()
     End Sub
 
+    'Verbindung zu Ergebnisdatenbank schließen
+    '*****************************************
     Private Sub db_disconnect()
         db.Close()
     End Sub
 
     'ModellParameter werden aus OptParametern errechnet
+    '**************************************************
     Public Sub OptParameter_to_ModellParameter()
         Dim i As Integer
         Dim j As Integer
@@ -385,6 +429,7 @@ Public Class BlueM
     End Sub
 
     'Die ModellParameter in die BM-Eingabedateien schreiben
+    '******************************************************
     Public Sub ModellParameter_schreiben()
         Dim Wert As String
         Dim AnzZeil As Integer
@@ -454,6 +499,8 @@ Public Class BlueM
 
     End Sub
 
+    'BlauesModell ausführen (simulieren)
+    '***********************************
     Public Sub launchBM()
         'starte Programm mit neuen Parametern
         Dim ProcID As Integer
@@ -469,6 +516,7 @@ Public Class BlueM
         ChDir(currentDir)
 
         'überprüfen, ob Simulation erfolgreich
+        '-------------------------------------
         If (File.Exists(WorkDir & "$FEHL.TMP")) Then
 
             'Fehler aufgetreten
@@ -493,26 +541,26 @@ Public Class BlueM
     End Sub
 
     'Berechnung des Qualitätswerts (Zielwert)
+    '****************************************
     Public Function QualitaetsWert_berechnen(ByVal ZielNr As Integer) As Double
 
         Dim QWert As Double = 0
         Dim OptZiel As OptZiel = OptZieleListe(ZielNr)
 
         If (OptZiel.ZielTyp = "EcoFlood") Then
-            'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
             'Qualitätswert EcoFlood
-            'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+            '----------------------
             Dim i As Integer
             'QualitaetsWert_berechnen = 0
             For i = 0 To OptParameterListe.GetUpperBound(0)
                 QWert = QWert + (OptParameterListe(i).Wert * OptParameterListe(i).Wert) / 1000
             Next
             'QWert = (1 / QWert) * 100
-        ElseIf (OptZiel.ZielTyp = "IHA") Then
-            'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-            'Qualitätswert aus IHA
-            'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
+        ElseIf (OptZiel.ZielTyp = "IHA") Then
+            'Qualitätswert IHA
+            '-----------------
+            QWert = IHA1.calculate_IHA(OptZiel.ZielReihe)
 
         Else
 
@@ -698,6 +746,8 @@ Public Class BlueM
 
     End Function
 
+    'Eine ZRE-Datei einlesen
+    '***********************
     Public Function ReadZRE(ByVal DateiPfad As String, ByRef ZRE(,) As Object) As Boolean
 
         'Lesen einer ZRE-Datei
@@ -742,9 +792,15 @@ Public Class BlueM
 
     End Function
 
+    'Eine Spalte einer WEL-Datei einlesen
+    '************************************
     Public Function ReadWEL(ByVal Dateipfad As String, ByVal Spalte As String, ByRef WEL(,) As Object) As Boolean
 
-        'Lesen einer WEL-Datei (muss im CSV-Format mit Semikola vorliegen)
+        'Einschränkungen:
+        '----------------
+        'WEL-Datei muss im CSV-Format mit Semikola vorliegen
+
+
         Dim AnzZeil As Integer = 0
         Dim j As Integer = 0
         Dim Zeile As String
@@ -807,9 +863,10 @@ Public Class BlueM
 
     End Function
 
+    'Eine PRB-Datei einlesen
+    '***********************
     Public Function ReadPRB(ByVal DateiPfad As String, ByVal ZielGr As String, ByRef PRB(,) As Object) As Boolean
 
-        'Lesen einer PRB-Datei
         Dim ZeileStart As Integer = 0
         Dim AnzZeil = 26                   'Anzahl der Zeilen ist immer 26, definiert durch MAXSTZ in BM
         Dim j As Integer = 0
@@ -873,7 +930,8 @@ Public Class BlueM
 
     End Function
 
-    'Update der DB mit QWerten und OptParametern
+    'Update der ErgebnisDB mit QWerten und OptParametern
+    '***************************************************
     Public Function db_update(ByVal durchlauf As Integer, ByVal ipop As Short) As Boolean
         Call db_connect()
 
@@ -911,8 +969,8 @@ Public Class BlueM
         Call db_disconnect()
     End Function
 
-    '********************* TeeChart Initialisierung für das BlaueModell *****************
-
+    'TeeChart Initialisierung für das BlaueModell (SO)
+    '*************************************************
     Public Sub TeeChartInitialise_SO_BlauesModell(ByVal n_Populationen As Integer, ByVal n_Kalkulationen As Integer, ByRef TChart1 As Steema.TeeChart.TChart)
         'Dim Anzahl_Kalkulationen As Integer
         'Dim Populationen As Short
@@ -952,6 +1010,8 @@ Public Class BlueM
         End With
     End Sub
 
+    'TeeChart Initialisierung für das BlaueModell (MO)
+    '*************************************************
     Public Sub TeeChartInitialise_MO_BlauesModell(ByRef TChart1 As Steema.TeeChart.TChart)
 
         With TChart1
@@ -993,9 +1053,8 @@ Public Class BlueM
         End With
     End Sub
 
-    '    Evaluierung des Blauen Modells für Parameter Optimierung - Steuerungseinheit
-    '************************************************************************************
-
+    'Evaluierung des Blauen Modells für Parameter Optimierung - Steuerungseinheit
+    '****************************************************************************
     Public Function Evaluierung_BlauesModell_ParaOpt(ByVal GlobalAnzPar As Short, ByVal GlobalAnzZiel As Short, ByVal mypara As Double(,), ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN As Double(), ByRef TChart1 As Steema.TeeChart.TChart) As Boolean
         Dim i As Short
 
@@ -1032,17 +1091,17 @@ Public Class BlueM
         End Select
 
         'Qualitätswerte und OptParameter in DB speichern
-        Call db_update(durchlauf, ipop)
+        If (Ergebnisdb = True) Then
+            Call db_update(durchlauf, ipop)
+        End If
 
     End Function
 
-    '************************** Funktionen für CombiOpt *********************************
-    '************************************************************************************
+    'Kombinatorik
+    'XXXXXXXXXXXX
 
-
-    '    Evaluierung des Blauen Modells für Kombinatorik Optimierung - Steuerungseinheit
-    '************************************************************************************
-
+    'Evaluierung des Blauen Modells für Kombinatorik Optimierung - Steuerungseinheit
+    '*******************************************************************************
     Public Function Evaluierung_BlauesModell_CombiOpt(ByVal n_Ziele As Short, ByVal durchlauf As Integer, ByVal ipop As Short, ByRef Quality As Double(), ByRef TChart1 As Steema.TeeChart.TChart) As Boolean
         Dim i As Short
 
@@ -1070,30 +1129,17 @@ Public Class BlueM
                 'TODO: Call Zielfunktion_zeichnen_MultiObPar_XD()
         End Select
 
-        ''Qualitätswerte und OptParameter in DB speichern
-        'Call db_update(durchlauf, ipop)
+        'Qualitätswerte und OptParameter in DB speichern
+        If (Ergebnisdb = True) Then
+            Call db_update(durchlauf, ipop)
+        End If
 
     End Function
 
-    'Kombinatorik Struktur **************************************
 
-    Public Structure Massnahme
-        Public Name As String
-        Public Schaltung(,) As String
-    End Structure
-
-    Public Structure Lokation
-        Public Name As String
-        Public MassnahmeListe() As Massnahme
-    End Structure
-
-    Public LocationList() As Lokation
-
-    Public VerzweigungsDatei(,) As String
-
-    'Kombinatorik Funktionen **************************************
 
     'Kombinatorik einlesen
+    '*********************
     Public Sub Kombinatorik_einlesen()
         Try
             Dim Datei As String = WorkDir & Datensatz & "." & Combi_Ext
@@ -1158,6 +1204,7 @@ Public Class BlueM
     End Sub
 
     'Validierungsfunktion der Kombinatorik Prüft ob Verbraucher an zwei Standorten Dopp vorhanden sind
+    '*************************************************************************************************
     Public Function Combinatoric_is_Valid() As Boolean
         Combinatoric_is_Valid = True
         Dim i, j, x, y, m, n As Integer
@@ -1182,6 +1229,7 @@ Public Class BlueM
     End Function
 
     'Liest die Verzweigungen aus dem BModel in ein Array ein
+    '*******************************************************
     Public Sub Verzweigung_Read()
         Dim i As Integer
 
@@ -1228,6 +1276,8 @@ Public Class BlueM
             MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim Lesen der Kombinatorik")
         End Try
     End Sub
+
+    '******************************************************************
     Public Function Combinatoric_fits_to_Verzweisungsdatei() As Boolean
         Combinatoric_fits_to_Verzweisungsdatei = True
         Dim i As Integer = 0
@@ -1294,6 +1344,7 @@ Public Class BlueM
     End Function
 
     'Schreibt die neuen Verzweigungen
+    '********************************
     Public Sub Verzweigung_Write(ByVal SchaltArray(,))
 
         Dim AnzZeil As Integer
@@ -1363,10 +1414,11 @@ Public Class BlueM
 
     End Sub
 
-    '***************************** Hilfs Funktionen *************************************
-    '************************************************************************************
+    'Hilfs Funktionen
+    'XXXXXXXXXXXXXXXX
 
     'Hilfsfunktion um zu Prüfen ob der Name bereits vorhanden ist oder nicht
+    '***********************************************************************
     Private Function Is_Name_IN(ByVal Name As String, ByVal Array() As Lokation) As Boolean
         Is_Name_IN = False
         Dim i As Integer
@@ -1377,5 +1429,7 @@ Public Class BlueM
             End If
         Next
     End Function
+
+#End Region 'Methoden
 
 End Class
