@@ -101,10 +101,8 @@ Friend Class Form1
 
                     'Ergebnisdatenbank ausschalten
                     BlueM1.Ergebnisdb = False
-                    'Einlesen OptPara, ModellPara, Zielfunktionen
-                    Call BlueM1.OptParameter_einlesen()
-                    Call BlueM1.ModellParameter_einlesen()
-                    Call BlueM1.OptZiele_einlesen()
+                    'BM-Einstellungen initialisieren 
+                    Call BlueM1.BM_Ini()
 
                     'Original ModellParameter werden geschrieben
                     Call BlueM1.ModellParameter_schreiben()
@@ -188,7 +186,7 @@ Friend Class Form1
 
                     'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
                     'ToDo: Hier Message Box einbauen
-                    isOK = BlueM1.Combinatoric_fits_to_Verzweisungsdatei()
+                    isOK = BlueM1.Combinatoric_fits_to_Verzweigungsdatei()
 
                     'Call Initialisierung_BlauesModell_CombiOpt()
 

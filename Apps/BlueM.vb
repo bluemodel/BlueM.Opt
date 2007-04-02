@@ -120,8 +120,8 @@ Public Class BlueM
     'Public Maﬂnahme As Collection
     'Public Kombinatorik As Collection
 
-    'DB
-    '--
+    'Ergebnisdatenbank
+    '-----------------
     Dim db As OleDb.OleDbConnection
 
 #End Region 'Eigenschaften
@@ -148,7 +148,7 @@ Public Class BlueM
 
     'Ergebnisdatenbank vorbereiten
     '*****************************
-    Public Sub db_prepare()
+    Private Sub db_prepare()
 
         'Leere/Neue Ergebnisdatenbank in Arbeitsverzeichnis kopieren
         '-----------------------------------------------------------
@@ -205,7 +205,7 @@ Public Class BlueM
 
     'Optimierungsparameter einlesen
     '******************************
-    Public Sub OptParameter_einlesen()
+    Private Sub OptParameter_einlesen()
 
         Try
             Dim Datei As String = WorkDir & Datensatz & "." & OptParameter_Ext
@@ -255,7 +255,7 @@ Public Class BlueM
 
     'Modellparameter einlesen
     '************************
-    Public Sub ModellParameter_einlesen()
+    Private Sub ModellParameter_einlesen()
         Try
             Dim Datei As String = WorkDir & Datensatz & "." & ModParameter_Ext
 
@@ -308,7 +308,7 @@ Public Class BlueM
 
     'Optimierungsziele einlesen
     '**************************
-    Public Sub OptZiele_einlesen()
+    Private Sub OptZiele_einlesen()
         Dim AnzZiele As Integer = 0
         Dim IsOK As Boolean
         Dim ext As String
@@ -416,7 +416,7 @@ Public Class BlueM
 
     'ModellParameter werden aus OptParametern errechnet
     '**************************************************
-    Public Sub OptParameter_to_ModellParameter()
+    Private Sub OptParameter_to_ModellParameter()
         Dim i As Integer
         Dim j As Integer
         For i = 0 To ModellParameterListe.GetUpperBound(0)
@@ -932,7 +932,7 @@ Public Class BlueM
 
     'Update der ErgebnisDB mit QWerten und OptParametern
     '***************************************************
-    Public Function db_update(ByVal durchlauf As Integer, ByVal ipop As Short) As Boolean
+    Private Function db_update(ByVal durchlauf As Integer, ByVal ipop As Short) As Boolean
         Call db_connect()
 
         Dim i As Integer
@@ -1277,9 +1277,10 @@ Public Class BlueM
         End Try
     End Sub
 
-    '******************************************************************
-    Public Function Combinatoric_fits_to_Verzweisungsdatei() As Boolean
-        Combinatoric_fits_to_Verzweisungsdatei = True
+    'TODO: Funktionsbeschreibung
+    '***************************
+    Public Function Combinatoric_fits_to_Verzweigungsdatei() As Boolean
+        Combinatoric_fits_to_Verzweigungsdatei = True
         Dim i As Integer = 0
         Dim j As Integer = 0
         Dim x As Integer = 0
@@ -1332,11 +1333,11 @@ Public Class BlueM
 
         '‹bergabe
         If FoundB = False Then
-            Combinatoric_fits_to_Verzweisungsdatei = False
+            Combinatoric_fits_to_Verzweigungsdatei = False
         Else
             For i = 0 To FoundA.GetUpperBound(0)
                 If FoundA(i) = False Then
-                    Combinatoric_fits_to_Verzweisungsdatei = False
+                    Combinatoric_fits_to_Verzweigungsdatei = False
                 End If
             Next
         End If
