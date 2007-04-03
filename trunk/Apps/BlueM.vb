@@ -136,6 +136,8 @@ Public Class BlueM
     'BM-Einstellungen initialisieren
     '*******************************
     Public Sub BM_Ini()
+        'Simulationsdaten einlesen
+        Call SimParameter_einlesen()
         'Optimierungsparameter einlesen
         Call OptParameter_einlesen()
         'ModellParameter einlesen
@@ -146,8 +148,6 @@ Public Class BlueM
         If (Ergebnisdb = True) Then
             Call db_prepare()
         End If
-        'Simulationsdaten einlesen
-        Call SimParameter_einlesen()
     End Sub
 
     'Simulationsparameter einlesen
@@ -408,7 +408,7 @@ Public Class BlueM
 
         'Falls mit Reihen verglichen werden soll werden hier die Reihen eingelesen
         For i = 0 To AnzZiele - 1
-            If OptZieleListe(i).ZielTyp = "Reihe" Then
+            If (OptZieleListe(i).ZielTyp = "Reihe" Or OptZieleListe(i).ZielTyp = "IHA") Then
 
                 'Dateiendung der Zielreihe bestimmen
                 ext = OptZieleListe(i).ZielReihePfad.Substring(OptZieleListe(i).ZielReihePfad.LastIndexOf(".") + 1)
@@ -432,7 +432,7 @@ Public Class BlueM
                 '----------------------------------
 
                 'IHA
-                If (OptZieleListe(i).ZielFkt = "IHA") Then
+                If (OptZieleListe(i).ZielTyp = "IHA") Then
                     'IHA-Berechnung vorbereiten
                     Call IHA1.IHA_prepare(Me)
                 End If
