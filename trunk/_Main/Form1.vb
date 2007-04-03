@@ -465,7 +465,7 @@ Friend Class Form1
             'BlueM1.ReadWEL(BlueM1.WorkDir & BlueM1.Datensatz & ".wel", BlueM1.OptZieleListe(0).SpalteWel, Wave1.WaveList(1).Wave)
             'End If
 
-            BlueM1.OptZieleListe(0).QWertTmp = BlueM1.QualitaetsWert_berechnen(0)
+            BlueM1.OptZieleListe(0).QWertTmp = BlueM1.QWert(0)
             TChart1.Series(0).Add(BlueM1.OptZieleListe(0).QWertTmp, BlueM1.OptParameterListe(0).Wert, "")
             'Call BlueM1.db_update(durchlauf, ipop)
             durchlauf += 1

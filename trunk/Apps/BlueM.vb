@@ -583,207 +583,244 @@ Public Class BlueM
 
     'Berechnung des Qualitätswerts (Zielwert)
     '****************************************
-    Public Function QualitaetsWert_berechnen(ByVal ZielNr As Integer) As Double
+    Public Function QWert(ByVal ZielNr As Integer) As Double
 
-        Dim QWert As Double = 0
+        QWert = 0
         Dim OptZiel As OptZiel = OptZieleListe(ZielNr)
 
-        If (OptZiel.ZielTyp = "EcoFlood") Then
-            'Qualitätswert EcoFlood
-            '----------------------
-            Dim i As Integer
-            'QualitaetsWert_berechnen = 0
-            For i = 0 To OptParameterListe.GetUpperBound(0)
-                QWert = QWert + (OptParameterListe(i).Wert * OptParameterListe(i).Wert) / 1000
-            Next
-            'QWert = (1 / QWert) * 100
+        Dim IsOK As Boolean
 
-        ElseIf (OptZiel.ZielTyp = "IHA") Then
-            'Qualitätswert IHA
-            '-----------------
-            QWert = IHA1.calculate_IHA(OptZiel.ZielReihe)
+        'Fallunterscheidung Ergebnisdatei
+        '--------------------------------
+        Select Case OptZiel.Datei
 
-        Else
+            Case "WEL"
+                'QWert aus WEL-Datei
+                QWert = QWert_WEL(OptZiel)
 
-            Dim i As Integer
-            Dim SimReihe(,) As Object = {}
-            Dim SimWert As Single
-            Dim IsOK As Boolean
+            Case "PRB"
+                'QWert aus PRB-Datei
+                QWert = QWert_PRB(OptZiel)
 
-            Select Case OptZiel.Datei
-                Case "WEL"
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-                    'Qualitätswert aus WEL-Datei
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+            Case Else
+                'es wurde eine nicht unterstützte Ergebnisdatei angegeben
+                IsOK = False
 
-                    'Simulationsergebnis auslesen
-                    IsOK = ReadWEL(WorkDir & Datensatz & ".wel", OptZiel.SimGr, SimReihe)
+        End Select
 
-                    '--------------------------------------------------------
-                    'bei Werten zuerst Wert aus Simulationsergebnis berechnen
-                    '--------------------------------------------------------
-                    If (OptZiel.ZielTyp = "Wert") Then
-
-                        Select Case OptZiel.WertTyp
-
-                            Case "MaxWert"
-                                SimWert = 0
-                                For i = 0 To SimReihe.GetUpperBound(0)
-                                    If SimReihe(i, 1) > SimWert Then
-                                        SimWert = SimReihe(i, 1)
-                                    End If
-                                Next
-
-                            Case "MinWert"
-                                SimWert = 999999999999999999
-                                For i = 0 To SimReihe.GetUpperBound(0)
-                                    If SimReihe(i, 1) < SimWert Then
-                                        SimWert = SimReihe(i, 1)
-                                    End If
-                                Next
-
-                            Case "Average"
-                                SimWert = 0
-                                For i = 0 To SimReihe.GetUpperBound(0)
-                                    SimWert += SimReihe(i, 1)
-                                Next
-                                SimWert = SimWert / SimReihe.GetLength(0)
-
-                            Case "AnfWert"
-                                SimWert = SimReihe(0, 1)
-
-                            Case "EndWert"
-                                SimWert = SimReihe(SimReihe.GetUpperBound(0), 1)
-
-                            Case Else
-                                'TODO: Fehlerbehandlung
-                        End Select
-
-                    End If
-
-                    '--------------------------------------------------------
-                    'Berechnung des Qualitätswerts
-                    '--------------------------------------------------------
-                    Select Case OptZiel.ZielFkt
-
-                        Case "AbQuad"
-                            'Summe der Fehlerquadrate
-                            '------------------------
-                            Select Case OptZiel.ZielTyp
-                                Case "Wert"
-                                    QWert = (OptZiel.ZielWert - SimWert) * (OptZiel.ZielWert - SimWert)
-
-                                Case "Reihe"
-                                    For i = 0 To SimReihe.GetUpperBound(0)
-                                        QWert += (OptZiel.ZielReihe(i, 1) - SimReihe(i, 1)) * (OptZiel.ZielReihe(i, 1) - SimReihe(i, 1))
-                                    Next
-                            End Select
-                            '------------------------
-
-                        Case "Diff"
-                            'Summe der Fehler
-                            '------------------------
-                            Select Case OptZiel.ZielTyp
-                                Case "Wert"
-                                    QWert = Math.Abs(OptZiel.ZielWert - SimWert)
-
-                                Case "Reihe"
-                                    For i = 0 To SimReihe.GetUpperBound(0)
-                                        QWert += Math.Abs(OptZiel.ZielReihe(i, 1) - SimReihe(i, 1))
-                                    Next
-                            End Select
-                            '------------------------
-
-                        Case "Volf"
-                            'Volumenfehler
-                            '--------------------------
-                            Select Case OptZiel.ZielTyp
-                                Case "Wert"
-                                    'TODO: MSGBox Fehler in der Zielfunktionsdatei: Volumenfehler kann nicht mit einzelnen Werten gerechnet werden
-
-                                Case "Reihe"
-                                    'TODO: Volumenfehler rechnet noch nicht echtes Volumen, dazu ist Zeitschrittweite notwendig
-                                    Dim VolSim As Double = 0
-                                    Dim VolZiel As Double = 0
-                                    For i = 0 To SimReihe.GetUpperBound(0)
-                                        VolSim += SimReihe(i, 1)
-                                        VolZiel += OptZiel.ZielReihe(i, 1)
-                                    Next
-                                    QWert = Math.Abs(VolZiel - VolSim)
-                            End Select
-                            '------------------------
-
-                        Case Else
-                            'TODO: MsgBox Fehler in der Zielfunktionsdatei
-                    End Select
-
-                Case "PRB"
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-                    'Qualitätswert aus PRB-Datei
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                    'Simulationsergebnis auslesen
-                    IsOK = ReadPRB(WorkDir & Datensatz & ".PRB", OptZiel.SimGr, SimReihe)
-
-                    '--------------------------------------------------------
-                    'Berechnung des Qualitätswerts
-                    '--------------------------------------------------------
-                    'Diff
-                    '----
-                    'Überflüssige Stützstellen (P) entfernen
-                    'Anzahl Stützstellen bestimmen
-                    Dim stuetz As Integer = 0
-                    Dim P_vorher As Double = -99
-                    For i = 0 To SimReihe.GetUpperBound(0)
-                        If (i = 0 Or Not SimReihe(i, 1) = P_vorher) Then
-                            stuetz += 1
-                            P_vorher = SimReihe(i, 1)
-                        End If
-                    Next
-                    'Werte in neues Array schreiben
-                    Dim PRBtmp(stuetz, 1) As Object
-                    stuetz = 0
-                    For i = 0 To SimReihe.GetUpperBound(0)
-                        If (i = 0 Or Not SimReihe(i, 1) = P_vorher) Then
-                            PRBtmp(stuetz, 0) = SimReihe(i, 0)
-                            PRBtmp(stuetz, 1) = SimReihe(i, 1)
-                            P_vorher = SimReihe(i, 1)
-                            stuetz += 1
-                        End If
-                    Next
-                    'Reihe um eine Stützstelle erweitern
-                    'PRBtmp(stuetz, 0) = PRBtmp(stuetz - 1, 0)
-                    'PRBtmp(stuetz, 1) = PRBtmp(stuetz - 1, 1)
-
-                    'An Stützstellen der ZielReihe interpolieren
-                    Dim PRBintp(OptZiel.ZielReihe.GetUpperBound(0), 1) As Object
-                    Dim j As Integer
-                    For i = 0 To OptZiel.ZielReihe.GetUpperBound(0)
-                        'zugehörige Lamelle in SimReihe finden
-                        j = 0
-                        Do While (PRBtmp(j, 1) < OptZiel.ZielReihe(i, 1))
-                            j += 1
-                        Loop
-                        'interpolieren
-                        PRBintp(i, 0) = (PRBtmp(j + 1, 0) - PRBtmp(j, 0)) / (PRBtmp(j + 1, 1) - PRBtmp(j, 1)) * (OptZiel.ZielReihe(i, 1) - PRBtmp(j, 1)) + PRBtmp(j, 0)
-                        PRBintp(i, 1) = OptZiel.ZielReihe(i, 1)
-                    Next
-
-                    For i = 0 To OptZiel.ZielReihe.GetUpperBound(0)
-                        QWert += Math.Abs(OptZiel.ZielReihe(i, 0) - PRBintp(i, 0))
-                    Next
-
-                Case Else
-                    IsOK = False
-            End Select
-
-            If (IsOK = False) Then
-                'TODO: Fehlerbehandlung
-            End If
-
+        If (IsOK = False) Then
+            'TODO: Fehlerbehandlung
         End If
 
-        QualitaetsWert_berechnen = QWert
+    End Function
+
+    'Qualitätswert aus WEL-Datei
+    '****************************************
+    Private Function QWert_WEL(ByVal OptZiel As OptZiel) As Double
+
+        Dim i As Integer
+        Dim IsOK As Boolean
+        Dim QWert As Double
+        Dim SimReihe(,) As Object = {}
+
+        'Simulationsergebnis auslesen
+        IsOK = ReadWEL(WorkDir & Datensatz & ".wel", OptZiel.SimGr, SimReihe)
+
+        'Fallunterscheidung Zieltyp
+        '--------------------------
+        Select Case OptZiel.ZielTyp
+
+            Case "EcoFlood"
+                For i = 0 To OptParameterListe.GetUpperBound(0)
+                    QWert = QWert + (OptParameterListe(i).Wert * OptParameterListe(i).Wert) / 1000
+                Next
+                'QWert = (1 / QWert) * 100
+
+            Case "IHA"
+                QWert = IHA1.calculate_IHA(SimReihe)
+
+            Case "Wert"
+                QWert = QWert_Wert(OptZiel, SimReihe)
+
+            Case "Reihe"
+                QWert = QWert_Reihe(OptZiel, SimReihe)
+
+        End Select
+
+        Return QWert
+
+    End Function
+
+    'Qualitätswert berechnen: Zieltyp = Reihe
+    '***************************************
+    Private Function QWert_Reihe(ByVal OptZiel As OptZiel, ByVal SimReihe As Object(,)) As Double
+
+        Dim QWert As Double
+        Dim i As Integer
+
+        'Fallunterscheidung Zielfunktion
+        '-------------------------------
+        Select Case OptZiel.ZielFkt
+
+            Case "AbQuad"
+                'Summe der Fehlerquadrate
+                For i = 0 To SimReihe.GetUpperBound(0)
+                    QWert += (OptZiel.ZielReihe(i, 1) - SimReihe(i, 1)) * (OptZiel.ZielReihe(i, 1) - SimReihe(i, 1))
+                Next
+
+            Case "Diff"
+                'Summe der Fehler
+                For i = 0 To SimReihe.GetUpperBound(0)
+                    QWert += Math.Abs(OptZiel.ZielReihe(i, 1) - SimReihe(i, 1))
+                Next
+
+            Case "Volf"
+                'Volumenfehler
+                'TODO: Volumenfehler rechnet noch nicht echtes Volumen, dazu ist Zeitschrittweite notwendig
+                Dim VolSim As Double = 0
+                Dim VolZiel As Double = 0
+                For i = 0 To SimReihe.GetUpperBound(0)
+                    VolSim += SimReihe(i, 1)
+                    VolZiel += OptZiel.ZielReihe(i, 1)
+                Next
+                QWert = Math.Abs(VolZiel - VolSim)
+
+            Case Else
+                'TODO: MsgBox Fehler in der Zielfunktionsdatei
+        End Select
+
+        Return QWert
+
+    End Function
+
+    'Qualitätswert berechnen: Zieltyp = Wert
+    '***************************************
+    Private Function QWert_Wert(ByVal OptZiel As OptZiel, ByVal SimReihe As Object(,)) As Double
+
+        Dim QWert As Double
+        Dim i As Integer
+
+        'Wert aus Simulationsergebnis berechnen
+        '--------------------------------------
+        Dim SimWert As Single
+
+        Select Case OptZiel.WertTyp
+
+            Case "MaxWert"
+                SimWert = 0
+                For i = 0 To SimReihe.GetUpperBound(0)
+                    If SimReihe(i, 1) > SimWert Then
+                        SimWert = SimReihe(i, 1)
+                    End If
+                Next
+
+            Case "MinWert"
+                SimWert = 999999999999999999
+                For i = 0 To SimReihe.GetUpperBound(0)
+                    If SimReihe(i, 1) < SimWert Then
+                        SimWert = SimReihe(i, 1)
+                    End If
+                Next
+
+            Case "Average"
+                SimWert = 0
+                For i = 0 To SimReihe.GetUpperBound(0)
+                    SimWert += SimReihe(i, 1)
+                Next
+                SimWert = SimWert / SimReihe.GetLength(0)
+
+            Case "AnfWert"
+                SimWert = SimReihe(0, 1)
+
+            Case "EndWert"
+                SimWert = SimReihe(SimReihe.GetUpperBound(0), 1)
+
+            Case Else
+                'TODO: Fehlerbehandlung
+        End Select
+
+        'QWert berechnen
+        '---------------
+        'Fallunterscheidung Zielfunktion
+        '-------------------------------
+        Select Case OptZiel.ZielFkt
+
+            Case "AbQuad"
+                'Summe der Fehlerquadrate
+                QWert = (OptZiel.ZielWert - SimWert) * (OptZiel.ZielWert - SimWert)
+
+            Case "Diff"
+                'Summe der Fehler
+                QWert = Math.Abs(OptZiel.ZielWert - SimWert)
+
+            Case Else
+                'TODO: MsgBox Fehler in der Zielfunktionsdatei
+        End Select
+
+        Return QWert
+
+    End Function
+
+    'Qualitätswert aus PRB-Datei
+    '***************************
+    Private Function QWert_PRB(ByVal OptZiel As OptZiel) As Double
+
+        Dim i As Integer
+        Dim IsOK As Boolean
+        Dim QWert As Double
+        Dim SimReihe As Object(,) = {}
+
+        'Simulationsergebnis auslesen
+        IsOK = ReadPRB(WorkDir & Datensatz & ".PRB", OptZiel.SimGr, SimReihe)
+
+        'Diff
+        '----
+        'Überflüssige Stützstellen (P) entfernen
+        '---------------------------------------
+        'Anzahl Stützstellen bestimmen
+        Dim stuetz As Integer = 0
+        Dim P_vorher As Double = -99
+        For i = 0 To SimReihe.GetUpperBound(0)
+            If (i = 0 Or Not SimReihe(i, 1) = P_vorher) Then
+                stuetz += 1
+                P_vorher = SimReihe(i, 1)
+            End If
+        Next
+        'Werte in neues Array schreiben
+        Dim PRBtmp(stuetz, 1) As Object
+        stuetz = 0
+        For i = 0 To SimReihe.GetUpperBound(0)
+            If (i = 0 Or Not SimReihe(i, 1) = P_vorher) Then
+                PRBtmp(stuetz, 0) = SimReihe(i, 0)
+                PRBtmp(stuetz, 1) = SimReihe(i, 1)
+                P_vorher = SimReihe(i, 1)
+                stuetz += 1
+            End If
+        Next
+        'Reihe um eine Stützstelle erweitern
+        'PRBtmp(stuetz, 0) = PRBtmp(stuetz - 1, 0)
+        'PRBtmp(stuetz, 1) = PRBtmp(stuetz - 1, 1)
+
+        'An Stützstellen der ZielReihe interpolieren
+        '-------------------------------------------
+        Dim PRBintp(OptZiel.ZielReihe.GetUpperBound(0), 1) As Object
+        Dim j As Integer
+        For i = 0 To OptZiel.ZielReihe.GetUpperBound(0)
+            'zugehörige Lamelle in SimReihe finden
+            j = 0
+            Do While (PRBtmp(j, 1) < OptZiel.ZielReihe(i, 1))
+                j += 1
+            Loop
+            'interpolieren
+            PRBintp(i, 0) = (PRBtmp(j + 1, 0) - PRBtmp(j, 0)) / (PRBtmp(j + 1, 1) - PRBtmp(j, 1)) * (OptZiel.ZielReihe(i, 1) - PRBtmp(j, 1)) + PRBtmp(j, 0)
+            PRBintp(i, 1) = OptZiel.ZielReihe(i, 1)
+        Next
+
+        For i = 0 To OptZiel.ZielReihe.GetUpperBound(0)
+            QWert += Math.Abs(OptZiel.ZielReihe(i, 0) - PRBintp(i, 0))
+        Next
+
+        Return QWert
 
     End Function
 
@@ -791,11 +828,11 @@ Public Class BlueM
     '***********************
     Public Function ReadZRE(ByVal DateiPfad As String, ByRef ZRE(,) As Object) As Boolean
 
-        'Lesen einer ZRE-Datei
         Dim AnzZeil As Integer = 0
         Dim j As Integer = 0
         Dim Zeile As String
         Const ZREHEaderLen As Integer = 4     'Die ersten 4 Zeilen der ZRE-Datei gehören zum Header
+
         ReadZRE = True
 
         Try
@@ -838,9 +875,8 @@ Public Class BlueM
     Public Function ReadWEL(ByVal Dateipfad As String, ByVal Spalte As String, ByRef WEL(,) As Object) As Boolean
 
         'Einschränkungen:
-        '----------------
+        '---------------------------------------------------
         'WEL-Datei muss im CSV-Format mit Semikola vorliegen
-
 
         Dim AnzZeil As Integer = 0
         Dim j As Integer = 0
@@ -863,13 +899,14 @@ Public Class BlueM
             ReDim WEL(AnzZeil - WELHeaderLen - 1, 1)
 
             'Position der zu lesenden Spalte bestimmen
+            '-----------------------------------------
             FiStr.Seek(0, SeekOrigin.Begin)
-            ' Zeile mit den Spaltenüberschriften auslesen
+            'Zeile mit den Spaltenüberschriften auslesen
             For j = 0 To 1
                 Werte = StrRead.ReadLine.ToString.Split(";")
             Next
             StrRead.ReadToEnd()
-            ' Spaltenüberschriften vergleichen
+            'Spaltenüberschriften vergleichen
             For j = 0 To Werte.GetUpperBound(0)
                 If Werte(j).Trim() = Spalte Then
                     SpalteNr = j
@@ -942,6 +979,7 @@ Public Class BlueM
             FiStr.Close()
 
             'Überflüssige Stützstellen (P) entfernen
+            '---------------------------------------
             'Anzahl Stützstellen bestimmen
             Dim stuetz As Integer = 0
             Dim P_vorher As Double = -99
@@ -1113,7 +1151,7 @@ Public Class BlueM
         'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
         'BUG 57: QN() fängt bei 1 an!
         For i = 0 To GlobalAnzZiel - 1
-            OptZieleListe(i).QWertTmp = QualitaetsWert_berechnen(i)
+            OptZieleListe(i).QWertTmp = QWert(i)
             QN(i + 1) = OptZieleListe(i).QWertTmp
         Next
 
@@ -1152,7 +1190,7 @@ Public Class BlueM
         'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
         'BUG 57: QN() fängt bei 1 an!
         For i = 0 To n_Ziele - 1
-            OptZieleListe(i).QWertTmp = QualitaetsWert_berechnen(i)
+            OptZieleListe(i).QWertTmp = QWert(i)
             Quality(i) = OptZieleListe(i).QWertTmp
         Next
 
