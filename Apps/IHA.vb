@@ -3,12 +3,15 @@ Imports System.IO
 Public Class IHA
 
     'Einschränkungen:
-    '--------------------------------------------
+    '------------------------------------------------------------------------
     'dt = 1 Tag (24h)
     'nur eine IHA-Zielfunktion erlaubt
     'IHA-Vergleich zweier Zeitreihen (Perioden)
     'Hydrologisches Jahr fängt immer am 1.Okt an
-    '--------------------------------------------
+
+    'Hinweise:
+    '------------------------------------------------------------------------
+    'bei Jahreszahlen gilt: 1994 entspricht Zeitraum 1.10.1993 bis 30.09.1994
 
 #Region "Eigenschaften"
 
@@ -76,39 +79,39 @@ Public Class IHA
         'BeginPre
         Dim StartDatum As DateTime = ZeitReihe(0, 0)
         If (StartDatum.DayOfYear > BegWatrYr) Then
-            Me.BeginPre = StartDatum.Year + 1
+            Me.BeginPre = StartDatum.Year + 2
         Else
-            Me.BeginPre = StartDatum.Year
+            Me.BeginPre = StartDatum.Year + 1
         End If
 
         'EndPre
         Dim EndDatum As DateTime = ZeitReihe(ZeitReihe.GetUpperBound(0), 0)
-        If (EndDatum.DayOfYear > BegWatrYr) Then
-            Me.EndPre = EndDatum.Year - 1
+        If (EndDatum.DayOfYear >= BegWatrYr) Then
+            Me.EndPre = EndDatum.Year
         Else
-            Me.EndPre = EndDatum.Year - 2
+            Me.EndPre = EndDatum.Year - 1
         End If
 
         'BeginPost
         If (BlueM1.SimStart.DayOfYear > BegWatrYr) Then
-            Me.BeginPost_sim = BlueM1.SimStart.Year + 1
+            Me.BeginPost_sim = BlueM1.SimStart.Year + 2
         Else
-            Me.BeginPost_sim = BlueM1.SimStart.Year
+            Me.BeginPost_sim = BlueM1.SimStart.Year + 1
         End If
         Me.BeginPost = Me.EndPre + 1 '(Post-Zeitraum wird an das Ende des Pre-Zeitraums angehängt!)
 
         'EndPost
-        If (BlueM1.SimEnde.DayOfYear > BegWatrYr) Then
-            Me.EndPost_sim = BlueM1.SimEnde.Year - 1
+        If (BlueM1.SimEnde.DayOfYear >= BegWatrYr) Then
+            Me.EndPost_sim = BlueM1.SimEnde.Year
         Else
-            Me.EndPost_sim = BlueM1.SimEnde.Year - 2
+            Me.EndPost_sim = BlueM1.SimEnde.Year - 1
         End If
         Me.EndPost = Me.BeginPost + (Me.EndPost_sim - Me.BeginPost_sim)
 
         'Zeitreihe kürzen und nach RefReihe(,) kopieren
         '----------------------------------------------
-        Dim cutLength As Integer = (New DateTime(Me.EndPre + 1, 9, 30) - New DateTime(Me.BeginPre, 10, 1)).Days + 1
-        Dim cutBegin As Integer = (New DateTime(Me.BeginPre, 10, 1) - StartDatum).Days
+        Dim cutLength As Integer = (New DateTime(Me.EndPre, 9, 30) - New DateTime(Me.BeginPre - 1, 10, 1)).Days + 1
+        Dim cutBegin As Integer = (New DateTime(Me.BeginPre - 1, 10, 1) - StartDatum).Days
         Dim RefReihe(cutLength - 1, 1) As Object
         Array.Copy(ZeitReihe, cutBegin * 2, RefReihe, 0, cutlength * 2)
 
@@ -245,8 +248,8 @@ Public Class IHA
 
         'Simulationsreihe entsprechend kürzen
         Dim Startdatum As DateTime = simreihe(0, 0)
-        Dim cutLength As Integer = (New DateTime(Me.EndPost_sim + 1, 9, 30) - New DateTime(Me.BeginPost_sim, 10, 1)).Days + 1
-        Dim cutBegin As Integer = (New DateTime(Me.BeginPost_sim, 10, 1) - Startdatum).Days
+        Dim cutLength As Integer = (New DateTime(Me.EndPost_sim, 9, 30) - New DateTime(Me.BeginPost_sim - 1, 10, 1)).Days + 1
+        Dim cutBegin As Integer = (New DateTime(Me.BeginPost_sim - 1, 10, 1) - Startdatum).Days
         Dim PostReihe(cutLength - 1, 1) As Object
         Array.Copy(simreihe, cutBegin * 2, PostReihe, 0, cutLength * 2)
 
