@@ -1194,27 +1194,7 @@ Public Class BlueM
             Quality(i) = OptZieleListe(i).QWertTmp
         Next
 
-        'Qualitätswerte im TeeChart zeichnen
-        Select Case n_Ziele
-            Case 1
-                TChart1.Series(ipop).Add(durchlauf, OptZieleListe(0).QWertTmp)
-            Case 2
-                TChart1.Series(0).Add(OptZieleListe(0).QWertTmp, OptZieleListe(1).QWertTmp, "")
-            Case 3
-                'TODO MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
-                'Call Zielfunktion_zeichnen_MultiObPar_3D(BlueM1.OptZieleListe(0).QWertTmp, BlueM1.OptZieleListe(1).QWertTmp, BlueM1.OptZieleListe(2).QWertTmp)
-            Case Else
-                'TODO MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
-                'TODO: Call Zielfunktion_zeichnen_MultiObPar_XD()
-        End Select
-
-        'Qualitätswerte und OptParameter in DB speichern
-        If (Ergebnisdb = True) Then
-            Call db_update(durchlauf, ipop)
-        End If
-
     End Function
-
 
 
     'Kombinatorik einlesen

@@ -562,10 +562,13 @@ Friend Class Form1
         Call BlueM1.TeeChartInitialise_SO_BlauesModell(1, Tmp, TChart1)
 
         'Zufällige Kinderpfade werden generiert
-        'Call CES1.Generate_Random_Path_BM()
+        Call CES1.Generate_Random_Path_BM()
 
-        'Funktion zum manuellen Testen der Paths in der ersten Generation
-        Call CES1.Generate_Test_Path_BM()
+        'HACK: Funktion zum manuellen Testen der Paths in der ersten Generation
+        'Call CES1.Generate_Test_Path_BM()
+
+        'HACK: zum testen aller Kombinationen
+        Call CES1.Generate_All_Test_Path_BM()
 
         'Generationsschleife
         For gen = 1 To CES1.n_Gen
@@ -586,7 +589,12 @@ Friend Class Form1
                 Call CES1.MO_TO_SO(CES1.ChildList_BM(i))
 
                 'Zeichnen der Kinder
-                Call TChart1.Series(0).Add(durchlauf, CES1.ChildList_BM(i).Quality_SO)
+                'Call TChart1.Series(0).Add(durchlauf, CES1.ChildList_BM(i).Quality_SO)
+
+                'HACK zum zeichnen aller Qualitäten
+                Call TChart1.Series(0).Add(durchlauf, CES1.ChildList_BM(i).Quality_MO(0))
+                Call TChart1.Series(1).Add(durchlauf, CES1.ChildList_BM(i).Quality_MO(1))
+                Call TChart1.Series(2).Add(durchlauf, CES1.ChildList_BM(i).Quality_MO(2))
                 System.Windows.Forms.Application.DoEvents()
             Next
 
@@ -598,7 +606,7 @@ Friend Class Form1
 
             'Zeichnen des besten Elter
             For i = 0 To CES1.ParentList_BM.GetUpperBound(0)
-                durchlauf += 1
+                'durchlauf += 1
                 Call TChart1.Series(1).Add(durchlauf, CES1.ParentList_BM(i).Quality_SO)
             Next
 

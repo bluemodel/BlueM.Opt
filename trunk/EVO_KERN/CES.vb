@@ -30,7 +30,7 @@ Public Class CES
     'Public Variablen
     Public n_Cities As Integer = 80
     Public ListOfCities(,) As Object
-    Public n_Gen As Integer = 10   
+    Public n_Gen As Integer = 1
     Public n_Ziele As Integer
 
     'Private Variablen
@@ -39,7 +39,7 @@ Public Class CES
     Private MutOperator_TSP As String = "Translocation"
     Private MutOperator_BM As String = "Random_Switch"
     Private n_Parents As Integer = 3
-    Private n_Childs As Integer = 5
+    Private n_Childs As Integer = 36
     Private Strategy As String = "plus"         '"plus" oder "minus" Strategie
     Private MutRate As Integer = 30              'Definiert die Wahrscheinlichkeit der Mutationsrate in %
 
@@ -188,6 +188,7 @@ Public Class CES
 
     End Sub
 
+    'HACK
     'Funktion zum manuellen Testen der Paths in der ersten Generation
     Public Sub Generate_Test_Path_BM()
         Dim i, j As Integer
@@ -203,6 +204,38 @@ Public Class CES
                     ChildList_BM(i).Path(j) = 0
                 End If
             Next
+        Next
+
+    End Sub
+
+    'HACK
+    'Funktion zum manuellen Testen der Paths in der ersten Generation
+    Public Sub Generate_All_Test_Path_BM()
+        Dim i As Integer
+        Dim x, y, z As Integer
+
+        x = 0
+        y = 0
+        z = 0
+
+        For i = 0 To n_Childs - 1
+
+            ChildList_BM(i).Path(0) = x
+            ChildList_BM(i).Path(1) = y
+            ChildList_BM(i).Path(2) = z
+            x += 1
+            If x > BlueM1.LocationList(0).MassnahmeListe.GetUpperBound(0) Then
+                x = 0
+                y += 1
+            End If
+            If y > BlueM1.LocationList(1).MassnahmeListe.GetUpperBound(0) Then
+                y = 0
+                z += 1
+            End If
+            If z > BlueM1.LocationList(2).MassnahmeListe.GetUpperBound(0) Then
+                z = 0
+            End If
+
         Next
 
     End Sub
