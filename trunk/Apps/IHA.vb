@@ -2,6 +2,8 @@ Imports System.IO
 
 Public Class IHA
 
+    'TODO: Beschreibung der Klasse ;-)
+
     'Einschränkungen:
     '------------------------------------------------------------------------
     'dt = 1 Tag (24h)
@@ -113,7 +115,7 @@ Public Class IHA
         Dim cutLength As Integer = (New DateTime(Me.EndPre, 9, 30) - New DateTime(Me.BeginPre - 1, 10, 1)).Days + 1
         Dim cutBegin As Integer = (New DateTime(Me.BeginPre - 1, 10, 1) - StartDatum).Days
         Dim RefReihe(cutLength - 1, 1) As Object
-        Array.Copy(ZeitReihe, cutBegin * 2, RefReihe, 0, cutlength * 2)
+        Array.Copy(ZeitReihe, cutBegin * 2, RefReihe, 0, cutLength * 2)
 
         'Referenz-Zeitreihe umformatieren und in RefData(,) speichern
         '---------------------------------------------------------

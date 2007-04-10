@@ -30,7 +30,7 @@ Public Class CES
     'Public Variablen
     Public n_Cities As Integer = 80
     Public ListOfCities(,) As Object
-    Public n_Gen As Integer = 1
+    Public n_Gen As Integer = 10
     Public n_Ziele As Integer
 
     'Private Variablen
@@ -39,7 +39,7 @@ Public Class CES
     Private MutOperator_TSP As String = "Translocation"
     Private MutOperator_BM As String = "Random_Switch"
     Private n_Parents As Integer = 3
-    Private n_Childs As Integer = 36
+    Private n_Childs As Integer = 10
     Private Strategy As String = "plus"         '"plus" oder "minus" Strategie
     Private MutRate As Integer = 30              'Definiert die Wahrscheinlichkeit der Mutationsrate in %
 
@@ -895,7 +895,7 @@ Public Class CES
         For x = 0 To FaksimileList.Quality_MO.GetUpperBound(0)
             FaksimileList.Quality_SO = FaksimileList.Quality_SO + FaksimileList.Quality_MO(x)
         Next
-        FaksimileList.Quality_SO = FaksimileList.Quality_SO / n_Ziele
+        'FaksimileList.Quality_SO = FaksimileList.Quality_SO / n_Ziele
 
     End Sub
 

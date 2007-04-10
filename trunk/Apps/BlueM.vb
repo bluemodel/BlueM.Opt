@@ -104,9 +104,13 @@ Public Class BlueM
 
     'Kombinatorik
     '------------
+    Public SKos1 As New SKos()
+
     Public Structure Massnahme
         Public Name As String
         Public Schaltung(,) As String
+        Public KostenTyp As Integer
+        Public Bauwerke() As String
     End Structure
 
     Public Structure Lokation
@@ -414,11 +418,11 @@ Public Class BlueM
                 ext = OptZieleListe(i).ZielReihePfad.Substring(OptZieleListe(i).ZielReihePfad.LastIndexOf(".") + 1)
                 Select Case (ext.ToUpper)
                     Case "WEL"
-                        IsOK = ReadWEL(OptZieleListe(i).ZielReihePfad, OptZieleListe(i).ZielGr, OptZieleListe(i).ZielReihe)
+                        IsOK = Read_WEL(OptZieleListe(i).ZielReihePfad, OptZieleListe(i).ZielGr, OptZieleListe(i).ZielReihe)
                     Case "ZRE"
-                        IsOK = ReadZRE(OptZieleListe(i).ZielReihePfad, OptZieleListe(i).ZielReihe)
+                        IsOK = Read_ZRE(OptZieleListe(i).ZielReihePfad, OptZieleListe(i).ZielReihe)
                     Case "PRB"
-                        IsOK = ReadPRB(OptZieleListe(i).ZielReihePfad, OptZieleListe(i).ZielGr, OptZieleListe(i).ZielReihe)
+                        IsOK = Read_PRB(OptZieleListe(i).ZielReihePfad, OptZieleListe(i).ZielGr, OptZieleListe(i).ZielReihe)
                     Case Else
                         IsOK = False
                 End Select
@@ -624,17 +628,14 @@ Public Class BlueM
         Dim SimReihe(,) As Object = {}
 
         'Simulationsergebnis auslesen
-        IsOK = ReadWEL(WorkDir & Datensatz & ".wel", OptZiel.SimGr, SimReihe)
+        IsOK = Read_WEL(WorkDir & Datensatz & ".wel", OptZiel.SimGr, SimReihe)
 
         'Fallunterscheidung Zieltyp
         '--------------------------
         Select Case OptZiel.ZielTyp
 
-            Case "EcoFlood"
-                For i = 0 To OptParameterListe.GetUpperBound(0)
-                    QWert = QWert + (OptParameterListe(i).Wert * OptParameterListe(i).Wert) / 1000
-                Next
-                'QWert = (1 / QWert) * 100
+            Case "Kosten"
+                QWert = SKos1.calculate_costs
 
             Case "IHA"
                 QWert = IHA1.calculate_IHA(SimReihe)
@@ -771,7 +772,7 @@ Public Class BlueM
         Dim SimReihe As Object(,) = {}
 
         'Simulationsergebnis auslesen
-        IsOK = ReadPRB(WorkDir & Datensatz & ".PRB", OptZiel.SimGr, SimReihe)
+        IsOK = Read_PRB(WorkDir & Datensatz & ".PRB", OptZiel.SimGr, SimReihe)
 
         'Diff
         '----
@@ -826,14 +827,14 @@ Public Class BlueM
 
     'Eine ZRE-Datei einlesen
     '***********************
-    Public Function ReadZRE(ByVal DateiPfad As String, ByRef ZRE(,) As Object) As Boolean
+    Public Function Read_ZRE(ByVal DateiPfad As String, ByRef ZRE(,) As Object) As Boolean
 
         Dim AnzZeil As Integer = 0
         Dim j As Integer = 0
         Dim Zeile As String
         Const ZREHEaderLen As Integer = 4     'Die ersten 4 Zeilen der ZRE-Datei gehören zum Header
 
-        ReadZRE = True
+        Read_ZRE = True
 
         Try
             Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
@@ -865,14 +866,14 @@ Public Class BlueM
 
         Catch except As Exception
             MsgBox("Fehler beim lesen der ZRE-Datei" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
-            ReadZRE = False
+            Read_ZRE = False
         End Try
 
     End Function
 
     'Eine Spalte einer WEL-Datei einlesen
     '************************************
-    Public Function ReadWEL(ByVal Dateipfad As String, ByVal Spalte As String, ByRef WEL(,) As Object) As Boolean
+    Public Function Read_WEL(ByVal Dateipfad As String, ByVal Spalte As String, ByRef WEL(,) As Object) As Boolean
 
         'Einschränkungen:
         '---------------------------------------------------
@@ -884,7 +885,7 @@ Public Class BlueM
         Dim Werte() As String = {}
         Dim SpalteNr As Integer = -1
         Const WELHeaderLen As Integer = 3       'Die ersten 3 Zeilen der WEL-Datei gehören zum Header
-        ReadWEL = True
+        Read_WEL = True
 
         Try
             Dim FiStr As FileStream = New FileStream(Dateipfad, FileMode.Open, IO.FileAccess.ReadWrite)
@@ -913,7 +914,7 @@ Public Class BlueM
                 End If
             Next
             If (SpalteNr = -1) Then
-                ReadWEL = False
+                Read_WEL = False
                 MsgBox("Konnte die Spalte """ & Spalte & """ in der WEL-Datei nicht finden!", MsgBoxStyle.Exclamation, "Fehler")
                 Exit Function
             End If
@@ -936,20 +937,20 @@ Public Class BlueM
 
         Catch except As Exception
             MsgBox("Fehler beim lesen der WEL-Datei" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
-            ReadWEL = False
+            Read_WEL = False
         End Try
 
     End Function
 
     'Eine PRB-Datei einlesen
     '***********************
-    Public Function ReadPRB(ByVal DateiPfad As String, ByVal ZielGr As String, ByRef PRB(,) As Object) As Boolean
+    Public Function Read_PRB(ByVal DateiPfad As String, ByVal ZielGr As String, ByRef PRB(,) As Object) As Boolean
 
         Dim ZeileStart As Integer = 0
         Dim AnzZeil = 26                   'Anzahl der Zeilen ist immer 26, definiert durch MAXSTZ in BM
         Dim j As Integer = 0
         Dim Zeile As String
-        ReadPRB = True
+        Read_PRB = True
 
         Try
             Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
@@ -1004,7 +1005,7 @@ Public Class BlueM
 
         Catch except As Exception
             MsgBox("Fehler beim lesen der PRB-Datei:" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
-            ReadPRB = False
+            Read_PRB = False
         End Try
 
     End Function
@@ -1070,12 +1071,12 @@ Public Class BlueM
             Point0.Pointer.VertSize = 3
 
             'Series(1 bis n): Für jede Population eine Series 'TODO: es würde auch eine Series für alle reichen!
-            For i = 0 To n_Populationen
+            For i = 1 To n_Populationen
                 Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
                 Point1.Title = "Population " & i.ToString()
                 Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-                Point1.Pointer.HorizSize = 3
-                Point1.Pointer.VertSize = 3
+                Point1.Pointer.HorizSize = 2
+                Point1.Pointer.VertSize = 2
             Next i
 
             'Formatierung der Axen
@@ -1199,7 +1200,7 @@ Public Class BlueM
 
     'Kombinatorik einlesen
     '*********************
-    Public Sub Kombinatorik_einlesen()
+    Public Sub Read_CES()
         Try
             Dim Datei As String = WorkDir & Datensatz & "." & Combi_Ext
 
@@ -1240,6 +1241,7 @@ Public Class BlueM
                     End If
                     System.Array.Resize(LocationList(i).MassnahmeListe, j + 1)
                     ReDim LocationList(i).MassnahmeListe(j).Schaltung(2, 1)
+                    ReDim LocationList(i).MassnahmeListe(j).Bauwerke(3)
                     LocationList(i).MassnahmeListe(j).Name = array(2).Trim()
                     LocationList(i).MassnahmeListe(j).Schaltung(0, 0) = array(3).Trim()
                     LocationList(i).MassnahmeListe(j).Schaltung(0, 1) = array(4).Trim()
@@ -1247,7 +1249,11 @@ Public Class BlueM
                     LocationList(i).MassnahmeListe(j).Schaltung(1, 1) = array(6).Trim()
                     LocationList(i).MassnahmeListe(j).Schaltung(2, 0) = array(7).Trim()
                     LocationList(i).MassnahmeListe(j).Schaltung(2, 1) = array(8).Trim()
-                    'i += 1
+                    LocationList(i).MassnahmeListe(j).KostenTyp = array(9).Trim()
+                    LocationList(i).MassnahmeListe(j).Bauwerke(0) = array(10).Trim()
+                    LocationList(i).MassnahmeListe(j).Bauwerke(1) = array(11).Trim()
+                    LocationList(i).MassnahmeListe(j).Bauwerke(2) = array(12).Trim()
+                    LocationList(i).MassnahmeListe(j).Bauwerke(3) = array(13).Trim()
                     j += 1
                 End If
 
@@ -1336,10 +1342,10 @@ Public Class BlueM
         End Try
     End Sub
 
-    'TODO: Funktionsbeschreibung
+    'Mehrere Prüfungen ob die .VER Datei des BlueM und der .CES Datei auch zusammenpassen
     '***************************
-    Public Function Combinatoric_fits_to_Verzweigungsdatei() As Boolean
-        Combinatoric_fits_to_Verzweigungsdatei = True
+    Public Function CES_fits_to_VER() As Boolean
+        CES_fits_to_VER = True
         Dim i As Integer = 0
         Dim j As Integer = 0
         Dim x As Integer = 0
@@ -1392,11 +1398,11 @@ Public Class BlueM
 
         'Übergabe
         If FoundB = False Then
-            Combinatoric_fits_to_Verzweigungsdatei = False
+            CES_fits_to_VER = False
         Else
             For i = 0 To FoundA.GetUpperBound(0)
                 If FoundA(i) = False Then
-                    Combinatoric_fits_to_Verzweigungsdatei = False
+                    CES_fits_to_VER = False
                 End If
             Next
         End If

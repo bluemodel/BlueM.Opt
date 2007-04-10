@@ -175,7 +175,7 @@ Friend Class Form1
                     'End If
 
                     'Einlesen der CombiOpt Datei
-                    Call BlueM1.Kombinatorik_einlesen()
+                    Call BlueM1.Read_CES()
 
                     'Überprüfen der Kombinatorik
                     'ToDo: Hier Message Box einbauen
@@ -186,7 +186,7 @@ Friend Class Form1
 
                     'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
                     'ToDo: Hier Message Box einbauen
-                    isOK = BlueM1.Combinatoric_fits_to_Verzweigungsdatei()
+                    isOK = BlueM1.CES_fits_to_VER()
 
                     'Call Initialisierung_BlauesModell_CombiOpt()
 
@@ -440,7 +440,7 @@ Friend Class Form1
 
         ReDim Wave1.WaveList(Anz_Sim + 1)
         'HACK: Die Spalte der WEL-Datei ist hartvercodet!
-        BlueM1.ReadWEL(BlueM1.WorkDir & BlueM1.Datensatz & ".wel", "S201_1ZU", Wave1.WaveList(0).Wave)
+        BlueM1.Read_WEL(BlueM1.WorkDir & BlueM1.Datensatz & ".wel", "S201_1ZU", Wave1.WaveList(0).Wave)
 
         Randomize()
 
@@ -460,7 +460,7 @@ Friend Class Form1
             Wave1.WaveList(i).Bezeichnung = BlueM1.OptZieleListe(0).SimGr
             'Wave1.WaveList(1).Bezeichnung = BlueM1.OptZieleListe(0).SpalteWel
             'If i = 0 Then
-            BlueM1.ReadWEL(BlueM1.WorkDir & BlueM1.Datensatz & ".wel", BlueM1.OptZieleListe(0).SimGr, Wave1.WaveList(i + 1).Wave)
+            BlueM1.Read_WEL(BlueM1.WorkDir & BlueM1.Datensatz & ".wel", BlueM1.OptZieleListe(0).SimGr, Wave1.WaveList(i + 1).Wave)
             'ElseIf i = Anz_Sim Then
             'BlueM1.ReadWEL(BlueM1.WorkDir & BlueM1.Datensatz & ".wel", BlueM1.OptZieleListe(0).SpalteWel, Wave1.WaveList(1).Wave)
             'End If
@@ -558,8 +558,8 @@ Friend Class Form1
 
         'TeeChart initialisieren
         Dim Tmp As Integer
-        Tmp = CES1.n_Gen * (CES1.ChildList_BM.GetLength(0) + CES1.ParentList_BM.GetLength(0))
-        Call BlueM1.TeeChartInitialise_SO_BlauesModell(1, Tmp, TChart1)
+        Tmp = CES1.n_Gen * (CES1.ChildList_BM.GetLength(0))
+        Call BlueM1.TeeChartInitialise_SO_BlauesModell(4, Tmp, TChart1)
 
         'Zufällige Kinderpfade werden generiert
         Call CES1.Generate_Random_Path_BM()
@@ -568,7 +568,7 @@ Friend Class Form1
         'Call CES1.Generate_Test_Path_BM()
 
         'HACK: zum testen aller Kombinationen
-        Call CES1.Generate_All_Test_Path_BM()
+        'Call CES1.Generate_All_Test_Path_BM()
 
         'Generationsschleife
         For gen = 1 To CES1.n_Gen
@@ -589,12 +589,12 @@ Friend Class Form1
                 Call CES1.MO_TO_SO(CES1.ChildList_BM(i))
 
                 'Zeichnen der Kinder
-                'Call TChart1.Series(0).Add(durchlauf, CES1.ChildList_BM(i).Quality_SO)
+                Call TChart1.Series(0).Add(durchlauf, CES1.ChildList_BM(i).Quality_SO)
 
                 'HACK zum zeichnen aller Qualitäten
-                Call TChart1.Series(0).Add(durchlauf, CES1.ChildList_BM(i).Quality_MO(0))
-                Call TChart1.Series(1).Add(durchlauf, CES1.ChildList_BM(i).Quality_MO(1))
-                Call TChart1.Series(2).Add(durchlauf, CES1.ChildList_BM(i).Quality_MO(2))
+                Call TChart1.Series(2).Add(durchlauf, CES1.ChildList_BM(i).Quality_MO(0))
+                Call TChart1.Series(3).Add(durchlauf, CES1.ChildList_BM(i).Quality_MO(1))
+                Call TChart1.Series(4).Add(durchlauf, CES1.ChildList_BM(i).Quality_MO(2))
                 System.Windows.Forms.Application.DoEvents()
             Next
 
