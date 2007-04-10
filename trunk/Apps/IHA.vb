@@ -2,18 +2,34 @@ Imports System.IO
 
 Public Class IHA
 
-    'TODO: Beschreibung der Klasse ;-)
-
-    'Einschränkungen:
-    '------------------------------------------------------------------------
-    'dt = 1 Tag (24h)
-    'nur eine IHA-Zielfunktion erlaubt
-    'IHA-Vergleich zweier Zeitreihen (Perioden)
-    'Hydrologisches Jahr fängt immer am 1.Okt an
-
-    'Hinweise:
-    '------------------------------------------------------------------------
-    'bei Jahreszahlen gilt: 1994 entspricht Zeitraum 1.10.1993 bis 30.09.1994
+    '***************************************************************************************
+    '***************************************************************************************
+    '**** Klasse IHA zur Ermittlung der Hydrologischen Veränderung                      ****
+    '**** mittels "IHA Software" v7.03 von The Nature Conservancy                       ****
+    '**** http://www.nature.org/initiatives/freshwater/conservationtools/art17004.html  ****
+    '****                                                                               ****
+    '**** Felix Froehlich                                                               ****
+    '****                                                                               ****
+    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung                      ****
+    '**** TU Darmstadt                                                                  ****
+    '****                                                                               ****
+    '**** April 2007                                                                    ****
+    '****                                                                               ****
+    '**** Letzte Änderung: April 2007                                                   ****
+    '****                                                                               ****
+    '**** Einschränkungen:                                                              ****
+    '**** ----------------                                                              ****
+    '**** Zeitreihen dt = 1 Tag (24h)                                                   ****
+    '**** nur eine einzige IHA-Zielfunktion erlaubt                                     ****
+    '**** Vergleich der Simulationszeitreihe mit einer Referenzzeitreihe                ****
+    '**** Hydrologisches Jahr fängt immer am 1. Okt an                                  ****
+    '****                                                                               ****
+    '**** Hinweise:                                                                     ****
+    '**** ---------                                                                     ****
+    '**** bei Jahreszahlen gilt: 1994 entspricht Zeitraum 1.10.1993 bis 30.09.1994      ****
+    '****                                                                               ****
+    '***************************************************************************************
+    '***************************************************************************************
 
 #Region "Eigenschaften"
 
@@ -247,6 +263,7 @@ Public Class IHA
     Public Function calculate_IHA(ByVal simreihe As Object(,)) As Double
 
         Dim i, j, k As Integer
+        Dim QWert As Double
 
         'Simulationsreihe entsprechend kürzen
         Dim Startdatum As DateTime = simreihe(0, 0)
@@ -298,6 +315,12 @@ Public Class IHA
         'IHA-Berechnung ausführen
         '------------------------
         Call launchIHA()
+
+        'QWert aus IHA-Parametern berechnen
+        '----------------------------------
+        'TODO: IHA-QWert
+
+        Return QWert
 
     End Function
 
