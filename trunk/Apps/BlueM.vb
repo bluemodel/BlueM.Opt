@@ -622,7 +622,6 @@ Public Class BlueM
     '****************************************
     Private Function QWert_WEL(ByVal OptZiel As OptZiel) As Double
 
-        Dim i As Integer
         Dim IsOK As Boolean
         Dim QWert As Double
         Dim SimReihe(,) As Object = {}
@@ -635,7 +634,7 @@ Public Class BlueM
         Select Case OptZiel.ZielTyp
 
             Case "Kosten"
-                QWert = SKos1.calculate_costs
+                QWert = SKos1.calculate_costs(Me)
 
             Case "IHA"
                 QWert = IHA1.calculate_IHA(SimReihe)
@@ -1004,7 +1003,7 @@ Public Class BlueM
             PRB = PRBtmp
 
         Catch except As Exception
-            MsgBox("Fehler beim lesen der PRB-Datei:" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
+            MsgBox("Fehler beim lesen der PRB-Datei:" & Chr(13) & Chr(10) & except.Message & Chr(13) & Chr(10) & "Ein Fehler könnten Leerzeichen in der letzten Zeile der Datei sein.", MsgBoxStyle.Exclamation, "Fehler")
             Read_PRB = False
         End Try
 
@@ -1263,7 +1262,7 @@ Public Class BlueM
             FiStr.Close()
 
         Catch except As Exception
-            MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim Lesen der Kombinatorik")
+            MsgBox(except.Message & Chr(13) & Chr(10) & "Ein Fehler könnten Leerzeichen in der letzten Zeile der Datei sein.", MsgBoxStyle.Exclamation, "Fehler beim Lesen der Kombinatorik")
         End Try
 
     End Sub
