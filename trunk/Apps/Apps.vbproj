@@ -61,6 +61,7 @@
     <Compile Include="BlueM.vb">
     </Compile>
     <Compile Include="IHA.vb" />
+    <Compile Include="Sim.vb" />
     <Compile Include="SKos.vb" />
     <Compile Include="SensiPlot.Designer.vb">
       <DependentUpon>SensiPlot.vb</DependentUpon>
