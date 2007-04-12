@@ -83,8 +83,8 @@ Public Class SKos
 
             Dim i As Integer = -1
             Dim j As Integer = 0
-            ReDim LocationList(0)
-            ReDim LocationList(0).MassnahmeListe(0)
+            ReDim BlueM1.LocationList(0)
+            ReDim BlueM1.LocationList(0).MassnahmeListe(0)
 
             'Zurück zum Dateianfang und lesen
             FiStr.Seek(0, SeekOrigin.Begin)
@@ -96,27 +96,27 @@ Public Class SKos
                     array = Zeile.Split("|")
                     'Werte zuweisen
 
-                    If Not Is_Name_IN(array(1).Trim(), LocationList) Then
+                    If Not BlueM.Is_Name_IN(array(1).Trim(), BlueM1.LocationList) Then
                         i += 1
                         j = 0
-                        System.Array.Resize(LocationList, i + 1)
-                        LocationList(i).Name = array(1).Trim()
+                        System.Array.Resize(BlueM1.LocationList, i + 1)
+                        BlueM1.LocationList(i).Name = array(1).Trim()
                     End If
-                    System.Array.Resize(LocationList(i).MassnahmeListe, j + 1)
-                    ReDim LocationList(i).MassnahmeListe(j).Schaltung(2, 1)
-                    ReDim LocationList(i).MassnahmeListe(j).Bauwerke(3)
-                    LocationList(i).MassnahmeListe(j).Name = array(2).Trim()
-                    LocationList(i).MassnahmeListe(j).Schaltung(0, 0) = array(3).Trim()
-                    LocationList(i).MassnahmeListe(j).Schaltung(0, 1) = array(4).Trim()
-                    LocationList(i).MassnahmeListe(j).Schaltung(1, 0) = array(5).Trim()
-                    LocationList(i).MassnahmeListe(j).Schaltung(1, 1) = array(6).Trim()
-                    LocationList(i).MassnahmeListe(j).Schaltung(2, 0) = array(7).Trim()
-                    LocationList(i).MassnahmeListe(j).Schaltung(2, 1) = array(8).Trim()
-                    LocationList(i).MassnahmeListe(j).KostenTyp = array(9).Trim()
-                    LocationList(i).MassnahmeListe(j).Bauwerke(0) = array(10).Trim()
-                    LocationList(i).MassnahmeListe(j).Bauwerke(1) = array(11).Trim()
-                    LocationList(i).MassnahmeListe(j).Bauwerke(2) = array(12).Trim()
-                    LocationList(i).MassnahmeListe(j).Bauwerke(3) = array(13).Trim()
+                    System.Array.Resize(BlueM1.LocationList(i).MassnahmeListe, j + 1)
+                    ReDim BlueM1.LocationList(i).MassnahmeListe(j).Schaltung(2, 1)
+                    ReDim BlueM1.LocationList(i).MassnahmeListe(j).Bauwerke(3)
+                    BlueM1.LocationList(i).MassnahmeListe(j).Name = array(2).Trim()
+                    BlueM1.LocationList(i).MassnahmeListe(j).Schaltung(0, 0) = array(3).Trim()
+                    BlueM1.LocationList(i).MassnahmeListe(j).Schaltung(0, 1) = array(4).Trim()
+                    BlueM1.LocationList(i).MassnahmeListe(j).Schaltung(1, 0) = array(5).Trim()
+                    BlueM1.LocationList(i).MassnahmeListe(j).Schaltung(1, 1) = array(6).Trim()
+                    BlueM1.LocationList(i).MassnahmeListe(j).Schaltung(2, 0) = array(7).Trim()
+                    BlueM1.LocationList(i).MassnahmeListe(j).Schaltung(2, 1) = array(8).Trim()
+                    BlueM1.LocationList(i).MassnahmeListe(j).KostenTyp = array(9).Trim()
+                    BlueM1.LocationList(i).MassnahmeListe(j).Bauwerke(0) = array(10).Trim()
+                    BlueM1.LocationList(i).MassnahmeListe(j).Bauwerke(1) = array(11).Trim()
+                    BlueM1.LocationList(i).MassnahmeListe(j).Bauwerke(2) = array(12).Trim()
+                    BlueM1.LocationList(i).MassnahmeListe(j).Bauwerke(3) = array(13).Trim()
                     j += 1
                 End If
 

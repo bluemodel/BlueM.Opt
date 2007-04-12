@@ -102,7 +102,7 @@ Friend Class Form1
                     'Ergebnisdatenbank ausschalten
                     BlueM1.Ergebnisdb = False
                     'BM-Einstellungen initialisieren 
-                    Call BlueM1.BM_Ini()
+                    Call BlueM1.Sim_Ini()
 
                     'Original ModellParameter werden geschrieben
                     Call BlueM1.ModellParameter_schreiben()
@@ -117,7 +117,7 @@ Friend Class Form1
                     'Ergebnisdatenbank ausschalten
                     BlueM1.Ergebnisdb = False
                     'BM-Einstellungen initialisieren 
-                    Call BlueM1.BM_Ini()
+                    Call BlueM1.Sim_Ini()
                     'Sensi Plot Dialog starten und List_Boxen füllen
                     Dim i As Integer
                     Dim IsOK As Boolean
@@ -139,7 +139,7 @@ Friend Class Form1
                     Testprobleme1.Enabled = False
 
                     'BM-Einstellungen initialisieren 
-                    Call BlueM1.BM_Ini()
+                    Call BlueM1.Sim_Ini()
 
                     'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
                     If BlueM1.OptZieleListe.GetLength(0) = 1 Then
@@ -161,7 +161,7 @@ Friend Class Form1
                     'Ergebnisdatenbank ausschalten
                     BlueM1.Ergebnisdb = False
                     'BM-Einstellungen initialisieren 
-                    Call BlueM1.BM_Ini()
+                    Call BlueM1.Sim_Ini()
 
                     CES1.n_Ziele = BlueM1.OptZieleListe.GetLength(0)
 
@@ -267,7 +267,7 @@ Friend Class Form1
                 For i = 0 To Configs.GetUpperBound(0)
                     Select Case Configs(i, 0)
                         Case "BM_Exe"
-                            BlueM1.BM_Exe = Configs(i, 1)
+                            BlueM1.Exe = Configs(i, 1)
                         Case "Datensatz"
                             'Dateiname vom Ende abtrennen
                             BlueM1.Datensatz = Configs(i, 1).Substring(Configs(i, 1).LastIndexOf("\") + 1)
@@ -331,9 +331,9 @@ Friend Class Form1
 
         'Initialisierung der TeeChart Serien je nach SO oder MO
         If (isMultiObjective) = False Then
-            Call BlueM1.TeeChartInitialise_SO_BlauesModell(n_Populationen, n_Kalkulationen, TChart1)
+            Call BlueM1.TeeChartInitialise_SO(n_Populationen, n_Kalkulationen, TChart1)
         Else
-            Call BlueM1.TeeChartInitialise_MO_BlauesModell(TChart1)
+            Call BlueM1.TeeChartInitialise_MO(TChart1)
         End If
 
     End Sub
@@ -355,7 +355,7 @@ Friend Class Form1
         myisrun = True
         Select Case Anwendung
             Case ANW_RESETPARA_RUNBM
-                Call BlueM1.launchBM()
+                Call BlueM1.launchSim()
             Case ANW_SENSIPLOT_MODPARA
                 myIsOK = SensiPlot_STARTEN(SensiPlot1.Selected_OptParameter, SensiPlot1.Selected_OptZiel, SensiPlot1.Selected_SensiType, SensiPlot1.Anz_Sim)
             Case ANW_BLAUESMODELL
@@ -440,7 +440,7 @@ Friend Class Form1
 
         ReDim Wave1.WaveList(Anz_Sim + 1)
         'HACK: Die Spalte der WEL-Datei ist hartvercodet!
-        BlueM1.Read_WEL(BlueM1.WorkDir & BlueM1.Datensatz & ".wel", "S201_1ZU", Wave1.WaveList(0).Wave)
+        Apps.Sim.Read_WEL(BlueM1.WorkDir & BlueM1.Datensatz & ".wel", "S201_1ZU", Wave1.WaveList(0).Wave)
 
         Randomize()
 
@@ -454,13 +454,13 @@ Friend Class Form1
             End Select
 
             Call BlueM1.ModellParameter_schreiben()
-            Call BlueM1.launchBM()
+            Call BlueM1.launchSim()
 
             'Speichern der ersten und letzten Wave
             Wave1.WaveList(i).Bezeichnung = BlueM1.OptZieleListe(0).SimGr
             'Wave1.WaveList(1).Bezeichnung = BlueM1.OptZieleListe(0).SpalteWel
             'If i = 0 Then
-            BlueM1.Read_WEL(BlueM1.WorkDir & BlueM1.Datensatz & ".wel", BlueM1.OptZieleListe(0).SimGr, Wave1.WaveList(i + 1).Wave)
+            Apps.Sim.Read_WEL(BlueM1.WorkDir & BlueM1.Datensatz & ".wel", BlueM1.OptZieleListe(0).SimGr, Wave1.WaveList(i + 1).Wave)
             'ElseIf i = Anz_Sim Then
             'BlueM1.ReadWEL(BlueM1.WorkDir & BlueM1.Datensatz & ".wel", BlueM1.OptZieleListe(0).SpalteWel, Wave1.WaveList(1).Wave)
             'End If
@@ -559,7 +559,7 @@ Friend Class Form1
         'TeeChart initialisieren
         Dim Tmp As Integer
         Tmp = CES1.n_Gen * (CES1.ChildList_BM.GetLength(0))
-        Call BlueM1.TeeChartInitialise_SO_BlauesModell(4, Tmp, TChart1)
+        Call BlueM1.TeeChartInitialise_SO(4, Tmp, TChart1)
 
         'Zufällige Kinderpfade werden generiert
         Call CES1.Generate_Random_Path_BM()
@@ -583,7 +583,7 @@ Friend Class Form1
                 'Schreibt die neuen Verzweigungen
                 'Dieser Teil steht im Moment im BM Form muss aber ins CES!
                 Call BlueM1.Verzweigung_Write(CES1.ChildList_BM(i).Image)
-                Call BlueM1.Evaluierung_BlauesModell_CombiOpt(CES1.n_Ziele, durchlauf, 1, CES1.ChildList_BM(i).Quality_MO, TChart1)
+                Call BlueM1.Eval_Sim_CombiOpt(CES1.n_Ziele, durchlauf, 1, CES1.ChildList_BM(i).Quality_MO, TChart1)
 
                 'HACK zur Reduzierung auf eine Zielfunktion
                 Call CES1.MO_TO_SO(CES1.ChildList_BM(i))
@@ -825,7 +825,7 @@ Start_Evolutionsrunden:
                             Case ANW_TESTPROBLEME
                                 myIsOK = Testprobleme1.Evaluierung_TestProbleme(Testprobleme1.Combo_Testproblem.Text, globalAnzPar, mypara, durchlauf, ipop, QN, RN, TChart1)
                             Case ANW_BLAUESMODELL
-                                myIsOK = BlueM1.Evaluierung_BlauesModell_ParaOpt(globalAnzPar, globalAnzZiel_ParaOpt, mypara, durchlauf, ipop, QN, TChart1)
+                                myIsOK = BlueM1.Eval_Sim_ParaOpt(globalAnzPar, globalAnzZiel_ParaOpt, mypara, durchlauf, ipop, QN, TChart1)
                         End Select
 
                         'Einordnen der Qualitätsfunktion im Bestwertspeicher
