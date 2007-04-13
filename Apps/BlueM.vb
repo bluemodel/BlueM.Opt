@@ -253,7 +253,7 @@ Public Class BlueM
     Public Overrides Sub TeeChartInitialise_SO(ByVal n_Populationen As Integer, ByVal n_Kalkulationen As Integer, ByRef TChart1 As Steema.TeeChart.TChart)
 
         Call MyBase.TeeChartInitialise_SO(n_Populationen, n_Kalkulationen, TChart1)
-        TChart1.Header.Text = "BlauesModell"
+        TChart1.Header.Text = "BlauesModell: " & Me.Datensatz
 
     End Sub
 
@@ -262,7 +262,7 @@ Public Class BlueM
     Public Overrides Sub TeeChartInitialise_MO(ByRef TChart1 As Steema.TeeChart.TChart)
 
         Call MyBase.TeeChartInitialise_MO(TChart1)
-        TChart1.Header.Text = "BlauesModell"
+        TChart1.Header.Text = "BlauesModell: " & Me.Datensatz
 
     End Sub
 
