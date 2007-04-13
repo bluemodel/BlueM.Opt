@@ -597,7 +597,8 @@ Partial Class Form1
 
                 'Schreibt die neuen Verzweigungen
                 'ToDo: Dieser Teil steht im Moment im BM Form muss aber ins CES!
-                Call BlueM1.Verzweigung_Write(CES1.ChildList_BM(i).Image)
+                Call BlueM1.Define_aktuelle_Bauwerke(CES1.ChildList_BM(i).Path)
+                Call BlueM1.Verzweigung_Write(CES1.ChildList_BM(i).VER_ONOFF)
                 Call BlueM1.Eval_Sim_CombiOpt(CES1.n_Ziele, durchlauf, 1, CES1.ChildList_BM(i).Quality_MO, TChart1)
 
                 ''HACK zur Reduzierung auf eine Zielfunktion
@@ -625,11 +626,11 @@ Partial Class Form1
             'Selectionsprozess je nach "plus" oder "minus" Strategie
             Call CES1.Selection_Process_BM()
 
-            'Zeichnen des besten Elter
-            For i = 0 To CES1.ParentList_BM.GetUpperBound(0)
-                'durchlauf += 1
-                Call TChart1.Series(1).Add(durchlauf, CES1.ParentList_BM(i).Quality_SO)
-            Next
+            ''Zeichnen des besten Elter
+            'For i = 0 To CES1.ParentList_BM.GetUpperBound(0)
+            '    'durchlauf += 1
+            '    Call TChart1.Series(1).Add(durchlauf, CES1.ParentList_BM(i).Quality_SO)
+            'Next
 
             'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
             Call CES1.Reset_Childs_BM()

@@ -58,7 +58,7 @@ Public Class CES
         Dim Path() As Integer
         Dim Quality_SO As Double    'HACK zum Ausgleich von MO und SO
         Dim Quality_MO() As Double
-        Dim Image(,) As Object
+        Dim VER_ONOFF(,) As Object
     End Structure
 
     '************************************* TSP Listen ******************************
@@ -77,7 +77,7 @@ Public Class CES
         ReDim ListOfCities(n_Cities - 1, 2)
 
         Randomize()
-        Call TeeChart_Initialise_TSP(Tchart1)
+        Call TeeChart_Initialise_TSP(TChart1)
 
         For i = 0 To n_Cities - 1
             ListOfCities(i, 0) = i + 1
@@ -85,7 +85,7 @@ Public Class CES
             ListOfCities(i, 2) = Math.Round(Rnd() * 100)
         Next
 
-        Call TeeChart_Zeichnen_TSP(Tchart1, ListOfCities)
+        Call TeeChart_Zeichnen_TSP(TChart1, ListOfCities)
 
     End Sub
 
@@ -119,7 +119,7 @@ Public Class CES
                 ChildList_BM(i).Quality_MO(j) = 999999999999999999
             Next
             ReDim ChildList_BM(i).Path(BlueM1.LocationList.GetUpperBound(0))
-            ReDim ChildList_BM(i).Image(BlueM1.VerzweigungsDatei.GetUpperBound(0), 1)
+            ReDim ChildList_BM(i).VER_ONOFF(BlueM1.VerzweigungsDatei.GetUpperBound(0), 1)
         Next
 
     End Sub
@@ -153,7 +153,7 @@ Public Class CES
                 ParentList_BM(i).Quality_MO(j) = 999999999999999999
             Next
             ReDim ParentList_BM(i).Path(BlueM1.LocationList.GetUpperBound(0))
-            ReDim ParentList_BM(i).Image(BlueM1.VerzweigungsDatei.GetUpperBound(0), 1)
+            ReDim ParentList_BM(i).VER_ONOFF(BlueM1.VerzweigungsDatei.GetUpperBound(0), 1)
         Next
 
     End Sub
@@ -338,7 +338,7 @@ Public Class CES
         If Strategy = "minus" Then
             For i = 0 To n_Parents - 1
                 ParentList_BM(i).Quality_SO = ChildList_BM(i).Quality_SO
-                Array.Copy(ChildList_BM(i).Image, ParentList_BM(i).Image, ChildList_BM(i).Image.Length)
+                Array.Copy(ChildList_BM(i).VER_ONOFF, ParentList_BM(i).VER_ONOFF, ChildList_BM(i).VER_ONOFF.Length)
                 Array.Copy(ChildList_BM(i).Path, ParentList_BM(i).Path, ChildList_BM(i).Path.Length)
             Next i
 
@@ -350,7 +350,7 @@ Public Class CES
                 Else
                     ParentList_BM(i).Quality_SO = ChildList_BM(j).Quality_SO
                     ParentList_BM(i).Quality_MO = ChildList_BM(j).Quality_MO 'HACK: hier Qualität Doppelt
-                    Array.Copy(ChildList_BM(j).Image, ParentList_BM(i).Image, ChildList_BM(j).Image.Length)
+                    Array.Copy(ChildList_BM(j).VER_ONOFF, ParentList_BM(i).VER_ONOFF, ChildList_BM(j).VER_ONOFF.Length)
                     Array.Copy(ChildList_BM(j).Path, ParentList_BM(i).Path, ChildList_BM(j).Path.Length)
                 End If
                 j += 1
@@ -383,7 +383,7 @@ Public Class CES
                 ChildList_BM(i).Quality_MO(j) = 999999999999999999
             Next
             Array.Clear(ChildList_BM(i).Path, 0, ChildList_BM(i).Path.GetLength(0))
-            ReDim ChildList_BM(i).Image(BlueM1.VerzweigungsDatei.GetUpperBound(0), 1)
+            ReDim ChildList_BM(i).VER_ONOFF(BlueM1.VerzweigungsDatei.GetUpperBound(0), 1)
         Next
 
     End Sub
@@ -981,15 +981,15 @@ Public Class CES
         'Schreibt alle Verzweigungen ins Array
         'kann man auch früher machen!!!!
         For i = 0 To n_Childs - 1
-            For j = 0 To ChildList_BM(i).Image.GetUpperBound(0)
-                ChildList_BM(i).Image(j, 0) = BlueM1.VerzweigungsDatei(j, 0)
+            For j = 0 To ChildList_BM(i).VER_ONOFF.GetUpperBound(0)
+                ChildList_BM(i).VER_ONOFF(j, 0) = BlueM1.VerzweigungsDatei(j, 0)
             Next
             For x = 0 To ChildList_BM(i).Path.GetUpperBound(0)
                 No = ChildList_BM(i).Path(x)
                 For y = 0 To BlueM1.LocationList(x).MassnahmeListe(No).Schaltung.GetUpperBound(0)
-                    For z = 0 To ChildList_BM(i).Image.GetUpperBound(0)
-                        If BlueM1.LocationList(x).MassnahmeListe(No).Schaltung(y, 0) = ChildList_BM(i).Image(z, 0) Then
-                            ChildList_BM(i).Image(z, 1) = BlueM1.LocationList(x).MassnahmeListe(No).Schaltung(y, 1)
+                    For z = 0 To ChildList_BM(i).VER_ONOFF.GetUpperBound(0)
+                        If BlueM1.LocationList(x).MassnahmeListe(No).Schaltung(y, 0) = ChildList_BM(i).VER_ONOFF(z, 0) Then
+                            ChildList_BM(i).VER_ONOFF(z, 1) = BlueM1.LocationList(x).MassnahmeListe(No).Schaltung(y, 1)
                         End If
                     Next
                 Next

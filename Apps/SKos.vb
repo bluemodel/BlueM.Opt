@@ -17,7 +17,7 @@ Public Class SKos
     '**** Letzte Änderung: April 2007                                           ****
     '*******************************************************************************
     '*******************************************************************************
-
+    Public AktuelleBauwerke() as Object
 
     Public Function calculate_costs(ByVal BlueM1 As BlueM)
         Dim costs As Double = 0
@@ -35,10 +35,17 @@ Public Class SKos
         'Kalkulieren der Kosten für jedes Bauwerk
         Call Acquire_Costs(TRS_Array, TAL_Array, Bauwerksliste)
 
+        'Aktuelles Bauwerks Array bereinigen
+        Call Remove_X(AktuelleBauwerke)
+
         'Kosten aufsummieren
-        Dim i As Integer
-        For i = 0 To Bauwerksliste.GetUpperBound(0)
-            costs = costs + Bauwerksliste(i, 1)
+        Dim i, j As Integer
+        For i = 0 To AktuelleBauwerke.GetUpperBound(0)
+            For j = 0 To Bauwerksliste.GetUpperBound(0)
+                If Bauwerksliste(j, 0) = AktuelleBauwerke(i) Then
+                    costs = costs + Bauwerksliste(i, 1)
+                End If
+            Next
         Next
 
         Return costs
@@ -62,23 +69,29 @@ Public Class SKos
             Next
         Next
 
-        'Die "X" Einträge werden entfernt
-        Dim TmpArray(Bauwerks_Array.GetUpperBound(0)) As String
-        Array.Copy(Bauwerks_Array, TmpArray, Bauwerks_Array.GetLength(0))
-        x = 0
-        For i = 0 To TmpArray.GetUpperBound(0)
-            If Not TmpArray(i) = "X" Then
-                Bauwerks_Array(x) = TmpArray(i)
-                x += 1
-            End If
-        Next
+        Call Remove_X(Bauwerks_Array)
 
         'Die Werte des Arrays werden an die Liste übertragen
-        System.Array.Resize(Bauwerks_Array, x)
-        ReDim Bauwerksliste(x - 1, 1)
+        ReDim Bauwerksliste(Bauwerks_Array.GetUpperBound(0), 1)
         For i = 0 To Bauwerks_Array.GetUpperBound(0)
             Bauwerksliste(i, 0) = Bauwerks_Array(i)
         Next
+    End Sub
+
+    'Die "X" Einträge werden entfernt
+    Private Sub Remove_X(ByRef Array As Object())
+        Dim x As Integer
+        Dim i As Integer
+        Dim TmpArray(Array.GetUpperBound(0)) As String
+        System.Array.Copy(Array, TmpArray, Array.GetLength(0))
+        x = 0
+        For i = 0 To TmpArray.GetUpperBound(0)
+            If Not TmpArray(i) = "X" Then
+                Array(x) = TmpArray(i)
+                x += 1
+            End If
+        Next
+        System.Array.Resize(Array, x)
     End Sub
 
     'Länge der Transportstrecken einlesen
