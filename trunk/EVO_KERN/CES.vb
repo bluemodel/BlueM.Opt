@@ -44,7 +44,7 @@ Public Class CES
     Private MutRate As Integer = 30              'Definiert die Wahrscheinlichkeit der Mutationsrate in %
 
     '************************************* TSP Struktur *****************************
-    Public Structure Faksimile
+    Public Structure Faksimile_TSP
         Dim No As Short
         Dim Path() As Integer
         Dim Quality_SO As Double    'HACK zum Ausgleich von MO und SO
@@ -52,13 +52,22 @@ Public Class CES
         Dim Image(,) As Object
     End Structure
 
-    Public ChildList_TSP() As Faksimile = {}
-    Public ParentList_TSP() As Faksimile = {}
+    '************************************* BM Struktur *****************************
+    Public Structure Faksimile_BM
+        Dim No As Short
+        Dim Path() As Integer
+        Dim Quality_SO As Double    'HACK zum Ausgleich von MO und SO
+        Dim Quality_MO() As Double
+        Dim Image(,) As Object
+    End Structure
+
+    '************************************* TSP Listen ******************************
+    Public ChildList_TSP() As Faksimile_TSP = {}
+    Public ParentList_TSP() As Faksimile_TSP = {}
 
     '************************************* BM Listen ******************************
-
-    Public ChildList_BM() As Faksimile
-    Public ParentList_BM() As Faksimile
+    Public ChildList_BM() As Faksimile_BM
+    Public ParentList_BM() As Faksimile_BM
 
     '******************************** Initialisierung *************************************
 
@@ -808,10 +817,10 @@ Public Class CES
     End Function
 
     'Hilfsfunktion zum sortieren der Faksimile
-    Public Sub Sort_Faksimile_TSP(ByRef FaksimileList() As Faksimile)
+    Public Sub Sort_Faksimile_TSP(ByRef FaksimileList() As Faksimile_TSP)
         'Sortiert die Fiksimile anhand des Abstandes
         Dim i, j As Integer
-        Dim swap As EvoKern.CES.Faksimile
+        Dim swap As EvoKern.CES.Faksimile_TSP
 
         For i = 0 To FaksimileList.GetUpperBound(0)
             For j = 0 To FaksimileList.GetUpperBound(0)
@@ -826,10 +835,10 @@ Public Class CES
     End Sub
 
     'Hilfsfunktion zum sortieren der Faksimile
-    Public Sub Sort_Faksimile_BM(ByRef FaksimileList() As Faksimile)
+    Public Sub Sort_Faksimile_BM(ByRef FaksimileList() As Faksimile_BM)
         'Sortiert die Fiksimile anhand des Abstandes
         Dim i, j As Integer
-        Dim swap As EvoKern.CES.Faksimile
+        Dim swap As EvoKern.CES.Faksimile_BM
 
         For i = 0 To FaksimileList.GetUpperBound(0)
             For j = 0 To FaksimileList.GetUpperBound(0)
@@ -889,7 +898,7 @@ Public Class CES
     End Function
 
     'HACK zur Reduzierung auf eine Zielfunktion
-    Public Sub MO_TO_SO(ByRef FaksimileList As Faksimile)
+    Public Sub MO_TO_SO(ByRef FaksimileList As Faksimile_BM)
         Dim x As Integer
         FaksimileList.Quality_SO = 0
         For x = 0 To FaksimileList.Quality_MO.GetUpperBound(0)
