@@ -484,6 +484,22 @@ Public Class BlueM
 
     End Function
 
+    'Die Liste mit den aktuellen Bauwerken des Kindes wird erstellt und in SKos geschrieben
+    Public Sub Define_aktuelle_Bauwerke(ByVal Path() As Integer)
+        Dim i, j As Integer
+        Dim No As Integer
+
+        Dim x As Integer = 0
+        For i = 0 To Path.GetUpperBound(0)
+            No = Path(i)
+            For j = 0 To LocationList(i).MassnahmeListe(No).Bauwerke.GetUpperBound(0)
+                Array.Resize(SKos1.AktuelleBauwerke, x + 1)
+                SKos1.AktuelleBauwerke(x) = LocationList(i).MassnahmeListe(No).Bauwerke(j)
+                x += 1
+            Next
+        Next
+    End Sub
+
     'Schreibt die neuen Verzweigungen
     '********************************
     Public Sub Verzweigung_Write(ByVal SchaltArray(,))
