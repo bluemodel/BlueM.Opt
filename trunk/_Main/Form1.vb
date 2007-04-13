@@ -564,10 +564,17 @@ Partial Class Form1
         Call CES1.Dim_Parents_BM()
         Call CES1.Dim_Childs_BM()
 
-        'TeeChart initialisieren
+        'TeeChart initialisieren MO oder SO
         Dim Tmp As Integer
         Tmp = CES1.n_Gen * (CES1.ChildList_BM.GetLength(0))
-        Call BlueM1.TeeChartInitialise_SO(4, Tmp, TChart1)
+
+        If BlueM1.OptZieleListe.GetLength(0) = 1 Then
+            Call BlueM1.TeeChartInitialise_SO(4, Tmp, TChart1)
+        Else if BlueM1.OptZieleListe.GetLength(0) = 2 then
+            Call BlueM1.TeeChartInitialise_MO(TChart1)
+        Else
+            MsgBox("Zu viele Ziele. Max=2", MsgBoxStyle.Exclamation, "Fehler")
+        End If
 
         'Zufällige Kinderpfade werden generiert
         Call CES1.Generate_Random_Path_BM()
@@ -589,20 +596,26 @@ Partial Class Form1
                 durchlauf += 1
 
                 'Schreibt die neuen Verzweigungen
-                'Dieser Teil steht im Moment im BM Form muss aber ins CES!
+                'ToDo: Dieser Teil steht im Moment im BM Form muss aber ins CES!
                 Call BlueM1.Verzweigung_Write(CES1.ChildList_BM(i).Image)
                 Call BlueM1.Eval_Sim_CombiOpt(CES1.n_Ziele, durchlauf, 1, CES1.ChildList_BM(i).Quality_MO, TChart1)
 
-                'HACK zur Reduzierung auf eine Zielfunktion
-                Call CES1.MO_TO_SO(CES1.ChildList_BM(i))
+                ''HACK zur Reduzierung auf eine Zielfunktion
+                'Call CES1.MO_TO_SO(CES1.ChildList_BM(i))
 
                 'Zeichnen der Kinder
-                Call TChart1.Series(0).Add(durchlauf, CES1.ChildList_BM(i).Quality_SO)
+                If BlueM1.OptZieleListe.GetLength(0) = 1 Then
+                    Call TChart1.Series(0).Add(durchlauf, CES1.ChildList_BM(i).Quality_SO)
+                Else if BlueM1.OptZieleListe.GetLength(0) = 2 then
+                    Call TChart1.Series(0).Add(CES1.ChildList_BM(i).Quality_MO(0), CES1.ChildList_BM(i).Quality_MO(1))
+                Else
+                    MsgBox("Zu viele Ziele. Max=2",MsgBoxStyle.Exclamation,"Fehler")
+                End If
 
-                'HACK zum zeichnen aller Qualitäten
-                Call TChart1.Series(2).Add(durchlauf, CES1.ChildList_BM(i).Quality_MO(0))
-                Call TChart1.Series(3).Add(durchlauf, CES1.ChildList_BM(i).Quality_MO(1))
-                Call TChart1.Series(4).Add(durchlauf, CES1.ChildList_BM(i).Quality_MO(2))
+                ''HACK zum zeichnen aller Qualitäten
+                'Call TChart1.Series(2).Add(durchlauf, CES1.ChildList_BM(i).Quality_MO(0))
+                'Call TChart1.Series(3).Add(durchlauf, CES1.ChildList_BM(i).Quality_MO(1))
+                'Call TChart1.Series(4).Add(durchlauf, CES1.ChildList_BM(i).Quality_MO(2))
                 System.Windows.Forms.Application.DoEvents()
             Next
 

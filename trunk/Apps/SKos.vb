@@ -20,11 +20,10 @@ Public Class SKos
 
 
     Public Function calculate_costs(ByVal BlueM1 As BlueM)
-        Dim costs As Double
+        Dim costs As Double = 0
         Dim Bauwerksliste(0, 1) As Object
         Dim TRS_Array(,) As Object = {}
         Dim TAL_Array(,) As Object = {}
-
 
         'Bauwerksliste wird erstellt
         Call create_Bauwerksliste(BlueM1, Bauwerksliste)
@@ -33,6 +32,14 @@ Public Class SKos
         Call Read_TRS(BlueM1, TRS_Array)
         Call Read_TAL(BlueM1, TAL_Array)
 
+        'Kalkulieren der Kosten für jedes Bauwerk
+        Call Acquire_Costs(TRS_Array, TAL_Array, Bauwerksliste)
+
+        'Kosten aufsummieren
+        Dim i As Integer
+        For i = 0 To Bauwerksliste.GetUpperBound(0)
+            costs = costs + Bauwerksliste(i, 1)
+        Next
 
         Return costs
     End Function
@@ -46,9 +53,11 @@ Public Class SKos
         For i = 0 To BlueM1.LocationList.GetUpperBound(0)
             For j = 0 To BlueM1.LocationList(i).MassnahmeListe.GetUpperBound(0)
                 For k = 0 To BlueM1.LocationList(i).MassnahmeListe(j).Bauwerke.GetUpperBound(0)
-                    System.Array.Resize(Bauwerks_Array, x + 1)
-                    Bauwerks_Array(x) = BlueM1.LocationList(i).MassnahmeListe(j).Bauwerke(k)
-                    x += 1
+                    If BlueM1.LocationList(i).MassnahmeListe(j).KostenTyp = 1 Then
+                        System.Array.Resize(Bauwerks_Array, x + 1)
+                        Bauwerks_Array(x) = BlueM1.LocationList(i).MassnahmeListe(j).Bauwerke(k)
+                        x += 1
+                    End If
                 Next
             Next
         Next
@@ -68,7 +77,7 @@ Public Class SKos
         System.Array.Resize(Bauwerks_Array, x)
         ReDim Bauwerksliste(x - 1, 1)
         For i = 0 To Bauwerks_Array.GetUpperBound(0)
-            Bauwerksliste(i, 1) = Bauwerks_Array(i)
+            Bauwerksliste(i, 0) = Bauwerks_Array(i)
         Next
     End Sub
 
@@ -219,5 +228,36 @@ Public Class SKos
         Next
 
     End Sub
+    'Weist den Bauwerken die Kosten zu
+    Private Sub Acquire_Costs(ByVal TRS_Array(,) As Object, ByVal TAL_Array(,) As Object, ByVal Bauwerksliste(,) As Object)
+        Dim i, j As Integer
+        Dim gefunden As Boolean = False
+        Dim Volumen As Double
+        Dim Laenge As Double
 
+        For i = 0 To Bauwerksliste.GetUpperBound(0)
+            If Bauwerksliste(i, 0).Startswith("T") Then
+                For j = 0 To TAL_Array.GetUpperBound(0)
+                    If Bauwerksliste(i, 0) = TAL_Array(j, 0) Then
+                        Volumen = TAL_Array(j, 1)
+                        'Kalkulation: (Kosten €) = 9.0882 * (Volumen m³) + 396586
+                        Bauwerksliste(i, 1) = 9.1 * Volumen + 400000
+                        gefunden = True
+                    End If
+                Next
+            ElseIf Bauwerksliste(i, 0).Startswith("S") Then
+                For j = 0 To TRS_Array.GetUpperBound(0)
+                    If Bauwerksliste(i, 0) = TRS_Array(j, 0) Then
+                        Laenge = TRS_Array(j, 1)
+                        'Kalkulation: 100€/lfm
+                        Bauwerksliste(i, 1) = Laenge * 200
+                        gefunden = True
+                    End If
+                Next
+            End If
+            If Not gefunden Then
+                MsgBox("Bauwerk wurde nicht in den Modellparametern gefunden", MsgBoxStyle.Exclamation, "Fehler")
+            End If
+        Next
+    End Sub
 End Class
