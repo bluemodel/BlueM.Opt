@@ -9,22 +9,22 @@ Imports System.IO
 '**** Dirk Muschalla, Christoph Huebner, Felix Froehlich                    ****
 '****                                                                       ****
 '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
-'**** TU Darmstadt                               Dezember 2006              ****
+'**** TU Darmstadt                                                          ****
 '****                                                                       ****
-'**** Dezember 2003                                                         ****
+'**** Erstellt: Dezember 2003                                               ****
 '****                                                                       ****
-'**** Letzte Änderung: März 2007                                            ****
+'**** Letzte Änderung: April 2007                                           ****
 '*******************************************************************************
 '*******************************************************************************
 
-Friend Class Form1
+Partial Class Form1
+    Inherits System.Windows.Forms.Form
 
 #Region "Initialisierung der Anwendungen"
     '************************************************************************************
     '****** Form1 wird initialisiert bzw. geladen; weitere Module werden deklariert *****
     '************************************************************************************
 
-    Inherits System.Windows.Forms.Form
     Private IsInitializing As Boolean
 
     Private Anwendung As String                'zu optimierende Anwendung
@@ -83,6 +83,10 @@ Friend Class Form1
             EVO_Einstellungen1.Enabled = False
             Exit Sub
         Else
+
+            'Mauszeiger busy
+            Cursor = System.Windows.Forms.Cursors.WaitCursor
+
             AppIniOK = True
             Anwendung = ComboBox_Anwendung.SelectedItem
 
@@ -206,6 +210,10 @@ Friend Class Form1
                     CES1.CES_Modus = "TSP"
             End Select
         End If
+
+        'Mauszeiger wieder normal
+        Cursor = System.Windows.Forms.Cursors.Default
+
     End Sub
 
 
