@@ -849,6 +849,8 @@ Public MustInherit Class Sim
     '********************************************
     Public Overridable Sub TeeChartInitialise_SO(ByVal n_Populationen As Integer, ByVal n_Kalkulationen As Integer, ByRef TChart1 As Steema.TeeChart.TChart)
 
+        'BUG 100: n_Populationen und n_Kalkulationen können sich zu einem späteren Zeitpunkt nochmals ändern!
+
         'Dim Anzahl_Kalkulationen As Integer
         'Dim Populationen As Short
         Dim i As Short
@@ -881,7 +883,7 @@ Public MustInherit Class Sim
             .Chart.Axes.Bottom.Automatic = False
             .Chart.Axes.Bottom.Maximum = n_Kalkulationen
             .Chart.Axes.Bottom.Minimum = 0
-            '.Chart.Axes.Left.Title.Caption = OptZieleListe(0).Bezeichnung
+            .Chart.Axes.Left.Title.Caption = Me.OptZieleListe(0).Bezeichnung
             .Chart.Axes.Left.Automatic = True
             .Chart.Axes.Left.Minimum = 0
         End With
