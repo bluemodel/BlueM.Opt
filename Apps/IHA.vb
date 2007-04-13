@@ -13,7 +13,7 @@ Public Class IHA
     '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung                      ****
     '**** TU Darmstadt                                                                  ****
     '****                                                                               ****
-    '**** April 2007                                                                    ****
+    '**** Erstellt: April 2007                                                          ****
     '****                                                                               ****
     '**** Letzte Änderung: April 2007                                                   ****
     '****                                                                               ****
@@ -38,6 +38,29 @@ Public Class IHA
 
     Private IHADir                          'Verzeichnis für IHA-Dateien
 
+    'IHA-Ergebnisse
+    '--------------
+    Private Structure IHAParam               'Struktur für IHA Ergebnis eines Parameters
+        Public PName As String
+        Public HAMiddle As Double
+    End Structure
+
+    Private Structure IHAParamGroup          'Struktur für IHA Ergebnis einer Parametergruppe
+        Public No As Short
+        Public GName As String
+        Public Avg As Double
+        Public IHAParams() As IHAParam
+    End Structure
+
+    Private Structure IHAResult              'Struktur für alle IHA Ergebnisse zusammen
+        Public Avg As Double
+        Public IHAParamGroups() As IHAParamGroup
+    End Structure
+
+    Private IHARes As IHAResult
+
+    'IHA-Parameter
+    '-------------
     Private Const BegWatrYr = 275           '1. Okt.
 
     'Jahreszahlen
@@ -56,6 +79,51 @@ Public Class IHA
 
     'Methoden
     '########
+
+    'Konstruktor
+    '***********
+    Public Sub New()
+
+        'IHA-Parametergruppen definieren
+        '-------------------------------
+
+        With Me.IHARes
+
+            ReDim .IHAParamGroups(4)
+
+            'Parameter group #1
+            '.IHAParamGroups(0) = New IHAParamGroup
+            .IHAParamGroups(0).No = 1
+            .IHAParamGroups(0).GName = "Quantity"
+            ReDim .IHAParamGroups(0).IHAParams(11)
+
+            'Parameter group #2
+            '.IHAParamGroups(1) = New IHAParamGroup
+            .IHAParamGroups(1).No = 2
+            .IHAParamGroups(1).GName = "Extremes"
+            ReDim .IHAParamGroups(1).IHAParams(11)
+
+            'Parameter group #3
+            '.IHAParamGroups(2) = New IHAParamGroup
+            .IHAParamGroups(2).No = 3
+            .IHAParamGroups(2).GName = "Timing"
+            ReDim .IHAParamGroups(2).IHAParams(1)
+
+            'Parameter group #4
+            '.IHAParamGroups(3) = New IHAParamGroup
+            .IHAParamGroups(3).No = 4
+            .IHAParamGroups(3).GName = "Frequency"
+            ReDim .IHAParamGroups(3).IHAParams(3)
+
+            'Parameter group #5
+            '.IHAParamGroups(4) = New IHAParamGroup
+            .IHAParamGroups(4).No = 5
+            .IHAParamGroups(4).GName = "Rate"
+            ReDim .IHAParamGroups(4).IHAParams(2)
+
+        End With
+
+    End Sub
 
     'IHA-Berechnung vorbereiten (einmalig)
     '*************************************
@@ -165,13 +233,13 @@ Public Class IHA
 
         'input.par Datei schreiben
         '-------------------------
-        Call writeInputPar(BlueM1.Datensatz)
+        Call write_InputPar(BlueM1.Datensatz)
 
     End Sub
 
     'input.par Datei schreiben
     '*************************
-    Private Sub writeInputPar(ByVal title As String)
+    Private Sub write_InputPar(ByVal title As String)
         Try
             Dim StrWrite As StreamWriter = New StreamWriter(Me.IHADir & "input.par", False, System.Text.Encoding.GetEncoding("iso8859-1"))
             StrWrite.WriteLine("&initial")
@@ -226,7 +294,7 @@ Public Class IHA
 
     'input.dat Datei schreiben
     '*************************
-    Private Sub writeInputDat(ByVal Data(,) As Double)
+    Private Sub write_InputDat(ByVal Data(,) As Double)
         Dim Zeile As String
         Dim j, k As Integer
 
@@ -263,7 +331,7 @@ Public Class IHA
     Public Function calculate_IHA(ByVal simreihe As Object(,)) As Double
 
         Dim i, j, k As Integer
-        Dim QWert As Double
+        Dim QWert As Double = -999999
 
         'Simulationsreihe entsprechend kürzen
         Dim Startdatum As DateTime = simreihe(0, 0)
@@ -310,23 +378,85 @@ Public Class IHA
 
         'input.dat Datei schreiben
         '-------------------------
-        Call writeInputDat(Data)
+        Call write_InputDat(Data)
 
         'IHA-Berechnung ausführen
         '------------------------
-        Call launchIHA()
+        Call launch_IHA()
 
         'QWert aus IHA-Parametern berechnen
         '----------------------------------
-        'TODO: IHA-QWert
+        QWert = read_IHAResults()
 
         Return QWert
 
     End Function
 
+    'IHA Ergebnisse einlesen und QWert berechnen
+    '*******************************************
+    Private Function read_IHAResults() As Double
+
+        'RVA-Datei öffnen und einlesen
+        '-----------------------------
+
+        Try
+            Dim FiStr As FileStream = New FileStream(Me.IHADir & "output.rva", FileMode.Open, IO.FileAccess.ReadWrite)
+            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+            Dim i, j As Integer
+            Dim Zeile As String
+            Dim Psum, Gsum As Double
+
+            'Schleife über Parametergruppen
+            '------------------------------
+            Gsum = 0
+            For i = 0 To IHARes.IHAParamGroups.GetUpperBound(0)
+
+                'Ergebnisse einer Parametergruppe einlesen
+                '-----------------------------------------
+                With Me.IHARes.IHAParamGroups(i)
+
+                    Do
+                        Zeile = StrRead.ReadLine.ToString
+                        If (Zeile.Contains("Parameter Group #" & .No)) Then
+
+                            Psum = 0
+                            'Schleife über Parameter
+                            For j = 0 To .IHAParams.GetUpperBound(0)
+                                Zeile = StrRead.ReadLine.ToString
+                                .IHAParams(j).PName = Zeile.Substring(0, 20).Trim
+                                .IHAParams(j).HAMiddle = Convert.ToDouble(Zeile.Substring(171, 14).Trim)
+                                Psum += .IHAParams(j).HAMiddle
+                            Next
+
+                            Exit Do
+                        End If
+                    Loop Until StrRead.Peek() = -1
+
+                    'Mittelwert einer Parametergruppe berechnen
+                    '------------------------------------------
+                    .Avg = Psum / .IHAParams.GetLength(0)
+                    Gsum += .Avg
+
+                End With
+
+            Next 'Ende Schleife über Parametergruppen
+
+            'Mittelwert aller Parametergruppen berechnen
+            '-------------------------------------------
+            Me.IHARes.Avg = Gsum / Me.IHARes.IHAParamGroups.GetLength(0)
+
+        Catch except As Exception
+            MsgBox("Fehler beim einlesen der IHA-Datei ""output.rva"":" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Critical, "Fehler")
+        End Try
+
+        Return Me.IHARes.Avg * Me.IHARes.Avg
+
+    End Function
+
     'IHA_Batchfor.exe ausführen
     '**************************
-    Public Sub launchIHA()
+    Public Sub launch_IHA()
         'starte Programm mit neuen Parametern
         Dim ProcID As Integer
         'Aktuelles Arbeitsverzeichnis feststellen
