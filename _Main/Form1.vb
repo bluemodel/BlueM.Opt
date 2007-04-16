@@ -448,8 +448,9 @@ Partial Class Form1
         Call SensiPlot1.TeeChart_Ini_SensiPlot(TChart1, EVO_Einstellungen1.NPopul, BlueM1.OptZieleListe(0).Bezeichnung, BlueM1.OptParameterListe(0).Bezeichnung)
 
         ReDim Wave1.WaveList(Anz_Sim + 1)
-        'HACK: Die Spalte der WEL-Datei ist hartvercodet!
-        Apps.Sim.Read_WEL(BlueM1.WorkDir & BlueM1.Datensatz & ".wel", "S201_1ZU", Wave1.WaveList(0).Wave)
+        
+        'ACHTUNG: Voraussetzung: Es liegt bereits eine .WEL-Datei vor!
+        Apps.Sim.Read_WEL(BlueM1.WorkDir & BlueM1.Datensatz & ".wel", BlueM1.OptZieleListe(0).SimGr, Wave1.WaveList(0).Wave)
 
         Randomize()
 
@@ -471,7 +472,7 @@ Partial Class Form1
             'If i = 0 Then
             Apps.Sim.Read_WEL(BlueM1.WorkDir & BlueM1.Datensatz & ".wel", BlueM1.OptZieleListe(0).SimGr, Wave1.WaveList(i + 1).Wave)
             'ElseIf i = Anz_Sim Then
-            'BlueM1.ReadWEL(BlueM1.WorkDir & BlueM1.Datensatz & ".wel", BlueM1.OptZieleListe(0).SpalteWel, Wave1.WaveList(1).Wave)
+            'BlueM1.ReadWEL(BlueM1.WorkDir & BlueM1.Datensatz & ".wel", BlueM1.OptZieleListe(0).SimGr, Wave1.WaveList(1).Wave)
             'End If
 
             BlueM1.OptZieleListe(0).QWertTmp = BlueM1.QWert(0)
