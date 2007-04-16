@@ -9,6 +9,7 @@ Public Class Wave
 
     Public WaveList() As Wave = {}                  'Liste der Waves
 
+    'Bug 85: nach Klasse Diagramm auslagern!
     Public Sub TeeChart_initialise()
         Dim i As Integer
 
