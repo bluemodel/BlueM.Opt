@@ -22,7 +22,6 @@ Partial Class EVO_Einstellungen
     'Wird vom Windows Form-Designer benötigt.
     Private components As System.ComponentModel.IContainer
     Public ToolTip1 As System.Windows.Forms.ToolTip
-    Friend WithEvents ComboModus As System.Windows.Forms.ComboBox
     Friend WithEvents CheckisDnVektor As System.Windows.Forms.CheckBox
     Friend WithEvents ComboOptVorgabe As System.Windows.Forms.ComboBox
     Friend WithEvents TextDeltaStart As System.Windows.Forms.TextBox
@@ -59,7 +58,6 @@ Partial Class EVO_Einstellungen
     Friend WithEvents _LabelFramePop_2 As System.Windows.Forms.Label
     Friend WithEvents _LabelFramePop_1 As System.Windows.Forms.Label
     Friend WithEvents FramePop As System.Windows.Forms.GroupBox
-    Friend WithEvents _Label1_1 As System.Windows.Forms.Label
     Friend WithEvents _Label1_15 As System.Windows.Forms.Label
     Friend WithEvents _Label1_12 As System.Windows.Forms.Label
     Friend WithEvents _Label1_0 As System.Windows.Forms.Label
@@ -73,7 +71,6 @@ Partial Class EVO_Einstellungen
         Me.components = New System.ComponentModel.Container
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.FrameOptions = New System.Windows.Forms.GroupBox
-        Me.ComboModus = New System.Windows.Forms.ComboBox
         Me.CheckisDnVektor = New System.Windows.Forms.CheckBox
         Me.ComboOptVorgabe = New System.Windows.Forms.ComboBox
         Me.TextDeltaStart = New System.Windows.Forms.TextBox
@@ -110,12 +107,13 @@ Partial Class EVO_Einstellungen
         Me._LabelFramePop_3 = New System.Windows.Forms.Label
         Me._LabelFramePop_2 = New System.Windows.Forms.Label
         Me._LabelFramePop_1 = New System.Windows.Forms.Label
-        Me._Label1_1 = New System.Windows.Forms.Label
         Me._Label1_15 = New System.Windows.Forms.Label
         Me._Label1_12 = New System.Windows.Forms.Label
         Me._Label1_0 = New System.Windows.Forms.Label
         Me.Label1 = New Microsoft.VisualBasic.Compatibility.VB6.LabelArray(Me.components)
         Me.LabelFramePop = New Microsoft.VisualBasic.Compatibility.VB6.LabelArray(Me.components)
+        Me.Label_OptModus = New System.Windows.Forms.Label
+        Me.Label_OptModusValue = New System.Windows.Forms.Label
         Me.FrameOptions.SuspendLayout()
         Me.FrameGen.SuspendLayout()
         Me.FramePop.SuspendLayout()
@@ -126,15 +124,15 @@ Partial Class EVO_Einstellungen
         'FrameOptions
         '
         Me.FrameOptions.BackColor = System.Drawing.SystemColors.Control
+        Me.FrameOptions.Controls.Add(Me.Label_OptModusValue)
+        Me.FrameOptions.Controls.Add(Me.Label_OptModus)
         Me.FrameOptions.Controls.Add(Me.CheckisDnVektor)
-        Me.FrameOptions.Controls.Add(Me.ComboModus)
         Me.FrameOptions.Controls.Add(Me.ComboOptVorgabe)
         Me.FrameOptions.Controls.Add(Me.TextDeltaStart)
         Me.FrameOptions.Controls.Add(Me.CheckisPopul)
         Me.FrameOptions.Controls.Add(Me.ComboStrategie)
         Me.FrameOptions.Controls.Add(Me.FrameGen)
         Me.FrameOptions.Controls.Add(Me.FramePop)
-        Me.FrameOptions.Controls.Add(Me._Label1_1)
         Me.FrameOptions.Controls.Add(Me._Label1_15)
         Me.FrameOptions.Controls.Add(Me._Label1_12)
         Me.FrameOptions.Controls.Add(Me._Label1_0)
@@ -146,18 +144,6 @@ Partial Class EVO_Einstellungen
         Me.FrameOptions.TabIndex = 0
         Me.FrameOptions.TabStop = False
         Me.FrameOptions.Text = "Einstellungen"
-        '
-        'ComboModus
-        '
-        Me.ComboModus.BackColor = System.Drawing.SystemColors.Window
-        Me.ComboModus.Cursor = System.Windows.Forms.Cursors.Default
-        Me.ComboModus.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboModus.ForeColor = System.Drawing.SystemColors.WindowText
-        Me.ComboModus.Location = New System.Drawing.Point(84, 64)
-        Me.ComboModus.Name = "ComboModus"
-        Me.ComboModus.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.ComboModus.Size = New System.Drawing.Size(123, 21)
-        Me.ComboModus.TabIndex = 33
         '
         'CheckisDnVektor
         '
@@ -178,7 +164,7 @@ Partial Class EVO_Einstellungen
         Me.ComboOptVorgabe.Cursor = System.Windows.Forms.Cursors.Default
         Me.ComboOptVorgabe.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboOptVorgabe.ForeColor = System.Drawing.SystemColors.WindowText
-        Me.ComboOptVorgabe.Location = New System.Drawing.Point(84, 40)
+        Me.ComboOptVorgabe.Location = New System.Drawing.Point(84, 69)
         Me.ComboOptVorgabe.Name = "ComboOptVorgabe"
         Me.ComboOptVorgabe.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.ComboOptVorgabe.Size = New System.Drawing.Size(123, 21)
@@ -218,7 +204,7 @@ Partial Class EVO_Einstellungen
         Me.ComboStrategie.Cursor = System.Windows.Forms.Cursors.Default
         Me.ComboStrategie.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboStrategie.ForeColor = System.Drawing.SystemColors.WindowText
-        Me.ComboStrategie.Location = New System.Drawing.Point(84, 16)
+        Me.ComboStrategie.Location = New System.Drawing.Point(84, 42)
         Me.ComboStrategie.Name = "ComboStrategie"
         Me.ComboStrategie.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.ComboStrategie.Size = New System.Drawing.Size(123, 21)
@@ -293,7 +279,7 @@ Partial Class EVO_Einstellungen
         Me.TextRekombxy.MaxLength = 0
         Me.TextRekombxy.Name = "TextRekombxy"
         Me.TextRekombxy.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.TextRekombxy.Size = New System.Drawing.Size(25, 19)
+        Me.TextRekombxy.Size = New System.Drawing.Size(25, 20)
         Me.TextRekombxy.TabIndex = 23
         Me.TextRekombxy.Text = "2"
         Me.TextRekombxy.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
@@ -661,20 +647,6 @@ Partial Class EVO_Einstellungen
         Me._LabelFramePop_1.TabIndex = 6
         Me._LabelFramePop_1.Text = "Anzahl der Runden:"
         '
-        '_Label1_1
-        '
-        Me._Label1_1.AutoSize = True
-        Me._Label1_1.BackColor = System.Drawing.SystemColors.Control
-        Me._Label1_1.Cursor = System.Windows.Forms.Cursors.Default
-        Me._Label1_1.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.Label1.SetIndex(Me._Label1_1, CType(1, Short))
-        Me._Label1_1.Location = New System.Drawing.Point(13, 64)
-        Me._Label1_1.Name = "_Label1_1"
-        Me._Label1_1.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me._Label1_1.Size = New System.Drawing.Size(42, 13)
-        Me._Label1_1.TabIndex = 34
-        Me._Label1_1.Text = "Modus:"
-        '
         '_Label1_15
         '
         Me._Label1_15.AutoSize = True
@@ -682,7 +654,7 @@ Partial Class EVO_Einstellungen
         Me._Label1_15.Cursor = System.Windows.Forms.Cursors.Default
         Me._Label1_15.ForeColor = System.Drawing.SystemColors.ControlText
         Me.Label1.SetIndex(Me._Label1_15, CType(15, Short))
-        Me._Label1_15.Location = New System.Drawing.Point(13, 40)
+        Me._Label1_15.Location = New System.Drawing.Point(16, 73)
         Me._Label1_15.Name = "_Label1_15"
         Me._Label1_15.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me._Label1_15.Size = New System.Drawing.Size(58, 13)
@@ -710,12 +682,30 @@ Partial Class EVO_Einstellungen
         Me._Label1_0.Cursor = System.Windows.Forms.Cursors.Default
         Me._Label1_0.ForeColor = System.Drawing.SystemColors.ControlText
         Me.Label1.SetIndex(Me._Label1_0, CType(0, Short))
-        Me._Label1_0.Location = New System.Drawing.Point(13, 16)
+        Me._Label1_0.Location = New System.Drawing.Point(16, 46)
         Me._Label1_0.Name = "_Label1_0"
         Me._Label1_0.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me._Label1_0.Size = New System.Drawing.Size(54, 13)
         Me._Label1_0.TabIndex = 19
         Me._Label1_0.Text = "Selektion:"
+        '
+        'Label_OptModus
+        '
+        Me.Label_OptModus.AutoSize = True
+        Me.Label_OptModus.Location = New System.Drawing.Point(16, 20)
+        Me.Label_OptModus.Name = "Label_OptModus"
+        Me.Label_OptModus.Size = New System.Drawing.Size(42, 13)
+        Me.Label_OptModus.TabIndex = 31
+        Me.Label_OptModus.Text = "Modus:"
+        '
+        'Label_OptModusValue
+        '
+        Me.Label_OptModusValue.AutoSize = True
+        Me.Label_OptModusValue.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label_OptModusValue.Location = New System.Drawing.Point(84, 19)
+        Me.Label_OptModusValue.Name = "Label_OptModusValue"
+        Me.Label_OptModusValue.Size = New System.Drawing.Size(0, 13)
+        Me.Label_OptModusValue.TabIndex = 32
         '
         'EVO_Einstellungen
         '
@@ -733,4 +723,6 @@ Partial Class EVO_Einstellungen
         Me.ResumeLayout(False)
 
     End Sub
+    Friend WithEvents Label_OptModusValue As System.Windows.Forms.Label
+    Friend WithEvents Label_OptModus As System.Windows.Forms.Label
 End Class
