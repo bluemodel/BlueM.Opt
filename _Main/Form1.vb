@@ -35,8 +35,6 @@ Partial Class Form1
     Private Const ANW_TESTPROBLEME As String = "Test-Probleme"
     Private Const ANW_TSP As String = "TS-Problem"
 
-    Private AppIniOK As Boolean = False
-
     '**** Deklarationen der Module *****
     Public BlueM1 As New Apps.BlueM
     Public SensiPlot1 As New Apps.SensiPlot
@@ -77,17 +75,21 @@ Partial Class Form1
 
     'Auswahl der zu optimierenden Anwendung geändert
     Private Sub IniApp(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_IniApp.Click, ComboBox_Anwendung.SelectedIndexChanged, Testprobleme1.Testproblem_Changed
-        If Me.IsInitializing = True Then
+
+        Dim IsOK as Boolean = True
+
+        If (Me.IsInitializing = True) Then
+
             'Testprobleme und Evo Deaktivieren
             Testprobleme1.Enabled = False
             EVO_Einstellungen1.Enabled = False
             Exit Sub
+
         Else
 
             'Mauszeiger busy
             Cursor = System.Windows.Forms.Cursors.WaitCursor
 
-            AppIniOK = True
             Anwendung = ComboBox_Anwendung.SelectedItem
 
             Select Case Anwendung
@@ -124,7 +126,6 @@ Partial Class Form1
                     Call BlueM1.Sim_Ini()
                     'Sensi Plot Dialog starten und List_Boxen füllen
                     Dim i As Integer
-                    Dim IsOK As Boolean
 
                     For i = 0 To BlueM1.OptParameterListe.GetUpperBound(0)
                         IsOK = SensiPlot1.ListBox_OptParameter_add(BlueM1.OptParameterListe(i).Bezeichnung)
@@ -154,7 +155,6 @@ Partial Class Form1
                     Call Initialisierung_BlauesModell_ParaOpt()
 
                 Case ANW_COMBIBM
-                    Dim isOK As Boolean
                     'Voreinstellungen lesen EVO.INI
                     Call ReadEVOIni()
                     'Evo deaktiviern
@@ -183,14 +183,14 @@ Partial Class Form1
 
                     'Überprüfen der Kombinatorik
                     'ToDo: Hier Message Box einbauen
-                    isOK = BlueM1.Combinatoric_is_Valid
+                    IsOK = BlueM1.Combinatoric_is_Valid
 
                     'Einlesen der Verbraucher Datei
                     Call BlueM1.Verzweigung_Read()
 
                     'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
                     'ToDo: Hier Message Box einbauen
-                    isOK = BlueM1.CES_fits_to_VER()
+                    IsOK = BlueM1.CES_fits_to_VER()
 
                     'Call Initialisierung_BlauesModell_CombiOpt()
 
@@ -213,6 +213,12 @@ Partial Class Form1
 
         'Mauszeiger wieder normal
         Cursor = System.Windows.Forms.Cursors.Default
+
+        'Fehlerbehandlung
+        '----------------
+        If (IsOK = False) Then
+            MsgBox("Initialisierung der Anwendung fehlgeschlagen!", MsgBoxStyle.Exclamation, "Fehler")
+        End If
 
     End Sub
 
@@ -355,11 +361,6 @@ Partial Class Form1
     '************************************************************************************
 
     Private Sub Button_Start_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Button_Start.Click
-        If Not AppIniOK Then
-            MsgBox("Bitte zuerst Anwendung Initialisieren", MsgBoxStyle.Exclamation, "Fehler")
-            Exit Sub
-        End If
-        AppIniOK = False
         myisrun = True
         Select Case Anwendung
             Case ANW_RESETPARA_RUNBM
