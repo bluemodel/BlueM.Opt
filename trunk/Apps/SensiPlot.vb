@@ -8,10 +8,12 @@ Public Class SensiPlot
 
     Public Function ListBox_OptParameter_add(ByVal Bezeichnung As String) As Boolean
         ListBox_OptParameter.Items.Add(Bezeichnung)
+        Return True
     End Function
 
     Public Function ListBox_OptZiele_add(ByVal Bezeichnung As String) As Boolean
         ListBox_OptZiele.Items.Add(Bezeichnung)
+        Return True
     End Function
 
     Private Sub OK_Button_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OK_Button.Click
