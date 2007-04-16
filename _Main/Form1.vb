@@ -20,10 +20,7 @@ Imports System.IO
 Partial Class Form1
     Inherits System.Windows.Forms.Form
 
-#Region "Initialisierung der Anwendungen"
-    '************************************************************************************
-    '****** Form1 wird initialisiert bzw. geladen; weitere Module werden deklariert *****
-    '************************************************************************************
+#Region "Eigenschaften"
 
     Private IsInitializing As Boolean
 
@@ -53,7 +50,12 @@ Partial Class Form1
     Dim Population(,) As Double
     Dim mypara(,) As Double
 
+#End Region 'Eigenschaften
 
+#Region "Methoden"
+
+    'Initialisierung von Form1
+    '*************************
     Private Sub Form1_Load(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles MyBase.Load
 
         'XP-look
@@ -63,11 +65,12 @@ Partial Class Form1
         ComboBox_Anwendung.Items.AddRange(New Object() {"", ANW_RESETPARA_RUNBM, ANW_SENSIPLOT_MODPARA, ANW_BLAUESMODELL, ANW_COMBIBM, ANW_TESTPROBLEME, ANW_TSP})
         ComboBox_Anwendung.SelectedIndex = 0
 
-
         'Ende der Initialisierung
         IsInitializing = False
 
     End Sub
+
+#Region "Initialisierung der Anwendungen"
 
     '************************************************************************************
     '*********** Die Anwendung wurde ausgewählt und wird jetzt initialisiert ************
@@ -113,6 +116,8 @@ Partial Class Form1
                     'Original ModellParameter werden geschrieben
                     Call BlueM1.ModellParameter_schreiben()
 
+                    MsgBox("Die Startwerte der Optimierungsparameter wurden in die Eingabedateien geschrieben.", MsgBoxStyle.Information, "Info")
+
                 Case ANW_SENSIPLOT_MODPARA
                     'Voreinstellungen lesen EVO.INI
                     Call ReadEVOIni()
@@ -152,7 +157,7 @@ Partial Class Form1
                     ElseIf BlueM1.OptZieleListe.GetLength(0) > 1 Then
                         EVO_Einstellungen1.OptModus = 1
                     End If
-                    Call Initialisierung_BlauesModell_ParaOpt()
+                    Call BlueM1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
 
                 Case ANW_COMBIBM
                     'Voreinstellungen lesen EVO.INI
@@ -201,13 +206,15 @@ Partial Class Form1
                     'Test-Probleme und Evo aktivieren
                     Testprobleme1.Enabled = True
                     EVO_Einstellungen1.Enabled = True
-                    Call Testprobleme_Initialisierung()
+                    EVO_Einstellungen1.OptModus = Testprobleme1.OptModus
+                    'Globale Parameter werden gesetzt
+                    Call Testprobleme1.Parameter_Uebergabe(Testprobleme1.Combo_Testproblem.Text, Testprobleme1.Text_Sinusfunktion_Par.Text, Testprobleme1.Text_Schwefel24_Par.Text, globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
 
                 Case ANW_TSP
-                    Call CES1.TSP_Initialize(TChart1)
-
+                    Call CES1.TSP_Initialize(Diag)
                     'CES MOdus setzen -> "TSP" oder "BM" Optimierung
                     CES1.CES_Modus = "TSP"
+
             End Select
         End If
 
@@ -222,37 +229,9 @@ Partial Class Form1
 
     End Sub
 
-
-
-    '******************** Initialisierung der Anwendung *********************************
-    '************************************************************************************
-
-    '******************* Initialisierung der Testprobleme *******************************
-
-    Private Sub Testprobleme_Initialisierung()
-
-        'OptModus wird festgelegt um die richtigen EVO.Einstellungen anzuzeigen
-        EVO_Einstellungen1.OptModus = Testprobleme1.OptModus
-
-        'BUG: Bug 57: Für alle Testprobleme ReDim mypara(globalAnzPar - 1, 0) ! (wegen Array-Anfang bei 0)
-        'Globale Parameter werden gesetzt
-        Call Testprobleme1.Parameter_Uebergabe(Testprobleme1.Combo_Testproblem.Text, Testprobleme1.Text_Sinusfunktion_Par.Text, Testprobleme1.Text_Schwefel24_Par.Text, globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
-
-        Select Case Testprobleme1.Combo_Testproblem.Text
-            Case "Sinus-Funktion"
-                Call Testprobleme1.TeeChartIni_SinusFunktion(EVO_Einstellungen1, globalAnzPar, Testprobleme1.Text_Sinusfunktion_Par.Text, TChart1)
-            Case "Beale-Problem" 'x1 = [-5;5], x2=[-2;2]
-                Call Testprobleme1.TeeChartIni_BealeProblem(EVO_Einstellungen1, globalAnzPar, TChart1)
-            Case "Schwefel 2.4-Problem" 'xi = [-10,10]
-                Call Testprobleme1.TeeChartIni_SchwefelProblem(EVO_Einstellungen1, globalAnzPar, TChart1)
-            Case Else
-                Call Testprobleme1.TeeChartIni_MultiTestProb(EVO_Einstellungen1, Testprobleme1.Combo_Testproblem.Text, TChart1)
-        End Select
-    End Sub
-
-    '*************************** EVO.ini Datei einlesen *********************************
-
-    'TODO: ReadEVO.ini müsste hier raus nach BlueM und "Read_Model_OptConfig" heißen **
+    'EVO.ini Datei einlesen 
+    '**********************
+    'Bug 94: ReadEVO.ini müsste hier raus nach BlueM und "Read_Model_OptConfig" heißen **
     Private Sub ReadEVOIni()
         If File.Exists("EVO.ini") Then
             Try
@@ -297,57 +276,6 @@ Partial Class Form1
             Catch except As Exception
                 MsgBox("Fehler beim lesen der EVO.ini Datei:" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
             End Try
-        End If
-
-    End Sub
-
-    '************************* Initialisierung des BlauenModells Für ParameterOptimierung *************************
-
-    Private Sub Initialisierung_BlauesModell_ParaOpt()
-        Dim i As Integer
-        Dim isMultiObjective As Boolean
-        Dim n_Kalkulationen As Integer
-        Dim n_Populationen As Integer
-
-        isMultiObjective = EVO_Einstellungen1.isMultiObjective
-
-        'Anzahl Optimierungsparameter übergeben
-        '-----------------------------------------------------
-        globalAnzPar = BlueM1.OptParameterListe.GetLength(0)
-
-        'Parameterwerte übergeben
-        'BUG 57: mypara() fängt bei 1 an!
-        ReDim mypara(globalAnzPar, 1)
-        For i = 1 To globalAnzPar
-            mypara(i, 1) = BlueM1.OptParameterListe(i - 1).SKWert
-        Next
-
-        'globale Anzahl der Ziele muss hier auf Länge der Zielliste gesetzt werden
-        globalAnzZiel_ParaOpt = BlueM1.OptZieleListe.GetLength(0)
-
-        'TODO: Randbedingungen
-        globalAnzRand = 2
-
-        'Anzahl Kalkulationen
-        'Ob das hier die richtige Stelle ist?
-        If EVO_Einstellungen1.isPOPUL Then
-            n_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden
-        Else
-            n_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
-        End If
-
-        'Anzahl Populationen
-        'Ob das hier die richtige Stelle ist?
-        n_Populationen = 1
-        If EVO_Einstellungen1.isPOPUL Then
-            n_Populationen = EVO_Einstellungen1.NPopul
-        End If
-
-        'Initialisierung der TeeChart Serien je nach SO oder MO
-        If (isMultiObjective) = False Then
-            Call BlueM1.TeeChartInitialise_SO(n_Populationen, n_Kalkulationen, TChart1)
-        Else
-            Call BlueM1.TeeChartInitialise_MO(TChart1)
         End If
 
     End Sub
@@ -443,10 +371,14 @@ Partial Class Form1
         Dim durchlauf As Integer = 1
         Dim ipop As Integer = 1
 
-        'TODO: Das hier muss neuer TeeChartInitialise_Werden
-        'TODO: TeeChart Initialise muss generalisiert werden
-        Call SensiPlot1.TeeChart_Ini_SensiPlot(TChart1, EVO_Einstellungen1.NPopul, BlueM1.OptZieleListe(0).Bezeichnung, BlueM1.OptParameterListe(0).Bezeichnung)
+        'Achsen:
+        Dim Achsen(1) As Diagramm.Achse
+        Achsen(0).Beschriftung = BlueM1.OptZieleListe(0).Bezeichnung
+        Achsen(1).Beschriftung = BlueM1.OptParameterListe(0).Bezeichnung
 
+        'Diagramm initialisieren
+        Call Diag.DiagInitialise_MO("Sensiplot", Achsen)
+        
         ReDim Wave1.WaveList(Anz_Sim + 1)
         
         'ACHTUNG: Voraussetzung: Es liegt bereits eine .WEL-Datei vor!
@@ -476,7 +408,7 @@ Partial Class Form1
             'End If
 
             BlueM1.OptZieleListe(0).QWertTmp = BlueM1.QWert(0)
-            TChart1.Series(0).Add(BlueM1.OptZieleListe(0).QWertTmp, BlueM1.OptParameterListe(0).Wert, "")
+            Diag.Series(0).Add(BlueM1.OptZieleListe(0).QWertTmp, BlueM1.OptParameterListe(0).Wert, "")
             'Call BlueM1.db_update(durchlauf, ipop)
             durchlauf += 1
             System.Windows.Forms.Application.DoEvents()
@@ -505,7 +437,8 @@ Partial Class Form1
         Dim gen As Integer
 
         'ToDo: nochmal Prüfen wie das mit den Kids REDIMS ist.
-        Call CES1.TeeChart_Initialise_TSP(TChart1)
+        'BUG 85: Nach Klasse Diagramm auslagern!
+        Call CES1.TeeChart_Initialise_TSP(Diag)
 
         'Arrays werden Dimensioniert
         Call CES1.Dim_Parents_TSP()
@@ -532,7 +465,7 @@ Partial Class Form1
             'Zeichnen des besten Elter
             'TODO: funzt nur, wenn ganz am ende gezeichnet wird
             If gen = CES1.n_Gen Then
-                Call CES1.TeeChart_Zeichnen_TSP(TChart1, CES1.ParentList_TSP(0).Image)
+                Call CES1.TeeChart_Zeichnen_TSP(Diag, CES1.ParentList_TSP(0).Image)
             End If
 
             'Kinder werden Hier vollständig gelöscht
@@ -566,14 +499,22 @@ Partial Class Form1
         Call CES1.Dim_Parents_BM()
         Call CES1.Dim_Childs_BM()
 
-        'TeeChart initialisieren MO oder SO
-        Dim Tmp As Integer
-        Tmp = CES1.n_Gen * (CES1.ChildList_BM.GetLength(0))
-
+        'TeeChart initialisieren
         If BlueM1.OptZieleListe.GetLength(0) = 1 Then
-            Call BlueM1.TeeChartInitialise_SO(4, Tmp, TChart1)
+            'SingleObjective
+            Dim n_kalk As Integer = CES1.n_Gen * (CES1.ChildList_BM.GetLength(0))
+            Dim Achse as Diagramm.Achse
+            Achse.Beschriftung = BlueM1.OptZieleListe(0).Bezeichnung
+            Call Diag.DiagInitialise_SO("CES", Achse, 4, n_kalk)
+        
         Else if BlueM1.OptZieleListe.GetLength(0) = 2 then
-            Call BlueM1.TeeChartInitialise_MO(TChart1)
+            'MultiObjective
+            Dim Achsen() as Diagramm.Achse = {}
+            For i = 0 to BlueM1.OptZieleListe.GetUpperBound(0)
+                Achsen(i).Beschriftung = BlueM1.OptZieleListe(i).Bezeichnung
+            Next
+           Call Diag.DiagInitialise_MO("CES", Achsen)
+        
         Else
             MsgBox("Zu viele Ziele. Max=2", MsgBoxStyle.Exclamation, "Fehler")
         End If
@@ -601,16 +542,16 @@ Partial Class Form1
                 'ToDo: Dieser Teil steht im Moment im BM Form muss aber ins CES!
                 Call BlueM1.Define_aktuelle_Bauwerke(CES1.ChildList_BM(i).Path)
                 Call BlueM1.Verzweigung_Write(CES1.ChildList_BM(i).VER_ONOFF)
-                Call BlueM1.Eval_Sim_CombiOpt(CES1.n_Ziele, durchlauf, 1, CES1.ChildList_BM(i).Quality_MO, TChart1)
+                Call BlueM1.Eval_Sim_CombiOpt(CES1.n_Ziele, durchlauf, 1, CES1.ChildList_BM(i).Quality_MO, Diag)
 
                 ''HACK zur Reduzierung auf eine Zielfunktion
                 'Call CES1.MO_TO_SO(CES1.ChildList_BM(i))
 
                 'Zeichnen der Kinder
                 If BlueM1.OptZieleListe.GetLength(0) = 1 Then
-                    Call TChart1.Series(0).Add(durchlauf, CES1.ChildList_BM(i).Quality_SO)
+                    Call Diag.Series(0).Add(durchlauf, CES1.ChildList_BM(i).Quality_SO)
                 Else if BlueM1.OptZieleListe.GetLength(0) = 2 then
-                    Call TChart1.Series(0).Add(CES1.ChildList_BM(i).Quality_MO(0), CES1.ChildList_BM(i).Quality_MO(1))
+                    Call Diag.Series(0).Add(CES1.ChildList_BM(i).Quality_MO(0), CES1.ChildList_BM(i).Quality_MO(1))
                 Else
                     MsgBox("Zu viele Ziele. Max=2",MsgBoxStyle.Exclamation,"Fehler")
                 End If
@@ -742,6 +683,9 @@ Partial Class Form1
             GoTo ErrCode_ES_STARTEN
         End If
 
+        'Diagramm vorbereiten und initialisieren
+        Call PrepareDiagramm()
+
         '1. Schritt: CEvolutionsstrategie
         'Objekt der Klasse CEvolutionsstrategie wird erzeugen
         '******************************************************************************************
@@ -847,9 +791,9 @@ Start_Evolutionsrunden:
                         '************************************************************************************
                         Select Case Anwendung
                             Case ANW_TESTPROBLEME
-                                myIsOK = Testprobleme1.Evaluierung_TestProbleme(Testprobleme1.Combo_Testproblem.Text, globalAnzPar, mypara, durchlauf, ipop, QN, RN, TChart1)
+                                myIsOK = Testprobleme1.Evaluierung_TestProbleme(Testprobleme1.Combo_Testproblem.Text, globalAnzPar, mypara, durchlauf, ipop, QN, RN, Diag)
                             Case ANW_BLAUESMODELL
-                                myIsOK = BlueM1.Eval_Sim_ParaOpt(globalAnzPar, globalAnzZiel_ParaOpt, mypara, durchlauf, ipop, QN, TChart1)
+                                myIsOK = BlueM1.Eval_Sim_ParaOpt(globalAnzPar, globalAnzZiel_ParaOpt, mypara, durchlauf, ipop, QN, Diag)
                         End Select
 
                         'Einordnen der Qualitätsfunktion im Bestwertspeicher
@@ -930,7 +874,7 @@ ErrCode_ES_STARTEN:
 
     Private Sub Bestwertzeichnen_Pareto(ByRef Bestwert(,) As Double, ByRef ipop As Short)
         Dim i As Short
-        With TChart1
+        With Diag
             .Series(ipop).Clear()
             If UBound(Bestwert, 2) = 2 Then
                 For i = 1 To UBound(Bestwert, 1)
@@ -948,7 +892,7 @@ ErrCode_ES_STARTEN:
     Private Sub SekundärePopulationZeichnen(ByRef Population(,) As Double)
         Dim i As Short
         Dim Datenreihe As Short
-        With TChart1
+        With Diag
             If EVO_Einstellungen1.isPOPUL Then
                 Datenreihe = EVO_Einstellungen1.NPopul + 1
             Else
@@ -968,6 +912,8 @@ ErrCode_ES_STARTEN:
         End With
     End Sub
 
+#End Region 'Start Button Pressed
+
     'Überprüfung der Eingabe von "Anzahl Parameter" bei Sinus-Funktion
     Private Sub Par_Sinus_KeyPress(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.KeyPressEventArgs)
         Dim KeyAscii As Short = Asc(eventArgs.KeyChar)
@@ -978,51 +924,119 @@ ErrCode_ES_STARTEN:
         End If
     End Sub
 
-    '******************************** TChart Funktionen *******************************************
-    '**********************************************************************************************
+#Region "Diagrammfunktionen"
+
+    'Diagrammfunktionen
+    '###################
+
+    'Diagramm vorbereiten und Initialisierung aufrufen
+    '*************************************************
+    Private Sub PrepareDiagramm()
+
+        Select Case Anwendung
+
+            'Spezialfall Tesprobleme:
+            Case ANW_TESTPROBLEME
+
+                Select Case Testprobleme1.Combo_Testproblem.Text
+                    Case "Sinus-Funktion"
+                        Call Diag.DiagInitialise_SinusFunktion(EVO_Einstellungen1, globalAnzPar, Testprobleme1.Text_Sinusfunktion_Par.Text)
+                    Case "Beale-Problem" 'x1 = [-5;5], x2=[-2;2]
+                        Call Diag.DiagInitialise_BealeProblem(EVO_Einstellungen1, globalAnzPar)
+                    Case "Schwefel 2.4-Problem" 'xi = [-10,10]
+                        Call Diag.DiagInitialise_SchwefelProblem(EVO_Einstellungen1, globalAnzPar)
+                    Case Else
+                        Call Diag.DiagInitialise_MultiTestProb(EVO_Einstellungen1, Testprobleme1.Combo_Testproblem.Text)
+                End Select
+
+            'Alle anderen Anwendungen:
+            Case Else
+
+                Dim n_Kalkulationen As Integer
+                Dim n_Populationen As Integer
+
+                'Anzahl Kalkulationen
+                If EVO_Einstellungen1.isPOPUL Then
+                    n_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden
+                Else
+                    n_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
+                End If
+
+                'Anzahl Populationen
+                n_Populationen = 1
+                If EVO_Einstellungen1.isPOPUL Then
+                    n_Populationen = EVO_Einstellungen1.NPopul
+                End If
+
+                'Achsen:
+                Dim Achsen() As Diagramm.Achse = {}
+                ReDim Achsen(BlueM1.OptZieleListe.GetUpperBound(0))
+                'HACK: bisher nur für Anwendung BlueM
+                For i As Integer = 0 To BlueM1.OptZieleListe.GetUpperBound(0)
+                    Achsen(i).Beschriftung = BlueM1.OptZieleListe(i).Bezeichnung
+                Next
+
+                'Initialisierung der TeeChart Serien je nach SO oder MO
+                '------------------------------------------------------
+                'TODO: SO/MO vereinheitlichen
+                If (EVO_Einstellungen1.isMultiObjective = False) Then
+                    Call Diag.DiagInitialise_SO(Anwendung, Achsen(0), n_Populationen, n_Kalkulationen)
+                Else
+                    Call Diag.DiagInitialise_MO(Anwendung, Achsen)
+                End If
+
+        End Select
+
+    End Sub
 
     'Chart bearbeiten
+    '****************
     Private Sub TChartEdit(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_TChartEdit.Click
-        TChart1.ShowEditor()
+        Diag.ShowEditor()
     End Sub
 
     'Chart nach Excel exportieren
+    '****************************
     Private Sub TChart2Excel(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_TChart2Excel.Click
-        SaveFileDialog1.DefaultExt = TChart1.Export.Data.Excel.FileExtension
-        SaveFileDialog1.FileName = TChart1.Name + "." + SaveFileDialog1.DefaultExt
+        SaveFileDialog1.DefaultExt = Diag.Export.Data.Excel.FileExtension
+        SaveFileDialog1.FileName = Diag.Name + "." + SaveFileDialog1.DefaultExt
         SaveFileDialog1.Filter = "Excel-Dateien (*.xls)|*.xls"
         If (Me.SaveFileDialog1.ShowDialog() = System.Windows.Forms.DialogResult.OK) Then
-            TChart1.Export.Data.Excel.Series = Nothing 'export all series
-            TChart1.Export.Data.Excel.IncludeLabels = True
-            TChart1.Export.Data.Excel.IncludeIndex = True
-            TChart1.Export.Data.Excel.IncludeHeader = True
-            TChart1.Export.Data.Excel.IncludeSeriesTitle = True
-            TChart1.Export.Data.Excel.Save(Me.SaveFileDialog1.FileName)
+            Diag.Export.Data.Excel.Series = Nothing 'export all series
+            Diag.Export.Data.Excel.IncludeLabels = True
+            Diag.Export.Data.Excel.IncludeIndex = True
+            Diag.Export.Data.Excel.IncludeHeader = True
+            Diag.Export.Data.Excel.IncludeSeriesTitle = True
+            Diag.Export.Data.Excel.Save(Me.SaveFileDialog1.FileName)
         End If
     End Sub
 
     'Chart als PNG exportieren
+    '*************************
     Private Sub TChart2PNG(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_TChart2PNG.Click
-        SaveFileDialog1.DefaultExt = TChart1.Export.Image.PNG.FileExtension
-        SaveFileDialog1.FileName = TChart1.Name + "." + SaveFileDialog1.DefaultExt
+        SaveFileDialog1.DefaultExt = Diag.Export.Image.PNG.FileExtension
+        SaveFileDialog1.FileName = Diag.Name + "." + SaveFileDialog1.DefaultExt
         SaveFileDialog1.Filter = "PNG-Dateien (*.png)|*.png"
         If (Me.SaveFileDialog1.ShowDialog() = System.Windows.Forms.DialogResult.OK) Then
-            TChart1.Export.Image.PNG.GrayScale = False
-            TChart1.Export.Image.PNG.Save(Me.SaveFileDialog1.FileName)
+            Diag.Export.Image.PNG.GrayScale = False
+            Diag.Export.Image.PNG.Save(Me.SaveFileDialog1.FileName)
         End If
     End Sub
 
     'Chart in nativem TeeChart-Format abspeichern
+    '********************************************
     Private Sub TChartSave(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_TChartSave.Click
-        SaveFileDialog1.DefaultExt = TChart1.Export.Template.FileExtension
-        SaveFileDialog1.FileName = TChart1.Name + "." + SaveFileDialog1.DefaultExt
+        SaveFileDialog1.DefaultExt = Diag.Export.Template.FileExtension
+        SaveFileDialog1.FileName = Diag.Name + "." + SaveFileDialog1.DefaultExt
         SaveFileDialog1.Filter = "TeeChart-Dateien (*.ten)|*.ten"
         If (Me.SaveFileDialog1.ShowDialog() = System.Windows.Forms.DialogResult.OK) Then
-            TChart1.Export.Template.IncludeData = True
-            TChart1.Export.Template.Save(Me.SaveFileDialog1.FileName)
+            Diag.Export.Template.IncludeData = True
+            Diag.Export.Template.Save(Me.SaveFileDialog1.FileName)
         End If
     End Sub
 
-#End Region
+#End Region 'Diagrammfunktionen
+
+#End Region 'Methoden
 
 End Class

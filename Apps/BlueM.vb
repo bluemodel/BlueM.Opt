@@ -243,31 +243,6 @@ Public Class BlueM
     End Function
 
 
-#Region "TeeChart"
-
-    'TeeChart
-    '########
-
-    'TeeChart Initialisierung für SingleObjective
-    '********************************************
-    Public Overrides Sub TeeChartInitialise_SO(ByVal n_Populationen As Integer, ByVal n_Kalkulationen As Integer, ByRef TChart1 As Steema.TeeChart.TChart)
-
-        Call MyBase.TeeChartInitialise_SO(n_Populationen, n_Kalkulationen, TChart1)
-        TChart1.Header.Text = "BlauesModell: " & Me.Datensatz
-
-    End Sub
-
-    'TeeChart Initialisierung für MultiObjective
-    '*******************************************
-    Public Overrides Sub TeeChartInitialise_MO(ByRef TChart1 As Steema.TeeChart.TChart)
-
-        Call MyBase.TeeChartInitialise_MO(TChart1)
-        TChart1.Header.Text = "BlauesModell: " & Me.Datensatz
-
-    End Sub
-
-#End Region 'TeeChart
-
 #Region "Kombinatorik"
 
     'Kombinatorik

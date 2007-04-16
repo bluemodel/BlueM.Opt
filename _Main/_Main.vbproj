@@ -146,6 +146,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Diagramm.vb">
+      <SubType>Component</SubType>
+    </Compile>
     <EmbeddedResource Include="Form1.resX">
       <DependentUpon>Form1.vb</DependentUpon>
       <SubType>Designer</SubType>

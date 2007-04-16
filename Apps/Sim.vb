@@ -325,6 +325,30 @@ Public MustInherit Class Sim
 
 #Region "Misc"
 
+    'EVO-Parameterübergabe
+    '*********************
+    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara(,) As Double)
+        
+        Dim i As Integer
+
+        'Anzahl Optimierungsparameter übergeben
+        globalAnzPar = Me.OptParameterListe.GetLength(0)
+
+        'Parameterwerte übergeben
+        'BUG 57: mypara() fängt bei 1 an!
+        ReDim mypara(globalAnzPar, 1)
+        For i = 1 To globalAnzPar
+            mypara(i, 1) = Me.OptParameterListe(i - 1).SKWert
+        Next
+
+        'globale Anzahl der Ziele muss hier auf Länge der Zielliste gesetzt werden
+        globalAnzZiel = Me.OptZieleListe.GetLength(0)
+
+        'TODO: Randbedingungen
+        globalAnzRand = 2
+
+    End Sub
+
     'ModellParameter aus OptParametern errechnen
     '*******************************************
     Protected Sub OptParameter_to_ModellParameter()
@@ -839,100 +863,6 @@ Public MustInherit Class Sim
     End Function
 
 #End Region 'SimErgebnisse lesen
-
-#Region "TeeChart"
-
-    'TeeChart
-    '########
-
-    'TeeChart Initialisierung für SingleObjective
-    '********************************************
-    Public Overridable Sub TeeChartInitialise_SO(ByVal n_Populationen As Integer, ByVal n_Kalkulationen As Integer, ByRef TChart1 As Steema.TeeChart.TChart)
-
-        'BUG 100: n_Populationen und n_Kalkulationen können sich zu einem späteren Zeitpunkt nochmals ändern!
-
-        'Dim Anzahl_Kalkulationen As Integer
-        'Dim Populationen As Short
-        Dim i As Short
-
-        With TChart1
-            .Clear()
-            .Header.Text = "SimModell"
-            .Aspect.View3D = False
-            .Legend.Visible = False
-
-            'Series(0): Anfangswert
-            Dim Point0 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point0.Title = "Anfangswert"
-            Point0.Color = System.Drawing.Color.Red
-            Point0.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point0.Pointer.HorizSize = 3
-            Point0.Pointer.VertSize = 3
-
-            'Series(1 bis n): Für jede Population eine Series 'TODO: es würde auch eine Series für alle reichen!
-            For i = 1 To n_Populationen
-                Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
-                Point1.Title = "Population " & i.ToString()
-                Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-                Point1.Pointer.HorizSize = 2
-                Point1.Pointer.VertSize = 2
-            Next i
-
-            'Formatierung der Axen
-            .Chart.Axes.Bottom.Title.Caption = "Simulation"
-            .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Maximum = n_Kalkulationen
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Left.Title.Caption = Me.OptZieleListe(0).Bezeichnung
-            .Chart.Axes.Left.Automatic = True
-            .Chart.Axes.Left.Minimum = 0
-        End With
-    End Sub
-
-    'TeeChart Initialisierung für MultiObjective
-    '*******************************************
-    Public Overridable Sub TeeChartInitialise_MO(ByRef TChart1 As Steema.TeeChart.TChart)
-
-        With TChart1
-            .Clear()
-            .Header.Text = "SimModell"
-            .Aspect.View3D = False
-            .Legend.Visible = False
-
-            'Formatierung der Axen
-            .Chart.Axes.Bottom.Title.Caption = OptZieleListe(0).Bezeichnung 'HACK: Beschriftung der Axen
-            .Chart.Axes.Bottom.Automatic = True
-            .Chart.Axes.Left.Title.Caption = OptZieleListe(1).Bezeichnung 'HACK: Beschriftung der Axen
-            .Chart.Axes.Left.Automatic = True
-
-            'Series(0): Series für die Population.
-            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point1.Title = "Population"
-            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point1.Color = System.Drawing.Color.Orange
-            Point1.Pointer.HorizSize = 2
-            Point1.Pointer.VertSize = 2
-
-            'Series(1): Series für die Sekundäre Population
-            Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point2.Title = "Sekundäre Population"
-            Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point2.Color = System.Drawing.Color.Blue
-            Point2.Pointer.HorizSize = 3
-            Point2.Pointer.VertSize = 3
-
-            'Series(2): Series für Bestwert
-            Dim Point3 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point3.Title = "Bestwerte"
-            Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point3.Color = System.Drawing.Color.Green
-            Point3.Pointer.HorizSize = 3
-            Point3.Pointer.VertSize = 3
-
-        End With
-    End Sub
-
-#End Region 'TeeChart
 
 #Region "Ergebnisdatenbank"
 
