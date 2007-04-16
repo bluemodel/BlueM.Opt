@@ -169,19 +169,18 @@ Partial Class Form1
 
                     'Ergebnisdatenbank ausschalten
                     BlueM1.Ergebnisdb = False
+
                     'BM-Einstellungen initialisieren 
                     Call BlueM1.Sim_Ini()
 
-                    CES1.n_Ziele = BlueM1.OptZieleListe.GetLength(0)
+                    'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
+                    If BlueM1.OptZieleListe.GetLength(0) = 1 Then
+                        EVO_Einstellungen1.OptModus = 0
+                    ElseIf BlueM1.OptZieleListe.GetLength(0) > 1 Then
+                        EVO_Einstellungen1.OptModus = 1
+                    End If
 
-                    'If (BM_OK = Windows.Forms.DialogResult.OK) Then
-                    '    'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
-                    '    If BlueM1.OptZieleListe.GetLength(0) = 1 Then
-                    '        EVO_Einstellungen1.OptModus = 0
-                    '    ElseIf BlueM1.OptZieleListe.GetLength(0) > 1 Then
-                    '        EVO_Einstellungen1.OptModus = 1
-                    '    End If
-                    'End If
+                    CES1.n_Ziele = BlueM1.OptZieleListe.GetLength(0)
 
                     'Einlesen der CombiOpt Datei
                     Call BlueM1.Read_CES()
@@ -538,10 +537,12 @@ Partial Class Form1
             For i = 0 To CES1.ChildList_BM.GetUpperBound(0)
                 durchlauf += 1
 
-                'Schreibt die neuen Verzweigungen
                 'ToDo: Dieser Teil steht im Moment im BM Form muss aber ins CES!
+                'Erstellt die aktuelle Bauerksliste und überträgt sie zu SKos
                 Call BlueM1.Define_aktuelle_Bauwerke(CES1.ChildList_BM(i).Path)
+                'Schreibt die neuen Verzweigungen
                 Call BlueM1.Verzweigung_Write(CES1.ChildList_BM(i).VER_ONOFF)
+                'Evaluiert das Blaue Modell
                 Call BlueM1.Eval_Sim_CombiOpt(CES1.n_Ziele, durchlauf, 1, CES1.ChildList_BM(i).Quality_MO, Diag)
 
                 ''HACK zur Reduzierung auf eine Zielfunktion
@@ -563,11 +564,18 @@ Partial Class Form1
                 System.Windows.Forms.Application.DoEvents()
             Next
 
+                            If BlueM1.OptZieleListe.GetLength(0) = 1 Then
             'Sortieren der Kinden anhand der Qualität
             Call CES1.Sort_Faksimile_BM(CES1.ChildList_BM)
 
-            'Selectionsprozess je nach "plus" oder "minus" Strategie
-            Call CES1.Selection_Process_BM()
+                'Selectionsprozess je nach "plus" oder "minus" Strategie
+                Call CES1.Selection_Process_BM()
+            ElseIf BlueM1.OptZieleListe.GetLength(0) = 2 Then
+                'call 
+
+            Else
+                MsgBox("Zu viele Ziele. Max=2", MsgBoxStyle.Exclamation, "Fehler")
+            End If
 
             ''Zeichnen des besten Elter
             'For i = 0 To CES1.ParentList_BM.GetUpperBound(0)
