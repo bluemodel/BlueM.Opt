@@ -3,17 +3,20 @@ Option Explicit On
 Public Class EVO_Einstellungen
     Inherits System.Windows.Forms.UserControl
 
+    Private OptModusValue As Short = EVO_MODUS_SINGEL_OBJECTIVE
     Dim isParetoOptimierung, isMultiObjectiveOptimierung As Boolean
-    Public Event ModusChanges(ByVal Sender As System.Object, ByVal e As System.EventArgs)
 
-    'UPGRADE_WARNING: Das Ereignis ComboModus.SelectedIndexChanged kann ausgelöst werden, wenn das Formular initialisiert wird. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup2075"'
-    Private Sub ComboModus_SelectedIndexChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles ComboModus.SelectedIndexChanged
+    'Optimierungsmodus wurde geändert
+    '********************************
+    Private Sub OptModus_Change()
+
         Dim i As Short
 
-        Select Case ComboModus.SelectedIndex
+        Select Case Me.OptModus
 
             Case EVO_MODUS_SINGEL_OBJECTIVE
                 'Vorgaben und Anzeige
+                Label_OptModusValue.Text = "Single Objective"
                 TextAnzGen.Text = CStr(20)
                 TextAnzEltern.Text = CStr(3)
                 TextAnzNachf.Text = CStr(10)
@@ -40,6 +43,7 @@ Public Class EVO_Einstellungen
 
             Case EVO_MODUS_MULTIOBJECTIVE_PARETO
                 'Vorgaben und Anzeige
+                Label_OptModusValue.Text = "MultiObjective Pareto"
                 TextAnzGen.Text = CStr(250)
                 TextAnzEltern.Text = CStr(25)
                 TextAnzNachf.Text = CStr(75)
@@ -68,7 +72,6 @@ Public Class EVO_Einstellungen
 
         Call FILLCOMBO_OPTELTERN(ComboOptEltern)
         Call FILLCOMBO_POPPENALTY(ComboPopPenalty)
-        RaiseEvent ModusChanges(Me, Nothing)
     End Sub
 
     'UPGRADE_WARNING: Das Ereignis ComboOptEltern.SelectedIndexChanged kann ausgelöst werden, wenn das Formular initialisiert wird. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup2075"'
@@ -213,12 +216,6 @@ Public Class EVO_Einstellungen
         Cntrl.SelectedIndex = 0
     End Sub
 
-    Private Sub FILLCOMBO_MODUS(ByRef Cntrl As System.Windows.Forms.ComboBox)
-        Cntrl.Items.Add("Single Objective")
-        Cntrl.Items.Add("Multi-Objective Pareto")
-        Cntrl.SelectedIndex = 0
-    End Sub
-
     Private Sub FILLCOMBO_OPTELTERN(ByRef Cntrl As System.Windows.Forms.ComboBox)
         Cntrl.Items.Clear()
         Cntrl.Items.Add(New VB6.ListBoxItem("Selektion", EVO_ELTERN_SELEKT))
@@ -226,7 +223,7 @@ Public Class EVO_Einstellungen
         Cntrl.Items.Add(New VB6.ListBoxItem("Rekomb x/x, mitteln", EVO_ELTERN_XX_MITTELN))
         Cntrl.Items.Add(New VB6.ListBoxItem("Rekomb x/y, diskret", EVO_ELTERN_XY_DISKRET))
         Cntrl.Items.Add(New VB6.ListBoxItem("Rekomb x/y, mitteln", EVO_ELTERN_XY_MITTELN))
-        If (ComboModus.SelectedIndex = EVO_MODUS_MULTIOBJECTIVE_PARETO) Then
+        If (Me.OptModus = EVO_MODUS_MULTIOBJECTIVE_PARETO) Then
             Cntrl.Items.Add(New VB6.ListBoxItem("Neighbourhood", EVO_ELTERN_Neighbourhood))
         End If
         Cntrl.SelectedIndex = 1
@@ -240,7 +237,7 @@ Public Class EVO_Einstellungen
 
     Private Sub FILLCOMBO_POPPENALTY(ByRef Cntrl As System.Windows.Forms.ComboBox)
         Cntrl.Items.Clear()
-        Select Case ComboModus.SelectedIndex
+        Select Case Me.OptModusValue
             Case EVO_MODUS_SINGEL_OBJECTIVE
                 Cntrl.Items.Add(New VB6.ListBoxItem("Mittelwert", EVO_POP_PENALTY_MITTELWERT))
                 Cntrl.Items.Add(New VB6.ListBoxItem("Schlechtester", EVO_POP_PENALTY_SCHLECHTESTER))
@@ -253,7 +250,6 @@ Public Class EVO_Einstellungen
     End Sub
 
     Private Sub UserControl_Initialize()
-        Call FILLCOMBO_MODUS(ComboModus)
         Call FILLCOMBO_STRATEGIE(ComboStrategie)
         Call FILLCOMBO_STRATEGIE(ComboPopStrategie)
         Call FILLCOMBO_OPTPOPELTERN(ComboOptPopEltern)
@@ -280,12 +276,13 @@ Public Class EVO_Einstellungen
     End Property
 
 	'Dieses Property nicht ReadOnly weil die Anzahl der Zielfunktionen durch OptZiele bestimmt werden kann
-    Public Property OptModus() As Integer
+    Public Property OptModus() As Short
         Get
-            OptModus = ComboModus.SelectedIndex
+            OptModus = Me.OptModusValue
         End Get
-        Set(ByVal Index As Integer)
-            ComboModus.SelectedIndex = Index
+        Set(ByVal Index As Short)
+            Me.OptModusValue = Index
+            Call OptModus_Change()
         End Set
     End Property
 
