@@ -36,31 +36,31 @@ Public Class IHA
     'Eigenschaften
     '#############
 
-    Private IHADir                          'Verzeichnis für IHA-Dateien
+    Private IHADir                                  'Verzeichnis für IHA-Dateien
 
     'IHA-Ergebnisse
     '--------------
-    Private Structure IHAParam               'Struktur für IHA Ergebnis eines Parameters
-        Public PName As String
-        Public HAMiddle As Double
+    Private Structure IHAParam                      'Struktur für IHA Ergebnis eines Parameters
+        Public PName As String                      'Parametername
+        Public HAMiddle As Double                   'Hydrologic Alteration (HA) - Middle RVA Category
     End Structure
 
-    Private Structure IHAParamGroup          'Struktur für IHA Ergebnis einer Parametergruppe
-        Public No As Short
-        Public GName As String
-        Public Avg As Double
-        Public IHAParams() As IHAParam
+    Private Structure IHAParamGroup                 'Struktur für IHA Ergebnis einer Parametergruppe
+        Public No As Short                          'Gruppennummer
+        Public GName As String                      'Gruppennname
+        Public Avg As Double                        'HA-Mittelwert der Gruppe
+        Public IHAParams() As IHAParam              'Liste der Paremeter
     End Structure
 
-    Private Structure IHAResult              'Struktur für alle IHA Ergebnisse zusammen
-        Public Avg As Double
-        Public IHAParamGroups() As IHAParamGroup
+    Private Structure IHAResult                     'Struktur für alle IHA Ergebnisse zusammen
+        Public Avg As Double                        'HA-Mittelwert über alle Gruppen
+        Public IHAParamGroups() As IHAParamGroup    'Liste der Parametergruppen
     End Structure
 
     Private IHARes As IHAResult
 
-    'IHA-Parameter
-    '-------------
+    'IHA-Software-Parameter
+    '----------------------
     Private Const BegWatrYr = 275           '1. Okt.
 
     'Jahreszahlen
@@ -92,31 +92,26 @@ Public Class IHA
             ReDim .IHAParamGroups(4)
 
             'Parameter group #1
-            '.IHAParamGroups(0) = New IHAParamGroup
             .IHAParamGroups(0).No = 1
             .IHAParamGroups(0).GName = "Quantity"
             ReDim .IHAParamGroups(0).IHAParams(11)
 
             'Parameter group #2
-            '.IHAParamGroups(1) = New IHAParamGroup
             .IHAParamGroups(1).No = 2
             .IHAParamGroups(1).GName = "Extremes"
             ReDim .IHAParamGroups(1).IHAParams(11)
 
             'Parameter group #3
-            '.IHAParamGroups(2) = New IHAParamGroup
             .IHAParamGroups(2).No = 3
             .IHAParamGroups(2).GName = "Timing"
             ReDim .IHAParamGroups(2).IHAParams(1)
 
             'Parameter group #4
-            '.IHAParamGroups(3) = New IHAParamGroup
             .IHAParamGroups(3).No = 4
             .IHAParamGroups(3).GName = "Frequency"
             ReDim .IHAParamGroups(3).IHAParams(3)
 
             'Parameter group #5
-            '.IHAParamGroups(4) = New IHAParamGroup
             .IHAParamGroups(4).No = 5
             .IHAParamGroups(4).GName = "Rate"
             ReDim .IHAParamGroups(4).IHAParams(2)
@@ -331,7 +326,7 @@ Public Class IHA
     Public Function calculate_IHA(ByVal simreihe As Object(,)) As Double
 
         Dim i, j, k As Integer
-        Dim QWert As Double = -999999
+        Dim QWert As Double
 
         'Simulationsreihe entsprechend kürzen
         Dim Startdatum As DateTime = simreihe(0, 0)
@@ -384,17 +379,34 @@ Public Class IHA
         '------------------------
         Call launch_IHA()
 
-        'QWert aus IHA-Parametern berechnen
-        '----------------------------------
-        QWert = read_IHAResults()
+        'IHA-Ergebnisse einlesen
+        '-----------------------
+        Call read_IHAResults()
+
+        'QWert berechnen
+        '---------------
+        QWert = calculate_QWert()
 
         Return QWert
 
     End Function
 
-    'IHA Ergebnisse einlesen und QWert berechnen
-    '*******************************************
-    Private Function read_IHAResults() As Double
+    'QWert aus IHA-Ergebnissen berechnen
+    '***********************************
+    Private Function calculate_QWert() As Double
+
+        Dim QWert as Double
+
+        'QWert = (Mittelwert von HA) ^2
+        QWert = IHARes.Avg * IHARes.Avg
+
+        Return QWert
+
+    End Function
+
+    'IHA Ergebnisse einlesen
+    '***********************
+    Private Sub read_IHAResults()
 
         'RVA-Datei öffnen und einlesen
         '-----------------------------
@@ -450,13 +462,11 @@ Public Class IHA
             MsgBox("Fehler beim einlesen der IHA-Datei ""output.rva"":" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Critical, "Fehler")
         End Try
 
-        Return Me.IHARes.Avg * Me.IHARes.Avg
-
-    End Function
+    End Sub
 
     'IHA_Batchfor.exe ausführen
     '**************************
-    Public Sub launch_IHA()
+    Private Sub launch_IHA()
         'starte Programm mit neuen Parametern
         Dim ProcID As Integer
         'Aktuelles Arbeitsverzeichnis feststellen
