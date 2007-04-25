@@ -1,11 +1,11 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Anwendung", "EVO_Anwendung\Anwendung.vbproj", "{FF1D5494-1205-4F3E-BD65-ADB8C6BD04D4}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "_Main", "_Main\_Main.vbproj", "{FF1D5494-1205-4F3E-BD65-ADB8C6BD04D4}"
 	ProjectSection(ProjectDependencies) = postProject
 		{62B1C1E7-26DE-418A-AAEE-102E02A50DF6} = {62B1C1E7-26DE-418A-AAEE-102E02A50DF6}
 	EndProjectSection
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "EVO_BM", "EVO_BM\EVO_BM.vbproj", "{62B1C1E7-26DE-418A-AAEE-102E02A50DF6}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Apps", "Apps\Apps.vbproj", "{62B1C1E7-26DE-418A-AAEE-102E02A50DF6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
