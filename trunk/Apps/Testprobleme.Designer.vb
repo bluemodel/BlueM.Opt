@@ -22,7 +22,7 @@ Partial Class Testprobleme
         Me.GroupBox_Testproblem = New System.Windows.Forms.GroupBox
         Me.Combo_Testproblem = New System.Windows.Forms.ComboBox
         Me.Problem_SinusFunktion = New System.Windows.Forms.GroupBox
-        Me.Text_Sinusfunktion_Par = New System.Windows.Forms.TextBox
+        Me.Text_Sinusfunktion_Par = New System.Windows.Forms.MaskedTextBox
         Me.Text_Sinusfunktion = New System.Windows.Forms.TextBox
         Me.Label_Sinusfunktion = New System.Windows.Forms.Label
         Me.Problem_BealeProblem = New System.Windows.Forms.GroupBox
@@ -106,17 +106,16 @@ Partial Class Testprobleme
         '
         'Text_Sinusfunktion_Par
         '
-        Me.Text_Sinusfunktion_Par.AcceptsReturn = True
-        Me.Text_Sinusfunktion_Par.BackColor = System.Drawing.SystemColors.Window
-        Me.Text_Sinusfunktion_Par.Cursor = System.Windows.Forms.Cursors.IBeam
-        Me.Text_Sinusfunktion_Par.ForeColor = System.Drawing.SystemColors.WindowText
+        Me.Text_Sinusfunktion_Par.BeepOnError = True
+        Me.Text_Sinusfunktion_Par.HidePromptOnLeave = True
         Me.Text_Sinusfunktion_Par.Location = New System.Drawing.Point(152, 40)
-        Me.Text_Sinusfunktion_Par.MaxLength = 0
+        Me.Text_Sinusfunktion_Par.Mask = "###"
         Me.Text_Sinusfunktion_Par.Name = "Text_Sinusfunktion_Par"
-        Me.Text_Sinusfunktion_Par.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.Text_Sinusfunktion_Par.PromptChar = Global.Microsoft.VisualBasic.ChrW(32)
         Me.Text_Sinusfunktion_Par.Size = New System.Drawing.Size(41, 20)
         Me.Text_Sinusfunktion_Par.TabIndex = 3
         Me.Text_Sinusfunktion_Par.Text = "50"
+        Me.Text_Sinusfunktion_Par.ValidatingType = GetType(Integer)
         '
         'Text_Sinusfunktion
         '
@@ -478,7 +477,7 @@ Partial Class Testprobleme
     Friend WithEvents GroupBox_Testproblem As System.Windows.Forms.GroupBox
     Public WithEvents Combo_Testproblem As System.Windows.Forms.ComboBox
     Friend WithEvents Problem_SinusFunktion As System.Windows.Forms.GroupBox
-    Public WithEvents Text_Sinusfunktion_Par As System.Windows.Forms.TextBox
+    Public WithEvents Text_Sinusfunktion_Par As System.Windows.Forms.MaskedTextBox
     Public WithEvents Text_Sinusfunktion As System.Windows.Forms.TextBox
     Public WithEvents Label_Sinusfunktion As System.Windows.Forms.Label
     Friend WithEvents Problem_BealeProblem As System.Windows.Forms.GroupBox

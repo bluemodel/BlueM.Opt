@@ -103,9 +103,12 @@ Partial Class SensiPlot
         '
         'TextBox_AnzSim
         '
+        Me.TextBox_AnzSim.BeepOnError = True
+        Me.TextBox_AnzSim.HidePromptOnLeave = True
         Me.TextBox_AnzSim.Location = New System.Drawing.Point(370, 83)
-        Me.TextBox_AnzSim.Mask = "00000"
+        Me.TextBox_AnzSim.Mask = "#####"
         Me.TextBox_AnzSim.Name = "TextBox_AnzSim"
+        Me.TextBox_AnzSim.PromptChar = Global.Microsoft.VisualBasic.ChrW(32)
         Me.TextBox_AnzSim.Size = New System.Drawing.Size(67, 20)
         Me.TextBox_AnzSim.TabIndex = 7
         Me.TextBox_AnzSim.Text = "7"

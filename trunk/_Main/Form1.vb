@@ -939,16 +939,6 @@ ErrCode_ES_STARTEN:
 
 #End Region 'Start Button Pressed
 
-    'Überprüfung der Eingabe von "Anzahl Parameter" bei Sinus-Funktion
-    Private Sub Par_Sinus_KeyPress(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.KeyPressEventArgs)
-        Dim KeyAscii As Short = Asc(eventArgs.KeyChar)
-        'UPGRADE_ISSUE: Zuweisung wird nicht unterstützt: KeyAscii an Nicht-Null-Wert Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1058"'
-        KeyAscii = KEYOK(KeyAscii, AllowIntegerOnly)
-        If KeyAscii = 0 Then
-            eventArgs.Handled = True
-        End If
-    End Sub
-
 #Region "Diagrammfunktionen"
 
     'Diagrammfunktionen
