@@ -305,21 +305,28 @@ Partial Class Form1
     '************************************************************************************
 
     Private Sub Button_Start_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Button_Start.Click
-        myisrun = True
-        Select Case Anwendung
-            Case ANW_RESETPARA_RUNBM
-                Call BlueM1.launchSim()
-            Case ANW_SENSIPLOT_MODPARA
-                myIsOK = SensiPlot_STARTEN(SensiPlot1.Selected_OptParameter, SensiPlot1.Selected_OptZiel, SensiPlot1.Selected_SensiType, SensiPlot1.Anz_Sim)
-            Case ANW_BLAUESMODELL
-                myIsOK = ES_STARTEN()
-            Case ANW_COMBIBM
-                myIsOK = CombiBM_STARTEN()
-            Case ANW_TESTPROBLEME
-                myIsOK = ES_STARTEN()
-            Case ANW_TSP
-                myIsOK = TSP_STARTEN()
-        End Select
+
+        Try
+            myisrun = True
+            Select Case Anwendung
+                Case ANW_RESETPARA_RUNBM
+                    Call BlueM1.launchSim()
+                Case ANW_SENSIPLOT_MODPARA
+                    myIsOK = SensiPlot_STARTEN(SensiPlot1.Selected_OptParameter, SensiPlot1.Selected_OptZiel, SensiPlot1.Selected_SensiType, SensiPlot1.Anz_Sim)
+                Case ANW_BLAUESMODELL
+                    myIsOK = ES_STARTEN()
+                Case ANW_COMBIBM
+                    myIsOK = CombiBM_STARTEN()
+                Case ANW_TESTPROBLEME
+                    myIsOK = ES_STARTEN()
+                Case ANW_TSP
+                    myIsOK = TSP_STARTEN()
+            End Select
+
+        'Fehlerbehandlung:
+        Catch ex As Exception
+            MsgBox(ex.Message, MsgBoxStyle.Critical, "Fehler")
+        End Try
     End Sub
 
     'TODO: Das wird nie aufgerufen
@@ -387,13 +394,8 @@ Partial Class Form1
         Dim durchlauf As Integer = 1
         Dim ipop As Integer = 1
 
-        'Achsen:
-        Dim Achsen(1) As Diagramm.Achse
-        Achsen(0).Beschriftung = BlueM1.OptZieleListe(0).Bezeichnung
-        Achsen(1).Beschriftung = BlueM1.OptParameterListe(0).Bezeichnung
-
-        'Diagramm initialisieren
-        Call Diag.DiagInitialise_MO("Sensiplot", Achsen)
+        'Diagramm vorbereiten und initialisieren
+        Call PrepareDiagramm()
         
         ReDim Wave1.WaveList(Anz_Sim + 1)
         
@@ -502,6 +504,11 @@ Partial Class Form1
 
     Private Function CombiBM_STARTEN() As Boolean
 
+        'Fehlerabfragen
+        If (BlueM1.OptZieleListe.GetLength(0) > 2) Then
+            Throw New Exception("Zu viele Ziele für CES. Max=2")
+        End If
+
         Dim durchlauf As Integer = 0
 
         'BlueM wird an CES übergeben um Zugriff auf alle Objekte zu haben
@@ -514,26 +521,9 @@ Partial Class Form1
         'Arrays werden Dimensioniert
         Call CES1.Dim_Parents_BM()
         Call CES1.Dim_Childs_BM()
-
-        'TeeChart initialisieren
-        If BlueM1.OptZieleListe.GetLength(0) = 1 Then
-            'SingleObjective
-            Dim n_kalk As Integer = CES1.n_Gen * (CES1.ChildList_BM.GetLength(0))
-            Dim Achse as Diagramm.Achse
-            Achse.Beschriftung = BlueM1.OptZieleListe(0).Bezeichnung
-            Call Diag.DiagInitialise_SO("CES", Achse, 4, n_kalk)
         
-        Else if BlueM1.OptZieleListe.GetLength(0) = 2 then
-            'MultiObjective
-            Dim Achsen() as Diagramm.Achse = {}
-            For i = 0 to BlueM1.OptZieleListe.GetUpperBound(0)
-                Achsen(i).Beschriftung = BlueM1.OptZieleListe(i).Bezeichnung
-            Next
-           Call Diag.DiagInitialise_MO("CES", Achsen)
-        
-        Else
-            MsgBox("Zu viele Ziele. Max=2", MsgBoxStyle.Exclamation, "Fehler")
-        End If
+        'Diagramm vorbereiten und initialisieren        
+        Call PrepareDiagramm()
 
         'Zufällige Kinderpfade werden generiert
         Call CES1.Generate_Random_Path_BM()
@@ -948,9 +938,12 @@ ErrCode_ES_STARTEN:
     '*************************************************
     Private Sub PrepareDiagramm()
 
+        Dim i as Integer
+
         Select Case Anwendung
 
-            'Spezialfall Tesprobleme:
+            'Testprobleme:
+            '-------------
             Case ANW_TESTPROBLEME
 
                 Select Case Testprobleme1.Combo_Testproblem.Text
@@ -964,13 +957,47 @@ ErrCode_ES_STARTEN:
                         Call Diag.DiagInitialise_MultiTestProb(EVO_Einstellungen1, Testprobleme1.Combo_Testproblem.Text)
                 End Select
 
+            'SensiPlot:
+            '----------
+            Case ANW_SENSIPLOT_MODPARA
+                
+                'Initialisierung von TeeChart
+                '----------------------------
+
+                'Achsen:
+                Dim Achse as Diagramm.Achse
+                Dim Achsen As New Collection
+                'X-Achse = QWert
+                Achse.Name = BlueM1.OptZieleListe(0).Bezeichnung
+                Achse.Auto = True
+                Achse.Max = 0
+                Achsen.Add(Achse)
+                'Y-Achse = OptParameter
+                Achse.Name = BlueM1.OptParameterListe(0).Bezeichnung
+                Achse.Auto = True
+                Achse.Max = 0
+                Achsen.Add(Achse)
+            
+                'Diagramm initialisieren
+                Call Diag.DiagInitialise(Anwendung, Achsen)
+
+                'Series initialisieren
+                Dim tmpPoint As New Steema.TeeChart.Styles.Points(Me.Diag.Chart)
+                tmpPoint.Title = "Simulationsergebnis"
+                tmpPoint.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+                tmpPoint.Color = System.Drawing.Color.Orange
+                tmpPoint.Pointer.HorizSize = 2
+                tmpPoint.Pointer.VertSize = 2
+
             'Alle anderen Anwendungen:
+            '-------------------------
             Case Else
 
                 Dim n_Kalkulationen As Integer
                 Dim n_Populationen As Integer
 
                 'Anzahl Kalkulationen
+                '--------------------
                 If EVO_Einstellungen1.isPOPUL Then
                     n_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden
                 Else
@@ -978,26 +1005,42 @@ ErrCode_ES_STARTEN:
                 End If
 
                 'Anzahl Populationen
+                '-------------------
                 n_Populationen = 1
                 If EVO_Einstellungen1.isPOPUL Then
                     n_Populationen = EVO_Einstellungen1.NPopul
                 End If
 
+                'Initialisierung von TeeChart
+                '----------------------------
+
                 'Achsen:
-                Dim Achsen() As Diagramm.Achse = {}
-                ReDim Achsen(BlueM1.OptZieleListe.GetUpperBound(0))
-                'HACK: bisher nur für Anwendung BlueM
-                For i As Integer = 0 To BlueM1.OptZieleListe.GetUpperBound(0)
-                    Achsen(i).Beschriftung = BlueM1.OptZieleListe(i).Bezeichnung
+                Dim Achse as Diagramm.Achse
+                Dim Achsen As New Collection
+                'Bei SO: X-Achse = Simulationen
+                If (EVO_Einstellungen1.isMultiObjective = False) Then
+                    Achse.Name = "Simulation"
+                    Achse.Auto = False
+                    Achse.Max = n_Kalkulationen
+                    Achsen.Add(Achse)
+                End If
+                'für jede Zielfunktion eine weitere Achse hinzufügen
+                'HACK: Diagramm-Achsen bisher nur für Anwendung BlueM!
+                For i = 0 To BlueM1.OptZieleListe.GetUpperBound(0)
+                    Achse.Name = BlueM1.OptZieleListe(i).Bezeichnung
+                    Achse.Auto = True
+                    Achse.Max = 0
+                    Achsen.Add(Achse)
                 Next
 
-                'Initialisierung der TeeChart Serien je nach SO oder MO
-                '------------------------------------------------------
-                'TODO: SO/MO vereinheitlichen
+                'Diagramm initialisieren
+                Call Diag.DiagInitialise(Anwendung, Achsen)
+
+                'Series initialisieren
                 If (EVO_Einstellungen1.isMultiObjective = False) Then
-                    Call Diag.DiagInitialise_SO(Anwendung, Achsen(0), n_Populationen, n_Kalkulationen)
+                    Call Diag.prepareSeries_SO(n_Populationen)
                 Else
-                    Call Diag.DiagInitialise_MO(Anwendung, Achsen)
+                    Call Diag.prepareSeries_MO()
                 End If
 
         End Select

@@ -1,92 +1,90 @@
 Public Class Diagramm
     Inherits Steema.TeeChart.TChart
 
-Public Structure Achse
-        Public Beschriftung as String
-        Public Max as Double
-End Structure
+    Public Structure Achse
+            Public Name as String
+            Public Auto as Boolean
+            Public Max as Double
+    End Structure
 
-    'TeeChart Initialisierung für SingleObjective
-    '********************************************
-    Public Sub DiagInitialise_SO(ByVal Titel as String, ByVal Achse as Achse, ByVal n_Populationen As Integer, ByVal n_Kalkulationen As Integer)
+    'TeeChart Initialisierung (Titel und Achsen)
+    '*******************************************
+    Public Sub DiagInitialise(ByVal Titel As String, ByVal Achsen As Collection)
+
+        With Me
+            .Clear()
+            .Header.Text = Titel
+            .Aspect.View3D = False
+            .Legend.Visible = False
+
+            'Formatierung der Axen
+            '---------------------
+            'X-Achse:
+            .Chart.Axes.Bottom.Title.Caption = Achsen(1).Name
+            .Chart.Axes.Bottom.Automatic = Achsen(1).Auto
+            .Chart.Axes.Bottom.Minimum = 0
+            .Chart.Axes.Bottom.Maximum = Achsen(1).Max
+            'Y-Achse:
+            .Chart.Axes.Left.Title.Caption = Achsen(2).Name
+            .Chart.Axes.Left.Automatic = Achsen(2).Auto
+            .Chart.Axes.Left.Minimum = 0
+            .Chart.Axes.Bottom.Maximum = Achsen(2).Max
+        End With
+
+    End Sub
+
+    'Serien-Initialisierung für SingleObjective
+    '******************************************
+    Public Sub prepareSeries_SO(ByVal n_Populationen As Integer)
 
         Dim i As Integer
 
-        With Me
-            .Clear()
-            .Header.Text = Titel
-            .Aspect.View3D = False
-            .Legend.Visible = False
+        'Series(0): Anfangswert
+        Dim tmpSeries As New Steema.TeeChart.Styles.Points(Me.Chart)
+        tmpSeries.Title = "Anfangswert"
+        tmpSeries.Color = System.Drawing.Color.Red
+        tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+        tmpSeries.Pointer.HorizSize = 3
+        tmpSeries.Pointer.VertSize = 3
 
-            'Series(0): Anfangswert
-            Dim Point0 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point0.Title = "Anfangswert"
-            Point0.Color = System.Drawing.Color.Red
-            Point0.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point0.Pointer.HorizSize = 3
-            Point0.Pointer.VertSize = 3
+        'Series(1 bis n): Für jede Population eine Series
+        For i = 1 To n_Populationen
+            tmpSeries = New Steema.TeeChart.Styles.Points(Me.Chart)
+            tmpSeries.Title = "Population " & i.ToString()
+            tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            tmpSeries.Pointer.HorizSize = 2
+            tmpSeries.Pointer.VertSize = 2
+        Next
 
-            'Series(1 bis n): Für jede Population eine Series 'TODO: es würde auch eine Series für alle reichen!
-            For i = 1 To n_Populationen
-                Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
-                Point1.Title = "Population " & i.ToString()
-                Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-                Point1.Pointer.HorizSize = 2
-                Point1.Pointer.VertSize = 2
-            Next i
-
-            'Formatierung der Axen
-            .Chart.Axes.Bottom.Title.Caption = "Simulation"
-            .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Maximum = n_Kalkulationen
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Left.Title.Caption = Achse.Beschriftung
-            .Chart.Axes.Left.Automatic = True
-            .Chart.Axes.Left.Minimum = 0
-        End With
     End Sub
 
-    'TeeChart Initialisierung für MultiObjective
-    '*******************************************
-    Public Sub DiagInitialise_MO(Titel as String, ByVal Achsen() As Achse)
+    'Serien-Initialisierung für MultiObjective
+    '*****************************************
+    Public Sub prepareSeries_MO()
 
-        With Me
-            .Clear()
-            .Header.Text = Titel
-            .Aspect.View3D = False
-            .Legend.Visible = False
+        'Series(0): Series für die Population.
+        Dim tmpSeries As New Steema.TeeChart.Styles.Points(Me.Chart)
+        tmpSeries.Title = "Population"
+        tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+        tmpSeries.Color = System.Drawing.Color.Orange
+        tmpSeries.Pointer.HorizSize = 2
+        tmpSeries.Pointer.VertSize = 2
 
-            'Formatierung der Axen
-            .Chart.Axes.Bottom.Title.Caption = Achsen(0).Beschriftung
-            .Chart.Axes.Bottom.Automatic = True
-            .Chart.Axes.Left.Title.Caption = Achsen(1).Beschriftung
-            .Chart.Axes.Left.Automatic = True
+        'Series(1): Series für die Sekundäre Population
+        tmpSeries = New Steema.TeeChart.Styles.Points(Me.Chart)
+        tmpSeries.Title = "Sekundäre Population"
+        tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+        tmpSeries.Color = System.Drawing.Color.Blue
+        tmpSeries.Pointer.HorizSize = 3
+        tmpSeries.Pointer.VertSize = 3
 
-            'Series(0): Series für die Population.
-            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point1.Title = "Population"
-            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point1.Color = System.Drawing.Color.Orange
-            Point1.Pointer.HorizSize = 2
-            Point1.Pointer.VertSize = 2
-
-            'Series(1): Series für die Sekundäre Population
-            Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point2.Title = "Sekundäre Population"
-            Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point2.Color = System.Drawing.Color.Blue
-            Point2.Pointer.HorizSize = 3
-            Point2.Pointer.VertSize = 3
-
-            'Series(2): Series für Bestwert
-            Dim Point3 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point3.Title = "Bestwerte"
-            Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point3.Color = System.Drawing.Color.Green
-            Point3.Pointer.HorizSize = 3
-            Point3.Pointer.VertSize = 3
-
-        End With
+        'Series(2): Series für Bestwert
+        tmpSeries = New Steema.TeeChart.Styles.Points(Me.Chart)
+        tmpSeries.Title = "Bestwerte"
+        tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+        tmpSeries.Color = System.Drawing.Color.Green
+        tmpSeries.Pointer.HorizSize = 3
+        tmpSeries.Pointer.VertSize = 3
 
     End Sub
 
