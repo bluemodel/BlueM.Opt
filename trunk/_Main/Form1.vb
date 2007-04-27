@@ -312,15 +312,15 @@ Partial Class Form1
                 Case ANW_RESETPARA_RUNBM
                     Call BlueM1.launchSim()
                 Case ANW_SENSIPLOT_MODPARA
-                    myIsOK = SensiPlot_STARTEN(SensiPlot1.Selected_OptParameter, SensiPlot1.Selected_OptZiel, SensiPlot1.Selected_SensiType, SensiPlot1.Anz_Sim)
+                    Call SensiPlot_STARTEN(SensiPlot1.Selected_OptParameter, SensiPlot1.Selected_OptZiel, SensiPlot1.Selected_SensiType, SensiPlot1.Anz_Sim)
                 Case ANW_BLAUESMODELL
-                    myIsOK = ES_STARTEN()
+                    Call ES_STARTEN()
                 Case ANW_COMBIBM
-                    myIsOK = CombiBM_STARTEN()
+                    Call CombiBM_STARTEN()
                 Case ANW_TESTPROBLEME
-                    myIsOK = ES_STARTEN()
+                    Call ES_STARTEN()
                 Case ANW_TSP
-                    myIsOK = TSP_STARTEN()
+                    Call TSP_STARTEN()
             End Select
 
         'Fehlerbehandlung:
@@ -338,8 +338,7 @@ Partial Class Form1
     '           Anwendung SensiPlot - START; läuft ohne Evolutionsstrategie             
     '************************************************************************************
 
-    Private Function SensiPlot_STARTEN(ByRef Selected_OptParameter As String, ByRef Selected_OptZiel As String, ByRef Selected_SensiType As String, ByRef Anz_Sim As Integer) As Boolean
-        SensiPlot_STARTEN = False
+    Private Sub SensiPlot_STARTEN(ByRef Selected_OptParameter As String, ByRef Selected_OptZiel As String, ByRef Selected_SensiType As String, ByRef Anz_Sim As Integer)
 
         globalAnzZiel_ParaOpt = 2
         globalAnzRand = 0
@@ -442,14 +441,13 @@ Partial Class Form1
         Call Wave1.ShowDialog()
         System.Windows.Forms.Application.DoEvents()
 
-        SensiPlot_STARTEN = True
-    End Function
+    End Sub
 
 
     '                      Anwendung Traveling Salesman - Start                         
     '************************************************************************************
 
-    Private Function TSP_STARTEN() As Boolean
+    Private Sub TSP_STARTEN()
 
         'Laufvariable für die Generationen
         Dim gen As Integer
@@ -497,12 +495,12 @@ Partial Class Form1
 
         Next gen
 
-    End Function
+    End Sub
 
     '           Anwendung CombiBM - START; läuft ohne Evolutionsstrategie             
     '************************************************************************************
 
-    Private Function CombiBM_STARTEN() As Boolean
+    Private Sub CombiBM_STARTEN()
 
         'Fehlerabfragen
         If (BlueM1.OptZieleListe.GetLength(0) > 2) Then
@@ -558,10 +556,8 @@ Partial Class Form1
                 'Zeichnen der Kinder
                 If BlueM1.OptZieleListe.GetLength(0) = 1 Then
                     Call Diag.Series(0).Add(durchlauf, CES1.ChildList_BM(i).Quality_SO)
-                Else if BlueM1.OptZieleListe.GetLength(0) = 2 then
-                    Call Diag.Series(0).Add(CES1.ChildList_BM(i).Quality_MO(0), CES1.ChildList_BM(i).Quality_MO(1))
                 Else
-                    MsgBox("Zu viele Ziele. Max=2",MsgBoxStyle.Exclamation,"Fehler")
+                    Call Diag.Series(0).Add(CES1.ChildList_BM(i).Quality_MO(0), CES1.ChildList_BM(i).Quality_MO(1))
                 End If
 
                 ''HACK zum zeichnen aller Qualitäten
@@ -571,17 +567,16 @@ Partial Class Form1
                 System.Windows.Forms.Application.DoEvents()
             Next
 
-                            If BlueM1.OptZieleListe.GetLength(0) = 1 Then
-            'Sortieren der Kinden anhand der Qualität
-            Call CES1.Sort_Faksimile_BM(CES1.ChildList_BM)
+            If BlueM1.OptZieleListe.GetLength(0) = 1 Then
+                'Sortieren der Kinden anhand der Qualität
+                Call CES1.Sort_Faksimile_BM(CES1.ChildList_BM)
 
                 'Selectionsprozess je nach "plus" oder "minus" Strategie
                 Call CES1.Selection_Process_BM()
-            ElseIf BlueM1.OptZieleListe.GetLength(0) = 2 Then
-                'call 
 
             Else
-                MsgBox("Zu viele Ziele. Max=2", MsgBoxStyle.Exclamation, "Fehler")
+                'call 
+
             End If
 
             ''Zeichnen des besten Elter
@@ -601,17 +596,15 @@ Partial Class Form1
 
         Next
 
-    End Function
+    End Sub
 
 
     '     Anwendung Evolutionsstrategie für Parameter Optimierung - hier Steuerung       
     '************************************************************************************
 
-    Private Function ES_STARTEN() As Boolean
+    Private Sub ES_STARTEN()
         '==========================
-        Dim isOK As Boolean
         Dim i As Integer
-        Dim Txt As String
         '--------------------------
         Dim durchlauf As Integer
         '--------------------------
@@ -640,10 +633,6 @@ Partial Class Form1
         Dim QN() As Double = {}
         Dim RN() As Double = {}
         '--------------------------
-
-        'TODO: On Error GoTo Err_ES_STARTEN
-
-        ES_STARTEN = False
 
         'TODO: If (ipop + igen + inachf + irunde) > 4 Then GoTo Start_Evolutionsrunden
 
@@ -678,24 +667,19 @@ Partial Class Form1
 
         'Kontrolle der Variablen
         If NRunden = 0 Or NPopul = 0 Or NPopEltern = 0 Then
-            Txt = "Anzahl der Runden, Populationen oder Populationseltern ist zu klein!"
-            GoTo ErrCode_ES_STARTEN
+            Throw New Exception("Anzahl der Runden, Populationen oder Populationseltern ist zu klein!")
         End If
         If NGen = 0 Or NEltern = 0 Or NNachf = 0 Then
-            Txt = "Anzahl der Generationen, Eltern oder Nachfolger ist zu klein!"
-            GoTo ErrCode_ES_STARTEN
+            Throw New Exception("Anzahl der Generationen, Eltern oder Nachfolger ist zu klein!")
         End If
         If rDeltaStart < 0 Then
-            Txt = "Die Startschrittweite ist unzulässig oder kleiner als die minimale Schrittweite!"
-            GoTo ErrCode_ES_STARTEN
+            Throw New Exception("Die Startschrittweite ist unzulässig oder kleiner als die minimale Schrittweite!")
         End If
         If globalAnzPar = 0 Then
-            Txt = "Die Anzahl der Parameter ist unzulässig!"
-            GoTo ErrCode_ES_STARTEN
+            Throw New Exception("Die Anzahl der Parameter ist unzulässig!")
         End If
         If NPopul < NPopEltern Then
-            Txt = "Die Anzahl der Populationseltern darf nicht größer als die Anzahl der Populationen sein!"
-            GoTo ErrCode_ES_STARTEN
+            Throw New Exception("Die Anzahl der Populationseltern darf nicht größer als die Anzahl der Populationen sein!")
         End If
 
         'Diagramm vorbereiten und initialisieren
@@ -710,12 +694,12 @@ Partial Class Form1
         'Die öffentlichen dynamischen Arrays werden initialisiert (Dn, An, Xn, Xmin, Xmax)
         'und die Anzahl der Zielfunktionen wird festgelegt
         '******************************************************************************************
-        isOK = evolutionsstrategie.EsIni(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand)
+        myIsOK = evolutionsstrategie.EsIni(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand)
 
         '3. Schritt: CEvolutionsstrategie - ES_OPTIONS
         'Optionen der Evolutionsstrategie werden übergeben
         '******************************************************************************************
-        isOK = evolutionsstrategie.EsOptions(iEvoTyp, iPopEvoTyp, isPOPUL, NRunden, NPopul, NPopEltern, iOptPopEltern, iOptEltern, iPopPenalty, NGen, NEltern, NNachf, NRekombXY, rDeltaStart, iStartPar, isdnvektor, isMultiObjective, isPareto, isPareto3D, Interact, isInteract, NMemberSecondPop)
+        myIsOK = evolutionsstrategie.EsOptions(iEvoTyp, iPopEvoTyp, isPOPUL, NRunden, NPopul, NPopEltern, iOptPopEltern, iOptEltern, iPopPenalty, NGen, NEltern, NNachf, NRekombXY, rDeltaStart, iStartPar, isdnvektor, isMultiObjective, isPareto, isPareto3D, Interact, isInteract, NMemberSecondPop)
 
         '4. Schritt: CEvolutionsstrategie - ES_LET_PARAMETER
         'Ausgangsparameter werden übergeben
@@ -806,9 +790,9 @@ Start_Evolutionsrunden:
                         '************************************************************************************
                         Select Case Anwendung
                             Case ANW_TESTPROBLEME
-                                myIsOK = Testprobleme1.Evaluierung_TestProbleme(Testprobleme1.Combo_Testproblem.Text, globalAnzPar, mypara, durchlauf, ipop, QN, RN, Diag)
+                                Call Testprobleme1.Evaluierung_TestProbleme(Testprobleme1.Combo_Testproblem.Text, globalAnzPar, mypara, durchlauf, ipop, QN, RN, Diag)
                             Case ANW_BLAUESMODELL
-                                myIsOK = BlueM1.Eval_Sim_ParaOpt(globalAnzPar, globalAnzZiel_ParaOpt, mypara, durchlauf, ipop, QN, Diag)
+                                Call BlueM1.Eval_Sim_ParaOpt(globalAnzPar, globalAnzZiel_ParaOpt, mypara, durchlauf, ipop, QN, Diag)
                         End Select
 
                         'Einordnen der Qualitätsfunktion im Bestwertspeicher
@@ -865,22 +849,8 @@ Start_Evolutionsrunden:
         'UPGRADE_NOTE: Das Objekt evolutionsstrategie kann erst dann gelöscht werden, wenn die Garbagecollection durchgeführt wurde. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1029"'
         'TODO: Ersetzen durch dispose funzt net
         evolutionsstrategie = Nothing
-        ES_STARTEN = True
 
-EXIT_ES_STARTEN:
-        'Cursor setzen
-        'System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
-        Exit Function
-        'xxxxxxxxxxxxxxxxxxxxxxxxxx
-Err_ES_STARTEN:
-        Beep()
-        MsgBox("ES_STARTEN: " & ErrorToString(), MsgBoxStyle.Critical)
-        GoTo EXIT_ES_STARTEN
-ErrCode_ES_STARTEN:
-        Beep()
-        MsgBox("ES_STARTEN: " & Txt, MsgBoxStyle.Information)
-        GoTo EXIT_ES_STARTEN
-    End Function
+    End Sub
 
 
     '************************************************************************************

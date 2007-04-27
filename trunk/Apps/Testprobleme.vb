@@ -171,7 +171,7 @@ Public Class Testprobleme
     '                      Evaluierung der Testprobleme                                 *
     '************************************************************************************
 
-    Public Function Evaluierung_TestProbleme(ByRef Testproblem As String, ByVal globalAnzPar As Short, ByVal mypara(,) As Double, ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN() As Double, ByRef RN() As Double, ByRef Diag As Steema.TeeChart.TChart) As Boolean
+    Public Sub Evaluierung_TestProbleme(ByRef Testproblem As String, ByVal globalAnzPar As Short, ByVal mypara(,) As Double, ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN() As Double, ByRef RN() As Double, ByRef Diag As Steema.TeeChart.TChart)
 
         Dim i As Short
         Dim Unterteilung_X As Double
@@ -304,8 +304,8 @@ Public Class Testprobleme
                 RN(2) = g2
                 Call Zielfunktion_zeichnen_MultiObPar_3D(f1, f2, f3, Diag)
         End Select
-        Evaluierung_TestProbleme = True
-    End Function
+
+    End Sub
 
     '************************************************************************************
     '                          Zeichenfunktionen                                        *

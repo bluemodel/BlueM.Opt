@@ -369,7 +369,8 @@ Public MustInherit Class Sim
 
     'Evaluierung des SimModells für Parameter Optimierung - Steuerungseinheit
     '************************************************************************
-    Public Function Eval_Sim_ParaOpt(ByVal GlobalAnzPar As Short, ByVal GlobalAnzZiel As Short, ByVal mypara As Double(,), ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN As Double(), ByRef TChart1 As Steema.TeeChart.TChart) As Boolean
+    Public Sub Eval_Sim_ParaOpt(ByVal GlobalAnzPar As Short, ByVal GlobalAnzZiel As Short, ByVal mypara As Double(,), ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN As Double(), ByRef TChart1 As Steema.TeeChart.TChart)
+
         Dim i As Short
 
         'Mutierte Parameter an OptParameter übergeben
@@ -408,7 +409,7 @@ Public MustInherit Class Sim
             Call db_update(durchlauf, ipop)
         End If
 
-    End Function
+    End Sub
 
     'Evaluierung des SimModells für Kombinatorik Optimierung - Steuerungseinheit
     '***************************************************************************
