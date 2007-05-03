@@ -24,13 +24,14 @@ Partial Class Form1
 
     Private IsInitializing As Boolean
 
-    Private Anwendung As String                'zu optimierende Anwendung
-    Private Const ANW_RESETPARA_RUNBM As String = "ResetPara & RunBM"
-    Private Const ANW_SENSIPLOT_MODPARA As String = "SensiPlot ModPara"
-    Private Const ANW_BLAUESMODELL As String = "Blaues Modell"
-    Private Const ANW_COMBIBM As String = "BM Combinatorics"
-    Private Const ANW_TESTPROBLEME As String = "Test-Probleme"
-    Private Const ANW_TSP As String = "TS-Problem"
+    'zu optimierende Anwendung
+    Private Anwendung As String
+    Private Const ANW_BM_RESET As String = "BlueM Reset"
+    Private Const ANW_BM_SENSIPLOT As String = "BlueM SensiPlot"
+    Private Const ANW_BM_PES As String = "BlueM PES"
+    Private Const ANW_BM_CES As String = "BlueM CES"
+    Private Const ANW_TESTPROBLEME As String = "Testprobleme"
+    Private Const ANW_TSP As String = "Traveling Salesman"
 
     '**** Deklarationen der Module *****
     Public BlueM1 As New Apps.BlueM
@@ -62,7 +63,7 @@ Partial Class Form1
         System.Windows.Forms.Application.EnableVisualStyles()
 
         'Liste der Anwendungen in ComboBox schreiben und Anfangseinstellung wählen
-        ComboBox_Anwendung.Items.AddRange(New Object() {"", ANW_RESETPARA_RUNBM, ANW_SENSIPLOT_MODPARA, ANW_BLAUESMODELL, ANW_COMBIBM, ANW_TESTPROBLEME, ANW_TSP})
+        ComboBox_Anwendung.Items.AddRange(New Object() {"", ANW_BM_RESET, ANW_BM_PES, ANW_BM_CES, ANW_BM_SENSIPLOT, ANW_TESTPROBLEME, ANW_TSP})
         ComboBox_Anwendung.SelectedIndex = 0
 
         'Ende der Initialisierung
@@ -72,9 +73,8 @@ Partial Class Form1
 
 #Region "Initialisierung der Anwendungen"
 
-    '************************************************************************************
-    '*********** Die Anwendung wurde ausgewählt und wird jetzt initialisiert ************
-    '************************************************************************************
+    'Die Anwendung wurde ausgewählt und wird jetzt initialisiert
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
     'Auswahl der zu optimierenden Anwendung geändert
     '***********************************************
@@ -99,18 +99,18 @@ Partial Class Form1
                 Anwendung = ComboBox_Anwendung.SelectedItem
 
                 Select Case Anwendung
-                    Case ""
-                        'Keine Anwendung ausgewählt
-                        'xxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    Case "" 'Keine Anwendung ausgewählt
+                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                         'Testprobleme und Evo Deaktivieren
                         Testprobleme1.Enabled = False
                         EVO_Einstellungen1.Enabled = False
+                        Exit Try
 
 
-                    Case ANW_RESETPARA_RUNBM
-                        'Anwendung ResetPara & RunBM
-                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                    Case ANW_BM_RESET 'Anwendung ResetPara & RunBM
+                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                         'Voreinstellungen lesen EVO.INI
                         Call ReadEVOIni()
@@ -129,9 +129,8 @@ Partial Class Form1
                         MsgBox("Die Startwerte der Optimierungsparameter wurden in die Eingabedateien geschrieben.", MsgBoxStyle.Information, "Info")
 
 
-                    Case ANW_SENSIPLOT_MODPARA
-                        'Anwendung SensiPlot
-                        'xxxxxxxxxxxxxxxxxxx
+                    Case ANW_BM_SENSIPLOT 'Anwendung SensiPlot
+                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                         'Voreinstellungen lesen EVO.INI
                         Call ReadEVOIni()
@@ -162,9 +161,8 @@ Partial Class Form1
                         End If
 
 
-                    Case ANW_BLAUESMODELL
-                        'Anwendung BlauesModell PES
-                        'xxxxxxxxxxxxxxxxxxxxxxxxxx
+                    Case ANW_BM_PES 'Anwendung BlauesModell PES
+                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                         'Voreinstellungen lesen EVO.INI
                         Call ReadEVOIni()
@@ -185,9 +183,8 @@ Partial Class Form1
                         Call BlueM1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
 
 
-                    Case ANW_COMBIBM
-                        'Anwendung BlauesModell CES
-                        'xxxxxxxxxxxxxxxxxxxxxxxxxx
+                    Case ANW_BM_CES 'Anwendung BlauesModell CES
+                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                         'Voreinstellungen lesen EVO.INI
                         Call ReadEVOIni()
@@ -231,9 +228,8 @@ Partial Class Form1
                         CES1.CES_Modus = "BM"
 
 
-                    Case ANW_TESTPROBLEME
-                        'Anwendung Testprobleme
-                        'xxxxxxxxxxxxxxxxxxxxxx
+                    Case ANW_TESTPROBLEME 'Anwendung Testprobleme
+                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                         'Test-Probleme und Evo aktivieren
                         Testprobleme1.Enabled = True
@@ -243,9 +239,8 @@ Partial Class Form1
                         Call Testprobleme1.Parameter_Uebergabe(Testprobleme1.Combo_Testproblem.Text, Testprobleme1.Text_Sinusfunktion_Par.Text, Testprobleme1.Text_Schwefel24_Par.Text, globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
 
 
-                    Case ANW_TSP
-                        'Anwendung Traveling Salesman Problem (TSP)
-                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                    Case ANW_TSP 'Anwendung Traveling Salesman Problem (TSP)
+                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                         Call CES1.TSP_Initialize(Diag)
                         'CES MOdus setzen -> "TSP" oder "BM" Optimierung
@@ -273,8 +268,8 @@ Partial Class Form1
     '**********************
     'Bug 94: ReadEVO.ini müsste hier raus nach BlueM und "Read_Model_OptConfig" heißen **
     Private Sub ReadEVOIni()
-    
-        Dim IsOK as Boolean = True
+
+        Dim IsOK As Boolean = True
 
         If File.Exists("EVO.ini") Then
             Try
@@ -332,37 +327,36 @@ Partial Class Form1
         If (IsOK = False) Then
             Throw New Exception("Fehler beim Einlesen der Datei ""EVO.ini""!")
         End If
-        
+
     End Sub
 
 #End Region
 
 #Region "Start Button Pressed"
 
-    '************************************************************************************
-    '************************* Start BUTTON wurde pressed *******************************
-    '************************************************************************************
+    'Start BUTTON wurde pressed
+    'XXXXXXXXXXXXXXXXXXXXXXXXXX
 
     Private Sub Button_Start_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Button_Start.Click
 
         Try
             myisrun = True
             Select Case Anwendung
-                Case ANW_RESETPARA_RUNBM
+                Case ANW_BM_RESET
                     Call BlueM1.launchSim()
-                Case ANW_SENSIPLOT_MODPARA
+                Case ANW_BM_SENSIPLOT
                     Call SensiPlot_STARTEN(SensiPlot1.Selected_OptParameter, SensiPlot1.Selected_OptZiel, SensiPlot1.Selected_SensiType, SensiPlot1.Anz_Sim)
-                Case ANW_BLAUESMODELL
+                Case ANW_BM_PES
                     Call ES_STARTEN()
-                Case ANW_COMBIBM
-                    Call CombiBM_STARTEN()
+                Case ANW_BM_CES
+                    Call BM_CES_STARTEN()
                 Case ANW_TESTPROBLEME
                     Call ES_STARTEN()
                 Case ANW_TSP
                     Call TSP_STARTEN()
             End Select
 
-        'Fehlerbehandlung:
+            'Fehlerbehandlung:
         Catch ex As Exception
             MsgBox(ex.Message, MsgBoxStyle.Critical, "Fehler")
         End Try
@@ -374,9 +368,8 @@ Partial Class Form1
     End Sub
 
 
-    '           Anwendung SensiPlot - START; läuft ohne Evolutionsstrategie             
-    '************************************************************************************
-
+    'Anwendung SensiPlot - START; läuft ohne Evolutionsstrategie             
+    '***********************************************************
     Private Sub SensiPlot_STARTEN(ByRef Selected_OptParameter As String, ByRef Selected_OptZiel As String, ByRef Selected_SensiType As String, ByRef Anz_Sim As Integer)
 
         globalAnzZiel_ParaOpt = 2
@@ -434,9 +427,9 @@ Partial Class Form1
 
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
-        
+
         ReDim Wave1.WaveList(Anz_Sim + 1)
-        
+
         'ACHTUNG: Voraussetzung: Es liegt bereits eine .WEL-Datei vor!
         Apps.Sim.Read_WEL(BlueM1.WorkDir & BlueM1.Datensatz & ".wel", BlueM1.OptZieleListe(0).SimGr, Wave1.WaveList(0).Wave)
 
@@ -483,9 +476,8 @@ Partial Class Form1
     End Sub
 
 
-    '                      Anwendung Traveling Salesman - Start                         
-    '************************************************************************************
-
+    'Anwendung Traveling Salesman - Start                         
+    '************************************
     Private Sub TSP_STARTEN()
 
         'Laufvariable für die Generationen
@@ -536,10 +528,9 @@ Partial Class Form1
 
     End Sub
 
-    '           Anwendung CombiBM - START; läuft ohne Evolutionsstrategie             
-    '************************************************************************************
-
-    Private Sub CombiBM_STARTEN()
+    'Anwendung CombiBM - START; läuft ohne Evolutionsstrategie             
+    '*********************************************************
+    Private Sub BM_CES_STARTEN()
 
         'Fehlerabfragen
         If (BlueM1.OptZieleListe.GetLength(0) > 2) Then
@@ -558,7 +549,7 @@ Partial Class Form1
         'Arrays werden Dimensioniert
         Call CES1.Dim_Parents_BM()
         Call CES1.Dim_Childs_BM()
-        
+
         'Diagramm vorbereiten und initialisieren        
         Call PrepareDiagramm()
 
@@ -638,8 +629,8 @@ Partial Class Form1
     End Sub
 
 
-    '     Anwendung Evolutionsstrategie für Parameter Optimierung - hier Steuerung       
-    '************************************************************************************
+    'Anwendung Evolutionsstrategie für Parameter Optimierung - hier Steuerung       
+    '************************************************************************
 
     Private Sub ES_STARTEN()
         '==========================
@@ -830,7 +821,7 @@ Start_Evolutionsrunden:
                         Select Case Anwendung
                             Case ANW_TESTPROBLEME
                                 Call Testprobleme1.Evaluierung_TestProbleme(Testprobleme1.Combo_Testproblem.Text, globalAnzPar, mypara, durchlauf, ipop, QN, RN, Diag)
-                            Case ANW_BLAUESMODELL
+                            Case ANW_BM_PES
                                 Call BlueM1.Eval_Sim_ParaOpt(globalAnzPar, globalAnzZiel_ParaOpt, mypara, durchlauf, ipop, QN, Diag)
                         End Select
 
@@ -892,9 +883,8 @@ Start_Evolutionsrunden:
     End Sub
 
 
-    '************************************************************************************
-    '                          Zeichenfunktionen                                        *
-    '************************************************************************************
+    'Zeichenfunktionen
+    'XXXXXXXXXXXXXXXXX
 
     Private Sub Bestwertzeichnen_Pareto(ByRef Bestwert(,) As Double, ByRef ipop As Short)
         Dim i As Short
@@ -947,7 +937,7 @@ Start_Evolutionsrunden:
     '*************************************************
     Private Sub PrepareDiagramm()
 
-        Dim i as Integer
+        Dim i As Integer
 
         Select Case Anwendung
 
@@ -966,15 +956,15 @@ Start_Evolutionsrunden:
                         Call Diag.DiagInitialise_MultiTestProb(EVO_Einstellungen1, Testprobleme1.Combo_Testproblem.Text)
                 End Select
 
-            'SensiPlot:
-            '----------
-            Case ANW_SENSIPLOT_MODPARA
-                
+                'SensiPlot:
+                '----------
+            Case ANW_BM_SENSIPLOT
+
                 'Initialisierung von TeeChart
                 '----------------------------
 
                 'Achsen:
-                Dim Achse as Diagramm.Achse
+                Dim Achse As Diagramm.Achse
                 Dim Achsen As New Collection
                 'X-Achse = QWert
                 Achse.Name = BlueM1.OptZieleListe(0).Bezeichnung
@@ -986,7 +976,7 @@ Start_Evolutionsrunden:
                 Achse.Auto = True
                 Achse.Max = 0
                 Achsen.Add(Achse)
-            
+
                 'Diagramm initialisieren
                 Call Diag.DiagInitialise(Anwendung, Achsen)
 
@@ -998,8 +988,8 @@ Start_Evolutionsrunden:
                 tmpPoint.Pointer.HorizSize = 2
                 tmpPoint.Pointer.VertSize = 2
 
-            'Alle anderen Anwendungen:
-            '-------------------------
+                'Alle anderen Anwendungen:
+                '-------------------------
             Case Else
 
                 Dim n_Kalkulationen As Integer
@@ -1024,7 +1014,7 @@ Start_Evolutionsrunden:
                 '----------------------------
 
                 'Achsen:
-                Dim Achse as Diagramm.Achse
+                Dim Achse As Diagramm.Achse
                 Dim Achsen As New Collection
                 'Bei SO: X-Achse = Simulationen
                 If (EVO_Einstellungen1.isMultiObjective = False) Then
