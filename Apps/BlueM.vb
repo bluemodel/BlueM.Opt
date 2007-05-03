@@ -320,8 +320,8 @@ Public Class BlueM
 
     'Validierungsfunktion der Kombinatorik Prüft ob Verbraucher an zwei Standorten Dopp vorhanden sind
     '*************************************************************************************************
-    Public Function Combinatoric_is_Valid() As Boolean
-        Combinatoric_is_Valid = True
+    Public Sub Combinatoric_is_Valid()
+
         Dim i, j, x, y, m, n As Integer
 
         For i = 0 To LocationList.GetUpperBound(0)
@@ -332,7 +332,7 @@ Public Class BlueM
                             For n = 0 To 2
                                 If Not LocationList(i).MassnahmeListe(x).Schaltung(m, 0) = "X" And LocationList(j).MassnahmeListe(y).Schaltung(n, 0) = "X" Then
                                     If LocationList(i).MassnahmeListe(x).Schaltung(m, 0) = LocationList(j).MassnahmeListe(y).Schaltung(n, 0) Then
-                                        Combinatoric_is_Valid = False
+                                        Throw new Exception("Kombinatorik ist nicht valid!")
                                     End If
                                 End If
                             Next
@@ -341,7 +341,7 @@ Public Class BlueM
                 Next
             Next
         Next
-    End Function
+    End Sub
 
     'Liest die Verzweigungen aus dem BModel in ein Array ein
     '*******************************************************
@@ -393,9 +393,9 @@ Public Class BlueM
     End Sub
 
     'Mehrere Prüfungen ob die .VER Datei des BlueM und der .CES Datei auch zusammenpassen
-    '***************************
-    Public Function CES_fits_to_VER() As Boolean
-        CES_fits_to_VER = True
+    '************************************************************************************
+    Public Sub CES_fits_to_VER()
+
         Dim i As Integer = 0
         Dim j As Integer = 0
         Dim x As Integer = 0
@@ -448,18 +448,19 @@ Public Class BlueM
 
         'Übergabe
         If FoundB = False Then
-            CES_fits_to_VER = False
+            Throw New Exception(".VER und .CES Dateien passen nicht zusammen!")
         Else
             For i = 0 To FoundA.GetUpperBound(0)
                 If FoundA(i) = False Then
-                    CES_fits_to_VER = False
+                    Throw New Exception(".VER und .CES Dateien passen nicht zusammen!")
                 End If
             Next
         End If
 
-    End Function
+    End Sub
 
     'Die Liste mit den aktuellen Bauwerken des Kindes wird erstellt und in SKos geschrieben
+    '**************************************************************************************
     Public Sub Define_aktuelle_Bauwerke(ByVal Path() As Integer)
         Dim i, j As Integer
         Dim No As Integer

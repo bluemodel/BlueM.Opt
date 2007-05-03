@@ -32,6 +32,10 @@ Partial Class Form1
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.Button_Start = New System.Windows.Forms.Button
         Me.Button_IniApp = New System.Windows.Forms.Button
+        Me.Button_TChart2Excel = New System.Windows.Forms.Button
+        Me.Button_TChartSave = New System.Windows.Forms.Button
+        Me.Button_TChart2PNG = New System.Windows.Forms.Button
+        Me.Button_TChartEdit = New System.Windows.Forms.Button
         Me.Diag = New Main.Diagramm
         Me.GroupBox_Anwendung = New System.Windows.Forms.GroupBox
         Me.Label_Anwendung = New System.Windows.Forms.Label
@@ -40,10 +44,6 @@ Partial Class Form1
         Me.EVO_Opt_Verlauf1 = New EvoForm.EVO_Opt_Verlauf
         Me.EVO_Einstellungen1 = New EvoForm.EVO_Einstellungen
         Me.Testprobleme1 = New Apps.Testprobleme
-        Me.Button_TChart2Excel = New System.Windows.Forms.Button
-        Me.Button_TChartSave = New System.Windows.Forms.Button
-        Me.Button_TChart2PNG = New System.Windows.Forms.Button
-        Me.Button_TChartEdit = New System.Windows.Forms.Button
         Me.GroupBox_TChartButtons = New System.Windows.Forms.GroupBox
         Me.GroupBox_Anwendung.SuspendLayout()
         Me.GroupBox_TChartButtons.SuspendLayout()
@@ -53,6 +53,7 @@ Partial Class Form1
         '
         Me.Button_Start.BackColor = System.Drawing.SystemColors.Control
         Me.Button_Start.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Button_Start.Enabled = False
         Me.Button_Start.ForeColor = System.Drawing.SystemColors.ControlText
         Me.Button_Start.Location = New System.Drawing.Point(584, 652)
         Me.Button_Start.Name = "Button_Start"
@@ -72,6 +73,47 @@ Partial Class Form1
         Me.Button_IniApp.Text = "Ini"
         Me.ToolTip1.SetToolTip(Me.Button_IniApp, "Anwendung initialisieren")
         Me.Button_IniApp.UseVisualStyleBackColor = True
+        '
+        'Button_TChart2Excel
+        '
+        Me.Button_TChart2Excel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
+        Me.Button_TChart2Excel.Image = Global.Main.My.Resources.Resources.icon_excel
+        Me.Button_TChart2Excel.Location = New System.Drawing.Point(49, 19)
+        Me.Button_TChart2Excel.Name = "Button_TChart2Excel"
+        Me.Button_TChart2Excel.Size = New System.Drawing.Size(25, 25)
+        Me.Button_TChart2Excel.TabIndex = 1
+        Me.ToolTip1.SetToolTip(Me.Button_TChart2Excel, "als Excel-Datei speichern")
+        Me.Button_TChart2Excel.UseVisualStyleBackColor = False
+        '
+        'Button_TChartSave
+        '
+        Me.Button_TChartSave.Image = Global.Main.My.Resources.Resources.icon_teechart
+        Me.Button_TChartSave.Location = New System.Drawing.Point(80, 19)
+        Me.Button_TChartSave.Name = "Button_TChartSave"
+        Me.Button_TChartSave.Size = New System.Drawing.Size(25, 25)
+        Me.Button_TChartSave.TabIndex = 2
+        Me.ToolTip1.SetToolTip(Me.Button_TChartSave, "als natives TeeChart-Format speichern")
+        Me.Button_TChartSave.UseVisualStyleBackColor = True
+        '
+        'Button_TChart2PNG
+        '
+        Me.Button_TChart2PNG.Image = Global.Main.My.Resources.Resources.icon_png
+        Me.Button_TChart2PNG.Location = New System.Drawing.Point(111, 19)
+        Me.Button_TChart2PNG.Name = "Button_TChart2PNG"
+        Me.Button_TChart2PNG.Size = New System.Drawing.Size(25, 25)
+        Me.Button_TChart2PNG.TabIndex = 3
+        Me.ToolTip1.SetToolTip(Me.Button_TChart2PNG, "als PNG speichern")
+        Me.Button_TChart2PNG.UseVisualStyleBackColor = True
+        '
+        'Button_TChartEdit
+        '
+        Me.Button_TChartEdit.Image = Global.Main.My.Resources.Resources.icon_edit
+        Me.Button_TChartEdit.Location = New System.Drawing.Point(6, 19)
+        Me.Button_TChartEdit.Name = "Button_TChartEdit"
+        Me.Button_TChartEdit.Size = New System.Drawing.Size(25, 25)
+        Me.Button_TChartEdit.TabIndex = 0
+        Me.ToolTip1.SetToolTip(Me.Button_TChartEdit, "TChart editieren")
+        Me.Button_TChartEdit.UseVisualStyleBackColor = True
         '
         'Diag
         '
@@ -248,47 +290,6 @@ Partial Class Form1
         Me.Testprobleme1.Name = "Testprobleme1"
         Me.Testprobleme1.Size = New System.Drawing.Size(225, 121)
         Me.Testprobleme1.TabIndex = 7
-        '
-        'Button_TChart2Excel
-        '
-        Me.Button_TChart2Excel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
-        Me.Button_TChart2Excel.Image = Global.Main.My.Resources.Resources.icon_excel
-        Me.Button_TChart2Excel.Location = New System.Drawing.Point(49, 19)
-        Me.Button_TChart2Excel.Name = "Button_TChart2Excel"
-        Me.Button_TChart2Excel.Size = New System.Drawing.Size(25, 25)
-        Me.Button_TChart2Excel.TabIndex = 1
-        Me.ToolTip1.SetToolTip(Me.Button_TChart2Excel, "als Excel-Datei speichern")
-        Me.Button_TChart2Excel.UseVisualStyleBackColor = False
-        '
-        'Button_TChartSave
-        '
-        Me.Button_TChartSave.Image = Global.Main.My.Resources.Resources.icon_teechart
-        Me.Button_TChartSave.Location = New System.Drawing.Point(80, 19)
-        Me.Button_TChartSave.Name = "Button_TChartSave"
-        Me.Button_TChartSave.Size = New System.Drawing.Size(25, 25)
-        Me.Button_TChartSave.TabIndex = 2
-        Me.ToolTip1.SetToolTip(Me.Button_TChartSave, "als natives TeeChart-Format speichern")
-        Me.Button_TChartSave.UseVisualStyleBackColor = True
-        '
-        'Button_TChart2PNG
-        '
-        Me.Button_TChart2PNG.Image = Global.Main.My.Resources.Resources.icon_png
-        Me.Button_TChart2PNG.Location = New System.Drawing.Point(111, 19)
-        Me.Button_TChart2PNG.Name = "Button_TChart2PNG"
-        Me.Button_TChart2PNG.Size = New System.Drawing.Size(25, 25)
-        Me.Button_TChart2PNG.TabIndex = 3
-        Me.ToolTip1.SetToolTip(Me.Button_TChart2PNG, "als PNG speichern")
-        Me.Button_TChart2PNG.UseVisualStyleBackColor = True
-        '
-        'Button_TChartEdit
-        '
-        Me.Button_TChartEdit.Image = Global.Main.My.Resources.Resources.icon_edit
-        Me.Button_TChartEdit.Location = New System.Drawing.Point(6, 19)
-        Me.Button_TChartEdit.Name = "Button_TChartEdit"
-        Me.Button_TChartEdit.Size = New System.Drawing.Size(25, 25)
-        Me.Button_TChartEdit.TabIndex = 0
-        Me.ToolTip1.SetToolTip(Me.Button_TChartEdit, "TChart editieren")
-        Me.Button_TChartEdit.UseVisualStyleBackColor = True
         '
         'GroupBox_TChartButtons
         '
