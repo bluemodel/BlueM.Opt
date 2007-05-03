@@ -30,7 +30,9 @@ Partial Class SensiPlot
         Me.Label_AnzSim = New System.Windows.Forms.Label
         Me.RadioButton_Gleichverteilt = New System.Windows.Forms.RadioButton
         Me.RadioButton_Diskret = New System.Windows.Forms.RadioButton
+        Me.GroupBox_Modus = New System.Windows.Forms.GroupBox
         Me.TableLayoutPanel1.SuspendLayout()
+        Me.GroupBox_Modus.SuspendLayout()
         Me.SuspendLayout()
         '
         'TableLayoutPanel1
@@ -51,6 +53,7 @@ Partial Class SensiPlot
         'OK_Button
         '
         Me.OK_Button.Anchor = System.Windows.Forms.AnchorStyles.None
+        Me.OK_Button.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.OK_Button.Location = New System.Drawing.Point(3, 3)
         Me.OK_Button.Name = "OK_Button"
         Me.OK_Button.Size = New System.Drawing.Size(67, 23)
@@ -80,9 +83,9 @@ Partial Class SensiPlot
         Me.Label_OptParameter.AutoSize = True
         Me.Label_OptParameter.Location = New System.Drawing.Point(12, 13)
         Me.Label_OptParameter.Name = "Label_OptParameter"
-        Me.Label_OptParameter.Size = New System.Drawing.Size(69, 13)
+        Me.Label_OptParameter.Size = New System.Drawing.Size(75, 13)
         Me.Label_OptParameter.TabIndex = 2
-        Me.Label_OptParameter.Text = "OptPrameter:"
+        Me.Label_OptParameter.Text = "OptParameter:"
         '
         'ListBox_OptZiele
         '
@@ -105,19 +108,18 @@ Partial Class SensiPlot
         '
         Me.TextBox_AnzSim.BeepOnError = True
         Me.TextBox_AnzSim.HidePromptOnLeave = True
-        Me.TextBox_AnzSim.Location = New System.Drawing.Point(370, 83)
-        Me.TextBox_AnzSim.Mask = "#####"
+        Me.TextBox_AnzSim.Location = New System.Drawing.Point(370, 89)
+        Me.TextBox_AnzSim.Mask = "0999"
         Me.TextBox_AnzSim.Name = "TextBox_AnzSim"
         Me.TextBox_AnzSim.PromptChar = Global.Microsoft.VisualBasic.ChrW(32)
         Me.TextBox_AnzSim.Size = New System.Drawing.Size(67, 20)
         Me.TextBox_AnzSim.TabIndex = 7
         Me.TextBox_AnzSim.Text = "7"
-        Me.TextBox_AnzSim.ValidatingType = GetType(Integer)
         '
         'Label_AnzSim
         '
         Me.Label_AnzSim.AutoSize = True
-        Me.Label_AnzSim.Location = New System.Drawing.Point(294, 86)
+        Me.Label_AnzSim.Location = New System.Drawing.Point(294, 92)
         Me.Label_AnzSim.Name = "Label_AnzSim"
         Me.Label_AnzSim.Size = New System.Drawing.Size(62, 13)
         Me.Label_AnzSim.TabIndex = 8
@@ -127,7 +129,7 @@ Partial Class SensiPlot
         '
         Me.RadioButton_Gleichverteilt.AutoSize = True
         Me.RadioButton_Gleichverteilt.Checked = True
-        Me.RadioButton_Gleichverteilt.Location = New System.Drawing.Point(297, 32)
+        Me.RadioButton_Gleichverteilt.Location = New System.Drawing.Point(9, 19)
         Me.RadioButton_Gleichverteilt.Name = "RadioButton_Gleichverteilt"
         Me.RadioButton_Gleichverteilt.Size = New System.Drawing.Size(86, 17)
         Me.RadioButton_Gleichverteilt.TabIndex = 9
@@ -138,12 +140,23 @@ Partial Class SensiPlot
         'RadioButton_Diskret
         '
         Me.RadioButton_Diskret.AutoSize = True
-        Me.RadioButton_Diskret.Location = New System.Drawing.Point(297, 55)
+        Me.RadioButton_Diskret.Location = New System.Drawing.Point(9, 42)
         Me.RadioButton_Diskret.Name = "RadioButton_Diskret"
         Me.RadioButton_Diskret.Size = New System.Drawing.Size(58, 17)
         Me.RadioButton_Diskret.TabIndex = 10
         Me.RadioButton_Diskret.Text = "Diskret"
         Me.RadioButton_Diskret.UseVisualStyleBackColor = True
+        '
+        'GroupBox_Modus
+        '
+        Me.GroupBox_Modus.Controls.Add(Me.RadioButton_Diskret)
+        Me.GroupBox_Modus.Controls.Add(Me.RadioButton_Gleichverteilt)
+        Me.GroupBox_Modus.Location = New System.Drawing.Point(294, 13)
+        Me.GroupBox_Modus.Name = "GroupBox_Modus"
+        Me.GroupBox_Modus.Size = New System.Drawing.Size(143, 70)
+        Me.GroupBox_Modus.TabIndex = 11
+        Me.GroupBox_Modus.TabStop = False
+        Me.GroupBox_Modus.Text = "Modus"
         '
         'SensiPlot
         '
@@ -152,8 +165,7 @@ Partial Class SensiPlot
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.Cancel_Button
         Me.ClientSize = New System.Drawing.Size(452, 260)
-        Me.Controls.Add(Me.RadioButton_Diskret)
-        Me.Controls.Add(Me.RadioButton_Gleichverteilt)
+        Me.Controls.Add(Me.GroupBox_Modus)
         Me.Controls.Add(Me.Label_AnzSim)
         Me.Controls.Add(Me.TextBox_AnzSim)
         Me.Controls.Add(Me.Label_OptZiele)
@@ -169,6 +181,8 @@ Partial Class SensiPlot
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = "SensiPlot"
         Me.TableLayoutPanel1.ResumeLayout(False)
+        Me.GroupBox_Modus.ResumeLayout(False)
+        Me.GroupBox_Modus.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -184,5 +198,6 @@ Partial Class SensiPlot
     Friend WithEvents Label_AnzSim As System.Windows.Forms.Label
     Friend WithEvents RadioButton_Gleichverteilt As System.Windows.Forms.RadioButton
     Friend WithEvents RadioButton_Diskret As System.Windows.Forms.RadioButton
+    Friend WithEvents GroupBox_Modus As System.Windows.Forms.GroupBox
 
 End Class

@@ -77,9 +77,8 @@ Partial Class Form1
     '************************************************************************************
 
     'Auswahl der zu optimierenden Anwendung geändert
+    '***********************************************
     Private Sub IniApp(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_IniApp.Click, ComboBox_Anwendung.SelectedIndexChanged, Testprobleme1.Testproblem_Changed
-
-        Dim IsOK as Boolean = True
 
         If (Me.IsInitializing = True) Then
 
@@ -90,7 +89,10 @@ Partial Class Form1
 
         Else
 
-            Try 
+            Try
+                'Start Button deaktivieren
+                Me.Button_Start.Enabled = False
+
                 'Mauszeiger busy
                 Cursor = System.Windows.Forms.Cursors.WaitCursor
 
@@ -98,11 +100,18 @@ Partial Class Form1
 
                 Select Case Anwendung
                     Case ""
+                        'Keine Anwendung ausgewählt
+                        'xxxxxxxxxxxxxxxxxxxxxxxxxx
+
                         'Testprobleme und Evo Deaktivieren
                         Testprobleme1.Enabled = False
                         EVO_Einstellungen1.Enabled = False
 
+
                     Case ANW_RESETPARA_RUNBM
+                        'Anwendung ResetPara & RunBM
+                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
                         'Voreinstellungen lesen EVO.INI
                         Call ReadEVOIni()
                         'Testprobleme und Evo Deaktivieren
@@ -119,7 +128,11 @@ Partial Class Form1
 
                         MsgBox("Die Startwerte der Optimierungsparameter wurden in die Eingabedateien geschrieben.", MsgBoxStyle.Information, "Info")
 
+
                     Case ANW_SENSIPLOT_MODPARA
+                        'Anwendung SensiPlot
+                        'xxxxxxxxxxxxxxxxxxx
+
                         'Voreinstellungen lesen EVO.INI
                         Call ReadEVOIni()
                         'Testprobleme und Evo Deaktivieren
@@ -130,18 +143,29 @@ Partial Class Form1
                         BlueM1.Ergebnisdb = False
                         'BM-Einstellungen initialisieren 
                         Call BlueM1.Sim_Ini()
-                        'Sensi Plot Dialog starten und List_Boxen füllen
-                        Dim i As Integer
 
+                        'SensiPlot Dialog anzeigen:
+                        '--------------------------
+                        'List_Boxen füllen
+                        Dim i As Integer
                         For i = 0 To BlueM1.OptParameterListe.GetUpperBound(0)
-                            IsOK = SensiPlot1.ListBox_OptParameter_add(BlueM1.OptParameterListe(i).Bezeichnung)
+                            Call SensiPlot1.ListBox_OptParameter_add(BlueM1.OptParameterListe(i).Bezeichnung)
                         Next
                         For i = 0 To BlueM1.OptZieleListe.GetUpperBound(0)
-                            IsOK = SensiPlot1.ListBox_OptZiele_add(BlueM1.OptZieleListe(i).Bezeichnung)
+                            Call SensiPlot1.ListBox_OptZiele_add(BlueM1.OptZieleListe(i).Bezeichnung)
                         Next
-                        Call SensiPlot1.ShowDialog()
+                        'Dialog anzeigen
+                        Dim SensiPlotDiagResult As Windows.Forms.DialogResult
+                        SensiPlotDiagResult = SensiPlot1.ShowDialog()
+                        If (Not SensiPlotDiagResult = Windows.Forms.DialogResult.OK) Then
+                            Exit Try
+                        End If
+
 
                     Case ANW_BLAUESMODELL
+                        'Anwendung BlauesModell PES
+                        'xxxxxxxxxxxxxxxxxxxxxxxxxx
+
                         'Voreinstellungen lesen EVO.INI
                         Call ReadEVOIni()
                         'Evo aktivieren
@@ -160,7 +184,11 @@ Partial Class Form1
                         End If
                         Call BlueM1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
 
+
                     Case ANW_COMBIBM
+                        'Anwendung BlauesModell CES
+                        'xxxxxxxxxxxxxxxxxxxxxxxxxx
+
                         'Voreinstellungen lesen EVO.INI
                         Call ReadEVOIni()
                         'Evo deaktiviern
@@ -188,21 +216,25 @@ Partial Class Form1
 
                         'Überprüfen der Kombinatorik
                         'ToDo: Hier Message Box einbauen
-                        IsOK = BlueM1.Combinatoric_is_Valid
+                        Call BlueM1.Combinatoric_is_Valid()
 
                         'Einlesen der Verbraucher Datei
                         Call BlueM1.Verzweigung_Read()
 
                         'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
                         'ToDo: Hier Message Box einbauen
-                        IsOK = BlueM1.CES_fits_to_VER()
+                        Call BlueM1.CES_fits_to_VER()
 
                         'Call Initialisierung_BlauesModell_CombiOpt()
 
                         'CES MOdus setzen -> "TSP" oder "BM" Optimierung
                         CES1.CES_Modus = "BM"
 
+
                     Case ANW_TESTPROBLEME
+                        'Anwendung Testprobleme
+                        'xxxxxxxxxxxxxxxxxxxxxx
+
                         'Test-Probleme und Evo aktivieren
                         Testprobleme1.Enabled = True
                         EVO_Einstellungen1.Enabled = True
@@ -210,23 +242,30 @@ Partial Class Form1
                         'Globale Parameter werden gesetzt
                         Call Testprobleme1.Parameter_Uebergabe(Testprobleme1.Combo_Testproblem.Text, Testprobleme1.Text_Sinusfunktion_Par.Text, Testprobleme1.Text_Schwefel24_Par.Text, globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
 
+
                     Case ANW_TSP
+                        'Anwendung Traveling Salesman Problem (TSP)
+                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
                         Call CES1.TSP_Initialize(Diag)
                         'CES MOdus setzen -> "TSP" oder "BM" Optimierung
                         CES1.CES_Modus = "TSP"
 
                 End Select
 
-            'Fehlerbehandlung
-            '----------------
-            Catch except as Exception
+                'IniApp OK -> Start Button aktivieren
+                Me.Button_Start.Enabled = True
+
+            Catch except As Exception
+                'Fehlerbehandlung
                 MsgBox("Initialisierung der Anwendung fehlgeschlagen!" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Critical, "Fehler")
-            End try
+
+            End Try
+
+            'Mauszeiger wieder normal
+            Cursor = System.Windows.Forms.Cursors.Default
 
         End If
-
-        'Mauszeiger wieder normal
-        Cursor = System.Windows.Forms.Cursors.Default
 
     End Sub
 
