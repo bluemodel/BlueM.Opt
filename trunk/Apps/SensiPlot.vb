@@ -28,6 +28,17 @@ Public Class SensiPlot
             Exit Sub
         End If
 
+        'Modus
+        If (Me.RadioButton_Gleichverteilt.Checked) Then
+            Me.Selected_SensiType = Me.RadioButton_Gleichverteilt.Text
+        ElseIf (Me.RadioButton_Diskret.Checked) Then
+            Me.Selected_SensiType = Me.RadioButton_Diskret.Text
+        Else
+            MsgBox("Bitte einen Modus (Diskret / Gleichverteilt) auswählen!", MsgBoxStyle.Exclamation, "Fehler")
+            Me.DialogResult = Windows.Forms.DialogResult.None
+            Exit Sub
+        End If
+
         'Anzahl Simulationen
         Me.TextBox_AnzSim.ValidatingType = GetType(System.Int32)
         If (Me.TextBox_AnzSim.ValidateText() = Nothing) Then
