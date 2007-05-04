@@ -59,6 +59,9 @@ Public MustInherit Class Sim
                 Wert = value * (Max - Min) + Min
             End Set
         End Property
+        Public Overrides Function toString() As String
+            return Bezeichnung
+        End Function
     End Structure
 
     Public OptParameterListe() As OptParameter = {} 'Liste der Optimierungsparameter
@@ -95,6 +98,9 @@ Public MustInherit Class Sim
         Public ZielGr As String                     'Spalte der .wel Datei falls ZielReihe .wel Datei ist
         Public ZielReihe(,) As Object               'Die Zielreihe
         Public QWertTmp As Double                   'Qualitätswert der letzten Simulation wird hier zwischengespeichert 
+        Public Overrides Function toString() As String
+            Return Bezeichnung
+        End Function
     End Structure
 
     Public OptZieleListe() As OptZiel = {}          'Liste der Zielfunktionnen
@@ -386,7 +392,7 @@ Public MustInherit Class Sim
 
         'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
         For i = 0 To GlobalAnzZiel - 1                              'BUG 57: QN() fängt bei 1 an!
-            OptZieleListe(i).QWertTmp = QWert(i)
+            OptZieleListe(i).QWertTmp = QWert(OptZieleListe(i))
             QN(i + 1) = OptZieleListe(i).QWertTmp
         Next
 
@@ -421,7 +427,7 @@ Public MustInherit Class Sim
 
         'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
         For i = 0 To n_Ziele - 1                                    'BUG 57: QN() fängt bei 1 an!
-            OptZieleListe(i).QWertTmp = QWert(i)
+            OptZieleListe(i).QWertTmp = QWert(OptZieleListe(i))
             Quality(i) = OptZieleListe(i).QWertTmp
         Next
 
@@ -440,10 +446,9 @@ Public MustInherit Class Sim
 
     'Berechnung des Qualitätswerts (Zielwert)
     '****************************************
-    Public Function QWert(ByVal ZielNr As Integer) As Double
+    Public Function QWert(ByVal OptZiel As OptZiel) As Double
 
         QWert = 0
-        Dim OptZiel As OptZiel = OptZieleListe(ZielNr)
 
         Dim IsOK As Boolean
 

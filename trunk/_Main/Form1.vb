@@ -36,7 +36,6 @@ Partial Class Form1
     '**** Deklarationen der Module *****
     Public BlueM1 As New Apps.BlueM
     Public SensiPlot1 As New Apps.SensiPlot
-    Public Wave1 As New Apps.Wave
     Public CES1 As New EvoKern.CES
 
     '**** Globale Parameter Parameter Optimierung ****
@@ -148,10 +147,10 @@ Partial Class Form1
                         'List_Boxen füllen
                         Dim i As Integer
                         For i = 0 To BlueM1.OptParameterListe.GetUpperBound(0)
-                            Call SensiPlot1.ListBox_OptParameter_add(BlueM1.OptParameterListe(i).Bezeichnung)
+                            Call SensiPlot1.ListBox_OptParameter_add(BlueM1.OptParameterListe(i))
                         Next
                         For i = 0 To BlueM1.OptZieleListe.GetUpperBound(0)
-                            Call SensiPlot1.ListBox_OptZiele_add(BlueM1.OptZieleListe(i).Bezeichnung)
+                            Call SensiPlot1.ListBox_OptZiele_add(BlueM1.OptZieleListe(i))
                         Next
                         'Dialog anzeigen
                         Dim SensiPlotDiagResult As Windows.Forms.DialogResult
@@ -180,7 +179,11 @@ Partial Class Form1
                         ElseIf BlueM1.OptZieleListe.GetLength(0) > 1 Then
                             EVO_Einstellungen1.OptModus = 1
                         End If
+
+                        'Parameterübergabe an ES
                         Call BlueM1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
+
+                        'WEL-Chart vorbereiten
 
 
                     Case ANW_BM_CES 'Anwendung BlauesModell CES
@@ -345,7 +348,7 @@ Partial Class Form1
                 Case ANW_BM_RESET
                     Call BlueM1.launchSim()
                 Case ANW_BM_SENSIPLOT
-                    Call SensiPlot_STARTEN(SensiPlot1.Selected_OptParameter, SensiPlot1.Selected_OptZiel, SensiPlot1.Selected_SensiType, SensiPlot1.Anz_Sim)
+                    Call SensiPlot_STARTEN()
                 Case ANW_BM_PES
                     Call ES_STARTEN()
                 Case ANW_BM_CES
@@ -370,108 +373,93 @@ Partial Class Form1
 
     'Anwendung SensiPlot - START; läuft ohne Evolutionsstrategie             
     '***********************************************************
-    Private Sub SensiPlot_STARTEN(ByRef Selected_OptParameter As String, ByRef Selected_OptZiel As String, ByRef Selected_SensiType As String, ByRef Anz_Sim As Integer)
+    Private Sub SensiPlot_STARTEN()
 
-        globalAnzZiel_ParaOpt = 2
-        globalAnzRand = 0
+        'Einschränkung:
+        '------------------------------------------------------------------------
+        'Die Modellparameter werden auch für die nicht ausgewählten OptParameter 
+        'geschrieben, und zwar mit den in der OPT-Datei angegebenen Startwerten
+        '------------------------------------------------------------------------
 
-        'Anpassung der Arrays für "Call BlueM1.ModellParameter_schreiben()"
-        'TODO: Sehr kompliziert, ModellParameter_schreiben und weitere Funktionen sollten pro Prameter funzen.
+        'Wave deklarieren
+        Dim Wave1 As New Main.Wave
+        ReDim Wave1.WaveList(SensiPlot1.Anz_Sim - 1)
+
+        'Parameterübergabe an ES
+        Me.globalAnzZiel_ParaOpt = 1
+        Me.globalAnzRand = 0
+        Me.globalAnzPar = 1
 
         Dim i As Integer
-        Dim j As Integer
-        Dim AnzModPara As Integer = 0
-
-        Dim OptParameterListeOrig() As Apps.BlueM.OptParameter = {}
-        Dim ModellParameterListeOrig() As Apps.BlueM.ModellParameter = {}
-        Dim OptZieleListeOrig() As Apps.BlueM.OptZiel = {}
-
-        OptParameterListeOrig = BlueM1.OptParameterListe
-        ModellParameterListeOrig = BlueM1.ModellParameterListe
-        OptZieleListeOrig = BlueM1.OptZieleListe
-
-        For i = 0 To ModellParameterListeOrig.GetUpperBound(0)
-            If ModellParameterListeOrig(i).OptParameter = Selected_OptParameter Then
-                AnzModPara += 1
-            End If
-        Next
-
-        ReDim BlueM1.OptParameterListe(0)
-        ReDim BlueM1.ModellParameterListe(AnzModPara - 1)
-        ReDim BlueM1.OptZieleListe(0)
-
-        For i = 0 To OptParameterListeOrig.GetUpperBound(0)
-            If OptParameterListeOrig(i).Bezeichnung = Selected_OptParameter Then
-                BlueM1.OptParameterListe(0) = OptParameterListeOrig(i)
-            End If
-        Next
-
-        For j = 0 To AnzModPara - 1
-            For i = 0 To ModellParameterListeOrig.GetUpperBound(0)
-                If ModellParameterListeOrig(i).OptParameter = Selected_OptParameter Then
-                    BlueM1.ModellParameterListe(j) = ModellParameterListeOrig(i)
-                    j += 1
-                End If
-            Next
-        Next
-
-        For i = 0 To OptZieleListeOrig.GetUpperBound(0)
-            If OptZieleListeOrig(i).Bezeichnung = Selected_OptZiel Then
-                BlueM1.OptZieleListe(0) = OptZieleListeOrig(i)
-            End If
-        Next
-
-        Dim globalAnzPar As Integer = 1
         Dim durchlauf As Integer = 1
         Dim ipop As Integer = 1
 
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
 
-        ReDim Wave1.WaveList(Anz_Sim + 1)
-
-        'ACHTUNG: Voraussetzung: Es liegt bereits eine .WEL-Datei vor!
-        Apps.Sim.Read_WEL(BlueM1.WorkDir & BlueM1.Datensatz & ".wel", BlueM1.OptZieleListe(0).SimGr, Wave1.WaveList(0).Wave)
-
+        'Simulationsschleife
+        '-------------------
         Randomize()
 
-        For i = 0 To Anz_Sim
+        For i = 0 To SensiPlot1.Anz_Sim - 1
 
-            Select Case Selected_SensiType
+            'OptParameterwert variieren
+            Select Case SensiPlot1.Selected_SensiType
                 Case "Gleichverteilt"
-                    BlueM1.OptParameterListe(0).SKWert = Rnd()
+                    BlueM1.OptParameterListe(SensiPlot1.Selected_OptParameter).SKWert = Rnd()
                 Case "Diskret"
-                    BlueM1.OptParameterListe(0).SKWert = i / Anz_Sim
+                    BlueM1.OptParameterListe(SensiPlot1.Selected_OptParameter).SKWert = i / SensiPlot1.Anz_Sim
             End Select
 
+            'Modellparameter schreiben
             Call BlueM1.ModellParameter_schreiben()
+
+            'Simulieren
             Call BlueM1.launchSim()
 
-            'Speichern der ersten und letzten Wave
-            Wave1.WaveList(i).Bezeichnung = BlueM1.OptZieleListe(0).SimGr
-            'Wave1.WaveList(1).Bezeichnung = BlueM1.OptZieleListe(0).SpalteWel
-            'If i = 0 Then
-            Apps.Sim.Read_WEL(BlueM1.WorkDir & BlueM1.Datensatz & ".wel", BlueM1.OptZieleListe(0).SimGr, Wave1.WaveList(i + 1).Wave)
-            'ElseIf i = Anz_Sim Then
-            'BlueM1.ReadWEL(BlueM1.WorkDir & BlueM1.Datensatz & ".wel", BlueM1.OptZieleListe(0).SimGr, Wave1.WaveList(1).Wave)
-            'End If
+            'Qwert berechnen
+            BlueM1.OptZieleListe(SensiPlot1.Selected_OptZiel).QWertTmp = BlueM1.QWert(BlueM1.OptZieleListe(SensiPlot1.Selected_OptZiel))
 
-            BlueM1.OptZieleListe(0).QWertTmp = BlueM1.QWert(0)
-            Diag.Series(0).Add(BlueM1.OptZieleListe(0).QWertTmp, BlueM1.OptParameterListe(0).Wert, "")
-            'Call BlueM1.db_update(durchlauf, ipop)
+            'Diagramm aktualisieren
+            Diag.Series(0).Add(BlueM1.OptZieleListe(SensiPlot1.Selected_OptZiel).QWertTmp, BlueM1.OptParameterListe(SensiPlot1.Selected_OptParameter).Wert, "")
+
+            'Speichern des Simulationsergebnisses für Wave
+            'Wave1.WaveList(i).Bezeichnung = SensiPlot1.Selected_OptZiel.SimGr & "(Sim " & i & ")"
+            Apps.Sim.Read_WEL(BlueM1.WorkDir & BlueM1.Datensatz & ".wel", BlueM1.OptZieleListe(SensiPlot1.Selected_OptZiel).SimGr, Wave1.WaveList(i).Wave)
+
             durchlauf += 1
+
             System.Windows.Forms.Application.DoEvents()
 
         Next
 
-        BlueM1.OptParameterListe = OptParameterListeOrig
-        BlueM1.ModellParameterListe = ModellParameterListeOrig
-        BlueM1.OptZieleListe = OptZieleListeOrig
+        'Wave Diagramm anzeigen:
+        '-----------------------
+        'Achsen:
+        Dim Achsen As New Collection
+        Dim xAchse, yAchse As Diagramm.Achse
+        xAchse.Name = "Zeit"
+        xAchse.Auto = True
+        Achsen.Add(xAchse)
+        yAchse.Name = BlueM1.OptZieleListe(SensiPlot1.Selected_OptZiel).SimGr
+        yAchse.Auto = True
+        Achsen.Add(yAchse)
 
-        Call Wave1.TeeChart_initialise()
-        Call Wave1.TeeChart_draw()
-        Call Wave1.ShowDialog()
-        System.Windows.Forms.Application.DoEvents()
+        Call Wave1.Diag.DiagInitialise("SensiPlot", Achsen)
+
+        'Serien initialisieren
+        Dim tmpSeries As Steema.TeeChart.Styles.Line
+        For i = 1 To SensiPlot1.Anz_Sim
+            tmpSeries = New Steema.TeeChart.Styles.Line(Wave1.Diag.Chart)
+            tmpSeries.Title = "Sim " & i.ToString()
+            tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Nothing
+        Next
+
+        'Serien zeichnen
+        Call Wave1.Wave_draw()
+
+        'Dialog anzeigen
+        Call Wave1.Show()
 
     End Sub
 
@@ -960,19 +948,16 @@ Start_Evolutionsrunden:
                 '----------
             Case ANW_BM_SENSIPLOT
 
-                'Initialisierung von TeeChart
-                '----------------------------
-
                 'Achsen:
                 Dim Achse As Diagramm.Achse
                 Dim Achsen As New Collection
                 'X-Achse = QWert
-                Achse.Name = BlueM1.OptZieleListe(0).Bezeichnung
+                Achse.Name = BlueM1.OptZieleListe(SensiPlot1.Selected_OptZiel).Bezeichnung
                 Achse.Auto = True
                 Achse.Max = 0
                 Achsen.Add(Achse)
                 'Y-Achse = OptParameter
-                Achse.Name = BlueM1.OptParameterListe(0).Bezeichnung
+                Achse.Name = BlueM1.OptParameterListe(SensiPlot1.Selected_OptParameter).Bezeichnung
                 Achse.Auto = True
                 Achse.Max = 0
                 Achsen.Add(Achse)
