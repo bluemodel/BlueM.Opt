@@ -28,7 +28,7 @@ Public Class Diagramm
             .Chart.Axes.Left.Title.Caption = Achsen(2).Name
             .Chart.Axes.Left.Automatic = Achsen(2).Auto
             .Chart.Axes.Left.Minimum = 0
-            .Chart.Axes.Bottom.Maximum = Achsen(2).Max
+            .Chart.Axes.Left.Maximum = Achsen(2).Max
         End With
 
     End Sub

@@ -1,32 +1,31 @@
-Imports System.Windows.Forms
-
 Public Class SensiPlot
-    Public Selected_OptParameter As String
-    Public Selected_OptZiel As String
+    Inherits System.Windows.Forms.Form
+
+    Public Selected_OptParameter As Integer
+    Public Selected_OptZiel As Integer
     Public Selected_SensiType As String
     Public Anz_Sim As Integer
 
-    Public Sub ListBox_OptParameter_add(ByVal Bezeichnung As String)
-        ListBox_OptParameter.Items.Add(Bezeichnung)
+    Public Sub ListBox_OptParameter_add(ByVal OptParameter As Sim.OptParameter)
+        ListBox_OptParameter.Items.Add(OptParameter)
     End Sub
 
-    Public Sub ListBox_OptZiele_add(ByVal Bezeichnung As String)
-        ListBox_OptZiele.Items.Add(Bezeichnung)
+    Public Sub ListBox_OptZiele_add(ByVal OptZiel As Sim.OptZiel)
+        ListBox_OptZiele.Items.Add(OptZiel)
     End Sub
 
-    'Überprüfung der Einstellungen
-    '*****************************
+    'Überprüfung und Anwendung der Einstellungen
+    '*******************************************
     Private Sub OK_Button_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OK_Button.Click
 
-        'Selectboxen
-        Me.Selected_OptParameter = Me.ListBox_OptParameter.SelectedItem
-        Me.Selected_OptZiel = Me.ListBox_OptZiele.SelectedItem
-
-        If (Me.Selected_OptParameter = "" Or Me.Selected_OptZiel = "") Then
+        'OptParameter und OptZiel
+        If (Me.ListBox_OptParameter.SelectedIndex = -1 Or Me.ListBox_OptZiele.SelectedIndex = -1) Then
             MsgBox("Bitte jeweils einen OptParameter und ein OptZiel auswählen!", MsgBoxStyle.Exclamation, "Fehler")
             Me.DialogResult = Windows.Forms.DialogResult.None
             Exit Sub
         End If
+        Me.Selected_OptParameter = Me.ListBox_OptParameter.SelectedIndex
+        Me.Selected_OptZiel = Me.ListBox_OptZiele.SelectedIndex
 
         'Modus
         If (Me.RadioButton_Gleichverteilt.Checked) Then
