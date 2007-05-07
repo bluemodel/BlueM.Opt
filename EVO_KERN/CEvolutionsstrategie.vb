@@ -1797,7 +1797,7 @@ ES_POP_ELTERN_ERROR:
                 ReDim NDSResult(i).X(Eigenschaft.varanz)
             Next i
 
-            Temp = VB6.CopyArray(NDSorting)
+            array.Copy(NDSorting,Temp,NDSorting.GetLength(0))
 
             Do
                 Call Non_Dominated_Sorting(Temp, durchlauf) 'aktuallisiert auf n Objectives dm 10.05.05
@@ -1939,6 +1939,7 @@ ES_ELTERN_ERROR:
 
     '*******************************************************************************
     'Non_Dominated_Sorting
+    'Entscheidet welche Werte Dominiert werden und welche nicht
     '*******************************************************************************
     Private Sub Non_Dominated_Sorting(ByRef NDSorting() As NDSortingType, ByRef durchlauf As Short)
 
@@ -2019,6 +2020,7 @@ ES_ELTERN_ERROR:
 
     '*******************************************************************************
     'Non_Dominated_Count_and_Sort
+    'Sortiert die nicht dominanten Lösungen nach oben, die dominanten nach unten
     '*******************************************************************************
 
     Private Function Non_Dominated_Count_and_Sort(ByRef NDSorting() As NDSortingType) As Short
@@ -2036,6 +2038,7 @@ ES_ELTERN_ERROR:
         Non_Dominated_Count_and_Sort = 0
         counter = 0
 
+        'Die nicht dominanten Lösungen werden nach oben kopiert
         For i = 1 To UBound(NDSorting)
             If NDSorting(i).dominated = True Then
                 counter = counter + 1
@@ -2043,8 +2046,10 @@ ES_ELTERN_ERROR:
             End If
         Next i
 
+        'Zahl der dominanten wird errechnet und zurückgegeben
         Non_Dominated_Count_and_Sort = UBound(NDSorting) - counter
 
+        'Die dominanten Lösungen werden nach unten kopiert
         For i = 1 To UBound(NDSorting)
             If NDSorting(i).dominated = False Then
                 counter = counter + 1
@@ -2052,7 +2057,7 @@ ES_ELTERN_ERROR:
             End If
         Next i
 
-        NDSorting = VB6.CopyArray(Temp)
+        Array.Copy(Temp, NDSorting, NDSorting.GetLength(0))
 
     End Function
 
@@ -2091,8 +2096,7 @@ ES_ELTERN_ERROR:
             End If
         Next i
 
-
-        NDSorting = VB6.CopyArray(Temp)
+        Array.Copy(Temp, NDSorting, NDSorting.GetLength(0))
 
     End Function
 
@@ -2367,7 +2371,7 @@ ES_ELTERN_ERROR:
 
         ReDim QbTemp(Eigenschaft.NEltern, Eigenschaft.NPopul, Eigenschaft.NPenalty)
 
-        QbTemp = VB6.CopyArray(Qb)
+        array.Copy(Qb,QbTemp,Qb.GetLength(0))
         For i = 1 To Eigenschaft.NEltern
             Distanceb(i) = 0
         Next i

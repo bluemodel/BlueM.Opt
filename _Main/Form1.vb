@@ -588,14 +588,14 @@ Partial Class Form1
             If BlueM1.OptZieleListe.GetLength(0) = 1 Then
                 'Sortieren der Kinden anhand der Qualität
                 Call CES1.Sort_Faksimile_BM(CES1.ChildList_BM)
-
-                'Selectionsprozess je nach "plus" oder "minus" Strategie
-                Call CES1.Selection_Process_BM()
-
-            Else
-                'call 
-
+            ElseIf BlueM1.OptZieleListe.GetLength(0) = 2 Then
+                'ndSorting
+                
             End If
+
+            'Selectionsprozess je nach "plus" oder "minus" Strategie
+            'ToDO: Soll auch funzen by ndSorting
+            Call CES1.Selection_Process_BM()
 
             ''Zeichnen des besten Elter
             'For i = 0 To CES1.ParentList_BM.GetUpperBound(0)
