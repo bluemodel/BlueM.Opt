@@ -1939,7 +1939,7 @@ ES_ELTERN_ERROR:
 
     '*******************************************************************************
     'Non_Dominated_Sorting
-    'Entscheidet welche Werte Dominiert werden und welche nicht
+    'Entscheidet welche Werte dominiert werden und welche nicht
     '*******************************************************************************
     Private Sub Non_Dominated_Sorting(ByRef NDSorting() As NDSortingType, ByRef durchlauf As Short)
 
@@ -2148,8 +2148,11 @@ ES_ELTERN_ERROR:
         Dim i As Integer
         Dim j As Integer
         Dim k As Short
-        'UPGRADE_WARNING: Arrays in Struktur swap müssen möglicherweise initialisiert werden, bevor sie verwendet werden können. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1063"'
+
         Dim swap As NDSortingType
+        ReDim swap.d(Eigenschaft.varanz)
+        ReDim swap.X(Eigenschaft.varanz)
+
         Dim fmin, fmax As Double
 
         For k = 1 To Eigenschaft.NPenalty
