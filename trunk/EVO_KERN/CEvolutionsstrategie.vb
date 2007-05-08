@@ -1752,6 +1752,7 @@ ES_POP_ELTERN_ERROR:
         Else 'Multi-objective mit Paretofront
 
             '1. Eltern und Nachfolger werden gemeinsam betrachtet
+            'Die Eltern werden NDSorting hinzugefügt
             '----------------------------------------------------
 
             For m = Eigenschaft.NNachf + 1 To Eigenschaft.NNachf + Eigenschaft.NEltern
@@ -1783,13 +1784,14 @@ ES_POP_ELTERN_ERROR:
             durchlauf = 1
             NFrontMember_gesamt = 0
 
+            'Initialisierung von Temp (NDSorting)
             ReDim Temp(Eigenschaft.NNachf + Eigenschaft.NEltern)
 
             For i = 1 To (Eigenschaft.NNachf + Eigenschaft.NEltern)
                 ReDim Temp(i).d(Eigenschaft.varanz)
                 ReDim Temp(i).X(Eigenschaft.varanz)
             Next i
-
+            'Initialisierung von NDSResult (NDSorting)
             ReDim NDSResult(Eigenschaft.NNachf + Eigenschaft.NEltern)
 
             For i = 1 To (Eigenschaft.NNachf + Eigenschaft.NEltern)
@@ -1797,13 +1799,23 @@ ES_POP_ELTERN_ERROR:
                 ReDim NDSResult(i).X(Eigenschaft.varanz)
             Next i
 
+            'NDSorting wird in Temp kopiert
             array.Copy(NDSorting,Temp,NDSorting.GetLength(0))
 
+            'Schleife läuft über die Zahl der Fronten die hier auch bestimmte werden
             Do
+                'Entscheidet welche Werte dominiert werden und welche nicht
                 Call Non_Dominated_Sorting(Temp, durchlauf) 'aktuallisiert auf n Objectives dm 10.05.05
+                'Sortiert die nicht dominanten Lösungen nach oben,
+                'die dominanten nach unten und zählt die Mitglieder der aktuellen Front
                 NFrontMember_aktuell = Non_Dominated_Count_and_Sort(Temp)
+                'NFrontMember_aktuell: Anzahl der Mitglieder der gerade bestimmten Front
+                'NFrontMember_gesamt: Alle bisher als nicht dominiert klassifizierten Individuum
                 NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
+                'Hier wird pro durchlauf die nicht dominierte Front in NDSResult geschaufelt
+                'und die bereits klassifizierten Lösungen aus Temp Array gelöscht
                 Call Non_Dominated_Result(Temp, NDSResult, NFrontMember_aktuell, NFrontMember_gesamt)
+                'Durchlauf ist hier die Nummer der Front
                 durchlauf = durchlauf + 1
             Loop While Not (NFrontMember_gesamt = Eigenschaft.NEltern + Eigenschaft.NNachf)
 
@@ -1817,6 +1829,8 @@ ES_POP_ELTERN_ERROR:
             Do
                 NFrontMember_aktuell = Count_Front_Members(aktuelle_Front, NDSResult)
 
+                'Es sind mehr Elterplätze für die nächste Generation verfügaber
+                '-> schiss wird einfach rüberkopiert
                 If NFrontMember_aktuell <= Eigenschaft.NEltern - NFrontMember_gesamt Then
                     For i = NFrontMember_gesamt + 1 To NFrontMember_aktuell + NFrontMember_gesamt
                         For j = 1 To Eigenschaft.NPenalty
@@ -1834,7 +1848,11 @@ ES_POP_ELTERN_ERROR:
 
                     Next i
                     NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
+
                 Else
+                    'Es sind weniger Elterplätze für die nächste Generation verfügber
+                    'als Mitglieder der aktuellen Front. Nur für diesen Rest wird crowding distance
+                    'gemacht um zu bestimmen wer noch mitspielen darf und wer noch a biserl was druff hat
                     Call NDS_Crowding_Distance_Sort(NDSResult, NFrontMember_gesamt + 1, NFrontMember_gesamt + NFrontMember_aktuell)
 
                     For i = NFrontMember_gesamt + 1 To Eigenschaft.NEltern
@@ -2013,6 +2031,7 @@ ES_ELTERN_ERROR:
         End If
 
         For i = 1 To UBound(NDSorting)
+            'Hier wird die Nummer der Front geschrieben
             If NDSorting(i).dominated = False Then NDSorting(i).Front = durchlauf
         Next i
 
@@ -2062,7 +2081,9 @@ ES_ELTERN_ERROR:
     End Function
 
     '*******************************************************************************
-    'Non_Dominated_Count_and_Sort
+    'Non_Dominated_Count_and_Sort_Sekundäre_Population
+    'Sortiert die nicht dominanten Lösungen nach oben, die dominanten nach unten
+    'hier für die Sekundäre Population
     '*******************************************************************************
 
     Private Function Non_Dominated_Count_and_Sort_Sekundäre_Population(ByRef NDSorting() As NDSortingType) As Short
@@ -2102,6 +2123,8 @@ ES_ELTERN_ERROR:
 
     '*******************************************************************************
     'Non_Dominated_Result
+    'Hier wird pro durchlauf die nicht dominierte Front in NDSResult geschaufelt
+    'und die bereits klassifizierten Lösungen aus Temp Array gelöscht
     '*******************************************************************************
 
     Private Sub Non_Dominated_Result(ByRef Temp() As NDSortingType, ByRef NDSResult() As NDSortingType, ByRef NFrontMember_aktuell As Short, ByRef NFrontMember_gesamt As Short)
@@ -2110,12 +2133,17 @@ ES_ELTERN_ERROR:
 
         Position = NFrontMember_gesamt - NFrontMember_aktuell + 1
 
+        'In NDSResult werden die nicht dominierten Lösungen eingefügt
         For i = UBound(Temp) + 1 - NFrontMember_aktuell To UBound(Temp)
+            'NDSResult alle bisher gefundene Fronten
             NDSResult(Position) = Temp(i)
             Position = Position + 1
         Next i
+
+        'Die bereits klassifizierten Member werden aus dem Temp Array gelöscht
         If Eigenschaft.NNachf + Eigenschaft.NEltern - NFrontMember_gesamt > 0 Then
             ReDim Preserve Temp(Eigenschaft.NNachf + Eigenschaft.NEltern - NFrontMember_gesamt)
+            'Der Flag wird zur klassifizierung in der nächsten Runde zurückgesetzt
             For i = 1 To UBound(Temp)
                 Temp(i).dominated = False
             Next i
@@ -2258,6 +2286,7 @@ ES_ELTERN_ERROR:
 
     End Function
     '*******************************************************************************
+    'Neighbourhood_AbstandsArray
     'Bestimme Array der Raumabstände für Neighbourhood-Rekombination
     '*******************************************************************************
     Private Sub Neighbourhood_AbstandsArray(ByRef PenaltyDistance(,) As Double, ByRef Qb(,,) As Double)
@@ -2311,6 +2340,10 @@ ES_ELTERN_ERROR:
 
     End Sub
 
+    '*******************************************************************************
+    'SekundärQb_Duplettten
+    '
+    '*******************************************************************************
     Private Sub SekundärQb_Duplettten(ByRef SekundärQb() As NDSortingType)
         Dim i As Short
         Dim j As Short
@@ -2328,6 +2361,7 @@ ES_ELTERN_ERROR:
         Next i
     End Sub
     '*******************************************************************************
+    'Neighbourhood_Eltern
     'Bestimme die NAnzahlEltern mit geringsten Raumabständen für Neighbourhood-Rekombination
     '*******************************************************************************
     Private Sub Neighbourhood_Eltern(ByRef PenaltyDistance(,) As Double, ByRef IndexElter As Short, ByRef NAnzahlEltern As Short, ByRef IndexEltern() As Short)
@@ -2364,6 +2398,10 @@ ES_ELTERN_ERROR:
 
     End Sub
 
+    '*******************************************************************************
+    'Neighbourhood_Crowding_Distance
+    'Bestimme die NAnzahlEltern mit geringsten Raumabständen für Neighbourhood-Rekombination
+    '*******************************************************************************
     Private Sub Neighbourhood_Crowding_Distance(ByRef Distanceb() As Double, ByRef Qb(,,) As Double)
         Dim i As Integer
         Dim j As Integer
