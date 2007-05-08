@@ -33,6 +33,7 @@ Public MustInherit Class Sim
     Public Ergebnisdb As Boolean = True                  'Gibt an, ob die Ergebnisdatenbank geschrieben werden soll
     Public SimStart As DateTime                          'Anfangsdatum der Simulation
     Public SimEnde As DateTime                           'Enddatum der Simulation
+    Public SimDT As TimeSpan                             'Zeitschrittweite der Simulation
 
     'Konstanten
     '----------
@@ -302,10 +303,13 @@ Public MustInherit Class Sim
         End Try
 
         'Falls mit Reihen verglichen werden soll werden hier die Reihen eingelesen
+        Dim ZielStart As Date 
+        Dim ZielEnde As Date
+
         For i = 0 To AnzZiele - 1
             If (OptZieleListe(i).ZielTyp = "Reihe" Or OptZieleListe(i).ZielTyp = "IHA") Then
 
-                'Dateiendung der Zielreihe bestimmen
+                'Dateiendung der Zielreihendatei bestimmen und Reihe einlesen
                 ext = OptZieleListe(i).ZielReihePfad.Substring(OptZieleListe(i).ZielReihePfad.LastIndexOf(".") + 1)
                 Select Case (ext.ToUpper)
                     Case "WEL"
@@ -319,8 +323,33 @@ Public MustInherit Class Sim
                 End Select
 
                 If (IsOK = False) Then
-                    MsgBox("Fehler beim einlesen der Zielreihe '" & OptZieleListe(i).ZielReihePfad & "'" & Chr(13) & Chr(10) & "Ein Fehler könnten Leerzeichen in der letzten Zeile der Datei sein", MsgBoxStyle.Exclamation, "Fehler")
-                    Exit Sub
+                    Throw New Exception("Fehler beim einlesen der Zielreihe in '" & OptZieleListe(i).ZielReihePfad & "'" & Chr(13) & Chr(10) & "Ein Fehler könnten Leerzeichen in der letzten Zeile der Datei sein")
+                End If
+
+                'Zielreihe entsprechend dem Simulationszeitraum kürzen (nur bei WEL und ZRE)
+                '---------------------------------------------------------------------------
+                If (ext.ToUpper = "WEL" Or ext.ToUpper = "ZRE") Then
+
+                    ZielStart = OptZieleListe(i).ZielReihe(0, 0)
+                    ZielEnde = OptZieleListe(i).ZielReihe(OptZieleListe(i).ZielReihe.GetUpperBound(0), 0)
+
+                    If (ZielStart > Me.SimStart Or ZielEnde < Me.SimEnde) Then
+                        'Zielreihe deckt Simulationszeitraum nicht ab
+                        Throw New Exception("Die Zielreihe in '" & OptZieleListe(i).ZielReihePfad & "' deckt den Simulationszeitraum nicht ab!")
+                    Else
+                        'Länge der Simulationszeitreihe:
+                        Dim length_n As Integer = ((Me.SimEnde - Me.SimStart).TotalSeconds / Me.SimDT.TotalSeconds) + 1
+                        'Zielreihe kopieren und redimensionieren
+                        Dim tmpArray(,) As Object = OptZieleListe(i).ZielReihe
+                        ReDim OptZieleListe(i).ZielReihe(length_n - 1, 1)
+                        'Abstand zwischen Start von Simreihe und Zielreihe bestimmen
+                        Dim offset_t As TimeSpan = Me.SimStart - ZielStart
+                        Dim dt As TimeSpan = tmpArray(1, 0) - tmpArray(0, 0) 'BUG 105: Es wird von konstanten Zeitschritten ausgegangen
+                        Dim offset_n As Integer = offset_t.TotalSeconds / dt.TotalSeconds
+                        'Simulationszeitraum zurück in Zielreihe kopieren
+                        Array.Copy(tmpArray, offset_n * 2, OptZieleListe(i).ZielReihe, 0, length_n * 2)
+                    End If
+
                 End If
 
             End If
