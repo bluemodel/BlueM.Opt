@@ -111,6 +111,8 @@ Partial Class Form1
                     Case ANW_BM_RESET 'Anwendung ResetPara & RunBM
                         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
+                        'eingestelltes Dezimaltrennzeichen überprüfen
+                        Call CheckDezimaltrennzeichen()
                         'Voreinstellungen lesen EVO.INI
                         Call ReadEVOIni()
                         'Testprobleme und Evo Deaktivieren
@@ -131,6 +133,8 @@ Partial Class Form1
                     Case ANW_BM_SENSIPLOT 'Anwendung SensiPlot
                         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
+                        'eingestelltes Dezimaltrennzeichen überprüfen
+                        Call CheckDezimaltrennzeichen()
                         'Voreinstellungen lesen EVO.INI
                         Call ReadEVOIni()
                         'Testprobleme und Evo Deaktivieren
@@ -163,6 +167,8 @@ Partial Class Form1
                     Case ANW_BM_PES 'Anwendung BlauesModell PES
                         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
+                        'eingestelltes Dezimaltrennzeichen überprüfen
+                        Call CheckDezimaltrennzeichen()
                         'Voreinstellungen lesen EVO.INI
                         Call ReadEVOIni()
                         'Evo aktivieren
@@ -189,6 +195,8 @@ Partial Class Form1
                     Case ANW_BM_CES 'Anwendung BlauesModell CES
                         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
+                        'eingestelltes Dezimaltrennzeichen überprüfen
+                        Call CheckDezimaltrennzeichen()
                         'Voreinstellungen lesen EVO.INI
                         Call ReadEVOIni()
                         'Evo deaktiviern
@@ -915,6 +923,24 @@ Start_Evolutionsrunden:
     End Sub
 
 #End Region 'Start Button Pressed
+
+    'Überprüfen, ob Punkt als Dezimaltrennzeichen eingestellt ist
+    '***********************************************************
+    Private Sub CheckDezimaltrennzeichen()
+
+        Dim ci As System.Globalization.CultureInfo
+        Dim nfi As System.Globalization.NumberFormatInfo
+
+        'Aktuelle Einstellungen lesen
+        ci = System.Globalization.CultureInfo.CurrentCulture
+        nfi = ci.NumberFormat
+
+        'Dezimaltrennzeichen überprüfen
+        If (Not nfi.NumberDecimalSeparator = ".") Then
+            Throw New Exception("Um mit BlueM arbeiten zu können, muss in der Systemsteuerung" & Chr(10) & Chr(13) & "als Dezimaltrennzeichen Punkt (.) eingestellt sein!")
+        End If
+
+    End Sub
 
 #Region "Diagrammfunktionen"
 
