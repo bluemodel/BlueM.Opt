@@ -533,7 +533,8 @@ Public MustInherit Class Sim
     End Function
 
     'Qualitätswert berechnen: Zieltyp = Reihe
-    '***************************************
+    '****************************************
+    'BUG 105: Konstante und gleiche Zeitschrittweiten vorausgesetzt!
     Protected Function QWert_Reihe(ByVal OptZiel As OptZiel, ByVal SimReihe As Object(,)) As Double
 
         Dim QWert As Double
