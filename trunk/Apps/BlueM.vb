@@ -66,6 +66,7 @@ Public Class BlueM
 
         Dim SimStart_str As String = ""
         Dim SimEnde_str As String = ""
+        Dim SimDT_str as String = ""
 
         'ALL-Datei öffnen
         '----------------
@@ -79,16 +80,26 @@ Public Class BlueM
             Dim Zeile As String
             Do
                 Zeile = StrRead.ReadLine.ToString()
+
                 'Simulationszeitraum auslesen
-                If (Zeile.StartsWith(" SimBeginn - SimEnde ............:") = True) Then
+                If (Zeile.StartsWith(" SimBeginn - SimEnde ............:")) Then
                     SimStart_str = Zeile.Substring(35, 16)
                     SimEnde_str = Zeile.Substring(54, 16)
                 End If
+
+                'Zeitschrittweite auslesen
+                If (Zeile.StartsWith(" Zeitschrittlaenge [min] ........:")) Then
+                    SimDT_str = Zeile.Substring(35).Trim
+                End If
+
             Loop Until StrRead.Peek() = -1
 
             'SimStart und SimEnde in echtes Datum konvertieren
             Me.SimStart = New DateTime(SimStart_str.Substring(6, 4), SimStart_str.Substring(3, 2), SimStart_str.Substring(0, 2), SimStart_str.Substring(11, 2), SimStart_str.Substring(14, 2), 0)
             Me.SimEnde = New DateTime(SimEnde_str.Substring(6, 4), SimEnde_str.Substring(3, 2), SimEnde_str.Substring(0, 2), SimEnde_str.Substring(11, 2), SimEnde_str.Substring(14, 2), 0)
+
+            'Zeitschrittweite in echte Dauer konvertieren
+            Me.SimDT = New TimeSpan(0, Convert.ToInt16(SimDT_str), 0)
 
         Catch except As Exception
             MsgBox("Fehler beim einlesen der BlueM-Simulationsparameter:" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Critical, "Fehler")

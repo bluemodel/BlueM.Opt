@@ -937,7 +937,7 @@ Start_Evolutionsrunden:
 
         'Dezimaltrennzeichen überprüfen
         If (Not nfi.NumberDecimalSeparator = ".") Then
-            Throw New Exception("Um mit BlueM arbeiten zu können, muss in der Systemsteuerung" & Chr(10) & Chr(13) & "als Dezimaltrennzeichen Punkt (.) eingestellt sein!")
+            Throw New Exception("Um mit BlueM arbeiten zu können, muss in der Systemsteuerung" & Chr(13) & Chr(10) & "als Dezimaltrennzeichen Punkt (.) eingestellt sein!")
         End If
 
     End Sub
