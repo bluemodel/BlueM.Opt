@@ -233,9 +233,6 @@ Partial Class Form1
 
                         'Call Initialisierung_BlauesModell_CombiOpt()
 
-                        'CES MOdus setzen -> "TSP" oder "BM" Optimierung
-                        CES1.CES_Modus = "BM"
-
                         'Anzahl der Ziele wird an CES übergeben
                         CES1.n_Ziele = BlueM1.OptZieleListe.GetLength(0)
 
@@ -542,7 +539,7 @@ Partial Class Form1
 
         'Parents und Child werden Dimensioniert
         Call CES1.Dim_Parents_BM()
-        Call CES1.Dim_Childs_BM()
+        Call CES1.Dim_Childs()
 
         'Falls MO wird NDSorting gestarted
         If BlueM1.OptZieleListe.GetLength(0) = 2 Then
@@ -553,13 +550,13 @@ Partial Class Form1
         Call PrepareDiagramm()
 
         'Zufällige Kinderpfade werden generiert
-        Call CES1.Generate_Random_Path_BM()
+        Call CES1.Generate_Random_Path()
 
         'HACK: Funktion zum manuellen Testen der Paths in der ersten Generation
-        'Call CES1.Generate_Test_Path_BM()
+        'Call CES1.Generate_Test_Path()
 
         'HACK: zum testen aller Kombinationen
-        'Call CES1.Generate_All_Test_Path_BM()
+        'Call CES1.Generate_All_Test_Path()
 
         'Generationsschleife
         For gen = 1 To CES1.n_Gen
@@ -598,7 +595,7 @@ Partial Class Form1
 
             If BlueM1.OptZieleListe.GetLength(0) = 1 Then
                 'Sortieren der Kinden anhand der Qualität
-                Call CES1.Sort_Faksimile_BM(CES1.ChildList_BM)
+                Call CES1.Sort_Faksimile(CES1.ChildList_BM)
                 'Selectionsprozess je nach "plus" oder "minus" Strategie
                 Call CES1.Selection_Process_BM()
 
