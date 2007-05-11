@@ -75,6 +75,7 @@
     <Compile Include="Testprobleme.vb">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="TSP.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="SensiPlot.resx">
