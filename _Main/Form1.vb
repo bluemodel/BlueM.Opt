@@ -37,6 +37,7 @@ Partial Class Form1
     Public BlueM1 As New Apps.BlueM
     Public SensiPlot1 As New Apps.SensiPlot
     Public CES1 As New EvoKern.CES
+    Public TSP1 as New Apps.TSP
 
     '**** Globale Parameter Parameter Optimierung ****
     Dim myIsOK As Boolean
@@ -203,7 +204,6 @@ Partial Class Form1
                         EVO_Einstellungen1.Enabled = False
                         'Testprobleme ausschalten
                         Testprobleme1.Enabled = False
-
                         'Ergebnisdatenbank ausschalten
                         BlueM1.Ergebnisdb = False
 
@@ -216,8 +216,6 @@ Partial Class Form1
                         ElseIf BlueM1.OptZieleListe.GetLength(0) > 1 Then
                             EVO_Einstellungen1.OptModus = 1
                         End If
-
-                        CES1.n_Ziele = BlueM1.OptZieleListe.GetLength(0)
 
                         'Einlesen der CombiOpt Datei
                         Call BlueM1.Read_CES()
@@ -238,6 +236,8 @@ Partial Class Form1
                         'CES MOdus setzen -> "TSP" oder "BM" Optimierung
                         CES1.CES_Modus = "BM"
 
+                        'Anzahl der Ziele wird an CES übergeben
+                        CES1.n_Ziele = BlueM1.OptZieleListe.GetLength(0)
 
                     Case ANW_TESTPROBLEME 'Anwendung Testprobleme
                         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -253,9 +253,7 @@ Partial Class Form1
                     Case ANW_TSP 'Anwendung Traveling Salesman Problem (TSP)
                         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                        Call CES1.TSP_Initialize(Diag)
-                        'CES MOdus setzen -> "TSP" oder "BM" Optimierung
-                        CES1.CES_Modus = "TSP"
+                        Call TSP1.TSP_Initialize(Diag)
 
                 End Select
 
@@ -481,44 +479,44 @@ Partial Class Form1
 
         'ToDo: nochmal Prüfen wie das mit den Kids REDIMS ist.
         'BUG 85: Nach Klasse Diagramm auslagern!
-        Call CES1.TeeChart_Initialise_TSP(Diag)
+        Call TSP1.TeeChart_Initialise_TSP(Diag)
 
         'Arrays werden Dimensioniert
-        Call CES1.Dim_Parents_TSP()
-        Call CES1.Dim_Childs_TSP()
+        Call TSP1.Dim_Parents_TSP()
+        Call TSP1.Dim_Childs()
 
         'Zufällige Kinderpfade werden generiert
-        Call CES1.Generate_Random_Path_TSP()
+        Call TSP1.Generate_Random_Path_TSP()
 
         'Generationsschleife
-        For gen = 1 To CES1.n_Gen
+        For gen = 1 To TSP1.n_Gen
 
             'Den Kindern werden die Städte Ihres Pfades entsprechend zugewiesen
-            Call CES1.Cities_according_ChildPath_TSP()
+            Call TSP1.Cities_according_ChildPath()
 
             'Bestimmung des der Qualität der Kinder
-            Call CES1.Evaluate_child_Quality_TSP()
+            Call TSP1.Evaluate_child_Quality()
 
             'Sortieren der Kinden anhand der Qualität
-            Call CES1.Sort_Faksimile_TSP(CES1.ChildList_TSP)
+            Call TSP1.Sort_Faksimile(TSP1.ChildList)
 
             'Selections Prozess (Übergabe der Kinder an die Eltern je nach Strategie)
-            Call CES1.Selection_Process_TSP()
+            Call TSP1.Selection_Process()
 
             'Zeichnen des besten Elter
             'TODO: funzt nur, wenn ganz am ende gezeichnet wird
-            If gen = CES1.n_Gen Then
-                Call CES1.TeeChart_Zeichnen_TSP(Diag, CES1.ParentList_TSP(0).Image)
+            If gen = TSP1.n_Gen Then
+                Call TSP1.TeeChart_Zeichnen_TSP(Diag, TSP1.ParentList(0).Image)
             End If
 
             'Kinder werden Hier vollständig gelöscht
-            Call CES1.Reset_Childs_TSP()
+            Call TSP1.Reset_Childs_TSP()
 
             'Reproduktionsoperatoren, hier gehts dezent zur Sache
-            Call CES1.Reproduction_Operations_TSP()
+            Call TSP1.Reproduction_Control()
 
             'Mutationsoperatoren
-            Call CES1.Mutation_Operations_TSP()
+            Call TSP1.Mutation_Control()
 
         Next gen
 
@@ -542,9 +540,14 @@ Partial Class Form1
         Dim gen As Integer
         Dim i As Integer
 
-        'Arrays werden Dimensioniert
+        'Parents und Child werden Dimensioniert
         Call CES1.Dim_Parents_BM()
         Call CES1.Dim_Childs_BM()
+
+        'Falls MO wird NDSorting gestarted
+        If BlueM1.OptZieleListe.GetLength(0) = 2 Then
+            Call CES1.Dim_NDSorting()
+        End If
 
         'Diagramm vorbereiten und initialisieren        
         Call PrepareDiagramm()
@@ -574,16 +577,16 @@ Partial Class Form1
                 'Schreibt die neuen Verzweigungen
                 Call BlueM1.Verzweigung_Write(CES1.ChildList_BM(i).VER_ONOFF)
                 'Evaluiert das Blaue Modell
-                Call BlueM1.Eval_Sim_CombiOpt(CES1.n_Ziele, durchlauf, 1, CES1.ChildList_BM(i).Quality_MO, Diag)
+                Call BlueM1.Eval_Sim_CombiOpt(CES1.n_Ziele, durchlauf, 1, CES1.ChildList_BM(i).Penalty_MO, Diag)
 
                 ''HACK zur Reduzierung auf eine Zielfunktion
                 'Call CES1.MO_TO_SO(CES1.ChildList_BM(i))
 
                 'Zeichnen der Kinder
                 If BlueM1.OptZieleListe.GetLength(0) = 1 Then
-                    Call Diag.Series(0).Add(durchlauf, CES1.ChildList_BM(i).Quality_SO)
+                    Call Diag.Series(0).Add(durchlauf, CES1.ChildList_BM(i).Penalty_SO)
                 Else
-                    Call Diag.Series(0).Add(CES1.ChildList_BM(i).Quality_MO(0), CES1.ChildList_BM(i).Quality_MO(1))
+                    Call Diag.Series(0).Add(CES1.ChildList_BM(i).Penalty_MO(0), CES1.ChildList_BM(i).Penalty_MO(1))
                 End If
 
                 ''HACK zum zeichnen aller Qualitäten
@@ -596,14 +599,14 @@ Partial Class Form1
             If BlueM1.OptZieleListe.GetLength(0) = 1 Then
                 'Sortieren der Kinden anhand der Qualität
                 Call CES1.Sort_Faksimile_BM(CES1.ChildList_BM)
-            ElseIf BlueM1.OptZieleListe.GetLength(0) = 2 Then
-                'ndSorting
-                
-            End If
+                'Selectionsprozess je nach "plus" oder "minus" Strategie
+                Call CES1.Selection_Process_BM()
 
-            'Selectionsprozess je nach "plus" oder "minus" Strategie
-            'ToDO: Soll auch funzen by ndSorting
-            Call CES1.Selection_Process_BM()
+            ElseIf BlueM1.OptZieleListe.GetLength(0) = 2 Then
+                'NDSorting
+                'Call CES1.NDSorting_Control()
+
+            End If
 
             ''Zeichnen des besten Elter
             'For i = 0 To CES1.ParentList_BM.GetUpperBound(0)
@@ -615,10 +618,10 @@ Partial Class Form1
             Call CES1.Reset_Childs_BM()
 
             'Reproduktionsoperatoren, hier gehts dezent zur Sache
-            Call CES1.Reproduction_Operations_BM()
+            Call CES1.Reproduction_Control_BM()
 
             'Mutationsoperatoren
-            Call CES1.Mutation_Operations_BM()
+            Call CES1.Mutation_Control_BM()
 
         Next
 

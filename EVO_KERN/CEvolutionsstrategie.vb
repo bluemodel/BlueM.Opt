@@ -650,6 +650,8 @@ ES_GET_SCHRITTWEITE_ERROR:
 
     '*******************************************************************************
     'ES_GET_SEKUNDÄRE_POPULATIONEN
+    'Sekundäre Population speichert immer die angegebene Anzahl von Bestwerten und
+    'kann den Bestwertspeicher alle x Generationen überschreiben
     '*******************************************************************************
 
     Public Function esGetSekundärePopulation(ByRef Population(,) As Double) As Boolean
@@ -689,6 +691,7 @@ ES_GET_SCHRITTWEITE_ERROR:
 
     'Function ES_GET_POP_BESTWERT gibt den kompletten Bestwertspeicher aus
     'Bestwert() muss ein dynamisches Array sein
+    'ToDo: diese Funktion wird derzeit nicht verwendet
 
     Public Function EsGetPopBestWert(ByRef POP_Bestwert(,,,) As Double) As Boolean
 
@@ -1626,7 +1629,7 @@ ES_POP_BESTWERTSPEICHER_ERROR:
     End Function
 
     '*******************************************************************************
-    'ES_POP_ELTERN
+    'ES_POP_ELTERN  Eltern Population
     '*******************************************************************************
 
     Public Function EsPopEltern() As Boolean
@@ -1739,7 +1742,8 @@ ES_POP_ELTERN_ERROR:
 
         On Error GoTo ES_ELTERN_ERROR
 
-        If Not Eigenschaft.isPareto Then 'Standard ES nach Rechenberg/Schwefel
+        '*** Standard ES nach Rechenberg/Schwefel ***
+        If Not Eigenschaft.isPareto Then
 
             'Die Eltern werden gleich der besten Kinder gesetzt (Schrittweite und Parameterwert)
             For m = 1 To Eigenschaft.NEltern
@@ -1749,11 +1753,11 @@ ES_POP_ELTERN_ERROR:
                 Next v
             Next m
 
-        Else 'Multi-objective mit Paretofront
-
+        Else
+            '*** Multi-objective mit Paretofront ***
             '1. Eltern und Nachfolger werden gemeinsam betrachtet
-            'Die Eltern werden NDSorting hinzugefügt
-            '----------------------------------------------------
+            'Nur Eltern werden NDSorting hinzugefügt, Kinder sind schon oben drin
+            '---------------------------------------------------------------------
 
             For m = Eigenschaft.NNachf + 1 To Eigenschaft.NNachf + Eigenschaft.NEltern
                 With NDSorting(m)
@@ -1800,7 +1804,7 @@ ES_POP_ELTERN_ERROR:
             Next i
 
             'NDSorting wird in Temp kopiert
-            array.Copy(NDSorting,Temp,NDSorting.GetLength(0))
+            Array.Copy(NDSorting, Temp, NDSorting.GetLength(0))
 
             'Schleife läuft über die Zahl der Fronten die hier auch bestimmte werden
             Do
@@ -1944,8 +1948,6 @@ ES_POP_ELTERN_ERROR:
             End If
 
         End If
-
-
 
         EsEltern = True
         Exit Function

@@ -29,45 +29,62 @@ Public Class CES
 
     'Public Variablen
     Public n_Cities As Integer = 80
+    Public n_Locations As Integer
     Public ListOfCities(,) As Object
     Public n_Gen As Integer = 10
     Public n_Ziele As Integer
 
     'Private Variablen
+    Private n_Parents As Integer = 3
+    Private n_Childs As Integer = 10
+
     Private ReprodOperator_TSP As String = "Order_Crossover_OX"
     Private ReprodOperator_BM As String = "Select_Random_Uniform"
     Private MutOperator_TSP As String = "Translocation"
     Private MutOperator_BM As String = "Random_Switch"
-    Private n_Parents As Integer = 3
-    Private n_Childs As Integer = 10
     Private Strategy As String = "plus"         '"plus" oder "minus" Strategie
     Private MutRate As Integer = 30              'Definiert die Wahrscheinlichkeit der Mutationsrate in %
 
     '************************************* TSP Struktur *****************************
-    Public Structure Faksimile_TSP
+    Public Structure Faksimile_TSP_Type
         Dim No As Short
         Dim Path() As Integer
-        Dim Quality_SO As Double    'HACK zum Ausgleich von MO und SO
-        Dim Quality_MO() As Double
+        Dim Penalty_SO As Double    'HACK zum Ausgleich von MO und SO
+        Dim Penalty_MO() As Double
         Dim Image(,) As Object
     End Structure
 
     '************************************* BM Struktur *****************************
-    Public Structure Faksimile_BM
+    Public Structure Faksimile_BM_Type
         Dim No As Short
         Dim Path() As Integer
-        Dim Quality_SO As Double    'HACK zum Ausgleich von MO und SO
-        Dim Quality_MO() As Double
+        Dim Penalty_SO As Double    'HACK zum Ausgleich von MO und SO
+        Dim Penalty_MO() As Double
         Dim VER_ONOFF(,) As Object
     End Structure
 
     '************************************* TSP Listen ******************************
-    Public ChildList_TSP() As Faksimile_TSP = {}
-    Public ParentList_TSP() As Faksimile_TSP = {}
+    Public ChildList_TSP() As Faksimile_TSP_Type = {}
+    Public ParentList_TSP() As Faksimile_TSP_Type = {}
 
     '************************************* BM Listen ******************************
-    Public ChildList_BM() As Faksimile_BM
-    Public ParentList_BM() As Faksimile_BM
+    Public ChildList_BM() As Faksimile_BM_Type
+    Public ParentList_BM() As Faksimile_BM_Type
+
+    '******************************** NDSorting Struktur **************************
+    Public Structure NDSortingType
+        Dim Penalty_MO() As Double             'DM: Werte der Penaltyfunktion(en)
+        Dim Constrain() As Double           'DM: Werte der Randbedingung(en)
+        Dim Feasible As Boolean             'DM: Gültiges Ergebnis ?
+        Dim dominated As Boolean            'DM: Kennzeichnung ob dominiert
+        Dim Front As Short                  'DM: Nummer der Pareto Front
+        Dim Distance As Double              'DM: Distanzwert für Crowding distance sort
+        Dim No As Short                     'CH: Nummer des Faksimile
+        Dim Path() As Integer               'CH: Der Pfad
+    End Structure
+
+    Dim NDSorting() As NDSortingType ' NDSorting Liste ***************************
+
 
     '******************************** Initialisierung *************************************
 
@@ -98,7 +115,7 @@ Public Class CES
 
         For i = 0 To n_Childs - 1
             ChildList_TSP(i).No = i + 1
-            ChildList_TSP(i).Quality_SO = 999999999999999999
+            ChildList_TSP(i).Penalty_SO = 999999999999999999
             ReDim ChildList_TSP(i).Image(n_Cities - 1, 2)
             ReDim ChildList_TSP(i).Path(n_Cities - 1)
         Next
@@ -112,11 +129,11 @@ Public Class CES
 
         For i = 0 To n_Childs - 1
             ChildList_BM(i).No = i + 1
-            ChildList_BM(i).Quality_SO = 999999999999999999
+            ChildList_BM(i).Penalty_SO = 999999999999999999
 
-            ReDim ChildList_BM(i).Quality_MO(n_Ziele - 1)
-            For j = 0 To ChildList_BM(i).Quality_MO.GetUpperBound(0)
-                ChildList_BM(i).Quality_MO(j) = 999999999999999999
+            ReDim ChildList_BM(i).Penalty_MO(n_Ziele - 1)
+            For j = 0 To ChildList_BM(i).Penalty_MO.GetUpperBound(0)
+                ChildList_BM(i).Penalty_MO(j) = 999999999999999999
             Next
             ReDim ChildList_BM(i).Path(BlueM1.LocationList.GetUpperBound(0))
             ReDim ChildList_BM(i).VER_ONOFF(BlueM1.VerzweigungsDatei.GetUpperBound(0), 1)
@@ -132,7 +149,7 @@ Public Class CES
 
         For i = 0 To n_Parents - 1
             ParentList_TSP(i).No = i + 1
-            ParentList_TSP(i).Quality_SO = 999999999999999999
+            ParentList_TSP(i).Penalty_SO = 999999999999999999
             ReDim ParentList_TSP(i).Image(n_Cities - 1, 2)
             ReDim ParentList_TSP(i).Path(n_Cities - 1)
         Next
@@ -147,12 +164,31 @@ Public Class CES
 
         For i = 0 To n_Parents - 1
             ParentList_BM(i).No = i + 1
-            ParentList_BM(i).Quality_SO = 999999999999999999
-            ReDim ParentList_BM(i).Quality_MO(n_Ziele - 1)
-            For j = 0 To ParentList_BM(i).Quality_MO.GetUpperBound(0)
-                ParentList_BM(i).Quality_MO(j) = 999999999999999999
+            ParentList_BM(i).Penalty_SO = 999999999999999999
+            ReDim ParentList_BM(i).Penalty_MO(n_Ziele - 1)
+            For j = 0 To ParentList_BM(i).Penalty_MO.GetUpperBound(0)
+                ParentList_BM(i).Penalty_MO(j) = 999999999999999999
             Next
             ReDim ParentList_BM(i).Path(BlueM1.LocationList.GetUpperBound(0))
+            ReDim ParentList_BM(i).VER_ONOFF(BlueM1.VerzweigungsDatei.GetUpperBound(0), 1)
+        Next
+
+    End Sub
+
+    'Dimensionieren des ParentStructs BM Problem
+    Public Sub Dim_NDSorting()
+        Dim i, j As Integer
+
+        ReDim NDSorting(n_Childs + n_Parents - 1)
+
+        For i = 0 To n_Childs + n_Parents - 1
+            NDSorting(i).No = 0
+            'NDSorting(i).Penalty_SO = 999999999999999999
+            ReDim NDSorting(i).Penalty_MO(n_Ziele - 1)
+            For j = 0 To NDSorting(i).Penalty_MO.GetUpperBound(0)
+                NDSorting(i).Penalty_MO(j) = 999999999999999999
+            Next
+            ReDim NDSorting(i).Path(BlueM1.LocationList.GetUpperBound(0))
             ReDim ParentList_BM(i).VER_ONOFF(BlueM1.VerzweigungsDatei.GetUpperBound(0), 1)
         Next
 
@@ -278,7 +314,7 @@ Public Class CES
             distanceX = 0
             distanceY = 0
             For j = 0 To n_Cities - 2
-                ChildList_TSP(i).Quality_SO = 999999999999999999
+                ChildList_TSP(i).Penalty_SO = 999999999999999999
                 distanceX = (ChildList_TSP(i).Image(j, 1) - ChildList_TSP(i).Image(j + 1, 1))
                 distanceX = distanceX * distanceX
                 distanceY = (ChildList_TSP(i).Image(j, 2) - ChildList_TSP(i).Image(j + 1, 2))
@@ -290,7 +326,7 @@ Public Class CES
             distanceY = (ChildList_TSP(i).Image(0, 2) - ChildList_TSP(i).Image(n_Cities - 1, 2))
             distanceY = distanceY * distanceY
             distance = distance + Math.Sqrt(distanceX + distanceY)
-            ChildList_TSP(i).Quality_SO = distance
+            ChildList_TSP(i).Penalty_SO = distance
         Next i
 
     End Sub
@@ -308,7 +344,7 @@ Public Class CES
 
         If Strategy = "minus" Then
             For i = 0 To n_Parents - 1
-                ParentList_TSP(i).Quality_SO = ChildList_TSP(i).Quality_SO
+                ParentList_TSP(i).Penalty_SO = ChildList_TSP(i).Penalty_SO
                 Array.Copy(ChildList_TSP(i).Image, ParentList_TSP(i).Image, ChildList_TSP(i).Image.Length)
                 Array.Copy(ChildList_TSP(i).Path, ParentList_TSP(i).Path, ChildList_TSP(i).Path.Length)
             Next i
@@ -316,10 +352,10 @@ Public Class CES
         ElseIf Strategy = "plus" Then
             j = 0
             For i = 0 To n_Parents - 1
-                If ParentList_TSP(i).Quality_SO < ChildList_TSP(j).Quality_SO Then
+                If ParentList_TSP(i).Penalty_SO < ChildList_TSP(j).Penalty_SO Then
                     j -= 1
                 Else
-                    ParentList_TSP(i).Quality_SO = ChildList_TSP(j).Quality_SO
+                    ParentList_TSP(i).Penalty_SO = ChildList_TSP(j).Penalty_SO
                     Array.Copy(ChildList_TSP(j).Image, ParentList_TSP(i).Image, ChildList_TSP(j).Image.Length)
                     Array.Copy(ChildList_TSP(j).Path, ParentList_TSP(i).Path, ChildList_TSP(j).Path.Length)
                 End If
@@ -337,7 +373,7 @@ Public Class CES
 
         If Strategy = "minus" Then
             For i = 0 To n_Parents - 1
-                ParentList_BM(i).Quality_SO = ChildList_BM(i).Quality_SO
+                ParentList_BM(i).Penalty_SO = ChildList_BM(i).Penalty_SO
                 Array.Copy(ChildList_BM(i).VER_ONOFF, ParentList_BM(i).VER_ONOFF, ChildList_BM(i).VER_ONOFF.Length)
                 Array.Copy(ChildList_BM(i).Path, ParentList_BM(i).Path, ChildList_BM(i).Path.Length)
             Next i
@@ -345,11 +381,11 @@ Public Class CES
         ElseIf Strategy = "plus" Then
             j = 0
             For i = 0 To n_Parents - 1
-                If ParentList_BM(i).Quality_SO < ChildList_BM(j).Quality_SO Then
+                If ParentList_BM(i).Penalty_SO < ChildList_BM(j).Penalty_SO Then
                     j -= 1
                 Else
-                    ParentList_BM(i).Quality_SO = ChildList_BM(j).Quality_SO
-                    ParentList_BM(i).Quality_MO = ChildList_BM(j).Quality_MO 'HACK: hier Qualität Doppelt
+                    ParentList_BM(i).Penalty_SO = ChildList_BM(j).Penalty_SO
+                    ParentList_BM(i).Penalty_MO = ChildList_BM(j).Penalty_MO 'HACK: hier Qualität Doppelt
                     Array.Copy(ChildList_BM(j).VER_ONOFF, ParentList_BM(i).VER_ONOFF, ChildList_BM(j).VER_ONOFF.Length)
                     Array.Copy(ChildList_BM(j).Path, ParentList_BM(i).Path, ChildList_BM(j).Path.Length)
                 End If
@@ -365,7 +401,7 @@ Public Class CES
 
         For i = 0 To n_Childs - 1
             ChildList_TSP(i).No = i + 1
-            ChildList_TSP(i).Quality_SO = 999999999999999999
+            ChildList_TSP(i).Penalty_SO = 999999999999999999
             Array.Clear(ChildList_TSP(i).Path, 0, ChildList_TSP(i).Path.GetLength(0))
             ReDim ChildList_TSP(i).Image(n_Cities, 2)
         Next
@@ -378,9 +414,9 @@ Public Class CES
 
         For i = 0 To n_Childs - 1
             ChildList_BM(i).No = i + 1
-            ChildList_BM(i).Quality_SO = 999999999999999999
-            For j = 0 To ChildList_BM(i).Quality_MO.GetUpperBound(0)
-                ChildList_BM(i).Quality_MO(j) = 999999999999999999
+            ChildList_BM(i).Penalty_SO = 999999999999999999
+            For j = 0 To ChildList_BM(i).Penalty_MO.GetUpperBound(0)
+                ChildList_BM(i).Penalty_MO(j) = 999999999999999999
             Next
             Array.Clear(ChildList_BM(i).Path, 0, ChildList_BM(i).Path.GetLength(0))
             ReDim ChildList_BM(i).VER_ONOFF(BlueM1.VerzweigungsDatei.GetUpperBound(0), 1)
@@ -391,7 +427,7 @@ Public Class CES
     '**************************************** Reproductionsfunktionen ****************************************
 
     'Steuerung der Reproduktionsoperatoren
-    Public Sub Reproduction_Operations_TSP()
+    Public Sub Reproduction_Control_TSP()
         Dim i As Integer
         Dim x, y As Integer
         Dim Einzelkind(n_Cities - 1) As Integer
@@ -431,7 +467,7 @@ Public Class CES
     End Sub
 
     'Steuerung der Reproduktionsoperatoren
-    Public Sub Reproduction_Operations_BM()
+    Public Sub Reproduction_Control_BM()
         Dim i As Integer
         Dim x, y As Integer
         Dim Einzelkind(BlueM1.LocationList.GetUpperBound(0)) As Integer
@@ -615,7 +651,7 @@ Public Class CES
     '****************************************** Mutationsfunktionen ****************************************
 
     'Steuerung der Mutationsoperatoren
-    Public Sub Mutation_Operations_TSP()
+    Public Sub Mutation_Control_TSP()
         Dim i As Integer
 
         Select Case MutOperator_TSP
@@ -638,7 +674,7 @@ Public Class CES
     End Sub
 
     'Steuerung der Mutationsoperatoren
-    Public Sub Mutation_Operations_BM()
+    Public Sub Mutation_Control_BM()
         Dim i As Integer
 
         Select Case MutOperator_BM
@@ -817,14 +853,14 @@ Public Class CES
     End Function
 
     'Hilfsfunktion zum sortieren der Faksimile
-    Public Sub Sort_Faksimile_TSP(ByRef FaksimileList() As Faksimile_TSP)
+    Public Sub Sort_Faksimile_TSP(ByRef FaksimileList() As Faksimile_TSP_Type)
         'Sortiert die Fiksimile anhand des Abstandes
         Dim i, j As Integer
-        Dim swap As EvoKern.CES.Faksimile_TSP
+        Dim swap As EvoKern.CES.Faksimile_TSP_Type
 
         For i = 0 To FaksimileList.GetUpperBound(0)
             For j = 0 To FaksimileList.GetUpperBound(0)
-                If FaksimileList(i).Quality_SO < FaksimileList(j).Quality_SO Then
+                If FaksimileList(i).Penalty_SO < FaksimileList(j).Penalty_SO Then
                     swap = FaksimileList(i)
                     FaksimileList(i) = FaksimileList(j)
                     FaksimileList(j) = swap
@@ -835,14 +871,14 @@ Public Class CES
     End Sub
 
     'Hilfsfunktion zum sortieren der Faksimile
-    Public Sub Sort_Faksimile_BM(ByRef FaksimileList() As Faksimile_BM)
+    Public Sub Sort_Faksimile_BM(ByRef FaksimileList() As Faksimile_BM_Type)
         'Sortiert die Fiksimile anhand des Abstandes
         Dim i, j As Integer
-        Dim swap As EvoKern.CES.Faksimile_BM
+        Dim swap As EvoKern.CES.Faksimile_BM_Type
 
         For i = 0 To FaksimileList.GetUpperBound(0)
             For j = 0 To FaksimileList.GetUpperBound(0)
-                If FaksimileList(i).Quality_SO < FaksimileList(j).Quality_SO Then
+                If FaksimileList(i).Penalty_SO < FaksimileList(j).Penalty_SO Then
                     swap = FaksimileList(i)
                     FaksimileList(i) = FaksimileList(j)
                     FaksimileList(j) = swap
@@ -879,7 +915,7 @@ Public Class CES
 
     End Sub
 
-    'Hilffunktion generiert Bernoulli verteilte Zufallszahl
+    'Hilfsfunktion generiert Bernoulli verteilte Zufallszahl
     Public Function Bernoulli() As Boolean
         Dim lowerb As Integer = 0
         Dim upperbo As Integer = 1
@@ -898,11 +934,11 @@ Public Class CES
     End Function
 
     'HACK zur Reduzierung auf eine Zielfunktion
-    Public Sub MO_TO_SO(ByRef FaksimileList As Faksimile_BM)
+    Public Sub MO_TO_SO(ByRef FaksimileList As Faksimile_BM_Type)
         Dim x As Integer
-        FaksimileList.Quality_SO = 0
-        For x = 0 To FaksimileList.Quality_MO.GetUpperBound(0)
-            FaksimileList.Quality_SO = FaksimileList.Quality_SO + FaksimileList.Quality_MO(x)
+        FaksimileList.Penalty_SO = 0
+        For x = 0 To FaksimileList.Penalty_MO.GetUpperBound(0)
+            FaksimileList.Penalty_SO = FaksimileList.Penalty_SO + FaksimileList.Penalty_MO(x)
         Next
         'FaksimileList.Quality_SO = FaksimileList.Quality_SO / n_Ziele
 
@@ -997,6 +1033,52 @@ Public Class CES
         Next
     End Sub
 
+    ''                          Steuerung des NDSorting
+    ''********************************************************************************
+
+    'Public Sub NDSorting_Control()
+    '    Dim i, j As Short
+    '    Dim NFrontMember_aktuell, NFrontMember_gesamt As Short
+    '    Dim Durchlauf_Front As Short
+    '    Dim Temp() As NDSortingType
+    '    Dim NDSResult() As NDSortingType
+    '    Dim Count, aktuelle_Front As Short
+    '    Dim Member_Sekundärefront As Short
+
+    '    '1. Eltern und Nachfolger werden gemeinsam betrachtet
+    '    'Nur Eltern werden NDSorting hinzugefügt, Kinder sind schon oben drin
+    '    '---------------------------------------------------------------------
+    '    For i = n_Childs To n_Childs + n_Parents - 1
+    '        With NDSorting(i)
+    '            For j = 0 To n_Ziele - 1
+    '                .Penalty_MO(j) = ChildList_BM(i - n_Childs).Penalty_MO(j)
+    '            Next j
+
+    '            'Constraints bisher nicht eingebaut
+    '            '***************************************
+    '            'If Eigenschaft.NConstrains > 0 Then
+    '            '    .Feasible = True
+    '            '    For l = 1 To Eigenschaft.NConstrains
+    '            '        .Constrain(l) = Rb(m - Eigenschaft.NNachf, Eigenschaft.iaktuellePopulation, l)
+    '            '        If .Constrain(l) < 0 Then .Feasible = False
+    '            '    Next l
+    '            'End If
+
+    '            .dominated = False
+    '            .Front = 0
+    '            For v = 1 To Eigenschaft.varanz
+    '                'Die Schrittweite wird ebenfalls übernommen
+    '                .d(v) = Db(v, i - Eigenschaft.NNachf, Eigenschaft.iaktuellePopulation)
+    '                'Die eigentlichen Parameterwerte werden übernommen
+    '                .X(v) = Xb(v, i - Eigenschaft.NNachf, Eigenschaft.iaktuellePopulation)
+    '            Next v
+    '            .Distance = 0
+    '        End With
+    '    Next i
+
+
+
+    'End Sub
 
 End Class
 
