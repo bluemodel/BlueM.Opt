@@ -238,6 +238,13 @@ Partial Class Form1
                         CES1.n_Locations = BlueM1.LocationList.GetLength(0)
                         CES1.n_Verzweig = BlueM1.VerzweigungsDatei.GetLength(0)
 
+                        'Gibt die PathSize an für jede Pfadstelle
+                        Dim i As Integer
+                        Redim CES1.n_PathSize(ces1.n_Locations-1)
+                        For i = 0 To CES1.n_Locations - 1
+                            CES1.n_PathSize(i) = BlueM1.LocationList(i).MassnahmeListe.GetLength(0)
+                        Next
+
                     Case ANW_TESTPROBLEME 'Anwendung Testprobleme
                         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
