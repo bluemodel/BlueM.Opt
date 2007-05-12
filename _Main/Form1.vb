@@ -233,8 +233,10 @@ Partial Class Form1
 
                         'Call Initialisierung_BlauesModell_CombiOpt()
 
-                        'Anzahl der Ziele wird an CES übergeben
+                        'Anzahl der Ziele, Locations und Verzeigungen wird an CES übergeben
                         CES1.n_Ziele = BlueM1.OptZieleListe.GetLength(0)
+                        CES1.n_Locations = BlueM1.LocationList.GetLength(0)
+                        CES1.n_Verzweig = BlueM1.VerzweigungsDatei.GetLength(0)
 
                     Case ANW_TESTPROBLEME 'Anwendung Testprobleme
                         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
