@@ -32,6 +32,8 @@ Public Class BlueM
     'Kombinatorik
     '------------
     Public SKos1 As New SKos()
+    Public Path_Aktuell() As Integer
+    Public VER_ONOFF(,) As Object
 
     Public Structure Massnahme
         Public Name As String
@@ -46,7 +48,6 @@ Public Class BlueM
     End Structure
 
     Public LocationList() As Lokation
-
     Public VerzweigungsDatei(,) As String
 
     'Public Schaltung(2, 1) As Object
@@ -355,6 +356,7 @@ Public Class BlueM
     End Sub
 
     'Liest die Verzweigungen aus dem BModel in ein Array ein
+    'Und Dimensioniert das Verzweigungsarray
     '*******************************************************
     Public Sub Verzweigung_Read()
         Dim i As Integer
@@ -401,6 +403,9 @@ Public Class BlueM
         Catch except As Exception
             MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim Lesen der Kombinatorik")
         End Try
+
+        'Hier wird das Verzweigungsarray Dimensioniert
+        ReDim VER_ONOFF(VerzweigungsDatei.GetUpperBound(0), 1)
     End Sub
 
     'Mehrere Prüfungen ob die .VER Datei des BlueM und der .CES Datei auch zusammenpassen
@@ -487,9 +492,33 @@ Public Class BlueM
         Next
     End Sub
 
+    'Ermittelt das aktuelle Verzweigungsarray
+    '****************************************
+    Public Sub Verzweigung_ON_OFF(ByVal Path() As Integer)
+        Dim j, x, y, z As Integer
+        Dim No As Short
+
+        'Schreibt alle Bezeichnungen der Verzweigungen ins Array
+        For j = 0 To VER_ONOFF.GetUpperBound(0)
+            VER_ONOFF(j, 0) = VerzweigungsDatei(j, 0)
+        Next
+        'Weist die Werte das Pfades zu
+        For x = 0 To Path.GetUpperBound(0)
+            No = Path(x)
+            For y = 0 To LocationList(x).MassnahmeListe(No).Schaltung.GetUpperBound(0)
+                For z = 0 To VER_ONOFF.GetUpperBound(0)
+                    If LocationList(x).MassnahmeListe(No).Schaltung(y, 0) = VER_ONOFF(z, 0) Then
+                        VER_ONOFF(z, 1) = LocationList(x).MassnahmeListe(No).Schaltung(y, 1)
+                    End If
+                Next
+            Next
+        Next
+
+    End Sub
+
     'Schreibt die neuen Verzweigungen
     '********************************
-    Public Sub Verzweigung_Write(ByVal SchaltArray(,))
+    Public Sub Verzweigung_Write()
 
         Dim AnzZeil As Integer
         Dim i, j As Integer
@@ -525,17 +554,17 @@ Public Class BlueM
             FiStr.Close()
 
             'ZeilenArray wird zu neuer Datei zusammen gebaut
-            For i = 0 To SchaltArray.GetUpperBound(0)
-                If Not SchaltArray(i, 1) = Nothing Then
+            For i = 0 To VER_ONOFF.GetUpperBound(0)
+                If Not VER_ONOFF(i, 1) = Nothing Then
                     For j = 0 To Zeilenarray.GetUpperBound(0)
                         If Not Zeilenarray(j).StartsWith("*") Then
                             SplitZeile = Zeilenarray(j).Split("|")
-                            If SchaltArray(i, 0) = SplitZeile(1).Trim Then
+                            If VER_ONOFF(i, 0) = SplitZeile(1).Trim Then
                                 StrLeft = Microsoft.VisualBasic.Left(Zeilenarray(j), 31)
                                 StrRight = Microsoft.VisualBasic.Right(Zeilenarray(j), 49)
-                                If SchaltArray(i, 1) = "1" Then
+                                If VER_ONOFF(i, 1) = "1" Then
                                     Zeilenarray(j) = StrLeft & "      100     " & StrRight
-                                ElseIf (SchaltArray(i, 1) = "0") Then
+                                ElseIf (VER_ONOFF(i, 1) = "0") Then
                                     Zeilenarray(j) = StrLeft & "        0     " & StrRight
                                 End If
                             End If
