@@ -570,29 +570,30 @@ Partial Class Form1
         'Generationsschleife
         For gen = 1 To CES1.n_Gen
 
-            'Ermittelt Verzweigung ON_OFF
-            Call CES1.Verzweigung_ON_OFF()
-
             'Child Schleife
-            For i = 0 To CES1.ChildList_BM.GetUpperBound(0)
+            For i = 0 To CES1.ChildList.GetUpperBound(0)
                 durchlauf += 1
 
-                'ToDo: Dieser Teil steht im Moment im BM Form muss aber ins CES!
                 'Erstellt die aktuelle Bauerksliste und überträgt sie zu SKos
-                Call BlueM1.Define_aktuelle_Bauwerke(CES1.ChildList_BM(i).Path)
+                Call BlueM1.Define_aktuelle_Bauwerke(CES1.ChildList(i).Path)
+
+                'Ermittelt das aktuelle_ON_OFF array
+                Call BlueM1.Verzweigung_ON_OFF(CES1.ChildList(i).Path)
+
                 'Schreibt die neuen Verzweigungen
-                Call BlueM1.Verzweigung_Write(CES1.ChildList_BM(i).VER_ONOFF)
+                Call BlueM1.Verzweigung_Write()
+
                 'Evaluiert das Blaue Modell
-                Call BlueM1.Eval_Sim_CombiOpt(CES1.n_Ziele, durchlauf, 1, CES1.ChildList_BM(i).Penalty_MO, Diag)
+                Call BlueM1.Eval_Sim_CombiOpt(CES1.n_Ziele, durchlauf, 1, CES1.ChildList(i).Penalty_MO, Diag)
 
                 ''HACK zur Reduzierung auf eine Zielfunktion
                 'Call CES1.MO_TO_SO(CES1.ChildList_BM(i))
 
                 'Zeichnen der Kinder
                 If BlueM1.OptZieleListe.GetLength(0) = 1 Then
-                    Call Diag.Series(0).Add(durchlauf, CES1.ChildList_BM(i).Penalty_SO)
+                    Call Diag.Series(0).Add(durchlauf, CES1.ChildList(i).Penalty_SO)
                 Else
-                    Call Diag.Series(0).Add(CES1.ChildList_BM(i).Penalty_MO(0), CES1.ChildList_BM(i).Penalty_MO(1))
+                    Call Diag.Series(0).Add(CES1.ChildList(i).Penalty_MO(0), CES1.ChildList(i).Penalty_MO(1))
                 End If
 
                 ''HACK zum zeichnen aller Qualitäten
@@ -604,7 +605,7 @@ Partial Class Form1
 
             If BlueM1.OptZieleListe.GetLength(0) = 1 Then
                 'Sortieren der Kinden anhand der Qualität
-                Call CES1.Sort_Faksimile(CES1.ChildList_BM)
+                Call CES1.Sort_Faksimile(CES1.ChildList)
                 'Selectionsprozess je nach "plus" oder "minus" Strategie
                 Call CES1.Selection_Process_BM()
 

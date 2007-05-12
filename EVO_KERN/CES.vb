@@ -48,12 +48,11 @@ Public Class CES
         Dim Path() As Integer      'auf 0 ist die Stadt, auf 1 die Anzahl der Städte
         Dim Penalty_SO As Double    'HACK zum Ausgleich von MO und SO
         Dim Penalty_MO() As Double
-        Dim VER_ONOFF(,) As Object
     End Structure
 
     '************************************* Listen ******************************
-    Public ChildList_BM() As Faksimile_Type
-    Public ParentList_BM() As Faksimile_Type
+    Public ChildList() As Faksimile_Type
+    Public ParentList() As Faksimile_Type
 
     '******************************** NDSorting Struktur **************************
     Public Structure NDSortingType
@@ -75,18 +74,17 @@ Public Class CES
     'Dimensionieren des ChildStructs
     Public Sub Dim_Childs()
         Dim i, j As Integer
-        ReDim ChildList_BM(n_Childs - 1)
+        ReDim ChildList(n_Childs - 1)
 
         For i = 0 To n_Childs - 1
-            ChildList_BM(i).No = i + 1
-            ChildList_BM(i).Penalty_SO = 999999999999999999
+            ChildList(i).No = i + 1
+            ChildList(i).Penalty_SO = 999999999999999999
 
-            ReDim ChildList_BM(i).Penalty_MO(n_Ziele - 1)
+            ReDim ChildList(i).Penalty_MO(n_Ziele - 1)
             For j = 0 To n_Ziele - 1
-                ChildList_BM(i).Penalty_MO(j) = 999999999999999999
+                ChildList(i).Penalty_MO(j) = 999999999999999999
             Next
-            ReDim ChildList_BM(i).Path(n_Locations - 1)
-            ReDim ChildList_BM(i).VER_ONOFF(n_Verzweig - 1, 1)
+            ReDim ChildList(i).Path(n_Locations - 1)
         Next
 
     End Sub
@@ -95,17 +93,16 @@ Public Class CES
     Public Sub Dim_Parents_BM()
         Dim i, j As Integer
 
-        ReDim ParentList_BM(n_Parents - 1)
+        ReDim ParentList(n_Parents - 1)
 
         For i = 0 To n_Parents - 1
-            ParentList_BM(i).No = i + 1
-            ParentList_BM(i).Penalty_SO = 999999999999999999
-            ReDim ParentList_BM(i).Penalty_MO(n_Ziele - 1)
+            ParentList(i).No = i + 1
+            ParentList(i).Penalty_SO = 999999999999999999
+            ReDim ParentList(i).Penalty_MO(n_Ziele - 1)
             For j = 0 To n_Ziele - 1
-                ParentList_BM(i).Penalty_MO(j) = 999999999999999999
+                ParentList(i).Penalty_MO(j) = 999999999999999999
             Next
-            ReDim ParentList_BM(i).Path(n_Locations - 1)
-            ReDim ParentList_BM(i).VER_ONOFF(n_Verzweig - 1, 1)
+            ReDim ParentList(i).Path(n_Locations - 1)
         Next
 
     End Sub
@@ -124,7 +121,7 @@ Public Class CES
                 NDSorting(i).Penalty_MO(j) = 999999999999999999
             Next
             ReDim NDSorting(i).Path(n_Locations - 1)
-            ReDim ParentList_BM(i).VER_ONOFF(n_Verzweig - 1, 1)
+            'ReDim NDSorting(i).VER_ONOFF(n_Verzweig - 1, 1)
         Next
 
     End Sub
@@ -138,11 +135,11 @@ Public Class CES
         Randomize()
 
         For i = 0 To n_Childs - 1
-            For j = 0 To n_locations -1
+            For j = 0 To n_Locations - 1
                 upperb = n_PathSize(j)
                 'Randomize() nicht vergessen
                 tmp = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
-                ChildList_BM(i).Path(j) = tmp
+                ChildList(i).Path(j) = tmp
             Next
         Next
 
@@ -156,12 +153,12 @@ Public Class CES
 
         'Achtung n_Childs sollte Größer als die Möglichen Kombinationen an einer Stelle sein
         For i = 0 To n_Childs - 1
-            For j = 0 To n_locations - 1
-                Grenze = n_PathSize(j)-1
+            For j = 0 To n_Locations - 1
+                Grenze = n_PathSize(j) - 1
                 If i <= Grenze Then
-                    ChildList_BM(i).Path(j) = i
+                    ChildList(i).Path(j) = i
                 Else
-                    ChildList_BM(i).Path(j) = 0
+                    ChildList(i).Path(j) = 0
                 End If
             Next
         Next
@@ -180,9 +177,9 @@ Public Class CES
 
         For i = 0 To n_Childs - 1
 
-            ChildList_BM(i).Path(0) = x
-            ChildList_BM(i).Path(1) = y
-            ChildList_BM(i).Path(2) = z
+            ChildList(i).Path(0) = x
+            ChildList(i).Path(1) = y
+            ChildList(i).Path(2) = z
             x += 1
             If x > n_PathSize(0) - 1 Then
                 x = 0
@@ -218,21 +215,19 @@ Public Class CES
 
         If Strategy = "minus" Then
             For i = 0 To n_Parents - 1
-                ParentList_BM(i).Penalty_SO = ChildList_BM(i).Penalty_SO
-                Array.Copy(ChildList_BM(i).VER_ONOFF, ParentList_BM(i).VER_ONOFF, ChildList_BM(i).VER_ONOFF.Length)
-                Array.Copy(ChildList_BM(i).Path, ParentList_BM(i).Path, ChildList_BM(i).Path.Length)
+                ParentList(i).Penalty_SO = ChildList(i).Penalty_SO
+                Array.Copy(ChildList(i).Path, ParentList(i).Path, ChildList(i).Path.Length)
             Next i
 
         ElseIf Strategy = "plus" Then
             j = 0
             For i = 0 To n_Parents - 1
-                If ParentList_BM(i).Penalty_SO < ChildList_BM(j).Penalty_SO Then
+                If ParentList(i).Penalty_SO < ChildList(j).Penalty_SO Then
                     j -= 1
                 Else
-                    ParentList_BM(i).Penalty_SO = ChildList_BM(j).Penalty_SO
-                    ParentList_BM(i).Penalty_MO = ChildList_BM(j).Penalty_MO 'HACK: hier Qualität Doppelt
-                    Array.Copy(ChildList_BM(j).VER_ONOFF, ParentList_BM(i).VER_ONOFF, ChildList_BM(j).VER_ONOFF.Length)
-                    Array.Copy(ChildList_BM(j).Path, ParentList_BM(i).Path, ChildList_BM(j).Path.Length)
+                    ParentList(i).Penalty_SO = ChildList(j).Penalty_SO
+                    ParentList(i).Penalty_MO = ChildList(j).Penalty_MO 'HACK: hier Qualität Doppelt
+                    Array.Copy(ChildList(j).Path, ParentList(i).Path, ChildList(j).Path.Length)
                 End If
                 j += 1
             Next i
@@ -245,13 +240,12 @@ Public Class CES
         Dim i, j As Integer
 
         For i = 0 To n_Childs - 1
-            ChildList_BM(i).No = i + 1
-            ChildList_BM(i).Penalty_SO = 999999999999999999
-            For j = 0 To ChildList_BM(i).Penalty_MO.GetUpperBound(0)
-                ChildList_BM(i).Penalty_MO(j) = 999999999999999999
+            ChildList(i).No = i + 1
+            ChildList(i).Penalty_SO = 999999999999999999
+            For j = 0 To ChildList(i).Penalty_MO.GetUpperBound(0)
+                ChildList(i).Penalty_MO(j) = 999999999999999999
             Next
-            Array.Clear(ChildList_BM(i).Path, 0, ChildList_BM(i).Path.GetLength(0))
-            ReDim ChildList_BM(i).VER_ONOFF(n_Verzweig - 1, 1)
+            Array.Clear(ChildList(i).Path, 0, ChildList(i).Path.GetLength(0))
         Next
 
     End Sub
@@ -270,14 +264,14 @@ Public Class CES
                 x = 0
                 y = 1
                 For i = 0 To n_Childs - 2 Step 2
-                    Call ReprodOp_Select_Random_Uniform(ParentList_BM(x).Path, ParentList_BM(y).Path, ChildList_BM(i).Path, ChildList_BM(i + 1).Path)
+                    Call ReprodOp_Select_Random_Uniform(ParentList(x).Path, ParentList(y).Path, ChildList(i).Path, ChildList(i + 1).Path)
                     x += 1
                     y += 1
                     If x = n_Parents - 1 Then x = 0
                     If y = n_Parents - 1 Then y = 0
                 Next i
                 If Even_Number(n_Childs) = False Then
-                    Call ReprodOp_Select_Random_Uniform(ParentList_BM(x).Path, ParentList_BM(y).Path, ChildList_BM(n_Childs - 1).Path, Einzelkind)
+                    Call ReprodOp_Select_Random_Uniform(ParentList(x).Path, ParentList(y).Path, ChildList(n_Childs - 1).Path, Einzelkind)
                 End If
         End Select
 
@@ -317,7 +311,7 @@ Public Class CES
         Select Case MutOperator_BM
             Case "Random_Switch"
                 For i = 0 To n_Childs - 1
-                    Call MutOp_RND_Switch(ChildList_BM(i).Path)
+                    Call MutOp_RND_Switch(ChildList(i).Path)
                     'If PathValid(ChildList(i).Path) = False Then MsgBox("Fehler im Path", MsgBoxStyle.Information, "Fehler")
                 Next i
         End Select
@@ -339,7 +333,7 @@ Public Class CES
         For i = 0 To Path.GetUpperBound(0)
             Tmp_a = CInt(Int((upperb_a - lowerb_a + 1) * Rnd() + lowerb_a))
             If Tmp_a <= MutRate Then
-                upperb_b = n_PathSize (i)-1
+                upperb_b = n_PathSize(i) - 1
                 'Randomize() nicht vergessen
                 Tmp_b = CInt(Int((upperb_b - lowerb_b + 1) * Rnd() + lowerb_b))
                 Path(i) = Tmp_b
@@ -407,35 +401,6 @@ Public Class CES
         Next
         'FaksimileList.Quality_SO = FaksimileList.Quality_SO / n_Ziele
 
-    End Sub
-
-    '                          Funktionen für CombiBM
-    '********************************************************************************
-
-    'Ermittelt des Erforderlichen Zustands für die Verzweigungen
-    'ToDo: das muss hier raus und ins BlueM immer kutz vor dem ausführen des Modells
-    'starten, dann kann auch die Verzweigungsgeschichte aus dem Faksimile
-    Public Sub Verzweigung_ON_OFF()
-        Dim i, j, x, y, z As Integer
-        Dim No As Short
-
-        'Schreibt alle Verzweigungen ins Array
-        'kann man auch früher machen!!!!
-        For i = 0 To n_Childs - 1
-            For j = 0 To ChildList_BM(i).VER_ONOFF.GetUpperBound(0)
-                ChildList_BM(i).VER_ONOFF(j, 0) = BlueM1.VerzweigungsDatei(j, 0)
-            Next
-            For x = 0 To ChildList_BM(i).Path.GetUpperBound(0)
-                No = ChildList_BM(i).Path(x)
-                For y = 0 To BlueM1.LocationList(x).MassnahmeListe(No).Schaltung.GetUpperBound(0)
-                    For z = 0 To ChildList_BM(i).VER_ONOFF.GetUpperBound(0)
-                        If BlueM1.LocationList(x).MassnahmeListe(No).Schaltung(y, 0) = ChildList_BM(i).VER_ONOFF(z, 0) Then
-                            ChildList_BM(i).VER_ONOFF(z, 1) = BlueM1.LocationList(x).MassnahmeListe(No).Schaltung(y, 1)
-                        End If
-                    Next
-                Next
-            Next
-        Next
     End Sub
 
     '                          Steuerung des NDSorting
