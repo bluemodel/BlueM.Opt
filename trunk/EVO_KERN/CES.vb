@@ -28,6 +28,7 @@ Public Class CES
     Public n_Locations As Integer       'Anzahl der Locations wird von außen gesetzt
     Public n_Ziele As Integer           'Anzahl der Ziele wird von außen gesetzt
     Public n_Verzweig As Integer        'Anzahl der Verzweigungen in der Verzweigungsdatei
+    Public n_PathSize () as Integer     'Anzahl der "Städte/Maßnahmen" an jeder Stelle
     Public n_Gen As Integer = 10
 
     'Private Variablen
@@ -44,7 +45,7 @@ Public Class CES
     '************************************* Struktur *****************************
     Public Structure Faksimile_Type
         Dim No As Short
-        Dim Path(,) As Integer      'auf 0 ist die Stadt, auf 1 die Anzahl der Städte
+        Dim Path() As Integer      'auf 0 ist die Stadt, auf 1 die Anzahl der Städte
         Dim Penalty_SO As Double    'HACK zum Ausgleich von MO und SO
         Dim Penalty_MO() As Double
         Dim VER_ONOFF(,) As Object
@@ -84,7 +85,7 @@ Public Class CES
             For j = 0 To n_Ziele - 1
                 ChildList_BM(i).Penalty_MO(j) = 999999999999999999
             Next
-            ReDim ChildList_BM(i).Path(n_Locations - 1,1)
+            ReDim ChildList_BM(i).Path(n_Locations - 1)
             ReDim ChildList_BM(i).VER_ONOFF(n_Verzweig - 1, 1)
         Next
 
@@ -103,7 +104,7 @@ Public Class CES
             For j = 0 To n_Ziele - 1
                 ParentList_BM(i).Penalty_MO(j) = 999999999999999999
             Next
-            ReDim ParentList_BM(i).Path(n_Locations - 1, 1)
+            ReDim ParentList_BM(i).Path(n_Locations - 1)
             ReDim ParentList_BM(i).VER_ONOFF(n_Verzweig - 1, 1)
         Next
 
@@ -137,11 +138,11 @@ Public Class CES
         Randomize()
 
         For i = 0 To n_Childs - 1
-            For j = 0 To ChildList_BM(i).Path.GetUpperBound(0)
-                upperb = BlueM1.LocationList(j).MassnahmeListe.GetUpperBound(0)
+            For j = 0 To n_locations -1
+                upperb = n_PathSize(j)
                 'Randomize() nicht vergessen
                 tmp = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
-                ChildList_BM(i).Path(j,0) = tmp
+                ChildList_BM(i).Path(j) = tmp
             Next
         Next
 
@@ -155,12 +156,12 @@ Public Class CES
 
         'Achtung n_Childs sollte Größer als die Möglichen Kombinationen an einer Stelle sein
         For i = 0 To n_Childs - 1
-            For j = 0 To ChildList_BM(i).Path.GetUpperBound(0)
-                Grenze = BlueM1.LocationList(j).MassnahmeListe.GetUpperBound(0)
+            For j = 0 To n_locations - 1
+                Grenze = n_PathSize(j)-1
                 If i <= Grenze Then
-                    ChildList_BM(i).Path(j, 0) = i
+                    ChildList_BM(i).Path(j) = i
                 Else
-                    ChildList_BM(i).Path(j, 0) = 0
+                    ChildList_BM(i).Path(j) = 0
                 End If
             Next
         Next
@@ -179,19 +180,19 @@ Public Class CES
 
         For i = 0 To n_Childs - 1
 
-            ChildList_BM(i).Path(0, 0) = x
-            ChildList_BM(i).Path(1, 0) = y
-            ChildList_BM(i).Path(2, 0) = z
+            ChildList_BM(i).Path(0) = x
+            ChildList_BM(i).Path(1) = y
+            ChildList_BM(i).Path(2) = z
             x += 1
-            If x > BlueM1.LocationList(0).MassnahmeListe.GetUpperBound(0) Then
+            If x > n_PathSize(0) - 1 Then
                 x = 0
                 y += 1
             End If
-            If y > BlueM1.LocationList(1).MassnahmeListe.GetUpperBound(0) Then
+            If y > n_PathSize(1) - 1 Then
                 y = 0
                 z += 1
             End If
-            If z > BlueM1.LocationList(2).MassnahmeListe.GetUpperBound(0) Then
+            If z > n_PathSize(2) - 1 Then
                 z = 0
             End If
 
@@ -261,7 +262,7 @@ Public Class CES
     Public Sub Reproduction_Control_BM()
         Dim i As Integer
         Dim x, y As Integer
-        Dim Einzelkind(n_Locations - 1, 1) As Integer
+        Dim Einzelkind(n_Locations - 1) As Integer
 
         Select Case ReprodOperator_BM
             'ToDo: Eltern werden nicht zufällig gewählt sondern immer in Top Down Reihenfolge
@@ -284,23 +285,23 @@ Public Class CES
 
     'Reproductionsoperator: "Select_Random_Uniform"
     'Entscheidet zufällig welcher ob der Wert aus dem Path des Elter_A oder Elter_B verwendet wird
-    Private Sub ReprodOp_Select_Random_Uniform(ByVal ParPath_A(,) As Integer, ByVal ParPath_B(,) As Integer, ByRef ChildPath_A(,) As Integer, ByRef ChildPath_B(,) As Integer)
+    Private Sub ReprodOp_Select_Random_Uniform(ByVal ParPath_A() As Integer, ByVal ParPath_B() As Integer, ByRef ChildPath_A() As Integer, ByRef ChildPath_B() As Integer)
 
         Dim i As Integer
 
         For i = 0 To ChildPath_A.GetUpperBound(0)    'ToDo: Es müsste eigentlich eine definierte Pfadlänge geben
             If Bernoulli() = True Then
-                ChildPath_A(i,0) = ParPath_B(i,0)
+                ChildPath_A(i) = ParPath_B(i)
             Else
-                ChildPath_A(i,0) = ParPath_A(i,0)
+                ChildPath_A(i) = ParPath_A(i)
             End If
         Next
 
         For i = 0 To ChildPath_B.GetUpperBound(0)    'ToDo: Es müsste eigentlich eine definierte Pfadlänge geben
             If Bernoulli() = True Then
-                ChildPath_B(i,0) = ParPath_A(i,0)
+                ChildPath_B(i) = ParPath_A(i)
             Else
-                ChildPath_B(i, 0) = ParPath_B(i, 0)
+                ChildPath_B(i) = ParPath_B(i)
             End If
         Next
 
@@ -325,7 +326,7 @@ Public Class CES
 
     'Mutationsoperator "Random_Switch"
     'Verändert zufällig ein gen des Paths
-    Private Sub MutOp_RND_Switch(ByVal Path(,) As Integer)
+    Private Sub MutOp_RND_Switch(ByVal Path() As Integer)
         Dim i As Integer
         Dim Tmp_a As Integer
         Dim Tmp_b As Integer
@@ -338,10 +339,10 @@ Public Class CES
         For i = 0 To Path.GetUpperBound(0)
             Tmp_a = CInt(Int((upperb_a - lowerb_a + 1) * Rnd() + lowerb_a))
             If Tmp_a <= MutRate Then
-                upperb_b = BlueM1.LocationList(i).MassnahmeListe.GetUpperBound(0)
+                upperb_b = n_PathSize (i)-1
                 'Randomize() nicht vergessen
                 Tmp_b = CInt(Int((upperb_b - lowerb_b + 1) * Rnd() + lowerb_b))
-                Path(i, 0) = Tmp_b
+                Path(i) = Tmp_b
             End If
         Next
 
@@ -412,6 +413,8 @@ Public Class CES
     '********************************************************************************
 
     'Ermittelt des Erforderlichen Zustands für die Verzweigungen
+    'ToDo: das muss hier raus und ins BlueM immer kutz vor dem ausführen des Modells
+    'starten, dann kann auch die Verzweigungsgeschichte aus dem Faksimile
     Public Sub Verzweigung_ON_OFF()
         Dim i, j, x, y, z As Integer
         Dim No As Short
@@ -423,7 +426,7 @@ Public Class CES
                 ChildList_BM(i).VER_ONOFF(j, 0) = BlueM1.VerzweigungsDatei(j, 0)
             Next
             For x = 0 To ChildList_BM(i).Path.GetUpperBound(0)
-                No = ChildList_BM(i).Path(x, 0)
+                No = ChildList_BM(i).Path(x)
                 For y = 0 To BlueM1.LocationList(x).MassnahmeListe(No).Schaltung.GetUpperBound(0)
                     For z = 0 To ChildList_BM(i).VER_ONOFF.GetUpperBound(0)
                         If BlueM1.LocationList(x).MassnahmeListe(No).Schaltung(y, 0) = ChildList_BM(i).VER_ONOFF(z, 0) Then
