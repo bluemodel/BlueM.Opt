@@ -539,9 +539,6 @@ Partial Class Form1
 
         Dim durchlauf As Integer = 0
 
-        'BlueM wird an CES übergeben um Zugriff auf alle Objekte zu haben
-        CES1.BlueM1 = BlueM1
-
         'Laufvariable für die Generationen
         Dim gen As Integer
         Dim i As Integer

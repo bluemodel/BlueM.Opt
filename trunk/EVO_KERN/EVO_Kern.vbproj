@@ -135,12 +135,6 @@
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Apps\Apps.vbproj">
-      <Project>{62B1C1E7-26DE-418A-AAEE-102E02A50DF6}</Project>
-      <Name>Apps</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
     <PreBuildEvent>

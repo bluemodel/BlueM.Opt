@@ -21,9 +21,6 @@ Public Class CES
     'CutPoint:     1 2 3 4 5 6
     'LB + UB n=2   x         x
 
-    'BlueM wird kopiert, achtung kein Zeiger
-    Public BlueM1 As Apps.BlueM
-
     'Public Variablen
     Public n_Locations As Integer       'Anzahl der Locations wird von auﬂen gesetzt
     Public n_Ziele As Integer           'Anzahl der Ziele wird von auﬂen gesetzt
@@ -198,14 +195,6 @@ Public Class CES
     End Sub
 
     '*************************** Functionen innerhalb der Generationsschleife ****************************
-
-
-    'Ermittelt die Qualit‰t der Kinder mit dem BlueM
-    'Achtung! dies Funktionen liegen jetzt im BlueM
-    Public Sub Evaluate_Child_Quality_BM()
-
-
-    End Sub
 
     'Selectionsprozess je nach "plus" oder "minus" Strategie
     Public Sub Selection_Process_BM()
