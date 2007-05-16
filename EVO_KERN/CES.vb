@@ -105,20 +105,17 @@ Public Class CES
     End Sub
 
     'Dimensionieren des NDSortingStructs BM Problem
-    Public Sub Dim_NDSorting()
+    Public Sub Dim_NDSorting_Type(ByRef TMP() As NDSortingType)
         Dim i, j As Integer
 
-        ReDim NDSorting(n_Childs + n_Parents - 1)
-
-        For i = 0 To n_Childs + n_Parents - 1
-            NDSorting(i).No = 0
+        For i = 0 To TMP.GetUpperBound(0)
+            TMP(i).No = 0
             'NDSorting(i).Penalty_SO = 999999999999999999
-            ReDim NDSorting(i).Penalty_MO(n_Ziele - 1)
+            ReDim TMP(i).Penalty_MO(n_Ziele - 1)
             For j = 0 To n_Ziele - 1
-                NDSorting(i).Penalty_MO(j) = 999999999999999999
+                TMP(i).Penalty_MO(j) = 999999999999999999
             Next
-            ReDim NDSorting(i).Path(n_Locations - 1)
-            'ReDim NDSorting(i).VER_ONOFF(n_Verzweig - 1, 1)
+            ReDim TMP(i).Path(n_Locations - 1)
         Next
 
     End Sub
@@ -395,50 +392,450 @@ Public Class CES
     '                          Steuerung des NDSorting
     '********************************************************************************
 
-    'Public Sub NDSorting_Control()
-    '    Dim i, j As Short
-    '    Dim NFrontMember_aktuell, NFrontMember_gesamt As Short
-    '    Dim Durchlauf_Front As Short
-    '    Dim Temp() As NDSortingType
-    '    Dim NDSResult() As NDSortingType
-    '    Dim Count, aktuelle_Front As Short
-    '    Dim Member_Sekundärefront As Short
+    Public Sub NDSorting_Control()
+        Dim i, j As Short
+        Dim NFrontMember_aktuell, NFrontMember_gesamt As Short
+        Dim Durchlauf_Front As Short
+        Dim Count, aktuelle_Front As Short
+        Dim Member_Sekundärefront As Short
 
-    '    '1. Eltern und Nachfolger werden gemeinsam betrachtet
-    '    'Nur Eltern werden NDSorting hinzugefügt, Kinder sind schon oben drin
-    '    '---------------------------------------------------------------------
-    '    For i = n_Childs To n_Childs + n_Parents - 1
-    '        With NDSorting(i)
-    '            For j = 0 To n_Ziele - 1
-    '                .Penalty_MO(j) = ChildList_BM(i - n_Childs).Penalty_MO(j)
-    '            Next j
+        '1. Eltern und Nachfolger werden gemeinsam betrachtet
+        'Nur die neuen Eltern werden NDSorting hinzugefügt, Kinder sind schon oben drin
+        '---------------------------------------------------------------------
 
-    '            'Constraints bisher nicht eingebaut
-    '            '***************************************
-    '            'If Eigenschaft.NConstrains > 0 Then
-    '            '    .Feasible = True
-    '            '    For l = 1 To Eigenschaft.NConstrains
-    '            '        .Constrain(l) = Rb(m - Eigenschaft.NNachf, Eigenschaft.iaktuellePopulation, l)
-    '            '        If .Constrain(l) < 0 Then .Feasible = False
-    '            '    Next l
-    '            'End If
+        Redim NDSorting(n_Childs + n_Parents - 1)
+        Call Dim_NDSorting_Type(NDSorting)
 
-    '            .dominated = False
-    '            .Front = 0
-    '            .Distance = 0
-    '            For j = 1 To Eigenschaft.varanz
-    '                'Die Schrittweite wird ebenfalls übernommen
-    '                .d(v) = Db(v, i - Eigenschaft.NNachf, Eigenschaft.iaktuellePopulation)
-    '                'Die eigentlichen Parameterwerte werden übernommen
-    '                .X(v) = Xb(v, i - Eigenschaft.NNachf, Eigenschaft.iaktuellePopulation)
-    '            Next v
+        For i = n_Childs To n_Childs + n_Parents - 1
+            With NDSorting(i)
+                For j = 0 To n_Ziele - 1
+                    .Penalty_MO(j) = ChildList(i - n_Childs).Penalty_MO(j)
+                Next j
 
-    '        End With
-    '    Next i
+                ''NConstrains ********************************
+                'If Eigenschaft.NConstrains > 0 Then
+                '    .Feasible = True
+                '    For l = 1 To Eigenschaft.NConstrains
+                '        .Constrain(l) = Rb(m - Eigenschaft.NNachf, Eigenschaft.iaktuellePopulation, l)
+                '        If .Constrain(l) < 0 Then .Feasible = False
+                '    Next l
+                'End If
+
+                array.Copy(ChildList(i - n_Childs).Penalty_MO,.Penalty_MO,.Penalty_MO.GetLength(0))
+                .dominated = False
+                .Front = 0
+                .Distance = 0
+                array.Copy(ChildList(i - n_Childs).Path,.Path,.Path.GetLength(0))
+            End With
+        Next i
+
+        '2. Die einzelnen Fronten werden bestimmt
+        '----------------------------------------
+        Durchlauf_Front = 1
+        NFrontMember_gesamt = 0
+
+        'Initialisierung von Temp (NDSorting)
+        Dim Temp(n_Childs + n_Parents - 1) As NDSortingType
+        Call Dim_NDSorting_Type(Temp)
+
+        'Initialisierung von NDSResult (NDSorting)
+        Dim NDSResult(n_Childs + n_Parents - 1) As NDSortingType
+        Call Dim_NDSorting_Type(NDSResult)
+
+        'NDSorting wird in Temp kopiert
+        Array.Copy(NDSorting, Temp, NDSorting.GetLength(0))
+
+        'Schleife läuft über die Zahl der Fronten die hier auch bestimmte werden
+        Do
+            'A: Entscheidet welche Werte dominiert werden und welche nicht
+            Call Non_Dominated_Sorting(Temp, Durchlauf_Front) 'aktuallisiert auf n Objectives dm 10.05.05
+
+            'B: Sortiert die nicht dominanten Lösungen nach oben,
+            'die dominanten nach unten und zählt die Mitglieder der aktuellen Front
+            NFrontMember_aktuell = Non_Dominated_Count_and_Sort(Temp)
+            'NFrontMember_aktuell: Anzahl der Mitglieder der gerade bestimmten Front
+            'NFrontMember_gesamt: Alle bisher als nicht dominiert klassifizierten Individuum
+            NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
+
+            'C: Hier wird pro durchlauf die nicht dominierte Front in NDSResult geschaufelt
+            'und die bereits klassifizierten Lösungen aus Temp Array gelöscht
+            Call Non_Dominated_Result(Temp, NDSResult, NFrontMember_aktuell, NFrontMember_gesamt)
+            'Durchlauf ist hier die Nummer der Front
+            Durchlauf_Front = Durchlauf_Front + 1
+        Loop While Not (NFrontMember_gesamt = n_Parents + n_Childs)
 
 
+        '3. Der Bestwertspeicher wird entsprechend der Fronten oder der
+        'sekundären Population gefüllt
+        '-------------------------------------------------------------
+        NFrontMember_aktuell = 0
+        NFrontMember_gesamt = 0
+        aktuelle_Front = 1
 
-    'End Sub
+        Do
+            NFrontMember_aktuell = Count_Front_Members(aktuelle_Front, NDSResult)
+
+            'Es sind mehr Elterplätze für die nächste Generation verfügaber
+            '-> schiss wird einfach rüberkopiert
+            If NFrontMember_aktuell <= n_parents - NFrontMember_gesamt Then
+                For i = NFrontMember_gesamt + 1 To NFrontMember_aktuell + NFrontMember_gesamt
+                    For j = 0 To n_ziele - 1
+                        Qb(i, Eigenschaft.iaktuellePopulation, j) = NDSResult(i).penalty(j)
+                    Next j
+                    If Eigenschaft.NConstrains > 0 Then
+                        For j = 1 To Eigenschaft.NConstrains
+                            Rb(i, Eigenschaft.iaktuellePopulation, j) = NDSResult(i).Constrain(j)
+                        Next j
+                    End If
+                    For v = 1 To Eigenschaft.varanz
+                        Db(v, i, Eigenschaft.iaktuellePopulation) = NDSResult(i).d(v)
+                        Xb(v, i, Eigenschaft.iaktuellePopulation) = NDSResult(i).X(v)
+                    Next v
+
+                Next i
+                NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
+
+            Else
+                'Es sind weniger Elterplätze für die nächste Generation verfügber
+                'als Mitglieder der aktuellen Front. Nur für diesen Rest wird crowding distance
+                'gemacht um zu bestimmen wer noch mitspielen darf und wer noch a biserl was druff hat
+                Call NDS_Crowding_Distance_Sort(NDSResult, NFrontMember_gesamt + 1, NFrontMember_gesamt + NFrontMember_aktuell)
+
+                For i = NFrontMember_gesamt + 1 To Eigenschaft.NEltern
+
+                    For j = 1 To Eigenschaft.NPenalty
+                        Qb(i, Eigenschaft.iaktuellePopulation, j) = NDSResult(i).penalty(j)
+                    Next j
+                    If Eigenschaft.NConstrains > 0 Then
+                        For j = 1 To Eigenschaft.NConstrains
+                            Rb(i, Eigenschaft.iaktuellePopulation, j) = NDSResult(i).Constrain(j)
+                        Next j
+                    End If
+                    For v = 1 To Eigenschaft.varanz
+                        Db(v, i, Eigenschaft.iaktuellePopulation) = NDSResult(i).d(v)
+                        Xb(v, i, Eigenschaft.iaktuellePopulation) = NDSResult(i).X(v)
+                    Next v
+
+                Next i
+
+                NFrontMember_gesamt = Eigenschaft.NEltern
+
+            End If
+
+            aktuelle_Front = aktuelle_Front + 1
+
+        Loop While Not (NFrontMember_gesamt = Eigenschaft.NEltern)
+
+        '3. Der Bestwertspeicher wird entsprechend der Fronten oder der
+        'sekundären Population gefüllt
+        '-------------------------------------------------------------
+        NFrontMember_aktuell = 0
+        NFrontMember_gesamt = 0
+        aktuelle_Front = 1
+
+        Do
+            NFrontMember_aktuell = Count_Front_Members(aktuelle_Front, NDSResult)
+
+            'Es sind mehr Elterplätze für die nächste Generation verfügaber
+            '-> schiss wird einfach rüberkopiert
+            If NFrontMember_aktuell <= Eigenschaft.NEltern - NFrontMember_gesamt Then
+                For i = NFrontMember_gesamt + 1 To NFrontMember_aktuell + NFrontMember_gesamt
+                    For j = 1 To Eigenschaft.NPenalty
+                        Qb(i, Eigenschaft.iaktuellePopulation, j) = NDSResult(i).penalty(j)
+                    Next j
+                    If Eigenschaft.NConstrains > 0 Then
+                        For j = 1 To Eigenschaft.NConstrains
+                            Rb(i, Eigenschaft.iaktuellePopulation, j) = NDSResult(i).Constrain(j)
+                        Next j
+                    End If
+                    For v = 1 To Eigenschaft.varanz
+                        Db(v, i, Eigenschaft.iaktuellePopulation) = NDSResult(i).d(v)
+                        Xb(v, i, Eigenschaft.iaktuellePopulation) = NDSResult(i).X(v)
+                    Next v
+
+                Next i
+                NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
+
+            Else
+                'Es sind weniger Elterplätze für die nächste Generation verfügber
+                'als Mitglieder der aktuellen Front. Nur für diesen Rest wird crowding distance
+                'gemacht um zu bestimmen wer noch mitspielen darf und wer noch a biserl was druff hat
+                Call NDS_Crowding_Distance_Sort(NDSResult, NFrontMember_gesamt + 1, NFrontMember_gesamt + NFrontMember_aktuell)
+
+                For i = NFrontMember_gesamt + 1 To Eigenschaft.NEltern
+
+                    For j = 1 To Eigenschaft.NPenalty
+                        Qb(i, Eigenschaft.iaktuellePopulation, j) = NDSResult(i).penalty(j)
+                    Next j
+                    If Eigenschaft.NConstrains > 0 Then
+                        For j = 1 To Eigenschaft.NConstrains
+                            Rb(i, Eigenschaft.iaktuellePopulation, j) = NDSResult(i).Constrain(j)
+                        Next j
+                    End If
+                    For v = 1 To Eigenschaft.varanz
+                        Db(v, i, Eigenschaft.iaktuellePopulation) = NDSResult(i).d(v)
+                        Xb(v, i, Eigenschaft.iaktuellePopulation) = NDSResult(i).X(v)
+                    Next v
+
+                Next i
+
+                NFrontMember_gesamt = Eigenschaft.NEltern
+
+            End If
+
+            aktuelle_Front = aktuelle_Front + 1
+
+        Loop While Not (NFrontMember_gesamt = Eigenschaft.NEltern)
+
+        '4: Sekundäre Population wird bestimmt und gespeichert
+        NFrontMember_aktuell = Count_Front_Members(1, NDSResult)
+
+        If Eigenschaft.iaktuelleRunde = 1 And Eigenschaft.iaktuellePopulation = 1 And Eigenschaft.iaktuelleGeneration = 1 Then
+            ReDim Preserve SekundärQb(Member_Sekundärefront + NFrontMember_aktuell)
+        Else
+            Member_Sekundärefront = UBound(SekundärQb)
+            ReDim Preserve SekundärQb(Member_Sekundärefront + NFrontMember_aktuell)
+        End If
+
+        For i = Member_Sekundärefront + 1 To Member_Sekundärefront + NFrontMember_aktuell
+            SekundärQb(i) = NDSResult(i - Member_Sekundärefront)
+        Next i
+
+        Call Non_Dominated_Sorting(SekundärQb, 1)
+        NFrontMember_aktuell = Non_Dominated_Count_and_Sort_Sekundäre_Population(SekundärQb)
+        ReDim Preserve SekundärQb(NFrontMember_aktuell)
+        Call SekundärQb_Duplettten(SekundärQb)
+        NFrontMember_aktuell = Non_Dominated_Count_and_Sort_Sekundäre_Population(SekundärQb)
+        ReDim Preserve SekundärQb(NFrontMember_aktuell)
+
+        If UBound(SekundärQb) > Eigenschaft.NMemberSecondPop Then
+            Call NDS_Crowding_Distance_Sort(SekundärQb, 1, UBound(SekundärQb))
+            ReDim Preserve SekundärQb(Eigenschaft.NMemberSecondPop)
+        End If
+
+        If (Eigenschaft.iaktuelleGeneration Mod Eigenschaft.interact) = 0 And Eigenschaft.isInteract Then
+            NFrontMember_aktuell = Count_Front_Members(1, SekundärQb)
+            If NFrontMember_aktuell > Eigenschaft.NEltern Then
+                Call NDS_Crowding_Distance_Sort(SekundärQb, 1, UBound(SekundärQb))
+                For i = 1 To Eigenschaft.NEltern
+
+                    For j = 1 To Eigenschaft.NPenalty
+                        Qb(i, Eigenschaft.iaktuellePopulation, j) = SekundärQb(i).penalty(j)
+                    Next j
+                    If Eigenschaft.NConstrains > 0 Then
+                        For j = 1 To Eigenschaft.NConstrains
+                            Rb(i, Eigenschaft.iaktuellePopulation, j) = SekundärQb(i).constrain(j)
+                        Next j
+                    End If
+                    For v = 1 To Eigenschaft.varanz
+                        Db(v, i, Eigenschaft.iaktuellePopulation) = SekundärQb(i).d(v)
+                        Xb(v, i, Eigenschaft.iaktuellePopulation) = SekundärQb(i).X(v)
+                    Next v
+
+                Next i
+            End If
+        End If
+
+        'Neue Eltern werden gleich dem Bestwertspeicher gesetzt
+        For m = 1 To Eigenschaft.NEltern
+            For v = 1 To Eigenschaft.varanz
+                De(v, m, Eigenschaft.iaktuellePopulation) = Db(v, m, Eigenschaft.iaktuellePopulation)
+                Xe(v, m, Eigenschaft.iaktuellePopulation) = Xb(v, m, Eigenschaft.iaktuellePopulation)
+            Next v
+        Next m
+
+        'Sortierung der Lösungen ist nur für Neighbourhood-Rekombination notwendig
+        If Eigenschaft.iOptEltern = EVO_ELTERN_Neighbourhood Then
+            Call Neighbourhood_AbstandsArray(PenaltyDistance, Qb)
+            Call Neighbourhood_Crowding_Distance(Distanceb, Qb)
+        End If
+
+        'End If
+
+        EsEltern = True
+        Exit Sub
+
+ES_ELTERN_ERROR:
+        Exit Sub
+
+    End Sub
+
+
+    '*******************************************************************************
+    'A: Non_Dominated_Sorting
+    'Entscheidet welche Werte dominiert werden und welche nicht
+    '*******************************************************************************
+    Private Sub Non_Dominated_Sorting(ByRef NDSorting() As NDSortingType, ByRef Durchlauf_Front As Short)
+
+        Dim j, i, k As Short
+        Dim Logical As Boolean
+        Dim Summe_Constrain(2) As Double
+
+        'If Eigenschaft.NConstrains > 0 Then
+        '    For i = 1 To UBound(NDSorting)
+        '        For j = 1 To UBound(NDSorting)
+        '            If NDSorting(i).Feasible And Not NDSorting(j).Feasible Then
+        '                If NDSorting(j).dominated = False Then NDSorting(j).dominated = True
+        '            ElseIf ((Not NDSorting(i).Feasible) And (Not NDSorting(j).Feasible)) Then
+        '                Summe_Constrain(1) = 0
+        '                Summe_Constrain(2) = 0
+        '                For k = 1 To Eigenschaft.NConstrains
+        '                    If NDSorting(i).Constrain(k) < 0 Then
+        '                        Summe_Constrain(1) = Summe_Constrain(1) + NDSorting(i).Constrain(k)
+        '                    End If
+        '                    If NDSorting(j).Constrain(k) < 0 Then
+        '                        Summe_Constrain(2) = Summe_Constrain(2) + NDSorting(j).Constrain(k)
+        '                    End If
+        '                Next k
+        '                If Summe_Constrain(1) > Summe_Constrain(2) Then
+        '                    If NDSorting(j).dominated = False Then NDSorting(j).dominated = True
+        '                End If
+        '            ElseIf (NDSorting(i).Feasible And NDSorting(j).Feasible) Then
+        '                Logical = False
+        '                For k = 1 To Eigenschaft.NPenalty
+        '                    Logical = Logical Or (NDSorting(i).penalty(k) < NDSorting(j).penalty(k))
+        '                Next k
+        '                For k = 1 To Eigenschaft.NPenalty
+        '                    Logical = Logical And (NDSorting(i).penalty(k) <= NDSorting(j).penalty(k))
+        '                Next k
+        '                If Logical Then
+        '                    If NDSorting(j).dominated = False Then NDSorting(j).dominated = True
+        '                End If
+        '            End If
+        '        Next j
+        '    Next i
+        'Else
+        For i = 0 To NDSorting.GetUpperBound(0)
+            For j = 0 To NDSorting.GetUpperBound(0)
+                Logical = False
+
+                For k = 0 To n_Ziele -1
+                    Logical = Logical Or (NDSorting(i).Penalty_MO(k) < NDSorting(j).Penalty_MO(k))
+                Next k
+
+                For k = 0 To n_Ziele - 1
+                    Logical = Logical And (NDSorting(i).Penalty_MO(k) <= NDSorting(j).Penalty_MO(k))
+                Next k
+
+                If Logical Then
+                    If NDSorting(j).dominated = False Then NDSorting(j).dominated = True
+                End If
+            Next j
+        Next i
+
+        'End If
+
+        For i = 0 To NDSorting.GetUpperBound(0)
+            'Hier wird die Nummer der Front geschrieben
+            If NDSorting(i).dominated = False Then NDSorting(i).Front = Durchlauf_Front
+        Next i
+
+    End Sub
+
+
+    '*******************************************************************************
+    'B: Non_Dominated_Count_and_Sort
+    'Sortiert die nicht dominanten Lösungen nach oben, die dominanten nach unten
+    '*******************************************************************************
+
+    Private Function Non_Dominated_Count_and_Sort(ByRef NDSorting() As NDSortingType) As Short
+        Dim i As Short
+        Dim Temp() As NDSortingType
+        Dim counter As Short
+
+        ReDim Temp(NDSorting.GetUpperBound(0))
+        call Dim_NDSorting_Type(Temp)
+
+        Non_Dominated_Count_and_Sort = 0
+        counter = 0
+
+        'Die nicht dominanten Lösungen werden nach oben kopiert
+        For i = 0 To NDSorting.GetUpperBound(0)
+            If NDSorting(i).dominated = True Then
+                counter = counter + 1
+                Temp(counter) = NDSorting(i)
+            End If
+        Next i
+
+        'Zahl der dominanten wird errechnet und zurückgegeben
+        Non_Dominated_Count_and_Sort = NDSorting.GetLength(0) - counter
+
+        'Die dominanten Lösungen werden nach unten kopiert
+        For i = 0 To NDSorting.GetUpperBound(0)
+            If NDSorting(i).dominated = False Then
+                counter = counter + 1
+                Temp(counter) = NDSorting(i)
+            End If
+        Next i
+
+        Array.Copy(Temp, NDSorting, NDSorting.GetLength(0))
+
+    End Function
+
+
+    '*******************************************************************************
+    'Non_Dominated_Count_and_Sort_Sekundäre_Population
+    'Sortiert die nicht dominanten Lösungen nach oben, die dominanten nach unten
+    'hier für die Sekundäre Population
+    '*******************************************************************************
+
+    'Private Function Non_Dominated_Count_and_Sort_Sekundäre_Population(ByRef NDSorting() As NDSortingType) As Short
+
+
+    'End Function
+
+
+    '*******************************************************************************
+    'C: Non_Dominated_Result
+    'Hier wird pro durchlauf die nicht dominierte Front in NDSResult geschaufelt
+    'und die bereits klassifizierten Lösungen aus Temp Array gelöscht
+    '*******************************************************************************
+
+    Private Sub Non_Dominated_Result(ByRef Temp() As NDSortingType, ByRef NDSResult() As NDSortingType, ByRef NFrontMember_aktuell As Short, ByRef NFrontMember_gesamt As Short)
+
+        Dim i, Position As Short
+
+        Position = NFrontMember_gesamt - NFrontMember_aktuell + 1
+
+        'In NDSResult werden die nicht dominierten Lösungen eingefügt
+        'ToDo: Hier müssen die Grenzen überprüft werden
+        For i = Temp.GetUpperBound(0) - NFrontMember_aktuell to Temp.GetUpperBound(0)
+            'Alt: For i = UBound(Temp) + 1 - NFrontMember_aktuell To UBound(Temp)
+            'NDSResult alle bisher gefundene Fronten
+            NDSResult(Position) = Temp(i)
+            Position = Position + 1
+        Next i
+
+        'Die bereits klassifizierten Member werden aus dem Temp Array gelöscht
+        If n_Childs + n_Parents - NFrontMember_gesamt > 0 Then
+
+            ReDim Preserve Temp(n_Childs + n_Parents - NFrontMember_gesamt - 1)
+            'ToDo: Hier müssen die Grenzen überprüft werden
+            'Alt: ReDim Preserve Temp(Eigenschaft.NNachf + Eigenschaft.NEltern - NFrontMember_gesamt)
+            'Der Flag wird zur klassifizierung in der nächsten Runde zurückgesetzt
+            For i = 1 To UBound(Temp)
+                Temp(i).dominated = False
+            Next i
+        End If
+
+    End Sub
+
+    '*******************************************************************************
+    'Count_Front_Members
+    '*******************************************************************************
+
+    Private Function Count_Front_Members(ByRef aktuell_Front As Short, ByRef NDSResult() As NDSortingType) As Integer
+        Dim i As Short
+
+        Count_Front_Members = 0
+
+        For i = 1 To UBound(NDSResult)
+            If NDSResult(i).Front = aktuell_Front Then
+                Count_Front_Members = Count_Front_Members + 1
+            End If
+        Next i
+
+    End Function
 
 End Class
 
