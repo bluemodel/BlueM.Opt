@@ -1884,7 +1884,7 @@ ES_POP_ELTERN_ERROR:
 
             Loop While Not (NFrontMember_gesamt = Eigenschaft.NEltern)
 
-            'Sekundäre Population wird bestimmt und gespeichert
+            '4: Sekundäre Population wird bestimmt und gespeichert
             NFrontMember_aktuell = Count_Front_Members(1, NDSResult)
 
             If Eigenschaft.iaktuelleRunde = 1 And Eigenschaft.iaktuellePopulation = 1 And Eigenschaft.iaktuelleGeneration = 1 Then
