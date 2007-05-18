@@ -39,6 +39,7 @@ Public Class CES
         Dim Path() As Integer      'auf 0 ist die Stadt, auf 1 die Anzahl der Städte
         Dim Penalty_SO As Double    'HACK zum Ausgleich von MO und SO
         Dim Penalty_MO() As Double
+        Dim Front As Short
     End Structure
 
     '************************************* Listen ******************************
@@ -387,19 +388,43 @@ Public Class CES
     '********************************************************************************
 
     Public Sub NDSorting_Control()
-        Dim i, j As Short
+        Dim i As Short
         Dim NFrontMember_aktuell, NFrontMember_gesamt As Short
         Dim Durchlauf_Front As Short
         'Dim Count as short
         Dim aktuelle_Front As Short
         'Dim Member_Sekundärefront As Short
 
-        '1. Eltern und Nachfolger werden gemeinsam betrachtet
-        'Nur die neuen Eltern werden NDSorting hinzugefügt, Kinder sind schon oben drin
-        '---------------------------------------------------------------------
-
         ReDim NDSorting(n_Childs + n_Parents - 1)
         Call Dim_NDSorting_Type(NDSorting)
+
+        '0. Eltern und Nachfolger werden gemeinsam betrachtet
+        'Die Kinder werden NDSorting hinzugefügt
+        '-------------------------------------------
+
+        For i = 0 To n_Childs - 1
+            With NDSorting(i)
+
+                ''NConstrains ********************************
+                'If Eigenschaft.NConstrains > 0 Then
+                '    .Feasible = True
+                '    For l = 1 To Eigenschaft.NConstrains
+                '        .Constrain(l) = Rb(m - Eigenschaft.NNachf, Eigenschaft.iaktuellePopulation, l)
+                '        If .Constrain(l) < 0 Then .Feasible = False
+                '    Next l
+                'End If
+
+                Array.Copy(ChildList(i).Penalty_MO, .Penalty_MO, .Penalty_MO.GetLength(0))
+                .dominated = False
+                .Front = 0
+                .Distance = 0
+                Array.Copy(ChildList(i).Path, .Path, .Path.GetLength(0))
+            End With
+        Next i
+
+        '1. Eltern und Nachfolger werden gemeinsam betrachtet
+        'Die Eltern werden NDSorting hinzugefügt
+        '-------------------------------------------
 
         For i = n_Childs To n_Childs + n_Parents - 1
             With NDSorting(i)
@@ -413,11 +438,11 @@ Public Class CES
                 '    Next l
                 'End If
 
-                array.Copy(ChildList(i - n_Childs).Penalty_MO, .Penalty_MO, .Penalty_MO.GetLength(0))
+                array.Copy(parentlist(i - n_Childs).Penalty_MO, .Penalty_MO, .Penalty_MO.GetLength(0))
                 .dominated = False
                 .Front = 0
                 .Distance = 0
-                array.Copy(ChildList(i - n_Childs).Path, .Path, .Path.GetLength(0))
+                array.Copy(parentlist(i - n_Childs).Path, .Path, .Path.GetLength(0))
             End With
         Next i
 
@@ -474,6 +499,7 @@ Public Class CES
                     Array.Copy(NDSResult(i).Penalty_MO, ParentList(i).Penalty_MO, n_Penalty)
                     Array.Copy(NDSResult(i).Path, ParentList(i).Path, n_Location)
                     ParentList(i).No = NDSResult(i).No
+                    ParentList(i).Front = NDSResult(i).Front
                 Next i
                 NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
 
@@ -481,17 +507,16 @@ Public Class CES
                 'Es sind weniger Elterplätze für die nächste Generation verfügber
                 'als Mitglieder der aktuellen Front. Nur für diesen Rest wird crowding distance
                 'gemacht um zu bestimmen wer noch mitspielen darf und wer noch a biserl was druff hat
-                Call NDS_Crowding_Distance_Sort(NDSResult, NFrontMember_gesamt + 1, NFrontMember_gesamt + NFrontMember_aktuell)
+                Call NDS_Crowding_Distance_Sort(NDSResult, NFrontMember_gesamt, NFrontMember_gesamt + NFrontMember_aktuell - 1)
 
                 For i = NFrontMember_gesamt To n_Parents - 1
-
                     Array.Copy(NDSResult(i).Penalty_MO, ParentList(i).Penalty_MO, n_Penalty)
                     Array.Copy(NDSResult(i).Path, ParentList(i).Path, n_Location)
                     ParentList(i).No = NDSResult(i).No
-
+                    ParentList(i).Front = NDSResult(i).Front
                 Next i
 
-                NFrontMember_gesamt = n_Penalty
+                NFrontMember_gesamt = n_Parents
 
             End If
 
@@ -664,8 +689,8 @@ Public Class CES
         'Die nicht dominanten Lösungen werden nach oben kopiert
         For i = 0 To NDSorting.GetUpperBound(0)
             If NDSorting(i).dominated = True Then
-                counter = counter + 1
                 Temp(counter) = NDSorting(i)
+                counter = counter + 1
             End If
         Next i
 
@@ -675,8 +700,8 @@ Public Class CES
         'Die dominanten Lösungen werden nach unten kopiert
         For i = 0 To NDSorting.GetUpperBound(0)
             If NDSorting(i).dominated = False Then
-                counter = counter + 1
                 Temp(counter) = NDSorting(i)
+                counter = counter + 1
             End If
         Next i
 
@@ -707,12 +732,10 @@ Public Class CES
 
         Dim i, Position As Short
 
-        Position = NFrontMember_gesamt - NFrontMember_aktuell + 1
+        Position = NFrontMember_gesamt - NFrontMember_aktuell
 
         'In NDSResult werden die nicht dominierten Lösungen eingefügt
-        'ToDo: Hier müssen die Grenzen überprüft werden
-        For i = Temp.GetUpperBound(0) - NFrontMember_aktuell To Temp.GetUpperBound(0)
-            'Alt: For i = UBound(Temp) + 1 - NFrontMember_aktuell To UBound(Temp)
+        For i = Temp.GetUpperBound(0)+1 - NFrontMember_aktuell To Temp.GetUpperBound(0)
             'NDSResult alle bisher gefundene Fronten
             NDSResult(Position) = Temp(i)
             Position = Position + 1
@@ -722,10 +745,8 @@ Public Class CES
         If n_Childs + n_Parents - NFrontMember_gesamt > 0 Then
 
             ReDim Preserve Temp(n_Childs + n_Parents - NFrontMember_gesamt - 1)
-            'ToDo: Hier müssen die Grenzen überprüft werden
-            'Alt: ReDim Preserve Temp(Eigenschaft.NNachf + Eigenschaft.NEltern - NFrontMember_gesamt)
             'Der Flag wird zur klassifizierung in der nächsten Runde zurückgesetzt
-            For i = 1 To UBound(Temp)
+            For i = 0 To Temp.GetUpperBound(0)
                 Temp(i).dominated = False
             Next i
         End If
@@ -736,12 +757,12 @@ Public Class CES
     'Count_Front_Members
     '*******************************************************************************
 
-    Private Function Count_Front_Members(ByRef aktuell_Front As Short, ByRef NDSResult() As NDSortingType) As Integer
+    Private Function Count_Front_Members(ByVal aktuell_Front As Short, ByRef NDSResult() As NDSortingType) As Integer
         Dim i As Short
 
         Count_Front_Members = 0
 
-        For i = 1 To UBound(NDSResult)
+        For i = 0 To NDSResult.GetUpperBound(0)
             If NDSResult(i).Front = aktuell_Front Then
                 Count_Front_Members = Count_Front_Members + 1
             End If
@@ -765,7 +786,7 @@ Public Class CES
 
         Dim fmin, fmax As Double
 
-        For k = 1 To n_Penalty
+        For k = 0 To n_Penalty - 1
             For i = start To ende
                 For j = start To ende
                     If NDSorting(i).Penalty_MO(k) < NDSorting(j).Penalty_MO(k) Then
