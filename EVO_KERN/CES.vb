@@ -396,8 +396,9 @@ Public Class CES
         Dim i, j As Short
         Dim NFrontMember_aktuell, NFrontMember_gesamt As Short
         Dim Durchlauf_Front As Short
-        Dim Count, aktuelle_Front As Short
-        Dim Member_Sekundärefront As Short
+        'Dim Count as short
+        Dim aktuelle_Front As Short
+        'Dim Member_Sekundärefront As Short
 
         '1. Eltern und Nachfolger werden gemeinsam betrachtet
         'Nur die neuen Eltern werden NDSorting hinzugefügt, Kinder sind schon oben drin
@@ -464,7 +465,6 @@ Public Class CES
             Durchlauf_Front = Durchlauf_Front + 1
         Loop While Not (NFrontMember_gesamt = n_Parents + n_Childs)
 
-
         '3. Der Bestwertspeicher wird entsprechend der Fronten oder der
         'sekundären Population gefüllt
         '-------------------------------------------------------------
@@ -477,21 +477,12 @@ Public Class CES
 
             'Es sind mehr Elterplätze für die nächste Generation verfügaber
             '-> schiss wird einfach rüberkopiert
-            If NFrontMember_aktuell <= n_parents - NFrontMember_gesamt Then
+            If NFrontMember_aktuell <= n_Parents - NFrontMember_gesamt Then
+                'ToDo: Grenzen müssen überprüft werden
                 For i = NFrontMember_gesamt + 1 To NFrontMember_aktuell + NFrontMember_gesamt
-                    For j = 0 To n_ziele - 1
-                        Qb(i, Eigenschaft.iaktuellePopulation, j) = NDSResult(i).penalty(j)
-                    Next j
-                    If Eigenschaft.NConstrains > 0 Then
-                        For j = 1 To Eigenschaft.NConstrains
-                            Rb(i, Eigenschaft.iaktuellePopulation, j) = NDSResult(i).Constrain(j)
-                        Next j
-                    End If
-                    For v = 1 To Eigenschaft.varanz
-                        Db(v, i, Eigenschaft.iaktuellePopulation) = NDSResult(i).d(v)
-                        Xb(v, i, Eigenschaft.iaktuellePopulation) = NDSResult(i).X(v)
-                    Next v
-
+                    Array.Copy(NDSResult(i).Penalty_MO, ParentList(i).Penalty_MO, n_Ziele)
+                    Array.Copy(NDSResult(i).Path, ParentList(i).Path, n_Locations)
+                    ParentList(i).No = NDSResult(i).No
                 Next i
                 NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
 
@@ -501,162 +492,92 @@ Public Class CES
                 'gemacht um zu bestimmen wer noch mitspielen darf und wer noch a biserl was druff hat
                 Call NDS_Crowding_Distance_Sort(NDSResult, NFrontMember_gesamt + 1, NFrontMember_gesamt + NFrontMember_aktuell)
 
-                For i = NFrontMember_gesamt + 1 To Eigenschaft.NEltern
+                For i = NFrontMember_gesamt To n_Parents - 1
 
-                    For j = 1 To Eigenschaft.NPenalty
-                        Qb(i, Eigenschaft.iaktuellePopulation, j) = NDSResult(i).penalty(j)
-                    Next j
-                    If Eigenschaft.NConstrains > 0 Then
-                        For j = 1 To Eigenschaft.NConstrains
-                            Rb(i, Eigenschaft.iaktuellePopulation, j) = NDSResult(i).Constrain(j)
-                        Next j
-                    End If
-                    For v = 1 To Eigenschaft.varanz
-                        Db(v, i, Eigenschaft.iaktuellePopulation) = NDSResult(i).d(v)
-                        Xb(v, i, Eigenschaft.iaktuellePopulation) = NDSResult(i).X(v)
-                    Next v
+                    Array.Copy(NDSResult(i).Penalty_MO, ParentList(i).Penalty_MO, n_Ziele)
+                    Array.Copy(NDSResult(i).Path, ParentList(i).Path, n_Locations)
+                    ParentList(i).No = NDSResult(i).No
 
                 Next i
 
-                NFrontMember_gesamt = Eigenschaft.NEltern
+                NFrontMember_gesamt = n_Ziele
 
             End If
 
             aktuelle_Front = aktuelle_Front + 1
 
-        Loop While Not (NFrontMember_gesamt = Eigenschaft.NEltern)
+        Loop While Not (NFrontMember_gesamt = n_parents)
 
-        '3. Der Bestwertspeicher wird entsprechend der Fronten oder der
-        'sekundären Population gefüllt
-        '-------------------------------------------------------------
-        NFrontMember_aktuell = 0
-        NFrontMember_gesamt = 0
-        aktuelle_Front = 1
+        '        '4: Sekundäre Population wird bestimmt und gespeichert
+        '        NFrontMember_aktuell = Count_Front_Members(1, NDSResult)
 
-        Do
-            NFrontMember_aktuell = Count_Front_Members(aktuelle_Front, NDSResult)
+        '        If Eigenschaft.iaktuelleRunde = 1 And Eigenschaft.iaktuellePopulation = 1 And Eigenschaft.iaktuelleGeneration = 1 Then
+        '            ReDim Preserve SekundärQb(Member_Sekundärefront + NFrontMember_aktuell)
+        '        Else
+        '            Member_Sekundärefront = UBound(SekundärQb)
+        '            ReDim Preserve SekundärQb(Member_Sekundärefront + NFrontMember_aktuell)
+        '        End If
 
-            'Es sind mehr Elterplätze für die nächste Generation verfügaber
-            '-> schiss wird einfach rüberkopiert
-            If NFrontMember_aktuell <= Eigenschaft.NEltern - NFrontMember_gesamt Then
-                For i = NFrontMember_gesamt + 1 To NFrontMember_aktuell + NFrontMember_gesamt
-                    For j = 1 To Eigenschaft.NPenalty
-                        Qb(i, Eigenschaft.iaktuellePopulation, j) = NDSResult(i).penalty(j)
-                    Next j
-                    If Eigenschaft.NConstrains > 0 Then
-                        For j = 1 To Eigenschaft.NConstrains
-                            Rb(i, Eigenschaft.iaktuellePopulation, j) = NDSResult(i).Constrain(j)
-                        Next j
-                    End If
-                    For v = 1 To Eigenschaft.varanz
-                        Db(v, i, Eigenschaft.iaktuellePopulation) = NDSResult(i).d(v)
-                        Xb(v, i, Eigenschaft.iaktuellePopulation) = NDSResult(i).X(v)
-                    Next v
+        '        For i = Member_Sekundärefront + 1 To Member_Sekundärefront + NFrontMember_aktuell
+        '            SekundärQb(i) = NDSResult(i - Member_Sekundärefront)
+        '        Next i
 
-                Next i
-                NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
+        '        Call Non_Dominated_Sorting(SekundärQb, 1)
+        '        NFrontMember_aktuell = Non_Dominated_Count_and_Sort_Sekundäre_Population(SekundärQb)
+        '        ReDim Preserve SekundärQb(NFrontMember_aktuell)
+        '        Call SekundärQb_Duplettten(SekundärQb)
+        '        NFrontMember_aktuell = Non_Dominated_Count_and_Sort_Sekundäre_Population(SekundärQb)
+        '        ReDim Preserve SekundärQb(NFrontMember_aktuell)
 
-            Else
-                'Es sind weniger Elterplätze für die nächste Generation verfügber
-                'als Mitglieder der aktuellen Front. Nur für diesen Rest wird crowding distance
-                'gemacht um zu bestimmen wer noch mitspielen darf und wer noch a biserl was druff hat
-                Call NDS_Crowding_Distance_Sort(NDSResult, NFrontMember_gesamt + 1, NFrontMember_gesamt + NFrontMember_aktuell)
+        '        If UBound(SekundärQb) > Eigenschaft.NMemberSecondPop Then
+        '            Call NDS_Crowding_Distance_Sort(SekundärQb, 1, UBound(SekundärQb))
+        '            ReDim Preserve SekundärQb(Eigenschaft.NMemberSecondPop)
+        '        End If
 
-                For i = NFrontMember_gesamt + 1 To Eigenschaft.NEltern
+        '        If (Eigenschaft.iaktuelleGeneration Mod Eigenschaft.interact) = 0 And Eigenschaft.isInteract Then
+        '            NFrontMember_aktuell = Count_Front_Members(1, SekundärQb)
+        '            If NFrontMember_aktuell > Eigenschaft.NEltern Then
+        '                Call NDS_Crowding_Distance_Sort(SekundärQb, 1, UBound(SekundärQb))
+        '                For i = 1 To Eigenschaft.NEltern
 
-                    For j = 1 To Eigenschaft.NPenalty
-                        Qb(i, Eigenschaft.iaktuellePopulation, j) = NDSResult(i).penalty(j)
-                    Next j
-                    If Eigenschaft.NConstrains > 0 Then
-                        For j = 1 To Eigenschaft.NConstrains
-                            Rb(i, Eigenschaft.iaktuellePopulation, j) = NDSResult(i).Constrain(j)
-                        Next j
-                    End If
-                    For v = 1 To Eigenschaft.varanz
-                        Db(v, i, Eigenschaft.iaktuellePopulation) = NDSResult(i).d(v)
-                        Xb(v, i, Eigenschaft.iaktuellePopulation) = NDSResult(i).X(v)
-                    Next v
+        '                    For j = 1 To Eigenschaft.NPenalty
+        '                        Qb(i, Eigenschaft.iaktuellePopulation, j) = SekundärQb(i).penalty(j)
+        '                    Next j
+        '                    If Eigenschaft.NConstrains > 0 Then
+        '                        For j = 1 To Eigenschaft.NConstrains
+        '                            Rb(i, Eigenschaft.iaktuellePopulation, j) = SekundärQb(i).constrain(j)
+        '                        Next j
+        '                    End If
+        '                    For v = 1 To Eigenschaft.varanz
+        '                        Db(v, i, Eigenschaft.iaktuellePopulation) = SekundärQb(i).d(v)
+        '                        Xb(v, i, Eigenschaft.iaktuellePopulation) = SekundärQb(i).X(v)
+        '                    Next v
 
-                Next i
+        '                Next i
+        '            End If
+        '        End If
 
-                NFrontMember_gesamt = Eigenschaft.NEltern
+        '        'Neue Eltern werden gleich dem Bestwertspeicher gesetzt
+        '        For m = 1 To Eigenschaft.NEltern
+        '            For v = 1 To Eigenschaft.varanz
+        '                De(v, m, Eigenschaft.iaktuellePopulation) = Db(v, m, Eigenschaft.iaktuellePopulation)
+        '                Xe(v, m, Eigenschaft.iaktuellePopulation) = Xb(v, m, Eigenschaft.iaktuellePopulation)
+        '            Next v
+        '        Next m
 
-            End If
+        '        'Sortierung der Lösungen ist nur für Neighbourhood-Rekombination notwendig
+        '        If Eigenschaft.iOptEltern = EVO_ELTERN_Neighbourhood Then
+        '            Call Neighbourhood_AbstandsArray(PenaltyDistance, Qb)
+        '            Call Neighbourhood_Crowding_Distance(Distanceb, Qb)
+        '        End If
 
-            aktuelle_Front = aktuelle_Front + 1
+        '        'End If
 
-        Loop While Not (NFrontMember_gesamt = Eigenschaft.NEltern)
+        '        EsEltern = True
+        '        Exit Sub
 
-        '4: Sekundäre Population wird bestimmt und gespeichert
-        NFrontMember_aktuell = Count_Front_Members(1, NDSResult)
-
-        If Eigenschaft.iaktuelleRunde = 1 And Eigenschaft.iaktuellePopulation = 1 And Eigenschaft.iaktuelleGeneration = 1 Then
-            ReDim Preserve SekundärQb(Member_Sekundärefront + NFrontMember_aktuell)
-        Else
-            Member_Sekundärefront = UBound(SekundärQb)
-            ReDim Preserve SekundärQb(Member_Sekundärefront + NFrontMember_aktuell)
-        End If
-
-        For i = Member_Sekundärefront + 1 To Member_Sekundärefront + NFrontMember_aktuell
-            SekundärQb(i) = NDSResult(i - Member_Sekundärefront)
-        Next i
-
-        Call Non_Dominated_Sorting(SekundärQb, 1)
-        NFrontMember_aktuell = Non_Dominated_Count_and_Sort_Sekundäre_Population(SekundärQb)
-        ReDim Preserve SekundärQb(NFrontMember_aktuell)
-        Call SekundärQb_Duplettten(SekundärQb)
-        NFrontMember_aktuell = Non_Dominated_Count_and_Sort_Sekundäre_Population(SekundärQb)
-        ReDim Preserve SekundärQb(NFrontMember_aktuell)
-
-        If UBound(SekundärQb) > Eigenschaft.NMemberSecondPop Then
-            Call NDS_Crowding_Distance_Sort(SekundärQb, 1, UBound(SekundärQb))
-            ReDim Preserve SekundärQb(Eigenschaft.NMemberSecondPop)
-        End If
-
-        If (Eigenschaft.iaktuelleGeneration Mod Eigenschaft.interact) = 0 And Eigenschaft.isInteract Then
-            NFrontMember_aktuell = Count_Front_Members(1, SekundärQb)
-            If NFrontMember_aktuell > Eigenschaft.NEltern Then
-                Call NDS_Crowding_Distance_Sort(SekundärQb, 1, UBound(SekundärQb))
-                For i = 1 To Eigenschaft.NEltern
-
-                    For j = 1 To Eigenschaft.NPenalty
-                        Qb(i, Eigenschaft.iaktuellePopulation, j) = SekundärQb(i).penalty(j)
-                    Next j
-                    If Eigenschaft.NConstrains > 0 Then
-                        For j = 1 To Eigenschaft.NConstrains
-                            Rb(i, Eigenschaft.iaktuellePopulation, j) = SekundärQb(i).constrain(j)
-                        Next j
-                    End If
-                    For v = 1 To Eigenschaft.varanz
-                        Db(v, i, Eigenschaft.iaktuellePopulation) = SekundärQb(i).d(v)
-                        Xb(v, i, Eigenschaft.iaktuellePopulation) = SekundärQb(i).X(v)
-                    Next v
-
-                Next i
-            End If
-        End If
-
-        'Neue Eltern werden gleich dem Bestwertspeicher gesetzt
-        For m = 1 To Eigenschaft.NEltern
-            For v = 1 To Eigenschaft.varanz
-                De(v, m, Eigenschaft.iaktuellePopulation) = Db(v, m, Eigenschaft.iaktuellePopulation)
-                Xe(v, m, Eigenschaft.iaktuellePopulation) = Xb(v, m, Eigenschaft.iaktuellePopulation)
-            Next v
-        Next m
-
-        'Sortierung der Lösungen ist nur für Neighbourhood-Rekombination notwendig
-        If Eigenschaft.iOptEltern = EVO_ELTERN_Neighbourhood Then
-            Call Neighbourhood_AbstandsArray(PenaltyDistance, Qb)
-            Call Neighbourhood_Crowding_Distance(Distanceb, Qb)
-        End If
-
-        'End If
-
-        EsEltern = True
-        Exit Sub
-
-ES_ELTERN_ERROR:
-        Exit Sub
+        'ES_ELTERN_ERROR:
+        '        Exit Sub
 
     End Sub
 
@@ -833,6 +754,127 @@ ES_ELTERN_ERROR:
             If NDSResult(i).Front = aktuell_Front Then
                 Count_Front_Members = Count_Front_Members + 1
             End If
+        Next i
+
+    End Function
+
+
+    '*******************************************************************************
+    'NDS_Crowding_Distance_Sort
+    '*******************************************************************************
+
+    Private Sub NDS_Crowding_Distance_Sort(ByRef NDSorting() As NDSortingType, ByRef start As Short, ByRef ende As Short)
+        Dim i As Integer
+        Dim j As Integer
+        Dim k As Short
+
+        Dim swap As NDSortingType
+        ReDim swap.Penalty_MO(n_Ziele - 1)
+        Redim swap.Path(n_locations-1)
+
+        Dim fmin, fmax As Double
+
+        For k = 1 To n_Ziele
+            For i = start To ende
+                For j = start To ende
+                    If NDSorting(i).penalty_MO(k) < NDSorting(j).penalty_MO(k) Then
+                        swap = NDSorting(i)
+                        NDSorting(i) = NDSorting(j)
+                        NDSorting(j) = swap
+                    End If
+                Next j
+            Next i
+
+            fmin = NDSorting(start).penalty_MO(k)
+            fmax = NDSorting(ende).penalty_MO(k)
+
+            NDSorting(start).distance = 1.0E+300
+            NDSorting(ende).distance = 1.0E+300
+
+            For i = start + 1 To ende - 1
+                NDSorting(i).distance = NDSorting(i).distance + (NDSorting(i + 1).penalty_MO(k) - NDSorting(i - 1).penalty_MO(k)) / (fmax - fmin)
+            Next i
+        Next k
+
+        For i = start To ende
+            For j = start To ende
+                If NDSorting(i).distance > NDSorting(j).distance Then
+                    swap = NDSorting(i)
+                    NDSorting(i) = NDSorting(j)
+                    NDSorting(j) = swap
+                End If
+            Next j
+        Next i
+
+    End Sub
+
+
+
+    '*******************************************************************************
+    'NDS_Crowding_Distance_Count
+    '*******************************************************************************
+
+    Private Function NDS_Crowding_Distance_Count(ByRef Qb(,,) As Double, ByRef Spannweite As Double) As Double
+
+        Dim i As Short
+        Dim j As Short
+        Dim k As Short
+        Dim TempDistance() As Double
+        Dim PenaltyDistance(,) As Double
+
+        Dim d() As Double
+        Dim d_mean As Double
+
+        ReDim TempDistance(n_Ziele -1)
+        ReDim PenaltyDistance(n_Parents - 1, n_Parents - 1)
+        ReDim d(n_Parents - 1)
+
+        'Bestimmen der normierten Raumabstände zwischen allen Elternindividuen
+        For i = 0 To n_Parents -1
+            PenaltyDistance(i, i) = 0
+            For j = i + 1 To n_Parents - 1
+                PenaltyDistance(i, j) = 0
+                For k = 0 To n_Ziele - 1
+                    TempDistance(k) = ParentList(i).Penalty_MO(k) - ParentList(j).Penalty_MO(k)
+                    TempDistance(k) = TempDistance(k) * TempDistance(k)
+                    PenaltyDistance(i, j) = PenaltyDistance(i, j) + TempDistance(k)
+                Next k
+                PenaltyDistance(i, j) = System.Math.Sqrt(PenaltyDistance(i, j))
+                PenaltyDistance(j, i) = PenaltyDistance(i, j)
+            Next j
+        Next i
+
+        d_mean = 0
+
+        For i = 0 To n_parents - 2
+            d(i) = 1.0E+300
+            For j = 0 To i - 1
+                If PenaltyDistance(i, j) < d(i) Then d(i) = PenaltyDistance(i, j)
+            Next j
+            For j = i + 1 To n_Parents - 1
+                If PenaltyDistance(i, j) < d(i) Then d(i) = PenaltyDistance(i, j)
+            Next j
+            d_mean = d_mean + d(i)
+        Next i
+
+        d_mean = d_mean / n_parents
+
+        NDS_Crowding_Distance_Count = 0
+
+        For i = 0 To n_Parents - 2
+            NDS_Crowding_Distance_Count = NDS_Crowding_Distance_Count + (d_mean - d(i)) * (d_mean - d(i))
+        Next i
+
+        NDS_Crowding_Distance_Count = NDS_Crowding_Distance_Count / n_parents
+
+        NDS_Crowding_Distance_Count = System.Math.Sqrt(NDS_Crowding_Distance_Count)
+
+        Spannweite = 0
+        For i = 0 To n_Parents - 1
+            'ToDo : sollte hier nicht j = i + 1 stehen?
+            For j = i To n_Parents - 1
+                If PenaltyDistance(i, j) > Spannweite Then Spannweite = PenaltyDistance(i, j)
+            Next j
         Next i
 
     End Function

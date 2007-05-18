@@ -547,11 +547,6 @@ Partial Class Form1
         Call CES1.Dim_Parents_BM()
         Call CES1.Dim_Childs()
 
-        'Falls MO wird NDSorting gestarted
-        If BlueM1.OptZieleListe.GetLength(0) = 2 Then
-            Call CES1.Dim_NDSorting_Types()
-        End If
-
         'Diagramm vorbereiten und initialisieren        
         Call PrepareDiagramm()
 
