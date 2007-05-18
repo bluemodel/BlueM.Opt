@@ -234,14 +234,14 @@ Partial Class Form1
                         'Call Initialisierung_BlauesModell_CombiOpt()
 
                         'Anzahl der Ziele, Locations und Verzeigungen wird an CES übergeben
-                        CES1.n_Ziele = BlueM1.OptZieleListe.GetLength(0)
-                        CES1.n_Locations = BlueM1.LocationList.GetLength(0)
+                        CES1.n_Penalty = BlueM1.OptZieleListe.GetLength(0)
+                        CES1.n_Location = BlueM1.LocationList.GetLength(0)
                         CES1.n_Verzweig = BlueM1.VerzweigungsDatei.GetLength(0)
 
                         'Gibt die PathSize an für jede Pfadstelle
                         Dim i As Integer
-                        Redim CES1.n_PathSize(ces1.n_Locations-1)
-                        For i = 0 To CES1.n_Locations - 1
+                        ReDim CES1.n_PathSize(CES1.n_Location - 1)
+                        For i = 0 To CES1.n_Location - 1
                             CES1.n_PathSize(i) = BlueM1.LocationList(i).MassnahmeListe.GetLength(0)
                         Next
 
@@ -560,7 +560,7 @@ Partial Class Form1
         'Call CES1.Generate_All_Test_Path()
 
         'Generationsschleife
-        For gen = 1 To CES1.n_Gen
+        For gen = 1 To CES1.n_Generation
 
             'Child Schleife
             For i = 0 To CES1.ChildList.GetUpperBound(0)
@@ -576,7 +576,7 @@ Partial Class Form1
                 Call BlueM1.Verzweigung_Write()
 
                 'Evaluiert das Blaue Modell
-                Call BlueM1.Eval_Sim_CombiOpt(CES1.n_Ziele, durchlauf, 1, CES1.ChildList(i).Penalty_MO, Diag)
+                Call BlueM1.Eval_Sim_CombiOpt(CES1.n_Penalty, durchlauf, 1, CES1.ChildList(i).Penalty_MO, Diag)
 
                 ''HACK zur Reduzierung auf eine Zielfunktion
                 'Call CES1.MO_TO_SO(CES1.ChildList_BM(i))
@@ -600,11 +600,9 @@ Partial Class Form1
                 Call CES1.Sort_Faksimile(CES1.ChildList)
                 'Selectionsprozess je nach "plus" oder "minus" Strategie
                 Call CES1.Selection_Process_BM()
-
             ElseIf BlueM1.OptZieleListe.GetLength(0) = 2 Then
                 'NDSorting
-                'Call CES1.NDSorting_Control()
-
+                Call CES1.NDSorting_Control()
             End If
 
             ''Zeichnen des besten Elter

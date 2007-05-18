@@ -15,18 +15,12 @@ Public Class CES
     '*******************************************************************************
     '*******************************************************************************
 
-    '********************************************* Konvention *****************************
-    'Cities:      1 2 3 4 5 6 7
-    'Pathindex:   0 1 2 3 4 5 6
-    'CutPoint:     1 2 3 4 5 6
-    'LB + UB n=2   x         x
-
     'Public Variablen
-    Public n_Locations As Integer       'Anzahl der Locations wird von auﬂen gesetzt
-    Public n_Ziele As Integer           'Anzahl der Ziele wird von auﬂen gesetzt
+    Public n_Location As Integer       'Anzahl der Locations wird von auﬂen gesetzt
+    Public n_Penalty As Integer           'Anzahl der Ziele wird von auﬂen gesetzt
     Public n_Verzweig As Integer        'Anzahl der Verzweigungen in der Verzweigungsdatei
-    Public n_PathSize () as Integer     'Anzahl der "St‰dte/Maﬂnahmen" an jeder Stelle
-    Public n_Gen As Integer = 10
+    Public n_PathSize() As Integer     'Anzahl der "St‰dte/Maﬂnahmen" an jeder Stelle
+    Public n_Generation As Integer = 10
 
     'Private Variablen
     Private n_Parents As Integer = 3
@@ -77,11 +71,11 @@ Public Class CES
             ChildList(i).No = i + 1
             ChildList(i).Penalty_SO = 999999999999999999
 
-            ReDim ChildList(i).Penalty_MO(n_Ziele - 1)
-            For j = 0 To n_Ziele - 1
+            ReDim ChildList(i).Penalty_MO(n_Penalty - 1)
+            For j = 0 To n_Penalty - 1
                 ChildList(i).Penalty_MO(j) = 999999999999999999
             Next
-            ReDim ChildList(i).Path(n_Locations - 1)
+            ReDim ChildList(i).Path(n_Location - 1)
         Next
 
     End Sub
@@ -95,11 +89,11 @@ Public Class CES
         For i = 0 To n_Parents - 1
             ParentList(i).No = i + 1
             ParentList(i).Penalty_SO = 999999999999999999
-            ReDim ParentList(i).Penalty_MO(n_Ziele - 1)
-            For j = 0 To n_Ziele - 1
+            ReDim ParentList(i).Penalty_MO(n_Penalty - 1)
+            For j = 0 To n_Penalty - 1
                 ParentList(i).Penalty_MO(j) = 999999999999999999
             Next
-            ReDim ParentList(i).Path(n_Locations - 1)
+            ReDim ParentList(i).Path(n_Location - 1)
         Next
 
     End Sub
@@ -111,11 +105,11 @@ Public Class CES
         For i = 0 To TMP.GetUpperBound(0)
             TMP(i).No = 0
             'NDSorting(i).Penalty_SO = 999999999999999999
-            ReDim TMP(i).Penalty_MO(n_Ziele - 1)
-            For j = 0 To n_Ziele - 1
+            ReDim TMP(i).Penalty_MO(n_Penalty - 1)
+            For j = 0 To n_Penalty - 1
                 TMP(i).Penalty_MO(j) = 999999999999999999
             Next
-            ReDim TMP(i).Path(n_Locations - 1)
+            ReDim TMP(i).Path(n_Location - 1)
         Next
 
     End Sub
@@ -129,8 +123,8 @@ Public Class CES
         Randomize()
 
         For i = 0 To n_Childs - 1
-            For j = 0 To n_Locations - 1
-                upperb = n_PathSize(j)
+            For j = 0 To n_Location - 1
+                upperb = n_PathSize(j) - 1
                 'Randomize() nicht vergessen
                 tmp = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
                 ChildList(i).Path(j) = tmp
@@ -147,7 +141,7 @@ Public Class CES
 
         'Achtung n_Childs sollte Grˆﬂer als die Mˆglichen Kombinationen an einer Stelle sein
         For i = 0 To n_Childs - 1
-            For j = 0 To n_Locations - 1
+            For j = 0 To n_Location - 1
                 Grenze = n_PathSize(j) - 1
                 If i <= Grenze Then
                     ChildList(i).Path(j) = i
@@ -242,7 +236,7 @@ Public Class CES
     Public Sub Reproduction_Control_BM()
         Dim i As Integer
         Dim x, y As Integer
-        Dim Einzelkind(n_Locations - 1) As Integer
+        Dim Einzelkind(n_Location - 1) As Integer
 
         Select Case ReprodOperator_BM
             'ToDo: Eltern werden nicht zuf‰llig gew‰hlt sondern immer in Top Down Reihenfolge
@@ -404,14 +398,11 @@ Public Class CES
         'Nur die neuen Eltern werden NDSorting hinzugef¸gt, Kinder sind schon oben drin
         '---------------------------------------------------------------------
 
-        Redim NDSorting(n_Childs + n_Parents - 1)
+        ReDim NDSorting(n_Childs + n_Parents - 1)
         Call Dim_NDSorting_Type(NDSorting)
 
         For i = n_Childs To n_Childs + n_Parents - 1
             With NDSorting(i)
-                For j = 0 To n_Ziele - 1
-                    .Penalty_MO(j) = ChildList(i - n_Childs).Penalty_MO(j)
-                Next j
 
                 ''NConstrains ********************************
                 'If Eigenschaft.NConstrains > 0 Then
@@ -422,11 +413,11 @@ Public Class CES
                 '    Next l
                 'End If
 
-                array.Copy(ChildList(i - n_Childs).Penalty_MO,.Penalty_MO,.Penalty_MO.GetLength(0))
+                array.Copy(ChildList(i - n_Childs).Penalty_MO, .Penalty_MO, .Penalty_MO.GetLength(0))
                 .dominated = False
                 .Front = 0
                 .Distance = 0
-                array.Copy(ChildList(i - n_Childs).Path,.Path,.Path.GetLength(0))
+                array.Copy(ChildList(i - n_Childs).Path, .Path, .Path.GetLength(0))
             End With
         Next i
 
@@ -480,8 +471,8 @@ Public Class CES
             If NFrontMember_aktuell <= n_Parents - NFrontMember_gesamt Then
                 'ToDo: Grenzen m¸ssen ¸berpr¸ft werden
                 For i = NFrontMember_gesamt + 1 To NFrontMember_aktuell + NFrontMember_gesamt
-                    Array.Copy(NDSResult(i).Penalty_MO, ParentList(i).Penalty_MO, n_Ziele)
-                    Array.Copy(NDSResult(i).Path, ParentList(i).Path, n_Locations)
+                    Array.Copy(NDSResult(i).Penalty_MO, ParentList(i).Penalty_MO, n_Penalty)
+                    Array.Copy(NDSResult(i).Path, ParentList(i).Path, n_Location)
                     ParentList(i).No = NDSResult(i).No
                 Next i
                 NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
@@ -494,19 +485,19 @@ Public Class CES
 
                 For i = NFrontMember_gesamt To n_Parents - 1
 
-                    Array.Copy(NDSResult(i).Penalty_MO, ParentList(i).Penalty_MO, n_Ziele)
-                    Array.Copy(NDSResult(i).Path, ParentList(i).Path, n_Locations)
+                    Array.Copy(NDSResult(i).Penalty_MO, ParentList(i).Penalty_MO, n_Penalty)
+                    Array.Copy(NDSResult(i).Path, ParentList(i).Path, n_Location)
                     ParentList(i).No = NDSResult(i).No
 
                 Next i
 
-                NFrontMember_gesamt = n_Ziele
+                NFrontMember_gesamt = n_Penalty
 
             End If
 
             aktuelle_Front = aktuelle_Front + 1
 
-        Loop While Not (NFrontMember_gesamt = n_parents)
+        Loop While Not (NFrontMember_gesamt = n_Parents)
 
         '        '4: Sekund‰re Population wird bestimmt und gespeichert
         '        NFrontMember_aktuell = Count_Front_Members(1, NDSResult)
@@ -630,11 +621,11 @@ Public Class CES
             For j = 0 To NDSorting.GetUpperBound(0)
                 Logical = False
 
-                For k = 0 To n_Ziele -1
+                For k = 0 To n_Penalty - 1
                     Logical = Logical Or (NDSorting(i).Penalty_MO(k) < NDSorting(j).Penalty_MO(k))
                 Next k
 
-                For k = 0 To n_Ziele - 1
+                For k = 0 To n_Penalty - 1
                     Logical = Logical And (NDSorting(i).Penalty_MO(k) <= NDSorting(j).Penalty_MO(k))
                 Next k
 
@@ -665,7 +656,7 @@ Public Class CES
         Dim counter As Short
 
         ReDim Temp(NDSorting.GetUpperBound(0))
-        call Dim_NDSorting_Type(Temp)
+        Call Dim_NDSorting_Type(Temp)
 
         Non_Dominated_Count_and_Sort = 0
         counter = 0
@@ -720,7 +711,7 @@ Public Class CES
 
         'In NDSResult werden die nicht dominierten Lˆsungen eingef¸gt
         'ToDo: Hier m¸ssen die Grenzen ¸berpr¸ft werden
-        For i = Temp.GetUpperBound(0) - NFrontMember_aktuell to Temp.GetUpperBound(0)
+        For i = Temp.GetUpperBound(0) - NFrontMember_aktuell To Temp.GetUpperBound(0)
             'Alt: For i = UBound(Temp) + 1 - NFrontMember_aktuell To UBound(Temp)
             'NDSResult alle bisher gefundene Fronten
             NDSResult(Position) = Temp(i)
@@ -769,15 +760,15 @@ Public Class CES
         Dim k As Short
 
         Dim swap As NDSortingType
-        ReDim swap.Penalty_MO(n_Ziele - 1)
-        Redim swap.Path(n_locations-1)
+        ReDim swap.Penalty_MO(n_Penalty - 1)
+        ReDim swap.Path(n_Location - 1)
 
         Dim fmin, fmax As Double
 
-        For k = 1 To n_Ziele
+        For k = 1 To n_Penalty
             For i = start To ende
                 For j = start To ende
-                    If NDSorting(i).penalty_MO(k) < NDSorting(j).penalty_MO(k) Then
+                    If NDSorting(i).Penalty_MO(k) < NDSorting(j).Penalty_MO(k) Then
                         swap = NDSorting(i)
                         NDSorting(i) = NDSorting(j)
                         NDSorting(j) = swap
@@ -785,20 +776,20 @@ Public Class CES
                 Next j
             Next i
 
-            fmin = NDSorting(start).penalty_MO(k)
-            fmax = NDSorting(ende).penalty_MO(k)
+            fmin = NDSorting(start).Penalty_MO(k)
+            fmax = NDSorting(ende).Penalty_MO(k)
 
-            NDSorting(start).distance = 1.0E+300
-            NDSorting(ende).distance = 1.0E+300
+            NDSorting(start).Distance = 1.0E+300
+            NDSorting(ende).Distance = 1.0E+300
 
             For i = start + 1 To ende - 1
-                NDSorting(i).distance = NDSorting(i).distance + (NDSorting(i + 1).penalty_MO(k) - NDSorting(i - 1).penalty_MO(k)) / (fmax - fmin)
+                NDSorting(i).Distance = NDSorting(i).Distance + (NDSorting(i + 1).Penalty_MO(k) - NDSorting(i - 1).Penalty_MO(k)) / (fmax - fmin)
             Next i
         Next k
 
         For i = start To ende
             For j = start To ende
-                If NDSorting(i).distance > NDSorting(j).distance Then
+                If NDSorting(i).Distance > NDSorting(j).Distance Then
                     swap = NDSorting(i)
                     NDSorting(i) = NDSorting(j)
                     NDSorting(j) = swap
@@ -825,16 +816,16 @@ Public Class CES
         Dim d() As Double
         Dim d_mean As Double
 
-        ReDim TempDistance(n_Ziele -1)
+        ReDim TempDistance(n_Penalty - 1)
         ReDim PenaltyDistance(n_Parents - 1, n_Parents - 1)
         ReDim d(n_Parents - 1)
 
         'Bestimmen der normierten Raumabst‰nde zwischen allen Elternindividuen
-        For i = 0 To n_Parents -1
+        For i = 0 To n_Parents - 1
             PenaltyDistance(i, i) = 0
             For j = i + 1 To n_Parents - 1
                 PenaltyDistance(i, j) = 0
-                For k = 0 To n_Ziele - 1
+                For k = 0 To n_Penalty - 1
                     TempDistance(k) = ParentList(i).Penalty_MO(k) - ParentList(j).Penalty_MO(k)
                     TempDistance(k) = TempDistance(k) * TempDistance(k)
                     PenaltyDistance(i, j) = PenaltyDistance(i, j) + TempDistance(k)
