@@ -1885,6 +1885,7 @@ ES_POP_ELTERN_ERROR:
             Loop While Not (NFrontMember_gesamt = Eigenschaft.NEltern)
 
             '4: Sekundäre Population wird bestimmt und gespeichert
+            '-------------------------------------------------------
             NFrontMember_aktuell = Count_Front_Members(1, NDSResult)
 
             If Eigenschaft.iaktuelleRunde = 1 And Eigenschaft.iaktuellePopulation = 1 And Eigenschaft.iaktuelleGeneration = 1 Then
@@ -2281,6 +2282,7 @@ ES_ELTERN_ERROR:
 
         Spannweite = 0
         For i = 1 To Eigenschaft.NEltern
+            'ToDo : sollte hier nicht j = i + 1 stehen?
             For j = i To Eigenschaft.NEltern
                 If PenaltyDistance(i, j) > Spannweite Then Spannweite = PenaltyDistance(i, j)
             Next j
