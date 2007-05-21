@@ -22,10 +22,11 @@ Public Class CES
     Public n_PathSize() As Integer     'Anzahl der "Städte/Maßnahmen" an jeder Stelle
     Public n_Generation As Integer = 10
 
-    'Private Variablen
-    Private n_Parents As Integer = 3
-    Private n_Childs As Integer = 10
+    'Eingabe
+    Public n_Parents As Integer = 3
+    Public n_Childs As Integer = 10
 
+    'Private Variablen
     Private ReprodOperator_TSP As String = "Order_Crossover_OX"
     Private ReprodOperator_BM As String = "Select_Random_Uniform"
     Private MutOperator_TSP As String = "Translocation"
@@ -478,7 +479,6 @@ Public Class CES
             'Es sind mehr Elterplätze für die nächste Generation verfügaber
             '-> schiss wird einfach rüberkopiert
             If NFrontMember_aktuell <= n_Parents - NFrontMember_gesamt Then
-                'ToDo: Grenzen müssen überprüft werden
                 For i = NFrontMember_gesamt + 1 To NFrontMember_aktuell + NFrontMember_gesamt
                     Array.Copy(NDSResult(i).Penalty, ParentList(i).Penalty, n_Penalty)
                     Array.Copy(NDSResult(i).Path, ParentList(i).Path, n_Location)
