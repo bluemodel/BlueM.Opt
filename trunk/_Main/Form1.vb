@@ -560,10 +560,10 @@ Partial Class Form1
         'Call CES1.Generate_All_Test_Path()
 
         'Generationsschleife
-        For gen = 1 To CES1.n_Generation
+        For gen = 0 To CES1.n_Generation - 1
 
             'Child Schleife
-            For i = 0 To CES1.ChildList.GetUpperBound(0)
+            For i = 0 To CES1.n_Childs - 1
                 durchlauf += 1
 
                 'Erstellt die aktuelle Bauerksliste und überträgt sie zu SKos
