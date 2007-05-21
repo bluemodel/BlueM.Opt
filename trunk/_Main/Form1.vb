@@ -576,16 +576,13 @@ Partial Class Form1
                 Call BlueM1.Verzweigung_Write()
 
                 'Evaluiert das Blaue Modell
-                Call BlueM1.Eval_Sim_CombiOpt(CES1.n_Penalty, durchlauf, 1, CES1.ChildList(i).Penalty_MO, Diag)
-
-                ''HACK zur Reduzierung auf eine Zielfunktion
-                'Call CES1.MO_TO_SO(CES1.ChildList_BM(i))
+                Call BlueM1.Eval_Sim_CombiOpt(CES1.n_Penalty, durchlauf, 1, CES1.ChildList(i).Penalty, Diag)
 
                 'Zeichnen der Kinder
                 If BlueM1.OptZieleListe.GetLength(0) = 1 Then
-                    Call Diag.Series(0).Add(durchlauf, CES1.ChildList(i).Penalty_SO)
+                    Call Diag.Series(0).Add(durchlauf, CES1.ChildList(i).Penalty(0))
                 Else
-                    Call Diag.Series(0).Add(CES1.ChildList(i).Penalty_MO(0), CES1.ChildList(i).Penalty_MO(1))
+                    Call Diag.Series(0).Add(CES1.ChildList(i).Penalty(0), CES1.ChildList(i).Penalty(1))
                 End If
 
                 ''HACK zum zeichnen aller Qualitäten
@@ -599,7 +596,7 @@ Partial Class Form1
                 'Sortieren der Kinden anhand der Qualität
                 Call CES1.Sort_Faksimile(CES1.ChildList)
                 'Selectionsprozess je nach "plus" oder "minus" Strategie
-                Call CES1.Selection_Process_BM()
+                Call CES1.Selection_Process()
             ElseIf BlueM1.OptZieleListe.GetLength(0) = 2 Then
                 'NDSorting
                 Call CES1.NDSorting_Control()
