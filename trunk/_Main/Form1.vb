@@ -537,7 +537,7 @@ Partial Class Form1
             Throw New Exception("Zu viele Ziele für CES. Max=2")
         End If
 
-        Dim durchlauf As Integer = 0
+        Dim durchlauf_all As Integer = 0
 
         'Laufvariable für die Generationen
         Dim gen As Integer
@@ -564,7 +564,7 @@ Partial Class Form1
 
             'Child Schleife
             For i = 0 To CES1.n_Childs - 1
-                durchlauf += 1
+                durchlauf_all += 1
 
                 'Erstellt die aktuelle Bauerksliste und überträgt sie zu SKos
                 Call BlueM1.Define_aktuelle_Bauwerke(CES1.ChildList(i).Path)
@@ -576,11 +576,11 @@ Partial Class Form1
                 Call BlueM1.Verzweigung_Write()
 
                 'Evaluiert das Blaue Modell
-                Call BlueM1.Eval_Sim_CombiOpt(CES1.n_Penalty, durchlauf, 1, CES1.ChildList(i).Penalty, Diag)
+                Call BlueM1.Eval_Sim_CombiOpt(CES1.n_Penalty, durchlauf_all, 1, CES1.ChildList(i).Penalty, Diag)
 
                 'Zeichnen der Kinder
                 If BlueM1.OptZieleListe.GetLength(0) = 1 Then
-                    Call Diag.Series(0).Add(durchlauf, CES1.ChildList(i).Penalty(0))
+                    Call Diag.Series(0).Add(durchlauf_all, CES1.ChildList(i).Penalty(0))
                 Else
                     Call Diag.Series(0).Add(CES1.ChildList(i).Penalty(0), CES1.ChildList(i).Penalty(1))
                 End If
