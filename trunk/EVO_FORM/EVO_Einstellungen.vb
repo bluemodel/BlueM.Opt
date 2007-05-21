@@ -25,6 +25,7 @@ Public Class EVO_Einstellungen
                 TextAnzRunden.Text = CStr(10)
                 TextAnzPop.Enabled = False
                 TextAnzPopEltern.Enabled = False
+                ComboStrategie.Enabled = True
                 ComboOptPopEltern.Enabled = False
                 ComboPopStrategie.Enabled = False
                 ComboPopPenalty.Enabled = False
@@ -52,6 +53,8 @@ Public Class EVO_Einstellungen
                 TextAnzRunden.Text = CStr(10)
                 TextAnzPop.Enabled = False
                 TextAnzPopEltern.Enabled = False
+                ComboStrategie.Text = "'+' (Eltern+Nachfolger)"
+                ComboStrategie.Enabled = False
                 ComboOptPopEltern.Enabled = False
                 ComboPopStrategie.Enabled = False
                 ComboPopPenalty.Enabled = False
