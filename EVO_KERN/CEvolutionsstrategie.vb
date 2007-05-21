@@ -1638,16 +1638,12 @@ ES_POP_BESTWERTSPEICHER_ERROR:
         Dim Realisierungsspeicher(,) As Double
         Dim Z As Short
 
-        If Eigenschaft.isMultiObjective And Not Eigenschaft.isPareto Then
-            Z = 2 'Kosten werden maﬂgeblich
-        Else
-            Select Case Eigenschaft.iPopPenalty
-                Case 1 'Crowding
-                    Z = 1 '
-                Case 2 'Spannweite
-                    Z = 2
-            End Select
-        End If
+        Select Case Eigenschaft.iPopPenalty
+            Case 1 'Crowding
+                Z = 1 '
+            Case 2 'Spannweite
+                Z = 2
+        End Select
 
         EsPopEltern = False
 
