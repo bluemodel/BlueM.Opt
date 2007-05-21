@@ -116,9 +116,6 @@
     <Compile Include="EVO_Opt_Verlauf.vb">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="myEVOS.vb">
-      <SubType>Code</SubType>
-    </Compile>
     <EmbeddedResource Include="EVO_Einstellungen.resX">
       <DependentUpon>EVO_Einstellungen.vb</DependentUpon>
       <SubType>Designer</SubType>
