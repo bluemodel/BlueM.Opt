@@ -432,11 +432,11 @@ Public MustInherit Class Sim
             Case 2
                 TChart1.Series(0).Add(OptZieleListe(0).QWertTmp, OptZieleListe(1).QWertTmp, "")
             Case 3
-                'TODO MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
+                'UPGRADE: MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
                 'Call Zielfunktion_zeichnen_MultiObPar_3D(BlueM1.OptZieleListe(0).QWertTmp, BlueM1.OptZieleListe(1).QWertTmp, BlueM1.OptZieleListe(2).QWertTmp)
             Case Else
-                'TODO MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
-                'TODO: Call Zielfunktion_zeichnen_MultiObPar_XD()
+                'UPGRADE: MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
+                'UPGRADE: Call Zielfunktion_zeichnen_MultiObPar_XD()
         End Select
 
         'Qualitätswerte und OptParameter in DB speichern
@@ -558,7 +558,7 @@ Public MustInherit Class Sim
 
             Case "Volf"
                 'Volumenfehler
-                'TODO: Volumenfehler rechnet noch nicht echtes Volumen, dazu ist Zeitschrittweite notwendig
+                'UPGRADE: Volumenfehler rechnet noch nicht echtes Volumen, dazu ist Zeitschrittweite notwendig
                 Dim VolSim As Double = 0
                 Dim VolZiel As Double = 0
                 For i = 0 To SimReihe.GetUpperBound(0)
@@ -568,7 +568,7 @@ Public MustInherit Class Sim
                 QWert = Math.Abs(VolZiel - VolSim)
 
             Case Else
-                'TODO: MsgBox Fehler in der Zielfunktionsdatei
+                MsgBox("Evtl. Fehler in der Zielfunktionsdatei", MsgBoxStyle.Exclamation, "Fehler")
         End Select
 
         Return QWert
@@ -618,7 +618,7 @@ Public MustInherit Class Sim
                 SimWert = SimReihe(SimReihe.GetUpperBound(0), 1)
 
             Case Else
-                'TODO: Fehlerbehandlung
+                MsgBox("Evtl. Fehler in der Zielfunktionsdatei", MsgBoxStyle.Exclamation, "Fehler")
         End Select
 
         'QWert berechnen
@@ -636,7 +636,7 @@ Public MustInherit Class Sim
                 QWert = Math.Abs(OptZiel.ZielWert - SimWert)
 
             Case Else
-                'TODO: MsgBox Fehler in der Zielfunktionsdatei
+                MsgBox("Evtl. Fehler in der Zielfunktionsdatei", MsgBoxStyle.Exclamation, "Fehler")
         End Select
 
         Return QWert

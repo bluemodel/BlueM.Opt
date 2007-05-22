@@ -530,7 +530,7 @@ Public Class Diagramm
     End Sub
 
     Public Sub DiagInitialise_3D_Box(ByVal isPopul As Boolean, ByVal NPopul As Short)
-        'TODO: Zeichnen muss auf 3D erweitert werden. Hier 3D Testproblem.
+        'UPGRADE: Zeichnen muss auf 3D erweitert werden. Hier 3D Testproblem.
         Dim Populationen As Short
         Dim ArrayX(100) As Double
         Dim ArrayY(100) As Double

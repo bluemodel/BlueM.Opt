@@ -132,8 +132,7 @@ Public Class CES
 
     End Sub
 
-    'HACK
-    'Funktion zum manuellen Testen der Paths in der ersten Generation
+    'HACK: Funktion zum manuellen testen der Paths in der ersten Generation
     Public Sub Generate_Test_Path()
         Dim i, j As Integer
         Dim Grenze As Integer
@@ -152,8 +151,7 @@ Public Class CES
 
     End Sub
 
-    'HACK
-    'Funktion zum manuellen Testen der Paths in der ersten Generation
+    'HACK: Funktion zum manuellen testen aller Kombinationen
     Public Sub Generate_All_Test_Path()
         Dim i As Integer
         Dim x, y, z As Integer
@@ -236,7 +234,7 @@ Public Class CES
         Dim Einzelkind(n_Location - 1) As Integer
 
         Select Case ReprodOperator_BM
-            'ToDo: Eltern werden nicht zufällig gewählt sondern immer in Top Down Reihenfolge
+            'UPGRADE: Eltern werden nicht zufällig gewählt sondern immer in Top Down Reihenfolge
             Case "Select_Random_Uniform"
                 x = 0
                 y = 1
@@ -260,7 +258,7 @@ Public Class CES
 
         Dim i As Integer
 
-        For i = 0 To ChildPath_A.GetUpperBound(0)    'ToDo: Es müsste eigentlich eine definierte Pfadlänge geben
+        For i = 0 To ChildPath_A.GetUpperBound(0)    'TODO: Es müsste eigentlich eine definierte Pfadlänge geben
             If Bernoulli() = True Then
                 ChildPath_A(i) = ParPath_B(i)
             Else
@@ -268,7 +266,7 @@ Public Class CES
             End If
         Next
 
-        For i = 0 To ChildPath_B.GetUpperBound(0)    'ToDo: Es müsste eigentlich eine definierte Pfadlänge geben
+        For i = 0 To ChildPath_B.GetUpperBound(0)    'TODO: Es müsste eigentlich eine definierte Pfadlänge geben
             If Bernoulli() = True Then
                 ChildPath_B(i) = ParPath_A(i)
             Else
@@ -805,7 +803,6 @@ Public Class CES
     End Sub
 
 
-
     '*******************************************************************************
     'NDS_Crowding_Distance_Count
     '*******************************************************************************
@@ -867,7 +864,7 @@ Public Class CES
 
         Spannweite = 0
         For i = 0 To n_Parents - 1
-            'ToDo : sollte hier nicht j = i + 1 stehen?
+            'TODO: sollte hier nicht j = i + 1 stehen?
             For j = i To n_Parents - 1
                 If PenaltyDistance(i, j) > Spannweite Then Spannweite = PenaltyDistance(i, j)
             Next j

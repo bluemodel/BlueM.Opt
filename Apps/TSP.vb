@@ -214,7 +214,7 @@ Public Class TSP
         Dim Einzelkind(n_Cities - 1) As Integer
 
         Select Case ReprodOperator_TSP
-            'ToDo: Eltern werden nicht zufällig gewählt sondern immer in Top Down Reihenfolge
+            'UPGRADE: Eltern werden nicht zufällig gewählt sondern immer in Top Down Reihenfolge
             Case "Order_Crossover_OX"
                 x = 0
                 y = 1
@@ -249,7 +249,7 @@ Public Class TSP
 
     'Reproductionsoperator "Order_Crossover (CX)"
     'Kopiert den mittleren Teil des einen Elter und füllt den Rest aus der Reihenfolge des anderen Elter auf
-    'ToDo: Es wird immer nur der mittlere Teil Kopiert, könnte auch mal ein einderer sein
+    'UPGRADE: Es wird immer nur der mittlere Teil Kopiert, könnte auch mal ein einderer sein
     Private Sub ReprodOp_Order_Crossover(ByVal ParPath_A() As Integer, ByVal ParPath_B() As Integer, ByRef ChildPath_A() As Integer, ByRef ChildPath_B() As Integer)
 
         Dim i As Integer
@@ -385,7 +385,7 @@ Public Class TSP
 
         Dim i As Integer
 
-        For i = 0 To ChildPath_A.GetUpperBound(0)    'ToDo: Es müsste eigentlich eine definierte Pfadlänge geben
+        For i = 0 To ChildPath_A.GetUpperBound(0)    'TODO: Es müsste eigentlich eine definierte Pfadlänge geben
             If Bernoulli() = True Then
                 ChildPath_A(i) = ParPath_B(i)
             Else
@@ -393,7 +393,7 @@ Public Class TSP
             End If
         Next
 
-        For i = 0 To ChildPath_B.GetUpperBound(0)    'ToDo: Es müsste eigentlich eine definierte Pfadlänge geben
+        For i = 0 To ChildPath_B.GetUpperBound(0)    'TODO: Es müsste eigentlich eine definierte Pfadlänge geben
             If Bernoulli() = True Then
                 ChildPath_B(i) = ParPath_A(i)
             Else
@@ -431,7 +431,7 @@ Public Class TSP
 
     'Mutationsoperator "Inversion"
     'Schneidet ein Segment aus dem Path heraus und fügt es invers wieder ein
-    'ToDo: Wird bis jetzt nur auf den mittleren Teil angewendet
+    'UPGRADE: Wird bis jetzt nur auf den mittleren Teil angewendet
     Private Sub MutOp_Inversion(ByVal Path() As Integer)
         Dim i As Integer
         Dim x As Integer
@@ -458,7 +458,7 @@ Public Class TSP
 
     'Mutationsoperator "Translocation"
     'Vertauscht zufällig 3 Abschnitte aus dem String und verwendet Bernoulli verteilt die Inverse
-    'ToDo: Jetzt werden immer 3 Translocation durchgeführt könnte man auf n-Ausbauen
+    'UPGRADE: Jetzt werden immer 3 Translocation durchgeführt könnte man auf n-Ausbauen
     Private Sub MutOp_Translocation(ByVal Path() As Integer)
         Dim i, j As Integer
         Dim x As Integer
@@ -547,7 +547,7 @@ Public Class TSP
     '******************************************* Hilfsfunktionen *******************************************
 
     'Hilfsfunktion: Validierung der Paths
-    'ToDo:Option zum ein und Ausschalten dieser Function
+    'UPGRADE:Option zum ein und Ausschalten dieser Function
     Public Function PathValid(ByVal Path() As Integer) As Boolean
         Dim i As Integer
         Array.Sort(Path)
