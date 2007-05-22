@@ -70,7 +70,6 @@ Public Class CES
 
         For i = 0 To n_Childs - 1
             ChildList(i).No = i + 1
-
             ReDim ChildList(i).Penalty(n_Penalty - 1)
             For j = 0 To n_Penalty - 1
                 ChildList(i).Penalty(j) = 999999999999999999
@@ -102,8 +101,7 @@ Public Class CES
         Dim i, j As Integer
 
         For i = 0 To TMP.GetUpperBound(0)
-            TMP(i).No = 0
-            'NDSorting(i).Penalty_SO = 999999999999999999
+            TMP(i).No = i + 1
             ReDim TMP(i).Penalty(n_Penalty - 1)
             For j = 0 To n_Penalty - 1
                 TMP(i).Penalty(j) = 999999999999999999
@@ -477,7 +475,7 @@ Public Class CES
             'Es sind mehr Elterplätze für die nächste Generation verfügaber
             '-> schiss wird einfach rüberkopiert
             If NFrontMember_aktuell <= n_Parents - NFrontMember_gesamt Then
-                For i = NFrontMember_gesamt + 1 To NFrontMember_aktuell + NFrontMember_gesamt
+                For i = NFrontMember_gesamt To NFrontMember_aktuell + NFrontMember_gesamt - 1
                     Array.Copy(NDSResult(i).Penalty, ParentList(i).Penalty, n_Penalty)
                     Array.Copy(NDSResult(i).Path, ParentList(i).Path, n_Location)
                     ParentList(i).No = NDSResult(i).No
