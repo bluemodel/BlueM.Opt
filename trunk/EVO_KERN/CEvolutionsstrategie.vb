@@ -691,7 +691,7 @@ ES_GET_SCHRITTWEITE_ERROR:
 
     'Function ES_GET_POP_BESTWERT gibt den kompletten Bestwertspeicher aus
     'Bestwert() muss ein dynamisches Array sein
-    'ToDo: diese Funktion wird derzeit nicht verwendet
+    'TODO: diese Funktion wird derzeit nicht verwendet
 
     Public Function EsGetPopBestWert(ByRef POP_Bestwert(,,,) As Double) As Boolean
 
@@ -2278,7 +2278,7 @@ ES_ELTERN_ERROR:
 
         Spannweite = 0
         For i = 1 To Eigenschaft.NEltern
-            'ToDo : sollte hier nicht j = i + 1 stehen?
+            'TODO: sollte hier nicht j = i + 1 stehen?
             For j = i To Eigenschaft.NEltern
                 If PenaltyDistance(i, j) > Spannweite Then Spannweite = PenaltyDistance(i, j)
             Next j

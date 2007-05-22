@@ -221,14 +221,12 @@ Partial Class Form1
                         Call BlueM1.Read_CES()
 
                         'Überprüfen der Kombinatorik
-                        'ToDo: Hier Message Box einbauen
                         Call BlueM1.Combinatoric_is_Valid()
 
                         'Einlesen der Verbraucher Datei
                         Call BlueM1.Verzweigung_Read()
 
                         'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
-                        'ToDo: Hier Message Box einbauen
                         Call BlueM1.CES_fits_to_VER()
 
                         'Call Initialisierung_BlauesModell_CombiOpt()
@@ -281,7 +279,7 @@ Partial Class Form1
 
     'EVO.ini Datei einlesen 
     '**********************
-    'Bug 94: ReadEVO.ini müsste hier raus nach BlueM und "Read_Model_OptConfig" heißen **
+    'BUG 94: ReadEVO.ini müsste hier raus nach BlueM und "Read_Model_OptConfig" heißen **
     Private Sub ReadEVOIni()
 
         Dim IsOK As Boolean = True
@@ -483,7 +481,6 @@ Partial Class Form1
         'Laufvariable für die Generationen
         Dim gen As Integer
 
-        'ToDo: nochmal Prüfen wie das mit den Kids REDIMS ist.
         'BUG 85: Nach Klasse Diagramm auslagern!
         Call TSP1.TeeChart_Initialise_TSP(Diag)
 
@@ -553,10 +550,10 @@ Partial Class Form1
         'Zufällige Kinderpfade werden generiert
         Call CES1.Generate_Random_Path()
 
-        'HACK: Funktion zum manuellen Testen der Paths in der ersten Generation
+        'HACK: Funktion zum manuellen testen der Paths in der ersten Generation
         'Call CES1.Generate_Test_Path()
 
-        'HACK: zum testen aller Kombinationen
+        'HACK: Funktion zum manuellen testen aller Kombinationen
         'Call CES1.Generate_All_Test_Path()
 
         'Generationsschleife
@@ -658,6 +655,7 @@ Partial Class Form1
         '--------------------------
 
         'TODO: If (ipop + igen + inachf + irunde) > 4 Then GoTo Start_Evolutionsrunden
+        '????? Wie?
 
         myisrun = True
 
@@ -773,7 +771,7 @@ Start_Evolutionsrunden:
 
                 myIsOK = evolutionsstrategie.EsPopMutation
 
-                'ToDo: Scheint mir Schwachsinnig an dieser Stelle Weil es überschrieben wird
+                'TODO: Scheint mir Schwachsinnig an dieser Stelle Weil es überschrieben wird
                 durchlauf = NGen * NNachf * (irunde - 1)
 
                 'Loop über alle Generationen

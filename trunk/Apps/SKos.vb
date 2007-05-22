@@ -218,7 +218,7 @@ Public Class SKos
         End Try
 
         'Array bereinigen
-        'ToDo: Bereinigung könnte stark verkürzt werden, da das Array keine "leeren" Plätze enthält
+        'UPGRADE: Bereinigung könnte stark verkürzt werden, da das Array keine "leeren" Plätze enthält
         Dim x, y As Integer
         Dim TmpArray(TAL_Array.GetUpperBound(0), 1) As String
         Array.Copy(TAL_Array, TmpArray, TAL_Array.Length)
