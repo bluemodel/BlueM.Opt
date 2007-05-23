@@ -96,55 +96,51 @@ Public Class SKos
 
     'Länge der Transportstrecken einlesen
     Private Sub Read_TRS(ByVal BlueM1 As BlueM, ByRef TRS_Array As Object)
+
         'Dim TRS_Array(,) As Object = {}
-        Try
-            Dim Datei As String = BlueM1.WorkDir & BlueM1.Datensatz & ".TRS"
+        Dim Datei As String = BlueM1.WorkDir & BlueM1.Datensatz & ".TRS"
 
-            Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-            Dim Zeile As String
-            Dim Anz As Integer = 0
+        Dim Zeile As String
+        Dim Anz As Integer = 0
 
-            'Anzahl der Zeilen feststellen
-            Do
-                Zeile = StrRead.ReadLine.ToString()
-                If (Zeile.StartsWith("*") = False) Then
-                    Anz += 1
-                End If
-            Loop Until StrRead.Peek() = -1
+        'Anzahl der Zeilen feststellen
+        Do
+            Zeile = StrRead.ReadLine.ToString()
+            If (Zeile.StartsWith("*") = False) Then
+                Anz += 1
+            End If
+        Loop Until StrRead.Peek() = -1
 
-            Dim i As Integer = -1
-            Dim j As Integer = 0
-            ReDim TRS_Array(Anz - 1, 1)
+        Dim i As Integer = -1
+        Dim j As Integer = 0
+        ReDim TRS_Array(Anz - 1, 1)
 
-            'Zurück zum Dateianfang und lesen
-            FiStr.Seek(0, SeekOrigin.Begin)
+        'Zurück zum Dateianfang und lesen
+        FiStr.Seek(0, SeekOrigin.Begin)
 
-            Dim array() As String
-            Do
-                Zeile = StrRead.ReadLine.ToString()
-                If (Zeile.StartsWith("*") = False) Then
-                    array = Zeile.Split("|")
-                    'Werte zuweisen
-                    TRS_Array(j, 0) = array(1).Trim()
-                    TRS_Array(j, 1) = array(3).Trim()
-                    j += 1
-                End If
+        Dim array() As String
+        Do
+            Zeile = StrRead.ReadLine.ToString()
+            If (Zeile.StartsWith("*") = False) Then
+                array = Zeile.Split("|")
+                'Werte zuweisen
+                TRS_Array(j, 0) = array(1).Trim()
+                TRS_Array(j, 1) = array(3).Trim()
+                j += 1
+            End If
 
-            Loop Until StrRead.Peek() = -1
+        Loop Until StrRead.Peek() = -1
 
-            StrRead.Close()
-            FiStr.Close()
-
-        Catch except As Exception
-            MsgBox(except.Message & Chr(13) & Chr(10) & "Ein Fehler könnten Leerzeichen in der letzten Zeile der Datei sein.", MsgBoxStyle.Exclamation, "Fehler beim Lesen der Kombinatorik")
-        End Try
+        StrRead.Close()
+        FiStr.Close()
 
         'Array bereinigen
         Dim x, y As Integer
         Dim TmpArray(TRS_Array.GetUpperBound(0), 1) As String
-        Array.Copy(TRS_Array, TmpArray, TRS_Array.Length)
+        System.Array.Copy(TRS_Array, TmpArray, TRS_Array.Length)
         x = 0
 
         For y = 0 To TmpArray.GetUpperBound(0)
@@ -167,61 +163,57 @@ Public Class SKos
 
     'Volumen der Talsperren einlesen
     Private Sub Read_TAL(ByVal BlueM1 As BlueM, ByRef TAl_Array As Object)
+
         'Dim TAL_Array(,) As Object = {}
-        Try
-            Dim Datei As String = BlueM1.WorkDir & BlueM1.Datensatz & ".TAL"
+        Dim Datei As String = BlueM1.WorkDir & BlueM1.Datensatz & ".TAL"
 
-            Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-            Dim Zeile As String
-            Dim Anz As Integer = 0
-            Dim gelesen As Boolean = False
+        Dim Zeile As String
+        Dim Anz As Integer = 0
+        Dim gelesen As Boolean = False
 
-            'Anzahl der Zeilen feststellen
-            Do
-                Zeile = StrRead.ReadLine.ToString()
-                If (Zeile.StartsWith("*") = False) Then
-                    Anz += 1
-                End If
-            Loop Until StrRead.Peek() = -1
+        'Anzahl der Zeilen feststellen
+        Do
+            Zeile = StrRead.ReadLine.ToString()
+            If (Zeile.StartsWith("*") = False) Then
+                Anz += 1
+            End If
+        Loop Until StrRead.Peek() = -1
 
-            Dim i As Integer = -1
-            Dim j As Integer = 0
-            ReDim TAL_Array(Anz - 1, 1)
+        Dim i As Integer = -1
+        Dim j As Integer = 0
+        ReDim TAl_Array(Anz - 1, 1)
 
-            'Zurück zum Dateianfang und lesen
-            FiStr.Seek(0, SeekOrigin.Begin)
+        'Zurück zum Dateianfang und lesen
+        FiStr.Seek(0, SeekOrigin.Begin)
 
-            Dim array() As String
-            Do
-                Zeile = StrRead.ReadLine.ToString()
-                If (Zeile.StartsWith("*") = False) Then
-                    array = Zeile.Split("|")
-                    'Werte zuweisen
-                    TAL_Array(j, 0) = array(1).Trim()
-                    TAL_Array(j, 1) = array(3).Trim()
-                    j += 1
-                    gelesen = True
-                End If
-                If (Zeile.StartsWith("*") = True And gelesen) Then
-                    Exit Do
-                End If
+        Dim array() As String
+        Do
+            Zeile = StrRead.ReadLine.ToString()
+            If (Zeile.StartsWith("*") = False) Then
+                array = Zeile.Split("|")
+                'Werte zuweisen
+                TAl_Array(j, 0) = array(1).Trim()
+                TAl_Array(j, 1) = array(3).Trim()
+                j += 1
+                gelesen = True
+            End If
+            If (Zeile.StartsWith("*") = True And gelesen) Then
+                Exit Do
+            End If
 
-            Loop Until StrRead.Peek() = -1
+        Loop Until StrRead.Peek() = -1
 
-            StrRead.Close()
-            FiStr.Close()
-
-        Catch except As Exception
-            MsgBox(except.Message & Chr(13) & Chr(10) & "Ein Fehler könnten Leerzeichen in der letzten Zeile der Datei sein.", MsgBoxStyle.Exclamation, "Fehler beim Lesen der Kombinatorik")
-        End Try
+        StrRead.Close()
+        FiStr.Close()
 
         'Array bereinigen
         'UPGRADE: Bereinigung könnte stark verkürzt werden, da das Array keine "leeren" Plätze enthält
         Dim x, y As Integer
-        Dim TmpArray(TAL_Array.GetUpperBound(0), 1) As String
-        Array.Copy(TAL_Array, TmpArray, TAL_Array.Length)
+        Dim TmpArray(TAl_Array.GetUpperBound(0), 1) As String
+        System.Array.Copy(TAl_Array, TmpArray, TAl_Array.Length)
         x = 0
 
         For y = 0 To TmpArray.GetUpperBound(0)
@@ -234,15 +226,18 @@ Public Class SKos
             End If
         Next
 
-        ReDim TAL_Array(x - 1, 1)
+        ReDim TAl_Array(x - 1, 1)
         For y = 0 To x - 1
-            TAL_Array(y, 0) = TmpArray(y, 0)
-            TAL_Array(y, 1) = TmpArray(y, 1)
+            TAl_Array(y, 0) = TmpArray(y, 0)
+            TAl_Array(y, 1) = TmpArray(y, 1)
         Next
 
     End Sub
+
     'Weist den Bauwerken die Kosten zu
+    '*********************************
     Private Sub Acquire_Costs(ByVal TRS_Array(,) As Object, ByVal TAL_Array(,) As Object, ByVal Bauwerksliste(,) As Object)
+
         Dim i, j As Integer
         Dim gefunden As Boolean = False
         Dim Volumen As Double
@@ -269,8 +264,10 @@ Public Class SKos
                 Next
             End If
             If Not gefunden Then
-                MsgBox("Bauwerk wurde nicht in den Modellparametern gefunden", MsgBoxStyle.Exclamation, "Fehler")
+                Throw New Exception("Bauwerk wurde nicht in den Modellparametern gefunden")
             End If
         Next
+
     End Sub
+
 End Class

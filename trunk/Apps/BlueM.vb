@@ -71,41 +71,35 @@ Public Class BlueM
 
         'ALL-Datei öffnen
         '----------------
-        Try
-            Dim Datei As String = Me.WorkDir & Me.Datensatz & ".ALL"
+        Dim Datei As String = Me.WorkDir & Me.Datensatz & ".ALL"
 
-            Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-            'Alle Zeilen durchlaufen
-            Dim Zeile As String
-            Do
-                Zeile = StrRead.ReadLine.ToString()
+        'Alle Zeilen durchlaufen
+        Dim Zeile As String
+        Do
+            Zeile = StrRead.ReadLine.ToString()
 
-                'Simulationszeitraum auslesen
-                If (Zeile.StartsWith(" SimBeginn - SimEnde ............:")) Then
-                    SimStart_str = Zeile.Substring(35, 16)
-                    SimEnde_str = Zeile.Substring(54, 16)
-                End If
+            'Simulationszeitraum auslesen
+            If (Zeile.StartsWith(" SimBeginn - SimEnde ............:")) Then
+                SimStart_str = Zeile.Substring(35, 16)
+                SimEnde_str = Zeile.Substring(54, 16)
+            End If
 
-                'Zeitschrittweite auslesen
-                If (Zeile.StartsWith(" Zeitschrittlaenge [min] ........:")) Then
-                    SimDT_str = Zeile.Substring(35).Trim
-                End If
+            'Zeitschrittweite auslesen
+            If (Zeile.StartsWith(" Zeitschrittlaenge [min] ........:")) Then
+                SimDT_str = Zeile.Substring(35).Trim
+            End If
 
-            Loop Until StrRead.Peek() = -1
+        Loop Until StrRead.Peek() = -1
 
-            'SimStart und SimEnde in echtes Datum konvertieren
-            Me.SimStart = New DateTime(SimStart_str.Substring(6, 4), SimStart_str.Substring(3, 2), SimStart_str.Substring(0, 2), SimStart_str.Substring(11, 2), SimStart_str.Substring(14, 2), 0)
-            Me.SimEnde = New DateTime(SimEnde_str.Substring(6, 4), SimEnde_str.Substring(3, 2), SimEnde_str.Substring(0, 2), SimEnde_str.Substring(11, 2), SimEnde_str.Substring(14, 2), 0)
+        'SimStart und SimEnde in echtes Datum konvertieren
+        Me.SimStart = New DateTime(SimStart_str.Substring(6, 4), SimStart_str.Substring(3, 2), SimStart_str.Substring(0, 2), SimStart_str.Substring(11, 2), SimStart_str.Substring(14, 2), 0)
+        Me.SimEnde = New DateTime(SimEnde_str.Substring(6, 4), SimEnde_str.Substring(3, 2), SimEnde_str.Substring(0, 2), SimEnde_str.Substring(11, 2), SimEnde_str.Substring(14, 2), 0)
 
-            'Zeitschrittweite in echte Dauer konvertieren
-            Me.SimDT = New TimeSpan(0, Convert.ToInt16(SimDT_str), 0)
-
-        Catch except As Exception
-            MsgBox("Fehler beim einlesen der BlueM-Simulationsparameter:" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Critical, "Fehler")
-            Exit Sub
-        End Try
+        'Zeitschrittweite in echte Dauer konvertieren
+        Me.SimDT = New TimeSpan(0, Convert.ToInt16(SimDT_str), 0)
 
     End Sub
 
@@ -126,56 +120,53 @@ Public Class BlueM
 
         'Alle ModellParameter durchlaufen
         For i As Integer = 0 To ModellParameterListe.GetUpperBound(0)
-            Try
-                DateiPfad = WorkDir & Datensatz & "." & ModellParameterListe(i).Datei
-                'Datei öffnen
-                Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.Read)
-                Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-                'Anzahl der Zeilen feststellen
-                AnzZeil = 0
-                Do
-                    Zeile = StrRead.ReadLine.ToString
-                    AnzZeil += 1
-                Loop Until StrRead.Peek() = -1
+            DateiPfad = WorkDir & Datensatz & "." & ModellParameterListe(i).Datei
+            'Datei öffnen
+            Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.Read)
+            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-                ReDim Zeilenarray(AnzZeil - 1)
+            'Anzahl der Zeilen feststellen
+            AnzZeil = 0
+            Do
+                Zeile = StrRead.ReadLine.ToString
+                AnzZeil += 1
+            Loop Until StrRead.Peek() = -1
 
-                'Datei komplett einlesen
-                FiStr.Seek(0, SeekOrigin.Begin)
-                For j = 0 To AnzZeil - 1
-                    Zeilenarray(j) = StrRead.ReadLine.ToString
-                Next
+            ReDim Zeilenarray(AnzZeil - 1)
 
-                StrRead.Close()
-                FiStr.Close()
+            'Datei komplett einlesen
+            FiStr.Seek(0, SeekOrigin.Begin)
+            For j = 0 To AnzZeil - 1
+                Zeilenarray(j) = StrRead.ReadLine.ToString
+            Next
 
-                'Zeile ändern
-                Zeile = Zeilenarray(ModellParameterListe(i).ZeileNr - 1)
-                Dim Length As Short = ModellParameterListe(i).SpBis - ModellParameterListe(i).SpVon
-                StrLeft = Microsoft.VisualBasic.Left(Zeile, ModellParameterListe(i).SpVon - 1)
-                StrRight = Microsoft.VisualBasic.Right(Zeile, Len(Zeile) - ModellParameterListe(i).SpBis + 1)
+            StrRead.Close()
+            FiStr.Close()
 
-                Wert = ModellParameterListe(i).Wert.ToString()
-                If (Wert.Length > Length) Then
-                    'TODO: Parameter wird für erforderliche Stringlänge einfach abgeschnitten, sollte aber gerundet werden!
-                    Wert = Wert.Substring(0, Length)
-                Else
-                    Wert = Wert.PadLeft(Length)
-                End If
-                Zeilenarray(ModellParameterListe(i).ZeileNr - 1) = StrLeft & Wert & StrRight
+            'Zeile ändern
+            Zeile = Zeilenarray(ModellParameterListe(i).ZeileNr - 1)
+            Dim Length As Short = ModellParameterListe(i).SpBis - ModellParameterListe(i).SpVon
+            StrLeft = Microsoft.VisualBasic.Left(Zeile, ModellParameterListe(i).SpVon - 1)
+            StrRight = Microsoft.VisualBasic.Right(Zeile, Len(Zeile) - ModellParameterListe(i).SpBis + 1)
 
-                'Alle Zeilen wieder in Datei schreiben
-                Dim StrWrite As StreamWriter = New StreamWriter(DateiPfad, False, System.Text.Encoding.GetEncoding("iso8859-1"))
-                For j = 0 To AnzZeil - 1
-                    StrWrite.WriteLine(Zeilenarray(j))
-                Next
+            Wert = ModellParameterListe(i).Wert.ToString()
+            If (Wert.Length > Length) Then
+                'TODO: Parameter wird für erforderliche Stringlänge einfach abgeschnitten, sollte aber gerundet werden!
+                Wert = Wert.Substring(0, Length)
+            Else
+                Wert = Wert.PadLeft(Length)
+            End If
+            Zeilenarray(ModellParameterListe(i).ZeileNr - 1) = StrLeft & Wert & StrRight
 
-                StrWrite.Close()
+            'Alle Zeilen wieder in Datei schreiben
+            Dim StrWrite As StreamWriter = New StreamWriter(DateiPfad, False, System.Text.Encoding.GetEncoding("iso8859-1"))
+            For j = 0 To AnzZeil - 1
+                StrWrite.WriteLine(Zeilenarray(j))
+            Next
 
-            Catch except As Exception
-                MsgBox("Fehler beim Schreiben der Mutierten Parameter" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
-            End Try
+            StrWrite.Close()
+
         Next
 
     End Sub
@@ -200,22 +191,17 @@ Public Class BlueM
         '-------------------------------------
         If (File.Exists(WorkDir & "$FEHL.TMP")) Then
 
-            'Fehler aufgetreten
+            'Simulationsfehler aufgetreten
             Dim DateiInhalt As String = ""
 
-            Try
-                Dim FiStr As FileStream = New FileStream(WorkDir & "$fehl.tmp", FileMode.Open, IO.FileAccess.Read)
-                Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+            Dim FiStr As FileStream = New FileStream(WorkDir & "$fehl.tmp", FileMode.Open, IO.FileAccess.Read)
+            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-                Do
-                    DateiInhalt = DateiInhalt & Chr(13) & Chr(10) & StrRead.ReadLine.ToString
-                Loop Until StrRead.Peek() = -1
+            Do
+                DateiInhalt = DateiInhalt & Chr(13) & Chr(10) & StrRead.ReadLine.ToString
+            Loop Until StrRead.Peek() = -1
 
-                MsgBox("Das BlaueModell hat einen Fehler zurückgegeben:" & Chr(13) & Chr(10) & DateiInhalt, MsgBoxStyle.Exclamation, "Simulationsfehler")
-
-            Catch except As Exception
-                MsgBox("Konnte Datei ""$FEHL.TMP"" nicht lesen!" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
-            End Try
+            Throw New Exception("Das BlaueModell hat einen Fehler zurückgegeben:" & Chr(13) & Chr(10) & DateiInhalt)
 
         End If
 
@@ -263,70 +249,66 @@ Public Class BlueM
     'Kombinatorik einlesen
     '*********************
     Public Sub Read_CES()
-        Try
-            Dim Datei As String = WorkDir & Datensatz & "." & Combi_Ext
 
-            Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Dim Datei As String = WorkDir & Datensatz & "." & Combi_Ext
 
-            Dim Zeile As String
-            Dim Anz As Integer = 0
+        Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-            'Anzahl der Parameter feststellen
-            Do
-                Zeile = StrRead.ReadLine.ToString()
-                If (Zeile.StartsWith("*") = False) Then
-                    Anz += 1
+        Dim Zeile As String
+        Dim Anz As Integer = 0
+
+        'Anzahl der Parameter feststellen
+        Do
+            Zeile = StrRead.ReadLine.ToString()
+            If (Zeile.StartsWith("*") = False) Then
+                Anz += 1
+            End If
+        Loop Until StrRead.Peek() = -1
+
+        Dim i As Integer = -1
+        Dim j As Integer = 0
+        ReDim LocationList(0)
+        ReDim LocationList(0).MassnahmeListe(0)
+
+        'Zurück zum Dateianfang und lesen
+        FiStr.Seek(0, SeekOrigin.Begin)
+
+        Dim array() As String
+        Do
+            Zeile = StrRead.ReadLine.ToString()
+            If (Zeile.StartsWith("*") = False) Then
+                array = Zeile.Split("|")
+                'Werte zuweisen
+
+                If Not Is_Name_IN(array(1).Trim(), LocationList) Then
+                    i += 1
+                    j = 0
+                    System.Array.Resize(LocationList, i + 1)
+                    LocationList(i).Name = array(1).Trim()
                 End If
-            Loop Until StrRead.Peek() = -1
+                System.Array.Resize(LocationList(i).MassnahmeListe, j + 1)
+                ReDim LocationList(i).MassnahmeListe(j).Schaltung(2, 1)
+                ReDim LocationList(i).MassnahmeListe(j).Bauwerke(3)
+                LocationList(i).MassnahmeListe(j).Name = array(2).Trim()
+                LocationList(i).MassnahmeListe(j).Schaltung(0, 0) = array(3).Trim()
+                LocationList(i).MassnahmeListe(j).Schaltung(0, 1) = array(4).Trim()
+                LocationList(i).MassnahmeListe(j).Schaltung(1, 0) = array(5).Trim()
+                LocationList(i).MassnahmeListe(j).Schaltung(1, 1) = array(6).Trim()
+                LocationList(i).MassnahmeListe(j).Schaltung(2, 0) = array(7).Trim()
+                LocationList(i).MassnahmeListe(j).Schaltung(2, 1) = array(8).Trim()
+                LocationList(i).MassnahmeListe(j).KostenTyp = array(9).Trim()
+                LocationList(i).MassnahmeListe(j).Bauwerke(0) = array(10).Trim()
+                LocationList(i).MassnahmeListe(j).Bauwerke(1) = array(11).Trim()
+                LocationList(i).MassnahmeListe(j).Bauwerke(2) = array(12).Trim()
+                LocationList(i).MassnahmeListe(j).Bauwerke(3) = array(13).Trim()
+                j += 1
+            End If
 
-            Dim i As Integer = -1
-            Dim j As Integer = 0
-            ReDim LocationList(0)
-            ReDim LocationList(0).MassnahmeListe(0)
+        Loop Until StrRead.Peek() = -1
 
-            'Zurück zum Dateianfang und lesen
-            FiStr.Seek(0, SeekOrigin.Begin)
-
-            Dim array() As String
-            Do
-                Zeile = StrRead.ReadLine.ToString()
-                If (Zeile.StartsWith("*") = False) Then
-                    array = Zeile.Split("|")
-                    'Werte zuweisen
-
-                    If Not Is_Name_IN(array(1).Trim(), LocationList) Then
-                        i += 1
-                        j = 0
-                        System.Array.Resize(LocationList, i + 1)
-                        LocationList(i).Name = array(1).Trim()
-                    End If
-                    System.Array.Resize(LocationList(i).MassnahmeListe, j + 1)
-                    ReDim LocationList(i).MassnahmeListe(j).Schaltung(2, 1)
-                    ReDim LocationList(i).MassnahmeListe(j).Bauwerke(3)
-                    LocationList(i).MassnahmeListe(j).Name = array(2).Trim()
-                    LocationList(i).MassnahmeListe(j).Schaltung(0, 0) = array(3).Trim()
-                    LocationList(i).MassnahmeListe(j).Schaltung(0, 1) = array(4).Trim()
-                    LocationList(i).MassnahmeListe(j).Schaltung(1, 0) = array(5).Trim()
-                    LocationList(i).MassnahmeListe(j).Schaltung(1, 1) = array(6).Trim()
-                    LocationList(i).MassnahmeListe(j).Schaltung(2, 0) = array(7).Trim()
-                    LocationList(i).MassnahmeListe(j).Schaltung(2, 1) = array(8).Trim()
-                    LocationList(i).MassnahmeListe(j).KostenTyp = array(9).Trim()
-                    LocationList(i).MassnahmeListe(j).Bauwerke(0) = array(10).Trim()
-                    LocationList(i).MassnahmeListe(j).Bauwerke(1) = array(11).Trim()
-                    LocationList(i).MassnahmeListe(j).Bauwerke(2) = array(12).Trim()
-                    LocationList(i).MassnahmeListe(j).Bauwerke(3) = array(13).Trim()
-                    j += 1
-                End If
-
-            Loop Until StrRead.Peek() = -1
-
-            StrRead.Close()
-            FiStr.Close()
-
-        Catch except As Exception
-            MsgBox(except.Message & Chr(13) & Chr(10) & "Ein Fehler könnten Leerzeichen in der letzten Zeile der Datei sein.", MsgBoxStyle.Exclamation, "Fehler beim Lesen der Kombinatorik")
-        End Try
+        StrRead.Close()
+        FiStr.Close()
 
     End Sub
 
@@ -359,53 +341,50 @@ Public Class BlueM
     'Und Dimensioniert das Verzweigungsarray
     '*******************************************************
     Public Sub Verzweigung_Read()
+
         Dim i As Integer
 
-        Try
-            Dim FiStr As FileStream = New FileStream(WorkDir & Datensatz & ".ver", FileMode.Open, IO.FileAccess.ReadWrite)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Dim FiStr As FileStream = New FileStream(WorkDir & Datensatz & ".ver", FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-            'Anzahl der Parameter feststellen
-            Dim Zeile As String
-            Dim Anz As Integer = 0
+        'Anzahl der Parameter feststellen
+        Dim Zeile As String
+        Dim Anz As Integer = 0
 
-            Do
-                Zeile = StrRead.ReadLine.ToString()
-                If (Zeile.StartsWith("*") = False) Then
-                    Anz += 1
-                End If
-            Loop Until StrRead.Peek() = -1
-            ReDim VerzweigungsDatei(Anz - 1, 3)
+        Do
+            Zeile = StrRead.ReadLine.ToString()
+            If (Zeile.StartsWith("*") = False) Then
+                Anz += 1
+            End If
+        Loop Until StrRead.Peek() = -1
+        ReDim VerzweigungsDatei(Anz - 1, 3)
 
-            'Zurück zum Dateianfang und lesen
-            FiStr.Seek(0, SeekOrigin.Begin)
+        'Zurück zum Dateianfang und lesen
+        FiStr.Seek(0, SeekOrigin.Begin)
 
-            'Einlesen der Zeile und übergeben an das Verzweidungsarray
-            Dim ZeilenArray() As String
+        'Einlesen der Zeile und übergeben an das Verzweidungsarray
+        Dim ZeilenArray() As String
 
-            Do
-                Zeile = StrRead.ReadLine.ToString()
-                If (Zeile.StartsWith("*") = False) Then
-                    ZeilenArray = Zeile.Split("|")
-                    'Verbraucher Array füllen
-                    VerzweigungsDatei(i, 0) = ZeilenArray(1).Trim
-                    VerzweigungsDatei(i, 1) = ZeilenArray(2).Trim
-                    VerzweigungsDatei(i, 2) = ZeilenArray(3).Trim
-                    VerzweigungsDatei(i, 3) = ZeilenArray(4).Trim
-                    i += 1
-                End If
+        Do
+            Zeile = StrRead.ReadLine.ToString()
+            If (Zeile.StartsWith("*") = False) Then
+                ZeilenArray = Zeile.Split("|")
+                'Verbraucher Array füllen
+                VerzweigungsDatei(i, 0) = ZeilenArray(1).Trim
+                VerzweigungsDatei(i, 1) = ZeilenArray(2).Trim
+                VerzweigungsDatei(i, 2) = ZeilenArray(3).Trim
+                VerzweigungsDatei(i, 3) = ZeilenArray(4).Trim
+                i += 1
+            End If
 
-            Loop Until StrRead.Peek() = -1
+        Loop Until StrRead.Peek() = -1
 
-            StrRead.Close()
-            FiStr.Close()
-
-        Catch except As Exception
-            MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim Lesen der Kombinatorik")
-        End Try
+        StrRead.Close()
+        FiStr.Close()
 
         'Hier wird das Verzweigungsarray Dimensioniert
         ReDim VER_ONOFF(VerzweigungsDatei.GetUpperBound(0), 1)
+
     End Sub
 
     'Mehrere Prüfungen ob die .VER Datei des BlueM und der .CES Datei auch zusammenpassen
@@ -529,61 +508,56 @@ Public Class BlueM
         Dim DateiPfad As String
         Dim SplitZeile() As String
 
-        Try
-            DateiPfad = WorkDir & Datensatz & ".ver"
-            'Datei öffnen
-            Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.Read)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        DateiPfad = WorkDir & Datensatz & ".ver"
+        'Datei öffnen
+        Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.Read)
+        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-            'Anzahl der Zeilen feststellen
-            AnzZeil = 0
-            Do
-                Zeile = StrRead.ReadLine.ToString
-                AnzZeil += 1
-            Loop Until StrRead.Peek() = -1
+        'Anzahl der Zeilen feststellen
+        AnzZeil = 0
+        Do
+            Zeile = StrRead.ReadLine.ToString
+            AnzZeil += 1
+        Loop Until StrRead.Peek() = -1
 
-            ReDim Zeilenarray(AnzZeil - 1)
+        ReDim Zeilenarray(AnzZeil - 1)
 
-            'Datei komplett einlesen
-            FiStr.Seek(0, SeekOrigin.Begin)
-            For j = 0 To AnzZeil - 1
-                Zeilenarray(j) = StrRead.ReadLine.ToString
-            Next
+        'Datei komplett einlesen
+        FiStr.Seek(0, SeekOrigin.Begin)
+        For j = 0 To AnzZeil - 1
+            Zeilenarray(j) = StrRead.ReadLine.ToString
+        Next
 
-            StrRead.Close()
-            FiStr.Close()
+        StrRead.Close()
+        FiStr.Close()
 
-            'ZeilenArray wird zu neuer Datei zusammen gebaut
-            For i = 0 To VER_ONOFF.GetUpperBound(0)
-                If Not VER_ONOFF(i, 1) = Nothing Then
-                    For j = 0 To Zeilenarray.GetUpperBound(0)
-                        If Not Zeilenarray(j).StartsWith("*") Then
-                            SplitZeile = Zeilenarray(j).Split("|")
-                            If VER_ONOFF(i, 0) = SplitZeile(1).Trim Then
-                                StrLeft = Microsoft.VisualBasic.Left(Zeilenarray(j), 31)
-                                StrRight = Microsoft.VisualBasic.Right(Zeilenarray(j), 49)
-                                If VER_ONOFF(i, 1) = "1" Then
-                                    Zeilenarray(j) = StrLeft & "      100     " & StrRight
-                                ElseIf (VER_ONOFF(i, 1) = "0") Then
-                                    Zeilenarray(j) = StrLeft & "        0     " & StrRight
-                                End If
+        'ZeilenArray wird zu neuer Datei zusammen gebaut
+        For i = 0 To VER_ONOFF.GetUpperBound(0)
+            If Not VER_ONOFF(i, 1) = Nothing Then
+                For j = 0 To Zeilenarray.GetUpperBound(0)
+                    If Not Zeilenarray(j).StartsWith("*") Then
+                        SplitZeile = Zeilenarray(j).Split("|")
+                        If VER_ONOFF(i, 0) = SplitZeile(1).Trim Then
+                            StrLeft = Microsoft.VisualBasic.Left(Zeilenarray(j), 31)
+                            StrRight = Microsoft.VisualBasic.Right(Zeilenarray(j), 49)
+                            If VER_ONOFF(i, 1) = "1" Then
+                                Zeilenarray(j) = StrLeft & "      100     " & StrRight
+                            ElseIf (VER_ONOFF(i, 1) = "0") Then
+                                Zeilenarray(j) = StrLeft & "        0     " & StrRight
                             End If
                         End If
-                    Next
-                End If
-            Next
+                    End If
+                Next
+            End If
+        Next
 
-            'Alle Zeilen wieder in Datei schreiben
-            Dim StrWrite As StreamWriter = New StreamWriter(DateiPfad, False, System.Text.Encoding.GetEncoding("iso8859-1"))
-            For j = 0 To AnzZeil - 1
-                StrWrite.WriteLine(Zeilenarray(j))
-            Next
+        'Alle Zeilen wieder in Datei schreiben
+        Dim StrWrite As StreamWriter = New StreamWriter(DateiPfad, False, System.Text.Encoding.GetEncoding("iso8859-1"))
+        For j = 0 To AnzZeil - 1
+            StrWrite.WriteLine(Zeilenarray(j))
+        Next
 
-            StrWrite.Close()
-
-        Catch except As Exception
-            MsgBox("Fehler beim Schreiben der Mutierten Parameter" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
-        End Try
+        StrWrite.Close()
 
     End Sub
 
