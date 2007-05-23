@@ -259,6 +259,10 @@ Public MustInherit Class Sim
             End If
         Loop Until StrRead.Peek() = -1
 
+        If AnzZiele > 2 Then
+            Throw New Exception("Entweder iste die Anzahl der Ziele zu Groß oder ein Fehler in der Ziele Datei (Z.B.: Leere Zeile am Ende der Datei")
+        End If
+
         ReDim OptZieleListe(AnzZiele - 1)
 
         'Zurück zum Dateianfang und lesen
