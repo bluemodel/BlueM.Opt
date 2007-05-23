@@ -533,9 +533,6 @@ Partial Class Form1
         'Zufällige Kinderpfade werden generiert
         Call CES1.Generate_Random_Path()
 
-        'HACK: Funktion zum manuellen testen der Paths in der ersten Generation
-        'Call CES1.Generate_Test_Path()
-
         'HACK: Funktion zum manuellen testen aller Kombinationen
         'Call CES1.Generate_All_Test_Path()
 
@@ -559,9 +556,9 @@ Partial Class Form1
                 Call BlueM1.Eval_Sim_CombiOpt(CES1.n_Penalty, durchlauf_all, 1, CES1.ChildList(i).Penalty, Diag)
 
                 'Zeichnen der Kinder
-                If BlueM1.OptZieleListe.GetLength(0) = 1 Then
+                If CES1.n_Penalty = 1 Then
                     Call Diag.Series(0).Add(durchlauf_all, CES1.ChildList(i).Penalty(0))
-                Else
+                Else if CES1.n_Penalty = 2
                     Call Diag.Series(0).Add(CES1.ChildList(i).Penalty(0), CES1.ChildList(i).Penalty(1))
                 End If
 
@@ -572,21 +569,34 @@ Partial Class Form1
                 System.Windows.Forms.Application.DoEvents()
             Next
 
-            If BlueM1.OptZieleListe.GetLength(0) = 1 Then
+            'MO oder SO
+            If CES1.n_Penalty = 1 Then
                 'Sortieren der Kinden anhand der Qualität
                 Call CES1.Sort_Faksimile(CES1.ChildList)
                 'Selectionsprozess je nach "plus" oder "minus" Strategie
                 Call CES1.Selection_Process()
-            ElseIf BlueM1.OptZieleListe.GetLength(0) = 2 Then
+            ElseIf CES1.n_Penalty = 2 Then
                 'NDSorting
                 Call CES1.NDSorting_Control()
+
             End If
 
-            ''Zeichnen des besten Elter
-            'For i = 0 To CES1.ParentList_BM.GetUpperBound(0)
-            '    'durchlauf += 1
-            '    Call TChart1.Series(1).Add(durchlauf, CES1.ParentList_BM(i).Quality_SO)
-            'Next
+            'MO oder SO
+            If CES1.n_Penalty = 1 Then
+                'Zeichnen des besten Elter
+                For i = 0 To CES1.n_Parents - 1
+                    'durchlauf += 1
+                    Call Diag.Series(1).Add(durchlauf_all, CES1.ParentList(i).Penalty(0))
+                Next
+            ElseIf CES1.n_Penalty = 2 Then
+                'Zeichnen von NDSortingResult
+                dim f as Integer
+                For i = 0 To CES1.n_Childs + CES1.n_Parents - 1
+                    f = CES1.NDSResult(i).Front
+                    call diag.Series(f+1).add(ces1.NDSResult(i).Penalty(0),ces1.NDSResult(i).Penalty(1))
+                Next
+            End If
+
 
             'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
             Call CES1.Reset_Childs_BM()

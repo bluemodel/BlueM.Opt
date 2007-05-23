@@ -58,8 +58,8 @@ Public Class CES
         Dim Path() As Integer               'CH: Der Pfad
     End Structure
 
-    Dim NDSorting() As NDSortingType ' NDSorting Liste ***************************
-
+    Public NDSorting() As NDSortingType ' NDSorting Liste ***************************
+    Public NDSResult(n_Childs + n_Parents - 1) As NDSortingType
 
     '*********************************** Programm ******************************************
 
@@ -82,7 +82,6 @@ Public Class CES
     'Dimensionieren des ParentStructs
     Public Sub Dim_Parents_BM()
         Dim i, j As Integer
-
         ReDim ParentList(n_Parents - 1)
 
         For i = 0 To n_Parents - 1
@@ -130,25 +129,6 @@ Public Class CES
 
     End Sub
 
-    'HACK: Funktion zum manuellen testen der Paths in der ersten Generation
-    Public Sub Generate_Test_Path()
-        Dim i, j As Integer
-        Dim Grenze As Integer
-
-        'Achtung n_Childs sollte Größer als die Möglichen Kombinationen an einer Stelle sein
-        For i = 0 To n_Childs - 1
-            For j = 0 To n_Location - 1
-                Grenze = n_PathSize(j) - 1
-                If i <= Grenze Then
-                    ChildList(i).Path(j) = i
-                Else
-                    ChildList(i).Path(j) = 0
-                End If
-            Next
-        Next
-
-    End Sub
-
     'HACK: Funktion zum manuellen testen aller Kombinationen
     Public Sub Generate_All_Test_Path()
         Dim i As Integer
@@ -180,7 +160,7 @@ Public Class CES
 
     End Sub
 
-    '*************************** Functionen innerhalb der Generationsschleife ****************************
+    '*************************** Funktionen innerhalb der Generationsschleife ****************************
 
     'Selectionsprozess je nach "plus" oder "minus" Strategie
     Public Sub Selection_Process()
@@ -439,7 +419,6 @@ Public Class CES
         Call Dim_NDSorting_Type(Temp)
 
         'Initialisierung von NDSResult (NDSorting)
-        Dim NDSResult(n_Childs + n_Parents - 1) As NDSortingType
         Call Dim_NDSorting_Type(NDSResult)
 
         'NDSorting wird in Temp kopiert
