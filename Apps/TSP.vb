@@ -414,12 +414,12 @@ Public Class TSP
             Case "Inversion"
                 For i = 0 To n_Childs - 1
                     Call MutOp_Inversion(ChildList(i).Path)
-                    'If PathValid(ChildList(i).Path) = False Then MsgBox("Fehler im Path", MsgBoxStyle.Information, "Fehler")
+                    'If PathValid(ChildList(i).Path) = False Then Throw New Exception("Fehler im Path")
                 Next i
             Case "Translocation"
                 For i = 0 To n_Childs - 1
                     Call MutOp_Translocation(ChildList(i).Path)
-                    'If PathValid(ChildList(i).Path) = False Then MsgBox("Fehler im Path", MsgBoxStyle.Information, "Fehler")
+                    'If PathValid(ChildList(i).Path) = False Then Throw New Exception("Fehler im Path")
                 Next i
             Case "Transposition"
                 For i = 0 To n_Childs - 1

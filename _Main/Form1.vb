@@ -89,186 +89,183 @@ Partial Class Form1
 
         Else
 
-            Try
-                'Start Button deaktivieren
-                Me.Button_Start.Enabled = False
+            'Start Button deaktivieren
+            Me.Button_Start.Enabled = False
 
-                'Mauszeiger busy
-                Cursor = System.Windows.Forms.Cursors.WaitCursor
+            'Mauszeiger busy
+            Cursor = System.Windows.Forms.Cursors.WaitCursor
 
-                Anwendung = ComboBox_Anwendung.SelectedItem
+            Anwendung = ComboBox_Anwendung.SelectedItem
 
-                Select Case Anwendung
+            Select Case Anwendung
 
-                    Case "" 'Keine Anwendung ausgewählt
-                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                Case "" 'Keine Anwendung ausgewählt
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                        'Testprobleme und Evo Deaktivieren
-                        Testprobleme1.Enabled = False
-                        EVO_Einstellungen1.Enabled = False
-                        Exit Try
-
-
-                    Case ANW_BM_RESET 'Anwendung ResetPara & RunBM
-                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                        'eingestelltes Dezimaltrennzeichen überprüfen
-                        Call CheckDezimaltrennzeichen()
-                        'Voreinstellungen lesen EVO.INI
-                        Call ReadEVOIni()
-                        'Testprobleme und Evo Deaktivieren
-                        Testprobleme1.Enabled = False
-                        EVO_Einstellungen1.Enabled = False
-
-                        'Ergebnisdatenbank ausschalten
-                        BlueM1.Ergebnisdb = False
-                        'BM-Einstellungen initialisieren 
-                        Call BlueM1.Sim_Ini()
-
-                        'Original ModellParameter werden geschrieben
-                        Call BlueM1.ModellParameter_schreiben()
-
-                        MsgBox("Die Startwerte der Optimierungsparameter wurden in die Eingabedateien geschrieben.", MsgBoxStyle.Information, "Info")
+                    'Testprobleme und Evo Deaktivieren
+                    Testprobleme1.Enabled = False
+                    EVO_Einstellungen1.Enabled = False
+                    'Mauszeiger wieder normal
+                    Cursor = System.Windows.Forms.Cursors.Default
+                    Exit Sub
 
 
-                    Case ANW_BM_SENSIPLOT 'Anwendung SensiPlot
-                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                Case ANW_BM_RESET 'Anwendung ResetPara & RunBM
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                        'eingestelltes Dezimaltrennzeichen überprüfen
-                        Call CheckDezimaltrennzeichen()
-                        'Voreinstellungen lesen EVO.INI
-                        Call ReadEVOIni()
-                        'Testprobleme und Evo Deaktivieren
-                        Testprobleme1.Enabled = False
-                        EVO_Einstellungen1.Enabled = False
+                    'eingestelltes Dezimaltrennzeichen überprüfen
+                    Call CheckDezimaltrennzeichen()
+                    'Voreinstellungen lesen EVO.INI
+                    Call ReadEVOIni()
+                    'Testprobleme und Evo Deaktivieren
+                    Testprobleme1.Enabled = False
+                    EVO_Einstellungen1.Enabled = False
 
-                        'Ergebnisdatenbank ausschalten
-                        BlueM1.Ergebnisdb = False
-                        'BM-Einstellungen initialisieren 
-                        Call BlueM1.Sim_Ini()
+                    'Ergebnisdatenbank ausschalten
+                    BlueM1.Ergebnisdb = False
+                    'BM-Einstellungen initialisieren 
+                    Call BlueM1.Sim_Ini()
 
-                        'SensiPlot Dialog anzeigen:
-                        '--------------------------
-                        'List_Boxen füllen
-                        Dim i As Integer
-                        For i = 0 To BlueM1.OptParameterListe.GetUpperBound(0)
-                            Call SensiPlot1.ListBox_OptParameter_add(BlueM1.OptParameterListe(i))
-                        Next
-                        For i = 0 To BlueM1.OptZieleListe.GetUpperBound(0)
-                            Call SensiPlot1.ListBox_OptZiele_add(BlueM1.OptZieleListe(i))
-                        Next
-                        'Dialog anzeigen
-                        Dim SensiPlotDiagResult As Windows.Forms.DialogResult
-                        SensiPlotDiagResult = SensiPlot1.ShowDialog()
-                        If (Not SensiPlotDiagResult = Windows.Forms.DialogResult.OK) Then
-                            Exit Try
-                        End If
+                    'Original ModellParameter werden geschrieben
+                    Call BlueM1.ModellParameter_schreiben()
+
+                    MsgBox("Die Startwerte der Optimierungsparameter wurden in die Eingabedateien geschrieben.", MsgBoxStyle.Information, "Info")
 
 
-                    Case ANW_BM_PES 'Anwendung BlauesModell PES
-                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                Case ANW_BM_SENSIPLOT 'Anwendung SensiPlot
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                        'eingestelltes Dezimaltrennzeichen überprüfen
-                        Call CheckDezimaltrennzeichen()
-                        'Voreinstellungen lesen EVO.INI
-                        Call ReadEVOIni()
-                        'Evo aktivieren
-                        EVO_Einstellungen1.Enabled = True
-                        'Testprobleme ausschalten
-                        Testprobleme1.Enabled = False
+                    'eingestelltes Dezimaltrennzeichen überprüfen
+                    Call CheckDezimaltrennzeichen()
+                    'Voreinstellungen lesen EVO.INI
+                    Call ReadEVOIni()
+                    'Testprobleme und Evo Deaktivieren
+                    Testprobleme1.Enabled = False
+                    EVO_Einstellungen1.Enabled = False
 
-                        'BM-Einstellungen initialisieren 
-                        Call BlueM1.Sim_Ini()
+                    'Ergebnisdatenbank ausschalten
+                    BlueM1.Ergebnisdb = False
+                    'BM-Einstellungen initialisieren 
+                    Call BlueM1.Sim_Ini()
 
-                        'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
-                        If BlueM1.OptZieleListe.GetLength(0) = 1 Then
-                            EVO_Einstellungen1.OptModus = 0
-                        ElseIf BlueM1.OptZieleListe.GetLength(0) > 1 Then
-                            EVO_Einstellungen1.OptModus = 1
-                        End If
-
-                        'Parameterübergabe an ES
-                        Call BlueM1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
-
-                        'WEL-Chart vorbereiten
-
-
-                    Case ANW_BM_CES 'Anwendung BlauesModell CES
-                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                        'eingestelltes Dezimaltrennzeichen überprüfen
-                        Call CheckDezimaltrennzeichen()
-                        'Voreinstellungen lesen EVO.INI
-                        Call ReadEVOIni()
-                        'Evo deaktiviern
-                        EVO_Einstellungen1.Enabled = False
-                        'Testprobleme ausschalten
-                        Testprobleme1.Enabled = False
-                        'Ergebnisdatenbank ausschalten
-                        BlueM1.Ergebnisdb = False
-
-                        'BM-Einstellungen initialisieren 
-                        Call BlueM1.Sim_Ini()
-
-                        'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
-                        If BlueM1.OptZieleListe.GetLength(0) = 1 Then
-                            EVO_Einstellungen1.OptModus = 0
-                        ElseIf BlueM1.OptZieleListe.GetLength(0) > 1 Then
-                            EVO_Einstellungen1.OptModus = 1
-                        End If
-
-                        'Einlesen der CombiOpt Datei
-                        Call BlueM1.Read_CES()
-
-                        'Überprüfen der Kombinatorik
-                        Call BlueM1.Combinatoric_is_Valid()
-
-                        'Einlesen der Verbraucher Datei
-                        Call BlueM1.Verzweigung_Read()
-
-                        'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
-                        Call BlueM1.CES_fits_to_VER()
-
-                        'Call Initialisierung_BlauesModell_CombiOpt()
-
-                        'Anzahl der Ziele, Locations und Verzeigungen wird an CES übergeben
-                        CES1.n_Penalty = BlueM1.OptZieleListe.GetLength(0)
-                        CES1.n_Location = BlueM1.LocationList.GetLength(0)
-                        CES1.n_Verzweig = BlueM1.VerzweigungsDatei.GetLength(0)
-
-                        'Gibt die PathSize an für jede Pfadstelle
-                        Dim i As Integer
-                        ReDim CES1.n_PathSize(CES1.n_Location - 1)
-                        For i = 0 To CES1.n_Location - 1
-                            CES1.n_PathSize(i) = BlueM1.LocationList(i).MassnahmeListe.GetLength(0)
-                        Next
-
-                    Case ANW_TESTPROBLEME 'Anwendung Testprobleme
-                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                        'Test-Probleme und Evo aktivieren
-                        Testprobleme1.Enabled = True
-                        EVO_Einstellungen1.Enabled = True
-                        EVO_Einstellungen1.OptModus = Testprobleme1.OptModus
-                        'Globale Parameter werden gesetzt
-                        Call Testprobleme1.Parameter_Uebergabe(Testprobleme1.Combo_Testproblem.Text, Testprobleme1.Text_Sinusfunktion_Par.Text, Testprobleme1.Text_Schwefel24_Par.Text, globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
+                    'SensiPlot Dialog anzeigen:
+                    '--------------------------
+                    'List_Boxen füllen
+                    Dim i As Integer
+                    For i = 0 To BlueM1.OptParameterListe.GetUpperBound(0)
+                        Call SensiPlot1.ListBox_OptParameter_add(BlueM1.OptParameterListe(i))
+                    Next
+                    For i = 0 To BlueM1.OptZieleListe.GetUpperBound(0)
+                        Call SensiPlot1.ListBox_OptZiele_add(BlueM1.OptZieleListe(i))
+                    Next
+                    'Dialog anzeigen
+                    Dim SensiPlotDiagResult As Windows.Forms.DialogResult
+                    SensiPlotDiagResult = SensiPlot1.ShowDialog()
+                    If (Not SensiPlotDiagResult = Windows.Forms.DialogResult.OK) Then
+                        'Mauszeiger wieder normal
+                        Cursor = System.Windows.Forms.Cursors.Default
+                        Exit Sub
+                    End If
 
 
-                    Case ANW_TSP 'Anwendung Traveling Salesman Problem (TSP)
-                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                Case ANW_BM_PES 'Anwendung BlauesModell PES
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                        Call TSP1.TSP_Initialize(Diag)
+                    'eingestelltes Dezimaltrennzeichen überprüfen
+                    Call CheckDezimaltrennzeichen()
+                    'Voreinstellungen lesen EVO.INI
+                    Call ReadEVOIni()
+                    'Evo aktivieren
+                    EVO_Einstellungen1.Enabled = True
+                    'Testprobleme ausschalten
+                    Testprobleme1.Enabled = False
 
-                End Select
+                    'BM-Einstellungen initialisieren 
+                    Call BlueM1.Sim_Ini()
 
-                'IniApp OK -> Start Button aktivieren
-                Me.Button_Start.Enabled = True
+                    'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
+                    If BlueM1.OptZieleListe.GetLength(0) = 1 Then
+                        EVO_Einstellungen1.OptModus = 0
+                    ElseIf BlueM1.OptZieleListe.GetLength(0) > 1 Then
+                        EVO_Einstellungen1.OptModus = 1
+                    End If
 
-            Catch except As Exception
-                'Fehlerbehandlung
-                MsgBox("Initialisierung der Anwendung fehlgeschlagen!" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Critical, "Fehler")
+                    'Parameterübergabe an ES
+                    Call BlueM1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
 
-            End Try
+                    'WEL-Chart vorbereiten
+
+
+                Case ANW_BM_CES 'Anwendung BlauesModell CES
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'eingestelltes Dezimaltrennzeichen überprüfen
+                    Call CheckDezimaltrennzeichen()
+                    'Voreinstellungen lesen EVO.INI
+                    Call ReadEVOIni()
+                    'Evo deaktiviern
+                    EVO_Einstellungen1.Enabled = False
+                    'Testprobleme ausschalten
+                    Testprobleme1.Enabled = False
+                    'Ergebnisdatenbank ausschalten
+                    BlueM1.Ergebnisdb = False
+
+                    'BM-Einstellungen initialisieren 
+                    Call BlueM1.Sim_Ini()
+
+                    'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
+                    If BlueM1.OptZieleListe.GetLength(0) = 1 Then
+                        EVO_Einstellungen1.OptModus = 0
+                    ElseIf BlueM1.OptZieleListe.GetLength(0) > 1 Then
+                        EVO_Einstellungen1.OptModus = 1
+                    End If
+
+                    'Einlesen der CombiOpt Datei
+                    Call BlueM1.Read_CES()
+
+                    'Überprüfen der Kombinatorik
+                    Call BlueM1.Combinatoric_is_Valid()
+
+                    'Einlesen der Verbraucher Datei
+                    Call BlueM1.Verzweigung_Read()
+
+                    'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
+                    Call BlueM1.CES_fits_to_VER()
+
+                    'Call Initialisierung_BlauesModell_CombiOpt()
+
+                    'Anzahl der Ziele, Locations und Verzeigungen wird an CES übergeben
+                    CES1.n_Penalty = BlueM1.OptZieleListe.GetLength(0)
+                    CES1.n_Location = BlueM1.LocationList.GetLength(0)
+                    CES1.n_Verzweig = BlueM1.VerzweigungsDatei.GetLength(0)
+
+                    'Gibt die PathSize an für jede Pfadstelle
+                    Dim i As Integer
+                    ReDim CES1.n_PathSize(CES1.n_Location - 1)
+                    For i = 0 To CES1.n_Location - 1
+                        CES1.n_PathSize(i) = BlueM1.LocationList(i).MassnahmeListe.GetLength(0)
+                    Next
+
+                Case ANW_TESTPROBLEME 'Anwendung Testprobleme
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'Test-Probleme und Evo aktivieren
+                    Testprobleme1.Enabled = True
+                    EVO_Einstellungen1.Enabled = True
+                    EVO_Einstellungen1.OptModus = Testprobleme1.OptModus
+                    'Globale Parameter werden gesetzt
+                    Call Testprobleme1.Parameter_Uebergabe(Testprobleme1.Combo_Testproblem.Text, Testprobleme1.Text_Sinusfunktion_Par.Text, Testprobleme1.Text_Schwefel24_Par.Text, globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
+
+
+                Case ANW_TSP 'Anwendung Traveling Salesman Problem (TSP)
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    Call TSP1.TSP_Initialize(Diag)
+
+            End Select
+
+            'IniApp OK -> Start Button aktivieren
+            Me.Button_Start.Enabled = True
 
             'Mauszeiger wieder normal
             Cursor = System.Windows.Forms.Cursors.Default
@@ -282,63 +279,49 @@ Partial Class Form1
     'BUG 94: ReadEVO.ini müsste hier raus nach BlueM und "Read_Model_OptConfig" heißen **
     Private Sub ReadEVOIni()
 
-        Dim IsOK As Boolean = True
-
         If File.Exists("EVO.ini") Then
-            Try
-                'Datei einlesen
-                Dim FiStr As FileStream = New FileStream("EVO.ini", FileMode.Open, IO.FileAccess.Read)
-                Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-                Dim Configs(9, 1) As String
-                Dim Line As String
-                Dim Pairs() As String
-                Dim i As Integer = 0
-                Do
-                    Line = StrRead.ReadLine.ToString()
-                    If (Line.StartsWith("[") = False And Line.StartsWith(";") = False) Then
-                        Pairs = Line.Split("=")
-                        Configs(i, 0) = Pairs(0)
-                        Configs(i, 1) = Pairs(1)
-                        i += 1
-                    End If
-                Loop Until StrRead.Peek() = -1
+            'Datei einlesen
+            Dim FiStr As FileStream = New FileStream("EVO.ini", FileMode.Open, IO.FileAccess.Read)
+            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-                StrRead.Close()
-                FiStr.Close()
+            Dim Configs(9, 1) As String
+            Dim Line As String
+            Dim Pairs() As String
+            Dim i As Integer = 0
+            Do
+                Line = StrRead.ReadLine.ToString()
+                If (Line.StartsWith("[") = False And Line.StartsWith(";") = False) Then
+                    Pairs = Line.Split("=")
+                    Configs(i, 0) = Pairs(0)
+                    Configs(i, 1) = Pairs(1)
+                    i += 1
+                End If
+            Loop Until StrRead.Peek() = -1
 
-                'Default-Werte setzen
-                For i = 0 To Configs.GetUpperBound(0)
-                    Select Case Configs(i, 0)
-                        Case "BM_Exe"
-                            BlueM1.Exe = Configs(i, 1)
-                        Case "Datensatz"
-                            'Dateiname vom Ende abtrennen
-                            BlueM1.Datensatz = Configs(i, 1).Substring(Configs(i, 1).LastIndexOf("\") + 1)
-                            'Dateiendung entfernen
-                            BlueM1.Datensatz = BlueM1.Datensatz.Substring(0, BlueM1.Datensatz.Length - 4)
-                            'Arbeitsverzeichnis bestimmen
-                            BlueM1.WorkDir = Configs(i, 1).Substring(0, Configs(i, 1).LastIndexOf("\") + 1)
-                        Case Else
-                            'weitere Voreinstellungen
-                    End Select
-                Next
+            StrRead.Close()
+            FiStr.Close()
 
-            Catch except As Exception
-                MsgBox("Fehler beim lesen der EVO.ini Datei:" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
-                IsOK = False
-            End Try
+            'Default-Werte setzen
+            For i = 0 To Configs.GetUpperBound(0)
+                Select Case Configs(i, 0)
+                    Case "BM_Exe"
+                        BlueM1.Exe = Configs(i, 1)
+                    Case "Datensatz"
+                        'Dateiname vom Ende abtrennen
+                        BlueM1.Datensatz = Configs(i, 1).Substring(Configs(i, 1).LastIndexOf("\") + 1)
+                        'Dateiendung entfernen
+                        BlueM1.Datensatz = BlueM1.Datensatz.Substring(0, BlueM1.Datensatz.Length - 4)
+                        'Arbeitsverzeichnis bestimmen
+                        BlueM1.WorkDir = Configs(i, 1).Substring(0, Configs(i, 1).LastIndexOf("\") + 1)
+                    Case Else
+                        'weitere Voreinstellungen
+                End Select
+            Next
 
         Else
             'Datei EVO.ini existiert nicht
-            MsgBox("Die Datei ""EVO.ini"" konnte nicht gefunden werden!" & Chr(13) & Chr(10) & "Bitte gemäß Dokumentation eine Datei ""EVO.ini"" erstellen.", MsgBoxStyle.Critical, "Fehler")
-            IsOK = False
-        End If
-
-        'Ausnahme werfen
-        '---------------
-        If (IsOK = False) Then
-            Throw New Exception("Fehler beim Einlesen der Datei ""EVO.ini""!")
+            Throw New Exception("Die Datei ""EVO.ini"" konnte nicht gefunden werden!" & Chr(13) & Chr(10) & "Bitte gemäß Dokumentation eine Datei ""EVO.ini"" erstellen.")
         End If
 
     End Sub
@@ -352,27 +335,27 @@ Partial Class Form1
 
     Private Sub Button_Start_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Button_Start.Click
 
-        Try
-            myisrun = True
-            Select Case Anwendung
-                Case ANW_BM_RESET
-                    Call BlueM1.launchSim()
-                Case ANW_BM_SENSIPLOT
-                    Call SensiPlot_STARTEN()
-                Case ANW_BM_PES
-                    Call ES_STARTEN()
-                Case ANW_BM_CES
-                    Call BM_CES_STARTEN()
-                Case ANW_TESTPROBLEME
-                    Call ES_STARTEN()
-                Case ANW_TSP
-                    Call TSP_STARTEN()
-            End Select
+        'Try
+        myisrun = True
+        Select Case Anwendung
+            Case ANW_BM_RESET
+                Call BlueM1.launchSim()
+            Case ANW_BM_SENSIPLOT
+                Call SensiPlot_STARTEN()
+            Case ANW_BM_PES
+                Call ES_STARTEN()
+            Case ANW_BM_CES
+                Call BM_CES_STARTEN()
+            Case ANW_TESTPROBLEME
+                Call ES_STARTEN()
+            Case ANW_TSP
+                Call TSP_STARTEN()
+        End Select
 
-            'Fehlerbehandlung:
-        Catch ex As Exception
-            MsgBox(ex.Message, MsgBoxStyle.Critical, "Fehler")
-        End Try
+        ''Globale Fehlerbehandlung für Optimierungslauf:
+        'Catch ex As Exception
+        '    MsgBox(ex.Message, MsgBoxStyle.Critical, "Fehler")
+        'End Try
     End Sub
 
     'TODO: Das wird nie aufgerufen

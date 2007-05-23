@@ -919,7 +919,7 @@ ES_isNEXTPOP_ERROR:
         If Eigenschaft.iaktuelleRunde <= Eigenschaft.NRunden Then
             EsIsNextRunde = True
         Else
-            MsgBox("Optimierung beendet")
+            MsgBox("Optimierung beendet", MsgBoxStyle.Information, "Info")
         End If
 
         Exit Function

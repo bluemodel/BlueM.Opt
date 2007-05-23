@@ -144,102 +144,94 @@ Public MustInherit Class Sim
     '******************************
     Protected Sub OptParameter_einlesen()
 
-        Try
-            Dim Datei As String = WorkDir & Datensatz & "." & OptParameter_Ext
+        Dim Datei As String = WorkDir & Datensatz & "." & OptParameter_Ext
 
-            Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-            Dim Zeile As String
-            Dim AnzParam As Integer = 0
+        Dim Zeile As String
+        Dim AnzParam As Integer = 0
 
-            'Anzahl der Parameter feststellen
-            Do
-                Zeile = StrRead.ReadLine.ToString()
-                If (Zeile.StartsWith("*") = False) Then
-                    AnzParam += 1
-                End If
-            Loop Until StrRead.Peek() = -1
+        'Anzahl der Parameter feststellen
+        Do
+            Zeile = StrRead.ReadLine.ToString()
+            If (Zeile.StartsWith("*") = False) Then
+                AnzParam += 1
+            End If
+        Loop Until StrRead.Peek() = -1
 
-            ReDim OptParameterListe(AnzParam - 1)
+        ReDim OptParameterListe(AnzParam - 1)
 
-            'Zurück zum Dateianfang und lesen
-            FiStr.Seek(0, SeekOrigin.Begin)
+        'Zurück zum Dateianfang und lesen
+        FiStr.Seek(0, SeekOrigin.Begin)
 
-            Dim array() As String
-            Dim i As Integer = 0
-            Do
-                Zeile = StrRead.ReadLine.ToString()
-                If (Zeile.StartsWith("*") = False) Then
-                    array = Zeile.Split("|")
-                    'Werte zuweisen
-                    OptParameterListe(i).Bezeichnung = array(1).Trim()
-                    OptParameterListe(i).Einheit = array(2).Trim()
-                    OptParameterListe(i).Wert = Convert.ToDouble(array(3).Trim())
-                    OptParameterListe(i).Min = Convert.ToDouble(array(4).Trim())
-                    OptParameterListe(i).Max = Convert.ToDouble(array(5).Trim())
-                    i += 1
-                End If
-            Loop Until StrRead.Peek() = -1
+        Dim array() As String
+        Dim i As Integer = 0
+        Do
+            Zeile = StrRead.ReadLine.ToString()
+            If (Zeile.StartsWith("*") = False) Then
+                array = Zeile.Split("|")
+                'Werte zuweisen
+                OptParameterListe(i).Bezeichnung = array(1).Trim()
+                OptParameterListe(i).Einheit = array(2).Trim()
+                OptParameterListe(i).Wert = Convert.ToDouble(array(3).Trim())
+                OptParameterListe(i).Min = Convert.ToDouble(array(4).Trim())
+                OptParameterListe(i).Max = Convert.ToDouble(array(5).Trim())
+                i += 1
+            End If
+        Loop Until StrRead.Peek() = -1
 
-            StrRead.Close()
-            FiStr.Close()
+        StrRead.Close()
+        FiStr.Close()
 
-        Catch except As Exception
-            MsgBox("Fehler beim Lesen der Optimierungsparameter:" & Chr(13) & Chr(10) & except.Message & Chr(13) & Chr(10) & "Ein Fehler könnten Leerzeichen in der letzten Zeile der Datei sein.", MsgBoxStyle.Exclamation, "Fehler")
-        End Try
     End Sub
 
     'Modellparameter einlesen
     '************************
     Private Sub ModellParameter_einlesen()
-        Try
-            Dim Datei As String = WorkDir & Datensatz & "." & ModParameter_Ext
 
-            Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Dim Datei As String = WorkDir & Datensatz & "." & ModParameter_Ext
 
-            Dim Zeile As String
-            Dim AnzParam As Integer = 0
+        Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-            'Anzahl der Parameter feststellen
-            Do
-                Zeile = StrRead.ReadLine.ToString()
-                If (Zeile.StartsWith("*") = False) Then
-                    AnzParam += 1
-                End If
-            Loop Until StrRead.Peek() = -1
+        Dim Zeile As String
+        Dim AnzParam As Integer = 0
 
-            ReDim ModellParameterListe(AnzParam - 1)
+        'Anzahl der Parameter feststellen
+        Do
+            Zeile = StrRead.ReadLine.ToString()
+            If (Zeile.StartsWith("*") = False) Then
+                AnzParam += 1
+            End If
+        Loop Until StrRead.Peek() = -1
 
-            'Zurück zum Dateianfang und lesen
-            FiStr.Seek(0, SeekOrigin.Begin)
+        ReDim ModellParameterListe(AnzParam - 1)
 
-            Dim array() As String
-            Dim i As Integer = 0
-            Do
-                Zeile = StrRead.ReadLine.ToString()
-                If (Zeile.StartsWith("*") = False) Then
-                    array = Zeile.Split("|")
-                    'Werte zuweisen
-                    ModellParameterListe(i).OptParameter = array(1).Trim()
-                    ModellParameterListe(i).Bezeichnung = array(2).Trim()
-                    ModellParameterListe(i).Einheit = array(3).Trim()
-                    ModellParameterListe(i).Datei = array(4).Trim()
-                    ModellParameterListe(i).ZeileNr = Convert.ToInt16(array(5).Trim())
-                    ModellParameterListe(i).SpVon = Convert.ToInt16(array(6).Trim())
-                    ModellParameterListe(i).SpBis = Convert.ToInt16(array(7).Trim())
-                    ModellParameterListe(i).Faktor = Convert.ToDouble(array(8).Trim())
-                    i += 1
-                End If
-            Loop Until StrRead.Peek() = -1
+        'Zurück zum Dateianfang und lesen
+        FiStr.Seek(0, SeekOrigin.Begin)
 
-            StrRead.Close()
-            FiStr.Close()
+        Dim array() As String
+        Dim i As Integer = 0
+        Do
+            Zeile = StrRead.ReadLine.ToString()
+            If (Zeile.StartsWith("*") = False) Then
+                array = Zeile.Split("|")
+                'Werte zuweisen
+                ModellParameterListe(i).OptParameter = array(1).Trim()
+                ModellParameterListe(i).Bezeichnung = array(2).Trim()
+                ModellParameterListe(i).Einheit = array(3).Trim()
+                ModellParameterListe(i).Datei = array(4).Trim()
+                ModellParameterListe(i).ZeileNr = Convert.ToInt16(array(5).Trim())
+                ModellParameterListe(i).SpVon = Convert.ToInt16(array(6).Trim())
+                ModellParameterListe(i).SpBis = Convert.ToInt16(array(7).Trim())
+                ModellParameterListe(i).Faktor = Convert.ToDouble(array(8).Trim())
+                i += 1
+            End If
+        Loop Until StrRead.Peek() = -1
 
-        Catch except As Exception
-            MsgBox(except.Message, MsgBoxStyle.Exclamation, "Fehler beim Lesen der Optimierungsparameter" & Chr(13) & Chr(10) & "Ein Fehler könnten Leerzeichen in der letzten Zeile der Datei sein")
-        End Try
+        StrRead.Close()
+        FiStr.Close()
 
     End Sub
 
@@ -252,58 +244,52 @@ Public MustInherit Class Sim
         Dim i As Integer = 0
         Dim j As Integer = 0
 
-        Try
-            Dim Datei As String = WorkDir & Datensatz & "." & OptZiele_Ext
+        Dim Datei As String = WorkDir & Datensatz & "." & OptZiele_Ext
 
-            Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-            Dim Zeile As String = ""
+        Dim Zeile As String = ""
 
-            'Anzahl der Zielfunktionen feststellen
-            Do
-                Zeile = StrRead.ReadLine.ToString()
-                If (Zeile.StartsWith("*") = False) Then
-                    AnzZiele += 1
-                End If
-            Loop Until StrRead.Peek() = -1
+        'Anzahl der Zielfunktionen feststellen
+        Do
+            Zeile = StrRead.ReadLine.ToString()
+            If (Zeile.StartsWith("*") = False) Then
+                AnzZiele += 1
+            End If
+        Loop Until StrRead.Peek() = -1
 
-            ReDim OptZieleListe(AnzZiele - 1)
+        ReDim OptZieleListe(AnzZiele - 1)
 
-            'Zurück zum Dateianfang und lesen
-            FiStr.Seek(0, SeekOrigin.Begin)
+        'Zurück zum Dateianfang und lesen
+        FiStr.Seek(0, SeekOrigin.Begin)
 
-            'Einlesen der Zeile und übergeben an die OptimierungsZiele Liste
-            Dim ZeilenArray(9) As String
+        'Einlesen der Zeile und übergeben an die OptimierungsZiele Liste
+        Dim ZeilenArray(9) As String
 
-            Do
-                Zeile = StrRead.ReadLine.ToString()
-                If (Zeile.StartsWith("*") = False) Then
-                    ZeilenArray = Zeile.Split("|")
-                    'Werte zuweisen
-                    OptZieleListe(i).Bezeichnung = ZeilenArray(1).Trim()
-                    OptZieleListe(i).ZielTyp = ZeilenArray(2).Trim()
-                    OptZieleListe(i).Datei = ZeilenArray(3).Trim()
-                    OptZieleListe(i).SimGr = ZeilenArray(4).Trim()
-                    OptZieleListe(i).ZielFkt = ZeilenArray(5).Trim()
-                    OptZieleListe(i).WertTyp = ZeilenArray(6).Trim()
-                    OptZieleListe(i).ZielWert = ZeilenArray(7).Trim()
-                    OptZieleListe(i).ZielGr = ZeilenArray(8).Trim()
-                    OptZieleListe(i).ZielReihePfad = ZeilenArray(9).Trim()
-                    i += 1
-                End If
-            Loop Until StrRead.Peek() = -1
+        Do
+            Zeile = StrRead.ReadLine.ToString()
+            If (Zeile.StartsWith("*") = False) Then
+                ZeilenArray = Zeile.Split("|")
+                'Werte zuweisen
+                OptZieleListe(i).Bezeichnung = ZeilenArray(1).Trim()
+                OptZieleListe(i).ZielTyp = ZeilenArray(2).Trim()
+                OptZieleListe(i).Datei = ZeilenArray(3).Trim()
+                OptZieleListe(i).SimGr = ZeilenArray(4).Trim()
+                OptZieleListe(i).ZielFkt = ZeilenArray(5).Trim()
+                OptZieleListe(i).WertTyp = ZeilenArray(6).Trim()
+                OptZieleListe(i).ZielWert = ZeilenArray(7).Trim()
+                OptZieleListe(i).ZielGr = ZeilenArray(8).Trim()
+                OptZieleListe(i).ZielReihePfad = ZeilenArray(9).Trim()
+                i += 1
+            End If
+        Loop Until StrRead.Peek() = -1
 
-            StrRead.Close()
-            FiStr.Close()
-
-        Catch except As Exception
-            MsgBox("Fehler beim lesen der Optimierungsziel-Datei:" & Chr(13) & Chr(10) & except.Message & Chr(13) & Chr(10) & "Ein Fehler könnten Leerzeichen in der letzten Zeile der Datei sein", MsgBoxStyle.Exclamation, "Fehler")
-            Exit Sub
-        End Try
+        StrRead.Close()
+        FiStr.Close()
 
         'Falls mit Reihen verglichen werden soll werden hier die Reihen eingelesen
-        Dim ZielStart As Date 
+        Dim ZielStart As Date
         Dim ZielEnde As Date
 
         For i = 0 To AnzZiele - 1
@@ -432,11 +418,13 @@ Public MustInherit Class Sim
             Case 2
                 TChart1.Series(0).Add(OptZieleListe(0).QWertTmp, OptZieleListe(1).QWertTmp, "")
             Case 3
-                'UPGRADE: MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
+                'BUG 66: Zeichnen von mehr als 2 Zielfunktionen
+                Throw New Exception("Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt")
                 'Call Zielfunktion_zeichnen_MultiObPar_3D(BlueM1.OptZieleListe(0).QWertTmp, BlueM1.OptZieleListe(1).QWertTmp, BlueM1.OptZieleListe(2).QWertTmp)
             Case Else
-                'UPGRADE: MsgBox: Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt
-                'UPGRADE: Call Zielfunktion_zeichnen_MultiObPar_XD()
+                'BUG 66: Zeichnen von mehr als 2 Zielfunktionen
+                Throw New Exception("Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt")
+                'Call Zielfunktion_zeichnen_MultiObPar_XD()
         End Select
 
         'Qualitätswerte und OptParameter in DB speichern
@@ -558,7 +546,7 @@ Public MustInherit Class Sim
 
             Case "Volf"
                 'Volumenfehler
-                'UPGRADE: Volumenfehler rechnet noch nicht echtes Volumen, dazu ist Zeitschrittweite notwendig
+                'BUG 104: Volumenfehler rechnet noch nicht echtes Volumen, dazu ist Zeitschrittweite notwendig
                 Dim VolSim As Double = 0
                 Dim VolZiel As Double = 0
                 For i = 0 To SimReihe.GetUpperBound(0)
@@ -568,7 +556,8 @@ Public MustInherit Class Sim
                 QWert = Math.Abs(VolZiel - VolSim)
 
             Case Else
-                MsgBox("Evtl. Fehler in der Zielfunktionsdatei", MsgBoxStyle.Exclamation, "Fehler")
+                Throw New Exception("Die Zielfunktion '" & OptZiel.ZielFkt & "' wird nicht unterstützt!")
+
         End Select
 
         Return QWert
@@ -618,7 +607,8 @@ Public MustInherit Class Sim
                 SimWert = SimReihe(SimReihe.GetUpperBound(0), 1)
 
             Case Else
-                MsgBox("Evtl. Fehler in der Zielfunktionsdatei", MsgBoxStyle.Exclamation, "Fehler")
+                Throw New Exception("Der Werttyp '" & OptZiel.WertTyp & "' wird nicht unterstützt!")
+
         End Select
 
         'QWert berechnen
@@ -636,7 +626,8 @@ Public MustInherit Class Sim
                 QWert = Math.Abs(OptZiel.ZielWert - SimWert)
 
             Case Else
-                MsgBox("Evtl. Fehler in der Zielfunktionsdatei", MsgBoxStyle.Exclamation, "Fehler")
+                Throw New Exception("Die Zielfunktion '"& OptZiel.ZielFkt & "' wird für Werte nicht unterstützt!")
+
         End Select
 
         Return QWert
@@ -724,38 +715,32 @@ Public MustInherit Class Sim
 
         Read_ZRE = True
 
-        Try
-            Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-            'Anzahl der Zeilen feststellen
-            Do
-                Zeile = StrRead.ReadLine.ToString()
-                AnzZeil += 1
-            Loop Until StrRead.Peek() = -1
+        'Anzahl der Zeilen feststellen
+        Do
+            Zeile = StrRead.ReadLine.ToString()
+            AnzZeil += 1
+        Loop Until StrRead.Peek() = -1
 
-            ReDim ZRE(AnzZeil - ZREHEaderLen - 1, 1)
+        ReDim ZRE(AnzZeil - ZREHEaderLen - 1, 1)
 
-            'Zurück zum Dateianfang und lesen
-            FiStr.Seek(0, SeekOrigin.Begin)
+        'Zurück zum Dateianfang und lesen
+        FiStr.Seek(0, SeekOrigin.Begin)
 
-            For j = 0 To AnzZeil - 1
-                Zeile = StrRead.ReadLine.ToString()
-                If (j >= ZREHEaderLen) Then
-                    'Datum
-                    ZRE(j - ZREHEaderLen, 0) = New System.DateTime(Zeile.Substring(0, 4), Zeile.Substring(4, 2), Zeile.Substring(6, 2), Zeile.Substring(9, 2), Zeile.Substring(12, 2), 0, New System.Globalization.GregorianCalendar())
-                    'Wert
-                    ZRE(j - ZREHEaderLen, 1) = Convert.ToDouble(Zeile.Substring(15, 14))
-                End If
-            Next
+        For j = 0 To AnzZeil - 1
+            Zeile = StrRead.ReadLine.ToString()
+            If (j >= ZREHEaderLen) Then
+                'Datum
+                ZRE(j - ZREHEaderLen, 0) = New System.DateTime(Zeile.Substring(0, 4), Zeile.Substring(4, 2), Zeile.Substring(6, 2), Zeile.Substring(9, 2), Zeile.Substring(12, 2), 0, New System.Globalization.GregorianCalendar())
+                'Wert
+                ZRE(j - ZREHEaderLen, 1) = Convert.ToDouble(Zeile.Substring(15, 14))
+            End If
+        Next
 
-            StrRead.Close()
-            FiStr.Close()
-
-        Catch except As Exception
-            MsgBox("Fehler beim lesen der ZRE-Datei" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
-            Read_ZRE = False
-        End Try
+        StrRead.Close()
+        FiStr.Close()
 
     End Function
 
@@ -775,58 +760,55 @@ Public MustInherit Class Sim
         Const WELHeaderLen As Integer = 3       'Die ersten 3 Zeilen der WEL-Datei gehören zum Header
         Read_WEL = True
 
-        Try
-            Dim FiStr As FileStream = New FileStream(Dateipfad, FileMode.Open, IO.FileAccess.ReadWrite)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Dim FiStr As FileStream = New FileStream(Dateipfad, FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-            'Anzahl der Zeilen feststellen
-            Do
-                Zeile = StrRead.ReadLine.ToString
-                AnzZeil += 1
-            Loop Until StrRead.Peek() = -1
+        'Anzahl der Zeilen feststellen
+        Do
+            Zeile = StrRead.ReadLine.ToString
+            AnzZeil += 1
+        Loop Until StrRead.Peek() = -1
 
-            ReDim WEL(AnzZeil - WELHeaderLen - 1, 1)
+        ReDim WEL(AnzZeil - WELHeaderLen - 1, 1)
 
-            'Position der zu lesenden Spalte bestimmen
-            '-----------------------------------------
-            FiStr.Seek(0, SeekOrigin.Begin)
-            'Zeile mit den Spaltenüberschriften auslesen
-            For j = 0 To 1
-                Werte = StrRead.ReadLine.ToString.Split(";")
-            Next
-            StrRead.ReadToEnd()
-            'Spaltenüberschriften vergleichen
-            For j = 0 To Werte.GetUpperBound(0)
-                If Werte(j).Trim() = Spalte Then
-                    SpalteNr = j
-                End If
-            Next
-            If (SpalteNr = -1) Then
-                Read_WEL = False
-                MsgBox("Konnte die Spalte """ & Spalte & """ in der WEL-Datei nicht finden!", MsgBoxStyle.Exclamation, "Fehler")
-                Exit Function
+        'Position der zu lesenden Spalte bestimmen
+        '-----------------------------------------
+        FiStr.Seek(0, SeekOrigin.Begin)
+        'Zeile mit den Spaltenüberschriften auslesen
+        For j = 0 To 1
+            Werte = StrRead.ReadLine.ToString.Split(";")
+        Next
+        StrRead.ReadToEnd()
+        'Spaltenüberschriften vergleichen
+        For j = 0 To Werte.GetUpperBound(0)
+            If Werte(j).Trim() = Spalte Then
+                SpalteNr = j
             End If
+        Next
 
-            'Auf Anfang setzen und lesen
-            FiStr.Seek(0, SeekOrigin.Begin)
-
-            For j = 0 To AnzZeil - 1
-                Werte = StrRead.ReadLine.ToString.Split(";")
-                If (j >= WELHeaderLen) Then
-                    'Datum
-                    WEL(j - WELHeaderLen, 0) = New System.DateTime(Werte(1).Substring(6, 4), Werte(1).Substring(3, 2), Werte(1).Substring(0, 2), Werte(1).Substring(11, 2), Werte(1).Substring(14, 2), 0, New System.Globalization.GregorianCalendar())
-                    'Wert
-                    WEL(j - WELHeaderLen, 1) = Convert.ToDouble(Werte(SpalteNr))
-                End If
-            Next
-
-            StrRead.Close()
-            FiStr.Close()
-
-        Catch except As Exception
-            MsgBox("Fehler beim lesen der WEL-Datei" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
+        'Wenn Spalte nicht gefunden
+        '--------------------------
+        If (SpalteNr = -1) Then
             Read_WEL = False
-        End Try
+            Throw New Exception("Konnte die Spalte """ & Spalte & """ in der WEL-Datei nicht finden!")
+        End If
+
+        'Auf Anfang setzen und einlesen
+        '------------------------------
+        FiStr.Seek(0, SeekOrigin.Begin)
+
+        For j = 0 To AnzZeil - 1
+            Werte = StrRead.ReadLine.ToString.Split(";")
+            If (j >= WELHeaderLen) Then
+                'Datum
+                WEL(j - WELHeaderLen, 0) = New System.DateTime(Werte(1).Substring(6, 4), Werte(1).Substring(3, 2), Werte(1).Substring(0, 2), Werte(1).Substring(11, 2), Werte(1).Substring(14, 2), 0, New System.Globalization.GregorianCalendar())
+                'Wert
+                WEL(j - WELHeaderLen, 1) = Convert.ToDouble(Werte(SpalteNr))
+            End If
+        Next
+
+        StrRead.Close()
+        FiStr.Close()
 
     End Function
 
@@ -840,61 +822,55 @@ Public MustInherit Class Sim
         Dim Zeile As String
         Read_PRB = True
 
-        Try
-            Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-            'Array redimensionieren
-            ReDim PRB(AnzZeil - 1, 1)
+        'Array redimensionieren
+        ReDim PRB(AnzZeil - 1, 1)
 
-            'Anfangszeile suchen
-            Do
-                Zeile = StrRead.ReadLine.ToString
-                If (Zeile.Contains("+ Wahrscheinlichkeitskeitsverteilung: " & ZielGr)) Then
-                    Exit Do
-                End If
-            Loop Until StrRead.Peek() = -1
-
-            'Zeile mit Spaltenüberschriften überspringen
+        'Anfangszeile suchen
+        Do
             Zeile = StrRead.ReadLine.ToString
+            If (Zeile.Contains("+ Wahrscheinlichkeitskeitsverteilung: " & ZielGr)) Then
+                Exit Do
+            End If
+        Loop Until StrRead.Peek() = -1
 
-            For j = 0 To AnzZeil - 1
-                Zeile = StrRead.ReadLine.ToString()
-                PRB(j, 0) = Convert.ToDouble(Zeile.Substring(2, 10))        'X-Wert
-                PRB(j, 1) = Convert.ToDouble(Zeile.Substring(13, 8))        'P(Jahr)
-            Next
+        'Zeile mit Spaltenüberschriften überspringen
+        Zeile = StrRead.ReadLine.ToString
 
-            StrRead.Close()
-            FiStr.Close()
+        For j = 0 To AnzZeil - 1
+            Zeile = StrRead.ReadLine.ToString()
+            PRB(j, 0) = Convert.ToDouble(Zeile.Substring(2, 10))        'X-Wert
+            PRB(j, 1) = Convert.ToDouble(Zeile.Substring(13, 8))        'P(Jahr)
+        Next
 
-            'Überflüssige Stützstellen (P) entfernen
-            '---------------------------------------
-            'Anzahl Stützstellen bestimmen
-            Dim stuetz As Integer = 0
-            Dim P_vorher As Double = -99
-            For j = 0 To PRB.GetUpperBound(0)
-                If (j = 0 Or Not PRB(j, 1) = P_vorher) Then
-                    stuetz += 1
-                    P_vorher = PRB(j, 1)
-                End If
-            Next
-            'Werte in neues Array schreiben
-            Dim PRBtmp(stuetz - 1, 1) As Object
-            stuetz = 0
-            For j = 0 To PRB.GetUpperBound(0)
-                If (j = 0 Or Not PRB(j, 1) = P_vorher) Then
-                    PRBtmp(stuetz, 0) = PRB(j, 0)
-                    PRBtmp(stuetz, 1) = PRB(j, 1)
-                    P_vorher = PRB(j, 1)
-                    stuetz += 1
-                End If
-            Next
-            PRB = PRBtmp
+        StrRead.Close()
+        FiStr.Close()
 
-        Catch except As Exception
-            MsgBox("Fehler beim lesen der PRB-Datei:" & Chr(13) & Chr(10) & except.Message & Chr(13) & Chr(10) & "Ein Fehler könnten Leerzeichen in der letzten Zeile der Datei sein.", MsgBoxStyle.Exclamation, "Fehler")
-            Read_PRB = False
-        End Try
+        'Überflüssige Stützstellen (P) entfernen
+        '---------------------------------------
+        'Anzahl Stützstellen bestimmen
+        Dim stuetz As Integer = 0
+        Dim P_vorher As Double = -99
+        For j = 0 To PRB.GetUpperBound(0)
+            If (j = 0 Or Not PRB(j, 1) = P_vorher) Then
+                stuetz += 1
+                P_vorher = PRB(j, 1)
+            End If
+        Next
+        'Werte in neues Array schreiben
+        Dim PRBtmp(stuetz - 1, 1) As Object
+        stuetz = 0
+        For j = 0 To PRB.GetUpperBound(0)
+            If (j = 0 Or Not PRB(j, 1) = P_vorher) Then
+                PRBtmp(stuetz, 0) = PRB(j, 0)
+                PRBtmp(stuetz, 1) = PRB(j, 1)
+                P_vorher = PRB(j, 1)
+                stuetz += 1
+            End If
+        Next
+        PRB = PRBtmp
 
     End Function
 
@@ -913,52 +889,43 @@ Public MustInherit Class Sim
         '-----------------------------------------------------------
         Dim ZielDatei As String = WorkDir & Datensatz & "_EVO.mdb"
 
-        Try
-            Dim currentDir As String = CurDir()     'sollte das /bin Verzeichnis von _Main sein
-            ChDir("../../Apps")                     'wechselt in das /Apps Verzeichnis 
-            My.Computer.FileSystem.CopyFile("EVO.mdb", ZielDatei, True)
-            ChDir(currentDir)                       'zurück in das Ausgangsverzeichnis wechseln
-        Catch except As Exception
-            MsgBox("Ergebnisdatenbank konnte nicht ins Arbeitsverzeichnis kopiert werden:" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
-            Exit Sub
-        End Try
+        Dim currentDir As String = CurDir()     'sollte das /bin Verzeichnis von _Main sein
+        ChDir("../../Apps")                     'wechselt in das /Apps Verzeichnis 
+        My.Computer.FileSystem.CopyFile("EVO.mdb", ZielDatei, True)
+        ChDir(currentDir)                       'zurück in das Ausgangsverzeichnis wechseln
 
         'Tabellen anpassen
         '-----------------
         Dim i As Integer
-        Try
-            Call db_connect()
-            Dim command As OleDbCommand = New OleDbCommand("", db)
-            'Tabelle 'QWerte'
-            'Spalten festlegen:
-            Dim fieldnames As String = ""
-            For i = 0 To OptZieleListe.GetUpperBound(0)
-                If (i > 0) Then
-                    fieldnames &= ", "
-                End If
-                fieldnames &= "'" & OptZieleListe(i).Bezeichnung & "' DOUBLE"
-            Next
-            'Tabelle anpassen
-            command.CommandText = "ALTER TABLE QWerte ADD COLUMN " & fieldnames
-            command.ExecuteNonQuery()
 
-            'Tabelle 'OptParameter'
-            'Spalten festlegen:
-            fieldnames = ""
-            For i = 0 To OptParameterListe.GetUpperBound(0)
-                If (i > 0) Then
-                    fieldnames &= ", "
-                End If
-                fieldnames &= "'" & OptParameterListe(i).Bezeichnung & "' DOUBLE"
-            Next
-            'Tabelle anpassen
-            command.CommandText = "ALTER TABLE OptParameter ADD COLUMN " & fieldnames
-            command.ExecuteNonQuery()
-            Call db_disconnect()
-        Catch except As Exception
-            MsgBox("Konnte Tabellen nicht anpassen:" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
-            Exit Sub
-        End Try
+        Call db_connect()
+        Dim command As OleDbCommand = New OleDbCommand("", db)
+        'Tabelle 'QWerte'
+        'Spalten festlegen:
+        Dim fieldnames As String = ""
+        For i = 0 To OptZieleListe.GetUpperBound(0)
+            If (i > 0) Then
+                fieldnames &= ", "
+            End If
+            fieldnames &= "'" & OptZieleListe(i).Bezeichnung & "' DOUBLE"
+        Next
+        'Tabelle anpassen
+        command.CommandText = "ALTER TABLE QWerte ADD COLUMN " & fieldnames
+        command.ExecuteNonQuery()
+
+        'Tabelle 'OptParameter'
+        'Spalten festlegen:
+        fieldnames = ""
+        For i = 0 To OptParameterListe.GetUpperBound(0)
+            If (i > 0) Then
+                fieldnames &= ", "
+            End If
+            fieldnames &= "'" & OptParameterListe(i).Bezeichnung & "' DOUBLE"
+        Next
+        'Tabelle anpassen
+        command.CommandText = "ALTER TABLE OptParameter ADD COLUMN " & fieldnames
+        command.ExecuteNonQuery()
+        Call db_disconnect()
 
     End Sub
 
@@ -983,36 +950,33 @@ Public MustInherit Class Sim
 
         Dim i As Integer
 
-        Try
-            Dim command As OleDbCommand = New OleDbCommand("", db)
-            'QWert schreiben 
-            'Spalten der Tabelle 'Qwerte' bestimmen:
-            Dim fieldnames As String = ""
-            Dim fieldvalues As String = ""
-            For i = 0 To OptZieleListe.GetUpperBound(0)
-                fieldnames &= ", '" & OptZieleListe(i).Bezeichnung & "'"
-                fieldvalues &= ", " & OptZieleListe(i).QWertTmp
-            Next
-            command.CommandText = "INSERT INTO QWerte (durchlauf, ipop " & fieldnames & ") VALUES (" & durchlauf & ", " & ipop & fieldvalues & ")"
-            command.ExecuteNonQuery()
-            'ID des zuletzt geschriebenen QWerts holen
-            command.CommandText = "SELECT @@IDENTITY AS ID"
-            Dim QWert_ID As Integer = command.ExecuteScalar()
+        Dim command As OleDbCommand = New OleDbCommand("", db)
+        'QWert schreiben 
+        'Spalten der Tabelle 'Qwerte' bestimmen:
+        Dim fieldnames As String = ""
+        Dim fieldvalues As String = ""
+        For i = 0 To OptZieleListe.GetUpperBound(0)
+            fieldnames &= ", '" & OptZieleListe(i).Bezeichnung & "'"
+            fieldvalues &= ", " & OptZieleListe(i).QWertTmp
+        Next
+        command.CommandText = "INSERT INTO QWerte (durchlauf, ipop " & fieldnames & ") VALUES (" & durchlauf & ", " & ipop & fieldvalues & ")"
+        command.ExecuteNonQuery()
+        'ID des zuletzt geschriebenen QWerts holen
+        command.CommandText = "SELECT @@IDENTITY AS ID"
+        Dim QWert_ID As Integer = command.ExecuteScalar()
 
-            'Zugehörige OptParameter schreiben
-            fieldnames = ""
-            fieldvalues = ""
-            For i = 0 To OptParameterListe.GetUpperBound(0)
-                fieldnames &= ", '" & OptParameterListe(i).Bezeichnung & "'"
-                fieldvalues &= ", " & OptParameterListe(i).Wert
-            Next
-            command.CommandText = "INSERT INTO OptParameter (QWert_ID" & fieldnames & ") VALUES (" & QWert_ID & fieldvalues & ")"
-            command.ExecuteNonQuery()
-        Catch except As Exception
-            MsgBox("Fehler beim schreiben in die Ergebnisdatenbank" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
-        End Try
+        'Zugehörige OptParameter schreiben
+        fieldnames = ""
+        fieldvalues = ""
+        For i = 0 To OptParameterListe.GetUpperBound(0)
+            fieldnames &= ", '" & OptParameterListe(i).Bezeichnung & "'"
+            fieldvalues &= ", " & OptParameterListe(i).Wert
+        Next
+        command.CommandText = "INSERT INTO OptParameter (QWert_ID" & fieldnames & ") VALUES (" & QWert_ID & fieldvalues & ")"
+        command.ExecuteNonQuery()
 
         Call db_disconnect()
+
     End Function
 
 #End Region 'Ergebnisdatenbank
