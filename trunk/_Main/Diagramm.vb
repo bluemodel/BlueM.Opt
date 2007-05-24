@@ -135,22 +135,15 @@ Public Class Diagramm
     Public Sub DiagInitialise_SinusFunktion(ByVal EVO_Einstellungen1 As EvoForm.EVO_Einstellungen, ByVal globalAnzPar As Short, ByVal AnzPara As Integer)
         Dim array_x() As Double = {}
         Dim array_y() As Double = {}
-        Dim Ausgangsergebnis As Double
-        Dim Anzahl_Kalkulationen As Integer
         Dim Populationen As Short
         Dim i As Short
         Dim Datenmenge As Short
         Dim Unterteilung_X As Double
-
-        If EVO_Einstellungen1.isPOPUL Then
-            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden
-        Else
-            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
-        End If
+        Dim Pi as Double = 3.141592654
 
         'Ausgengsergebnisse für die Linien im TeeChart Rechnen
         Datenmenge = AnzPara
-        Unterteilung_X = 2 * 3.141592654 / (Datenmenge - 1)
+        Unterteilung_X = 2 * Pi / (Datenmenge - 1)
 
         'Linien für die Ausgangsergebnisse im TeeChart zeichnen
         ReDim array_x(Datenmenge - 1)
@@ -165,8 +158,8 @@ Public Class Diagramm
         With Me
             .Clear()
             .Header.Text = "Sinus Funktion"
-            .Chart.Axes.Left.Title.Caption = "Funktionswert"
-            .Chart.Axes.Bottom.Title.Caption = "Berechnungsschritt"
+            .Chart.Axes.Left.Title.Caption = "Y-Wert"
+            .Chart.Axes.Bottom.Title.Caption = "X-Wert"
             .Aspect.View3D = False
             .Legend.Visible = False
 
@@ -192,13 +185,9 @@ Public Class Diagramm
 
             'Axen Formatieren
             .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Maximum = Anzahl_Kalkulationen
+            .Chart.Axes.Bottom.Maximum = 2 * Pi
             .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Left.Automatic = False
-            .Chart.Axes.Left.Maximum = Ausgangsergebnis * 1.3
-            .Chart.Axes.Left.Minimum = 0
-            .Chart.Axes.Left.Logarithmic = False
-            .Chart.Axes.Bottom.Automatic = True
+            .Chart.Axes.Bottom.Increment = Pi
             .Chart.Axes.Left.Automatic = False
             .Chart.Axes.Left.Minimum = -1
             .Chart.Axes.Left.Maximum = 1
@@ -216,11 +205,7 @@ Public Class Diagramm
         Dim i As Short
         Dim OptErg() As Double
 
-        If EVO_Einstellungen1.isPOPUL Then
-            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden
-        Else
-            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
-        End If
+        Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
 
         'Ausgengsergebnisse für die Linien im TeeChart Rechnen
         ReDim OptErg(Anzahl_Kalkulationen)
@@ -270,7 +255,6 @@ Public Class Diagramm
             .Chart.Axes.Left.Automatic = False
             .Chart.Axes.Left.Maximum = Ausgangsergebnis * 1.3
             .Chart.Axes.Left.Minimum = 0
-            .Chart.Axes.Left.Logarithmic = False
 
         End With
     End Sub
@@ -284,13 +268,9 @@ Public Class Diagramm
         Dim i As Short
         Dim X() As Double
 
-        If EVO_Einstellungen1.isPOPUL Then
-            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden
-        Else
-            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
-        End If
+        Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
 
-        'Ausgengsergebnisse für die Linien im TeeChart Rechnen
+        'Ausgangsergebnisse für die Linien im TeeChart Rechnen
         ReDim X(globalAnzPar)
         For i = 1 To globalAnzPar
             X(i) = 10
