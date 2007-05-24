@@ -343,11 +343,11 @@ Partial Class Form1
             Case ANW_BM_SENSIPLOT
                 Call STARTEN_SensiPlot()
             Case ANW_BM_PES
-                Call STARTEN_ES()
+                Call STARTEN_BM_PES()
             Case ANW_BM_CES
                 Call STARTEN_BM_CES()
             Case ANW_TESTPROBLEME
-                Call STARTEN_ES()
+                Call STARTEN_BM_PES()
             Case ANW_TSP
                 Call STARTEN_TSP()
         End Select
@@ -586,14 +586,15 @@ Partial Class Form1
                 Next
             ElseIf CES1.n_Penalty = 2 Then
                 'Zeichnen von NDSortingResult
+                Call Diag.DeleteSeries(CES1.n_Childs - 1, 1)
+
                 Dim f As Integer
-                For i = 0 To CES1.n_Childs + CES1.n_Parents - 1
+                For i = 0 To CES1.n_Childs - 1
                     f = CES1.NDSResult(i).Front
                     Call Diag.prepareSeries(f, "Front:" & f, Steema.TeeChart.Styles.PointerStyles.Circle, 4)
                     Call Diag.Series(f).Add(CES1.NDSResult(i).Penalty(0), CES1.NDSResult(i).Penalty(1))
                 Next
             End If
-
 
             'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
             Call CES1.Reset_Childs_BM()
@@ -612,7 +613,7 @@ Partial Class Form1
     'Anwendung Evolutionsstrategie für Parameter Optimierung - hier Steuerung       
     '************************************************************************
 
-    Private Sub STARTEN_ES()
+    Private Sub STARTEN_BM_PES()
         '==========================
         Dim i As Integer
         '--------------------------
