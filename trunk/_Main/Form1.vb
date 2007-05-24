@@ -260,7 +260,7 @@ Partial Class Form1
                 Case ANW_TSP 'Anwendung Traveling Salesman Problem (TSP)
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    Call TSP1.TSP_Initialize(Diag)
+                    Call TSP1.TSP_Initialize(DForm.Diag)
 
             End Select
 
@@ -408,7 +408,7 @@ Partial Class Form1
             BlueM1.OptZieleListe(SensiPlot1.Selected_OptZiel).QWertTmp = BlueM1.QWert(BlueM1.OptZieleListe(SensiPlot1.Selected_OptZiel))
 
             'Diagramm aktualisieren
-            Diag.Series(0).Add(BlueM1.OptZieleListe(SensiPlot1.Selected_OptZiel).QWertTmp, BlueM1.OptParameterListe(SensiPlot1.Selected_OptParameter).Wert, "")
+            DForm.Diag.Series(0).Add(BlueM1.OptZieleListe(SensiPlot1.Selected_OptZiel).QWertTmp, BlueM1.OptParameterListe(SensiPlot1.Selected_OptParameter).Wert, "")
 
             'Speichern des Simulationsergebnisses für Wave
             'Wave1.WaveList(i).Bezeichnung = SensiPlot1.Selected_OptZiel.SimGr & "(Sim " & i & ")"
@@ -432,12 +432,12 @@ Partial Class Form1
         yAchse.Auto = True
         Achsen.Add(yAchse)
 
-        Call Wave1.Diag.DiagInitialise("SensiPlot", Achsen)
+        Call Wave1.WForm.Diag.DiagInitialise("SensiPlot", Achsen)
 
         'Serien initialisieren
         Dim tmpSeries As Steema.TeeChart.Styles.Line
         For i = 1 To SensiPlot1.Anz_Sim
-            tmpSeries = New Steema.TeeChart.Styles.Line(Wave1.Diag.Chart)
+            tmpSeries = New Steema.TeeChart.Styles.Line(Wave1.WForm.Diag.Chart)
             tmpSeries.Title = "Sim " & i.ToString()
             tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Nothing
         Next
@@ -459,7 +459,7 @@ Partial Class Form1
         Dim gen As Integer
 
         'BUG 85: Nach Klasse Diagramm auslagern!
-        Call TSP1.TeeChart_Initialise_TSP(Diag)
+        Call TSP1.TeeChart_Initialise_TSP(DForm.Diag)
 
         'Arrays werden Dimensioniert
         Call TSP1.Dim_Parents_TSP()
@@ -486,7 +486,7 @@ Partial Class Form1
             'Zeichnen des besten Elter
             'TODO: funzt nur, wenn ganz am ende gezeichnet wird
             If gen = TSP1.n_Gen Then
-                Call TSP1.TeeChart_Zeichnen_TSP(Diag, TSP1.ParentList(0).Image)
+                Call TSP1.TeeChart_Zeichnen_TSP(DForm.Diag, TSP1.ParentList(0).Image)
             End If
 
             'Kinder werden Hier vollständig gelöscht
@@ -547,14 +547,14 @@ Partial Class Form1
                 Call BlueM1.Verzweigung_Write()
 
                 'Evaluiert das Blaue Modell
-                Call BlueM1.Eval_Sim_CombiOpt(CES1.n_Penalty, durchlauf_all, 1, CES1.ChildList(i).Penalty, Diag)
+                Call BlueM1.Eval_Sim_CombiOpt(CES1.n_Penalty, durchlauf_all, 1, CES1.ChildList(i).Penalty, DForm.Diag)
 
                 'Zeichnen der Kinder
-                Call Diag.prepareSeries(0, "Childs", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
+                Call DForm.Diag.prepareSeries(0, "Childs", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
                 If CES1.n_Penalty = 1 Then
-                    Call Diag.Series(0).Add(durchlauf_all, CES1.ChildList(i).Penalty(0))
+                    Call DForm.Diag.Series(0).Add(durchlauf_all, CES1.ChildList(i).Penalty(0))
                 ElseIf CES1.n_Penalty = 2 Then
-                    Call Diag.Series(0).Add(CES1.ChildList(i).Penalty(0), CES1.ChildList(i).Penalty(1))
+                    Call DForm.Diag.Series(0).Add(CES1.ChildList(i).Penalty(0), CES1.ChildList(i).Penalty(1))
                 End If
 
                 ''HACK zum zeichnen aller Qualitäten
@@ -581,18 +581,18 @@ Partial Class Form1
                 'Zeichnen des besten Elter
                 For i = 0 To CES1.n_Parents - 1
                     'durchlauf += 1
-                    Call Diag.prepareSeries(1, "Parent", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                    Call Diag.Series(1).Add(durchlauf_all, CES1.ParentList(i).Penalty(0))
+                    Call DForm.Diag.prepareSeries(1, "Parent", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                    Call DForm.Diag.Series(1).Add(durchlauf_all, CES1.ParentList(i).Penalty(0))
                 Next
             ElseIf CES1.n_Penalty = 2 Then
                 'Zeichnen von NDSortingResult
-                Call Diag.DeleteSeries(CES1.n_Childs - 1, 1)
+                Call DForm.Diag.DeleteSeries(CES1.n_Childs - 1, 1)
 
                 Dim f As Integer
                 For i = 0 To CES1.n_Childs - 1
                     f = CES1.NDSResult(i).Front
-                    Call Diag.prepareSeries(f, "Front:" & f, Steema.TeeChart.Styles.PointerStyles.Circle, 4)
-                    Call Diag.Series(f).Add(CES1.NDSResult(i).Penalty(0), CES1.NDSResult(i).Penalty(1))
+                    Call DForm.Diag.prepareSeries(f, "Front:" & f, Steema.TeeChart.Styles.PointerStyles.Circle, 4)
+                    Call DForm.Diag.Series(f).Add(CES1.NDSResult(i).Penalty(0), CES1.NDSResult(i).Penalty(1))
                 Next
             End If
 
@@ -802,9 +802,9 @@ Start_Evolutionsrunden:
                         '************************************************************************************
                         Select Case Anwendung
                             Case ANW_TESTPROBLEME
-                                Call Testprobleme1.Evaluierung_TestProbleme(Testprobleme1.Combo_Testproblem.Text, globalAnzPar, mypara, durchlauf, ipop, QN, RN, Diag)
+                                Call Testprobleme1.Evaluierung_TestProbleme(Testprobleme1.Combo_Testproblem.Text, globalAnzPar, mypara, durchlauf, ipop, QN, RN, DForm.Diag)
                             Case ANW_BM_PES
-                                Call BlueM1.Eval_Sim_ParaOpt(globalAnzPar, globalAnzZiel_ParaOpt, mypara, durchlauf, ipop, QN, Diag)
+                                Call BlueM1.Eval_Sim_ParaOpt(globalAnzPar, globalAnzZiel_ParaOpt, mypara, durchlauf, ipop, QN, DForm.Diag)
                         End Select
 
                         'Einordnen der Qualitätsfunktion im Bestwertspeicher
@@ -870,7 +870,7 @@ Start_Evolutionsrunden:
 
     Private Sub Bestwertzeichnen_Pareto(ByRef Bestwert(,) As Double, ByRef ipop As Short)
         Dim i As Short
-        With Diag
+        With DForm.Diag
             .Series(ipop).Clear()
             If UBound(Bestwert, 2) = 2 Then
                 For i = 1 To UBound(Bestwert, 1)
@@ -888,7 +888,7 @@ Start_Evolutionsrunden:
     Private Sub SekundärePopulationZeichnen(ByRef Population(,) As Double)
         Dim i As Short
         Dim Datenreihe As Short
-        With Diag
+        With DForm.Diag
             If EVO_Einstellungen1.isPOPUL Then
                 Datenreihe = EVO_Einstellungen1.NPopul + 1
             Else
@@ -933,8 +933,8 @@ Start_Evolutionsrunden:
     'Diagrammfunktionen
     '###################
 
-    'Diagramm vorbereiten und Initialisierung aufrufen
-    '*************************************************
+    'Achsen und Standard-Series initialisieren
+    '*****************************************
     Private Sub PrepareDiagramm()
 
         Dim i As Integer
@@ -946,13 +946,13 @@ Start_Evolutionsrunden:
 
                 Select Case Testprobleme1.Combo_Testproblem.Text
                     Case "Sinus-Funktion"
-                        Call Diag.DiagInitialise_SinusFunktion(EVO_Einstellungen1, globalAnzPar, Testprobleme1.Text_Sinusfunktion_Par.Text)
+                        Call DForm.Diag.DiagInitialise_SinusFunktion(EVO_Einstellungen1, globalAnzPar, Testprobleme1.Text_Sinusfunktion_Par.Text)
                     Case "Beale-Problem" 'x1 = [-5;5], x2=[-2;2]
-                        Call Diag.DiagInitialise_BealeProblem(EVO_Einstellungen1, globalAnzPar)
+                        Call DForm.Diag.DiagInitialise_BealeProblem(EVO_Einstellungen1, globalAnzPar)
                     Case "Schwefel 2.4-Problem" 'xi = [-10,10]
-                        Call Diag.DiagInitialise_SchwefelProblem(EVO_Einstellungen1, globalAnzPar)
+                        Call DForm.Diag.DiagInitialise_SchwefelProblem(EVO_Einstellungen1, globalAnzPar)
                     Case Else
-                        Call Diag.DiagInitialise_MultiTestProb(EVO_Einstellungen1, Testprobleme1.Combo_Testproblem.Text)
+                        Call DForm.Diag.DiagInitialise_MultiTestProb(EVO_Einstellungen1, Testprobleme1.Combo_Testproblem.Text)
                 End Select
 
 
@@ -960,6 +960,7 @@ Start_Evolutionsrunden:
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXX
 
                 'Achsen:
+                '-------
                 Dim Achse As Diagramm.Achse
                 Dim Achsen As New Collection
                 'X-Achse = QWert
@@ -974,10 +975,10 @@ Start_Evolutionsrunden:
                 Achsen.Add(Achse)
 
                 'Diagramm initialisieren
-                Call Diag.DiagInitialise(Anwendung, Achsen)
+                Call DForm.Diag.DiagInitialise(Anwendung, Achsen)
 
                 'Series initialisieren
-                Dim tmpPoint As New Steema.TeeChart.Styles.Points(Me.Diag.Chart)
+                Dim tmpPoint As New Steema.TeeChart.Styles.Points(Me.DForm.Diag.Chart)
                 tmpPoint.Title = "Simulationsergebnis"
                 tmpPoint.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
                 tmpPoint.Color = System.Drawing.Color.Orange
@@ -989,6 +990,7 @@ Start_Evolutionsrunden:
                 'XXXXXXXXXXXXXXXXXXXXX
 
                 'Achsen:
+                '-------
                 Dim Achse As Diagramm.Achse
                 Dim Achsen As New Collection
                 'Bei SO: X-Achse = Simulationen
@@ -1008,7 +1010,7 @@ Start_Evolutionsrunden:
                 Next
 
                 'Diagramm initialisieren
-                Call Diag.DiagInitialise(Anwendung, Achsen)
+                Call DForm.Diag.DiagInitialise(Anwendung, Achsen)
 
 
             Case ANW_BM_PES 'BlueM PES
@@ -1018,20 +1020,16 @@ Start_Evolutionsrunden:
                 Dim n_Populationen As Integer
 
                 'Anzahl Kalkulationen
-                '--------------------
                 n_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
 
                 'Anzahl Populationen
-                '-------------------
                 n_Populationen = 1
                 If EVO_Einstellungen1.isPOPUL Then
                     n_Populationen = EVO_Einstellungen1.NPopul
                 End If
 
-                'Initialisierung von TeeChart
-                '----------------------------
-
                 'Achsen:
+                '-------
                 Dim Achse As Diagramm.Achse
                 Dim Achsen As New Collection
                 'Bei SO: X-Achse = Simulationen
@@ -1051,13 +1049,13 @@ Start_Evolutionsrunden:
                 Next
 
                 'Diagramm initialisieren
-                Call Diag.DiagInitialise(Anwendung, Achsen)
+                Call DForm.Diag.DiagInitialise(Anwendung, Achsen)
 
-                'Series initialisieren
+                'Standard-Series initialisieren
                 If (EVO_Einstellungen1.isMultiObjective = False) Then
-                    Call Diag.prepareSeries_SO(n_Populationen)
+                    Call DForm.Diag.prepareSeries_SO(n_Populationen)
                 Else
-                    Call Diag.prepareSeries_MO()
+                    Call DForm.Diag.prepareSeries_MO()
                 End If
 
 
@@ -1067,52 +1065,6 @@ Start_Evolutionsrunden:
 
         End Select
 
-    End Sub
-
-    'Chart bearbeiten
-    '****************
-    Private Sub TChartEdit(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_TChartEdit.Click
-        Diag.ShowEditor()
-    End Sub
-
-    'Chart nach Excel exportieren
-    '****************************
-    Private Sub TChart2Excel(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_TChart2Excel.Click
-        SaveFileDialog1.DefaultExt = Diag.Export.Data.Excel.FileExtension
-        SaveFileDialog1.FileName = Diag.Name + "." + SaveFileDialog1.DefaultExt
-        SaveFileDialog1.Filter = "Excel-Dateien (*.xls)|*.xls"
-        If (Me.SaveFileDialog1.ShowDialog() = System.Windows.Forms.DialogResult.OK) Then
-            Diag.Export.Data.Excel.Series = Nothing 'export all series
-            Diag.Export.Data.Excel.IncludeLabels = True
-            Diag.Export.Data.Excel.IncludeIndex = True
-            Diag.Export.Data.Excel.IncludeHeader = True
-            Diag.Export.Data.Excel.IncludeSeriesTitle = True
-            Diag.Export.Data.Excel.Save(Me.SaveFileDialog1.FileName)
-        End If
-    End Sub
-
-    'Chart als PNG exportieren
-    '*************************
-    Private Sub TChart2PNG(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_TChart2PNG.Click
-        SaveFileDialog1.DefaultExt = Diag.Export.Image.PNG.FileExtension
-        SaveFileDialog1.FileName = Diag.Name + "." + SaveFileDialog1.DefaultExt
-        SaveFileDialog1.Filter = "PNG-Dateien (*.png)|*.png"
-        If (Me.SaveFileDialog1.ShowDialog() = System.Windows.Forms.DialogResult.OK) Then
-            Diag.Export.Image.PNG.GrayScale = False
-            Diag.Export.Image.PNG.Save(Me.SaveFileDialog1.FileName)
-        End If
-    End Sub
-
-    'Chart in nativem TeeChart-Format abspeichern
-    '********************************************
-    Private Sub TChartSave(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_TChartSave.Click
-        SaveFileDialog1.DefaultExt = Diag.Export.Template.FileExtension
-        SaveFileDialog1.FileName = Diag.Name + "." + SaveFileDialog1.DefaultExt
-        SaveFileDialog1.Filter = "TeeChart-Dateien (*.ten)|*.ten"
-        If (Me.SaveFileDialog1.ShowDialog() = System.Windows.Forms.DialogResult.OK) Then
-            Diag.Export.Template.IncludeData = True
-            Diag.Export.Template.Save(Me.SaveFileDialog1.FileName)
-        End If
     End Sub
 
 #End Region 'Diagrammfunktionen
