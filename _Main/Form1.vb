@@ -527,7 +527,7 @@ Partial Class Form1
         Call CES1.Dim_Parents_BM()
         Call CES1.Dim_Childs()
 
-        'Diagramm vorbereiten und initialisieren        
+        'Diagramm vorbereiten und initialisieren *****************************
         Call PrepareDiagramm()
 
         'Zufällige Kinderpfade werden generiert
@@ -556,9 +556,10 @@ Partial Class Form1
                 Call BlueM1.Eval_Sim_CombiOpt(CES1.n_Penalty, durchlauf_all, 1, CES1.ChildList(i).Penalty, Diag)
 
                 'Zeichnen der Kinder
+                Call Diag.Check_or_DIM_Series(0, "Childs", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
                 If CES1.n_Penalty = 1 Then
                     Call Diag.Series(0).Add(durchlauf_all, CES1.ChildList(i).Penalty(0))
-                Else if CES1.n_Penalty = 2
+                ElseIf CES1.n_Penalty = 2 Then
                     Call Diag.Series(0).Add(CES1.ChildList(i).Penalty(0), CES1.ChildList(i).Penalty(1))
                 End If
 
@@ -586,6 +587,7 @@ Partial Class Form1
                 'Zeichnen des besten Elter
                 For i = 0 To CES1.n_Parents - 1
                     'durchlauf += 1
+                    Call Diag.Check_or_DIM_Series(1, "Parent", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                     Call Diag.Series(1).Add(durchlauf_all, CES1.ParentList(i).Penalty(0))
                 Next
             ElseIf CES1.n_Penalty = 2 Then
@@ -593,7 +595,8 @@ Partial Class Form1
                 dim f as Integer
                 For i = 0 To CES1.n_Childs + CES1.n_Parents - 1
                     f = CES1.NDSResult(i).Front
-                    call diag.Series(f+1).add(ces1.NDSResult(i).Penalty(0),ces1.NDSResult(i).Penalty(1))
+                    call diag.Check_or_DIM_Series(f,"Front:" & f,Steema.TeeChart.Styles.PointerStyles.Circle,4)
+                    call diag.Series(f).add(ces1.NDSResult(i).Penalty(0),ces1.NDSResult(i).Penalty(1))
                 Next
             End If
 
@@ -986,6 +989,32 @@ Start_Evolutionsrunden:
                 tmpPoint.Color = System.Drawing.Color.Orange
                 tmpPoint.Pointer.HorizSize = 2
                 tmpPoint.Pointer.VertSize = 2
+
+                'BlueM CES:
+                '----------
+            Case ANW_BM_CES
+
+                'Achsen:
+                Dim Achse As Diagramm.Achse
+                Dim Achsen As New Collection
+                'Bei SO: X-Achse = Simulationen
+                If (EVO_Einstellungen1.isMultiObjective = False) Then
+                    Achse.Name = "Simulation"
+                    Achse.Auto = False
+                    Achse.Max = CES1.n_Childs * CES1.n_Generation
+                    Achsen.Add(Achse)
+                End If
+                'für jede Zielfunktion eine weitere Achse hinzufügen
+                'HACK: Diagramm-Achsen bisher nur für Anwendung BlueM!
+                For i = 0 To BlueM1.OptZieleListe.GetUpperBound(0)
+                    Achse.Name = BlueM1.OptZieleListe(i).Bezeichnung
+                    Achse.Auto = True
+                    Achse.Max = 0
+                    Achsen.Add(Achse)
+                Next
+
+                'Diagramm initialisieren
+                Call Diag.DiagInitialise(Anwendung, Achsen)
 
                 'Alle anderen Anwendungen:
                 '-------------------------

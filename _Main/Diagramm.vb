@@ -57,6 +57,22 @@ Public Class Diagramm
         Next
 
     End Sub
+    'Serien-Initialisierung
+    '**********************
+    Public Sub Check_or_DIM_Series(ByVal SeriesNo As Integer, ByVal Title As String, ByVal Style As Steema.TeeChart.Styles.PointerStyles, ByVal Size As Integer)
+
+        If Me.Chart.Series.Count - 1 < SeriesNo Then
+            Dim tmpSeries As New Steema.TeeChart.Styles.Points(Me.Chart)
+            tmpSeries.Title = Title
+            'tmpSeries.Color = Color
+            tmpSeries.Pointer.Style = Style
+            tmpSeries.Pointer.HorizSize = Size
+            tmpSeries.Pointer.VertSize = Size
+        End If
+
+
+    End Sub
+
 
     'Serien-Initialisierung für MultiObjective
     '*****************************************
