@@ -19,207 +19,32 @@ Partial Class Wave
     'Das Bearbeiten mit dem Code-Editor ist nicht möglich.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.Diag = New Main.Diagramm
-        Me.GroupBox_TChartButtons = New System.Windows.Forms.GroupBox
-        Me.Button_TChartEdit = New System.Windows.Forms.Button
-        Me.Button_TChart2PNG = New System.Windows.Forms.Button
-        Me.Button_TChartSave = New System.Windows.Forms.Button
-        Me.Button_TChart2Excel = New System.Windows.Forms.Button
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog
-        Me.GroupBox_TChartButtons.SuspendLayout()
+        Me.WForm = New Main.DiagrammForm
         Me.SuspendLayout()
-        '
-        'Diag
-        '
-        '
-        '
-        '
-        Me.Diag.Aspect.ElevationFloat = 345
-        Me.Diag.Aspect.RotationFloat = 345
-        Me.Diag.Aspect.View3D = False
-        '
-        '
-        '
-        '
-        '
-        '
-        Me.Diag.Axes.Bottom.Automatic = True
-        '
-        '
-        '
-        Me.Diag.Axes.Bottom.Grid.Style = System.Drawing.Drawing2D.DashStyle.Dash
-        Me.Diag.Axes.Bottom.Grid.ZPosition = 0
-        '
-        '
-        '
-        Me.Diag.Axes.Depth.Automatic = True
-        '
-        '
-        '
-        Me.Diag.Axes.Depth.Grid.Style = System.Drawing.Drawing2D.DashStyle.Dash
-        Me.Diag.Axes.Depth.Grid.ZPosition = 0
-        '
-        '
-        '
-        Me.Diag.Axes.DepthTop.Automatic = True
-        '
-        '
-        '
-        Me.Diag.Axes.DepthTop.Grid.Style = System.Drawing.Drawing2D.DashStyle.Dash
-        Me.Diag.Axes.DepthTop.Grid.ZPosition = 0
-        '
-        '
-        '
-        Me.Diag.Axes.Left.Automatic = True
-        '
-        '
-        '
-        Me.Diag.Axes.Left.Grid.Style = System.Drawing.Drawing2D.DashStyle.Dash
-        Me.Diag.Axes.Left.Grid.ZPosition = 0
-        Me.Diag.Axes.Left.Visible = False
-        '
-        '
-        '
-        Me.Diag.Axes.Right.Automatic = True
-        '
-        '
-        '
-        Me.Diag.Axes.Right.Grid.Style = System.Drawing.Drawing2D.DashStyle.Dash
-        Me.Diag.Axes.Right.Grid.ZPosition = 0
-        '
-        '
-        '
-        Me.Diag.Axes.Top.Automatic = True
-        '
-        '
-        '
-        Me.Diag.Axes.Top.Grid.Style = System.Drawing.Drawing2D.DashStyle.Dash
-        Me.Diag.Axes.Top.Grid.ZPosition = 0
-        Me.Diag.Cursor = System.Windows.Forms.Cursors.Default
-        '
-        '
-        '
-        Me.Diag.Header.Lines = New String() {"TeeChart"}
-        '
-        '
-        '
-        '
-        '
-        '
-        Me.Diag.Legend.Shadow.Visible = True
-        '
-        '
-        '
-        '
-        '
-        '
-        Me.Diag.Legend.Title.Font.Bold = True
-        '
-        '
-        '
-        Me.Diag.Legend.Title.Pen.Visible = False
-        Me.Diag.Location = New System.Drawing.Point(0, 0)
-        Me.Diag.Name = "Diag"
-        '
-        '
-        '
-        Me.Diag.Panel.MarginBottom = 2
-        Me.Diag.Panel.MarginRight = 2
-        Me.Diag.Panel.MarginTop = 2
-        Me.Diag.Size = New System.Drawing.Size(800, 600)
-        Me.Diag.TabIndex = 0
-        '
-        '
-        '
-        '
-        '
-        '
-        Me.Diag.Walls.Back.AutoHide = False
-        '
-        '
-        '
-        Me.Diag.Walls.Bottom.AutoHide = False
-        '
-        '
-        '
-        Me.Diag.Walls.Left.AutoHide = False
-        '
-        '
-        '
-        Me.Diag.Walls.Right.AutoHide = False
-        '
-        'GroupBox_TChartButtons
-        '
-        Me.GroupBox_TChartButtons.Controls.Add(Me.Button_TChartEdit)
-        Me.GroupBox_TChartButtons.Controls.Add(Me.Button_TChart2PNG)
-        Me.GroupBox_TChartButtons.Controls.Add(Me.Button_TChartSave)
-        Me.GroupBox_TChartButtons.Controls.Add(Me.Button_TChart2Excel)
-        Me.GroupBox_TChartButtons.Location = New System.Drawing.Point(4, 606)
-        Me.GroupBox_TChartButtons.Name = "GroupBox_TChartButtons"
-        Me.GroupBox_TChartButtons.Size = New System.Drawing.Size(796, 49)
-        Me.GroupBox_TChartButtons.TabIndex = 5
-        Me.GroupBox_TChartButtons.TabStop = False
-        Me.GroupBox_TChartButtons.Text = "TChart"
-        '
-        'Button_TChartEdit
-        '
-        Me.Button_TChartEdit.Image = Global.Main.My.Resources.Resources.icon_edit
-        Me.Button_TChartEdit.Location = New System.Drawing.Point(6, 19)
-        Me.Button_TChartEdit.Name = "Button_TChartEdit"
-        Me.Button_TChartEdit.Size = New System.Drawing.Size(25, 25)
-        Me.Button_TChartEdit.TabIndex = 0
-        Me.Button_TChartEdit.UseVisualStyleBackColor = True
-        '
-        'Button_TChart2PNG
-        '
-        Me.Button_TChart2PNG.Image = Global.Main.My.Resources.Resources.icon_png
-        Me.Button_TChart2PNG.Location = New System.Drawing.Point(111, 19)
-        Me.Button_TChart2PNG.Name = "Button_TChart2PNG"
-        Me.Button_TChart2PNG.Size = New System.Drawing.Size(25, 25)
-        Me.Button_TChart2PNG.TabIndex = 3
-        Me.Button_TChart2PNG.UseVisualStyleBackColor = True
-        '
-        'Button_TChartSave
-        '
-        Me.Button_TChartSave.Image = Global.Main.My.Resources.Resources.icon_teechart
-        Me.Button_TChartSave.Location = New System.Drawing.Point(80, 19)
-        Me.Button_TChartSave.Name = "Button_TChartSave"
-        Me.Button_TChartSave.Size = New System.Drawing.Size(25, 25)
-        Me.Button_TChartSave.TabIndex = 2
-        Me.Button_TChartSave.UseVisualStyleBackColor = True
-        '
-        'Button_TChart2Excel
-        '
-        Me.Button_TChart2Excel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
-        Me.Button_TChart2Excel.Image = Global.Main.My.Resources.Resources.icon_excel
-        Me.Button_TChart2Excel.Location = New System.Drawing.Point(49, 19)
-        Me.Button_TChart2Excel.Name = "Button_TChart2Excel"
-        Me.Button_TChart2Excel.Size = New System.Drawing.Size(25, 25)
-        Me.Button_TChart2Excel.TabIndex = 1
-        Me.Button_TChart2Excel.UseVisualStyleBackColor = False
         '
         'SaveFileDialog1
         '
         Me.SaveFileDialog1.Title = "Datei speichern"
         '
+        'WForm
+        '
+        Me.WForm.Location = New System.Drawing.Point(0, 0)
+        Me.WForm.Name = "WForm"
+        Me.WForm.Size = New System.Drawing.Size(820, 680)
+        Me.WForm.TabIndex = 0
+        '
         'Wave
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(802, 659)
-        Me.Controls.Add(Me.GroupBox_TChartButtons)
-        Me.Controls.Add(Me.Diag)
+        Me.ClientSize = New System.Drawing.Size(812, 656)
+        Me.Controls.Add(Me.WForm)
         Me.Name = "Wave"
         Me.Text = "Wave"
-        Me.GroupBox_TChartButtons.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
-    Friend WithEvents Diag As Main.Diagramm
-    Friend WithEvents GroupBox_TChartButtons As System.Windows.Forms.GroupBox
-    Friend WithEvents Button_TChartEdit As System.Windows.Forms.Button
-    Friend WithEvents Button_TChart2PNG As System.Windows.Forms.Button
-    Friend WithEvents Button_TChartSave As System.Windows.Forms.Button
-    Friend WithEvents Button_TChart2Excel As System.Windows.Forms.Button
     Friend WithEvents SaveFileDialog1 As System.Windows.Forms.SaveFileDialog
+    Friend WithEvents WForm As Main.DiagrammForm
 End Class

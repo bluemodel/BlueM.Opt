@@ -132,6 +132,12 @@
     <Compile Include="AssemblyInfo.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DiagrammForm.Designer.vb">
+      <DependentUpon>DiagrammForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="DiagrammForm.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="Form1.Designer.vb">
       <DependentUpon>Form1.vb</DependentUpon>
     </Compile>
@@ -152,6 +158,10 @@
     <Compile Include="Wave.vb">
       <SubType>Form</SubType>
     </Compile>
+    <EmbeddedResource Include="DiagrammForm.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DiagrammForm.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resX">
       <DependentUpon>Form1.vb</DependentUpon>
       <SubType>Designer</SubType>
