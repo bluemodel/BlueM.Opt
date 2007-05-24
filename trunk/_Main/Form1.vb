@@ -550,7 +550,7 @@ Partial Class Form1
                 Call BlueM1.Eval_Sim_CombiOpt(CES1.n_Penalty, durchlauf_all, 1, CES1.ChildList(i).Penalty, Diag)
 
                 'Zeichnen der Kinder
-                Call Diag.Check_or_DIM_Series(0, "Childs", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
+                Call Diag.prepareSeries(0, "Childs", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
                 If CES1.n_Penalty = 1 Then
                     Call Diag.Series(0).Add(durchlauf_all, CES1.ChildList(i).Penalty(0))
                 ElseIf CES1.n_Penalty = 2 Then
@@ -581,7 +581,7 @@ Partial Class Form1
                 'Zeichnen des besten Elter
                 For i = 0 To CES1.n_Parents - 1
                     'durchlauf += 1
-                    Call Diag.Check_or_DIM_Series(1, "Parent", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                    Call Diag.prepareSeries(1, "Parent", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                     Call Diag.Series(1).Add(durchlauf_all, CES1.ParentList(i).Penalty(0))
                 Next
             ElseIf CES1.n_Penalty = 2 Then
@@ -589,7 +589,7 @@ Partial Class Form1
                 Dim f As Integer
                 For i = 0 To CES1.n_Childs + CES1.n_Parents - 1
                     f = CES1.NDSResult(i).Front
-                    Call Diag.Check_or_DIM_Series(f, "Front:" & f, Steema.TeeChart.Styles.PointerStyles.Circle, 4)
+                    Call Diag.prepareSeries(f, "Front:" & f, Steema.TeeChart.Styles.PointerStyles.Circle, 4)
                     Call Diag.Series(f).Add(CES1.NDSResult(i).Penalty(0), CES1.NDSResult(i).Penalty(1))
                 Next
             End If
