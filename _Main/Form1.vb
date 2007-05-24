@@ -941,9 +941,8 @@ Start_Evolutionsrunden:
 
         Select Case Anwendung
 
-            'Testprobleme:
-            '-------------
-            Case ANW_TESTPROBLEME
+            Case ANW_TESTPROBLEME 'Testprobleme
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
                 Select Case Testprobleme1.Combo_Testproblem.Text
                     Case "Sinus-Funktion"
@@ -956,9 +955,9 @@ Start_Evolutionsrunden:
                         Call Diag.DiagInitialise_MultiTestProb(EVO_Einstellungen1, Testprobleme1.Combo_Testproblem.Text)
                 End Select
 
-                'SensiPlot:
-                '----------
-            Case ANW_BM_SENSIPLOT
+
+            Case ANW_BM_SENSIPLOT 'SensiPlot
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXX
 
                 'Achsen:
                 Dim Achse As Diagramm.Achse
@@ -985,9 +984,9 @@ Start_Evolutionsrunden:
                 tmpPoint.Pointer.HorizSize = 2
                 tmpPoint.Pointer.VertSize = 2
 
-                'BlueM CES:
-                '----------
-            Case ANW_BM_CES
+
+            Case ANW_BM_CES 'BlueM CES
+                'XXXXXXXXXXXXXXXXXXXXX
 
                 'Achsen:
                 Dim Achse As Diagramm.Achse
@@ -1011,20 +1010,16 @@ Start_Evolutionsrunden:
                 'Diagramm initialisieren
                 Call Diag.DiagInitialise(Anwendung, Achsen)
 
-                'Alle anderen Anwendungen:
-                '-------------------------
-            Case Else
+
+            Case ANW_BM_PES 'BlueM PES
+                'XXXXXXXXXXXXXXXXXXXXX
 
                 Dim n_Kalkulationen As Integer
                 Dim n_Populationen As Integer
 
                 'Anzahl Kalkulationen
                 '--------------------
-                If EVO_Einstellungen1.isPOPUL Then
-                    n_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden
-                Else
-                    n_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
-                End If
+                n_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
 
                 'Anzahl Populationen
                 '-------------------
@@ -1064,6 +1059,11 @@ Start_Evolutionsrunden:
                 Else
                     Call Diag.prepareSeries_MO()
                 End If
+
+
+                Case Else 'andere Anwendungen
+                    'XXXXXXXXXXXXXXXXXXXXXXXX
+                    Throw New Exception("Diese Funktion ist für die Anwendung '" & Anwendung & "' nicht vorgesehen")
 
         End Select
 
