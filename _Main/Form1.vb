@@ -333,7 +333,7 @@ Partial Class Form1
     'Start BUTTON wurde pressed
     'XXXXXXXXXXXXXXXXXXXXXXXXXX
 
-    Private Sub Button_Start_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Button_Start.Click
+    Private Sub STARTEN_Button_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Button_Start.Click
 
         'Try
         myisrun = True
@@ -341,15 +341,15 @@ Partial Class Form1
             Case ANW_BM_RESET
                 Call BlueM1.launchSim()
             Case ANW_BM_SENSIPLOT
-                Call SensiPlot_STARTEN()
+                Call STARTEN_SensiPlot()
             Case ANW_BM_PES
-                Call ES_STARTEN()
+                Call STARTEN_ES()
             Case ANW_BM_CES
-                Call BM_CES_STARTEN()
+                Call STARTEN_BM_CES()
             Case ANW_TESTPROBLEME
-                Call ES_STARTEN()
+                Call STARTEN_ES()
             Case ANW_TSP
-                Call TSP_STARTEN()
+                Call STARTEN_TSP()
         End Select
 
         ''Globale Fehlerbehandlung für Optimierungslauf:
@@ -358,15 +358,9 @@ Partial Class Form1
         'End Try
     End Sub
 
-    'TODO: Das wird nie aufgerufen
-    Private Sub Command2_Click()
-        myisrun = False
-    End Sub
-
-
     'Anwendung SensiPlot - START; läuft ohne Evolutionsstrategie             
     '***********************************************************
-    Private Sub SensiPlot_STARTEN()
+    Private Sub STARTEN_SensiPlot()
 
         'Einschränkung:
         '------------------------------------------------------------------------
@@ -459,7 +453,7 @@ Partial Class Form1
 
     'Anwendung Traveling Salesman - Start                         
     '************************************
-    Private Sub TSP_STARTEN()
+    Private Sub STARTEN_TSP()
 
         'Laufvariable für die Generationen
         Dim gen As Integer
@@ -510,7 +504,7 @@ Partial Class Form1
 
     'Anwendung CombiBM - START; läuft ohne Evolutionsstrategie             
     '*********************************************************
-    Private Sub BM_CES_STARTEN()
+    Private Sub STARTEN_BM_CES()
 
         'Fehlerabfragen
         If (BlueM1.OptZieleListe.GetLength(0) > 2) Then
@@ -592,11 +586,11 @@ Partial Class Form1
                 Next
             ElseIf CES1.n_Penalty = 2 Then
                 'Zeichnen von NDSortingResult
-                dim f as Integer
+                Dim f As Integer
                 For i = 0 To CES1.n_Childs + CES1.n_Parents - 1
                     f = CES1.NDSResult(i).Front
-                    call diag.Check_or_DIM_Series(f,"Front:" & f,Steema.TeeChart.Styles.PointerStyles.Circle,4)
-                    call diag.Series(f).add(ces1.NDSResult(i).Penalty(0),ces1.NDSResult(i).Penalty(1))
+                    Call Diag.Check_or_DIM_Series(f, "Front:" & f, Steema.TeeChart.Styles.PointerStyles.Circle, 4)
+                    Call Diag.Series(f).Add(CES1.NDSResult(i).Penalty(0), CES1.NDSResult(i).Penalty(1))
                 Next
             End If
 
@@ -618,7 +612,7 @@ Partial Class Form1
     'Anwendung Evolutionsstrategie für Parameter Optimierung - hier Steuerung       
     '************************************************************************
 
-    Private Sub ES_STARTEN()
+    Private Sub STARTEN_ES()
         '==========================
         Dim i As Integer
         '--------------------------
