@@ -210,6 +210,7 @@ Public Class CES
         Dim i As Integer
         Dim x, y As Integer
         Dim Einzelkind(n_Location - 1) As Integer
+        Dim Clone As Boolean
 
         Select Case ReprodOperator_BM
             'UPGRADE: Eltern werden nicht zufällig gewählt sondern immer in Top Down Reihenfolge
@@ -217,7 +218,10 @@ Public Class CES
                 x = 0
                 y = 1
                 For i = 0 To n_Childs - 2 Step 2
-                    Call ReprodOp_Select_Random_Uniform(ParentList(x).Path, ParentList(y).Path, ChildList(i).Path, ChildList(i + 1).Path)
+                    Do
+                        Call ReprodOp_Select_Random_Uniform(ParentList(x).Path, ParentList(y).Path, ChildList(i).Path, ChildList(i + 1).Path)
+
+                    Loop While Clone
                     x += 1
                     y += 1
                     If x = n_Parents - 1 Then x = 0
@@ -254,6 +258,15 @@ Public Class CES
 
     End Sub
 
+    'Checkt ob die neuen Childs Clone(Duplikate) sind
+    Private Function Clone_Check(ByVal ChechPath() As Integer) As Boolean
+
+        Dim i As Integer
+
+        for i = 0 to n_parents
+
+
+    End Function
 
     '****************************************** Mutationsfunktionen ****************************************
 
