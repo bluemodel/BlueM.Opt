@@ -57,19 +57,30 @@ Public Class Diagramm
         Next
 
     End Sub
+
     'Serien-Initialisierung
     '**********************
-    Public Sub Check_or_DIM_Series(ByVal SeriesNo As Integer, ByVal Title As String, ByVal Style As Steema.TeeChart.Styles.PointerStyles, ByVal Size As Integer)
+    Public Sub prepareSeries(ByVal SeriesNo As Integer, ByVal Title As String, Optional ByVal Style As Steema.TeeChart.Styles.PointerStyles = Steema.TeeChart.Styles.PointerStyles.Circle, Optional ByVal Size As Integer = 3)
 
-        If Me.Chart.Series.Count - 1 < SeriesNo Then
+        'Neue Series nur dann zum Chart hinzufügen, 
+        'wenn SeriesNo dem nächsten freien Index entspricht
+        If (Me.Chart.Series.Count = SeriesNo) Then
+            'Series hinzufügen
             Dim tmpSeries As New Steema.TeeChart.Styles.Points(Me.Chart)
             tmpSeries.Title = Title
-            'tmpSeries.Color = Color
             tmpSeries.Pointer.Style = Style
             tmpSeries.Pointer.HorizSize = Size
             tmpSeries.Pointer.VertSize = Size
-        End If
 
+        ElseIf (Me.Chart.Series.Count < SeriesNo) Then
+            'Es wurde eine SeriesNo angegeben, 
+            'die größer als der nächste freie Index ist!
+            Throw New Exception("SeriesNo ist größer als nächster freier Index in SeriesCollection!")
+
+        Else
+            'Series besteht schon
+
+        End If
 
     End Sub
 
