@@ -33,6 +33,43 @@ Public Class Diagramm
 
     End Sub
 
+    'Serien-Initialisierung-Dynamisch
+    '********************************
+    Public Sub prepareSeries(ByVal SeriesNo As Integer, ByVal Title As String, Optional ByVal Style As Steema.TeeChart.Styles.PointerStyles = Steema.TeeChart.Styles.PointerStyles.Circle, Optional ByVal Size As Integer = 3)
+
+        'Neue Series nur dann zum Chart hinzufügen, 
+        'wenn SeriesNo dem nächsten freien Index entspricht
+        If (Me.Chart.Series.Count = SeriesNo) Then
+            'Series hinzufügen
+            Dim tmpSeries As New Steema.TeeChart.Styles.Points(Me.Chart)
+            tmpSeries.Title = Title
+            tmpSeries.Pointer.Style = Style
+            tmpSeries.Pointer.HorizSize = Size
+            tmpSeries.Pointer.VertSize = Size
+
+        ElseIf (Me.Chart.Series.Count < SeriesNo) Then
+            'Es wurde eine SeriesNo angegeben, 
+            'die größer als der nächste freie Index ist!
+            Throw New Exception("SeriesNo ist größer als nächster freier Index in SeriesCollection!")
+
+        Else
+            'Series besteht schon
+        End If
+
+    End Sub
+    'Serien werden von Hinten gelöscht
+    '*********************************
+    Sub DeleteSeries(ByVal Max As Integer, ByVal Min As Integer)
+
+        Dim i As Integer
+        For i = Max To Min Step -1
+            If Me.Chart.Series.Count - 1 = i Then
+                Me.Chart.Series.Remove(Me.Chart.Series(i))
+            End If
+        Next
+
+    End Sub
+
     'Serien-Initialisierung für SingleObjective
     '******************************************
     Public Sub prepareSeries_SO(ByVal n_Populationen As Integer)
@@ -57,33 +94,6 @@ Public Class Diagramm
         Next
 
     End Sub
-
-    'Serien-Initialisierung
-    '**********************
-    Public Sub prepareSeries(ByVal SeriesNo As Integer, ByVal Title As String, Optional ByVal Style As Steema.TeeChart.Styles.PointerStyles = Steema.TeeChart.Styles.PointerStyles.Circle, Optional ByVal Size As Integer = 3)
-
-        'Neue Series nur dann zum Chart hinzufügen, 
-        'wenn SeriesNo dem nächsten freien Index entspricht
-        If (Me.Chart.Series.Count = SeriesNo) Then
-            'Series hinzufügen
-            Dim tmpSeries As New Steema.TeeChart.Styles.Points(Me.Chart)
-            tmpSeries.Title = Title
-            tmpSeries.Pointer.Style = Style
-            tmpSeries.Pointer.HorizSize = Size
-            tmpSeries.Pointer.VertSize = Size
-
-        ElseIf (Me.Chart.Series.Count < SeriesNo) Then
-            'Es wurde eine SeriesNo angegeben, 
-            'die größer als der nächste freie Index ist!
-            Throw New Exception("SeriesNo ist größer als nächster freier Index in SeriesCollection!")
-
-        Else
-            'Series besteht schon
-
-        End If
-
-    End Sub
-
 
     'Serien-Initialisierung für MultiObjective
     '*****************************************
