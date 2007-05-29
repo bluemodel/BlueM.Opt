@@ -35,12 +35,12 @@ Partial Class DiagrammForm
         Me.GroupBox_TChartButtons.Controls.Add(Me.Button_TChart2PNG)
         Me.GroupBox_TChartButtons.Controls.Add(Me.Button_TChartSave)
         Me.GroupBox_TChartButtons.Controls.Add(Me.Button_TChart2Excel)
-        Me.GroupBox_TChartButtons.Location = New System.Drawing.Point(327, 3)
+        Me.GroupBox_TChartButtons.Location = New System.Drawing.Point(3, 570)
         Me.GroupBox_TChartButtons.Name = "GroupBox_TChartButtons"
         Me.GroupBox_TChartButtons.Size = New System.Drawing.Size(143, 49)
         Me.GroupBox_TChartButtons.TabIndex = 5
         Me.GroupBox_TChartButtons.TabStop = False
-        Me.GroupBox_TChartButtons.Text = "TChart"
+        Me.GroupBox_TChartButtons.Text = "Diagramm"
         '
         'Button_TChartEdit
         '
@@ -90,6 +90,7 @@ Partial Class DiagrammForm
         '
         Me.Diag.Aspect.ElevationFloat = 345
         Me.Diag.Aspect.RotationFloat = 345
+        Me.Diag.Aspect.View3D = False
         '
         '
         '
@@ -169,9 +170,9 @@ Partial Class DiagrammForm
         '
         '
         Me.Diag.Legend.Title.Pen.Visible = False
-        Me.Diag.Location = New System.Drawing.Point(3, 58)
+        Me.Diag.Location = New System.Drawing.Point(0, 0)
         Me.Diag.Name = "Diag"
-        Me.Diag.Size = New System.Drawing.Size(465, 564)
+        Me.Diag.Size = New System.Drawing.Size(473, 564)
         Me.Diag.TabIndex = 0
         '
         '

@@ -32,6 +32,7 @@ Partial Class Form1
         Me.Button_Start = New System.Windows.Forms.Button
         Me.Button_IniApp = New System.Windows.Forms.Button
         Me.GroupBox_Anwendung = New System.Windows.Forms.GroupBox
+        Me.LinkLabel_WorkDir = New System.Windows.Forms.LinkLabel
         Me.Label_Anwendung = New System.Windows.Forms.Label
         Me.ComboBox_Anwendung = New System.Windows.Forms.ComboBox
         Me.Testprobleme1 = New Apps.Testprobleme
@@ -47,7 +48,7 @@ Partial Class Form1
         Me.Button_Start.Cursor = System.Windows.Forms.Cursors.Default
         Me.Button_Start.Enabled = False
         Me.Button_Start.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.Button_Start.Location = New System.Drawing.Point(584, 652)
+        Me.Button_Start.Location = New System.Drawing.Point(587, 648)
         Me.Button_Start.Name = "Button_Start"
         Me.Button_Start.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.Button_Start.Size = New System.Drawing.Size(112, 39)
@@ -69,16 +70,27 @@ Partial Class Form1
         'GroupBox_Anwendung
         '
         Me.GroupBox_Anwendung.BackColor = System.Drawing.SystemColors.Control
-        Me.GroupBox_Anwendung.Controls.Add(Me.Button_IniApp)
         Me.GroupBox_Anwendung.Controls.Add(Me.Label_Anwendung)
         Me.GroupBox_Anwendung.Controls.Add(Me.ComboBox_Anwendung)
+        Me.GroupBox_Anwendung.Controls.Add(Me.Button_IniApp)
+        Me.GroupBox_Anwendung.Controls.Add(Me.LinkLabel_WorkDir)
         Me.GroupBox_Anwendung.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.GroupBox_Anwendung.Location = New System.Drawing.Point(10, 12)
         Me.GroupBox_Anwendung.Name = "GroupBox_Anwendung"
-        Me.GroupBox_Anwendung.Size = New System.Drawing.Size(217, 50)
+        Me.GroupBox_Anwendung.Size = New System.Drawing.Size(689, 50)
         Me.GroupBox_Anwendung.TabIndex = 0
         Me.GroupBox_Anwendung.TabStop = False
         Me.GroupBox_Anwendung.Text = "Anwendung"
+        '
+        'LinkLabel_WorkDir
+        '
+        Me.LinkLabel_WorkDir.AutoSize = True
+        Me.LinkLabel_WorkDir.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline
+        Me.LinkLabel_WorkDir.Location = New System.Drawing.Point(224, 23)
+        Me.LinkLabel_WorkDir.Name = "LinkLabel_WorkDir"
+        Me.LinkLabel_WorkDir.Size = New System.Drawing.Size(0, 13)
+        Me.LinkLabel_WorkDir.TabIndex = 9
+        Me.ToolTip1.SetToolTip(Me.LinkLabel_WorkDir, "Ordner öffnen")
         '
         'Label_Anwendung
         '
@@ -128,7 +140,7 @@ Partial Class Form1
         '
         'DForm
         '
-        Me.DForm.Location = New System.Drawing.Point(233, 12)
+        Me.DForm.Location = New System.Drawing.Point(233, 68)
         Me.DForm.Name = "DForm"
         Me.DForm.Size = New System.Drawing.Size(473, 625)
         Me.DForm.TabIndex = 8
@@ -138,12 +150,12 @@ Partial Class Form1
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.BackColor = System.Drawing.SystemColors.Control
         Me.ClientSize = New System.Drawing.Size(712, 780)
-        Me.Controls.Add(Me.DForm)
         Me.Controls.Add(Me.Testprobleme1)
         Me.Controls.Add(Me.Button_Start)
         Me.Controls.Add(Me.GroupBox_Anwendung)
         Me.Controls.Add(Me.EVO_Opt_Verlauf1)
         Me.Controls.Add(Me.EVO_Einstellungen1)
+        Me.Controls.Add(Me.DForm)
         Me.Cursor = System.Windows.Forms.Cursors.Default
         Me.Location = New System.Drawing.Point(100, 100)
         Me.Name = "Form1"
@@ -161,4 +173,5 @@ Partial Class Form1
     Friend WithEvents Button_IniApp As System.Windows.Forms.Button
     Friend WithEvents Testprobleme1 As Apps.Testprobleme
     Friend WithEvents DForm As Main.DiagrammForm
+    Friend WithEvents LinkLabel_WorkDir As System.Windows.Forms.LinkLabel
 End Class

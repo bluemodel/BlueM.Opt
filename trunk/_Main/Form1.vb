@@ -319,11 +319,22 @@ Partial Class Form1
                 End Select
             Next
 
+            'Datensatzanzeige aktualisieren
+            Me.LinkLabel_WorkDir.Text = BlueM1.WorkDir & BlueM1.Datensatz & ".ALL"
+            Me.LinkLabel_WorkDir.Links(0).LinkData = BlueM1.WorkDir
+
         Else
             'Datei EVO.ini existiert nicht
             Throw New Exception("Die Datei ""EVO.ini"" konnte nicht gefunden werden!" & Chr(13) & Chr(10) & "Bitte gem‰ﬂ Dokumentation eine Datei ""EVO.ini"" erstellen.")
         End If
 
+
+    End Sub
+
+    'Klick auf Datensatzanzeige
+    '**************************
+    Private Sub LinkLabel_WorkDir_LinkClicked( ByVal sender As System.Object,  ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles LinkLabel_WorkDir.LinkClicked
+        System.Diagnostics.Process.Start(Me.LinkLabel_WorkDir.Links(0).LinkData)
     End Sub
 
 #End Region

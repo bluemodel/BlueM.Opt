@@ -57,6 +57,7 @@ Public Class Diagramm
         End If
 
     End Sub
+
     'Serien werden von Hinten gelöscht
     '*********************************
     Sub DeleteSeries(ByVal Max As Integer, ByVal Min As Integer)
