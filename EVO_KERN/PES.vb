@@ -1,6 +1,6 @@
 Option Strict Off
 Option Explicit On
-<System.Runtime.InteropServices.ProgId("CEvolutionsstrategie_NET.CEvolutionsstrategie")> Public Class PES
+Public Class PES
 
 
 	'*******************************************************************************
