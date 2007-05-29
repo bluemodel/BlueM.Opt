@@ -708,35 +708,35 @@ Partial Class Form1
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
 
-        '1. Schritt: CEvolutionsstrategie
-        'Objekt der Klasse CEvolutionsstrategie wird erzeugen
+        '1. Schritt: PES
+        'Objekt der Klasse PES wird erzeugt
         '******************************************************************************************
         PES1 = New EvoKern.PES
 
-        '2. Schritt: CEvolutionsstrategie - ES_INI
+        '2. Schritt: PES - ES_INI
         'Die öffentlichen dynamischen Arrays werden initialisiert (Dn, An, Xn, Xmin, Xmax)
         'und die Anzahl der Zielfunktionen wird festgelegt
         '******************************************************************************************
         myIsOK = PES1.EsIni(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand)
 
-        '3. Schritt: CEvolutionsstrategie - ES_OPTIONS
+        '3. Schritt: PES - ES_OPTIONS
         'Optionen der Evolutionsstrategie werden übergeben
         '******************************************************************************************
         myIsOK = PES1.EsOptions(iEvoTyp, iPopEvoTyp, isPOPUL, NRunden, NPopul, NPopEltern, iOptPopEltern, iOptEltern, iPopPenalty, NGen, NEltern, NNachf, NRekombXY, rDeltaStart, iStartPar, isdnvektor, isMultiObjective, isPareto, isPareto3D, Interact, isInteract, NMemberSecondPop)
 
-        '4. Schritt: CEvolutionsstrategie - ES_LET_PARAMETER
+        '4. Schritt: PES - ES_LET_PARAMETER
         'Ausgangsparameter werden übergeben
         '******************************************************************************************
         For i = 1 To globalAnzPar
             myIsOK = PES1.EsLetParameter(i, mypara(i, 1))
         Next i
 
-        '5. Schritt: CEvolutionsstrategie - ES_PREPARE
+        '5. Schritt: PES - ES_PREPARE
         'Interne Variablen werden initialisiert, Zufallsgenerator wird initialisiert
         '******************************************************************************************
         myIsOK = PES1.EsPrepare()
 
-        '6. Schritt: CEvolutionsstrategie - ES_STARTVALUES
+        '6. Schritt: PES - ES_STARTVALUES
         'Startwerte werden zugewiesen
         '******************************************************************************************
         myIsOK = PES1.EsStartvalues()
@@ -866,10 +866,10 @@ Start_Evolutionsrunden:
             '***********************************************************************************************
         Loop 'Schleife über alle Runden
 
-        'CEvolutionsstrategie, letzter. Schritt
-        'Objekt der Klasse CEvolutionsstrategie wird vernichtet
+        'PES, letzter. Schritt
+        'Objekt der Klasse PES wird vernichtet
         '***************************************************************************************************
-        'UPGRADE_NOTE: Das Objekt evolutionsstrategie kann erst dann gelöscht werden, wenn die Garbagecollection durchgeführt wurde. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1029"'
+        'UPGRADE_NOTE: Das Objekt PES1 kann erst dann gelöscht werden, wenn die Garbagecollection durchgeführt wurde. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1029"'
         'TODO: Ersetzen durch dispose funzt net
         PES1 = Nothing
 
