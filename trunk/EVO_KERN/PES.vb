@@ -1,11 +1,11 @@
 Option Strict Off
 Option Explicit On
-<System.Runtime.InteropServices.ProgId("CEvolutionsstrategie_NET.CEvolutionsstrategie")> Public Class CEvolutionsstrategie
+<System.Runtime.InteropServices.ProgId("CEvolutionsstrategie_NET.CEvolutionsstrategie")> Public Class PES
 
 
 	'*******************************************************************************
 	'*******************************************************************************
-	'**** Klasse CEvolutionsstrategie                                           ****
+	'**** Klasse PES (Parametric Evolution Strategy)                            ****
 	'****                                                                       ****
 	'**** Modifizierte Evolutionsstrategie nach Rechenberg und Schwefel         ****
 	'**** Klasse enthält alle Funktionen und Methoden zur Anwendung             ****
@@ -24,7 +24,7 @@ Option Explicit On
 	'****                                                                       ****
 	'**** Dezember 2003                                                         ****
 	'****                                                                       ****
-	'**** Letzte Änderung: Mai 2005                                             ****
+	'**** Letzte Änderung: Mai 2007                                             ****
 	'*******************************************************************************
 	'*******************************************************************************
 	

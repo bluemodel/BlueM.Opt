@@ -127,7 +127,7 @@
     <Import Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CEvolutionsstrategie.vb">
+    <Compile Include="PES.vb">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="CES.vb" />
