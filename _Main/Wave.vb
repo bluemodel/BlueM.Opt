@@ -9,9 +9,19 @@ Public Class Wave
 
     Public WaveList() As Wave = {}                  'Liste der Waves
 
+    'Initialisierung
+    '***************
     Private Sub Wave_Load(sender as Object, e as System.EventArgs) Handles MyBase.Load
+ 
+       'Größen und Positionen des Diagrammforms anpassen
         Me.WForm.Diag.Width = 800
         Me.WForm.Diag.Height = 600
+        Me.WForm.GroupBox_TChartButtons.Location = New System.Drawing.Point(10, 610)
+ 
+       'Legende anzeigen
+        Me.WForm.Diag.Legend.LegendStyle = Steema.TeeChart.LegendStyles.Series
+        Me.WForm.Diag.Legend.Visible = True
+
     End Sub
 
     'gespeicherte Serien in Diagramm eintragen
