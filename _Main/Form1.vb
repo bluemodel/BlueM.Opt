@@ -630,7 +630,7 @@ Partial Class Form1
         '--------------------------
         Dim durchlauf As Integer
         '--------------------------
-        Dim evolutionsstrategie As EvoKern.CEvolutionsstrategie
+        Dim PES1 As EvoKern.PES
         '--------------------------
         'Variablen für Optionen Evostrategie
         Dim iEvoTyp, iPopEvoTyp As Integer
@@ -711,42 +711,42 @@ Partial Class Form1
         '1. Schritt: CEvolutionsstrategie
         'Objekt der Klasse CEvolutionsstrategie wird erzeugen
         '******************************************************************************************
-        evolutionsstrategie = New EvoKern.CEvolutionsstrategie
+        PES1 = New EvoKern.PES
 
         '2. Schritt: CEvolutionsstrategie - ES_INI
         'Die öffentlichen dynamischen Arrays werden initialisiert (Dn, An, Xn, Xmin, Xmax)
         'und die Anzahl der Zielfunktionen wird festgelegt
         '******************************************************************************************
-        myIsOK = evolutionsstrategie.EsIni(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand)
+        myIsOK = PES1.EsIni(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand)
 
         '3. Schritt: CEvolutionsstrategie - ES_OPTIONS
         'Optionen der Evolutionsstrategie werden übergeben
         '******************************************************************************************
-        myIsOK = evolutionsstrategie.EsOptions(iEvoTyp, iPopEvoTyp, isPOPUL, NRunden, NPopul, NPopEltern, iOptPopEltern, iOptEltern, iPopPenalty, NGen, NEltern, NNachf, NRekombXY, rDeltaStart, iStartPar, isdnvektor, isMultiObjective, isPareto, isPareto3D, Interact, isInteract, NMemberSecondPop)
+        myIsOK = PES1.EsOptions(iEvoTyp, iPopEvoTyp, isPOPUL, NRunden, NPopul, NPopEltern, iOptPopEltern, iOptEltern, iPopPenalty, NGen, NEltern, NNachf, NRekombXY, rDeltaStart, iStartPar, isdnvektor, isMultiObjective, isPareto, isPareto3D, Interact, isInteract, NMemberSecondPop)
 
         '4. Schritt: CEvolutionsstrategie - ES_LET_PARAMETER
         'Ausgangsparameter werden übergeben
         '******************************************************************************************
         For i = 1 To globalAnzPar
-            myIsOK = evolutionsstrategie.EsLetParameter(i, mypara(i, 1))
+            myIsOK = PES1.EsLetParameter(i, mypara(i, 1))
         Next i
 
         '5. Schritt: CEvolutionsstrategie - ES_PREPARE
         'Interne Variablen werden initialisiert, Zufallsgenerator wird initialisiert
         '******************************************************************************************
-        myIsOK = evolutionsstrategie.EsPrepare()
+        myIsOK = PES1.EsPrepare()
 
         '6. Schritt: CEvolutionsstrategie - ES_STARTVALUES
         'Startwerte werden zugewiesen
         '******************************************************************************************
-        myIsOK = evolutionsstrategie.EsStartvalues()
+        myIsOK = PES1.EsStartvalues()
 
         'Startwerte werden der Bedienoberfläche zugewiesen
         '******************************************************************************************
-        EVO_Opt_Verlauf1.NRunden = evolutionsstrategie.NRunden
-        EVO_Opt_Verlauf1.NPopul = evolutionsstrategie.NPopul
-        EVO_Opt_Verlauf1.NGen = evolutionsstrategie.NGen
-        EVO_Opt_Verlauf1.NNachf = evolutionsstrategie.NNachf
+        EVO_Opt_Verlauf1.NRunden = PES1.NRunden
+        EVO_Opt_Verlauf1.NPopul = PES1.NPopul
+        EVO_Opt_Verlauf1.NGen = PES1.NGen
+        EVO_Opt_Verlauf1.NNachf = PES1.NNachf
         EVO_Opt_Verlauf1.Initialisieren()
 
         durchlauf = 0
@@ -756,56 +756,56 @@ Start_Evolutionsrunden:
         'System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
         'Loop über alle Runden
         '*******************************************************************************************
-        Do While (evolutionsstrategie.EsIsNextRunde)
+        Do While (PES1.EsIsNextRunde)
 
-            irunde = evolutionsstrategie.iaktuelleRunde
+            irunde = PES1.iaktuelleRunde
             Call EVO_Opt_Verlauf1.Runden(irunde)
 
-            myIsOK = evolutionsstrategie.EsPopBestwertspeicher()
+            myIsOK = PES1.EsPopBestwertspeicher()
             'Loop über alle Populationen
             '***********************************************************************************************
-            Do While (evolutionsstrategie.EsIsNextPop)
+            Do While (PES1.EsIsNextPop)
 
-                ipop = evolutionsstrategie.iaktuellePopulation
+                ipop = PES1.iaktuellePopulation
                 Call EVO_Opt_Verlauf1.Populationen(ipop)
 
-                myIsOK = evolutionsstrategie.EsPopVaria
+                myIsOK = PES1.EsPopVaria
 
-                myIsOK = evolutionsstrategie.EsPopMutation
+                myIsOK = PES1.EsPopMutation
 
                 'TODO: Scheint mir Schwachsinnig an dieser Stelle Weil es überschrieben wird
                 durchlauf = NGen * NNachf * (irunde - 1)
 
                 'Loop über alle Generationen
                 '***********************************************************************************************
-                Do While (evolutionsstrategie.EsIsNextGen)
+                Do While (PES1.EsIsNextGen)
 
-                    igen = evolutionsstrategie.iaktuelleGeneration
+                    igen = PES1.iaktuelleGeneration
                     Call EVO_Opt_Verlauf1.Generation(igen)
 
-                    myIsOK = evolutionsstrategie.EsBestwertspeicher()
+                    myIsOK = PES1.EsBestwertspeicher()
 
                     'Loop über alle Nachkommen
                     '********************************************************************
-                    Do While (evolutionsstrategie.EsIsNextNachf)
+                    Do While (PES1.EsIsNextNachf)
 
-                        inachf = evolutionsstrategie.iaktuellerNachfahre
+                        inachf = PES1.iaktuellerNachfahre
                         Call EVO_Opt_Verlauf1.Nachfolger(inachf)
 
                         durchlauf = durchlauf + 1
 
                         'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
-                        myIsOK = evolutionsstrategie.EsVaria
+                        myIsOK = PES1.EsVaria
 
                         'Mutieren der Ausgangswerte
-                        myIsOK = evolutionsstrategie.EsMutation
+                        myIsOK = PES1.EsMutation
 
                         'Auslesen der Variierten Parameter
-                        myIsOK = evolutionsstrategie.EsGetParameter(globalAnzPar, mypara)
+                        myIsOK = PES1.EsGetParameter(globalAnzPar, mypara)
 
                         'Auslesen des Bestwertspeichers
-                        If Not evolutionsstrategie.isMultiObjective Then
-                            myIsOK = evolutionsstrategie.EsGetBestwert(Bestwert)
+                        If Not PES1.isMultiObjective Then
+                            myIsOK = PES1.EsGetBestwert(Bestwert)
                         End If
 
                         '************************************************************************************
@@ -820,7 +820,7 @@ Start_Evolutionsrunden:
 
                         'Einordnen der Qualitätsfunktion im Bestwertspeicher
                         '**************************************************************************
-                        myIsOK = evolutionsstrategie.EsBest(QN, RN)
+                        myIsOK = PES1.EsBest(QN, RN)
 
                         System.Windows.Forms.Application.DoEvents()
 
@@ -830,13 +830,13 @@ Start_Evolutionsrunden:
 
 
                     'Die neuen Eltern werden generiert
-                    myIsOK = evolutionsstrategie.EsEltern()
+                    myIsOK = PES1.EsEltern()
 
                     'Bestwerte und sekundäre Population
-                    If evolutionsstrategie.isMultiObjective Then
-                        myIsOK = evolutionsstrategie.EsGetBestwert(Bestwert)
+                    If PES1.isMultiObjective Then
+                        myIsOK = PES1.EsGetBestwert(Bestwert)
                         'TODO: Call Bestwertzeichnen_Pareto(Bestwert, ipop)
-                        myIsOK = evolutionsstrategie.esGetSekundärePopulation(Population)
+                        myIsOK = PES1.esGetSekundärePopulation(Population)
                         Call SekundärePopulationZeichnen(Population)
                     End If
 
@@ -849,7 +849,7 @@ Start_Evolutionsrunden:
                 System.Windows.Forms.Application.DoEvents()
 
                 'Einordnen der Qualitätsfunktion im PopulationsBestwertspeicher
-                myIsOK = evolutionsstrategie.EsPopBest()
+                myIsOK = PES1.EsPopBest()
 
                 'Ende Loop über alle Populationen
                 '***********************************************************************************************
@@ -858,7 +858,7 @@ Start_Evolutionsrunden:
 
 
             'Die neuen Populationseltern werden generiert
-            myIsOK = evolutionsstrategie.EsPopEltern
+            myIsOK = PES1.EsPopEltern
 
             System.Windows.Forms.Application.DoEvents()
 
@@ -871,7 +871,7 @@ Start_Evolutionsrunden:
         '***************************************************************************************************
         'UPGRADE_NOTE: Das Objekt evolutionsstrategie kann erst dann gelöscht werden, wenn die Garbagecollection durchgeführt wurde. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1029"'
         'TODO: Ersetzen durch dispose funzt net
-        evolutionsstrategie = Nothing
+        PES1 = Nothing
 
     End Sub
 
