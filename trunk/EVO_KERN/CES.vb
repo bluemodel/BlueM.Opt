@@ -129,7 +129,7 @@ Public Class CES
                 Next
                 ChildList(i).mutated = True
                 ChildList(i).No = i + 1
-            Loop While Is_Twin(i) = False
+            Loop While Is_Twin(i) = True
         Next
 
     End Sub
@@ -272,7 +272,7 @@ Public Class CES
                     do
                         Call MutOp_RND_Switch(ChildList(i).Path)
                         ChildList(i).mutated = True
-                    Loop While Is_Twin(i) = True
+                    Loop While Is_Twin(i) = True Or Is_Clone(i) = True
                 Next i
             Case "Dyn_Switch"
                 Dim count As Integer = 0
@@ -281,7 +281,7 @@ Public Class CES
                         Call MutOp_Dyn_Switch(ChildList(i).Path, count)
                         ChildList(i).mutated = True
                         count += 1
-                    Loop While Is_Twin(i) = True
+                    Loop While Is_Twin(i) = True Or Is_Clone(i) = True
                 Next i
         End Select
 
@@ -368,7 +368,7 @@ Public Class CES
     End Sub
 
     'Hilfsfunktion checkt ob die neuen Childs Zwillinge sind
-    Public Function Is_Twin(ByVal ChildIndex As Integer) As Boolean
+    Private Function Is_Twin(ByVal ChildIndex As Integer) As Boolean
         Dim n As Integer = 0
         Dim i, j As Integer
         Dim PathOK As Boolean
@@ -376,7 +376,7 @@ Public Class CES
         Is_Twin = False
 
         For i = 0 To n_Childs - 1
-            If ChildIndex <> i And ChildList(i).Mutated = True Then
+            If ChildIndex <> i And ChildList(i).mutated = True Then
                 PathOK = False
                 For j = 0 To ChildList(ChildIndex).Path.GetUpperBound(0)
                     If ChildList(ChildIndex).Path(j) <> ChildList(i).Path(j) Then
@@ -386,6 +386,26 @@ Public Class CES
                 If PathOK = False Then
                     Is_Twin = True
                 End If
+            End If
+        Next
+    End Function
+
+    'Hilfsfunktion checkt ob die neuen Childs Kone sind
+    Private Function Is_Clone(ByVal ChildIndex As Integer) As Boolean
+        Dim i, j As Integer
+        Dim PathOK As Boolean
+        PathOK = False
+        Is_Clone = False
+
+        For i = 0 To n_Parents - 1
+            PathOK = False
+            For j = 0 To ChildList(ChildIndex).Path.GetUpperBound(0)
+                If ChildList(ChildIndex).Path(j) <> ParentList(i).Path(j) Then
+                    PathOK = True
+                End If
+            Next
+            If PathOK = False Then
+                Is_Clone = True
             End If
         Next
 
