@@ -29,12 +29,14 @@ Partial Class Form1
     Private Const ANW_BM_RESET As String = "BlueM Reset"
     Private Const ANW_BM_SENSIPLOT As String = "BlueM SensiPlot"
     Private Const ANW_BM_PES As String = "BlueM PES"
+    Private Const ANW_SMUSI_PES As String = "Smusi PES"
     Private Const ANW_BM_CES As String = "BlueM CES"
     Private Const ANW_TESTPROBLEME As String = "Testprobleme"
     Private Const ANW_TSP As String = "Traveling Salesman"
 
     '**** Deklarationen der Module *****
     Public BlueM1 As New Apps.BlueM
+    Public Smusi1 As New Apps.Smusi
     Public SensiPlot1 As New Apps.SensiPlot
     Public CES1 As New EvoKern.CES
     Public TSP1 as New Apps.TSP
@@ -63,7 +65,7 @@ Partial Class Form1
         System.Windows.Forms.Application.EnableVisualStyles()
 
         'Liste der Anwendungen in ComboBox schreiben und Anfangseinstellung wählen
-        ComboBox_Anwendung.Items.AddRange(New Object() {"", ANW_BM_RESET, ANW_BM_PES, ANW_BM_CES, ANW_BM_SENSIPLOT, ANW_TESTPROBLEME, ANW_TSP})
+        ComboBox_Anwendung.Items.AddRange(New Object() {"", ANW_BM_RESET, ANW_BM_PES, ANW_SMUSI_PES, ANW_BM_CES, ANW_BM_SENSIPLOT, ANW_TESTPROBLEME, ANW_TSP})
         ComboBox_Anwendung.SelectedIndex = 0
 
         'Ende der Initialisierung
@@ -196,6 +198,32 @@ Partial Class Form1
                     'WEL-Chart vorbereiten
 
 
+                Case ANW_SMUSI_PES 'Anwendung Smusi PES
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'eingestelltes Dezimaltrennzeichen überprüfen
+                    Call CheckDezimaltrennzeichen()
+                    'Voreinstellungen lesen EVO.INI
+                    Call ReadEVOIni()
+                    'Evo aktivieren
+                    EVO_Einstellungen1.Enabled = True
+                    'Testprobleme ausschalten
+                    Testprobleme1.Enabled = False
+
+                    'Smusi-Einstellungen initialisieren 
+                    Call Smusi1.Sim_Ini()
+
+                    'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
+                    If Smusi1.OptZieleListe.GetLength(0) = 1 Then
+                        EVO_Einstellungen1.OptModus = 0
+                    ElseIf Smusi1.OptZieleListe.GetLength(0) > 1 Then
+                        EVO_Einstellungen1.OptModus = 1
+                    End If
+
+                    'Parameterübergabe an ES
+                    Call Smusi1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
+
+
                 Case ANW_BM_CES 'Anwendung BlauesModell CES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
@@ -314,6 +342,15 @@ Partial Class Form1
                         BlueM1.Datensatz = BlueM1.Datensatz.Substring(0, BlueM1.Datensatz.Length - 4)
                         'Arbeitsverzeichnis bestimmen
                         BlueM1.WorkDir = Configs(i, 1).Substring(0, Configs(i, 1).LastIndexOf("\") + 1)
+                    Case "Smusi_Exe"
+                        Smusi1.Exe = Configs(i, 1)
+                    Case "Smusi_Datensatz"
+                        'Dateiname vom Ende abtrennen
+                        Smusi1.Datensatz = Configs(i, 1).Substring(Configs(i, 1).LastIndexOf("\") + 1)
+                        'Dateiendung entfernen
+                        Smusi1.Datensatz = Smusi1.Datensatz.Substring(0, Smusi1.Datensatz.Length - 4)
+                        'Arbeitsverzeichnis bestimmen
+                        Smusi1.WorkDir = Configs(i, 1).Substring(0, Configs(i, 1).LastIndexOf("\") + 1)
                     Case Else
                         'weitere Voreinstellungen
                 End Select
@@ -816,6 +853,8 @@ Start_Evolutionsrunden:
                                 Call Testprobleme1.Evaluierung_TestProbleme(Testprobleme1.Combo_Testproblem.Text, globalAnzPar, mypara, durchlauf, ipop, QN, RN, DForm.Diag)
                             Case ANW_BM_PES
                                 Call BlueM1.Eval_Sim_ParaOpt(globalAnzPar, globalAnzZiel_ParaOpt, mypara, durchlauf, ipop, QN, DForm.Diag)
+                            Case ANW_SMUSI_PES
+                                Call Smusi1.Eval_Sim_ParaOpt(globalAnzPar, globalAnzZiel_ParaOpt, mypara, durchlauf, ipop, QN, DForm.Diag)
                         End Select
 
                         'Einordnen der Qualitätsfunktion im Bestwertspeicher
