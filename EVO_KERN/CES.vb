@@ -19,7 +19,7 @@ Public Class CES
     Public n_Location As Integer       'Anzahl der Locations wird von außen gesetzt
     Public n_Penalty As Integer           'Anzahl der Ziele wird von außen gesetzt
     Public n_Verzweig As Integer        'Anzahl der Verzweigungen in der Verzweigungsdatei
-    Public n_PathSize() As Integer     'Anzahl der "Städte/Maßnahmen" an jeder Stelle
+    Public n_PathDimension() As Integer     'Anzahl der "Städte/Maßnahmen" an jeder Stelle
     Public n_Generation As Integer = 5
 
     'Eingabe
@@ -122,7 +122,7 @@ Public Class CES
         For i = 0 To n_Childs - 1
             do 
                 For j = 0 To n_Location - 1
-                    upperb = n_PathSize(j) - 1
+                    upperb = n_PathDimension(j) - 1
                     'Randomize() nicht vergessen
                     tmp = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
                     ChildList(i).Path(j) = tmp
@@ -149,15 +149,15 @@ Public Class CES
             ChildList(i).Path(1) = y
             ChildList(i).Path(2) = z
             x += 1
-            If x > n_PathSize(0) - 1 Then
+            If x > n_PathDimension(0) - 1 Then
                 x = 0
                 y += 1
             End If
-            If y > n_PathSize(1) - 1 Then
+            If y > n_PathDimension(1) - 1 Then
                 y = 0
                 z += 1
             End If
-            If z > n_PathSize(2) - 1 Then
+            If z > n_PathDimension(2) - 1 Then
                 z = 0
             End If
 
@@ -302,7 +302,7 @@ Public Class CES
         For i = 0 To Path.GetUpperBound(0)
             Tmp_a = CInt(Int((upperb_a - lowerb_a + 1) * Rnd() + lowerb_a))
             If Tmp_a <= MutRate Then
-                upperb_b = n_PathSize(i) - 1
+                upperb_b = n_PathDimension(i) - 1
                 'Randomize() nicht vergessen
                 Tmp_b = CInt(Int((upperb_b - lowerb_b + 1) * Rnd() + lowerb_b))
                 Path(i) = Tmp_b
@@ -326,7 +326,7 @@ Public Class CES
         For i = 0 To Path.GetUpperBound(0)
             Tmp_a = CInt(Int((upperb_a - lowerb_a + 1) * Rnd() + lowerb_a))
             If Tmp_a <= Dyn_MutRate Then
-                upperb_b = n_PathSize(i) - 1
+                upperb_b = n_PathDimension(i) - 1
                 'Randomize() nicht vergessen
                 Tmp_b = CInt(Int((upperb_b - lowerb_b + 1) * Rnd() + lowerb_b))
                 Path(i) = Tmp_b
