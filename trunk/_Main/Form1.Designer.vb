@@ -31,8 +31,10 @@ Partial Class Form1
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.Button_Start = New System.Windows.Forms.Button
         Me.Button_IniApp = New System.Windows.Forms.Button
-        Me.GroupBox_Anwendung = New System.Windows.Forms.GroupBox
         Me.LinkLabel_WorkDir = New System.Windows.Forms.LinkLabel
+        Me.GroupBox_Anwendung = New System.Windows.Forms.GroupBox
+        Me.Label_Methode = New System.Windows.Forms.Label
+        Me.ComboBox_Methode = New System.Windows.Forms.ComboBox
         Me.Label_Anwendung = New System.Windows.Forms.Label
         Me.ComboBox_Anwendung = New System.Windows.Forms.ComboBox
         Me.Testprobleme1 = New Apps.Testprobleme
@@ -59,7 +61,7 @@ Partial Class Form1
         '
         'Button_IniApp
         '
-        Me.Button_IniApp.Location = New System.Drawing.Point(176, 19)
+        Me.Button_IniApp.Location = New System.Drawing.Point(357, 19)
         Me.Button_IniApp.Name = "Button_IniApp"
         Me.Button_IniApp.Size = New System.Drawing.Size(35, 21)
         Me.Button_IniApp.TabIndex = 1
@@ -67,9 +69,21 @@ Partial Class Form1
         Me.ToolTip1.SetToolTip(Me.Button_IniApp, "Anwendung initialisieren")
         Me.Button_IniApp.UseVisualStyleBackColor = True
         '
+        'LinkLabel_WorkDir
+        '
+        Me.LinkLabel_WorkDir.AutoSize = True
+        Me.LinkLabel_WorkDir.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline
+        Me.LinkLabel_WorkDir.Location = New System.Drawing.Point(406, 23)
+        Me.LinkLabel_WorkDir.Name = "LinkLabel_WorkDir"
+        Me.LinkLabel_WorkDir.Size = New System.Drawing.Size(0, 13)
+        Me.LinkLabel_WorkDir.TabIndex = 9
+        Me.ToolTip1.SetToolTip(Me.LinkLabel_WorkDir, "Ordner öffnen")
+        '
         'GroupBox_Anwendung
         '
         Me.GroupBox_Anwendung.BackColor = System.Drawing.SystemColors.Control
+        Me.GroupBox_Anwendung.Controls.Add(Me.Label_Methode)
+        Me.GroupBox_Anwendung.Controls.Add(Me.ComboBox_Methode)
         Me.GroupBox_Anwendung.Controls.Add(Me.Label_Anwendung)
         Me.GroupBox_Anwendung.Controls.Add(Me.ComboBox_Anwendung)
         Me.GroupBox_Anwendung.Controls.Add(Me.Button_IniApp)
@@ -82,15 +96,23 @@ Partial Class Form1
         Me.GroupBox_Anwendung.TabStop = False
         Me.GroupBox_Anwendung.Text = "Anwendung"
         '
-        'LinkLabel_WorkDir
+        'Label_Methode
         '
-        Me.LinkLabel_WorkDir.AutoSize = True
-        Me.LinkLabel_WorkDir.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline
-        Me.LinkLabel_WorkDir.Location = New System.Drawing.Point(224, 23)
-        Me.LinkLabel_WorkDir.Name = "LinkLabel_WorkDir"
-        Me.LinkLabel_WorkDir.Size = New System.Drawing.Size(0, 13)
-        Me.LinkLabel_WorkDir.TabIndex = 9
-        Me.ToolTip1.SetToolTip(Me.LinkLabel_WorkDir, "Ordner öffnen")
+        Me.Label_Methode.AutoSize = True
+        Me.Label_Methode.Location = New System.Drawing.Point(172, 22)
+        Me.Label_Methode.Name = "Label_Methode"
+        Me.Label_Methode.Size = New System.Drawing.Size(52, 13)
+        Me.Label_Methode.TabIndex = 11
+        Me.Label_Methode.Text = "Methode:"
+        '
+        'ComboBox_Methode
+        '
+        Me.ComboBox_Methode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboBox_Methode.FormattingEnabled = True
+        Me.ComboBox_Methode.Location = New System.Drawing.Point(230, 19)
+        Me.ComboBox_Methode.Name = "ComboBox_Methode"
+        Me.ComboBox_Methode.Size = New System.Drawing.Size(121, 21)
+        Me.ComboBox_Methode.TabIndex = 10
         '
         'Label_Anwendung
         '
@@ -98,16 +120,16 @@ Partial Class Form1
         Me.Label_Anwendung.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
         Me.Label_Anwendung.Location = New System.Drawing.Point(6, 22)
         Me.Label_Anwendung.Name = "Label_Anwendung"
-        Me.Label_Anwendung.Size = New System.Drawing.Size(34, 13)
+        Me.Label_Anwendung.Size = New System.Drawing.Size(29, 13)
         Me.Label_Anwendung.TabIndex = 2
-        Me.Label_Anwendung.Text = "Apps:"
+        Me.Label_Anwendung.Text = "App:"
         '
         'ComboBox_Anwendung
         '
         Me.ComboBox_Anwendung.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox_Anwendung.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
         Me.ComboBox_Anwendung.FormattingEnabled = True
-        Me.ComboBox_Anwendung.Location = New System.Drawing.Point(46, 19)
+        Me.ComboBox_Anwendung.Location = New System.Drawing.Point(42, 19)
         Me.ComboBox_Anwendung.Name = "ComboBox_Anwendung"
         Me.ComboBox_Anwendung.Size = New System.Drawing.Size(124, 21)
         Me.ComboBox_Anwendung.TabIndex = 0
@@ -174,4 +196,6 @@ Partial Class Form1
     Friend WithEvents Testprobleme1 As Apps.Testprobleme
     Friend WithEvents DForm As Main.DiagrammForm
     Friend WithEvents LinkLabel_WorkDir As System.Windows.Forms.LinkLabel
+    Friend WithEvents ComboBox_Methode As System.Windows.Forms.ComboBox
+    Friend WithEvents Label_Methode As System.Windows.Forms.Label
 End Class

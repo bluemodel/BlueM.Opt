@@ -110,6 +110,31 @@ Public MustInherit Class Sim
     '-----------------
     Private db As OleDb.OleDbConnection
 
+    'Kombinatorik
+    '------------
+    Public SKos1 As New SKos()
+    Public Path_Aktuell() As Integer
+    Public VER_ONOFF(,) As Object
+
+    Public Structure Massnahme
+        Public Name As String
+        Public Schaltung(,) As String
+        Public KostenTyp As Integer
+        Public Bauwerke() As String
+    End Structure
+
+    Public Structure Lokation
+        Public Name As String
+        Public MassnahmeListe() As Massnahme
+    End Structure
+
+    Public LocationList() As Lokation
+    Public VerzweigungsDatei(,) As String
+
+    'Public Schaltung(2, 1) As Object
+    'Public Maßnahme As Collection
+    'Public Kombinatorik As Collection
+
 #End Region 'Eigenschaften
 
 #Region "Methoden"
@@ -353,7 +378,7 @@ Public MustInherit Class Sim
     'EVO-Parameterübergabe
     '*********************
     Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara(,) As Double)
-        
+
         Dim i As Integer
 
         'Anzahl Optimierungsparameter übergeben
@@ -390,7 +415,73 @@ Public MustInherit Class Sim
 
     'Die ModellParameter in die Eingabedateien des SimModells schreiben
     '******************************************************************
-    Public MustOverride Sub ModellParameter_schreiben()
+    'Die ModellParameter in die Eingabedateien schreiben
+    '******************************************************
+    Public Sub ModellParameter_schreiben()
+        Dim Wert As String
+        Dim AnzZeil As Integer
+        Dim j As Integer
+        Dim Zeilenarray() As String
+        Dim Zeile As String
+        Dim StrLeft As String
+        Dim StrRight As String
+        Dim DateiPfad As String
+
+        'ModellParameter aus OptParametern kalkulieren()
+        Call OptParameter_to_ModellParameter()
+
+        'Alle ModellParameter durchlaufen
+        For i As Integer = 0 To ModellParameterListe.GetUpperBound(0)
+
+            DateiPfad = WorkDir & Datensatz & "." & ModellParameterListe(i).Datei
+            'Datei öffnen
+            Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.Read)
+            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+            'Anzahl der Zeilen feststellen
+            AnzZeil = 0
+            Do
+                Zeile = StrRead.ReadLine.ToString
+                AnzZeil += 1
+            Loop Until StrRead.Peek() = -1
+
+            ReDim Zeilenarray(AnzZeil - 1)
+
+            'Datei komplett einlesen
+            FiStr.Seek(0, SeekOrigin.Begin)
+            For j = 0 To AnzZeil - 1
+                Zeilenarray(j) = StrRead.ReadLine.ToString
+            Next
+
+            StrRead.Close()
+            FiStr.Close()
+
+            'Zeile ändern
+            Zeile = Zeilenarray(ModellParameterListe(i).ZeileNr - 1)
+            Dim Length As Short = ModellParameterListe(i).SpBis - ModellParameterListe(i).SpVon
+            StrLeft = Microsoft.VisualBasic.Left(Zeile, ModellParameterListe(i).SpVon - 1)
+            StrRight = Microsoft.VisualBasic.Right(Zeile, Len(Zeile) - ModellParameterListe(i).SpBis + 1)
+
+            Wert = ModellParameterListe(i).Wert.ToString()
+            If (Wert.Length > Length) Then
+                'TODO: Parameter wird für erforderliche Stringlänge einfach abgeschnitten, sollte aber gerundet werden!
+                Wert = Wert.Substring(0, Length)
+            Else
+                Wert = Wert.PadLeft(Length)
+            End If
+            Zeilenarray(ModellParameterListe(i).ZeileNr - 1) = StrLeft & Wert & StrRight
+
+            'Alle Zeilen wieder in Datei schreiben
+            Dim StrWrite As StreamWriter = New StreamWriter(DateiPfad, False, System.Text.Encoding.GetEncoding("iso8859-1"))
+            For j = 0 To AnzZeil - 1
+                StrWrite.WriteLine(Zeilenarray(j))
+            Next
+
+            StrWrite.Close()
+
+        Next
+
+    End Sub
 
     'Evaluierung des SimModells für Parameter Optimierung - Steuerungseinheit
     '************************************************************************
@@ -630,7 +721,7 @@ Public MustInherit Class Sim
                 QWert = Math.Abs(OptZiel.ZielWert - SimWert)
 
             Case Else
-                Throw New Exception("Die Zielfunktion '"& OptZiel.ZielFkt & "' wird für Werte nicht unterstützt!")
+                Throw New Exception("Die Zielfunktion '" & OptZiel.ZielFkt & "' wird für Werte nicht unterstützt!")
 
         End Select
 
@@ -984,6 +1075,42 @@ Public MustInherit Class Sim
     End Function
 
 #End Region 'Ergebnisdatenbank
+
+#Region "Kombinatorik"
+
+    'Kombinatorik
+    '############
+
+    'Kombinatorik einlesen
+    '*********************
+    Public MustOverride Sub Read_CES()
+
+    'Validierungsfunktion der Kombinatorik Prüft ob Verbraucher an zwei Standorten Dopp vorhanden sind
+    '*************************************************************************************************
+    Public MustOverride Sub Combinatoric_is_Valid()
+
+    'Liest die Verzweigungen aus dem BModel in ein Array ein
+    'Und Dimensioniert das Verzweigungsarray
+    '*******************************************************
+    Public MustOverride Sub Verzweigung_Read()
+
+    'Mehrere Prüfungen ob die .VER Datei des BlueM und der .CES Datei auch zusammenpassen
+    '************************************************************************************
+    Public MustOverride Sub CES_fits_to_VER()
+
+    'Die Liste mit den aktuellen Bauwerken des Kindes wird erstellt und in SKos geschrieben
+    '**************************************************************************************
+    Public MustOverride Sub Define_aktuelle_Bauwerke(ByVal Path() As Integer)
+
+    'Ermittelt das aktuelle Verzweigungsarray
+    '****************************************
+    Public MustOverride Sub Verzweigung_ON_OFF(ByVal Path() As Integer)
+
+    'Schreibt die neuen Verzweigungen
+    '********************************
+    Public MustOverride Sub Verzweigung_Write()
+
+#End Region 'Kombinatorik
 
 #End Region 'Methoden
 
