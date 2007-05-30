@@ -260,8 +260,6 @@ Partial Class Form1
                     'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
                     Call BlueM1.CES_fits_to_VER()
 
-                    'Call Initialisierung_BlauesModell_CombiOpt()
-
                     'Anzahl der Ziele, Locations und Verzeigungen wird an CES übergeben
                     CES1.n_Penalty = BlueM1.OptZieleListe.GetLength(0)
                     CES1.n_Location = BlueM1.LocationList.GetLength(0)
@@ -269,9 +267,9 @@ Partial Class Form1
 
                     'Gibt die PathSize an für jede Pfadstelle
                     Dim i As Integer
-                    ReDim CES1.n_PathSize(CES1.n_Location - 1)
+                    ReDim CES1.n_PathDimension(CES1.n_Location - 1)
                     For i = 0 To CES1.n_Location - 1
-                        CES1.n_PathSize(i) = BlueM1.LocationList(i).MassnahmeListe.GetLength(0)
+                        CES1.n_PathDimension(i) = BlueM1.LocationList(i).MassnahmeListe.GetLength(0)
                     Next
 
                 Case ANW_TESTPROBLEME 'Anwendung Testprobleme
