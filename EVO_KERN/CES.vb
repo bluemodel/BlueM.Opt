@@ -30,15 +30,16 @@ Public Class CES
     Private ReprodOperator_TSP As String = "Order_Crossover_OX"
     Private ReprodOperator_BM As String = "Select_Random_Uniform"
     Private MutOperator_TSP As String = "Translocation"
-    Private MutOperator_BM As String = "Random_Switch"
+    Private MutOperator_BM As String = "RND_Switch"
     Private Strategy As String = "plus"         '"plus" oder "minus" Strategie
-    Private MutRate As Integer = 30              'Definiert die Wahrscheinlichkeit der Mutationsrate in %
+    Private MutRate As Integer = 10              'Definiert die Wahrscheinlichkeit der Mutationsrate in %
 
     '************************************* Struktur *****************************
     Public Structure Faksimile_Type
         Dim No As Short
         Dim Path() As Integer      'auf 0 ist die Stadt, auf 1 die Anzahl der Städte
         Dim Penalty() As Double
+        Dim mutated As Boolean
         Dim Front As Short
     End Structure
 
@@ -80,7 +81,7 @@ Public Class CES
     End Sub
 
     'Dimensionieren des ParentStructs
-    Public Sub Dim_Parents_BM()
+    Public Sub Dim_Parents()
         Dim i, j As Integer
         ReDim ParentList(n_Parents - 1)
 
@@ -119,12 +120,16 @@ Public Class CES
         Randomize()
 
         For i = 0 To n_Childs - 1
-            For j = 0 To n_Location - 1
-                upperb = n_PathSize(j) - 1
-                'Randomize() nicht vergessen
-                tmp = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
-                ChildList(i).Path(j) = tmp
-            Next
+            do 
+                For j = 0 To n_Location - 1
+                    upperb = n_PathSize(j) - 1
+                    'Randomize() nicht vergessen
+                    tmp = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
+                    ChildList(i).Path(j) = tmp
+                Next
+                ChildList(i).mutated = True
+                ChildList(i).No = i + 1
+            Loop While Is_Twin(i) = False
         Next
 
     End Sub
@@ -190,7 +195,7 @@ Public Class CES
     End Sub
 
     'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
-    Public Sub Reset_Childs_BM()
+    Public Sub Reset_Childs()
         Dim i, j As Integer
 
         For i = 0 To n_Childs - 1
@@ -199,6 +204,7 @@ Public Class CES
                 ChildList(i).Penalty(j) = 999999999999999999
             Next
             Array.Clear(ChildList(i).Path, 0, ChildList(i).Path.GetLength(0))
+            ChildList(i).mutated = False
         Next
 
     End Sub
@@ -206,11 +212,10 @@ Public Class CES
     '**************************************** Reproductionsfunktionen ****************************************
 
     'Steuerung der Reproduktionsoperatoren
-    Public Sub Reproduction_Control_BM()
+    Public Sub Reproduction_Control()
         Dim i As Integer
         Dim x, y As Integer
         Dim Einzelkind(n_Location - 1) As Integer
-        Dim Clone As Boolean
 
         Select Case ReprodOperator_BM
             'UPGRADE: Eltern werden nicht zufällig gewählt sondern immer in Top Down Reihenfolge
@@ -218,10 +223,7 @@ Public Class CES
                 x = 0
                 y = 1
                 For i = 0 To n_Childs - 2 Step 2
-                    Do
-                        Call ReprodOp_Select_Random_Uniform(ParentList(x).Path, ParentList(y).Path, ChildList(i).Path, ChildList(i + 1).Path)
-
-                    Loop While Clone
+                    Call ReprodOp_Select_Random_Uniform(ParentList(x).Path, ParentList(y).Path, ChildList(i).Path, ChildList(i + 1).Path)
                     x += 1
                     y += 1
                     If x = n_Parents - 1 Then x = 0
@@ -235,7 +237,7 @@ Public Class CES
     End Sub
 
     'Reproductionsoperator: "Select_Random_Uniform"
-    'Entscheidet zufällig welcher ob der Wert aus dem Path des Elter_A oder Elter_B verwendet wird
+    'Entscheidet zufällig ob der Wert aus dem Path des Elter_A oder Elter_B verwendet wird
     Private Sub ReprodOp_Select_Random_Uniform(ByVal ParPath_A() As Integer, ByVal ParPath_B() As Integer, ByRef ChildPath_A() As Integer, ByRef ChildPath_B() As Integer)
 
         Dim i As Integer
@@ -258,35 +260,34 @@ Public Class CES
 
     End Sub
 
-    'Checkt ob die neuen Childs Clone(Duplikate) sind
-    Private Function Clone_Check(ByVal ChechPath() As Integer) As Boolean
-
-        Dim i As Integer
-
-        'for i = 0 to n_parents
-
-
-    End Function
-
     '****************************************** Mutationsfunktionen ****************************************
 
     'Steuerung der Mutationsoperatoren
-    Public Sub Mutation_Control_BM()
+    Public Sub Mutation_Control()
         Dim i As Integer
 
         Select Case MutOperator_BM
-            Case "Random_Switch"
+            Case "RND_Switch"
                 For i = 0 To n_Childs - 1
-                    Call MutOp_RND_Switch(ChildList(i).Path)
-                    'If PathValid(ChildList(i).Path) = False Then 
-                    '    Throw New Exception("Fehler im Path")
-                    'End If
+                    do
+                        Call MutOp_RND_Switch(ChildList(i).Path)
+                        ChildList(i).mutated = True
+                    Loop While Is_Twin(i) = True
+                Next i
+            Case "Dyn_Switch"
+                Dim count As Integer = 0
+                For i = 0 To n_Childs - 1
+                    Do
+                        Call MutOp_Dyn_Switch(ChildList(i).Path, count)
+                        ChildList(i).mutated = True
+                        count += 1
+                    Loop While Is_Twin(i) = True
                 Next i
         End Select
 
     End Sub
 
-    'Mutationsoperator "Random_Switch"
+    'Mutationsoperator "RND_Switch"
     'Verändert zufällig ein gen des Paths
     Private Sub MutOp_RND_Switch(ByVal Path() As Integer)
         Dim i As Integer
@@ -301,6 +302,30 @@ Public Class CES
         For i = 0 To Path.GetUpperBound(0)
             Tmp_a = CInt(Int((upperb_a - lowerb_a + 1) * Rnd() + lowerb_a))
             If Tmp_a <= MutRate Then
+                upperb_b = n_PathSize(i) - 1
+                'Randomize() nicht vergessen
+                Tmp_b = CInt(Int((upperb_b - lowerb_b + 1) * Rnd() + lowerb_b))
+                Path(i) = Tmp_b
+            End If
+        Next
+
+    End Sub
+
+    'Mutationsoperator "Dyn_Switch"
+    'Verändert zufällig ein gen des Paths
+    Private Sub MutOp_Dyn_Switch(ByVal Path() As Integer, ByVal Dyn_MutRate As Integer)
+        Dim i As Integer
+        Dim Tmp_a As Integer
+        Dim Tmp_b As Integer
+        Dim lowerb_a As Integer = 1
+        Dim upperb_a As Integer = 100
+        Dim lowerb_b As Integer = 0
+        Dim upperb_b As Integer
+        Randomize()
+
+        For i = 0 To Path.GetUpperBound(0)
+            Tmp_a = CInt(Int((upperb_a - lowerb_a + 1) * Rnd() + lowerb_a))
+            If Tmp_a <= Dyn_MutRate Then
                 upperb_b = n_PathSize(i) - 1
                 'Randomize() nicht vergessen
                 Tmp_b = CInt(Int((upperb_b - lowerb_b + 1) * Rnd() + lowerb_b))
@@ -341,6 +366,30 @@ Public Class CES
         Next i
 
     End Sub
+
+    'Hilfsfunktion checkt ob die neuen Childs Zwillinge sind
+    Public Function Is_Twin(ByVal ChildIndex As Integer) As Boolean
+        Dim n As Integer = 0
+        Dim i, j As Integer
+        Dim PathOK As Boolean
+        PathOK = False
+        Is_Twin = False
+
+        For i = 0 To n_Childs - 1
+            If ChildIndex <> i And ChildList(i).Mutated = True Then
+                PathOK = False
+                For j = 0 To ChildList(ChildIndex).Path.GetUpperBound(0)
+                    If ChildList(ChildIndex).Path(j) <> ChildList(i).Path(j) Then
+                        PathOK = True
+                    End If
+                Next
+                If PathOK = False Then
+                    Is_Twin = True
+                End If
+            End If
+        Next
+
+    End Function
 
     'Hilfsfunktion generiert Bernoulli verteilte Zufallszahl
     Public Function Bernoulli() As Boolean
