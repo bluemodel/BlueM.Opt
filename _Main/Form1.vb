@@ -24,22 +24,25 @@ Partial Class Form1
 
     Private IsInitializing As Boolean
 
-    'zu optimierende Anwendung
+    'Anwendung
     Private Anwendung As String
-    Private Const ANW_BM_RESET As String = "BlueM Reset"
-    Private Const ANW_BM_SENSIPLOT As String = "BlueM SensiPlot"
-    Private Const ANW_BM_PES As String = "BlueM PES"
-    Private Const ANW_SMUSI_PES As String = "Smusi PES"
-    Private Const ANW_BM_CES As String = "BlueM CES"
+    Private Const ANW_BLUEM As String = "BlueM"
+    Private Const ANW_SMUSI As String = "Smusi"
     Private Const ANW_TESTPROBLEME As String = "Testprobleme"
     Private Const ANW_TSP As String = "Traveling Salesman"
 
+    'Optimierungsmethode
+    Private Methode As String
+    Private Const METH_RESET As String = "Reset"
+    Private Const METH_PES As String = "PES"
+    Private Const METH_CES As String = "CES"
+    Private Const METH_SENSIPLOT As String = "SensiPlot"
+
     '**** Deklarationen der Module *****
-    Public BlueM1 As New Apps.BlueM
-    Public Smusi1 As New Apps.Smusi
-    Public SensiPlot1 As New Apps.SensiPlot
-    Public CES1 As New EvoKern.CES
-    Public TSP1 as New Apps.TSP
+    Public Sim1 As Apps.Sim
+    Public SensiPlot1 As Apps.SensiPlot
+    Public CES1 As EvoKern.CES
+    Public TSP1 As Apps.TSP
 
     '**** Globale Parameter Parameter Optimierung ****
     Dim myIsOK As Boolean
@@ -65,8 +68,13 @@ Partial Class Form1
         System.Windows.Forms.Application.EnableVisualStyles()
 
         'Liste der Anwendungen in ComboBox schreiben und Anfangseinstellung wählen
-        ComboBox_Anwendung.Items.AddRange(New Object() {"", ANW_BM_RESET, ANW_BM_PES, ANW_SMUSI_PES, ANW_BM_CES, ANW_BM_SENSIPLOT, ANW_TESTPROBLEME, ANW_TSP})
+        ComboBox_Anwendung.Items.AddRange(New Object() {"", ANW_BLUEM, ANW_SMUSI, ANW_TESTPROBLEME, ANW_TSP})
         ComboBox_Anwendung.SelectedIndex = 0
+
+        'Liste der Methoden in ComboBox schreiben und Anfangseinstellung wählen
+        ComboBox_Methode.Items.AddRange(New Object() {"", METH_RESET, METH_PES, METH_CES, METH_SENSIPLOT})
+        ComboBox_Methode.SelectedIndex = 0
+        ComboBox_Methode.Enabled = False
 
         'Ende der Initialisierung
         IsInitializing = False
@@ -78,14 +86,126 @@ Partial Class Form1
     'Die Anwendung wurde ausgewählt und wird jetzt initialisiert
     'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-    'Auswahl der zu optimierenden Anwendung geändert
-    '***********************************************
-    Private Sub IniApp(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_IniApp.Click, ComboBox_Anwendung.SelectedIndexChanged, Testprobleme1.Testproblem_Changed
+    'Anwendung wurde ausgewählt
+    '**************************
+    Private Sub IniApp(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Anwendung.SelectedIndexChanged, Testprobleme1.Testproblem_Changed
 
         If (Me.IsInitializing = True) Then
 
-            'Testprobleme und Evo Deaktivieren
+            'Testprobleme deaktivieren
             Testprobleme1.Enabled = False
+            Exit Sub
+
+        Else
+
+            'Start Button deaktivieren
+            Me.Button_Start.Enabled = False
+
+            'Combobox Methode deaktivieren
+            ComboBox_Methode.Enabled = False
+
+            'Mauszeiger busy
+            Cursor = System.Windows.Forms.Cursors.WaitCursor
+
+            Me.Anwendung = ComboBox_Anwendung.SelectedItem
+
+            Select Case Me.Anwendung
+
+                Case "" 'Keine Anwendung ausgewählt
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'Testprobleme deaktivieren
+                    Testprobleme1.Enabled = False
+
+                    'Mauszeiger wieder normal
+                    Cursor = System.Windows.Forms.Cursors.Default
+                    Exit Sub
+
+
+                Case ANW_BLUEM 'Anwendung BlueM
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'Objekt der Klasse BlueM initialisieren
+                    Sim1 = New Apps.BlueM
+
+                    'eingestelltes Dezimaltrennzeichen überprüfen
+                    Call CheckDezimaltrennzeichen()
+                    
+                    'Voreinstellungen lesen EVO.INI
+                    Call ReadEVOIni()
+
+                    'Testprobleme deaktivieren
+                    Testprobleme1.Enabled = False
+
+                    'BM-Einstellungen initialisieren 
+                    Call Sim1.Sim_Ini()
+
+
+                Case ANW_SMUSI 'Anwendung Smusi
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'Objekt der Klasse BlueM initialisieren
+                    Sim1 = New Apps.Smusi
+
+                    'eingestelltes Dezimaltrennzeichen überprüfen
+                    Call CheckDezimaltrennzeichen()
+
+                    'Voreinstellungen lesen EVO.INI
+                    Call ReadEVOIni()
+
+                    'Testprobleme deaktivieren
+                    Testprobleme1.Enabled = False
+
+                    'Smusi-Einstellungen initialisieren 
+                    Call Sim1.Sim_Ini()
+
+
+                Case ANW_TESTPROBLEME 'Anwendung Testprobleme
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'Test-Probleme aktivieren
+                    Testprobleme1.Enabled = True
+
+                    EVO_Einstellungen1.OptModus = Testprobleme1.OptModus
+
+                    'Globale Parameter werden gesetzt
+                    Call Testprobleme1.Parameter_Uebergabe(Testprobleme1.Combo_Testproblem.Text, Testprobleme1.Text_Sinusfunktion_Par.Text, Testprobleme1.Text_Schwefel24_Par.Text, globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
+
+                    'Start-Button aktivieren (keine Methodenauswahl erforderlich)
+                    Button_Start.Enabled = True
+
+
+                Case ANW_TSP 'Anwendung Traveling Salesman Problem (TSP)
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    TSP1 = New Apps.TSP
+
+                    Call TSP1.TSP_Initialize(DForm.Diag)
+
+                    'Start-Button aktivieren (keine Methodenauswahl erforderlich)
+                    Button_Start.Enabled = True
+
+            End Select
+
+            'Mauszeiger wieder normal
+            Cursor = System.Windows.Forms.Cursors.Default
+
+            'Combobox Methode aktivieren
+            If (Not Anwendung = ANW_TESTPROBLEME and Not Anwendung = ANW_TSP) Then
+                ComboBox_Methode.Enabled = True
+            End If
+
+        End If
+
+    End Sub
+    
+    'Methode wurde ausgewählt
+    '************************
+    Private Sub IniMethod( ByVal sender As System.Object,  ByVal e As System.EventArgs) Handles Button_IniApp.Click, ComboBox_Methode.SelectedIndexChanged
+
+        If (Me.IsInitializing = True) Then
+
+            'EVO_Einstellungen deaktivieren
             EVO_Einstellungen1.Enabled = False
             Exit Sub
 
@@ -97,68 +217,56 @@ Partial Class Form1
             'Mauszeiger busy
             Cursor = System.Windows.Forms.Cursors.WaitCursor
 
-            Anwendung = ComboBox_Anwendung.SelectedItem
+            Me.Methode = ComboBox_Methode.SelectedItem
 
-            Select Case Anwendung
+            Select Case Me.Methode
 
-                Case "" 'Keine Anwendung ausgewählt
+                Case "" 'Keine Methode ausgewählt
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'Testprobleme und Evo Deaktivieren
-                    Testprobleme1.Enabled = False
+                    'EVO_Einstellungen deaktivieren
                     EVO_Einstellungen1.Enabled = False
+
                     'Mauszeiger wieder normal
                     Cursor = System.Windows.Forms.Cursors.Default
                     Exit Sub
 
 
-                Case ANW_BM_RESET 'Anwendung ResetPara & RunBM
+                Case METH_RESET 'Methode Reset
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'eingestelltes Dezimaltrennzeichen überprüfen
-                    Call CheckDezimaltrennzeichen()
-                    'Voreinstellungen lesen EVO.INI
-                    Call ReadEVOIni()
-                    'Testprobleme und Evo Deaktivieren
-                    Testprobleme1.Enabled = False
+                    'EVO_Einstellungen deaktivieren
                     EVO_Einstellungen1.Enabled = False
 
                     'Ergebnisdatenbank ausschalten
-                    BlueM1.Ergebnisdb = False
-                    'BM-Einstellungen initialisieren 
-                    Call BlueM1.Sim_Ini()
+                    Sim1.Ergebnisdb = False
 
-                    'Original ModellParameter werden geschrieben
-                    Call BlueM1.ModellParameter_schreiben()
+                    'Original ModellParameter schreiben
+                    Call Sim1.ModellParameter_schreiben()
 
                     MsgBox("Die Startwerte der Optimierungsparameter wurden in die Eingabedateien geschrieben.", MsgBoxStyle.Information, "Info")
 
 
-                Case ANW_BM_SENSIPLOT 'Anwendung SensiPlot
+                Case METH_SENSIPLOT 'Methode SensiPlot
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'eingestelltes Dezimaltrennzeichen überprüfen
-                    Call CheckDezimaltrennzeichen()
-                    'Voreinstellungen lesen EVO.INI
-                    Call ReadEVOIni()
-                    'Testprobleme und Evo Deaktivieren
-                    Testprobleme1.Enabled = False
+                    SensiPlot1 = New Apps.SensiPlot
+
+                    'EVO_Einstellungen deaktivieren
                     EVO_Einstellungen1.Enabled = False
 
                     'Ergebnisdatenbank ausschalten
-                    BlueM1.Ergebnisdb = False
-                    'BM-Einstellungen initialisieren 
-                    Call BlueM1.Sim_Ini()
+                    Sim1.Ergebnisdb = False
 
                     'SensiPlot Dialog anzeigen:
                     '--------------------------
                     'List_Boxen füllen
                     Dim i As Integer
-                    For i = 0 To BlueM1.OptParameterListe.GetUpperBound(0)
-                        Call SensiPlot1.ListBox_OptParameter_add(BlueM1.OptParameterListe(i))
+                    For i = 0 To Sim1.OptParameterListe.GetUpperBound(0)
+                        Call SensiPlot1.ListBox_OptParameter_add(Sim1.OptParameterListe(i))
                     Next
-                    For i = 0 To BlueM1.OptZieleListe.GetUpperBound(0)
-                        Call SensiPlot1.ListBox_OptZiele_add(BlueM1.OptZieleListe(i))
+                    For i = 0 To Sim1.OptZieleListe.GetUpperBound(0)
+                        Call SensiPlot1.ListBox_OptZiele_add(Sim1.OptZieleListe(i))
                     Next
                     'Dialog anzeigen
                     Dim SensiPlotDiagResult As Windows.Forms.DialogResult
@@ -169,124 +277,69 @@ Partial Class Form1
                         Exit Sub
                     End If
 
-
-                Case ANW_BM_PES 'Anwendung BlauesModell PES
+                Case METH_PES 'Methode PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'eingestelltes Dezimaltrennzeichen überprüfen
-                    Call CheckDezimaltrennzeichen()
-                    'Voreinstellungen lesen EVO.INI
-                    Call ReadEVOIni()
-                    'Evo aktivieren
+                    'EVO_Einstellungen aktivieren
                     EVO_Einstellungen1.Enabled = True
-                    'Testprobleme ausschalten
-                    Testprobleme1.Enabled = False
-
-                    'BM-Einstellungen initialisieren 
-                    Call BlueM1.Sim_Ini()
 
                     'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
-                    If BlueM1.OptZieleListe.GetLength(0) = 1 Then
+                    If (Sim1.OptZieleListe.GetLength(0) = 1) Then
                         EVO_Einstellungen1.OptModus = 0
-                    ElseIf BlueM1.OptZieleListe.GetLength(0) > 1 Then
+                    ElseIf (Sim1.OptZieleListe.GetLength(0) > 1) Then
                         EVO_Einstellungen1.OptModus = 1
                     End If
 
                     'Parameterübergabe an ES
-                    Call BlueM1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
-
-                    'WEL-Chart vorbereiten
+                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
 
 
-                Case ANW_SMUSI_PES 'Anwendung Smusi PES
+                Case METH_CES 'Methode CES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'eingestelltes Dezimaltrennzeichen überprüfen
-                    Call CheckDezimaltrennzeichen()
-                    'Voreinstellungen lesen EVO.INI
-                    Call ReadEVOIni()
-                    'Evo aktivieren
-                    EVO_Einstellungen1.Enabled = True
-                    'Testprobleme ausschalten
-                    Testprobleme1.Enabled = False
-
-                    'Smusi-Einstellungen initialisieren 
-                    Call Smusi1.Sim_Ini()
-
-                    'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
-                    If Smusi1.OptZieleListe.GetLength(0) = 1 Then
-                        EVO_Einstellungen1.OptModus = 0
-                    ElseIf Smusi1.OptZieleListe.GetLength(0) > 1 Then
-                        EVO_Einstellungen1.OptModus = 1
+                    'Funktioniert nur bei BlueM!
+                    If (Not Anwendung = ANW_BLUEM) Then
+                        Throw New Exception("CES funktioniert nur mit BlueM!")
                     End If
 
-                    'Parameterübergabe an ES
-                    Call Smusi1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
+                    CES1 = New EvoKern.CES
 
-
-                Case ANW_BM_CES 'Anwendung BlauesModell CES
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                    'eingestelltes Dezimaltrennzeichen überprüfen
-                    Call CheckDezimaltrennzeichen()
-                    'Voreinstellungen lesen EVO.INI
-                    Call ReadEVOIni()
-                    'Evo deaktiviern
+                    'EVO_Einstellungen deaktiviern
                     EVO_Einstellungen1.Enabled = False
-                    'Testprobleme ausschalten
-                    Testprobleme1.Enabled = False
-                    'Ergebnisdatenbank ausschalten
-                    BlueM1.Ergebnisdb = False
 
-                    'BM-Einstellungen initialisieren 
-                    Call BlueM1.Sim_Ini()
+                    'Ergebnisdatenbank ausschalten
+                    Sim1.Ergebnisdb = False
 
                     'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
-                    If BlueM1.OptZieleListe.GetLength(0) = 1 Then
+                    If (Sim1.OptZieleListe.GetLength(0) = 1) Then
                         EVO_Einstellungen1.OptModus = 0
-                    ElseIf BlueM1.OptZieleListe.GetLength(0) > 1 Then
+                    ElseIf (Sim1.OptZieleListe.GetLength(0) > 1) Then
                         EVO_Einstellungen1.OptModus = 1
                     End If
 
                     'Einlesen der CombiOpt Datei
-                    Call BlueM1.Read_CES()
+                    Call Sim1.Read_CES()
 
                     'Überprüfen der Kombinatorik
-                    Call BlueM1.Combinatoric_is_Valid()
+                    Call Sim1.Combinatoric_is_Valid()
 
                     'Einlesen der Verbraucher Datei
-                    Call BlueM1.Verzweigung_Read()
+                    Call Sim1.Verzweigung_Read()
 
                     'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
-                    Call BlueM1.CES_fits_to_VER()
+                    Call Sim1.CES_fits_to_VER()
 
                     'Anzahl der Ziele, Locations und Verzeigungen wird an CES übergeben
-                    CES1.n_Penalty = BlueM1.OptZieleListe.GetLength(0)
-                    CES1.n_Location = BlueM1.LocationList.GetLength(0)
-                    CES1.n_Verzweig = BlueM1.VerzweigungsDatei.GetLength(0)
+                    CES1.n_Penalty = Sim1.OptZieleListe.GetLength(0)
+                    CES1.n_Location = Sim1.LocationList.GetLength(0)
+                    CES1.n_Verzweig = Sim1.VerzweigungsDatei.GetLength(0)
 
                     'Gibt die PathSize an für jede Pfadstelle
                     Dim i As Integer
                     ReDim CES1.n_PathDimension(CES1.n_Location - 1)
                     For i = 0 To CES1.n_Location - 1
-                        CES1.n_PathDimension(i) = BlueM1.LocationList(i).MassnahmeListe.GetLength(0)
+                        CES1.n_PathDimension(i) = Sim1.LocationList(i).MassnahmeListe.GetLength(0)
                     Next
-
-                Case ANW_TESTPROBLEME 'Anwendung Testprobleme
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                    'Test-Probleme und Evo aktivieren
-                    Testprobleme1.Enabled = True
-                    EVO_Einstellungen1.Enabled = True
-                    EVO_Einstellungen1.OptModus = Testprobleme1.OptModus
-                    'Globale Parameter werden gesetzt
-                    Call Testprobleme1.Parameter_Uebergabe(Testprobleme1.Combo_Testproblem.Text, Testprobleme1.Text_Sinusfunktion_Par.Text, Testprobleme1.Text_Schwefel24_Par.Text, globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
-
-
-                Case ANW_TSP 'Anwendung Traveling Salesman Problem (TSP)
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                    Call TSP1.TSP_Initialize(DForm.Diag)
 
             End Select
 
@@ -331,32 +384,23 @@ Partial Class Form1
             'Default-Werte setzen
             For i = 0 To Configs.GetUpperBound(0)
                 Select Case Configs(i, 0)
-                    Case "BM_Exe"
-                        BlueM1.Exe = Configs(i, 1)
+                    Case "Exe"
+                        Sim1.Exe = Configs(i, 1)
                     Case "Datensatz"
                         'Dateiname vom Ende abtrennen
-                        BlueM1.Datensatz = Configs(i, 1).Substring(Configs(i, 1).LastIndexOf("\") + 1)
+                        Sim1.Datensatz = Configs(i, 1).Substring(Configs(i, 1).LastIndexOf("\") + 1)
                         'Dateiendung entfernen
-                        BlueM1.Datensatz = BlueM1.Datensatz.Substring(0, BlueM1.Datensatz.Length - 4)
+                        Sim1.Datensatz = Sim1.Datensatz.Substring(0, Sim1.Datensatz.Length - 4)
                         'Arbeitsverzeichnis bestimmen
-                        BlueM1.WorkDir = Configs(i, 1).Substring(0, Configs(i, 1).LastIndexOf("\") + 1)
-                    Case "Smusi_Exe"
-                        Smusi1.Exe = Configs(i, 1)
-                    Case "Smusi_Datensatz"
-                        'Dateiname vom Ende abtrennen
-                        Smusi1.Datensatz = Configs(i, 1).Substring(Configs(i, 1).LastIndexOf("\") + 1)
-                        'Dateiendung entfernen
-                        Smusi1.Datensatz = Smusi1.Datensatz.Substring(0, Smusi1.Datensatz.Length - 4)
-                        'Arbeitsverzeichnis bestimmen
-                        Smusi1.WorkDir = Configs(i, 1).Substring(0, Configs(i, 1).LastIndexOf("\") + 1)
+                        Sim1.WorkDir = Configs(i, 1).Substring(0, Configs(i, 1).LastIndexOf("\") + 1)
                     Case Else
                         'weitere Voreinstellungen
                 End Select
             Next
 
             'Datensatzanzeige aktualisieren
-            Me.LinkLabel_WorkDir.Text = BlueM1.WorkDir & BlueM1.Datensatz & ".ALL"
-            Me.LinkLabel_WorkDir.Links(0).LinkData = BlueM1.WorkDir
+            Me.LinkLabel_WorkDir.Text = Sim1.WorkDir & Sim1.Datensatz & ".ALL"
+            Me.LinkLabel_WorkDir.Links(0).LinkData = Sim1.WorkDir
 
         Else
             'Datei EVO.ini existiert nicht
@@ -384,18 +428,26 @@ Partial Class Form1
         'Try
         myisrun = True
         Select Case Anwendung
-            Case ANW_BM_RESET
-                Call BlueM1.launchSim()
-            Case ANW_BM_SENSIPLOT
-                Call STARTEN_SensiPlot()
-            Case ANW_BM_PES
-                Call STARTEN_BM_PES()
-            Case ANW_BM_CES
-                Call STARTEN_BM_CES()
+
+            Case ANW_BLUEM, ANW_SMUSI
+
+                Select Case Methode
+                    Case METH_RESET
+                        Call Sim1.launchSim()
+                    Case METH_SENSIPLOT
+                        Call STARTEN_SensiPlot()
+                    Case METH_PES
+                        Call STARTEN_PES()
+                    Case METH_CES
+                        Call STARTEN_CES()
+                End Select
+
             Case ANW_TESTPROBLEME
-                Call STARTEN_BM_PES()
+                Call STARTEN_PES()
+
             Case ANW_TSP
                 Call STARTEN_TSP()
+
         End Select
 
         ''Globale Fehlerbehandlung für Optimierungslauf:
@@ -439,26 +491,27 @@ Partial Class Form1
             'OptParameterwert variieren
             Select Case SensiPlot1.Selected_SensiType
                 Case "Gleichverteilt"
-                    BlueM1.OptParameterListe(SensiPlot1.Selected_OptParameter).SKWert = Rnd()
+                    Sim1.OptParameterListe(SensiPlot1.Selected_OptParameter).SKWert = Rnd()
                 Case "Diskret"
-                    BlueM1.OptParameterListe(SensiPlot1.Selected_OptParameter).SKWert = i / SensiPlot1.Anz_Sim
+                    Sim1.OptParameterListe(SensiPlot1.Selected_OptParameter).SKWert = i / SensiPlot1.Anz_Sim
             End Select
 
             'Modellparameter schreiben
-            Call BlueM1.ModellParameter_schreiben()
+            Call Sim1.ModellParameter_schreiben()
 
             'Simulieren
-            Call BlueM1.launchSim()
+            Call Sim1.launchSim()
 
             'Qwert berechnen
-            BlueM1.OptZieleListe(SensiPlot1.Selected_OptZiel).QWertTmp = BlueM1.QWert(BlueM1.OptZieleListe(SensiPlot1.Selected_OptZiel))
+            Sim1.OptZieleListe(SensiPlot1.Selected_OptZiel).QWertTmp = Sim1.QWert(Sim1.OptZieleListe(SensiPlot1.Selected_OptZiel))
 
             'Diagramm aktualisieren
-            DForm.Diag.Series(0).Add(BlueM1.OptZieleListe(SensiPlot1.Selected_OptZiel).QWertTmp, BlueM1.OptParameterListe(SensiPlot1.Selected_OptParameter).Wert, "")
+            DForm.Diag.Series(0).Add(Sim1.OptZieleListe(SensiPlot1.Selected_OptZiel).QWertTmp, Sim1.OptParameterListe(SensiPlot1.Selected_OptParameter).Wert, "")
 
             'Speichern des Simulationsergebnisses für Wave
+            'TODO
             'Wave1.WaveList(i).Bezeichnung = SensiPlot1.Selected_OptZiel.SimGr & "(Sim " & i & ")"
-            Apps.Sim.Read_WEL(BlueM1.WorkDir & BlueM1.Datensatz & ".wel", BlueM1.OptZieleListe(SensiPlot1.Selected_OptZiel).SimGr, Wave1.WaveList(i).Wave)
+            Apps.Sim.Read_WEL(Sim1.WorkDir & Sim1.Datensatz & ".wel", Sim1.OptZieleListe(SensiPlot1.Selected_OptZiel).SimGr, Wave1.WaveList(i).Wave)
 
             durchlauf += 1
 
@@ -474,7 +527,7 @@ Partial Class Form1
         xAchse.Name = "Zeit"
         xAchse.Auto = True
         Achsen.Add(xAchse)
-        yAchse.Name = BlueM1.OptZieleListe(SensiPlot1.Selected_OptZiel).SimGr
+        yAchse.Name = Sim1.OptZieleListe(SensiPlot1.Selected_OptZiel).SimGr
         yAchse.Auto = True
         Achsen.Add(yAchse)
 
@@ -550,10 +603,10 @@ Partial Class Form1
 
     'Anwendung CombiBM - START; läuft ohne Evolutionsstrategie             
     '*********************************************************
-    Private Sub STARTEN_BM_CES()
+    Private Sub STARTEN_CES()
 
         'Fehlerabfragen
-        If (BlueM1.OptZieleListe.GetLength(0) > 2) Then
+        If (Sim1.OptZieleListe.GetLength(0) > 2) Then
             Throw New Exception("Zu viele Ziele für CES. Max=2")
         End If
 
@@ -584,16 +637,16 @@ Partial Class Form1
                 durchlauf_all += 1
 
                 'Erstellt die aktuelle Bauerksliste und überträgt sie zu SKos
-                Call BlueM1.Define_aktuelle_Bauwerke(CES1.ChildList(i).Path)
+                Call Sim1.Define_aktuelle_Bauwerke(CES1.ChildList(i).Path)
 
                 'Ermittelt das aktuelle_ON_OFF array
-                Call BlueM1.Verzweigung_ON_OFF(CES1.ChildList(i).Path)
+                Call Sim1.Verzweigung_ON_OFF(CES1.ChildList(i).Path)
 
                 'Schreibt die neuen Verzweigungen
-                Call BlueM1.Verzweigung_Write()
+                Call Sim1.Verzweigung_Write()
 
                 'Evaluiert das Blaue Modell
-                Call BlueM1.Eval_Sim_CombiOpt(CES1.n_Penalty, durchlauf_all, 1, CES1.ChildList(i).Penalty, DForm.Diag)
+                Call Sim1.Eval_Sim_CombiOpt(CES1.n_Penalty, durchlauf_all, 1, CES1.ChildList(i).Penalty, DForm.Diag)
 
                 'Zeichnen MO_SO
                 Call DForm.Diag.prepareSeries(0, "Childs", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
@@ -660,7 +713,7 @@ Partial Class Form1
     'Anwendung Evolutionsstrategie für Parameter Optimierung - hier Steuerung       
     '************************************************************************
 
-    Private Sub STARTEN_BM_PES()
+    Private Sub STARTEN_PES()
         '==========================
         Dim i As Integer
         '--------------------------
@@ -850,10 +903,8 @@ Start_Evolutionsrunden:
                         Select Case Anwendung
                             Case ANW_TESTPROBLEME
                                 Call Testprobleme1.Evaluierung_TestProbleme(Testprobleme1.Combo_Testproblem.Text, globalAnzPar, mypara, durchlauf, ipop, QN, RN, DForm.Diag)
-                            Case ANW_BM_PES
-                                Call BlueM1.Eval_Sim_ParaOpt(globalAnzPar, globalAnzZiel_ParaOpt, mypara, durchlauf, ipop, QN, DForm.Diag)
-                            Case ANW_SMUSI_PES
-                                Call Smusi1.Eval_Sim_ParaOpt(globalAnzPar, globalAnzZiel_ParaOpt, mypara, durchlauf, ipop, QN, DForm.Diag)
+                            Case ANW_BLUEM, ANW_SMUSI
+                                Call Sim1.Eval_Sim_ParaOpt(globalAnzPar, globalAnzZiel_ParaOpt, mypara, durchlauf, ipop, QN, DForm.Diag)
                         End Select
 
                         'Einordnen der Qualitätsfunktion im Bestwertspeicher
@@ -1004,113 +1055,118 @@ Start_Evolutionsrunden:
                         Call DForm.Diag.DiagInitialise_MultiTestProb(EVO_Einstellungen1, Testprobleme1.Combo_Testproblem.Text)
                 End Select
 
+            Case ANW_BLUEM, ANW_SMUSI 'BlueM oder SMUSI
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-            Case ANW_BM_SENSIPLOT 'SensiPlot
-                'XXXXXXXXXXXXXXXXXXXXXXXXXXX
+                Select Case Methode
 
-                'Achsen:
-                '-------
-                Dim Achse As Diagramm.Achse
-                Dim Achsen As New Collection
-                'X-Achse = QWert
-                Achse.Name = BlueM1.OptZieleListe(SensiPlot1.Selected_OptZiel).Bezeichnung
-                Achse.Auto = True
-                Achse.Max = 0
-                Achsen.Add(Achse)
-                'Y-Achse = OptParameter
-                Achse.Name = BlueM1.OptParameterListe(SensiPlot1.Selected_OptParameter).Bezeichnung
-                Achse.Auto = True
-                Achse.Max = 0
-                Achsen.Add(Achse)
+                    Case METH_SENSIPLOT 'SensiPlot
+                        'XXXXXXXXXXXXXXXXXXXXXXXXX
 
-                'Diagramm initialisieren
-                Call DForm.Diag.DiagInitialise(Anwendung, Achsen)
+                        'Achsen:
+                        '-------
+                        Dim Achse As Diagramm.Achse
+                        Dim Achsen As New Collection
+                        'X-Achse = QWert
+                        Achse.Name = Sim1.OptZieleListe(SensiPlot1.Selected_OptZiel).Bezeichnung
+                        Achse.Auto = True
+                        Achse.Max = 0
+                        Achsen.Add(Achse)
+                        'Y-Achse = OptParameter
+                        Achse.Name = Sim1.OptParameterListe(SensiPlot1.Selected_OptParameter).Bezeichnung
+                        Achse.Auto = True
+                        Achse.Max = 0
+                        Achsen.Add(Achse)
 
-                'Series initialisieren
-                Dim tmpPoint As New Steema.TeeChart.Styles.Points(Me.DForm.Diag.Chart)
-                tmpPoint.Title = "Simulationsergebnis"
-                tmpPoint.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-                tmpPoint.Color = System.Drawing.Color.Orange
-                tmpPoint.Pointer.HorizSize = 2
-                tmpPoint.Pointer.VertSize = 2
+                        'Diagramm initialisieren
+                        Call DForm.Diag.DiagInitialise(Anwendung, Achsen)
 
-
-            Case ANW_BM_CES 'BlueM CES
-                'XXXXXXXXXXXXXXXXXXXXX
-
-                'Achsen:
-                '-------
-                Dim Achse As Diagramm.Achse
-                Dim Achsen As New Collection
-                'Bei SO: X-Achse = Simulationen
-                If (EVO_Einstellungen1.isMultiObjective = False) Then
-                    Achse.Name = "Simulation"
-                    Achse.Auto = False
-                    Achse.Max = CES1.n_Childs * CES1.n_Generation
-                    Achsen.Add(Achse)
-                End If
-                'für jede Zielfunktion eine weitere Achse hinzufügen
-                'HACK: Diagramm-Achsen bisher nur für Anwendung BlueM!
-                For i = 0 To BlueM1.OptZieleListe.GetUpperBound(0)
-                    Achse.Name = BlueM1.OptZieleListe(i).Bezeichnung
-                    Achse.Auto = True
-                    Achse.Max = 0
-                    Achsen.Add(Achse)
-                Next
-
-                'Diagramm initialisieren
-                Call DForm.Diag.DiagInitialise(Anwendung, Achsen)
+                        'Series initialisieren
+                        Dim tmpPoint As New Steema.TeeChart.Styles.Points(Me.DForm.Diag.Chart)
+                        tmpPoint.Title = "Simulationsergebnis"
+                        tmpPoint.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+                        tmpPoint.Color = System.Drawing.Color.Orange
+                        tmpPoint.Pointer.HorizSize = 2
+                        tmpPoint.Pointer.VertSize = 2
 
 
-            Case ANW_BM_PES 'BlueM PES
-                'XXXXXXXXXXXXXXXXXXXXX
+                    Case METH_CES 'Methode CES
+                        'XXXXXXXXXXXXXXXXXXXXX
 
-                Dim n_Kalkulationen As Integer
-                Dim n_Populationen As Integer
+                        'Achsen:
+                        '-------
+                        Dim Achse As Diagramm.Achse
+                        Dim Achsen As New Collection
+                        'Bei SO: X-Achse = Simulationen
+                        If (EVO_Einstellungen1.isMultiObjective = False) Then
+                            Achse.Name = "Simulation"
+                            Achse.Auto = False
+                            Achse.Max = CES1.n_Childs * CES1.n_Generation
+                            Achsen.Add(Achse)
+                        End If
+                        'für jede Zielfunktion eine weitere Achse hinzufügen
+                        'HACK: Diagramm-Achsen bisher nur für Anwendung BlueM!
+                        For i = 0 To Sim1.OptZieleListe.GetUpperBound(0)
+                            Achse.Name = Sim1.OptZieleListe(i).Bezeichnung
+                            Achse.Auto = True
+                            Achse.Max = 0
+                            Achsen.Add(Achse)
+                        Next
 
-                'Anzahl Kalkulationen
-                n_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
-
-                'Anzahl Populationen
-                n_Populationen = 1
-                If EVO_Einstellungen1.isPOPUL Then
-                    n_Populationen = EVO_Einstellungen1.NPopul
-                End If
-
-                'Achsen:
-                '-------
-                Dim Achse As Diagramm.Achse
-                Dim Achsen As New Collection
-                'Bei SO: X-Achse = Simulationen
-                If (EVO_Einstellungen1.isMultiObjective = False) Then
-                    Achse.Name = "Simulation"
-                    Achse.Auto = False
-                    Achse.Max = n_Kalkulationen
-                    Achsen.Add(Achse)
-                End If
-                'für jede Zielfunktion eine weitere Achse hinzufügen
-                'HACK: Diagramm-Achsen bisher nur für Anwendung BlueM!
-                For i = 0 To BlueM1.OptZieleListe.GetUpperBound(0)
-                    Achse.Name = BlueM1.OptZieleListe(i).Bezeichnung
-                    Achse.Auto = True
-                    Achse.Max = 0
-                    Achsen.Add(Achse)
-                Next
-
-                'Diagramm initialisieren
-                Call DForm.Diag.DiagInitialise(Anwendung, Achsen)
-
-                'Standard-Series initialisieren
-                If (EVO_Einstellungen1.isMultiObjective = False) Then
-                    Call DForm.Diag.prepareSeries_SO(n_Populationen)
-                Else
-                    Call DForm.Diag.prepareSeries_MO()
-                End If
+                        'Diagramm initialisieren
+                        Call DForm.Diag.DiagInitialise(Anwendung, Achsen)
 
 
-                Case Else 'andere Anwendungen
-                    'XXXXXXXXXXXXXXXXXXXXXXXX
-                    Throw New Exception("Diese Funktion ist für die Anwendung '" & Anwendung & "' nicht vorgesehen")
+                    Case METH_PES 'Methode PES
+                        'XXXXXXXXXXXXXXXXXXXXX
+
+                        Dim n_Kalkulationen As Integer
+                        Dim n_Populationen As Integer
+
+                        'Anzahl Kalkulationen
+                        n_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
+
+                        'Anzahl Populationen
+                        n_Populationen = 1
+                        If EVO_Einstellungen1.isPOPUL Then
+                            n_Populationen = EVO_Einstellungen1.NPopul
+                        End If
+
+                        'Achsen:
+                        '-------
+                        Dim Achse As Diagramm.Achse
+                        Dim Achsen As New Collection
+                        'Bei SO: X-Achse = Simulationen
+                        If (EVO_Einstellungen1.isMultiObjective = False) Then
+                            Achse.Name = "Simulation"
+                            Achse.Auto = False
+                            Achse.Max = n_Kalkulationen
+                            Achsen.Add(Achse)
+                        End If
+                        'für jede Zielfunktion eine weitere Achse hinzufügen
+                        For i = 0 To Sim1.OptZieleListe.GetUpperBound(0)
+                            Achse.Name = Sim1.OptZieleListe(i).Bezeichnung
+                            Achse.Auto = True
+                            Achse.Max = 0
+                            Achsen.Add(Achse)
+                        Next
+
+                        'Diagramm initialisieren
+                        Call DForm.Diag.DiagInitialise(Anwendung, Achsen)
+
+                        'Standard-Series initialisieren
+                        If (EVO_Einstellungen1.isMultiObjective = False) Then
+                            Call DForm.Diag.prepareSeries_SO(n_Populationen)
+                        Else
+                            Call DForm.Diag.prepareSeries_MO()
+                        End If
+
+
+                    Case Else 'andere Anwendungen
+                        'XXXXXXXXXXXXXXXXXXXXXXXX
+                        Throw New Exception("Diese Funktion ist für die Anwendung '" & Anwendung & "' nicht vorgesehen")
+
+                End Select
 
         End Select
 

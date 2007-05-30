@@ -29,31 +29,6 @@ Public Class BlueM
     '---
     Private IHA1 As New IHA()
 
-    'Kombinatorik
-    '------------
-    Public SKos1 As New SKos()
-    Public Path_Aktuell() As Integer
-    Public VER_ONOFF(,) As Object
-
-    Public Structure Massnahme
-        Public Name As String
-        Public Schaltung(,) As String
-        Public KostenTyp As Integer
-        Public Bauwerke() As String
-    End Structure
-
-    Public Structure Lokation
-        Public Name As String
-        Public MassnahmeListe() As Massnahme
-    End Structure
-
-    Public LocationList() As Lokation
-    Public VerzweigungsDatei(,) As String
-
-    'Public Schaltung(2, 1) As Object
-    'Public Maßnahme As Collection
-    'Public Kombinatorik As Collection
-
 #End Region 'Eigenschaften
 
 #Region "Methoden"
@@ -100,74 +75,6 @@ Public Class BlueM
 
         'Zeitschrittweite in echte Dauer konvertieren
         Me.SimDT = New TimeSpan(0, Convert.ToInt16(SimDT_str), 0)
-
-    End Sub
-
-    'Die ModellParameter in die BM-Eingabedateien schreiben
-    '******************************************************
-    Public Overrides Sub ModellParameter_schreiben()
-        Dim Wert As String
-        Dim AnzZeil As Integer
-        Dim j As Integer
-        Dim Zeilenarray() As String
-        Dim Zeile As String
-        Dim StrLeft As String
-        Dim StrRight As String
-        Dim DateiPfad As String
-
-        'ModellParameter aus OptParametern kalkulieren()
-        Call OptParameter_to_ModellParameter()
-
-        'Alle ModellParameter durchlaufen
-        For i As Integer = 0 To ModellParameterListe.GetUpperBound(0)
-
-            DateiPfad = WorkDir & Datensatz & "." & ModellParameterListe(i).Datei
-            'Datei öffnen
-            Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.Read)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-
-            'Anzahl der Zeilen feststellen
-            AnzZeil = 0
-            Do
-                Zeile = StrRead.ReadLine.ToString
-                AnzZeil += 1
-            Loop Until StrRead.Peek() = -1
-
-            ReDim Zeilenarray(AnzZeil - 1)
-
-            'Datei komplett einlesen
-            FiStr.Seek(0, SeekOrigin.Begin)
-            For j = 0 To AnzZeil - 1
-                Zeilenarray(j) = StrRead.ReadLine.ToString
-            Next
-
-            StrRead.Close()
-            FiStr.Close()
-
-            'Zeile ändern
-            Zeile = Zeilenarray(ModellParameterListe(i).ZeileNr - 1)
-            Dim Length As Short = ModellParameterListe(i).SpBis - ModellParameterListe(i).SpVon
-            StrLeft = Microsoft.VisualBasic.Left(Zeile, ModellParameterListe(i).SpVon - 1)
-            StrRight = Microsoft.VisualBasic.Right(Zeile, Len(Zeile) - ModellParameterListe(i).SpBis + 1)
-
-            Wert = ModellParameterListe(i).Wert.ToString()
-            If (Wert.Length > Length) Then
-                'TODO: Parameter wird für erforderliche Stringlänge einfach abgeschnitten, sollte aber gerundet werden!
-                Wert = Wert.Substring(0, Length)
-            Else
-                Wert = Wert.PadLeft(Length)
-            End If
-            Zeilenarray(ModellParameterListe(i).ZeileNr - 1) = StrLeft & Wert & StrRight
-
-            'Alle Zeilen wieder in Datei schreiben
-            Dim StrWrite As StreamWriter = New StreamWriter(DateiPfad, False, System.Text.Encoding.GetEncoding("iso8859-1"))
-            For j = 0 To AnzZeil - 1
-                StrWrite.WriteLine(Zeilenarray(j))
-            Next
-
-            StrWrite.Close()
-
-        Next
 
     End Sub
 
@@ -248,7 +155,7 @@ Public Class BlueM
 
     'Kombinatorik einlesen
     '*********************
-    Public Sub Read_CES()
+    Public Overrides Sub Read_CES()
 
         Dim Datei As String = WorkDir & Datensatz & "." & Combi_Ext
 
@@ -314,7 +221,7 @@ Public Class BlueM
 
     'Validierungsfunktion der Kombinatorik Prüft ob Verbraucher an zwei Standorten Dopp vorhanden sind
     '*************************************************************************************************
-    Public Sub Combinatoric_is_Valid()
+    Public Overrides Sub Combinatoric_is_Valid()
 
         Dim i, j, x, y, m, n As Integer
 
@@ -326,7 +233,7 @@ Public Class BlueM
                             For n = 0 To 2
                                 If Not LocationList(i).MassnahmeListe(x).Schaltung(m, 0) = "X" And LocationList(j).MassnahmeListe(y).Schaltung(n, 0) = "X" Then
                                     If LocationList(i).MassnahmeListe(x).Schaltung(m, 0) = LocationList(j).MassnahmeListe(y).Schaltung(n, 0) Then
-                                        Throw new Exception("Kombinatorik ist nicht valid!")
+                                        Throw New Exception("Kombinatorik ist nicht valid!")
                                     End If
                                 End If
                             Next
@@ -340,7 +247,7 @@ Public Class BlueM
     'Liest die Verzweigungen aus dem BModel in ein Array ein
     'Und Dimensioniert das Verzweigungsarray
     '*******************************************************
-    Public Sub Verzweigung_Read()
+    Public Overrides Sub Verzweigung_Read()
 
         Dim i As Integer
 
@@ -389,7 +296,7 @@ Public Class BlueM
 
     'Mehrere Prüfungen ob die .VER Datei des BlueM und der .CES Datei auch zusammenpassen
     '************************************************************************************
-    Public Sub CES_fits_to_VER()
+    Public Overrides Sub CES_fits_to_VER()
 
         Dim i As Integer = 0
         Dim j As Integer = 0
@@ -456,7 +363,7 @@ Public Class BlueM
 
     'Die Liste mit den aktuellen Bauwerken des Kindes wird erstellt und in SKos geschrieben
     '**************************************************************************************
-    Public Sub Define_aktuelle_Bauwerke(ByVal Path() As Integer)
+    Public Overrides Sub Define_aktuelle_Bauwerke(ByVal Path() As Integer)
         Dim i, j As Integer
         Dim No As Integer
 
@@ -473,7 +380,7 @@ Public Class BlueM
 
     'Ermittelt das aktuelle Verzweigungsarray
     '****************************************
-    Public Sub Verzweigung_ON_OFF(ByVal Path() As Integer)
+    Public Overrides Sub Verzweigung_ON_OFF(ByVal Path() As Integer)
         Dim j, x, y, z As Integer
         Dim No As Short
 
@@ -497,7 +404,7 @@ Public Class BlueM
 
     'Schreibt die neuen Verzweigungen
     '********************************
-    Public Sub Verzweigung_Write()
+    Public Overrides Sub Verzweigung_Write()
 
         Dim AnzZeil As Integer
         Dim i, j As Integer

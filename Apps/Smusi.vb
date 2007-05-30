@@ -63,80 +63,12 @@ Public Class Smusi
         Me.SimStart = New DateTime(SimStart_str.Substring(6, 4), SimStart_str.Substring(3, 2), SimStart_str.Substring(0, 2), SimStart_str.Substring(11, 2), SimStart_str.Substring(14, 2), 0)
         Me.SimEnde = New DateTime(SimEnde_str.Substring(6, 4), SimEnde_str.Substring(3, 2), SimEnde_str.Substring(0, 2), SimEnde_str.Substring(11, 2), SimEnde_str.Substring(14, 2), 0)
 
-        'Zeitschrittweite in echte Dauer konvertieren
+        'Zeitschrittweite ist immer 5 Minuten
         Me.SimDT = New TimeSpan(0, 5, 0)
 
     End Sub
 
-    'Die ModellParameter in die BM-Eingabedateien schreiben
-    '******************************************************
-    Public Overrides Sub ModellParameter_schreiben()
-        Dim Wert As String
-        Dim AnzZeil As Integer
-        Dim j As Integer
-        Dim Zeilenarray() As String
-        Dim Zeile As String
-        Dim StrLeft As String
-        Dim StrRight As String
-        Dim DateiPfad As String
-
-        'ModellParameter aus OptParametern kalkulieren()
-        Call OptParameter_to_ModellParameter()
-
-        'Alle ModellParameter durchlaufen
-        For i As Integer = 0 To ModellParameterListe.GetUpperBound(0)
-
-            DateiPfad = WorkDir & Datensatz & "." & ModellParameterListe(i).Datei
-            'Datei öffnen
-            Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.Read)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-
-            'Anzahl der Zeilen feststellen
-            AnzZeil = 0
-            Do
-                Zeile = StrRead.ReadLine.ToString
-                AnzZeil += 1
-            Loop Until StrRead.Peek() = -1
-
-            ReDim Zeilenarray(AnzZeil - 1)
-
-            'Datei komplett einlesen
-            FiStr.Seek(0, SeekOrigin.Begin)
-            For j = 0 To AnzZeil - 1
-                Zeilenarray(j) = StrRead.ReadLine.ToString
-            Next
-
-            StrRead.Close()
-            FiStr.Close()
-
-            'Zeile ändern
-            Zeile = Zeilenarray(ModellParameterListe(i).ZeileNr - 1)
-            Dim Length As Short = ModellParameterListe(i).SpBis - ModellParameterListe(i).SpVon
-            StrLeft = Microsoft.VisualBasic.Left(Zeile, ModellParameterListe(i).SpVon - 1)
-            StrRight = Microsoft.VisualBasic.Right(Zeile, Len(Zeile) - ModellParameterListe(i).SpBis + 1)
-
-            Wert = ModellParameterListe(i).Wert.ToString()
-            If (Wert.Length > Length) Then
-                'TODO: Parameter wird für erforderliche Stringlänge einfach abgeschnitten, sollte aber gerundet werden!
-                Wert = Wert.Substring(0, Length)
-            Else
-                Wert = Wert.PadLeft(Length)
-            End If
-            Zeilenarray(ModellParameterListe(i).ZeileNr - 1) = StrLeft & Wert & StrRight
-
-            'Alle Zeilen wieder in Datei schreiben
-            Dim StrWrite As StreamWriter = New StreamWriter(DateiPfad, False, System.Text.Encoding.GetEncoding("iso8859-1"))
-            For j = 0 To AnzZeil - 1
-                StrWrite.WriteLine(Zeilenarray(j))
-            Next
-
-            StrWrite.Close()
-
-        Next
-
-    End Sub
-
-    'BlauesModell ausführen (simulieren)
+    'SMUSI ausführen (simulieren)
     '***********************************
     Public Overrides Sub launchSim()
         'starte Programm mit neuen Parametern
@@ -200,6 +132,56 @@ Public Class Smusi
 
     End Function
 
+
+#Region "Kombinatorik"
+
+    'Kombinatorik
+    '############
+
+    'Kombinatorik einlesen
+    '*********************
+    Public Overrides Sub Read_CES()
+
+    End Sub
+
+    'Validierungsfunktion der Kombinatorik Prüft ob Verbraucher an zwei Standorten Dopp vorhanden sind
+    '*************************************************************************************************
+    Public Overrides Sub Combinatoric_is_Valid()
+
+    End Sub
+
+    'Liest die Verzweigungen aus dem BModel in ein Array ein
+    'Und Dimensioniert das Verzweigungsarray
+    '*******************************************************
+    Public Overrides Sub Verzweigung_Read()
+
+    End Sub
+
+    'Mehrere Prüfungen ob die .VER Datei des BlueM und der .CES Datei auch zusammenpassen
+    '************************************************************************************
+    Public Overrides Sub CES_fits_to_VER()
+
+    End Sub
+
+    'Die Liste mit den aktuellen Bauwerken des Kindes wird erstellt und in SKos geschrieben
+    '**************************************************************************************
+    Public Overrides Sub Define_aktuelle_Bauwerke(ByVal Path() As Integer)
+
+    End Sub
+
+    'Ermittelt das aktuelle Verzweigungsarray
+    '****************************************
+    Public Overrides Sub Verzweigung_ON_OFF(ByVal Path() As Integer)
+
+    End Sub
+
+    'Schreibt die neuen Verzweigungen
+    '********************************
+    Public Overrides Sub Verzweigung_Write()
+
+    End Sub
+
+#End Region 'Kombinatorik
 
 #End Region 'Methoden
 
