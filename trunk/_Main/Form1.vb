@@ -319,7 +319,6 @@ Partial Class Form1
 
                     'EVO_Einstellungen deaktiviern
                     EVO_Einstellungen1.Enabled = False
-
                     'Ergebnisdatenbank ausschalten
                     Sim1.Ergebnisdb = False
 
@@ -332,10 +331,8 @@ Partial Class Form1
 
                     'Überprüfen der Kombinatorik
                     Call Sim1.Combinatoric_is_Valid()
-
                     'Einlesen der Verbraucher Datei
                     Call Sim1.Verzweigung_Read()
-
                     'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
                     Call Sim1.CES_fits_to_VER()
 
@@ -373,7 +370,6 @@ Partial Class Form1
 
                     'EVO_Einstellungen deaktiviern
                     EVO_Einstellungen1.Enabled = True
-
                     'Ergebnisdatenbank ausschalten
                     Sim1.Ergebnisdb = False
 
@@ -386,10 +382,8 @@ Partial Class Form1
 
                     'Überprüfen der Kombinatorik
                     Call Sim1.Combinatoric_is_Valid()
-
                     'Einlesen der Verbraucher Datei
                     Call Sim1.Verzweigung_Read()
-
                     'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
                     Call Sim1.CES_fits_to_VER()
 
@@ -404,7 +398,6 @@ Partial Class Form1
                     For i = 0 To CES1.n_Location - 1
                         CES1.n_PathDimension(i) = Sim1.LocationList(i).MassnahmeListe.GetLength(0)
                     Next
-
 
             End Select
 
@@ -687,7 +680,7 @@ Partial Class Form1
         Call CES1.Dim_Parents()
         Call CES1.Dim_Childs()
 
-        'Diagramm vorbereiten und initialisieren *****************************
+        'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
 
         'Zufällige Kinderpfade werden generiert
@@ -779,6 +772,108 @@ Partial Class Form1
     'Anwendung BlueM mit CES und PES - START             
     '***************************************
     Private Sub STARTEN_CES_PES()
+
+        'Fehlerabfragen
+        If (Sim1.OptZieleListe.GetLength(0) > 2) Then
+            Throw New Exception("Zu viele Ziele für CES. Max=2")
+        End If
+
+        Dim durchlauf_all As Integer = 0
+
+        'Laufvariable für die Generationen
+        Dim gen As Integer
+        Dim i As Integer
+
+        'Parents und Child werden Dimensioniert
+        Call CES1.Dim_Parents()
+        Call CES1.Dim_Childs()
+
+        'Diagramm vorbereiten und initialisieren
+        Call PrepareDiagramm()
+
+        'Zufällige Kinderpfade werden generiert
+        Call CES1.Generate_Random_Path()
+
+        'HACK: Funktion zum manuellen testen aller Kombinationen
+        'Call CES1.Generate_All_Test_Path()
+
+        'Generationsschleife
+        For gen = 0 To CES1.n_Generation - 1
+
+            'Child Schleife
+            For i = 0 To CES1.n_Childs - 1
+                durchlauf_all += 1
+
+                'Erstellt die aktuelle Bauerksliste und überträgt sie zu SKos
+                Call Sim1.Define_aktuelle_Bauwerke(CES1.ChildList(i).Path)
+
+                'Ermittelt das aktuelle_ON_OFF array
+                Call Sim1.Verzweigung_ON_OFF(CES1.ChildList(i).Path)
+
+                'Schreibt die neuen Verzweigungen
+                Call Sim1.Verzweigung_Write()
+
+                'Evaluiert das Blaue Modell
+                Call Sim1.Eval_Sim_CombiOpt(CES1.n_Penalty, durchlauf_all, 1, CES1.ChildList(i).Penalty, DForm.Diag)
+
+                'Zeichnen MO_SO
+                Call DForm.Diag.prepareSeries(0, "Childs", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
+                If CES1.n_Penalty = 1 Then
+                    Call DForm.Diag.Series(0).Add(durchlauf_all, CES1.ChildList(i).Penalty(0))
+                ElseIf CES1.n_Penalty = 2 Then
+                    Call DForm.Diag.Series(0).Add(CES1.ChildList(i).Penalty(0), CES1.ChildList(i).Penalty(1))
+                End If
+
+                ''HACK zum zeichnen aller Qualitäten
+                'Call TChart1.Series(2).Add(durchlauf, CES1.ChildList_BM(i).Quality_MO(0))
+                'Call TChart1.Series(3).Add(durchlauf, CES1.ChildList_BM(i).Quality_MO(1))
+                'Call TChart1.Series(4).Add(durchlauf, CES1.ChildList_BM(i).Quality_MO(2))
+                System.Windows.Forms.Application.DoEvents()
+            Next
+
+            'MO oder SO
+            '----------
+            If CES1.n_Penalty = 1 Then
+                'Sortieren der Kinden anhand der Qualität
+                Call CES1.Sort_Faksimile(CES1.ChildList)
+                'Selectionsprozess je nach "plus" oder "minus" Strategie
+                Call CES1.Selection_Process()
+            ElseIf CES1.n_Penalty = 2 Then
+                'NDSorting
+                Call CES1.NDSorting_Control()
+            End If
+
+
+            'MO oder SO
+            '----------
+            If CES1.n_Penalty = 1 Then
+                'Zeichnen des besten Elter
+                For i = 0 To CES1.n_Parents - 1
+                    'durchlauf += 1
+                    Call DForm.Diag.prepareSeries(1, "Parent", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                    Call DForm.Diag.Series(1).Add(durchlauf_all, CES1.ParentList(i).Penalty(0))
+                Next
+            ElseIf CES1.n_Penalty = 2 Then
+                'Zeichnen von NDSortingResult
+                Call DForm.Diag.DeleteSeries(CES1.n_Childs - 1, 1)
+                Dim f As Integer
+                For i = 0 To CES1.n_Childs - 1
+                    f = CES1.NDSResult(i).Front
+                    Call DForm.Diag.prepareSeries(f, "Front:" & f, Steema.TeeChart.Styles.PointerStyles.Circle, 4)
+                    Call DForm.Diag.Series(f).Add(CES1.NDSResult(i).Penalty(0), CES1.NDSResult(i).Penalty(1))
+                Next
+            End If
+
+            'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
+            Call CES1.Reset_Childs()
+
+            'Reproduktionsoperatoren, hier gehts dezent zur Sache
+            Call CES1.Reproduction_Control()
+
+            'Mutationsoperatoren
+            Call CES1.Mutation_Control()
+
+        Next
 
     End Sub
 
