@@ -36,6 +36,7 @@ Partial Class Form1
     Private Const METH_RESET As String = "Reset"
     Private Const METH_PES As String = "PES"
     Private Const METH_CES As String = "CES"
+    Private Const METH_CES_PES As String = "CES + PES"
     Private Const METH_SENSIPLOT As String = "SensiPlot"
 
     '**** Deklarationen der Module *****
@@ -72,7 +73,7 @@ Partial Class Form1
         ComboBox_Anwendung.SelectedIndex = 0
 
         'Liste der Methoden in ComboBox schreiben und Anfangseinstellung wählen
-        ComboBox_Methode.Items.AddRange(New Object() {"", METH_RESET, METH_PES, METH_CES, METH_SENSIPLOT})
+        ComboBox_Methode.Items.AddRange(New Object() {"", METH_RESET, METH_PES, METH_CES,METH_CES_PES, METH_SENSIPLOT})
         ComboBox_Methode.SelectedIndex = 0
         ComboBox_Methode.Enabled = False
 
@@ -341,6 +342,8 @@ Partial Class Form1
                         CES1.n_PathDimension(i) = Sim1.LocationList(i).MassnahmeListe.GetLength(0)
                     Next
 
+                Case METH_CES_PES 'Methode CES + PES
+
             End Select
 
             'IniApp OK -> Start Button aktivieren
@@ -440,6 +443,8 @@ Partial Class Form1
                         Call STARTEN_PES()
                     Case METH_CES
                         Call STARTEN_CES()
+                    Case METH_CES_PES
+                        Call STARTEN_CES_PES()
                 End Select
 
             Case ANW_TESTPROBLEME
@@ -709,6 +714,11 @@ Partial Class Form1
 
     End Sub
 
+    'Anwendung BlueM mit CES und PES - START             
+    '***************************************
+    Private Sub STARTEN_CES_PES()
+
+    End Sub
 
     'Anwendung Evolutionsstrategie für Parameter Optimierung - hier Steuerung       
     '************************************************************************
@@ -1116,6 +1126,8 @@ Start_Evolutionsrunden:
                         'Diagramm initialisieren
                         Call DForm.Diag.DiagInitialise(Anwendung, Achsen)
 
+                    Case METH_CES_PES 'Methode CES + PES
+                        'XXXXXXXXXXXXXXXXXXXXX
 
                     Case METH_PES 'Methode PES
                         'XXXXXXXXXXXXXXXXXXXXX
@@ -1160,7 +1172,6 @@ Start_Evolutionsrunden:
                         Else
                             Call DForm.Diag.prepareSeries_MO()
                         End If
-
 
                     Case Else 'andere Anwendungen
                         'XXXXXXXXXXXXXXXXXXXXXXXX
