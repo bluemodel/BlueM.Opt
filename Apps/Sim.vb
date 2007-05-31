@@ -144,30 +144,17 @@ Public MustInherit Class Sim
 
 #Region "Eingabedateien lesen"
 
-    'Eingabedateien einlesen
-    '***********************
-    Public Sub Sim_Ini()
-        'Simulationsdaten einlesen
-        Call SimParameter_einlesen()
-        'Optimierungsparameter einlesen
-        Call OptParameter_einlesen()
-        'ModellParameter einlesen
-        Call ModellParameter_einlesen()
-        'Zielfunktionen einlesen
-        Call OptZiele_einlesen()
-        'Datenbank vorbereiten
-        If (Ergebnisdb = True) Then
-            Call db_prepare()
-        End If
-    End Sub
-
     'Simulationsparameter einlesen
     '*****************************
-    Protected MustOverride Sub SimParameter_einlesen()
+    Public MustOverride Sub Read_SimParameter()
+
+    'Kombinatorik einlesen
+    '*********************
+    Public MustOverride Sub Read_CES()
 
     'Optimierungsparameter einlesen
     '******************************
-    Protected Sub OptParameter_einlesen()
+    Public Sub Read_OptParameter()
 
         Dim Datei As String = WorkDir & Datensatz & "." & OptParameter_Ext
 
@@ -213,7 +200,7 @@ Public MustInherit Class Sim
 
     'Modellparameter einlesen
     '************************
-    Private Sub ModellParameter_einlesen()
+    Public Sub Read_ModellParameter()
 
         Dim Datei As String = WorkDir & Datensatz & "." & ModParameter_Ext
 
@@ -262,7 +249,7 @@ Public MustInherit Class Sim
 
     'Optimierungsziele einlesen
     '**************************
-    Protected Overridable Sub OptZiele_einlesen()
+    Public Overridable Sub Read_OptZiele()
         Dim AnzZiele As Integer = 0
         Dim IsOK As Boolean
         Dim ext As String
@@ -978,7 +965,7 @@ Public MustInherit Class Sim
 
     'Ergebnisdatenbank vorbereiten
     '*****************************
-    Private Sub db_prepare()
+    Public Sub db_prepare()
 
         'Leere/Neue Ergebnisdatenbank in Arbeitsverzeichnis kopieren
         '-----------------------------------------------------------
@@ -1080,10 +1067,6 @@ Public MustInherit Class Sim
 
     'Kombinatorik
     '############
-
-    'Kombinatorik einlesen
-    '*********************
-    Public MustOverride Sub Read_CES()
 
     'Validierungsfunktion der Kombinatorik Prüft ob Verbraucher an zwei Standorten Dopp vorhanden sind
     '*************************************************************************************************
