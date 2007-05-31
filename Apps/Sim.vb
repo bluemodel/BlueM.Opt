@@ -150,7 +150,12 @@ Public MustInherit Class Sim
 
     'Kombinatorik einlesen
     '*********************
-    Public MustOverride Sub Read_CES()
+    Public MustOverride Sub Read_Kombinatorik()
+
+    'Liest die Verzweigungen aus dem BModel in ein Array ein
+    'Und Dimensioniert das Verzweigungsarray
+    '*******************************************************
+    Public MustOverride Sub Read_Verzweigungen()
 
     'Optimierungsparameter einlesen
     '******************************
@@ -360,7 +365,19 @@ Public MustInherit Class Sim
 
 #End Region 'Eingabedateien einlesen
 
-#Region "Misc"
+#Region "Prüfung der Eingabedateien"
+
+    'Validierungsfunktion der Kombinatorik Prüft ob Verbraucher an zwei Standorten Dopp vorhanden sind
+    '*************************************************************************************************
+    Public MustOverride Sub Combinatoric_is_Valid()
+
+    'Mehrere Prüfungen ob die .VER Datei des BlueM und der .CES Datei auch zusammenpassen
+    '************************************************************************************
+    Public MustOverride Sub CES_fits_to_VER()
+
+#End Region 'Prüfung der Eingabedateien
+
+#Region "Evaluierung"
 
     'EVO-Parameterübergabe
     '*********************
@@ -386,24 +403,54 @@ Public MustInherit Class Sim
 
     End Sub
 
-    'ModellParameter aus OptParametern errechnen
-    '*******************************************
-    Protected Sub OptParameter_to_ModellParameter()
-        Dim i As Integer
-        Dim j As Integer
-        For i = 0 To ModellParameterListe.GetUpperBound(0)
-            For j = 0 To OptParameterListe.GetUpperBound(0)
-                If ModellParameterListe(i).OptParameter = OptParameterListe(j).Bezeichnung Then
-                    ModellParameterListe(i).Wert = OptParameterListe(j).Wert * ModellParameterListe(i).Faktor
-                End If
-            Next
+    'Evaluierung des SimModells für Parameter Optimierung - Steuerungseinheit
+    '************************************************************************
+    Public Sub Eval_Sim_ParaOpt(ByVal GlobalAnzPar As Short, ByVal GlobalAnzZiel As Short, ByVal mypara As Double(,), ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN As Double(), ByRef TChart1 As Steema.TeeChart.TChart)
+
+        Dim i As Short
+
+        'Mutierte Parameter an OptParameter übergeben
+        For i = 1 To GlobalAnzPar                                   'BUG 57: mypara(,) fängt bei 1 an!
+            OptParameterListe(i - 1).SKWert = mypara(i, 1)          'OptParameterListe(i-1) weil Array bei 0 anfängt!
         Next
+
+        'Mutierte Parameter in Eingabedateien schreiben
+        Call ModellParameter_schreiben()
+
+        'Modell Starten
+        Call launchSim()
+
+        'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
+        For i = 0 To GlobalAnzZiel - 1                              'BUG 57: QN() fängt bei 1 an!
+            OptZieleListe(i).QWertTmp = QWert(OptZieleListe(i))
+            QN(i + 1) = OptZieleListe(i).QWertTmp
+        Next
+
+        'Qualitätswerte im TeeChart zeichnen
+        Select Case GlobalAnzZiel
+            Case 1
+                TChart1.Series(ipop).Add(durchlauf, OptZieleListe(0).QWertTmp)
+            Case 2
+                TChart1.Series(0).Add(OptZieleListe(0).QWertTmp, OptZieleListe(1).QWertTmp, "")
+            Case 3
+                'BUG 66: Zeichnen von mehr als 2 Zielfunktionen
+                Throw New Exception("Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt")
+                'Call Zielfunktion_zeichnen_MultiObPar_3D(BlueM1.OptZieleListe(0).QWertTmp, BlueM1.OptZieleListe(1).QWertTmp, BlueM1.OptZieleListe(2).QWertTmp)
+            Case Else
+                'BUG 66: Zeichnen von mehr als 2 Zielfunktionen
+                Throw New Exception("Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt")
+                'Call Zielfunktion_zeichnen_MultiObPar_XD()
+        End Select
+
+        'Qualitätswerte und OptParameter in DB speichern
+        If (Ergebnisdb = True) Then
+            Call db_update(durchlauf, ipop)
+        End If
+
     End Sub
 
     'Die ModellParameter in die Eingabedateien des SimModells schreiben
     '******************************************************************
-    'Die ModellParameter in die Eingabedateien schreiben
-    '******************************************************
     Public Sub ModellParameter_schreiben()
         Dim Wert As String
         Dim AnzZeil As Integer
@@ -470,56 +517,33 @@ Public MustInherit Class Sim
 
     End Sub
 
-    'Evaluierung des SimModells für Parameter Optimierung - Steuerungseinheit
-    '************************************************************************
-    Public Sub Eval_Sim_ParaOpt(ByVal GlobalAnzPar As Short, ByVal GlobalAnzZiel As Short, ByVal mypara As Double(,), ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN As Double(), ByRef TChart1 As Steema.TeeChart.TChart)
-
-        Dim i As Short
-
-        'Mutierte Parameter an OptParameter übergeben
-        For i = 1 To GlobalAnzPar                                   'BUG 57: mypara(,) fängt bei 1 an!
-            OptParameterListe(i - 1).SKWert = mypara(i, 1)          'OptParameterListe(i-1) weil Array bei 0 anfängt!
+    'ModellParameter aus OptParametern errechnen
+    '*******************************************
+    Protected Sub OptParameter_to_ModellParameter()
+        Dim i As Integer
+        Dim j As Integer
+        For i = 0 To ModellParameterListe.GetUpperBound(0)
+            For j = 0 To OptParameterListe.GetUpperBound(0)
+                If ModellParameterListe(i).OptParameter = OptParameterListe(j).Bezeichnung Then
+                    ModellParameterListe(i).Wert = OptParameterListe(j).Wert * ModellParameterListe(i).Faktor
+                End If
+            Next
         Next
-
-        'Mutierte Parameter in Eingabedateien schreiben
-        Call ModellParameter_schreiben()
-
-        'Modell Starten
-        Call launchSim()
-
-        'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
-        For i = 0 To GlobalAnzZiel - 1                              'BUG 57: QN() fängt bei 1 an!
-            OptZieleListe(i).QWertTmp = QWert(OptZieleListe(i))
-            QN(i + 1) = OptZieleListe(i).QWertTmp
-        Next
-
-        'Qualitätswerte im TeeChart zeichnen
-        Select Case GlobalAnzZiel
-            Case 1
-                TChart1.Series(ipop).Add(durchlauf, OptZieleListe(0).QWertTmp)
-            Case 2
-                TChart1.Series(0).Add(OptZieleListe(0).QWertTmp, OptZieleListe(1).QWertTmp, "")
-            Case 3
-                'BUG 66: Zeichnen von mehr als 2 Zielfunktionen
-                Throw New Exception("Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt")
-                'Call Zielfunktion_zeichnen_MultiObPar_3D(BlueM1.OptZieleListe(0).QWertTmp, BlueM1.OptZieleListe(1).QWertTmp, BlueM1.OptZieleListe(2).QWertTmp)
-            Case Else
-                'BUG 66: Zeichnen von mehr als 2 Zielfunktionen
-                Throw New Exception("Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt")
-                'Call Zielfunktion_zeichnen_MultiObPar_XD()
-        End Select
-
-        'Qualitätswerte und OptParameter in DB speichern
-        If (Ergebnisdb = True) Then
-            Call db_update(durchlauf, ipop)
-        End If
-
     End Sub
 
     'Evaluierung des SimModells für Kombinatorik Optimierung - Steuerungseinheit
     '***************************************************************************
-    Public Function Eval_Sim_CombiOpt(ByVal n_Ziele As Short, ByVal durchlauf As Integer, ByVal ipop As Short, ByRef Quality As Double(), ByRef TChart1 As Steema.TeeChart.TChart) As Boolean
+    Public Function Eval_Sim_CombiOpt(ByVal Path() As Integer, ByVal n_Ziele As Short, ByVal durchlauf As Integer, ByVal ipop As Short, ByRef Quality As Double(), ByRef TChart1 As Steema.TeeChart.TChart) As Boolean
         Dim i As Short
+
+        'Erstellt die aktuelle Bauerksliste und überträgt sie zu SKos
+        Call Define_aktuelle_Bauwerke(Path)
+
+        'Ermittelt das aktuelle_ON_OFF array
+        Call Verzweigung_ON_OFF(Path)
+
+        'Schreibt die neuen Verzweigungen
+        Call Write_Verzweigungen()
 
         'Modell Starten
         Call launchSim()
@@ -532,11 +556,24 @@ Public MustInherit Class Sim
 
     End Function
 
+
+    'Die Liste mit den aktuellen Bauwerken des Kindes wird erstellt und in SKos geschrieben
+    '**************************************************************************************
+    Public MustOverride Sub Define_aktuelle_Bauwerke(ByVal Path() As Integer)
+
+    'Ermittelt das aktuelle Verzweigungsarray
+    '****************************************
+    Public MustOverride Sub Verzweigung_ON_OFF(ByVal Path() As Integer)
+
+    'Schreibt die neuen Verzweigungen
+    '********************************
+    Public MustOverride Sub Write_Verzweigungen()
+
     'SimModell ausführen (simulieren)
     '********************************
     Public MustOverride Sub launchSim()
 
-#End Region 'Misc
+#End Region 'Evaluierung
 
 #Region "Qualitätswertberechnung"
 
@@ -1062,38 +1099,6 @@ Public MustInherit Class Sim
     End Function
 
 #End Region 'Ergebnisdatenbank
-
-#Region "Kombinatorik"
-
-    'Kombinatorik
-    '############
-
-    'Validierungsfunktion der Kombinatorik Prüft ob Verbraucher an zwei Standorten Dopp vorhanden sind
-    '*************************************************************************************************
-    Public MustOverride Sub Combinatoric_is_Valid()
-
-    'Liest die Verzweigungen aus dem BModel in ein Array ein
-    'Und Dimensioniert das Verzweigungsarray
-    '*******************************************************
-    Public MustOverride Sub Verzweigung_Read()
-
-    'Mehrere Prüfungen ob die .VER Datei des BlueM und der .CES Datei auch zusammenpassen
-    '************************************************************************************
-    Public MustOverride Sub CES_fits_to_VER()
-
-    'Die Liste mit den aktuellen Bauwerken des Kindes wird erstellt und in SKos geschrieben
-    '**************************************************************************************
-    Public MustOverride Sub Define_aktuelle_Bauwerke(ByVal Path() As Integer)
-
-    'Ermittelt das aktuelle Verzweigungsarray
-    '****************************************
-    Public MustOverride Sub Verzweigung_ON_OFF(ByVal Path() As Integer)
-
-    'Schreibt die neuen Verzweigungen
-    '********************************
-    Public MustOverride Sub Verzweigung_Write()
-
-#End Region 'Kombinatorik
 
 #End Region 'Methoden
 
