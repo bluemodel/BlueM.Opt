@@ -140,7 +140,7 @@ Public Class Smusi
 
     'Kombinatorik einlesen
     '*********************
-    Public Overrides Sub Read_CES()
+    Public Overrides Sub Read_Kombinatorik()
 
     End Sub
 
@@ -153,7 +153,7 @@ Public Class Smusi
     'Liest die Verzweigungen aus dem BModel in ein Array ein
     'Und Dimensioniert das Verzweigungsarray
     '*******************************************************
-    Public Overrides Sub Verzweigung_Read()
+    Public Overrides Sub Read_Verzweigungen()
 
     End Sub
 
@@ -177,7 +177,7 @@ Public Class Smusi
 
     'Schreibt die neuen Verzweigungen
     '********************************
-    Public Overrides Sub Verzweigung_Write()
+    Public Overrides Sub Write_Verzweigungen()
 
     End Sub
 

@@ -300,7 +300,6 @@ Partial Class Form1
                     'Parameterübergabe an ES
                     Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
 
-
                 Case METH_CES 'Methode CES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
@@ -308,7 +307,9 @@ Partial Class Form1
                     'Zielfunktionen einlesen
                     Call Sim1.Read_OptZiele()
                     'Kombinatorik Datei einlesen
-                    Call Sim1.Read_CES()
+                    Call Sim1.Read_Kombinatorik()
+                    'Verzweigungs Datei einlesen
+                    Call Sim1.Read_Verzweigungen()
 
                     'Funktioniert nur bei BlueM!
                     If (Not Anwendung = ANW_BLUEM) Then
@@ -331,8 +332,7 @@ Partial Class Form1
 
                     'Überprüfen der Kombinatorik
                     Call Sim1.Combinatoric_is_Valid()
-                    'Einlesen der Verbraucher Datei
-                    Call Sim1.Verzweigung_Read()
+
                     'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
                     Call Sim1.CES_fits_to_VER()
 
@@ -359,7 +359,9 @@ Partial Class Form1
                     'ModellParameter einlesen
                     Call Sim1.Read_ModellParameter()
                     'Kombinatorik Datei einlesen
-                    Call Sim1.Read_CES()
+                    Call Sim1.Read_Kombinatorik()
+                    'Verzweigungs Datei einlesen
+                    Call Sim1.Read_Verzweigungen()
 
                     'Funktioniert nur bei BlueM!
                     If (Not Anwendung = ANW_BLUEM) Then
@@ -382,8 +384,6 @@ Partial Class Form1
 
                     'Überprüfen der Kombinatorik
                     Call Sim1.Combinatoric_is_Valid()
-                    'Einlesen der Verbraucher Datei
-                    Call Sim1.Verzweigung_Read()
                     'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
                     Call Sim1.CES_fits_to_VER()
 
@@ -398,6 +398,9 @@ Partial Class Form1
                     For i = 0 To CES1.n_Location - 1
                         CES1.n_PathDimension(i) = Sim1.LocationList(i).MassnahmeListe.GetLength(0)
                     Next
+
+                    'Parameterübergabe an ES
+                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
 
             End Select
 
@@ -696,17 +699,9 @@ Partial Class Form1
             For i = 0 To CES1.n_Childs - 1
                 durchlauf_all += 1
 
-                'Erstellt die aktuelle Bauerksliste und überträgt sie zu SKos
-                Call Sim1.Define_aktuelle_Bauwerke(CES1.ChildList(i).Path)
-
-                'Ermittelt das aktuelle_ON_OFF array
-                Call Sim1.Verzweigung_ON_OFF(CES1.ChildList(i).Path)
-
-                'Schreibt die neuen Verzweigungen
-                Call Sim1.Verzweigung_Write()
-
                 'Evaluiert das Blaue Modell
-                Call Sim1.Eval_Sim_CombiOpt(CES1.n_Penalty, durchlauf_all, 1, CES1.ChildList(i).Penalty, DForm.Diag)
+                '**************************
+                Call Sim1.Eval_Sim_CombiOpt(CES1.ChildList(i).Path, CES1.n_Penalty, durchlauf_all, 1, CES1.ChildList(i).Penalty, DForm.Diag)
 
                 'Zeichnen MO_SO
                 Call DForm.Diag.prepareSeries(0, "Childs", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
@@ -804,17 +799,17 @@ Partial Class Form1
             For i = 0 To CES1.n_Childs - 1
                 durchlauf_all += 1
 
-                'Erstellt die aktuelle Bauerksliste und überträgt sie zu SKos
-                Call Sim1.Define_aktuelle_Bauwerke(CES1.ChildList(i).Path)
+                ''Erstellt die aktuelle Bauerksliste und überträgt sie zu SKos
+                'Call Sim1.Define_aktuelle_Bauwerke(CES1.ChildList(i).Path)
 
-                'Ermittelt das aktuelle_ON_OFF array
-                Call Sim1.Verzweigung_ON_OFF(CES1.ChildList(i).Path)
+                ''Ermittelt das aktuelle_ON_OFF array
+                'Call Sim1.Verzweigung_ON_OFF(CES1.ChildList(i).Path)
 
-                'Schreibt die neuen Verzweigungen
-                Call Sim1.Verzweigung_Write()
+                ''Schreibt die neuen Verzweigungen
+                'Call Sim1.Verzweigung_Write()
 
                 'Evaluiert das Blaue Modell
-                Call Sim1.Eval_Sim_CombiOpt(CES1.n_Penalty, durchlauf_all, 1, CES1.ChildList(i).Penalty, DForm.Diag)
+                Call Sim1.Eval_Sim_CombiOpt(CES1.ChildList(i).Path, CES1.n_Penalty, durchlauf_all, 1, CES1.ChildList(i).Penalty, DForm.Diag)
 
                 'Zeichnen MO_SO
                 Call DForm.Diag.prepareSeries(0, "Childs", Steema.TeeChart.Styles.PointerStyles.Circle, 3)

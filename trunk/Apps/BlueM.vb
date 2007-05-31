@@ -33,8 +33,73 @@ Public Class BlueM
 
 #Region "Methoden"
 
-    'Methoden
-    '########
+#Region "Eingabedateien lesen"
+
+    'Kombinatorik einlesen
+    '*********************
+    Public Overrides Sub Read_Kombinatorik()
+
+        Dim Datei As String = WorkDir & Datensatz & "." & Combi_Ext
+
+        Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+        Dim Zeile As String
+        Dim Anz As Integer = 0
+
+        'Anzahl der Parameter feststellen
+        Do
+            Zeile = StrRead.ReadLine.ToString()
+            If (Zeile.StartsWith("*") = False) Then
+                Anz += 1
+            End If
+        Loop Until StrRead.Peek() = -1
+
+        Dim i As Integer = -1
+        Dim j As Integer = 0
+        ReDim LocationList(0)
+        ReDim LocationList(0).MassnahmeListe(0)
+
+        'Zurück zum Dateianfang und lesen
+        FiStr.Seek(0, SeekOrigin.Begin)
+
+        Dim array() As String
+        Do
+            Zeile = StrRead.ReadLine.ToString()
+            If (Zeile.StartsWith("*") = False) Then
+                array = Zeile.Split("|")
+                'Werte zuweisen
+
+                If Not Is_Name_IN(array(1).Trim(), LocationList) Then
+                    i += 1
+                    j = 0
+                    System.Array.Resize(LocationList, i + 1)
+                    LocationList(i).Name = array(1).Trim()
+                End If
+                System.Array.Resize(LocationList(i).MassnahmeListe, j + 1)
+                ReDim LocationList(i).MassnahmeListe(j).Schaltung(2, 1)
+                ReDim LocationList(i).MassnahmeListe(j).Bauwerke(3)
+                LocationList(i).MassnahmeListe(j).Name = array(2).Trim()
+                LocationList(i).MassnahmeListe(j).Schaltung(0, 0) = array(3).Trim()
+                LocationList(i).MassnahmeListe(j).Schaltung(0, 1) = array(4).Trim()
+                LocationList(i).MassnahmeListe(j).Schaltung(1, 0) = array(5).Trim()
+                LocationList(i).MassnahmeListe(j).Schaltung(1, 1) = array(6).Trim()
+                LocationList(i).MassnahmeListe(j).Schaltung(2, 0) = array(7).Trim()
+                LocationList(i).MassnahmeListe(j).Schaltung(2, 1) = array(8).Trim()
+                LocationList(i).MassnahmeListe(j).KostenTyp = array(9).Trim()
+                LocationList(i).MassnahmeListe(j).Bauwerke(0) = array(10).Trim()
+                LocationList(i).MassnahmeListe(j).Bauwerke(1) = array(11).Trim()
+                LocationList(i).MassnahmeListe(j).Bauwerke(2) = array(12).Trim()
+                LocationList(i).MassnahmeListe(j).Bauwerke(3) = array(13).Trim()
+                j += 1
+            End If
+
+        Loop Until StrRead.Peek() = -1
+
+        StrRead.Close()
+        FiStr.Close()
+
+    End Sub
 
     'Simulationsparameter einlesen
     '*****************************
@@ -77,6 +142,179 @@ Public Class BlueM
         Me.SimDT = New TimeSpan(0, Convert.ToInt16(SimDT_str), 0)
 
     End Sub
+
+    'Liest die Verzweigungen aus dem BModel in ein Array ein
+    'Und Dimensioniert das Verzweigungsarray
+    '*******************************************************
+    Public Overrides Sub Read_Verzweigungen()
+
+        Dim i As Integer
+
+        Dim FiStr As FileStream = New FileStream(WorkDir & Datensatz & ".ver", FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+        'Anzahl der Parameter feststellen
+        Dim Zeile As String
+        Dim Anz As Integer = 0
+
+        Do
+            Zeile = StrRead.ReadLine.ToString()
+            If (Zeile.StartsWith("*") = False) Then
+                Anz += 1
+            End If
+        Loop Until StrRead.Peek() = -1
+        ReDim VerzweigungsDatei(Anz - 1, 3)
+
+        'Zurück zum Dateianfang und lesen
+        FiStr.Seek(0, SeekOrigin.Begin)
+
+        'Einlesen der Zeile und übergeben an das Verzweidungsarray
+        Dim ZeilenArray() As String
+
+        Do
+            Zeile = StrRead.ReadLine.ToString()
+            If (Zeile.StartsWith("*") = False) Then
+                ZeilenArray = Zeile.Split("|")
+                'Verbraucher Array füllen
+                VerzweigungsDatei(i, 0) = ZeilenArray(1).Trim
+                VerzweigungsDatei(i, 1) = ZeilenArray(2).Trim
+                VerzweigungsDatei(i, 2) = ZeilenArray(3).Trim
+                VerzweigungsDatei(i, 3) = ZeilenArray(4).Trim
+                i += 1
+            End If
+
+        Loop Until StrRead.Peek() = -1
+
+        StrRead.Close()
+        FiStr.Close()
+
+        'Hier wird das Verzweigungsarray Dimensioniert
+        ReDim VER_ONOFF(VerzweigungsDatei.GetUpperBound(0), 1)
+
+    End Sub
+
+    'Optimierungsziele einlesen
+    '**************************
+    Public Overrides Sub Read_OptZiele()
+
+        Call MyBase.Read_OptZiele()
+
+        'Weiterverarbeitung von ZielReihen:
+        '----------------------------------
+        Dim i As Integer
+
+        'IHA
+        For i = 0 To Me.OptZieleListe.GetUpperBound(0)
+            If (Me.OptZieleListe(i).ZielTyp = "IHA") Then
+                'IHA-Berechnung vorbereiten
+                Call Me.IHA1.IHA_prepare(Me)
+                Exit For
+            End If
+        Next
+
+    End Sub
+
+#End Region 'Eingabedateien lesen
+
+
+#Region "Prüfung der Eingabedateien"
+
+    'Validierungsfunktion der Kombinatorik Prüft ob Verbraucher an zwei Standorten Doppelt vorhanden sind
+    '****************************************************************************************************
+    Public Overrides Sub Combinatoric_is_Valid()
+
+        Dim i, j, x, y, m, n As Integer
+
+        For i = 0 To LocationList.GetUpperBound(0)
+            For j = 1 To LocationList.GetUpperBound(0)
+                For x = 0 To LocationList(i).MassnahmeListe.GetUpperBound(0)
+                    For y = 0 To LocationList(j).MassnahmeListe.GetUpperBound(0)
+                        For m = 0 To 2
+                            For n = 0 To 2
+                                If Not LocationList(i).MassnahmeListe(x).Schaltung(m, 0) = "X" And LocationList(j).MassnahmeListe(y).Schaltung(n, 0) = "X" Then
+                                    If LocationList(i).MassnahmeListe(x).Schaltung(m, 0) = LocationList(j).MassnahmeListe(y).Schaltung(n, 0) Then
+                                        Throw New Exception("Kombinatorik ist nicht valid!")
+                                    End If
+                                End If
+                            Next
+                        Next
+                    Next
+                Next
+            Next
+        Next
+    End Sub
+
+    'Mehrere Prüfungen ob die .VER Datei des BlueM und der .CES Datei auch zusammenpassen
+    '************************************************************************************
+    Public Overrides Sub CES_fits_to_VER()
+
+        Dim i As Integer = 0
+        Dim j As Integer = 0
+        Dim x As Integer = 0
+        Dim y As Integer = 0
+
+        Dim FoundA(VerzweigungsDatei.GetUpperBound(0)) As Boolean
+
+        'Prüft ob jede Verzweigung einmal in der LocationList vorkommt
+        For i = 0 To VerzweigungsDatei.GetUpperBound(0)
+            For j = 0 To LocationList.GetUpperBound(0)
+                For x = 0 To LocationList(j).MassnahmeListe.GetUpperBound(0)
+                    For y = 0 To LocationList(j).MassnahmeListe(x).Schaltung.GetUpperBound(0)
+                        If VerzweigungsDatei(i, 0) = LocationList(j).MassnahmeListe(x).Schaltung(y, 0) And VerzweigungsDatei(i, 1) = "2" Then
+                            FoundA(i) = True
+                        End If
+                    Next
+                Next
+            Next
+        Next
+
+        'Prüft ob die nicht vorkommenden Verzweigungen Verzweigungen anderer Art sind
+        For i = 0 To VerzweigungsDatei.GetUpperBound(0)
+            If Not VerzweigungsDatei(i, 1) = "2" And FoundA(i) = False Then
+                FoundA(i) = True
+            End If
+        Next
+
+        Dim FoundB As Boolean = True
+        Dim TmpBool As Boolean = False
+
+        'Prüft ob alle in der LocationList Vorkommenden Verzweigungen auch in der Verzweigungsdatei sind
+        For j = 0 To LocationList.GetUpperBound(0)
+            For x = 0 To LocationList(j).MassnahmeListe.GetUpperBound(0)
+                For y = 0 To LocationList(j).MassnahmeListe(x).Schaltung.GetUpperBound(0)
+                    If Not LocationList(j).MassnahmeListe(x).Schaltung(y, 0) = "X" Then
+                        TmpBool = False
+                        For i = 0 To VerzweigungsDatei.GetUpperBound(0)
+                            If VerzweigungsDatei(i, 0) = LocationList(j).MassnahmeListe(x).Schaltung(y, 0) And VerzweigungsDatei(i, 1) = "2" Then
+                                TmpBool = True
+                            End If
+                        Next
+                        If Not TmpBool Then
+                            FoundB = False
+                        End If
+                    End If
+
+                Next
+            Next
+        Next
+
+        'Übergabe
+        If FoundB = False Then
+            Throw New Exception(".VER und .CES Dateien passen nicht zusammen!")
+        Else
+            For i = 0 To FoundA.GetUpperBound(0)
+                If FoundA(i) = False Then
+                    Throw New Exception(".VER und .CES Dateien passen nicht zusammen!")
+                End If
+            Next
+        End If
+
+    End Sub
+
+#End Region 'Prüfung der Eingabedateien
+
+    'Methoden
+    '########
 
     'BlauesModell ausführen (simulieren)
     '***********************************
@@ -153,214 +391,6 @@ Public Class BlueM
     'Kombinatorik
     '############
 
-    'Kombinatorik einlesen
-    '*********************
-    Public Overrides Sub Read_CES()
-
-        Dim Datei As String = WorkDir & Datensatz & "." & Combi_Ext
-
-        Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
-        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-
-        Dim Zeile As String
-        Dim Anz As Integer = 0
-
-        'Anzahl der Parameter feststellen
-        Do
-            Zeile = StrRead.ReadLine.ToString()
-            If (Zeile.StartsWith("*") = False) Then
-                Anz += 1
-            End If
-        Loop Until StrRead.Peek() = -1
-
-        Dim i As Integer = -1
-        Dim j As Integer = 0
-        ReDim LocationList(0)
-        ReDim LocationList(0).MassnahmeListe(0)
-
-        'Zurück zum Dateianfang und lesen
-        FiStr.Seek(0, SeekOrigin.Begin)
-
-        Dim array() As String
-        Do
-            Zeile = StrRead.ReadLine.ToString()
-            If (Zeile.StartsWith("*") = False) Then
-                array = Zeile.Split("|")
-                'Werte zuweisen
-
-                If Not Is_Name_IN(array(1).Trim(), LocationList) Then
-                    i += 1
-                    j = 0
-                    System.Array.Resize(LocationList, i + 1)
-                    LocationList(i).Name = array(1).Trim()
-                End If
-                System.Array.Resize(LocationList(i).MassnahmeListe, j + 1)
-                ReDim LocationList(i).MassnahmeListe(j).Schaltung(2, 1)
-                ReDim LocationList(i).MassnahmeListe(j).Bauwerke(3)
-                LocationList(i).MassnahmeListe(j).Name = array(2).Trim()
-                LocationList(i).MassnahmeListe(j).Schaltung(0, 0) = array(3).Trim()
-                LocationList(i).MassnahmeListe(j).Schaltung(0, 1) = array(4).Trim()
-                LocationList(i).MassnahmeListe(j).Schaltung(1, 0) = array(5).Trim()
-                LocationList(i).MassnahmeListe(j).Schaltung(1, 1) = array(6).Trim()
-                LocationList(i).MassnahmeListe(j).Schaltung(2, 0) = array(7).Trim()
-                LocationList(i).MassnahmeListe(j).Schaltung(2, 1) = array(8).Trim()
-                LocationList(i).MassnahmeListe(j).KostenTyp = array(9).Trim()
-                LocationList(i).MassnahmeListe(j).Bauwerke(0) = array(10).Trim()
-                LocationList(i).MassnahmeListe(j).Bauwerke(1) = array(11).Trim()
-                LocationList(i).MassnahmeListe(j).Bauwerke(2) = array(12).Trim()
-                LocationList(i).MassnahmeListe(j).Bauwerke(3) = array(13).Trim()
-                j += 1
-            End If
-
-        Loop Until StrRead.Peek() = -1
-
-        StrRead.Close()
-        FiStr.Close()
-
-    End Sub
-
-    'Validierungsfunktion der Kombinatorik Prüft ob Verbraucher an zwei Standorten Dopp vorhanden sind
-    '*************************************************************************************************
-    Public Overrides Sub Combinatoric_is_Valid()
-
-        Dim i, j, x, y, m, n As Integer
-
-        For i = 0 To LocationList.GetUpperBound(0)
-            For j = 1 To LocationList.GetUpperBound(0)
-                For x = 0 To LocationList(i).MassnahmeListe.GetUpperBound(0)
-                    For y = 0 To LocationList(j).MassnahmeListe.GetUpperBound(0)
-                        For m = 0 To 2
-                            For n = 0 To 2
-                                If Not LocationList(i).MassnahmeListe(x).Schaltung(m, 0) = "X" And LocationList(j).MassnahmeListe(y).Schaltung(n, 0) = "X" Then
-                                    If LocationList(i).MassnahmeListe(x).Schaltung(m, 0) = LocationList(j).MassnahmeListe(y).Schaltung(n, 0) Then
-                                        Throw New Exception("Kombinatorik ist nicht valid!")
-                                    End If
-                                End If
-                            Next
-                        Next
-                    Next
-                Next
-            Next
-        Next
-    End Sub
-
-    'Liest die Verzweigungen aus dem BModel in ein Array ein
-    'Und Dimensioniert das Verzweigungsarray
-    '*******************************************************
-    Public Overrides Sub Verzweigung_Read()
-
-        Dim i As Integer
-
-        Dim FiStr As FileStream = New FileStream(WorkDir & Datensatz & ".ver", FileMode.Open, IO.FileAccess.ReadWrite)
-        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-
-        'Anzahl der Parameter feststellen
-        Dim Zeile As String
-        Dim Anz As Integer = 0
-
-        Do
-            Zeile = StrRead.ReadLine.ToString()
-            If (Zeile.StartsWith("*") = False) Then
-                Anz += 1
-            End If
-        Loop Until StrRead.Peek() = -1
-        ReDim VerzweigungsDatei(Anz - 1, 3)
-
-        'Zurück zum Dateianfang und lesen
-        FiStr.Seek(0, SeekOrigin.Begin)
-
-        'Einlesen der Zeile und übergeben an das Verzweidungsarray
-        Dim ZeilenArray() As String
-
-        Do
-            Zeile = StrRead.ReadLine.ToString()
-            If (Zeile.StartsWith("*") = False) Then
-                ZeilenArray = Zeile.Split("|")
-                'Verbraucher Array füllen
-                VerzweigungsDatei(i, 0) = ZeilenArray(1).Trim
-                VerzweigungsDatei(i, 1) = ZeilenArray(2).Trim
-                VerzweigungsDatei(i, 2) = ZeilenArray(3).Trim
-                VerzweigungsDatei(i, 3) = ZeilenArray(4).Trim
-                i += 1
-            End If
-
-        Loop Until StrRead.Peek() = -1
-
-        StrRead.Close()
-        FiStr.Close()
-
-        'Hier wird das Verzweigungsarray Dimensioniert
-        ReDim VER_ONOFF(VerzweigungsDatei.GetUpperBound(0), 1)
-
-    End Sub
-
-    'Mehrere Prüfungen ob die .VER Datei des BlueM und der .CES Datei auch zusammenpassen
-    '************************************************************************************
-    Public Overrides Sub CES_fits_to_VER()
-
-        Dim i As Integer = 0
-        Dim j As Integer = 0
-        Dim x As Integer = 0
-        Dim y As Integer = 0
-
-        Dim FoundA(VerzweigungsDatei.GetUpperBound(0)) As Boolean
-
-        'Prüft ob jede Verzweigung einmal in der LocationList vorkommt
-        For i = 0 To VerzweigungsDatei.GetUpperBound(0)
-            For j = 0 To LocationList.GetUpperBound(0)
-                For x = 0 To LocationList(j).MassnahmeListe.GetUpperBound(0)
-                    For y = 0 To LocationList(j).MassnahmeListe(x).Schaltung.GetUpperBound(0)
-                        If VerzweigungsDatei(i, 0) = LocationList(j).MassnahmeListe(x).Schaltung(y, 0) And VerzweigungsDatei(i, 1) = "2" Then
-                            FoundA(i) = True
-                        End If
-                    Next
-                Next
-            Next
-        Next
-
-        'Prüft ob die nicht vorkommenden Verzweigungen Verzweigungen anderer Art sind
-        For i = 0 To VerzweigungsDatei.GetUpperBound(0)
-            If Not VerzweigungsDatei(i, 1) = "2" And FoundA(i) = False Then
-                FoundA(i) = True
-            End If
-        Next
-
-        Dim FoundB As Boolean = True
-        Dim TmpBool As Boolean = False
-
-        'Prüft ob alle in der LocationList Vorkommenden Verzweigungen auch in der Verzweigungsdatei sind
-        For j = 0 To LocationList.GetUpperBound(0)
-            For x = 0 To LocationList(j).MassnahmeListe.GetUpperBound(0)
-                For y = 0 To LocationList(j).MassnahmeListe(x).Schaltung.GetUpperBound(0)
-                    If Not LocationList(j).MassnahmeListe(x).Schaltung(y, 0) = "X" Then
-                        TmpBool = False
-                        For i = 0 To VerzweigungsDatei.GetUpperBound(0)
-                            If VerzweigungsDatei(i, 0) = LocationList(j).MassnahmeListe(x).Schaltung(y, 0) And VerzweigungsDatei(i, 1) = "2" Then
-                                TmpBool = True
-                            End If
-                        Next
-                        If Not TmpBool Then
-                            FoundB = False
-                        End If
-                    End If
-
-                Next
-            Next
-        Next
-
-        'Übergabe
-        If FoundB = False Then
-            Throw New Exception(".VER und .CES Dateien passen nicht zusammen!")
-        Else
-            For i = 0 To FoundA.GetUpperBound(0)
-                If FoundA(i) = False Then
-                    Throw New Exception(".VER und .CES Dateien passen nicht zusammen!")
-                End If
-            Next
-        End If
-
-    End Sub
-
     'Die Liste mit den aktuellen Bauwerken des Kindes wird erstellt und in SKos geschrieben
     '**************************************************************************************
     Public Overrides Sub Define_aktuelle_Bauwerke(ByVal Path() As Integer)
@@ -404,7 +434,7 @@ Public Class BlueM
 
     'Schreibt die neuen Verzweigungen
     '********************************
-    Public Overrides Sub Verzweigung_Write()
+    Public Overrides Sub Write_Verzweigungen()
 
         Dim AnzZeil As Integer
         Dim i, j As Integer
@@ -470,33 +500,6 @@ Public Class BlueM
 
 #End Region 'Kombinatorik
 
-#Region "IHA"
-
-    'IHA
-    '###
-
-    'Optimierungsziele einlesen
-    '**************************
-    Public Overrides Sub Read_OptZiele()
-
-        Call MyBase.Read_OptZiele()
-
-        'Weiterverarbeitung von ZielReihen:
-        '----------------------------------
-        Dim i As Integer
-
-        'IHA
-        For i = 0 To Me.OptZieleListe.GetUpperBound(0)
-            If (Me.OptZieleListe(i).ZielTyp = "IHA") Then
-                'IHA-Berechnung vorbereiten
-                Call Me.IHA1.IHA_prepare(Me)
-                Exit For
-            End If
-        Next
-
-    End Sub
-
-#End Region
 
     'Hilfs Funktionen
     'XXXXXXXXXXXXXXXX
