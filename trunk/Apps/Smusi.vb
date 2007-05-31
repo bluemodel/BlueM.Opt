@@ -34,7 +34,7 @@ Public Class Smusi
 
     'Simulationsparameter einlesen
     '*****************************
-    Protected Overrides Sub SimParameter_einlesen()
+    Public Overrides Sub Read_SimParameter()
 
         Dim SimStart_str As String = ""
         Dim SimEnde_str As String = ""

@@ -138,10 +138,6 @@ Partial Class Form1
                     'Testprobleme deaktivieren
                     Testprobleme1.Enabled = False
 
-                    'BM-Einstellungen initialisieren 
-                    Call Sim1.Sim_Ini()
-
-
                 Case ANW_SMUSI 'Anwendung Smusi
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
@@ -156,10 +152,6 @@ Partial Class Form1
 
                     'Testprobleme deaktivieren
                     Testprobleme1.Enabled = False
-
-                    'Smusi-Einstellungen initialisieren 
-                    Call Sim1.Sim_Ini()
-
 
                 Case ANW_TESTPROBLEME 'Anwendung Testprobleme
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -281,6 +273,20 @@ Partial Class Form1
                 Case METH_PES 'Methode PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
+                    'Erforderliche Dateien werden eingelesen und DB vorbereitet
+                    'Zielfunktionen einlesen
+                    Call Sim1.Read_OptZiele()
+                    'Optimierungsparameter einlesen
+                    Call Sim1.Read_OptParameter()
+                    'ModellParameter einlesen
+                    Call Sim1.Read_ModellParameter()
+                    'Simulationsdaten einlesen der Modelle
+                    Call Sim1.Read_SimParameter()
+                    'Datenbank vorbereiten
+                    If Sim1.Ergebnisdb = True Then
+                        Call Sim1.db_prepare()
+                    End If
+
                     'EVO_Einstellungen aktivieren
                     EVO_Einstellungen1.Enabled = True
 
@@ -298,9 +304,15 @@ Partial Class Form1
                 Case METH_CES 'Methode CES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
+                    'Erforderliche Dateien werden eingelesen
+                    'Zielfunktionen einlesen
+                    Call Sim1.Read_OptZiele()
+                    'Kombinatorik Datei einlesen
+                    Call Sim1.Read_CES()
+
                     'Funktioniert nur bei BlueM!
                     If (Not Anwendung = ANW_BLUEM) Then
-                        Throw New Exception("CES funktioniert nur mit BlueM!")
+                        Throw New Exception("CES funktioniert bisher nur mit BlueM!")
                     End If
 
                     CES1 = New EvoKern.CES
@@ -317,9 +329,6 @@ Partial Class Form1
                     ElseIf (Sim1.OptZieleListe.GetLength(0) > 1) Then
                         EVO_Einstellungen1.OptModus = 1
                     End If
-
-                    'Einlesen der CombiOpt Datei
-                    Call Sim1.Read_CES()
 
                     'Überprüfen der Kombinatorik
                     Call Sim1.Combinatoric_is_Valid()
@@ -343,6 +352,59 @@ Partial Class Form1
                     Next
 
                 Case METH_CES_PES 'Methode CES + PES
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'Erforderliche Dateien werden eingelesen
+                    'Zielfunktionen einlesen
+                    Call Sim1.Read_OptZiele()
+                    'Optimierungsparameter einlesen
+                    Call Sim1.Read_OptParameter()
+                    'ModellParameter einlesen
+                    Call Sim1.Read_ModellParameter()
+                    'Kombinatorik Datei einlesen
+                    Call Sim1.Read_CES()
+
+                    'Funktioniert nur bei BlueM!
+                    If (Not Anwendung = ANW_BLUEM) Then
+                        Throw New Exception("CES funktioniert bisher nur mit BlueM!")
+                    End If
+
+                    CES1 = New EvoKern.CES
+
+                    'EVO_Einstellungen deaktiviern
+                    EVO_Einstellungen1.Enabled = True
+
+                    'Ergebnisdatenbank ausschalten
+                    Sim1.Ergebnisdb = False
+
+                    'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
+                    If (Sim1.OptZieleListe.GetLength(0) = 1) Then
+                        EVO_Einstellungen1.OptModus = 0
+                    ElseIf (Sim1.OptZieleListe.GetLength(0) > 1) Then
+                        EVO_Einstellungen1.OptModus = 1
+                    End If
+
+                    'Überprüfen der Kombinatorik
+                    Call Sim1.Combinatoric_is_Valid()
+
+                    'Einlesen der Verbraucher Datei
+                    Call Sim1.Verzweigung_Read()
+
+                    'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
+                    Call Sim1.CES_fits_to_VER()
+
+                    'Anzahl der Ziele, Locations und Verzeigungen wird an CES übergeben
+                    CES1.n_Penalty = Sim1.OptZieleListe.GetLength(0)
+                    CES1.n_Location = Sim1.LocationList.GetLength(0)
+                    CES1.n_Verzweig = Sim1.VerzweigungsDatei.GetLength(0)
+
+                    'Gibt die PathSize an für jede Pfadstelle
+                    Dim i As Integer
+                    ReDim CES1.n_PathDimension(CES1.n_Location - 1)
+                    For i = 0 To CES1.n_Location - 1
+                        CES1.n_PathDimension(i) = Sim1.LocationList(i).MassnahmeListe.GetLength(0)
+                    Next
+
 
             End Select
 

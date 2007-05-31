@@ -38,11 +38,11 @@ Public Class BlueM
 
     'Simulationsparameter einlesen
     '*****************************
-    Protected Overrides Sub SimParameter_einlesen()
+    Public Overrides Sub Read_SimParameter()
 
         Dim SimStart_str As String = ""
         Dim SimEnde_str As String = ""
-        Dim SimDT_str as String = ""
+        Dim SimDT_str As String = ""
 
         'ALL-Datei öffnen
         '----------------
@@ -477,9 +477,9 @@ Public Class BlueM
 
     'Optimierungsziele einlesen
     '**************************
-    Protected Overrides Sub OptZiele_einlesen()
+    Public Overrides Sub Read_OptZiele()
 
-        Call MyBase.OptZiele_einlesen()
+        Call MyBase.Read_OptZiele()
 
         'Weiterverarbeitung von ZielReihen:
         '----------------------------------
