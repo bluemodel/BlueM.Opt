@@ -37,7 +37,7 @@ Public Class BlueM
 
     'Kombinatorik einlesen
     '*********************
-    Public Overrides Sub Read_Kombinatorik()
+    Protected Overrides Sub Read_Kombinatorik()
 
         Dim Datei As String = WorkDir & Datensatz & "." & Combi_Ext
 
@@ -103,7 +103,7 @@ Public Class BlueM
 
     'Simulationsparameter einlesen
     '*****************************
-    Public Overrides Sub Read_SimParameter()
+    Protected Overrides Sub Read_SimParameter()
 
         Dim SimStart_str As String = ""
         Dim SimEnde_str As String = ""
@@ -146,7 +146,7 @@ Public Class BlueM
     'Liest die Verzweigungen aus dem BModel in ein Array ein
     'Und Dimensioniert das Verzweigungsarray
     '*******************************************************
-    Public Overrides Sub Read_Verzweigungen()
+    Protected Overrides Sub Read_Verzweigungen()
 
         Dim i As Integer
 
@@ -195,7 +195,7 @@ Public Class BlueM
 
     'Optimierungsziele einlesen
     '**************************
-    Public Overrides Sub Read_OptZiele()
+    Protected Overrides Sub Read_OptZiele()
 
         Call MyBase.Read_OptZiele()
 

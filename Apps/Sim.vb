@@ -144,22 +144,56 @@ Public MustInherit Class Sim
 
 #Region "Eingabedateien lesen"
 
+    'PES vorbereiten
+    'Erforderliche Dateien werden eingelesen und DB vorbereitet
+    '**********************************************************
+    Public Sub prepare_Sim_PES()
+        
+        'Simulationsdaten einlesen
+        Call Me.Read_SimParameter()
+        'Zielfunktionen einlesen
+        Call Me.Read_OptZiele()
+        'Optimierungsparameter einlesen
+        Call Me.Read_OptParameter()
+        'ModellParameter einlesen
+        Call Me.Read_ModellParameter()
+        'Datenbank vorbereiten
+        If Me.Ergebnisdb = True Then
+            Call Me.db_prepare()
+        End If
+
+    End Sub
+
+    'CES vorbereiten
+    'Erforderliche Dateien werden eingelesen
+    '***************************************
+    Public Sub prepare_Sim_CES()
+
+        'Zielfunktionen einlesen
+        Call Me.Read_OptZiele()
+        'Kombinatorik Datei einlesen
+        Call Me.Read_Kombinatorik()
+        'Verzweigungs Datei einlesen
+        Call Me.Read_Verzweigungen()
+
+    End Sub
+
     'Simulationsparameter einlesen
     '*****************************
-    Public MustOverride Sub Read_SimParameter()
+    Protected MustOverride Sub Read_SimParameter()
 
     'Kombinatorik einlesen
     '*********************
-    Public MustOverride Sub Read_Kombinatorik()
+    Protected MustOverride Sub Read_Kombinatorik()
 
     'Liest die Verzweigungen aus dem BModel in ein Array ein
     'Und Dimensioniert das Verzweigungsarray
     '*******************************************************
-    Public MustOverride Sub Read_Verzweigungen()
+    Protected MustOverride Sub Read_Verzweigungen()
 
     'Optimierungsparameter einlesen
     '******************************
-    Public Sub Read_OptParameter()
+    Private Sub Read_OptParameter()
 
         Dim Datei As String = WorkDir & Datensatz & "." & OptParameter_Ext
 
@@ -205,7 +239,7 @@ Public MustInherit Class Sim
 
     'Modellparameter einlesen
     '************************
-    Public Sub Read_ModellParameter()
+    Private Sub Read_ModellParameter()
 
         Dim Datei As String = WorkDir & Datensatz & "." & ModParameter_Ext
 
@@ -254,7 +288,7 @@ Public MustInherit Class Sim
 
     'Optimierungsziele einlesen
     '**************************
-    Public Overridable Sub Read_OptZiele()
+    Protected Overridable Sub Read_OptZiele()
         Dim AnzZiele As Integer = 0
         Dim IsOK As Boolean
         Dim ext As String
@@ -1002,7 +1036,7 @@ Public MustInherit Class Sim
 
     'Ergebnisdatenbank vorbereiten
     '*****************************
-    Public Sub db_prepare()
+    Private Sub db_prepare()
 
         'Leere/Neue Ergebnisdatenbank in Arbeitsverzeichnis kopieren
         '-----------------------------------------------------------

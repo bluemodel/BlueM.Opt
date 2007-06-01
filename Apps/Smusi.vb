@@ -34,7 +34,7 @@ Public Class Smusi
 
     'Simulationsparameter einlesen
     '*****************************
-    Public Overrides Sub Read_SimParameter()
+    Protected Overrides Sub Read_SimParameter()
 
         Dim SimStart_str As String = ""
         Dim SimEnde_str As String = ""
@@ -140,7 +140,7 @@ Public Class Smusi
 
     'Kombinatorik einlesen
     '*********************
-    Public Overrides Sub Read_Kombinatorik()
+    Protected Overrides Sub Read_Kombinatorik()
 
     End Sub
 
@@ -153,7 +153,7 @@ Public Class Smusi
     'Liest die Verzweigungen aus dem BModel in ein Array ein
     'Und Dimensioniert das Verzweigungsarray
     '*******************************************************
-    Public Overrides Sub Read_Verzweigungen()
+    Protected Overrides Sub Read_Verzweigungen()
 
     End Sub
 

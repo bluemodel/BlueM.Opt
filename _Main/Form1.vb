@@ -270,25 +270,15 @@ Partial Class Form1
                         Exit Sub
                     End If
 
+
                 Case METH_PES 'Methode PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'Erforderliche Dateien werden eingelesen und DB vorbereitet
-                    'Zielfunktionen einlesen
-                    Call Sim1.Read_OptZiele()
-                    'Optimierungsparameter einlesen
-                    Call Sim1.Read_OptParameter()
-                    'ModellParameter einlesen
-                    Call Sim1.Read_ModellParameter()
-                    'Simulationsdaten einlesen der Modelle
-                    Call Sim1.Read_SimParameter()
-                    'Datenbank vorbereiten
-                    If Sim1.Ergebnisdb = True Then
-                        Call Sim1.db_prepare()
-                    End If
-
                     'EVO_Einstellungen aktivieren
                     EVO_Einstellungen1.Enabled = True
+
+                    'PES für Sim vorbereiten
+                    Call Sim1.prepare_Sim_PES()
 
                     'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
                     If (Sim1.OptZieleListe.GetLength(0) = 1) Then
@@ -300,28 +290,25 @@ Partial Class Form1
                     'Parameterübergabe an ES
                     Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
 
+
                 Case METH_CES 'Methode CES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                    'Erforderliche Dateien werden eingelesen
-                    'Zielfunktionen einlesen
-                    Call Sim1.Read_OptZiele()
-                    'Kombinatorik Datei einlesen
-                    Call Sim1.Read_Kombinatorik()
-                    'Verzweigungs Datei einlesen
-                    Call Sim1.Read_Verzweigungen()
 
                     'Funktioniert nur bei BlueM!
                     If (Not Anwendung = ANW_BLUEM) Then
                         Throw New Exception("CES funktioniert bisher nur mit BlueM!")
                     End If
 
-                    CES1 = New EvoKern.CES
-
                     'EVO_Einstellungen deaktiviern
                     EVO_Einstellungen1.Enabled = False
+
                     'Ergebnisdatenbank ausschalten
                     Sim1.Ergebnisdb = False
+
+                    'CES für Sim vorbereiten
+                    Call Sim1.prepare_Sim_CES()
+
+                    CES1 = New EvoKern.CES
 
                     'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
                     If (Sim1.OptZieleListe.GetLength(0) = 1) Then
@@ -351,29 +338,22 @@ Partial Class Form1
                 Case METH_CES_PES 'Methode CES + PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'Erforderliche Dateien werden eingelesen
-                    'Zielfunktionen einlesen
-                    Call Sim1.Read_OptZiele()
-                    'Optimierungsparameter einlesen
-                    Call Sim1.Read_OptParameter()
-                    'ModellParameter einlesen
-                    Call Sim1.Read_ModellParameter()
-                    'Kombinatorik Datei einlesen
-                    Call Sim1.Read_Kombinatorik()
-                    'Verzweigungs Datei einlesen
-                    Call Sim1.Read_Verzweigungen()
-
                     'Funktioniert nur bei BlueM!
                     If (Not Anwendung = ANW_BLUEM) Then
                         Throw New Exception("CES funktioniert bisher nur mit BlueM!")
                     End If
 
-                    CES1 = New EvoKern.CES
-
-                    'EVO_Einstellungen deaktiviern
+                    'EVO_Einstellungen aktiviern
                     EVO_Einstellungen1.Enabled = True
+
                     'Ergebnisdatenbank ausschalten
                     Sim1.Ergebnisdb = False
+
+                    'CES + PES für Sim vorbereiten
+                    Call Sim1.prepare_Sim_PES()
+                    Call Sim1.prepare_Sim_CES()
+
+                    CES1 = New EvoKern.CES
 
                     'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
                     If (Sim1.OptZieleListe.GetLength(0) = 1) Then
