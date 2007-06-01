@@ -627,6 +627,7 @@ Public MustInherit Class Sim
 
             'Zeile ändern
             Zeile = Zeilenarray(ModellParameterListe(i).ZeileNr - 1)
+            'BUG 120: richtig wäre: Length = SpBis - SpVon + 1
             Dim Length As Short = ModellParameterListe(i).SpBis - ModellParameterListe(i).SpVon
             StrLeft = Microsoft.VisualBasic.Left(Zeile, ModellParameterListe(i).SpVon - 1)
             StrRight = Microsoft.VisualBasic.Right(Zeile, Len(Zeile) - ModellParameterListe(i).SpBis + 1)
