@@ -129,11 +129,8 @@ Partial Class Form1
                     'Objekt der Klasse BlueM initialisieren
                     Sim1 = New Apps.BlueM
 
-                    'Dezimaltrennzeichen überprüfen
-                    Call Sim1.checkDezimaltrennzeichen()
-
-                    'EVO.ini Datei einlesen
-                    Call Sim1.ReadEVOIni()
+                    'Initialisieren
+                    Call Sim1.SimIni()
 
                     'Testprobleme deaktivieren
                     Testprobleme1.Enabled = False
@@ -145,11 +142,8 @@ Partial Class Form1
                     'Objekt der Klasse BlueM initialisieren
                     Sim1 = New Apps.Smusi
 
-                    'Dezimaltrennzeichen überprüfen
-                    Call Sim1.checkDezimaltrennzeichen()
-
-                    'EVO.ini Datei einlesen
-                    Call Sim1.ReadEVOIni()
+                    'Initialisieren
+                    Call Sim1.SimIni()
 
                     'Testprobleme deaktivieren
                     Testprobleme1.Enabled = False

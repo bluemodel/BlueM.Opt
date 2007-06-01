@@ -145,6 +145,18 @@ Public MustInherit Class Sim
 
 #Region "Initialisierung"
 
+    'Bündelung von Initialisierungsfunktionen
+    '****************************************
+    Public Sub SimIni()
+
+        'Dezimaltrennzeichen überprüfen
+        Call Me.checkDezimaltrennzeichen()
+
+        'EVO.ini Datei einlesen
+        Call Me.ReadEVOIni()
+
+    End Sub
+
     'Überprüfen, ob Punkt als Dezimaltrennzeichen eingestellt ist
     '***********************************************************
     Public Sub checkDezimaltrennzeichen()
