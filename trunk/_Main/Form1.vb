@@ -251,6 +251,9 @@ Partial Class Form1
                     'Ergebnisdatenbank ausschalten
                     Sim1.Ergebnisdb = False
 
+                    'SensiPlot für Sim vorbereiten
+                    Call Sim1.prepare_Sim_PES()
+
                     'SensiPlot Dialog anzeigen:
                     '--------------------------
                     'List_Boxen füllen

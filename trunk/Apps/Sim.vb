@@ -144,11 +144,11 @@ Public MustInherit Class Sim
 
 #Region "Eingabedateien lesen"
 
-    'PES vorbereiten
+    'PES vorbereiten (auch für SensiPlot)
     'Erforderliche Dateien werden eingelesen und DB vorbereitet
     '**********************************************************
     Public Sub prepare_Sim_PES()
-        
+
         'Simulationsdaten einlesen
         Call Me.Read_SimParameter()
         'Zielfunktionen einlesen
