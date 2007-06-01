@@ -517,8 +517,7 @@ Partial Class Form1
             DForm.Diag.Series(0).Add(Sim1.OptZieleListe(SensiPlot1.Selected_OptZiel).QWertTmp, Sim1.OptParameterListe(SensiPlot1.Selected_OptParameter).Wert, "")
 
             'Speichern des Simulationsergebnisses für Wave
-            'TODO
-            'Wave1.WaveList(i).Bezeichnung = SensiPlot1.Selected_OptZiel.SimGr & "(Sim " & i & ")"
+            'BUG 119: Die WEL-Datei hat bei Smusi einen anderen Namen!
             Apps.Sim.Read_WEL(Sim1.WorkDir & Sim1.Datensatz & ".wel", Sim1.OptZieleListe(SensiPlot1.Selected_OptZiel).SimGr, Wave1.WaveList(i).Wave)
 
             durchlauf += 1
