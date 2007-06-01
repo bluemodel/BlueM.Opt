@@ -463,6 +463,8 @@ Partial Class Form1
     '****************
     Private Sub changeDatensatz(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles LinkLabel_WorkDir.LinkClicked
 
+        'Aktuelles Verzeichnis auslesen
+        Dim currentDir As String = CurDir()
         'Alten Datensatz dem Dialog zuweisen
         OpenFileDialog_Datensatz.FileName = Sim1.WorkDir & Sim1.Datensatz & ".ALL"
         'Dialog öffnen
@@ -471,6 +473,10 @@ Partial Class Form1
         If (DatensatzResult = Windows.Forms.DialogResult.OK) Then
             Call saveDatensatz(OpenFileDialog_Datensatz.FileName)
         End If
+        'Wieder ins Standardverzeichnis zurückwechseln
+        ChDir(currentDir)
+        'Startbutton deaktivieren (Der Benutzer muss zuerst Ini neu ausführen!)
+        Me.Button_Start.Enabled = False
 
     End Sub
 
