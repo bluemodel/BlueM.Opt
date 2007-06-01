@@ -29,6 +29,7 @@ Public MustInherit Class Sim
     '-----------------------
     Public Datensatz As String                           'Name des zu simulierenden Datensatzes
     Public WorkDir As String                             'Arbeitsverzeichnis für das Blaue Modell
+    Public Event WorkDirChange                           'Event für Änderung des Arbeitsverzeichnisses
     Public Exe As String                                 'Pfad zur EXE für die Simulation
     Public Ergebnisdb As Boolean = True                  'Gibt an, ob die Ergebnisdatenbank geschrieben werden soll
     Public SimStart As DateTime                          'Anfangsdatum der Simulation
@@ -141,6 +142,94 @@ Public MustInherit Class Sim
 
     'Methoden
     '########
+
+#Region "Initialisierung"
+
+    'Überprüfen, ob Punkt als Dezimaltrennzeichen eingestellt ist
+    '***********************************************************
+    Public Sub checkDezimaltrennzeichen()
+
+        Dim ci As System.Globalization.CultureInfo
+        Dim nfi As System.Globalization.NumberFormatInfo
+
+        'Aktuelle Einstellungen lesen
+        ci = System.Globalization.CultureInfo.CurrentCulture
+        nfi = ci.NumberFormat
+
+        'Dezimaltrennzeichen überprüfen
+        If (Not nfi.NumberDecimalSeparator = ".") Then
+            Throw New Exception("Um mit BlueM oder SMUSI arbeiten zu können, muss in der Systemsteuerung" & Chr(13) & Chr(10) & "als Dezimaltrennzeichen Punkt (.) eingestellt sein!")
+        End If
+
+    End Sub
+
+    'EVO.ini Datei einlesen 
+    '**********************
+    Public Sub ReadEVOIni()
+
+        'Einschränkung:
+        '------------------------------------------------------------
+        'Geht davon aus, dass das aktuelle Verzeichnis _Main\bin ist!
+        '------------------------------------------------------------
+
+        If File.Exists("EVO.ini") Then
+
+            'Datei einlesen
+            Dim FiStr As FileStream = New FileStream("EVO.ini", FileMode.Open, IO.FileAccess.Read)
+            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+            Dim Configs(9, 1) As String
+            Dim Line As String
+            Dim Pairs() As String
+            Dim i As Integer = 0
+            Do
+                Line = StrRead.ReadLine.ToString()
+                If (Line.StartsWith("[") = False And Line.StartsWith(";") = False) Then
+                    Pairs = Line.Split("=")
+                    Configs(i, 0) = Pairs(0)
+                    Configs(i, 1) = Pairs(1)
+                    i += 1
+                End If
+            Loop Until StrRead.Peek() = -1
+
+            StrRead.Close()
+            FiStr.Close()
+
+            'Default-Werte setzen
+            For i = 0 To Configs.GetUpperBound(0)
+                Select Case Configs(i, 0)
+                    Case "Exe"
+                        Me.Exe = Configs(i, 1)
+                    Case "Datensatz"
+                        Call Me.saveDatensatz(Configs(i, 1))
+                    Case Else
+                        'weitere Voreinstellungen
+                End Select
+            Next
+
+        Else
+            'Datei EVO.ini existiert nicht
+            Throw New Exception("Die Datei ""EVO.ini"" konnte nicht gefunden werden!" & Chr(13) & Chr(10) & "Bitte gemäß Dokumentation eine Datei ""EVO.ini"" erstellen.")
+        End If
+
+    End Sub
+
+    'Pfad zum Datensatz verarbeiten und speichern
+    '********************************************
+    Public Sub saveDatensatz(ByVal Pfad As String)
+
+        'Dateiname vom Ende abtrennen
+        Me.Datensatz = Pfad.Substring(Pfad.LastIndexOf("\") + 1)
+        'Dateiendung entfernen
+        Me.Datensatz = Me.Datensatz.Substring(0, Me.Datensatz.Length - 4)
+        'Arbeitsverzeichnis bestimmen
+        Me.WorkDir = Pfad.Substring(0, Pfad.LastIndexOf("\") + 1)
+        'Event auslösen (wird von Form1.displayWorkDir() verarbeitet)
+        RaiseEvent WorkDirChange()
+
+    End Sub
+
+#End Region 'Initialisierung
 
 #Region "Eingabedateien lesen"
 
