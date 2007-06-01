@@ -37,9 +37,10 @@ Partial Class Form1
         Me.ComboBox_Methode = New System.Windows.Forms.ComboBox
         Me.Label_Anwendung = New System.Windows.Forms.Label
         Me.ComboBox_Anwendung = New System.Windows.Forms.ComboBox
-        Me.Testprobleme1 = New Apps.Testprobleme
         Me.EVO_Opt_Verlauf1 = New EvoForm.EVO_Opt_Verlauf
         Me.EVO_Einstellungen1 = New EvoForm.EVO_Einstellungen
+        Me.Testprobleme1 = New Apps.Testprobleme
+        Me.OpenFileDialog_Datensatz = New System.Windows.Forms.OpenFileDialog
         Me.DForm = New Main.DiagrammForm
         Me.GroupBox_Anwendung.SuspendLayout()
         Me.SuspendLayout()
@@ -66,18 +67,19 @@ Partial Class Form1
         Me.Button_IniApp.Size = New System.Drawing.Size(35, 21)
         Me.Button_IniApp.TabIndex = 1
         Me.Button_IniApp.Text = "Ini"
-        Me.ToolTip1.SetToolTip(Me.Button_IniApp, "Anwendung initialisieren")
+        Me.ToolTip1.SetToolTip(Me.Button_IniApp, "Initialisieren")
         Me.Button_IniApp.UseVisualStyleBackColor = True
         '
         'LinkLabel_WorkDir
         '
         Me.LinkLabel_WorkDir.AutoSize = True
+        Me.LinkLabel_WorkDir.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.LinkLabel_WorkDir.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline
         Me.LinkLabel_WorkDir.Location = New System.Drawing.Point(406, 23)
         Me.LinkLabel_WorkDir.Name = "LinkLabel_WorkDir"
         Me.LinkLabel_WorkDir.Size = New System.Drawing.Size(0, 13)
         Me.LinkLabel_WorkDir.TabIndex = 9
-        Me.ToolTip1.SetToolTip(Me.LinkLabel_WorkDir, "Ordner öffnen")
+        Me.ToolTip1.SetToolTip(Me.LinkLabel_WorkDir, "Datensatz ändern")
         '
         'GroupBox_Anwendung
         '
@@ -134,13 +136,6 @@ Partial Class Form1
         Me.ComboBox_Anwendung.Size = New System.Drawing.Size(124, 21)
         Me.ComboBox_Anwendung.TabIndex = 0
         '
-        'Testprobleme1
-        '
-        Me.Testprobleme1.Location = New System.Drawing.Point(8, 68)
-        Me.Testprobleme1.Name = "Testprobleme1"
-        Me.Testprobleme1.Size = New System.Drawing.Size(225, 121)
-        Me.Testprobleme1.TabIndex = 7
-        '
         'EVO_Opt_Verlauf1
         '
         Me.EVO_Opt_Verlauf1.Location = New System.Drawing.Point(233, 698)
@@ -159,6 +154,19 @@ Partial Class Form1
         Me.EVO_Einstellungen1.OptModus = CType(0, Short)
         Me.EVO_Einstellungen1.Size = New System.Drawing.Size(225, 585)
         Me.EVO_Einstellungen1.TabIndex = 2
+        '
+        'Testprobleme1
+        '
+        Me.Testprobleme1.Location = New System.Drawing.Point(8, 68)
+        Me.Testprobleme1.Name = "Testprobleme1"
+        Me.Testprobleme1.Size = New System.Drawing.Size(225, 121)
+        Me.Testprobleme1.TabIndex = 7
+        '
+        'OpenFileDialog_Datensatz
+        '
+        Me.OpenFileDialog_Datensatz.DefaultExt = "ALL"
+        Me.OpenFileDialog_Datensatz.Filter = "ALL-Dateien (*.ALL)|*.ALL"
+        Me.OpenFileDialog_Datensatz.Title = "Datensatz auswählen"
         '
         'DForm
         '
@@ -198,4 +206,5 @@ Partial Class Form1
     Friend WithEvents LinkLabel_WorkDir As System.Windows.Forms.LinkLabel
     Friend WithEvents ComboBox_Methode As System.Windows.Forms.ComboBox
     Friend WithEvents Label_Methode As System.Windows.Forms.Label
+    Friend WithEvents OpenFileDialog_Datensatz As System.Windows.Forms.OpenFileDialog
 End Class

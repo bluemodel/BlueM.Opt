@@ -428,20 +428,11 @@ Partial Class Form1
                     Case "Exe"
                         Sim1.Exe = Configs(i, 1)
                     Case "Datensatz"
-                        'Dateiname vom Ende abtrennen
-                        Sim1.Datensatz = Configs(i, 1).Substring(Configs(i, 1).LastIndexOf("\") + 1)
-                        'Dateiendung entfernen
-                        Sim1.Datensatz = Sim1.Datensatz.Substring(0, Sim1.Datensatz.Length - 4)
-                        'Arbeitsverzeichnis bestimmen
-                        Sim1.WorkDir = Configs(i, 1).Substring(0, Configs(i, 1).LastIndexOf("\") + 1)
+                        Call saveDatensatz(Configs(i, 1))
                     Case Else
                         'weitere Voreinstellungen
                 End Select
             Next
-
-            'Datensatzanzeige aktualisieren
-            Me.LinkLabel_WorkDir.Text = Sim1.WorkDir & Sim1.Datensatz & ".ALL"
-            Me.LinkLabel_WorkDir.Links(0).LinkData = Sim1.WorkDir
 
         Else
             'Datei EVO.ini existiert nicht
@@ -451,13 +442,39 @@ Partial Class Form1
 
     End Sub
 
-    'Klick auf Datensatzanzeige
-    '**************************
-    Private Sub LinkLabel_WorkDir_LinkClicked( ByVal sender As System.Object,  ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles LinkLabel_WorkDir.LinkClicked
-        System.Diagnostics.Process.Start(Me.LinkLabel_WorkDir.Links(0).LinkData)
+    'Pfad zum Datensatz verarbeiten und speichern
+    '********************************************
+    Private Sub saveDatensatz(ByVal Pfad As String)
+
+        'Dateiname vom Ende abtrennen
+        Sim1.Datensatz = Pfad.Substring(Pfad.LastIndexOf("\") + 1)
+        'Dateiendung entfernen
+        Sim1.Datensatz = Sim1.Datensatz.Substring(0, Sim1.Datensatz.Length - 4)
+        'Arbeitsverzeichnis bestimmen
+        Sim1.WorkDir = Pfad.Substring(0, Pfad.LastIndexOf("\") + 1)
+
+        'Datensatzanzeige aktualisieren
+        Me.LinkLabel_WorkDir.Text = Sim1.WorkDir & Sim1.Datensatz & ".ALL"
+        Me.LinkLabel_WorkDir.Links(0).LinkData = Sim1.WorkDir
+
     End Sub
 
-#End Region
+    'Datensatz ändern
+    '****************
+    Private Sub changeDatensatz(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles LinkLabel_WorkDir.LinkClicked
+
+        'Alten Datensatz dem Dialog zuweisen
+        OpenFileDialog_Datensatz.FileName = Sim1.WorkDir & Sim1.Datensatz & ".ALL"
+        'Dialog öffnen
+        Dim DatensatzResult As DialogResult = OpenFileDialog_Datensatz.ShowDialog()
+        'Neuen Datensatz speichern
+        If (DatensatzResult = Windows.Forms.DialogResult.OK) Then
+            Call saveDatensatz(OpenFileDialog_Datensatz.FileName)
+        End If
+
+    End Sub
+
+#End Region 'Initialisierung der Anwendungen
 
 #Region "Start Button Pressed"
 
