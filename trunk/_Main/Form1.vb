@@ -40,7 +40,7 @@ Partial Class Form1
     Private Const METH_SENSIPLOT As String = "SensiPlot"
 
     '**** Deklarationen der Module *****
-    Public Sim1 As Apps.Sim
+    Public WithEvents Sim1 As Apps.Sim
     Public SensiPlot1 As Apps.SensiPlot
     Public CES1 As EvoKern.CES
     Public TSP1 As Apps.TSP
@@ -129,14 +129,15 @@ Partial Class Form1
                     'Objekt der Klasse BlueM initialisieren
                     Sim1 = New Apps.BlueM
 
-                    'eingestelltes Dezimaltrennzeichen überprüfen
-                    Call CheckDezimaltrennzeichen()
-                    
-                    'Voreinstellungen lesen EVO.INI
-                    Call ReadEVOIni()
+                    'Dezimaltrennzeichen überprüfen
+                    Call Sim1.checkDezimaltrennzeichen()
+
+                    'EVO.ini Datei einlesen
+                    Call Sim1.ReadEVOIni()
 
                     'Testprobleme deaktivieren
                     Testprobleme1.Enabled = False
+
 
                 Case ANW_SMUSI 'Anwendung Smusi
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -144,14 +145,15 @@ Partial Class Form1
                     'Objekt der Klasse BlueM initialisieren
                     Sim1 = New Apps.Smusi
 
-                    'eingestelltes Dezimaltrennzeichen überprüfen
-                    Call CheckDezimaltrennzeichen()
+                    'Dezimaltrennzeichen überprüfen
+                    Call Sim1.checkDezimaltrennzeichen()
 
-                    'Voreinstellungen lesen EVO.INI
-                    Call ReadEVOIni()
+                    'EVO.ini Datei einlesen
+                    Call Sim1.ReadEVOIni()
 
                     'Testprobleme deaktivieren
                     Testprobleme1.Enabled = False
+
 
                 Case ANW_TESTPROBLEME 'Anwendung Testprobleme
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -397,73 +399,8 @@ Partial Class Form1
 
     End Sub
 
-    'EVO.ini Datei einlesen 
-    '**********************
-    'BUG 94: ReadEVO.ini müsste hier raus nach BlueM und "Read_Model_OptConfig" heißen **
-    Private Sub ReadEVOIni()
-
-        If File.Exists("EVO.ini") Then
-
-            'Datei einlesen
-            Dim FiStr As FileStream = New FileStream("EVO.ini", FileMode.Open, IO.FileAccess.Read)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-
-            Dim Configs(9, 1) As String
-            Dim Line As String
-            Dim Pairs() As String
-            Dim i As Integer = 0
-            Do
-                Line = StrRead.ReadLine.ToString()
-                If (Line.StartsWith("[") = False And Line.StartsWith(";") = False) Then
-                    Pairs = Line.Split("=")
-                    Configs(i, 0) = Pairs(0)
-                    Configs(i, 1) = Pairs(1)
-                    i += 1
-                End If
-            Loop Until StrRead.Peek() = -1
-
-            StrRead.Close()
-            FiStr.Close()
-
-            'Default-Werte setzen
-            For i = 0 To Configs.GetUpperBound(0)
-                Select Case Configs(i, 0)
-                    Case "Exe"
-                        Sim1.Exe = Configs(i, 1)
-                    Case "Datensatz"
-                        Call saveDatensatz(Configs(i, 1))
-                    Case Else
-                        'weitere Voreinstellungen
-                End Select
-            Next
-
-        Else
-            'Datei EVO.ini existiert nicht
-            Throw New Exception("Die Datei ""EVO.ini"" konnte nicht gefunden werden!" & Chr(13) & Chr(10) & "Bitte gemäß Dokumentation eine Datei ""EVO.ini"" erstellen.")
-        End If
-
-
-    End Sub
-
-    'Pfad zum Datensatz verarbeiten und speichern
-    '********************************************
-    Private Sub saveDatensatz(ByVal Pfad As String)
-
-        'Dateiname vom Ende abtrennen
-        Sim1.Datensatz = Pfad.Substring(Pfad.LastIndexOf("\") + 1)
-        'Dateiendung entfernen
-        Sim1.Datensatz = Sim1.Datensatz.Substring(0, Sim1.Datensatz.Length - 4)
-        'Arbeitsverzeichnis bestimmen
-        Sim1.WorkDir = Pfad.Substring(0, Pfad.LastIndexOf("\") + 1)
-
-        'Datensatzanzeige aktualisieren
-        Me.LinkLabel_WorkDir.Text = Sim1.WorkDir & Sim1.Datensatz & ".ALL"
-        Me.LinkLabel_WorkDir.Links(0).LinkData = Sim1.WorkDir
-
-    End Sub
-
-    'Datensatz ändern
-    '****************
+    'Arbeitsverzeichnis/Datensatz ändern
+    '***********************************
     Private Sub changeDatensatz(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles LinkLabel_WorkDir.LinkClicked
 
         'Aktuelles Verzeichnis auslesen
@@ -474,13 +411,21 @@ Partial Class Form1
         Dim DatensatzResult As DialogResult = OpenFileDialog_Datensatz.ShowDialog()
         'Neuen Datensatz speichern
         If (DatensatzResult = Windows.Forms.DialogResult.OK) Then
-            Call saveDatensatz(OpenFileDialog_Datensatz.FileName)
+            Call Sim1.saveDatensatz(OpenFileDialog_Datensatz.FileName)
         End If
         'Wieder ins Standardverzeichnis zurückwechseln
         ChDir(currentDir)
         'Startbutton deaktivieren (Der Benutzer muss zuerst Ini neu ausführen!)
         Me.Button_Start.Enabled = False
 
+    End Sub
+
+    'Arbeitsverzeichnis wurde geändert -> Anzeige aktualisieren
+    '**********************************************************
+    Private Sub displayWorkDir() Handles Sim1.WorkDirChange
+        'Datensatzanzeige aktualisieren
+        Me.LinkLabel_WorkDir.Text = Sim1.WorkDir & Sim1.Datensatz & ".ALL"
+        Me.LinkLabel_WorkDir.Links(0).LinkData = Sim1.WorkDir
     End Sub
 
 #End Region 'Initialisierung der Anwendungen
@@ -1178,24 +1123,6 @@ Start_Evolutionsrunden:
 
 #End Region 'Start Button Pressed
 
-    'Überprüfen, ob Punkt als Dezimaltrennzeichen eingestellt ist
-    '***********************************************************
-    Private Sub CheckDezimaltrennzeichen()
-
-        Dim ci As System.Globalization.CultureInfo
-        Dim nfi As System.Globalization.NumberFormatInfo
-
-        'Aktuelle Einstellungen lesen
-        ci = System.Globalization.CultureInfo.CurrentCulture
-        nfi = ci.NumberFormat
-
-        'Dezimaltrennzeichen überprüfen
-        If (Not nfi.NumberDecimalSeparator = ".") Then
-            Throw New Exception("Um mit BlueM arbeiten zu können, muss in der Systemsteuerung" & Chr(13) & Chr(10) & "als Dezimaltrennzeichen Punkt (.) eingestellt sein!")
-        End If
-
-    End Sub
-
 #Region "Diagrammfunktionen"
 
     'Diagrammfunktionen
@@ -1286,6 +1213,7 @@ Start_Evolutionsrunden:
 
                     Case METH_CES_PES 'Methode CES + PES
                         'XXXXXXXXXXXXXXXXXXXXX
+                        'TODO: Diagramm für CES + PES
 
                     Case METH_PES 'Methode PES
                         'XXXXXXXXXXXXXXXXXXXXX
