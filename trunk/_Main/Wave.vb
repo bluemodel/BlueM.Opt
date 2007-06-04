@@ -22,6 +22,9 @@ Public Class Wave
         Me.WForm.Diag.Legend.LegendStyle = Steema.TeeChart.LegendStyles.Series
         Me.WForm.Diag.Legend.Visible = True
 
+        'Handler für Klick auf Series entfernen
+        RemoveHandler WForm.Diag.ClickSeries, AddressOf Main.Form1.seriesClick
+
     End Sub
 
     'gespeicherte Serien in Diagramm eintragen
@@ -31,6 +34,9 @@ Public Class Wave
         Dim i, j As Integer
 
         For i = 0 To WaveList.GetUpperBound(0)
+            'Serie initialisieren, wenn noch nicht geschehen
+            Me.WForm.Diag.prepareSeries(i, WaveList(i).Bezeichnung)
+            'Punkte zur Serie hinzufügen
             For j = 0 To WaveList(i).Wave.GetUpperBound(0)
                 Me.WForm.Diag.Series(i).Add(WaveList(i).Wave(j, 0), WaveList(i).Wave(j, 1))
             Next j

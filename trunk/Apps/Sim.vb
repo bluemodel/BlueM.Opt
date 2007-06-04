@@ -1239,6 +1239,32 @@ Public MustInherit Class Sim
 
     End Function
 
+    'Einen Parametersatz auslesen
+    '****************************
+    Public Sub db_getOptPara(ByVal id As Integer)
+
+        Call db_connect()
+
+        Dim q As String = "SELECT * FROM OptParameter WHERE ID = " & id
+
+        Dim adapter As OleDbDataAdapter = New OleDbDataAdapter(q, db)
+
+        Dim ds As New DataSet("EVO")
+        adapter.Fill(ds, "OptParameter")
+
+        'Parametersatz übergeben
+        For i As Integer = 0 To Me.OptParameterListe.GetUpperBound(0)
+
+            With Me.OptParameterListe(i)
+                .Wert = ds.Tables("OptParameter").Rows(0).Item("'" & .Bezeichnung & "'")
+            End With
+
+        Next
+
+        Call db_disconnect()
+
+    End Sub
+
 #End Region 'Ergebnisdatenbank
 
 #End Region 'Methoden

@@ -1258,6 +1258,109 @@ Start_Evolutionsrunden:
 
     End Sub
 
+    'Klick auf Serie in Diagramm
+    '***************************
+    Public Sub seriesClick(ByVal sender As Object, ByVal s As Steema.TeeChart.Styles.Series, ByVal valueIndex As Integer, ByVal e As System.Windows.Forms.MouseEventArgs)
+
+        'nur bei Anwendung = Sim ausführen
+        If (Anwendung = ANW_BLUEM Or Anwendung = ANW_SMUSI) Then
+
+            Dim i As Integer
+
+            'OptParameter aus DB lesen
+            Call Sim1.db_getOptPara(valueIndex + 1) 'valueIndex fängt bei 0 an, DB-ID aber bei 1
+
+            'Modellparameter schreiben
+            Call Sim1.ModellParameter_schreiben()
+
+            'String für die Anzeige der Werte
+            Dim paraliste As String
+            paraliste = Chr(13) & Chr(10) & "OptParameter - Wert: " & Chr(13) & Chr(10)
+            For i = 0 To Sim1.OptParameterListe.GetUpperBound(0)
+                With Sim1.OptParameterListe(i)
+                    paraliste &= Chr(13) & Chr(10) & .Bezeichnung & " - " & .Wert
+                End With
+            Next
+
+            'MessageBox
+            Dim res As MsgBoxResult = MsgBox("Diesen Parametersatz simulieren?" & Chr(13) & Chr(10) & paraliste, MsgBoxStyle.OkCancel, "Info")
+            If (res = MsgBoxResult.Ok) Then
+
+                'Simulieren
+                Sim1.launchSim()
+
+                'Wave anzeigen
+                '-------------
+                Dim Wave1 As New Wave()
+                Dim n As Integer = 0                            'Anzahl Waves
+                Dim SimGrs As New Collection                    'zu zeichnende Simulationsgrößen
+
+                'zu zeichnenden Reihen raussuchen
+                For i = 0 To Sim1.OptZieleListe.GetUpperBound(0)
+
+                    With Sim1.OptZieleListe(i)
+
+                        'Simulationsgrößen nur jeweils ein Mal zeichnen
+                        If (Not SimGrs.Contains(.SimGr)) Then
+                            SimGrs.Add(.SimGr, .SimGr)
+                            'Simulationsergebnis in Wave speichern
+                            Dim simresult(,) As Object = {}
+                            Dim isOK As Boolean = Apps.Sim.Read_WEL(Sim1.WorkDir & Sim1.Datensatz & ".WEL", Sim1.OptZieleListe(0).SimGr, simresult)
+                            n += 1
+                            ReDim Preserve Wave1.WaveList(n - 1)
+                            Wave1.WaveList(n - 1).Bezeichnung = .SimGr
+                            Wave1.WaveList(n - 1).Wave = simresult
+                        End If
+
+                        'ggf. Referenzreihe in Wave speichern
+                        If (.ZielTyp = "Reihe") Then
+                            n += 1
+                            ReDim Preserve Wave1.WaveList(n - 1)
+                            Wave1.WaveList(n - 1).Bezeichnung = .SimGr & " (REF)"
+                            Wave1.WaveList(n - 1).Wave = .ZielReihe
+                        End If
+
+                    End With
+                Next
+
+                'Titel
+                Dim Titel As String = "Simulationsergebnis"
+                'Achsen
+                Dim Achsen As New Collection
+                'X-Achse: Zeit
+                Dim XAchse As Diagramm.Achse
+                XAchse.Name = "Zeit"
+                XAchse.Auto = True
+                Achsen.Add(XAchse)
+                'Y-Achse: 
+                Dim YAchse As Diagramm.Achse
+                YAchse.Name = ""
+                YAchse.Auto = True
+                Achsen.Add(YAchse)
+
+                'Initialisierung
+                Call Wave1.WForm.Diag.DiagInitialise(Titel, Achsen)
+
+                'Serien initialisieren
+                Dim tmpSeries As Steema.TeeChart.Styles.Line
+                For i = 0 To Wave1.WaveList.GetUpperBound(0)
+                    tmpSeries = New Steema.TeeChart.Styles.Line(Wave1.WForm.Diag.Chart)
+                    tmpSeries.Title = Wave1.WaveList(i).Bezeichnung
+                    tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Nothing
+                Next
+
+                'Reihen zeichnen
+                Wave1.Wave_draw()
+
+                'Form anzeigen
+                Wave1.Show()
+
+            End If
+
+        End If
+
+    End Sub
+
 #End Region 'Diagrammfunktionen
 
 #End Region 'Methoden
