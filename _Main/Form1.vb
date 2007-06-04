@@ -737,6 +737,7 @@ Partial Class Form1
         'Call CES1.Generate_All_Test_Path()
 
         'Generationsschleife
+        'xxxxxxxxxxxxxxxxxxx
         For gen = 0 To CES1.n_Generation - 1
 
             'Child Schleife
@@ -744,7 +745,7 @@ Partial Class Form1
                 durchlauf_all += 1
 
                 'Evaluiert das Blaue Modell
-                '**************************
+                '--------------------------
                 Call Sim1.Eval_Sim_CombiOpt(CES1.ChildList(i).Path, CES1.n_Penalty, durchlauf_all, 1, CES1.ChildList(i).Penalty, DForm.Diag)
 
                 'Zeichnen MO_SO
@@ -805,6 +806,10 @@ Partial Class Form1
             Call CES1.Mutation_Control()
 
         Next
+        'Ende der Generationsschleife
+
+
+
 
     End Sub
 
@@ -1170,7 +1175,7 @@ Start_Evolutionsrunden:
                         tmpPoint.Pointer.VertSize = 2
 
 
-                    Case METH_CES 'Methode CES
+                    Case METH_CES, METH_CES_PES 'Methode CES
                         'XXXXXXXXXXXXXXXXXXXXX
 
                         'Achsen:
@@ -1195,10 +1200,6 @@ Start_Evolutionsrunden:
 
                         'Diagramm initialisieren
                         Call DForm.Diag.DiagInitialise(Anwendung, Achsen)
-
-                    Case METH_CES_PES 'Methode CES + PES
-                        'XXXXXXXXXXXXXXXXXXXXX
-                        'TODO: Diagramm für CES + PES
 
                     Case METH_PES 'Methode PES
                         'XXXXXXXXXXXXXXXXXXXXX

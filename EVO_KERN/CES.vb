@@ -15,6 +15,9 @@ Public Class CES
     '*******************************************************************************
     '*******************************************************************************
 
+#Region "Eigenschaften"
+    '##################
+
     'Public Variablen
     Public n_Location As Integer       'Anzahl der Locations wird von außen gesetzt
     Public n_Penalty As Integer           'Anzahl der Ziele wird von außen gesetzt
@@ -62,9 +65,14 @@ Public Class CES
     Public NDSorting() As NDSortingType ' NDSorting Liste ***************************
     Public NDSResult(n_Childs + n_Parents - 1) As NDSortingType
 
-    '*********************************** Programm ******************************************
+#End Region 'Eigenschaften
+
+
+#Region "Methoden"
+    '#############
 
     'Dimensionieren des ChildStructs
+    '*******************************
     Public Sub Dim_Childs()
         Dim i, j As Integer
         ReDim ChildList(n_Childs - 1)
@@ -81,6 +89,7 @@ Public Class CES
     End Sub
 
     'Dimensionieren des ParentStructs
+    '********************************
     Public Sub Dim_Parents()
         Dim i, j As Integer
         ReDim ParentList(n_Parents - 1)
@@ -97,6 +106,7 @@ Public Class CES
     End Sub
 
     'Dimensionieren des NDSortingStructs BM Problem
+    '**********************************************
     Public Sub Dim_NDSorting_Type(ByRef TMP() As NDSortingType)
         Dim i, j As Integer
 
@@ -112,6 +122,7 @@ Public Class CES
     End Sub
 
     'Generiert zufällige Paths für alle Kinder BM Problem
+    '****************************************************
     Public Sub Generate_Random_Path()
         Dim i, j As Integer
         Dim tmp As Integer
@@ -120,7 +131,7 @@ Public Class CES
         Randomize()
 
         For i = 0 To n_Childs - 1
-            do 
+            Do
                 For j = 0 To n_Location - 1
                     upperb = n_PathDimension(j) - 1
                     'Randomize() nicht vergessen
@@ -135,6 +146,7 @@ Public Class CES
     End Sub
 
     'HACK: Funktion zum manuellen testen aller Kombinationen
+    '*******************************************************
     Public Sub Generate_All_Test_Path()
         Dim i As Integer
         Dim x, y, z As Integer
@@ -165,9 +177,8 @@ Public Class CES
 
     End Sub
 
-    '*************************** Funktionen innerhalb der Generationsschleife ****************************
-
     'Selectionsprozess je nach "plus" oder "minus" Strategie
+    '*******************************************************
     Public Sub Selection_Process()
         Dim i, j As Integer
         Dim ChildQ_TMP As Double = 0
@@ -195,6 +206,7 @@ Public Class CES
     End Sub
 
     'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
+    '*************************************************************
     Public Sub Reset_Childs()
         Dim i, j As Integer
 
@@ -209,9 +221,11 @@ Public Class CES
 
     End Sub
 
-    '**************************************** Reproductionsfunktionen ****************************************
+    'Reproductionsfunktionen
+    'XXXXXXXXXXXXXXXXXXXXXXX
 
     'Steuerung der Reproduktionsoperatoren
+    '*************************************
     Public Sub Reproduction_Control()
         Dim i As Integer
         Dim x, y As Integer
@@ -238,6 +252,7 @@ Public Class CES
 
     'Reproductionsoperator: "Select_Random_Uniform"
     'Entscheidet zufällig ob der Wert aus dem Path des Elter_A oder Elter_B verwendet wird
+    '*************************************************************************************
     Private Sub ReprodOp_Select_Random_Uniform(ByVal ParPath_A() As Integer, ByVal ParPath_B() As Integer, ByRef ChildPath_A() As Integer, ByRef ChildPath_B() As Integer)
 
         Dim i As Integer
@@ -260,16 +275,18 @@ Public Class CES
 
     End Sub
 
-    '****************************************** Mutationsfunktionen ****************************************
+    'Mutationsfunktionen
+    'XXXXXXXXXXXXXXXXXXX
 
     'Steuerung der Mutationsoperatoren
+    '*********************************
     Public Sub Mutation_Control()
         Dim i As Integer
 
         Select Case MutOperator_BM
             Case "RND_Switch"
                 For i = 0 To n_Childs - 1
-                    do
+                    Do
                         Call MutOp_RND_Switch(ChildList(i).Path)
                         ChildList(i).mutated = True
                     Loop While Is_Twin(i) = True Or Is_Clone(i) = True
@@ -289,6 +306,7 @@ Public Class CES
 
     'Mutationsoperator "RND_Switch"
     'Verändert zufällig ein gen des Paths
+    '************************************
     Private Sub MutOp_RND_Switch(ByVal Path() As Integer)
         Dim i As Integer
         Dim Tmp_a As Integer
@@ -313,6 +331,7 @@ Public Class CES
 
     'Mutationsoperator "Dyn_Switch"
     'Verändert zufällig ein gen des Paths
+    '************************************
     Private Sub MutOp_Dyn_Switch(ByVal Path() As Integer, ByVal Dyn_MutRate As Integer)
         Dim i As Integer
         Dim Tmp_a As Integer
@@ -335,9 +354,11 @@ Public Class CES
 
     End Sub
 
-    '******************************************* Hilfsfunktionen *******************************************
+    'Hilfsfunktionen
+    'XXXXXXXXXXXXXXX
 
     'Hilfsfunktion um zu Prüfen ob eine Zahl bereits in einem Array vorhanden ist oder nicht
+    '***************************************************************************************
     Public Function Is_No_OK(ByVal No As Integer, ByVal Path() As Integer) As Boolean
         Is_No_OK = True
         Dim i As Integer
@@ -350,6 +371,7 @@ Public Class CES
     End Function
 
     'Hilfsfunktion zum sortieren der Faksimile
+    '*****************************************
     Public Sub Sort_Faksimile(ByRef FaksimileList() As Faksimile_Type)
         'Sortiert die Fiksimile anhand des Abstandes
         Dim i, j As Integer
@@ -368,6 +390,7 @@ Public Class CES
     End Sub
 
     'Hilfsfunktion checkt ob die neuen Childs Zwillinge sind
+    '*******************************************************
     Private Function Is_Twin(ByVal ChildIndex As Integer) As Boolean
         Dim n As Integer = 0
         Dim i, j As Integer
@@ -391,6 +414,7 @@ Public Class CES
     End Function
 
     'Hilfsfunktion checkt ob die neuen Childs Kone sind
+    '**************************************************
     Private Function Is_Clone(ByVal ChildIndex As Integer) As Boolean
         Dim i, j As Integer
         Dim PathOK As Boolean
@@ -412,6 +436,7 @@ Public Class CES
     End Function
 
     'Hilfsfunktion generiert Bernoulli verteilte Zufallszahl
+    '*******************************************************
     Public Function Bernoulli() As Boolean
         Dim lowerb As Integer = 0
         Dim upperbo As Integer = 1
@@ -419,6 +444,7 @@ Public Class CES
     End Function
 
     'Hilfsfunktion: Gerade oder Ungerade Zahl
+    '****************************************
     Public Function Even_Number(ByVal Number As Integer) As Boolean
         Dim tmp_a As Double
         Dim tmp_b As Double
@@ -429,9 +455,11 @@ Public Class CES
         If tmp_c = 0 Then Even_Number = True
     End Function
 
-    '                          Steuerung des NDSorting
-    '********************************************************************************
+    'NonDominated Sorting
+    'XXXXXXXXXXXXXXXXXXXX
 
+    'Steuerung des NDSorting
+    '**************************************************
     Public Sub NDSorting_Control()
         Dim i As Short
         Dim NFrontMember_aktuell, NFrontMember_gesamt As Short
@@ -640,8 +668,6 @@ Public Class CES
 
     End Sub
 
-
-    '*******************************************************************************
     'A: Non_Dominated_Sorting
     'Entscheidet welche Werte dominiert werden und welche nicht
     '*******************************************************************************
@@ -712,12 +738,9 @@ Public Class CES
 
     End Sub
 
-
-    '*******************************************************************************
     'B: Non_Dominated_Count_and_Sort
     'Sortiert die nicht dominanten Lösungen nach oben, die dominanten nach unten
     '*******************************************************************************
-
     Private Function Non_Dominated_Count_and_Sort(ByRef NDSorting() As NDSortingType) As Short
         Dim i As Short
         Dim Temp() As NDSortingType
@@ -752,8 +775,6 @@ Public Class CES
 
     End Function
 
-
-    '*******************************************************************************
     'Non_Dominated_Count_and_Sort_Sekundäre_Population
     'Sortiert die nicht dominanten Lösungen nach oben, die dominanten nach unten
     'hier für die Sekundäre Population
@@ -761,16 +782,13 @@ Public Class CES
 
     'Private Function Non_Dominated_Count_and_Sort_Sekundäre_Population(ByRef NDSorting() As NDSortingType) As Short
 
-
     'End Function
 
 
-    '*******************************************************************************
     'C: Non_Dominated_Result
     'Hier wird pro durchlauf die nicht dominierte Front in NDSResult geschaufelt
     'und die bereits klassifizierten Lösungen aus Temp Array gelöscht
     '*******************************************************************************
-
     Private Sub Non_Dominated_Result(ByRef Temp() As NDSortingType, ByRef NDSResult() As NDSortingType, ByRef NFrontMember_aktuell As Short, ByRef NFrontMember_gesamt As Short)
 
         Dim i, Position As Short
@@ -796,10 +814,8 @@ Public Class CES
 
     End Sub
 
-    '*******************************************************************************
     'Count_Front_Members
     '*******************************************************************************
-
     Private Function Count_Front_Members(ByVal aktuell_Front As Short, ByRef NDSResult() As NDSortingType) As Integer
         Dim i As Short
 
@@ -813,8 +829,6 @@ Public Class CES
 
     End Function
 
-
-    '*******************************************************************************
     'NDS_Crowding_Distance_Sort
     '*******************************************************************************
 
@@ -863,11 +877,8 @@ Public Class CES
 
     End Sub
 
-
-    '*******************************************************************************
     'NDS_Crowding_Distance_Count
     '*******************************************************************************
-
     Private Function NDS_Crowding_Distance_Count(ByRef Qb(,,) As Double, ByRef Spannweite As Double) As Double
 
         Dim i As Short
@@ -932,6 +943,8 @@ Public Class CES
         Next i
 
     End Function
+
+#End Region 'Methoden
 
 End Class
 
