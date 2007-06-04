@@ -89,7 +89,7 @@ Partial Class Form1
 
     'Anwendung wurde ausgewählt
     '**************************
-    Private Sub IniApp(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Anwendung.SelectedIndexChanged, Testprobleme1.Testproblem_Changed
+    Private Sub INI_App(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Anwendung.SelectedIndexChanged, Testprobleme1.Testproblem_Changed
 
         If (Me.IsInitializing = True) Then
 
@@ -180,7 +180,7 @@ Partial Class Form1
             Cursor = System.Windows.Forms.Cursors.Default
 
             'Combobox Methode aktivieren
-            If (Not Anwendung = ANW_TESTPROBLEME and Not Anwendung = ANW_TSP) Then
+            If (Not Anwendung = ANW_TESTPROBLEME And Not Anwendung = ANW_TSP) Then
                 ComboBox_Methode.Enabled = True
             End If
 
@@ -190,7 +190,7 @@ Partial Class Form1
     
     'Methode wurde ausgewählt
     '************************
-    Private Sub IniMethod( ByVal sender As System.Object,  ByVal e As System.EventArgs) Handles Button_IniApp.Click, ComboBox_Methode.SelectedIndexChanged
+    Private Sub INI_Method(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_IniApp.Click, ComboBox_Methode.SelectedIndexChanged
 
         If (Me.IsInitializing = True) Then
 
@@ -289,9 +289,8 @@ Partial Class Form1
                         EVO_Einstellungen1.OptModus = 1
                     End If
 
-                    'Parameterübergabe an ES
+                    'Parameterübergabe an PES
                     Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
-
 
                 Case METH_CES 'Methode CES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -321,7 +320,6 @@ Partial Class Form1
 
                     'Überprüfen der Kombinatorik
                     Call Sim1.Combinatoric_is_Valid()
-
                     'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
                     Call Sim1.CES_fits_to_VER()
 
@@ -380,9 +378,6 @@ Partial Class Form1
                     For i = 0 To CES1.n_Location - 1
                         CES1.n_PathDimension(i) = Sim1.LocationList(i).MassnahmeListe.GetLength(0)
                     Next
-
-                    'Parameterübergabe an ES
-                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
 
             End Select
 
@@ -811,6 +806,15 @@ Partial Class Form1
                 'Bereitet das BlaueModell für die Kombinatorik ein
                 '*************************************************
                 Call Sim1.Sim_Prepare(CES1.List_Parents(i).Path)
+
+                'Parameterübergabe an PES
+                '************************
+                Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
+                'Starten der PES
+                '***************
+                Call STARTEN_PES()
+
+
 
             End If
         Next
