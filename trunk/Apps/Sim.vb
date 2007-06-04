@@ -48,6 +48,7 @@ Public MustInherit Class Sim
     Public Structure OptParameter
         '*| Bezeichnung | Einh. | Anfangsw. | Min | Max |
         Public Bezeichnung As String                'Bezeichnung
+        Public Element As String                    'BlueM Element Name
         Public Einheit As String                    'Einheit
         Public Wert As Double                       'Parameterwert
         Public Min As Double                        'Minimum
@@ -325,10 +326,11 @@ Public MustInherit Class Sim
                 array = Zeile.Split("|")
                 'Werte zuweisen
                 OptParameterListe(i).Bezeichnung = array(1).Trim()
-                OptParameterListe(i).Einheit = array(2).Trim()
-                OptParameterListe(i).Wert = Convert.ToDouble(array(3).Trim())
-                OptParameterListe(i).Min = Convert.ToDouble(array(4).Trim())
-                OptParameterListe(i).Max = Convert.ToDouble(array(5).Trim())
+                OptParameterListe(i).Element = array(2).Trim()
+                OptParameterListe(i).Einheit = array(3).Trim()
+                OptParameterListe(i).Wert = Convert.ToDouble(array(4).Trim())
+                OptParameterListe(i).Min = Convert.ToDouble(array(5).Trim())
+                OptParameterListe(i).Max = Convert.ToDouble(array(6).Trim())
                 i += 1
             End If
         Loop Until StrRead.Peek() = -1
