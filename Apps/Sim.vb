@@ -667,10 +667,9 @@ Public MustInherit Class Sim
         Next
     End Sub
 
-    'Evaluierung des SimModells für Kombinatorik Optimierung - Steuerungseinheit
-    '***************************************************************************
-    Public Function Eval_Sim_CombiOpt(ByVal Path() As Integer, ByVal n_Ziele As Short, ByVal durchlauf As Integer, ByVal ipop As Short, ByRef Quality As Double(), ByRef TChart1 As Steema.TeeChart.TChart) As Boolean
-        Dim i As Short
+    'Bereitet das SimModell für Kombinatorik Optimierung vor
+    '*******************************************************
+    Public Sub Sim_Prepare(ByVal Path() As Integer)
 
         'Erstellt die aktuelle Bauerksliste und überträgt sie zu SKos
         Call Define_aktuelle_Bauwerke(Path)
@@ -681,17 +680,23 @@ Public MustInherit Class Sim
         'Schreibt die neuen Verzweigungen
         Call Write_Verzweigungen()
 
+    End Sub
+
+    'Evaluiert die Kinderchen für Kombinatorik Optimierung vor
+    '*********************************************************
+    Public Function Sim_Evaluierung_CombiOpt(ByVal n_Ziele As Short, ByRef Penalty As Double()) As Boolean
+        Dim i As Short
+
         'Modell Starten
         Call launchSim()
 
         'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
         For i = 0 To n_Ziele - 1                                    'BUG 57: QN() fängt bei 1 an!
             OptZieleListe(i).QWertTmp = QWert(OptZieleListe(i))
-            Quality(i) = OptZieleListe(i).QWertTmp
+            Penalty(i) = OptZieleListe(i).QWertTmp
         Next
 
     End Function
-
 
     'Die Liste mit den aktuellen Bauwerken des Kindes wird erstellt und in SKos geschrieben
     '**************************************************************************************

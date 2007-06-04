@@ -643,16 +643,18 @@ Partial Class Form1
             For i = 0 To CES1.n_Childs - 1
                 durchlauf_all += 1
 
-                'Evaluiert das Blaue Modell
-                '**************************
-                Call Sim1.Eval_Sim_CombiOpt(CES1.ChildList(i).Path, CES1.n_Penalty, durchlauf_all, 1, CES1.ChildList(i).Penalty, DForm.Diag)
+                'Vorbereitung und Evaluierung des Blauen Modells
+                '***********************************************
+                Call Sim1.Sim_Prepare(CES1.List_Childs(i).Path)
+                Call Sim1.Sim_Evaluierung_CombiOpt(CES1.n_Penalty, CES1.List_Childs(i).Penalty)
+                '***********************************************
 
                 'Zeichnen MO_SO
                 Call DForm.Diag.prepareSeries(0, "Childs", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
                 If CES1.n_Penalty = 1 Then
-                    Call DForm.Diag.Series(0).Add(durchlauf_all, CES1.ChildList(i).Penalty(0))
+                    Call DForm.Diag.Series(0).Add(durchlauf_all, CES1.List_Childs(i).Penalty(0))
                 ElseIf CES1.n_Penalty = 2 Then
-                    Call DForm.Diag.Series(0).Add(CES1.ChildList(i).Penalty(0), CES1.ChildList(i).Penalty(1))
+                    Call DForm.Diag.Series(0).Add(CES1.List_Childs(i).Penalty(0), CES1.List_Childs(i).Penalty(1))
                 End If
 
                 ''HACK zum zeichnen aller Qualitäten
@@ -666,17 +668,18 @@ Partial Class Form1
             '----------
             If CES1.n_Penalty = 1 Then
                 'Sortieren der Kinden anhand der Qualität
-                Call CES1.Sort_Faksimile(CES1.ChildList)
+                Call CES1.Sort_Faksimile(CES1.List_Childs)
                 'Selectionsprozess je nach "plus" oder "minus" Strategie
                 Call CES1.Selection_Process()
                 'Zeichnen des besten Elter
                 For i = 0 To CES1.n_Parents - 1
                     'durchlauf += 1
                     Call DForm.Diag.prepareSeries(1, "Parent", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                    Call DForm.Diag.Series(1).Add(durchlauf_all, CES1.ParentList(i).Penalty(0))
+                    Call DForm.Diag.Series(1).Add(durchlauf_all, CES1.List_Parents(i).Penalty(0))
                 Next
+
             ElseIf CES1.n_Penalty = 2 Then
-                'NDSorting
+                'NDSorting ******************
                 Call CES1.NDSorting_Control()
                 'Zeichnen von NDSortingResult
                 Call DForm.Diag.DeleteSeries(CES1.n_Childs - 1, 1)
@@ -727,24 +730,26 @@ Partial Class Form1
         'HACK: Funktion zum manuellen testen aller Kombinationen
         'Call CES1.Generate_All_Test_Path()
 
-        'Generationsschleife
-        'xxxxxxxxxxxxxxxxxxx
+        'Generationsschleife für CES
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxx
         For gen = 0 To CES1.n_Generation - 1
 
             'Child Schleife
             For i = 0 To CES1.n_Childs - 1
                 durchlauf_all += 1
 
-                'Evaluiert das Blaue Modell ***************
-                Call Sim1.Eval_Sim_CombiOpt(CES1.ChildList(i).Path, CES1.n_Penalty, durchlauf_all, 1, CES1.ChildList(i).Penalty, DForm.Diag)
+                'Vorbereitung und Evaluierung des Blauen Modells
+                '***********************************************
+                Call Sim1.Sim_Prepare(CES1.List_Childs(i).Path)
+                Call Sim1.Sim_Evaluierung_CombiOpt(CES1.n_Penalty, CES1.List_Childs(i).Penalty)
                 '******************************************
 
                 'Zeichnen MO_SO
                 Call DForm.Diag.prepareSeries(0, "Childs", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
                 If CES1.n_Penalty = 1 Then
-                    Call DForm.Diag.Series(0).Add(durchlauf_all, CES1.ChildList(i).Penalty(0))
+                    Call DForm.Diag.Series(0).Add(durchlauf_all, CES1.List_Childs(i).Penalty(0))
                 ElseIf CES1.n_Penalty = 2 Then
-                    Call DForm.Diag.Series(0).Add(CES1.ChildList(i).Penalty(0), CES1.ChildList(i).Penalty(1))
+                    Call DForm.Diag.Series(0).Add(CES1.List_Childs(i).Penalty(0), CES1.List_Childs(i).Penalty(1))
                 End If
 
                 ''HACK zum zeichnen aller Qualitäten
@@ -758,17 +763,18 @@ Partial Class Form1
             '----------
             If CES1.n_Penalty = 1 Then
                 'Sortieren der Kinden anhand der Qualität
-                Call CES1.Sort_Faksimile(CES1.ChildList)
+                Call CES1.Sort_Faksimile(CES1.List_Childs)
                 'Selectionsprozess je nach "plus" oder "minus" Strategie
                 Call CES1.Selection_Process()
                 'Zeichnen des besten Elter
                 For i = 0 To CES1.n_Parents - 1
                     'durchlauf += 1
                     Call DForm.Diag.prepareSeries(1, "Parent", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                    Call DForm.Diag.Series(1).Add(durchlauf_all, CES1.ParentList(i).Penalty(0))
+                    Call DForm.Diag.Series(1).Add(durchlauf_all, CES1.List_Parents(i).Penalty(0))
                 Next
+
             ElseIf CES1.n_Penalty = 2 Then
-                'NDSorting
+                'NDSorting ******************
                 Call CES1.NDSorting_Control()
                 'Zeichnen von NDSortingResult
                 Call DForm.Diag.DeleteSeries(CES1.n_Childs - 1, 1)
@@ -790,11 +796,21 @@ Partial Class Form1
         Next
         'Ende der Generationsschleife
 
+        'Starten der PES mit der Front von CES
+        '(MaxAnzahl ist die Zahl der Eltern -> ToDo: SecPop oder Bestwertspeicher)
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
+        'Einstellungen für PES werden gesetzt
+        Call evo_einstellungen1.SetFor_CES_PES()
 
+        For i = 0 To CES1.n_Parents - 1
+            If CES1.List_Parents(i).Front = 1 Then
+                'Bereitet das BlaueModell für die Kombinatorik ein
+                '*************************************************
+                Call Sim1.Sim_Prepare(CES1.List_Parents(i).Path)
 
-
-
+            End If
+        Next
     End Sub
 
     'Anwendung Evolutionsstrategie für Parameter Optimierung - hier Steuerung       

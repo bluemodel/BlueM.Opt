@@ -77,6 +77,16 @@ Public Class EVO_Einstellungen
         Call FILLCOMBO_POPPENALTY(ComboPopPenalty)
     End Sub
 
+    Public Sub SetFor_CES_PES()
+        'Vorgaben und Anzeige
+        Label_OptModusValue.Text = "MultiObjective Pareto"
+        TextAnzGen.Text = CStr(2)
+        TextAnzEltern.Text = CStr(3)
+        TextAnzNachf.Text = CStr(10)
+
+    End Sub
+
+
     'UPGRADE_WARNING: Das Ereignis ComboOptEltern.SelectedIndexChanged kann ausgelöst werden, wenn das Formular initialisiert wird. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup2075"'
     Private Sub ComboOptEltern_SelectedIndexChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles ComboOptEltern.SelectedIndexChanged
         Select Case VB6.GetItemData(ComboOptEltern, ComboOptEltern.SelectedIndex)
@@ -278,7 +288,7 @@ Public Class EVO_Einstellungen
         End Get
     End Property
 
-	'Dieses Property nicht ReadOnly weil die Anzahl der Zielfunktionen durch OptZiele bestimmt werden kann
+    'Dieses Property nicht ReadOnly weil die Anzahl der Zielfunktionen durch OptZiele bestimmt werden kann
     Public Property OptModus() As Short
         Get
             OptModus = Me.OptModusValue
