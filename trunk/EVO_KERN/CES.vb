@@ -23,11 +23,11 @@ Public Class CES
     Public n_Penalty As Integer           'Anzahl der Ziele wird von außen gesetzt
     Public n_Verzweig As Integer        'Anzahl der Verzweigungen in der Verzweigungsdatei
     Public n_PathDimension() As Integer     'Anzahl der "Städte/Maßnahmen" an jeder Stelle
-    Public n_Generation As Integer = 5
+    Public n_Generation As Integer = 2
 
     'Eingabe
     Public n_Parents As Integer = 3
-    Public n_Childs As Integer = 10
+    Public n_Childs As Integer = 7
 
     'Private Variablen
     Private ReprodOperator_TSP As String = "Order_Crossover_OX"
@@ -37,8 +37,9 @@ Public Class CES
     Private Strategy As String = "plus"         '"plus" oder "minus" Strategie
     Private MutRate As Integer = 10              'Definiert die Wahrscheinlichkeit der Mutationsrate in %
 
-    '************************************* Struktur *****************************
-    Public Structure Faksimile_Type
+    'Faksimile Struktur
+    '******************
+    Public Structure Struct_Faksimile
         Dim No As Short
         Dim Path() As Integer      'auf 0 ist die Stadt, auf 1 die Anzahl der Städte
         Dim Penalty() As Double
@@ -46,12 +47,12 @@ Public Class CES
         Dim Front As Short
     End Structure
 
-    '************************************* Listen ******************************
-    Public ChildList() As Faksimile_Type
-    Public ParentList() As Faksimile_Type
+    Public List_Childs() As Struct_Faksimile
+    Public List_Parents() As Struct_Faksimile
 
-    '******************************** NDSorting Struktur **************************
-    Public Structure NDSortingType
+    'NDSorting Struktur
+    '******************
+    Public Structure Struct_NDSorting
         Dim Penalty() As Double             'DM: Werte der Penaltyfunktion(en)
         Dim Constrain() As Double           'DM: Werte der Randbedingung(en)
         Dim Feasible As Boolean             'DM: Gültiges Ergebnis ?
@@ -62,11 +63,19 @@ Public Class CES
         Dim Path() As Integer               'CH: Der Pfad
     End Structure
 
-    Public NDSorting() As NDSortingType ' NDSorting Liste ***************************
-    Public NDSResult(n_Childs + n_Parents - 1) As NDSortingType
+    Public NDSorting() As Struct_NDSorting
+    Public NDSResult(n_Childs + n_Parents - 1) As Struct_NDSorting
+
+    'PES Struktur
+    '************
+    Public Structure Struct_PES
+        Dim No As Short
+
+    End Structure
+
+    Public List_PES() as Struct_PES
 
 #End Region 'Eigenschaften
-
 
 #Region "Methoden"
     '#############
@@ -75,15 +84,15 @@ Public Class CES
     '*******************************
     Public Sub Dim_Childs()
         Dim i, j As Integer
-        ReDim ChildList(n_Childs - 1)
+        ReDim List_Childs(n_Childs - 1)
 
         For i = 0 To n_Childs - 1
-            ChildList(i).No = i + 1
-            ReDim ChildList(i).Penalty(n_Penalty - 1)
+            List_Childs(i).No = i + 1
+            ReDim List_Childs(i).Penalty(n_Penalty - 1)
             For j = 0 To n_Penalty - 1
-                ChildList(i).Penalty(j) = 999999999999999999
+                List_Childs(i).Penalty(j) = 999999999999999999
             Next
-            ReDim ChildList(i).Path(n_Location - 1)
+            ReDim List_Childs(i).Path(n_Location - 1)
         Next
 
     End Sub
@@ -92,22 +101,22 @@ Public Class CES
     '********************************
     Public Sub Dim_Parents()
         Dim i, j As Integer
-        ReDim ParentList(n_Parents - 1)
+        ReDim List_Parents(n_Parents - 1)
 
         For i = 0 To n_Parents - 1
-            ParentList(i).No = i + 1
-            ReDim ParentList(i).Penalty(n_Penalty - 1)
+            List_Parents(i).No = i + 1
+            ReDim List_Parents(i).Penalty(n_Penalty - 1)
             For j = 0 To n_Penalty - 1
-                ParentList(i).Penalty(j) = 999999999999999999
+                List_Parents(i).Penalty(j) = 999999999999999999
             Next
-            ReDim ParentList(i).Path(n_Location - 1)
+            ReDim List_Parents(i).Path(n_Location - 1)
         Next
 
     End Sub
 
     'Dimensionieren des NDSortingStructs BM Problem
     '**********************************************
-    Public Sub Dim_NDSorting_Type(ByRef TMP() As NDSortingType)
+    Public Sub Dim_NDSorting_Type(ByRef TMP() As Struct_NDSorting)
         Dim i, j As Integer
 
         For i = 0 To TMP.GetUpperBound(0)
@@ -136,10 +145,10 @@ Public Class CES
                     upperb = n_PathDimension(j) - 1
                     'Randomize() nicht vergessen
                     tmp = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
-                    ChildList(i).Path(j) = tmp
+                    List_Childs(i).Path(j) = tmp
                 Next
-                ChildList(i).mutated = True
-                ChildList(i).No = i + 1
+                List_Childs(i).mutated = True
+                List_Childs(i).No = i + 1
             Loop While Is_Twin(i) = True
         Next
 
@@ -157,9 +166,9 @@ Public Class CES
 
         For i = 0 To n_Childs - 1
 
-            ChildList(i).Path(0) = x
-            ChildList(i).Path(1) = y
-            ChildList(i).Path(2) = z
+            List_Childs(i).Path(0) = x
+            List_Childs(i).Path(1) = y
+            List_Childs(i).Path(2) = z
             x += 1
             If x > n_PathDimension(0) - 1 Then
                 x = 0
@@ -186,18 +195,18 @@ Public Class CES
 
         If Strategy = "minus" Then
             For i = 0 To n_Parents - 1
-                ParentList(i).Penalty(0) = ChildList(i).Penalty(0)
-                Array.Copy(ChildList(i).Path, ParentList(i).Path, ChildList(i).Path.Length)
+                List_Parents(i).Penalty(0) = List_Childs(i).Penalty(0)
+                Array.Copy(List_Childs(i).Path, List_Parents(i).Path, List_Childs(i).Path.Length)
             Next i
 
         ElseIf Strategy = "plus" Then
             j = 0
             For i = 0 To n_Parents - 1
-                If ParentList(i).Penalty(0) < ChildList(j).Penalty(0) Then
+                If List_Parents(i).Penalty(0) < List_Childs(j).Penalty(0) Then
                     j -= 1
                 Else
-                    ParentList(i).Penalty(0) = ChildList(j).Penalty(0)
-                    Array.Copy(ChildList(j).Path, ParentList(i).Path, ChildList(j).Path.Length)
+                    List_Parents(i).Penalty(0) = List_Childs(j).Penalty(0)
+                    Array.Copy(List_Childs(j).Path, List_Parents(i).Path, List_Childs(j).Path.Length)
                 End If
                 j += 1
             Next i
@@ -211,12 +220,12 @@ Public Class CES
         Dim i, j As Integer
 
         For i = 0 To n_Childs - 1
-            ChildList(i).No = i + 1
-            For j = 0 To ChildList(i).Penalty.GetUpperBound(0)
-                ChildList(i).Penalty(j) = 999999999999999999
+            List_Childs(i).No = i + 1
+            For j = 0 To List_Childs(i).Penalty.GetUpperBound(0)
+                List_Childs(i).Penalty(j) = 999999999999999999
             Next
-            Array.Clear(ChildList(i).Path, 0, ChildList(i).Path.GetLength(0))
-            ChildList(i).mutated = False
+            Array.Clear(List_Childs(i).Path, 0, List_Childs(i).Path.GetLength(0))
+            List_Childs(i).mutated = False
         Next
 
     End Sub
@@ -237,14 +246,14 @@ Public Class CES
                 x = 0
                 y = 1
                 For i = 0 To n_Childs - 2 Step 2
-                    Call ReprodOp_Select_Random_Uniform(ParentList(x).Path, ParentList(y).Path, ChildList(i).Path, ChildList(i + 1).Path)
+                    Call ReprodOp_Select_Random_Uniform(List_Parents(x).Path, List_Parents(y).Path, List_Childs(i).Path, List_Childs(i + 1).Path)
                     x += 1
                     y += 1
                     If x = n_Parents - 1 Then x = 0
                     If y = n_Parents - 1 Then y = 0
                 Next i
                 If Even_Number(n_Childs) = False Then
-                    Call ReprodOp_Select_Random_Uniform(ParentList(x).Path, ParentList(y).Path, ChildList(n_Childs - 1).Path, Einzelkind)
+                    Call ReprodOp_Select_Random_Uniform(List_Parents(x).Path, List_Parents(y).Path, List_Childs(n_Childs - 1).Path, Einzelkind)
                 End If
         End Select
 
@@ -287,16 +296,16 @@ Public Class CES
             Case "RND_Switch"
                 For i = 0 To n_Childs - 1
                     Do
-                        Call MutOp_RND_Switch(ChildList(i).Path)
-                        ChildList(i).mutated = True
+                        Call MutOp_RND_Switch(List_Childs(i).Path)
+                        List_Childs(i).mutated = True
                     Loop While Is_Twin(i) = True Or Is_Clone(i) = True
                 Next i
             Case "Dyn_Switch"
                 Dim count As Integer = 0
                 For i = 0 To n_Childs - 1
                     Do
-                        Call MutOp_Dyn_Switch(ChildList(i).Path, count)
-                        ChildList(i).mutated = True
+                        Call MutOp_Dyn_Switch(List_Childs(i).Path, count)
+                        List_Childs(i).mutated = True
                         count += 1
                     Loop While Is_Twin(i) = True Or Is_Clone(i) = True
                 Next i
@@ -372,10 +381,10 @@ Public Class CES
 
     'Hilfsfunktion zum sortieren der Faksimile
     '*****************************************
-    Public Sub Sort_Faksimile(ByRef FaksimileList() As Faksimile_Type)
+    Public Sub Sort_Faksimile(ByRef FaksimileList() As Struct_Faksimile)
         'Sortiert die Fiksimile anhand des Abstandes
         Dim i, j As Integer
-        Dim swap As EvoKern.CES.Faksimile_Type
+        Dim swap As EvoKern.CES.Struct_Faksimile
 
         For i = 0 To FaksimileList.GetUpperBound(0)
             For j = 0 To FaksimileList.GetUpperBound(0)
@@ -399,10 +408,10 @@ Public Class CES
         Is_Twin = False
 
         For i = 0 To n_Childs - 1
-            If ChildIndex <> i And ChildList(i).mutated = True Then
+            If ChildIndex <> i And List_Childs(i).mutated = True Then
                 PathOK = False
-                For j = 0 To ChildList(ChildIndex).Path.GetUpperBound(0)
-                    If ChildList(ChildIndex).Path(j) <> ChildList(i).Path(j) Then
+                For j = 0 To List_Childs(ChildIndex).Path.GetUpperBound(0)
+                    If List_Childs(ChildIndex).Path(j) <> List_Childs(i).Path(j) Then
                         PathOK = True
                     End If
                 Next
@@ -423,8 +432,8 @@ Public Class CES
 
         For i = 0 To n_Parents - 1
             PathOK = False
-            For j = 0 To ChildList(ChildIndex).Path.GetUpperBound(0)
-                If ChildList(ChildIndex).Path(j) <> ParentList(i).Path(j) Then
+            For j = 0 To List_Childs(ChildIndex).Path.GetUpperBound(0)
+                If List_Childs(ChildIndex).Path(j) <> List_Parents(i).Path(j) Then
                     PathOK = True
                 End If
             Next
@@ -487,11 +496,11 @@ Public Class CES
                 '    Next l
                 'End If
 
-                Array.Copy(ChildList(i).Penalty, .Penalty, .Penalty.GetLength(0))
+                Array.Copy(List_Childs(i).Penalty, .Penalty, .Penalty.GetLength(0))
                 .dominated = False
                 .Front = 0
                 .Distance = 0
-                Array.Copy(ChildList(i).Path, .Path, .Path.GetLength(0))
+                Array.Copy(List_Childs(i).Path, .Path, .Path.GetLength(0))
             End With
         Next i
 
@@ -511,11 +520,11 @@ Public Class CES
                 '    Next l
                 'End If
 
-                Array.Copy(ParentList(i - n_Childs).Penalty, .Penalty, .Penalty.GetLength(0))
+                Array.Copy(List_Parents(i - n_Childs).Penalty, .Penalty, .Penalty.GetLength(0))
                 .dominated = False
                 .Front = 0
                 .Distance = 0
-                Array.Copy(ParentList(i - n_Childs).Path, .Path, .Path.GetLength(0))
+                Array.Copy(List_Parents(i - n_Childs).Path, .Path, .Path.GetLength(0))
             End With
         Next i
 
@@ -525,7 +534,7 @@ Public Class CES
         NFrontMember_gesamt = 0
 
         'Initialisierung von Temp (NDSorting)
-        Dim Temp(n_Childs + n_Parents - 1) As NDSortingType
+        Dim Temp(n_Childs + n_Parents - 1) As Struct_NDSorting
         Call Dim_NDSorting_Type(Temp)
 
         'Initialisierung von NDSResult (NDSorting)
@@ -567,10 +576,10 @@ Public Class CES
             '-> schiss wird einfach rüberkopiert
             If NFrontMember_aktuell <= n_Parents - NFrontMember_gesamt Then
                 For i = NFrontMember_gesamt To NFrontMember_aktuell + NFrontMember_gesamt - 1
-                    Array.Copy(NDSResult(i).Penalty, ParentList(i).Penalty, n_Penalty)
-                    Array.Copy(NDSResult(i).Path, ParentList(i).Path, n_Location)
-                    ParentList(i).No = NDSResult(i).No
-                    ParentList(i).Front = NDSResult(i).Front
+                    Array.Copy(NDSResult(i).Penalty, List_Parents(i).Penalty, n_Penalty)
+                    Array.Copy(NDSResult(i).Path, List_Parents(i).Path, n_Location)
+                    List_Parents(i).No = NDSResult(i).No
+                    List_Parents(i).Front = NDSResult(i).Front
                 Next i
                 NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
 
@@ -581,10 +590,10 @@ Public Class CES
                 Call NDS_Crowding_Distance_Sort(NDSResult, NFrontMember_gesamt, NFrontMember_gesamt + NFrontMember_aktuell - 1)
 
                 For i = NFrontMember_gesamt To n_Parents - 1
-                    Array.Copy(NDSResult(i).Penalty, ParentList(i).Penalty, n_Penalty)
-                    Array.Copy(NDSResult(i).Path, ParentList(i).Path, n_Location)
-                    ParentList(i).No = NDSResult(i).No
-                    ParentList(i).Front = NDSResult(i).Front
+                    Array.Copy(NDSResult(i).Penalty, List_Parents(i).Penalty, n_Penalty)
+                    Array.Copy(NDSResult(i).Path, List_Parents(i).Path, n_Location)
+                    List_Parents(i).No = NDSResult(i).No
+                    List_Parents(i).Front = NDSResult(i).Front
                 Next i
 
                 NFrontMember_gesamt = n_Parents
@@ -671,7 +680,7 @@ Public Class CES
     'A: Non_Dominated_Sorting
     'Entscheidet welche Werte dominiert werden und welche nicht
     '*******************************************************************************
-    Private Sub Non_Dominated_Sorting(ByRef NDSorting() As NDSortingType, ByRef Durchlauf_Front As Short)
+    Private Sub Non_Dominated_Sorting(ByRef NDSorting() As Struct_NDSorting, ByRef Durchlauf_Front As Short)
 
         Dim j, i, k As Short
         Dim Logical As Boolean
@@ -741,9 +750,9 @@ Public Class CES
     'B: Non_Dominated_Count_and_Sort
     'Sortiert die nicht dominanten Lösungen nach oben, die dominanten nach unten
     '*******************************************************************************
-    Private Function Non_Dominated_Count_and_Sort(ByRef NDSorting() As NDSortingType) As Short
+    Private Function Non_Dominated_Count_and_Sort(ByRef NDSorting() As Struct_NDSorting) As Short
         Dim i As Short
-        Dim Temp() As NDSortingType
+        Dim Temp() As Struct_NDSorting
         Dim counter As Short
 
         ReDim Temp(NDSorting.GetUpperBound(0))
@@ -789,7 +798,7 @@ Public Class CES
     'Hier wird pro durchlauf die nicht dominierte Front in NDSResult geschaufelt
     'und die bereits klassifizierten Lösungen aus Temp Array gelöscht
     '*******************************************************************************
-    Private Sub Non_Dominated_Result(ByRef Temp() As NDSortingType, ByRef NDSResult() As NDSortingType, ByRef NFrontMember_aktuell As Short, ByRef NFrontMember_gesamt As Short)
+    Private Sub Non_Dominated_Result(ByRef Temp() As Struct_NDSorting, ByRef NDSResult() As Struct_NDSorting, ByRef NFrontMember_aktuell As Short, ByRef NFrontMember_gesamt As Short)
 
         Dim i, Position As Short
 
@@ -816,7 +825,7 @@ Public Class CES
 
     'Count_Front_Members
     '*******************************************************************************
-    Private Function Count_Front_Members(ByVal aktuell_Front As Short, ByRef NDSResult() As NDSortingType) As Integer
+    Private Function Count_Front_Members(ByVal aktuell_Front As Short, ByRef NDSResult() As Struct_NDSorting) As Integer
         Dim i As Short
 
         Count_Front_Members = 0
@@ -832,12 +841,12 @@ Public Class CES
     'NDS_Crowding_Distance_Sort
     '*******************************************************************************
 
-    Private Sub NDS_Crowding_Distance_Sort(ByRef NDSorting() As NDSortingType, ByRef start As Short, ByRef ende As Short)
+    Private Sub NDS_Crowding_Distance_Sort(ByRef NDSorting() As Struct_NDSorting, ByRef start As Short, ByRef ende As Short)
         Dim i As Integer
         Dim j As Integer
         Dim k As Short
 
-        Dim swap As NDSortingType
+        Dim swap As Struct_NDSorting
         ReDim swap.Penalty(n_Penalty - 1)
         ReDim swap.Path(n_Location - 1)
 
@@ -900,7 +909,7 @@ Public Class CES
             For j = i + 1 To n_Parents - 1
                 PenaltyDistance(i, j) = 0
                 For k = 0 To n_Penalty - 1
-                    TempDistance(k) = ParentList(i).Penalty(k) - ParentList(j).Penalty(k)
+                    TempDistance(k) = List_Parents(i).Penalty(k) - List_Parents(j).Penalty(k)
                     TempDistance(k) = TempDistance(k) * TempDistance(k)
                     PenaltyDistance(i, j) = PenaltyDistance(i, j) + TempDistance(k)
                 Next k
