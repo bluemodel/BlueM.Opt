@@ -669,15 +669,6 @@ Partial Class Form1
                 Call CES1.Sort_Faksimile(CES1.ChildList)
                 'Selectionsprozess je nach "plus" oder "minus" Strategie
                 Call CES1.Selection_Process()
-            ElseIf CES1.n_Penalty = 2 Then
-                'NDSorting
-                Call CES1.NDSorting_Control()
-            End If
-
-
-            'MO oder SO
-            '----------
-            If CES1.n_Penalty = 1 Then
                 'Zeichnen des besten Elter
                 For i = 0 To CES1.n_Parents - 1
                     'durchlauf += 1
@@ -685,6 +676,8 @@ Partial Class Form1
                     Call DForm.Diag.Series(1).Add(durchlauf_all, CES1.ParentList(i).Penalty(0))
                 Next
             ElseIf CES1.n_Penalty = 2 Then
+                'NDSorting
+                Call CES1.NDSorting_Control()
                 'Zeichnen von NDSortingResult
                 Call DForm.Diag.DeleteSeries(CES1.n_Childs - 1, 1)
                 Dim f As Integer
@@ -697,10 +690,8 @@ Partial Class Form1
 
             'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
             Call CES1.Reset_Childs()
-
             'Reproduktionsoperatoren, hier gehts dezent zur Sache
             Call CES1.Reproduction_Control()
-
             'Mutationsoperatoren
             Call CES1.Mutation_Control()
 
@@ -744,9 +735,9 @@ Partial Class Form1
             For i = 0 To CES1.n_Childs - 1
                 durchlauf_all += 1
 
-                'Evaluiert das Blaue Modell
-                '--------------------------
+                'Evaluiert das Blaue Modell ***************
                 Call Sim1.Eval_Sim_CombiOpt(CES1.ChildList(i).Path, CES1.n_Penalty, durchlauf_all, 1, CES1.ChildList(i).Penalty, DForm.Diag)
+                '******************************************
 
                 'Zeichnen MO_SO
                 Call DForm.Diag.prepareSeries(0, "Childs", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
@@ -770,15 +761,6 @@ Partial Class Form1
                 Call CES1.Sort_Faksimile(CES1.ChildList)
                 'Selectionsprozess je nach "plus" oder "minus" Strategie
                 Call CES1.Selection_Process()
-            ElseIf CES1.n_Penalty = 2 Then
-                'NDSorting
-                Call CES1.NDSorting_Control()
-            End If
-
-
-            'MO oder SO
-            '----------
-            If CES1.n_Penalty = 1 Then
                 'Zeichnen des besten Elter
                 For i = 0 To CES1.n_Parents - 1
                     'durchlauf += 1
@@ -786,6 +768,8 @@ Partial Class Form1
                     Call DForm.Diag.Series(1).Add(durchlauf_all, CES1.ParentList(i).Penalty(0))
                 Next
             ElseIf CES1.n_Penalty = 2 Then
+                'NDSorting
+                Call CES1.NDSorting_Control()
                 'Zeichnen von NDSortingResult
                 Call DForm.Diag.DeleteSeries(CES1.n_Childs - 1, 1)
                 Dim f As Integer
@@ -798,15 +782,15 @@ Partial Class Form1
 
             'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
             Call CES1.Reset_Childs()
-
             'Reproduktionsoperatoren, hier gehts dezent zur Sache
             Call CES1.Reproduction_Control()
-
             'Mutationsoperatoren
             Call CES1.Mutation_Control()
 
         Next
         'Ende der Generationsschleife
+
+
 
 
 
