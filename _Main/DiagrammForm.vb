@@ -1,9 +1,16 @@
 Partial Public Class DiagrammForm
     Inherits System.Windows.Forms.UserControl
 
+    'Form laden
+    '**********
+    Private Sub DForm_Load(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles MyBase.Load
+        'Handler für Klick auf Serien zuweisen
+        AddHandler Me.Diag.ClickSeries, AddressOf Main.Form1.seriesClick
+    End Sub
+
     'Chart bearbeiten
     '****************
-    Private Sub TChartEdit(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_TChartEdit.Click 
+    Private Sub TChartEdit(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_TChartEdit.Click
         Me.Diag.ShowEditor()
     End Sub
 
