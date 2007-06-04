@@ -276,6 +276,9 @@ Partial Class Form1
                     'EVO_Einstellungen aktivieren
                     EVO_Einstellungen1.Enabled = True
 
+                    'Ergebnisdatenbank einschalten
+                    Sim1.Ergebnisdb = True
+
                     'PES für Sim vorbereiten
                     Call Sim1.prepare_Sim_PES()
 
