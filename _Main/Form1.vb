@@ -743,16 +743,8 @@ Partial Class Form1
             For i = 0 To CES1.n_Childs - 1
                 durchlauf_all += 1
 
-                ''Erstellt die aktuelle Bauerksliste und überträgt sie zu SKos
-                'Call Sim1.Define_aktuelle_Bauwerke(CES1.ChildList(i).Path)
-
-                ''Ermittelt das aktuelle_ON_OFF array
-                'Call Sim1.Verzweigung_ON_OFF(CES1.ChildList(i).Path)
-
-                ''Schreibt die neuen Verzweigungen
-                'Call Sim1.Verzweigung_Write()
-
                 'Evaluiert das Blaue Modell
+                '**************************
                 Call Sim1.Eval_Sim_CombiOpt(CES1.ChildList(i).Path, CES1.n_Penalty, durchlauf_all, 1, CES1.ChildList(i).Penalty, DForm.Diag)
 
                 'Zeichnen MO_SO
