@@ -903,6 +903,9 @@ Partial Class Form1
         If NPopul < NPopEltern Then
             Throw New Exception("Die Anzahl der Populationseltern darf nicht größer als die Anzahl der Populationen sein!")
         End If
+        If NNachf <= NEltern Then
+            Throw New Exception("Die Anzahl der Eltern kann nicht größer als die Anzahl der Nachfahren sein!" & Chr(13) & Chr(10) & "Optimal ist ein Verhältnis von 1:3 bis 1:5.")
+        End If
 
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
