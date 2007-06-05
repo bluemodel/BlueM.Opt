@@ -47,6 +47,8 @@ Public Class Diagramm
             tmpSeries.Pointer.HorizSize = Size
             tmpSeries.Pointer.VertSize = Size
 
+            Call Me.add_MarksTips()
+
         ElseIf (Me.Chart.Series.Count < SeriesNo) Then
             'Es wurde eine SeriesNo angegeben, 
             'die größer als der nächste freie Index ist!
@@ -94,6 +96,8 @@ Public Class Diagramm
             tmpSeries.Pointer.VertSize = 2
         Next
 
+        Call Me.add_MarksTips()
+
     End Sub
 
     'Serien-Initialisierung für MultiObjective
@@ -124,6 +128,22 @@ Public Class Diagramm
         tmpSeries.Pointer.HorizSize = 3
         tmpSeries.Pointer.VertSize = 3
 
+        Call Me.add_MarksTips()
+
+    End Sub
+
+    'MarksTips zu Serien hinzufügen
+    '******************************
+    Private Sub add_MarksTips()
+        Dim tmpMarksTip As Steema.TeeChart.Tools.MarksTip
+        For i As Integer = 0 To Me.Chart.Series.Count - 1
+            Me.Chart.Series(i).Cursor = Cursors.Hand
+            tmpMarksTip = New Steema.TeeChart.Tools.MarksTip(Me.Chart)
+            tmpMarksTip.Series = Me.Chart.Series(i)
+            tmpMarksTip.MouseAction = Steema.TeeChart.Tools.MarksTipMouseAction.Move
+            tmpMarksTip.MouseDelay = 10 'millisekunden
+            tmpMarksTip.Style = Steema.TeeChart.Styles.MarksStyles.XY
+        Next
     End Sub
 
 #Region "Testprobleme"
@@ -140,7 +160,7 @@ Public Class Diagramm
         Dim i As Short
         Dim Datenmenge As Short
         Dim Unterteilung_X As Double
-        Dim Pi as Double = 3.141592654
+        Dim Pi As Double = 3.141592654
 
         'Ausgengsergebnisse für die Linien im TeeChart Rechnen
         Datenmenge = AnzPara
@@ -193,6 +213,8 @@ Public Class Diagramm
             .Chart.Axes.Left.Minimum = -1
             .Chart.Axes.Left.Maximum = 1
             .Chart.Axes.Left.Increment = 0.2
+
+            Call Me.add_MarksTips()
 
         End With
     End Sub
@@ -256,6 +278,8 @@ Public Class Diagramm
             .Chart.Axes.Left.Automatic = False
             .Chart.Axes.Left.Maximum = Ausgangsergebnis * 1.3
             .Chart.Axes.Left.Minimum = 0
+
+            Call Me.add_MarksTips()
 
         End With
     End Sub
@@ -326,6 +350,9 @@ Public Class Diagramm
             .Chart.Axes.Left.Maximum = Ausgangsergebnis * 1.3
             .Chart.Axes.Left.Minimum = 0
             .Chart.Axes.Left.Logarithmic = False
+
+            Call Me.add_MarksTips()
+
         End With
     End Sub
 
@@ -544,6 +571,9 @@ Public Class Diagramm
                     Line4.ClickableLine = True
                     .Series(6).Add(Array4X, Array4Y)
             End Select
+
+            Call Me.add_MarksTips()
+
         End With
     End Sub
 
@@ -624,6 +654,9 @@ Public Class Diagramm
             '.Series(Populationen + 2).asPoint3D.Pointer.VerticalSize = 2
             '.Series(Populationen + 2).Color = System.Convert.ToUInt32(System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Red))
         End With
+
+        Call Me.add_MarksTips()
+
     End Sub
 
 #End Region 'Testprobleme
