@@ -1300,19 +1300,28 @@ Start_Evolutionsrunden:
                 '-------------
                 Dim Wave1 As New Wave()
                 Dim n As Integer = 0                            'Anzahl Waves
-                Dim SimGrs As New Collection                    'zu zeichnende Simulationsgrößen
+                Dim SimSeries As New Collection                 'zu zeichnende Simulationsgrößen
+                Dim RefSeries As New Collection                 'zu zeichnende Referenzreihen
 
                 'zu zeichnenden Reihen raussuchen
                 For i = 0 To Sim1.OptZieleListe.GetUpperBound(0)
 
                     With Sim1.OptZieleListe(i)
 
+                        'Name der WEL-Simulationsergebnisdatei
+                        Dim WELFile as String = ""
+                        If (Anwendung = ANW_BLUEM) Then
+                            WELFile = Sim1.WorkDir & Sim1.Datensatz & ".WEL"
+                        ElseIf (Anwendung = ANW_SMUSI) Then
+                            WELFile = Sim1.WorkDir & .SimGr.Substring(0, 4) & "_WEL.ASC"
+                        End If
+
                         'Simulationsgrößen nur jeweils ein Mal zeichnen
-                        If (Not SimGrs.Contains(.SimGr)) Then
-                            SimGrs.Add(.SimGr, .SimGr)
+                        If (Not SimSeries.Contains(.SimGr)) Then
+                            SimSeries.Add(.SimGr, .SimGr)
                             'Simulationsergebnis in Wave speichern
                             Dim simresult(,) As Object = {}
-                            Dim isOK As Boolean = Apps.Sim.Read_WEL(Sim1.WorkDir & Sim1.Datensatz & ".WEL", Sim1.OptZieleListe(0).SimGr, simresult)
+                            Dim isOK As Boolean = Apps.Sim.Read_WEL(WELFile, Sim1.OptZieleListe(0).SimGr, simresult)
                             n += 1
                             ReDim Preserve Wave1.WaveList(n - 1)
                             Wave1.WaveList(n - 1).Bezeichnung = .SimGr
@@ -1321,10 +1330,14 @@ Start_Evolutionsrunden:
 
                         'ggf. Referenzreihe in Wave speichern
                         If (.ZielTyp = "Reihe") Then
-                            n += 1
-                            ReDim Preserve Wave1.WaveList(n - 1)
-                            Wave1.WaveList(n - 1).Bezeichnung = .SimGr & " (REF)"
-                            Wave1.WaveList(n - 1).Wave = .ZielReihe
+                            'Referenzreihen nur jeweils ein Mal zeichnen
+                            If (Not RefSeries.Contains(.ZielReihePfad & .ZielGr)) Then
+                                RefSeries.Add(.ZielGr, .ZielReihePfad & .ZielGr)
+                                n += 1
+                                ReDim Preserve Wave1.WaveList(n - 1)
+                                Wave1.WaveList(n - 1).Bezeichnung = .SimGr & " (REF)"
+                                Wave1.WaveList(n - 1).Wave = .ZielReihe
+                            End If
                         End If
 
                     End With
