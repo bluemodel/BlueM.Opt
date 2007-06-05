@@ -71,6 +71,8 @@ Partial Class EVO_Einstellungen
         Me.components = New System.ComponentModel.Container
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.FrameOptions = New System.Windows.Forms.GroupBox
+        Me.Label_OptModusValue = New System.Windows.Forms.Label
+        Me.Label_OptModus = New System.Windows.Forms.Label
         Me.CheckisDnVektor = New System.Windows.Forms.CheckBox
         Me.ComboOptVorgabe = New System.Windows.Forms.ComboBox
         Me.TextDeltaStart = New System.Windows.Forms.TextBox
@@ -112,8 +114,6 @@ Partial Class EVO_Einstellungen
         Me._Label1_0 = New System.Windows.Forms.Label
         Me.Label1 = New Microsoft.VisualBasic.Compatibility.VB6.LabelArray(Me.components)
         Me.LabelFramePop = New Microsoft.VisualBasic.Compatibility.VB6.LabelArray(Me.components)
-        Me.Label_OptModus = New System.Windows.Forms.Label
-        Me.Label_OptModusValue = New System.Windows.Forms.Label
         Me.FrameOptions.SuspendLayout()
         Me.FrameGen.SuspendLayout()
         Me.FramePop.SuspendLayout()
@@ -144,6 +144,24 @@ Partial Class EVO_Einstellungen
         Me.FrameOptions.TabIndex = 0
         Me.FrameOptions.TabStop = False
         Me.FrameOptions.Text = "Einstellungen"
+        '
+        'Label_OptModusValue
+        '
+        Me.Label_OptModusValue.AutoSize = True
+        Me.Label_OptModusValue.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label_OptModusValue.Location = New System.Drawing.Point(84, 19)
+        Me.Label_OptModusValue.Name = "Label_OptModusValue"
+        Me.Label_OptModusValue.Size = New System.Drawing.Size(0, 13)
+        Me.Label_OptModusValue.TabIndex = 32
+        '
+        'Label_OptModus
+        '
+        Me.Label_OptModus.AutoSize = True
+        Me.Label_OptModus.Location = New System.Drawing.Point(16, 20)
+        Me.Label_OptModus.Name = "Label_OptModus"
+        Me.Label_OptModus.Size = New System.Drawing.Size(42, 13)
+        Me.Label_OptModus.TabIndex = 31
+        Me.Label_OptModus.Text = "Modus:"
         '
         'CheckisDnVektor
         '
@@ -442,9 +460,9 @@ Partial Class EVO_Einstellungen
         Me._Label1_7.Location = New System.Drawing.Point(7, 42)
         Me._Label1_7.Name = "_Label1_7"
         Me._Label1_7.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me._Label1_7.Size = New System.Drawing.Size(112, 13)
+        Me._Label1_7.Size = New System.Drawing.Size(72, 13)
         Me._Label1_7.TabIndex = 15
-        Me._Label1_7.Text = "Anzahl Eltern [max=5]:"
+        Me._Label1_7.Text = "Anzahl Eltern:"
         '
         '_Label1_6
         '
@@ -688,24 +706,6 @@ Partial Class EVO_Einstellungen
         Me._Label1_0.Size = New System.Drawing.Size(54, 13)
         Me._Label1_0.TabIndex = 19
         Me._Label1_0.Text = "Selektion:"
-        '
-        'Label_OptModus
-        '
-        Me.Label_OptModus.AutoSize = True
-        Me.Label_OptModus.Location = New System.Drawing.Point(16, 20)
-        Me.Label_OptModus.Name = "Label_OptModus"
-        Me.Label_OptModus.Size = New System.Drawing.Size(42, 13)
-        Me.Label_OptModus.TabIndex = 31
-        Me.Label_OptModus.Text = "Modus:"
-        '
-        'Label_OptModusValue
-        '
-        Me.Label_OptModusValue.AutoSize = True
-        Me.Label_OptModusValue.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label_OptModusValue.Location = New System.Drawing.Point(84, 19)
-        Me.Label_OptModusValue.Name = "Label_OptModusValue"
-        Me.Label_OptModusValue.Size = New System.Drawing.Size(0, 13)
-        Me.Label_OptModusValue.TabIndex = 32
         '
         'EVO_Einstellungen
         '
