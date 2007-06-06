@@ -165,7 +165,7 @@ Public Class Smusi
 
     'Die Liste mit den aktuellen Bauwerken des Kindes wird erstellt und in SKos geschrieben
     '**************************************************************************************
-    Public Overrides Sub Define_aktuelle_Bauwerke(ByVal Path() As Integer)
+    Public Overrides Sub Define_aktuelle_Elemente(ByVal Path() As Integer)
 
     End Sub
 

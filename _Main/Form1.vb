@@ -623,7 +623,7 @@ Partial Class Form1
         Dim i As Integer
 
         'Parents und Child werden Dimensioniert
-        Call CES1.Dim_Faksimile(ces1.List_Parents)
+        Call CES1.Dim_Faksimile(CES1.List_Parents)
         Call CES1.Dim_Faksimile(CES1.List_Childs)
 
         'Diagramm vorbereiten und initialisieren
@@ -645,6 +645,7 @@ Partial Class Form1
                 'Vorbereitung und Evaluierung des Blauen Modells
                 '***********************************************
                 Call Sim1.Sim_Prepare(CES1.List_Childs(i).Path)
+                Call Sim1.Set_Elemente(CES1.List_Childs(i).Elemente)
                 Call Sim1.Sim_Evaluierung_CombiOpt(CES1.n_Penalty, CES1.List_Childs(i).Penalty)
                 '***********************************************
 
@@ -740,6 +741,7 @@ Partial Class Form1
                 'Vorbereitung und Evaluierung des Blauen Modells
                 '***********************************************
                 Call Sim1.Sim_Prepare(CES1.List_Childs(i).Path)
+                Call Sim1.Set_Elemente(CES1.List_Childs(i).Elemente)
                 Call Sim1.Sim_Evaluierung_CombiOpt(CES1.n_Penalty, CES1.List_Childs(i).Penalty)
                 '******************************************
 
