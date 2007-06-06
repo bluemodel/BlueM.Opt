@@ -33,7 +33,74 @@ Public Class BlueM
 
 #Region "Methoden"
 
+    'Methoden
+    '########
+
 #Region "Eingabedateien lesen"
+
+    'Simulationsparameter einlesen
+    '*****************************
+    Protected Overrides Sub Read_SimParameter()
+
+        Dim SimStart_str As String = ""
+        Dim SimEnde_str As String = ""
+        Dim SimDT_str As String = ""
+
+        'ALL-Datei öffnen
+        '----------------
+        Dim Datei As String = Me.WorkDir & Me.Datensatz & ".ALL"
+
+        Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+        'Alle Zeilen durchlaufen
+        Dim Zeile As String
+        Do
+            Zeile = StrRead.ReadLine.ToString()
+
+            'Simulationszeitraum auslesen
+            If (Zeile.StartsWith(" SimBeginn - SimEnde ............:")) Then
+                SimStart_str = Zeile.Substring(35, 16)
+                SimEnde_str = Zeile.Substring(54, 16)
+            End If
+
+            'Zeitschrittweite auslesen
+            If (Zeile.StartsWith(" Zeitschrittlaenge [min] ........:")) Then
+                SimDT_str = Zeile.Substring(35).Trim
+            End If
+
+        Loop Until StrRead.Peek() = -1
+
+        'SimStart und SimEnde in echtes Datum konvertieren
+        Me.SimStart = New DateTime(SimStart_str.Substring(6, 4), SimStart_str.Substring(3, 2), SimStart_str.Substring(0, 2), SimStart_str.Substring(11, 2), SimStart_str.Substring(14, 2), 0)
+        Me.SimEnde = New DateTime(SimEnde_str.Substring(6, 4), SimEnde_str.Substring(3, 2), SimEnde_str.Substring(0, 2), SimEnde_str.Substring(11, 2), SimEnde_str.Substring(14, 2), 0)
+
+        'Zeitschrittweite in echte Dauer konvertieren
+        Me.SimDT = New TimeSpan(0, Convert.ToInt16(SimDT_str), 0)
+
+    End Sub
+
+    'Optimierungsziele einlesen
+    '**************************
+    Protected Overrides Sub Read_OptZiele()
+
+        Call MyBase.Read_OptZiele()
+
+        'Weiterverarbeitung von ZielReihen:
+        '----------------------------------
+        Dim i As Integer
+
+        'IHA
+        For i = 0 To Me.OptZieleListe.GetUpperBound(0)
+            If (Me.OptZieleListe(i).ZielTyp = "IHA") Then
+                'IHA-Berechnung vorbereiten
+                Me.IHA1 = New Apps.IHA()
+                Call Me.IHA1.IHA_prepare(Me)
+                Exit For
+            End If
+        Next
+
+    End Sub
 
     'Kombinatorik einlesen
     '*********************
@@ -101,49 +168,7 @@ Public Class BlueM
 
     End Sub
 
-    'Simulationsparameter einlesen
-    '*****************************
-    Protected Overrides Sub Read_SimParameter()
-
-        Dim SimStart_str As String = ""
-        Dim SimEnde_str As String = ""
-        Dim SimDT_str As String = ""
-
-        'ALL-Datei öffnen
-        '----------------
-        Dim Datei As String = Me.WorkDir & Me.Datensatz & ".ALL"
-
-        Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
-        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-
-        'Alle Zeilen durchlaufen
-        Dim Zeile As String
-        Do
-            Zeile = StrRead.ReadLine.ToString()
-
-            'Simulationszeitraum auslesen
-            If (Zeile.StartsWith(" SimBeginn - SimEnde ............:")) Then
-                SimStart_str = Zeile.Substring(35, 16)
-                SimEnde_str = Zeile.Substring(54, 16)
-            End If
-
-            'Zeitschrittweite auslesen
-            If (Zeile.StartsWith(" Zeitschrittlaenge [min] ........:")) Then
-                SimDT_str = Zeile.Substring(35).Trim
-            End If
-
-        Loop Until StrRead.Peek() = -1
-
-        'SimStart und SimEnde in echtes Datum konvertieren
-        Me.SimStart = New DateTime(SimStart_str.Substring(6, 4), SimStart_str.Substring(3, 2), SimStart_str.Substring(0, 2), SimStart_str.Substring(11, 2), SimStart_str.Substring(14, 2), 0)
-        Me.SimEnde = New DateTime(SimEnde_str.Substring(6, 4), SimEnde_str.Substring(3, 2), SimEnde_str.Substring(0, 2), SimEnde_str.Substring(11, 2), SimEnde_str.Substring(14, 2), 0)
-
-        'Zeitschrittweite in echte Dauer konvertieren
-        Me.SimDT = New TimeSpan(0, Convert.ToInt16(SimDT_str), 0)
-
-    End Sub
-
-    'Liest die Verzweigungen aus dem BModel in ein Array ein
+    'Liest die Verzweigungen aus BlueM in ein Array ein
     'Und Dimensioniert das Verzweigungsarray
     '*******************************************************
     Protected Overrides Sub Read_Verzweigungen()
@@ -193,129 +218,9 @@ Public Class BlueM
 
     End Sub
 
-    'Optimierungsziele einlesen
-    '**************************
-    Protected Overrides Sub Read_OptZiele()
-
-        Call MyBase.Read_OptZiele()
-
-        'Weiterverarbeitung von ZielReihen:
-        '----------------------------------
-        Dim i As Integer
-
-        'IHA
-        For i = 0 To Me.OptZieleListe.GetUpperBound(0)
-            If (Me.OptZieleListe(i).ZielTyp = "IHA") Then
-                'IHA-Berechnung vorbereiten
-                Me.IHA1 = New Apps.IHA()
-                Call Me.IHA1.IHA_prepare(Me)
-                Exit For
-            End If
-        Next
-
-    End Sub
-
 #End Region 'Eingabedateien lesen
 
-
-#Region "Prüfung der Eingabedateien"
-
-    'Validierungsfunktion der Kombinatorik Prüft ob Verbraucher an zwei Standorten Doppelt vorhanden sind
-    '****************************************************************************************************
-    Public Overrides Sub Validate_Combinatoric()
-
-        Dim i, j, x, y, m, n As Integer
-
-        For i = 0 To LocationList.GetUpperBound(0)
-            For j = 1 To LocationList.GetUpperBound(0)
-                For x = 0 To LocationList(i).MassnahmeListe.GetUpperBound(0)
-                    For y = 0 To LocationList(j).MassnahmeListe.GetUpperBound(0)
-                        For m = 0 To 2
-                            For n = 0 To 2
-                                If Not LocationList(i).MassnahmeListe(x).Schaltung(m, 0) = "X" And LocationList(j).MassnahmeListe(y).Schaltung(n, 0) = "X" Then
-                                    If LocationList(i).MassnahmeListe(x).Schaltung(m, 0) = LocationList(j).MassnahmeListe(y).Schaltung(n, 0) Then
-                                        Throw New Exception("Kombinatorik ist nicht valid!")
-                                    End If
-                                End If
-                            Next
-                        Next
-                    Next
-                Next
-            Next
-        Next
-    End Sub
-
-    'Mehrere Prüfungen ob die .VER Datei des BlueM und der .CES Datei auch zusammenpassen
-    '************************************************************************************
-    Public Overrides Sub Validate_CES_fits_to_VER()
-
-        Dim i As Integer = 0
-        Dim j As Integer = 0
-        Dim x As Integer = 0
-        Dim y As Integer = 0
-
-        Dim FoundA(VerzweigungsDatei.GetUpperBound(0)) As Boolean
-
-        'Prüft ob jede Verzweigung einmal in der LocationList vorkommt
-        For i = 0 To VerzweigungsDatei.GetUpperBound(0)
-            For j = 0 To LocationList.GetUpperBound(0)
-                For x = 0 To LocationList(j).MassnahmeListe.GetUpperBound(0)
-                    For y = 0 To LocationList(j).MassnahmeListe(x).Schaltung.GetUpperBound(0)
-                        If VerzweigungsDatei(i, 0) = LocationList(j).MassnahmeListe(x).Schaltung(y, 0) And VerzweigungsDatei(i, 1) = "2" Then
-                            FoundA(i) = True
-                        End If
-                    Next
-                Next
-            Next
-        Next
-
-        'Prüft ob die nicht vorkommenden Verzweigungen Verzweigungen anderer Art sind
-        For i = 0 To VerzweigungsDatei.GetUpperBound(0)
-            If Not VerzweigungsDatei(i, 1) = "2" And FoundA(i) = False Then
-                FoundA(i) = True
-            End If
-        Next
-
-        Dim FoundB As Boolean = True
-        Dim TmpBool As Boolean = False
-
-        'Prüft ob alle in der LocationList Vorkommenden Verzweigungen auch in der Verzweigungsdatei sind
-        For j = 0 To LocationList.GetUpperBound(0)
-            For x = 0 To LocationList(j).MassnahmeListe.GetUpperBound(0)
-                For y = 0 To LocationList(j).MassnahmeListe(x).Schaltung.GetUpperBound(0)
-                    If Not LocationList(j).MassnahmeListe(x).Schaltung(y, 0) = "X" Then
-                        TmpBool = False
-                        For i = 0 To VerzweigungsDatei.GetUpperBound(0)
-                            If VerzweigungsDatei(i, 0) = LocationList(j).MassnahmeListe(x).Schaltung(y, 0) And VerzweigungsDatei(i, 1) = "2" Then
-                                TmpBool = True
-                            End If
-                        Next
-                        If Not TmpBool Then
-                            FoundB = False
-                        End If
-                    End If
-
-                Next
-            Next
-        Next
-
-        'Übergabe
-        If FoundB = False Then
-            Throw New Exception(".VER und .CES Dateien passen nicht zusammen!")
-        Else
-            For i = 0 To FoundA.GetUpperBound(0)
-                If FoundA(i) = False Then
-                    Throw New Exception(".VER und .CES Dateien passen nicht zusammen!")
-                End If
-            Next
-        End If
-
-    End Sub
-
-#End Region 'Prüfung der Eingabedateien
-
-    'Methoden
-    '########
+#Region "Evaluierung"
 
     'BlauesModell ausführen (simulieren)
     '***********************************
@@ -353,6 +258,10 @@ Public Class BlueM
 
     End Sub
 
+#End Region 'Evaluierung
+
+#Region "Qualitätswertberechnung"
+
     'Qualitätswert aus WEL-Datei
     '***************************
     Protected Overrides Function QWert_WEL(ByVal OptZiel As OptZiel) As Double
@@ -386,59 +295,16 @@ Public Class BlueM
 
     End Function
 
+#End Region 'Qualitätswertberechnung
 
 #Region "Kombinatorik"
 
     'Kombinatorik
     '############
 
-    'Die Liste mit den aktuellen Bauwerken des Kindes wird erstellt und in SKos geschrieben
-    '**************************************************************************************
-    Public Overrides Sub Define_aktuelle_Elemente(ByVal Path() As Integer)
-        Dim i, j As Integer
-        Dim No As Integer
-
-        Dim x As Integer = 0
-        For i = 0 To Path.GetUpperBound(0)
-            No = Path(i)
-            For j = 0 To LocationList(i).MassnahmeListe(No).Bauwerke.GetUpperBound(0)
-                Array.Resize(SKos1.AktuelleElemente, x + 1)
-                SKos1.AktuelleElemente(x) = LocationList(i).MassnahmeListe(No).Bauwerke(j)
-                x += 1
-            Next
-        Next
-
-        'Entfernt die X Einträge
-        Call SKos1.Remove_X(SKos1.AktuelleElemente)
-    End Sub
-
-    'Ermittelt das aktuelle Verzweigungsarray
-    '****************************************
-    Public Overrides Sub Verzweigung_ON_OFF(ByVal Path() As Integer)
-        Dim j, x, y, z As Integer
-        Dim No As Short
-
-        'Schreibt alle Bezeichnungen der Verzweigungen ins Array
-        For j = 0 To VER_ONOFF.GetUpperBound(0)
-            VER_ONOFF(j, 0) = VerzweigungsDatei(j, 0)
-        Next
-        'Weist die Werte das Pfades zu
-        For x = 0 To Path.GetUpperBound(0)
-            No = Path(x)
-            For y = 0 To LocationList(x).MassnahmeListe(No).Schaltung.GetUpperBound(0)
-                For z = 0 To VER_ONOFF.GetUpperBound(0)
-                    If LocationList(x).MassnahmeListe(No).Schaltung(y, 0) = VER_ONOFF(z, 0) Then
-                        VER_ONOFF(z, 1) = LocationList(x).MassnahmeListe(No).Schaltung(y, 1)
-                    End If
-                Next
-            Next
-        Next
-
-    End Sub
-
     'Schreibt die neuen Verzweigungen
     '********************************
-    Public Overrides Sub Write_Verzweigungen()
+    Protected Overrides Sub Write_Verzweigungen()
 
         Dim AnzZeil As Integer
         Dim i, j As Integer
@@ -503,7 +369,6 @@ Public Class BlueM
     End Sub
 
 #End Region 'Kombinatorik
-
 
     'Hilfs Funktionen
     'XXXXXXXXXXXXXXXX

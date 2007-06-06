@@ -259,6 +259,8 @@ Public MustInherit Class Sim
         Call Me.Read_OptParameter()
         'ModellParameter einlesen
         Call Me.Read_ModellParameter()
+        'Modell-/Optparameter validieren
+        Call Me.Validate_OPT_fits_to_MOD()
         'Datenbank vorbereiten
         If Me.Ergebnisdb = True Then
             Call Me.db_prepare()
@@ -506,7 +508,7 @@ Public MustInherit Class Sim
 
     'Prüft ob .OPT und .MOD Dateien zusammenpassen
     '*********************************************
-    Public Sub Validate_OPT_fits_to_MOD()
+    Private Sub Validate_OPT_fits_to_MOD()
         Dim i, j As Integer
         Dim isValid_A As Boolean = True
         Dim isValid_B As Boolean = True
@@ -539,7 +541,7 @@ Public MustInherit Class Sim
         Next
 
         If Not isValid_A Then
-            Throw New Exception("Für eine OptParameter ist kein Modellparameter vorhanden!")
+            Throw New Exception("Für einen OptParameter ist kein Modellparameter vorhanden!")
         End If
 
         If Not isValid_B Then
@@ -550,13 +552,174 @@ Public MustInherit Class Sim
 
     'Validierungsfunktion der Kombinatorik Prüft ob Verbraucher an zwei Standorten Dopp vorhanden sind
     '*************************************************************************************************
-    Public MustOverride Sub Validate_Combinatoric()
+    Public Sub Validate_Combinatoric()
+
+        Dim i, j, x, y, m, n As Integer
+
+        For i = 0 To LocationList.GetUpperBound(0)
+            For j = 1 To LocationList.GetUpperBound(0)
+                For x = 0 To LocationList(i).MassnahmeListe.GetUpperBound(0)
+                    For y = 0 To LocationList(j).MassnahmeListe.GetUpperBound(0)
+                        For m = 0 To 2
+                            For n = 0 To 2
+                                If Not LocationList(i).MassnahmeListe(x).Schaltung(m, 0) = "X" And LocationList(j).MassnahmeListe(y).Schaltung(n, 0) = "X" Then
+                                    If LocationList(i).MassnahmeListe(x).Schaltung(m, 0) = LocationList(j).MassnahmeListe(y).Schaltung(n, 0) Then
+                                        Throw New Exception("Kombinatorik ist nicht valid!")
+                                    End If
+                                End If
+                            Next
+                        Next
+                    Next
+                Next
+            Next
+        Next
+
+    End Sub
 
     'Mehrere Prüfungen ob die .VER Datei des BlueM und der .CES Datei auch zusammenpassen
     '************************************************************************************
-    Public MustOverride Sub Validate_CES_fits_to_VER()
+    Public Sub Validate_CES_fits_to_VER()
+
+        Dim i As Integer = 0
+        Dim j As Integer = 0
+        Dim x As Integer = 0
+        Dim y As Integer = 0
+
+        Dim FoundA(VerzweigungsDatei.GetUpperBound(0)) As Boolean
+
+        'Prüft ob jede Verzweigung einmal in der LocationList vorkommt
+        For i = 0 To VerzweigungsDatei.GetUpperBound(0)
+            For j = 0 To LocationList.GetUpperBound(0)
+                For x = 0 To LocationList(j).MassnahmeListe.GetUpperBound(0)
+                    For y = 0 To LocationList(j).MassnahmeListe(x).Schaltung.GetUpperBound(0)
+                        If VerzweigungsDatei(i, 0) = LocationList(j).MassnahmeListe(x).Schaltung(y, 0) And VerzweigungsDatei(i, 1) = "2" Then
+                            FoundA(i) = True
+                        End If
+                    Next
+                Next
+            Next
+        Next
+
+        'Prüft ob die nicht vorkommenden Verzweigungen Verzweigungen anderer Art sind
+        For i = 0 To VerzweigungsDatei.GetUpperBound(0)
+            If Not VerzweigungsDatei(i, 1) = "2" And FoundA(i) = False Then
+                FoundA(i) = True
+            End If
+        Next
+
+        Dim FoundB As Boolean = True
+        Dim TmpBool As Boolean = False
+
+        'Prüft ob alle in der LocationList Vorkommenden Verzweigungen auch in der Verzweigungsdatei sind
+        For j = 0 To LocationList.GetUpperBound(0)
+            For x = 0 To LocationList(j).MassnahmeListe.GetUpperBound(0)
+                For y = 0 To LocationList(j).MassnahmeListe(x).Schaltung.GetUpperBound(0)
+                    If Not LocationList(j).MassnahmeListe(x).Schaltung(y, 0) = "X" Then
+                        TmpBool = False
+                        For i = 0 To VerzweigungsDatei.GetUpperBound(0)
+                            If VerzweigungsDatei(i, 0) = LocationList(j).MassnahmeListe(x).Schaltung(y, 0) And VerzweigungsDatei(i, 1) = "2" Then
+                                TmpBool = True
+                            End If
+                        Next
+                        If Not TmpBool Then
+                            FoundB = False
+                        End If
+                    End If
+
+                Next
+            Next
+        Next
+
+        'Übergabe
+        If FoundB = False Then
+            Throw New Exception(".VER und .CES Dateien passen nicht zusammen!")
+        Else
+            For i = 0 To FoundA.GetUpperBound(0)
+                If FoundA(i) = False Then
+                    Throw New Exception(".VER und .CES Dateien passen nicht zusammen!")
+                End If
+            Next
+        End If
+
+    End Sub
 
 #End Region 'Prüfung der Eingabedateien
+
+#Region "Kombinatorik"
+
+    'Kombinatorik
+    '############
+
+    'Bereitet das SimModell für Kombinatorik Optimierung vor
+    'TODO: Dieser Funktionsname ist sehr ähnlich mit "prepare_SIM_CES()"!
+    '*******************************************************
+    Public Sub Sim_Prepare(ByVal Path() As Integer)
+
+        'Erstellt die aktuelle Bauerksliste und überträgt sie zu SKos
+        Call Define_aktuelle_Elemente(Path)
+
+        'Ermittelt das aktuelle_ON_OFF array
+        Call Verzweigung_ON_OFF(Path)
+
+        'Schreibt die neuen Verzweigungen
+        Call Me.Write_Verzweigungen()
+
+    End Sub
+
+    'Die Liste mit den aktuellen Bauwerken des Kindes wird erstellt und in SKos geschrieben
+    '**************************************************************************************
+    Private Sub Define_aktuelle_Elemente(ByVal Path() As Integer)
+        Dim i, j As Integer
+        Dim No As Integer
+
+        Dim x As Integer = 0
+        For i = 0 To Path.GetUpperBound(0)
+            No = Path(i)
+            For j = 0 To LocationList(i).MassnahmeListe(No).Bauwerke.GetUpperBound(0)
+                Array.Resize(SKos1.AktuelleElemente, x + 1)
+                SKos1.AktuelleElemente(x) = LocationList(i).MassnahmeListe(No).Bauwerke(j)
+                x += 1
+            Next
+        Next
+
+        'Entfernt die X Einträge
+        Call SKos1.Remove_X(SKos1.AktuelleElemente)
+    End Sub
+
+    'Die Liste mit den aktuellen Bauwerken wird an das Kind übergeben
+    '**************************************************************************************
+    Public Sub Set_Elemente(ByRef Path() As Object)
+
+        ReDim Path(SKos1.AktuelleElemente.GetUpperBound(0))
+        Array.Copy(SKos1.AktuelleElemente, Path, SKos1.AktuelleElemente.GetLength(0))
+
+    End Sub
+
+    'Ermittelt das aktuelle Verzweigungsarray
+    '****************************************
+    Private Sub Verzweigung_ON_OFF(ByVal Path() As Integer)
+        Dim j, x, y, z As Integer
+        Dim No As Short
+
+        'Schreibt alle Bezeichnungen der Verzweigungen ins Array
+        For j = 0 To VER_ONOFF.GetUpperBound(0)
+            VER_ONOFF(j, 0) = VerzweigungsDatei(j, 0)
+        Next
+        'Weist die Werte das Pfades zu
+        For x = 0 To Path.GetUpperBound(0)
+            No = Path(x)
+            For y = 0 To LocationList(x).MassnahmeListe(No).Schaltung.GetUpperBound(0)
+                For z = 0 To VER_ONOFF.GetUpperBound(0)
+                    If LocationList(x).MassnahmeListe(No).Schaltung(y, 0) = VER_ONOFF(z, 0) Then
+                        VER_ONOFF(z, 1) = LocationList(x).MassnahmeListe(No).Schaltung(y, 1)
+                    End If
+                Next
+            Next
+        Next
+
+    End Sub
+
+#End Region 'Kombinatorik
 
 #Region "Evaluierung"
 
@@ -718,21 +881,6 @@ Public MustInherit Class Sim
         Next
     End Sub
 
-    'Bereitet das SimModell für Kombinatorik Optimierung vor
-    '*******************************************************
-    Public Sub Sim_Prepare(ByVal Path() As Integer)
-
-        'Erstellt die aktuelle Bauerksliste und überträgt sie zu SKos
-        Call Define_aktuelle_Elemente(Path)
-
-        'Ermittelt das aktuelle_ON_OFF array
-        Call Verzweigung_ON_OFF(Path)
-
-        'Schreibt die neuen Verzweigungen
-        Call Write_Verzweigungen()
-
-    End Sub
-
     'Evaluiert die Kinderchen für Kombinatorik Optimierung vor
     '*********************************************************
     Public Function Sim_Evaluierung_CombiOpt(ByVal n_Ziele As Short, ByRef Penalty As Double()) As Boolean
@@ -749,26 +897,9 @@ Public MustInherit Class Sim
 
     End Function
 
-    'Die Liste mit den aktuellen Bauwerken des Kindes wird erstellt und in SKos geschrieben
-    '**************************************************************************************
-    Public MustOverride Sub Define_aktuelle_Elemente(ByVal Path() As Integer)
-
-    'Die Liste mit den aktuellen Bauwerken wird an das Kind übergeben
-    '**************************************************************************************
-    Public Sub Set_Elemente(ByRef Path() As Object)
-
-        ReDim Path(SKos1.AktuelleElemente.GetUpperBound(0))
-        Array.Copy(SKos1.AktuelleElemente, Path, SKos1.AktuelleElemente.GetLength(0))
-
-    End Sub
-
-    'Ermittelt das aktuelle Verzweigungsarray
-    '****************************************
-    Public MustOverride Sub Verzweigung_ON_OFF(ByVal Path() As Integer)
-
     'Schreibt die neuen Verzweigungen
     '********************************
-    Public MustOverride Sub Write_Verzweigungen()
+    Protected MustOverride Sub Write_Verzweigungen()
 
     'SimModell ausführen (simulieren)
     '********************************
