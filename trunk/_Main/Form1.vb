@@ -54,7 +54,7 @@ Partial Class Form1
     Dim array_x() As Double
     Dim array_y() As Double
     Dim Bestwert(,) As Double = {}
-    Dim Population(,) As Double
+    Dim SekPopulation(,) As Double
     Dim mypara(,) As Double
 
 #End Region 'Eigenschaften
@@ -1034,12 +1034,10 @@ Start_Evolutionsrunden:
                     'Die neuen Eltern werden generiert
                     myIsOK = PES1.EsEltern()
 
-                    'Bestwerte und sekundäre Population
+                    'sekundäre Population zeichnen
                     If PES1.isMultiObjective Then
-                        myIsOK = PES1.EsGetBestwert(Bestwert)
-                        'TODO: Call Bestwertzeichnen_Pareto(Bestwert, ipop)
-                        myIsOK = PES1.esGetSekundärePopulation(Population)
-                        Call SekundärePopulationZeichnen(Population)
+                        myIsOK = PES1.esGetSekundärePopulation(SekPopulation)
+                        Call SekundärePopulationZeichnen(SekPopulation)
                     End If
 
                     System.Windows.Forms.Application.DoEvents()
@@ -1081,41 +1079,20 @@ Start_Evolutionsrunden:
     'Zeichenfunktionen
     'XXXXXXXXXXXXXXXXX
 
-    Private Sub Bestwertzeichnen_Pareto(ByRef Bestwert(,) As Double, ByRef ipop As Short)
+    'Sekundäre Population zeichnen
+    '*****************************
+    Private Sub SekundärePopulationZeichnen(ByVal Population(,) As Double)
         Dim i As Short
-        With DForm.Diag
-            .Series(ipop).Clear()
-            If UBound(Bestwert, 2) = 2 Then
-                For i = 1 To UBound(Bestwert, 1)
-                    .Series(ipop).Add(Bestwert(i, 1), Bestwert(i, 2), "")
-                Next i
-            ElseIf UBound(Bestwert, 2) = 3 Then
-                For i = 1 To UBound(Bestwert, 1)
-                    'TODO: Hier muss eine 3D-Punkt angezeigt werden
-                    '.Series(ipop).Add(Bestwert(i, 1), Bestwert(i, 2), Bestwert(i, 2), "")
-                Next i
-            End If
-        End With
-    End Sub
-
-    Private Sub SekundärePopulationZeichnen(ByRef Population(,) As Double)
-        Dim i As Short
-        Dim Datenreihe As Short
-        With DForm.Diag
-            If EVO_Einstellungen1.isPOPUL Then
-                Datenreihe = EVO_Einstellungen1.NPopul + 1
-            Else
-                Datenreihe = 1
-            End If
-            .Series(Datenreihe).Clear()
+        With DForm.Diag.Series(1)
+            .Clear()
             If UBound(Population, 2) = 2 Then
                 For i = 1 To UBound(Population, 1)
-                    .Series(Datenreihe).Add(Population(i, 1), Population(i, 2), "")
+                    .Add(Population(i, 1), Population(i, 2), "")
                 Next i
             ElseIf UBound(Population, 2) = 3 Then
                 For i = 1 To UBound(Population, 1)
                     'TODO: Hier muss eine 3D-Reihe angezeigt werden
-                    '.Series(Datenreihe).Add(Population(i, 1), Population(i, 2), Population(i, 3), "") 
+                    '.Add(Population(i, 1), Population(i, 2), Population(i, 3), "") 
                 Next i
             End If
         End With
