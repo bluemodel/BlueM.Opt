@@ -866,6 +866,16 @@ Public MustInherit Class Sim
                 Next
                 QWert = Math.Abs(VolZiel - VolSim)
 
+            Case "nÜber"
+                'Relative Anzahl der Zeitschritte mit Überschreitungen (in Prozent)
+                Dim nUeber As Integer = 0
+                For i = 0 To SimReihe.GetUpperBound(0)
+                    If (SimReihe(i, 1) > OptZiel.ZielReihe(i, 1)) Then
+                        nUeber += 1
+                    End If
+                Next
+                QWert = nUeber / SimReihe.GetUpperBound(0) * 100
+
             Case Else
                 Throw New Exception("Die Zielfunktion '" & OptZiel.ZielFkt & "' wird nicht unterstützt!")
 
@@ -935,6 +945,16 @@ Public MustInherit Class Sim
             Case "Diff"
                 'Summe der Fehler
                 QWert = Math.Abs(OptZiel.ZielWert - SimWert)
+
+            Case "nÜber"
+                'Relative Anzahl der Zeitschritte mit Überschreitungen (in Prozent)
+                Dim nUeber As Integer = 0
+                For i = 0 To SimReihe.GetUpperBound(0)
+                    If (SimReihe(i, 1) > OptZiel.ZielWert) Then
+                        nUeber += 1
+                    End If
+                Next
+                QWert = nUeber / SimReihe.GetUpperBound(0) * 100
 
             Case Else
                 Throw New Exception("Die Zielfunktion '" & OptZiel.ZielFkt & "' wird für Werte nicht unterstützt!")
