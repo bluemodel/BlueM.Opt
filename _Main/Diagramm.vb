@@ -120,14 +120,6 @@ Public Class Diagramm
         tmpSeries.Pointer.HorizSize = 3
         tmpSeries.Pointer.VertSize = 3
 
-        'Series(2): Series für Bestwert
-        tmpSeries = New Steema.TeeChart.Styles.Points(Me.Chart)
-        tmpSeries.Title = "Bestwerte"
-        tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-        tmpSeries.Color = System.Drawing.Color.Green
-        tmpSeries.Pointer.HorizSize = 3
-        tmpSeries.Pointer.VertSize = 3
-
         Call Me.add_MarksTips()
 
     End Sub
