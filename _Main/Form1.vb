@@ -1247,6 +1247,8 @@ Start_Evolutionsrunden:
 
         End Select
 
+        Call Application.DoEvents()
+
     End Sub
 
     'Klick auf Serie in Diagramm
@@ -1263,10 +1265,21 @@ Start_Evolutionsrunden:
                 Exit Sub
             End If
 
+            'Bestimmung der Parametersatz-ID
+            Dim dbID As Integer
+            'valueIndex fängt bei 0 an, DB-ID aber bei 1
+            If (Me.EVO_Einstellungen1.isPOPUL) Then
+                Dim ipop As Integer = Convert.ToInt32(s.Title.Substring(10).Trim)
+                Dim nKalk As Integer = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
+                dbID = ((ipop - 1) * nKalk) + (valueIndex + 1)
+            Else
+                dbID = valueIndex + 1
+            End If
+
             Dim i As Integer
 
             'OptParameter aus DB lesen
-            Call Sim1.db_getOptPara(valueIndex + 1) 'valueIndex fängt bei 0 an, DB-ID aber bei 1
+            Call Sim1.db_getOptPara(dbID)
 
             'Modellparameter schreiben
             Call Sim1.ModellParameter_schreiben()

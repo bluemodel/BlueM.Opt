@@ -24,11 +24,13 @@ Public Class Diagramm
             .Chart.Axes.Bottom.Automatic = Achsen(1).Auto
             .Chart.Axes.Bottom.Minimum = 0
             .Chart.Axes.Bottom.Maximum = Achsen(1).Max
+            .Chart.Axes.Bottom.Labels.Style = Steema.TeeChart.AxisLabelStyle.Value
             'Y-Achse:
             .Chart.Axes.Left.Title.Caption = Achsen(2).Name
             .Chart.Axes.Left.Automatic = Achsen(2).Auto
             .Chart.Axes.Left.Minimum = 0
             .Chart.Axes.Left.Maximum = Achsen(2).Max
+            .Chart.Axes.Left.Labels.Style = Steema.TeeChart.AxisLabelStyle.Value
         End With
 
     End Sub
