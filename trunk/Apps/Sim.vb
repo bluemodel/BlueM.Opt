@@ -504,13 +504,57 @@ Public MustInherit Class Sim
 
 #Region "Prüfung der Eingabedateien"
 
+    'Prüft ob .OPT und .MOD Dateien zusammenpassen
+    '*********************************************
+    Public Sub Validate_OPT_fits_to_MOD()
+        Dim i, j As Integer
+        Dim isValid_A As Boolean = True
+        Dim isValid_B As Boolean = True
+        Dim isValid As Boolean = False
+
+        'A: Prüfung ob für jeden OptParameter mindestens ein Modellparameter existiert
+        For i = 0 To OptParameterListe.GetUpperBound(0)
+            isvalid = False
+            For j = 0 To ModellParameterListe.GetUpperBound(0)
+                If OptParameterListe(i).Bezeichnung = ModellParameterListe(j).OptParameter Then
+                    isValid = True
+                End If
+            Next
+            If isValid = False Then
+                isValid_A = False
+            End If
+        Next
+
+        'B: Prüfung ob jeder ModellParameter einem richtigen OptParameter zugewiesen ist.
+        For i = 0 To ModellParameterListe.GetUpperBound(0)
+            isValid = False
+            For j = 0 To OptParameterListe.GetUpperBound(0)
+                If ModellParameterListe(i).OptParameter = OptParameterListe(j).Bezeichnung Then
+                    isValid = True
+                End If
+            Next
+            If isValid = False Then
+                isValid_B = False
+            End If
+        Next
+
+        If Not isValid_A Then
+            Throw New Exception("Für eine OptParameter ist kein Modellparameter vorhanden!")
+        End If
+
+        If Not isValid_B Then
+            Throw New Exception("Ein Modellparameter ist keinem OptParameter zugewiesen!")
+        End If
+
+    End Sub
+
     'Validierungsfunktion der Kombinatorik Prüft ob Verbraucher an zwei Standorten Dopp vorhanden sind
     '*************************************************************************************************
-    Public MustOverride Sub Combinatoric_is_Valid()
+    Public MustOverride Sub Validate_Combinatoric()
 
     'Mehrere Prüfungen ob die .VER Datei des BlueM und der .CES Datei auch zusammenpassen
     '************************************************************************************
-    Public MustOverride Sub CES_fits_to_VER()
+    Public MustOverride Sub Validate_CES_fits_to_VER()
 
 #End Region 'Prüfung der Eingabedateien
 

@@ -146,7 +146,7 @@ Public Class Smusi
 
     'Validierungsfunktion der Kombinatorik Prüft ob Verbraucher an zwei Standorten Dopp vorhanden sind
     '*************************************************************************************************
-    Public Overrides Sub Combinatoric_is_Valid()
+    Public Overrides Sub Validate_Combinatoric()
 
     End Sub
 
@@ -159,7 +159,7 @@ Public Class Smusi
 
     'Mehrere Prüfungen ob die .VER Datei des BlueM und der .CES Datei auch zusammenpassen
     '************************************************************************************
-    Public Overrides Sub CES_fits_to_VER()
+    Public Overrides Sub Validate_CES_fits_to_VER()
 
     End Sub
 
