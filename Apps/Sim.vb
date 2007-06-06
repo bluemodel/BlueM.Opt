@@ -76,6 +76,7 @@ Public MustInherit Class Sim
         Public Bezeichnung As String                'Bezeichnung
         Public Einheit As String                    'Einheit
         Public Datei As String                      'Dateiendung der BM-Eingabedatei
+        Public Element as String                    'Optional: Das Element auf das sich der Modellparameter bezieht
         Public ZeileNr As Short                     'Zeile
         Public SpVon As Short                       'Anfangsspalte
         Public SpBis As Short                       'Endspalte
@@ -374,10 +375,11 @@ Public MustInherit Class Sim
                 ModellParameterListe(i).Bezeichnung = array(2).Trim()
                 ModellParameterListe(i).Einheit = array(3).Trim()
                 ModellParameterListe(i).Datei = array(4).Trim()
-                ModellParameterListe(i).ZeileNr = Convert.ToInt16(array(5).Trim())
-                ModellParameterListe(i).SpVon = Convert.ToInt16(array(6).Trim())
-                ModellParameterListe(i).SpBis = Convert.ToInt16(array(7).Trim())
-                ModellParameterListe(i).Faktor = Convert.ToDouble(array(8).Trim())
+                ModellParameterListe(i).Element = array(5).Trim()
+                ModellParameterListe(i).ZeileNr = Convert.ToInt16(array(6).Trim())
+                ModellParameterListe(i).SpVon = Convert.ToInt16(array(7).Trim())
+                ModellParameterListe(i).SpBis = Convert.ToInt16(array(8).Trim())
+                ModellParameterListe(i).Faktor = Convert.ToDouble(array(9).Trim())
                 i += 1
             End If
         Loop Until StrRead.Peek() = -1
