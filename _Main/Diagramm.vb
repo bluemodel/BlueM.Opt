@@ -94,6 +94,7 @@ Public Class Diagramm
             tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
             tmpSeries.Pointer.HorizSize = 2
             tmpSeries.Pointer.VertSize = 2
+            tmpSeries.Cursor = Cursors.Hand
         Next
 
         Call Me.add_MarksTips()
@@ -111,6 +112,7 @@ Public Class Diagramm
         tmpSeries.Color = System.Drawing.Color.Orange
         tmpSeries.Pointer.HorizSize = 2
         tmpSeries.Pointer.VertSize = 2
+        tmpSeries.Cursor = Cursors.Hand
 
         'Series(1): Series für die Sekundäre Population
         tmpSeries = New Steema.TeeChart.Styles.Points(Me.Chart)
@@ -126,10 +128,9 @@ Public Class Diagramm
 
     'MarksTips zu Serien hinzufügen
     '******************************
-    Private Sub add_MarksTips()
+    Public Sub add_MarksTips()
         Dim tmpMarksTip As Steema.TeeChart.Tools.MarksTip
         For i As Integer = 0 To Me.Chart.Series.Count - 1
-            Me.Chart.Series(i).Cursor = Cursors.Hand
             tmpMarksTip = New Steema.TeeChart.Tools.MarksTip(Me.Chart)
             tmpMarksTip.Series = Me.Chart.Series(i)
             tmpMarksTip.MouseAction = Steema.TeeChart.Tools.MarksTipMouseAction.Move

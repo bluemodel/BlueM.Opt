@@ -1161,6 +1161,8 @@ Start_Evolutionsrunden:
                         tmpPoint.Pointer.HorizSize = 2
                         tmpPoint.Pointer.VertSize = 2
 
+                        Call DForm.Diag.add_MarksTips()
+
 
                     Case METH_CES, METH_CES_PES 'Methode CES
                         'XXXXXXXXXXXXXXXXXXXXX
@@ -1246,8 +1248,15 @@ Start_Evolutionsrunden:
     '***************************
     Public Sub seriesClick(ByVal sender As Object, ByVal s As Steema.TeeChart.Styles.Series, ByVal valueIndex As Integer, ByVal e As System.Windows.Forms.MouseEventArgs)
 
-        'nur bei Anwendung = Sim ausführen
-        If (Anwendung = ANW_BLUEM Or Anwendung = ANW_SMUSI) Then
+        'nur bei Anwendung = Sim und aktiver ErgebnisDB ausführen
+        If ((Anwendung = ANW_BLUEM Or Anwendung = ANW_SMUSI) And Sim1.Ergebnisdb = True) Then
+
+            If (Not s.Title.StartsWith("Population")) Then
+                MsgBox("Parametersätze können leider nur" & Chr(13) & Chr(10) _
+                        & "für Populations-Punkte (gelb) & Chr(13) & Chr(10) _
+                        & "aus der DB abgerufen werden!", MsgBoxStyle.Information, "Info")
+                Exit Sub
+            End If
 
             Dim i As Integer
 
