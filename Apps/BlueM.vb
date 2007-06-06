@@ -222,7 +222,7 @@ Public Class BlueM
 
     'Validierungsfunktion der Kombinatorik Prüft ob Verbraucher an zwei Standorten Doppelt vorhanden sind
     '****************************************************************************************************
-    Public Overrides Sub Combinatoric_is_Valid()
+    Public Overrides Sub Validate_Combinatoric()
 
         Dim i, j, x, y, m, n As Integer
 
@@ -247,7 +247,7 @@ Public Class BlueM
 
     'Mehrere Prüfungen ob die .VER Datei des BlueM und der .CES Datei auch zusammenpassen
     '************************************************************************************
-    Public Overrides Sub CES_fits_to_VER()
+    Public Overrides Sub Validate_CES_fits_to_VER()
 
         Dim i As Integer = 0
         Dim j As Integer = 0

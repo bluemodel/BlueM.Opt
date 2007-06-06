@@ -281,6 +281,7 @@ Partial Class Form1
 
                     'PES für Sim vorbereiten
                     Call Sim1.prepare_Sim_PES()
+                    Call Sim1.Validate_OPT_fits_to_MOD()
 
                     'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
                     If (Sim1.OptZieleListe.GetLength(0) = 1) Then
@@ -308,6 +309,10 @@ Partial Class Form1
 
                     'CES für Sim vorbereiten
                     Call Sim1.prepare_Sim_CES()
+                    'Überprüfen der Kombinatorik
+                    Call Sim1.Validate_Combinatoric()
+                    'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
+                    Call Sim1.Validate_CES_fits_to_VER()
 
                     CES1 = New EvoKern.CES
 
@@ -317,11 +322,6 @@ Partial Class Form1
                     ElseIf (Sim1.OptZieleListe.GetLength(0) > 1) Then
                         EVO_Einstellungen1.OptModus = 1
                     End If
-
-                    'Überprüfen der Kombinatorik
-                    Call Sim1.Combinatoric_is_Valid()
-                    'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
-                    Call Sim1.CES_fits_to_VER()
 
                     'Anzahl der Ziele, Locations und Verzeigungen wird an CES übergeben
                     CES1.n_Penalty = Sim1.OptZieleListe.GetLength(0)
@@ -352,6 +352,12 @@ Partial Class Form1
                     'CES + PES für Sim vorbereiten
                     Call Sim1.prepare_Sim_PES()
                     Call Sim1.prepare_Sim_CES()
+                    Call Sim1.Validate_OPT_fits_to_MOD()
+
+                    'Überprüfen der Kombinatorik
+                    Call Sim1.Validate_Combinatoric()
+                    'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
+                    Call Sim1.Validate_CES_fits_to_VER()
 
                     CES1 = New EvoKern.CES
 
@@ -361,11 +367,6 @@ Partial Class Form1
                     ElseIf (Sim1.OptZieleListe.GetLength(0) > 1) Then
                         EVO_Einstellungen1.OptModus = 1
                     End If
-
-                    'Überprüfen der Kombinatorik
-                    Call Sim1.Combinatoric_is_Valid()
-                    'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
-                    Call Sim1.CES_fits_to_VER()
 
                     'Anzahl der Ziele, Locations und Verzeigungen wird an CES übergeben
                     CES1.n_Penalty = Sim1.OptZieleListe.GetLength(0)
