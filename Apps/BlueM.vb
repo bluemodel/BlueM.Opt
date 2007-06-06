@@ -402,11 +402,14 @@ Public Class BlueM
         For i = 0 To Path.GetUpperBound(0)
             No = Path(i)
             For j = 0 To LocationList(i).MassnahmeListe(No).Bauwerke.GetUpperBound(0)
-                Array.Resize(SKos1.AktuelleBauwerke, x + 1)
-                SKos1.AktuelleBauwerke(x) = LocationList(i).MassnahmeListe(No).Bauwerke(j)
+                Array.Resize(SKos1.AktuelleElemente, x + 1)
+                SKos1.AktuelleElemente(x) = LocationList(i).MassnahmeListe(No).Bauwerke(j)
                 x += 1
             Next
         Next
+
+        'Entfernt die X Einträge
+        Call SKos1.Remove_X(SKos1.AktuelleElemente)
     End Sub
 
     'Ermittelt das aktuelle Verzweigungsarray

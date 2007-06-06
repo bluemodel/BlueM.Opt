@@ -17,7 +17,8 @@ Public Class SKos
     '**** Letzte Änderung: April 2007                                           ****
     '*******************************************************************************
     '*******************************************************************************
-    Public AktuelleBauwerke() as Object
+
+    Public AktuelleElemente() As Object
 
     Public Function calculate_costs(ByVal BlueM1 As BlueM)
         Dim costs As Double = 0
@@ -35,14 +36,11 @@ Public Class SKos
         'Kalkulieren der Kosten für jedes Bauwerk
         Call Acquire_Costs(TRS_Array, TAL_Array, Bauwerksliste)
 
-        'Aktuelles Bauwerks Array bereinigen
-        Call Remove_X(AktuelleBauwerke)
-
         'Kosten aufsummieren
         Dim i, j As Integer
-        For i = 0 To AktuelleBauwerke.GetUpperBound(0)
+        For i = 0 To AktuelleElemente.GetUpperBound(0)
             For j = 0 To Bauwerksliste.GetUpperBound(0)
-                If Bauwerksliste(j, 0) = AktuelleBauwerke(i) Then
+                If Bauwerksliste(j, 0) = AktuelleElemente(i) Then
                     costs = costs + Bauwerksliste(i, 1)
                 End If
             Next
@@ -78,8 +76,9 @@ Public Class SKos
         Next
     End Sub
 
-    'Die "X" Einträge werden entfernt
-    Private Sub Remove_X(ByRef Array As Object())
+    'Hilfsfunktion: Die "X" Einträge werden entfernt
+    '***********************************************
+    Public Sub Remove_X(ByRef Array As Object())
         Dim x As Integer
         Dim i As Integer
         Dim TmpArray(Array.GetUpperBound(0)) As String
@@ -95,6 +94,7 @@ Public Class SKos
     End Sub
 
     'Länge der Transportstrecken einlesen
+    '************************************
     Private Sub Read_TRS(ByVal BlueM1 As BlueM, ByRef TRS_Array As Object)
 
         'Dim TRS_Array(,) As Object = {}

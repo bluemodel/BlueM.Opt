@@ -43,6 +43,7 @@ Public Class CES
         Dim No As Short
         Dim Path() As Integer      'auf 0 ist die Stadt, auf 1 die Anzahl der Städte
         Dim Penalty() As Double
+        Dim Elemente() As Object
         Dim mutated As Boolean
         Dim Front As Short
     End Structure
@@ -80,36 +81,19 @@ Public Class CES
 #Region "Methoden"
     '#############
 
-    'Dimensionieren des ChildStructs
+    'Dimensionieren des Faksimile
     '*******************************
-    Public Sub Dim_Childs()
+    Public Sub Dim_Faksimile(ByRef TMP() As Struct_Faksimile)
         Dim i, j As Integer
-        ReDim List_Childs(n_Childs - 1)
+        ReDim TMP(n_Childs - 1)
 
-        For i = 0 To n_Childs - 1
-            List_Childs(i).No = i + 1
-            ReDim List_Childs(i).Penalty(n_Penalty - 1)
+        For i = 0 To TMP.GetUpperBound(0)
+            TMP(i).No = i + 1
+            ReDim TMP(i).Penalty(n_Penalty - 1)
             For j = 0 To n_Penalty - 1
-                List_Childs(i).Penalty(j) = 999999999999999999
+                TMP(i).Penalty(j) = 999999999999999999
             Next
-            ReDim List_Childs(i).Path(n_Location - 1)
-        Next
-
-    End Sub
-
-    'Dimensionieren des ParentStructs
-    '********************************
-    Public Sub Dim_Parents()
-        Dim i, j As Integer
-        ReDim List_Parents(n_Parents - 1)
-
-        For i = 0 To n_Parents - 1
-            List_Parents(i).No = i + 1
-            ReDim List_Parents(i).Penalty(n_Penalty - 1)
-            For j = 0 To n_Penalty - 1
-                List_Parents(i).Penalty(j) = 999999999999999999
-            Next
-            ReDim List_Parents(i).Path(n_Location - 1)
+            ReDim TMP(i).Path(n_Location - 1)
         Next
 
     End Sub
