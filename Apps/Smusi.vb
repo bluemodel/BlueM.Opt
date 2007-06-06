@@ -144,40 +144,16 @@ Public Class Smusi
 
     End Sub
 
-    'Validierungsfunktion der Kombinatorik Prüft ob Verbraucher an zwei Standorten Dopp vorhanden sind
-    '*************************************************************************************************
-    Public Overrides Sub Validate_Combinatoric()
-
-    End Sub
-
-    'Liest die Verzweigungen aus dem BModel in ein Array ein
+    'Liest die Verzweigungen aus SMUSI in ein Array ein
     'Und Dimensioniert das Verzweigungsarray
     '*******************************************************
     Protected Overrides Sub Read_Verzweigungen()
 
     End Sub
 
-    'Mehrere Prüfungen ob die .VER Datei des BlueM und der .CES Datei auch zusammenpassen
-    '************************************************************************************
-    Public Overrides Sub Validate_CES_fits_to_VER()
-
-    End Sub
-
-    'Die Liste mit den aktuellen Bauwerken des Kindes wird erstellt und in SKos geschrieben
-    '**************************************************************************************
-    Public Overrides Sub Define_aktuelle_Elemente(ByVal Path() As Integer)
-
-    End Sub
-
-    'Ermittelt das aktuelle Verzweigungsarray
-    '****************************************
-    Public Overrides Sub Verzweigung_ON_OFF(ByVal Path() As Integer)
-
-    End Sub
-
     'Schreibt die neuen Verzweigungen
     '********************************
-    Public Overrides Sub Write_Verzweigungen()
+    Protected Overrides Sub Write_Verzweigungen()
 
     End Sub
 

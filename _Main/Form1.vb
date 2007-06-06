@@ -281,7 +281,6 @@ Partial Class Form1
 
                     'PES für Sim vorbereiten
                     Call Sim1.prepare_Sim_PES()
-                    Call Sim1.Validate_OPT_fits_to_MOD()
 
                     'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
                     If (Sim1.OptZieleListe.GetLength(0) = 1) Then
@@ -352,7 +351,6 @@ Partial Class Form1
                     'CES + PES für Sim vorbereiten
                     Call Sim1.prepare_Sim_PES()
                     Call Sim1.prepare_Sim_CES()
-                    Call Sim1.Validate_OPT_fits_to_MOD()
 
                     'Überprüfen der Kombinatorik
                     Call Sim1.Validate_Combinatoric()
