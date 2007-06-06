@@ -1328,7 +1328,7 @@ Start_Evolutionsrunden:
                             SimSeries.Add(.SimGr, .SimGr)
                             'Simulationsergebnis in Wave speichern
                             Dim simresult(,) As Object = {}
-                            Dim isOK As Boolean = Apps.Sim.Read_WEL(WELFile, Sim1.OptZieleListe(0).SimGr, simresult)
+                            Dim isOK As Boolean = Apps.Sim.Read_WEL(WELFile, .SimGr, simresult)
                             n += 1
                             ReDim Preserve Wave1.WaveList(n - 1)
                             Wave1.WaveList(n - 1).Bezeichnung = .SimGr
