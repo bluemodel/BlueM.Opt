@@ -1253,7 +1253,7 @@ Start_Evolutionsrunden:
 
             If (Not s.Title.StartsWith("Population")) Then
                 MsgBox("Parametersätze können leider nur" & Chr(13) & Chr(10) _
-                        & "für Populations-Punkte (gelb) & Chr(13) & Chr(10) _
+                        & "für Populations-Punkte (gelb)" & Chr(13) & Chr(10) _
                         & "aus der DB abgerufen werden!", MsgBoxStyle.Information, "Info")
                 Exit Sub
             End If
