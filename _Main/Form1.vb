@@ -1280,17 +1280,17 @@ Start_Evolutionsrunden:
             'Modellparameter schreiben
             Call Sim1.ModellParameter_schreiben()
 
-            'String für die Anzeige der Werte
-            Dim paraliste As String
-            paraliste = Chr(13) & Chr(10) & "OptParameter - Wert: " & Chr(13) & Chr(10)
+            'String für die Anzeige der OptParameter
+            Dim OptParaString As String
+            OptParaString = Chr(13) & Chr(10) & "OptParameter: " & Chr(13) & Chr(10)
             For i = 0 To Sim1.OptParameterListe.GetUpperBound(0)
                 With Sim1.OptParameterListe(i)
-                    paraliste &= Chr(13) & Chr(10) & .Bezeichnung & " - " & .Wert
+                    OptParaString &= Chr(13) & Chr(10) & .Bezeichnung & ": " & .Wert.ToString()
                 End With
             Next
 
             'MessageBox
-            Dim res As MsgBoxResult = MsgBox("Diesen Parametersatz simulieren?" & Chr(13) & Chr(10) & paraliste, MsgBoxStyle.OkCancel, "Info")
+            Dim res As MsgBoxResult = MsgBox("Diesen Parametersatz simulieren?" & Chr(13) & Chr(10) & OptParaString, MsgBoxStyle.OkCancel, "Info")
             If (res = MsgBoxResult.Ok) Then
 
                 'Simulieren
@@ -1302,14 +1302,21 @@ Start_Evolutionsrunden:
                 Dim n As Integer = 0                            'Anzahl Waves
                 Dim SimSeries As New Collection                 'zu zeichnende Simulationsgrößen
                 Dim RefSeries As New Collection                 'zu zeichnende Referenzreihen
+                Dim QWertString As String                       'String für die Anzeige der QWerte
+
+                QWertString = "QWerte: " & Chr(13) & Chr(10)
 
                 'zu zeichnenden Reihen raussuchen
                 For i = 0 To Sim1.OptZieleListe.GetUpperBound(0)
 
                     With Sim1.OptZieleListe(i)
 
+                        'Qualitätswert berechnen und an String anhängen
+                        .QWertTmp = Sim1.QWert(Sim1.OptZieleListe(i))
+                        QWertString &= Chr(13) & Chr(10) & .Bezeichnung & ": " & .QWertTmp.ToString()
+
                         'Name der WEL-Simulationsergebnisdatei
-                        Dim WELFile as String = ""
+                        Dim WELFile As String = ""
                         If (Anwendung = ANW_BLUEM) Then
                             WELFile = Sim1.WorkDir & Sim1.Datensatz & ".WEL"
                         ElseIf (Anwendung = ANW_SMUSI) Then
@@ -1329,7 +1336,7 @@ Start_Evolutionsrunden:
                         End If
 
                         'ggf. Referenzreihe in Wave speichern
-                        If (.ZielTyp = "Reihe") Then
+                        If (.ZielTyp = "Reihe" Or .ZielTyp = "IHA") Then
                             'Referenzreihen nur jeweils ein Mal zeichnen
                             If (Not RefSeries.Contains(.ZielReihePfad & .ZielGr)) Then
                                 RefSeries.Add(.ZielGr, .ZielReihePfad & .ZielGr)
@@ -1360,6 +1367,11 @@ Start_Evolutionsrunden:
 
                 'Initialisierung
                 Call Wave1.WForm.Diag.DiagInitialise(Titel, Achsen)
+
+                'Annotation anzeigen
+                Dim anno1 As New Steema.TeeChart.Tools.Annotation(Wave1.WForm.Diag.Chart)
+                anno1.Text = QWertString & Chr(13) & Chr(10) & OptParaString
+                anno1.Position = Steema.TeeChart.Tools.AnnotationPositions.LeftTop
 
                 'Serien initialisieren
                 Dim tmpSeries As Steema.TeeChart.Styles.Line
