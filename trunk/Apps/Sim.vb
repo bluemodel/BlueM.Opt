@@ -723,7 +723,7 @@ Public MustInherit Class Sim
     Public Sub Sim_Prepare(ByVal Path() As Integer)
 
         'Erstellt die aktuelle Bauerksliste und überträgt sie zu SKos
-        Call Define_aktuelle_Bauwerke(Path)
+        Call Define_aktuelle_Elemente(Path)
 
         'Ermittelt das aktuelle_ON_OFF array
         Call Verzweigung_ON_OFF(Path)
@@ -751,7 +751,16 @@ Public MustInherit Class Sim
 
     'Die Liste mit den aktuellen Bauwerken des Kindes wird erstellt und in SKos geschrieben
     '**************************************************************************************
-    Public MustOverride Sub Define_aktuelle_Bauwerke(ByVal Path() As Integer)
+    Public MustOverride Sub Define_aktuelle_Elemente(ByVal Path() As Integer)
+
+    'Die Liste mit den aktuellen Bauwerken wird an das Kind übergeben
+    '**************************************************************************************
+    Public Sub Set_Elemente(ByRef Path() As Object)
+
+        ReDim Path(SKos1.AktuelleElemente.GetUpperBound(0))
+        Array.Copy(SKos1.AktuelleElemente, Path, SKos1.AktuelleElemente.GetLength(0))
+
+    End Sub
 
     'Ermittelt das aktuelle Verzweigungsarray
     '****************************************

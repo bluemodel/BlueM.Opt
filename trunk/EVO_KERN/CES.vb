@@ -210,6 +210,9 @@ Public Class CES
             Next
             Array.Clear(List_Childs(i).Path, 0, List_Childs(i).Path.GetLength(0))
             List_Childs(i).mutated = False
+            For j = 0 To List_Childs(i).Elemente.GetUpperBound(0)
+                List_Childs(i).Elemente(j) = ""
+            Next
         Next
 
     End Sub
