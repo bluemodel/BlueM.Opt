@@ -623,8 +623,8 @@ Partial Class Form1
         Dim i As Integer
 
         'Parents und Child werden Dimensioniert
-        Call CES1.Dim_Parents()
-        Call CES1.Dim_Childs()
+        Call CES1.Dim_Faksimile(ces1.List_Parents)
+        Call CES1.Dim_Faksimile(CES1.List_Childs)
 
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
@@ -717,8 +717,8 @@ Partial Class Form1
         Dim i As Integer
 
         'Parents und Child werden Dimensioniert
-        Call CES1.Dim_Parents()
-        Call CES1.Dim_Childs()
+        Call CES1.Dim_Faksimile(CES1.List_Parents)
+        Call CES1.Dim_Faksimile(CES1.List_Childs)
 
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
@@ -804,9 +804,13 @@ Partial Class Form1
 
         For i = 0 To CES1.n_Parents - 1
             If CES1.List_Parents(i).Front = 1 Then
-                'Bereitet das BlaueModell für die Kombinatorik ein
+                'Bereitet das BlaueModell für die Kombinatorik vor
                 '*************************************************
                 Call Sim1.Sim_Prepare(CES1.List_Parents(i).Path)
+
+                'Reduktion der OptimierungsParameter
+                '***********************************
+                Call Sim1.Reduce_OptParameter()
 
                 'Parameterübergabe an PES
                 '************************

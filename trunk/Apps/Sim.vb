@@ -560,6 +560,11 @@ Public MustInherit Class Sim
 
 #Region "Evaluierung"
 
+    Public Sub Reduce_OptParameter()
+
+
+    End Sub
+
     'EVO-Parameterübergabe
     '*********************
     Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara(,) As Double)
@@ -584,8 +589,8 @@ Public MustInherit Class Sim
 
     End Sub
 
-    'Evaluierung des SimModells für Parameter Optimierung - Steuerungseinheit
-    '************************************************************************
+    'Evaluierung des SimModells für ParameterOptimierung - Steuerungseinheit
+    '***********************************************************************
     Public Sub Eval_Sim_ParaOpt(ByVal GlobalAnzPar As Short, ByVal GlobalAnzZiel As Short, ByVal mypara As Double(,), ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN As Double(), ByRef TChart1 As Steema.TeeChart.TChart)
 
         Dim i As Short
