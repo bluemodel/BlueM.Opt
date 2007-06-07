@@ -307,11 +307,7 @@ Partial Class Form1
                     Sim1.Ergebnisdb = False
 
                     'CES für Sim vorbereiten
-                    Call Sim1.prepare_Sim_CES()
-                    'Überprüfen der Kombinatorik
-                    Call Sim1.Validate_Combinatoric()
-                    'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
-                    Call Sim1.Validate_CES_fits_to_VER()
+                    Call Sim1.prepare_Sim_CES(CES1.TestModus)
 
                     CES1 = New EvoKern.CES
 
@@ -348,14 +344,10 @@ Partial Class Form1
                     'Ergebnisdatenbank ausschalten
                     Sim1.Ergebnisdb = False
 
-                    'CES + PES für Sim vorbereiten
+                    'CES für Sim vorbereiten
+                    Call Sim1.prepare_Sim_CES(CES1.TestModus)
+                    'PES für Sim vorbereiten
                     Call Sim1.prepare_Sim_PES()
-                    Call Sim1.prepare_Sim_CES()
-
-                    'Überprüfen der Kombinatorik
-                    Call Sim1.Validate_Combinatoric()
-                    'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
-                    Call Sim1.Validate_CES_fits_to_VER()
 
                     CES1 = New EvoKern.CES
 
