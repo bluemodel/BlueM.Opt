@@ -40,12 +40,12 @@ Public Class CES
     'Faksimile Struktur
     '******************
     Public Structure Struct_Faksimile
-        Dim No As Short
-        Dim Path() As Integer      'auf 0 ist die Stadt, auf 1 die Anzahl der Städte
-        Dim Penalty() As Double
-        Dim Elemente() As Object
-        Dim mutated As Boolean
-        Dim Front As Short
+        Dim No As Short                     'Nummer des NDSorting
+        Dim Path() As Integer               'Der Pfad
+        Dim Elemente() As Object            'Liste der Elemente
+        Dim Penalty() As Double             'Werte der Penaltyfunktion(en)
+        Dim mutated As Boolean              'Gibt an ob der Wert bereits mutiert ist oder nicht
+        Dim Front As Short                  'Nummer der Pareto Front
     End Structure
 
     Public List_Childs() As Struct_Faksimile
@@ -54,14 +54,15 @@ Public Class CES
     'NDSorting Struktur
     '******************
     Public Structure Struct_NDSorting
+        Dim No As Short                     'CH: Nummer des NDSorting
+        Dim Path() As Integer               'CH: Der Pfad
+        Dim Elemente() As Object            'CH: Liste der Elemente
         Dim Penalty() As Double             'DM: Werte der Penaltyfunktion(en)
-        Dim Constrain() As Double           'DM: Werte der Randbedingung(en)
-        Dim Feasible As Boolean             'DM: Gültiges Ergebnis ?
+        'Dim Constrain() As Double           'DM: Werte der Randbedingung(en)
+        'Dim Feasible As Boolean             'DM: Gültiges Ergebnis ?
         Dim dominated As Boolean            'DM: Kennzeichnung ob dominiert
         Dim Front As Short                  'DM: Nummer der Pareto Front
         Dim Distance As Double              'DM: Distanzwert für Crowding distance sort
-        Dim No As Short                     'CH: Nummer des Faksimile
-        Dim Path() As Integer               'CH: Der Pfad
     End Structure
 
     Public NDSorting() As Struct_NDSorting
@@ -90,6 +91,7 @@ Public Class CES
         For i = 0 To TMP.GetUpperBound(0)
             TMP(i).No = i + 1
             ReDim TMP(i).Penalty(n_Penalty - 1)
+            Redim TMP(i).Elemente(0)
             For j = 0 To n_Penalty - 1
                 TMP(i).Penalty(j) = 999999999999999999
             Next
@@ -98,19 +100,77 @@ Public Class CES
 
     End Sub
 
-    'Dimensionieren des NDSortingStructs BM Problem
-    '**********************************************
+    'Dimensionieren des NDSortingStructs
+    '***********************************
     Public Sub Dim_NDSorting_Type(ByRef TMP() As Struct_NDSorting)
         Dim i, j As Integer
 
         For i = 0 To TMP.GetUpperBound(0)
             TMP(i).No = i + 1
+            ReDim TMP(i).Path(n_Location - 1)
+            Redim tmp(i).Elemente(0)
             ReDim TMP(i).Penalty(n_Penalty - 1)
             For j = 0 To n_Penalty - 1
                 TMP(i).Penalty(j) = 999999999999999999
             Next
-            ReDim TMP(i).Path(n_Location - 1)
+
         Next
+
+    End Sub
+
+    'Kopiert ein Faksimile
+    '*********************
+    Public Sub Copy_Faksimile_NDSorting(ByVal Source As Struct_Faksimile, ByRef Destination As Struct_Faksimile)
+
+        Destination.No = Source.No
+        Array.Copy(Source.Path, Destination.Path, Source.Path.Length)
+        ReDim Destination.Elemente(Source.Elemente.GetUpperBound(0))
+        Array.Copy(Source.Elemente, Destination.Elemente, Source.Elemente.Length)
+        Array.Copy(Source.Penalty, Destination.Penalty, Source.Penalty.Length)
+        Destination.mutated = Source.mutated
+        Destination.Front = Source.Front
+
+    End Sub
+
+    'Kopiert ein Faksimile soweit möglich in ein NDSorting
+    '*****************************************************
+    Public Sub Copy_Faksimile_NDSorting(ByVal Source As Struct_Faksimile, ByRef Destination As Struct_NDSorting)
+
+        Destination.No = Source.No
+        Array.Copy(Source.Path, Destination.Path, Source.Path.Length)
+        ReDim Destination.Elemente(Source.Elemente.GetUpperBound(0))
+        Array.Copy(Source.Elemente, Destination.Elemente, Source.Elemente.Length)
+        Array.Copy(Source.Penalty, Destination.Penalty, Source.Penalty.Length)
+        Destination.Front = Source.Front
+
+    End Sub
+
+    'Kopiert ein NDSOrting in ein Faksimile
+    '**************************************
+    Public Sub Copy_Faksimile_NDSorting(ByVal Source As Struct_NDSorting, ByRef Destination As Struct_Faksimile)
+
+        Destination.No = Source.No
+        Array.Copy(Source.Path, Destination.Path, Source.Path.Length)
+        ReDim Destination.Elemente(Source.Elemente.GetUpperBound(0))
+        Array.Copy(Source.Elemente, Destination.Elemente, Source.Elemente.Length)
+        Array.Copy(Source.Penalty, Destination.Penalty, Source.Penalty.Length)
+        Destination.Front = Source.Front
+
+    End Sub
+
+    'Kopiert ein NDSOrting
+    '*********************
+    Public Sub Copy_Faksimile_NDSorting(ByVal Source As Struct_NDSorting, ByRef Destination As Struct_NDSorting)
+
+        Destination.No = Source.No
+        Array.Copy(Source.Path, Destination.Path, Source.Path.Length)
+        ReDim Destination.Elemente(Source.Elemente.GetUpperBound(0))
+        Array.Copy(Source.Elemente, Destination.Elemente, Source.Elemente.Length)
+        Array.Copy(Source.Penalty, Destination.Penalty, Source.Penalty.Length)
+        Destination.dominated = Source.dominated
+        Destination.Front = Source.Front
+
+        Destination.Distance = Source.Distance
 
     End Sub
 
@@ -179,8 +239,7 @@ Public Class CES
 
         If Strategy = "minus" Then
             For i = 0 To n_Parents - 1
-                List_Parents(i).Penalty(0) = List_Childs(i).Penalty(0)
-                Array.Copy(List_Childs(i).Path, List_Parents(i).Path, List_Childs(i).Path.Length)
+                Call Copy_Faksimile_NDSorting(List_Childs(i), List_Parents(i))
             Next i
 
         ElseIf Strategy = "plus" Then
@@ -189,8 +248,7 @@ Public Class CES
                 If List_Parents(i).Penalty(0) < List_Childs(j).Penalty(0) Then
                     j -= 1
                 Else
-                    List_Parents(i).Penalty(0) = List_Childs(j).Penalty(0)
-                    Array.Copy(List_Childs(j).Path, List_Parents(i).Path, List_Childs(j).Path.Length)
+                    Call Copy_Faksimile_NDSorting(List_Childs(i), List_Parents(i))
                 End If
                 j += 1
             Next i
@@ -472,23 +530,22 @@ Public Class CES
         '-------------------------------------------
 
         For i = 0 To n_Childs - 1
-            With NDSorting(i)
+ 
+            ''NConstrains ********************************
+            'If Eigenschaft.NConstrains > 0 Then
+            '    NDSorting(i).Feasible = True
+            '    For l = 1 To Eigenschaft.NConstrains
+            '        NDSorting(i).Constrain(l) = Rb(m - Eigenschaft.NNachf, Eigenschaft.iaktuellePopulation, l)
+            '        If NDSorting(i).Constrain(l) < 0 Then NDSorting(i).Feasible = False
+            '    Next l
+            'End If
 
-                ''NConstrains ********************************
-                'If Eigenschaft.NConstrains > 0 Then
-                '    .Feasible = True
-                '    For l = 1 To Eigenschaft.NConstrains
-                '        .Constrain(l) = Rb(m - Eigenschaft.NNachf, Eigenschaft.iaktuellePopulation, l)
-                '        If .Constrain(l) < 0 Then .Feasible = False
-                '    Next l
-                'End If
+            Call Copy_Faksimile_NDSorting(List_Childs(i), NDSorting(i))
 
-                Array.Copy(List_Childs(i).Penalty, .Penalty, .Penalty.GetLength(0))
-                .dominated = False
-                .Front = 0
-                .Distance = 0
-                Array.Copy(List_Childs(i).Path, .Path, .Path.GetLength(0))
-            End With
+            NDSorting(i).dominated = False
+            NDSorting(i).Front = 0
+            NDSorting(i).Distance = 0
+  
         Next i
 
         '1. Eltern und Nachfolger werden gemeinsam betrachtet
@@ -496,23 +553,22 @@ Public Class CES
         '-------------------------------------------
 
         For i = n_Childs To n_Childs + n_Parents - 1
-            With NDSorting(i)
 
-                ''NConstrains ********************************
-                'If Eigenschaft.NConstrains > 0 Then
-                '    .Feasible = True
-                '    For l = 1 To Eigenschaft.NConstrains
-                '        .Constrain(l) = Rb(m - Eigenschaft.NNachf, Eigenschaft.iaktuellePopulation, l)
-                '        If .Constrain(l) < 0 Then .Feasible = False
-                '    Next l
-                'End If
+            ''NConstrains ********************************
+            'If Eigenschaft.NConstrains > 0 Then
+            '    NDSorting(i).Feasible = True
+            '    For l = 1 To Eigenschaft.NConstrains
+            '        NDSorting(i).Constrain(l) = Rb(m - Eigenschaft.NNachf, Eigenschaft.iaktuellePopulation, l)
+            '        If NDSorting(i).Constrain(l) < 0 Then NDSorting(i).Feasible = False
+            '    Next l
+            'End If
 
-                Array.Copy(List_Parents(i - n_Childs).Penalty, .Penalty, .Penalty.GetLength(0))
-                .dominated = False
-                .Front = 0
-                .Distance = 0
-                Array.Copy(List_Parents(i - n_Childs).Path, .Path, .Path.GetLength(0))
-            End With
+            Call Copy_Faksimile_NDSorting(List_Parents(i - n_Childs), NDSorting(i))
+
+            NDSorting(i).dominated = False
+            NDSorting(i).Front = 0
+            NDSorting(i).Distance = 0
+
         Next i
 
         '2. Die einzelnen Fronten werden bestimmt
@@ -528,7 +584,9 @@ Public Class CES
         Call Dim_NDSorting_Type(NDSResult)
 
         'NDSorting wird in Temp kopiert
-        Array.Copy(NDSorting, Temp, NDSorting.GetLength(0))
+        For i = 0 To NDSorting.GetUpperBound(0)
+            call Copy_Faksimile_NDSorting(NDSOrting(i),temp(i))
+        Next
 
         'Schleife läuft über die Zahl der Fronten die hier auch bestimmte werden
         Do
@@ -563,10 +621,7 @@ Public Class CES
             '-> schiss wird einfach rüberkopiert
             If NFrontMember_aktuell <= n_Parents - NFrontMember_gesamt Then
                 For i = NFrontMember_gesamt To NFrontMember_aktuell + NFrontMember_gesamt - 1
-                    Array.Copy(NDSResult(i).Penalty, List_Parents(i).Penalty, n_Penalty)
-                    Array.Copy(NDSResult(i).Path, List_Parents(i).Path, n_Location)
-                    List_Parents(i).No = NDSResult(i).No
-                    List_Parents(i).Front = NDSResult(i).Front
+                    call Copy_Faksimile_NDSorting(NDSResult(i),List_Parents(i))
                 Next i
                 NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
 
@@ -577,10 +632,7 @@ Public Class CES
                 Call NDS_Crowding_Distance_Sort(NDSResult, NFrontMember_gesamt, NFrontMember_gesamt + NFrontMember_aktuell - 1)
 
                 For i = NFrontMember_gesamt To n_Parents - 1
-                    Array.Copy(NDSResult(i).Penalty, List_Parents(i).Penalty, n_Penalty)
-                    Array.Copy(NDSResult(i).Path, List_Parents(i).Path, n_Location)
-                    List_Parents(i).No = NDSResult(i).No
-                    List_Parents(i).Front = NDSResult(i).Front
+                    Call Copy_Faksimile_NDSorting(NDSResult(i), List_Parents(i))
                 Next i
 
                 NFrontMember_gesamt = n_Parents
@@ -751,7 +803,7 @@ Public Class CES
         'Die nicht dominanten Lösungen werden nach oben kopiert
         For i = 0 To NDSorting.GetUpperBound(0)
             If NDSorting(i).dominated = True Then
-                Temp(counter) = NDSorting(i)
+                Call Copy_Faksimile_NDSorting(NDSorting(i), Temp(counter))
                 counter = counter + 1
             End If
         Next i
@@ -762,12 +814,14 @@ Public Class CES
         'Die dominanten Lösungen werden nach unten kopiert
         For i = 0 To NDSorting.GetUpperBound(0)
             If NDSorting(i).dominated = False Then
-                Temp(counter) = NDSorting(i)
+                Call Copy_Faksimile_NDSorting(NDSorting(i), Temp(counter))
                 counter = counter + 1
             End If
         Next i
 
-        Array.Copy(Temp, NDSorting, NDSorting.GetLength(0))
+        For i = 0 To Temp.GetUpperBound(0)
+            Call Copy_Faksimile_NDSorting(Temp(i), NDSorting(i))
+        Next
 
     End Function
 
@@ -794,7 +848,7 @@ Public Class CES
         'In NDSResult werden die nicht dominierten Lösungen eingefügt
         For i = Temp.GetUpperBound(0) + 1 - NFrontMember_aktuell To Temp.GetUpperBound(0)
             'NDSResult alle bisher gefundene Fronten
-            NDSResult(Position) = Temp(i)
+            Call Copy_Faksimile_NDSorting(Temp(i), NDSResult(Position))
             Position = Position + 1
         Next i
 
@@ -833,9 +887,8 @@ Public Class CES
         Dim j As Integer
         Dim k As Short
 
-        Dim swap As Struct_NDSorting
-        ReDim swap.Penalty(n_Penalty - 1)
-        ReDim swap.Path(n_Location - 1)
+        Dim swap(0) As Struct_NDSorting
+        call Dim_NDSorting_Type(swap)
 
         Dim fmin, fmax As Double
 
@@ -843,9 +896,9 @@ Public Class CES
             For i = start To ende
                 For j = start To ende
                     If NDSorting(i).Penalty(k) < NDSorting(j).Penalty(k) Then
-                        swap = NDSorting(i)
-                        NDSorting(i) = NDSorting(j)
-                        NDSorting(j) = swap
+                        call Copy_Faksimile_NDSorting(NDSorting(i),swap(0))
+                        call Copy_Faksimile_NDSorting(NDSorting(j),NDSorting(i))
+                        call Copy_Faksimile_NDSorting(swap(0),NDSorting(j))
                     End If
                 Next j
             Next i
@@ -864,9 +917,9 @@ Public Class CES
         For i = start To ende
             For j = start To ende
                 If NDSorting(i).Distance > NDSorting(j).Distance Then
-                    swap = NDSorting(i)
-                    NDSorting(i) = NDSorting(j)
-                    NDSorting(j) = swap
+                    Call Copy_Faksimile_NDSorting(NDSorting(i), swap(0))
+                    Call Copy_Faksimile_NDSorting(NDSorting(j), NDSorting(i))
+                    Call Copy_Faksimile_NDSorting(swap(0), NDSorting(j))
                 End If
             Next j
         Next i
