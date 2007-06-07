@@ -19,7 +19,8 @@ Public Class CES
     '##################
 
     'Public Variablen
-    Public TestModus As Integer         'Gibt den Testmodus an
+    Public TestModus As Integer             'Gibt den Testmodus an
+    Public n_Combinations As Integer        'Anzahl aller Kombinationen
     Public n_Location As Integer            'Anzahl der Locations wird von außen gesetzt
     Public n_Penalty As Integer             'Anzahl der Ziele wird von außen gesetzt
     Public n_Verzweig As Integer            'Anzahl der Verzweigungen in der Verzweigungsdatei
@@ -199,34 +200,32 @@ Public Class CES
 
     End Sub
 
-    'HACK: Funktion zum manuellen testen aller Kombinationen
-    '*******************************************************
+    'Testmodus2: Funktion zum testen aller Kombinationen
+    '***************************************************
     Public Sub Generate_All_Test_Path()
-        Dim i As Integer
-        Dim x, y, z As Integer
 
-        x = 0
-        y = 0
-        z = 0
+        Dim i, j As Integer
+        'Dim x, y, z As Integer
+
+        Dim array() As Integer
+        ReDim array(List_Childs(i).Path.GetUpperBound(0))
+        For i = 0 To array.GetUpperBound(0)
+            array(i) = 0
+        Next
 
         For i = 0 To n_Childs - 1
-
-            List_Childs(i).Path(0) = x
-            List_Childs(i).Path(1) = y
-            List_Childs(i).Path(2) = z
-            x += 1
-            If x > n_PathDimension(0) - 1 Then
-                x = 0
-                y += 1
+            For j = 0 To List_Childs(i).Path.GetUpperBound(0)
+                list_childs(i).Path(j) = array(j)
+            Next
+            array(0) += 1
+            If Not i = n_Childs - 1 Then
+                For j = 0 To List_Childs(i).Path.GetUpperBound(0)
+                    If array(j) > n_PathDimension(j) - 1 Then
+                        array(j) = 0
+                        array(j + 1) += 1
+                    End If
+                Next
             End If
-            If y > n_PathDimension(1) - 1 Then
-                y = 0
-                z += 1
-            End If
-            If z > n_PathDimension(2) - 1 Then
-                z = 0
-            End If
-
         Next
 
     End Sub
@@ -531,7 +530,7 @@ Public Class CES
         '-------------------------------------------
 
         For i = 0 To n_Childs - 1
- 
+
             ''NConstrains ********************************
             'If Eigenschaft.NConstrains > 0 Then
             '    NDSorting(i).Feasible = True
@@ -546,7 +545,7 @@ Public Class CES
             NDSorting(i).dominated = False
             NDSorting(i).Front = 0
             NDSorting(i).Distance = 0
-  
+
         Next i
 
         '1. Eltern und Nachfolger werden gemeinsam betrachtet
@@ -586,7 +585,7 @@ Public Class CES
 
         'NDSorting wird in Temp kopiert
         For i = 0 To NDSorting.GetUpperBound(0)
-            call Copy_Faksimile_NDSorting(NDSOrting(i),temp(i))
+            Call Copy_Faksimile_NDSorting(NDSorting(i), Temp(i))
         Next
 
         'Schleife läuft über die Zahl der Fronten die hier auch bestimmte werden
@@ -622,7 +621,7 @@ Public Class CES
             '-> schiss wird einfach rüberkopiert
             If NFrontMember_aktuell <= n_Parents - NFrontMember_gesamt Then
                 For i = NFrontMember_gesamt To NFrontMember_aktuell + NFrontMember_gesamt - 1
-                    call Copy_Faksimile_NDSorting(NDSResult(i),List_Parents(i))
+                    Call Copy_Faksimile_NDSorting(NDSResult(i), List_Parents(i))
                 Next i
                 NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
 
@@ -889,7 +888,7 @@ Public Class CES
         Dim k As Short
 
         Dim swap(0) As Struct_NDSorting
-        call Dim_NDSorting_Type(swap)
+        Call Dim_NDSorting_Type(swap)
 
         Dim fmin, fmax As Double
 
@@ -897,9 +896,9 @@ Public Class CES
             For i = start To ende
                 For j = start To ende
                     If NDSorting(i).Penalty(k) < NDSorting(j).Penalty(k) Then
-                        call Copy_Faksimile_NDSorting(NDSorting(i),swap(0))
-                        call Copy_Faksimile_NDSorting(NDSorting(j),NDSorting(i))
-                        call Copy_Faksimile_NDSorting(swap(0),NDSorting(j))
+                        Call Copy_Faksimile_NDSorting(NDSorting(i), swap(0))
+                        Call Copy_Faksimile_NDSorting(NDSorting(j), NDSorting(i))
+                        Call Copy_Faksimile_NDSorting(swap(0), NDSorting(j))
                     End If
                 Next j
             Next i

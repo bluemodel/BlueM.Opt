@@ -655,6 +655,19 @@ Public MustInherit Class Sim
     'Kombinatorik
     '############
 
+    'Berechnet die Anzahl maximal möglicher Kombinationen
+    '****************************************************
+    Public Function No_of_Combinations() As Integer
+        Dim i As Integer
+
+        No_of_Combinations = List_Locations(0).List_Massnahmen.GetLength(0)
+
+        For i = 1 To List_Locations.GetUpperBound(0)
+            No_of_Combinations = No_of_Combinations * List_Locations(i).List_Massnahmen.GetLength(0)
+        Next
+
+    End Function
+
     'Überprüft ob und welcher TestModus aktiv ist
     'Beschreibung:
     '********************************************
@@ -689,11 +702,9 @@ Public MustInherit Class Sim
         count_B = 0
         For i = 0 To List_Locations.GetUpperBound(0)
             count_A += 1
-            Bool = False
             For j = 0 To List_Locations(i).List_Massnahmen.GetUpperBound(0)
-                If List_Locations(i).List_Massnahmen(j).TestModus = 1 And Not Bool Then
+                If List_Locations(i).List_Massnahmen(j).TestModus = 1 Then
                     count_B += 1
-                    Bool = True
                 End If
             Next
         Next
