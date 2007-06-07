@@ -307,7 +307,7 @@ Partial Class Form1
                     Sim1.Ergebnisdb = False
 
                     'CES für Sim vorbereiten
-                    Call Sim1.prepare_Sim_CES(CES1.TestModus)
+                    Call Sim1.prepare_Sim_CES()
 
                     CES1 = New EvoKern.CES
 
@@ -322,6 +322,7 @@ Partial Class Form1
                     CES1.n_Penalty = Sim1.List_OptZiele.GetLength(0)
                     CES1.n_Location = Sim1.List_Locations.GetLength(0)
                     CES1.n_Verzweig = Sim1.VerzweigungsDatei.GetLength(0)
+                    CES1.TestModus = Sim1.Set_TestModus
 
                     'Gibt die PathSize an für jede Pfadstelle
                     Dim i As Integer
@@ -345,7 +346,7 @@ Partial Class Form1
                     Sim1.Ergebnisdb = False
 
                     'CES für Sim vorbereiten
-                    Call Sim1.prepare_Sim_CES(CES1.TestModus)
+                    Call Sim1.prepare_Sim_CES()
                     'PES für Sim vorbereiten
                     Call Sim1.prepare_Sim_PES()
 
@@ -362,6 +363,7 @@ Partial Class Form1
                     CES1.n_Penalty = Sim1.List_OptZiele.GetLength(0)
                     CES1.n_Location = Sim1.List_Locations.GetLength(0)
                     CES1.n_Verzweig = Sim1.VerzweigungsDatei.GetLength(0)
+                    CES1.TestModus = Sim1.Set_TestModus
 
                     'Gibt die PathSize an für jede Pfadstelle
                     Dim i As Integer

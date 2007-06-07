@@ -272,7 +272,7 @@ Public MustInherit Class Sim
     'CES vorbereiten
     'Erforderliche Dateien werden eingelesen
     '***************************************
-    Public Sub prepare_Sim_CES(byref TestModus as Integer)
+    Public Sub prepare_Sim_CES()
 
         'Zielfunktionen einlesen
         Call Me.Read_OptZiele()
@@ -284,8 +284,6 @@ Public MustInherit Class Sim
         Call Me.Validate_Combinatoric()
         'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
         Call Me.Validate_CES_fits_to_VER()
-        'auslesen des TestModus
-        Call Me.Set_TestModus(TestModus)
 
     End Sub
 
@@ -660,16 +658,17 @@ Public MustInherit Class Sim
     'Überprüft ob und welcher TestModus aktiv ist
     'Beschreibung:
     '********************************************
-    Public Sub Set_TestModus(ByRef Modus as Integer)
+    Public Function Set_TestModus() As Integer
 
         Dim i, j As Integer
-        Dim count_A As Integer = 0
-        Dim count_B As Integer = 0
-        Dim Bool_A As Boolean = False
-        Dim Bool_B as Integer = false
+        Dim count_A As Integer
+        Dim count_B As Integer
+        Dim Bool As Boolean = False
 
         'Prüft auf den Modus "0" kein TestModus
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        count_A = 0
+        count_B = 0
         For i = 0 To List_Locations.GetUpperBound(0)
             For j = 0 To List_Locations(i).List_Massnahmen.GetUpperBound(0)
                 count_A += 1
@@ -679,29 +678,35 @@ Public MustInherit Class Sim
             Next
         Next
 
-        If count_A = count_b Then
-            Modus = 0
-            Exit Sub
+        If count_A = count_B Then
+            Set_TestModus = 0
+            Exit Function
         End If
 
         'Prüft aus Testen einer definierten Kombination
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        count_A = 0
+        count_B = 0
         For i = 0 To List_Locations.GetUpperBound(0)
             count_A += 1
+            Bool = False
             For j = 0 To List_Locations(i).List_Massnahmen.GetUpperBound(0)
-                If List_Locations(i).List_Massnahmen(j).TestModus = 1 Then
+                If List_Locations(i).List_Massnahmen(j).TestModus = 1 And Not Bool Then
                     count_B += 1
+                    Bool = True
                 End If
             Next
         Next
 
         If count_A = count_B Then
-            Modus = 1
-            Exit Sub
+            Set_TestModus = 1
+            Exit Function
         End If
 
         'Prüft auf einmaliges Testen aller möglichen Kombinationen
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        count_A = 0
+        count_B = 0
         For i = 0 To List_Locations.GetUpperBound(0)
             For j = 0 To List_Locations(i).List_Massnahmen.GetUpperBound(0)
                 count_A += 1
@@ -712,11 +717,13 @@ Public MustInherit Class Sim
         Next
 
         If count_A = count_B Then
-            Modus = 2
-            Exit Sub
+            Set_TestModus = 2
+            Exit Function
         End If
 
-    End Sub
+        Throw New Exception("Fehler bei der angabe des Testmodus")
+
+    End Function
 
     'Bereitet das SimModell für Kombinatorik Optimierung vor
     'TODO: Dieser Funktionsname ist sehr ähnlich mit "prepare_SIM_CES()"!
