@@ -158,6 +158,7 @@ Public Class BlueM
                 List_Locations(i).List_Massnahmen(j).Bauwerke(1) = array(11).Trim()
                 List_Locations(i).List_Massnahmen(j).Bauwerke(2) = array(12).Trim()
                 List_Locations(i).List_Massnahmen(j).Bauwerke(3) = array(13).Trim()
+                List_Locations(i).List_Massnahmen(j).TestModus = Convert.ToInt16(array(14).Trim())
                 j += 1
             End If
 
