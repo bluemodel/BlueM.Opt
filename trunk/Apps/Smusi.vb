@@ -106,7 +106,7 @@ Public Class Smusi
 
     'Qualitätswert aus WEL-Datei
     '***************************
-    Protected Overrides Function QWert_WEL(ByVal OptZiel As OptZiel) As Double
+    Protected Overrides Function QWert_WEL(ByVal OptZiel As Struct_OptZiel) As Double
 
         Dim IsOK As Boolean
         Dim QWert As Double

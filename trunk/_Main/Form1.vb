@@ -254,11 +254,11 @@ Partial Class Form1
                     '--------------------------
                     'List_Boxen füllen
                     Dim i As Integer
-                    For i = 0 To Sim1.OptParameterListe.GetUpperBound(0)
-                        Call SensiPlot1.ListBox_OptParameter_add(Sim1.OptParameterListe(i))
+                    For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
+                        Call SensiPlot1.ListBox_OptParameter_add(Sim1.List_OptParameter(i))
                     Next
-                    For i = 0 To Sim1.OptZieleListe.GetUpperBound(0)
-                        Call SensiPlot1.ListBox_OptZiele_add(Sim1.OptZieleListe(i))
+                    For i = 0 To Sim1.List_OptZiele.GetUpperBound(0)
+                        Call SensiPlot1.ListBox_OptZiele_add(Sim1.List_OptZiele(i))
                     Next
                     'Dialog anzeigen
                     Dim SensiPlotDiagResult As Windows.Forms.DialogResult
@@ -283,9 +283,9 @@ Partial Class Form1
                     Call Sim1.prepare_Sim_PES()
 
                     'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
-                    If (Sim1.OptZieleListe.GetLength(0) = 1) Then
+                    If (Sim1.List_OptZiele.GetLength(0) = 1) Then
                         EVO_Einstellungen1.OptModus = 0
-                    ElseIf (Sim1.OptZieleListe.GetLength(0) > 1) Then
+                    ElseIf (Sim1.List_OptZiele.GetLength(0) > 1) Then
                         EVO_Einstellungen1.OptModus = 1
                     End If
 
@@ -316,22 +316,22 @@ Partial Class Form1
                     CES1 = New EvoKern.CES
 
                     'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
-                    If (Sim1.OptZieleListe.GetLength(0) = 1) Then
+                    If (Sim1.List_OptZiele.GetLength(0) = 1) Then
                         EVO_Einstellungen1.OptModus = 0
-                    ElseIf (Sim1.OptZieleListe.GetLength(0) > 1) Then
+                    ElseIf (Sim1.List_OptZiele.GetLength(0) > 1) Then
                         EVO_Einstellungen1.OptModus = 1
                     End If
 
                     'Anzahl der Ziele, Locations und Verzeigungen wird an CES übergeben
-                    CES1.n_Penalty = Sim1.OptZieleListe.GetLength(0)
-                    CES1.n_Location = Sim1.LocationList.GetLength(0)
+                    CES1.n_Penalty = Sim1.List_OptZiele.GetLength(0)
+                    CES1.n_Location = Sim1.List_Locations.GetLength(0)
                     CES1.n_Verzweig = Sim1.VerzweigungsDatei.GetLength(0)
 
                     'Gibt die PathSize an für jede Pfadstelle
                     Dim i As Integer
                     ReDim CES1.n_PathDimension(CES1.n_Location - 1)
                     For i = 0 To CES1.n_Location - 1
-                        CES1.n_PathDimension(i) = Sim1.LocationList(i).MassnahmeListe.GetLength(0)
+                        CES1.n_PathDimension(i) = Sim1.List_Locations(i).List_Massnahmen.GetLength(0)
                     Next
 
                 Case METH_CES_PES 'Methode CES + PES
@@ -360,22 +360,22 @@ Partial Class Form1
                     CES1 = New EvoKern.CES
 
                     'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
-                    If (Sim1.OptZieleListe.GetLength(0) = 1) Then
+                    If (Sim1.List_OptZiele.GetLength(0) = 1) Then
                         EVO_Einstellungen1.OptModus = 0
-                    ElseIf (Sim1.OptZieleListe.GetLength(0) > 1) Then
+                    ElseIf (Sim1.List_OptZiele.GetLength(0) > 1) Then
                         EVO_Einstellungen1.OptModus = 1
                     End If
 
                     'Anzahl der Ziele, Locations und Verzeigungen wird an CES übergeben
-                    CES1.n_Penalty = Sim1.OptZieleListe.GetLength(0)
-                    CES1.n_Location = Sim1.LocationList.GetLength(0)
+                    CES1.n_Penalty = Sim1.List_OptZiele.GetLength(0)
+                    CES1.n_Location = Sim1.List_Locations.GetLength(0)
                     CES1.n_Verzweig = Sim1.VerzweigungsDatei.GetLength(0)
 
                     'Gibt die PathSize an für jede Pfadstelle
                     Dim i As Integer
                     ReDim CES1.n_PathDimension(CES1.n_Location - 1)
                     For i = 0 To CES1.n_Location - 1
-                        CES1.n_PathDimension(i) = Sim1.LocationList(i).MassnahmeListe.GetLength(0)
+                        CES1.n_PathDimension(i) = Sim1.List_Locations(i).List_Massnahmen.GetLength(0)
                     Next
 
             End Select
@@ -496,9 +496,9 @@ Partial Class Form1
             'OptParameterwert variieren
             Select Case SensiPlot1.Selected_SensiType
                 Case "Gleichverteilt"
-                    Sim1.OptParameterListe(SensiPlot1.Selected_OptParameter).SKWert = Rnd()
+                    Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter).SKWert = Rnd()
                 Case "Diskret"
-                    Sim1.OptParameterListe(SensiPlot1.Selected_OptParameter).SKWert = i / SensiPlot1.Anz_Sim
+                    Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter).SKWert = i / SensiPlot1.Anz_Sim
             End Select
 
             'Modellparameter schreiben
@@ -508,14 +508,14 @@ Partial Class Form1
             Call Sim1.launchSim()
 
             'Qwert berechnen
-            Sim1.OptZieleListe(SensiPlot1.Selected_OptZiel).QWertTmp = Sim1.QWert(Sim1.OptZieleListe(SensiPlot1.Selected_OptZiel))
+            Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).QWertTmp = Sim1.QWert(Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel))
 
             'Diagramm aktualisieren
-            DForm.Diag.Series(0).Add(Sim1.OptZieleListe(SensiPlot1.Selected_OptZiel).QWertTmp, Sim1.OptParameterListe(SensiPlot1.Selected_OptParameter).Wert, "")
+            DForm.Diag.Series(0).Add(Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).QWertTmp, Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter).Wert, "")
 
             'Speichern des Simulationsergebnisses für Wave
             'BUG 119: Die WEL-Datei hat bei Smusi einen anderen Namen!
-            Apps.Sim.Read_WEL(Sim1.WorkDir & Sim1.Datensatz & ".wel", Sim1.OptZieleListe(SensiPlot1.Selected_OptZiel).SimGr, Wave1.WaveList(i).Wave)
+            Apps.Sim.Read_WEL(Sim1.WorkDir & Sim1.Datensatz & ".wel", Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).SimGr, Wave1.WaveList(i).Wave)
 
             durchlauf += 1
 
@@ -531,7 +531,7 @@ Partial Class Form1
         xAchse.Name = "Zeit"
         xAchse.Auto = True
         Achsen.Add(xAchse)
-        yAchse.Name = Sim1.OptZieleListe(SensiPlot1.Selected_OptZiel).SimGr
+        yAchse.Name = Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).SimGr
         yAchse.Auto = True
         Achsen.Add(yAchse)
 
@@ -610,7 +610,7 @@ Partial Class Form1
     Private Sub STARTEN_CES()
 
         'Fehlerabfragen
-        If (Sim1.OptZieleListe.GetLength(0) > 2) Then
+        If (Sim1.List_OptZiele.GetLength(0) > 2) Then
             Throw New Exception("Zu viele Ziele für CES. Max=2")
         End If
 
@@ -705,7 +705,7 @@ Partial Class Form1
     Private Sub STARTEN_CES_PES()
 
         'Fehlerabfragen
-        If (Sim1.OptZieleListe.GetLength(0) > 2) Then
+        If (Sim1.List_OptZiele.GetLength(0) > 2) Then
             Throw New Exception("Zu viele Ziele für CES. Max=2")
         End If
 
@@ -810,7 +810,7 @@ Partial Class Form1
 
                 'Reduktion der OptimierungsParameter
                 '***********************************
-                Call Sim1.Reduce_OptParameter()
+                Call Sim1.Reduce_OptParameter(ces1.List_Parents(i).Elemente)
 
                 'Parameterübergabe an PES
                 '************************
@@ -1145,12 +1145,12 @@ Start_Evolutionsrunden:
                         Dim Achse As Diagramm.Achse
                         Dim Achsen As New Collection
                         'X-Achse = QWert
-                        Achse.Name = Sim1.OptZieleListe(SensiPlot1.Selected_OptZiel).Bezeichnung
+                        Achse.Name = Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).Bezeichnung
                         Achse.Auto = True
                         Achse.Max = 0
                         Achsen.Add(Achse)
                         'Y-Achse = OptParameter
-                        Achse.Name = Sim1.OptParameterListe(SensiPlot1.Selected_OptParameter).Bezeichnung
+                        Achse.Name = Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter).Bezeichnung
                         Achse.Auto = True
                         Achse.Max = 0
                         Achsen.Add(Achse)
@@ -1185,8 +1185,8 @@ Start_Evolutionsrunden:
                         End If
                         'für jede Zielfunktion eine weitere Achse hinzufügen
                         'HACK: Diagramm-Achsen bisher nur für Anwendung BlueM!
-                        For i = 0 To Sim1.OptZieleListe.GetUpperBound(0)
-                            Achse.Name = Sim1.OptZieleListe(i).Bezeichnung
+                        For i = 0 To Sim1.List_OptZiele.GetUpperBound(0)
+                            Achse.Name = Sim1.List_OptZiele(i).Bezeichnung
                             Achse.Auto = True
                             Achse.Max = 0
                             Achsen.Add(Achse)
@@ -1222,8 +1222,8 @@ Start_Evolutionsrunden:
                             Achsen.Add(Achse)
                         End If
                         'für jede Zielfunktion eine weitere Achse hinzufügen
-                        For i = 0 To Sim1.OptZieleListe.GetUpperBound(0)
-                            Achse.Name = Sim1.OptZieleListe(i).Bezeichnung
+                        For i = 0 To Sim1.List_OptZiele.GetUpperBound(0)
+                            Achse.Name = Sim1.List_OptZiele(i).Bezeichnung
                             Achse.Auto = True
                             Achse.Max = 0
                             Achsen.Add(Achse)
@@ -1287,8 +1287,8 @@ Start_Evolutionsrunden:
             'String für die Anzeige der OptParameter
             Dim OptParaString As String
             OptParaString = Chr(13) & Chr(10) & "OptParameter: " & Chr(13) & Chr(10)
-            For i = 0 To Sim1.OptParameterListe.GetUpperBound(0)
-                With Sim1.OptParameterListe(i)
+            For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
+                With Sim1.List_OptParameter(i)
                     OptParaString &= Chr(13) & Chr(10) & .Bezeichnung & ": " & .Wert.ToString()
                 End With
             Next
@@ -1311,12 +1311,12 @@ Start_Evolutionsrunden:
                 QWertString = "QWerte: " & Chr(13) & Chr(10)
 
                 'zu zeichnenden Reihen raussuchen
-                For i = 0 To Sim1.OptZieleListe.GetUpperBound(0)
+                For i = 0 To Sim1.List_OptZiele.GetUpperBound(0)
 
-                    With Sim1.OptZieleListe(i)
+                    With Sim1.List_OptZiele(i)
 
                         'Qualitätswert berechnen und an String anhängen
-                        .QWertTmp = Sim1.QWert(Sim1.OptZieleListe(i))
+                        .QWertTmp = Sim1.QWert(Sim1.List_OptZiele(i))
                         QWertString &= Chr(13) & Chr(10) & .Bezeichnung & ": " & .QWertTmp.ToString()
 
                         'Name der WEL-Simulationsergebnisdatei

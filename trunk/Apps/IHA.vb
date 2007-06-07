@@ -146,9 +146,9 @@ Public Class IHA
         '-----------------------------
         'Referenz-Zeitreihe raussuchen
         Dim ZeitReihe(,) As Object = {}
-        For i = 0 To BlueM1.OptZieleListe.GetUpperBound(0)
-            If (BlueM1.OptZieleListe(i).ZielTyp = "IHA") Then
-                ZeitReihe = BlueM1.OptZieleListe(i).ZielReihe
+        For i = 0 To BlueM1.List_OptZiele.GetUpperBound(0)
+            If (BlueM1.List_OptZiele(i).ZielTyp = "IHA") Then
+                ZeitReihe = BlueM1.List_OptZiele(i).ZielReihe
                 Exit For
             End If
         Next
