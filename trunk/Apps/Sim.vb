@@ -123,6 +123,7 @@ Public MustInherit Class Sim
         Public Schaltung(,) As String
         Public KostenTyp As Integer
         Public Bauwerke() As String
+        Public TestModus As Integer
     End Structure
 
     Public Structure Struct_Lokation
