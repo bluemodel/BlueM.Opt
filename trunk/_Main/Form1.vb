@@ -323,6 +323,16 @@ Partial Class Form1
                     CES1.n_Location = Sim1.List_Locations.GetLength(0)
                     CES1.n_Verzweig = Sim1.VerzweigungsDatei.GetLength(0)
                     CES1.TestModus = Sim1.Set_TestModus
+                    CES1.n_Combinations = Sim1.No_of_Combinations
+                    If CES1.TestModus = 1 Then
+                        CES1.n_Childs = 1
+                        CES1.n_Generation = 1
+                        ReDim CES1.NDSResult(CES1.n_Childs + CES1.n_Parents - 1)
+                    ElseIf CES1.TestModus = 2 Then
+                        CES1.n_Childs = CES1.n_Combinations
+                        CES1.n_Generation = 1
+                        ReDim CES1.NDSResult(CES1.n_Childs + CES1.n_Parents - 1)
+                    End If
 
                     'Gibt die PathSize an für jede Pfadstelle
                     Dim i As Integer
@@ -364,6 +374,16 @@ Partial Class Form1
                     CES1.n_Location = Sim1.List_Locations.GetLength(0)
                     CES1.n_Verzweig = Sim1.VerzweigungsDatei.GetLength(0)
                     CES1.TestModus = Sim1.Set_TestModus
+                    CES1.n_Combinations = Sim1.No_of_Combinations
+                    If CES1.TestModus = 1 Then
+                        CES1.n_Childs = 1
+                        CES1.n_Generation = 1
+                        ReDim CES1.NDSResult(CES1.n_Childs + CES1.n_Parents - 1)
+                    ElseIf CES1.TestModus = 2 Then
+                        CES1.n_Childs = CES1.n_Combinations
+                        CES1.n_Generation = 1
+                        ReDim CES1.NDSResult(CES1.n_Childs + CES1.n_Parents - 1)
+                    End If
 
                     'Gibt die PathSize an für jede Pfadstelle
                     Dim i As Integer
@@ -621,11 +641,18 @@ Partial Class Form1
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
 
-        'Zufällige Kinderpfade werden generiert
-        Call CES1.Generate_Random_Path()
-
-        'HACK: Funktion zum manuellen testen aller Kombinationen
-        'Call CES1.Generate_All_Test_Path()
+        'Die verschiedenen Modi
+        'xxxxxxxxxxxxxxxxxxxxxx
+        If ces1.Testmodus = 0 Then
+            'Normaler Modus: Zufällige Kinderpfade werden generiert
+            Call CES1.Generate_Random_Path()
+        ElseIf CES1.TestModus = 1 Then
+            'Testmodus 1: Funktion zum testen einer ausgewählten Kombinationen
+            'ToDO: Modus fehlt
+        ElseIf CES1.TestModus = 2 Then
+            'Testmodus 2: Funktion zum  testen aller Kombinationen
+            Call CES1.Generate_All_Test_Path()
+        End If
 
         'Generationsschleife
         For gen = 0 To CES1.n_Generation - 1
@@ -716,11 +743,18 @@ Partial Class Form1
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
 
-        'Zufällige Kinderpfade werden generiert
-        Call CES1.Generate_Random_Path()
-
-        'HACK: Funktion zum manuellen testen aller Kombinationen
-        'Call CES1.Generate_All_Test_Path()
+        'Die verschiedenen Modi
+        'xxxxxxxxxxxxxxxxxxxxxx
+        If CES1.TestModus = 0 Then
+            'Normaler Modus: Zufällige Kinderpfade werden generiert
+            Call CES1.Generate_Random_Path()
+        ElseIf CES1.TestModus = 1 Then
+            'Testmodus 1: Funktion zum testen einer ausgewählten Kombinationen
+            'ToDO: Modus fehlt
+        ElseIf CES1.TestModus = 2 Then
+            'Testmodus 2: Funktion zum  testen aller Kombinationen
+            Call CES1.Generate_All_Test_Path()
+        End If
 
         'Generationsschleife für CES
         'xxxxxxxxxxxxxxxxxxxxxxxxxxx
