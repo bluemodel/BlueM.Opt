@@ -651,6 +651,67 @@ Public MustInherit Class Sim
     'Kombinatorik
     '############
 
+    'Überprüft ob und welcher TestModus aktiv ist
+    'Beschreibung:
+    '********************************************
+    Public Sub Set_TestModus(ByRef Modus as Integer)
+
+        Dim i, j As Integer
+        Dim count_A As Integer = 0
+        Dim count_B As Integer = 0
+        Dim Bool_A As Boolean = False
+        Dim Bool_B as Integer = false
+
+        'Prüft auf den Modus "0" kein TestModus
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        For i = 0 To List_Locations.GetUpperBound(0)
+            For j = 0 To List_Locations(i).List_Massnahmen.GetUpperBound(0)
+                count_A += 1
+                If List_Locations(i).List_Massnahmen(j).TestModus = 0 Then
+                    count_B += 1
+                End If
+            Next
+        Next
+
+        If count_A = count_b Then
+            Modus = 0
+            Exit Sub
+        End If
+
+        'Prüft aus Testen einer definierten Kombination
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        For i = 0 To List_Locations.GetUpperBound(0)
+            count_A += 1
+            For j = 0 To List_Locations(i).List_Massnahmen.GetUpperBound(0)
+                If List_Locations(i).List_Massnahmen(j).TestModus = 1 Then
+                    count_B += 1
+                End If
+            Next
+        Next
+
+        If count_A = count_B Then
+            Modus = 1
+            Exit Sub
+        End If
+
+        'Prüft auf einmaliges Testen aller möglichen Kombinationen
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        For i = 0 To List_Locations.GetUpperBound(0)
+            For j = 0 To List_Locations(i).List_Massnahmen.GetUpperBound(0)
+                count_A += 1
+                If List_Locations(i).List_Massnahmen(j).TestModus = 1 Then
+                    count_B += 1
+                End If
+            Next
+        Next
+
+        If count_A = count_B Then
+            Modus = 2
+            Exit Sub
+        End If
+
+    End Sub
+
     'Bereitet das SimModell für Kombinatorik Optimierung vor
     'TODO: Dieser Funktionsname ist sehr ähnlich mit "prepare_SIM_CES()"!
     '*******************************************************
