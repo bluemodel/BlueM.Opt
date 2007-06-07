@@ -19,7 +19,7 @@ Public Class CES
     '##################
 
     'Public Variablen
-    Public TestModus As Integer
+    Public TestModus As Integer         'Gibt den Testmodus an
     Public n_Location As Integer            'Anzahl der Locations wird von auﬂen gesetzt
     Public n_Penalty As Integer             'Anzahl der Ziele wird von auﬂen gesetzt
     Public n_Verzweig As Integer            'Anzahl der Verzweigungen in der Verzweigungsdatei
