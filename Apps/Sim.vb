@@ -723,11 +723,50 @@ Public MustInherit Class Sim
 
 #Region "Evaluierung"
 
-    Public Sub Reduce_OptParameter(ByVal Bauwerksliste() As Object)
-        dim TMP as
+    'Reduziert die OptParameter und die ModellParameter auf die aktiven Elemente
+    '***************************************************************************
+    Public Sub Reduce_OptPara_ModPara(ByVal Bauwerksliste() As Object)
+        Dim i, j, count As Integer
+        Dim TMP() As Struct_ModellParameter
+        ReDim TMP(List_ModellParameter.GetUpperBound(0))
 
+        count = 0
+        For i = 0 To List_ModellParameter.GetUpperBound(0)
+            For j = 0 To Bauwerksliste.GetUpperBound(0)
+                If List_ModellParameter(i).Element = Bauwerksliste(j) Then
+                    Call copy_Struct_ModellParemeter(List_ModellParameter(i), TMP(count))
+                    count += 1
+                End If
+            Next
+        Next
+
+        Array.Resize(TMP, count)
+        Array.Resize(List_ModellParameter, count)
+
+        For i = 0 To TMP.GetUpperBound(0)
+            Call copy_Struct_ModellParemeter(TMP(i), List_ModellParameter(i))
+        Next
 
     End Sub
+
+    'Kopiert ein Strukt_ModellParameter
+    '**********************************
+    Private Sub copy_Struct_ModellParemeter(ByVal Source As Struct_ModellParameter, ByRef Destination As Struct_ModellParameter)
+
+        Destination.OptParameter = Source.OptParameter
+        Destination.Bezeichnung = Source.Bezeichnung
+        Destination.Einheit = Source.Einheit
+        Destination.Datei = Source.Datei
+        Destination.Element = Source.Element
+        Destination.ZeileNr = Source.ZeileNr
+        Destination.SpVon = Source.SpVon
+        Destination.SpBis = Source.SpBis
+        Destination.Faktor = Source.Faktor
+        Destination.Wert = Source.Wert
+
+    End Sub
+
+
 
     'EVO-Parameterübergabe
     '*********************
