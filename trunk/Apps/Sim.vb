@@ -272,7 +272,7 @@ Public MustInherit Class Sim
     'CES vorbereiten
     'Erforderliche Dateien werden eingelesen
     '***************************************
-    Public Sub prepare_Sim_CES()
+    Public Sub prepare_Sim_CES(byref TestModus as Integer)
 
         'Zielfunktionen einlesen
         Call Me.Read_OptZiele()
@@ -280,6 +280,12 @@ Public MustInherit Class Sim
         Call Me.Read_Kombinatorik()
         'Verzweigungs Datei einlesen
         Call Me.Read_Verzweigungen()
+        'Überprüfen der Kombinatorik
+        Call Me.Validate_Combinatoric()
+        'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
+        Call Me.Validate_CES_fits_to_VER()
+        'auslesen des TestModus
+        Call Me.Set_TestModus(TestModus)
 
     End Sub
 
