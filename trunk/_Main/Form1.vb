@@ -810,7 +810,7 @@ Partial Class Form1
 
                 'Reduktion der OptimierungsParameter
                 '***********************************
-                Call Sim1.Reduce_OptParameter(ces1.List_Parents(i).Elemente)
+                Call Sim1.Reduce_OptPara_ModPara(ces1.List_Parents(i).Elemente)
 
                 'Parameterübergabe an PES
                 '************************
