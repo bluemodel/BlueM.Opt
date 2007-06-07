@@ -6,11 +6,11 @@ Public Class SensiPlot
     Public Selected_SensiType As String
     Public Anz_Sim As Integer
 
-    Public Sub ListBox_OptParameter_add(ByVal OptParameter As Sim.OptParameter)
+    Public Sub ListBox_OptParameter_add(ByVal OptParameter As Sim.Struct_OptParameter)
         ListBox_OptParameter.Items.Add(OptParameter)
     End Sub
 
-    Public Sub ListBox_OptZiele_add(ByVal OptZiel As Sim.OptZiel)
+    Public Sub ListBox_OptZiele_add(ByVal OptZiel As Sim.Struct_OptZiel)
         ListBox_OptZiele.Items.Add(OptZiel)
     End Sub
 

@@ -55,12 +55,12 @@ Public Class SKos
         'Kopiert die Bauwerke aus dem BlueM
         Dim i, j, k As Integer
         Dim x As Integer = 0
-        For i = 0 To BlueM1.LocationList.GetUpperBound(0)
-            For j = 0 To BlueM1.LocationList(i).MassnahmeListe.GetUpperBound(0)
-                For k = 0 To BlueM1.LocationList(i).MassnahmeListe(j).Bauwerke.GetUpperBound(0)
-                    If BlueM1.LocationList(i).MassnahmeListe(j).KostenTyp = 1 Then
+        For i = 0 To BlueM1.List_Locations.GetUpperBound(0)
+            For j = 0 To BlueM1.List_Locations(i).List_Massnahmen.GetUpperBound(0)
+                For k = 0 To BlueM1.List_Locations(i).List_Massnahmen(j).Bauwerke.GetUpperBound(0)
+                    If BlueM1.List_Locations(i).List_Massnahmen(j).KostenTyp = 1 Then
                         System.Array.Resize(Bauwerks_Array, x + 1)
-                        Bauwerks_Array(x) = BlueM1.LocationList(i).MassnahmeListe(j).Bauwerke(k)
+                        Bauwerks_Array(x) = BlueM1.List_Locations(i).List_Massnahmen(j).Bauwerke(k)
                         x += 1
                     End If
                 Next
