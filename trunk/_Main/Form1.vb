@@ -158,6 +158,9 @@ Partial Class Form1
                     'Test-Probleme aktivieren
                     Testprobleme1.Enabled = True
 
+                    'EVO_Einstellungen aktivieren
+                    EVO_Einstellungen1.Enabled = True
+
                     EVO_Einstellungen1.OptModus = Testprobleme1.OptModus
 
                     'Globale Parameter werden gesetzt
