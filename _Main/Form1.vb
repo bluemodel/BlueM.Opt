@@ -47,7 +47,6 @@ Partial Class Form1
 
     '**** Globale Parameter Parameter Optimierung ****
     Dim myIsOK As Boolean
-    Dim myisrun As Boolean
     Dim globalAnzPar As Short
     Dim globalAnzZiel_ParaOpt As Short
     Dim globalAnzRand As Short
@@ -56,6 +55,10 @@ Partial Class Form1
     Dim Bestwert(,) As Double = {}
     Dim SekPopulation(,) As Double
     Dim mypara(,) As Double
+
+    '**** Verschiedenes ****
+    Dim isrun As Boolean = False                        'Optimierung läuft
+    Dim ispause As Boolean = False                      'Optimierung ist pausiert
 
 #End Region 'Eigenschaften
 
@@ -442,37 +445,60 @@ Partial Class Form1
 
     Private Sub STARTEN_Button_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Button_Start.Click
 
-        'Try
-        myisrun = True
-        Select Case Anwendung
+        If (Me.isrun And Not Me.ispause) Then
+            'Optimierung pausieren
+            Me.ispause = True
+            Me.Button_Start.Text = ">"
+            Do While (Me.ispause)
+                Application.DoEvents()
+            Loop
 
-            Case ANW_BLUEM, ANW_SMUSI
+        ElseIf (Me.isrun) Then
+            'Optimierung weiterlaufen lassen
+            Me.ispause = False
+            Me.Button_Start.Text = "||"
 
-                Select Case Methode
-                    Case METH_RESET
-                        Call Sim1.launchSim()
-                    Case METH_SENSIPLOT
-                        Call STARTEN_SensiPlot()
-                    Case METH_PES
-                        Call STARTEN_PES()
-                    Case METH_CES
-                        Call STARTEN_CES()
-                    Case METH_CES_PES
-                        Call STARTEN_CES_PES()
-                End Select
+        Else
+            'Optimierung starten
+            Me.isrun = True
+            Me.Button_Start.Text = "||"
 
-            Case ANW_TESTPROBLEME
-                Call STARTEN_PES()
+            'Try
 
-            Case ANW_TSP
-                Call STARTEN_TSP()
+            Select Case Anwendung
 
-        End Select
+                Case ANW_BLUEM, ANW_SMUSI
 
-        ''Globale Fehlerbehandlung für Optimierungslauf:
-        'Catch ex As Exception
-        '    MsgBox(ex.Message, MsgBoxStyle.Critical, "Fehler")
-        'End Try
+                    Select Case Methode
+                        Case METH_RESET
+                            Call Sim1.launchSim()
+                        Case METH_SENSIPLOT
+                            Call STARTEN_SensiPlot()
+                        Case METH_PES
+                            Call STARTEN_PES()
+                        Case METH_CES
+                            Call STARTEN_CES()
+                        Case METH_CES_PES
+                            Call STARTEN_CES_PES()
+                    End Select
+
+                Case ANW_TESTPROBLEME
+                    Call STARTEN_PES()
+
+                Case ANW_TSP
+                    Call STARTEN_TSP()
+
+            End Select
+
+            'Optimierung beendet
+            Me.isrun = False
+            Me.Button_Start.Text = ">"
+
+            ''Globale Fehlerbehandlung für Optimierungslauf:
+            'Catch ex As Exception
+            '    MsgBox(ex.Message, MsgBoxStyle.Critical, "Fehler")
+            'End Try
+        End If
     End Sub
 
     'Anwendung SensiPlot - START; läuft ohne Evolutionsstrategie             
@@ -890,8 +916,6 @@ Partial Class Form1
 
         'TODO: If (ipop + igen + inachf + irunde) > 4 Then GoTo Start_Evolutionsrunden
         '????? Wie?
-
-        myisrun = True
 
         'Werte an Variablen übergeben
         iEvoTyp = EVO_Einstellungen1.iEvoTyp

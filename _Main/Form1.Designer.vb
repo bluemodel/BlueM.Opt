@@ -50,11 +50,12 @@ Partial Class Form1
         Me.Button_Start.BackColor = System.Drawing.SystemColors.Control
         Me.Button_Start.Cursor = System.Windows.Forms.Cursors.Default
         Me.Button_Start.Enabled = False
+        Me.Button_Start.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Button_Start.ForeColor = System.Drawing.SystemColors.ControlText
         Me.Button_Start.Location = New System.Drawing.Point(587, 648)
         Me.Button_Start.Name = "Button_Start"
         Me.Button_Start.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.Button_Start.Size = New System.Drawing.Size(112, 39)
+        Me.Button_Start.Size = New System.Drawing.Size(112, 40)
         Me.Button_Start.TabIndex = 3
         Me.Button_Start.Text = ">"
         Me.ToolTip1.SetToolTip(Me.Button_Start, "Optimierung starten")
@@ -91,9 +92,9 @@ Partial Class Form1
         Me.GroupBox_Anwendung.Controls.Add(Me.Button_IniApp)
         Me.GroupBox_Anwendung.Controls.Add(Me.LinkLabel_WorkDir)
         Me.GroupBox_Anwendung.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.GroupBox_Anwendung.Location = New System.Drawing.Point(10, 12)
+        Me.GroupBox_Anwendung.Location = New System.Drawing.Point(8, 12)
         Me.GroupBox_Anwendung.Name = "GroupBox_Anwendung"
-        Me.GroupBox_Anwendung.Size = New System.Drawing.Size(689, 50)
+        Me.GroupBox_Anwendung.Size = New System.Drawing.Size(698, 50)
         Me.GroupBox_Anwendung.TabIndex = 0
         Me.GroupBox_Anwendung.TabStop = False
         Me.GroupBox_Anwendung.Text = "Anwendung"
@@ -157,7 +158,7 @@ Partial Class Form1
         '
         'Testprobleme1
         '
-        Me.Testprobleme1.Location = New System.Drawing.Point(8, 68)
+        Me.Testprobleme1.Location = New System.Drawing.Point(5, 68)
         Me.Testprobleme1.Name = "Testprobleme1"
         Me.Testprobleme1.Size = New System.Drawing.Size(225, 121)
         Me.Testprobleme1.TabIndex = 7
@@ -180,8 +181,8 @@ Partial Class Form1
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.BackColor = System.Drawing.SystemColors.Control
         Me.ClientSize = New System.Drawing.Size(712, 780)
-        Me.Controls.Add(Me.Testprobleme1)
         Me.Controls.Add(Me.Button_Start)
+        Me.Controls.Add(Me.Testprobleme1)
         Me.Controls.Add(Me.GroupBox_Anwendung)
         Me.Controls.Add(Me.EVO_Opt_Verlauf1)
         Me.Controls.Add(Me.EVO_Einstellungen1)
