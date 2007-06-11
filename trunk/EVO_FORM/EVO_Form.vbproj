@@ -113,6 +113,9 @@
     <Compile Include="EVO_Einstellungen.vb">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="EVO_Opt_Verlauf.Designer.vb">
+      <DependentUpon>EVO_Opt_Verlauf.vb</DependentUpon>
+    </Compile>
     <Compile Include="EVO_Opt_Verlauf.vb">
       <SubType>UserControl</SubType>
     </Compile>
