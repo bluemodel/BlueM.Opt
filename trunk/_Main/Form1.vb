@@ -450,6 +450,7 @@ Partial Class Form1
 
         If (Me.isrun And Not Me.ispause) Then
             'Optimierung pausieren
+            '---------------------
             Me.ispause = True
             Me.Button_Start.Text = ">"
             Do While (Me.ispause)
@@ -458,11 +459,13 @@ Partial Class Form1
 
         ElseIf (Me.isrun) Then
             'Optimierung weiterlaufen lassen
+            '-------------------------------
             Me.ispause = False
             Me.Button_Start.Text = "||"
 
         Else
             'Optimierung starten
+            '-------------------
             Me.isrun = True
             Me.Button_Start.Text = "||"
 
@@ -493,15 +496,18 @@ Partial Class Form1
 
             End Select
 
-            'Optimierung beendet
-            Me.isrun = False
-            Me.Button_Start.Text = ">"
-
             ''Globale Fehlerbehandlung für Optimierungslauf:
             'Catch ex As Exception
             '    MsgBox(ex.Message, MsgBoxStyle.Critical, "Fehler")
             'End Try
+
+            'Optimierung beendet
+            '-------------------
+            Me.isrun = False
+            Me.Button_Start.Text = ">"
+
         End If
+
     End Sub
 
     'Anwendung SensiPlot - START; läuft ohne Evolutionsstrategie             
@@ -948,24 +954,29 @@ Partial Class Form1
         ReDim RN(globalAnzRand)
 
         'Kontrolle der Variablen
-        If NRunden = 0 Or NPopul = 0 Or NPopEltern = 0 Then
-            Throw New Exception("Anzahl der Runden, Populationen oder Populationseltern ist zu klein!")
-        End If
-        If NGen = 0 Or NEltern = 0 Or NNachf = 0 Then
-            Throw New Exception("Anzahl der Generationen, Eltern oder Nachfolger ist zu klein!")
-        End If
-        If rDeltaStart < 0 Then
-            Throw New Exception("Die Startschrittweite ist unzulässig oder kleiner als die minimale Schrittweite!")
-        End If
-        If globalAnzPar = 0 Then
-            Throw New Exception("Die Anzahl der Parameter ist unzulässig!")
-        End If
-        If NPopul < NPopEltern Then
-            Throw New Exception("Die Anzahl der Populationseltern darf nicht größer als die Anzahl der Populationen sein!")
-        End If
-        If NNachf <= NEltern Then
-            Throw New Exception("Die Anzahl der Eltern kann nicht größer als die Anzahl der Nachfahren sein!" & Chr(13) & Chr(10) & "Optimal ist ein Verhältnis von 1:3 bis 1:5.")
-        End If
+        Try
+            If NRunden = 0 Or NPopul = 0 Or NPopEltern = 0 Then
+                Throw New Exception("Anzahl der Runden, Populationen oder Populationseltern ist zu klein!")
+            End If
+            If NGen = 0 Or NEltern = 0 Or NNachf = 0 Then
+                Throw New Exception("Anzahl der Generationen, Eltern oder Nachfolger ist zu klein!")
+            End If
+            If rDeltaStart < 0 Then
+                Throw New Exception("Die Startschrittweite ist unzulässig oder kleiner als die minimale Schrittweite!")
+            End If
+            If globalAnzPar = 0 Then
+                Throw New Exception("Die Anzahl der Parameter ist unzulässig!")
+            End If
+            If NPopul < NPopEltern Then
+                Throw New Exception("Die Anzahl der Populationseltern darf nicht größer als die Anzahl der Populationen sein!")
+            End If
+            If NNachf <= NEltern Then
+                Throw New Exception("Die Anzahl der Eltern kann nicht größer als die Anzahl der Nachfahren sein!" & Chr(13) & Chr(10) & "Optimal ist ein Verhältnis von 1:3 bis 1:5.")
+            End If
+        Catch ex As Exception
+            MsgBox(ex.Message, MsgBoxStyle.Exclamation, "Fehler")
+            Exit Sub
+        End Try
 
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
