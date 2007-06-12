@@ -4,7 +4,7 @@ Public Class Wave
         Public Bezeichnung As String                'Bezeichnung
         Public Einheit As String                    'Einheit
         Public Typ As String                        'Q, N, W ....
-        Public Wave(,) As Object
+        Public Wave(,) As Object                    'Zeitreihe
     End Structure
 
     Public WaveList() As Wave = {}                  'Liste der Waves
