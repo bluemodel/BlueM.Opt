@@ -152,6 +152,12 @@
     <Compile Include="Diagramm.vb">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Scatterplot.Designer.vb">
+      <DependentUpon>Scatterplot.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Scatterplot.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Wave.Designer.vb">
       <DependentUpon>Wave.vb</DependentUpon>
     </Compile>
@@ -173,6 +179,10 @@
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="Scatterplot.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>Scatterplot.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Wave.resx">
       <DependentUpon>Wave.vb</DependentUpon>
       <SubType>Designer</SubType>
@@ -185,6 +195,7 @@
     <None Include="Resources\icon_png.png" />
     <None Include="Resources\icon_edit.png" />
     <Content Include="Resources\icon_teechart.png" />
+    <None Include="Resources\scatterplot.png" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
