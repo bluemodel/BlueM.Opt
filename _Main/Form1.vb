@@ -1463,6 +1463,33 @@ Start_Evolutionsrunden:
 
     End Sub
 
+    'Daten aus DB laden und als Scatterplot-Matrix anzeigen
+    '*******************************************************
+    Private Sub Button_LoadFromMDB_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Scatterplot.Click
+
+        'Datei-öffnen Dialog anzeigen
+        If (Not IsNothing(Sim1)) Then
+            Me.OpenFileDialog_MDB.InitialDirectory = Sim1.WorkDir
+        End If
+        Dim diagresult As DialogResult = Me.OpenFileDialog_MDB.ShowDialog()
+
+        If (diagresult = Windows.Forms.DialogResult.OK) Then
+
+            Cursor = Cursors.WaitCursor
+
+            'Daten einlesen
+            Dim series As Collection = Apps.Sim.db_readQWerte(Me.OpenFileDialog_MDB.FileName)
+
+            'Scatterplot anzeigen
+            Dim scatterplot1 As New Scatterplot
+            Call scatterplot1.zeichnen(series)
+            Call scatterplot1.Show()
+
+            Cursor = Cursors.Default
+
+        End If
+    End Sub
+
 #End Region 'Diagrammfunktionen
 
 #End Region 'Methoden

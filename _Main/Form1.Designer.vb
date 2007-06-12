@@ -32,6 +32,7 @@ Partial Class Form1
         Me.Button_Start = New System.Windows.Forms.Button
         Me.Button_IniApp = New System.Windows.Forms.Button
         Me.LinkLabel_WorkDir = New System.Windows.Forms.LinkLabel
+        Me.Button_Scatterplot = New System.Windows.Forms.Button
         Me.GroupBox_Anwendung = New System.Windows.Forms.GroupBox
         Me.Label_Methode = New System.Windows.Forms.Label
         Me.ComboBox_Methode = New System.Windows.Forms.ComboBox
@@ -41,6 +42,7 @@ Partial Class Form1
         Me.EVO_Einstellungen1 = New EvoForm.EVO_Einstellungen
         Me.Testprobleme1 = New Apps.Testprobleme
         Me.OpenFileDialog_Datensatz = New System.Windows.Forms.OpenFileDialog
+        Me.OpenFileDialog_MDB = New System.Windows.Forms.OpenFileDialog
         Me.DForm = New Main.DiagrammForm
         Me.GroupBox_Anwendung.SuspendLayout()
         Me.SuspendLayout()
@@ -81,6 +83,16 @@ Partial Class Form1
         Me.LinkLabel_WorkDir.Size = New System.Drawing.Size(0, 13)
         Me.LinkLabel_WorkDir.TabIndex = 9
         Me.ToolTip1.SetToolTip(Me.LinkLabel_WorkDir, "Datensatz ändern")
+        '
+        'Button_Scatterplot
+        '
+        Me.Button_Scatterplot.Image = Global.Main.My.Resources.Resources.scatterplot
+        Me.Button_Scatterplot.Location = New System.Drawing.Point(546, 656)
+        Me.Button_Scatterplot.Name = "Button_Scatterplot"
+        Me.Button_Scatterplot.Size = New System.Drawing.Size(25, 25)
+        Me.Button_Scatterplot.TabIndex = 9
+        Me.ToolTip1.SetToolTip(Me.Button_Scatterplot, "Scatterplot-Matrix anzeigen")
+        Me.Button_Scatterplot.UseVisualStyleBackColor = True
         '
         'GroupBox_Anwendung
         '
@@ -169,6 +181,11 @@ Partial Class Form1
         Me.OpenFileDialog_Datensatz.Filter = "ALL-Dateien (*.ALL)|*.ALL"
         Me.OpenFileDialog_Datensatz.Title = "Datensatz auswählen"
         '
+        'OpenFileDialog_MDB
+        '
+        Me.OpenFileDialog_MDB.Filter = "Access-Datenbanken|*.mdb"
+        Me.OpenFileDialog_MDB.Title = "Ergebnisdatenbank auswählen"
+        '
         'DForm
         '
         Me.DForm.Location = New System.Drawing.Point(233, 68)
@@ -181,6 +198,7 @@ Partial Class Form1
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.BackColor = System.Drawing.SystemColors.Control
         Me.ClientSize = New System.Drawing.Size(712, 780)
+        Me.Controls.Add(Me.Button_Scatterplot)
         Me.Controls.Add(Me.Button_Start)
         Me.Controls.Add(Me.Testprobleme1)
         Me.Controls.Add(Me.GroupBox_Anwendung)
@@ -208,4 +226,6 @@ Partial Class Form1
     Friend WithEvents ComboBox_Methode As System.Windows.Forms.ComboBox
     Friend WithEvents Label_Methode As System.Windows.Forms.Label
     Friend WithEvents OpenFileDialog_Datensatz As System.Windows.Forms.OpenFileDialog
+    Friend WithEvents Button_Scatterplot As System.Windows.Forms.Button
+    Friend WithEvents OpenFileDialog_MDB As System.Windows.Forms.OpenFileDialog
 End Class

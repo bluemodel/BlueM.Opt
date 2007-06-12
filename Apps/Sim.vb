@@ -14,7 +14,7 @@ Imports System.Data.OleDb
 '****                                                                       ****
 '**** Erstellt: April 2006                                                  ****
 '****                                                                       ****
-'**** Letzte Änderung: Juni 2007 300 Commits                                ****
+'**** Letzte Änderung: Juni 2007                                            ****
 '*******************************************************************************
 '*******************************************************************************
 
@@ -420,8 +420,10 @@ Public MustInherit Class Sim
             End If
         Loop Until StrRead.Peek() = -1
 
-        If AnzZiele > 2 Then
-            Throw New Exception("Entweder iste die Anzahl der Ziele zu Groß oder ein Fehler in der Ziele Datei (Z.B.: Leere Zeile am Ende der Datei")
+        'BUG 66: nur die ersten beiden Zielfunktionen werden gezeichnet
+        If (AnzZiele > 2) Then
+            MsgBox("Die Anzahl der Ziele beträgt mehr als 2!" & Chr(13) & Chr(10) _
+                    & "Es werden nur die ersten beiden Zielfunktionen im Hauptdiagramm angezeigt!", MsgBoxStyle.Information, "Info")
         End If
 
         ReDim List_OptZiele(AnzZiele - 1)
@@ -852,8 +854,6 @@ Public MustInherit Class Sim
 
     End Sub
 
-
-
     'EVO-Parameterübergabe
     '*********************
     Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara(,) As Double)
@@ -902,20 +902,14 @@ Public MustInherit Class Sim
         Next
 
         'Qualitätswerte im TeeChart zeichnen
-        Select Case GlobalAnzZiel
-            Case 1
-                TChart1.Series(ipop).Add(durchlauf, List_OptZiele(0).QWertTmp)
-            Case 2
-                TChart1.Series(0).Add(List_OptZiele(0).QWertTmp, List_OptZiele(1).QWertTmp, "")
-            Case 3
-                'BUG 66: Zeichnen von mehr als 2 Zielfunktionen
-                Throw New Exception("Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt")
-                'Call Zielfunktion_zeichnen_MultiObPar_3D(BlueM1.OptZieleListe(0).QWertTmp, BlueM1.OptZieleListe(1).QWertTmp, BlueM1.OptZieleListe(2).QWertTmp)
-            Case Else
-                'BUG 66: Zeichnen von mehr als 2 Zielfunktionen
-                Throw New Exception("Das Zeichnen von mehr als 2 Zielfunktionen wird bisher nicht unterstützt")
-                'Call Zielfunktion_zeichnen_MultiObPar_XD()
-        End Select
+        If (GlobalAnzZiel = 1) Then
+            'SingleObjective
+            TChart1.Series(ipop).Add(durchlauf, List_OptZiele(0).QWertTmp)
+        Else
+            'MultiObjective
+            'BUG 66: nur die ersten beiden Zielfunktionen werden gezeichnet
+            TChart1.Series(0).Add(List_OptZiele(0).QWertTmp, List_OptZiele(1).QWertTmp, "")
+        End If
 
         'Qualitätswerte und OptParameter in DB speichern
         If (Ergebnisdb = True) Then
@@ -1602,8 +1596,68 @@ Public MustInherit Class Sim
 
     End Sub
 
+    'QWerte aus einer DB lesen
+    '*************************
+    Public Shared Function db_readQWerte(ByVal mdbfile As String) As Collection
+
+        'Connect
+        Dim ConnectionString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & mdbfile
+        Dim db As OleDb.OleDbConnection = New OleDb.OleDbConnection(ConnectionString)
+        db.Open()
+
+        'Read
+        Dim q As String = "SELECT * FROM QWerte ORDER BY ID"
+
+        Dim adapter As OleDbDataAdapter = New OleDbDataAdapter(q, db)
+
+        Dim ds As New DataSet("QWerte")
+        adapter.Fill(ds, "QWerte")
+
+        'Disconnect
+        db.Close()
+
+        'Werte einlesen
+        '--------------
+        Dim seriesCollection As New Collection
+        'Schleife über Spalten (Zielfunktionen fangen erst bei 3 an!)
+        For i As Integer = 3 To ds.Tables("QWerte").Columns.Count - 1
+            Dim tmpserie As Serie = New Serie(ds.Tables("QWerte").Columns(i).Caption, ds.Tables("QWerte").Rows.Count)
+            'Schleife über Reihen
+            For j As Integer = 0 To ds.Tables("QWerte").Rows.Count - 1
+                tmpserie.values(j) = ds.Tables("QWerte").Rows(j).Item(i)
+            Next
+            'Serie zu Collection hinzufügen
+            seriesCollection.Add(tmpserie, tmpserie.name)
+        Next
+
+        Return seriesCollection
+
+    End Function
+
 #End Region 'Ergebnisdatenbank
 
 #End Region 'Methoden
 
 End Class
+
+'zusätzliche Klassen
+'###################
+
+'Klasse Serie 
+'enthält einen Namen und eine Liste von Werten
+'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+Public Class Serie
+
+    Public name As String
+    Public values() As Double
+
+    'Konstruktor
+    '***********
+    Public Sub New(ByVal name As String, ByVal length As Integer)
+        Me.name = name
+        ReDim values(length)
+    End Sub
+
+End Class
+
+
