@@ -133,10 +133,20 @@ Public Class IHA
             'IHA_Batchfor.exe in Verzeichnis kopieren
             Dim ZielDatei As String = Me.IHADir & "IHA_Batchfor.exe"
 
-            Dim currentDir As String = CurDir()     'sollte das /bin Verzeichnis von _Main sein
-            ChDir("../../Apps")                     'wechselt in das /Apps Verzeichnis 
+            'aktuelles Verzeichnis bestimmen
+            Dim currentDir As String = CurDir()
+            'Pfad zur Assembly bestimmen (\_Main\bin\)
+            Dim binpath As String = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly.Location)
+            'in das \_Main\bin Verzeichnis wechseln
+            ChDrive(binpath)
+            ChDir(binpath)
+            'in das \Apps Verzeichnis wechseln
+            ChDir("../../Apps")
+            'Datei kopieren
             My.Computer.FileSystem.CopyFile("IHA_Batchfor.exe", ZielDatei, True)
-            ChDir(currentDir)                       'zurück in das Ausgangsverzeichnis wechseln
+            'zurück in das Ausgangsverzeichnis wechseln
+            ChDrive(currentDir)
+            ChDir(currentDir)
 
         End If
 
@@ -449,16 +459,14 @@ Public Class IHA
     'IHA_Batchfor.exe ausführen
     '**************************
     Private Sub launch_IHA()
-        'starte Programm mit neuen Parametern
-        Dim ProcID As Integer
-        'Aktuelles Arbeitsverzeichnis feststellen
+        'Aktuelles Verzeichnis bestimmen
         Dim currentDir As String = CurDir()
-        'zum gewünschten Arbeitsverzeichnis navigieren
-        ChDrive(Me.IHADir) 'nur nötig falls Arbeitsverzeichnis und aktuelles Verzeichnis auf verschiedenen Laufwerken sind
+        'zum Arbeitsverzeichnis wechseln
+        ChDrive(Me.IHADir)
         ChDir(Me.IHADir)
         'EXE aufrufen
-        ProcID = Shell("""IHA_Batchfor.exe"" input.par", AppWinStyle.MinimizedNoFocus, True)
-        'Arbeitsverzeichnis wieder zurücksetzen (optional)
+        Dim ProcID As Integer = Shell("""IHA_Batchfor.exe"" input.par", AppWinStyle.MinimizedNoFocus, True)
+        'zurück in Ausgangsverzeichnis wechseln
         ChDrive(currentDir)
         ChDir(currentDir)
     End Sub

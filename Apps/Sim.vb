@@ -181,15 +181,14 @@ Public MustInherit Class Sim
     '**********************
     Public Sub ReadEVOIni()
 
-        'Einschränkung:
-        '------------------------------------------------------------
-        'Geht davon aus, dass das aktuelle Verzeichnis _Main\bin ist!
-        '------------------------------------------------------------
+        'Pfad zur Assembly bestimmen (\_Main\bin\)
+        Dim binpath As String = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly.Location)
+        Dim inifilepath as String = binpath & "\EVO.ini"
 
-        If File.Exists("EVO.ini") Then
+        If File.Exists(inifilepath) Then
 
             'Datei einlesen
-            Dim FiStr As FileStream = New FileStream("EVO.ini", FileMode.Open, IO.FileAccess.Read)
+            Dim FiStr As FileStream = New FileStream(inifilepath, FileMode.Open, IO.FileAccess.Read)
             Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
             Dim Configs(9, 1) As String
@@ -232,12 +231,10 @@ Public MustInherit Class Sim
     '********************************************
     Public Sub saveDatensatz(ByVal Pfad As String)
 
-        'Dateiname vom Ende abtrennen
-        Me.Datensatz = Pfad.Substring(Pfad.LastIndexOf("\") + 1)
-        'Dateiendung entfernen
-        Me.Datensatz = Me.Datensatz.Substring(0, Me.Datensatz.Length - 4)
+        'Datensatzname bestimmen
+        Me.Datensatz = Path.GetFileNameWithoutExtension(Pfad)
         'Arbeitsverzeichnis bestimmen
-        Me.WorkDir = Pfad.Substring(0, Pfad.LastIndexOf("\") + 1)
+        Me.WorkDir = Path.GetDirectoryName(Pfad) & "\"
         'Event auslösen (wird von Form1.displayWorkDir() verarbeitet)
         RaiseEvent WorkDirChange()
 
@@ -523,7 +520,7 @@ Public MustInherit Class Sim
 
         'A: Prüfung ob für jeden OptParameter mindestens ein Modellparameter existiert
         For i = 0 To List_OptParameter.GetUpperBound(0)
-            isvalid = False
+            isValid = False
             For j = 0 To List_ModellParameter.GetUpperBound(0)
                 If List_OptParameter(i).Bezeichnung = List_ModellParameter(j).OptParameter Then
                     isValid = True
@@ -1500,10 +1497,20 @@ Public MustInherit Class Sim
         '-----------------------------------------------------------
         Dim ZielDatei As String = WorkDir & Datensatz & "_EVO.mdb"
 
-        Dim currentDir As String = CurDir()     'sollte das /bin Verzeichnis von _Main sein
-        ChDir("../../Apps")                     'wechselt in das /Apps Verzeichnis 
+        'aktuelles Verzeichnis bestimmen
+        Dim currentDir As String = CurDir()
+        'Pfad zur Assembly bestimmen (\_Main\bin\)
+        Dim binpath As String = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly.Location)
+        'in das \_Main\bin Verzeichnis wechseln
+        ChDrive(binpath)
+        ChDir(binpath)
+        'in das \Apps Verzeichnis wechseln
+        ChDir("..\..\Apps")
+        'Datei kopieren
         My.Computer.FileSystem.CopyFile("EVO.mdb", ZielDatei, True)
-        ChDir(currentDir)                       'zurück in das Ausgangsverzeichnis wechseln
+        'zurück in das Ausgangsverzeichnis wechseln
+        ChDrive(currentDir)
+        ChDir(currentDir)
 
         'Tabellen anpassen
         '-----------------
