@@ -30,7 +30,7 @@ Partial Class Form1
         Me.components = New System.ComponentModel.Container
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.Button_Start = New System.Windows.Forms.Button
-        Me.Button_IniApp = New System.Windows.Forms.Button
+        Me.Button_IniMethod = New System.Windows.Forms.Button
         Me.LinkLabel_WorkDir = New System.Windows.Forms.LinkLabel
         Me.Button_Scatterplot = New System.Windows.Forms.Button
         Me.GroupBox_Anwendung = New System.Windows.Forms.GroupBox
@@ -63,15 +63,15 @@ Partial Class Form1
         Me.ToolTip1.SetToolTip(Me.Button_Start, "Optimierung starten")
         Me.Button_Start.UseVisualStyleBackColor = True
         '
-        'Button_IniApp
+        'Button_IniMethod
         '
-        Me.Button_IniApp.Location = New System.Drawing.Point(357, 19)
-        Me.Button_IniApp.Name = "Button_IniApp"
-        Me.Button_IniApp.Size = New System.Drawing.Size(35, 21)
-        Me.Button_IniApp.TabIndex = 1
-        Me.Button_IniApp.Text = "Ini"
-        Me.ToolTip1.SetToolTip(Me.Button_IniApp, "Initialisieren")
-        Me.Button_IniApp.UseVisualStyleBackColor = True
+        Me.Button_IniMethod.Location = New System.Drawing.Point(357, 19)
+        Me.Button_IniMethod.Name = "Button_IniMethod"
+        Me.Button_IniMethod.Size = New System.Drawing.Size(35, 21)
+        Me.Button_IniMethod.TabIndex = 1
+        Me.Button_IniMethod.Text = "Ini"
+        Me.ToolTip1.SetToolTip(Me.Button_IniMethod, "Initialisieren")
+        Me.Button_IniMethod.UseVisualStyleBackColor = True
         '
         'LinkLabel_WorkDir
         '
@@ -101,7 +101,7 @@ Partial Class Form1
         Me.GroupBox_Anwendung.Controls.Add(Me.ComboBox_Methode)
         Me.GroupBox_Anwendung.Controls.Add(Me.Label_Anwendung)
         Me.GroupBox_Anwendung.Controls.Add(Me.ComboBox_Anwendung)
-        Me.GroupBox_Anwendung.Controls.Add(Me.Button_IniApp)
+        Me.GroupBox_Anwendung.Controls.Add(Me.Button_IniMethod)
         Me.GroupBox_Anwendung.Controls.Add(Me.LinkLabel_WorkDir)
         Me.GroupBox_Anwendung.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.GroupBox_Anwendung.Location = New System.Drawing.Point(8, 12)
@@ -219,7 +219,7 @@ Partial Class Form1
     Friend WithEvents GroupBox_Anwendung As System.Windows.Forms.GroupBox
     Friend WithEvents ComboBox_Anwendung As System.Windows.Forms.ComboBox
     Friend WithEvents Label_Anwendung As System.Windows.Forms.Label
-    Friend WithEvents Button_IniApp As System.Windows.Forms.Button
+    Friend WithEvents Button_IniMethod As System.Windows.Forms.Button
     Friend WithEvents Testprobleme1 As Apps.Testprobleme
     Friend WithEvents DForm As Main.DiagrammForm
     Friend WithEvents LinkLabel_WorkDir As System.Windows.Forms.LinkLabel

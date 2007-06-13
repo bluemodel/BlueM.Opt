@@ -196,7 +196,7 @@ Partial Class Form1
     
     'Methode wurde ausgewählt
     '************************
-    Private Sub INI_Method(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_IniApp.Click, ComboBox_Methode.SelectedIndexChanged
+    Private Sub INI_Method(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_IniMethod.Click, ComboBox_Methode.SelectedIndexChanged
 
         If (Me.IsInitializing = True) Then
 
@@ -423,8 +423,8 @@ Partial Class Form1
         If (DatensatzResult = Windows.Forms.DialogResult.OK) Then
             Call Sim1.saveDatensatz(OpenFileDialog_Datensatz.FileName)
         End If
-        'Startbutton deaktivieren (Der Benutzer muss zuerst Ini neu ausführen!)
-        Me.Button_Start.Enabled = False
+        'Methodenauswahl wieder zurücksetzen (Der Benutzer muss zuerst Ini neu ausführen!)
+        Me.ComboBox_Methode.SelectedItem = ""
 
     End Sub
 
