@@ -530,8 +530,6 @@ Partial Class Form1
         Me.globalAnzPar = 1
 
         Dim i As Integer
-        Dim durchlauf As Integer = 1
-        Dim ipop As Integer = 1
 
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
@@ -565,8 +563,8 @@ Partial Class Form1
             'Speichern des Simulationsergebnisses für Wave
             'BUG 119: Die WEL-Datei hat bei Smusi einen anderen Namen!
             Apps.Sim.Read_WEL(Sim1.WorkDir & Sim1.Datensatz & ".wel", Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).SimGr, Wave1.WaveList(i).Wave)
-
-            durchlauf += 1
+            Wave1.WaveList(i).Bezeichnung = Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter).Bezeichnung & ": " _
+                                            & Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter).Wert
 
             System.Windows.Forms.Application.DoEvents()
 
@@ -588,9 +586,9 @@ Partial Class Form1
 
         'Serien initialisieren
         Dim tmpSeries As Steema.TeeChart.Styles.Line
-        For i = 1 To SensiPlot1.Anz_Sim
+        For i = 0 To SensiPlot1.Anz_Sim - 1
             tmpSeries = New Steema.TeeChart.Styles.Line(Wave1.WForm.Diag.Chart)
-            tmpSeries.Title = "Sim " & i.ToString()
+            tmpSeries.Title = Wave1.WaveList(i).Bezeichnung
             tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Nothing
         Next
 
