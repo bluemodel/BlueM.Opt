@@ -71,16 +71,15 @@ Public Class Smusi
     'SMUSI ausführen (simulieren)
     '***********************************
     Public Overrides Sub launchSim()
-        'starte Programm mit neuen Parametern
-        Dim ProcID As Integer
-        'Aktuelles Arbeitsverzeichnis feststellen
+
+        'Aktuelles Verzeichnis bestimmen
         Dim currentDir As String = CurDir()
-        'zum gewünschten Arbeitsverzeichnis navigieren
-        ChDrive(WorkDir) 'nur nötig falls Arbeitsverzeichnis und aktuelles Verzeichnis auf verschiedenen Laufwerken sind
-        ChDir(WorkDir)
+        'zum Arbeitsverzeichnis wechseln
+        ChDrive(Me.WorkDir)
+        ChDir(Me.WorkDir)
         'EXE aufrufen
-        ProcID = Shell("""" & Exe & """ " & Datensatz & " 1", AppWinStyle.MinimizedNoFocus, True)
-        'Arbeitsverzeichnis wieder zurücksetzen (optional)
+        Dim ProcID As Integer = Shell("""" & Exe & """ " & Datensatz & " 1", AppWinStyle.MinimizedNoFocus, True)
+        'zurück ins Ausgangsverzeichnis wechseln
         ChDrive(currentDir)
         ChDir(currentDir)
 

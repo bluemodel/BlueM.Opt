@@ -226,16 +226,15 @@ Public Class BlueM
     'BlauesModell ausführen (simulieren)
     '***********************************
     Public Overrides Sub launchSim()
-        'starte Programm mit neuen Parametern
-        Dim ProcID As Integer
-        'Aktuelles Arbeitsverzeichnis feststellen
+
+        'Aktuelles Verzeichnis bestimmen
         Dim currentDir As String = CurDir()
-        'zum gewünschten Arbeitsverzeichnis navigieren
-        ChDrive(WorkDir) 'nur nötig falls Arbeitsverzeichnis und aktuelles Verzeichnis auf verschiedenen Laufwerken sind
+        'zum Arbeitsverzeichnis wechseln
+        ChDrive(WorkDir)
         ChDir(WorkDir)
         'EXE aufrufen
-        ProcID = Shell("""" & Exe & """ " & Datensatz, AppWinStyle.MinimizedNoFocus, True)
-        'Arbeitsverzeichnis wieder zurücksetzen (optional)
+        Dim ProcID As Integer = Shell("""" & Exe & """ " & Datensatz, AppWinStyle.MinimizedNoFocus, True)
+        'zurück ins Ausgangsverzeichnis wechseln
         ChDrive(currentDir)
         ChDir(currentDir)
 
