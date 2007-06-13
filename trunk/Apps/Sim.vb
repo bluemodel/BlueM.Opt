@@ -182,8 +182,8 @@ Public MustInherit Class Sim
     Public Sub ReadEVOIni()
 
         'Pfad zur Assembly bestimmen (\_Main\bin\)
-        Dim binpath As String = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly.Location)
-        Dim inifilepath as String = binpath & "\EVO.ini"
+        Dim binpath As String = System.Windows.Forms.Application.StartupPath()
+        Dim inifilepath As String = binpath & "\EVO.ini"
 
         If File.Exists(inifilepath) Then
 
@@ -1500,7 +1500,7 @@ Public MustInherit Class Sim
         'aktuelles Verzeichnis bestimmen
         Dim currentDir As String = CurDir()
         'Pfad zur Assembly bestimmen (\_Main\bin\)
-        Dim binpath As String = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly.Location)
+        Dim binpath As String = System.Windows.Forms.Application.StartupPath()
         'in das \_Main\bin Verzeichnis wechseln
         ChDrive(binpath)
         ChDir(binpath)

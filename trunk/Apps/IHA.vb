@@ -136,12 +136,12 @@ Public Class IHA
             'aktuelles Verzeichnis bestimmen
             Dim currentDir As String = CurDir()
             'Pfad zur Assembly bestimmen (\_Main\bin\)
-            Dim binpath As String = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly.Location)
+            Dim binpath As String = System.Windows.Forms.Application.StartupPath()
             'in das \_Main\bin Verzeichnis wechseln
             ChDrive(binpath)
             ChDir(binpath)
             'in das \Apps Verzeichnis wechseln
-            ChDir("../../Apps")
+            ChDir("..\..\Apps")
             'Datei kopieren
             My.Computer.FileSystem.CopyFile("IHA_Batchfor.exe", ZielDatei, True)
             'zurück in das Ausgangsverzeichnis wechseln
