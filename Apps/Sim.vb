@@ -1126,6 +1126,16 @@ Public MustInherit Class Sim
                 Next
                 QWert = Math.Abs(VolZiel - VolSim)
 
+            Case "nUnter"
+                'Relative Anzahl der Zeitschritte mit Unterschreitungen (in Prozent)
+                Dim nUnter As Integer = 0
+                For i = 0 To SimReihe.GetUpperBound(0)
+                    If (SimReihe(i, 1) < OptZiel.ZielReihe(i, 1)) Then
+                        nUnter += 1
+                    End If
+                Next
+                QWert = nUnter / SimReihe.GetUpperBound(0) * 100
+
             Case "nÜber"
                 'Relative Anzahl der Zeitschritte mit Überschreitungen (in Prozent)
                 Dim nUeber As Integer = 0
@@ -1205,6 +1215,16 @@ Public MustInherit Class Sim
             Case "Diff"
                 'Summe der Fehler
                 QWert = Math.Abs(OptZiel.ZielWert - SimWert)
+
+            Case "nUnter"
+                'Relative Anzahl der Zeitschritte mit Unterschreitungen (in Prozent)
+                Dim nUnter As Integer = 0
+                For i = 0 To SimReihe.GetUpperBound(0)
+                    If (SimReihe(i, 1) < OptZiel.ZielWert) Then
+                        nUnter += 1
+                    End If
+                Next
+                QWert = nUnter / SimReihe.GetUpperBound(0) * 100
 
             Case "nÜber"
                 'Relative Anzahl der Zeitschritte mit Überschreitungen (in Prozent)
