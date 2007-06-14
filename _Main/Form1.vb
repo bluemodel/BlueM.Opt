@@ -330,8 +330,11 @@ Partial Class Form1
                     CES1.n_Verzweig = Sim1.VerzweigungsDatei.GetLength(0)
                     CES1.TestModus = Sim1.Set_TestModus
                     CES1.n_Combinations = Sim1.No_of_Combinations
+
+                    'Bei Testmodus wird die Anzahl der Kinder und Generationen überschrieben
                     If CES1.TestModus = 1 Then
                         CES1.n_Childs = 1
+                        CES1.n_parents = 1
                         CES1.n_Generation = 1
                         ReDim CES1.NDSResult(CES1.n_Childs + CES1.n_Parents - 1)
                     ElseIf CES1.TestModus = 2 Then
@@ -381,8 +384,11 @@ Partial Class Form1
                     CES1.n_Verzweig = Sim1.VerzweigungsDatei.GetLength(0)
                     CES1.TestModus = Sim1.Set_TestModus
                     CES1.n_Combinations = Sim1.No_of_Combinations
+
+                    'Bei Testmodus wird die Anzahl der Kinder und Generationen überschrieben
                     If CES1.TestModus = 1 Then
                         CES1.n_Childs = 1
+                        CES1.n_parents = 1
                         CES1.n_Generation = 1
                         ReDim CES1.NDSResult(CES1.n_Childs + CES1.n_Parents - 1)
                     ElseIf CES1.TestModus = 2 Then
@@ -678,10 +684,10 @@ Partial Class Form1
             Call CES1.Generate_Random_Path()
         ElseIf CES1.TestModus = 1 Then
             'Testmodus 1: Funktion zum testen einer ausgewählten Kombinationen
-            'ToDO: Modus fehlt
+            Sim1.get_TestPath(CES1.List_Childs(0).Path)
         ElseIf CES1.TestModus = 2 Then
             'Testmodus 2: Funktion zum  testen aller Kombinationen
-            Call CES1.Generate_All_Test_Path()
+            Call CES1.Generate_All_Test_Paths()
         End If
 
         'Generationsschleife
@@ -706,10 +712,6 @@ Partial Class Form1
                     Call DForm.Diag.Series(0).Add(CES1.List_Childs(i).Penalty(0), CES1.List_Childs(i).Penalty(1))
                 End If
 
-                ''HACK zum zeichnen aller Qualitäten
-                'Call TChart1.Series(2).Add(durchlauf, CES1.ChildList_BM(i).Quality_MO(0))
-                'Call TChart1.Series(3).Add(durchlauf, CES1.ChildList_BM(i).Quality_MO(1))
-                'Call TChart1.Series(4).Add(durchlauf, CES1.ChildList_BM(i).Quality_MO(2))
                 System.Windows.Forms.Application.DoEvents()
             Next
 
@@ -785,10 +787,10 @@ Partial Class Form1
             Call CES1.Generate_Random_Path()
         ElseIf CES1.TestModus = 1 Then
             'Testmodus 1: Funktion zum testen einer ausgewählten Kombinationen
-            'ToDO: Modus fehlt
+            Sim1.get_TestPath(CES1.List_Childs(0).Path)
         ElseIf CES1.TestModus = 2 Then
             'Testmodus 2: Funktion zum  testen aller Kombinationen
-            Call CES1.Generate_All_Test_Path()
+            Call CES1.Generate_All_Test_Paths()
         End If
 
         'Generationsschleife für CES
@@ -814,10 +816,6 @@ Partial Class Form1
                     Call DForm.Diag.Series(0).Add(CES1.List_Childs(i).Penalty(0), CES1.List_Childs(i).Penalty(1))
                 End If
 
-                ''HACK zum zeichnen aller Qualitäten
-                'Call TChart1.Series(2).Add(durchlauf, CES1.ChildList_BM(i).Quality_MO(0))
-                'Call TChart1.Series(3).Add(durchlauf, CES1.ChildList_BM(i).Quality_MO(1))
-                'Call TChart1.Series(4).Add(durchlauf, CES1.ChildList_BM(i).Quality_MO(2))
                 System.Windows.Forms.Application.DoEvents()
             Next
 
@@ -867,7 +865,7 @@ Partial Class Form1
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
         'Einstellungen für PES werden gesetzt
-        Call evo_einstellungen1.SetFor_CES_PES()
+        Call EVO_Einstellungen1.SetFor_CES_PES()
 
         For i = 0 To CES1.n_Parents - 1
             If CES1.List_Parents(i).Front = 1 Then
@@ -877,7 +875,7 @@ Partial Class Form1
 
                 'Reduktion der OptimierungsParameter
                 '***********************************
-                Call Sim1.Reduce_OptPara_ModPara(ces1.List_Parents(i).Elemente)
+                Call Sim1.Reduce_OptPara_ModPara(CES1.List_Parents(i).Elemente)
 
                 'Parameterübergabe an PES
                 '************************
