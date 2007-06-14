@@ -740,12 +740,17 @@ Partial Class Form1
                 Next
             End If
 
-            'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
-            Call CES1.Reset_Childs()
-            'Reproduktionsoperatoren, hier gehts dezent zur Sache
-            Call CES1.Reproduction_Control()
-            'Mutationsoperatoren
-            Call CES1.Mutation_Control()
+            'Nur wenn normaler Modus wird vererbt
+            '************************************
+            If CES1.TestModus = 0 Then
+                'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
+                Call CES1.Reset_Childs()
+                'Reproduktionsoperatoren, hier gehts dezent zur Sache
+                Call CES1.Reproduction_Control()
+                'Mutationsoperatoren
+                Call CES1.Mutation_Control()
+            End If
+
 
         Next
 
@@ -843,12 +848,16 @@ Partial Class Form1
                 Next
             End If
 
-            'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
-            Call CES1.Reset_Childs()
-            'Reproduktionsoperatoren, hier gehts dezent zur Sache
-            Call CES1.Reproduction_Control()
-            'Mutationsoperatoren
-            Call CES1.Mutation_Control()
+            'Nur wenn normaler Modus wird vererbt
+            '************************************
+            If CES1.TestModus = 0 Then
+                'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
+                Call CES1.Reset_Childs()
+                'Reproduktionsoperatoren, hier gehts dezent zur Sache
+                Call CES1.Reproduction_Control()
+                'Mutationsoperatoren
+                Call CES1.Mutation_Control()
+            End If
 
         Next
         'Ende der Generationsschleife
