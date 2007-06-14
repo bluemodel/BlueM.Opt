@@ -176,8 +176,8 @@ Public Class CES
 
     End Sub
 
-    'Generiert zufällige Paths für alle Kinder BM Problem
-    '****************************************************
+    'Normaler Modus: Generiert zufällige Paths für alle Kinder BM Problem
+    '*********************************************************************
     Public Sub Generate_Random_Path()
         Dim i, j As Integer
         Dim tmp As Integer
@@ -200,12 +200,10 @@ Public Class CES
 
     End Sub
 
-    'Testmodus2: Funktion zum testen aller Kombinationen
+    'Testmodus 2: Funktion zum testen aller Kombinationen
     '***************************************************
-    Public Sub Generate_All_Test_Path()
-
+    Public Sub Generate_All_Test_Paths()
         Dim i, j As Integer
-        'Dim x, y, z As Integer
 
         Dim array() As Integer
         ReDim array(List_Childs(i).Path.GetUpperBound(0))
@@ -215,7 +213,7 @@ Public Class CES
 
         For i = 0 To n_Childs - 1
             For j = 0 To List_Childs(i).Path.GetUpperBound(0)
-                list_childs(i).Path(j) = array(j)
+                List_Childs(i).Path(j) = array(j)
             Next
             array(0) += 1
             If Not i = n_Childs - 1 Then

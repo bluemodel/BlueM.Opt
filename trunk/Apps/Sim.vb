@@ -735,6 +735,23 @@ Public MustInherit Class Sim
 
     End Function
 
+    'Im Falle des Testmodus 1 wird der gewählte Path in das einzige Kind geschrieben
+    '*******************************************************************************
+    Public Sub get_TestPath(ByRef Path() As Integer)
+        Dim i, j, counter As Integer
+
+        For i = 0 To Path.GetUpperBound(0)
+            counter = 0
+            For j = 0 To List_Locations(i).List_Massnahmen.GetUpperBound(0)
+                If List_Locations(i).List_Massnahmen(j).TestModus = 1 Then
+                    path(i) = counter
+                End If
+                counter += 1
+            Next
+        Next
+
+    End Sub
+
     'Bereitet das SimModell für Kombinatorik Optimierung vor
     'TODO: Dieser Funktionsname ist sehr ähnlich mit "prepare_SIM_CES()"!
     '*******************************************************
