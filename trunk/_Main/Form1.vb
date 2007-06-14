@@ -254,7 +254,7 @@ Partial Class Form1
                     Sim1.Ergebnisdb = False
 
                     'SensiPlot für Sim vorbereiten
-                    Call Sim1.prepare_Sim_PES()
+                    Call Sim1.prepare_PES()
 
                     'SensiPlot Dialog anzeigen:
                     '--------------------------
@@ -286,7 +286,7 @@ Partial Class Form1
                     Sim1.Ergebnisdb = True
 
                     'PES für Sim vorbereiten
-                    Call Sim1.prepare_Sim_PES()
+                    Call Sim1.prepare_PES()
 
                     'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
                     If (Sim1.List_OptZiele.GetLength(0) = 1) Then
@@ -313,7 +313,7 @@ Partial Class Form1
                     Sim1.Ergebnisdb = False
 
                     'CES für Sim vorbereiten
-                    Call Sim1.prepare_Sim_CES()
+                    Call Sim1.prepare_CES()
 
                     CES1 = New EvoKern.CES
 
@@ -365,9 +365,9 @@ Partial Class Form1
                     Sim1.Ergebnisdb = False
 
                     'CES für Sim vorbereiten
-                    Call Sim1.prepare_Sim_CES()
+                    Call Sim1.prepare_CES()
                     'PES für Sim vorbereiten
-                    Call Sim1.prepare_Sim_PES()
+                    Call Sim1.prepare_PES()
 
                     CES1 = New EvoKern.CES
 
@@ -699,7 +699,7 @@ Partial Class Form1
 
                 'Vorbereitung und Evaluierung des Blauen Modells
                 '***********************************************
-                Call Sim1.Sim_Prepare(CES1.List_Childs(i).Path)
+                Call Sim1.Prepare_Evaluation_CES(CES1.List_Childs(i).Path)
                 Call Sim1.Set_Elemente(CES1.List_Childs(i).Elemente)
                 Call Sim1.Sim_Evaluierung_CombiOpt(CES1.n_Penalty, CES1.List_Childs(i).Penalty)
                 '***********************************************
@@ -742,8 +742,8 @@ Partial Class Form1
                 Next
             End If
 
-            'Nur wenn normaler Modus wird vererbt
-            '************************************
+            'Nur wenn Testmodus
+            '******************
             If CES1.TestModus = 0 Then
                 'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
                 Call CES1.Reset_Childs()
@@ -803,7 +803,7 @@ Partial Class Form1
 
                 'Vorbereitung und Evaluierung des Blauen Modells
                 '***********************************************
-                Call Sim1.Sim_Prepare(CES1.List_Childs(i).Path)
+                Call Sim1.Prepare_Evaluation_CES(CES1.List_Childs(i).Path)
                 Call Sim1.Set_Elemente(CES1.List_Childs(i).Elemente)
                 Call Sim1.Sim_Evaluierung_CombiOpt(CES1.n_Penalty, CES1.List_Childs(i).Penalty)
                 '******************************************
@@ -846,8 +846,8 @@ Partial Class Form1
                 Next
             End If
 
-            'Nur wenn normaler Modus wird vererbt
-            '************************************
+            'Nicht wenn Testmodus
+            '********************
             If CES1.TestModus = 0 Then
                 'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
                 Call CES1.Reset_Childs()
@@ -871,7 +871,7 @@ Partial Class Form1
             If CES1.List_Parents(i).Front = 1 Then
                 'Bereitet das BlaueModell für die Kombinatorik vor
                 '*************************************************
-                Call Sim1.Sim_Prepare(CES1.List_Parents(i).Path)
+                Call Sim1.Prepare_Evaluation_CES(CES1.List_Parents(i).Path)
 
                 'Reduktion der OptimierungsParameter
                 '***********************************

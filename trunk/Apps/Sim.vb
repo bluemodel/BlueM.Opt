@@ -247,7 +247,7 @@ Public MustInherit Class Sim
     'PES vorbereiten (auch für SensiPlot)
     'Erforderliche Dateien werden eingelesen und DB vorbereitet
     '**********************************************************
-    Public Sub prepare_Sim_PES()
+    Public Sub prepare_PES()
 
         'Simulationsdaten einlesen
         Call Me.Read_SimParameter()
@@ -269,7 +269,7 @@ Public MustInherit Class Sim
     'CES vorbereiten
     'Erforderliche Dateien werden eingelesen
     '***************************************
-    Public Sub prepare_Sim_CES()
+    Public Sub prepare_CES()
 
         'Zielfunktionen einlesen
         Call Me.Read_OptZiele()
@@ -753,9 +753,8 @@ Public MustInherit Class Sim
     End Sub
 
     'Bereitet das SimModell für Kombinatorik Optimierung vor
-    'TODO: Dieser Funktionsname ist sehr ähnlich mit "prepare_SIM_CES()"!
     '*******************************************************
-    Public Sub Sim_Prepare(ByVal Path() As Integer)
+    Public Sub Prepare_Evaluation_CES(ByVal Path() As Integer)
 
         'Erstellt die aktuelle Bauerksliste und überträgt sie zu SKos
         Call Define_aktuelle_Elemente(Path)
