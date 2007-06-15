@@ -920,11 +920,13 @@ Public MustInherit Class Sim
         If (GlobalAnzZiel = 1) Then
             'SingleObjective
             Call Diag.prepareSeries(ipop - 1, "Population " & ipop)
+            Diag.Series(ipop - 1).Cursor = Cursors.Hand
             Call Diag.Series(ipop - 1).Add(durchlauf, List_OptZiele(0).QWertTmp)
         ElseIf (GlobalAnzZiel > 1) Then
             'MultiObjective
             'BUG 66: nur die ersten beiden Zielfunktionen werden gezeichnet
-            Call Diag.prepareSeries(0, "Child")
+            Call Diag.prepareSeries(0, "Population")
+            Diag.Series(0).Cursor = Cursors.Hand
             Call Diag.Series(0).Add(List_OptZiele(0).QWertTmp, List_OptZiele(1).QWertTmp)
         End If
 
