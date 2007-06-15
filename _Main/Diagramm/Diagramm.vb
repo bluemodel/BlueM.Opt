@@ -148,7 +148,7 @@ Public Class Diagramm
 
     'Alle Series für TeeChart werden initialisiert
     'Teilweise werden die Ziel bzw. Ausgangslinien berechnet und gezeichnet
-    Public Sub DiagInitialise_SinusFunktion(ByVal EVO_Einstellungen1 As EvoForm.EVO_Einstellungen, ByVal globalAnzPar As Short, ByVal AnzPara As Integer)
+    Public Sub DiagInitialise_SinusFunktion(ByVal EVO_Einstellungen1 As EVO_Einstellungen, ByVal globalAnzPar As Short, ByVal AnzPara As Integer)
         Dim array_x() As Double = {}
         Dim array_y() As Double = {}
         Dim Populationen As Short
@@ -214,7 +214,7 @@ Public Class Diagramm
         End With
     End Sub
 
-    Public Sub DiagInitialise_BealeProblem(ByVal EVO_Einstellungen1 As EvoForm.EVO_Einstellungen, ByVal globalAnzPar As Short)
+    Public Sub DiagInitialise_BealeProblem(ByVal EVO_Einstellungen1 As EVO_Einstellungen, ByVal globalAnzPar As Short)
         Dim array_x() As Double = {}
         Dim array_y() As Double = {}
         Dim Ausgangsergebnis As Double
@@ -279,7 +279,7 @@ Public Class Diagramm
         End With
     End Sub
 
-    Public Sub DiagInitialise_SchwefelProblem(ByVal EVO_Einstellungen1 As EvoForm.EVO_Einstellungen, ByVal globalAnzPar As Short)
+    Public Sub DiagInitialise_SchwefelProblem(ByVal EVO_Einstellungen1 As EVO_Einstellungen, ByVal globalAnzPar As Short)
         Dim array_x() As Double = {}
         Dim array_y() As Double = {}
         Dim Ausgangsergebnis As Double
@@ -351,7 +351,7 @@ Public Class Diagramm
         End With
     End Sub
 
-    Public Sub DiagInitialise_MultiTestProb(ByVal EVO_Einstellungen1 As EvoForm.EVO_Einstellungen, ByVal Testproblem As String)
+    Public Sub DiagInitialise_MultiTestProb(ByVal EVO_Einstellungen1 As EVO_Einstellungen, ByVal Testproblem As String)
         Dim Populationen As Short
         Dim i, j As Short
 

@@ -1521,7 +1521,7 @@ Public MustInherit Class Sim
         ChDrive(binpath)
         ChDir(binpath)
         'in das \Apps Verzeichnis wechseln
-        ChDir("..\..\Apps")
+        ChDir("..\Apps")
         'Datei kopieren
         My.Computer.FileSystem.CopyFile("EVO.mdb", ZielDatei, True)
         'zurück in das Ausgangsverzeichnis wechseln

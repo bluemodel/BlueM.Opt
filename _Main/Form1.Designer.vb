@@ -20,8 +20,8 @@ Partial Class Form1
     'Wird vom Windows Form-Designer benötigt.
     Private components As System.ComponentModel.IContainer
     Public ToolTip1 As System.Windows.Forms.ToolTip
-    Public WithEvents EVO_Opt_Verlauf1 As EvoForm.EVO_Opt_Verlauf
-    Public WithEvents EVO_Einstellungen1 As EvoForm.EVO_Einstellungen
+    Public WithEvents EVO_Opt_Verlauf1 As EVO_Opt_Verlauf
+    Public WithEvents EVO_Einstellungen1 As EVO_Einstellungen
     Public WithEvents Button_Start As System.Windows.Forms.Button
     'Hinweis: Die folgende Prozedur wird vom Windows Form-Designer benötigt.
     'Das Verändern mit dem Windows Form-Designer ist nicht möglich.
@@ -38,9 +38,9 @@ Partial Class Form1
         Me.ComboBox_Methode = New System.Windows.Forms.ComboBox
         Me.Label_Anwendung = New System.Windows.Forms.Label
         Me.ComboBox_Anwendung = New System.Windows.Forms.ComboBox
-        Me.EVO_Opt_Verlauf1 = New EvoForm.EVO_Opt_Verlauf
-        Me.EVO_Einstellungen1 = New EvoForm.EVO_Einstellungen
-        Me.Testprobleme1 = New Apps.Testprobleme
+        Me.EVO_Opt_Verlauf1 = New EVO_Opt_Verlauf
+        Me.EVO_Einstellungen1 = New EVO_Einstellungen
+        Me.Testprobleme1 = New Testprobleme
         Me.OpenFileDialog_Datensatz = New System.Windows.Forms.OpenFileDialog
         Me.OpenFileDialog_MDB = New System.Windows.Forms.OpenFileDialog
         Me.DForm = New Main.DiagrammForm
@@ -220,7 +220,7 @@ Partial Class Form1
     Friend WithEvents ComboBox_Anwendung As System.Windows.Forms.ComboBox
     Friend WithEvents Label_Anwendung As System.Windows.Forms.Label
     Friend WithEvents Button_IniMethod As System.Windows.Forms.Button
-    Friend WithEvents Testprobleme1 As Apps.Testprobleme
+    Friend WithEvents Testprobleme1 As Testprobleme
     Friend WithEvents DForm As Main.DiagrammForm
     Friend WithEvents LinkLabel_WorkDir As System.Windows.Forms.LinkLabel
     Friend WithEvents ComboBox_Methode As System.Windows.Forms.ComboBox
