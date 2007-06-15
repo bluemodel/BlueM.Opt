@@ -1408,8 +1408,8 @@ GenerierenAusgangswerte:
                         'ggf. Referenzreihe in Wave speichern
                         If (.ZielTyp = "Reihe" Or .ZielTyp = "IHA") Then
                             'Referenzreihen nur jeweils ein Mal zeichnen
-                            If (Not RefSeries.Contains(.ZielReihePfad & .ZielGr)) Then
-                                RefSeries.Add(.ZielGr, .ZielReihePfad & .ZielGr)
+                            If (Not RefSeries.Contains(.ZielReiheDatei & .ZielGr)) Then
+                                RefSeries.Add(.ZielGr, .ZielReiheDatei & .ZielGr)
                                 n += 1
                                 ReDim Preserve Wave1.WaveList(n - 1)
                                 Wave1.WaveList(n - 1).Bezeichnung = .SimGr & " (REF)"
