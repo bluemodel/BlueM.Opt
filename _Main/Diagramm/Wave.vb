@@ -23,7 +23,7 @@ Public Class Wave
         Me.WForm.Diag.Legend.Visible = True
 
         'Handler für Klick auf Series entfernen
-        RemoveHandler WForm.Diag.ClickSeries, AddressOf Main.Form1.seriesClick
+        RemoveHandler WForm.Diag.ClickSeries, AddressOf Main.Form1.showWave
 
     End Sub
 
