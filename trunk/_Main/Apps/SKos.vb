@@ -20,7 +20,7 @@ Public Class SKos
 
     Public AktuelleElemente() As Object
 
-    Public Function calculate_costs(ByVal BlueM1 As BlueM)
+    Public Function calculate_costs(ByVal BlueM1 As BlueM) As Double
         Dim costs As Double = 0
         Dim Bauwerksliste(0, 1) As Object
         Dim TRS_Array(,) As Object = {}
@@ -49,7 +49,7 @@ Public Class SKos
         Return costs
     End Function
     'Funktion zum erstellen der Bauwerksliste
-    Private Sub create_Bauwerksliste(ByVal BlueM1 As BlueM, ByRef Bauwerksliste As Object)
+    Private Sub create_Bauwerksliste(ByVal BlueM1 As BlueM, ByRef Bauwerksliste(,) As Object)
         Dim Bauwerks_Array() As Object = {}
 
         'Kopiert die Bauwerke aus dem BlueM
@@ -95,7 +95,7 @@ Public Class SKos
 
     'Länge der Transportstrecken einlesen
     '************************************
-    Private Sub Read_TRS(ByVal BlueM1 As BlueM, ByRef TRS_Array As Object)
+    Private Sub Read_TRS(ByVal BlueM1 As BlueM, ByRef TRS_Array(,) As Object)
 
         'Dim TRS_Array(,) As Object = {}
         Dim Datei As String = BlueM1.WorkDir & BlueM1.Datensatz & ".TRS"
@@ -162,7 +162,7 @@ Public Class SKos
     End Sub
 
     'Volumen der Talsperren einlesen
-    Private Sub Read_TAL(ByVal BlueM1 As BlueM, ByRef TAl_Array As Object)
+    Private Sub Read_TAL(ByVal BlueM1 As BlueM, ByRef TAl_Array(,) As Object)
 
         'Dim TAL_Array(,) As Object = {}
         Dim Datei As String = BlueM1.WorkDir & BlueM1.Datensatz & ".TAL"
