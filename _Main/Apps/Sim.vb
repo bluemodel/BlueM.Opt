@@ -891,9 +891,9 @@ Public MustInherit Class Sim
 
     End Sub
 
-    'Evaluierung des SimModells für Parameter Optimierung - Steuerungseinheit
-    '************************************************************************
-    Public Function Eval_Sim_ParaOpt(ByVal GlobalAnzPar As Short, ByVal GlobalAnzZiel As Short, ByVal mypara As Double(,), ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN As Double(), ByRef TChart1 As Steema.TeeChart.TChart) As Boolean
+    'Evaluierung des SimModells für ParameterOptimierung - Steuerungseinheit
+    '***********************************************************************
+    Public Function Eval_Sim_ParaOpt(ByVal GlobalAnzPar As Short, ByVal GlobalAnzZiel As Short, ByVal mypara As Double(,), ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN As Double(), ByRef Diag As Main.Diagramm) As Boolean
 
         Dim i As Short
 
@@ -919,11 +919,13 @@ Public MustInherit Class Sim
         'Qualitätswerte im TeeChart zeichnen
         If (GlobalAnzZiel = 1) Then
             'SingleObjective
-            TChart1.Series(ipop).Add(durchlauf, List_OptZiele(0).QWertTmp)
-        Else
+            Call Diag.prepareSeries(ipop - 1, "Population" & ipop, Steema.TeeChart.Styles.PointerStyles.Circle, 4)
+            Call Diag.Series(ipop - 1).Add(durchlauf, List_OptZiele(0).QWertTmp)
+        ElseIf GlobalAnzZiel = 2 Then
             'MultiObjective
             'BUG 66: nur die ersten beiden Zielfunktionen werden gezeichnet
-            TChart1.Series(0).Add(List_OptZiele(0).QWertTmp, List_OptZiele(1).QWertTmp, "")
+            Call Diag.prepareSeries(0, "Child", Steema.TeeChart.Styles.PointerStyles.Circle, 4)
+            Call Diag.Series(0).Add(List_OptZiele(0).QWertTmp, List_OptZiele(1).QWertTmp)
         End If
 
         'Qualitätswerte und OptParameter in DB speichern
