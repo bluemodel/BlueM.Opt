@@ -1168,6 +1168,7 @@ GenerierenAusgangswerte:
     '*****************************
     Private Sub SekundärePopulationZeichnen(ByVal Population(,) As Double)
         Dim i As Short
+        Call DForm.Diag.prepareSeries(1, "Sekundäre Population", Steema.TeeChart.Styles.PointerStyles.Circle, 4)
         With DForm.Diag.Series(1)
             .Clear()
             If UBound(Population, 2) = 2 Then

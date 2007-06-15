@@ -919,12 +919,12 @@ Public MustInherit Class Sim
         'Qualitätswerte im TeeChart zeichnen
         If (GlobalAnzZiel = 1) Then
             'SingleObjective
-            Call Diag.prepareSeries(ipop - 1, "Population" & ipop, Steema.TeeChart.Styles.PointerStyles.Circle, 4)
+            Call Diag.prepareSeries(ipop - 1, "Population " & ipop)
             Call Diag.Series(ipop - 1).Add(durchlauf, List_OptZiele(0).QWertTmp)
-        ElseIf GlobalAnzZiel = 2 Then
+        ElseIf (GlobalAnzZiel > 1) Then
             'MultiObjective
             'BUG 66: nur die ersten beiden Zielfunktionen werden gezeichnet
-            Call Diag.prepareSeries(0, "Child", Steema.TeeChart.Styles.PointerStyles.Circle, 4)
+            Call Diag.prepareSeries(0, "Child")
             Call Diag.Series(0).Add(List_OptZiele(0).QWertTmp, List_OptZiele(1).QWertTmp)
         End If
 

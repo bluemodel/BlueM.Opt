@@ -75,59 +75,6 @@ Public Class Diagramm
 
     End Sub
 
-    'Serien-Initialisierung für SingleObjective
-    '******************************************
-    Public Sub prepareSeries_SO(ByVal n_Populationen As Integer)
-
-        Dim i As Integer
-
-        'Series(0): Anfangswert
-        Dim tmpSeries As New Steema.TeeChart.Styles.Points(Me.Chart)
-        tmpSeries.Title = "Anfangswert"
-        tmpSeries.Color = System.Drawing.Color.Red
-        tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-        tmpSeries.Pointer.HorizSize = 3
-        tmpSeries.Pointer.VertSize = 3
-
-        'Series(1 bis n): Für jede Population eine Series
-        For i = 1 To n_Populationen
-            tmpSeries = New Steema.TeeChart.Styles.Points(Me.Chart)
-            tmpSeries.Title = "Population " & i.ToString()
-            tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            tmpSeries.Pointer.HorizSize = 2
-            tmpSeries.Pointer.VertSize = 2
-            tmpSeries.Cursor = Cursors.Hand
-        Next
-
-        Call Me.add_MarksTips()
-
-    End Sub
-
-    'Serien-Initialisierung für MultiObjective
-    '*****************************************
-    Public Sub prepareSeries_MO()
-
-        'Series(0): Series für die Population.
-        Dim tmpSeries As New Steema.TeeChart.Styles.Points(Me.Chart)
-        tmpSeries.Title = "Population"
-        tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-        tmpSeries.Color = System.Drawing.Color.Orange
-        tmpSeries.Pointer.HorizSize = 2
-        tmpSeries.Pointer.VertSize = 2
-        tmpSeries.Cursor = Cursors.Hand
-
-        'Series(1): Series für die Sekundäre Population
-        tmpSeries = New Steema.TeeChart.Styles.Points(Me.Chart)
-        tmpSeries.Title = "Sekundäre Population"
-        tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-        tmpSeries.Color = System.Drawing.Color.Blue
-        tmpSeries.Pointer.HorizSize = 3
-        tmpSeries.Pointer.VertSize = 3
-
-        Call Me.add_MarksTips()
-
-    End Sub
-
     'MarksTips zu Serien hinzufügen
     '******************************
     Public Sub add_MarksTips()
