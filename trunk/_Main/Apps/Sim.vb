@@ -97,9 +97,9 @@ Public MustInherit Class Sim
         Public ZielFkt As String                    'Zielfunktion
         Public WertTyp As String                    'Gibt an wie der Wert, der mit dem Zielwert verglichen werden soll, aus dem Simulationsergebnis berechnet werden soll.
         Public ZielWert As String                   'Der vorgegeben Zielwert
-        Public ZielReihePfad As String              'Der Pfad zur Zielreihe
+        Public ZielReiheDatei As String             'Der Dateiname der Zielreihe
         Public ZielGr As String                     'Spalte der .wel Datei falls ZielReihe .wel Datei ist
-        Public ZielReihe(,) As Object               'Die Zielreihe
+        Public ZielReihe(,) As Object               'Die Werte der Zielreihe
         Public QWertTmp As Double                   'Qualitätswert der letzten Simulation wird hier zwischengespeichert 
         Public Overrides Function toString() As String
             Return Bezeichnung
@@ -444,7 +444,7 @@ Public MustInherit Class Sim
                 List_OptZiele(i).WertTyp = ZeilenArray(6).Trim()
                 List_OptZiele(i).ZielWert = ZeilenArray(7).Trim()
                 List_OptZiele(i).ZielGr = ZeilenArray(8).Trim()
-                List_OptZiele(i).ZielReihePfad = ZeilenArray(9).Trim()
+                List_OptZiele(i).ZielReiheDatei = ZeilenArray(9).Trim()
                 i += 1
             End If
         Loop Until StrRead.Peek() = -1
@@ -460,32 +460,32 @@ Public MustInherit Class Sim
             If (List_OptZiele(i).ZielTyp = "Reihe" Or List_OptZiele(i).ZielTyp = "IHA") Then
 
                 'Dateiendung der Zielreihendatei bestimmen und Reihe einlesen
-                ext = List_OptZiele(i).ZielReihePfad.Substring(List_OptZiele(i).ZielReihePfad.LastIndexOf(".") + 1)
+                ext = Path.GetExtension(List_OptZiele(i).ZielReiheDatei)
                 Select Case (ext.ToUpper)
-                    Case "WEL"
-                        IsOK = Read_WEL(List_OptZiele(i).ZielReihePfad, List_OptZiele(i).ZielGr, List_OptZiele(i).ZielReihe)
-                    Case "ZRE"
-                        IsOK = Read_ZRE(List_OptZiele(i).ZielReihePfad, List_OptZiele(i).ZielReihe)
-                    Case "PRB"
-                        IsOK = Read_PRB(List_OptZiele(i).ZielReihePfad, List_OptZiele(i).ZielGr, List_OptZiele(i).ZielReihe)
+                    Case ".WEL"
+                        IsOK = Read_WEL(Me.WorkDir & List_OptZiele(i).ZielReiheDatei, List_OptZiele(i).ZielGr, List_OptZiele(i).ZielReihe)
+                    Case ".ZRE"
+                        IsOK = Read_ZRE(Me.WorkDir & List_OptZiele(i).ZielReiheDatei, List_OptZiele(i).ZielReihe)
+                    Case ".PRB"
+                        IsOK = Read_PRB(Me.WorkDir & List_OptZiele(i).ZielReiheDatei, List_OptZiele(i).ZielGr, List_OptZiele(i).ZielReihe)
                     Case Else
                         IsOK = False
                 End Select
 
                 If (IsOK = False) Then
-                    Throw New Exception("Fehler beim einlesen der Zielreihe in '" & List_OptZiele(i).ZielReihePfad & "'" & Chr(13) & Chr(10) & "Ein Fehler könnten Leerzeichen in der letzten Zeile der Datei sein")
+                    Throw New Exception("Fehler beim einlesen der Zielreihe '" & List_OptZiele(i).ZielReiheDatei & "'" & Chr(13) & Chr(10) & "Ein Fehler könnten Leerzeichen in der letzten Zeile der Datei sein")
                 End If
 
                 'Zielreihe entsprechend dem Simulationszeitraum kürzen (nur bei WEL und ZRE)
                 '---------------------------------------------------------------------------
-                If (ext.ToUpper = "WEL" Or ext.ToUpper = "ZRE") Then
+                If (ext.ToUpper = ".WEL" Or ext.ToUpper = ".ZRE") Then
 
                     ZielStart = List_OptZiele(i).ZielReihe(0, 0)
                     ZielEnde = List_OptZiele(i).ZielReihe(List_OptZiele(i).ZielReihe.GetUpperBound(0), 0)
 
                     If (ZielStart > Me.SimStart Or ZielEnde < Me.SimEnde) Then
                         'Zielreihe deckt Simulationszeitraum nicht ab
-                        Throw New Exception("Die Zielreihe in '" & List_OptZiele(i).ZielReihePfad & "' deckt den Simulationszeitraum nicht ab!")
+                        Throw New Exception("Die Zielreihe '" & List_OptZiele(i).ZielReiheDatei & "' deckt den Simulationszeitraum nicht ab!")
                     Else
                         'Länge der Simulationszeitreihe:
                         Dim length_n As Integer = ((Me.SimEnde - Me.SimStart).TotalSeconds / Me.SimDT.TotalSeconds) + 1
