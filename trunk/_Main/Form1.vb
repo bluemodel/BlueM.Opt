@@ -1290,7 +1290,7 @@ GenerierenAusgangswerte:
                             If EVO_Einstellungen1.isPOPUL Then
                                 Achse.Max = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden + 1
                             Else
-                                Achse.Max = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
+                                Achse.Max = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf + 1
                             End If
                             Achsen.Add(Achse)
                         End If
