@@ -170,7 +170,11 @@ Public Class Diagramm
         Dim i As Short
         Dim OptErg() As Double
 
-        Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
+        If EVO_Einstellungen1.isPOPUL Then
+            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden + 1
+        Else
+            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf + 1
+        End If
 
         'Ausgengsergebnisse für die Linien im TeeChart Rechnen
         ReDim OptErg(Anzahl_Kalkulationen)
@@ -235,7 +239,11 @@ Public Class Diagramm
         Dim i As Short
         Dim X() As Double
 
-        Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
+        If EVO_Einstellungen1.isPOPUL Then
+            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden + 1
+        Else
+            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf + 1
+        End If
 
         'Ausgangsergebnisse für die Linien im TeeChart Rechnen
         ReDim X(globalAnzPar)
