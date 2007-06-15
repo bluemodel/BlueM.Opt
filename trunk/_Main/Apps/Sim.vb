@@ -827,29 +827,59 @@ Public MustInherit Class Sim
     'Reduziert die OptParameter und die ModellParameter auf die aktiven Elemente
     '***************************************************************************
     Public Sub Reduce_OptPara_ModPara(ByVal Bauwerksliste() As Object)
+
+        'Reduzierung der ModParameter
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxx
         Dim i, j, count As Integer
-        Dim TMP() As Struct_ModellParameter
-        ReDim TMP(List_ModellParameter.GetUpperBound(0))
+        Dim TMP_ModPara() As Struct_ModellParameter
+        ReDim TMP_ModPara(List_ModellParameter.GetUpperBound(0))
 
         count = 0
         For i = 0 To List_ModellParameter.GetUpperBound(0)
             For j = 0 To Bauwerksliste.GetUpperBound(0)
                 If List_ModellParameter(i).Element = Bauwerksliste(j) Then
-                    Call copy_Struct_ModellParemeter(List_ModellParameter(i), TMP(count))
+                    Call copy_Struct_ModellParemeter(List_ModellParameter(i), TMP_ModPara(count))
                     count += 1
                 End If
             Next
         Next
 
         If count = 0 Then
-            throw new Exception("Die aktuelle Kombination enthält keine Bauwerke, für die OptimierungsParameter vorliegen")
+            Throw New Exception("Die aktuelle Kombination enthält keine Bauwerke, für die OptimierungsParameter vorliegen")
         End If
 
-        Array.Resize(TMP, count)
+        Array.Resize(TMP_ModPara, count)
         Array.Resize(List_ModellParameter, count)
 
-        For i = 0 To TMP.GetUpperBound(0)
-            Call copy_Struct_ModellParemeter(TMP(i), List_ModellParameter(i))
+        For i = 0 To TMP_ModPara.GetUpperBound(0)
+            Call copy_Struct_ModellParemeter(TMP_ModPara(i), List_ModellParameter(i))
+        Next
+
+        'Reduzierung der OptParameter
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        Dim TMP_OptPara() As Struct_OptParameter
+        ReDim TMP_OptPara(List_OptParameter.GetUpperBound(0))
+
+        count = 0
+        For i = 0 To List_OptParameter.GetUpperBound(0)
+            For j = 0 To List_ModellParameter.GetUpperBound(0)
+                If List_OptParameter(i).Bezeichnung = List_ModellParameter(j).OptParameter Then
+                    Call copy_Struct_OptParemeter(List_OptParameter(i), TMP_OptPara(count))
+                    count += 1
+                    j = List_ModellParameter.GetUpperBound(0)
+                End If
+            Next
+        Next
+
+        If count = 0 Then
+            Throw New Exception("Die aktuelle Kombination enthält keine Bauwerke, für die OptimierungsParameter vorliegen")
+        End If
+
+        Array.Resize(TMP_OptPara, count)
+        Array.Resize(List_OptParameter, count)
+
+        For i = 0 To TMP_OptPara.GetUpperBound(0)
+            Call copy_Struct_OptParemeter(TMP_OptPara(i), List_OptParameter(i))
         Next
 
     End Sub
@@ -868,6 +898,19 @@ Public MustInherit Class Sim
         Destination.SpBis = Source.SpBis
         Destination.Faktor = Source.Faktor
         Destination.Wert = Source.Wert
+
+    End Sub
+
+    'Kopiert ein Strukt_OptParameter
+    '**********************************
+    Private Sub copy_Struct_OptParemeter(ByVal Source As Struct_OptParameter, ByRef Destination As Struct_OptParameter)
+
+        Destination.Bezeichnung = Source.Bezeichnung
+        Destination.Einheit = Source.Einheit
+        Destination.Wert = Source.Wert
+        Destination.Min = Source.Min
+        Destination.Max = Source.Max
+        Destination.SKWert = Source.SKWert
 
     End Sub
 
