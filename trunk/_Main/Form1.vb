@@ -40,10 +40,10 @@ Partial Class Form1
     Private Const METH_SENSIPLOT As String = "SensiPlot"
 
     '**** Deklarationen der Module *****
-    Public WithEvents Sim1 As Apps.Sim
-    Public SensiPlot1 As Apps.SensiPlot
+    Public WithEvents Sim1 As Sim
+    Public SensiPlot1 As SensiPlot
     Public CES1 As EvoKern.CES
-    Public TSP1 As Apps.TSP
+    Public TSP1 As TSP
 
     '**** Globale Parameter Parameter Optimierung ****
     Dim myIsOK As Boolean
@@ -130,7 +130,7 @@ Partial Class Form1
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Objekt der Klasse BlueM initialisieren
-                    Sim1 = New Apps.BlueM
+                    Sim1 = New BlueM
 
                     'Initialisieren
                     Call Sim1.SimIni()
@@ -143,7 +143,7 @@ Partial Class Form1
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Objekt der Klasse BlueM initialisieren
-                    Sim1 = New Apps.Smusi
+                    Sim1 = New Smusi
 
                     'Initialisieren
                     Call Sim1.SimIni()
@@ -173,7 +173,7 @@ Partial Class Form1
                 Case ANW_TSP 'Anwendung Traveling Salesman Problem (TSP)
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    TSP1 = New Apps.TSP
+                    TSP1 = New TSP
 
                     Call TSP1.TSP_Initialize(DForm.Diag)
 
@@ -245,7 +245,7 @@ Partial Class Form1
                 Case METH_SENSIPLOT 'Methode SensiPlot
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    SensiPlot1 = New Apps.SensiPlot
+                    SensiPlot1 = New SensiPlot
 
                     'EVO_Einstellungen deaktivieren
                     EVO_Einstellungen1.Enabled = False
@@ -565,7 +565,7 @@ Partial Class Form1
 
             'Speichern des Simulationsergebnisses für Wave
             'BUG 119: Die WEL-Datei hat bei Smusi einen anderen Namen!
-            Apps.Sim.Read_WEL(Sim1.WorkDir & Sim1.Datensatz & ".wel", Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).SimGr, Wave1.WaveList(i).Wave)
+            Sim.Read_WEL(Sim1.WorkDir & Sim1.Datensatz & ".wel", Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).SimGr, Wave1.WaveList(i).Wave)
             Wave1.WaveList(i).Bezeichnung = Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter).Bezeichnung & ": " _
                                             & Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter).Wert
 
@@ -1400,7 +1400,7 @@ Start_Evolutionsrunden:
                             SimSeries.Add(.SimGr, .SimGr)
                             'Simulationsergebnis in Wave speichern
                             Dim simresult(,) As Object = {}
-                            Dim isOK As Boolean = Apps.Sim.Read_WEL(WELFile, .SimGr, simresult)
+                            Dim isOK As Boolean = Sim.Read_WEL(WELFile, .SimGr, simresult)
                             n += 1
                             ReDim Preserve Wave1.WaveList(n - 1)
                             Wave1.WaveList(n - 1).Bezeichnung = .SimGr
@@ -1480,7 +1480,7 @@ Start_Evolutionsrunden:
             Cursor = Cursors.WaitCursor
 
             'Daten einlesen
-            Dim series As Collection = Apps.Sim.db_readQWerte(Me.OpenFileDialog_MDB.FileName)
+            Dim series As Collection = Sim.db_readQWerte(Me.OpenFileDialog_MDB.FileName)
 
             'Scatterplot anzeigen
             Dim scatterplot1 As New Scatterplot

@@ -66,12 +66,12 @@ Public Class IHA
     'Jahreszahlen
     Private BeginPre As Integer
     Private EndPre As Integer
-    Private BeginPost_sim As Integer        'tatsächlich
-    Private EndPost_sim As Integer          'tatsächlich
-    Private BeginPost As Integer            'für IHA verwendet
-    Private EndPost As Integer              'für IHA verwendet
+    Private BeginPost_sim As Integer                'tatsächlich
+    Private EndPost_sim As Integer                  'tatsächlich
+    Private BeginPost As Integer                    'für IHA verwendet
+    Private EndPost As Integer                      'für IHA verwendet
 
-    Private RefData(,) As Double            'Enthält die Referenz-Abflussdaten in Zeilen für jeden Tag des Jahres
+    Private RefData(,) As Double                    'Enthält die Referenz-Abflussdaten in Zeilen für jeden Tag des Jahres
 
 #End Region 'Eigenschaften
 
@@ -141,7 +141,7 @@ Public Class IHA
             ChDrive(binpath)
             ChDir(binpath)
             'in das \Apps Verzeichnis wechseln
-            ChDir("..\..\Apps")
+            ChDir("..\Apps")
             'Datei kopieren
             My.Computer.FileSystem.CopyFile("IHA_Batchfor.exe", ZielDatei, True)
             'zurück in das Ausgangsverzeichnis wechseln

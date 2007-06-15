@@ -27,7 +27,7 @@ Public Class BlueM
 
     'IHA
     '---
-    Private IHA1 As Apps.IHA
+    Private IHA1 As IHA
 
 #End Region 'Eigenschaften
 
@@ -94,7 +94,7 @@ Public Class BlueM
         For i = 0 To Me.List_OptZiele.GetUpperBound(0)
             If (Me.List_OptZiele(i).ZielTyp = "IHA") Then
                 'IHA-Berechnung vorbereiten
-                Me.IHA1 = New Apps.IHA()
+                Me.IHA1 = New IHA()
                 Call Me.IHA1.IHA_prepare(Me)
                 Exit For
             End If

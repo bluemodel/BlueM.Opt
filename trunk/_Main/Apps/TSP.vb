@@ -575,7 +575,7 @@ Public Class TSP
     Public Sub Sort_Faksimile(ByRef FaksimileList() As Faksimile_Type)
         'Sortiert die Fiksimile anhand des Abstandes
         Dim i, j As Integer
-        Dim swap As Apps.TSP.Faksimile_Type
+        Dim swap As TSP.Faksimile_Type
 
         For i = 0 To FaksimileList.GetUpperBound(0)
             For j = 0 To FaksimileList.GetUpperBound(0)
