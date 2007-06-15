@@ -1,93 +1,144 @@
 Public Class Diagramm
     Inherits Steema.TeeChart.TChart
 
-Public Structure Achse
-        Public Beschriftung as String
-        Public Max as Double
-End Structure
+    Public Structure Achse
+            Public Name as String
+            Public Auto as Boolean
+            Public Max as Double
+    End Structure
 
-    'TeeChart Initialisierung für SingleObjective
-    '********************************************
-    Public Sub DiagInitialise_SO(ByVal Titel as String, ByVal Achse as Achse, ByVal n_Populationen As Integer, ByVal n_Kalkulationen As Integer)
+    'TeeChart Initialisierung (Titel und Achsen)
+    '*******************************************
+    Public Sub DiagInitialise(ByVal Titel As String, ByVal Achsen As Collection)
+
+        With Me
+            .Clear()
+            .Header.Text = Titel
+            .Aspect.View3D = False
+            .Legend.Visible = False
+
+            'Formatierung der Axen
+            '---------------------
+            'X-Achse:
+            .Chart.Axes.Bottom.Title.Caption = Achsen(1).Name
+            .Chart.Axes.Bottom.Automatic = Achsen(1).Auto
+            .Chart.Axes.Bottom.Minimum = 0
+            .Chart.Axes.Bottom.Maximum = Achsen(1).Max
+            .Chart.Axes.Bottom.Labels.Style = Steema.TeeChart.AxisLabelStyle.Value
+            'Y-Achse:
+            .Chart.Axes.Left.Title.Caption = Achsen(2).Name
+            .Chart.Axes.Left.Automatic = Achsen(2).Auto
+            .Chart.Axes.Left.Minimum = 0
+            .Chart.Axes.Left.Maximum = Achsen(2).Max
+            .Chart.Axes.Left.Labels.Style = Steema.TeeChart.AxisLabelStyle.Value
+        End With
+
+    End Sub
+
+    'Serien-Initialisierung-Dynamisch
+    '********************************
+    Public Sub prepareSeries(ByVal SeriesNo As Integer, ByVal Title As String, Optional ByVal Style As Steema.TeeChart.Styles.PointerStyles = Steema.TeeChart.Styles.PointerStyles.Circle, Optional ByVal Size As Integer = 3)
+
+        'Neue Series nur dann zum Chart hinzufügen, 
+        'wenn SeriesNo dem nächsten freien Index entspricht
+        If (Me.Chart.Series.Count = SeriesNo) Then
+            'Series hinzufügen
+            Dim tmpSeries As New Steema.TeeChart.Styles.Points(Me.Chart)
+            tmpSeries.Title = Title
+            tmpSeries.Pointer.Style = Style
+            tmpSeries.Pointer.HorizSize = Size
+            tmpSeries.Pointer.VertSize = Size
+
+            Call Me.add_MarksTips()
+
+        ElseIf (Me.Chart.Series.Count < SeriesNo) Then
+            'Es wurde eine SeriesNo angegeben, 
+            'die größer als der nächste freie Index ist!
+            Throw New Exception("SeriesNo ist größer als nächster freier Index in SeriesCollection!")
+
+        Else
+            'Series besteht schon
+        End If
+
+    End Sub
+
+    'Serien werden von Hinten gelöscht
+    '*********************************
+    Sub DeleteSeries(ByVal Max As Integer, ByVal Min As Integer)
+
+        Dim i As Integer
+        For i = Max To Min Step -1
+            If Me.Chart.Series.Count - 1 = i Then
+                Me.Chart.Series.Remove(Me.Chart.Series(i))
+            End If
+        Next
+
+    End Sub
+
+    'Serien-Initialisierung für SingleObjective
+    '******************************************
+    Public Sub prepareSeries_SO(ByVal n_Populationen As Integer)
 
         Dim i As Integer
 
-        With Me
-            .Clear()
-            .Header.Text = Titel
-            .Aspect.View3D = False
-            .Legend.Visible = False
+        'Series(0): Anfangswert
+        Dim tmpSeries As New Steema.TeeChart.Styles.Points(Me.Chart)
+        tmpSeries.Title = "Anfangswert"
+        tmpSeries.Color = System.Drawing.Color.Red
+        tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+        tmpSeries.Pointer.HorizSize = 3
+        tmpSeries.Pointer.VertSize = 3
 
-            'Series(0): Anfangswert
-            Dim Point0 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point0.Title = "Anfangswert"
-            Point0.Color = System.Drawing.Color.Red
-            Point0.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point0.Pointer.HorizSize = 3
-            Point0.Pointer.VertSize = 3
+        'Series(1 bis n): Für jede Population eine Series
+        For i = 1 To n_Populationen
+            tmpSeries = New Steema.TeeChart.Styles.Points(Me.Chart)
+            tmpSeries.Title = "Population " & i.ToString()
+            tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            tmpSeries.Pointer.HorizSize = 2
+            tmpSeries.Pointer.VertSize = 2
+            tmpSeries.Cursor = Cursors.Hand
+        Next
 
-            'Series(1 bis n): Für jede Population eine Series 'TODO: es würde auch eine Series für alle reichen!
-            For i = 1 To n_Populationen
-                Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
-                Point1.Title = "Population " & i.ToString()
-                Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-                Point1.Pointer.HorizSize = 2
-                Point1.Pointer.VertSize = 2
-            Next i
+        Call Me.add_MarksTips()
 
-            'Formatierung der Axen
-            .Chart.Axes.Bottom.Title.Caption = "Simulation"
-            .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Maximum = n_Kalkulationen
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Left.Title.Caption = Achse.Beschriftung
-            .Chart.Axes.Left.Automatic = True
-            .Chart.Axes.Left.Minimum = 0
-        End With
     End Sub
 
-    'TeeChart Initialisierung für MultiObjective
-    '*******************************************
-    Public Sub DiagInitialise_MO(Titel as String, ByVal Achsen() As Achse)
+    'Serien-Initialisierung für MultiObjective
+    '*****************************************
+    Public Sub prepareSeries_MO()
 
-        With Me
-            .Clear()
-            .Header.Text = Titel
-            .Aspect.View3D = False
-            .Legend.Visible = False
+        'Series(0): Series für die Population.
+        Dim tmpSeries As New Steema.TeeChart.Styles.Points(Me.Chart)
+        tmpSeries.Title = "Population"
+        tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+        tmpSeries.Color = System.Drawing.Color.Orange
+        tmpSeries.Pointer.HorizSize = 2
+        tmpSeries.Pointer.VertSize = 2
+        tmpSeries.Cursor = Cursors.Hand
 
-            'Formatierung der Axen
-            .Chart.Axes.Bottom.Title.Caption = Achsen(0).Beschriftung
-            .Chart.Axes.Bottom.Automatic = True
-            .Chart.Axes.Left.Title.Caption = Achsen(1).Beschriftung
-            .Chart.Axes.Left.Automatic = True
+        'Series(1): Series für die Sekundäre Population
+        tmpSeries = New Steema.TeeChart.Styles.Points(Me.Chart)
+        tmpSeries.Title = "Sekundäre Population"
+        tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+        tmpSeries.Color = System.Drawing.Color.Blue
+        tmpSeries.Pointer.HorizSize = 3
+        tmpSeries.Pointer.VertSize = 3
 
-            'Series(0): Series für die Population.
-            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point1.Title = "Population"
-            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point1.Color = System.Drawing.Color.Orange
-            Point1.Pointer.HorizSize = 2
-            Point1.Pointer.VertSize = 2
+        Call Me.add_MarksTips()
 
-            'Series(1): Series für die Sekundäre Population
-            Dim Point2 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point2.Title = "Sekundäre Population"
-            Point2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point2.Color = System.Drawing.Color.Blue
-            Point2.Pointer.HorizSize = 3
-            Point2.Pointer.VertSize = 3
+    End Sub
 
-            'Series(2): Series für Bestwert
-            Dim Point3 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point3.Title = "Bestwerte"
-            Point3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point3.Color = System.Drawing.Color.Green
-            Point3.Pointer.HorizSize = 3
-            Point3.Pointer.VertSize = 3
-
-        End With
-
+    'MarksTips zu Serien hinzufügen
+    '******************************
+    Public Sub add_MarksTips()
+        Dim tmpMarksTip As Steema.TeeChart.Tools.MarksTip
+        For i As Integer = 0 To Me.Chart.Series.Count - 1
+            tmpMarksTip = New Steema.TeeChart.Tools.MarksTip(Me.Chart)
+            tmpMarksTip.Series = Me.Chart.Series(i)
+            tmpMarksTip.MouseAction = Steema.TeeChart.Tools.MarksTipMouseAction.Move
+            tmpMarksTip.MouseDelay = 10 'millisekunden
+            tmpMarksTip.Style = Steema.TeeChart.Styles.MarksStyles.XY
+        Next
     End Sub
 
 #Region "Testprobleme"
@@ -97,25 +148,18 @@ End Structure
 
     'Alle Series für TeeChart werden initialisiert
     'Teilweise werden die Ziel bzw. Ausgangslinien berechnet und gezeichnet
-    Public Sub DiagInitialise_SinusFunktion(ByVal EVO_Einstellungen1 As EvoForm.EVO_Einstellungen, ByVal globalAnzPar As Short, ByVal AnzPara As Integer)
+    Public Sub DiagInitialise_SinusFunktion(ByVal EVO_Einstellungen1 As EVO_Einstellungen, ByVal globalAnzPar As Short, ByVal AnzPara As Integer)
         Dim array_x() As Double = {}
         Dim array_y() As Double = {}
-        Dim Ausgangsergebnis As Double
-        Dim Anzahl_Kalkulationen As Integer
         Dim Populationen As Short
         Dim i As Short
         Dim Datenmenge As Short
         Dim Unterteilung_X As Double
-
-        If EVO_Einstellungen1.isPOPUL Then
-            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden
-        Else
-            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
-        End If
+        Dim Pi As Double = 3.141592654
 
         'Ausgengsergebnisse für die Linien im TeeChart Rechnen
         Datenmenge = AnzPara
-        Unterteilung_X = 2 * 3.141592654 / (Datenmenge - 1)
+        Unterteilung_X = 2 * Pi / (Datenmenge - 1)
 
         'Linien für die Ausgangsergebnisse im TeeChart zeichnen
         ReDim array_x(Datenmenge - 1)
@@ -130,8 +174,8 @@ End Structure
         With Me
             .Clear()
             .Header.Text = "Sinus Funktion"
-            .Chart.Axes.Left.Title.Caption = "Funktionswert"
-            .Chart.Axes.Bottom.Title.Caption = "Berechnungsschritt"
+            .Chart.Axes.Left.Title.Caption = "Y-Wert"
+            .Chart.Axes.Bottom.Title.Caption = "X-Wert"
             .Aspect.View3D = False
             .Legend.Visible = False
 
@@ -157,22 +201,20 @@ End Structure
 
             'Axen Formatieren
             .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Maximum = Anzahl_Kalkulationen
+            .Chart.Axes.Bottom.Maximum = 2 * Pi
             .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Left.Automatic = False
-            .Chart.Axes.Left.Maximum = Ausgangsergebnis * 1.3
-            .Chart.Axes.Left.Minimum = 0
-            .Chart.Axes.Left.Logarithmic = False
-            .Chart.Axes.Bottom.Automatic = True
+            .Chart.Axes.Bottom.Increment = Pi
             .Chart.Axes.Left.Automatic = False
             .Chart.Axes.Left.Minimum = -1
             .Chart.Axes.Left.Maximum = 1
             .Chart.Axes.Left.Increment = 0.2
 
+            Call Me.add_MarksTips()
+
         End With
     End Sub
 
-    Public Sub DiagInitialise_BealeProblem(ByVal EVO_Einstellungen1 As EvoForm.EVO_Einstellungen, ByVal globalAnzPar As Short)
+    Public Sub DiagInitialise_BealeProblem(ByVal EVO_Einstellungen1 As EVO_Einstellungen, ByVal globalAnzPar As Short)
         Dim array_x() As Double = {}
         Dim array_y() As Double = {}
         Dim Ausgangsergebnis As Double
@@ -181,11 +223,7 @@ End Structure
         Dim i As Short
         Dim OptErg() As Double
 
-        If EVO_Einstellungen1.isPOPUL Then
-            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden
-        Else
-            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
-        End If
+        Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
 
         'Ausgengsergebnisse für die Linien im TeeChart Rechnen
         ReDim OptErg(Anzahl_Kalkulationen)
@@ -235,12 +273,13 @@ End Structure
             .Chart.Axes.Left.Automatic = False
             .Chart.Axes.Left.Maximum = Ausgangsergebnis * 1.3
             .Chart.Axes.Left.Minimum = 0
-            .Chart.Axes.Left.Logarithmic = False
+
+            Call Me.add_MarksTips()
 
         End With
     End Sub
 
-    Public Sub DiagInitialise_SchwefelProblem(ByVal EVO_Einstellungen1 As EvoForm.EVO_Einstellungen, ByVal globalAnzPar As Short)
+    Public Sub DiagInitialise_SchwefelProblem(ByVal EVO_Einstellungen1 As EVO_Einstellungen, ByVal globalAnzPar As Short)
         Dim array_x() As Double = {}
         Dim array_y() As Double = {}
         Dim Ausgangsergebnis As Double
@@ -249,13 +288,9 @@ End Structure
         Dim i As Short
         Dim X() As Double
 
-        If EVO_Einstellungen1.isPOPUL Then
-            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden
-        Else
-            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
-        End If
+        Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
 
-        'Ausgengsergebnisse für die Linien im TeeChart Rechnen
+        'Ausgangsergebnisse für die Linien im TeeChart Rechnen
         ReDim X(globalAnzPar)
         For i = 1 To globalAnzPar
             X(i) = 10
@@ -310,10 +345,13 @@ End Structure
             .Chart.Axes.Left.Maximum = Ausgangsergebnis * 1.3
             .Chart.Axes.Left.Minimum = 0
             .Chart.Axes.Left.Logarithmic = False
+
+            Call Me.add_MarksTips()
+
         End With
     End Sub
 
-    Public Sub DiagInitialise_MultiTestProb(ByVal EVO_Einstellungen1 As EvoForm.EVO_Einstellungen, ByVal Testproblem As String)
+    Public Sub DiagInitialise_MultiTestProb(ByVal EVO_Einstellungen1 As EVO_Einstellungen, ByVal Testproblem As String)
         Dim Populationen As Short
         Dim i, j As Short
 
@@ -528,11 +566,14 @@ End Structure
                     Line4.ClickableLine = True
                     .Series(6).Add(Array4X, Array4Y)
             End Select
+
+            Call Me.add_MarksTips()
+
         End With
     End Sub
 
     Public Sub DiagInitialise_3D_Box(ByVal isPopul As Boolean, ByVal NPopul As Short)
-        'TODO: Zeichnen muss auf 3D erweitert werden. Hier 3D Testproblem.
+        'UPGRADE: Zeichnen muss auf 3D erweitert werden. Hier 3D Testproblem.
         Dim Populationen As Short
         Dim ArrayX(100) As Double
         Dim ArrayY(100) As Double
@@ -608,6 +649,9 @@ End Structure
             '.Series(Populationen + 2).asPoint3D.Pointer.VerticalSize = 2
             '.Series(Populationen + 2).Color = System.Convert.ToUInt32(System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Red))
         End With
+
+        Call Me.add_MarksTips()
+
     End Sub
 
 #End Region 'Testprobleme

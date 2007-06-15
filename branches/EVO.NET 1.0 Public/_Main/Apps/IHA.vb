@@ -36,7 +36,7 @@ Public Class IHA
     'Eigenschaften
     '#############
 
-    Private IHADir                                  'Verzeichnis für IHA-Dateien
+    Private IHADir As String                        'Verzeichnis für IHA-Dateien
 
     'IHA-Ergebnisse
     '--------------
@@ -61,17 +61,17 @@ Public Class IHA
 
     'IHA-Software-Parameter
     '----------------------
-    Private Const BegWatrYr = 275           '1. Okt.
+    Private Const BegWatrYr as Integer = 275        '1. Okt.
 
     'Jahreszahlen
     Private BeginPre As Integer
     Private EndPre As Integer
-    Private BeginPost_sim As Integer        'tatsächlich
-    Private EndPost_sim As Integer          'tatsächlich
-    Private BeginPost As Integer            'für IHA verwendet
-    Private EndPost As Integer              'für IHA verwendet
+    Private BeginPost_sim As Integer                'tatsächlich
+    Private EndPost_sim As Integer                  'tatsächlich
+    Private BeginPost As Integer                    'für IHA verwendet
+    Private EndPost As Integer                      'für IHA verwendet
 
-    Private RefData(,) As Double            'Enthält die Referenz-Abflussdaten in Zeilen für jeden Tag des Jahres
+    Private RefData(,) As Double                    'Enthält die Referenz-Abflussdaten in Zeilen für jeden Tag des Jahres
 
 #End Region 'Eigenschaften
 
@@ -132,15 +132,21 @@ Public Class IHA
             Directory.CreateDirectory(Me.IHADir)
             'IHA_Batchfor.exe in Verzeichnis kopieren
             Dim ZielDatei As String = Me.IHADir & "IHA_Batchfor.exe"
-            Try
-                Dim currentDir As String = CurDir()     'sollte das /bin Verzeichnis von _Main sein
-                ChDir("../../Apps")                     'wechselt in das /Apps Verzeichnis 
-                My.Computer.FileSystem.CopyFile("IHA_Batchfor.exe", ZielDatei, True)
-                ChDir(currentDir)                       'zurück in das Ausgangsverzeichnis wechseln
-            Catch except As Exception
-                MsgBox("IHA_Batchfor.exe konnte nicht ins IHA-Arbeitsverzeichnis kopiert werden:" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
-                Exit Sub
-            End Try
+
+            'aktuelles Verzeichnis bestimmen
+            Dim currentDir As String = CurDir()
+            'Pfad zur Assembly bestimmen (\_Main\bin\)
+            Dim binpath As String = System.Windows.Forms.Application.StartupPath()
+            'in das \_Main\bin Verzeichnis wechseln
+            ChDrive(binpath)
+            ChDir(binpath)
+            'in das \Apps Verzeichnis wechseln
+            ChDir("..\Apps")
+            'Datei kopieren
+            My.Computer.FileSystem.CopyFile("IHA_Batchfor.exe", ZielDatei, True)
+            'zurück in das Ausgangsverzeichnis wechseln
+            ChDrive(currentDir)
+            ChDir(currentDir)
 
         End If
 
@@ -150,9 +156,9 @@ Public Class IHA
         '-----------------------------
         'Referenz-Zeitreihe raussuchen
         Dim ZeitReihe(,) As Object = {}
-        For i = 0 To BlueM1.OptZieleListe.GetUpperBound(0)
-            If (BlueM1.OptZieleListe(i).ZielTyp = "IHA") Then
-                ZeitReihe = BlueM1.OptZieleListe(i).ZielReihe
+        For i = 0 To BlueM1.List_OptZiele.GetUpperBound(0)
+            If (BlueM1.List_OptZiele(i).ZielTyp = "IHA") Then
+                ZeitReihe = BlueM1.List_OptZiele(i).ZielReihe
                 Exit For
             End If
         Next
@@ -235,56 +241,52 @@ Public Class IHA
     'input.par Datei schreiben
     '*************************
     Private Sub write_InputPar(ByVal title As String)
-        Try
-            Dim StrWrite As StreamWriter = New StreamWriter(Me.IHADir & "input.par", False, System.Text.Encoding.GetEncoding("iso8859-1"))
-            StrWrite.WriteLine("&initial")
-            StrWrite.WriteLine("infile=" & Me.IHADir & "input.dat")
-            StrWrite.WriteLine("outscore=" & Me.IHADir & "output.sco")
-            StrWrite.WriteLine("outpct=" & Me.IHADir & "output.pct")
-            StrWrite.WriteLine("outsum=" & Me.IHADir & "output.ann")
-            StrWrite.WriteLine("outRVA=" & Me.IHADir & "output.rva")
-            StrWrite.WriteLine("outBAW=" & Me.IHADir & "output.baw")
-            StrWrite.WriteLine("outLsq=" & Me.IHADir & "output.lsq")
-            StrWrite.WriteLine("outMsg=" & Me.IHADir & "output.msg")
-            StrWrite.WriteLine("BigTitle='" & title & "'")
-            StrWrite.WriteLine("TwoPeriods=T")
-            StrWrite.WriteLine("ImpactYear=" & Me.BeginPost)
-            StrWrite.WriteLine("BeginPre=" & Me.BeginPre)
-            StrWrite.WriteLine("EndPre=" & Me.EndPre)
-            StrWrite.WriteLine("BeginPost=" & Me.BeginPost)
-            StrWrite.WriteLine("EndPost=" & Me.EndPost)
-            StrWrite.WriteLine("HiPulseLvl=25")
-            StrWrite.WriteLine("HiRVAlim=17")
-            StrWrite.WriteLine("LoPulseLvl=25")
-            StrWrite.WriteLine("LoRVALim=17")
-            StrWrite.WriteLine("Parametric=F")
-            StrWrite.WriteLine("BegDay=1")
-            StrWrite.WriteLine("EndDay=366")
-            StrWrite.WriteLine("Watershed=1")
-            StrWrite.WriteLine("Normalize=1")
-            StrWrite.WriteLine("BegWatrYr=" & BegWatrYr)
-            StrWrite.WriteLine("Nmissing=10")
-            StrWrite.WriteLine("Rmissing=999999")
-            StrWrite.WriteLine("MKS=F")
-            StrWrite.WriteLine("DroughtLvl=10")
-            StrWrite.WriteLine("BeginFloodRate=25")
-            StrWrite.WriteLine("BeginFloodLevel=75")
-            StrWrite.WriteLine("EndFloodRate=10")
-            StrWrite.WriteLine("EndFloodLevel=50")
-            StrWrite.WriteLine("FloodOne=2")
-            StrWrite.WriteLine("FloodTwo=10")
-            StrWrite.WriteLine("BegSeasonOne=" & BegWatrYr)
-            StrWrite.WriteLine("EndSeasonOne=" & BegWatrYr - 1)
-            StrWrite.WriteLine("BegSeasonTwo=0")
-            StrWrite.WriteLine("EndSeasonTwo=0")
-            StrWrite.WriteLine("/")
 
-            StrWrite.Close()
+        Dim StrWrite As StreamWriter = New StreamWriter(Me.IHADir & "input.par", False, System.Text.Encoding.GetEncoding("iso8859-1"))
+        StrWrite.WriteLine("&initial")
+        StrWrite.WriteLine("infile=" & Me.IHADir & "input.dat")
+        StrWrite.WriteLine("outscore=" & Me.IHADir & "output.sco")
+        StrWrite.WriteLine("outpct=" & Me.IHADir & "output.pct")
+        StrWrite.WriteLine("outsum=" & Me.IHADir & "output.ann")
+        StrWrite.WriteLine("outRVA=" & Me.IHADir & "output.rva")
+        StrWrite.WriteLine("outBAW=" & Me.IHADir & "output.baw")
+        StrWrite.WriteLine("outLsq=" & Me.IHADir & "output.lsq")
+        StrWrite.WriteLine("outMsg=" & Me.IHADir & "output.msg")
+        StrWrite.WriteLine("BigTitle='" & title & "'")
+        StrWrite.WriteLine("TwoPeriods=T")
+        StrWrite.WriteLine("ImpactYear=" & Me.BeginPost)
+        StrWrite.WriteLine("BeginPre=" & Me.BeginPre)
+        StrWrite.WriteLine("EndPre=" & Me.EndPre)
+        StrWrite.WriteLine("BeginPost=" & Me.BeginPost)
+        StrWrite.WriteLine("EndPost=" & Me.EndPost)
+        StrWrite.WriteLine("HiPulseLvl=25")
+        StrWrite.WriteLine("HiRVAlim=17")
+        StrWrite.WriteLine("LoPulseLvl=25")
+        StrWrite.WriteLine("LoRVALim=17")
+        StrWrite.WriteLine("Parametric=F")
+        StrWrite.WriteLine("BegDay=1")
+        StrWrite.WriteLine("EndDay=366")
+        StrWrite.WriteLine("Watershed=1")
+        StrWrite.WriteLine("Normalize=1")
+        StrWrite.WriteLine("BegWatrYr=" & BegWatrYr)
+        StrWrite.WriteLine("Nmissing=10")
+        StrWrite.WriteLine("Rmissing=999999")
+        StrWrite.WriteLine("MKS=F")
+        StrWrite.WriteLine("DroughtLvl=10")
+        StrWrite.WriteLine("BeginFloodRate=25")
+        StrWrite.WriteLine("BeginFloodLevel=75")
+        StrWrite.WriteLine("EndFloodRate=10")
+        StrWrite.WriteLine("EndFloodLevel=50")
+        StrWrite.WriteLine("FloodOne=2")
+        StrWrite.WriteLine("FloodTwo=10")
+        StrWrite.WriteLine("BegSeasonOne=" & BegWatrYr)
+        StrWrite.WriteLine("EndSeasonOne=" & BegWatrYr - 1)
+        StrWrite.WriteLine("BegSeasonTwo=0")
+        StrWrite.WriteLine("EndSeasonTwo=0")
+        StrWrite.WriteLine("/")
 
-        Catch except As Exception
-            MsgBox("Fehler beim Schreiben der IHA-Datei ""input.par""" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
-            Exit Sub
-        End Try
+        StrWrite.Close()
+
     End Sub
 
     'input.dat Datei schreiben
@@ -293,32 +295,27 @@ Public Class IHA
         Dim Zeile As String
         Dim j, k As Integer
 
-        Try
-            Dim StrWrite As StreamWriter = New StreamWriter(Me.IHADir & "input.dat", False, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Dim StrWrite As StreamWriter = New StreamWriter(Me.IHADir & "input.dat", False, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-            'Erste Zeile mit Jahreszahlen
-            j = 0
+        'Erste Zeile mit Jahreszahlen
+        j = 0
+        Zeile = ""
+        For k = 0 To Data.GetUpperBound(1)
+            Zeile &= "              " & Data(j, k).ToString("0000")
+        Next
+        StrWrite.WriteLine(Zeile)
+
+        'Weitere Zeilen mit Daten
+        For j = 1 To Data.GetUpperBound(0)
             Zeile = ""
             For k = 0 To Data.GetUpperBound(1)
-                Zeile &= "              " & Data(j, k).ToString("0000")
+                Zeile &= "   " & Data(j, k).ToString(" 0.000000000E+0;-0.000000000E+0")
             Next
             StrWrite.WriteLine(Zeile)
+        Next
 
-            'Weitere Zeilen mit Daten
-            For j = 1 To Data.GetUpperBound(0)
-                Zeile = ""
-                For k = 0 To Data.GetUpperBound(1)
-                    Zeile &= "   " & Data(j, k).ToString(" 0.000000000E+0;-0.000000000E+0")
-                Next
-                StrWrite.WriteLine(Zeile)
-            Next
+        StrWrite.Close()
 
-            StrWrite.Close()
-
-        Catch except As Exception
-            MsgBox("Fehler beim Schreiben der IHA-Datei ""input.dat""" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Exclamation, "Fehler")
-            Exit Sub
-        End Try
     End Sub
 
     'IHA-Berechnung ausführen (gibt QWert zurück)
@@ -411,72 +408,65 @@ Public Class IHA
         'RVA-Datei öffnen und einlesen
         '-----------------------------
 
-        Try
-            Dim FiStr As FileStream = New FileStream(Me.IHADir & "output.rva", FileMode.Open, IO.FileAccess.ReadWrite)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Dim FiStr As FileStream = New FileStream(Me.IHADir & "output.rva", FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-            Dim i, j As Integer
-            Dim Zeile As String
-            Dim Psum, Gsum As Double
+        Dim i, j As Integer
+        Dim Zeile As String
+        Dim Psum, Gsum As Double
 
-            'Schleife über Parametergruppen
-            '------------------------------
-            Gsum = 0
-            For i = 0 To IHARes.IHAParamGroups.GetUpperBound(0)
+        'Schleife über Parametergruppen
+        '------------------------------
+        Gsum = 0
+        For i = 0 To IHARes.IHAParamGroups.GetUpperBound(0)
 
-                'Ergebnisse einer Parametergruppe einlesen
-                '-----------------------------------------
-                With Me.IHARes.IHAParamGroups(i)
+            'Ergebnisse einer Parametergruppe einlesen
+            '-----------------------------------------
+            With Me.IHARes.IHAParamGroups(i)
 
-                    Do
-                        Zeile = StrRead.ReadLine.ToString
-                        If (Zeile.Contains("Parameter Group #" & .No)) Then
+                Do
+                    Zeile = StrRead.ReadLine.ToString
+                    If (Zeile.Contains("Parameter Group #" & .No)) Then
 
-                            Psum = 0
-                            'Schleife über Parameter
-                            For j = 0 To .IHAParams.GetUpperBound(0)
-                                Zeile = StrRead.ReadLine.ToString
-                                .IHAParams(j).PName = Zeile.Substring(0, 20).Trim
-                                .IHAParams(j).HAMiddle = Convert.ToDouble(Zeile.Substring(171, 14).Trim)
-                                Psum += .IHAParams(j).HAMiddle
-                            Next
+                        Psum = 0
+                        'Schleife über Parameter
+                        For j = 0 To .IHAParams.GetUpperBound(0)
+                            Zeile = StrRead.ReadLine.ToString
+                            .IHAParams(j).PName = Zeile.Substring(0, 20).Trim
+                            .IHAParams(j).HAMiddle = Convert.ToDouble(Zeile.Substring(171, 14).Trim)
+                            Psum += .IHAParams(j).HAMiddle
+                        Next
 
-                            Exit Do
-                        End If
-                    Loop Until StrRead.Peek() = -1
+                        Exit Do
+                    End If
+                Loop Until StrRead.Peek() = -1
 
-                    'Mittelwert einer Parametergruppe berechnen
-                    '------------------------------------------
-                    .Avg = Psum / .IHAParams.GetLength(0)
-                    Gsum += .Avg
+                'Mittelwert einer Parametergruppe berechnen
+                '------------------------------------------
+                .Avg = Psum / .IHAParams.GetLength(0)
+                Gsum += .Avg
 
-                End With
+            End With
 
-            Next 'Ende Schleife über Parametergruppen
+        Next 'Ende Schleife über Parametergruppen
 
-            'Mittelwert aller Parametergruppen berechnen
-            '-------------------------------------------
-            Me.IHARes.Avg = Gsum / Me.IHARes.IHAParamGroups.GetLength(0)
-
-        Catch except As Exception
-            MsgBox("Fehler beim einlesen der IHA-Datei ""output.rva"":" & Chr(13) & Chr(10) & except.Message, MsgBoxStyle.Critical, "Fehler")
-        End Try
+        'Mittelwert aller Parametergruppen berechnen
+        '-------------------------------------------
+        Me.IHARes.Avg = Gsum / Me.IHARes.IHAParamGroups.GetLength(0)
 
     End Sub
 
     'IHA_Batchfor.exe ausführen
     '**************************
     Private Sub launch_IHA()
-        'starte Programm mit neuen Parametern
-        Dim ProcID As Integer
-        'Aktuelles Arbeitsverzeichnis feststellen
+        'Aktuelles Verzeichnis bestimmen
         Dim currentDir As String = CurDir()
-        'zum gewünschten Arbeitsverzeichnis navigieren
-        ChDrive(Me.IHADir) 'nur nötig falls Arbeitsverzeichnis und aktuelles Verzeichnis auf verschiedenen Laufwerken sind
+        'zum Arbeitsverzeichnis wechseln
+        ChDrive(Me.IHADir)
         ChDir(Me.IHADir)
         'EXE aufrufen
-        ProcID = Shell("""IHA_Batchfor.exe"" input.par", AppWinStyle.MinimizedNoFocus, True)
-        'Arbeitsverzeichnis wieder zurücksetzen (optional)
+        Dim ProcID As Integer = Shell("""IHA_Batchfor.exe"" input.par", AppWinStyle.MinimizedNoFocus, True)
+        'zurück in Ausgangsverzeichnis wechseln
         ChDrive(currentDir)
         ChDir(currentDir)
     End Sub

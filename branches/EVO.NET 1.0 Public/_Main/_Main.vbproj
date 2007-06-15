@@ -67,10 +67,6 @@
     <DebugType>none</DebugType>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EvoForm, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\EVO_FORM\EvoForm.dll</HintPath>
-    </Reference>
     <Reference Include="EvoKern, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\EVO_KERN\EvoKern.dll</HintPath>
@@ -123,8 +119,47 @@
     <Import Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Apps\BlueM.vb">
+    </Compile>
+    <Compile Include="Apps\IHA.vb">
+    </Compile>
+    <Compile Include="Apps\SensiPlot.Designer.vb">
+      <DependentUpon>SensiPlot.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Apps\SensiPlot.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Apps\Sim.vb" />
+    <Compile Include="Apps\SKos.vb" />
+    <Compile Include="Apps\Smusi.vb" />
+    <Compile Include="Apps\Testprobleme.Designer.vb">
+      <DependentUpon>Testprobleme.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Apps\Testprobleme.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Apps\TSP.vb" />
     <Compile Include="AssemblyInfo.vb">
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Diagramm\DiagrammForm.Designer.vb">
+      <DependentUpon>DiagrammForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Diagramm\DiagrammForm.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="EVOMOD.vb" />
+    <Compile Include="EVO_Einstellungen.Designer.vb">
+      <DependentUpon>EVO_Einstellungen.vb</DependentUpon>
+    </Compile>
+    <Compile Include="EVO_Einstellungen.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="EVO_Opt_Verlauf.Designer.vb">
+      <DependentUpon>EVO_Opt_Verlauf.vb</DependentUpon>
+    </Compile>
+    <Compile Include="EVO_Opt_Verlauf.vb">
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Form1.Designer.vb">
       <DependentUpon>Form1.vb</DependentUpon>
@@ -132,17 +167,46 @@
     <Compile Include="Form1.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Module1.vb">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="My Project\Resources.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Diagramm.vb">
+    <Compile Include="Diagramm\Diagramm.vb">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Diagramm\Scatterplot.Designer.vb">
+      <DependentUpon>Scatterplot.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Diagramm\Scatterplot.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Diagramm\Wave.Designer.vb">
+      <DependentUpon>Wave.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Diagramm\Wave.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <EmbeddedResource Include="Apps\SensiPlot.resx">
+      <DependentUpon>SensiPlot.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Apps\Testprobleme.resx">
+      <DependentUpon>Testprobleme.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Diagramm\DiagrammForm.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DiagrammForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EVO_Einstellungen.resX">
+      <DependentUpon>EVO_Einstellungen.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EVO_Opt_Verlauf.resX">
+      <DependentUpon>EVO_Opt_Verlauf.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resX">
       <DependentUpon>Form1.vb</DependentUpon>
       <SubType>Designer</SubType>
@@ -154,6 +218,14 @@
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="Diagramm\Scatterplot.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>Scatterplot.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Diagramm\Wave.resx">
+      <DependentUpon>Wave.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\icon_excel.png" />
@@ -162,12 +234,7 @@
     <None Include="Resources\icon_png.png" />
     <None Include="Resources\icon_edit.png" />
     <Content Include="Resources\icon_teechart.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Apps\Apps.vbproj">
-      <Project>{62B1C1E7-26DE-418A-AAEE-102E02A50DF6}</Project>
-      <Name>Apps</Name>
-    </ProjectReference>
+    <None Include="Resources\scatterplot.png" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
