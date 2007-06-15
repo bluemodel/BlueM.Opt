@@ -1321,7 +1321,7 @@ Start_Evolutionsrunden:
 
     'Klick auf Serie in Diagramm
     '***************************
-    Public Sub seriesClick(ByVal sender As Object, ByVal s As Steema.TeeChart.Styles.Series, ByVal valueIndex As Integer, ByVal e As System.Windows.Forms.MouseEventArgs)
+    Public Sub showWave(ByVal sender As Object, ByVal s As Steema.TeeChart.Styles.Series, ByVal valueIndex As Integer, ByVal e As System.Windows.Forms.MouseEventArgs)
 
         'nur bei Anwendung = Sim und aktiver ErgebnisDB ausführen
         If ((Anwendung = ANW_BLUEM Or Anwendung = ANW_SMUSI) And Sim1.Ergebnisdb = True) Then

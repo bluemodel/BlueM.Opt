@@ -5,7 +5,7 @@ Partial Public Class DiagrammForm
     '**********
     Private Sub DForm_Load(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles MyBase.Load
         'Handler für Klick auf Serien zuweisen
-        AddHandler Me.Diag.ClickSeries, AddressOf Main.Form1.seriesClick
+        AddHandler Me.Diag.ClickSeries, AddressOf Main.Form1.showWave
     End Sub
 
     'Chart bearbeiten
