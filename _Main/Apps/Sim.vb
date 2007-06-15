@@ -841,6 +841,10 @@ Public MustInherit Class Sim
             Next
         Next
 
+        If count = 0 Then
+            throw new Exception("Die aktuelle Kombination enthält keine Bauwerke, für die OptimierungsParameter vorliegen")
+        End If
+
         Array.Resize(TMP, count)
         Array.Resize(List_ModellParameter, count)
 
