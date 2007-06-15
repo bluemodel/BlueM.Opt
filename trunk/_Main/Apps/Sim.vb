@@ -1441,7 +1441,7 @@ Public MustInherit Class Sim
     Public Shared Function Read_PRB(ByVal DateiPfad As String, ByVal ZielGr As String, ByRef PRB(,) As Object) As Boolean
 
         Dim ZeileStart As Integer = 0
-        Dim AnzZeil = 26                   'Anzahl der Zeilen ist immer 26, definiert durch MAXSTZ in BM
+        Dim AnzZeil As Integer = 26                   'Anzahl der Zeilen ist immer 26, definiert durch MAXSTZ in BM
         Dim j As Integer = 0
         Dim Zeile As String
         Read_PRB = True
@@ -1566,7 +1566,7 @@ Public MustInherit Class Sim
     'Mit Ergebnisdatenbank verbinden
     '*******************************
     Private Sub db_connect()
-        Dim ConnectionString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & WorkDir & Datensatz & "_EVO.mdb"
+        Dim ConnectionString As String = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & WorkDir & Datensatz & "_EVO.mdb"
         db = New OleDb.OleDbConnection(ConnectionString)
         db.Open()
     End Sub
@@ -1644,7 +1644,7 @@ Public MustInherit Class Sim
     Public Shared Function db_readQWerte(ByVal mdbfile As String) As Collection
 
         'Connect
-        Dim ConnectionString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & mdbfile
+        Dim ConnectionString As String = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & mdbfile
         Dim db As OleDb.OleDbConnection = New OleDb.OleDbConnection(ConnectionString)
         db.Open()
 
