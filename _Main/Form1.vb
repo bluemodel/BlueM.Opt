@@ -1465,7 +1465,7 @@ GenerierenAusgangswerte:
 
     'Daten aus DB laden und als Scatterplot-Matrix anzeigen
     '*******************************************************
-    Private Sub Button_LoadFromMDB_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Scatterplot.Click
+    Private Sub showScatterplot(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Scatterplot.Click
 
         'Datei-öffnen Dialog anzeigen
         If (Not IsNothing(Sim1)) Then
