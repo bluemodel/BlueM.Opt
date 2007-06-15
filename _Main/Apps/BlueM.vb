@@ -226,7 +226,8 @@ Public Class BlueM
     'BlauesModell ausführen (simulieren)
     '***********************************
     Public Overrides Function launchSim() As Boolean
-        launchSim = False
+
+        Dim simOK As Boolean
         'Aktuelles Verzeichnis bestimmen
         Dim currentDir As String = CurDir()
         'zum Arbeitsverzeichnis wechseln
@@ -243,20 +244,24 @@ Public Class BlueM
         If (File.Exists(WorkDir & "$FEHL.TMP")) Then
 
             'Simulationsfehler aufgetreten
-            Dim DateiInhalt As String = ""
+            simOK = False
 
+            Dim DateiInhalt As String = ""
             Dim FiStr As FileStream = New FileStream(WorkDir & "$fehl.tmp", FileMode.Open, IO.FileAccess.Read)
             Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-
             Do
                 DateiInhalt = DateiInhalt & Chr(13) & Chr(10) & StrRead.ReadLine.ToString
             Loop Until StrRead.Peek() = -1
 
-            Throw New Exception("Das BlaueModell hat einen Fehler zurückgegeben:" & Chr(13) & Chr(10) & DateiInhalt)
+            MsgBox("BlueM hat einen Fehler zurückgegeben:" & Chr(13) & Chr(10) & DateiInhalt, MsgBoxStyle.Exclamation, "BlueM")
+
+        Else
+            'Simulation erfolgreich
+            simOK = True
 
         End If
 
-        launchSim = True
+        Return simOK
 
     End Function
 
