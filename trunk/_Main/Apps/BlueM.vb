@@ -225,8 +225,8 @@ Public Class BlueM
 
     'BlauesModell ausführen (simulieren)
     '***********************************
-    Public Overrides Sub launchSim()
-
+    Public Overrides Function launchSim() As Boolean
+        launchSim = False
         'Aktuelles Verzeichnis bestimmen
         Dim currentDir As String = CurDir()
         'zum Arbeitsverzeichnis wechseln
@@ -256,7 +256,9 @@ Public Class BlueM
 
         End If
 
-    End Sub
+        launchSim = True
+
+    End Function
 
 #End Region 'Evaluierung
 

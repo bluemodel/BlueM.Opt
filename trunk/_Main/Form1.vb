@@ -142,7 +142,7 @@ Partial Class Form1
                 Case ANW_SMUSI 'Anwendung Smusi
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'Objekt der Klasse BlueM initialisieren
+                    'Objekt der Klasse Smusi initialisieren
                     Sim1 = New Smusi
 
                     'Initialisieren
@@ -898,6 +898,7 @@ Partial Class Form1
         Dim i As Integer
         '--------------------------
         Dim durchlauf As Integer
+        Dim Versuch As Integer
         '--------------------------
         Dim PES1 As EvoKern.PES
         '--------------------------
@@ -1069,6 +1070,15 @@ Start_Evolutionsrunden:
 
                         durchlauf = durchlauf + 1
 
+                        Versuch = 0
+
+GenerierenAusgangswerte:
+
+                        Versuch = Versuch + 1
+                        If Versuch > 10 Then
+                            Throw New Exception("Es konnte keingültiger Datensatz erzeugt werden!")
+                        End If
+
                         'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
                         myIsOK = PES1.EsVaria
 
@@ -1090,7 +1100,9 @@ Start_Evolutionsrunden:
                             Case ANW_TESTPROBLEME
                                 Call Testprobleme1.Evaluierung_TestProbleme(Testprobleme1.Combo_Testproblem.Text, globalAnzPar, mypara, durchlauf, ipop, QN, RN, DForm.Diag)
                             Case ANW_BLUEM, ANW_SMUSI
-                                Call Sim1.Eval_Sim_ParaOpt(globalAnzPar, globalAnzZiel_ParaOpt, mypara, durchlauf, ipop, QN, DForm.Diag)
+                                If Not Sim1.Eval_Sim_ParaOpt(globalAnzPar, globalAnzZiel_ParaOpt, mypara, durchlauf, ipop, QN, DForm.Diag) Then
+                                    GoTo GenerierenAusgangswerte
+                                End If
                         End Select
 
                         'Einordnen der Qualitätsfunktion im Bestwertspeicher
@@ -1286,7 +1298,11 @@ Start_Evolutionsrunden:
                         If (EVO_Einstellungen1.isMultiObjective = False) Then
                             Achse.Name = "Simulation"
                             Achse.Auto = False
-                            Achse.Max = n_Kalkulationen
+                            If EVO_Einstellungen1.isPOPUL Then
+                                Achse.Max = n_Kalkulationen * EVO_Einstellungen1.NRunden
+                            Else
+                                Achse.Max = n_Kalkulationen
+                            End If
                             Achsen.Add(Achse)
                         End If
                         'für jede Zielfunktion eine weitere Achse hinzufügen
