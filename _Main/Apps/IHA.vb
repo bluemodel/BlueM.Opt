@@ -36,7 +36,7 @@ Public Class IHA
     'Eigenschaften
     '#############
 
-    Private IHADir                                  'Verzeichnis für IHA-Dateien
+    Private IHADir As String                        'Verzeichnis für IHA-Dateien
 
     'IHA-Ergebnisse
     '--------------
@@ -61,7 +61,7 @@ Public Class IHA
 
     'IHA-Software-Parameter
     '----------------------
-    Private Const BegWatrYr = 275           '1. Okt.
+    Private Const BegWatrYr as Integer = 275        '1. Okt.
 
     'Jahreszahlen
     Private BeginPre As Integer
