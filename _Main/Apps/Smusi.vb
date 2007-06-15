@@ -53,8 +53,8 @@ Public Class Smusi
 
             'Simulationszeitraum auslesen
             If (Zeile.StartsWith("    SimBeginn - SimEnde")) Then
-                SimStart_str = Zeile.Substring(38, 16)
-                SimEnde_str = Zeile.Substring(57, 16)
+                SimStart_str = Zeile.Substring(37, 16)
+                SimEnde_str = Zeile.Substring(56, 16)
             End If
 
         Loop Until StrRead.Peek() = -1
@@ -70,7 +70,7 @@ Public Class Smusi
 
     'SMUSI ausführen (simulieren)
     '***********************************
-    Public Overrides Sub launchSim()
+    Public Overrides Function launchSim() As Boolean
 
         'Aktuelles Verzeichnis bestimmen
         Dim currentDir As String = CurDir()
@@ -78,7 +78,7 @@ Public Class Smusi
         ChDrive(Me.WorkDir)
         ChDir(Me.WorkDir)
         'EXE aufrufen
-        Dim ProcID As Integer = Shell("""" & Exe & """ " & Datensatz & " 1", AppWinStyle.MinimizedNoFocus, True)
+        Dim ProcID As Integer = Shell("""" & Exe & """ " & Datensatz & ":", AppWinStyle.MinimizedNoFocus, True)
         'zurück ins Ausgangsverzeichnis wechseln
         ChDrive(currentDir)
         ChDir(currentDir)
@@ -87,21 +87,26 @@ Public Class Smusi
         '-------------------------------------
         If (File.Exists(WorkDir & Datensatz & ".FEL")) Then
 
+            launchSim = False
+            Exit Function
             'Simulationsfehler aufgetreten
-            Dim DateiInhalt As String = ""
+            'Dim DateiInhalt As String = ""
 
-            Dim FiStr As FileStream = New FileStream(WorkDir & Datensatz & ".FEL", FileMode.Open, IO.FileAccess.Read)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+            'Dim FiStr As FileStream = New FileStream(WorkDir & Datensatz & ".FEL", FileMode.Open, IO.FileAccess.Read)
+            'Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-            Do
-                DateiInhalt = DateiInhalt & Chr(13) & Chr(10) & StrRead.ReadLine.ToString
-            Loop Until StrRead.Peek() = -1
+            'Do
+            '    DateiInhalt = DateiInhalt & Chr(13) & Chr(10) & StrRead.ReadLine.ToString
+            'Loop Until StrRead.Peek() = -1
 
-            Throw New Exception("SMUSI hat einen Fehler zurückgegeben:" & Chr(13) & Chr(10) & DateiInhalt)
+            'Throw New Exception("SMUSI hat einen Fehler zurückgegeben:" & Chr(13) & Chr(10) & DateiInhalt)
+        Else
+
+            launchSim = True
 
         End If
 
-    End Sub
+    End Function
 
     'Qualitätswert aus WEL-Datei
     '***************************

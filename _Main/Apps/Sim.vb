@@ -891,11 +891,13 @@ Public MustInherit Class Sim
 
     End Sub
 
-    'Evaluierung des SimModells für ParameterOptimierung - Steuerungseinheit
-    '***********************************************************************
-    Public Sub Eval_Sim_ParaOpt(ByVal GlobalAnzPar As Short, ByVal GlobalAnzZiel As Short, ByVal mypara As Double(,), ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN As Double(), ByRef TChart1 As Steema.TeeChart.TChart)
+    'Evaluierung des SimModells für Parameter Optimierung - Steuerungseinheit
+    '************************************************************************
+    Public Function Eval_Sim_ParaOpt(ByVal GlobalAnzPar As Short, ByVal GlobalAnzZiel As Short, ByVal mypara As Double(,), ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN As Double(), ByRef TChart1 As Steema.TeeChart.TChart) As Boolean
 
         Dim i As Short
+
+        Eval_Sim_ParaOpt = False
 
         'Mutierte Parameter an OptParameter übergeben
         For i = 1 To GlobalAnzPar                                   'BUG 57: mypara(,) fängt bei 1 an!
@@ -906,7 +908,7 @@ Public MustInherit Class Sim
         Call ModellParameter_schreiben()
 
         'Modell Starten
-        Call launchSim()
+        If Not launchSim() Then Exit Function
 
         'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
         For i = 0 To GlobalAnzZiel - 1                              'BUG 57: QN() fängt bei 1 an!
@@ -929,7 +931,9 @@ Public MustInherit Class Sim
             Call db_update(durchlauf, ipop)
         End If
 
-    End Sub
+        Eval_Sim_ParaOpt = True
+
+    End Function
 
     'Die ModellParameter in die Eingabedateien des SimModells schreiben
     '******************************************************************
@@ -1036,7 +1040,7 @@ Public MustInherit Class Sim
 
     'SimModell ausführen (simulieren)
     '********************************
-    Public MustOverride Sub launchSim()
+    Public MustOverride Function launchSim() As Boolean
 
 #End Region 'Evaluierung
 
