@@ -1278,18 +1278,6 @@ GenerierenAusgangswerte:
                     Case METH_PES 'Methode PES
                         'XXXXXXXXXXXXXXXXXXXXX
 
-                        Dim n_Kalkulationen As Integer
-                        Dim n_Populationen As Integer
-
-                        'Anzahl Kalkulationen
-                        n_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
-
-                        'Anzahl Populationen
-                        n_Populationen = 1
-                        If EVO_Einstellungen1.isPOPUL Then
-                            n_Populationen = EVO_Einstellungen1.NPopul
-                        End If
-
                         'Achsen:
                         '-------
                         Dim Achse As Diagramm.Achse
@@ -1299,9 +1287,9 @@ GenerierenAusgangswerte:
                             Achse.Name = "Simulation"
                             Achse.Auto = False
                             If EVO_Einstellungen1.isPOPUL Then
-                                Achse.Max = n_Kalkulationen * EVO_Einstellungen1.NRunden
+                                Achse.Max = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden + 1
                             Else
-                                Achse.Max = n_Kalkulationen
+                                Achse.Max = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
                             End If
                             Achsen.Add(Achse)
                         End If
@@ -1315,13 +1303,6 @@ GenerierenAusgangswerte:
 
                         'Diagramm initialisieren
                         Call DForm.Diag.DiagInitialise(Anwendung, Achsen)
-
-                        'Standard-Series initialisieren
-                        If (EVO_Einstellungen1.isMultiObjective = False) Then
-                            Call DForm.Diag.prepareSeries_SO(n_Populationen)
-                        Else
-                            Call DForm.Diag.prepareSeries_MO()
-                        End If
 
                     Case Else 'andere Anwendungen
                         'XXXXXXXXXXXXXXXXXXXXXXXX
