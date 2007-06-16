@@ -41,7 +41,7 @@ Public Class SKos
         For i = 0 To AktuelleElemente.GetUpperBound(0)
             For j = 0 To Bauwerksliste.GetUpperBound(0)
                 If Bauwerksliste(j, 0) = AktuelleElemente(i) Then
-                    costs = costs + Bauwerksliste(i, 1)
+                    costs = costs + Bauwerksliste(j, 1)
                 End If
             Next
         Next
