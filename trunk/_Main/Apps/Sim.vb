@@ -966,7 +966,7 @@ Public MustInherit Class Sim
 
     'Evaluierung des SimModells für ParameterOptimierung - Steuerungseinheit
     '***********************************************************************
-    Public Function Eval_Sim_ParaOpt(ByVal GlobalAnzPar As Short, ByVal GlobalAnzZiel As Short, ByVal mypara As Double(,), ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN As Double(), ByRef Diag As Main.Diagramm) As Boolean
+    Public Function Eval_Sim_ParaOpt(ByVal GlobalAnzPar As Short, ByVal GlobalAnzZiel As Short, ByVal mypara As Double(,), ByVal durchlauf As Integer, ByVal ipop As Short, ByVal Series_No As Integer, ByRef QN As Double(), ByRef Diag As Main.Diagramm) As Boolean
 
         Dim i As Short
 
@@ -998,9 +998,9 @@ Public MustInherit Class Sim
         ElseIf (GlobalAnzZiel > 1) Then
             'MultiObjective
             'BUG 66: nur die ersten beiden Zielfunktionen werden gezeichnet
-            Call Diag.prepareSeries(0, "Population")
-            Diag.Series(0).Cursor = Cursors.Hand
-            Call Diag.Series(0).Add(List_OptZiele(0).QWertTmp, List_OptZiele(1).QWertTmp)
+            Call Diag.prepareSeries(Series_No, "Population")
+            Diag.Series(Series_No).Cursor = Cursors.Hand
+            Call Diag.Series(Series_No).Add(List_OptZiele(0).QWertTmp, List_OptZiele(1).QWertTmp)
         End If
 
         'Qualitätswerte und OptParameter in DB speichern
