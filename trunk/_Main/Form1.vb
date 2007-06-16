@@ -32,7 +32,7 @@ Partial Class Form1
     Private Const ANW_TSP As String = "Traveling Salesman"
 
     'Optimierungsmethode
-    Private Methode As String
+    Private Method As String
     Private Const METH_RESET As String = "Reset"
     Private Const METH_PES As String = "PES"
     Private Const METH_CES As String = "CES"
@@ -59,6 +59,12 @@ Partial Class Form1
     '**** Verschiedenes ****
     Dim isrun As Boolean = False                        'Optimierung läuft
     Dim ispause As Boolean = False                      'Optimierung ist pausiert
+
+    Structure Struct_Exchange                           'Struktur um Informationen zwischen PES und CES auszutauschen 
+        Dim Series As Integer
+    End Structure
+
+    Dim Exchange As Struct_Exchange
 
 #End Region 'Eigenschaften
 
@@ -212,9 +218,9 @@ Partial Class Form1
             'Mauszeiger busy
             Cursor = System.Windows.Forms.Cursors.WaitCursor
 
-            Me.Methode = ComboBox_Methode.SelectedItem
+            Me.Method = ComboBox_Methode.SelectedItem
 
-            Select Case Me.Methode
+            Select Case Me.Method
 
                 Case "" 'Keine Methode ausgewählt
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -334,7 +340,7 @@ Partial Class Form1
                     'Bei Testmodus wird die Anzahl der Kinder und Generationen überschrieben
                     If CES1.TestModus = 1 Then
                         CES1.n_Childs = 1
-                        CES1.n_parents = 1
+                        CES1.n_Parents = 1
                         CES1.n_Generation = 1
                         ReDim CES1.NDSResult(CES1.n_Childs + CES1.n_Parents - 1)
                     ElseIf CES1.TestModus = 2 Then
@@ -388,7 +394,7 @@ Partial Class Form1
                     'Bei Testmodus wird die Anzahl der Kinder und Generationen überschrieben
                     If CES1.TestModus = 1 Then
                         CES1.n_Childs = 1
-                        CES1.n_parents = 1
+                        CES1.n_Parents = 1
                         CES1.n_Generation = 1
                         ReDim CES1.NDSResult(CES1.n_Childs + CES1.n_Parents - 1)
                     ElseIf CES1.TestModus = 2 Then
@@ -478,13 +484,13 @@ Partial Class Form1
 
                 Case ANW_BLUEM, ANW_SMUSI
 
-                    Select Case Methode
+                    Select Case Method
                         Case METH_RESET
                             Call Sim1.launchSim()
                         Case METH_SENSIPLOT
                             Call STARTEN_SensiPlot()
                         Case METH_PES
-                            Call STARTEN_PES()
+                            Call STARTEN_PES(Exchange)
                         Case METH_CES
                             Call STARTEN_CES()
                         Case METH_CES_PES
@@ -492,7 +498,7 @@ Partial Class Form1
                     End Select
 
                 Case ANW_TESTPROBLEME
-                    Call STARTEN_PES()
+                    Call STARTEN_PES(Exchange)
 
                 Case ANW_TSP
                     Call STARTEN_TSP()
@@ -679,7 +685,7 @@ Partial Class Form1
 
         'Die verschiedenen Modi
         'xxxxxxxxxxxxxxxxxxxxxx
-        If ces1.Testmodus = 0 Then
+        If CES1.TestModus = 0 Then
             'Normaler Modus: Zufällige Kinderpfade werden generiert
             Call CES1.Generate_Random_Path()
         ElseIf CES1.TestModus = 1 Then
@@ -882,7 +888,7 @@ Partial Class Form1
                 Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
                 'Starten der PES
                 '***************
-                Call STARTEN_PES()
+                Call STARTEN_PES(Exchange)
 
 
 
@@ -893,7 +899,7 @@ Partial Class Form1
     'Anwendung Evolutionsstrategie für Parameter Optimierung - hier Steuerung       
     '************************************************************************
 
-    Private Sub STARTEN_PES()
+    Private Sub STARTEN_PES(ByRef Exchange As Struct_Exchange)
         '==========================
         Dim i As Integer
         '--------------------------
@@ -1032,7 +1038,7 @@ Start_Evolutionsrunden:
         'System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
         'Loop über alle Runden
         '*******************************************************************************************
-        Do While (PES1.EsIsNextRunde)
+        Do While (PES1.EsIsNextRunde(me.Method))
 
             irunde = PES1.iaktuelleRunde
             Call EVO_Opt_Verlauf1.Runden(irunde)
@@ -1216,7 +1222,7 @@ GenerierenAusgangswerte:
             Case ANW_BLUEM, ANW_SMUSI 'BlueM oder SMUSI
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-                Select Case Methode
+                Select Case Method
 
                     Case METH_SENSIPLOT 'SensiPlot
                         'XXXXXXXXXXXXXXXXXXXXXXXXX
