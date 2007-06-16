@@ -67,6 +67,7 @@ Public MustInherit Class Sim
     End Structure
 
     Public List_OptParameter() As Struct_OptParameter = {} 'Liste der Optimierungsparameter
+    Public List_OptParameter_Save() As Struct_OptParameter = {} 'Liste der Optimierungsparameter die nicht verändert wird
 
     'ModellParameter
     '---------------
@@ -84,7 +85,8 @@ Public MustInherit Class Sim
         Public Wert As Double                       'Aus OptParameter errechneter Wert
     End Structure
 
-    Public List_ModellParameter() As Struct_ModellParameter = {} 'Liste der Modellparameter
+    Public List_ModellParameter() As Struct_ModellParameter = {}      'Liste der Modellparameter
+    Public List_ModellParameter_Save() As Struct_ModellParameter = {} 'Liste der Modellparameter die nicht verändert wird
 
     'Optimierungsziele
     '-----------------
@@ -318,6 +320,7 @@ Public MustInherit Class Sim
         Loop Until StrRead.Peek() = -1
 
         ReDim List_OptParameter(AnzParam - 1)
+        ReDim List_OptParameter_Save(AnzParam - 1)
 
         'Zurück zum Dateianfang und lesen
         FiStr.Seek(0, SeekOrigin.Begin)
@@ -340,6 +343,11 @@ Public MustInherit Class Sim
 
         StrRead.Close()
         FiStr.Close()
+
+        'OptParameter werden hier gesichert
+        For i = 0 To List_OptParameter.GetUpperBound(0)
+            Call copy_Struct_OptParemeter(List_OptParameter(i), List_OptParameter_Save(i))
+        Next
 
     End Sub
 
@@ -364,6 +372,7 @@ Public MustInherit Class Sim
         Loop Until StrRead.Peek() = -1
 
         ReDim List_ModellParameter(AnzParam - 1)
+        ReDim List_ModellParameter_Save(AnzParam - 1)
 
         'Zurück zum Dateianfang und lesen
         FiStr.Seek(0, SeekOrigin.Begin)
@@ -390,6 +399,11 @@ Public MustInherit Class Sim
 
         StrRead.Close()
         FiStr.Close()
+
+        'ModellParameter werden hier gesichert
+        For i = 0 To List_ModellParameter.GetUpperBound(0)
+            Call copy_Struct_ModellParemeter(List_ModellParameter(i), List_ModellParameter_Save(i))
+        Next
 
     End Sub
 
@@ -827,10 +841,22 @@ Public MustInherit Class Sim
     'Reduziert die OptParameter und die ModellParameter auf die aktiven Elemente
     '***************************************************************************
     Public Sub Reduce_OptPara_ModPara(ByVal Bauwerksliste() As Object)
+        Dim i as Integer
+
+        'Kopieren der Listen aus den Sicherungen
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        ReDim List_ModellParameter(List_ModellParameter_Save.GetUpperBound(0))
+        For i = 0 To List_ModellParameter_Save.GetUpperBound(0)
+            copy_Struct_ModellParemeter(List_ModellParameter_Save(i), List_ModellParameter(i))
+        Next
+        Redim List_OptParameter(List_OptParameter_Save.GetUpperBound(0))
+        For i = 0 To List_OptParameter_Save.GetUpperBound(0)
+            copy_Struct_OptParemeter(List_OptParameter_Save(i),List_OptParameter(i))
+        Next
 
         'Reduzierung der ModParameter
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        Dim i, j, count As Integer
+        Dim j, count As Integer
         Dim TMP_ModPara() As Struct_ModellParameter
         ReDim TMP_ModPara(List_ModellParameter.GetUpperBound(0))
 

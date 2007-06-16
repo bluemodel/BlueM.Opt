@@ -906,7 +906,7 @@ ES_isNEXTPOP_ERROR:
     '*******************************************************************************
     'Funktion zählt die Runden und ermittelt, ob die maximale Anzahl
     'an Runden erreicht ist
-    Public Function EsIsNextRunde() As Boolean
+    Public Function EsIsNextRunde(ByVal Method as String) As Boolean
 
         EsIsNextRunde = False
 
@@ -918,7 +918,7 @@ ES_isNEXTPOP_ERROR:
         'Abfrage ob die maximale Anzahl an Runden erreicht ist
         If Eigenschaft.iaktuelleRunde <= Eigenschaft.NRunden Then
             EsIsNextRunde = True
-        Else
+        ElseIf Not Method = "CES + PES" Then
             MsgBox("Optimierung beendet", MsgBoxStyle.Information, "Info")
         End If
 
