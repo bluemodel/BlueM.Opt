@@ -114,7 +114,8 @@ Partial Class SensiPlot
         Me.TextBox_AnzSim.PromptChar = Global.Microsoft.VisualBasic.ChrW(32)
         Me.TextBox_AnzSim.Size = New System.Drawing.Size(67, 20)
         Me.TextBox_AnzSim.TabIndex = 7
-        Me.TextBox_AnzSim.Text = "7"
+        Me.TextBox_AnzSim.Text = "12"
+        Me.TextBox_AnzSim.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'Label_AnzSim
         '
@@ -128,22 +129,22 @@ Partial Class SensiPlot
         'RadioButton_Gleichverteilt
         '
         Me.RadioButton_Gleichverteilt.AutoSize = True
-        Me.RadioButton_Gleichverteilt.Checked = True
         Me.RadioButton_Gleichverteilt.Location = New System.Drawing.Point(9, 19)
         Me.RadioButton_Gleichverteilt.Name = "RadioButton_Gleichverteilt"
         Me.RadioButton_Gleichverteilt.Size = New System.Drawing.Size(86, 17)
         Me.RadioButton_Gleichverteilt.TabIndex = 9
-        Me.RadioButton_Gleichverteilt.TabStop = True
         Me.RadioButton_Gleichverteilt.Text = "Gleichverteilt"
         Me.RadioButton_Gleichverteilt.UseVisualStyleBackColor = True
         '
         'RadioButton_Diskret
         '
         Me.RadioButton_Diskret.AutoSize = True
+        Me.RadioButton_Diskret.Checked = True
         Me.RadioButton_Diskret.Location = New System.Drawing.Point(9, 42)
         Me.RadioButton_Diskret.Name = "RadioButton_Diskret"
         Me.RadioButton_Diskret.Size = New System.Drawing.Size(58, 17)
         Me.RadioButton_Diskret.TabIndex = 10
+        Me.RadioButton_Diskret.TabStop = True
         Me.RadioButton_Diskret.Text = "Diskret"
         Me.RadioButton_Diskret.UseVisualStyleBackColor = True
         '
