@@ -31,7 +31,7 @@ Public Class PES
 	'Deklarationsteil
 	'*******************************************************************************
 	
-    Private Structure EigenschaftTyp
+    Private Structure Struct_Eigenschaft
         Dim varanz As Short                 'Anzahl Parameter
         Dim NEltern As Short                'Anzahl Eltern
         Dim NNachf As Short                 'Anzahl Kinder
@@ -40,7 +40,7 @@ Public Class PES
         Dim NConstrains As Short            'Anzahl der Randbedingungen
         Dim iEvoTyp As Short                'Typ der Evolutionsstrategie (+ oder ,)
         Dim iPopEvoTyp As Short             'Typ der Evolutionsstrategie (+ oder ,) auf
-                                            'Populationsebene
+        'Populationsebene
         Dim iPopPenalty As Short            'Art der Beurteilung der Populationsgüte (Multiobjective)
         Dim isPOPUL As Boolean              'Mit Populationen
         Dim isMultiObjective As Boolean     'Mit zweiter Objective-function
@@ -50,9 +50,9 @@ Public Class PES
         Dim NPopul As Short                 'Anzahl Populationen
         Dim NPopEltern As Short             'Anzahl Populationseltern
         Dim iOptPopEltern As Short          'Ermittlung der Populationseltern (Mittelwert,
-                                            'Rekombination)
+        'Rekombination)
         Dim iOptEltern As Short             'Ermittlung der Individuum-Eltern (Mittelwert,
-                                            'Rekombination, einfache Auswahl)
+        'Rekombination, einfache Auswahl)
         Dim NRekombXY As Short              'X/Y-Schema Rekombination
         Dim rDeltaMin As Single             'Mindestschrittweite
         Dim rDeltaStart As Single           'Startschrittweite
@@ -69,13 +69,13 @@ Public Class PES
         Dim iaktuellerNachfahre As Short    'Zähler für aktuellen Nachfahre
         Dim d As Double                     'Faktor für Rekombinationsoperator
         Dim interact As Short               'Alle wieviel Generationen soll die aktuelle Population
-                                            'mit Mitgliedern der sekundären Population aufgefüllt werden
+        'mit Mitgliedern der sekundären Population aufgefüllt werden
         Dim isInteract As Boolean           'Mit Austausch zwischen Population und Sekundärer Population
         Dim NMemberSecondPop As Short       'Maximale Anzahl Mitglieder der Sekundärpopulation
     End Structure
 
     'UPGRADE_WARNING: Arrays in Struktur Property müssen möglicherweise initialisiert werden, bevor sie verwendet werden können. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1063"'
-    Dim Eigenschaft As EigenschaftTyp
+    Dim Eigenschaft As Struct_Eigenschaft
 
     Private Xp(,,) As Double                'PopulationsElternwert der Variable
     Private Dp(,,) As Double                'PopulationsElternschrittweite
@@ -91,7 +91,7 @@ Public Class PES
     Private Qb(,,) As Double                'Bestwertspeicher Generationsebene
     Private Rb(,,) As Double                'Restriktionen auf Generationsebene
     '---------------------
-    Private SekundärQb() As NDSortingType = {}   'Sekundäre Population
+    Private SekundärQb() As Struct_NDSorting = {}   'Sekundäre Population
     Private expo As Short                   'Exponent für Schrittweite (+/-1)
     Private DnTemp As Double                'Temporäre Schrittweite für Nachkomme
     Private XnTemp As Double                'Temporärer Parameterwert für Nachkomme
@@ -112,7 +112,7 @@ Public Class PES
     '*******************************************************************************
     '*******************************************************************************
 
-    Private Structure NDSortingType
+    Private Structure Struct_NDSorting
         Dim penalty() As Double             'Werte der Penaltyfunktion(en)
         Dim constrain() As Double           'Werte der Randbedingung(en)
         Dim feasible As Boolean             'Gültiges Ergebnis ?
@@ -123,14 +123,14 @@ Public Class PES
         Dim distance As Double              'Distanzwert für Crowding distance sort
     End Structure
 
-    Dim NDSorting() As NDSortingType
+    Dim List_NDSorting() As Struct_NDSorting
 
-    Private Structure Sortierung
+    Private Structure Struct_Sortierung
         Dim Index As Short
         Dim penalty() As Double
     End Structure
 
-    Private Structure Neighbourhood
+    Private Structure Struct_Neighbourhood
         Dim distance As Double
         Dim Index As Short
     End Structure
@@ -752,14 +752,14 @@ ES_GET_SCHRITTWEITE_ERROR:
         '---------------------
         'NDSorting wird nur benötigt, falls eine Paretofront approximiert wird
         If Eigenschaft.isPareto Then
-            ReDim NDSorting(Eigenschaft.NEltern + Eigenschaft.NNachf)
+            ReDim List_NDSorting(Eigenschaft.NEltern + Eigenschaft.NNachf)
             For i = 1 To Eigenschaft.NEltern + Eigenschaft.NNachf
-                ReDim NDSorting(i).penalty(Eigenschaft.NPenalty)
+                ReDim List_NDSorting(i).penalty(Eigenschaft.NPenalty)
                 If Eigenschaft.NConstrains > 0 Then
-                    ReDim NDSorting(i).constrain(Eigenschaft.NConstrains)
+                    ReDim List_NDSorting(i).constrain(Eigenschaft.NConstrains)
                 End If
-                ReDim NDSorting(i).d(Eigenschaft.varanz)
-                ReDim NDSorting(i).X(Eigenschaft.varanz)
+                ReDim List_NDSorting(i).d(Eigenschaft.varanz)
+                ReDim List_NDSorting(i).X(Eigenschaft.varanz)
             Next i
             If Eigenschaft.iOptEltern = EVO_ELTERN_Neighbourhood Then
                 ReDim PenaltyDistance(Eigenschaft.NEltern, Eigenschaft.NEltern)
@@ -1527,7 +1527,7 @@ ES_POP_BEST_ERROR:
             End If
 
         Else 'Multi-objective mit paretofront
-            With NDSorting(Eigenschaft.iaktuellerNachfahre)
+            With List_NDSorting(Eigenschaft.iaktuellerNachfahre)
                 For i = 1 To Eigenschaft.NPenalty
                     .penalty(i) = ZF(i)
                 Next i
@@ -1728,8 +1728,8 @@ ES_POP_ELTERN_ERROR:
         Dim l, n, m, v, i, j As Short
         Dim NFrontMember_aktuell, NFrontMember_gesamt As Short
         Dim durchlauf As Short
-        Dim Temp() As NDSortingType
-        Dim NDSResult() As NDSortingType
+        Dim Temp() As Struct_NDSorting
+        Dim NDSResult() As Struct_NDSorting
         Dim Count, aktuelle_Front As Short
         Dim Member_Sekundärefront As Short
 
@@ -1756,7 +1756,7 @@ ES_POP_ELTERN_ERROR:
             '---------------------------------------------------------------------
 
             For m = Eigenschaft.NNachf + 1 To Eigenschaft.NNachf + Eigenschaft.NEltern
-                With NDSorting(m)
+                With List_NDSorting(m)
                     For l = 1 To Eigenschaft.NPenalty
                         .penalty(l) = Qb(m - Eigenschaft.NNachf, Eigenschaft.iaktuellePopulation, l)
                     Next l
@@ -1800,7 +1800,7 @@ ES_POP_ELTERN_ERROR:
             Next i
 
             'NDSorting wird in Temp kopiert
-            Array.Copy(NDSorting, Temp, NDSorting.GetLength(0))
+            Array.Copy(List_NDSorting, Temp, List_NDSorting.GetLength(0))
 
             'Schleife läuft über die Zahl der Fronten die hier auch bestimmte werden
             Do
@@ -1958,7 +1958,7 @@ ES_ELTERN_ERROR:
     'Non_Dominated_Sorting
     'Entscheidet welche Werte dominiert werden und welche nicht
     '*******************************************************************************
-    Private Sub Non_Dominated_Sorting(ByRef NDSorting() As NDSortingType, ByRef durchlauf As Short)
+    Private Sub Non_Dominated_Sorting(ByRef NDSorting() As Struct_NDSorting, ByRef durchlauf As Short)
 
         Dim j, i, k As Short
         Dim Logical As Boolean
@@ -2041,9 +2041,9 @@ ES_ELTERN_ERROR:
     'Sortiert die nicht dominanten Lösungen nach oben, die dominanten nach unten
     '*******************************************************************************
 
-    Private Function Non_Dominated_Count_and_Sort(ByRef NDSorting() As NDSortingType) As Short
+    Private Function Non_Dominated_Count_and_Sort(ByRef NDSorting() As Struct_NDSorting) As Short
         Dim i As Short
-        Dim Temp() As NDSortingType
+        Dim Temp() As Struct_NDSorting
         Dim counter As Short
 
         ReDim Temp(UBound(NDSorting))
@@ -2085,9 +2085,9 @@ ES_ELTERN_ERROR:
     'hier für die Sekundäre Population
     '*******************************************************************************
 
-    Private Function Non_Dominated_Count_and_Sort_Sekundäre_Population(ByRef NDSorting() As NDSortingType) As Short
+    Private Function Non_Dominated_Count_and_Sort_Sekundäre_Population(ByRef NDSorting() As Struct_NDSorting) As Short
         Dim i As Short
-        Dim Temp() As NDSortingType
+        Dim Temp() As Struct_NDSorting
         Dim counter As Short
 
         ReDim Temp(UBound(NDSorting))
@@ -2126,7 +2126,7 @@ ES_ELTERN_ERROR:
     'und die bereits klassifizierten Lösungen aus Temp Array gelöscht
     '*******************************************************************************
 
-    Private Sub Non_Dominated_Result(ByRef Temp() As NDSortingType, ByRef NDSResult() As NDSortingType, ByRef NFrontMember_aktuell As Short, ByRef NFrontMember_gesamt As Short)
+    Private Sub Non_Dominated_Result(ByRef Temp() As Struct_NDSorting, ByRef NDSResult() As Struct_NDSorting, ByRef NFrontMember_aktuell As Short, ByRef NFrontMember_gesamt As Short)
 
         Dim i, Position As Short
 
@@ -2154,7 +2154,7 @@ ES_ELTERN_ERROR:
     'Count_Front_Members
     '*******************************************************************************
 
-    Private Function Count_Front_Members(ByRef aktuell_Front As Short, ByRef NDSResult() As NDSortingType) As Integer
+    Private Function Count_Front_Members(ByRef aktuell_Front As Short, ByRef NDSResult() As Struct_NDSorting) As Integer
         Dim i As Short
 
         Count_Front_Members = 0
@@ -2171,12 +2171,12 @@ ES_ELTERN_ERROR:
     'NDS_Crowding_Distance_Sort
     '*******************************************************************************
 
-    Private Sub NDS_Crowding_Distance_Sort(ByRef NDSorting() As NDSortingType, ByRef start As Short, ByRef ende As Short)
+    Private Sub NDS_Crowding_Distance_Sort(ByRef NDSorting() As Struct_NDSorting, ByRef start As Short, ByRef ende As Short)
         Dim i As Integer
         Dim j As Integer
         Dim k As Short
 
-        Dim swap As NDSortingType
+        Dim swap As Struct_NDSorting
         ReDim swap.d(Eigenschaft.varanz)
         ReDim swap.X(Eigenschaft.varanz)
 
@@ -2344,7 +2344,7 @@ ES_ELTERN_ERROR:
     'SekundärQb_Duplettten
     '
     '*******************************************************************************
-    Private Sub SekundärQb_Duplettten(ByRef SekundärQb() As NDSortingType)
+    Private Sub SekundärQb_Duplettten(ByRef SekundärQb() As Struct_NDSorting)
         Dim i As Short
         Dim j As Short
         Dim k As Short
@@ -2368,8 +2368,8 @@ ES_ELTERN_ERROR:
 
         Dim i As Short
         Dim j As Short
-        Dim Nachbarn() As Neighbourhood
-        Dim swap As Neighbourhood
+        Dim Nachbarn() As Struct_Neighbourhood
+        Dim swap As Struct_Neighbourhood
 
         ReDim Nachbarn(Eigenschaft.NEltern - 1)
 
