@@ -61,7 +61,7 @@ Partial Class Form1
     Dim ispause As Boolean = False                      'Optimierung ist pausiert
 
     Structure Struct_Exchange                           'Struktur um Informationen zwischen PES und CES auszutauschen 
-        Dim Series As Integer
+        Dim Series_No As Integer
     End Structure
 
     Dim Exchange As Struct_Exchange
@@ -85,6 +85,9 @@ Partial Class Form1
         ComboBox_Methode.Items.AddRange(New Object() {"", METH_RESET, METH_PES, METH_CES, METH_CES_PES, METH_SENSIPLOT})
         ComboBox_Methode.SelectedIndex = 0
         ComboBox_Methode.Enabled = False
+
+        'Exchenge wird initialisiert
+        Me.Exchange.Series_No = 0
 
         'Ende der Initialisierung
         IsInitializing = False
@@ -815,7 +818,7 @@ Partial Class Form1
                 '******************************************
 
                 'Zeichnen MO_SO
-                Call DForm.Diag.prepareSeries(0, "Childs", Steema.TeeChart.Styles.PointerStyles.Rectangle, 3)
+                Call DForm.Diag.prepareSeries(0, "Childs", Steema.TeeChart.Styles.PointerStyles.Triangle, 3)
                 If CES1.n_Penalty = 1 Then
                     Call DForm.Diag.Series(0).Add(durchlauf_all, CES1.List_Childs(i).Penalty(0))
                 ElseIf CES1.n_Penalty = 2 Then
@@ -835,7 +838,7 @@ Partial Class Form1
                 'Zeichnen des besten Elter
                 For i = 0 To CES1.n_Parents - 1
                     'durchlauf += 1
-                    Call DForm.Diag.prepareSeries(1, "Parent", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                    Call DForm.Diag.prepareSeries(1, "Parent", Steema.TeeChart.Styles.PointerStyles.Triangle, 3)
                     Call DForm.Diag.Series(1).Add(durchlauf_all, CES1.List_Parents(i).Penalty(0))
                 Next
 
@@ -847,7 +850,8 @@ Partial Class Form1
                 Dim f As Integer
                 For i = 0 To CES1.n_Childs - 1
                     f = CES1.NDSResult(i).Front
-                    Call DForm.Diag.prepareSeries(f, "Front:" & f, Steema.TeeChart.Styles.PointerStyles.Circle, 4)
+                    Me.Exchange.Series_No = CES1.NDSResult(i).Front + 1
+                    Call DForm.Diag.prepareSeries(f, "Front:" & f, Steema.TeeChart.Styles.PointerStyles.Triangle, 4)
                     Call DForm.Diag.Series(f).Add(CES1.NDSResult(i).Penalty(0), CES1.NDSResult(i).Penalty(1))
                 Next
             End If
@@ -890,7 +894,8 @@ Partial Class Form1
                 '***************
                 Call STARTEN_PES(Exchange)
 
-
+                'Series wird zwei weiter gesetzt
+                Me.Exchange.Series_No += 2
 
             End If
         Next
@@ -988,7 +993,9 @@ Partial Class Form1
         End Try
 
         'Diagramm vorbereiten und initialisieren
-        Call PrepareDiagramm()
+        If Not Me.Method = METH_CES_PES Then
+            Call PrepareDiagramm()
+        End If
 
         '1. Schritt: PES
         'Objekt der Klasse PES wird erzeugt
@@ -1038,7 +1045,7 @@ Start_Evolutionsrunden:
         'System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
         'Loop über alle Runden
         '*******************************************************************************************
-        Do While (PES1.EsIsNextRunde(me.Method))
+        Do While (PES1.EsIsNextRunde(Me.Method))
 
             irunde = PES1.iaktuelleRunde
             Call EVO_Opt_Verlauf1.Runden(irunde)
@@ -1106,7 +1113,7 @@ GenerierenAusgangswerte:
                             Case ANW_TESTPROBLEME
                                 Call Testprobleme1.Evaluierung_TestProbleme(Testprobleme1.Combo_Testproblem.Text, globalAnzPar, mypara, durchlauf, ipop, QN, RN, DForm.Diag)
                             Case ANW_BLUEM, ANW_SMUSI
-                                If Not Sim1.Eval_Sim_ParaOpt(globalAnzPar, globalAnzZiel_ParaOpt, mypara, durchlauf, ipop, QN, DForm.Diag) Then
+                                If Not Sim1.Eval_Sim_ParaOpt(globalAnzPar, globalAnzZiel_ParaOpt, mypara, durchlauf, ipop, Exchange.Series_No, QN, DForm.Diag) Then
                                     GoTo GenerierenAusgangswerte
                                 End If
                         End Select
@@ -1174,8 +1181,8 @@ GenerierenAusgangswerte:
     '*****************************
     Private Sub SekundärePopulationZeichnen(ByVal Population(,) As Double)
         Dim i As Short
-        Call DForm.Diag.prepareSeries(1, "Sekundäre Population", Steema.TeeChart.Styles.PointerStyles.Circle, 4)
-        With DForm.Diag.Series(1)
+        Call DForm.Diag.prepareSeries(Me.Exchange.Series_No + 1, "Sekundäre Population", Steema.TeeChart.Styles.PointerStyles.Circle, 4)
+        With DForm.Diag.Series(Me.Exchange.Series_No + 1)
             .Clear()
             If UBound(Population, 2) = 2 Then
                 For i = 1 To UBound(Population, 1)
