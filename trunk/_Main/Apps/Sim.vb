@@ -31,7 +31,6 @@ Public MustInherit Class Sim
     Public WorkDir As String                             'Arbeitsverzeichnis für das Blaue Modell
     Public Event WorkDirChange                           'Event für Änderung des Arbeitsverzeichnisses
     Public Exe As String                                 'Pfad zur EXE für die Simulation
-    Public Ergebnisdb As Boolean = True                  'Gibt an, ob die Ergebnisdatenbank geschrieben werden soll
     Public SimStart As DateTime                          'Anfangsdatum der Simulation
     Public SimEnde As DateTime                           'Enddatum der Simulation
     Public SimDT As TimeSpan                             'Zeitschrittweite der Simulation
@@ -108,10 +107,12 @@ Public MustInherit Class Sim
         End Function
     End Structure
 
-    Public List_OptZiele() As Struct_OptZiel = {}          'Liste der Zielfunktionnen
+    Public List_OptZiele() As Struct_OptZiel = {}   'Liste der Zielfunktionnen
 
     'Ergebnisdatenbank
     '-----------------
+    Public Ergebnisdb As Boolean = True             'Gibt an, ob die Ergebnisdatenbank geschrieben werden soll
+    Public db_path As String                        'Pfad zur Ergebnisdatenbank
     Private db As OleDb.OleDbConnection
 
     'Kombinatorik
@@ -1609,6 +1610,9 @@ Public MustInherit Class Sim
         ChDrive(currentDir)
         ChDir(currentDir)
 
+        'Pfad setzen
+        db_path = ZielDatei
+
         'Tabellen anpassen
         '-----------------
         Dim i As Integer
@@ -1647,7 +1651,7 @@ Public MustInherit Class Sim
     'Mit Ergebnisdatenbank verbinden
     '*******************************
     Private Sub db_connect()
-        Dim ConnectionString As String = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & WorkDir & Datensatz & "_EVO.mdb"
+        Dim ConnectionString As String = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & Me.db_path
         db = New OleDb.OleDbConnection(ConnectionString)
         db.Open()
     End Sub
@@ -1722,12 +1726,10 @@ Public MustInherit Class Sim
 
     'QWerte aus einer DB lesen
     '*************************
-    Public Shared Function db_readQWerte(ByVal mdbfile As String) As Collection
+    Public Function db_readQWerte() As Collection
 
         'Connect
-        Dim ConnectionString As String = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & mdbfile
-        Dim db As OleDb.OleDbConnection = New OleDb.OleDbConnection(ConnectionString)
-        db.Open()
+        Call db_connect()
 
         'Read
         Dim q As String = "SELECT * FROM QWerte ORDER BY ID"
@@ -1738,7 +1740,7 @@ Public MustInherit Class Sim
         adapter.Fill(ds, "QWerte")
 
         'Disconnect
-        db.Close()
+        Call db_disconnect()
 
         'Werte einlesen
         '--------------
