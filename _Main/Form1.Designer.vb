@@ -38,9 +38,9 @@ Partial Class Form1
         Me.ComboBox_Methode = New System.Windows.Forms.ComboBox
         Me.Label_Anwendung = New System.Windows.Forms.Label
         Me.ComboBox_Anwendung = New System.Windows.Forms.ComboBox
-        Me.EVO_Opt_Verlauf1 = New EVO_Opt_Verlauf
-        Me.EVO_Einstellungen1 = New EVO_Einstellungen
-        Me.Testprobleme1 = New Testprobleme
+        Me.EVO_Opt_Verlauf1 = New Main.EVO_Opt_Verlauf
+        Me.EVO_Einstellungen1 = New Main.EVO_Einstellungen
+        Me.Testprobleme1 = New Main.Testprobleme
         Me.OpenFileDialog_Datensatz = New System.Windows.Forms.OpenFileDialog
         Me.OpenFileDialog_MDB = New System.Windows.Forms.OpenFileDialog
         Me.DForm = New Main.DiagrammForm
@@ -86,6 +86,7 @@ Partial Class Form1
         '
         'Button_Scatterplot
         '
+        Me.Button_Scatterplot.Enabled = False
         Me.Button_Scatterplot.Image = Global.Main.My.Resources.Resources.scatterplot
         Me.Button_Scatterplot.Location = New System.Drawing.Point(546, 656)
         Me.Button_Scatterplot.Name = "Button_Scatterplot"
@@ -162,6 +163,7 @@ Partial Class Form1
         '
         'EVO_Einstellungen1
         '
+        Me.EVO_Einstellungen1.Enabled = False
         Me.EVO_Einstellungen1.Location = New System.Drawing.Point(8, 187)
         Me.EVO_Einstellungen1.Name = "EVO_Einstellungen1"
         Me.EVO_Einstellungen1.OptModus = CType(0, Short)
@@ -170,6 +172,7 @@ Partial Class Form1
         '
         'Testprobleme1
         '
+        Me.Testprobleme1.Enabled = False
         Me.Testprobleme1.Location = New System.Drawing.Point(5, 68)
         Me.Testprobleme1.Name = "Testprobleme1"
         Me.Testprobleme1.Size = New System.Drawing.Size(225, 121)

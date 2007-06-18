@@ -105,17 +105,24 @@ Partial Class Form1
 
         If (Me.IsInitializing = True) Then
 
-            'Testprobleme deaktivieren
-            Testprobleme1.Enabled = False
             Exit Sub
 
         Else
 
+            'Alles deaktivieren, danach je nach Anwendung aktivieren
+            '-------------------------------------------------------
+
             'Start Button deaktivieren
             Me.Button_Start.Enabled = False
 
+            'Testprobleme deaktivieren
+            Testprobleme1.Enabled = False
+
             'Combobox Methode deaktivieren
             ComboBox_Methode.Enabled = False
+
+            'Scatterplot deaktivieren
+            Me.Button_Scatterplot.Enabled = False
 
             'Mauszeiger busy
             Cursor = System.Windows.Forms.Cursors.WaitCursor
@@ -126,9 +133,6 @@ Partial Class Form1
 
                 Case "" 'Keine Anwendung ausgewählt
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                    'Testprobleme deaktivieren
-                    Testprobleme1.Enabled = False
 
                     'Mauszeiger wieder normal
                     Cursor = System.Windows.Forms.Cursors.Default
@@ -144,9 +148,6 @@ Partial Class Form1
                     'Initialisieren
                     Call Sim1.SimIni()
 
-                    'Testprobleme deaktivieren
-                    Testprobleme1.Enabled = False
-
 
                 Case ANW_SMUSI 'Anwendung Smusi
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -156,9 +157,6 @@ Partial Class Form1
 
                     'Initialisieren
                     Call Sim1.SimIni()
-
-                    'Testprobleme deaktivieren
-                    Testprobleme1.Enabled = False
 
 
                 Case ANW_TESTPROBLEME 'Anwendung Testprobleme
@@ -209,14 +207,21 @@ Partial Class Form1
 
         If (Me.IsInitializing = True) Then
 
-            'EVO_Einstellungen deaktivieren
-            EVO_Einstellungen1.Enabled = False
             Exit Sub
 
         Else
 
+            'Alles deaktivieren, danach je nach Methode aktivieren
+            '-----------------------------------------------------
+
             'Start Button deaktivieren
             Me.Button_Start.Enabled = False
+
+            'Scatterplot deaktivieren
+            Me.Button_Scatterplot.Enabled = False
+
+            'EVO_Einstellungen deaktivieren
+            EVO_Einstellungen1.Enabled = False
 
             'Mauszeiger busy
             Cursor = System.Windows.Forms.Cursors.WaitCursor
@@ -228,9 +233,6 @@ Partial Class Form1
                 Case "" 'Keine Methode ausgewählt
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'EVO_Einstellungen deaktivieren
-                    EVO_Einstellungen1.Enabled = False
-
                     'Mauszeiger wieder normal
                     Cursor = System.Windows.Forms.Cursors.Default
                     Exit Sub
@@ -238,9 +240,6 @@ Partial Class Form1
 
                 Case METH_RESET 'Methode Reset
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                    'EVO_Einstellungen deaktivieren
-                    EVO_Einstellungen1.Enabled = False
 
                     'Ergebnisdatenbank ausschalten
                     Sim1.Ergebnisdb = False
@@ -255,9 +254,6 @@ Partial Class Form1
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     SensiPlot1 = New SensiPlot
-
-                    'EVO_Einstellungen deaktivieren
-                    EVO_Einstellungen1.Enabled = False
 
                     'Ergebnisdatenbank ausschalten
                     Sim1.Ergebnisdb = False
@@ -294,6 +290,9 @@ Partial Class Form1
                     'Ergebnisdatenbank einschalten
                     Sim1.Ergebnisdb = True
 
+                    'Scatterplot aktivieren
+                    Me.Button_Scatterplot.Enabled = True
+
                     'PES für Sim vorbereiten
                     Call Sim1.prepare_PES()
 
@@ -314,9 +313,6 @@ Partial Class Form1
                     If (Not Anwendung = ANW_BLUEM) Then
                         Throw New Exception("CES funktioniert bisher nur mit BlueM!")
                     End If
-
-                    'EVO_Einstellungen deaktiviern
-                    EVO_Einstellungen1.Enabled = False
 
                     'Ergebnisdatenbank ausschalten
                     Sim1.Ergebnisdb = False
@@ -1334,9 +1330,15 @@ GenerierenAusgangswerte:
     '***************************
     Public Sub showWave(ByVal sender As Object, ByVal s As Steema.TeeChart.Styles.Series, ByVal valueIndex As Integer, ByVal e As System.Windows.Forms.MouseEventArgs)
 
-        'nur bei Anwendung = Sim und aktiver ErgebnisDB ausführen
-        If ((Anwendung = ANW_BLUEM Or Anwendung = ANW_SMUSI) And Sim1.Ergebnisdb = True) Then
+        'nur bei aktiver ErgebnisDB ausführen
+        If (Not Sim1.Ergebnisdb) Then
 
+            MsgBox("Wave funktioniert nur bei angeschlossener Ergebnisdatenbank!", MsgBoxStyle.Exclamation, "Fehler")
+            Exit Sub
+
+        Else
+
+            'nur bei Population-Serien ausführen
             If (Not s.Title.StartsWith("Population")) Then
                 MsgBox("Parametersätze können leider nur" & Chr(13) & Chr(10) _
                         & "für Populations-Punkte" & Chr(13) & Chr(10) _
@@ -1480,27 +1482,68 @@ GenerierenAusgangswerte:
     '*******************************************************
     Private Sub showScatterplot(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Scatterplot.Click
 
+        Dim diagresult As DialogResult
+
         'Datei-öffnen Dialog anzeigen
-        If (Not IsNothing(Sim1)) Then
-            Me.OpenFileDialog_MDB.InitialDirectory = Sim1.WorkDir
-        End If
-        Dim diagresult As DialogResult = Me.OpenFileDialog_MDB.ShowDialog()
+        Me.OpenFileDialog_MDB.InitialDirectory = Sim1.WorkDir
+        diagresult = Me.OpenFileDialog_MDB.ShowDialog()
 
         If (diagresult = Windows.Forms.DialogResult.OK) Then
 
-            Cursor = Cursors.WaitCursor
+            'Neuen DB-Pfad speichern
+            Sim1.db_path = Me.OpenFileDialog_MDB.FileName
+
+            'Methode zurücksetzen, damit die ausgewählte DB später nicht überschrieben wird
+            Me.ComboBox_Methode.SelectedItem = ""
 
             'Daten einlesen
-            Dim series As Collection = Sim.db_readQWerte(Me.OpenFileDialog_MDB.FileName)
-
-            'Scatterplot anzeigen
-            Dim scatterplot1 As New Scatterplot
-            Call scatterplot1.zeichnen(series)
-            Call scatterplot1.Show()
-
+            Cursor = Cursors.WaitCursor
+            Dim series As Collection = Sim1.db_readQWerte()
             Cursor = Cursors.Default
 
+            'Abfrageform
+            Dim Form2 As New ScatterplotAbfrage
+            For Each serie As Main.Serie In series
+                Form2.ListBox_OptZieleX.Items.Add(serie.name)
+                Form2.ListBox_OptZieleY.Items.Add(serie.name)
+            Next
+            diagresult = Form2.ShowDialog()
+
+            If (diagresult = Windows.Forms.DialogResult.OK) Then
+
+                If (Form2.CheckBox_Hauptdiagramm.Checked) Then
+                    'Hauptdiagramm
+                    '-------------
+                    Dim Achsen As New Collection
+                    Dim tmpAchse As Main.Diagramm.Achse
+                    tmpAchse.Auto = True
+                    tmpAchse.Name = Form2.ListBox_OptZieleX.SelectedItem
+                    Achsen.Add(tmpAchse)
+                    tmpAchse.Name = Form2.ListBox_OptZieleY.SelectedItem
+                    Achsen.Add(tmpAchse)
+                    Me.DForm.Diag.Clear()
+                    Me.DForm.Diag.DiagInitialise(Path.GetFileName(Sim1.db_path), Achsen)
+                    Me.DForm.Diag.prepareSeries(0, "Population")
+                    Me.DForm.Diag.Chart.Series(0).Cursor = Cursors.Hand
+                    For i As Integer = 0 To series(1).values.getUpperBound(0)
+                        Me.DForm.Diag.Chart.Series(0).Add(series(Form2.ListBox_OptZieleX.SelectedIndex + 1).values(i), series(Form2.ListBox_OptZieleY.SelectedIndex + 1).values(i))
+                    Next
+                End If
+
+                If (Form2.CheckBox_Scatterplot.Checked) Then
+                    'Scatterplot
+                    '-----------
+                    Cursor = Cursors.WaitCursor
+                    Dim scatterplot1 As New Scatterplot
+                    Call scatterplot1.zeichnen(series)
+                    Call scatterplot1.Show()
+                    Cursor = Cursors.Default
+                End If
+
+            End If
+
         End If
+
     End Sub
 
 #End Region 'Diagrammfunktionen
