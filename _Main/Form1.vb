@@ -109,6 +109,9 @@ Partial Class Form1
 
         Else
 
+            'Diagramm zurücksetzen
+            Me.DForm.Diag.Reset()
+
             'Alles deaktivieren, danach je nach Anwendung aktivieren
             '-------------------------------------------------------
 
@@ -210,6 +213,9 @@ Partial Class Form1
             Exit Sub
 
         Else
+
+            'Diagramm zurücksetzen
+            Me.DForm.Diag.Reset()
 
             'Alles deaktivieren, danach je nach Methode aktivieren
             '-----------------------------------------------------

@@ -7,6 +7,17 @@ Public Class Diagramm
             Public Max as Double
     End Structure
 
+    'TeeChart zurücksetzen
+    '*********************
+    Public Sub Reset()
+        With Me
+            .Clear()
+            .Header.Text = "EVO"
+            .Chart.Axes.Bottom.Title.Caption = ""
+            .Chart.Axes.Left.Title.Caption = ""
+        End With
+    End Sub
+
     'TeeChart Initialisierung (Titel und Achsen)
     '*******************************************
     Public Sub DiagInitialise(ByVal Titel As String, ByVal Achsen As Collection)
@@ -128,7 +139,7 @@ Public Class Diagramm
 
             'S0: Die Ausgangs- oder Ziellinien
             Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-            Line1.Title = "Ausgangs-/Ziellinie"
+            Line1.Title = "Sinusfunktion"
             Line1.Add(array_x, array_y)
             Line1.Brush.Color = System.Drawing.Color.Red
             Line1.ClickableLine = True
