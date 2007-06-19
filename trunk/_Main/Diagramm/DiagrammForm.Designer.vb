@@ -157,7 +157,7 @@ Partial Class DiagrammForm
         '
         '
         '
-        Me.Diag.Header.Lines = New String() {"TeeChart"}
+        Me.Diag.Header.Lines = New String() {"EVO"}
         '
         '
         '
