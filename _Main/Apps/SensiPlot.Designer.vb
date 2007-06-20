@@ -19,6 +19,7 @@ Partial Class SensiPlot
     'Das Bearbeiten mit dem Code-Editor ist nicht möglich.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel
         Me.OK_Button = New System.Windows.Forms.Button
         Me.Cancel_Button = New System.Windows.Forms.Button
@@ -31,6 +32,8 @@ Partial Class SensiPlot
         Me.RadioButton_Gleichverteilt = New System.Windows.Forms.RadioButton
         Me.RadioButton_Diskret = New System.Windows.Forms.RadioButton
         Me.GroupBox_Modus = New System.Windows.Forms.GroupBox
+        Me.CheckBox_wave = New System.Windows.Forms.CheckBox
+        Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.TableLayoutPanel1.SuspendLayout()
         Me.GroupBox_Modus.SuspendLayout()
         Me.SuspendLayout()
@@ -160,6 +163,18 @@ Partial Class SensiPlot
         Me.GroupBox_Modus.TabStop = False
         Me.GroupBox_Modus.Text = "Modus"
         '
+        'CheckBox_wave
+        '
+        Me.CheckBox_wave.AutoSize = True
+        Me.CheckBox_wave.Location = New System.Drawing.Point(297, 125)
+        Me.CheckBox_wave.Name = "CheckBox_wave"
+        Me.CheckBox_wave.Size = New System.Drawing.Size(101, 17)
+        Me.CheckBox_wave.TabIndex = 12
+        Me.CheckBox_wave.Text = "Wave anzeigen"
+        Me.ToolTip1.SetToolTip(Me.CheckBox_wave, "Im Anschluss an die Sensitivitätsanalyse die Ganglinien aller Simulationen in ein" & _
+                "em separaten Diagramm anzeigen")
+        Me.CheckBox_wave.UseVisualStyleBackColor = True
+        '
         'SensiPlot
         '
         Me.AcceptButton = Me.OK_Button
@@ -167,6 +182,7 @@ Partial Class SensiPlot
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.Cancel_Button
         Me.ClientSize = New System.Drawing.Size(452, 260)
+        Me.Controls.Add(Me.CheckBox_wave)
         Me.Controls.Add(Me.GroupBox_Modus)
         Me.Controls.Add(Me.Label_AnzStep)
         Me.Controls.Add(Me.TextBox_AnzSim)
@@ -201,5 +217,7 @@ Partial Class SensiPlot
     Friend WithEvents RadioButton_Gleichverteilt As System.Windows.Forms.RadioButton
     Friend WithEvents RadioButton_Diskret As System.Windows.Forms.RadioButton
     Friend WithEvents GroupBox_Modus As System.Windows.Forms.GroupBox
+    Friend WithEvents CheckBox_wave As System.Windows.Forms.CheckBox
+    Friend WithEvents ToolTip1 As System.Windows.Forms.ToolTip
 
 End Class

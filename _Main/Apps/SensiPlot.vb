@@ -5,6 +5,7 @@ Public Class SensiPlot
     Public Selected_OptZiel As Integer
     Public Selected_SensiType As String
     Public Anz_Steps As Integer
+    Public show_Wave As Boolean
 
     Public Sub ListBox_OptParameter_add(ByVal OptParameter As Sim.Struct_OptParameter)
         ListBox_OptParameter.Items.Add(OptParameter)
@@ -67,6 +68,9 @@ Public Class SensiPlot
                 Exit Sub
             End If
         End If
+
+        'show Wave
+        Me.show_Wave = Me.CheckBox_wave.Checked
 
         'Überprüfung erfolgreich 
         Me.ListBox_OptParameter.Items.Clear()
