@@ -534,55 +534,101 @@ Partial Class Form1
         'geschrieben, und zwar mit den in der OPT-Datei angegebenen Startwerten
         '------------------------------------------------------------------------
 
-        'Wave deklarieren
-        Dim Wave1 As New Main.Wave
-        ReDim Wave1.WaveList(SensiPlot1.Anz_Sim - 1)
-
         'Parameterübergabe an ES
         Me.globalAnzZiel_ParaOpt = 1
         Me.globalAnzRand = 0
-        Me.globalAnzPar = 1
+        Me.globalAnzPar = SensiPlot1.Selected_OptParameter.GetLength(0)
 
-        Dim i As Integer
+        'Anzahl Simulationen
+        Dim Anz_Sim As Integer
+        If (Me.globalAnzPar = 1) Then
+            '1 Parameter
+            Anz_Sim = SensiPlot1.Anz_Steps
+        Else
+            '2 Parameter
+            Anz_Sim = SensiPlot1.Anz_Steps ^ 2
+        End If
+
+        'Wave deklarieren
+        Dim Wave1 As New Main.Wave
+        ReDim Wave1.WaveList(Anz_Sim - 1)
+
+        Dim i, j, n As Integer
 
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
+
+        'Oberflächendiagramm
+        Dim surface As Steema.TeeChart.Styles.Surface
+        If (Me.globalAnzPar > 1) Then
+            surface = New Steema.TeeChart.Styles.Surface(Me.DForm.Diag.Chart)
+            surface.IrregularGrid = True
+            surface.NumXValues = SensiPlot1.Anz_Steps
+            surface.NumZValues = SensiPlot1.Anz_Steps
+            Me.DForm.Diag.Tools.Add(New Steema.TeeChart.Tools.Rotate)
+            Me.DForm.Diag.add_MarksTips()
+        End If
 
         'Simulationsschleife
         '-------------------
         Randomize()
 
-        For i = 0 To SensiPlot1.Anz_Sim - 1
+        n = 0
+        'Äussere Schleife (2. OptParameter)
+        For i = 0 To (SensiPlot1.Anz_Steps - 1 * (Me.globalAnzPar - 1))
 
-            'OptParameterwert variieren
-            Select Case SensiPlot1.Selected_SensiType
-                Case "Gleichverteilt"
-                    Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter).SKWert = Rnd()
-                Case "Diskret"
-                    Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter).SKWert = i / SensiPlot1.Anz_Sim
-            End Select
+            If (Me.globalAnzPar > 1) Then
+                '2. OptParameterwert variieren
+                Select Case SensiPlot1.Selected_SensiType
+                    Case "Gleichverteilt"
+                        Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).SKWert = Rnd()
+                    Case "Diskret"
+                        Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).SKWert = i / SensiPlot1.Anz_Steps
+                End Select
+            End If
 
-            'Modellparameter schreiben
-            Call Sim1.ModellParameter_schreiben()
+            'Innere Schleife (1. OptParameter)
+            For j = 0 To SensiPlot1.Anz_Steps - 1
 
-            'Simulieren
-            Call Sim1.launchSim()
+                '1. OptParameterwert variieren
+                Select Case SensiPlot1.Selected_SensiType
+                    Case "Gleichverteilt"
+                        Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).SKWert = Rnd()
+                    Case "Diskret"
+                        Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).SKWert = j / SensiPlot1.Anz_Steps
+                End Select
 
-            'Qwert berechnen
-            Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).QWertTmp = Sim1.QWert(Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel))
+                'Modellparameter schreiben
+                Call Sim1.ModellParameter_schreiben()
 
-            'Diagramm aktualisieren
-            DForm.Diag.Series(0).Add(Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).QWertTmp, Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter).Wert, "")
+                'Simulieren
+                Call Sim1.launchSim()
 
-            'Speichern des Simulationsergebnisses für Wave
-            'BUG 119: Die WEL-Datei hat bei Smusi einen anderen Namen!
-            Sim.Read_WEL(Sim1.WorkDir & Sim1.Datensatz & ".wel", Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).SimGr, Wave1.WaveList(i).Wave)
-            Wave1.WaveList(i).Bezeichnung = Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter).Bezeichnung & ": " _
-                                            & Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter).Wert
+                'Qwert berechnen
+                Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).QWertTmp = Sim1.QWert(Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel))
 
-            System.Windows.Forms.Application.DoEvents()
+                'Diagramm aktualisieren
+                If (Me.globalAnzPar = 1) Then
+                    '1 Parameter
+                    DForm.Diag.Series(0).Add(Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).QWertTmp, Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Wert, "")
+                Else
+                    '2 Parameter
+                    surface.Add(Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Wert, Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).QWertTmp, Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Wert)
+                End If
 
+                'Speichern des Simulationsergebnisses für Wave
+                'BUG 119: Die WEL-Datei hat bei Smusi einen anderen Namen!
+                Sim.Read_WEL(Sim1.WorkDir & Sim1.Datensatz & ".wel", Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).SimGr, Wave1.WaveList(n).Wave)
+                'TODO: Serienbezeichnung enthält nur Namen und Wert des ersten Optimierungsparameters!
+                Wave1.WaveList(n).Bezeichnung = Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Bezeichnung & ": " _
+                                                & Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Wert
+                n += 1
+
+                System.Windows.Forms.Application.DoEvents()
+
+            Next
         Next
+
 
         'Wave Diagramm anzeigen:
         '-----------------------
@@ -600,7 +646,7 @@ Partial Class Form1
 
         'Serien initialisieren
         Dim tmpSeries As Steema.TeeChart.Styles.Line
-        For i = 0 To SensiPlot1.Anz_Sim - 1
+        For i = 0 To Anz_Sim - 1
             tmpSeries = New Steema.TeeChart.Styles.Line(Wave1.WForm.Diag.Chart)
             tmpSeries.Title = Wave1.WaveList(i).Bezeichnung
             tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Nothing
@@ -1236,31 +1282,76 @@ GenerierenAusgangswerte:
                     Case METH_SENSIPLOT 'SensiPlot
                         'XXXXXXXXXXXXXXXXXXXXXXXXX
 
-                        'Achsen:
-                        '-------
-                        Dim Achse As Diagramm.Achse
-                        Dim Achsen As New Collection
-                        'X-Achse = QWert
-                        Achse.Name = Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).Bezeichnung
-                        Achse.Auto = True
-                        Achse.Max = 0
-                        Achsen.Add(Achse)
-                        'Y-Achse = OptParameter
-                        Achse.Name = Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter).Bezeichnung
-                        Achse.Auto = True
-                        Achse.Max = 0
-                        Achsen.Add(Achse)
+                        If (SensiPlot1.Selected_OptParameter.GetLength(0) = 1) Then
 
-                        'Diagramm initialisieren
-                        Call DForm.Diag.DiagInitialise(Anwendung, Achsen)
+                            '1 OptParameter:
+                            '---------------
 
-                        'Series initialisieren
-                        Dim tmpPoint As New Steema.TeeChart.Styles.Points(Me.DForm.Diag.Chart)
-                        tmpPoint.Title = "Simulationsergebnis"
-                        tmpPoint.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-                        tmpPoint.Color = System.Drawing.Color.Orange
-                        tmpPoint.Pointer.HorizSize = 2
-                        tmpPoint.Pointer.VertSize = 2
+                            'Achsen:
+                            '-------
+                            Dim Achse As Diagramm.Achse
+                            Dim Achsen As New Collection
+                            'X-Achse = QWert
+                            Achse.Name = Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).Bezeichnung
+                            Achse.Auto = True
+                            Achse.Max = 0
+                            Achsen.Add(Achse)
+                            'Y-Achse = OptParameter
+                            Achse.Name = Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Bezeichnung
+                            Achse.Auto = True
+                            Achse.Max = 0
+                            Achsen.Add(Achse)
+
+                            'Diagramm initialisieren
+                            Call DForm.Diag.DiagInitialise(Anwendung, Achsen)
+
+                            'Series initialisieren
+                            Dim tmpPoint As New Steema.TeeChart.Styles.Points(Me.DForm.Diag.Chart)
+                            tmpPoint.Title = "Simulationsergebnis"
+                            tmpPoint.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+                            tmpPoint.Color = System.Drawing.Color.Orange
+                            tmpPoint.Pointer.HorizSize = 2
+                            tmpPoint.Pointer.VertSize = 2
+
+                        Else
+                            '2 OptParameter:
+                            '---------------
+
+                            'Achsen:
+                            '-------
+                            Dim Achse As Diagramm.Achse
+                            Dim Achsen As New Collection
+                            'X-Achse = OptParameter1
+                            Achse.Name = Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Bezeichnung
+                            Achse.Auto = True
+                            Achse.Max = 0
+                            Achsen.Add(Achse)
+                            'Y-Achse = QWert
+                            Achse.Name = Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).Bezeichnung
+                            Achse.Auto = True
+                            Achse.Max = 0
+                            Achsen.Add(Achse)
+
+                            'Diagramm initialisieren
+                            Call DForm.Diag.DiagInitialise(Anwendung, Achsen)
+
+                            'Z-Achse = OptParameter2
+                            DForm.Diag.Axes.Depth.Title.Caption = Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Bezeichnung
+                            DForm.Diag.Axes.Depth.Automatic = True
+                            DForm.Diag.Axes.Depth.Visible = True
+
+                            '3D-Diagramm vorbereiten
+                            DForm.Diag.Aspect.View3D = True
+                            DForm.Diag.Aspect.Chart3DPercent = 90
+                            DForm.Diag.Aspect.Elevation = 348
+                            DForm.Diag.Aspect.Orthogonal = False
+                            DForm.Diag.Aspect.Perspective = 62
+                            DForm.Diag.Aspect.Rotation = 329
+                            DForm.Diag.Aspect.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality
+                            DForm.Diag.Aspect.VertOffset = -20
+                            DForm.Diag.Aspect.Zoom = 66
+
+                        End If
 
                         Call DForm.Diag.add_MarksTips()
 

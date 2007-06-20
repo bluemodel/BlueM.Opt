@@ -27,7 +27,7 @@ Partial Class SensiPlot
         Me.ListBox_OptZiele = New System.Windows.Forms.ListBox
         Me.Label_OptZiele = New System.Windows.Forms.Label
         Me.TextBox_AnzSim = New System.Windows.Forms.MaskedTextBox
-        Me.Label_AnzSim = New System.Windows.Forms.Label
+        Me.Label_AnzStep = New System.Windows.Forms.Label
         Me.RadioButton_Gleichverteilt = New System.Windows.Forms.RadioButton
         Me.RadioButton_Diskret = New System.Windows.Forms.RadioButton
         Me.GroupBox_Modus = New System.Windows.Forms.GroupBox
@@ -75,6 +75,7 @@ Partial Class SensiPlot
         Me.ListBox_OptParameter.FormattingEnabled = True
         Me.ListBox_OptParameter.Location = New System.Drawing.Point(12, 32)
         Me.ListBox_OptParameter.Name = "ListBox_OptParameter"
+        Me.ListBox_OptParameter.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended
         Me.ListBox_OptParameter.Size = New System.Drawing.Size(130, 212)
         Me.ListBox_OptParameter.TabIndex = 1
         '
@@ -108,23 +109,23 @@ Partial Class SensiPlot
         '
         Me.TextBox_AnzSim.BeepOnError = True
         Me.TextBox_AnzSim.HidePromptOnLeave = True
-        Me.TextBox_AnzSim.Location = New System.Drawing.Point(370, 89)
+        Me.TextBox_AnzSim.Location = New System.Drawing.Point(381, 89)
         Me.TextBox_AnzSim.Mask = "0999"
         Me.TextBox_AnzSim.Name = "TextBox_AnzSim"
         Me.TextBox_AnzSim.PromptChar = Global.Microsoft.VisualBasic.ChrW(32)
-        Me.TextBox_AnzSim.Size = New System.Drawing.Size(67, 20)
+        Me.TextBox_AnzSim.Size = New System.Drawing.Size(56, 20)
         Me.TextBox_AnzSim.TabIndex = 7
         Me.TextBox_AnzSim.Text = "12"
         Me.TextBox_AnzSim.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
-        'Label_AnzSim
+        'Label_AnzStep
         '
-        Me.Label_AnzSim.AutoSize = True
-        Me.Label_AnzSim.Location = New System.Drawing.Point(294, 92)
-        Me.Label_AnzSim.Name = "Label_AnzSim"
-        Me.Label_AnzSim.Size = New System.Drawing.Size(62, 13)
-        Me.Label_AnzSim.TabIndex = 8
-        Me.Label_AnzSim.Text = "Anzahl Sim:"
+        Me.Label_AnzStep.AutoSize = True
+        Me.Label_AnzStep.Location = New System.Drawing.Point(294, 92)
+        Me.Label_AnzStep.Name = "Label_AnzStep"
+        Me.Label_AnzStep.Size = New System.Drawing.Size(81, 13)
+        Me.Label_AnzStep.TabIndex = 8
+        Me.Label_AnzStep.Text = "Anzahl Schritte:"
         '
         'RadioButton_Gleichverteilt
         '
@@ -167,7 +168,7 @@ Partial Class SensiPlot
         Me.CancelButton = Me.Cancel_Button
         Me.ClientSize = New System.Drawing.Size(452, 260)
         Me.Controls.Add(Me.GroupBox_Modus)
-        Me.Controls.Add(Me.Label_AnzSim)
+        Me.Controls.Add(Me.Label_AnzStep)
         Me.Controls.Add(Me.TextBox_AnzSim)
         Me.Controls.Add(Me.Label_OptZiele)
         Me.Controls.Add(Me.ListBox_OptZiele)
@@ -196,7 +197,7 @@ Partial Class SensiPlot
     Friend WithEvents ListBox_OptZiele As System.Windows.Forms.ListBox
     Friend WithEvents Label_OptZiele As System.Windows.Forms.Label
     Friend WithEvents TextBox_AnzSim As System.Windows.Forms.MaskedTextBox
-    Friend WithEvents Label_AnzSim As System.Windows.Forms.Label
+    Friend WithEvents Label_AnzStep As System.Windows.Forms.Label
     Friend WithEvents RadioButton_Gleichverteilt As System.Windows.Forms.RadioButton
     Friend WithEvents RadioButton_Diskret As System.Windows.Forms.RadioButton
     Friend WithEvents GroupBox_Modus As System.Windows.Forms.GroupBox
