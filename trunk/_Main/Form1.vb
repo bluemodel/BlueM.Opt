@@ -261,8 +261,8 @@ Partial Class Form1
 
                     SensiPlot1 = New SensiPlot
 
-                    'Ergebnisdatenbank ausschalten
-                    Sim1.Ergebnisdb = False
+                    'Ergebnisdatenbank einschalten
+                    Sim1.Ergebnisdb = True
 
                     'SensiPlot für Sim vorbereiten
                     Call Sim1.prepare_PES()
@@ -528,7 +528,7 @@ Partial Class Form1
     '***********************************************************
     Private Sub STARTEN_SensiPlot()
 
-        'Einschränkung:
+        'Hinweis:
         '------------------------------------------------------------------------
         'Die Modellparameter werden auch für die nicht ausgewählten OptParameter 
         'geschrieben, und zwar mit den in der OPT-Datei angegebenen Startwerten
@@ -565,8 +565,14 @@ Partial Class Form1
             surface.IrregularGrid = True
             surface.NumXValues = SensiPlot1.Anz_Steps
             surface.NumZValues = SensiPlot1.Anz_Steps
-            Me.DForm.Diag.Tools.Add(New Steema.TeeChart.Tools.Rotate)
+            'Diagramm drehen (rechter Mausbutton)
+            Dim rotate1 As New Steema.TeeChart.Tools.Rotate
+            rotate1.Button = Windows.Forms.MouseButtons.Right
+            Me.DForm.Diag.Tools.Add(rotate1)
+            'Punkte anklicken (linker Mausbutton)
             Me.DForm.Diag.add_MarksTips()
+            surface.Title = "Population"
+            surface.Cursor = Cursors.Hand
         End If
 
         'Simulationsschleife
@@ -575,10 +581,11 @@ Partial Class Form1
 
         n = 0
         'Äussere Schleife (2. OptParameter)
+        '----------------------------------
         For i = 0 To (SensiPlot1.Anz_Steps - 1 * (Me.globalAnzPar - 1))
 
+            '2. OptParameterwert variieren
             If (Me.globalAnzPar > 1) Then
-                '2. OptParameterwert variieren
                 Select Case SensiPlot1.Selected_SensiType
                     Case "Gleichverteilt"
                         Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).SKWert = Rnd()
@@ -588,6 +595,7 @@ Partial Class Form1
             End If
 
             'Innere Schleife (1. OptParameter)
+            '---------------------------------
             For j = 0 To SensiPlot1.Anz_Steps - 1
 
                 '1. OptParameterwert variieren
@@ -617,11 +625,19 @@ Partial Class Form1
                 End If
 
                 'Speichern des Simulationsergebnisses für Wave
-                'BUG 119: Die WEL-Datei hat bei Smusi einen anderen Namen!
-                Sim.Read_WEL(Sim1.WorkDir & Sim1.Datensatz & ".wel", Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).SimGr, Wave1.WaveList(n).Wave)
-                'TODO: Serienbezeichnung enthält nur Namen und Wert des ersten Optimierungsparameters!
-                Wave1.WaveList(n).Bezeichnung = Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Bezeichnung & ": " _
-                                                & Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Wert
+                If (SensiPlot1.show_Wave) Then
+                    'BUG 119: Die WEL-Datei hat bei Smusi einen anderen Namen!
+                    Sim.Read_WEL(Sim1.WorkDir & Sim1.Datensatz & ".wel", Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).SimGr, Wave1.WaveList(n).Wave)
+                    'TODO: Serienbezeichnung enthält nur Namen und Wert des ersten Optimierungsparameters!
+                    Wave1.WaveList(n).Bezeichnung = Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Bezeichnung & ": " _
+                                                    & Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Wert
+                End If
+
+                'Qualitätswerte und OptParameter in DB speichern
+                If (Sim1.Ergebnisdb = True) Then
+                    Call Sim1.db_update(n, 1)
+                End If
+
                 n += 1
 
                 System.Windows.Forms.Application.DoEvents()
@@ -629,34 +645,35 @@ Partial Class Form1
             Next
         Next
 
-
         'Wave Diagramm anzeigen:
         '-----------------------
-        'Achsen:
-        Dim Achsen As New Collection
-        Dim xAchse, yAchse As Diagramm.Achse
-        xAchse.Name = "Zeit"
-        xAchse.Auto = True
-        Achsen.Add(xAchse)
-        yAchse.Name = Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).SimGr
-        yAchse.Auto = True
-        Achsen.Add(yAchse)
+        If (SensiPlot1.show_Wave) Then
+            'Achsen:
+            Dim Achsen As New Collection
+            Dim xAchse, yAchse As Diagramm.Achse
+            xAchse.Name = "Zeit"
+            xAchse.Auto = True
+            Achsen.Add(xAchse)
+            yAchse.Name = Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).SimGr
+            yAchse.Auto = True
+            Achsen.Add(yAchse)
 
-        Call Wave1.WForm.Diag.DiagInitialise("SensiPlot", Achsen)
+            Call Wave1.WForm.Diag.DiagInitialise("SensiPlot", Achsen)
 
-        'Serien initialisieren
-        Dim tmpSeries As Steema.TeeChart.Styles.Line
-        For i = 0 To Anz_Sim - 1
-            tmpSeries = New Steema.TeeChart.Styles.Line(Wave1.WForm.Diag.Chart)
-            tmpSeries.Title = Wave1.WaveList(i).Bezeichnung
-            tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Nothing
-        Next
+            'Serien initialisieren
+            Dim tmpSeries As Steema.TeeChart.Styles.Line
+            For i = 0 To Anz_Sim - 1
+                tmpSeries = New Steema.TeeChart.Styles.Line(Wave1.WForm.Diag.Chart)
+                tmpSeries.Title = Wave1.WaveList(i).Bezeichnung
+                tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Nothing
+            Next
 
-        'Serien zeichnen
-        Call Wave1.Wave_draw()
+            'Serien zeichnen
+            Call Wave1.Wave_draw()
 
-        'Dialog anzeigen
-        Call Wave1.Show()
+            'Form anzeigen
+            Call Wave1.Show()
+        End If
 
     End Sub
 
@@ -1307,11 +1324,14 @@ GenerierenAusgangswerte:
 
                             'Series initialisieren
                             Dim tmpPoint As New Steema.TeeChart.Styles.Points(Me.DForm.Diag.Chart)
-                            tmpPoint.Title = "Simulationsergebnis"
+                            tmpPoint.Title = "Population"
                             tmpPoint.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
                             tmpPoint.Color = System.Drawing.Color.Orange
                             tmpPoint.Pointer.HorizSize = 2
                             tmpPoint.Pointer.VertSize = 2
+                            tmpPoint.Cursor = Cursors.Hand
+
+                            Call DForm.Diag.add_MarksTips()
 
                         Else
                             '2 OptParameter:
@@ -1352,8 +1372,6 @@ GenerierenAusgangswerte:
                             DForm.Diag.Aspect.Zoom = 66
 
                         End If
-
-                        Call DForm.Diag.add_MarksTips()
 
 
                     Case METH_CES, METH_CES_PES 'Methode CES
@@ -1429,7 +1447,6 @@ GenerierenAusgangswerte:
 
         'nur bei aktiver ErgebnisDB ausführen
         If (Not Sim1.Ergebnisdb) Then
-
             MsgBox("Wave funktioniert nur bei angeschlossener Ergebnisdatenbank!", MsgBoxStyle.Exclamation, "Fehler")
             Exit Sub
 
@@ -1564,10 +1581,10 @@ GenerierenAusgangswerte:
                 Next
 
                 'Reihen zeichnen
-                Wave1.Wave_draw()
+                Call Wave1.Wave_draw()
 
                 'Form anzeigen
-                Wave1.Show()
+                Call Wave1.Show()
 
             End If
 

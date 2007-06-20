@@ -1664,7 +1664,7 @@ Public MustInherit Class Sim
 
     'Update der ErgebnisDB mit QWerten und OptParametern
     '***************************************************
-    Private Function db_update(ByVal durchlauf As Integer, ByVal ipop As Short) As Boolean
+    Public Function db_update(ByVal durchlauf As Integer, ByVal ipop As Short) As Boolean
         Call db_connect()
 
         Dim i As Integer
