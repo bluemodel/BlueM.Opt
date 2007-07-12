@@ -27,6 +27,7 @@ Public Class BlueM
 
     'IHA
     '---
+    Private isIHA as Boolean = False
     Private IHA1 As IHA
 
 #End Region 'Eigenschaften
@@ -90,15 +91,20 @@ Public Class BlueM
         '----------------------------------
         Dim i As Integer
 
-        'IHA
+        'Gibt es eine IHA-Zielfunktion?
         For i = 0 To Me.List_OptZiele.GetUpperBound(0)
             If (Me.List_OptZiele(i).ZielTyp = "IHA") Then
+                'HACK: es wird immer das erste IHA-Ziel verwendet!
+                'IHA-Berechnung einschalten
+                Me.isIHA = True
+                'IHA-Objekt instanziieren
+                Me.IHA1 = New IHA(Me.List_OptZiele(i))
                 'IHA-Berechnung vorbereiten
-                Me.IHA1 = New IHA()
-                Call Me.IHA1.IHA_prepare(Me)
+                Call Me.IHA1.prepare_IHA(Me)
                 Exit For
             End If
         Next
+
 
     End Sub
 
@@ -259,6 +265,12 @@ Public Class BlueM
             'Simulation erfolgreich
             simOK = True
 
+            'Bei IHA-Berechnung jetzt IHA-Software ausführen
+            '-----------------------------------------------
+            If (Me.isIHA) Then
+                Call Me.IHA1.calculate_IHA(Me.WorkDir & Me.Datensatz & ".WEL")
+            End If
+
         End If
 
         Return simOK
@@ -294,7 +306,7 @@ Public Class BlueM
                 QWert = Me.SKos1.calculate_costs(Me)
 
             Case "IHA"
-                QWert = Me.IHA1.calculate_IHA(SimReihe)
+                QWert = Me.IHA1.QWert_IHA(OptZiel)
 
         End Select
 

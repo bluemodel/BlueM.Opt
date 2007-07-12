@@ -36,6 +36,7 @@ Public Class IHA
     'Eigenschaften
     '#############
 
+    Private IHAZiel As Sim.Struct_OptZiel           'Kopie des OptZiels mit ZielTyp "IHA"
     Private IHADir As String                        'Verzeichnis für IHA-Dateien
 
     'IHA-Ergebnisse
@@ -82,11 +83,14 @@ Public Class IHA
 
     'Konstruktor
     '***********
-    Public Sub New()
+    Public Sub New(ByVal OptZiel as Sim.Struct_OptZiel)
+
+        'IHAZiel kopieren
+        '----------------
+        Me.IHAZiel = OptZiel
 
         'IHA-Parametergruppen definieren
         '-------------------------------
-
         With Me.IHARes
 
             ReDim .IHAParamGroups(4)
@@ -122,12 +126,14 @@ Public Class IHA
 
     'IHA-Berechnung vorbereiten (einmalig)
     '*************************************
-    Public Sub IHA_prepare(ByRef BlueM1 As BlueM)
+    Public Sub prepare_IHA(ByRef BlueM1 As BlueM)
 
-        Me.IHADir = BlueM1.WorkDir & "IHA\"
+        Dim i As Integer
 
         'IHA-Unterverzeichnis anlegen
         '----------------------------
+        Me.IHADir = BlueM1.WorkDir & "IHA\"
+
         If (Directory.Exists(Me.IHADir) = False) Then
             Directory.CreateDirectory(Me.IHADir)
             'IHA_Batchfor.exe in Verzeichnis kopieren
@@ -150,18 +156,11 @@ Public Class IHA
 
         End If
 
-        Dim i As Integer
-
         'Datume bestimmen
         '-----------------------------
         'Referenz-Zeitreihe raussuchen
         Dim ZeitReihe(,) As Object = {}
-        For i = 0 To BlueM1.List_OptZiele.GetUpperBound(0)
-            If (BlueM1.List_OptZiele(i).ZielTyp = "IHA") Then
-                ZeitReihe = BlueM1.List_OptZiele(i).ZielReihe
-                Exit For
-            End If
-        Next
+        ZeitReihe = IHAZiel.ZielReihe
 
         'BeginPre
         Dim StartDatum As DateTime = ZeitReihe(0, 0)
@@ -318,12 +317,17 @@ Public Class IHA
 
     End Sub
 
-    'IHA-Berechnung ausführen (gibt QWert zurück)
-    '********************************************
-    Public Function calculate_IHA(ByVal simreihe As Object(,)) As Double
+    'IHA-Berechnung ausführen
+    '************************
+    Public Sub calculate_IHA(ByVal WELFile As String)
 
         Dim i, j, k As Integer
-        Dim QWert As Double
+        Dim isOK As Boolean
+        Dim simreihe As Object(,) = {}
+
+        'Simulationsreihe einlesen
+        '-------------------------
+        isOK = Sim.Read_WEL(WELFile, Me.IHAZiel.SimGr, simreihe)
 
         'Simulationsreihe entsprechend kürzen
         Dim Startdatum As DateTime = simreihe(0, 0)
@@ -380,22 +384,37 @@ Public Class IHA
         '-----------------------
         Call read_IHAResults()
 
-        'QWert berechnen
-        '---------------
-        QWert = calculate_QWert()
-
-        Return QWert
-
-    End Function
+    End Sub
 
     'QWert aus IHA-Ergebnissen berechnen
     '***********************************
-    Private Function calculate_QWert() As Double
+    Public Function QWert_IHA(ByVal OptZiel As Sim.Struct_OptZiel) As Double
 
-        Dim QWert as Double
+        Dim QWert As Double
+        Dim HA As Double
+        Dim i As Integer
+        'Parameter für Normalverteilung mit f(0) ~= 1
+        Dim std As Double = 0.398942423706863                   'Standardabweichung
+        Dim avg As Double = 0                                   'Erwartungswert
 
-        'QWert = (Mittelwert von HA) ^2
-        QWert = IHARes.Avg * IHARes.Avg
+        'HA-Wert bestimmen
+        '-----------------
+        If (OptZiel.ZielFkt = "") Then
+            'HA Gesamtmittelwert
+            HA = Me.IHARes.Avg
+        Else
+            'HA Mittelwert einer Parametergruppe
+            For i = 0 To Me.IHARes.IHAParamGroups.GetUpperBound(0)
+                If (OptZiel.ZielFkt = Me.IHARes.IHAParamGroups(i).GName) Then
+                    HA = Me.IHARes.IHAParamGroups(i).Avg
+                    Exit For
+                End If
+            Next
+        End If
+
+        'QWert = 1 - f(x)
+        '[EXCEL:] 1/(std*WURZEL(2*PI()))*EXP(-1/2*((X-avg)/std)^2)
+        QWert = 1 - 1 / (std * Math.Sqrt(2 * Math.PI)) * Math.Exp(-1 / 2 * ((HA - avg) / std) ^ 2)
 
         Return QWert
 
