@@ -1445,25 +1445,33 @@ GenerierenAusgangswerte:
     '***************************
     Public Sub showWave(ByVal sender As Object, ByVal s As Steema.TeeChart.Styles.Series, ByVal valueIndex As Integer, ByVal e As System.Windows.Forms.MouseEventArgs)
 
-        'nur bei aktiver ErgebnisDB ausführen
-        If (Not Sim1.Ergebnisdb) Then
-            MsgBox("Wave funktioniert nur bei angeschlossener Ergebnisdatenbank!", MsgBoxStyle.Exclamation, "Fehler")
+        'Notwendige Bedingungen überprüfen
+        '---------------------------------
+        If (IsNothing(Sim1)) Then
+            'Anwendung != Sim
+            MsgBox("Wave funktioniert nur bei Anwendungen BlueM oder SMUSI!", MsgBoxStyle.Information, "Info")
+            Exit Sub
+
+        ElseIf (Not Sim1.Ergebnisdb) Then
+            'ErgebnisDB ist deaktiviert
+            MsgBox("Wave funktioniert nur bei angeschlossener Ergebnisdatenbank!", MsgBoxStyle.Information, "Info")
+            Exit Sub
+
+        ElseIf (Not s.Title.StartsWith("Population")) Then
+            'Serientitel fängt nicht mit "Population" an
+            MsgBox("Parametersätze können leider nur" & Chr(13) & Chr(10) _
+                        & "für Populations-Punkte" & Chr(13) & Chr(10) _
+                        & "aus der DB abgerufen werden!", MsgBoxStyle.Information, "Info")
             Exit Sub
 
         Else
 
-            'nur bei Population-Serien ausführen
-            If (Not s.Title.StartsWith("Population")) Then
-                MsgBox("Parametersätze können leider nur" & Chr(13) & Chr(10) _
-                        & "für Populations-Punkte" & Chr(13) & Chr(10) _
-                        & "aus der DB abgerufen werden!", MsgBoxStyle.Information, "Info")
-                Exit Sub
-            End If
-
             'Bestimmung der Parametersatz-ID
+            '-------------------------------
             Dim dbID As Integer
-            'valueIndex fängt bei 0 an, DB-ID aber bei 1
+            'valueIndex fängt bei 0 an, ID aber bei 1
             If (Me.EVO_Einstellungen1.isPOPUL) Then
+                'Bei Populationen muss ID mithilfe von ipop (hinterlegt im Serentitel) bestimmt werden
                 Dim ipop As Integer = Convert.ToInt32(s.Title.Substring(10).Trim)
                 Dim nKalk As Integer = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
                 dbID = ((ipop - 1) * nKalk) + (valueIndex + 1)
