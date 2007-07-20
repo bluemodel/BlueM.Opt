@@ -325,8 +325,13 @@ Partial Class Form1
 
                     'CES für Sim vorbereiten
                     Call Sim1.prepare_CES()
-
+                    'CES initialisieren
                     CES1 = New EvoKern.CES
+                    'Prüft ob die Zahl mög. Kombinationen < Zahl Eltern + Nachfolger
+                    If (CES1.n_Childs + CES1.n_Parents) > Sim1.No_of_Combinations Then
+                        Throw New Exception("Die Zahl der Eltern + die Zahl der Kinder ist größer als die mögliche Zahl der Kombinationen.")
+                    End If
+
 
                     'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
                     If (Sim1.List_OptZiele.GetLength(0) = 1) Then
@@ -377,10 +382,15 @@ Partial Class Form1
 
                     'CES für Sim vorbereiten
                     Call Sim1.prepare_CES()
+                    'CES initialisieren
+                    CES1 = New EvoKern.CES
+                    'Prüft ob die Zahl mög. Kombinationen < Zahl Eltern + Nachfolger
+                    If (CES1.n_Childs + CES1.n_Parents) > Sim1.No_of_Combinations Then
+                        Throw New Exception("Die Zahl der Eltern + die Zahl der Kinder ist größer als die mögliche Zahl der Kombinationen.")
+                    End If
+
                     'PES für Sim vorbereiten
                     Call Sim1.prepare_PES()
-
-                    CES1 = New EvoKern.CES
 
                     'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
                     If (Sim1.List_OptZiele.GetLength(0) = 1) Then
@@ -883,7 +893,7 @@ Partial Class Form1
                 '******************************************
 
                 'Zeichnen MO_SO
-                Call DForm.Diag.prepareSeries(0, "Childs", Steema.TeeChart.Styles.PointerStyles.Triangle, 3)
+                Call DForm.Diag.prepareSeries(0, "Childs", Steema.TeeChart.Styles.PointerStyles.Triangle, 4)
                 If CES1.n_Penalty = 1 Then
                     Call DForm.Diag.Series(0).Add(durchlauf_all, CES1.List_Childs(i).Penalty(0))
                 ElseIf CES1.n_Penalty = 2 Then
@@ -1246,7 +1256,7 @@ GenerierenAusgangswerte:
     '*****************************
     Private Sub SekundärePopulationZeichnen(ByVal Population(,) As Double)
         Dim i As Short
-        Call DForm.Diag.prepareSeries(Me.Exchange.Series_No + 1, "Sekundäre Population", Steema.TeeChart.Styles.PointerStyles.Circle, 4)
+        Call DForm.Diag.prepareSeries(Me.Exchange.Series_No + 1, "Sekundäre Population", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
         With DForm.Diag.Series(Me.Exchange.Series_No + 1)
             .Clear()
             If UBound(Population, 2) = 2 Then

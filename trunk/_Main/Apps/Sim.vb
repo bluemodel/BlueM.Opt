@@ -999,7 +999,7 @@ Public MustInherit Class Sim
         ElseIf (GlobalAnzZiel > 1) Then
             'MultiObjective
             'BUG 66: nur die ersten beiden Zielfunktionen werden gezeichnet
-            Call Diag.prepareSeries(Series_No, "Population")
+            Call Diag.prepareSeries(Series_No, "Population", Steema.TeeChart.Styles.PointerStyles.Circle, 4)
             Diag.Series(Series_No).Cursor = Cursors.Hand
             Call Diag.Series(Series_No).Add(List_OptZiele(0).QWertTmp, List_OptZiele(1).QWertTmp)
         End If
