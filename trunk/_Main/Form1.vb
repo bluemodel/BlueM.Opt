@@ -958,20 +958,21 @@ Partial Class Form1
                 '*************************************************
                 Call Sim1.Prepare_Evaluation_CES(CES1.List_Parents(i).Path)
 
-                'Reduktion der OptimierungsParameter
-                '***********************************
-                Call Sim1.Reduce_OptPara_ModPara(CES1.List_Parents(i).Elemente)
+                'Reduktion der OptimierungsParameter und immer dann wenn nicht Nullvariante
+                '****************************************************************************
+                If Sim1.Reduce_OptPara_ModPara(CES1.List_Parents(i).Elemente) Then
 
-                'Parameterübergabe an PES
-                '************************
-                Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
-                'Starten der PES
-                '***************
-                Call STARTEN_PES(Exchange)
+                    'Parameterübergabe an PES
+                    '************************
+                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
+                    'Starten der PES
+                    '***************
+                    Call STARTEN_PES(Exchange)
 
-                'Series wird zwei weiter gesetzt
-                Me.Exchange.Series_No += 2
+                    'Series wird zwei weiter gesetzt
+                    Me.Exchange.Series_No += 2
 
+                End If
             End If
         Next
     End Sub

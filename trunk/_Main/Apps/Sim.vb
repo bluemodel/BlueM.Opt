@@ -841,8 +841,9 @@ Public MustInherit Class Sim
 
     'Reduziert die OptParameter und die ModellParameter auf die aktiven Elemente
     '***************************************************************************
-    Public Sub Reduce_OptPara_ModPara(ByVal Bauwerksliste() As Object)
-        Dim i as Integer
+    Public Function Reduce_OptPara_ModPara(ByVal Bauwerksliste() As Object) As Boolean
+        Reduce_OptPara_ModPara = True
+        Dim i As Integer
 
         'Kopieren der Listen aus den Sicherungen
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -850,9 +851,9 @@ Public MustInherit Class Sim
         For i = 0 To List_ModellParameter_Save.GetUpperBound(0)
             copy_Struct_ModellParemeter(List_ModellParameter_Save(i), List_ModellParameter(i))
         Next
-        Redim List_OptParameter(List_OptParameter_Save.GetUpperBound(0))
+        ReDim List_OptParameter(List_OptParameter_Save.GetUpperBound(0))
         For i = 0 To List_OptParameter_Save.GetUpperBound(0)
-            copy_Struct_OptParemeter(List_OptParameter_Save(i),List_OptParameter(i))
+            copy_Struct_OptParemeter(List_OptParameter_Save(i), List_OptParameter(i))
         Next
 
         'Reduzierung der ModParameter
@@ -871,45 +872,48 @@ Public MustInherit Class Sim
             Next
         Next
 
+        'Immer dann wenn nicht Nullvariante
+        '**********************************
         If count = 0 Then
-            Throw New Exception("Die aktuelle Kombination enthält keine Bauwerke, für die OptimierungsParameter vorliegen")
-        End If
+            Reduce_OptPara_ModPara = False
+        Else
+            Array.Resize(TMP_ModPara, count)
+            Array.Resize(List_ModellParameter, count)
 
-        Array.Resize(TMP_ModPara, count)
-        Array.Resize(List_ModellParameter, count)
-
-        For i = 0 To TMP_ModPara.GetUpperBound(0)
-            Call copy_Struct_ModellParemeter(TMP_ModPara(i), List_ModellParameter(i))
-        Next
-
-        'Reduzierung der OptParameter
-        'xxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        Dim TMP_OptPara() As Struct_OptParameter
-        ReDim TMP_OptPara(List_OptParameter.GetUpperBound(0))
-
-        count = 0
-        For i = 0 To List_OptParameter.GetUpperBound(0)
-            For j = 0 To List_ModellParameter.GetUpperBound(0)
-                If List_OptParameter(i).Bezeichnung = List_ModellParameter(j).OptParameter Then
-                    Call copy_Struct_OptParemeter(List_OptParameter(i), TMP_OptPara(count))
-                    count += 1
-                    j = List_ModellParameter.GetUpperBound(0)
-                End If
+            For i = 0 To TMP_ModPara.GetUpperBound(0)
+                Call copy_Struct_ModellParemeter(TMP_ModPara(i), List_ModellParameter(i))
             Next
-        Next
 
-        If count = 0 Then
-            Throw New Exception("Die aktuelle Kombination enthält keine Bauwerke, für die OptimierungsParameter vorliegen")
+            'Reduzierung der OptParameter
+            'xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+            Dim TMP_OptPara() As Struct_OptParameter
+            ReDim TMP_OptPara(List_OptParameter.GetUpperBound(0))
+
+            count = 0
+            For i = 0 To List_OptParameter.GetUpperBound(0)
+                For j = 0 To List_ModellParameter.GetUpperBound(0)
+                    If List_OptParameter(i).Bezeichnung = List_ModellParameter(j).OptParameter Then
+                        Call copy_Struct_OptParemeter(List_OptParameter(i), TMP_OptPara(count))
+                        count += 1
+                        j = List_ModellParameter.GetUpperBound(0)
+                    End If
+                Next
+            Next
+
+            If count = 0 Then
+                Throw New Exception("Die aktuelle Kombination enthält keine Bauwerke, für die OptimierungsParameter vorliegen")
+            End If
+
+            Array.Resize(TMP_OptPara, count)
+            Array.Resize(List_OptParameter, count)
+
+            For i = 0 To TMP_OptPara.GetUpperBound(0)
+                Call copy_Struct_OptParemeter(TMP_OptPara(i), List_OptParameter(i))
+            Next
+
         End If
 
-        Array.Resize(TMP_OptPara, count)
-        Array.Resize(List_OptParameter, count)
-
-        For i = 0 To TMP_OptPara.GetUpperBound(0)
-            Call copy_Struct_OptParemeter(TMP_OptPara(i), List_OptParameter(i))
-        Next
-
-    End Sub
+    End Function
 
     'Kopiert ein Strukt_ModellParameter
     '**********************************
