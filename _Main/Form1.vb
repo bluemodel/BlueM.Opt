@@ -6,14 +6,14 @@ Imports System.IO
 '*******************************************************************************
 '**** ihwb Optimierung                                                      ****
 '****                                                                       ****
-'**** Dirk Muschalla, Christoph Huebner, Felix Froehlich                    ****
+'**** Christoph Huebner, Felix Froehlich, Dirk Muschalla                    ****
 '****                                                                       ****
 '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
 '**** TU Darmstadt                                                          ****
 '****                                                                       ****
 '**** Erstellt: Dezember 2003                                               ****
 '****                                                                       ****
-'**** Letzte Änderung: April 2007                                           ****
+'**** Letzte Änderung: Juli 2007                                           ****
 '*******************************************************************************
 '*******************************************************************************
 
