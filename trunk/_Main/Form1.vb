@@ -592,7 +592,7 @@ Partial Class Form1
         n = 0
         'Äussere Schleife (2. OptParameter)
         '----------------------------------
-        For i = 0 To (SensiPlot1.Anz_Steps - 1 * (Me.globalAnzPar - 1))
+        For i = 0 To ((SensiPlot1.Anz_Steps - 1) * (Me.globalAnzPar - 1))
 
             '2. OptParameterwert variieren
             If (Me.globalAnzPar > 1) Then
