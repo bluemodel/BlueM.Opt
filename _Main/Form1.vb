@@ -560,8 +560,7 @@ Partial Class Form1
         End If
 
         'Wave deklarieren
-        Dim Wave1 As New Main.Wave
-        ReDim Wave1.WaveList(Anz_Sim - 1)
+        Dim Wave1 As New Wave.Wave
 
         Dim i, j, n As Integer
 
@@ -569,7 +568,7 @@ Partial Class Form1
         Call PrepareDiagramm()
 
         'Oberflächendiagramm
-        Dim surface As Steema.TeeChart.Styles.Surface
+        Dim surface As New Steema.TeeChart.Styles.Surface
         If (Me.globalAnzPar > 1) Then
             surface = New Steema.TeeChart.Styles.Surface(Me.DForm.Diag.Chart)
             surface.IrregularGrid = True
@@ -634,13 +633,15 @@ Partial Class Form1
                     surface.Add(Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Wert, Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).QWertTmp, Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Wert)
                 End If
 
-                'Speichern des Simulationsergebnisses für Wave
+                'Simulationsergebnis in Wave laden
                 If (SensiPlot1.show_Wave) Then
                     'BUG 119: Die WEL-Datei hat bei Smusi einen anderen Namen!
-                    Sim.Read_WEL(Sim1.WorkDir & Sim1.Datensatz & ".wel", Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).SimGr, Wave1.WaveList(n).Wave)
-                    'TODO: Serienbezeichnung enthält nur Namen und Wert des ersten Optimierungsparameters!
-                    Wave1.WaveList(n).Bezeichnung = Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Bezeichnung & ": " _
-                                                    & Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Wert
+                    Dim WEL As New Wave.WEL(Sim1.WorkDir & Sim1.Datensatz & ".wel", Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).SimGr)
+                    'OptParameter und -Wert an Titel anhängen
+                    'TODO: bei 2-Parametern auch den Wert des 2. Parameters anhängen!
+                    WEL.Zeitreihen(0).Title += " (" & Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Bezeichnung & ": " _
+                                                    & Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Wert & ")"
+                    Wave1.Import_Zeitreihe(WEL.Zeitreihen(0))
                 End If
 
                 'Qualitätswerte und OptParameter in DB speichern
@@ -658,30 +659,6 @@ Partial Class Form1
         'Wave Diagramm anzeigen:
         '-----------------------
         If (SensiPlot1.show_Wave) Then
-            'Achsen:
-            Dim Achsen As New Collection
-            Dim xAchse, yAchse As Diagramm.Achse
-            xAchse.Name = "Zeit"
-            xAchse.Auto = True
-            Achsen.Add(xAchse)
-            yAchse.Name = Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).SimGr
-            yAchse.Auto = True
-            Achsen.Add(yAchse)
-
-            Call Wave1.WForm.Diag.DiagInitialise("SensiPlot", Achsen)
-
-            'Serien initialisieren
-            Dim tmpSeries As Steema.TeeChart.Styles.Line
-            For i = 0 To Anz_Sim - 1
-                tmpSeries = New Steema.TeeChart.Styles.Line(Wave1.WForm.Diag.Chart)
-                tmpSeries.Title = Wave1.WaveList(i).Bezeichnung
-                tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Nothing
-            Next
-
-            'Serien zeichnen
-            Call Wave1.Wave_draw()
-
-            'Form anzeigen
             Call Wave1.Show()
         End If
 
@@ -1511,20 +1488,19 @@ GenerierenAusgangswerte:
             Dim res As MsgBoxResult = MsgBox("Diesen Parametersatz simulieren?" & Chr(13) & Chr(10) & OptParaString, MsgBoxStyle.OkCancel, "Info")
             If (res = MsgBoxResult.Ok) Then
 
-                'Simulieren
-                Sim1.launchSim()
-
-                'Wave anzeigen
-                '-------------
-                Dim Wave1 As New Wave()
-                Dim n As Integer = 0                            'Anzahl Waves
                 Dim SimSeries As New Collection                 'zu zeichnende Simulationsgrößen
                 Dim RefSeries As New Collection                 'zu zeichnende Referenzreihen
                 Dim QWertString As String                       'String für die Anzeige der QWerte
 
+                'Simulieren
+                Sim1.launchSim()
+
+                'Wave instanzieren
+                Dim Wave1 As New Wave.Wave
+
                 QWertString = "QWerte: " & Chr(13) & Chr(10)
 
-                'zu zeichnenden Reihen raussuchen
+                'zu zeichnenden Reihen aus Liste der OptZiele raussuchen
                 For i = 0 To Sim1.List_OptZiele.GetUpperBound(0)
 
                     With Sim1.List_OptZiele(i)
@@ -1534,6 +1510,7 @@ GenerierenAusgangswerte:
                         QWertString &= Chr(13) & Chr(10) & .Bezeichnung & ": " & .QWertTmp.ToString()
 
                         'Name der WEL-Simulationsergebnisdatei
+                        'BUG 137: Name der Ergebnisdatei
                         Dim WELFile As String = ""
                         If (Anwendung = ANW_BLUEM) Then
                             WELFile = Sim1.WorkDir & Sim1.Datensatz & ".WEL"
@@ -1544,13 +1521,8 @@ GenerierenAusgangswerte:
                         'Simulationsgrößen nur jeweils ein Mal zeichnen
                         If (Not SimSeries.Contains(.SimGr)) Then
                             SimSeries.Add(.SimGr, .SimGr)
-                            'Simulationsergebnis in Wave speichern
-                            Dim simresult(,) As Object = {}
-                            Dim isOK As Boolean = Sim.Read_WEL(WELFile, .SimGr, simresult)
-                            n += 1
-                            ReDim Preserve Wave1.WaveList(n - 1)
-                            Wave1.WaveList(n - 1).Bezeichnung = .SimGr
-                            Wave1.WaveList(n - 1).Wave = simresult
+                            'Simulationsergebnis in Wave laden
+                            Wave1.Import_WEL(WELFile, .SimGr)
                         End If
 
                         'ggf. Referenzreihe in Wave speichern
@@ -1558,51 +1530,20 @@ GenerierenAusgangswerte:
                             'Referenzreihen nur jeweils ein Mal zeichnen
                             If (Not RefSeries.Contains(.ZielReiheDatei & .ZielGr)) Then
                                 RefSeries.Add(.ZielGr, .ZielReiheDatei & .ZielGr)
-                                n += 1
-                                ReDim Preserve Wave1.WaveList(n - 1)
-                                Wave1.WaveList(n - 1).Bezeichnung = .SimGr & " (REF)"
-                                Wave1.WaveList(n - 1).Wave = .ZielReihe
+                                'Referenzreihe in Wave laden
+                                Wave1.Import_Zeitreihe(.ZielReihe)
                             End If
                         End If
 
                     End With
                 Next
 
-                'Titel
-                Dim Titel As String = "Simulationsergebnis"
-                'Achsen
-                Dim Achsen As New Collection
-                'X-Achse: Zeit
-                Dim XAchse As Diagramm.Achse
-                XAchse.Name = "Zeit"
-                XAchse.Auto = True
-                Achsen.Add(XAchse)
-                'Y-Achse: 
-                Dim YAchse As Diagramm.Achse
-                YAchse.Name = ""
-                YAchse.Auto = True
-                Achsen.Add(YAchse)
-
-                'Initialisierung
-                Call Wave1.WForm.Diag.DiagInitialise(Titel, Achsen)
-
                 'Annotation anzeigen
-                Dim anno1 As New Steema.TeeChart.Tools.Annotation(Wave1.WForm.Diag.Chart)
+                Dim anno1 As New Steema.TeeChart.Tools.Annotation(Wave1.TChart1.Chart)
                 anno1.Text = QWertString & Chr(13) & Chr(10) & OptParaString
                 anno1.Position = Steema.TeeChart.Tools.AnnotationPositions.LeftTop
 
-                'Serien initialisieren
-                Dim tmpSeries As Steema.TeeChart.Styles.Line
-                For i = 0 To Wave1.WaveList.GetUpperBound(0)
-                    tmpSeries = New Steema.TeeChart.Styles.Line(Wave1.WForm.Diag.Chart)
-                    tmpSeries.Title = Wave1.WaveList(i).Bezeichnung
-                    tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Nothing
-                Next
-
-                'Reihen zeichnen
-                Call Wave1.Wave_draw()
-
-                'Form anzeigen
+                'Wave anzeigen
                 Call Wave1.Show()
 
             End If

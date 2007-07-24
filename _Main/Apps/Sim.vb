@@ -100,7 +100,7 @@ Public MustInherit Class Sim
         Public ZielWert As String                   'Der vorgegeben Zielwert
         Public ZielReiheDatei As String             'Der Dateiname der Zielreihe
         Public ZielGr As String                     'Spalte der .wel Datei falls ZielReihe .wel Datei ist
-        Public ZielReihe(,) As Object               'Die Werte der Zielreihe
+        Public ZielReihe As Wave.Zeitreihe          'Die Werte der Zielreihe
         Public QWertTmp As Double                   'Qualitätswert der letzten Simulation wird hier zwischengespeichert 
         Public Overrides Function toString() As String
             Return Bezeichnung
@@ -411,11 +411,10 @@ Public MustInherit Class Sim
     'Optimierungsziele einlesen
     '**************************
     Protected Overridable Sub Read_OptZiele()
+
         Dim AnzZiele As Integer = 0
-        Dim IsOK As Boolean
         Dim ext As String
-        Dim i As Integer = 0
-        Dim j As Integer = 0
+        Dim i As Integer
 
         Dim Datei As String = WorkDir & Datensatz & "." & OptZiele_Ext
 
@@ -446,6 +445,7 @@ Public MustInherit Class Sim
         'Einlesen der Zeile und übergeben an die OptimierungsZiele Liste
         Dim ZeilenArray(9) As String
 
+        i = 0
         Do
             Zeile = StrRead.ReadLine.ToString()
             If (Zeile.StartsWith("*") = False) Then
@@ -472,52 +472,47 @@ Public MustInherit Class Sim
         Dim ZielEnde As Date
 
         For i = 0 To AnzZiele - 1
-            If (List_OptZiele(i).ZielTyp = "Reihe" Or List_OptZiele(i).ZielTyp = "IHA") Then
+            With List_OptZiele(i)
+                If (.ZielTyp = "Reihe" Or .ZielTyp = "IHA") Then
 
-                'Dateiendung der Zielreihendatei bestimmen und Reihe einlesen
-                ext = Path.GetExtension(List_OptZiele(i).ZielReiheDatei)
-                Select Case (ext.ToUpper)
-                    Case ".WEL"
-                        IsOK = Read_WEL(Me.WorkDir & List_OptZiele(i).ZielReiheDatei, List_OptZiele(i).ZielGr, List_OptZiele(i).ZielReihe)
-                    Case ".ZRE"
-                        IsOK = Read_ZRE(Me.WorkDir & List_OptZiele(i).ZielReiheDatei, List_OptZiele(i).ZielReihe)
-                    Case ".PRB"
-                        IsOK = Read_PRB(Me.WorkDir & List_OptZiele(i).ZielReiheDatei, List_OptZiele(i).ZielGr, List_OptZiele(i).ZielReihe)
-                    Case Else
-                        IsOK = False
-                End Select
+                    'Dateiendung der Zielreihendatei bestimmen und Reihe einlesen
+                    ext = Path.GetExtension(.ZielReiheDatei)
+                    Select Case (ext.ToUpper)
+                        Case ".WEL"
+                            Dim WEL As New Wave.WEL(Me.WorkDir & .ZielReiheDatei, .ZielGr)
+                            .ZielReihe = WEL.Read_WEL()(0)
+                        Case ".ZRE"
+                            Dim ZRE As New Wave.ZRE(Me.WorkDir & .ZielReiheDatei)
+                            .ZielReihe = ZRE.Zeitreihe
+                        Case ".PRB"
+                            'BUG 136: geht nicht mehr, weil PRB-Dateien keine Zeitreihen sind!
+                            'IsOK = Read_PRB(Me.WorkDir & .ZielReiheDatei, .ZielGr, .ZielReihe)
+                        Case Else
+                            Throw New Exception("Das Format der Zielreihe '" & .ZielReiheDatei & "' wurde nicht erkannt!")
+                    End Select
 
-                If (IsOK = False) Then
-                    Throw New Exception("Fehler beim einlesen der Zielreihe '" & List_OptZiele(i).ZielReiheDatei & "'" & Chr(13) & Chr(10) & "Ein Fehler könnten Leerzeichen in der letzten Zeile der Datei sein")
-                End If
+                    'Zeitraum der Zielreihe überprüfen (nur bei WEL und ZRE)
+                    '-------------------------------------------------------
+                    If (ext.ToUpper = ".WEL" Or ext.ToUpper = ".ZRE") Then
 
-                'Zielreihe entsprechend dem Simulationszeitraum kürzen (nur bei WEL und ZRE)
-                '---------------------------------------------------------------------------
-                If (ext.ToUpper = ".WEL" Or ext.ToUpper = ".ZRE") Then
+                        ZielStart = .ZielReihe.XWerte(0)
+                        ZielEnde = .ZielReihe.XWerte(.ZielReihe.Length - 1)
 
-                    ZielStart = List_OptZiele(i).ZielReihe(0, 0)
-                    ZielEnde = List_OptZiele(i).ZielReihe(List_OptZiele(i).ZielReihe.GetUpperBound(0), 0)
+                        If (ZielStart > Me.SimStart Or ZielEnde < Me.SimEnde) Then
+                            'Zielreihe deckt Simulationszeitraum nicht ab
+                            Throw New Exception("Die Zielreihe '" & .ZielReiheDatei & "' deckt den Simulationszeitraum nicht ab!")
+                        Else
+                            'Zielreihe auf Simulationszeitraum kürzen
+                            Call .ZielReihe.cut(Me.SimStart, Me.SimEnde)
+                        End If
 
-                    If (ZielStart > Me.SimStart Or ZielEnde < Me.SimEnde) Then
-                        'Zielreihe deckt Simulationszeitraum nicht ab
-                        Throw New Exception("Die Zielreihe '" & List_OptZiele(i).ZielReiheDatei & "' deckt den Simulationszeitraum nicht ab!")
-                    Else
-                        'Länge der Simulationszeitreihe:
-                        Dim length_n As Integer = ((Me.SimEnde - Me.SimStart).TotalSeconds / Me.SimDT.TotalSeconds) + 1
-                        'Zielreihe kopieren und redimensionieren
-                        Dim tmpArray(,) As Object = List_OptZiele(i).ZielReihe
-                        ReDim List_OptZiele(i).ZielReihe(length_n - 1, 1)
-                        'Abstand zwischen Start von Simreihe und Zielreihe bestimmen
-                        Dim offset_t As TimeSpan = Me.SimStart - ZielStart
-                        Dim dt As TimeSpan = tmpArray(1, 0) - tmpArray(0, 0) 'BUG 105: Es wird von konstanten Zeitschritten ausgegangen
-                        Dim offset_n As Integer = offset_t.TotalSeconds / dt.TotalSeconds
-                        'Simulationszeitraum zurück in Zielreihe kopieren
-                        Array.Copy(tmpArray, offset_n * 2, List_OptZiele(i).ZielReihe, 0, length_n * 2)
                     End If
 
-                End If
+                    'Zielreihe umbenennen
+                    .ZielReihe.Title += " (Referenz)"
 
-            End If
+                End If
+            End With
         Next
     End Sub
 
@@ -1149,7 +1144,9 @@ Public MustInherit Class Sim
 
             Case "PRB"
                 'QWert aus PRB-Datei
-                QWert = QWert_PRB(OptZiel)
+                'BUG 138: PRB geht nicht, weil keine Zeitreihe
+                Throw New Exception("PRB als OptZiel geht z.Zt. nicht (siehe Bug 138)")
+                'QWert = QWert_PRB(OptZiel)
 
             Case Else
                 'es wurde eine nicht unterstützte Ergebnisdatei angegeben
@@ -1167,12 +1164,12 @@ Public MustInherit Class Sim
     '***************************
     Protected Overridable Function QWert_WEL(ByVal OptZiel As Struct_OptZiel) As Double
 
-        Dim IsOK As Boolean
         Dim QWert As Double
-        Dim SimReihe(,) As Object = {}
 
         'Simulationsergebnis auslesen
-        IsOK = Read_WEL(WorkDir & Datensatz & ".wel", OptZiel.SimGr, SimReihe)
+        Dim SimReihe As New Wave.Zeitreihe(OptZiel.SimGr)
+        Dim WEL As New Wave.WEL(WorkDir & Datensatz & ".wel", OptZiel.SimGr)
+        SimReihe = WEL.Read_WEL()(0)
 
         'Fallunterscheidung Zieltyp
         '--------------------------
@@ -1193,7 +1190,7 @@ Public MustInherit Class Sim
     'Qualitätswert berechnen: Zieltyp = Reihe
     '****************************************
     'BUG 105: Konstante und gleiche Zeitschrittweiten vorausgesetzt!
-    Protected Function QWert_Reihe(ByVal OptZiel As Struct_OptZiel, ByVal SimReihe As Object(,)) As Double
+    Protected Function QWert_Reihe(ByVal OptZiel As Struct_OptZiel, ByVal SimReihe As Wave.Zeitreihe) As Double
 
         Dim QWert As Double
         Dim i As Integer
@@ -1204,14 +1201,14 @@ Public MustInherit Class Sim
 
             Case "AbQuad"
                 'Summe der Fehlerquadrate
-                For i = 0 To SimReihe.GetUpperBound(0)
-                    QWert += (OptZiel.ZielReihe(i, 1) - SimReihe(i, 1)) * (OptZiel.ZielReihe(i, 1) - SimReihe(i, 1))
+                For i = 0 To SimReihe.Length - 1
+                    QWert += (OptZiel.ZielReihe.YWerte(i) - SimReihe.YWerte(i)) * (OptZiel.ZielReihe.YWerte(i) - SimReihe.YWerte(i))
                 Next
 
             Case "Diff"
                 'Summe der Fehler
-                For i = 0 To SimReihe.GetUpperBound(0)
-                    QWert += Math.Abs(OptZiel.ZielReihe(i, 1) - SimReihe(i, 1))
+                For i = 0 To SimReihe.Length - 1
+                    QWert += Math.Abs(OptZiel.ZielReihe.YWerte(i) - SimReihe.YWerte(i))
                 Next
 
             Case "Volf"
@@ -1219,31 +1216,31 @@ Public MustInherit Class Sim
                 'BUG 104: Volumenfehler rechnet noch nicht echtes Volumen, dazu ist Zeitschrittweite notwendig
                 Dim VolSim As Double = 0
                 Dim VolZiel As Double = 0
-                For i = 0 To SimReihe.GetUpperBound(0)
-                    VolSim += SimReihe(i, 1)
-                    VolZiel += OptZiel.ZielReihe(i, 1)
+                For i = 0 To SimReihe.Length - 1
+                    VolSim += SimReihe.YWerte(i)
+                    VolZiel += OptZiel.ZielReihe.YWerte(i)
                 Next
                 QWert = Math.Abs(VolZiel - VolSim)
 
             Case "nUnter"
                 'Relative Anzahl der Zeitschritte mit Unterschreitungen (in Prozent)
                 Dim nUnter As Integer = 0
-                For i = 0 To SimReihe.GetUpperBound(0)
-                    If (SimReihe(i, 1) < OptZiel.ZielReihe(i, 1)) Then
+                For i = 0 To SimReihe.Length - 1
+                    If (SimReihe.YWerte(i) < OptZiel.ZielReihe.YWerte(i)) Then
                         nUnter += 1
                     End If
                 Next
-                QWert = nUnter / SimReihe.GetUpperBound(0) * 100
+                QWert = nUnter / SimReihe.Length * 100
 
             Case "nÜber"
                 'Relative Anzahl der Zeitschritte mit Überschreitungen (in Prozent)
                 Dim nUeber As Integer = 0
-                For i = 0 To SimReihe.GetUpperBound(0)
-                    If (SimReihe(i, 1) > OptZiel.ZielReihe(i, 1)) Then
+                For i = 0 To SimReihe.Length - 1
+                    If (SimReihe.YWerte(i) > OptZiel.ZielReihe.YWerte(i)) Then
                         nUeber += 1
                     End If
                 Next
-                QWert = nUeber / SimReihe.GetUpperBound(0) * 100
+                QWert = nUeber / SimReihe.Length * 100
 
             Case Else
                 Throw New Exception("Die Zielfunktion '" & OptZiel.ZielFkt & "' wird nicht unterstützt!")
@@ -1256,7 +1253,7 @@ Public MustInherit Class Sim
 
     'Qualitätswert berechnen: Zieltyp = Wert
     '***************************************
-    Protected Function QWert_Wert(ByVal OptZiel As Struct_OptZiel, ByVal SimReihe As Object(,)) As Double
+    Protected Function QWert_Wert(ByVal OptZiel As Struct_OptZiel, ByVal SimReihe As Wave.Zeitreihe) As Double
 
         Dim QWert As Double
         Dim i As Integer
@@ -1269,32 +1266,32 @@ Public MustInherit Class Sim
 
             Case "MaxWert"
                 SimWert = 0
-                For i = 0 To SimReihe.GetUpperBound(0)
-                    If SimReihe(i, 1) > SimWert Then
-                        SimWert = SimReihe(i, 1)
+                For i = 0 To SimReihe.Length - 1
+                    If (SimReihe.YWerte(i) > SimWert) Then
+                        SimWert = SimReihe.YWerte(i)
                     End If
                 Next
 
             Case "MinWert"
                 SimWert = 999999999999999999
-                For i = 0 To SimReihe.GetUpperBound(0)
-                    If SimReihe(i, 1) < SimWert Then
-                        SimWert = SimReihe(i, 1)
+                For i = 0 To SimReihe.Length - 1
+                    If (SimReihe.YWerte(i) < SimWert) Then
+                        SimWert = SimReihe.YWerte(i)
                     End If
                 Next
 
             Case "Average"
                 SimWert = 0
-                For i = 0 To SimReihe.GetUpperBound(0)
-                    SimWert += SimReihe(i, 1)
+                For i = 0 To SimReihe.Length - 1
+                    SimWert += SimReihe.YWerte(i)
                 Next
-                SimWert = SimWert / SimReihe.GetLength(0)
+                SimWert = SimWert / SimReihe.Length
 
             Case "AnfWert"
-                SimWert = SimReihe(0, 1)
+                SimWert = SimReihe.YWerte(0)
 
             Case "EndWert"
-                SimWert = SimReihe(SimReihe.GetUpperBound(0), 1)
+                SimWert = SimReihe.YWerte(SimReihe.Length - 1)
 
             Case Else
                 Throw New Exception("Der Werttyp '" & OptZiel.WertTyp & "' wird nicht unterstützt!")
@@ -1318,22 +1315,22 @@ Public MustInherit Class Sim
             Case "nUnter"
                 'Relative Anzahl der Zeitschritte mit Unterschreitungen (in Prozent)
                 Dim nUnter As Integer = 0
-                For i = 0 To SimReihe.GetUpperBound(0)
-                    If (SimReihe(i, 1) < OptZiel.ZielWert) Then
+                For i = 0 To SimReihe.Length - 1
+                    If (SimReihe.YWerte(i) < OptZiel.ZielWert) Then
                         nUnter += 1
                     End If
                 Next
-                QWert = nUnter / SimReihe.GetUpperBound(0) * 100
+                QWert = nUnter / SimReihe.Length * 100
 
             Case "nÜber"
                 'Relative Anzahl der Zeitschritte mit Überschreitungen (in Prozent)
                 Dim nUeber As Integer = 0
-                For i = 0 To SimReihe.GetUpperBound(0)
-                    If (SimReihe(i, 1) > OptZiel.ZielWert) Then
+                For i = 0 To SimReihe.Length - 1
+                    If (SimReihe.YWerte(i) > OptZiel.ZielWert) Then
                         nUeber += 1
                     End If
                 Next
-                QWert = nUeber / SimReihe.GetUpperBound(0) * 100
+                QWert = nUeber / SimReihe.Length * 100
 
             Case Else
                 Throw New Exception("Die Zielfunktion '" & OptZiel.ZielFkt & "' wird für Werte nicht unterstützt!")
@@ -1348,62 +1345,63 @@ Public MustInherit Class Sim
     '***************************
     Private Function QWert_PRB(ByVal OptZiel As Struct_OptZiel) As Double
 
-        Dim i As Integer
-        Dim IsOK As Boolean
-        Dim QWert As Double
-        Dim SimReihe As Object(,) = {}
+        'BUG 138: PRB geht nicht, weil keine Zeitreihe
+        'Dim i As Integer
+        'Dim IsOK As Boolean
+        'Dim QWert As Double
+        'Dim SimReihe As Object(,) = {}
 
-        'Simulationsergebnis auslesen
-        IsOK = Read_PRB(WorkDir & Datensatz & ".PRB", OptZiel.SimGr, SimReihe)
+        ''Simulationsergebnis auslesen
+        'IsOK = Read_PRB(WorkDir & Datensatz & ".PRB", OptZiel.SimGr, SimReihe)
 
-        'Diff
-        '----
-        'Überflüssige Stützstellen (P) entfernen
-        '---------------------------------------
-        'Anzahl Stützstellen bestimmen
-        Dim stuetz As Integer = 0
-        Dim P_vorher As Double = -99
-        For i = 0 To SimReihe.GetUpperBound(0)
-            If (i = 0 Or Not SimReihe(i, 1) = P_vorher) Then
-                stuetz += 1
-                P_vorher = SimReihe(i, 1)
-            End If
-        Next
-        'Werte in neues Array schreiben
-        Dim PRBtmp(stuetz, 1) As Object
-        stuetz = 0
-        For i = 0 To SimReihe.GetUpperBound(0)
-            If (i = 0 Or Not SimReihe(i, 1) = P_vorher) Then
-                PRBtmp(stuetz, 0) = SimReihe(i, 0)
-                PRBtmp(stuetz, 1) = SimReihe(i, 1)
-                P_vorher = SimReihe(i, 1)
-                stuetz += 1
-            End If
-        Next
-        'Reihe um eine Stützstelle erweitern
-        'PRBtmp(stuetz, 0) = PRBtmp(stuetz - 1, 0)
-        'PRBtmp(stuetz, 1) = PRBtmp(stuetz - 1, 1)
+        ''Diff
+        ''----
+        ''Überflüssige Stützstellen (P) entfernen
+        ''---------------------------------------
+        ''Anzahl Stützstellen bestimmen
+        'Dim stuetz As Integer = 0
+        'Dim P_vorher As Double = -99
+        'For i = 0 To SimReihe.GetUpperBound(0)
+        '    If (i = 0 Or Not SimReihe(i, 1) = P_vorher) Then
+        '        stuetz += 1
+        '        P_vorher = SimReihe(i, 1)
+        '    End If
+        'Next
+        ''Werte in neues Array schreiben
+        'Dim PRBtmp(stuetz, 1) As Object
+        'stuetz = 0
+        'For i = 0 To SimReihe.GetUpperBound(0)
+        '    If (i = 0 Or Not SimReihe(i, 1) = P_vorher) Then
+        '        PRBtmp(stuetz, 0) = SimReihe(i, 0)
+        '        PRBtmp(stuetz, 1) = SimReihe(i, 1)
+        '        P_vorher = SimReihe(i, 1)
+        '        stuetz += 1
+        '    End If
+        'Next
+        ''Reihe um eine Stützstelle erweitern
+        ''PRBtmp(stuetz, 0) = PRBtmp(stuetz - 1, 0)
+        ''PRBtmp(stuetz, 1) = PRBtmp(stuetz - 1, 1)
 
-        'An Stützstellen der ZielReihe interpolieren
-        '-------------------------------------------
-        Dim PRBintp(OptZiel.ZielReihe.GetUpperBound(0), 1) As Object
-        Dim j As Integer
-        For i = 0 To OptZiel.ZielReihe.GetUpperBound(0)
-            'zugehörige Lamelle in SimReihe finden
-            j = 0
-            Do While (PRBtmp(j, 1) < OptZiel.ZielReihe(i, 1))
-                j += 1
-            Loop
-            'interpolieren
-            PRBintp(i, 0) = (PRBtmp(j + 1, 0) - PRBtmp(j, 0)) / (PRBtmp(j + 1, 1) - PRBtmp(j, 1)) * (OptZiel.ZielReihe(i, 1) - PRBtmp(j, 1)) + PRBtmp(j, 0)
-            PRBintp(i, 1) = OptZiel.ZielReihe(i, 1)
-        Next
+        ''An Stützstellen der ZielReihe interpolieren
+        ''-------------------------------------------
+        'Dim PRBintp(OptZiel.ZielReihe.GetUpperBound(0), 1) As Object
+        'Dim j As Integer
+        'For i = 0 To OptZiel.ZielReihe.GetUpperBound(0)
+        '    'zugehörige Lamelle in SimReihe finden
+        '    j = 0
+        '    Do While (PRBtmp(j, 1) < OptZiel.ZielReihe(i, 1))
+        '        j += 1
+        '    Loop
+        '    'interpolieren
+        '    PRBintp(i, 0) = (PRBtmp(j + 1, 0) - PRBtmp(j, 0)) / (PRBtmp(j + 1, 1) - PRBtmp(j, 1)) * (OptZiel.ZielReihe(i, 1) - PRBtmp(j, 1)) + PRBtmp(j, 0)
+        '    PRBintp(i, 1) = OptZiel.ZielReihe(i, 1)
+        'Next
 
-        For i = 0 To OptZiel.ZielReihe.GetUpperBound(0)
-            QWert += Math.Abs(OptZiel.ZielReihe(i, 0) - PRBintp(i, 0))
-        Next
+        'For i = 0 To OptZiel.ZielReihe.GetUpperBound(0)
+        '    QWert += Math.Abs(OptZiel.ZielReihe(i, 0) - PRBintp(i, 0))
+        'Next
 
-        Return QWert
+        'Return QWert
 
     End Function
 
@@ -1413,114 +1411,6 @@ Public MustInherit Class Sim
 
     'SimErgebnisse lesen
     '###################
-
-    'Eine ZRE-Datei einlesen
-    '***********************
-    Public Shared Function Read_ZRE(ByVal DateiPfad As String, ByRef ZRE(,) As Object) As Boolean
-
-        Dim AnzZeil As Integer = 0
-        Dim j As Integer = 0
-        Dim Zeile As String
-        Const ZREHEaderLen As Integer = 4     'Die ersten 4 Zeilen der ZRE-Datei gehören zum Header
-
-        Read_ZRE = True
-
-        Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
-        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-
-        'Anzahl der Zeilen feststellen
-        Do
-            Zeile = StrRead.ReadLine.ToString()
-            AnzZeil += 1
-        Loop Until StrRead.Peek() = -1
-
-        ReDim ZRE(AnzZeil - ZREHEaderLen - 1, 1)
-
-        'Zurück zum Dateianfang und lesen
-        FiStr.Seek(0, SeekOrigin.Begin)
-
-        For j = 0 To AnzZeil - 1
-            Zeile = StrRead.ReadLine.ToString()
-            If (j >= ZREHEaderLen) Then
-                'Datum
-                ZRE(j - ZREHEaderLen, 0) = New System.DateTime(Zeile.Substring(0, 4), Zeile.Substring(4, 2), Zeile.Substring(6, 2), Zeile.Substring(9, 2), Zeile.Substring(12, 2), 0, New System.Globalization.GregorianCalendar())
-                'Wert
-                ZRE(j - ZREHEaderLen, 1) = Convert.ToDouble(Zeile.Substring(15, 14))
-            End If
-        Next
-
-        StrRead.Close()
-        FiStr.Close()
-
-    End Function
-
-    'Eine Spalte einer WEL-Datei einlesen
-    '************************************
-    Public Shared Function Read_WEL(ByVal Dateipfad As String, ByVal Spalte As String, ByRef WEL(,) As Object) As Boolean
-
-        'Einschränkungen:
-        '---------------------------------------------------
-        'WEL-Datei muss im CSV-Format mit Semikola vorliegen
-
-        Dim AnzZeil As Integer = 0
-        Dim j As Integer = 0
-        Dim Zeile As String
-        Dim Werte() As String = {}
-        Dim SpalteNr As Integer = -1
-        Const WELHeaderLen As Integer = 3       'Die ersten 3 Zeilen der WEL-Datei gehören zum Header
-        Read_WEL = True
-
-        Dim FiStr As FileStream = New FileStream(Dateipfad, FileMode.Open, IO.FileAccess.ReadWrite)
-        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-
-        'Anzahl der Zeilen feststellen
-        Do
-            Zeile = StrRead.ReadLine.ToString
-            AnzZeil += 1
-        Loop Until StrRead.Peek() = -1
-
-        ReDim WEL(AnzZeil - WELHeaderLen - 1, 1)
-
-        'Position der zu lesenden Spalte bestimmen
-        '-----------------------------------------
-        FiStr.Seek(0, SeekOrigin.Begin)
-        'Zeile mit den Spaltenüberschriften auslesen
-        For j = 0 To 1
-            Werte = StrRead.ReadLine.ToString.Split(";")
-        Next
-        StrRead.ReadToEnd()
-        'Spaltenüberschriften vergleichen
-        For j = 0 To Werte.GetUpperBound(0)
-            If Werte(j).Trim() = Spalte Then
-                SpalteNr = j
-            End If
-        Next
-
-        'Wenn Spalte nicht gefunden
-        '--------------------------
-        If (SpalteNr = -1) Then
-            Read_WEL = False
-            Throw New Exception("Konnte die Spalte """ & Spalte & """ in der WEL-Datei nicht finden!")
-        End If
-
-        'Auf Anfang setzen und einlesen
-        '------------------------------
-        FiStr.Seek(0, SeekOrigin.Begin)
-
-        For j = 0 To AnzZeil - 1
-            Werte = StrRead.ReadLine.ToString.Split(";")
-            If (j >= WELHeaderLen) Then
-                'Datum
-                WEL(j - WELHeaderLen, 0) = New System.DateTime(Werte(1).Substring(6, 4), Werte(1).Substring(3, 2), Werte(1).Substring(0, 2), Werte(1).Substring(11, 2), Werte(1).Substring(14, 2), 0, New System.Globalization.GregorianCalendar())
-                'Wert
-                WEL(j - WELHeaderLen, 1) = Convert.ToDouble(Werte(SpalteNr))
-            End If
-        Next
-
-        StrRead.Close()
-        FiStr.Close()
-
-    End Function
 
     'Ein Ergebnis aus einer PRB-Datei einlesen
     '*****************************************

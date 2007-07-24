@@ -128,7 +128,7 @@ Public Class IHA
     '*************************************
     Public Sub prepare_IHA(ByRef BlueM1 As BlueM)
 
-        Dim i As Integer
+        Dim i, j, k As Integer
 
         'IHA-Unterverzeichnis anlegen
         '----------------------------
@@ -159,11 +159,11 @@ Public Class IHA
         'Datume bestimmen
         '-----------------------------
         'Referenz-Zeitreihe raussuchen
-        Dim ZeitReihe(,) As Object = {}
-        ZeitReihe = IHAZiel.ZielReihe
+        Dim RefReihe As New Wave.Zeitreihe("")
+        RefReihe = IHAZiel.ZielReihe.copy()
 
         'BeginPre
-        Dim StartDatum As DateTime = ZeitReihe(0, 0)
+        Dim StartDatum As DateTime = RefReihe.XWerte(0)
         If (StartDatum.DayOfYear > BegWatrYr) Then
             Me.BeginPre = StartDatum.Year + 2
         Else
@@ -171,7 +171,7 @@ Public Class IHA
         End If
 
         'EndPre
-        Dim EndDatum As DateTime = ZeitReihe(ZeitReihe.GetUpperBound(0), 0)
+        Dim EndDatum As DateTime = RefReihe.XWerte(RefReihe.Length - 1)
         If (EndDatum.DayOfYear >= BegWatrYr) Then
             Me.EndPre = EndDatum.Year
         Else
@@ -194,12 +194,9 @@ Public Class IHA
         End If
         Me.EndPost = Me.BeginPost + (Me.EndPost_sim - Me.BeginPost_sim)
 
-        'Zeitreihe kürzen und nach RefReihe(,) kopieren
-        '----------------------------------------------
-        Dim cutLength As Integer = (New DateTime(Me.EndPre, 9, 30) - New DateTime(Me.BeginPre - 1, 10, 1)).Days + 1
-        Dim cutBegin As Integer = (New DateTime(Me.BeginPre - 1, 10, 1) - StartDatum).Days
-        Dim RefReihe(cutLength - 1, 1) As Object
-        Array.Copy(ZeitReihe, cutBegin * 2, RefReihe, 0, cutLength * 2)
+        'Zeitreihe kürzen
+        '----------------
+        Call RefReihe.cut(New DateTime(Me.BeginPre - 1, 10, 1), New DateTime(Me.EndPre, 9, 30))
 
         'Referenz-Zeitreihe umformatieren und in RefData(,) speichern
         '---------------------------------------------------------
@@ -215,14 +212,13 @@ Public Class IHA
         Next
 
         'Weitere Zeilen mit Werten füllen
-        Dim j, k As Integer
         i = 0
         k = 0
-        While (i <= RefReihe.GetUpperBound(0))
+        While (i <= RefReihe.Length - 1)
             For j = 1 To 366
-                Me.RefData(j, k) = RefReihe(i, 1)
+                Me.RefData(j, k) = RefReihe.YWerte(i)
                 'bei Nicht-Schaltjahren nach dem 28.Feb. einen Wert auffüllen
-                If (RefReihe(i, 0).DayOfYear = 59 And DateTime.IsLeapYear(RefReihe(i, 0).Year) = False) Then
+                If (RefReihe.XWerte(i).DayOfYear = 59 And DateTime.IsLeapYear(RefReihe.XWerte(i).Year) = False) Then
                     j += 1
                     Me.RefData(j, k) = -999999
                 End If
@@ -322,19 +318,15 @@ Public Class IHA
     Public Sub calculate_IHA(ByVal WELFile As String)
 
         Dim i, j, k As Integer
-        Dim isOK As Boolean
-        Dim simreihe As Object(,) = {}
 
         'Simulationsreihe einlesen
         '-------------------------
-        isOK = Sim.Read_WEL(WELFile, Me.IHAZiel.SimGr, simreihe)
+        Dim SimReihe As New Wave.Zeitreihe(Me.IHAZiel.SimGr)
+        Dim WEL As New Wave.WEL(WELFile, Me.IHAZiel.SimGr)
+        SimReihe = WEL.Read_WEL()(0)
 
         'Simulationsreihe entsprechend kürzen
-        Dim Startdatum As DateTime = simreihe(0, 0)
-        Dim cutLength As Integer = (New DateTime(Me.EndPost_sim, 9, 30) - New DateTime(Me.BeginPost_sim - 1, 10, 1)).Days + 1
-        Dim cutBegin As Integer = (New DateTime(Me.BeginPost_sim - 1, 10, 1) - Startdatum).Days
-        Dim PostReihe(cutLength - 1, 1) As Object
-        Array.Copy(simreihe, cutBegin * 2, PostReihe, 0, cutLength * 2)
+        SimReihe.cut(New DateTime(Me.BeginPost_sim - 1, 10, 1), New DateTime(Me.EndPost_sim, 9, 30))
 
         'Data(,) dimensionieren 
         Dim AnzJahre As Integer = Me.EndPost - Me.BeginPost + 1
@@ -359,11 +351,11 @@ Public Class IHA
         'Weitere Zeilen mit Werten füllen
         i = 0
         k = Me.BeginPost - Me.BeginPre
-        While (i <= PostReihe.GetUpperBound(0))
+        While (i <= PostReihe.Length - 1)
             For j = 1 To 366
-                Data(j, k) = PostReihe(i, 1)
+                Data(j, k) = PostReihe.YWerte(i)
                 'bei Nicht-Schaltjahren nach dem 28.Feb. einen Wert auffüllen
-                If (PostReihe(i, 0).DayOfYear = 59 And DateTime.IsLeapYear(PostReihe(i, 0).Year) = False) Then
+                If (PostReihe.XWerte(i).DayOfYear = 59 And DateTime.IsLeapYear(PostReihe.XWerte(i).Year) = False) Then
                     j += 1
                     Data(j, k) = -999999
                 End If
