@@ -112,13 +112,13 @@ Public Class Smusi
     '***************************
     Protected Overrides Function QWert_WEL(ByVal OptZiel As Struct_OptZiel) As Double
 
-        Dim IsOK As Boolean
         Dim QWert As Double
-        Dim SimReihe(,) As Object = {}
 
         'Simulationsergebnis auslesen
+        Dim SimReihe As New Wave.Zeitreihe(OptZiel.SimGr)
         Dim datei As String = OptZiel.SimGr.Substring(0, 4) & "_WEL.ASC"
-        IsOK = Read_WEL(WorkDir & datei, OptZiel.SimGr, SimReihe)
+        Dim WEL As New Wave.WEL(WorkDir & datei, OptZiel.SimGr)
+        SimReihe = WEL.Read_WEL()(0)
 
         'Fallunterscheidung Zieltyp
         '--------------------------

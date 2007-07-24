@@ -285,12 +285,12 @@ Public Class BlueM
     '***************************
     Protected Overrides Function QWert_WEL(ByVal OptZiel As Struct_OptZiel) As Double
 
-        Dim IsOK As Boolean
         Dim QWert As Double
-        Dim SimReihe(,) As Object = {}
 
         'Simulationsergebnis auslesen
-        IsOK = Read_WEL(WorkDir & Datensatz & ".wel", OptZiel.SimGr, SimReihe)
+        Dim SimReihe As New Wave.Zeitreihe(OptZiel.SimGr)
+        Dim WEL As New Wave.WEL(WorkDir & Datensatz & ".wel", OptZiel.SimGr)
+        SimReihe = WEL.Read_WEL()(0)
 
         'Fallunterscheidung Zieltyp
         '--------------------------
