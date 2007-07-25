@@ -118,7 +118,8 @@ Public MustInherit Class Sim
     'Kombinatorik
     '------------
     Public SKos1 As New SKos()
-    Public Path_Aktuell() As Integer
+    Public Aktuell_Path() As Integer
+    Public Aktuell_Elemente() As String
     Public VER_ONOFF(,) As Object
 
     Public Structure Struct_Massnahme
@@ -764,13 +765,16 @@ Public MustInherit Class Sim
 
     'Bereitet das SimModell für Kombinatorik Optimierung vor
     '*******************************************************
-    Public Sub Prepare_Evaluation_CES()
+    Public Sub prepare_Evaluation_CES(ByVal Path() As Integer)
+
+        'Setzt den Aktuellen Pfad
+        Aktuell_Path = Path
 
         'Erstellt die aktuelle Bauerksliste und überträgt sie zu SKos
-        Call Define_aktuelle_Elemente()
+        Call Prepare_aktuelle_Elemente()
 
         'Ermittelt das aktuelle_ON_OFF array
-        Call Verzweigung_ON_OFF()
+        Call Prepare_Verzweigung_ON_OFF()
 
         'Schreibt die neuen Verzweigungen
         Call Me.Write_Verzweigungen()
@@ -779,13 +783,13 @@ Public MustInherit Class Sim
 
     'Die Liste mit den aktuellen Bauwerken des Kindes wird erstellt und in SKos geschrieben
     '**************************************************************************************
-    Private Sub Define_aktuelle_Elemente()
+    Private Sub Prepare_aktuelle_Elemente()
         Dim i, j As Integer
         Dim No As Integer
 
         Dim x As Integer = 0
-        For i = 0 To Path_Aktuell.GetUpperBound(0)
-            No = Path_Aktuell(i)
+        For i = 0 To Aktuell_Path.GetUpperBound(0)
+            No = Aktuell_Path(i)
             For j = 0 To List_Locations(i).List_Massnahmen(No).Bauwerke.GetUpperBound(0)
                 Array.Resize(SKos1.AktuelleElemente, x + 1)
                 SKos1.AktuelleElemente(x) = List_Locations(i).List_Massnahmen(No).Bauwerke(j)
@@ -795,20 +799,15 @@ Public MustInherit Class Sim
 
         'Entfernt die X Einträge
         Call SKos1.Remove_X(SKos1.AktuelleElemente)
-    End Sub
 
-    'Die Liste mit den aktuellen Bauwerken wird an das Kind übergeben
-    '**************************************************************************************
-    Public Sub Set_Elemente(ByRef Elemente() As Object)
-
-        ReDim Elemente(SKos1.AktuelleElemente.GetUpperBound(0))
-        Array.Copy(SKos1.AktuelleElemente, Elemente, SKos1.AktuelleElemente.GetLength(0))
-
+        'Kopiert die aktuelle ElementeListe in dieses Aktuell_Element Array
+        Redim Aktuell_Elemente(skos1.AktuelleElemente.GetUpperBound(0))
+        Array.Copy(skos1.AktuelleElemente,Aktuell_Elemente,skos1.AktuelleElemente.GetLength(0))
     End Sub
 
     'Ermittelt das aktuelle Verzweigungsarray
     '****************************************
-    Private Sub Verzweigung_ON_OFF()
+    Private Sub Prepare_Verzweigung_ON_OFF()
         Dim j, x, y, z As Integer
         Dim No As Short
 
@@ -817,8 +816,8 @@ Public MustInherit Class Sim
             VER_ONOFF(j, 0) = VerzweigungsDatei(j, 0)
         Next
         'Weist die Werte das Pfades zu
-        For x = 0 To Path_Aktuell.GetUpperBound(0)
-            No = Path_Aktuell(x)
+        For x = 0 To Aktuell_Path.GetUpperBound(0)
+            No = Aktuell_Path(x)
             For y = 0 To List_Locations(x).List_Massnahmen(No).Schaltung.GetUpperBound(0)
                 For z = 0 To VER_ONOFF.GetUpperBound(0)
                     If List_Locations(x).List_Massnahmen(No).Schaltung(y, 0) = VER_ONOFF(z, 0) Then
@@ -830,13 +829,17 @@ Public MustInherit Class Sim
 
     End Sub
 
+    'Schreibt die neuen Verzweigungen
+    '********************************
+    Protected MustOverride Sub Write_Verzweigungen()
+
 #End Region 'Kombinatorik
 
 #Region "Evaluierung"
 
     'Reduziert die OptParameter und die ModellParameter auf die aktiven Elemente
     '***************************************************************************
-    Public Function Reduce_OptPara_ModPara(ByVal Bauwerksliste() As Object) As Boolean
+    Public Function Reduce_OptPara_ModPara() As Boolean
         Reduce_OptPara_ModPara = True
         Dim i As Integer
 
@@ -859,8 +862,8 @@ Public MustInherit Class Sim
 
         count = 0
         For i = 0 To List_ModellParameter.GetUpperBound(0)
-            For j = 0 To Bauwerksliste.GetUpperBound(0)
-                If List_ModellParameter(i).Element = Bauwerksliste(j) Then
+            For j = 0 To Aktuell_Elemente.GetUpperBound(0)
+                If List_ModellParameter(i).Element = Aktuell_Elemente(j) Then
                     Call copy_Struct_ModellParemeter(List_ModellParameter(i), TMP_ModPara(count))
                     count += 1
                 End If
@@ -1110,10 +1113,6 @@ Public MustInherit Class Sim
         Next
 
     End Function
-
-    'Schreibt die neuen Verzweigungen
-    '********************************
-    Protected MustOverride Sub Write_Verzweigungen()
 
     'SimModell ausführen (simulieren)
     '********************************

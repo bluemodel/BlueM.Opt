@@ -44,7 +44,6 @@ Public Class CES
     Public Structure Struct_Faksimile
         Dim No As Short                     'Nummer des NDSorting
         Dim Path() As Integer               'Der Pfad
-        Dim Elemente() As Object            'Liste der Elemente
         Dim Penalty() As Double             'Werte der Penaltyfunktion(en)
         Dim mutated As Boolean              'Gibt an ob der Wert bereits mutiert ist oder nicht
         Dim Front As Short                  'Nummer der Pareto Front
@@ -58,10 +57,9 @@ Public Class CES
     Public Structure Struct_NDSorting
         Dim No As Short                     'CH: Nummer des NDSorting
         Dim Path() As Integer               'CH: Der Pfad
-        Dim Elemente() As Object            'CH: Liste der Elemente
         Dim Penalty() As Double             'DM: Werte der Penaltyfunktion(en)
-        'Dim Constrain() As Double           'DM: Werte der Randbedingung(en)
-        'Dim Feasible As Boolean             'DM: Gültiges Ergebnis ?
+        'Dim Constrain() As Double          'DM: Werte der Randbedingung(en)
+        'Dim Feasible As Boolean            'DM: Gültiges Ergebnis ?
         Dim dominated As Boolean            'DM: Kennzeichnung ob dominiert
         Dim Front As Short                  'DM: Nummer der Pareto Front
         Dim Distance As Double              'DM: Distanzwert für Crowding distance sort
@@ -77,7 +75,7 @@ Public Class CES
 
     End Structure
 
-    Public List_PES() as Struct_PES
+    Public List_PES() As Struct_PES
 
 #End Region 'Eigenschaften
 
@@ -93,7 +91,6 @@ Public Class CES
         For i = 0 To TMP.GetUpperBound(0)
             TMP(i).No = i + 1
             ReDim TMP(i).Penalty(n_Penalty - 1)
-            Redim TMP(i).Elemente(0)
             For j = 0 To n_Penalty - 1
                 TMP(i).Penalty(j) = 999999999999999999
             Next
@@ -110,7 +107,6 @@ Public Class CES
         For i = 0 To TMP.GetUpperBound(0)
             TMP(i).No = i + 1
             ReDim TMP(i).Path(n_Location - 1)
-            Redim tmp(i).Elemente(0)
             ReDim TMP(i).Penalty(n_Penalty - 1)
             For j = 0 To n_Penalty - 1
                 TMP(i).Penalty(j) = 999999999999999999
@@ -126,8 +122,6 @@ Public Class CES
 
         Destination.No = Source.No
         Array.Copy(Source.Path, Destination.Path, Source.Path.Length)
-        ReDim Destination.Elemente(Source.Elemente.GetUpperBound(0))
-        Array.Copy(Source.Elemente, Destination.Elemente, Source.Elemente.Length)
         Array.Copy(Source.Penalty, Destination.Penalty, Source.Penalty.Length)
         Destination.mutated = Source.mutated
         Destination.Front = Source.Front
@@ -140,8 +134,6 @@ Public Class CES
 
         Destination.No = Source.No
         Array.Copy(Source.Path, Destination.Path, Source.Path.Length)
-        ReDim Destination.Elemente(Source.Elemente.GetUpperBound(0))
-        Array.Copy(Source.Elemente, Destination.Elemente, Source.Elemente.Length)
         Array.Copy(Source.Penalty, Destination.Penalty, Source.Penalty.Length)
         Destination.Front = Source.Front
 
@@ -153,8 +145,6 @@ Public Class CES
 
         Destination.No = Source.No
         Array.Copy(Source.Path, Destination.Path, Source.Path.Length)
-        ReDim Destination.Elemente(Source.Elemente.GetUpperBound(0))
-        Array.Copy(Source.Elemente, Destination.Elemente, Source.Elemente.Length)
         Array.Copy(Source.Penalty, Destination.Penalty, Source.Penalty.Length)
         Destination.Front = Source.Front
 
@@ -166,8 +156,6 @@ Public Class CES
 
         Destination.No = Source.No
         Array.Copy(Source.Path, Destination.Path, Source.Path.Length)
-        ReDim Destination.Elemente(Source.Elemente.GetUpperBound(0))
-        Array.Copy(Source.Elemente, Destination.Elemente, Source.Elemente.Length)
         Array.Copy(Source.Penalty, Destination.Penalty, Source.Penalty.Length)
         Destination.dominated = Source.dominated
         Destination.Front = Source.Front
@@ -266,9 +254,6 @@ Public Class CES
             Next
             Array.Clear(List_Childs(i).Path, 0, List_Childs(i).Path.GetLength(0))
             List_Childs(i).mutated = False
-            For j = 0 To List_Childs(i).Elemente.GetUpperBound(0)
-                List_Childs(i).Elemente(j) = ""
-            Next
         Next
 
     End Sub
