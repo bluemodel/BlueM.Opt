@@ -351,11 +351,11 @@ Public Class IHA
         'Weitere Zeilen mit Werten füllen
         i = 0
         k = Me.BeginPost - Me.BeginPre
-        While (i <= PostReihe.Length - 1)
+        While (i <= SimReihe.Length - 1)
             For j = 1 To 366
-                Data(j, k) = PostReihe.YWerte(i)
+                Data(j, k) = SimReihe.YWerte(i)
                 'bei Nicht-Schaltjahren nach dem 28.Feb. einen Wert auffüllen
-                If (PostReihe.XWerte(i).DayOfYear = 59 And DateTime.IsLeapYear(PostReihe.XWerte(i).Year) = False) Then
+                If (SimReihe.XWerte(i).DayOfYear = 59 And DateTime.IsLeapYear(SimReihe.XWerte(i).Year) = False) Then
                     j += 1
                     Data(j, k) = -999999
                 End If
