@@ -758,12 +758,10 @@ Partial Class Form1
             For i = 0 To CES1.n_Childs - 1
                 durchlauf_all += 1
 
-                'Aktueller Pfad wird an Sim zurückgegeben
                 '****************************************
-                Sim1.Path_Aktuell = CES1.List_Childs(i).Path
+                'Aktueller Pfad wird an Sim zurückgegeben
                 'Bereitet das BlaueModell für die Kombinatorik vor
-                Call Sim1.Prepare_Evaluation_CES()
-                Call Sim1.Set_Elemente(CES1.List_Childs(i).Elemente)
+                Call Sim1.prepare_Evaluation_CES(CES1.List_Childs(i).Path)
                 Call Sim1.Sim_Evaluierung_CombiOpt(CES1.n_Penalty, CES1.List_Childs(i).Penalty)
                 '***********************************************
 
@@ -864,12 +862,10 @@ Partial Class Form1
             For i = 0 To CES1.n_Childs - 1
                 durchlauf_all += 1
 
-                'Aktueller Pfad wird an Sim zurückgegeben
                 '****************************************
-                Sim1.Path_Aktuell = CES1.List_Childs(i).Path
+                'Aktueller Pfad wird an Sim zurückgegeben
                 'Bereitet das BlaueModell für die Kombinatorik vor
-                Call Sim1.Prepare_Evaluation_CES()
-                Call Sim1.Set_Elemente(CES1.List_Childs(i).Elemente)
+                Call Sim1.prepare_Evaluation_CES(CES1.List_Childs(i).Path)
                 Call Sim1.Sim_Evaluierung_CombiOpt(CES1.n_Penalty, CES1.List_Childs(i).Penalty)
                 '******************************************
 
@@ -936,15 +932,14 @@ Partial Class Form1
         For i = 0 To CES1.n_Parents - 1
             If CES1.List_Parents(i).Front = 1 Then
 
-                'Aktueller Pfad wird an Sim zurückgegeben
                 '****************************************
-                Sim1.Path_Aktuell = CES1.List_Childs(i).Path
+                'Aktueller Pfad wird an Sim zurückgegeben
                 'Bereitet das BlaueModell für die Kombinatorik vor
-                Call Sim1.Prepare_Evaluation_CES()
+                Call Sim1.prepare_Evaluation_CES(CES1.List_Childs(i).Path)
 
                 'Reduktion der OptimierungsParameter und immer dann wenn nicht Nullvariante
                 '****************************************************************************
-                If Sim1.Reduce_OptPara_ModPara(CES1.List_Parents(i).Elemente) Then
+                If Sim1.Reduce_OptPara_ModPara() Then
 
                     'Parameterübergabe an PES
                     '************************
