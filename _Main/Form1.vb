@@ -265,7 +265,7 @@ Partial Class Form1
                     Sim1.Ergebnisdb = True
 
                     'SensiPlot für Sim vorbereiten
-                    Call Sim1.prepare_PES()
+                    Call Sim1.read_and_valid_INI_Files_PES()
 
                     'SensiPlot Dialog anzeigen:
                     '--------------------------
@@ -300,7 +300,7 @@ Partial Class Form1
                     Me.Button_Scatterplot.Enabled = True
 
                     'PES für Sim vorbereiten
-                    Call Sim1.prepare_PES()
+                    Call Sim1.read_and_valid_INI_Files_PES()
 
                     'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
                     If (Sim1.List_OptZiele.GetLength(0) = 1) Then
@@ -323,8 +323,8 @@ Partial Class Form1
                     'Ergebnisdatenbank ausschalten
                     Sim1.Ergebnisdb = False
 
-                    'CES für Sim vorbereiten
-                    Call Sim1.prepare_CES()
+                    'CES für Sim vorbereiten (Files lesen und Validieren)
+                    Call Sim1.read_and_valid_INI_Files_CES()
                     'CES initialisieren
                     CES1 = New EvoKern.CES
                     'Prüft ob die Zahl mög. Kombinationen < Zahl Eltern + Nachfolger
@@ -380,8 +380,8 @@ Partial Class Form1
                     'Ergebnisdatenbank ausschalten
                     Sim1.Ergebnisdb = False
 
-                    'CES für Sim vorbereiten
-                    Call Sim1.prepare_CES()
+                    'CES für Sim vorbereiten (Dateien einlesen und Prüfen)
+                    Call Sim1.read_and_valid_INI_Files_CES()
                     'CES initialisieren
                     CES1 = New EvoKern.CES
                     'Prüft ob die Zahl mög. Kombinationen < Zahl Eltern + Nachfolger
@@ -389,8 +389,8 @@ Partial Class Form1
                         Throw New Exception("Die Zahl der Eltern + die Zahl der Kinder ist größer als die mögliche Zahl der Kombinationen.")
                     End If
 
-                    'PES für Sim vorbereiten
-                    Call Sim1.prepare_PES()
+                    'PES für Sim vorbereiten (Files lesen und Validieren)
+                    Call Sim1.read_and_valid_INI_Files_PES()
 
                     'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
                     If (Sim1.List_OptZiele.GetLength(0) = 1) Then
@@ -758,9 +758,11 @@ Partial Class Form1
             For i = 0 To CES1.n_Childs - 1
                 durchlauf_all += 1
 
-                'Vorbereitung und Evaluierung des Blauen Modells
-                '***********************************************
-                Call Sim1.Prepare_Evaluation_CES(CES1.List_Childs(i).Path)
+                'Aktueller Pfad wird an Sim zurückgegeben
+                '****************************************
+                Sim1.Path_Aktuell = CES1.List_Childs(i).Path
+                'Bereitet das BlaueModell für die Kombinatorik vor
+                Call Sim1.Prepare_Evaluation_CES()
                 Call Sim1.Set_Elemente(CES1.List_Childs(i).Elemente)
                 Call Sim1.Sim_Evaluierung_CombiOpt(CES1.n_Penalty, CES1.List_Childs(i).Penalty)
                 '***********************************************
@@ -862,9 +864,11 @@ Partial Class Form1
             For i = 0 To CES1.n_Childs - 1
                 durchlauf_all += 1
 
-                'Vorbereitung und Evaluierung des Blauen Modells
-                '***********************************************
-                Call Sim1.Prepare_Evaluation_CES(CES1.List_Childs(i).Path)
+                'Aktueller Pfad wird an Sim zurückgegeben
+                '****************************************
+                Sim1.Path_Aktuell = CES1.List_Childs(i).Path
+                'Bereitet das BlaueModell für die Kombinatorik vor
+                Call Sim1.Prepare_Evaluation_CES()
                 Call Sim1.Set_Elemente(CES1.List_Childs(i).Elemente)
                 Call Sim1.Sim_Evaluierung_CombiOpt(CES1.n_Penalty, CES1.List_Childs(i).Penalty)
                 '******************************************
@@ -931,9 +935,12 @@ Partial Class Form1
 
         For i = 0 To CES1.n_Parents - 1
             If CES1.List_Parents(i).Front = 1 Then
+
+                'Aktueller Pfad wird an Sim zurückgegeben
+                '****************************************
+                Sim1.Path_Aktuell = CES1.List_Childs(i).Path
                 'Bereitet das BlaueModell für die Kombinatorik vor
-                '*************************************************
-                Call Sim1.Prepare_Evaluation_CES(CES1.List_Parents(i).Path)
+                Call Sim1.Prepare_Evaluation_CES()
 
                 'Reduktion der OptimierungsParameter und immer dann wenn nicht Nullvariante
                 '****************************************************************************
