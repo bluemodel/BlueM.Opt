@@ -250,7 +250,7 @@ Public MustInherit Class Sim
     'PES vorbereiten (auch für SensiPlot)
     'Erforderliche Dateien werden eingelesen und DB vorbereitet
     '**********************************************************
-    Public Sub prepare_PES()
+    Public Sub read_and_valid_INI_Files_PES()
 
         'Simulationsdaten einlesen
         Call Me.Read_SimParameter()
@@ -272,7 +272,7 @@ Public MustInherit Class Sim
     'CES vorbereiten
     'Erforderliche Dateien werden eingelesen
     '***************************************
-    Public Sub prepare_CES()
+    Public Sub read_and_valid_INI_Files_CES()
 
         'Zielfunktionen einlesen
         Call Me.Read_OptZiele()
@@ -745,8 +745,8 @@ Public MustInherit Class Sim
 
     End Function
 
-    'Im Falle des Testmodus 1 wird der gewählte Path in das einzige Kind geschrieben
-    '*******************************************************************************
+    'Holt sich im Falle des Testmodus 1 den Pfad aus der .CES Datei
+    '**************************************************************
     Public Sub get_TestPath(ByRef Path() As Integer)
         Dim i, j, counter As Integer
 
@@ -764,13 +764,13 @@ Public MustInherit Class Sim
 
     'Bereitet das SimModell für Kombinatorik Optimierung vor
     '*******************************************************
-    Public Sub Prepare_Evaluation_CES(ByVal Path() As Integer)
+    Public Sub Prepare_Evaluation_CES()
 
         'Erstellt die aktuelle Bauerksliste und überträgt sie zu SKos
-        Call Define_aktuelle_Elemente(Path)
+        Call Define_aktuelle_Elemente()
 
         'Ermittelt das aktuelle_ON_OFF array
-        Call Verzweigung_ON_OFF(Path)
+        Call Verzweigung_ON_OFF()
 
         'Schreibt die neuen Verzweigungen
         Call Me.Write_Verzweigungen()
@@ -779,13 +779,13 @@ Public MustInherit Class Sim
 
     'Die Liste mit den aktuellen Bauwerken des Kindes wird erstellt und in SKos geschrieben
     '**************************************************************************************
-    Private Sub Define_aktuelle_Elemente(ByVal Path() As Integer)
+    Private Sub Define_aktuelle_Elemente()
         Dim i, j As Integer
         Dim No As Integer
 
         Dim x As Integer = 0
-        For i = 0 To Path.GetUpperBound(0)
-            No = Path(i)
+        For i = 0 To Path_Aktuell.GetUpperBound(0)
+            No = Path_Aktuell(i)
             For j = 0 To List_Locations(i).List_Massnahmen(No).Bauwerke.GetUpperBound(0)
                 Array.Resize(SKos1.AktuelleElemente, x + 1)
                 SKos1.AktuelleElemente(x) = List_Locations(i).List_Massnahmen(No).Bauwerke(j)
@@ -799,16 +799,16 @@ Public MustInherit Class Sim
 
     'Die Liste mit den aktuellen Bauwerken wird an das Kind übergeben
     '**************************************************************************************
-    Public Sub Set_Elemente(ByRef Path() As Object)
+    Public Sub Set_Elemente(ByRef Elemente() As Object)
 
-        ReDim Path(SKos1.AktuelleElemente.GetUpperBound(0))
-        Array.Copy(SKos1.AktuelleElemente, Path, SKos1.AktuelleElemente.GetLength(0))
+        ReDim Elemente(SKos1.AktuelleElemente.GetUpperBound(0))
+        Array.Copy(SKos1.AktuelleElemente, Elemente, SKos1.AktuelleElemente.GetLength(0))
 
     End Sub
 
     'Ermittelt das aktuelle Verzweigungsarray
     '****************************************
-    Private Sub Verzweigung_ON_OFF(ByVal Path() As Integer)
+    Private Sub Verzweigung_ON_OFF()
         Dim j, x, y, z As Integer
         Dim No As Short
 
@@ -817,8 +817,8 @@ Public MustInherit Class Sim
             VER_ONOFF(j, 0) = VerzweigungsDatei(j, 0)
         Next
         'Weist die Werte das Pfades zu
-        For x = 0 To Path.GetUpperBound(0)
-            No = Path(x)
+        For x = 0 To Path_Aktuell.GetUpperBound(0)
+            No = Path_Aktuell(x)
             For y = 0 To List_Locations(x).List_Massnahmen(No).Schaltung.GetUpperBound(0)
                 For z = 0 To VER_ONOFF.GetUpperBound(0)
                     If List_Locations(x).List_Massnahmen(No).Schaltung(y, 0) = VER_ONOFF(z, 0) Then
