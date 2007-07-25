@@ -791,18 +791,18 @@ Public MustInherit Class Sim
         For i = 0 To Aktuell_Path.GetUpperBound(0)
             No = Aktuell_Path(i)
             For j = 0 To List_Locations(i).List_Massnahmen(No).Bauwerke.GetUpperBound(0)
-                Array.Resize(SKos1.AktuelleElemente, x + 1)
-                SKos1.AktuelleElemente(x) = List_Locations(i).List_Massnahmen(No).Bauwerke(j)
+                Array.Resize(Aktuell_Elemente, x + 1)
+                Aktuell_Elemente(x) = List_Locations(i).List_Massnahmen(No).Bauwerke(j)
                 x += 1
             Next
         Next
 
         'Entfernt die X Einträge
-        Call SKos1.Remove_X(SKos1.AktuelleElemente)
+        Call SKos1.Remove_X(Aktuell_Elemente)
 
         'Kopiert die aktuelle ElementeListe in dieses Aktuell_Element Array
-        Redim Aktuell_Elemente(skos1.AktuelleElemente.GetUpperBound(0))
-        Array.Copy(skos1.AktuelleElemente,Aktuell_Elemente,skos1.AktuelleElemente.GetLength(0))
+        ReDim SKos1.Aktuell_Elemente(Aktuell_Elemente.GetUpperBound(0))
+        Array.Copy(Aktuell_Elemente, SKos1.Aktuell_Elemente, Aktuell_Elemente.GetLength(0))
     End Sub
 
     'Ermittelt das aktuelle Verzweigungsarray

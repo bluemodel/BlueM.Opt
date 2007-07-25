@@ -18,7 +18,7 @@ Public Class SKos
     '*******************************************************************************
     '*******************************************************************************
 
-    Public AktuelleElemente() As Object
+    Public Aktuell_Elemente() As String
 
     Public Function calculate_costs(ByVal BlueM1 As BlueM) As Double
         Dim costs As Double = 0
@@ -38,9 +38,9 @@ Public Class SKos
 
         'Kosten aufsummieren
         Dim i, j As Integer
-        For i = 0 To AktuelleElemente.GetUpperBound(0)
+        For i = 0 To Aktuell_Elemente.GetUpperBound(0)
             For j = 0 To Bauwerksliste.GetUpperBound(0)
-                If Bauwerksliste(j, 0) = AktuelleElemente(i) Then
+                If Bauwerksliste(j, 0) = Aktuell_Elemente(i) Then
                     costs = costs + Bauwerksliste(j, 1)
                 End If
             Next
@@ -78,7 +78,7 @@ Public Class SKos
 
     'Hilfsfunktion: Die "X" Einträge werden entfernt
     '***********************************************
-    Public Sub Remove_X(ByRef Array As Object())
+    Public Sub Remove_X(ByRef Array As String())
         Dim x As Integer
         Dim i As Integer
         Dim TmpArray(Array.GetUpperBound(0)) As String
