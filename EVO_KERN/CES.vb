@@ -25,7 +25,7 @@ Public Class CES
     Public n_Penalty As Integer             'Anzahl der Ziele wird von auﬂen gesetzt
     Public n_Verzweig As Integer            'Anzahl der Verzweigungen in der Verzweigungsdatei
     Public n_PathDimension() As Integer     'Anzahl der Maﬂnahmen an jeder Stelle
-    Public n_Generation As Integer = 2      'Anzahl der Generationen
+    Public n_Generation As Integer = 1      'Anzahl der Generationen
 
     'Eingabe
     Public n_Parents As Integer = 5

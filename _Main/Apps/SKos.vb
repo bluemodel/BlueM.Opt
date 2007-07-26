@@ -50,7 +50,7 @@ Public Class SKos
     End Function
     'Funktion zum erstellen der Bauwerksliste
     Private Sub create_Bauwerksliste(ByVal BlueM1 As BlueM, ByRef Bauwerksliste(,) As Object)
-        Dim Bauwerks_Array() As Object = {}
+        Dim Bauwerks_Array() As String = {}
 
         'Kopiert die Bauwerke aus dem BlueM
         Dim i, j, k As Integer

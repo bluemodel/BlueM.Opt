@@ -247,6 +247,9 @@ Partial Class Form1
                 Case METH_RESET 'Methode Reset
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
+                    'Methode setzen
+                    Sim1.Method = METH_RESET
+
                     'Ergebnisdatenbank ausschalten
                     Sim1.Ergebnisdb = False
 
@@ -260,6 +263,9 @@ Partial Class Form1
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     SensiPlot1 = New SensiPlot
+
+                    'Methode setzen
+                    Sim1.Method = METH_SENSIPLOT
 
                     'Ergebnisdatenbank einschalten
                     Sim1.Ergebnisdb = True
@@ -293,6 +299,9 @@ Partial Class Form1
                     'EVO_Einstellungen aktivieren
                     EVO_Einstellungen1.Enabled = True
 
+                    'Methode setzen
+                    Sim1.Method = METH_PES
+
                     'Ergebnisdatenbank einschalten
                     Sim1.Ergebnisdb = True
 
@@ -320,8 +329,11 @@ Partial Class Form1
                         Throw New Exception("CES funktioniert bisher nur mit BlueM!")
                     End If
 
+                    'Methode setzen
+                    Sim1.Method = METH_CES
+
                     'Ergebnisdatenbank ausschalten
-                    Sim1.Ergebnisdb = False
+                    Sim1.Ergebnisdb = True
 
                     'CES für Sim vorbereiten (Files lesen und Validieren)
                     Call Sim1.read_and_valid_INI_Files_CES()
@@ -374,23 +386,23 @@ Partial Class Form1
                         Throw New Exception("CES funktioniert bisher nur mit BlueM!")
                     End If
 
+                    'Methode setzen
+                    Sim1.Method = METH_CES_PES
+
                     'EVO_Einstellungen aktiviern
                     EVO_Einstellungen1.Enabled = True
 
                     'Ergebnisdatenbank ausschalten
-                    Sim1.Ergebnisdb = False
+                    Sim1.Ergebnisdb = True
 
                     'CES für Sim vorbereiten (Dateien einlesen und Prüfen)
-                    Call Sim1.read_and_valid_INI_Files_CES()
+                    Call Sim1.read_and_valid_INI_Files_CES_PES()
                     'CES initialisieren
                     CES1 = New EvoKern.CES
                     'Prüft ob die Zahl mög. Kombinationen < Zahl Eltern + Nachfolger
                     If (CES1.n_Childs + CES1.n_Parents) > Sim1.No_of_Combinations Then
                         Throw New Exception("Die Zahl der Eltern + die Zahl der Kinder ist größer als die mögliche Zahl der Kombinationen.")
                     End If
-
-                    'PES für Sim vorbereiten (Files lesen und Validieren)
-                    Call Sim1.read_and_valid_INI_Files_PES()
 
                     'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
                     If (Sim1.List_OptZiele.GetLength(0) = 1) Then
@@ -762,7 +774,7 @@ Partial Class Form1
                 'Aktueller Pfad wird an Sim zurückgegeben
                 'Bereitet das BlaueModell für die Kombinatorik vor
                 Call Sim1.prepare_Evaluation_CES(CES1.List_Childs(i).Path)
-                Call Sim1.Sim_Evaluierung_CombiOpt(CES1.n_Penalty, CES1.List_Childs(i).Penalty)
+                Call Sim1.SIM_Evaluierung_CombiOpt(CES1.n_Penalty, CES1.List_Childs(i).Penalty)
                 '***********************************************
 
                 'Zeichnen MO_SO
@@ -866,7 +878,7 @@ Partial Class Form1
                 'Aktueller Pfad wird an Sim zurückgegeben
                 'Bereitet das BlaueModell für die Kombinatorik vor
                 Call Sim1.prepare_Evaluation_CES(CES1.List_Childs(i).Path)
-                Call Sim1.Sim_Evaluierung_CombiOpt(CES1.n_Penalty, CES1.List_Childs(i).Penalty)
+                Call Sim1.SIM_Evaluierung_CombiOpt(CES1.n_Penalty, CES1.List_Childs(i).Penalty)
                 '******************************************
 
                 'Zeichnen MO_SO
@@ -1168,7 +1180,7 @@ GenerierenAusgangswerte:
                             Case ANW_TESTPROBLEME
                                 Call Testprobleme1.Evaluierung_TestProbleme(Testprobleme1.Combo_Testproblem.Text, globalAnzPar, mypara, durchlauf, ipop, QN, RN, DForm.Diag)
                             Case ANW_BLUEM, ANW_SMUSI
-                                If Not Sim1.Eval_Sim_ParaOpt(globalAnzPar, globalAnzZiel_ParaOpt, mypara, durchlauf, ipop, Exchange.Series_No, QN, DForm.Diag) Then
+                                If Not Sim1.SIM_Evaluierung_ParaOpt(mypara, durchlauf, ipop, Exchange.Series_No, QN, DForm.Diag) Then
                                     GoTo GenerierenAusgangswerte
                                 End If
                         End Select

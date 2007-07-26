@@ -25,11 +25,16 @@ Public MustInherit Class Sim
     'Eigenschaften
     '#############
 
+    'Information
+    '-----------
+
+    Public Method as String                             'Verwendete Methode
+
     'Generelle Eigenschaften
     '-----------------------
     Public Datensatz As String                           'Name des zu simulierenden Datensatzes
     Public WorkDir As String                             'Arbeitsverzeichnis für das Blaue Modell
-    Public Event WorkDirChange                           'Event für Änderung des Arbeitsverzeichnisses
+    Public Event WorkDirChange()                           'Event für Änderung des Arbeitsverzeichnisses
     Public Exe As String                                 'Pfad zur EXE für die Simulation
     Public SimStart As DateTime                          'Anfangsdatum der Simulation
     Public SimEnde As DateTime                           'Enddatum der Simulation
@@ -117,10 +122,13 @@ Public MustInherit Class Sim
 
     'Kombinatorik
     '------------
-    Public SKos1 As New SKos()
-    Public Aktuell_Path() As Integer
-    Public Aktuell_Elemente() As String
-    Public VER_ONOFF(,) As Object
+    Protected SKos1 As New SKos()
+    Private Aktuell_Path() As Integer
+    Private Aktuell_Measure() As String
+    Private Aktuell_Elemente() As String
+    'Private IsNewCombination As Boolean
+    'Private Aktuell_db_Pfad_ID as Integer
+    Protected VER_ONOFF(,) As Object
 
     Public Structure Struct_Massnahme
         Public Name As String
@@ -266,6 +274,7 @@ Public MustInherit Class Sim
         'Datenbank vorbereiten
         If Me.Ergebnisdb = True Then
             Call Me.db_prepare()
+            Call Me.db_prepare_PES()
         End If
 
     End Sub
@@ -285,8 +294,53 @@ Public MustInherit Class Sim
         Call Me.Validate_Combinatoric()
         'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
         Call Me.Validate_CES_fits_to_VER()
+        'Datenbank vorbereiten
+        If Me.Ergebnisdb = True Then
+            Call Me.db_prepare()
+            Call Me.db_prepare_CES()
+        End If
 
     End Sub
+
+    Public Sub read_and_valid_INI_Files_CES_PES()
+
+        'CES vorbereiten
+        'Erforderliche Dateien werden eingelesen
+        '***************************************
+        'Zielfunktionen einlesen
+        Call Me.Read_OptZiele()
+        'Kombinatorik Datei einlesen
+        Call Me.Read_Kombinatorik()
+        'Verzweigungs Datei einlesen
+        Call Me.Read_Verzweigungen()
+        'Überprüfen der Kombinatorik
+        Call Me.Validate_Combinatoric()
+        'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
+        Call Me.Validate_CES_fits_to_VER()
+        'Datenbank vorbereiten
+
+        'PES vorbereiten
+        'Erforderliche Dateien werden eingelesen
+        '***************************************
+        'Simulationsdaten einlesen
+        Call Me.Read_SimParameter()
+        'Zielfunktionen einlesen
+        Call Me.Read_OptZiele()
+        'Optimierungsparameter einlesen
+        Call Me.Read_OptParameter()
+        'ModellParameter einlesen
+        Call Me.Read_ModellParameter()
+        'Modell-/Optparameter validieren
+        Call Me.Validate_OPT_fits_to_MOD()
+
+        'Datenbank vorbereiten
+        '*********************
+        If Me.Ergebnisdb = True Then
+            Call Me.db_prepare()
+            Call Me.db_prepare_CES_PES()
+        End If
+    End Sub
+
 
     'Simulationsparameter einlesen
     '*****************************
@@ -755,7 +809,7 @@ Public MustInherit Class Sim
             counter = 0
             For j = 0 To List_Locations(i).List_Massnahmen.GetUpperBound(0)
                 If List_Locations(i).List_Massnahmen(j).TestModus = 1 Then
-                    path(i) = counter
+                    Path(i) = counter
                 End If
                 counter += 1
             Next
@@ -772,6 +826,9 @@ Public MustInherit Class Sim
 
         'Erstellt die aktuelle Bauerksliste und überträgt sie zu SKos
         Call Prepare_aktuelle_Elemente()
+
+        'Ermittelt die Namen der Locations
+        Call Prepare_aktuelle_Locations()
 
         'Ermittelt das aktuelle_ON_OFF array
         Call Prepare_Verzweigung_ON_OFF()
@@ -803,6 +860,22 @@ Public MustInherit Class Sim
         'Kopiert die aktuelle ElementeListe in dieses Aktuell_Element Array
         ReDim SKos1.Aktuell_Elemente(Aktuell_Elemente.GetUpperBound(0))
         Array.Copy(Aktuell_Elemente, SKos1.Aktuell_Elemente, Aktuell_Elemente.GetLength(0))
+    End Sub
+
+    'Ermittelt die Namen der aktuellen Bauwerke
+    '******************************************
+    Private Sub Prepare_aktuelle_Locations()
+        Dim i, j As Integer
+
+        ReDim Aktuell_Measure(List_Locations.GetUpperBound(0))
+
+        For i = 0 To List_Locations.GetUpperBound(0)
+            For j = 0 To List_Locations(i).List_Massnahmen.GetUpperBound(0)
+                If j = Aktuell_Path(i) Then
+                    Aktuell_Measure(i) = List_Locations(i).List_Massnahmen(j).Name
+                End If
+            Next
+        Next
     End Sub
 
     'Ermittelt das aktuelle Verzweigungsarray
@@ -969,15 +1042,15 @@ Public MustInherit Class Sim
 
     'Evaluierung des SimModells für ParameterOptimierung - Steuerungseinheit
     '***********************************************************************
-    Public Function Eval_Sim_ParaOpt(ByVal GlobalAnzPar As Short, ByVal GlobalAnzZiel As Short, ByVal mypara As Double(,), ByVal durchlauf As Integer, ByVal ipop As Short, ByVal Series_No As Integer, ByRef QN As Double(), ByRef Diag As Main.Diagramm) As Boolean
+    Public Function SIM_Evaluierung_ParaOpt(ByVal mypara As Double(,), ByVal durchlauf As Integer, ByVal ipop As Short, ByVal Series_No As Integer, ByRef QN As Double(), ByRef Diag As Main.Diagramm) As Boolean
 
         Dim i As Short
 
-        Eval_Sim_ParaOpt = False
+        SIM_Evaluierung_ParaOpt = False
 
         'Mutierte Parameter an OptParameter übergeben
-        For i = 1 To GlobalAnzPar                                   'BUG 57: mypara(,) fängt bei 1 an!
-            List_OptParameter(i - 1).SKWert = mypara(i, 1)          'OptParameterListe(i-1) weil Array bei 0 anfängt!
+        For i = 0 To Me.List_OptParameter.GetUpperBound(0)          'BUG 57: mypara(,) fängt bei 1 an!
+            List_OptParameter(i).SKWert = mypara(i + 1, 1)          'OptParameterListe(i+1) weil Array bei 0 anfängt!
         Next
 
         'Mutierte Parameter in Eingabedateien schreiben
@@ -987,18 +1060,18 @@ Public MustInherit Class Sim
         If Not launchSim() Then Exit Function
 
         'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
-        For i = 0 To GlobalAnzZiel - 1                              'BUG 57: QN() fängt bei 1 an!
+        For i = 0 To Me.List_OptZiele.GetUpperBound(0)              'BUG 57: QN() fängt bei 1 an!
             List_OptZiele(i).QWertTmp = QWert(List_OptZiele(i))
-            QN(i + 1) = List_OptZiele(i).QWertTmp
+            QN(i + 1) = List_OptZiele(i).QWertTmp                   'QN(i+1) weil Array bei 0 anfängt!
         Next
 
         'Qualitätswerte im TeeChart zeichnen
-        If (GlobalAnzZiel = 1) Then
+        If (Me.List_OptZiele.Length = 1) Then
             'SingleObjective
             Call Diag.prepareSeries(ipop - 1, "Population " & ipop)
             Diag.Series(ipop - 1).Cursor = Cursors.Hand
             Call Diag.Series(ipop - 1).Add(durchlauf, List_OptZiele(0).QWertTmp)
-        ElseIf (GlobalAnzZiel > 1) Then
+        Else
             'MultiObjective
             'BUG 66: nur die ersten beiden Zielfunktionen werden gezeichnet
             Call Diag.prepareSeries(Series_No, "Population", Steema.TeeChart.Styles.PointerStyles.Circle, 4)
@@ -1011,7 +1084,7 @@ Public MustInherit Class Sim
             Call db_update(durchlauf, ipop)
         End If
 
-        Eval_Sim_ParaOpt = True
+        SIM_Evaluierung_ParaOpt = True
 
     End Function
 
@@ -1100,7 +1173,7 @@ Public MustInherit Class Sim
 
     'Evaluiert die Kinderchen für Kombinatorik Optimierung vor
     '*********************************************************
-    Public Function Sim_Evaluierung_CombiOpt(ByVal n_Ziele As Short, ByRef Penalty As Double()) As Boolean
+    Public Function SIM_Evaluierung_CombiOpt(ByVal n_Ziele As Short, ByRef Penalty As Double()) As Boolean
         Dim i As Short
 
         'Modell Starten
@@ -1111,6 +1184,11 @@ Public MustInherit Class Sim
             List_OptZiele(i).QWertTmp = QWert(List_OptZiele(i))
             Penalty(i) = List_OptZiele(i).QWertTmp
         Next
+
+        'Qualitätswerte und OptParameter in DB speichern
+        If (Ergebnisdb = True) Then
+            Call db_update(12, 15)
+        End If
 
     End Function
 
@@ -1525,9 +1603,22 @@ Public MustInherit Class Sim
         command.CommandText = "ALTER TABLE QWerte ADD COLUMN " & fieldnames
         command.ExecuteNonQuery()
 
+        Call db_disconnect()
+
+    End Sub
+
+    'Ergebnisdatenbank für PES vorbereiten
+    '*************************************
+    Private Sub db_prepare_PES()
+
+        Call db_connect()
+        Dim command As OleDbCommand = New OleDbCommand("", db)
+
         'Tabelle 'OptParameter'
         'Spalten festlegen:
-        fieldnames = ""
+        Dim fieldnames As String = ""
+        Dim i As Integer
+
         For i = 0 To List_OptParameter.GetUpperBound(0)
             If (i > 0) Then
                 fieldnames &= ", "
@@ -1537,9 +1628,80 @@ Public MustInherit Class Sim
         'Tabelle anpassen
         command.CommandText = "ALTER TABLE OptParameter ADD COLUMN " & fieldnames
         command.ExecuteNonQuery()
+
         Call db_disconnect()
 
     End Sub
+
+    'Ergebnisdatenbank für CES vorbereiten
+    '*************************************
+    Private Sub db_prepare_CES()
+
+        Call db_connect()
+        Dim command As OleDbCommand = New OleDbCommand("", db)
+
+        'Tabelle 'Pfad'
+        'Spalten festlegen:
+        Dim fieldnames As String = ""
+        Dim i As Integer
+
+        command.CommandText = "ALTER TABLE Pfad ADD COLUMN 'QWert_ID' INTEGER"
+        command.ExecuteNonQuery()
+
+        For i = 0 To Me.List_Locations.GetUpperBound(0)
+            If (i > 0) Then
+                fieldnames &= ", "
+            End If
+            fieldnames &= Me.List_Locations(i).Name & " TEXT"
+        Next
+        'Tabelle anpassen
+        command.CommandText = "ALTER TABLE Pfad ADD COLUMN " & fieldnames
+        command.ExecuteNonQuery()
+
+        Call db_disconnect()
+
+    End Sub
+
+    'Ergebnisdatenbank für CES & PES vorbereiten
+    '*******************************************
+    Private Sub db_prepare_CES_PES()
+
+        Call db_connect()
+        Dim command As OleDbCommand = New OleDbCommand("", db)
+
+        'Tabelle 'OptParameter'
+        'Spalten festlegen:
+        Dim fieldnames As String = ""
+        Dim i As Integer
+
+        For i = 0 To List_OptParameter.GetUpperBound(0)
+            If (i > 0) Then
+                fieldnames &= ", "
+            End If
+            fieldnames &= "'" & List_OptParameter(i).Bezeichnung & "' DOUBLE"
+        Next
+        'Tabelle anpassen
+        command.CommandText = "ALTER TABLE OptParameter ADD COLUMN " & fieldnames
+        command.ExecuteNonQuery()
+
+        'Tabelle 'Pfad'
+        'Spalten festlegen:
+        fieldnames = ""
+
+        For i = 0 To Me.List_Locations.GetUpperBound(0)
+            If (i > 0) Then
+                fieldnames &= ", "
+            End If
+            fieldnames &= Me.List_Locations(i).Name & " TEXT"
+        Next
+        'Tabelle anpassen
+        command.CommandText = "ALTER TABLE Pfad ADD COLUMN " & fieldnames
+        command.ExecuteNonQuery()
+
+        Call db_disconnect()
+
+    End Sub
+
 
     'Mit Ergebnisdatenbank verbinden
     '*******************************
@@ -1577,15 +1739,95 @@ Public MustInherit Class Sim
         command.CommandText = "SELECT @@IDENTITY AS ID"
         Dim QWert_ID As Integer = command.ExecuteScalar()
 
-        'Zugehörige OptParameter schreiben
-        fieldnames = ""
-        fieldvalues = ""
-        For i = 0 To List_OptParameter.GetUpperBound(0)
-            fieldnames &= ", '" & List_OptParameter(i).Bezeichnung & "'"
-            fieldvalues &= ", " & List_OptParameter(i).Wert
-        Next
-        command.CommandText = "INSERT INTO OptParameter (QWert_ID" & fieldnames & ") VALUES (" & QWert_ID & fieldvalues & ")"
-        command.ExecuteNonQuery()
+        Select Case Me.Method
+
+            Case "PES"
+                'Zugehörige OptParameter schreiben
+                fieldnames = ""
+                fieldvalues = ""
+                For i = 0 To List_OptParameter.GetUpperBound(0)
+                    fieldnames &= ", '" & List_OptParameter(i).Bezeichnung & "'"
+                    fieldvalues &= ", " & List_OptParameter(i).Wert
+                Next
+                command.CommandText = "INSERT INTO OptParameter (QWert_ID" & fieldnames & ") VALUES (" & QWert_ID & fieldvalues & ")"
+                command.ExecuteNonQuery()
+
+            Case "CES"
+
+                'Zugehörigen Pfad schreiben
+                fieldnames = ""
+                fieldvalues = ""
+                For i = 0 To Me.List_Locations.GetUpperBound(0)
+                    fieldnames &= ", " & Me.List_Locations(i).Name
+                    fieldvalues &= ", '" & Me.Aktuell_Measure(i) & "'"
+                Next
+                command.CommandText = "INSERT INTO Pfad ('QWert_ID'" & fieldnames & ") VALUES (" & QWert_ID & fieldvalues & ")"
+                command.ExecuteNonQuery()
+
+
+            Case "CES + PES"
+
+                'OptParameter
+                '------------
+
+                'Zugehörige OptParameter schreiben
+                fieldnames = ""
+                fieldvalues = ""
+                For i = 0 To List_OptParameter.GetUpperBound(0)
+                    fieldnames &= ", '" & List_OptParameter(i).Bezeichnung & "'"
+                    fieldvalues &= ", " & List_OptParameter(i).Wert
+                Next
+                command.CommandText = "INSERT INTO OptParameter (QWert_ID" & fieldnames & ") VALUES (" & QWert_ID & fieldvalues & ")"
+                command.ExecuteNonQuery()
+
+                'ID des zuletzt geschriebenen OptParameter holen
+                command.CommandText = "SELECT @@IDENTITY AS ID"
+                Dim OptParam_ID As Integer = command.ExecuteScalar()
+
+                'Pfad
+                '----
+
+                'Überprüfen, ob der Pfad schon existiert
+                Dim Pfad_ID as Integer
+                Dim condition As String = ""
+                For i = 0 To Me.List_Locations.GetUpperBound(0)
+                    If (i > 0) Then
+                        condition &= " AND "
+                    End If
+                    condition &= Me.List_Locations(i).Name & " = '" & Me.Aktuell_Measure(i) & "'"
+                Next
+                command.CommandText = "SELECT ID FROM Pfad WHERE (" & condition & ")"
+                If (Not IsNothing(command.ExecuteScalar())) Then
+                    'Pfad_ID übernehmen
+                    Pfad_ID = command.ExecuteScalar()
+                Else
+                    'Neuen Pfad einfügen
+                    fieldnames = ""
+                    fieldvalues = ""
+                    For i = 0 To Me.List_Locations.GetUpperBound(0)
+                        If (i > 0) Then
+                            fieldnames &= ","
+                            fieldvalues &= ","
+                        End If
+                        fieldnames &= " " & Me.List_Locations(i).Name
+                        fieldvalues &= " '" & Me.Aktuell_Measure(i) & "'"
+                    Next
+                    command.CommandText = "INSERT INTO Pfad (" & fieldnames & ") VALUES (" & fieldvalues & ")"
+                    command.ExecuteNonQuery()
+
+                    'ID des zuletzt geschriebenen Pfads holen
+                    command.CommandText = "SELECT @@IDENTITY AS ID"
+                    Pfad_ID = command.ExecuteScalar()
+                End If
+
+                'Verknüpfung
+                '-----------
+
+                'Verknüpfung zwischen OptParameter und Pfad schreiben
+                command.CommandText = "INSERT INTO Rel_Pfad_OptParameter (Pfad_ID, OptParameter_ID) VALUES (" & Pfad_ID & ", " & OptParam_ID & ")"
+                command.ExecuteNonQuery()
+
+        End Select
 
         Call db_disconnect()
 

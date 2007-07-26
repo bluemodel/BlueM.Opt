@@ -82,7 +82,7 @@ Public Class EVO_Einstellungen
         Label_OptModusValue.Text = "MultiObjective Pareto"
         TextAnzGen.Text = CStr(2)
         TextAnzEltern.Text = CStr(3)
-        TextAnzNachf.Text = CStr(5)
+        TextAnzNachf.Text = CStr(15)
 
     End Sub
 
