@@ -36,43 +36,48 @@ Public Class IHA
     'Eigenschaften
     '#############
 
-    Private IHAZiel As Sim.Struct_OptZiel           'Kopie des OptZiels mit ZielTyp "IHA"
-    Private IHADir As String                        'Verzeichnis für IHA-Dateien
+    Private IHAZiel As Sim.Struct_OptZiel               'Kopie des OptZiels mit ZielTyp "IHA"
+    Private IHADir As String                            'Verzeichnis für IHA-Dateien
 
     'IHA-Ergebnisse
     '--------------
-    Private Structure IHAParam                      'Struktur für IHA Ergebnis eines Parameters
-        Public PName As String                      'Parametername
-        Public HAMiddle As Double                   'Hydrologic Alteration (HA) - Middle RVA Category
+    Private Structure IHAParam                          'Struktur für IHA Ergebnis eines Parameters
+        Public PName As String                          'Parametername
+        Public HAMiddle As Double                       'Hydrologic Alteration (HA) - Middle RVA Category
+        Public ReadOnly Property fx_HA() As Double      'normalverteilter Funktionswert des HA-Werts
+            Get
+                Return fx(HAMiddle)
+            End Get
+        End Property
     End Structure
 
-    Private Structure IHAParamGroup                 'Struktur für IHA Ergebnis einer Parametergruppe
-        Public No As Short                          'Gruppennummer
-        Public GName As String                      'Gruppennname
-        Public Avg As Double                        'HA-Mittelwert der Gruppe
-        Public IHAParams() As IHAParam              'Liste der Paremeter
+    Private Structure IHAParamGroup                     'Struktur für IHA Ergebnis einer Parametergruppe
+        Public No As Short                              'Gruppennummer
+        Public GName As String                          'Gruppennname
+        Public Avg_fx_HA As Double                      'Mittelwert der fx(HA)-Werte der Gruppe
+        Public IHAParams() As IHAParam                  'Liste der Paremeter
     End Structure
 
-    Private Structure IHAResult                     'Struktur für alle IHA Ergebnisse zusammen
-        Public Avg As Double                        'HA-Mittelwert über alle Gruppen
-        Public IHAParamGroups() As IHAParamGroup    'Liste der Parametergruppen
+    Private Structure IHAResult                         'Struktur für alle IHA Ergebnisse zusammen
+        Public GAvg_fx_HA As Double                     'Mittelwert der fx(HA)-Werte über alle Gruppen
+        Public IHAParamGroups() As IHAParamGroup        'Liste der Parametergruppen
     End Structure
 
     Private IHARes As IHAResult
 
     'IHA-Software-Parameter
     '----------------------
-    Private Const BegWatrYr as Integer = 275        '1. Okt.
+    Private Const BegWatrYr As Integer = 275            '1. Okt.
 
     'Jahreszahlen
     Private BeginPre As Integer
     Private EndPre As Integer
-    Private BeginPost_sim As Integer                'tatsächlich
-    Private EndPost_sim As Integer                  'tatsächlich
-    Private BeginPost As Integer                    'für IHA verwendet
-    Private EndPost As Integer                      'für IHA verwendet
+    Private BeginPost_sim As Integer                    'tatsächlich
+    Private EndPost_sim As Integer                      'tatsächlich
+    Private BeginPost As Integer                        'für IHA verwendet
+    Private EndPost As Integer                          'für IHA verwendet
 
-    Private RefData(,) As Double                    'Enthält die Referenz-Abflussdaten in Zeilen für jeden Tag des Jahres
+    Private RefData(,) As Double                        'Enthält die Referenz-Abflussdaten in Zeilen für jeden Tag des Jahres
 
 #End Region 'Eigenschaften
 
@@ -83,7 +88,7 @@ Public Class IHA
 
     'Konstruktor
     '***********
-    Public Sub New(ByVal OptZiel as Sim.Struct_OptZiel)
+    Public Sub New(ByVal OptZiel As Sim.Struct_OptZiel)
 
         'IHAZiel kopieren
         '----------------
@@ -383,32 +388,42 @@ Public Class IHA
     Public Function QWert_IHA(ByVal OptZiel As Sim.Struct_OptZiel) As Double
 
         Dim QWert As Double
-        Dim HA As Double
+        Dim fx_HA As Double
         Dim i As Integer
-        'Parameter für Normalverteilung mit f(0) ~= 1
-        Dim std As Double = 0.398942423706863                   'Standardabweichung
-        Dim avg As Double = 0                                   'Erwartungswert
 
-        'HA-Wert bestimmen
+        'fx(HA) Wert bestimmen
         '-----------------
         If (OptZiel.ZielFkt = "") Then
-            'HA Gesamtmittelwert
-            HA = Me.IHARes.Avg
+            'fx(HA) Gesamtmittelwert
+            fx_HA = Me.IHARes.GAvg_fx_HA
         Else
-            'HA Mittelwert einer Parametergruppe
+            'fx(HA) Mittelwert einer Parametergruppe
             For i = 0 To Me.IHARes.IHAParamGroups.GetUpperBound(0)
                 If (OptZiel.ZielFkt = Me.IHARes.IHAParamGroups(i).GName) Then
-                    HA = Me.IHARes.IHAParamGroups(i).Avg
+                    fx_HA = Me.IHARes.IHAParamGroups(i).Avg_fx_HA
                     Exit For
                 End If
             Next
         End If
 
-        'QWert = 1 - f(x)
-        '[EXCEL:] 1/(std*WURZEL(2*PI()))*EXP(-1/2*((X-avg)/std)^2)
-        QWert = 1 - 1 / (std * Math.Sqrt(2 * Math.PI)) * Math.Exp(-1 / 2 * ((HA - avg) / std) ^ 2)
+        QWert = 1 - fx_HA
 
         Return QWert
+
+    End Function
+
+    'Transformiert einen HA-Wert in einen normalverteilten Funktionswert
+    '*******************************************************************
+    Private Shared Function fx(ByVal HA As Double) As Double
+
+        'Parameter für Normalverteilung mit f(0) ~= 1
+        '[EXCEL:] 1/(std*WURZEL(2*PI()))*EXP(-1/2*((X-avg)/std)^2)
+        Dim std As Double = 0.398942423706863                   'Standardabweichung
+        Dim avg As Double = 0                                   'Erwartungswert
+
+        fx = 1 / (std * Math.Sqrt(2 * Math.PI)) * Math.Exp(-1 / 2 * ((HA - avg) / std) ^ 2)
+
+        Return fx
 
     End Function
 
@@ -424,7 +439,7 @@ Public Class IHA
 
         Dim i, j As Integer
         Dim Zeile As String
-        Dim Psum, Gsum As Double
+        Dim Psum, Gsum As Double                        'Summen der fx_HA Werte
 
         'Schleife über Parametergruppen
         '------------------------------
@@ -445,17 +460,17 @@ Public Class IHA
                             Zeile = StrRead.ReadLine.ToString
                             .IHAParams(j).PName = Zeile.Substring(0, 20).Trim
                             .IHAParams(j).HAMiddle = Convert.ToDouble(Zeile.Substring(171, 14).Trim)
-                            Psum += .IHAParams(j).HAMiddle
+                            Psum += .IHAParams(j).fx_HA
                         Next
 
                         Exit Do
                     End If
                 Loop Until StrRead.Peek() = -1
 
-                'Mittelwert einer Parametergruppe berechnen
-                '------------------------------------------
-                .Avg = Psum / .IHAParams.GetLength(0)
-                Gsum += .Avg
+                'Mittelwert für eine Parametergruppe berechnen
+                '---------------------------------------------
+                .Avg_fx_HA = Psum / .IHAParams.GetLength(0)
+                Gsum += .Avg_fx_HA
 
             End With
 
@@ -463,7 +478,7 @@ Public Class IHA
 
         'Mittelwert aller Parametergruppen berechnen
         '-------------------------------------------
-        Me.IHARes.Avg = Gsum / Me.IHARes.IHAParamGroups.GetLength(0)
+        Me.IHARes.GAvg_fx_HA = Gsum / Me.IHARes.IHAParamGroups.GetLength(0)
 
     End Sub
 
