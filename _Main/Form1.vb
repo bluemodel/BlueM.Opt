@@ -1459,7 +1459,7 @@ GenerierenAusgangswerte:
             MsgBox("Wave funktioniert nur bei angeschlossener Ergebnisdatenbank!", MsgBoxStyle.Information, "Info")
             Exit Sub
 
-        ElseIf (Not s.Title.StartsWith("Population")) Then
+        ElseIf (Not s.Title.StartsWith("Population")) And (Not s.Title.StartsWith("Childs")) Then
             'Serientitel fängt nicht mit "Population" an
             MsgBox("Parametersätze können leider nur" & Chr(13) & Chr(10) _
                         & "für Populations-Punkte" & Chr(13) & Chr(10) _
@@ -1468,38 +1468,76 @@ GenerierenAusgangswerte:
 
         Else
 
-            'Bestimmung der Parametersatz-ID
-            '-------------------------------
+            'Unterscheidung für die Methoden
+            '*******************************
             Dim dbID As Integer
-            'valueIndex fängt bei 0 an, ID aber bei 1
-            If (Me.EVO_Einstellungen1.isPOPUL) Then
-                'Bei Populationen muss ID mithilfe von ipop (hinterlegt im Serentitel) bestimmt werden
-                Dim ipop As Integer = Convert.ToInt32(s.Title.Substring(10).Trim)
-                Dim nKalk As Integer = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
-                dbID = ((ipop - 1) * nKalk) + (valueIndex + 1)
-            Else
-                dbID = valueIndex + 1
-            End If
+            Dim res As MsgBoxResult
+            'String für die Anzeige der OptParameter oder Pfade
+            Dim MsgString As String = ""
 
-            Dim i As Integer
+            Select Case Method
+                Case METH_PES
 
-            'OptParameter aus DB lesen
-            Call Sim1.db_getOptPara(dbID)
+                    'Bestimmung der Parametersatz-ID
+                    '-------------------------------
+                    'valueIndex fängt bei 0 an, ID aber bei 1
+                    If (Me.EVO_Einstellungen1.isPOPUL) Then
+                        'Bei Populationen muss ID mithilfe von ipop (hinterlegt im Serentitel) bestimmt werden
+                        Dim ipop As Integer = Convert.ToInt32(s.Title.Substring(10).Trim)
+                        Dim nKalk As Integer = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
+                        dbID = ((ipop - 1) * nKalk) + (valueIndex + 1)
+                    Else
+                        dbID = valueIndex + 1
+                    End If
 
-            'Modellparameter schreiben
-            Call Sim1.ModellParameter_schreiben()
+                    Dim i As Integer
 
-            'String für die Anzeige der OptParameter
-            Dim OptParaString As String
-            OptParaString = Chr(13) & Chr(10) & "OptParameter: " & Chr(13) & Chr(10)
-            For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
-                With Sim1.List_OptParameter(i)
-                    OptParaString &= Chr(13) & Chr(10) & .Bezeichnung & ": " & .Wert.ToString()
-                End With
-            Next
+                    'OptParameter aus DB lesen
+                    Call Sim1.db_getOptPara(dbID)
 
-            'MessageBox
-            Dim res As MsgBoxResult = MsgBox("Diesen Parametersatz simulieren?" & Chr(13) & Chr(10) & OptParaString, MsgBoxStyle.OkCancel, "Info")
+                    'Modellparameter schreiben
+                    Call Sim1.ModellParameter_schreiben()
+
+                    'String für die Anzeige der OptParameter wird generiert
+                    MsgString = Chr(13) & Chr(10) & "OptParameter: " & Chr(13) & Chr(10)
+                    For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
+                        With Sim1.List_OptParameter(i)
+                            MsgString &= Chr(13) & Chr(10) & .Bezeichnung & ": " & .Wert.ToString()
+                        End With
+                    Next
+
+                    'MessageBox
+                    res = MsgBox("Diesen Parametersatz simulieren?" & Chr(13) & Chr(10) & MsgString, MsgBoxStyle.OkCancel, "Info")
+
+                Case METH_CES
+
+                    'Bestimmung der Parametersatz-ID
+                    '-------------------------------
+                    dbID = valueIndex + 1
+
+                    Dim i As Integer
+
+                    'Pfad aus DB lesen
+                    Call Sim1.db_getPfad(dbID)
+
+                    'Aktueller Pfad wird an Sim zurückgegeben
+                    'Bereitet das BlaueModell für die Kombinatorik vor
+                    Call Sim1.prepare_Evaluation_CES()
+
+                    'String für die Anzeige der Pfade wird generiert
+                    MsgString = Chr(13) & Chr(10) & "Pfad: " & Chr(13) & Chr(10)
+                    For i = 0 To Sim1.Aktuell_Measure.GetUpperBound(0)
+                        MsgString &= Chr(13) & Chr(10) & Sim1.List_Locations(i).Name & ": " & Sim1.Aktuell_Measure(i).ToString()
+                    Next
+
+                    'MessageBox
+                    res = MsgBox("Diesen Pfad simulieren?" & Chr(13) & Chr(10) & MsgString, MsgBoxStyle.OkCancel, "Info")
+
+                Case METH_CES_PES
+
+            End Select
+
+
             If (res = MsgBoxResult.Ok) Then
 
                 Dim SimSeries As New Collection                 'zu zeichnende Simulationsgrößen
@@ -1515,6 +1553,7 @@ GenerierenAusgangswerte:
                 QWertString = "QWerte: " & Chr(13) & Chr(10)
 
                 'zu zeichnenden Reihen aus Liste der OptZiele raussuchen
+                Dim i As Integer
                 For i = 0 To Sim1.List_OptZiele.GetUpperBound(0)
 
                     With Sim1.List_OptZiele(i)
@@ -1554,7 +1593,7 @@ GenerierenAusgangswerte:
 
                 'Annotation anzeigen
                 Dim anno1 As New Steema.TeeChart.Tools.Annotation(Wave1.TChart1.Chart)
-                anno1.Text = QWertString & Chr(13) & Chr(10) & OptParaString
+                anno1.Text = QWertString & Chr(13) & Chr(10) & MsgString
                 anno1.Position = Steema.TeeChart.Tools.AnnotationPositions.LeftTop
 
                 'Wave anzeigen

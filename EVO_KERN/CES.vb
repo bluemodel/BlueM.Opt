@@ -28,8 +28,8 @@ Public Class CES
     Public n_Generation As Integer = 1      'Anzahl der Generationen
 
     'Eingabe
-    Public n_Parents As Integer = 5
-    Public n_Childs As Integer = 15
+    Public n_Parents As Integer = 3
+    Public n_Childs As Integer = 7
 
     'Private Variablen
     Private ReprodOperator_TSP As String = "Order_Crossover_OX"

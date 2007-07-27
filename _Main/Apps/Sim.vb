@@ -124,7 +124,7 @@ Public MustInherit Class Sim
     '------------
     Protected SKos1 As New SKos()
     Private Aktuell_Path() As Integer
-    Private Aktuell_Measure() As String
+    Public Aktuell_Measure() As String
     Private Aktuell_Elemente() As String
     'Private IsNewCombination As Boolean
     'Private Aktuell_db_Pfad_ID as Integer
@@ -828,7 +828,7 @@ Public MustInherit Class Sim
         Call Prepare_aktuelle_Elemente()
 
         'Ermittelt die Namen der Locations
-        Call Prepare_aktuelle_Locations()
+        Call Prepare_aktuelle_Measures()
 
         'Ermittelt das aktuelle_ON_OFF array
         Call Prepare_Verzweigung_ON_OFF()
@@ -837,6 +837,31 @@ Public MustInherit Class Sim
         Call Me.Write_Verzweigungen()
 
     End Sub
+
+    '*******************************************************
+    Public Sub prepare_Evaluation_CES()
+
+        'Wandelt die Maßnahmen Namen wieder in einen Pfad zurück
+        Dim i, j As Integer
+        For i = 0 To Aktuell_Measure.GetUpperBound(0)
+            For j = 0 To List_Locations(i).List_Massnahmen.GetUpperBound(0)
+                If (List_Locations(i).List_Massnahmen(j).Name = Aktuell_Measure(i)) Then
+                    Aktuell_Path(i) = j
+                End If
+            Next
+        Next
+
+        'Erstellt die aktuelle Bauerksliste und überträgt sie zu SKos
+        Call Prepare_aktuelle_Elemente()
+
+        'Ermittelt das aktuelle_ON_OFF array
+        Call Prepare_Verzweigung_ON_OFF()
+
+        'Schreibt die neuen Verzweigungen
+        Call Me.Write_Verzweigungen()
+
+    End Sub
+
 
     'Die Liste mit den aktuellen Bauwerken des Kindes wird erstellt und in SKos geschrieben
     '**************************************************************************************
@@ -864,7 +889,7 @@ Public MustInherit Class Sim
 
     'Ermittelt die Namen der aktuellen Bauwerke
     '******************************************
-    Private Sub Prepare_aktuelle_Locations()
+    Private Sub Prepare_aktuelle_Measures()
         Dim i, j As Integer
 
         ReDim Aktuell_Measure(List_Locations.GetUpperBound(0))
@@ -1788,7 +1813,7 @@ Public MustInherit Class Sim
                 '----
 
                 'Überprüfen, ob der Pfad schon existiert
-                Dim Pfad_ID as Integer
+                Dim Pfad_ID As Integer
                 Dim condition As String = ""
                 For i = 0 To Me.List_Locations.GetUpperBound(0)
                     If (i > 0) Then
@@ -1852,6 +1877,30 @@ Public MustInherit Class Sim
             With Me.List_OptParameter(i)
                 .Wert = ds.Tables("OptParameter").Rows(0).Item("'" & .Bezeichnung & "'")
             End With
+
+        Next
+
+        Call db_disconnect()
+
+    End Sub
+
+    'Einen Pfad auslesen
+    '*******************
+    Public Sub db_getPfad(ByVal id As Integer)
+
+        Call db_connect()
+
+        Dim q As String = "SELECT * FROM Pfad WHERE ID = " & id
+
+        Dim adapter As OleDbDataAdapter = New OleDbDataAdapter(q, db)
+
+        Dim ds As New DataSet("EVO")
+        adapter.Fill(ds, "Pfad")
+
+        'Parametersatz übergeben
+        For i As Integer = 0 To Me.Aktuell_Measure.GetUpperBound(0)
+
+            Aktuell_Measure(i) = ds.Tables("Pfad").Rows(0).Item(List_Locations(i).Name)
 
         Next
 
