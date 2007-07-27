@@ -701,11 +701,11 @@ Public MustInherit Class Sim
 
         'Übergabe
         If FoundB = False Then
-            Throw New Exception(".VER und .CES Dateien passen nicht zusammen!")
+            Throw New Exception(".VER und .CES Dateien passen nicht zusammen! Eine Verzweigung in der VER Datei kommt in der CES Datei nicht vor und ist nicht nicht vom Typ Prozentsatz (Kennung 2)")
         Else
             For i = 0 To FoundA.GetUpperBound(0)
                 If FoundA(i) = False Then
-                    Throw New Exception(".VER und .CES Dateien passen nicht zusammen!")
+                    Throw New Exception(".VER und .CES Dateien passen nicht zusammen! Eine in der CES Datei angegebene Verzeigung kommt in der VEr Datei nicht vor.")
                 End If
             Next
         End If

@@ -20,6 +20,8 @@ Public Class SKos
 
     Public Aktuell_Elemente() As String
 
+    'Funktion für die Kalkulation der Kosten
+    '***************************************
     Public Function calculate_costs(ByVal BlueM1 As BlueM) As Double
         Dim costs As Double = 0
         Dim Bauwerksliste(0, 1) As Object
@@ -49,6 +51,7 @@ Public Class SKos
         Return costs
     End Function
     'Funktion zum erstellen der Bauwerksliste
+    '****************************************
     Private Sub create_Bauwerksliste(ByVal BlueM1 As BlueM, ByRef Bauwerksliste(,) As Object)
         Dim Bauwerks_Array() As String = {}
 
