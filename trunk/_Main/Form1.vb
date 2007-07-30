@@ -1447,6 +1447,11 @@ GenerierenAusgangswerte:
     '***************************
     Public Sub showWave(ByVal sender As Object, ByVal s As Steema.TeeChart.Styles.Series, ByVal valueIndex As Integer, ByVal e As System.Windows.Forms.MouseEventArgs)
 
+        'Die X uns Y werte aus der dem Punkt mit der ValueID organisiert
+        Dim xWert, yWert As Double
+        xWert = s.XValues(valueIndex)
+        yWert = s.YValues(valueIndex)
+
         'Notwendige Bedingungen überprüfen
         '---------------------------------
         If (IsNothing(Sim1)) Then
@@ -1457,13 +1462,6 @@ GenerierenAusgangswerte:
         ElseIf (Not Sim1.Ergebnisdb) Then
             'ErgebnisDB ist deaktiviert
             MsgBox("Wave funktioniert nur bei angeschlossener Ergebnisdatenbank!", MsgBoxStyle.Information, "Info")
-            Exit Sub
-
-        ElseIf (Not s.Title.StartsWith("Population")) And (Not s.Title.StartsWith("Childs")) Then
-            'Serientitel fängt nicht mit "Population" an
-            MsgBox("Parametersätze können leider nur" & Chr(13) & Chr(10) _
-                        & "für Populations-Punkte" & Chr(13) & Chr(10) _
-                        & "aus der DB abgerufen werden!", MsgBoxStyle.Information, "Info")
             Exit Sub
 
         Else
@@ -1478,19 +1476,10 @@ GenerierenAusgangswerte:
             Select Case Method
                 Case METH_PES
 
-                    'Bestimmung der Parametersatz-ID
-                    '-------------------------------
-                    'valueIndex fängt bei 0 an, ID aber bei 1
-                    If (Me.EVO_Einstellungen1.isPOPUL) Then
-                        'Bei Populationen muss ID mithilfe von ipop (hinterlegt im Serentitel) bestimmt werden
-                        Dim ipop As Integer = Convert.ToInt32(s.Title.Substring(10).Trim)
-                        Dim nKalk As Integer = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
-                        dbID = ((ipop - 1) * nKalk) + (valueIndex + 1)
-                    Else
-                        dbID = valueIndex + 1
-                    End If
-
                     Dim i As Integer
+
+                    'Bestimmung der DB_ID durch x und y Werte
+                    dbID = Sim1.db_getDBID(xWert, yWert)
 
                     'OptParameter aus DB lesen
                     Call Sim1.db_getOptPara(dbID)
@@ -1510,12 +1499,10 @@ GenerierenAusgangswerte:
                     res = MsgBox("Diesen Parametersatz simulieren?" & Chr(13) & Chr(10) & MsgString, MsgBoxStyle.OkCancel, "Info")
 
                 Case METH_CES
-
-                    'Bestimmung der Parametersatz-ID
-                    '-------------------------------
-                    dbID = valueIndex + 1
-
                     Dim i As Integer
+
+                    'Bestimmung der DB_ID durch x und y werte
+                    dbID = Sim1.db_getDBID(xWert, yWert)
 
                     'Pfad aus DB lesen
                     Call Sim1.db_getPfad(dbID)

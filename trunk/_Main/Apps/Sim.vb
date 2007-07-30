@@ -1908,6 +1908,28 @@ Public MustInherit Class Sim
 
     End Sub
 
+    'Erstmal die DB ID aus den Qualitätswertn holen
+    Public Function db_getDBID(ByVal xWert As Double, ByVal yWert As Double) As Integer
+
+        Call db_connect()
+
+        Dim q As String = "SELECT ID FROM QWerte WHERE ['" & List_OptZiele(0).Bezeichnung & "']=" & xWert & " AND ['" & List_OptZiele(1).Bezeichnung & "']=" & yWert
+
+        db_getDBID = 777
+
+        Dim adapter As OleDbDataAdapter = New OleDbDataAdapter(q, db)
+
+        Dim ds As New DataSet("EVO")
+        adapter.Fill(ds, "QWerteID")
+
+        'Parametersatz übergeben
+
+        db_getDBID = ds.Tables("QWerteID").Rows(0).Item("ID")
+
+        Call db_disconnect()
+
+    End Function
+
     'QWerte aus einer DB lesen
     '*************************
     Public Function db_readQWerte() As Collection
