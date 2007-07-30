@@ -80,9 +80,9 @@ Public Class EVO_Einstellungen
     Public Sub SetFor_CES_PES()
         'Vorgaben und Anzeige
         Label_OptModusValue.Text = "MultiObjective Pareto"
-        TextAnzGen.Text = CStr(2)
+        TextAnzGen.Text = CStr(1)
         TextAnzEltern.Text = CStr(3)
-        TextAnzNachf.Text = CStr(15)
+        TextAnzNachf.Text = CStr(5)
 
     End Sub
 

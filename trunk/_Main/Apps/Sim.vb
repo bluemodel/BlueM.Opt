@@ -1909,13 +1909,11 @@ Public MustInherit Class Sim
     End Sub
 
     'Erstmal die DB ID aus den Qualitätswertn holen
-    Public Function db_getDBID(ByVal xWert As Double, ByVal yWert As Double) As Integer
+    Public Function db_get_ID_QWert(ByVal xWert As Double, ByVal yWert As Double) As Integer
 
         Call db_connect()
 
         Dim q As String = "SELECT ID FROM QWerte WHERE ['" & List_OptZiele(0).Bezeichnung & "']=" & xWert & " AND ['" & List_OptZiele(1).Bezeichnung & "']=" & yWert
-
-        db_getDBID = 777
 
         Dim adapter As OleDbDataAdapter = New OleDbDataAdapter(q, db)
 
@@ -1924,7 +1922,27 @@ Public MustInherit Class Sim
 
         'Parametersatz übergeben
 
-        db_getDBID = ds.Tables("QWerteID").Rows(0).Item("ID")
+        db_get_ID_QWert = ds.Tables("QWerteID").Rows(0).Item("ID")
+
+        Call db_disconnect()
+
+    End Function
+
+    'Erstmal die DB ID aus den Qualitätswertn holen
+    Public Function db_get_ID_Pfad(ByVal QWert_ID as Integer) As Integer
+
+        Call db_connect()
+
+        Dim q As String = "SELECT Pfad_ID FROM Rel_Pfad_OptParameter WHERE OptParameter_ID=" & QWert_ID
+
+        Dim adapter As OleDbDataAdapter = New OleDbDataAdapter(q, db)
+
+        Dim ds As New DataSet("EVO")
+        adapter.Fill(ds, "PfadID")
+
+        'Parametersatz übergeben
+
+        db_get_ID_Pfad = ds.Tables("PfadID").Rows(0).Item("Pfad_ID")
 
         Call db_disconnect()
 

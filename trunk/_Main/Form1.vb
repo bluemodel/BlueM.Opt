@@ -1468,7 +1468,8 @@ GenerierenAusgangswerte:
 
             'Unterscheidung für die Methoden
             '*******************************
-            Dim dbID As Integer
+            Dim db_ID_QWert As Integer
+            Dim db_ID_Pfad As Integer
             Dim res As MsgBoxResult
             'String für die Anzeige der OptParameter oder Pfade
             Dim MsgString As String = ""
@@ -1479,10 +1480,10 @@ GenerierenAusgangswerte:
                     Dim i As Integer
 
                     'Bestimmung der DB_ID durch x und y Werte
-                    dbID = Sim1.db_getDBID(xWert, yWert)
+                    db_ID_QWert = Sim1.db_get_ID_QWert(xWert, yWert)
 
                     'OptParameter aus DB lesen
-                    Call Sim1.db_getOptPara(dbID)
+                    Call Sim1.db_getOptPara(db_ID_QWert)
 
                     'Modellparameter schreiben
                     Call Sim1.ModellParameter_schreiben()
@@ -1502,12 +1503,11 @@ GenerierenAusgangswerte:
                     Dim i As Integer
 
                     'Bestimmung der DB_ID durch x und y werte
-                    dbID = Sim1.db_getDBID(xWert, yWert)
+                    db_ID_QWert = Sim1.db_get_ID_QWert(xWert, yWert)
 
                     'Pfad aus DB lesen
-                    Call Sim1.db_getPfad(dbID)
+                    Call Sim1.db_getPfad(db_ID_QWert)
 
-                    'Aktueller Pfad wird an Sim zurückgegeben
                     'Bereitet das BlaueModell für die Kombinatorik vor
                     Call Sim1.prepare_Evaluation_CES()
 
@@ -1521,6 +1521,36 @@ GenerierenAusgangswerte:
                     res = MsgBox("Diesen Pfad simulieren?" & Chr(13) & Chr(10) & MsgString, MsgBoxStyle.OkCancel, "Info")
 
                 Case METH_CES_PES
+
+                    Dim i As Integer
+
+                    'Bestimmung der DB_ID durch x und y werte
+                    db_ID_QWert = Sim1.db_get_ID_QWert(xWert, yWert)
+                    db_ID_Pfad = sim1.db_get_ID_Pfad(db_id_QWert)
+
+                    'Pfad und Parameter aus DB lesen
+                    Call Sim1.db_getOptPara(db_ID_QWert)
+                    Call Sim1.db_getPfad(db_ID_Pfad)
+
+                    'Bereitet das BlaueModell für die Kombinatorik vor
+                    Call Sim1.prepare_Evaluation_CES()
+                    'Modellparameter schreiben
+                    Call Sim1.ModellParameter_schreiben()
+
+                    'String für die Anzeige der Pfade wird generiert
+                    MsgString = Chr(13) & Chr(10) & "Pfad: " & Chr(13) & Chr(10)
+                    For i = 0 To Sim1.Aktuell_Measure.GetUpperBound(0)
+                        MsgString &= Chr(13) & Chr(10) & Sim1.List_Locations(i).Name & ": " & Sim1.Aktuell_Measure(i).ToString()
+                    Next
+                    'MsgString &= Chr(13) & Chr(10) & "OptParameter: " & Chr(13) & Chr(10)
+                    'For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
+                    '    With Sim1.List_OptParameter(i)
+                    '        MsgString &= Chr(13) & Chr(10) & .Bezeichnung & ": " & .Wert.ToString()
+                    '    End With
+                    'Next
+
+                    'MessageBox
+                    res = MsgBox("Diesen Pfad simulieren?" & Chr(13) & Chr(10) & MsgString, MsgBoxStyle.OkCancel, "Info")
 
             End Select
 
