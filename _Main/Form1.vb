@@ -1,7 +1,7 @@
 Option Strict Off ' Off ist Default
 Option Explicit On
 Imports System.IO
-
+Imports System.Management
 '*******************************************************************************
 '*******************************************************************************
 '**** ihwb Optimierung                                                      ****
@@ -23,6 +23,9 @@ Partial Class Form1
 #Region "Eigenschaften"
 
     Private IsInitializing As Boolean
+
+    Private PhysCPU As Integer                              'Anzahl physikalischer Prozessoren
+    Private LogCPU As Integer                               'Anzahl logischer Prozessoren
 
     'Anwendung
     Private Anwendung As String
@@ -73,6 +76,9 @@ Partial Class Form1
     'Initialisierung von Form1
     '*************************
     Private Sub Form1_Load(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles MyBase.Load
+
+        'Anzahl der Prozessoren wird ermittelt
+        Anzahl_Prozessoren(PhysCPU,LogCPU)
 
         'XP-look
         System.Windows.Forms.Application.EnableVisualStyles()
@@ -1691,6 +1697,26 @@ GenerierenAusgangswerte:
     End Sub
 
 #End Region 'Diagrammfunktionen
+
+    'Ermittelt die beim Start die Anzahl der Physikalischen Prozessoren
+    '******************************************************************
+    Public Sub Anzahl_Prozessoren(ByRef PhysCPU As Integer, ByRef LogCPU As Integer)
+        Dim mc As ManagementClass = New ManagementClass("Win32_Processor")
+        Dim moc As ManagementObjectCollection = mc.GetInstances()
+        Dim SocketDesignation As String = String.Empty
+        Dim PhysCPUarray As ArrayList = New ArrayList
+
+        Dim mo As ManagementObject
+        For Each mo In moc
+            LogCPU += 1
+            SocketDesignation = mo.Properties("SocketDesignation").Value.ToString()
+            If Not PhysCPUarray.Contains(SocketDesignation) Then
+                PhysCPUarray.Add(SocketDesignation)
+            End If
+        Next
+        PhysCPU = PhysCPUarray.Count
+
+    End Sub
 
 #End Region 'Methoden
 
