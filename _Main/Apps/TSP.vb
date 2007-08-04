@@ -193,7 +193,7 @@ Public Class TSP
     End Sub
 
     'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
-    Public Sub Reset_Childs_TSP()
+    Public Sub Reset_Childs()
         Dim i As Integer
 
         For i = 0 To n_Childs - 1
@@ -247,7 +247,7 @@ Public Class TSP
 
     End Sub
 
-    'Reproductionsoperator "Order_Crossover (CX)"
+    'Reproductionsoperator "Order_Crossover (OX)"
     'Kopiert den mittleren Teil des einen Elter und füllt den Rest aus der Reihenfolge des anderen Elter auf
     'UPGRADE: Es wird immer nur der mittlere Teil Kopiert, könnte auch mal ein einderer sein
     Private Sub ReprodOp_Order_Crossover(ByVal ParPath_A() As Integer, ByVal ParPath_B() As Integer, ByRef ChildPath_A() As Integer, ByRef ChildPath_B() As Integer)

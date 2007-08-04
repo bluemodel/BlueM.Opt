@@ -360,7 +360,7 @@ Partial Class Form1
 
                     'Anzahl der Ziele, Locations und Verzeigungen wird an CES übergeben
                     CES1.n_Penalty = Sim1.List_OptZiele.GetLength(0)
-                    CES1.n_Location = Sim1.List_Locations.GetLength(0)
+                    CES1.n_Locations = Sim1.List_Locations.GetLength(0)
                     CES1.n_Verzweig = Sim1.VerzweigungsDatei.GetLength(0)
                     CES1.TestModus = Sim1.Set_TestModus
                     CES1.n_Combinations = Sim1.No_of_Combinations
@@ -379,8 +379,8 @@ Partial Class Form1
 
                     'Gibt die PathSize an für jede Pfadstelle
                     Dim i As Integer
-                    ReDim CES1.n_PathDimension(CES1.n_Location - 1)
-                    For i = 0 To CES1.n_Location - 1
+                    ReDim CES1.n_PathDimension(CES1.n_Locations - 1)
+                    For i = 0 To CES1.n_Locations - 1
                         CES1.n_PathDimension(i) = Sim1.List_Locations(i).List_Massnahmen.GetLength(0)
                     Next
 
@@ -419,7 +419,7 @@ Partial Class Form1
 
                     'Anzahl der Ziele, Locations und Verzeigungen wird an CES übergeben
                     CES1.n_Penalty = Sim1.List_OptZiele.GetLength(0)
-                    CES1.n_Location = Sim1.List_Locations.GetLength(0)
+                    CES1.n_Locations = Sim1.List_Locations.GetLength(0)
                     CES1.n_Verzweig = Sim1.VerzweigungsDatei.GetLength(0)
                     CES1.TestModus = Sim1.Set_TestModus
                     CES1.n_Combinations = Sim1.No_of_Combinations
@@ -438,8 +438,8 @@ Partial Class Form1
 
                     'Gibt die PathSize an für jede Pfadstelle
                     Dim i As Integer
-                    ReDim CES1.n_PathDimension(CES1.n_Location - 1)
-                    For i = 0 To CES1.n_Location - 1
+                    ReDim CES1.n_PathDimension(CES1.n_Locations - 1)
+                    For i = 0 To CES1.n_Locations - 1
                         CES1.n_PathDimension(i) = Sim1.List_Locations(i).List_Massnahmen.GetLength(0)
                     Next
 
@@ -722,7 +722,7 @@ Partial Class Form1
             End If
 
             'Kinder werden Hier vollständig gelöscht
-            Call TSP1.Reset_Childs_TSP()
+            Call TSP1.Reset_Childs()
 
             'Reproduktionsoperatoren, hier gehts dezent zur Sache
             Call TSP1.Reproduction_Control()
