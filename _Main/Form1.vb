@@ -369,11 +369,11 @@ Partial Class Form1
                     If CES1.TestModus = 1 Then
                         CES1.n_Childs = 1
                         CES1.n_Parents = 1
-                        CES1.n_Generation = 1
+                        CES1.n_Generations = 1
                         ReDim CES1.NDSResult(CES1.n_Childs + CES1.n_Parents - 1)
                     ElseIf CES1.TestModus = 2 Then
                         CES1.n_Childs = CES1.n_Combinations
-                        CES1.n_Generation = 1
+                        CES1.n_Generations = 1
                         ReDim CES1.NDSResult(CES1.n_Childs + CES1.n_Parents - 1)
                     End If
 
@@ -428,11 +428,11 @@ Partial Class Form1
                     If CES1.TestModus = 1 Then
                         CES1.n_Childs = 1
                         CES1.n_Parents = 1
-                        CES1.n_Generation = 1
+                        CES1.n_Generations = 1
                         ReDim CES1.NDSResult(CES1.n_Childs + CES1.n_Parents - 1)
                     ElseIf CES1.TestModus = 2 Then
                         CES1.n_Childs = CES1.n_Combinations
-                        CES1.n_Generation = 1
+                        CES1.n_Generations = 1
                         ReDim CES1.NDSResult(CES1.n_Childs + CES1.n_Parents - 1)
                     End If
 
@@ -769,12 +769,24 @@ Partial Class Form1
             Call CES1.Generate_All_Test_Paths()
         End If
 
+        'Startwerte werden der Bedienoberfläche zugewiesen
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        EVO_Opt_Verlauf1.NRunden = 1
+        EVO_Opt_Verlauf1.NPopul = 1
+        EVO_Opt_Verlauf1.NGen = CES1.n_Generations
+        EVO_Opt_Verlauf1.NNachf = CES1.n_Childs
+        EVO_Opt_Verlauf1.Initialisieren()
+
         'Generationsschleife
-        For gen = 0 To CES1.n_Generation - 1
+        For gen = 0 To CES1.n_Generations - 1
+
+            Call EVO_Opt_Verlauf1.Generation(gen +1)
 
             'Child Schleife
             For i = 0 To CES1.n_Childs - 1
                 durchlauf_all += 1
+
+                Call EVO_Opt_Verlauf1.Nachfolger(i + 1)
 
                 '****************************************
                 'Aktueller Pfad wird an Sim zurückgegeben
@@ -872,12 +884,25 @@ Partial Class Form1
             Call CES1.Generate_All_Test_Paths()
         End If
 
+        'Startwerte werden der Bedienoberfläche zugewiesen
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        EVO_Opt_Verlauf1.NRunden = 1
+        EVO_Opt_Verlauf1.NPopul = 1
+        EVO_Opt_Verlauf1.NGen = CES1.n_Generations
+        EVO_Opt_Verlauf1.NNachf = CES1.n_Childs
+        EVO_Opt_Verlauf1.Initialisieren()
+
         'Generationsschleife für CES
         'xxxxxxxxxxxxxxxxxxxxxxxxxxx
-        For gen = 0 To CES1.n_Generation - 1
+        For gen = 0 To CES1.n_Generations - 1
+
+            Call EVO_Opt_Verlauf1.Generation(gen + 1)
 
             'Child Schleife
             For i = 0 To CES1.n_Childs - 1
+
+                Call EVO_Opt_Verlauf1.Nachfolger(i + 1)
+
                 durchlauf_all += 1
 
                 '****************************************
@@ -1393,7 +1418,7 @@ GenerierenAusgangswerte:
                         If (EVO_Einstellungen1.isMultiObjective = False) Then
                             Achse.Name = "Simulation"
                             Achse.Auto = False
-                            Achse.Max = CES1.n_Childs * CES1.n_Generation
+                            Achse.Max = CES1.n_Childs * CES1.n_Generations
                             Achsen.Add(Achse)
                         End If
                         'für jede Zielfunktion eine weitere Achse hinzufügen
@@ -1532,7 +1557,7 @@ GenerierenAusgangswerte:
 
                     'Bestimmung der DB_ID durch x und y werte
                     db_ID_QWert = Sim1.db_get_ID_QWert(xWert, yWert)
-                    db_ID_Pfad = sim1.db_get_ID_Pfad(db_id_QWert)
+                    db_ID_Pfad = Sim1.db_get_ID_Pfad(db_ID_QWert)
 
                     'Pfad und Parameter aus DB lesen
                     Call Sim1.db_getOptPara(db_ID_QWert)
