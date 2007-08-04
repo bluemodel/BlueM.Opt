@@ -21,7 +21,7 @@ Public Class CES
     'Public Variablen
     Public TestModus As Integer             'Gibt den Testmodus an
     Public n_Combinations As Integer        'Anzahl aller Kombinationen
-    Public n_Location As Integer            'Anzahl der Locations wird von außen gesetzt
+    Public n_Locations As Integer            'Anzahl der Locations wird von außen gesetzt
     Public n_Penalty As Integer             'Anzahl der Ziele wird von außen gesetzt
     Public n_Verzweig As Integer            'Anzahl der Verzweigungen in der Verzweigungsdatei
     Public n_PathDimension() As Integer     'Anzahl der Maßnahmen an jeder Stelle
@@ -32,10 +32,8 @@ Public Class CES
     Public n_Childs As Integer = 9
 
     'Private Variablen
-    Private ReprodOperator_TSP As String = "Order_Crossover_OX"
-    Private ReprodOperator_BM As String = "Select_Random_Uniform"
-    Private MutOperator_TSP As String = "Translocation"
-    Private MutOperator_BM As String = "RND_Switch"
+    Private ReprodOperator As String = "Select_Random_Uniform"
+    Private MutOperator As String = "RND_Switch"
     Private Strategy As String = "plus"         '"plus" oder "minus" Strategie
     Private MutRate As Integer = 10              'Definiert die Wahrscheinlichkeit der Mutationsrate in %
 
@@ -94,7 +92,7 @@ Public Class CES
             For j = 0 To n_Penalty - 1
                 TMP(i).Penalty(j) = 999999999999999999
             Next
-            ReDim TMP(i).Path(n_Location - 1)
+            ReDim TMP(i).Path(n_Locations - 1)
         Next
 
     End Sub
@@ -106,7 +104,7 @@ Public Class CES
 
         For i = 0 To TMP.GetUpperBound(0)
             TMP(i).No = i + 1
-            ReDim TMP(i).Path(n_Location - 1)
+            ReDim TMP(i).Path(n_Locations - 1)
             ReDim TMP(i).Penalty(n_Penalty - 1)
             For j = 0 To n_Penalty - 1
                 TMP(i).Penalty(j) = 999999999999999999
@@ -175,7 +173,7 @@ Public Class CES
 
         For i = 0 To n_Childs - 1
             Do
-                For j = 0 To n_Location - 1
+                For j = 0 To n_Locations - 1
                     upperb = n_PathDimension(j) - 1
                     'Randomize() nicht vergessen
                     tmp = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
@@ -266,9 +264,9 @@ Public Class CES
     Public Sub Reproduction_Control()
         Dim i As Integer
         Dim x, y As Integer
-        Dim Einzelkind(n_Location - 1) As Integer
+        Dim Einzelkind(n_Locations - 1) As Integer
 
-        Select Case ReprodOperator_BM
+        Select Case ReprodOperator
             'UPGRADE: Eltern werden nicht zufällig gewählt sondern immer in Top Down Reihenfolge
             Case "Select_Random_Uniform"
                 x = 0
@@ -283,6 +281,22 @@ Public Class CES
                 If Even_Number(n_Childs) = False Then
                     Call ReprodOp_Select_Random_Uniform(List_Parents(x).Path, List_Parents(y).Path, List_Childs(n_Childs - 1).Path, Einzelkind)
                 End If
+
+            Case "Order_Crossover (OX)"
+
+                x = 0
+                y = 1
+                For i = 0 To n_Childs - 2 Step 2
+                    Call ReprodOp_Order_Crossover(List_Parents(x).Path, List_Parents(y).Path, List_Childs(i).Path, List_Childs(i + 1).Path)
+                    x += 1
+                    y += 1
+                    If x = n_Parents - 1 Then x = 0
+                    If y = n_Parents - 1 Then y = 0
+                Next i
+                If Even_Number(n_Childs) = False Then
+                    Call ReprodOp_Order_Crossover(List_Parents(x).Path, List_Parents(y).Path, List_Childs(n_Childs - 1).Path, Einzelkind)
+                End If
+
         End Select
 
     End Sub
@@ -312,6 +326,63 @@ Public Class CES
 
     End Sub
 
+
+    'Reproductionsoperator "Order_Crossover (OX)"
+    'Kopiert den mittleren Teil des einen Elter und füllt den Rest aus der Reihenfolge des anderen Elter auf
+    'UPGRADE: Es wird immer nur der mittlere Teil Kopiert, könnte auch mal ein einderer sein
+    Private Sub ReprodOp_Order_Crossover(ByVal ParPath_A() As Integer, ByVal ParPath_B() As Integer, ByRef ChildPath_A() As Integer, ByRef ChildPath_B() As Integer)
+
+        Dim i As Integer
+        Dim x, y As Integer
+
+        Dim CutPoint(1) As Integer
+        Call Create_n_Cutpoints(CutPoint)
+
+        'Kopieren des mittleren Paths
+        For i = CutPoint(0) + 1 To CutPoint(1)
+            ChildPath_A(i) = ParPath_A(i)
+            ChildPath_B(i) = ParPath_B(i)
+        Next
+        'Auffüllen des Paths Teil 3 des Childs A mit dem anderen Elter beginnend bei 0
+        x = 0
+        For i = CutPoint(1) + 1 To n_Locations - 1
+            If Is_No_OK(ParPath_B(x), ChildPath_A) Then
+                ChildPath_A(i) = ParPath_B(x)
+            Else
+                i -= 1
+            End If
+            x += 1
+        Next
+        'Auffüllen des Paths Teil 3 des Childs B mit dem anderen Elter beginnend bei 0
+        y = 0
+        For i = CutPoint(1) + 1 To n_Locations - 1
+            If Is_No_OK(ParPath_A(y), ChildPath_B) Then
+                ChildPath_B(i) = ParPath_A(y)
+            Else
+                i -= 1
+            End If
+            y += 1
+        Next
+        'Auffüllen des Paths Teil 1 des Childs A mit dem anderen Elter beginnend bei 0
+        For i = 0 To CutPoint(0)
+            If Is_No_OK(ParPath_B(x), ChildPath_A) Then
+                ChildPath_A(i) = ParPath_B(x)
+            Else
+                i -= 1
+            End If
+            x += 1
+        Next
+        'Auffüllen des Paths Teil 1 des Childs B mit dem anderen Elter beginnend bei 0
+        For i = 0 To CutPoint(0)
+            If Is_No_OK(ParPath_A(y), ChildPath_B) Then
+                ChildPath_B(i) = ParPath_A(y)
+            Else
+                i -= 1
+            End If
+            y += 1
+        Next
+    End Sub
+
     'Mutationsfunktionen
     'XXXXXXXXXXXXXXXXXXX
 
@@ -323,7 +394,7 @@ Public Class CES
         For i = 0 To n_Childs - 1
             Dim count As Integer = 0
             Do
-                Select Case MutOperator_BM
+                Select Case MutOperator
                     Case "RND_Switch"
                         'Verändert zufällig ein gen des Paths
                         Call MutOp_RND_Switch(List_Childs(i).Path)
@@ -975,6 +1046,38 @@ Public Class CES
     End Function
 
 #End Region 'Methoden
+
+#Region "Hilfsmethoden"
+
+
+    'Hilfsfunktion zum generieren von zufälligen Schnittpunkten innerhalb eines Pfades
+    'Mit Bernoulli Verteilung mal von rechts mal von links
+    Public Sub Create_n_Cutpoints(ByRef CutPoint() As Integer)
+        'Generiert zwei CutPoints
+        Dim i As Integer
+        Dim lowerb As Integer
+        Dim upperb As Integer
+
+        'wird zufällig entweder von Link oder von Rechts geschnitten
+        If Bernoulli() = True Then
+            lowerb = 0
+            For i = 0 To CutPoint.GetUpperBound(0)
+                upperb = n_Locations - CutPoint.GetLength(0) - 1 + i
+                CutPoint(i) = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
+                lowerb = CutPoint(i) + 1
+            Next i
+        Else
+            upperb = n_Locations - 2
+            For i = CutPoint.GetUpperBound(0) To 0 Step -1
+                lowerb = i
+                CutPoint(i) = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
+                upperb = CutPoint(i) - 1
+            Next i
+        End If
+
+    End Sub
+
+#End Region 'Hilfsmethoden
 
 End Class
 
