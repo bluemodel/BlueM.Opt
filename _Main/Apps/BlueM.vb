@@ -46,6 +46,8 @@ Public Class BlueM
         Dim SimStart_str As String = ""
         Dim SimEnde_str As String = ""
         Dim SimDT_str As String = ""
+        Dim Ganglinie As String = ""
+        DIM CSV_Format as String = ""
 
         'ALL-Datei öffnen
         '----------------
@@ -70,6 +72,16 @@ Public Class BlueM
                 SimDT_str = Zeile.Substring(35).Trim
             End If
 
+            'Überprüfen ob die Ganglinien (.WEL Datei) ausgegeben wird
+            If (Zeile.StartsWith(" Ganglinienausgabe ....... [J/N] :")) Then
+                Ganglinie = Zeile.Substring(35).Trim
+            End If
+
+            'Überprüfen ob CSV Format eingeschaltet ist
+            If (Zeile.StartsWith(" ... CSV-Format .......... [J/N] :")) Then
+                CSV_Format = Zeile.Substring(35).Trim
+            End If
+
         Loop Until StrRead.Peek() = -1
 
         'SimStart und SimEnde in echtes Datum konvertieren
@@ -78,6 +90,17 @@ Public Class BlueM
 
         'Zeitschrittweite in echte Dauer konvertieren
         Me.SimDT = New TimeSpan(0, Convert.ToInt16(SimDT_str), 0)
+
+        'Fehlermeldung Ganglinie nicht eingeschaltet
+        If Ganglinie <> "J" Then
+            throw new Exception("Die Ganglinienausgabe (.WEL Datei) ist nicht eingeschaltet. Bitte in .ALL Datei unter 'Ganglinienausgabe' einschalten")
+        End If
+
+        'Fehlermeldung CSv Format nicht eingeschaltet
+        if CSV_Format <> "J" then
+            Throw New Exception("Das CSV Format für die .WEL Datei ist nicht eingeschaltet. Bitte in .ALL unter '... CSV-Format' einschalten.")
+        End If
+
 
     End Sub
 
