@@ -297,6 +297,20 @@ Public Class CES
                     Call ReprodOp_Order_Crossover(List_Parents(x).Path, List_Parents(y).Path, List_Childs(n_Childs - 1).Path, Einzelkind)
                 End If
 
+            Case "Partially_Mapped_Crossover"
+                x = 0
+                y = 1
+                For i = 0 To n_Childs - 2 Step 2
+                    Call ReprodOp_Part_Mapped_Crossover(List_Parents(x).Path, List_Parents(y).Path, List_Childs(i).Path, List_Childs(i + 1).Path)
+                    x += 1
+                    y += 1
+                    If x = n_Parents - 1 Then x = 0
+                    If y = n_Parents - 1 Then y = 0
+                Next i
+                If Even_Number(n_Childs) = False Then
+                    Call ReprodOp_Part_Mapped_Crossover(List_Parents(x).Path, List_Parents(y).Path, List_Childs(n_Childs - 1).Path, Einzelkind)
+                End If
+
         End Select
 
     End Sub
@@ -382,6 +396,83 @@ Public Class CES
             y += 1
         Next
     End Sub
+
+    'Reproductionsoperator: "Partially_Mapped_Crossover (PMX)"
+    'Kopiert den mittleren Teil des anderen Elter und füllt den Rest mit dem eigenen auf. Falls Doppelt wird gemaped.
+    Public Sub ReprodOp_Part_Mapped_Crossover(ByVal ParPath_A() As Integer, ByVal ParPath_B() As Integer, ByRef ChildPath_A() As Integer, ByRef ChildPath_B() As Integer)
+        Dim i As Integer
+        Dim x As Integer
+        Dim Index As Integer
+        Dim mapper As Integer
+
+        Dim CutPoint(1) As Integer
+        For i = 0 To 10
+            Call Create_n_Cutpoints(CutPoint)
+        Next
+
+        'Kopieren des mittleren Paths und füllen des Mappers
+        x = 0
+        For i = CutPoint(0) + 1 To CutPoint(1)
+            ChildPath_B(i) = ParPath_A(i)
+            ChildPath_A(i) = ParPath_B(i)
+            x += 1
+        Next
+
+        'Auffüllen des Paths Teil 1 des Childs A und B mit dem anderen Elter beginnend bei 0
+        For i = 0 To CutPoint(0)
+            'für Child A
+            If Is_No_OK(ParPath_A(i), ChildPath_A) Then
+                ChildPath_A(i) = ParPath_A(i)
+            Else
+                mapper = ParPath_A(i)
+                Do Until (Is_No_OK(mapper, ChildPath_A) = True)
+                    Index = Array.IndexOf(ParPath_B, mapper)
+                    mapper = ParPath_A(Index)
+                Loop
+                ChildPath_A(i) = mapper
+            End If
+
+            'für Child B
+            If Is_No_OK(ParPath_B(i), ChildPath_B) Then
+                ChildPath_B(i) = ParPath_B(i)
+            Else
+                mapper = ParPath_B(i)
+                Do Until (Is_No_OK(mapper, ChildPath_B) = True)
+                    Index = Array.IndexOf(ParPath_A, mapper)
+                    mapper = ParPath_B(Index)
+                Loop
+                ChildPath_B(i) = mapper
+            End If
+        Next i
+
+        'Auffüllen des Paths Teil 3 des Childs A und B mit dem anderen Elter beginnend bei 0
+        For i = CutPoint(1) + 1 To n_Locations - 1
+            'für Child A
+            If Is_No_OK(ParPath_A(i), ChildPath_A) Then
+                ChildPath_A(i) = ParPath_A(i)
+            Else
+                mapper = ParPath_A(i)
+                Do Until (Is_No_OK(mapper, ChildPath_A) = True)
+                    Index = Array.IndexOf(ParPath_B, mapper)
+                    mapper = ParPath_A(Index)
+                Loop
+                ChildPath_A(i) = mapper
+            End If
+
+            'für Child B
+            If Is_No_OK(ParPath_B(i), ChildPath_B) Then
+                ChildPath_B(i) = ParPath_B(i)
+            Else
+                mapper = ParPath_B(i)
+                Do Until (Is_No_OK(mapper, ChildPath_B) = True)
+                    Index = Array.IndexOf(ParPath_A, mapper)
+                    mapper = ParPath_B(Index)
+                Loop
+                ChildPath_B(i) = mapper
+            End If
+        Next
+    End Sub
+
 
     'Mutationsfunktionen
     'XXXXXXXXXXXXXXXXXXX
