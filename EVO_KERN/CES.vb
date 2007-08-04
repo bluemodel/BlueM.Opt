@@ -25,7 +25,7 @@ Public Class CES
     Public n_Penalty As Integer             'Anzahl der Ziele wird von außen gesetzt
     Public n_Verzweig As Integer            'Anzahl der Verzweigungen in der Verzweigungsdatei
     Public n_PathDimension() As Integer     'Anzahl der Maßnahmen an jeder Stelle
-    Public n_Generation As Integer = 1      'Anzahl der Generationen
+    Public n_Generation As Integer = 5      'Anzahl der Generationen
 
     'Eingabe
     Public n_Parents As Integer = 3
@@ -320,24 +320,22 @@ Public Class CES
     Public Sub Mutation_Control()
         Dim i As Integer
 
-        Select Case MutOperator_BM
-            Case "RND_Switch"
-                For i = 0 To n_Childs - 1
-                    Do
+        For i = 0 To n_Childs - 1
+            Dim count As Integer = 0
+            Do
+                Select Case MutOperator_BM
+                    Case "RND_Switch"
+                        'Verändert zufällig ein gen des Paths
                         Call MutOp_RND_Switch(List_Childs(i).Path)
-                        List_Childs(i).mutated = True
-                    Loop While Is_Twin(i) = True Or Is_Clone(i) = True
-                Next i
-            Case "Dyn_Switch"
-                Dim count As Integer = 0
-                For i = 0 To n_Childs - 1
-                    Do
+
+                    Case "Dyn_Switch"
+                        'Verändert zufällig ein gen des Paths mit dynamisch erhöhter Mutationsrate
                         Call MutOp_Dyn_Switch(List_Childs(i).Path, count)
-                        List_Childs(i).mutated = True
-                        count += 1
-                    Loop While Is_Twin(i) = True Or Is_Clone(i) = True
-                Next i
-        End Select
+                End Select
+                count += 1
+            Loop While Is_Twin(i) = True Or Is_Clone(i) = True
+            List_Childs(i).mutated = True
+        Next
 
     End Sub
 
@@ -367,8 +365,8 @@ Public Class CES
     End Sub
 
     'Mutationsoperator "Dyn_Switch"
-    'Verändert zufällig ein gen des Paths
-    '************************************
+    'Verändert zufällig ein gen des Paths mit dynamisch erhöhter Mutationsrate
+    '*************************************************************************
     Private Sub MutOp_Dyn_Switch(ByVal Path() As Integer, ByVal Dyn_MutRate As Integer)
         Dim i As Integer
         Dim Tmp_a As Integer
