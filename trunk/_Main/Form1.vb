@@ -261,7 +261,7 @@ Partial Class Form1
                     Sim1.Ergebnisdb = False
 
                     'Original ModellParameter schreiben
-                    Call Sim1.ModellParameter_schreiben()
+                    Call Sim1.Prepare_Write_ModellParameter()
 
                     MsgBox("Die Startwerte der Optimierungsparameter wurden in die Eingabedateien geschrieben.", MsgBoxStyle.Information, "Info")
 
@@ -592,7 +592,7 @@ Partial Class Form1
                 End Select
 
                 'Modellparameter schreiben
-                Call Sim1.ModellParameter_schreiben()
+                Call Sim1.Prepare_Write_ModellParameter()
 
                 'Simulieren
                 Call Sim1.launchSim()
@@ -711,6 +711,10 @@ Partial Class Form1
         Call CES1.Dim_Faksimile(CES1.List_Parents)
         Call CES1.Dim_Faksimile(CES1.List_Childs)
 
+        If Method = METH_MIX_CESPES Then
+            Call CES1.Dim_PES_Memory()
+        End If
+
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
 
@@ -745,8 +749,8 @@ Partial Class Form1
                 '****************************************
                 'Aktueller Pfad wird an Sim zurückgegeben
                 'Bereitet das BlaueModell für die Kombinatorik vor
-                Call Sim1.prepare_Evaluation_CES(CES1.List_Childs(i).Path)
-                Call Sim1.SIM_Evaluierung_CombiOpt(CES1.n_Penalty, CES1.List_Childs(i).Penalty)
+                Call Sim1.PREPARE_Evaluation_CES(CES1.List_Childs(i).Path) '''''''''''''''''''''''''''
+                Call Sim1.SIM_Evaluierung_CES(CES1.n_Penalty, CES1.List_Childs(i).Penalty)
                 '***********************************************
 
                 'Zeichnen MO_SO
@@ -805,7 +809,7 @@ Partial Class Form1
         'Falls jetzt noch PES ausgeführt werden soll
         'Starten der PES mit der Front von CES
         '*******************************************
-        If Me.Method = METH_CES_PES Then
+        If Method = METH_CES_PES Then
             Call Start_PES_after_CES()
         End If
 
@@ -826,7 +830,7 @@ Partial Class Form1
                 '****************************************
                 'Aktueller Pfad wird an Sim zurückgegeben
                 'Bereitet das BlaueModell für die Kombinatorik vor
-                Call Sim1.prepare_Evaluation_CES(CES1.List_Childs(i).Path)
+                Call Sim1.PREPARE_Evaluation_CES(CES1.List_Childs(i).Path)
 
                 'Reduktion der OptimierungsParameter und immer dann wenn nicht Nullvariante
                 '****************************************************************************
@@ -1054,7 +1058,9 @@ GenerierenAusgangswerte:
                             Case ANW_TESTPROBLEME
                                 Call Testprobleme1.Evaluierung_TestProbleme(Testprobleme1.Combo_Testproblem.Text, globalAnzPar, mypara, durchlauf, ipop, QN, RN, DForm.Diag)
                             Case ANW_BLUEM, ANW_SMUSI
-                                If Not Sim1.SIM_Evaluierung_ParaOpt(mypara, durchlauf, ipop, Exchange.Series_No, QN, DForm.Diag) Then
+                                'Vorbereiten des Modelldatensatzes
+                                Call Sim1.PREPARE_Evaluation_PES(mypara)
+                                If Not Sim1.SIM_Evaluierung_PES(durchlauf, ipop, Exchange.Series_No, QN, DForm.Diag) Then
                                     GoTo GenerierenAusgangswerte
                                 End If
                         End Select
@@ -1371,7 +1377,7 @@ GenerierenAusgangswerte:
                     Call Sim1.db_getOptPara(db_ID_QWert)
 
                     'Modellparameter schreiben
-                    Call Sim1.ModellParameter_schreiben()
+                    Call Sim1.Prepare_Write_ModellParameter()
 
                     'String für die Anzeige der OptParameter wird generiert
                     MsgString = Chr(13) & Chr(10) & "OptParameter: " & Chr(13) & Chr(10)
@@ -1394,7 +1400,7 @@ GenerierenAusgangswerte:
                     Call Sim1.db_getPfad(db_ID_QWert)
 
                     'Bereitet das BlaueModell für die Kombinatorik vor
-                    Call Sim1.prepare_Evaluation_CES()
+                    Call Sim1.PREPARE_Evaluation_CES()
 
                     'String für die Anzeige der Pfade wird generiert
                     MsgString = Chr(13) & Chr(10) & "Pfad: " & Chr(13) & Chr(10)
@@ -1418,9 +1424,9 @@ GenerierenAusgangswerte:
                     Call Sim1.db_getPfad(db_ID_Pfad)
 
                     'Bereitet das BlaueModell für die Kombinatorik vor
-                    Call Sim1.prepare_Evaluation_CES()
+                    Call Sim1.PREPARE_Evaluation_CES()
                     'Modellparameter schreiben
-                    Call Sim1.ModellParameter_schreiben()
+                    Call Sim1.Prepare_Write_ModellParameter()
 
                     'String für die Anzeige der Pfade wird generiert
                     MsgString = Chr(13) & Chr(10) & "Pfad: " & Chr(13) & Chr(10)
