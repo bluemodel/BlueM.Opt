@@ -40,6 +40,7 @@ Partial Class Form1
     Private Const METH_PES As String = "PES"
     Private Const METH_CES As String = "CES"
     Private Const METH_CES_PES As String = "CES + PES"
+    Private Const METH_MIX_CESPES As String = "MIX_CESPES"
     Private Const METH_SENSIPLOT As String = "SensiPlot"
 
     '**** Deklarationen der Module *****
@@ -88,7 +89,7 @@ Partial Class Form1
         ComboBox_Anwendung.SelectedIndex = 0
 
         'Liste der Methoden in ComboBox schreiben und Anfangseinstellung wählen
-        ComboBox_Methode.Items.AddRange(New Object() {"", METH_RESET, METH_PES, METH_CES, METH_CES_PES, METH_SENSIPLOT})
+        ComboBox_Methode.Items.AddRange(New Object() {"", METH_RESET, METH_PES, METH_CES, METH_CES_PES, METH_MIX_CESPES, METH_SENSIPLOT})
         ComboBox_Methode.SelectedIndex = 0
         ComboBox_Methode.Enabled = False
 
@@ -327,7 +328,7 @@ Partial Class Form1
                     'Parameterübergabe an PES
                     Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
 
-                Case METH_CES, METH_CES_PES 'Methode CES und Methode CES_PES
+                Case METH_CES, METH_CES_PES, METH_MIX_CESPES 'Methode CES und Methode CES_PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Funktioniert nur bei BlueM!
@@ -347,7 +348,7 @@ Partial Class Form1
                             'CES für Sim vorbereiten (Files lesen und Validieren)
                             Call Sim1.read_and_valid_INI_Files_CES()
 
-                        Case METH_CES_PES
+                        Case METH_CES_PES, METH_MIX_CESPES
                             'Methode setzen
                             Sim1.Method = METH_CES_PES
 
@@ -355,7 +356,7 @@ Partial Class Form1
                             EVO_Einstellungen1.Enabled = True
 
                             'CES für Sim vorbereiten (Files lesen und Validieren)
-                            Call Sim1.read_and_valid_INI_Files_CES_PES
+                            Call Sim1.read_and_valid_INI_Files_CES_PES()
 
                     End Select
 
@@ -726,13 +727,8 @@ Partial Class Form1
             Call CES1.Generate_All_Test_Paths()
         End If
 
-        'Startwerte werden der Bedienoberfläche zugewiesen
-        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        EVO_Opt_Verlauf1.NRunden = 1
-        EVO_Opt_Verlauf1.NPopul = 1
-        EVO_Opt_Verlauf1.NGen = CES1.n_Generations
-        EVO_Opt_Verlauf1.NNachf = CES1.n_Childs
-        EVO_Opt_Verlauf1.Initialisieren()
+        'Startwerte werden der Verlaufsanzeige werden zugewiesen
+        Call Me.INI_Verlaufsanzeige(1, 1, CES1.n_Generations, CES1.n_Childs)
 
         'Generationsschleife CES
         'xxxxxxxxxxxxxxxxxxxxxxx
@@ -975,13 +971,8 @@ Partial Class Form1
         '******************************************************************************************
         myIsOK = PES1.EsStartvalues()
 
-        'Startwerte werden der Bedienoberfläche zugewiesen
-        '******************************************************************************************
-        EVO_Opt_Verlauf1.NRunden = PES1.NRunden
-        EVO_Opt_Verlauf1.NPopul = PES1.NPopul
-        EVO_Opt_Verlauf1.NGen = PES1.NGen
-        EVO_Opt_Verlauf1.NNachf = PES1.NNachf
-        EVO_Opt_Verlauf1.Initialisieren()
+        'Startwerte werden der Verlaufsanzeige werden zugewiesen
+        Call Me.INI_Verlaufsanzeige(PES1.NRunden, PES1.NPopul, PES1.NGen, PES1.NNachf)
 
         durchlauf = 0
 
@@ -1118,7 +1109,6 @@ GenerierenAusgangswerte:
 
     End Sub
 
-
     'Zeichenfunktionen
     'XXXXXXXXXXXXXXXXX
 
@@ -1142,15 +1132,27 @@ GenerierenAusgangswerte:
         End With
     End Sub
 
+    'Startwerte werden der Verlaufsanzeige werden zugewiesen
+    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+    Private Sub INI_Verlaufsanzeige(ByRef NRunden As Integer, ByRef NPopul As Integer, ByRef NGen As Integer, ByRef NNachf As Integer)
+        EVO_Opt_Verlauf1.NRunden = 1
+        EVO_Opt_Verlauf1.NPopul = 1
+        EVO_Opt_Verlauf1.NGen = CES1.n_Generations
+        EVO_Opt_Verlauf1.NNachf = CES1.n_Childs
+        EVO_Opt_Verlauf1.Initialisieren()
+    End Sub
+
+
 #End Region 'Start Button Pressed
 
 #Region "Diagrammfunktionen"
 
-    'Diagrammfunktionen
-    '###################
+        'Diagrammfunktionen
+        '###################
 
-    'Achsen und Standard-Series initialisieren
-    '*****************************************
+        'Achsen und Standard-Series initialisieren
+        '*****************************************
     Private Sub PrepareDiagramm()
 
         Dim i As Integer
