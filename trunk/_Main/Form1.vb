@@ -482,9 +482,9 @@ Partial Class Form1
                         Case METH_PES
                             Call STARTEN_PES(Exchange)
                         Case METH_CES
-                            Call STARTEN_CES()
+                            Call STARTEN_CES_or_CES_PES()
                         Case METH_CES_PES
-                            Call STARTEN_CES_PES()
+                            Call STARTEN_CES_or_CES_PES()
                     End Select
 
                 Case ANW_TESTPROBLEME
@@ -691,9 +691,9 @@ Partial Class Form1
 
     End Sub
 
-    'Anwendung CombiBM - START; läuft ohne Evolutionsstrategie             
-    '*********************************************************
-    Private Sub STARTEN_CES()
+    'Anwendung CES und CES_PES             
+    '*************************
+    Private Sub STARTEN_CES_or_CES_PES()
 
         'Fehlerabfragen
         If (Sim1.List_OptZiele.GetLength(0) > 2) Then
@@ -734,10 +734,11 @@ Partial Class Form1
         EVO_Opt_Verlauf1.NNachf = CES1.n_Childs
         EVO_Opt_Verlauf1.Initialisieren()
 
-        'Generationsschleife
+        'Generationsschleife CES
+        'xxxxxxxxxxxxxxxxxxxxxxx
         For gen = 0 To CES1.n_Generations - 1
 
-            Call EVO_Opt_Verlauf1.Generation(gen +1)
+            Call EVO_Opt_Verlauf1.Generation(gen + 1)
 
             'Child Schleife
             For i = 0 To CES1.n_Childs - 1
@@ -751,123 +752,6 @@ Partial Class Form1
                 Call Sim1.prepare_Evaluation_CES(CES1.List_Childs(i).Path)
                 Call Sim1.SIM_Evaluierung_CombiOpt(CES1.n_Penalty, CES1.List_Childs(i).Penalty)
                 '***********************************************
-
-                'Zeichnen MO_SO
-                Call DForm.Diag.prepareSeries(0, "Childs", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
-                If CES1.n_Penalty = 1 Then
-                    Call DForm.Diag.Series(0).Add(durchlauf_all, CES1.List_Childs(i).Penalty(0))
-                ElseIf CES1.n_Penalty = 2 Then
-                    Call DForm.Diag.Series(0).Add(CES1.List_Childs(i).Penalty(0), CES1.List_Childs(i).Penalty(1))
-                End If
-
-                System.Windows.Forms.Application.DoEvents()
-            Next
-
-            'MO oder SO
-            '----------
-            If CES1.n_Penalty = 1 Then
-                'Sortieren der Kinden anhand der Qualität
-                Call CES1.Sort_Faksimile(CES1.List_Childs)
-                'Selectionsprozess je nach "plus" oder "minus" Strategie
-                Call CES1.Selection_Process()
-                'Zeichnen des besten Elter
-                For i = 0 To CES1.n_Parents - 1
-                    'durchlauf += 1
-                    Call DForm.Diag.prepareSeries(1, "Parent", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                    Call DForm.Diag.Series(1).Add(durchlauf_all, CES1.List_Parents(i).Penalty(0))
-                Next
-
-            ElseIf CES1.n_Penalty = 2 Then
-                'NDSorting ******************
-                Call CES1.NDSorting_Control()
-                'Zeichnen von NDSortingResult
-                Call DForm.Diag.DeleteSeries(CES1.n_Childs - 1, 1)
-                Dim f As Integer
-                For i = 0 To CES1.n_Childs - 1
-                    f = CES1.NDSResult(i).Front
-                    Call DForm.Diag.prepareSeries(f, "Front:" & f, Steema.TeeChart.Styles.PointerStyles.Circle, 4)
-                    Call DForm.Diag.Series(f).Add(CES1.NDSResult(i).Penalty(0), CES1.NDSResult(i).Penalty(1))
-                Next
-            End If
-
-            'Nur wenn Testmodus
-            '******************
-            If CES1.TestModus = 0 Then
-                'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
-                Call CES1.Reset_Childs()
-                'Reproduktionsoperatoren, hier gehts dezent zur Sache
-                Call CES1.Reproduction_Control()
-                'Mutationsoperatoren
-                Call CES1.Mutation_Control()
-            End If
-
-
-        Next
-
-    End Sub
-
-    'Anwendung BlueM mit CES und PES - START             
-    '***************************************
-    Private Sub STARTEN_CES_PES()
-
-        'Fehlerabfragen
-        If (Sim1.List_OptZiele.GetLength(0) > 2) Then
-            Throw New Exception("Zu viele Ziele für CES. Max=2")
-        End If
-
-        Dim durchlauf_all As Integer = 0
-
-        'Laufvariable für die Generationen
-        Dim gen As Integer
-        Dim i As Integer
-
-        'Parents und Child werden Dimensioniert
-        Call CES1.Dim_Faksimile(CES1.List_Parents)
-        Call CES1.Dim_Faksimile(CES1.List_Childs)
-
-        'Diagramm vorbereiten und initialisieren
-        Call PrepareDiagramm()
-
-        'Die verschiedenen Modi
-        'xxxxxxxxxxxxxxxxxxxxxx
-        If CES1.TestModus = 0 Then
-            'Normaler Modus: Zufällige Kinderpfade werden generiert
-            Call CES1.Generate_Random_Path()
-        ElseIf CES1.TestModus = 1 Then
-            'Testmodus 1: Funktion zum testen einer ausgewählten Kombinationen
-            Sim1.get_TestPath(CES1.List_Childs(0).Path)
-        ElseIf CES1.TestModus = 2 Then
-            'Testmodus 2: Funktion zum  testen aller Kombinationen
-            Call CES1.Generate_All_Test_Paths()
-        End If
-
-        'Startwerte werden der Bedienoberfläche zugewiesen
-        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        EVO_Opt_Verlauf1.NRunden = 1
-        EVO_Opt_Verlauf1.NPopul = 1
-        EVO_Opt_Verlauf1.NGen = CES1.n_Generations
-        EVO_Opt_Verlauf1.NNachf = CES1.n_Childs
-        EVO_Opt_Verlauf1.Initialisieren()
-
-        'Generationsschleife für CES
-        'xxxxxxxxxxxxxxxxxxxxxxxxxxx
-        For gen = 0 To CES1.n_Generations - 1
-
-            Call EVO_Opt_Verlauf1.Generation(gen + 1)
-
-            'Child Schleife
-            For i = 0 To CES1.n_Childs - 1
-
-                Call EVO_Opt_Verlauf1.Nachfolger(i + 1)
-
-                durchlauf_all += 1
-
-                '****************************************
-                'Aktueller Pfad wird an Sim zurückgegeben
-                'Bereitet das BlaueModell für die Kombinatorik vor
-                Call Sim1.prepare_Evaluation_CES(CES1.List_Childs(i).Path)
-                Call Sim1.SIM_Evaluierung_CombiOpt(CES1.n_Penalty, CES1.List_Childs(i).Penalty)
-                '******************************************
 
                 'Zeichnen MO_SO
                 Call DForm.Diag.prepareSeries(0, "Childs", Steema.TeeChart.Styles.PointerStyles.Triangle, 4)
@@ -920,40 +804,46 @@ Partial Class Form1
             End If
 
         Next
-        'Ende der Generationsschleife
+        'Ende der Generationsschleife CES
 
-        'Starten der PES mit der Front von CES
-        '(MaxAnzahl ist die Zahl der Eltern -> ToDo: SecPop oder Bestwertspeicher)
-        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        'Falls jetzt noch PES ausgeführt werden soll
+        '*******************************************
+        If Me.Method = METH_CES_PES Then
 
-        'Einstellungen für PES werden gesetzt
-        Call EVO_Einstellungen1.SetFor_CES_PES()
+            'Starten der PES mit der Front von CES
+            '(MaxAnzahl ist die Zahl der Eltern -> ToDo: SecPop oder Bestwertspeicher)
+            'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-        For i = 0 To CES1.n_Parents - 1
-            If CES1.List_Parents(i).Front = 1 Then
+            'Einstellungen für PES werden gesetzt
+            Call EVO_Einstellungen1.SetFor_CES_PES()
 
-                '****************************************
-                'Aktueller Pfad wird an Sim zurückgegeben
-                'Bereitet das BlaueModell für die Kombinatorik vor
-                Call Sim1.prepare_Evaluation_CES(CES1.List_Childs(i).Path)
+            For i = 0 To CES1.n_Parents - 1
+                If CES1.List_Parents(i).Front = 1 Then
 
-                'Reduktion der OptimierungsParameter und immer dann wenn nicht Nullvariante
-                '****************************************************************************
-                If Sim1.Reduce_OptPara_ModPara() Then
+                    '****************************************
+                    'Aktueller Pfad wird an Sim zurückgegeben
+                    'Bereitet das BlaueModell für die Kombinatorik vor
+                    Call Sim1.prepare_Evaluation_CES(CES1.List_Childs(i).Path)
 
-                    'Parameterübergabe an PES
-                    '************************
-                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
-                    'Starten der PES
-                    '***************
-                    Call STARTEN_PES(Exchange)
+                    'Reduktion der OptimierungsParameter und immer dann wenn nicht Nullvariante
+                    '****************************************************************************
+                    If Sim1.Reduce_OptPara_ModPara() Then
 
-                    'Series wird zwei weiter gesetzt
-                    Me.Exchange.Series_No += 2
+                        'Parameterübergabe an PES
+                        '************************
+                        Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
+                        'Starten der PES
+                        '***************
+                        Call STARTEN_PES(Exchange)
 
+                        'Series wird zwei weiter gesetzt
+                        Me.Exchange.Series_No += 2
+
+                    End If
                 End If
-            End If
-        Next
+            Next
+        End If
+
     End Sub
 
     'Anwendung Evolutionsstrategie für Parameter Optimierung - hier Steuerung       
