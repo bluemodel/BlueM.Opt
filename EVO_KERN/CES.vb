@@ -66,14 +66,21 @@ Public Class CES
     Public NDSorting() As Struct_NDSorting
     Public NDSResult(n_Childs + n_Parents - 1) As Struct_NDSorting
 
-    'PES Struktur
-    '************
-    Public Structure Struct_PES
-        Dim No As Short
-
+    'Bestwertspeicher zum Speichern der PES Parametersätze
+    '*****************************************************
+    Public Structure Struct_Parmeter_Satz
+        Dim Path() As Integer
+        Dim Parameter() As Double
+        Dim Penalty() As Double
+        Dim Generation as Integer
     End Structure
 
-    Public List_PES() As Struct_PES
+    Public Structure Struct_PES_Memory
+        Dim Loc_No As Short
+        Dim List_Parameter_Satz() As Struct_Parmeter_Satz
+    End Structure
+
+    Public PES_Memory() As Struct_PES_Memory        'Die Liste ist so lang wie die Anzahl der Locations
 
 #End Region 'Eigenschaften
 
@@ -109,7 +116,19 @@ Public Class CES
             For j = 0 To n_Penalty - 1
                 TMP(i).Penalty(j) = 999999999999999999
             Next
+        Next
 
+    End Sub
+
+    'Dimensionieren des NDSortingStructs
+    '***********************************
+    Public Sub Dim_PES_Memory()
+
+        Dim i As Integer
+
+        ReDim PES_Memory(n_Locations - 1)
+        For i = 0 To PES_Memory.GetUpperBound(0)
+            Pes_Memory(i).Loc_No = i + 1
         Next
 
     End Sub
@@ -160,7 +179,6 @@ Public Class CES
         Destination.Distance = Source.Distance
 
     End Sub
-
 
 
     'Normaler Modus: Generiert zufällige Paths für alle Kinder BM Problem

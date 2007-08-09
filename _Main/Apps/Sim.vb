@@ -819,7 +819,7 @@ Public MustInherit Class Sim
 
     'Bereitet das SimModell für Kombinatorik Optimierung vor
     '*******************************************************
-    Public Sub prepare_Evaluation_CES(ByVal Path() As Integer)
+    Public Sub PREPARE_Evaluation_CES(ByVal Path() As Integer)
 
         'Setzt den Aktuellen Pfad
         Aktuell_Path = Path
@@ -834,12 +834,12 @@ Public MustInherit Class Sim
         Call Prepare_Verzweigung_ON_OFF()
 
         'Schreibt die neuen Verzweigungen
-        Call Me.Write_Verzweigungen()
+        Call Me.Prepere_Write_Verzweigungen()
 
     End Sub
 
     '*******************************************************
-    Public Sub prepare_Evaluation_CES()
+    Public Sub PREPARE_Evaluation_CES()
 
         'Wandelt die Maßnahmen Namen wieder in einen Pfad zurück
         Dim i, j As Integer
@@ -858,7 +858,7 @@ Public MustInherit Class Sim
         Call Prepare_Verzweigung_ON_OFF()
 
         'Schreibt die neuen Verzweigungen
-        Call Me.Write_Verzweigungen()
+        Call Prepere_Write_Verzweigungen()
 
     End Sub
 
@@ -929,7 +929,28 @@ Public MustInherit Class Sim
 
     'Schreibt die neuen Verzweigungen
     '********************************
-    Protected MustOverride Sub Write_Verzweigungen()
+    Protected MustOverride Sub Prepere_Write_Verzweigungen()
+
+    'Evaluiert die Kinderchen für Kombinatorik Optimierung vor
+    '*********************************************************
+    Public Function SIM_Evaluierung_CES(ByVal n_Ziele As Short, ByRef Penalty As Double()) As Boolean
+        Dim i As Short
+
+        'Modell Starten
+        Call launchSim()
+
+        'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
+        For i = 0 To n_Ziele - 1                                    'BUG 57: QN() fängt bei 1 an!
+            List_OptZiele(i).QWertTmp = QWert(List_OptZiele(i))
+            Penalty(i) = List_OptZiele(i).QWertTmp
+        Next
+
+        'Qualitätswerte und OptParameter in DB speichern
+        If (Ergebnisdb = True) Then
+            Call db_update(12, 15)
+        End If
+
+    End Function
 
 #End Region 'Kombinatorik
 
@@ -1067,11 +1088,9 @@ Public MustInherit Class Sim
 
     'Evaluierung des SimModells für ParameterOptimierung - Steuerungseinheit
     '***********************************************************************
-    Public Function SIM_Evaluierung_ParaOpt(ByVal mypara As Double(,), ByVal durchlauf As Integer, ByVal ipop As Short, ByVal Series_No As Integer, ByRef QN As Double(), ByRef Diag As Main.Diagramm) As Boolean
+    Public Sub PREPARE_Evaluation_PES(ByVal mypara As Double(,))
 
         Dim i As Short
-
-        SIM_Evaluierung_ParaOpt = False
 
         'Mutierte Parameter an OptParameter übergeben
         For i = 0 To Me.List_OptParameter.GetUpperBound(0)          'BUG 57: mypara(,) fängt bei 1 an!
@@ -1079,43 +1098,14 @@ Public MustInherit Class Sim
         Next
 
         'Mutierte Parameter in Eingabedateien schreiben
-        Call ModellParameter_schreiben()
+        Call Prepare_Write_ModellParameter()
 
-        'Modell Starten
-        If Not launchSim() Then Exit Function
+    End Sub
 
-        'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
-        For i = 0 To Me.List_OptZiele.GetUpperBound(0)              'BUG 57: QN() fängt bei 1 an!
-            List_OptZiele(i).QWertTmp = QWert(List_OptZiele(i))
-            QN(i + 1) = List_OptZiele(i).QWertTmp                   'QN(i+1) weil Array bei 0 anfängt!
-        Next
-
-        'Qualitätswerte im TeeChart zeichnen
-        If (Me.List_OptZiele.Length = 1) Then
-            'SingleObjective
-            Call Diag.prepareSeries(ipop - 1, "Population " & ipop)
-            Diag.Series(ipop - 1).Cursor = Cursors.Hand
-            Call Diag.Series(ipop - 1).Add(durchlauf, List_OptZiele(0).QWertTmp)
-        Else
-            'MultiObjective
-            'BUG 66: nur die ersten beiden Zielfunktionen werden gezeichnet
-            Call Diag.prepareSeries(Series_No, "Population", Steema.TeeChart.Styles.PointerStyles.Circle, 4)
-            Diag.Series(Series_No).Cursor = Cursors.Hand
-            Call Diag.Series(Series_No).Add(List_OptZiele(0).QWertTmp, List_OptZiele(1).QWertTmp)
-        End If
-
-        'Qualitätswerte und OptParameter in DB speichern
-        If (Ergebnisdb = True) Then
-            Call db_update(durchlauf, ipop)
-        End If
-
-        SIM_Evaluierung_ParaOpt = True
-
-    End Function
 
     'Die ModellParameter in die Eingabedateien des SimModells schreiben
     '******************************************************************
-    Public Sub ModellParameter_schreiben()
+    Public Sub Prepare_Write_ModellParameter()
         Dim Wert As String
         Dim AnzZeil As Integer
         Dim j As Integer
@@ -1182,6 +1172,47 @@ Public MustInherit Class Sim
 
     End Sub
 
+    'Evaluierung des SimModells für ParameterOptimierung - Steuerungseinheit
+    '***********************************************************************
+    Public Function SIM_Evaluierung_PES(ByVal durchlauf As Integer, ByVal ipop As Short, ByVal Series_No As Integer, ByRef QN As Double(), ByRef Diag As Main.Diagramm) As Boolean
+
+        Dim i As Short
+
+        SIM_Evaluierung_PES = False
+
+        'Modell Starten
+        If Not launchSim() Then Exit Function
+
+        'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
+        For i = 0 To Me.List_OptZiele.GetUpperBound(0)              'BUG 57: QN() fängt bei 1 an!
+            List_OptZiele(i).QWertTmp = QWert(List_OptZiele(i))
+            QN(i + 1) = List_OptZiele(i).QWertTmp                   'QN(i+1) weil Array bei 0 anfängt!
+        Next
+
+        'Qualitätswerte im TeeChart zeichnen
+        If (Me.List_OptZiele.Length = 1) Then
+            'SingleObjective
+            Call Diag.prepareSeries(ipop - 1, "Population " & ipop)
+            Diag.Series(ipop - 1).Cursor = Cursors.Hand
+            Call Diag.Series(ipop - 1).Add(durchlauf, List_OptZiele(0).QWertTmp)
+        Else
+            'MultiObjective
+            'BUG 66: nur die ersten beiden Zielfunktionen werden gezeichnet
+            Call Diag.prepareSeries(Series_No, "Population", Steema.TeeChart.Styles.PointerStyles.Circle, 4)
+            Diag.Series(Series_No).Cursor = Cursors.Hand
+            Call Diag.Series(Series_No).Add(List_OptZiele(0).QWertTmp, List_OptZiele(1).QWertTmp)
+        End If
+
+        'Qualitätswerte und OptParameter in DB speichern
+        If (Ergebnisdb = True) Then
+            Call db_update(durchlauf, ipop)
+        End If
+
+        SIM_Evaluierung_PES = True
+
+    End Function
+
+
     'ModellParameter aus OptParametern errechnen
     '*******************************************
     Protected Sub OptParameter_to_ModellParameter()
@@ -1196,26 +1227,6 @@ Public MustInherit Class Sim
         Next
     End Sub
 
-    'Evaluiert die Kinderchen für Kombinatorik Optimierung vor
-    '*********************************************************
-    Public Function SIM_Evaluierung_CombiOpt(ByVal n_Ziele As Short, ByRef Penalty As Double()) As Boolean
-        Dim i As Short
-
-        'Modell Starten
-        Call launchSim()
-
-        'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
-        For i = 0 To n_Ziele - 1                                    'BUG 57: QN() fängt bei 1 an!
-            List_OptZiele(i).QWertTmp = QWert(List_OptZiele(i))
-            Penalty(i) = List_OptZiele(i).QWertTmp
-        Next
-
-        'Qualitätswerte und OptParameter in DB speichern
-        If (Ergebnisdb = True) Then
-            Call db_update(12, 15)
-        End If
-
-    End Function
 
     'SimModell ausführen (simulieren)
     '********************************
