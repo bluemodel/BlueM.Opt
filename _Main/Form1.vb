@@ -327,7 +327,7 @@ Partial Class Form1
                     'Parameterübergabe an PES
                     Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
 
-                Case METH_CES 'Methode CES
+                Case METH_CES, METH_CES_PES 'Methode CES und Methode CES_PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Funktioniert nur bei BlueM!
@@ -335,14 +335,30 @@ Partial Class Form1
                         Throw New Exception("CES funktioniert bisher nur mit BlueM!")
                     End If
 
-                    'Methode setzen
-                    Sim1.Method = METH_CES
-
-                    'Ergebnisdatenbank ausschalten
+                    'Ergebnisdatenbank einschalten
                     Sim1.Ergebnisdb = True
 
-                    'CES für Sim vorbereiten (Files lesen und Validieren)
-                    Call Sim1.read_and_valid_INI_Files_CES()
+                    'Fallunterscheidung CES oder CES_PES
+                    Select Case Me.Method
+                        Case METH_CES
+                            'Methode setzen
+                            Sim1.Method = METH_CES
+
+                            'CES für Sim vorbereiten (Files lesen und Validieren)
+                            Call Sim1.read_and_valid_INI_Files_CES()
+
+                        Case METH_CES_PES
+                            'Methode setzen
+                            Sim1.Method = METH_CES_PES
+
+                            'EVO_Einstellungen aktiviern
+                            EVO_Einstellungen1.Enabled = True
+
+                            'CES für Sim vorbereiten (Files lesen und Validieren)
+                            Call Sim1.read_and_valid_INI_Files_CES_PES
+
+                    End Select
+
                     'CES initialisieren
                     CES1 = New EvoKern.CES
                     'Prüft ob die Zahl mög. Kombinationen < Zahl Eltern + Nachfolger
@@ -350,65 +366,6 @@ Partial Class Form1
                         Throw New Exception("Die Zahl der Eltern + die Zahl der Kinder ist größer als die mögliche Zahl der Kombinationen.")
                     End If
 
-
-                    'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
-                    If (Sim1.List_OptZiele.GetLength(0) = 1) Then
-                        EVO_Einstellungen1.OptModus = 0
-                    ElseIf (Sim1.List_OptZiele.GetLength(0) > 1) Then
-                        EVO_Einstellungen1.OptModus = 1
-                    End If
-
-                    'Anzahl der Ziele, Locations und Verzeigungen wird an CES übergeben
-                    CES1.n_Penalty = Sim1.List_OptZiele.GetLength(0)
-                    CES1.n_Locations = Sim1.List_Locations.GetLength(0)
-                    CES1.n_Verzweig = Sim1.VerzweigungsDatei.GetLength(0)
-                    CES1.TestModus = Sim1.Set_TestModus
-                    CES1.n_Combinations = Sim1.No_of_Combinations
-
-                    'Bei Testmodus wird die Anzahl der Kinder und Generationen überschrieben
-                    If CES1.TestModus = 1 Then
-                        CES1.n_Childs = 1
-                        CES1.n_Parents = 1
-                        CES1.n_Generations = 1
-                        ReDim CES1.NDSResult(CES1.n_Childs + CES1.n_Parents - 1)
-                    ElseIf CES1.TestModus = 2 Then
-                        CES1.n_Childs = CES1.n_Combinations
-                        CES1.n_Generations = 1
-                        ReDim CES1.NDSResult(CES1.n_Childs + CES1.n_Parents - 1)
-                    End If
-
-                    'Gibt die PathSize an für jede Pfadstelle
-                    Dim i As Integer
-                    ReDim CES1.n_PathDimension(CES1.n_Locations - 1)
-                    For i = 0 To CES1.n_Locations - 1
-                        CES1.n_PathDimension(i) = Sim1.List_Locations(i).List_Massnahmen.GetLength(0)
-                    Next
-
-                Case METH_CES_PES 'Methode CES + PES
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                    'Funktioniert nur bei BlueM!
-                    If (Not Anwendung = ANW_BLUEM) Then
-                        Throw New Exception("CES funktioniert bisher nur mit BlueM!")
-                    End If
-
-                    'Methode setzen
-                    Sim1.Method = METH_CES_PES
-
-                    'EVO_Einstellungen aktiviern
-                    EVO_Einstellungen1.Enabled = True
-
-                    'Ergebnisdatenbank ausschalten
-                    Sim1.Ergebnisdb = True
-
-                    'CES für Sim vorbereiten (Dateien einlesen und Prüfen)
-                    Call Sim1.read_and_valid_INI_Files_CES_PES()
-                    'CES initialisieren
-                    CES1 = New EvoKern.CES
-                    'Prüft ob die Zahl mög. Kombinationen < Zahl Eltern + Nachfolger
-                    If (CES1.n_Childs + CES1.n_Parents) > Sim1.No_of_Combinations Then
-                        Throw New Exception("Die Zahl der Eltern + die Zahl der Kinder ist größer als die mögliche Zahl der Kombinationen.")
-                    End If
 
                     'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
                     If (Sim1.List_OptZiele.GetLength(0) = 1) Then
