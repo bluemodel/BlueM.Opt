@@ -21,11 +21,11 @@ Public Class CES
     'Public Variablen
     Public TestModus As Integer             'Gibt den Testmodus an
     Public n_Combinations As Integer        'Anzahl aller Kombinationen
-    Public n_Locations As Integer            'Anzahl der Locations wird von auﬂen gesetzt
+    Public n_Locations As Integer           'Anzahl der Locations wird von auﬂen gesetzt
     Public n_Penalty As Integer             'Anzahl der Ziele wird von auﬂen gesetzt
     Public n_Verzweig As Integer            'Anzahl der Verzweigungen in der Verzweigungsdatei
     Public n_PathDimension() As Integer     'Anzahl der Maﬂnahmen an jeder Stelle
-    Public n_Generations As Integer = 5      'Anzahl der Generationen
+    Public n_Generations As Integer = 5     'Anzahl der Generationen
 
     'Eingabe
     Public n_Parents As Integer = 3
@@ -157,7 +157,6 @@ Public Class CES
         Array.Copy(Source.Penalty, Destination.Penalty, Source.Penalty.Length)
         Destination.dominated = Source.dominated
         Destination.Front = Source.Front
-
         Destination.Distance = Source.Distance
 
     End Sub
@@ -610,8 +609,8 @@ Public Class CES
         Next
     End Function
 
-    'Hilfsfunktion checkt ob die neuen Childs Kone sind
-    '**************************************************
+    'Hilfsfunktion checkt ob die neuen Childs Klone sind
+    '***************************************************
     Private Function Is_Clone(ByVal ChildIndex As Integer) As Boolean
         Dim i, j As Integer
         Dim PathOK As Boolean
