@@ -803,43 +803,48 @@ Partial Class Form1
         'Ende der Generationsschleife CES
 
         'Falls jetzt noch PES ausgeführt werden soll
+        'Starten der PES mit der Front von CES
         '*******************************************
         If Me.Method = METH_CES_PES Then
-
-            'Starten der PES mit der Front von CES
-            '(MaxAnzahl ist die Zahl der Eltern -> ToDo: SecPop oder Bestwertspeicher)
-            'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-            'Einstellungen für PES werden gesetzt
-            Call EVO_Einstellungen1.SetFor_CES_PES()
-
-            For i = 0 To CES1.n_Parents - 1
-                If CES1.List_Parents(i).Front = 1 Then
-
-                    '****************************************
-                    'Aktueller Pfad wird an Sim zurückgegeben
-                    'Bereitet das BlaueModell für die Kombinatorik vor
-                    Call Sim1.prepare_Evaluation_CES(CES1.List_Childs(i).Path)
-
-                    'Reduktion der OptimierungsParameter und immer dann wenn nicht Nullvariante
-                    '****************************************************************************
-                    If Sim1.Reduce_OptPara_ModPara() Then
-
-                        'Parameterübergabe an PES
-                        '************************
-                        Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
-                        'Starten der PES
-                        '***************
-                        Call STARTEN_PES(Exchange)
-
-                        'Series wird zwei weiter gesetzt
-                        Me.Exchange.Series_No += 2
-
-                    End If
-                End If
-            Next
+            Call Start_PES_after_CES()
         End If
 
+    End Sub
+
+    'Starten der PES mit der Front von CES
+    '(MaxAnzahl ist die Zahl der Eltern -> ToDo: SecPop oder Bestwertspeicher)
+    '*************************************************************************
+    Private Sub Start_PES_after_CES()
+        Dim i As Integer
+
+        'Einstellungen für PES werden gesetzt
+        Call EVO_Einstellungen1.SetFor_CES_PES()
+
+        For i = 0 To CES1.n_Parents - 1
+            If CES1.List_Parents(i).Front = 1 Then
+
+                '****************************************
+                'Aktueller Pfad wird an Sim zurückgegeben
+                'Bereitet das BlaueModell für die Kombinatorik vor
+                Call Sim1.prepare_Evaluation_CES(CES1.List_Childs(i).Path)
+
+                'Reduktion der OptimierungsParameter und immer dann wenn nicht Nullvariante
+                '****************************************************************************
+                If Sim1.Reduce_OptPara_ModPara() Then
+
+                    'Parameterübergabe an PES
+                    '************************
+                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
+                    'Starten der PES
+                    '***************
+                    Call STARTEN_PES(Exchange)
+
+                    'Series wird zwei weiter gesetzt
+                    Me.Exchange.Series_No += 2
+
+                End If
+            End If
+        Next
     End Sub
 
     'Anwendung Evolutionsstrategie für Parameter Optimierung - hier Steuerung       
@@ -1148,11 +1153,11 @@ GenerierenAusgangswerte:
 
 #Region "Diagrammfunktionen"
 
-        'Diagrammfunktionen
-        '###################
+    'Diagrammfunktionen
+    '###################
 
-        'Achsen und Standard-Series initialisieren
-        '*****************************************
+    'Achsen und Standard-Series initialisieren
+    '*****************************************
     Private Sub PrepareDiagramm()
 
         Dim i As Integer
