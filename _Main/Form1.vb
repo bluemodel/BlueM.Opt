@@ -40,7 +40,7 @@ Partial Class Form1
     Private Const METH_PES As String = "PES"
     Private Const METH_CES As String = "CES"
     Private Const METH_CES_PES As String = "CES + PES"
-    Private Const METH_MIX_CESPES As String = "MIX_CESPES"
+    Private Const METH_HYBRID As String = "HYBRID"
     Private Const METH_SENSIPLOT As String = "SensiPlot"
 
     '**** Deklarationen der Module *****
@@ -79,7 +79,7 @@ Partial Class Form1
     Private Sub Form1_Load(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles MyBase.Load
 
         'Anzahl der Prozessoren wird ermittelt
-        Anzahl_Prozessoren(PhysCPU,LogCPU)
+        Anzahl_Prozessoren(PhysCPU, LogCPU)
 
         'XP-look
         System.Windows.Forms.Application.EnableVisualStyles()
@@ -89,11 +89,11 @@ Partial Class Form1
         ComboBox_Anwendung.SelectedIndex = 0
 
         'Liste der Methoden in ComboBox schreiben und Anfangseinstellung wählen
-        ComboBox_Methode.Items.AddRange(New Object() {"", METH_RESET, METH_PES, METH_CES, METH_CES_PES, METH_MIX_CESPES, METH_SENSIPLOT})
+        ComboBox_Methode.Items.AddRange(New Object() {"", METH_RESET, METH_PES, METH_CES, METH_CES_PES, METH_HYBRID, METH_SENSIPLOT})
         ComboBox_Methode.SelectedIndex = 0
         ComboBox_Methode.Enabled = False
 
-        'Exchenge wird initialisiert
+        'Exchange wird initialisiert
         Me.Exchange.Series_No = 0
 
         'Ende der Initialisierung
@@ -328,7 +328,7 @@ Partial Class Form1
                     'Parameterübergabe an PES
                     Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
 
-                Case METH_CES, METH_CES_PES, METH_MIX_CESPES 'Methode CES und Methode CES_PES
+                Case METH_CES, METH_CES_PES, METH_HYBRID 'Methode CES und Methode CES_PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Funktioniert nur bei BlueM!
@@ -348,7 +348,7 @@ Partial Class Form1
                             'CES für Sim vorbereiten (Files lesen und Validieren)
                             Call Sim1.read_and_valid_INI_Files_CES()
 
-                        Case METH_CES_PES, METH_MIX_CESPES
+                        Case METH_CES_PES, METH_HYBRID
                             'Methode setzen
                             Sim1.Method = METH_CES_PES
 
@@ -366,7 +366,6 @@ Partial Class Form1
                     If (CES1.n_Childs + CES1.n_Parents) > Sim1.No_of_Combinations Then
                         Throw New Exception("Die Zahl der Eltern + die Zahl der Kinder ist größer als die mögliche Zahl der Kombinationen.")
                     End If
-
 
                     'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
                     If (Sim1.List_OptZiele.GetLength(0) = 1) Then
@@ -711,7 +710,7 @@ Partial Class Form1
         Call CES1.Dim_Faksimile(CES1.List_Parents)
         Call CES1.Dim_Faksimile(CES1.List_Childs)
 
-        If Method = METH_MIX_CESPES Then
+        If Method = METH_HYBRID Then
             Call CES1.Dim_PES_Memory()
         End If
 
@@ -749,8 +748,14 @@ Partial Class Form1
                 '****************************************
                 'Aktueller Pfad wird an Sim zurückgegeben
                 'Bereitet das BlaueModell für die Kombinatorik vor
-                Call Sim1.PREPARE_Evaluation_CES(CES1.List_Childs(i).Path) '''''''''''''''''''''''''''
-                Call Sim1.SIM_Evaluierung_CES(CES1.n_Penalty, CES1.List_Childs(i).Penalty)
+                Call Sim1.PREPARE_Evaluation_CES(CES1.List_Childs(i).Path)
+
+                'Falls Hybrid
+                If Method = METH_HYBRID Then
+                    'Call Sim1.PREPARE_Evaluation_PES(mypara
+                End If
+
+                Call Sim1.SIM_Evaluierung_CES(CES1.List_Childs(i).Penalty)
                 '***********************************************
 
                 'Zeichnen MO_SO
@@ -1060,8 +1065,21 @@ GenerierenAusgangswerte:
                             Case ANW_BLUEM, ANW_SMUSI
                                 'Vorbereiten des Modelldatensatzes
                                 Call Sim1.PREPARE_Evaluation_PES(mypara)
-                                If Not Sim1.SIM_Evaluierung_PES(durchlauf, ipop, Exchange.Series_No, QN, DForm.Diag) Then
+                                If Not Sim1.SIM_Evaluierung_PES(durchlauf, ipop, QN) Then
                                     GoTo GenerierenAusgangswerte
+                                End If
+                                'Qualitätswerte im TeeChart zeichnen
+                                If (Sim1.List_OptZiele.Length = 1) Then
+                                    'SingleObjective
+                                    Call DForm.Diag.prepareSeries(ipop - 1, "Population " & ipop)
+                                    DForm.Diag.Series(ipop - 1).Cursor = Cursors.Hand
+                                    Call DForm.Diag.Series(ipop - 1).Add(durchlauf, Sim1.List_OptZiele(0).QWertTmp)
+                                Else
+                                    'MultiObjective
+                                    'BUG 66: nur die ersten beiden Zielfunktionen werden gezeichnet
+                                    Call DForm.Diag.prepareSeries(0, "Population", Steema.TeeChart.Styles.PointerStyles.Circle, 4)
+                                    DForm.Diag.Series(0).Cursor = Cursors.Hand
+                                    Call DForm.Diag.Series(0).Add(Sim1.List_OptZiele(0).QWertTmp, Sim1.List_OptZiele(1).QWertTmp)
                                 End If
                         End Select
 
@@ -1149,8 +1167,8 @@ GenerierenAusgangswerte:
     Private Sub INI_Verlaufsanzeige(ByRef NRunden As Integer, ByRef NPopul As Integer, ByRef NGen As Integer, ByRef NNachf As Integer)
         EVO_Opt_Verlauf1.NRunden = 1
         EVO_Opt_Verlauf1.NPopul = 1
-        EVO_Opt_Verlauf1.NGen = CES1.n_Generations
-        EVO_Opt_Verlauf1.NNachf = CES1.n_Childs
+        EVO_Opt_Verlauf1.NGen = NGen
+        EVO_Opt_Verlauf1.NNachf = NNachf
         EVO_Opt_Verlauf1.Initialisieren()
     End Sub
 

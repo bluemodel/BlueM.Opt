@@ -933,14 +933,14 @@ Public MustInherit Class Sim
 
     'Evaluiert die Kinderchen für Kombinatorik Optimierung vor
     '*********************************************************
-    Public Function SIM_Evaluierung_CES(ByVal n_Ziele As Short, ByRef Penalty As Double()) As Boolean
+    Public Function SIM_Evaluierung_CES(ByRef Penalty As Double()) As Boolean
         Dim i As Short
 
         'Modell Starten
         Call launchSim()
 
         'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
-        For i = 0 To n_Ziele - 1                                    'BUG 57: QN() fängt bei 1 an!
+        For i = 0 To Penalty.GetUpperBound(0)                                 'BUG 57: QN() fängt bei 1 an!
             List_OptZiele(i).QWertTmp = QWert(List_OptZiele(i))
             Penalty(i) = List_OptZiele(i).QWertTmp
         Next
@@ -1174,7 +1174,7 @@ Public MustInherit Class Sim
 
     'Evaluierung des SimModells für ParameterOptimierung - Steuerungseinheit
     '***********************************************************************
-    Public Function SIM_Evaluierung_PES(ByVal durchlauf As Integer, ByVal ipop As Short, ByVal Series_No As Integer, ByRef QN As Double(), ByRef Diag As Main.Diagramm) As Boolean
+    Public Function SIM_Evaluierung_PES(ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN As Double()) As Boolean
 
         Dim i As Short
 
@@ -1188,20 +1188,6 @@ Public MustInherit Class Sim
             List_OptZiele(i).QWertTmp = QWert(List_OptZiele(i))
             QN(i + 1) = List_OptZiele(i).QWertTmp                   'QN(i+1) weil Array bei 0 anfängt!
         Next
-
-        'Qualitätswerte im TeeChart zeichnen
-        If (Me.List_OptZiele.Length = 1) Then
-            'SingleObjective
-            Call Diag.prepareSeries(ipop - 1, "Population " & ipop)
-            Diag.Series(ipop - 1).Cursor = Cursors.Hand
-            Call Diag.Series(ipop - 1).Add(durchlauf, List_OptZiele(0).QWertTmp)
-        Else
-            'MultiObjective
-            'BUG 66: nur die ersten beiden Zielfunktionen werden gezeichnet
-            Call Diag.prepareSeries(Series_No, "Population", Steema.TeeChart.Styles.PointerStyles.Circle, 4)
-            Diag.Series(Series_No).Cursor = Cursors.Hand
-            Call Diag.Series(Series_No).Add(List_OptZiele(0).QWertTmp, List_OptZiele(1).QWertTmp)
-        End If
 
         'Qualitätswerte und OptParameter in DB speichern
         If (Ergebnisdb = True) Then
