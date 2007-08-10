@@ -25,7 +25,6 @@ Public Class CES
     Public n_Penalty As Integer             'Anzahl der Ziele wird von außen gesetzt
     Public n_Verzweig As Integer            'Anzahl der Verzweigungen in der Verzweigungsdatei
     Public n_PathDimension() As Integer     'Anzahl der Maßnahmen an jeder Stelle
-    Public n_Parameters As Integer          'Anzahl aller möglichen Prameter
     Public n_Generations As Integer = 5     'Anzahl der Generationen
     Public Lenght_PartPath As Integer = 2   'Länge des Gedächtnispfades
 
