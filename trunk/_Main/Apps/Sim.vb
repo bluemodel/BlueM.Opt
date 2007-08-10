@@ -123,11 +123,9 @@ Public MustInherit Class Sim
     'Kombinatorik
     '------------
     Protected SKos1 As New SKos()
-    Private Aktuell_Path() As Integer
-    Public Aktuell_Measure() As String
-    Private Aktuell_Elemente() As String
-    'Private IsNewCombination As Boolean
-    'Private Aktuell_db_Pfad_ID as Integer
+    Private Aktueller_Path() As Integer
+    Public Aktuelle_Massnahmen() As String
+    Private Aktuelle_Elemente() As String
     Protected VER_ONOFF(,) As Object
 
     Public Structure Struct_Massnahme
@@ -145,10 +143,6 @@ Public MustInherit Class Sim
 
     Public List_Locations() As Struct_Lokation
     Public VerzweigungsDatei(,) As String
-
-    'Public Schaltung(2, 1) As Object
-    'Public Maßnahme As Collection
-    'Public Kombinatorik As Collection
 
 #End Region 'Eigenschaften
 
@@ -822,7 +816,7 @@ Public MustInherit Class Sim
     Public Sub PREPARE_Evaluation_CES(ByVal Path() As Integer)
 
         'Setzt den Aktuellen Pfad
-        Aktuell_Path = Path
+        Aktueller_Path = Path
 
         'Erstellt die aktuelle Bauerksliste und überträgt sie zu SKos
         Call Prepare_aktuelle_Elemente()
@@ -843,10 +837,10 @@ Public MustInherit Class Sim
 
         'Wandelt die Maßnahmen Namen wieder in einen Pfad zurück
         Dim i, j As Integer
-        For i = 0 To Aktuell_Measure.GetUpperBound(0)
+        For i = 0 To Aktuelle_Massnahmen.GetUpperBound(0)
             For j = 0 To List_Locations(i).List_Massnahmen.GetUpperBound(0)
-                If (List_Locations(i).List_Massnahmen(j).Name = Aktuell_Measure(i)) Then
-                    Aktuell_Path(i) = j
+                If (List_Locations(i).List_Massnahmen(j).Name = Aktuelle_Massnahmen(i)) Then
+                    Aktueller_Path(i) = j
                 End If
             Next
         Next
@@ -870,21 +864,21 @@ Public MustInherit Class Sim
         Dim No As Integer
 
         Dim x As Integer = 0
-        For i = 0 To Aktuell_Path.GetUpperBound(0)
-            No = Aktuell_Path(i)
+        For i = 0 To Aktueller_Path.GetUpperBound(0)
+            No = Aktueller_Path(i)
             For j = 0 To List_Locations(i).List_Massnahmen(No).Bauwerke.GetUpperBound(0)
-                Array.Resize(Aktuell_Elemente, x + 1)
-                Aktuell_Elemente(x) = List_Locations(i).List_Massnahmen(No).Bauwerke(j)
+                Array.Resize(Aktuelle_Elemente, x + 1)
+                Aktuelle_Elemente(x) = List_Locations(i).List_Massnahmen(No).Bauwerke(j)
                 x += 1
             Next
         Next
 
         'Entfernt die X Einträge
-        Call SKos1.Remove_X(Aktuell_Elemente)
+        Call SKos1.Remove_X(Aktuelle_Elemente)
 
         'Kopiert die aktuelle ElementeListe in dieses Aktuell_Element Array
-        ReDim SKos1.Aktuell_Elemente(Aktuell_Elemente.GetUpperBound(0))
-        Array.Copy(Aktuell_Elemente, SKos1.Aktuell_Elemente, Aktuell_Elemente.GetLength(0))
+        ReDim SKos1.Aktuell_Elemente(Aktuelle_Elemente.GetUpperBound(0))
+        Array.Copy(Aktuelle_Elemente, SKos1.Aktuell_Elemente, Aktuelle_Elemente.GetLength(0))
     End Sub
 
     'Ermittelt die Namen der aktuellen Bauwerke
@@ -892,12 +886,12 @@ Public MustInherit Class Sim
     Private Sub Prepare_aktuelle_Measures()
         Dim i, j As Integer
 
-        ReDim Aktuell_Measure(List_Locations.GetUpperBound(0))
+        ReDim Aktuelle_Massnahmen(List_Locations.GetUpperBound(0))
 
         For i = 0 To List_Locations.GetUpperBound(0)
             For j = 0 To List_Locations(i).List_Massnahmen.GetUpperBound(0)
-                If j = Aktuell_Path(i) Then
-                    Aktuell_Measure(i) = List_Locations(i).List_Massnahmen(j).Name
+                If j = Aktueller_Path(i) Then
+                    Aktuelle_Massnahmen(i) = List_Locations(i).List_Massnahmen(j).Name
                 End If
             Next
         Next
@@ -914,8 +908,8 @@ Public MustInherit Class Sim
             VER_ONOFF(j, 0) = VerzweigungsDatei(j, 0)
         Next
         'Weist die Werte das Pfades zu
-        For x = 0 To Aktuell_Path.GetUpperBound(0)
-            No = Aktuell_Path(x)
+        For x = 0 To Aktueller_Path.GetUpperBound(0)
+            No = Aktueller_Path(x)
             For y = 0 To List_Locations(x).List_Massnahmen(No).Schaltung.GetUpperBound(0)
                 For z = 0 To VER_ONOFF.GetUpperBound(0)
                     If List_Locations(x).List_Massnahmen(No).Schaltung(y, 0) = VER_ONOFF(z, 0) Then
@@ -981,8 +975,8 @@ Public MustInherit Class Sim
 
         count = 0
         For i = 0 To List_ModellParameter.GetUpperBound(0)
-            For j = 0 To Aktuell_Elemente.GetUpperBound(0)
-                If List_ModellParameter(i).Element = Aktuell_Elemente(j) Then
+            For j = 0 To Aktuelle_Elemente.GetUpperBound(0)
+                If List_ModellParameter(i).Element = Aktuelle_Elemente(j) Then
                     Call copy_Struct_ModellParemeter(List_ModellParameter(i), TMP_ModPara(count))
                     count += 1
                 End If
@@ -1031,6 +1025,19 @@ Public MustInherit Class Sim
         End If
 
     End Function
+
+    'Schreibt die passenden OptParameter ins Child
+    '************************************************
+    Public Sub SaveParameter_to_Child(ByRef Parameter(,) As Object)
+        Dim i As Integer
+        Redim Parameter(List_OptParameter.GetUpperBound(0),1)
+
+        For i = 0 To List_OptParameter.GetUpperBound(0)
+            Parameter(i, 0) = List_OptParameter(i).Bezeichnung
+            Parameter(i, 1) = List_OptParameter(i).SKWert
+        Next
+
+    End Sub
 
     'Kopiert ein Strukt_ModellParameter
     '**********************************
@@ -1088,13 +1095,13 @@ Public MustInherit Class Sim
 
     'Evaluierung des SimModells für ParameterOptimierung - Steuerungseinheit
     '***********************************************************************
-    Public Sub PREPARE_Evaluation_PES(ByVal mypara As Double(,))
+    Public Sub PREPARE_Evaluation_PES(ByVal myPara As Double(,))
 
         Dim i As Short
 
         'Mutierte Parameter an OptParameter übergeben
         For i = 0 To Me.List_OptParameter.GetUpperBound(0)          'BUG 57: mypara(,) fängt bei 1 an!
-            List_OptParameter(i).SKWert = mypara(i + 1, 1)          'OptParameterListe(i+1) weil Array bei 0 anfängt!
+            List_OptParameter(i).SKWert = myPara(i + 1, 1)          'OptParameterListe(i+1) weil Array bei 0 anfängt!
         Next
 
         'Mutierte Parameter in Eingabedateien schreiben
@@ -1781,7 +1788,7 @@ Public MustInherit Class Sim
                 fieldvalues = ""
                 For i = 0 To Me.List_Locations.GetUpperBound(0)
                     fieldnames &= ", " & Me.List_Locations(i).Name
-                    fieldvalues &= ", '" & Me.Aktuell_Measure(i) & "'"
+                    fieldvalues &= ", '" & Me.Aktuelle_Massnahmen(i) & "'"
                 Next
                 command.CommandText = "INSERT INTO Pfad ('QWert_ID'" & fieldnames & ") VALUES (" & QWert_ID & fieldvalues & ")"
                 command.ExecuteNonQuery()
@@ -1816,7 +1823,7 @@ Public MustInherit Class Sim
                     If (i > 0) Then
                         condition &= " AND "
                     End If
-                    condition &= Me.List_Locations(i).Name & " = '" & Me.Aktuell_Measure(i) & "'"
+                    condition &= Me.List_Locations(i).Name & " = '" & Me.Aktuelle_Massnahmen(i) & "'"
                 Next
                 command.CommandText = "SELECT ID FROM Pfad WHERE (" & condition & ")"
                 If (Not IsNothing(command.ExecuteScalar())) Then
@@ -1832,7 +1839,7 @@ Public MustInherit Class Sim
                             fieldvalues &= ","
                         End If
                         fieldnames &= " " & Me.List_Locations(i).Name
-                        fieldvalues &= " '" & Me.Aktuell_Measure(i) & "'"
+                        fieldvalues &= " '" & Me.Aktuelle_Massnahmen(i) & "'"
                     Next
                     command.CommandText = "INSERT INTO Pfad (" & fieldnames & ") VALUES (" & fieldvalues & ")"
                     command.ExecuteNonQuery()
@@ -1895,9 +1902,9 @@ Public MustInherit Class Sim
         adapter.Fill(ds, "Pfad")
 
         'Parametersatz übergeben
-        For i As Integer = 0 To Me.Aktuell_Measure.GetUpperBound(0)
+        For i As Integer = 0 To Me.Aktuelle_Massnahmen.GetUpperBound(0)
 
-            Aktuell_Measure(i) = ds.Tables("Pfad").Rows(0).Item(List_Locations(i).Name)
+            Aktuelle_Massnahmen(i) = ds.Tables("Pfad").Rows(0).Item(List_Locations(i).Name)
 
         Next
 
@@ -1926,7 +1933,7 @@ Public MustInherit Class Sim
     End Function
 
     'Erstmal die DB ID aus den Qualitätswertn holen
-    Public Function db_get_ID_Pfad(ByVal QWert_ID as Integer) As Integer
+    Public Function db_get_ID_Pfad(ByVal QWert_ID As Integer) As Integer
 
         Call db_connect()
 

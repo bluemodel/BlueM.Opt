@@ -25,7 +25,9 @@ Public Class CES
     Public n_Penalty As Integer             'Anzahl der Ziele wird von außen gesetzt
     Public n_Verzweig As Integer            'Anzahl der Verzweigungen in der Verzweigungsdatei
     Public n_PathDimension() As Integer     'Anzahl der Maßnahmen an jeder Stelle
+    Public n_Parameters As Integer          'Anzahl aller möglichen Prameter
     Public n_Generations As Integer = 5     'Anzahl der Generationen
+    Public Lenght_PartPath As Integer = 2   'Länge des Gedächtnispfades
 
     'Eingabe
     Public n_Parents As Integer = 3
@@ -45,6 +47,7 @@ Public Class CES
         Dim Penalty() As Double             'Werte der Penaltyfunktion(en)
         Dim mutated As Boolean              'Gibt an ob der Wert bereits mutiert ist oder nicht
         Dim Front As Short                  'Nummer der Pareto Front
+        Dim myPara(,) As Object             'Die Optimierungsparameter
     End Structure
 
     Public List_Childs() As Struct_Faksimile
@@ -66,21 +69,16 @@ Public Class CES
     Public NDSorting() As Struct_NDSorting
     Public NDSResult(n_Childs + n_Parents - 1) As Struct_NDSorting
 
-    'Bestwertspeicher zum Speichern der PES Parametersätze
-    '*****************************************************
-    Public Structure Struct_Parmeter_Satz
+    'Memory zum Speichern der PES Parametersätze
+    '*******************************************
+    Public Structure Struct_PES_Memory
         Dim Path() As Integer
-        Dim Parameter() As Double
+        Dim Parameter(,) As Object
         Dim Penalty() As Double
         Dim Generation as Integer
     End Structure
 
-    Public Structure Struct_PES_Memory
-        Dim Loc_No As Short
-        Dim List_Parameter_Satz() As Struct_Parmeter_Satz
-    End Structure
-
-    Public PES_Memory() As Struct_PES_Memory        'Die Liste ist so lang wie die Anzahl der Locations
+    Public PES_Memory() As Struct_PES_Memory
 
 #End Region 'Eigenschaften
 
@@ -102,6 +100,9 @@ Public Class CES
             ReDim TMP(i).Path(n_Locations - 1)
         Next
 
+        'myPara wird Dynamisch generiert
+        'ReDim TMP(i).myPara(n_Parameters, 1)
+
     End Sub
 
     'Dimensionieren des NDSortingStructs
@@ -120,18 +121,18 @@ Public Class CES
 
     End Sub
 
-    'Dimensionieren des NDSortingStructs
-    '***********************************
-    Public Sub Dim_PES_Memory()
+    ''Dimensionieren des PES Memory
+    ''*****************************
+    'Public Sub Dim_PES_Memory()
 
-        Dim i As Integer
+    '    Dim i As Integer
 
-        ReDim PES_Memory(n_Locations - 1)
-        For i = 0 To PES_Memory.GetUpperBound(0)
-            Pes_Memory(i).Loc_No = i + 1
-        Next
+    '    ReDim PES_Memory(n_Locations - 1)
+    '    For i = 0 To PES_Memory.GetUpperBound(0)
+    '        Pes_Memory(i).Loc_No = i + 1
+    '    Next
 
-    End Sub
+    'End Sub
 
     'Kopiert ein Faksimile
     '*********************
@@ -570,6 +571,28 @@ Public Class CES
 
     End Sub
 
+    'Speichert die Child Ergebnisse im PES Memory
+    Sub Store_Child_Experience(ByVal Child_No As Integer, ByVal Gen_No As Integer)
+
+        Dim neu As Integer
+        neu = 0
+
+        If Not (Gen_No = 0 And Child_No = 0) Then
+            ReDim Preserve PES_Memory(PES_Memory.Length)
+            neu = PES_Memory.GetUpperBound(0)
+        End If
+
+        ReDim PES_Memory(neu).Path(n_Locations - 1)
+        ReDim PES_Memory(neu).Parameter(List_Childs(Child_No).myPara.GetUpperBound(0), 1)
+        ReDim PES_Memory(neu).Penalty(n_Penalty-1)
+
+        PES_Memory(neu).Generation = Gen_No
+        Array.Copy(List_Childs(Child_No).Path, PES_Memory(neu).Path, List_Childs(Child_No).Path.Length)
+        Array.Copy(List_Childs(Child_No).myPara, PES_Memory(neu).Parameter, List_Childs(Child_No).myPara.Length)
+        Array.Copy(List_Childs(Child_No).Penalty, PES_Memory(neu).Penalty, List_Childs(Child_No).Penalty.Length)
+
+    End Sub
+
     'Hilfsfunktionen
     'XXXXXXXXXXXXXXX
 
@@ -670,6 +693,34 @@ Public Class CES
         tmp_c = tmp_a - tmp_b
         If tmp_c = 0 Then Even_Number = True
     End Function
+
+    'Hilfsfunktion zum generieren von zufälligen Schnittpunkten innerhalb eines Pfades
+    'Mit Bernoulli Verteilung mal von rechts mal von links
+    '*****************************************************
+    Public Sub Create_n_Cutpoints(ByRef CutPoint() As Integer)
+        'Generiert zwei CutPoints
+        Dim i As Integer
+        Dim lowerb As Integer
+        Dim upperb As Integer
+
+        'wird zufällig entweder von Link oder von Rechts geschnitten
+        If Bernoulli() = True Then
+            lowerb = 0
+            For i = 0 To CutPoint.GetUpperBound(0)
+                upperb = n_Locations - CutPoint.GetLength(0) - 1 + i
+                CutPoint(i) = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
+                lowerb = CutPoint(i) + 1
+            Next i
+        Else
+            upperb = n_Locations - 2
+            For i = CutPoint.GetUpperBound(0) To 0 Step -1
+                lowerb = i
+                CutPoint(i) = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
+                upperb = CutPoint(i) - 1
+            Next i
+        End If
+
+    End Sub
 
     'NonDominated Sorting
     'XXXXXXXXXXXXXXXXXXXX
@@ -1156,38 +1207,6 @@ Public Class CES
     End Function
 
 #End Region 'Methoden
-
-#Region "Hilfsmethoden"
-
-
-    'Hilfsfunktion zum generieren von zufälligen Schnittpunkten innerhalb eines Pfades
-    'Mit Bernoulli Verteilung mal von rechts mal von links
-    Public Sub Create_n_Cutpoints(ByRef CutPoint() As Integer)
-        'Generiert zwei CutPoints
-        Dim i As Integer
-        Dim lowerb As Integer
-        Dim upperb As Integer
-
-        'wird zufällig entweder von Link oder von Rechts geschnitten
-        If Bernoulli() = True Then
-            lowerb = 0
-            For i = 0 To CutPoint.GetUpperBound(0)
-                upperb = n_Locations - CutPoint.GetLength(0) - 1 + i
-                CutPoint(i) = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
-                lowerb = CutPoint(i) + 1
-            Next i
-        Else
-            upperb = n_Locations - 2
-            For i = CutPoint.GetUpperBound(0) To 0 Step -1
-                lowerb = i
-                CutPoint(i) = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
-                upperb = CutPoint(i) - 1
-            Next i
-        End If
-
-    End Sub
-
-#End Region 'Hilfsmethoden
 
 End Class
 
