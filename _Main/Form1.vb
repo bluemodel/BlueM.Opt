@@ -380,7 +380,6 @@ Partial Class Form1
                     CES1.n_Verzweig = Sim1.VerzweigungsDatei.GetLength(0)
                     CES1.TestModus = Sim1.Set_TestModus
                     CES1.n_Combinations = Sim1.No_of_Combinations
-                    CES1.n_Parameters = Sim1.List_OptParameter.GetLength(0)
 
                     'Bei Testmodus wird die Anzahl der Kinder und Generationen überschrieben
                     If CES1.TestModus = 1 Then
