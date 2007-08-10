@@ -1174,7 +1174,7 @@ Public MustInherit Class Sim
 
     'Evaluierung des SimModells für ParameterOptimierung - Steuerungseinheit
     '***********************************************************************
-    Public Function SIM_Evaluierung_PES(ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN As Double()) As Boolean
+    Public Function SIM_Evaluierung_PES(ByVal iEvaluierung As Integer, ByVal ipop As Short, ByRef QN As Double()) As Boolean
 
         Dim i As Short
 
@@ -1191,7 +1191,7 @@ Public MustInherit Class Sim
 
         'Qualitätswerte und OptParameter in DB speichern
         If (Ergebnisdb = True) Then
-            Call db_update(durchlauf, ipop)
+            Call db_update(iEvaluierung, ipop)
         End If
 
         SIM_Evaluierung_PES = True
@@ -1741,7 +1741,7 @@ Public MustInherit Class Sim
 
     'Update der ErgebnisDB mit QWerten und OptParametern
     '***************************************************
-    Public Function db_update(ByVal durchlauf As Integer, ByVal ipop As Short) As Boolean
+    Public Function db_update(ByVal iEvaluierung As Integer, ByVal ipop As Short) As Boolean
         Call db_connect()
 
         Dim i As Integer
@@ -1755,7 +1755,7 @@ Public MustInherit Class Sim
             fieldnames &= ", '" & List_OptZiele(i).Bezeichnung & "'"
             fieldvalues &= ", " & List_OptZiele(i).QWertTmp
         Next
-        command.CommandText = "INSERT INTO QWerte (durchlauf, ipop " & fieldnames & ") VALUES (" & durchlauf & ", " & ipop & fieldvalues & ")"
+        command.CommandText = "INSERT INTO QWerte (durchlauf, ipop " & fieldnames & ") VALUES (" & iEvaluierung & ", " & ipop & fieldvalues & ")"
         command.ExecuteNonQuery()
         'ID des zuletzt geschriebenen QWerts holen
         command.CommandText = "SELECT @@IDENTITY AS ID"
