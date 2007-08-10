@@ -58,7 +58,7 @@ Partial Class Form1
     Dim array_y() As Double
     Dim Bestwert(,) As Double = {}
     Dim SekPopulation(,) As Double
-    Dim mypara(,) As Double
+    Dim myPara(,) As Double
 
     '**** Verschiedenes ****
     Dim isrun As Boolean = False                        'Optimierung läuft
@@ -181,7 +181,7 @@ Partial Class Form1
                     EVO_Einstellungen1.OptModus = Testprobleme1.OptModus
 
                     'Globale Parameter werden gesetzt
-                    Call Testprobleme1.Parameter_Uebergabe(Testprobleme1.Combo_Testproblem.Text, Testprobleme1.Text_Sinusfunktion_Par.Text, Testprobleme1.Text_Schwefel24_Par.Text, globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
+                    Call Testprobleme1.Parameter_Uebergabe(Testprobleme1.Combo_Testproblem.Text, Testprobleme1.Text_Sinusfunktion_Par.Text, Testprobleme1.Text_Schwefel24_Par.Text, globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, myPara)
 
                     'Start-Button aktivieren (keine Methodenauswahl erforderlich)
                     Button_Start.Enabled = True
@@ -326,7 +326,7 @@ Partial Class Form1
                     End If
 
                     'Parameterübergabe an PES
-                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
+                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, myPara)
 
                 Case METH_CES, METH_CES_PES, METH_HYBRID 'Methode CES und Methode CES_PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -380,6 +380,7 @@ Partial Class Form1
                     CES1.n_Verzweig = Sim1.VerzweigungsDatei.GetLength(0)
                     CES1.TestModus = Sim1.Set_TestModus
                     CES1.n_Combinations = Sim1.No_of_Combinations
+                    CES1.n_Parameters = Sim1.List_OptParameter.GetLength(0)
 
                     'Bei Testmodus wird die Anzahl der Kinder und Generationen überschrieben
                     If CES1.TestModus = 1 Then
@@ -484,6 +485,8 @@ Partial Class Form1
                         Case METH_CES
                             Call STARTEN_CES_or_CES_PES()
                         Case METH_CES_PES
+                            Call STARTEN_CES_or_CES_PES()
+                        Case METH_HYBRID
                             Call STARTEN_CES_or_CES_PES()
                     End Select
 
@@ -710,9 +713,8 @@ Partial Class Form1
         Call CES1.Dim_Faksimile(CES1.List_Parents)
         Call CES1.Dim_Faksimile(CES1.List_Childs)
 
-        If Method = METH_HYBRID Then
-            Call CES1.Dim_PES_Memory()
-        End If
+        'PES Memory wird zum ersten mal dimmensioniert
+        Redim CES1.PES_Memory(0)
 
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
@@ -750,13 +752,23 @@ Partial Class Form1
                 'Bereitet das BlaueModell für die Kombinatorik vor
                 Call Sim1.PREPARE_Evaluation_CES(CES1.List_Childs(i).Path)
 
-                'Falls Hybrid
+                'HYBRID
+                '******
                 If Method = METH_HYBRID Then
-                    'Call Sim1.PREPARE_Evaluation_PES(mypara
+                    Call Sim1.Reduce_OptPara_ModPara()
+                    Call Sim1.SaveParameter_to_Child(CES1.List_Childs(i).myPara)
+                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, myPara)
+                    Call Sim1.PREPARE_Evaluation_PES(myPara)
                 End If
 
                 Call Sim1.SIM_Evaluierung_CES(CES1.List_Childs(i).Penalty)
-                '***********************************************
+                '*********************************************************
+
+                'HYBRID: Speichert die PES Erfahrung diesen Childs
+                '*************************************************
+                If Method = METH_HYBRID Then
+                    Call CES1.Store_Child_Experience(i, gen)
+                End If
 
                 'Zeichnen MO_SO
                 Call DForm.Diag.prepareSeries(0, "Childs", Steema.TeeChart.Styles.PointerStyles.Triangle, 4)
@@ -843,7 +855,7 @@ Partial Class Form1
 
                     'Parameterübergabe an PES
                     '************************
-                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, mypara)
+                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, myPara)
                     'Starten der PES
                     '***************
                     Call STARTEN_PES(Exchange)
@@ -972,7 +984,7 @@ Partial Class Form1
         'Ausgangsparameter werden übergeben
         '******************************************************************************************
         For i = 1 To globalAnzPar
-            myIsOK = PES1.EsLetParameter(i, mypara(i, 1))
+            myIsOK = PES1.EsLetParameter(i, myPara(i, 1))
         Next i
 
         '5. Schritt: PES - ES_PREPARE
@@ -1049,7 +1061,7 @@ GenerierenAusgangswerte:
                         myIsOK = PES1.EsMutation
 
                         'Auslesen der Variierten Parameter
-                        myIsOK = PES1.EsGetParameter(globalAnzPar, mypara)
+                        myIsOK = PES1.EsGetParameter(globalAnzPar, myPara)
 
                         'Auslesen des Bestwertspeichers
                         If Not PES1.isMultiObjective Then
@@ -1285,7 +1297,7 @@ GenerierenAusgangswerte:
                         End If
 
 
-                    Case METH_CES, METH_CES_PES 'Methode CES
+                    Case METH_CES, METH_CES_PES, METH_HYBRID 'Methode CES
                         'XXXXXXXXXXXXXXXXXXXXX
 
                         'Achsen:
@@ -1422,8 +1434,8 @@ GenerierenAusgangswerte:
 
                     'String für die Anzeige der Pfade wird generiert
                     MsgString = Chr(13) & Chr(10) & "Pfad: " & Chr(13) & Chr(10)
-                    For i = 0 To Sim1.Aktuell_Measure.GetUpperBound(0)
-                        MsgString &= Chr(13) & Chr(10) & Sim1.List_Locations(i).Name & ": " & Sim1.Aktuell_Measure(i).ToString()
+                    For i = 0 To Sim1.Aktuelle_Massnahmen.GetUpperBound(0)
+                        MsgString &= Chr(13) & Chr(10) & Sim1.List_Locations(i).Name & ": " & Sim1.Aktuelle_Massnahmen(i).ToString()
                     Next
 
                     'MessageBox
@@ -1448,8 +1460,8 @@ GenerierenAusgangswerte:
 
                     'String für die Anzeige der Pfade wird generiert
                     MsgString = Chr(13) & Chr(10) & "Pfad: " & Chr(13) & Chr(10)
-                    For i = 0 To Sim1.Aktuell_Measure.GetUpperBound(0)
-                        MsgString &= Chr(13) & Chr(10) & Sim1.List_Locations(i).Name & ": " & Sim1.Aktuell_Measure(i).ToString()
+                    For i = 0 To Sim1.Aktuelle_Massnahmen.GetUpperBound(0)
+                        MsgString &= Chr(13) & Chr(10) & Sim1.List_Locations(i).Name & ": " & Sim1.Aktuelle_Massnahmen(i).ToString()
                     Next
                     'MsgString &= Chr(13) & Chr(10) & "OptParameter: " & Chr(13) & Chr(10)
                     'For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
