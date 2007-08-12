@@ -661,16 +661,65 @@ Public Class CES
                     End If
                 Next
             Next
+
+            'Die Doppelten niedrigeren Ränge werden gelöscht
+            call PES_Memory_Dubletten_loeschen(PES_Parents)
+
         Next
     End Sub
 
-    'Löscht wenn ein Individuum bei der gleichen Lokation einmal als Rank 1 und einmal als Rank 2 definiert. Bei Rank 2 entsprechnd Rank 3
-    '*************************************
-    Private Sub Dubletten_loeschen(ByRef PES_Parents() As Struct_PES_Parent)
+    'Löscht wenn ein Individuum bei der gleichen Lokation einmal als Rank 1 und einmal als Rank 2 definiert. Bei Rank 2 entsprechnd Rank 3. Außerdem wird der erste leere Datensatz geloescht.
+    '***************************************************************************************
+    Private Sub PES_Memory_Dubletten_loeschen(ByRef PES_Parents() As Struct_PES_Parent)
 
+        Dim tmp(PES_Parents.GetUpperBound(0) - 1) As Struct_PES_Parent
+        Dim isDouble As Boolean
+        Dim i, j, x As Integer
 
+        x = 0
+        For i = 1 To PES_Parents.GetUpperBound(0)
+            isDouble = False
+            For j = 1 To PES_Parents.GetUpperBound(0)
+                If i <> j And PES_Parents(i).iLocation And is_PES_Double(PES_Parents(i), PES_Parents(j)) Then
+                    isDouble = True
+                End If
+            Next
+            If isDouble = False Then
+                coppy_PES_Struct(PES_Parents(i), tmp(x))
+                x += 1
+            End If
+        Next
+
+        ReDim Preserve tmp(x - 1)
+        ReDim Preserve PES_Parents(x - 1)
+
+        For i = 0 To tmp.GetUpperBound(0)
+            coppy_PES_Struct(tmp(i), PES_Parents(i))
+        Next
 
     End Sub
+
+    'Prüft ob die beiden den gleichen Pfad und zur gleichen location gehören
+    '***********************************************************************
+    Private Function is_PES_Double(ByVal First As Struct_PES_Parent, ByVal Second As Struct_PES_Parent) As Boolean
+        is_PES_Double = False
+
+        Dim count as Integer = 0
+        Dim i As Integer
+
+        For i = 0 To First.Path.GetUpperBound(0)
+            If First.Path(i) = Second.Path(i) Then
+                count += 1
+            End If
+        Next
+
+        If count = First.Path.GetLength(0) Then
+            If First.iLocation = Second.iLocation and first.Memory_Rank < second.Memory_Rank Then
+                is_PES_Double = True
+            End If
+        End If
+
+    End Function
 
 
     'Hilfsfunktion: Kopiert ein Memory Struct ins Parent
@@ -678,9 +727,26 @@ Public Class CES
     Private Sub coppy_PES_Struct(ByVal Source As Struct_PES_Memory, ByRef Desti As Struct_PES_Parent)
 
         ReDim Desti.Path(n_Locations - 1)
-        ReDim Desti.Parameter(Source.parameter.GetLength(0), 1)
+        ReDim Desti.Parameter(Source.Parameter.GetLength(0), 1)
         ReDim Desti.Penalty(n_Penalty - 1)
 
+        Desti.Generation = Source.Generation
+        Array.Copy(Source.Path, Desti.Path, Source.Path.Length)
+        Array.Copy(Source.Parameter, Desti.Parameter, Source.Parameter.Length)
+        Array.Copy(Source.Penalty, Desti.Penalty, Source.Penalty.Length)
+
+    End Sub
+
+    'Hilfsfunktion: koppiert ein PES Parent Struct
+    '***************************************************
+    Private Sub coppy_PES_Struct(ByVal Source As Struct_PES_Parent, ByRef Desti As Struct_PES_Parent)
+
+        ReDim Desti.Path(n_Locations - 1)
+        ReDim Desti.Parameter(Source.Parameter.GetLength(0), 1)
+        ReDim Desti.Penalty(n_Penalty - 1)
+
+        Desti.iLocation = Source.iLocation
+        Desti.Memory_Rank = Source.Memory_Rank
         Desti.Generation = Source.Generation
         Array.Copy(Source.Path, Desti.Path, Source.Path.Length)
         Array.Copy(Source.Parameter, Desti.Parameter, Source.Parameter.Length)
