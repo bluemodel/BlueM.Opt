@@ -25,12 +25,12 @@ Public Class CES
     Public n_Penalty As Integer             'Anzahl der Ziele wird von außen gesetzt
     Public n_Verzweig As Integer            'Anzahl der Verzweigungen in der Verzweigungsdatei
     Public n_PathDimension() As Integer     'Anzahl der Maßnahmen an jeder Stelle
-    Public n_Generations As Integer = 5     'Anzahl der Generationen
-    Public Lenght_PartPath As Integer = 2   'Länge des Gedächtnispfades
 
     'Eingabe
+    Public n_Generations As Integer = 5     'Anzahl der Generationen
+    Public n_Parts_of_Path As Integer = 3   'Länge des Gedächtnispfades Achtung Maximum ist 3
     Public n_Parents As Integer = 3
-    Public n_Childs As Integer = 9
+    Public n_Childs As Integer = 5
 
     'Private Variablen
     Private ReprodOperator As String = "Select_Random_Uniform"
@@ -77,7 +77,16 @@ Public Class CES
         Dim Generation as Integer
     End Structure
 
-    Public PES_Memory() As Struct_PES_Memory
+    Public Memory() As Struct_PES_Memory
+
+    Public Structure Struct_PES_Parent
+        Dim Memory_Rank As Integer
+        Dim Path() As Integer
+        Dim Parameter(,) As Object
+        Dim Penalty() As Double
+        Dim iLocation As Integer
+        Dim Generation As Integer
+    End Structure
 
 #End Region 'Eigenschaften
 
@@ -571,24 +580,111 @@ Public Class CES
     End Sub
 
     'Speichert die Child Ergebnisse im PES Memory
-    Sub Store_Child_Experience(ByVal Child_No As Integer, ByVal Gen_No As Integer)
+    '********************************************
+    Sub Memory_Store(ByVal Child_No As Integer, ByVal Gen_No As Integer)
 
         Dim neu As Integer
-        neu = 0
 
-        If Not (Gen_No = 0 And Child_No = 0) Then
-            ReDim Preserve PES_Memory(PES_Memory.Length)
-            neu = PES_Memory.GetUpperBound(0)
+        If (Gen_No = 0 And Child_No = 0) Then
+            ReDim Memory(0)
+        Else
+            ReDim Preserve Memory(Memory.GetLength(0))
+            neu = Memory.GetUpperBound(0)
         End If
 
-        ReDim PES_Memory(neu).Path(n_Locations - 1)
-        ReDim PES_Memory(neu).Parameter(List_Childs(Child_No).myPara.GetUpperBound(0), 1)
-        ReDim PES_Memory(neu).Penalty(n_Penalty-1)
+        ReDim Memory(neu).Path(n_Locations - 1)
+        ReDim Memory(neu).Parameter(List_Childs(Child_No).myPara.GetUpperBound(0), 1)
+        ReDim Memory(neu).Penalty(n_Penalty - 1)
 
-        PES_Memory(neu).Generation = Gen_No
-        Array.Copy(List_Childs(Child_No).Path, PES_Memory(neu).Path, List_Childs(Child_No).Path.Length)
-        Array.Copy(List_Childs(Child_No).myPara, PES_Memory(neu).Parameter, List_Childs(Child_No).myPara.Length)
-        Array.Copy(List_Childs(Child_No).Penalty, PES_Memory(neu).Penalty, List_Childs(Child_No).Penalty.Length)
+        Memory(neu).Generation = Gen_No
+        Array.Copy(List_Childs(Child_No).Path, Memory(neu).Path, List_Childs(Child_No).Path.Length)
+        Array.Copy(List_Childs(Child_No).myPara, Memory(neu).Parameter, List_Childs(Child_No).myPara.Length)
+        Array.Copy(List_Childs(Child_No).Penalty, Memory(neu).Penalty, List_Childs(Child_No).Penalty.Length)
+
+    End Sub
+
+    'Durchsucht den Memory
+    '*********************
+    Sub Memory_Search()
+
+        Dim i, j, m As Integer
+        Dim count_a(n_Locations - 1) As Integer
+        Dim count_b(n_Locations - 1) As Integer
+        Dim count_c(n_Locations - 1) As Integer
+
+        For i = 0 To List_Childs.GetUpperBound(0)
+
+            Dim PES_Parents(0) As Struct_PES_Parent
+            DIm akt as Integer = 0
+
+            For j = 0 To n_Locations - 1
+                count_a(j) = 0
+                count_b(j) = 0
+                count_c(j) = 0
+            Next
+
+            For j = 0 To n_Locations - 1
+                For m = 0 To Memory.GetUpperBound(0)
+
+                    'Rank Nummer 1
+                    If List_Childs(i).Path(j) = Memory(m).Path(j) Then
+                        ReDim Preserve PES_Parents(PES_Parents.GetLength(0))
+                        akt = PES_Parents.GetUpperBound(0)
+                        Call coppy_PES_Struct(Memory(m), PES_Parents(akt))
+                        PES_Parents(akt).iLocation = j + 1
+                        PES_Parents(akt).Memory_Rank = 1
+                        count_a(j) += 1
+                    End If
+
+                    'Rank Nummer 2
+                    If Not j = n_Locations - 1 And n_Parts_of_Path > 1 Then
+                        If List_Childs(i).Path(j) = Memory(m).Path(j) And List_Childs(i).Path(j + 1) = Memory(m).Path(j + 1) Then
+                            ReDim Preserve PES_Parents(PES_Parents.GetLength(0))
+                            akt = PES_Parents.GetUpperBound(0)
+                            Call coppy_PES_Struct(Memory(m), PES_Parents(akt))
+                            PES_Parents(akt).iLocation = j + 1
+                            PES_Parents(akt).Memory_Rank = 2
+                            count_b(j) += 1
+                        End If
+                    End If
+
+                    'Rank Nummer 3
+                    If Not (j = n_Locations - 1 Or j = n_Locations - 2) And n_Parts_of_Path > 2 Then
+                        If List_Childs(i).Path(j) = Memory(m).Path(j) And List_Childs(i).Path(j + 1) = Memory(m).Path(j + 1) And List_Childs(i).Path(j + 2) = Memory(m).Path(j + 2) Then
+                            ReDim Preserve PES_Parents(PES_Parents.GetLength(0))
+                            akt = PES_Parents.GetUpperBound(0)
+                            Call coppy_PES_Struct(Memory(m), PES_Parents(akt))
+                            PES_Parents(akt).iLocation = j + 1
+                            PES_Parents(akt).Memory_Rank = 3
+                            count_c(j) += 1
+                        End If
+                    End If
+                Next
+            Next
+        Next
+    End Sub
+
+    'Löscht wenn ein Individuum bei der gleichen Lokation einmal als Rank 1 und einmal als Rank 2 definiert. Bei Rank 2 entsprechnd Rank 3
+    '*************************************
+    Private Sub Dubletten_loeschen(ByRef PES_Parents() As Struct_PES_Parent)
+
+
+
+    End Sub
+
+
+    'Hilfsfunktion: Kopiert ein Memory Struct ins Parent
+    '***************************************************
+    Private Sub coppy_PES_Struct(ByVal Source As Struct_PES_Memory, ByRef Desti As Struct_PES_Parent)
+
+        ReDim Desti.Path(n_Locations - 1)
+        ReDim Desti.Parameter(Source.parameter.GetLength(0), 1)
+        ReDim Desti.Penalty(n_Penalty - 1)
+
+        Desti.Generation = Source.Generation
+        Array.Copy(Source.Path, Desti.Path, Source.Path.Length)
+        Array.Copy(Source.Parameter, Desti.Parameter, Source.Parameter.Length)
+        Array.Copy(Source.Penalty, Desti.Penalty, Source.Penalty.Length)
 
     End Sub
 

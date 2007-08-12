@@ -712,9 +712,6 @@ Partial Class Form1
         Call CES1.Dim_Faksimile(CES1.List_Parents)
         Call CES1.Dim_Faksimile(CES1.List_Childs)
 
-        'PES Memory wird zum ersten mal dimmensioniert
-        Redim CES1.PES_Memory(0)
-
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
 
@@ -766,10 +763,10 @@ Partial Class Form1
                 'HYBRID: Speichert die PES Erfahrung diesen Childs
                 '*************************************************
                 If Method = METH_HYBRID Then
-                    Call CES1.Store_Child_Experience(i, gen)
+                    Call CES1.Memory_Store(i, gen)
                 End If
 
-                'Zeichnen MO_SO
+                'Zeichnen MO_SO Zeichnen
                 Call DForm.Diag.prepareSeries(0, "Childs", Steema.TeeChart.Styles.PointerStyles.Triangle, 4)
                 If CES1.n_Penalty = 1 Then
                     Call DForm.Diag.Series(0).Add(durchlauf_all, CES1.List_Childs(i).Penalty(0))
@@ -780,8 +777,8 @@ Partial Class Form1
                 System.Windows.Forms.Application.DoEvents()
             Next
 
-            'MO oder SO
-            '----------
+            'MO oder SO Selectionsprozess oder NDSorting
+            '-------------------------------------------
             If CES1.n_Penalty = 1 Then
                 'Sortieren der Kinden anhand der Qualität
                 Call CES1.Sort_Faksimile(CES1.List_Childs)
@@ -817,6 +814,12 @@ Partial Class Form1
                 Call CES1.Reproduction_Control()
                 'Mutationsoperatoren
                 Call CES1.Mutation_Control()
+            End If
+
+            'HYBRID: Durchsucht den Speicher
+            '*******************************
+            If Method = METH_HYBRID Then
+                Call CES1.Memory_Search()
             End If
 
         Next
