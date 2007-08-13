@@ -39,8 +39,7 @@ Public Class PES
         Dim NPenalty As Short               'Anzahl der Penaltyfunktionen
         Dim NConstrains As Short            'Anzahl der Randbedingungen
         Dim iEvoTyp As Short                'Typ der Evolutionsstrategie (+ oder ,)
-        Dim iPopEvoTyp As Short             'Typ der Evolutionsstrategie (+ oder ,) auf
-        'Populationsebene
+        Dim iPopEvoTyp As Short             'Typ der Evolutionsstrategie (+ oder ,) auf Populationsebene
         Dim iPopPenalty As Short            'Art der Beurteilung der Populationsgüte (Multiobjective)
         Dim isPOPUL As Boolean              'Mit Populationen
         Dim isMultiObjective As Boolean     'Mit zweiter Objective-function
@@ -49,10 +48,8 @@ Public Class PES
         Dim NRunden As Short                'Anzahl Runden
         Dim NPopul As Short                 'Anzahl Populationen
         Dim NPopEltern As Short             'Anzahl Populationseltern
-        Dim iOptPopEltern As Short          'Ermittlung der Populationseltern (Mittelwert,
-        'Rekombination)
-        Dim iOptEltern As Short             'Ermittlung der Individuum-Eltern (Mittelwert,
-        'Rekombination, einfache Auswahl)
+        Dim iOptPopEltern As Short          'Ermittlung der Populationseltern (Mittelwert, Rekombination, Selektion)
+        Dim iOptEltern As Short             'Ermittlung der Individuum-Eltern (Mittelwert, Rekombination, einfache Auswahl)
         Dim NRekombXY As Short              'X/Y-Schema Rekombination
         Dim rDeltaMin As Single             'Mindestschrittweite
         Dim rDeltaStart As Single           'Startschrittweite
@@ -68,8 +65,7 @@ Public Class PES
         Dim iaktuelleGeneration As Short    'Zähler für aktuelle Generation
         Dim iaktuellerNachfahre As Short    'Zähler für aktuellen Nachfahre
         Dim d As Double                     'Faktor für Rekombinationsoperator
-        Dim interact As Short               'Alle wieviel Generationen soll die aktuelle Population
-        'mit Mitgliedern der sekundären Population aufgefüllt werden
+        Dim interact As Short               'Alle wieviel Generationen soll die aktuelle Population mit Mitgliedern der sekundären Population aufgefüllt werden
         Dim isInteract As Boolean           'Mit Austausch zwischen Population und Sekundärer Population
         Dim NMemberSecondPop As Short       'Maximale Anzahl Mitglieder der Sekundärpopulation
     End Structure
@@ -508,7 +504,20 @@ ES_INI_ERROR:
         On Error GoTo ES_OPTIONS_ERROR
 
         'Überprüfung der Übergebenen Werte
-        If ((iEvoTyp < 1 Or iEvoTyp > 2) Or (iPopEvoTyp < 1 Or iPopEvoTyp > 2) Or NRunden < 1 Or NPopul < 1 Or NPopEltern < 1 Or (iOptPopEltern < 1 Or iOptPopEltern > 3) Or (iOptEltern < 1 Or iOptEltern > 6) Or NEltern < 1 Or NNachf < 1 Or NGen < 1 Or NRekombXY < 1 Or rDeltaStart < 0 Or (iStartPar < 1 Or iStartPar > 2)) Then GoTo ES_OPTIONS_ERROR
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        If (iEvoTyp < 1 Or iEvoTyp > 2) Then Throw New Exception("Typ der Evolutionsstrategie ist nicht '+' oder ','") 
+        If (iPopEvoTyp < 1 Or iPopEvoTyp > 2) Then Throw New Exception("Typ der Evolutionsstrategie auf Pupulationsebene ist nicht '+' oder ','") 
+        If NRunden < 1 Then Throw New Exception("Die Anzahl der Runden ist kleiner 1") 
+        If NPopul < 1 Then Throw New Exception("Die Anzahl der Populationen ist kleiner 1") 
+        If NPopEltern < 1 Then Throw New Exception("Die Anzahl der Populationseltern ist kleiner 1") 
+        If (iOptPopEltern < 1 Or iOptPopEltern > 3) Then Throw New Exception("Ermittlung der Populationseltern ist nicht Mittelwert, Rekombination oder Selektion") 
+        If(iOptEltern < 1 Or iOptEltern > 6) Then Throw New Exception("Strategie zur Ermittlung der Eltern ist nicht möglich") 
+        If NEltern < 1 Then Throw New Exception("Die Anzahl der Eltern ist kleiner 1") 
+        If NNachf < 1 Then Throw New Exception("Die Anzahl der Nachfahren ist kleiner 1")
+        If NGen < 1 Then Throw New Exception("Die Anzahl der Generationen ist kleiner 1") 
+        If NRekombXY < 1 Then Throw New Exception("Der Wert für die X/Y-Schema Rekombination ist kleiner 1") 
+        If rDeltaStart < 0 Then Throw New Exception("Die Startschrittweite darf nicht kleiner 0 sein") 
+        If (iStartPar < 1 Or iStartPar > 2) Then Throw New Exception("Die Startaparameter dürfen nur zufällig sein oder aus den Originalparameter bestehen")
 
         'Übergabe der Optionen
         Eigenschaft.iEvoTyp = iEvoTyp
