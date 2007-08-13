@@ -52,7 +52,7 @@ Partial Class Form1
     '**** Globale Parameter Parameter Optimierung ****
     Dim myIsOK As Boolean
     Dim globalAnzPar As Short
-    Dim globalAnzZiel_ParaOpt As Short
+    Dim globalAnzZiel As Short
     Dim globalAnzRand As Short
     Dim array_x() As Double
     Dim array_y() As Double
@@ -181,7 +181,7 @@ Partial Class Form1
                     EVO_Einstellungen1.OptModus = Testprobleme1.OptModus
 
                     'Globale Parameter werden gesetzt
-                    Call Testprobleme1.Parameter_Uebergabe(Testprobleme1.Combo_Testproblem.Text, Testprobleme1.Text_Sinusfunktion_Par.Text, Testprobleme1.Text_Schwefel24_Par.Text, globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, myPara)
+                    Call Testprobleme1.Parameter_Uebergabe(Testprobleme1.Combo_Testproblem.Text, Testprobleme1.Text_Sinusfunktion_Par.Text, Testprobleme1.Text_Schwefel24_Par.Text, globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
 
                     'Start-Button aktivieren (keine Methodenauswahl erforderlich)
                     Button_Start.Enabled = True
@@ -326,7 +326,7 @@ Partial Class Form1
                     End If
 
                     'Parameterübergabe an PES
-                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, myPara)
+                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
 
                 Case METH_CES, METH_CES_PES, METH_HYBRID 'Methode CES und Methode CES_PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -522,7 +522,7 @@ Partial Class Form1
         '------------------------------------------------------------------------
 
         'Parameterübergabe an ES
-        Me.globalAnzZiel_ParaOpt = 1
+        Me.globalAnzZiel = 1
         Me.globalAnzRand = 0
         Me.globalAnzPar = SensiPlot1.Selected_OptParameter.GetLength(0)
 
@@ -753,7 +753,7 @@ Partial Class Form1
                 If Method = METH_HYBRID Then
                     Call Sim1.Reduce_OptPara_ModPara()
                     Call Sim1.SaveParameter_to_Child(CES1.List_Childs(i).myPara)
-                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, myPara)
+                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
                     Call Sim1.PREPARE_Evaluation_PES(myPara)
                 End If
 
@@ -831,7 +831,7 @@ Partial Class Form1
                     'Die öffentlichen dynamischen Arrays werden initialisiert (Dn, An, Xn, Xmin, Xmax)
                     'und die Anzahl der Zielfunktionen wird festgelegt
                     '******************************************************************************************
-                    myIsOK = PES1.EsIni(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand)
+                    myIsOK = PES1.EsIni(globalAnzPar, globalAnzZiel, globalAnzRand)
                     '3. Schritt: PES - ES_OPTIONS
                     'Optionen der Evolutionsstrategie werden übergeben
                     '******************************************************************************************
@@ -876,7 +876,7 @@ Partial Class Form1
 
                     'Parameterübergabe an PES
                     '************************
-                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand, myPara)
+                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
                     'Starten der PES
                     '***************
                     Call STARTEN_PES(Exchange)
@@ -902,22 +902,11 @@ Partial Class Form1
         Dim PES1 As EvoKern.PES
         '--------------------------
         'Dimensionierung der Variablen für Optionen Evostrategie
+        'Das Struct aus PES wird hier verwendet
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        Dim PES_Options as EvoKern.PES.Struct_Options
+        Dim PES_Options As EvoKern.PES.Struct_Settings
 
-        'Dim varanz As Short                 'Anzahl Parameter
-        'Dim NPenalty As Short               'Anzahl der Penaltyfunktionen
-        'Dim NConstrains As Short            'Anzahl der Randbedingungen
-        'Dim Dn() As Double                  'Schrittweitenvektor
-        'Dim Xn() As Double                  'aktuelle Variablenwerte
-        'Dim Xmin() As Double                'untere Schranke
-        'Dim Xmax() As Double                'Obere Schranke
-        'Dim iaktuelleRunde As Short         'Zähler für aktuelle Runde
-        'Dim iaktuellePopulation As Short    'Zähler für aktuelle Population
-        'Dim iaktuelleGeneration As Short    'Zähler für aktuelle Generation
-        'Dim iaktuellerNachfahre As Short    'Zähler für aktuellen Nachfahre
-
-        '--------------------------
+        'Check!
         Dim ipop As Short = 0
         Dim igen As Short
         Dim inachf As Short
@@ -951,19 +940,7 @@ Partial Class Form1
         PES_Options.isInteract = EVO_Einstellungen1.isInteract
         PES_Options.NMemberSecondPop = EVO_Einstellungen1.NMemberSecondPop
 
-        'Dim varanz As Short                 'Anzahl Parameter
-        'Dim NPenalty As Short               'Anzahl der Penaltyfunktionen
-        'Dim NConstrains As Short            'Anzahl der Randbedingungen
-        'Dim Dn() As Double                  'Schrittweitenvektor
-        'Dim Xn() As Double                  'aktuelle Variablenwerte
-        'Dim Xmin() As Double                'untere Schranke
-        'Dim Xmax() As Double                'Obere Schranke
-        'Dim iaktuelleRunde As Short         'Zähler für aktuelle Runde
-        'Dim iaktuellePopulation As Short    'Zähler für aktuelle Population
-        'Dim iaktuelleGeneration As Short    'Zähler für aktuelle Generation
-        'Dim iaktuellerNachfahre As Short    'Zähler für aktuellen Nachfahre
-
-        ReDim QN(globalAnzZiel_ParaOpt)
+        ReDim QN(globalAnzZiel)
         ReDim RN(globalAnzRand)
 
         'Diagramm vorbereiten und initialisieren
@@ -976,16 +953,16 @@ Partial Class Form1
         '******************************************************************************************
         PES1 = New EvoKern.PES
 
-        '2. Schritt: PES - ES_INI
+        '2. Schritt: PES - ES_OPTIONS
+        'Optionen der Evolutionsstrategie werden übergeben
+        '******************************************************************************************
+        myIsOK = PES1.EsOptions(PES_Options)
+
+        '3. Schritt: PES - ES_INI
         'Die öffentlichen dynamischen Arrays werden initialisiert (Dn, An, Xn, Xmin, Xmax)
         'und die Anzahl der Zielfunktionen wird festgelegt
         '******************************************************************************************
-        myIsOK = PES1.EsIni(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand)
-
-        '3. Schritt: PES - ES_OPTIONS
-        'Optionen der Evolutionsstrategie werden übergeben
-        '******************************************************************************************
-        myIsOK = PES1.EsOptions(PES_Options, globalAnzPar)
+        myIsOK = PES1.EsIni(globalAnzPar, globalAnzZiel, globalAnzRand)
 
         '4. Schritt: PES - ES_LET_PARAMETER
         'Ausgangsparameter werden übergeben
@@ -1005,7 +982,7 @@ Partial Class Form1
         myIsOK = PES1.EsStartvalues()
 
         'Startwerte werden der Verlaufsanzeige werden zugewiesen
-        Call Me.INI_Verlaufsanzeige(PES1.NRunden, PES1.NPopul, PES1.NGen, PES1.NNachf)
+        Call Me.INI_Verlaufsanzeige(EVO_Einstellungen1.NRunden, EVO_Einstellungen1.NPopul, EVO_Einstellungen1.NGen, EVO_Einstellungen1.NNachf)
 
         durchlauf = 0
 
@@ -1016,7 +993,7 @@ Start_Evolutionsrunden:
         '*******************************************************************************************
         Do While (PES1.EsIsNextRunde(Me.Method))
 
-            irunde = PES1.iaktuelleRunde
+            irunde = PES1.PES_iAkt.iAktRunde
             Call EVO_Opt_Verlauf1.Runden(irunde)
 
             myIsOK = PES1.EsPopBestwertspeicher()
@@ -1024,7 +1001,7 @@ Start_Evolutionsrunden:
             '***********************************************************************************************
             Do While (PES1.EsIsNextPop)
 
-                ipop = PES1.iaktuellePopulation
+                ipop = PES1.PES_iAkt.iAktPop
                 Call EVO_Opt_Verlauf1.Populationen(ipop)
 
                 myIsOK = PES1.EsPopVaria
@@ -1035,7 +1012,7 @@ Start_Evolutionsrunden:
                 '***********************************************************************************************
                 Do While (PES1.EsIsNextGen)
 
-                    igen = PES1.iaktuelleGeneration
+                    igen = PES1.PES_iAkt.iAktGen
                     Call EVO_Opt_Verlauf1.Generation(igen)
 
                     myIsOK = PES1.EsBestwertspeicher()
@@ -1044,7 +1021,7 @@ Start_Evolutionsrunden:
                     '********************************************************************
                     Do While (PES1.EsIsNextNachf)
 
-                        inachf = PES1.iaktuellerNachfahre
+                        inachf = PES1.PES_iAkt.iAktNachf
                         Call EVO_Opt_Verlauf1.Nachfolger(inachf)
 
                         durchlauf = durchlauf + 1
@@ -1070,7 +1047,7 @@ GenerierenAusgangswerte:
                         myIsOK = PES1.EsGetParameter(globalAnzPar, myPara)
 
                         'Auslesen des Bestwertspeichers
-                        If Not PES1.isMultiObjective Then
+                        If Not Evo_Einstellungen1.isMultiObjective Then
                             myIsOK = PES1.EsGetBestwert(Bestwert)
                         End If
 
@@ -1121,7 +1098,7 @@ GenerierenAusgangswerte:
                     myIsOK = PES1.EsEltern()
 
                     'sekundäre Population zeichnen
-                    If PES1.isMultiObjective Then
+                    If EVO_Einstellungen1.isMultiObjective Then
                         myIsOK = PES1.esGetSekundärePopulation(SekPopulation)
                         Call SekundärePopulationZeichnen(SekPopulation)
                     End If
@@ -1188,8 +1165,8 @@ GenerierenAusgangswerte:
     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
     Private Sub INI_Verlaufsanzeige(ByRef NRunden As Integer, ByRef NPopul As Integer, ByRef NGen As Integer, ByRef NNachf As Integer)
-        EVO_Opt_Verlauf1.NRunden = 1
-        EVO_Opt_Verlauf1.NPopul = 1
+        EVO_Opt_Verlauf1.NRunden = NRunden
+        EVO_Opt_Verlauf1.NPopul = NPopul
         EVO_Opt_Verlauf1.NGen = NGen
         EVO_Opt_Verlauf1.NNachf = NNachf
         EVO_Opt_Verlauf1.Initialisieren()
