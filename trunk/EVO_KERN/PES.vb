@@ -496,7 +496,7 @@ ES_INI_ERROR:
     'ES_OPTIONS
     '*******************************************************************************
 
-    'Function ES_OPTIONS übergibt Optionen für Evolutionsstrategie
+    'Function ES_OPTIONS übergibt Optionen für Evolutionsstrategie und Prüft die eingestellten Optionen
     Public Function EsOptions(ByRef iEvoTyp As Integer, ByRef iPopEvoTyp As Integer, ByRef isPOPUL As Boolean, ByRef NRunden As Integer, ByRef NPopul As Integer, ByRef NPopEltern As Integer, ByRef iOptPopEltern As Integer, ByRef iOptEltern As Integer, ByRef iPopPenalty As Integer, ByRef NGen As Integer, ByRef NEltern As Integer, ByRef NNachf As Integer, ByRef NRekombXY As Integer, ByRef rDeltaStart As Single, ByRef iStartPar As Integer, ByRef isDnVektor As Boolean, ByRef isMultiObjective As Boolean, ByRef isPareto As Boolean, ByRef isPareto3D As Boolean, ByRef interact As Short, ByRef isInteract As Boolean, ByRef NMemberSecondPop As Short, ByRef globalAnzPar as Short) As Boolean
 
         EsOptions = False
@@ -548,13 +548,14 @@ ES_INI_ERROR:
             Throw New Exception("Die Anzahl der Populationseltern darf nicht größer als die Anzahl der Populationen!")
         End If
         If NNachf <= NEltern Then
-            Throw New Exception("Die Anzahl der Eltern kann nicht größer als die Anzahl der Nachfahren sein!" & Chr(13) & Chr(10) & "Optimal ist ein Verhältnis von 1:3 bis 1:5.")
+            Throw New Exception("Die Anzahl der Eltern kann nicht größer als die Anzahl der Nachfahren sein!" & Chr(13) & Chr(10) & "'Rechenberg 73' schlägt ein Verhältnis von 1:3 bis 1:5 vor.")
         End If
         If globalAnzPar < 1 Then
             Throw New Exception("Die Anzahl der Parameter ist kleiner 1!")
         End If
 
         'Übergabe der Optionen
+        'xxxxxxxxxxxxxxxxxxxxx
         Eigenschaft.iEvoTyp = iEvoTyp
         Eigenschaft.iPopEvoTyp = iPopEvoTyp
         Eigenschaft.isPOPUL = isPOPUL
