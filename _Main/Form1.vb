@@ -823,6 +823,10 @@ Partial Class Form1
                 For i = 0 To CES1.List_Childs.GetUpperBound(0)
                     'Ermittelt fuer jedes Child den PES Parent Satz
                     Call CES1.Memory_Search(CES1.List_Childs(i))
+
+                    'Jetzt muss die PES initiert werden
+
+
                 Next
             End If
 
@@ -940,31 +944,6 @@ Partial Class Form1
         ReDim QN(globalAnzZiel_ParaOpt)
         ReDim RN(globalAnzRand)
 
-        'Kontrolle der Variablen
-        Try
-            If NRunden = 0 Or NPopul = 0 Or NPopEltern = 0 Then
-                Throw New Exception("Anzahl der Runden, Populationen oder Populationseltern ist zu klein!")
-            End If
-            If NGen = 0 Or NEltern = 0 Or NNachf = 0 Then
-                Throw New Exception("Anzahl der Generationen, Eltern oder Nachfolger ist zu klein!")
-            End If
-            If rDeltaStart < 0 Then
-                Throw New Exception("Die Startschrittweite ist unzulässig oder kleiner als die minimale Schrittweite!")
-            End If
-            If globalAnzPar = 0 Then
-                Throw New Exception("Die Anzahl der Parameter ist unzulässig!")
-            End If
-            If NPopul < NPopEltern Then
-                Throw New Exception("Die Anzahl der Populationseltern darf nicht größer als die Anzahl der Populationen sein!")
-            End If
-            If NNachf <= NEltern Then
-                Throw New Exception("Die Anzahl der Eltern kann nicht größer als die Anzahl der Nachfahren sein!" & Chr(13) & Chr(10) & "Optimal ist ein Verhältnis von 1:3 bis 1:5.")
-            End If
-        Catch ex As Exception
-            MsgBox(ex.Message, MsgBoxStyle.Exclamation, "Fehler")
-            Exit Sub
-        End Try
-
         'Diagramm vorbereiten und initialisieren
         If Not Me.Method = METH_CES_PES Then
             Call PrepareDiagramm()
@@ -984,7 +963,7 @@ Partial Class Form1
         '3. Schritt: PES - ES_OPTIONS
         'Optionen der Evolutionsstrategie werden übergeben
         '******************************************************************************************
-        myIsOK = PES1.EsOptions(iEvoTyp, iPopEvoTyp, isPOPUL, NRunden, NPopul, NPopEltern, iOptPopEltern, iOptEltern, iPopPenalty, NGen, NEltern, NNachf, NRekombXY, rDeltaStart, iStartPar, isdnvektor, isMultiObjective, isPareto, isPareto3D, Interact, isInteract, NMemberSecondPop)
+        myIsOK = PES1.EsOptions(iEvoTyp, iPopEvoTyp, isPOPUL, NRunden, NPopul, NPopEltern, iOptPopEltern, iOptEltern, iPopPenalty, NGen, NEltern, NNachf, NRekombXY, rDeltaStart, iStartPar, isdnvektor, isMultiObjective, isPareto, isPareto3D, Interact, isInteract, NMemberSecondPop, globalAnzPar)
 
         '4. Schritt: PES - ES_LET_PARAMETER
         'Ausgangsparameter werden übergeben
@@ -1081,10 +1060,10 @@ GenerierenAusgangswerte:
                         '************************************************************************************
                         Select Case Anwendung
                             Case ANW_TESTPROBLEME
-                                Call Testprobleme1.Evaluierung_TestProbleme(Testprobleme1.Combo_Testproblem.Text, globalAnzPar, mypara, durchlauf, ipop, QN, RN, DForm.Diag)
+                                Call Testprobleme1.Evaluierung_TestProbleme(Testprobleme1.Combo_Testproblem.Text, globalAnzPar, myPara, durchlauf, ipop, QN, RN, DForm.Diag)
                             Case ANW_BLUEM, ANW_SMUSI
                                 'Vorbereiten des Modelldatensatzes
-                                Call Sim1.PREPARE_Evaluation_PES(mypara)
+                                Call Sim1.PREPARE_Evaluation_PES(myPara)
                                 If Not Sim1.SIM_Evaluierung_PES(durchlauf, ipop, QN) Then
                                     GoTo GenerierenAusgangswerte
                                 End If
