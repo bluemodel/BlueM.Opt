@@ -497,7 +497,7 @@ ES_INI_ERROR:
     '*******************************************************************************
 
     'Function ES_OPTIONS übergibt Optionen für Evolutionsstrategie
-    Public Function EsOptions(ByRef iEvoTyp As Integer, ByRef iPopEvoTyp As Integer, ByRef isPOPUL As Boolean, ByRef NRunden As Integer, ByRef NPopul As Integer, ByRef NPopEltern As Integer, ByRef iOptPopEltern As Integer, ByRef iOptEltern As Integer, ByRef iPopPenalty As Integer, ByRef NGen As Integer, ByRef NEltern As Integer, ByRef NNachf As Integer, ByRef NRekombXY As Integer, ByRef rDeltaStart As Single, ByRef iStartPar As Integer, ByRef isDnVektor As Boolean, ByRef isMultiObjective As Boolean, ByRef isPareto As Boolean, ByRef isPareto3D As Boolean, ByRef interact As Short, ByRef isInteract As Boolean, ByRef NMemberSecondPop As Short) As Boolean
+    Public Function EsOptions(ByRef iEvoTyp As Integer, ByRef iPopEvoTyp As Integer, ByRef isPOPUL As Boolean, ByRef NRunden As Integer, ByRef NPopul As Integer, ByRef NPopEltern As Integer, ByRef iOptPopEltern As Integer, ByRef iOptEltern As Integer, ByRef iPopPenalty As Integer, ByRef NGen As Integer, ByRef NEltern As Integer, ByRef NNachf As Integer, ByRef NRekombXY As Integer, ByRef rDeltaStart As Single, ByRef iStartPar As Integer, ByRef isDnVektor As Boolean, ByRef isMultiObjective As Boolean, ByRef isPareto As Boolean, ByRef isPareto3D As Boolean, ByRef interact As Short, ByRef isInteract As Boolean, ByRef NMemberSecondPop As Short, ByRef globalAnzPar as Short) As Boolean
 
         EsOptions = False
 
@@ -505,19 +505,54 @@ ES_INI_ERROR:
 
         'Überprüfung der Übergebenen Werte
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        If (iEvoTyp < 1 Or iEvoTyp > 2) Then Throw New Exception("Typ der Evolutionsstrategie ist nicht '+' oder ','") 
-        If (iPopEvoTyp < 1 Or iPopEvoTyp > 2) Then Throw New Exception("Typ der Evolutionsstrategie auf Pupulationsebene ist nicht '+' oder ','") 
-        If NRunden < 1 Then Throw New Exception("Die Anzahl der Runden ist kleiner 1") 
-        If NPopul < 1 Then Throw New Exception("Die Anzahl der Populationen ist kleiner 1") 
-        If NPopEltern < 1 Then Throw New Exception("Die Anzahl der Populationseltern ist kleiner 1") 
-        If (iOptPopEltern < 1 Or iOptPopEltern > 3) Then Throw New Exception("Ermittlung der Populationseltern ist nicht Mittelwert, Rekombination oder Selektion") 
-        If(iOptEltern < 1 Or iOptEltern > 6) Then Throw New Exception("Strategie zur Ermittlung der Eltern ist nicht möglich") 
-        If NEltern < 1 Then Throw New Exception("Die Anzahl der Eltern ist kleiner 1") 
-        If NNachf < 1 Then Throw New Exception("Die Anzahl der Nachfahren ist kleiner 1")
-        If NGen < 1 Then Throw New Exception("Die Anzahl der Generationen ist kleiner 1") 
-        If NRekombXY < 1 Then Throw New Exception("Der Wert für die X/Y-Schema Rekombination ist kleiner 1") 
-        If rDeltaStart < 0 Then Throw New Exception("Die Startschrittweite darf nicht kleiner 0 sein") 
-        If (iStartPar < 1 Or iStartPar > 2) Then Throw New Exception("Die Startaparameter dürfen nur zufällig sein oder aus den Originalparameter bestehen")
+        If (iEvoTyp < 1 Or iEvoTyp > 2) Then
+            Throw New Exception("Typ der Evolutionsstrategie ist nicht '+' oder ','")
+        End If
+        If (iPopEvoTyp < 1 Or iPopEvoTyp > 2) Then
+            Throw New Exception("Typ der Evolutionsstrategie auf Pupulationsebene ist nicht '+' oder ','")
+        End If
+        If NRunden < 1 Then
+            Throw New Exception("Die Anzahl der Runden ist kleiner 1")
+        End If
+        If NPopul < 1 Then
+            Throw New Exception("Die Anzahl der Populationen ist kleiner 1")
+        End If
+        If NPopEltern < 1 Then
+            Throw New Exception("Die Anzahl der Populationseltern ist kleiner 1")
+        End If
+        If (iOptPopEltern < 1 Or iOptPopEltern > 3) Then
+            Throw New Exception("Ermittlung der Populationseltern ist nicht Mittelwert, Rekombination oder Selektion!")
+        End If
+        If (iOptEltern < 1 Or iOptEltern > 6) Then
+            Throw New Exception("Strategie zur Ermittlung der Eltern ist nicht möglich!")
+        End If
+        If NEltern < 1 Then
+            Throw New Exception("Die Anzahl der Eltern ist kleiner 1!")
+        End If
+        If NNachf < 1 Then
+            Throw New Exception("Die Anzahl der Nachfahren ist kleiner 1!")
+        End If
+        If NGen < 1 Then
+            Throw New Exception("Die Anzahl der Generationen ist kleiner 1!")
+        End If
+        If NRekombXY < 1 Then
+            Throw New Exception("Der Wert für die X/Y-Schema Rekombination ist kleiner 1!")
+        End If
+        If rDeltaStart < 0 Then
+            Throw New Exception("Die Startschrittweite darf nicht kleiner 0 sein!")
+        End If
+        If (iStartPar < 1 Or iStartPar > 2) Then
+            Throw New Exception("Die Startaparameter dürfen nur zufällig sein oder aus den Originalparameter bestehen!")
+        End If
+        If NPopul < NPopEltern Then
+            Throw New Exception("Die Anzahl der Populationseltern darf nicht größer als die Anzahl der Populationen!")
+        End If
+        If NNachf <= NEltern Then
+            Throw New Exception("Die Anzahl der Eltern kann nicht größer als die Anzahl der Nachfahren sein!" & Chr(13) & Chr(10) & "Optimal ist ein Verhältnis von 1:3 bis 1:5.")
+        End If
+        If globalAnzPar < 1 Then
+            Throw New Exception("Die Anzahl der Parameter ist kleiner 1!")
+        End If
 
         'Übergabe der Optionen
         Eigenschaft.iEvoTyp = iEvoTyp
