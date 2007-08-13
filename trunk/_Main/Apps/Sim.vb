@@ -45,6 +45,7 @@ Public MustInherit Class Sim
     Public Const OptParameter_Ext As String = "OPT"      'Erweiterung der Datei mit den Optimierungsparametern (*.OPT)
     Public Const ModParameter_Ext As String = "MOD"      'Erweiterung der Datei mit den Modellparametern (*.MOD)
     Public Const OptZiele_Ext As String = "ZIE"          'Erweiterung der Datei mit den Zielfunktionen (*.ZIE)
+    Public Const Constraints_Ext As String = "CON"       'Erweiterung der Datei mit den Constraints (*.CON)
     Public Const Combi_Ext As String = "CES"             'Erweiterung der Datei mit der Kombinatorik  (*.CES)
 
     'Optimierungsparameter
@@ -112,7 +113,28 @@ Public MustInherit Class Sim
         End Function
     End Structure
 
-    Public List_OptZiele() As Struct_OptZiel = {}   'Liste der Zielfunktionnen
+    Public List_OptZiele() As Struct_OptZiel = {}   'Liste der Zielfunktionen
+
+    'Constraints
+    '-----------
+    Public Structure Struct_Constraint
+        Public Bezeichnung As String                'Bezeichnung
+        Public GrenzTyp As String                   'Gibt an ob es sich um einen Wert oder um eine Reihe handelt
+        Public Datei As String                      'Die Ergebnisdatei, aus der das Simulationsergebnis ausgelesen werden soll [WEL]
+        Public SimGr As String                      'Die Simulationsgröße, die auf Verletzung der Grenze überprüft werden soll
+        Public GrenzPos As String                   'Grenzposition (Ober-/Untergrenze)
+        Public WertTyp As String                    'Gibt an wie der Wert, der mit dem Grenzwert verglichen werden soll, aus dem Simulationsergebnis berechnet werden soll
+        Public GrenzWert As String                  'Der vorgegeben Grenzwert
+        Public GrenzReiheDatei As String            'Der Dateiname der Grenzwertreihe
+        Public GrenzGr As String                    'Spalte der .wel Datei falls Grenzwertreihe .wel Datei ist
+        Public GrenzReihe As Wave.Zeitreihe         'Die Werte der Grenzwertreihe
+        Public ConstTmp As Double                   'Constraintwert der letzten Simulation wird hier zwischengespeichert 
+        Public Overrides Function toString() As String
+            Return Bezeichnung
+        End Function
+    End Structure
+
+    Public List_Constraints() As Struct_Constraint = {} 'Liste der Constraints
 
     'Ergebnisdatenbank
     '-----------------
@@ -259,6 +281,8 @@ Public MustInherit Class Sim
         Call Me.Read_SimParameter()
         'Zielfunktionen einlesen
         Call Me.Read_OptZiele()
+        'Constraints einlesen
+        Call Me.Read_Constraints()
         'Optimierungsparameter einlesen
         Call Me.Read_OptParameter()
         'ModellParameter einlesen
@@ -280,6 +304,8 @@ Public MustInherit Class Sim
 
         'Zielfunktionen einlesen
         Call Me.Read_OptZiele()
+        'Constraints einlesen
+        Call Me.Read_Constraints()
         'Kombinatorik Datei einlesen
         Call Me.Read_Kombinatorik()
         'Verzweigungs Datei einlesen
@@ -303,6 +329,8 @@ Public MustInherit Class Sim
         '***************************************
         'Zielfunktionen einlesen
         Call Me.Read_OptZiele()
+        'Constraints einlesen
+        Call Me.Read_Constraints()
         'Kombinatorik Datei einlesen
         Call Me.Read_Kombinatorik()
         'Verzweigungs Datei einlesen
@@ -314,12 +342,10 @@ Public MustInherit Class Sim
         'Datenbank vorbereiten
 
         'PES vorbereiten
-        'Erforderliche Dateien werden eingelesen
+        'zusätzliche Dateien werden eingelesen
         '***************************************
         'Simulationsdaten einlesen
         Call Me.Read_SimParameter()
-        'Zielfunktionen einlesen
-        Call Me.Read_OptZiele()
         'Optimierungsparameter einlesen
         Call Me.Read_OptParameter()
         'ModellParameter einlesen
@@ -563,6 +589,109 @@ Public MustInherit Class Sim
                 End If
             End With
         Next
+    End Sub
+
+    'Constraints einlesen
+    '********************
+    Private Sub Read_Constraints()
+
+        Dim AnzConst As Integer = 0
+        Dim ext As String
+        Dim i As Integer
+
+        Dim Datei As String = WorkDir & Datensatz & "." & Constraints_Ext
+
+        If (File.Exists(Datei)) Then
+
+            Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.Read)
+            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+            Dim Zeile As String = ""
+
+            'Anzahl der Constraints feststellen
+            Do
+                Zeile = StrRead.ReadLine.ToString()
+                If (Zeile.StartsWith("*") = False) Then
+                    AnzConst += 1
+                End If
+            Loop Until StrRead.Peek() = -1
+
+            ReDim List_Constraints(AnzConst - 1)
+
+            'Zurück zum Dateianfang und lesen
+            FiStr.Seek(0, SeekOrigin.Begin)
+
+            'Einlesen der Zeile und übergeben an die Constraints Liste
+            Dim ZeilenArray(9) As String
+
+            i = 0
+            Do
+                Zeile = StrRead.ReadLine.ToString()
+                If (Zeile.StartsWith("*") = False) Then
+                    ZeilenArray = Zeile.Split("|")
+                    'Werte zuweisen
+                    List_Constraints(i).Bezeichnung = ZeilenArray(1).Trim()
+                    List_Constraints(i).GrenzTyp = ZeilenArray(2).Trim()
+                    List_Constraints(i).Datei = ZeilenArray(3).Trim()
+                    List_Constraints(i).SimGr = ZeilenArray(4).Trim()
+                    List_Constraints(i).GrenzPos = ZeilenArray(5).Trim()
+                    List_Constraints(i).WertTyp = ZeilenArray(6).Trim()
+                    List_Constraints(i).GrenzWert = ZeilenArray(7).Trim()
+                    List_Constraints(i).GrenzGr = ZeilenArray(8).Trim()
+                    List_Constraints(i).GrenzReiheDatei = ZeilenArray(9).Trim()
+                    i += 1
+                End If
+            Loop Until StrRead.Peek() = -1
+
+            StrRead.Close()
+            FiStr.Close()
+
+            'Falls mit Reihen verglichen werden soll werden hier die Reihen eingelesen
+            Dim GrenzStart As Date
+            Dim GrenzEnde As Date
+
+            For i = 0 To AnzConst - 1
+                With List_Constraints(i)
+                    If (.GrenzTyp = "Reihe") Then
+
+                        'Dateiendung der Grenzwertdatei bestimmen und Reihe einlesen
+                        ext = Path.GetExtension(.GrenzReiheDatei)
+                        Select Case (ext.ToUpper)
+                            Case ".WEL"
+                                Dim WEL As New Wave.WEL(Me.WorkDir & .GrenzReiheDatei, .GrenzGr)
+                                .GrenzReihe = WEL.Read_WEL()(0)
+                            Case ".ZRE"
+                                Dim ZRE As New Wave.ZRE(Me.WorkDir & .GrenzReiheDatei)
+                                .GrenzReihe = ZRE.Zeitreihe
+                            Case Else
+                                Throw New Exception("Das Format der Grenzwertreihe '" & .GrenzReiheDatei & "' wurde nicht erkannt!")
+                        End Select
+
+                        'Zeitraum der Grenzwertreihe überprüfen
+                        '--------------------------------------
+                        GrenzStart = .GrenzReihe.XWerte(0)
+                        GrenzEnde = .GrenzReihe.XWerte(.GrenzReihe.Length - 1)
+
+                        If (GrenzStart > Me.SimStart Or GrenzEnde < Me.SimEnde) Then
+                            'Grenzwertreihe deckt Simulationszeitraum nicht ab
+                            Throw New Exception("Die Grenzwertreihe '" & .GrenzReiheDatei & "' deckt den Simulationszeitraum nicht ab!")
+                        Else
+                            'Zielreihe auf Simulationszeitraum kürzen
+                            Call .GrenzReihe.cut(Me.SimStart, Me.SimEnde)
+                        End If
+
+                        'Grenzwertreihe umbenennen
+                        .GrenzReihe.Title += " (Grenze)"
+
+                    End If
+                End With
+            Next
+
+        Else
+            'CON-Datei existiert nicht
+            ReDim Me.List_Constraints(0)
+        End If
+
     End Sub
 
 #End Region 'Eingabedateien einlesen
@@ -828,7 +957,7 @@ Public MustInherit Class Sim
         Call Prepare_Verzweigung_ON_OFF()
 
         'Schreibt die neuen Verzweigungen
-        Call Me.Prepere_Write_Verzweigungen()
+        Call Me.Prepare_Write_Verzweigungen()
 
     End Sub
 
@@ -852,7 +981,7 @@ Public MustInherit Class Sim
         Call Prepare_Verzweigung_ON_OFF()
 
         'Schreibt die neuen Verzweigungen
-        Call Prepere_Write_Verzweigungen()
+        Call Prepare_Write_Verzweigungen()
 
     End Sub
 
@@ -923,26 +1052,32 @@ Public MustInherit Class Sim
 
     'Schreibt die neuen Verzweigungen
     '********************************
-    Protected MustOverride Sub Prepere_Write_Verzweigungen()
+    Protected MustOverride Sub Prepare_Write_Verzweigungen()
 
     'Evaluiert die Kinderchen für Kombinatorik Optimierung vor
     '*********************************************************
-    Public Function SIM_Evaluierung_CES(ByRef Penalty As Double()) As Boolean
+    Public Function SIM_Evaluierung_CES(ByRef QN() As Double) As Boolean
         Dim i As Short
 
         'Modell Starten
         Call launchSim()
 
         'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
-        For i = 0 To Penalty.GetUpperBound(0)                                 'BUG 57: QN() fängt bei 1 an!
+        For i = 0 To QN.GetUpperBound(0)                                 'BUG 57: QN() fängt bei 1 an!
             List_OptZiele(i).QWertTmp = QWert(List_OptZiele(i))
-            Penalty(i) = List_OptZiele(i).QWertTmp
+            QN(i) = List_OptZiele(i).QWertTmp
         Next
 
         'Qualitätswerte und OptParameter in DB speichern
         If (Ergebnisdb = True) Then
             Call db_update(12, 15)
         End If
+
+        'BUG 144: TODO: Constraints berechnen für CES
+        'For i = 0 To Me.List_Constraints.GetUpperBound(0)
+        '    List_Constraints(i).ConstTmp = Constraint(List_Constraints(i))
+        '    RN(i + 1) = List_Constraints(i).ConstTmp                'BUG 57: RN() fängt bei 1 an!
+        'Next
 
     End Function
 
@@ -1030,7 +1165,7 @@ Public MustInherit Class Sim
     '************************************************
     Public Sub SaveParameter_to_Child(ByRef Parameter(,) As Object)
         Dim i As Integer
-        Redim Parameter(List_OptParameter.GetUpperBound(0),1)
+        ReDim Parameter(List_OptParameter.GetUpperBound(0), 1)
 
         For i = 0 To List_OptParameter.GetUpperBound(0)
             Parameter(i, 0) = List_OptParameter(i).Bezeichnung
@@ -1085,11 +1220,11 @@ Public MustInherit Class Sim
             mypara(i, 1) = Me.List_OptParameter(i - 1).SKWert
         Next
 
-        'globale Anzahl der Ziele muss hier auf Länge der Zielliste gesetzt werden
+        'Anzahl Optimierungsziele übergeben
         globalAnzZiel = Me.List_OptZiele.GetLength(0)
 
-        'TODO: Randbedingungen
-        globalAnzRand = 2
+        'Anzahl Randbedingungen übergeben
+        globalAnzRand = Me.List_Constraints.GetLength(0)
 
     End Sub
 
@@ -1181,7 +1316,7 @@ Public MustInherit Class Sim
 
     'Evaluierung des SimModells für ParameterOptimierung - Steuerungseinheit
     '***********************************************************************
-    Public Function SIM_Evaluierung_PES(ByVal iEvaluierung As Integer, ByVal ipop As Short, ByRef QN As Double()) As Boolean
+    Public Function SIM_Evaluierung_PES(ByVal iEvaluierung As Integer, ByVal ipop As Short, ByRef QN() As Double, ByRef RN() As Double) As Boolean
 
         Dim i As Short
 
@@ -1191,15 +1326,21 @@ Public MustInherit Class Sim
         If Not launchSim() Then Exit Function
 
         'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
-        For i = 0 To Me.List_OptZiele.GetUpperBound(0)              'BUG 57: QN() fängt bei 1 an!
+        For i = 0 To Me.List_OptZiele.GetUpperBound(0)
             List_OptZiele(i).QWertTmp = QWert(List_OptZiele(i))
-            QN(i + 1) = List_OptZiele(i).QWertTmp                   'QN(i+1) weil Array bei 0 anfängt!
+            QN(i + 1) = List_OptZiele(i).QWertTmp                   'BUG 57: QN() fängt bei 1 an!
         Next
 
         'Qualitätswerte und OptParameter in DB speichern
         If (Ergebnisdb = True) Then
             Call db_update(iEvaluierung, ipop)
         End If
+
+        'Constraints berechnen
+        For i = 0 To Me.List_Constraints.GetUpperBound(0)
+            List_Constraints(i).ConstTmp = Constraint(List_Constraints(i))
+            RN(i + 1) = List_Constraints(i).ConstTmp                'BUG 57: RN() fängt bei 1 an!
+        Next
 
         SIM_Evaluierung_PES = True
 
@@ -1364,50 +1505,13 @@ Public MustInherit Class Sim
         Dim QWert As Double
         Dim i As Integer
 
-        'Wert aus Simulationsergebnis berechnen
-        '--------------------------------------
-        Dim SimWert As Single
-
-        Select Case OptZiel.WertTyp
-
-            Case "MaxWert"
-                SimWert = 0
-                For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) > SimWert) Then
-                        SimWert = SimReihe.YWerte(i)
-                    End If
-                Next
-
-            Case "MinWert"
-                SimWert = 999999999999999999
-                For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) < SimWert) Then
-                        SimWert = SimReihe.YWerte(i)
-                    End If
-                Next
-
-            Case "Average"
-                SimWert = 0
-                For i = 0 To SimReihe.Length - 1
-                    SimWert += SimReihe.YWerte(i)
-                Next
-                SimWert = SimWert / SimReihe.Length
-
-            Case "AnfWert"
-                SimWert = SimReihe.YWerte(0)
-
-            Case "EndWert"
-                SimWert = SimReihe.YWerte(SimReihe.Length - 1)
-
-            Case Else
-                Throw New Exception("Der Werttyp '" & OptZiel.WertTyp & "' wird nicht unterstützt!")
-
-        End Select
+        'Simulationswert aus Simulationsergebnis berechnen
+        Dim SimWert As Double
+        SimWert = SimReihe.getWert(OptZiel.WertTyp)
 
         'QWert berechnen
         '---------------
         'Fallunterscheidung Zielfunktion
-        '-------------------------------
         Select Case OptZiel.ZielFkt
 
             Case "AbQuad"
@@ -1512,6 +1616,59 @@ Public MustInherit Class Sim
     End Function
 
 #End Region 'Qualitätswertberechnung
+
+#Region "Constraintberechnung"
+
+    'Constraint berechnen
+    '********************
+    Private Function Constraint(ByVal constr As Struct_Constraint) As Double
+
+        Dim VWert as Double
+
+        Dim i As Integer
+
+        'Simulationsergebnis auslesen
+        Dim SimReihe As New Wave.Zeitreihe(constr.SimGr)
+        Dim WEL As New Wave.WEL(WorkDir & Datensatz & ".wel", constr.SimGr)
+        SimReihe = WEL.Read_WEL()(0)
+
+        'Fallunterscheidung GrenzTyp (Wert/Reihe)
+        Select Case constr.GrenzTyp
+
+            Case "Wert"
+                'zuerst Simulationswert aus Simulationsergebnis berechnen
+                Dim SimWert As Double
+                SimWert = SimReihe.getWert(constr.WertTyp)
+
+                VWert = SimWert - constr.GrenzWert
+
+            Case "Reihe"
+                'BUG 144: TODO: Constraintberechnung bei einer Reihe!
+                'Es wird der Mittelwert der Grenzwertverletzungen verwendet
+                Dim tmp As Double = 0
+                For i = 0 To SimReihe.Length - 1
+                    tmp += SimReihe.YWerte(i) - constr.GrenzReihe.YWerte(i)
+                Next
+                VWert = tmp / SimReihe.Length
+
+        End Select
+
+        'Je nach Grenzposition Ergebnis umkehren (VWert < 0 ist Grenzverletzung)
+        If (constr.GrenzPos = "Obergrenze") Then
+            VWert = VWert * -1
+
+        ElseIf (constr.GrenzPos = "Untergrenze") Then
+            VWert = VWert
+
+        Else
+            Throw New Exception("Die Grenzposition '" & constr.GrenzPos & "' wird nicht unterstützt!")
+        End If
+
+        Return VWert
+
+    End Function
+
+#End Region 'Constraintberechnung
 
 #Region "SimErgebnisse lesen"
 

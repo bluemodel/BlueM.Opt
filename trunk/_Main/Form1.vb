@@ -1030,15 +1030,15 @@ Start_Evolutionsrunden:
 
                         durchlauf = durchlauf + 1
 
-                        'Um Modellfehler bzw. Evaluierungsabrüche abzufangen
-                        'ToDo: noch nicht fertig das Ergebnis wird noch nicht auf Fehler ueberprueft
+                        'Um Modellfehler bzw. Evaluierungsabbrüche abzufangen
+                        'TODO: noch nicht fertig das Ergebnis wird noch nicht auf Fehler ueberprueft
                         Versuch = 0
 
 GenerierenAusgangswerte:
 
                         Versuch = Versuch + 1
                         If Versuch > 10 Then
-                            Throw New Exception("Es konnte keingültiger Datensatz erzeugt werden!")
+                            Throw New Exception("Es konnte kein gültiger Datensatz erzeugt werden!")
                         End If
 
                         'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
@@ -1062,12 +1062,17 @@ GenerierenAusgangswerte:
                             Case ANW_TESTPROBLEME
                                 Call Testprobleme1.Evaluierung_TestProbleme(Testprobleme1.Combo_Testproblem.Text, globalAnzPar, myPara, durchlauf, ipop, QN, RN, DForm.Diag)
                             Case ANW_BLUEM, ANW_SMUSI
+
                                 'Vorbereiten des Modelldatensatzes
                                 Call Sim1.PREPARE_Evaluation_PES(myPara)
-                                If Not Sim1.SIM_Evaluierung_PES(durchlauf, ipop, QN) Then
+
+                                'Simulation und Evaluierung
+                                If Not Sim1.SIM_Evaluierung_PES(durchlauf, ipop, QN, RN) Then
                                     GoTo GenerierenAusgangswerte
                                 End If
+
                                 'Qualitätswerte im TeeChart zeichnen
+                                'BUG 144: TODO: Bei Verletzung von Constraints Punkt anders malen!
                                 If (Sim1.List_OptZiele.Length = 1) Then
                                     'SingleObjective
                                     Call DForm.Diag.prepareSeries(ipop - 1, "Population " & ipop)

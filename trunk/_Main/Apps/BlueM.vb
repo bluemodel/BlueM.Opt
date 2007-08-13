@@ -346,7 +346,7 @@ Public Class BlueM
 
     'Schreibt die neuen Verzweigungen
     '********************************
-    Protected Overrides Sub Prepere_Write_Verzweigungen()
+    Protected Overrides Sub Prepare_Write_Verzweigungen()
 
         Dim AnzZeil As Integer
         Dim i, j As Integer
