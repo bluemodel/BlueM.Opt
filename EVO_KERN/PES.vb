@@ -24,7 +24,7 @@ Public Class PES
 	'****                                                                       ****
 	'**** Dezember 2003                                                         ****
 	'****                                                                       ****
-	'**** Letzte Änderung: Mai 2007                                             ****
+	'**** Letzte Änderung: Juli 2007                                            ****
 	'*******************************************************************************
 	'*******************************************************************************
 	
@@ -32,12 +32,9 @@ Public Class PES
 	'*******************************************************************************
 	
     Public Structure Struct_PES_Options
-        Dim varanz As Short                 'Anzahl Parameter
         Dim NEltern As Short                'Anzahl Eltern
         Dim NNachf As Short                 'Anzahl Kinder
         Dim NGen As Short                   'Anzahl Generationen
-        Dim NPenalty As Short               'Anzahl der Penaltyfunktionen
-        Dim NConstrains As Short            'Anzahl der Randbedingungen
         Dim iEvoTyp As Short                'Typ der Evolutionsstrategie (+ oder ,)
         Dim iPopEvoTyp As Short             'Typ der Evolutionsstrategie (+ oder ,) auf Populationsebene
         Dim iPopPenalty As Short            'Art der Beurteilung der Populationsgüte (Multiobjective)
@@ -51,12 +48,17 @@ Public Class PES
         Dim iOptPopEltern As Short          'Ermittlung der Populationseltern (Mittelwert, Rekombination, Selektion)
         Dim iOptEltern As Short             'Ermittlung der Individuum-Eltern (Mittelwert, Rekombination, einfache Auswahl)
         Dim NRekombXY As Short              'X/Y-Schema Rekombination
-        Dim rDeltaMin As Single             'Mindestschrittweite
         Dim rDeltaStart As Single           'Startschrittweite
         Dim iStartPar As Short              'Startaparameter (zufällig, Originalparameter)
         Dim isDnVektor As Boolean           'Soll ein Schrittweitenvektor benutz werden
+        Dim interact As Short               'Alle wieviel Generationen soll die aktuelle Population mit Mitgliedern der sekundären Population aufgefüllt werden
+        Dim isInteract As Boolean           'Mit Austausch zwischen Population und Sekundärer Population
+        Dim NMemberSecondPop As Short       'Maximale Anzahl Mitglieder der Sekundärpopulation
+
+        Dim varanz As Short                 'Anzahl Parameter
+        Dim NPenalty As Short               'Anzahl der Penaltyfunktionen
+        Dim NConstrains As Short            'Anzahl der Randbedingungen
         Dim Dn() As Double                  'Schrittweitenvektor
-        Dim An() As Double                  'Drehwinkelmatrix
         Dim Xn() As Double                  'aktuelle Variablenwerte
         Dim Xmin() As Double                'untere Schranke
         Dim Xmax() As Double                'Obere Schranke
@@ -64,13 +66,8 @@ Public Class PES
         Dim iaktuellePopulation As Short    'Zähler für aktuelle Population
         Dim iaktuelleGeneration As Short    'Zähler für aktuelle Generation
         Dim iaktuellerNachfahre As Short    'Zähler für aktuellen Nachfahre
-        Dim d As Double                     'Faktor für Rekombinationsoperator
-        Dim interact As Short               'Alle wieviel Generationen soll die aktuelle Population mit Mitgliedern der sekundären Population aufgefüllt werden
-        Dim isInteract As Boolean           'Mit Austausch zwischen Population und Sekundärer Population
-        Dim NMemberSecondPop As Short       'Maximale Anzahl Mitglieder der Sekundärpopulation
     End Structure
 
-    'UPGRADE_WARNING: Arrays in Struktur Property müssen möglicherweise initialisiert werden, bevor sie verwendet werden können. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1063"'
     Dim PES_Options As Struct_PES_Options
 
     Private Xp(,,) As Double                'PopulationsElternwert der Variable
@@ -103,9 +100,7 @@ Public Class PES
     Const palpha As Double = 1.1            'Faktor alpha=1.1 auf Populationsebene nach Rechenberg
 
     '*******************************************************************************
-    '*******************************************************************************
     'Deklarationsteil für Non-Dominated Sorting
-    '*******************************************************************************
     '*******************************************************************************
 
     Private Structure Struct_NDSorting
@@ -132,9 +127,7 @@ Public Class PES
     End Structure
 
     '*******************************************************************************
-    '*******************************************************************************
     'Deklarationsteil allgemein
-    '*******************************************************************************
     '*******************************************************************************
 
     'Evo-Strategie-Typ:
@@ -346,26 +339,26 @@ ES_INI_ERROR:
 
         'Übergabe der Optionen
         'xxxxxxxxxxxxxxxxxxxxx
+        PES_Options.NEltern = NEltern
+        PES_Options.NNachf = NNachf
+        PES_Options.NGen = NGen
         PES_Options.iEvoTyp = iEvoTyp
         PES_Options.iPopEvoTyp = iPopEvoTyp
+        PES_Options.iPopPenalty = iPopPenalty
         PES_Options.isPOPUL = isPOPUL
+        PES_Options.isMultiObjective = isMultiObjective
+        PES_Options.isPareto = isPareto
+        PES_Options.isPareto3D = isPareto3D
         PES_Options.NRunden = NRunden
         PES_Options.NPopul = NPopul
         PES_Options.NPopEltern = NPopEltern
         PES_Options.iOptPopEltern = iOptPopEltern
         PES_Options.iOptEltern = iOptEltern
-        PES_Options.iPopPenalty = iPopPenalty
-        PES_Options.NEltern = NEltern
-        PES_Options.NNachf = NNachf
-        PES_Options.NGen = NGen
         PES_Options.NRekombXY = NRekombXY
         PES_Options.rDeltaStart = rDeltaStart
         PES_Options.iStartPar = iStartPar
         PES_Options.isDnVektor = isDnVektor
-        PES_Options.isMultiObjective = isMultiObjective
-        PES_Options.isPareto = isPareto
-        PES_Options.isPareto3D = isPareto3D
-        PES_Options.d = 0.25
+        PES_Options.isInteract = isInteract
         PES_Options.interact = interact
         PES_Options.NMemberSecondPop = NMemberSecondPop
 
