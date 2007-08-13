@@ -824,7 +824,18 @@ Partial Class Form1
                     'Ermittelt fuer jedes Child den PES Parent Satz
                     Call CES1.Memory_Search(CES1.List_Childs(i))
 
-                    'Jetzt muss die PES initiert werden
+                    'PES Geschichten
+                    'Objekt der Klasse PES wird erzeugt PES wird erzeugt
+                    Dim PES1 As EvoKern.PES
+                    PES1 = New EvoKern.PES
+                    'Die öffentlichen dynamischen Arrays werden initialisiert (Dn, An, Xn, Xmin, Xmax)
+                    'und die Anzahl der Zielfunktionen wird festgelegt
+                    '******************************************************************************************
+                    myIsOK = PES1.EsIni(globalAnzPar, globalAnzZiel_ParaOpt, globalAnzRand)
+                    '3. Schritt: PES - ES_OPTIONS
+                    'Optionen der Evolutionsstrategie werden übergeben
+                    '******************************************************************************************
+                    'myIsOK = PES1.EsOptions(iEvoTyp, iPopEvoTyp, isPOPUL, NRunden, NPopul, NPopEltern, iOptPopEltern, iOptEltern, iPopPenalty, NGen, NEltern, NNachf, NRekombXY, rDeltaStart, iStartPar, isdnvektor, isMultiObjective, isPareto, isPareto3D, Interact, isInteract, NMemberSecondPop, globalAnzPar)
 
 
                 Next
@@ -890,18 +901,41 @@ Partial Class Form1
         '--------------------------
         Dim PES1 As EvoKern.PES
         '--------------------------
-        'Variablen für Optionen Evostrategie
-        Dim iEvoTyp, iPopEvoTyp As Integer
-        Dim isPOPUL As Boolean
-        Dim isMultiObjective, isPareto, isPareto3D As Boolean
-        Dim NPopEltern, NRunden, NPopul, iOptPopEltern As Integer
-        Dim iOptEltern, iPopPenalty As Integer
+        'Dimensionierung der Variablen für Optionen Evostrategie
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        'Dim varanz As Short                 'Anzahl Parameter
         Dim NEltern As Integer
+        Dim NNachf As Integer
+        Dim NGen As Integer
+        'Dim NPenalty As Short               'Anzahl der Penaltyfunktionen
+        'Dim NConstrains As Short            'Anzahl der Randbedingungen
+        Dim iEvoTyp as Integer
+        Dim iPopEvoTyp As Integer
+        Dim iPopPenalty As Integer
+        Dim isPOPUL As Boolean
+        Dim isMultiObjective as Boolean
+        Dim isPareto As Boolean
+        Dim isPareto3D As Boolean
+        Dim NRunden As Integer
+        Dim NPopul As Integer
+        Dim NPopEltern As Integer
+        Dim iOptPopEltern As Integer
+        Dim iOptEltern As Integer
         Dim NRekombXY As Integer
+        'Dim rDeltaMin As Single             'Mindestschrittweite
         Dim rDeltaStart As Single
         Dim iStartPar As Integer
         Dim isdnvektor As Boolean
-        Dim NGen, NNachf As Integer
+        'Dim Dn() As Double                  'Schrittweitenvektor
+        'Dim An() As Double                  'Drehwinkelmatrix
+        'Dim Xn() As Double                  'aktuelle Variablenwerte
+        'Dim Xmin() As Double                'untere Schranke
+        'Dim Xmax() As Double                'Obere Schranke
+        'Dim iaktuelleRunde As Short         'Zähler für aktuelle Runde
+        'Dim iaktuellePopulation As Short    'Zähler für aktuelle Population
+        'Dim iaktuelleGeneration As Short    'Zähler für aktuelle Generation
+        'Dim iaktuellerNachfahre As Short    'Zähler für aktuellen Nachfahre
+        'Dim d As Double                     'Faktor für Rekombinationsoperator
         Dim Interact As Short
         Dim isInteract As Boolean
         Dim NMemberSecondPop As Short
@@ -913,13 +947,18 @@ Partial Class Form1
         Dim QN() As Double = {}
         Dim RN() As Double = {}
         '--------------------------
-
-        'TODO: If (ipop + igen + inachf + irunde) > 4 Then GoTo Start_Evolutionsrunden
-        '????? Wie?
-
-        'Werte an Variablen übergeben
+        'TODO: If (ipop + igen + inachf + irunde) > 4 Then GoTo Start_Evolutionsrunden '????? Wie?
+        'Werte an Variablen übergeben auskommentiert Werte finden sich im PES werden hier aber nicht zugewiesen
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        'Dim varanz As Short                 'Anzahl Parameter
+        NEltern = EVO_Einstellungen1.NEltern
+        NNachf = EVO_Einstellungen1.NNachf
+        NGen = EVO_Einstellungen1.NGen
+        'Dim NPenalty As Short               'Anzahl der Penaltyfunktionen
+        'Dim NConstrains As Short            'Anzahl der Randbedingungen
         iEvoTyp = EVO_Einstellungen1.iEvoTyp
         iPopEvoTyp = EVO_Einstellungen1.iPopEvoTyp
+        iPopPenalty = EVO_Einstellungen1.iPopPenalty
         isPOPUL = EVO_Einstellungen1.isPOPUL
         isMultiObjective = EVO_Einstellungen1.isMultiObjective
         isPareto = EVO_Einstellungen1.isPareto
@@ -929,14 +968,21 @@ Partial Class Form1
         NPopEltern = EVO_Einstellungen1.NPopEltern
         iOptPopEltern = EVO_Einstellungen1.iOptPopEltern
         iOptEltern = EVO_Einstellungen1.iOptEltern
-        iPopPenalty = EVO_Einstellungen1.iPopPenalty
-        NGen = EVO_Einstellungen1.NGen
-        NEltern = EVO_Einstellungen1.NEltern
-        NNachf = EVO_Einstellungen1.NNachf
         NRekombXY = EVO_Einstellungen1.NRekombXY
+        'Dim rDeltaMin As Single             'Mindestschrittweite
         rDeltaStart = EVO_Einstellungen1.rDeltaStart
-        isdnvektor = EVO_Einstellungen1.isDnVektor
         iStartPar = EVO_Einstellungen1.globalOPTVORGABE
+        isdnvektor = EVO_Einstellungen1.isDnVektor
+        'Dim Dn() As Double                  'Schrittweitenvektor
+        'Dim An() As Double                  'Drehwinkelmatrix
+        'Dim Xn() As Double                  'aktuelle Variablenwerte
+        'Dim Xmin() As Double                'untere Schranke
+        'Dim Xmax() As Double                'Obere Schranke
+        'Dim iaktuelleRunde As Short         'Zähler für aktuelle Runde
+        'Dim iaktuellePopulation As Short    'Zähler für aktuelle Population
+        'Dim iaktuelleGeneration As Short    'Zähler für aktuelle Generation
+        'Dim iaktuellerNachfahre As Short    'Zähler für aktuellen Nachfahre
+        'Dim d As Double                     'Faktor für Rekombinationsoperator
         Interact = EVO_Einstellungen1.Interact
         isInteract = EVO_Einstellungen1.isInteract
         NMemberSecondPop = EVO_Einstellungen1.NMemberSecondPop
