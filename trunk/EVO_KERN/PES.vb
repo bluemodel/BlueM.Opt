@@ -141,29 +141,6 @@ Public Class PES
     Private Const EVO_PLUS As Short = 1
     Private Const EVO_KOMMA As Short = 2
 
-
-    'Property varanz
-    '***********************************************
-    Public Property varanz() As Short
-        Get
-            Return PES_Options.varanz
-        End Get
-        Set(ByVal Value As Short)
-            PES_Options.varanz = Value
-        End Set
-    End Property
-
-    'Property NEltern
-    '***********************************************
-    Public Property NEltern() As Short
-        Get
-            Return PES_Options.NEltern
-        End Get
-        Set(ByVal Value As Short)
-            PES_Options.NEltern = Value
-        End Set
-    End Property
-
     'Property NNachf
     '***********************************************
     Public Property NNachf() As Short
@@ -186,61 +163,6 @@ Public Class PES
         End Set
     End Property
 
-    'Property NPenalty
-    '***********************************************
-    Public Property NPenalty() As Short
-        Get
-            Return PES_Options.NPenalty
-        End Get
-        Set(ByVal Value As Short)
-            PES_Options.NPenalty = Value
-        End Set
-    End Property
-
-    'Property iEvoTyp
-    '***********************************************
-    Public Property iEvoTyp() As Short
-        Get
-            Return PES_Options.iEvoTyp
-        End Get
-        Set(ByVal Value As Short)
-            PES_Options.iEvoTyp = Value
-        End Set
-    End Property
-
-    'Property iPopEvoTyp
-    '***********************************************
-    Public Property iPopEvoTyp() As Short
-        Get
-            Return PES_Options.iPopEvoTyp
-        End Get
-        Set(ByVal Value As Short)
-            PES_Options.iPopEvoTyp = Value
-        End Set
-    End Property
-
-    'Property iPopPenalty
-    '***********************************************
-    Public Property iPopPenalty() As Short
-        Get
-            Return PES_Options.iPopPenalty
-        End Get
-        Set(ByVal Value As Short)
-            PES_Options.iPopPenalty = Value
-        End Set
-    End Property
-
-    'Property isPOPUL
-    '***********************************************
-    Public Property isPOPUL() As Boolean
-        Get
-            Return PES_Options.isPOPUL
-        End Get
-        Set(ByVal Value As Boolean)
-            PES_Options.isPOPUL = Value
-        End Set
-    End Property
-
     'Property isMultiObjective
     '***********************************************
     Public Property isMultiObjective() As Boolean
@@ -249,28 +171,6 @@ Public Class PES
         End Get
         Set(ByVal Value As Boolean)
             PES_Options.isMultiObjective = Value
-        End Set
-    End Property
-
-    'Property isPareto
-    '***********************************************
-    Public Property isPareto() As Boolean
-        Get
-            Return PES_Options.isPareto
-        End Get
-        Set(ByVal Value As Boolean)
-            PES_Options.isPareto = Value
-        End Set
-    End Property
-
-    'Property isPareto3D
-    '***********************************************
-    Public Property isPareto3D() As Boolean
-        Get
-            Return PES_Options.isPareto3D
-        End Get
-        Set(ByVal Value As Boolean)
-            PES_Options.isPareto3D = Value
         End Set
     End Property
 
@@ -293,83 +193,6 @@ Public Class PES
         End Get
         Set(ByVal Value As Short)
             PES_Options.NPopul = Value
-        End Set
-    End Property
-
-    'Property NPopEltern
-    '***********************************************
-    Public Property NPopEltern() As Short
-        Get
-            Return PES_Options.NPopEltern
-        End Get
-        Set(ByVal Value As Short)
-            PES_Options.NPopEltern = Value
-        End Set
-    End Property
-
-    'Property iOptPopEltern
-    '***********************************************
-    Public Property iOptPopEltern() As Short
-        Get
-            Return PES_Options.iOptPopEltern
-        End Get
-        Set(ByVal Value As Short)
-            PES_Options.iOptPopEltern = Value
-        End Set
-    End Property
-
-    'Property iOptEltern
-    '***********************************************
-    Public Property iOptEltern() As Short
-        Get
-            Return PES_Options.iOptEltern
-        End Get
-        Set(ByVal Value As Short)
-            PES_Options.iOptEltern = Value
-        End Set
-    End Property
-
-    'Property rDeltaMin
-    '***********************************************
-    Public Property rDeltaMin() As Single
-        Get
-            Return PES_Options.rDeltaMin
-        End Get
-        Set(ByVal Value As Single)
-            PES_Options.rDeltaMin = Value
-        End Set
-    End Property
-
-    'Property rDeltaStart
-    '***********************************************
-    Public Property rDeltaStart() As Single
-        Get
-            Return PES_Options.rDeltaStart
-        End Get
-        Set(ByVal Value As Single)
-            PES_Options.rDeltaStart = Value
-        End Set
-    End Property
-
-    'Property iStartPar
-    '***********************************************
-    Public Property iStartPar() As Short
-        Get
-            Return PES_Options.iStartPar
-        End Get
-        Set(ByVal Value As Short)
-            PES_Options.iStartPar = Value
-        End Set
-    End Property
-
-    'Property isDnVektor
-    '***********************************************
-    Public Property isDnVektor() As Boolean
-        Get
-            Return PES_Options.isDnVektor
-        End Get
-        Set(ByVal Value As Boolean)
-            PES_Options.isDnVektor = Value
         End Set
     End Property
 
@@ -414,39 +237,6 @@ Public Class PES
         End Get
         Set(ByVal Value As Short)
             PES_Options.iaktuellerNachfahre = Value
-        End Set
-    End Property
-
-   'Property interact
-    '***********************************************
-    Public Property interact() As Short
-        Get
-            Return PES_Options.interact
-        End Get
-        Set(ByVal Value As Short)
-            PES_Options.interact = Value
-        End Set
-    End Property
-
-    'Property isInteract
-    '***********************************************
-    Private Property isInteract() As Boolean
-        Get
-            Return PES_Options.isInteract
-        End Get
-        Set(ByVal Value As Boolean)
-            PES_Options.isInteract = Value
-        End Set
-    End Property
-
-    'Property NMemberSecondPop
-    '***********************************************
-    Private Property NMemberSecondPop() As Short
-        Get
-            Return PES_Options.NMemberSecondPop
-        End Get
-        Set(ByVal Value As Short)
-            PES_Options.NMemberSecondPop = Value
         End Set
     End Property
 
