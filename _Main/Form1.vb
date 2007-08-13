@@ -903,28 +903,7 @@ Partial Class Form1
         '--------------------------
         'Dimensionierung der Variablen für Optionen Evostrategie
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        Dim NEltern As Integer
-        Dim NNachf As Integer
-        Dim NGen As Integer
-        Dim iEvoTyp As Integer
-        Dim iPopEvoTyp As Integer
-        Dim iPopPenalty As Integer
-        Dim isPOPUL As Boolean
-        Dim isMultiObjective As Boolean
-        Dim isPareto As Boolean
-        Dim isPareto3D As Boolean
-        Dim NRunden As Integer
-        Dim NPopul As Integer
-        Dim NPopEltern As Integer
-        Dim iOptPopEltern As Integer
-        Dim iOptEltern As Integer
-        Dim NRekombXY As Integer
-        Dim rDeltaStart As Single
-        Dim iStartPar As Integer
-        Dim isDnVektor As Boolean
-        Dim Interact As Short
-        Dim isInteract As Boolean
-        Dim NMemberSecondPop As Short
+        Dim PES_Options as EvoKern.PES.Struct_Options
 
         'Dim varanz As Short                 'Anzahl Parameter
         'Dim NPenalty As Short               'Anzahl der Penaltyfunktionen
@@ -949,28 +928,28 @@ Partial Class Form1
         'TODO: If (ipop + igen + inachf + irunde) > 4 Then GoTo Start_Evolutionsrunden '????? Wie?
         'Werte an Variablen übergeben auskommentiert Werte finden sich im PES werden hier aber nicht zugewiesen
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        NEltern = EVO_Einstellungen1.NEltern
-        NNachf = EVO_Einstellungen1.NNachf
-        NGen = EVO_Einstellungen1.NGen
-        iEvoTyp = EVO_Einstellungen1.iEvoTyp
-        iPopEvoTyp = EVO_Einstellungen1.iPopEvoTyp
-        iPopPenalty = EVO_Einstellungen1.iPopPenalty
-        isPOPUL = EVO_Einstellungen1.isPOPUL
-        isMultiObjective = EVO_Einstellungen1.isMultiObjective
-        isPareto = EVO_Einstellungen1.isPareto
-        isPareto3D = False
-        NRunden = EVO_Einstellungen1.NRunden
-        NPopul = EVO_Einstellungen1.NPopul
-        NPopEltern = EVO_Einstellungen1.NPopEltern
-        iOptPopEltern = EVO_Einstellungen1.iOptPopEltern
-        iOptEltern = EVO_Einstellungen1.iOptEltern
-        NRekombXY = EVO_Einstellungen1.NRekombXY
-        rDeltaStart = EVO_Einstellungen1.rDeltaStart
-        iStartPar = EVO_Einstellungen1.globalOPTVORGABE
-        isDnVektor = EVO_Einstellungen1.isDnVektor
-        Interact = EVO_Einstellungen1.Interact
-        isInteract = EVO_Einstellungen1.isInteract
-        NMemberSecondPop = EVO_Einstellungen1.NMemberSecondPop
+        PES_Options.NEltern = EVO_Einstellungen1.NEltern
+        PES_Options.NNachf = EVO_Einstellungen1.NNachf
+        PES_Options.NGen = EVO_Einstellungen1.NGen
+        PES_Options.iEvoTyp = EVO_Einstellungen1.iEvoTyp
+        PES_Options.iPopEvoTyp = EVO_Einstellungen1.iPopEvoTyp
+        PES_Options.iPopPenalty = EVO_Einstellungen1.iPopPenalty
+        PES_Options.isPOPUL = EVO_Einstellungen1.isPOPUL
+        PES_Options.isMultiObjective = EVO_Einstellungen1.isMultiObjective
+        PES_Options.isPareto = EVO_Einstellungen1.isPareto
+        PES_Options.isPareto3D = False
+        PES_Options.NRunden = EVO_Einstellungen1.NRunden
+        PES_Options. NPopul = EVO_Einstellungen1.NPopul
+        PES_Options.NPopEltern = EVO_Einstellungen1.NPopEltern
+        PES_Options.iOptPopEltern = EVO_Einstellungen1.iOptPopEltern
+        PES_Options.iOptEltern = EVO_Einstellungen1.iOptEltern
+        PES_Options.NRekombXY = EVO_Einstellungen1.NRekombXY
+        PES_Options.rDeltaStart = EVO_Einstellungen1.rDeltaStart
+        PES_Options.iStartPar = EVO_Einstellungen1.globalOPTVORGABE
+        PES_Options.isDnVektor = EVO_Einstellungen1.isDnVektor
+        PES_Options.Interact = EVO_Einstellungen1.Interact
+        PES_Options.isInteract = EVO_Einstellungen1.isInteract
+        PES_Options.NMemberSecondPop = EVO_Einstellungen1.NMemberSecondPop
 
         'Dim varanz As Short                 'Anzahl Parameter
         'Dim NPenalty As Short               'Anzahl der Penaltyfunktionen
@@ -1006,7 +985,7 @@ Partial Class Form1
         '3. Schritt: PES - ES_OPTIONS
         'Optionen der Evolutionsstrategie werden übergeben
         '******************************************************************************************
-        myIsOK = PES1.EsOptions(iEvoTyp, iPopEvoTyp, isPOPUL, NRunden, NPopul, NPopEltern, iOptPopEltern, iOptEltern, iPopPenalty, NGen, NEltern, NNachf, NRekombXY, rDeltaStart, iStartPar, isDnvektor, isMultiObjective, isPareto, isPareto3D, Interact, isInteract, NMemberSecondPop, globalAnzPar)
+        myIsOK = PES1.EsOptions(PES_Options, globalAnzPar)
 
         '4. Schritt: PES - ES_LET_PARAMETER
         'Ausgangsparameter werden übergeben
@@ -1051,9 +1030,6 @@ Start_Evolutionsrunden:
                 myIsOK = PES1.EsPopVaria
 
                 myIsOK = PES1.EsPopMutation
-
-                'TODO: Scheint mir Schwachsinnig an dieser Stelle Weil es überschrieben wird
-                durchlauf = NGen * NNachf * (irunde - 1)
 
                 'Loop über alle Generationen
                 '***********************************************************************************************
