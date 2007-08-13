@@ -760,8 +760,8 @@ Partial Class Form1
                 Call Sim1.SIM_Evaluierung_CES(CES1.List_Childs(i).Penalty)
                 '*********************************************************
 
-                'HYBRID: Speichert die PES Erfahrung diesen Childs
-                '*************************************************
+                'HYBRID: Speichert die PES Erfahrung diesen Childs im PES Memory
+                '***************************************************************
                 If Method = METH_HYBRID Then
                     Call CES1.Memory_Store(i, gen)
                 End If
@@ -816,10 +816,14 @@ Partial Class Form1
                 Call CES1.Mutation_Control()
             End If
 
-            'HYBRID: Durchsucht den Speicher
-            '*******************************
+            'HYBRID:
+            '*******
             If Method = METH_HYBRID Then
-                Call CES1.Memory_Search()
+                'Child Schleife hier da für jedes Child die PES Funktionen angesteuert werden
+                For i = 0 To CES1.List_Childs.GetUpperBound(0)
+                    'Ermittelt fuer jedes Child den PES Parent Satz
+                    Call CES1.Memory_Search(CES1.List_Childs(i))
+                Next
             End If
 
         Next
@@ -1047,6 +1051,8 @@ Start_Evolutionsrunden:
 
                         durchlauf = durchlauf + 1
 
+                        'Um Modellfehler bzw. Evaluierungsabrüche abzufangen
+                        'ToDo: noch nicht fertig das Ergebnis wird noch nicht auf Fehler ueberprueft
                         Versuch = 0
 
 GenerierenAusgangswerte:
