@@ -157,7 +157,7 @@ Public Class Smusi
 
     'Schreibt die neuen Verzweigungen
     '********************************
-    Protected Overrides Sub Prepere_Write_Verzweigungen()
+    Protected Overrides Sub Prepare_Write_Verzweigungen()
 
     End Sub
 
