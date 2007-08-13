@@ -73,6 +73,7 @@ Public Class CES
     Public Structure Struct_PES_Memory
         Dim Path() As Integer
         Dim Parameter(,) As Object
+        Dim D() As Object
         Dim Penalty() As Double
         Dim Generation as Integer
     End Structure
@@ -83,6 +84,7 @@ Public Class CES
         Dim Memory_Rank As Integer
         Dim Path() As Integer
         Dim Parameter(,) As Object
+        Dim D() As Object
         Dim Penalty() As Double
         Dim iLocation As Integer
         Dim Generation As Integer
@@ -594,25 +596,26 @@ Public Class CES
 
         ReDim Memory(neu).Path(n_Locations - 1)
         ReDim Memory(neu).Parameter(List_Childs(Child_No).myPara.GetUpperBound(0), 1)
+        Redim Memory(neu).D(List_Childs(Child_No).myPara.GetUpperBound(0))
         ReDim Memory(neu).Penalty(n_Penalty - 1)
 
         Memory(neu).Generation = Gen_No
         Array.Copy(List_Childs(Child_No).Path, Memory(neu).Path, List_Childs(Child_No).Path.Length)
         Array.Copy(List_Childs(Child_No).myPara, Memory(neu).Parameter, List_Childs(Child_No).myPara.Length)
+        'ToDo im Child fehlt auch das Dn
+        'Array.Copy(List_Childs(Child_No).myPara, Memory(neu).D, List_Childs(Child_No).myPara.Length)
         Array.Copy(List_Childs(Child_No).Penalty, Memory(neu).Penalty, List_Childs(Child_No).Penalty.Length)
 
     End Sub
 
     'Durchsucht den Memory
     '*********************
-    Sub Memory_Search()
+    Sub Memory_Search(byref Child as  Struct_Faksimile)
 
-        Dim i, j, m As Integer
+        Dim j, m As Integer
         Dim count_a(n_Locations - 1) As Integer
         Dim count_b(n_Locations - 1) As Integer
         Dim count_c(n_Locations - 1) As Integer
-
-        For i = 0 To List_Childs.GetUpperBound(0)
 
             Dim PES_Parents(0) As Struct_PES_Parent
             DIm akt as Integer = 0
@@ -627,7 +630,7 @@ Public Class CES
                 For m = 0 To Memory.GetUpperBound(0)
 
                     'Rank Nummer 1
-                    If List_Childs(i).Path(j) = Memory(m).Path(j) Then
+                    If Child.Path(j) = Memory(m).Path(j) Then
                         ReDim Preserve PES_Parents(PES_Parents.GetLength(0))
                         akt = PES_Parents.GetUpperBound(0)
                         Call coppy_PES_Struct(Memory(m), PES_Parents(akt))
@@ -638,7 +641,7 @@ Public Class CES
 
                     'Rank Nummer 2
                     If Not j = n_Locations - 1 And n_Parts_of_Path > 1 Then
-                        If List_Childs(i).Path(j) = Memory(m).Path(j) And List_Childs(i).Path(j + 1) = Memory(m).Path(j + 1) Then
+                        If Child.Path(j) = Memory(m).Path(j) And Child.Path(j + 1) = Memory(m).Path(j + 1) Then
                             ReDim Preserve PES_Parents(PES_Parents.GetLength(0))
                             akt = PES_Parents.GetUpperBound(0)
                             Call coppy_PES_Struct(Memory(m), PES_Parents(akt))
@@ -650,7 +653,7 @@ Public Class CES
 
                     'Rank Nummer 3
                     If Not (j = n_Locations - 1 Or j = n_Locations - 2) And n_Parts_of_Path > 2 Then
-                        If List_Childs(i).Path(j) = Memory(m).Path(j) And List_Childs(i).Path(j + 1) = Memory(m).Path(j + 1) And List_Childs(i).Path(j + 2) = Memory(m).Path(j + 2) Then
+                        If Child.Path(j) = Memory(m).Path(j) And Child.Path(j + 1) = Memory(m).Path(j + 1) And Child.Path(j + 2) = Memory(m).Path(j + 2) Then
                             ReDim Preserve PES_Parents(PES_Parents.GetLength(0))
                             akt = PES_Parents.GetUpperBound(0)
                             Call coppy_PES_Struct(Memory(m), PES_Parents(akt))
@@ -660,12 +663,11 @@ Public Class CES
                         End If
                     End If
                 Next
-            Next
+        Next
 
             'Die Doppelten niedrigeren Ränge werden gelöscht
-            call PES_Memory_Dubletten_loeschen(PES_Parents)
+        Call PES_Memory_Dubletten_loeschen(PES_Parents)
 
-        Next
     End Sub
 
     'Löscht wenn ein Individuum bei der gleichen Lokation einmal als Rank 1 und einmal als Rank 2 definiert. Bei Rank 2 entsprechnd Rank 3. Außerdem wird der erste leere Datensatz geloescht.
@@ -728,11 +730,13 @@ Public Class CES
 
         ReDim Desti.Path(n_Locations - 1)
         ReDim Desti.Parameter(Source.Parameter.GetLength(0), 1)
+        ReDim Desti.D(Source.D.GetLength(0))
         ReDim Desti.Penalty(n_Penalty - 1)
 
         Desti.Generation = Source.Generation
         Array.Copy(Source.Path, Desti.Path, Source.Path.Length)
         Array.Copy(Source.Parameter, Desti.Parameter, Source.Parameter.Length)
+        Array.Copy(Source.D, Desti.D, Source.Parameter.Length)
         Array.Copy(Source.Penalty, Desti.Penalty, Source.Penalty.Length)
 
     End Sub
