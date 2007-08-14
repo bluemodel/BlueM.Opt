@@ -1250,14 +1250,14 @@ Public MustInherit Class Sim
         Next
 
         'Mutierte Parameter in Eingabedateien schreiben
-        Call Prepare_Write_ModellParameter()
+        Call Write_ModellParameter()
 
     End Sub
 
 
     'Die ModellParameter in die Eingabedateien des SimModells schreiben
     '******************************************************************
-    Public Sub Prepare_Write_ModellParameter()
+    Public Sub Write_ModellParameter()
         Dim Wert As String
         Dim AnzZeil As Integer
         Dim j As Integer
