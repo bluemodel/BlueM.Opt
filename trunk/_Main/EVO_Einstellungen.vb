@@ -275,19 +275,6 @@ Public Class EVO_Einstellungen
     'Schnittstelle
     '********************************************************************
 
-    Public ReadOnly Property isDnVektor() As Boolean
-        Get
-            isDnVektor = False
-            If CheckisDnVektor.CheckState = System.Windows.Forms.CheckState.Checked Then isDnVektor = True
-        End Get
-    End Property
-
-    Public ReadOnly Property globalOPTVORGABE() As Integer
-        Get
-            globalOPTVORGABE = VB6.GetItemData(ComboOptVorgabe, ComboOptVorgabe.SelectedIndex)
-        End Get
-    End Property
-
     'Dieses Property nicht ReadOnly weil die Anzahl der Zielfunktionen durch OptZiele bestimmt werden kann
     Public Property OptModus() As Short
         Get
@@ -299,128 +286,45 @@ Public Class EVO_Einstellungen
         End Set
     End Property
 
-    Public ReadOnly Property rDeltaStart() As Single
+    Public Property PES_Settings() As EvoKern.PES.Struct_Settings
         Get
-            rDeltaStart = Val(TextDeltaStart.Text)
-        End Get
-    End Property
-
-
-    Public ReadOnly Property NNachf() As Integer
-        Get
-            NNachf = Val(TextAnzNachf.Text)
-        End Get
-    End Property
-
-    Public ReadOnly Property NEltern() As Integer
-        Get
-            NEltern = Val(TextAnzEltern.Text)
-        End Get
-    End Property
-
-    Public ReadOnly Property NGen() As Integer
-        Get
-            NGen = Val(TextAnzGen.Text)
-        End Get
-    End Property
-
-    Public ReadOnly Property iOptEltern() As Integer
-        Get
-            iOptEltern = VB6.GetItemData(ComboOptEltern, ComboOptEltern.SelectedIndex)
-        End Get
-    End Property
-
-    Public ReadOnly Property iPopPenalty() As Integer
-        Get
-            iPopPenalty = VB6.GetItemData(ComboPopPenalty, ComboPopPenalty.SelectedIndex)
-        End Get
-    End Property
-
-    Public ReadOnly Property NRekombXY() As Integer
-        Get
-            NRekombXY = Val(TextRekombxy.Text)
-        End Get
-    End Property
-
-    Public ReadOnly Property iOptPopEltern() As Integer
-        Get
-            iOptPopEltern = VB6.GetItemData(ComboOptPopEltern, ComboOptPopEltern.SelectedIndex)
-        End Get
-    End Property
-
-    Public ReadOnly Property NPopEltern() As Integer
-        Get
-            NPopEltern = Val(TextAnzPopEltern.Text)
-        End Get
-    End Property
-
-    Public ReadOnly Property iEvoTyp() As Integer
-        Get
-            iEvoTyp = VB6.GetItemData(ComboStrategie, ComboStrategie.SelectedIndex)
-        End Get
-    End Property
-
-    Public ReadOnly Property iPopEvoTyp() As Integer
-        Get
-            iPopEvoTyp = VB6.GetItemData(ComboPopStrategie, ComboPopStrategie.SelectedIndex)
-        End Get
-    End Property
-
-    Public ReadOnly Property isPOPUL() As Boolean
-        Get
-            isPOPUL = False
-            If CheckisPopul.CheckState = System.Windows.Forms.CheckState.Checked Then isPOPUL = True
-        End Get
-    End Property
-
-    Public ReadOnly Property isMultiObjective() As Boolean
-        Get
-            isMultiObjective = isMultiObjectiveOptimierung
-        End Get
-    End Property
-
-    Public ReadOnly Property isPareto() As Boolean
-        Get
-            isPareto = isParetoOptimierung
-        End Get
-    End Property
-
-    Public ReadOnly Property NRunden() As Integer
-        Get
-            NRunden = Val(TextAnzRunden.Text)
-        End Get
-    End Property
-
-    Public ReadOnly Property NPopul() As Integer
-        Get
-            NPopul = Val(TextAnzPop.Text)
-        End Get
-    End Property
-
-    Public ReadOnly Property Interact() As Short
-        Get
+            PES_Settings.NEltern = Val(TextAnzEltern.Text)
+            PES_Settings.NNachf = Val(TextAnzNachf.Text)
+            PES_Settings.NGen = Val(TextAnzGen.Text)
+            PES_Settings.iEvoTyp = VB6.GetItemData(ComboStrategie, ComboStrategie.SelectedIndex)
+            PES_Settings.iPopEvoTyp = VB6.GetItemData(ComboPopStrategie, ComboPopStrategie.SelectedIndex)
+            PES_Settings.iPopPenalty = VB6.GetItemData(ComboPopPenalty, ComboPopPenalty.SelectedIndex)
+            PES_Settings.isPOPUL = False        'siehe BUG 60 und BUG 158
+            If CheckisPopul.CheckState = System.Windows.Forms.CheckState.Checked Then PES_Settings.isPOPUL = True
+            PES_Settings.isMultiObjective = isMultiObjectiveOptimierung
+            PES_Settings.isPareto = isParetoOptimierung
+            PES_Settings.isPareto3D = False     'siehe BUG 60 und BUG 158
+            PES_Settings.NRunden = Val(TextAnzRunden.Text)
+            PES_Settings.NPopul = Val(TextAnzPop.Text)
+            PES_Settings.NPopEltern = Val(TextAnzPopEltern.Text)
+            PES_Settings.iOptEltern = VB6.GetItemData(ComboOptEltern, ComboOptEltern.SelectedIndex)
+            PES_Settings.iOptPopEltern = VB6.GetItemData(ComboOptPopEltern, ComboOptPopEltern.SelectedIndex)
+            PES_Settings.NRekombXY = Val(TextRekombxy.Text)
+            PES_Settings.rDeltaStart = Val(TextDeltaStart.Text)
+            PES_Settings.iStartPar = VB6.GetItemData(ComboOptVorgabe, ComboOptVorgabe.SelectedIndex)
+            PES_Settings.isDnVektor = False
+            If CheckisDnVektor.CheckState = System.Windows.Forms.CheckState.Checked Then PES_Settings.isDnVektor = True
             If Val(TextInteract.Text) <= 0 Then
-                Interact = 1
+                PES_Settings.interact = 1
             Else
-                Interact = Val(TextInteract.Text)
+                PES_Settings.interact = Val(TextInteract.Text)
             End If
-        End Get
-    End Property
-
-    Public ReadOnly Property NMemberSecondPop() As Short
-        Get
-            NMemberSecondPop = Val(TextNMemberSecondPop.Text)
-        End Get
-    End Property
-
-    Public ReadOnly Property isInteract() As Boolean
-        Get
             If Val(TextInteract.Text) <= 0 Then
-                isInteract = False
+                PES_Settings.isInteract = False
             Else
-                isInteract = True
+                PES_Settings.isInteract = True
             End If
+            PES_Settings.NMemberSecondPop = Val(TextNMemberSecondPop.Text)
+
         End Get
+        Set(ByVal value As EvoKern.PES.Struct_Settings)
+
+        End Set
     End Property
 
 End Class
