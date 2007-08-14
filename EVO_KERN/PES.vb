@@ -42,7 +42,6 @@ Public Class PES
         Dim isPOPUL As Boolean              'Mit Populationen
         Dim isMultiObjective As Boolean     'Mit zweiter Objective-function
         Dim isPareto As Boolean             'mit Non-Dominated Sorting (nur falls multiobjective)
-        Dim isPareto3D As Boolean           'mit Non-Dominated Sorting (3 Objectives)
         Dim NRunden As Short                'Anzahl Runden
         Dim NPopul As Short                 'Anzahl Populationen
         Dim NPopEltern As Short             'Anzahl Populationseltern
