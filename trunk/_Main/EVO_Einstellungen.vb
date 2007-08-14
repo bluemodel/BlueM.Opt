@@ -298,7 +298,6 @@ Public Class EVO_Einstellungen
             If CheckisPopul.CheckState = System.Windows.Forms.CheckState.Checked Then PES_Settings.isPOPUL = True
             PES_Settings.isMultiObjective = isMultiObjectiveOptimierung
             PES_Settings.isPareto = isParetoOptimierung
-            PES_Settings.isPareto3D = False     'siehe BUG 60 und BUG 158
             PES_Settings.NRunden = Val(TextAnzRunden.Text)
             PES_Settings.NPopul = Val(TextAnzPop.Text)
             PES_Settings.NPopEltern = Val(TextAnzPopEltern.Text)
