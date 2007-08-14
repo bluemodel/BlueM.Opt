@@ -646,6 +646,16 @@ Public MustInherit Class Sim
             StrRead.Close()
             FiStr.Close()
 
+            'Kontrolle
+            '---------
+            For i = 0 To Me.List_Constraints.GetUpperBound(0)
+                With Me.List_Constraints(i)
+                    If (Not .GrenzTyp = "Wert" And Not .GrenzTyp = "Reihe") Then Throw New Exception("Constraints: GrenzTxyp muss entweder 'Wert' oder 'Reihe' sein!")
+                    If (Not .Datei = "WEL") Then Throw New Exception("Constraints: Als Datei wird momentan nur 'WEL' unterstützt!")
+                    If (Not .GrenzPos = "Obergrenze" And Not .GrenzPos = "Untergrenze") Then Throw New Exception("Constraints: Für Oben/Unten muss entweder 'Obergrenze' oder 'Untergrenze' angegeben sein!")
+                End With
+            Next
+
             'Falls mit Reihen verglichen werden soll werden hier die Reihen eingelesen
             Dim GrenzStart As Date
             Dim GrenzEnde As Date
@@ -1619,11 +1629,9 @@ Public MustInherit Class Sim
 
 #Region "Constraintberechnung"
 
-    'Constraint berechnen
-    '********************
+    'Constraint berechnen (Constraint < 0 ist Grenzverletzung)
+    '****************************************************
     Private Function Constraint(ByVal constr As Struct_Constraint) As Double
-
-        Dim VWert as Double
 
         Dim i As Integer
 
@@ -1640,31 +1648,37 @@ Public MustInherit Class Sim
                 Dim SimWert As Double
                 SimWert = SimReihe.getWert(constr.WertTyp)
 
-                VWert = SimWert - constr.GrenzWert
+                'Grenzverletzung berechnen
+                If (constr.GrenzPos = "Obergrenze") Then
+                    Constraint = constr.GrenzWert - SimWert
+
+                ElseIf (constr.GrenzPos = "Untergrenze") Then
+                    Constraint = SimWert - constr.GrenzWert
+
+                End If
 
             Case "Reihe"
                 'BUG 144: TODO: Constraintberechnung bei einer Reihe!
-                'Es wird der Mittelwert der Grenzwertverletzungen verwendet
-                Dim tmp As Double = 0
+                'Es wird die Summe der Grenzwertverletzungen verwendet
+                Dim summe As Double = 0
+
                 For i = 0 To SimReihe.Length - 1
-                    tmp += SimReihe.YWerte(i) - constr.GrenzReihe.YWerte(i)
+
+                    If (constr.GrenzPos = "Obergrenze") Then
+                        summe += Math.Min(constr.GrenzReihe.YWerte(i) - SimReihe.YWerte(i), 0)
+
+                    ElseIf (constr.GrenzPos = "Untergrenze") Then
+                        summe += Math.Min(SimReihe.YWerte(i) - constr.GrenzReihe.YWerte(i), 0)
+
+                    End If
+
                 Next
-                VWert = tmp / SimReihe.Length
+
+                Constraint = summe
 
         End Select
 
-        'Je nach Grenzposition Ergebnis umkehren (VWert < 0 ist Grenzverletzung)
-        If (constr.GrenzPos = "Obergrenze") Then
-            VWert = VWert * -1
-
-        ElseIf (constr.GrenzPos = "Untergrenze") Then
-            VWert = VWert
-
-        Else
-            Throw New Exception("Die Grenzposition '" & constr.GrenzPos & "' wird nicht unterstützt!")
-        End If
-
-        Return VWert
+        Return Constraint
 
     End Function
 
