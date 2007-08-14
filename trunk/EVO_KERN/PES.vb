@@ -40,8 +40,7 @@ Public Class PES
         Dim iPopEvoTyp As Short             'Typ der Evolutionsstrategie (+ oder ,) auf Populationsebene
         Dim iPopPenalty As Short            'Art der Beurteilung der Populationsgüte (Multiobjective)
         Dim isPOPUL As Boolean              'Mit Populationen
-        Dim isMultiObjective As Boolean     'Mit zweiter Objective-function
-        Dim isPareto As Boolean             'mit Non-Dominated Sorting (nur falls multiobjective)
+        Dim is_MO_Pareto As Boolean         'Multi-Objective mit Pareto Front
         Dim NRunden As Short                'Anzahl Runden
         Dim NPopul As Short                 'Anzahl Populationen
         Dim NPopEltern As Short             'Anzahl Populationseltern
@@ -444,7 +443,7 @@ ES_GET_SCHRITTWEITE_ERROR:
         ReDim Rb(PES_Settings.NEltern, PES_Settings.NPopul, PES_Initial.NPenalty)
         '---------------------
         'NDSorting wird nur benötigt, falls eine Paretofront approximiert wird
-        If PES_Settings.isPareto Then
+        If PES_Settings.is_MO_Pareto Then
             ReDim List_NDSorting(PES_Settings.NEltern + PES_Settings.NNachf)
             For i = 1 To PES_Settings.NEltern + PES_Settings.NNachf
                 ReDim List_NDSorting(i).penalty(PES_Initial.NPenalty)
@@ -476,7 +475,7 @@ ES_GET_SCHRITTWEITE_ERROR:
             Next m
         Next
 
-        If PES_Settings.isMultiObjective And PES_Settings.isPareto Then
+        If PES_Settings.is_MO_Pareto And PES_Settings.is_MO_Pareto Then
             For n = 1 To PES_Settings.NPopul
                 For m = 1 To PES_Initial.NPenalty
                     Select Case PES_Settings.iPopPenalty
@@ -1032,7 +1031,7 @@ ES_MUTATION_ERROR:
         i = 1
         h1 = Qbpop(1, 1)
         For m = 2 To PES_Settings.NPopul
-            If Not PES_Settings.isPareto Then
+            If Not PES_Settings.is_MO_Pareto Then
                 If Qbpop(m, 1) > h1 Then
                     h1 = Qbpop(m, 1)
                     i = m
@@ -1055,11 +1054,11 @@ ES_MUTATION_ERROR:
 
         'Der schlechtetste der besten Qualitätswerte wird bestimmt ; Position -> i
         '(höchster Wert der Kostenfunktion, niedrigster Wert der Spannweite)
-        If PES_Settings.isMultiObjective Then
+        If PES_Settings.is_MO_Pareto Then
             j = 1
             h2 = Qbpop(1, 2)
             For m = 2 To PES_Settings.NPopul
-                If Not PES_Settings.isPareto Then
+                If Not PES_Settings.is_MO_Pareto Then
                     If Qbpop(m, 2) > h2 Then
                         h2 = Qbpop(m, 2)
                         j = m
@@ -1075,13 +1074,13 @@ ES_MUTATION_ERROR:
 
         'Qualität der aktuellen Population wird bestimmt
         h1 = 0
-        If PES_Settings.isMultiObjective Then h2 = 0
+        If PES_Settings.is_MO_Pareto Then h2 = 0
 
         For m = 1 To PES_Settings.NEltern
-            If Not PES_Settings.isMultiObjective Then
+            If Not PES_Settings.is_MO_Pareto Then
                 h1 = h1 + Qb(m, PES_iAkt.iAktPop, 1) / PES_Settings.NEltern
             Else
-                If Not PES_Settings.isPareto Then
+                If Not PES_Settings.is_MO_Pareto Then
 
                     Select Case PES_Settings.iPopPenalty
 
@@ -1104,13 +1103,13 @@ ES_MUTATION_ERROR:
             End If
         Next m
 
-        If PES_Settings.isPareto Then
+        If PES_Settings.is_MO_Pareto Then
             h1 = NDS_Crowding_Distance_Count(Qb, h2)
         End If
 
         'Falls die Qualität des aktuellen Population besser ist (Penaltyfunktion geringer)
         'als die schlechteste im Bestwertspeicher, wird diese ersetzt
-        If Not PES_Settings.isMultiObjective Then
+        If Not PES_Settings.is_MO_Pareto Then
             If h1 < Qbpop(i, 1) Then
                 Qbpop(i, 1) = h1
                 For m = 1 To PES_Initial.varanz
@@ -1123,7 +1122,7 @@ ES_MUTATION_ERROR:
                 Next m
             End If
         Else
-            If Not PES_Settings.isPareto Then
+            If Not PES_Settings.is_MO_Pareto Then
                 If h1 <= Qbpop(i, 1) And h2 < Qbpop(i, 2) Then
                     Qbpop(j, 1) = h1
                     Qbpop(j, 2) = h2
@@ -1191,7 +1190,7 @@ ES_POP_BEST_ERROR:
         On Error GoTo ES_BEST_ERROR
 
 
-        If Not PES_Settings.isPareto Then 'Standard ES nach Rechenberg
+        If Not PES_Settings.is_MO_Pareto Then 'Standard ES nach Rechenberg
             'Der schlechtetste der besten Qualitätswerte wird bestimmt ; Position -> j
             '(höchster Wert der Peanaltyfunktion)
             j = 1
@@ -1260,7 +1259,7 @@ ES_BEST_ERROR:
         On Error GoTo ES_BESTWERTSPEICHER_ERROR
 
         If PES_Settings.iEvoTyp = EVO_KOMMA Then
-            If Not PES_Settings.isPareto Then
+            If Not PES_Settings.is_MO_Pareto Then
                 For n = 1 To PES_Settings.NEltern
                     For i = 1 To PES_Initial.NPenalty 'dm 29.04.05
                         Qb(n, PES_iAkt.iAktPop, i) = 1.0E+300 'dm 29.04.05
@@ -1298,7 +1297,7 @@ ES_BESTWERTSPEICHER_ERROR:
         On Error GoTo ES_POP_BESTWERTSPEICHER_ERROR
 
         If PES_Settings.iPopEvoTyp = EVO_KOMMA Then
-            If Not PES_Settings.isPareto Then
+            If Not PES_Settings.is_MO_Pareto Then
                 For n = 1 To PES_Settings.NPopul
                     For i = 1 To PES_Initial.NPenalty 'dm 29.04.05
                         Qbpop(n, i) = 1.0E+300 'dm 29.04.05
@@ -1350,7 +1349,7 @@ ES_POP_BESTWERTSPEICHER_ERROR:
             Realisierungsspeicher(m, 2) = m
         Next m
 
-        If Not PES_Settings.isPareto Then
+        If Not PES_Settings.is_MO_Pareto Then
             For m = 1 To PES_Settings.NPopul
                 For n = m To PES_Settings.NPopul
                     If Realisierungsspeicher(m, 1) > Realisierungsspeicher(n, 1) Then
@@ -1432,7 +1431,7 @@ ES_POP_ELTERN_ERROR:
         On Error GoTo ES_ELTERN_ERROR
 
         '*** Standard ES nach Rechenberg/Schwefel ***
-        If Not PES_Settings.isPareto Then
+        If Not PES_Settings.is_MO_Pareto Then
 
             'Die Eltern werden gleich der besten Kinder gesetzt (Schrittweite und Parameterwert)
             For m = 1 To PES_Settings.NEltern

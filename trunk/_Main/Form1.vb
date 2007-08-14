@@ -1024,7 +1024,7 @@ GenerierenAusgangswerte:
                         myIsOK = PES1.EsGetParameter(globalAnzPar, myPara)
 
                         'Auslesen des Bestwertspeichers
-                        If Not EVO_Settings1.PES_Settings.isMultiObjective Then
+                        If Not EVO_Settings1.PES_Settings.is_MO_Pareto Then
                             myIsOK = PES1.EsGetBestwert(Bestwert)
                         End If
 
@@ -1075,7 +1075,7 @@ GenerierenAusgangswerte:
                     myIsOK = PES1.EsEltern()
 
                     'sekundäre Population zeichnen
-                    If EVO_Settings1.PES_Settings.isMultiObjective Then
+                    If EVO_Settings1.PES_Settings.is_MO_Pareto Then
                         myIsOK = PES1.esGetSekundärePopulation(SekPopulation)
                         Call SekundärePopulationZeichnen(SekPopulation)
                     End If
@@ -1270,7 +1270,7 @@ GenerierenAusgangswerte:
                         Dim Achse As Diagramm.Achse
                         Dim Achsen As New Collection
                         'Bei SO: X-Achse = Simulationen
-                        If (EVO_Settings1.PES_Settings.isMultiObjective = False) Then
+                        If (EVO_Settings1.PES_Settings.is_MO_Pareto = False) Then
                             Achse.Name = "Simulation"
                             Achse.Auto = False
                             Achse.Max = CES1.n_Childs * CES1.n_Generations
@@ -1296,7 +1296,7 @@ GenerierenAusgangswerte:
                         Dim Achse As Diagramm.Achse
                         Dim Achsen As New Collection
                         'Bei SO: X-Achse = Simulationen
-                        If (EVO_Settings1.PES_Settings.isMultiObjective = False) Then
+                        If (EVO_Settings1.PES_Settings.is_MO_Pareto = False) Then
                             Achse.Name = "Simulation"
                             Achse.Auto = False
                             If EVO_Settings1.PES_Settings.isPOPUL Then
