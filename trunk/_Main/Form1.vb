@@ -261,7 +261,7 @@ Partial Class Form1
                     Sim1.Ergebnisdb = False
 
                     'Original ModellParameter schreiben
-                    Call Sim1.Prepare_Write_ModellParameter()
+                    Call Sim1.Write_ModellParameter()
 
                     MsgBox("Die Startwerte der Optimierungsparameter wurden in die Eingabedateien geschrieben.", MsgBoxStyle.Information, "Info")
 
@@ -593,7 +593,7 @@ Partial Class Form1
                 End Select
 
                 'Modellparameter schreiben
-                Call Sim1.Prepare_Write_ModellParameter()
+                Call Sim1.Write_ModellParameter()
 
                 'Simulieren
                 Call Sim1.launchSim()
@@ -928,7 +928,7 @@ Partial Class Form1
         PES_Options.isPareto = EVO_Einstellungen1.isPareto
         PES_Options.isPareto3D = False
         PES_Options.NRunden = EVO_Einstellungen1.NRunden
-        PES_Options. NPopul = EVO_Einstellungen1.NPopul
+        PES_Options.NPopul = EVO_Einstellungen1.NPopul
         PES_Options.NPopEltern = EVO_Einstellungen1.NPopEltern
         PES_Options.iOptPopEltern = EVO_Einstellungen1.iOptPopEltern
         PES_Options.iOptEltern = EVO_Einstellungen1.iOptEltern
@@ -1395,7 +1395,7 @@ GenerierenAusgangswerte:
                     Call Sim1.db_getOptPara(db_ID_QWert)
 
                     'Modellparameter schreiben
-                    Call Sim1.Prepare_Write_ModellParameter()
+                    Call Sim1.Write_ModellParameter()
 
                     'String für die Anzeige der OptParameter wird generiert
                     MsgString = Chr(13) & Chr(10) & "OptParameter: " & Chr(13) & Chr(10)
@@ -1444,7 +1444,7 @@ GenerierenAusgangswerte:
                     'Bereitet das BlaueModell für die Kombinatorik vor
                     Call Sim1.PREPARE_Evaluation_CES()
                     'Modellparameter schreiben
-                    Call Sim1.Prepare_Write_ModellParameter()
+                    Call Sim1.Write_ModellParameter()
 
                     'String für die Anzeige der Pfade wird generiert
                     MsgString = Chr(13) & Chr(10) & "Pfad: " & Chr(13) & Chr(10)
