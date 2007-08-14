@@ -146,8 +146,8 @@ Public Class Diagramm
 
             'S1: Generieren der Series für die Populationen
             Populationen = 1
-            If EVO_Einstellungen1.isPOPUL Then
-                Populationen = EVO_Einstellungen1.NPopul
+            If EVO_Einstellungen1.PES_Settings.isPOPUL Then
+                Populationen = EVO_Einstellungen1.PES_Settings.NPopul
             End If
             For i = 1 To Populationen
                 Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
@@ -181,10 +181,10 @@ Public Class Diagramm
         Dim i As Short
         Dim OptErg() As Double
 
-        If EVO_Einstellungen1.isPOPUL Then
-            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden + 1
+        If EVO_Einstellungen1.PES_Settings.isPOPUL Then
+            Anzahl_Kalkulationen = EVO_Einstellungen1.PES_Settings.NGen * EVO_Einstellungen1.PES_Settings.NNachf * EVO_Einstellungen1.PES_Settings.NRunden + 1
         Else
-            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf + 1
+            Anzahl_Kalkulationen = EVO_Einstellungen1.PES_Settings.NGen * EVO_Einstellungen1.PES_Settings.NNachf + 1
         End If
 
         'Ausgengsergebnisse für die Linien im TeeChart Rechnen
@@ -217,8 +217,8 @@ Public Class Diagramm
 
             'S1: Generieren der Series für die Populationen
             Populationen = 1
-            If EVO_Einstellungen1.isPOPUL Then
-                Populationen = EVO_Einstellungen1.NPopul
+            If EVO_Einstellungen1.PES_Settings.isPOPUL Then
+                Populationen = EVO_Einstellungen1.PES_Settings.NPopul
             End If
             For i = 1 To Populationen
                 Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
@@ -250,10 +250,10 @@ Public Class Diagramm
         Dim i As Short
         Dim X() As Double
 
-        If EVO_Einstellungen1.isPOPUL Then
-            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden + 1
+        If EVO_Einstellungen1.PES_Settings.isPOPUL Then
+            Anzahl_Kalkulationen = EVO_Einstellungen1.PES_Settings.NGen * EVO_Einstellungen1.PES_Settings.NNachf * EVO_Einstellungen1.PES_Settings.NRunden + 1
         Else
-            Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf + 1
+            Anzahl_Kalkulationen = EVO_Einstellungen1.PES_Settings.NGen * EVO_Einstellungen1.PES_Settings.NNachf + 1
         End If
 
         'Ausgangsergebnisse für die Linien im TeeChart Rechnen
@@ -292,8 +292,8 @@ Public Class Diagramm
 
             'S1: Generieren der Series für die Populationen
             Populationen = 1
-            If EVO_Einstellungen1.isPOPUL Then
-                Populationen = EVO_Einstellungen1.NPopul
+            If EVO_Einstellungen1.PES_Settings.isPOPUL Then
+                Populationen = EVO_Einstellungen1.PES_Settings.NPopul
             End If
             For i = 1 To Populationen
                 Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
@@ -321,7 +321,7 @@ Public Class Diagramm
         Dim Populationen As Short
         Dim i, j As Short
 
-        Populationen = EVO_Einstellungen1.NPopul
+        Populationen = EVO_Einstellungen1.PES_Settings.NPopul
 
         With Me
             .Clear()

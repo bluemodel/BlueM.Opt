@@ -176,9 +176,9 @@ Partial Class Form1
                     Testprobleme1.Enabled = True
 
                     'EVO_Einstellungen aktivieren
-                    EVO_Einstellungen1.Enabled = True
+                    EVO_Settings1.Enabled = True
 
-                    EVO_Einstellungen1.OptModus = Testprobleme1.OptModus
+                    EVO_Settings1.OptModus = Testprobleme1.OptModus
 
                     'Globale Parameter werden gesetzt
                     Call Testprobleme1.Parameter_Uebergabe(Testprobleme1.Combo_Testproblem.Text, Testprobleme1.Text_Sinusfunktion_Par.Text, Testprobleme1.Text_Schwefel24_Par.Text, globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
@@ -234,7 +234,7 @@ Partial Class Form1
             Me.Button_Scatterplot.Enabled = False
 
             'EVO_Einstellungen deaktivieren
-            EVO_Einstellungen1.Enabled = False
+            EVO_Settings1.Enabled = False
 
             'Mauszeiger busy
             Cursor = System.Windows.Forms.Cursors.WaitCursor
@@ -304,7 +304,7 @@ Partial Class Form1
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'EVO_Einstellungen aktivieren
-                    EVO_Einstellungen1.Enabled = True
+                    EVO_Settings1.Enabled = True
 
                     'Methode setzen
                     Sim1.Method = METH_PES
@@ -320,9 +320,9 @@ Partial Class Form1
 
                     'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
                     If (Sim1.List_OptZiele.GetLength(0) = 1) Then
-                        EVO_Einstellungen1.OptModus = 0
+                        EVO_Settings1.OptModus = 0
                     ElseIf (Sim1.List_OptZiele.GetLength(0) > 1) Then
-                        EVO_Einstellungen1.OptModus = 1
+                        EVO_Settings1.OptModus = 1
                     End If
 
                     'Parameterübergabe an PES
@@ -353,7 +353,7 @@ Partial Class Form1
                             Sim1.Method = METH_CES_PES
 
                             'EVO_Einstellungen aktiviern
-                            EVO_Einstellungen1.Enabled = True
+                            EVO_Settings1.Enabled = True
 
                             'CES für Sim vorbereiten (Files lesen und Validieren)
                             Call Sim1.read_and_valid_INI_Files_CES_PES()
@@ -369,9 +369,9 @@ Partial Class Form1
 
                     'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
                     If (Sim1.List_OptZiele.GetLength(0) = 1) Then
-                        EVO_Einstellungen1.OptModus = 0
+                        EVO_Settings1.OptModus = 0
                     ElseIf (Sim1.List_OptZiele.GetLength(0) > 1) Then
-                        EVO_Einstellungen1.OptModus = 1
+                        EVO_Settings1.OptModus = 1
                     End If
 
                     'Anzahl der Ziele, Locations und Verzeigungen wird an CES übergeben
@@ -860,7 +860,7 @@ Partial Class Form1
         Dim i As Integer
 
         'Einstellungen für PES werden gesetzt
-        Call EVO_Einstellungen1.SetFor_CES_PES()
+        Call EVO_Settings1.SetFor_CES_PES()
 
         For i = 0 To CES1.n_Parents - 1
             If CES1.List_Parents(i).Front = 1 Then
@@ -904,7 +904,6 @@ Partial Class Form1
         'Dimensionierung der Variablen für Optionen Evostrategie
         'Das Struct aus PES wird hier verwendet
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        Dim PES_Options As EvoKern.PES.Struct_Settings
 
         'Check!
         Dim ipop As Short = 0
@@ -917,28 +916,6 @@ Partial Class Form1
         'TODO: If (ipop + igen + inachf + irunde) > 4 Then GoTo Start_Evolutionsrunden '????? Wie?
         'Werte an Variablen übergeben auskommentiert Werte finden sich im PES werden hier aber nicht zugewiesen
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        PES_Options.NEltern = EVO_Einstellungen1.NEltern
-        PES_Options.NNachf = EVO_Einstellungen1.NNachf
-        PES_Options.NGen = EVO_Einstellungen1.NGen
-        PES_Options.iEvoTyp = EVO_Einstellungen1.iEvoTyp
-        PES_Options.iPopEvoTyp = EVO_Einstellungen1.iPopEvoTyp
-        PES_Options.iPopPenalty = EVO_Einstellungen1.iPopPenalty
-        PES_Options.isPOPUL = EVO_Einstellungen1.isPOPUL
-        PES_Options.isMultiObjective = EVO_Einstellungen1.isMultiObjective
-        PES_Options.isPareto = EVO_Einstellungen1.isPareto
-        PES_Options.isPareto3D = False
-        PES_Options.NRunden = EVO_Einstellungen1.NRunden
-        PES_Options.NPopul = EVO_Einstellungen1.NPopul
-        PES_Options.NPopEltern = EVO_Einstellungen1.NPopEltern
-        PES_Options.iOptPopEltern = EVO_Einstellungen1.iOptPopEltern
-        PES_Options.iOptEltern = EVO_Einstellungen1.iOptEltern
-        PES_Options.NRekombXY = EVO_Einstellungen1.NRekombXY
-        PES_Options.rDeltaStart = EVO_Einstellungen1.rDeltaStart
-        PES_Options.iStartPar = EVO_Einstellungen1.globalOPTVORGABE
-        PES_Options.isDnVektor = EVO_Einstellungen1.isDnVektor
-        PES_Options.Interact = EVO_Einstellungen1.Interact
-        PES_Options.isInteract = EVO_Einstellungen1.isInteract
-        PES_Options.NMemberSecondPop = EVO_Einstellungen1.NMemberSecondPop
 
         ReDim QN(globalAnzZiel)
         ReDim RN(globalAnzRand)
@@ -956,7 +933,7 @@ Partial Class Form1
         '2. Schritt: PES - ES_OPTIONS
         'Optionen der Evolutionsstrategie werden übergeben
         '******************************************************************************************
-        myIsOK = PES1.EsOptions(PES_Options)
+        myIsOK = PES1.EsSettings(EVO_Settings1.PES_Settings)
 
         '3. Schritt: PES - ES_INI
         'Die öffentlichen dynamischen Arrays werden initialisiert (Dn, An, Xn, Xmin, Xmax)
@@ -982,7 +959,7 @@ Partial Class Form1
         myIsOK = PES1.EsStartvalues()
 
         'Startwerte werden der Verlaufsanzeige werden zugewiesen
-        Call Me.INI_Verlaufsanzeige(EVO_Einstellungen1.NRunden, EVO_Einstellungen1.NPopul, EVO_Einstellungen1.NGen, EVO_Einstellungen1.NNachf)
+        Call Me.INI_Verlaufsanzeige(EVO_Settings1.PES_Settings.NRunden, EVO_Settings1.PES_Settings.NPopul, EVO_Settings1.PES_Settings.NGen, EVO_Settings1.PES_Settings.NNachf)
 
         durchlauf = 0
 
@@ -1047,7 +1024,7 @@ GenerierenAusgangswerte:
                         myIsOK = PES1.EsGetParameter(globalAnzPar, myPara)
 
                         'Auslesen des Bestwertspeichers
-                        If Not Evo_Einstellungen1.isMultiObjective Then
+                        If Not EVO_Settings1.PES_Settings.isMultiObjective Then
                             myIsOK = PES1.EsGetBestwert(Bestwert)
                         End If
 
@@ -1098,7 +1075,7 @@ GenerierenAusgangswerte:
                     myIsOK = PES1.EsEltern()
 
                     'sekundäre Population zeichnen
-                    If EVO_Einstellungen1.isMultiObjective Then
+                    If EVO_Settings1.PES_Settings.isMultiObjective Then
                         myIsOK = PES1.esGetSekundärePopulation(SekPopulation)
                         Call SekundärePopulationZeichnen(SekPopulation)
                     End If
@@ -1193,13 +1170,13 @@ GenerierenAusgangswerte:
 
                 Select Case Testprobleme1.Combo_Testproblem.Text
                     Case "Sinus-Funktion"
-                        Call DForm.Diag.DiagInitialise_SinusFunktion(EVO_Einstellungen1, globalAnzPar, Testprobleme1.Text_Sinusfunktion_Par.Text)
+                        Call DForm.Diag.DiagInitialise_SinusFunktion(EVO_Settings1, globalAnzPar, Testprobleme1.Text_Sinusfunktion_Par.Text)
                     Case "Beale-Problem" 'x1 = [-5;5], x2=[-2;2]
-                        Call DForm.Diag.DiagInitialise_BealeProblem(EVO_Einstellungen1, globalAnzPar)
+                        Call DForm.Diag.DiagInitialise_BealeProblem(EVO_Settings1, globalAnzPar)
                     Case "Schwefel 2.4-Problem" 'xi = [-10,10]
-                        Call DForm.Diag.DiagInitialise_SchwefelProblem(EVO_Einstellungen1, globalAnzPar)
+                        Call DForm.Diag.DiagInitialise_SchwefelProblem(EVO_Settings1, globalAnzPar)
                     Case Else
-                        Call DForm.Diag.DiagInitialise_MultiTestProb(EVO_Einstellungen1, Testprobleme1.Combo_Testproblem.Text)
+                        Call DForm.Diag.DiagInitialise_MultiTestProb(EVO_Settings1, Testprobleme1.Combo_Testproblem.Text)
                 End Select
 
             Case ANW_BLUEM, ANW_SMUSI 'BlueM oder SMUSI
@@ -1293,7 +1270,7 @@ GenerierenAusgangswerte:
                         Dim Achse As Diagramm.Achse
                         Dim Achsen As New Collection
                         'Bei SO: X-Achse = Simulationen
-                        If (EVO_Einstellungen1.isMultiObjective = False) Then
+                        If (EVO_Settings1.PES_Settings.isMultiObjective = False) Then
                             Achse.Name = "Simulation"
                             Achse.Auto = False
                             Achse.Max = CES1.n_Childs * CES1.n_Generations
@@ -1319,13 +1296,13 @@ GenerierenAusgangswerte:
                         Dim Achse As Diagramm.Achse
                         Dim Achsen As New Collection
                         'Bei SO: X-Achse = Simulationen
-                        If (EVO_Einstellungen1.isMultiObjective = False) Then
+                        If (EVO_Settings1.PES_Settings.isMultiObjective = False) Then
                             Achse.Name = "Simulation"
                             Achse.Auto = False
-                            If EVO_Einstellungen1.isPOPUL Then
-                                Achse.Max = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf * EVO_Einstellungen1.NRunden + 1
+                            If EVO_Settings1.PES_Settings.isPOPUL Then
+                                Achse.Max = EVO_Settings1.PES_Settings.NGen * EVO_Settings1.PES_Settings.NNachf * EVO_Settings1.PES_Settings.NRunden + 1
                             Else
-                                Achse.Max = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf + 1
+                                Achse.Max = EVO_Settings1.PES_Settings.NGen * EVO_Settings1.PES_Settings.NNachf + 1
                             End If
                             Achsen.Add(Achse)
                         End If
