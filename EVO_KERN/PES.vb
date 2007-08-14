@@ -157,6 +157,10 @@ Public Class PES
 
         EsSettings = False
 
+        'Übergabe der Optionen
+        'xxxxxxxxxxxxxxxxxxxxx
+        Me.PES_Settings = Settings
+
         'Überprüfung der Übergebenen Werte
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         If (Settings.iEvoTyp < 1 Or Settings.iEvoTyp > 2) Then
@@ -204,11 +208,6 @@ Public Class PES
         If Settings.NNachf <= Settings.NEltern Then
             Throw New Exception("Die Anzahl der Eltern kann nicht größer als die Anzahl der Nachfahren sein!" & Chr(13) & Chr(10) & "'Rechenberg 73' schlägt ein Verhältnis von 1:3 bis 1:5 vor.")
         End If
-
-        'Übergabe der Optionen
-        'xxxxxxxxxxxxxxxxxxxxx
-
-        Me.PES_Settings = Settings
 
         If Not PES_Settings.isPOPUL Then
             PES_Settings.NPopul = 1
