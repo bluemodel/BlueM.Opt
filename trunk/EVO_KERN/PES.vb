@@ -40,7 +40,7 @@ Public Class PES
         Dim iPopEvoTyp As Short             'Typ der Evolutionsstrategie (+ oder ,) auf Populationsebene
         Dim iPopPenalty As Short            'Art der Beurteilung der Populationsgüte (Multiobjective)
         Dim isPOPUL As Boolean              'Mit Populationen
-        'Dim is_MO_Pareto As Boolean         'Multi-Objective mit Pareto Front
+        Dim is_MO_Pareto As Boolean         'Multi-Objective mit Pareto Front
         Dim NRunden As Short                'Anzahl Runden
         Dim NPopul As Short                 'Anzahl Populationen
         Dim NPopEltern As Short             'Anzahl Populationseltern
