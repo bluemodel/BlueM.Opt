@@ -4,7 +4,7 @@ Public Class EVO_Einstellungen
     Inherits System.Windows.Forms.UserControl
 
     Private OptModusValue As Short = EVO_MODUS_SINGEL_OBJECTIVE
-    Dim isParetoOptimierung, isMultiObjectiveOptimierung As Boolean
+    Dim isMultiObjectiveOptimierung As Boolean
 
     'Optimierungsmodus wurde geändert
     '********************************
@@ -33,7 +33,6 @@ Public Class EVO_Einstellungen
                     LabelFramePop(i).Enabled = False
                 Next i
                 'Setzen der Modusabhängigen Vorgaben
-                isParetoOptimierung = False
                 isMultiObjectiveOptimierung = False
                 CheckisPopul.Enabled = True
                 CheckisPopul.CheckState = CheckState.Unchecked
@@ -63,7 +62,6 @@ Public Class EVO_Einstellungen
                 Next i
                 'Setzen der Modusabhängigen Vorgaben
                 isMultiObjectiveOptimierung = True
-                isParetoOptimierung = True
                 'CheckisPopul.CheckState = CheckState.Unchecked
                 CheckisPopul.Enabled = False
                 LabelInteract.Enabled = True
@@ -296,8 +294,7 @@ Public Class EVO_Einstellungen
             PES_Settings.iPopPenalty = VB6.GetItemData(ComboPopPenalty, ComboPopPenalty.SelectedIndex)
             PES_Settings.isPOPUL = False        'siehe BUG 60 und BUG 158
             If CheckisPopul.CheckState = System.Windows.Forms.CheckState.Checked Then PES_Settings.isPOPUL = True
-            PES_Settings.isMultiObjective = isMultiObjectiveOptimierung
-            PES_Settings.isPareto = isParetoOptimierung
+            PES_Settings.is_MO_Pareto = isMultiObjectiveOptimierung
             PES_Settings.NRunden = Val(TextAnzRunden.Text)
             PES_Settings.NPopul = Val(TextAnzPop.Text)
             PES_Settings.NPopEltern = Val(TextAnzPopEltern.Text)
