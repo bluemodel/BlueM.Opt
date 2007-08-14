@@ -40,7 +40,7 @@ Public Class PES
         Dim iPopEvoTyp As Short             'Typ der Evolutionsstrategie (+ oder ,) auf Populationsebene
         Dim iPopPenalty As Short            'Art der Beurteilung der Populationsgüte (Multiobjective)
         Dim isPOPUL As Boolean              'Mit Populationen
-        Dim is_MO_Pareto As Boolean         'Multi-Objective mit Pareto Front
+        'Dim is_MO_Pareto As Boolean         'Multi-Objective mit Pareto Front
         Dim NRunden As Short                'Anzahl Runden
         Dim NPopul As Short                 'Anzahl Populationen
         Dim NPopEltern As Short             'Anzahl Populationseltern
@@ -475,7 +475,7 @@ ES_GET_SCHRITTWEITE_ERROR:
             Next m
         Next
 
-        If PES_Settings.is_MO_Pareto And PES_Settings.is_MO_Pareto Then
+        If PES_Settings.is_MO_Pareto Then
             For n = 1 To PES_Settings.NPopul
                 For m = 1 To PES_Initial.NPenalty
                     Select Case PES_Settings.iPopPenalty
@@ -1058,52 +1058,21 @@ ES_MUTATION_ERROR:
             j = 1
             h2 = Qbpop(1, 2)
             For m = 2 To PES_Settings.NPopul
-                If Not PES_Settings.is_MO_Pareto Then
-                    If Qbpop(m, 2) > h2 Then
-                        h2 = Qbpop(m, 2)
-                        j = m
-                    End If
-                Else
-                    If Qbpop(m, 2) < h2 Then
-                        h2 = Qbpop(m, 2)
-                        j = m
-                    End If
+                If Qbpop(m, 2) < h2 Then
+                    h2 = Qbpop(m, 2)
+                    j = m
                 End If
             Next m
         End If
 
         'Qualität der aktuellen Population wird bestimmt
         h1 = 0
-        If PES_Settings.is_MO_Pareto Then h2 = 0
-
-        For m = 1 To PES_Settings.NEltern
-            If Not PES_Settings.is_MO_Pareto Then
+        If Not PES_Settings.is_MO_Pareto Then
+            For m = 1 To PES_Settings.NEltern
                 h1 = h1 + Qb(m, PES_iAkt.iAktPop, 1) / PES_Settings.NEltern
-            Else
-                If Not PES_Settings.is_MO_Pareto Then
-
-                    Select Case PES_Settings.iPopPenalty
-
-                        Case 1 'Mittelwert
-                            h1 = h1 + Qb(m, PES_iAkt.iAktPop, 1) / PES_Settings.NEltern
-                            h2 = h2 + Qb(m, PES_iAkt.iAktPop, 2) / PES_Settings.NEltern
-
-                        Case 2 'teuerster und schlechtester Wert der Population als Bewertung
-                            If h1 < Qb(m, PES_iAkt.iAktPop, 1) Then
-                                h1 = Qb(m, PES_iAkt.iAktPop, 1)
-                            End If
-
-                            If h2 < Qb(m, PES_iAkt.iAktPop, 2) Then
-                                h2 = Qb(m, PES_iAkt.iAktPop, 2)
-                            End If
-
-                    End Select
-
-                End If
-            End If
-        Next m
-
-        If PES_Settings.is_MO_Pareto Then
+            Next m
+        Else
+            h2 = 0
             h1 = NDS_Crowding_Distance_Count(Qb, h2)
         End If
 
@@ -1122,47 +1091,32 @@ ES_MUTATION_ERROR:
                 Next m
             End If
         Else
-            If Not PES_Settings.is_MO_Pareto Then
-                If h1 <= Qbpop(i, 1) And h2 < Qbpop(i, 2) Then
-                    Qbpop(j, 1) = h1
-                    Qbpop(j, 2) = h2
-                    For m = 1 To PES_Initial.varanz
-                        For n = 1 To PES_Settings.NEltern
-                            'Die Schrittweite wird ebenfalls übernommen
-                            Dbpop(m, n, i) = Db(m, n, PES_iAkt.iAktPop)
-                            'Die eigentlichen Parameterwerte werden übernommen
-                            Xbpop(m, n, i) = Xb(m, n, PES_iAkt.iAktPop)
-                        Next n
-                    Next m
-                End If
-            Else
-                Select Case PES_Settings.iPopPenalty
-                    Case 1 'Crowding
-                        If h1 < Qbpop(i, 1) Then
-                            Qbpop(i, 1) = h1
-                            For m = 1 To PES_Initial.varanz
-                                For n = 1 To PES_Settings.NEltern
-                                    'Die Schrittweite wird ebenfalls übernommen
-                                    Dbpop(m, n, i) = Db(m, n, PES_iAkt.iAktPop)
-                                    'Die eigentlichen Parameterwerte werden übernommen
-                                    Xbpop(m, n, i) = Xb(m, n, PES_iAkt.iAktPop)
-                                Next n
-                            Next m
-                        End If
-                    Case 2
-                        If h2 > Qbpop(j, 2) Then
-                            Qbpop(j, 2) = h2
-                            For m = 1 To PES_Initial.varanz
-                                For n = 1 To PES_Settings.NEltern
-                                    'Die Schrittweite wird ebenfalls übernommen
-                                    Dbpop(m, n, j) = Db(m, n, PES_iAkt.iAktPop)
-                                    'Die eigentlichen Parameterwerte werden übernommen
-                                    Xbpop(m, n, j) = Xb(m, n, PES_iAkt.iAktPop)
-                                Next n
-                            Next m
-                        End If
-                End Select
-            End If
+            Select Case PES_Settings.iPopPenalty
+                Case 1 'Crowding
+                    If h1 < Qbpop(i, 1) Then
+                        Qbpop(i, 1) = h1
+                        For m = 1 To PES_Initial.varanz
+                            For n = 1 To PES_Settings.NEltern
+                                'Die Schrittweite wird ebenfalls übernommen
+                                Dbpop(m, n, i) = Db(m, n, PES_iAkt.iAktPop)
+                                'Die eigentlichen Parameterwerte werden übernommen
+                                Xbpop(m, n, i) = Xb(m, n, PES_iAkt.iAktPop)
+                            Next n
+                        Next m
+                    End If
+                Case 2
+                    If h2 > Qbpop(j, 2) Then
+                        Qbpop(j, 2) = h2
+                        For m = 1 To PES_Initial.varanz
+                            For n = 1 To PES_Settings.NEltern
+                                'Die Schrittweite wird ebenfalls übernommen
+                                Dbpop(m, n, j) = Db(m, n, PES_iAkt.iAktPop)
+                                'Die eigentlichen Parameterwerte werden übernommen
+                                Xbpop(m, n, j) = Xb(m, n, PES_iAkt.iAktPop)
+                            Next n
+                        Next m
+                    End If
+            End Select
         End If
 
         EsPopBest = True
