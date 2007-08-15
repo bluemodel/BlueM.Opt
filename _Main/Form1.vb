@@ -618,7 +618,7 @@ Partial Class Form1
                     'TODO: bei 2-Parametern auch den Wert des 2. Parameters anhängen!
                     WEL.Zeitreihen(0).Title += " (" & Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Bezeichnung & ": " _
                                                     & Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Wert & ")"
-                    Wave1.Import_Zeitreihe(WEL.Zeitreihen(0))
+                    Wave1.Display_Series(WEL.Zeitreihen(0))
                 End If
 
                 'Qualitätswerte und OptParameter in DB speichern
@@ -1487,7 +1487,7 @@ GenerierenAusgangswerte:
                             If (Not RefSeries.Contains(.ZielReiheDatei & .ZielGr)) Then
                                 RefSeries.Add(.ZielGr, .ZielReiheDatei & .ZielGr)
                                 'Referenzreihe in Wave laden
-                                Wave1.Import_Zeitreihe(.ZielReihe)
+                                Wave1.Display_Series(.ZielReihe)
                             End If
                         End If
 
