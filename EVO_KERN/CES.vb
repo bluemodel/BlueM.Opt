@@ -27,7 +27,7 @@ Public Class CES
     Public n_PathDimension() As Integer     'Anzahl der Maﬂnahmen an jeder Stelle
 
     'Eingabe
-    Public n_Generations As Integer = 5     'Anzahl der Generationen
+    Public n_Generations As Integer = 2     'Anzahl der Generationen
     Public n_Parts_of_Path As Integer = 3   'L‰nge des Ged‰chtnispfades Achtung Maximum ist 3
     Public n_Parents As Integer = 3
     Public n_Childs As Integer = 5

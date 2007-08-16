@@ -64,12 +64,6 @@ Partial Class Form1
     Dim isrun As Boolean = False                        'Optimierung läuft
     Dim ispause As Boolean = False                      'Optimierung ist pausiert
 
-    Structure Struct_Exchange                           'Struktur um Informationen zwischen PES und CES auszutauschen 
-        Dim Series_No As Integer
-    End Structure
-
-    Dim Exchange As Struct_Exchange
-
 #End Region 'Eigenschaften
 
 #Region "Methoden"
@@ -92,9 +86,6 @@ Partial Class Form1
         ComboBox_Methode.Items.AddRange(New Object() {"", METH_RESET, METH_PES, METH_CES, METH_CES_PES, METH_HYBRID, METH_SENSIPLOT})
         ComboBox_Methode.SelectedIndex = 0
         ComboBox_Methode.Enabled = False
-
-        'Exchange wird initialisiert
-        Me.Exchange.Series_No = 0
 
         'Ende der Initialisierung
         IsInitializing = False
@@ -480,7 +471,7 @@ Partial Class Form1
                         Case METH_SENSIPLOT
                             Call STARTEN_SensiPlot()
                         Case METH_PES
-                            Call STARTEN_PES(Exchange)
+                            Call STARTEN_PES()
                         Case METH_CES
                             Call STARTEN_CES_or_CES_PES()
                         Case METH_CES_PES
@@ -490,7 +481,7 @@ Partial Class Form1
                     End Select
 
                 Case ANW_TESTPROBLEME
-                    Call STARTEN_PES(Exchange)
+                    Call STARTEN_PES()
 
                 Case ANW_TSP
                     Call STARTEN_TSP()
@@ -796,12 +787,9 @@ Partial Class Form1
                 Call CES1.NDSorting_Control()
                 'Zeichnen von NDSortingResult
                 Call DForm.Diag.DeleteSeries(CES1.n_Childs - 1, 1)
-                Dim f As Integer
                 For i = 0 To CES1.n_Childs - 1
-                    f = CES1.NDSResult(i).Front
-                    Me.Exchange.Series_No = CES1.NDSResult(i).Front + 1
-                    Call DForm.Diag.prepareSeries(f, "Front:" & f, Steema.TeeChart.Styles.PointerStyles.Triangle, 4)
-                    Call DForm.Diag.Series(f).Add(CES1.NDSResult(i).Penalty(0), CES1.NDSResult(i).Penalty(1))
+                    Call DForm.Diag.prepareSeries(1, "Front:" & 1, Steema.TeeChart.Styles.PointerStyles.Triangle, 4)
+                    Call DForm.Diag.Series(1).Add(CES1.NDSResult(i).Penalty(0), CES1.NDSResult(i).Penalty(1))
                 Next
             End If
 
@@ -879,10 +867,7 @@ Partial Class Form1
                     Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
                     'Starten der PES
                     '***************
-                    Call STARTEN_PES(Exchange)
-
-                    'Series wird zwei weiter gesetzt
-                    Me.Exchange.Series_No += 2
+                    Call STARTEN_PES()
 
                 End If
             End If
@@ -892,7 +877,7 @@ Partial Class Form1
     'Anwendung Evolutionsstrategie für Parameter Optimierung - hier Steuerung       
     '************************************************************************
 
-    Private Sub STARTEN_PES(ByRef Exchange As Struct_Exchange)
+    Private Sub STARTEN_PES()
         '==========================
         Dim i As Integer
         '--------------------------
@@ -1122,8 +1107,12 @@ GenerierenAusgangswerte:
     '*****************************
     Private Sub SekundärePopulationZeichnen(ByVal Population(,) As Double)
         Dim i As Short
-        Call DForm.Diag.prepareSeries(Me.Exchange.Series_No + 1, "Sekundäre Population", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-        With DForm.Diag.Series(Me.Exchange.Series_No + 1)
+        Dim nSeriesSekPop As Integer = 1
+
+        If Method = METH_CES_PES Then nSeriesSekPop = 2
+
+        Call DForm.Diag.prepareSeries(nSeriesSekPop, "Sekundäre Population", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+        With DForm.Diag.Series(nSeriesSekPop)
             .Clear()
             If UBound(Population, 2) = 2 Then
                 For i = 1 To UBound(Population, 1)
