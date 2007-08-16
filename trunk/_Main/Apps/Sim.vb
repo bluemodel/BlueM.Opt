@@ -1080,7 +1080,7 @@ Public MustInherit Class Sim
 
         'Qualitätswerte und OptParameter in DB speichern
         If (Ergebnisdb = True) Then
-            Call db_update(12, 15)
+            Call Me.db_update()
         End If
 
         'BUG 144: TODO: Constraints berechnen für CES
@@ -1326,7 +1326,7 @@ Public MustInherit Class Sim
 
     'Evaluierung des SimModells für ParameterOptimierung - Steuerungseinheit
     '***********************************************************************
-    Public Function SIM_Evaluierung_PES(ByVal iEvaluierung As Integer, ByVal ipop As Short, ByRef QN() As Double, ByRef RN() As Double) As Boolean
+    Public Function SIM_Evaluierung_PES(ByRef QN() As Double, ByRef RN() As Double) As Boolean
 
         Dim i As Short
 
@@ -1343,7 +1343,7 @@ Public MustInherit Class Sim
 
         'Qualitätswerte und OptParameter in DB speichern
         If (Ergebnisdb = True) Then
-            Call db_update(iEvaluierung, ipop)
+            Call Me.db_update()
         End If
 
         'Constraints berechnen
@@ -1797,7 +1797,7 @@ Public MustInherit Class Sim
             If (i > 0) Then
                 fieldnames &= ", "
             End If
-            fieldnames &= "'" & List_OptZiele(i).Bezeichnung & "' DOUBLE"
+            fieldnames &= "[" & List_OptZiele(i).Bezeichnung & "] DOUBLE"
         Next
         'Tabelle anpassen
         command.CommandText = "ALTER TABLE QWerte ADD COLUMN " & fieldnames
@@ -1823,7 +1823,7 @@ Public MustInherit Class Sim
             If (i > 0) Then
                 fieldnames &= ", "
             End If
-            fieldnames &= "'" & List_OptParameter(i).Bezeichnung & "' DOUBLE"
+            fieldnames &= "[" & List_OptParameter(i).Bezeichnung & "] DOUBLE"
         Next
         'Tabelle anpassen
         command.CommandText = "ALTER TABLE OptParameter ADD COLUMN " & fieldnames
@@ -1845,14 +1845,14 @@ Public MustInherit Class Sim
         Dim fieldnames As String = ""
         Dim i As Integer
 
-        command.CommandText = "ALTER TABLE Pfad ADD COLUMN 'QWert_ID' INTEGER"
+        command.CommandText = "ALTER TABLE Pfad ADD COLUMN QWert_ID INTEGER"
         command.ExecuteNonQuery()
 
         For i = 0 To Me.List_Locations.GetUpperBound(0)
             If (i > 0) Then
                 fieldnames &= ", "
             End If
-            fieldnames &= Me.List_Locations(i).Name & " TEXT"
+            fieldnames &= "[" & Me.List_Locations(i).Name & "] TEXT"
         Next
         'Tabelle anpassen
         command.CommandText = "ALTER TABLE Pfad ADD COLUMN " & fieldnames
@@ -1878,7 +1878,7 @@ Public MustInherit Class Sim
             If (i > 0) Then
                 fieldnames &= ", "
             End If
-            fieldnames &= "'" & List_OptParameter(i).Bezeichnung & "' DOUBLE"
+            fieldnames &= "[" & List_OptParameter(i).Bezeichnung & "] DOUBLE"
         Next
         'Tabelle anpassen
         command.CommandText = "ALTER TABLE OptParameter ADD COLUMN " & fieldnames
@@ -1892,7 +1892,7 @@ Public MustInherit Class Sim
             If (i > 0) Then
                 fieldnames &= ", "
             End If
-            fieldnames &= Me.List_Locations(i).Name & " TEXT"
+            fieldnames &= "[" & Me.List_Locations(i).Name & "] TEXT"
         Next
         'Tabelle anpassen
         command.CommandText = "ALTER TABLE Pfad ADD COLUMN " & fieldnames
@@ -1919,7 +1919,7 @@ Public MustInherit Class Sim
 
     'Update der ErgebnisDB mit QWerten und OptParametern
     '***************************************************
-    Public Function db_update(ByVal iEvaluierung As Integer, ByVal ipop As Short) As Boolean
+    Public Function db_update() As Boolean
         Call db_connect()
 
         Dim i As Integer
@@ -1930,10 +1930,14 @@ Public MustInherit Class Sim
         Dim fieldnames As String = ""
         Dim fieldvalues As String = ""
         For i = 0 To List_OptZiele.GetUpperBound(0)
-            fieldnames &= ", '" & List_OptZiele(i).Bezeichnung & "'"
-            fieldvalues &= ", " & List_OptZiele(i).QWertTmp
+            If (i > 0) Then
+                fieldnames &= ", "
+                fieldvalues &= ", "
+            End If
+            fieldnames &= "[" & List_OptZiele(i).Bezeichnung & "]"
+            fieldvalues &= List_OptZiele(i).QWertTmp
         Next
-        command.CommandText = "INSERT INTO QWerte (durchlauf, ipop " & fieldnames & ") VALUES (" & iEvaluierung & ", " & ipop & fieldvalues & ")"
+        command.CommandText = "INSERT INTO QWerte (" & fieldnames & ") VALUES (" & fieldvalues & ")"
         command.ExecuteNonQuery()
         'ID des zuletzt geschriebenen QWerts holen
         command.CommandText = "SELECT @@IDENTITY AS ID"
@@ -1941,12 +1945,12 @@ Public MustInherit Class Sim
 
         Select Case Me.Method
 
-            Case "PES"
+            Case "PES", "SensiPlot"
                 'Zugehörige OptParameter schreiben
                 fieldnames = ""
                 fieldvalues = ""
                 For i = 0 To List_OptParameter.GetUpperBound(0)
-                    fieldnames &= ", '" & List_OptParameter(i).Bezeichnung & "'"
+                    fieldnames &= ", [" & List_OptParameter(i).Bezeichnung & "]"
                     fieldvalues &= ", " & List_OptParameter(i).Wert
                 Next
                 command.CommandText = "INSERT INTO OptParameter (QWert_ID" & fieldnames & ") VALUES (" & QWert_ID & fieldvalues & ")"
@@ -1958,10 +1962,10 @@ Public MustInherit Class Sim
                 fieldnames = ""
                 fieldvalues = ""
                 For i = 0 To Me.List_Locations.GetUpperBound(0)
-                    fieldnames &= ", " & Me.List_Locations(i).Name
+                    fieldnames &= ", [" & Me.List_Locations(i).Name & "]"
                     fieldvalues &= ", '" & Me.Aktuelle_Massnahmen(i) & "'"
                 Next
-                command.CommandText = "INSERT INTO Pfad ('QWert_ID'" & fieldnames & ") VALUES (" & QWert_ID & fieldvalues & ")"
+                command.CommandText = "INSERT INTO Pfad (QWert_ID" & fieldnames & ") VALUES (" & QWert_ID & fieldvalues & ")"
                 command.ExecuteNonQuery()
 
 
@@ -1974,7 +1978,7 @@ Public MustInherit Class Sim
                 fieldnames = ""
                 fieldvalues = ""
                 For i = 0 To List_OptParameter.GetUpperBound(0)
-                    fieldnames &= ", '" & List_OptParameter(i).Bezeichnung & "'"
+                    fieldnames &= ", [" & List_OptParameter(i).Bezeichnung & "]"
                     fieldvalues &= ", " & List_OptParameter(i).Wert
                 Next
                 command.CommandText = "INSERT INTO OptParameter (QWert_ID" & fieldnames & ") VALUES (" & QWert_ID & fieldvalues & ")"
@@ -1994,7 +1998,7 @@ Public MustInherit Class Sim
                     If (i > 0) Then
                         condition &= " AND "
                     End If
-                    condition &= Me.List_Locations(i).Name & " = '" & Me.Aktuelle_Massnahmen(i) & "'"
+                    condition &= "[" & Me.List_Locations(i).Name & "] = '" & Me.Aktuelle_Massnahmen(i) & "'"
                 Next
                 command.CommandText = "SELECT ID FROM Pfad WHERE (" & condition & ")"
                 If (Not IsNothing(command.ExecuteScalar())) Then
@@ -2009,7 +2013,7 @@ Public MustInherit Class Sim
                             fieldnames &= ","
                             fieldvalues &= ","
                         End If
-                        fieldnames &= " " & Me.List_Locations(i).Name
+                        fieldnames &= " [" & Me.List_Locations(i).Name & "]"
                         fieldvalues &= " '" & Me.Aktuelle_Massnahmen(i) & "'"
                     Next
                     command.CommandText = "INSERT INTO Pfad (" & fieldnames & ") VALUES (" & fieldvalues & ")"
@@ -2033,91 +2037,124 @@ Public MustInherit Class Sim
 
     End Function
 
-    'Einen Parametersatz auslesen
-    '****************************
-    Public Sub db_getOptPara(ByVal id As Integer)
+    'Einen Parametersatz aus der DB übernehmen
+    '*****************************************
+    Public Function db_getPara(ByVal xAchse As String, ByVal xWert As Double, ByVal yAchse As String, ByVal yWert As Double) As Boolean
+
+        db_getPara = True
+        Dim q as String
+        Dim adapter As OleDbDataAdapter
+        Dim ds As DataSet
+        Dim numrows as Integer
 
         Call db_connect()
 
-        Dim q As String = "SELECT * FROM OptParameter WHERE ID = " & id
+        'Fallunterscheidung nach Methode
+        Select Case Me.Method
 
-        Dim adapter As OleDbDataAdapter = New OleDbDataAdapter(q, db)
+            Case "PES", "SensiPlot"
 
-        Dim ds As New DataSet("EVO")
-        adapter.Fill(ds, "OptParameter")
+                'Unterscheidung für SO und SensiPlot
+                If (Me.Method = "SensiPlot" Or Me.List_OptZiele.Length = 1) Then
+                    'Nur ein QWert, und zwar auf der xAchse
+                    q = "SELECT OptParameter.* FROM OptParameter INNER JOIN QWerte ON OptParameter.QWert_ID = QWerte.ID WHERE (QWerte.[" & xAchse & "] = " & xWert & ")"
+                Else
+                    'xAchse und yAchse sind beides QWerte
+                    q = "SELECT OptParameter.* FROM OptParameter INNER JOIN QWerte ON OptParameter.QWert_ID = QWerte.ID WHERE (QWerte.[" & xAchse & "] = " & xWert & " AND QWerte.[" & yAchse & "] = " & yWert & ")"
+                End If
 
-        'Parametersatz übergeben
-        For i As Integer = 0 To Me.List_OptParameter.GetUpperBound(0)
+                adapter = New OleDbDataAdapter(q, db)
 
-            With Me.List_OptParameter(i)
-                .Wert = ds.Tables("OptParameter").Rows(0).Item("'" & .Bezeichnung & "'")
-            End With
+                ds = New DataSet("EVO")
+                numrows = adapter.Fill(ds, "OptParameter")
 
-        Next
+                'Anzahl Übereinstimmungen überprüfen
+                If (numrows = 0) Then
+                    MsgBox("Es wurde keine Übereinstimmung in der Datenbank gefunden!", MsgBoxStyle.Exclamation, "Problem")
+                    Return False
+                ElseIf (numrows > 1) Then
+                    MsgBox("Es wurden mehr als eine Entsprechung von OptParametern für den gewählten Punkt gefunden!" & Chr(13) & Chr(10) & "Es wird nur das erste Ergebnis verwendet!", MsgBoxStyle.Exclamation, "Problem")
+                End If
 
-        Call db_disconnect()
+                'OptParametersatz übernehmen
+                For i As Integer = 0 To Me.List_OptParameter.GetUpperBound(0)
+                    With Me.List_OptParameter(i)
+                        .Wert = ds.Tables("OptParameter").Rows(0).Item(.Bezeichnung)
+                    End With
+                Next
 
-    End Sub
+                'Modellparameter schreiben
+                Call Me.Write_ModellParameter()
 
-    'Einen Pfad auslesen
-    '*******************
-    Public Sub db_getPfad(ByVal id As Integer)
 
-        Call db_connect()
+            Case "CES"
 
-        Dim q As String = "SELECT * FROM Pfad WHERE ID = " & id
+                q = "SELECT Pfad.* FROM Pfad INNER JOIN QWerte ON Pfad.QWert_ID = QWerte.ID WHERE (QWerte.[" & xAchse & "] = " & xWert & " AND QWerte.[" & yAchse & "] = " & yWert & ")"
 
-        Dim adapter As OleDbDataAdapter = New OleDbDataAdapter(q, db)
+                adapter = New OleDbDataAdapter(q, db)
 
-        Dim ds As New DataSet("EVO")
-        adapter.Fill(ds, "Pfad")
+                ds = New DataSet("EVO")
+                numrows = adapter.Fill(ds, "Pfad")
 
-        'Parametersatz übergeben
-        For i As Integer = 0 To Me.Aktuelle_Massnahmen.GetUpperBound(0)
+                'Anzahl Übereinstimmungen überprüfen
+                If (numrows = 0) Then
+                    MsgBox("Es wurde keine Übereinstimmung in der Datenbank gefunden!", MsgBoxStyle.Exclamation, "Problem")
+                    Return False
+                ElseIf (numrows > 1) Then
+                    MsgBox("Es wurden mehr als eine Entsprechung von Pfaden für den gewählten Punkt gefunden!" & Chr(13) & Chr(10) & "Es wird nur das erste Ergebnis verwendet!", MsgBoxStyle.Exclamation, "Problem")
+                End If
 
-            Aktuelle_Massnahmen(i) = ds.Tables("Pfad").Rows(0).Item(List_Locations(i).Name)
+                'Pfad übernehmen
+                For i As Integer = 0 To Me.Aktuelle_Massnahmen.GetUpperBound(0)
+                    Me.Aktuelle_Massnahmen(i) = ds.Tables("Pfad").Rows(0).Item(List_Locations(i).Name)
+                Next
 
-        Next
+                'Bereitet das BlaueModell für die Kombinatorik vor
+                Call Me.PREPARE_Evaluation_CES()
 
-        Call db_disconnect()
 
-    End Sub
+            Case "CES + PES"
 
-    'Erstmal die DB ID aus den Qualitätswertn holen
-    Public Function db_get_ID_QWert(ByVal xWert As Double, ByVal yWert As Double) As Integer
+                q = "SELECT OptParameter.*, Pfad.* FROM (Rel_Pfad_OptParameter INNER JOIN Pfad ON Rel_Pfad_OptParameter.Pfad_ID = Pfad.ID) INNER JOIN (OptParameter INNER JOIN QWerte ON OptParameter.QWert_ID = QWerte.ID) ON Rel_Pfad_OptParameter.OptParameter_ID = OptParameter.ID WHERE (QWerte.[" & xAchse & "] = " & xWert & " AND QWerte.[" & yAchse & "] = " & yWert & ")"
 
-        Call db_connect()
+                adapter = New OleDbDataAdapter(q, db)
 
-        Dim q As String = "SELECT ID FROM QWerte WHERE ['" & List_OptZiele(0).Bezeichnung & "']=" & xWert & " AND ['" & List_OptZiele(1).Bezeichnung & "']=" & yWert
+                ds = New DataSet("EVO")
+                adapter.Fill(ds, "OptParameter")
+                adapter.Fill(ds, "Pfad")
 
-        Dim adapter As OleDbDataAdapter = New OleDbDataAdapter(q, db)
+                'Anzahl Übereinstimmungen überprüfen
+                numrows = ds.Tables("OptParameter").Rows.Count
 
-        Dim ds As New DataSet("EVO")
-        adapter.Fill(ds, "QWerteID")
+                If (numrows = 0) Then
+                    MsgBox("Es wurde keine Übereinstimmung in der Datenbank gefunden!", MsgBoxStyle.Exclamation, "Problem")
+                    Return False
+                ElseIf (numrows > 1) Then
+                    MsgBox("Es wurden mehr als eine Entsprechung von OptParametern / Pfad für den gewählten Punkt gefunden!" & Chr(13) & Chr(10) & "Es wird nur das erste Ergebnis verwendet!", MsgBoxStyle.Exclamation, "Problem")
+                End If
 
-        'Parametersatz übergeben
+                'Pfad übernehmen
+                For i As Integer = 0 To Me.Aktuelle_Massnahmen.GetUpperBound(0)
+                    Me.Aktuelle_Massnahmen(i) = ds.Tables("Pfad").Rows(0).Item(List_Locations(i).Name)
+                Next
 
-        db_get_ID_QWert = ds.Tables("QWerteID").Rows(0).Item("ID")
+                'Bereitet das BlaueModell für die Kombinatorik vor
+                Call Me.PREPARE_Evaluation_CES()
 
-        Call db_disconnect()
+                'OptParameter reduzieren
+                Me.Reduce_OptPara_ModPara()
 
-    End Function
+                'OptParametersatz übernehmen
+                For i As Integer = 0 To Me.List_OptParameter.GetUpperBound(0)
+                    With Me.List_OptParameter(i)
+                        .Wert = ds.Tables("OptParameter").Rows(0).Item(.Bezeichnung)
+                    End With
+                Next
 
-    'Erstmal die DB ID aus den Qualitätswertn holen
-    Public Function db_get_ID_Pfad(ByVal QWert_ID As Integer) As Integer
+                'Modellparameter schreiben
+                Call Me.Write_ModellParameter()
 
-        Call db_connect()
-
-        Dim q As String = "SELECT Pfad_ID FROM Rel_Pfad_OptParameter WHERE OptParameter_ID=" & QWert_ID
-
-        Dim adapter As OleDbDataAdapter = New OleDbDataAdapter(q, db)
-
-        Dim ds As New DataSet("EVO")
-        adapter.Fill(ds, "PfadID")
-
-        'Parametersatz übergeben
-
-        db_get_ID_Pfad = ds.Tables("PfadID").Rows(0).Item("Pfad_ID")
+        End Select
 
         Call db_disconnect()
 
