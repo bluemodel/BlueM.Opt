@@ -230,7 +230,9 @@ Partial Class Form1
             'Mauszeiger busy
             Cursor = System.Windows.Forms.Cursors.WaitCursor
 
+            'Methode setzen und an Sim übergeben
             Me.Method = ComboBox_Methode.SelectedItem
+            Sim1.Method = Me.Method
 
             Select Case Me.Method
 
@@ -245,9 +247,6 @@ Partial Class Form1
                 Case METH_RESET 'Methode Reset
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'Methode setzen
-                    Sim1.Method = METH_RESET
-
                     'Ergebnisdatenbank ausschalten
                     Sim1.Ergebnisdb = False
 
@@ -261,9 +260,6 @@ Partial Class Form1
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     SensiPlot1 = New SensiPlot
-
-                    'Methode setzen
-                    Sim1.Method = METH_SENSIPLOT
 
                     'Ergebnisdatenbank einschalten
                     Sim1.Ergebnisdb = True
@@ -296,9 +292,6 @@ Partial Class Form1
 
                     'EVO_Einstellungen aktivieren
                     EVO_Settings1.Enabled = True
-
-                    'Methode setzen
-                    Sim1.Method = METH_PES
 
                     'Ergebnisdatenbank einschalten
                     Sim1.Ergebnisdb = True
@@ -333,16 +326,10 @@ Partial Class Form1
                     'Fallunterscheidung CES oder CES_PES
                     Select Case Me.Method
                         Case METH_CES
-                            'Methode setzen
-                            Sim1.Method = METH_CES
-
                             'CES für Sim vorbereiten (Files lesen und Validieren)
                             Call Sim1.read_and_valid_INI_Files_CES()
 
                         Case METH_CES_PES, METH_HYBRID
-                            'Methode setzen
-                            Sim1.Method = METH_CES_PES
-
                             'EVO_Einstellungen aktiviern
                             EVO_Settings1.Enabled = True
 
@@ -530,7 +517,7 @@ Partial Class Form1
         'Wave deklarieren
         Dim Wave1 As New Wave.Wave
 
-        Dim i, j, n As Integer
+        Dim i, j As Integer
 
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
@@ -556,7 +543,6 @@ Partial Class Form1
         '-------------------
         Randomize()
 
-        n = 0
         'Äussere Schleife (2. OptParameter)
         '----------------------------------
         For i = 0 To ((SensiPlot1.Anz_Steps - 1) * (Me.globalAnzPar - 1))
@@ -614,10 +600,8 @@ Partial Class Form1
 
                 'Qualitätswerte und OptParameter in DB speichern
                 If (Sim1.Ergebnisdb = True) Then
-                    Call Sim1.db_update(n, 1)
+                    Call Sim1.db_update()
                 End If
-
-                n += 1
 
                 System.Windows.Forms.Application.DoEvents()
 
@@ -1025,7 +1009,7 @@ GenerierenAusgangswerte:
                                 Call Sim1.PREPARE_Evaluation_PES(myPara)
 
                                 'Simulation und Evaluierung
-                                If Not Sim1.SIM_Evaluierung_PES(durchlauf, ipop, QN, RN) Then
+                                If Not Sim1.SIM_Evaluierung_PES(QN, RN) Then
                                     GoTo GenerierenAusgangswerte
                                 End If
 
@@ -1322,11 +1306,6 @@ GenerierenAusgangswerte:
     '***************************
     Public Sub showWave(ByVal sender As Object, ByVal s As Steema.TeeChart.Styles.Series, ByVal valueIndex As Integer, ByVal e As System.Windows.Forms.MouseEventArgs)
 
-        'Die X uns Y werte aus der dem Punkt mit der ValueID organisiert
-        Dim xWert, yWert As Double
-        xWert = s.XValues(valueIndex)
-        yWert = s.YValues(valueIndex)
-
         'Notwendige Bedingungen überprüfen
         '---------------------------------
         If (IsNothing(Sim1)) Then
@@ -1341,155 +1320,135 @@ GenerierenAusgangswerte:
 
         Else
 
-            'Unterscheidung für die Methoden
-            '*******************************
-            Dim db_ID_QWert As Integer
-            Dim db_ID_Pfad As Integer
+            'Punkt-Informationen bestimmen
+            '-----------------------------
+            'X und Y Werte
+            Dim xWert, yWert As Double
+            xWert = s.XValues(valueIndex)
+            yWert = s.YValues(valueIndex)
+            'X und Y Achsen (Zielfunktionen)
+            Dim xAchse, yAchse As String
+            xAchse = Me.DForm.Diag.Chart.Axes.Bottom.Title.Caption
+            yAchse = Me.DForm.Diag.Chart.Axes.Left.Title.Caption
+
+            'Parametersatz aus der DB übernehmen
+            '-----------------------------------
+            Dim i As Integer
+            Dim isOK As Boolean
             Dim res As MsgBoxResult
-            'String für die Anzeige der OptParameter oder Pfade
-            Dim MsgString As String = ""
+            Dim MsgString As String = ""            'String für die Anzeige der OptParameter oder Pfade
 
-            Select Case Method
-                Case METH_PES
+            isOK = Sim1.db_getPara(xAchse, xWert, yAchse, yWert)
 
-                    Dim i As Integer
+            If (isOK) Then
 
-                    'Bestimmung der DB_ID durch x und y Werte
-                    db_ID_QWert = Sim1.db_get_ID_QWert(xWert, yWert)
+                'Unterscheidung für die Methoden
+                '-------------------------------
+                Select Case Me.Method
 
-                    'OptParameter aus DB lesen
-                    Call Sim1.db_getOptPara(db_ID_QWert)
+                    Case METH_PES, METH_SENSIPLOT
 
-                    'Modellparameter schreiben
-                    Call Sim1.Write_ModellParameter()
+                        'String für die Anzeige der OptParameter wird generiert
+                        MsgString = Chr(13) & Chr(10) & "OptParameter: " & Chr(13) & Chr(10)
+                        For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
+                            With Sim1.List_OptParameter(i)
+                                MsgString &= Chr(13) & Chr(10) & .Bezeichnung & ": " & .Wert.ToString()
+                            End With
+                        Next
 
-                    'String für die Anzeige der OptParameter wird generiert
-                    MsgString = Chr(13) & Chr(10) & "OptParameter: " & Chr(13) & Chr(10)
-                    For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
-                        With Sim1.List_OptParameter(i)
-                            MsgString &= Chr(13) & Chr(10) & .Bezeichnung & ": " & .Wert.ToString()
+
+                    Case METH_CES
+
+                        'String für die Anzeige der Pfade wird generiert
+                        MsgString = Chr(13) & Chr(10) & "Pfad: " & Chr(13) & Chr(10)
+                        For i = 0 To Sim1.Aktuelle_Massnahmen.GetUpperBound(0)
+                            MsgString &= Chr(13) & Chr(10) & Sim1.List_Locations(i).Name & ": " & Sim1.Aktuelle_Massnahmen(i).ToString()
+                        Next
+
+
+                    Case METH_CES_PES
+
+                        'String für die Anzeige von Pfad/OptParameter wird generiert
+                        MsgString = Chr(13) & Chr(10) & "Pfad: " & Chr(13) & Chr(10)
+                        For i = 0 To Sim1.Aktuelle_Massnahmen.GetUpperBound(0)
+                            MsgString &= Chr(13) & Chr(10) & Sim1.List_Locations(i).Name & ": " & Sim1.Aktuelle_Massnahmen(i).ToString()
+                        Next
+                        MsgString &= Chr(13) & Chr(10) & Chr(13) & Chr(10) & "OptParameter: " & Chr(13) & Chr(10)
+                        For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
+                            With Sim1.List_OptParameter(i)
+                                MsgString &= Chr(13) & Chr(10) & .Bezeichnung & ": " & .Wert.ToString()
+                            End With
+                        Next
+
+                End Select
+
+                'MessageBox
+                res = MsgBox("Diesen Parametersatz simulieren?" & Chr(13) & Chr(10) & MsgString, MsgBoxStyle.OkCancel, "Info")
+
+                If (res = MsgBoxResult.Ok) Then
+
+                    'Simulation ausführen
+                    'xxxxxxxxxxxxxxxxxxxx
+
+                    Dim SimSeries As New Collection                 'zu zeichnende Simulationsgrößen
+                    Dim RefSeries As New Collection                 'zu zeichnende Referenzreihen
+                    Dim QWertString As String                       'String für die Anzeige der QWerte
+
+                    'Simulieren
+                    Sim1.launchSim()
+
+                    'Wave instanzieren
+                    Dim Wave1 As New Wave.Wave
+
+                    QWertString = "QWerte: " & Chr(13) & Chr(10)
+
+                    'zu zeichnenden Reihen aus Liste der OptZiele raussuchen
+                    For i = 0 To Sim1.List_OptZiele.GetUpperBound(0)
+
+                        With Sim1.List_OptZiele(i)
+
+                            'Qualitätswert berechnen und an String anhängen
+                            .QWertTmp = Sim1.QWert(Sim1.List_OptZiele(i))
+                            QWertString &= Chr(13) & Chr(10) & .Bezeichnung & ": " & .QWertTmp.ToString()
+
+                            'Name der WEL-Simulationsergebnisdatei
+                            'BUG 137: Name der Ergebnisdatei
+                            Dim WELFile As String = ""
+                            If (Anwendung = ANW_BLUEM) Then
+                                WELFile = Sim1.WorkDir & Sim1.Datensatz & ".WEL"
+                            ElseIf (Anwendung = ANW_SMUSI) Then
+                                WELFile = Sim1.WorkDir & .SimGr.Substring(0, 4) & "_WEL.ASC"
+                            End If
+
+                            'Simulationsgrößen nur jeweils ein Mal zeichnen
+                            If (Not SimSeries.Contains(.SimGr)) Then
+                                SimSeries.Add(.SimGr, .SimGr)
+                                'Simulationsergebnis in Wave laden
+                                Wave1.Import_WEL(WELFile, .SimGr)
+                            End If
+
+                            'ggf. Referenzreihe in Wave speichern
+                            If (.ZielTyp = "Reihe" Or .ZielTyp = "IHA") Then
+                                'Referenzreihen nur jeweils ein Mal zeichnen
+                                If (Not RefSeries.Contains(.ZielReiheDatei & .ZielGr)) Then
+                                    RefSeries.Add(.ZielGr, .ZielReiheDatei & .ZielGr)
+                                    'Referenzreihe in Wave laden
+                                    Wave1.Display_Series(.ZielReihe)
+                                End If
+                            End If
+
                         End With
                     Next
 
-                    'MessageBox
-                    res = MsgBox("Diesen Parametersatz simulieren?" & Chr(13) & Chr(10) & MsgString, MsgBoxStyle.OkCancel, "Info")
+                    'Annotation anzeigen
+                    Dim anno1 As New Steema.TeeChart.Tools.Annotation(Wave1.TChart1.Chart)
+                    anno1.Text = QWertString & Chr(13) & Chr(10) & MsgString
+                    anno1.Position = Steema.TeeChart.Tools.AnnotationPositions.LeftTop
 
-                Case METH_CES
-                    Dim i As Integer
+                    'Wave anzeigen
+                    Call Wave1.Show()
 
-                    'Bestimmung der DB_ID durch x und y werte
-                    db_ID_QWert = Sim1.db_get_ID_QWert(xWert, yWert)
-
-                    'Pfad aus DB lesen
-                    Call Sim1.db_getPfad(db_ID_QWert)
-
-                    'Bereitet das BlaueModell für die Kombinatorik vor
-                    Call Sim1.PREPARE_Evaluation_CES()
-
-                    'String für die Anzeige der Pfade wird generiert
-                    MsgString = Chr(13) & Chr(10) & "Pfad: " & Chr(13) & Chr(10)
-                    For i = 0 To Sim1.Aktuelle_Massnahmen.GetUpperBound(0)
-                        MsgString &= Chr(13) & Chr(10) & Sim1.List_Locations(i).Name & ": " & Sim1.Aktuelle_Massnahmen(i).ToString()
-                    Next
-
-                    'MessageBox
-                    res = MsgBox("Diesen Pfad simulieren?" & Chr(13) & Chr(10) & MsgString, MsgBoxStyle.OkCancel, "Info")
-
-                Case METH_CES_PES
-
-                    Dim i As Integer
-
-                    'Bestimmung der DB_ID durch x und y werte
-                    db_ID_QWert = Sim1.db_get_ID_QWert(xWert, yWert)
-                    db_ID_Pfad = Sim1.db_get_ID_Pfad(db_ID_QWert)
-
-                    'Pfad und Parameter aus DB lesen
-                    Call Sim1.db_getOptPara(db_ID_QWert)
-                    Call Sim1.db_getPfad(db_ID_Pfad)
-
-                    'Bereitet das BlaueModell für die Kombinatorik vor
-                    Call Sim1.PREPARE_Evaluation_CES()
-                    'Modellparameter schreiben
-                    Call Sim1.Write_ModellParameter()
-
-                    'String für die Anzeige der Pfade wird generiert
-                    MsgString = Chr(13) & Chr(10) & "Pfad: " & Chr(13) & Chr(10)
-                    For i = 0 To Sim1.Aktuelle_Massnahmen.GetUpperBound(0)
-                        MsgString &= Chr(13) & Chr(10) & Sim1.List_Locations(i).Name & ": " & Sim1.Aktuelle_Massnahmen(i).ToString()
-                    Next
-                    'MsgString &= Chr(13) & Chr(10) & "OptParameter: " & Chr(13) & Chr(10)
-                    'For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
-                    '    With Sim1.List_OptParameter(i)
-                    '        MsgString &= Chr(13) & Chr(10) & .Bezeichnung & ": " & .Wert.ToString()
-                    '    End With
-                    'Next
-
-                    'MessageBox
-                    res = MsgBox("Diesen Pfad simulieren?" & Chr(13) & Chr(10) & MsgString, MsgBoxStyle.OkCancel, "Info")
-
-            End Select
-
-
-            If (res = MsgBoxResult.Ok) Then
-
-                Dim SimSeries As New Collection                 'zu zeichnende Simulationsgrößen
-                Dim RefSeries As New Collection                 'zu zeichnende Referenzreihen
-                Dim QWertString As String                       'String für die Anzeige der QWerte
-
-                'Simulieren
-                Sim1.launchSim()
-
-                'Wave instanzieren
-                Dim Wave1 As New Wave.Wave
-
-                QWertString = "QWerte: " & Chr(13) & Chr(10)
-
-                'zu zeichnenden Reihen aus Liste der OptZiele raussuchen
-                Dim i As Integer
-                For i = 0 To Sim1.List_OptZiele.GetUpperBound(0)
-
-                    With Sim1.List_OptZiele(i)
-
-                        'Qualitätswert berechnen und an String anhängen
-                        .QWertTmp = Sim1.QWert(Sim1.List_OptZiele(i))
-                        QWertString &= Chr(13) & Chr(10) & .Bezeichnung & ": " & .QWertTmp.ToString()
-
-                        'Name der WEL-Simulationsergebnisdatei
-                        'BUG 137: Name der Ergebnisdatei
-                        Dim WELFile As String = ""
-                        If (Anwendung = ANW_BLUEM) Then
-                            WELFile = Sim1.WorkDir & Sim1.Datensatz & ".WEL"
-                        ElseIf (Anwendung = ANW_SMUSI) Then
-                            WELFile = Sim1.WorkDir & .SimGr.Substring(0, 4) & "_WEL.ASC"
-                        End If
-
-                        'Simulationsgrößen nur jeweils ein Mal zeichnen
-                        If (Not SimSeries.Contains(.SimGr)) Then
-                            SimSeries.Add(.SimGr, .SimGr)
-                            'Simulationsergebnis in Wave laden
-                            Wave1.Import_WEL(WELFile, .SimGr)
-                        End If
-
-                        'ggf. Referenzreihe in Wave speichern
-                        If (.ZielTyp = "Reihe" Or .ZielTyp = "IHA") Then
-                            'Referenzreihen nur jeweils ein Mal zeichnen
-                            If (Not RefSeries.Contains(.ZielReiheDatei & .ZielGr)) Then
-                                RefSeries.Add(.ZielGr, .ZielReiheDatei & .ZielGr)
-                                'Referenzreihe in Wave laden
-                                Wave1.Display_Series(.ZielReihe)
-                            End If
-                        End If
-
-                    End With
-                Next
-
-                'Annotation anzeigen
-                Dim anno1 As New Steema.TeeChart.Tools.Annotation(Wave1.TChart1.Chart)
-                anno1.Text = QWertString & Chr(13) & Chr(10) & MsgString
-                anno1.Position = Steema.TeeChart.Tools.AnnotationPositions.LeftTop
-
-                'Wave anzeigen
-                Call Wave1.Show()
+                End If
 
             End If
 
@@ -1511,9 +1470,6 @@ GenerierenAusgangswerte:
 
             'Neuen DB-Pfad speichern
             Sim1.db_path = Me.OpenFileDialog_MDB.FileName
-
-            'Methode zurücksetzen, damit die ausgewählte DB später nicht überschrieben wird
-            Me.ComboBox_Methode.SelectedItem = ""
 
             'Daten einlesen
             Cursor = Cursors.WaitCursor
