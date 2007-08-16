@@ -440,7 +440,7 @@ ES_GET_SCHRITTWEITE_ERROR:
         ReDim Db(PES_Initial.varanz, PES_Settings.NEltern, PES_Settings.NPopul)
         ReDim Xb(PES_Initial.varanz, PES_Settings.NEltern, PES_Settings.NPopul)
         ReDim Qb(PES_Settings.NEltern, PES_Settings.NPopul, PES_Initial.NPenalty)
-        ReDim Rb(PES_Settings.NEltern, PES_Settings.NPopul, PES_Initial.NPenalty)
+        ReDim Rb(PES_Settings.NEltern, PES_Settings.NPopul, PES_Initial.NConstrains)
         '---------------------
         'NDSorting wird nur benötigt, falls eine Paretofront approximiert wird
         If PES_Settings.is_MO_Pareto Then
@@ -467,7 +467,7 @@ ES_GET_SCHRITTWEITE_ERROR:
                     Qb(n, m, l) = 1.0E+300
                 Next l
                 If PES_Initial.NConstrains > 0 Then
-                    For l = 1 To PES_Initial.NPenalty
+                    For l = 1 To PES_Initial.NConstrains
                         'Restriktion der Eltern (Anzahl = parents) wird auf sehr kleinen Wert gesetzt
                         Rb(n, m, l) = -1.0E+300
                     Next l
