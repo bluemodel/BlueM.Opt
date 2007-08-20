@@ -21,7 +21,7 @@ Partial Class Form1
     Private components As System.ComponentModel.IContainer
     Public ToolTip1 As System.Windows.Forms.ToolTip
     Public WithEvents EVO_Opt_Verlauf1 As EVO_Opt_Verlauf
-    Public WithEvents EVO_Einstellungen1 As EVO_Einstellungen
+    Public WithEvents EVO_Settings1 As EVO_Einstellungen
     Public WithEvents Button_Start As System.Windows.Forms.Button
     'Hinweis: Die folgende Prozedur wird vom Windows Form-Designer benötigt.
     'Das Verändern mit dem Windows Form-Designer ist nicht möglich.
@@ -38,9 +38,9 @@ Partial Class Form1
         Me.ComboBox_Methode = New System.Windows.Forms.ComboBox
         Me.Label_Anwendung = New System.Windows.Forms.Label
         Me.ComboBox_Anwendung = New System.Windows.Forms.ComboBox
-        Me.EVO_Opt_Verlauf1 = New EVO_Opt_Verlauf
-        Me.EVO_Einstellungen1 = New EVO_Einstellungen
-        Me.Testprobleme1 = New Testprobleme
+        Me.EVO_Opt_Verlauf1 = New Main.EVO_Opt_Verlauf
+        Me.EVO_Settings1 = New Main.EVO_Einstellungen
+        Me.Testprobleme1 = New Main.Testprobleme
         Me.OpenFileDialog_Datensatz = New System.Windows.Forms.OpenFileDialog
         Me.OpenFileDialog_MDB = New System.Windows.Forms.OpenFileDialog
         Me.DForm = New Main.DiagrammForm
@@ -86,6 +86,7 @@ Partial Class Form1
         '
         'Button_Scatterplot
         '
+        Me.Button_Scatterplot.Enabled = False
         Me.Button_Scatterplot.Image = Global.Main.My.Resources.Resources.scatterplot
         Me.Button_Scatterplot.Location = New System.Drawing.Point(546, 656)
         Me.Button_Scatterplot.Name = "Button_Scatterplot"
@@ -162,14 +163,16 @@ Partial Class Form1
         '
         'EVO_Einstellungen1
         '
-        Me.EVO_Einstellungen1.Location = New System.Drawing.Point(8, 187)
-        Me.EVO_Einstellungen1.Name = "EVO_Einstellungen1"
-        Me.EVO_Einstellungen1.OptModus = CType(0, Short)
-        Me.EVO_Einstellungen1.Size = New System.Drawing.Size(225, 585)
-        Me.EVO_Einstellungen1.TabIndex = 2
+        Me.EVO_Settings1.Enabled = False
+        Me.EVO_Settings1.Location = New System.Drawing.Point(8, 187)
+        Me.EVO_Settings1.Name = "EVO_Einstellungen1"
+        Me.EVO_Settings1.OptModus = CType(0, Short)
+        Me.EVO_Settings1.Size = New System.Drawing.Size(225, 585)
+        Me.EVO_Settings1.TabIndex = 2
         '
         'Testprobleme1
         '
+        Me.Testprobleme1.Enabled = False
         Me.Testprobleme1.Location = New System.Drawing.Point(5, 68)
         Me.Testprobleme1.Name = "Testprobleme1"
         Me.Testprobleme1.Size = New System.Drawing.Size(225, 121)
@@ -203,7 +206,7 @@ Partial Class Form1
         Me.Controls.Add(Me.Testprobleme1)
         Me.Controls.Add(Me.GroupBox_Anwendung)
         Me.Controls.Add(Me.EVO_Opt_Verlauf1)
-        Me.Controls.Add(Me.EVO_Einstellungen1)
+        Me.Controls.Add(Me.EVO_Settings1)
         Me.Controls.Add(Me.DForm)
         Me.Cursor = System.Windows.Forms.Cursors.Default
         Me.Location = New System.Drawing.Point(100, 100)

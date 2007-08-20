@@ -83,6 +83,7 @@
     <Reference Include="System.Drawing">
       <Name>System.Drawing</Name>
     </Reference>
+    <Reference Include="System.Management" />
     <Reference Include="System.Windows.Forms">
       <Name>System.Windows.Forms</Name>
     </Reference>
@@ -148,6 +149,12 @@
     <Compile Include="Diagramm\DiagrammForm.vb">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="Diagramm\ScatterplotAbfrage.Designer.vb">
+      <DependentUpon>ScatterplotAbfrage.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Diagramm\ScatterplotAbfrage.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="EVOMOD.vb" />
     <Compile Include="EVO_Einstellungen.Designer.vb">
       <DependentUpon>EVO_Einstellungen.vb</DependentUpon>
@@ -181,12 +188,6 @@
     <Compile Include="Diagramm\Scatterplot.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Diagramm\Wave.Designer.vb">
-      <DependentUpon>Wave.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Diagramm\Wave.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <EmbeddedResource Include="Apps\SensiPlot.resx">
       <DependentUpon>SensiPlot.vb</DependentUpon>
       <SubType>Designer</SubType>
@@ -198,6 +199,10 @@
     <EmbeddedResource Include="Diagramm\DiagrammForm.resx">
       <SubType>Designer</SubType>
       <DependentUpon>DiagrammForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Diagramm\ScatterplotAbfrage.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>ScatterplotAbfrage.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="EVO_Einstellungen.resX">
       <DependentUpon>EVO_Einstellungen.vb</DependentUpon>
@@ -222,10 +227,6 @@
       <SubType>Designer</SubType>
       <DependentUpon>Scatterplot.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Diagramm\Wave.resx">
-      <DependentUpon>Wave.vb</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\icon_excel.png" />
@@ -235,6 +236,12 @@
     <None Include="Resources\icon_edit.png" />
     <Content Include="Resources\icon_teechart.png" />
     <None Include="Resources\scatterplot.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Wave\Wave.vbproj">
+      <Project>{BCD1BBE3-5AB2-4C3F-AC12-43EB977C6F6F}</Project>
+      <Name>Wave</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>

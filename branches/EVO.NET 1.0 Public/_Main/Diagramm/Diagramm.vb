@@ -7,6 +7,17 @@ Public Class Diagramm
             Public Max as Double
     End Structure
 
+    'TeeChart zurücksetzen
+    '*********************
+    Public Sub Reset()
+        With Me
+            .Clear()
+            .Header.Text = "EVO"
+            .Chart.Axes.Bottom.Title.Caption = ""
+            .Chart.Axes.Left.Title.Caption = ""
+        End With
+    End Sub
+
     'TeeChart Initialisierung (Titel und Achsen)
     '*******************************************
     Public Sub DiagInitialise(ByVal Titel As String, ByVal Achsen As Collection)
@@ -75,59 +86,6 @@ Public Class Diagramm
 
     End Sub
 
-    'Serien-Initialisierung für SingleObjective
-    '******************************************
-    Public Sub prepareSeries_SO(ByVal n_Populationen As Integer)
-
-        Dim i As Integer
-
-        'Series(0): Anfangswert
-        Dim tmpSeries As New Steema.TeeChart.Styles.Points(Me.Chart)
-        tmpSeries.Title = "Anfangswert"
-        tmpSeries.Color = System.Drawing.Color.Red
-        tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-        tmpSeries.Pointer.HorizSize = 3
-        tmpSeries.Pointer.VertSize = 3
-
-        'Series(1 bis n): Für jede Population eine Series
-        For i = 1 To n_Populationen
-            tmpSeries = New Steema.TeeChart.Styles.Points(Me.Chart)
-            tmpSeries.Title = "Population " & i.ToString()
-            tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            tmpSeries.Pointer.HorizSize = 2
-            tmpSeries.Pointer.VertSize = 2
-            tmpSeries.Cursor = Cursors.Hand
-        Next
-
-        Call Me.add_MarksTips()
-
-    End Sub
-
-    'Serien-Initialisierung für MultiObjective
-    '*****************************************
-    Public Sub prepareSeries_MO()
-
-        'Series(0): Series für die Population.
-        Dim tmpSeries As New Steema.TeeChart.Styles.Points(Me.Chart)
-        tmpSeries.Title = "Population"
-        tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-        tmpSeries.Color = System.Drawing.Color.Orange
-        tmpSeries.Pointer.HorizSize = 2
-        tmpSeries.Pointer.VertSize = 2
-        tmpSeries.Cursor = Cursors.Hand
-
-        'Series(1): Series für die Sekundäre Population
-        tmpSeries = New Steema.TeeChart.Styles.Points(Me.Chart)
-        tmpSeries.Title = "Sekundäre Population"
-        tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-        tmpSeries.Color = System.Drawing.Color.Blue
-        tmpSeries.Pointer.HorizSize = 3
-        tmpSeries.Pointer.VertSize = 3
-
-        Call Me.add_MarksTips()
-
-    End Sub
-
     'MarksTips zu Serien hinzufügen
     '******************************
     Public Sub add_MarksTips()
@@ -181,15 +139,15 @@ Public Class Diagramm
 
             'S0: Die Ausgangs- oder Ziellinien
             Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-            Line1.Title = "Ausgangs-/Ziellinie"
+            Line1.Title = "Sinusfunktion"
             Line1.Add(array_x, array_y)
             Line1.Brush.Color = System.Drawing.Color.Red
             Line1.ClickableLine = True
 
             'S1: Generieren der Series für die Populationen
             Populationen = 1
-            If EVO_Einstellungen1.isPOPUL Then
-                Populationen = EVO_Einstellungen1.NPopul
+            If EVO_Einstellungen1.PES_Settings.isPOPUL Then
+                Populationen = EVO_Einstellungen1.PES_Settings.NPopul
             End If
             For i = 1 To Populationen
                 Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
@@ -223,7 +181,11 @@ Public Class Diagramm
         Dim i As Short
         Dim OptErg() As Double
 
-        Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
+        If EVO_Einstellungen1.PES_Settings.isPOPUL Then
+            Anzahl_Kalkulationen = EVO_Einstellungen1.PES_Settings.NGen * EVO_Einstellungen1.PES_Settings.NNachf * EVO_Einstellungen1.PES_Settings.NRunden + 1
+        Else
+            Anzahl_Kalkulationen = EVO_Einstellungen1.PES_Settings.NGen * EVO_Einstellungen1.PES_Settings.NNachf + 1
+        End If
 
         'Ausgengsergebnisse für die Linien im TeeChart Rechnen
         ReDim OptErg(Anzahl_Kalkulationen)
@@ -255,8 +217,8 @@ Public Class Diagramm
 
             'S1: Generieren der Series für die Populationen
             Populationen = 1
-            If EVO_Einstellungen1.isPOPUL Then
-                Populationen = EVO_Einstellungen1.NPopul
+            If EVO_Einstellungen1.PES_Settings.isPOPUL Then
+                Populationen = EVO_Einstellungen1.PES_Settings.NPopul
             End If
             For i = 1 To Populationen
                 Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
@@ -288,7 +250,11 @@ Public Class Diagramm
         Dim i As Short
         Dim X() As Double
 
-        Anzahl_Kalkulationen = EVO_Einstellungen1.NGen * EVO_Einstellungen1.NNachf
+        If EVO_Einstellungen1.PES_Settings.isPOPUL Then
+            Anzahl_Kalkulationen = EVO_Einstellungen1.PES_Settings.NGen * EVO_Einstellungen1.PES_Settings.NNachf * EVO_Einstellungen1.PES_Settings.NRunden + 1
+        Else
+            Anzahl_Kalkulationen = EVO_Einstellungen1.PES_Settings.NGen * EVO_Einstellungen1.PES_Settings.NNachf + 1
+        End If
 
         'Ausgangsergebnisse für die Linien im TeeChart Rechnen
         ReDim X(globalAnzPar)
@@ -326,8 +292,8 @@ Public Class Diagramm
 
             'S1: Generieren der Series für die Populationen
             Populationen = 1
-            If EVO_Einstellungen1.isPOPUL Then
-                Populationen = EVO_Einstellungen1.NPopul
+            If EVO_Einstellungen1.PES_Settings.isPOPUL Then
+                Populationen = EVO_Einstellungen1.PES_Settings.NPopul
             End If
             For i = 1 To Populationen
                 Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
@@ -355,7 +321,7 @@ Public Class Diagramm
         Dim Populationen As Short
         Dim i, j As Short
 
-        Populationen = EVO_Einstellungen1.NPopul
+        Populationen = EVO_Einstellungen1.PES_Settings.NPopul
 
         With Me
             .Clear()

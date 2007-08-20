@@ -36,42 +36,48 @@ Public Class IHA
     'Eigenschaften
     '#############
 
-    Private IHADir As String                        'Verzeichnis für IHA-Dateien
+    Private IHAZiel As Sim.Struct_OptZiel               'Kopie des OptZiels mit ZielTyp "IHA"
+    Private IHADir As String                            'Verzeichnis für IHA-Dateien
 
     'IHA-Ergebnisse
     '--------------
-    Private Structure IHAParam                      'Struktur für IHA Ergebnis eines Parameters
-        Public PName As String                      'Parametername
-        Public HAMiddle As Double                   'Hydrologic Alteration (HA) - Middle RVA Category
+    Private Structure IHAParam                          'Struktur für IHA Ergebnis eines Parameters
+        Public PName As String                          'Parametername
+        Public HAMiddle As Double                       'Hydrologic Alteration (HA) - Middle RVA Category
+        Public ReadOnly Property fx_HA() As Double      'normalverteilter Funktionswert des HA-Werts
+            Get
+                Return fx(HAMiddle)
+            End Get
+        End Property
     End Structure
 
-    Private Structure IHAParamGroup                 'Struktur für IHA Ergebnis einer Parametergruppe
-        Public No As Short                          'Gruppennummer
-        Public GName As String                      'Gruppennname
-        Public Avg As Double                        'HA-Mittelwert der Gruppe
-        Public IHAParams() As IHAParam              'Liste der Paremeter
+    Private Structure IHAParamGroup                     'Struktur für IHA Ergebnis einer Parametergruppe
+        Public No As Short                              'Gruppennummer
+        Public GName As String                          'Gruppennname
+        Public Avg_fx_HA As Double                      'Mittelwert der fx(HA)-Werte der Gruppe
+        Public IHAParams() As IHAParam                  'Liste der Paremeter
     End Structure
 
-    Private Structure IHAResult                     'Struktur für alle IHA Ergebnisse zusammen
-        Public Avg As Double                        'HA-Mittelwert über alle Gruppen
-        Public IHAParamGroups() As IHAParamGroup    'Liste der Parametergruppen
+    Private Structure IHAResult                         'Struktur für alle IHA Ergebnisse zusammen
+        Public GAvg_fx_HA As Double                     'Mittelwert der fx(HA)-Werte über alle Gruppen
+        Public IHAParamGroups() As IHAParamGroup        'Liste der Parametergruppen
     End Structure
 
     Private IHARes As IHAResult
 
     'IHA-Software-Parameter
     '----------------------
-    Private Const BegWatrYr as Integer = 275        '1. Okt.
+    Private Const BegWatrYr As Integer = 275            '1. Okt.
 
     'Jahreszahlen
     Private BeginPre As Integer
     Private EndPre As Integer
-    Private BeginPost_sim As Integer                'tatsächlich
-    Private EndPost_sim As Integer                  'tatsächlich
-    Private BeginPost As Integer                    'für IHA verwendet
-    Private EndPost As Integer                      'für IHA verwendet
+    Private BeginPost_sim As Integer                    'tatsächlich
+    Private EndPost_sim As Integer                      'tatsächlich
+    Private BeginPost As Integer                        'für IHA verwendet
+    Private EndPost As Integer                          'für IHA verwendet
 
-    Private RefData(,) As Double                    'Enthält die Referenz-Abflussdaten in Zeilen für jeden Tag des Jahres
+    Private RefData(,) As Double                        'Enthält die Referenz-Abflussdaten in Zeilen für jeden Tag des Jahres
 
 #End Region 'Eigenschaften
 
@@ -82,11 +88,14 @@ Public Class IHA
 
     'Konstruktor
     '***********
-    Public Sub New()
+    Public Sub New(ByVal OptZiel As Sim.Struct_OptZiel)
+
+        'IHAZiel kopieren
+        '----------------
+        Me.IHAZiel = OptZiel
 
         'IHA-Parametergruppen definieren
         '-------------------------------
-
         With Me.IHARes
 
             ReDim .IHAParamGroups(4)
@@ -122,12 +131,14 @@ Public Class IHA
 
     'IHA-Berechnung vorbereiten (einmalig)
     '*************************************
-    Public Sub IHA_prepare(ByRef BlueM1 As BlueM)
+    Public Sub prepare_IHA(ByRef BlueM1 As BlueM)
 
-        Me.IHADir = BlueM1.WorkDir & "IHA\"
+        Dim i, j, k As Integer
 
         'IHA-Unterverzeichnis anlegen
         '----------------------------
+        Me.IHADir = BlueM1.WorkDir & "IHA\"
+
         If (Directory.Exists(Me.IHADir) = False) Then
             Directory.CreateDirectory(Me.IHADir)
             'IHA_Batchfor.exe in Verzeichnis kopieren
@@ -150,21 +161,14 @@ Public Class IHA
 
         End If
 
-        Dim i As Integer
-
         'Datume bestimmen
         '-----------------------------
         'Referenz-Zeitreihe raussuchen
-        Dim ZeitReihe(,) As Object = {}
-        For i = 0 To BlueM1.List_OptZiele.GetUpperBound(0)
-            If (BlueM1.List_OptZiele(i).ZielTyp = "IHA") Then
-                ZeitReihe = BlueM1.List_OptZiele(i).ZielReihe
-                Exit For
-            End If
-        Next
+        Dim RefReihe As New Wave.Zeitreihe("")
+        RefReihe = IHAZiel.ZielReihe.copy()
 
         'BeginPre
-        Dim StartDatum As DateTime = ZeitReihe(0, 0)
+        Dim StartDatum As DateTime = RefReihe.XWerte(0)
         If (StartDatum.DayOfYear > BegWatrYr) Then
             Me.BeginPre = StartDatum.Year + 2
         Else
@@ -172,7 +176,7 @@ Public Class IHA
         End If
 
         'EndPre
-        Dim EndDatum As DateTime = ZeitReihe(ZeitReihe.GetUpperBound(0), 0)
+        Dim EndDatum As DateTime = RefReihe.XWerte(RefReihe.Length - 1)
         If (EndDatum.DayOfYear >= BegWatrYr) Then
             Me.EndPre = EndDatum.Year
         Else
@@ -195,12 +199,9 @@ Public Class IHA
         End If
         Me.EndPost = Me.BeginPost + (Me.EndPost_sim - Me.BeginPost_sim)
 
-        'Zeitreihe kürzen und nach RefReihe(,) kopieren
-        '----------------------------------------------
-        Dim cutLength As Integer = (New DateTime(Me.EndPre, 9, 30) - New DateTime(Me.BeginPre - 1, 10, 1)).Days + 1
-        Dim cutBegin As Integer = (New DateTime(Me.BeginPre - 1, 10, 1) - StartDatum).Days
-        Dim RefReihe(cutLength - 1, 1) As Object
-        Array.Copy(ZeitReihe, cutBegin * 2, RefReihe, 0, cutLength * 2)
+        'Zeitreihe kürzen
+        '----------------
+        Call RefReihe.cut(New DateTime(Me.BeginPre - 1, 10, 1), New DateTime(Me.EndPre, 9, 30))
 
         'Referenz-Zeitreihe umformatieren und in RefData(,) speichern
         '---------------------------------------------------------
@@ -216,14 +217,13 @@ Public Class IHA
         Next
 
         'Weitere Zeilen mit Werten füllen
-        Dim j, k As Integer
         i = 0
         k = 0
-        While (i <= RefReihe.GetUpperBound(0))
+        While (i <= RefReihe.Length - 1)
             For j = 1 To 366
-                Me.RefData(j, k) = RefReihe(i, 1)
+                Me.RefData(j, k) = RefReihe.YWerte(i)
                 'bei Nicht-Schaltjahren nach dem 28.Feb. einen Wert auffüllen
-                If (RefReihe(i, 0).DayOfYear = 59 And DateTime.IsLeapYear(RefReihe(i, 0).Year) = False) Then
+                If (RefReihe.XWerte(i).DayOfYear = 59 And DateTime.IsLeapYear(RefReihe.XWerte(i).Year) = False) Then
                     j += 1
                     Me.RefData(j, k) = -999999
                 End If
@@ -318,19 +318,20 @@ Public Class IHA
 
     End Sub
 
-    'IHA-Berechnung ausführen (gibt QWert zurück)
-    '********************************************
-    Public Function calculate_IHA(ByVal simreihe As Object(,)) As Double
+    'IHA-Berechnung ausführen
+    '************************
+    Public Sub calculate_IHA(ByVal WELFile As String)
 
         Dim i, j, k As Integer
-        Dim QWert As Double
+
+        'Simulationsreihe einlesen
+        '-------------------------
+        Dim SimReihe As New Wave.Zeitreihe(Me.IHAZiel.SimGr)
+        Dim WEL As New Wave.WEL(WELFile, Me.IHAZiel.SimGr)
+        SimReihe = WEL.Read_WEL()(0)
 
         'Simulationsreihe entsprechend kürzen
-        Dim Startdatum As DateTime = simreihe(0, 0)
-        Dim cutLength As Integer = (New DateTime(Me.EndPost_sim, 9, 30) - New DateTime(Me.BeginPost_sim - 1, 10, 1)).Days + 1
-        Dim cutBegin As Integer = (New DateTime(Me.BeginPost_sim - 1, 10, 1) - Startdatum).Days
-        Dim PostReihe(cutLength - 1, 1) As Object
-        Array.Copy(simreihe, cutBegin * 2, PostReihe, 0, cutLength * 2)
+        SimReihe.cut(New DateTime(Me.BeginPost_sim - 1, 10, 1), New DateTime(Me.EndPost_sim, 9, 30))
 
         'Data(,) dimensionieren 
         Dim AnzJahre As Integer = Me.EndPost - Me.BeginPost + 1
@@ -355,11 +356,11 @@ Public Class IHA
         'Weitere Zeilen mit Werten füllen
         i = 0
         k = Me.BeginPost - Me.BeginPre
-        While (i <= PostReihe.GetUpperBound(0))
+        While (i <= SimReihe.Length - 1)
             For j = 1 To 366
-                Data(j, k) = PostReihe(i, 1)
+                Data(j, k) = SimReihe.YWerte(i)
                 'bei Nicht-Schaltjahren nach dem 28.Feb. einen Wert auffüllen
-                If (PostReihe(i, 0).DayOfYear = 59 And DateTime.IsLeapYear(PostReihe(i, 0).Year) = False) Then
+                If (SimReihe.XWerte(i).DayOfYear = 59 And DateTime.IsLeapYear(SimReihe.XWerte(i).Year) = False) Then
                     j += 1
                     Data(j, k) = -999999
                 End If
@@ -380,24 +381,49 @@ Public Class IHA
         '-----------------------
         Call read_IHAResults()
 
-        'QWert berechnen
-        '---------------
-        QWert = calculate_QWert()
+    End Sub
+
+    'QWert aus IHA-Ergebnissen berechnen
+    '***********************************
+    Public Function QWert_IHA(ByVal OptZiel As Sim.Struct_OptZiel) As Double
+
+        Dim QWert As Double
+        Dim fx_HA As Double
+        Dim i As Integer
+
+        'fx(HA) Wert bestimmen
+        '-----------------
+        If (OptZiel.ZielFkt = "") Then
+            'fx(HA) Gesamtmittelwert
+            fx_HA = Me.IHARes.GAvg_fx_HA
+        Else
+            'fx(HA) Mittelwert einer Parametergruppe
+            For i = 0 To Me.IHARes.IHAParamGroups.GetUpperBound(0)
+                If (OptZiel.ZielFkt = Me.IHARes.IHAParamGroups(i).GName) Then
+                    fx_HA = Me.IHARes.IHAParamGroups(i).Avg_fx_HA
+                    Exit For
+                End If
+            Next
+        End If
+
+        QWert = 1 - fx_HA
 
         Return QWert
 
     End Function
 
-    'QWert aus IHA-Ergebnissen berechnen
-    '***********************************
-    Private Function calculate_QWert() As Double
+    'Transformiert einen HA-Wert in einen normalverteilten Funktionswert
+    '*******************************************************************
+    Private Shared Function fx(ByVal HA As Double) As Double
 
-        Dim QWert as Double
+        'Parameter für Normalverteilung mit f(0) ~= 1
+        '[EXCEL:] 1/(std*WURZEL(2*PI()))*EXP(-1/2*((X-avg)/std)^2)
+        Dim std As Double = 0.398942423706863                   'Standardabweichung
+        Dim avg As Double = 0                                   'Erwartungswert
 
-        'QWert = (Mittelwert von HA) ^2
-        QWert = IHARes.Avg * IHARes.Avg
+        fx = 1 / (std * Math.Sqrt(2 * Math.PI)) * Math.Exp(-1 / 2 * ((HA - avg) / std) ^ 2)
 
-        Return QWert
+        Return fx
 
     End Function
 
@@ -413,7 +439,7 @@ Public Class IHA
 
         Dim i, j As Integer
         Dim Zeile As String
-        Dim Psum, Gsum As Double
+        Dim Psum, Gsum As Double                        'Summen der fx_HA Werte
 
         'Schleife über Parametergruppen
         '------------------------------
@@ -434,17 +460,17 @@ Public Class IHA
                             Zeile = StrRead.ReadLine.ToString
                             .IHAParams(j).PName = Zeile.Substring(0, 20).Trim
                             .IHAParams(j).HAMiddle = Convert.ToDouble(Zeile.Substring(171, 14).Trim)
-                            Psum += .IHAParams(j).HAMiddle
+                            Psum += .IHAParams(j).fx_HA
                         Next
 
                         Exit Do
                     End If
                 Loop Until StrRead.Peek() = -1
 
-                'Mittelwert einer Parametergruppe berechnen
-                '------------------------------------------
-                .Avg = Psum / .IHAParams.GetLength(0)
-                Gsum += .Avg
+                'Mittelwert für eine Parametergruppe berechnen
+                '---------------------------------------------
+                .Avg_fx_HA = Psum / .IHAParams.GetLength(0)
+                Gsum += .Avg_fx_HA
 
             End With
 
@@ -452,7 +478,7 @@ Public Class IHA
 
         'Mittelwert aller Parametergruppen berechnen
         '-------------------------------------------
-        Me.IHARes.Avg = Gsum / Me.IHARes.IHAParamGroups.GetLength(0)
+        Me.IHARes.GAvg_fx_HA = Gsum / Me.IHARes.IHAParamGroups.GetLength(0)
 
     End Sub
 

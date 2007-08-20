@@ -18,9 +18,11 @@ Public Class SKos
     '*******************************************************************************
     '*******************************************************************************
 
-    Public AktuelleElemente() As Object
+    Public Aktuell_Elemente() As String
 
-    Public Function calculate_costs(ByVal BlueM1 As BlueM)
+    'Funktion für die Kalkulation der Kosten
+    '***************************************
+    Public Function calculate_costs(ByVal BlueM1 As BlueM) As Double
         Dim costs As Double = 0
         Dim Bauwerksliste(0, 1) As Object
         Dim TRS_Array(,) As Object = {}
@@ -38,10 +40,10 @@ Public Class SKos
 
         'Kosten aufsummieren
         Dim i, j As Integer
-        For i = 0 To AktuelleElemente.GetUpperBound(0)
+        For i = 0 To Aktuell_Elemente.GetUpperBound(0)
             For j = 0 To Bauwerksliste.GetUpperBound(0)
-                If Bauwerksliste(j, 0) = AktuelleElemente(i) Then
-                    costs = costs + Bauwerksliste(i, 1)
+                If Bauwerksliste(j, 0) = Aktuell_Elemente(i) Then
+                    costs = costs + Bauwerksliste(j, 1)
                 End If
             Next
         Next
@@ -49,8 +51,9 @@ Public Class SKos
         Return costs
     End Function
     'Funktion zum erstellen der Bauwerksliste
-    Private Sub create_Bauwerksliste(ByVal BlueM1 As BlueM, ByRef Bauwerksliste As Object)
-        Dim Bauwerks_Array() As Object = {}
+    '****************************************
+    Private Sub create_Bauwerksliste(ByVal BlueM1 As BlueM, ByRef Bauwerksliste(,) As Object)
+        Dim Bauwerks_Array() As String = {}
 
         'Kopiert die Bauwerke aus dem BlueM
         Dim i, j, k As Integer
@@ -78,7 +81,7 @@ Public Class SKos
 
     'Hilfsfunktion: Die "X" Einträge werden entfernt
     '***********************************************
-    Public Sub Remove_X(ByRef Array As Object())
+    Public Sub Remove_X(ByRef Array As String())
         Dim x As Integer
         Dim i As Integer
         Dim TmpArray(Array.GetUpperBound(0)) As String
@@ -95,7 +98,7 @@ Public Class SKos
 
     'Länge der Transportstrecken einlesen
     '************************************
-    Private Sub Read_TRS(ByVal BlueM1 As BlueM, ByRef TRS_Array As Object)
+    Private Sub Read_TRS(ByVal BlueM1 As BlueM, ByRef TRS_Array(,) As Object)
 
         'Dim TRS_Array(,) As Object = {}
         Dim Datei As String = BlueM1.WorkDir & BlueM1.Datensatz & ".TRS"
@@ -162,7 +165,7 @@ Public Class SKos
     End Sub
 
     'Volumen der Talsperren einlesen
-    Private Sub Read_TAL(ByVal BlueM1 As BlueM, ByRef TAl_Array As Object)
+    Private Sub Read_TAL(ByVal BlueM1 As BlueM, ByRef TAl_Array(,) As Object)
 
         'Dim TAL_Array(,) As Object = {}
         Dim Datei As String = BlueM1.WorkDir & BlueM1.Datensatz & ".TAL"

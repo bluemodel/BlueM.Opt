@@ -13,7 +13,7 @@ Imports System.IO
 '****                                                                       ****
 '**** Erstellt: Dezember 2006                                               ****
 '****                                                                       ****
-'**** Letzte Änderung: April 2007                                           ****
+'**** Letzte Änderung: Juli 2007                                           ****
 '*******************************************************************************
 '*******************************************************************************
 
@@ -27,6 +27,7 @@ Public Class BlueM
 
     'IHA
     '---
+    Private isIHA as Boolean = False
     Private IHA1 As IHA
 
 #End Region 'Eigenschaften
@@ -45,6 +46,8 @@ Public Class BlueM
         Dim SimStart_str As String = ""
         Dim SimEnde_str As String = ""
         Dim SimDT_str As String = ""
+        Dim Ganglinie As String = ""
+        DIM CSV_Format as String = ""
 
         'ALL-Datei öffnen
         '----------------
@@ -69,6 +72,16 @@ Public Class BlueM
                 SimDT_str = Zeile.Substring(35).Trim
             End If
 
+            'Überprüfen ob die Ganglinien (.WEL Datei) ausgegeben wird
+            If (Zeile.StartsWith(" Ganglinienausgabe ....... [J/N] :")) Then
+                Ganglinie = Zeile.Substring(35).Trim
+            End If
+
+            'Überprüfen ob CSV Format eingeschaltet ist
+            If (Zeile.StartsWith(" ... CSV-Format .......... [J/N] :")) Then
+                CSV_Format = Zeile.Substring(35).Trim
+            End If
+
         Loop Until StrRead.Peek() = -1
 
         'SimStart und SimEnde in echtes Datum konvertieren
@@ -77,6 +90,17 @@ Public Class BlueM
 
         'Zeitschrittweite in echte Dauer konvertieren
         Me.SimDT = New TimeSpan(0, Convert.ToInt16(SimDT_str), 0)
+
+        'Fehlermeldung Ganglinie nicht eingeschaltet
+        If Ganglinie <> "J" Then
+            throw new Exception("Die Ganglinienausgabe (.WEL Datei) ist nicht eingeschaltet. Bitte in .ALL Datei unter 'Ganglinienausgabe' einschalten")
+        End If
+
+        'Fehlermeldung CSv Format nicht eingeschaltet
+        if CSV_Format <> "J" then
+            Throw New Exception("Das CSV Format für die .WEL Datei ist nicht eingeschaltet. Bitte in .ALL unter '... CSV-Format' einschalten.")
+        End If
+
 
     End Sub
 
@@ -90,15 +114,20 @@ Public Class BlueM
         '----------------------------------
         Dim i As Integer
 
-        'IHA
+        'Gibt es eine IHA-Zielfunktion?
         For i = 0 To Me.List_OptZiele.GetUpperBound(0)
             If (Me.List_OptZiele(i).ZielTyp = "IHA") Then
+                'HACK: es wird immer das erste IHA-Ziel verwendet!
+                'IHA-Berechnung einschalten
+                Me.isIHA = True
+                'IHA-Objekt instanziieren
+                Me.IHA1 = New IHA(Me.List_OptZiele(i))
                 'IHA-Berechnung vorbereiten
-                Me.IHA1 = New IHA()
-                Call Me.IHA1.IHA_prepare(Me)
+                Call Me.IHA1.prepare_IHA(Me)
                 Exit For
             End If
         Next
+
 
     End Sub
 
@@ -225,8 +254,9 @@ Public Class BlueM
 
     'BlauesModell ausführen (simulieren)
     '***********************************
-    Public Overrides Sub launchSim()
+    Public Overrides Function launchSim() As Boolean
 
+        Dim simOK As Boolean
         'Aktuelles Verzeichnis bestimmen
         Dim currentDir As String = CurDir()
         'zum Arbeitsverzeichnis wechseln
@@ -243,20 +273,32 @@ Public Class BlueM
         If (File.Exists(WorkDir & "$FEHL.TMP")) Then
 
             'Simulationsfehler aufgetreten
-            Dim DateiInhalt As String = ""
+            simOK = False
 
+            Dim DateiInhalt As String = ""
             Dim FiStr As FileStream = New FileStream(WorkDir & "$fehl.tmp", FileMode.Open, IO.FileAccess.Read)
             Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-
             Do
                 DateiInhalt = DateiInhalt & Chr(13) & Chr(10) & StrRead.ReadLine.ToString
             Loop Until StrRead.Peek() = -1
 
-            Throw New Exception("Das BlaueModell hat einen Fehler zurückgegeben:" & Chr(13) & Chr(10) & DateiInhalt)
+            MsgBox("BlueM hat einen Fehler zurückgegeben:" & Chr(13) & Chr(10) & DateiInhalt, MsgBoxStyle.Exclamation, "BlueM")
+
+        Else
+            'Simulation erfolgreich
+            simOK = True
+
+            'Bei IHA-Berechnung jetzt IHA-Software ausführen
+            '-----------------------------------------------
+            If (Me.isIHA) Then
+                Call Me.IHA1.calculate_IHA(Me.WorkDir & Me.Datensatz & ".WEL")
+            End If
 
         End If
 
-    End Sub
+        Return simOK
+
+    End Function
 
 #End Region 'Evaluierung
 
@@ -266,12 +308,12 @@ Public Class BlueM
     '***************************
     Protected Overrides Function QWert_WEL(ByVal OptZiel As Struct_OptZiel) As Double
 
-        Dim IsOK As Boolean
         Dim QWert As Double
-        Dim SimReihe(,) As Object = {}
 
         'Simulationsergebnis auslesen
-        IsOK = Read_WEL(WorkDir & Datensatz & ".wel", OptZiel.SimGr, SimReihe)
+        Dim SimReihe As New Wave.Zeitreihe(OptZiel.SimGr)
+        Dim WEL As New Wave.WEL(WorkDir & Datensatz & ".wel", OptZiel.SimGr)
+        SimReihe = WEL.Read_WEL()(0)
 
         'Fallunterscheidung Zieltyp
         '--------------------------
@@ -287,7 +329,7 @@ Public Class BlueM
                 QWert = Me.SKos1.calculate_costs(Me)
 
             Case "IHA"
-                QWert = Me.IHA1.calculate_IHA(SimReihe)
+                QWert = Me.IHA1.QWert_IHA(OptZiel)
 
         End Select
 
@@ -304,7 +346,7 @@ Public Class BlueM
 
     'Schreibt die neuen Verzweigungen
     '********************************
-    Protected Overrides Sub Write_Verzweigungen()
+    Protected Overrides Sub Prepare_Write_Verzweigungen()
 
         Dim AnzZeil As Integer
         Dim i, j As Integer
