@@ -1489,6 +1489,16 @@ Public MustInherit Class Sim
                 Next
                 QWert = nUnter / SimReihe.Length * 100
 
+            Case "sUnter"
+                'Summe der Unterschreitungen
+                Dim sUnter As Integer = 0
+                For i = 0 To SimReihe.Length - 1
+                    If (SimReihe.YWerte(i) < OptZiel.ZielReihe.YWerte(i)) Then
+                        sUnter += OptZiel.ZielReihe.YWerte(i) - SimReihe.YWerte(i)
+                    End If
+                Next
+                QWert = sUnter
+
             Case "nÜber"
                 'Relative Anzahl der Zeitschritte mit Überschreitungen (in Prozent)
                 Dim nUeber As Integer = 0
@@ -1498,6 +1508,16 @@ Public MustInherit Class Sim
                     End If
                 Next
                 QWert = nUeber / SimReihe.Length * 100
+
+            Case "sÜber"
+                'Summe der Überschreitungen
+                Dim sUeber As Integer = 0
+                For i = 0 To SimReihe.Length - 1
+                    If (SimReihe.YWerte(i) > OptZiel.ZielReihe.YWerte(i)) Then
+                        sUeber += SimReihe.YWerte(i) - OptZiel.ZielReihe.YWerte(i)
+                    End If
+                Next
+                QWert = sUeber
 
             Case Else
                 Throw New Exception("Die Zielfunktion '" & OptZiel.ZielFkt & "' wird nicht unterstützt!")
