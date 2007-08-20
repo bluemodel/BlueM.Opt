@@ -2181,9 +2181,9 @@ Public MustInherit Class Sim
         'Werte einlesen
         '--------------
         Dim seriesCollection As New Collection
-        'Schleife über Spalten (Zielfunktionen fangen erst bei 3 an!)
-        For i As Integer = 3 To ds.Tables("QWerte").Columns.Count - 1
-            Dim tmpserie As Serie = New Serie(ds.Tables("QWerte").Columns(i).Caption, ds.Tables("QWerte").Rows.Count)
+        'Schleife über Spalten (Spalte ID überspringen!)
+        For i As Integer = 1 To ds.Tables("QWerte").Columns.Count - 1
+            Dim tmpserie As Serie = New Serie(ds.Tables("QWerte").Columns(i).Caption, ds.Tables("QWerte").Rows.Count - 1)
             'Schleife über Reihen
             For j As Integer = 0 To ds.Tables("QWerte").Rows.Count - 1
                 tmpserie.values(j) = ds.Tables("QWerte").Rows(j).Item(i)
