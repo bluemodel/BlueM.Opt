@@ -34,8 +34,12 @@ Public MustInherit Class Sim
     '-----------------------
     Public Datensatz As String                           'Name des zu simulierenden Datensatzes
     Public WorkDir As String                             'Arbeitsverzeichnis für das Blaue Modell
-    Public Event WorkDirChange()                           'Event für Änderung des Arbeitsverzeichnisses
-    Public Exe As String                                 'Pfad zur EXE für die Simulation
+    Public Event WorkDirChange()                         'Event für Änderung des Arbeitsverzeichnisses
+
+    Protected Exe As String                              'Pfad zur EXE für die Simulation
+    Protected Dll As String                              'Pfad zur Dll für die Simulation
+    Protected isDll As Boolean = False                   'Gibt an, ob die DLL benutzt wird oder die Exe
+
     Public SimStart As DateTime                          'Anfangsdatum der Simulation
     Public SimEnde As DateTime                           'Enddatum der Simulation
     Public SimDT As TimeSpan                             'Zeitschrittweite der Simulation
@@ -175,9 +179,9 @@ Public MustInherit Class Sim
 
 #Region "Initialisierung"
 
-    'Bündelung von Initialisierungsfunktionen
-    '****************************************
-    Public Sub SimIni()
+    'Konstruktor
+    '***********
+    Public Sub New()
 
         'Dezimaltrennzeichen überprüfen
         Call Me.checkDezimaltrennzeichen()
@@ -236,13 +240,16 @@ Public MustInherit Class Sim
             StrRead.Close()
             FiStr.Close()
 
-            'Default-Werte setzen
+            'Einstellungen setzen
             For i = 0 To Configs.GetUpperBound(0)
                 Select Case Configs(i, 0)
                     Case "Exe"
                         Me.Exe = Configs(i, 1)
                     Case "Datensatz"
                         Call Me.saveDatensatz(Configs(i, 1))
+                    Case "Dll"
+                        Me.Dll = Configs(i, 1)
+                        Me.isDll = True
                     Case Else
                         'weitere Voreinstellungen
                 End Select
