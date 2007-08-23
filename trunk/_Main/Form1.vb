@@ -144,20 +144,16 @@ Partial Class Form1
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Objekt der Klasse BlueM initialisieren
-                    Sim1 = New BlueM
-
-                    'Initialisieren
-                    Call Sim1.SimIni()
+                    Sim1 = New BlueM()
+                    Call Me.displayWorkDir()
 
 
                 Case ANW_SMUSI 'Anwendung Smusi
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Objekt der Klasse Smusi initialisieren
-                    Sim1 = New Smusi
-
-                    'Initialisieren
-                    Call Sim1.SimIni()
+                    Sim1 = New Smusi()
+                    Call Me.displayWorkDir()
 
 
                 Case ANW_TESTPROBLEME 'Anwendung Testprobleme
@@ -980,7 +976,7 @@ GenerierenAusgangswerte:
 
                         Versuch = Versuch + 1
                         If Versuch > 10 Then
-                            Throw New Exception("Es konnte kein gültiger Datensatz erzeugt werden!")
+                            'Throw New Exception("Es konnte kein gültiger Datensatz erzeugt werden!")
                         End If
 
                         'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
