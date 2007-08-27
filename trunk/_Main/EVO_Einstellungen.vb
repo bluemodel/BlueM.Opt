@@ -3,6 +3,9 @@ Option Explicit On
 Public Class EVO_Einstellungen
     Inherits System.Windows.Forms.UserControl
 
+    Private _settings As EvoKern.PES.Struct_Settings                'Sicherung sämtlicher Einstellungen
+    Private isSaved as Boolean = False                              'Flag der anzeigt, ob die Einstellungen bereits gesichert wurden
+
     Private OptModusValue As Short = EVO_MODUS_SINGEL_OBJECTIVE
     Dim isMultiObjectiveOptimierung As Boolean
 
@@ -269,9 +272,48 @@ Public Class EVO_Einstellungen
         Call FILLCOMBO_POPPENALTY(ComboPopPenalty)
     End Sub
 
-    '********************************************************************
+    'Speichern der Einstellungen
+    '***************************
+    Private Sub saveSettings()
+
+        _settings.NEltern = Val(TextAnzEltern.Text)
+        _settings.NNachf = Val(TextAnzNachf.Text)
+        _settings.NGen = Val(TextAnzGen.Text)
+        _settings.iEvoTyp = VB6.GetItemData(ComboStrategie, ComboStrategie.SelectedIndex)
+        _settings.iPopEvoTyp = VB6.GetItemData(ComboPopStrategie, ComboPopStrategie.SelectedIndex)
+        _settings.iPopPenalty = VB6.GetItemData(ComboPopPenalty, ComboPopPenalty.SelectedIndex)
+        _settings.isPOPUL = CheckisPopul.Checked 'BUG 60 und BUG 158
+        _settings.is_MO_Pareto = isMultiObjectiveOptimierung
+        _settings.NRunden = Val(TextAnzRunden.Text)
+        _settings.NPopul = Val(TextAnzPop.Text)
+        _settings.NPopEltern = Val(TextAnzPopEltern.Text)
+        _settings.iOptEltern = VB6.GetItemData(ComboOptEltern, ComboOptEltern.SelectedIndex)
+        _settings.iOptPopEltern = VB6.GetItemData(ComboOptPopEltern, ComboOptPopEltern.SelectedIndex)
+        _settings.NRekombXY = Val(TextRekombxy.Text)
+        _settings.rDeltaStart = Val(TextDeltaStart.Text)
+        _settings.iStartPar = VB6.GetItemData(ComboOptVorgabe, ComboOptVorgabe.SelectedIndex)
+        _settings.isDnVektor = CheckisDnVektor.Checked
+        If Val(TextInteract.Text) <= 0 Then
+            _settings.interact = 1
+        Else
+            _settings.interact = Val(TextInteract.Text)
+        End If
+        If Val(TextInteract.Text) <= 0 Then
+            _settings.isInteract = False
+        Else
+            _settings.isInteract = True
+        End If
+        _settings.NMemberSecondPop = Val(TextNMemberSecondPop.Text)
+
+        'Flag setzen
+        Me.isSaved = True
+
+    End Sub
+
+#Region "Schnittstelle"
+
     'Schnittstelle
-    '********************************************************************
+    'XXXXXXXXXXXXX
 
     'Dieses Property nicht ReadOnly weil die Anzahl der Zielfunktionen durch OptZiele bestimmt werden kann
     Public Property OptModus() As Short
@@ -284,43 +326,16 @@ Public Class EVO_Einstellungen
         End Set
     End Property
 
-    Public Property PES_Settings() As EvoKern.PES.Struct_Settings
+    Public ReadOnly Property PES_Settings() As EvoKern.PES.Struct_Settings
         Get
-            PES_Settings.NEltern = Val(TextAnzEltern.Text)
-            PES_Settings.NNachf = Val(TextAnzNachf.Text)
-            PES_Settings.NGen = Val(TextAnzGen.Text)
-            PES_Settings.iEvoTyp = VB6.GetItemData(ComboStrategie, ComboStrategie.SelectedIndex)
-            PES_Settings.iPopEvoTyp = VB6.GetItemData(ComboPopStrategie, ComboPopStrategie.SelectedIndex)
-            PES_Settings.iPopPenalty = VB6.GetItemData(ComboPopPenalty, ComboPopPenalty.SelectedIndex)
-            PES_Settings.isPOPUL = False        'siehe BUG 60 und BUG 158
-            If CheckisPopul.CheckState = System.Windows.Forms.CheckState.Checked Then PES_Settings.isPOPUL = True
-            PES_Settings.is_MO_Pareto = isMultiObjectiveOptimierung
-            PES_Settings.NRunden = Val(TextAnzRunden.Text)
-            PES_Settings.NPopul = Val(TextAnzPop.Text)
-            PES_Settings.NPopEltern = Val(TextAnzPopEltern.Text)
-            PES_Settings.iOptEltern = VB6.GetItemData(ComboOptEltern, ComboOptEltern.SelectedIndex)
-            PES_Settings.iOptPopEltern = VB6.GetItemData(ComboOptPopEltern, ComboOptPopEltern.SelectedIndex)
-            PES_Settings.NRekombXY = Val(TextRekombxy.Text)
-            PES_Settings.rDeltaStart = Val(TextDeltaStart.Text)
-            PES_Settings.iStartPar = VB6.GetItemData(ComboOptVorgabe, ComboOptVorgabe.SelectedIndex)
-            PES_Settings.isDnVektor = False
-            If CheckisDnVektor.CheckState = System.Windows.Forms.CheckState.Checked Then PES_Settings.isDnVektor = True
-            If Val(TextInteract.Text) <= 0 Then
-                PES_Settings.interact = 1
-            Else
-                PES_Settings.interact = Val(TextInteract.Text)
+            'Wenn Einstellungen noch nicht gespeichert, zuerst speichern
+            If (Not Me.isSaved) Then
+                Call saveSettings()
             End If
-            If Val(TextInteract.Text) <= 0 Then
-                PES_Settings.isInteract = False
-            Else
-                PES_Settings.isInteract = True
-            End If
-            PES_Settings.NMemberSecondPop = Val(TextNMemberSecondPop.Text)
-
+            PES_Settings = Me._settings
         End Get
-        Set(ByVal value As EvoKern.PES.Struct_Settings)
-
-        End Set
     End Property
+
+#End Region 'Schnittstelle
 
 End Class
