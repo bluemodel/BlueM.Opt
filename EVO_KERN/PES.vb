@@ -223,6 +223,7 @@ Public Class PES
     'Function ES_INI Initialisiert benötigte dynamische Arrays und legt Anzahl der Zielfunktionen fest
     '*************************************************************************************************
     Public Function EsIni(ByRef AnzahlParameter As Short, ByRef AnzahlPenaltyfunktionen As Short, ByRef AnzahlRandbedingungen As Short) As Boolean
+
         EsIni = False
 
         'Überprüfung der Eingabeparameter (es muss mindestens ein Parameter variiert und eine
@@ -252,8 +253,6 @@ Public Class PES
 
         EsLetParameter = False
 
-        On Error GoTo ES_LET_PARAMETER_ERROR
-
         PES_Initial.Xn(i) = Parameter
         PES_Initial.Xmin(i) = 0
         PES_Initial.Xmax(i) = 1
@@ -261,50 +260,38 @@ Public Class PES
         PES_Initial.Xn(i) = Math.Max(PES_Initial.Xn(i), PES_Initial.Xmin(i))
 
         EsLetParameter = True
-        Exit Function
-
-ES_LET_PARAMETER_ERROR:
-        Exit Function
 
     End Function
 
     '*******************************************************************************
     'ES_GET_PARAMETER
-    '*******************************************************************************
     'Function ES_GET_PARAMETER dient zur Übergabe der mutierten Parameter
     'Alle Parameter werden in ein Array geschrieben
     'globalAnzPar ist die Anzahl der mutierten Parameter,
-
+    '*******************************************************************************
     Public Function EsGetParameter(ByRef globalAnzPar As Short, ByRef mypara(,) As Double) As Boolean
+
         Dim i As Short
 
         EsGetParameter = False
-
-        On Error GoTo ES_GET_PARAMETER_ERROR
 
         For i = 1 To globalAnzPar
             mypara(i, 1) = PES_Initial.Xn(i)
         Next i
 
         EsGetParameter = True
-        Exit Function
 
-ES_GET_PARAMETER_ERROR:
-        Exit Function
     End Function
 
     '*******************************************************************************
     'ES_GET_SCHRITTWEITE
-    '*******************************************************************************
-
     'Function ES_GET_SCHRITTWEITE gibt die aktuellen Schrittweiten aus
-
+    '*******************************************************************************
     Public Function EsGetSchrittweite(ByRef globalAnzPar As Short, ByRef mystep() As Double) As Boolean
+
         Dim i As Short
 
         EsGetSchrittweite = False
-
-        On Error GoTo ES_GET_SCHRITTWEITE_ERROR
 
         For i = 1 To globalAnzPar
             mystep(i) = PES_Initial.Dn(i)
@@ -312,17 +299,13 @@ ES_GET_PARAMETER_ERROR:
 
         EsGetSchrittweite = True
 
-ES_GET_SCHRITTWEITE_ERROR:
-        Exit Function
     End Function
 
     '*******************************************************************************
     'ES_GET_BESTWERT
-    '*******************************************************************************
-
     'Function ES_GET_BESTWERT gibt den kompletten Bestwertspeicher aus
     'Bestwert(,) muss ein dynamisches Array sein
-
+    '*******************************************************************************
     Public Function EsGetBestwert(ByRef Bestwert(,) As Double) As Boolean
 
         Dim i, j As Short
@@ -345,7 +328,6 @@ ES_GET_SCHRITTWEITE_ERROR:
     'Sekundäre Population speichert immer die angegebene Anzahl von Bestwerten und
     'kann den Bestwertspeicher alle x Generationen überschreiben
     '*******************************************************************************
-
     Public Function esGetSekundärePopulation(ByRef Population(,) As Double) As Boolean
 
         Dim j, i As Short
@@ -379,12 +361,10 @@ ES_GET_SCHRITTWEITE_ERROR:
 
     '*******************************************************************************
     'ES_GET_POP_BESTWERT
-    '*******************************************************************************
-
     'Function ES_GET_POP_BESTWERT gibt den kompletten Bestwertspeicher aus
     'Bestwert() muss ein dynamisches Array sein
     'TODO: diese Funktion wird derzeit nicht verwendet
-
+    '*******************************************************************************
     Public Function EsGetPopBestWert(ByRef POP_Bestwert(,,,) As Double) As Boolean
 
         Dim k, i, j, l As Short
@@ -408,20 +388,16 @@ ES_GET_SCHRITTWEITE_ERROR:
 
     '*******************************************************************************
     'ES_PREPARE
-    '*******************************************************************************
-
     'Function ES_PREPARE initialisiert alle internen Arrays und setzt den
     'Bestwertspeicher auf sehr großen Wert (Strategie minimiert in dieser
     'Umsetzung)
     'TODO: ESPrepare Für Paretooptimierung noch nicht fertig!!!!
-
+    '*******************************************************************************
     Public Function EsPrepare() As Boolean
-        Dim m, n, l As Short
-        Dim w, v, i As Short
+
+        Dim m, n, l, i As Short
 
         EsPrepare = False
-
-        On Error GoTo ES_PREPARE_ERROR
 
         For i = 1 To PES_Initial.varanz
             PES_Initial.Dn(i) = PES_Settings.rDeltaStart
@@ -507,30 +483,22 @@ ES_GET_SCHRITTWEITE_ERROR:
         PES_iAkt.iAktNachf = 0
 
         EsPrepare = True
-        Exit Function
-
-ES_PREPARE_ERROR:
-        Exit Function
 
     End Function
 
     '*******************************************************************************
     'ES_STARTVALUES
-    '*******************************************************************************
-
     'Function ES_STARTVALUES setzt die Startwerte
     'Option 1: Zufällige Startwert -> Schrittweite = Startschrittweite
     '                              -> Parameterwert = zufällig [0,1]
     'Option 2: Originalparameter   -> Schrittweite = Startschrittweite
     '                              -> Parameterwert = Originalparameter
-
+    '*******************************************************************************
     Public Function EsStartvalues() As Boolean
-        Dim Zufallszahl01 As Single
-        Dim w, n, v, m As Short
+
+        Dim n, v, m As Short
 
         EsStartvalues = False
-
-        On Error GoTo ES_STARTVALUES_ERROR
 
         Select Case PES_Settings.iStartPar
             Case 1 'Zufälligen Startwerte
@@ -559,23 +527,17 @@ ES_PREPARE_ERROR:
                 Next v
         End Select
         EsStartvalues = True
-        Exit Function
-
-ES_STARTVALUES_ERROR:
-        Exit Function
 
     End Function
 
     '*******************************************************************************
     'ES_isNEXTPOP
-    '*******************************************************************************
     'Funktion zählt die Popultationenschleifen und ermittelt, ob die maximale Anzahl
     'an Populationen erreicht ist
+    '*******************************************************************************
     Public Function EsIsNextPop() As Boolean
 
         EsIsNextPop = False
-
-        On Error GoTo ES_isNEXTPOP_ERROR
 
         'Anzahl der Populationenschleifen wird hochgezählt
         PES_iAkt.iAktPop += 1
@@ -587,22 +549,16 @@ ES_STARTVALUES_ERROR:
             PES_iAkt.iAktPop = 0
         End If
 
-        Exit Function
-
-ES_isNEXTPOP_ERROR:
-        Exit Function
     End Function
 
     '*******************************************************************************
     'ES_isNEXTRUNDE
-    '*******************************************************************************
     'Funktion zählt die Runden und ermittelt, ob die maximale Anzahl
     'an Runden erreicht ist
+    '*******************************************************************************
     Public Function EsIsNextRunde(ByVal Method As String) As Boolean
 
         EsIsNextRunde = False
-
-        On Error GoTo ES_isNEXTRUNDE_ERROR
 
         'Anzahl der Runden wird hochgezählt
         PES_iAkt.iAktRunde += 1
@@ -614,22 +570,16 @@ ES_isNEXTPOP_ERROR:
             MsgBox("Optimierung beendet", MsgBoxStyle.Information, "Info")
         End If
 
-        Exit Function
-
-ES_isNEXTRUNDE_ERROR:
-        Exit Function
     End Function
 
     '*******************************************************************************
     'ES_isNEXTGEN
-    '*******************************************************************************
     'Funktion zählt die Generationen und ermittelt, ob die maximale Anzahl
     'an Generationen erreicht ist
+    '*******************************************************************************
     Public Function EsIsNextGen() As Boolean
 
         EsIsNextGen = False
-
-        On Error GoTo ES_isNEXTGEN_ERROR
 
         'Anzahl der Generation wird hochgezählt
         PES_iAkt.iAktGen += 1
@@ -641,22 +591,16 @@ ES_isNEXTRUNDE_ERROR:
             PES_iAkt.iAktGen = 0
         End If
 
-        Exit Function
-
-ES_isNEXTGEN_ERROR:
-        Exit Function
     End Function
 
     '*******************************************************************************
     'ES_isNEXTNACHF
-    '*******************************************************************************
     'Funktion zählt die Nachfahren und ermittelt, ob die maximale Anzahl
     'an Nachfahren erreicht ist
+    '*******************************************************************************
     Public Function EsIsNextNachf() As Boolean
 
         EsIsNextNachf = False
-
-        On Error GoTo ES_isNEXTNACHF_ERROR
 
         'Anzahl der Nachfahren wird hochgezählt
         PES_iAkt.iAktNachf += 1
@@ -667,25 +611,16 @@ ES_isNEXTGEN_ERROR:
             PES_iAkt.iAktNachf = 0
         End If
 
-        Exit Function
-
-ES_isNEXTNACHF_ERROR:
-        Exit Function
     End Function
 
     '*******************************************************************************
     'ES_POP_VARIA
     '*******************************************************************************
-
     Public Function EsPopVaria() As Boolean
-        Dim w, m, n, v, i As Short
-        Dim j As Short
-        Dim Realisierungsspeicher() As Short
-        Dim Elternspeicher() As Short
+
+        Dim m, n, v As Short
 
         EsPopVaria = False
-
-        On Error GoTo ES_POP_VARIA_ERROR
 
         '===========================================================================
         'Start Ermittlung der zu mutierenden Eltern
@@ -730,27 +665,20 @@ ES_isNEXTNACHF_ERROR:
         End Select
 
         EsPopVaria = True
-        Exit Function
 
-ES_POP_VARIA_ERROR:
-        Exit Function
     End Function
 
     '*******************************************************************************
     'ES_VARIA
     '*******************************************************************************
-
     Public Function EsVaria() As Boolean
-        Dim i, v, n, w, j As Short
+
+        Dim i, v, n, j As Short
         Dim Realisierungsspeicher() As Short
         Dim Elternspeicher() As Short
         Dim Z1, Elter, Z2 As Short
-        Dim Faktor As Double
-
 
         EsVaria = False
-
-        On Error GoTo ES_VARIA_ERROR
 
         '===========================================================================
         'Start Ermittlung der zu mutierenden Eltern
@@ -903,25 +831,19 @@ ES_POP_VARIA_ERROR:
         End Select
 
         EsVaria = True
-        Exit Function
-
-ES_VARIA_ERROR:
-        Exit Function
 
     End Function
 
     '*******************************************************************************
     'ES_POP_MUTATION
     '*******************************************************************************
-
     Public Function EsPopMutation() As Boolean
+
         Dim v, n As Short
         '===========================================================================
         'Start Mutation
         '===========================================================================
         EsPopMutation = False
-
-        On Error GoTo ES_POP_MUTATION_ERROR
 
         If Not PES_Settings.isDnVektor Then
             '+/-1
@@ -959,25 +881,19 @@ ES_VARIA_ERROR:
         Next v
 
         EsPopMutation = True
-        Exit Function
-
-ES_POP_MUTATION_ERROR:
-        Exit Function
 
     End Function
 
     '*******************************************************************************
     'ES_MUTATION
     '*******************************************************************************
-
     Public Function EsMutation() As Boolean
+
         Dim v As Short
         '===========================================================================
         'Start Mutation
         '===========================================================================
         EsMutation = False
-
-        On Error GoTo ES_MUTATION_ERROR
 
         If Not PES_Settings.isDnVektor Then
             '+/-1
@@ -1007,24 +923,18 @@ ES_POP_MUTATION_ERROR:
         Next v
 
         EsMutation = True
-        Exit Function
-
-ES_MUTATION_ERROR:
-        Exit Function
 
     End Function
 
     '*******************************************************************************
     'ES_POP_BEST
     '*******************************************************************************
-
     Public Function EsPopBest() As Boolean
+
         Dim m, i, j, n As Short
         Dim h1, h2 As Double
 
         EsPopBest = False
-
-        On Error GoTo ES_POP_BEST_ERROR
 
         'Der schlechtetste der besten Qualitätswerte wird bestimmt ; Position -> i
         '(höchster Wert der Peanaltyfunktion, niedrigster Wert der Crowding Distance)
@@ -1121,28 +1031,17 @@ ES_MUTATION_ERROR:
 
         EsPopBest = True
 
-ES_POP_BEST_ERROR:
-        Exit Function
     End Function
 
     '*******************************************************************************
     'ES_BEST
     '*******************************************************************************
-
-    Public Function EsBest(ByRef ZF() As Double, ByRef RF() As Double) As Boolean
-
-        'ZF ist der berechnete Zielfunktionswert, z derTyp der Zielfunktion
-        'momentan z = 1 - okölogisch orientierte Zielfunktion
-        '         z = 2 - monetär orientierte Zielfunktion
-        '         z = 3 - weitere okölogisch orientierte Zielfunktion
+    Public Function EsBest(ByVal QN() As Double, ByVal RN() As Double) As Boolean
 
         Dim m, i, j, v As Short
         Dim h As Double
 
         EsBest = False
-
-        On Error GoTo ES_BEST_ERROR
-
 
         If Not PES_Settings.is_MO_Pareto Then 'Standard ES nach Rechenberg
             'Der schlechtetste der besten Qualitätswerte wird bestimmt ; Position -> j
@@ -1159,8 +1058,8 @@ ES_POP_BEST_ERROR:
 
             'Falls die Qualität des aktuellen Nachkommen besser ist (Penaltyfunktion geringer)
             'als die schlechteste im Bestwertspeicher, wird diese ersetz
-            If ZF(1) < Qb(j, PES_iAkt.iAktPop, 1) Then
-                Qb(j, PES_iAkt.iAktPop, 1) = ZF(1)
+            If QN(1) < Qb(j, PES_iAkt.iAktPop, 1) Then
+                Qb(j, PES_iAkt.iAktPop, 1) = QN(1)
                 For v = 1 To PES_Initial.varanz
                     'Die Schrittweite wird ebenfalls übernommen
                     Db(v, j, PES_iAkt.iAktPop) = PES_Initial.Dn(v)
@@ -1168,18 +1067,18 @@ ES_POP_BEST_ERROR:
                     Xb(v, j, PES_iAkt.iAktPop) = PES_Initial.Xn(v)
                 Next v
                 If PES_Initial.NPenalty = 2 Then
-                    Qb(j, PES_iAkt.iAktPop, 2) = ZF(2)
+                    Qb(j, PES_iAkt.iAktPop, 2) = QN(2)
                 End If
             End If
 
         Else 'Multi-objective mit paretofront
             With List_NDSorting(PES_iAkt.iAktNachf)
                 For i = 1 To PES_Initial.NPenalty
-                    .penalty(i) = ZF(i)
+                    .penalty(i) = QN(i)
                 Next i
                 .feasible = True
                 For i = 1 To PES_Initial.NConstrains
-                    .constrain(i) = RF(i)
+                    .constrain(i) = RN(i)
                     If .constrain(i) < 0 Then .feasible = False
                 Next i
                 .dominated = False
@@ -1194,23 +1093,18 @@ ES_POP_BEST_ERROR:
 
         EsBest = True
 
-ES_BEST_ERROR:
-        Exit Function
     End Function
 
     '*******************************************************************************
     'ES_BESTWERTSPEICHER
-    '
     'Führt einen Reset des Bestwertspeicher durch,
     'falls eine Komma-Strategie gewählt ist
     '*******************************************************************************
-
     Public Function EsBestwertspeicher() As Boolean
+
         Dim n, i As Short
 
         EsBestwertspeicher = False
-
-        On Error GoTo ES_BESTWERTSPEICHER_ERROR
 
         If PES_Settings.iEvoTyp = EVO_KOMMA Then
             If Not PES_Settings.is_MO_Pareto Then
@@ -1229,26 +1123,19 @@ ES_BEST_ERROR:
         End If
 
         EsBestwertspeicher = True
-        Exit Function
-
-ES_BESTWERTSPEICHER_ERROR:
-        Exit Function
 
     End Function
 
     '*******************************************************************************
     'ES_POP_BESTWERTSPEICHER
-    '
     'Führt einen Reset des Bestwertspeicher auf Populationsebene durch,
     'falls eine Komma-Strategie gewählt ist
     '*******************************************************************************
-
     Public Function EsPopBestwertspeicher() As Boolean
+
         Dim n, i As Short
 
         EsPopBestwertspeicher = False
-
-        On Error GoTo ES_POP_BESTWERTSPEICHER_ERROR
 
         If PES_Settings.iPopEvoTyp = EVO_KOMMA Then
             If Not PES_Settings.is_MO_Pareto Then
@@ -1267,18 +1154,15 @@ ES_BESTWERTSPEICHER_ERROR:
         End If
 
         EsPopBestwertspeicher = True
-        Exit Function
-
-ES_POP_BESTWERTSPEICHER_ERROR:
-        Exit Function
 
     End Function
 
     '*******************************************************************************
-    'ES_POP_ELTERN  Eltern Population
+    'ES_POP_ELTERN  
+    'Eltern Population
     '*******************************************************************************
-
     Public Function EsPopEltern() As Boolean
+
         Dim n, m, v As Short
         Dim swap(2) As Double
         Dim Realisierungsspeicher(,) As Double
@@ -1292,8 +1176,6 @@ ES_POP_BESTWERTSPEICHER_ERROR:
         End Select
 
         EsPopEltern = False
-
-        On Error GoTo ES_POP_ELTERN_ERROR
 
         ReDim Realisierungsspeicher(PES_Settings.NPopul, 2)
 
@@ -1358,31 +1240,23 @@ ES_POP_BESTWERTSPEICHER_ERROR:
 
 
         EsPopEltern = True
-        Exit Function
-
-ES_POP_ELTERN_ERROR:
-        Exit Function
 
     End Function
 
     '*******************************************************************************
     'ES_ELTERN
     '*******************************************************************************
-
     Public Function EsEltern() As Boolean
 
-        Dim l, n, m, v, i, j As Short
+        Dim l, m, v, i, j As Short
         Dim NFrontMember_aktuell, NFrontMember_gesamt As Short
         Dim durchlauf As Short
         Dim Temp() As Struct_NDSorting
         Dim NDSResult() As Struct_NDSorting
-        Dim Count, aktuelle_Front As Short
+        Dim aktuelle_Front As Short
         Dim Member_Sekundärefront As Short
 
-
         EsEltern = False
-
-        On Error GoTo ES_ELTERN_ERROR
 
         '*** Standard ES nach Rechenberg/Schwefel ***
         If Not PES_Settings.is_MO_Pareto Then
@@ -1594,10 +1468,6 @@ ES_POP_ELTERN_ERROR:
         End If
 
         EsEltern = True
-        Exit Function
-
-ES_ELTERN_ERROR:
-        Exit Function
 
     End Function
 
@@ -1687,8 +1557,8 @@ ES_ELTERN_ERROR:
     'Non_Dominated_Count_and_Sort
     'Sortiert die nicht dominanten Lösungen nach oben, die dominanten nach unten
     '*******************************************************************************
-
     Private Function Non_Dominated_Count_and_Sort(ByRef NDSorting() As Struct_NDSorting) As Short
+
         Dim i As Short
         Dim Temp() As Struct_NDSorting
         Dim counter As Short
@@ -1731,8 +1601,8 @@ ES_ELTERN_ERROR:
     'Sortiert die nicht dominanten Lösungen nach oben, die dominanten nach unten
     'hier für die Sekundäre Population
     '*******************************************************************************
-
     Private Function Non_Dominated_Count_and_Sort_Sekundäre_Population(ByRef NDSorting() As Struct_NDSorting) As Short
+
         Dim i As Short
         Dim Temp() As Struct_NDSorting
         Dim counter As Short
@@ -1772,7 +1642,6 @@ ES_ELTERN_ERROR:
     'Hier wird pro durchlauf die nicht dominierte Front in NDSResult geschaufelt
     'und die bereits klassifizierten Lösungen aus Temp Array gelöscht
     '*******************************************************************************
-
     Private Sub Non_Dominated_Result(ByRef Temp() As Struct_NDSorting, ByRef NDSResult() As Struct_NDSorting, ByRef NFrontMember_aktuell As Short, ByRef NFrontMember_gesamt As Short)
 
         Dim i, Position As Short
@@ -1800,7 +1669,6 @@ ES_ELTERN_ERROR:
     '*******************************************************************************
     'Count_Front_Members
     '*******************************************************************************
-
     Private Function Count_Front_Members(ByVal aktuell_Front As Short, ByRef NDSResult() As Struct_NDSorting) As Integer
 
         Dim i As Short
@@ -1817,8 +1685,8 @@ ES_ELTERN_ERROR:
     '*******************************************************************************
     'NDS_Crowding_Distance_Sort
     '*******************************************************************************
-
     Private Sub NDS_Crowding_Distance_Sort(ByRef NDSorting() As Struct_NDSorting, ByRef start As Short, ByRef ende As Short)
+
         Dim i As Integer
         Dim j As Integer
         Dim k As Short
@@ -1867,7 +1735,6 @@ ES_ELTERN_ERROR:
     '*******************************************************************************
     'NDS_Crowding_Distance_Count
     '*******************************************************************************
-
     Private Function NDS_Crowding_Distance_Count(ByRef Qb(,,) As Double, ByRef Spannweite As Double) As Double
 
         Dim i As Short
@@ -1932,6 +1799,7 @@ ES_ELTERN_ERROR:
         Next i
 
     End Function
+
     '*******************************************************************************
     'Neighbourhood_AbstandsArray
     'Bestimme Array der Raumabstände für Neighbourhood-Rekombination
@@ -1989,12 +1857,10 @@ ES_ELTERN_ERROR:
 
     '*******************************************************************************
     'SekundärQb_Dubletten
-    '
     '*******************************************************************************
     Private Sub SekundärQb_Dubletten(ByRef SekundärQb() As Struct_NDSorting)
-        Dim i As Short
-        Dim j As Short
-        Dim k As Short
+
+        Dim i, j, k As Short
         Dim Logical As Boolean
 
         For i = 1 To UBound(SekundärQb) - 1
@@ -2007,6 +1873,7 @@ ES_ELTERN_ERROR:
             Next j
         Next i
     End Sub
+
     '*******************************************************************************
     'Neighbourhood_Eltern
     'Bestimme die NAnzahlEltern mit geringsten Raumabständen für Neighbourhood-Rekombination
@@ -2050,6 +1917,7 @@ ES_ELTERN_ERROR:
     'Bestimme die NAnzahlEltern mit geringsten Raumabständen für Neighbourhood-Rekombination
     '*******************************************************************************
     Private Sub Neighbourhood_Crowding_Distance(ByRef Distanceb() As Double, ByRef Qb(,,) As Double)
+
         Dim i As Integer
         Dim j As Integer
         Dim k As Short
@@ -2085,12 +1953,13 @@ ES_ELTERN_ERROR:
                 Distanceb(i) = Distanceb(i) + (QbTemp(i + 1, PES_iAkt.iAktPop, k) - QbTemp(i - 1, PES_iAkt.iAktPop, k)) / (fmax - fmin)
             Next i
         Next k
+
     End Sub
 
     '*******************************************************************************
     'Sortiere
-    '*******************************************************************************
     'TODO: Sortiere() wird nicht benutzt!
+    '*******************************************************************************
     Private Sub Sortiere(ByRef t() As Double)
         Dim i As Integer
         Dim j As Integer
