@@ -1,35 +1,35 @@
 Option Strict Off
-Option Explicit On
+
 Public Class PES
 
 
-	'*******************************************************************************
-	'*******************************************************************************
-	'**** Klasse PES (Parametric Evolution Strategy)                            ****
-	'****                                                                       ****
-	'**** Modifizierte Evolutionsstrategie nach Rechenberg und Schwefel         ****
-	'**** Klasse enthält alle Funktionen und Methoden zur Anwendung             ****
-	'**** der Evolutionsstategie                                                ****
-	'****                                                                       ****
-	'**** Literatur:                                                            ****
-	'**** 1) Rechenberg, Ingo, Evolutionsstrategie '94, Fromman-Holzboog, 1994  ****
-	'**** 2) Schwefel, Hans-Paul, Evolution and Optimum Seeking, Wiley, 1995    ****
-	'**** 3) Deb, Kalyanmoy, Multi-Objective Optimization using Evolutionary    ****
-	'****    Algorithms, Wiley, 2001                                            ****
-	'****                                                                       ****
+    '*******************************************************************************
+    '*******************************************************************************
+    '**** Klasse PES (Parametric Evolution Strategy)                            ****
+    '****                                                                       ****
+    '**** Modifizierte Evolutionsstrategie nach Rechenberg und Schwefel         ****
+    '**** Klasse enthält alle Funktionen und Methoden zur Anwendung             ****
+    '**** der Evolutionsstategie                                                ****
+    '****                                                                       ****
+    '**** Literatur:                                                            ****
+    '**** 1) Rechenberg, Ingo, Evolutionsstrategie '94, Fromman-Holzboog, 1994  ****
+    '**** 2) Schwefel, Hans-Paul, Evolution and Optimum Seeking, Wiley, 1995    ****
+    '**** 3) Deb, Kalyanmoy, Multi-Objective Optimization using Evolutionary    ****
+    '****    Algorithms, Wiley, 2001                                            ****
+    '****                                                                       ****
     '**** Dirk Muschalla, Christoph Huebner                                     ****
-	'****                                                                       ****
-	'**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
-	'**** TU Darmstadt                                                          ****
-	'****                                                                       ****
-	'**** Dezember 2003                                                         ****
-	'****                                                                       ****
-	'**** Letzte Änderung: Juli 2007                                            ****
-	'*******************************************************************************
-	'*******************************************************************************
-	
-	'Deklarationsteil
-	'*******************************************************************************
+    '****                                                                       ****
+    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
+    '**** TU Darmstadt                                                          ****
+    '****                                                                       ****
+    '**** Dezember 2003                                                         ****
+    '****                                                                       ****
+    '**** Letzte Änderung: Juli 2007                                            ****
+    '*******************************************************************************
+    '*******************************************************************************
+
+    'Deklarationsteil
+    '*******************************************************************************
 
     'Structure zum Speichern aller Einstellungen aus dem Form
     Public Structure Struct_Settings
@@ -257,8 +257,8 @@ Public Class PES
         PES_Initial.Xn(i) = Parameter
         PES_Initial.Xmin(i) = 0
         PES_Initial.Xmax(i) = 1
-        PES_Initial.Xn(i) = BestimmeMinWert(PES_Initial.Xn(i), PES_Initial.Xmax(i))
-        PES_Initial.Xn(i) = BestimmeMaxWert(PES_Initial.Xn(i), PES_Initial.Xmin(i))
+        PES_Initial.Xn(i) = Math.Min(PES_Initial.Xn(i), PES_Initial.Xmax(i))
+        PES_Initial.Xn(i) = Math.Max(PES_Initial.Xn(i), PES_Initial.Xmin(i))
 
         EsLetParameter = True
         Exit Function
@@ -578,7 +578,7 @@ ES_STARTVALUES_ERROR:
         On Error GoTo ES_isNEXTPOP_ERROR
 
         'Anzahl der Populationenschleifen wird hochgezählt
-        PES_iAkt.iAktPop = PES_iAkt.iAktPop + 1
+        PES_iAkt.iAktPop += 1
 
         'Abfrage ob die maximale Anzahl an Populationenschleifen erreicht ist
         If PES_iAkt.iAktPop <= PES_Settings.NPopul Then
@@ -605,7 +605,7 @@ ES_isNEXTPOP_ERROR:
         On Error GoTo ES_isNEXTRUNDE_ERROR
 
         'Anzahl der Runden wird hochgezählt
-        PES_iAkt.iAktRunde = PES_iAkt.iAktRunde + 1
+        PES_iAkt.iAktRunde += 1
 
         'Abfrage ob die maximale Anzahl an Runden erreicht ist
         If PES_iAkt.iAktRunde <= PES_Settings.NRunden Then
@@ -632,7 +632,7 @@ ES_isNEXTRUNDE_ERROR:
         On Error GoTo ES_isNEXTGEN_ERROR
 
         'Anzahl der Generation wird hochgezählt
-        PES_iAkt.iAktGen = PES_iAkt.iAktGen + 1
+        PES_iAkt.iAktGen += 1
 
         'Abfrage ob die aktuelle Generation abgeschlossen ist
         If PES_iAkt.iAktGen <= PES_Settings.NGen Then
@@ -659,7 +659,7 @@ ES_isNEXTGEN_ERROR:
         On Error GoTo ES_isNEXTNACHF_ERROR
 
         'Anzahl der Nachfahren wird hochgezählt
-        PES_iAkt.iAktNachf = PES_iAkt.iAktNachf + 1
+        PES_iAkt.iAktNachf += 1
 
         If PES_iAkt.iAktNachf <= PES_Settings.NNachf Then
             EsIsNextNachf = True
@@ -1530,13 +1530,12 @@ ES_POP_ELTERN_ERROR:
             '-------------------------------------------------------
             NFrontMember_aktuell = Count_Front_Members(1, NDSResult)
 
-            If PES_iAkt.iAktRunde = 1 And PES_iAkt.iAktPop = 1 And PES_iAkt.iAktGen = 1 Then
-                ReDim Preserve SekundärQb(Member_Sekundärefront + NFrontMember_aktuell)
-            Else
-                Member_Sekundärefront = UBound(SekundärQb)
-                ReDim Preserve SekundärQb(Member_Sekundärefront + NFrontMember_aktuell)
-            End If
+            Member_Sekundärefront = UBound(SekundärQb)
 
+            'SekPop wird um die aktuelle Front erweitert
+            ReDim Preserve SekundärQb(Member_Sekundärefront + NFrontMember_aktuell)
+
+            'Neue Member der SekPop bestimmen
             For i = Member_Sekundärefront + 1 To Member_Sekundärefront + NFrontMember_aktuell
                 SekundärQb(i) = NDSResult(i - Member_Sekundärefront)
             Next i
@@ -1544,7 +1543,7 @@ ES_POP_ELTERN_ERROR:
             Call Non_Dominated_Sorting(SekundärQb, 1)
             NFrontMember_aktuell = Non_Dominated_Count_and_Sort_Sekundäre_Population(SekundärQb)
             ReDim Preserve SekundärQb(NFrontMember_aktuell)
-            Call SekundärQb_Duplettten(SekundärQb)
+            Call SekundärQb_Dubletten(SekundärQb)
             NFrontMember_aktuell = Non_Dominated_Count_and_Sort_Sekundäre_Population(SekundärQb)
             ReDim Preserve SekundärQb(NFrontMember_aktuell)
 
@@ -1553,6 +1552,8 @@ ES_POP_ELTERN_ERROR:
                 ReDim Preserve SekundärQb(PES_Settings.NMemberSecondPop)
             End If
 
+            'Prüfen, ob die Population jetzt mit Mitgliedern
+            'aus der Sekundären Population aufgefüllt werden soll
             If (PES_iAkt.iAktGen Mod PES_Settings.interact) = 0 And PES_Settings.isInteract Then
                 NFrontMember_aktuell = Count_Front_Members(1, SekundärQb)
                 If NFrontMember_aktuell > PES_Settings.NEltern Then
@@ -1800,14 +1801,14 @@ ES_ELTERN_ERROR:
     'Count_Front_Members
     '*******************************************************************************
 
-    Private Function Count_Front_Members(ByRef aktuell_Front As Short, ByRef NDSResult() As Struct_NDSorting) As Integer
-        Dim i As Short
+    Private Function Count_Front_Members(ByVal aktuell_Front As Short, ByRef NDSResult() As Struct_NDSorting) As Integer
 
+        Dim i As Short
         Count_Front_Members = 0
 
         For i = 1 To UBound(NDSResult)
-            If NDSResult(i).Front = aktuell_Front Then
-                Count_Front_Members = Count_Front_Members + 1
+            If (NDSResult(i).Front = aktuell_Front) Then
+                Count_Front_Members += 1
             End If
         Next i
 
@@ -1987,10 +1988,10 @@ ES_ELTERN_ERROR:
     End Sub
 
     '*******************************************************************************
-    'SekundärQb_Duplettten
+    'SekundärQb_Dubletten
     '
     '*******************************************************************************
-    Private Sub SekundärQb_Duplettten(ByRef SekundärQb() As Struct_NDSorting)
+    Private Sub SekundärQb_Dubletten(ByRef SekundärQb() As Struct_NDSorting)
         Dim i As Short
         Dim j As Short
         Dim k As Short
@@ -2087,34 +2088,9 @@ ES_ELTERN_ERROR:
     End Sub
 
     '*******************************************************************************
-    'BestimmeMinWert
-    '*******************************************************************************
-
-    Private Function BestimmeMinWert(ByRef Wert1 As Double, ByRef Wert2 As Double) As Double
-        If Wert1 > Wert2 Then
-            BestimmeMinWert = Wert2
-        Else
-            BestimmeMinWert = Wert1
-        End If
-    End Function
-
-    '*******************************************************************************
-    'BestimmeMaxWert
-    '*******************************************************************************
-
-    Private Function BestimmeMaxWert(ByRef Wert1 As Double, ByRef Wert2 As Double) As Double
-
-        If Wert1 < Wert2 Then
-            BestimmeMaxWert = Wert2
-        Else
-            BestimmeMaxWert = Wert1
-        End If
-    End Function
-
-    '*******************************************************************************
     'Sortiere
     '*******************************************************************************
-
+    'TODO: Sortiere() wird nicht benutzt!
     Private Sub Sortiere(ByRef t() As Double)
         Dim i As Integer
         Dim j As Integer
@@ -2130,27 +2106,4 @@ ES_ELTERN_ERROR:
         Next
     End Sub
 
-    '*******************************************************************************
-    'Class_Initialisieren
-    '*******************************************************************************
-
-    Private Sub Class_Initialisieren()
-
-    End Sub
-    Public Sub New()
-        MyBase.New()
-        Class_Initialisieren()
-    End Sub
-
-    '*******************************************************************************
-    'Class_Terminieren
-    '*******************************************************************************
-
-    Private Sub Class_Terminieren()
-
-    End Sub
-    Protected Overrides Sub Finalize()
-        Class_Terminieren()
-        MyBase.Finalize()
-    End Sub
 End Class
