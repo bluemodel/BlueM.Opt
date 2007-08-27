@@ -4,7 +4,8 @@ Public Class EVO_Einstellungen
     Inherits System.Windows.Forms.UserControl
 
     Private _settings As EvoKern.PES.Struct_Settings                'Sicherung sämtlicher Einstellungen
-    Private isSaved as Boolean = False                              'Flag der anzeigt, ob die Einstellungen bereits gesichert wurden
+    'BUG 225: isSaved müsste bei Neustart zurückgesetzt werden
+    Private isSaved As Boolean = False                              'Flag der anzeigt, ob die Einstellungen bereits gesichert wurden
 
     Private OptModusValue As Short = EVO_MODUS_SINGEL_OBJECTIVE
     Dim isMultiObjectiveOptimierung As Boolean
@@ -282,7 +283,7 @@ Public Class EVO_Einstellungen
         _settings.iEvoTyp = VB6.GetItemData(ComboStrategie, ComboStrategie.SelectedIndex)
         _settings.iPopEvoTyp = VB6.GetItemData(ComboPopStrategie, ComboPopStrategie.SelectedIndex)
         _settings.iPopPenalty = VB6.GetItemData(ComboPopPenalty, ComboPopPenalty.SelectedIndex)
-        _settings.isPOPUL = CheckisPopul.Checked 'BUG 60 und BUG 158
+        _settings.isPOPUL = CheckisPopul.Checked 'BUG 174 und BUG 185
         _settings.is_MO_Pareto = isMultiObjectiveOptimierung
         _settings.NRunden = Val(TextAnzRunden.Text)
         _settings.NPopul = Val(TextAnzPop.Text)

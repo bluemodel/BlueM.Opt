@@ -585,7 +585,7 @@ Partial Class Form1
 
                 'Simulationsergebnis in Wave laden
                 If (SensiPlot1.show_Wave) Then
-                    'BUG 119: Die WEL-Datei hat bei Smusi einen anderen Namen!
+                    'BUG 182: Die WEL-Datei hat bei Smusi einen anderen Namen!
                     Dim WEL As New Wave.WEL(Sim1.WorkDir & Sim1.Datensatz & ".wel", Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).SimGr)
                     'OptParameter und -Wert an Titel anhängen
                     'TODO: bei 2-Parametern auch den Wert des 2. Parameters anhängen!
@@ -620,7 +620,7 @@ Partial Class Form1
         'Laufvariable für die Generationen
         Dim gen As Integer
 
-        'BUG 85: Nach Klasse Diagramm auslagern!
+        'BUG 212: Nach Klasse Diagramm auslagern!
         Call TSP1.TeeChart_Initialise_TSP(DForm.Diag)
 
         'Arrays werden Dimensioniert
@@ -1010,7 +1010,7 @@ GenerierenAusgangswerte:
                                 End If
 
                                 'Qualitätswerte im TeeChart zeichnen
-                                'BUG 144: TODO: Bei Verletzung von Constraints Punkt anders malen!
+                                'BUG 112: TODO: Bei Verletzung von Constraints Punkt anders malen!
                                 If (Sim1.List_OptZiele.Length = 1) Then
                                     'SingleObjective
                                     Call DForm.Diag.prepareSeries(ipop - 1, "Population " & ipop)
@@ -1018,7 +1018,7 @@ GenerierenAusgangswerte:
                                     Call DForm.Diag.Series(ipop - 1).Add(durchlauf, Sim1.List_OptZiele(0).QWertTmp)
                                 Else
                                     'MultiObjective
-                                    'BUG 66: nur die ersten beiden Zielfunktionen werden gezeichnet
+                                    'BUG 118: nur die ersten beiden Zielfunktionen werden gezeichnet
                                     Call DForm.Diag.prepareSeries(0, "Population", Steema.TeeChart.Styles.PointerStyles.Circle, 4)
                                     DForm.Diag.Series(0).Cursor = Cursors.Hand
                                     Call DForm.Diag.Series(0).Add(Sim1.List_OptZiele(0).QWertTmp, Sim1.List_OptZiele(1).QWertTmp)
@@ -1408,7 +1408,7 @@ GenerierenAusgangswerte:
                             QWertString &= Chr(13) & Chr(10) & .Bezeichnung & ": " & .QWertTmp.ToString()
 
                             'Name der WEL-Simulationsergebnisdatei
-                            'BUG 137: Name der Ergebnisdatei
+                            'BUG 171: Name der Ergebnisdatei
                             Dim WELFile As String = ""
                             If (Anwendung = ANW_BLUEM) Then
                                 WELFile = Sim1.WorkDir & Sim1.Datensatz & ".WEL"
