@@ -636,7 +636,7 @@ Public Class TSP
 
 
     '******************************************* TeeChart Funktionen **********************************
-    'BUG 85: Nach Klasse Diagramm auslagern!
+    'BUG 212: Nach Klasse Diagramm auslagern!
     Public Sub TeeChart_Initialise_TSP(ByRef TChart1 As Steema.TeeChart.TChart)
         Dim i As Integer
 

@@ -34,8 +34,12 @@ Public MustInherit Class Sim
     '-----------------------
     Public Datensatz As String                           'Name des zu simulierenden Datensatzes
     Public WorkDir As String                             'Arbeitsverzeichnis für das Blaue Modell
-    Public Event WorkDirChange()                           'Event für Änderung des Arbeitsverzeichnisses
-    Public Exe As String                                 'Pfad zur EXE für die Simulation
+    Public Event WorkDirChange()                         'Event für Änderung des Arbeitsverzeichnisses
+
+    Protected Exe As String                              'Pfad zur EXE für die Simulation
+    Protected Dll As String                              'Pfad zur Dll für die Simulation
+    Protected isDll As Boolean = False                   'Gibt an, ob die DLL benutzt wird oder die Exe
+
     Public SimStart As DateTime                          'Anfangsdatum der Simulation
     Public SimEnde As DateTime                           'Enddatum der Simulation
     Public SimDT As TimeSpan                             'Zeitschrittweite der Simulation
@@ -175,9 +179,9 @@ Public MustInherit Class Sim
 
 #Region "Initialisierung"
 
-    'Bündelung von Initialisierungsfunktionen
-    '****************************************
-    Public Sub SimIni()
+    'Konstruktor
+    '***********
+    Public Sub New()
 
         'Dezimaltrennzeichen überprüfen
         Call Me.checkDezimaltrennzeichen()
@@ -236,13 +240,16 @@ Public MustInherit Class Sim
             StrRead.Close()
             FiStr.Close()
 
-            'Default-Werte setzen
+            'Einstellungen setzen
             For i = 0 To Configs.GetUpperBound(0)
                 Select Case Configs(i, 0)
                     Case "Exe"
                         Me.Exe = Configs(i, 1)
                     Case "Datensatz"
                         Call Me.saveDatensatz(Configs(i, 1))
+                    Case "Dll"
+                        Me.Dll = Configs(i, 1)
+                        Me.isDll = True
                     Case Else
                         'weitere Voreinstellungen
                 End Select
@@ -506,7 +513,7 @@ Public MustInherit Class Sim
             End If
         Loop Until StrRead.Peek() = -1
 
-        'BUG 66: nur die ersten beiden Zielfunktionen werden gezeichnet
+        'BUG 118: nur die ersten beiden Zielfunktionen werden gezeichnet
         If (AnzZiele > 2) Then
             MsgBox("Die Anzahl der Ziele beträgt mehr als 2!" & Chr(13) & Chr(10) _
                     & "Es werden nur die ersten beiden Zielfunktionen im Hauptdiagramm angezeigt!", MsgBoxStyle.Information, "Info")
@@ -560,7 +567,7 @@ Public MustInherit Class Sim
                             Dim ZRE As New Wave.ZRE(Me.WorkDir & .ZielReiheDatei)
                             .ZielReihe = ZRE.Zeitreihe
                         Case ".PRB"
-                            'BUG 136: geht nicht mehr, weil PRB-Dateien keine Zeitreihen sind!
+                            'BUG 183: geht nicht mehr, weil PRB-Dateien keine Zeitreihen sind!
                             'IsOK = Read_PRB(Me.WorkDir & .ZielReiheDatei, .ZielGr, .ZielReihe)
                         Case Else
                             Throw New Exception("Das Format der Zielreihe '" & .ZielReiheDatei & "' wurde nicht erkannt!")
@@ -1073,7 +1080,7 @@ Public MustInherit Class Sim
         Call launchSim()
 
         'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
-        For i = 0 To QN.GetUpperBound(0)                                 'BUG 57: QN() fängt bei 1 an!
+        For i = 0 To QN.GetUpperBound(0)                                 'BUG 135: QN() fängt bei 1 an!
             List_OptZiele(i).QWertTmp = QWert(List_OptZiele(i))
             QN(i) = List_OptZiele(i).QWertTmp
         Next
@@ -1083,7 +1090,7 @@ Public MustInherit Class Sim
             Call Me.db_update()
         End If
 
-        'BUG 144: TODO: Constraints berechnen für CES
+        'BUG 112: TODO: Constraints berechnen für CES
         'For i = 0 To Me.List_Constraints.GetUpperBound(0)
         '    List_Constraints(i).ConstTmp = Constraint(List_Constraints(i))
         '    RN(i + 1) = List_Constraints(i).ConstTmp                'BUG 57: RN() fängt bei 1 an!
@@ -1224,7 +1231,7 @@ Public MustInherit Class Sim
         globalAnzPar = Me.List_OptParameter.GetLength(0)
 
         'Parameterwerte übergeben
-        'BUG 57: mypara() fängt bei 1 an!
+        'BUG 135: mypara() fängt bei 1 an!
         ReDim mypara(globalAnzPar, 1)
         For i = 1 To globalAnzPar
             mypara(i, 1) = Me.List_OptParameter(i - 1).SKWert
@@ -1245,7 +1252,7 @@ Public MustInherit Class Sim
         Dim i As Short
 
         'Mutierte Parameter an OptParameter übergeben
-        For i = 0 To Me.List_OptParameter.GetUpperBound(0)          'BUG 57: mypara(,) fängt bei 1 an!
+        For i = 0 To Me.List_OptParameter.GetUpperBound(0)          'BUG 135: mypara(,) fängt bei 1 an!
             List_OptParameter(i).SKWert = myPara(i + 1, 1)          'OptParameterListe(i+1) weil Array bei 0 anfängt!
         Next
 
@@ -1298,7 +1305,7 @@ Public MustInherit Class Sim
 
             'Zeile ändern
             Zeile = Zeilenarray(List_ModellParameter(i).ZeileNr - 1)
-            'BUG 120: richtig wäre: Length = SpBis - SpVon + 1
+            'BUG 170: richtig wäre: Length = SpBis - SpVon + 1
             Dim Length As Short = List_ModellParameter(i).SpBis - List_ModellParameter(i).SpVon
             StrLeft = Microsoft.VisualBasic.Left(Zeile, List_ModellParameter(i).SpVon - 1)
             StrRight = Microsoft.VisualBasic.Right(Zeile, Len(Zeile) - List_ModellParameter(i).SpBis + 1)
@@ -1338,7 +1345,7 @@ Public MustInherit Class Sim
         'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
         For i = 0 To Me.List_OptZiele.GetUpperBound(0)
             List_OptZiele(i).QWertTmp = QWert(List_OptZiele(i))
-            QN(i + 1) = List_OptZiele(i).QWertTmp                   'BUG 57: QN() fängt bei 1 an!
+            QN(i + 1) = List_OptZiele(i).QWertTmp                   'BUG 135: QN() fängt bei 1 an!
         Next
 
         'Qualitätswerte und OptParameter in DB speichern
@@ -1349,7 +1356,7 @@ Public MustInherit Class Sim
         'Constraints berechnen
         For i = 0 To Me.List_Constraints.GetUpperBound(0)
             List_Constraints(i).ConstTmp = Constraint(List_Constraints(i))
-            RN(i + 1) = List_Constraints(i).ConstTmp                'BUG 57: RN() fängt bei 1 an!
+            RN(i + 1) = List_Constraints(i).ConstTmp                'BUG 135: RN() fängt bei 1 an!
         Next
 
         SIM_Evaluierung_PES = True
@@ -1401,7 +1408,7 @@ Public MustInherit Class Sim
 
             Case "PRB"
                 'QWert aus PRB-Datei
-                'BUG 138: PRB geht nicht, weil keine Zeitreihe
+                'BUG 220: PRB geht nicht, weil keine Zeitreihe
                 Throw New Exception("PRB als OptZiel geht z.Zt. nicht (siehe Bug 138)")
                 'QWert = QWert_PRB(OptZiel)
 
@@ -1446,7 +1453,7 @@ Public MustInherit Class Sim
 
     'Qualitätswert berechnen: Zieltyp = Reihe
     '****************************************
-    'BUG 105: Konstante und gleiche Zeitschrittweiten vorausgesetzt!
+    'BUG 218: Konstante und gleiche Zeitschrittweiten vorausgesetzt!
     Protected Function QWert_Reihe(ByVal OptZiel As Struct_OptZiel, ByVal SimReihe As Wave.Zeitreihe) As Double
 
         Dim QWert As Double
@@ -1470,7 +1477,7 @@ Public MustInherit Class Sim
 
             Case "Volf"
                 'Volumenfehler
-                'BUG 104: Volumenfehler rechnet noch nicht echtes Volumen, dazu ist Zeitschrittweite notwendig
+                'BUG 169: Volumenfehler rechnet noch nicht echtes Volumen, dazu ist Zeitschrittweite notwendig
                 Dim VolSim As Double = 0
                 Dim VolZiel As Double = 0
                 For i = 0 To SimReihe.Length - 1
@@ -1585,7 +1592,7 @@ Public MustInherit Class Sim
     '***************************
     Private Function QWert_PRB(ByVal OptZiel As Struct_OptZiel) As Double
 
-        'BUG 138: PRB geht nicht, weil keine Zeitreihe
+        'BUG 220: PRB geht nicht, weil keine Zeitreihe
         'Dim i As Integer
         'Dim IsOK As Boolean
         'Dim QWert As Double
@@ -1678,7 +1685,7 @@ Public MustInherit Class Sim
                 End If
 
             Case "Reihe"
-                'BUG 144: TODO: Constraintberechnung bei einer Reihe!
+                'BUG 112: TODO: Constraintberechnung bei einer Reihe!
                 'Es wird die Summe der Grenzwertverletzungen verwendet
                 Dim summe As Double = 0
 

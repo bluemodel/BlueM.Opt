@@ -1,4 +1,5 @@
 Imports System.IO
+Imports IHWB.BlueM
 
 '*******************************************************************************
 '*******************************************************************************
@@ -25,6 +26,10 @@ Public Class BlueM
     'Eigenschaften
     '#############
 
+    'BlueM DLL
+    '---------
+    Private bluem_dll As BlueM_EngineDotNetAccess
+
     'IHA
     '---
     Private isIHA as Boolean = False
@@ -37,6 +42,20 @@ Public Class BlueM
     'Methoden
     '########
 
+    'Konstruktor
+    '***********
+    Public Sub New()
+
+        Call MyBase.New()
+
+        If (Me.isDll) Then
+            'BlueM DLL instanzieren
+            bluem_dll = New BlueM_EngineDotNetAccess(Me.Dll)
+        End If
+
+    End Sub
+
+
 #Region "Eingabedateien lesen"
 
     'Simulationsparameter einlesen
@@ -47,7 +66,7 @@ Public Class BlueM
         Dim SimEnde_str As String = ""
         Dim SimDT_str As String = ""
         Dim Ganglinie As String = ""
-        DIM CSV_Format as String = ""
+        Dim CSV_Format As String = ""
 
         'ALL-Datei öffnen
         '----------------
@@ -93,11 +112,11 @@ Public Class BlueM
 
         'Fehlermeldung Ganglinie nicht eingeschaltet
         If Ganglinie <> "J" Then
-            throw new Exception("Die Ganglinienausgabe (.WEL Datei) ist nicht eingeschaltet. Bitte in .ALL Datei unter 'Ganglinienausgabe' einschalten")
+            Throw New Exception("Die Ganglinienausgabe (.WEL Datei) ist nicht eingeschaltet. Bitte in .ALL Datei unter 'Ganglinienausgabe' einschalten")
         End If
 
         'Fehlermeldung CSv Format nicht eingeschaltet
-        if CSV_Format <> "J" then
+        If CSV_Format <> "J" Then
             Throw New Exception("Das CSV Format für die .WEL Datei ist nicht eingeschaltet. Bitte in .ALL unter '... CSV-Format' einschalten.")
         End If
 
@@ -257,43 +276,83 @@ Public Class BlueM
     Public Overrides Function launchSim() As Boolean
 
         Dim simOK As Boolean
-        'Aktuelles Verzeichnis bestimmen
-        Dim currentDir As String = CurDir()
-        'zum Arbeitsverzeichnis wechseln
-        ChDrive(WorkDir)
-        ChDir(WorkDir)
-        'EXE aufrufen
-        Dim ProcID As Integer = Shell("""" & Exe & """ " & Datensatz, AppWinStyle.MinimizedNoFocus, True)
-        'zurück ins Ausgangsverzeichnis wechseln
-        ChDrive(currentDir)
-        ChDir(currentDir)
 
-        'überprüfen, ob Simulation erfolgreich
-        '-------------------------------------
-        If (File.Exists(WorkDir & "$FEHL.TMP")) Then
+        If (Not Me.isDll) Then
 
-            'Simulationsfehler aufgetreten
-            simOK = False
+            'Als EXE simulieren
+            'xxxxxxxxxxxxxxxxxx
 
-            Dim DateiInhalt As String = ""
-            Dim FiStr As FileStream = New FileStream(WorkDir & "$fehl.tmp", FileMode.Open, IO.FileAccess.Read)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-            Do
-                DateiInhalt = DateiInhalt & Chr(13) & Chr(10) & StrRead.ReadLine.ToString
-            Loop Until StrRead.Peek() = -1
+            'Aktuelles Verzeichnis bestimmen
+            Dim currentDir As String = CurDir()
+            'zum Arbeitsverzeichnis wechseln
+            ChDrive(WorkDir)
+            ChDir(WorkDir)
+            'EXE aufrufen
+            Dim ProcID As Integer = Shell("""" & Exe & """ " & Datensatz, AppWinStyle.MinimizedNoFocus, True)
+            'zurück ins Ausgangsverzeichnis wechseln
+            ChDrive(currentDir)
+            ChDir(currentDir)
 
-            MsgBox("BlueM hat einen Fehler zurückgegeben:" & Chr(13) & Chr(10) & DateiInhalt, MsgBoxStyle.Exclamation, "BlueM")
+            'überprüfen, ob Simulation erfolgreich
+            '-------------------------------------
+            If (File.Exists(WorkDir & "$FEHL.TMP")) Then
 
-        Else
-            'Simulation erfolgreich
-            simOK = True
+                'Simulationsfehler aufgetreten
+                simOK = False
 
-            'Bei IHA-Berechnung jetzt IHA-Software ausführen
-            '-----------------------------------------------
-            If (Me.isIHA) Then
-                Call Me.IHA1.calculate_IHA(Me.WorkDir & Me.Datensatz & ".WEL")
+                Dim DateiInhalt As String = ""
+                Dim FiStr As FileStream = New FileStream(WorkDir & "$fehl.tmp", FileMode.Open, IO.FileAccess.Read)
+                Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+                Do
+                    DateiInhalt = DateiInhalt & Chr(13) & Chr(10) & StrRead.ReadLine.ToString
+                Loop Until StrRead.Peek() = -1
+
+                MsgBox("BlueM hat einen Fehler zurückgegeben:" & Chr(13) & Chr(10) & DateiInhalt, MsgBoxStyle.Exclamation, "BlueM")
+
+            Else
+                'Simulation erfolgreich
+                simOK = True
             End If
 
+
+        Else
+
+            'Als DLL simulieren
+            'xxxxxxxxxxxxxxxxxx
+
+            Try
+
+                Call bluem_dll.Initialize(Me.WorkDir & Me.Datensatz)
+
+                Dim SimEnde As DateTime = BlueM_EngineDotNetAccess.DateTime(bluem_dll.GetSimulationEndDate())
+
+                'Simulationszeitraum 
+                Do While (BlueM_EngineDotNetAccess.DateTime(bluem_dll.GetCurrentTime) <= SimEnde)
+                    Call bluem_dll.PerformTimeStep()
+                Loop
+
+                'Simulation erfolgreich
+                simOK = True
+
+            Catch ex As Exception
+
+                'Simulationsfehler aufgetreten
+                MsgBox(ex.Message, MsgBoxStyle.Exclamation, "BlueM")
+                simOK = False
+
+            Finally
+
+                Call bluem_dll.Finish()
+                Call bluem_dll.Dispose()
+
+            End Try
+
+        End If
+
+        'Bei IHA-Berechnung jetzt IHA-Software ausführen
+        '-----------------------------------------------
+        If (simOK And Me.isIHA) Then
+            Call Me.IHA1.calculate_IHA(Me.WorkDir & Me.Datensatz & ".WEL")
         End If
 
         Return simOK
