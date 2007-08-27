@@ -31,7 +31,7 @@ Public Class PES
 	'Deklarationsteil
 	'*******************************************************************************
 
-    'Struct zum Speichern aller Einstellungen aus dem Form
+    'Structure zum Speichern aller Einstellungen aus dem Form
     Public Structure Struct_Settings
         Dim NEltern As Short                'Anzahl Eltern
         Dim NNachf As Short                 'Anzahl Kinder
@@ -48,14 +48,14 @@ Public Class PES
         Dim iOptEltern As Short             'Ermittlung der Individuum-Eltern (Mittelwert, Rekombination, einfache Auswahl)
         Dim NRekombXY As Short              'X/Y-Schema Rekombination
         Dim rDeltaStart As Single           'Startschrittweite
-        Dim iStartPar As Short              'Startaparameter (zufällig, Originalparameter)
-        Dim isDnVektor As Boolean           'Soll ein Schrittweitenvektor benutz werden
+        Dim iStartPar As Short              'Startparameter (zufällig, Originalparameter)
+        Dim isDnVektor As Boolean           'Soll ein Schrittweitenvektor benutzt werden
         Dim interact As Short               'Alle wieviel Generationen soll die aktuelle Population mit Mitgliedern der sekundären Population aufgefüllt werden
         Dim isInteract As Boolean           'Mit Austausch zwischen Population und Sekundärer Population
         Dim NMemberSecondPop As Short       'Maximale Anzahl Mitglieder der Sekundärpopulation
     End Structure
 
-    'Structur zum Speichern der Werte die as den OptDateien generiert werden
+    'Structure zum Speichern der Werte die aus den OptDateien generiert werden
     Private Structure Struct_Initial
         Dim varanz As Short                 'Anzahl Parameter
         Dim NPenalty As Short               'Anzahl der Penaltyfunktionen
