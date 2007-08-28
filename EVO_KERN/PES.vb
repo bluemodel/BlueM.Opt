@@ -38,17 +38,17 @@ Public Class PES
         Dim NGen As Short                   'Anzahl Generationen
         Dim iEvoTyp As Short                'Typ der Evolutionsstrategie (+ oder ,)
         Dim iPopEvoTyp As Short             'Typ der Evolutionsstrategie (+ oder ,) auf Populationsebene
-        Dim iPopPenalty As Short            'Art der Beurteilung der Populationsgüte (Multiobjective)
+        Dim iPopPenalty As Short            'Art der Beurteilung der Populationsgüte (Multiobjective) (1: Crowding, 2: Spannweite)
         Dim isPOPUL As Boolean              'Mit Populationen
         Dim is_MO_Pareto As Boolean         'Multi-Objective mit Pareto Front
         Dim NRunden As Short                'Anzahl Runden
         Dim NPopul As Short                 'Anzahl Populationen
         Dim NPopEltern As Short             'Anzahl Populationseltern
-        Dim iOptPopEltern As Short          'Ermittlung der Populationseltern (Mittelwert, Rekombination, Selektion)
-        Dim iOptEltern As Short             'Ermittlung der Individuum-Eltern (Mittelwert, Rekombination, einfache Auswahl)
+        Dim iOptPopEltern As Short          'Ermittlung der Populationseltern (1: Rekombination, 2: Mittelwert, 3: Selektion)
+        Dim iOptEltern As Short             'Ermittlung der Individuum-Eltern (1: Selektion, 2: Rekomb x/x, diskret, 3: Rekomb x/x, mitteln, 4: Rekomb x/y, diskret, 5: Rekomb x/y, mitteln, 6: Neighbourhood)
         Dim NRekombXY As Short              'X/Y-Schema Rekombination
         Dim rDeltaStart As Single           'Startschrittweite
-        Dim iStartPar As Short              'Startparameter (zufällig, Originalparameter)
+        Dim iStartPar As Short              'Startparameter (1: zufällig, 2: Originalparameter)
         Dim isDnVektor As Boolean           'Soll ein Schrittweitenvektor benutzt werden
         Dim interact As Short               'Alle wieviel Generationen soll die aktuelle Population mit Mitgliedern der sekundären Population aufgefüllt werden
         Dim isInteract As Boolean           'Mit Austausch zwischen Population und Sekundärer Population
@@ -69,14 +69,15 @@ Public Class PES
     'Diese Struktur speichert den aktuellen Zustand
     'ToDo: Könnte man auch entfernen wenn man die Schleifenkontrolle ins Form legt
     Public Structure Struct_iAkt
-        Dim iAktRunde As Short         'Zähler für aktuelle Runde
-        Dim iAktPop As Short    'Zähler für aktuelle Population
-        Dim iAktGen As Short    'Zähler für aktuelle Generation
-        Dim iAktNachf As Short    'Zähler für aktuellen Nachfahre
+        Dim iAktRunde As Short              'Zähler für aktuelle Runde
+        Dim iAktPop As Short                'Zähler für aktuelle Population
+        Dim iAktGen As Short                'Zähler für aktuelle Generation
+        Dim iAktNachf As Short              'Zähler für aktuellen Nachfahre
     End Structure
 
     Private PES_Settings As Struct_Settings
     Private PES_Initial As Struct_Initial
+
     'Muss Public sein, da das Form hiermit die Schleifen kontrolliert
     Public PES_iAkt As Struct_iAkt
 
@@ -151,9 +152,7 @@ Public Class PES
     'Schritt 2: ES_SETTINGS
     'Function ES_SETTINGS übergibt Optionen für Evolutionsstrategie und Prüft die eingestellten Optionen
     '**************************************************************************************************
-    Public Function EsSettings(ByRef Settings As Struct_Settings) As Boolean
-
-        EsSettings = False
+    Public Sub EsSettings(ByRef Settings As Struct_Settings)
 
         'Überprüfung der Übergebenen Werte
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -214,44 +213,37 @@ Public Class PES
             PES_Settings.NRunden = 1
         End If
 
-        EsSettings = True
-
-    End Function
+    End Sub
 
 
     'ES_INI
     'Function ES_INI Initialisiert benötigte dynamische Arrays und legt Anzahl der Zielfunktionen fest
     '*************************************************************************************************
-    Public Function EsIni(ByRef AnzahlParameter As Short, ByRef AnzahlPenaltyfunktionen As Short, ByRef AnzahlRandbedingungen As Short) As Boolean
-
-        EsIni = False
+    Public Sub EsIni(ByVal AnzahlParameter As Short, ByVal AnzahlPenaltyfunktionen As Short, ByVal AnzahlRandbedingungen As Short)
 
         'Überprüfung der Eingabeparameter (es muss mindestens ein Parameter variiert und eine
         'Penaltyfunktion ausgewertet werden)
 
-        If AnzahlParameter <= 0 Or AnzahlPenaltyfunktionen <= 0 Then
-            Throw New Exception("es muss mindestens ein Parameter variiert und eine Penaltyfunktion ausgewertet werden")
+        If (AnzahlParameter <= 0 Or AnzahlPenaltyfunktionen <= 0) Then
+            Throw New Exception("Es muss mindestens ein Parameter variiert und eine Penaltyfunktion ausgewertet werden")
         End If
 
-        PES_Initial.varanz = AnzahlParameter                   'Anzahl der Parameter wird übergeben
-        PES_Initial.NPenalty = AnzahlPenaltyfunktionen         'Anzahl der Zielfunktionen wird übergeben
-        PES_Initial.NConstrains = AnzahlRandbedingungen    'Anzahl der Randbedingungen wird übergeben
+        PES_Initial.varanz = AnzahlParameter                    'Anzahl der Parameter wird übergeben
+        PES_Initial.NPenalty = AnzahlPenaltyfunktionen          'Anzahl der Zielfunktionen wird übergeben
+        PES_Initial.NConstrains = AnzahlRandbedingungen         'Anzahl der Randbedingungen wird übergeben
 
-        ReDim PES_Initial.Xn(PES_Initial.varanz) 'Variablenvektor wird initialisiert
-        ReDim PES_Initial.Xmin(PES_Initial.varanz) 'UntereSchrankenvektor wird initialisiert
-        ReDim PES_Initial.Xmax(PES_Initial.varanz) 'ObereSchrankenvektor wird initialisiert
-        ReDim PES_Initial.Dn(PES_Initial.varanz) 'Schrittweitenvektor wird initialisiert
+        ReDim PES_Initial.Xn(PES_Initial.varanz)                'Variablenvektor wird initialisiert
+        ReDim PES_Initial.Xmin(PES_Initial.varanz)              'UntereSchrankenvektor wird initialisiert
+        ReDim PES_Initial.Xmax(PES_Initial.varanz)              'ObereSchrankenvektor wird initialisiert
+        ReDim PES_Initial.Dn(PES_Initial.varanz)                'Schrittweitenvektor wird initialisiert
 
-        EsIni = True
-    End Function
+    End Sub
 
     'ES_LET_PARAMETER
     'Function ES_LET_PARAMETER dient zur Übergabe der Ausgangsparameter an die Evolutionsstrategie,
     'i ist der Index des Parameters, es wird genau ein Parameter übergeben
     '*******************************************************************************
-    Public Function EsLetParameter(ByRef i As Integer, ByRef Parameter As Double) As Boolean
-
-        EsLetParameter = False
+    Public Sub EsLetParameter(ByVal i As Integer, ByVal Parameter As Double)
 
         PES_Initial.Xn(i) = Parameter
         PES_Initial.Xmin(i) = 0
@@ -259,9 +251,7 @@ Public Class PES
         PES_Initial.Xn(i) = Math.Min(PES_Initial.Xn(i), PES_Initial.Xmax(i))
         PES_Initial.Xn(i) = Math.Max(PES_Initial.Xn(i), PES_Initial.Xmin(i))
 
-        EsLetParameter = True
-
-    End Function
+    End Sub
 
     '*******************************************************************************
     'ES_GET_PARAMETER
@@ -269,57 +259,59 @@ Public Class PES
     'Alle Parameter werden in ein Array geschrieben
     'globalAnzPar ist die Anzahl der mutierten Parameter,
     '*******************************************************************************
-    Public Function EsGetParameter(ByRef globalAnzPar As Short, ByRef mypara(,) As Double) As Boolean
+    Public Function EsGetParameter() As Double(,)
 
         Dim i As Short
+        Dim mypara(,) As Double
 
-        EsGetParameter = False
+        ReDim mypara(PES_Initial.varanz, 1)
 
-        For i = 1 To globalAnzPar
+        For i = 1 To PES_Initial.varanz
             mypara(i, 1) = PES_Initial.Xn(i)
         Next i
 
-        EsGetParameter = True
+        Return mypara
 
     End Function
 
     '*******************************************************************************
     'ES_GET_SCHRITTWEITE
     'Function ES_GET_SCHRITTWEITE gibt die aktuellen Schrittweiten aus
+    'TODO: Diese Funktion wird nicht benutzt!
     '*******************************************************************************
-    Public Function EsGetSchrittweite(ByRef globalAnzPar As Short, ByRef mystep() As Double) As Boolean
+    Public Function EsGetSchrittweite() As Double()
 
         Dim i As Short
+        Dim mystep() As Double
 
-        EsGetSchrittweite = False
+        ReDim mystep(PES_Initial.varanz)
 
-        For i = 1 To globalAnzPar
+        For i = 1 To PES_Initial.varanz
             mystep(i) = PES_Initial.Dn(i)
         Next i
 
-        EsGetSchrittweite = True
+        Return mystep
 
     End Function
 
     '*******************************************************************************
     'ES_GET_BESTWERT
     'Function ES_GET_BESTWERT gibt den kompletten Bestwertspeicher aus
-    'Bestwert(,) muss ein dynamisches Array sein
     '*******************************************************************************
-    Public Function EsGetBestwert(ByRef Bestwert(,) As Double) As Boolean
+    Public Function EsGetBestwert() As Double(,)
 
         Dim i, j As Short
-
-        EsGetBestwert = False
+        Dim Bestwert(,) As Double
 
         ReDim Bestwert(PES_Settings.NEltern, PES_Initial.NPenalty)
-        For i = 1 To PES_Initial.NPenalty ' dm 29.04.05
+
+        For i = 1 To PES_Initial.NPenalty
             For j = 1 To PES_Settings.NEltern
                 Bestwert(j, i) = Qb(j, PES_iAkt.iAktPop, i)
             Next j
         Next i
 
-        EsGetBestwert = True
+        Return Bestwert
 
     End Function
 
@@ -328,11 +320,10 @@ Public Class PES
     'Sekundäre Population speichert immer die angegebene Anzahl von Bestwerten und
     'kann den Bestwertspeicher alle x Generationen überschreiben
     '*******************************************************************************
-    Public Function esGetSekundärePopulation(ByRef Population(,) As Double) As Boolean
+    Public Function EsGetSekundärePopulation() As Double(,)
 
         Dim j, i As Short
-
-        esGetSekundärePopulation = False
+        Dim SekPopulation(,) As Double
 
         ''Notwendig, falls auch die Variablenwerte für eine spätere Datensatzerstellung ausgelesen werden sollen (Dirk)
 
@@ -346,31 +337,31 @@ Public Class PES
         '    Next j
         'Next i
 
-        ReDim Population(UBound(SekundärQb), PES_Initial.NPenalty)
+        ReDim SekPopulation(UBound(SekundärQb), PES_Initial.NPenalty)
         '!Wenn Fehler hier "SekundäreQb = Nothing" auftritt wurde TeeChart mit der falschen Serie bzw. zu wenig Serien gestartet!!!
 
         For i = 1 To UBound(SekundärQb)
             For j = 1 To PES_Initial.NPenalty
-                Population(i, j) = SekundärQb(i).penalty(j)
+                SekPopulation(i, j) = SekundärQb(i).penalty(j)
             Next j
         Next i
 
-        esGetSekundärePopulation = True
+        Return SekPopulation
 
     End Function
 
     '*******************************************************************************
     'ES_GET_POP_BESTWERT
     'Function ES_GET_POP_BESTWERT gibt den kompletten Bestwertspeicher aus
-    'Bestwert() muss ein dynamisches Array sein
     'TODO: diese Funktion wird derzeit nicht verwendet
     '*******************************************************************************
-    Public Function EsGetPopBestWert(ByRef POP_Bestwert(,,,) As Double) As Boolean
+    Public Function EsGetPopBestWert() As Double(,,,)
 
         Dim k, i, j, l As Short
+        Dim POP_Bestwert(,,,) As Double
 
-        ReDim POP_Bestwert(PES_Settings.NPopul, PES_Settings.NEltern, PES_Initial.varanz, PES_Initial.NPenalty)
         ReDim POP_Bestwert(PES_Settings.NPopul, PES_Settings.NEltern, PES_Initial.varanz, PES_Initial.NPenalty + 1)
+
         For i = 1 To PES_Settings.NPopul
             For j = 1 To PES_Settings.NEltern
                 For k = 1 To PES_Initial.varanz
@@ -382,8 +373,9 @@ Public Class PES
             Next j
         Next i
 
-    End Function
+        Return POP_Bestwert
 
+    End Function
 
 
     '*******************************************************************************
@@ -393,11 +385,9 @@ Public Class PES
     'Umsetzung)
     'TODO: ESPrepare Für Paretooptimierung noch nicht fertig!!!!
     '*******************************************************************************
-    Public Function EsPrepare() As Boolean
+    Public Sub EsPrepare()
 
         Dim m, n, l, i As Short
-
-        EsPrepare = False
 
         For i = 1 To PES_Initial.varanz
             PES_Initial.Dn(i) = PES_Settings.rDeltaStart
@@ -456,10 +446,10 @@ Public Class PES
                 For m = 1 To PES_Initial.NPenalty
                     Select Case PES_Settings.iPopPenalty
                         Case 1 'Crowding
-                            'Qualität der Populationseltern wird 0 gesetzt
+                            'Qualität der Populationseltern wird auf sehr großen Wert gesetzt
                             Qbpop(n, m) = 1.0E+300
                         Case 2 'Spannweite
-                            'Qualität der Populationseltern wird auf sehr großen Wert gesetzt
+                            'Qualität der Populationseltern wird auf 0 gesetzt
                             Qbpop(n, m) = 0
                     End Select
                 Next m
@@ -482,26 +472,22 @@ Public Class PES
         PES_iAkt.iAktGen = 0
         PES_iAkt.iAktNachf = 0
 
-        EsPrepare = True
-
-    End Function
+    End Sub
 
     '*******************************************************************************
     'ES_STARTVALUES
     'Function ES_STARTVALUES setzt die Startwerte
-    'Option 1: Zufällige Startwert -> Schrittweite = Startschrittweite
-    '                              -> Parameterwert = zufällig [0,1]
-    'Option 2: Originalparameter   -> Schrittweite = Startschrittweite
-    '                              -> Parameterwert = Originalparameter
+    'PES_Settings.iStartPar 1: Zufällige Startwert  -> Schrittweite = Startschrittweite
+    '                                               -> Parameterwert = zufällig [0,1]
+    'PES_Settings.iStartPar 2: Originalparameter    -> Schrittweite = Startschrittweite
+    '                                               -> Parameterwert = Originalparameter
     '*******************************************************************************
-    Public Function EsStartvalues() As Boolean
+    Public Sub EsStartvalues()
 
         Dim n, v, m As Short
 
-        EsStartvalues = False
-
         Select Case PES_Settings.iStartPar
-            Case 1 'Zufälligen Startwerte
+            Case 1 'Zufällige Startwerte
                 For v = 1 To PES_Initial.varanz
                     For n = 1 To PES_Settings.NEltern
                         For m = 1 To PES_Settings.NPopEltern
@@ -526,14 +512,13 @@ Public Class PES
                     Next n
                 Next v
         End Select
-        EsStartvalues = True
 
-    End Function
+    End Sub
 
     '*******************************************************************************
     'ES_isNEXTPOP
-    'Funktion zählt die Popultationenschleifen und ermittelt, ob die maximale Anzahl
-    'an Populationen erreicht ist
+    'Funktion zählt die Popultationenschleifen hoch und ermittelt, 
+    'ob die maximale Anzahl an Populationen erreicht ist
     '*******************************************************************************
     Public Function EsIsNextPop() As Boolean
 
@@ -553,8 +538,8 @@ Public Class PES
 
     '*******************************************************************************
     'ES_isNEXTRUNDE
-    'Funktion zählt die Runden und ermittelt, ob die maximale Anzahl
-    'an Runden erreicht ist
+    'Funktion zählt die Runden hoch und ermittelt, 
+    'ob die maximale Anzahl an Runden erreicht ist
     '*******************************************************************************
     Public Function EsIsNextRunde(ByVal Method As String) As Boolean
 
@@ -574,8 +559,8 @@ Public Class PES
 
     '*******************************************************************************
     'ES_isNEXTGEN
-    'Funktion zählt die Generationen und ermittelt, ob die maximale Anzahl
-    'an Generationen erreicht ist
+    'Funktion zählt die Generationen hoch und ermittelt, 
+    'ob die maximale Anzahl an Generationen erreicht ist
     '*******************************************************************************
     Public Function EsIsNextGen() As Boolean
 
@@ -595,8 +580,8 @@ Public Class PES
 
     '*******************************************************************************
     'ES_isNEXTNACHF
-    'Funktion zählt die Nachfahren und ermittelt, ob die maximale Anzahl
-    'an Nachfahren erreicht ist
+    'Funktion zählt die Nachfahren hoch und ermittelt, 
+    'ob die maximale Anzahl an Nachfahren erreicht ist
     '*******************************************************************************
     Public Function EsIsNextNachf() As Boolean
 
@@ -616,17 +601,16 @@ Public Class PES
     '*******************************************************************************
     'ES_POP_VARIA
     '*******************************************************************************
-    Public Function EsPopVaria() As Boolean
+    Public Sub EsPopVaria()
 
         Dim m, n, v As Short
-
-        EsPopVaria = False
 
         '===========================================================================
         'Start Ermittlung der zu mutierenden Eltern
         '===========================================================================
 
         Select Case PES_Settings.iOptPopEltern
+
             Case 1 'MultiRekombination über alle Eltern (x/x,y) oder (x/x+y)
                 For n = 1 To PES_Settings.NEltern
                     R = Int(PES_Settings.NPopEltern * Rnd()) + 1
@@ -637,6 +621,7 @@ Public Class PES
                         Xe(v, n, PES_iAkt.iAktPop) = Xp(v, n, R)
                     Next v
                 Next n
+
             Case 2 'Mittelwertbildung über alle Eltern
                 'Ermitteln der Elter und Schrittweite über Mittelung der Elternschrittweiten
                 For v = 1 To PES_Initial.varanz
@@ -651,6 +636,7 @@ Public Class PES
                         Next m
                     Next n
                 Next v
+
             Case 3 'Zufallswahl über alle Eltern
                 R = Int(PES_Settings.NPopEltern * Rnd()) + 1 'Zufallszahl entscheidet welcher
                 'Elternteil vererbt wird
@@ -662,23 +648,21 @@ Public Class PES
                         Xe(v, n, PES_iAkt.iAktPop) = Xp(v, n, R)
                     Next n
                 Next v
+
         End Select
 
-        EsPopVaria = True
-
-    End Function
+    End Sub
 
     '*******************************************************************************
     'ES_VARIA
+    'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
     '*******************************************************************************
-    Public Function EsVaria() As Boolean
+    Public Sub EsVaria()
 
         Dim i, v, n, j As Short
         Dim Realisierungsspeicher() As Short
         Dim Elternspeicher() As Short
         Dim Z1, Elter, Z2 As Short
-
-        EsVaria = False
 
         '===========================================================================
         'Start Ermittlung der zu mutierenden Eltern
@@ -807,7 +791,7 @@ Public Class PES
 
                 Else
 
-                    Call Neighbourhood_Eltern(PenaltyDistance, Elter, PES_Settings.NRekombXY, IndexEltern)
+                    Call Neighbourhood_Eltern(Elter)
                     For v = 1 To PES_Initial.varanz
                         'Do
                         '    Faktor = Rnd
@@ -830,20 +814,18 @@ Public Class PES
 
         End Select
 
-        EsVaria = True
-
-    End Function
+    End Sub
 
     '*******************************************************************************
     'ES_POP_MUTATION
     '*******************************************************************************
-    Public Function EsPopMutation() As Boolean
+    Public Sub EsPopMutation()
 
         Dim v, n As Short
+
         '===========================================================================
         'Start Mutation
         '===========================================================================
-        EsPopMutation = False
 
         If Not PES_Settings.isDnVektor Then
             '+/-1
@@ -880,20 +862,19 @@ Public Class PES
 
         Next v
 
-        EsPopMutation = True
-
-    End Function
+    End Sub
 
     '*******************************************************************************
     'ES_MUTATION
+    'Mutieren der Ausgangswerte
     '*******************************************************************************
-    Public Function EsMutation() As Boolean
+    Public Sub EsMutation()
 
         Dim v As Short
+
         '===========================================================================
         'Start Mutation
         '===========================================================================
-        EsMutation = False
 
         If Not PES_Settings.isDnVektor Then
             '+/-1
@@ -922,19 +903,16 @@ Public Class PES
             PES_Initial.Xn(v) = XnTemp
         Next v
 
-        EsMutation = True
-
-    End Function
+    End Sub
 
     '*******************************************************************************
     'ES_POP_BEST
+    'Einordnen der Qualitätsfunktion im PopulationsBestwertspeicher
     '*******************************************************************************
-    Public Function EsPopBest() As Boolean
+    Public Sub EsPopBest()
 
         Dim m, i, j, n As Short
         Dim h1, h2 As Double
-
-        EsPopBest = False
 
         'Der schlechtetste der besten Qualitätswerte wird bestimmt ; Position -> i
         '(höchster Wert der Peanaltyfunktion, niedrigster Wert der Crowding Distance)
@@ -983,7 +961,7 @@ Public Class PES
             Next m
         Else
             h2 = 0
-            h1 = NDS_Crowding_Distance_Count(Qb, h2)
+            h1 = NDS_Crowding_Distance_Count(h2)
         End If
 
         'Falls die Qualität des aktuellen Population besser ist (Penaltyfunktion geringer)
@@ -1014,7 +992,7 @@ Public Class PES
                             Next n
                         Next m
                     End If
-                Case 2
+                Case 2 'Spannweite
                     If h2 > Qbpop(j, 2) Then
                         Qbpop(j, 2) = h2
                         For m = 1 To PES_Initial.varanz
@@ -1029,23 +1007,22 @@ Public Class PES
             End Select
         End If
 
-        EsPopBest = True
-
-    End Function
+    End Sub
 
     '*******************************************************************************
     'ES_BEST
+    'Einordnen der Qualitätsfunktion im Bestwertspeicher
     '*******************************************************************************
-    Public Function EsBest(ByVal QN() As Double, ByVal RN() As Double) As Boolean
+    Public Sub EsBest(ByVal QN() As Double, ByVal RN() As Double)
 
         Dim m, i, j, v As Short
         Dim h As Double
 
-        EsBest = False
-
-        If Not PES_Settings.is_MO_Pareto Then 'Standard ES nach Rechenberg
-            'Der schlechtetste der besten Qualitätswerte wird bestimmt ; Position -> j
-            '(höchster Wert der Peanaltyfunktion)
+        If (Not PES_Settings.is_MO_Pareto) Then
+            'Standard ES nach Rechenberg
+            '---------------------------
+            'Der schlechteste der besten Qualitätswerte wird bestimmt ; Position -> j
+            '(höchster Wert der Penaltyfunktion)
             j = 1
             h = Qb(1, PES_iAkt.iAktPop, 1)
 
@@ -1057,7 +1034,7 @@ Public Class PES
             Next m
 
             'Falls die Qualität des aktuellen Nachkommen besser ist (Penaltyfunktion geringer)
-            'als die schlechteste im Bestwertspeicher, wird diese ersetz
+            'als die schlechteste im Bestwertspeicher, wird diese ersetzt
             If QN(1) < Qb(j, PES_iAkt.iAktPop, 1) Then
                 Qb(j, PES_iAkt.iAktPop, 1) = QN(1)
                 For v = 1 To PES_Initial.varanz
@@ -1071,7 +1048,9 @@ Public Class PES
                 End If
             End If
 
-        Else 'Multi-objective mit paretofront
+        Else
+            'Multi-Objective mit Paretofront
+            '-------------------------------
             With List_NDSorting(PES_iAkt.iAktNachf)
                 For i = 1 To PES_Initial.NPenalty
                     .penalty(i) = QN(i)
@@ -1091,77 +1070,81 @@ Public Class PES
             End With
         End If
 
-        EsBest = True
-
-    End Function
+    End Sub
 
     '*******************************************************************************
     'ES_BESTWERTSPEICHER
     'Führt einen Reset des Bestwertspeicher durch,
     'falls eine Komma-Strategie gewählt ist
     '*******************************************************************************
-    Public Function EsBestwertspeicher() As Boolean
+    Public Sub EsBestwertspeicher()
 
         Dim n, i As Short
 
-        EsBestwertspeicher = False
+        If (PES_Settings.iEvoTyp = EVO_KOMMA) Then
 
-        If PES_Settings.iEvoTyp = EVO_KOMMA Then
-            If Not PES_Settings.is_MO_Pareto Then
+            If (Not PES_Settings.is_MO_Pareto) Then
+                'Standard ES nach Rechenberg
+                '---------------------------
                 For n = 1 To PES_Settings.NEltern
                     For i = 1 To PES_Initial.NPenalty 'dm 29.04.05
                         Qb(n, PES_iAkt.iAktPop, i) = 1.0E+300 'dm 29.04.05
                     Next i 'dm 29.04.05
                 Next n
+
             Else
+                'Multi-Objective mit Paretofront
+                '-------------------------------
                 For n = 1 To PES_Settings.NEltern
                     For i = 1 To PES_Initial.NPenalty 'dm 29.04.05
                         Qb(n, PES_iAkt.iAktPop, i) = 0 'dm 29.04.05
                     Next i
                 Next n
             End If
+
         End If
 
-        EsBestwertspeicher = True
-
-    End Function
+    End Sub
 
     '*******************************************************************************
     'ES_POP_BESTWERTSPEICHER
     'Führt einen Reset des Bestwertspeicher auf Populationsebene durch,
     'falls eine Komma-Strategie gewählt ist
     '*******************************************************************************
-    Public Function EsPopBestwertspeicher() As Boolean
+    Public Sub EsPopBestwertspeicher()
 
         Dim n, i As Short
 
-        EsPopBestwertspeicher = False
+        If (PES_Settings.iPopEvoTyp = EVO_KOMMA) Then
 
-        If PES_Settings.iPopEvoTyp = EVO_KOMMA Then
-            If Not PES_Settings.is_MO_Pareto Then
+            If (Not PES_Settings.is_MO_Pareto) Then
+                'Standard ES nach Rechenberg
+                '---------------------------
                 For n = 1 To PES_Settings.NPopul
                     For i = 1 To PES_Initial.NPenalty 'dm 29.04.05
                         Qbpop(n, i) = 1.0E+300 'dm 29.04.05
                     Next i 'dm 29.04.05
                 Next n
+
             Else
+                'Multi-Objective mit Paretofront
+                '-------------------------------
                 For n = 1 To PES_Settings.NPopul
                     For i = 1 To PES_Initial.NPenalty 'dm 29.04.05
                         Qbpop(n, i) = 0 'dm 29.04.05
                     Next i 'dm 29.04.05
                 Next n
             End If
+
         End If
 
-        EsPopBestwertspeicher = True
-
-    End Function
+    End Sub
 
     '*******************************************************************************
     'ES_POP_ELTERN  
     'Eltern Population
     '*******************************************************************************
-    Public Function EsPopEltern() As Boolean
+    Public Sub EsPopEltern()
 
         Dim n, m, v As Short
         Dim swap(2) As Double
@@ -1175,8 +1158,6 @@ Public Class PES
                 Z = 2
         End Select
 
-        EsPopEltern = False
-
         ReDim Realisierungsspeicher(PES_Settings.NPopul, 2)
 
         'Die NPopEltern besten Individium-Sätze werden ermittelt
@@ -1185,7 +1166,9 @@ Public Class PES
             Realisierungsspeicher(m, 2) = m
         Next m
 
-        If Not PES_Settings.is_MO_Pareto Then
+        If (Not PES_Settings.is_MO_Pareto) Then
+            'Standard ES nach Rechenberg
+            '---------------------------
             For m = 1 To PES_Settings.NPopul
                 For n = m To PES_Settings.NPopul
                     If Realisierungsspeicher(m, 1) > Realisierungsspeicher(n, 1) Then
@@ -1198,7 +1181,10 @@ Public Class PES
                     End If
                 Next
             Next
+
         Else
+            'Multi-Objective mit Paretofront
+            '-------------------------------
             Select Case PES_Settings.iPopPenalty
                 Case 1 'Crowding
                     For m = 1 To PES_Settings.NPopul
@@ -1228,6 +1214,7 @@ Public Class PES
                     Next
             End Select
         End If
+
         'Die Eltern werden gleich der besten Kinder gesetzt (Schrittweite und Parameterwert)
         For m = 1 To PES_Settings.NPopEltern
             For n = 1 To PES_Settings.NEltern
@@ -1238,15 +1225,13 @@ Public Class PES
             Next n
         Next m
 
-
-        EsPopEltern = True
-
-    End Function
+    End Sub
 
     '*******************************************************************************
     'ES_ELTERN
+    'Die neuen Eltern werden generiert
     '*******************************************************************************
-    Public Function EsEltern() As Boolean
+    Public Sub EsEltern()
 
         Dim l, m, v, i, j As Short
         Dim NFrontMember_aktuell, NFrontMember_gesamt As Short
@@ -1256,12 +1241,12 @@ Public Class PES
         Dim aktuelle_Front As Short
         Dim Member_Sekundärefront As Short
 
-        EsEltern = False
-
-        '*** Standard ES nach Rechenberg/Schwefel ***
-        If Not PES_Settings.is_MO_Pareto Then
-
-            'Die Eltern werden gleich der besten Kinder gesetzt (Schrittweite und Parameterwert)
+        If (Not PES_Settings.is_MO_Pareto) Then
+            'Standard ES nach Rechenberg
+            '---------------------------------------------------------------------
+            'Die Eltern werden gleich der besten Kinder gesetzt 
+            '(Schrittweite und Parameterwert)
+            '---------------------------------------------------------------------
             For m = 1 To PES_Settings.NEltern
                 For v = 1 To PES_Initial.varanz
                     De(v, m, PES_iAkt.iAktPop) = Db(v, m, PES_iAkt.iAktPop)
@@ -1270,11 +1255,11 @@ Public Class PES
             Next m
 
         Else
-            '*** Multi-objective mit Paretofront ***
+            'Multi-Objective mit Paretofront
+            '---------------------------------------------------------------------
             '1. Eltern und Nachfolger werden gemeinsam betrachtet
             'Nur Eltern werden NDSorting hinzugefügt, Kinder sind schon oben drin
             '---------------------------------------------------------------------
-
             For m = PES_Settings.NNachf + 1 To PES_Settings.NNachf + PES_Settings.NEltern
                 With List_NDSorting(m)
                     For l = 1 To PES_Initial.NPenalty
@@ -1322,10 +1307,10 @@ Public Class PES
             'NDSorting wird in Temp kopiert
             Array.Copy(List_NDSorting, Temp, List_NDSorting.GetLength(0))
 
-            'Schleife läuft über die Zahl der Fronten die hier auch bestimmte werden
+            'Schleife läuft über die Zahl der Fronten die hier auch bestimmt werden
             Do
                 'Entscheidet welche Werte dominiert werden und welche nicht
-                Call Non_Dominated_Sorting(Temp, durchlauf) 'aktuallisiert auf n Objectives dm 10.05.05
+                Call Non_Dominated_Sorting(Temp, durchlauf) 'aktualisiert auf n Objectives dm 10.05.05
                 'Sortiert die nicht dominanten Lösungen nach oben,
                 'die dominanten nach unten und zählt die Mitglieder der aktuellen Front
                 NFrontMember_aktuell = Non_Dominated_Count_and_Sort(Temp)
@@ -1336,7 +1321,7 @@ Public Class PES
                 'und die bereits klassifizierten Lösungen aus Temp Array gelöscht
                 Call Non_Dominated_Result(Temp, NDSResult, NFrontMember_aktuell, NFrontMember_gesamt)
                 'Durchlauf ist hier die Nummer der Front
-                durchlauf = durchlauf + 1
+                durchlauf += 1
             Loop While Not (NFrontMember_gesamt = PES_Settings.NEltern + PES_Settings.NNachf)
 
             '3. Der Bestwertspeicher wird entsprechend der Fronten oder der
@@ -1396,7 +1381,7 @@ Public Class PES
 
                 End If
 
-                aktuelle_Front = aktuelle_Front + 1
+                aktuelle_Front += 1
 
             Loop While Not (NFrontMember_gesamt = PES_Settings.NEltern)
 
@@ -1417,7 +1402,7 @@ Public Class PES
             Call Non_Dominated_Sorting(SekundärQb, 1)
             NFrontMember_aktuell = Non_Dominated_Count_and_Sort_Sekundäre_Population(SekundärQb)
             ReDim Preserve SekundärQb(NFrontMember_aktuell)
-            Call SekundärQb_Dubletten(SekundärQb)
+            Call SekundärQb_Dubletten()
             NFrontMember_aktuell = Non_Dominated_Count_and_Sort_Sekundäre_Population(SekundärQb)
             ReDim Preserve SekundärQb(NFrontMember_aktuell)
 
@@ -1461,27 +1446,27 @@ Public Class PES
 
             'Sortierung der Lösungen ist nur für Neighbourhood-Rekombination notwendig
             If PES_Settings.iOptEltern = EVO_ELTERN_Neighbourhood Then
-                Call Neighbourhood_AbstandsArray(PenaltyDistance, Qb)
-                Call Neighbourhood_Crowding_Distance(Distanceb, Qb)
+                Call Neighbourhood_AbstandsArray()
+                Call Neighbourhood_Crowding_Distance()
             End If
 
         End If
 
-        EsEltern = True
-
-    End Function
+    End Sub
 
     '*******************************************************************************
     'Non_Dominated_Sorting
     'Entscheidet welche Werte dominiert werden und welche nicht
     '*******************************************************************************
-    Private Sub Non_Dominated_Sorting(ByRef NDSorting() As Struct_NDSorting, ByRef durchlauf As Short)
+    Private Sub Non_Dominated_Sorting(ByRef NDSorting() As Struct_NDSorting, ByVal rang As Short)
 
         Dim j, i, k As Short
         Dim Logical As Boolean
         Dim Summe_Constrain(2) As Double
 
-        If PES_Initial.NConstrains > 0 Then
+        If (PES_Initial.NConstrains > 0) Then
+            'Mit Constraints
+            '---------------
             For i = 1 To UBound(NDSorting)
                 For j = 1 To UBound(NDSorting)
                     If NDSorting(i).feasible And Not NDSorting(j).feasible Then
@@ -1525,7 +1510,10 @@ Public Class PES
                     End If
                 Next j
             Next i
+
         Else
+            'Ohne Constraints
+            '----------------
             For i = 1 To UBound(NDSorting)
                 For j = 1 To UBound(NDSorting)
 
@@ -1548,7 +1536,7 @@ Public Class PES
 
         For i = 1 To UBound(NDSorting)
             'Hier wird die Nummer der Front geschrieben
-            If NDSorting(i).dominated = False Then NDSorting(i).Front = durchlauf
+            If NDSorting(i).dominated = False Then NDSorting(i).Front = rang
         Next i
 
     End Sub
@@ -1556,12 +1544,14 @@ Public Class PES
     '*******************************************************************************
     'Non_Dominated_Count_and_Sort
     'Sortiert die nicht dominanten Lösungen nach oben, die dominanten nach unten
+    'Gibt die Zahl der dominanten Lösungen zurück (Front)
     '*******************************************************************************
     Private Function Non_Dominated_Count_and_Sort(ByRef NDSorting() As Struct_NDSorting) As Short
 
         Dim i As Short
         Dim Temp() As Struct_NDSorting
         Dim counter As Short
+        Dim NFrontMember As Short
 
         ReDim Temp(UBound(NDSorting))
 
@@ -1570,35 +1560,38 @@ Public Class PES
             ReDim Temp(i).X(PES_Initial.varanz)
         Next i
 
-        Non_Dominated_Count_and_Sort = 0
+        NFrontMember = 0
         counter = 0
 
         'Die nicht dominanten Lösungen werden nach oben kopiert
         For i = 1 To UBound(NDSorting)
-            If NDSorting(i).dominated = True Then
-                counter = counter + 1
+            If (NDSorting(i).dominated = True) Then
+                counter += 1
                 Temp(counter) = NDSorting(i)
             End If
         Next i
 
-        'Zahl der dominanten wird errechnet und zurückgegeben
-        Non_Dominated_Count_and_Sort = UBound(NDSorting) - counter
+        'Zahl der dominanten Lösungen wird errechnet
+        NFrontMember = UBound(NDSorting) - counter
 
         'Die dominanten Lösungen werden nach unten kopiert
         For i = 1 To UBound(NDSorting)
-            If NDSorting(i).dominated = False Then
-                counter = counter + 1
+            If (NDSorting(i).dominated = False) Then
+                counter += 1
                 Temp(counter) = NDSorting(i)
             End If
         Next i
 
         Array.Copy(Temp, NDSorting, NDSorting.GetLength(0))
 
+        Return NFrontMember
+
     End Function
 
     '*******************************************************************************
     'Non_Dominated_Count_and_Sort_Sekundäre_Population
     'Sortiert die nicht dominanten Lösungen nach oben, die dominanten nach unten
+    'Gibt die Zahl der dominanten Lösungen zurück (Front)
     'hier für die Sekundäre Population
     '*******************************************************************************
     Private Function Non_Dominated_Count_and_Sort_Sekundäre_Population(ByRef NDSorting() As Struct_NDSorting) As Short
@@ -1606,6 +1599,7 @@ Public Class PES
         Dim i As Short
         Dim Temp() As Struct_NDSorting
         Dim counter As Short
+        Dim NFrontMember as Short
 
         ReDim Temp(UBound(NDSorting))
 
@@ -1614,26 +1608,28 @@ Public Class PES
             ReDim Temp(i).X(PES_Initial.varanz)
         Next i
 
-        Non_Dominated_Count_and_Sort_Sekundäre_Population = 0
+        NFrontMember = 0
         counter = 0
 
         For i = 1 To UBound(NDSorting)
-            If NDSorting(i).dominated = False Then
-                counter = counter + 1
+            If (NDSorting(i).dominated = False) Then
+                counter += 1
                 Temp(counter) = NDSorting(i)
             End If
         Next i
 
-        Non_Dominated_Count_and_Sort_Sekundäre_Population = counter
+        NFrontMember = counter
 
         For i = 1 To UBound(NDSorting)
-            If NDSorting(i).dominated = True Then
-                counter = counter + 1
+            If (NDSorting(i).dominated = True) Then
+                counter += 1
                 Temp(counter) = NDSorting(i)
             End If
         Next i
 
         Array.Copy(Temp, NDSorting, NDSorting.GetLength(0))
+
+        Return NFrontMember
 
     End Function
 
@@ -1642,7 +1638,7 @@ Public Class PES
     'Hier wird pro durchlauf die nicht dominierte Front in NDSResult geschaufelt
     'und die bereits klassifizierten Lösungen aus Temp Array gelöscht
     '*******************************************************************************
-    Private Sub Non_Dominated_Result(ByRef Temp() As Struct_NDSorting, ByRef NDSResult() As Struct_NDSorting, ByRef NFrontMember_aktuell As Short, ByRef NFrontMember_gesamt As Short)
+    Private Sub Non_Dominated_Result(ByRef Temp() As Struct_NDSorting, ByRef NDSResult() As Struct_NDSorting, ByVal NFrontMember_aktuell As Short, ByVal NFrontMember_gesamt As Short)
 
         Dim i, Position As Short
 
@@ -1652,11 +1648,11 @@ Public Class PES
         For i = UBound(Temp) + 1 - NFrontMember_aktuell To UBound(Temp)
             'NDSResult alle bisher gefundene Fronten
             NDSResult(Position) = Temp(i)
-            Position = Position + 1
+            Position += 1
         Next i
 
         'Die bereits klassifizierten Member werden aus dem Temp Array gelöscht
-        If PES_Settings.NNachf + PES_Settings.NEltern - NFrontMember_gesamt > 0 Then
+        If (PES_Settings.NNachf + PES_Settings.NEltern - NFrontMember_gesamt > 0) Then
             ReDim Preserve Temp(PES_Settings.NNachf + PES_Settings.NEltern - NFrontMember_gesamt)
             'Der Flag wird zur klassifizierung in der nächsten Runde zurückgesetzt
             For i = 1 To UBound(Temp)
@@ -1685,7 +1681,7 @@ Public Class PES
     '*******************************************************************************
     'NDS_Crowding_Distance_Sort
     '*******************************************************************************
-    Private Sub NDS_Crowding_Distance_Sort(ByRef NDSorting() As Struct_NDSorting, ByRef start As Short, ByRef ende As Short)
+    Private Sub NDS_Crowding_Distance_Sort(ByRef NDSorting() As Struct_NDSorting, ByVal start As Short, ByVal ende As Short)
 
         Dim i As Integer
         Dim j As Integer
@@ -1700,7 +1696,7 @@ Public Class PES
         For k = 1 To PES_Initial.NPenalty
             For i = start To ende
                 For j = start To ende
-                    If NDSorting(i).penalty(k) < NDSorting(j).penalty(k) Then
+                    If (NDSorting(i).penalty(k) < NDSorting(j).penalty(k)) Then
                         swap = NDSorting(i)
                         NDSorting(i) = NDSorting(j)
                         NDSorting(j) = swap
@@ -1721,7 +1717,7 @@ Public Class PES
 
         For i = start To ende
             For j = start To ende
-                If NDSorting(i).distance > NDSorting(j).distance Then
+                If (NDSorting(i).distance > NDSorting(j).distance) Then
                     swap = NDSorting(i)
                     NDSorting(i) = NDSorting(j)
                     NDSorting(j) = swap
@@ -1735,7 +1731,7 @@ Public Class PES
     '*******************************************************************************
     'NDS_Crowding_Distance_Count
     '*******************************************************************************
-    Private Function NDS_Crowding_Distance_Count(ByRef Qb(,,) As Double, ByRef Spannweite As Double) As Double
+    Private Function NDS_Crowding_Distance_Count(ByRef Spannweite As Double) As Double
 
         Dim i As Short
         Dim j As Short
@@ -1749,8 +1745,8 @@ Public Class PES
         ReDim TempDistance(PES_Initial.NPenalty)
         ReDim PenaltyDistance(PES_Settings.NEltern, PES_Settings.NEltern)
         ReDim d(PES_Settings.NEltern - 1)
-        'Bestimmen der normierten Raumabstände zwischen allen Elternindividuen
 
+        'Bestimmen der normierten Raumabstände zwischen allen Elternindividuen
         For i = 1 To PES_Settings.NEltern
             PenaltyDistance(i, i) = 0
             For j = i + 1 To PES_Settings.NEltern
@@ -1770,10 +1766,10 @@ Public Class PES
         For i = 1 To PES_Settings.NEltern - 1
             d(i) = 1.0E+300
             For j = 1 To i - 1
-                If PenaltyDistance(i, j) < d(i) Then d(i) = PenaltyDistance(i, j)
+                If (PenaltyDistance(i, j) < d(i)) Then d(i) = PenaltyDistance(i, j)
             Next j
             For j = i + 1 To PES_Settings.NEltern
-                If PenaltyDistance(i, j) < d(i) Then d(i) = PenaltyDistance(i, j)
+                If (PenaltyDistance(i, j) < d(i)) Then d(i) = PenaltyDistance(i, j)
             Next j
             d_mean = d_mean + d(i)
         Next i
@@ -1804,7 +1800,7 @@ Public Class PES
     'Neighbourhood_AbstandsArray
     'Bestimme Array der Raumabstände für Neighbourhood-Rekombination
     '*******************************************************************************
-    Private Sub Neighbourhood_AbstandsArray(ByRef PenaltyDistance(,) As Double, ByRef Qb(,,) As Double)
+    Private Sub Neighbourhood_AbstandsArray()
 
         Dim i As Short
         Dim j As Short
@@ -1820,8 +1816,8 @@ Public Class PES
             Min = Qb(1, PES_iAkt.iAktPop, k)
             Max = Qb(1, PES_iAkt.iAktPop, k)
             For j = 1 To PES_Settings.NEltern
-                If Min > Qb(j, PES_iAkt.iAktPop, k) Then Min = Qb(j, PES_iAkt.iAktPop, k)
-                If Max < Qb(j, PES_iAkt.iAktPop, k) Then Max = Qb(j, PES_iAkt.iAktPop, k)
+                If (Min > Qb(j, PES_iAkt.iAktPop, k)) Then Min = Qb(j, PES_iAkt.iAktPop, k)
+                If (Max < Qb(j, PES_iAkt.iAktPop, k)) Then Max = Qb(j, PES_iAkt.iAktPop, k)
             Next j
             MinMax(k) = Max - Min
         Next k
@@ -1858,7 +1854,7 @@ Public Class PES
     '*******************************************************************************
     'SekundärQb_Dubletten
     '*******************************************************************************
-    Private Sub SekundärQb_Dubletten(ByRef SekundärQb() As Struct_NDSorting)
+    Private Sub SekundärQb_Dubletten()
 
         Dim i, j, k As Short
         Dim Logical As Boolean
@@ -1869,7 +1865,7 @@ Public Class PES
                 For k = 1 To PES_Initial.NPenalty
                     Logical = Logical And (SekundärQb(i).penalty(k) = SekundärQb(j).penalty(k))
                 Next k
-                If Logical Then SekundärQb(i).dominated = True
+                If (Logical) Then SekundärQb(i).dominated = True
             Next j
         Next i
     End Sub
@@ -1878,7 +1874,7 @@ Public Class PES
     'Neighbourhood_Eltern
     'Bestimme die NAnzahlEltern mit geringsten Raumabständen für Neighbourhood-Rekombination
     '*******************************************************************************
-    Private Sub Neighbourhood_Eltern(ByRef PenaltyDistance(,) As Double, ByRef IndexElter As Short, ByRef NAnzahlEltern As Short, ByRef IndexEltern() As Short)
+    Private Sub Neighbourhood_Eltern(ByVal IndexElter As Short)
 
         Dim i As Short
         Dim j As Short
@@ -1898,7 +1894,7 @@ Public Class PES
 
         For i = 1 To UBound(Nachbarn)
             For j = i To UBound(Nachbarn)
-                If Nachbarn(i).distance > Nachbarn(j).distance Then
+                If (Nachbarn(i).distance > Nachbarn(j).distance) Then
                     swap = Nachbarn(i)
                     Nachbarn(i) = Nachbarn(j)
                     Nachbarn(j) = swap
@@ -1906,7 +1902,7 @@ Public Class PES
             Next
         Next
 
-        For i = 1 To NAnzahlEltern
+        For i = 1 To PES_Settings.NRekombXY
             IndexEltern(i) = Nachbarn(i).Index
         Next i
 
@@ -1916,7 +1912,7 @@ Public Class PES
     'Neighbourhood_Crowding_Distance
     'Bestimme die NAnzahlEltern mit geringsten Raumabständen für Neighbourhood-Rekombination
     '*******************************************************************************
-    Private Sub Neighbourhood_Crowding_Distance(ByRef Distanceb() As Double, ByRef Qb(,,) As Double)
+    Private Sub Neighbourhood_Crowding_Distance()
 
         Dim i As Integer
         Dim j As Integer
@@ -1935,7 +1931,7 @@ Public Class PES
         For k = 1 To PES_Initial.NPenalty
             For i = 1 To PES_Settings.NEltern
                 For j = 1 To PES_Settings.NEltern
-                    If QbTemp(i, PES_iAkt.iAktPop, k) < QbTemp(j, PES_iAkt.iAktPop, k) Then
+                    If (QbTemp(i, PES_iAkt.iAktPop, k) < QbTemp(j, PES_iAkt.iAktPop, k)) Then
                         swap = QbTemp(i, PES_iAkt.iAktPop, k)
                         QbTemp(i, PES_iAkt.iAktPop, k) = QbTemp(j, PES_iAkt.iAktPop, k)
                         QbTemp(j, PES_iAkt.iAktPop, k) = swap
@@ -1961,6 +1957,7 @@ Public Class PES
     'TODO: Sortiere() wird nicht benutzt!
     '*******************************************************************************
     Private Sub Sortiere(ByRef t() As Double)
+
         Dim i As Integer
         Dim j As Integer
         Dim swap As String

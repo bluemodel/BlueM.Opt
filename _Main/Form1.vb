@@ -50,7 +50,6 @@ Partial Class Form1
     Public TSP1 As TSP
 
     '**** Globale Parameter Parameter Optimierung ****
-    Dim myIsOK As Boolean
     Dim globalAnzPar As Short
     Dim globalAnzZiel As Short
     Dim globalAnzRand As Short
@@ -799,7 +798,8 @@ Partial Class Form1
                     'Die öffentlichen dynamischen Arrays werden initialisiert (Dn, An, Xn, Xmin, Xmax)
                     'und die Anzahl der Zielfunktionen wird festgelegt
                     '******************************************************************************************
-                    myIsOK = PES1.EsIni(globalAnzPar, globalAnzZiel, globalAnzRand)
+                    Call PES1.EsIni(globalAnzPar, globalAnzZiel, globalAnzRand)
+
                     '3. Schritt: PES - ES_OPTIONS
                     'Optionen der Evolutionsstrategie werden übergeben
                     '******************************************************************************************
@@ -898,30 +898,30 @@ Partial Class Form1
         '2. Schritt: PES - ES_OPTIONS
         'Optionen der Evolutionsstrategie werden übergeben
         '******************************************************************************************
-        myIsOK = PES1.EsSettings(EVO_Settings1.PES_Settings)
+        Call PES1.EsSettings(EVO_Settings1.PES_Settings)
 
         '3. Schritt: PES - ES_INI
         'Die öffentlichen dynamischen Arrays werden initialisiert (Dn, An, Xn, Xmin, Xmax)
         'und die Anzahl der Zielfunktionen wird festgelegt
         '******************************************************************************************
-        myIsOK = PES1.EsIni(globalAnzPar, globalAnzZiel, globalAnzRand)
+        Call PES1.EsIni(globalAnzPar, globalAnzZiel, globalAnzRand)
 
         '4. Schritt: PES - ES_LET_PARAMETER
         'Ausgangsparameter werden übergeben
         '******************************************************************************************
         For i = 1 To globalAnzPar
-            myIsOK = PES1.EsLetParameter(i, myPara(i, 1))
+            Call PES1.EsLetParameter(i, myPara(i, 1))
         Next i
 
         '5. Schritt: PES - ES_PREPARE
         'Interne Variablen werden initialisiert, Zufallsgenerator wird initialisiert
         '******************************************************************************************
-        myIsOK = PES1.EsPrepare()
+        Call PES1.EsPrepare()
 
         '6. Schritt: PES - ES_STARTVALUES
         'Startwerte werden zugewiesen
         '******************************************************************************************
-        myIsOK = PES1.EsStartvalues()
+        Call PES1.EsStartvalues()
 
         'Startwerte werden der Verlaufsanzeige werden zugewiesen
         Call Me.INI_Verlaufsanzeige(EVO_Settings1.PES_Settings.NRunden, EVO_Settings1.PES_Settings.NPopul, EVO_Settings1.PES_Settings.NGen, EVO_Settings1.PES_Settings.NNachf)
@@ -931,6 +931,7 @@ Partial Class Form1
 Start_Evolutionsrunden:
         'Cursor setzen
         'System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+
         'Loop über alle Runden
         '*******************************************************************************************
         Do While (PES1.EsIsNextRunde(Me.Method))
@@ -938,29 +939,30 @@ Start_Evolutionsrunden:
             irunde = PES1.PES_iAkt.iAktRunde
             Call EVO_Opt_Verlauf1.Runden(irunde)
 
-            myIsOK = PES1.EsPopBestwertspeicher()
+            Call PES1.EsPopBestwertspeicher()
+
             'Loop über alle Populationen
-            '***********************************************************************************************
+            '***************************************************************************************
             Do While (PES1.EsIsNextPop)
 
                 ipop = PES1.PES_iAkt.iAktPop
                 Call EVO_Opt_Verlauf1.Populationen(ipop)
 
-                myIsOK = PES1.EsPopVaria
+                Call PES1.EsPopVaria()
 
-                myIsOK = PES1.EsPopMutation
+                Call PES1.EsPopMutation()
 
                 'Loop über alle Generationen
-                '***********************************************************************************************
+                '***********************************************************************************
                 Do While (PES1.EsIsNextGen)
 
                     igen = PES1.PES_iAkt.iAktGen
                     Call EVO_Opt_Verlauf1.Generation(igen)
 
-                    myIsOK = PES1.EsBestwertspeicher()
+                    Call PES1.EsBestwertspeicher()
 
                     'Loop über alle Nachkommen
-                    '********************************************************************
+                    '*******************************************************************************
                     Do While (PES1.EsIsNextNachf)
 
                         inachf = PES1.PES_iAkt.iAktNachf
@@ -975,27 +977,26 @@ Start_Evolutionsrunden:
 GenerierenAusgangswerte:
 
                         Versuch = Versuch + 1
-                        If Versuch > 10 Then
-                            'Throw New Exception("Es konnte kein gültiger Datensatz erzeugt werden!")
+                        If (Versuch > 10) Then
+                            Throw New Exception("Es konnte kein gültiger Datensatz erzeugt werden!")
                         End If
 
                         'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
-                        myIsOK = PES1.EsVaria
+                        Call PES1.EsVaria()
 
                         'Mutieren der Ausgangswerte
-                        myIsOK = PES1.EsMutation
+                        Call PES1.EsMutation()
 
                         'Auslesen der Variierten Parameter
-                        myIsOK = PES1.EsGetParameter(globalAnzPar, myPara)
+                        myPara = PES1.EsGetParameter()
 
                         'Auslesen des Bestwertspeichers
-                        If Not EVO_Settings1.PES_Settings.is_MO_Pareto Then
-                            myIsOK = PES1.EsGetBestwert(Bestwert)
+                        If (Not EVO_Settings1.PES_Settings.is_MO_Pareto) Then
+                            Bestwert = PES1.EsGetBestwert()
                         End If
 
-                        '************************************************************************************
-                        '******************* Ansteuerung der zu optimierenden Anwendung *********************
-                        '************************************************************************************
+                        'Ansteuerung der zu optimierenden Anwendung
+                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
                         Select Case Anwendung
                             Case ANW_TESTPROBLEME
                                 Call Testprobleme1.Evaluierung_TestProbleme(Testprobleme1.Combo_Testproblem.Text, globalAnzPar, myPara, durchlauf, ipop, QN, RN, DForm.Diag)
@@ -1026,54 +1027,47 @@ GenerierenAusgangswerte:
                         End Select
 
                         'Einordnen der Qualitätsfunktion im Bestwertspeicher
-                        '**************************************************************************
-                        myIsOK = PES1.EsBest(QN, RN)
+                        Call PES1.EsBest(QN, RN)
 
                         System.Windows.Forms.Application.DoEvents()
 
-                        'Ende Loop über alle Nachkommen
-                        '**************************************************************************
-                    Loop
 
+                    Loop 'Ende Schleife über alle Nachkommen
+                    '**********************************************************************
 
                     'Die neuen Eltern werden generiert
-                    myIsOK = PES1.EsEltern()
+                    Call PES1.EsEltern()
 
                     'sekundäre Population zeichnen
-                    If EVO_Settings1.PES_Settings.is_MO_Pareto Then
-                        myIsOK = PES1.esGetSekundärePopulation(SekPopulation)
+                    If (EVO_Settings1.PES_Settings.is_MO_Pareto) Then
+                        SekPopulation = PES1.EsGetSekundärePopulation()
                         Call SekundärePopulationZeichnen(SekPopulation)
                     End If
 
                     System.Windows.Forms.Application.DoEvents()
 
-                    'Ende Loop über alle Generationen
-                    '***********************************************************************************************
-                Loop 'Schleife über alle Generationen
+                Loop 'Ende Schleife über alle Generationen
+                '**************************************************************************
 
                 System.Windows.Forms.Application.DoEvents()
 
                 'Einordnen der Qualitätsfunktion im PopulationsBestwertspeicher
-                myIsOK = PES1.EsPopBest()
+                Call PES1.EsPopBest()
 
-                'Ende Loop über alle Populationen
-                '***********************************************************************************************
-            Loop 'Schleife über alle Populationen
-
-
+            Loop 'Ende Schleife über alle Populationen
+            '******************************************************************************
 
             'Die neuen Populationseltern werden generiert
-            myIsOK = PES1.EsPopEltern
+            Call PES1.EsPopEltern()
 
             System.Windows.Forms.Application.DoEvents()
 
-            'Ende Loop über alle Runden
-            '***********************************************************************************************
-        Loop 'Schleife über alle Runden
+        Loop 'Ende Schleife über alle Runden
+        '**********************************************************************************
 
         'PES, letzter. Schritt
         'Objekt der Klasse PES wird vernichtet
-        '***************************************************************************************************
+        '**********************************************************************************
         'UPGRADE_NOTE: Das Objekt PES1 kann erst dann gelöscht werden, wenn die Garbagecollection durchgeführt wurde. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1029"'
         'TODO: Ersetzen durch dispose funzt net
         PES1 = Nothing
