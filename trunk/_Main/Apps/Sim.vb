@@ -1223,7 +1223,7 @@ Public MustInherit Class Sim
 
     'EVO-Parameterübergabe
     '*********************
-    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara(,) As Double)
+    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara() As Double)
 
         Dim i As Integer
 
@@ -1232,9 +1232,9 @@ Public MustInherit Class Sim
 
         'Parameterwerte übergeben
         'BUG 135: mypara() fängt bei 1 an!
-        ReDim mypara(globalAnzPar, 1)
+        ReDim mypara(globalAnzPar)
         For i = 1 To globalAnzPar
-            mypara(i, 1) = Me.List_OptParameter(i - 1).SKWert
+            mypara(i) = Me.List_OptParameter(i - 1).SKWert
         Next
 
         'Anzahl Optimierungsziele übergeben
@@ -1247,13 +1247,13 @@ Public MustInherit Class Sim
 
     'Evaluierung des SimModells für ParameterOptimierung - Steuerungseinheit
     '***********************************************************************
-    Public Sub PREPARE_Evaluation_PES(ByVal myPara As Double(,))
+    Public Sub PREPARE_Evaluation_PES(ByVal myPara() As Double)
 
         Dim i As Short
 
         'Mutierte Parameter an OptParameter übergeben
-        For i = 0 To Me.List_OptParameter.GetUpperBound(0)          'BUG 135: mypara(,) fängt bei 1 an!
-            List_OptParameter(i).SKWert = myPara(i + 1, 1)          'OptParameterListe(i+1) weil Array bei 0 anfängt!
+        For i = 0 To Me.List_OptParameter.GetUpperBound(0)
+            List_OptParameter(i).SKWert = myPara(i + 1)         'BUG 135: mypara() fängt bei 1 an!
         Next
 
         'Mutierte Parameter in Eingabedateien schreiben

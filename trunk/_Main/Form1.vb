@@ -57,7 +57,7 @@ Partial Class Form1
     Dim array_y() As Double
     Dim Bestwert(,) As Double = {}
     Dim SekPopulation(,) As Double
-    Dim myPara(,) As Double
+    Dim myPara() As Double
 
     '**** Verschiedenes ****
     Dim isrun As Boolean = False                        'Optimierung läuft
@@ -909,9 +909,7 @@ Partial Class Form1
         '4. Schritt: PES - ES_LET_PARAMETER
         'Ausgangsparameter werden übergeben
         '******************************************************************************************
-        For i = 1 To globalAnzPar
-            Call PES1.EsLetParameter(i, myPara(i, 1))
-        Next i
+        Call PES1.EsLetParameter(myPara)
 
         '5. Schritt: PES - ES_PREPARE
         'Interne Variablen werden initialisiert, Zufallsgenerator wird initialisiert
@@ -998,8 +996,10 @@ GenerierenAusgangswerte:
                         'Ansteuerung der zu optimierenden Anwendung
                         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
                         Select Case Anwendung
+
                             Case ANW_TESTPROBLEME
-                                Call Testprobleme1.Evaluierung_TestProbleme(Testprobleme1.Combo_Testproblem.Text, globalAnzPar, myPara, durchlauf, ipop, QN, RN, DForm.Diag)
+                                Call Testprobleme1.Evaluierung_TestProbleme(Testprobleme1.Combo_Testproblem.Text, myPara, durchlauf, ipop, QN, RN, DForm.Diag)
+
                             Case ANW_BLUEM, ANW_SMUSI
 
                                 'Vorbereiten des Modelldatensatzes
