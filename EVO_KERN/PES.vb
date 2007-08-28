@@ -240,34 +240,35 @@ Public Class PES
     End Sub
 
     'ES_LET_PARAMETER
-    'Function ES_LET_PARAMETER dient zur Übergabe der Ausgangsparameter an die Evolutionsstrategie,
-    'i ist der Index des Parameters, es wird genau ein Parameter übergeben
+    'Function ES_LET_PARAMETER dient zur Übergabe der Ausgangsparameter an die Evolutionsstrategie
     '*******************************************************************************
-    Public Sub EsLetParameter(ByVal i As Integer, ByVal Parameter As Double)
+    Public Sub EsLetParameter(ByVal mypara() As Double)
 
-        PES_Initial.Xn(i) = Parameter
-        PES_Initial.Xmin(i) = 0
-        PES_Initial.Xmax(i) = 1
-        PES_Initial.Xn(i) = Math.Min(PES_Initial.Xn(i), PES_Initial.Xmax(i))
-        PES_Initial.Xn(i) = Math.Max(PES_Initial.Xn(i), PES_Initial.Xmin(i))
+        Dim i As Short
+
+        For i = 1 To PES_Initial.varanz
+            PES_Initial.Xn(i) = mypara(i)
+            PES_Initial.Xmin(i) = 0
+            PES_Initial.Xmax(i) = 1
+            PES_Initial.Xn(i) = Math.Min(PES_Initial.Xn(i), PES_Initial.Xmax(i))
+            PES_Initial.Xn(i) = Math.Max(PES_Initial.Xn(i), PES_Initial.Xmin(i))
+        Next
 
     End Sub
 
     '*******************************************************************************
     'ES_GET_PARAMETER
-    'Function ES_GET_PARAMETER dient zur Übergabe der mutierten Parameter
-    'Alle Parameter werden in ein Array geschrieben
-    'globalAnzPar ist die Anzahl der mutierten Parameter,
+    'Function ES_GET_PARAMETER dient zur Rückgabe der mutierten Parameter
     '*******************************************************************************
-    Public Function EsGetParameter() As Double(,)
+    Public Function EsGetParameter() As Double()
 
         Dim i As Short
-        Dim mypara(,) As Double
+        Dim mypara() As Double
 
-        ReDim mypara(PES_Initial.varanz, 1)
+        ReDim mypara(PES_Initial.varanz)
 
         For i = 1 To PES_Initial.varanz
-            mypara(i, 1) = PES_Initial.Xn(i)
+            mypara(i) = PES_Initial.Xn(i)
         Next i
 
         Return mypara
