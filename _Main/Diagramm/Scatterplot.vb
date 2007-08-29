@@ -47,10 +47,10 @@ Partial Public Class Scatterplot
                         .Axes.Bottom.Title.Caption = series(i + 1).name
                         .Axes.Left.Title.Caption = series(j + 1).name
                         'Serie initialisieren
-                        Call .prepareSeries(0, i & ", " & j)
+                        Dim SeriesNo as Integer = .prepareSeries(i & ", " & j, "", Steema.TeeChart.Styles.PointerStyles.SmallDot, 1)
                         'Punkte einzeichnen
                         For k = 0 To series(i + 1).values.getUpperBound(0)
-                            .Chart.Series(0).Add(series(i + 1).values(k), series(j + 1).values(k))
+                            .Chart.Series(SeriesNo).Add(series(i + 1).values(k), series(j + 1).values(k))
                         Next
                     End With
                 End If

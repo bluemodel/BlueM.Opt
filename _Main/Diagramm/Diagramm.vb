@@ -46,20 +46,21 @@ Public Class Diagramm
 
     End Sub
 
-    'Serien-Initialisierung-Dynamisch
+    'Serien-Initialisierung dynamisch
     'gibt die SeriesNo zurück
     '********************************
-    Public Function prepareSeries(ByVal Title As String, Optional ByVal Style As Steema.TeeChart.Styles.PointerStyles = Steema.TeeChart.Styles.PointerStyles.Circle, Optional ByVal Size As Integer = 3) As Integer
+    Public Function prepareSeries(ByVal title As String, _
+                                  Optional ByVal colorName As String = "", _
+                                  Optional ByVal style As Steema.TeeChart.Styles.PointerStyles = Steema.TeeChart.Styles.PointerStyles.Circle, _
+                                  Optional ByVal size As Integer = 3) As Integer
 
         Dim SeriesNo As Integer
-        Dim SeriesExists as Boolean = False
+        Dim SeriesExists As Boolean = False
         Dim i As Integer
 
-        'Neue Series nur dann zum Chart hinzufügen, 
-        'wenn noch keine Series mit dem gegebenen Namen existiert
-
+        'Überprüfen, ob Serie bereits existiert
         For i = 0 To Me.Chart.Series.Count - 1
-            If (Me.Chart.Series(i).Title = Title) Then
+            If (Me.Chart.Series(i).Title = title) Then
                 SeriesExists = True
                 SeriesNo = i
                 Exit For
@@ -67,18 +68,21 @@ Public Class Diagramm
         Next
 
         If (Not SeriesExists) Then
-            'Series hinzufügen
+            'Serie neu hinzufügen
             Dim tmpSeries As New Steema.TeeChart.Styles.Points(Me.Chart)
-            tmpSeries.Title = Title
-            tmpSeries.Pointer.Style = Style
-            tmpSeries.Pointer.HorizSize = Size
-            tmpSeries.Pointer.VertSize = Size
+            tmpSeries.Title = title
+            tmpSeries.Pointer.Style = style
+            tmpSeries.Pointer.HorizSize = size
+            tmpSeries.Pointer.VertSize = size
+            If (Not colorName = "") Then
+                tmpSeries.Color = Drawing.Color.FromName(colorName)
+            End If
 
             Call Me.add_MarksTips()
 
             SeriesNo = Me.Chart.Series.Count - 1
         Else
-            'Series besteht schon
+            'Serie besteht schon
         End If
 
         Return SeriesNo
