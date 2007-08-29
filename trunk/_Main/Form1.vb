@@ -738,7 +738,7 @@ Partial Class Form1
                 End If
 
                 'Zeichnen MO_SO Zeichnen
-                SeriesNo = DForm.Diag.prepareSeries("Childs", Steema.TeeChart.Styles.PointerStyles.Triangle, 4)
+                SeriesNo = DForm.Diag.prepareSeries("Childs", "", Steema.TeeChart.Styles.PointerStyles.Triangle, 4)
                 If CES1.n_Penalty = 1 Then
                     Call DForm.Diag.Series(SeriesNo).Add(durchlauf_all, CES1.List_Childs(i).Penalty(0))
                 ElseIf CES1.n_Penalty = 2 Then
@@ -758,7 +758,7 @@ Partial Class Form1
                 'Zeichnen des besten Elter
                 For i = 0 To CES1.n_Parents - 1
                     'durchlauf += 1
-                    SeriesNo = DForm.Diag.prepareSeries("Parent", Steema.TeeChart.Styles.PointerStyles.Triangle, 3)
+                    SeriesNo = DForm.Diag.prepareSeries("Parent", "", Steema.TeeChart.Styles.PointerStyles.Triangle, 3)
                     Call DForm.Diag.Series(SeriesNo).Add(durchlauf_all, CES1.List_Parents(i).Penalty(0))
                 Next
 
@@ -768,7 +768,7 @@ Partial Class Form1
                 'Zeichnen von NDSortingResult
                 Call DForm.Diag.DeleteSeries(CES1.n_Childs - 1, 1)
                 For i = 0 To CES1.n_Childs - 1
-                    SeriesNo = DForm.Diag.prepareSeries("Front:" & 1, Steema.TeeChart.Styles.PointerStyles.Triangle, 4)
+                    SeriesNo = DForm.Diag.prepareSeries("Front:" & 1, "", Steema.TeeChart.Styles.PointerStyles.Triangle, 4)
                     Call DForm.Diag.Series(SeriesNo).Add(CES1.NDSResult(i).Penalty(0), CES1.NDSResult(i).Penalty(1))
                 Next
             End If
@@ -1022,7 +1022,7 @@ GenerierenAusgangswerte:
                                 Else
                                     'MultiObjective
                                     'BUG 118: nur die ersten beiden Zielfunktionen werden gezeichnet
-                                    SeriesNo = DForm.Diag.prepareSeries("Population", Steema.TeeChart.Styles.PointerStyles.Circle, 4)
+                                    SeriesNo = DForm.Diag.prepareSeries("Population", "Yellow", Steema.TeeChart.Styles.PointerStyles.Circle, 4)
                                     DForm.Diag.Series(SeriesNo).Cursor = Cursors.Hand
                                     Call DForm.Diag.Series(SeriesNo).Add(Sim1.List_OptZiele(0).QWertTmp, Sim1.List_OptZiele(1).QWertTmp)
                                 End If
@@ -1086,7 +1086,7 @@ GenerierenAusgangswerte:
         Dim i As Short
         Dim SeriesNo As Integer
 
-        SeriesNo = DForm.Diag.prepareSeries("Sekundäre Population", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+        SeriesNo = DForm.Diag.prepareSeries("Sekundäre Population", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
         With DForm.Diag.Series(SeriesNo)
             .Clear()
             If UBound(Population, 2) = 2 Then
@@ -1489,10 +1489,10 @@ GenerierenAusgangswerte:
                     Achsen.Add(tmpAchse)
                     Me.DForm.Diag.Clear()
                     Me.DForm.Diag.DiagInitialise(Path.GetFileName(Sim1.db_path), Achsen)
-                    Me.DForm.Diag.prepareSeries(0, "Population")
-                    Me.DForm.Diag.Chart.Series(0).Cursor = Cursors.Hand
+                    Dim SeriesNo as Integer = Me.DForm.Diag.prepareSeries("Population")
+                    Me.DForm.Diag.Chart.Series(SeriesNo).Cursor = Cursors.Hand
                     For i As Integer = 0 To series(1).values.getUpperBound(0)
-                        Me.DForm.Diag.Chart.Series(0).Add(series(Form2.ListBox_OptZieleX.SelectedIndex + 1).values(i), series(Form2.ListBox_OptZieleY.SelectedIndex + 1).values(i))
+                        Me.DForm.Diag.Chart.Series(SeriesNo).Add(series(Form2.ListBox_OptZieleX.SelectedIndex + 1).values(i), series(Form2.ListBox_OptZieleY.SelectedIndex + 1).values(i))
                     Next
                 End If
 
