@@ -1236,7 +1236,7 @@ Public Class PES
 
         Dim l, m, v, i, j As Short
         Dim NFrontMember_aktuell, NFrontMember_gesamt As Short
-        Dim durchlauf As Short
+        Dim rang As Short
         Dim Temp() As Struct_NDSorting
         Dim NDSResult() As Struct_NDSorting
         Dim aktuelle_Front As Short
@@ -1287,7 +1287,7 @@ Public Class PES
 
             '2. Die einzelnen Fronten werden bestimmt
             '----------------------------------------
-            durchlauf = 1
+            rang = 1
             NFrontMember_gesamt = 0
 
             'Initialisierung von Temp (NDSorting)
@@ -1311,7 +1311,7 @@ Public Class PES
             'Schleife läuft über die Zahl der Fronten die hier auch bestimmt werden
             Do
                 'Entscheidet welche Werte dominiert werden und welche nicht
-                Call Non_Dominated_Sorting(Temp, durchlauf) 'aktualisiert auf n Objectives dm 10.05.05
+                Call Non_Dominated_Sorting(Temp, rang) 'aktualisiert auf n Objectives dm 10.05.05
                 'Sortiert die nicht dominanten Lösungen nach oben,
                 'die dominanten nach unten und zählt die Mitglieder der aktuellen Front
                 NFrontMember_aktuell = Non_Dominated_Count_and_Sort(Temp)
@@ -1321,8 +1321,8 @@ Public Class PES
                 'Hier wird pro durchlauf die nicht dominierte Front in NDSResult geschaufelt
                 'und die bereits klassifizierten Lösungen aus Temp Array gelöscht
                 Call Non_Dominated_Result(Temp, NDSResult, NFrontMember_aktuell, NFrontMember_gesamt)
-                'Durchlauf ist hier die Nummer der Front
-                durchlauf += 1
+                'Rang ist hier die Nummer der Front
+                rang += 1
             Loop While Not (NFrontMember_gesamt = PES_Settings.NEltern + PES_Settings.NNachf)
 
             '3. Der Bestwertspeicher wird entsprechend der Fronten oder der
@@ -1390,7 +1390,7 @@ Public Class PES
             '-------------------------------------------------------
             NFrontMember_aktuell = Count_Front_Members(1, NDSResult)
 
-            Member_Sekundärefront = UBound(SekundärQb)
+            Member_Sekundärefront = Math.Max(UBound(SekundärQb), 0) 'Weil wenn die Länge von SekundärQb 0 ist, gibt UBound -1 zurück!
 
             'SekPop wird um die aktuelle Front erweitert
             ReDim Preserve SekundärQb(Member_Sekundärefront + NFrontMember_aktuell)
@@ -1407,7 +1407,7 @@ Public Class PES
             NFrontMember_aktuell = Non_Dominated_Count_and_Sort_Sekundäre_Population(SekundärQb)
             ReDim Preserve SekundärQb(NFrontMember_aktuell)
 
-            If UBound(SekundärQb) > PES_Settings.NMemberSecondPop Then
+            If (UBound(SekundärQb) > PES_Settings.NMemberSecondPop) Then
                 Call NDS_Crowding_Distance_Sort(SekundärQb, 1, UBound(SekundärQb))
                 ReDim Preserve SekundärQb(PES_Settings.NMemberSecondPop)
             End If
@@ -1462,51 +1462,58 @@ Public Class PES
     Private Sub Non_Dominated_Sorting(ByRef NDSorting() As Struct_NDSorting, ByVal rang As Short)
 
         Dim j, i, k As Short
-        Dim Logical As Boolean
+        Dim isDominated As Boolean
         Dim Summe_Constrain(2) As Double
 
         If (PES_Initial.NConstrains > 0) Then
             'Mit Constraints
-            '---------------
+            '===============
             For i = 1 To UBound(NDSorting)
                 For j = 1 To UBound(NDSorting)
-                    If NDSorting(i).feasible And Not NDSorting(j).feasible Then
 
-                        If NDSorting(j).dominated = False Then NDSorting(j).dominated = True
+                    'Überpüfen, ob NDSorting(j) von NDSorting(i) dominiert wird
+                    '----------------------------------------------------------
+                    If (NDSorting(i).feasible And Not NDSorting(j).feasible) Then
+
+                        'i gültig und j ungültig
+                        '-----------------------
+                        NDSorting(j).dominated = True
 
                     ElseIf ((Not NDSorting(i).feasible) And (Not NDSorting(j).feasible)) Then
 
+                        'beide ungültig
+                        '--------------
                         Summe_Constrain(1) = 0
                         Summe_Constrain(2) = 0
 
                         For k = 1 To PES_Initial.NConstrains
-                            If NDSorting(i).constrain(k) < 0 Then
-                                Summe_Constrain(1) = Summe_Constrain(1) + NDSorting(i).constrain(k)
+                            If (NDSorting(i).constrain(k) < 0) Then
+                                Summe_Constrain(1) += NDSorting(i).constrain(k)
                             End If
-                            If NDSorting(j).constrain(k) < 0 Then
-                                Summe_Constrain(2) = Summe_Constrain(2) + NDSorting(j).constrain(k)
+                            If (NDSorting(j).constrain(k) < 0) Then
+                                Summe_Constrain(2) += NDSorting(j).constrain(k)
                             End If
                         Next k
 
-                        If Summe_Constrain(1) > Summe_Constrain(2) Then
-                            If NDSorting(j).dominated = False Then NDSorting(j).dominated = True
+                        If (Summe_Constrain(1) > Summe_Constrain(2)) Then
+                            NDSorting(j).dominated = True
                         End If
 
                     ElseIf (NDSorting(i).feasible And NDSorting(j).feasible) Then
 
-                        Logical = False
+                        'beide gültig
+                        '------------
+                        isDominated = False
 
                         For k = 1 To PES_Initial.NPenalty
-                            Logical = Logical Or (NDSorting(i).penalty(k) < NDSorting(j).penalty(k))
+                            isDominated = isDominated Or (NDSorting(i).penalty(k) < NDSorting(j).penalty(k))
                         Next k
 
                         For k = 1 To PES_Initial.NPenalty
-                            Logical = Logical And (NDSorting(i).penalty(k) <= NDSorting(j).penalty(k))
+                            isDominated = isDominated And (NDSorting(i).penalty(k) <= NDSorting(j).penalty(k))
                         Next k
 
-                        If Logical Then
-                            If NDSorting(j).dominated = False Then NDSorting(j).dominated = True
-                        End If
+                        NDSorting(j).dominated = isDominated
 
                     End If
                 Next j
@@ -1518,19 +1525,17 @@ Public Class PES
             For i = 1 To UBound(NDSorting)
                 For j = 1 To UBound(NDSorting)
 
-                    Logical = False
+                    isDominated = False
 
                     For k = 1 To PES_Initial.NPenalty
-                        Logical = Logical Or (NDSorting(i).penalty(k) < NDSorting(j).penalty(k))
+                        isDominated = isDominated Or (NDSorting(i).penalty(k) < NDSorting(j).penalty(k))
                     Next k
 
                     For k = 1 To PES_Initial.NPenalty
-                        Logical = Logical And (NDSorting(i).penalty(k) <= NDSorting(j).penalty(k))
+                        isDominated = isDominated And (NDSorting(i).penalty(k) <= NDSorting(j).penalty(k))
                     Next k
 
-                    If Logical Then
-                        If NDSorting(j).dominated = False Then NDSorting(j).dominated = True
-                    End If
+                    NDSorting(j).dominated = isDominated
                 Next j
             Next i
         End If
