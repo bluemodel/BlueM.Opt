@@ -1486,7 +1486,7 @@ GenerierenAusgangswerte:
 
             'Daten einlesen
             Cursor = Cursors.WaitCursor
-            Dim series As Collection = Sim1.db_readQWerte()
+            Dim series As Collection = Sim1.db_readResults()
             Cursor = Cursors.Default
 
             'Abfrageform
@@ -1513,9 +1513,7 @@ GenerierenAusgangswerte:
                     Me.DForm.Diag.DiagInitialise(Path.GetFileName(Sim1.db_path), Achsen)
                     Dim SeriesNo as Integer = Me.DForm.Diag.prepareSeries("Population")
                     Me.DForm.Diag.Chart.Series(SeriesNo).Cursor = Cursors.Hand
-                    For i As Integer = 0 To series(1).values.getUpperBound(0)
-                        Me.DForm.Diag.Chart.Series(SeriesNo).Add(series(Form2.ListBox_OptZieleX.SelectedIndex + 1).values(i), series(Form2.ListBox_OptZieleY.SelectedIndex + 1).values(i))
-                    Next
+                    Me.DForm.Diag.Chart.Series(SeriesNo).Add(series(Form2.ListBox_OptZieleX.SelectedIndex + 1).values, series(Form2.ListBox_OptZieleY.SelectedIndex + 1).values)
                 End If
 
                 If (Form2.CheckBox_Scatterplot.Checked) Then

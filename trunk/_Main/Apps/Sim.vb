@@ -364,7 +364,8 @@ Public MustInherit Class Sim
         '*********************
         If Me.Ergebnisdb = True Then
             Call Me.db_prepare()
-            Call Me.db_prepare_CES_PES()
+            Call Me.db_prepare_PES()
+            Call Me.db_prepare_CES()
         End If
     End Sub
 
@@ -706,7 +707,6 @@ Public MustInherit Class Sim
 
         Else
             'CON-Datei existiert nicht
-            ReDim Me.List_Constraints(0)
         End If
 
     End Sub
@@ -1812,12 +1812,14 @@ Public MustInherit Class Sim
         db_path = ZielDatei
 
         'Tabellen anpassen
-        '-----------------
+        '=================
         Dim i As Integer
 
         Call db_connect()
         Dim command As OleDbCommand = New OleDbCommand("", db)
+
         'Tabelle 'QWerte'
+        '----------------
         'Spalten festlegen:
         Dim fieldnames As String = ""
         For i = 0 To List_OptZiele.GetUpperBound(0)
@@ -1829,6 +1831,22 @@ Public MustInherit Class Sim
         'Tabelle anpassen
         command.CommandText = "ALTER TABLE QWerte ADD COLUMN " & fieldnames
         command.ExecuteNonQuery()
+
+        'Tabelle 'Constraints'
+        '----------------
+        If (Me.List_Constraints.GetLength(0) > 0) Then
+            'Spalten festlegen:
+            fieldnames = ""
+            For i = 0 To Me.List_Constraints.GetUpperBound(0)
+                If (i > 0) Then
+                    fieldnames &= ", "
+                End If
+                fieldnames &= "[" & Me.List_Constraints(i).Bezeichnung & "] DOUBLE"
+            Next
+            'Tabelle anpassen
+            command.CommandText = "ALTER TABLE [Constraints] ADD COLUMN " & fieldnames
+            command.ExecuteNonQuery()
+        End If
 
         Call db_disconnect()
 
@@ -1842,6 +1860,7 @@ Public MustInherit Class Sim
         Dim command As OleDbCommand = New OleDbCommand("", db)
 
         'Tabelle 'OptParameter'
+        '----------------------
         'Spalten festlegen:
         Dim fieldnames As String = ""
         Dim i As Integer
@@ -1868,12 +1887,10 @@ Public MustInherit Class Sim
         Dim command As OleDbCommand = New OleDbCommand("", db)
 
         'Tabelle 'Pfad'
+        '--------------
         'Spalten festlegen:
         Dim fieldnames As String = ""
         Dim i As Integer
-
-        command.CommandText = "ALTER TABLE Pfad ADD COLUMN QWert_ID INTEGER"
-        command.ExecuteNonQuery()
 
         For i = 0 To Me.List_Locations.GetUpperBound(0)
             If (i > 0) Then
@@ -1888,47 +1905,6 @@ Public MustInherit Class Sim
         Call db_disconnect()
 
     End Sub
-
-    'Ergebnisdatenbank für CES & PES vorbereiten
-    '*******************************************
-    Private Sub db_prepare_CES_PES()
-
-        Call db_connect()
-        Dim command As OleDbCommand = New OleDbCommand("", db)
-
-        'Tabelle 'OptParameter'
-        'Spalten festlegen:
-        Dim fieldnames As String = ""
-        Dim i As Integer
-
-        For i = 0 To List_OptParameter.GetUpperBound(0)
-            If (i > 0) Then
-                fieldnames &= ", "
-            End If
-            fieldnames &= "[" & List_OptParameter(i).Bezeichnung & "] DOUBLE"
-        Next
-        'Tabelle anpassen
-        command.CommandText = "ALTER TABLE OptParameter ADD COLUMN " & fieldnames
-        command.ExecuteNonQuery()
-
-        'Tabelle 'Pfad'
-        'Spalten festlegen:
-        fieldnames = ""
-
-        For i = 0 To Me.List_Locations.GetUpperBound(0)
-            If (i > 0) Then
-                fieldnames &= ", "
-            End If
-            fieldnames &= "[" & Me.List_Locations(i).Name & "] TEXT"
-        Next
-        'Tabelle anpassen
-        command.CommandText = "ALTER TABLE Pfad ADD COLUMN " & fieldnames
-        command.ExecuteNonQuery()
-
-        Call db_disconnect()
-
-    End Sub
-
 
     'Mit Ergebnisdatenbank verbinden
     '*******************************
@@ -1947,118 +1923,74 @@ Public MustInherit Class Sim
     'Update der ErgebnisDB mit QWerten und OptParametern
     '***************************************************
     Public Function db_update() As Boolean
+
         Call db_connect()
 
         Dim i As Integer
 
         Dim command As OleDbCommand = New OleDbCommand("", db)
-        'QWert schreiben 
-        'Spalten der Tabelle 'Qwerte' bestimmen:
+
+        'Sim schreiben
+        '-------------
+        command.CommandText = "INSERT INTO Sim (Name) VALUES ('" & Me.Datensatz & "')"
+        command.ExecuteNonQuery()
+        'SimID holen
+        command.CommandText = "SELECT @@IDENTITY AS ID"
+        Dim Sim_ID As Integer = command.ExecuteScalar()
+
+        'QWerte schreiben 
+        '----------------
         Dim fieldnames As String = ""
         Dim fieldvalues As String = ""
         For i = 0 To List_OptZiele.GetUpperBound(0)
-            If (i > 0) Then
-                fieldnames &= ", "
-                fieldvalues &= ", "
-            End If
-            fieldnames &= "[" & List_OptZiele(i).Bezeichnung & "]"
-            fieldvalues &= List_OptZiele(i).QWertTmp
+            fieldnames &= ", [" & List_OptZiele(i).Bezeichnung & "]"
+            fieldvalues &= ", " & List_OptZiele(i).QWertTmp
         Next
-        command.CommandText = "INSERT INTO QWerte (" & fieldnames & ") VALUES (" & fieldvalues & ")"
+        command.CommandText = "INSERT INTO QWerte (Sim_ID" & fieldnames & ") VALUES (" & Sim_ID & fieldvalues & ")"
         command.ExecuteNonQuery()
-        'ID des zuletzt geschriebenen QWerts holen
-        command.CommandText = "SELECT @@IDENTITY AS ID"
-        Dim QWert_ID As Integer = command.ExecuteScalar()
 
-        Select Case Me.Method
+        'Constraints schreiben 
+        '---------------------
+        If (Me.List_Constraints.GetLength(0) > 0) Then
+            fieldnames = ""
+            fieldvalues = ""
+            For i = 0 To Me.List_Constraints.GetUpperBound(0)
+                fieldnames &= ", [" & Me.List_Constraints(i).Bezeichnung & "]"
+                fieldvalues &= ", " & Me.List_Constraints(i).ConstTmp
+            Next
+            command.CommandText = "INSERT INTO [Constraints] (Sim_ID" & fieldnames & ") VALUES (" & Sim_ID & fieldvalues & ")"
+            command.ExecuteNonQuery()
+        End If
 
-            Case "PES", "SensiPlot"
-                'Zugehörige OptParameter schreiben
-                fieldnames = ""
-                fieldvalues = ""
-                For i = 0 To List_OptParameter.GetUpperBound(0)
-                    fieldnames &= ", [" & List_OptParameter(i).Bezeichnung & "]"
-                    fieldvalues &= ", " & List_OptParameter(i).Wert
-                Next
-                command.CommandText = "INSERT INTO OptParameter (QWert_ID" & fieldnames & ") VALUES (" & QWert_ID & fieldvalues & ")"
-                command.ExecuteNonQuery()
+        If (Me.Method = "PES" Or Me.Method = "CES + PES" Or Me.Method = "SensiPlot") Then
 
-            Case "CES"
+            'OptParameter schreiben
+            '----------------------
+            fieldnames = ""
+            fieldvalues = ""
+            For i = 0 To Me.List_OptParameter.GetUpperBound(0)
+                fieldnames &= ", [" & Me.List_OptParameter(i).Bezeichnung & "]"
+                fieldvalues &= ", " & Me.List_OptParameter(i).Wert
+            Next
+            command.CommandText = "INSERT INTO OptParameter (Sim_ID" & fieldnames & ") VALUES (" & Sim_ID & fieldvalues & ")"
+            command.ExecuteNonQuery()
 
-                'Zugehörigen Pfad schreiben
-                fieldnames = ""
-                fieldvalues = ""
-                For i = 0 To Me.List_Locations.GetUpperBound(0)
-                    fieldnames &= ", [" & Me.List_Locations(i).Name & "]"
-                    fieldvalues &= ", '" & Me.Aktuelle_Massnahmen(i) & "'"
-                Next
-                command.CommandText = "INSERT INTO Pfad (QWert_ID" & fieldnames & ") VALUES (" & QWert_ID & fieldvalues & ")"
-                command.ExecuteNonQuery()
+        End If
 
+        If (Me.Method = "CES" Or Me.Method = "CES + PES") Then
 
-            Case "CES + PES"
+            'Pfad schreiben
+            '--------------
+            fieldnames = ""
+            fieldvalues = ""
+            For i = 0 To Me.List_Locations.GetUpperBound(0)
+                fieldnames &= ", [" & Me.List_Locations(i).Name & "]"
+                fieldvalues &= ", '" & Me.Aktuelle_Massnahmen(i) & "'"
+            Next
+            command.CommandText = "INSERT INTO Pfad (Sim_ID" & fieldnames & ") VALUES (" & Sim_ID & fieldvalues & ")"
+            command.ExecuteNonQuery()
 
-                'OptParameter
-                '------------
-
-                'Zugehörige OptParameter schreiben
-                fieldnames = ""
-                fieldvalues = ""
-                For i = 0 To List_OptParameter.GetUpperBound(0)
-                    fieldnames &= ", [" & List_OptParameter(i).Bezeichnung & "]"
-                    fieldvalues &= ", " & List_OptParameter(i).Wert
-                Next
-                command.CommandText = "INSERT INTO OptParameter (QWert_ID" & fieldnames & ") VALUES (" & QWert_ID & fieldvalues & ")"
-                command.ExecuteNonQuery()
-
-                'ID des zuletzt geschriebenen OptParameter holen
-                command.CommandText = "SELECT @@IDENTITY AS ID"
-                Dim OptParam_ID As Integer = command.ExecuteScalar()
-
-                'Pfad
-                '----
-
-                'Überprüfen, ob der Pfad schon existiert
-                Dim Pfad_ID As Integer
-                Dim condition As String = ""
-                For i = 0 To Me.List_Locations.GetUpperBound(0)
-                    If (i > 0) Then
-                        condition &= " AND "
-                    End If
-                    condition &= "[" & Me.List_Locations(i).Name & "] = '" & Me.Aktuelle_Massnahmen(i) & "'"
-                Next
-                command.CommandText = "SELECT ID FROM Pfad WHERE (" & condition & ")"
-                If (Not IsNothing(command.ExecuteScalar())) Then
-                    'Pfad_ID übernehmen
-                    Pfad_ID = command.ExecuteScalar()
-                Else
-                    'Neuen Pfad einfügen
-                    fieldnames = ""
-                    fieldvalues = ""
-                    For i = 0 To Me.List_Locations.GetUpperBound(0)
-                        If (i > 0) Then
-                            fieldnames &= ","
-                            fieldvalues &= ","
-                        End If
-                        fieldnames &= " [" & Me.List_Locations(i).Name & "]"
-                        fieldvalues &= " '" & Me.Aktuelle_Massnahmen(i) & "'"
-                    Next
-                    command.CommandText = "INSERT INTO Pfad (" & fieldnames & ") VALUES (" & fieldvalues & ")"
-                    command.ExecuteNonQuery()
-
-                    'ID des zuletzt geschriebenen Pfads holen
-                    command.CommandText = "SELECT @@IDENTITY AS ID"
-                    Pfad_ID = command.ExecuteScalar()
-                End If
-
-                'Verknüpfung
-                '-----------
-
-                'Verknüpfung zwischen OptParameter und Pfad schreiben
-                command.CommandText = "INSERT INTO Rel_Pfad_OptParameter (Pfad_ID, OptParameter_ID) VALUES (" & Pfad_ID & ", " & OptParam_ID & ")"
-                command.ExecuteNonQuery()
-
-        End Select
+        End If
 
         Call db_disconnect()
 
@@ -2084,10 +2016,10 @@ Public MustInherit Class Sim
                 'Unterscheidung für SO und SensiPlot
                 If (Me.Method = "SensiPlot" Or Me.List_OptZiele.Length = 1) Then
                     'Nur ein QWert, und zwar auf der xAchse
-                    q = "SELECT OptParameter.* FROM OptParameter INNER JOIN QWerte ON OptParameter.QWert_ID = QWerte.ID WHERE (QWerte.[" & xAchse & "] = " & xWert & ")"
+                    q = "SELECT OptParameter.* FROM OptParameter INNER JOIN QWerte ON OptParameter.Sim_ID = QWerte.Sim_ID WHERE (QWerte.[" & xAchse & "] = " & xWert & ")"
                 Else
                     'xAchse und yAchse sind beides QWerte
-                    q = "SELECT OptParameter.* FROM OptParameter INNER JOIN QWerte ON OptParameter.QWert_ID = QWerte.ID WHERE (QWerte.[" & xAchse & "] = " & xWert & " AND QWerte.[" & yAchse & "] = " & yWert & ")"
+                    q = "SELECT OptParameter.* FROM OptParameter INNER JOIN QWerte ON OptParameter.Sim_ID = QWerte.Sim_ID WHERE (QWerte.[" & xAchse & "] = " & xWert & " AND QWerte.[" & yAchse & "] = " & yWert & ")"
                 End If
 
                 adapter = New OleDbDataAdapter(q, db)
@@ -2116,7 +2048,7 @@ Public MustInherit Class Sim
 
             Case "CES"
 
-                q = "SELECT Pfad.* FROM Pfad INNER JOIN QWerte ON Pfad.QWert_ID = QWerte.ID WHERE (QWerte.[" & xAchse & "] = " & xWert & " AND QWerte.[" & yAchse & "] = " & yWert & ")"
+                q = "SELECT Pfad.* FROM Pfad INNER JOIN QWerte ON Pfad.Sim_ID = QWerte.Sim_ID WHERE (QWerte.[" & xAchse & "] = " & xWert & " AND QWerte.[" & yAchse & "] = " & yWert & ")"
 
                 adapter = New OleDbDataAdapter(q, db)
 
@@ -2142,16 +2074,15 @@ Public MustInherit Class Sim
 
             Case "CES + PES"
 
-                q = "SELECT OptParameter.*, Pfad.* FROM (Rel_Pfad_OptParameter INNER JOIN Pfad ON Rel_Pfad_OptParameter.Pfad_ID = Pfad.ID) INNER JOIN (OptParameter INNER JOIN QWerte ON OptParameter.QWert_ID = QWerte.ID) ON Rel_Pfad_OptParameter.OptParameter_ID = OptParameter.ID WHERE (QWerte.[" & xAchse & "] = " & xWert & " AND QWerte.[" & yAchse & "] = " & yWert & ")"
+                q = "SELECT OptParameter.*, Pfad.* FROM (((Sim INNER JOIN Constraints ON Sim.ID = Constraints.Sim_ID) INNER JOIN OptParameter ON Sim.ID = OptParameter.Sim_ID) INNER JOIN Pfad ON Sim.ID = Pfad.Sim_ID) INNER JOIN QWerte ON Sim.ID = QWerte.Sim_ID WHERE (QWerte.[" & xAchse & "] = " & xWert & " AND QWerte.[" & yAchse & "] = " & yWert & ")"
 
                 adapter = New OleDbDataAdapter(q, db)
 
                 ds = New DataSet("EVO")
-                adapter.Fill(ds, "OptParameter")
-                adapter.Fill(ds, "Pfad")
+                adapter.Fill(ds, "OptParameter_Pfad")
 
                 'Anzahl Übereinstimmungen überprüfen
-                numrows = ds.Tables("OptParameter").Rows.Count
+                numrows = ds.Tables("OptParameter_Pfad").Rows.Count
 
                 If (numrows = 0) Then
                     MsgBox("Es wurde keine Übereinstimmung in der Datenbank gefunden!", MsgBoxStyle.Exclamation, "Problem")
@@ -2162,7 +2093,7 @@ Public MustInherit Class Sim
 
                 'Pfad übernehmen
                 For i As Integer = 0 To Me.Aktuelle_Massnahmen.GetUpperBound(0)
-                    Me.Aktuelle_Massnahmen(i) = ds.Tables("Pfad").Rows(0).Item(List_Locations(i).Name)
+                    Me.Aktuelle_Massnahmen(i) = ds.Tables("OptParameter_Pfad").Rows(0).Item(List_Locations(i).Name)
                 Next
 
                 'Bereitet das BlaueModell für die Kombinatorik vor
@@ -2174,7 +2105,7 @@ Public MustInherit Class Sim
                 'OptParametersatz übernehmen
                 For i As Integer = 0 To Me.List_OptParameter.GetUpperBound(0)
                     With Me.List_OptParameter(i)
-                        .Wert = ds.Tables("OptParameter").Rows(0).Item(.Bezeichnung)
+                        .Wert = ds.Tables("OptParameter_Pfad").Rows(0).Item(.Bezeichnung)
                     End With
                 Next
 
@@ -2187,33 +2118,47 @@ Public MustInherit Class Sim
 
     End Function
 
-    'QWerte aus einer DB lesen
-    '*************************
-    Public Function db_readQWerte() As Collection
+    'QWerte und Constraints aus einer DB lesen
+    '*****************************************
+    Public Function db_readResults() As Collection
 
         'Connect
         Call db_connect()
 
         'Read
-        Dim q As String = "SELECT * FROM QWerte ORDER BY ID"
+        Dim q As String = "SELECT QWerte.*, Constraints.* FROM QWerte INNER JOIN [Constraints] ON QWerte.Sim_ID = Constraints.Sim_ID ORDER BY QWerte.Sim_ID"
 
         Dim adapter As OleDbDataAdapter = New OleDbDataAdapter(q, db)
 
-        Dim ds As New DataSet("QWerte")
-        adapter.Fill(ds, "QWerte")
+        Dim ds As New DataSet("EVO")
+        adapter.Fill(ds, "QWerte_Constraints")
 
         'Disconnect
         Call db_disconnect()
 
         'Werte einlesen
-        '--------------
-        Dim seriesCollection As New Collection
-        'Schleife über Spalten (Spalte ID überspringen!)
-        For i As Integer = 1 To ds.Tables("QWerte").Columns.Count - 1
-            Dim tmpserie As Serie = New Serie(ds.Tables("QWerte").Columns(i).Caption, ds.Tables("QWerte").Rows.Count - 1)
-            'Schleife über Reihen
-            For j As Integer = 0 To ds.Tables("QWerte").Rows.Count - 1
-                tmpserie.values(j) = ds.Tables("QWerte").Rows(j).Item(i)
+        '==============
+        Dim seriesCollection As New Collection()
+        Dim tmpserie As Serie
+        Dim i As Integer
+        'QWerte
+        '------
+        For i = 0 To Me.List_OptZiele.GetUpperBound(0)
+            tmpserie = New Serie("OptZiel " & Me.List_OptZiele(i).Bezeichnung, ds.Tables("QWerte_Constraints").Rows.Count - 1)
+            'Schleife über alle Zeilen
+            For j As Integer = 0 To ds.Tables("QWerte_Constraints").Rows.Count - 1
+                tmpserie.values(j) = ds.Tables("QWerte_Constraints").Rows(j).Item(Me.List_OptZiele(i).Bezeichnung)
+            Next
+            'Serie zu Collection hinzufügen
+            seriesCollection.Add(tmpserie, tmpserie.name)
+        Next
+        'Constraints
+        '-----------
+        For i = 0 To Me.List_Constraints.GetUpperBound(0)
+            tmpserie = New Serie("Constraint " & Me.List_Constraints(i).Bezeichnung, ds.Tables("QWerte_Constraints").Rows.Count - 1)
+            'Schleife über alle Zeilen
+            For j As Integer = 0 To ds.Tables("QWerte_Constraints").Rows.Count - 1
+                tmpserie.values(j) = ds.Tables("QWerte_Constraints").Rows(j).Item(Me.List_Constraints(i).Bezeichnung)
             Next
             'Serie zu Collection hinzufügen
             seriesCollection.Add(tmpserie, tmpserie.name)
