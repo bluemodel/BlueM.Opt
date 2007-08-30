@@ -1089,14 +1089,15 @@ GenerierenAusgangswerte:
         SeriesNo = DForm.Diag.prepareSeries("Sekundäre Population", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
         With DForm.Diag.Series(SeriesNo)
             .Clear()
+            'BUG 135: SekPop(,) fängt bei 1 an!
             If UBound(Population, 2) = 2 Then
                 For i = 1 To UBound(Population, 1)
                     .Add(Population(i, 1), Population(i, 2), "")
                 Next i
             ElseIf UBound(Population, 2) = 3 Then
                 For i = 1 To UBound(Population, 1)
-                    'TODO: Hier muss eine 3D-Reihe angezeigt werden
-                    '.Add(Population(i, 1), Population(i, 2), Population(i, 3), "") 
+                    'BUG 118: nur die ersten beiden Zielfunktionen werden gezeichnet
+                    .Add(Population(i, 1), Population(i, 2), "") 
                 Next i
             End If
         End With
