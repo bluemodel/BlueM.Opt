@@ -887,7 +887,7 @@ Partial Class Form1
         ReDim RN(globalAnzRand)
 
         'Diagramm vorbereiten und initialisieren
-        If Not Me.Method = METH_CES_PES Then
+        If (Not Me.Method = METH_CES_PES) Then
             Call PrepareDiagramm()
         End If
 
@@ -967,7 +967,7 @@ Start_Evolutionsrunden:
                         inachf = PES1.PES_iAkt.iAktNachf
                         Call EVO_Opt_Verlauf1.Nachfolger(inachf)
 
-                        durchlauf = durchlauf + 1
+                        durchlauf += 1
 
                         'Um Modellfehler bzw. Evaluierungsabbrüche abzufangen
                         'TODO: noch nicht fertig das Ergebnis wird noch nicht auf Fehler ueberprueft
@@ -975,7 +975,7 @@ Start_Evolutionsrunden:
 
 GenerierenAusgangswerte:
 
-                        Versuch = Versuch + 1
+                        Versuch += 1
                         If (Versuch > 10) Then
                             Throw New Exception("Es konnte kein gültiger Datensatz erzeugt werden!")
                         End If
@@ -1012,27 +1012,48 @@ GenerierenAusgangswerte:
                                 End If
 
                                 'Qualitätswerte im TeeChart zeichnen
+                                '===================================
                                 Dim SeriesNo as Integer
-                                'BUG 112: TODO: Bei Verletzung von Constraints Punkt anders malen!
-                                If (Sim1.List_OptZiele.Length = 1) Then
+
+                                'Constraintverletzung prüfen
+                                Dim isInvalid As Boolean = False
+                                For i = 0 To Sim1.List_Constraints.GetUpperBound(0)
+                                    If (Sim1.List_Constraints(i).ConstTmp < 0) Then
+                                        isInvalid = True
+                                        Exit For
+                                    End If
+                                Next
+
+                                If (Not EVO_Settings1.PES_Settings.is_MO_Pareto) Then
                                     'SingleObjective
-                                    SeriesNo = DForm.Diag.prepareSeries("Population " & ipop)
+                                    '---------------
+                                    If (isInvalid) Then
+                                        SeriesNo = DForm.Diag.prepareSeries("Population " & ipop & " (ungültig)", "Gray")
+                                    Else
+                                        SeriesNo = DForm.Diag.prepareSeries("Population " & ipop, "Orange")
+                                    End If
                                     DForm.Diag.Series(SeriesNo).Cursor = Cursors.Hand
                                     Call DForm.Diag.Series(SeriesNo).Add(durchlauf, Sim1.List_OptZiele(0).QWertTmp)
+
                                 Else
                                     'MultiObjective
+                                    '--------------
                                     'BUG 118: nur die ersten beiden Zielfunktionen werden gezeichnet
-                                    SeriesNo = DForm.Diag.prepareSeries("Population", "Yellow", Steema.TeeChart.Styles.PointerStyles.Circle, 4)
+                                    If (isInvalid) Then
+                                        SeriesNo = DForm.Diag.prepareSeries("Population" & " (ungültig)", "Gray")
+                                    Else
+                                        SeriesNo = DForm.Diag.prepareSeries("Population", "Orange")
+                                    End If
                                     DForm.Diag.Series(SeriesNo).Cursor = Cursors.Hand
                                     Call DForm.Diag.Series(SeriesNo).Add(Sim1.List_OptZiele(0).QWertTmp, Sim1.List_OptZiele(1).QWertTmp)
                                 End If
+
                         End Select
 
                         'Einordnen der Qualitätsfunktion im Bestwertspeicher
                         Call PES1.EsBest(QN, RN)
 
                         System.Windows.Forms.Application.DoEvents()
-
 
                     Loop 'Ende Schleife über alle Nachkommen
                     '**********************************************************************
