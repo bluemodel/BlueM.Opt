@@ -2118,53 +2118,66 @@ Public MustInherit Class Sim
 
     End Function
 
-    'QWerte und Constraints aus einer DB lesen
-    '*****************************************
-    Public Function db_readResults() As Collection
+    'Optimierungsergebnis aus einer DB lesen
+    '***************************************
+    Public Function db_getOptResult() As OptResult
+
+        '---------------------------------------------------------------------------
+        'Hinweise:
+        'Die EVO-Eingabedateien müssen eingelesen sein und mit der DB übereinstimmen
+        'Funktioniert momentan nur für PES
+        '---------------------------------------------------------------------------
+
+        Dim i, j As Integer
+        Dim OptResult As Main.OptResult
 
         'Connect
         Call db_connect()
 
         'Read
-        Dim q As String = "SELECT QWerte.*, Constraints.* FROM QWerte INNER JOIN [Constraints] ON QWerte.Sim_ID = Constraints.Sim_ID ORDER BY QWerte.Sim_ID"
+        Dim q As String = "SELECT OptParameter.*, QWerte.*, Constraints.* FROM ((Sim INNER JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN OptParameter ON Sim.ID=OptParameter.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID ORDER BY Sim.ID"
 
         Dim adapter As OleDbDataAdapter = New OleDbDataAdapter(q, db)
 
         Dim ds As New DataSet("EVO")
-        adapter.Fill(ds, "QWerte_Constraints")
+        Dim numRows As Integer = adapter.Fill(ds, "PESResult")
 
         'Disconnect
         Call db_disconnect()
 
         'Werte einlesen
         '==============
-        Dim seriesCollection As New Collection()
-        Dim tmpserie As Serie
-        Dim i As Integer
-        'QWerte
-        '------
-        For i = 0 To Me.List_OptZiele.GetUpperBound(0)
-            tmpserie = New Serie("OptZiel " & Me.List_OptZiele(i).Bezeichnung, ds.Tables("QWerte_Constraints").Rows.Count - 1)
-            'Schleife über alle Zeilen
-            For j As Integer = 0 To ds.Tables("QWerte_Constraints").Rows.Count - 1
-                tmpserie.values(j) = ds.Tables("QWerte_Constraints").Rows(j).Item(Me.List_OptZiele(i).Bezeichnung)
-            Next
-            'Serie zu Collection hinzufügen
-            seriesCollection.Add(tmpserie, tmpserie.name)
-        Next
-        'Constraints
-        '-----------
-        For i = 0 To Me.List_Constraints.GetUpperBound(0)
-            tmpserie = New Serie("Constraint " & Me.List_Constraints(i).Bezeichnung, ds.Tables("QWerte_Constraints").Rows.Count - 1)
-            'Schleife über alle Zeilen
-            For j As Integer = 0 To ds.Tables("QWerte_Constraints").Rows.Count - 1
-                tmpserie.values(j) = ds.Tables("QWerte_Constraints").Rows(j).Item(Me.List_Constraints(i).Bezeichnung)
-            Next
-            'Serie zu Collection hinzufügen
-            seriesCollection.Add(tmpserie, tmpserie.name)
+        OptResult = New Main.OptResult()
+        OptResult.List_OptParameter = Me.List_OptParameter
+        OptResult.List_OptZiele = Me.List_OptZiele
+        OptResult.List_Constraints = Me.List_Constraints
+
+        ReDim OptResult.Solutions(numRows - 1)
+
+        For i = 0 To numRows - 1
+            With OptResult.Solutions(i)
+                'OptParameter
+                '------------
+                ReDim .OptPara(Me.List_OptParameter.GetUpperBound(0))
+                For j = 0 To Me.List_OptParameter.GetUpperBound(0)
+                    .OptPara(j) = ds.Tables(0).Rows(i).Item(Me.List_OptParameter(j).Bezeichnung)
+                Next
+                'QWerte
+                '------
+                ReDim .QWerte(Me.List_OptZiele.GetUpperBound(0))
+                For j = 0 To Me.List_OptZiele.GetUpperBound(0)
+                    .QWerte(j) = ds.Tables(0).Rows(i).Item(Me.List_OptZiele(j).Bezeichnung)
+                Next
+                'Constraints
+                '-----------
+                ReDim .Constraints(Me.List_Constraints.GetUpperBound(0))
+                For j = 0 To Me.List_Constraints.GetUpperBound(0)
+                    .Constraints(j) = ds.Tables(0).Rows(i).Item(Me.List_Constraints(j).Bezeichnung)
+                Next
+            End With
         Next
 
-        Return seriesCollection
+        Return OptResult
 
     End Function
 
@@ -2177,21 +2190,32 @@ End Class
 'zusätzliche Klassen
 '###################
 
-'Klasse Serie 
-'enthält einen Namen und eine Liste von Werten
-'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-Public Class Serie
+'Klasse OptResult
+'enthält die Ergebnisse eines Optimierungslaufs
+'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+Public Class OptResult
 
-    Public name As String
-    Public values() As Double
+    'Optimierungsbedingungen
+    Public List_OptZiele() As Sim.Struct_OptZiel
+    Public List_OptParameter() As Sim.Struct_OptParameter
+    Public List_Constraints() As Sim.Struct_Constraint
 
-    'Konstruktor
-    '***********
-    Public Sub New(ByVal name As String, ByVal length As Integer)
-        Me.name = name
-        ReDim values(length)
-    End Sub
+    'Structure einer Lösung
+    Public Structure Struct_Solution
+        Public QWerte() As Double
+        Public OptPara() As Double
+        Public Constraints() As Double
+        Public ReadOnly Property isValid() As Boolean
+            Get
+                For i As Integer = 0 To Me.Constraints.GetUpperBound(0)
+                    If (Me.Constraints(i) < 0) Then Return False
+                Next
+                Return True
+            End Get
+        End Property
+    End Structure
+
+    'Array von Lösungen
+    Public Solutions() As Struct_Solution
 
 End Class
-
-

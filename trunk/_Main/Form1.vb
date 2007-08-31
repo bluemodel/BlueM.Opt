@@ -1473,6 +1473,7 @@ GenerierenAusgangswerte:
     '*******************************************************
     Private Sub showScatterplot(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Scatterplot.Click
 
+        Dim i As Integer
         Dim diagresult As DialogResult
 
         'Datei-öffnen Dialog anzeigen
@@ -1486,14 +1487,14 @@ GenerierenAusgangswerte:
 
             'Daten einlesen
             Cursor = Cursors.WaitCursor
-            Dim series As Collection = Sim1.db_readResults()
+            Dim OptResult As Main.OptResult = Sim1.db_getOptResult()
             Cursor = Cursors.Default
 
             'Abfrageform
             Dim Form2 As New ScatterplotAbfrage
-            For Each serie As Main.Serie In series
-                Form2.ListBox_OptZieleX.Items.Add(serie.name)
-                Form2.ListBox_OptZieleY.Items.Add(serie.name)
+            For Each OptZiel As Sim.Struct_OptZiel In OptResult.List_OptZiele
+                Form2.ListBox_OptZieleX.Items.Add(OptZiel.Bezeichnung)
+                Form2.ListBox_OptZieleY.Items.Add(OptZiel.Bezeichnung)
             Next
             diagresult = Form2.ShowDialog()
 
@@ -1501,7 +1502,13 @@ GenerierenAusgangswerte:
 
                 If (Form2.CheckBox_Hauptdiagramm.Checked) Then
                     'Hauptdiagramm
-                    '-------------
+                    '=============
+                    Dim OptZielIndexX, OptZielIndexY as Integer
+                    OptZielIndexX = Form2.ListBox_OptZieleX.SelectedIndex
+                    OptZielIndexY = Form2.ListBox_OptZieleY.SelectedIndex
+
+                    'Achsen
+                    '------
                     Dim Achsen As New Collection
                     Dim tmpAchse As Main.Diagramm.Achse
                     tmpAchse.Auto = True
@@ -1511,9 +1518,31 @@ GenerierenAusgangswerte:
                     Achsen.Add(tmpAchse)
                     Me.DForm.Diag.Clear()
                     Me.DForm.Diag.DiagInitialise(Path.GetFileName(Sim1.db_path), Achsen)
-                    Dim SeriesNo as Integer = Me.DForm.Diag.prepareSeries("Population")
-                    Me.DForm.Diag.Chart.Series(SeriesNo).Cursor = Cursors.Hand
-                    Me.DForm.Diag.Chart.Series(SeriesNo).Add(series(Form2.ListBox_OptZieleX.SelectedIndex + 1).values, series(Form2.ListBox_OptZieleY.SelectedIndex + 1).values)
+
+                    'Serien
+                    '------
+                    Dim SeriesNo, SeriesNoValid, SeriesNoInvalid As Integer
+                    'Serie für gültige Lösungen
+                    SeriesNoValid = Me.DForm.Diag.prepareSeries("Population", "Orange")
+                    Me.DForm.Diag.Chart.Series(SeriesNoValid).Cursor = Cursors.Hand
+                    'Serie für ungültige Lösungen
+                    SeriesNoInvalid = Me.DForm.Diag.prepareSeries("Population (ungültig)", "Gray")
+                    Me.DForm.Diag.Chart.Series(SeriesNoInvalid).Cursor = Cursors.Hand
+
+                    'Punkte eintragen
+                    '----------------
+                    For i = 0 To OptResult.Solutions.getUpperBound(0)
+                        With OptResult.Solutions(i)
+                            'Constraintverletzung prüfen
+                            If (.isValid) Then
+                                SeriesNo = SeriesNoValid
+                            Else
+                                SeriesNo = SeriesNoInvalid
+                            End If
+                            Me.DForm.Diag.Chart.Series(SeriesNo).Add(.QWerte(OptZielIndexX), .QWerte(OptZielIndexY))
+                        End With
+                    Next
+
                 End If
 
                 If (Form2.CheckBox_Scatterplot.Checked) Then
@@ -1521,7 +1550,7 @@ GenerierenAusgangswerte:
                     '-----------
                     Cursor = Cursors.WaitCursor
                     Dim scatterplot1 As New Scatterplot
-                    Call scatterplot1.zeichnen(series)
+                    Call scatterplot1.zeichnen(OptResult)
                     Call scatterplot1.Show()
                     Cursor = Cursors.Default
                 End If
