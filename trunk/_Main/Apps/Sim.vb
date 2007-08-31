@@ -1658,7 +1658,7 @@ Public MustInherit Class Sim
 
     'Constraint berechnen (Constraint < 0 ist Grenzverletzung)
     '****************************************************
-    Private Function Constraint(ByVal constr As Struct_Constraint) As Double
+    Public Function Constraint(ByVal constr As Struct_Constraint) As Double
 
         Dim i As Integer
 

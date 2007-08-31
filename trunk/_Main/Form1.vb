@@ -1349,7 +1349,8 @@ GenerierenAusgangswerte:
             Dim i As Integer
             Dim isOK As Boolean
             Dim res As MsgBoxResult
-            Dim MsgString As String = ""            'String für die Anzeige der OptParameter oder Pfade
+            Dim eol As String = Chr(13) & Chr(10)   'Zeilenumbruch
+            Dim ParamString As String = ""          'String für die Anzeige der OptParameter / des Pfads
 
             isOK = Sim1.db_getPara(xAchse, xWert, yAchse, yWert)
 
@@ -1362,10 +1363,10 @@ GenerierenAusgangswerte:
                     Case METH_PES, METH_SENSIPLOT
 
                         'String für die Anzeige der OptParameter wird generiert
-                        MsgString = Chr(13) & Chr(10) & "OptParameter: " & Chr(13) & Chr(10)
+                        ParamString = eol & "OptParameter: " & eol
                         For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
                             With Sim1.List_OptParameter(i)
-                                MsgString &= Chr(13) & Chr(10) & .Bezeichnung & ": " & .Wert.ToString()
+                                ParamString &= eol & .Bezeichnung & ": " & .Wert.ToString()
                             End With
                         Next
 
@@ -1373,30 +1374,30 @@ GenerierenAusgangswerte:
                     Case METH_CES
 
                         'String für die Anzeige der Pfade wird generiert
-                        MsgString = Chr(13) & Chr(10) & "Pfad: " & Chr(13) & Chr(10)
+                        ParamString = eol & "Pfad: " & eol
                         For i = 0 To Sim1.Aktuelle_Massnahmen.GetUpperBound(0)
-                            MsgString &= Chr(13) & Chr(10) & Sim1.List_Locations(i).Name & ": " & Sim1.Aktuelle_Massnahmen(i).ToString()
+                            ParamString &= eol & Sim1.List_Locations(i).Name & ": " & Sim1.Aktuelle_Massnahmen(i).ToString()
                         Next
 
 
                     Case METH_CES_PES
 
                         'String für die Anzeige von Pfad/OptParameter wird generiert
-                        MsgString = Chr(13) & Chr(10) & "Pfad: " & Chr(13) & Chr(10)
+                        ParamString = eol & "Pfad: " & eol
                         For i = 0 To Sim1.Aktuelle_Massnahmen.GetUpperBound(0)
-                            MsgString &= Chr(13) & Chr(10) & Sim1.List_Locations(i).Name & ": " & Sim1.Aktuelle_Massnahmen(i).ToString()
+                            ParamString &= eol & Sim1.List_Locations(i).Name & ": " & Sim1.Aktuelle_Massnahmen(i).ToString()
                         Next
-                        MsgString &= Chr(13) & Chr(10) & Chr(13) & Chr(10) & "OptParameter: " & Chr(13) & Chr(10)
+                        ParamString &= eol & eol & "OptParameter: " & eol
                         For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
                             With Sim1.List_OptParameter(i)
-                                MsgString &= Chr(13) & Chr(10) & .Bezeichnung & ": " & .Wert.ToString()
+                                ParamString &= eol & .Bezeichnung & ": " & .Wert.ToString()
                             End With
                         Next
 
                 End Select
 
                 'MessageBox
-                res = MsgBox("Diesen Parametersatz simulieren?" & Chr(13) & Chr(10) & MsgString, MsgBoxStyle.OkCancel, "Info")
+                res = MsgBox("Diesen Parametersatz simulieren?" & eol & ParamString, MsgBoxStyle.OkCancel, "Info")
 
                 If (res = MsgBoxResult.Ok) Then
 
@@ -1406,6 +1407,7 @@ GenerierenAusgangswerte:
                     Dim SimSeries As New Collection                 'zu zeichnende Simulationsgrößen
                     Dim RefSeries As New Collection                 'zu zeichnende Referenzreihen
                     Dim QWertString As String                       'String für die Anzeige der QWerte
+                    Dim ConstrString As String = ""                 'String für die Anzeige der Constraints
 
                     'Simulieren
                     Sim1.launchSim()
@@ -1413,7 +1415,9 @@ GenerierenAusgangswerte:
                     'Wave instanzieren
                     Dim Wave1 As New Wave.Wave
 
-                    QWertString = "QWerte: " & Chr(13) & Chr(10)
+                    'QWerte berechnen, in String speichern und zugehörige Reihen anzeigen
+                    '--------------------------------------------------------------------
+                    QWertString = "QWerte: " & eol
 
                     'zu zeichnenden Reihen aus Liste der OptZiele raussuchen
                     For i = 0 To Sim1.List_OptZiele.GetUpperBound(0)
@@ -1422,7 +1426,7 @@ GenerierenAusgangswerte:
 
                             'Qualitätswert berechnen und an String anhängen
                             .QWertTmp = Sim1.QWert(Sim1.List_OptZiele(i))
-                            QWertString &= Chr(13) & Chr(10) & .Bezeichnung & ": " & .QWertTmp.ToString()
+                            QWertString &= eol & .Bezeichnung & ": " & .QWertTmp.ToString()
 
                             'Name der WEL-Simulationsergebnisdatei
                             'BUG 171: Name der Ergebnisdatei
@@ -1453,12 +1457,26 @@ GenerierenAusgangswerte:
                         End With
                     Next
 
+                    'Constraints berechnen und in String speichern
+                    '---------------------------------------------
+                    If (Sim1.List_Constraints.GetLength(0) > 0) Then
+                        ConstrString = eol & eol & "Constraints: " & eol
+                        For i = 0 To Sim1.List_Constraints.GetUpperBound(0)
+                            With Sim1.List_Constraints(i)
+                                .ConstTmp = Sim1.Constraint(Sim1.List_Constraints(i))
+                                ConstrString &= eol & .Bezeichnung & ": " & .ConstTmp.ToString()
+                            End With
+                        Next
+                    End If
+
                     'Annotation anzeigen
+                    '-------------------
                     Dim anno1 As New Steema.TeeChart.Tools.Annotation(Wave1.TChart1.Chart)
-                    anno1.Text = QWertString & Chr(13) & Chr(10) & MsgString
+                    anno1.Text = QWertString & eol & ParamString & ConstrString
                     anno1.Position = Steema.TeeChart.Tools.AnnotationPositions.LeftTop
 
                     'Wave anzeigen
+                    '-------------
                     Call Wave1.Show()
 
                 End If
