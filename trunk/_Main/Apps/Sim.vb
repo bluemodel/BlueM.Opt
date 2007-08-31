@@ -2001,10 +2001,10 @@ Public MustInherit Class Sim
     Public Function db_getPara(ByVal xAchse As String, ByVal xWert As Double, ByVal yAchse As String, ByVal yWert As Double) As Boolean
 
         db_getPara = True
-        Dim q as String
+        Dim q As String
         Dim adapter As OleDbDataAdapter
         Dim ds As DataSet
-        Dim numrows as Integer
+        Dim numrows As Integer
 
         Call db_connect()
 
