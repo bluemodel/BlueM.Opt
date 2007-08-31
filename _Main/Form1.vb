@@ -1013,7 +1013,7 @@ GenerierenAusgangswerte:
 
                                 'Qualitätswerte im TeeChart zeichnen
                                 '===================================
-                                Dim SeriesNo as Integer
+                                Dim SeriesNo As Integer
 
                                 'Constraintverletzung prüfen
                                 Dim isInvalid As Boolean = False
@@ -1118,7 +1118,7 @@ GenerierenAusgangswerte:
             ElseIf UBound(Population, 2) = 3 Then
                 For i = 1 To UBound(Population, 1)
                     'BUG 118: nur die ersten beiden Zielfunktionen werden gezeichnet
-                    .Add(Population(i, 1), Population(i, 2), "") 
+                    .Add(Population(i, 1), Population(i, 2), "")
                 Next i
             End If
         End With
@@ -1521,7 +1521,7 @@ GenerierenAusgangswerte:
                 If (Form2.CheckBox_Hauptdiagramm.Checked) Then
                     'Hauptdiagramm
                     '=============
-                    Dim OptZielIndexX, OptZielIndexY as Integer
+                    Dim OptZielIndexX, OptZielIndexY As Integer
                     OptZielIndexX = Form2.ListBox_OptZieleX.SelectedIndex
                     OptZielIndexY = Form2.ListBox_OptZieleY.SelectedIndex
 
