@@ -162,13 +162,13 @@ Public Class PES
         If (Settings.iPopEvoTyp < 1 Or Settings.iPopEvoTyp > 2) Then
             Throw New Exception("Typ der Evolutionsstrategie auf Pupulationsebene ist nicht '+' oder ','")
         End If
-        If Settings.NRunden < 1 Then
+        If (Settings.NRunden < 1) Then
             Throw New Exception("Die Anzahl der Runden ist kleiner 1")
         End If
-        If Settings.NPopul < 1 Then
+        If (Settings.NPopul < 1) Then
             Throw New Exception("Die Anzahl der Populationen ist kleiner 1")
         End If
-        If Settings.NPopEltern < 1 Then
+        If (Settings.NPopEltern < 1) Then
             Throw New Exception("Die Anzahl der Populationseltern ist kleiner 1")
         End If
         If (Settings.iOptPopEltern < 1 Or Settings.iOptPopEltern > 3) Then
@@ -177,28 +177,28 @@ Public Class PES
         If (Settings.iOptEltern < 1 Or Settings.iOptEltern > 6) Then
             Throw New Exception("Strategie zur Ermittlung der Eltern ist nicht möglich!")
         End If
-        If Settings.NEltern < 1 Then
+        If (Settings.NEltern < 1) Then
             Throw New Exception("Die Anzahl der Eltern ist kleiner 1!")
         End If
-        If Settings.NNachf < 1 Then
+        If (Settings.NNachf < 1) Then
             Throw New Exception("Die Anzahl der Nachfahren ist kleiner 1!")
         End If
-        If Settings.NGen < 1 Then
+        If (Settings.NGen < 1) Then
             Throw New Exception("Die Anzahl der Generationen ist kleiner 1!")
         End If
-        If Settings.NRekombXY < 1 Then
+        If (Settings.NRekombXY < 1) Then
             Throw New Exception("Der Wert für die X/Y-Schema Rekombination ist kleiner 1!")
         End If
-        If Settings.rDeltaStart < 0 Then
+        If (Settings.rDeltaStart < 0) Then
             Throw New Exception("Die Startschrittweite darf nicht kleiner 0 sein!")
         End If
         If (Settings.iStartPar < 1 Or Settings.iStartPar > 2) Then
             Throw New Exception("Die Startaparameter dürfen nur zufällig sein oder aus den Originalparameter bestehen!")
         End If
-        If Settings.NPopul < Settings.NPopEltern Then
+        If (Settings.NPopul < Settings.NPopEltern) Then
             Throw New Exception("Die Anzahl der Populationseltern darf nicht größer als die Anzahl der Populationen!")
         End If
-        If Settings.NNachf <= Settings.NEltern Then
+        If (Settings.NNachf <= Settings.NEltern) Then
             Throw New Exception("Die Anzahl der Eltern kann nicht größer als die Anzahl der Nachfahren sein!" & Chr(13) & Chr(10) & "'Rechenberg 73' schlägt ein Verhältnis von 1:3 bis 1:5 vor.")
         End If
 
@@ -206,12 +206,6 @@ Public Class PES
         'xxxxxxxxxxxxxxxxxxxxx
 
         Me.PES_Settings = Settings
-
-        If Not PES_Settings.isPOPUL Then
-            PES_Settings.NPopul = 1
-            PES_Settings.NPopEltern = 1
-            PES_Settings.NRunden = 1
-        End If
 
     End Sub
 

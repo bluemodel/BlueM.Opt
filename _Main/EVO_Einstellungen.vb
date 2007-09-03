@@ -14,8 +14,6 @@ Public Class EVO_Einstellungen
     '********************************
     Private Sub OptModus_Change()
 
-        Dim i As Short
-
         Select Case Me.OptModus
 
             Case EVO_MODUS_SINGEL_OBJECTIVE
@@ -24,26 +22,20 @@ Public Class EVO_Einstellungen
                 TextAnzGen.Text = CStr(20)
                 TextAnzEltern.Text = CStr(3)
                 TextAnzNachf.Text = CStr(10)
-                FramePop.Enabled = False
-                TextAnzRunden.Enabled = False
                 TextAnzRunden.Text = CStr(10)
-                TextAnzPop.Enabled = False
-                TextAnzPopEltern.Enabled = False
-                ComboStrategie.Enabled = True
-                ComboOptPopEltern.Enabled = False
-                ComboPopStrategie.Enabled = False
-                ComboPopPenalty.Enabled = False
-                For i = 1 To 6
-                    LabelFramePop(i).Enabled = False
-                Next i
-                'Setzen der Modusabhängigen Vorgaben
+                'Modus
                 isMultiObjectiveOptimierung = False
-                CheckisPopul.Enabled = True
-                CheckisPopul.CheckState = CheckState.Unchecked
+                'Strategie
+                ComboStrategie.Enabled = True
+                'Sekundäre Population
                 LabelInteract.Enabled = False
                 TextInteract.Enabled = False
                 LabelNMemberSecondPop.Enabled = False
                 TextNMemberSecondPop.Enabled = False
+                'Populationen
+                CheckisPopul.Enabled = True
+                CheckisPopul.Checked = False
+                GroupBox_Populationen.Enabled = False
 
             Case EVO_MODUS_MULTIOBJECTIVE_PARETO
                 'Vorgaben und Anzeige
@@ -51,27 +43,21 @@ Public Class EVO_Einstellungen
                 TextAnzGen.Text = CStr(250)
                 TextAnzEltern.Text = CStr(25)
                 TextAnzNachf.Text = CStr(75)
-                FramePop.Enabled = False
-                TextAnzRunden.Enabled = False
                 TextAnzRunden.Text = CStr(10)
-                TextAnzPop.Enabled = False
-                TextAnzPopEltern.Enabled = False
+                'Modus
+                isMultiObjectiveOptimierung = True
+                'Strategie
                 ComboStrategie.Text = "'+' (Eltern+Nachfolger)"
                 ComboStrategie.Enabled = False
-                ComboOptPopEltern.Enabled = False
-                ComboPopStrategie.Enabled = False
-                ComboPopPenalty.Enabled = False
-                For i = 1 To 6
-                    LabelFramePop(i).Enabled = False
-                Next i
-                'Setzen der Modusabhängigen Vorgaben
-                isMultiObjectiveOptimierung = True
-                'CheckisPopul.CheckState = CheckState.Unchecked
-                CheckisPopul.Enabled = False
+                'Sekundäre Population
                 LabelInteract.Enabled = True
                 TextInteract.Enabled = True
                 LabelNMemberSecondPop.Enabled = True
                 TextNMemberSecondPop.Enabled = True
+                'Populationen
+                CheckisPopul.Enabled = False
+                CheckisPopul.Checked = False
+                GroupBox_Populationen.Enabled = False
 
         End Select
 
@@ -189,31 +175,11 @@ Public Class EVO_Einstellungen
 
     'UPGRADE_WARNING: Das Ereignis CheckisPopul.CheckStateChanged kann ausgelöst werden, wenn das Formular initialisiert wird. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup2075"'
     Private Sub CheckisPopul_CheckStateChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles CheckisPopul.CheckStateChanged
-        Dim i As Short
 
-        If CheckisPopul.CheckState = System.Windows.Forms.CheckState.Checked Then
-            FramePop.Enabled = True
-            TextAnzRunden.Enabled = True
-            TextAnzPop.Enabled = True
-            TextAnzPopEltern.Enabled = True
-            ComboOptPopEltern.Enabled = True
-            ComboPopStrategie.Enabled = True
-            ComboPopPenalty.Enabled = True
-
-            For i = 1 To 6
-                LabelFramePop(i).Enabled = True
-            Next i
+        If (CheckisPopul.Checked) Then
+            GroupBox_Populationen.Enabled = True
         Else
-            FramePop.Enabled = False
-            TextAnzRunden.Enabled = False
-            TextAnzPop.Enabled = False
-            TextAnzPopEltern.Enabled = False
-            ComboOptPopEltern.Enabled = False
-            ComboPopStrategie.Enabled = False
-            ComboPopPenalty.Enabled = False
-            For i = 1 To 6
-                LabelFramePop(i).Enabled = False
-            Next i
+            GroupBox_Populationen.Enabled = False
         End If
     End Sub
 
@@ -283,11 +249,17 @@ Public Class EVO_Einstellungen
         _settings.iEvoTyp = VB6.GetItemData(ComboStrategie, ComboStrategie.SelectedIndex)
         _settings.iPopEvoTyp = VB6.GetItemData(ComboPopStrategie, ComboPopStrategie.SelectedIndex)
         _settings.iPopPenalty = VB6.GetItemData(ComboPopPenalty, ComboPopPenalty.SelectedIndex)
-        _settings.isPOPUL = CheckisPopul.Checked 'BUG 174 und BUG 185
         _settings.is_MO_Pareto = isMultiObjectiveOptimierung
-        _settings.NRunden = Val(TextAnzRunden.Text)
-        _settings.NPopul = Val(TextAnzPop.Text)
-        _settings.NPopEltern = Val(TextAnzPopEltern.Text)
+        _settings.isPOPUL = CheckisPopul.Checked
+        If (_settings.isPOPUL) Then
+            _settings.NRunden = Val(TextAnzRunden.Text)
+            _settings.NPopul = Val(TextAnzPop.Text)
+            _settings.NPopEltern = Val(TextAnzPopEltern.Text)
+        Else
+            _settings.NRunden = 1
+            _settings.NPopul = 1
+            _settings.NPopEltern = 1
+        End If
         _settings.iOptEltern = VB6.GetItemData(ComboOptEltern, ComboOptEltern.SelectedIndex)
         _settings.iOptPopEltern = VB6.GetItemData(ComboOptPopEltern, ComboOptPopEltern.SelectedIndex)
         _settings.NRekombXY = Val(TextRekombxy.Text)
