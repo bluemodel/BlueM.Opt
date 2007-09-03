@@ -1317,7 +1317,7 @@ Public Class PES
                 NFrontMember_aktuell = Non_Dominated_Count_and_Sort(Temp)
                 'NFrontMember_aktuell: Anzahl der Mitglieder der gerade bestimmten Front
                 'NFrontMember_gesamt: Alle bisher als nicht dominiert klassifizierten Individuum
-                NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
+                NFrontMember_gesamt += NFrontMember_aktuell
                 'Hier wird pro durchlauf die nicht dominierte Front in NDSResult geschaufelt
                 'und die bereits klassifizierten Lösungen aus Temp Array gelöscht
                 Call Non_Dominated_Result(Temp, NDSResult, NFrontMember_aktuell, NFrontMember_gesamt)
@@ -1513,7 +1513,10 @@ Public Class PES
                             isDominated = isDominated And (NDSorting(i).penalty(k) <= NDSorting(j).penalty(k))
                         Next k
 
-                        NDSorting(j).dominated = isDominated
+                        If (isDominated) Then
+                            NDSorting(j).dominated = True
+                        End If
+
 
                     End If
                 Next j
@@ -1535,7 +1538,9 @@ Public Class PES
                         isDominated = isDominated And (NDSorting(i).penalty(k) <= NDSorting(j).penalty(k))
                     Next k
 
-                    NDSorting(j).dominated = isDominated
+                    If (isDominated) Then
+                        NDSorting(j).dominated = True
+                    End If
                 Next j
             Next i
         End If
