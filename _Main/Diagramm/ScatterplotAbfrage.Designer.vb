@@ -26,10 +26,11 @@ Partial Class ScatterplotAbfrage
         Me.Cancel_Button = New System.Windows.Forms.Button
         Me.CheckBox_Scatterplot = New System.Windows.Forms.CheckBox
         Me.GroupBox_Hauptdiagramm = New System.Windows.Forms.GroupBox
+        Me.CheckBox_Hauptdiagramm = New System.Windows.Forms.CheckBox
         Me.ListBox_OptZieleY = New System.Windows.Forms.ListBox
         Me.Label_YAchse = New System.Windows.Forms.Label
         Me.GroupBox_Scatterplot = New System.Windows.Forms.GroupBox
-        Me.CheckBox_Hauptdiagramm = New System.Windows.Forms.CheckBox
+        Me.CheckBox_onlySekPop = New System.Windows.Forms.CheckBox
         Me.TableLayoutPanel1.SuspendLayout()
         Me.GroupBox_Hauptdiagramm.SuspendLayout()
         Me.GroupBox_Scatterplot.SuspendLayout()
@@ -49,7 +50,7 @@ Partial Class ScatterplotAbfrage
         Me.ListBox_OptZieleX.FormattingEnabled = True
         Me.ListBox_OptZieleX.Location = New System.Drawing.Point(9, 55)
         Me.ListBox_OptZieleX.Name = "ListBox_OptZieleX"
-        Me.ListBox_OptZieleX.Size = New System.Drawing.Size(130, 212)
+        Me.ListBox_OptZieleX.Size = New System.Drawing.Size(130, 186)
         Me.ListBox_OptZieleX.TabIndex = 5
         '
         'TableLayoutPanel1
@@ -60,7 +61,7 @@ Partial Class ScatterplotAbfrage
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanel1.Controls.Add(Me.OK_Button, 0, 0)
         Me.TableLayoutPanel1.Controls.Add(Me.Cancel_Button, 1, 0)
-        Me.TableLayoutPanel1.Location = New System.Drawing.Point(300, 295)
+        Me.TableLayoutPanel1.Location = New System.Drawing.Point(300, 272)
         Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
         Me.TableLayoutPanel1.RowCount = 1
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
@@ -106,17 +107,29 @@ Partial Class ScatterplotAbfrage
         Me.GroupBox_Hauptdiagramm.Controls.Add(Me.Label_XAchse)
         Me.GroupBox_Hauptdiagramm.Location = New System.Drawing.Point(12, 12)
         Me.GroupBox_Hauptdiagramm.Name = "GroupBox_Hauptdiagramm"
-        Me.GroupBox_Hauptdiagramm.Size = New System.Drawing.Size(284, 275)
+        Me.GroupBox_Hauptdiagramm.Size = New System.Drawing.Size(284, 251)
         Me.GroupBox_Hauptdiagramm.TabIndex = 9
         Me.GroupBox_Hauptdiagramm.TabStop = False
         Me.GroupBox_Hauptdiagramm.Text = "Hauptdiagramm"
+        '
+        'CheckBox_Hauptdiagramm
+        '
+        Me.CheckBox_Hauptdiagramm.AutoSize = True
+        Me.CheckBox_Hauptdiagramm.Checked = True
+        Me.CheckBox_Hauptdiagramm.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.CheckBox_Hauptdiagramm.Location = New System.Drawing.Point(6, 19)
+        Me.CheckBox_Hauptdiagramm.Name = "CheckBox_Hauptdiagramm"
+        Me.CheckBox_Hauptdiagramm.Size = New System.Drawing.Size(146, 17)
+        Me.CheckBox_Hauptdiagramm.TabIndex = 12
+        Me.CheckBox_Hauptdiagramm.Text = "Hauptdiagramm anzeigen"
+        Me.CheckBox_Hauptdiagramm.UseVisualStyleBackColor = True
         '
         'ListBox_OptZieleY
         '
         Me.ListBox_OptZieleY.FormattingEnabled = True
         Me.ListBox_OptZieleY.Location = New System.Drawing.Point(144, 55)
         Me.ListBox_OptZieleY.Name = "ListBox_OptZieleY"
-        Me.ListBox_OptZieleY.Size = New System.Drawing.Size(130, 212)
+        Me.ListBox_OptZieleY.Size = New System.Drawing.Size(130, 186)
         Me.ListBox_OptZieleY.TabIndex = 10
         '
         'Label_YAchse
@@ -133,26 +146,27 @@ Partial Class ScatterplotAbfrage
         Me.GroupBox_Scatterplot.Controls.Add(Me.CheckBox_Scatterplot)
         Me.GroupBox_Scatterplot.Location = New System.Drawing.Point(302, 12)
         Me.GroupBox_Scatterplot.Name = "GroupBox_Scatterplot"
-        Me.GroupBox_Scatterplot.Size = New System.Drawing.Size(140, 275)
+        Me.GroupBox_Scatterplot.Size = New System.Drawing.Size(140, 251)
         Me.GroupBox_Scatterplot.TabIndex = 10
         Me.GroupBox_Scatterplot.TabStop = False
         Me.GroupBox_Scatterplot.Text = "Scatterplot"
         '
-        'CheckBox_Hauptdiagramm
+        'CheckBox_onlySekPop
         '
-        Me.CheckBox_Hauptdiagramm.AutoSize = True
-        Me.CheckBox_Hauptdiagramm.Location = New System.Drawing.Point(6, 19)
-        Me.CheckBox_Hauptdiagramm.Name = "CheckBox_Hauptdiagramm"
-        Me.CheckBox_Hauptdiagramm.Size = New System.Drawing.Size(146, 17)
-        Me.CheckBox_Hauptdiagramm.TabIndex = 12
-        Me.CheckBox_Hauptdiagramm.Text = "Hauptdiagramm anzeigen"
-        Me.CheckBox_Hauptdiagramm.UseVisualStyleBackColor = True
+        Me.CheckBox_onlySekPop.AutoSize = True
+        Me.CheckBox_onlySekPop.Location = New System.Drawing.Point(139, 279)
+        Me.CheckBox_onlySekPop.Name = "CheckBox_onlySekPop"
+        Me.CheckBox_onlySekPop.Size = New System.Drawing.Size(147, 17)
+        Me.CheckBox_onlySekPop.TabIndex = 11
+        Me.CheckBox_onlySekPop.Text = "nur sekundäre Population"
+        Me.CheckBox_onlySekPop.UseVisualStyleBackColor = True
         '
         'ScatterplotAbfrage
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(458, 336)
+        Me.ClientSize = New System.Drawing.Size(458, 313)
+        Me.Controls.Add(Me.CheckBox_onlySekPop)
         Me.Controls.Add(Me.GroupBox_Scatterplot)
         Me.Controls.Add(Me.GroupBox_Hauptdiagramm)
         Me.Controls.Add(Me.TableLayoutPanel1)
@@ -164,6 +178,7 @@ Partial Class ScatterplotAbfrage
         Me.GroupBox_Scatterplot.ResumeLayout(False)
         Me.GroupBox_Scatterplot.PerformLayout()
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
     Friend WithEvents Label_XAchse As System.Windows.Forms.Label
@@ -177,4 +192,5 @@ Partial Class ScatterplotAbfrage
     Friend WithEvents GroupBox_Scatterplot As System.Windows.Forms.GroupBox
     Friend WithEvents CheckBox_Scatterplot As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBox_Hauptdiagramm As System.Windows.Forms.CheckBox
+    Friend WithEvents CheckBox_onlySekPop As System.Windows.Forms.CheckBox
 End Class

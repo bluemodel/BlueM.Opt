@@ -18,6 +18,11 @@ Public Class ScatterplotAbfrage
                 Me.DialogResult = Windows.Forms.DialogResult.None
                 Exit Sub
             End If
+
+        ElseIf (Not Me.CheckBox_Scatterplot.Checked) Then
+            MsgBox("Bitte entweder 'Hauptdiagramm' oder 'Scatterplot auswählen!", MsgBoxStyle.Exclamation, "Fehler")
+            Me.DialogResult = Windows.Forms.DialogResult.None
+            Exit Sub
         End If
 
     End Sub
