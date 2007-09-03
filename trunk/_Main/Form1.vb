@@ -1512,20 +1512,20 @@ GenerierenAusgangswerte:
             'Neuen DB-Pfad speichern
             Sim1.db_path = Me.OpenFileDialog_MDB.FileName
 
-            'Daten einlesen
-            Cursor = Cursors.WaitCursor
-            Dim OptResult As Main.OptResult = Sim1.db_getOptResult()
-            Cursor = Cursors.Default
-
             'Abfrageform
             Dim Form2 As New ScatterplotAbfrage
-            For Each OptZiel As Sim.Struct_OptZiel In OptResult.List_OptZiele
+            For Each OptZiel As Sim.Struct_OptZiel In Sim1.List_OptZiele
                 Form2.ListBox_OptZieleX.Items.Add(OptZiel.Bezeichnung)
                 Form2.ListBox_OptZieleY.Items.Add(OptZiel.Bezeichnung)
             Next
             diagresult = Form2.ShowDialog()
 
             If (diagresult = Windows.Forms.DialogResult.OK) Then
+
+                'Daten einlesen
+                Cursor = Cursors.WaitCursor
+                Dim OptResult As Main.OptResult = Sim1.db_getOptResult(Form2.CheckBox_onlySekPop.Checked)
+                Cursor = Cursors.Default
 
                 If (Form2.CheckBox_Hauptdiagramm.Checked) Then
                     'Hauptdiagramm
@@ -1558,7 +1558,7 @@ GenerierenAusgangswerte:
 
                     'Punkte eintragen
                     '----------------
-                    For i = 0 To OptResult.Solutions.getUpperBound(0)
+                    For i = 0 To OptResult.Solutions.GetUpperBound(0)
                         With OptResult.Solutions(i)
                             'Constraintverletzung prüfen
                             If (.isValid) Then

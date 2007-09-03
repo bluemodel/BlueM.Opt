@@ -2157,7 +2157,7 @@ Public MustInherit Class Sim
 
     'Optimierungsergebnis aus einer DB lesen
     '***************************************
-    Public Function db_getOptResult() As OptResult
+    Public Function db_getOptResult(ByVal Optional onlySekPop As Boolean = True) As OptResult
 
         '---------------------------------------------------------------------------
         'Hinweise:
@@ -2172,7 +2172,14 @@ Public MustInherit Class Sim
         Call db_connect()
 
         'Read
-        Dim q As String = "SELECT OptParameter.*, QWerte.*, Constraints.* FROM ((Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN OptParameter ON Sim.ID=OptParameter.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID ORDER BY Sim.ID"
+        Dim q As String
+        If (onlySekPop) Then
+            'Nur die Lösungen aus der letzten Sekundären Population
+            q = "SELECT SekPop.Generation, OptParameter.*, QWerte.*, Constraints.* FROM (((Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN OptParameter ON Sim.ID=OptParameter.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID) INNER JOIN SekPop ON Sim.ID=SekPop.Sim_ID WHERE (((SekPop.Generation)=(SELECT MAX(Generation) FROM SekPop)))"
+        Else
+            'Alle Lösungen
+            q = "SELECT OptParameter.*, QWerte.*, Constraints.* FROM ((Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN OptParameter ON Sim.ID=OptParameter.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID ORDER BY Sim.ID"
+        End If
 
         Dim adapter As OleDbDataAdapter = New OleDbDataAdapter(q, db)
 
