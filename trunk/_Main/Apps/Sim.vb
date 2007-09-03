@@ -241,18 +241,22 @@ Public MustInherit Class Sim
             FiStr.Close()
 
             'Einstellungen setzen
+            Dim Param As String
             For i = 0 To Configs.GetUpperBound(0)
-                Select Case Configs(i, 0)
-                    Case "Exe"
-                        Me.Exe = Configs(i, 1)
-                    Case "Datensatz"
-                        Call Me.saveDatensatz(Configs(i, 1))
-                    Case "Dll"
-                        Me.Dll = Configs(i, 1)
-                        Me.isDll = True
-                    Case Else
-                        'weitere Voreinstellungen
-                End Select
+                If (Not isNothing(Configs(i, 0))) Then
+                    Param = Configs(i, 0).ToUpper()
+                    Select Case Param
+                        Case "EXE"
+                            Me.Exe = Configs(i, 1)
+                        Case "DATENSATZ"
+                            Call Me.saveDatensatz(Configs(i, 1))
+                        Case "DLL"
+                            Me.Dll = Configs(i, 1)
+                            Me.isDll = True
+                        Case Else
+                            'weitere Voreinstellungen
+                    End Select
+                End If
             Next
 
         Else
@@ -1998,7 +2002,7 @@ Public MustInherit Class Sim
 
     'Sekundäre Population in DB speichern
     '************************************
-    Public Sub db_setSekPop(ByVal SekPop(,) As Double, ByVal igen as Integer)
+    Public Sub db_setSekPop(ByVal SekPop(,) As Double, ByVal igen As Integer)
 
         Call db_connect()
 
@@ -2012,7 +2016,7 @@ Public MustInherit Class Sim
         Dim i, j As Integer
         Dim bedingung As String
         Dim Sim_ID As Integer
-        For i = 1 To SekPop.GetUpperBound(0)	'BUG 135: SekPop(,) fängt bei 1 an!
+        For i = 1 To SekPop.GetUpperBound(0)    'BUG 135: SekPop(,) fängt bei 1 an!
 
             'zugehörige Sim_ID bestimmen
             bedingung = ""
@@ -2157,7 +2161,7 @@ Public MustInherit Class Sim
 
     'Optimierungsergebnis aus einer DB lesen
     '***************************************
-    Public Function db_getOptResult(ByVal Optional onlySekPop As Boolean = True) As OptResult
+    Public Function db_getOptResult(Optional ByVal onlySekPop As Boolean = True) As OptResult
 
         '---------------------------------------------------------------------------
         'Hinweise:
