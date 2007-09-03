@@ -1996,6 +1996,43 @@ Public MustInherit Class Sim
 
     End Function
 
+    'Sekundäre Population in DB speichern
+    '************************************
+    Public Sub db_setSekPop(ByVal SekPop(,) As Double, ByVal igen as Integer)
+
+        Call db_connect()
+
+        Dim command As OleDbCommand = New OleDbCommand("", db)
+
+        ''Alte SekPop löschen
+        'command.CommandText = "DELETE FROM SekPop"
+        'command.ExecuteNonQuery()
+
+        'Neue SekPop speichern
+        Dim i, j As Integer
+        Dim bedingung As String
+        Dim Sim_ID As Integer
+        For i = 1 To SekPop.GetUpperBound(0)	'BUG 135: SekPop(,) fängt bei 1 an!
+
+            'zugehörige Sim_ID bestimmen
+            bedingung = ""
+            For j = 0 To Me.List_OptZiele.GetUpperBound(0)
+                bedingung &= " AND QWerte.[" & Me.List_OptZiele(j).Bezeichnung & "] = " & SekPop(i, j + 1)
+            Next
+            command.CommandText = "SELECT Sim.ID FROM Sim INNER JOIN QWerte ON Sim.ID = QWerte.Sim_ID WHERE (1=1" & bedingung & ")"
+            Sim_ID = command.ExecuteScalar()
+
+            If (Sim_ID > 0) Then
+                'SekPop Member speichern
+                command.CommandText = "INSERT INTO SekPop (Generation, Sim_ID) VALUES (" & igen & ", " & Sim_ID & ")"
+                command.ExecuteNonQuery()
+            End If
+        Next
+
+        Call db_disconnect()
+
+    End Sub
+
     'Einen Parametersatz aus der DB übernehmen
     '*****************************************
     Public Function db_getPara(ByVal xAchse As String, ByVal xWert As Double, ByVal yAchse As String, ByVal yWert As Double) As Boolean
