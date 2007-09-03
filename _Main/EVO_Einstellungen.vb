@@ -266,15 +266,12 @@ Public Class EVO_Einstellungen
         _settings.rDeltaStart = Val(TextDeltaStart.Text)
         _settings.iStartPar = VB6.GetItemData(ComboOptVorgabe, ComboOptVorgabe.SelectedIndex)
         _settings.isDnVektor = CheckisDnVektor.Checked
-        If Val(TextInteract.Text) <= 0 Then
+        If (Val(TextInteract.Text) <= 0) Then
+            _settings.isInteract = False
             _settings.interact = 1
         Else
-            _settings.interact = Val(TextInteract.Text)
-        End If
-        If Val(TextInteract.Text) <= 0 Then
-            _settings.isInteract = False
-        Else
             _settings.isInteract = True
+            _settings.interact = Val(TextInteract.Text)
         End If
         _settings.NMemberSecondPop = Val(TextNMemberSecondPop.Text)
 
