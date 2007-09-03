@@ -1481,13 +1481,16 @@ Public MustInherit Class Sim
 
             Case "Volf"
                 'Volumenfehler
-                'BUG 169: Volumenfehler rechnet noch nicht echtes Volumen, dazu ist Zeitschrittweite notwendig
                 Dim VolSim As Double = 0
                 Dim VolZiel As Double = 0
                 For i = 0 To SimReihe.Length - 1
                     VolSim += SimReihe.YWerte(i)
                     VolZiel += OptZiel.ZielReihe.YWerte(i)
                 Next
+                'Umrechnen in echtes Volumen
+                VolSim *= Me.SimDT.TotalSeconds
+                VolZiel *= Me.SimDT.TotalSeconds
+                'Differenz bilden
                 QWert = Math.Abs(VolZiel - VolSim)
 
             Case "nUnter"
