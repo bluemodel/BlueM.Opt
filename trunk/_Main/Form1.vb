@@ -2,6 +2,7 @@ Option Strict Off ' Off ist Default
 Option Explicit On
 Imports System.IO
 Imports System.Management
+
 '*******************************************************************************
 '*******************************************************************************
 '**** ihwb Optimierung                                                      ****
@@ -479,6 +480,7 @@ Partial Class Form1
             '-------------------
             Me.isrun = False
             Me.Button_Start.Text = ">"
+            Me.Button_Start.Enabled = False
 
         End If
 
@@ -1061,10 +1063,17 @@ GenerierenAusgangswerte:
                     'Die neuen Eltern werden generiert
                     Call PES1.EsEltern()
 
-                    'sekundäre Population zeichnen
+                    'Sekundäre Population 'BUG 135: SekPop(,) fängt bei 1 an!
                     If (EVO_Settings1.PES_Settings.is_MO_Pareto) Then
                         SekPopulation = PES1.EsGetSekundärePopulation()
+                        'SekPop zeichnen
                         Call SekundärePopulationZeichnen(SekPopulation)
+                        'SekPop in DB speichern
+                        If (Not IsNothing(Sim1)) Then
+                            If (Sim1.Ergebnisdb) Then
+                                Call Sim1.db_setSekPop(SekPopulation, igen)
+                            End If
+                        End If
                     End If
 
                     System.Windows.Forms.Application.DoEvents()
@@ -1102,7 +1111,7 @@ GenerierenAusgangswerte:
 
     'Sekundäre Population zeichnen
     '*****************************
-    Private Sub SekundärePopulationZeichnen(ByVal Population(,) As Double)
+    Private Sub SekundärePopulationZeichnen(ByVal SekPop(,) As Double)
 
         Dim i As Short
         Dim SeriesNo As Integer
@@ -1111,14 +1120,14 @@ GenerierenAusgangswerte:
         With DForm.Diag.Series(SeriesNo)
             .Clear()
             'BUG 135: SekPop(,) fängt bei 1 an!
-            If UBound(Population, 2) = 2 Then
-                For i = 1 To UBound(Population, 1)
-                    .Add(Population(i, 1), Population(i, 2), "")
+            If UBound(SekPop, 2) = 2 Then
+                For i = 1 To UBound(SekPop, 1)
+                    .Add(SekPop(i, 1), SekPop(i, 2), "")
                 Next i
-            ElseIf UBound(Population, 2) = 3 Then
-                For i = 1 To UBound(Population, 1)
+            ElseIf UBound(SekPop, 2) = 3 Then
+                For i = 1 To UBound(SekPop, 1)
                     'BUG 118: nur die ersten beiden Zielfunktionen werden gezeichnet
-                    .Add(Population(i, 1), Population(i, 2), "")
+                    .Add(SekPop(i, 1), SekPop(i, 2), "")
                 Next i
             End If
         End With
