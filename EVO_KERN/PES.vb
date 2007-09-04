@@ -66,6 +66,8 @@ Public Class PES
         Dim Xmax() As Double                'Obere Schranke (Dimension varanz)
     End Structure
 
+    Private PES_Initial As Struct_Initial
+
     'Diese Struktur speichert den aktuellen Zustand
     'ToDo: Könnte man auch entfernen wenn man die Schleifenkontrolle ins Form legt
     Public Structure Struct_iAkt
@@ -76,7 +78,6 @@ Public Class PES
     End Structure
 
     Private PES_Settings As Struct_Settings
-    Private PES_Initial As Struct_Initial
 
     'Muss Public sein, da das Form hiermit die Schleifen kontrolliert
     Public PES_iAkt As Struct_iAkt
@@ -244,6 +245,7 @@ Public Class PES
             PES_Initial.Xn(i) = mypara(i)
             PES_Initial.Xmin(i) = 0
             PES_Initial.Xmax(i) = 1
+            'Welchen Zweck hat diese Prüfung hier. Die Grenzen sollten zu jeder Zeit eingehalten werden
             PES_Initial.Xn(i) = Math.Min(PES_Initial.Xn(i), PES_Initial.Xmax(i))
             PES_Initial.Xn(i) = Math.Max(PES_Initial.Xn(i), PES_Initial.Xmin(i))
         Next
@@ -649,7 +651,7 @@ Public Class PES
     End Sub
 
     '*******************************************************************************
-    'ES_VARIA
+    'ES_VARIA - REPRODUKTIONSPROZESS
     'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
     '*******************************************************************************
     Public Sub EsVaria()
@@ -1030,8 +1032,8 @@ Public Class PES
 
             'Falls die Qualität des aktuellen Nachkommen besser ist (Penaltyfunktion geringer)
             'als die schlechteste im Bestwertspeicher, wird diese ersetzt
-            If QN(1) < Qb(j, PES_iAkt.iAktPop, 1) Then
-                Qb(j, PES_iAkt.iAktPop, 1) = QN(1)
+            If QN(0) < Qb(j, PES_iAkt.iAktPop, 1) Then
+                Qb(j, PES_iAkt.iAktPop, 1) = QN(0)
                 For v = 1 To PES_Initial.varanz
                     'Die Schrittweite wird ebenfalls übernommen
                     Db(v, j, PES_iAkt.iAktPop) = PES_Initial.Dn(v)
@@ -1039,7 +1041,7 @@ Public Class PES
                     Xb(v, j, PES_iAkt.iAktPop) = PES_Initial.Xn(v)
                 Next v
                 If PES_Initial.NPenalty = 2 Then
-                    Qb(j, PES_iAkt.iAktPop, 2) = QN(2)
+                    Qb(j, PES_iAkt.iAktPop, 2) = QN(1)
                 End If
             End If
 
@@ -1047,11 +1049,11 @@ Public Class PES
             'Multi-Objective mit Paretofront
             '-------------------------------
             With List_NDSorting(PES_iAkt.iAktNachf)
-                For i = 1 To PES_Initial.NPenalty
+                For i = 0 To PES_Initial.NPenalty - 1
                     .penalty(i) = QN(i)
                 Next i
                 .feasible = True
-                For i = 1 To PES_Initial.NConstrains
+                For i = 0 To PES_Initial.NConstrains - 1
                     .constrain(i) = RN(i)
                     If .constrain(i) < 0 Then .feasible = False
                 Next i

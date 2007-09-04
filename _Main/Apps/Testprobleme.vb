@@ -186,27 +186,27 @@ Public Class Testprobleme
 
             Case "Sinus-Funktion" 'Fehlerquadrate zur Sinusfunktion |0-2pi|
                 Unterteilung_X = 2 * 3.1415926535898 / (globalAnzPar - 1)
-                QN(1) = 0
+                QN(0) = 0
                 For i = 1 To globalAnzPar
-                    QN(1) = QN(1) + (System.Math.Sin((i - 1) * Unterteilung_X) - (-1 + (mypara(i) * 2))) * (System.Math.Sin((i - 1) * Unterteilung_X) - (-1 + mypara(i) * 2))
+                    QN(0) = QN(0) + (System.Math.Sin((i - 1) * Unterteilung_X) - (-1 + (mypara(i) * 2))) * (System.Math.Sin((i - 1) * Unterteilung_X) - (-1 + mypara(i) * 2))
                 Next i
                 Call Zielfunktion_zeichnen_Sinus(ipop, globalAnzPar, mypara, Diag)
             Case "Beale-Problem" 'Beale-Problem
                 x1 = -5 + (mypara(1) * 10)
                 x2 = -2 + (mypara(2) * 4)
 
-                QN(1) = (1.5 - x1 * (1 - x2)) ^ 2 + (2.25 - x1 * (1 - x2) ^ 2) ^ 2 + (2.625 - x1 * (1 - x2) ^ 3) ^ 2
-                Diag.Series(ipop).Add(durchlauf, QN(1))
+                QN(0) = (1.5 - x1 * (1 - x2)) ^ 2 + (2.25 - x1 * (1 - x2) ^ 2) ^ 2 + (2.625 - x1 * (1 - x2) ^ 3) ^ 2
+                Diag.Series(ipop).Add(durchlauf, QN(0))
             Case "Schwefel 2.4-Problem" 'Schwefel 2.4 S. 329
                 ReDim X(globalAnzPar)
                 For i = 1 To globalAnzPar
                     X(i) = -10 + mypara(i) * 20
                 Next i
-                QN(1) = 0
+                QN(0) = 0
                 For i = 1 To globalAnzPar
-                    QN(1) = QN(1) + ((X(1) - X(i) ^ 2) ^ 2 + (X(i) - 1) ^ 2)
+                    QN(0) = QN(0) + ((X(1) - X(i) ^ 2) ^ 2 + (X(i) - 1) ^ 2)
                 Next i
-                Diag.Series(ipop).Add(durchlauf, QN(1))
+                Diag.Series(ipop).Add(durchlauf, QN(0))
                 '*************************************
                 '* Multi-Objective Problemstellungen *
                 '*************************************
@@ -214,8 +214,8 @@ Public Class Testprobleme
             Case "Deb 1"
                 f1 = mypara(1) * (9 / 10) + 0.1
                 f2 = (1 + 5 * mypara(2)) / (mypara(1) * (9 / 10) + 0.1)
-                QN(1) = f1
-                QN(2) = f2
+                QN(0) = f1
+                QN(1) = f2
                 Diag.Series(0).Add(f1, f2, "")
 
                 'Zitzler/Deb/Thiele 2000, T1 (Konvexe Pareto-Front)
@@ -227,8 +227,8 @@ Public Class Testprobleme
                 Next i
                 f2 = 1 + 9 / (globalAnzPar - 1) * f2
                 f2 = f2 * (1 - System.Math.Sqrt(f1 / f2))
-                QN(1) = f1
-                QN(2) = f2
+                QN(0) = f1
+                QN(1) = f2
                 Diag.Series(0).Add(f1, f2, "")
 
                 'Zitzler/Deb/Thiele 2000, T2 (Non-Konvexe Pareto-Front)
@@ -240,8 +240,8 @@ Public Class Testprobleme
                 Next i
                 f2 = 1 + 9 / (globalAnzPar - 1) * f2
                 f2 = f2 * (1 - (f1 / f2) * (f1 / f2))
-                QN(1) = f1
-                QN(2) = f2
+                QN(0) = f1
+                QN(1) = f2
                 Diag.Series(0).Add(f1, f2, "")
 
                 'Zitzler/Deb/Thiele 2000, T3 (disconected Pareto-Front)
@@ -253,8 +253,8 @@ Public Class Testprobleme
                 Next i
                 f2 = 1 + 9 / (globalAnzPar - 1) * f2
                 f2 = f2 * (1 - System.Math.Sqrt(f1 / f2) - (f1 / f2) * System.Math.Sin(10 * 3.14159265358979 * f1))
-                QN(1) = f1
-                QN(2) = f2
+                QN(0) = f1
+                QN(1) = f2
                 Diag.Series(0).Add(f1, f2, "")
 
                 'Zitzler/Deb/Thiele 2000, T4 (local/global Pareto-Fronts)
@@ -267,8 +267,8 @@ Public Class Testprobleme
                 Next i
                 f2 = 1 + 10 * (globalAnzPar - 1) + f2
                 f2 = f2 * (1 - System.Math.Sqrt(f1 / f2))
-                QN(1) = f1
-                QN(2) = f2
+                QN(0) = f1
+                QN(1) = f2
                 Diag.Series(0).Add(f1, f2, "")
 
             Case "CONSTR"
@@ -278,10 +278,10 @@ Public Class Testprobleme
                 g1 = (5 * mypara(2)) + 9 * (mypara(1) * (9 / 10) + 0.1) - 6
                 g2 = (-1) * (5 * mypara(2)) + 9 * (mypara(1) * (9 / 10) + 0.1) - 1
 
-                QN(1) = f1
-                QN(2) = f2
-                RN(1) = g1
-                RN(2) = g2
+                QN(0) = f1
+                QN(1) = f2
+                RN(0) = g1
+                RN(1) = g2
                 Diag.Series(0).Add(f1, f2, "")
 
             Case "Box"
@@ -298,11 +298,11 @@ Public Class Testprobleme
                 'g1 = Par(1, 1) ^ 2 + Par(3, 1) ^ 2 - 0.5
                 'g2 = Par(2, 1) ^ 2 + Par(3, 1) ^ 2 - 0.5
 
-                QN(1) = f1
-                QN(2) = f2
-                QN(3) = f3
-                RN(1) = g1
-                RN(2) = g2
+                QN(0) = f1
+                QN(1) = f2
+                QN(2) = f3
+                RN(0) = g1
+                RN(1) = g2
                 Call Zielfunktion_zeichnen_MultiObPar_3D(f1, f2, f3, Diag)
         End Select
 

@@ -44,6 +44,7 @@ Public Class CES
         Dim No As Short                     'Nummer des NDSorting
         Dim Path() As Integer               'Der Pfad
         Dim Penalty() As Double             'Werte der Penaltyfunktion(en)
+        Dim Constrain() As Double           'Wert der Randbedingung(en)
         Dim mutated As Boolean              'Gibt an ob der Wert bereits mutiert ist oder nicht
         Dim Front As Short                  'Nummer der Pareto Front
         Dim myPara(,) As Object             'Die Optimierungsparameter
@@ -58,7 +59,7 @@ Public Class CES
         Dim No As Short                     'CH: Nummer des NDSorting
         Dim Path() As Integer               'CH: Der Pfad
         Dim Penalty() As Double             'DM: Werte der Penaltyfunktion(en)
-        'Dim Constrain() As Double          'DM: Werte der Randbedingung(en)
+        Dim Constrain() As Double          'DM: Werte der Randbedingung(en)
         'Dim Feasible As Boolean            'DM: Gültiges Ergebnis ?
         Dim dominated As Boolean            'DM: Kennzeichnung ob dominiert
         Dim Front As Short                  'DM: Nummer der Pareto Front
@@ -75,6 +76,7 @@ Public Class CES
         Dim Parameter(,) As Object
         Dim D() As Object
         Dim Penalty() As Double
+        Dim Constrain() As Double
         Dim Generation as Integer
     End Structure
 
@@ -151,6 +153,7 @@ Public Class CES
         Destination.No = Source.No
         Array.Copy(Source.Path, Destination.Path, Source.Path.Length)
         Array.Copy(Source.Penalty, Destination.Penalty, Source.Penalty.Length)
+        Array.Copy(Source.Constrain, Destination.Constrain, Source.Constrain.Length)
         Destination.mutated = Source.mutated
         Destination.Front = Source.Front
 
@@ -163,6 +166,7 @@ Public Class CES
         Destination.No = Source.No
         Array.Copy(Source.Path, Destination.Path, Source.Path.Length)
         Array.Copy(Source.Penalty, Destination.Penalty, Source.Penalty.Length)
+        Array.Copy(Source.Constrain, Destination.Constrain, Source.Constrain.Length)
         Destination.Front = Source.Front
 
     End Sub
@@ -174,6 +178,7 @@ Public Class CES
         Destination.No = Source.No
         Array.Copy(Source.Path, Destination.Path, Source.Path.Length)
         Array.Copy(Source.Penalty, Destination.Penalty, Source.Penalty.Length)
+        Array.Copy(Source.Constrain, Destination.Constrain, Source.Constrain.Length)
         Destination.Front = Source.Front
 
     End Sub
@@ -279,6 +284,9 @@ Public Class CES
             List_Childs(i).No = i + 1
             For j = 0 To List_Childs(i).Penalty.GetUpperBound(0)
                 List_Childs(i).Penalty(j) = 999999999999999999
+            Next
+            For j = 0 To List_Childs(i).Constrain.GetUpperBound(0)
+                List_Childs(i).Constrain(j) = 0
             Next
             Array.Clear(List_Childs(i).Path, 0, List_Childs(i).Path.GetLength(0))
             List_Childs(i).mutated = False
@@ -602,9 +610,10 @@ Public Class CES
         Memory(neu).Generation = Gen_No
         Array.Copy(List_Childs(Child_No).Path, Memory(neu).Path, List_Childs(Child_No).Path.Length)
         Array.Copy(List_Childs(Child_No).myPara, Memory(neu).Parameter, List_Childs(Child_No).myPara.Length)
-        'ToDo im Child fehlt auch das Dn
+        'ToDo: im Child fehlt auch das Dn
         'Array.Copy(List_Childs(Child_No).myPara, Memory(neu).D, List_Childs(Child_No).myPara.Length)
         Array.Copy(List_Childs(Child_No).Penalty, Memory(neu).Penalty, List_Childs(Child_No).Penalty.Length)
+        Array.Copy(List_Childs(Child_No).Constrain, Memory(neu).Constrain, List_Childs(Child_No).Constrain.Length)
 
     End Sub
 
