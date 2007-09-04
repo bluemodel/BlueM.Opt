@@ -1076,33 +1076,6 @@ Public MustInherit Class Sim
     '********************************
     Protected MustOverride Sub Prepare_Write_Verzweigungen()
 
-    'Evaluiert die Kinderchen für Kombinatorik Optimierung vor
-    '*********************************************************
-    Public Function SIM_Evaluierung_CES(ByRef QN() As Double) As Boolean
-        Dim i As Short
-
-        'Modell Starten
-        Call launchSim()
-
-        'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
-        For i = 0 To QN.GetUpperBound(0)                                 'BUG 135: QN() fängt bei 1 an!
-            List_OptZiele(i).QWertTmp = QWert(List_OptZiele(i))
-            QN(i) = List_OptZiele(i).QWertTmp
-        Next
-
-        'Qualitätswerte und OptParameter in DB speichern
-        If (Ergebnisdb = True) Then
-            Call Me.db_update()
-        End If
-
-        'BUG 112: TODO: Constraints berechnen für CES
-        'For i = 0 To Me.List_Constraints.GetUpperBound(0)
-        '    List_Constraints(i).ConstTmp = Constraint(List_Constraints(i))
-        '    RN(i + 1) = List_Constraints(i).ConstTmp                'BUG 57: RN() fängt bei 1 an!
-        'Next
-
-    End Function
-
 #End Region 'Kombinatorik
 
 #Region "Evaluierung"
@@ -1336,13 +1309,13 @@ Public MustInherit Class Sim
 
     End Sub
 
-    'Evaluierung des SimModells für ParameterOptimierung - Steuerungseinheit
-    '***********************************************************************
-    Public Function SIM_Evaluierung_PES(ByRef QN() As Double, ByRef RN() As Double) As Boolean
+    'Evaluiert die Kinderchen mti Hilfe des Simulationsmodells
+    '*********************************************************
+    Public Function SIM_Evaluierung(ByRef QN() As Double, ByRef RN() As Double) As Boolean
 
         Dim i As Short
 
-        SIM_Evaluierung_PES = False
+        SIM_Evaluierung = False
 
         'Modell Starten
         If Not launchSim() Then Exit Function
@@ -1350,7 +1323,7 @@ Public MustInherit Class Sim
         'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
         For i = 0 To Me.List_OptZiele.GetUpperBound(0)
             List_OptZiele(i).QWertTmp = QWert(List_OptZiele(i))
-            QN(i + 1) = List_OptZiele(i).QWertTmp                   'BUG 135: QN() fängt bei 1 an!
+            QN(i) = List_OptZiele(i).QWertTmp
         Next
 
         'Qualitätswerte und OptParameter in DB speichern
@@ -1361,13 +1334,12 @@ Public MustInherit Class Sim
         'Constraints berechnen
         For i = 0 To Me.List_Constraints.GetUpperBound(0)
             List_Constraints(i).ConstTmp = Constraint(List_Constraints(i))
-            RN(i + 1) = List_Constraints(i).ConstTmp                'BUG 135: RN() fängt bei 1 an!
+            RN(i) = List_Constraints(i).ConstTmp
         Next
 
-        SIM_Evaluierung_PES = True
+        SIM_Evaluierung = True
 
     End Function
-
 
     'ModellParameter aus OptParametern errechnen
     '*******************************************

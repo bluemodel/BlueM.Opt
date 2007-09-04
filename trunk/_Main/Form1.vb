@@ -730,7 +730,7 @@ Partial Class Form1
                     Call Sim1.PREPARE_Evaluation_PES(myPara)
                 End If
 
-                Call Sim1.SIM_Evaluierung_CES(CES1.List_Childs(i).Penalty)
+                Call Sim1.SIM_Evaluierung(CES1.List_Childs(i).Penalty, CES1.List_Childs(i).Constrain)
                 '*********************************************************
 
                 'HYBRID: Speichert die PES Erfahrung diesen Childs im PES Memory
@@ -750,8 +750,8 @@ Partial Class Form1
                 System.Windows.Forms.Application.DoEvents()
             Next
 
-            'MO oder SO Selectionsprozess oder NDSorting
-            '-------------------------------------------
+            'MO oder SO SELEKTIONSPROZESS oder NDSorting SELEKTION
+            '-----------------------------------------------------
             If CES1.n_Penalty = 1 Then
                 'Sortieren der Kinden anhand der Qualität
                 Call CES1.Sort_Faksimile(CES1.List_Childs)
@@ -775,8 +775,8 @@ Partial Class Form1
                 Next
             End If
 
-            'Nicht wenn Testmodus
-            '********************
+            'REPRODUKTION und MUTATION Nicht wenn Testmodus
+            '***********************************************
             If CES1.TestModus = 0 Then
                 'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
                 Call CES1.Reset_Childs()
@@ -786,8 +786,8 @@ Partial Class Form1
                 Call CES1.Mutation_Control()
             End If
 
-            'HYBRID:
-            '*******
+            'HYBRID: REPRODUKTION und MUTATION
+            '*********************************
             If Method = METH_HYBRID Then
                 'Child Schleife hier da für jedes Child die PES Funktionen angesteuert werden
                 For i = 0 To CES1.List_Childs.GetUpperBound(0)
@@ -885,8 +885,8 @@ Partial Class Form1
         'Werte an Variablen übergeben auskommentiert Werte finden sich im PES werden hier aber nicht zugewiesen
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-        ReDim QN(globalAnzZiel)
-        ReDim RN(globalAnzRand)
+        ReDim QN(globalAnzZiel - 1)
+        ReDim RN(globalAnzRand - 1)
 
         'Diagramm vorbereiten und initialisieren
         If (Not Me.Method = METH_CES_PES) Then
@@ -982,10 +982,14 @@ GenerierenAusgangswerte:
                             Throw New Exception("Es konnte kein gültiger Datensatz erzeugt werden!")
                         End If
 
+                        'REPRODUKTIONSPROZESS
                         'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
+                        '***************************************************************
                         Call PES1.EsVaria()
 
+                        'MUTATIONSPROZESS
                         'Mutieren der Ausgangswerte
+                        '**************************
                         Call PES1.EsMutation()
 
                         'Auslesen der Variierten Parameter
@@ -1009,7 +1013,7 @@ GenerierenAusgangswerte:
                                 Call Sim1.PREPARE_Evaluation_PES(myPara)
 
                                 'Simulation und Evaluierung
-                                If Not Sim1.SIM_Evaluierung_PES(QN, RN) Then
+                                If Not Sim1.SIM_Evaluierung(QN, RN) Then
                                     GoTo GenerierenAusgangswerte
                                 End If
 
