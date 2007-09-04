@@ -711,6 +711,7 @@ Public MustInherit Class Sim
 
         Else
             'CON-Datei existiert nicht
+            Redim List_Constraints(-1)
         End If
 
     End Sub
