@@ -265,25 +265,6 @@ Public Class PES
 
     End Function
 
-    '*******************************************************************************
-    'ES_GET_SCHRITTWEITE
-    'Function ES_GET_SCHRITTWEITE gibt die aktuellen Schrittweiten aus
-    'TODO: Diese Funktion wird nicht benutzt!
-    '*******************************************************************************
-    Public Function EsGetSchrittweite() As Double()
-
-        Dim i As Short
-        Dim mystep() As Double
-
-        ReDim mystep(PES_Initial.varanz)
-
-        For i = 1 To PES_Initial.varanz
-            mystep(i) = PES_Initial.Dn(i)
-        Next i
-
-        Return mystep
-
-    End Function
 
     '*******************************************************************************
     'ES_GET_BESTWERT
