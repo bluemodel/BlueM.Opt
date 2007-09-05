@@ -801,7 +801,7 @@ Partial Class Form1
                     'Die öffentlichen dynamischen Arrays werden initialisiert (Dn, An, Xn, Xmin, Xmax)
                     'und die Anzahl der Zielfunktionen wird festgelegt
                     '******************************************************************************************
-                    Call PES1.EsIni(globalAnzPar, globalAnzZiel, globalAnzRand)
+                    Call PES1.EsIni(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
 
                     '3. Schritt: PES - ES_OPTIONS
                     'Optionen der Evolutionsstrategie werden übergeben
@@ -905,14 +905,10 @@ Partial Class Form1
 
         '3. Schritt: PES - ES_INI
         'Die öffentlichen dynamischen Arrays werden initialisiert (Dn, An, Xn, Xmin, Xmax)
-        'und die Anzahl der Zielfunktionen wird festgelegt
+        'die Anzahl der Zielfunktionen wird festgelegt
+        '4. Ausgangsparameter werden übergeben
         '******************************************************************************************
-        Call PES1.EsIni(globalAnzPar, globalAnzZiel, globalAnzRand)
-
-        '4. Schritt: PES - ES_LET_PARAMETER
-        'Ausgangsparameter werden übergeben
-        '******************************************************************************************
-        Call PES1.EsLetParameter(myPara)
+        Call PES1.EsIni(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
 
         '5. Schritt: PES - ES_PREPARE
         'Interne Variablen werden initialisiert, Zufallsgenerator wird initialisiert

@@ -97,6 +97,7 @@ Public Class PES
     Private Rb(,,) As Double                'Restriktionen auf Generationsebene
     '---------------------
     Private SekundärQb() As Struct_NDSorting = {}   'Sekundäre Population
+    '---------------------
     Private expo As Short                   'Exponent für Schrittweite (+/-1)
     Private DnTemp As Double                'Temporäre Schrittweite für Nachkomme
     Private XnTemp As Double                'Temporärer Parameterwert für Nachkomme
@@ -214,7 +215,8 @@ Public Class PES
     'ES_INI
     'Function ES_INI Initialisiert benötigte dynamische Arrays und legt Anzahl der Zielfunktionen fest
     '*************************************************************************************************
-    Public Sub EsIni(ByVal AnzahlParameter As Short, ByVal AnzahlPenaltyfunktionen As Short, ByVal AnzahlRandbedingungen As Short)
+    Public Sub EsIni(ByVal AnzahlParameter As Short, ByVal AnzahlPenaltyfunktionen As Short, ByVal AnzahlRandbedingungen As Short, ByVal mypara() As Double)
+        Dim i As Integer
 
         'Überprüfung der Eingabeparameter (es muss mindestens ein Parameter variiert und eine
         'Penaltyfunktion ausgewertet werden)
@@ -232,15 +234,6 @@ Public Class PES
         ReDim PES_Initial.Xmax(PES_Initial.varanz)              'ObereSchrankenvektor wird initialisiert
         ReDim PES_Initial.Dn(PES_Initial.varanz)                'Schrittweitenvektor wird initialisiert
 
-    End Sub
-
-    'ES_LET_PARAMETER
-    'Function ES_LET_PARAMETER dient zur Übergabe der Ausgangsparameter an die Evolutionsstrategie
-    '*******************************************************************************
-    Public Sub EsLetParameter(ByVal mypara() As Double)
-
-        Dim i As Short
-
         For i = 1 To PES_Initial.varanz
             PES_Initial.Xn(i) = mypara(i)
             PES_Initial.Xmin(i) = 0
@@ -251,6 +244,7 @@ Public Class PES
         Next
 
     End Sub
+
 
     '*******************************************************************************
     'ES_GET_PARAMETER
