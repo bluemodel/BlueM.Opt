@@ -55,6 +55,8 @@ Public Class PES
         Dim NMemberSecondPop As Short       'Maximale Anzahl Mitglieder der Sekundärpopulation
     End Structure
 
+    Public PES_Settings As Struct_Settings
+
     'Structure zum Speichern der Werte die aus den OptDateien generiert werden
     Private Structure Struct_Initial
         Dim varanz As Short                 'Anzahl Parameter
@@ -76,8 +78,6 @@ Public Class PES
         Dim iAktGen As Short                'Zähler für aktuelle Generation
         Dim iAktNachf As Short              'Zähler für aktuellen Nachfahre
     End Structure
-
-    Private PES_Settings As Struct_Settings
 
     'Muss Public sein, da das Form hiermit die Schleifen kontrolliert
     Public PES_iAkt As Struct_iAkt
@@ -509,89 +509,6 @@ Public Class PES
 
     End Function
 
-
-    '*******************************************************************************
-    'ES_isNEXTPOP
-    'Funktion zählt die Popultationenschleifen hoch und ermittelt, 
-    'ob die maximale Anzahl an Populationen erreicht ist
-    '*******************************************************************************
-    Public Function EsIsNextPop() As Boolean
-
-        EsIsNextPop = False
-
-        'Anzahl der Populationenschleifen wird hochgezählt
-        PES_iAkt.iAktPop += 1
-
-        'Abfrage ob die maximale Anzahl an Populationenschleifen erreicht ist
-        If PES_iAkt.iAktPop <= PES_Settings.NPopul Then
-            EsIsNextPop = True
-        Else
-            PES_iAkt.iAktPop = 0
-        End If
-
-    End Function
-
-    '*******************************************************************************
-    'ES_isNEXTRUNDE
-    'Funktion zählt die Runden hoch und ermittelt, 
-    'ob die maximale Anzahl an Runden erreicht ist
-    '*******************************************************************************
-    Public Function EsIsNextRunde(ByVal Method As String) As Boolean
-
-        EsIsNextRunde = False
-
-        'Anzahl der Runden wird hochgezählt
-        PES_iAkt.iAktRunde += 1
-
-        'Abfrage ob die maximale Anzahl an Runden erreicht ist
-        If PES_iAkt.iAktRunde <= PES_Settings.NRunden Then
-            EsIsNextRunde = True
-        ElseIf Not Method = "CES + PES" Then
-            MsgBox("Optimierung beendet", MsgBoxStyle.Information, "Info")
-        End If
-
-    End Function
-
-    '*******************************************************************************
-    'ES_isNEXTGEN
-    'Funktion zählt die Generationen hoch und ermittelt, 
-    'ob die maximale Anzahl an Generationen erreicht ist
-    '*******************************************************************************
-    Public Function EsIsNextGen() As Boolean
-
-        EsIsNextGen = False
-
-        'Anzahl der Generation wird hochgezählt
-        PES_iAkt.iAktGen += 1
-
-        'Abfrage ob die aktuelle Generation abgeschlossen ist
-        If PES_iAkt.iAktGen <= PES_Settings.NGen Then
-            EsIsNextGen = True
-        Else
-            PES_iAkt.iAktGen = 0
-        End If
-
-    End Function
-
-    '*******************************************************************************
-    'ES_isNEXTNACHF
-    'Funktion zählt die Nachfahren hoch und ermittelt, 
-    'ob die maximale Anzahl an Nachfahren erreicht ist
-    '*******************************************************************************
-    Public Function EsIsNextNachf() As Boolean
-
-        EsIsNextNachf = False
-
-        'Anzahl der Nachfahren wird hochgezählt
-        PES_iAkt.iAktNachf += 1
-
-        If PES_iAkt.iAktNachf <= PES_Settings.NNachf Then
-            EsIsNextNachf = True
-        Else
-            PES_iAkt.iAktNachf = 0
-        End If
-
-    End Function
 
     '*******************************************************************************
     'ES_POP_VARIA
