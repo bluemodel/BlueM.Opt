@@ -899,8 +899,8 @@ Public Class CES
     'NonDominated Sorting
     'XXXXXXXXXXXXXXXXXXXX
 
-    'Steuerung des NDSorting
-    '**************************************************
+    'Steuerung des NDSorting (Ursprünglich aus ES Eltern)
+    '****************************************************
     Public Sub NDSorting_Control()
         Dim i As Short
         Dim NFrontMember_aktuell, NFrontMember_gesamt As Short
