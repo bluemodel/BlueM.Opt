@@ -151,10 +151,39 @@ Public Class PES
     'Methoden
     '*******************************************************************************
 
+    'Schritt 2 -5 zum Initialisieren der PES
+    '***************************************
+
+    Public Sub PesInitialise(ByRef PES_Settings As Struct_Settings, ByVal AnzPara As Short, ByVal AnzPenalty As Short, ByVal AnzConstr As Short, ByVal mypara() As Double)
+
+        '2. Schritt: PES - ES_OPTIONS
+        'Optionen der Evolutionsstrategie werden übergeben
+        '******************************************************************************************
+        Call EsSettings(PES_Settings)
+
+        '3. Schritt: PES - ES_INI
+        'Die öffentlichen dynamischen Arrays werden initialisiert (Dn, An, Xn, Xmin, Xmax),
+        'die Anzahl der Zielfunktionen wird festgelegt
+        'und Ausgangsparameter werden übergeben (War früher ES_Let Parameter)
+        '******************************************************************************************
+        Call EsDim(AnzPara, AnzPenalty, AnzConstr, mypara)
+
+        '4. Schritt: PES - ES_PREPARE
+        'Interne Variablen werden initialisiert, Zufallsgenerator wird initialisiert
+        '******************************************************************************************
+        Call EsPrepare()
+
+        '5. Schritt: PES - ES_STARTVALUES
+        'Startwerte werden zugewiesen
+        '******************************************************************************************
+        Call EsStartvalues()
+
+    End Sub
+
     'Schritt 2: ES_SETTINGS
     'Function ES_SETTINGS übergibt Optionen für Evolutionsstrategie und Prüft die eingestellten Optionen
     '**************************************************************************************************
-    Public Sub EsSettings(ByRef Settings As Struct_Settings)
+    Private Sub EsSettings(ByRef Settings As Struct_Settings)
 
         'Überprüfung der Übergebenen Werte
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -212,22 +241,22 @@ Public Class PES
     End Sub
 
 
-    'ES_INI
+    'Schritt 3: ES_INI
     'Function ES_INI Initialisiert benötigte dynamische Arrays und legt Anzahl der Zielfunktionen fest
     '*************************************************************************************************
-    Public Sub EsIni(ByVal AnzahlParameter As Short, ByVal AnzahlPenaltyfunktionen As Short, ByVal AnzahlRandbedingungen As Short, ByVal mypara() As Double)
+    Private Sub EsDim(ByVal AnzPara As Short, ByVal AnzPenalty As Short, ByVal AnzConstr As Short, ByVal mypara() As Double)
         Dim i As Integer
 
         'Überprüfung der Eingabeparameter (es muss mindestens ein Parameter variiert und eine
         'Penaltyfunktion ausgewertet werden)
 
-        If (AnzahlParameter <= 0 Or AnzahlPenaltyfunktionen <= 0) Then
+        If (AnzPara <= 0 Or AnzPenalty <= 0) Then
             Throw New Exception("Es muss mindestens ein Parameter variiert und eine Penaltyfunktion ausgewertet werden")
         End If
 
-        PES_Initial.varanz = AnzahlParameter                    'Anzahl der Parameter wird übergeben
-        PES_Initial.NPenalty = AnzahlPenaltyfunktionen          'Anzahl der Zielfunktionen wird übergeben
-        PES_Initial.NConstrains = AnzahlRandbedingungen         'Anzahl der Randbedingungen wird übergeben
+        PES_Initial.varanz = AnzPara                    'Anzahl der Parameter wird übergeben
+        PES_Initial.NPenalty = AnzPenalty          'Anzahl der Zielfunktionen wird übergeben
+        PES_Initial.NConstrains = AnzConstr         'Anzahl der Randbedingungen wird übergeben
 
         ReDim PES_Initial.Xn(PES_Initial.varanz)                'Variablenvektor wird initialisiert
         ReDim PES_Initial.Xmin(PES_Initial.varanz)              'UntereSchrankenvektor wird initialisiert
@@ -242,6 +271,144 @@ Public Class PES
             PES_Initial.Xn(i) = Math.Min(PES_Initial.Xn(i), PES_Initial.Xmax(i))
             PES_Initial.Xn(i) = Math.Max(PES_Initial.Xn(i), PES_Initial.Xmin(i))
         Next
+
+    End Sub
+
+
+    '*******************************************************************************
+    'Schritt 4: ES_PREPARE
+    'Function ES_PREPARE initialisiert alle internen Arrays und setzt den
+    'Bestwertspeicher auf sehr großen Wert (Strategie minimiert in dieser
+    'Umsetzung)
+    'TODO: ESPrepare Für Paretooptimierung noch nicht fertig!!!!
+    '*******************************************************************************
+    Private Sub EsPrepare()
+
+        Dim m, n, l, i As Short
+
+        For i = 1 To PES_Initial.varanz
+            PES_Initial.Dn(i) = PES_Settings.rDeltaStart
+        Next i
+
+        'Parametervektoren initialisieren
+        ReDim Dp(PES_Initial.varanz, PES_Settings.NEltern, PES_Settings.NPopEltern)
+        ReDim Xp(PES_Initial.varanz, PES_Settings.NEltern, PES_Settings.NPopEltern)
+        ReDim Qbpop(PES_Settings.NPopul, PES_Initial.NPenalty)
+        ReDim QbpopD(PES_Settings.NPopul)
+        ReDim Dbpop(PES_Initial.varanz, PES_Settings.NEltern, PES_Settings.NPopul)
+        ReDim Xbpop(PES_Initial.varanz, PES_Settings.NEltern, PES_Settings.NPopul)
+        '---------------------
+        ReDim De(PES_Initial.varanz, PES_Settings.NEltern, PES_Settings.NPopul)
+        ReDim Xe(PES_Initial.varanz, PES_Settings.NEltern, PES_Settings.NPopul)
+        ReDim Db(PES_Initial.varanz, PES_Settings.NEltern, PES_Settings.NPopul)
+        ReDim Xb(PES_Initial.varanz, PES_Settings.NEltern, PES_Settings.NPopul)
+        ReDim Qb(PES_Settings.NEltern, PES_Settings.NPopul, PES_Initial.NPenalty)
+        ReDim Rb(PES_Settings.NEltern, PES_Settings.NPopul, PES_Initial.NConstrains)
+        '---------------------
+        'NDSorting wird nur benötigt, falls eine Paretofront approximiert wird
+        If PES_Settings.is_MO_Pareto Then
+            ReDim List_NDSorting(PES_Settings.NEltern + PES_Settings.NNachf)
+            For i = 1 To PES_Settings.NEltern + PES_Settings.NNachf
+                ReDim List_NDSorting(i).penalty(PES_Initial.NPenalty)
+                If PES_Initial.NConstrains > 0 Then
+                    ReDim List_NDSorting(i).constrain(PES_Initial.NConstrains)
+                End If
+                ReDim List_NDSorting(i).d(PES_Initial.varanz)
+                ReDim List_NDSorting(i).X(PES_Initial.varanz)
+            Next i
+            If PES_Settings.iOptEltern = EVO_ELTERN_Neighbourhood Then
+                ReDim PenaltyDistance(PES_Settings.NEltern, PES_Settings.NEltern)
+                ReDim IndexEltern(PES_Settings.NEltern - 1)
+                ReDim Distanceb(PES_Settings.NEltern)
+            End If
+        End If
+
+        For n = 1 To PES_Settings.NEltern
+            For m = 1 To PES_Settings.NPopul
+                For l = 1 To PES_Initial.NPenalty
+                    'Qualität der Eltern (Anzahl = parents) wird auf sehr großen Wert gesetzt
+                    Qb(n, m, l) = 1.0E+300
+                Next l
+                If PES_Initial.NConstrains > 0 Then
+                    For l = 1 To PES_Initial.NConstrains
+                        'Restriktion der Eltern (Anzahl = parents) wird auf sehr kleinen Wert gesetzt
+                        Rb(n, m, l) = -1.0E+300
+                    Next l
+                End If
+            Next m
+        Next
+
+        If PES_Settings.is_MO_Pareto Then
+            For n = 1 To PES_Settings.NPopul
+                For m = 1 To PES_Initial.NPenalty
+                    Select Case PES_Settings.iPopPenalty
+                        Case 1 'Crowding
+                            'Qualität der Populationseltern wird auf sehr großen Wert gesetzt
+                            Qbpop(n, m) = 1.0E+300
+                        Case 2 'Spannweite
+                            'Qualität der Populationseltern wird auf 0 gesetzt
+                            Qbpop(n, m) = 0
+                    End Select
+                Next m
+            Next n
+        Else
+            For n = 1 To PES_Settings.NPopul
+                For m = 1 To PES_Initial.NPenalty
+                    'Qualität der Populationseltern wird auf sehr großen Wert gesetzt
+                    Qbpop(n, m) = 1.0E+300
+                Next m
+            Next n
+        End If
+
+        'Zufallsgenerator initialisieren
+        Randomize()
+
+        'Informationen über aktuelle Runden übergeben
+        PES_iAkt.iAktRunde = 0
+        PES_iAkt.iAktPop = 0
+        PES_iAkt.iAktGen = 0
+        PES_iAkt.iAktNachf = 0
+
+    End Sub
+
+    '*******************************************************************************
+    'Schritt 5: ES_STARTVALUES
+    'Function ES_STARTVALUES setzt die Startwerte
+    'PES_Settings.iStartPar 1: Zufällige Startwert  -> Schrittweite = Startschrittweite
+    '                                               -> Parameterwert = zufällig [0,1]
+    'PES_Settings.iStartPar 2: Originalparameter    -> Schrittweite = Startschrittweite
+    '                                               -> Parameterwert = Originalparameter
+    '*******************************************************************************
+    Private Sub EsStartvalues()
+
+        Dim n, v, m As Short
+
+        Select Case PES_Settings.iStartPar
+            Case 1 'Zufällige Startwerte
+                For v = 1 To PES_Initial.varanz
+                    For n = 1 To PES_Settings.NEltern
+                        For m = 1 To PES_Settings.NPopEltern
+                            'Startwert für die Elternschrittweite wird zugewiesen
+                            Dp(v, n, m) = PES_Initial.Dn(1)
+                            'Startwert für die Eltern werden zugewiesen
+                            '(Zufallszahl zwischen 0 und 1)
+                            Xp(v, n, m) = Rnd()
+                        Next m
+                    Next n
+                Next v
+            Case 2 'Originalparameter
+                For v = 1 To PES_Initial.varanz
+                    For n = 1 To PES_Settings.NEltern
+                        For m = 1 To PES_Settings.NPopEltern
+                            'Startwert für die Elternschrittweite wird zugewiesen
+                            Dp(v, n, m) = PES_Initial.Dn(1)
+                            'Startwert für die Eltern werden zugewiesen
+                            '(alle gleich Anfangswerte)
+                            Xp(v, n, m) = PES_Initial.Xn(v)
+                        Next m
+                    Next n
+                Next v
+        End Select
 
     End Sub
 
@@ -349,143 +516,6 @@ Public Class PES
 
     End Function
 
-
-    '*******************************************************************************
-    'ES_PREPARE
-    'Function ES_PREPARE initialisiert alle internen Arrays und setzt den
-    'Bestwertspeicher auf sehr großen Wert (Strategie minimiert in dieser
-    'Umsetzung)
-    'TODO: ESPrepare Für Paretooptimierung noch nicht fertig!!!!
-    '*******************************************************************************
-    Public Sub EsPrepare()
-
-        Dim m, n, l, i As Short
-
-        For i = 1 To PES_Initial.varanz
-            PES_Initial.Dn(i) = PES_Settings.rDeltaStart
-        Next i
-
-        'Parametervektoren initialisieren
-        ReDim Dp(PES_Initial.varanz, PES_Settings.NEltern, PES_Settings.NPopEltern)
-        ReDim Xp(PES_Initial.varanz, PES_Settings.NEltern, PES_Settings.NPopEltern)
-        ReDim Qbpop(PES_Settings.NPopul, PES_Initial.NPenalty)
-        ReDim QbpopD(PES_Settings.NPopul)
-        ReDim Dbpop(PES_Initial.varanz, PES_Settings.NEltern, PES_Settings.NPopul)
-        ReDim Xbpop(PES_Initial.varanz, PES_Settings.NEltern, PES_Settings.NPopul)
-        '---------------------
-        ReDim De(PES_Initial.varanz, PES_Settings.NEltern, PES_Settings.NPopul)
-        ReDim Xe(PES_Initial.varanz, PES_Settings.NEltern, PES_Settings.NPopul)
-        ReDim Db(PES_Initial.varanz, PES_Settings.NEltern, PES_Settings.NPopul)
-        ReDim Xb(PES_Initial.varanz, PES_Settings.NEltern, PES_Settings.NPopul)
-        ReDim Qb(PES_Settings.NEltern, PES_Settings.NPopul, PES_Initial.NPenalty)
-        ReDim Rb(PES_Settings.NEltern, PES_Settings.NPopul, PES_Initial.NConstrains)
-        '---------------------
-        'NDSorting wird nur benötigt, falls eine Paretofront approximiert wird
-        If PES_Settings.is_MO_Pareto Then
-            ReDim List_NDSorting(PES_Settings.NEltern + PES_Settings.NNachf)
-            For i = 1 To PES_Settings.NEltern + PES_Settings.NNachf
-                ReDim List_NDSorting(i).penalty(PES_Initial.NPenalty)
-                If PES_Initial.NConstrains > 0 Then
-                    ReDim List_NDSorting(i).constrain(PES_Initial.NConstrains)
-                End If
-                ReDim List_NDSorting(i).d(PES_Initial.varanz)
-                ReDim List_NDSorting(i).X(PES_Initial.varanz)
-            Next i
-            If PES_Settings.iOptEltern = EVO_ELTERN_Neighbourhood Then
-                ReDim PenaltyDistance(PES_Settings.NEltern, PES_Settings.NEltern)
-                ReDim IndexEltern(PES_Settings.NEltern - 1)
-                ReDim Distanceb(PES_Settings.NEltern)
-            End If
-        End If
-
-        For n = 1 To PES_Settings.NEltern
-            For m = 1 To PES_Settings.NPopul
-                For l = 1 To PES_Initial.NPenalty
-                    'Qualität der Eltern (Anzahl = parents) wird auf sehr großen Wert gesetzt
-                    Qb(n, m, l) = 1.0E+300
-                Next l
-                If PES_Initial.NConstrains > 0 Then
-                    For l = 1 To PES_Initial.NConstrains
-                        'Restriktion der Eltern (Anzahl = parents) wird auf sehr kleinen Wert gesetzt
-                        Rb(n, m, l) = -1.0E+300
-                    Next l
-                End If
-            Next m
-        Next
-
-        If PES_Settings.is_MO_Pareto Then
-            For n = 1 To PES_Settings.NPopul
-                For m = 1 To PES_Initial.NPenalty
-                    Select Case PES_Settings.iPopPenalty
-                        Case 1 'Crowding
-                            'Qualität der Populationseltern wird auf sehr großen Wert gesetzt
-                            Qbpop(n, m) = 1.0E+300
-                        Case 2 'Spannweite
-                            'Qualität der Populationseltern wird auf 0 gesetzt
-                            Qbpop(n, m) = 0
-                    End Select
-                Next m
-            Next n
-        Else
-            For n = 1 To PES_Settings.NPopul
-                For m = 1 To PES_Initial.NPenalty
-                    'Qualität der Populationseltern wird auf sehr großen Wert gesetzt
-                    Qbpop(n, m) = 1.0E+300
-                Next m
-            Next n
-        End If
-
-        'Zufallsgenerator initialisieren
-        Randomize()
-
-        'Informationen über aktuelle Runden übergeben
-        PES_iAkt.iAktRunde = 0
-        PES_iAkt.iAktPop = 0
-        PES_iAkt.iAktGen = 0
-        PES_iAkt.iAktNachf = 0
-
-    End Sub
-
-    '*******************************************************************************
-    'ES_STARTVALUES
-    'Function ES_STARTVALUES setzt die Startwerte
-    'PES_Settings.iStartPar 1: Zufällige Startwert  -> Schrittweite = Startschrittweite
-    '                                               -> Parameterwert = zufällig [0,1]
-    'PES_Settings.iStartPar 2: Originalparameter    -> Schrittweite = Startschrittweite
-    '                                               -> Parameterwert = Originalparameter
-    '*******************************************************************************
-    Public Sub EsStartvalues()
-
-        Dim n, v, m As Short
-
-        Select Case PES_Settings.iStartPar
-            Case 1 'Zufällige Startwerte
-                For v = 1 To PES_Initial.varanz
-                    For n = 1 To PES_Settings.NEltern
-                        For m = 1 To PES_Settings.NPopEltern
-                            'Startwert für die Elternschrittweite wird zugewiesen
-                            Dp(v, n, m) = PES_Initial.Dn(1)
-                            'Startwert für die Eltern werden zugewiesen
-                            '(Zufallszahl zwischen 0 und 1)
-                            Xp(v, n, m) = Rnd()
-                        Next m
-                    Next n
-                Next v
-            Case 2 'Originalparameter
-                For v = 1 To PES_Initial.varanz
-                    For n = 1 To PES_Settings.NEltern
-                        For m = 1 To PES_Settings.NPopEltern
-                            'Startwert für die Elternschrittweite wird zugewiesen
-                            Dp(v, n, m) = PES_Initial.Dn(1)
-                            'Startwert für die Eltern werden zugewiesen
-                            '(alle gleich Anfangswerte)
-                            Xp(v, n, m) = PES_Initial.Xn(v)
-                        Next m
-                    Next n
-                Next v
-        End Select
-
-    End Sub
 
     '*******************************************************************************
     'ES_isNEXTPOP
@@ -1581,7 +1611,7 @@ Public Class PES
         Dim i As Short
         Dim Temp() As Struct_NDSorting
         Dim counter As Short
-        Dim NFrontMember as Short
+        Dim NFrontMember As Short
 
         ReDim Temp(UBound(NDSorting))
 

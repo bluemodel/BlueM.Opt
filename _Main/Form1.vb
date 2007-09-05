@@ -796,35 +796,19 @@ Partial Class Form1
 
                     'PES Geschichten
                     '###############
+
+                    '+++++++ZUSAMMENFASSEN+++++++++
+
                     '1. Schritt: PES
                     'Objekt der Klasse PES wird erzeugt PES wird erzeugt
-                    ****************************************************
+                    '****************************************************
                     Dim PES1 As EvoKern.PES
                     PES1 = New EvoKern.PES
-                    '2. Schritt: PES - ES_OPTIONS
-                    'Optionen der Evolutionsstrategie werden übergeben
-                    '******************************************************************************************
-                    Call PES1.EsSettings(EVO_Settings1.PES_Settings)
-                    '3. Schritt: PES - ES_INI von SRTARTEN_PES
-                    'Die öffentlichen dynamischen Arrays werden initialisiert (Dn, An, Xn, Xmin, Xmax)
-                    'die Anzahl der Zielfunktionen wird festgelegt
-                    '4. Ausgangsparameter werden übergeben (War früher ES_Let Parameter)
-                    '******************************************************************************************
-                    Call PES1.EsIni(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
 
-                    '5. Schritt: PES - ES_PREPARE
-                    'Interne Variablen werden initialisiert, Zufallsgenerator wird initialisiert
-                    '******************************************************************************************
-                    Call PES1.EsPrepare()
-
-                    '6. Schritt: PES - ES_STARTVALUES
-                    'Startwerte werden zugewiesen
-                    '******************************************************************************************
-                    Call PES1.EsStartvalues()
-
-
-
-
+                    'Schritte 2 - 5 PES wird initialisiert
+                    'Weiteres siehe dort ;-)
+                    '*************************************
+                    Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
 
                 Next
             End If
@@ -914,27 +898,11 @@ Partial Class Form1
         Dim PES1 As EvoKern.PES
         PES1 = New EvoKern.PES
 
-        '2. Schritt: PES - ES_OPTIONS
-        'Optionen der Evolutionsstrategie werden übergeben
-        '******************************************************************************************
-        Call PES1.EsSettings(EVO_Settings1.PES_Settings)
+        'Schritte 2 - 5 PES wird initialisiert
+        'Weiteres siehe dort ;-)
+        '*************************************
+        Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
 
-        '3. Schritt: PES - ES_INI
-        'Die öffentlichen dynamischen Arrays werden initialisiert (Dn, An, Xn, Xmin, Xmax)
-        'die Anzahl der Zielfunktionen wird festgelegt
-        '4. Ausgangsparameter werden übergeben (War früher ES_Let Parameter)
-        '******************************************************************************************
-        Call PES1.EsIni(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
-
-        '5. Schritt: PES - ES_PREPARE
-        'Interne Variablen werden initialisiert, Zufallsgenerator wird initialisiert
-        '******************************************************************************************
-        Call PES1.EsPrepare()
-
-        '6. Schritt: PES - ES_STARTVALUES
-        'Startwerte werden zugewiesen
-        '******************************************************************************************
-        Call PES1.EsStartvalues()
 
         'Startwerte werden der Verlaufsanzeige werden zugewiesen
         Call Me.INI_Verlaufsanzeige(EVO_Settings1.PES_Settings.NRunden, EVO_Settings1.PES_Settings.NPopul, EVO_Settings1.PES_Settings.NGen, EVO_Settings1.PES_Settings.NNachf)
