@@ -810,6 +810,10 @@ Partial Class Form1
                     '*************************************
                     Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
 
+
+
+
+
                 Next
             End If
 
@@ -873,10 +877,6 @@ Partial Class Form1
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
         'Check!
-        Dim ipop As Short = 0
-        Dim igen As Short
-        Dim inachf As Short
-        Dim irunde As Short
         Dim QN() As Double = {}
         Dim RN() As Double = {}
         '--------------------------
@@ -903,51 +903,44 @@ Partial Class Form1
         '*************************************
         Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
 
-
         'Startwerte werden der Verlaufsanzeige werden zugewiesen
         Call Me.INI_Verlaufsanzeige(EVO_Settings1.PES_Settings.NRunden, EVO_Settings1.PES_Settings.NPopul, EVO_Settings1.PES_Settings.NGen, EVO_Settings1.PES_Settings.NNachf)
 
         durchlauf = 0
 
 Start_Evolutionsrunden:
-        'Cursor setzen
-        'System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
 
         'Loop über alle Runden
-        '*******************************************************************************************
+        'xxxxxxxxxxxxxxxxxxxxx
         Do While (PES1.EsIsNextRunde(Me.Method))
 
-            irunde = PES1.PES_iAkt.iAktRunde
-            Call EVO_Opt_Verlauf1.Runden(irunde)
+            Call EVO_Opt_Verlauf1.Runden(PES1.PES_iAkt.iAktRunde)
 
             Call PES1.EsPopBestwertspeicher()
 
             'Loop über alle Populationen
-            '***************************************************************************************
+            'xxxxxxxxxxxxxxxxxxxxxxxxxxx
             Do While (PES1.EsIsNextPop)
 
-                ipop = PES1.PES_iAkt.iAktPop
-                Call EVO_Opt_Verlauf1.Populationen(ipop)
+                Call EVO_Opt_Verlauf1.Populationen(PES1.PES_iAkt.iAktPop)
 
                 Call PES1.EsPopVaria()
 
                 Call PES1.EsPopMutation()
 
                 'Loop über alle Generationen
-                '***********************************************************************************
+                'xxxxxxxxxxxxxxxxxxxxxxxxxxx
                 Do While (PES1.EsIsNextGen)
 
-                    igen = PES1.PES_iAkt.iAktGen
-                    Call EVO_Opt_Verlauf1.Generation(igen)
+                    Call EVO_Opt_Verlauf1.Generation(PES1.PES_iAkt.iAktGen)
 
                     Call PES1.EsBestwertspeicher()
 
                     'Loop über alle Nachkommen
-                    '*******************************************************************************
+                    'xxxxxxxxxxxxxxxxxxxxxxxxx
                     Do While (PES1.EsIsNextNachf)
 
-                        inachf = PES1.PES_iAkt.iAktNachf
-                        Call EVO_Opt_Verlauf1.Nachfolger(inachf)
+                        Call EVO_Opt_Verlauf1.Nachfolger(PES1.PES_iAkt.iAktNachf)
 
                         durchlauf += 1
 
@@ -964,12 +957,12 @@ GenerierenAusgangswerte:
 
                         'REPRODUKTIONSPROZESS
                         'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
-                        '***************************************************************
+                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
                         Call PES1.EsVaria()
 
                         'MUTATIONSPROZESS
                         'Mutieren der Ausgangswerte
-                        '**************************
+                        'xxxxxxxxxxxxxxxxxxxxxxxxxx
                         Call PES1.EsMutation()
 
                         'Auslesen der Variierten Parameter
@@ -985,7 +978,7 @@ GenerierenAusgangswerte:
                         Select Case Anwendung
 
                             Case ANW_TESTPROBLEME
-                                Call Testprobleme1.Evaluierung_TestProbleme(Testprobleme1.Combo_Testproblem.Text, myPara, durchlauf, ipop, QN, RN, DForm.Diag)
+                                Call Testprobleme1.Evaluierung_TestProbleme(Testprobleme1.Combo_Testproblem.Text, myPara, durchlauf, PES1.PES_iAkt.iAktPop, QN, RN, DForm.Diag)
 
                             Case ANW_BLUEM, ANW_SMUSI
 
@@ -1014,9 +1007,9 @@ GenerierenAusgangswerte:
                                     'SingleObjective
                                     '---------------
                                     If (isInvalid) Then
-                                        SeriesNo = DForm.Diag.prepareSeries("Population " & ipop & " (ungültig)", "Gray")
+                                        SeriesNo = DForm.Diag.prepareSeries("Population " & PES1.PES_iAkt.iAktPop & " (ungültig)", "Gray")
                                     Else
-                                        SeriesNo = DForm.Diag.prepareSeries("Population " & ipop, "Orange")
+                                        SeriesNo = DForm.Diag.prepareSeries("Population " & PES1.PES_iAkt.iAktPop, "Orange")
                                     End If
                                     DForm.Diag.Series(SeriesNo).Cursor = Cursors.Hand
                                     Call DForm.Diag.Series(SeriesNo).Add(durchlauf, Sim1.List_OptZiele(0).QWertTmp)
@@ -1042,7 +1035,7 @@ GenerierenAusgangswerte:
                         System.Windows.Forms.Application.DoEvents()
 
                     Loop 'Ende Schleife über alle Nachkommen
-                    '**********************************************************************
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Die neuen Eltern werden generiert
                     Call PES1.EsEltern()
@@ -1055,7 +1048,7 @@ GenerierenAusgangswerte:
                         'SekPop in DB speichern
                         If (Not IsNothing(Sim1)) Then
                             If (Sim1.Ergebnisdb) Then
-                                Call Sim1.db_setSekPop(SekPopulation, igen)
+                                Call Sim1.db_setSekPop(SekPopulation, PES1.PES_iAkt.iAktGen)
                             End If
                         End If
                     End If
@@ -1063,7 +1056,7 @@ GenerierenAusgangswerte:
                     System.Windows.Forms.Application.DoEvents()
 
                 Loop 'Ende Schleife über alle Generationen
-                '**************************************************************************
+                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                 System.Windows.Forms.Application.DoEvents()
 
@@ -1071,7 +1064,7 @@ GenerierenAusgangswerte:
                 Call PES1.EsPopBest()
 
             Loop 'Ende Schleife über alle Populationen
-            '******************************************************************************
+            'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
             'Die neuen Populationseltern werden generiert
             Call PES1.EsPopEltern()
@@ -1079,7 +1072,7 @@ GenerierenAusgangswerte:
             System.Windows.Forms.Application.DoEvents()
 
         Loop 'Ende Schleife über alle Runden
-        '**********************************************************************************
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
         'PES, letzter. Schritt
         'Objekt der Klasse PES wird vernichtet

@@ -152,30 +152,23 @@ Public Class PES
     '*******************************************************************************
 
     'Schritt 2 -5 zum Initialisieren der PES
-    '***************************************
-
+    '#######################################
     Public Sub PesInitialise(ByRef PES_Settings As Struct_Settings, ByVal AnzPara As Short, ByVal AnzPenalty As Short, ByVal AnzConstr As Short, ByVal mypara() As Double)
 
         '2. Schritt: PES - ES_OPTIONS
         'Optionen der Evolutionsstrategie werden übergeben
-        '******************************************************************************************
         Call EsSettings(PES_Settings)
 
         '3. Schritt: PES - ES_INI
-        'Die öffentlichen dynamischen Arrays werden initialisiert (Dn, An, Xn, Xmin, Xmax),
-        'die Anzahl der Zielfunktionen wird festgelegt
-        'und Ausgangsparameter werden übergeben (War früher ES_Let Parameter)
-        '******************************************************************************************
+        'Die öffentlichen dynamischen Arrays werden initialisiert (Dn, An, Xn, Xmin, Xmax), die Anzahl der Zielfunktionen wird festgelegt und Ausgangsparameter werden übergeben (War früher ES_Let Parameter)
         Call EsDim(AnzPara, AnzPenalty, AnzConstr, mypara)
 
         '4. Schritt: PES - ES_PREPARE
         'Interne Variablen werden initialisiert, Zufallsgenerator wird initialisiert
-        '******************************************************************************************
         Call EsPrepare()
 
         '5. Schritt: PES - ES_STARTVALUES
         'Startwerte werden zugewiesen
-        '******************************************************************************************
         Call EsStartvalues()
 
     End Sub
@@ -371,14 +364,14 @@ Public Class PES
 
     End Sub
 
-    '*******************************************************************************
+    '***********************************************************************************
     'Schritt 5: ES_STARTVALUES
     'Function ES_STARTVALUES setzt die Startwerte
     'PES_Settings.iStartPar 1: Zufällige Startwert  -> Schrittweite = Startschrittweite
     '                                               -> Parameterwert = zufällig [0,1]
     'PES_Settings.iStartPar 2: Originalparameter    -> Schrittweite = Startschrittweite
     '                                               -> Parameterwert = Originalparameter
-    '*******************************************************************************
+    '***********************************************************************************
     Private Sub EsStartvalues()
 
         Dim n, v, m As Short
