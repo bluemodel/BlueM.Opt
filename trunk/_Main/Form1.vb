@@ -910,35 +910,34 @@ Partial Class Form1
 
 Start_Evolutionsrunden:
 
-        'Loop über alle Runden
+        'Über alle Runden
         'xxxxxxxxxxxxxxxxxxxxx
-        Do While (PES1.EsIsNextRunde(Me.Method))
+        For PES1.PES_iAkt.iAktRunde = 1 To PES1.PES_Settings.NRunden
 
             Call EVO_Opt_Verlauf1.Runden(PES1.PES_iAkt.iAktRunde)
 
             Call PES1.EsPopBestwertspeicher()
 
-            'Loop über alle Populationen
+            'Über alle Populationen
             'xxxxxxxxxxxxxxxxxxxxxxxxxxx
-            Do While (PES1.EsIsNextPop)
+            For PES1.PES_iAkt.iAktPop = 1 To PES1.PES_Settings.NPopul
+
+                'Do While (PES1.EsIsNextPop)
 
                 Call EVO_Opt_Verlauf1.Populationen(PES1.PES_iAkt.iAktPop)
-
                 Call PES1.EsPopVaria()
-
                 Call PES1.EsPopMutation()
 
-                'Loop über alle Generationen
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxx
-                Do While (PES1.EsIsNextGen)
+                'Über alle Generationen
+                'xxxxxxxxxxxxxxxxxxxxxx
+                For PES1.PES_iAkt.iAktGen = 1 To PES1.PES_Settings.NGen
 
                     Call EVO_Opt_Verlauf1.Generation(PES1.PES_iAkt.iAktGen)
-
                     Call PES1.EsBestwertspeicher()
 
                     'Loop über alle Nachkommen
                     'xxxxxxxxxxxxxxxxxxxxxxxxx
-                    Do While (PES1.EsIsNextNachf)
+                    For PES1.PES_iAkt.iAktNachf = 1 To PES1.PES_Settings.NNachf
 
                         Call EVO_Opt_Verlauf1.Nachfolger(PES1.PES_iAkt.iAktNachf)
 
@@ -1034,7 +1033,7 @@ GenerierenAusgangswerte:
 
                         System.Windows.Forms.Application.DoEvents()
 
-                    Loop 'Ende Schleife über alle Nachkommen
+                    Next 'Ende Schleife über alle Nachkommen
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Die neuen Eltern werden generiert
@@ -1055,7 +1054,7 @@ GenerierenAusgangswerte:
 
                     System.Windows.Forms.Application.DoEvents()
 
-                Loop 'Ende Schleife über alle Generationen
+                Next 'Ende Schleife über alle Generationen
                 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                 System.Windows.Forms.Application.DoEvents()
@@ -1063,7 +1062,7 @@ GenerierenAusgangswerte:
                 'Einordnen der Qualitätsfunktion im PopulationsBestwertspeicher
                 Call PES1.EsPopBest()
 
-            Loop 'Ende Schleife über alle Populationen
+            Next 'Ende Schleife über alle Populationen
             'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
             'Die neuen Populationseltern werden generiert
@@ -1071,7 +1070,8 @@ GenerierenAusgangswerte:
 
             System.Windows.Forms.Application.DoEvents()
 
-        Loop 'Ende Schleife über alle Runden
+
+        Next 'Ende Schleife über alle Runden
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
         'PES, letzter. Schritt
