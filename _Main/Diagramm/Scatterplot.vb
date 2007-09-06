@@ -57,8 +57,8 @@ Partial Public Class Scatterplot
                         'Serien initialisieren
                         '---------------------
                         Dim SeriesNo, SeriesNoValid, SeriesNoInvalid As Integer
-                        SeriesNoValid = .prepareSeries(xAchse & ", " & yAchse, "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 1)
-                        SeriesNoInvalid = .prepareSeries(xAchse & ", " & yAchse & " (ungültig)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 1)
+                        SeriesNoValid = .prepareSeriesPoint(xAchse & ", " & yAchse, "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 1)
+                        SeriesNoInvalid = .prepareSeriesPoint(xAchse & ", " & yAchse & " (ungültig)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 1)
 
                         'Punkte eintragen
                         '----------------
