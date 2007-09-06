@@ -956,6 +956,7 @@ Public Class PES
                     Xb(v, j, PES_iAkt.iAktPop) = PES_Initial.Xn(v)
                 Next v
                 If PES_Initial.NPenalty = 2 Then
+                    'TODO: Bei Single-Objective sollte es nie 2 Zielfunktionen geben, oder?
                     Qb(j, PES_iAkt.iAktPop, 2) = QN(1)
                 End If
             End If
@@ -964,12 +965,12 @@ Public Class PES
             'Multi-Objective mit Paretofront
             '-------------------------------
             With List_NDSorting(PES_iAkt.iAktNachf)
-                For i = 0 To PES_Initial.NPenalty - 1
-                    .penalty(i) = QN(i)
+                For i = 1 To PES_Initial.NPenalty
+                    .penalty(i) = QN(i - 1)             'Bug 135: .penalty fängt bei 1 an!
                 Next i
                 .feasible = True
-                For i = 0 To PES_Initial.NConstrains - 1
-                    .constrain(i) = RN(i)
+                For i = 1 To PES_Initial.NConstrains
+                    .constrain(i) = RN(i - 1)           'Bug 135: .constrain fängt bei 1 an!
                     If .constrain(i) < 0 Then .feasible = False
                 Next i
                 .dominated = False
