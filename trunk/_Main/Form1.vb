@@ -740,7 +740,7 @@ Partial Class Form1
                 End If
 
                 'Zeichnen MO_SO Zeichnen
-                SeriesNo = DForm.Diag.prepareSeries("Childs", "", Steema.TeeChart.Styles.PointerStyles.Triangle, 4)
+                SeriesNo = DForm.Diag.prepareSeriesPoint("Childs", "", Steema.TeeChart.Styles.PointerStyles.Triangle, 4)
                 If CES1.n_Penalty = 1 Then
                     Call DForm.Diag.Series(SeriesNo).Add(durchlauf_all, CES1.List_Childs(i).Penalty(0))
                 ElseIf CES1.n_Penalty = 2 Then
@@ -760,7 +760,7 @@ Partial Class Form1
                 'Zeichnen des besten Elter
                 For i = 0 To CES1.n_Parents - 1
                     'durchlauf += 1
-                    SeriesNo = DForm.Diag.prepareSeries("Parent", "", Steema.TeeChart.Styles.PointerStyles.Triangle, 3)
+                    SeriesNo = DForm.Diag.prepareSeriesPoint("Parent", "", Steema.TeeChart.Styles.PointerStyles.Triangle, 3)
                     Call DForm.Diag.Series(SeriesNo).Add(durchlauf_all, CES1.List_Parents(i).Penalty(0))
                 Next
 
@@ -770,7 +770,7 @@ Partial Class Form1
                 'Zeichnen von NDSortingResult
                 Call DForm.Diag.DeleteSeries(CES1.n_Childs - 1, 1)
                 For i = 0 To CES1.n_Childs - 1
-                    SeriesNo = DForm.Diag.prepareSeries("Front:" & 1, "", Steema.TeeChart.Styles.PointerStyles.Triangle, 4)
+                    SeriesNo = DForm.Diag.prepareSeriesPoint("Front:" & 1, "", Steema.TeeChart.Styles.PointerStyles.Triangle, 4)
                     Call DForm.Diag.Series(SeriesNo).Add(CES1.NDSResult(i).Penalty(0), CES1.NDSResult(i).Penalty(1))
                 Next
             End If
@@ -977,6 +977,7 @@ GenerierenAusgangswerte:
                         Select Case Anwendung
 
                             Case ANW_TESTPROBLEME
+
                                 Call Testprobleme1.Evaluierung_TestProbleme(Testprobleme1.Combo_Testproblem.Text, myPara, durchlauf, PES1.PES_iAkt.iAktPop, QN, RN, DForm.Diag)
 
                             Case ANW_BLUEM, ANW_SMUSI
@@ -1006,9 +1007,9 @@ GenerierenAusgangswerte:
                                     'SingleObjective
                                     '---------------
                                     If (isInvalid) Then
-                                        SeriesNo = DForm.Diag.prepareSeries("Population " & PES1.PES_iAkt.iAktPop & " (ungültig)", "Gray")
+                                        SeriesNo = DForm.Diag.prepareSeriesPoint("Population " & PES1.PES_iAkt.iAktPop & " (ungültig)", "Gray")
                                     Else
-                                        SeriesNo = DForm.Diag.prepareSeries("Population " & PES1.PES_iAkt.iAktPop, "Orange")
+                                        SeriesNo = DForm.Diag.prepareSeriesPoint("Population " & PES1.PES_iAkt.iAktPop, "Orange")
                                     End If
                                     DForm.Diag.Series(SeriesNo).Cursor = Cursors.Hand
                                     Call DForm.Diag.Series(SeriesNo).Add(durchlauf, Sim1.List_OptZiele(0).QWertTmp)
@@ -1018,9 +1019,9 @@ GenerierenAusgangswerte:
                                     '--------------
                                     'BUG 118: nur die ersten beiden Zielfunktionen werden gezeichnet
                                     If (isInvalid) Then
-                                        SeriesNo = DForm.Diag.prepareSeries("Population" & " (ungültig)", "Gray")
+                                        SeriesNo = DForm.Diag.prepareSeriesPoint("Population" & " (ungültig)", "Gray")
                                     Else
-                                        SeriesNo = DForm.Diag.prepareSeries("Population", "Orange")
+                                        SeriesNo = DForm.Diag.prepareSeriesPoint("Population", "Orange")
                                     End If
                                     DForm.Diag.Series(SeriesNo).Cursor = Cursors.Hand
                                     Call DForm.Diag.Series(SeriesNo).Add(Sim1.List_OptZiele(0).QWertTmp, Sim1.List_OptZiele(1).QWertTmp)
@@ -1093,7 +1094,7 @@ GenerierenAusgangswerte:
         Dim i As Short
         Dim SeriesNo As Integer
 
-        SeriesNo = DForm.Diag.prepareSeries("Sekundäre Population", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+        SeriesNo = DForm.Diag.prepareSeriesPoint("Sekundäre Population", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
         With DForm.Diag.Series(SeriesNo)
             .Clear()
             'BUG 135: SekPop(,) fängt bei 1 an!
@@ -1140,16 +1141,7 @@ GenerierenAusgangswerte:
             Case ANW_TESTPROBLEME 'Testprobleme
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-                Select Case Testprobleme1.Combo_Testproblem.Text
-                    Case "Sinus-Funktion"
-                        Call DForm.Diag.DiagInitialise_SinusFunktion(EVO_Settings1, globalAnzPar, Testprobleme1.Text_Sinusfunktion_Par.Text)
-                    Case "Beale-Problem" 'x1 = [-5;5], x2=[-2;2]
-                        Call DForm.Diag.DiagInitialise_BealeProblem(EVO_Settings1, globalAnzPar)
-                    Case "Schwefel 2.4-Problem" 'xi = [-10,10]
-                        Call DForm.Diag.DiagInitialise_SchwefelProblem(EVO_Settings1, globalAnzPar)
-                    Case Else
-                        Call DForm.Diag.DiagInitialise_MultiTestProb(EVO_Settings1, Testprobleme1.Combo_Testproblem.Text)
-                End Select
+                Call Testprobleme1.DiagInitialise(Me.EVO_Settings1.PES_Settings, globalAnzPar, Me.DForm.Diag) 
 
             Case ANW_BLUEM, ANW_SMUSI 'BlueM oder SMUSI
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -1527,10 +1519,10 @@ GenerierenAusgangswerte:
                     '------
                     Dim SeriesNo, SeriesNoValid, SeriesNoInvalid As Integer
                     'Serie für gültige Lösungen
-                    SeriesNoValid = Me.DForm.Diag.prepareSeries("Population", "Orange")
+                    SeriesNoValid = Me.DForm.Diag.prepareSeriesPoint("Population", "Orange")
                     Me.DForm.Diag.Chart.Series(SeriesNoValid).Cursor = Cursors.Hand
                     'Serie für ungültige Lösungen
-                    SeriesNoInvalid = Me.DForm.Diag.prepareSeries("Population (ungültig)", "Gray")
+                    SeriesNoInvalid = Me.DForm.Diag.prepareSeriesPoint("Population (ungültig)", "Gray")
                     Me.DForm.Diag.Chart.Series(SeriesNoInvalid).Cursor = Cursors.Hand
 
                     'Punkte eintragen
