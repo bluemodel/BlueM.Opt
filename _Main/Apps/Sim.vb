@@ -518,10 +518,9 @@ Public MustInherit Class Sim
             End If
         Loop Until StrRead.Peek() = -1
 
-        'BUG 118: nur die ersten beiden Zielfunktionen werden gezeichnet
-        If (AnzZiele > 2) Then
-            MsgBox("Die Anzahl der Ziele beträgt mehr als 2!" & Chr(13) & Chr(10) _
-                    & "Es werden nur die ersten beiden Zielfunktionen im Hauptdiagramm angezeigt!", MsgBoxStyle.Information, "Info")
+        If (AnzZiele > 3) Then
+            MsgBox("Die Anzahl der Ziele beträgt mehr als 3!" & Chr(13) & Chr(10) _
+                    & "Es werden nur die ersten drei Zielfunktionen im Hauptdiagramm angezeigt!", MsgBoxStyle.Information, "Info")
         End If
 
         ReDim List_OptZiele(AnzZiele - 1)

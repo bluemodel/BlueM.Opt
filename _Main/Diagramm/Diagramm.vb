@@ -42,6 +42,32 @@ Public Class Diagramm
             .Chart.Axes.Left.Minimum = 0
             .Chart.Axes.Left.Maximum = Achsen(2).Max
             .Chart.Axes.Left.Labels.Style = Steema.TeeChart.AxisLabelStyle.Value
+
+            'Bei mehr als 2 Achsen 3D-Diagramm
+            '---------------------------------
+            If (Achsen.Count > 2) Then
+
+                'Z-Achse:
+                .Chart.Axes.Depth.Title.Caption = Achsen(3).Name
+                .Chart.Axes.Depth.Automatic = Achsen(3).Auto
+                .Chart.Axes.Depth.Minimum = 0
+                .Chart.Axes.Depth.Maximum = Achsen(3).Max
+                .Chart.Axes.Depth.Labels.Style = Steema.TeeChart.AxisLabelStyle.Value
+                .Chart.Axes.Depth.Visible = True
+
+                '3D-Diagramm vorbereiten
+                .Chart.Aspect.View3D = True
+                .Chart.Aspect.Chart3DPercent = 90
+                .Chart.Aspect.Elevation = 348
+                .Chart.Aspect.Orthogonal = False
+                .Chart.Aspect.Perspective = 62
+                .Chart.Aspect.Rotation = 329
+                .Chart.Aspect.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality
+                .Chart.Aspect.VertOffset = -20
+                .Chart.Aspect.Zoom = 66
+
+            End If
+
         End With
 
     End Sub
@@ -95,6 +121,44 @@ Public Class Diagramm
             End If
 
             Call Me.add_MarksTips()
+
+            SeriesNo = Me.Chart.Series.Count - 1
+        Else
+            'Serie besteht schon
+        End If
+
+        Return SeriesNo
+
+    End Function
+
+    'Serien-Initialisierung (3DPunkt)
+    'gibt die SeriesNo zurück
+    '********************************
+    Public Function prepareSeries3DPoint(ByVal title As String, _
+                                      Optional ByVal colorName As String = "", _
+                                      Optional ByVal style As Steema.TeeChart.Styles.PointerStyles = Steema.TeeChart.Styles.PointerStyles.Circle, _
+                                      Optional ByVal size As Integer = 3) As Integer
+
+        Dim SeriesNo As Integer
+
+        If (Not seriesExists(title, SeriesNo)) Then
+            'Serie neu hinzufügen
+            Dim tmpSeries As New Steema.TeeChart.Styles.Points3D(Me.Chart)
+            tmpSeries.Title = title
+            tmpSeries.Pointer.Style = style
+            tmpSeries.Pointer.HorizSize = size
+            tmpSeries.Pointer.VertSize = size
+            tmpSeries.Pointer.Draw3D = True
+            tmpSeries.Depth = size
+            tmpSeries.LinePen.Visible = False
+            tmpSeries.ColorEach = False
+            If (Not colorName = "") Then
+                tmpSeries.Color = Drawing.Color.FromName(colorName)
+            End If
+
+            'BUG: TeeChart MarksTip funktioniert momentan nur in der XY-Ebene
+            'Siehe http://www.teechart.net/support/viewtopic.php?t=5982&highlight=&sid=4db52d0d1a4b78f30842ede881ce5bef
+            'Call Me.add_MarksTips()
 
             SeriesNo = Me.Chart.Series.Count - 1
         Else
