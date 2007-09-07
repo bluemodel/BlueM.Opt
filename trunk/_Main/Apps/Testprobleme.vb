@@ -484,7 +484,6 @@ Public Class Testprobleme
 
                 Case "CONSTR"
                     'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-                    'TODO: Titel der Serien (für Export)
                     Dim Array1X(100) As Double
                     Dim Array1Y(100) As Double
                     Dim Array2X(100) As Double
@@ -540,8 +539,10 @@ Public Class Testprobleme
     '********************************************
     Private Sub DiagInitialise_3D_Box(ByVal PES_Settings As EvoKern.PES.Struct_Settings, ByVal AnzPar As Integer, ByRef Diag As Main.Diagramm)
 
-        Dim ArrayX(100) As Double
-        Dim ArrayY(100) As Double
+        Dim i, j, n As Integer
+        Dim ArrayX() As Double
+        Dim ArrayY() As Double
+        Dim ArrayZ() As Double
 
         With Diag
             .Clear()
@@ -559,60 +560,147 @@ Public Class Testprobleme
             .Tools.Add(New Steema.TeeChart.Tools.Rotate())
 
             'Achsen:
-            .Chart.Axes.Bottom.Automatic = True
+            .Chart.Axes.Bottom.Automatic = False
             .Chart.Axes.Bottom.Visible = True
-            '.Chart.Axes.Bottom.Maximum = 1
-            '.Chart.Axes.Bottom.Minimum = 0
-            '.Chart.Axes.Bottom.Increment = 0.2
-            .Chart.Axes.Left.Automatic = True
+            .Chart.Axes.Bottom.Title.Caption = "X"
+            .Chart.Axes.Bottom.Maximum = 1
+            .Chart.Axes.Bottom.Minimum = 0
+            .Chart.Axes.Bottom.Increment = 0.2
+
+            .Chart.Axes.Left.Automatic = False
             .Chart.Axes.Left.Visible = True
-            '.Chart.Axes.Left.Maximum = 1
-            '.Chart.Axes.Left.Minimum = 0
-            '.Chart.Axes.Left.Increment = 0.2
-            .Chart.Axes.Depth.Automatic = True
+            .Chart.Axes.Left.Title.Caption = "Y"
+            .Chart.Axes.Left.Maximum = 1
+            .Chart.Axes.Left.Minimum = 0
+            .Chart.Axes.Left.Increment = 0.2
+
+            .Chart.Axes.Depth.Automatic = False
             .Chart.Axes.Depth.Visible = True
-            '.Chart.Axes.Depth.Maximum = 1
-            '.Chart.Axes.Depth.Minimum = 0
-            '.Chart.Axes.Depth.Increment = 0.2
+            .Chart.Axes.Depth.Title.Caption = "Z"
+            .Chart.Axes.Depth.Maximum = 1
+            .Chart.Axes.Depth.Minimum = 0
+            .Chart.Axes.Depth.Increment = 0.2
+
+            'Serien
+            '-----------
+            Dim surface As Steema.TeeChart.Styles.Surface
+            Dim series3D As Steema.TeeChart.Styles.Points3D
+
+            'Constraint 1
+            'x + y + z <= 0.8
+            Dim surfaceRes As Integer = 11
+            ReDim ArrayX(surfaceRes ^ 2 - 1)
+            ReDim ArrayY(surfaceRes ^ 2 - 1)
+            ReDim ArrayZ(surfaceRes ^ 2 - 1)
+
+            n = 0
+            For i = 0 To surfaceRes - 1
+                For j = 0 To (surfaceRes - 1)
+                    ArrayX(n) = i * (1.1 / surfaceRes)
+                    ArrayZ(n) = j * (1.1 / surfaceRes)
+                    ArrayY(n) = Math.Max(0.8 - ArrayX(n) - ArrayZ(n), 0)
+                    n += 1
+                Next
+            Next
+
+            surface = New Steema.TeeChart.Styles.Surface(Diag.Chart)
+            surface.Title = "Constraint 1"
+            surface.IrregularGrid = True
+            surface.NumXValues = surfaceRes
+            surface.NumZValues = surfaceRes
+            surface.Add(ArrayX, ArrayY, ArrayZ)
+            surface.UseColorRange = False
+            surface.UsePalette = False
+            surface.Brush.Solid = True
+            surface.Brush.Color = Color.Green
+            surface.Brush.Transparency = 70
+            surface.Pen.Color = Color.Green
+            surface.SideBrush.Visible = True
+            surface.SideBrush.Color = Color.Red
+            surface.SideBrush.Transparency = 70
+
+            'Constraint 2
+            'x + y <= 0.5
+            ReDim ArrayX(65)
+            ReDim ArrayY(65)
+            ReDim ArrayZ(65)
+
+            n = 0
+            For i = 0 To 10
+                For j = 0 To 5
+                    ArrayX(n) = j * 0.1
+                    ArrayZ(n) = i * 0.1
+                    ArrayY(n) = 0.5 - ArrayX(n)
+                    n += 1
+                Next
+            Next
+
+            surface = New Steema.TeeChart.Styles.Surface(Diag.Chart)
+            surface.Title = "Constraint 2"
+            surface.IrregularGrid = True
+            surface.NumXValues = 10
+            surface.NumZValues = 10
+            surface.Add(ArrayX, ArrayY, ArrayZ)
+            surface.UseColorRange = False
+            surface.UsePalette = False
+            surface.Brush.Solid = True
+            surface.Brush.Color = Color.Blue
+            surface.Brush.Transparency = 70
+            surface.Pen.Color = Color.Blue
+            surface.SideBrush.Visible = True
+            surface.SideBrush.Color = Color.Red
+            surface.SideBrush.Transparency = 70
+
+            'Schnittgerade zwischen den Constraints
+            series3D = New Steema.TeeChart.Styles.Points3D(Diag.Chart)
+            series3D.Title = "Schnittgerade"
+            series3D.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Nothing
+            series3D.LinePen.Visible = True
+            series3D.LinePen.Width = 1
+            series3D.LinePen.Color = Color.Red
+            series3D.Add(0.5, 0, 0.3)
+            series3D.Add(0, 0.5, 0.3)
 
             'Series für die Population
-            Dim tmpSeries As New Steema.TeeChart.Styles.Points3D(Diag.Chart)
-            tmpSeries.Title = "Population"
-            tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            tmpSeries.Pointer.Draw3D = True
-            tmpSeries.Depth = 3
-            tmpSeries.Pointer.HorizSize = 3
-            tmpSeries.Pointer.VertSize = 3
-            tmpSeries.Pointer.Color = Color.Orange
-            tmpSeries.LinePen.Visible = False
-            tmpSeries.ColorEach = False
+            series3D = New Steema.TeeChart.Styles.Points3D(Diag.Chart)
+            series3D.Title = "Population"
+            series3D.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            series3D.Pointer.Draw3D = True
+            series3D.Depth = 3
+            series3D.Pointer.HorizSize = 3
+            series3D.Pointer.VertSize = 3
+            series3D.Pointer.Color = Color.Orange
+            series3D.LinePen.Visible = False
+            series3D.ColorEach = False
 
             'Series für die ungültige Population
-            tmpSeries = New Steema.TeeChart.Styles.Points3D(Diag.Chart)
-            tmpSeries.Title = "Population (ungültig)"
-            tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            tmpSeries.Pointer.Draw3D = True
-            tmpSeries.Depth = 3
-            tmpSeries.Pointer.HorizSize = 3
-            tmpSeries.Pointer.VertSize = 3
-            tmpSeries.Pointer.Color = Color.Gray
-            tmpSeries.LinePen.Visible = False
-            tmpSeries.ColorEach = False
+            series3D = New Steema.TeeChart.Styles.Points3D(Diag.Chart)
+            series3D.Title = "Population (ungültig)"
+            series3D.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            series3D.Pointer.Draw3D = True
+            series3D.Depth = 3
+            series3D.Pointer.HorizSize = 3
+            series3D.Pointer.VertSize = 3
+            series3D.Pointer.Color = Color.Gray
+            series3D.LinePen.Visible = False
+            series3D.ColorEach = False
 
             'Series für die Sekundäre Population
             'BUG 195: Sekundäre Population wird nur in 2D gezeichnet
-            tmpSeries = New Steema.TeeChart.Styles.Points3D(Diag.Chart)
-            tmpSeries.Title = "Sekundäre Population"
-            tmpSeries.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            tmpSeries.Pointer.Draw3D = True
-            tmpSeries.Depth = 3
-            tmpSeries.Pointer.HorizSize = 3
-            tmpSeries.Pointer.VertSize = 3
-            tmpSeries.Pointer.Color = Color.Green
-            tmpSeries.LinePen.Visible = False
-            tmpSeries.ColorEach = False
+            series3D = New Steema.TeeChart.Styles.Points3D(Diag.Chart)
+            series3D.Title = "Sekundäre Population"
+            series3D.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            series3D.Pointer.Draw3D = True
+            series3D.Depth = 3
+            series3D.Pointer.HorizSize = 3
+            series3D.Pointer.VertSize = 3
+            series3D.Pointer.Color = Color.Green
+            series3D.LinePen.Visible = False
+            series3D.ColorEach = False
 
-            Call Diag.add_MarksTips()
+            'BUG: TeeChart MarksTip funktioniert momentan nur in der XY-Ebene
+            'Siehe http://www.teechart.net/support/viewtopic.php?t=5982&highlight=&sid=4db52d0d1a4b78f30842ede881ce5bef
+            'Call Diag.add_MarksTips()
 
         End With
 
@@ -840,12 +928,9 @@ Public Class Testprobleme
 
                 'Qualitätswerte berechnen
                 '------------------------
-                f1 = mypara(1) ^ 2
-                f2 = mypara(2) ^ 2
-                f3 = mypara(3) ^ 2
-                'f1 = 1 + (1 - mypara(1)) ^ 5
-                'f2 = mypara(2)
-                'f3 = mypara(3)
+                f1 = mypara(1)
+                f2 = mypara(2)
+                f3 = mypara(3)
 
                 QN(0) = f1
                 QN(1) = f2
@@ -853,10 +938,8 @@ Public Class Testprobleme
 
                 'Constraints berechnen
                 '---------------------
-                g1 = mypara(1) + mypara(3) - 0.5
+                g1 = mypara(1) + mypara(2) - 0.5
                 g2 = mypara(1) + mypara(2) + mypara(3) - 0.8
-                'g1 = mypara(1) ^ 2 + mypara(3) ^ 2 - 0.5
-                'g2 = mypara(2) ^ 2 + mypara(3) ^ 2 - 0.5
 
                 RN(0) = g1
                 RN(1) = g2
