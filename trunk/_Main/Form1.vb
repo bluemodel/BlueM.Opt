@@ -990,14 +990,14 @@ GenerierenAusgangswerte:
                                     GoTo GenerierenAusgangswerte
                                 End If
 
-                                'Qualitätswerte im TeeChart zeichnen
-                                '===================================
+                                'Lösung im TeeChart einzeichnen
+                                '==============================
                                 Dim SeriesNo As Integer
 
                                 'Constraintverletzung prüfen
                                 Dim isInvalid As Boolean = False
-                                For i = 0 To Sim1.List_Constraints.GetUpperBound(0)
-                                    If (Sim1.List_Constraints(i).ConstTmp < 0) Then
+                                For i = 0 To globalAnzRand - 1
+                                    If (RN(i) < 0) Then
                                         isInvalid = True
                                         Exit For
                                     End If
@@ -1012,19 +1012,35 @@ GenerierenAusgangswerte:
                                         SeriesNo = DForm.Diag.prepareSeriesPoint("Population " & PES1.PES_iAkt.iAktPop, "Orange")
                                     End If
                                     DForm.Diag.Series(SeriesNo).Cursor = Cursors.Hand
-                                    Call DForm.Diag.Series(SeriesNo).Add(durchlauf, Sim1.List_OptZiele(0).QWertTmp)
+                                    Call DForm.Diag.Series(SeriesNo).Add(durchlauf, QN(0))
 
                                 Else
                                     'MultiObjective
                                     '--------------
-                                    'BUG 118: nur die ersten beiden Zielfunktionen werden gezeichnet
-                                    If (isInvalid) Then
-                                        SeriesNo = DForm.Diag.prepareSeriesPoint("Population" & " (ungültig)", "Gray")
+                                    If (globalAnzZiel = 2) Then
+                                        '2D-Diagramm
+                                        '------------------------------------------------------------------------
+                                        If (isInvalid) Then
+                                            SeriesNo = DForm.Diag.prepareSeriesPoint("Population" & " (ungültig)", "Gray")
+                                        Else
+                                            SeriesNo = DForm.Diag.prepareSeriesPoint("Population", "Orange")
+                                        End If
+                                        DForm.Diag.Series(SeriesNo).Cursor = Cursors.Hand
+                                        Call DForm.Diag.Series(SeriesNo).Add(QN(0), QN(1))
+
                                     Else
-                                        SeriesNo = DForm.Diag.prepareSeriesPoint("Population", "Orange")
+                                        '3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
+                                        '------------------------------------------------------------------------
+                                        If (isInvalid) Then
+                                            SeriesNo = DForm.Diag.prepareSeries3DPoint("Population" & " (ungültig)", "Gray")
+                                        Else
+                                            SeriesNo = DForm.Diag.prepareSeries3DPoint("Population", "Orange")
+                                        End If
+                                        Dim series3D As Steema.TeeChart.Styles.Points3D
+                                        series3D = DForm.Diag.Series(SeriesNo)
+                                        Call series3D.Add(QN(0), QN(1), QN(2))
+
                                     End If
-                                    DForm.Diag.Series(SeriesNo).Cursor = Cursors.Hand
-                                    Call DForm.Diag.Series(SeriesNo).Add(Sim1.List_OptZiele(0).QWertTmp, Sim1.List_OptZiele(1).QWertTmp)
                                 End If
 
                         End Select
@@ -1094,21 +1110,28 @@ GenerierenAusgangswerte:
         Dim i As Short
         Dim SeriesNo As Integer
 
-        SeriesNo = DForm.Diag.prepareSeriesPoint("Sekundäre Population", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-        With DForm.Diag.Series(SeriesNo)
-            .Clear()
-            'BUG 135: SekPop(,) fängt bei 1 an!
-            If UBound(SekPop, 2) = 2 Then
-                For i = 1 To UBound(SekPop, 1)
-                    .Add(SekPop(i, 1), SekPop(i, 2), "")
-                Next i
-            ElseIf UBound(SekPop, 2) = 3 Then
-                For i = 1 To UBound(SekPop, 1)
-                    'BUG 118: nur die ersten beiden Zielfunktionen werden gezeichnet
-                    .Add(SekPop(i, 1), SekPop(i, 2), "")
-                Next i
-            End If
-        End With
+        'BUG 135: SekPop(,) fängt bei 1 an!
+        If (UBound(SekPop, 2) = 2) Then
+            '2 Zielfunktionen
+            '----------------------------------------------------------------
+            SeriesNo = DForm.Diag.prepareSeriesPoint("Sekundäre Population", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+            Dim series As Steema.TeeChart.Styles.Points = DForm.Diag.Series(SeriesNo)
+            series.Clear()
+            For i = 1 To UBound(SekPop, 1)
+                series.Add(SekPop(i, 1), SekPop(i, 2), "")
+            Next i
+
+        ElseIf (UBound(SekPop, 2) >= 3) Then
+            '3 oder mehr Zielfunktionen (es werden die ersten drei angezeigt)
+            '----------------------------------------------------------------
+            SeriesNo = DForm.Diag.prepareSeries3DPoint("Sekundäre Population", "Green")
+            Dim series3D As Steema.TeeChart.Styles.Points3D = DForm.Diag.Series(SeriesNo)
+            series3D.Clear()
+            For i = 1 To UBound(SekPop, 1)
+                series3D.Add(SekPop(i, 1), SekPop(i, 2), SekPop(i, 3))
+            Next i
+        End If
+
     End Sub
 
     'Startwerte werden der Verlaufsanzeige werden zugewiesen
@@ -1259,8 +1282,10 @@ GenerierenAusgangswerte:
                         '-------
                         Dim Achse As Diagramm.Achse
                         Dim Achsen As New Collection
-                        'Bei SO: X-Achse = Simulationen
+
+                        'Bei Single-Objective: X-Achse = Nr. der Simulation (Durchlauf)
                         If (EVO_Settings1.PES_Settings.is_MO_Pareto = False) Then
+
                             Achse.Name = "Simulation"
                             Achse.Auto = False
                             If EVO_Settings1.PES_Settings.isPOPUL Then
@@ -1269,7 +1294,9 @@ GenerierenAusgangswerte:
                                 Achse.Max = EVO_Settings1.PES_Settings.NGen * EVO_Settings1.PES_Settings.NNachf + 1
                             End If
                             Achsen.Add(Achse)
+
                         End If
+
                         'für jede Zielfunktion eine weitere Achse hinzufügen
                         For i = 0 To Sim1.List_OptZiele.GetUpperBound(0)
                             Achse.Name = Sim1.List_OptZiele(i).Bezeichnung
