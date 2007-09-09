@@ -870,7 +870,6 @@ Partial Class Form1
         Dim i As Integer
         '--------------------------
         Dim durchlauf As Integer
-        Dim Versuch As Integer
         '--------------------------
         'Dimensionierung der Variablen für Optionen Evostrategie
         'Das Struct aus PES wird hier verwendet
@@ -911,18 +910,15 @@ Partial Class Form1
 Start_Evolutionsrunden:
 
         'Über alle Runden
-        'xxxxxxxxxxxxxxxxxxxxx
+        'xxxxxxxxxxxxxxxx
         For PES1.PES_iAkt.iAktRunde = 1 To PES1.PES_Settings.NRunden
 
             Call EVO_Opt_Verlauf1.Runden(PES1.PES_iAkt.iAktRunde)
-
             Call PES1.EsPopBestwertspeicher()
 
             'Über alle Populationen
-            'xxxxxxxxxxxxxxxxxxxxxxxxxxx
+            'xxxxxxxxxxxxxxxxxxxxxx
             For PES1.PES_iAkt.iAktPop = 1 To PES1.PES_Settings.NPopul
-
-                'Do While (PES1.EsIsNextPop)
 
                 Call EVO_Opt_Verlauf1.Populationen(PES1.PES_iAkt.iAktPop)
                 Call PES1.EsPopVaria()
@@ -935,7 +931,7 @@ Start_Evolutionsrunden:
                     Call EVO_Opt_Verlauf1.Generation(PES1.PES_iAkt.iAktGen)
                     Call PES1.EsBestwertspeicher()
 
-                    'Loop über alle Nachkommen
+                    'Über alle Nachkommen
                     'xxxxxxxxxxxxxxxxxxxxxxxxx
                     For PES1.PES_iAkt.iAktNachf = 1 To PES1.PES_Settings.NNachf
 
@@ -945,78 +941,68 @@ Start_Evolutionsrunden:
 
                         'Um Modellfehler bzw. Evaluierungsabbrüche abzufangen
                         'TODO: noch nicht fertig das Ergebnis wird noch nicht auf Fehler ueberprueft
-                        Versuch = 0
+                        Dim Eval_Count As Integer = 0
+                        Dim SIM_Eval_is_OK As Boolean = True
+                        Do
+                            'REPRODUKTIONSPROZESS - Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
+                            'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                            Call PES1.EsVaria()
 
-GenerierenAusgangswerte:
+                            'MUTATIONSPROZESS - Mutieren der Ausgangswerte
+                            'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                            Call PES1.EsMutation()
 
-                        Versuch += 1
-                        If (Versuch > 10) Then
-                            Throw New Exception("Es konnte kein gültiger Datensatz erzeugt werden!")
-                        End If
+                            'Auslesen der Variierten Parameter
+                            myPara = PES1.EsGetParameter()
 
-                        'REPRODUKTIONSPROZESS
-                        'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
-                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-                        Call PES1.EsVaria()
+                            'Auslesen des Bestwertspeichers
+                            If (Not EVO_Settings1.PES_Settings.is_MO_Pareto) Then
+                                Bestwert = PES1.EsGetBestwert()
+                            End If
 
-                        'MUTATIONSPROZESS
-                        'Mutieren der Ausgangswerte
-                        'xxxxxxxxxxxxxxxxxxxxxxxxxx
-                        Call PES1.EsMutation()
+                            'Ansteuerung der zu optimierenden Anwendung
+                            'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                            Select Case Anwendung
 
-                        'Auslesen der Variierten Parameter
-                        myPara = PES1.EsGetParameter()
+                                Case ANW_TESTPROBLEME
 
-                        'Auslesen des Bestwertspeichers
-                        If (Not EVO_Settings1.PES_Settings.is_MO_Pareto) Then
-                            Bestwert = PES1.EsGetBestwert()
-                        End If
+                                    Call Testprobleme1.Evaluierung_TestProbleme(Testprobleme1.Combo_Testproblem.Text, myPara, durchlauf, PES1.PES_iAkt.iAktPop, QN, RN, DForm.Diag)
 
-                        'Ansteuerung der zu optimierenden Anwendung
-                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-                        Select Case Anwendung
+                                Case ANW_BLUEM, ANW_SMUSI
 
-                            Case ANW_TESTPROBLEME
+                                    'Vorbereiten des Modelldatensatzes
+                                    Call Sim1.PREPARE_Evaluation_PES(myPara)
 
-                                Call Testprobleme1.Evaluierung_TestProbleme(Testprobleme1.Combo_Testproblem.Text, myPara, durchlauf, PES1.PES_iAkt.iAktPop, QN, RN, DForm.Diag)
-
-                            Case ANW_BLUEM, ANW_SMUSI
-
-                                'Vorbereiten des Modelldatensatzes
-                                Call Sim1.PREPARE_Evaluation_PES(myPara)
-
-                                'Simulation und Evaluierung
-                                If Not Sim1.SIM_Evaluierung(QN, RN) Then
-                                    GoTo GenerierenAusgangswerte
-                                End If
+                                    'Evaluierung des Simulationsmodells (ToDo: Validätsprüfung fehlt)
+                                    SIM_Eval_is_OK = Sim1.SIM_Evaluierung(QN, RN)
 
                                 'Lösung im TeeChart einzeichnen
                                 '==============================
-                                Dim SeriesNo As Integer
+                                    Dim SeriesNo As Integer
 
-                                'Constraintverletzung prüfen
-                                Dim isInvalid As Boolean = False
+                                    'Constraintverletzung prüfen
+                                    Dim isInvalid As Boolean = False
                                 For i = 0 To globalAnzRand - 1
                                     If (RN(i) < 0) Then
-                                        isInvalid = True
-                                        Exit For
-                                    End If
-                                Next
+                                            isInvalid = True
+                                            Exit For
+                                        End If
+                                    Next
 
-                                If (Not EVO_Settings1.PES_Settings.is_MO_Pareto) Then
-                                    'SingleObjective
-                                    '---------------
-                                    If (isInvalid) Then
+                                    If (Not EVO_Settings1.PES_Settings.is_MO_Pareto) Then
+                                        'SingleObjective
+                                        'xxxxxxxxxxxxxxx
+                                        If (isInvalid) Then
                                         SeriesNo = DForm.Diag.prepareSeriesPoint("Population " & PES1.PES_iAkt.iAktPop & " (ungültig)", "Gray")
-                                    Else
+                                        Else
                                         SeriesNo = DForm.Diag.prepareSeriesPoint("Population " & PES1.PES_iAkt.iAktPop, "Orange")
-                                    End If
-                                    DForm.Diag.Series(SeriesNo).Cursor = Cursors.Hand
+                                        End If
+                                        DForm.Diag.Series(SeriesNo).Cursor = Cursors.Hand
                                     Call DForm.Diag.Series(SeriesNo).Add(durchlauf, QN(0))
 
-                                Else
-                                    'MultiObjective
-                                    '--------------
+                                    Else
+                                        'MultiObjective
+                                        'xxxxxxxxxxxxxx
                                     If (globalAnzZiel = 2) Then
                                         '2D-Diagramm
                                         '------------------------------------------------------------------------
@@ -1043,7 +1029,14 @@ GenerierenAusgangswerte:
                                     End If
                                 End If
 
-                        End Select
+                            End Select
+
+                            Eval_Count += 1
+                            If (Eval_Count >= 10) Then
+                                Throw New Exception("Es konnte kein gültiger Datensatz erzeugt werden!")
+                            End If
+
+                        Loop While SIM_Eval_is_OK = False
 
                         'Einordnen der Qualitätsfunktion im Bestwertspeicher
                         Call PES1.EsBest(QN, RN)
@@ -1051,45 +1044,44 @@ GenerierenAusgangswerte:
                         System.Windows.Forms.Application.DoEvents()
 
                     Next 'Ende Schleife über alle Nachkommen
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'Die neuen Eltern werden generiert
-                    Call PES1.EsEltern()
+                'Die neuen Eltern werden generiert
+                Call PES1.EsEltern()
 
-                    'Sekundäre Population 'BUG 135: SekPop(,) fängt bei 1 an!
-                    If (EVO_Settings1.PES_Settings.is_MO_Pareto) Then
-                        SekPopulation = PES1.EsGetSekundärePopulation()
-                        'SekPop zeichnen
-                        Call SekundärePopulationZeichnen(SekPopulation)
-                        'SekPop in DB speichern
-                        If (Not IsNothing(Sim1)) Then
-                            If (Sim1.Ergebnisdb) Then
-                                Call Sim1.db_setSekPop(SekPopulation, PES1.PES_iAkt.iAktGen)
-                            End If
+                'Sekundäre Population 'BUG 135: SekPop(,) fängt bei 1 an!
+                If (EVO_Settings1.PES_Settings.is_MO_Pareto) Then
+                    SekPopulation = PES1.EsGetSekundärePopulation()
+                    'SekPop zeichnen
+                    Call SekundärePopulationZeichnen(SekPopulation)
+                    'SekPop in DB speichern
+                    If (Not IsNothing(Sim1)) Then
+                        If (Sim1.Ergebnisdb) Then
+                            Call Sim1.db_setSekPop(SekPopulation, PES1.PES_iAkt.iAktGen)
                         End If
                     End If
-
-                    System.Windows.Forms.Application.DoEvents()
-
-                Next 'Ende Schleife über alle Generationen
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                End If
 
                 System.Windows.Forms.Application.DoEvents()
 
-                'Einordnen der Qualitätsfunktion im PopulationsBestwertspeicher
-                Call PES1.EsPopBest()
-
-            Next 'Ende Schleife über alle Populationen
-            'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-            'Die neuen Populationseltern werden generiert
-            Call PES1.EsPopEltern()
-
+            Next 'Ende alle Generationen
+            'xxxxxxxxxxxxxxxxxxxxxxxxxxx
             System.Windows.Forms.Application.DoEvents()
 
+            'Einordnen der Qualitätsfunktion im PopulationsBestwertspeicher
+            Call PES1.EsPopBest()
 
-        Next 'Ende Schleife über alle Runden
-        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        Next 'Ende alle Populationen
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        'Die neuen Populationseltern werden generiert
+        Call PES1.EsPopEltern()
+
+        System.Windows.Forms.Application.DoEvents()
+
+
+        Next 'Ende alle Runden
+        'xxxxxxxxxxxxxxxxxxxxx
 
         'PES, letzter. Schritt
         'Objekt der Klasse PES wird vernichtet
@@ -1110,16 +1102,16 @@ GenerierenAusgangswerte:
         Dim i As Short
         Dim SeriesNo As Integer
 
-        'BUG 135: SekPop(,) fängt bei 1 an!
+            'BUG 135: SekPop(,) fängt bei 1 an!
         If (UBound(SekPop, 2) = 2) Then
             '2 Zielfunktionen
             '----------------------------------------------------------------
             SeriesNo = DForm.Diag.prepareSeriesPoint("Sekundäre Population", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
             Dim series As Steema.TeeChart.Styles.Points = DForm.Diag.Series(SeriesNo)
             series.Clear()
-            For i = 1 To UBound(SekPop, 1)
+                For i = 1 To UBound(SekPop, 1)
                 series.Add(SekPop(i, 1), SekPop(i, 2), "")
-            Next i
+                Next i
 
         ElseIf (UBound(SekPop, 2) >= 3) Then
             '3 oder mehr Zielfunktionen (es werden die ersten drei angezeigt)
@@ -1127,10 +1119,10 @@ GenerierenAusgangswerte:
             SeriesNo = DForm.Diag.prepareSeries3DPoint("Sekundäre Population", "Green")
             Dim series3D As Steema.TeeChart.Styles.Points3D = DForm.Diag.Series(SeriesNo)
             series3D.Clear()
-            For i = 1 To UBound(SekPop, 1)
+                For i = 1 To UBound(SekPop, 1)
                 series3D.Add(SekPop(i, 1), SekPop(i, 2), SekPop(i, 3))
-            Next i
-        End If
+                Next i
+            End If
 
     End Sub
 
