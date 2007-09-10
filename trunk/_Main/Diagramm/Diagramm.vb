@@ -97,7 +97,8 @@ Public Class Diagramm
                 tmpSeries.Color = Drawing.Color.FromName(colorName)
             End If
 
-            Call Me.add_MarksTips()
+            Call Me.add_MarksTips(tmpSeries)
+            tmpSeries.Cursor = Cursors.Hand
 
             SeriesNo = Me.Chart.Series.Count - 1
         Else
@@ -124,7 +125,7 @@ Public Class Diagramm
                 tmpSeries.Color = Drawing.Color.FromName(colorName)
             End If
 
-            Call Me.add_MarksTips()
+            Call Me.add_MarksTips(tmpSeries)
 
             SeriesNo = Me.Chart.Series.Count - 1
         Else
@@ -162,7 +163,8 @@ Public Class Diagramm
 
             'BUG: TeeChart MarksTip funktioniert momentan nur in der XY-Ebene korrekt
             'Siehe http://www.teechart.net/support/viewtopic.php?t=5982&highlight=&sid=4db52d0d1a4b78f30842ede881ce5bef
-            Call Me.add_MarksTips()
+            Call Me.add_MarksTips(tmpSeries)
+            tmpSeries.Cursor = Cursors.Hand
 
             SeriesNo = Me.Chart.Series.Count - 1
         Else
@@ -206,17 +208,17 @@ Public Class Diagramm
 
     End Sub
 
-    'MarksTips zu Serien hinzufügen
-    '******************************
-    Public Sub add_MarksTips()
+    'MarksTips zu einer Serie hinzufügen
+    '***********************************
+    Public Sub add_MarksTips(ByVal serie As Steema.TeeChart.Styles.Series)
+
         Dim tmpMarksTip As Steema.TeeChart.Tools.MarksTip
-        For i As Integer = 0 To Me.Chart.Series.Count - 1
-            tmpMarksTip = New Steema.TeeChart.Tools.MarksTip(Me.Chart)
-            tmpMarksTip.Series = Me.Chart.Series(i)
-            tmpMarksTip.MouseAction = Steema.TeeChart.Tools.MarksTipMouseAction.Move
-            tmpMarksTip.MouseDelay = 10 'millisekunden
-            tmpMarksTip.Style = Steema.TeeChart.Styles.MarksStyles.XY
-        Next
+        tmpMarksTip = New Steema.TeeChart.Tools.MarksTip(Me.Chart)
+        tmpMarksTip.Series = serie
+        tmpMarksTip.MouseAction = Steema.TeeChart.Tools.MarksTipMouseAction.Move
+        tmpMarksTip.MouseDelay = 10 'millisekunden
+        tmpMarksTip.Style = Steema.TeeChart.Styles.MarksStyles.XY
+
     End Sub
 
 End Class
