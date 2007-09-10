@@ -1505,6 +1505,7 @@ Start_Evolutionsrunden:
             For Each OptZiel As Sim.Struct_OptZiel In Sim1.List_OptZiele
                 Form2.ListBox_OptZieleX.Items.Add(OptZiel.Bezeichnung)
                 Form2.ListBox_OptZieleY.Items.Add(OptZiel.Bezeichnung)
+                Form2.ListBox_OptZieleZ.Items.Add(OptZiel.Bezeichnung)
             Next
             diagresult = Form2.ShowDialog()
 
@@ -1518,31 +1519,53 @@ Start_Evolutionsrunden:
                 If (Form2.CheckBox_Hauptdiagramm.Checked) Then
                     'Hauptdiagramm
                     '=============
-                    Dim OptZielIndexX, OptZielIndexY As Integer
+                    Dim OptZielIndexX, OptZielIndexY, OptZielIndexZ As Integer
                     OptZielIndexX = Form2.ListBox_OptZieleX.SelectedIndex
                     OptZielIndexY = Form2.ListBox_OptZieleY.SelectedIndex
+                    OptZielIndexZ = Form2.ListBox_OptZieleZ.SelectedIndex
 
                     'Achsen
                     '------
                     Dim Achsen As New Collection
                     Dim tmpAchse As Main.Diagramm.Achse
                     tmpAchse.Auto = True
+                    'X-Achse
                     tmpAchse.Name = Form2.ListBox_OptZieleX.SelectedItem
                     Achsen.Add(tmpAchse)
+                    'Y-Achse
                     tmpAchse.Name = Form2.ListBox_OptZieleY.SelectedItem
                     Achsen.Add(tmpAchse)
+                    If (Not OptZielIndexZ = -1) Then
+                        'Z-Achse
+                        tmpAchse.Name = Form2.ListBox_OptZieleZ.SelectedItem
+                        Achsen.Add(tmpAchse)
+                    End If
+                    'Diagramm initialisieren
                     Me.DForm.Diag.Clear()
                     Me.DForm.Diag.DiagInitialise(Path.GetFileName(Sim1.db_path), Achsen)
 
-                    'Serien
-                    '------
+                    'Serien vorbereiten
+                    '------------------
                     Dim SeriesNo, SeriesNoValid, SeriesNoInvalid As Integer
-                    'Serie für gültige Lösungen
-                    SeriesNoValid = Me.DForm.Diag.prepareSeriesPoint("Population", "Orange")
-                    Me.DForm.Diag.Chart.Series(SeriesNoValid).Cursor = Cursors.Hand
-                    'Serie für ungültige Lösungen
-                    SeriesNoInvalid = Me.DForm.Diag.prepareSeriesPoint("Population (ungültig)", "Gray")
-                    Me.DForm.Diag.Chart.Series(SeriesNoInvalid).Cursor = Cursors.Hand
+                    If (OptZielIndexZ = -1) Then
+                        '2D
+                        '--
+                        'Serie für gültige Lösungen
+                        SeriesNoValid = Me.DForm.Diag.prepareSeriesPoint("Population", "Orange")
+                        Me.DForm.Diag.Chart.Series(SeriesNoValid).Cursor = Cursors.Hand
+                        'Serie für ungültige Lösungen
+                        SeriesNoInvalid = Me.DForm.Diag.prepareSeriesPoint("Population (ungültig)", "Gray")
+                        Me.DForm.Diag.Chart.Series(SeriesNoInvalid).Cursor = Cursors.Hand
+                    Else
+                        '3D
+                        '--
+                        'Serie für gültige Lösungen
+                        SeriesNoValid = Me.DForm.Diag.prepareSeries3DPoint("Population", "Orange")
+                        Me.DForm.Diag.Chart.Series(SeriesNoValid).Cursor = Cursors.Hand
+                        'Serie für ungültige Lösungen
+                        SeriesNoInvalid = Me.DForm.Diag.prepareSeries3DPoint("Population (ungültig)", "Gray")
+                        Me.DForm.Diag.Chart.Series(SeriesNoInvalid).Cursor = Cursors.Hand
+                    End If
 
                     'Punkte eintragen
                     '----------------
@@ -1554,7 +1577,15 @@ Start_Evolutionsrunden:
                             Else
                                 SeriesNo = SeriesNoInvalid
                             End If
-                            Me.DForm.Diag.Chart.Series(SeriesNo).Add(.QWerte(OptZielIndexX), .QWerte(OptZielIndexY))
+                            If (OptZielIndexZ = -1) Then
+                                '2D
+                                Me.DForm.Diag.Series(SeriesNo).Add(.QWerte(OptZielIndexX), .QWerte(OptZielIndexY))
+                            Else
+                                '3D
+                                Dim series3D As Steema.TeeChart.Styles.Points3D
+                                series3D = Me.DForm.Diag.Series(SeriesNo)
+                                series3D.Add(.QWerte(OptZielIndexX), .QWerte(OptZielIndexY), .QWerte(OptZielIndexZ))
+                            End If
                         End With
                     Next
 

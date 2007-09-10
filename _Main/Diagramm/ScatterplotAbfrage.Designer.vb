@@ -31,6 +31,8 @@ Partial Class ScatterplotAbfrage
         Me.Label_YAchse = New System.Windows.Forms.Label
         Me.GroupBox_Scatterplot = New System.Windows.Forms.GroupBox
         Me.CheckBox_onlySekPop = New System.Windows.Forms.CheckBox
+        Me.ListBox_OptZieleZ = New System.Windows.Forms.ListBox
+        Me.Label_ZAchse = New System.Windows.Forms.Label
         Me.TableLayoutPanel1.SuspendLayout()
         Me.GroupBox_Hauptdiagramm.SuspendLayout()
         Me.GroupBox_Scatterplot.SuspendLayout()
@@ -39,7 +41,7 @@ Partial Class ScatterplotAbfrage
         'Label_XAchse
         '
         Me.Label_XAchse.AutoSize = True
-        Me.Label_XAchse.Location = New System.Drawing.Point(6, 39)
+        Me.Label_XAchse.Location = New System.Drawing.Point(6, 38)
         Me.Label_XAchse.Name = "Label_XAchse"
         Me.Label_XAchse.Size = New System.Drawing.Size(50, 13)
         Me.Label_XAchse.TabIndex = 6
@@ -48,7 +50,7 @@ Partial Class ScatterplotAbfrage
         'ListBox_OptZieleX
         '
         Me.ListBox_OptZieleX.FormattingEnabled = True
-        Me.ListBox_OptZieleX.Location = New System.Drawing.Point(9, 55)
+        Me.ListBox_OptZieleX.Location = New System.Drawing.Point(9, 58)
         Me.ListBox_OptZieleX.Name = "ListBox_OptZieleX"
         Me.ListBox_OptZieleX.Size = New System.Drawing.Size(130, 186)
         Me.ListBox_OptZieleX.TabIndex = 5
@@ -61,7 +63,7 @@ Partial Class ScatterplotAbfrage
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanel1.Controls.Add(Me.OK_Button, 0, 0)
         Me.TableLayoutPanel1.Controls.Add(Me.Cancel_Button, 1, 0)
-        Me.TableLayoutPanel1.Location = New System.Drawing.Point(300, 272)
+        Me.TableLayoutPanel1.Location = New System.Drawing.Point(282, 325)
         Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
         Me.TableLayoutPanel1.RowCount = 1
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
@@ -91,7 +93,7 @@ Partial Class ScatterplotAbfrage
         'CheckBox_Scatterplot
         '
         Me.CheckBox_Scatterplot.AutoSize = True
-        Me.CheckBox_Scatterplot.Location = New System.Drawing.Point(6, 19)
+        Me.CheckBox_Scatterplot.Location = New System.Drawing.Point(9, 19)
         Me.CheckBox_Scatterplot.Name = "CheckBox_Scatterplot"
         Me.CheckBox_Scatterplot.Size = New System.Drawing.Size(123, 17)
         Me.CheckBox_Scatterplot.TabIndex = 8
@@ -101,13 +103,15 @@ Partial Class ScatterplotAbfrage
         'GroupBox_Hauptdiagramm
         '
         Me.GroupBox_Hauptdiagramm.Controls.Add(Me.CheckBox_Hauptdiagramm)
-        Me.GroupBox_Hauptdiagramm.Controls.Add(Me.ListBox_OptZieleY)
-        Me.GroupBox_Hauptdiagramm.Controls.Add(Me.ListBox_OptZieleX)
-        Me.GroupBox_Hauptdiagramm.Controls.Add(Me.Label_YAchse)
         Me.GroupBox_Hauptdiagramm.Controls.Add(Me.Label_XAchse)
+        Me.GroupBox_Hauptdiagramm.Controls.Add(Me.Label_YAchse)
+        Me.GroupBox_Hauptdiagramm.Controls.Add(Me.Label_ZAchse)
+        Me.GroupBox_Hauptdiagramm.Controls.Add(Me.ListBox_OptZieleX)
+        Me.GroupBox_Hauptdiagramm.Controls.Add(Me.ListBox_OptZieleY)
+        Me.GroupBox_Hauptdiagramm.Controls.Add(Me.ListBox_OptZieleZ)
         Me.GroupBox_Hauptdiagramm.Location = New System.Drawing.Point(12, 12)
         Me.GroupBox_Hauptdiagramm.Name = "GroupBox_Hauptdiagramm"
-        Me.GroupBox_Hauptdiagramm.Size = New System.Drawing.Size(284, 251)
+        Me.GroupBox_Hauptdiagramm.Size = New System.Drawing.Size(418, 251)
         Me.GroupBox_Hauptdiagramm.TabIndex = 9
         Me.GroupBox_Hauptdiagramm.TabStop = False
         Me.GroupBox_Hauptdiagramm.Text = "Hauptdiagramm"
@@ -117,7 +121,7 @@ Partial Class ScatterplotAbfrage
         Me.CheckBox_Hauptdiagramm.AutoSize = True
         Me.CheckBox_Hauptdiagramm.Checked = True
         Me.CheckBox_Hauptdiagramm.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBox_Hauptdiagramm.Location = New System.Drawing.Point(6, 19)
+        Me.CheckBox_Hauptdiagramm.Location = New System.Drawing.Point(9, 19)
         Me.CheckBox_Hauptdiagramm.Name = "CheckBox_Hauptdiagramm"
         Me.CheckBox_Hauptdiagramm.Size = New System.Drawing.Size(146, 17)
         Me.CheckBox_Hauptdiagramm.TabIndex = 12
@@ -127,7 +131,7 @@ Partial Class ScatterplotAbfrage
         'ListBox_OptZieleY
         '
         Me.ListBox_OptZieleY.FormattingEnabled = True
-        Me.ListBox_OptZieleY.Location = New System.Drawing.Point(144, 55)
+        Me.ListBox_OptZieleY.Location = New System.Drawing.Point(144, 58)
         Me.ListBox_OptZieleY.Name = "ListBox_OptZieleY"
         Me.ListBox_OptZieleY.Size = New System.Drawing.Size(130, 186)
         Me.ListBox_OptZieleY.TabIndex = 10
@@ -135,7 +139,7 @@ Partial Class ScatterplotAbfrage
         'Label_YAchse
         '
         Me.Label_YAchse.AutoSize = True
-        Me.Label_YAchse.Location = New System.Drawing.Point(141, 39)
+        Me.Label_YAchse.Location = New System.Drawing.Point(141, 38)
         Me.Label_YAchse.Name = "Label_YAchse"
         Me.Label_YAchse.Size = New System.Drawing.Size(50, 13)
         Me.Label_YAchse.TabIndex = 11
@@ -144,9 +148,9 @@ Partial Class ScatterplotAbfrage
         'GroupBox_Scatterplot
         '
         Me.GroupBox_Scatterplot.Controls.Add(Me.CheckBox_Scatterplot)
-        Me.GroupBox_Scatterplot.Location = New System.Drawing.Point(302, 12)
+        Me.GroupBox_Scatterplot.Location = New System.Drawing.Point(12, 269)
         Me.GroupBox_Scatterplot.Name = "GroupBox_Scatterplot"
-        Me.GroupBox_Scatterplot.Size = New System.Drawing.Size(140, 251)
+        Me.GroupBox_Scatterplot.Size = New System.Drawing.Size(418, 46)
         Me.GroupBox_Scatterplot.TabIndex = 10
         Me.GroupBox_Scatterplot.TabStop = False
         Me.GroupBox_Scatterplot.Text = "Scatterplot"
@@ -154,18 +158,35 @@ Partial Class ScatterplotAbfrage
         'CheckBox_onlySekPop
         '
         Me.CheckBox_onlySekPop.AutoSize = True
-        Me.CheckBox_onlySekPop.Location = New System.Drawing.Point(139, 279)
+        Me.CheckBox_onlySekPop.Location = New System.Drawing.Point(21, 332)
         Me.CheckBox_onlySekPop.Name = "CheckBox_onlySekPop"
         Me.CheckBox_onlySekPop.Size = New System.Drawing.Size(147, 17)
         Me.CheckBox_onlySekPop.TabIndex = 11
         Me.CheckBox_onlySekPop.Text = "nur sekundäre Population"
         Me.CheckBox_onlySekPop.UseVisualStyleBackColor = True
         '
+        'ListBox_OptZieleZ
+        '
+        Me.ListBox_OptZieleZ.FormattingEnabled = True
+        Me.ListBox_OptZieleZ.Location = New System.Drawing.Point(280, 58)
+        Me.ListBox_OptZieleZ.Name = "ListBox_OptZieleZ"
+        Me.ListBox_OptZieleZ.Size = New System.Drawing.Size(130, 186)
+        Me.ListBox_OptZieleZ.TabIndex = 13
+        '
+        'Label_ZAchse
+        '
+        Me.Label_ZAchse.AutoSize = True
+        Me.Label_ZAchse.Location = New System.Drawing.Point(277, 38)
+        Me.Label_ZAchse.Name = "Label_ZAchse"
+        Me.Label_ZAchse.Size = New System.Drawing.Size(96, 13)
+        Me.Label_ZAchse.TabIndex = 14
+        Me.Label_ZAchse.Text = "Z-Achse (optional):"
+        '
         'ScatterplotAbfrage
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(458, 313)
+        Me.ClientSize = New System.Drawing.Size(440, 366)
         Me.Controls.Add(Me.CheckBox_onlySekPop)
         Me.Controls.Add(Me.GroupBox_Scatterplot)
         Me.Controls.Add(Me.GroupBox_Hauptdiagramm)
@@ -193,4 +214,6 @@ Partial Class ScatterplotAbfrage
     Friend WithEvents CheckBox_Scatterplot As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBox_Hauptdiagramm As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBox_onlySekPop As System.Windows.Forms.CheckBox
+    Friend WithEvents Label_ZAchse As System.Windows.Forms.Label
+    Friend WithEvents ListBox_OptZieleZ As System.Windows.Forms.ListBox
 End Class
