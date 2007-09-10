@@ -54,22 +54,19 @@ Partial Public Class Scatterplot
                         .Axes.Bottom.Title.Caption = xAchse
                         .Axes.Left.Title.Caption = yAchse
 
-                        'Serien initialisieren
-                        '---------------------
-                        Dim SeriesNo, SeriesNoValid, SeriesNoInvalid As Integer
-                        SeriesNoValid = .prepareSeriesPoint(xAchse & ", " & yAchse, "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 1)
-                        SeriesNoInvalid = .prepareSeriesPoint(xAchse & ", " & yAchse & " (ungültig)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 1)
-
                         'Punkte eintragen
                         '----------------
-                        For n = 0 To OptResult.Solutions.getUpperBound(0)
+                        Dim serie As Steema.TeeChart.Styles.Series
+
+                        For n = 0 To OptResult.Solutions.GetUpperBound(0)
                             'Constraintverletzung prüfen
                             If (OptResult.Solutions(n).isValid) Then
-                                SeriesNo = SeriesNoValid
+                                serie = .getSeriesPoint(xAchse & ", " & yAchse, "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 1)
                             Else
-                                SeriesNo = SeriesNoInvalid
+                                serie = .getSeriesPoint(xAchse & ", " & yAchse & " (ungültig)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 1)
                             End If
-                            .Chart.Series(SeriesNo).Add(OptResult.Solutions(n).QWerte(i), OptResult.Solutions(n).QWerte(j))
+                            'Zeichnen
+                            serie.Add(OptResult.Solutions(n).QWerte(i), OptResult.Solutions(n).QWerte(j))
                         Next
                     End With
                 End If

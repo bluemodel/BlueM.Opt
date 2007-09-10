@@ -211,7 +211,7 @@ Public Class Testprobleme
         Dim array_y() As Double = {}
         Dim i As Short
         Dim Unterteilung_X As Double
-        Dim SeriesNo As Integer
+        Dim serie As Steema.TeeChart.Styles.Series
 
         'TeeChart Einrichten und Series generieren
         With Diag
@@ -243,8 +243,8 @@ Public Class Testprobleme
                 array_y(i) = Math.Sin(i * Unterteilung_X)
             Next i
 
-            SeriesNo = .prepareSeriesLine("Sinusfunktion", "Green")
-            .Series(SeriesNo).Add(array_x, array_y)
+            serie = .getSeriesLine("Sinusfunktion", "Green")
+            serie.Add(array_x, array_y)
 
         End With
     End Sub
@@ -258,7 +258,7 @@ Public Class Testprobleme
         Dim Ausgangswert As Double
         Dim Anzahl_Kalkulationen As Integer
         Dim i As Short
-        Dim SeriesNo As Integer
+        Dim serie As Steema.TeeChart.Styles.Series
 
         If (PES_Settings.isPOPUL) Then
             Anzahl_Kalkulationen = PES_Settings.NGen * PES_Settings.NNachf * PES_Settings.NRunden + 1
@@ -295,8 +295,8 @@ Public Class Testprobleme
             Next i
 
             'Den Ausgangswert zeichnen
-            SeriesNo = .prepareSeriesLine("Ausgangswert", "Green")
-            .Series(SeriesNo).Add(array_x, array_y)
+            serie = .getSeriesLine("Ausgangswert", "Green")
+            serie.Add(array_x, array_y)
 
         End With
     End Sub
@@ -311,7 +311,7 @@ Public Class Testprobleme
         Dim Anzahl_Kalkulationen As Integer
         Dim i As Short
         Dim X() As Double
-        Dim SeriesNo as Integer
+        Dim serie As Steema.TeeChart.Styles.Series
 
         If (PES_Settings.isPOPUL) Then
             Anzahl_Kalkulationen = PES_Settings.NGen * PES_Settings.NNachf * PES_Settings.NRunden + 1
@@ -356,8 +356,8 @@ Public Class Testprobleme
             .Chart.Axes.Left.Logarithmic = False
 
             'Ausgangswert zeichnen
-            SeriesNo = .prepareSeriesLine("Ausgangswert", "Red")
-            .Series(SeriesNo).Add(array_x, array_y)
+            serie = .getSeriesLine("Ausgangswert", "Red")
+            serie.Add(array_x, array_y)
 
         End With
 
@@ -368,7 +368,7 @@ Public Class Testprobleme
     Private Sub DiagInitialise_MultiTestProb(ByVal PES_Settings As EvoKern.PES.Struct_Settings, ByRef Diag As Main.Diagramm)
 
         Dim i, j As Short
-        Dim SeriesNo As Integer
+        Dim serie As Steema.TeeChart.Styles.Series
 
         With Diag
             .Clear()
@@ -382,157 +382,157 @@ Public Class Testprobleme
             .Chart.Axes.Left.Maximum = 10
             .Chart.Axes.Left.Minimum = 0
             .Chart.Axes.Left.Increment = 2
+        End With
 
-            Select Case Me.Combo_Testproblem.Text
+        Select Case Me.Combo_Testproblem.Text
 
-                Case "Deb 1"
-                    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-                    Dim Array1X(100) As Double
-                    Dim Array1Y(100) As Double
-                    Dim Array2X(100) As Double
-                    Dim Array2Y(100) As Double
-                    .Header.Text = "Deb D1 - MO-konvex"
+            Case "Deb 1"
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                Dim Array1X(100) As Double
+                Dim Array1Y(100) As Double
+                Dim Array2X(100) As Double
+                Dim Array2Y(100) As Double
+                Diag.Header.Text = "Deb D1 - MO-konvex"
 
-                    'Paretofront berechnen und zeichnen
-                    For j = 0 To 100
-                        Array1X(j) = 0.1 + j * 0.009
-                        Array1Y(j) = 1 / Array1X(j)
-                    Next j
-                    SeriesNo = Diag.prepareSeriesLine("Paretofront", "Green")
-                    .Series(SeriesNo).Add(Array1X, Array1Y)
+                'Paretofront berechnen und zeichnen
+                For j = 0 To 100
+                    Array1X(j) = 0.1 + j * 0.009
+                    Array1Y(j) = 1 / Array1X(j)
+                Next j
+                serie = Diag.getSeriesLine("Paretofront", "Green")
+                serie.Add(Array1X, Array1Y)
 
-                    'Linie 2 berechnen und zeichnen
-                    For j = 0 To 100
-                        Array2X(j) = 0.1 + j * 0.009
-                        Array2Y(j) = (1 + 5) / Array2X(j)
-                    Next j
-                    SeriesNo = Diag.prepareSeriesLine("Linie 2", "Red")
-                    .Series(SeriesNo).Add(Array2X, Array2Y)
+                'Linie 2 berechnen und zeichnen
+                For j = 0 To 100
+                    Array2X(j) = 0.1 + j * 0.009
+                    Array2Y(j) = (1 + 5) / Array2X(j)
+                Next j
+                serie = Diag.getSeriesLine("Linie 2", "Red")
+                serie.Add(Array2X, Array2Y)
 
 
-                Case "Zitzler/Deb T1"
-                    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-                    Dim ArrayX(1000) As Double
-                    Dim ArrayY(1000) As Double
-                    .Header.Text = "Zitzler/Deb/Theile T1"
-                    .Chart.Axes.Left.Maximum = 7
-                    .Chart.Axes.Left.Increment = 0.5
+            Case "Zitzler/Deb T1"
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                Dim ArrayX(1000) As Double
+                Dim ArrayY(1000) As Double
+                Diag.Header.Text = "Zitzler/Deb/Theile T1"
+                Diag.Chart.Axes.Left.Maximum = 7
+                Diag.Chart.Axes.Left.Increment = 0.5
 
-                    'Paretofront berechnen und zeichnen
+                'Paretofront berechnen und zeichnen
+                For j = 0 To 1000
+                    ArrayX(j) = j / 1000
+                    ArrayY(j) = 1 - Math.Sqrt(ArrayX(j))
+                Next j
+                serie = Diag.getSeriesLine("Paretofront", "Green")
+                serie.Add(ArrayX, ArrayY)
+
+
+            Case "Zitzler/Deb T2"
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                Dim ArrayX(100) As Double
+                Dim ArrayY(100) As Double
+                Diag.Header.Text = "Zitzler/Deb/Theile T2"
+                Diag.Chart.Axes.Left.Maximum = 7
+
+                'Paretofront berechnen und zeichnen
+                For j = 0 To 100
+                    ArrayX(j) = j / 100
+                    ArrayY(j) = 1 - (ArrayX(j) * ArrayX(j))
+                Next j
+                serie = Diag.getSeriesLine("Paretofront", "Green")
+                serie.Add(ArrayX, ArrayY)
+
+
+            Case "Zitzler/Deb T3"
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                'TODO: Titel der Serien (für Export)
+                Dim ArrayX(100) As Double
+                Dim ArrayY(100) As Double
+                Diag.Header.Text = "Zitzler/Deb/Theile T3"
+                Diag.Chart.Axes.Bottom.Increment = 0.2
+                Diag.Chart.Axes.Left.Maximum = 7
+                Diag.Chart.Axes.Left.Minimum = -1
+                Diag.Chart.Axes.Left.Increment = 0.5
+
+                'Paretofront berechnen und zeichnen
+                For j = 0 To 100
+                    ArrayX(j) = j / 100
+                    ArrayY(j) = 1 - Math.Sqrt(ArrayX(j)) - ArrayX(j) * Math.Sin(10 * Math.PI * ArrayX(j))
+                Next j
+                serie = Diag.getSeriesLine("Paretofront", "Green")
+                serie.Add(ArrayX, ArrayY)
+
+
+            Case "Zitzler/Deb T4"
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                Dim ArrayX(1000) As Double
+                Dim ArrayY(1000) As Double
+                Diag.Header.Text = "Zitzler/Deb/Theile T4"
+                Diag.Chart.Axes.Bottom.Automatic = True
+                Diag.Chart.Axes.Left.Automatic = True
+
+                'Lokale Optima berechnen und zeichnen
+                For i = 1 To 10
                     For j = 0 To 1000
                         ArrayX(j) = j / 1000
-                        ArrayY(j) = 1 - Math.Sqrt(ArrayX(j))
-                    Next j
-                    SeriesNo = Diag.prepareSeriesLine("Paretofront", "Green")
-                    Diag.Series(SeriesNo).Add(ArrayX, ArrayY)
-
-
-                Case "Zitzler/Deb T2"
-                    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-                    Dim ArrayX(100) As Double
-                    Dim ArrayY(100) As Double
-                    .Header.Text = "Zitzler/Deb/Theile T2"
-                    .Chart.Axes.Left.Maximum = 7
-
-                    'Paretofront berechnen und zeichnen
-                    For j = 0 To 100
-                        ArrayX(j) = j / 100
-                        ArrayY(j) = 1 - (ArrayX(j) * ArrayX(j))
-                    Next j
-                    SeriesNo = Diag.prepareSeriesLine("Paretofront", "Green")
-                    Diag.Series(SeriesNo).Add(ArrayX, ArrayY)
-
-
-                Case "Zitzler/Deb T3"
-                    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-                    'TODO: Titel der Serien (für Export)
-                    Dim ArrayX(100) As Double
-                    Dim ArrayY(100) As Double
-                    .Header.Text = "Zitzler/Deb/Theile T3"
-                    .Chart.Axes.Bottom.Increment = 0.2
-                    .Chart.Axes.Left.Maximum = 7
-                    .Chart.Axes.Left.Minimum = -1
-                    .Chart.Axes.Left.Increment = 0.5
-
-                    'Paretofront berechnen und zeichnen
-                    For j = 0 To 100
-                        ArrayX(j) = j / 100
-                        ArrayY(j) = 1 - Math.Sqrt(ArrayX(j)) - ArrayX(j) * Math.Sin(10 * Math.PI * ArrayX(j))
-                    Next j
-                    SeriesNo = Diag.prepareSeriesLine("Paretofront", "Green")
-                    Diag.Series(SeriesNo).Add(ArrayX, ArrayY)
-
-
-                Case "Zitzler/Deb T4"
-                    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-                    Dim ArrayX(1000) As Double
-                    Dim ArrayY(1000) As Double
-                    .Header.Text = "Zitzler/Deb/Theile T4"
-                    .Chart.Axes.Bottom.Automatic = True
-                    .Chart.Axes.Left.Automatic = True
-
-                    'Lokale Optima berechnen und zeichnen
-                    For i = 1 To 10
-                        For j = 0 To 1000
-                            ArrayX(j) = j / 1000
-                            ArrayY(j) = (1 + (i - 1) / 4) * (1 - Math.Sqrt(ArrayX(j) / (1 + (i - 1) / 4)))
-                        Next
-                        SeriesNo = .prepareSeriesLine("Lokales Optimum " & i)
-                        .Series(SeriesNo).Add(ArrayX, ArrayY)
+                        ArrayY(j) = (1 + (i - 1) / 4) * (1 - Math.Sqrt(ArrayX(j) / (1 + (i - 1) / 4)))
                     Next
+                    serie = Diag.getSeriesLine("Lokales Optimum " & i)
+                    serie.Add(ArrayX, ArrayY)
+                Next
 
 
-                Case "CONSTR"
-                    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-                    Dim Array1X(100) As Double
-                    Dim Array1Y(100) As Double
-                    Dim Array2X(100) As Double
-                    Dim Array2Y(100) As Double
-                    Dim Array3X(61) As Double
-                    Dim Array3Y(61) As Double
-                    Dim Array4X(61) As Double
-                    Dim Array4Y(61) As Double
-                    .Header.Text = "CONSTR"
+            Case "CONSTR"
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                Dim Array1X(100) As Double
+                Dim Array1Y(100) As Double
+                Dim Array2X(100) As Double
+                Dim Array2Y(100) As Double
+                Dim Array3X(61) As Double
+                Dim Array3Y(61) As Double
+                Dim Array4X(61) As Double
+                Dim Array4Y(61) As Double
+                Diag.Header.Text = "CONSTR"
 
-                    'Grenze 1 berechnen und zeichnen
-                    For j = 0 To 100
-                        Array1X(j) = 0.1 + j * 0.009
-                        Array1Y(j) = 1 / Array1X(j)
-                    Next j
-                    SeriesNo = .prepareSeriesLine("Grenze 1", "Red")
-                    .Series(SeriesNo).Add(Array1X, Array1Y)
+                'Grenze 1 berechnen und zeichnen
+                For j = 0 To 100
+                    Array1X(j) = 0.1 + j * 0.009
+                    Array1Y(j) = 1 / Array1X(j)
+                Next j
+                serie = Diag.getSeriesLine("Grenze 1", "Red")
+                serie.Add(Array1X, Array1Y)
 
-                    'Grenze 2 berechnen und zeichnen
-                    For j = 0 To 100
-                        Array2X(j) = 0.1 + j * 0.009
-                        Array2Y(j) = (1 + 5) / Array2X(j)
-                    Next j
-                    SeriesNo = .prepareSeriesLine("Grenze 2", "Red")
-                    .Series(SeriesNo).Add(Array2X, Array2Y)
+                'Grenze 2 berechnen und zeichnen
+                For j = 0 To 100
+                    Array2X(j) = 0.1 + j * 0.009
+                    Array2Y(j) = (1 + 5) / Array2X(j)
+                Next j
+                serie = Diag.getSeriesLine("Grenze 2", "Red")
+                serie.Add(Array2X, Array2Y)
 
-                    'Grenze 3 berechnen und zeichnen
-                    ReDim Array3X(61)
-                    ReDim Array3Y(61)
-                    For j = 0 To 61
-                        Array3X(j) = 0.1 + (j + 2) * 0.009
-                        Array3Y(j) = (7 - 9 * Array3X(j)) / Array3X(j)
-                    Next j
-                    SeriesNo = .prepareSeriesLine("Grenze 3", "Blue")
-                    .Series(SeriesNo).Add(Array3X, Array3Y)
+                'Grenze 3 berechnen und zeichnen
+                ReDim Array3X(61)
+                ReDim Array3Y(61)
+                For j = 0 To 61
+                    Array3X(j) = 0.1 + (j + 2) * 0.009
+                    Array3Y(j) = (7 - 9 * Array3X(j)) / Array3X(j)
+                Next j
+                serie = Diag.getSeriesLine("Grenze 3", "Blue")
+                serie.Add(Array3X, Array3Y)
 
-                    'Grenze 4 berechnen und zeichnen
-                    ReDim Array4X(61)
-                    ReDim Array4Y(61)
-                    For j = 0 To 61
-                        Array4X(j) = 0.1 + (j + 2) * 0.009
-                        Array4Y(j) = (9 * Array4X(j)) / Array4X(j)
-                    Next j
-                    SeriesNo = .prepareSeriesLine("Grenze 4", "Red")
-                    .Series(SeriesNo).Add(Array4X, Array4Y)
+                'Grenze 4 berechnen und zeichnen
+                ReDim Array4X(61)
+                ReDim Array4Y(61)
+                For j = 0 To 61
+                    Array4X(j) = 0.1 + (j + 2) * 0.009
+                    Array4Y(j) = (9 * Array4X(j)) / Array4X(j)
+                Next j
+                serie = Diag.getSeriesLine("Grenze 4", "Red")
+                serie.Add(Array4X, Array4Y)
 
-            End Select
+        End Select
 
-        End With
     End Sub
 
     'Diagramm für Box-Problem (3D) initialisieren
@@ -661,47 +661,6 @@ Public Class Testprobleme
             series3D.Add(0.5, 0, 0.3)
             series3D.Add(0, 0.5, 0.3)
 
-            'Series für die Population
-            series3D = New Steema.TeeChart.Styles.Points3D(Diag.Chart)
-            series3D.Title = "Population"
-            series3D.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            series3D.Pointer.Draw3D = True
-            series3D.Depth = 3
-            series3D.Pointer.HorizSize = 3
-            series3D.Pointer.VertSize = 3
-            series3D.Pointer.Color = Color.Orange
-            series3D.LinePen.Visible = False
-            series3D.ColorEach = False
-
-            'Series für die ungültige Population
-            series3D = New Steema.TeeChart.Styles.Points3D(Diag.Chart)
-            series3D.Title = "Population (ungültig)"
-            series3D.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            series3D.Pointer.Draw3D = True
-            series3D.Depth = 3
-            series3D.Pointer.HorizSize = 3
-            series3D.Pointer.VertSize = 3
-            series3D.Pointer.Color = Color.Gray
-            series3D.LinePen.Visible = False
-            series3D.ColorEach = False
-
-            'Series für die Sekundäre Population
-            'BUG 195: Sekundäre Population wird nur in 2D gezeichnet
-            series3D = New Steema.TeeChart.Styles.Points3D(Diag.Chart)
-            series3D.Title = "Sekundäre Population"
-            series3D.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            series3D.Pointer.Draw3D = True
-            series3D.Depth = 3
-            series3D.Pointer.HorizSize = 3
-            series3D.Pointer.VertSize = 3
-            series3D.Pointer.Color = Color.Green
-            series3D.LinePen.Visible = False
-            series3D.ColorEach = False
-
-            'BUG: TeeChart MarksTip funktioniert momentan nur in der XY-Ebene
-            'Siehe http://www.teechart.net/support/viewtopic.php?t=5982&highlight=&sid=4db52d0d1a4b78f30842ede881ce5bef
-            'Call Diag.add_MarksTips()
-
         End With
 
 
@@ -722,7 +681,7 @@ Public Class Testprobleme
         Dim f2, f1, f3 As Double
         Dim g1, g2 As Double
         Dim globalAnzPar As Short = UBound(mypara)
-        Dim SeriesNo As Integer
+        Dim serie As Steema.TeeChart.Styles.Series
 
         Select Case Testproblem
 
@@ -754,8 +713,8 @@ Public Class Testprobleme
                     array_y(i) = (-1 + mypara(i + 1) * 2)                       'Bug 135: mypara fängt bei 1 an!
                 Next i
 
-                SeriesNo = Diag.prepareSeriesPoint("Population " & ipop)
-                Diag.Series(SeriesNo).Add(array_x, array_y)
+                serie = Diag.getSeriesPoint("Population " & ipop)
+                serie.Add(array_x, array_y)
 
 
             Case "Beale-Problem"
@@ -770,8 +729,8 @@ Public Class Testprobleme
 
                 'Zeichnen
                 '--------
-                SeriesNo = Diag.prepareSeriesPoint("Population " & ipop)
-                Diag.Series(SeriesNo).Add(durchlauf, QN(0))
+                serie = Diag.getSeriesPoint("Population " & ipop)
+                serie.Add(durchlauf, QN(0))
 
             Case "Schwefel 2.4-Problem"
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -789,8 +748,8 @@ Public Class Testprobleme
 
                 'Zeichnen
                 '--------
-                SeriesNo = Diag.prepareSeriesPoint("Population " & ipop)
-                Diag.Series(SeriesNo).Add(durchlauf, QN(0))
+                serie = Diag.getSeriesPoint("Population " & ipop)
+                serie.Add(durchlauf, QN(0))
 
                 '*************************************
                 '* Multi-Objective Problemstellungen *
@@ -808,8 +767,8 @@ Public Class Testprobleme
 
                 'Zeichnen
                 '--------
-                SeriesNo = Diag.prepareSeriesPoint("Population", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                Diag.Series(SeriesNo).Add(f1, f2)
+                serie = Diag.getSeriesPoint("Population", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                serie.Add(f1, f2)
 
             Case "Zitzler/Deb T1" 'Zitzler/Deb/Thiele 2000, T1 (Konvexe Pareto-Front)
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -828,8 +787,8 @@ Public Class Testprobleme
 
                 'Zeichnen
                 '--------
-                SeriesNo = Diag.prepareSeriesPoint("Population", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                Diag.Series(SeriesNo).Add(f1, f2)
+                serie = Diag.getSeriesPoint("Population", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                serie.Add(f1, f2)
 
             Case "Zitzler/Deb T2" 'Zitzler/Deb/Thiele 2000, T2 (Non-Konvexe Pareto-Front)
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -848,8 +807,8 @@ Public Class Testprobleme
 
                 'Zeichnen
                 '--------
-                SeriesNo = Diag.prepareSeriesPoint("Population", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                Diag.Series(SeriesNo).Add(f1, f2)
+                serie = Diag.getSeriesPoint("Population", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                serie.Add(f1, f2)
 
             Case "Zitzler/Deb T3" 'Zitzler/Deb/Thiele 2000, T3 (disconected Pareto-Front)
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -868,8 +827,8 @@ Public Class Testprobleme
 
                 'Zeichnen
                 '--------
-                SeriesNo = Diag.prepareSeriesPoint("Population", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                Diag.Series(SeriesNo).Add(f1, f2)
+                serie = Diag.getSeriesPoint("Population", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                serie.Add(f1, f2)
 
             Case "Zitzler/Deb T4" 'Zitzler/Deb/Thiele 2000, T4 (local/global Pareto-Fronts)
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -889,8 +848,8 @@ Public Class Testprobleme
 
                 'Zeichnen
                 '--------
-                SeriesNo = Diag.prepareSeriesPoint("Population", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                Diag.Series(SeriesNo).Add(f1, f2)
+                serie = Diag.getSeriesPoint("Population", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                serie.Add(f1, f2)
 
             Case "CONSTR"
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -915,13 +874,12 @@ Public Class Testprobleme
                 '--------
                 If (g1 < 0 Or g2 < 0) Then
                     'Ungültige Lösung
-                    SeriesNo = Diag.prepareSeriesPoint("Population (ungültig)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                    Diag.Series(SeriesNo).Add(f1, f2)
+                    serie = Diag.getSeriesPoint("Population (ungültig)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                 Else
                     'Gültige Lösung
-                    SeriesNo = Diag.prepareSeriesPoint("Population", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                    Diag.Series(SeriesNo).Add(f1, f2)
+                    serie = Diag.getSeriesPoint("Population", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                 End If
+                serie.Add(f1, f2)
 
             Case "Box"
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -946,16 +904,15 @@ Public Class Testprobleme
 
                 'Zeichnen
                 '--------
-                Dim series3D As Steema.TeeChart.Styles.Points3D
+                Dim serie3D As Steema.TeeChart.Styles.Points3D
                 If (g1 < 0 Or g2 < 0) Then
                     'Ungültige Lösung
-                    SeriesNo = Diag.prepareSeriesPoint("Population (ungültig)", "Gray")
+                    serie3D = Diag.getSeries3DPoint("Population (ungültig)", "Gray")
                 Else
                     'Gültige Lösung
-                    SeriesNo = Diag.prepareSeriesPoint("Population", "Orange")
+                    serie3D = Diag.getSeries3DPoint("Population", "Orange")
                 End If
-                series3D = Diag.Series(SeriesNo)
-                series3D.Add(f1, f2, f3)
+                serie3D.Add(f1, f2, f3)
 
         End Select
 
