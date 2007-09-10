@@ -126,7 +126,7 @@ Partial Class Form1
             Me.Button_Scatterplot.Enabled = False
 
             'Mauszeiger busy
-            Cursor = System.Windows.Forms.Cursors.WaitCursor
+            Cursor = Cursors.WaitCursor
 
             Me.Anwendung = ComboBox_Anwendung.SelectedItem
 
@@ -136,7 +136,7 @@ Partial Class Form1
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Mauszeiger wieder normal
-                    Cursor = System.Windows.Forms.Cursors.Default
+                    Cursor = Cursors.Default
                     Exit Sub
 
 
@@ -187,7 +187,7 @@ Partial Class Form1
             End Select
 
             'Mauszeiger wieder normal
-            Cursor = System.Windows.Forms.Cursors.Default
+            Cursor = Cursors.Default
 
             'Combobox Methode aktivieren
             If (Not Anwendung = ANW_TESTPROBLEME And Not Anwendung = ANW_TSP) Then
@@ -224,7 +224,7 @@ Partial Class Form1
             EVO_Settings1.Enabled = False
 
             'Mauszeiger busy
-            Cursor = System.Windows.Forms.Cursors.WaitCursor
+            Cursor = Cursors.WaitCursor
 
             'Methode setzen und an Sim übergeben
             Me.Method = ComboBox_Methode.SelectedItem
@@ -236,7 +236,7 @@ Partial Class Form1
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Mauszeiger wieder normal
-                    Cursor = System.Windows.Forms.Cursors.Default
+                    Cursor = Cursors.Default
                     Exit Sub
 
 
@@ -278,7 +278,7 @@ Partial Class Form1
                     SensiPlotDiagResult = SensiPlot1.ShowDialog()
                     If (Not SensiPlotDiagResult = Windows.Forms.DialogResult.OK) Then
                         'Mauszeiger wieder normal
-                        Cursor = System.Windows.Forms.Cursors.Default
+                        Cursor = Cursors.Default
                         Exit Sub
                     End If
 
@@ -380,7 +380,7 @@ Partial Class Form1
             Me.Button_Start.Enabled = True
 
             'Mauszeiger wieder normal
-            Cursor = System.Windows.Forms.Cursors.Default
+            Cursor = Cursors.Default
 
         End If
 
@@ -531,8 +531,8 @@ Partial Class Form1
             rotate1.Button = Windows.Forms.MouseButtons.Right
             Me.DForm.Diag.Tools.Add(rotate1)
             'Punkte anklicken (linker Mausbutton)
-            Me.DForm.Diag.add_MarksTips()
-            surface.Title = "Population"
+            Me.DForm.Diag.add_MarksTips(surface)
+            surface.Title = "SensiPlot"
             surface.Cursor = Cursors.Hand
         End If
 
@@ -578,7 +578,8 @@ Partial Class Form1
                 'Diagramm aktualisieren
                 If (Me.globalAnzPar = 1) Then
                     '1 Parameter
-                    DForm.Diag.Series(0).Add(Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).QWertTmp, Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Wert, "")
+                    Dim SeriesNo As Integer = DForm.Diag.prepareSeriesPoint("SensiPlot", "Orange")
+                    DForm.Diag.Series(SeriesNo).Add(Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).QWertTmp, Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Wert, "")
                 Else
                     '2 Parameter
                     surface.Add(Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Wert, Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).QWertTmp, Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Wert)
@@ -997,8 +998,7 @@ Start_Evolutionsrunden:
                                         Else
                                         SeriesNo = DForm.Diag.prepareSeriesPoint("Population " & PES1.PES_iAkt.iAktPop, "Orange")
                                         End If
-                                        DForm.Diag.Series(SeriesNo).Cursor = Cursors.Hand
-                                    Call DForm.Diag.Series(SeriesNo).Add(durchlauf, QN(0))
+                                        Call DForm.Diag.Series(SeriesNo).Add(durchlauf, QN(0))
 
                                     Else
                                         'MultiObjective
@@ -1011,8 +1011,7 @@ Start_Evolutionsrunden:
                                         Else
                                             SeriesNo = DForm.Diag.prepareSeriesPoint("Population", "Orange")
                                         End If
-                                        DForm.Diag.Series(SeriesNo).Cursor = Cursors.Hand
-                                        Call DForm.Diag.Series(SeriesNo).Add(QN(0), QN(1))
+                                            Call DForm.Diag.Series(SeriesNo).Add(QN(0), QN(1))
 
                                     Else
                                         '3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
@@ -1166,6 +1165,9 @@ Start_Evolutionsrunden:
                     Case METH_SENSIPLOT 'SensiPlot
                         'XXXXXXXXXXXXXXXXXXXXXXXXX
 
+                        Dim Achse As Diagramm.Achse
+                        Dim Achsen As New Collection
+
                         If (SensiPlot1.Selected_OptParameter.GetLength(0) = 1) Then
 
                             '1 OptParameter:
@@ -1173,8 +1175,6 @@ Start_Evolutionsrunden:
 
                             'Achsen:
                             '-------
-                            Dim Achse As Diagramm.Achse
-                            Dim Achsen As New Collection
                             'X-Achse = QWert
                             Achse.Name = Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).Bezeichnung
                             Achse.Auto = True
@@ -1186,28 +1186,12 @@ Start_Evolutionsrunden:
                             Achse.Max = 0
                             Achsen.Add(Achse)
 
-                            'Diagramm initialisieren
-                            Call DForm.Diag.DiagInitialise(Anwendung, Achsen)
-
-                            'Series initialisieren
-                            Dim tmpPoint As New Steema.TeeChart.Styles.Points(Me.DForm.Diag.Chart)
-                            tmpPoint.Title = "Population"
-                            tmpPoint.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-                            tmpPoint.Color = System.Drawing.Color.Orange
-                            tmpPoint.Pointer.HorizSize = 2
-                            tmpPoint.Pointer.VertSize = 2
-                            tmpPoint.Cursor = Cursors.Hand
-
-                            Call DForm.Diag.add_MarksTips()
-
                         Else
                             '2 OptParameter:
                             '---------------
 
                             'Achsen:
                             '-------
-                            Dim Achse As Diagramm.Achse
-                            Dim Achsen As New Collection
                             'X-Achse = OptParameter1
                             Achse.Name = Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Bezeichnung
                             Achse.Auto = True
@@ -1218,27 +1202,16 @@ Start_Evolutionsrunden:
                             Achse.Auto = True
                             Achse.Max = 0
                             Achsen.Add(Achse)
-
-                            'Diagramm initialisieren
-                            Call DForm.Diag.DiagInitialise(Anwendung, Achsen)
-
                             'Z-Achse = OptParameter2
-                            DForm.Diag.Axes.Depth.Title.Caption = Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Bezeichnung
-                            DForm.Diag.Axes.Depth.Automatic = True
-                            DForm.Diag.Axes.Depth.Visible = True
-
-                            '3D-Diagramm vorbereiten
-                            DForm.Diag.Aspect.View3D = True
-                            DForm.Diag.Aspect.Chart3DPercent = 90
-                            DForm.Diag.Aspect.Elevation = 348
-                            DForm.Diag.Aspect.Orthogonal = False
-                            DForm.Diag.Aspect.Perspective = 62
-                            DForm.Diag.Aspect.Rotation = 329
-                            DForm.Diag.Aspect.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality
-                            DForm.Diag.Aspect.VertOffset = -20
-                            DForm.Diag.Aspect.Zoom = 66
+                            Achse.Name = Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Bezeichnung
+                            Achse.Auto = True
+                            Achse.Max = 0
+                            Achsen.Add(Achse)
 
                         End If
+
+                        'Diagramm initialisieren
+                        Call DForm.Diag.DiagInitialise(Anwendung, Achsen)
 
 
                     Case METH_CES, METH_CES_PES, METH_HYBRID 'Methode CES
@@ -1552,19 +1525,15 @@ Start_Evolutionsrunden:
                         '--
                         'Serie für gültige Lösungen
                         SeriesNoValid = Me.DForm.Diag.prepareSeriesPoint("Population", "Orange")
-                        Me.DForm.Diag.Chart.Series(SeriesNoValid).Cursor = Cursors.Hand
                         'Serie für ungültige Lösungen
                         SeriesNoInvalid = Me.DForm.Diag.prepareSeriesPoint("Population (ungültig)", "Gray")
-                        Me.DForm.Diag.Chart.Series(SeriesNoInvalid).Cursor = Cursors.Hand
                     Else
                         '3D
                         '--
                         'Serie für gültige Lösungen
                         SeriesNoValid = Me.DForm.Diag.prepareSeries3DPoint("Population", "Orange")
-                        Me.DForm.Diag.Chart.Series(SeriesNoValid).Cursor = Cursors.Hand
                         'Serie für ungültige Lösungen
                         SeriesNoInvalid = Me.DForm.Diag.prepareSeries3DPoint("Population (ungültig)", "Gray")
-                        Me.DForm.Diag.Chart.Series(SeriesNoInvalid).Cursor = Cursors.Hand
                     End If
 
                     'Punkte eintragen
