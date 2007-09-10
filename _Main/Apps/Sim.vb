@@ -1308,7 +1308,7 @@ Public MustInherit Class Sim
 
     End Sub
 
-    'Evaluiert die Kinderchen mti Hilfe des Simulationsmodells
+    'Evaluiert die Kinderchen mit Hilfe des Simulationsmodells
     '*********************************************************
     Public Function SIM_Evaluierung(ByRef QN() As Double, ByRef RN() As Double) As Boolean
 
@@ -1319,22 +1319,22 @@ Public MustInherit Class Sim
         'Modell Starten
         If Not launchSim() Then Exit Function
 
-        'Qualitätswerte berechnen und Rückgabe an den OptiAlgo
+        'Qualitätswerte berechnen
         For i = 0 To Me.List_OptZiele.GetUpperBound(0)
             List_OptZiele(i).QWertTmp = QWert(List_OptZiele(i))
             QN(i) = List_OptZiele(i).QWertTmp
         Next
-
-        'Qualitätswerte und OptParameter in DB speichern
-        If (Ergebnisdb = True) Then
-            Call Me.db_update()
-        End If
 
         'Constraints berechnen
         For i = 0 To Me.List_Constraints.GetUpperBound(0)
             List_Constraints(i).ConstTmp = Constraint(List_Constraints(i))
             RN(i) = List_Constraints(i).ConstTmp
         Next
+
+        'Lösung in DB speichern
+        If (Ergebnisdb = True) Then
+            Call Me.db_update()
+        End If
 
         SIM_Evaluierung = True
 
