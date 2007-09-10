@@ -66,6 +66,10 @@ Public Class Diagramm
                 .Chart.Aspect.VertOffset = -20
                 .Chart.Aspect.Zoom = 66
 
+                'Rotate Tool
+                Dim rotate as New Steema.TeeChart.Tools.Rotate(.Chart)
+                rotate.Button = Windows.Forms.MouseButtons.Right
+
             End If
 
         End With
@@ -156,9 +160,9 @@ Public Class Diagramm
                 tmpSeries.Color = Drawing.Color.FromName(colorName)
             End If
 
-            'BUG: TeeChart MarksTip funktioniert momentan nur in der XY-Ebene
+            'BUG: TeeChart MarksTip funktioniert momentan nur in der XY-Ebene korrekt
             'Siehe http://www.teechart.net/support/viewtopic.php?t=5982&highlight=&sid=4db52d0d1a4b78f30842ede881ce5bef
-            'Call Me.add_MarksTips()
+            Call Me.add_MarksTips()
 
             SeriesNo = Me.Chart.Series.Count - 1
         Else
