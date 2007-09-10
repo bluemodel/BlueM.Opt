@@ -496,6 +496,9 @@ Partial Class Form1
         'geschrieben, und zwar mit den in der OPT-Datei angegebenen Startwerten
         '------------------------------------------------------------------------
 
+        Dim serie As Steema.TeeChart.Styles.Series
+        Dim surface As New Steema.TeeChart.Styles.Surface
+
         'Parameterübergabe an ES
         Me.globalAnzZiel = 1
         Me.globalAnzRand = 0
@@ -520,7 +523,6 @@ Partial Class Form1
         Call PrepareDiagramm()
 
         'Oberflächendiagramm
-        Dim surface As New Steema.TeeChart.Styles.Surface
         If (Me.globalAnzPar > 1) Then
             surface = New Steema.TeeChart.Styles.Surface(Me.DForm.Diag.Chart)
             surface.IrregularGrid = True
@@ -578,8 +580,8 @@ Partial Class Form1
                 'Diagramm aktualisieren
                 If (Me.globalAnzPar = 1) Then
                     '1 Parameter
-                    Dim SeriesNo As Integer = DForm.Diag.prepareSeriesPoint("SensiPlot", "Orange")
-                    DForm.Diag.Series(SeriesNo).Add(Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).QWertTmp, Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Wert, "")
+                    serie = DForm.Diag.getSeriesPoint("SensiPlot", "Orange")
+                    serie.Add(Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).QWertTmp, Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Wert, "")
                 Else
                     '2 Parameter
                     surface.Add(Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Wert, Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).QWertTmp, Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Wert)
@@ -676,7 +678,7 @@ Partial Class Form1
         End If
 
         Dim durchlauf_all As Integer = 0
-        Dim SeriesNo As Integer
+        Dim serie As Steema.TeeChart.Styles.Series
 
         'Laufvariable für die Generationen
         Dim gen As Integer
@@ -741,11 +743,11 @@ Partial Class Form1
                 End If
 
                 'Zeichnen MO_SO Zeichnen
-                SeriesNo = DForm.Diag.prepareSeriesPoint("Childs", "", Steema.TeeChart.Styles.PointerStyles.Triangle, 4)
+                serie = DForm.Diag.getSeriesPoint("Childs", "", Steema.TeeChart.Styles.PointerStyles.Triangle, 4)
                 If CES1.n_Penalty = 1 Then
-                    Call DForm.Diag.Series(SeriesNo).Add(durchlauf_all, CES1.List_Childs(i).Penalty(0))
+                    Call serie.Add(durchlauf_all, CES1.List_Childs(i).Penalty(0))
                 ElseIf CES1.n_Penalty = 2 Then
-                    Call DForm.Diag.Series(SeriesNo).Add(CES1.List_Childs(i).Penalty(0), CES1.List_Childs(i).Penalty(1))
+                    Call serie.Add(CES1.List_Childs(i).Penalty(0), CES1.List_Childs(i).Penalty(1))
                 End If
 
                 System.Windows.Forms.Application.DoEvents()
@@ -761,8 +763,8 @@ Partial Class Form1
                 'Zeichnen des besten Elter
                 For i = 0 To CES1.n_Parents - 1
                     'durchlauf += 1
-                    SeriesNo = DForm.Diag.prepareSeriesPoint("Parent", "", Steema.TeeChart.Styles.PointerStyles.Triangle, 3)
-                    Call DForm.Diag.Series(SeriesNo).Add(durchlauf_all, CES1.List_Parents(i).Penalty(0))
+                    serie = DForm.Diag.getSeriesPoint("Parent", "", Steema.TeeChart.Styles.PointerStyles.Triangle, 3)
+                    Call serie.Add(durchlauf_all, CES1.List_Parents(i).Penalty(0))
                 Next
 
             ElseIf CES1.n_Penalty = 2 Then
@@ -770,9 +772,9 @@ Partial Class Form1
                 Call CES1.NDSorting_Control()
                 'Zeichnen von NDSortingResult
                 Call DForm.Diag.DeleteSeries(CES1.n_Childs - 1, 1)
+                serie = DForm.Diag.getSeriesPoint("Front:" & 1, "", Steema.TeeChart.Styles.PointerStyles.Triangle, 4)
                 For i = 0 To CES1.n_Childs - 1
-                    SeriesNo = DForm.Diag.prepareSeriesPoint("Front:" & 1, "", Steema.TeeChart.Styles.PointerStyles.Triangle, 4)
-                    Call DForm.Diag.Series(SeriesNo).Add(CES1.NDSResult(i).Penalty(0), CES1.NDSResult(i).Penalty(1))
+                    Call serie.Add(CES1.NDSResult(i).Penalty(0), CES1.NDSResult(i).Penalty(1))
                 Next
             End If
 
@@ -977,14 +979,14 @@ Start_Evolutionsrunden:
                                     'Evaluierung des Simulationsmodells (ToDo: Validätsprüfung fehlt)
                                     SIM_Eval_is_OK = Sim1.SIM_Evaluierung(QN, RN)
 
-                                'Lösung im TeeChart einzeichnen
-                                '==============================
-                                    Dim SeriesNo As Integer
+                                    'Lösung im TeeChart einzeichnen
+                                    '==============================
+                                    Dim serie As Steema.TeeChart.Styles.Series
 
                                     'Constraintverletzung prüfen
                                     Dim isInvalid As Boolean = False
-                                For i = 0 To globalAnzRand - 1
-                                    If (RN(i) < 0) Then
+                                    For i = 0 To globalAnzRand - 1
+                                        If (RN(i) < 0) Then
                                             isInvalid = True
                                             Exit For
                                         End If
@@ -994,39 +996,38 @@ Start_Evolutionsrunden:
                                         'SingleObjective
                                         'xxxxxxxxxxxxxxx
                                         If (isInvalid) Then
-                                        SeriesNo = DForm.Diag.prepareSeriesPoint("Population " & PES1.PES_iAkt.iAktPop & " (ungültig)", "Gray")
+                                            serie = DForm.Diag.getSeriesPoint("Population " & PES1.PES_iAkt.iAktPop & " (ungültig)", "Gray")
                                         Else
-                                        SeriesNo = DForm.Diag.prepareSeriesPoint("Population " & PES1.PES_iAkt.iAktPop, "Orange")
+                                            serie = DForm.Diag.getSeriesPoint("Population " & PES1.PES_iAkt.iAktPop, "Orange")
                                         End If
-                                        Call DForm.Diag.Series(SeriesNo).Add(durchlauf, QN(0))
+                                        Call serie.Add(durchlauf, QN(0))
 
                                     Else
                                         'MultiObjective
                                         'xxxxxxxxxxxxxx
-                                    If (globalAnzZiel = 2) Then
-                                        '2D-Diagramm
-                                        '------------------------------------------------------------------------
-                                        If (isInvalid) Then
-                                            SeriesNo = DForm.Diag.prepareSeriesPoint("Population" & " (ungültig)", "Gray")
-                                        Else
-                                            SeriesNo = DForm.Diag.prepareSeriesPoint("Population", "Orange")
-                                        End If
-                                            Call DForm.Diag.Series(SeriesNo).Add(QN(0), QN(1))
+                                        If (globalAnzZiel = 2) Then
+                                            '2D-Diagramm
+                                            '------------------------------------------------------------------------
+                                            If (isInvalid) Then
+                                                serie = DForm.Diag.getSeriesPoint("Population" & " (ungültig)", "Gray")
+                                            Else
+                                                serie = DForm.Diag.getSeriesPoint("Population", "Orange")
+                                            End If
+                                            Call serie.Add(QN(0), QN(1))
 
-                                    Else
-                                        '3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
-                                        '------------------------------------------------------------------------
-                                        If (isInvalid) Then
-                                            SeriesNo = DForm.Diag.prepareSeries3DPoint("Population" & " (ungültig)", "Gray")
                                         Else
-                                            SeriesNo = DForm.Diag.prepareSeries3DPoint("Population", "Orange")
-                                        End If
-                                        Dim series3D As Steema.TeeChart.Styles.Points3D
-                                        series3D = DForm.Diag.Series(SeriesNo)
-                                        Call series3D.Add(QN(0), QN(1), QN(2))
+                                            '3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
+                                            '------------------------------------------------------------------------
+                                            Dim serie3D As Steema.TeeChart.Styles.Points3D
+                                            If (isInvalid) Then
+                                                serie3D = DForm.Diag.getSeries3DPoint("Population" & " (ungültig)", "Gray")
+                                            Else
+                                                serie3D = DForm.Diag.getSeries3DPoint("Population", "Orange")
+                                            End If
+                                            Call serie3D.Add(QN(0), QN(1), QN(2))
 
+                                        End If
                                     End If
-                                End If
 
                             End Select
 
@@ -1099,27 +1100,26 @@ Start_Evolutionsrunden:
     Private Sub SekundärePopulationZeichnen(ByVal SekPop(,) As Double)
 
         Dim i As Short
-        Dim SeriesNo As Integer
+        Dim serie As Steema.TeeChart.Styles.Series
 
             'BUG 135: SekPop(,) fängt bei 1 an!
         If (UBound(SekPop, 2) = 2) Then
             '2 Zielfunktionen
             '----------------------------------------------------------------
-            SeriesNo = DForm.Diag.prepareSeriesPoint("Sekundäre Population", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-            Dim series As Steema.TeeChart.Styles.Points = DForm.Diag.Series(SeriesNo)
-            series.Clear()
+            serie = DForm.Diag.getSeriesPoint("Sekundäre Population", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+            serie.Clear()
                 For i = 1 To UBound(SekPop, 1)
-                series.Add(SekPop(i, 1), SekPop(i, 2), "")
+                serie.Add(SekPop(i, 1), SekPop(i, 2), "")
                 Next i
 
         ElseIf (UBound(SekPop, 2) >= 3) Then
             '3 oder mehr Zielfunktionen (es werden die ersten drei angezeigt)
             '----------------------------------------------------------------
-            SeriesNo = DForm.Diag.prepareSeries3DPoint("Sekundäre Population", "Green")
-            Dim series3D As Steema.TeeChart.Styles.Points3D = DForm.Diag.Series(SeriesNo)
-            series3D.Clear()
+            Dim serie3D As Steema.TeeChart.Styles.Points3D
+            serie3D = DForm.Diag.getSeries3DPoint("Sekundäre Population", "Green")
+            serie3D.Clear()
                 For i = 1 To UBound(SekPop, 1)
-                series3D.Add(SekPop(i, 1), SekPop(i, 2), SekPop(i, 3))
+                serie3D.Add(SekPop(i, 1), SekPop(i, 2), SekPop(i, 3))
                 Next i
             End If
 
@@ -1513,47 +1513,41 @@ Start_Evolutionsrunden:
                         tmpAchse.Name = Form2.ListBox_OptZieleZ.SelectedItem
                         Achsen.Add(tmpAchse)
                     End If
+
                     'Diagramm initialisieren
+                    '-----------------------
                     Me.DForm.Diag.Clear()
                     Me.DForm.Diag.DiagInitialise(Path.GetFileName(Sim1.db_path), Achsen)
 
-                    'Serien vorbereiten
-                    '------------------
-                    Dim SeriesNo, SeriesNoValid, SeriesNoInvalid As Integer
-                    If (OptZielIndexZ = -1) Then
-                        '2D
-                        '--
-                        'Serie für gültige Lösungen
-                        SeriesNoValid = Me.DForm.Diag.prepareSeriesPoint("Population", "Orange")
-                        'Serie für ungültige Lösungen
-                        SeriesNoInvalid = Me.DForm.Diag.prepareSeriesPoint("Population (ungültig)", "Gray")
-                    Else
-                        '3D
-                        '--
-                        'Serie für gültige Lösungen
-                        SeriesNoValid = Me.DForm.Diag.prepareSeries3DPoint("Population", "Orange")
-                        'Serie für ungültige Lösungen
-                        SeriesNoInvalid = Me.DForm.Diag.prepareSeries3DPoint("Population (ungültig)", "Gray")
-                    End If
-
                     'Punkte eintragen
                     '----------------
+                    Dim serie As Steema.TeeChart.Styles.Series
+                    Dim serie3D As Steema.TeeChart.Styles.Points3D
+
                     For i = 0 To OptResult.Solutions.GetUpperBound(0)
                         With OptResult.Solutions(i)
-                            'Constraintverletzung prüfen
-                            If (.isValid) Then
-                                SeriesNo = SeriesNoValid
-                            Else
-                                SeriesNo = SeriesNoInvalid
-                            End If
                             If (OptZielIndexZ = -1) Then
                                 '2D
-                                Me.DForm.Diag.Series(SeriesNo).Add(.QWerte(OptZielIndexX), .QWerte(OptZielIndexY))
+                                '--
+                                'Constraintverletzung prüfen
+                                If (.isValid) Then
+                                    serie = Me.DForm.Diag.getSeriesPoint("Population", "Orange")
+                                Else
+                                    serie = Me.DForm.Diag.getSeriesPoint("Population (ungültig)", "Gray")
+                                End If
+                                'Zeichnen
+                                serie.Add(.QWerte(OptZielIndexX), .QWerte(OptZielIndexY))
                             Else
                                 '3D
-                                Dim series3D As Steema.TeeChart.Styles.Points3D
-                                series3D = Me.DForm.Diag.Series(SeriesNo)
-                                series3D.Add(.QWerte(OptZielIndexX), .QWerte(OptZielIndexY), .QWerte(OptZielIndexZ))
+                                '--
+                                'Constraintverletzung prüfen
+                                If (.isValid) Then
+                                    serie3D = Me.DForm.Diag.getSeries3DPoint("Population", "Orange")
+                                Else
+                                    serie3D = Me.DForm.Diag.getSeries3DPoint("Population (ungültig)", "Gray")
+                                End If
+                                'Zeichnen
+                                serie3D.Add(.QWerte(OptZielIndexX), .QWerte(OptZielIndexY), .QWerte(OptZielIndexZ))
                             End If
                         End With
                     Next

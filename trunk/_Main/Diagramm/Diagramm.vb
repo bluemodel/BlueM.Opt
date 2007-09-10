@@ -77,121 +77,110 @@ Public Class Diagramm
     End Sub
 
     'Serien-Initialisierung (Punkt)
-    'gibt die SeriesNo zurück
-    '********************************
-    Public Function prepareSeriesPoint(ByVal title As String, _
+    'gibt die Serie zurück
+    '******************************
+    Public Function getSeriesPoint(ByVal title As String, _
                                       Optional ByVal colorName As String = "", _
                                       Optional ByVal style As Steema.TeeChart.Styles.PointerStyles = Steema.TeeChart.Styles.PointerStyles.Circle, _
-                                      Optional ByVal size As Integer = 3) As Integer
+                                      Optional ByVal size As Integer = 3) As Steema.TeeChart.Styles.Points
 
-        Dim SeriesNo As Integer
+        Dim i As Integer
+        Dim serie As Steema.TeeChart.Styles.Points
 
-        If (Not seriesExists(title, SeriesNo)) Then
-            'Serie neu hinzufügen
-            Dim tmpSeries As New Steema.TeeChart.Styles.Points(Me.Chart)
-            tmpSeries.Title = title
-            tmpSeries.Pointer.Style = style
-            tmpSeries.Pointer.HorizSize = size
-            tmpSeries.Pointer.VertSize = size
-            If (Not colorName = "") Then
-                tmpSeries.Color = Drawing.Color.FromName(colorName)
+        'Überprüfen, ob Serie bereits existiert
+        For i = 0 To Me.Chart.Series.Count - 1
+            If (Me.Chart.Series(i).Title = title) Then
+                serie = Me.Chart.Series(i)
+                Return serie
             End If
+        Next
 
-            Call Me.add_MarksTips(tmpSeries)
-            tmpSeries.Cursor = Cursors.Hand
-
-            SeriesNo = Me.Chart.Series.Count - 1
-        Else
-            'Serie besteht schon
+        'Sonst Serie neu hinzufügen
+        serie = New Steema.TeeChart.Styles.Points(Me.Chart)
+        serie.Title = title
+        serie.Pointer.Style = style
+        serie.Pointer.HorizSize = size
+        serie.Pointer.VertSize = size
+        If (Not colorName = "") Then
+            serie.Color = Drawing.Color.FromName(colorName)
         End If
 
-        Return SeriesNo
+        Call Me.add_MarksTips(serie)
+        serie.Cursor = Cursors.Hand
+
+        Return serie
 
     End Function
 
     'Serien-Initialisierung (Linie)
-    'gibt die SeriesNo zurück
-    '********************************
-    Public Function prepareSeriesLine(ByVal title As String, _
-                                      Optional ByVal colorName As String = "") As Integer
+    'gibt die Serie zurück
+    '******************************
+    Public Function getSeriesLine(ByVal title As String, _
+                                      Optional ByVal colorName As String = "") As Steema.TeeChart.Styles.Line
 
-        Dim SeriesNo As Integer
+        Dim i As Integer
+        Dim serie As Steema.TeeChart.Styles.Line
 
-        If (Not seriesExists(title, SeriesNo)) Then
-            'Serie neu hinzufügen
-            Dim tmpSeries As New Steema.TeeChart.Styles.Line(Me.Chart)
-            tmpSeries.Title = title
-            If (Not colorName = "") Then
-                tmpSeries.Color = Drawing.Color.FromName(colorName)
+        'Überprüfen, ob Serie bereits existiert
+        For i = 0 To Me.Chart.Series.Count - 1
+            If (Me.Chart.Series(i).Title = title) Then
+                serie = Me.Chart.Series(i)
+                Return serie
             End If
+        Next
 
-            Call Me.add_MarksTips(tmpSeries)
-
-            SeriesNo = Me.Chart.Series.Count - 1
-        Else
-            'Serie besteht schon
+        'Sonst Serie neu hinzufügen
+        serie = New Steema.TeeChart.Styles.Line(Me.Chart)
+        serie.Title = title
+        If (Not colorName = "") Then
+            serie.Color = Drawing.Color.FromName(colorName)
         End If
 
-        Return SeriesNo
+        Call Me.add_MarksTips(serie)
+
+        Return serie
 
     End Function
 
     'Serien-Initialisierung (3DPunkt)
-    'gibt die SeriesNo zurück
+    'gibt die Serie zurück
     '********************************
-    Public Function prepareSeries3DPoint(ByVal title As String, _
+    Public Function getSeries3DPoint(ByVal title As String, _
                                       Optional ByVal colorName As String = "", _
                                       Optional ByVal style As Steema.TeeChart.Styles.PointerStyles = Steema.TeeChart.Styles.PointerStyles.Circle, _
-                                      Optional ByVal size As Integer = 3) As Integer
-
-        Dim SeriesNo As Integer
-
-        If (Not seriesExists(title, SeriesNo)) Then
-            'Serie neu hinzufügen
-            Dim tmpSeries As New Steema.TeeChart.Styles.Points3D(Me.Chart)
-            tmpSeries.Title = title
-            tmpSeries.Pointer.Style = style
-            tmpSeries.Pointer.HorizSize = size
-            tmpSeries.Pointer.VertSize = size
-            tmpSeries.Pointer.Draw3D = True
-            tmpSeries.Depth = size
-            tmpSeries.LinePen.Visible = False
-            tmpSeries.ColorEach = False
-            If (Not colorName = "") Then
-                tmpSeries.Color = Drawing.Color.FromName(colorName)
-            End If
-
-            'BUG: TeeChart MarksTip funktioniert momentan nur in der XY-Ebene korrekt
-            'Siehe http://www.teechart.net/support/viewtopic.php?t=5982&highlight=&sid=4db52d0d1a4b78f30842ede881ce5bef
-            Call Me.add_MarksTips(tmpSeries)
-            tmpSeries.Cursor = Cursors.Hand
-
-            SeriesNo = Me.Chart.Series.Count - 1
-        Else
-            'Serie besteht schon
-        End If
-
-        Return SeriesNo
-
-    End Function
-
-    'Überprüfen, ob Serie bereits existiert
-    '**************************************
-    Private Function seriesExists(ByVal title As String, ByRef SeriesNo As Integer) As Boolean
+                                      Optional ByVal size As Integer = 3) As Steema.TeeChart.Styles.Points3D
 
         Dim i As Integer
+        Dim serie As New Steema.TeeChart.Styles.Points3D
 
-        seriesExists = False
-
+        'Überprüfen, ob Serie bereits existiert
         For i = 0 To Me.Chart.Series.Count - 1
             If (Me.Chart.Series(i).Title = title) Then
-                seriesExists = True
-                SeriesNo = i
-                Exit For
+                serie = Me.Chart.Series(i)
+                Return serie
             End If
         Next
 
-        Return seriesExists
+        'Sonst Serie neu hinzufügen
+        serie = New Steema.TeeChart.Styles.Points3D(Me.Chart)
+        serie.Title = title
+        serie.Pointer.Style = style
+        serie.Pointer.HorizSize = size
+        serie.Pointer.VertSize = size
+        serie.Pointer.Draw3D = True
+        serie.Depth = size
+        serie.LinePen.Visible = False
+        serie.ColorEach = False
+        If (Not colorName = "") Then
+            serie.Color = Drawing.Color.FromName(colorName)
+        End If
+
+        'BUG: TeeChart MarksTip funktioniert momentan nur in der XY-Ebene korrekt
+        'Siehe http://www.teechart.net/support/viewtopic.php?t=5982&highlight=&sid=4db52d0d1a4b78f30842ede881ce5bef
+        Call Me.add_MarksTips(serie)
+        serie.Cursor = Cursors.Hand
+
+        Return serie
 
     End Function
 
