@@ -175,8 +175,7 @@ Public Class Diagramm
             serie.Color = Drawing.Color.FromName(colorName)
         End If
 
-        'BUG: TeeChart MarksTip funktioniert momentan nur in der XY-Ebene korrekt
-        'Siehe http://www.teechart.net/support/viewtopic.php?t=5982&highlight=&sid=4db52d0d1a4b78f30842ede881ce5bef
+        'BUG 234: MarksTip funktioniert momentan nur in der XY-Ebene korrekt
         Call Me.add_MarksTips(serie)
         serie.Cursor = Cursors.Hand
 
