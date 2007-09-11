@@ -350,6 +350,7 @@ Partial Class Form1
 
                     'Anzahl der Ziele, Locations und Verzeigungen wird an CES übergeben
                     CES1.n_Penalty = Sim1.List_OptZiele.GetLength(0)
+                    Ces1.n_Constrain = Sim1.List_Constraints.GetLength(0)
                     CES1.n_Locations = Sim1.List_Locations.GetLength(0)
                     CES1.n_Verzweig = Sim1.VerzweigungsDatei.GetLength(0)
                     CES1.TestModus = Sim1.Set_TestModus
@@ -900,9 +901,8 @@ Partial Class Form1
         Dim PES1 As EvoKern.PES
         PES1 = New EvoKern.PES
 
-        'Schritte 2 - 5 PES wird initialisiert
-        'Weiteres siehe dort ;-)
-        '*************************************
+        'Schritte 2 - 5 PES wird initialisiert (Weiteres siehe dort ;-)
+        '**************************************************************
         Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
 
         'Startwerte werden der Verlaufsanzeige werden zugewiesen

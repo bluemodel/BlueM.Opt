@@ -23,6 +23,7 @@ Public Class CES
     Public n_Combinations As Integer        'Anzahl aller Kombinationen
     Public n_Locations As Integer           'Anzahl der Locations wird von auﬂen gesetzt
     Public n_Penalty As Integer             'Anzahl der Ziele wird von auﬂen gesetzt
+    Public n_Constrain as integer           'Anzahl der Rabdbedingungen
     Public n_Verzweig As Integer            'Anzahl der Verzweigungen in der Verzweigungsdatei
     Public n_PathDimension() As Integer     'Anzahl der Maﬂnahmen an jeder Stelle
 
@@ -109,6 +110,9 @@ Public Class CES
             For j = 0 To n_Penalty - 1
                 TMP(i).Penalty(j) = 999999999999999999
             Next
+            If n_Constrain = 0 Then
+                ReDim TMP(i).Constrain(-1)
+            End If
             ReDim TMP(i).Path(n_Locations - 1)
         Next
 
@@ -133,19 +137,6 @@ Public Class CES
 
     End Sub
 
-    ''Dimensionieren des PES Memory
-    ''*****************************
-    'Public Sub Dim_PES_Memory()
-
-    '    Dim i As Integer
-
-    '    ReDim PES_Memory(n_Locations - 1)
-    '    For i = 0 To PES_Memory.GetUpperBound(0)
-    '        Pes_Memory(i).Loc_No = i + 1
-    '    Next
-
-    'End Sub
-
     'Kopiert ein Faksimile
     '*********************
     Public Sub Copy_Faksimile_NDSorting(ByVal Source As Struct_Faksimile, ByRef Destination As Struct_Faksimile)
@@ -153,7 +144,9 @@ Public Class CES
         Destination.No = Source.No
         Array.Copy(Source.Path, Destination.Path, Source.Path.Length)
         Array.Copy(Source.Penalty, Destination.Penalty, Source.Penalty.Length)
-        Array.Copy(Source.Constrain, Destination.Constrain, Source.Constrain.Length)
+        If Not n_Constrain = 0 Then
+            Array.Copy(Source.Constrain, Destination.Constrain, Source.Constrain.Length)
+        End If
         Destination.mutated = Source.mutated
         Destination.Front = Source.Front
 
@@ -166,7 +159,9 @@ Public Class CES
         Destination.No = Source.No
         Array.Copy(Source.Path, Destination.Path, Source.Path.Length)
         Array.Copy(Source.Penalty, Destination.Penalty, Source.Penalty.Length)
-        Array.Copy(Source.Constrain, Destination.Constrain, Source.Constrain.Length)
+        If Not n_Constrain = 0 Then
+            Array.Copy(Source.Constrain, Destination.Constrain, Source.Constrain.Length)
+        End If
         Destination.Front = Source.Front
 
     End Sub
@@ -178,7 +173,9 @@ Public Class CES
         Destination.No = Source.No
         Array.Copy(Source.Path, Destination.Path, Source.Path.Length)
         Array.Copy(Source.Penalty, Destination.Penalty, Source.Penalty.Length)
-        Array.Copy(Source.Constrain, Destination.Constrain, Source.Constrain.Length)
+        If Not n_Constrain = 0 Then
+            Array.Copy(Source.Constrain, Destination.Constrain, Source.Constrain.Length)
+        End If
         Destination.Front = Source.Front
 
     End Sub
@@ -190,6 +187,9 @@ Public Class CES
         Destination.No = Source.No
         Array.Copy(Source.Path, Destination.Path, Source.Path.Length)
         Array.Copy(Source.Penalty, Destination.Penalty, Source.Penalty.Length)
+        If Not n_Constrain = 0 Then
+            Array.Copy(Source.Constrain, Destination.Constrain, Source.Constrain.Length)
+        End If
         Destination.dominated = Source.dominated
         Destination.Front = Source.Front
         Destination.Distance = Source.Distance
