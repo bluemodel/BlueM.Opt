@@ -103,8 +103,7 @@ Public Class PES
     Private XnTemp As Double                'Temporärer Parameterwert für Nachkomme
     Private DeTemp As Double                'Temporäre Schrittweite für Elter
     Private XeTemp As Double                'Temporäre Parameterwert für Elter
-    Private R As Short
-    Private Z As Double
+    'Private R As Short                      'Zufälliger Wert
     Private PenaltyDistance(,) As Double    'Array für normierte Raumabstände (Neighbourhood-Rekomb.)
     Private IndexEltern() As Short          'Array mit Index der Eltern (Neighbourhood-Rekomb.)
     Private Distanceb() As Double           'Array mit Crowding-Distance (Neighbourhood-Rekomb.)
@@ -516,6 +515,7 @@ Public Class PES
     Public Sub EsPopVaria()
 
         Dim m, n, v As Short
+        Dim R As Short                      'Zufälliger Integer Wert
 
         '===========================================================================
         'Start Ermittlung der zu mutierenden Eltern
@@ -572,6 +572,7 @@ Public Class PES
     Public Sub EsVaria()
 
         Dim i, v, n, j As Short
+        Dim R As Short                      'Zufälliger Integer Wert
         Dim Realisierungsspeicher() As Short
         Dim Elternspeicher() As Short
         Dim Z1, Elter, Z2 As Short
@@ -734,7 +735,6 @@ Public Class PES
     Public Sub EsPopMutation()
 
         Dim v, n As Short
-
         '===========================================================================
         'Start Mutation
         '===========================================================================
@@ -758,8 +758,8 @@ Public Class PES
                         'Schrittweite wird mutiert
                         DeTemp = De(v, n, PES_iAkt.iAktPop) * palpha ^ expo
                     End If
-                    'Normalverteilte Zufallszahl mit
-                    'Standardabweichung 1/sqr(varanz)
+                    'Normalverteilte Zufallszahl mit Standardabweichung 1/sqr(varanz)
+                    Dim Z As Double
                     Z = System.Math.Sqrt(-2 * System.Math.Log(1 - Rnd()) / PES_Initial.varanz) * System.Math.Sin(6.2832 * Rnd())
                     'Mutation wird durchgeführt
                     XeTemp = Xe(v, n, PES_iAkt.iAktPop) + DeTemp * Z
@@ -783,7 +783,6 @@ Public Class PES
     Public Sub EsMutation()
 
         Dim v As Short
-
         '===========================================================================
         'Start Mutation
         '===========================================================================
@@ -803,12 +802,12 @@ Public Class PES
                     'Schrittweite wird mutiert
                     DnTemp = PES_Initial.Dn(v) * galpha ^ expo
                 End If
-                'Normalverteilte Zufallszahl mit
-                'Standardabweichung 1/sqr(varanz)
+                'Normalverteilte Zufallszahl mit Standardabweichung 1/sqr(varanz)
+                Dim Z As Double
                 Z = System.Math.Sqrt(-2 * System.Math.Log(1 - Rnd()) / PES_Initial.varanz) * System.Math.Sin(6.2832 * Rnd())
                 'Mutation wird durchgeführt
                 XnTemp = PES_Initial.Xn(v) + DnTemp * Z
-                ' Restriktion für die mutierten Werte
+                'Restriktion für die mutierten Werte
             Loop While (XnTemp <= PES_Initial.Xmin(v) Or XnTemp > PES_Initial.Xmax(v))
 
             PES_Initial.Dn(v) = DnTemp
