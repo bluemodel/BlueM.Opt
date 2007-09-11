@@ -103,7 +103,6 @@ Public Class PES
     Private XnTemp As Double                'Temporärer Parameterwert für Nachkomme
     Private DeTemp As Double                'Temporäre Schrittweite für Elter
     Private XeTemp As Double                'Temporäre Parameterwert für Elter
-    'Private R As Short                      'Zufälliger Wert
     Private PenaltyDistance(,) As Double    'Array für normierte Raumabstände (Neighbourhood-Rekomb.)
     Private IndexEltern() As Short          'Array mit Index der Eltern (Neighbourhood-Rekomb.)
     Private Distanceb() As Double           'Array mit Crowding-Distance (Neighbourhood-Rekomb.)
