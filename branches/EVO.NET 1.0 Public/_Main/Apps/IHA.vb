@@ -263,7 +263,7 @@ Public Class IHA
         StrWrite.WriteLine("HiRVAlim=17")
         StrWrite.WriteLine("LoPulseLvl=25")
         StrWrite.WriteLine("LoRVALim=17")
-        StrWrite.WriteLine("Parametric=F")
+        StrWrite.WriteLine("Parametric=F")                              'F: non-parametric; T: parametric
         StrWrite.WriteLine("BegDay=1")
         StrWrite.WriteLine("EndDay=366")
         StrWrite.WriteLine("Watershed=1")
