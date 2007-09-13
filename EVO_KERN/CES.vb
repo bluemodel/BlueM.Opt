@@ -936,8 +936,8 @@ Public Class CES
         Next i
 
         '1. Eltern und Nachfolger werden gemeinsam betrachtet
-        'Die Eltern werden NDSorting hinzugefügt
-        '-------------------------------------------
+        'Nur Eltern werden NDSorting hinzugefügt, Kinder sind schon oben drin
+        '--------------------------------------------------------------------
 
         For i = n_Childs To n_Childs + n_Parents - 1
 
