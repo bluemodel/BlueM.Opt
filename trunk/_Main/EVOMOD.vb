@@ -42,24 +42,6 @@ Module EVOMOD
     '******** Konstanten aus früherem myEVOS.vb ***************************
     '************* Hauptsächlich für KeyOK ********************************
 
-    'Global globalrDatum() As Double
-    'Global globalParWert() As Single
-    '
-    'Global QMorg(12) As Double
-    'Global QSTDorg(12) As Double
-    'Global CSorg(12) As Double
-    'Global KORorg(12) As Double
-    'Global REGMorg(12) As Double
-    'Global REGBorg(12) As Double
-    '
-    'Global Const myoptRND = 0
-    'Global Const myoptGENQMON = 1
-    'Global Const myTypZRE = 1
-    '
-    'Global optRND As Integer
-    'Global optGENQMON As Integer
-    'Global EVOOPTION As Integer
-
     'Konstanten für erlaubte/unerlaubte Eingaben in Steuerelemente (TextBoxen)
     'Function: KeyOK() benutzt die Konstanten
     Public Const AllowFiguresOnly As Short = 1

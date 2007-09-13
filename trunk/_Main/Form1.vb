@@ -917,7 +917,7 @@ Start_Evolutionsrunden:
         For PES1.PES_iAkt.iAktRunde = 1 To PES1.PES_Settings.NRunden
 
             Call EVO_Opt_Verlauf1.Runden(PES1.PES_iAkt.iAktRunde)
-            Call PES1.EsPopBestwertspeicher()
+            Call PES1.EsResetPopBWSpeicher()
 
             'Über alle Populationen
             'xxxxxxxxxxxxxxxxxxxxxx
@@ -932,7 +932,7 @@ Start_Evolutionsrunden:
                 For PES1.PES_iAkt.iAktGen = 1 To PES1.PES_Settings.NGen
 
                     Call EVO_Opt_Verlauf1.Generation(PES1.PES_iAkt.iAktGen)
-                    Call PES1.EsBestwertspeicher()
+                    Call PES1.EsResetBWSpeicher()
 
                     'Über alle Nachkommen
                     'xxxxxxxxxxxxxxxxxxxxxxxxx
@@ -1038,57 +1038,49 @@ Start_Evolutionsrunden:
 
                         Loop While SIM_Eval_is_OK = False
 
-                        'Einordnen der Qualitätsfunktion im Bestwertspeicher
+                        'Einordnen der Qualitätsfunktion im Bestwertspeicher bei SO
+                        'Falls MO Einordnen der Qualitätsfunktion in NDSorting
                         Call PES1.EsBest(QN, RN)
 
                         System.Windows.Forms.Application.DoEvents()
 
                     Next 'Ende Schleife über alle Nachkommen
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                'Die neuen Eltern werden generiert
-                Call PES1.EsEltern()
+                    'Die neuen Eltern werden generiert
+                    Call PES1.EsEltern()
 
-                'Sekundäre Population 'BUG 135: SekPop(,) fängt bei 1 an!
-                If (EVO_Settings1.PES_Settings.is_MO_Pareto) Then
-                    SekPopulation = PES1.EsGetSekundärePopulation()
-                    'SekPop zeichnen
-                    Call SekundärePopulationZeichnen(SekPopulation)
-                    'SekPop in DB speichern
-                    If (Not IsNothing(Sim1)) Then
-                        If (Sim1.Ergebnisdb) Then
-                            Call Sim1.db_setSekPop(SekPopulation, PES1.PES_iAkt.iAktGen)
+                    'Sekundäre Population 'BUG 135: SekPop(,) fängt bei 1 an!
+                    If (EVO_Settings1.PES_Settings.is_MO_Pareto) Then
+                        SekPopulation = PES1.EsGetSekundärePopulation()
+                        'SekPop zeichnen
+                        Call SekundärePopulationZeichnen(SekPopulation)
+                        'SekPop in DB speichern
+                        If (Not IsNothing(Sim1)) Then
+                            If (Sim1.Ergebnisdb) Then
+                                Call Sim1.db_setSekPop(SekPopulation, PES1.PES_iAkt.iAktGen)
+                            End If
                         End If
                     End If
-                End If
 
+                    System.Windows.Forms.Application.DoEvents()
+
+                Next 'Ende alle Generatione
+                'xxxxxxxxxxxxxxxxxxxxxxxxxxx
                 System.Windows.Forms.Application.DoEvents()
 
-            Next 'Ende alle Generationen
-            'xxxxxxxxxxxxxxxxxxxxxxxxxxx
+                'Einordnen der Qualitätsfunktion im PopulationsBestwertspeicher
+                Call PES1.EsPopBest()
+
+            Next 'Ende alle Populationen
+            'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+            'Die neuen Populationseltern werden generiert
+            Call PES1.EsPopEltern()
             System.Windows.Forms.Application.DoEvents()
-
-            'Einordnen der Qualitätsfunktion im PopulationsBestwertspeicher
-            Call PES1.EsPopBest()
-
-        Next 'Ende alle Populationen
-        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-        'Die neuen Populationseltern werden generiert
-        Call PES1.EsPopEltern()
-
-        System.Windows.Forms.Application.DoEvents()
-
 
         Next 'Ende alle Runden
         'xxxxxxxxxxxxxxxxxxxxx
-
-        'PES, letzter. Schritt
-        'Objekt der Klasse PES wird vernichtet
-        '**********************************************************************************
-        'UPGRADE_NOTE: Das Objekt PES1 kann erst dann gelöscht werden, wenn die Garbagecollection durchgeführt wurde. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1029"'
-        'TODO: Ersetzen durch dispose funzt net
-        PES1 = Nothing
 
     End Sub
 

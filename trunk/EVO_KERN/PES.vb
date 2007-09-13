@@ -84,17 +84,19 @@ Public Class PES
 
     Private Xp(,,) As Double                'PopulationsElternwert der Variable
     Private Dp(,,) As Double                'PopulationsElternschrittweite
-    Private Xbpop(,,) As Double             'Bestwertspeicher Variablenwerte Generationsebene
-    Private Dbpop(,,) As Double             'Bestwertspeicher Schrittweite Generationsebene
-    Private Qbpop(,) As Double              'Bestwertspeicher auf Populationsebene
-    Private QbpopD() As Double              'Bestwertspeicher Crowdings Distance
+    '----------------------
+    Private Xbpop(,,) As Double             'Bestwertspeicher Variablenwerte für eine Population
+    Private Dbpop(,,) As Double             'Bestwertspeicher Schrittweite für eine Population
+    Private Qbpop(,) As Double              'Bestwertspeicher  für eine Population
+    Private QbpopD() As Double              'Bestwertspeicher Crowdings Distance  für eine Population
     '---------------------
     Private Xe(,,) As Double                'Elternwerte der Variablen
     Private De(,,) As Double                'Elternschrittweite
-    Private Xb(,,) As Double                'Bestwertspeicher Variablenwerte Generationsebene
-    Private Db(,,) As Double                'Bestwertspeicher Schrittweite Generationsebene
-    Private Qb(,,) As Double                'Bestwertspeicher Generationsebene
-    Private Rb(,,) As Double                'Restriktionen auf Generationsebene
+    '---------------------
+    Private Xb(,,) As Double                'Bestwertspeicher Variablenwerte für eine Generation
+    Private Db(,,) As Double                'Bestwertspeicher Schrittweite für eine Generation
+    Private Qb(,,) As Double                'Bestwertspeicher für eine Generation
+    Private Rb(,,) As Double                'Restriktionen für eine Generation
     '---------------------
     Private SekundärQb() As Struct_NDSorting = {}   'Sekundäre Population
     '---------------------
@@ -269,8 +271,7 @@ Public Class PES
     '*******************************************************************************
     'Schritt 4: ES_PREPARE
     'Function ES_PREPARE initialisiert alle internen Arrays und setzt den
-    'Bestwertspeicher auf sehr großen Wert (Strategie minimiert in dieser
-    'Umsetzung)
+    'Bestwertspeicher auf sehr großen Wert (Strategie minimiert in dieser Umsetzung)
     'TODO: ESPrepare Für Paretooptimierung noch nicht fertig!!!!
     '*******************************************************************************
     Private Sub EsPrepare()
@@ -291,6 +292,7 @@ Public Class PES
         '---------------------
         ReDim De(PES_Initial.varanz, PES_Settings.NEltern, PES_Settings.NPopul)
         ReDim Xe(PES_Initial.varanz, PES_Settings.NEltern, PES_Settings.NPopul)
+        '---------------------
         ReDim Db(PES_Initial.varanz, PES_Settings.NEltern, PES_Settings.NPopul)
         ReDim Xb(PES_Initial.varanz, PES_Settings.NEltern, PES_Settings.NPopul)
         ReDim Qb(PES_Settings.NEltern, PES_Settings.NPopul, PES_Initial.NPenalty)
@@ -929,8 +931,8 @@ Public Class PES
         Dim h As Double
 
         If (Not PES_Settings.is_MO_Pareto) Then
-            'Standard ES nach Rechenberg
-            '---------------------------
+            'SO - Standard ES nach Rechenberg
+            '--------------------------------
             'Der schlechteste der besten Qualitätswerte wird bestimmt ; Position -> j
             '(höchster Wert der Penaltyfunktion)
             j = 1
@@ -944,7 +946,7 @@ Public Class PES
             Next m
 
             'Falls die Qualität des aktuellen Nachkommen besser ist (Penaltyfunktion geringer)
-            'als die schlechteste im Bestwertspeicher, wird diese ersetzt
+            'als die schlechteste im Bestwertspeicher, wird dieser ersetzt
             If QN(0) < Qb(j, PES_iAkt.iAktPop, 1) Then
                 Qb(j, PES_iAkt.iAktPop, 1) = QN(0)
                 For v = 1 To PES_Initial.varanz
@@ -960,8 +962,8 @@ Public Class PES
             End If
 
         Else
-            'Multi-Objective mit Paretofront
-            '-------------------------------
+            'Multi-Objective Pareto
+            '----------------------
             With List_NDSorting(PES_iAkt.iAktNachf)
                 For i = 1 To PES_Initial.NPenalty
                     .penalty(i) = QN(i - 1)             'Bug 135: .penalty fängt bei 1 an!
@@ -983,12 +985,11 @@ Public Class PES
 
     End Sub
 
-    '*******************************************************************************
+    '************************************************************************************
     'ES_BESTWERTSPEICHER
-    'Führt einen Reset des Bestwertspeicher durch,
-    'falls eine Komma-Strategie gewählt ist
-    '*******************************************************************************
-    Public Sub EsBestwertspeicher()
+    'Führt einen Reset des Bestwertspeicher durch, falls eine Komma-Strategie gewählt ist
+    '************************************************************************************
+    Public Sub EsResetBWSpeicher()
 
         Dim n, i As Short
 
@@ -998,17 +999,17 @@ Public Class PES
                 'Standard ES nach Rechenberg
                 '---------------------------
                 For n = 1 To PES_Settings.NEltern
-                    For i = 1 To PES_Initial.NPenalty 'dm 29.04.05
-                        Qb(n, PES_iAkt.iAktPop, i) = 1.0E+300 'dm 29.04.05
-                    Next i 'dm 29.04.05
+                    For i = 1 To PES_Initial.NPenalty
+                        Qb(n, PES_iAkt.iAktPop, i) = 1.0E+300
+                    Next i
                 Next n
 
             Else
                 'Multi-Objective mit Paretofront
                 '-------------------------------
                 For n = 1 To PES_Settings.NEltern
-                    For i = 1 To PES_Initial.NPenalty 'dm 29.04.05
-                        Qb(n, PES_iAkt.iAktPop, i) = 0 'dm 29.04.05
+                    For i = 1 To PES_Initial.NPenalty
+                        Qb(n, PES_iAkt.iAktPop, i) = 0
                     Next i
                 Next n
             End If
@@ -1019,10 +1020,9 @@ Public Class PES
 
     '*******************************************************************************
     'ES_POP_BESTWERTSPEICHER
-    'Führt einen Reset des Bestwertspeicher auf Populationsebene durch,
-    'falls eine Komma-Strategie gewählt ist
+    'Führt einen Reset des Bestwertspeicher auf Populationsebene durch, falls eine Komma-Strategie gewählt ist
     '*******************************************************************************
-    Public Sub EsPopBestwertspeicher()
+    Public Sub EsResetPopBWSpeicher()
 
         Dim n, i As Short
 
@@ -1032,18 +1032,18 @@ Public Class PES
                 'Standard ES nach Rechenberg
                 '---------------------------
                 For n = 1 To PES_Settings.NPopul
-                    For i = 1 To PES_Initial.NPenalty 'dm 29.04.05
-                        Qbpop(n, i) = 1.0E+300 'dm 29.04.05
-                    Next i 'dm 29.04.05
+                    For i = 1 To PES_Initial.NPenalty
+                        Qbpop(n, i) = 1.0E+300
+                    Next i
                 Next n
 
             Else
                 'Multi-Objective mit Paretofront
                 '-------------------------------
                 For n = 1 To PES_Settings.NPopul
-                    For i = 1 To PES_Initial.NPenalty 'dm 29.04.05
-                        Qbpop(n, i) = 0 'dm 29.04.05
-                    Next i 'dm 29.04.05
+                    For i = 1 To PES_Initial.NPenalty
+                        Qbpop(n, i) = 0
+                    Next i
                 Next n
             End If
 
@@ -1154,9 +1154,8 @@ Public Class PES
 
         If (Not PES_Settings.is_MO_Pareto) Then
             'Standard ES nach Rechenberg
-            '---------------------------------------------------------------------
-            'Die Eltern werden gleich der besten Kinder gesetzt 
-            '(Schrittweite und Parameterwert)
+            'xxxxxxxxxxxxxxxxxxxxxxxxxxx
+            'Die Eltern werden gleich der besten Kinder gesetzt (Schrittweite und Parameterwert)
             '---------------------------------------------------------------------
             For m = 1 To PES_Settings.NEltern
                 For v = 1 To PES_Initial.varanz
@@ -1166,11 +1165,11 @@ Public Class PES
             Next m
 
         Else
-            'Multi-Objective mit Paretofront
-            '---------------------------------------------------------------------
+            'Multi-Objective Pareto
+            'xxxxxxxxxxxxxxxxxxxxxx
             '1. Eltern und Nachfolger werden gemeinsam betrachtet
             'Nur Eltern werden NDSorting hinzugefügt, Kinder sind schon oben drin
-            '---------------------------------------------------------------------
+            '--------------------------------------------------------------------
             For m = PES_Settings.NNachf + 1 To PES_Settings.NNachf + PES_Settings.NEltern
                 With List_NDSorting(m)
                     For l = 1 To PES_Initial.NPenalty
@@ -1261,7 +1260,6 @@ Public Class PES
                             Db(v, i, PES_iAkt.iAktPop) = NDSResult(i).d(v)
                             Xb(v, i, PES_iAkt.iAktPop) = NDSResult(i).X(v)
                         Next v
-
                     Next i
                     NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
 
@@ -1322,8 +1320,7 @@ Public Class PES
                 ReDim Preserve SekundärQb(PES_Settings.NMemberSecondPop)
             End If
 
-            'Prüfen, ob die Population jetzt mit Mitgliedern
-            'aus der Sekundären Population aufgefüllt werden soll
+            'Prüfen, ob die Population jetzt mit Mitgliedern aus der Sekundären Population aufgefüllt werden soll
             If (PES_iAkt.iAktGen Mod PES_Settings.interact) = 0 And PES_Settings.isInteract Then
                 NFrontMember_aktuell = Count_Front_Members(1, SekundärQb)
                 If NFrontMember_aktuell > PES_Settings.NEltern Then
