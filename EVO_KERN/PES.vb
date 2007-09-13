@@ -985,73 +985,38 @@ Public Class PES
 
     End Sub
 
-    '************************************************************************************
     'ES_BESTWERTSPEICHER
     'Führt einen Reset des Bestwertspeicher durch, falls eine Komma-Strategie gewählt ist
     '************************************************************************************
     Public Sub EsResetBWSpeicher()
-
         Dim n, i As Short
 
         If (PES_Settings.iEvoTyp = EVO_KOMMA) Then
-
-            If (Not PES_Settings.is_MO_Pareto) Then
-                'Standard ES nach Rechenberg
-                '---------------------------
-                For n = 1 To PES_Settings.NEltern
-                    For i = 1 To PES_Initial.NPenalty
-                        Qb(n, PES_iAkt.iAktPop, i) = 1.0E+300
-                    Next i
-                Next n
-
-            Else
-                'Multi-Objective mit Paretofront
-                '-------------------------------
-                For n = 1 To PES_Settings.NEltern
-                    For i = 1 To PES_Initial.NPenalty
-                        Qb(n, PES_iAkt.iAktPop, i) = 0
-                    Next i
-                Next n
-            End If
-
+            For n = 1 To PES_Settings.NEltern
+                For i = 1 To PES_Initial.NPenalty
+                    Qb(n, PES_iAkt.iAktPop, i) = 1.0E+300
+                Next i
+            Next n
         End If
 
     End Sub
 
-    '*******************************************************************************
     'ES_POP_BESTWERTSPEICHER
     'Führt einen Reset des Bestwertspeicher auf Populationsebene durch, falls eine Komma-Strategie gewählt ist
-    '*******************************************************************************
+    '*********************************************************************************************************
     Public Sub EsResetPopBWSpeicher()
-
         Dim n, i As Short
 
         If (PES_Settings.iPopEvoTyp = EVO_KOMMA) Then
-
-            If (Not PES_Settings.is_MO_Pareto) Then
-                'Standard ES nach Rechenberg
-                '---------------------------
-                For n = 1 To PES_Settings.NPopul
-                    For i = 1 To PES_Initial.NPenalty
-                        Qbpop(n, i) = 1.0E+300
-                    Next i
-                Next n
-
-            Else
-                'Multi-Objective mit Paretofront
-                '-------------------------------
-                For n = 1 To PES_Settings.NPopul
-                    For i = 1 To PES_Initial.NPenalty
-                        Qbpop(n, i) = 0
-                    Next i
-                Next n
-            End If
-
+            For n = 1 To PES_Settings.NPopul
+                For i = 1 To PES_Initial.NPenalty
+                    Qbpop(n, i) = 1.0E+300
+                Next i
+            Next n
         End If
 
     End Sub
 
-    '*******************************************************************************
     'ES_POP_ELTERN  
     'Eltern Population
     '*******************************************************************************
