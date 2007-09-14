@@ -686,8 +686,10 @@ Partial Class Form1
         Dim i As Integer
 
         'Parents und Child werden Dimensioniert
-        Call CES1.Dim_Faksimile(CES1.List_Parents)
-        Call CES1.Dim_Faksimile(CES1.List_Childs)
+        Redim CES1.List_Parents(CES1.n_Parents -1)
+        Call CES1.Dim_Faksimile(CES1.List_Parents, "Parent")
+        Redim CES1.List_Childs(CES1.n_Childs -1)
+        Call CES1.Dim_Faksimile(CES1.List_Childs, "Child")
 
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
