@@ -51,10 +51,10 @@ Public Class CES
 
         'Für ND Sorting -------------------------------------------------
         Dim dominated As Boolean            '07 Kennzeichnung ob Dominiert
-        'Dim Feasible As Boolean            'Gültiges Ergebnis ?
         Dim Front As Short                  '08 Nummer der Pareto Front
         Dim Distance As Double              '09 Für crowding distance
         Dim myPara(,) As Object             '10 Die Optimierungsparameter
+        'Dim Feasible As Boolean            'Gültiges Ergebnis ?
     End Structure
 
     Public List_Childs() As Struct_Faksimile
@@ -198,52 +198,6 @@ Public Class CES
 
     End Sub
 
-
-    'Kopiert ein Faksimile soweit möglich in ein NDSorting
-    '*****************************************************
-    Public Sub Copy_Faksimile_NDSorting(ByVal Source As Struct_Faksimile, ByRef Destination As Struct_NDSorting)
-
-        Destination.No = Source.No
-        Array.Copy(Source.Path, Destination.Path, Source.Path.Length)
-        Array.Copy(Source.Penalty, Destination.Penalty, Source.Penalty.Length)
-        If Not n_Constrain = 0 Then
-            Array.Copy(Source.Constrain, Destination.Constrain, Source.Constrain.Length)
-        End If
-        Destination.Front = Source.Front
-
-    End Sub
-
-    'Kopiert ein NDSOrting in ein Faksimile
-    '**************************************
-    Public Sub Copy_Faksimile_NDSorting(ByVal Source As Struct_NDSorting, ByRef Destination As Struct_Faksimile)
-
-        Destination.No = Source.No
-        Array.Copy(Source.Path, Destination.Path, Source.Path.Length)
-        Array.Copy(Source.Penalty, Destination.Penalty, Source.Penalty.Length)
-        If Not n_Constrain = 0 Then
-            Array.Copy(Source.Constrain, Destination.Constrain, Source.Constrain.Length)
-        End If
-        Destination.Front = Source.Front
-
-    End Sub
-
-    'Kopiert ein NDSOrting
-    '*********************
-    Public Sub Copy_Faksimile_NDSorting(ByVal Source As Struct_NDSorting, ByRef Destination As Struct_NDSorting)
-
-        Destination.No = Source.No
-        Array.Copy(Source.Path, Destination.Path, Source.Path.Length)
-        Array.Copy(Source.Penalty, Destination.Penalty, Source.Penalty.Length)
-        If Not n_Constrain = 0 Then
-            Array.Copy(Source.Constrain, Destination.Constrain, Source.Constrain.Length)
-        End If
-        Destination.dominated = Source.dominated
-        Destination.Front = Source.Front
-        Destination.Distance = Source.Distance
-
-    End Sub
-
-
     'Normaler Modus: Generiert zufällige Paths für alle Kinder BM Problem
     '*********************************************************************
     Public Sub Generate_Random_Path()
@@ -319,25 +273,6 @@ Public Class CES
                 j += 1
             Next i
         End If
-
-    End Sub
-
-    'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
-    '*************************************************************
-    Public Sub Reset_Childs()
-        Dim i, j As Integer
-
-        For i = 0 To n_Childs - 1
-            List_Childs(i).No = i + 1
-            For j = 0 To List_Childs(i).Penalty.GetUpperBound(0)
-                List_Childs(i).Penalty(j) = 999999999999999999
-            Next
-            For j = 0 To List_Childs(i).Constrain.GetUpperBound(0)
-                List_Childs(i).Constrain(j) = 0
-            Next
-            Array.Clear(List_Childs(i).Path, 0, List_Childs(i).Path.GetLength(0))
-            List_Childs(i).mutated = False
-        Next
 
     End Sub
 
