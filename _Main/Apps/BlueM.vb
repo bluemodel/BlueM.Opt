@@ -1,5 +1,5 @@
 Imports System.IO
-Imports IHWB.BlueM
+Imports IHWB.BlueM.DllAdapter
 
 '*******************************************************************************
 '*******************************************************************************
@@ -32,7 +32,7 @@ Public Class BlueM
 
     'IHA
     '---
-    Private isIHA as Boolean = False
+    Private isIHA As Boolean = False
     Private IHA1 As IHA
 
 #End Region 'Eigenschaften
@@ -337,7 +337,7 @@ Public Class BlueM
             Catch ex As Exception
 
                 'Simulationsfehler aufgetreten
-                MsgBox(ex.Message, MsgBoxStyle.Exclamation, "BlueM")
+                'MsgBox(ex.Message, MsgBoxStyle.Exclamation, "BlueM")
                 simOK = False
 
             Finally
