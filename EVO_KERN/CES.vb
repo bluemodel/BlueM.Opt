@@ -80,74 +80,83 @@ Public Class CES
 #Region "Methoden"
     '#############
 
-    'Dimensionieren des Faksimile
-    '*******************************
+    'Dimensionieren eines einzelnen Faksimile
+    '****************************************
+    Public Sub Dim_Faksimile(ByRef TMP As Struct_Faksimile, ByVal Type As String, ByVal No As Integer)
+
+        Dim j As Integer = 0
+
+        '01 Typ des Faksimile
+        TMP.Type = Type
+
+        '02 Nummer des Faksimile
+        TMP.No = No + 1
+
+        '03 Der Pfad - zur Kontrolle wird falscher Pfad gesetzt
+        ReDim TMP.Path(n_Locations - 1)
+        For j = 0 To TMP.Path.GetUpperBound(0)
+            TMP.Path(j) = 777
+        Next
+
+        '04 Werte der Penaltyfunktion(en)
+        ReDim TMP.Penalty(n_Penalty - 1)
+        For j = 0 To n_Penalty - 1
+            TMP.Penalty(j) = 999999999999999999
+        Next
+
+        '05 Wert der Randbedingung(en)
+        If n_Constrain = 0 Then
+            ReDim TMP.Constrain(-1)
+        Else
+            ReDim TMP.Constrain(n_Constrain - 1)
+            For j = 0 To TMP.Constrain.GetUpperBound(0)
+                TMP.Constrain(j) = -999999999999999999
+            Next
+        End If
+
+        '06 Gibt an ob der Wert bereits mutiert ist oder nicht
+        TMP.mutated = False
+
+        '07 Kennzeichnung ob Dominiert
+        TMP.dominated = False
+
+        '08 Nummer der Pareto Front
+        TMP.Front = 0
+
+        '09 Für crowding distance
+        TMP.Distance = 0
+
+        '10 Die Optimierungsparameter - wird dynamisch behandelt
+        ReDim TMP.PES_Para(3, 1)
+        For j = 0 To TMP.PES_Para.GetUpperBound(0)
+            TMP.PES_Para(j, 0) = "xxx"
+            TMP.PES_Para(j, 1) = 777
+        Next
+
+        '11 Das Dn für PES
+        ReDim TMP.PES_Dn(3)
+        For j = 0 To TMP.PES_Dn.GetUpperBound(0)
+            TMP.PES_Dn(j) = 777
+        Next
+
+        '12 Die Generation (eher zur Information)
+        TMP.Generation = 0
+
+        '13 MemoryRang des PES Elters
+        TMP.Memory_Rank = 777
+
+        '14 Location des PES Parent
+        TMP.iLocation = 777
+
+    End Sub
+
+    'Dim Faksimile für ein Array
+    '***************************
     Public Sub Dim_Faksimile(ByRef TMP() As Struct_Faksimile, ByVal Type As String)
-        Dim i, j As Integer
+        Dim i As Integer
 
         For i = 0 To TMP.GetUpperBound(0)
-            '01 Typ des Faksimile
-            TMP(i).Type = Type
-
-            '02 Nummer des Faksimile
-            TMP(i).No = i + 1
-
-            '03 Der Pfad - zur Kontrolle wird falscher Pfad gesetzt
-            ReDim TMP(i).Path(n_Locations - 1)
-            For j = 0 To TMP(i).Path.GetUpperBound(0)
-                TMP(i).Path(j) = 777
-            Next
-
-            '04 Werte der Penaltyfunktion(en)
-            ReDim TMP(i).Penalty(n_Penalty - 1)
-            For j = 0 To n_Penalty - 1
-                TMP(i).Penalty(j) = 999999999999999999
-            Next
-
-            '05 Wert der Randbedingung(en)
-            If n_Constrain = 0 Then
-                ReDim TMP(i).Constrain(-1)
-            Else
-                ReDim TMP(i).Constrain(n_Constrain - 1)
-                For j = 0 To TMP(i).Constrain.GetUpperBound(0)
-                    TMP(i).Constrain(j) = -999999999999999999
-                Next
-            End If
-
-            '06 Gibt an ob der Wert bereits mutiert ist oder nicht
-            TMP(i).mutated = False
-
-            '07 Kennzeichnung ob Dominiert
-            TMP(i).dominated = False
-
-            '08 Nummer der Pareto Front
-            TMP(i).Front = 0
-
-            '09 Für crowding distance
-            TMP(i).Distance = 0
-
-            '10 Die Optimierungsparameter - wird dynamisch behandelt
-            ReDim TMP(i).PES_Para(3, 1)
-            For j = 0 To TMP(i).PES_Para.GetUpperBound(0)
-                TMP(i).PES_Para(j, 0) = "xxx"
-                TMP(i).PES_Para(j, 1) = 777
-            Next
-
-            '11 Das Dn für PES
-            ReDim TMP(i).PES_Dn(3)
-            For j = 0 To TMP(i).PES_Dn.GetUpperBound(0)
-                TMP(i).PES_Dn(j) = 777
-            Next
-
-            '12 Die Generation (eher zur Information)
-            TMP(i).Generation = 0
-
-            '13 MemoryRang des PES Elters
-            TMP(i).Memory_Rank = 777
-
-            '14 Location des PES Parent
-            TMP(i).iLocation = 777
-
+            Call Dim_Faksimile(TMP(i), Type, i)
         Next
     End Sub
 
@@ -602,6 +611,8 @@ Public Class CES
             neu = Memory.GetUpperBound(0)
         End If
 
+        Call Dim_Faksimile(Memory(), "Memory")
+
         ReDim Memory(neu).Path(n_Locations - 1)
         ReDim Memory(neu).PES_Para(List_Childs(Child_No).PES_Para.GetUpperBound(0), 1)
         ReDim Memory(neu).PES_Dn(List_Childs(Child_No).PES_Para.GetUpperBound(0))
@@ -696,7 +707,7 @@ Public Class CES
                 End If
             Next
             If isDouble = False Then
-                copy_Faksimile(PES_Parents(i), tmp(x))
+                Copy_Faksimile(PES_Parents(i), tmp(x))
                 x += 1
             End If
         Next
@@ -1237,7 +1248,7 @@ Public Class CES
     Private Sub NDS_Crowding_Distance_Sort(ByRef NDSorting() As Struct_Faksimile, ByRef start As Short, ByRef ende As Short)
         Dim i As Integer
         Dim j As Integer
-        Dim k As Short
+        Dim k As Integer
 
         Dim swap(0) As Struct_Faksimile
         Call Dim_Faksimile(swap, "swap")
