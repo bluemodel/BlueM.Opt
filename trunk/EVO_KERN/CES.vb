@@ -29,7 +29,7 @@ Public Class CES
 
     'Eingabe
     Public n_Parts_of_Path As Integer = 3   'Länge des Gedächtnispfades Achtung Maximum ist 3
-    Public n_Generations As Integer = 5     'Anzahl der Generationen
+    Public n_Generations As Integer = 7     'Anzahl der Generationen
     Public n_Parents As Integer = 3
     Public n_Childs As Integer = 4
 
@@ -257,21 +257,34 @@ Public Class CES
         Dim ChildQ_TMP As Double = 0
         Dim ParentQ_TMP As Double = 0
 
+        'Strategie MINUS
+        'xxxxxxxxxxxxxxx
         If Strategy = "minus" Then
             For i = 0 To n_Parents - 1
                 Call Copy_Faksimile(List_Childs(i), List_Parents(i))
             Next i
 
+            'Strategie PLUS
+            'xxxxxxxxxxxxxx
         ElseIf Strategy = "plus" Then
-            j = 0
-            For i = 0 To n_Parents - 1
-                If List_Parents(i).Penalty(0) < List_Childs(j).Penalty(0) Then
-                    j -= 1
-                Else
-                    Call Copy_Faksimile(List_Childs(i), List_Parents(i))
+
+            For i = 0 To n_Childs - 1
+                'Des schlechteste Elter wird bestimmt
+                Dim bad_no As Integer = 0
+                Dim bad_penalty As Double = List_Parents(0).Penalty(0)
+                For j = 1 To n_Parents - 1
+                    If bad_penalty < List_Parents(j).Penalty(0) Then
+                        bad_no = j
+                        bad_penalty = List_Parents(j).Penalty(0)
+                    End If
+                Next
+
+                'Falls der schlechteste Parent schlechter als der Child ist wird er durch den Child ersetzt
+                If List_Parents(bad_no).Penalty(0) > List_Childs(i).Penalty(0) Then
+                    Call Copy_Faksimile(List_Childs(i), List_Parents(bad_no))
                 End If
-                j += 1
-            Next i
+            Next
+
         End If
 
     End Sub
