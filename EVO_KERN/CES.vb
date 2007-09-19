@@ -62,19 +62,6 @@ Public Class CES
     Public NDSorting(n_Childs + n_Parents - 1) As Struct_Faksimile
     Public NDSResult(n_Childs + n_Parents - 1) As Struct_Faksimile
 
-    'NDSorting Struktur
-    '******************
-    Public Structure Struct_NDSorting
-        Dim No As Short                     'CH: 02 Nummer des NDSorting
-        Dim Path() As Integer               'CH: 03 Der Pfad
-        Dim Penalty() As Double             'DM: 04 Werte der Penaltyfunktion(en)
-        Dim Constrain() As Double           'DM: 05 Werte der Randbedingung(en)
-        'Dim Feasible As Boolean            'DM: Gültiges Ergebnis ?
-        Dim dominated As Boolean            'DM: Kennzeichnung ob dominiert
-        Dim Front As Short                  'DM: Nummer der Pareto Front
-        Dim Distance As Double              'DM: Distanzwert für Crowding distance sort
-    End Structure
-
 
     'Memory zum Speichern der PES Parametersätze
     '*******************************************
@@ -250,8 +237,8 @@ Public Class CES
 
     End Sub
 
-    'Selectionsprozess je nach "plus" oder "minus" Strategie
-    '*******************************************************
+    'Selectionsprozess je nach "plus" oder "minus" Strategie (Die beiden Listen sind schon vorsortiert!)
+    '***************************************************************************************************
     Public Sub Selection_Process()
         Dim i, j As Integer
         Dim ChildQ_TMP As Double = 0
