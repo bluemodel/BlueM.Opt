@@ -53,38 +53,27 @@ Public Class CES
         Dim dominated As Boolean            '07 Kennzeichnung ob Dominiert
         Dim Front As Short                  '08 Nummer der Pareto Front
         Dim Distance As Double              '09 Für crowding distance
-        Dim myPara(,) As Object             '10 Die Optimierungsparameter
         'Dim Feasible As Boolean            'Gültiges Ergebnis ?
+
+        'Für PES --------------------------------------------------------
+        Dim PES_Para(,) As Object           '10 Die Optimierungsparameter für PES
+        Dim PES_Dn() As Object              '11 Das Dn für PES
+
+        'Für PES Memory -------------------------------------------------
+        Dim Generation As Integer           '12 Die Generation (eher zur Information)
+
+        'Für PES Parent -------------------------------------------------
+        Dim Memory_Rank As Integer          '13 MemoryRang des PES Elters
+        Dim iLocation As Integer            '14 Location des PES Parent
+
     End Structure
 
     Public List_Childs() As Struct_Faksimile
     Public List_Parents() As Struct_Faksimile
     Public NDSorting(n_Childs + n_Parents - 1) As Struct_Faksimile
     Public NDSResult(n_Childs + n_Parents - 1) As Struct_Faksimile
+    Public Memory() As Struct_Faksimile
 
-
-    'Memory zum Speichern der PES Parametersätze
-    '*******************************************
-    Public Structure Struct_PES_Memory
-        Dim Path() As Integer
-        Dim Parameter(,) As Object
-        Dim D() As Object
-        Dim Penalty() As Double
-        Dim Constrain() As Double
-        Dim Generation as Integer
-    End Structure
-
-    Public Memory() As Struct_PES_Memory
-
-    Public Structure Struct_PES_Parent
-        Dim Memory_Rank As Integer
-        Dim Path() As Integer
-        Dim Parameter(,) As Object
-        Dim D() As Object
-        Dim Penalty() As Double
-        Dim iLocation As Integer
-        Dim Generation As Integer
-    End Structure
 
 #End Region 'Eigenschaften
 
@@ -138,17 +127,34 @@ Public Class CES
             TMP(i).Distance = 0
 
             '10 Die Optimierungsparameter - wird dynamisch behandelt
-            ReDim TMP(i).myPara(3, 1)
-            For j = 0 To TMP(i).myPara.GetUpperBound(0)
-                TMP(i).myPara(j, 0) = "xxx"
-                TMP(i).myPara(j, 1) = 777
+            ReDim TMP(i).PES_Para(3, 1)
+            For j = 0 To TMP(i).PES_Para.GetUpperBound(0)
+                TMP(i).PES_Para(j, 0) = "xxx"
+                TMP(i).PES_Para(j, 1) = 777
             Next
+
+            '11 Das Dn für PES
+            ReDim TMP(i).PES_Dn(3)
+            For j = 0 To TMP(i).PES_Dn.GetUpperBound(0)
+                TMP(i).PES_Dn(j) = 777
+            Next
+
+            '12 Die Generation (eher zur Information)
+            TMP(i).Generation = 0
+
+            '13 MemoryRang des PES Elters
+            TMP(i).Memory_Rank = 777
+
+            '14 Location des PES Parent
+            TMP(i).iLocation = 777
+
         Next
     End Sub
 
     'Kopiert ein Faksimile
     '*********************
     Public Sub Copy_Faksimile(ByVal Source As Struct_Faksimile, ByRef Dest As Struct_Faksimile)
+
         '01 Typ des Faksimile
         'Dest.Type Bleibt bestehen
 
@@ -179,9 +185,21 @@ Public Class CES
         Dest.Distance = Source.Distance
 
         '10 Die Optimierungsparameter - wird dynamisch behandelt (Funzt auch für 2D Array)
-        ReDim Dest.myPara(Source.myPara.GetUpperBound(0), 1)
-        Array.Copy(Source.myPara, Dest.myPara, Source.myPara.Length)
+        ReDim Dest.PES_Para(Source.PES_Para.GetUpperBound(0), 1)
+        Array.Copy(Source.PES_Para, Dest.PES_Para, Source.PES_Para.Length)
 
+        '11 Das Dn für PES
+        ReDim Dest.PES_Dn(Source.PES_Dn.GetUpperBound(0))
+        Array.Copy(Source.PES_Dn, Dest.PES_Dn, Source.PES_Dn.Length)
+
+        '12 Die Generation (eher zur Information)
+        Dest.Generation = Source.Generation
+
+        '13 MemoryRang des PES Elters
+        Dest.Memory_Rank = Source.Memory_Rank
+
+        '14 Location des PES Parent
+        Dest.iLocation = Source.iLocation
 
     End Sub
 
@@ -585,13 +603,13 @@ Public Class CES
         End If
 
         ReDim Memory(neu).Path(n_Locations - 1)
-        ReDim Memory(neu).Parameter(List_Childs(Child_No).myPara.GetUpperBound(0), 1)
-        ReDim Memory(neu).D(List_Childs(Child_No).myPara.GetUpperBound(0))
+        ReDim Memory(neu).PES_Para(List_Childs(Child_No).PES_Para.GetUpperBound(0), 1)
+        ReDim Memory(neu).PES_Dn(List_Childs(Child_No).PES_Para.GetUpperBound(0))
         ReDim Memory(neu).Penalty(n_Penalty - 1)
 
         Memory(neu).Generation = Gen_No
         Array.Copy(List_Childs(Child_No).Path, Memory(neu).Path, List_Childs(Child_No).Path.Length)
-        Array.Copy(List_Childs(Child_No).myPara, Memory(neu).Parameter, List_Childs(Child_No).myPara.Length)
+        Array.Copy(List_Childs(Child_No).PES_Para, Memory(neu).PES_Para, List_Childs(Child_No).PES_Para.Length)
         'ToDo: im Child fehlt auch das Dn
         'Array.Copy(List_Childs(Child_No).myPara, Memory(neu).D, List_Childs(Child_No).myPara.Length)
         Array.Copy(List_Childs(Child_No).Penalty, Memory(neu).Penalty, List_Childs(Child_No).Penalty.Length)
@@ -608,7 +626,7 @@ Public Class CES
         Dim count_b(n_Locations - 1) As Integer
         Dim count_c(n_Locations - 1) As Integer
 
-        Dim PES_Parents(0) As Struct_PES_Parent
+        Dim PES_Parents(0) As Struct_Faksimile
         Dim akt As Integer = 0
 
         For j = 0 To n_Locations - 1
@@ -624,7 +642,7 @@ Public Class CES
                 If Child.Path(j) = Memory(m).Path(j) Then
                     ReDim Preserve PES_Parents(PES_Parents.GetLength(0))
                     akt = PES_Parents.GetUpperBound(0)
-                    Call coppy_PES_Struct(Memory(m), PES_Parents(akt))
+                    Call Copy_Faksimile(Memory(m), PES_Parents(akt))
                     PES_Parents(akt).iLocation = j + 1
                     PES_Parents(akt).Memory_Rank = 1
                     count_a(j) += 1
@@ -635,7 +653,7 @@ Public Class CES
                     If Child.Path(j) = Memory(m).Path(j) And Child.Path(j + 1) = Memory(m).Path(j + 1) Then
                         ReDim Preserve PES_Parents(PES_Parents.GetLength(0))
                         akt = PES_Parents.GetUpperBound(0)
-                        Call coppy_PES_Struct(Memory(m), PES_Parents(akt))
+                        Call Copy_Faksimile(Memory(m), PES_Parents(akt))
                         PES_Parents(akt).iLocation = j + 1
                         PES_Parents(akt).Memory_Rank = 2
                         count_b(j) += 1
@@ -647,7 +665,7 @@ Public Class CES
                     If Child.Path(j) = Memory(m).Path(j) And Child.Path(j + 1) = Memory(m).Path(j + 1) And Child.Path(j + 2) = Memory(m).Path(j + 2) Then
                         ReDim Preserve PES_Parents(PES_Parents.GetLength(0))
                         akt = PES_Parents.GetUpperBound(0)
-                        Call coppy_PES_Struct(Memory(m), PES_Parents(akt))
+                        Call Copy_Faksimile(Memory(m), PES_Parents(akt))
                         PES_Parents(akt).iLocation = j + 1
                         PES_Parents(akt).Memory_Rank = 3
                         count_c(j) += 1
@@ -663,9 +681,9 @@ Public Class CES
 
     'Löscht wenn ein Individuum bei der gleichen Lokation einmal als Rank 1 und einmal als Rank 2 definiert. Bei Rank 2 entsprechnd Rank 3. Außerdem wird der erste leere Datensatz geloescht.
     '***************************************************************************************
-    Private Sub PES_Memory_Dubletten_loeschen(ByRef PES_Parents() As Struct_PES_Parent)
+    Private Sub PES_Memory_Dubletten_loeschen(ByRef PES_Parents() As Struct_Faksimile)
 
-        Dim tmp(PES_Parents.GetUpperBound(0) - 1) As Struct_PES_Parent
+        Dim tmp(PES_Parents.GetUpperBound(0) - 1) As Struct_Faksimile
         Dim isDouble As Boolean
         Dim i, j, x As Integer
 
@@ -678,7 +696,7 @@ Public Class CES
                 End If
             Next
             If isDouble = False Then
-                coppy_PES_Struct(PES_Parents(i), tmp(x))
+                copy_Faksimile(PES_Parents(i), tmp(x))
                 x += 1
             End If
         Next
@@ -687,14 +705,14 @@ Public Class CES
         ReDim Preserve PES_Parents(x - 1)
 
         For i = 0 To tmp.GetUpperBound(0)
-            coppy_PES_Struct(tmp(i), PES_Parents(i))
+            Copy_Faksimile(tmp(i), PES_Parents(i))
         Next
 
     End Sub
 
     'Prüft ob die beiden den gleichen Pfad und zur gleichen location gehören
     '***********************************************************************
-    Private Function is_PES_Double(ByVal First As Struct_PES_Parent, ByVal Second As Struct_PES_Parent) As Boolean
+    Private Function is_PES_Double(ByVal First As Struct_Faksimile, ByVal Second As Struct_Faksimile) As Boolean
         is_PES_Double = False
 
         Dim count As Integer = 0
@@ -714,40 +732,6 @@ Public Class CES
 
     End Function
 
-
-    'Hilfsfunktion: Kopiert ein Memory Struct ins Parent
-    '***************************************************
-    Private Sub coppy_PES_Struct(ByVal Source As Struct_PES_Memory, ByRef Desti As Struct_PES_Parent)
-
-        ReDim Desti.Path(n_Locations - 1)
-        ReDim Desti.Parameter(Source.Parameter.GetLength(0), 1)
-        ReDim Desti.D(Source.D.GetLength(0))
-        ReDim Desti.Penalty(n_Penalty - 1)
-
-        Desti.Generation = Source.Generation
-        Array.Copy(Source.Path, Desti.Path, Source.Path.Length)
-        Array.Copy(Source.Parameter, Desti.Parameter, Source.Parameter.Length)
-        Array.Copy(Source.D, Desti.D, Source.Parameter.Length)
-        Array.Copy(Source.Penalty, Desti.Penalty, Source.Penalty.Length)
-
-    End Sub
-
-    'Hilfsfunktion: koppiert ein PES Parent Struct
-    '***************************************************
-    Private Sub coppy_PES_Struct(ByVal Source As Struct_PES_Parent, ByRef Desti As Struct_PES_Parent)
-
-        ReDim Desti.Path(n_Locations - 1)
-        ReDim Desti.Parameter(Source.Parameter.GetLength(0), 1)
-        ReDim Desti.Penalty(n_Penalty - 1)
-
-        Desti.iLocation = Source.iLocation
-        Desti.Memory_Rank = Source.Memory_Rank
-        Desti.Generation = Source.Generation
-        Array.Copy(Source.Path, Desti.Path, Source.Path.Length)
-        Array.Copy(Source.Parameter, Desti.Parameter, Source.Parameter.Length)
-        Array.Copy(Source.Penalty, Desti.Penalty, Source.Penalty.Length)
-
-    End Sub
 
     'Hilfsfunktionen
     'XXXXXXXXXXXXXXX

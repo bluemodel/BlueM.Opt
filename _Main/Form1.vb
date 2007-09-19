@@ -731,7 +731,7 @@ Partial Class Form1
                 '******
                 If Method = METH_HYBRID Then
                     Call Sim1.Reduce_OptPara_ModPara()
-                    Call Sim1.SaveParameter_to_Child(CES1.List_Childs(i).myPara)
+                    Call Sim1.SaveParameter_to_Child(CES1.List_Childs(i).PES_Para)
                     Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
                     Call Sim1.PREPARE_Evaluation_PES(myPara)
                 End If
