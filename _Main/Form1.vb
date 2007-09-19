@@ -745,8 +745,8 @@ Partial Class Form1
                     Call CES1.Memory_Store(i, gen)
                 End If
 
-                'Zeichnen MO_SO Zeichnen
-                serie = DForm.Diag.getSeriesPoint("Childs", "", Steema.TeeChart.Styles.PointerStyles.Triangle, 4)
+                'Zeichnen MO_SO der Kinder
+                serie = DForm.Diag.getSeriesPoint("Childs", "", Steema.TeeChart.Styles.PointerStyles.Rectangle, 4)
                 If CES1.n_Penalty = 1 Then
                     Call serie.Add(durchlauf_all, CES1.List_Childs(i).Penalty(0))
                 ElseIf CES1.n_Penalty = 2 Then
@@ -763,10 +763,10 @@ Partial Class Form1
                 Call CES1.Sort_Faksimile(CES1.List_Childs)
                 'Selectionsprozess je nach "plus" oder "minus" Strategie
                 Call CES1.Selection_Process()
-                'Zeichnen des besten Elter
+                'Zeichnen der besten Eltern
                 For i = 0 To CES1.n_Parents - 1
                     'durchlauf += 1
-                    serie = DForm.Diag.getSeriesPoint("Parent", "", Steema.TeeChart.Styles.PointerStyles.Triangle, 3)
+                    serie = DForm.Diag.getSeriesPoint("Parent", "", Steema.TeeChart.Styles.PointerStyles.Diamond, 4)
                     Call serie.Add(durchlauf_all, CES1.List_Parents(i).Penalty(0))
                 Next
 

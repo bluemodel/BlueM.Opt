@@ -29,9 +29,9 @@ Public Class CES
 
     'Eingabe
     Public n_Parts_of_Path As Integer = 3   'Länge des Gedächtnispfades Achtung Maximum ist 3
-    Public n_Generations As Integer = 2     'Anzahl der Generationen
+    Public n_Generations As Integer = 5     'Anzahl der Generationen
     Public n_Parents As Integer = 3
-    Public n_Childs As Integer = 12
+    Public n_Childs As Integer = 4
 
     'Private Variablen
     Private ReprodOperator As String = "Select_Random_Uniform"

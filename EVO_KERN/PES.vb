@@ -891,10 +891,6 @@ Public Class PES
                     'Die eigentlichen Parameterwerte werden übernommen
                     Xb(v, j, PES_iAkt.iAktPop) = PES_Initial.Xn(v)
                 Next v
-                If PES_Initial.NPenalty = 2 Then
-                    'TODO: Bei Single-Objective sollte es nie 2 Zielfunktionen geben, oder?
-                    Qb(j, PES_iAkt.iAktPop, 2) = QN(1)
-                End If
             End If
 
         Else
