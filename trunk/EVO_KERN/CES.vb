@@ -41,8 +41,8 @@ Public Class CES
 
     'Faksimile Struktur - enthält alles was für eine Evaluierung erforderlich ist
     '****************************************************************************
-    Public Structure Struct_Faksimile
-        Dim Type as String                  '01 Typ des Faksimile
+    Public Structure Faksimile
+        Dim Type As String                  '01 Typ des Faksimile
         Dim No As Short                     '02 Nummer des Faksimile
         Dim Path() As Integer               '03 Der Pfad
         Dim Penalty() As Double             '04 Werte der Penaltyfunktion(en)
@@ -68,11 +68,11 @@ Public Class CES
 
     End Structure
 
-    Public List_Childs() As Struct_Faksimile
-    Public List_Parents() As Struct_Faksimile
-    Public NDSorting(n_Childs + n_Parents - 1) As Struct_Faksimile
-    Public NDSResult(n_Childs + n_Parents - 1) As Struct_Faksimile
-    Public Memory() As Struct_Faksimile
+    Public List_Childs() As Faksimile
+    Public List_Parents() As Faksimile
+    Public NDSorting(n_Childs + n_Parents - 1) As Faksimile
+    Public NDSResult(n_Childs + n_Parents - 1) As Faksimile
+    Public Memory() As Faksimile
 
 
 #End Region 'Eigenschaften
@@ -80,9 +80,9 @@ Public Class CES
 #Region "Methoden"
     '#############
 
-    'Dimensionieren eines einzelnen Faksimile
-    '****************************************
-    Public Sub Dim_Faksimile(ByRef TMP As Struct_Faksimile, ByVal Type As String, ByVal No As Integer)
+    'Dimensionieren eines einzelnen Faksimile (Überladen)
+    '****************************************************
+    Public Sub Faksimile_Dim(ByRef TMP As Faksimile, ByVal Type As String, ByVal No As Integer)
 
         Dim j As Integer = 0
 
@@ -150,19 +150,19 @@ Public Class CES
 
     End Sub
 
-    'Dim Faksimile für ein Array
-    '***************************
-    Public Sub Dim_Faksimile(ByRef TMP() As Struct_Faksimile, ByVal Type As String)
+    'Dim Faksimile für ein Array (Überladen)
+    '***************************************
+    Public Sub Faksimile_Dim(ByRef TMP() As Faksimile, ByVal Type As String)
         Dim i As Integer
 
         For i = 0 To TMP.GetUpperBound(0)
-            Call Dim_Faksimile(TMP(i), Type, i)
+            Call Faksimile_Dim(TMP(i), Type, i)
         Next
     End Sub
 
     'Kopiert ein Faksimile
     '*********************
-    Public Sub Copy_Faksimile(ByVal Source As Struct_Faksimile, ByRef Dest As Struct_Faksimile)
+    Public Sub Faksimile_Copy(ByVal Source As Faksimile, ByRef Dest As Faksimile)
 
         '01 Typ des Faksimile
         'Dest.Type Bleibt bestehen
@@ -275,7 +275,7 @@ Public Class CES
         'xxxxxxxxxxxxxxx
         If Strategy = "minus" Then
             For i = 0 To n_Parents - 1
-                Call Copy_Faksimile(List_Childs(i), List_Parents(i))
+                Call Faksimile_Copy(List_Childs(i), List_Parents(i))
             Next i
 
             'Strategie PLUS
@@ -295,7 +295,7 @@ Public Class CES
 
                 'Falls der schlechteste Parent schlechter als der Child ist wird er durch den Child ersetzt
                 If List_Parents(bad_no).Penalty(0) > List_Childs(i).Penalty(0) Then
-                    Call Copy_Faksimile(List_Childs(i), List_Parents(bad_no))
+                    Call Faksimile_Copy(List_Childs(i), List_Parents(bad_no))
                 End If
             Next
 
@@ -611,33 +611,23 @@ Public Class CES
             neu = Memory.GetUpperBound(0)
         End If
 
-        Call Dim_Faksimile(Memory(), "Memory")
+        Call Faksimile_Dim(Memory(neu), "Memory", neu)
 
-        ReDim Memory(neu).Path(n_Locations - 1)
-        ReDim Memory(neu).PES_Para(List_Childs(Child_No).PES_Para.GetUpperBound(0), 1)
-        ReDim Memory(neu).PES_Dn(List_Childs(Child_No).PES_Para.GetUpperBound(0))
-        ReDim Memory(neu).Penalty(n_Penalty - 1)
-
+        Call Faksimile_Copy(List_Childs(Child_No), Memory(neu))
         Memory(neu).Generation = Gen_No
-        Array.Copy(List_Childs(Child_No).Path, Memory(neu).Path, List_Childs(Child_No).Path.Length)
-        Array.Copy(List_Childs(Child_No).PES_Para, Memory(neu).PES_Para, List_Childs(Child_No).PES_Para.Length)
-        'ToDo: im Child fehlt auch das Dn
-        'Array.Copy(List_Childs(Child_No).myPara, Memory(neu).D, List_Childs(Child_No).myPara.Length)
-        Array.Copy(List_Childs(Child_No).Penalty, Memory(neu).Penalty, List_Childs(Child_No).Penalty.Length)
-        Array.Copy(List_Childs(Child_No).Constrain, Memory(neu).Constrain, List_Childs(Child_No).Constrain.Length)
 
     End Sub
 
     'Durchsucht den Memory
     '*********************
-    Sub Memory_Search(ByRef Child As Struct_Faksimile)
+    Sub Memory_Search(ByRef Child As Faksimile)
 
         Dim j, m As Integer
         Dim count_a(n_Locations - 1) As Integer
         Dim count_b(n_Locations - 1) As Integer
         Dim count_c(n_Locations - 1) As Integer
 
-        Dim PES_Parents(0) As Struct_Faksimile
+        Dim PES_Parents(0) As Faksimile
         Dim akt As Integer = 0
 
         For j = 0 To n_Locations - 1
@@ -653,7 +643,7 @@ Public Class CES
                 If Child.Path(j) = Memory(m).Path(j) Then
                     ReDim Preserve PES_Parents(PES_Parents.GetLength(0))
                     akt = PES_Parents.GetUpperBound(0)
-                    Call Copy_Faksimile(Memory(m), PES_Parents(akt))
+                    Call Faksimile_Copy(Memory(m), PES_Parents(akt))
                     PES_Parents(akt).iLocation = j + 1
                     PES_Parents(akt).Memory_Rank = 1
                     count_a(j) += 1
@@ -664,7 +654,7 @@ Public Class CES
                     If Child.Path(j) = Memory(m).Path(j) And Child.Path(j + 1) = Memory(m).Path(j + 1) Then
                         ReDim Preserve PES_Parents(PES_Parents.GetLength(0))
                         akt = PES_Parents.GetUpperBound(0)
-                        Call Copy_Faksimile(Memory(m), PES_Parents(akt))
+                        Call Faksimile_Copy(Memory(m), PES_Parents(akt))
                         PES_Parents(akt).iLocation = j + 1
                         PES_Parents(akt).Memory_Rank = 2
                         count_b(j) += 1
@@ -676,7 +666,7 @@ Public Class CES
                     If Child.Path(j) = Memory(m).Path(j) And Child.Path(j + 1) = Memory(m).Path(j + 1) And Child.Path(j + 2) = Memory(m).Path(j + 2) Then
                         ReDim Preserve PES_Parents(PES_Parents.GetLength(0))
                         akt = PES_Parents.GetUpperBound(0)
-                        Call Copy_Faksimile(Memory(m), PES_Parents(akt))
+                        Call Faksimile_Copy(Memory(m), PES_Parents(akt))
                         PES_Parents(akt).iLocation = j + 1
                         PES_Parents(akt).Memory_Rank = 3
                         count_c(j) += 1
@@ -692,9 +682,9 @@ Public Class CES
 
     'Löscht wenn ein Individuum bei der gleichen Lokation einmal als Rank 1 und einmal als Rank 2 definiert. Bei Rank 2 entsprechnd Rank 3. Außerdem wird der erste leere Datensatz geloescht.
     '***************************************************************************************
-    Private Sub PES_Memory_Dubletten_loeschen(ByRef PES_Parents() As Struct_Faksimile)
+    Private Sub PES_Memory_Dubletten_loeschen(ByRef PES_Parents() As Faksimile)
 
-        Dim tmp(PES_Parents.GetUpperBound(0) - 1) As Struct_Faksimile
+        Dim tmp(PES_Parents.GetUpperBound(0) - 1) As Faksimile
         Dim isDouble As Boolean
         Dim i, j, x As Integer
 
@@ -707,7 +697,7 @@ Public Class CES
                 End If
             Next
             If isDouble = False Then
-                Copy_Faksimile(PES_Parents(i), tmp(x))
+                Faksimile_Copy(PES_Parents(i), tmp(x))
                 x += 1
             End If
         Next
@@ -716,14 +706,14 @@ Public Class CES
         ReDim Preserve PES_Parents(x - 1)
 
         For i = 0 To tmp.GetUpperBound(0)
-            Copy_Faksimile(tmp(i), PES_Parents(i))
+            Faksimile_Copy(tmp(i), PES_Parents(i))
         Next
 
     End Sub
 
     'Prüft ob die beiden den gleichen Pfad und zur gleichen location gehören
     '***********************************************************************
-    Private Function is_PES_Double(ByVal First As Struct_Faksimile, ByVal Second As Struct_Faksimile) As Boolean
+    Private Function is_PES_Double(ByVal First As Faksimile, ByVal Second As Faksimile) As Boolean
         is_PES_Double = False
 
         Dim count As Integer = 0
@@ -762,10 +752,10 @@ Public Class CES
 
     'Hilfsfunktion zum sortieren der Faksimile
     '*****************************************
-    Public Sub Sort_Faksimile(ByRef FaksimileList() As Struct_Faksimile)
+    Public Sub Sort_Faksimile(ByRef FaksimileList() As Faksimile)
         'Sortiert die Fiksimile anhand des Abstandes
         Dim i, j As Integer
-        Dim swap As EvoKern.CES.Struct_Faksimile
+        Dim swap As EvoKern.CES.Faksimile
 
         For i = 0 To FaksimileList.GetUpperBound(0)
             For j = 0 To FaksimileList.GetUpperBound(0)
@@ -886,8 +876,8 @@ Public Class CES
         Dim aktuelle_Front As Short
         'Dim Member_Sekundärefront As Short
 
-        Dim NDSorting(n_Childs + n_Parents - 1) As Struct_Faksimile
-        Call Dim_Faksimile(NDSorting, "NDSorting")
+        Dim NDSorting(n_Childs + n_Parents - 1) As Faksimile
+        Call Faksimile_Dim(NDSorting, "NDSorting")
 
         '0. Eltern und Nachfolger werden gemeinsam betrachtet
         'Die Kinder werden NDSorting hinzugefügt
@@ -904,7 +894,7 @@ Public Class CES
             '    Next l
             'End If
 
-            Call Copy_Faksimile(List_Childs(i), NDSorting(i))
+            Call Faksimile_Copy(List_Childs(i), NDSorting(i))
 
             NDSorting(i).dominated = False
             NDSorting(i).Front = 0
@@ -927,7 +917,7 @@ Public Class CES
             '    Next l
             'End If
 
-            Call Copy_Faksimile(List_Parents(i - n_Childs), NDSorting(i))
+            Call Faksimile_Copy(List_Parents(i - n_Childs), NDSorting(i))
 
             NDSorting(i).dominated = False
             NDSorting(i).Front = 0
@@ -941,15 +931,15 @@ Public Class CES
         NFrontMember_gesamt = 0
 
         'Initialisierung von Temp (NDSorting)
-        Dim Temp(n_Childs + n_Parents - 1) As Struct_Faksimile
-        Call Dim_Faksimile(Temp, "TMP_NDSorting")
+        Dim Temp(n_Childs + n_Parents - 1) As Faksimile
+        Call Faksimile_Dim(Temp, "TMP_NDSorting")
 
         'Initialisierung von NDSResult (NDSorting)
-        Call Dim_Faksimile(NDSResult, "NDSResult")
+        Call Faksimile_Dim(NDSResult, "NDSResult")
 
         'NDSorting wird in Temp kopiert
         For i = 0 To NDSorting.GetUpperBound(0)
-            Call Copy_Faksimile(NDSorting(i), Temp(i))
+            Call Faksimile_Copy(NDSorting(i), Temp(i))
         Next
 
         'Schleife läuft über die Zahl der Fronten die hier auch bestimmte werden
@@ -985,7 +975,7 @@ Public Class CES
             '-> schiss wird einfach rüberkopiert
             If NFrontMember_aktuell <= n_Parents - NFrontMember_gesamt Then
                 For i = NFrontMember_gesamt To NFrontMember_aktuell + NFrontMember_gesamt - 1
-                    Call Copy_Faksimile(NDSResult(i), List_Parents(i))
+                    Call Faksimile_Copy(NDSResult(i), List_Parents(i))
                 Next i
                 NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
 
@@ -996,7 +986,7 @@ Public Class CES
                 Call NDS_Crowding_Distance_Sort(NDSResult, NFrontMember_gesamt, NFrontMember_gesamt + NFrontMember_aktuell - 1)
 
                 For i = NFrontMember_gesamt To n_Parents - 1
-                    Call Copy_Faksimile(NDSResult(i), List_Parents(i))
+                    Call Faksimile_Copy(NDSResult(i), List_Parents(i))
                 Next i
 
                 NFrontMember_gesamt = n_Parents
@@ -1083,7 +1073,7 @@ Public Class CES
     'A: Non_Dominated_Sorting
     'Entscheidet welche Werte dominiert werden und welche nicht
     '*******************************************************************************
-    Private Sub Non_Dominated_Sorting(ByRef NDSorting() As Struct_Faksimile, ByRef Durchlauf_Front As Short)
+    Private Sub Non_Dominated_Sorting(ByRef NDSorting() As Faksimile, ByRef Durchlauf_Front As Short)
 
         Dim j, i, k As Short
         Dim Logical As Boolean
@@ -1153,12 +1143,12 @@ Public Class CES
     'B: Non_Dominated_Count_and_Sort
     'Sortiert die nicht dominanten Lösungen nach oben, die dominanten nach unten
     '*******************************************************************************
-    Private Function Non_Dominated_Count_and_Sort(ByRef NDSorting() As Struct_Faksimile) As Short
+    Private Function Non_Dominated_Count_and_Sort(ByRef NDSorting() As Faksimile) As Short
         Dim i As Short
         Dim counter As Short
 
-        Dim Temp(NDSorting.GetUpperBound(0)) As Struct_Faksimile
-        Call Dim_Faksimile(Temp, "Temp_NDSorting")
+        Dim Temp(NDSorting.GetUpperBound(0)) As Faksimile
+        Call Faksimile_Dim(Temp, "Temp_NDSorting")
 
         Non_Dominated_Count_and_Sort = 0
         counter = 0
@@ -1166,7 +1156,7 @@ Public Class CES
         'Die nicht dominanten Lösungen werden nach oben kopiert
         For i = 0 To NDSorting.GetUpperBound(0)
             If NDSorting(i).dominated = True Then
-                Call Copy_Faksimile(NDSorting(i), Temp(counter))
+                Call Faksimile_Copy(NDSorting(i), Temp(counter))
                 counter = counter + 1
             End If
         Next i
@@ -1177,13 +1167,13 @@ Public Class CES
         'Die dominanten Lösungen werden nach unten kopiert
         For i = 0 To NDSorting.GetUpperBound(0)
             If NDSorting(i).dominated = False Then
-                Call Copy_Faksimile(NDSorting(i), Temp(counter))
+                Call Faksimile_Copy(NDSorting(i), Temp(counter))
                 counter = counter + 1
             End If
         Next i
 
         For i = 0 To Temp.GetUpperBound(0)
-            Call Copy_Faksimile(Temp(i), NDSorting(i))
+            Call Faksimile_Copy(Temp(i), NDSorting(i))
         Next
 
     End Function
@@ -1202,7 +1192,7 @@ Public Class CES
     'Hier wird pro durchlauf die nicht dominierte Front in NDSResult geschaufelt
     'und die bereits klassifizierten Lösungen aus Temp Array gelöscht
     '*******************************************************************************
-    Private Sub Non_Dominated_Result(ByRef Temp() As Struct_Faksimile, ByRef NDSResult() As Struct_Faksimile, ByRef NFrontMember_aktuell As Short, ByRef NFrontMember_gesamt As Short)
+    Private Sub Non_Dominated_Result(ByRef Temp() As Faksimile, ByRef NDSResult() As Faksimile, ByRef NFrontMember_aktuell As Short, ByRef NFrontMember_gesamt As Short)
 
         Dim i, Position As Short
 
@@ -1211,7 +1201,7 @@ Public Class CES
         'In NDSResult werden die nicht dominierten Lösungen eingefügt
         For i = Temp.GetUpperBound(0) + 1 - NFrontMember_aktuell To Temp.GetUpperBound(0)
             'NDSResult alle bisher gefundene Fronten
-            Call Copy_Faksimile(Temp(i), NDSResult(Position))
+            Call Faksimile_Copy(Temp(i), NDSResult(Position))
             Position = Position + 1
         Next i
 
@@ -1229,7 +1219,7 @@ Public Class CES
 
     'Count_Front_Members
     '*******************************************************************************
-    Private Function Count_Front_Members(ByVal aktuell_Front As Short, ByRef NDSResult() As Struct_Faksimile) As Integer
+    Private Function Count_Front_Members(ByVal aktuell_Front As Short, ByRef NDSResult() As Faksimile) As Integer
         Dim i As Short
 
         Count_Front_Members = 0
@@ -1245,13 +1235,13 @@ Public Class CES
     'NDS_Crowding_Distance_Sort
     '*******************************************************************************
 
-    Private Sub NDS_Crowding_Distance_Sort(ByRef NDSorting() As Struct_Faksimile, ByRef start As Short, ByRef ende As Short)
+    Private Sub NDS_Crowding_Distance_Sort(ByRef NDSorting() As Faksimile, ByRef start As Short, ByRef ende As Short)
         Dim i As Integer
         Dim j As Integer
         Dim k As Integer
 
-        Dim swap(0) As Struct_Faksimile
-        Call Dim_Faksimile(swap, "swap")
+        Dim swap(0) As Faksimile
+        Call Faksimile_Dim(swap, "swap")
 
         Dim fmin, fmax As Double
 
@@ -1259,9 +1249,9 @@ Public Class CES
             For i = start To ende
                 For j = start To ende
                     If NDSorting(i).Penalty(k) < NDSorting(j).Penalty(k) Then
-                        Call Copy_Faksimile(NDSorting(i), swap(0))
-                        Call Copy_Faksimile(NDSorting(j), NDSorting(i))
-                        Call Copy_Faksimile(swap(0), NDSorting(j))
+                        Call Faksimile_Copy(NDSorting(i), swap(0))
+                        Call Faksimile_Copy(NDSorting(j), NDSorting(i))
+                        Call Faksimile_Copy(swap(0), NDSorting(j))
                     End If
                 Next j
             Next i
@@ -1280,9 +1270,9 @@ Public Class CES
         For i = start To ende
             For j = start To ende
                 If NDSorting(i).Distance > NDSorting(j).Distance Then
-                    Call Copy_Faksimile(NDSorting(i), swap(0))
-                    Call Copy_Faksimile(NDSorting(j), NDSorting(i))
-                    Call Copy_Faksimile(swap(0), NDSorting(j))
+                    Call Faksimile_Copy(NDSorting(i), swap(0))
+                    Call Faksimile_Copy(NDSorting(j), NDSorting(i))
+                    Call Faksimile_Copy(swap(0), NDSorting(j))
                 End If
             Next j
         Next i
