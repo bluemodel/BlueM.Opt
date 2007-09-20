@@ -739,7 +739,10 @@ Partial Class Form1
                 '******
                 If Method = METH_HYBRID Then
                     Call Sim1.Reduce_OptPara_ModPara()
-                    Call Sim1.SaveParameter_to_Child(CES1.List_Childs(i).PES_Para)
+                    Dim j As Integer
+                    For j = 0 To CES1.n_Locations - 1
+                        Call Sim1.SaveParameter_to_Child(CES1.List_Childs(i).pes(j).PES_Para)
+                    Next
                     Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
                     Call Sim1.PREPARE_Evaluation_PES(myPara)
                 End If
@@ -808,24 +811,30 @@ Partial Class Form1
                     'Ermittelt fuer jedes Child den PES Parent Satz
                     Call CES1.Memory_Search(CES1.List_Childs(i))
 
-                    'PES Geschichten
-                    '###############
+                    'Schleife über alle Locations
+                    Dim j as Integer
+                    For j = 0 To CES1.n_Locations - 1
 
-                    '1. Schritt: PES
-                    'Objekt der Klasse PES wird erzeugt PES wird erzeugt
-                    '****************************************************
-                    Dim PES1 As EvoKern.PES
-                    PES1 = New EvoKern.PES
+                        ReDim CES1.PES_Parents(0)
+                        'Call Reduce_Para(ces1.PES_Parents
 
-                    'Schritte 2 - 5 PES wird initialisiert
-                    'Weiteres siehe dort ;-)
-                    '*************************************
-                    Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
+                        'PES Geschichten
+                        '###############
+
+                        '1. Schritt: PES
+                        'Objekt der Klasse PES wird erzeugt PES wird erzeugt
+                        '****************************************************
+                        Dim PES1 As EvoKern.PES
+                        PES1 = New EvoKern.PES
+
+                        'Schritte 2 - 5 PES wird initialisiert
+                        'Weiteres siehe dort ;-)
+                        '*************************************
+                        Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
 
 
 
-
-
+                    Next
                 Next
             End If
 
