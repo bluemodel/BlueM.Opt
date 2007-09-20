@@ -51,6 +51,7 @@ Partial Class Form1
     Public TSP1 As TSP
 
     '**** Globale Parameter Parameter Optimierung ****
+    'ToDo: diese Werte sollten eigentlich nur in CES bzw PES vorgehalten werden
     Dim globalAnzPar As Short
     Dim globalAnzZiel As Short
     Dim globalAnzRand As Short
@@ -809,8 +810,6 @@ Partial Class Form1
 
                     'PES Geschichten
                     '###############
-
-                    '+++++++ZUSAMMENFASSEN+++++++++
 
                     '1. Schritt: PES
                     'Objekt der Klasse PES wird erzeugt PES wird erzeugt

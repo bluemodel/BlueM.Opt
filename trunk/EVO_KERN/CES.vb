@@ -172,9 +172,11 @@ Public Class CES
         Dest.No = Source.No
 
         '03 Der Pfad - zur Kontrolle wird falscher Pfad gesetzt
+        ReDim Dest.Path(Source.Path.GetUpperBound(0))
         Array.Copy(Source.Path, Dest.Path, Source.Path.Length)
 
         '04 Werte der Penaltyfunktion(en)
+        ReDim Dest.Penalty(Source.Penalty.GetUpperBound(0))
         Array.Copy(Source.Penalty, Dest.Penalty, Source.Penalty.Length)
 
         '05 Wert der Randbedingung(en)
