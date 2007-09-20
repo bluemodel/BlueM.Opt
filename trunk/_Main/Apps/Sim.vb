@@ -1165,6 +1165,7 @@ Public MustInherit Class Sim
     End Function
 
     'Schreibt die passenden OptParameter ins Child
+    'ToDo alles ist da!
     '************************************************
     Public Sub SaveParameter_to_Child(ByRef Parameter(,) As Object)
         Dim i As Integer
@@ -1174,6 +1175,8 @@ Public MustInherit Class Sim
             Parameter(i, 0) = List_OptParameter(i).Bezeichnung
             Parameter(i, 1) = List_OptParameter(i).SKWert
         Next
+
+        Redim List_Locations(0)
 
     End Sub
 
