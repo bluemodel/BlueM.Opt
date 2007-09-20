@@ -732,7 +732,7 @@ Partial Class Form1
                 '****************************************
                 'Aktueller Pfad wird an Sim zurückgegeben
                 'Bereitet das BlaueModell für die Kombinatorik vor
-                Call Sim1.PREPARE_Evaluation_CES(CES1.List_Childs(i).Path)
+                Call Sim1.Set_Aktuell_CES(CES1.List_Childs(i).Path)
 
                 'HYBRID
                 '******
@@ -857,7 +857,7 @@ Partial Class Form1
                 '****************************************
                 'Aktueller Pfad wird an Sim zurückgegeben
                 'Bereitet das BlaueModell für die Kombinatorik vor
-                Call Sim1.PREPARE_Evaluation_CES(CES1.List_Childs(i).Path)
+                Call Sim1.Set_Aktuell_CES(CES1.List_Childs(i).Path)
 
                 'Reduktion der OptimierungsParameter und immer dann wenn nicht Nullvariante
                 '****************************************************************************
@@ -1346,8 +1346,8 @@ Start_Evolutionsrunden:
 
                         'String für die Anzeige der Pfade wird generiert
                         ParamString = eol & "Pfad: " & eol
-                        For i = 0 To Sim1.Akt.Massnahmen.GetUpperBound(0)
-                            ParamString &= eol & Sim1.List_Locations(i).Name & ": " & Sim1.Akt.Massnahmen(i).ToString()
+                        For i = 0 To Sim1.Akt.Measures.GetUpperBound(0)
+                            ParamString &= eol & Sim1.List_Locations(i).Name & ": " & Sim1.Akt.Measures(i).ToString()
                         Next
 
 
@@ -1355,8 +1355,8 @@ Start_Evolutionsrunden:
 
                         'String für die Anzeige von Pfad/OptParameter wird generiert
                         ParamString = eol & "Pfad: " & eol
-                        For i = 0 To Sim1.Akt.Massnahmen.GetUpperBound(0)
-                            ParamString &= eol & Sim1.List_Locations(i).Name & ": " & Sim1.Akt.Massnahmen(i).ToString()
+                        For i = 0 To Sim1.Akt.Measures.GetUpperBound(0)
+                            ParamString &= eol & Sim1.List_Locations(i).Name & ": " & Sim1.Akt.Measures(i).ToString()
                         Next
                         ParamString &= eol & eol & "OptParameter: " & eol
                         For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
