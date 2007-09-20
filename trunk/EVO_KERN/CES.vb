@@ -48,6 +48,7 @@ Public Class CES
         Dim Penalty() As Double             '04 Werte der Penaltyfunktion(en)
         Dim Constrain() As Double           '05 Wert der Randbedingung(en)
         Dim mutated As Boolean              '06 Gibt an ob der Wert bereits mutiert ist oder nicht
+        Dim measures() As String            'xx die liste der Massnahmen
 
         'Für ND Sorting -------------------------------------------------
         Dim dominated As Boolean            '07 Kennzeichnung ob Dominiert

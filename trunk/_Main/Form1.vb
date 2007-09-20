@@ -685,7 +685,7 @@ Partial Class Form1
         Dim gen As Integer
         Dim i As Integer
 
-        'Parents und Child werden Dimensioniert
+        'Parents und Childs werden Dimensioniert
         Redim CES1.List_Parents(CES1.n_Parents -1)
         Call CES1.Faksimile_Dim(CES1.List_Parents, "Parent")
         Redim CES1.List_Childs(CES1.n_Childs -1)
@@ -707,6 +707,12 @@ Partial Class Form1
             Call CES1.Generate_All_Test_Paths()
         End If
 
+        'HYBRID ToDo sollte hier nicht der Para und Dn vector initialisiert werden?
+        '******
+        If Method = METH_HYBRID Then
+
+        End If
+
         'Startwerte werden der Verlaufsanzeige werden zugewiesen
         Call Me.INI_Verlaufsanzeige(1, 1, CES1.n_Generations, CES1.n_Childs)
 
@@ -717,6 +723,7 @@ Partial Class Form1
             Call EVO_Opt_Verlauf1.Generation(gen + 1)
 
             'Child Schleife
+            'xxxxxxxxxxxxxx
             For i = 0 To CES1.n_Childs - 1
                 durchlauf_all += 1
 
@@ -1339,8 +1346,8 @@ Start_Evolutionsrunden:
 
                         'String für die Anzeige der Pfade wird generiert
                         ParamString = eol & "Pfad: " & eol
-                        For i = 0 To Sim1.Aktuelle_Massnahmen.GetUpperBound(0)
-                            ParamString &= eol & Sim1.List_Locations(i).Name & ": " & Sim1.Aktuelle_Massnahmen(i).ToString()
+                        For i = 0 To Sim1.Akt.Massnahmen.GetUpperBound(0)
+                            ParamString &= eol & Sim1.List_Locations(i).Name & ": " & Sim1.Akt.Massnahmen(i).ToString()
                         Next
 
 
@@ -1348,8 +1355,8 @@ Start_Evolutionsrunden:
 
                         'String für die Anzeige von Pfad/OptParameter wird generiert
                         ParamString = eol & "Pfad: " & eol
-                        For i = 0 To Sim1.Aktuelle_Massnahmen.GetUpperBound(0)
-                            ParamString &= eol & Sim1.List_Locations(i).Name & ": " & Sim1.Aktuelle_Massnahmen(i).ToString()
+                        For i = 0 To Sim1.Akt.Massnahmen.GetUpperBound(0)
+                            ParamString &= eol & Sim1.List_Locations(i).Name & ": " & Sim1.Akt.Massnahmen(i).ToString()
                         Next
                         ParamString &= eol & eol & "OptParameter: " & eol
                         For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
