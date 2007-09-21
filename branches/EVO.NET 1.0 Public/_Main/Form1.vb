@@ -51,6 +51,7 @@ Partial Class Form1
     Public TSP1 As TSP
 
     '**** Globale Parameter Parameter Optimierung ****
+    'ToDo: diese Werte sollten eigentlich nur in CES bzw PES vorgehalten werden
     Dim globalAnzPar As Short
     Dim globalAnzZiel As Short
     Dim globalAnzRand As Short
@@ -350,6 +351,7 @@ Partial Class Form1
 
                     'Anzahl der Ziele, Locations und Verzeigungen wird an CES übergeben
                     CES1.n_Penalty = Sim1.List_OptZiele.GetLength(0)
+                    Ces1.n_Constrain = Sim1.List_Constraints.GetLength(0)
                     CES1.n_Locations = Sim1.List_Locations.GetLength(0)
                     CES1.n_Verzweig = Sim1.VerzweigungsDatei.GetLength(0)
                     CES1.TestModus = Sim1.Set_TestModus
@@ -684,9 +686,11 @@ Partial Class Form1
         Dim gen As Integer
         Dim i As Integer
 
-        'Parents und Child werden Dimensioniert
-        Call CES1.Dim_Faksimile(CES1.List_Parents)
-        Call CES1.Dim_Faksimile(CES1.List_Childs)
+        'Parents und Childs werden Dimensioniert
+        Redim CES1.List_Parents(CES1.n_Parents -1)
+        Call CES1.Faksimile_Dim(CES1.List_Parents, "Parent")
+        Redim CES1.List_Childs(CES1.n_Childs -1)
+        Call CES1.Faksimile_Dim(CES1.List_Childs, "Child")
 
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
@@ -704,6 +708,12 @@ Partial Class Form1
             Call CES1.Generate_All_Test_Paths()
         End If
 
+        'HYBRID ToDo sollte hier nicht der Para und Dn vector initialisiert werden?
+        '******
+        If Method = METH_HYBRID Then
+
+        End If
+
         'Startwerte werden der Verlaufsanzeige werden zugewiesen
         Call Me.INI_Verlaufsanzeige(1, 1, CES1.n_Generations, CES1.n_Childs)
 
@@ -714,6 +724,7 @@ Partial Class Form1
             Call EVO_Opt_Verlauf1.Generation(gen + 1)
 
             'Child Schleife
+            'xxxxxxxxxxxxxx
             For i = 0 To CES1.n_Childs - 1
                 durchlauf_all += 1
 
@@ -722,13 +733,16 @@ Partial Class Form1
                 '****************************************
                 'Aktueller Pfad wird an Sim zurückgegeben
                 'Bereitet das BlaueModell für die Kombinatorik vor
-                Call Sim1.PREPARE_Evaluation_CES(CES1.List_Childs(i).Path)
+                Call Sim1.Set_Aktuell_CES(CES1.List_Childs(i).Path)
 
                 'HYBRID
                 '******
                 If Method = METH_HYBRID Then
                     Call Sim1.Reduce_OptPara_ModPara()
-                    Call Sim1.SaveParameter_to_Child(CES1.List_Childs(i).myPara)
+                    Dim j As Integer
+                    For j = 0 To CES1.n_Locations - 1
+                        Call Sim1.SaveParameter_to_Child(CES1.List_Childs(i).pes(j).PES_Para)
+                    Next
                     Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
                     Call Sim1.PREPARE_Evaluation_PES(myPara)
                 End If
@@ -742,8 +756,8 @@ Partial Class Form1
                     Call CES1.Memory_Store(i, gen)
                 End If
 
-                'Zeichnen MO_SO Zeichnen
-                serie = DForm.Diag.getSeriesPoint("Childs", "", Steema.TeeChart.Styles.PointerStyles.Triangle, 4)
+                'Zeichnen MO_SO der Kinder
+                serie = DForm.Diag.getSeriesPoint("Childs", "", Steema.TeeChart.Styles.PointerStyles.Rectangle, 4)
                 If CES1.n_Penalty = 1 Then
                     Call serie.Add(durchlauf_all, CES1.List_Childs(i).Penalty(0))
                 ElseIf CES1.n_Penalty = 2 Then
@@ -760,10 +774,10 @@ Partial Class Form1
                 Call CES1.Sort_Faksimile(CES1.List_Childs)
                 'Selectionsprozess je nach "plus" oder "minus" Strategie
                 Call CES1.Selection_Process()
-                'Zeichnen des besten Elter
+                'Zeichnen der besten Eltern
                 For i = 0 To CES1.n_Parents - 1
                     'durchlauf += 1
-                    serie = DForm.Diag.getSeriesPoint("Parent", "", Steema.TeeChart.Styles.PointerStyles.Triangle, 3)
+                    serie = DForm.Diag.getSeriesPoint("Parent", "", Steema.TeeChart.Styles.PointerStyles.Diamond, 4)
                     Call serie.Add(durchlauf_all, CES1.List_Parents(i).Penalty(0))
                 Next
 
@@ -782,7 +796,7 @@ Partial Class Form1
             '***********************************************
             If CES1.TestModus = 0 Then
                 'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
-                Call CES1.Reset_Childs()
+                Call CES1.Faksimile_Dim(CES1.List_Childs, "Child")
                 'Reproduktionsoperatoren, hier gehts dezent zur Sache
                 Call CES1.Reproduction_Control()
                 'Mutationsoperatoren
@@ -797,26 +811,30 @@ Partial Class Form1
                     'Ermittelt fuer jedes Child den PES Parent Satz
                     Call CES1.Memory_Search(CES1.List_Childs(i))
 
-                    'PES Geschichten
-                    '###############
+                    'Schleife über alle Locations
+                    Dim j as Integer
+                    For j = 0 To CES1.n_Locations - 1
 
-                    '+++++++ZUSAMMENFASSEN+++++++++
+                        ReDim CES1.PES_Parents(0)
+                        'Call Reduce_Para(ces1.PES_Parents
 
-                    '1. Schritt: PES
-                    'Objekt der Klasse PES wird erzeugt PES wird erzeugt
-                    '****************************************************
-                    Dim PES1 As EvoKern.PES
-                    PES1 = New EvoKern.PES
+                        'PES Geschichten
+                        '###############
 
-                    'Schritte 2 - 5 PES wird initialisiert
-                    'Weiteres siehe dort ;-)
-                    '*************************************
-                    Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
+                        '1. Schritt: PES
+                        'Objekt der Klasse PES wird erzeugt PES wird erzeugt
+                        '****************************************************
+                        Dim PES1 As EvoKern.PES
+                        PES1 = New EvoKern.PES
+
+                        'Schritte 2 - 5 PES wird initialisiert
+                        'Weiteres siehe dort ;-)
+                        '*************************************
+                        Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
 
 
 
-
-
+                    Next
                 Next
             End If
 
@@ -847,7 +865,7 @@ Partial Class Form1
                 '****************************************
                 'Aktueller Pfad wird an Sim zurückgegeben
                 'Bereitet das BlaueModell für die Kombinatorik vor
-                Call Sim1.PREPARE_Evaluation_CES(CES1.List_Childs(i).Path)
+                Call Sim1.Set_Aktuell_CES(CES1.List_Childs(i).Path)
 
                 'Reduktion der OptimierungsParameter und immer dann wenn nicht Nullvariante
                 '****************************************************************************
@@ -900,9 +918,8 @@ Partial Class Form1
         Dim PES1 As EvoKern.PES
         PES1 = New EvoKern.PES
 
-        'Schritte 2 - 5 PES wird initialisiert
-        'Weiteres siehe dort ;-)
-        '*************************************
+        'Schritte 2 - 5 PES wird initialisiert (Weiteres siehe dort ;-)
+        '**************************************************************
         Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
 
         'Startwerte werden der Verlaufsanzeige werden zugewiesen
@@ -917,7 +934,7 @@ Start_Evolutionsrunden:
         For PES1.PES_iAkt.iAktRunde = 1 To PES1.PES_Settings.NRunden
 
             Call EVO_Opt_Verlauf1.Runden(PES1.PES_iAkt.iAktRunde)
-            Call PES1.EsPopBestwertspeicher()
+            Call PES1.EsResetPopBWSpeicher()
 
             'Über alle Populationen
             'xxxxxxxxxxxxxxxxxxxxxx
@@ -932,7 +949,7 @@ Start_Evolutionsrunden:
                 For PES1.PES_iAkt.iAktGen = 1 To PES1.PES_Settings.NGen
 
                     Call EVO_Opt_Verlauf1.Generation(PES1.PES_iAkt.iAktGen)
-                    Call PES1.EsBestwertspeicher()
+                    Call PES1.EsResetBWSpeicher()
 
                     'Über alle Nachkommen
                     'xxxxxxxxxxxxxxxxxxxxxxxxx
@@ -1038,57 +1055,49 @@ Start_Evolutionsrunden:
 
                         Loop While SIM_Eval_is_OK = False
 
-                        'Einordnen der Qualitätsfunktion im Bestwertspeicher
+                        'Einordnen der Qualitätsfunktion im Bestwertspeicher bei SO
+                        'Falls MO Einordnen der Qualitätsfunktion in NDSorting
                         Call PES1.EsBest(QN, RN)
 
                         System.Windows.Forms.Application.DoEvents()
 
                     Next 'Ende Schleife über alle Nachkommen
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                'Die neuen Eltern werden generiert
-                Call PES1.EsEltern()
+                    'Die neuen Eltern werden generiert
+                    Call PES1.EsEltern()
 
-                'Sekundäre Population 'BUG 135: SekPop(,) fängt bei 1 an!
-                If (EVO_Settings1.PES_Settings.is_MO_Pareto) Then
-                    SekPopulation = PES1.EsGetSekundärePopulation()
-                    'SekPop zeichnen
-                    Call SekundärePopulationZeichnen(SekPopulation)
-                    'SekPop in DB speichern
-                    If (Not IsNothing(Sim1)) Then
-                        If (Sim1.Ergebnisdb) Then
-                            Call Sim1.db_setSekPop(SekPopulation, PES1.PES_iAkt.iAktGen)
+                    'Sekundäre Population 'BUG 135: SekPop(,) fängt bei 1 an!
+                    If (EVO_Settings1.PES_Settings.is_MO_Pareto) Then
+                        SekPopulation = PES1.EsGetSekundärePopulation()
+                        'SekPop zeichnen
+                        Call SekundärePopulationZeichnen(SekPopulation)
+                        'SekPop in DB speichern
+                        If (Not IsNothing(Sim1)) Then
+                            If (Sim1.Ergebnisdb) Then
+                                Call Sim1.db_setSekPop(SekPopulation, PES1.PES_iAkt.iAktGen)
+                            End If
                         End If
                     End If
-                End If
 
+                    System.Windows.Forms.Application.DoEvents()
+
+                Next 'Ende alle Generatione
+                'xxxxxxxxxxxxxxxxxxxxxxxxxxx
                 System.Windows.Forms.Application.DoEvents()
 
-            Next 'Ende alle Generationen
-            'xxxxxxxxxxxxxxxxxxxxxxxxxxx
+                'Einordnen der Qualitätsfunktion im PopulationsBestwertspeicher
+                Call PES1.EsPopBest()
+
+            Next 'Ende alle Populationen
+            'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+            'Die neuen Populationseltern werden generiert
+            Call PES1.EsPopEltern()
             System.Windows.Forms.Application.DoEvents()
-
-            'Einordnen der Qualitätsfunktion im PopulationsBestwertspeicher
-            Call PES1.EsPopBest()
-
-        Next 'Ende alle Populationen
-        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-        'Die neuen Populationseltern werden generiert
-        Call PES1.EsPopEltern()
-
-        System.Windows.Forms.Application.DoEvents()
-
 
         Next 'Ende alle Runden
         'xxxxxxxxxxxxxxxxxxxxx
-
-        'PES, letzter. Schritt
-        'Objekt der Klasse PES wird vernichtet
-        '**********************************************************************************
-        'UPGRADE_NOTE: Das Objekt PES1 kann erst dann gelöscht werden, wenn die Garbagecollection durchgeführt wurde. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1029"'
-        'TODO: Ersetzen durch dispose funzt net
-        PES1 = Nothing
 
     End Sub
 
@@ -1345,8 +1354,8 @@ Start_Evolutionsrunden:
 
                         'String für die Anzeige der Pfade wird generiert
                         ParamString = eol & "Pfad: " & eol
-                        For i = 0 To Sim1.Aktuelle_Massnahmen.GetUpperBound(0)
-                            ParamString &= eol & Sim1.List_Locations(i).Name & ": " & Sim1.Aktuelle_Massnahmen(i).ToString()
+                        For i = 0 To Sim1.Akt.Measures.GetUpperBound(0)
+                            ParamString &= eol & Sim1.List_Locations(i).Name & ": " & Sim1.Akt.Measures(i).ToString()
                         Next
 
 
@@ -1354,8 +1363,8 @@ Start_Evolutionsrunden:
 
                         'String für die Anzeige von Pfad/OptParameter wird generiert
                         ParamString = eol & "Pfad: " & eol
-                        For i = 0 To Sim1.Aktuelle_Massnahmen.GetUpperBound(0)
-                            ParamString &= eol & Sim1.List_Locations(i).Name & ": " & Sim1.Aktuelle_Massnahmen(i).ToString()
+                        For i = 0 To Sim1.Akt.Measures.GetUpperBound(0)
+                            ParamString &= eol & Sim1.List_Locations(i).Name & ": " & Sim1.Akt.Measures(i).ToString()
                         Next
                         ParamString &= eol & eol & "OptParameter: " & eol
                         For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)

@@ -1,5 +1,5 @@
 Imports System.IO
-Imports IHWB.BlueM
+Imports IHWB.BlueM.DllAdapter
 
 '*******************************************************************************
 '*******************************************************************************
@@ -32,7 +32,7 @@ Public Class BlueM
 
     'IHA
     '---
-    Private isIHA as Boolean = False
+    Private isIHA As Boolean = False
     Private IHA1 As IHA
 
 #End Region 'Eigenschaften
@@ -263,7 +263,7 @@ Public Class BlueM
         FiStr.Close()
 
         'Hier wird das Verzweigungsarray Dimensioniert
-        ReDim VER_ONOFF(VerzweigungsDatei.GetUpperBound(0), 1)
+        ReDim Akt.VER_ONOFF(VerzweigungsDatei.GetUpperBound(0), 1)
 
     End Sub
 
@@ -405,7 +405,7 @@ Public Class BlueM
 
     'Schreibt die neuen Verzweigungen
     '********************************
-    Protected Overrides Sub Prepare_Write_Verzweigungen()
+    Protected Overrides Sub Write_Verzweigungen()
 
         Dim AnzZeil As Integer
         Dim i, j As Integer
@@ -440,17 +440,17 @@ Public Class BlueM
         FiStr.Close()
 
         'ZeilenArray wird zu neuer Datei zusammen gebaut
-        For i = 0 To VER_ONOFF.GetUpperBound(0)
-            If Not VER_ONOFF(i, 1) = Nothing Then
+        For i = 0 To Akt.VER_ONOFF.GetUpperBound(0)
+            If Not Akt.VER_ONOFF(i, 1) = Nothing Then
                 For j = 0 To Zeilenarray.GetUpperBound(0)
                     If Not Zeilenarray(j).StartsWith("*") Then
                         SplitZeile = Zeilenarray(j).Split("|")
-                        If VER_ONOFF(i, 0) = SplitZeile(1).Trim Then
+                        If Akt.VER_ONOFF(i, 0) = SplitZeile(1).Trim Then
                             StrLeft = Microsoft.VisualBasic.Left(Zeilenarray(j), 31)
                             StrRight = Microsoft.VisualBasic.Right(Zeilenarray(j), 49)
-                            If VER_ONOFF(i, 1) = "1" Then
+                            If Akt.VER_ONOFF(i, 1) = "1" Then
                                 Zeilenarray(j) = StrLeft & "      100     " & StrRight
-                            ElseIf (VER_ONOFF(i, 1) = "0") Then
+                            ElseIf (Akt.VER_ONOFF(i, 1) = "0") Then
                                 Zeilenarray(j) = StrLeft & "        0     " & StrRight
                             End If
                         End If

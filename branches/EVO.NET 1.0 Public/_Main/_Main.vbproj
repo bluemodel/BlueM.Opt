@@ -242,9 +242,9 @@
     <None Include="Resources\scatterplot.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\IHWB.BlueM_DllAdapter\IHWB.BlueM_DllAdapter.csproj">
+    <ProjectReference Include="..\BlueM.DLLAdapter\IHWB.BlueM.DLLAdapter.csproj">
       <Project>{1EC50F6A-48C0-48F3-B9CD-77097889CF02}</Project>
-      <Name>IHWB.BlueM_DllAdapter</Name>
+      <Name>IHWB.BlueM.DLLAdapter</Name>
     </ProjectReference>
     <ProjectReference Include="..\Wave\Wave.vbproj">
       <Project>{BCD1BBE3-5AB2-4C3F-AC12-43EB977C6F6F}</Project>
