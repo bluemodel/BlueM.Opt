@@ -138,14 +138,14 @@ Public Class CES
         For i = 0 To TMP.PES.GetUpperBound(0)
 
             '10 Die Optimierungsparameter - wird dynamisch behandelt
-            ReDim TMP.PES(i).PES_Para(3, 1)
-            For j = 0 To TMP.PES(i).PES_Para.GetUpperBound(0)
-                TMP.PES(i).PES_Para(j, 0) = "xxx"
-                TMP.PES(i).PES_Para(j, 1) = 777
+            ReDim TMP.PES(i).PES_Para(1, 0)
+            For j = 0 To TMP.PES(i).PES_Para.GetUpperBound(1)
+                TMP.PES(i).PES_Para(0, j) = "xxx"
+                TMP.PES(i).PES_Para(1, j) = 777
             Next
 
             '11 Das Dn für PES
-            ReDim TMP.PES(i).PES_Dn(3)
+            ReDim TMP.PES(i).PES_Dn(0)
             For j = 0 To TMP.PES(i).PES_Dn.GetUpperBound(0)
                 TMP.PES(i).PES_Dn(j) = 777
             Next
@@ -215,7 +215,7 @@ Public Class CES
         For i = 0 To Source.PES.GetUpperBound(0)
 
             '10 Die Optimierungsparameter - wird dynamisch behandelt (Funzt auch für 2D Array)
-            ReDim Dest.PES(i).PES_Para(Source.PES(i).PES_Para.GetUpperBound(0), 1)
+            ReDim Dest.PES(i).PES_Para(1, Source.PES(i).PES_Para.GetUpperBound(1))
             Array.Copy(Source.PES(i).PES_Para, Dest.PES(i).PES_Para, Source.PES(i).PES_Para.Length)
 
             '11 Das Dn für PES
