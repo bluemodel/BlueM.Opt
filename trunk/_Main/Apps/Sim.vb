@@ -957,6 +957,27 @@ Public MustInherit Class Sim
 
     End Sub
 
+    'Die Elemente werden pro Location im Child gespeichert
+    '*****************************************************
+    Public Sub Identify_Elements(ByVal No_Loc As Integer, ByVal No_Measure As Integer, ByRef Elements() As String)
+
+        Dim j As Integer
+        Dim x as Integer = 0
+
+        For j = 0 To List_Locations(No_Loc).List_Massnahmen(No_Measure).Bauwerke.GetUpperBound(0)
+            If Not List_Locations(No_Loc).List_Massnahmen(No_Measure).Bauwerke(j) = "X" Then
+                Elements(x) = List_Locations(No_Loc).List_Massnahmen(No_Measure).Bauwerke(j)
+                x += 1
+                ReDim Preserve Elements(x)
+            End If
+        Next
+
+        ReDim Preserve Elements(x - 1)
+
+    End Sub
+
+
+
     'Struct und Methoden welche aktuellen Informationen zur Verfügung stellen
     '#########################################################################
     Public Structure Aktuell
@@ -970,19 +991,19 @@ Public MustInherit Class Sim
 
     'Bereitet das SimModell für Kombinatorik Optimierung vor
     '*******************************************************
-    Public Sub Set_Aktuell_CES(ByVal Path() As Integer)
+    Public Sub PREPARE_Evaluation_CES(ByVal Path() As Integer)
 
         'Setzt den Aktuellen Pfad
         Akt.Path = Path
 
         'Erstellt die aktuelle Bauerksliste und überträgt sie zu SKos
-        Call Set_aktuelle_Elemente()
+        Call Prepare_aktuelle_Elemente()
 
         'Ermittelt die Namen der Locations
-        Call Set_aktuelle_Measures()
+        Call Prepare_aktuelle_Measures()
 
         'Ermittelt das aktuelle_ON_OFF array
-        Call Set_Verzweigung_ON_OFF()
+        Call Prepare_Verzweigung_ON_OFF()
 
         'Schreibt die neuen Verzweigungen
         Call Me.Write_Verzweigungen()
@@ -1004,10 +1025,10 @@ Public MustInherit Class Sim
         Next
 
         'Erstellt die aktuelle Bauerksliste und überträgt sie zu SKos
-        Call Set_aktuelle_Elemente()
+        Call Prepare_aktuelle_Elemente()
 
         'Ermittelt das aktuelle_ON_OFF array
-        Call Set_Verzweigung_ON_OFF()
+        Call Prepare_Verzweigung_ON_OFF()
 
         'Schreibt die neuen Verzweigungen
         Call Write_Verzweigungen()
@@ -1017,7 +1038,7 @@ Public MustInherit Class Sim
 
     'Die Liste mit den aktuellen Bauwerken des Kindes wird erstellt und in SKos geschrieben
     '**************************************************************************************
-    Private Sub Set_aktuelle_Elemente()
+    Private Sub Prepare_aktuelle_Elemente()
         Dim i, j As Integer
         Dim No As Integer
 
@@ -1041,7 +1062,7 @@ Public MustInherit Class Sim
 
     'Ermittelt die Namen der aktuellen Bauwerke
     '******************************************
-    Private Sub Set_aktuelle_Measures()
+    Private Sub Prepare_aktuelle_Measures()
         Dim i, j As Integer
 
         ReDim Akt.Measures(List_Locations.GetUpperBound(0))
@@ -1058,7 +1079,7 @@ Public MustInherit Class Sim
 
     'Ermittelt das aktuelle Verzweigungsarray
     '****************************************
-    Private Sub Set_Verzweigung_ON_OFF()
+    Private Sub Prepare_Verzweigung_ON_OFF()
         Dim j, x, y, z As Integer
         Dim No As Short
 
@@ -1149,6 +1170,7 @@ Public MustInherit Class Sim
                 Next
             Next
 
+            'ToDo: Dieser Fall ist nur Relevant, wenn CES + PES sequentiell
             If count = 0 Then
                 Throw New Exception("Die aktuelle Kombination enthält keine Bauwerke, für die OptimierungsParameter vorliegen")
             End If
@@ -2144,7 +2166,7 @@ Public MustInherit Class Sim
                 'Bereitet das BlaueModell für die Kombinatorik vor
                 Call Me.Set_Aktuell_CES()
 
-                'OptParameter reduzieren
+                'OptParameter reduzieren (War das nur für die Datensätze? Hat hier eigentlich nichts zu suchen.)
                 Me.Reduce_OptPara_ModPara()
 
                 'OptParametersatz übernehmen

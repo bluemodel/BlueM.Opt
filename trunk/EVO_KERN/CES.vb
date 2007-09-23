@@ -57,7 +57,7 @@ Public Class CES
         'Dim Feasible As Boolean            'Gültiges Ergebnis ?
 
         'Für PES --------------------------------------------------------
-        Dim PES() As PES_Data               '10 + 11 Daten für PES
+        Dim Loc() As Location_Data               '10 + 11 Daten für PES
 
         'Für PES Memory -------------------------------------------------
         Dim Generation As Integer           '12 Die Generation (eher zur Information)
@@ -68,9 +68,10 @@ Public Class CES
 
     End Structure
 
-    Public Structure PES_Data
-        Dim PES_Para(,) As Object           '10 Die Optimierungsparameter für PES
-        Dim PES_Dn() As Object              '11 Das Dn für PES
+    Public Structure Location_Data
+        Dim Loc_Para(,) As Object           '10 Die Optimierungsparameter für PES
+        Dim Loc_Dn() As Object              '11 Das Dn für PES
+        Dim Loc_Elem() As String          '11a Die Elemente die zur Location gehören
     End Structure
 
     Public List_Childs() As Faksimile
@@ -133,21 +134,27 @@ Public Class CES
         TMP.Distance = 0
 
         '11 + 10 PES Informationen
-        ReDim TMP.PES(n_Locations)
+        ReDim TMP.Loc(n_Locations)
 
-        For i = 0 To TMP.PES.GetUpperBound(0)
+        For i = 0 To TMP.Loc.GetUpperBound(0)
 
             '10 Die Optimierungsparameter - wird dynamisch behandelt
-            ReDim TMP.PES(i).PES_Para(1, 0)
-            For j = 0 To TMP.PES(i).PES_Para.GetUpperBound(1)
-                TMP.PES(i).PES_Para(0, j) = "xxx"
-                TMP.PES(i).PES_Para(1, j) = 777
+            ReDim TMP.Loc(i).Loc_Para(1, 0)
+            For j = 0 To TMP.Loc(i).Loc_Para.GetUpperBound(1)
+                TMP.Loc(i).Loc_Para(0, j) = "xxx"
+                TMP.Loc(i).Loc_Para(1, j) = 777
             Next
 
             '11 Das Dn für PES
-            ReDim TMP.PES(i).PES_Dn(0)
-            For j = 0 To TMP.PES(i).PES_Dn.GetUpperBound(0)
-                TMP.PES(i).PES_Dn(j) = 777
+            ReDim TMP.Loc(i).Loc_Dn(0)
+            For j = 0 To TMP.Loc(i).Loc_Dn.GetUpperBound(0)
+                TMP.Loc(i).Loc_Dn(j) = 777
+            Next
+
+            '11a Die Elemente die zur Location gehören
+            ReDim TMP.Loc(i).Loc_Elem(0)
+            For j = 0 To TMP.Loc(i).Loc_Elem.GetUpperBound(0)
+                TMP.Loc(i).Loc_Elem(j) = "xyz"
             Next
         Next
 
@@ -210,19 +217,22 @@ Public Class CES
         Dest.Distance = Source.Distance
 
         '10 + 11 Die PES Informationen
-        ReDim Dest.PES(Source.PES.GetUpperBound(0))
+        ReDim Dest.Loc(Source.Loc.GetUpperBound(0))
 
-        For i = 0 To Source.PES.GetUpperBound(0)
+        For i = 0 To Source.Loc.GetUpperBound(0)
 
             '10 Die Optimierungsparameter - wird dynamisch behandelt (Funzt auch für 2D Array)
-            ReDim Dest.PES(i).PES_Para(1, Source.PES(i).PES_Para.GetUpperBound(1))
-            Array.Copy(Source.PES(i).PES_Para, Dest.PES(i).PES_Para, Source.PES(i).PES_Para.Length)
+            ReDim Dest.Loc(i).Loc_Para(1, Source.Loc(i).Loc_Para.GetUpperBound(1))
+            Array.Copy(Source.Loc(i).Loc_Para, Dest.Loc(i).Loc_Para, Source.Loc(i).Loc_Para.Length)
 
             '11 Das Dn für PES
-            ReDim Dest.PES(i).PES_Dn(Source.PES(i).PES_Dn.GetUpperBound(0))
-            Array.Copy(Source.PES(i).PES_Dn, Dest.PES(i).PES_Dn, Source.PES(i).PES_Dn.Length)
-        Next
+            ReDim Dest.Loc(i).Loc_Dn(Source.Loc(i).Loc_Dn.GetUpperBound(0))
+            Array.Copy(Source.Loc(i).Loc_Dn, Dest.Loc(i).Loc_Dn, Source.Loc(i).Loc_Dn.Length)
 
+            '11a Die Elemte die zur Location gehören
+            ReDim Dest.Loc(i).Loc_Elem(Source.Loc(i).Loc_Elem.GetUpperBound(0))
+            Array.Copy(Source.Loc(i).Loc_Elem, Dest.Loc(i).Loc_Elem, Source.Loc(i).Loc_Elem.Length)
+        Next
 
         '12 Die Generation (eher zur Information)
         Dest.Generation = Source.Generation
@@ -652,7 +662,7 @@ Public Class CES
         Dim count_c(n_Locations - 1) As Integer
 
         ReDim PES_Parents(0)
-        Call faksimile_dim(PES_Parents(0), "PES_Parent", 0)
+        Call Faksimile_Dim(PES_Parents(0), "PES_Parent", 0)
 
         Dim akt As Integer = 0
 
@@ -668,7 +678,7 @@ Public Class CES
                 'Rank Nummer 1
                 If Child.Path(j) = Memory(m).Path(j) Then
                     ReDim Preserve PES_Parents(PES_Parents.GetLength(0))
-                    Call faksimile_dim(PES_Parents(PES_Parents.GetUpperBound(0)), "PES_Parent", PES_Parents.GetUpperBound(0))
+                    Call Faksimile_Dim(PES_Parents(PES_Parents.GetUpperBound(0)), "PES_Parent", PES_Parents.GetUpperBound(0))
                     akt = PES_Parents.GetUpperBound(0)
                     Call Faksimile_Copy(Memory(m), PES_Parents(akt))
                     PES_Parents(akt).iLocation = j + 1
@@ -680,7 +690,7 @@ Public Class CES
                 If Not j = n_Locations - 1 And n_Parts_of_Path > 1 Then
                     If Child.Path(j) = Memory(m).Path(j) And Child.Path(j + 1) = Memory(m).Path(j + 1) Then
                         ReDim Preserve PES_Parents(PES_Parents.GetLength(0))
-                        Call faksimile_dim(PES_Parents(PES_Parents.GetUpperBound(0)), "PES_Parent", PES_Parents.GetUpperBound(0))
+                        Call Faksimile_Dim(PES_Parents(PES_Parents.GetUpperBound(0)), "PES_Parent", PES_Parents.GetUpperBound(0))
                         akt = PES_Parents.GetUpperBound(0)
                         Call Faksimile_Copy(Memory(m), PES_Parents(akt))
                         PES_Parents(akt).iLocation = j + 1
@@ -693,7 +703,7 @@ Public Class CES
                 If Not (j = n_Locations - 1 Or j = n_Locations - 2) And n_Parts_of_Path > 2 Then
                     If Child.Path(j) = Memory(m).Path(j) And Child.Path(j + 1) = Memory(m).Path(j + 1) And Child.Path(j + 2) = Memory(m).Path(j + 2) Then
                         ReDim Preserve PES_Parents(PES_Parents.GetLength(0))
-                        Call faksimile_dim(PES_Parents(PES_Parents.GetUpperBound(0)), "PES_Parent", PES_Parents.GetUpperBound(0))
+                        Call Faksimile_Dim(PES_Parents(PES_Parents.GetUpperBound(0)), "PES_Parent", PES_Parents.GetUpperBound(0))
                         akt = PES_Parents.GetUpperBound(0)
                         Call Faksimile_Copy(Memory(m), PES_Parents(akt))
                         PES_Parents(akt).iLocation = j + 1
