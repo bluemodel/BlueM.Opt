@@ -56,8 +56,8 @@ Public Class CES
         Dim Distance As Double              '09 Für crowding distance
         'Dim Feasible As Boolean            'Gültiges Ergebnis ?
 
-        'Für PES --------------------------------------------------------
-        Dim Loc() As Location_Data               '10 + 11 Daten für PES
+        'Information pro Location ---------------------------------------
+        Dim Loc() As Location_Data               '10 + 11 Information pro Location
 
         'Für PES Memory -------------------------------------------------
         Dim Generation As Integer           '12 Die Generation (eher zur Information)
@@ -65,6 +65,24 @@ Public Class CES
         'Für PES Parent -------------------------------------------------
         Dim Memory_Rank As Integer          '13 MemoryRang des PES Elters
         Dim iLocation As Integer            '14 Location des PES Parent
+
+        'Gibt ein Array mit den Elementen aller Locations zurück
+        Public ReadOnly Property All_Elem() As String()
+            Get
+                Dim i As Integer
+                Dim array() As String = {}
+                For i = 0 To Loc.GetUpperBound(0)
+                    If Loc(i).Loc_Elem.GetLength(0) = 0 Then
+                        throw new Exception("Die Element Gesamtlicte wurde abgerufen bevor die Elemente pro Location ermittelt wurden")
+                    End If
+                    If i = 0 Then ReDim All_Elem(-1)
+                    ReDim Preserve array(array.GetUpperBound(0) + Loc(i).Loc_Elem.GetLength(0))
+                    System.Array.Copy(Loc(i).Loc_Elem, 0, array, array.GetUpperBound(0) - Loc(i).Loc_Elem.GetUpperBound(0), Loc(i).Loc_Elem.GetLength(0))
+                Next
+                All_Elem = array
+            End Get
+
+        End Property
 
     End Structure
 
@@ -133,8 +151,8 @@ Public Class CES
         '09 Für crowding distance
         TMP.Distance = 0
 
-        '11 + 10 PES Informationen
-        ReDim TMP.Loc(n_Locations)
+        '11 + 10 Informationen pro Location
+        ReDim TMP.Loc(n_Locations - 1)
 
         For i = 0 To TMP.Loc.GetUpperBound(0)
 
@@ -152,10 +170,7 @@ Public Class CES
             Next
 
             '11a Die Elemente die zur Location gehören
-            ReDim TMP.Loc(i).Loc_Elem(0)
-            For j = 0 To TMP.Loc(i).Loc_Elem.GetUpperBound(0)
-                TMP.Loc(i).Loc_Elem(j) = "xyz"
-            Next
+            ReDim TMP.Loc(i).Loc_Elem(-1)
         Next
 
         '12 Die Generation (eher zur Information)

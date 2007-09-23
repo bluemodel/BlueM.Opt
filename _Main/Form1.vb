@@ -712,6 +712,7 @@ Partial Class Form1
         'Am einfachsten die aktuellen Elemente mit dem Child führen
         '****** Soll er immer machen, da diese für Skos gebraucht werden
 
+        'Hier werden dem Child die passenden Elemente pro Location zugewiesen
         For i = 0 To CES1.n_Childs - 1
             Dim j As Integer
             For j = 0 To CES1.n_Locations - 1
@@ -745,7 +746,7 @@ Partial Class Form1
                 '******
                 If Method = METH_HYBRID Then
                     'Die Parameterliste wird auf die wirklich verwendeten reduziert
-                    Call Sim1.Reduce_OptPara_ModPara()
+                    Call Sim1.Reduce_OptPara_ModPara(ces1.List_Childs(i).All_Elem)
                     Dim j As Integer
                     'Die Parameter für jede Location werden gespeichert
                     For j = 0 To CES1.n_Locations - 1
@@ -816,11 +817,23 @@ Partial Class Form1
                 Call CES1.Mutation_Control()
             End If
 
+            'Hier werden dem Child die passenden Elemente pro Location zugewiesen
+            For i = 0 To CES1.n_Childs - 1
+                Dim j As Integer
+                For j = 0 To CES1.n_Locations - 1
+                    Call Sim1.Identify_Elements(j, CES1.List_Childs(i).Path(j), CES1.List_Childs(i).Loc(j).Loc_Elem)
+                Next
+            Next
+
             'HYBRID: REPRODUKTION und MUTATION
             '*********************************
             If Method = METH_HYBRID Then
                 'Child Schleife hier da für jedes Child die PES Funktionen angesteuert werden
                 For i = 0 To CES1.List_Childs.GetUpperBound(0)
+
+
+
+
                     'Ermittelt fuer jedes Child den PES Parent Satz
                     Call CES1.Memory_Search(CES1.List_Childs(i))
 
@@ -880,9 +893,15 @@ Partial Class Form1
                 'Bereitet das BlaueModell für die Kombinatorik vor
                 Call Sim1.PREPARE_Evaluation_CES(CES1.List_Childs(i).Path)
 
+                'Hier werden Child die passenden Elemente zugewiesen
+                Dim j As Integer
+                For j = 0 To CES1.n_Locations - 1
+                    Call Sim1.Identify_Elements(j, CES1.List_Childs(i).Path(j), CES1.List_Childs(i).Loc(j).Loc_Elem)
+                Next
+
                 'Reduktion der OptimierungsParameter und immer dann wenn nicht Nullvariante
                 '****************************************************************************
-                If Sim1.Reduce_OptPara_ModPara() Then
+                If Sim1.Reduce_OptPara_ModPara(ces1.List_Childs(i).All_Elem) Then
 
                     'Parameterübergabe an PES
                     '************************
