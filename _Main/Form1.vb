@@ -708,11 +708,17 @@ Partial Class Form1
             Call CES1.Generate_All_Test_Paths()
         End If
 
-        'HYBRID ToDo sollte hier nicht der Para und Dn vector initialisiert werden?
-        '******
-        If Method = METH_HYBRID Then
+        'HYBRID ToDo sollte hier nicht der Para und Dn vector initialisiert werden? Exakt!
+        'Am einfachsten die aktuellen Elemente mit dem Child führen
+        '****** Soll er immer machen, da diese für Skos gebraucht werden
 
-        End If
+        For i = 0 To CES1.n_Childs - 1
+            Dim j As Integer
+            For j = 0 To CES1.n_Locations - 1
+                Call Sim1.Identify_Elements(j, CES1.List_Childs(i).Path(j), CES1.List_Childs(i).Loc(j).Loc_Elem)
+            Next
+        Next
+
 
         'Startwerte werden der Verlaufsanzeige werden zugewiesen
         Call Me.INI_Verlaufsanzeige(1, 1, CES1.n_Generations, CES1.n_Childs)
@@ -733,9 +739,9 @@ Partial Class Form1
                 '****************************************
                 'Aktueller Pfad wird an Sim zurückgegeben
                 'Bereitet das BlaueModell für die Kombinatorik vor
-                Call Sim1.Set_Aktuell_CES(CES1.List_Childs(i).Path)
+                Call Sim1.PREPARE_Evaluation_CES(CES1.List_Childs(i).Path)
 
-                'HYBRID
+                'HYBRID Mmuss hier raus !!! und nach unten
                 '******
                 If Method = METH_HYBRID Then
                     'Die Parameterliste wird auf die wirklich verwendeten reduziert
@@ -743,10 +749,12 @@ Partial Class Form1
                     Dim j As Integer
                     'Die Parameter für jede Location werden gespeichert
                     For j = 0 To CES1.n_Locations - 1
-                        Call Sim1.SaveParameter_to_Child(j, CES1.List_Childs(i).Path(j), CES1.List_Childs(i).PES(j).PES_Para)
+                        Call Sim1.SaveParameter_to_Child(j, CES1.List_Childs(i).Path(j), CES1.List_Childs(i).Loc(j).Loc_Para)
                     Next
                     'Das müsste auch pro Location sein oder ? -------------------------
                     'Falsch hier entweder Später die Parameter überschreiben oder weg hier ---------------------
+                    'die Parameter müssen aus dem child geschrieben werden
+                    'also vorher einmal die start werte einlesen und dann hinter her mit der PES mutieren
                     Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
                     'hier müsten die Parameter wieder zusammengefast werden ---------------------------
                     Call Sim1.PREPARE_Evaluation_PES(myPara)
@@ -817,7 +825,7 @@ Partial Class Form1
                     Call CES1.Memory_Search(CES1.List_Childs(i))
 
                     'Schleife über alle Locations
-                    Dim j as Integer
+                    Dim j As Integer
                     For j = 0 To CES1.n_Locations - 1
 
                         ReDim CES1.PES_Parents(0)
@@ -870,7 +878,7 @@ Partial Class Form1
                 '****************************************
                 'Aktueller Pfad wird an Sim zurückgegeben
                 'Bereitet das BlaueModell für die Kombinatorik vor
-                Call Sim1.Set_Aktuell_CES(CES1.List_Childs(i).Path)
+                Call Sim1.PREPARE_Evaluation_CES(CES1.List_Childs(i).Path)
 
                 'Reduktion der OptimierungsParameter und immer dann wenn nicht Nullvariante
                 '****************************************************************************
@@ -907,6 +915,7 @@ Partial Class Form1
         '--------------------------
         'TODO: If (ipop + igen + inachf + irunde) > 4 Then GoTo Start_Evolutionsrunden '????? Wie?
         'Werte an Variablen übergeben auskommentiert Werte finden sich im PES werden hier aber nicht zugewiesen
+        'Kann der Kommentar nicht weg?
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
         ReDim QN(globalAnzZiel - 1)
