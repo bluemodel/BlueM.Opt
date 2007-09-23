@@ -716,7 +716,7 @@ Partial Class Form1
         For i = 0 To CES1.n_Childs - 1
             Dim j As Integer
             For j = 0 To CES1.n_Locations - 1
-                Call Sim1.Identify_Elements(j, CES1.List_Childs(i).Path(j), CES1.List_Childs(i).Loc(j).Loc_Elem)
+                Call Sim1.Identify_Measures_and_their_Elements(j, CES1.List_Childs(i).Path(j), ces1.List_Childs(i).Measures(j), CES1.List_Childs(i).Loc(j).Loc_Elem)
             Next
         Next
 
@@ -821,7 +821,7 @@ Partial Class Form1
             For i = 0 To CES1.n_Childs - 1
                 Dim j As Integer
                 For j = 0 To CES1.n_Locations - 1
-                    Call Sim1.Identify_Elements(j, CES1.List_Childs(i).Path(j), CES1.List_Childs(i).Loc(j).Loc_Elem)
+                    Call Sim1.Identify_Measures_and_their_Elements(j, CES1.List_Childs(i).Path(j), ces1.List_Childs(i).Measures(j), CES1.List_Childs(i).Loc(j).Loc_Elem)
                 Next
             Next
 
@@ -896,7 +896,7 @@ Partial Class Form1
                 'Hier werden Child die passenden Elemente zugewiesen
                 Dim j As Integer
                 For j = 0 To CES1.n_Locations - 1
-                    Call Sim1.Identify_Elements(j, CES1.List_Childs(i).Path(j), CES1.List_Childs(i).Loc(j).Loc_Elem)
+                    Call Sim1.Identify_Measures_and_their_Elements(j, CES1.List_Childs(i).Path(j), ces1.List_Childs(i).Measures(j), CES1.List_Childs(i).Loc(j).Loc_Elem)
                 Next
 
                 'Reduktion der OptimierungsParameter und immer dann wenn nicht Nullvariante
