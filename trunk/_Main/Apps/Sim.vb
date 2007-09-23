@@ -966,13 +966,17 @@ Public MustInherit Class Sim
 
         For j = 0 To List_Locations(No_Loc).List_Massnahmen(No_Measure).Bauwerke.GetUpperBound(0)
             If Not List_Locations(No_Loc).List_Massnahmen(No_Measure).Bauwerke(j) = "X" Then
+                ReDim Preserve Elements(x)
                 Elements(x) = List_Locations(No_Loc).List_Massnahmen(No_Measure).Bauwerke(j)
                 x += 1
-                ReDim Preserve Elements(x)
             End If
         Next
 
-        ReDim Preserve Elements(x - 1)
+        'Kopiert die aktuelle ElementeListe in dieses Aktuell_Element Array
+        'ToDo: sollte an eine bessere stelle
+        If No_Loc = 0 Then ReDim SKos1.Aktuell_Elemente(-1)
+        ReDim Preserve SKos1.Aktuell_Elemente(SKos1.Aktuell_Elemente.GetUpperBound(0) + Elements.GetLength(0))
+        Array.Copy(Elements, 0, SKos1.Aktuell_Elemente, SKos1.Aktuell_Elemente.GetUpperBound(0) - Elements.GetUpperBound(0), Elements.GetLength(0))
 
     End Sub
 
@@ -983,7 +987,7 @@ Public MustInherit Class Sim
     Public Structure Aktuell
         Public Path() As Integer
         Public Measures() As String
-        Public Elements() As String
+        'Public Elements() As String
         Public VER_ONOFF(,) As Object
     End Structure
 
@@ -995,9 +999,6 @@ Public MustInherit Class Sim
 
         'Setzt den Aktuellen Pfad
         Akt.Path = Path
-
-        'Erstellt die aktuelle Bauerksliste und überträgt sie zu SKos
-        Call Prepare_aktuelle_Elemente()
 
         'Ermittelt die Namen der Locations
         Call Prepare_aktuelle_Measures()
@@ -1012,7 +1013,7 @@ Public MustInherit Class Sim
 
     'ToDo: nicht besonders hübsch überladen
     '*************************************
-    Public Sub Set_Aktuell_CES()
+    Public Sub PREPARE_Evaluation_CES()
 
         'Wandelt die Maßnahmen Namen wieder in einen Pfad zurück
         Dim i, j As Integer
@@ -1024,40 +1025,12 @@ Public MustInherit Class Sim
             Next
         Next
 
-        'Erstellt die aktuelle Bauerksliste und überträgt sie zu SKos
-        Call Prepare_aktuelle_Elemente()
-
         'Ermittelt das aktuelle_ON_OFF array
         Call Prepare_Verzweigung_ON_OFF()
 
         'Schreibt die neuen Verzweigungen
         Call Write_Verzweigungen()
 
-    End Sub
-
-
-    'Die Liste mit den aktuellen Bauwerken des Kindes wird erstellt und in SKos geschrieben
-    '**************************************************************************************
-    Private Sub Prepare_aktuelle_Elemente()
-        Dim i, j As Integer
-        Dim No As Integer
-
-        Dim x As Integer = 0
-        For i = 0 To Akt.Path.GetUpperBound(0)
-            No = Akt.Path(i)
-            For j = 0 To List_Locations(i).List_Massnahmen(No).Bauwerke.GetUpperBound(0)
-                Array.Resize(Akt.Elements, x + 1)
-                Akt.Elements(x) = List_Locations(i).List_Massnahmen(No).Bauwerke(j)
-                x += 1
-            Next
-        Next
-
-        'Entfernt die X Einträge
-        Call SKos1.Remove_X(Akt.Elements)
-
-        'Kopiert die aktuelle ElementeListe in dieses Aktuell_Element Array
-        ReDim SKos1.Aktuell_Elemente(Akt.Elements.GetUpperBound(0))
-        Array.Copy(Akt.Elements, SKos1.Aktuell_Elemente, Akt.Elements.GetLength(0))
     End Sub
 
     'Ermittelt die Namen der aktuellen Bauwerke
@@ -1111,7 +1084,7 @@ Public MustInherit Class Sim
 
     'Reduziert die OptParameter und die ModellParameter auf die aktiven Elemente
     '***************************************************************************
-    Public Function Reduce_OptPara_ModPara() As Boolean
+    Public Function Reduce_OptPara_ModPara(ByRef Elements () as string) As Boolean
         Reduce_OptPara_ModPara = True
         Dim i As Integer
 
@@ -1134,8 +1107,8 @@ Public MustInherit Class Sim
 
         count = 0
         For i = 0 To List_ModellParameter.GetUpperBound(0)
-            For j = 0 To Akt.Elements.GetUpperBound(0)
-                If List_ModellParameter(i).Element = Akt.Elements(j) Then
+            For j = 0 To Elements.GetUpperBound(0)
+                If List_ModellParameter(i).Element = Elements(j) Then
                     Call copy_Struct_ModellParemeter(List_ModellParameter(i), TMP_ModPara(count))
                     count += 1
                 End If
@@ -2136,7 +2109,7 @@ Public MustInherit Class Sim
                 Next
 
                 'Bereitet das BlaueModell für die Kombinatorik vor
-                Call Me.Set_Aktuell_CES()
+                Call Me.PREPARE_Evaluation_CES()
 
 
             Case "CES + PES"
@@ -2164,10 +2137,7 @@ Public MustInherit Class Sim
                 Next
 
                 'Bereitet das BlaueModell für die Kombinatorik vor
-                Call Me.Set_Aktuell_CES()
-
-                'OptParameter reduzieren (War das nur für die Datensätze? Hat hier eigentlich nichts zu suchen.)
-                Me.Reduce_OptPara_ModPara()
+                Call Me.PREPARE_Evaluation_CES()
 
                 'OptParametersatz übernehmen
                 For i As Integer = 0 To Me.List_OptParameter.GetUpperBound(0)
