@@ -959,11 +959,18 @@ Public MustInherit Class Sim
 
     'Die Elemente werden pro Location im Child gespeichert
     '*****************************************************
-    Public Sub Identify_Elements(ByVal No_Loc As Integer, ByVal No_Measure As Integer, ByRef Elements() As String)
+    Public Sub Identify_Measures_and_their_Elements(ByVal No_Loc As Integer, ByVal No_Measure As Integer, byref Measure as String, ByRef Elements() As String)
 
         Dim j As Integer
-        Dim x as Integer = 0
+        Dim x As Integer = 0
 
+        'Die Maﬂnahme wird ermittelt
+        Measure = List_Locations(No_Loc).List_Massnahmen(No_Measure).Name
+        'ToDo: Measure aktuell ist hier noch redundant
+        ReDim preserve Akt.Measures(List_Locations.GetUpperBound(0))
+        Akt.Measures(No_Loc) = Measure
+
+        'Die Elemente werden Ermittelt
         For j = 0 To List_Locations(No_Loc).List_Massnahmen(No_Measure).Bauwerke.GetUpperBound(0)
             If Not List_Locations(No_Loc).List_Massnahmen(No_Measure).Bauwerke(j) = "X" Then
                 ReDim Preserve Elements(x)
@@ -987,7 +994,6 @@ Public MustInherit Class Sim
     Public Structure Aktuell
         Public Path() As Integer
         Public Measures() As String
-        'Public Elements() As String
         Public VER_ONOFF(,) As Object
     End Structure
 
@@ -999,9 +1005,6 @@ Public MustInherit Class Sim
 
         'Setzt den Aktuellen Pfad
         Akt.Path = Path
-
-        'Ermittelt die Namen der Locations
-        Call Prepare_aktuelle_Measures()
 
         'Ermittelt das aktuelle_ON_OFF array
         Call Prepare_Verzweigung_ON_OFF()
@@ -1032,23 +1035,6 @@ Public MustInherit Class Sim
         Call Write_Verzweigungen()
 
     End Sub
-
-    'Ermittelt die Namen der aktuellen Bauwerke
-    '******************************************
-    Private Sub Prepare_aktuelle_Measures()
-        Dim i, j As Integer
-
-        ReDim Akt.Measures(List_Locations.GetUpperBound(0))
-
-        For i = 0 To List_Locations.GetUpperBound(0)
-            For j = 0 To List_Locations(i).List_Massnahmen.GetUpperBound(0)
-                If j = Akt.Path(i) Then
-                    Akt.Measures(i) = List_Locations(i).List_Massnahmen(j).Name
-                End If
-            Next
-        Next
-    End Sub
-
 
     'Ermittelt das aktuelle Verzweigungsarray
     '****************************************

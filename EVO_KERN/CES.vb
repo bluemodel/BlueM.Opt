@@ -48,7 +48,6 @@ Public Class CES
         Dim Penalty() As Double             '04 Werte der Penaltyfunktion(en)
         Dim Constrain() As Double           '05 Wert der Randbedingung(en)
         Dim mutated As Boolean              '06 Gibt an ob der Wert bereits mutiert ist oder nicht
-        Dim measures() As String            'xx die liste der Massnahmen
 
         'Für ND Sorting -------------------------------------------------
         Dim dominated As Boolean            '07 Kennzeichnung ob Dominiert
@@ -57,7 +56,8 @@ Public Class CES
         'Dim Feasible As Boolean            'Gültiges Ergebnis ?
 
         'Information pro Location ---------------------------------------
-        Dim Loc() As Location_Data               '10 + 11 Information pro Location
+        Dim Measures() as String            '09a Die Namen der Maßnahmen
+        Dim Loc() As Location_Data          '10 + 11a Information pro Location
 
         'Für PES Memory -------------------------------------------------
         Dim Generation As Integer           '12 Die Generation (eher zur Information)
@@ -151,6 +151,9 @@ Public Class CES
         '09 Für crowding distance
         TMP.Distance = 0
 
+        '09a Die Namen der Maßnahmen
+        Redim TMP.Measures(n_Locations - 1)
+
         '11 + 10 Informationen pro Location
         ReDim TMP.Loc(n_Locations - 1)
 
@@ -230,6 +233,10 @@ Public Class CES
 
         '09 Für crowding distance
         Dest.Distance = Source.Distance
+
+        '09a Die Namen der Maßnahmen
+        ReDim Dest.Measures(Source.Measures.GetUpperBound(0))
+        Array.Copy(Source.Measures, Dest.Measures, Source.Measures.Length)
 
         '10 + 11 Die PES Informationen
         ReDim Dest.Loc(Source.Loc.GetUpperBound(0))
