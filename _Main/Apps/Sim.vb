@@ -1164,19 +1164,36 @@ Public MustInherit Class Sim
 
     End Function
 
-    'Schreibt die passenden OptParameter ins Child
+    'Schreibt die passenden OptParameter für jede Location ins Child
     'ToDo alles ist da!
-    '************************************************
-    Public Sub SaveParameter_to_Child(ByRef Parameter(,) As Object)
-        Dim i As Integer
-        ReDim Parameter(List_OptParameter.GetUpperBound(0), 1)
+    '***************************************************************
+    Dim n_tmp As Integer = 0
 
+    Public Sub SaveParameter_to_Child(ByVal Loc As Integer, ByVal Measure As Integer, ByVal Parameter(,) As Object)
+
+        Dim i, j As Integer
+        Dim x As Integer = 0
+
+        'Die Parameterliste wird auf die einzelnen Locations verteilt
         For i = 0 To List_OptParameter.GetUpperBound(0)
-            Parameter(i, 0) = List_OptParameter(i).Bezeichnung
-            Parameter(i, 1) = List_OptParameter(i).SKWert
+            For j = 0 To List_Locations(Loc).List_Massnahmen(Measure).Bauwerke.GetUpperBound(0)
+                If Left(List_OptParameter(i).Bezeichnung, 4) = List_Locations(Loc).List_Massnahmen(Measure).Bauwerke(j) Then
+                    Parameter(0, x) = List_OptParameter(i).Bezeichnung
+                    Parameter(1, x) = List_OptParameter(i).SKWert
+                    x += 1
+                    ReDim Preserve Parameter(1, x)
+                End If
+            Next
         Next
 
-        Redim List_Locations(0)
+        ReDim Preserve Parameter(1, x - 1)
+
+        'Prüfung ob alle Parameter verteilt wurden
+        n_tmp += Parameter.GetLength(1)
+
+        If Loc = List_Locations.GetUpperBound(0) And Not List_OptParameter.GetLength(0) = n_tmp Then
+            Throw New Exception("Die Zahl der Parameter in der OptParliste entspricht nicht der Zahl der Parameter des Faksimile")
+        End If
 
     End Sub
 

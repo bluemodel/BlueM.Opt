@@ -738,12 +738,17 @@ Partial Class Form1
                 'HYBRID
                 '******
                 If Method = METH_HYBRID Then
+                    'Die Parameterliste wird auf die wirklich verwendeten reduziert
                     Call Sim1.Reduce_OptPara_ModPara()
                     Dim j As Integer
+                    'Die Parameter für jede Location werden gespeichert
                     For j = 0 To CES1.n_Locations - 1
-                        Call Sim1.SaveParameter_to_Child(CES1.List_Childs(i).pes(j).PES_Para)
+                        Call Sim1.SaveParameter_to_Child(j, CES1.List_Childs(i).Path(j), CES1.List_Childs(i).PES(j).PES_Para)
                     Next
+                    'Das müsste auch pro Location sein oder ? -------------------------
+                    'Falsch hier entweder Später die Parameter überschreiben oder weg hier ---------------------
                     Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
+                    'hier müsten die Parameter wieder zusammengefast werden ---------------------------
                     Call Sim1.PREPARE_Evaluation_PES(myPara)
                 End If
 
