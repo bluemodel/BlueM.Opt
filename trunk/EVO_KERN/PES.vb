@@ -116,17 +116,79 @@ Public Class PES
     '******************************************
 
     Private Structure Struct_NDSorting
-        Dim penalty() As Double             'Werte der Penaltyfunktion(en)
-        Dim constrain() As Double           'Werte der Randbedingung(en)
-        Dim feasible As Boolean             'Gültiges Ergebnis ?
-        Dim dominated As Boolean            'Kennzeichnung ob dominiert
-        Dim Front As Short                  'Nummer der Pareto Front
-        Dim X() As Double                   'Wert der Variablen
-        Dim d() As Double                   'Schrittweite der Variablen
-        Dim distance As Double              'Distanzwert für Crowding distance sort
+        Dim penalty() As Double             '01 Werte der Penaltyfunktion(en)
+        Dim constrain() As Double           '02 Werte der Randbedingung(en)
+        Dim feasible As Boolean             '03 Gültiges Ergebnis
+        Dim dominated As Boolean            '04 Kennzeichnung ob dominiert
+        Dim Front As Short                  '05 Nummer der Pareto Front
+        Dim X() As Double                   '06 Wert der Variablen
+        Dim d() As Double                   '07 Schrittweite der Variablen
+        Dim distance As Double              '08 Distanzwert für Crowding distance sort
     End Structure
 
-    Dim List_NDSorting() As Struct_NDSorting
+    Dim NDSorting() As Struct_NDSorting
+    Dim swap As Struct_NDSorting
+
+    'Methode um ein NDSorting zu Dimensionieren
+    '******************************************
+    Private Sub NDSorting_Dim(ByRef TMP As Struct_NDSorting)
+
+        Dim i As Integer
+
+        ReDim TMP.penalty(PES_Initial.NPenalty)          '01 Werte der Penaltyfunktion(en)
+        For i = 0 To TMP.penalty.GetUpperBound(0)
+            TMP.penalty(i) = 1.0E+300
+        Next
+
+        ReDim TMP.constrain(PES_Initial.NConstrains)     '02 Werte der Randbedingung(en)
+        For i = 0 To TMP.constrain.GetUpperBound(0)
+            TMP.constrain(i) = -1.0E+300
+        Next
+
+        TMP.feasible = False                             '03 Gültiges Ergebnis
+        TMP.dominated = False                            '04 Kennzeichnung ob dominiert
+        TMP.Front = 0                                    '05 Nummer der Pareto Front
+
+        ReDim TMP.X(PES_Initial.varanz)                  '06 Wert der Variablen
+        For i = 0 To TMP.X.GetUpperBound(0)
+            TMP.X(i) = 0
+        Next
+
+        ReDim TMP.d(PES_Initial.varanz)                  '07 Schrittweite der Variablen
+        For i = 0 To TMP.d.GetUpperBound(0)
+            TMP.d(i) = 0
+        Next
+
+        TMP.distance = 0                                 '08 Distanzwert für Crowding distance sort
+
+    End Sub
+
+
+    'Überladen Methode die ein Struct NDSorting kopiert
+    '**************************************************
+    Private Sub NDSorting_Copy(ByVal Source As Struct_NDSorting, ByRef Dest As Struct_NDSorting)
+
+        Dest.penalty = Source.penalty.Clone       '01 Werte der Penaltyfunktion(en)
+        Dest.constrain = Source.constrain.Clone   '02 Werte der Randbedingung(en)
+        Dest.feasible = Source.feasible           '03 Gültiges Ergebnis ?
+        Dest.dominated = Source.dominated         '04 Kennzeichnung ob dominiert
+        Dest.Front = Source.Front                 '05 Nummer der Pareto Front
+        Dest.X = Source.X.Clone                   '06 Wert der Variablen
+        Dest.d = Source.d.Clone                   '07 Schrittweite der Variablen
+        Dest.distance = Source.distance           '08 Distanzwert für Crowding distance sort
+
+    End Sub
+
+    'Überladen Methode die ein Array aus Struct NDSorting kopiert
+    '************************************************************
+    Private Sub NDSorting_Copy(ByVal Source() As Struct_NDSorting, ByRef Dest() As Struct_NDSorting)
+        Dim i As Integer
+
+        For i = 0 To Source.GetUpperBound(0)
+            Call NDSorting_Copy(Source(i), Dest(i))
+        Next
+
+    End Sub
 
     Private Structure Struct_Sortierung
         Dim Index As Short
@@ -134,8 +196,8 @@ Public Class PES
     End Structure
 
     Private Structure Struct_Neighbourhood
-        Dim distance As Double
         Dim Index As Short
+        Dim distance As Double
     End Structure
 
     'Deklarationsteil allgemein
@@ -296,14 +358,14 @@ Public Class PES
         '---------------------
         'NDSorting wird nur benötigt, falls eine Paretofront approximiert wird
         If PES_Settings.is_MO_Pareto Then
-            ReDim List_NDSorting(PES_Settings.NEltern + PES_Settings.NNachf)
+            ReDim NDSorting(PES_Settings.NEltern + PES_Settings.NNachf)
             For i = 1 To PES_Settings.NEltern + PES_Settings.NNachf
-                ReDim List_NDSorting(i).penalty(PES_Initial.NPenalty)
+                ReDim NDSorting(i).penalty(PES_Initial.NPenalty)
                 If PES_Initial.NConstrains > 0 Then
-                    ReDim List_NDSorting(i).constrain(PES_Initial.NConstrains)
+                    ReDim NDSorting(i).constrain(PES_Initial.NConstrains)
                 End If
-                ReDim List_NDSorting(i).d(PES_Initial.varanz)
-                ReDim List_NDSorting(i).X(PES_Initial.varanz)
+                ReDim NDSorting(i).d(PES_Initial.varanz)
+                ReDim NDSorting(i).X(PES_Initial.varanz)
             Next i
             If PES_Settings.iOptEltern = EVO_ELTERN_Neighbourhood Then
                 ReDim PenaltyDistance(PES_Settings.NEltern, PES_Settings.NEltern)
@@ -896,7 +958,7 @@ Public Class PES
         Else
             'Multi-Objective Pareto
             '----------------------
-            With List_NDSorting(PES_iAkt.iAktNachf)
+            With NDSorting(PES_iAkt.iAktNachf)
                 For i = 1 To PES_Initial.NPenalty
                     .penalty(i) = QN(i - 1)             'Bug 135: .penalty fängt bei 1 an!
                 Next i
@@ -1065,7 +1127,7 @@ Public Class PES
             'Nur Eltern werden NDSorting hinzugefügt, Kinder sind schon oben drin
             '--------------------------------------------------------------------
             For m = PES_Settings.NNachf + 1 To PES_Settings.NNachf + PES_Settings.NEltern
-                With List_NDSorting(m)
+                With NDSorting(m)
                     For l = 1 To PES_Initial.NPenalty
                         .penalty(l) = Qb(m - PES_Settings.NNachf, PES_iAkt.iAktPop, l)
                     Next l
@@ -1109,7 +1171,7 @@ Public Class PES
             Next i
 
             'NDSorting wird in Temp kopiert
-            Array.Copy(List_NDSorting, Temp, List_NDSorting.GetLength(0))
+            Array.Copy(NDSorting, Temp, NDSorting.GetLength(0))
 
             'Schleife läuft über die Zahl der Fronten die hier auch bestimmt werden
             Do
@@ -1489,9 +1551,7 @@ Public Class PES
         Dim j As Integer
         Dim k As Short
 
-        Dim swap As Struct_NDSorting
-        ReDim swap.d(PES_Initial.varanz)
-        ReDim swap.X(PES_Initial.varanz)
+        Call NDSorting_Dim(swap)
 
         Dim fmin, fmax As Double
 
@@ -1520,9 +1580,10 @@ Public Class PES
         For i = start To ende
             For j = start To ende
                 If (NDSorting(i).distance > NDSorting(j).distance) Then
-                    swap = NDSorting(i)
-                    NDSorting(i) = NDSorting(j)
-                    NDSorting(j) = swap
+
+                    Call NDSorting_Copy(NDSorting(i), swap)
+                    Call NDSorting_Copy(NDSorting(j), NDSorting(i))
+                    Call NDSorting_Copy(swap, NDSorting(j))
                 End If
             Next j
         Next i
