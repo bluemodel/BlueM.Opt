@@ -152,7 +152,7 @@ Public Class PES
         End Sub
 
         'Überladene Methode um einArray aus NDSorting zu Dimensionieren
-        Public Sub NDSorting_Dim(ByVal NPenalty As Integer, ByVal NConstrains As Integer, ByVal varanz As Integer,ByRef TMP() As Struct_NDSorting)
+        Public Sub Dimit(ByVal NPenalty As Integer, ByVal NConstrains As Integer, ByVal varanz As Integer, ByRef TMP() As Struct_NDSorting)
             Dim i As Integer
 
             For i = 0 To TMP.GetUpperBound(0)
@@ -1167,7 +1167,7 @@ Public Class PES
             Next i
 
             'NDSorting wird in Temp kopiert
-            Array.Copy(NDSorting, Temp, NDSorting.GetLength(0))
+            Call Temp(0).Copy(NDSorting, Temp)
 
             'Schleife läuft über die Zahl der Fronten die hier auch bestimmt werden
             Do
@@ -1420,11 +1420,7 @@ Public Class PES
         Dim NFrontMember As Short
 
         ReDim Temp(UBound(NDSorting))
-
-        For i = 1 To (UBound(NDSorting))
-            ReDim Temp(i).d(Initial.varanz)
-            ReDim Temp(i).X(Initial.varanz)
-        Next i
+        Call Temp(0).Dimit(Initial.NPenalty, Initial.NConstrains, Initial.varanz, Temp)
 
         NFrontMember = 0
         counter = 0
@@ -1433,7 +1429,7 @@ Public Class PES
         For i = 1 To UBound(NDSorting)
             If (NDSorting(i).dominated = True) Then
                 counter += 1
-                Temp(counter) = NDSorting(i)
+                call temp(0).Copy(NDSorting(i),Temp(counter))
             End If
         Next i
 
@@ -1444,11 +1440,11 @@ Public Class PES
         For i = 1 To UBound(NDSorting)
             If (NDSorting(i).dominated = False) Then
                 counter += 1
-                Temp(counter) = NDSorting(i)
+                Call Temp(0).Copy(NDSorting(i), Temp(counter))
             End If
         Next i
 
-        Array.Copy(Temp, NDSorting, NDSorting.GetLength(0))
+        Call Temp(0).Copy(Temp, NDSorting)
 
         Return NFrontMember
 
@@ -1466,11 +1462,7 @@ Public Class PES
         Dim NFrontMember As Short
 
         ReDim Temp(UBound(NDSorting))
-
-        For i = 1 To (UBound(NDSorting))
-            ReDim Temp(i).d(Initial.varanz)
-            ReDim Temp(i).X(Initial.varanz)
-        Next i
+        Call Temp(0).Dimit(Initial.NPenalty, Initial.NConstrains, Initial.varanz, Temp)
 
         NFrontMember = 0
         counter = 0
@@ -1478,7 +1470,7 @@ Public Class PES
         For i = 1 To UBound(NDSorting)
             If (NDSorting(i).dominated = False) Then
                 counter += 1
-                Temp(counter) = NDSorting(i)
+                Call Temp(0).Copy(NDSorting(i), Temp(counter))
             End If
         Next i
 
@@ -1487,11 +1479,11 @@ Public Class PES
         For i = 1 To UBound(NDSorting)
             If (NDSorting(i).dominated = True) Then
                 counter += 1
-                Temp(counter) = NDSorting(i)
+                Call Temp(0).Copy(NDSorting(i), Temp(counter))
             End If
         Next i
 
-        Array.Copy(Temp, NDSorting, NDSorting.GetLength(0))
+        Call Temp(0).Copy(Temp, NDSorting)
 
         Return NFrontMember
 
@@ -1509,7 +1501,7 @@ Public Class PES
         'In NDSResult werden die nicht dominierten Lösungen eingefügt
         For i = UBound(Temp) + 1 - NFrontMember_aktuell To UBound(Temp)
             'NDSResult alle bisher gefundene Fronten
-            NDSResult(Position) = Temp(i)
+            Call Temp(0).Copy(Temp(i), NDSResult(Position))
             Position += 1
         Next i
 
@@ -1555,9 +1547,9 @@ Public Class PES
             For i = start To ende
                 For j = start To ende
                     If (NDSorting(i).penalty(k) < NDSorting(j).penalty(k)) Then
-                        swap = NDSorting(i)
-                        NDSorting(i) = NDSorting(j)
-                        NDSorting(j) = swap
+                        Call NDSorting(0).Copy(NDSorting(i), swap)
+                        Call NDSorting(0).Copy(NDSorting(j), NDSorting(i))
+                        Call NDSorting(0).Copy(swap, NDSorting(j))
                     End If
                 Next j
             Next i
