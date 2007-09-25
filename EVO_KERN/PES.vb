@@ -124,6 +124,31 @@ Public Class PES
         Dim X() As Double                   '06 Wert der Variablen
         Dim d() As Double                   '07 Schrittweite der Variablen
         Dim distance As Double              '08 Distanzwert für Crowding distance sort
+
+        'Überladen Methode die ein Struct NDSorting kopiert
+        Public Sub NDSorting_Copy(ByVal Source As Struct_NDSorting, ByRef Dest As Struct_NDSorting)
+
+            Dest.penalty = Source.penalty.Clone       '01 Werte der Penaltyfunktion(en)
+            Dest.constrain = Source.constrain.Clone   '02 Werte der Randbedingung(en)
+            Dest.feasible = Source.feasible           '03 Gültiges Ergebnis ?
+            Dest.dominated = Source.dominated         '04 Kennzeichnung ob dominiert
+            Dest.Front = Source.Front                 '05 Nummer der Pareto Front
+            Dest.X = Source.X.Clone                   '06 Wert der Variablen
+            Dest.d = Source.d.Clone                   '07 Schrittweite der Variablen
+            Dest.distance = Source.distance           '08 Distanzwert für Crowding distance sort
+
+        End Sub
+
+        'Überladen Methode die ein Array aus Struct NDSorting kopiert
+        Public Sub NDSorting_Copy(ByVal Source() As Struct_NDSorting, ByRef Dest() As Struct_NDSorting)
+            Dim i As Integer
+
+            For i = 0 To Source.GetUpperBound(0)
+                Call NDSorting_Copy(Source(i), Dest(i))
+            Next
+
+        End Sub
+
     End Structure
 
     Dim NDSorting() As Struct_NDSorting
@@ -170,33 +195,6 @@ Public Class PES
 
         For i = 0 To TMP.GetUpperBound(0)
             Call NDSorting_Dim(TMP(i))
-        Next
-
-    End Sub
-
-
-    'Überladen Methode die ein Struct NDSorting kopiert
-    '**************************************************
-    Private Sub NDSorting_Copy(ByVal Source As Struct_NDSorting, ByRef Dest As Struct_NDSorting)
-
-        Dest.penalty = Source.penalty.Clone       '01 Werte der Penaltyfunktion(en)
-        Dest.constrain = Source.constrain.Clone   '02 Werte der Randbedingung(en)
-        Dest.feasible = Source.feasible           '03 Gültiges Ergebnis ?
-        Dest.dominated = Source.dominated         '04 Kennzeichnung ob dominiert
-        Dest.Front = Source.Front                 '05 Nummer der Pareto Front
-        Dest.X = Source.X.Clone                   '06 Wert der Variablen
-        Dest.d = Source.d.Clone                   '07 Schrittweite der Variablen
-        Dest.distance = Source.distance           '08 Distanzwert für Crowding distance sort
-
-    End Sub
-
-    'Überladen Methode die ein Array aus Struct NDSorting kopiert
-    '************************************************************
-    Private Sub NDSorting_Copy(ByVal Source() As Struct_NDSorting, ByRef Dest() As Struct_NDSorting)
-        Dim i As Integer
-
-        For i = 0 To Source.GetUpperBound(0)
-            Call NDSorting_Copy(Source(i), Dest(i))
         Next
 
     End Sub
@@ -1592,9 +1590,11 @@ Public Class PES
             For j = start To ende
                 If (NDSorting(i).distance > NDSorting(j).distance) Then
 
-                    Call NDSorting_Copy(NDSorting(i), swap)
-                    Call NDSorting_Copy(NDSorting(j), NDSorting(i))
-                    Call NDSorting_Copy(swap, NDSorting(j))
+                    'Call swap.NDSorting_Copy(NDSorting(i), swap)
+
+                    Call swap.NDSorting_Copy(NDSorting(i), swap)
+                    Call swap.NDSorting_Copy(NDSorting(j), NDSorting(i))
+                    Call swap.NDSorting_Copy(swap, NDSorting(j))
                 End If
             Next j
         Next i
