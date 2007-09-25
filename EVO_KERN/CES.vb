@@ -126,7 +126,7 @@ Public Class CES
         '04 Werte der Penaltyfunktion(en)
         ReDim TMP.Penalty(n_Penalty - 1)
         For j = 0 To n_Penalty - 1
-            TMP.Penalty(j) = 999999999999999999
+            TMP.Penalty(j) = 1.0E+300
         Next
 
         '05 Wert der Randbedingung(en)
@@ -135,7 +135,7 @@ Public Class CES
         Else
             ReDim TMP.Constrain(n_Constrain - 1)
             For j = 0 To TMP.Constrain.GetUpperBound(0)
-                TMP.Constrain(j) = -999999999999999999
+                TMP.Constrain(j) = -1.0E+300
             Next
         End If
 
@@ -199,7 +199,7 @@ Public Class CES
 
     'Kopiert ein Faksimile
     '*********************
-    Public Sub Faksimile_Copy(ByVal Source As Faksimile, ByRef Dest As Faksimile)
+    Private Sub Faksimile_Copy(ByVal Source As Faksimile, ByRef Dest As Faksimile)
 
         Dim i As Integer
 
