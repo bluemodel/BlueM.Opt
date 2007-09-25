@@ -129,8 +129,8 @@ Public Class PES
     Dim NDSorting() As Struct_NDSorting
     Dim swap As Struct_NDSorting
 
-    'Methode um ein NDSorting zu Dimensionieren
-    '******************************************
+    'Überladene Methode um ein NDSorting zu Dimensionieren
+    '*****************************************************
     Private Sub NDSorting_Dim(ByRef TMP As Struct_NDSorting)
 
         Dim i As Integer
@@ -160,6 +160,17 @@ Public Class PES
         Next
 
         TMP.distance = 0                                 '08 Distanzwert für Crowding distance sort
+
+    End Sub
+
+    'Überladene Methode um einArray aus NDSorting zu Dimensionieren
+    '**************************************************************
+    Private Sub NDSorting_Dim(ByRef TMP() As Struct_NDSorting)
+        Dim i As Integer
+
+        For i = 0 To TMP.GetUpperBound(0)
+            Call NDSorting_Dim(TMP(i))
+        Next
 
     End Sub
 
