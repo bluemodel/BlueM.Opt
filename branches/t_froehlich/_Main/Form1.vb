@@ -60,6 +60,7 @@ Partial Class Form1
     Dim Bestwert(,) As Double = {}
     Dim SekPopulation(,) As Double
     Dim myPara() As Double
+    Dim myParaAbh() As EvoKern.PES.Struct_Abh
 
     '**** Verschiedenes ****
     Dim isrun As Boolean = False                        'Optimierung läuft
@@ -307,7 +308,7 @@ Partial Class Form1
                     End If
 
                     'Parameterübergabe an PES
-                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
+                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, myParaAbh)
 
                 Case METH_CES, METH_CES_PES, METH_HYBRID 'Methode CES und Methode CES_PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -756,7 +757,7 @@ Partial Class Form1
                     'Falsch hier entweder Später die Parameter überschreiben oder weg hier ---------------------
                     'die Parameter müssen aus dem child geschrieben werden
                     'also vorher einmal die start werte einlesen und dann hinter her mit der PES mutieren
-                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
+                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, myParaAbh)
                     'hier müsten die Parameter wieder zusammengefast werden ---------------------------
                     Call Sim1.PREPARE_Evaluation_PES(myPara)
                 End If
@@ -856,7 +857,7 @@ Partial Class Form1
                         'Schritte 2 - 5 PES wird initialisiert
                         'Weiteres siehe dort ;-)
                         '*************************************
-                        Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
+                        Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, myParaAbh)
 
 
 
@@ -905,7 +906,7 @@ Partial Class Form1
 
                     'Parameterübergabe an PES
                     '************************
-                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
+                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, myParaAbh)
                     'Starten der PES
                     '***************
                     Call STARTEN_PES()
@@ -953,7 +954,7 @@ Partial Class Form1
 
         'Schritte 2 - 5 PES wird initialisiert (Weiteres siehe dort ;-)
         '**************************************************************
-        Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
+        Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, myParaAbh)
 
         'Startwerte werden der Verlaufsanzeige werden zugewiesen
         Call Me.INI_Verlaufsanzeige(EVO_Settings1.PES_Settings.NRunden, EVO_Settings1.PES_Settings.NPopul, EVO_Settings1.PES_Settings.NGen, EVO_Settings1.PES_Settings.NNachf)
