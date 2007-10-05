@@ -6,8 +6,7 @@
     <ProjectGuid>{FF1D5494-1205-4F3E-BD65-ADB8C6BD04D4}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ApplicationIcon>
-    </ApplicationIcon>
+    <ApplicationIcon>Resources\EVO.ico</ApplicationIcon>
     <AssemblyKeyContainerName>
     </AssemblyKeyContainerName>
     <AssemblyName>Evo</AssemblyName>
@@ -251,8 +250,9 @@
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
     </Content>
+    <Content Include="Resources\EVO.ico" />
     <Content Include="Resources\icon_teechart.png" />
-    <None Include="Resources\scatterplot.png" />
+    <None Include="Resources\scatterplot.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
