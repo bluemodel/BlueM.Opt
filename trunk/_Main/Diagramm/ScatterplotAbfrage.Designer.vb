@@ -19,6 +19,7 @@ Partial Class ScatterplotAbfrage
     'Das Bearbeiten mit dem Code-Editor ist nicht möglich.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(ScatterplotAbfrage))
         Me.Label_XAchse = New System.Windows.Forms.Label
         Me.ListBox_OptZieleX = New System.Windows.Forms.ListBox
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel
@@ -27,12 +28,12 @@ Partial Class ScatterplotAbfrage
         Me.CheckBox_Scatterplot = New System.Windows.Forms.CheckBox
         Me.GroupBox_Hauptdiagramm = New System.Windows.Forms.GroupBox
         Me.CheckBox_Hauptdiagramm = New System.Windows.Forms.CheckBox
-        Me.ListBox_OptZieleY = New System.Windows.Forms.ListBox
         Me.Label_YAchse = New System.Windows.Forms.Label
+        Me.Label_ZAchse = New System.Windows.Forms.Label
+        Me.ListBox_OptZieleY = New System.Windows.Forms.ListBox
+        Me.ListBox_OptZieleZ = New System.Windows.Forms.ListBox
         Me.GroupBox_Scatterplot = New System.Windows.Forms.GroupBox
         Me.CheckBox_onlySekPop = New System.Windows.Forms.CheckBox
-        Me.ListBox_OptZieleZ = New System.Windows.Forms.ListBox
-        Me.Label_ZAchse = New System.Windows.Forms.Label
         Me.TableLayoutPanel1.SuspendLayout()
         Me.GroupBox_Hauptdiagramm.SuspendLayout()
         Me.GroupBox_Scatterplot.SuspendLayout()
@@ -128,14 +129,6 @@ Partial Class ScatterplotAbfrage
         Me.CheckBox_Hauptdiagramm.Text = "Hauptdiagramm anzeigen"
         Me.CheckBox_Hauptdiagramm.UseVisualStyleBackColor = True
         '
-        'ListBox_OptZieleY
-        '
-        Me.ListBox_OptZieleY.FormattingEnabled = True
-        Me.ListBox_OptZieleY.Location = New System.Drawing.Point(144, 58)
-        Me.ListBox_OptZieleY.Name = "ListBox_OptZieleY"
-        Me.ListBox_OptZieleY.Size = New System.Drawing.Size(130, 186)
-        Me.ListBox_OptZieleY.TabIndex = 10
-        '
         'Label_YAchse
         '
         Me.Label_YAchse.AutoSize = True
@@ -144,6 +137,31 @@ Partial Class ScatterplotAbfrage
         Me.Label_YAchse.Size = New System.Drawing.Size(50, 13)
         Me.Label_YAchse.TabIndex = 11
         Me.Label_YAchse.Text = "Y-Achse:"
+        '
+        'Label_ZAchse
+        '
+        Me.Label_ZAchse.AutoSize = True
+        Me.Label_ZAchse.Location = New System.Drawing.Point(277, 38)
+        Me.Label_ZAchse.Name = "Label_ZAchse"
+        Me.Label_ZAchse.Size = New System.Drawing.Size(96, 13)
+        Me.Label_ZAchse.TabIndex = 14
+        Me.Label_ZAchse.Text = "Z-Achse (optional):"
+        '
+        'ListBox_OptZieleY
+        '
+        Me.ListBox_OptZieleY.FormattingEnabled = True
+        Me.ListBox_OptZieleY.Location = New System.Drawing.Point(144, 58)
+        Me.ListBox_OptZieleY.Name = "ListBox_OptZieleY"
+        Me.ListBox_OptZieleY.Size = New System.Drawing.Size(130, 186)
+        Me.ListBox_OptZieleY.TabIndex = 10
+        '
+        'ListBox_OptZieleZ
+        '
+        Me.ListBox_OptZieleZ.FormattingEnabled = True
+        Me.ListBox_OptZieleZ.Location = New System.Drawing.Point(280, 58)
+        Me.ListBox_OptZieleZ.Name = "ListBox_OptZieleZ"
+        Me.ListBox_OptZieleZ.Size = New System.Drawing.Size(130, 186)
+        Me.ListBox_OptZieleZ.TabIndex = 13
         '
         'GroupBox_Scatterplot
         '
@@ -165,23 +183,6 @@ Partial Class ScatterplotAbfrage
         Me.CheckBox_onlySekPop.Text = "nur sekundäre Population"
         Me.CheckBox_onlySekPop.UseVisualStyleBackColor = True
         '
-        'ListBox_OptZieleZ
-        '
-        Me.ListBox_OptZieleZ.FormattingEnabled = True
-        Me.ListBox_OptZieleZ.Location = New System.Drawing.Point(280, 58)
-        Me.ListBox_OptZieleZ.Name = "ListBox_OptZieleZ"
-        Me.ListBox_OptZieleZ.Size = New System.Drawing.Size(130, 186)
-        Me.ListBox_OptZieleZ.TabIndex = 13
-        '
-        'Label_ZAchse
-        '
-        Me.Label_ZAchse.AutoSize = True
-        Me.Label_ZAchse.Location = New System.Drawing.Point(277, 38)
-        Me.Label_ZAchse.Name = "Label_ZAchse"
-        Me.Label_ZAchse.Size = New System.Drawing.Size(96, 13)
-        Me.Label_ZAchse.TabIndex = 14
-        Me.Label_ZAchse.Text = "Z-Achse (optional):"
-        '
         'ScatterplotAbfrage
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -191,6 +192,7 @@ Partial Class ScatterplotAbfrage
         Me.Controls.Add(Me.GroupBox_Scatterplot)
         Me.Controls.Add(Me.GroupBox_Hauptdiagramm)
         Me.Controls.Add(Me.TableLayoutPanel1)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "ScatterplotAbfrage"
         Me.Text = "Scatterplot"
         Me.TableLayoutPanel1.ResumeLayout(False)

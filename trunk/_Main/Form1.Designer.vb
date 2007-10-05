@@ -28,6 +28,7 @@ Partial Class Form1
     'Das Verändern mit dem Code-Editor ist nicht möglich.
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.Button_Start = New System.Windows.Forms.Button
         Me.Button_IniMethod = New System.Windows.Forms.Button
@@ -209,6 +210,7 @@ Partial Class Form1
         Me.Controls.Add(Me.EVO_Settings1)
         Me.Controls.Add(Me.DForm)
         Me.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Location = New System.Drawing.Point(100, 100)
         Me.Name = "Form1"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
