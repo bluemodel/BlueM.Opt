@@ -826,7 +826,7 @@ Public Class PES
                 'Mutation wird durchgeführt
                 XnTemp = Initial.Xn(v) + DnTemp * Z
                 'Restriktion für die mutierten Werte
-            Loop While (XnTemp <= Initial.Xmin(v) Or XnTemp > Initial.Xmax(v) Or Not checkAbhaengigkeiten(v))
+            Loop While (XnTemp <= Initial.Xmin(v) Or XnTemp > Initial.Xmax(v) Or Not checkAbhaengigkeiten(v, XnTemp))
 
             Initial.Dn(v) = DnTemp
             Initial.Xn(v) = XnTemp
@@ -1819,7 +1819,7 @@ Public Class PES
 
     'Einen Parameterwert auf Einhaltung der Abhängigkeiten überprüfen
     '****************************************************************
-    Private Function checkAbhaengigkeiten(ByVal ipara As Integer) As Boolean
+    Private Function checkAbhaengigkeiten(ByVal ipara As Integer, ByVal XNnTemp As Double) As Boolean
 
         'ipara ist der Index des zu überprüfenden Parameters
 
@@ -1835,13 +1835,13 @@ Public Class PES
             Dim ref As Double = Initial.Xn(refpara)
             Select Case Initial.Abh(ipara).beziehung
                 Case Beziehung.kleiner
-                    If (Initial.Xn(ipara) < ref) Then isOK = True
+                    If (XnTemp < ref) Then isOK = True
                 Case Beziehung.kleinergleich
-                    If (Initial.Xn(ipara) <= ref) Then isOK = True
+                    If (XnTemp <= ref) Then isOK = True
                 Case Beziehung.groesser
-                    If (Initial.Xn(ipara) > ref) Then isOK = True
+                    If (XnTemp > ref) Then isOK = True
                 Case Beziehung.groessergleich
-                    If (Initial.Xn(ipara) >= ref) Then isOK = True
+                    If (XnTemp >= ref) Then isOK = True
             End Select
         End If
 
