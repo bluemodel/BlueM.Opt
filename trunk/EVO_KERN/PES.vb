@@ -357,9 +357,7 @@ Public Class PES
             ReDim NDSorting(PES_Settings.NEltern + PES_Settings.NNachf)
             For i = 1 To PES_Settings.NEltern + PES_Settings.NNachf
                 ReDim NDSorting(i).penalty(Initial.NPenalty)
-                If Initial.NConstrains > 0 Then
-                    ReDim NDSorting(i).constrain(Initial.NConstrains)
-                End If
+                ReDim NDSorting(i).constrain(Initial.NConstrains)
                 ReDim NDSorting(i).d(Initial.varanz)
                 ReDim NDSorting(i).X(Initial.varanz)
             Next i
