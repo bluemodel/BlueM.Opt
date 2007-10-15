@@ -130,32 +130,32 @@ Public Class PES
             Dim i As Integer
 
             ReDim TMP.penalty(NPenalty)                      '01 Werte der Penaltyfunktion(en)
-            For i = 0 To TMP.penalty.GetUpperBound(0)
+            For i = 1 To TMP.penalty.GetUpperBound(0)
                 TMP.penalty(i) = 1.0E+300
             Next
             ReDim TMP.constrain(NConstrains)                 '02 Werte der Randbedingung(en)
-            For i = 0 To TMP.constrain.GetUpperBound(0)
+            For i = 1 To TMP.constrain.GetUpperBound(0)
                 TMP.constrain(i) = -1.0E+300
             Next
             TMP.feasible = False                             '03 Gültiges Ergebnis
             TMP.dominated = False                            '04 Kennzeichnung ob dominiert
             TMP.Front = 0                                    '05 Nummer der Pareto Front
             ReDim TMP.X(varanz)                              '06 Wert der Variablen
-            For i = 0 To TMP.X.GetUpperBound(0)
+            For i = 1 To TMP.X.GetUpperBound(0)
                 TMP.X(i) = 0
             Next
             ReDim TMP.d(varanz)                              '07 Schrittweite der Variablen
-            For i = 0 To TMP.d.GetUpperBound(0)
+            For i = 1 To TMP.d.GetUpperBound(0)
                 TMP.d(i) = 0
             Next
             TMP.distance = 0                                 '08 Distanzwert für Crowding distance sort
         End Sub
 
-        'Überladene Methode um einArray aus NDSorting zu Dimensionieren
+        'Überladene Methode um ein Array aus NDSorting zu Dimensionieren
         Public Sub Dimit(ByVal NPenalty As Integer, ByVal NConstrains As Integer, ByVal varanz As Integer, ByRef TMP() As Struct_NDSorting)
             Dim i As Integer
 
-            For i = 0 To TMP.GetUpperBound(0)
+            For i = 1 To TMP.GetUpperBound(0)
                 Call Dimit(NPenalty, NConstrains, varanz, TMP(i))
             Next
 
@@ -176,7 +176,7 @@ Public Class PES
         'Überladen Methode die ein Array aus Struct NDSorting kopiert
         Public Sub Copy(ByVal Source() As Struct_NDSorting, ByRef Dest() As Struct_NDSorting)
             Dim i As Integer
-            For i = 0 To Source.GetUpperBound(0)
+            For i = 1 To Source.GetUpperBound(0)
                 Call Copy(Source(i), Dest(i))
             Next
         End Sub
@@ -423,9 +423,12 @@ Public Class PES
     'PES_Settings.iStartPar 2: Originalparameter    -> Schrittweite = Startschrittweite
     '                                               -> Parameterwert = Originalparameter
     '***********************************************************************************
-    Private Sub EsStartvalues()
+    Public Sub EsStartvalues()
 
         Dim n, v, m As Short
+
+        'Zufallsgenerator initialisieren
+        Randomize()
 
         Select Case PES_Settings.iStartPar
             Case 1 'Zufällige Startwerte
