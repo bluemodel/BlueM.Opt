@@ -712,13 +712,30 @@ Partial Class Form1
         'Am einfachsten die aktuellen Elemente mit dem Child führen
         '****** Soll er immer machen, da diese für Skos gebraucht werden
 
-        'Hier werden dem Child die passenden Elemente pro Location zugewiesen
+        'Hier werden dem Child die passenden Massnahmen und deren Elemente pro Location zugewiesen
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         For i = 0 To CES1.n_Childs - 1
             Dim j As Integer
             For j = 0 To CES1.n_Locations - 1
                 Call Sim1.Identify_Measures_and_their_Elements(j, CES1.List_Childs(i).Path(j), ces1.List_Childs(i).Measures(j), CES1.List_Childs(i).Loc(j).Loc_Elem)
             Next
         Next
+
+        '1. Schritt: PES - Objekt der Klasse PES wird erzeugt PES wird erzeugt
+        '*********************************************************************
+        Dim PES1 As EvoKern.PES
+        PES1 = New EvoKern.PES
+
+        'Falls HYBRID werden entprechend der Einstellung im PES die Parameter auf Zufällig oder Start gesetzt
+        If Method = METH_HYBRID Then
+
+            'Schritte 2 - 5 PES wird initialisiert (Weiteres siehe dort ;-)
+            '**************************************************************
+            Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
+
+            'Call PES1.EsStartvalues()
+
+        End If
 
 
         'Startwerte werden der Verlaufsanzeige werden zugewiesen
@@ -745,8 +762,8 @@ Partial Class Form1
                 'HYBRID Mmuss hier raus !!! und nach unten
                 '******
                 If Method = METH_HYBRID Then
-                    'Die Parameterliste wird auf die wirklich verwendeten reduziert
-                    Call Sim1.Reduce_OptPara_ModPara(ces1.List_Childs(i).All_Elem)
+                    'Reduktion der OptimierungsParameter und immer dann wenn nicht Nullvariante
+                    Call Sim1.Reduce_OptPara_ModPara(CES1.List_Childs(i).All_Elem)
                     Dim j As Integer
                     'Die Parameter für jede Location werden gespeichert
                     For j = 0 To CES1.n_Locations - 1
@@ -821,7 +838,7 @@ Partial Class Form1
             For i = 0 To CES1.n_Childs - 1
                 Dim j As Integer
                 For j = 0 To CES1.n_Locations - 1
-                    Call Sim1.Identify_Measures_and_their_Elements(j, CES1.List_Childs(i).Path(j), ces1.List_Childs(i).Measures(j), CES1.List_Childs(i).Loc(j).Loc_Elem)
+                    Call Sim1.Identify_Measures_and_their_Elements(j, CES1.List_Childs(i).Path(j), CES1.List_Childs(i).Measures(j), CES1.List_Childs(i).Loc(j).Loc_Elem)
                 Next
             Next
 
@@ -847,15 +864,8 @@ Partial Class Form1
                         'PES Geschichten
                         '###############
 
-                        '1. Schritt: PES
-                        'Objekt der Klasse PES wird erzeugt PES wird erzeugt
-                        '****************************************************
-                        Dim PES1 As EvoKern.PES
-                        PES1 = New EvoKern.PES
-
-                        'Schritte 2 - 5 PES wird initialisiert
-                        'Weiteres siehe dort ;-)
-                        '*************************************
+                        'Schritte 2 - 5 PES wird initialisiert - Weiteres siehe dort ;-)
+                        '***************************************************************
                         Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
 
 
@@ -900,7 +910,7 @@ Partial Class Form1
                 Next
 
                 'Reduktion der OptimierungsParameter und immer dann wenn nicht Nullvariante
-                '****************************************************************************
+                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
                 If Sim1.Reduce_OptPara_ModPara(ces1.List_Childs(i).All_Elem) Then
 
                     'Parameterübergabe an PES

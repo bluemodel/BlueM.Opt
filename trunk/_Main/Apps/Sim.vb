@@ -1060,9 +1060,10 @@ Public MustInherit Class Sim
 #Region "Evaluierung"
 
     'Reduziert die OptParameter und die ModellParameter auf die aktiven Elemente
+    '!Wird jetzt aus den Elemten des Child generiert!
     '***************************************************************************
-    Public Function Reduce_OptPara_ModPara(ByRef Elements () as string) As Boolean
-        Reduce_OptPara_ModPara = True
+    Public Function Reduce_OptPara_ModPara(ByRef Elements() As String) As Boolean
+        Reduce_OptPara_ModPara = True 'Wird wirklich abgefragt!
         Dim i As Integer
 
         'Kopieren der Listen aus den Sicherungen
