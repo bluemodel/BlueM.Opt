@@ -36,10 +36,6 @@ Public MustInherit Class Sim
     Public WorkDir As String                             'Arbeitsverzeichnis für das Blaue Modell
     Public Event WorkDirChange()                         'Event für Änderung des Arbeitsverzeichnisses
 
-    Protected Exe As String                              'Pfad zur EXE für die Simulation
-    Protected Dll As String                              'Pfad zur Dll für die Simulation
-    Protected isDll As Boolean = False                   'Gibt an, ob die DLL benutzt wird oder die Exe
-
     Public SimStart As DateTime                          'Anfangsdatum der Simulation
     Public SimEnde As DateTime                           'Enddatum der Simulation
     Public SimDT As TimeSpan                             'Zeitschrittweite der Simulation
@@ -242,13 +238,8 @@ Public MustInherit Class Sim
                 If (Not IsNothing(Configs(i, 0))) Then
                     Param = Configs(i, 0).ToUpper()
                     Select Case Param
-                        Case "EXE"
-                            Me.Exe = Configs(i, 1)
                         Case "DATENSATZ"
                             Call Me.saveDatensatz(Configs(i, 1))
-                        Case "DLL"
-                            Me.Dll = Configs(i, 1)
-                            Me.isDll = True
                         Case Else
                             'weitere Voreinstellungen
                     End Select

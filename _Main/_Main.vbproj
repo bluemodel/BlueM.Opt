@@ -66,6 +66,7 @@
     <DebugType>none</DebugType>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="IHWB.BlueM.DllAdapter, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualBasic.Compatibility">
       <Name>Microsoft.VisualBasic.Compatibility</Name>
     </Reference>
@@ -103,10 +104,6 @@
       <Lcid>0</Lcid>
       <WrapperTool>primary</WrapperTool>
     </COMReference>
-    <ProjectReference Include="..\BlueM.DLLAdapter\IHWB.BlueM.DLLAdapter.csproj">
-      <Project>{1EC50F6A-48C0-48F3-B9CD-77097889CF02}</Project>
-      <Name>IHWB.BlueM.DLLAdapter</Name>
-    </ProjectReference>
     <ProjectReference Include="..\EVO_KERN\EVO_Kern.vbproj">
       <Name>EVO_Kern</Name>
       <Project>{58356A07-425E-4C91-ACB8-17B9286C9417}</Project>
@@ -246,6 +243,13 @@
   <ItemGroup>
     <None Include="Resources\icon_png.png" />
     <None Include="Resources\icon_edit.png" />
+    <Content Include="Apps\BlueM.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Apps\IHA_Batchfor.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Apps\IHWB.BlueM.DllAdapter.dll" />
     <Content Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
