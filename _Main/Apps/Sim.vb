@@ -1772,25 +1772,16 @@ Public MustInherit Class Sim
 
         'Leere/Neue Ergebnisdatenbank in Arbeitsverzeichnis kopieren
         '-----------------------------------------------------------
-        Dim ZielDatei As String = WorkDir & Datensatz & "_EVO.mdb"
 
-        'aktuelles Verzeichnis bestimmen
-        Dim currentDir As String = CurDir()
-        'Pfad zur Assembly bestimmen (\_Main\bin\)
-        Dim binpath As String = System.Windows.Forms.Application.StartupPath()
-        'in das \_Main\bin Verzeichnis wechseln
-        ChDrive(binpath)
-        ChDir(binpath)
-        'in das \Apps Verzeichnis wechseln
-        ChDir("..\Apps")
+        'Pfad zur Vorlage
+        Dim db_path_source As String = System.Windows.Forms.Application.StartupPath() & "\EVO.mdb"
+        'Pfad zur Zieldatei
+        Dim db_path_target As String = Me.WorkDir & Me.Datensatz & "_EVO.mdb"
         'Datei kopieren
-        My.Computer.FileSystem.CopyFile("EVO.mdb", ZielDatei, True)
-        'zurück in das Ausgangsverzeichnis wechseln
-        ChDrive(currentDir)
-        ChDir(currentDir)
+        My.Computer.FileSystem.CopyFile(db_path_source, db_path_target, True)
 
         'Pfad setzen
-        db_path = ZielDatei
+        Me.db_path = db_path_target
 
         'Tabellen anpassen
         '=================
