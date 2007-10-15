@@ -38,6 +38,7 @@ Public Class IHA
 
     Private IHAZiel As Sim.Struct_OptZiel               'Kopie des OptZiels mit ZielTyp "IHA"
     Private IHADir As String                            'Verzeichnis für IHA-Dateien
+    Private exe_path As String                          'Pfad zur IHA_Batchfor.exe
 
     'IHA-Ergebnisse
     '--------------
@@ -90,6 +91,13 @@ Public Class IHA
     '***********
     Public Sub New(ByVal OptZiel As Sim.Struct_OptZiel)
 
+        'Pfad zur EXE festlegen
+        '----------------------
+        Me.exe_path = System.Windows.Forms.Application.StartupPath() & "\Apps\IHA_Batchfor.exe"
+        If (Not File.Exists(Me.exe_path)) Then
+        	Throw New Exception("IHA_Batchfor.exe nicht gefunden!")
+       	End If
+
         'IHAZiel kopieren
         '----------------
         Me.IHAZiel = OptZiel
@@ -141,24 +149,6 @@ Public Class IHA
 
         If (Directory.Exists(Me.IHADir) = False) Then
             Directory.CreateDirectory(Me.IHADir)
-            'IHA_Batchfor.exe in Verzeichnis kopieren
-            Dim ZielDatei As String = Me.IHADir & "IHA_Batchfor.exe"
-
-            'aktuelles Verzeichnis bestimmen
-            Dim currentDir As String = CurDir()
-            'Pfad zur Assembly bestimmen (\_Main\bin\)
-            Dim binpath As String = System.Windows.Forms.Application.StartupPath()
-            'in das \_Main\bin Verzeichnis wechseln
-            ChDrive(binpath)
-            ChDir(binpath)
-            'in das \Apps Verzeichnis wechseln
-            ChDir("..\Apps")
-            'Datei kopieren
-            My.Computer.FileSystem.CopyFile("IHA_Batchfor.exe", ZielDatei, True)
-            'zurück in das Ausgangsverzeichnis wechseln
-            ChDrive(currentDir)
-            ChDir(currentDir)
-
         End If
 
         'Datume bestimmen
@@ -487,11 +477,11 @@ Public Class IHA
     Private Sub launch_IHA()
         'Aktuelles Verzeichnis bestimmen
         Dim currentDir As String = CurDir()
-        'zum Arbeitsverzeichnis wechseln
+        'zum IHA-Verzeichnis wechseln
         ChDrive(Me.IHADir)
         ChDir(Me.IHADir)
         'EXE aufrufen
-        Dim ProcID As Integer = Shell("""IHA_Batchfor.exe"" input.par", AppWinStyle.MinimizedNoFocus, True)
+        Dim ProcID As Integer = Shell("""" & Me.exe_path & """ input.par", AppWinStyle.MinimizedNoFocus, True)
         'zurück in Ausgangsverzeichnis wechseln
         ChDrive(currentDir)
         ChDir(currentDir)

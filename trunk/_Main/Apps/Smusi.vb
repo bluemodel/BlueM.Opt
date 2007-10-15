@@ -78,7 +78,8 @@ Public Class Smusi
         ChDrive(Me.WorkDir)
         ChDir(Me.WorkDir)
         'EXE aufrufen
-        Dim ProcID As Integer = Shell("""" & Exe & """ " & Datensatz & ":", AppWinStyle.MinimizedNoFocus, True)
+        'TODO: SMUSI EXE muss dem Projekt hinzugefügt werden!
+        Dim ProcID As Integer = Shell("""smusi.exe"" " & Datensatz & ":", AppWinStyle.MinimizedNoFocus, True)
         'zurück ins Ausgangsverzeichnis wechseln
         ChDrive(currentDir)
         ChDir(currentDir)
