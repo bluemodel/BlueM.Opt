@@ -126,6 +126,9 @@ Partial Class Form1
             'Scatterplot deaktivieren
             Me.Button_Scatterplot.Enabled = False
 
+            'EVO_Settings zurücksetzen
+            EVO_Settings1.isSaved = False
+
             'Mauszeiger busy
             Cursor = Cursors.WaitCursor
 
@@ -223,6 +226,9 @@ Partial Class Form1
 
             'EVO_Einstellungen deaktivieren
             EVO_Settings1.Enabled = False
+
+            'EVO_Settings zurücksetzen
+            EVO_Settings1.isSaved = False
 
             'Mauszeiger busy
             Cursor = Cursors.WaitCursor
