@@ -69,13 +69,15 @@ Partial Class EVO_Einstellungen
         Me.components = New System.ComponentModel.Container
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox
-        Me.Label_OptModusValue = New System.Windows.Forms.Label
         Me.Label_OptModus = New System.Windows.Forms.Label
-        Me.CheckisDnVektor = New System.Windows.Forms.CheckBox
-        Me.ComboOptVorgabe = New System.Windows.Forms.ComboBox
-        Me.TextDeltaStart = New System.Windows.Forms.TextBox
-        Me.CheckisPopul = New System.Windows.Forms.CheckBox
+        Me.Label_OptModusValue = New System.Windows.Forms.Label
+        Me.LabelStrategie = New System.Windows.Forms.Label
         Me.ComboStrategie = New System.Windows.Forms.ComboBox
+        Me.LabelStartwerte = New System.Windows.Forms.Label
+        Me.ComboOptVorgabe = New System.Windows.Forms.ComboBox
+        Me.LabelStartSchrittweite = New System.Windows.Forms.Label
+        Me.TextDeltaStart = New System.Windows.Forms.TextBox
+        Me.CheckisDnVektor = New System.Windows.Forms.CheckBox
         Me.GroupBox_Generationen = New System.Windows.Forms.GroupBox
         Me.TextNMemberSecondPop = New System.Windows.Forms.TextBox
         Me.TextInteract = New System.Windows.Forms.TextBox
@@ -94,22 +96,20 @@ Partial Class EVO_Einstellungen
         Me.LabelAnzNachf = New System.Windows.Forms.Label
         Me.LabelAnzEltern = New System.Windows.Forms.Label
         Me.LabelAnzGen = New System.Windows.Forms.Label
+        Me.CheckisPopul = New System.Windows.Forms.CheckBox
         Me.GroupBox_Populationen = New System.Windows.Forms.GroupBox
-        Me.ComboPopPenalty = New System.Windows.Forms.ComboBox
-        Me.ComboPopStrategie = New System.Windows.Forms.ComboBox
-        Me.ComboOptPopEltern = New System.Windows.Forms.ComboBox
-        Me.TextAnzPopEltern = New System.Windows.Forms.TextBox
-        Me.TextAnzPop = New System.Windows.Forms.TextBox
-        Me.TextAnzRunden = New System.Windows.Forms.TextBox
-        Me.LabelPopPenalty = New System.Windows.Forms.Label
-        Me.LabelPopStrategie = New System.Windows.Forms.Label
-        Me.LabelOptPopEltern = New System.Windows.Forms.Label
-        Me.LabelAnzPopEltern = New System.Windows.Forms.Label
-        Me.LabelAnzPop = New System.Windows.Forms.Label
         Me.LabelAnzRunden = New System.Windows.Forms.Label
-        Me.LabelStartwerte = New System.Windows.Forms.Label
-        Me.LabelStartSchrittweite = New System.Windows.Forms.Label
-        Me.LabelStrategie = New System.Windows.Forms.Label
+        Me.TextAnzRunden = New System.Windows.Forms.TextBox
+        Me.LabelAnzPop = New System.Windows.Forms.Label
+        Me.TextAnzPop = New System.Windows.Forms.TextBox
+        Me.LabelAnzPopEltern = New System.Windows.Forms.Label
+        Me.TextAnzPopEltern = New System.Windows.Forms.TextBox
+        Me.LabelOptPopEltern = New System.Windows.Forms.Label
+        Me.ComboOptPopEltern = New System.Windows.Forms.ComboBox
+        Me.LabelPopStrategie = New System.Windows.Forms.Label
+        Me.ComboPopStrategie = New System.Windows.Forms.ComboBox
+        Me.LabelPopPenalty = New System.Windows.Forms.Label
+        Me.ComboPopPenalty = New System.Windows.Forms.ComboBox
         Me.GroupBox_Einstellungen.SuspendLayout()
         Me.GroupBox_Generationen.SuspendLayout()
         Me.GroupBox_Populationen.SuspendLayout()
@@ -139,15 +139,6 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Einstellungen.TabStop = False
         Me.GroupBox_Einstellungen.Text = "Einstellungen"
         '
-        'Label_OptModusValue
-        '
-        Me.Label_OptModusValue.AutoSize = True
-        Me.Label_OptModusValue.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label_OptModusValue.Location = New System.Drawing.Point(84, 19)
-        Me.Label_OptModusValue.Name = "Label_OptModusValue"
-        Me.Label_OptModusValue.Size = New System.Drawing.Size(0, 13)
-        Me.Label_OptModusValue.TabIndex = 32
-        '
         'Label_OptModus
         '
         Me.Label_OptModus.AutoSize = True
@@ -157,18 +148,52 @@ Partial Class EVO_Einstellungen
         Me.Label_OptModus.TabIndex = 31
         Me.Label_OptModus.Text = "Modus:"
         '
-        'CheckisDnVektor
+        'Label_OptModusValue
         '
-        Me.CheckisDnVektor.BackColor = System.Drawing.SystemColors.Control
-        Me.CheckisDnVektor.Cursor = System.Windows.Forms.Cursors.Default
-        Me.CheckisDnVektor.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.CheckisDnVektor.Location = New System.Drawing.Point(16, 120)
-        Me.CheckisDnVektor.Name = "CheckisDnVektor"
-        Me.CheckisDnVektor.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.CheckisDnVektor.Size = New System.Drawing.Size(144, 13)
-        Me.CheckisDnVektor.TabIndex = 3
-        Me.CheckisDnVektor.Text = "mit Schrittweitenvektor"
-        Me.CheckisDnVektor.UseVisualStyleBackColor = False
+        Me.Label_OptModusValue.AutoSize = True
+        Me.Label_OptModusValue.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label_OptModusValue.Location = New System.Drawing.Point(84, 19)
+        Me.Label_OptModusValue.Name = "Label_OptModusValue"
+        Me.Label_OptModusValue.Size = New System.Drawing.Size(0, 13)
+        Me.Label_OptModusValue.TabIndex = 32
+        '
+        'LabelStrategie
+        '
+        Me.LabelStrategie.AutoSize = True
+        Me.LabelStrategie.BackColor = System.Drawing.SystemColors.Control
+        Me.LabelStrategie.Cursor = System.Windows.Forms.Cursors.Default
+        Me.LabelStrategie.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.LabelStrategie.Location = New System.Drawing.Point(16, 46)
+        Me.LabelStrategie.Name = "LabelStrategie"
+        Me.LabelStrategie.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.LabelStrategie.Size = New System.Drawing.Size(54, 13)
+        Me.LabelStrategie.TabIndex = 19
+        Me.LabelStrategie.Text = "Selektion:"
+        '
+        'ComboStrategie
+        '
+        Me.ComboStrategie.BackColor = System.Drawing.SystemColors.Window
+        Me.ComboStrategie.Cursor = System.Windows.Forms.Cursors.Default
+        Me.ComboStrategie.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboStrategie.ForeColor = System.Drawing.SystemColors.WindowText
+        Me.ComboStrategie.Location = New System.Drawing.Point(84, 42)
+        Me.ComboStrategie.Name = "ComboStrategie"
+        Me.ComboStrategie.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.ComboStrategie.Size = New System.Drawing.Size(123, 21)
+        Me.ComboStrategie.TabIndex = 0
+        '
+        'LabelStartwerte
+        '
+        Me.LabelStartwerte.AutoSize = True
+        Me.LabelStartwerte.BackColor = System.Drawing.SystemColors.Control
+        Me.LabelStartwerte.Cursor = System.Windows.Forms.Cursors.Default
+        Me.LabelStartwerte.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.LabelStartwerte.Location = New System.Drawing.Point(16, 73)
+        Me.LabelStartwerte.Name = "LabelStartwerte"
+        Me.LabelStartwerte.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.LabelStartwerte.Size = New System.Drawing.Size(58, 13)
+        Me.LabelStartwerte.TabIndex = 29
+        Me.LabelStartwerte.Text = "Startwerte:"
         '
         'ComboOptVorgabe
         '
@@ -181,6 +206,19 @@ Partial Class EVO_Einstellungen
         Me.ComboOptVorgabe.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.ComboOptVorgabe.Size = New System.Drawing.Size(123, 21)
         Me.ComboOptVorgabe.TabIndex = 1
+        '
+        'LabelStartSchrittweite
+        '
+        Me.LabelStartSchrittweite.AutoSize = True
+        Me.LabelStartSchrittweite.BackColor = System.Drawing.SystemColors.Control
+        Me.LabelStartSchrittweite.Cursor = System.Windows.Forms.Cursors.Default
+        Me.LabelStartSchrittweite.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.LabelStartSchrittweite.Location = New System.Drawing.Point(13, 99)
+        Me.LabelStartSchrittweite.Name = "LabelStartSchrittweite"
+        Me.LabelStartSchrittweite.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.LabelStartSchrittweite.Size = New System.Drawing.Size(90, 13)
+        Me.LabelStartSchrittweite.TabIndex = 27
+        Me.LabelStartSchrittweite.Text = "Start-Schrittweite:"
         '
         'TextDeltaStart
         '
@@ -197,30 +235,18 @@ Partial Class EVO_Einstellungen
         Me.TextDeltaStart.Text = "0.1"
         Me.TextDeltaStart.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
-        'CheckisPopul
+        'CheckisDnVektor
         '
-        Me.CheckisPopul.BackColor = System.Drawing.SystemColors.Control
-        Me.CheckisPopul.Cursor = System.Windows.Forms.Cursors.Default
-        Me.CheckisPopul.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.CheckisPopul.Location = New System.Drawing.Point(8, 370)
-        Me.CheckisPopul.Name = "CheckisPopul"
-        Me.CheckisPopul.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.CheckisPopul.Size = New System.Drawing.Size(112, 16)
-        Me.CheckisPopul.TabIndex = 5
-        Me.CheckisPopul.Text = "mit Populationen"
-        Me.CheckisPopul.UseVisualStyleBackColor = False
-        '
-        'ComboStrategie
-        '
-        Me.ComboStrategie.BackColor = System.Drawing.SystemColors.Window
-        Me.ComboStrategie.Cursor = System.Windows.Forms.Cursors.Default
-        Me.ComboStrategie.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboStrategie.ForeColor = System.Drawing.SystemColors.WindowText
-        Me.ComboStrategie.Location = New System.Drawing.Point(84, 42)
-        Me.ComboStrategie.Name = "ComboStrategie"
-        Me.ComboStrategie.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.ComboStrategie.Size = New System.Drawing.Size(123, 21)
-        Me.ComboStrategie.TabIndex = 0
+        Me.CheckisDnVektor.BackColor = System.Drawing.SystemColors.Control
+        Me.CheckisDnVektor.Cursor = System.Windows.Forms.Cursors.Default
+        Me.CheckisDnVektor.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.CheckisDnVektor.Location = New System.Drawing.Point(16, 120)
+        Me.CheckisDnVektor.Name = "CheckisDnVektor"
+        Me.CheckisDnVektor.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.CheckisDnVektor.Size = New System.Drawing.Size(144, 13)
+        Me.CheckisDnVektor.TabIndex = 3
+        Me.CheckisDnVektor.Text = "mit Schrittweitenvektor"
+        Me.CheckisDnVektor.UseVisualStyleBackColor = False
         '
         'GroupBox_Generationen
         '
@@ -469,6 +495,19 @@ Partial Class EVO_Einstellungen
         Me.LabelAnzGen.TabIndex = 14
         Me.LabelAnzGen.Text = "Anzahl der Generationen:"
         '
+        'CheckisPopul
+        '
+        Me.CheckisPopul.BackColor = System.Drawing.SystemColors.Control
+        Me.CheckisPopul.Cursor = System.Windows.Forms.Cursors.Default
+        Me.CheckisPopul.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.CheckisPopul.Location = New System.Drawing.Point(8, 370)
+        Me.CheckisPopul.Name = "CheckisPopul"
+        Me.CheckisPopul.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.CheckisPopul.Size = New System.Drawing.Size(112, 16)
+        Me.CheckisPopul.TabIndex = 5
+        Me.CheckisPopul.Text = "mit Populationen"
+        Me.CheckisPopul.UseVisualStyleBackColor = False
+        '
         'GroupBox_Populationen
         '
         Me.GroupBox_Populationen.BackColor = System.Drawing.SystemColors.Control
@@ -494,56 +533,32 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Populationen.TabStop = False
         Me.GroupBox_Populationen.Text = "Populationen:"
         '
-        'ComboPopPenalty
+        'LabelAnzRunden
         '
-        Me.ComboPopPenalty.BackColor = System.Drawing.SystemColors.Window
-        Me.ComboPopPenalty.Cursor = System.Windows.Forms.Cursors.Default
-        Me.ComboPopPenalty.ForeColor = System.Drawing.SystemColors.WindowText
-        Me.ComboPopPenalty.Location = New System.Drawing.Point(85, 138)
-        Me.ComboPopPenalty.Name = "ComboPopPenalty"
-        Me.ComboPopPenalty.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.ComboPopPenalty.Size = New System.Drawing.Size(108, 21)
-        Me.ComboPopPenalty.TabIndex = 5
-        Me.ComboPopPenalty.Text = "ComboPopPenalty"
+        Me.LabelAnzRunden.AutoSize = True
+        Me.LabelAnzRunden.BackColor = System.Drawing.SystemColors.Control
+        Me.LabelAnzRunden.Cursor = System.Windows.Forms.Cursors.Default
+        Me.LabelAnzRunden.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.LabelAnzRunden.Location = New System.Drawing.Point(8, 16)
+        Me.LabelAnzRunden.Name = "LabelAnzRunden"
+        Me.LabelAnzRunden.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.LabelAnzRunden.Size = New System.Drawing.Size(101, 13)
+        Me.LabelAnzRunden.TabIndex = 6
+        Me.LabelAnzRunden.Text = "Anzahl der Runden:"
         '
-        'ComboPopStrategie
         '
-        Me.ComboPopStrategie.BackColor = System.Drawing.SystemColors.Window
-        Me.ComboPopStrategie.Cursor = System.Windows.Forms.Cursors.Default
-        Me.ComboPopStrategie.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboPopStrategie.ForeColor = System.Drawing.SystemColors.WindowText
-        Me.ComboPopStrategie.Location = New System.Drawing.Point(85, 114)
-        Me.ComboPopStrategie.Name = "ComboPopStrategie"
-        Me.ComboPopStrategie.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.ComboPopStrategie.Size = New System.Drawing.Size(108, 21)
-        Me.ComboPopStrategie.TabIndex = 4
+        'LabelAnzPop
         '
-        'ComboOptPopEltern
-        '
-        Me.ComboOptPopEltern.BackColor = System.Drawing.SystemColors.Window
-        Me.ComboOptPopEltern.Cursor = System.Windows.Forms.Cursors.Default
-        Me.ComboOptPopEltern.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboOptPopEltern.ForeColor = System.Drawing.SystemColors.WindowText
-        Me.ComboOptPopEltern.Location = New System.Drawing.Point(85, 90)
-        Me.ComboOptPopEltern.Name = "ComboOptPopEltern"
-        Me.ComboOptPopEltern.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.ComboOptPopEltern.Size = New System.Drawing.Size(108, 21)
-        Me.ComboOptPopEltern.TabIndex = 3
-        '
-        'TextAnzPopEltern
-        '
-        Me.TextAnzPopEltern.AcceptsReturn = True
-        Me.TextAnzPopEltern.BackColor = System.Drawing.SystemColors.Window
-        Me.TextAnzPopEltern.Cursor = System.Windows.Forms.Cursors.IBeam
-        Me.TextAnzPopEltern.ForeColor = System.Drawing.SystemColors.WindowText
-        Me.TextAnzPopEltern.Location = New System.Drawing.Point(140, 58)
-        Me.TextAnzPopEltern.MaxLength = 0
-        Me.TextAnzPopEltern.Name = "TextAnzPopEltern"
-        Me.TextAnzPopEltern.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.TextAnzPopEltern.Size = New System.Drawing.Size(43, 20)
-        Me.TextAnzPopEltern.TabIndex = 2
-        Me.TextAnzPopEltern.Text = "2"
-        Me.TextAnzPopEltern.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.LabelAnzPop.AutoSize = True
+        Me.LabelAnzPop.BackColor = System.Drawing.SystemColors.Control
+        Me.LabelAnzPop.Cursor = System.Windows.Forms.Cursors.Default
+        Me.LabelAnzPop.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.LabelAnzPop.Location = New System.Drawing.Point(7, 36)
+        Me.LabelAnzPop.Name = "LabelAnzPop"
+        Me.LabelAnzPop.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.LabelAnzPop.Size = New System.Drawing.Size(107, 13)
+        Me.LabelAnzPop.TabIndex = 7
+        Me.LabelAnzPop.Text = "Anzahl Populationen:"
         '
         'TextAnzPop
         '
@@ -575,42 +590,6 @@ Partial Class EVO_Einstellungen
         Me.TextAnzRunden.Text = "50"
         Me.TextAnzRunden.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
-        'LabelPopPenalty
-        '
-        Me.LabelPopPenalty.BackColor = System.Drawing.SystemColors.Control
-        Me.LabelPopPenalty.Cursor = System.Windows.Forms.Cursors.Default
-        Me.LabelPopPenalty.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.LabelPopPenalty.Location = New System.Drawing.Point(8, 131)
-        Me.LabelPopPenalty.Name = "LabelPopPenalty"
-        Me.LabelPopPenalty.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.LabelPopPenalty.Size = New System.Drawing.Size(76, 29)
-        Me.LabelPopPenalty.TabIndex = 36
-        Me.LabelPopPenalty.Text = "Ermittlung der Pop-Güte:"
-        '
-        'LabelPopStrategie
-        '
-        Me.LabelPopStrategie.BackColor = System.Drawing.SystemColors.Control
-        Me.LabelPopStrategie.Cursor = System.Windows.Forms.Cursors.Default
-        Me.LabelPopStrategie.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.LabelPopStrategie.Location = New System.Drawing.Point(8, 116)
-        Me.LabelPopStrategie.Name = "LabelPopStrategie"
-        Me.LabelPopStrategie.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.LabelPopStrategie.Size = New System.Drawing.Size(76, 17)
-        Me.LabelPopStrategie.TabIndex = 31
-        Me.LabelPopStrategie.Text = "Selektion:"
-        '
-        'LabelOptPopEltern
-        '
-        Me.LabelOptPopEltern.BackColor = System.Drawing.SystemColors.Control
-        Me.LabelOptPopEltern.Cursor = System.Windows.Forms.Cursors.Default
-        Me.LabelOptPopEltern.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.LabelOptPopEltern.Location = New System.Drawing.Point(8, 88)
-        Me.LabelOptPopEltern.Name = "LabelOptPopEltern"
-        Me.LabelOptPopEltern.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.LabelOptPopEltern.Size = New System.Drawing.Size(76, 28)
-        Me.LabelOptPopEltern.TabIndex = 9
-        Me.LabelOptPopEltern.Text = "Ermittlung der Pop-Eltern:"
-        '
         'LabelAnzPopEltern
         '
         Me.LabelAnzPopEltern.AutoSize = True
@@ -624,70 +603,92 @@ Partial Class EVO_Einstellungen
         Me.LabelAnzPopEltern.TabIndex = 8
         Me.LabelAnzPopEltern.Text = "Anzahl Eltern [max=5]:"
         '
-        'LabelAnzPop
+        'TextAnzPopEltern
         '
-        Me.LabelAnzPop.AutoSize = True
-        Me.LabelAnzPop.BackColor = System.Drawing.SystemColors.Control
-        Me.LabelAnzPop.Cursor = System.Windows.Forms.Cursors.Default
-        Me.LabelAnzPop.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.LabelAnzPop.Location = New System.Drawing.Point(7, 36)
-        Me.LabelAnzPop.Name = "LabelAnzPop"
-        Me.LabelAnzPop.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.LabelAnzPop.Size = New System.Drawing.Size(107, 13)
-        Me.LabelAnzPop.TabIndex = 7
-        Me.LabelAnzPop.Text = "Anzahl Populationen:"
+        Me.TextAnzPopEltern.AcceptsReturn = True
+        Me.TextAnzPopEltern.BackColor = System.Drawing.SystemColors.Window
+        Me.TextAnzPopEltern.Cursor = System.Windows.Forms.Cursors.IBeam
+        Me.TextAnzPopEltern.ForeColor = System.Drawing.SystemColors.WindowText
+        Me.TextAnzPopEltern.Location = New System.Drawing.Point(140, 58)
+        Me.TextAnzPopEltern.MaxLength = 0
+        Me.TextAnzPopEltern.Name = "TextAnzPopEltern"
+        Me.TextAnzPopEltern.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.TextAnzPopEltern.Size = New System.Drawing.Size(43, 20)
+        Me.TextAnzPopEltern.TabIndex = 2
+        Me.TextAnzPopEltern.Text = "2"
+        Me.TextAnzPopEltern.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
-        'LabelAnzRunden
+        'LabelOptPopEltern
         '
-        Me.LabelAnzRunden.AutoSize = True
-        Me.LabelAnzRunden.BackColor = System.Drawing.SystemColors.Control
-        Me.LabelAnzRunden.Cursor = System.Windows.Forms.Cursors.Default
-        Me.LabelAnzRunden.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.LabelAnzRunden.Location = New System.Drawing.Point(8, 16)
-        Me.LabelAnzRunden.Name = "LabelAnzRunden"
-        Me.LabelAnzRunden.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.LabelAnzRunden.Size = New System.Drawing.Size(101, 13)
-        Me.LabelAnzRunden.TabIndex = 6
-        Me.LabelAnzRunden.Text = "Anzahl der Runden:"
+        Me.LabelOptPopEltern.BackColor = System.Drawing.SystemColors.Control
+        Me.LabelOptPopEltern.Cursor = System.Windows.Forms.Cursors.Default
+        Me.LabelOptPopEltern.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.LabelOptPopEltern.Location = New System.Drawing.Point(8, 88)
+        Me.LabelOptPopEltern.Name = "LabelOptPopEltern"
+        Me.LabelOptPopEltern.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.LabelOptPopEltern.Size = New System.Drawing.Size(76, 28)
+        Me.LabelOptPopEltern.TabIndex = 9
+        Me.LabelOptPopEltern.Text = "Ermittlung der Pop-Eltern:"
         '
-        'LabelStartwerte
+        'ComboOptPopEltern
         '
-        Me.LabelStartwerte.AutoSize = True
-        Me.LabelStartwerte.BackColor = System.Drawing.SystemColors.Control
-        Me.LabelStartwerte.Cursor = System.Windows.Forms.Cursors.Default
-        Me.LabelStartwerte.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.LabelStartwerte.Location = New System.Drawing.Point(16, 73)
-        Me.LabelStartwerte.Name = "LabelStartwerte"
-        Me.LabelStartwerte.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.LabelStartwerte.Size = New System.Drawing.Size(58, 13)
-        Me.LabelStartwerte.TabIndex = 29
-        Me.LabelStartwerte.Text = "Startwerte:"
+        Me.ComboOptPopEltern.BackColor = System.Drawing.SystemColors.Window
+        Me.ComboOptPopEltern.Cursor = System.Windows.Forms.Cursors.Default
+        Me.ComboOptPopEltern.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboOptPopEltern.ForeColor = System.Drawing.SystemColors.WindowText
+        Me.ComboOptPopEltern.Location = New System.Drawing.Point(85, 90)
+        Me.ComboOptPopEltern.Name = "ComboOptPopEltern"
+        Me.ComboOptPopEltern.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.ComboOptPopEltern.Size = New System.Drawing.Size(108, 21)
+        Me.ComboOptPopEltern.TabIndex = 3
         '
-        'LabelStartSchrittweite
+        'LabelPopStrategie
         '
-        Me.LabelStartSchrittweite.AutoSize = True
-        Me.LabelStartSchrittweite.BackColor = System.Drawing.SystemColors.Control
-        Me.LabelStartSchrittweite.Cursor = System.Windows.Forms.Cursors.Default
-        Me.LabelStartSchrittweite.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.LabelStartSchrittweite.Location = New System.Drawing.Point(13, 99)
-        Me.LabelStartSchrittweite.Name = "LabelStartSchrittweite"
-        Me.LabelStartSchrittweite.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.LabelStartSchrittweite.Size = New System.Drawing.Size(90, 13)
-        Me.LabelStartSchrittweite.TabIndex = 27
-        Me.LabelStartSchrittweite.Text = "Start-Schrittweite:"
+        Me.LabelPopStrategie.BackColor = System.Drawing.SystemColors.Control
+        Me.LabelPopStrategie.Cursor = System.Windows.Forms.Cursors.Default
+        Me.LabelPopStrategie.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.LabelPopStrategie.Location = New System.Drawing.Point(8, 116)
+        Me.LabelPopStrategie.Name = "LabelPopStrategie"
+        Me.LabelPopStrategie.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.LabelPopStrategie.Size = New System.Drawing.Size(76, 17)
+        Me.LabelPopStrategie.TabIndex = 31
+        Me.LabelPopStrategie.Text = "Selektion:"
         '
-        'LabelStrategie
+        'ComboPopStrategie
         '
-        Me.LabelStrategie.AutoSize = True
-        Me.LabelStrategie.BackColor = System.Drawing.SystemColors.Control
-        Me.LabelStrategie.Cursor = System.Windows.Forms.Cursors.Default
-        Me.LabelStrategie.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.LabelStrategie.Location = New System.Drawing.Point(16, 46)
-        Me.LabelStrategie.Name = "LabelStrategie"
-        Me.LabelStrategie.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.LabelStrategie.Size = New System.Drawing.Size(54, 13)
-        Me.LabelStrategie.TabIndex = 19
-        Me.LabelStrategie.Text = "Selektion:"
+        Me.ComboPopStrategie.BackColor = System.Drawing.SystemColors.Window
+        Me.ComboPopStrategie.Cursor = System.Windows.Forms.Cursors.Default
+        Me.ComboPopStrategie.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboPopStrategie.ForeColor = System.Drawing.SystemColors.WindowText
+        Me.ComboPopStrategie.Location = New System.Drawing.Point(85, 114)
+        Me.ComboPopStrategie.Name = "ComboPopStrategie"
+        Me.ComboPopStrategie.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.ComboPopStrategie.Size = New System.Drawing.Size(108, 21)
+        Me.ComboPopStrategie.TabIndex = 4
+        '
+        'LabelPopPenalty
+        '
+        Me.LabelPopPenalty.BackColor = System.Drawing.SystemColors.Control
+        Me.LabelPopPenalty.Cursor = System.Windows.Forms.Cursors.Default
+        Me.LabelPopPenalty.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.LabelPopPenalty.Location = New System.Drawing.Point(8, 131)
+        Me.LabelPopPenalty.Name = "LabelPopPenalty"
+        Me.LabelPopPenalty.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.LabelPopPenalty.Size = New System.Drawing.Size(76, 29)
+        Me.LabelPopPenalty.TabIndex = 36
+        Me.LabelPopPenalty.Text = "Ermittlung der Pop-Güte:"
+        '
+        'ComboPopPenalty
+        '
+        Me.ComboPopPenalty.BackColor = System.Drawing.SystemColors.Window
+        Me.ComboPopPenalty.Cursor = System.Windows.Forms.Cursors.Default
+        Me.ComboPopPenalty.ForeColor = System.Drawing.SystemColors.WindowText
+        Me.ComboPopPenalty.Location = New System.Drawing.Point(85, 138)
+        Me.ComboPopPenalty.Name = "ComboPopPenalty"
+        Me.ComboPopPenalty.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.ComboPopPenalty.Size = New System.Drawing.Size(108, 21)
+        Me.ComboPopPenalty.TabIndex = 5
+        Me.ComboPopPenalty.Text = "ComboPopPenalty"
         '
         'EVO_Einstellungen
         '

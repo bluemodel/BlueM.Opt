@@ -1,5 +1,7 @@
 Option Strict Off
 Option Explicit On
+Imports IHWB.EVO.Kern
+
 Public Class EVO_Einstellungen
     Inherits System.Windows.Forms.UserControl
 
@@ -7,7 +9,7 @@ Public Class EVO_Einstellungen
     'BUG 225: isSaved müsste bei Neustart zurückgesetzt werden
     Private isSaved As Boolean = False                              'Flag der anzeigt, ob die Einstellungen bereits gesichert wurden
 
-    Private OptModusValue As Short = EVO_MODUS_SINGEL_OBJECTIVE
+    Private OptModusValue As Short = EVO_MODUS.Single_Objective
     Dim isMultiObjectiveOptimierung As Boolean
 
     'Optimierungsmodus wurde geändert
@@ -16,7 +18,7 @@ Public Class EVO_Einstellungen
 
         Select Case Me.OptModus
 
-            Case EVO_MODUS_SINGEL_OBJECTIVE
+            Case EVO_MODUS.Single_Objective
                 'Vorgaben und Anzeige
                 Label_OptModusValue.Text = "Single Objective"
                 TextAnzGen.Text = CStr(20)
@@ -37,7 +39,7 @@ Public Class EVO_Einstellungen
                 CheckisPopul.Checked = False
                 GroupBox_Populationen.Enabled = False
 
-            Case EVO_MODUS_MULTIOBJECTIVE_PARETO
+            Case EVO_MODUS.Multi_Objective
                 'Vorgaben und Anzeige
                 Label_OptModusValue.Text = "MultiObjective Pareto"
                 TextAnzGen.Text = CStr(250)
@@ -78,7 +80,7 @@ Public Class EVO_Einstellungen
     'UPGRADE_WARNING: Das Ereignis ComboOptEltern.SelectedIndexChanged kann ausgelöst werden, wenn das Formular initialisiert wird. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup2075"'
     Private Sub ComboOptEltern_SelectedIndexChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles ComboOptEltern.SelectedIndexChanged
         Select Case VB6.GetItemData(ComboOptEltern, ComboOptEltern.SelectedIndex)
-            Case EVO_ELTERN_XY_DISKRET, EVO_ELTERN_XY_MITTELN, EVO_ELTERN_Neighbourhood
+            Case EVO_ELTERN.XY_Diskret, EVO_ELTERN.XY_Mitteln, EVO_ELTERN.Neighbourhood
                 LabelRekombxy1.Enabled = True
                 LabelRekombxy3.Enabled = True
                 TextRekombxy.Enabled = True
@@ -185,47 +187,47 @@ Public Class EVO_Einstellungen
 
 
     Private Sub FILLCOMBO_STRATEGIE(ByRef Cntrl As System.Windows.Forms.ComboBox)
-        Cntrl.Items.Add(New VB6.ListBoxItem("'+' (Eltern+Nachfolger)", EVO_PLUS))
-        Cntrl.Items.Add(New VB6.ListBoxItem("',' (nur Nachfolger)", EVO_KOMMA))
+        Cntrl.Items.Add(New VB6.ListBoxItem("'+' (Eltern+Nachfolger)", EVO_STRATEGIE.Plus))
+        Cntrl.Items.Add(New VB6.ListBoxItem("',' (nur Nachfolger)", EVO_STRATEGIE.Komma))
         Cntrl.SelectedIndex = 0
     End Sub
 
     Private Sub FILLCOMBO_OPTPOPELTERN(ByRef Cntrl As System.Windows.Forms.ComboBox)
-        Cntrl.Items.Add(New VB6.ListBoxItem("mit Rekombination", EVO_POPELTERN_REKOMB))
-        Cntrl.Items.Add(New VB6.ListBoxItem("Mittelwerte", EVO_POPELTERN_MITTEL))
-        Cntrl.Items.Add(New VB6.ListBoxItem("Selektion", EVO_POPELTERN_SELEKT))
+        Cntrl.Items.Add(New VB6.ListBoxItem("mit Rekombination", EVO_POP_ELTERN.Rekombination))
+        Cntrl.Items.Add(New VB6.ListBoxItem("Mittelwerte", EVO_POP_ELTERN.Mittelwert))
+        Cntrl.Items.Add(New VB6.ListBoxItem("Selektion", EVO_POP_ELTERN.Selektion))
         Cntrl.SelectedIndex = 0
     End Sub
 
     Private Sub FILLCOMBO_OPTELTERN(ByRef Cntrl As System.Windows.Forms.ComboBox)
         Cntrl.Items.Clear()
-        Cntrl.Items.Add(New VB6.ListBoxItem("Selektion", EVO_ELTERN_SELEKT))
-        Cntrl.Items.Add(New VB6.ListBoxItem("Rekomb x/x, diskret", EVO_ELTERN_XX_DISKRET))
-        Cntrl.Items.Add(New VB6.ListBoxItem("Rekomb x/x, mitteln", EVO_ELTERN_XX_MITTELN))
-        Cntrl.Items.Add(New VB6.ListBoxItem("Rekomb x/y, diskret", EVO_ELTERN_XY_DISKRET))
-        Cntrl.Items.Add(New VB6.ListBoxItem("Rekomb x/y, mitteln", EVO_ELTERN_XY_MITTELN))
-        If (Me.OptModus = EVO_MODUS_MULTIOBJECTIVE_PARETO) Then
-            Cntrl.Items.Add(New VB6.ListBoxItem("Neighbourhood", EVO_ELTERN_Neighbourhood))
+        Cntrl.Items.Add(New VB6.ListBoxItem("Selektion", EVO_ELTERN.Selektion))
+        Cntrl.Items.Add(New VB6.ListBoxItem("Rekomb x/x, diskret", EVO_ELTERN.XX_Diskret))
+        Cntrl.Items.Add(New VB6.ListBoxItem("Rekomb x/x, mitteln", EVO_ELTERN.XX_Mitteln))
+        Cntrl.Items.Add(New VB6.ListBoxItem("Rekomb x/y, diskret", EVO_ELTERN.XY_Diskret))
+        Cntrl.Items.Add(New VB6.ListBoxItem("Rekomb x/y, mitteln", EVO_ELTERN.XY_Mitteln))
+        If (Me.OptModus = EVO_MODUS.Multi_Objective) Then
+            Cntrl.Items.Add(New VB6.ListBoxItem("Neighbourhood", EVO_ELTERN.Neighbourhood))
         End If
         Cntrl.SelectedIndex = 1
     End Sub
 
     Private Sub FILLCOMBO_OPTVORGABE(ByRef Cntrl As System.Windows.Forms.ComboBox)
-        Cntrl.Items.Add(New VB6.ListBoxItem("Zufällig", globalVORGABE_ZUFALL))
-        Cntrl.Items.Add(New VB6.ListBoxItem("Originalparameter", globalVORGABE_Original))
+        Cntrl.Items.Add(New VB6.ListBoxItem("Zufällig", EVO_STARTPARAMETER.Zufall))
+        Cntrl.Items.Add(New VB6.ListBoxItem("Originalparameter", EVO_STARTPARAMETER.Original))
         Cntrl.SelectedIndex = 1
     End Sub
 
     Private Sub FILLCOMBO_POPPENALTY(ByRef Cntrl As System.Windows.Forms.ComboBox)
         Cntrl.Items.Clear()
         Select Case Me.OptModusValue
-            Case EVO_MODUS_SINGEL_OBJECTIVE
-                Cntrl.Items.Add(New VB6.ListBoxItem("Mittelwert", EVO_POP_PENALTY_MITTELWERT))
-                Cntrl.Items.Add(New VB6.ListBoxItem("Schlechtester", EVO_POP_PENALTY_SCHLECHTESTER))
+            Case EVO.Kern.EVO_MODUS.Single_Objective
+                Cntrl.Items.Add(New VB6.ListBoxItem("Mittelwert", EVO_POP_PENALTY.Mittelwert))
+                Cntrl.Items.Add(New VB6.ListBoxItem("Schlechtester", EVO_POP_PENALTY.Schlechtester))
                 Cntrl.SelectedIndex = 0
-            Case EVO_MODUS_MULTIOBJECTIVE_PARETO
-                Cntrl.Items.Add(New VB6.ListBoxItem("Crowding", EVO_POP_PENALTY_CROWDING))
-                Cntrl.Items.Add(New VB6.ListBoxItem("Spannweite", EVO_POP_PENALTY_SPANNWEITE))
+            Case EVO.Kern.EVO_MODUS.Multi_Objective
+                Cntrl.Items.Add(New VB6.ListBoxItem("Crowding", EVO_POP_PENALTY.Crowding))
+                Cntrl.Items.Add(New VB6.ListBoxItem("Spannweite", EVO_POP_PENALTY.Spannweite))
                 Cntrl.SelectedIndex = 0
         End Select
     End Sub
@@ -296,7 +298,7 @@ Public Class EVO_Einstellungen
         End Set
     End Property
 
-    Public ReadOnly Property PES_Settings() As EVO.Kern.PES.Struct_Settings
+    Public ReadOnly Property PES_Settings() As PES.Struct_Settings
         Get
             'Wenn Einstellungen noch nicht gespeichert, zuerst speichern
             If (Not Me.isSaved) Then
