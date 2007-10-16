@@ -5,9 +5,8 @@ Imports IHWB.EVO.Kern
 Public Class EVO_Einstellungen
     Inherits System.Windows.Forms.UserControl
 
-    Private _settings As EVO.Kern.PES.Struct_Settings                'Sicherung sämtlicher Einstellungen
-    'BUG 225: isSaved müsste bei Neustart zurückgesetzt werden
-    Private isSaved As Boolean = False                              'Flag der anzeigt, ob die Einstellungen bereits gesichert wurden
+    Private _settings As PES.Struct_Settings        'Sicherung sämtlicher Einstellungen
+    Public isSaved As Boolean = False               'Flag der anzeigt, ob die Einstellungen bereits gesichert wurden
 
     Private OptModusValue As Short = EVO_MODUS.Single_Objective
     Dim isMultiObjectiveOptimierung As Boolean
