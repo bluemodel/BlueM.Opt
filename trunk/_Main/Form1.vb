@@ -47,7 +47,7 @@ Partial Class Form1
     '**** Deklarationen der Module *****
     Public WithEvents Sim1 As Sim
     Public SensiPlot1 As SensiPlot
-    Public CES1 As EvoKern.CES
+    Public CES1 As EVO.Kern.CES
     Public TSP1 As TSP
 
     '**** Globale Parameter Parameter Optimierung ****
@@ -336,7 +336,7 @@ Partial Class Form1
                     End Select
 
                     'CES initialisieren
-                    CES1 = New EvoKern.CES
+                    CES1 = New EVO.Kern.CES
                     'Prüft ob die Zahl mög. Kombinationen < Zahl Eltern + Nachfolger
                     If (CES1.n_Childs + CES1.n_Parents) > Sim1.No_of_Combinations Then
                         Throw New Exception("Die Zahl der Eltern + die Zahl der Kinder ist größer als die mögliche Zahl der Kombinationen.")
@@ -409,9 +409,19 @@ Partial Class Form1
     'Arbeitsverzeichnis wurde geändert -> Anzeige aktualisieren
     '**********************************************************
     Private Sub displayWorkDir() Handles Sim1.WorkDirChange
+
+        Dim pfad As String
+        pfad = Sim1.WorkDir & Sim1.Datensatz & ".ALL"
+
         'Datensatzanzeige aktualisieren
-        Me.LinkLabel_WorkDir.Text = Sim1.WorkDir & Sim1.Datensatz & ".ALL"
-        Me.LinkLabel_WorkDir.Links(0).LinkData = Sim1.WorkDir
+        If (File.Exists(pfad)) Then
+            Me.LinkLabel_WorkDir.Text = pfad
+            Me.LinkLabel_WorkDir.Links(0).LinkData = Sim1.WorkDir
+        Else
+            Me.LinkLabel_WorkDir.Text = "bitte Datensatz auswählen!"
+            Me.LinkLabel_WorkDir.Links(0).LinkData = CurDir()
+        End If
+
     End Sub
 
 #End Region 'Initialisierung der Anwendungen
@@ -723,8 +733,8 @@ Partial Class Form1
 
         '1. Schritt: PES - Objekt der Klasse PES wird erzeugt PES wird erzeugt
         '*********************************************************************
-        Dim PES1 As EvoKern.PES
-        PES1 = New EvoKern.PES
+        Dim PES1 As EVO.Kern.PES
+        PES1 = New EVO.Kern.PES
 
         'Falls HYBRID werden entprechend der Einstellung im PES die Parameter auf Zufällig oder Start gesetzt
         If Method = METH_HYBRID Then
@@ -958,8 +968,8 @@ Partial Class Form1
         '1. Schritt: PES
         'Objekt der Klasse PES wird erzeugt
         '**********************************
-        Dim PES1 As EvoKern.PES
-        PES1 = New EvoKern.PES
+        Dim PES1 As EVO.Kern.PES
+        PES1 = New EVO.Kern.PES
 
         'Schritte 2 - 5 PES wird initialisiert (Weiteres siehe dort ;-)
         '**************************************************************
@@ -1538,7 +1548,7 @@ Start_Evolutionsrunden:
 
                 'Daten einlesen
                 Cursor = Cursors.WaitCursor
-                Dim OptResult As Main.OptResult = Sim1.db_getOptResult(Form2.CheckBox_onlySekPop.Checked)
+                Dim OptResult As EVO.OptResult = Sim1.db_getOptResult(Form2.CheckBox_onlySekPop.Checked)
                 Cursor = Cursors.Default
 
                 If (Form2.CheckBox_Hauptdiagramm.Checked) Then
@@ -1552,7 +1562,7 @@ Start_Evolutionsrunden:
                     'Achsen
                     '------
                     Dim Achsen As New Collection
-                    Dim tmpAchse As Main.Diagramm.Achse
+                    Dim tmpAchse As EVO.Diagramm.Achse
                     tmpAchse.Auto = True
                     'X-Achse
                     tmpAchse.Name = Form2.ListBox_OptZieleX.SelectedItem

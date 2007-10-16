@@ -39,12 +39,12 @@ Partial Class Form1
         Me.ComboBox_Methode = New System.Windows.Forms.ComboBox
         Me.Label_Anwendung = New System.Windows.Forms.Label
         Me.ComboBox_Anwendung = New System.Windows.Forms.ComboBox
-        Me.EVO_Opt_Verlauf1 = New Main.EVO_Opt_Verlauf
-        Me.EVO_Settings1 = New Main.EVO_Einstellungen
-        Me.Testprobleme1 = New Main.Testprobleme
+        Me.EVO_Opt_Verlauf1 = New EVO.EVO_Opt_Verlauf
+        Me.EVO_Settings1 = New EVO.EVO_Einstellungen
+        Me.Testprobleme1 = New EVO.Testprobleme
         Me.OpenFileDialog_Datensatz = New System.Windows.Forms.OpenFileDialog
         Me.OpenFileDialog_MDB = New System.Windows.Forms.OpenFileDialog
-        Me.DForm = New Main.DiagrammForm
+        Me.DForm = New EVO.DiagrammForm
         Me.GroupBox_Anwendung.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -88,7 +88,7 @@ Partial Class Form1
         'Button_Scatterplot
         '
         Me.Button_Scatterplot.Enabled = False
-        Me.Button_Scatterplot.Image = Global.Main.My.Resources.Resources.scatterplot
+        Me.Button_Scatterplot.Image = My.Resources.Resources.scatterplot
         Me.Button_Scatterplot.Location = New System.Drawing.Point(546, 656)
         Me.Button_Scatterplot.Name = "Button_Scatterplot"
         Me.Button_Scatterplot.Size = New System.Drawing.Size(25, 25)
@@ -226,7 +226,7 @@ Partial Class Form1
     Friend WithEvents Label_Anwendung As System.Windows.Forms.Label
     Friend WithEvents Button_IniMethod As System.Windows.Forms.Button
     Friend WithEvents Testprobleme1 As Testprobleme
-    Friend WithEvents DForm As Main.DiagrammForm
+    Friend WithEvents DForm As EVO.DiagrammForm
     Friend WithEvents LinkLabel_WorkDir As System.Windows.Forms.LinkLabel
     Friend WithEvents ComboBox_Methode As System.Windows.Forms.ComboBox
     Friend WithEvents Label_Methode As System.Windows.Forms.Label

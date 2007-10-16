@@ -818,7 +818,7 @@ Public Class CES
     Public Sub Sort_Faksimile(ByRef FaksimileList() As Faksimile)
         'Sortiert die Fiksimile anhand des Abstandes
         Dim i, j As Integer
-        Dim swap As EvoKern.CES.Faksimile
+        Dim swap As EVO.Kern.CES.Faksimile
 
         For i = 0 To FaksimileList.GetUpperBound(0)
             For j = 0 To FaksimileList.GetUpperBound(0)
