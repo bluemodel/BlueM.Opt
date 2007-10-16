@@ -180,7 +180,7 @@ Public Class Testprobleme
 
 #Region "Diagrammfunktionen"
 
-    Public Sub DiagInitialise(ByVal PES_Settings As EvoKern.PES.Struct_Settings, ByVal globalAnzPar As Integer, ByRef Diag As Main.Diagramm)
+    Public Sub DiagInitialise(ByVal PES_Settings As EVO.Kern.PES.Struct_Settings, ByVal globalAnzPar As Integer, ByRef Diag As EVO.Diagramm)
 
         Select Case Me.Combo_Testproblem.Text
 
@@ -205,7 +205,7 @@ Public Class Testprobleme
 
     'Diagramm für Sinus-Funktion initialisieren
     '*******************************************
-    Private Sub DiagInitialise_SinusFunktion(ByVal globalAnzPar As Short, ByRef Diag As Main.Diagramm)
+    Private Sub DiagInitialise_SinusFunktion(ByVal globalAnzPar As Short, ByRef Diag As EVO.Diagramm)
 
         Dim array_x() As Double = {}
         Dim array_y() As Double = {}
@@ -251,7 +251,7 @@ Public Class Testprobleme
 
     'Diagramm für Beale-Problem initialisieren
     '*****************************************
-    Private Sub DiagInitialise_BealeProblem(ByVal PES_Settings As EvoKern.PES.Struct_Settings, ByVal globalAnzPar As Short, ByRef Diag As Main.Diagramm)
+    Private Sub DiagInitialise_BealeProblem(ByVal PES_Settings As EVO.Kern.PES.Struct_Settings, ByVal globalAnzPar As Short, ByRef Diag As EVO.Diagramm)
 
         Dim array_x() As Double = {}
         Dim array_y() As Double = {}
@@ -303,7 +303,7 @@ Public Class Testprobleme
 
     'Diagramm für Schwefel-Problem initialisieren
     '********************************************
-    Private Sub DiagInitialise_SchwefelProblem(ByVal PES_Settings As EvoKern.PES.Struct_Settings, ByVal globalAnzPar As Short, ByRef Diag As Main.Diagramm)
+    Private Sub DiagInitialise_SchwefelProblem(ByVal PES_Settings As EVO.Kern.PES.Struct_Settings, ByVal globalAnzPar As Short, ByRef Diag As EVO.Diagramm)
 
         Dim array_x() As Double = {}
         Dim array_y() As Double = {}
@@ -365,7 +365,7 @@ Public Class Testprobleme
 
     'Diagramm für MultiObjective-Probleme initialisieren
     '***************************************************
-    Private Sub DiagInitialise_MultiTestProb(ByVal PES_Settings As EvoKern.PES.Struct_Settings, ByRef Diag As Main.Diagramm)
+    Private Sub DiagInitialise_MultiTestProb(ByVal PES_Settings As EVO.Kern.PES.Struct_Settings, ByRef Diag As EVO.Diagramm)
 
         Dim i, j As Short
         Dim serie As Steema.TeeChart.Styles.Series
@@ -537,7 +537,7 @@ Public Class Testprobleme
 
     'Diagramm für Box-Problem (3D) initialisieren
     '********************************************
-    Private Sub DiagInitialise_3D_Box(ByVal PES_Settings As EvoKern.PES.Struct_Settings, ByVal AnzPar As Integer, ByRef Diag As Main.Diagramm)
+    Private Sub DiagInitialise_3D_Box(ByVal PES_Settings As EVO.Kern.PES.Struct_Settings, ByVal AnzPar As Integer, ByRef Diag As EVO.Diagramm)
 
         Dim i, j, n As Integer
         Dim ArrayX() As Double
@@ -672,7 +672,7 @@ Public Class Testprobleme
     
     'Evaluierung und Zeichnen der Testprobleme
     '*****************************************
-    Public Sub Evaluierung_TestProbleme(ByRef Testproblem As String, ByVal mypara() As Double, ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN() As Double, ByRef RN() As Double, ByRef Diag As Main.Diagramm)
+    Public Sub Evaluierung_TestProbleme(ByRef Testproblem As String, ByVal mypara() As Double, ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN() As Double, ByRef RN() As Double, ByRef Diag As EVO.Diagramm)
 
         Dim i As Short
         Dim Unterteilung_X As Double

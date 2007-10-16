@@ -179,7 +179,7 @@ Public MustInherit Class Sim
         Call Me.checkDezimaltrennzeichen()
 
         'EVO.ini Datei einlesen
-        Call Me.ReadEVOIni()
+        Call Me.ReadSettings()
 
     End Sub
 
@@ -201,55 +201,15 @@ Public MustInherit Class Sim
 
     End Sub
 
-    'EVO.ini Datei einlesen 
-    '**********************
-    Public Sub ReadEVOIni()
+    'Benutzereinstellungen einlesen 
+    '******************************
+    Public Sub ReadSettings()
 
-        'Pfad zur Assembly bestimmen (\_Main\bin\)
-        Dim binpath As String = System.Windows.Forms.Application.StartupPath()
-        Dim inifilepath As String = binpath & "\EVO.ini"
-
-        If File.Exists(inifilepath) Then
-
-            'Datei einlesen
-            Dim FiStr As FileStream = New FileStream(inifilepath, FileMode.Open, IO.FileAccess.Read)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-
-            Dim Configs(9, 1) As String
-            Dim Line As String
-            Dim Pairs() As String
-            Dim i As Integer = 0
-            Do
-                Line = StrRead.ReadLine.ToString()
-                If (Line.StartsWith("[") = False And Line.StartsWith(";") = False) Then
-                    Pairs = Line.Split("=")
-                    Configs(i, 0) = Pairs(0)
-                    Configs(i, 1) = Pairs(1)
-                    i += 1
-                End If
-            Loop Until StrRead.Peek() = -1
-
-            StrRead.Close()
-            FiStr.Close()
-
-            'Einstellungen setzen
-            Dim Param As String
-            For i = 0 To Configs.GetUpperBound(0)
-                If (Not IsNothing(Configs(i, 0))) Then
-                    Param = Configs(i, 0).ToUpper()
-                    Select Case Param
-                        Case "DATENSATZ"
-                            Call Me.saveDatensatz(Configs(i, 1))
-                        Case Else
-                            'weitere Voreinstellungen
-                    End Select
-                End If
-            Next
-
-        Else
-            'Datei EVO.ini existiert nicht
-            Throw New Exception("Die Datei ""EVO.ini"" konnte nicht gefunden werden!" & Chr(13) & Chr(10) & "Bitte gemäß Dokumentation eine Datei ""EVO.ini"" erstellen.")
-        End If
+        'Datensatz
+        '---------
+        Dim pfad As String
+        pfad = My.Settings.Datensatz
+        Call Me.saveDatensatz(pfad)
 
     End Sub
 
@@ -257,10 +217,15 @@ Public MustInherit Class Sim
     '********************************************
     Public Sub saveDatensatz(ByVal Pfad As String)
 
-        'Datensatzname bestimmen
-        Me.Datensatz = Path.GetFileNameWithoutExtension(Pfad)
-        'Arbeitsverzeichnis bestimmen
-        Me.WorkDir = Path.GetDirectoryName(Pfad) & "\"
+        If (File.Exists(Pfad)) Then
+            'Datensatzname bestimmen
+            Me.Datensatz = Path.GetFileNameWithoutExtension(Pfad)
+            'Arbeitsverzeichnis bestimmen
+            Me.WorkDir = Path.GetDirectoryName(Pfad) & "\"
+            'Benutzereinstellungen speichern
+            My.Settings.Datensatz = Pfad
+        End If
+
         'Event auslösen (wird von Form1.displayWorkDir() verarbeitet)
         RaiseEvent WorkDirChange()
 
@@ -2135,7 +2100,7 @@ Public MustInherit Class Sim
         '---------------------------------------------------------------------------
 
         Dim i, j As Integer
-        Dim OptResult As Main.OptResult
+        Dim OptResult As EVO.OptResult
 
         'Connect
         Call db_connect()
@@ -2160,7 +2125,7 @@ Public MustInherit Class Sim
 
         'Werte einlesen
         '==============
-        OptResult = New Main.OptResult()
+        OptResult = New EVO.OptResult()
         OptResult.List_OptParameter = Me.List_OptParameter
         OptResult.List_OptZiele = Me.List_OptZiele
         OptResult.List_Constraints = Me.List_Constraints

@@ -3,7 +3,7 @@ Option Explicit On
 Public Class EVO_Einstellungen
     Inherits System.Windows.Forms.UserControl
 
-    Private _settings As EvoKern.PES.Struct_Settings                'Sicherung sämtlicher Einstellungen
+    Private _settings As EVO.Kern.PES.Struct_Settings                'Sicherung sämtlicher Einstellungen
     'BUG 225: isSaved müsste bei Neustart zurückgesetzt werden
     Private isSaved As Boolean = False                              'Flag der anzeigt, ob die Einstellungen bereits gesichert wurden
 
@@ -296,7 +296,7 @@ Public Class EVO_Einstellungen
         End Set
     End Property
 
-    Public ReadOnly Property PES_Settings() As EvoKern.PES.Struct_Settings
+    Public ReadOnly Property PES_Settings() As EVO.Kern.PES.Struct_Settings
         Get
             'Wenn Einstellungen noch nicht gespeichert, zuerst speichern
             If (Not Me.isSaved) Then
