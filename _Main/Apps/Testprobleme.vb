@@ -1,8 +1,10 @@
+Imports IHWB.EVO.Kern
+
 Public Class Testprobleme
     Inherits System.Windows.Forms.UserControl
 
     Private IsInitializing As Boolean
-    Public OptModus As Short
+    Public OptModus As EVO_MODUS
     Event Testproblem_Changed(ByVal sender As Object, ByVal e As System.EventArgs)
 
     Private Sub Testprobleme_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
@@ -34,34 +36,34 @@ Public Class Testprobleme
             Select Case Combo_Testproblem.Text
                 Case "Sinus-Funktion"
                     Problem_SinusFunktion.BringToFront()
-                    OptModus = 0
+                    OptModus = EVO_MODUS.Single_Objective
                 Case "Beale-Problem"
                     Problem_BealeProblem.BringToFront()
-                    OptModus = 0
+                    OptModus = EVO_MODUS.Single_Objective
                 Case "Schwefel 2.4-Problem"
                     Problem_Schwefel24.BringToFront()
-                    OptModus = 0
+                    OptModus = EVO_MODUS.Single_Objective
                 Case "Deb 1"
                     Problem_D1Funktion.BringToFront()
-                    OptModus = 1
+                    OptModus = EVO_MODUS.Multi_Objective
                 Case "Zitzler/Deb T1"
                     Problem_T1Funktion.BringToFront()
-                    OptModus = 1
+                    OptModus = EVO_MODUS.Multi_Objective
                 Case "Zitzler/Deb T2"
                     Problem_T2Funktion.BringToFront()
-                    OptModus = 1
+                    OptModus = EVO_MODUS.Multi_Objective
                 Case "Zitzler/Deb T3"
                     Problem_T3Funktion.BringToFront()
-                    OptModus = 1
+                    OptModus = EVO_MODUS.Multi_Objective
                 Case "Zitzler/Deb T4"
                     Problem_T4Funktion.BringToFront()
-                    OptModus = 1
+                    OptModus = EVO_MODUS.Multi_Objective
                 Case "CONSTR"
                     Problem_CONSTRFunktion.BringToFront()
-                    OptModus = 1
+                    OptModus = EVO_MODUS.Multi_Objective
                 Case "Box"
                     Problem_TKNFunktion.BringToFront()
-                    OptModus = 1
+                    OptModus = EVO_MODUS.Multi_Objective
             End Select
 
             RaiseEvent Testproblem_Changed(sender, e) 'wird in Form1 von IniApp() verarbeitet
@@ -669,7 +671,7 @@ Public Class Testprobleme
 #End Region 'Diagrammfunktionen
 
 #Region "Evaluierung"
-    
+
     'Evaluierung und Zeichnen der Testprobleme
     '*****************************************
     Public Sub Evaluierung_TestProbleme(ByRef Testproblem As String, ByVal mypara() As Double, ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN() As Double, ByRef RN() As Double, ByRef Diag As EVO.Diagramm)
