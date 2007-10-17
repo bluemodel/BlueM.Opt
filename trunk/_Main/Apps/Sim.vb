@@ -252,6 +252,8 @@ Public MustInherit Class Sim
         Call Me.Read_ModellParameter()
         'Modell-/Optparameter validieren
         Call Me.Validate_OPT_fits_to_MOD()
+        'Prüfen der Anfangswerte
+        Call Me.Validate_Startvalues()
         'Datenbank vorbereiten
         If Me.Ergebnisdb = True Then
             Call Me.db_prepare()
@@ -315,6 +317,8 @@ Public MustInherit Class Sim
         Call Me.Read_ModellParameter()
         'Modell-/Optparameter validieren
         Call Me.Validate_OPT_fits_to_MOD()
+        'Prüfen der Anfangswerte
+        Call Me.Validate_Startvalues()
 
         'Datenbank vorbereiten
         '*********************
@@ -456,8 +460,8 @@ Public MustInherit Class Sim
         Dim i As Integer
 
         Dim Datei As String = WorkDir & Datensatz & "." & OptZiele_Ext
-
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
+
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
         Dim Zeile As String = ""
@@ -808,6 +812,21 @@ Public MustInherit Class Sim
 
     End Sub
 
+    'Prüft ob der Startwert der OptPara in der .OPT innerhalb der Min und Max Grenzen liegt
+    '**************************************************************************************
+    Public Sub Validate_Startvalues()
+        Dim i As Integer
+
+        For i = 0 To List_OptParameter.GetUpperBound(0)
+            If Not List_OptParameter(i).Wert <= List_OptParameter(i).Max Or Not List_OptParameter(i).Wert >= List_OptParameter(i).Min Then
+                Throw New Exception("Der Optimierungsparameter " & List_OptParameter(i).Bezeichnung & " in der .OPT Datei liegt nicht innerhalb der dort genannten Grenzen.")
+            End If
+        Next
+    End Sub
+
+
+
+
 #End Region 'Prüfung der Eingabedateien
 
 #Region "Kombinatorik"
@@ -915,32 +934,48 @@ Public MustInherit Class Sim
 
     'Die Elemente werden pro Location im Child gespeichert
     '*****************************************************
-    Public Sub Identify_Measures_and_their_Elements(ByVal No_Loc As Integer, ByVal No_Measure As Integer, byref Measure as String, ByRef Elements() As String)
+    Public Sub Identify_Measures_and_their_Elements(ByVal No_Loc As Integer, ByVal No_Measure As Integer, ByRef Measure As String, ByRef Elements() As String, ByRef Para(,) As Object)
 
-        Dim j As Integer
-        Dim x As Integer = 0
+        Dim i, j As Integer
+        Dim x As Integer
 
-        'Die Maßnahme wird ermittelt
+        '1. Die Maßnahme wird ermittelt
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         Measure = List_Locations(No_Loc).List_Massnahmen(No_Measure).Name
-        'ToDo: Measure aktuell ist hier noch redundant
-        ReDim preserve Akt.Measures(List_Locations.GetUpperBound(0))
+        'ToDo: Measure aktuell ist hier noch redundant!
+        ReDim Preserve Akt.Measures(List_Locations.GetUpperBound(0))
         Akt.Measures(No_Loc) = Measure
 
-        'Die Elemente werden Ermittelt
-        For j = 0 To List_Locations(No_Loc).List_Massnahmen(No_Measure).Bauwerke.GetUpperBound(0)
-            If Not List_Locations(No_Loc).List_Massnahmen(No_Measure).Bauwerke(j) = "X" Then
+        '2. Die Elemente werden Ermittelt
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        x = 0
+        For i = 0 To List_Locations(No_Loc).List_Massnahmen(No_Measure).Bauwerke.GetUpperBound(0)
+            If Not List_Locations(No_Loc).List_Massnahmen(No_Measure).Bauwerke(i) = "X" Then
                 ReDim Preserve Elements(x)
-                Elements(x) = List_Locations(No_Loc).List_Massnahmen(No_Measure).Bauwerke(j)
+                Elements(x) = List_Locations(No_Loc).List_Massnahmen(No_Measure).Bauwerke(i)
                 x += 1
             End If
         Next
 
         'Kopiert die aktuelle ElementeListe in dieses Aktuell_Element Array
-        'ToDo: sollte an eine bessere stelle
+        'ToDo: sollte an eine bessere stelle!
         If No_Loc = 0 Then ReDim SKos1.Aktuell_Elemente(-1)
         ReDim Preserve SKos1.Aktuell_Elemente(SKos1.Aktuell_Elemente.GetUpperBound(0) + Elements.GetLength(0))
         Array.Copy(Elements, 0, SKos1.Aktuell_Elemente, SKos1.Aktuell_Elemente.GetUpperBound(0) - Elements.GetUpperBound(0), Elements.GetLength(0))
 
+        '3. Die Parameter werden Ermittelt
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        x = 0
+        For i = 0 To Elements.GetUpperBound(0)
+            For j = 0 To List_OptParameter.GetUpperBound(0)
+                If Elements(i) = Left(List_OptParameter(j).Bezeichnung, 4) Then
+                    ReDim Preserve Para(1, x)
+                    Para(0, x) = List_OptParameter(j).Bezeichnung
+                    Para(1, x) = List_OptParameter(j).SKWert
+                    x += 1
+                End If
+            Next
+        Next
     End Sub
 
 
@@ -1027,8 +1062,8 @@ Public MustInherit Class Sim
     'Reduziert die OptParameter und die ModellParameter auf die aktiven Elemente
     '!Wird jetzt aus den Elemten des Child generiert!
     '***************************************************************************
-    Public Function Reduce_OptPara_ModPara(ByRef Elements() As String) As Boolean
-        Reduce_OptPara_ModPara = True 'Wird wirklich abgefragt!
+    Public Function Reduce_OptPara_and_ModPara(ByRef Elements() As String) As Boolean
+        Reduce_OptPara_and_ModPara = True 'Wird wirklich abgefragt!
         Dim i As Integer
 
         'Kopieren der Listen aus den Sicherungen
@@ -1061,7 +1096,7 @@ Public MustInherit Class Sim
         'Immer dann wenn nicht Nullvariante
         '**********************************
         If count = 0 Then
-            Reduce_OptPara_ModPara = False
+            Reduce_OptPara_and_ModPara = False
         Else
             Array.Resize(TMP_ModPara, count)
             Array.Resize(List_ModellParameter, count)
@@ -1165,8 +1200,8 @@ Public MustInherit Class Sim
 
     End Sub
 
-    'EVO-Parameterübergabe
-    '*********************
+    'EVO-Parameterübergabe die Standard Parameter werden aus den Listen der OptPara und OptZiele ermittelt
+    '*****************************************************************************************************
     Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara() As Double)
 
         Dim i As Integer
