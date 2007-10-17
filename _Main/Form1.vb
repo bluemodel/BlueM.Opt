@@ -700,7 +700,7 @@ Partial Class Form1
 
         'Laufvariable für die Generationen
         Dim gen As Integer
-        Dim i As Integer
+        Dim i, j, m As Integer
 
         'Parents und Childs werden Dimensioniert
         Redim CES1.List_Parents(CES1.n_Parents -1)
@@ -731,9 +731,8 @@ Partial Class Form1
         'Hier werden dem Child die passenden Massnahmen und deren Elemente pro Location zugewiesen
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         For i = 0 To CES1.n_Childs - 1
-            Dim j As Integer
             For j = 0 To CES1.n_Locations - 1
-                Call Sim1.Identify_Measures_and_their_Elements(j, CES1.List_Childs(i).Path(j), ces1.List_Childs(i).Measures(j), CES1.List_Childs(i).Loc(j).Loc_Elem)
+                Call Sim1.Identify_Measures_and_their_Elements(j, CES1.List_Childs(i).Path(j), CES1.List_Childs(i).Measures(j), CES1.List_Childs(i).Loc(j).Loc_Elem, CES1.List_Childs(i).Loc(j).Loc_Para)
             Next
         Next
 
@@ -744,13 +743,35 @@ Partial Class Form1
 
         'Falls HYBRID werden entprechend der Einstellung im PES die Parameter auf Zufällig oder Start gesetzt
         If Method = METH_HYBRID Then
+            'pro Child
+            'xxxxxxxxx
+            For i = 0 To CES1.n_Childs - 1
+                'Und pro Location
+                'xxxxxxxxxxxxxxxx
+                For j = 0 To CES1.List_Childs(i).Path.GetUpperBound(0)
 
-            'Schritte 2 - 5 PES wird initialisiert (Weiteres siehe dort ;-)
-            '**************************************************************
-            Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
+                    'Standard Parameter werden aus dem Sim besorgt
+                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
 
-            'Call PES1.EsStartvalues()
+                    'Die Zahl der Parameter wird überschrieben (AnzZiel und AnzRand sind OK)
+                    'Anzahl der Parameter bezieht sich hier nur auf eine Location
+                    globalAnzPar = CES1.List_Childs(i).Loc(j).Loc_Para.GetLength(0)
 
+                    'Die Parameter werden überschrieben
+                    ReDim myPara(CES1.List_Childs(i).Loc(j).Loc_Para.GetLength(1))
+                    For m = 1 To CES1.List_Childs(i).Loc(j).Loc_Para.GetLength(0)
+                        myPara(m) = CES1.List_Childs(i).Loc(j).Loc_Para(1, m - 1)
+                    Next
+
+                    'Die Settings werden für Hybrid gesetzt
+                    Call EVO_Settings1.SetFor_CES_PES(1, 1, CES1.n_Childs)
+
+                    'Schritte 2 - 5 PES wird initialisiert (Weiteres siehe dort ;-)
+                    '**************************************************************
+                    Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
+
+                Next
+            Next
         End If
 
 
@@ -779,8 +800,7 @@ Partial Class Form1
                 '******
                 If Method = METH_HYBRID Then
                     'Reduktion der OptimierungsParameter und immer dann wenn nicht Nullvariante
-                    Call Sim1.Reduce_OptPara_ModPara(CES1.List_Childs(i).All_Elem)
-                    Dim j As Integer
+                    Call Sim1.Reduce_OptPara_and_ModPara(CES1.List_Childs(i).All_Elem)
                     'Die Parameter für jede Location werden gespeichert
                     For j = 0 To CES1.n_Locations - 1
                         Call Sim1.SaveParameter_to_Child(j, CES1.List_Childs(i).Path(j), CES1.List_Childs(i).Loc(j).Loc_Para)
@@ -852,9 +872,8 @@ Partial Class Form1
 
             'Hier werden dem Child die passenden Elemente pro Location zugewiesen
             For i = 0 To CES1.n_Childs - 1
-                Dim j As Integer
                 For j = 0 To CES1.n_Locations - 1
-                    Call Sim1.Identify_Measures_and_their_Elements(j, CES1.List_Childs(i).Path(j), CES1.List_Childs(i).Measures(j), CES1.List_Childs(i).Loc(j).Loc_Elem)
+                    Call Sim1.Identify_Measures_and_their_Elements(j, CES1.List_Childs(i).Path(j), CES1.List_Childs(i).Measures(j), CES1.List_Childs(i).Loc(j).Loc_Elem, CES1.List_Childs(i).Loc(j).Loc_Para)
                 Next
             Next
 
@@ -871,7 +890,6 @@ Partial Class Form1
                     Call CES1.Memory_Search(CES1.List_Childs(i))
 
                     'Schleife über alle Locations
-                    Dim j As Integer
                     For j = 0 To CES1.n_Locations - 1
 
                         ReDim CES1.PES_Parents(0)
@@ -908,8 +926,8 @@ Partial Class Form1
     Private Sub Start_PES_after_CES()
         Dim i As Integer
 
-        'Einstellungen für PES werden gesetzt
-        Call EVO_Settings1.SetFor_CES_PES()
+        'Einstellungen für PES werden gesetzt (AnzGen, AnzEltern, AnzNachf)
+        Call EVO_Settings1.SetFor_CES_PES(1, 3, 5)
 
         For i = 0 To CES1.n_Parents - 1
             If CES1.List_Parents(i).Front = 1 Then
@@ -922,12 +940,12 @@ Partial Class Form1
                 'Hier werden Child die passenden Elemente zugewiesen
                 Dim j As Integer
                 For j = 0 To CES1.n_Locations - 1
-                    Call Sim1.Identify_Measures_and_their_Elements(j, CES1.List_Childs(i).Path(j), ces1.List_Childs(i).Measures(j), CES1.List_Childs(i).Loc(j).Loc_Elem)
+                    Call Sim1.Identify_Measures_and_their_Elements(j, CES1.List_Childs(i).Path(j), ces1.List_Childs(i).Measures(j), CES1.List_Childs(i).Loc(j).Loc_Elem, CES1.List_Childs(i).Loc(j).Loc_Para)
                 Next
 
                 'Reduktion der OptimierungsParameter und immer dann wenn nicht Nullvariante
                 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-                If Sim1.Reduce_OptPara_ModPara(ces1.List_Childs(i).All_Elem) Then
+                If Sim1.Reduce_OptPara_and_ModPara(ces1.List_Childs(i).All_Elem) Then
 
                     'Parameterübergabe an PES
                     '************************

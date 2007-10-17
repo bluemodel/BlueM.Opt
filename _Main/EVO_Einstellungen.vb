@@ -66,12 +66,12 @@ Public Class EVO_Einstellungen
         Call FILLCOMBO_POPPENALTY(ComboPopPenalty)
     End Sub
 
-    Public Sub SetFor_CES_PES()
+    Public Sub SetFor_CES_PES(byVal AnzGen as integer, byVal AnzEltern as integer, byVal AnzNachf as integer)
         'Vorgaben und Anzeige
         Label_OptModusValue.Text = "MultiObjective Pareto"
-        TextAnzGen.Text = CStr(1)
-        TextAnzEltern.Text = CStr(3)
-        TextAnzNachf.Text = CStr(5)
+        TextAnzGen.Text = CStr(AnzGen)
+        TextAnzEltern.Text = CStr(AnzEltern)
+        TextAnzNachf.Text = CStr(AnzNachf)
 
     End Sub
 
