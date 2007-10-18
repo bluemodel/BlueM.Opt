@@ -67,6 +67,7 @@ Public Class CES
         Dim iLocation As Integer            '14 Location des PES Parent
 
         'Gibt ein Array mit den Elementen aller Locations zurück
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         Public ReadOnly Property All_Elem() As String()
             Get
                 Dim i As Integer
@@ -86,6 +87,8 @@ Public Class CES
 
     End Structure
 
+    'Informationen pro Location
+    '**************************
     Public Structure Location_Data
         Dim Loc_Para(,) As Object           '10 Die Optimierungsparameter für PES
         Dim Loc_Dn() As Object              '11 Das Dn für PES

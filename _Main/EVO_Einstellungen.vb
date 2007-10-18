@@ -264,7 +264,7 @@ Public Class EVO_Einstellungen
         _settings.iOptEltern = VB6.GetItemData(ComboOptEltern, ComboOptEltern.SelectedIndex)
         _settings.iOptPopEltern = VB6.GetItemData(ComboOptPopEltern, ComboOptPopEltern.SelectedIndex)
         _settings.NRekombXY = Val(TextRekombxy.Text)
-        _settings.rDeltaStart = Val(TextDeltaStart.Text)
+        _settings.DnStart = Val(TextDeltaStart.Text)
         _settings.iStartPar = VB6.GetItemData(ComboOptVorgabe, ComboOptVorgabe.SelectedIndex)
         _settings.isDnVektor = CheckisDnVektor.Checked
         If (Val(TextInteract.Text) <= 0) Then

@@ -44,10 +44,10 @@ Public Class PES
         Dim NRunden As Short                'Anzahl Runden
         Dim NPopul As Short                 'Anzahl Populationen
         Dim NPopEltern As Short             'Anzahl Populationseltern
-        Dim iOptPopEltern As EVO_POP_ELTERN  'Ermittlung der Populationseltern
+        Dim iOptPopEltern As EVO_POP_ELTERN 'Ermittlung der Populationseltern
         Dim iOptEltern As EVO_ELTERN        'Ermittlung der Individuum-Eltern
         Dim NRekombXY As Short              'X/Y-Schema Rekombination
-        Dim rDeltaStart As Single           'Startschrittweite
+        Dim DnStart As Single               'Startschrittweite
         Dim iStartPar As EVO_STARTPARAMETER 'Startparameter
         Dim isDnVektor As Boolean           'Soll ein Schrittweitenvektor benutzt werden
         Dim interact As Short               'Alle wieviel Generationen soll die aktuelle Population mit Mitgliedern der sekundären Population aufgefüllt werden
@@ -204,11 +204,11 @@ Public Class PES
 
     'Schritt 2 -5 zum Initialisieren der PES
     '***************************************
-    Public Sub PesInitialise(ByRef PES_Settings As Struct_Settings, ByVal AnzPara As Short, ByVal AnzPenalty As Short, ByVal AnzConstr As Short, ByVal mypara() As Double)
+    Public Sub PesInitialise(ByRef PES_Settings As Struct_Settings, ByVal AnzPara As Short, ByVal AnzPenalty As Short, ByVal AnzConstr As Short, ByRef mypara() As Double, ByVal Method As String)
 
         '2. Schritt: PES - ES_OPTIONS
         'Optionen der Evolutionsstrategie werden übergeben
-        Call EsSettings(PES_Settings)
+        Call EsSettings(PES_Settings, Method)
 
         '3. Schritt: PES - ES_INI
         'Die öffentlichen dynamischen Arrays werden initialisiert (Dn, An, Xn, Xmin, Xmax), die Anzahl der Zielfunktionen wird festgelegt und Ausgangsparameter werden übergeben (War früher ES_Let Parameter)
@@ -227,7 +227,7 @@ Public Class PES
     'Schritt 2: ES_SETTINGS
     'Function ES_SETTINGS übergibt Optionen für Evolutionsstrategie und Prüft die eingestellten Optionen
     '***************************************************************************************************
-    Private Sub EsSettings(ByRef Settings As Struct_Settings)
+    Private Sub EsSettings(ByRef Settings As Struct_Settings, ByVal Method As String)
 
         'Überprüfung der Übergebenen Werte
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -264,7 +264,7 @@ Public Class PES
         If (Settings.NRekombXY < 1) Then
             Throw New Exception("Der Wert für die X/Y-Schema Rekombination ist kleiner 1!")
         End If
-        If (Settings.rDeltaStart < 0) Then
+        If (Settings.DnStart < 0) Then
             Throw New Exception("Die Startschrittweite darf nicht kleiner 0 sein!")
         End If
         If (Settings.iStartPar < 1 Or Settings.iStartPar > 2) Then
@@ -273,8 +273,8 @@ Public Class PES
         If (Settings.NPopul < Settings.NPopEltern) Then
             Throw New Exception("Die Anzahl der Populationseltern darf nicht größer als die Anzahl der Populationen!")
         End If
-        If (Settings.NNachf <= Settings.NEltern) Then
-            Throw New Exception("Die Anzahl der Eltern kann nicht größer als die Anzahl der Nachfahren sein!" & Chr(13) & Chr(10) & "'Rechenberg 73' schlägt ein Verhältnis von 1:3 bis 1:5 vor.")
+        If (Settings.NNachf <= Settings.NEltern) And Not Method = "HYBRID" Then
+            Throw New Exception("Die Anzahl der Eltern muss kleiner als die Anzahl der Nachfahren!" & Chr(13) & Chr(10) & "'Rechenberg 73' schlägt ein Verhältnis von 1:3 bis 1:5 vor.")
         End If
 
         'Übergabe der Optionen
@@ -298,9 +298,9 @@ Public Class PES
             Throw New Exception("Es muss mindestens ein Parameter variiert und eine Penaltyfunktion ausgewertet werden")
         End If
 
-        Initial.varanz = AnzPara                    'Anzahl der Parameter wird übergeben
-        Initial.NPenalty = AnzPenalty          'Anzahl der Zielfunktionen wird übergeben
-        Initial.NConstrains = AnzConstr         'Anzahl der Randbedingungen wird übergeben
+        Initial.varanz = AnzPara                        'Anzahl der Parameter wird übergeben
+        Initial.NPenalty = AnzPenalty                   'Anzahl der Zielfunktionen wird übergeben
+        Initial.NConstrains = AnzConstr                 'Anzahl der Randbedingungen wird übergeben
 
         ReDim Initial.Xn(Initial.varanz)                'Variablenvektor wird initialisiert
         ReDim Initial.Xmin(Initial.varanz)              'UntereSchrankenvektor wird initialisiert
@@ -311,7 +311,7 @@ Public Class PES
             Initial.Xn(i) = mypara(i)
             Initial.Xmin(i) = 0
             Initial.Xmax(i) = 1
-            'Welchen Zweck hat diese Prüfung hier. Die Grenzen sollten zu jeder Zeit eingehalten werden
+            'ToDo: Welchen Zweck hat diese Prüfung hier. Die Grenzen sollten zu jeder Zeit eingehalten werden
             Initial.Xn(i) = Math.Min(Initial.Xn(i), Initial.Xmax(i))
             Initial.Xn(i) = Math.Max(Initial.Xn(i), Initial.Xmin(i))
         Next
@@ -328,7 +328,7 @@ Public Class PES
         Dim m, n, l, i As Short
 
         For i = 1 To Initial.varanz
-            Initial.Dn(i) = PES_Settings.rDeltaStart
+            Initial.Dn(i) = PES_Settings.DnStart
         Next i
 
         'Parametervektoren initialisieren
