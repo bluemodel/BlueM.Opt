@@ -732,7 +732,7 @@ Partial Class Form1
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         For i = 0 To CES1.n_Childs - 1
             For j = 0 To CES1.n_Locations - 1
-                Call Sim1.Identify_Measures_and_their_Elements(j, CES1.List_Childs(i).Path(j), CES1.List_Childs(i).Measures(j), CES1.List_Childs(i).Loc(j).Loc_Elem, CES1.List_Childs(i).Loc(j).Loc_Para)
+                Call Sim1.Identify_Measures_Elements_Parameters(j, CES1.List_Childs(i).Path(j), CES1.List_Childs(i).Measures(j), CES1.List_Childs(i).Loc(j).Loc_Elem, CES1.List_Childs(i).Loc(j).Loc_Para)
             Next
         Next
 
@@ -742,6 +742,7 @@ Partial Class Form1
         PES1 = New EVO.Kern.PES
 
         'Falls HYBRID werden entprechend der Einstellung im PES die Parameter auf Zufällig oder Start gesetzt
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         If Method = METH_HYBRID Then
             'pro Child
             'xxxxxxxxx
@@ -755,21 +756,32 @@ Partial Class Form1
 
                     'Die Zahl der Parameter wird überschrieben (AnzZiel und AnzRand sind OK)
                     'Anzahl der Parameter bezieht sich hier nur auf eine Location
-                    globalAnzPar = CES1.List_Childs(i).Loc(j).Loc_Para.GetLength(0)
+                    globalAnzPar = CES1.List_Childs(i).Loc(j).Loc_Para.GetLength(1)
 
-                    'Die Parameter werden überschrieben
-                    ReDim myPara(CES1.List_Childs(i).Loc(j).Loc_Para.GetLength(1))
-                    For m = 1 To CES1.List_Childs(i).Loc(j).Loc_Para.GetLength(0)
-                        myPara(m) = CES1.List_Childs(i).Loc(j).Loc_Para(1, m - 1)
-                    Next
+                    'Die Parameter (falls vorhanden) werden überschrieben
+                    If Not CES1.List_Childs(i).Loc(j).Loc_Para.GetLength(1) = 0 Then
+                        ReDim myPara(CES1.List_Childs(i).Loc(j).Loc_Para.GetLength(1))
+                        For m = 0 To CES1.List_Childs(i).Loc(j).Loc_Para.GetUpperBound(1)
+                            myPara(m + 1) = CES1.List_Childs(i).Loc(j).Loc_Para(1, m)
+                        Next
+                        '1. EVO_Settings zurücksetzen; 2. Die Settings werden für Hybrid gesetzt
+                        EVO_Settings1.isSaved = False
+                        Call EVO_Settings1.SetFor_CES_PES(1, 1, 1)
 
-                    'Die Settings werden für Hybrid gesetzt
-                    Call EVO_Settings1.SetFor_CES_PES(1, 1, CES1.n_Childs)
-
-                    'Schritte 2 - 5 PES wird initialisiert (Weiteres siehe dort ;-)
-                    '**************************************************************
-                    Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
-
+                        'Schritte 2 - 5 PES wird initialisiert (Weiteres siehe dort ;-)
+                        '**************************************************************
+                        Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, Method)
+                        'Dem Child wird der Schrittweitenvektor zugewiesen und gegebenenfalls der Parameter zufällig gewählt
+                        'wird also nicht in PES.ESStarten gemacht
+                        ReDim CES1.List_Childs(i).Loc(j).Loc_Dn(CES1.List_Childs(i).Loc(j).Loc_Para.GetUpperBound(1))
+                        For m = 0 To CES1.List_Childs(i).Loc(j).Loc_Para.GetUpperBound(1)
+                            CES1.List_Childs(i).Loc(j).Loc_Dn(m) = EVO_Settings1.PES_Settings.DnStart
+                            If EVO_Settings1.PES_Settings.iStartPar = Kern.EVO_STARTPARAMETER.Zufall Then
+                                Randomize()
+                                CES1.List_Childs(i).Loc(j).Loc_Para(1, m) = Rnd()
+                            End If
+                        Next
+                    End If
                 Next
             Next
         End If
@@ -873,7 +885,7 @@ Partial Class Form1
             'Hier werden dem Child die passenden Elemente pro Location zugewiesen
             For i = 0 To CES1.n_Childs - 1
                 For j = 0 To CES1.n_Locations - 1
-                    Call Sim1.Identify_Measures_and_their_Elements(j, CES1.List_Childs(i).Path(j), CES1.List_Childs(i).Measures(j), CES1.List_Childs(i).Loc(j).Loc_Elem, CES1.List_Childs(i).Loc(j).Loc_Para)
+                    Call Sim1.Identify_Measures_Elements_Parameters(j, CES1.List_Childs(i).Path(j), CES1.List_Childs(i).Measures(j), CES1.List_Childs(i).Loc(j).Loc_Elem, CES1.List_Childs(i).Loc(j).Loc_Para)
                 Next
             Next
 
@@ -900,7 +912,7 @@ Partial Class Form1
 
                         'Schritte 2 - 5 PES wird initialisiert - Weiteres siehe dort ;-)
                         '***************************************************************
-                        Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
+                        Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, Method)
 
 
 
@@ -926,7 +938,8 @@ Partial Class Form1
     Private Sub Start_PES_after_CES()
         Dim i As Integer
 
-        'Einstellungen für PES werden gesetzt (AnzGen, AnzEltern, AnzNachf)
+        '1. EVO_Settings zurücksetzen; 2. Einstellungen für PES werden gesetzt (AnzGen, AnzEltern, AnzNachf)
+        EVO_Settings1.isSaved = False
         Call EVO_Settings1.SetFor_CES_PES(1, 3, 5)
 
         For i = 0 To CES1.n_Parents - 1
@@ -940,7 +953,7 @@ Partial Class Form1
                 'Hier werden Child die passenden Elemente zugewiesen
                 Dim j As Integer
                 For j = 0 To CES1.n_Locations - 1
-                    Call Sim1.Identify_Measures_and_their_Elements(j, CES1.List_Childs(i).Path(j), ces1.List_Childs(i).Measures(j), CES1.List_Childs(i).Loc(j).Loc_Elem, CES1.List_Childs(i).Loc(j).Loc_Para)
+                    Call Sim1.Identify_Measures_Elements_Parameters(j, CES1.List_Childs(i).Path(j), ces1.List_Childs(i).Measures(j), CES1.List_Childs(i).Loc(j).Loc_Elem, CES1.List_Childs(i).Loc(j).Loc_Para)
                 Next
 
                 'Reduktion der OptimierungsParameter und immer dann wenn nicht Nullvariante
@@ -997,7 +1010,7 @@ Partial Class Form1
 
         'Schritte 2 - 5 PES wird initialisiert (Weiteres siehe dort ;-)
         '**************************************************************
-        Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
+        Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, Method)
 
         'Startwerte werden der Verlaufsanzeige werden zugewiesen
         Call Me.INI_Verlaufsanzeige(EVO_Settings1.PES_Settings.NRunden, EVO_Settings1.PES_Settings.NPopul, EVO_Settings1.PES_Settings.NGen, EVO_Settings1.PES_Settings.NNachf)

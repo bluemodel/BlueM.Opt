@@ -934,7 +934,7 @@ Public MustInherit Class Sim
 
     'Die Elemente werden pro Location im Child gespeichert
     '*****************************************************
-    Public Sub Identify_Measures_and_their_Elements(ByVal No_Loc As Integer, ByVal No_Measure As Integer, ByRef Measure As String, ByRef Elements() As String, ByRef Para(,) As Object)
+    Public Sub Identify_Measures_Elements_Parameters(ByVal No_Loc As Integer, ByVal No_Measure As Integer, ByRef Measure As String, ByRef Elements() As String, ByRef Para(,) As Object)
 
         Dim i, j As Integer
         Dim x As Integer
@@ -976,6 +976,8 @@ Public MustInherit Class Sim
                 End If
             Next
         Next
+        If x = 0 Then ReDim Preserve Para(1, -1)
+
     End Sub
 
 
