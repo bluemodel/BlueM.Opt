@@ -84,8 +84,8 @@ Public Class CES
 
         End Property
 
-        'Gibt ein Array mit den Elementen aller Locations zurück
-        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        'Gibt ein Array mit den Parametern aller Locations zurück
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         Public ReadOnly Property All_Para() As Double()
             Get
                 Dim i, j, x As Integer
