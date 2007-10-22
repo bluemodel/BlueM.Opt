@@ -1144,6 +1144,7 @@ Public MustInherit Class Sim
     '***************************************************************
     Dim n_tmp As Integer = 0
 
+    'Funktion wahrscheinlich überflüssig
     Public Sub SaveParameter_to_Child(ByVal Loc As Integer, ByVal Measure As Integer, ByVal Parameter(,) As Object)
 
         Dim i, j As Integer

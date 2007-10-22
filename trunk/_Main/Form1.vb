@@ -771,6 +771,7 @@ Partial Class Form1
                         'Schritte 2 - 5 PES wird initialisiert (Weiteres siehe dort ;-)
                         '**************************************************************
                         Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, Method)
+                        '**************************************************************
                         'Dem Child wird der Schrittweitenvektor zugewiesen und gegebenenfalls der Parameter zufällig gewählt
                         'wird also nicht in PES.ESStarten gemacht
                         ReDim CES1.List_Childs(i).Loc(j).Loc_Dn(CES1.List_Childs(i).Loc(j).Loc_Para.GetUpperBound(1))
@@ -808,23 +809,26 @@ Partial Class Form1
                 'Bereitet das BlaueModell für die Kombinatorik vor
                 Call Sim1.PREPARE_Evaluation_CES(CES1.List_Childs(i).Path)
 
-                'HYBRID Mmuss hier raus !!! und nach unten
-                '******
-                If Method = METH_HYBRID Then
-                    'Reduktion der OptimierungsParameter und immer dann wenn nicht Nullvariante
-                    Call Sim1.Reduce_OptPara_and_ModPara(CES1.List_Childs(i).All_Elem)
-                    'Die Parameter für jede Location werden gespeichert
-                    For j = 0 To CES1.n_Locations - 1
-                        Call Sim1.SaveParameter_to_Child(j, CES1.List_Childs(i).Path(j), CES1.List_Childs(i).Loc(j).Loc_Para)
-                    Next
-                    'Das müsste auch pro Location sein oder ? -------------------------
-                    'Falsch hier entweder Später die Parameter überschreiben oder weg hier ---------------------
-                    'die Parameter müssen aus dem child geschrieben werden
-                    'also vorher einmal die start werte einlesen und dann hinter her mit der PES mutieren
-                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
-                    'hier müsten die Parameter wieder zusammengefast werden ---------------------------
-                    Call Sim1.PREPARE_Evaluation_PES(myPara)
-                End If
+                ''HYBRID Mmuss hier raus !!! und nach unten
+                ''******
+                'If Method = METH_HYBRID Then
+                '    'Reduktion der OptimierungsParameter und immer dann wenn nicht Nullvariante
+                '    Call Sim1.Reduce_OptPara_and_ModPara(CES1.List_Childs(i).All_Elem)
+                '    'Die Parameter für jede Location werden gespeichert
+                '    For j = 0 To CES1.n_Locations - 1
+                '        Call Sim1.SaveParameter_to_Child(j, CES1.List_Childs(i).Path(j), CES1.List_Childs(i).Loc(j).Loc_Para)
+                '    Next
+                '    'Das müsste auch pro Location sein oder ? -------------------------
+                '    'Falsch hier entweder Später die Parameter überschreiben oder weg hier ---------------------
+                '    'die Parameter müssen aus dem child geschrieben werden
+                '    'also vorher einmal die start werte einlesen und dann hinter her mit der PES mutieren
+                '    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
+                '    'hier müsten die Parameter wieder zusammengefast werden ---------------------------
+                'End If
+
+                Call Sim1.Reduce_OptPara_and_ModPara(CES1.List_Childs(i).All_Elem)
+                Call Sim1.PREPARE_Evaluation_PES(CES1.List_Childs(i).All_Para)
+
 
                 Call Sim1.SIM_Evaluierung(CES1.List_Childs(i).Penalty, CES1.List_Childs(i).Constrain)
                 '*********************************************************
