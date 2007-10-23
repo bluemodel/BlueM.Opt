@@ -348,7 +348,7 @@ Public Class CES
         Dim count As Integer = 0
 
         'Dim firstValues()() As Byte = {New Byte() {2, 1}, New Byte() {3, 0}}
-        Dim vector_array()() As Integer = {New Integer() {2, 2, 2}}
+        Dim vector_array()() As Integer = {New Integer() {1, 1, 1}}
 
         For i = 0 To vector_array.GetUpperBound(0)
             If vector_array(i).GetUpperBound(0) = path.GetUpperBound(0) Then
@@ -719,8 +719,8 @@ Public Class CES
     End Sub
 
     'Durchsucht den Memory - Der PES_Parantsatz für jedes Child wird hier ermittelt
-    'Eine Liste mit Eltern für ein Child incl. der Location Information wird erstellt
-    '********************************************************************************
+    'Eine Liste (PES_Parents) mit Eltern für ein Child incl. der Location Information wird erstellt
+    '**********************************************************************************************
     Sub Memory_Search(ByRef Child As Faksimile)
 
         Dim j, m As Integer
@@ -742,7 +742,7 @@ Public Class CES
         For j = 0 To n_Locations - 1
             For m = 0 To Memory.GetUpperBound(0)
 
-                'Rank Nummer 1
+                'Rank Nummer 1 (Lediglich Übereinstimmung in der Location selbst)
                 If Child.Path(j) = Memory(m).Path(j) Then
                     ReDim Preserve PES_Parents(PES_Parents.GetLength(0))
                     Call Faksimile_Dim(PES_Parents(PES_Parents.GetUpperBound(0)), "PES_Parent", PES_Parents.GetUpperBound(0))
@@ -753,7 +753,7 @@ Public Class CES
                     count_a(j) += 1
                 End If
 
-                'Rank Nummer 2
+                'Rank Nummer 2 (Übereinstimmung in Location 1 und 2)
                 If Not j = n_Locations - 1 And n_Parts_of_Path > 1 Then
                     If Child.Path(j) = Memory(m).Path(j) And Child.Path(j + 1) = Memory(m).Path(j + 1) Then
                         ReDim Preserve PES_Parents(PES_Parents.GetLength(0))
@@ -766,7 +766,7 @@ Public Class CES
                     End If
                 End If
 
-                'Rank Nummer 3
+                'Rank Nummer 3 (Übereinstimmung in Location 1, 2 und 3)
                 If Not (j = n_Locations - 1 Or j = n_Locations - 2) And n_Parts_of_Path > 2 Then
                     If Child.Path(j) = Memory(m).Path(j) And Child.Path(j + 1) = Memory(m).Path(j + 1) And Child.Path(j + 2) = Memory(m).Path(j + 2) Then
                         ReDim Preserve PES_Parents(PES_Parents.GetLength(0))
