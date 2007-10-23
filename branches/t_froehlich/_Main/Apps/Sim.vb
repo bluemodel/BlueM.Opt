@@ -36,10 +36,6 @@ Public MustInherit Class Sim
     Public WorkDir As String                             'Arbeitsverzeichnis für das Blaue Modell
     Public Event WorkDirChange()                         'Event für Änderung des Arbeitsverzeichnisses
 
-    Protected Exe As String                              'Pfad zur EXE für die Simulation
-    Protected Dll As String                              'Pfad zur Dll für die Simulation
-    Protected isDll As Boolean = False                   'Gibt an, ob die DLL benutzt wird oder die Exe
-
     Public SimStart As DateTime                          'Anfangsdatum der Simulation
     Public SimEnde As DateTime                           'Enddatum der Simulation
     Public SimDT As TimeSpan                             'Zeitschrittweite der Simulation
@@ -61,7 +57,7 @@ Public MustInherit Class Sim
         Public Wert As Double                               'Parameterwert
         Public Min As Double                                'Minimum
         Public Max As Double                                'Maximum
-        Public Beziehung As EvoKern.PES.Beziehung           'Beziehung zum vorherigen OptParameter
+        Public Beziehung As EVO.Kern.PES.Beziehung          'Beziehung zum vorherigen OptParameter
         Public Property SKWert() As Double                  'skalierter Wert (0 bis 1)
             Get
                 SKWert = (Wert - Min) / (Max - Min)
@@ -183,7 +179,7 @@ Public MustInherit Class Sim
         Call Me.checkDezimaltrennzeichen()
 
         'EVO.ini Datei einlesen
-        Call Me.ReadEVOIni()
+        Call Me.ReadSettings()
 
     End Sub
 
@@ -205,60 +201,15 @@ Public MustInherit Class Sim
 
     End Sub
 
-    'EVO.ini Datei einlesen 
-    '**********************
-    Public Sub ReadEVOIni()
+    'Benutzereinstellungen einlesen 
+    '******************************
+    Public Sub ReadSettings()
 
-        'Pfad zur Assembly bestimmen (\_Main\bin\)
-        Dim binpath As String = System.Windows.Forms.Application.StartupPath()
-        Dim inifilepath As String = binpath & "\EVO.ini"
-
-        If File.Exists(inifilepath) Then
-
-            'Datei einlesen
-            Dim FiStr As FileStream = New FileStream(inifilepath, FileMode.Open, IO.FileAccess.Read)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-
-            Dim Configs(9, 1) As String
-            Dim Line As String
-            Dim Pairs() As String
-            Dim i As Integer = 0
-            Do
-                Line = StrRead.ReadLine.ToString()
-                If (Line.StartsWith("[") = False And Line.StartsWith(";") = False) Then
-                    Pairs = Line.Split("=")
-                    Configs(i, 0) = Pairs(0)
-                    Configs(i, 1) = Pairs(1)
-                    i += 1
-                End If
-            Loop Until StrRead.Peek() = -1
-
-            StrRead.Close()
-            FiStr.Close()
-
-            'Einstellungen setzen
-            Dim Param As String
-            For i = 0 To Configs.GetUpperBound(0)
-                If (Not IsNothing(Configs(i, 0))) Then
-                    Param = Configs(i, 0).ToUpper()
-                    Select Case Param
-                        Case "EXE"
-                            Me.Exe = Configs(i, 1)
-                        Case "DATENSATZ"
-                            Call Me.saveDatensatz(Configs(i, 1))
-                        Case "DLL"
-                            Me.Dll = Configs(i, 1)
-                            Me.isDll = True
-                        Case Else
-                            'weitere Voreinstellungen
-                    End Select
-                End If
-            Next
-
-        Else
-            'Datei EVO.ini existiert nicht
-            Throw New Exception("Die Datei ""EVO.ini"" konnte nicht gefunden werden!" & Chr(13) & Chr(10) & "Bitte gemäß Dokumentation eine Datei ""EVO.ini"" erstellen.")
-        End If
+        'Datensatz
+        '---------
+        Dim pfad As String
+        pfad = My.Settings.Datensatz
+        Call Me.saveDatensatz(pfad)
 
     End Sub
 
@@ -266,10 +217,15 @@ Public MustInherit Class Sim
     '********************************************
     Public Sub saveDatensatz(ByVal Pfad As String)
 
-        'Datensatzname bestimmen
-        Me.Datensatz = Path.GetFileNameWithoutExtension(Pfad)
-        'Arbeitsverzeichnis bestimmen
-        Me.WorkDir = Path.GetDirectoryName(Pfad) & "\"
+        If (File.Exists(Pfad)) Then
+            'Datensatzname bestimmen
+            Me.Datensatz = Path.GetFileNameWithoutExtension(Pfad)
+            'Arbeitsverzeichnis bestimmen
+            Me.WorkDir = Path.GetDirectoryName(Pfad) & "\"
+            'Benutzereinstellungen speichern
+            My.Settings.Datensatz = Pfad
+        End If
+
         'Event auslösen (wird von Form1.displayWorkDir() verarbeitet)
         RaiseEvent WorkDirChange()
 
@@ -296,6 +252,8 @@ Public MustInherit Class Sim
         Call Me.Read_ModellParameter()
         'Modell-/Optparameter validieren
         Call Me.Validate_OPT_fits_to_MOD()
+        'Prüfen der Anfangswerte
+        Call Me.Validate_Startvalues()
         'Datenbank vorbereiten
         If Me.Ergebnisdb = True Then
             Call Me.db_prepare()
@@ -359,6 +317,8 @@ Public MustInherit Class Sim
         Call Me.Read_ModellParameter()
         'Modell-/Optparameter validieren
         Call Me.Validate_OPT_fits_to_MOD()
+        'Prüfen der Anfangswerte
+        Call Me.Validate_Startvalues()
 
         'Datenbank vorbereiten
         '*********************
@@ -431,7 +391,7 @@ Public MustInherit Class Sim
                 If (i > 0 And Not array(6).Trim() = "") Then
                     Me.List_OptParameter(i).Beziehung = getBeziehung(array(6).Trim())
                 Else
-                    Me.List_OptParameter(i).Beziehung = EvoKern.PES.Beziehung.keine
+                    Me.List_OptParameter(i).Beziehung = EVO.Kern.PES.Beziehung.keine
                 End If
                 i += 1
             End If
@@ -449,16 +409,16 @@ Public MustInherit Class Sim
 
     'String in der Form < >, <=, >= in Beziehung umwandeln
     '*****************************************************
-    Private Shared Function getBeziehung(ByVal bez_str As String) As EvoKern.PES.Beziehung
+    Private Shared Function getBeziehung(ByVal bez_str As String) As EVO.Kern.PES.Beziehung
         Select Case bez_str
             Case "<"
-                Return EvoKern.PES.Beziehung.kleiner
+                Return EVO.Kern.PES.Beziehung.kleiner
             Case "<="
-                Return EvoKern.PES.Beziehung.kleinergleich
+                Return EVO.Kern.PES.Beziehung.kleinergleich
             Case ">"
-                Return EvoKern.PES.Beziehung.groesser
+                Return EVO.Kern.PES.Beziehung.groesser
             Case ">="
-                Return EvoKern.PES.Beziehung.groessergleich
+                Return EVO.Kern.PES.Beziehung.groessergleich
             Case Else
                 Throw New Exception("Beziehung '" & bez_str & "' nicht erkannt!")
         End Select
@@ -534,8 +494,8 @@ Public MustInherit Class Sim
         Dim i As Integer
 
         Dim Datei As String = WorkDir & Datensatz & "." & OptZiele_Ext
-
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
+
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
         Dim Zeile As String = ""
@@ -886,6 +846,21 @@ Public MustInherit Class Sim
 
     End Sub
 
+    'Prüft ob der Startwert der OptPara in der .OPT innerhalb der Min und Max Grenzen liegt
+    '**************************************************************************************
+    Public Sub Validate_Startvalues()
+        Dim i As Integer
+
+        For i = 0 To List_OptParameter.GetUpperBound(0)
+            If Not List_OptParameter(i).Wert <= List_OptParameter(i).Max Or Not List_OptParameter(i).Wert >= List_OptParameter(i).Min Then
+                Throw New Exception("Der Optimierungsparameter " & List_OptParameter(i).Bezeichnung & " in der .OPT Datei liegt nicht innerhalb der dort genannten Grenzen.")
+            End If
+        Next
+    End Sub
+
+
+
+
 #End Region 'Prüfung der Eingabedateien
 
 #Region "Kombinatorik"
@@ -993,31 +968,49 @@ Public MustInherit Class Sim
 
     'Die Elemente werden pro Location im Child gespeichert
     '*****************************************************
-    Public Sub Identify_Measures_and_their_Elements(ByVal No_Loc As Integer, ByVal No_Measure As Integer, ByRef Measure As String, ByRef Elements() As String)
+    Public Sub Identify_Measures_Elements_Parameters(ByVal No_Loc As Integer, ByVal No_Measure As Integer, ByRef Measure As String, ByRef Elements() As String, ByRef Para(,) As Object)
 
-        Dim j As Integer
-        Dim x As Integer = 0
+        Dim i, j As Integer
+        Dim x As Integer
 
-        'Die Maßnahme wird ermittelt
+        '1. Die Maßnahme wird ermittelt
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         Measure = List_Locations(No_Loc).List_Massnahmen(No_Measure).Name
-        'ToDo: Measure aktuell ist hier noch redundant
+        'ToDo: Measure aktuell ist hier noch redundant!
         ReDim Preserve Akt.Measures(List_Locations.GetUpperBound(0))
         Akt.Measures(No_Loc) = Measure
 
-        'Die Elemente werden Ermittelt
-        For j = 0 To List_Locations(No_Loc).List_Massnahmen(No_Measure).Bauwerke.GetUpperBound(0)
-            If Not List_Locations(No_Loc).List_Massnahmen(No_Measure).Bauwerke(j) = "X" Then
+        '2. Die Elemente werden Ermittelt
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        x = 0
+        For i = 0 To List_Locations(No_Loc).List_Massnahmen(No_Measure).Bauwerke.GetUpperBound(0)
+            If Not List_Locations(No_Loc).List_Massnahmen(No_Measure).Bauwerke(i) = "X" Then
                 ReDim Preserve Elements(x)
-                Elements(x) = List_Locations(No_Loc).List_Massnahmen(No_Measure).Bauwerke(j)
+                Elements(x) = List_Locations(No_Loc).List_Massnahmen(No_Measure).Bauwerke(i)
                 x += 1
             End If
         Next
 
         'Kopiert die aktuelle ElementeListe in dieses Aktuell_Element Array
-        'ToDo: sollte an eine bessere stelle
+        'ToDo: sollte an eine bessere stelle!
         If No_Loc = 0 Then ReDim SKos1.Aktuell_Elemente(-1)
         ReDim Preserve SKos1.Aktuell_Elemente(SKos1.Aktuell_Elemente.GetUpperBound(0) + Elements.GetLength(0))
         Array.Copy(Elements, 0, SKos1.Aktuell_Elemente, SKos1.Aktuell_Elemente.GetUpperBound(0) - Elements.GetUpperBound(0), Elements.GetLength(0))
+
+        '3. Die Parameter werden Ermittelt
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        x = 0
+        For i = 0 To Elements.GetUpperBound(0)
+            For j = 0 To List_OptParameter.GetUpperBound(0)
+                If Elements(i) = Left(List_OptParameter(j).Bezeichnung, 4) Then
+                    ReDim Preserve Para(1, x)
+                    Para(0, x) = List_OptParameter(j).Bezeichnung
+                    Para(1, x) = List_OptParameter(j).SKWert
+                    x += 1
+                End If
+            Next
+        Next
+        If x = 0 Then ReDim Preserve Para(1, -1)
 
     End Sub
 
@@ -1103,9 +1096,10 @@ Public MustInherit Class Sim
 #Region "Evaluierung"
 
     'Reduziert die OptParameter und die ModellParameter auf die aktiven Elemente
+    '!Wird jetzt aus den Elemten des Child generiert!
     '***************************************************************************
-    Public Function Reduce_OptPara_ModPara(ByRef Elements() As String) As Boolean
-        Reduce_OptPara_ModPara = True
+    Public Function Reduce_OptPara_and_ModPara(ByRef Elements() As String) As Boolean
+        Reduce_OptPara_and_ModPara = True 'Wird wirklich abgefragt!
         Dim i As Integer
 
         'Kopieren der Listen aus den Sicherungen
@@ -1138,7 +1132,7 @@ Public MustInherit Class Sim
         'Immer dann wenn nicht Nullvariante
         '**********************************
         If count = 0 Then
-            Reduce_OptPara_ModPara = False
+            Reduce_OptPara_and_ModPara = False
         Else
             Array.Resize(TMP_ModPara, count)
             Array.Resize(List_ModellParameter, count)
@@ -1184,6 +1178,7 @@ Public MustInherit Class Sim
     '***************************************************************
     Dim n_tmp As Integer = 0
 
+    'Funktion wahrscheinlich überflüssig
     Public Sub SaveParameter_to_Child(ByVal Loc As Integer, ByVal Measure As Integer, ByVal Parameter(,) As Object)
 
         Dim i, j As Integer
@@ -1243,9 +1238,9 @@ Public MustInherit Class Sim
 
     End Sub
 
-    'EVO-Parameterübergabe
-    '*********************
-    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara() As Double, ByRef beziehungen() As EvoKern.PES.Beziehung)
+    'EVO-Parameterübergabe die Standard Parameter werden aus den Listen der OptPara und OptZiele ermittelt
+    '*****************************************************************************************************
+    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara() As Double, ByRef beziehungen() As EVO.Kern.PES.Beziehung)
 
         Dim i As Integer
 
@@ -1277,7 +1272,11 @@ Public MustInherit Class Sim
 
         'Mutierte Parameter an OptParameter übergeben
         For i = 0 To Me.List_OptParameter.GetUpperBound(0)
-            List_OptParameter(i).SKWert = myPara(i + 1)         'BUG 135: mypara() fängt bei 1 an!
+            If myPara.GetUpperBound(0) = List_OptParameter.GetUpperBound(0) - 1 Then
+                List_OptParameter(i).SKWert = myPara(i + 1)         'BUG 135: mypara() fängt bei 1 an!
+            Else
+                List_OptParameter(i).SKWert = myPara(i)
+            End If
         Next
 
         'Mutierte Parameter in Eingabedateien schreiben
@@ -1817,25 +1816,16 @@ Public MustInherit Class Sim
 
         'Leere/Neue Ergebnisdatenbank in Arbeitsverzeichnis kopieren
         '-----------------------------------------------------------
-        Dim ZielDatei As String = WorkDir & Datensatz & "_EVO.mdb"
 
-        'aktuelles Verzeichnis bestimmen
-        Dim currentDir As String = CurDir()
-        'Pfad zur Assembly bestimmen (\_Main\bin\)
-        Dim binpath As String = System.Windows.Forms.Application.StartupPath()
-        'in das \_Main\bin Verzeichnis wechseln
-        ChDrive(binpath)
-        ChDir(binpath)
-        'in das \Apps Verzeichnis wechseln
-        ChDir("..\Apps")
+        'Pfad zur Vorlage
+        Dim db_path_source As String = System.Windows.Forms.Application.StartupPath() & "\EVO.mdb"
+        'Pfad zur Zieldatei
+        Dim db_path_target As String = Me.WorkDir & Me.Datensatz & "_EVO.mdb"
         'Datei kopieren
-        My.Computer.FileSystem.CopyFile("EVO.mdb", ZielDatei, True)
-        'zurück in das Ausgangsverzeichnis wechseln
-        ChDrive(currentDir)
-        ChDir(currentDir)
+        My.Computer.FileSystem.CopyFile(db_path_source, db_path_target, True)
 
         'Pfad setzen
-        db_path = ZielDatei
+        Me.db_path = db_path_target
 
         'Tabellen anpassen
         '=================
@@ -2189,7 +2179,7 @@ Public MustInherit Class Sim
         '---------------------------------------------------------------------------
 
         Dim i, j As Integer
-        Dim OptResult As Main.OptResult
+        Dim OptResult As EVO.OptResult
 
         'Connect
         Call db_connect()
@@ -2214,7 +2204,7 @@ Public MustInherit Class Sim
 
         'Werte einlesen
         '==============
-        OptResult = New Main.OptResult()
+        OptResult = New EVO.OptResult()
         OptResult.List_OptParameter = Me.List_OptParameter
         OptResult.List_OptZiele = Me.List_OptZiele
         OptResult.List_Constraints = Me.List_Constraints

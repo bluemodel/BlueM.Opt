@@ -36,19 +36,19 @@ Public Class PES
         Dim NEltern As Short                'Anzahl Eltern
         Dim NNachf As Short                 'Anzahl Kinder
         Dim NGen As Short                   'Anzahl Generationen
-        Dim iEvoTyp As Short                'Typ der Evolutionsstrategie (+ oder ,)
-        Dim iPopEvoTyp As Short             'Typ der Evolutionsstrategie (+ oder ,) auf Populationsebene
-        Dim iPopPenalty As Short            'Art der Beurteilung der Populationsgüte (Multiobjective) (1: Crowding, 2: Spannweite)
+        Dim iEvoTyp As EVO_STRATEGIE        'Typ der Evolutionsstrategie (+ oder ,)
+        Dim iPopEvoTyp As EVO_STRATEGIE     'Typ der Evolutionsstrategie (+ oder ,) auf Populationsebene
+        Dim iPopPenalty As EVO_POP_PENALTY  'Art der Beurteilung der Populationsgüte (Multiobjective)
         Dim isPOPUL As Boolean              'Mit Populationen
         Dim is_MO_Pareto As Boolean         'Multi-Objective mit Pareto Front
         Dim NRunden As Short                'Anzahl Runden
         Dim NPopul As Short                 'Anzahl Populationen
         Dim NPopEltern As Short             'Anzahl Populationseltern
-        Dim iOptPopEltern As Short          'Ermittlung der Populationseltern (1: Rekombination, 2: Mittelwert, 3: Selektion)
-        Dim iOptEltern As Short             'Ermittlung der Individuum-Eltern (1: Selektion, 2: Rekomb x/x, diskret, 3: Rekomb x/x, mitteln, 4: Rekomb x/y, diskret, 5: Rekomb x/y, mitteln, 6: Neighbourhood)
+        Dim iOptPopEltern As EVO_POP_ELTERN 'Ermittlung der Populationseltern
+        Dim iOptEltern As EVO_ELTERN        'Ermittlung der Individuum-Eltern
         Dim NRekombXY As Short              'X/Y-Schema Rekombination
-        Dim rDeltaStart As Single           'Startschrittweite
-        Dim iStartPar As Short              'Startparameter (1: zufällig, 2: Originalparameter)
+        Dim DnStart As Single               'Startschrittweite
+        Dim iStartPar As EVO_STARTPARAMETER 'Startparameter
         Dim isDnVektor As Boolean           'Soll ein Schrittweitenvektor benutzt werden
         Dim interact As Short               'Alle wieviel Generationen soll die aktuelle Population mit Mitgliedern der sekundären Population aufgefüllt werden
         Dim isInteract As Boolean           'Mit Austausch zwischen Population und Sekundärer Population
@@ -141,32 +141,32 @@ Public Class PES
             Dim i As Integer
 
             ReDim TMP.penalty(NPenalty)                      '01 Werte der Penaltyfunktion(en)
-            For i = 0 To TMP.penalty.GetUpperBound(0)
+            For i = 1 To TMP.penalty.GetUpperBound(0)
                 TMP.penalty(i) = 1.0E+300
             Next
             ReDim TMP.constrain(NConstrains)                 '02 Werte der Randbedingung(en)
-            For i = 0 To TMP.constrain.GetUpperBound(0)
+            For i = 1 To TMP.constrain.GetUpperBound(0)
                 TMP.constrain(i) = -1.0E+300
             Next
             TMP.feasible = False                             '03 Gültiges Ergebnis
             TMP.dominated = False                            '04 Kennzeichnung ob dominiert
             TMP.Front = 0                                    '05 Nummer der Pareto Front
             ReDim TMP.X(varanz)                              '06 Wert der Variablen
-            For i = 0 To TMP.X.GetUpperBound(0)
+            For i = 1 To TMP.X.GetUpperBound(0)
                 TMP.X(i) = 0
             Next
             ReDim TMP.d(varanz)                              '07 Schrittweite der Variablen
-            For i = 0 To TMP.d.GetUpperBound(0)
+            For i = 1 To TMP.d.GetUpperBound(0)
                 TMP.d(i) = 0
             Next
             TMP.distance = 0                                 '08 Distanzwert für Crowding distance sort
         End Sub
 
-        'Überladene Methode um einArray aus NDSorting zu Dimensionieren
+        'Überladene Methode um ein Array aus NDSorting zu Dimensionieren
         Public Sub Dimit(ByVal NPenalty As Integer, ByVal NConstrains As Integer, ByVal varanz As Integer, ByRef TMP() As Struct_NDSorting)
             Dim i As Integer
 
-            For i = 0 To TMP.GetUpperBound(0)
+            For i = 1 To TMP.GetUpperBound(0)
                 Call Dimit(NPenalty, NConstrains, varanz, TMP(i))
             Next
 
@@ -187,7 +187,7 @@ Public Class PES
         'Überladen Methode die ein Array aus Struct NDSorting kopiert
         Public Sub Copy(ByVal Source() As Struct_NDSorting, ByRef Dest() As Struct_NDSorting)
             Dim i As Integer
-            For i = 0 To Source.GetUpperBound(0)
+            For i = 1 To Source.GetUpperBound(0)
                 Call Copy(Source(i), Dest(i))
             Next
         End Sub
@@ -210,21 +210,16 @@ Public Class PES
     'Deklarationsteil allgemein
     '**************************
 
-    'Evo-Strategie-Typ:
-    Private Const EVO_PLUS As Short = 1
-    Private Const EVO_KOMMA As Short = 2
-
-
     'Methoden
     '########
 
     'Schritt 2 -5 zum Initialisieren der PES
     '***************************************
-    Public Sub PesInitialise(ByRef PES_Settings As Struct_Settings, ByVal AnzPara As Short, ByVal AnzPenalty As Short, ByVal AnzConstr As Short, ByVal mypara() As Double, ByVal beziehungen() As Beziehung)
+    Public Sub PesInitialise(ByRef PES_Settings As Struct_Settings, ByVal AnzPara As Short, ByVal AnzPenalty As Short, ByVal AnzConstr As Short, ByRef mypara() As Double, ByVal beziehungen() As Beziehung, ByVal Method As String)
 
         '2. Schritt: PES - ES_OPTIONS
         'Optionen der Evolutionsstrategie werden übergeben
-        Call EsSettings(PES_Settings)
+        Call EsSettings(PES_Settings, Method)
 
         '3. Schritt: PES - ES_INI
         'Die öffentlichen dynamischen Arrays werden initialisiert (Dn, An, Xn, Xmin, Xmax), die Anzahl der Zielfunktionen wird festgelegt und Ausgangsparameter werden übergeben (War früher ES_Let Parameter)
@@ -243,7 +238,7 @@ Public Class PES
     'Schritt 2: ES_SETTINGS
     'Function ES_SETTINGS übergibt Optionen für Evolutionsstrategie und Prüft die eingestellten Optionen
     '***************************************************************************************************
-    Private Sub EsSettings(ByRef Settings As Struct_Settings)
+    Private Sub EsSettings(ByRef Settings As Struct_Settings, ByVal Method As String)
 
         'Überprüfung der Übergebenen Werte
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -280,7 +275,7 @@ Public Class PES
         If (Settings.NRekombXY < 1) Then
             Throw New Exception("Der Wert für die X/Y-Schema Rekombination ist kleiner 1!")
         End If
-        If (Settings.rDeltaStart < 0) Then
+        If (Settings.DnStart < 0) Then
             Throw New Exception("Die Startschrittweite darf nicht kleiner 0 sein!")
         End If
         If (Settings.iStartPar < 1 Or Settings.iStartPar > 2) Then
@@ -289,8 +284,8 @@ Public Class PES
         If (Settings.NPopul < Settings.NPopEltern) Then
             Throw New Exception("Die Anzahl der Populationseltern darf nicht größer als die Anzahl der Populationen!")
         End If
-        If (Settings.NNachf <= Settings.NEltern) Then
-            Throw New Exception("Die Anzahl der Eltern kann nicht größer als die Anzahl der Nachfahren sein!" & Chr(13) & Chr(10) & "'Rechenberg 73' schlägt ein Verhältnis von 1:3 bis 1:5 vor.")
+        If (Settings.NNachf <= Settings.NEltern) And Not Method = "HYBRID" Then
+            Throw New Exception("Die Anzahl der Eltern muss kleiner als die Anzahl der Nachfahren!" & Chr(13) & Chr(10) & "'Rechenberg 73' schlägt ein Verhältnis von 1:3 bis 1:5 vor.")
         End If
 
         'Übergabe der Optionen
@@ -329,7 +324,7 @@ Public Class PES
             Initial.Bez(i) = beziehungen(i)
             Initial.Xmin(i) = 0
             Initial.Xmax(i) = 1
-            'Welchen Zweck hat diese Prüfung hier. Die Grenzen sollten zu jeder Zeit eingehalten werden
+            'ToDo: Welchen Zweck hat diese Prüfung hier. Die Grenzen sollten zu jeder Zeit eingehalten werden
             Initial.Xn(i) = Math.Min(Initial.Xn(i), Initial.Xmax(i))
             Initial.Xn(i) = Math.Max(Initial.Xn(i), Initial.Xmin(i))
         Next
@@ -346,7 +341,7 @@ Public Class PES
         Dim m, n, l, i As Short
 
         For i = 1 To Initial.varanz
-            Initial.Dn(i) = PES_Settings.rDeltaStart
+            Initial.Dn(i) = PES_Settings.DnStart
         Next i
 
         'Parametervektoren initialisieren
@@ -370,13 +365,11 @@ Public Class PES
             ReDim NDSorting(PES_Settings.NEltern + PES_Settings.NNachf)
             For i = 1 To PES_Settings.NEltern + PES_Settings.NNachf
                 ReDim NDSorting(i).penalty(Initial.NPenalty)
-                If Initial.NConstrains > 0 Then
-                	ReDim NDSorting(i).constrain(Initial.NConstrains)
-                End If
+                ReDim NDSorting(i).constrain(Initial.NConstrains)
                 ReDim NDSorting(i).d(Initial.varanz)
                 ReDim NDSorting(i).X(Initial.varanz)
             Next i
-            If PES_Settings.iOptEltern = EVO_ELTERN_Neighbourhood Then
+            If PES_Settings.iOptEltern = EVO_ELTERN.Neighbourhood Then
                 ReDim PenaltyDistance(PES_Settings.NEltern, PES_Settings.NEltern)
                 ReDim IndexEltern(PES_Settings.NEltern - 1)
                 ReDim Distanceb(PES_Settings.NEltern)
@@ -402,10 +395,12 @@ Public Class PES
             For n = 1 To PES_Settings.NPopul
                 For m = 1 To Initial.NPenalty
                     Select Case PES_Settings.iPopPenalty
-                        Case 1 'Crowding
+
+                        Case EVO_POP_PENALTY.Crowding
                             'Qualität der Populationseltern wird auf sehr großen Wert gesetzt
                             Qbpop(n, m) = 1.0E+300
-                        Case 2 'Spannweite
+
+                        Case EVO_POP_PENALTY.Spannweite
                             'Qualität der Populationseltern wird auf 0 gesetzt
                             Qbpop(n, m) = 0
                     End Select
@@ -438,12 +433,16 @@ Public Class PES
     'PES_Settings.iStartPar 2: Originalparameter    -> Schrittweite = Startschrittweite
     '                                               -> Parameterwert = Originalparameter
     '***********************************************************************************
-    Private Sub EsStartvalues()
+    Public Sub EsStartvalues()
 
         Dim n, v, m As Short
 
+        'Zufallsgenerator initialisieren
+        Randomize()
+
         Select Case PES_Settings.iStartPar
-            Case 1 'Zufällige Startwerte
+
+            Case EVO_STARTPARAMETER.Zufall 'Zufällige Startwerte
                 For v = 1 To Initial.varanz
                     For n = 1 To PES_Settings.NEltern
                         For m = 1 To PES_Settings.NPopEltern
@@ -455,7 +454,8 @@ Public Class PES
                         Next m
                     Next n
                 Next v
-            Case 2 'Originalparameter
+
+            Case EVO_STARTPARAMETER.Original 'Originalparameter
                 For v = 1 To Initial.varanz
                     For n = 1 To PES_Settings.NEltern
                         For m = 1 To PES_Settings.NPopEltern
@@ -550,7 +550,7 @@ Public Class PES
 
         Select Case PES_Settings.iOptPopEltern
 
-            Case 1 'MultiRekombination über alle Eltern (x/x,y) oder (x/x+y)
+            Case EVO_POP_ELTERN.Rekombination 'MultiRekombination über alle Eltern (x/x,y) oder (x/x+y)
                 For n = 1 To PES_Settings.NEltern
                     R = Int(PES_Settings.NPopEltern * Rnd()) + 1
                     For v = 1 To Initial.varanz
@@ -561,7 +561,7 @@ Public Class PES
                     Next v
                 Next n
 
-            Case 2 'Mittelwertbildung über alle Eltern
+            Case EVO_POP_ELTERN.Mittelwert 'Mittelwertbildung über alle Eltern
                 'Ermitteln der Elter und Schrittweite über Mittelung der Elternschrittweiten
                 For v = 1 To Initial.varanz
                     For n = 1 To PES_Settings.NEltern
@@ -576,7 +576,7 @@ Public Class PES
                     Next n
                 Next v
 
-            Case 3 'Zufallswahl über alle Eltern
+            Case EVO_POP_ELTERN.Selektion 'Zufallswahl über alle Eltern
                 R = Int(PES_Settings.NPopEltern * Rnd()) + 1 'Zufallszahl entscheidet welcher
                 'Elternteil vererbt wird
                 For v = 1 To Initial.varanz
@@ -604,7 +604,7 @@ Public Class PES
 
         Select Case PES_Settings.iOptEltern
 
-            Case 1 'Zufallswahl über alle Eltern
+            Case EVO_ELTERN.Selektion 'Zufallswahl über alle Eltern
 
                 R = Int(PES_Settings.NEltern * Rnd()) + 1 'Zufallszahl entscheidet
                 'welcher Enternteil vererbt wird
@@ -615,7 +615,7 @@ Public Class PES
                     Initial.Xn(v) = Xe(v, R, PES_iAkt.iAktPop)
                 Next v
 
-            Case 2 'Multi-Rekombination, diskret
+            Case EVO_ELTERN.XX_Diskret 'Multi-Rekombination, diskret
 
                 For v = 1 To Initial.varanz
                     R = Int(PES_Settings.NEltern * Rnd()) + 1
@@ -625,7 +625,7 @@ Public Class PES
                     Initial.Xn(v) = Xe(v, R, PES_iAkt.iAktPop)
                 Next v
 
-            Case 3 'Multi-Rekombination, gemittelt
+            Case EVO_ELTERN.XX_Mitteln 'Multi-Rekombination, gemittelt
 
                 For v = 1 To Initial.varanz
                     Initial.Dn(v) = 0
@@ -640,7 +640,7 @@ Public Class PES
 
                 Next v
 
-            Case 4 'Multi-Rekombination nach X/Y-Schema, diskrete Vertauschung
+            Case EVO_ELTERN.XY_Diskret 'Multi-Rekombination nach X/Y-Schema, diskrete Vertauschung
 
                 ReDim Realisierungsspeicher(PES_Settings.NRekombXY)
                 ReDim Elternspeicher(PES_Settings.NEltern)
@@ -667,7 +667,7 @@ Public Class PES
                     Initial.Xn(v) = Xe(v, Realisierungsspeicher(R), PES_iAkt.iAktPop)
                 Next v
 
-            Case 5 'Multi-Rekombination nach X/Y-Schema, Mittelung der Gene
+            Case EVO_ELTERN.XY_Mitteln 'Multi-Rekombination nach X/Y-Schema, Mittelung der Gene
 
                 ReDim Realisierungsspeicher(PES_Settings.NRekombXY)
                 ReDim Elternspeicher(PES_Settings.NEltern)
@@ -699,7 +699,7 @@ Public Class PES
 
                 Next v
 
-            Case 6 'Neighbourhood Rekombination
+            Case EVO_ELTERN.Neighbourhood 'Neighbourhood Rekombination
 
                 Z1 = Int(PES_Settings.NEltern * Rnd()) + 1
                 Do
@@ -860,12 +860,14 @@ Public Class PES
                 End If
             Else
                 Select Case PES_Settings.iPopPenalty
-                    Case 1 'Crowding
+
+                    Case EVO_POP_PENALTY.Crowding
                         If Qbpop(m, 1) > h1 Then
                             h1 = Qbpop(m, 1)
                             i = m
                         End If
-                    Case 2 'Spannweite
+
+                    Case EVO_POP_PENALTY.Spannweite
                         If Qbpop(m, 1) < h1 Then
                             h2 = Qbpop(m, 2)
                             i = m
@@ -914,7 +916,8 @@ Public Class PES
             End If
         Else
             Select Case PES_Settings.iPopPenalty
-                Case 1 'Crowding
+
+                Case EVO_POP_PENALTY.Crowding
                     If h1 < Qbpop(i, 1) Then
                         Qbpop(i, 1) = h1
                         For m = 1 To Initial.varanz
@@ -926,7 +929,8 @@ Public Class PES
                             Next n
                         Next m
                     End If
-                Case 2 'Spannweite
+
+                Case EVO_POP_PENALTY.Spannweite
                     If h2 > Qbpop(j, 2) Then
                         Qbpop(j, 2) = h2
                         For m = 1 To Initial.varanz
@@ -1007,7 +1011,7 @@ Public Class PES
     Public Sub EsResetBWSpeicher()
         Dim n, i As Short
 
-        If (PES_Settings.iEvoTyp = EVO_KOMMA) Then
+        If (PES_Settings.iEvoTyp = EVO_STRATEGIE.Komma) Then
             For n = 1 To PES_Settings.NEltern
                 For i = 1 To Initial.NPenalty
                     Qb(n, PES_iAkt.iAktPop, i) = 1.0E+300
@@ -1023,7 +1027,7 @@ Public Class PES
     Public Sub EsResetPopBWSpeicher()
         Dim n, i As Short
 
-        If (PES_Settings.iPopEvoTyp = EVO_KOMMA) Then
+        If (PES_Settings.iPopEvoTyp = EVO_STRATEGIE.Komma) Then
             For n = 1 To PES_Settings.NPopul
                 For i = 1 To Initial.NPenalty
                     Qbpop(n, i) = 1.0E+300
@@ -1043,9 +1047,9 @@ Public Class PES
         Dim Z As Short
 
         Select Case PES_Settings.iPopPenalty
-            Case 1 'Crowding
-                Z = 1 '
-            Case 2 'Spannweite
+            Case EVO_POP_PENALTY.Crowding
+                Z = 1
+            Case EVO_POP_PENALTY.Spannweite
                 Z = 2
         End Select
 
@@ -1077,7 +1081,8 @@ Public Class PES
             'Multi-Objective mit Paretofront
             '-------------------------------
             Select Case PES_Settings.iPopPenalty
-                Case 1 'Crowding
+
+                Case EVO_POP_PENALTY.Crowding
                     For m = 1 To PES_Settings.NPopul
                         For n = m To PES_Settings.NPopul
                             If Realisierungsspeicher(m, 1) > Realisierungsspeicher(n, 1) Then
@@ -1090,7 +1095,8 @@ Public Class PES
                             End If
                         Next
                     Next
-                Case 2 'Spannweite
+
+                Case EVO_POP_PENALTY.Spannweite
                     For m = 1 To PES_Settings.NPopul
                         For n = m To PES_Settings.NPopul
                             If Realisierungsspeicher(m, 1) < Realisierungsspeicher(n, 1) Then
@@ -1331,7 +1337,7 @@ Public Class PES
             Next m
 
             'Sortierung der Lösungen ist nur für Neighbourhood-Rekombination notwendig
-            If PES_Settings.iOptEltern = EVO_ELTERN_Neighbourhood Then
+            If (PES_Settings.iOptEltern = EVO_ELTERN.Neighbourhood) Then
                 Call Neighbourhood_AbstandsArray()
                 Call Neighbourhood_Crowding_Distance()
             End If

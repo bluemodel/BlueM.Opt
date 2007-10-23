@@ -1,8 +1,10 @@
+Imports IHWB.EVO.Kern
+
 Public Class Testprobleme
     Inherits System.Windows.Forms.UserControl
 
     Private IsInitializing As Boolean
-    Public OptModus As Short
+    Public OptModus As EVO_MODUS
     Event Testproblem_Changed(ByVal sender As Object, ByVal e As System.EventArgs)
 
     Private Sub Testprobleme_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
@@ -35,34 +37,34 @@ Public Class Testprobleme
             Select Case Combo_Testproblem.Text
                 Case "Sinus-Funktion"
                     Problem_SinusFunktion.BringToFront()
-                    OptModus = 0
+                    OptModus = EVO_MODUS.Single_Objective
                 Case "Beale-Problem"
                     Problem_BealeProblem.BringToFront()
-                    OptModus = 0
+                    OptModus = EVO_MODUS.Single_Objective
                 Case "Schwefel 2.4-Problem"
                     Problem_Schwefel24.BringToFront()
-                    OptModus = 0
+                    OptModus = EVO_MODUS.Single_Objective
                 Case "Deb 1"
                     Problem_D1Funktion.BringToFront()
-                    OptModus = 1
+                    OptModus = EVO_MODUS.Multi_Objective
                 Case "Zitzler/Deb T1"
                     Problem_T1Funktion.BringToFront()
-                    OptModus = 1
+                    OptModus = EVO_MODUS.Multi_Objective
                 Case "Zitzler/Deb T2"
                     Problem_T2Funktion.BringToFront()
-                    OptModus = 1
+                    OptModus = EVO_MODUS.Multi_Objective
                 Case "Zitzler/Deb T3"
                     Problem_T3Funktion.BringToFront()
-                    OptModus = 1
+                    OptModus = EVO_MODUS.Multi_Objective
                 Case "Zitzler/Deb T4"
                     Problem_T4Funktion.BringToFront()
-                    OptModus = 1
+                    OptModus = EVO_MODUS.Multi_Objective
                 Case "CONSTR"
                     Problem_CONSTRFunktion.BringToFront()
-                    OptModus = 1
+                    OptModus = EVO_MODUS.Multi_Objective
                 Case "Box"
                     Problem_TKNFunktion.BringToFront()
-                    OptModus = 1
+                    OptModus = EVO_MODUS.Multi_Objective
                 Case "Abhängige Parameter"
                     OptModus = 1
 
@@ -78,7 +80,7 @@ Public Class Testprobleme
     '************************************************************************************
 
     'Startparameter werden festgesetzt
-    Public Sub Parameter_Uebergabe(ByVal Testproblem As String, ByVal globAnzPar_Sin As String, ByVal globAnzPar_Schw As String, ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara() As Double, ByRef beziehungen() As EvoKern.PES.Beziehung)
+    Public Sub Parameter_Uebergabe(ByVal Testproblem As String, ByVal globAnzPar_Sin As String, ByVal globAnzPar_Schw As String, ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara() As Double, ByRef beziehungen() As EVO.Kern.PES.Beziehung)
 
         Dim i As Integer
 
@@ -185,8 +187,8 @@ Public Class Testprobleme
                 ReDim mypara(globalAnzPar)
                 'Beziehungen
                 ReDim beziehungen(globalAnzPar)
-                beziehungen(1) = EvoKern.PES.Beziehung.keine
-                beziehungen(2) = EvoKern.PES.Beziehung.groesser
+                beziehungen(1) = EVO.Kern.PES.Beziehung.keine
+                beziehungen(2) = EVO.Kern.PES.Beziehung.groesser
                 Randomize()
                 mypara(1) = Rnd()
                 mypara(2) = Rnd()
@@ -197,7 +199,7 @@ Public Class Testprobleme
 
 #Region "Diagrammfunktionen"
 
-    Public Sub DiagInitialise(ByVal PES_Settings As EvoKern.PES.Struct_Settings, ByVal globalAnzPar As Integer, ByRef Diag As Main.Diagramm)
+    Public Sub DiagInitialise(ByVal PES_Settings As EVO.Kern.PES.Struct_Settings, ByVal globalAnzPar As Integer, ByRef Diag As EVO.Diagramm)
 
         Select Case Me.Combo_Testproblem.Text
 
@@ -222,7 +224,7 @@ Public Class Testprobleme
 
     'Diagramm für Sinus-Funktion initialisieren
     '*******************************************
-    Private Sub DiagInitialise_SinusFunktion(ByVal globalAnzPar As Short, ByRef Diag As Main.Diagramm)
+    Private Sub DiagInitialise_SinusFunktion(ByVal globalAnzPar As Short, ByRef Diag As EVO.Diagramm)
 
         Dim array_x() As Double = {}
         Dim array_y() As Double = {}
@@ -268,7 +270,7 @@ Public Class Testprobleme
 
     'Diagramm für Beale-Problem initialisieren
     '*****************************************
-    Private Sub DiagInitialise_BealeProblem(ByVal PES_Settings As EvoKern.PES.Struct_Settings, ByVal globalAnzPar As Short, ByRef Diag As Main.Diagramm)
+    Private Sub DiagInitialise_BealeProblem(ByVal PES_Settings As EVO.Kern.PES.Struct_Settings, ByVal globalAnzPar As Short, ByRef Diag As EVO.Diagramm)
 
         Dim array_x() As Double = {}
         Dim array_y() As Double = {}
@@ -320,7 +322,7 @@ Public Class Testprobleme
 
     'Diagramm für Schwefel-Problem initialisieren
     '********************************************
-    Private Sub DiagInitialise_SchwefelProblem(ByVal PES_Settings As EvoKern.PES.Struct_Settings, ByVal globalAnzPar As Short, ByRef Diag As Main.Diagramm)
+    Private Sub DiagInitialise_SchwefelProblem(ByVal PES_Settings As EVO.Kern.PES.Struct_Settings, ByVal globalAnzPar As Short, ByRef Diag As EVO.Diagramm)
 
         Dim array_x() As Double = {}
         Dim array_y() As Double = {}
@@ -382,7 +384,7 @@ Public Class Testprobleme
 
     'Diagramm für MultiObjective-Probleme initialisieren
     '***************************************************
-    Private Sub DiagInitialise_MultiTestProb(ByVal PES_Settings As EvoKern.PES.Struct_Settings, ByRef Diag As Main.Diagramm)
+    Private Sub DiagInitialise_MultiTestProb(ByVal PES_Settings As EVO.Kern.PES.Struct_Settings, ByRef Diag As EVO.Diagramm)
 
         Dim i, j As Short
         Dim serie As Steema.TeeChart.Styles.Series
@@ -561,7 +563,7 @@ Public Class Testprobleme
 
     'Diagramm für Box-Problem (3D) initialisieren
     '********************************************
-    Private Sub DiagInitialise_3D_Box(ByVal PES_Settings As EvoKern.PES.Struct_Settings, ByVal AnzPar As Integer, ByRef Diag As Main.Diagramm)
+    Private Sub DiagInitialise_3D_Box(ByVal PES_Settings As EVO.Kern.PES.Struct_Settings, ByVal AnzPar As Integer, ByRef Diag As EVO.Diagramm)
 
         Dim i, j, n As Integer
         Dim ArrayX() As Double
@@ -693,10 +695,10 @@ Public Class Testprobleme
 #End Region 'Diagrammfunktionen
 
 #Region "Evaluierung"
-    
+
     'Evaluierung und Zeichnen der Testprobleme
     '*****************************************
-    Public Sub Evaluierung_TestProbleme(ByRef Testproblem As String, ByVal mypara() As Double, ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN() As Double, ByRef RN() As Double, ByRef Diag As Main.Diagramm)
+    Public Sub Evaluierung_TestProbleme(ByRef Testproblem As String, ByVal mypara() As Double, ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN() As Double, ByRef RN() As Double, ByRef Diag As EVO.Diagramm)
 
         Dim i As Short
         Dim Unterteilung_X As Double

@@ -39,7 +39,7 @@ Namespace My.Resources
         Friend ReadOnly Property ResourceManager() As Global.System.Resources.ResourceManager
             Get
                 If Object.ReferenceEquals(resourceMan, Nothing) Then
-                    Dim temp As Global.System.Resources.ResourceManager = New Global.System.Resources.ResourceManager("Main.Resources", GetType(Resources).Assembly)
+                    Dim temp As Global.System.Resources.ResourceManager = New Global.System.Resources.ResourceManager("IHWB.EVO.Resources", GetType(Resources).Assembly)
                     resourceMan = temp
                 End If
                 Return resourceMan
@@ -58,6 +58,13 @@ Namespace My.Resources
             Set
                 resourceCulture = value
             End Set
+        End Property
+        
+        Friend ReadOnly Property EVO() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("EVO", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
         End Property
         
         Friend ReadOnly Property icon_edit() As System.Drawing.Bitmap

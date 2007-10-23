@@ -67,29 +67,50 @@ Public Class CES
         Dim iLocation As Integer            '14 Location des PES Parent
 
         'Gibt ein Array mit den Elementen aller Locations zurück
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         Public ReadOnly Property All_Elem() As String()
             Get
                 Dim i As Integer
                 Dim array() As String = {}
                 For i = 0 To Loc.GetUpperBound(0)
                     If Loc(i).Loc_Elem.GetLength(0) = 0 Then
-                        throw new Exception("Die Element Gesamtlicte wurde abgerufen bevor die Elemente pro Location ermittelt wurden")
+                        Throw New Exception("Die Element Gesamtliste wurde abgerufen bevor die Elemente pro Location ermittelt wurden")
                     End If
-                    If i = 0 Then ReDim All_Elem(-1)
                     ReDim Preserve array(array.GetUpperBound(0) + Loc(i).Loc_Elem.GetLength(0))
                     System.Array.Copy(Loc(i).Loc_Elem, 0, array, array.GetUpperBound(0) - Loc(i).Loc_Elem.GetUpperBound(0), Loc(i).Loc_Elem.GetLength(0))
                 Next
-                All_Elem = array
+                All_Elem = array.Clone
+            End Get
+
+        End Property
+
+        'Gibt ein Array mit den Parametern aller Locations zurück
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        Public ReadOnly Property All_Para() As Double()
+            Get
+                Dim i, j, x As Integer
+                Dim array() As Double = {}
+                x = 0
+                For i = 0 To Loc.GetUpperBound(0)
+                    For j = 0 To Loc(i).Loc_Para.GetUpperBound(1)
+                        ReDim Preserve array(x)
+                        array(x) = Loc(i).Loc_Para(1, j)
+                        x += 1
+                    Next
+                Next
+                All_Para = array.Clone
             End Get
 
         End Property
 
     End Structure
 
+    'Informationen pro Location
+    '**************************
     Public Structure Location_Data
         Dim Loc_Para(,) As Object           '10 Die Optimierungsparameter für PES
         Dim Loc_Dn() As Object              '11 Das Dn für PES
-        Dim Loc_Elem() As String          '11a Die Elemente die zur Location gehören
+        Dim Loc_Elem() As String            '11a Die Elemente die zur Location gehören
     End Structure
 
     Public List_Childs() As Faksimile
@@ -818,7 +839,7 @@ Public Class CES
     Public Sub Sort_Faksimile(ByRef FaksimileList() As Faksimile)
         'Sortiert die Fiksimile anhand des Abstandes
         Dim i, j As Integer
-        Dim swap As EvoKern.CES.Faksimile
+        Dim swap As EVO.Kern.CES.Faksimile
 
         For i = 0 To FaksimileList.GetUpperBound(0)
             For j = 0 To FaksimileList.GetUpperBound(0)
