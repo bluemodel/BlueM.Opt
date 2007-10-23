@@ -307,7 +307,7 @@ Public Class CES
                 Next
                 List_Childs(i).mutated = True
                 List_Childs(i).No = i + 1
-            Loop While Is_Twin(i) = True
+            Loop While Is_Twin(i) = True Or approved(List_Childs(i).Path) = False
         Next
 
     End Sub
@@ -339,6 +339,30 @@ Public Class CES
         Next
 
     End Sub
+    'Hier kann man Pfade wie z.B. Nullvarianten die nicht erlaubt sind hard vercoden (ToDo!)
+    '***************************************************************************************
+    Public Function approved(ByVal path() As Integer) As Boolean
+        approved = True
+
+        Dim i, j As Integer
+        Dim count As Integer = 0
+
+        'Dim firstValues()() As Byte = {New Byte() {2, 1}, New Byte() {3, 0}}
+        Dim vector_array()() As Integer = {New Integer() {2, 2, 2}}
+
+        For i = 0 To vector_array.GetUpperBound(0)
+            If vector_array(i).GetUpperBound(0) = path.GetUpperBound(0) Then
+                For j = 0 To vector_array(i).GetUpperBound(0)
+                    If vector_array(i)(j) = path(j) Then
+                        count += 1
+                    End If
+                Next
+                If count = path.GetLength(0) Then
+                    approved = False
+                End If
+            End If
+        Next
+    End Function
 
     'Selectionsprozess je nach "plus" oder "minus" Strategie (Die beiden Listen sind schon vorsortiert!)
     '***************************************************************************************************
@@ -618,7 +642,7 @@ Public Class CES
                         Call MutOp_Dyn_Switch(List_Childs(i).Path, count)
                 End Select
                 count += 1
-            Loop While Is_Twin(i) = True Or Is_Clone(i) = True
+            Loop While Is_Twin(i) = True Or Is_Clone(i) = True Or approved(List_Childs(i).Path) = False
             List_Childs(i).mutated = True
         Next
 
