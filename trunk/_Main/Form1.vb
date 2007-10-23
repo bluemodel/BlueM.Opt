@@ -749,17 +749,18 @@ Partial Class Form1
             For i = 0 To CES1.n_Childs - 1
                 'Und pro Location
                 'xxxxxxxxxxxxxxxx
-                For j = 0 To CES1.List_Childs(i).Path.GetUpperBound(0)
-
-                    'Standard Parameter werden aus dem Sim besorgt
-                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
-
-                    'Die Zahl der Parameter wird überschrieben (AnzZiel und AnzRand sind OK)
-                    'Anzahl der Parameter bezieht sich hier nur auf eine Location
-                    globalAnzPar = CES1.List_Childs(i).Loc(j).Loc_Para.GetLength(1)
+                For j = 0 To CES1.n_Locations - 1
 
                     'Die Parameter (falls vorhanden) werden überschrieben
                     If Not CES1.List_Childs(i).Loc(j).Loc_Para.GetLength(1) = 0 Then
+
+                        'Standard Parameter werden aus dem Sim besorgt
+                        Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
+
+                        'Die Zahl der Parameter wird überschrieben (AnzZiel und AnzRand sind OK)
+                        'Anzahl der Parameter bezieht sich hier nur auf eine Location
+                        globalAnzPar = CES1.List_Childs(i).Loc(j).Loc_Para.GetLength(1)
+
                         ReDim myPara(CES1.List_Childs(i).Loc(j).Loc_Para.GetLength(1))
                         For m = 0 To CES1.List_Childs(i).Loc(j).Loc_Para.GetUpperBound(1)
                             myPara(m + 1) = CES1.List_Childs(i).Loc(j).Loc_Para(1, m)
@@ -771,7 +772,7 @@ Partial Class Form1
                         'Schritte 2 - 5 PES wird initialisiert (Weiteres siehe dort ;-)
                         '**************************************************************
                         Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, Method)
-                        '**************************************************************
+
                         'Dem Child wird der Schrittweitenvektor zugewiesen und gegebenenfalls der Parameter zufällig gewählt
                         'wird also nicht in PES.ESStarten gemacht
                         ReDim CES1.List_Childs(i).Loc(j).Loc_Dn(CES1.List_Childs(i).Loc(j).Loc_Para.GetUpperBound(1))
@@ -883,30 +884,55 @@ Partial Class Form1
             'HYBRID: REPRODUKTION und MUTATION
             '*********************************
             If Method = METH_HYBRID Then
-                'Child Schleife hier da für jedes Child die PES Funktionen angesteuert werden
+                'pro Child
+                'xxxxxxxxx
                 For i = 0 To CES1.List_Childs.GetUpperBound(0)
-
-
-
 
                     'Ermittelt fuer jedes Child den PES Parent Satz
                     Call CES1.Memory_Search(CES1.List_Childs(i))
 
-                    'Schleife über alle Locations
+                    'und pro Location
+                    'xxxxxxxxxxxxxxxx
                     For j = 0 To CES1.n_Locations - 1
 
-                        ReDim CES1.PES_Parents(0)
-                        'Call Reduce_Para(ces1.PES_Parents
+                        'Die Parameter (falls vorhanden) werden überschrieben
+                        If Not CES1.List_Childs(i).Loc(j).Loc_Para.GetLength(1) = 0 Then
 
-                        'PES Geschichten
-                        '###############
+                            '??????????????????????
+                            PES1 = New EVO.Kern.PES
 
-                        'Schritte 2 - 5 PES wird initialisiert - Weiteres siehe dort ;-)
-                        '***************************************************************
-                        Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, Method)
+                            'Standard Parameter werden aus dem Sim besorgt
+                            Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
+
+                            'Die Zahl der Parameter wird überschrieben (AnzZiel und AnzRand sind OK)
+                            'Anzahl der Parameter bezieht sich hier nur auf eine Location
+                            For m = 0 To CES1.PES_Parents.GetUpperBound(0)
+                                If CES1.PES_Parents(m).iLocation = j + 1 Then
+                                    globalAnzPar = CES1.PES_Parents(m).Loc(j).Loc_Para.GetLength(1)
+                                    Exit For
+                                End If
+                            Next
+
+                            '1. EVO_Settings zurücksetzen; 2. Die Settings werden auf Basis des Memory gesetzt
+                            Dim n_eltern As Integer = 0
+                            For m = 0 To CES1.PES_Parents.GetUpperBound(0)
+                                If j = CES1.PES_Parents(m).iLocation Then
+                                    n_eltern += 1
+                                End If
+                            Next
+
+                            EVO_Settings1.isSaved = False
+                            Call EVO_Settings1.SetFor_CES_PES(1, n_eltern, 1)
 
 
 
+
+
+                            Dim k As Integer = 0
+                            k = CES1.PES_Parents(0).iLocation
+
+
+                        End If
                     Next
                 Next
             End If
