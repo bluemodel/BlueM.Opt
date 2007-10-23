@@ -60,7 +60,7 @@ Partial Class Form1
     Dim Bestwert(,) As Double = {}
     Dim SekPopulation(,) As Double
     Dim myPara() As Double
-    Dim myParaAbh() As EvoKern.PES.Struct_Abh
+    Dim beziehungen() As EvoKern.PES.Beziehung
 
     '**** Verschiedenes ****
     Dim isrun As Boolean = False                        'Optimierung läuft
@@ -170,7 +170,7 @@ Partial Class Form1
                     EVO_Settings1.OptModus = Testprobleme1.OptModus
 
                     'Globale Parameter werden gesetzt
-                    Call Testprobleme1.Parameter_Uebergabe(Testprobleme1.Combo_Testproblem.Text, Testprobleme1.Text_Sinusfunktion_Par.Text, Testprobleme1.Text_Schwefel24_Par.Text, globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
+                    Call Testprobleme1.Parameter_Uebergabe(Testprobleme1.Combo_Testproblem.Text, Testprobleme1.Text_Sinusfunktion_Par.Text, Testprobleme1.Text_Schwefel24_Par.Text, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
 
                     'Start-Button aktivieren (keine Methodenauswahl erforderlich)
                     Button_Start.Enabled = True
@@ -308,7 +308,7 @@ Partial Class Form1
                     End If
 
                     'Parameterübergabe an PES
-                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, myParaAbh)
+                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
 
                 Case METH_CES, METH_CES_PES, METH_HYBRID 'Methode CES und Methode CES_PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -688,9 +688,9 @@ Partial Class Form1
         Dim i As Integer
 
         'Parents und Childs werden Dimensioniert
-        Redim CES1.List_Parents(CES1.n_Parents -1)
+        ReDim CES1.List_Parents(CES1.n_Parents - 1)
         Call CES1.Faksimile_Dim(CES1.List_Parents, "Parent")
-        Redim CES1.List_Childs(CES1.n_Childs -1)
+        ReDim CES1.List_Childs(CES1.n_Childs - 1)
         Call CES1.Faksimile_Dim(CES1.List_Childs, "Child")
 
         'Diagramm vorbereiten und initialisieren
@@ -757,7 +757,7 @@ Partial Class Form1
                     'Falsch hier entweder Später die Parameter überschreiben oder weg hier ---------------------
                     'die Parameter müssen aus dem child geschrieben werden
                     'also vorher einmal die start werte einlesen und dann hinter her mit der PES mutieren
-                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, myParaAbh)
+                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
                     'hier müsten die Parameter wieder zusammengefast werden ---------------------------
                     Call Sim1.PREPARE_Evaluation_PES(myPara)
                 End If
@@ -857,7 +857,7 @@ Partial Class Form1
                         'Schritte 2 - 5 PES wird initialisiert
                         'Weiteres siehe dort ;-)
                         '*************************************
-                        Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, myParaAbh)
+                        Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
 
 
 
@@ -906,7 +906,7 @@ Partial Class Form1
 
                     'Parameterübergabe an PES
                     '************************
-                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, myParaAbh)
+                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
                     'Starten der PES
                     '***************
                     Call STARTEN_PES()
@@ -954,7 +954,7 @@ Partial Class Form1
 
         'Schritte 2 - 5 PES wird initialisiert (Weiteres siehe dort ;-)
         '**************************************************************
-        Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, myParaAbh)
+        Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
 
         'Startwerte werden der Verlaufsanzeige werden zugewiesen
         Call Me.INI_Verlaufsanzeige(EVO_Settings1.PES_Settings.NRunden, EVO_Settings1.PES_Settings.NPopul, EVO_Settings1.PES_Settings.NGen, EVO_Settings1.PES_Settings.NNachf)
@@ -1145,15 +1145,15 @@ Start_Evolutionsrunden:
         Dim i As Short
         Dim serie As Steema.TeeChart.Styles.Series
 
-            'BUG 135: SekPop(,) fängt bei 1 an!
+        'BUG 135: SekPop(,) fängt bei 1 an!
         If (UBound(SekPop, 2) = 2) Then
             '2 Zielfunktionen
             '----------------------------------------------------------------
             serie = DForm.Diag.getSeriesPoint("Sekundäre Population", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
             serie.Clear()
-                For i = 1 To UBound(SekPop, 1)
+            For i = 1 To UBound(SekPop, 1)
                 serie.Add(SekPop(i, 1), SekPop(i, 2), "")
-                Next i
+            Next i
 
         ElseIf (UBound(SekPop, 2) >= 3) Then
             '3 oder mehr Zielfunktionen (es werden die ersten drei angezeigt)
@@ -1161,10 +1161,10 @@ Start_Evolutionsrunden:
             Dim serie3D As Steema.TeeChart.Styles.Points3D
             serie3D = DForm.Diag.getSeries3DPoint("Sekundäre Population", "Green")
             serie3D.Clear()
-                For i = 1 To UBound(SekPop, 1)
+            For i = 1 To UBound(SekPop, 1)
                 serie3D.Add(SekPop(i, 1), SekPop(i, 2), SekPop(i, 3))
-                Next i
-            End If
+            Next i
+        End If
 
     End Sub
 
@@ -1198,7 +1198,7 @@ Start_Evolutionsrunden:
             Case ANW_TESTPROBLEME 'Testprobleme
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-                Call Testprobleme1.DiagInitialise(Me.EVO_Settings1.PES_Settings, globalAnzPar, Me.DForm.Diag) 
+                Call Testprobleme1.DiagInitialise(Me.EVO_Settings1.PES_Settings, globalAnzPar, Me.DForm.Diag)
 
             Case ANW_BLUEM, ANW_SMUSI 'BlueM oder SMUSI
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX

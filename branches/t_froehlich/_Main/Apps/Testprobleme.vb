@@ -18,6 +18,7 @@ Public Class Testprobleme
         Combo_Testproblem.Items.Add("Zitzler/Deb T4")
         Combo_Testproblem.Items.Add("CONSTR")
         Combo_Testproblem.Items.Add("Box")
+        Combo_Testproblem.Items.Add("Abhängige Parameter")
 
         Combo_Testproblem.SelectedIndex = 0
 
@@ -62,6 +63,9 @@ Public Class Testprobleme
                 Case "Box"
                     Problem_TKNFunktion.BringToFront()
                     OptModus = 1
+                Case "Abhängige Parameter"
+                    OptModus = 1
+
             End Select
 
             RaiseEvent Testproblem_Changed(sender, e) 'wird in Form1 von IniApp() verarbeitet
@@ -74,7 +78,7 @@ Public Class Testprobleme
     '************************************************************************************
 
     'Startparameter werden festgesetzt
-    Public Sub Parameter_Uebergabe(ByVal Testproblem As String, ByVal globAnzPar_Sin As String, ByVal globAnzPar_Schw As String, ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara() As Double)
+    Public Sub Parameter_Uebergabe(ByVal Testproblem As String, ByVal globAnzPar_Sin As String, ByVal globAnzPar_Schw As String, ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara() As Double, ByRef beziehungen() As EvoKern.PES.Beziehung)
 
         Dim i As Integer
 
@@ -173,6 +177,19 @@ Public Class Testprobleme
                 mypara(1) = Rnd()
                 mypara(2) = Rnd()
                 mypara(3) = Rnd()
+
+            Case "Abhängige Parameter"
+                globalAnzPar = 2
+                globalAnzZiel = 1
+                globalAnzRand = 0
+                ReDim mypara(globalAnzPar)
+                'Beziehungen
+                ReDim beziehungen(globalAnzPar)
+                beziehungen(1) = EvoKern.PES.Beziehung.keine
+                beziehungen(2) = EvoKern.PES.Beziehung.groesser
+                Randomize()
+                mypara(1) = Rnd()
+                mypara(2) = Rnd()
 
         End Select
 
@@ -530,6 +547,13 @@ Public Class Testprobleme
                 Next j
                 serie = Diag.getSeriesLine("Grenze 4", "Red")
                 serie.Add(Array4X, Array4Y)
+
+
+            Case "Abhängige Parameter"
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                Diag.Header.Text = "Abhängige Parameter"
+                Diag.Axes.Left.Automatic = True
+                Diag.Axes.Bottom.Automatic = True
 
         End Select
 
@@ -913,6 +937,19 @@ Public Class Testprobleme
                     serie3D = Diag.getSeries3DPoint("Population", "Orange")
                 End If
                 serie3D.Add(f1, f2, f3)
+
+            Case "Abhängige Parameter"
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+                'Qualitätswerte berechnen
+                '------------------------
+                QN(0) = mypara(1) / mypara(2)
+                'QN(1) = mypara(1) / mypara(2)
+
+                'Zeichnen
+                '--------
+                serie = Diag.getSeriesPoint("Population", "Orange")
+                serie.Add(durchlauf, QN(0))
 
         End Select
 

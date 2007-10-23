@@ -53,22 +53,15 @@ Public MustInherit Class Sim
     Public Const Constraints_Ext As String = "CON"       'Erweiterung der Datei mit den Constraints (*.CON)
     Public Const Combi_Ext As String = "CES"             'Erweiterung der Datei mit der Kombinatorik  (*.CES)
 
-    'Structure für eine Abhängigkeit
-    '-------------------------------
-    Public Structure Struct_Abh
-        Public Beziehung As EvoKern.PES.Beziehung        'Beziehung
-        Public OptParam As String                        'Bezeichnung des OptParameters auf den sich die Abhängigkeit bezieht
-    End Structure
-
     'Optimierungsparameter
     '---------------------
     Public Structure Struct_OptParameter
-        '*| Bezeichnung | Einh. | Anfangsw. | Min | Max |
         Public Bezeichnung As String                        'Bezeichnung
         Public Einheit As String                            'Einheit
         Public Wert As Double                               'Parameterwert
         Public Min As Double                                'Minimum
         Public Max As Double                                'Maximum
+        Public Beziehung As EvoKern.PES.Beziehung           'Beziehung zum vorherigen OptParameter
         Public Property SKWert() As Double                  'skalierter Wert (0 bis 1)
             Get
                 SKWert = (Wert - Min) / (Max - Min)
@@ -78,7 +71,6 @@ Public MustInherit Class Sim
                 Wert = value * (Max - Min) + Min
             End Set
         End Property
-        Public Abh As Struct_Abh                            'Abhängigkeit
         Public Overrides Function toString() As String
             Return Bezeichnung
         End Function
@@ -90,7 +82,6 @@ Public MustInherit Class Sim
     'ModellParameter
     '---------------
     Public Structure Struct_ModellParameter
-        '*| OptParameter | Bezeichnung  | Einh. | Datei | Zeile | von | bis | Faktor |
         Public OptParameter As String               'Optimierungsparameter, aus dem dieser Modellparameter errechnet wird
         Public Bezeichnung As String                'Bezeichnung
         Public Einheit As String                    'Einheit
@@ -301,8 +292,6 @@ Public MustInherit Class Sim
         Call Me.Read_Constraints()
         'Optimierungsparameter einlesen
         Call Me.Read_OptParameter()
-        'Abhängigkeiten einlesen
-        Call Me.Read_OptAbhaengigkeiten()
         'ModellParameter einlesen
         Call Me.Read_ModellParameter()
         'Modell-/Optparameter validieren
@@ -364,8 +353,6 @@ Public MustInherit Class Sim
         '***************************************
         'Simulationsdaten einlesen
         Call Me.Read_SimParameter()
-        'Abhängigkeiten einlesen
-        Call Me.Read_OptAbhaengigkeiten()
         'Optimierungsparameter einlesen
         Call Me.Read_OptParameter()
         'ModellParameter einlesen
@@ -400,6 +387,11 @@ Public MustInherit Class Sim
     '******************************
     Private Sub Read_OptParameter()
 
+        'Format:
+        '*|--------------|-------|-----------|--------|--------|-----------|
+        '*| Bezeichnung  | Einh. | Anfangsw. |  Min   |  Max   | Beziehung |
+        '*|-<---------->-|-<--->-|-<------->-|-<---->-|-<---->-|-<------->-|
+
         Dim Datei As String = WorkDir & Datensatz & "." & OptParameter_Ext
 
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
@@ -423,6 +415,7 @@ Public MustInherit Class Sim
         FiStr.Seek(0, SeekOrigin.Begin)
 
         Dim array() As String
+        Dim Bez_str As String = ""
         Dim i As Integer = 0
         Do
             Zeile = StrRead.ReadLine.ToString()
@@ -434,6 +427,12 @@ Public MustInherit Class Sim
                 List_OptParameter(i).Wert = Convert.ToDouble(array(3).Trim())
                 List_OptParameter(i).Min = Convert.ToDouble(array(4).Trim())
                 List_OptParameter(i).Max = Convert.ToDouble(array(5).Trim())
+                'liegt eine Beziehung vor?
+                If (i > 0 And Not array(6).Trim() = "") Then
+                    Me.List_OptParameter(i).Beziehung = getBeziehung(array(6).Trim())
+                Else
+                    Me.List_OptParameter(i).Beziehung = EvoKern.PES.Beziehung.keine
+                End If
                 i += 1
             End If
         Loop Until StrRead.Peek() = -1
@@ -448,66 +447,10 @@ Public MustInherit Class Sim
 
     End Sub
 
-    'Abhängigkeiten einlesen
-    '***********************
-    Private Sub Read_OptAbhaengigkeiten()
-
-        Dim i As Integer
-        Dim Datei As String = WorkDir & Datensatz & "." & OptAbh_Ext
-
-        'Alle Abhängigkeiten zurücksetzen
-        For i = 0 To Me.List_OptParameter.GetUpperBound(0)
-            Me.List_OptParameter(i).Abh.OptParam = ""
-        Next
-
-        If (File.Exists(Datei)) Then
-
-            Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.Read)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-
-            Dim Zeile As String
-            Dim AnzAbh As Integer = 0
-
-            Dim OptPara1 As String = ""
-            Dim OptPara2 As String = ""
-            Dim Symbol As String = ""
-
-            Dim array() As String
-            Do
-                Zeile = StrRead.ReadLine.ToString()
-                If (Zeile.StartsWith("*") = False) Then
-                    array = Zeile.Split("|")
-                    'Werte einlesen
-                    OptPara1 = array(1).Trim()
-                    Symbol = array(2).Trim()
-                    OptPara2 = array(3).Trim()
-                End If
-                'Abhängigkeit in Struktur ablegen
-                For i = 0 To Me.List_OptParameter.GetUpperBound(0)
-                    If (Me.List_OptParameter(i).Bezeichnung = OptPara1) Then
-                        Me.List_OptParameter(i).Abh.Beziehung = getBeziehung(Symbol)
-                        Me.List_OptParameter(i).Abh.OptParam = OptPara2
-                        Exit For
-                    End If
-                Next
-            Loop Until StrRead.Peek() = -1
-
-            StrRead.Close()
-            FiStr.Close()
-
-            'OptParameter werden hier gesichert
-            For i = 0 To List_OptParameter.GetUpperBound(0)
-                Call copy_Struct_OptParameter(List_OptParameter(i), List_OptParameter_Save(i))
-            Next
-
-        End If
-
-    End Sub
-
     'String in der Form < >, <=, >= in Beziehung umwandeln
     '*****************************************************
-    Private Shared Function getBeziehung(ByVal symbol As String) As EvoKern.PES.Beziehung
-        Select Case symbol
+    Private Shared Function getBeziehung(ByVal bez_str As String) As EvoKern.PES.Beziehung
+        Select Case bez_str
             Case "<"
                 Return EvoKern.PES.Beziehung.kleiner
             Case "<="
@@ -517,13 +460,18 @@ Public MustInherit Class Sim
             Case ">="
                 Return EvoKern.PES.Beziehung.groessergleich
             Case Else
-                Throw New Exception("Beziehung '" & symbol & "' nicht erkannt!")
+                Throw New Exception("Beziehung '" & bez_str & "' nicht erkannt!")
         End Select
     End Function
 
     'Modellparameter einlesen
     '************************
     Private Sub Read_ModellParameter()
+
+        'Format:
+        '*|--------------|--------------|-------|-------|-------|-------|-----|-----|--------|
+        '*| OptParameter | Bezeichnung  | Einh. | Datei | Elem  | Zeile | von | bis | Faktor |
+        '*|-<---------->-|-<---------->-|-<--->-|-<--->-|-<--->-|-<--->-|-<->-|-<->-|-<---->-|       Dim Datei As String = WorkDir & Datensatz & "." & ModParameter_Ext
 
         Dim Datei As String = WorkDir & Datensatz & "." & ModParameter_Ext
 
@@ -1291,48 +1239,26 @@ Public MustInherit Class Sim
         Destination.Min = Source.Min
         Destination.Max = Source.Max
         Destination.SKWert = Source.SKWert
-        Destination.Abh = Source.Abh
+        Destination.Beziehung = Source.Beziehung
 
     End Sub
 
     'EVO-Parameterübergabe
     '*********************
-    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara() As Double, ByRef myparaAbh() as EvoKern.PES.Struct_Abh)
+    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara() As Double, ByRef beziehungen() As EvoKern.PES.Beziehung)
 
-        Dim i, j As Integer
+        Dim i As Integer
 
         'Anzahl Optimierungsparameter übergeben
         globalAnzPar = Me.List_OptParameter.GetLength(0)
 
-        'Parameterwerte übergeben
-        'BUG 135: mypara() fängt bei 1 an!
+        'Parameterwerte und Beziehungen übergeben
+        'BUG 135: mypara() und beziehungen() fangen bei 1 an!
         ReDim mypara(globalAnzPar)
+        ReDim beziehungen(globalAnzPar)
         For i = 1 To globalAnzPar
             mypara(i) = Me.List_OptParameter(i - 1).SKWert
-        Next
-
-        'Abhängigkeiten übergeben
-        '------------------------
-        'BUG 135: myparaAbh() fängt bei 1 an!
-        ReDim myparaAbh(globalAnzPar)
-        'Alle Abhängigkeiten zurücksetzen
-        For i = 1 To globalAnzPar
-            myparaAbh(i).ipara = 0
-        Next
-		'Abhängigkeiten durchlaufen und übertragen
-        For i = 0 To Me.List_OptParameter.GetUpperBound(0)
-            With Me.List_OptParameter(i)
-                If (Not .Abh.OptParam = "") Then
-                    'Referenzierten OptParameter finden
-                    For j = 0 To Me.List_OptParameter.GetUpperBound(0)
-                        If (Me.List_OptParameter(j).Bezeichnung = .Abh.OptParam) Then
-                            myparaAbh(i + 1).ipara = j + 1
-                            myparaAbh(i + 1).beziehung = .Abh.Beziehung
-                            Exit For
-                        End If
-                    Next
-                End If
-            End With
+            beziehungen(i) = Me.List_OptParameter(i - 1).Beziehung
         Next
 
         'Anzahl Optimierungsziele übergeben

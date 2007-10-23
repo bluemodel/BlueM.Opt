@@ -60,18 +60,12 @@ Public Class PES
     'Beziehung
     '--------------
     Public Enum Beziehung As Integer
+        keine = 0
         kleiner = 1
         kleinergleich = 2
         groesser = 3
         groessergleich = 4
     End Enum
-
-    'Structure für eine Abhängigkeit
-    '-------------------------------
-    Public Structure Struct_Abh
-        Public beziehung As Beziehung
-        Public ipara As Integer
-    End Structure
 
     'Structure zum Speichern der Werte die aus den OptDateien generiert werden
     Private Structure Struct_Initial
@@ -82,7 +76,7 @@ Public Class PES
         Dim Xn() As Double                  'aktuelle Variablenwerte (Dimension varanz)
         Dim Xmin() As Double                'untere Schranke (Dimension varanz)
         Dim Xmax() As Double                'Obere Schranke (Dimension varanz)
-        Dim Abh() As Struct_Abh             'Abhängigkeit
+        Dim Bez() As Beziehung              'Beziehungen
     End Structure
 
     Private Initial As Struct_Initial
@@ -226,7 +220,7 @@ Public Class PES
 
     'Schritt 2 -5 zum Initialisieren der PES
     '***************************************
-    Public Sub PesInitialise(ByRef PES_Settings As Struct_Settings, ByVal AnzPara As Short, ByVal AnzPenalty As Short, ByVal AnzConstr As Short, ByVal mypara() As Double, ByVal myparaAbh() As Struct_Abh)
+    Public Sub PesInitialise(ByRef PES_Settings As Struct_Settings, ByVal AnzPara As Short, ByVal AnzPenalty As Short, ByVal AnzConstr As Short, ByVal mypara() As Double, ByVal beziehungen() As Beziehung)
 
         '2. Schritt: PES - ES_OPTIONS
         'Optionen der Evolutionsstrategie werden übergeben
@@ -234,7 +228,7 @@ Public Class PES
 
         '3. Schritt: PES - ES_INI
         'Die öffentlichen dynamischen Arrays werden initialisiert (Dn, An, Xn, Xmin, Xmax), die Anzahl der Zielfunktionen wird festgelegt und Ausgangsparameter werden übergeben (War früher ES_Let Parameter)
-        Call EsDim(AnzPara, AnzPenalty, AnzConstr, mypara, myparaAbh)
+        Call EsDim(AnzPara, AnzPenalty, AnzConstr, mypara, beziehungen)
 
         '4. Schritt: PES - ES_PREPARE
         'Interne Variablen werden initialisiert, Zufallsgenerator wird initialisiert
@@ -310,7 +304,7 @@ Public Class PES
     'Schritt 3: ES_INI
     'Function ES_INI Initialisiert benötigte dynamische Arrays und legt Anzahl der Zielfunktionen fest
     '*************************************************************************************************
-    Private Sub EsDim(ByVal AnzPara As Short, ByVal AnzPenalty As Short, ByVal AnzConstr As Short, ByVal mypara() As Double, ByVal myparaAbh() as Struct_Abh)
+    Private Sub EsDim(ByVal AnzPara As Short, ByVal AnzPenalty As Short, ByVal AnzConstr As Short, ByVal mypara() As Double, ByVal beziehungen() As Beziehung)
         Dim i As Integer
 
         'Überprüfung der Eingabeparameter (es muss mindestens ein Parameter variiert und eine
@@ -325,19 +319,19 @@ Public Class PES
         Initial.NConstrains = AnzConstr                 'Anzahl der Randbedingungen wird übergeben
 
         ReDim Initial.Xn(Initial.varanz)                'Variablenvektor wird initialisiert
-        ReDim Initial.Abh(Initial.varanz)
+        ReDim Initial.Bez(Initial.varanz)
         ReDim Initial.Xmin(Initial.varanz)              'UntereSchrankenvektor wird initialisiert
         ReDim Initial.Xmax(Initial.varanz)              'ObereSchrankenvektor wird initialisiert
         ReDim Initial.Dn(Initial.varanz)                'Schrittweitenvektor wird initialisiert
 
         For i = 1 To Initial.varanz
             Initial.Xn(i) = mypara(i)
+            Initial.Bez(i) = beziehungen(i)
             Initial.Xmin(i) = 0
             Initial.Xmax(i) = 1
             'Welchen Zweck hat diese Prüfung hier. Die Grenzen sollten zu jeder Zeit eingehalten werden
             Initial.Xn(i) = Math.Min(Initial.Xn(i), Initial.Xmax(i))
             Initial.Xn(i) = Math.Max(Initial.Xn(i), Initial.Xmin(i))
-            Initial.Abh(i) = myparaAbh(i)
         Next
 
     End Sub
@@ -377,7 +371,7 @@ Public Class PES
             For i = 1 To PES_Settings.NEltern + PES_Settings.NNachf
                 ReDim NDSorting(i).penalty(Initial.NPenalty)
                 If Initial.NConstrains > 0 Then
-                    ReDim NDSorting(i).constrain(Initial.NConstrains)
+                	ReDim NDSorting(i).constrain(Initial.NConstrains)
                 End If
                 ReDim NDSorting(i).d(Initial.varanz)
                 ReDim NDSorting(i).X(Initial.varanz)
@@ -760,6 +754,8 @@ Public Class PES
     '******************************************
     Public Sub EsPopMutation()
 
+        'BUG 241: Beziehungen zwischen OptParas auf Populationsebene überprüfen!
+
         Dim v, n As Short
 
         If Not PES_Settings.isDnVektor Then
@@ -772,9 +768,7 @@ Public Class PES
         For v = 1 To Initial.varanz
 
             For n = 1 To PES_Settings.NEltern
-
                 Do
-
                     If PES_Settings.isDnVektor Then
                         '+/-1
                         expo = (2 * Int(Rnd() + 0.5) - 1)
@@ -788,7 +782,7 @@ Public Class PES
                     XeTemp = Xe(v, n, PES_iAkt.iAktPop) + DeTemp * Z
 
                     ' Restriktion für die mutierten Werte
-                Loop While (XeTemp <= Initial.Xmin(v) Or XeTemp > Initial.Xmax(v))
+                Loop While (XeTemp <= Initial.Xmin(v) Or XeTemp > Initial.Xmax(v) Or Not checkBeziehung(v, XeTemp))
 
                 De(v, n, PES_iAkt.iAktPop) = DeTemp
                 Xe(v, n, PES_iAkt.iAktPop) = XeTemp
@@ -803,7 +797,7 @@ Public Class PES
     '****************************************
     Public Sub EsMutation()
 
-        Dim v As Short
+        Dim v, i As Short
 
         If Not PES_Settings.isDnVektor Then
             '+/-1
@@ -813,7 +807,20 @@ Public Class PES
         End If
 
         For v = 1 To Initial.varanz
+            i = 0
             Do
+                i += 1
+                'Abbruchkriterium
+                If (i >= 1000) Then
+                    'Es konnte keine gültiger Parameter generiert werden!
+                    'Parameter zurücksetzen
+                    DnTemp = Initial.Dn(v)
+                    XnTemp = Initial.Xn(v)
+                    'Wieder von vorne anfangen
+                    i = 0
+                    v = 0
+                    Exit Do
+                End If
                 If PES_Settings.isDnVektor Then
                     '+/-1
                     expo = (2 * Int(Rnd() + 0.5) - 1)
@@ -826,7 +833,7 @@ Public Class PES
                 'Mutation wird durchgeführt
                 XnTemp = Initial.Xn(v) + DnTemp * Z
                 'Restriktion für die mutierten Werte
-            Loop While (XnTemp <= Initial.Xmin(v) Or XnTemp > Initial.Xmax(v) Or Not checkAbhaengigkeiten(v, XnTemp))
+            Loop While (XnTemp <= Initial.Xmin(v) Or XnTemp > Initial.Xmax(v) Or Not checkBeziehung(v, XnTemp))
 
             Initial.Dn(v) = DnTemp
             Initial.Xn(v) = XnTemp
@@ -1817,23 +1824,22 @@ Public Class PES
 
     End Sub
 
-    'Einen Parameterwert auf Einhaltung der Abhängigkeiten überprüfen
+    'Einen Parameterwert auf Einhaltung der Beziehung überprüfen
     '****************************************************************
-    Private Function checkAbhaengigkeiten(ByVal ipara As Integer, ByVal XNnTemp As Double) As Boolean
+    Private Function checkBeziehung(ByVal ipara As Integer, ByVal XnTemp As Double) As Boolean
 
-        'ipara ist der Index des zu überprüfenden Parameters
+        'ipara ist der Index des zu überprüfenden Parameters,
+        'XnTemp sein aktueller, zu überprüfender Wert
 
         Dim isOK As Boolean = False
 
-        Dim refpara As Integer = Initial.Abh(ipara).ipara
-
-        If (refpara = 0) Then
-            'Keine Abhängigkeit vorhanden
+        If (Initial.Bez(ipara) = Beziehung.keine) Then
+            'Keine Beziehung vorhanden
             isOK = True
         Else
             'Referenzierten Parameterwert vergleichen
-            Dim ref As Double = Initial.Xn(refpara)
-            Select Case Initial.Abh(ipara).beziehung
+            Dim ref As Double = Initial.Xn(ipara - 1)
+            Select Case Initial.Bez(ipara)
                 Case Beziehung.kleiner
                     If (XnTemp < ref) Then isOK = True
                 Case Beziehung.kleinergleich
