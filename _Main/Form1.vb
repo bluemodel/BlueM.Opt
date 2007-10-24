@@ -924,14 +924,27 @@ Partial Class Form1
                             EVO_Settings1.isSaved = False
                             Call EVO_Settings1.SetFor_CES_PES(1, n_eltern, 1)
 
+                            If n_eltern = 0 Then
+                                'Falls noch keine Eltern vorhanden sind
+                                ReDim CES1.List_Childs(i).Loc(j).Loc_Dn(CES1.List_Childs(i).Loc(j).Loc_Para.GetUpperBound(1))
+                                CES1.List_Childs(i).Loc(j).Loc_Dn(m) = EVO_Settings1.PES_Settings.DnStart
+                                For m = 0 To CES1.List_Childs(i).Loc(j).Loc_Para.GetUpperBound(1)
+                                    'Falls zufällige Startwerte
+                                    If EVO_Settings1.PES_Settings.iStartPar = Kern.EVO_STARTPARAMETER.Zufall Then
+                                        Randomize()
+                                        CES1.List_Childs(i).Loc(j).Loc_Para(1, m) = Rnd()
+                                    End If
+                                Next
+                            Else
+                                'Falls Eltern vorhanden sind Selektion, Reproduktion, Mutation
+                                Dim k As Integer = 0
+                                k = CES1.PES_Parents(0).iLocation
 
 
 
 
-                            Dim k As Integer = 0
-                            k = CES1.PES_Parents(0).iLocation
 
-
+                            End If
                         End If
                     Next
                 Next
