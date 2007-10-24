@@ -913,7 +913,7 @@ Partial Class Form1
                                 End If
                             Next
 
-                            '1. EVO_Settings zurücksetzen; 2. Die Settings werden auf Basis des Memory gesetzt
+                            'Die Anzahl der Eltern wird bestimmt
                             Dim n_eltern As Integer = 0
                             For m = 0 To CES1.PES_Parents.GetUpperBound(0)
                                 If j = CES1.PES_Parents(m).iLocation Then
@@ -921,14 +921,12 @@ Partial Class Form1
                                 End If
                             Next
 
-                            EVO_Settings1.isSaved = False
-                            Call EVO_Settings1.SetFor_CES_PES(1, n_eltern, 1)
-
+                            'Die Kinder bekommen je nach Fall (Eltern keine Eltern) neue Parameter
                             If n_eltern = 0 Then
                                 'Falls noch keine Eltern vorhanden sind
                                 ReDim CES1.List_Childs(i).Loc(j).Loc_Dn(CES1.List_Childs(i).Loc(j).Loc_Para.GetUpperBound(1))
-                                CES1.List_Childs(i).Loc(j).Loc_Dn(m) = EVO_Settings1.PES_Settings.DnStart
                                 For m = 0 To CES1.List_Childs(i).Loc(j).Loc_Para.GetUpperBound(1)
+                                    CES1.List_Childs(i).Loc(j).Loc_Dn(m) = EVO_Settings1.PES_Settings.DnStart
                                     'Falls zufällige Startwerte
                                     If EVO_Settings1.PES_Settings.iStartPar = Kern.EVO_STARTPARAMETER.Zufall Then
                                         Randomize()
@@ -936,6 +934,27 @@ Partial Class Form1
                                     End If
                                 Next
                             Else
+                                EVO_Settings1.isSaved = False
+                                Call EVO_Settings1.SetFor_CES_PES(1, n_eltern, 1)
+
+                                'Schritte 2 - 5 PES wird initialisiert (Weiteres siehe dort ;-)
+                                '**************************************************************
+                                Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, Method)
+
+                                'REPRODUKTIONSPROZESS - Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
+                                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                                Call PES1.EsVaria()
+
+                                'MUTATIONSPROZESS - Mutieren der Ausgangswerte
+                                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                                Call PES1.EsMutation()
+
+                                'Auslesen der Variierten Parameter
+                                myPara = PES1.EsGetParameter()
+
+
+
+
                                 'Falls Eltern vorhanden sind Selektion, Reproduktion, Mutation
                                 Dim k As Integer = 0
                                 k = CES1.PES_Parents(0).iLocation
@@ -1054,14 +1073,19 @@ Start_Evolutionsrunden:
         For PES1.PES_iAkt.iAktRunde = 1 To PES1.PES_Settings.NRunden
 
             Call EVO_Opt_Verlauf1.Runden(PES1.PES_iAkt.iAktRunde)
-            Call PES1.EsResetPopBWSpeicher()
+            Call PES1.EsResetPopBWSpeicher() 'Nur bei Komma Strategie
 
             'Über alle Populationen
             'xxxxxxxxxxxxxxxxxxxxxx
             For PES1.PES_iAkt.iAktPop = 1 To PES1.PES_Settings.NPopul
 
                 Call EVO_Opt_Verlauf1.Populationen(PES1.PES_iAkt.iAktPop)
+                'REPRODUKTIONSPROZESS - Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern der Population
+                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
                 Call PES1.EsPopVaria()
+
+                'MUTATIONSPROZESS - Mutieren der Ausgangswerte der Population
+                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
                 Call PES1.EsPopMutation()
 
                 'Über alle Generationen
@@ -1069,7 +1093,7 @@ Start_Evolutionsrunden:
                 For PES1.PES_iAkt.iAktGen = 1 To PES1.PES_Settings.NGen
 
                     Call EVO_Opt_Verlauf1.Generation(PES1.PES_iAkt.iAktGen)
-                    Call PES1.EsResetBWSpeicher()
+                    Call PES1.EsResetBWSpeicher()  'Nur bei Komma Strategie
 
                     'Über alle Nachkommen
                     'xxxxxxxxxxxxxxxxxxxxxxxxx
