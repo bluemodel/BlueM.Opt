@@ -88,7 +88,6 @@ Public Class PES
     Private Xbpop(,,) As Double             'Bestwertspeicher Variablenwerte für eine Population
     Private Dbpop(,,) As Double             'Bestwertspeicher Schrittweite für eine Population
     Private Qbpop(,) As Double              'Bestwertspeicher  für eine Population
-    Private QbpopD() As Double              'Bestwertspeicher Crowdings Distance  für eine Population
     '---------------------
     Private Xe(,,) As Double                'Elternwerte der Variablen
     Private De(,,) As Double                'Elternschrittweite
@@ -98,10 +97,10 @@ Public Class PES
     Private Qb(,,) As Double                'Bestwertspeicher für eine Generation
     Private Rb(,,) As Double                'Restriktionen für eine Generation
     '---------------------
-    Private SekundärQb() As Struct_NDSorting = {}   'Sekundäre Population
-    '---------------------
-    Private PenaltyDistance(,) As Double    'Array für normierte Raumabstände (Neighbourhood-Rekomb.)
     Private Distanceb() As Double           'Array mit Crowding-Distance (Neighbourhood-Rekomb.)
+    Private PenaltyDistance(,) As Double    'Array für normierte Raumabstände (Neighbourhood-Rekomb.)
+    '---------------------
+    Private SekundärQb() As Struct_NDSorting = {}   'Sekundäre Population
 
     Const galpha As Double = 1.3            'Faktor alpha=1.3 auf Generationsebene nach Rechenberg
     Const palpha As Double = 1.1            'Faktor alpha=1.1 auf Populationsebene nach Rechenberg
@@ -332,7 +331,6 @@ Public Class PES
         ReDim Dp(AktPara.varanz, PES_Settings.NEltern, PES_Settings.NPopEltern)
         ReDim Xp(AktPara.varanz, PES_Settings.NEltern, PES_Settings.NPopEltern)
         ReDim Qbpop(PES_Settings.NPopul, AktPara.NPenalty)
-        ReDim QbpopD(PES_Settings.NPopul)
         ReDim Dbpop(AktPara.varanz, PES_Settings.NEltern, PES_Settings.NPopul)
         ReDim Xbpop(AktPara.varanz, PES_Settings.NEltern, PES_Settings.NPopul)
         '---------------------
