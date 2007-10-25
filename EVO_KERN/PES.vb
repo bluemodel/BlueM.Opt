@@ -103,8 +103,6 @@ Public Class PES
     Private expo As Short                   'Exponent für Schrittweite (+/-1)
     Private DnTemp As Double                'Temporäre Schrittweite für Nachkomme
     Private XnTemp As Double                'Temporärer Parameterwert für Nachkomme
-    Private DeTemp As Double                'Temporäre Schrittweite für Elter
-    Private XeTemp As Double                'Temporäre Parameterwert für Elter
     Private PenaltyDistance(,) As Double    'Array für normierte Raumabstände (Neighbourhood-Rekomb.)
     Private Distanceb() As Double           'Array mit Crowding-Distance (Neighbourhood-Rekomb.)
 
@@ -630,7 +628,6 @@ Public Class PES
                         'Mittelung der Eltern,
                         AktPara.Xn(v) = AktPara.Xn(v) + (Xe(v, n, PES_iAkt.iAktPop) / PES_Settings.NRekombXY)
                     Next
-
                 Next v
 
             Case EVO_ELTERN.XY_Diskret 'Multi-Rekombination nach X/Y-Schema, diskrete Vertauschung
@@ -672,24 +669,20 @@ Public Class PES
                 For i = 1 To PES_Settings.NRekombXY
                     R = Int((PES_Settings.NEltern - (i - 1)) * Rnd()) + 1
                     Realisierungsspeicher(i) = Elternspeicher(R)
-
                     For j = R To (PES_Settings.NEltern - 1)
                         Elternspeicher(R) = Elternspeicher(R + 1)
                     Next j
-
                 Next i
 
                 For v = 1 To AktPara.varanz
                     AktPara.Dn(v) = 0
                     AktPara.Xn(v) = 0
-
                     For n = 1 To PES_Settings.NRekombXY
                         'Mittelung der Schrittweite,
                         AktPara.Dn(v) = AktPara.Dn(v) + (De(v, Elternspeicher(n), PES_iAkt.iAktPop) / PES_Settings.NRekombXY)
                         'Mittelung der Eltern,
                         AktPara.Xn(v) = AktPara.Xn(v) + (Xe(v, Elternspeicher(n), PES_iAkt.iAktPop) / PES_Settings.NRekombXY)
                     Next
-
                 Next v
 
             Case EVO_ELTERN.Neighbourhood 'Neighbourhood Rekombination
@@ -700,7 +693,6 @@ Public Class PES
                 Loop While Z1 = Z2
 
                 'Tournament über Crowding Distance
-
                 If Distanceb(Z1) > Distanceb(Z2) Then
                     Elter = Z1
                 Else
@@ -708,17 +700,14 @@ Public Class PES
                 End If
 
                 If (Elter = 1 Or Elter = PES_Settings.NEltern) Then
-
                     For v = 1 To AktPara.varanz
                         'Selektion der Schrittweite
                         AktPara.Dn(v) = De(v, Elter, PES_iAkt.iAktPop)
                         'Selektion des Elter
                         AktPara.Xn(v) = Xe(v, Elter, PES_iAkt.iAktPop)
                     Next
-
                 Else
                     Dim IndexEltern(PES_Settings.NEltern - 1) As Short          'Array mit Index der Eltern (Neighbourhood-Rekomb.)
-
                     Call Neighbourhood_Eltern(Elter, IndexEltern)
                     For v = 1 To AktPara.varanz
                         'Do
@@ -737,9 +726,7 @@ Public Class PES
                         'Selektion des Elter
                         AktPara.Xn(v) = Xe(v, IndexEltern(R), PES_iAkt.iAktPop)
                     Next
-
                 End If
-
         End Select
 
     End Sub
@@ -749,6 +736,8 @@ Public Class PES
     Public Sub EsPopMutation()
 
         Dim v, n As Short
+        Dim DeTemp As Double                'Temporäre Schrittweite für Elter
+        Dim XeTemp As Double                'Temporäre Parameterwert für Elter
 
         If Not PES_Settings.isDnVektor Then
             '+/-1
