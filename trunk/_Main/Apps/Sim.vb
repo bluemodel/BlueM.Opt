@@ -1986,12 +1986,12 @@ Public MustInherit Class Sim
         Dim i, j As Integer
         Dim bedingung As String
         Dim Sim_ID As Integer
-        For i = 1 To SekPop.GetUpperBound(0)    'BUG 135: SekPop(,) fängt bei 1 an!
+        For i = 0 To SekPop.GetUpperBound(0)
 
             'zugehörige Sim_ID bestimmen
             bedingung = ""
             For j = 0 To Me.List_OptZiele.GetUpperBound(0)
-                bedingung &= " AND QWerte.[" & Me.List_OptZiele(j).Bezeichnung & "] = " & SekPop(i, j + 1)
+                bedingung &= " AND QWerte.[" & Me.List_OptZiele(j).Bezeichnung & "] = " & SekPop(i, j)
             Next
             command.CommandText = "SELECT Sim.ID FROM Sim INNER JOIN QWerte ON Sim.ID = QWerte.Sim_ID WHERE (1=1" & bedingung & ")"
             Sim_ID = command.ExecuteScalar()
