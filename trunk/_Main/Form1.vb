@@ -761,9 +761,9 @@ Partial Class Form1
                         'Anzahl der Parameter bezieht sich hier nur auf eine Location
                         globalAnzPar = CES1.List_Childs(i).Loc(j).Loc_Para.GetLength(1)
 
-                        ReDim myPara(CES1.List_Childs(i).Loc(j).Loc_Para.GetLength(1))
+                        ReDim myPara(CES1.List_Childs(i).Loc(j).Loc_Para.GetUpperBound(1))
                         For m = 0 To CES1.List_Childs(i).Loc(j).Loc_Para.GetUpperBound(1)
-                            myPara(m + 1) = CES1.List_Childs(i).Loc(j).Loc_Para(1, m)
+                            myPara(m) = CES1.List_Childs(i).Loc(j).Loc_Para(1, m)
                         Next
                         '1. EVO_Settings zurücksetzen; 2. Die Settings werden für Hybrid gesetzt
                         EVO_Settings1.isSaved = False

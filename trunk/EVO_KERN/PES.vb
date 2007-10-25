@@ -206,6 +206,9 @@ Public Class PES
     '***************************************
     Public Sub PesInitialise(ByRef PES_Settings As Struct_Settings, ByVal AnzPara As Short, ByVal AnzPenalty As Short, ByVal AnzConstr As Short, ByRef mypara() As Double, ByVal Method As String)
 
+        'Setzt das Array Eins basiert
+        Call ChangeArrayBase(1, mypara)
+
         '2. Schritt: PES - ES_OPTIONS
         'Optionen der Evolutionsstrategie werden übergeben
         Call EsSettings(PES_Settings, Method)
@@ -470,6 +473,8 @@ Public Class PES
         For i = 1 To Initial.varanz
             mypara(i) = Initial.Xn(i)
         Next i
+		'Setzt das Array Null basiert
+        Call ChangeArrayBase(0, mypara)
 
         Return mypara
 
@@ -1804,5 +1809,20 @@ Public Class PES
 
     End Sub
 
+    'Setzt die Arrayy von Null basiert auf eins basiert oder umgekehrt
+    Private Sub ChangeArrayBase(ByVal Aim As Integer, ByRef Array() As Double)
+
+        If Aim = 0 Then
+            System.Array.Copy(Array, 1, Array, 0, Array.GetUpperBound(0))
+            ReDim Preserve Array(Array.GetUpperBound(0) - 1)
+        ElseIf Aim = 1 Then
+            ReDim Preserve Array(Array.GetLength(0))
+            System.Array.Copy(Array, 0, Array, 1, Array.GetUpperBound(0))
+            Array(0) = 0
+        Else
+            Throw New Exception("Das Array sollte entweder Null oder Eins als Basis haben")
+        End If
+
+    End Sub
 
 End Class

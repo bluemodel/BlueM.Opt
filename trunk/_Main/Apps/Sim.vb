@@ -1213,10 +1213,9 @@ Public MustInherit Class Sim
         globalAnzPar = Me.List_OptParameter.GetLength(0)
 
         'Parameterwerte übergeben
-        'BUG 135: mypara() fängt bei 1 an!
-        ReDim mypara(globalAnzPar)
-        For i = 1 To globalAnzPar
-            mypara(i) = Me.List_OptParameter(i - 1).SKWert
+        ReDim mypara(globalAnzPar - 1)
+        For i = 0 To globalAnzPar  - 1
+            mypara(i) = Me.List_OptParameter(i).SKWert
         Next
 
         'Anzahl Optimierungsziele übergeben
@@ -1235,12 +1234,7 @@ Public MustInherit Class Sim
 
         'Mutierte Parameter an OptParameter übergeben
         For i = 0 To Me.List_OptParameter.GetUpperBound(0)
-            If myPara.GetUpperBound(0) = List_OptParameter.GetUpperBound(0) + 1 Then
-                List_OptParameter(i).SKWert = myPara(i + 1)         'BUG 135: mypara() fängt bei 1 an!
-            Else
-                List_OptParameter(i).SKWert = myPara(i)
-            End If
-
+            List_OptParameter(i).SKWert = myPara(i)
         Next
 
         'Mutierte Parameter in Eingabedateien schreiben
