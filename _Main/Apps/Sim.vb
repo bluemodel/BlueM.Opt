@@ -1235,7 +1235,7 @@ Public MustInherit Class Sim
 
         'Mutierte Parameter an OptParameter übergeben
         For i = 0 To Me.List_OptParameter.GetUpperBound(0)
-            If myPara.GetUpperBound(0) = List_OptParameter.GetUpperBound(0) - 1 Then
+            If myPara.GetUpperBound(0) = List_OptParameter.GetUpperBound(0) + 1 Then
                 List_OptParameter(i).SKWert = myPara(i + 1)         'BUG 135: mypara() fängt bei 1 an!
             Else
                 List_OptParameter(i).SKWert = myPara(i)
