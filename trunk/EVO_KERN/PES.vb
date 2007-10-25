@@ -106,7 +106,6 @@ Public Class PES
     Private DeTemp As Double                'Temporäre Schrittweite für Elter
     Private XeTemp As Double                'Temporäre Parameterwert für Elter
     Private PenaltyDistance(,) As Double    'Array für normierte Raumabstände (Neighbourhood-Rekomb.)
-    Private IndexEltern() As Short          'Array mit Index der Eltern (Neighbourhood-Rekomb.)
     Private Distanceb() As Double           'Array mit Crowding-Distance (Neighbourhood-Rekomb.)
 
     Const galpha As Double = 1.3            'Faktor alpha=1.3 auf Generationsebene nach Rechenberg
@@ -361,7 +360,6 @@ Public Class PES
             Next i
             If PES_Settings.iOptEltern = EVO_ELTERN.Neighbourhood Then
                 ReDim PenaltyDistance(PES_Settings.NEltern, PES_Settings.NEltern)
-                ReDim IndexEltern(PES_Settings.NEltern - 1)
                 ReDim Distanceb(PES_Settings.NEltern)
             End If
         End If
@@ -716,8 +714,9 @@ Public Class PES
                     Next
 
                 Else
+                    Dim IndexEltern(PES_Settings.NEltern - 1) As Short          'Array mit Index der Eltern (Neighbourhood-Rekomb.)
 
-                    Call Neighbourhood_Eltern(Elter)
+                    Call Neighbourhood_Eltern(Elter, IndexEltern)
                     For v = 1 To Initial.varanz
                         'Do
                         '    Faktor = Rnd
@@ -1732,7 +1731,7 @@ Public Class PES
     'Neighbourhood_Eltern
     'Bestimme die NAnzahlEltern mit geringsten Raumabständen für Neighbourhood-Rekombination
     '***************************************************************************************
-    Private Sub Neighbourhood_Eltern(ByVal IndexElter As Short)
+    Private Sub Neighbourhood_Eltern(ByVal IndexElter As Short, ByRef IndexEltern() As Short)
 
         Dim i As Short
         Dim j As Short
