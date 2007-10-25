@@ -205,7 +205,7 @@ Public Class PES
     '***************************************
     Public Sub PesInitialise(ByRef PES_Settings As Struct_Settings, ByVal AnzPara As Short, ByVal AnzPenalty As Short, ByVal AnzConstr As Short, ByRef mypara() As Double, ByVal Method As String)
 
-        'Setzt das Array Eins basiert
+        'Bug 135: Array-Basis anpassen
         Call ChangeArrayBase(1, mypara)
 
         '2. Schritt: PES - ES_OPTIONS
@@ -471,7 +471,8 @@ Public Class PES
         For i = 1 To AktPara.varanz
             mypara(i) = AktPara.Xn(i)
         Next i
-        'Setzt das Array Null basiert
+
+        'Bug 135: Array-Basis anpassen
         Call ChangeArrayBase(0, mypara)
 
         Return mypara
@@ -517,12 +518,14 @@ Public Class PES
         '    Next j
         'Next i
 
-        ReDim SekPopulation(UBound(SekundärQb), AktPara.NPenalty)
+        'Bug 135: SekPopulation wird hier 0-basiert angelegt, weil es an Form1 übergeben wird
+
+        ReDim SekPopulation(UBound(SekundärQb) - 1, AktPara.NPenalty - 1)
         '!Wenn Fehler hier "SekundäreQb = Nothing" auftritt wurde TeeChart mit der falschen Serie bzw. zu wenig Serien gestartet!!!
 
         For i = 1 To UBound(SekundärQb)
             For j = 1 To AktPara.NPenalty
-                SekPopulation(i, j) = SekundärQb(i).penalty(j)
+                SekPopulation(i - 1, j - 1) = SekundärQb(i).penalty(j)
             Next j
         Next i
 
@@ -929,6 +932,11 @@ Public Class PES
     '*************************************************************
     Public Sub EsBest(ByVal QN() As Double, ByVal RN() As Double)
 
+        
+        'Bug 135: Array-Basis anpassen
+        Call ChangeArrayBase(1, QN)
+        Call ChangeArrayBase(1, RN)
+
         Dim m, i, j, v As Short
         Dim h As Double
 
@@ -949,8 +957,8 @@ Public Class PES
 
             'Falls die Qualität des aktuellen Nachkommen besser ist (Penaltyfunktion geringer)
             'als die schlechteste im Bestwertspeicher, wird dieser ersetzt
-            If QN(0) < Qb(j, PES_iAkt.iAktPop, 1) Then
-                Qb(j, PES_iAkt.iAktPop, 1) = QN(0)
+            If QN(1) < Qb(j, PES_iAkt.iAktPop, 1) Then
+                Qb(j, PES_iAkt.iAktPop, 1) = QN(1)
                 For v = 1 To AktPara.varanz
                     'Die Schrittweite wird ebenfalls übernommen
                     Db(v, j, PES_iAkt.iAktPop) = AktPara.Dn(v)
@@ -964,11 +972,11 @@ Public Class PES
             '----------------------
             With NDSorting(PES_iAkt.iAktNachf)
                 For i = 1 To AktPara.NPenalty
-                    .penalty(i) = QN(i - 1)             'Bug 135: .penalty fängt bei 1 an!
+                    .penalty(i) = QN(i)
                 Next i
                 .feasible = True
                 For i = 1 To AktPara.NConstrains
-                    .constrain(i) = RN(i - 1)           'Bug 135: .constrain fängt bei 1 an!
+                    .constrain(i) = RN(i)
                     If .constrain(i) < 0 Then .feasible = False
                 Next i
                 .dominated = False
@@ -1808,8 +1816,9 @@ Public Class PES
 
     End Sub
 
-    'Setzt die Arrayy von Null basiert auf eins basiert oder umgekehrt
-    Private Sub ChangeArrayBase(ByVal Aim As Integer, ByRef Array() As Double)
+    'Setzt ein Array von 0-basiert auf 1-basiert oder umgekehrt (Siehe Bug 135)
+    '**************************************************************************
+    Private Shared Sub ChangeArrayBase(ByVal Aim As Integer, ByRef Array() As Double)
 
         If Aim = 0 Then
             System.Array.Copy(Array, 1, Array, 0, Array.GetUpperBound(0))
