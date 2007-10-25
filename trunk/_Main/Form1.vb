@@ -1080,12 +1080,15 @@ Start_Evolutionsrunden:
             For PES1.PES_iAkt.iAktPop = 1 To PES1.PES_Settings.NPopul
 
                 Call EVO_Opt_Verlauf1.Populationen(PES1.PES_iAkt.iAktPop)
-                'REPRODUKTIONSPROZESS - Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern der Population
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                'POPULATIONS REPRODUKTIONSPROZESS
+                '################################
+                'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern der Population
                 Call PES1.EsPopVaria()
 
-                'MUTATIONSPROZESS - Mutieren der Ausgangswerte der Population
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                'POPULATIONS MUTATIONSPROZESS
+                '############################
+                'Mutieren der Ausgangswerte der Population
                 Call PES1.EsPopMutation()
 
                 'Über alle Generationen
@@ -1108,12 +1111,14 @@ Start_Evolutionsrunden:
                         Dim Eval_Count As Integer = 0
                         Dim SIM_Eval_is_OK As Boolean = True
                         Do
-                            'REPRODUKTIONSPROZESS - Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
-                            'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                            'REPRODUKTIONSPROZESS
+                            '####################
+                            'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
                             Call PES1.EsVaria()
 
-                            'MUTATIONSPROZESS - Mutieren der Ausgangswerte
-                            'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                            'MUTATIONSPROZESS
+                            '################
+                            'Mutieren der Ausgangswerte
                             Call PES1.EsMutation()
 
                             'Auslesen der Variierten Parameter
@@ -1199,6 +1204,8 @@ Start_Evolutionsrunden:
 
                         Loop While SIM_Eval_is_OK = False
 
+                        'SELEKTIONSPROZESS Schritt 1
+                        '###########################
                         'Einordnen der Qualitätsfunktion im Bestwertspeicher bei SO
                         'Falls MO Einordnen der Qualitätsfunktion in NDSorting
                         Call PES1.EsBest(QN, RN)
@@ -1206,8 +1213,9 @@ Start_Evolutionsrunden:
                         System.Windows.Forms.Application.DoEvents()
 
                     Next 'Ende Schleife über alle Nachkommen
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
+                    'SELEKTIONSPROZESS Schritt 2 für NDSorting sonst Xe = Xb
+                    '#######################################################
                     'Die neuen Eltern werden generiert
                     Call PES1.EsEltern()
 
@@ -1230,12 +1238,16 @@ Start_Evolutionsrunden:
                 'xxxxxxxxxxxxxxxxxxxxxxxxxxx
                 System.Windows.Forms.Application.DoEvents()
 
+                'POPULATIONS SELEKTIONSPROZESS  Schritt 1
+                '########################################
                 'Einordnen der Qualitätsfunktion im PopulationsBestwertspeicher
                 Call PES1.EsPopBest()
 
             Next 'Ende alle Populationen
             'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
+            'POPULATIONS SELEKTIONSPROZESS  Schritt 2
+            '########################################
             'Die neuen Populationseltern werden generiert
             Call PES1.EsPopEltern()
             System.Windows.Forms.Application.DoEvents()
