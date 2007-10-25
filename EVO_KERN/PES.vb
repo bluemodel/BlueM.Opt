@@ -100,7 +100,6 @@ Public Class PES
     '---------------------
     Private SekundärQb() As Struct_NDSorting = {}   'Sekundäre Population
     '---------------------
-    Private expo As Short                   'Exponent für Schrittweite (+/-1)
     Private PenaltyDistance(,) As Double    'Array für normierte Raumabstände (Neighbourhood-Rekomb.)
     Private Distanceb() As Double           'Array mit Crowding-Distance (Neighbourhood-Rekomb.)
 
@@ -736,6 +735,7 @@ Public Class PES
         Dim v, n As Short
         Dim DeTemp As Double                'Temporäre Schrittweite für Elter
         Dim XeTemp As Double                'Temporäre Parameterwert für Elter
+        Dim expo As Short                   'Exponent für Schrittweite (+/-1)
 
         If Not PES_Settings.isDnVektor Then
             '+/-1
@@ -781,6 +781,7 @@ Public Class PES
         Dim v As Short
         Dim DnTemp As Double                'Temporäre Schrittweite für Nachkomme
         Dim XnTemp As Double                'Temporärer Parameterwert für Nachkomme
+        Dim expo As Short                   'Exponent für Schrittweite (+/-1)
 
         If Not PES_Settings.isDnVektor Then
             '+/-1
