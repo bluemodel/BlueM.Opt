@@ -1282,7 +1282,7 @@ Start_Evolutionsrunden:
             Dim serie3D As Steema.TeeChart.Styles.Points3D
             serie3D = DForm.Diag.getSeries3DPoint("Sekundäre Population", "Green")
             serie3D.Clear()
-            For i = 0 To SekPop.GetUpperBound(1)
+            For i = 0 To SekPop.GetUpperBound(0)
                 serie3D.Add(SekPop(i, 0), SekPop(i, 1), SekPop(i, 2))
             Next i
         End If
