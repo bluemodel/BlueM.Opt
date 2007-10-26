@@ -943,7 +943,7 @@ Partial Class Form1
 
                                 'REPRODUKTIONSPROZESS - Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
                                 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-                                Call PES1.EsVaria()
+                                Call PES1.EsReproduktion()
 
                                 'MUTATIONSPROZESS - Mutieren der Ausgangswerte
                                 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -1002,12 +1002,12 @@ Partial Class Form1
                 'Hier werden Child die passenden Elemente zugewiesen
                 Dim j As Integer
                 For j = 0 To CES1.n_Locations - 1
-                    Call Sim1.Identify_Measures_Elements_Parameters(j, CES1.List_Childs(i).Path(j), ces1.List_Childs(i).Measures(j), CES1.List_Childs(i).Loc(j).Loc_Elem, CES1.List_Childs(i).Loc(j).Loc_Para)
+                    Call Sim1.Identify_Measures_Elements_Parameters(j, CES1.List_Childs(i).Path(j), CES1.List_Childs(i).Measures(j), CES1.List_Childs(i).Loc(j).Loc_Elem, CES1.List_Childs(i).Loc(j).Loc_Para)
                 Next
 
                 'Reduktion der OptimierungsParameter und immer dann wenn nicht Nullvariante
                 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-                If Sim1.Reduce_OptPara_and_ModPara(ces1.List_Childs(i).All_Elem) Then
+                If Sim1.Reduce_OptPara_and_ModPara(CES1.List_Childs(i).All_Elem) Then
 
                     'Parameterübergabe an PES
                     '************************
@@ -1084,7 +1084,7 @@ Start_Evolutionsrunden:
                 'POPULATIONS REPRODUKTIONSPROZESS
                 '################################
                 'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern der Population
-                Call PES1.EsPopVaria()
+                Call PES1.EsPopReproduktion()
 
                 'POPULATIONS MUTATIONSPROZESS
                 '############################
@@ -1114,7 +1114,7 @@ Start_Evolutionsrunden:
                             'REPRODUKTIONSPROZESS
                             '####################
                             'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
-                            Call PES1.EsVaria()
+                            Call PES1.EsReproduktion()
 
                             'MUTATIONSPROZESS
                             '################

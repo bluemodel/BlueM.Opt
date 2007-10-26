@@ -87,7 +87,7 @@ Public Class PES
     '----------------------
     Private Xbpop(,,) As Double             'Bestwertspeicher Variablenwerte für eine Population
     Private Dbpop(,,) As Double             'Bestwertspeicher Schrittweite für eine Population
-    Private Qbpop(,) As Double              'Bestwertspeicher  für eine Population
+    Private Qbpop(,) As Double              'Bestwertspeicher für eine Population
     '---------------------
     Private Xe(,,) As Double                'Elternwerte der Variablen
     Private De(,,) As Double                'Elternschrittweite
@@ -104,7 +104,6 @@ Public Class PES
 
     Const galpha As Double = 1.3            'Faktor alpha=1.3 auf Generationsebene nach Rechenberg
     Const palpha As Double = 1.1            'Faktor alpha=1.1 auf Populationsebene nach Rechenberg
-
 
     'Deklarationsteil für Non-Dominated Sorting
     '******************************************
@@ -529,7 +528,7 @@ Public Class PES
 
     'ES_POP_VARIA - REPRODUKTIONSPROZESS - ToDo: Beschreibung fehlt
     '*******************************************************************************
-    Public Sub EsPopVaria()
+    Public Sub EsPopReproduktion()
 
         Dim m, n, v As Short
         Dim R As Short                      'Zufälliger Integer Wert
@@ -580,7 +579,7 @@ Public Class PES
 
     'ES_VARIA - REPRODUKTIONSPROZESS - Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
     '*************************************************************************************************
-    Public Sub EsVaria()
+    Public Sub EsReproduktion()
 
         Dim i, v, n, j As Short
         Dim R As Short                      'Zufälliger Integer Wert
@@ -920,7 +919,6 @@ Public Class PES
     '*************************************************************
     Public Sub EsBest(ByVal QN() As Double, ByVal RN() As Double)
 
-        
         'Bug 135: Array-Basis anpassen
         Call ChangeArrayBase(1, QN)
         Call ChangeArrayBase(1, RN)
