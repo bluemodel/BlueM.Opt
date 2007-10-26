@@ -1267,7 +1267,7 @@ Start_Evolutionsrunden:
         Dim i As Short
         Dim serie As Steema.TeeChart.Styles.Series
 
-        If (SekPop.GetLength(2) = 2) Then
+        If (SekPop.GetLength(1) = 2) Then
             '2 Zielfunktionen
             '----------------------------------------------------------------
             serie = DForm.Diag.getSeriesPoint("Sekundäre Population", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
@@ -1276,7 +1276,7 @@ Start_Evolutionsrunden:
                 serie.Add(SekPop(i, 0), SekPop(i, 1), "")
             Next i
 
-        ElseIf (SekPop.GetLength(2) >= 3) Then
+        ElseIf (SekPop.GetLength(1) >= 3) Then
             '3 oder mehr Zielfunktionen (es werden die ersten drei angezeigt)
             '----------------------------------------------------------------
             Dim serie3D As Steema.TeeChart.Styles.Points3D
