@@ -118,7 +118,7 @@ Public Class PES
         Dim distance As Double              '08 Distanzwert für Crowding distance sort
 
         'Überladene Methode um ein NDSorting zu Dimensionieren
-        Public Sub Dimit(ByVal NPenalty As Integer, ByVal NConstrains As Integer, ByVal varanz As Integer, ByRef TMP As Struct_NDSorting)
+        Public Sub Dimit(ByVal NPenalty As Integer, ByVal NConstrains As Integer, ByVal NPara As Integer, ByRef TMP As Struct_NDSorting)
             Dim i As Integer
 
             'Bug 135
@@ -134,12 +134,12 @@ Public Class PES
             TMP.feasible = False                             '03 Gültiges Ergebnis
             TMP.dominated = False                            '04 Kennzeichnung ob dominiert
             TMP.Front = 0                                    '05 Nummer der Pareto Front
-            ReDim TMP.X(varanz)                              '06 Wert der Variablen
+            ReDim TMP.X(NPara)                              '06 Wert der Variablen
             'Bug 135:
             For i = 1 To TMP.X.GetUpperBound(0)
                 TMP.X(i) = 0
             Next
-            ReDim TMP.d(varanz)                              '07 Schrittweite der Variablen
+            ReDim TMP.d(NPara)                              '07 Schrittweite der Variablen
             'Bug 135:
             For i = 1 To TMP.d.GetUpperBound(0)
                 TMP.d(i) = 0
