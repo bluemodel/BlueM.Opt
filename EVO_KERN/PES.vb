@@ -148,12 +148,12 @@ Public Class PES
         End Sub
 
         'Überladene Methode um ein Array aus NDSorting zu Dimensionieren
-        Public Sub Dimit(ByVal NPenalty As Integer, ByVal NConstrains As Integer, ByVal varanz As Integer, ByRef TMP() As Struct_NDSorting)
+        Public Sub Dimit(ByVal NPenalty As Integer, ByVal NConstrains As Integer, ByVal NPara As Integer, ByRef TMP() As Struct_NDSorting)
             Dim i As Integer
 
             'Bug 135
             For i = 1 To TMP.GetUpperBound(0)
-                Call Dimit(NPenalty, NConstrains, varanz, TMP(i))
+                Call Dimit(NPenalty, NConstrains, NPara, TMP(i))
             Next
 
         End Sub
