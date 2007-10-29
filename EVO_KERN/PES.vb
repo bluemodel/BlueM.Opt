@@ -1633,7 +1633,6 @@ Public Class PES
         Next i
 
         d_mean = d_mean / PES_Settings.NEltern
-
         NDS_Crowding_Distance_Count = 0
 
         For i = 1 To PES_Settings.NEltern - 1
@@ -1641,7 +1640,6 @@ Public Class PES
         Next i
 
         NDS_Crowding_Distance_Count = NDS_Crowding_Distance_Count / PES_Settings.NEltern
-
         NDS_Crowding_Distance_Count = System.Math.Sqrt(NDS_Crowding_Distance_Count)
 
         Spannweite = 0
@@ -1682,26 +1680,18 @@ Public Class PES
         ReDim TempDistance(AktPara.NPenalty)
 
         For i = 1 To PES_Settings.NEltern
-
             PenaltyDistance(i, i) = 0
-
             For j = i + 1 To PES_Settings.NEltern
-
                 PenaltyDistance(i, j) = 0
-
                 For k = 1 To AktPara.NPenalty
-
                     TempDistance(k) = Qb(i, PES_iAkt.iAktPop, k) - Qb(j, PES_iAkt.iAktPop, k)
                     TempDistance(k) = TempDistance(k) '/ MinMax(k)
                     TempDistance(k) = TempDistance(k) * TempDistance(k)
-
                     PenaltyDistance(i, j) = PenaltyDistance(i, j) + TempDistance(k)
                 Next k
-
                 PenaltyDistance(i, j) = System.Math.Sqrt(PenaltyDistance(i, j))
                 'Die obere Diagonale wird eigentlich nicht benötigt - dient nur der Sicherheit, falls Indizes vertauscht werden!!!
                 PenaltyDistance(j, i) = PenaltyDistance(i, j)
-
             Next j
         Next i
 
