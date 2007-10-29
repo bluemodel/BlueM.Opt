@@ -1578,9 +1578,6 @@ Public Class PES
         For i = start To ende
             For j = start To ende
                 If (NDSorting(i).distance > NDSorting(j).distance) Then
-
-                    'Call swap.NDSorting_Copy(NDSorting(i), swap)
-
                     Call swap.Copy(NDSorting(i), swap)
                     Call swap.Copy(NDSorting(j), NDSorting(i))
                     Call swap.Copy(swap, NDSorting(j))
