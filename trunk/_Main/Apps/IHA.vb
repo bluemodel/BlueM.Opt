@@ -318,7 +318,7 @@ Public Class IHA
         '-------------------------
         Dim SimReihe As New Wave.Zeitreihe(Me.IHAZiel.SimGr)
         Dim WEL As New Wave.WEL(WELFile, Me.IHAZiel.SimGr)
-        SimReihe = WEL.Read_WEL()(0)
+        SimReihe = WEL.Zeitreihen(0)
 
         'Simulationsreihe entsprechend kürzen
         SimReihe.cut(New DateTime(Me.BeginPost_sim - 1, 10, 1), New DateTime(Me.EndPost_sim, 9, 30))

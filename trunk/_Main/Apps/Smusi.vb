@@ -119,7 +119,7 @@ Public Class Smusi
         Dim SimReihe As New Wave.Zeitreihe(OptZiel.SimGr)
         Dim datei As String = OptZiel.SimGr.Substring(0, 4) & "_WEL.ASC"
         Dim WEL As New Wave.WEL(WorkDir & datei, OptZiel.SimGr)
-        SimReihe = WEL.Read_WEL()(0)
+        SimReihe = WEL.Zeitreihen(0)
 
         'Fallunterscheidung Zieltyp
         '--------------------------
