@@ -48,9 +48,15 @@ Public Class BlueM
 
         Call MyBase.New()
 
-        If (Me.isDll) Then
-            'BlueM DLL instanzieren
-            bluem_dll = New BlueM_EngineDotNetAccess(Me.Dll)
+        'BlueM DLL instanzieren
+        '----------------------
+        Dim dll_path As String
+        dll_path = System.Windows.Forms.Application.StartupPath() & "\Apps\BlueM.dll"
+
+        If (File.Exists(dll_path)) Then
+            bluem_dll = New BlueM_EngineDotNetAccess(dll_path)
+        Else
+            Throw New Exception("BlueM.dll nicht gefunden!")
         End If
 
     End Sub
@@ -277,77 +283,30 @@ Public Class BlueM
 
         Dim simOK As Boolean
 
-        If (Not Me.isDll) Then
+        Try
 
-            'Als EXE simulieren
-            'xxxxxxxxxxxxxxxxxx
+            Call bluem_dll.Initialize(Me.WorkDir & Me.Datensatz)
 
-            'Aktuelles Verzeichnis bestimmen
-            Dim currentDir As String = CurDir()
-            'zum Arbeitsverzeichnis wechseln
-            ChDrive(WorkDir)
-            ChDir(WorkDir)
-            'EXE aufrufen
-            Dim ProcID As Integer = Shell("""" & Exe & """ " & Datensatz, AppWinStyle.MinimizedNoFocus, True)
-            'zurück ins Ausgangsverzeichnis wechseln
-            ChDrive(currentDir)
-            ChDir(currentDir)
+            'Simulationszeitraum 
+            Do While (BlueM_EngineDotNetAccess.DateTime(bluem_dll.GetCurrentTime) <= SimEnde)
+                Call bluem_dll.PerformTimeStep()
+            Loop
 
-            'überprüfen, ob Simulation erfolgreich
-            '-------------------------------------
-            If (File.Exists(WorkDir & "$FEHL.TMP")) Then
+            'Simulation erfolgreich
+            simOK = True
 
-                'Simulationsfehler aufgetreten
-                simOK = False
+        Catch ex As Exception
 
-                Dim DateiInhalt As String = ""
-                Dim FiStr As FileStream = New FileStream(WorkDir & "$fehl.tmp", FileMode.Open, IO.FileAccess.Read)
-                Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-                Do
-                    DateiInhalt = DateiInhalt & Chr(13) & Chr(10) & StrRead.ReadLine.ToString
-                Loop Until StrRead.Peek() = -1
+            'Simulationsfehler aufgetreten
+            MsgBox(ex.Message, MsgBoxStyle.Exclamation, "BlueM")
+            simOK = False
 
-                MsgBox("BlueM hat einen Fehler zurückgegeben:" & Chr(13) & Chr(10) & DateiInhalt, MsgBoxStyle.Exclamation, "BlueM")
+        Finally
 
-            Else
-                'Simulation erfolgreich
-                simOK = True
-            End If
+            Call bluem_dll.Finish()
+            Call bluem_dll.Dispose()
 
-
-        Else
-
-            'Als DLL simulieren
-            'xxxxxxxxxxxxxxxxxx
-
-            Try
-
-                Call bluem_dll.Initialize(Me.WorkDir & Me.Datensatz)
-
-                Dim SimEnde As DateTime = BlueM_EngineDotNetAccess.DateTime(bluem_dll.GetSimulationEndDate())
-
-                'Simulationszeitraum 
-                Do While (BlueM_EngineDotNetAccess.DateTime(bluem_dll.GetCurrentTime) <= SimEnde)
-                    Call bluem_dll.PerformTimeStep()
-                Loop
-
-                'Simulation erfolgreich
-                simOK = True
-
-            Catch ex As Exception
-
-                'Simulationsfehler aufgetreten
-                MsgBox(ex.Message, MsgBoxStyle.Exclamation, "BlueM")
-                simOK = False
-
-            Finally
-
-                Call bluem_dll.Finish()
-                Call bluem_dll.Dispose()
-
-            End Try
-
-        End If
+        End Try
 
         'Bei IHA-Berechnung jetzt IHA-Software ausführen
         '-----------------------------------------------
@@ -372,7 +331,7 @@ Public Class BlueM
         'Simulationsergebnis auslesen
         Dim SimReihe As New Wave.Zeitreihe(OptZiel.SimGr)
         Dim WEL As New Wave.WEL(WorkDir & Datensatz & ".wel", OptZiel.SimGr)
-        SimReihe = WEL.Read_WEL()(0)
+        SimReihe = WEL.Zeitreihen(0)
 
         'Fallunterscheidung Zieltyp
         '--------------------------

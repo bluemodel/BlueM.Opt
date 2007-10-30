@@ -24,7 +24,7 @@ Partial Public Class Scatterplot
 
     End Sub
 
-    Public Sub zeichnen(ByVal OptResult As Main.OptResult)
+    Public Sub zeichnen(ByVal OptResult As EVO.OptResult)
 
         'Matrix dimensionieren
         Me.dimensionieren(OptResult.Solutions(0).QWerte.GetLength(0))
@@ -46,7 +46,7 @@ Partial Public Class Scatterplot
                         .Aspect.View3D = False
                         .Legend.Visible = False
                         AddHandler .DoubleClick, AddressOf Me.ShowEditor
-                        
+
                         'Achsen
                         '------
                         Dim xAchse As String = OptResult.List_OptZiele(i).Bezeichnung

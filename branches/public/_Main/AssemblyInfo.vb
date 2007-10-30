@@ -10,11 +10,11 @@ Imports System.Runtime.InteropServices
 ' TODO: Werte der Assemblyattribute überprüfen
 
 
-<Assembly: AssemblyTitle("Evolutionsstrategie")>
+<Assembly: AssemblyTitle("EVO.NET")> 
 <Assembly: AssemblyDescription("")>
-<Assembly: AssemblyCompany("IHWB, TU Darmstadt")>
+<Assembly: AssemblyCompany("IHWB")> 
 <Assembly: AssemblyProduct("")>
-<Assembly: AssemblyCopyright("")>
+<Assembly: AssemblyCopyright("IHWB, TU Darmstadt")> 
 <Assembly: AssemblyTrademark("")>
 <Assembly: AssemblyCulture("")>
 

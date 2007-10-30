@@ -19,6 +19,7 @@ Partial Class Scatterplot
     'Das Bearbeiten mit dem Code-Editor ist nicht möglich.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Scatterplot))
         Me.matrix = New System.Windows.Forms.TableLayoutPanel
         Me.SuspendLayout()
         '
@@ -36,6 +37,7 @@ Partial Class Scatterplot
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(800, 800)
         Me.Controls.Add(Me.matrix)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "Scatterplot"
         Me.Text = "Scatterplot"
         Me.ResumeLayout(False)

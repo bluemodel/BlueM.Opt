@@ -1,8 +1,10 @@
+Imports IHWB.EVO.Kern
+
 Public Class Testprobleme
     Inherits System.Windows.Forms.UserControl
 
     Private IsInitializing As Boolean
-    Public OptModus As Short
+    Public OptModus As EVO_MODUS
     Event Testproblem_Changed(ByVal sender As Object, ByVal e As System.EventArgs)
 
     Private Sub Testprobleme_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
@@ -34,34 +36,34 @@ Public Class Testprobleme
             Select Case Combo_Testproblem.Text
                 Case "Sinus-Funktion"
                     Problem_SinusFunktion.BringToFront()
-                    OptModus = 0
+                    OptModus = EVO_MODUS.Single_Objective
                 Case "Beale-Problem"
                     Problem_BealeProblem.BringToFront()
-                    OptModus = 0
+                    OptModus = EVO_MODUS.Single_Objective
                 Case "Schwefel 2.4-Problem"
                     Problem_Schwefel24.BringToFront()
-                    OptModus = 0
+                    OptModus = EVO_MODUS.Single_Objective
                 Case "Deb 1"
                     Problem_D1Funktion.BringToFront()
-                    OptModus = 1
+                    OptModus = EVO_MODUS.Multi_Objective
                 Case "Zitzler/Deb T1"
                     Problem_T1Funktion.BringToFront()
-                    OptModus = 1
+                    OptModus = EVO_MODUS.Multi_Objective
                 Case "Zitzler/Deb T2"
                     Problem_T2Funktion.BringToFront()
-                    OptModus = 1
+                    OptModus = EVO_MODUS.Multi_Objective
                 Case "Zitzler/Deb T3"
                     Problem_T3Funktion.BringToFront()
-                    OptModus = 1
+                    OptModus = EVO_MODUS.Multi_Objective
                 Case "Zitzler/Deb T4"
                     Problem_T4Funktion.BringToFront()
-                    OptModus = 1
+                    OptModus = EVO_MODUS.Multi_Objective
                 Case "CONSTR"
                     Problem_CONSTRFunktion.BringToFront()
-                    OptModus = 1
+                    OptModus = EVO_MODUS.Multi_Objective
                 Case "Box"
                     Problem_TKNFunktion.BringToFront()
-                    OptModus = 1
+                    OptModus = EVO_MODUS.Multi_Objective
             End Select
 
             RaiseEvent Testproblem_Changed(sender, e) 'wird in Form1 von IniApp() verarbeitet
@@ -84,8 +86,8 @@ Public Class Testprobleme
                 globalAnzPar = CShort(globAnzPar_Sin)
                 globalAnzZiel = 1
                 globalAnzRand = 0
-                ReDim mypara(globalAnzPar)
-                For i = 1 To globalAnzPar
+                ReDim mypara(globalAnzPar - 1)
+                For i = 0 To globalAnzPar - 1
                     mypara(i) = 0
                 Next
 
@@ -93,16 +95,16 @@ Public Class Testprobleme
                 globalAnzPar = 2
                 globalAnzZiel = 1
                 globalAnzRand = 0
-                ReDim mypara(globalAnzPar)
+                ReDim mypara(globalAnzPar - 1)
+                mypara(0) = 0.5
                 mypara(1) = 0.5
-                mypara(2) = 0.5
 
             Case "Schwefel 2.4-Problem" 'xi = [-10,10]
                 globalAnzPar = CShort(globAnzPar_Schw)
                 globalAnzZiel = 1
                 globalAnzRand = 0
-                ReDim mypara(globalAnzPar)
-                For i = 1 To globalAnzPar
+                ReDim mypara(globalAnzPar - 1)
+                For i = 0 To globalAnzPar - 1
                     mypara(i) = 1
                 Next i
 
@@ -110,18 +112,18 @@ Public Class Testprobleme
                 globalAnzPar = 2
                 globalAnzZiel = 2
                 globalAnzRand = 0
-                ReDim mypara(globalAnzPar)
+                ReDim mypara(globalAnzPar - 1)
                 Randomize()
+                mypara(0) = Rnd()
                 mypara(1) = Rnd()
-                mypara(2) = Rnd()
 
             Case "Zitzler/Deb T1" 'xi = [0,1]
                 globalAnzPar = 30
                 globalAnzZiel = 2
                 globalAnzRand = 0
-                ReDim mypara(globalAnzPar)
+                ReDim mypara(globalAnzPar - 1)
                 Randomize()
-                For i = 1 To globalAnzPar
+                For i = 0 To globalAnzPar - 1
                     mypara(i) = Rnd()
                 Next i
 
@@ -129,9 +131,9 @@ Public Class Testprobleme
                 globalAnzPar = 30
                 globalAnzZiel = 2
                 globalAnzRand = 0
-                ReDim mypara(globalAnzPar)
+                ReDim mypara(globalAnzPar - 1)
                 Randomize()
-                For i = 1 To globalAnzPar
+                For i = 0 To globalAnzPar - 1
                     mypara(i) = Rnd()
                 Next i
 
@@ -139,9 +141,9 @@ Public Class Testprobleme
                 globalAnzPar = 15
                 globalAnzZiel = 2
                 globalAnzRand = 0
-                ReDim mypara(globalAnzPar)
+                ReDim mypara(globalAnzPar - 1)
                 Randomize()
-                For i = 1 To globalAnzPar
+                For i = 0 To globalAnzPar - 1
                     mypara(i) = Rnd()
                 Next i
 
@@ -149,9 +151,9 @@ Public Class Testprobleme
                 globalAnzPar = 10
                 globalAnzZiel = 2
                 globalAnzRand = 0
-                ReDim mypara(globalAnzPar)
+                ReDim mypara(globalAnzPar - 1)
                 Randomize()
-                For i = 1 To globalAnzPar
+                For i = 0 To globalAnzPar - 1
                     mypara(i) = Rnd()
                 Next i
 
@@ -159,20 +161,20 @@ Public Class Testprobleme
                 globalAnzPar = 2
                 globalAnzZiel = 2
                 globalAnzRand = 2
-                ReDim mypara(globalAnzPar)
+                ReDim mypara(globalAnzPar - 1)
                 Randomize()
+                mypara(0) = Rnd()
                 mypara(1) = Rnd()
-                mypara(2) = Rnd()
 
             Case "Box"
                 globalAnzPar = 3
                 globalAnzZiel = 3
                 globalAnzRand = 2
-                ReDim mypara(globalAnzPar)
+                ReDim mypara(globalAnzPar - 1)
                 Randomize()
+                mypara(0) = Rnd()
                 mypara(1) = Rnd()
                 mypara(2) = Rnd()
-                mypara(3) = Rnd()
 
         End Select
 
@@ -180,7 +182,7 @@ Public Class Testprobleme
 
 #Region "Diagrammfunktionen"
 
-    Public Sub DiagInitialise(ByVal PES_Settings As EvoKern.PES.Struct_Settings, ByVal globalAnzPar As Integer, ByRef Diag As Main.Diagramm)
+    Public Sub DiagInitialise(ByVal PES_Settings As EVO.Kern.PES.Struct_Settings, ByVal globalAnzPar As Integer, ByRef Diag As EVO.Diagramm)
 
         Select Case Me.Combo_Testproblem.Text
 
@@ -205,7 +207,7 @@ Public Class Testprobleme
 
     'Diagramm für Sinus-Funktion initialisieren
     '*******************************************
-    Private Sub DiagInitialise_SinusFunktion(ByVal globalAnzPar As Short, ByRef Diag As Main.Diagramm)
+    Private Sub DiagInitialise_SinusFunktion(ByVal globalAnzPar As Short, ByRef Diag As EVO.Diagramm)
 
         Dim array_x() As Double = {}
         Dim array_y() As Double = {}
@@ -251,7 +253,7 @@ Public Class Testprobleme
 
     'Diagramm für Beale-Problem initialisieren
     '*****************************************
-    Private Sub DiagInitialise_BealeProblem(ByVal PES_Settings As EvoKern.PES.Struct_Settings, ByVal globalAnzPar As Short, ByRef Diag As Main.Diagramm)
+    Private Sub DiagInitialise_BealeProblem(ByVal PES_Settings As EVO.Kern.PES.Struct_Settings, ByVal globalAnzPar As Short, ByRef Diag As EVO.Diagramm)
 
         Dim array_x() As Double = {}
         Dim array_y() As Double = {}
@@ -303,7 +305,7 @@ Public Class Testprobleme
 
     'Diagramm für Schwefel-Problem initialisieren
     '********************************************
-    Private Sub DiagInitialise_SchwefelProblem(ByVal PES_Settings As EvoKern.PES.Struct_Settings, ByVal globalAnzPar As Short, ByRef Diag As Main.Diagramm)
+    Private Sub DiagInitialise_SchwefelProblem(ByVal PES_Settings As EVO.Kern.PES.Struct_Settings, ByVal globalAnzPar As Short, ByRef Diag As EVO.Diagramm)
 
         Dim array_x() As Double = {}
         Dim array_y() As Double = {}
@@ -365,7 +367,7 @@ Public Class Testprobleme
 
     'Diagramm für MultiObjective-Probleme initialisieren
     '***************************************************
-    Private Sub DiagInitialise_MultiTestProb(ByVal PES_Settings As EvoKern.PES.Struct_Settings, ByRef Diag As Main.Diagramm)
+    Private Sub DiagInitialise_MultiTestProb(ByVal PES_Settings As EVO.Kern.PES.Struct_Settings, ByRef Diag As EVO.Diagramm)
 
         Dim i, j As Short
         Dim serie As Steema.TeeChart.Styles.Series
@@ -537,7 +539,7 @@ Public Class Testprobleme
 
     'Diagramm für Box-Problem (3D) initialisieren
     '********************************************
-    Private Sub DiagInitialise_3D_Box(ByVal PES_Settings As EvoKern.PES.Struct_Settings, ByVal AnzPar As Integer, ByRef Diag As Main.Diagramm)
+    Private Sub DiagInitialise_3D_Box(ByVal PES_Settings As EVO.Kern.PES.Struct_Settings, ByVal AnzPar As Integer, ByRef Diag As EVO.Diagramm)
 
         Dim i, j, n As Integer
         Dim ArrayX() As Double
@@ -669,10 +671,10 @@ Public Class Testprobleme
 #End Region 'Diagrammfunktionen
 
 #Region "Evaluierung"
-    
+
     'Evaluierung und Zeichnen der Testprobleme
     '*****************************************
-    Public Sub Evaluierung_TestProbleme(ByRef Testproblem As String, ByVal mypara() As Double, ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN() As Double, ByRef RN() As Double, ByRef Diag As Main.Diagramm)
+    Public Sub Evaluierung_TestProbleme(ByRef Testproblem As String, ByVal mypara() As Double, ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN() As Double, ByRef RN() As Double, ByRef Diag As EVO.Diagramm)
 
         Dim i As Short
         Dim Unterteilung_X As Double
@@ -680,7 +682,7 @@ Public Class Testprobleme
         Dim X() As Double
         Dim f2, f1, f3 As Double
         Dim g1, g2 As Double
-        Dim globalAnzPar As Short = UBound(mypara)
+        Dim globalAnzPar As Short = mypara.GetLength(0)
         Dim serie As Steema.TeeChart.Styles.Series
 
         Select Case Testproblem
@@ -698,7 +700,7 @@ Public Class Testprobleme
 
                 QN(0) = 0
                 For i = 0 To globalAnzPar - 1
-                    QN(0) += (Math.Sin(i * Unterteilung_X) - (-1 + (mypara(i + 1) * 2))) ^ 2     'Bug 135: mypara fängt bei 1 an!
+                    QN(0) += (Math.Sin(i * Unterteilung_X) - (-1 + (mypara(i) * 2))) ^ 2
                 Next i
 
                 'Zeichnen
@@ -710,7 +712,7 @@ Public Class Testprobleme
                 ReDim array_y(globalAnzPar - 1)
                 For i = 0 To globalAnzPar - 1
                     array_x(i) = Math.Round(i * Unterteilung_X, 2)
-                    array_y(i) = (-1 + mypara(i + 1) * 2)                       'Bug 135: mypara fängt bei 1 an!
+                    array_y(i) = (-1 + mypara(i) * 2)
                 Next i
 
                 serie = Diag.getSeriesPoint("Population " & ipop)
@@ -722,8 +724,8 @@ Public Class Testprobleme
 
                 'Qualitätswert berechnen
                 '-----------------------
-                x1 = -5 + (mypara(1) * 10)
-                x2 = -2 + (mypara(2) * 4)
+                x1 = -5 + (mypara(0) * 10)
+                x2 = -2 + (mypara(1) * 4)
 
                 QN(0) = (1.5 - x1 * (1 - x2)) ^ 2 + (2.25 - x1 * (1 - x2) ^ 2) ^ 2 + (2.625 - x1 * (1 - x2) ^ 3) ^ 2
 
@@ -737,13 +739,13 @@ Public Class Testprobleme
 
                 'Qualitätswert berechnen
                 '-----------------------
-                ReDim X(globalAnzPar)
-                For i = 1 To globalAnzPar
+                ReDim X(globalAnzPar - 1)
+                For i = 0 To globalAnzPar - 1
                     X(i) = -10 + mypara(i) * 20
                 Next i
                 QN(0) = 0
-                For i = 1 To globalAnzPar
-                    QN(0) = QN(0) + ((X(1) - X(i) ^ 2) ^ 2 + (X(i) - 1) ^ 2)
+                For i = 0 To globalAnzPar - 1
+                    QN(0) = QN(0) + ((X(0) - X(i) ^ 2) ^ 2 + (X(i) - 1) ^ 2)
                 Next i
 
                 'Zeichnen
@@ -760,8 +762,8 @@ Public Class Testprobleme
 
                 'Qualitätswert berechnen
                 '-----------------------
-                f1 = mypara(1) * (9 / 10) + 0.1
-                f2 = (1 + 5 * mypara(2)) / (mypara(1) * (9 / 10) + 0.1)
+                f1 = mypara(0) * (9 / 10) + 0.1
+                f2 = (1 + 5 * mypara(1)) / (mypara(0) * (9 / 10) + 0.1)
                 QN(0) = f1
                 QN(1) = f2
 
@@ -775,9 +777,9 @@ Public Class Testprobleme
 
                 'Qualitätswert berechnen
                 '-----------------------
-                f1 = mypara(1)
+                f1 = mypara(0)
                 f2 = 0
-                For i = 2 To globalAnzPar
+                For i = 1 To globalAnzPar - 1
                     f2 = f2 + mypara(i)
                 Next i
                 f2 = 1 + 9 / (globalAnzPar - 1) * f2
@@ -795,9 +797,9 @@ Public Class Testprobleme
 
                 'Qualitätswerte berechnen
                 '------------------------
-                f1 = mypara(1)
+                f1 = mypara(0)
                 f2 = 0
-                For i = 2 To globalAnzPar
+                For i = 1 To globalAnzPar - 1
                     f2 = f2 + mypara(i)
                 Next i
                 f2 = 1 + 9 / (globalAnzPar - 1) * f2
@@ -815,9 +817,9 @@ Public Class Testprobleme
 
                 'Qualitätswerte berechnen
                 '------------------------
-                f1 = mypara(1)
+                f1 = mypara(0)
                 f2 = 0
-                For i = 2 To globalAnzPar
+                For i = 1 To globalAnzPar - 1
                     f2 = f2 + mypara(i)
                 Next i
                 f2 = 1 + 9 / (globalAnzPar - 1) * f2
@@ -835,9 +837,9 @@ Public Class Testprobleme
 
                 'Qualitätswerte berechnen
                 '------------------------
-                f1 = mypara(1)
+                f1 = mypara(0)
                 f2 = 0
-                For i = 2 To globalAnzPar
+                For i = 1 To globalAnzPar - 1
                     x2 = -5 + (mypara(i) * 10)
                     f2 = f2 + (x2 * x2 - 10 * Math.Cos(4 * Math.PI * x2))
                 Next i
@@ -856,16 +858,16 @@ Public Class Testprobleme
 
                 'Qualitätswerte berechnen
                 '------------------------
-                f1 = mypara(1) * (9 / 10) + 0.1
-                f2 = (1 + 5 * mypara(2)) / (mypara(1) * (9 / 10) + 0.1)
+                f1 = mypara(0) * (9 / 10) + 0.1
+                f2 = (1 + 5 * mypara(1)) / (mypara(0) * (9 / 10) + 0.1)
 
                 QN(0) = f1
                 QN(1) = f2
 
                 'Constraints berechnen
                 '---------------------
-                g1 = (5 * mypara(2)) + 9 * (mypara(1) * (9 / 10) + 0.1) - 6
-                g2 = (-1) * (5 * mypara(2)) + 9 * (mypara(1) * (9 / 10) + 0.1) - 1
+                g1 = (5 * mypara(1)) + 9 * (mypara(0) * (9 / 10) + 0.1) - 6
+                g2 = (-1) * (5 * mypara(1)) + 9 * (mypara(0) * (9 / 10) + 0.1) - 1
 
                 RN(0) = g1
                 RN(1) = g2
@@ -886,9 +888,9 @@ Public Class Testprobleme
 
                 'Qualitätswerte berechnen
                 '------------------------
-                f1 = mypara(1)
-                f2 = mypara(2)
-                f3 = mypara(3)
+                f1 = mypara(0)
+                f2 = mypara(1)
+                f3 = mypara(2)
 
                 QN(0) = f1
                 QN(1) = f2
@@ -896,8 +898,8 @@ Public Class Testprobleme
 
                 'Constraints berechnen
                 '---------------------
-                g1 = mypara(1) + mypara(2) - 0.5
-                g2 = mypara(1) + mypara(2) + mypara(3) - 0.8
+                g1 = mypara(0) + mypara(1) - 0.5
+                g2 = mypara(0) + mypara(1) + mypara(2) - 0.8
 
                 RN(0) = g1
                 RN(1) = g2
