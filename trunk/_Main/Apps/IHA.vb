@@ -36,7 +36,7 @@ Public Class IHA
     'Eigenschaften
     '#############
 
-    Private IHAZiel As Sim.Struct_OptZiel               'Kopie des OptZiels mit ZielTyp "IHA"
+    Public IHAZiel As Sim.Struct_OptZiel                'Kopie des OptZiels mit ZielTyp "IHA"
     Private IHADir As String                            'Verzeichnis für IHA-Dateien
     Private exe_path As String                          'Pfad zur IHA_Batchfor.exe
 
@@ -310,15 +310,9 @@ Public Class IHA
 
     'IHA-Berechnung ausführen
     '************************
-    Public Sub calculate_IHA(ByVal WELFile As String)
+    Public Sub calculate_IHA(ByVal SimReihe As Wave.Zeitreihe)
 
         Dim i, j, k As Integer
-
-        'Simulationsreihe einlesen
-        '-------------------------
-        Dim SimReihe As New Wave.Zeitreihe(Me.IHAZiel.SimGr)
-        Dim WEL As New Wave.WEL(WELFile, Me.IHAZiel.SimGr)
-        SimReihe = WEL.Zeitreihen(0)
 
         'Simulationsreihe entsprechend kürzen
         SimReihe.cut(New DateTime(Me.BeginPost_sim - 1, 10, 1), New DateTime(Me.EndPost_sim, 9, 30))
