@@ -308,10 +308,20 @@ Public Class BlueM
 
         End Try
 
-        'Bei IHA-Berechnung jetzt IHA-Software ausführen
-        '-----------------------------------------------
-        If (simOK And Me.isIHA) Then
-            Call Me.IHA1.calculate_IHA(Me.WorkDir & Me.Datensatz & ".WEL")
+        'Simulationsergebnis verarbeiten
+        '-------------------------------
+        If (simOK) Then
+
+            'WEL-Datei einlesen
+            Me.SimErgebnis = New Wave.WEL(Me.WorkDir & Me.Datensatz & ".WEL")
+
+            'Bei IHA-Berechnung jetzt IHA-Software ausführen
+            If (Me.isIHA) Then
+                Dim IHAReihe As Wave.Zeitreihe
+                IHAReihe = Me.SimErgebnis.getReihe(Me.IHA1.IHAZiel.SimGr)
+                Call Me.IHA1.calculate_IHA(IHAReihe)
+            End If
+
         End If
 
         Return simOK
@@ -329,9 +339,8 @@ Public Class BlueM
         Dim QWert As Double
 
         'Simulationsergebnis auslesen
-        Dim SimReihe As New Wave.Zeitreihe(OptZiel.SimGr)
-        Dim WEL As New Wave.WEL(WorkDir & Datensatz & ".wel", OptZiel.SimGr)
-        SimReihe = WEL.Zeitreihen(0)
+        Dim SimReihe As Wave.Zeitreihe
+        SimReihe = Me.SimErgebnis.getReihe(OptZiel.SimGr)
 
         'Fallunterscheidung Zieltyp
         '--------------------------

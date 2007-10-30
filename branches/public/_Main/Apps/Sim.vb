@@ -28,7 +28,7 @@ Public MustInherit Class Sim
     'Information
     '-----------
 
-    Public Method as String                             'Verwendete Methode
+    Public Method as String                              'Verwendete Methode
 
     'Generelle Eigenschaften
     '-----------------------
@@ -39,6 +39,8 @@ Public MustInherit Class Sim
     Public SimStart As DateTime                          'Anfangsdatum der Simulation
     Public SimEnde As DateTime                           'Enddatum der Simulation
     Public SimDT As TimeSpan                             'Zeitschrittweite der Simulation
+
+    Protected SimErgebnis As Wave.WEL                    'Speichert das momentane Simulationsergebnis
 
     'Konstanten
     '----------
@@ -1411,9 +1413,8 @@ Public MustInherit Class Sim
         Dim QWert As Double
 
         'Simulationsergebnis auslesen
-        Dim SimReihe As New Wave.Zeitreihe(OptZiel.SimGr)
-        Dim WEL As New Wave.WEL(WorkDir & Datensatz & ".wel", OptZiel.SimGr)
-        SimReihe = WEL.Zeitreihen(0)
+        Dim SimReihe As Wave.Zeitreihe
+        SimReihe = Me.SimErgebnis.getReihe(OptZiel.SimGr)
 
         'Fallunterscheidung Zieltyp
         '--------------------------
