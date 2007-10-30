@@ -522,7 +522,7 @@ Public MustInherit Class Sim
                     Select Case (ext.ToUpper)
                         Case ".WEL"
                             Dim WEL As New Wave.WEL(Me.WorkDir & .ZielReiheDatei, .ZielGr)
-                            .ZielReihe = WEL.Read_WEL()(0)
+                            .ZielReihe = WEL.Zeitreihen(0)
                         Case ".ZRE"
                             Dim ZRE As New Wave.ZRE(Me.WorkDir & .ZielReiheDatei)
                             .ZielReihe = ZRE.Zeitreihe
@@ -636,7 +636,7 @@ Public MustInherit Class Sim
                         Select Case (ext.ToUpper)
                             Case ".WEL"
                                 Dim WEL As New Wave.WEL(Me.WorkDir & .GrenzReiheDatei, .GrenzGr)
-                                .GrenzReihe = WEL.Read_WEL()(0)
+                                .GrenzReihe = WEL.Zeitreihen(0)
                             Case ".ZRE"
                                 Dim ZRE As New Wave.ZRE(Me.WorkDir & .GrenzReiheDatei)
                                 .GrenzReihe = ZRE.Zeitreihe
@@ -1413,7 +1413,7 @@ Public MustInherit Class Sim
         'Simulationsergebnis auslesen
         Dim SimReihe As New Wave.Zeitreihe(OptZiel.SimGr)
         Dim WEL As New Wave.WEL(WorkDir & Datensatz & ".wel", OptZiel.SimGr)
-        SimReihe = WEL.Read_WEL()(0)
+        SimReihe = WEL.Zeitreihen(0)
 
         'Fallunterscheidung Zieltyp
         '--------------------------
@@ -1648,7 +1648,7 @@ Public MustInherit Class Sim
         'Simulationsergebnis auslesen
         Dim SimReihe As New Wave.Zeitreihe(constr.SimGr)
         Dim WEL As New Wave.WEL(WorkDir & Datensatz & ".wel", constr.SimGr)
-        SimReihe = WEL.Read_WEL()(0)
+        SimReihe = WEL.Zeitreihen(0)
 
         'Fallunterscheidung GrenzTyp (Wert/Reihe)
         Select Case constr.GrenzTyp
