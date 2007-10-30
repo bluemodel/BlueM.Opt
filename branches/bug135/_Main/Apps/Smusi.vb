@@ -118,8 +118,8 @@ Public Class Smusi
         'Simulationsergebnis auslesen
         Dim SimReihe As New Wave.Zeitreihe(OptZiel.SimGr)
         Dim datei As String = OptZiel.SimGr.Substring(0, 4) & "_WEL.ASC"
-        Dim WEL As New Wave.WEL(WorkDir & datei, OptZiel.SimGr)
-        SimReihe = WEL.Zeitreihen(0)
+        Dim WEL As New Wave.WEL(WorkDir & datei)
+        SimReihe = WEL.getReihe(OptZiel.SimGr)
 
         'Fallunterscheidung Zieltyp
         '--------------------------
