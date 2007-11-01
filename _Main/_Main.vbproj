@@ -64,6 +64,7 @@
     <WarningLevel>1</WarningLevel>
     <NoWarn>42016,42017,42018,42019,42032</NoWarn>
     <DebugType>none</DebugType>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="IHWB.BlueM.DllAdapter, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL" />
