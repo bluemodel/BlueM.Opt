@@ -2,9 +2,9 @@ Public Class Diagramm
     Inherits Steema.TeeChart.TChart
 
     Public Structure Achse
-            Public Name as String
-            Public Auto as Boolean
-            Public Max as Double
+        Public Name As String
+        Public Auto As Boolean
+        Public Max As Double
     End Structure
 
     'TeeChart zurücksetzen
