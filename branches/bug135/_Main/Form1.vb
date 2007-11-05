@@ -950,33 +950,8 @@ Partial Class Form1
                                     End If
                                 Next
 
-
-
-
-                                'Falls Eltern vorhanden sind Selektion, Reproduktion, Mutation
-                                Dim k As Integer = 0
-                                k = CES1.PES_Parents(0).iLocation
-
-
-                                'POPULATIONS REPRODUKTIONSPROZESS
-                                '################################
-                                'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern der Population
-                                Call PES1.EsPopReproduktion()
-
-                                'POPULATIONS MUTATIONSPROZESS
-                                '############################
-                                'Mutieren der Ausgangswerte der Population
-                                Call PES1.EsPopMutation()
-
-                                'REPRODUKTIONSPROZESS
-                                '####################
-                                'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
-                                Call PES1.EsReproduktion()
-
-                                'MUTATIONSPROZESS
-                                '################
-                                'Mutieren der Ausgangswerte
-                                Call PES1.EsMutation()
+                                'Startet die Prozesse nacheinander
+                                Call PES1.EsReproMut()
 
                                 'Auslesen der Variierten Parameter
                                 myPara = PES1.EsGetParameter()
@@ -984,6 +959,9 @@ Partial Class Form1
 
 
 
+                                'Falls Eltern vorhanden sind Selektion, Reproduktion, Mutation
+                                Dim k As Integer = 0
+                                k = CES1.PES_Parents(0).iLocation
 
                             End If
                         End If

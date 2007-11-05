@@ -524,6 +524,31 @@ Public Class PES
 
     End Function
 
+    'Function um PopReproduktion, PopMutation, Reproduktion und Mutio n direkt ablaufen zu lassen
+    '********************************************************************************************
+    Public Sub EsReproMut()
+
+        'POPULATIONS REPRODUKTIONSPROZESS
+        '################################
+        'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern der Population
+        Call EsPopReproduktion()
+
+        'POPULATIONS MUTATIONSPROZESS
+        '############################
+        'Mutieren der Ausgangswerte der Population
+        Call EsPopMutation()
+
+        'REPRODUKTIONSPROZESS
+        '####################
+        'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
+        Call EsReproduktion()
+
+        'MUTATIONSPROZESS
+        '################
+        'Mutieren der Ausgangswerte
+        Call EsMutation()
+
+    End Sub
 
     'ES_POP_VARIA - REPRODUKTIONSPROZESS - ToDo: Beschreibung fehlt
     '*******************************************************************************
