@@ -199,29 +199,25 @@ Public Class PES
     'Methoden
     '########
 
-    'Schritt 2 -5 zum Initialisieren der PES
+    'Initialisierung der PES
     '***************************************
     Public Sub PesInitialise(ByRef PES_Settings As Struct_Settings, ByVal AnzPara As Short, ByVal AnzPenalty As Short, ByVal AnzConstr As Short, ByRef mypara() As Double, ByVal Method As String)
 
-        '2. Schritt: PES - ES_OPTIONS
+        'PES - ES_OPTIONS
         'Optionen der Evolutionsstrategie werden übergeben
         Call EsSettings(PES_Settings, Method)
 
-        '3. Schritt: PES - ES_INI
-        'Die öffentlichen dynamischen Arrays werden initialisiert (Dn, An, Xn, Xmin, Xmax), die Anzahl der Zielfunktionen wird festgelegt und Ausgangsparameter werden übergeben (War früher ES_Let Parameter)
-        Call EsDim(AnzPara, AnzPenalty, AnzConstr, mypara)
-
-        '4. Schritt: PES - ES_PREPARE
+        'PES - ES_PREPARE
         'Interne Variablen werden initialisiert, Zufallsgenerator wird initialisiert
-        Call EsPrepare()
+        Call EsPrepare(AnzPara, AnzPenalty, AnzConstr, mypara)
 
-        '5. Schritt: PES - ES_STARTVALUES
+        'PES - ES_STARTVALUES
         'Startwerte werden zugewiesen
         Call EsStartvalues()
 
     End Sub
 
-    'Schritt 2: ES_SETTINGS
+    'ES_SETTINGS
     'Function ES_SETTINGS übergibt Optionen für Evolutionsstrategie und Prüft die eingestellten Optionen
     '***************************************************************************************************
     Private Sub EsSettings(ByRef Settings As Struct_Settings, ByVal Method As String)
@@ -281,12 +277,14 @@ Public Class PES
 
     End Sub
 
-
-    'Schritt 3: ES_INI
-    'Function ES_INI Initialisiert benötigte dynamische Arrays und legt Anzahl der Zielfunktionen fest
-    '*************************************************************************************************
-    Private Sub EsDim(ByVal AnzPara As Short, ByVal AnzPenalty As Short, ByVal AnzConstr As Short, ByVal mypara() As Double)
-        Dim i As Integer
+    'ES_PREPARE
+    'Initialisiert benötigte dynamische Arrays und legt Anzahl der Zielfunktionen fest
+    'Initialisiert alle internen Arrays und setzt den
+    'Bestwertspeicher auf sehr großen Wert (Strategie minimiert in dieser Umsetzung)
+    'TODO: ESPrepare Für Paretooptimierung noch nicht fertig!!!!
+    '*******************************************************************************
+    Private Sub EsPrepare(ByVal AnzPara As Short, ByVal AnzPenalty As Short, ByVal AnzConstr As Short, ByVal mypara() As Double)
+        Dim m, n, l, i As Short
 
         'Überprüfung der Eingabeparameter (es muss mindestens ein Parameter variiert und eine
         'Penaltyfunktion ausgewertet werden)
@@ -295,10 +293,12 @@ Public Class PES
             Throw New Exception("Es muss mindestens ein Parameter variiert und eine Penaltyfunktion ausgewertet werden")
         End If
 
+        'Anzahlen werden gesetzt
         AktPara.NPara = AnzPara                         'Anzahl der Parameter wird übergeben
         AktPara.NPenalty = AnzPenalty                   'Anzahl der Zielfunktionen wird übergeben
         AktPara.NConstrains = AnzConstr                 'Anzahl der Randbedingungen wird übergeben
 
+        'Dynamisches Array Initialisieren
         ReDim AktPara.Xn(AktPara.NPara - 1)                'Variablenvektor wird initialisiert
         ReDim AktPara.Xmin(AktPara.NPara - 1)              'UntereSchrankenvektor wird initialisiert
         ReDim AktPara.Xmax(AktPara.NPara - 1)              'ObereSchrankenvektor wird initialisiert
@@ -312,17 +312,6 @@ Public Class PES
             AktPara.Xn(i) = Math.Min(AktPara.Xn(i), AktPara.Xmax(i))
             AktPara.Xn(i) = Math.Max(AktPara.Xn(i), AktPara.Xmin(i))
         Next
-
-    End Sub
-
-    'Schritt 4: ES_PREPARE
-    'Function ES_PREPARE initialisiert alle internen Arrays und setzt den
-    'Bestwertspeicher auf sehr großen Wert (Strategie minimiert in dieser Umsetzung)
-    'TODO: ESPrepare Für Paretooptimierung noch nicht fertig!!!!
-    '*******************************************************************************
-    Private Sub EsPrepare()
-
-        Dim m, n, l, i As Short
 
         For i = 0 To AktPara.NPara - 1
             AktPara.Dn(i) = PES_Settings.DnStart
@@ -342,7 +331,7 @@ Public Class PES
         ReDim Xb(AktPara.NPara - 1, PES_Settings.NEltern - 1, PES_Settings.NPopul - 1)
         ReDim Qb(PES_Settings.NEltern - 1, PES_Settings.NPopul - 1, AktPara.NPenalty - 1)
         ReDim Rb(PES_Settings.NEltern - 1, PES_Settings.NPopul - 1, AktPara.NConstrains - 1)
-        '---------------------
+
         'NDSorting wird nur benötigt, falls eine Paretofront approximiert wird
         If PES_Settings.is_MO_Pareto Then
             ReDim NDSorting(PES_Settings.NEltern + PES_Settings.NNachf - 1)
@@ -373,6 +362,7 @@ Public Class PES
             Next m
         Next
 
+        'Falls NDSorting Crowding Distance wird initialisiert
         If PES_Settings.is_MO_Pareto Then
             For n = 0 To PES_Settings.NPopul - 1
                 For m = 0 To AktPara.NPenalty - 1
@@ -408,7 +398,6 @@ Public Class PES
 
     End Sub
 
-    'Schritt 5: ES_STARTVALUES
     'Function ES_STARTVALUES setzt die Startwerte
     'PES_Settings.iStartPar 1: Zufällige Startwert  -> Schrittweite = Startschrittweite
     '                                               -> Parameterwert = zufällig [0,1]
@@ -450,6 +439,23 @@ Public Class PES
                     Next n
                 Next v
         End Select
+
+    End Sub
+
+    'Überladen: Falls Startwerte aus CES kommen
+    Public Sub EsStartvalues(ByVal AktDn() As Object, ByVal AktXn(,) As Object, ByVal IndexElter As Integer)
+
+        Dim v As Short
+
+        'Die Startparameter werden aus den PES_Parents aus der CES gesetzt
+        For v = 0 To AktPara.NPara - 1
+            'Startwert für die Elternschrittweite wird zugewiesen
+            Dp(v, IndexElter, 0) = AktDn(v)
+            'Startwert für die Eltern werden zugewiesen
+            '(alle gleich Anfangswerte)
+            Xp(v, IndexElter, 0) = AktXn(1, v)
+        Next v
+
 
     End Sub
 

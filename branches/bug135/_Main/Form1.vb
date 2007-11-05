@@ -769,7 +769,7 @@ Partial Class Form1
                         EVO_Settings1.isSaved = False
                         Call EVO_Settings1.SetFor_CES_PES(1, 1, 1)
 
-                        'Schritte 2 - 5 PES wird initialisiert (Weiteres siehe dort ;-)
+                        'PES wird initialisiert (Weiteres siehe dort ;-)
                         '**************************************************************
                         Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, Method)
 
@@ -937,7 +937,7 @@ Partial Class Form1
                                 EVO_Settings1.isSaved = False
                                 Call EVO_Settings1.SetFor_CES_PES(1, n_eltern, 1)
 
-                                'Schritte 2 - 5 PES wird initialisiert (Weiteres siehe dort ;-)
+                                'PES wird initialisiert (Weiteres siehe dort ;-)
                                 '**************************************************************
                                 Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, Method)
 
@@ -1073,13 +1073,12 @@ Partial Class Form1
             Call PrepareDiagramm()
         End If
 
-        '1. Schritt: PES
         'Objekt der Klasse PES wird erzeugt
         '**********************************
         Dim PES1 As EVO.Kern.PES
         PES1 = New EVO.Kern.PES
 
-        'Schritte 2 - 5 PES wird initialisiert (Weiteres siehe dort ;-)
+        'ES wird initialisiert (Weiteres siehe dort ;-)
         '**************************************************************
         Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, Method)
 
