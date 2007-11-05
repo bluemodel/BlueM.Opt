@@ -382,7 +382,7 @@ Public Class PES
 
     End Sub
 
-    'Schritt 1: Function ES_STARTVALUES setzt die Startwerte
+    'Schritt 1: Function ES_STARTVALUES setzt die Startwerte - Vorsicht: ÜBERLADEN
     'PES_Settings.iStartPar 1: Zufällige Startwert  -> Schrittweite = Startschrittweite
     '                                               -> Parameterwert = zufällig [0,1]
     'PES_Settings.iStartPar 2: Originalparameter    -> Schrittweite = Startschrittweite
