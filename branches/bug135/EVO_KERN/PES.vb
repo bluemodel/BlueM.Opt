@@ -777,7 +777,7 @@ Public Class PES
             '+/-1
             expo = (2 * Int(Rnd() + 0.5) - 1)
             'Schrittweite wird mutiert
-            DnTemp = AktPara.Dn(1) * galpha ^ expo
+            DnTemp = AktPara.Dn(0) * galpha ^ expo
         End If
 
         For v = 0 To AktPara.NPara - 1
