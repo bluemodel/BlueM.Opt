@@ -941,15 +941,22 @@ Partial Class Form1
                                 '**************************************************************
                                 Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, Method)
 
+                                Dim Index as Integer = 0
+                                For m = 0 To CES1.PES_Parents.GetUpperBound(0)
+                                    If (j + 1) = CES1.PES_Parents(m).iLocation Then
+                                        'Die Startwerte werden überschrieben
+                                        Call PES1.EsStartvalues(CES1.PES_Parents(m).Loc(j).Loc_Dn, CES1.PES_Parents(m).Loc(j).Loc_Para, Index)
+                                        Index += 1
+                                    End If
+                                Next
+
+
+
 
                                 'Falls Eltern vorhanden sind Selektion, Reproduktion, Mutation
                                 Dim k As Integer = 0
                                 k = CES1.PES_Parents(0).iLocation
 
-
-
-                                'Die Startwerte werden überschrieben
-                                Call pes1.EsStartvalues
 
                                 'POPULATIONS REPRODUKTIONSPROZESS
                                 '################################
