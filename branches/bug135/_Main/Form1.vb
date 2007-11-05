@@ -916,7 +916,7 @@ Partial Class Form1
                             'Die Anzahl der Eltern wird bestimmt
                             Dim n_eltern As Integer = 0
                             For m = 0 To CES1.PES_Parents.GetUpperBound(0)
-                                If j = CES1.PES_Parents(m).iLocation Then
+                                If (j + 1) = CES1.PES_Parents(m).iLocation  Then
                                     n_eltern += 1
                                 End If
                             Next
@@ -941,23 +941,38 @@ Partial Class Form1
                                 '**************************************************************
                                 Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, Method)
 
-                                'REPRODUKTIONSPROZESS - Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
-                                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-                                Call PES1.EsReproduktion()
-
-                                'MUTATIONSPROZESS - Mutieren der Ausgangswerte
-                                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-                                Call PES1.EsMutation()
-
-                                'Auslesen der Variierten Parameter
-                                myPara = PES1.EsGetParameter()
-
-
-
 
                                 'Falls Eltern vorhanden sind Selektion, Reproduktion, Mutation
                                 Dim k As Integer = 0
                                 k = CES1.PES_Parents(0).iLocation
+
+
+
+                                'Die Startwerte werden überschrieben
+                                Call pes1.EsStartvalues
+
+                                'POPULATIONS REPRODUKTIONSPROZESS
+                                '################################
+                                'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern der Population
+                                Call PES1.EsPopReproduktion()
+
+                                'POPULATIONS MUTATIONSPROZESS
+                                '############################
+                                'Mutieren der Ausgangswerte der Population
+                                Call PES1.EsPopMutation()
+
+                                'REPRODUKTIONSPROZESS
+                                '####################
+                                'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
+                                Call PES1.EsReproduktion()
+
+                                'MUTATIONSPROZESS
+                                '################
+                                'Mutieren der Ausgangswerte
+                                Call PES1.EsMutation()
+
+                                'Auslesen der Variierten Parameter
+                                myPara = PES1.EsGetParameter()
 
 
 
