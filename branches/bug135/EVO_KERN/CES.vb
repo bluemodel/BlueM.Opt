@@ -111,14 +111,16 @@ Public Class CES
         Dim Loc_Dn() As Object              '11 Das Dn für PES
         Dim Loc_Elem() As String            '11a Die Elemente die zur Location gehören
 
-        'Schreibt die Parameter in Array
-        Public Writeonly Property Parameter() As Double()
-            'Get
-            '    Dim i As Integer
-            '    For i = 0 To Loc_Para.GetUpperBound(1)
-            '        Parameter(i) = Loc_Para(1, i)
-            '    Next
-            'End Get
+        'Verändert die Parameter im Parameter Array
+        Public Property Parameter() As Double()
+            Get
+                Dim i As Integer
+                Dim Array() As Double = {}
+                For i = 0 To Loc_Para.GetUpperBound(1)
+                    Array(i) = Loc_Para(1, i)
+                Next
+                Parameter = Array.Clone
+            End Get
 
             Set(ByVal Parameter() As Double)
                 Dim i As Integer

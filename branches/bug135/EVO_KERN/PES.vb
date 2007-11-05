@@ -439,7 +439,7 @@ Public Class PES
     End Sub
 
     'Überladen: Falls Startwerte aus CES kommen
-    Public Sub EsStartvalues(ByVal AktDn() As Object, ByVal AktXn(,) As Object, ByVal IndexElter As Integer)
+    Public Sub EsStartvalues(ByVal AktDn() As Object, ByVal AktXn() As Double, ByVal IndexElter As Integer)
 
         Dim v As Short
 
@@ -449,7 +449,7 @@ Public Class PES
             Dp(v, IndexElter, 0) = AktDn(v)
             'Startwert für die Eltern werden zugewiesen
             '(alle gleich Anfangswerte)
-            Xp(v, IndexElter, 0) = AktXn(1, v)
+            Xp(v, IndexElter, 0) = AktXn(v)
         Next v
 
 

@@ -945,7 +945,7 @@ Partial Class Form1
                                 For m = 0 To CES1.PES_Parents.GetUpperBound(0)
                                     If (j + 1) = CES1.PES_Parents(m).iLocation Then
                                         'Die Startwerte werden überschrieben
-                                        Call PES1.EsStartvalues(CES1.PES_Parents(m).Loc(j).Loc_Dn, CES1.PES_Parents(m).Loc(j).Loc_Para, Index)
+                                        Call PES1.EsStartvalues(CES1.PES_Parents(m).Loc(j).Loc_Dn, CES1.PES_Parents(m).Loc(j).Parameter, Index)
                                         Index += 1
                                     End If
                                 Next
