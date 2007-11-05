@@ -1647,9 +1647,8 @@ Public MustInherit Class Sim
         Dim i As Integer
 
         'Simulationsergebnis auslesen
-        Dim SimReihe As New Wave.Zeitreihe(constr.SimGr)
-        Dim WEL As New Wave.WEL(WorkDir & Datensatz & ".wel", constr.SimGr)
-        SimReihe = WEL.Zeitreihen(0)
+        Dim SimReihe As Wave.Zeitreihe
+        SimReihe = Me.SimErgebnis.getReihe(constr.SimGr)
 
         'Fallunterscheidung GrenzTyp (Wert/Reihe)
         Select Case constr.GrenzTyp
