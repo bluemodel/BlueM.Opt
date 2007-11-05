@@ -102,7 +102,6 @@ Public Class CES
             End Get
 
         End Property
-
     End Structure
 
     'Informationen pro Location
@@ -111,6 +110,25 @@ Public Class CES
         Dim Loc_Para(,) As Object           '10 Die Optimierungsparameter für PES
         Dim Loc_Dn() As Object              '11 Das Dn für PES
         Dim Loc_Elem() As String            '11a Die Elemente die zur Location gehören
+
+        'Schreibt die Parameter in Array
+        Public Writeonly Property Parameter() As Double()
+            'Get
+            '    Dim i As Integer
+            '    For i = 0 To Loc_Para.GetUpperBound(1)
+            '        Parameter(i) = Loc_Para(1, i)
+            '    Next
+            'End Get
+
+            Set(ByVal Parameter() As Double)
+                Dim i As Integer
+                For i = 0 To Loc_Para.GetUpperBound(1)
+                    Loc_Para(1, i) = Parameter(i)
+                Next
+            End Set
+
+        End Property
+
     End Structure
 
     Public List_Childs() As Faksimile

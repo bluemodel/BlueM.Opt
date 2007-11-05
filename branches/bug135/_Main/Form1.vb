@@ -950,11 +950,12 @@ Partial Class Form1
                                     End If
                                 Next
 
-                                'Startet die Prozesse nacheinander
+                                'Startet die Prozesse evolutionstheoretischen Prozesse nacheinander
                                 Call PES1.EsReproMut()
 
                                 'Auslesen der Variierten Parameter
                                 myPara = PES1.EsGetParameter()
+                                ces1.List_Childs(i).Loc(j).Parameter = PES1.EsGetParameter()
 
 
 
