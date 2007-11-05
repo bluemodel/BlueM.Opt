@@ -736,7 +736,7 @@ Partial Class Form1
             Next
         Next
 
-        '1. Schritt: PES - Objekt der Klasse PES wird erzeugt PES wird erzeugt
+        'Schritt 0: PES - Objekt der Klasse PES wird erzeugt PES wird erzeugt
         '*********************************************************************
         Dim PES1 As EVO.Kern.PES
         PES1 = New EVO.Kern.PES
@@ -769,7 +769,7 @@ Partial Class Form1
                         EVO_Settings1.isSaved = False
                         Call EVO_Settings1.SetFor_CES_PES(1, 1, 1)
 
-                        'PES wird initialisiert (Weiteres siehe dort ;-)
+                        'Schritte 1 - 3: PES wird initialisiert (Weiteres siehe dort ;-)
                         '**************************************************************
                         Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, Method)
 
@@ -937,7 +937,7 @@ Partial Class Form1
                                 EVO_Settings1.isSaved = False
                                 Call EVO_Settings1.SetFor_CES_PES(1, n_eltern, 1)
 
-                                'PES wird initialisiert (Weiteres siehe dort ;-)
+                                'Schritte 1 - 3: PES wird initialisiert (Weiteres siehe dort ;-)
                                 '**************************************************************
                                 Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, Method)
 
@@ -1073,12 +1073,12 @@ Partial Class Form1
             Call PrepareDiagramm()
         End If
 
-        'Objekt der Klasse PES wird erzeugt
-        '**********************************
+        'Schritte 0: Objekt der Klasse PES wird erzeugt
+        '**********************************************
         Dim PES1 As EVO.Kern.PES
         PES1 = New EVO.Kern.PES
 
-        'ES wird initialisiert (Weiteres siehe dort ;-)
+        'Schritte 1 - 3: ES wird initialisiert (Weiteres siehe dort ;-)
         '**************************************************************
         Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, Method)
 

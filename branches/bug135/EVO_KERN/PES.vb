@@ -202,21 +202,21 @@ Public Class PES
     '***************************************
     Public Sub PesInitialise(ByRef PES_Settings As Struct_Settings, ByVal AnzPara As Short, ByVal AnzPenalty As Short, ByVal AnzConstr As Short, ByRef Parameter() As Double, ByVal Method As String)
 
-        'PES - ES_OPTIONS
+        'Schritt 1: PES - ES_OPTIONS
         'Optionen der Evolutionsstrategie werden übergeben
         Call EsSettings(PES_Settings, Method)
 
-        'PES - ES_PREPARE
+        'Schritt 2: PES - ES_PREPARE
         'Interne Variablen werden initialisiert, Zufallsgenerator wird initialisiert
         Call EsPrepare(AnzPara, AnzPenalty, AnzConstr)
 
-        'PES - ES_STARTVALUES
+        'Schritt 3: PES - ES_STARTVALUES
         'Startwerte werden zugewiesen
         Call EsStartvalues(Parameter)
 
     End Sub
 
-    'ES_SETTINGS
+    'Schritt 1: ES_SETTINGS
     'Function ES_SETTINGS übergibt Optionen für Evolutionsstrategie und Prüft die eingestellten Optionen
     '***************************************************************************************************
     Private Sub EsSettings(ByRef Settings As Struct_Settings, ByVal Method As String)
@@ -276,7 +276,7 @@ Public Class PES
 
     End Sub
 
-    'ES_PREPARE
+    'Schritt 2: ES_PREPARE
     'Initialisiert benötigte dynamische Arrays und legt Anzahl der Zielfunktionen fest
     'Initialisiert alle internen Arrays und setzt den
     'Bestwertspeicher auf sehr großen Wert (Strategie minimiert in dieser Umsetzung)
@@ -382,7 +382,7 @@ Public Class PES
 
     End Sub
 
-    'Function ES_STARTVALUES setzt die Startwerte
+    'Schritt 1: Function ES_STARTVALUES setzt die Startwerte
     'PES_Settings.iStartPar 1: Zufällige Startwert  -> Schrittweite = Startschrittweite
     '                                               -> Parameterwert = zufällig [0,1]
     'PES_Settings.iStartPar 2: Originalparameter    -> Schrittweite = Startschrittweite
