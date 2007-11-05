@@ -957,13 +957,6 @@ Partial Class Form1
                                 myPara = PES1.EsGetParameter()
                                 ces1.List_Childs(i).Loc(j).Parameter = PES1.EsGetParameter()
 
-
-
-
-                                'Falls Eltern vorhanden sind Selektion, Reproduktion, Mutation
-                                Dim k As Integer = 0
-                                k = CES1.PES_Parents(0).iLocation
-
                             End If
                         End If
                     Next

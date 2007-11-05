@@ -115,7 +115,7 @@ Public Class CES
         Public Property Parameter() As Double()
             Get
                 Dim i As Integer
-                Dim Array() As Double = {}
+                Dim Array(Loc_Para.GetUpperBound(1)) As Double
                 For i = 0 To Loc_Para.GetUpperBound(1)
                     Array(i) = Loc_Para(1, i)
                 Next
