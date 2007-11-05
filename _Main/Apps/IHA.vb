@@ -233,6 +233,7 @@ Public Class IHA
     Private Sub write_InputPar(ByVal title As String)
 
         Dim StrWrite As StreamWriter = New StreamWriter(Me.IHADir & "input.par", False, System.Text.Encoding.GetEncoding("iso8859-1"))
+
         StrWrite.WriteLine("&initial")
         StrWrite.WriteLine("infile=" & Me.IHADir & "input.dat")
         StrWrite.WriteLine("outscore=" & Me.IHADir & "output.sco")
@@ -418,8 +419,9 @@ Public Class IHA
         'RVA-Datei öffnen und einlesen
         '-----------------------------
 
-        Dim FiStr As FileStream = New FileStream(Me.IHADir & "output.rva", FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim FiStr As FileStream = New FileStream(Me.IHADir & "output.rva", FileMode.Open, IO.FileAccess.Read)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Dim StrReadSync As TextReader = TextReader.Synchronized(StrRead)
 
         Dim i, j As Integer
         Dim Zeile As String
@@ -435,13 +437,13 @@ Public Class IHA
             With Me.IHARes.IHAParamGroups(i)
 
                 Do
-                    Zeile = StrRead.ReadLine.ToString
+                    Zeile = StrReadSync.ReadLine.ToString
                     If (Zeile.Contains("Parameter Group #" & .No)) Then
 
                         Psum = 0
                         'Schleife über Parameter
                         For j = 0 To .IHAParams.GetUpperBound(0)
-                            Zeile = StrRead.ReadLine.ToString
+                            Zeile = StrReadSync.ReadLine.ToString
                             .IHAParams(j).PName = Zeile.Substring(0, 20).Trim
                             .IHAParams(j).HAMiddle = Convert.ToDouble(Zeile.Substring(171, 14).Trim)
                             Psum += .IHAParams(j).fx_HA
@@ -449,7 +451,7 @@ Public Class IHA
 
                         Exit Do
                     End If
-                Loop Until StrRead.Peek() = -1
+                Loop Until StrReadSync.Peek() = -1
 
                 'Mittelwert für eine Parametergruppe berechnen
                 '---------------------------------------------
@@ -459,6 +461,10 @@ Public Class IHA
             End With
 
         Next 'Ende Schleife über Parametergruppen
+
+        StrReadSync.Close()
+        StrRead.Close()
+        FiStr.Close()
 
         'Mittelwert aller Parametergruppen berechnen
         '-------------------------------------------
@@ -475,7 +481,7 @@ Public Class IHA
         ChDrive(Me.IHADir)
         ChDir(Me.IHADir)
         'EXE aufrufen
-        Dim ProcID As Integer = Shell("""" & Me.exe_path & """ input.par", AppWinStyle.MinimizedNoFocus, True)
+        Dim ProcID As Integer = Shell("""" & Me.exe_path & """ input.par", AppWinStyle.Hide, True)
         'zurück in Ausgangsverzeichnis wechseln
         ChDrive(currentDir)
         ChDir(currentDir)
