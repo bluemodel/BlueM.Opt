@@ -199,7 +199,7 @@ Public Class PES
 
     'Initialisierung der PES
     '***************************************
-    Public Sub PesInitialise(ByRef PES_Settings As Struct_Settings, ByVal AnzPara As Short, ByVal AnzPenalty As Short, ByVal AnzConstr As Short, ByRef mypara() As Double, ByVal Method As String)
+    Public Sub PesInitialise(ByRef PES_Settings As Struct_Settings, ByVal AnzPara As Short, ByVal AnzPenalty As Short, ByVal AnzConstr As Short, ByRef Parameter() As Double, ByVal Method As String)
 
         'PES - ES_OPTIONS
         'Optionen der Evolutionsstrategie werden übergeben
@@ -207,11 +207,11 @@ Public Class PES
 
         'PES - ES_PREPARE
         'Interne Variablen werden initialisiert, Zufallsgenerator wird initialisiert
-        Call EsPrepare(AnzPara, AnzPenalty, AnzConstr, mypara)
+        Call EsPrepare(AnzPara, AnzPenalty, AnzConstr)
 
         'PES - ES_STARTVALUES
         'Startwerte werden zugewiesen
-        Call EsStartvalues()
+        Call EsStartvalues(Parameter)
 
     End Sub
 
@@ -281,7 +281,7 @@ Public Class PES
     'Bestwertspeicher auf sehr großen Wert (Strategie minimiert in dieser Umsetzung)
     'TODO: ESPrepare Für Paretooptimierung noch nicht fertig!!!!
     '*******************************************************************************
-    Private Sub EsPrepare(ByVal AnzPara As Short, ByVal AnzPenalty As Short, ByVal AnzConstr As Short, ByVal mypara() As Double)
+    Private Sub EsPrepare(ByVal AnzPara As Short, ByVal AnzPenalty As Short, ByVal AnzConstr As Short)
         Dim m, n, l, i As Short
 
         'Überprüfung der Eingabeparameter (es muss mindestens ein Parameter variiert und eine
@@ -299,14 +299,6 @@ Public Class PES
         'Dynamisches Array Initialisieren
         ReDim AktPara.Xn(AktPara.NPara - 1)                'Variablenvektor wird initialisiert
         ReDim AktPara.Dn(AktPara.NPara - 1)                'Schrittweitenvektor wird initialisiert
-
-        For i = 0 To AktPara.NPara - 1
-            If mypara(i) <= 0 Or mypara(i) > 1 Then
-                Throw new Exception("Der Startparameter " & i & " liegt nicht zwischen 0 und 1. Sie müssen hier skaliert vorliegen")
-            End If
-            AktPara.Xn(i) = mypara(i)
-            AktPara.Dn(i) = PES_Settings.DnStart
-        Next
 
         'Parametervektoren initialisieren
         ReDim Dp(AktPara.NPara - 1, PES_Settings.NEltern - 1, PES_Settings.NPopEltern - 1)
@@ -395,13 +387,25 @@ Public Class PES
     'PES_Settings.iStartPar 2: Originalparameter    -> Schrittweite = Startschrittweite
     '                                               -> Parameterwert = Originalparameter
     '***********************************************************************************
-    Public Sub EsStartvalues()
+    Public Sub EsStartvalues(ByVal Parameter() As Double)
+
+        Dim i As Integer
+
+        'Dynamisches Array wird mit Werten belegt
+        For i = 0 To AktPara.NPara - 1
+            If Parameter(i) <= 0 Or Parameter(i) > 1 Then
+                Throw New Exception("Der Startparameter " & i & " liegt nicht zwischen 0 und 1. Sie müssen hier skaliert vorliegen")
+            End If
+            AktPara.Xn(i) = Parameter(i)
+            AktPara.Dn(i) = PES_Settings.DnStart
+        Next
 
         Dim n, v, m As Short
 
         'Zufallsgenerator initialisieren
         Randomize()
 
+        'Die Startparameter für die Eltern werden gesetzt
         Select Case PES_Settings.iStartPar
 
             Case EVO_STARTPARAMETER.Zufall 'Zufällige Startwerte
