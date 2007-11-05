@@ -64,8 +64,6 @@ Public Class PES
         Dim NConstrains As Short            'Anzahl der Randbedingungen
         Dim Dn() As Double                  'Schrittweitenvektor (Dimension varanz)
         Dim Xn() As Double                  'aktuelle Variablenwerte (Dimension varanz)
-        Dim Xmin() As Double                'untere Schranke (Dimension varanz)
-        Dim Xmax() As Double                'Obere Schranke (Dimension varanz)
     End Structure
 
     Private AktPara As Struct_AktPara
@@ -300,22 +298,15 @@ Public Class PES
 
         'Dynamisches Array Initialisieren
         ReDim AktPara.Xn(AktPara.NPara - 1)                'Variablenvektor wird initialisiert
-        ReDim AktPara.Xmin(AktPara.NPara - 1)              'UntereSchrankenvektor wird initialisiert
-        ReDim AktPara.Xmax(AktPara.NPara - 1)              'ObereSchrankenvektor wird initialisiert
         ReDim AktPara.Dn(AktPara.NPara - 1)                'Schrittweitenvektor wird initialisiert
 
         For i = 0 To AktPara.NPara - 1
+            If mypara(i) <= 0 Or mypara(i) > 1 Then
+                Throw new Exception("Der Startparameter " & i & " liegt nicht zwischen 0 und 1. Sie müssen hier skaliert vorliegen")
+            End If
             AktPara.Xn(i) = mypara(i)
-            AktPara.Xmin(i) = 0
-            AktPara.Xmax(i) = 1
-            'ToDo: Welchen Zweck hat diese Prüfung hier. Die Grenzen sollten zu jeder Zeit eingehalten werden
-            AktPara.Xn(i) = Math.Min(AktPara.Xn(i), AktPara.Xmax(i))
-            AktPara.Xn(i) = Math.Max(AktPara.Xn(i), AktPara.Xmin(i))
-        Next
-
-        For i = 0 To AktPara.NPara - 1
             AktPara.Dn(i) = PES_Settings.DnStart
-        Next i
+        Next
 
         'Parametervektoren initialisieren
         ReDim Dp(AktPara.NPara - 1, PES_Settings.NEltern - 1, PES_Settings.NPopEltern - 1)
@@ -761,7 +752,7 @@ Public Class PES
                     XeTemp = Xe(v, n, PES_iAkt.iAktPop) + DeTemp * Z
 
                     ' Restriktion für die mutierten Werte
-                Loop While (XeTemp <= AktPara.Xmin(v) Or XeTemp > AktPara.Xmax(v))
+                Loop While (XeTemp <= 0 Or XeTemp > 1)
 
                 De(v, n, PES_iAkt.iAktPop) = DeTemp
                 Xe(v, n, PES_iAkt.iAktPop) = XeTemp
@@ -800,7 +791,7 @@ Public Class PES
                 'Mutation wird durchgeführt
                 XnTemp = AktPara.Xn(v) + DnTemp * Z
                 'Restriktion für die mutierten Werte
-            Loop While (XnTemp <= AktPara.Xmin(v) Or XnTemp > AktPara.Xmax(v))
+            Loop While (XnTemp <= 0 Or XnTemp > 1)
 
             AktPara.Dn(v) = DnTemp
             AktPara.Xn(v) = XnTemp
