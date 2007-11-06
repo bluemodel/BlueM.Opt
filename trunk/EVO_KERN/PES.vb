@@ -736,7 +736,7 @@ Public Class PES
             '+/-1
             expo = (2 * Int(Rnd() + 0.5) - 1)
             'Schrittweite wird mutiert
-            DeTemp = De(1, 1, PES_iAkt.iAktPop) * palpha ^ expo
+            DeTemp = De(0, 0, PES_iAkt.iAktPop) * palpha ^ expo
         End If
 
         For v = 0 To AktPara.NPara - 1
@@ -777,7 +777,7 @@ Public Class PES
             '+/-1
             expo = (2 * Int(Rnd() + 0.5) - 1)
             'Schrittweite wird mutiert
-            DnTemp = AktPara.Dn(1) * galpha ^ expo
+            DnTemp = AktPara.Dn(0) * galpha ^ expo
         End If
 
         For v = 0 To AktPara.NPara - 1
@@ -934,7 +934,7 @@ Public Class PES
             'als die schlechteste im Bestwertspeicher, wird dieser ersetzt
             If QN(0) < Qb(j, PES_iAkt.iAktPop, 0) Then
                 Qb(j, PES_iAkt.iAktPop, 0) = QN(0)
-                For v = 0 To AktPara.NPara  - 1
+                For v = 0 To AktPara.NPara - 1
                     'Die Schrittweite wird ebenfalls übernommen
                     Db(v, j, PES_iAkt.iAktPop) = AktPara.Dn(v)
                     'Die eigentlichen Parameterwerte werden übernommen
@@ -1243,7 +1243,7 @@ Public Class PES
             '-------------------------------------------------------
             NFrontMember_aktuell = Count_Front_Members(0, NDSResult)
 
-			'BUG 135
+            'BUG 135
             Member_Sekundärefront = Math.Max(UBound(SekundärQb), 0) 'Weil wenn die Länge von SekundärQb 0 ist, gibt UBound -1 zurück!
 
             'SekPop wird um die aktuelle Front erweitert
@@ -1463,7 +1463,7 @@ Public Class PES
         For i = 0 To NDSorting.GetUpperBound(0)
             If (NDSorting(i).dominated = False) Then
                 counter += 1
-                Call Temp(0).Copy(NDSorting(i), Temp(counter -1 ))
+                Call Temp(0).Copy(NDSorting(i), Temp(counter - 1))
             End If
         Next i
 
@@ -1604,7 +1604,7 @@ Public Class PES
         Next i
 
         d_mean = 0
-        
+
         'BUG 135
         For i = 0 To PES_Settings.NEltern - 2
             d(i) = 1.0E+300
@@ -1712,7 +1712,7 @@ Public Class PES
         Dim Nachbarn() As Struct_Neighbourhood
         Dim swap As Struct_Neighbourhood
 
-		'BUG 135 ganze Funktion
+        'BUG 135 ganze Funktion
         ReDim Nachbarn(PES_Settings.NEltern - 2)
 
         For i = 0 To IndexElter - 2
