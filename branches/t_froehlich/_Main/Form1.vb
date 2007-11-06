@@ -608,13 +608,14 @@ Partial Class Form1
 
                 'Simulationsergebnis in Wave laden
                 If (SensiPlot1.show_Wave) Then
-                    'BUG 182: Die WEL-Datei hat bei Smusi einen anderen Namen!
-                    Dim WEL As New Wave.WEL(Sim1.WorkDir & Sim1.Datensatz & ".wel", Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).SimGr)
+                    'SimReihe auslesen
+                    Dim SimReihe As Wave.Zeitreihe
+                    SimReihe = Sim1.SimErgebnis.getReihe(Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).SimGr)
                     'OptParameter und -Wert an Titel anhängen
                     'TODO: bei 2-Parametern auch den Wert des 2. Parameters anhängen!
-                    WEL.Zeitreihen(0).Title += " (" & Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Bezeichnung & ": " _
+                    SimReihe.Title += " (" & Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Bezeichnung & ": " _
                                                     & Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Wert & ")"
-                    Wave1.Display_Series(WEL.Zeitreihen(0))
+                    Wave1.Display_Series(SimReihe)
                 End If
 
                 'Qualitätswerte und OptParameter in DB speichern
@@ -750,20 +751,21 @@ Partial Class Form1
             For i = 0 To CES1.n_Childs - 1
                 'Und pro Location
                 'xxxxxxxxxxxxxxxx
-                For j = 0 To CES1.List_Childs(i).Path.GetUpperBound(0)
-
-                    'Standard Parameter werden aus dem Sim besorgt
-                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
-
-                    'Die Zahl der Parameter wird überschrieben (AnzZiel und AnzRand sind OK)
-                    'Anzahl der Parameter bezieht sich hier nur auf eine Location
-                    globalAnzPar = CES1.List_Childs(i).Loc(j).Loc_Para.GetLength(1)
+                For j = 0 To CES1.n_Locations - 1
 
                     'Die Parameter (falls vorhanden) werden überschrieben
                     If Not CES1.List_Childs(i).Loc(j).Loc_Para.GetLength(1) = 0 Then
-                        ReDim myPara(CES1.List_Childs(i).Loc(j).Loc_Para.GetLength(1))
+
+                        'Standard Parameter werden aus dem Sim besorgt
+                        Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
+
+                        'Die Zahl der Parameter wird überschrieben (AnzZiel und AnzRand sind OK)
+                        'Anzahl der Parameter bezieht sich hier nur auf eine Location
+                        globalAnzPar = CES1.List_Childs(i).Loc(j).Loc_Para.GetLength(1)
+
+                        ReDim myPara(CES1.List_Childs(i).Loc(j).Loc_Para.GetUpperBound(1))
                         For m = 0 To CES1.List_Childs(i).Loc(j).Loc_Para.GetUpperBound(1)
-                            myPara(m + 1) = CES1.List_Childs(i).Loc(j).Loc_Para(1, m)
+                            myPara(m) = CES1.List_Childs(i).Loc(j).Loc_Para(1, m)
                         Next
                         '1. EVO_Settings zurücksetzen; 2. Die Settings werden für Hybrid gesetzt
                         EVO_Settings1.isSaved = False
@@ -772,7 +774,7 @@ Partial Class Form1
                         'Schritte 2 - 5 PES wird initialisiert (Weiteres siehe dort ;-)
                         '**************************************************************
                         Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen, Method)
-                        '**************************************************************
+
                         'Dem Child wird der Schrittweitenvektor zugewiesen und gegebenenfalls der Parameter zufällig gewählt
                         'wird also nicht in PES.ESStarten gemacht
                         ReDim CES1.List_Childs(i).Loc(j).Loc_Dn(CES1.List_Childs(i).Loc(j).Loc_Para.GetUpperBound(1))
@@ -884,30 +886,88 @@ Partial Class Form1
             'HYBRID: REPRODUKTION und MUTATION
             '*********************************
             If Method = METH_HYBRID Then
-                'Child Schleife hier da für jedes Child die PES Funktionen angesteuert werden
+                'pro Child
+                'xxxxxxxxx
                 For i = 0 To CES1.List_Childs.GetUpperBound(0)
-
-
-
 
                     'Ermittelt fuer jedes Child den PES Parent Satz
                     Call CES1.Memory_Search(CES1.List_Childs(i))
 
-                    'Schleife über alle Locations
+                    'und pro Location
+                    'xxxxxxxxxxxxxxxx
                     For j = 0 To CES1.n_Locations - 1
 
-                        ReDim CES1.PES_Parents(0)
-                        'Call Reduce_Para(ces1.PES_Parents
+                        'Die Parameter (falls vorhanden) werden überschrieben
+                        If Not CES1.List_Childs(i).Loc(j).Loc_Para.GetLength(1) = 0 Then
 
-                        'PES Geschichten
-                        '###############
+                            '??????????????????????
+                            PES1 = New EVO.Kern.PES
 
-                        'Schritte 2 - 5 PES wird initialisiert - Weiteres siehe dort ;-)
-                        '***************************************************************
+                            'Standard Parameter werden aus dem Sim besorgt
+                            Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
+
+                            'Die Zahl der Parameter wird überschrieben (AnzZiel und AnzRand sind OK)
+                            'Anzahl der Parameter bezieht sich hier nur auf eine Location
+                            For m = 0 To CES1.PES_Parents.GetUpperBound(0)
+                                If CES1.PES_Parents(m).iLocation = j + 1 Then
+                                    globalAnzPar = CES1.PES_Parents(m).Loc(j).Loc_Para.GetLength(1)
+                                    Exit For
+                                End If
+                            Next
+
+                            'Die Anzahl der Eltern wird bestimmt
+                            Dim n_eltern As Integer = 0
+                            For m = 0 To CES1.PES_Parents.GetUpperBound(0)
+                                If j = CES1.PES_Parents(m).iLocation Then
+                                    n_eltern += 1
+                                End If
+                            Next
+
+                            'Die Kinder bekommen je nach Fall (Eltern keine Eltern) neue Parameter
+                            If n_eltern = 0 Then
+                                'Falls noch keine Eltern vorhanden sind
+                                ReDim CES1.List_Childs(i).Loc(j).Loc_Dn(CES1.List_Childs(i).Loc(j).Loc_Para.GetUpperBound(1))
+                                For m = 0 To CES1.List_Childs(i).Loc(j).Loc_Para.GetUpperBound(1)
+                                    CES1.List_Childs(i).Loc(j).Loc_Dn(m) = EVO_Settings1.PES_Settings.DnStart
+                                    'Falls zufällige Startwerte
+                                    If EVO_Settings1.PES_Settings.iStartPar = Kern.EVO_STARTPARAMETER.Zufall Then
+                                        Randomize()
+                                        CES1.List_Childs(i).Loc(j).Loc_Para(1, m) = Rnd()
+                                    End If
+                                Next
+                            Else
+                                EVO_Settings1.isSaved = False
+                                Call EVO_Settings1.SetFor_CES_PES(1, n_eltern, 1)
+
+                                'Schritte 2 - 5 PES wird initialisiert (Weiteres siehe dort ;-)
+                                '**************************************************************
+                                Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen, Method)
+
+                                'REPRODUKTIONSPROZESS - Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
+                                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                                Call PES1.EsReproduktion()
+
+                                'MUTATIONSPROZESS - Mutieren der Ausgangswerte
+                                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                                Call PES1.EsMutation()
+
+                                'Auslesen der Variierten Parameter
+                                myPara = PES1.EsGetParameter()
+
+
+
+
+                                'Falls Eltern vorhanden sind Selektion, Reproduktion, Mutation
+                                Dim k As Integer = 0
+                                k = CES1.PES_Parents(0).iLocation
+
+
                         Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen, Method)
 
 
 
+                            End If
+                        End If
                     Next
                 Next
             End If
@@ -945,12 +1005,12 @@ Partial Class Form1
                 'Hier werden Child die passenden Elemente zugewiesen
                 Dim j As Integer
                 For j = 0 To CES1.n_Locations - 1
-                    Call Sim1.Identify_Measures_Elements_Parameters(j, CES1.List_Childs(i).Path(j), ces1.List_Childs(i).Measures(j), CES1.List_Childs(i).Loc(j).Loc_Elem, CES1.List_Childs(i).Loc(j).Loc_Para)
+                    Call Sim1.Identify_Measures_Elements_Parameters(j, CES1.List_Childs(i).Path(j), CES1.List_Childs(i).Measures(j), CES1.List_Childs(i).Loc(j).Loc_Elem, CES1.List_Childs(i).Loc(j).Loc_Para)
                 Next
 
                 'Reduktion der OptimierungsParameter und immer dann wenn nicht Nullvariante
                 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-                If Sim1.Reduce_OptPara_and_ModPara(ces1.List_Childs(i).All_Elem) Then
+                If Sim1.Reduce_OptPara_and_ModPara(CES1.List_Childs(i).All_Elem) Then
 
                     'Parameterübergabe an PES
                     '************************
@@ -1016,14 +1076,22 @@ Start_Evolutionsrunden:
         For PES1.PES_iAkt.iAktRunde = 1 To PES1.PES_Settings.NRunden
 
             Call EVO_Opt_Verlauf1.Runden(PES1.PES_iAkt.iAktRunde)
-            Call PES1.EsResetPopBWSpeicher()
+            Call PES1.EsResetPopBWSpeicher() 'Nur bei Komma Strategie
 
             'Über alle Populationen
             'xxxxxxxxxxxxxxxxxxxxxx
             For PES1.PES_iAkt.iAktPop = 1 To PES1.PES_Settings.NPopul
 
                 Call EVO_Opt_Verlauf1.Populationen(PES1.PES_iAkt.iAktPop)
-                Call PES1.EsPopVaria()
+
+                'POPULATIONS REPRODUKTIONSPROZESS
+                '################################
+                'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern der Population
+                Call PES1.EsPopReproduktion()
+
+                'POPULATIONS MUTATIONSPROZESS
+                '############################
+                'Mutieren der Ausgangswerte der Population
                 Call PES1.EsPopMutation()
 
                 'Über alle Generationen
@@ -1031,7 +1099,7 @@ Start_Evolutionsrunden:
                 For PES1.PES_iAkt.iAktGen = 1 To PES1.PES_Settings.NGen
 
                     Call EVO_Opt_Verlauf1.Generation(PES1.PES_iAkt.iAktGen)
-                    Call PES1.EsResetBWSpeicher()
+                    Call PES1.EsResetBWSpeicher()  'Nur bei Komma Strategie
 
                     'Über alle Nachkommen
                     'xxxxxxxxxxxxxxxxxxxxxxxxx
@@ -1046,12 +1114,14 @@ Start_Evolutionsrunden:
                         Dim Eval_Count As Integer = 0
                         Dim SIM_Eval_is_OK As Boolean = True
                         Do
-                            'REPRODUKTIONSPROZESS - Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
-                            'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-                            Call PES1.EsVaria()
+                            'REPRODUKTIONSPROZESS
+                            '####################
+                            'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
+                            Call PES1.EsReproduktion()
 
-                            'MUTATIONSPROZESS - Mutieren der Ausgangswerte
-                            'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                            'MUTATIONSPROZESS
+                            '################
+                            'Mutieren der Ausgangswerte
                             Call PES1.EsMutation()
 
                             'Auslesen der Variierten Parameter
@@ -1137,6 +1207,8 @@ Start_Evolutionsrunden:
 
                         Loop While SIM_Eval_is_OK = False
 
+                        'SELEKTIONSPROZESS Schritt 1
+                        '###########################
                         'Einordnen der Qualitätsfunktion im Bestwertspeicher bei SO
                         'Falls MO Einordnen der Qualitätsfunktion in NDSorting
                         Call PES1.EsBest(QN, RN)
@@ -1144,12 +1216,13 @@ Start_Evolutionsrunden:
                         System.Windows.Forms.Application.DoEvents()
 
                     Next 'Ende Schleife über alle Nachkommen
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
+                    'SELEKTIONSPROZESS Schritt 2 für NDSorting sonst Xe = Xb
+                    '#######################################################
                     'Die neuen Eltern werden generiert
                     Call PES1.EsEltern()
 
-                    'Sekundäre Population 'BUG 135: SekPop(,) fängt bei 1 an!
+                    'Sekundäre Population
                     If (EVO_Settings1.PES_Settings.is_MO_Pareto) Then
                         SekPopulation = PES1.EsGetSekundärePopulation()
                         'SekPop zeichnen
@@ -1168,12 +1241,16 @@ Start_Evolutionsrunden:
                 'xxxxxxxxxxxxxxxxxxxxxxxxxxx
                 System.Windows.Forms.Application.DoEvents()
 
+                'POPULATIONS SELEKTIONSPROZESS  Schritt 1
+                '########################################
                 'Einordnen der Qualitätsfunktion im PopulationsBestwertspeicher
                 Call PES1.EsPopBest()
 
             Next 'Ende alle Populationen
             'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
+            'POPULATIONS SELEKTIONSPROZESS  Schritt 2
+            '########################################
             'Die neuen Populationseltern werden generiert
             Call PES1.EsPopEltern()
             System.Windows.Forms.Application.DoEvents()
@@ -1193,24 +1270,23 @@ Start_Evolutionsrunden:
         Dim i As Short
         Dim serie As Steema.TeeChart.Styles.Series
 
-        'BUG 135: SekPop(,) fängt bei 1 an!
-        If (UBound(SekPop, 2) = 2) Then
+        If (SekPop.GetLength(1) = 2) Then
             '2 Zielfunktionen
             '----------------------------------------------------------------
             serie = DForm.Diag.getSeriesPoint("Sekundäre Population", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
             serie.Clear()
-            For i = 1 To UBound(SekPop, 1)
-                serie.Add(SekPop(i, 1), SekPop(i, 2), "")
+            For i = 0 To SekPop.GetUpperBound(1)
+                serie.Add(SekPop(i, 0), SekPop(i, 1), "")
             Next i
 
-        ElseIf (UBound(SekPop, 2) >= 3) Then
+        ElseIf (SekPop.GetLength(1) >= 3) Then
             '3 oder mehr Zielfunktionen (es werden die ersten drei angezeigt)
             '----------------------------------------------------------------
             Dim serie3D As Steema.TeeChart.Styles.Points3D
             serie3D = DForm.Diag.getSeries3DPoint("Sekundäre Population", "Green")
             serie3D.Clear()
-            For i = 1 To UBound(SekPop, 1)
-                serie3D.Add(SekPop(i, 1), SekPop(i, 2), SekPop(i, 3))
+            For i = 0 To SekPop.GetUpperBound(0)
+                serie3D.Add(SekPop(i, 0), SekPop(i, 1), SekPop(i, 2))
             Next i
         End If
 
@@ -1489,20 +1565,11 @@ Start_Evolutionsrunden:
                             .QWertTmp = Sim1.QWert(Sim1.List_OptZiele(i))
                             QWertString &= eol & .Bezeichnung & ": " & .QWertTmp.ToString()
 
-                            'Name der WEL-Simulationsergebnisdatei
-                            'BUG 171: Name der Ergebnisdatei
-                            Dim WELFile As String = ""
-                            If (Anwendung = ANW_BLUEM) Then
-                                WELFile = Sim1.WorkDir & Sim1.Datensatz & ".WEL"
-                            ElseIf (Anwendung = ANW_SMUSI) Then
-                                WELFile = Sim1.WorkDir & .SimGr.Substring(0, 4) & "_WEL.ASC"
-                            End If
-
                             'Simulationsgrößen nur jeweils ein Mal zeichnen
                             If (Not SimSeries.Contains(.SimGr)) Then
                                 SimSeries.Add(.SimGr, .SimGr)
                                 'Simulationsergebnis in Wave laden
-                                Wave1.Import_WEL(WELFile, .SimGr)
+                                Wave1.Display_Series(Sim1.SimErgebnis.getReihe(.SimGr))
                             End If
 
                             'ggf. Referenzreihe in Wave speichern
@@ -1534,7 +1601,7 @@ Start_Evolutionsrunden:
                     '-------------------
                     Dim anno1 As New Steema.TeeChart.Tools.Annotation(Wave1.TChart1.Chart)
                     anno1.Text = QWertString & eol & ParamString & ConstrString
-                    anno1.Position = Steema.TeeChart.Tools.AnnotationPositions.LeftTop
+                    anno1.Position = Steema.TeeChart.Tools.AnnotationPositions.RightBottom
 
                     'Wave anzeigen
                     '-------------

@@ -28,7 +28,7 @@ Public MustInherit Class Sim
     'Information
     '-----------
 
-    Public Method as String                             'Verwendete Methode
+    Public Method as String                              'Verwendete Methode
 
     'Generelle Eigenschaften
     '-----------------------
@@ -39,6 +39,8 @@ Public MustInherit Class Sim
     Public SimStart As DateTime                          'Anfangsdatum der Simulation
     Public SimEnde As DateTime                           'Enddatum der Simulation
     Public SimDT As TimeSpan                             'Zeitschrittweite der Simulation
+
+    Public SimErgebnis As Wave.WEL                    'Speichert das momentane Simulationsergebnis
 
     'Konstanten
     '----------
@@ -555,11 +557,11 @@ Public MustInherit Class Sim
                     ext = Path.GetExtension(.ZielReiheDatei)
                     Select Case (ext.ToUpper)
                         Case ".WEL"
-                            Dim WEL As New Wave.WEL(Me.WorkDir & .ZielReiheDatei, .ZielGr)
-                            .ZielReihe = WEL.Read_WEL()(0)
+                            Dim WEL As New Wave.WEL(Me.WorkDir & .ZielReiheDatei, True)
+                            .ZielReihe = WEL.getReihe(.ZielGr)
                         Case ".ZRE"
-                            Dim ZRE As New Wave.ZRE(Me.WorkDir & .ZielReiheDatei)
-                            .ZielReihe = ZRE.Zeitreihe
+                            Dim ZRE As New Wave.ZRE(Me.WorkDir & .ZielReiheDatei, True)
+                            .ZielReihe = ZRE.Zeitreihen(0)
                         Case ".PRB"
                             'BUG 183: geht nicht mehr, weil PRB-Dateien keine Zeitreihen sind!
                             'IsOK = Read_PRB(Me.WorkDir & .ZielReiheDatei, .ZielGr, .ZielReihe)
@@ -669,11 +671,11 @@ Public MustInherit Class Sim
                         ext = Path.GetExtension(.GrenzReiheDatei)
                         Select Case (ext.ToUpper)
                             Case ".WEL"
-                                Dim WEL As New Wave.WEL(Me.WorkDir & .GrenzReiheDatei, .GrenzGr)
-                                .GrenzReihe = WEL.Read_WEL()(0)
+                                Dim WEL As New Wave.WEL(Me.WorkDir & .GrenzReiheDatei, True)
+                                .GrenzReihe = WEL.getReihe(.GrenzGr)
                             Case ".ZRE"
-                                Dim ZRE As New Wave.ZRE(Me.WorkDir & .GrenzReiheDatei)
-                                .GrenzReihe = ZRE.Zeitreihe
+                                Dim ZRE As New Wave.ZRE(Me.WorkDir & .GrenzReiheDatei, True)
+                                .GrenzReihe = ZRE.Zeitreihen(0)
                             Case Else
                                 Throw New Exception("Das Format der Grenzwertreihe '" & .GrenzReiheDatei & "' wurde nicht erkannt!")
                         End Select
@@ -1248,12 +1250,11 @@ Public MustInherit Class Sim
         globalAnzPar = Me.List_OptParameter.GetLength(0)
 
         'Parameterwerte und Beziehungen übergeben
-        'BUG 135: mypara() und beziehungen() fangen bei 1 an!
-        ReDim mypara(globalAnzPar)
-        ReDim beziehungen(globalAnzPar)
-        For i = 1 To globalAnzPar
-            mypara(i) = Me.List_OptParameter(i - 1).SKWert
-            beziehungen(i) = Me.List_OptParameter(i - 1).Beziehung
+        ReDim mypara(globalAnzPar - 1)
+        ReDim beziehungen(globalAnzPar - 1)
+        For i = 0 To globalAnzPar  - 1
+            mypara(i) = Me.List_OptParameter(i).SKWert
+            beziehungen(i) = Me.List_OptParameter(i).Beziehung
         Next
 
         'Anzahl Optimierungsziele übergeben
@@ -1272,11 +1273,7 @@ Public MustInherit Class Sim
 
         'Mutierte Parameter an OptParameter übergeben
         For i = 0 To Me.List_OptParameter.GetUpperBound(0)
-            If myPara.GetUpperBound(0) = List_OptParameter.GetUpperBound(0) - 1 Then
-                List_OptParameter(i).SKWert = myPara(i + 1)         'BUG 135: mypara() fängt bei 1 an!
-            Else
-                List_OptParameter(i).SKWert = myPara(i)
-            End If
+            List_OptParameter(i).SKWert = myPara(i)
         Next
 
         'Mutierte Parameter in Eingabedateien schreiben
@@ -1453,9 +1450,8 @@ Public MustInherit Class Sim
         Dim QWert As Double
 
         'Simulationsergebnis auslesen
-        Dim SimReihe As New Wave.Zeitreihe(OptZiel.SimGr)
-        Dim WEL As New Wave.WEL(WorkDir & Datensatz & ".wel", OptZiel.SimGr)
-        SimReihe = WEL.Read_WEL()(0)
+        Dim SimReihe As Wave.Zeitreihe
+        SimReihe = Me.SimErgebnis.getReihe(OptZiel.SimGr)
 
         'Fallunterscheidung Zieltyp
         '--------------------------
@@ -1688,9 +1684,8 @@ Public MustInherit Class Sim
         Dim i As Integer
 
         'Simulationsergebnis auslesen
-        Dim SimReihe As New Wave.Zeitreihe(constr.SimGr)
-        Dim WEL As New Wave.WEL(WorkDir & Datensatz & ".wel", constr.SimGr)
-        SimReihe = WEL.Read_WEL()(0)
+        Dim SimReihe As Wave.Zeitreihe
+        SimReihe = Me.SimErgebnis.getReihe(constr.SimGr)
 
         'Fallunterscheidung GrenzTyp (Wert/Reihe)
         Select Case constr.GrenzTyp
@@ -2028,12 +2023,12 @@ Public MustInherit Class Sim
         Dim i, j As Integer
         Dim bedingung As String
         Dim Sim_ID As Integer
-        For i = 1 To SekPop.GetUpperBound(0)    'BUG 135: SekPop(,) fängt bei 1 an!
+        For i = 0 To SekPop.GetUpperBound(0)
 
             'zugehörige Sim_ID bestimmen
             bedingung = ""
             For j = 0 To Me.List_OptZiele.GetUpperBound(0)
-                bedingung &= " AND QWerte.[" & Me.List_OptZiele(j).Bezeichnung & "] = " & SekPop(i, j + 1)
+                bedingung &= " AND QWerte.[" & Me.List_OptZiele(j).Bezeichnung & "] = " & SekPop(i, j)
             Next
             command.CommandText = "SELECT Sim.ID FROM Sim INNER JOIN QWerte ON Sim.ID = QWerte.Sim_ID WHERE (1=1" & bedingung & ")"
             Sim_ID = command.ExecuteScalar()
