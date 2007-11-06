@@ -59,13 +59,8 @@ Public Class PES
 
     'Structure zum Speichern der Werte die aus den OptDateien generiert werden
     Private Structure Struct_AktPara
-        Dim NPara As Short                  'Anzahl Parameter
-        Dim NPenalty As Short               'Anzahl der Penaltyfunktionen
-        Dim NConstrains As Short            'Anzahl der Randbedingungen
         Dim Dn() As Double                  'Schrittweitenvektor (Dimension varanz)
         Dim Xn() As Double                  'aktuelle Variablenwerte (Dimension varanz)
-        Dim Xmin() As Double                'untere Schranke (Dimension varanz)
-        Dim Xmax() As Double                'Obere Schranke (Dimension varanz)
     End Structure
 
     Private AktPara As Struct_AktPara
@@ -76,12 +71,16 @@ Public Class PES
         Dim iAktRunde As Short              'Zähler für aktuelle Runde
         Dim iAktPop As Short                'Zähler für aktuelle Population
         Dim iAktGen As Short                'Zähler für aktuelle Generation
-        Dim iAktNachf As Short              'Zähler für aktuellen Nachfahre
+        Dim iAktNachf As Short              'Zähler für aktuellen Nachfahren
     End Structure
 
     'Muss Public sein, da das Form hiermit die Schleifen kontrolliert
     Public PES_iAkt As Struct_iAkt
 
+    Private NPara As Short                  'Anzahl Parameter
+    Private NPenalty As Short               'Anzahl der Penaltyfunktionen
+    Private NConstrains As Short            'Anzahl der Randbedingungen 
+    '----------------------
     Private Xp(,,) As Double                'PopulationsElternwert der Variable
     Private Dp(,,) As Double                'PopulationsElternschrittweite
     '----------------------
@@ -199,29 +198,25 @@ Public Class PES
     'Methoden
     '########
 
-    'Schritt 2 -5 zum Initialisieren der PES
+    'Initialisierung der PES
     '***************************************
-    Public Sub PesInitialise(ByRef PES_Settings As Struct_Settings, ByVal AnzPara As Short, ByVal AnzPenalty As Short, ByVal AnzConstr As Short, ByRef mypara() As Double, ByVal Method As String)
+    Public Sub PesInitialise(ByRef PES_Settings As Struct_Settings, ByVal AnzPara As Short, ByVal AnzPenalty As Short, ByVal AnzConstr As Short, ByRef Parameter() As Double, ByVal Method As String)
 
-        '2. Schritt: PES - ES_OPTIONS
+        'Schritt 1: PES - ES_OPTIONS
         'Optionen der Evolutionsstrategie werden übergeben
         Call EsSettings(PES_Settings, Method)
 
-        '3. Schritt: PES - ES_INI
-        'Die öffentlichen dynamischen Arrays werden initialisiert (Dn, An, Xn, Xmin, Xmax), die Anzahl der Zielfunktionen wird festgelegt und Ausgangsparameter werden übergeben (War früher ES_Let Parameter)
-        Call EsDim(AnzPara, AnzPenalty, AnzConstr, mypara)
-
-        '4. Schritt: PES - ES_PREPARE
+        'Schritt 2: PES - ES_PREPARE
         'Interne Variablen werden initialisiert, Zufallsgenerator wird initialisiert
-        Call EsPrepare()
+        Call EsPrepare(AnzPara, AnzPenalty, AnzConstr)
 
-        '5. Schritt: PES - ES_STARTVALUES
+        'Schritt 3: PES - ES_STARTVALUES
         'Startwerte werden zugewiesen
-        Call EsStartvalues()
+        Call EsStartvalues(Parameter)
 
     End Sub
 
-    'Schritt 2: ES_SETTINGS
+    'Schritt 1: ES_SETTINGS
     'Function ES_SETTINGS übergibt Optionen für Evolutionsstrategie und Prüft die eingestellten Optionen
     '***************************************************************************************************
     Private Sub EsSettings(ByRef Settings As Struct_Settings, ByVal Method As String)
@@ -281,12 +276,14 @@ Public Class PES
 
     End Sub
 
-
-    'Schritt 3: ES_INI
-    'Function ES_INI Initialisiert benötigte dynamische Arrays und legt Anzahl der Zielfunktionen fest
-    '*************************************************************************************************
-    Private Sub EsDim(ByVal AnzPara As Short, ByVal AnzPenalty As Short, ByVal AnzConstr As Short, ByVal mypara() As Double)
-        Dim i As Integer
+    'Schritt 2: ES_PREPARE
+    'Initialisiert benötigte dynamische Arrays und legt Anzahl der Zielfunktionen fest
+    'Initialisiert alle internen Arrays und setzt den
+    'Bestwertspeicher auf sehr großen Wert (Strategie minimiert in dieser Umsetzung)
+    'TODO: ESPrepare Für Paretooptimierung noch nicht fertig!!!!
+    '*******************************************************************************
+    Private Sub EsPrepare(ByVal AnzPara As Short, ByVal AnzPenalty As Short, ByVal AnzConstr As Short)
+        Dim m, n, l, i As Short
 
         'Überprüfung der Eingabeparameter (es muss mindestens ein Parameter variiert und eine
         'Penaltyfunktion ausgewertet werden)
@@ -295,62 +292,38 @@ Public Class PES
             Throw New Exception("Es muss mindestens ein Parameter variiert und eine Penaltyfunktion ausgewertet werden")
         End If
 
-        AktPara.NPara = AnzPara                         'Anzahl der Parameter wird übergeben
-        AktPara.NPenalty = AnzPenalty                   'Anzahl der Zielfunktionen wird übergeben
-        AktPara.NConstrains = AnzConstr                 'Anzahl der Randbedingungen wird übergeben
+        'Anzahlen werden gesetzt
+        NPara = AnzPara                         'Anzahl der Parameter wird übergeben
+        NPenalty = AnzPenalty                   'Anzahl der Zielfunktionen wird übergeben
+        NConstrains = AnzConstr                 'Anzahl der Randbedingungen wird übergeben
 
-        ReDim AktPara.Xn(AktPara.NPara - 1)                'Variablenvektor wird initialisiert
-        ReDim AktPara.Xmin(AktPara.NPara - 1)              'UntereSchrankenvektor wird initialisiert
-        ReDim AktPara.Xmax(AktPara.NPara - 1)              'ObereSchrankenvektor wird initialisiert
-        ReDim AktPara.Dn(AktPara.NPara - 1)                'Schrittweitenvektor wird initialisiert
-
-        For i = 0 To AktPara.NPara - 1
-            AktPara.Xn(i) = mypara(i)
-            AktPara.Xmin(i) = 0
-            AktPara.Xmax(i) = 1
-            'ToDo: Welchen Zweck hat diese Prüfung hier. Die Grenzen sollten zu jeder Zeit eingehalten werden
-            AktPara.Xn(i) = Math.Min(AktPara.Xn(i), AktPara.Xmax(i))
-            AktPara.Xn(i) = Math.Max(AktPara.Xn(i), AktPara.Xmin(i))
-        Next
-
-    End Sub
-
-    'Schritt 4: ES_PREPARE
-    'Function ES_PREPARE initialisiert alle internen Arrays und setzt den
-    'Bestwertspeicher auf sehr großen Wert (Strategie minimiert in dieser Umsetzung)
-    'TODO: ESPrepare Für Paretooptimierung noch nicht fertig!!!!
-    '*******************************************************************************
-    Private Sub EsPrepare()
-
-        Dim m, n, l, i As Short
-
-        For i = 0 To AktPara.NPara - 1
-            AktPara.Dn(i) = PES_Settings.DnStart
-        Next i
+        'Dynamisches Array Initialisieren
+        ReDim AktPara.Xn(NPara - 1)                'Variablenvektor wird initialisiert
+        ReDim AktPara.Dn(NPara - 1)                'Schrittweitenvektor wird initialisiert
 
         'Parametervektoren initialisieren
-        ReDim Dp(AktPara.NPara - 1, PES_Settings.NEltern - 1, PES_Settings.NPopEltern - 1)
-        ReDim Xp(AktPara.NPara - 1, PES_Settings.NEltern - 1, PES_Settings.NPopEltern - 1)
-        ReDim Qbpop(PES_Settings.NPopul - 1, AktPara.NPenalty - 1)
-        ReDim Dbpop(AktPara.NPara - 1, PES_Settings.NEltern - 1, PES_Settings.NPopul - 1)
-        ReDim Xbpop(AktPara.NPara - 1, PES_Settings.NEltern - 1, PES_Settings.NPopul - 1)
+        ReDim Dp(NPara - 1, PES_Settings.NEltern - 1, PES_Settings.NPopEltern - 1)
+        ReDim Xp(NPara - 1, PES_Settings.NEltern - 1, PES_Settings.NPopEltern - 1)
+        ReDim Qbpop(PES_Settings.NPopul - 1, NPenalty - 1)
+        ReDim Dbpop(NPara - 1, PES_Settings.NEltern - 1, PES_Settings.NPopul - 1)
+        ReDim Xbpop(NPara - 1, PES_Settings.NEltern - 1, PES_Settings.NPopul - 1)
         '---------------------
-        ReDim De(AktPara.NPara - 1, PES_Settings.NEltern - 1, PES_Settings.NPopul - 1)
-        ReDim Xe(AktPara.NPara - 1, PES_Settings.NEltern - 1, PES_Settings.NPopul - 1)
+        ReDim De(NPara - 1, PES_Settings.NEltern - 1, PES_Settings.NPopul - 1)
+        ReDim Xe(NPara - 1, PES_Settings.NEltern - 1, PES_Settings.NPopul - 1)
         '---------------------
-        ReDim Db(AktPara.NPara - 1, PES_Settings.NEltern - 1, PES_Settings.NPopul - 1)
-        ReDim Xb(AktPara.NPara - 1, PES_Settings.NEltern - 1, PES_Settings.NPopul - 1)
-        ReDim Qb(PES_Settings.NEltern - 1, PES_Settings.NPopul - 1, AktPara.NPenalty - 1)
-        ReDim Rb(PES_Settings.NEltern - 1, PES_Settings.NPopul - 1, AktPara.NConstrains - 1)
-        '---------------------
+        ReDim Db(NPara - 1, PES_Settings.NEltern - 1, PES_Settings.NPopul - 1)
+        ReDim Xb(NPara - 1, PES_Settings.NEltern - 1, PES_Settings.NPopul - 1)
+        ReDim Qb(PES_Settings.NEltern - 1, PES_Settings.NPopul - 1, NPenalty - 1)
+        ReDim Rb(PES_Settings.NEltern - 1, PES_Settings.NPopul - 1, NConstrains - 1)
+
         'NDSorting wird nur benötigt, falls eine Paretofront approximiert wird
         If PES_Settings.is_MO_Pareto Then
             ReDim NDSorting(PES_Settings.NEltern + PES_Settings.NNachf - 1)
             For i = 0 To PES_Settings.NEltern + PES_Settings.NNachf - 1
-                ReDim NDSorting(i).penalty(AktPara.NPenalty - 1)
-                ReDim NDSorting(i).constrain(AktPara.NConstrains - 1)
-                ReDim NDSorting(i).d(AktPara.NPara - 1)
-                ReDim NDSorting(i).X(AktPara.NPara - 1)
+                ReDim NDSorting(i).penalty(NPenalty - 1)
+                ReDim NDSorting(i).constrain(NConstrains - 1)
+                ReDim NDSorting(i).d(NPara - 1)
+                ReDim NDSorting(i).X(NPara - 1)
             Next i
             If PES_Settings.iOptEltern = EVO_ELTERN.Neighbourhood Then
                 ReDim PenaltyDistance(PES_Settings.NEltern - 1, PES_Settings.NEltern - 1)
@@ -360,12 +333,12 @@ Public Class PES
 
         For n = 0 To PES_Settings.NEltern - 1
             For m = 0 To PES_Settings.NPopul - 1
-                For l = 0 To AktPara.NPenalty - 1
+                For l = 0 To NPenalty - 1
                     'Qualität der Eltern (Anzahl = parents) wird auf sehr großen Wert gesetzt
                     Qb(n, m, l) = 1.0E+300
                 Next l
-                If AktPara.NConstrains > 0 Then
-                    For l = 0 To AktPara.NConstrains - 1
+                If NConstrains > 0 Then
+                    For l = 0 To NConstrains - 1
                         'Restriktion der Eltern (Anzahl = parents) wird auf sehr kleinen Wert gesetzt
                         Rb(n, m, l) = -1.0E+300
                     Next l
@@ -373,9 +346,10 @@ Public Class PES
             Next m
         Next
 
+        'Falls NDSorting Crowding Distance wird initialisiert
         If PES_Settings.is_MO_Pareto Then
             For n = 0 To PES_Settings.NPopul - 1
-                For m = 0 To AktPara.NPenalty - 1
+                For m = 0 To NPenalty - 1
                     Select Case PES_Settings.iPopPenalty
 
                         Case EVO_POP_PENALTY.Crowding
@@ -390,7 +364,7 @@ Public Class PES
             Next n
         Else
             For n = 0 To PES_Settings.NPopul - 1
-                For m = 0 To AktPara.NPenalty - 1
+                For m = 0 To NPenalty - 1
                     'Qualität der Populationseltern wird auf sehr großen Wert gesetzt
                     Qbpop(n, m) = 1.0E+300
                 Next m
@@ -408,24 +382,35 @@ Public Class PES
 
     End Sub
 
-    'Schritt 5: ES_STARTVALUES
-    'Function ES_STARTVALUES setzt die Startwerte
+    'Schritt 1: Function ES_STARTVALUES setzt die Startwerte - Vorsicht: ÜBERLADEN
     'PES_Settings.iStartPar 1: Zufällige Startwert  -> Schrittweite = Startschrittweite
     '                                               -> Parameterwert = zufällig [0,1]
     'PES_Settings.iStartPar 2: Originalparameter    -> Schrittweite = Startschrittweite
     '                                               -> Parameterwert = Originalparameter
     '***********************************************************************************
-    Public Sub EsStartvalues()
+    Public Sub EsStartvalues(ByVal Parameter() As Double)
+
+        Dim i As Integer
+
+        'Dynamisches Array wird mit Werten belegt
+        For i = 0 To NPara - 1
+            If Parameter(i) <= 0 Or Parameter(i) > 1 Then
+                Throw New Exception("Der Startparameter " & i & " liegt nicht zwischen 0 und 1. Sie müssen hier skaliert vorliegen")
+            End If
+            AktPara.Xn(i) = Parameter(i)
+            AktPara.Dn(i) = PES_Settings.DnStart
+        Next
 
         Dim n, v, m As Short
 
         'Zufallsgenerator initialisieren
         Randomize()
 
+        'Die Startparameter für die Eltern werden gesetzt
         Select Case PES_Settings.iStartPar
 
             Case EVO_STARTPARAMETER.Zufall 'Zufällige Startwerte
-                For v = 0 To AktPara.NPara - 1
+                For v = 0 To NPara - 1
                     For n = 0 To PES_Settings.NEltern - 1
                         For m = 0 To PES_Settings.NPopEltern - 1
                             'Startwert für die Elternschrittweite wird zugewiesen
@@ -438,7 +423,7 @@ Public Class PES
                 Next v
 
             Case EVO_STARTPARAMETER.Original 'Originalparameter
-                For v = 0 To AktPara.NPara - 1
+                For v = 0 To NPara - 1
                     For n = 0 To PES_Settings.NEltern - 1
                         For m = 0 To PES_Settings.NPopEltern - 1
                             'Startwert für die Elternschrittweite wird zugewiesen
@@ -453,6 +438,23 @@ Public Class PES
 
     End Sub
 
+    'Überladen: Falls Startwerte aus CES kommen
+    Public Sub EsStartvalues(ByVal AktDn() As Object, ByVal AktXn() As Double, ByVal IndexElter As Integer)
+
+        Dim v As Short
+
+        'Die Startparameter werden aus den PES_Parents aus der CES gesetzt
+        For v = 0 To NPara - 1
+            'Startwert für die Elternschrittweite wird zugewiesen
+            Dp(v, IndexElter, 0) = AktDn(v)
+            'Startwert für die Eltern werden zugewiesen
+            '(alle gleich Anfangswerte)
+            Xp(v, IndexElter, 0) = AktXn(v)
+        Next v
+
+
+    End Sub
+
     'ES_GET_PARAMETER - dient zur Rückgabe der mutierten Parameter
     '*************************************************************
     Public Function EsGetParameter() As Double()
@@ -460,9 +462,9 @@ Public Class PES
         Dim i As Short
         Dim mypara() As Double
 
-        ReDim mypara(AktPara.NPara - 1)
+        ReDim mypara(NPara - 1)
 
-        For i = 0 To AktPara.NPara - 1
+        For i = 0 To NPara - 1
             mypara(i) = AktPara.Xn(i)
         Next i
 
@@ -477,9 +479,9 @@ Public Class PES
         Dim i, j As Short
         Dim Bestwert(,) As Double
 
-        ReDim Bestwert(PES_Settings.NEltern - 1, AktPara.NPenalty - 1)
+        ReDim Bestwert(PES_Settings.NEltern - 1, NPenalty - 1)
 
-        For i = 0 To AktPara.NPenalty - 1
+        For i = 0 To NPenalty - 1
             For j = 0 To PES_Settings.NEltern - 1
                 Bestwert(j, i) = Qb(j, PES_iAkt.iAktPop, i)
             Next j
@@ -509,11 +511,11 @@ Public Class PES
         '    Next j
         'Next i
 
-        ReDim SekPopulation(UBound(SekundärQb) - 1, AktPara.NPenalty - 1)
+        ReDim SekPopulation(UBound(SekundärQb) - 1, NPenalty - 1)
         '!Wenn Fehler hier "SekundäreQb = Nothing" auftritt wurde TeeChart mit der falschen Serie bzw. zu wenig Serien gestartet!!!
 
         For i = 0 To SekundärQb.GetUpperBound(0)
-            For j = 0 To AktPara.NPenalty - 1
+            For j = 0 To NPenalty - 1
                 SekPopulation(i, j) = SekundärQb(i).penalty(j)
             Next j
         Next i
@@ -522,6 +524,31 @@ Public Class PES
 
     End Function
 
+    'Function um PopReproduktion, PopMutation, Reproduktion und Mutio n direkt ablaufen zu lassen
+    '********************************************************************************************
+    Public Sub EsReproMut()
+
+        'POPULATIONS REPRODUKTIONSPROZESS
+        '################################
+        'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern der Population
+        Call EsPopReproduktion()
+
+        'POPULATIONS MUTATIONSPROZESS
+        '############################
+        'Mutieren der Ausgangswerte der Population
+        Call EsPopMutation()
+
+        'REPRODUKTIONSPROZESS
+        '####################
+        'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
+        Call EsReproduktion()
+
+        'MUTATIONSPROZESS
+        '################
+        'Mutieren der Ausgangswerte
+        Call EsMutation()
+
+    End Sub
 
     'ES_POP_VARIA - REPRODUKTIONSPROZESS - ToDo: Beschreibung fehlt
     '*******************************************************************************
@@ -535,7 +562,7 @@ Public Class PES
             Case EVO_POP_ELTERN.Rekombination 'MultiRekombination über alle Eltern (x/x,y) oder (x/x+y)
                 For n = 0 To PES_Settings.NEltern - 1
                     R = Int(PES_Settings.NPopEltern * Rnd())
-                    For v = 0 To AktPara.NPara - 1
+                    For v = 0 To NPara - 1
                         'Selektion der Schrittweite
                         De(v, n, PES_iAkt.iAktPop) = Dp(v, n, R)
                         'Selektion des Elter
@@ -545,7 +572,7 @@ Public Class PES
 
             Case EVO_POP_ELTERN.Mittelwert 'Mittelwertbildung über alle Eltern
                 'Ermitteln der Elter und Schrittweite über Mittelung der Elternschrittweiten
-                For v = 0 To AktPara.NPara - 1
+                For v = 0 To NPara - 1
                     For n = 0 To PES_Settings.NEltern - 1
                         De(v, n, PES_iAkt.iAktPop) = 0
                         Xe(v, n, PES_iAkt.iAktPop) = 0
@@ -561,7 +588,7 @@ Public Class PES
             Case EVO_POP_ELTERN.Selektion 'Zufallswahl über alle Eltern
                 R = Int(PES_Settings.NPopEltern * Rnd()) 'Zufallszahl entscheidet welcher
                 'Elternteil vererbt wird
-                For v = 0 To AktPara.NPara - 1
+                For v = 0 To NPara - 1
                     For n = 0 To PES_Settings.NEltern - 1
                         'Selektion der Schrittweite
                         De(v, n, PES_iAkt.iAktPop) = Dp(v, n, R)
@@ -590,7 +617,7 @@ Public Class PES
 
                 R = Int(PES_Settings.NEltern * Rnd())    'Zufallszahl entscheidet
                 'welcher Enternteil vererbt wird
-                For v = 0 To AktPara.NPara - 1
+                For v = 0 To NPara - 1
                     'Selektion der Schrittweite
                     AktPara.Dn(v) = De(v, R, PES_iAkt.iAktPop)
                     'Selektion des Elter
@@ -599,7 +626,7 @@ Public Class PES
 
             Case EVO_ELTERN.XX_Diskret 'Multi-Rekombination, diskret
 
-                For v = 0 To AktPara.NPara - 1
+                For v = 0 To NPara - 1
                     R = Int(PES_Settings.NEltern * Rnd())
                     'Selektion der Schrittweite
                     AktPara.Dn(v) = De(v, R, PES_iAkt.iAktPop)
@@ -609,7 +636,7 @@ Public Class PES
 
             Case EVO_ELTERN.XX_Mitteln 'Multi-Rekombination, gemittelt
 
-                For v = 0 To AktPara.NPara - 1
+                For v = 0 To NPara - 1
                     AktPara.Dn(v) = 0
                     AktPara.Xn(v) = 0
 
@@ -640,7 +667,7 @@ Public Class PES
 
                 Next i
 
-                For v = 0 To AktPara.NPara - 1
+                For v = 0 To NPara - 1
                     R = Int(PES_Settings.NRekombXY * Rnd())
                     'Selektion der Schrittweite
                     AktPara.Dn(v) = De(v, Realisierungsspeicher(R), PES_iAkt.iAktPop)
@@ -665,7 +692,7 @@ Public Class PES
                     Next j
                 Next i
 
-                For v = 1 To AktPara.NPara
+                For v = 1 To NPara
                     AktPara.Dn(v) = 0
                     AktPara.Xn(v) = 0
                     For n = 0 To PES_Settings.NRekombXY - 1
@@ -691,7 +718,7 @@ Public Class PES
                 End If
 
                 If (Elter = 0 Or Elter = PES_Settings.NEltern - 1) Then
-                    For v = 0 To AktPara.NPara - 1
+                    For v = 0 To NPara - 1
                         'Selektion der Schrittweite
                         AktPara.Dn(v) = De(v, Elter, PES_iAkt.iAktPop)
                         'Selektion des Elter
@@ -701,7 +728,7 @@ Public Class PES
                     'BUG 135
                     Dim IndexEltern(PES_Settings.NEltern - 1) As Short          'Array mit Index der Eltern (Neighbourhood-Rekomb.)
                     Call Neighbourhood_Eltern(Elter, IndexEltern)
-                    For v = 0 To AktPara.NPara - 1
+                    For v = 0 To NPara - 1
                         'Do
                         '    Faktor = Rnd
                         '    Faktor = (-1) * Eigenschaft.d + Faktor * (1 + Eigenschaft.d)
@@ -739,7 +766,7 @@ Public Class PES
             DeTemp = De(0, 0, PES_iAkt.iAktPop) * palpha ^ expo
         End If
 
-        For v = 0 To AktPara.NPara - 1
+        For v = 0 To NPara - 1
             For n = 0 To PES_Settings.NEltern - 1
                 Do
                     If PES_Settings.isDnVektor Then
@@ -750,12 +777,12 @@ Public Class PES
                     End If
                     'Normalverteilte Zufallszahl mit Standardabweichung 1/sqr(varanz)
                     Dim Z As Double
-                    Z = System.Math.Sqrt(-2 * System.Math.Log(1 - Rnd()) / AktPara.NPara) * System.Math.Sin(6.2832 * Rnd())
+                    Z = System.Math.Sqrt(-2 * System.Math.Log(1 - Rnd()) / NPara) * System.Math.Sin(6.2832 * Rnd())
                     'Mutation wird durchgeführt
                     XeTemp = Xe(v, n, PES_iAkt.iAktPop) + DeTemp * Z
 
                     ' Restriktion für die mutierten Werte
-                Loop While (XeTemp <= AktPara.Xmin(v) Or XeTemp > AktPara.Xmax(v))
+                Loop While (XeTemp <= 0 Or XeTemp > 1)
 
                 De(v, n, PES_iAkt.iAktPop) = DeTemp
                 Xe(v, n, PES_iAkt.iAktPop) = XeTemp
@@ -780,7 +807,7 @@ Public Class PES
             DnTemp = AktPara.Dn(0) * galpha ^ expo
         End If
 
-        For v = 0 To AktPara.NPara - 1
+        For v = 0 To NPara - 1
             Do
                 If PES_Settings.isDnVektor Then
                     '+/-1
@@ -790,11 +817,11 @@ Public Class PES
                 End If
                 'Normalverteilte Zufallszahl mit Standardabweichung 1/sqr(varanz)
                 Dim Z As Double
-                Z = System.Math.Sqrt(-2 * System.Math.Log(1 - Rnd()) / AktPara.NPara) * System.Math.Sin(6.2832 * Rnd())
+                Z = System.Math.Sqrt(-2 * System.Math.Log(1 - Rnd()) / NPara) * System.Math.Sin(6.2832 * Rnd())
                 'Mutation wird durchgeführt
                 XnTemp = AktPara.Xn(v) + DnTemp * Z
                 'Restriktion für die mutierten Werte
-            Loop While (XnTemp <= AktPara.Xmin(v) Or XnTemp > AktPara.Xmax(v))
+            Loop While (XnTemp <= 0 Or XnTemp > 1)
 
             AktPara.Dn(v) = DnTemp
             AktPara.Xn(v) = XnTemp
@@ -866,7 +893,7 @@ Public Class PES
         If Not PES_Settings.is_MO_Pareto Then
             If h1 < Qbpop(i, 1) Then
                 Qbpop(i, 1) = h1
-                For m = 0 To AktPara.NPara - 1
+                For m = 0 To NPara - 1
                     For n = 1 To PES_Settings.NEltern
                         'Die Schrittweite wird ebenfalls übernommen
                         Dbpop(m, n, i) = Db(m, n, PES_iAkt.iAktPop)
@@ -881,7 +908,7 @@ Public Class PES
                 Case EVO_POP_PENALTY.Crowding
                     If h1 < Qbpop(i, 0) Then
                         Qbpop(i, 0) = h1
-                        For m = 0 To AktPara.NPara - 1
+                        For m = 0 To NPara - 1
                             For n = 0 To PES_Settings.NEltern - 1
                                 'Die Schrittweite wird ebenfalls übernommen
                                 Dbpop(m, n, i) = Db(m, n, PES_iAkt.iAktPop)
@@ -894,7 +921,7 @@ Public Class PES
                 Case EVO_POP_PENALTY.Spannweite
                     If h2 > Qbpop(j, 1) Then
                         Qbpop(j, 1) = h2
-                        For m = 0 To AktPara.NPara - 1
+                        For m = 0 To NPara - 1
                             For n = 0 To PES_Settings.NEltern - 1
                                 'Die Schrittweite wird ebenfalls übernommen
                                 Dbpop(m, n, j) = Db(m, n, PES_iAkt.iAktPop)
@@ -934,7 +961,7 @@ Public Class PES
             'als die schlechteste im Bestwertspeicher, wird dieser ersetzt
             If QN(0) < Qb(j, PES_iAkt.iAktPop, 0) Then
                 Qb(j, PES_iAkt.iAktPop, 0) = QN(0)
-                For v = 0 To AktPara.NPara - 1
+                For v = 0 To NPara - 1
                     'Die Schrittweite wird ebenfalls übernommen
                     Db(v, j, PES_iAkt.iAktPop) = AktPara.Dn(v)
                     'Die eigentlichen Parameterwerte werden übernommen
@@ -946,17 +973,17 @@ Public Class PES
             'Multi-Objective Pareto
             '----------------------
             With NDSorting(PES_iAkt.iAktNachf)
-                For i = 0 To AktPara.NPenalty - 1
+                For i = 0 To NPenalty - 1
                     .penalty(i) = QN(i)
                 Next i
                 .feasible = True
-                For i = 0 To AktPara.NConstrains - 1
+                For i = 0 To NConstrains - 1
                     .constrain(i) = RN(i)
                     If .constrain(i) < 0 Then .feasible = False
                 Next i
                 .dominated = False
                 .Front = 0
-                For v = 0 To AktPara.NPara - 1
+                For v = 0 To NPara - 1
                     .d(v) = AktPara.Dn(v)
                     .X(v) = AktPara.Xn(v)
                 Next v
@@ -974,7 +1001,7 @@ Public Class PES
 
         If (PES_Settings.iEvoTyp = EVO_STRATEGIE.Komma) Then
             For n = 0 To PES_Settings.NEltern - 1
-                For i = 0 To AktPara.NPenalty - 1
+                For i = 0 To NPenalty - 1
                     Qb(n, PES_iAkt.iAktPop, i) = 1.0E+300
                 Next i
             Next n
@@ -990,7 +1017,7 @@ Public Class PES
 
         If (PES_Settings.iPopEvoTyp = EVO_STRATEGIE.Komma) Then
             For n = 0 To PES_Settings.NPopul - 1
-                For i = 0 To AktPara.NPenalty - 1
+                For i = 0 To NPenalty - 1
                     Qbpop(n, i) = 1.0E+300
                 Next i
             Next n
@@ -1076,7 +1103,7 @@ Public Class PES
         'Die Eltern werden gleich der besten Kinder gesetzt (Schrittweite und Parameterwert)
         For m = 0 To PES_Settings.NPopEltern - 1
             For n = 0 To PES_Settings.NEltern - 1
-                For v = 0 To AktPara.NPara - 1
+                For v = 0 To NPara - 1
                     Dp(v, n, m) = Dbpop(v, n, Int(Realisierungsspeicher(m, 1)))
                     Xp(v, n, m) = Xbpop(v, n, Int(Realisierungsspeicher(m, 1)))
                 Next v
@@ -1103,7 +1130,7 @@ Public Class PES
             'Die Eltern werden gleich der besten Kinder gesetzt (Schrittweite und Parameterwert)
             '---------------------------------------------------------------------
             For m = 0 To PES_Settings.NEltern - 1
-                For v = 0 To AktPara.NPara - 1
+                For v = 0 To NPara - 1
                     De(v, m, PES_iAkt.iAktPop) = Db(v, m, PES_iAkt.iAktPop)
                     Xe(v, m, PES_iAkt.iAktPop) = Xb(v, m, PES_iAkt.iAktPop)
                 Next v
@@ -1117,19 +1144,19 @@ Public Class PES
             '--------------------------------------------------------------------
             For m = PES_Settings.NNachf To PES_Settings.NNachf + PES_Settings.NEltern + 1
                 With NDSorting(m)
-                    For l = 0 To AktPara.NPenalty - 1
+                    For l = 0 To NPenalty - 1
                         .penalty(l) = Qb(m - PES_Settings.NNachf, PES_iAkt.iAktPop, l)
                     Next l
-                    If AktPara.NConstrains > 0 Then
+                    If NConstrains > 0 Then
                         .feasible = True
-                        For l = 0 To AktPara.NConstrains - 1
+                        For l = 0 To NConstrains - 1
                             .constrain(l) = Rb(m - PES_Settings.NNachf, PES_iAkt.iAktPop, l)
                             If .constrain(l) < 0 Then .feasible = False
                         Next l
                     End If
                     .dominated = False
                     .Front = 0
-                    For v = 0 To AktPara.NPara - 1
+                    For v = 0 To NPara - 1
                         'Die Schrittweite wird ebenfalls übernommen
                         .d(v) = Db(v, m - PES_Settings.NNachf, PES_iAkt.iAktPop)
                         'Die eigentlichen Parameterwerte werden übernommen
@@ -1148,15 +1175,15 @@ Public Class PES
             ReDim Temp(PES_Settings.NNachf + PES_Settings.NEltern - 1)
 
             For i = 0 To (PES_Settings.NNachf + PES_Settings.NEltern - 1)
-                ReDim Temp(i).d(AktPara.NPara - 1)
-                ReDim Temp(i).X(AktPara.NPara - 1)
+                ReDim Temp(i).d(NPara - 1)
+                ReDim Temp(i).X(NPara - 1)
             Next i
             'Initialisierung von NDSResult (NDSorting)
             ReDim NDSResult(PES_Settings.NNachf + PES_Settings.NEltern - 1)
 
             For i = 0 To (PES_Settings.NNachf + PES_Settings.NEltern - 1)
-                ReDim NDSResult(i).d(AktPara.NPara - 1)
-                ReDim NDSResult(i).X(AktPara.NPara - 1)
+                ReDim NDSResult(i).d(NPara - 1)
+                ReDim NDSResult(i).X(NPara - 1)
             Next i
 
             'NDSorting wird in Temp kopiert
@@ -1193,15 +1220,15 @@ Public Class PES
                 '-> schiss wird einfach rüberkopiert
                 If NFrontMember_aktuell <= PES_Settings.NEltern - NFrontMember_gesamt Then
                     For i = NFrontMember_gesamt To NFrontMember_aktuell + NFrontMember_gesamt - 1
-                        For j = 0 To AktPara.NPenalty - 1
+                        For j = 0 To NPenalty - 1
                             Qb(i, PES_iAkt.iAktPop, j) = NDSResult(i).penalty(j)
                         Next j
-                        If AktPara.NConstrains > 0 Then
-                            For j = 0 To AktPara.NConstrains - 1
+                        If NConstrains > 0 Then
+                            For j = 0 To NConstrains - 1
                                 Rb(i, PES_iAkt.iAktPop, j) = NDSResult(i).constrain(j)
                             Next j
                         End If
-                        For v = 0 To AktPara.NPara - 1
+                        For v = 0 To NPara - 1
                             Db(v, i, PES_iAkt.iAktPop) = NDSResult(i).d(v)
                             Xb(v, i, PES_iAkt.iAktPop) = NDSResult(i).X(v)
                         Next v
@@ -1216,15 +1243,15 @@ Public Class PES
 
                     For i = NFrontMember_gesamt To PES_Settings.NEltern - 1
 
-                        For j = 0 To AktPara.NPenalty - 1
+                        For j = 0 To NPenalty - 1
                             Qb(i, PES_iAkt.iAktPop, j) = NDSResult(i).penalty(j)
                         Next j
-                        If AktPara.NConstrains > 0 Then
-                            For j = 0 To AktPara.NConstrains - 1
+                        If NConstrains > 0 Then
+                            For j = 0 To NConstrains - 1
                                 Rb(i, PES_iAkt.iAktPop, j) = NDSResult(i).constrain(j)
                             Next j
                         End If
-                        For v = 0 To AktPara.NPara - 1
+                        For v = 0 To NPara - 1
                             Db(v, i, PES_iAkt.iAktPop) = NDSResult(i).d(v)
                             Xb(v, i, PES_iAkt.iAktPop) = NDSResult(i).X(v)
                         Next v
@@ -1273,15 +1300,15 @@ Public Class PES
                     Call NDS_Crowding_Distance_Sort(SekundärQb, 0, SekundärQb.GetUpperBound(0))
                     For i = 0 To PES_Settings.NEltern - 1
 
-                        For j = 0 To AktPara.NPenalty - 1
+                        For j = 0 To NPenalty - 1
                             Qb(i, PES_iAkt.iAktPop, j) = SekundärQb(i).penalty(j)
                         Next j
-                        If AktPara.NConstrains > 0 Then
-                            For j = 0 To AktPara.NConstrains - 1
+                        If NConstrains > 0 Then
+                            For j = 0 To NConstrains - 1
                                 Rb(i, PES_iAkt.iAktPop, j) = SekundärQb(i).constrain(j)
                             Next j
                         End If
-                        For v = 0 To AktPara.NPara - 1
+                        For v = 0 To NPara - 1
                             Db(v, i, PES_iAkt.iAktPop) = SekundärQb(i).d(v)
                             Xb(v, i, PES_iAkt.iAktPop) = SekundärQb(i).X(v)
                         Next v
@@ -1292,7 +1319,7 @@ Public Class PES
 
             'Neue Eltern werden gleich dem Bestwertspeicher gesetzt
             For m = 0 To PES_Settings.NEltern - 1
-                For v = 0 To AktPara.NPara - 1
+                For v = 0 To NPara - 1
                     De(v, m, PES_iAkt.iAktPop) = Db(v, m, PES_iAkt.iAktPop)
                     Xe(v, m, PES_iAkt.iAktPop) = Xb(v, m, PES_iAkt.iAktPop)
                 Next v
@@ -1316,7 +1343,7 @@ Public Class PES
         Dim isDominated As Boolean
         Dim Summe_Constrain(1) As Double
 
-        If (AktPara.NConstrains > 0) Then
+        If (NConstrains > 0) Then
             'Mit Constraints
             '===============
             For i = 0 To NDSorting.GetUpperBound(0)
@@ -1337,7 +1364,7 @@ Public Class PES
                         Summe_Constrain(0) = 0
                         Summe_Constrain(1) = 0
 
-                        For k = 0 To AktPara.NConstrains - 1
+                        For k = 0 To NConstrains - 1
                             If (NDSorting(i).constrain(k) < 0) Then
                                 Summe_Constrain(0) += NDSorting(i).constrain(k)
                             End If
@@ -1356,11 +1383,11 @@ Public Class PES
                         '------------
                         isDominated = False
 
-                        For k = 0 To AktPara.NPenalty - 1
+                        For k = 0 To NPenalty - 1
                             isDominated = isDominated Or (NDSorting(i).penalty(k) < NDSorting(j).penalty(k))
                         Next k
 
-                        For k = 0 To AktPara.NPenalty - 1
+                        For k = 0 To NPenalty - 1
                             isDominated = isDominated And (NDSorting(i).penalty(k) <= NDSorting(j).penalty(k))
                         Next k
 
@@ -1380,11 +1407,11 @@ Public Class PES
 
                     isDominated = False
 
-                    For k = 0 To AktPara.NPenalty - 1
+                    For k = 0 To NPenalty - 1
                         isDominated = isDominated Or (NDSorting(i).penalty(k) < NDSorting(j).penalty(k))
                     Next k
 
-                    For k = 0 To AktPara.NPenalty - 1
+                    For k = 0 To NPenalty - 1
                         isDominated = isDominated And (NDSorting(i).penalty(k) <= NDSorting(j).penalty(k))
                     Next k
 
@@ -1413,7 +1440,7 @@ Public Class PES
         Dim NFrontMember As Short
 
         ReDim Temp(NDSorting.GetUpperBound(0))
-        Call Temp(0).Dimit(AktPara.NPenalty, AktPara.NConstrains, AktPara.NPara, Temp)
+        Call Temp(0).Dimit(NPenalty, NConstrains, NPara, Temp)
 
         NFrontMember = 0
         counter = 0
@@ -1455,7 +1482,7 @@ Public Class PES
         Dim NFrontMember As Short
 
         ReDim Temp(NDSorting.GetUpperBound(0))
-        Call Temp(0).Dimit(AktPara.NPenalty, AktPara.NConstrains, AktPara.NPara, Temp)
+        Call Temp(0).Dimit(NPenalty, NConstrains, NPara, Temp)
 
         NFrontMember = 0
         counter = 0
@@ -1532,11 +1559,11 @@ Public Class PES
         Dim j As Integer
         Dim k As Short
 
-        Call swap.Dimit(AktPara.NPenalty, AktPara.NConstrains, AktPara.NPara, swap)
+        Call swap.Dimit(NPenalty, NConstrains, NPara, swap)
 
         Dim fmin, fmax As Double
 
-        For k = 0 To AktPara.NPenalty - 1
+        For k = 0 To NPenalty - 1
             For i = StartIndex To EndIndex
                 For j = StartIndex To EndIndex
                     If (NDSorting(i).penalty(k) < NDSorting(j).penalty(k)) Then
@@ -1583,7 +1610,7 @@ Public Class PES
         Dim d() As Double
         Dim d_mean As Double
 
-        ReDim TempDistance(AktPara.NPenalty - 1)
+        ReDim TempDistance(NPenalty - 1)
         ReDim PenaltyDistance(PES_Settings.NEltern - 1, PES_Settings.NEltern - 1)
         'BUG 135 ?
         ReDim d(PES_Settings.NEltern - 1)
@@ -1593,7 +1620,7 @@ Public Class PES
             PenaltyDistance(i, i) = 0
             For j = i + 1 To PES_Settings.NEltern - 1
                 PenaltyDistance(i, j) = 0
-                For k = 0 To AktPara.NPenalty - 1
+                For k = 0 To NPenalty - 1
                     TempDistance(k) = Qb(i, PES_iAkt.iAktPop, k) - Qb(j, PES_iAkt.iAktPop, k)
                     TempDistance(k) = TempDistance(k) * TempDistance(k)
                     PenaltyDistance(i, j) = PenaltyDistance(i, j) + TempDistance(k)
@@ -1651,8 +1678,8 @@ Public Class PES
         Dim TempDistance() As Double
 
         'Bestimmen des Normierungsfaktors für jede Dimension des Lösungsraums (MinMax)
-        ReDim MinMax(AktPara.NPenalty - 1)
-        For k = 0 To AktPara.NPenalty - 1
+        ReDim MinMax(NPenalty - 1)
+        For k = 0 To NPenalty - 1
             MinMax(k) = 0
             Min = Qb(0, PES_iAkt.iAktPop, k)
             Max = Qb(0, PES_iAkt.iAktPop, k)
@@ -1664,13 +1691,13 @@ Public Class PES
         Next k
 
         'Bestimmen der normierten Raumabstände zwischen allen Elternindividuen
-        ReDim TempDistance(AktPara.NPenalty)
+        ReDim TempDistance(NPenalty)
 
         For i = 0 To PES_Settings.NEltern - 1
             PenaltyDistance(i, i) = 0
             For j = i + 1 To PES_Settings.NEltern - 1
                 PenaltyDistance(i, j) = 0
-                For k = 0 To AktPara.NPenalty - 1
+                For k = 0 To NPenalty - 1
                     TempDistance(k) = Qb(i, PES_iAkt.iAktPop, k) - Qb(j, PES_iAkt.iAktPop, k)
                     TempDistance(k) = TempDistance(k) '/ MinMax(k)
                     TempDistance(k) = TempDistance(k) * TempDistance(k)
@@ -1694,7 +1721,7 @@ Public Class PES
         For i = 0 To SekundärQb.GetUpperBound(0) - 2
             For j = i + 1 To SekundärQb.GetUpperBound(0)
                 Logical = True
-                For k = 0 To AktPara.NPenalty - 1
+                For k = 0 To NPenalty - 1
                     Logical = Logical And (SekundärQb(i).penalty(k) = SekundärQb(j).penalty(k))
                 Next k
                 If (Logical) Then SekundärQb(i).dominated = True
@@ -1752,14 +1779,14 @@ Public Class PES
         Dim swap As Double
         Dim fmin, fmax As Double
 
-        ReDim QbTemp(PES_Settings.NEltern - 1, PES_Settings.NPopul - 1, AktPara.NPenalty - 1)
+        ReDim QbTemp(PES_Settings.NEltern - 1, PES_Settings.NPopul - 1, NPenalty - 1)
 
         Array.Copy(Qb, QbTemp, Qb.GetLength(0))
         For i = 0 To PES_Settings.NEltern - 1
             Distanceb(i) = 0
         Next i
 
-        For k = 0 To AktPara.NPenalty - 1
+        For k = 0 To NPenalty - 1
             For i = 0 To PES_Settings.NEltern - 1
                 For j = 0 To PES_Settings.NEltern - 1
                     If (QbTemp(i, PES_iAkt.iAktPop, k) < QbTemp(j, PES_iAkt.iAktPop, k)) Then
