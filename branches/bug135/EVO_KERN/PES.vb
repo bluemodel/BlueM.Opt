@@ -71,7 +71,7 @@ Public Class PES
         Dim iAktRunde As Short              'Zähler für aktuelle Runde
         Dim iAktPop As Short                'Zähler für aktuelle Population
         Dim iAktGen As Short                'Zähler für aktuelle Generation
-        Dim iAktNachf As Short              'Zähler für aktuellen Nachfahre
+        Dim iAktNachf As Short              'Zähler für aktuellen Nachfahren
     End Structure
 
     'Muss Public sein, da das Form hiermit die Schleifen kontrolliert
