@@ -216,6 +216,7 @@
       <DependentUpon>Form1.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Diagramm\licenses.licx" />
     <EmbeddedResource Include="My Project\Resources.resx">
       <SubType>Designer</SubType>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
@@ -259,10 +260,6 @@
     <None Include="Resources\scatterplot.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BlueM.DLLAdapter\IHWB.BlueM.DLLAdapter.csproj">
-      <Project>{1EC50F6A-48C0-48F3-B9CD-77097889CF02}</Project>
-      <Name>IHWB.BlueM.DLLAdapter</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Wave\Wave.vbproj">
       <Project>{BCD1BBE3-5AB2-4C3F-AC12-43EB977C6F6F}</Project>
       <Name>Wave</Name>

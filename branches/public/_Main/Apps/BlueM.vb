@@ -313,7 +313,7 @@ Public Class BlueM
         If (simOK) Then
 
             'WEL-Datei einlesen
-            Me.SimErgebnis = New Wave.WEL(Me.WorkDir & Me.Datensatz & ".WEL")
+            Me.SimErgebnis = New Wave.WEL(Me.WorkDir & Me.Datensatz & ".WEL", True)
 
             'Bei IHA-Berechnung jetzt IHA-Software ausführen
             If (Me.isIHA) Then

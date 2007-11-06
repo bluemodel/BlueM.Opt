@@ -40,7 +40,7 @@ Public MustInherit Class Sim
     Public SimEnde As DateTime                           'Enddatum der Simulation
     Public SimDT As TimeSpan                             'Zeitschrittweite der Simulation
 
-    Protected SimErgebnis As Wave.WEL                    'Speichert das momentane Simulationsergebnis
+    Public SimErgebnis As Wave.WEL                    'Speichert das momentane Simulationsergebnis
 
     'Konstanten
     '----------
@@ -523,11 +523,11 @@ Public MustInherit Class Sim
                     ext = Path.GetExtension(.ZielReiheDatei)
                     Select Case (ext.ToUpper)
                         Case ".WEL"
-                            Dim WEL As New Wave.WEL(Me.WorkDir & .ZielReiheDatei, .ZielGr)
-                            .ZielReihe = WEL.Zeitreihen(0)
+                            Dim WEL As New Wave.WEL(Me.WorkDir & .ZielReiheDatei, True)
+                            .ZielReihe = WEL.getReihe(.ZielGr)
                         Case ".ZRE"
-                            Dim ZRE As New Wave.ZRE(Me.WorkDir & .ZielReiheDatei)
-                            .ZielReihe = ZRE.Zeitreihe
+                            Dim ZRE As New Wave.ZRE(Me.WorkDir & .ZielReiheDatei, True)
+                            .ZielReihe = ZRE.Zeitreihen(0)
                         Case ".PRB"
                             'BUG 183: geht nicht mehr, weil PRB-Dateien keine Zeitreihen sind!
                             'IsOK = Read_PRB(Me.WorkDir & .ZielReiheDatei, .ZielGr, .ZielReihe)
@@ -637,11 +637,11 @@ Public MustInherit Class Sim
                         ext = Path.GetExtension(.GrenzReiheDatei)
                         Select Case (ext.ToUpper)
                             Case ".WEL"
-                                Dim WEL As New Wave.WEL(Me.WorkDir & .GrenzReiheDatei, .GrenzGr)
-                                .GrenzReihe = WEL.Zeitreihen(0)
+                                Dim WEL As New Wave.WEL(Me.WorkDir & .GrenzReiheDatei, True)
+                                .GrenzReihe = WEL.getReihe(.GrenzGr)
                             Case ".ZRE"
-                                Dim ZRE As New Wave.ZRE(Me.WorkDir & .GrenzReiheDatei)
-                                .GrenzReihe = ZRE.Zeitreihe
+                                Dim ZRE As New Wave.ZRE(Me.WorkDir & .GrenzReiheDatei, True)
+                                .GrenzReihe = ZRE.Zeitreihen(0)
                             Case Else
                                 Throw New Exception("Das Format der Grenzwertreihe '" & .GrenzReiheDatei & "' wurde nicht erkannt!")
                         End Select
@@ -1647,9 +1647,8 @@ Public MustInherit Class Sim
         Dim i As Integer
 
         'Simulationsergebnis auslesen
-        Dim SimReihe As New Wave.Zeitreihe(constr.SimGr)
-        Dim WEL As New Wave.WEL(WorkDir & Datensatz & ".wel", constr.SimGr)
-        SimReihe = WEL.Zeitreihen(0)
+        Dim SimReihe As Wave.Zeitreihe
+        SimReihe = Me.SimErgebnis.getReihe(constr.SimGr)
 
         'Fallunterscheidung GrenzTyp (Wert/Reihe)
         Select Case constr.GrenzTyp
