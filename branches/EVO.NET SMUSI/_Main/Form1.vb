@@ -1273,7 +1273,7 @@ Start_Evolutionsrunden:
             '----------------------------------------------------------------
             serie = DForm.Diag.getSeriesPoint("Sekundäre Population", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
             serie.Clear()
-            For i = 0 To SekPop.GetUpperBound(1)
+            For i = 0 To SekPop.GetUpperBound(0) 'Bug in Darstellung der Sek.Population behoben dm 11.2007
                 serie.Add(SekPop(i, 0), SekPop(i, 1), "")
             Next i
 
