@@ -737,7 +737,7 @@ Partial Class Form1
             Next
         Next
 
-        '1. Schritt: PES - Objekt der Klasse PES wird erzeugt PES wird erzeugt
+        'Schritt 0: PES - Objekt der Klasse PES wird erzeugt PES wird erzeugt
         '*********************************************************************
         Dim PES1 As EVO.Kern.PES
         PES1 = New EVO.Kern.PES
@@ -770,7 +770,7 @@ Partial Class Form1
                         EVO_Settings1.isSaved = False
                         Call EVO_Settings1.SetFor_CES_PES(1, 1, 1)
 
-                        'Schritte 2 - 5 PES wird initialisiert (Weiteres siehe dort ;-)
+                        'Schritte 1 - 3: PES wird initialisiert (Weiteres siehe dort ;-)
                         '**************************************************************
                         Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, Method)
 
@@ -938,46 +938,25 @@ Partial Class Form1
                                 EVO_Settings1.isSaved = False
                                 Call EVO_Settings1.SetFor_CES_PES(1, n_eltern, 1)
 
-                                'Schritte 2 - 5 PES wird initialisiert (Weiteres siehe dort ;-)
+                                'Schritte 1 - 3: PES wird initialisiert (Weiteres siehe dort ;-)
                                 '**************************************************************
                                 Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, Method)
 
+                                Dim Index as Integer = 0
+                                For m = 0 To CES1.PES_Parents.GetUpperBound(0)
+                                    If (j + 1) = CES1.PES_Parents(m).iLocation Then
+                                        'Die Startwerte werden überschrieben
+                                        Call PES1.EsStartvalues(CES1.PES_Parents(m).Loc(j).Loc_Dn, CES1.PES_Parents(m).Loc(j).Parameter, Index)
+                                        Index += 1
+                                    End If
+                                Next
 
-                                'Falls Eltern vorhanden sind Selektion, Reproduktion, Mutation
-                                Dim k As Integer = 0
-                                k = CES1.PES_Parents(0).iLocation
-
-
-
-                                'Die Startwerte werden überschrieben
-                                Call pes1.EsStartvalues
-
-                                'POPULATIONS REPRODUKTIONSPROZESS
-                                '################################
-                                'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern der Population
-                                Call PES1.EsPopReproduktion()
-
-                                'POPULATIONS MUTATIONSPROZESS
-                                '############################
-                                'Mutieren der Ausgangswerte der Population
-                                Call PES1.EsPopMutation()
-
-                                'REPRODUKTIONSPROZESS
-                                '####################
-                                'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
-                                Call PES1.EsReproduktion()
-
-                                'MUTATIONSPROZESS
-                                '################
-                                'Mutieren der Ausgangswerte
-                                Call PES1.EsMutation()
+                                'Startet die Prozesse evolutionstheoretischen Prozesse nacheinander
+                                Call PES1.EsReproMut()
 
                                 'Auslesen der Variierten Parameter
                                 myPara = PES1.EsGetParameter()
-
-
-
-
+                                ces1.List_Childs(i).Loc(j).Parameter = PES1.EsGetParameter()
 
                             End If
                         End If
@@ -1067,13 +1046,12 @@ Partial Class Form1
             Call PrepareDiagramm()
         End If
 
-        '1. Schritt: PES
-        'Objekt der Klasse PES wird erzeugt
-        '**********************************
+        'Schritte 0: Objekt der Klasse PES wird erzeugt
+        '**********************************************
         Dim PES1 As EVO.Kern.PES
         PES1 = New EVO.Kern.PES
 
-        'Schritte 2 - 5 PES wird initialisiert (Weiteres siehe dort ;-)
+        'Schritte 1 - 3: ES wird initialisiert (Weiteres siehe dort ;-)
         '**************************************************************
         Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, Method)
 
