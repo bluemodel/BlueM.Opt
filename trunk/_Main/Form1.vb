@@ -607,13 +607,14 @@ Partial Class Form1
 
                 'Simulationsergebnis in Wave laden
                 If (SensiPlot1.show_Wave) Then
-                    'BUG 182: Die WEL-Datei hat bei Smusi einen anderen Namen!
-                    Dim WEL As New Wave.WEL(Sim1.WorkDir & Sim1.Datensatz & ".wel", Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).SimGr)
+                    'SimReihe auslesen
+                    Dim SimReihe As Wave.Zeitreihe
+                    SimReihe = Sim1.SimErgebnis.getReihe(Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).SimGr)
                     'OptParameter und -Wert an Titel anhängen
                     'TODO: bei 2-Parametern auch den Wert des 2. Parameters anhängen!
-                    WEL.Zeitreihen(0).Title += " (" & Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Bezeichnung & ": " _
+                    SimReihe.Title += " (" & Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Bezeichnung & ": " _
                                                     & Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Wert & ")"
-                    Wave1.Display_Series(WEL.Zeitreihen(0))
+                    Wave1.Display_Series(SimReihe)
                 End If
 
                 'Qualitätswerte und OptParameter in DB speichern
@@ -1562,20 +1563,11 @@ Start_Evolutionsrunden:
                             .QWertTmp = Sim1.QWert(Sim1.List_OptZiele(i))
                             QWertString &= eol & .Bezeichnung & ": " & .QWertTmp.ToString()
 
-                            'Name der WEL-Simulationsergebnisdatei
-                            'BUG 171: Name der Ergebnisdatei
-                            Dim WELFile As String = ""
-                            If (Anwendung = ANW_BLUEM) Then
-                                WELFile = Sim1.WorkDir & Sim1.Datensatz & ".WEL"
-                            ElseIf (Anwendung = ANW_SMUSI) Then
-                                WELFile = Sim1.WorkDir & .SimGr.Substring(0, 4) & "_WEL.ASC"
-                            End If
-
                             'Simulationsgrößen nur jeweils ein Mal zeichnen
                             If (Not SimSeries.Contains(.SimGr)) Then
                                 SimSeries.Add(.SimGr, .SimGr)
                                 'Simulationsergebnis in Wave laden
-                                Wave1.Import_WEL(WELFile, .SimGr)
+                                Wave1.Display_Series(Sim1.SimErgebnis.getReihe(.SimGr))
                             End If
 
                             'ggf. Referenzreihe in Wave speichern
@@ -1607,7 +1599,7 @@ Start_Evolutionsrunden:
                     '-------------------
                     Dim anno1 As New Steema.TeeChart.Tools.Annotation(Wave1.TChart1.Chart)
                     anno1.Text = QWertString & eol & ParamString & ConstrString
-                    anno1.Position = Steema.TeeChart.Tools.AnnotationPositions.LeftTop
+                    anno1.Position = Steema.TeeChart.Tools.AnnotationPositions.RightBottom
 
                     'Wave anzeigen
                     '-------------
