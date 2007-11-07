@@ -1080,6 +1080,8 @@ Start_Evolutionsrunden:
             'xxxxxxxxxxxxxxxxxxxxxx
             For PES1.PES_iAkt.iAktPop = 1 To PES1.PES_Settings.NPopul
 
+                durchlauf = (PES1.PES_iAkt.iAktRunde - 1) * PES1.PES_Settings.NGen * PES1.PES_Settings.NNachf 'dm 11.2007
+
                 Call EVO_Opt_Verlauf1.Populationen(PES1.PES_iAkt.iAktPop)
 
                 'POPULATIONS REPRODUKTIONSPROZESS
