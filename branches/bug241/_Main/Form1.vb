@@ -738,7 +738,7 @@ Partial Class Form1
             Next
         Next
 
-        '1. Schritt: PES - Objekt der Klasse PES wird erzeugt PES wird erzeugt
+        'Schritt 0: PES - Objekt der Klasse PES wird erzeugt PES wird erzeugt
         '*********************************************************************
         Dim PES1 As EVO.Kern.PES
         PES1 = New EVO.Kern.PES
@@ -771,7 +771,7 @@ Partial Class Form1
                         EVO_Settings1.isSaved = False
                         Call EVO_Settings1.SetFor_CES_PES(1, 1, 1)
 
-                        'Schritte 2 - 5 PES wird initialisiert (Weiteres siehe dort ;-)
+                        'Schritte 1 - 3: PES wird initialisiert (Weiteres siehe dort ;-)
                         '**************************************************************
                         Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen, Method)
 
@@ -918,7 +918,7 @@ Partial Class Form1
                             'Die Anzahl der Eltern wird bestimmt
                             Dim n_eltern As Integer = 0
                             For m = 0 To CES1.PES_Parents.GetUpperBound(0)
-                                If j = CES1.PES_Parents(m).iLocation Then
+                                If (j + 1) = CES1.PES_Parents(m).iLocation  Then
                                     n_eltern += 1
                                 End If
                             Next
@@ -939,32 +939,25 @@ Partial Class Form1
                                 EVO_Settings1.isSaved = False
                                 Call EVO_Settings1.SetFor_CES_PES(1, n_eltern, 1)
 
-                                'Schritte 2 - 5 PES wird initialisiert (Weiteres siehe dort ;-)
+                                'Schritte 1 - 3: PES wird initialisiert (Weiteres siehe dort ;-)
                                 '**************************************************************
                                 Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen, Method)
 
-                                'REPRODUKTIONSPROZESS - Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
-                                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-                                Call PES1.EsReproduktion()
+                                Dim Index as Integer = 0
+                                For m = 0 To CES1.PES_Parents.GetUpperBound(0)
+                                    If (j + 1) = CES1.PES_Parents(m).iLocation Then
+                                        'Die Startwerte werden überschrieben
+                                        Call PES1.EsStartvalues(CES1.PES_Parents(m).Loc(j).Loc_Dn, CES1.PES_Parents(m).Loc(j).Parameter, Index)
+                                        Index += 1
+                                    End If
+                                Next
 
-                                'MUTATIONSPROZESS - Mutieren der Ausgangswerte
-                                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-                                Call PES1.EsMutation()
+                                'Startet die Prozesse evolutionstheoretischen Prozesse nacheinander
+                                Call PES1.EsReproMut()
 
                                 'Auslesen der Variierten Parameter
                                 myPara = PES1.EsGetParameter()
-
-
-
-
-                                'Falls Eltern vorhanden sind Selektion, Reproduktion, Mutation
-                                Dim k As Integer = 0
-                                k = CES1.PES_Parents(0).iLocation
-
-
-                        Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen, Method)
-
-
+                                ces1.List_Childs(i).Loc(j).Parameter = PES1.EsGetParameter()
 
                             End If
                         End If
@@ -1054,13 +1047,12 @@ Partial Class Form1
             Call PrepareDiagramm()
         End If
 
-        '1. Schritt: PES
-        'Objekt der Klasse PES wird erzeugt
-        '**********************************
+        'Schritte 0: Objekt der Klasse PES wird erzeugt
+        '**********************************************
         Dim PES1 As EVO.Kern.PES
         PES1 = New EVO.Kern.PES
 
-        'Schritte 2 - 5 PES wird initialisiert (Weiteres siehe dort ;-)
+        'Schritte 1 - 3: ES wird initialisiert (Weiteres siehe dort ;-)
         '**************************************************************
         Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen, Method)
 
@@ -1073,14 +1065,14 @@ Start_Evolutionsrunden:
 
         'Über alle Runden
         'xxxxxxxxxxxxxxxx
-        For PES1.PES_iAkt.iAktRunde = 1 To PES1.PES_Settings.NRunden
+        For PES1.PES_iAkt.iAktRunde = 0 To PES1.PES_Settings.NRunden - 1
 
             Call EVO_Opt_Verlauf1.Runden(PES1.PES_iAkt.iAktRunde)
             Call PES1.EsResetPopBWSpeicher() 'Nur bei Komma Strategie
 
             'Über alle Populationen
             'xxxxxxxxxxxxxxxxxxxxxx
-            For PES1.PES_iAkt.iAktPop = 1 To PES1.PES_Settings.NPopul
+            For PES1.PES_iAkt.iAktPop = 0 To PES1.PES_Settings.NPopul - 1
 
                 Call EVO_Opt_Verlauf1.Populationen(PES1.PES_iAkt.iAktPop)
 
@@ -1096,14 +1088,14 @@ Start_Evolutionsrunden:
 
                 'Über alle Generationen
                 'xxxxxxxxxxxxxxxxxxxxxx
-                For PES1.PES_iAkt.iAktGen = 1 To PES1.PES_Settings.NGen
+                For PES1.PES_iAkt.iAktGen = 0 To PES1.PES_Settings.NGen - 1
 
                     Call EVO_Opt_Verlauf1.Generation(PES1.PES_iAkt.iAktGen)
                     Call PES1.EsResetBWSpeicher()  'Nur bei Komma Strategie
 
                     'Über alle Nachkommen
                     'xxxxxxxxxxxxxxxxxxxxxxxxx
-                    For PES1.PES_iAkt.iAktNachf = 1 To PES1.PES_Settings.NNachf
+                    For PES1.PES_iAkt.iAktNachf = 0 To PES1.PES_Settings.NNachf - 1
 
                         Call EVO_Opt_Verlauf1.Nachfolger(PES1.PES_iAkt.iAktNachf)
 
@@ -1275,7 +1267,7 @@ Start_Evolutionsrunden:
             '----------------------------------------------------------------
             serie = DForm.Diag.getSeriesPoint("Sekundäre Population", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
             serie.Clear()
-            For i = 0 To SekPop.GetUpperBound(1)
+            For i = 0 To SekPop.GetUpperBound(0)
                 serie.Add(SekPop(i, 0), SekPop(i, 1), "")
             Next i
 
