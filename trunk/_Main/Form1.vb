@@ -1707,8 +1707,7 @@ Start_Evolutionsrunden:
                     'Scatterplot
                     '-----------
                     Cursor = Cursors.WaitCursor
-                    Dim scatterplot1 As New Scatterplot
-                    Call scatterplot1.zeichnen(OptResult)
+                    Dim scatterplot1 As New Scatterplot(OptResult)
                     Call scatterplot1.Show()
                     Cursor = Cursors.Default
                 End If
