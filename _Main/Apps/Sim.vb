@@ -2024,10 +2024,13 @@ Public MustInherit Class Sim
 
             Case "PES", "SensiPlot"
 
-                'Unterscheidung für SO und SensiPlot
-                If (Me.Method = "SensiPlot" Or Me.List_OptZiele.Length = 1) Then
-                    'Nur ein QWert, und zwar auf der xAchse
-                    q = "SELECT OptParameter.* FROM OptParameter INNER JOIN QWerte ON OptParameter.Sim_ID = QWerte.Sim_ID WHERE (QWerte.[" & xAchse & "] = " & xWert & ")"
+                'Unterscheidung
+                If (Me.Method = "SensiPlot") Then
+                    'xAchse ist QWert, yAchse ist OptPara
+                    q = "SELECT OptParameter.* FROM OptParameter INNER JOIN QWerte ON OptParameter.Sim_ID = QWerte.Sim_ID WHERE (OptParameter.[" & yAchse & "] = " & yWert & " AND QWerte.[" & xAchse & "] = " & xWert & ")"
+                ElseIf (Me.List_OptZiele.Length = 1) Then
+                    'nur yAchse ist QWert
+                    q = "SELECT OptParameter.* FROM OptParameter INNER JOIN QWerte ON OptParameter.Sim_ID = QWerte.Sim_ID WHERE (QWerte.[" & yAchse & "] = " & yWert & ")"
                 Else
                     'xAchse und yAchse sind beides QWerte
                     q = "SELECT OptParameter.* FROM OptParameter INNER JOIN QWerte ON OptParameter.Sim_ID = QWerte.Sim_ID WHERE (QWerte.[" & xAchse & "] = " & xWert & " AND QWerte.[" & yAchse & "] = " & yWert & ")"
