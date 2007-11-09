@@ -53,14 +53,20 @@ Partial Public Class Scatterplot
                     .Axes.Bottom.Title.Caption = xAchse
                     .Axes.Left.Title.Caption = yAchse
 
-                    'Achsen, die nicht am Rand liegen, verstecken
-                    '--------------------------------------------
-                    If (Not i = 0) Then
+                    'Achsen nur an den Rändern anzeigen
+                    '----------------------------------
+                    'YAchsen (Spalten)
+                    If (i > 0 And i < Me.nOptZiele - 1) Then
                         .Axes.Left.Title.Visible = False
                         .Axes.Left.Labels.CustomSize = 1
                         .Axes.Left.Labels.Font.Color = Color.Empty
+                    ElseIf (i = Me.nOptZiele - 1) Then
+                        .Axes.Left.OtherSide = True
                     End If
-                    If (Not j = Me.matrix.RowCount - 1) Then
+                    'XAchsen (Zeilen)
+                    If (j = 0) Then
+                        .Axes.Bottom.OtherSide = True
+                    ElseIf (j < Me.nOptZiele - 1) Then
                         .Axes.Bottom.Title.Visible = False
                         .Axes.Bottom.Labels.CustomSize = 1
                         .Axes.Bottom.Labels.Font.Color = Color.Empty
