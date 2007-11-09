@@ -1156,9 +1156,9 @@ Start_Evolutionsrunden:
                                         'SingleObjective
                                         'xxxxxxxxxxxxxxx
                                         If (isInvalid) Then
-                                            serie = DForm.Diag.getSeriesPoint("Population " & PES1.PES_iAkt.iAktPop & " (ungültig)", "Gray")
+                                            serie = DForm.Diag.getSeriesPoint("Population " & (PES1.PES_iAkt.iAktPop + 1).ToString() & " (ungültig)", "Gray")
                                         Else
-                                            serie = DForm.Diag.getSeriesPoint("Population " & PES1.PES_iAkt.iAktPop, "Orange")
+                                            serie = DForm.Diag.getSeriesPoint("Population " & (PES1.PES_iAkt.iAktPop + 1).ToString())
                                         End If
                                         Call serie.Add(durchlauf, QN(0))
 
