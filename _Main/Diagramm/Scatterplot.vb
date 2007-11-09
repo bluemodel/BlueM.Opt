@@ -30,6 +30,8 @@ Partial Public Class Scatterplot
         Call Me.dimensionieren()
 
         Dim i, j, n As Integer
+        Dim xAchse, yAchse As String
+        Dim serie As Steema.TeeChart.Styles.Series
 
         'Schleife über Spalten
         For i = 0 To Me.matrix.ColumnCount - 1
@@ -48,25 +50,37 @@ Partial Public Class Scatterplot
 
                     'Achsen
                     '------
-                    Dim xAchse As String = OptResult.List_OptZiele(i).Bezeichnung
-                    Dim yAchse As String = OptResult.List_OptZiele(j).Bezeichnung
+                    xAchse = OptResult.List_OptZiele(i).Bezeichnung
+                    yAchse = OptResult.List_OptZiele(j).Bezeichnung
+
                     .Axes.Bottom.Title.Caption = xAchse
                     .Axes.Left.Title.Caption = yAchse
 
+                    .Axes.Left.Labels.ValueFormat = "0.00E+00"
+                    .Axes.Bottom.Labels.ValueFormat = "0.00E+00"
+
                     'Achsen nur an den Rändern anzeigen
                     '----------------------------------
-                    'YAchsen (Spalten)
-                    If (i > 0 And i < Me.nOptZiele - 1) Then
+                    'YAchsen
+                    If (i = 0) Then
+                        'Achse standardmäßig anzeigen
+                    ElseIf (i = Me.nOptZiele - 1) Then
+                        'Achse rechts anzeigen
+                        .Axes.Left.OtherSide = True
+                    Else
+                        'Achse verstecken
                         .Axes.Left.Title.Visible = False
                         .Axes.Left.Labels.CustomSize = 1
                         .Axes.Left.Labels.Font.Color = Color.Empty
-                    ElseIf (i = Me.nOptZiele - 1) Then
-                        .Axes.Left.OtherSide = True
                     End If
-                    'XAchsen (Zeilen)
+                    'XAchsen
                     If (j = 0) Then
+                        'Achse oben anzeigen
                         .Axes.Bottom.OtherSide = True
-                    ElseIf (j < Me.nOptZiele - 1) Then
+                    ElseIf (j = Me.nOptZiele - 1) Then
+                        'Achse standardmäßig anzeigen
+                    Else
+                        'Achse verstecken
                         .Axes.Bottom.Title.Visible = False
                         .Axes.Bottom.Labels.CustomSize = 1
                         .Axes.Bottom.Labels.Font.Color = Color.Empty
@@ -74,8 +88,6 @@ Partial Public Class Scatterplot
 
                     'Punkte eintragen
                     '----------------
-                    Dim serie As Steema.TeeChart.Styles.Series
-
                     serie = .getSeriesPoint(xAchse & ", " & yAchse, "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
 
                     For n = 0 To OptResult.Solutions.GetUpperBound(0)
@@ -89,12 +101,12 @@ Partial Public Class Scatterplot
 
                     If (i = j) Then
                         'Diagramme auf der Diagonalen ausblenden
-                        .Panel.Color = Color.Gray
-                        .Tools.Clear(True)              'Um MarksTips zu entfernen
-                        serie.Cursor = Cursors.Default  'Kein Hand-Cursor
-                        serie.Color = Color.Empty       'Punkte unsichtbar
+                        .Walls.Back.Transparent = False     'Grau anzeigen
+                        .Tools.Clear(True)                  'Um MarksTips zu entfernen
+                        serie.Cursor = Cursors.Default      'Kein Hand-Cursor
+                        serie.Color = Color.Empty           'Punkte unsichtbar
                     Else
-                        'Handler für highlightPoint
+                        'alle anderen kriegen Handler für highlightPoint
                         AddHandler .ClickSeries, AddressOf Me.highlightPoint
                     End If
 
