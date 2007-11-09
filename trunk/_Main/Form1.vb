@@ -1461,25 +1461,26 @@ Start_Evolutionsrunden:
 
         Else
 
+            Dim xWert, yWert As Double
+            Dim xAchse, yAchse As String
+            Dim i As Integer
+            Dim isOK As Boolean
+            Dim res As MsgBoxResult
+            Const eol As String = Chr(13) & Chr(10) 'Zeilenumbruch
+            Const format As String = "G5"           'Zahlenformat
+            Dim ParamString As String = ""          'String für die Anzeige der OptParameter / des Pfads
+
             'Punkt-Informationen bestimmen
             '-----------------------------
             'X und Y Werte
-            Dim xWert, yWert As Double
             xWert = s.XValues(valueIndex)
             yWert = s.YValues(valueIndex)
             'X und Y Achsen (Zielfunktionen)
-            Dim xAchse, yAchse As String
             xAchse = Me.DForm.Diag.Chart.Axes.Bottom.Title.Caption
             yAchse = Me.DForm.Diag.Chart.Axes.Left.Title.Caption
 
             'Parametersatz aus der DB übernehmen
             '-----------------------------------
-            Dim i As Integer
-            Dim isOK As Boolean
-            Dim res As MsgBoxResult
-            Dim eol As String = Chr(13) & Chr(10)   'Zeilenumbruch
-            Dim ParamString As String = ""          'String für die Anzeige der OptParameter / des Pfads
-
             isOK = Sim1.db_getPara(xAchse, xWert, yAchse, yWert)
 
             If (isOK) Then
@@ -1491,10 +1492,10 @@ Start_Evolutionsrunden:
                     Case METH_PES, METH_SENSIPLOT
 
                         'String für die Anzeige der OptParameter wird generiert
-                        ParamString = eol & "OptParameter: " & eol
+                        ParamString = eol & "OptParameter: "
                         For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
                             With Sim1.List_OptParameter(i)
-                                ParamString &= eol & .Bezeichnung & ": " & .Wert.ToString()
+                                ParamString &= eol & "* " & .Bezeichnung & ": " & .Wert.ToString(format)
                             End With
                         Next
 
@@ -1502,23 +1503,23 @@ Start_Evolutionsrunden:
                     Case METH_CES
 
                         'String für die Anzeige der Pfade wird generiert
-                        ParamString = eol & "Pfad: " & eol
+                        ParamString = eol & "Pfad: "
                         For i = 0 To Sim1.Akt.Measures.GetUpperBound(0)
-                            ParamString &= eol & Sim1.List_Locations(i).Name & ": " & Sim1.Akt.Measures(i).ToString()
+                            ParamString &= eol & "* " & Sim1.List_Locations(i).Name & ": " & Sim1.Akt.Measures(i)
                         Next
 
 
                     Case METH_CES_PES
 
                         'String für die Anzeige von Pfad/OptParameter wird generiert
-                        ParamString = eol & "Pfad: " & eol
+                        ParamString = eol & "Pfad: "
                         For i = 0 To Sim1.Akt.Measures.GetUpperBound(0)
-                            ParamString &= eol & Sim1.List_Locations(i).Name & ": " & Sim1.Akt.Measures(i).ToString()
+                            ParamString &= eol & "* " & Sim1.List_Locations(i).Name & ": " & Sim1.Akt.Measures(i)
                         Next
-                        ParamString &= eol & eol & "OptParameter: " & eol
+                        ParamString &= eol & eol & "OptParameter: "
                         For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
                             With Sim1.List_OptParameter(i)
-                                ParamString &= eol & .Bezeichnung & ": " & .Wert.ToString()
+                                ParamString &= eol & "* " & .Bezeichnung & ": " & .Wert.ToString(format)
                             End With
                         Next
 
@@ -1545,7 +1546,7 @@ Start_Evolutionsrunden:
 
                     'QWerte berechnen, in String speichern und zugehörige Reihen anzeigen
                     '--------------------------------------------------------------------
-                    QWertString = "QWerte: " & eol
+                    QWertString = "QWerte: "
 
                     'zu zeichnenden Reihen aus Liste der OptZiele raussuchen
                     For i = 0 To Sim1.List_OptZiele.GetUpperBound(0)
@@ -1554,7 +1555,7 @@ Start_Evolutionsrunden:
 
                             'Qualitätswert berechnen und an String anhängen
                             .QWertTmp = Sim1.QWert(Sim1.List_OptZiele(i))
-                            QWertString &= eol & .Bezeichnung & ": " & .QWertTmp.ToString()
+                            QWertString &= eol & "* " & .Bezeichnung & ": " & .QWertTmp.ToString(format)
 
                             'Simulationsgrößen nur jeweils ein Mal zeichnen
                             If (Not SimSeries.Contains(.SimGr)) Then
@@ -1579,11 +1580,11 @@ Start_Evolutionsrunden:
                     'Constraints berechnen und in String speichern
                     '---------------------------------------------
                     If (Sim1.List_Constraints.GetLength(0) > 0) Then
-                        ConstrString = eol & eol & "Constraints: " & eol
+                        ConstrString = eol & eol & "Constraints: "
                         For i = 0 To Sim1.List_Constraints.GetUpperBound(0)
                             With Sim1.List_Constraints(i)
                                 .ConstTmp = Sim1.Constraint(Sim1.List_Constraints(i))
-                                ConstrString &= eol & .Bezeichnung & ": " & .ConstTmp.ToString()
+                                ConstrString &= eol & "* " & .Bezeichnung & ": " & .ConstTmp.ToString(format)
                             End With
                         Next
                     End If
