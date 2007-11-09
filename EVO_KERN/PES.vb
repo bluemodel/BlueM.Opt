@@ -1612,7 +1612,6 @@ Public Class PES
 
         ReDim TempDistance(NPenalty - 1)
         ReDim PenaltyDistance(PES_Settings.NEltern - 1, PES_Settings.NEltern - 1)
-        'BUG 135 ?
         ReDim d(PES_Settings.NEltern - 1)
 
         'Bestimmen der normierten Raumabstände zwischen allen Elternindividuen
@@ -1623,7 +1622,7 @@ Public Class PES
                 For k = 0 To NPenalty - 1
                     TempDistance(k) = Qb(i, PES_iAkt.iAktPop, k) - Qb(j, PES_iAkt.iAktPop, k)
                     TempDistance(k) = TempDistance(k) * TempDistance(k)
-                    PenaltyDistance(i, j) = PenaltyDistance(i, j) + TempDistance(k)
+                    PenaltyDistance(i, j) += TempDistance(k)
                 Next k
                 PenaltyDistance(i, j) = System.Math.Sqrt(PenaltyDistance(i, j))
                 PenaltyDistance(j, i) = PenaltyDistance(i, j)
@@ -1632,7 +1631,6 @@ Public Class PES
 
         d_mean = 0
 
-        'BUG 135
         For i = 0 To PES_Settings.NEltern - 2
             d(i) = 1.0E+300
             For j = 0 To i - 1
@@ -1641,25 +1639,23 @@ Public Class PES
             For j = i + 1 To PES_Settings.NEltern - 1
                 If (PenaltyDistance(i, j) < d(i)) Then d(i) = PenaltyDistance(i, j)
             Next j
-            d_mean = d_mean + d(i)
+            d_mean += d(i)
         Next i
 
         d_mean = d_mean / PES_Settings.NEltern
         NDS_Crowding_Distance_Count = 0
 
-        'BUG 135
         For i = 0 To PES_Settings.NEltern - 2
-            NDS_Crowding_Distance_Count = NDS_Crowding_Distance_Count + (d_mean - d(i)) * (d_mean - d(i))
+            NDS_Crowding_Distance_Count += (d_mean - d(i)) * (d_mean - d(i))
         Next i
 
         NDS_Crowding_Distance_Count = NDS_Crowding_Distance_Count / PES_Settings.NEltern
         NDS_Crowding_Distance_Count = System.Math.Sqrt(NDS_Crowding_Distance_Count)
 
         Spannweite = 0
-        'BUG 135
         For i = 0 To PES_Settings.NEltern - 1
             'TODO: sollte hier nicht j = i + 1 stehen?
-            For j = i To PES_Settings.NEltern
+            For j = i To PES_Settings.NEltern - 1
                 If PenaltyDistance(i, j) > Spannweite Then Spannweite = PenaltyDistance(i, j)
             Next j
         Next i
