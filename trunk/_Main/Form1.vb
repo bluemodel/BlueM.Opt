@@ -1066,14 +1066,14 @@ Start_Evolutionsrunden:
         'xxxxxxxxxxxxxxxx
         For PES1.PES_iAkt.iAktRunde = 0 To PES1.PES_Settings.NRunden - 1
 
-            Call EVO_Opt_Verlauf1.Runden(PES1.PES_iAkt.iAktRunde)
+            Call EVO_Opt_Verlauf1.Runden(PES1.PES_iAkt.iAktRunde + 1)
             Call PES1.EsResetPopBWSpeicher() 'Nur bei Komma Strategie
 
             'Über alle Populationen
             'xxxxxxxxxxxxxxxxxxxxxx
             For PES1.PES_iAkt.iAktPop = 0 To PES1.PES_Settings.NPopul - 1
 
-                Call EVO_Opt_Verlauf1.Populationen(PES1.PES_iAkt.iAktPop)
+                Call EVO_Opt_Verlauf1.Populationen(PES1.PES_iAkt.iAktPop + 1)
 
                 'POPULATIONS REPRODUKTIONSPROZESS
                 '################################
@@ -1089,14 +1089,14 @@ Start_Evolutionsrunden:
                 'xxxxxxxxxxxxxxxxxxxxxx
                 For PES1.PES_iAkt.iAktGen = 0 To PES1.PES_Settings.NGen - 1
 
-                    Call EVO_Opt_Verlauf1.Generation(PES1.PES_iAkt.iAktGen)
+                    Call EVO_Opt_Verlauf1.Generation(PES1.PES_iAkt.iAktGen + 1)
                     Call PES1.EsResetBWSpeicher()  'Nur bei Komma Strategie
 
                     'Über alle Nachkommen
                     'xxxxxxxxxxxxxxxxxxxxxxxxx
                     For PES1.PES_iAkt.iAktNachf = 0 To PES1.PES_Settings.NNachf - 1
 
-                        Call EVO_Opt_Verlauf1.Nachfolger(PES1.PES_iAkt.iAktNachf)
+                        Call EVO_Opt_Verlauf1.Nachfolger(PES1.PES_iAkt.iAktNachf + 1)
 
                         durchlauf += 1
 
