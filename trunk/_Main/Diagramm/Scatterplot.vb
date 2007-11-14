@@ -1,4 +1,18 @@
 Partial Public Class Scatterplot
+    Inherits System.Windows.Forms.Form
+
+    '*******************************************************************************
+    '*******************************************************************************
+    '**** Klasse Scatterplot                                                    ****
+    '****                                                                       ****
+    '**** Stellt ein Optimierungsergebnis als Scatterplot-Matrix dar            ****
+    '****                                                                       ****
+    '**** Autor: Felix Froehlich                                                ****
+    '****                                                                       ****
+    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
+    '**** TU Darmstadt                                                          ****
+    '*******************************************************************************
+    '*******************************************************************************
 
     Private Diags(,) As Diagramm
     Private OptResult As EVO.OptResult
@@ -6,7 +20,7 @@ Partial Public Class Scatterplot
 
     'Konstruktor
     '***********
-    Public Sub New(ByVal optres as EVO.OptResult)
+    Public Sub New(ByVal optres As EVO.OptResult)
 
         ' Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent()

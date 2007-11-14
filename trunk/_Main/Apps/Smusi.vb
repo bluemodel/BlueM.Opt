@@ -2,18 +2,14 @@ Imports System.IO
 
 '*******************************************************************************
 '*******************************************************************************
-'**** Klasse BlueM                                                          ****
+'**** Klasse Smusi                                                          ****
 '****                                                                       ****
-'**** Funktionen zur Kontrolle des BlauenModells                            ****
+'**** Funktionen zur Kontrolle von Smusi                                    ****
 '****                                                                       ****
-'**** Christoph Huebner, Felix Froehlich                                    ****
+'**** Autoren: Christoph Huebner, Felix Froehlich, Dirk Muschalla           ****
 '****                                                                       ****
 '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
 '**** TU Darmstadt                                                          ****
-'****                                                                       ****
-'**** Erstellt: Dezember 2006                                               ****
-'****                                                                       ****
-'**** Letzte Änderung: April 2007                                           ****
 '*******************************************************************************
 '*******************************************************************************
 
