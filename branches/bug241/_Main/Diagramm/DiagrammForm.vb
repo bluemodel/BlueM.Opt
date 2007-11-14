@@ -1,6 +1,20 @@
 Partial Public Class DiagrammForm
     Inherits System.Windows.Forms.UserControl
 
+    '*******************************************************************************
+    '*******************************************************************************
+    '**** Klasse DiagrammForm                                                   ****
+    '****                                                                       ****
+    '**** Steuerelement, das ein TeeChart Objekt (der Klasse EVO.Diagramm)      ****
+    '**** sowie Schaltflächen zum Bedienen des Charts enthält                   ****
+    '****                                                                       ****
+    '**** Autor: Felix Froehlich                                                ****
+    '****                                                                       ****
+    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
+    '**** TU Darmstadt                                                          ****
+    '*******************************************************************************
+    '*******************************************************************************
+
     'Form laden
     '**********
     Private Sub DForm_Load(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles MyBase.Load
