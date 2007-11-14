@@ -1,4 +1,18 @@
-Public Class ScatterplotAbfrage
+Partial Public Class ScatterplotAbfrage
+    Inherits System.Windows.Forms.Form
+
+    '*******************************************************************************
+    '*******************************************************************************
+    '**** Klasse ScatterplotAbfrage                                             ****
+    '****                                                                       ****
+    '**** Einstellungsdialog für Scatterplot                                    ****
+    '****                                                                       ****
+    '**** Autor: Felix Froehlich                                                ****
+    '****                                                                       ****
+    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
+    '**** TU Darmstadt                                                          ****
+    '*******************************************************************************
+    '*******************************************************************************
 
     'Überprüfung der Benutzereingabe
     '*******************************

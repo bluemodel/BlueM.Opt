@@ -7,14 +7,10 @@ Imports System.Data.OleDb
 '****                                                                       ****
 '**** Basisklasse für Simulationsmodelle wie BlueM und SMUSI                ****
 '****                                                                       ****
-'**** Christoph Huebner, Felix Froehlich                                    ****
+'**** Autoren: Christoph Huebner, Felix Froehlich                           ****
 '****                                                                       ****
 '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
 '**** TU Darmstadt                                                          ****
-'****                                                                       ****
-'**** Erstellt: April 2006                                                  ****
-'****                                                                       ****
-'**** Letzte Änderung: Juli 2007                                            ****
 '*******************************************************************************
 '*******************************************************************************
 

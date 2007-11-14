@@ -1,5 +1,19 @@
-Public Class SensiPlot
+Partial Public Class SensiPlot
     Inherits System.Windows.Forms.Form
+
+    '*******************************************************************************
+    '*******************************************************************************
+    '**** Klasse SensiPlot                                                      ****
+    '****                                                                       ****
+    '**** Einstellungsdialog für SensiPlot                                      ****
+    '**** Speichert SensiPlot-Einstellungen                                     ****
+    '****                                                                       ****
+    '**** Autoren: Christoph Hübner, Felix Froehlich                            ****
+    '****                                                                       ****
+    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
+    '**** TU Darmstadt                                                          ****
+    '*******************************************************************************
+    '*******************************************************************************
 
     Public Selected_OptParameter() As Integer
     Public Selected_OptZiel As Integer
