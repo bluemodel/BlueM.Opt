@@ -190,6 +190,7 @@
     </Compile>
     <Compile Include="OptResult.vb" />
     <Compile Include="Settings.vb" />
+    <Compile Include="Solution.vb" />
     <EmbeddedResource Include="Apps\SensiPlot.resx">
       <DependentUpon>SensiPlot.vb</DependentUpon>
       <SubType>Designer</SubType>
@@ -257,8 +258,11 @@
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
     </Content>
+    <None Include="Resources\cancel.png" />
     <Content Include="Resources\EVO.ico" />
     <Content Include="Resources\icon_teechart.png" />
+    <None Include="Resources\page_white_database.png" />
+    <None Include="Resources\wave.ico" />
     <None Include="Resources\scatterplot.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />

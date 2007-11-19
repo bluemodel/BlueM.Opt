@@ -161,7 +161,7 @@ Partial Public Class Scatterplot
         Dim xWert, yWert As Double
         Dim xAchse, yAchse As String
         Dim iOptZielx, iOptZiely As Integer
-        Dim Solution As EVO.OptResult.Struct_Solution
+        Dim Solution As New Solution
         Dim serie As Steema.TeeChart.Styles.Series
         'Dim anno As Steema.TeeChart.Tools.Annotation
 

@@ -60,6 +60,13 @@ Namespace My.Resources
             End Set
         End Property
         
+        Friend ReadOnly Property cancel() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("cancel", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
         Friend ReadOnly Property EVO() As System.Drawing.Icon
             Get
                 Dim obj As Object = ResourceManager.GetObject("EVO", resourceCulture)
@@ -95,9 +102,23 @@ Namespace My.Resources
             End Get
         End Property
         
+        Friend ReadOnly Property page_white_database() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("page_white_database", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
         Friend ReadOnly Property scatterplot() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("scatterplot", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        Friend ReadOnly Property wave() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("wave", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property
