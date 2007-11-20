@@ -915,7 +915,7 @@ Partial Class Form1
                                 End If
                             Next
 
-                            'Die Anzahl der Eltern wird bestimmt
+                            'Die Anzahl der Eltern wird bestimmt, bzw ob Eltern vorhanden
                             Dim n_eltern As Integer = 0
                             For m = 0 To CES1.PES_Parents.GetUpperBound(0)
                                 If (j + 1) = CES1.PES_Parents(m).iLocation  Then
@@ -925,7 +925,7 @@ Partial Class Form1
 
                             'Die Kinder bekommen je nach Fall (Eltern keine Eltern) neue Parameter
                             If n_eltern = 0 Then
-                                'Falls noch keine Eltern vorhanden sind
+                                'Falls noch keine Eltern vorhanden sind -> zufällige Werte
                                 ReDim CES1.List_Childs(i).Loc(j).Loc_Dn(CES1.List_Childs(i).Loc(j).Loc_Para.GetUpperBound(1))
                                 For m = 0 To CES1.List_Childs(i).Loc(j).Loc_Para.GetUpperBound(1)
                                     CES1.List_Childs(i).Loc(j).Loc_Dn(m) = EVO_Settings1.PES_Settings.DnStart
@@ -936,6 +936,7 @@ Partial Class Form1
                                     End If
                                 Next
                             Else
+                                'Falls Eltern vorhanden -> auf Basis des Memory
                                 EVO_Settings1.isSaved = False
                                 Call EVO_Settings1.SetFor_CES_PES(1, n_eltern, 1)
 
@@ -943,7 +944,7 @@ Partial Class Form1
                                 '**************************************************************
                                 Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen, Method)
 
-                                Dim Index as Integer = 0
+                                Dim Index As Integer = 0
                                 For m = 0 To CES1.PES_Parents.GetUpperBound(0)
                                     If (j + 1) = CES1.PES_Parents(m).iLocation Then
                                         'Die Startwerte werden überschrieben
@@ -957,8 +958,15 @@ Partial Class Form1
 
                                 'Auslesen der Variierten Parameter
                                 myPara = PES1.EsGetParameter()
-                                ces1.List_Childs(i).Loc(j).Parameter = PES1.EsGetParameter()
+                                CES1.List_Childs(i).Loc(j).Parameter = PES1.EsGetParameter()
 
+
+
+
+
+                                'Es fehlt noch: !!!
+                                ' - Das NDSorting für den PES Memory
+                                ' - Prüfen ob PES in dieser Form richtig arbeitet
                             End If
                         End If
                     Next
