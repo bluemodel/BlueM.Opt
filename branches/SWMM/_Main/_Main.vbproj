@@ -124,6 +124,8 @@
     <Compile Include="Apps\Sim.vb" />
     <Compile Include="Apps\SKos.vb" />
     <Compile Include="Apps\Smusi.vb" />
+    <Compile Include="Apps\SWMM.vb" />
+    <Compile Include="Apps\Swmm_Iface.vb" />
     <Compile Include="Apps\Testprobleme.Designer.vb">
       <DependentUpon>Testprobleme.vb</DependentUpon>
     </Compile>

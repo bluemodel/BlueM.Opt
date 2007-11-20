@@ -162,4 +162,7 @@ Public Class Smusi
 
 #End Region 'Methoden
 
+    Public Sub New()
+
+    End Sub
 End Class

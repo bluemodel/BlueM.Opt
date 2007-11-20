@@ -39,12 +39,12 @@ Partial Class Form1
         Me.ComboBox_Methode = New System.Windows.Forms.ComboBox
         Me.Label_Anwendung = New System.Windows.Forms.Label
         Me.ComboBox_Anwendung = New System.Windows.Forms.ComboBox
-        Me.EVO_Opt_Verlauf1 = New EVO.EVO_Opt_Verlauf
-        Me.EVO_Settings1 = New EVO.EVO_Einstellungen
-        Me.Testprobleme1 = New EVO.Testprobleme
+        Me.EVO_Opt_Verlauf1 = New IHWB.EVO.EVO_Opt_Verlauf
+        Me.EVO_Settings1 = New IHWB.EVO.EVO_Einstellungen
+        Me.Testprobleme1 = New IHWB.EVO.Testprobleme
         Me.OpenFileDialog_Datensatz = New System.Windows.Forms.OpenFileDialog
         Me.OpenFileDialog_MDB = New System.Windows.Forms.OpenFileDialog
-        Me.DForm = New EVO.DiagrammForm
+        Me.DForm = New IHWB.EVO.DiagrammForm
         Me.GroupBox_Anwendung.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -88,7 +88,7 @@ Partial Class Form1
         'Button_Scatterplot
         '
         Me.Button_Scatterplot.Enabled = False
-        Me.Button_Scatterplot.Image = My.Resources.Resources.scatterplot
+        Me.Button_Scatterplot.Image = Global.IHWB.EVO.My.Resources.Resources.scatterplot
         Me.Button_Scatterplot.Location = New System.Drawing.Point(546, 656)
         Me.Button_Scatterplot.Name = "Button_Scatterplot"
         Me.Button_Scatterplot.Size = New System.Drawing.Size(25, 25)
@@ -162,11 +162,11 @@ Partial Class Form1
         Me.EVO_Opt_Verlauf1.Size = New System.Drawing.Size(489, 73)
         Me.EVO_Opt_Verlauf1.TabIndex = 6
         '
-        'EVO_Einstellungen1
+        'EVO_Settings1
         '
         Me.EVO_Settings1.Enabled = False
         Me.EVO_Settings1.Location = New System.Drawing.Point(8, 187)
-        Me.EVO_Settings1.Name = "EVO_Einstellungen1"
+        Me.EVO_Settings1.Name = "EVO_Settings1"
         Me.EVO_Settings1.OptModus = CType(0, Short)
         Me.EVO_Settings1.Size = New System.Drawing.Size(225, 585)
         Me.EVO_Settings1.TabIndex = 2
@@ -182,7 +182,7 @@ Partial Class Form1
         'OpenFileDialog_Datensatz
         '
         Me.OpenFileDialog_Datensatz.DefaultExt = "ALL"
-        Me.OpenFileDialog_Datensatz.Filter = "ALL-Dateien (*.ALL)|*.ALL"
+        Me.OpenFileDialog_Datensatz.Filter = "ALL-Dateien (*.ALL)|*.ALL|INP-Dateien (*.INP)|*.INP"
         Me.OpenFileDialog_Datensatz.Title = "Datensatz auswählen"
         '
         'OpenFileDialog_MDB

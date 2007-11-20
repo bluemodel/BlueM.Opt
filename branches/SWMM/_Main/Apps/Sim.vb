@@ -343,7 +343,9 @@ Public MustInherit Class Sim
 
     'Optimierungsparameter einlesen
     '******************************
-    Private Sub Read_OptParameter()
+    '13.11.07_SH
+    'Routine von 'Privat' in 'Protected Overridable' geändert
+    Protected Overridable Sub Read_OptParameter()
 
         Dim Datei As String = WorkDir & Datensatz & "." & OptParameter_Ext
 
@@ -395,7 +397,9 @@ Public MustInherit Class Sim
 
     'Modellparameter einlesen
     '************************
-    Private Sub Read_ModellParameter()
+    '13.11.07_SH
+    'Routine von 'Privat' in 'Protected Overridable' geändert
+    Protected Overridable Sub Read_ModellParameter()
 
         Dim Datei As String = WorkDir & Datensatz & "." & ModParameter_Ext
 
@@ -1261,7 +1265,7 @@ Public MustInherit Class Sim
 
             DateiPfad = WorkDir & Datensatz & "." & List_ModellParameter(i).Datei
             'Datei öffnen
-            Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.Read)
+            Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
             Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
             'Anzahl der Zeilen feststellen
@@ -1285,11 +1289,15 @@ Public MustInherit Class Sim
             'Zeile ändern
             Zeile = Zeilenarray(List_ModellParameter(i).ZeileNr - 1)
             'BUG 170: richtig wäre: Length = SpBis - SpVon + 1
-            Dim Length As Short = List_ModellParameter(i).SpBis - List_ModellParameter(i).SpVon
+            '14.11.07_SH: +1 reingenommen
+            'Dim Length As Short = List_ModellParameter(i).SpBis - List_ModellParameter(i).SpVon
+            Dim Length As Short = List_ModellParameter(i).SpBis - List_ModellParameter(i).SpVon + 1
             StrLeft = Microsoft.VisualBasic.Left(Zeile, List_ModellParameter(i).SpVon - 1)
-            StrRight = Microsoft.VisualBasic.Right(Zeile, Len(Zeile) - List_ModellParameter(i).SpBis + 1)
+            '14.11.07_SH: +1 raus
+            'StrRight = Microsoft.VisualBasic.Right(Zeile, Len(Zeile) - List_ModellParameter(i).SpBis + 1) 
+            StrRight = Microsoft.VisualBasic.Right(Zeile, Len(Zeile) - List_ModellParameter(i).SpBis)
 
-            Wert = List_ModellParameter(i).Wert.ToString()
+            Wert = CInt(List_ModellParameter(i).Wert.ToString())
             If (Wert.Length > Length) Then
                 'TODO: Parameter wird für erforderliche Stringlänge einfach abgeschnitten, sollte aber gerundet werden!
                 Wert = Wert.Substring(0, Length)
@@ -1370,7 +1378,7 @@ Public MustInherit Class Sim
 
     'Berechnung des Qualitätswerts (Zielwert)
     '****************************************
-    Public Function QWert(ByVal OptZiel As Struct_OptZiel) As Double
+    Public Overridable Function QWert(ByVal OptZiel As Struct_OptZiel) As Double
 
         QWert = 0
 
@@ -1401,6 +1409,7 @@ Public MustInherit Class Sim
         End If
 
     End Function
+
 
     'Qualitätswert aus WEL-Datei
     '***************************
@@ -2232,4 +2241,7 @@ Public Class OptResult
     'Array von Lösungen
     Public Solutions() As Struct_Solution
 
+    Public Sub New()
+
+    End Sub
 End Class

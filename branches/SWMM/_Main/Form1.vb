@@ -32,6 +32,7 @@ Partial Class Form1
     Private Anwendung As String
     Private Const ANW_BLUEM As String = "BlueM"
     Private Const ANW_SMUSI As String = "Smusi"
+    Private Const ANW_SWMM As String = "SWMM"             'SH_13.11.07
     Private Const ANW_TESTPROBLEME As String = "Testprobleme"
     Private Const ANW_TSP As String = "Traveling Salesman"
 
@@ -80,7 +81,7 @@ Partial Class Form1
         System.Windows.Forms.Application.EnableVisualStyles()
 
         'Liste der Anwendungen in ComboBox schreiben und Anfangseinstellung wählen
-        ComboBox_Anwendung.Items.AddRange(New Object() {"", ANW_BLUEM, ANW_SMUSI, ANW_TESTPROBLEME, ANW_TSP})
+        ComboBox_Anwendung.Items.AddRange(New Object() {"", ANW_BLUEM, ANW_SMUSI, ANW_SWMM, ANW_TESTPROBLEME, ANW_TSP})
         ComboBox_Anwendung.SelectedIndex = 0
 
         'Liste der Methoden in ComboBox schreiben und Anfangseinstellung wählen
@@ -158,6 +159,14 @@ Partial Class Form1
                     'Objekt der Klasse Smusi initialisieren
                     Sim1 = New Smusi()
                     Call Me.displayWorkDir()
+
+                    'SH_13.11.07    
+                Case ANW_SWMM   'Anwendung SWMM
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                    'Objekt der Klasse SWMM initialisieren
+                    Sim1 = New SWMM()
+                    Call Me.displayWorkDir()
+                    'SH_13.11.07_Ende
 
 
                 Case ANW_TESTPROBLEME 'Anwendung Testprobleme
@@ -400,7 +409,12 @@ Partial Class Form1
 
         'Alten Datensatz dem Dialog zuweisen
         OpenFileDialog_Datensatz.InitialDirectory = Sim1.WorkDir
-        OpenFileDialog_Datensatz.FileName = Sim1.WorkDir & Sim1.Datensatz & ".ALL"
+        'SH_13.11.07
+        If Me.Anwendung = ANW_BLUEM Or Me.Anwendung = ANW_SMUSI Then
+            OpenFileDialog_Datensatz.FileName = Sim1.WorkDir & Sim1.Datensatz & ".ALL"
+        ElseIf Me.Anwendung = ANW_SWMM Then
+            OpenFileDialog_Datensatz.FileName = Sim1.WorkDir & Sim1.Datensatz & ".INP"
+        End If
         'Dialog öffnen
         Dim DatensatzResult As DialogResult = OpenFileDialog_Datensatz.ShowDialog()
         'Neuen Datensatz speichern
@@ -464,7 +478,7 @@ Partial Class Form1
 
             Select Case Anwendung
 
-                Case ANW_BLUEM, ANW_SMUSI
+                Case ANW_BLUEM, ANW_SMUSI, ANW_SWMM
 
                     Select Case Method
                         Case METH_RESET
@@ -1131,7 +1145,7 @@ Start_Evolutionsrunden:
 
                                     Call Testprobleme1.Evaluierung_TestProbleme(Testprobleme1.Combo_Testproblem.Text, myPara, durchlauf, PES1.PES_iAkt.iAktPop, QN, RN, DForm.Diag)
 
-                                Case ANW_BLUEM, ANW_SMUSI
+                                Case ANW_BLUEM, ANW_SMUSI, ANW_SWMM
 
                                     'Vorbereiten des Modelldatensatzes
                                     Call Sim1.PREPARE_Evaluation_PES(myPara)
@@ -1315,7 +1329,7 @@ Start_Evolutionsrunden:
 
                 Call Testprobleme1.DiagInitialise(Me.EVO_Settings1.PES_Settings, globalAnzPar, Me.DForm.Diag) 
 
-            Case ANW_BLUEM, ANW_SMUSI 'BlueM oder SMUSI
+            Case ANW_BLUEM, ANW_SMUSI, ANW_SWMM 'BlueM oder SMUSI
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
                 Select Case Method
@@ -1743,4 +1757,11 @@ Start_Evolutionsrunden:
 
 #End Region 'Methoden
 
+    Private Sub Button_Start_DragDrop(ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles Button_Start.DragDrop
+
+    End Sub
+
+    Private Sub OpenFileDialog_Datensatz_FileOk(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles OpenFileDialog_Datensatz.FileOk
+
+    End Sub
 End Class
