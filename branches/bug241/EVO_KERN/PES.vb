@@ -767,7 +767,7 @@ Public Class PES
     '******************************************
     Public Sub EsPopMutation()
 
-        'BUG 241: Beziehungen zwischen OptParas auf Populationsebene überprüfen!
+        'BUG 241: Beziehungen zwischen OptParas auf Populationsebene implementieren!
 
         Dim v, n As Short
         Dim DeTemp As Double                'Temporäre Schrittweite für Elter
@@ -797,7 +797,7 @@ Public Class PES
                     XeTemp = Xe(v, n, PES_iAkt.iAktPop) + DeTemp * Z
 
                     ' Restriktion für die mutierten Werte
-                Loop While (XeTemp <= 0 Or XeTemp > 1 Or Not checkBeziehung(v, XeTemp))
+                Loop While (XeTemp <= 0 Or XeTemp > 1)
 
                 De(v, n, PES_iAkt.iAktPop) = DeTemp
                 Xe(v, n, PES_iAkt.iAktPop) = XeTemp
