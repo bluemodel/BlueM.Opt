@@ -57,10 +57,21 @@ Public Class PES
 
     Public PES_Settings As Struct_Settings
 
+    'Beziehung
+    '--------------
+    Public Enum Beziehung As Integer
+        keine = 0
+        kleiner = 1
+        kleinergleich = 2
+        groesser = 3
+        groessergleich = 4
+    End Enum
+
     'Structure zum Speichern der Werte die aus den OptDateien generiert werden
     Private Structure Struct_AktPara
         Dim Dn() As Double                  'Schrittweitenvektor (Dimension varanz)
         Dim Xn() As Double                  'aktuelle Variablenwerte (Dimension varanz)
+        Dim Bez() As Beziehung              'Beziehungen
     End Structure
 
     Private AktPara As Struct_AktPara
@@ -200,7 +211,7 @@ Public Class PES
 
     'Initialisierung der PES
     '***************************************
-    Public Sub PesInitialise(ByRef PES_Settings As Struct_Settings, ByVal AnzPara As Short, ByVal AnzPenalty As Short, ByVal AnzConstr As Short, ByRef Parameter() As Double, ByVal Method As String)
+    Public Sub PesInitialise(ByRef PES_Settings As Struct_Settings, ByVal AnzPara As Short, ByVal AnzPenalty As Short, ByVal AnzConstr As Short, ByRef Parameter() As Double, ByVal beziehungen() As Beziehung, ByVal Method As String)
 
         'Schritt 1: PES - ES_OPTIONS
         'Optionen der Evolutionsstrategie werden übergeben
@@ -212,7 +223,7 @@ Public Class PES
 
         'Schritt 3: PES - ES_STARTVALUES
         'Startwerte werden zugewiesen
-        Call EsStartvalues(Parameter)
+        Call EsStartvalues(Parameter, beziehungen)
 
     End Sub
 
@@ -299,6 +310,7 @@ Public Class PES
 
         'Dynamisches Array Initialisieren
         ReDim AktPara.Xn(NPara - 1)                'Variablenvektor wird initialisiert
+		ReDim AktPara.Bez(NPara - 1)
         ReDim AktPara.Dn(NPara - 1)                'Schrittweitenvektor wird initialisiert
 
         'Parametervektoren initialisieren
@@ -388,7 +400,7 @@ Public Class PES
     'PES_Settings.iStartPar 2: Originalparameter    -> Schrittweite = Startschrittweite
     '                                               -> Parameterwert = Originalparameter
     '***********************************************************************************
-    Public Sub EsStartvalues(ByVal Parameter() As Double)
+    Public Sub EsStartvalues(ByVal Parameter() As Double, ByVal beziehungen() as Beziehung)
 
         Dim i As Integer
 
@@ -398,6 +410,7 @@ Public Class PES
                 Throw New Exception("Der Startparameter " & i & " liegt nicht zwischen 0 und 1. Sie müssen hier skaliert vorliegen")
             End If
             AktPara.Xn(i) = Parameter(i)
+            AktPara.Bez(i) = beziehungen(i)
             AktPara.Dn(i) = PES_Settings.DnStart
         Next
 
@@ -754,6 +767,8 @@ Public Class PES
     '******************************************
     Public Sub EsPopMutation()
 
+        'BUG 241: Beziehungen zwischen OptParas auf Populationsebene implementieren!
+
         Dim v, n As Short
         Dim DeTemp As Double                'Temporäre Schrittweite für Elter
         Dim XeTemp As Double                'Temporäre Parameterwert für Elter
@@ -795,7 +810,7 @@ Public Class PES
     '****************************************
     Public Sub EsMutation()
 
-        Dim v As Short
+        Dim v, i As Short
         Dim DnTemp As Double                'Temporäre Schrittweite für Nachkomme
         Dim XnTemp As Double                'Temporärer Parameterwert für Nachkomme
         Dim expo As Short                   'Exponent für Schrittweite (+/-1)
@@ -808,7 +823,20 @@ Public Class PES
         End If
 
         For v = 0 To NPara - 1
+		  		i = 0
             Do
+                i += 1
+                'Abbruchkriterium
+                If (i >= 1000) Then
+                    'Es konnte keine gültiger Parameter generiert werden!
+                    'Parameter zurücksetzen
+                    DnTemp = AktPara.Dn(v)
+                    XnTemp = AktPara.Xn(v)
+                    'Wieder von vorne anfangen
+                    i = 0
+                    v = 0
+                    Exit Do
+                End If
                 If PES_Settings.isDnVektor Then
                     '+/-1
                     expo = (2 * Int(Rnd() + 0.5) - 1)
@@ -821,7 +849,7 @@ Public Class PES
                 'Mutation wird durchgeführt
                 XnTemp = AktPara.Xn(v) + DnTemp * Z
                 'Restriktion für die mutierten Werte
-            Loop While (XnTemp <= 0 Or XnTemp > 1)
+            Loop While (XnTemp <= 0 Or XnTemp > 1 Or Not checkBeziehung(v, XnTemp))
 
             AktPara.Dn(v) = DnTemp
             AktPara.Xn(v) = XnTemp
@@ -1805,5 +1833,35 @@ Public Class PES
         Next k
 
     End Sub
+
+    'Einen Parameterwert auf Einhaltung der Beziehung überprüfen
+    '****************************************************************
+    Private Function checkBeziehung(ByVal ipara As Integer, ByVal XnTemp As Double) As Boolean
+
+        'ipara ist der Index des zu überprüfenden Parameters,
+        'XnTemp sein aktueller, zu überprüfender Wert
+
+        Dim isOK As Boolean = False
+        If (AktPara.Bez(ipara) = Beziehung.keine) Then
+            'Keine Beziehung vorhanden
+            isOK = True
+        Else
+            'Referenzierten Parameterwert vergleichen
+            Dim ref As Double = AktPara.Xn(ipara - 1)
+            Select Case AktPara.Bez(ipara)
+                Case Beziehung.kleiner
+                    If (XnTemp < ref) Then isOK = True
+                Case Beziehung.kleinergleich
+                    If (XnTemp <= ref) Then isOK = True
+                Case Beziehung.groesser
+                    If (XnTemp > ref) Then isOK = True
+                Case Beziehung.groessergleich
+                    If (XnTemp >= ref) Then isOK = True
+            End Select
+        End If
+
+        Return isOK
+
+    End Function
 
 End Class
