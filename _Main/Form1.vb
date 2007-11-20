@@ -962,6 +962,8 @@ Partial Class Form1
                                 'Auslesen der Variierten Parameter
                                 myPara = PES1.EsGetParameter()
                                 CES1.List_Childs(i).Loc(j).Parameter = PES1.EsGetParameter()
+                                myPara = PES1.EsGetDN
+                                CES1.List_Childs(i).Loc(j).Loc_Dn = PES1.EsGetDN()
 
 
 

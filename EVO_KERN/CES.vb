@@ -108,7 +108,7 @@ Public Class CES
     '**************************
     Public Structure Location_Data
         Dim Loc_Para(,) As Object           '10 Die Optimierungsparameter für PES
-        Dim Loc_Dn() As Object              '11 Das Dn für PES
+        Dim Loc_Dn() As Double              '11 Das Dn für PES
         Dim Loc_Elem() As String            '11a Die Elemente die zur Location gehören
 
         'Verändert die Parameter im Parameter Array
