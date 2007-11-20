@@ -125,7 +125,10 @@ Partial Class Form1
             'Combobox Methode deaktivieren
             ComboBox_Methode.Enabled = False
 
-            'Scatterplot deaktivieren
+            'Buttons
+            Me.Button_openMDB.Enabled = False
+            Me.Button_clearSelection.Enabled = False
+            Me.Button_showWave.Enabled = False
             Me.Button_Scatterplot.Enabled = False
 
             'EVO_Settings zurücksetzen
@@ -223,7 +226,10 @@ Partial Class Form1
             'Start Button deaktivieren
             Me.Button_Start.Enabled = False
 
-            'Scatterplot deaktivieren
+            'Buttons
+            Me.Button_openMDB.Enabled = False
+            Me.Button_clearSelection.Enabled = False
+            Me.Button_showWave.Enabled = False
             Me.Button_Scatterplot.Enabled = False
 
             'EVO_Einstellungen deaktivieren
@@ -257,6 +263,8 @@ Partial Class Form1
 
                     MsgBox("Die Startwerte der Optimierungsparameter wurden in die Eingabedateien geschrieben.", MsgBoxStyle.Information, "Info")
 
+                    'Buttons
+                    Me.Button_openMDB.Enabled = True
 
                 Case METH_SENSIPLOT 'Methode SensiPlot
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -292,8 +300,8 @@ Partial Class Form1
                     'EVO_Einstellungen aktivieren
                     EVO_Settings1.Enabled = True
 
-                    'Scatterplot aktivieren
-                    Me.Button_Scatterplot.Enabled = True
+                    'Buttons
+                    Me.Button_openMDB.Enabled = True
 
                     'PES für Sim vorbereiten
                     Call Sim1.read_and_valid_INI_Files_PES()
@@ -310,6 +318,10 @@ Partial Class Form1
 
                 Case METH_CES, METH_CES_PES, METH_HYBRID 'Methode CES und Methode CES_PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'Buttons
+                    Me.Button_openMDB.Enabled = True
+                    Me.Button_Scatterplot.Enabled = True
 
                     'Funktioniert nur bei BlueM!
                     If (Not Anwendung = ANW_BLUEM) Then
@@ -449,6 +461,9 @@ Partial Class Form1
             '-------------------
             Me.isrun = True
             Me.Button_Start.Text = "||"
+
+            'Buttons
+            Me.Button_Scatterplot.Enabled = True
 
             'Try
 
@@ -1563,6 +1578,12 @@ Start_Evolutionsrunden:
 
         End If
 
+        'Buttons
+        If (Sim1.OptResult.selSolutions.Length > 0) Then
+            Me.Button_clearSelection.Enabled = True
+            Me.Button_showWave.Enabled = True
+        End If
+
     End Sub
 
     'Lösungsauswahl zurücksetzen
@@ -1578,6 +1599,10 @@ Start_Evolutionsrunden:
         Me.DForm.Diag.anno1.Active = False
         'Auswahl zurücksetzen
         ReDim Me.Sim1.OptResult.selSolutions(-1)
+
+        'Buttons
+        Me.Button_clearSelection.Enabled = False
+        Me.Button_showWave.Enabled = False
 
     End Sub
 
@@ -1776,6 +1801,9 @@ Start_Evolutionsrunden:
                         End If
                     End With
                 Next
+
+                'Buttons
+                Me.Button_Scatterplot.Enabled = True
 
                 'Cursor Default
                 Cursor = Cursors.Default

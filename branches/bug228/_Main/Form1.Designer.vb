@@ -42,11 +42,11 @@ Partial Class Form1
         Me.ComboBox_Methode = New System.Windows.Forms.ComboBox
         Me.Label_Anwendung = New System.Windows.Forms.Label
         Me.ComboBox_Anwendung = New System.Windows.Forms.ComboBox
-        Me.EVO_Opt_Verlauf1 = New IHWB.EVO.EVO_Opt_Verlauf
-        Me.EVO_Settings1 = New IHWB.EVO.EVO_Einstellungen
-        Me.Testprobleme1 = New IHWB.EVO.Testprobleme
         Me.OpenFileDialog_Datensatz = New System.Windows.Forms.OpenFileDialog
         Me.OpenFileDialog_MDB = New System.Windows.Forms.OpenFileDialog
+        Me.Testprobleme1 = New IHWB.EVO.Testprobleme
+        Me.EVO_Opt_Verlauf1 = New IHWB.EVO.EVO_Opt_Verlauf
+        Me.EVO_Settings1 = New IHWB.EVO.EVO_Einstellungen
         Me.DForm = New IHWB.EVO.DiagrammForm
         Me.GroupBox_Anwendung.SuspendLayout()
         Me.SuspendLayout()
@@ -101,6 +101,7 @@ Partial Class Form1
         '
         'Button_showWave
         '
+        Me.Button_showWave.Enabled = False
         Me.Button_showWave.Image = Global.IHWB.EVO.My.Resources.Resources.wave
         Me.Button_showWave.Location = New System.Drawing.Point(517, 652)
         Me.Button_showWave.Name = "Button_showWave"
@@ -111,6 +112,7 @@ Partial Class Form1
         '
         'Button_clearSelection
         '
+        Me.Button_clearSelection.Enabled = False
         Me.Button_clearSelection.Image = Global.IHWB.EVO.My.Resources.Resources.cancel
         Me.Button_clearSelection.Location = New System.Drawing.Point(486, 652)
         Me.Button_clearSelection.Name = "Button_clearSelection"
@@ -121,6 +123,7 @@ Partial Class Form1
         '
         'Button_openMDB
         '
+        Me.Button_openMDB.Enabled = False
         Me.Button_openMDB.Image = Global.IHWB.EVO.My.Resources.Resources.page_white_database
         Me.Button_openMDB.Location = New System.Drawing.Point(455, 652)
         Me.Button_openMDB.Name = "Button_openMDB"
@@ -184,6 +187,25 @@ Partial Class Form1
         Me.ComboBox_Anwendung.Size = New System.Drawing.Size(124, 21)
         Me.ComboBox_Anwendung.TabIndex = 0
         '
+        'OpenFileDialog_Datensatz
+        '
+        Me.OpenFileDialog_Datensatz.DefaultExt = "ALL"
+        Me.OpenFileDialog_Datensatz.Filter = "ALL-Dateien (*.ALL)|*.ALL"
+        Me.OpenFileDialog_Datensatz.Title = "Datensatz auswählen"
+        '
+        'OpenFileDialog_MDB
+        '
+        Me.OpenFileDialog_MDB.Filter = "Access-Datenbanken|*.mdb"
+        Me.OpenFileDialog_MDB.Title = "Ergebnisdatenbank auswählen"
+        '
+        'Testprobleme1
+        '
+        Me.Testprobleme1.Enabled = False
+        Me.Testprobleme1.Location = New System.Drawing.Point(4, 60)
+        Me.Testprobleme1.Name = "Testprobleme1"
+        Me.Testprobleme1.Size = New System.Drawing.Size(225, 121)
+        Me.Testprobleme1.TabIndex = 7
+        '
         'EVO_Opt_Verlauf1
         '
         Me.EVO_Opt_Verlauf1.Location = New System.Drawing.Point(231, 690)
@@ -203,25 +225,6 @@ Partial Class Form1
         Me.EVO_Settings1.OptModus = CType(0, Short)
         Me.EVO_Settings1.Size = New System.Drawing.Size(225, 585)
         Me.EVO_Settings1.TabIndex = 2
-        '
-        'Testprobleme1
-        '
-        Me.Testprobleme1.Enabled = False
-        Me.Testprobleme1.Location = New System.Drawing.Point(4, 60)
-        Me.Testprobleme1.Name = "Testprobleme1"
-        Me.Testprobleme1.Size = New System.Drawing.Size(225, 121)
-        Me.Testprobleme1.TabIndex = 7
-        '
-        'OpenFileDialog_Datensatz
-        '
-        Me.OpenFileDialog_Datensatz.DefaultExt = "ALL"
-        Me.OpenFileDialog_Datensatz.Filter = "ALL-Dateien (*.ALL)|*.ALL"
-        Me.OpenFileDialog_Datensatz.Title = "Datensatz auswählen"
-        '
-        'OpenFileDialog_MDB
-        '
-        Me.OpenFileDialog_MDB.Filter = "Access-Datenbanken|*.mdb"
-        Me.OpenFileDialog_MDB.Title = "Ergebnisdatenbank auswählen"
         '
         'DForm
         '
