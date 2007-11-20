@@ -24,34 +24,35 @@ Public Class SKos
     '***************************************
     Public Function calculate_costs(ByVal BlueM1 As BlueM) As Double
         Dim costs As Double = 0
-        Dim Bauwerksliste(0, 1) As Object
+        Dim Elementliste(0, 1) As Object
         Dim TRS_Array(,) As Object = {}
         Dim TAL_Array(,) As Object = {}
 
         'Bauwerksliste wird erstellt
-        Call create_Bauwerksliste(BlueM1, Bauwerksliste)
+        Call create_Bauwerksliste(BlueM1, Elementliste)
 
         'Ermitteln der massgeblichen Größen
         Call Read_TRS(BlueM1, TRS_Array)
         Call Read_TAL(BlueM1, TAL_Array)
 
         'Kalkulieren der Kosten für jedes Bauwerk
-        Call Acquire_Costs(TRS_Array, TAL_Array, Bauwerksliste)
+        Call Acquire_Costs(TRS_Array, TAL_Array, Elementliste)
 
         'Kosten aufsummieren
         Dim i, j As Integer
         For i = 0 To Aktuell_Elemente.GetUpperBound(0)
-            For j = 0 To Bauwerksliste.GetUpperBound(0)
-                If Bauwerksliste(j, 0) = Aktuell_Elemente(i) Then
-                    costs = costs + Bauwerksliste(j, 1)
+            For j = 0 To Elementliste.GetUpperBound(0)
+                If Elementliste(j, 0) = Aktuell_Elemente(i) Then
+                    costs = costs + Elementliste(j, 1)
                 End If
             Next
         Next
 
         Return costs
     End Function
-    'Funktion zum erstellen der Bauwerksliste
-    '****************************************
+    'Funktion zum erstellen der Elementliste
+    'Alle Elemente aus der CES datei werden hier in die Liste gesetzt
+    '****************************************************************
     Private Sub create_Bauwerksliste(ByVal BlueM1 As BlueM, ByRef Bauwerksliste(,) As Object)
         Dim Bauwerks_Array() As String = {}
 

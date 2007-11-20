@@ -830,7 +830,7 @@ Partial Class Form1
                 End If
 
                 'Zeichnen MO_SO der Kinder
-                serie = DForm.Diag.getSeriesPoint("Childs", "", Steema.TeeChart.Styles.PointerStyles.Rectangle, 4)
+                serie = DForm.Diag.getSeriesPoint("Childs", "", Steema.TeeChart.Styles.PointerStyles.Circle, 4)
                 If CES1.n_Penalty = 1 Then
                     Call serie.Add(durchlauf_all, CES1.List_Childs(i).Penalty(0))
                 ElseIf CES1.n_Penalty = 2 Then
@@ -862,7 +862,7 @@ Partial Class Form1
                 Call CES1.NDSorting_Control()
                 'Zeichnen von NDSortingResult
                 Call DForm.Diag.DeleteSeries(CES1.n_Childs - 1, 1)
-                serie = DForm.Diag.getSeriesPoint("Front:" & 1, "", Steema.TeeChart.Styles.PointerStyles.Triangle, 4)
+                serie = DForm.Diag.getSeriesPoint("Front:" & 1, "", Steema.TeeChart.Styles.PointerStyles.Diamond, 4)
                 For i = 0 To CES1.n_Childs - 1
                     Call serie.Add(CES1.NDSResult(i).Penalty(0), CES1.NDSResult(i).Penalty(1))
                 Next
@@ -960,9 +960,7 @@ Partial Class Form1
                                 Call PES1.EsReproMut()
 
                                 'Auslesen der Variierten Parameter
-                                myPara = PES1.EsGetParameter()
                                 CES1.List_Childs(i).Loc(j).Parameter = PES1.EsGetParameter()
-                                myPara = PES1.EsGetDN
                                 CES1.List_Childs(i).Loc(j).Loc_Dn = PES1.EsGetDN()
 
 
@@ -970,6 +968,7 @@ Partial Class Form1
 
 
                                 'Es fehlt noch: !!!
+                                ' - erst Memory pro location
                                 ' - Das NDSorting für den PES Memory
                                 ' - Prüfen ob PES in dieser Form richtig arbeitet
                             End If
