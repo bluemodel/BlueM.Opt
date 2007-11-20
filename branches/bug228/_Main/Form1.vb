@@ -1451,9 +1451,18 @@ Start_Evolutionsrunden:
 
             Dim xWert, yWert As Double
             Dim xAchse, yAchse As String
-            Dim solID As Integer
-            Dim Solution As Solution
+            Dim i, solID As Integer
+            Dim sol As Solution
             Dim isOK As Boolean
+            Dim ParamString As String                       'String für die Anzeige der OptParameter
+            Dim QWertString As String                       'String für die Anzeige der QWerte
+            Dim ConstrString As String                      'String für die Anzeige der Constraints
+
+            Const format As String = "G5"
+
+            ParamString = "OptParameter:"
+            QWertString = eol & eol & "QWerte:"
+            ConstrString = eol & eol & "Constraints:"
 
             'Punkt-Informationen bestimmen
             '-----------------------------
@@ -1466,30 +1475,89 @@ Start_Evolutionsrunden:
 
             solID = s.Labels(valueIndex)
 
-            'Parametersatz aus der DB übernehmen
-            '-----------------------------------
-            Solution = New Solution()
-            isOK = Sim1.OptResult.getSolution(Solution, xAchse, xWert, yAchse, yWert)
+            'Lösung holen
+            '------------
+            sol = New Solution()
+            isOK = Sim1.OptResult.getSolution(sol, solID)
 
             If (isOK) Then
 
                 Dim anzLösungen As Integer = Sim1.OptResult.selSolutions.Length
 
-                Solution.ID = anzLösungen + 1
+                sol.ID = anzLösungen + 1
 
                 'Lösung zu ausgewählten Lösungen hinzufügen
                 ReDim Preserve Sim1.OptResult.selSolutions(anzLösungen)
-                Sim1.OptResult.selSolutions(anzLösungen) = Solution
+                Sim1.OptResult.selSolutions(anzLösungen) = sol
 
                 'In Chart anzeigen
                 'BUG 228: ausgewählte Lösungen in 3D-Charts anzeigen!
                 Dim serie As Steema.TeeChart.Styles.Series
                 serie = Me.DForm.Diag.getSeriesPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
-                serie.Add(xWert, yWert, Solution.ID.ToString())
+                serie.Add(xWert, yWert, sol.ID.ToString())
                 serie.Marks.Visible = True
                 serie.Marks.Style = Steema.TeeChart.Styles.MarksStyles.Label
                 serie.Marks.Transparency = 50
                 serie.Marks.ArrowLength = 10
+
+                'OptParameter String
+                '-------------------
+                Select Case Me.Method
+
+                    Case METH_PES, METH_SENSIPLOT
+
+                        For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
+                            ParamString &= eol & "* " & Sim1.List_OptParameter(i).Bezeichnung & ": " & sol.OptPara(i).ToString(format)
+                        Next
+
+                        'BUG 228: OptParameterStrings für CES
+
+                        'Case METH_CES
+
+                        '    'String für die Anzeige der Pfade wird generiert
+                        '    ParamString = eol & "Pfad: "
+                        '    For i = 0 To Sim1.Akt.Measures.GetUpperBound(0)
+                        '        ParamString &= eol & "* " & Sim1.List_Locations(i).Name & ": " & sol.Akt(i).Measures(i)
+                        '    Next
+
+
+                        'Case METH_CES_PES
+
+                        '    'String für die Anzeige von Pfad/OptParameter wird generiert
+                        '    ParamString = eol & "Pfad: "
+                        '    For i = 0 To Sim1.Akt.Measures.GetUpperBound(0)
+                        '        ParamString &= eol & "* " & Sim1.List_Locations(i).Name & ": " & sol.Akt(i).Measures(i)
+                        '    Next
+                        '    ParamString &= eol & eol & "OptParameter: "
+                        '    For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
+                        '        With Sim1.List_OptParameter(i)
+                        '            ParamString &= eol & "* " & .Bezeichnung & ": " & sol.OptPara(i).ToString(format)
+                        '        End With
+                        '    Next
+
+                End Select
+
+                'QWerte String
+                '-------------
+                For i = 0 To Sim1.List_OptZiele.GetUpperBound(0)
+                    QWertString &= eol & "* " & Sim1.List_OptZiele(i).Bezeichnung & ": " & sol.QWerte(i).ToString(format)
+                Next
+
+                'Constraints String
+                '------------------
+                If (Sim1.List_Constraints.GetLength(0) > 0) Then
+                    For i = 0 To Sim1.List_Constraints.GetUpperBound(0)
+                        ConstrString &= eol & "* " & Sim1.List_Constraints(i).Bezeichnung & ": " & sol.Constraints(i).ToString(format)
+                    Next
+                Else
+                    ConstrString = ""
+                End If
+
+                'Annotation anzeigen
+                '-------------------
+                If (Me.DForm.Diag.anno1.Text.Length > 0) Then Me.DForm.Diag.anno1.Text &= eol & eol
+                Me.DForm.Diag.anno1.Text &= "Lösung " & sol.ID & ":" & eol & "---------" & eol & ParamString & QWertString & ConstrString
+                Me.DForm.Diag.anno1.Active = True
 
             End If
 
@@ -1501,9 +1569,14 @@ Start_Evolutionsrunden:
     '***************************
     Private Sub clearSelection(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_clearSelection.Click
 
+        'Serie löschen
         Dim serie As Steema.TeeChart.Styles.Series
         serie = Me.DForm.Diag.getSeriesPoint("ausgewählte Lösungen")
         serie.Dispose()
+        'Annotation löschen
+        Me.DForm.Diag.anno1.Text = ""
+        Me.DForm.Diag.anno1.Active = False
+        'Auswahl zurücksetzen
         ReDim Me.Sim1.OptResult.selSolutions(-1)
 
     End Sub
@@ -1514,19 +1587,10 @@ Start_Evolutionsrunden:
 
         Dim i As Integer
         Dim isOK As Boolean
-        Dim ParamString As String                       'String für die Anzeige der OptParameter
-        Dim QWertString As String                       'String für die Anzeige der QWerte
-        Dim ConstrString As String                      'String für die Anzeige der Constraints
-
-        Const format As String = "G5"
 
         Dim zre As Wave.Zeitreihe
         Dim SimSeries As New Collection                 'zu zeichnende Simulationsreihen
         Dim RefSeries As New Collection                 'zu zeichnende Referenzreihen
-
-        ParamString = "OptParameter:" & eol & "-------------"
-        QWertString = eol & eol & "QWerte:" & eol & "-------"
-        ConstrString = eol & eol & "Constraints:" & eol & "------------"
 
         'Wait cursor
         Cursor = Cursors.WaitCursor
@@ -1537,47 +1601,6 @@ Start_Evolutionsrunden:
         'Alle ausgewählten Lösungen durchlaufen
         '======================================
         For Each iSolution As Solution In Sim1.OptResult.selSolutions
-
-            'Unterscheidung für die Methoden
-            '-------------------------------
-            Select Case Me.Method
-
-                Case METH_PES, METH_SENSIPLOT
-
-                    'String für die Anzeige der OptParameter wird generiert
-                    ParamString &= eol & "Lösung " & iSolution.ID.ToString() & ":"
-                    For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
-                        With Sim1.List_OptParameter(i)
-                            ParamString &= eol & "* " & .Bezeichnung & ": " & iSolution.OptPara(i).ToString(format)
-                        End With
-                    Next
-
-                    'BUG 228: showWave für CES
-
-                    'Case METH_CES
-
-                    '    'String für die Anzeige der Pfade wird generiert
-                    '    ParamString = eol & "Pfad: "
-                    '    For i = 0 To Sim1.Akt.Measures.GetUpperBound(0)
-                    '        ParamString &= eol & "* " & Sim1.List_Locations(i).Name & ": " & iSolution.Akt(i).Measures(i)
-                    '    Next
-
-
-                    'Case METH_CES_PES
-
-                    '    'String für die Anzeige von Pfad/OptParameter wird generiert
-                    '    ParamString = eol & "Pfad: "
-                    '    For i = 0 To Sim1.Akt.Measures.GetUpperBound(0)
-                    '        ParamString &= eol & "* " & Sim1.List_Locations(i).Name & ": " & iSolution.Akt(i).Measures(i)
-                    '    Next
-                    '    ParamString &= eol & eol & "OptParameter: "
-                    '    For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
-                    '        With Sim1.List_OptParameter(i)
-                    '            ParamString &= eol & "* " & .Bezeichnung & ": " & iSolution.OptPara(i).ToString(format)
-                    '        End With
-                    '    Next
-
-            End Select
 
             'Simulation ausführen
             'xxxxxxxxxxxxxxxxxxxx
@@ -1596,18 +1619,11 @@ Start_Evolutionsrunden:
             'Zu zeichnenden Simulationsreihen zurücksetzen
             SimSeries.Clear()
 
-            'QWerte berechnen, in String speichern und zugehörige Reihen anzeigen
-            '--------------------------------------------------------------------
-            QWertString &= eol & "Lösung " & iSolution.ID.ToString() & ":"
-
             'zu zeichnenden Reihen aus Liste der OptZiele raussuchen
+            '-------------------------------------------------------
             For i = 0 To Sim1.List_OptZiele.GetUpperBound(0)
 
                 With Sim1.List_OptZiele(i)
-
-                    'Qualitätswert berechnen und an String anhängen
-                    .QWertTmp = Sim1.QWert(Sim1.List_OptZiele(i))
-                    QWertString &= eol & "* " & .Bezeichnung & ": " & .QWertTmp.ToString(format)
 
                     'ggf. Referenzreihe in Wave laden
                     If (.ZielTyp = "Reihe" Or .ZielTyp = "IHA") Then
@@ -1632,28 +1648,14 @@ Start_Evolutionsrunden:
                 End With
             Next
 
-            'Constraints berechnen und in String speichern
-            '---------------------------------------------
-            If (Sim1.List_Constraints.GetLength(0) > 0) Then
-                ConstrString &= eol & "Lösung " & iSolution.ID.ToString() & ":"
-                For i = 0 To Sim1.List_Constraints.GetUpperBound(0)
-                    With Sim1.List_Constraints(i)
-                        .ConstTmp = Sim1.Constraint(Sim1.List_Constraints(i))
-                        ConstrString &= eol & "* " & .Bezeichnung & ": " & .ConstTmp.ToString(format)
-                    End With
-                Next
-            Else
-                ConstrString = ""
-            End If
-
         Next iSolution
 
         'Annotation anzeigen
         '-------------------
         Dim anno1 As New Steema.TeeChart.Tools.Annotation(Wave1.TChart1.Chart)
+        anno1.Text = Me.DForm.Diag.anno1.Text
         anno1.Shape.Font.Name = "Courier New"
         anno1.Position = Steema.TeeChart.Tools.AnnotationPositions.RightBottom
-        anno1.Text = ParamString & QWertString & ConstrString
 
         'Wave anzeigen
         '-------------
@@ -1664,34 +1666,18 @@ Start_Evolutionsrunden:
 
     End Sub
 
-
     'Scatterplot-Matrix anzeigen
     '****************************
     Private Sub showScatterplot(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Scatterplot.Click
 
-        'BUG 228:showScatterplot
+        Cursor = Cursors.WaitCursor
 
-    End Sub
+        'Scatterplot
+        '-----------
+        Dim scatterplot1 As New Scatterplot(Sim1.OptResult)
+        Call scatterplot1.Show()
 
-#End Region 'Diagrammfunktionen
-
-    'Ermittelt die beim Start die Anzahl der Physikalischen Prozessoren
-    '******************************************************************
-    Public Sub Anzahl_Prozessoren(ByRef PhysCPU As Integer, ByRef LogCPU As Integer)
-        Dim mc As ManagementClass = New ManagementClass("Win32_Processor")
-        Dim moc As ManagementObjectCollection = mc.GetInstances()
-        Dim SocketDesignation As String = String.Empty
-        Dim PhysCPUarray As ArrayList = New ArrayList
-
-        Dim mo As ManagementObject
-        For Each mo In moc
-            LogCPU += 1
-            SocketDesignation = mo.Properties("SocketDesignation").Value.ToString()
-            If Not PhysCPUarray.Contains(SocketDesignation) Then
-                PhysCPUarray.Add(SocketDesignation)
-            End If
-        Next
-        PhysCPU = PhysCPUarray.Count
+        Cursor = Cursors.Default
 
     End Sub
 
@@ -1711,8 +1697,8 @@ Start_Evolutionsrunden:
 
             sourceFile = Me.OpenFileDialog_MDB.FileName
 
-            'Abfrageform
-            Dim Form2 As New ScatterplotAbfrage
+            'Abfragedialog
+            Dim Form2 As New MDBImportDialog()
             For Each OptZiel As Sim.Struct_OptZiel In Sim1.List_OptZiele
                 Form2.ListBox_OptZieleX.Items.Add(OptZiel.Bezeichnung)
                 Form2.ListBox_OptZieleY.Items.Add(OptZiel.Bezeichnung)
@@ -1722,87 +1708,77 @@ Start_Evolutionsrunden:
 
             If (diagresult = Windows.Forms.DialogResult.OK) Then
 
-                'Auswahl zurücksetzen
-                Call Me.clearSelection(sender, e)
+                'Cursor Wait
+                Cursor = Cursors.WaitCursor
 
                 'Daten einlesen
-                Cursor = Cursors.WaitCursor
+                '==============
                 Call Sim1.OptResult.db_load(sourceFile, Form2.CheckBox_onlySekPop.Checked)
-                Cursor = Cursors.Default
 
-                If (Form2.CheckBox_Hauptdiagramm.Checked) Then
-                    'Hauptdiagramm
-                    '=============
-                    Dim OptZielIndexX, OptZielIndexY, OptZielIndexZ As Integer
-                    OptZielIndexX = Form2.ListBox_OptZieleX.SelectedIndex
-                    OptZielIndexY = Form2.ListBox_OptZieleY.SelectedIndex
-                    OptZielIndexZ = Form2.ListBox_OptZieleZ.SelectedIndex
+                'Hauptdiagramm
+                '=============
+                Dim OptZielIndexX, OptZielIndexY, OptZielIndexZ As Integer
+                OptZielIndexX = Form2.ListBox_OptZieleX.SelectedIndex
+                OptZielIndexY = Form2.ListBox_OptZieleY.SelectedIndex
+                OptZielIndexZ = Form2.ListBox_OptZieleZ.SelectedIndex
 
-                    'Achsen
-                    '------
-                    Dim Achsen As New Collection
-                    Dim tmpAchse As EVO.Diagramm.Achse
-                    tmpAchse.Auto = True
-                    'X-Achse
-                    tmpAchse.Name = Form2.ListBox_OptZieleX.SelectedItem
+                'Achsen
+                '------
+                Dim Achsen As New Collection
+                Dim tmpAchse As EVO.Diagramm.Achse
+                tmpAchse.Auto = True
+                'X-Achse
+                tmpAchse.Name = Form2.ListBox_OptZieleX.SelectedItem
+                Achsen.Add(tmpAchse)
+                'Y-Achse
+                tmpAchse.Name = Form2.ListBox_OptZieleY.SelectedItem
+                Achsen.Add(tmpAchse)
+                If (Not OptZielIndexZ = -1) Then
+                    'Z-Achse
+                    tmpAchse.Name = Form2.ListBox_OptZieleZ.SelectedItem
                     Achsen.Add(tmpAchse)
-                    'Y-Achse
-                    tmpAchse.Name = Form2.ListBox_OptZieleY.SelectedItem
-                    Achsen.Add(tmpAchse)
-                    If (Not OptZielIndexZ = -1) Then
-                        'Z-Achse
-                        tmpAchse.Name = Form2.ListBox_OptZieleZ.SelectedItem
-                        Achsen.Add(tmpAchse)
-                    End If
+                End If
 
-                    'Diagramm initialisieren
-                    '-----------------------
-                    Me.DForm.Diag.Clear()
-                    Me.DForm.Diag.DiagInitialise(Path.GetFileName(sourceFile), Achsen)
+                'Diagramm initialisieren
+                '-----------------------
+                Me.DForm.Diag.Clear()
+                Me.DForm.Diag.DiagInitialise(Path.GetFileName(sourceFile), Achsen)
 
-                    'Punkte eintragen
-                    '----------------
-                    Dim serie As Steema.TeeChart.Styles.Series
-                    Dim serie3D As Steema.TeeChart.Styles.Points3D
+                'Punkte eintragen
+                '----------------
+                Dim serie As Steema.TeeChart.Styles.Series
+                Dim serie3D As Steema.TeeChart.Styles.Points3D
 
-                    For i = 0 To Sim1.OptResult.Solutions.GetUpperBound(0)
-                        With Sim1.OptResult.Solutions(i)
-                            If (OptZielIndexZ = -1) Then
-                                '2D
-                                '--
-                                'Constraintverletzung prüfen
-                                If (.isValid) Then
-                                    serie = Me.DForm.Diag.getSeriesPoint("Population", "Orange")
-                                Else
-                                    serie = Me.DForm.Diag.getSeriesPoint("Population (ungültig)", "Gray")
-                                End If
-                                'Zeichnen
-                                serie.Add(.QWerte(OptZielIndexX), .QWerte(OptZielIndexY))
+                For i = 0 To Sim1.OptResult.Solutions.GetUpperBound(0)
+                    With Sim1.OptResult.Solutions(i)
+                        If (OptZielIndexZ = -1) Then
+                            '2D
+                            '--
+                            'Constraintverletzung prüfen
+                            If (.isValid) Then
+                                serie = Me.DForm.Diag.getSeriesPoint("Population", "Orange")
                             Else
-                                '3D
-                                '--
-                                'Constraintverletzung prüfen
-                                If (.isValid) Then
-                                    serie3D = Me.DForm.Diag.getSeries3DPoint("Population", "Orange")
-                                Else
-                                    serie3D = Me.DForm.Diag.getSeries3DPoint("Population (ungültig)", "Gray")
-                                End If
-                                'Zeichnen
-                                serie3D.Add(.QWerte(OptZielIndexX), .QWerte(OptZielIndexY), .QWerte(OptZielIndexZ))
+                                serie = Me.DForm.Diag.getSeriesPoint("Population (ungültig)", "Gray")
                             End If
-                        End With
-                    Next
+                            'Zeichnen
+                            serie.Add(.QWerte(OptZielIndexX), .QWerte(OptZielIndexY), .ID)
+                        Else
+                            '3D
+                            '--
+                            'Constraintverletzung prüfen
+                            If (.isValid) Then
+                                serie3D = Me.DForm.Diag.getSeries3DPoint("Population", "Orange")
+                            Else
+                                serie3D = Me.DForm.Diag.getSeries3DPoint("Population (ungültig)", "Gray")
+                            End If
+                            'Zeichnen
+                            serie3D.Add(.QWerte(OptZielIndexX), .QWerte(OptZielIndexY), .QWerte(OptZielIndexZ), .ID)
+                        End If
+                    End With
+                Next
 
-                End If
-
-                If (Form2.CheckBox_Scatterplot.Checked) Then
-                    'Scatterplot
-                    '-----------
-                    Cursor = Cursors.WaitCursor
-                    Dim scatterplot1 As New Scatterplot(Sim1.OptResult)
-                    Call scatterplot1.Show()
-                    Cursor = Cursors.Default
-                End If
+                'Cursor Default
+                Cursor = Cursors.Default
 
             End If
 
@@ -1810,8 +1786,29 @@ Start_Evolutionsrunden:
 
     End Sub
 
+#End Region 'Diagrammfunktionen
 
 #End Region 'UI
+
+    'Ermittelt beim Start die Anzahl der Physikalischen Prozessoren
+    '**************************************************************
+    Public Sub Anzahl_Prozessoren(ByRef PhysCPU As Integer, ByRef LogCPU As Integer)
+        Dim mc As ManagementClass = New ManagementClass("Win32_Processor")
+        Dim moc As ManagementObjectCollection = mc.GetInstances()
+        Dim SocketDesignation As String = String.Empty
+        Dim PhysCPUarray As ArrayList = New ArrayList
+
+        Dim mo As ManagementObject
+        For Each mo In moc
+            LogCPU += 1
+            SocketDesignation = mo.Properties("SocketDesignation").Value.ToString()
+            If Not PhysCPUarray.Contains(SocketDesignation) Then
+                PhysCPUarray.Add(SocketDesignation)
+            End If
+        Next
+        PhysCPU = PhysCPUarray.Count
+
+    End Sub
 
 #End Region 'Methoden
 

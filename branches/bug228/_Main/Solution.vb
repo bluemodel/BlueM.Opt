@@ -14,4 +14,19 @@ Public Class Solution
         End Get
     End Property
 
+    'Eine Lösung kopieren
+    '********************
+    Public Function copy() As Solution
+
+        Dim sol As New Solution
+
+        sol.ID = Me.ID
+        sol.QWerte = Me.QWerte
+        sol.OptPara = Me.OptPara
+        sol.Constraints = Me.Constraints
+
+        Return sol
+
+    End Function
+
 End Class

@@ -33,7 +33,6 @@ Public Class OptResult
 
     'Array von Lösungen
     Public Solutions() As Solution
-    Public anzSolutions As Integer
 
     Public selSolutions() As Solution                  'ausgewählte Lösungen
 
@@ -53,7 +52,7 @@ Public Class OptResult
         Me.List_Constraints = Sim1.List_Constraints
         Me.List_Locations = Sim1.List_Locations
 
-        Me.anzSolutions = 0
+        ReDim Me.Solutions(-1)
         ReDim Me.selSolutions(-1)
 
         'DB initialiseren
@@ -95,8 +94,8 @@ Public Class OptResult
             sol.Constraints(i) = Me.List_Constraints(i).ConstTmp
         Next
 
-        ReDim Preserve Me.Solutions(Me.anzSolutions)
-        Me.Solutions(Me.anzSolutions) = sol
+        ReDim Preserve Me.Solutions(Me.Solutions.GetUpperBound(0) + 1)
+        Me.Solutions(Me.Solutions.GetUpperBound(0)) = sol
 
         'In DB speichern
         Call Me.db_insert(sol)
@@ -105,10 +104,18 @@ Public Class OptResult
 
     'Eine Lösung identifizieren
     '**************************
-    Public Function getSolution(ByRef Solution As Solution, ByVal xAchse As String, ByVal xWert As Double, ByVal yAchse As String, ByVal yWert As Double) As Boolean
+    Public Function getSolution(ByRef sol As Solution, ByVal ID As Integer) As Boolean
 
         Dim isOK As Boolean
-        isOK = Me.db_getPara(Solution, xAchse, xWert, yAchse, yWert)
+
+        For Each tmpsol As Solution In Me.Solutions
+            If (tmpsol.ID = ID) Then
+                sol = tmpsol.copy()
+                isOK = True
+            End If
+        Next
+
+        'isOK = Me.db_getPara(Solution, xAchse, xWert, yAchse, yWert)
         Return isOK
 
     End Function
@@ -287,7 +294,7 @@ Public Class OptResult
 
     'Eine Lösung in die ErgebnisDB schreiben
     '***************************************
-    Private Function db_insert(sol As Solution) As Boolean
+    Private Function db_insert(ByVal sol As Solution) As Boolean
 
         Call db_connect()
 
