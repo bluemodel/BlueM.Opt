@@ -1101,14 +1101,7 @@ Public MustInherit Class Sim
 
         'Kopieren der Listen aus den Sicherungen
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        ReDim List_ModellParameter(List_ModellParameter_Save.GetUpperBound(0))
-        For i = 0 To List_ModellParameter_Save.GetUpperBound(0)
-            copy_Struct_ModellParemeter(List_ModellParameter_Save(i), List_ModellParameter(i))
-        Next
-        ReDim List_OptParameter(List_OptParameter_Save.GetUpperBound(0))
-        For i = 0 To List_OptParameter_Save.GetUpperBound(0)
-            copy_Struct_OptParameter(List_OptParameter_Save(i), List_OptParameter(i))
-        Next
+        Call Reset_OptPara_and_ModPara()
 
         'Reduzierung der ModParameter
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -1169,6 +1162,24 @@ Public MustInherit Class Sim
         End If
 
     End Function
+
+    'Setzt die Listen nach der Evaluierung wieder zurück auf alles was in den Eingabedateien steht
+    '*********************************************************************************************
+    Public Sub Reset_OptPara_and_ModPara()
+        Dim i As Integer
+
+        'Kopieren der Listen aus den Sicherungen
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        ReDim List_ModellParameter(List_ModellParameter_Save.GetUpperBound(0))
+        For i = 0 To List_ModellParameter_Save.GetUpperBound(0)
+            copy_Struct_ModellParemeter(List_ModellParameter_Save(i), List_ModellParameter(i))
+        Next
+        ReDim List_OptParameter(List_OptParameter_Save.GetUpperBound(0))
+        For i = 0 To List_OptParameter_Save.GetUpperBound(0)
+            copy_Struct_OptParameter(List_OptParameter_Save(i), List_OptParameter(i))
+        Next
+
+    End Sub
 
     'Schreibt die passenden OptParameter für jede Location ins Child
     'ToDo alles ist da!
