@@ -49,13 +49,13 @@ Public MustInherit Class Sim
     'Optimierungsparameter
     '---------------------
     Public Structure Struct_OptParameter
-        '*| Bezeichnung | Einh. | Anfangsw. | Min | Max |
-        Public Bezeichnung As String                'Bezeichnung
-        Public Einheit As String                    'Einheit
-        Public Wert As Double                       'Parameterwert
-        Public Min As Double                        'Minimum
-        Public Max As Double                        'Maximum
-        Public Property SKWert() As Double          'skalierter Wert (0 bis 1)
+        Public Bezeichnung As String                        'Bezeichnung
+        Public Einheit As String                            'Einheit
+        Public Wert As Double                               'Parameterwert
+        Public Min As Double                                'Minimum
+        Public Max As Double                                'Maximum
+        Public Beziehung As EVO.Kern.PES.Beziehung          'Beziehung zum vorherigen OptParameter
+        Public Property SKWert() As Double                  'skalierter Wert (0 bis 1)
             Get
                 SKWert = (Wert - Min) / (Max - Min)
                 Exit Property
@@ -75,7 +75,6 @@ Public MustInherit Class Sim
     'ModellParameter
     '---------------
     Public Structure Struct_ModellParameter
-        '*| OptParameter | Bezeichnung  | Einh. | Datei | Zeile | von | bis | Faktor |
         Public OptParameter As String               'Optimierungsparameter, aus dem dieser Modellparameter errechnet wird
         Public Bezeichnung As String                'Bezeichnung
         Public Einheit As String                    'Einheit
@@ -345,6 +344,11 @@ Public MustInherit Class Sim
     '******************************
     Private Sub Read_OptParameter()
 
+        'Format:
+        '*|--------------|-------|-----------|--------|--------|-----------|
+        '*| Bezeichnung  | Einh. | Anfangsw. |  Min   |  Max   | Beziehung |
+        '*|-<---------->-|-<--->-|-<------->-|-<---->-|-<---->-|-<------->-|
+
         Dim Datei As String = WorkDir & Datensatz & "." & OptParameter_Ext
 
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
@@ -368,6 +372,7 @@ Public MustInherit Class Sim
         FiStr.Seek(0, SeekOrigin.Begin)
 
         Dim array() As String
+        Dim Bez_str As String = ""
         Dim i As Integer = 0
         Do
             Zeile = StrRead.ReadLine.ToString()
@@ -379,6 +384,12 @@ Public MustInherit Class Sim
                 List_OptParameter(i).Wert = Convert.ToDouble(array(3).Trim())
                 List_OptParameter(i).Min = Convert.ToDouble(array(4).Trim())
                 List_OptParameter(i).Max = Convert.ToDouble(array(5).Trim())
+                'liegt eine Beziehung vor?
+                If (i > 0 And Not array(6).Trim() = "") Then
+                    Me.List_OptParameter(i).Beziehung = getBeziehung(array(6).Trim())
+                Else
+                    Me.List_OptParameter(i).Beziehung = EVO.Kern.PES.Beziehung.keine
+                End If
                 i += 1
             End If
         Loop Until StrRead.Peek() = -1
@@ -393,9 +404,31 @@ Public MustInherit Class Sim
 
     End Sub
 
+    'String in der Form < >, <=, >= in Beziehung umwandeln
+    '*****************************************************
+    Private Shared Function getBeziehung(ByVal bez_str As String) As EVO.Kern.PES.Beziehung
+        Select Case bez_str
+            Case "<"
+                Return EVO.Kern.PES.Beziehung.kleiner
+            Case "<="
+                Return EVO.Kern.PES.Beziehung.kleinergleich
+            Case ">"
+                Return EVO.Kern.PES.Beziehung.groesser
+            Case ">="
+                Return EVO.Kern.PES.Beziehung.groessergleich
+            Case Else
+                Throw New Exception("Beziehung '" & bez_str & "' nicht erkannt!")
+        End Select
+    End Function
+
     'Modellparameter einlesen
     '************************
     Private Sub Read_ModellParameter()
+
+        'Format:
+        '*|--------------|--------------|-------|-------|-------|-------|-----|-----|--------|
+        '*| OptParameter | Bezeichnung  | Einh. | Datei | Elem  | Zeile | von | bis | Faktor |
+        '*|-<---------->-|-<---------->-|-<--->-|-<--->-|-<--->-|-<--->-|-<->-|-<->-|-<---->-|
 
         Dim Datei As String = WorkDir & Datensatz & "." & ModParameter_Ext
 
@@ -1198,22 +1231,25 @@ Public MustInherit Class Sim
         Destination.Min = Source.Min
         Destination.Max = Source.Max
         Destination.SKWert = Source.SKWert
+        Destination.Beziehung = Source.Beziehung
 
     End Sub
 
     'EVO-Parameterübergabe die Standard Parameter werden aus den Listen der OptPara und OptZiele ermittelt
     '*****************************************************************************************************
-    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara() As Double)
+    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara() As Double, ByRef beziehungen() As EVO.Kern.PES.Beziehung)
 
         Dim i As Integer
 
         'Anzahl Optimierungsparameter übergeben
         globalAnzPar = Me.List_OptParameter.GetLength(0)
 
-        'Parameterwerte übergeben
+        'Parameterwerte und Beziehungen übergeben
         ReDim mypara(globalAnzPar - 1)
+        ReDim beziehungen(globalAnzPar - 1)
         For i = 0 To globalAnzPar  - 1
             mypara(i) = Me.List_OptParameter(i).SKWert
+            beziehungen(i) = Me.List_OptParameter(i).Beziehung
         Next
 
         'Anzahl Optimierungsziele übergeben

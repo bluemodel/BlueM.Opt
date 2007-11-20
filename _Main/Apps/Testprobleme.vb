@@ -20,6 +20,7 @@ Public Class Testprobleme
         Combo_Testproblem.Items.Add("Zitzler/Deb T4")
         Combo_Testproblem.Items.Add("CONSTR")
         Combo_Testproblem.Items.Add("Box")
+        Combo_Testproblem.Items.Add("Abhängige Parameter")
 
         Combo_Testproblem.SelectedIndex = 0
 
@@ -64,6 +65,10 @@ Public Class Testprobleme
                 Case "Box"
                     Problem_TKNFunktion.BringToFront()
                     OptModus = EVO_MODUS.Multi_Objective
+                Case "Abhängige Parameter"
+                    Problem_AbhParameter.BringToFront()
+                    OptModus = EVO_MODUS.Single_Objective
+
             End Select
 
             RaiseEvent Testproblem_Changed(sender, e) 'wird in Form1 von IniApp() verarbeitet
@@ -76,7 +81,7 @@ Public Class Testprobleme
     '************************************************************************************
 
     'Startparameter werden festgesetzt
-    Public Sub Parameter_Uebergabe(ByVal Testproblem As String, ByVal globAnzPar_Sin As String, ByVal globAnzPar_Schw As String, ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara() As Double)
+    Public Sub Parameter_Uebergabe(ByVal Testproblem As String, ByVal globAnzPar_Sin As String, ByVal globAnzPar_Schw As String, ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara() As Double, ByRef beziehungen() As EVO.Kern.PES.Beziehung)
 
         Dim i As Integer
 
@@ -176,6 +181,18 @@ Public Class Testprobleme
                 mypara(1) = Rnd()
                 mypara(2) = Rnd()
 
+            Case "Abhängige Parameter"
+                globalAnzPar = 2
+                globalAnzZiel = 1
+                globalAnzRand = 0
+                ReDim mypara(globalAnzPar - 1)
+                mypara(0) = 1
+                mypara(1) = 1
+                'Beziehungen
+                ReDim beziehungen(globalAnzPar - 1)
+                beziehungen(0) = EVO.Kern.PES.Beziehung.keine
+                beziehungen(1) = EVO.Kern.PES.Beziehung.groesser
+
         End Select
 
     End Sub
@@ -197,6 +214,9 @@ Public Class Testprobleme
 
             Case "Box"
                 Call Me.DiagInitialise_3D_Box(PES_Settings, globalAnzPar, Diag)
+
+            Case "Abhängige Parameter"
+                Call Me.DiagInitialise_AbhParameter(PES_Settings, globalAnzPar, Diag)
 
             Case Else
                 Call Me.DiagInitialise_MultiTestProb(PES_Settings, Diag)
@@ -668,6 +688,92 @@ Public Class Testprobleme
 
     End Sub
 
+    
+    'Diagramm für Abhängige Parameter initialisieren
+    '***********************************************
+    Private Sub DiagInitialise_AbhParameter(ByVal PES_Settings As EVO.Kern.PES.Struct_Settings, ByVal AnzPar As Integer, ByRef Diag As EVO.Diagramm)
+
+        With Diag
+            .Clear()
+            .Header.Text = "Abhängige Parameter"
+            .Legend.Visible = False
+            .Aspect.View3D = True
+            .Aspect.Chart3DPercent = 90
+            .Aspect.Elevation = 348
+            .Aspect.Orthogonal = False
+            .Aspect.Perspective = 62
+            .Aspect.Rotation = 329
+            .Aspect.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality
+            .Aspect.VertOffset = -20
+            .Aspect.Zoom = 66
+            .Tools.Add(New Steema.TeeChart.Tools.Rotate())
+
+            'Achsen:
+            .Chart.Axes.Bottom.Automatic = False
+            .Chart.Axes.Bottom.Visible = True
+            .Chart.Axes.Bottom.Title.Caption = "X"
+            .Chart.Axes.Bottom.Maximum = 1
+            .Chart.Axes.Bottom.Minimum = 0
+            .Chart.Axes.Bottom.Increment = 0.2
+
+            .Chart.Axes.Left.Automatic = False
+            .Chart.Axes.Left.Visible = True
+            .Chart.Axes.Left.Title.Caption = "Y"
+            .Chart.Axes.Left.Maximum = 1
+            .Chart.Axes.Left.Minimum = 0
+            .Chart.Axes.Left.Increment = 0.2
+
+            .Chart.Axes.Depth.Automatic = False
+            .Chart.Axes.Depth.Visible = True
+            .Chart.Axes.Depth.Title.Caption = "Zielfunktion"
+            .Chart.Axes.Depth.Maximum = 2
+            .Chart.Axes.Depth.Minimum = 0
+            .Chart.Axes.Depth.Increment = 0.5
+
+            'Serien
+            '-----------
+            Dim surface As Steema.TeeChart.Styles.Surface
+
+            'x = y
+            Dim i, j, n As Integer
+            Dim ArrayX() As Double
+            Dim ArrayY() As Double
+            Dim ArrayZ() As Double
+            Dim surfaceRes As Integer = 11
+            ReDim ArrayX(surfaceRes ^ 2 - 1)
+            ReDim ArrayY(surfaceRes ^ 2 - 1)
+            ReDim ArrayZ(surfaceRes ^ 2 - 1)
+
+            n = 0
+            For i = 0 To surfaceRes - 1
+                For j = 0 To (surfaceRes - 1)
+                    ArrayX(n) = i * (1.1 / surfaceRes)
+                    ArrayZ(n) = j * (2.1 / surfaceRes)
+                    ArrayY(n) = ArrayX(n)
+                    n += 1
+                Next
+            Next
+
+            surface = New Steema.TeeChart.Styles.Surface(Diag.Chart)
+            surface.Title = "X = Y"
+            surface.IrregularGrid = True
+            surface.NumXValues = surfaceRes
+            surface.NumZValues = surfaceRes
+            surface.Add(ArrayX, ArrayY, ArrayZ)
+            surface.UseColorRange = False
+            surface.UsePalette = False
+            surface.Brush.Solid = True
+            surface.Brush.Color = Color.Green
+            surface.Brush.Transparency = 70
+            surface.Pen.Color = Color.Green
+            surface.SideBrush.Visible = True
+            surface.SideBrush.Color = Color.Red
+            surface.SideBrush.Transparency = 70
+
+        End With
+
+    End Sub
+
 #End Region 'Diagrammfunktionen
 
 #Region "Evaluierung"
@@ -915,6 +1021,19 @@ Public Class Testprobleme
                     serie3D = Diag.getSeries3DPoint("Population", "Orange")
                 End If
                 serie3D.Add(f1, f2, f3)
+
+            Case "Abhängige Parameter"
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+                'Qualitätswerte berechnen
+                '------------------------
+                QN(0) = mypara(0)^2 + mypara(1)^2
+
+                'Zeichnen
+                '--------
+                Dim serie3D As Steema.TeeChart.Styles.Points3D
+                serie3D = Diag.getSeries3DPoint("Population", "Orange")
+                serie3D.Add(mypara(0), mypara(1), QN(0))
 
         End Select
 
