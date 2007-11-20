@@ -451,8 +451,8 @@ Public Class PES
 
     End Sub
 
-    'Überladen: Falls Startwerte aus CES kommen
-    Public Sub EsStartvalues(ByVal AktDn() As Object, ByVal AktXn() As Double, ByVal IndexElter As Integer)
+    'Überladen: Falls Startwerte aus CES kommen!
+    Public Sub EsStartvalues(ByVal AktDn() As Double, ByVal AktXn() As Double, ByVal IndexElter As Integer)
 
         Dim v As Short
 
@@ -473,6 +473,14 @@ Public Class PES
     Public Function EsGetParameter() As Double()
 
         Return AktPara.Xn
+
+    End Function
+
+    'ES_GET_DN - dient zur Rückgabe der Schrittweite
+    '*************************************************************
+    Public Function EsGetDN() As Double()
+
+        Return AktPara.Dn
 
     End Function
 
