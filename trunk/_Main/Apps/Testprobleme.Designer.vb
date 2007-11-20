@@ -45,6 +45,8 @@ Partial Class Testprobleme
         Me.Text_CONSTRFunktion = New System.Windows.Forms.TextBox
         Me.Problem_TKNFunktion = New System.Windows.Forms.GroupBox
         Me.Text_TKNFunktion = New System.Windows.Forms.TextBox
+        Me.Problem_AbhParameter = New System.Windows.Forms.GroupBox
+        Me.TextBox_AbhParameter = New System.Windows.Forms.TextBox
         Me.GroupBox_Testproblem.SuspendLayout()
         Me.Problem_SinusFunktion.SuspendLayout()
         Me.Problem_BealeProblem.SuspendLayout()
@@ -56,6 +58,7 @@ Partial Class Testprobleme
         Me.Problem_T4Funktion.SuspendLayout()
         Me.Problem_CONSTRFunktion.SuspendLayout()
         Me.Problem_TKNFunktion.SuspendLayout()
+        Me.Problem_AbhParameter.SuspendLayout()
         Me.SuspendLayout()
         '
         'GroupBox_Testproblem
@@ -72,6 +75,7 @@ Partial Class Testprobleme
         Me.GroupBox_Testproblem.Controls.Add(Me.Problem_T4Funktion)
         Me.GroupBox_Testproblem.Controls.Add(Me.Problem_CONSTRFunktion)
         Me.GroupBox_Testproblem.Controls.Add(Me.Problem_TKNFunktion)
+        Me.GroupBox_Testproblem.Controls.Add(Me.Problem_AbhParameter)
         Me.GroupBox_Testproblem.ForeColor = System.Drawing.SystemColors.ControlText
         Me.GroupBox_Testproblem.Location = New System.Drawing.Point(3, 3)
         Me.GroupBox_Testproblem.Name = "GroupBox_Testproblem"
@@ -444,6 +448,36 @@ Partial Class Testprobleme
         Me.Text_TKNFunktion.TabIndex = 26
         Me.Text_TKNFunktion.Text = "Multikriterielles Testproblem (Kreis)" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "mit zwei Randbedingungen" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10)
         '
+        'Problem_AbhParameter
+        '
+        Me.Problem_AbhParameter.BackColor = System.Drawing.SystemColors.Control
+        Me.Problem_AbhParameter.Controls.Add(Me.TextBox_AbhParameter)
+        Me.Problem_AbhParameter.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.Problem_AbhParameter.Location = New System.Drawing.Point(0, 43)
+        Me.Problem_AbhParameter.Name = "Problem_AbhParameter"
+        Me.Problem_AbhParameter.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.Problem_AbhParameter.Size = New System.Drawing.Size(217, 70)
+        Me.Problem_AbhParameter.TabIndex = 27
+        Me.Problem_AbhParameter.TabStop = False
+        Me.Problem_AbhParameter.Text = "Abhängige Parameter"
+        '
+        'TextBox_AbhParameter
+        '
+        Me.TextBox_AbhParameter.AcceptsReturn = True
+        Me.TextBox_AbhParameter.BackColor = System.Drawing.SystemColors.Control
+        Me.TextBox_AbhParameter.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.TextBox_AbhParameter.Cursor = System.Windows.Forms.Cursors.IBeam
+        Me.TextBox_AbhParameter.ForeColor = System.Drawing.Color.Red
+        Me.TextBox_AbhParameter.Location = New System.Drawing.Point(8, 32)
+        Me.TextBox_AbhParameter.MaxLength = 0
+        Me.TextBox_AbhParameter.Multiline = True
+        Me.TextBox_AbhParameter.Name = "TextBox_AbhParameter"
+        Me.TextBox_AbhParameter.ReadOnly = True
+        Me.TextBox_AbhParameter.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.TextBox_AbhParameter.Size = New System.Drawing.Size(177, 23)
+        Me.TextBox_AbhParameter.TabIndex = 26
+        Me.TextBox_AbhParameter.Text = "Bedingung: Y > X"
+        '
         'Testprobleme
         '
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit
@@ -471,6 +505,8 @@ Partial Class Testprobleme
         Me.Problem_CONSTRFunktion.PerformLayout()
         Me.Problem_TKNFunktion.ResumeLayout(False)
         Me.Problem_TKNFunktion.PerformLayout()
+        Me.Problem_AbhParameter.ResumeLayout(False)
+        Me.Problem_AbhParameter.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -508,4 +544,6 @@ Partial Class Testprobleme
         ' Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         System.Windows.Forms.Application.EnableVisualStyles()
     End Sub
+    Friend WithEvents Problem_AbhParameter As System.Windows.Forms.GroupBox
+    Public WithEvents TextBox_AbhParameter As System.Windows.Forms.TextBox
 End Class
