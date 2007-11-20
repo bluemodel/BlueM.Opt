@@ -472,16 +472,7 @@ Public Class PES
     '*************************************************************
     Public Function EsGetParameter() As Double()
 
-        Dim i As Short
-        Dim mypara() As Double
-
-        ReDim mypara(NPara - 1)
-
-        For i = 0 To NPara - 1
-            mypara(i) = AktPara.Xn(i)
-        Next i
-
-        Return mypara
+        Return AktPara.Xn
 
     End Function
 

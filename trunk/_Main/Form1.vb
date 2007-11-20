@@ -840,6 +840,9 @@ Partial Class Form1
                 System.Windows.Forms.Application.DoEvents()
             Next
 
+            'Die Listen müssen nach der letzten Evaluierung wieder zurückgesetzt werden
+            Call Sim1.Reset_OptPara_and_ModPara()
+
             'MO oder SO SELEKTIONSPROZESS oder NDSorting SELEKTION
             '-----------------------------------------------------
             If CES1.n_Penalty = 1 Then
