@@ -988,12 +988,6 @@ Public MustInherit Class Sim
             End If
         Next
 
-        'Kopiert die aktuelle ElementeListe in dieses Aktuell_Element Array
-        'ToDo: sollte an eine bessere stelle!
-        If No_Loc = 0 Then ReDim SKos1.Aktuell_Elemente(-1)
-        ReDim Preserve SKos1.Aktuell_Elemente(SKos1.Aktuell_Elemente.GetUpperBound(0) + Elements.GetLength(0))
-        Array.Copy(Elements, 0, SKos1.Aktuell_Elemente, SKos1.Aktuell_Elemente.GetUpperBound(0) - Elements.GetUpperBound(0), Elements.GetLength(0))
-
         '3. Die Parameter werden Ermittelt
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         x = 0
@@ -1025,10 +1019,13 @@ Public MustInherit Class Sim
 
     'Bereitet das SimModell für Kombinatorik Optimierung vor
     '*******************************************************
-    Public Sub PREPARE_Evaluation_CES(ByVal Path() As Integer)
+    Public Sub PREPARE_Evaluation_CES(ByVal Path() As Integer, byval Elements() as string)
 
         'Setzt den Aktuellen Pfad
         Akt.Path = Path
+
+        'Die elemente werden an die Kostenkalkulation übergeben
+        SKos1.Akt_Elemente = Elements
 
         'Ermittelt das aktuelle_ON_OFF array
         Call Prepare_Verzweigung_ON_OFF()
