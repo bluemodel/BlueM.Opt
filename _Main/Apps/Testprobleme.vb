@@ -92,8 +92,10 @@ Public Class Testprobleme
                 globalAnzZiel = 1
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
+                ReDim beziehungen(globalAnzPar - 1)
                 For i = 0 To globalAnzPar - 1
                     mypara(i) = 0
+                    beziehungen(i) = PES.Beziehung.keine
                 Next
 
             Case "Beale-Problem" 'x1 = [-5;5], x2=[-2;2]
@@ -101,93 +103,115 @@ Public Class Testprobleme
                 globalAnzZiel = 1
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
-                mypara(0) = 0.5
-                mypara(1) = 0.5
+                ReDim beziehungen(globalAnzPar - 1)
+                For i = 0 To globalAnzPar - 1
+                    mypara(i) = 0.5
+                    beziehungen(i) = PES.Beziehung.keine
+                Next
 
             Case "Schwefel 2.4-Problem" 'xi = [-10,10]
                 globalAnzPar = CShort(globAnzPar_Schw)
                 globalAnzZiel = 1
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
+                ReDim beziehungen(globalAnzPar - 1)
                 For i = 0 To globalAnzPar - 1
                     mypara(i) = 1
-                Next i
+                    beziehungen(i) = PES.Beziehung.keine
+                Next
 
             Case "Deb 1" 'x1 = [0.1;1], x2=[0;5]
                 globalAnzPar = 2
                 globalAnzZiel = 2
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
+                ReDim beziehungen(globalAnzPar - 1)
                 Randomize()
-                mypara(0) = Rnd()
-                mypara(1) = Rnd()
+                For i = 0 To globalAnzPar - 1
+                    mypara(i) = Rnd()
+                    beziehungen(i) = PES.Beziehung.keine
+                Next
 
             Case "Zitzler/Deb T1" 'xi = [0,1]
                 globalAnzPar = 30
                 globalAnzZiel = 2
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
+                ReDim beziehungen(globalAnzPar - 1)
                 Randomize()
                 For i = 0 To globalAnzPar - 1
                     mypara(i) = Rnd()
-                Next i
+                    beziehungen(i) = PES.Beziehung.keine
+                Next
 
             Case "Zitzler/Deb T2" 'xi = [0,1]
                 globalAnzPar = 30
                 globalAnzZiel = 2
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
+                ReDim beziehungen(globalAnzPar - 1)
                 Randomize()
                 For i = 0 To globalAnzPar - 1
                     mypara(i) = Rnd()
-                Next i
+                    beziehungen(i) = PES.Beziehung.keine
+                Next
 
             Case "Zitzler/Deb T3" 'xi = [0,1]
                 globalAnzPar = 15
                 globalAnzZiel = 2
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
+                ReDim beziehungen(globalAnzPar - 1)
                 Randomize()
                 For i = 0 To globalAnzPar - 1
                     mypara(i) = Rnd()
-                Next i
+                    beziehungen(i) = PES.Beziehung.keine
+                Next
 
             Case "Zitzler/Deb T4" 'x1 = [0,1], xi=[-5,5]
                 globalAnzPar = 10
                 globalAnzZiel = 2
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
+                ReDim beziehungen(globalAnzPar - 1)
                 Randomize()
                 For i = 0 To globalAnzPar - 1
                     mypara(i) = Rnd()
-                Next i
+                    beziehungen(i) = PES.Beziehung.keine
+                Next
 
             Case "CONSTR" 'x1 = [0.1;1], x2=[0;5]
                 globalAnzPar = 2
                 globalAnzZiel = 2
                 globalAnzRand = 2
                 ReDim mypara(globalAnzPar - 1)
+                ReDim beziehungen(globalAnzPar - 1)
                 Randomize()
-                mypara(0) = Rnd()
-                mypara(1) = Rnd()
+                For i = 0 To globalAnzPar - 1
+                    mypara(i) = Rnd()
+                    beziehungen(i) = PES.Beziehung.keine
+                Next
 
             Case "Box"
                 globalAnzPar = 3
                 globalAnzZiel = 3
                 globalAnzRand = 2
                 ReDim mypara(globalAnzPar - 1)
+                ReDim beziehungen(globalAnzPar - 1)
                 Randomize()
-                mypara(0) = Rnd()
-                mypara(1) = Rnd()
-                mypara(2) = Rnd()
+                For i = 0 To globalAnzPar - 1
+                    mypara(i) = Rnd()
+                    beziehungen(i) = PES.Beziehung.keine
+                Next
 
             Case "Abhängige Parameter"
                 globalAnzPar = 2
                 globalAnzZiel = 1
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
-                mypara(0) = 1
-                mypara(1) = 1
+                For i = 0 To globalAnzPar - 1
+                    mypara(i) = 1
+                Next
                 'Beziehungen
                 ReDim beziehungen(globalAnzPar - 1)
                 beziehungen(0) = EVO.Kern.PES.Beziehung.keine
