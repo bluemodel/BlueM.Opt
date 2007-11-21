@@ -161,13 +161,13 @@ Partial Class Form1
                     Sim1 = New Smusi()
                     Call Me.displayWorkDir()
 
-                    'SH_13.11.07    
+
                 Case ANW_SWMM   'Anwendung SWMM
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
                     'Objekt der Klasse SWMM initialisieren
                     Sim1 = New SWMM()
                     Call Me.displayWorkDir()
-                    'SH_13.11.07_Ende
+
 
 
                 Case ANW_TESTPROBLEME 'Anwendung Testprobleme
@@ -410,7 +410,7 @@ Partial Class Form1
 
         'Alten Datensatz dem Dialog zuweisen
         OpenFileDialog_Datensatz.InitialDirectory = Sim1.WorkDir
-        'SH_13.11.07
+
         If Me.Anwendung = ANW_BLUEM Or Me.Anwendung = ANW_SMUSI Then
             OpenFileDialog_Datensatz.FileName = Sim1.WorkDir & Sim1.Datensatz & ".ALL"
         ElseIf Me.Anwendung = ANW_SWMM Then

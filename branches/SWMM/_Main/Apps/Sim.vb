@@ -342,9 +342,7 @@ Public MustInherit Class Sim
 
     'Optimierungsparameter einlesen
     '******************************
-    '13.11.07_SH
-    'Routine von 'Privat' in 'Protected Overridable' geändert
-    Protected Overridable Sub Read_OptParameter()
+    Private Sub Read_OptParameter()
 
         'Format:
         '*|--------------|-------|-----------|--------|--------|-----------|
@@ -425,9 +423,7 @@ Public MustInherit Class Sim
 
     'Modellparameter einlesen
     '************************
-    '13.11.07_SH
-    'Routine von 'Privat' in 'Protected Overridable' geändert
-    Protected Overridable Sub Read_ModellParameter()
+    Private Sub Read_ModellParameter()
 
         'Format:
         '*|--------------|--------------|-------|-------|-------|-------|-----|-----|--------|
@@ -996,7 +992,7 @@ Public MustInherit Class Sim
         'ToDo: sollte an eine bessere stelle!
         If No_Loc = 0 Then ReDim SKos1.Aktuell_Elemente(-1)
         ReDim Preserve SKos1.Aktuell_Elemente(SKos1.Aktuell_Elemente.GetUpperBound(0) + Elements.GetLength(0))
-        Array.Copy(Elements, 0, SKos1.Aktuell_Elemente, SKos1.Aktuell_Elemente.GetUpperBound(0) - Elements.GetUpperBound(0), Elements.GetLength(0))
+        array.Copy(Elements, 0, SKos1.Aktuell_Elemente, SKos1.Aktuell_Elemente.GetUpperBound(0) - Elements.GetUpperBound(0), Elements.GetLength(0))
 
         '3. Die Parameter werden Ermittelt
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -1128,8 +1124,8 @@ Public MustInherit Class Sim
         If count = 0 Then
             Reduce_OptPara_and_ModPara = False
         Else
-            Array.Resize(TMP_ModPara, count)
-            Array.Resize(List_ModellParameter, count)
+            array.Resize(TMP_ModPara, count)
+            array.Resize(List_ModellParameter, count)
 
             For i = 0 To TMP_ModPara.GetUpperBound(0)
                 Call copy_Struct_ModellParemeter(TMP_ModPara(i), List_ModellParameter(i))
@@ -1156,8 +1152,8 @@ Public MustInherit Class Sim
                 Throw New Exception("Die aktuelle Kombination enthält keine Bauwerke, für die OptimierungsParameter vorliegen")
             End If
 
-            Array.Resize(TMP_OptPara, count)
-            Array.Resize(List_OptParameter, count)
+            array.Resize(TMP_OptPara, count)
+            array.Resize(List_OptParameter, count)
 
             For i = 0 To TMP_OptPara.GetUpperBound(0)
                 Call copy_Struct_OptParameter(TMP_OptPara(i), List_OptParameter(i))
@@ -1262,7 +1258,7 @@ Public MustInherit Class Sim
         'Parameterwerte und Beziehungen übergeben
         ReDim mypara(globalAnzPar - 1)
         ReDim beziehungen(globalAnzPar - 1)
-        For i = 0 To globalAnzPar  - 1
+        For i = 0 To globalAnzPar - 1
             mypara(i) = Me.List_OptParameter(i).SKWert
             beziehungen(i) = Me.List_OptParameter(i).Beziehung
         Next

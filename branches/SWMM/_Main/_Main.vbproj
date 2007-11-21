@@ -251,6 +251,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Apps\IHWB.BlueM.DllAdapter.dll" />
+    <Content Include="Apps\SWMM5.dll" />
     <Content Include="Diagramm\TeeChart.dll" />
     <Content Include="EVO.mdb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
