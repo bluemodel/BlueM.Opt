@@ -125,7 +125,7 @@ Partial Class Form1
             'Combobox Methode deaktivieren
             ComboBox_Methode.Enabled = False
 
-            'Buttons
+            'Ergebnis-Buttons
             Me.Button_openMDB.Enabled = False
             Me.Button_clearSelection.Enabled = False
             Me.Button_showWave.Enabled = False
@@ -226,7 +226,7 @@ Partial Class Form1
             'Start Button deaktivieren
             Me.Button_Start.Enabled = False
 
-            'Buttons
+            'Ergebnis-Buttons
             Me.Button_openMDB.Enabled = False
             Me.Button_clearSelection.Enabled = False
             Me.Button_showWave.Enabled = False
@@ -263,7 +263,7 @@ Partial Class Form1
 
                     MsgBox("Die Startwerte der Optimierungsparameter wurden in die Eingabedateien geschrieben.", MsgBoxStyle.Information, "Info")
 
-                    'Buttons
+                    'Ergebnis-Buttons
                     Me.Button_openMDB.Enabled = True
 
                 Case METH_SENSIPLOT 'Methode SensiPlot
@@ -300,7 +300,7 @@ Partial Class Form1
                     'EVO_Einstellungen aktivieren
                     EVO_Settings1.Enabled = True
 
-                    'Buttons
+                    'Ergebnis-Buttons
                     Me.Button_openMDB.Enabled = True
 
                     'PES für Sim vorbereiten
@@ -319,7 +319,7 @@ Partial Class Form1
                 Case METH_CES, METH_CES_PES, METH_HYBRID 'Methode CES und Methode CES_PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'Buttons
+                    'Ergebnis-Buttons
                     Me.Button_openMDB.Enabled = True
                     Me.Button_Scatterplot.Enabled = True
 
@@ -462,7 +462,7 @@ Partial Class Form1
             Me.isrun = True
             Me.Button_Start.Text = "||"
 
-            'Buttons
+            'Ergebnis-Buttons
             Me.Button_Scatterplot.Enabled = True
 
             'Try
@@ -1578,7 +1578,7 @@ Start_Evolutionsrunden:
 
         End If
 
-        'Buttons
+        'Ergebnis-Buttons
         If (Sim1.OptResult.selSolutions.Length > 0) Then
             Me.Button_clearSelection.Enabled = True
             Me.Button_showWave.Enabled = True
@@ -1600,7 +1600,7 @@ Start_Evolutionsrunden:
         'Auswahl zurücksetzen
         ReDim Me.Sim1.OptResult.selSolutions(-1)
 
-        'Buttons
+        'Ergebnis-Buttons
         Me.Button_clearSelection.Enabled = False
         Me.Button_showWave.Enabled = False
 
@@ -1802,7 +1802,7 @@ Start_Evolutionsrunden:
                     End With
                 Next
 
-                'Buttons
+                'Ergebnis-Buttons
                 Me.Button_Scatterplot.Enabled = True
 
                 'Cursor Default
