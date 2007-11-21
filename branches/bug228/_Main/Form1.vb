@@ -1225,11 +1225,14 @@ Start_Evolutionsrunden:
                     'Sekundäre Population
                     If (EVO_Settings1.PES_Settings.is_MO_Pareto) Then
                         SekPopulation = PES1.EsGetSekundärePopulation()
-                        'SekPop zeichnen
-                        Call SekundärePopulationZeichnen(SekPopulation)
-                        'SekPop in DB speichern
                         If (Not IsNothing(Sim1)) Then
+                            'SekPop abspeichern
                             Call Sim1.OptResult.setSekPop(SekPopulation, PES1.PES_iAkt.iAktGen)
+                            'SekPop mit Solution.IDs zeichnen
+                            Call SekundärePopulationZeichnen()
+                        Else
+                            'SekPop einfach so zeichnen
+                            Call SekundärePopulationZeichnen(SekPopulation)
                         End If
                     End If
 
@@ -1267,26 +1270,60 @@ Start_Evolutionsrunden:
 
         Dim i As Short
         Dim serie As Steema.TeeChart.Styles.Series
+        Dim serie3D As Steema.TeeChart.Styles.Points3D
 
-        If (SekPop.GetLength(1) = 2) Then
+        If (globalAnzZiel = 2) Then
             '2 Zielfunktionen
             '----------------------------------------------------------------
-            serie = DForm.Diag.getSeriesPoint("Sekundäre Population", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+            serie = DForm.Diag.getSeriesPoint("Sekundäre Population", "Green")
             serie.Clear()
             For i = 0 To SekPop.GetUpperBound(0)
-                serie.Add(SekPop(i, 0), SekPop(i, 1), "")
+                serie.Add(SekPop(i, 0), SekPop(i, 1))
             Next i
 
-        ElseIf (SekPop.GetLength(1) >= 3) Then
+        ElseIf (globalAnzZiel >= 3) Then
             '3 oder mehr Zielfunktionen (es werden die ersten drei angezeigt)
             '----------------------------------------------------------------
-            Dim serie3D As Steema.TeeChart.Styles.Points3D
             serie3D = DForm.Diag.getSeries3DPoint("Sekundäre Population", "Green")
             serie3D.Clear()
             For i = 0 To SekPop.GetUpperBound(0)
                 serie3D.Add(SekPop(i, 0), SekPop(i, 1), SekPop(i, 2))
             Next i
         End If
+
+    End Sub
+
+    'Sekundäre Population anhand von Sim-Ergebnisspeicher zeichnen
+    '*************************************************************
+    Private Sub SekundärePopulationZeichnen()
+
+        Dim i As Short
+        Dim serie As Steema.TeeChart.Styles.Series
+        Dim serie3D As Steema.TeeChart.Styles.Points3D
+
+        'Letzte Sekundärpopulation zeichnen
+        With Sim1.OptResult.SekPops(Sim1.OptResult.SekPops.GetUpperBound(0))
+
+            If (globalAnzZiel = 2) Then
+                '2 Zielfunktionen
+                '----------------------------------------------------------------
+                serie = DForm.Diag.getSeriesPoint("Sekundäre Population", "Green")
+                serie.Clear()
+                For i = 0 To .Solutions.GetUpperBound(0)
+                    serie.Add(.Solutions(i).QWerte(0), .Solutions(i).QWerte(1), .Solutions(i).ID)
+                Next i
+
+            ElseIf (globalAnzZiel >= 3) Then
+                '3 oder mehr Zielfunktionen (es werden die ersten drei angezeigt)
+                '----------------------------------------------------------------
+                serie3D = DForm.Diag.getSeries3DPoint("Sekundäre Population", "Green")
+                serie3D.Clear()
+                For i = 0 To .Solutions.GetUpperBound(0)
+                    serie3D.Add(.Solutions(i).QWerte(0), .Solutions(i).QWerte(1), .Solutions(i).QWerte(2), .Solutions(i).ID)
+                Next i
+            End If
+
+        End With
 
     End Sub
 

@@ -34,7 +34,16 @@ Public Class OptResult
     'Array von Lösungen
     Public Solutions() As Solution
 
-    Public selSolutions() As Solution                  'ausgewählte Lösungen
+    'Structure für Sekundäre Population
+    Public Structure Struct_SekPop
+        Public iGen As Integer                      'Generationsnummer
+        Public Solutions() As Solution              'Array von Lösungen
+    End Structure
+
+    'Array von Sekundären Populationen
+    Public SekPops() As Struct_SekPop               'Array von Sekundären Populationen
+
+    Public selSolutions() As Solution               'ausgewählte Lösungen (für Wave)
 
     'Konstruktor
     '***********
@@ -54,6 +63,7 @@ Public Class OptResult
 
         ReDim Me.Solutions(-1)
         ReDim Me.selSolutions(-1)
+        ReDim Me.SekPops(-1)
 
         'DB initialiseren
         Me.db_path = Me.Datensatz & ".mdb"
@@ -120,10 +130,69 @@ Public Class OptResult
 
     End Function
 
-    Public Sub setSekPop(ByVal SekPopulation(,) As Double, ByVal iGen As Integer)
+    'Sekundäre Population speichern
+    '******************************
+    Public Sub setSekPop(ByVal sekpop(,) As Double, ByVal igen As Integer)
 
-        'BUG 228: SekPop in OptResult speichern
-        Call Me.db_setSekPop(SekPopulation, iGen)
+        Dim i, j, k As Integer
+        Dim anzSekMembers, anzZielfkt As Integer
+        Dim isFound As Boolean
+
+        anzSekMembers = sekpop.GetLength(0)
+        anzZielfkt = sekpop.GetLength(1)
+
+        'SekPops um einen Eintrag erweitern
+        ReDim Preserve Me.SekPops(Me.SekPops.GetUpperBound(0) + 1)
+
+        'Neue Sekundäre Poulation füllen
+        With Me.SekPops(Me.SekPops.GetUpperBound(0))
+
+            .iGen = igen
+            ReDim .Solutions(anzSekMembers - 1)
+
+            'Alle SekPopMember durchlaufen und identifizieren
+            For i = 0 To anzSekMembers - 1
+
+                'Alle bereits gespeicherten Lösungen durchsuchen
+                For j = 0 To Me.Solutions.GetUpperBound(0)
+
+                    'isFound zurücksetzen
+                    isFound = False
+
+                    'QWerte vergleichen
+                    For k = 0 To anzZielfkt - 1
+                        If (Me.Solutions(j).QWerte(k) = sekpop(i, k)) Then
+                            isFound = True
+                        Else
+                            isFound = False
+                        End If
+                        'Gefunden?
+                        If (Not isFound) Then
+                            'Nächste Lösung versuchen
+                            Exit For
+                        End If
+
+                    Next k
+
+                    'Gefunden?
+                    If (isFound) Then
+                        .Solutions(i) = Me.Solutions(j).copy()
+                        'Zu nächstem SekPopMember springen
+                        Exit For
+                    End If
+
+                Next j
+
+            Next i
+
+            'Überprüfung
+            If (Not .Solutions.GetLength(0) = anzSekMembers) Then
+                Throw New Exception("Es konnten nicht alle Mitglieder der sekundären Population identifiziert werden!")
+            End If
+
+        End With
+
+        Call Me.db_setSekPop(sekpop, igen)
 
     End Sub
 
