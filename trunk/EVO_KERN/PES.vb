@@ -766,42 +766,75 @@ Public Class PES
     '******************************************
     Public Sub EsPopMutation()
 
-        'BUG 241: Beziehungen zwischen OptParas auf Populationsebene implementieren!
+        Dim i, v, n As Short
+        Dim DeTemp(,,) As Double      'Temporäre Schrittweiten für Eltern
+        Dim XeTemp(,,) As Double      'Temporäre Parameterwerte für Eltern
+        Dim expo As Short             'Exponent für Schrittweite (+/-1)
 
-        Dim v, n As Short
-        Dim DeTemp As Double                'Temporäre Schrittweite für Elter
-        Dim XeTemp As Double                'Temporäre Parameterwert für Elter
-        Dim expo As Short                   'Exponent für Schrittweite (+/-1)
+        ReDim DeTemp(NPara - 1, PES_Settings.NEltern - 1, PES_Settings.NPopul - 1)
+        ReDim XeTemp(NPara - 1, PES_Settings.NEltern - 1, PES_Settings.NPopul - 1)
 
-        If Not PES_Settings.isDnVektor Then
+StartMutation:
+
+        'Einheitliche Schrittweite
+        '-------------------------
+        If (Not PES_Settings.isDnVektor) Then
             '+/-1
             expo = (2 * Int(Rnd() + 0.5) - 1)
             'Schrittweite wird mutiert
-            DeTemp = De(0, 0, PES_iAkt.iAktPop) * palpha ^ expo
+            DeTemp(0, 0, PES_iAkt.iAktPop) = De(0, 0, PES_iAkt.iAktPop) * palpha ^ expo
+            'Schrittweite für alle übernehmen
+            For n = 0 To PES_Settings.NEltern - 1
+                For v = 0 To NPara - 1
+                    DeTemp(v, n, PES_iAkt.iAktPop) = DeTemp(0, 0, PES_iAkt.iAktPop)
+                Next
+            Next
         End If
 
-        For v = 0 To NPara - 1
-            For n = 0 To PES_Settings.NEltern - 1
+
+        'Mutation
+        '--------
+        For n = 0 To PES_Settings.NEltern - 1
+            For v = 0 To NPara - 1
+                i = 0
                 Do
-                    If PES_Settings.isDnVektor Then
+                    i += 1
+                    'Abbruchkriterium
+                    '----------------
+                    If (i >= 1000) Then
+                        'Es konnte kein gültiger Parametersatz generiert werden!
+                        'Wieder von vorne anfangen
+                        GoTo StartMutation
+                    End If
+
+                    'Schrittweitenvektor
+                    '-------------------
+                    If (PES_Settings.isDnVektor) Then
                         '+/-1
                         expo = (2 * Int(Rnd() + 0.5) - 1)
                         'Schrittweite wird mutiert
-                        DeTemp = De(v, n, PES_iAkt.iAktPop) * palpha ^ expo
+                        DeTemp(v, n, PES_iAkt.iAktPop) = De(v, n, PES_iAkt.iAktPop) * palpha ^ expo
                     End If
+
                     'Normalverteilte Zufallszahl mit Standardabweichung 1/sqr(varanz)
                     Dim Z As Double
                     Z = System.Math.Sqrt(-2 * System.Math.Log(1 - Rnd()) / NPara) * System.Math.Sin(6.2832 * Rnd())
                     'Mutation wird durchgeführt
-                    XeTemp = Xe(v, n, PES_iAkt.iAktPop) + DeTemp * Z
+                    XeTemp(v, n, PES_iAkt.iAktPop) = Xe(v, n, PES_iAkt.iAktPop) + DeTemp(v, n, PES_iAkt.iAktPop) * Z
 
                     ' Restriktion für die mutierten Werte
-                Loop While (XeTemp <= 0 Or XeTemp > 1)
+                Loop While (XeTemp(v, n, PES_iAkt.iAktPop) <= 0 Or XeTemp(v, n, PES_iAkt.iAktPop) > 1 Or Not checkBeziehungPop(v, n, XeTemp))
 
-                De(v, n, PES_iAkt.iAktPop) = DeTemp
-                Xe(v, n, PES_iAkt.iAktPop) = XeTemp
-            Next n
-        Next v
+            Next v
+
+            'Mutierte Werte übernehmen
+            '-------------------------
+            For v = 0 To NPara - 1
+                De(v, n, PES_iAkt.iAktPop) = DeTemp(v, n, PES_iAkt.iAktPop)
+                Xe(v, n, PES_iAkt.iAktPop) = XeTemp(v, n, PES_iAkt.iAktPop)
+            Next v
+
+        Next n
 
     End Sub
 
@@ -810,48 +843,67 @@ Public Class PES
     Public Sub EsMutation()
 
         Dim v, i As Short
-        Dim DnTemp As Double                'Temporäre Schrittweite für Nachkomme
-        Dim XnTemp As Double                'Temporärer Parameterwert für Nachkomme
-        Dim expo As Short                   'Exponent für Schrittweite (+/-1)
+        Dim DnTemp() As Double             'Temporäre Schrittweiten für Nachkomme
+        Dim XnTemp() As Double             'Temporäre Parameterwerte für Nachkomme
+        Dim expo As Short                  'Exponent für Schrittweite (+/-1)
 
-        If Not PES_Settings.isDnVektor Then
+        ReDim DnTemp(NPara - 1)
+        ReDim XnTemp(NPara - 1)
+
+StartMutation:
+
+        'Einheitliche Schrittweite
+        '-------------------------
+        If (Not PES_Settings.isDnVektor) Then
             '+/-1
             expo = (2 * Int(Rnd() + 0.5) - 1)
             'Schrittweite wird mutiert
-            DnTemp = AktPara.Dn(0) * galpha ^ expo
+            DnTemp(0) = AktPara.Dn(0) * galpha ^ expo
+            'Schrittweite für alle übernehmen
+            For v = 1 To NPara - 1
+                DnTemp(v) = DnTemp(0)
+            Next
         End If
 
+        'Mutation
+        '--------
         For v = 0 To NPara - 1
-		  		i = 0
+            i = 0
             Do
                 i += 1
                 'Abbruchkriterium
+                '----------------
                 If (i >= 1000) Then
-                    'Es konnte keine gültiger Parameter generiert werden!
-                    'Parameter zurücksetzen
-                    DnTemp = AktPara.Dn(v)
-                    XnTemp = AktPara.Xn(v)
+                    'Es konnte kein gültiger Parametersatz generiert werden!
                     'Wieder von vorne anfangen
-                    i = 0
-                    v = 0
-                    Exit Do
+                    GoTo StartMutation
                 End If
-                If PES_Settings.isDnVektor Then
+
+                'Schrittweitenvektor
+                '-------------------
+                If (PES_Settings.isDnVektor) Then
                     '+/-1
                     expo = (2 * Int(Rnd() + 0.5) - 1)
                     'Schrittweite wird mutiert
-                    DnTemp = AktPara.Dn(v) * galpha ^ expo
+                    DnTemp(v) = AktPara.Dn(v) * galpha ^ expo
                 End If
+
                 'Normalverteilte Zufallszahl mit Standardabweichung 1/sqr(varanz)
                 Dim Z As Double
                 Z = System.Math.Sqrt(-2 * System.Math.Log(1 - Rnd()) / NPara) * System.Math.Sin(6.2832 * Rnd())
                 'Mutation wird durchgeführt
-                XnTemp = AktPara.Xn(v) + DnTemp * Z
-                'Restriktion für die mutierten Werte
-            Loop While (XnTemp <= 0 Or XnTemp > 1 Or Not checkBeziehung(v, XnTemp))
+                XnTemp(v) = AktPara.Xn(v) + DnTemp(v) * Z
 
-            AktPara.Dn(v) = DnTemp
-            AktPara.Xn(v) = XnTemp
+                'Restriktion für die mutierten Werte
+            Loop While (XnTemp(v) <= 0 Or XnTemp(v) > 1 Or Not checkBeziehung(v, XnTemp))
+
+        Next v
+
+        'Mutierte Werte übernehmen
+        '-------------------------
+        For v = 0 To NPara - 1
+            AktPara.Dn(v) = DnTemp(v)
+            AktPara.Xn(v) = XnTemp(v)
         Next v
 
     End Sub
@@ -1834,11 +1886,11 @@ Public Class PES
     End Sub
 
     'Einen Parameterwert auf Einhaltung der Beziehung überprüfen
-    '****************************************************************
-    Private Function checkBeziehung(ByVal ipara As Integer, ByVal XnTemp As Double) As Boolean
+    '***********************************************************
+    Private Function checkBeziehung(ByVal ipara As Integer, ByVal XnTemp() As Double) As Boolean
 
         'ipara ist der Index des zu überprüfenden Parameters,
-        'XnTemp sein aktueller, zu überprüfender Wert
+        'XnTemp() die aktuellen Werte
 
         Dim isOK As Boolean = False
         If (AktPara.Bez(ipara) = Beziehung.keine) Then
@@ -1846,16 +1898,49 @@ Public Class PES
             isOK = True
         Else
             'Referenzierten Parameterwert vergleichen
-            Dim ref As Double = AktPara.Xn(ipara - 1)
+            Dim wert As Double = XnTemp(ipara)
+            Dim ref As Double = XnTemp(ipara - 1)
             Select Case AktPara.Bez(ipara)
                 Case Beziehung.kleiner
-                    If (XnTemp < ref) Then isOK = True
+                    If (wert < ref) Then isOK = True
                 Case Beziehung.kleinergleich
-                    If (XnTemp <= ref) Then isOK = True
+                    If (wert <= ref) Then isOK = True
                 Case Beziehung.groesser
-                    If (XnTemp > ref) Then isOK = True
+                    If (wert > ref) Then isOK = True
                 Case Beziehung.groessergleich
-                    If (XnTemp >= ref) Then isOK = True
+                    If (wert >= ref) Then isOK = True
+            End Select
+        End If
+
+        Return isOK
+
+    End Function
+
+    'Einen Parameterwert auf Einhaltung der Beziehung überprüfen (Populationsebene)
+    '******************************************************************************
+    Private Function checkBeziehungPop(ByVal ipara As Integer, ByVal iElter As Integer, ByVal XeTemp(,,) As Double) As Boolean
+
+        'ipara ist der Index des zu überprüfenden Parameters,
+        'iElter der Index des Elters,
+        'XeTemp die aktuellen Werte
+
+        Dim isOK As Boolean = False
+        If (AktPara.Bez(ipara) = Beziehung.keine) Then
+            'Keine Beziehung vorhanden
+            isOK = True
+        Else
+            'Referenzierten Parameterwert vergleichen
+            Dim wert As Double = XeTemp(ipara, iElter, PES_iAkt.iAktPop)
+            Dim ref As Double = XeTemp(ipara - 1, iElter, PES_iAkt.iAktPop)
+            Select Case AktPara.Bez(ipara)
+                Case Beziehung.kleiner
+                    If (wert < ref) Then isOK = True
+                Case Beziehung.kleinergleich
+                    If (wert <= ref) Then isOK = True
+                Case Beziehung.groesser
+                    If (wert > ref) Then isOK = True
+                Case Beziehung.groessergleich
+                    If (wert >= ref) Then isOK = True
             End Select
         End If
 
