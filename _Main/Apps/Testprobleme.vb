@@ -702,7 +702,7 @@ Public Class Testprobleme
             .Aspect.Elevation = 348
             .Aspect.Orthogonal = False
             .Aspect.Perspective = 62
-            .Aspect.Rotation = 329
+            .Aspect.Rotation = 360
             .Aspect.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality
             .Aspect.VertOffset = -20
             .Aspect.Zoom = 66
@@ -821,7 +821,7 @@ Public Class Testprobleme
                     array_y(i) = (-1 + mypara(i) * 2)
                 Next i
 
-                serie = Diag.getSeriesPoint("Population " & ipop)
+                serie = Diag.getSeriesPoint("Population " & ipop + 1)
                 serie.Add(array_x, array_y)
 
 
@@ -837,7 +837,7 @@ Public Class Testprobleme
 
                 'Zeichnen
                 '--------
-                serie = Diag.getSeriesPoint("Population " & ipop)
+                serie = Diag.getSeriesPoint("Population " & ipop + 1)
                 serie.Add(durchlauf, QN(0))
 
             Case "Schwefel 2.4-Problem"
@@ -856,7 +856,7 @@ Public Class Testprobleme
 
                 'Zeichnen
                 '--------
-                serie = Diag.getSeriesPoint("Population " & ipop)
+                serie = Diag.getSeriesPoint("Population " & ipop + 1)
                 serie.Add(durchlauf, QN(0))
 
                 '*************************************
@@ -1032,7 +1032,7 @@ Public Class Testprobleme
                 'Zeichnen
                 '--------
                 Dim serie3D As Steema.TeeChart.Styles.Points3D
-                serie3D = Diag.getSeries3DPoint("Population", "Orange")
+                serie3D = Diag.getSeries3DPoint("Population " & ipop + 1)
                 serie3D.Add(mypara(0), mypara(1), QN(0))
 
         End Select
