@@ -1350,7 +1350,7 @@ StartMutation:
             NFrontMember_aktuell = Count_Front_Members(1, NDSResult)
 
             'BUG 135
-            Member_Sekundärefront = Math.Max(UBound(SekundärQb), 0) 'Weil wenn die Länge von SekundärQb 0 ist, gibt UBound -1 zurück!
+            Member_Sekundärefront = Math.Max(SekundärQb.GetUpperBound(0), 0) 'Weil wenn die Länge von SekundärQb 0 ist, gibt UBound -1 zurück!
 
             'SekPop wird um die aktuelle Front erweitert
             ReDim Preserve SekundärQb(Member_Sekundärefront + NFrontMember_aktuell - 1)
