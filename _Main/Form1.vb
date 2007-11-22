@@ -706,9 +706,9 @@ Partial Class Form1
 
         'Parents und Childs werden Dimensioniert
         ReDim CES1.List_Parents(CES1.n_Parents - 1)
-        Call CES1.Faksimile_Dim(CES1.List_Parents, "Parent")
+        Call CES1.Individuum_Dim(CES1.List_Parents, "Parent")
         ReDim CES1.List_Childs(CES1.n_Childs - 1)
-        Call CES1.Faksimile_Dim(CES1.List_Childs, "Child")
+        Call CES1.Individuum_Dim(CES1.List_Childs, "Child")
 
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
@@ -859,7 +859,7 @@ Partial Class Form1
             '-----------------------------------------------------
             If CES1.n_Penalty = 1 Then
                 'Sortieren der Kinden anhand der Qualität
-                Call CES1.Sort_Faksimile(CES1.List_Childs)
+                Call CES1.Sort_Individuum(CES1.List_Childs)
                 'Selectionsprozess je nach "plus" oder "minus" Strategie
                 Call CES1.Selection_Process()
                 'Zeichnen der besten Eltern
@@ -883,7 +883,7 @@ Partial Class Form1
             '***********************************************
             If CES1.TestModus = 0 Then
                 'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
-                Call CES1.Faksimile_Dim(CES1.List_Childs, "Child")
+                Call CES1.Individuum_Dim(CES1.List_Childs, "Child")
                 'Reproduktionsoperatoren, hier gehts dezent zur Sache
                 Call CES1.Reproduction_Control()
                 'Mutationsoperatoren
@@ -932,7 +932,7 @@ Partial Class Form1
                             'Die Anzahl der Eltern wird bestimmt, bzw ob Eltern vorhanden
                             Dim n_eltern As Integer = 0
                             For m = 0 To CES1.PES_Parents.GetUpperBound(0)
-                                If (j + 1) = CES1.PES_Parents(m).iLocation  Then
+                                If (j + 1) = CES1.PES_Parents(m).iLocation Then
                                     n_eltern += 1
                                 End If
                             Next
