@@ -43,7 +43,7 @@ Public Class CES
     '****************************************************************************
     Public Structure Individuum
         Dim Type As String                  '01 Typ des Individuum
-        Dim No As Short                     '02 Nummer des Individuum
+        Dim No As Integer                     '02 Nummer des Individuum
         Dim Path() As Integer               '03 Der Pfad
         Dim Penalty() As Double             '04 Werte der Penaltyfunktion(en)
         Dim Constrain() As Double           '05 Wert der Randbedingung(en)
@@ -51,7 +51,7 @@ Public Class CES
 
         'Für ND Sorting -------------------------------------------------
         Dim dominated As Boolean            '07 Kennzeichnung ob Dominiert
-        Dim Front As Short                  '08 Nummer der Pareto Front
+        Dim Front As Integer                  '08 Nummer der Pareto Front
         Dim Distance As Double              '09 Für crowding distance
         'Dim Feasible As Boolean            'Gültiges Ergebnis ?
 
