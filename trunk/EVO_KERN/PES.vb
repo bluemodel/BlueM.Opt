@@ -503,26 +503,6 @@ Public Class PES
 
     End Function
 
-    'ES_GET_SEKUNDÄRE_POPULATIONEN - Sekundäre Population speichert immer die angegebene
-    'Anzahl von Bestwerten und kann den Bestwertspeicher alle x Generationen überschreiben
-    '*************************************************************************************
-    Public Function EsGetSekundärePopulation() As Double(,)
-
-        Dim j, i As Short
-        Dim SekPopulation(,) As Double
-
-        ReDim SekPopulation(SekundärQb.GetUpperBound(0), NPenalty - 1)
-
-        For i = 0 To SekundärQb.GetUpperBound(0)
-            For j = 0 To NPenalty - 1
-                SekPopulation(i, j) = SekundärQb(i).penalty(j)
-            Next j
-        Next i
-
-        Return SekPopulation
-
-    End Function
-
     'Function um PopReproduktion, PopMutation, Reproduktion und Mutio n direkt ablaufen zu lassen
     '********************************************************************************************
     Public Sub EsReproMut()
@@ -1356,9 +1336,9 @@ StartMutation:
 
     End Sub
 
-    '4: Sekundäre Population wird bestimmt und gespeichert
-    '-------------------------------------------------------
-    Private Sub SekundärQb_allocation(ByVal NFrontMember_aktuell As Short, ByVal NDSResult As Struct_NDSorting())
+    '4: Sekundäre Population wird bestimmt und gespeichert ggf gespeichert
+    '---------------------------------------------------------------------
+    Private Sub SekundärQb_Allocation(ByVal NFrontMember_aktuell As Short, ByVal NDSResult As Struct_NDSorting())
 
         Dim i, j, v As Integer
         Dim Member_Sekundärefront As Short
@@ -1379,32 +1359,40 @@ StartMutation:
         Next i
 
         Call Non_Dominated_Sorting(SekundärQb, 1)
+
         NFrontMember_aktuell = Non_Dominated_Count_and_Sort_Sekundäre_Population(SekundärQb)
         ReDim Preserve SekundärQb(NFrontMember_aktuell - 1)
+
+        'Dubletten werden gelöscht
         Call SekundärQb_Dubletten()
         NFrontMember_aktuell = Non_Dominated_Count_and_Sort_Sekundäre_Population(SekundärQb)
         ReDim Preserve SekundärQb(NFrontMember_aktuell - 1)
 
+        'Crowding Distance
         If (SekundärQb.GetUpperBound(0) > PES_Settings.NMemberSecondPop - 1) Then
             Call NDS_Crowding_Distance_Sort(SekundärQb, 0, SekundärQb.GetUpperBound(0))
             ReDim Preserve SekundärQb(PES_Settings.NMemberSecondPop - 1)
         End If
 
         'Prüfen, ob die Population jetzt mit Mitgliedern aus der Sekundären Population aufgefüllt werden soll
+        '----------------------------------------------------------------------------------------------------
         If (PES_iAkt.iAktGen Mod PES_Settings.interact) = 0 And PES_Settings.isInteract Then
             NFrontMember_aktuell = Count_Front_Members(1, SekundärQb)
             If NFrontMember_aktuell > PES_Settings.NEltern Then
+                'Crowding Distance
                 Call NDS_Crowding_Distance_Sort(SekundärQb, 0, SekundärQb.GetUpperBound(0))
                 For i = 0 To PES_Settings.NEltern - 1
-
+                    'Bestwertspeicher
                     For j = 0 To NPenalty - 1
                         Qb(i, PES_iAkt.iAktPop, j) = SekundärQb(i).penalty(j)
                     Next j
+                    'Randbedingungen
                     If NConstrains > 0 Then
                         For j = 0 To NConstrains - 1
                             Rb(i, PES_iAkt.iAktPop, j) = SekundärQb(i).constrain(j)
                         Next j
                     End If
+                    'Parameter
                     For v = 0 To NPara - 1
                         Db(v, i, PES_iAkt.iAktPop) = SekundärQb(i).d(v)
                         Xb(v, i, PES_iAkt.iAktPop) = SekundärQb(i).X(v)
@@ -1414,6 +1402,45 @@ StartMutation:
             End If
         End If
     End Sub
+
+    'SekundärQb_Dubletten
+    '********************
+    Private Sub SekundärQb_Dubletten()
+
+        Dim i, j, k As Short
+        Dim Logical As Boolean
+
+        For i = 0 To SekundärQb.GetUpperBound(0) - 2
+            For j = i + 1 To SekundärQb.GetUpperBound(0)
+                Logical = True
+                For k = 0 To NPenalty - 1
+                    Logical = Logical And (SekundärQb(i).penalty(k) = SekundärQb(j).penalty(k))
+                Next k
+                If (Logical) Then SekundärQb(i).dominated = True
+            Next j
+        Next i
+    End Sub
+
+
+    'ES_GET_SEKUNDÄRE_POPULATIONEN - Sekundäre Population speichert immer die angegebene
+    'Anzahl von Bestwerten und kann den Bestwertspeicher alle x Generationen überschreiben
+    '*************************************************************************************
+    Public Function SekundärQb_Get() As Double(,)
+
+        Dim j, i As Short
+        Dim SekPopulation(,) As Double
+
+        ReDim SekPopulation(SekundärQb.GetUpperBound(0), NPenalty - 1)
+
+        For i = 0 To SekundärQb.GetUpperBound(0)
+            For j = 0 To NPenalty - 1
+                SekPopulation(i, j) = SekundärQb(i).penalty(j)
+            Next j
+        Next i
+
+        Return SekPopulation
+
+    End Function
 
     'NON_DOMINATED_SORTING - Entscheidet welche Werte dominiert werden und welche nicht
     '**********************************************************************************
@@ -1785,24 +1812,6 @@ StartMutation:
             Next j
         Next i
 
-    End Sub
-
-    'SekundärQb_Dubletten
-    '********************
-    Private Sub SekundärQb_Dubletten()
-
-        Dim i, j, k As Short
-        Dim Logical As Boolean
-
-        For i = 0 To SekundärQb.GetUpperBound(0) - 2
-            For j = i + 1 To SekundärQb.GetUpperBound(0)
-                Logical = True
-                For k = 0 To NPenalty - 1
-                    Logical = Logical And (SekundärQb(i).penalty(k) = SekundärQb(j).penalty(k))
-                Next k
-                If (Logical) Then SekundärQb(i).dominated = True
-            Next j
-        Next i
     End Sub
 
     'Neighbourhood_Eltern
