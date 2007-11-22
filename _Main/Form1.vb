@@ -1235,7 +1235,7 @@ Start_Evolutionsrunden:
 
                     'Sekundäre Population
                     If (EVO_Settings1.PES_Settings.is_MO_Pareto) Then
-                        SekPopulation = PES1.EsGetSekundärePopulation()
+                        SekPopulation = PES1.SekundärQb_Get()
                         'SekPop zeichnen
                         Call SekundärePopulationZeichnen(SekPopulation)
                         'SekPop in DB speichern
