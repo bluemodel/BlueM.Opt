@@ -511,7 +511,8 @@ Public Class PES
         Dim j, i As Short
         Dim SekPopulation(,) As Double
 
-        ''Notwendig, falls auch die Variablenwerte für eine spätere Datensatzerstellung ausgelesen werden sollen (Dirk)
+        ''Notwendig, falls auch die Variablenwerte für eine spätere Datensatzerstellung
+        ''ausgelesen werden sollen (Dirk)
 
         'ReDim Population(UBound(SekundärQb), Eigenschaft.varanz, Eigenschaft.NPenalty + 1)
         'For i = 1 To UBound(SekundärQb)
@@ -524,7 +525,6 @@ Public Class PES
         'Next i
 
         ReDim SekPopulation(SekundärQb.GetUpperBound(0), NPenalty - 1)
-        '!Wenn Fehler hier "SekundäreQb = Nothing" auftritt wurde TeeChart mit der falschen Serie bzw. zu wenig Serien gestartet!!!
 
         For i = 0 To SekundärQb.GetUpperBound(0)
             For j = 0 To NPenalty - 1
