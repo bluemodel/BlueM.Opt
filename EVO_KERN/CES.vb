@@ -29,9 +29,9 @@ Public Class CES
 
     'Eingabe
     Public n_Parts_of_Path As Integer = 3   'Länge des Gedächtnispfades Achtung Maximum ist 3
-    Public n_Generations As Integer = 10     'Anzahl der Generationen
-    Public n_Parents As Integer = 4
-    Public n_Childs As Integer = 7
+    Public n_Generations As Integer = 500   'Anzahl der Generationen
+    Public n_Parents As Integer = 13
+    Public n_Childs As Integer = 20
 
     'Private Variablen
     Private ReprodOperator As String = "Select_Random_Uniform"
@@ -133,8 +133,11 @@ Public Class CES
 
     End Structure
 
+    'Listen für die Individuen
+    '*************************
     Public List_Childs() As Individuum
     Public List_Parents() As Individuum
+    Private SekundärQb() as Individuum
     Public NDSorting(n_Childs + n_Parents - 1) As Individuum
     Public NDSResult(n_Childs + n_Parents - 1) As Individuum
     Public Memory() As Individuum
@@ -146,7 +149,7 @@ Public Class CES
 #Region "Methoden"
     '#############
 
-    'Dimensionieren eines einzelnen Individuums (Überladen)
+    'Dimensionieren eines einzelnen Individuum (Überladen)
     '****************************************************
     Public Sub Individuum_Dim(ByRef TMP As Individuum, ByVal Type As String, ByVal No As Integer)
 
