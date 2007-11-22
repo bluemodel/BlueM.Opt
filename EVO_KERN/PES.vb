@@ -1168,7 +1168,7 @@ StartMutation:
     '*********************************************
     Public Sub EsEltern()
 
-        Dim l, m, v, i, j As Short
+        Dim l, m, v, i As Integer
         Dim NFrontMember_aktuell, NFrontMember_gesamt As Short
         Dim rang As Short
         Dim Temp() As Struct_NDSorting
@@ -1271,18 +1271,10 @@ StartMutation:
                 '-> schiss wird einfach rüberkopiert
                 If NFrontMember_aktuell <= PES_Settings.NEltern - NFrontMember_gesamt Then
                     For i = NFrontMember_gesamt To NFrontMember_aktuell + NFrontMember_gesamt - 1
-                        For j = 0 To NPenalty - 1
-                            Qb(i, PES_iAkt.iAktPop, j) = NDSResult(i).penalty(j)
-                        Next j
-                        If NConstrains > 0 Then
-                            For j = 0 To NConstrains - 1
-                                Rb(i, PES_iAkt.iAktPop, j) = NDSResult(i).constrain(j)
-                            Next j
-                        End If
-                        For v = 0 To NPara - 1
-                            Db(v, i, PES_iAkt.iAktPop) = NDSResult(i).d(v)
-                            Xb(v, i, PES_iAkt.iAktPop) = NDSResult(i).X(v)
-                        Next v
+
+                        'NDSResult wird in den Bestwertspeicher kopiert
+                        Call NDSResult_to_Bestwert(i, NDSResult)
+
                     Next i
                     NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
 
@@ -1294,18 +1286,8 @@ StartMutation:
 
                     For i = NFrontMember_gesamt To PES_Settings.NEltern - 1
 
-                        For j = 0 To NPenalty - 1
-                            Qb(i, PES_iAkt.iAktPop, j) = NDSResult(i).penalty(j)
-                        Next j
-                        If NConstrains > 0 Then
-                            For j = 0 To NConstrains - 1
-                                Rb(i, PES_iAkt.iAktPop, j) = NDSResult(i).constrain(j)
-                            Next j
-                        End If
-                        For v = 0 To NPara - 1
-                            Db(v, i, PES_iAkt.iAktPop) = NDSResult(i).d(v)
-                            Xb(v, i, PES_iAkt.iAktPop) = NDSResult(i).X(v)
-                        Next v
+                        'NDSResult wird in den Bestwertspeicher kopiert
+                        Call NDSResult_to_Bestwert(i, NDSResult)
 
                     Next i
 
@@ -1339,6 +1321,28 @@ StartMutation:
             End If
 
         End If
+
+    End Sub
+
+    'Kopiert NDSResult in cden Bestwertspeicher
+    '------------------------------------------
+    Private Sub NDSResult_to_Bestwert(ByVal i As Short, ByVal NDSResult As Struct_NDSorting())
+        Dim j, v As Integer
+
+        For j = 0 To NPenalty - 1
+            Qb(i, PES_iAkt.iAktPop, j) = NDSResult(i).penalty(j)
+        Next j
+
+        If NConstrains > 0 Then
+            For j = 0 To NConstrains - 1
+                Rb(i, PES_iAkt.iAktPop, j) = NDSResult(i).constrain(j)
+            Next j
+        End If
+
+        For v = 0 To NPara - 1
+            Db(v, i, PES_iAkt.iAktPop) = NDSResult(i).d(v)
+            Xb(v, i, PES_iAkt.iAktPop) = NDSResult(i).X(v)
+        Next v
 
     End Sub
 
