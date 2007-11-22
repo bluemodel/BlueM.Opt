@@ -88,25 +88,31 @@ Public Class PES
     'Muss Public sein, da das Form hiermit die Schleifen kontrolliert
     Public PES_iAkt As Struct_iAkt
 
+    '---Anzahlen-----------
     Private NPara As Short                  'Anzahl Parameter
     Private NPenalty As Short               'Anzahl der Penaltyfunktionen
-    Private NConstrains As Short            'Anzahl der Randbedingungen 
-    '----------------------
+    Private NConstrains As Short            'Anzahl der Randbedingungen
+
+    '---PopElternwerte-----
     Private Xp(,,) As Double                'PopulationsElternwert der Variable
     Private Dp(,,) As Double                'PopulationsElternschrittweite
-    '----------------------
+
+    '---PopBestwerte-------
     Private Xbpop(,,) As Double             'Bestwertspeicher Variablenwerte für eine Population
     Private Dbpop(,,) As Double             'Bestwertspeicher Schrittweite für eine Population
     Private Qbpop(,) As Double              'Bestwertspeicher für eine Population
-    '---------------------
+
+    '---Elternwerte--------
     Private Xe(,,) As Double                'Elternwerte der Variablen
     Private De(,,) As Double                'Elternschrittweite
-    '---------------------
+
+    '---Bestwerte----------
     Private Xb(,,) As Double                'Bestwertspeicher Variablenwerte für eine Generation
     Private Db(,,) As Double                'Bestwertspeicher Schrittweite für eine Generation
     Private Qb(,,) As Double                'Bestwertspeicher für eine Generation
     Private Rb(,,) As Double                'Restriktionen für eine Generation
-    '---------------------
+
+    '---Stuff--------------
     Private Distanceb() As Double           'Array mit Crowding-Distance (Neighbourhood-Rekomb.)
     Private PenaltyDistance(,) As Double    'Array für normierte Raumabstände (Neighbourhood-Rekomb.)
     '---------------------
@@ -1312,7 +1318,7 @@ StartMutation:
             Loop While Not (NFrontMember_gesamt = PES_Settings.NEltern)
 
             '4: Sekundäre Population wird bestimmt und gespeichert
-            '-------------------------------------------------------
+            '-----------------------------------------------------
             SekundärQb_allocation(NFrontMember_aktuell, NDSResult)
 
 
