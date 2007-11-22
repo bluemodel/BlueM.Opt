@@ -868,8 +868,7 @@ Partial Class Form1
                     serie = DForm.Diag.getSeriesPoint("Parent", "green")
                     Call serie.Add(durchlauf_all, CES1.List_Parents(i).Penalty(0))
                 Next
-
-            ElseIf CES1.n_Penalty = 2 Then
+            Else
                 'NDSorting ******************
                 Call CES1.NDSorting_Control()
                 'Zeichnen von NDSortingResult
