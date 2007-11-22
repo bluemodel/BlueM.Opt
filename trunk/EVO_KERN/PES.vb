@@ -1188,7 +1188,6 @@ StartMutation:
         Dim Temp() As Struct_NDSorting
         Dim NDSResult() As Struct_NDSorting
         Dim aktuelle_Front As Short
-        Dim Member_Sekundärefront As Short
 
         If (Not PES_Settings.is_MO_Pareto) Then
             'Standard ES nach Rechenberg
@@ -1334,56 +1333,11 @@ StartMutation:
 
             '4: Sekundäre Population wird bestimmt und gespeichert
             '-------------------------------------------------------
-            NFrontMember_aktuell = Count_Front_Members(1, NDSResult)
+            SekundärQb_allocation(NFrontMember_aktuell, NDSResult)
 
-            'BUG 135
-            Member_Sekundärefront = Math.Max(SekundärQb.GetUpperBound(0), 0) 'Weil wenn die Länge von SekundärQb 0 ist, gibt UBound -1 zurück!
 
-            'SekPop wird um die aktuelle Front erweitert
-            ReDim Preserve SekundärQb(Member_Sekundärefront + NFrontMember_aktuell - 1)
-
-            'Neue Member der SekPop bestimmen
-            For i = Member_Sekundärefront To Member_Sekundärefront + NFrontMember_aktuell - 1
-                SekundärQb(i) = NDSResult(i - Member_Sekundärefront)
-            Next i
-
-            Call Non_Dominated_Sorting(SekundärQb, 1)
-            NFrontMember_aktuell = Non_Dominated_Count_and_Sort_Sekundäre_Population(SekundärQb)
-            ReDim Preserve SekundärQb(NFrontMember_aktuell - 1)
-            Call SekundärQb_Dubletten()
-            NFrontMember_aktuell = Non_Dominated_Count_and_Sort_Sekundäre_Population(SekundärQb)
-            ReDim Preserve SekundärQb(NFrontMember_aktuell - 1)
-
-            If (SekundärQb.GetUpperBound(0) > PES_Settings.NMemberSecondPop - 1) Then
-                Call NDS_Crowding_Distance_Sort(SekundärQb, 0, SekundärQb.GetUpperBound(0))
-                ReDim Preserve SekundärQb(PES_Settings.NMemberSecondPop - 1)
-            End If
-
-            'Prüfen, ob die Population jetzt mit Mitgliedern aus der Sekundären Population aufgefüllt werden soll
-            If (PES_iAkt.iAktGen Mod PES_Settings.interact) = 0 And PES_Settings.isInteract Then
-                NFrontMember_aktuell = Count_Front_Members(1, SekundärQb)
-                If NFrontMember_aktuell > PES_Settings.NEltern Then
-                    Call NDS_Crowding_Distance_Sort(SekundärQb, 0, SekundärQb.GetUpperBound(0))
-                    For i = 0 To PES_Settings.NEltern - 1
-
-                        For j = 0 To NPenalty - 1
-                            Qb(i, PES_iAkt.iAktPop, j) = SekundärQb(i).penalty(j)
-                        Next j
-                        If NConstrains > 0 Then
-                            For j = 0 To NConstrains - 1
-                                Rb(i, PES_iAkt.iAktPop, j) = SekundärQb(i).constrain(j)
-                            Next j
-                        End If
-                        For v = 0 To NPara - 1
-                            Db(v, i, PES_iAkt.iAktPop) = SekundärQb(i).d(v)
-                            Xb(v, i, PES_iAkt.iAktPop) = SekundärQb(i).X(v)
-                        Next v
-
-                    Next i
-                End If
-            End If
-
-            'Neue Eltern werden gleich dem Bestwertspeicher gesetzt
+            '5: Neue Eltern werden gleich dem Bestwertspeicher gesetzt
+            '---------------------------------------------------------
             For m = 0 To PES_Settings.NEltern - 1
                 For v = 0 To NPara - 1
                     De(v, m, PES_iAkt.iAktPop) = Db(v, m, PES_iAkt.iAktPop)
@@ -1391,7 +1345,8 @@ StartMutation:
                 Next v
             Next m
 
-            'Sortierung der Lösungen ist nur für Neighbourhood-Rekombination notwendig
+            '6: Sortierung der Lösungen ist nur für Neighbourhood-Rekombination notwendig
+            '----------------------------------------------------------------------------
             If (PES_Settings.iOptEltern = EVO_ELTERN.Neighbourhood) Then
                 Call Neighbourhood_AbstandsArray()
                 Call Neighbourhood_Crowding_Distance()
@@ -1399,6 +1354,65 @@ StartMutation:
 
         End If
 
+    End Sub
+
+    '4: Sekundäre Population wird bestimmt und gespeichert
+    '-------------------------------------------------------
+    Private Sub SekundärQb_allocation(ByVal NFrontMember_aktuell As Short, ByVal NDSResult As Struct_NDSorting())
+
+        Dim i, j, v As Integer
+        Dim Member_Sekundärefront As Short
+
+        NFrontMember_aktuell = Count_Front_Members(1, NDSResult)
+
+        'BUG 135
+        'Weil wenn die Länge von SekundärQb 0 ist, gibt UBound -1 zurück!
+        'Problem: Upperbound liefert nicht die Anzahl! Was wird benötigt?
+        Member_Sekundärefront = Math.Max(SekundärQb.GetUpperBound(0), 0)
+
+        'SekPop wird um die aktuelle Front erweitert
+        ReDim Preserve SekundärQb(Member_Sekundärefront + NFrontMember_aktuell - 1)
+
+        'Neue Member der SekPop bestimmen
+        For i = Member_Sekundärefront To Member_Sekundärefront + NFrontMember_aktuell - 1
+            SekundärQb(i) = NDSResult(i - Member_Sekundärefront)
+        Next i
+
+        Call Non_Dominated_Sorting(SekundärQb, 1)
+        NFrontMember_aktuell = Non_Dominated_Count_and_Sort_Sekundäre_Population(SekundärQb)
+        ReDim Preserve SekundärQb(NFrontMember_aktuell - 1)
+        Call SekundärQb_Dubletten()
+        NFrontMember_aktuell = Non_Dominated_Count_and_Sort_Sekundäre_Population(SekundärQb)
+        ReDim Preserve SekundärQb(NFrontMember_aktuell - 1)
+
+        If (SekundärQb.GetUpperBound(0) > PES_Settings.NMemberSecondPop - 1) Then
+            Call NDS_Crowding_Distance_Sort(SekundärQb, 0, SekundärQb.GetUpperBound(0))
+            ReDim Preserve SekundärQb(PES_Settings.NMemberSecondPop - 1)
+        End If
+
+        'Prüfen, ob die Population jetzt mit Mitgliedern aus der Sekundären Population aufgefüllt werden soll
+        If (PES_iAkt.iAktGen Mod PES_Settings.interact) = 0 And PES_Settings.isInteract Then
+            NFrontMember_aktuell = Count_Front_Members(1, SekundärQb)
+            If NFrontMember_aktuell > PES_Settings.NEltern Then
+                Call NDS_Crowding_Distance_Sort(SekundärQb, 0, SekundärQb.GetUpperBound(0))
+                For i = 0 To PES_Settings.NEltern - 1
+
+                    For j = 0 To NPenalty - 1
+                        Qb(i, PES_iAkt.iAktPop, j) = SekundärQb(i).penalty(j)
+                    Next j
+                    If NConstrains > 0 Then
+                        For j = 0 To NConstrains - 1
+                            Rb(i, PES_iAkt.iAktPop, j) = SekundärQb(i).constrain(j)
+                        Next j
+                    End If
+                    For v = 0 To NPara - 1
+                        Db(v, i, PES_iAkt.iAktPop) = SekundärQb(i).d(v)
+                        Xb(v, i, PES_iAkt.iAktPop) = SekundärQb(i).X(v)
+                    Next v
+
+                Next i
+            End If
+        End If
     End Sub
 
     'NON_DOMINATED_SORTING - Entscheidet welche Werte dominiert werden und welche nicht
@@ -1604,7 +1618,7 @@ StartMutation:
 
     'COUNT_FRONT_MEMBERS
     '*******************
-    Private Function Count_Front_Members(ByVal aktuell_Front As Short, ByRef NDSResult() As Struct_NDSorting) As Integer
+    Private Function Count_Front_Members(ByVal aktuell_Front As Short, ByVal NDSResult() As Struct_NDSorting) As Integer
 
         Dim i As Short
         Count_Front_Members = 0
