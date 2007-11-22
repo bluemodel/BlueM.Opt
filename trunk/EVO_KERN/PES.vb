@@ -511,19 +511,6 @@ Public Class PES
         Dim j, i As Short
         Dim SekPopulation(,) As Double
 
-        ''Notwendig, falls auch die Variablenwerte für eine spätere Datensatzerstellung
-        ''ausgelesen werden sollen (Dirk)
-
-        'ReDim Population(UBound(SekundärQb), Eigenschaft.varanz, Eigenschaft.NPenalty + 1)
-        'For i = 1 To UBound(SekundärQb)
-        '    For j = 1 To Eigenschaft.varanz
-        '        Population(i, j, 1) = SekundärQb(i).X(j)
-        '        For k = 1 To Eigenschaft.NPenalty
-        '            Population(i, j, k + 1) = SekundärQb(i).penalty(k)
-        '        Next k
-        '    Next j
-        'Next i
-
         ReDim SekPopulation(SekundärQb.GetUpperBound(0), NPenalty - 1)
 
         For i = 0 To SekundärQb.GetUpperBound(0)
