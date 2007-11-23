@@ -1,5 +1,18 @@
 Public Class Solution
 
+    '*******************************************************************************
+    '*******************************************************************************
+    '**** Klasse Solution                                                       ****
+    '****                                                                       ****
+    '**** speichert die für EVO wichtigen Ergebniswerte einer Simulation        ****
+    '****                                                                       ****
+    '**** Autoren: Felix Froehlich                                              ****
+    '****                                                                       ****
+    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
+    '**** TU Darmstadt                                                          ****
+    '*******************************************************************************
+    '*******************************************************************************
+
     Public ID As Integer
     Public QWerte() As Double
     Public OptPara() As Double

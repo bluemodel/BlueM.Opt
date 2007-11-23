@@ -6,7 +6,7 @@ Public Class OptResult
     '*******************************************************************************
     '**** Klasse OptResult                                                      ****
     '****                                                                       ****
-    '**** Speichert die Ergebnisse eines Optimierungslaufs,                     ****
+    '**** Speichert und verwaltet die Ergebnisse eines Optimierungslaufs,       ****
     '**** schreibt die Ergebnisse in eine Datenbank                             ****
     '****                                                                       ****
     '**** Autoren: Felix Froehlich                                              ****
@@ -37,13 +37,13 @@ Public Class OptResult
     'Structure für Sekundäre Population
     Public Structure Struct_SekPop
         Public iGen As Integer                      'Generationsnummer
-        Public Solutions() As Solution              'Array von Lösungen
+        Public SolutionIDs() As Integer             'Array von Solution-IDs
     End Structure
 
     'Array von Sekundären Populationen
-    Public SekPops() As Struct_SekPop               'Array von Sekundären Populationen
+    Private SekPops() As Struct_SekPop               'Array von Sekundären Populationen
 
-    Public selSolutions() As Solution               'ausgewählte Lösungen (für Wave)
+    Private selSolutionIDs() As Integer             'ausgewählte Lösungen (für Wave)
 
     'Konstruktor
     '***********
@@ -62,7 +62,7 @@ Public Class OptResult
         Me.List_Locations = Sim1.List_Locations
 
         ReDim Me.Solutions(-1)
-        ReDim Me.selSolutions(-1)
+        ReDim Me.selSolutionIDs(-1)
         ReDim Me.SekPops(-1)
 
         'DB initialiseren
@@ -72,6 +72,35 @@ Public Class OptResult
     End Sub
 
 #Region "Ergebnisspeicher"
+
+    'Eine Lösung auswählen
+    '*********************
+    Public Sub selectSolution(ByVal ID As Integer)
+
+        ReDim Preserve Me.selSolutionIDs(Me.selSolutionIDs.GetUpperBound(0) + 1)
+        Me.selSolutionIDs(Me.selSolutionIDs.GetUpperBound(0)) = ID
+
+    End Sub
+
+    'Ausgewählte Lösungen holen
+    '**************************
+    Public Function getSelectedSolutions() As Solution()
+
+        Dim solutions() As Solution
+
+        solutions = getSolutions(Me.selSolutionIDs)
+
+        Return solutions
+
+    End Function
+
+    'Lösungsauswahl zurücksetzen
+    '***************************
+    Public Sub clearSelectedSolutions()
+
+        ReDim Me.selSolutionIDs(-1)
+
+    End Sub
 
     'Eine Lösung zum Optimierungsergebnis hinzufügen
     '***********************************************
@@ -114,87 +143,75 @@ Public Class OptResult
 
     'Eine Lösung identifizieren
     '**************************
-    Public Function getSolution(ByRef sol As Solution, ByVal ID As Integer) As Boolean
+    Public Function getSolution(ByVal ID As Integer) As Solution
 
-        Dim isOK As Boolean
+        Dim i As Integer
 
-        For Each tmpsol As Solution In Me.Solutions
-            If (tmpsol.ID = ID) Then
-                sol = tmpsol.copy()
-                isOK = True
+        For i = 0 To Me.Solutions.GetUpperBound(0)
+            If (Me.Solutions(i).ID = ID) Then
+                Return Me.Solutions(i)
             End If
         Next
 
-        'isOK = Me.db_getPara(Solution, xAchse, xWert, yAchse, yWert)
-        Return isOK
+        Return New Solution() 'TODO: Fehlerbehandlung
 
     End Function
 
-    'Sekundäre Population speichern
-    '******************************
-    Public Sub setSekPop(ByVal sekpop(,) As Double, ByVal igen As Integer)
+    'Sekundäre Population hinzufügen
+    '*******************************
+    Public Sub addSekPop(ByVal _sekpop(,) As Double, ByVal _igen As Integer)
 
-        Dim i, j, k As Integer
-        Dim anzSekMembers, anzZielfkt As Integer
-        Dim isFound As Boolean
+        Dim SekPop As Struct_SekPop
 
-        anzSekMembers = sekpop.GetLength(0)
-        anzZielfkt = sekpop.GetLength(1)
+        'SekPop in DB speichern
+        Call Me.db_setSekPop(_sekpop, _igen)
 
-        'SekPops um einen Eintrag erweitern
-        ReDim Preserve Me.SekPops(Me.SekPops.GetUpperBound(0) + 1)
+        'SekPop aus DB lesen
+        SekPop = db_getSekPop(_igen)
 
-        'Neue Sekundäre Poulation füllen
-        With Me.SekPops(Me.SekPops.GetUpperBound(0))
-
-            .iGen = igen
-            ReDim .Solutions(anzSekMembers - 1)
-
-            'Alle SekPopMember durchlaufen und identifizieren
-            For i = 0 To anzSekMembers - 1
-
-                'Alle bereits gespeicherten Lösungen durchsuchen
-                For j = 0 To Me.Solutions.GetUpperBound(0)
-
-                    'isFound zurücksetzen
-                    isFound = False
-
-                    'QWerte vergleichen
-                    For k = 0 To anzZielfkt - 1
-                        If (Me.Solutions(j).QWerte(k) = sekpop(i, k)) Then
-                            isFound = True
-                        Else
-                            isFound = False
-                        End If
-                        'Gefunden?
-                        If (Not isFound) Then
-                            'Nächste Lösung versuchen
-                            Exit For
-                        End If
-
-                    Next k
-
-                    'Gefunden?
-                    If (isFound) Then
-                        .Solutions(i) = Me.Solutions(j).copy()
-                        'Zu nächstem SekPopMember springen
-                        Exit For
-                    End If
-
-                Next j
-
-            Next i
-
-            'Überprüfung
-            If (Not .Solutions.GetLength(0) = anzSekMembers) Then
-                Throw New Exception("Es konnten nicht alle Mitglieder der sekundären Population identifiziert werden!")
-            End If
-
-        End With
-
-        Call Me.db_setSekPop(sekpop, igen)
+        'Array von Sekundären Populationen um eins erweitern
+        ReDim Preserve Me.SekPops(_igen)
+        Me.SekPops(_igen) = SekPop
 
     End Sub
+
+    'Sekundäre Population holen
+    '**************************
+    Public Function getSekPop(ByVal _igen As Integer) As Solution()
+
+        Dim i As Integer
+        Dim solutions() As Solution
+
+        ReDim solutions(-1)
+
+        'Alle Sekundären Populationen durchlaufen
+        For i = 0 To Me.SekPops.GetUpperBound(0)
+            If (Me.SekPops(i).iGen = _igen) Then
+                'SekPop gefunden, Lösungen holen
+                solutions = getSolutions(Me.SekPops(i).SolutionIDs)
+            End If
+        Next
+
+        Return solutions
+
+    End Function
+
+    'Lösungen anhand von IDs holen
+    '*****************************
+    Private Function getSolutions(ByVal IDs() As Integer) As Solution()
+
+        Dim i As Integer
+        Dim solutions() As Solution
+
+        ReDim solutions(IDs.GetUpperBound(0))
+
+        For i = 0 To solutions.GetUpperBound(0)
+            solutions(i) = getSolution(IDs(i))
+        Next
+
+        Return solutions
+
+    End Function
 
 #End Region 'Ergebnisspeicher
 
@@ -438,7 +455,7 @@ Public Class OptResult
 
     'Sekundäre Population in DB speichern
     '************************************
-    Public Sub db_setSekPop(ByVal SekPop(,) As Double, ByVal igen As Integer)
+    Private Sub db_setSekPop(ByVal SekPop(,) As Double, ByVal igen As Integer)
 
         Call db_connect()
 
@@ -472,6 +489,45 @@ Public Class OptResult
         Call db_disconnect()
 
     End Sub
+
+    'SekPop aus DB lesen
+    '*******************
+    Private Function db_getSekPop(ByVal igen As Integer) As Struct_SekPop
+
+        Dim i As Integer
+        Dim q As String
+        Dim adapter As OleDbDataAdapter
+        Dim ds As DataSet
+        Dim numrows As Integer
+        Dim SekPop As Struct_SekPop
+
+        Call db_connect()
+
+        q = "SELECT Sim_ID FROM SekPop WHERE Generation = " & igen
+
+        adapter = New OleDbDataAdapter(q, db)
+
+        ds = New DataSet("EVO")
+        numrows = adapter.Fill(ds, "SekPop")
+
+        Call db_disconnect()
+
+        If (numrows > 0) Then
+
+            SekPop.iGen = igen
+            ReDim SekPop.SolutionIDs(numrows - 1)
+
+            For i = 0 To numrows - 1
+                SekPop.SolutionIDs(i) = ds.Tables("SekPop").Rows(i).Item("Sim_ID")
+            Next
+
+        Else
+            Throw New Exception("Sekundäre Population nicht in DB vorhanden!")
+        End If
+
+        Return SekPop
+
+    End Function
 
     'Einen Parametersatz aus der DB übernehmen
     '*****************************************

@@ -1227,9 +1227,9 @@ Start_Evolutionsrunden:
                         SekPopulation = PES1.EsGetSekundärePopulation()
                         If (Not IsNothing(Sim1)) Then
                             'SekPop abspeichern
-                            Call Sim1.OptResult.setSekPop(SekPopulation, PES1.PES_iAkt.iAktGen)
+                            Call Sim1.OptResult.addSekPop(SekPopulation, PES1.PES_iAkt.iAktGen)
                             'SekPop mit Solution.IDs zeichnen
-                            Call SekundärePopulationZeichnen()
+                            Call SekundärePopulationZeichnen(PES1.PES_iAkt.iAktGen)
                         Else
                             'SekPop einfach so zeichnen
                             Call SekundärePopulationZeichnen(SekPopulation)
@@ -1295,35 +1295,34 @@ Start_Evolutionsrunden:
 
     'Sekundäre Population anhand von Sim-Ergebnisspeicher zeichnen
     '*************************************************************
-    Private Sub SekundärePopulationZeichnen()
+    Private Sub SekundärePopulationZeichnen(ByVal _igen as Integer)
 
         Dim i As Short
         Dim serie As Steema.TeeChart.Styles.Series
         Dim serie3D As Steema.TeeChart.Styles.Points3D
+        Dim solutions() As IHWB.EVO.Solution
 
-        'Letzte Sekundärpopulation zeichnen
-        With Sim1.OptResult.SekPops(Sim1.OptResult.SekPops.GetUpperBound(0))
+        'SekPop holen
+        solutions = Sim1.OptResult.getSekPop(_igen)
 
-            If (globalAnzZiel = 2) Then
-                '2 Zielfunktionen
-                '----------------------------------------------------------------
-                serie = DForm.Diag.getSeriesPoint("Sekundäre Population", "Green")
-                serie.Clear()
-                For i = 0 To .Solutions.GetUpperBound(0)
-                    serie.Add(.Solutions(i).QWerte(0), .Solutions(i).QWerte(1), .Solutions(i).ID)
-                Next i
+        If (globalAnzZiel = 2) Then
+            '2 Zielfunktionen
+            '----------------------------------------------------------------
+            serie = DForm.Diag.getSeriesPoint("Sekundäre Population", "Green")
+            serie.Clear()
+            For i = 0 To solutions.GetUpperBound(0)
+                serie.Add(solutions(i).QWerte(0), solutions(i).QWerte(1), solutions(i).ID)
+            Next i
 
-            ElseIf (globalAnzZiel >= 3) Then
-                '3 oder mehr Zielfunktionen (es werden die ersten drei angezeigt)
-                '----------------------------------------------------------------
-                serie3D = DForm.Diag.getSeries3DPoint("Sekundäre Population", "Green")
-                serie3D.Clear()
-                For i = 0 To .Solutions.GetUpperBound(0)
-                    serie3D.Add(.Solutions(i).QWerte(0), .Solutions(i).QWerte(1), .Solutions(i).QWerte(2), .Solutions(i).ID)
-                Next i
-            End If
-
-        End With
+        ElseIf (globalAnzZiel >= 3) Then
+            '3 oder mehr Zielfunktionen (es werden die ersten drei angezeigt)
+            '----------------------------------------------------------------
+            serie3D = DForm.Diag.getSeries3DPoint("Sekundäre Population", "Green")
+            serie3D.Clear()
+            For i = 0 To solutions.GetUpperBound(0)
+                serie3D.Add(solutions(i).QWerte(0), solutions(i).QWerte(1), solutions(i).QWerte(2), solutions(i).ID)
+            Next i
+        End If
 
     End Sub
 
@@ -1501,11 +1500,10 @@ Start_Evolutionsrunden:
             Exit Sub
         Else
 
-            Dim xWert, yWert As Double
-            Dim xAchse, yAchse As String
+            Dim xWert, yWert, zWert As Double
+            Dim xAchse, yAchse, zAchse As String
             Dim i, solID As Integer
             Dim sol As Solution
-            Dim isOK As Boolean
             Dim ParamString As String                       'String für die Anzeige der OptParameter
             Dim QWertString As String                       'String für die Anzeige der QWerte
             Dim ConstrString As String                      'String für die Anzeige der Constraints
@@ -1524,33 +1522,43 @@ Start_Evolutionsrunden:
             'X und Y Achsen (Zielfunktionen)
             xAchse = Me.DForm.Diag.Chart.Axes.Bottom.Title.Caption
             yAchse = Me.DForm.Diag.Chart.Axes.Left.Title.Caption
-
+            'Solution-ID
             solID = s.Labels(valueIndex)
 
             'Lösung holen
             '------------
-            sol = New Solution()
-            isOK = Sim1.OptResult.getSolution(sol, solID)
+            sol = Sim1.OptResult.getSolution(solID)
 
-            If (isOK) Then
-
-                Dim anzLösungen As Integer = Sim1.OptResult.selSolutions.Length
-
-                sol.ID = anzLösungen + 1
+            If (sol.ID = solID) Then
 
                 'Lösung zu ausgewählten Lösungen hinzufügen
-                ReDim Preserve Sim1.OptResult.selSolutions(anzLösungen)
-                Sim1.OptResult.selSolutions(anzLösungen) = sol
+                Call Sim1.OptResult.selectSolution(sol.ID)
 
                 'In Chart anzeigen
-                'BUG 228: ausgewählte Lösungen in 3D-Charts anzeigen!
-                Dim serie As Steema.TeeChart.Styles.Series
-                serie = Me.DForm.Diag.getSeriesPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
-                serie.Add(xWert, yWert, sol.ID.ToString())
-                serie.Marks.Visible = True
-                serie.Marks.Style = Steema.TeeChart.Styles.MarksStyles.Label
-                serie.Marks.Transparency = 50
-                serie.Marks.ArrowLength = 10
+                If (Not s.HasZValues) Then
+                    '2D-Diagramm
+                    '-----------
+                    Dim serie As Steema.TeeChart.Styles.Series
+                    serie = Me.DForm.Diag.getSeriesPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
+                    serie.Add(xWert, yWert, sol.ID.ToString())
+                    serie.Marks.Visible = True
+                    serie.Marks.Style = Steema.TeeChart.Styles.MarksStyles.Label
+                    serie.Marks.Transparency = 50
+                    serie.Marks.ArrowLength = 10
+                Else
+                    '3D-Diagramm
+                    '-----------
+                    Dim serie3D As Steema.TeeChart.Styles.Points3D
+                    serie3D = s
+                    zWert = serie3D.ZValues(valueIndex)
+                    zAchse = Me.DForm.Diag.Chart.Axes.Depth.Title.Caption
+                    serie3D = Me.DForm.Diag.getSeries3DPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
+                    serie3D.Add(xWert, yWert, zWert, sol.ID.ToString())
+                    serie3D.Marks.Visible = True
+                    serie3D.Marks.Style = Steema.TeeChart.Styles.MarksStyles.Label
+                    serie3D.Marks.Transparency = 50
+                    serie3D.Marks.ArrowLength = 10
+                End If
 
                 'OptParameter String
                 '-------------------
@@ -1616,7 +1624,7 @@ Start_Evolutionsrunden:
         End If
 
         'Ergebnis-Buttons
-        If (Sim1.OptResult.selSolutions.Length > 0) Then
+        If (Sim1.OptResult.getSelectedSolutions().Length > 0) Then
             Me.Button_clearSelection.Enabled = True
             Me.Button_showWave.Enabled = True
         End If
@@ -1635,7 +1643,7 @@ Start_Evolutionsrunden:
         Me.DForm.Diag.anno1.Text = ""
         Me.DForm.Diag.anno1.Active = False
         'Auswahl zurücksetzen
-        ReDim Me.Sim1.OptResult.selSolutions(-1)
+        Call Sim1.OptResult.clearSelectedSolutions()
 
         'Ergebnis-Buttons
         Me.Button_clearSelection.Enabled = False
@@ -1662,14 +1670,14 @@ Start_Evolutionsrunden:
 
         'Alle ausgewählten Lösungen durchlaufen
         '======================================
-        For Each iSolution As Solution In Sim1.OptResult.selSolutions
+        For Each sol As Solution In Sim1.OptResult.getSelectedSolutions()
 
             'Simulation ausführen
             'xxxxxxxxxxxxxxxxxxxx
 
             'OptParameter übernehmen
             For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
-                Sim1.List_OptParameter(i).Wert = iSolution.OptPara(i)
+                Sim1.List_OptParameter(i).Wert = sol.OptPara(i)
             Next
 
             'Modellparameter schreiben
@@ -1702,7 +1710,7 @@ Start_Evolutionsrunden:
                         SimSeries.Add(.SimGr, .SimGr)
                         zre = Sim1.SimErgebnis.getReihe(.SimGr).copy()
                         'Lösungsnummer an Titel anhängen
-                        zre.Title &= " (Lösung " & iSolution.ID.ToString() & ")"
+                        zre.Title &= " (Lösung " & sol.ID.ToString() & ")"
                         'Simreihe in Wave laden
                         Wave1.Display_Series(zre)
                     End If
@@ -1710,7 +1718,7 @@ Start_Evolutionsrunden:
                 End With
             Next
 
-        Next iSolution
+        Next sol
 
         'Annotation anzeigen
         '-------------------
