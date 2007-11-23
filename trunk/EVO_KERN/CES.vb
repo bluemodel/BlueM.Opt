@@ -43,7 +43,7 @@ Public Class CES
     '****************************************************************************
     Public Structure Individuum
         Dim Type As String                  '01 Typ des Individuum
-        Dim ID As Integer                     '02 Nummer des Individuum
+        Dim ID As Integer                   '02 Nummer des Individuum
         Dim Path() As Integer               '03 Der Pfad
         Dim Penalty() As Double             '04 Werte der Penaltyfunktion(en)
         Dim Constrain() As Double           '05 Wert der Randbedingung(en)
@@ -51,12 +51,12 @@ Public Class CES
 
         'Für ND Sorting -------------------------------------------------
         Dim dominated As Boolean            '07 Kennzeichnung ob Dominiert
-        Dim Front As Integer                  '08 Nummer der Pareto Front
+        Dim Front As Integer                '08 Nummer der Pareto Front
         Dim Distance As Double              '09 Für crowding distance
-        'Dim Feasible As Boolean            'Gültiges Ergebnis ?
+        Dim feasible As Boolean             '09a Gültiges Ergebnis
 
         'Information pro Location ---------------------------------------
-        Dim Measures() As String            '09a Die Namen der Maßnahmen
+        Dim Measures() As String            '09b Die Namen der Maßnahmen
         Dim Loc() As Location_Data          '10 + 11a Information pro Location
 
         'Für PES Memory -------------------------------------------------
@@ -237,7 +237,10 @@ Public Class CES
         '09 Für crowding distance
         TMP.Distance = 0
 
-        '09a Die Namen der Maßnahmen
+        '09a Gültiges Ergebnis
+        TMP.feasible = False
+
+        '09b Die Namen der Maßnahmen
         ReDim TMP.Measures(n_Locations - 1)
 
         '11 + 10 Informationen pro Location
@@ -320,7 +323,10 @@ Public Class CES
         '09 Für crowding distance
         Dest.Distance = Source.Distance
 
-        '09a Die Namen der Maßnahmen
+        '09a Gültiges Ergebnis
+        Dest.feasible = Source.feasible
+
+        '09b Die Namen der Maßnahmen
         ReDim Dest.Measures(Source.Measures.GetUpperBound(0))
         Array.Copy(Source.Measures, Dest.Measures, Source.Measures.Length)
 
