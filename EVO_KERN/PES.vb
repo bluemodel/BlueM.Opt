@@ -1273,7 +1273,7 @@ StartMutation:
                     For i = NFrontMember_gesamt To NFrontMember_aktuell + NFrontMember_gesamt - 1
 
                         'NDSResult wird in den Bestwertspeicher kopiert
-                        Call NDSResult_to_Bestwert(i, NDSResult)
+                        Call Struct_NDSorting_to_Bestwert(i, NDSResult)
 
                     Next i
                     NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
@@ -1287,7 +1287,7 @@ StartMutation:
                     For i = NFrontMember_gesamt To PES_Settings.NEltern - 1
 
                         'NDSResult wird in den Bestwertspeicher kopiert
-                        Call NDSResult_to_Bestwert(i, NDSResult)
+                        Call Struct_NDSorting_to_Bestwert(i, NDSResult)
 
                     Next i
 
@@ -1324,33 +1324,11 @@ StartMutation:
 
     End Sub
 
-    'Kopiert NDSResult in cden Bestwertspeicher
-    '------------------------------------------
-    Private Sub NDSResult_to_Bestwert(ByVal i As Integer, ByVal NDSResult As Struct_NDSorting())
-        Dim j, v As Integer
-
-        For j = 0 To NPenalty - 1
-            Qb(i, PES_iAkt.iAktPop, j) = NDSResult(i).penalty(j)
-        Next j
-
-        If NConstrains > 0 Then
-            For j = 0 To NConstrains - 1
-                Rb(i, PES_iAkt.iAktPop, j) = NDSResult(i).constrain(j)
-            Next j
-        End If
-
-        For v = 0 To NPara - 1
-            Db(v, i, PES_iAkt.iAktPop) = NDSResult(i).d(v)
-            Xb(v, i, PES_iAkt.iAktPop) = NDSResult(i).X(v)
-        Next v
-
-    End Sub
-
     '4: Sekundäre Population wird bestimmt und gespeichert ggf gespeichert
     '---------------------------------------------------------------------
     Private Sub SekundärQb_Allocation(ByVal NFrontMember_aktuell As Integer, ByVal NDSResult As Struct_NDSorting())
 
-        Dim i, j, v As Integer
+        Dim i As Integer
         Dim Member_Sekundärefront As Integer
 
         NFrontMember_aktuell = Count_Front_Members(1, NDSResult)
@@ -1392,25 +1370,35 @@ StartMutation:
                 'Crowding Distance
                 Call NDS_Crowding_Distance_Sort(SekundärQb, 0, SekundärQb.GetUpperBound(0))
                 For i = 0 To PES_Settings.NEltern - 1
-                    'Bestwertspeicher
-                    For j = 0 To NPenalty - 1
-                        Qb(i, PES_iAkt.iAktPop, j) = SekundärQb(i).penalty(j)
-                    Next j
-                    'Randbedingungen
-                    If NConstrains > 0 Then
-                        For j = 0 To NConstrains - 1
-                            Rb(i, PES_iAkt.iAktPop, j) = SekundärQb(i).constrain(j)
-                        Next j
-                    End If
-                    'Parameter
-                    For v = 0 To NPara - 1
-                        Db(v, i, PES_iAkt.iAktPop) = SekundärQb(i).d(v)
-                        Xb(v, i, PES_iAkt.iAktPop) = SekundärQb(i).X(v)
-                    Next v
+
+                    'NDSResult wird in den Bestwertspeicher kopiert
+                    Call Struct_NDSorting_to_Bestwert(i, SekundärQb)
 
                 Next i
             End If
         End If
+    End Sub
+
+    'Kopiert ein Struct_NDSorting in den Bestwertspeicher
+    '----------------------------------------------------
+    Private Sub Struct_NDSorting_to_Bestwert(ByVal i As Integer, ByVal NDSorting_Struct As Struct_NDSorting())
+        Dim j, v As Integer
+
+        For j = 0 To NPenalty - 1
+            Qb(i, PES_iAkt.iAktPop, j) = NDSorting_Struct(i).penalty(j)
+        Next j
+
+        If NConstrains > 0 Then
+            For j = 0 To NConstrains - 1
+                Rb(i, PES_iAkt.iAktPop, j) = NDSorting_Struct(i).constrain(j)
+            Next j
+        End If
+
+        For v = 0 To NPara - 1
+            Db(v, i, PES_iAkt.iAktPop) = NDSorting_Struct(i).d(v)
+            Xb(v, i, PES_iAkt.iAktPop) = NDSorting_Struct(i).X(v)
+        Next v
+
     End Sub
 
     'SekundärQb_Dubletten
