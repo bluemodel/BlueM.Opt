@@ -193,6 +193,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="OptResult.vb" />
     <Compile Include="Settings.vb" />
     <EmbeddedResource Include="Apps\SensiPlot.resx">
       <DependentUpon>SensiPlot.vb</DependentUpon>

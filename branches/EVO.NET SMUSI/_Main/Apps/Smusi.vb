@@ -7,14 +7,10 @@ Imports ihwb.SMUSI.DllAdapter
 '****                                                                       ****
 '**** Funktionen zur Kontrolle von SMUSI                                    ****
 '****                                                                       ****
-'**** Christoph Huebner, Felix Froehlich                                    ****
+'**** Autoren: Christoph Huebner, Felix Froehlich, Dirk Muschalla           ****
 '****                                                                       ****
 '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
 '**** TU Darmstadt                                                          ****
-'****                                                                       ****
-'**** Erstellt: Dezember 2006                                               ****
-'****                                                                       ****
-'**** Letzte Änderung: November 2007                                        ****
 '*******************************************************************************
 '*******************************************************************************
 

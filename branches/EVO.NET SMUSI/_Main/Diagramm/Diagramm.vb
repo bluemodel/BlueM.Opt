@@ -1,6 +1,19 @@
 Public Class Diagramm
     Inherits Steema.TeeChart.TChart
 
+    '*******************************************************************************
+    '*******************************************************************************
+    '**** Klasse Diagramm                                                       ****
+    '****                                                                       ****
+    '**** Erweiterung der Klasse Steema.TeeChart.TChart                         ****
+    '****                                                                       ****
+    '**** Autoren: Felix Froehlich, Christoph Hübner                            ****
+    '****                                                                       ****
+    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
+    '**** TU Darmstadt                                                          ****
+    '*******************************************************************************
+    '*******************************************************************************
+
     Public Structure Achse
         Public Name As String
         Public Auto As Boolean
