@@ -199,6 +199,9 @@ Partial Class Form1
                 ComboBox_Methode.Enabled = True
             End If
 
+            'EVO_Verlauf zurücksetzen
+            Call Me.INI_Verlaufsanzeige(EVO_Settings1.PES_Settings.NRunden, EVO_Settings1.PES_Settings.NPopul, EVO_Settings1.PES_Settings.NGen, EVO_Settings1.PES_Settings.NNachf)
+
         End If
 
     End Sub
@@ -316,6 +319,9 @@ Partial Class Form1
                     'Parameterübergabe an PES
                     Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
 
+                    'EVO_Verlauf zurücksetzen
+                    Call Me.INI_Verlaufsanzeige(EVO_Settings1.PES_Settings.NRunden, EVO_Settings1.PES_Settings.NPopul, EVO_Settings1.PES_Settings.NGen, EVO_Settings1.PES_Settings.NNachf)
+
                 Case METH_CES, METH_CES_PES, METH_HYBRID 'Methode CES und Methode CES_PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
@@ -382,6 +388,9 @@ Partial Class Form1
                     For i = 0 To CES1.n_Locations - 1
                         CES1.n_PathDimension(i) = Sim1.List_Locations(i).List_Massnahmen.GetLength(0)
                     Next
+
+                    'EVO_Verlauf zurücksetzen
+                    Call Me.INI_Verlaufsanzeige(1 , 1, CES1.n_Generations, CES1.n_Childs)
 
             End Select
 

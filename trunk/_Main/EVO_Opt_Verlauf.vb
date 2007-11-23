@@ -63,19 +63,20 @@ Public Partial Class EVO_Opt_Verlauf
 
         ProgressBarRunde.Minimum = 0
         ProgressBarRunde.Maximum = Eigenschaft.NRunden
-        ProgressBarRunde.Value = 1
+        ProgressBarRunde.Value = 0
 
         ProgressBarPop.Minimum = 0
         ProgressBarPop.Maximum = Eigenschaft.NPopul
-        ProgressBarPop.Value = 1
+        ProgressBarPop.Value = 0
 
         ProgressBarGen.Minimum = 0
         ProgressBarGen.Maximum = Eigenschaft.NGen
-        ProgressBarGen.Value = 1
+        ProgressBarGen.Value = 0
 
         ProgressBarNach.Minimum = 0
         ProgressBarNach.Maximum = Eigenschaft.NNachf
-        ProgressBarNach.Value = 1
+        ProgressBarNach.Value = 0
+
     End Sub
 
 
