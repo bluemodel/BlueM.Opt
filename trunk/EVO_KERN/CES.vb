@@ -144,9 +144,8 @@ Public Class CES
 
         End Property
 
-
-        'Kopiert ein Individuum
-        '**********************
+        'Überladen Methode die ein AIndividuum kopiert
+        '*********************************************
         Public Shared Sub Copy(ByVal Source As Individuum, ByRef Dest As Individuum)
 
             Dim i As Integer
@@ -216,6 +215,16 @@ Public Class CES
             '14 Location des PES Parent
             Dest.iLocation = Source.iLocation
 
+        End Sub
+
+        'Überladen Methode die ein Array aus Individuen kopiert
+        '******************************************************
+        Public Shared Sub Copy(ByVal Source() As Individuum, ByRef Dest() As Individuum)
+            Dim i As Integer
+
+            For i = 0 To Source.GetUpperBound(0)
+                Call Copy(Source(i), Dest(i))
+            Next
         End Sub
 
     End Structure
