@@ -43,7 +43,7 @@ Public Class CES
     '****************************************************************************
     Public Structure Individuum
         Dim Type As String                  '01 Typ des Individuum
-        Dim No As Integer                     '02 Nummer des Individuum
+        Dim ID As Integer                     '02 Nummer des Individuum
         Dim Path() As Integer               '03 Der Pfad
         Dim Penalty() As Double             '04 Werte der Penaltyfunktion(en)
         Dim Constrain() As Double           '05 Wert der Randbedingung(en)
@@ -113,7 +113,6 @@ Public Class CES
             End Set
 
         End Property
-
 
     'Gibt ein Array mit den DNs aller Locations zurück !oder!
     'Setzt die Zahl der locations auf 1 und schreibt dort alle DNs rein
@@ -202,7 +201,7 @@ Public Class CES
         TMP.Type = Type
 
         '02 Nummer des Individuum
-        TMP.No = No + 1
+        TMP.ID = No + 1
 
         '03 Der Pfad - zur Kontrolle wird falscher Pfad gesetzt
         ReDim TMP.Path(n_Locations - 1)
@@ -294,7 +293,7 @@ Public Class CES
         'Dest.Type Bleibt bestehen
 
         '02 Nummer des Individuum
-        Dest.No = Source.No
+        Dest.ID = Source.ID
 
         '03 Der Pfad - zur Kontrolle wird falscher Pfad gesetzt
         ReDim Dest.Path(Source.Path.GetUpperBound(0))
@@ -372,7 +371,7 @@ Public Class CES
                     List_Childs(i).Path(j) = tmp
                 Next
                 List_Childs(i).mutated = True
-                List_Childs(i).No = i + 1
+                List_Childs(i).ID = i + 1
             Loop While Is_Twin(i) = True Or approved(List_Childs(i).Path) = False
         Next
 
