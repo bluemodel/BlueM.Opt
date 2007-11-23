@@ -1,5 +1,6 @@
 Imports System.IO
 Imports System.Data.OleDb
+Imports System.Globalization
 
 '*******************************************************************************
 '*******************************************************************************
@@ -105,7 +106,7 @@ Public MustInherit Class Sim
         Public SimGr As String                      'Die Simulationsgröße, auf dessen Basis der Qualitätswert berechnet werden soll
         Public ZielFkt As String                    'Zielfunktion
         Public WertTyp As String                    'Gibt an wie der Wert, der mit dem Zielwert verglichen werden soll, aus dem Simulationsergebnis berechnet werden soll.
-        Public ZielWert As String                   'Der vorgegeben Zielwert
+        Public ZielWert As Double                   'Der vorgegeben Zielwert - muss doch eigentlich ein double sein dm 11.2007??
         Public ZielReiheDatei As String             'Der Dateiname der Zielreihe
         Public ZielGr As String                     'Spalte der .wel Datei falls ZielReihe .wel Datei ist
         Public ZielReihe As Wave.Zeitreihe          'Die Werte der Zielreihe
@@ -187,19 +188,20 @@ Public MustInherit Class Sim
 
     'Überprüfen, ob Punkt als Dezimaltrennzeichen eingestellt ist
     '***********************************************************
-    Public Sub checkDezimaltrennzeichen()
+    Public Sub checkDezimaltrennzeichen() 'kann raus, sobald Converttodouble überladen ist dm 11.2007
 
-        Dim ci As System.Globalization.CultureInfo
-        Dim nfi As System.Globalization.NumberFormatInfo
+        'Dim ci As System.Globalization.CultureInfo
+        'Dim nfi As System.Globalization.NumberFormatInfo
 
+        'wird nicht mehr benötigt, wenn über provider die entsprechenden Informationen über . und , gestzt werden dm 11.2007
         'Aktuelle Einstellungen lesen
-        ci = System.Globalization.CultureInfo.CurrentCulture
-        nfi = ci.NumberFormat
+        'ci = System.Globalization.CultureInfo.CurrentCulture
+        'nfi = ci.NumberFormat
 
-        'Dezimaltrennzeichen überprüfen
-        If (Not nfi.NumberDecimalSeparator = ".") Then
-            Throw New Exception("Um mit BlueM oder SMUSI arbeiten zu können, muss in der Systemsteuerung" & Chr(13) & Chr(10) & "als Dezimaltrennzeichen Punkt (.) eingestellt sein!")
-        End If
+        'Dezimaltrennzeichen überprüfen, wird durch provider ersetzt dm 11.2007
+        'If (Not nfi.NumberDecimalSeparator = ".") Then
+        '    Throw New Exception("Um mit BlueM oder SMUSI arbeiten zu können, muss in der Systemsteuerung" & Chr(13) & Chr(10) & "als Dezimaltrennzeichen Punkt (.) eingestellt sein!")
+        'End If
 
     End Sub
 
@@ -357,6 +359,12 @@ Public MustInherit Class Sim
         Dim Zeile As String
         Dim AnzParam As Integer = 0
 
+        'Inputfiles müssen immer mit angelsächsischer Einstellung erstellt sein dm 11.2007
+        Dim provider As NumberFormatInfo = New NumberFormatInfo()
+        provider.NumberDecimalSeparator = "."
+        provider.NumberGroupSeparator = ","
+        provider.NumberGroupSizes = New Integer() {3}
+
         'Anzahl der Parameter feststellen
         Do
             Zeile = StrRead.ReadLine.ToString()
@@ -380,9 +388,9 @@ Public MustInherit Class Sim
                 'Werte zuweisen
                 List_OptParameter(i).Bezeichnung = array(1).Trim()
                 List_OptParameter(i).Einheit = array(2).Trim()
-                List_OptParameter(i).Wert = Convert.ToDouble(array(3).Trim())
-                List_OptParameter(i).Min = Convert.ToDouble(array(4).Trim())
-                List_OptParameter(i).Max = Convert.ToDouble(array(5).Trim())
+                List_OptParameter(i).Wert = Convert.ToDouble(array(3).Trim(), provider) 'dm 11.2007
+                List_OptParameter(i).Min = Convert.ToDouble(array(4).Trim(), provider) ' dm 11.2007
+                List_OptParameter(i).Max = Convert.ToDouble(array(5).Trim(), provider) ' dm 11.2007
                 i += 1
             End If
         Loop Until StrRead.Peek() = -1
@@ -425,6 +433,13 @@ Public MustInherit Class Sim
 
         Dim array() As String
         Dim i As Integer = 0
+
+        'Inputfiles müssen immer mit angelsächsischer Einstellung erstellt sein dm 11.2007
+        Dim provider As NumberFormatInfo = New NumberFormatInfo()
+        provider.NumberDecimalSeparator = "."
+        provider.NumberGroupSeparator = ","
+        provider.NumberGroupSizes = New Integer() {3}
+
         Do
             Zeile = StrRead.ReadLine.ToString()
             If (Zeile.StartsWith("*") = False) Then
@@ -435,10 +450,10 @@ Public MustInherit Class Sim
                 List_ModellParameter(i).Einheit = array(3).Trim()
                 List_ModellParameter(i).Datei = array(4).Trim()
                 List_ModellParameter(i).Element = array(5).Trim()
-                List_ModellParameter(i).ZeileNr = Convert.ToInt16(array(6).Trim())
-                List_ModellParameter(i).SpVon = Convert.ToInt16(array(7).Trim())
-                List_ModellParameter(i).SpBis = Convert.ToInt16(array(8).Trim())
-                List_ModellParameter(i).Faktor = Convert.ToDouble(array(9).Trim())
+                List_ModellParameter(i).ZeileNr = Convert.ToInt16(array(6).Trim(), provider)
+                List_ModellParameter(i).SpVon = Convert.ToInt16(array(7).Trim(), provider)
+                List_ModellParameter(i).SpBis = Convert.ToInt16(array(8).Trim(), provider)
+                List_ModellParameter(i).Faktor = Convert.ToDouble(array(9).Trim(), provider)
                 i += 1
             End If
         Loop Until StrRead.Peek() = -1
@@ -467,6 +482,11 @@ Public MustInherit Class Sim
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
         Dim Zeile As String = ""
+
+        Dim provider As NumberFormatInfo = New NumberFormatInfo()
+        provider.NumberDecimalSeparator = "."
+        provider.NumberGroupSeparator = ","
+        provider.NumberGroupSizes = New Integer() {3}
 
         'Anzahl der Zielfunktionen feststellen
         Do
@@ -501,7 +521,7 @@ Public MustInherit Class Sim
                 List_OptZiele(i).SimGr = ZeilenArray(4).Trim()
                 List_OptZiele(i).ZielFkt = ZeilenArray(5).Trim()
                 List_OptZiele(i).WertTyp = ZeilenArray(6).Trim()
-                List_OptZiele(i).ZielWert = ZeilenArray(7).Trim()
+                If ZeilenArray(7).Trim() <> "" Then List_OptZiele(i).ZielWert = Convert.ToDouble(ZeilenArray(7).Trim(), provider)
                 List_OptZiele(i).ZielGr = ZeilenArray(8).Trim()
                 List_OptZiele(i).ZielReiheDatei = ZeilenArray(9).Trim()
                 i += 1
@@ -525,6 +545,9 @@ Public MustInherit Class Sim
                         Case ".WEL"
                             Dim WEL As New Wave.WEL(Me.WorkDir & .ZielReiheDatei, True)
                             .ZielReihe = WEL.getReihe(.ZielGr)
+                        Case ".ASC"
+                            Dim ASC As New Wave.ASC(Me.WorkDir & .ZielReiheDatei, True)
+                            .ZielReihe = ASC.getReihe(.ZielGr.Substring(5))
                         Case ".ZRE"
                             Dim ZRE As New Wave.ZRE(Me.WorkDir & .ZielReiheDatei, True)
                             .ZielReihe = ZRE.Zeitreihen(0)
@@ -537,7 +560,7 @@ Public MustInherit Class Sim
 
                     'Zeitraum der Zielreihe überprüfen (nur bei WEL und ZRE)
                     '-------------------------------------------------------
-                    If (ext.ToUpper = ".WEL" Or ext.ToUpper = ".ZRE") Then
+                    If (ext.ToUpper = ".WEL" Or ext.ToUpper = ".ZRE" Or ext.ToUpper = ".ASC") Then
 
                         ZielStart = .ZielReihe.XWerte(0)
                         ZielEnde = .ZielReihe.XWerte(.ZielReihe.Length - 1)
@@ -1257,6 +1280,11 @@ Public MustInherit Class Sim
         Dim StrRight As String
         Dim DateiPfad As String
 
+        Dim provider As NumberFormatInfo = New NumberFormatInfo() 'dm 11.2007
+        provider.NumberDecimalSeparator = "."
+        provider.NumberGroupSeparator = ","
+        provider.NumberGroupSizes = New Integer() {3}
+
         'ModellParameter aus OptParametern kalkulieren()
         Call OptParameter_to_ModellParameter()
 
@@ -1267,6 +1295,7 @@ Public MustInherit Class Sim
             'Datei öffnen
             Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.Read)
             Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+            Dim StrReadSync As TextReader = TextReader.Synchronized(StrRead)
 
             'Anzahl der Zeilen feststellen
             AnzZeil = 0
@@ -1283,31 +1312,49 @@ Public MustInherit Class Sim
                 Zeilenarray(j) = StrRead.ReadLine.ToString
             Next
 
+            StrReadSync.Close()
             StrRead.Close()
             FiStr.Close()
 
             'Zeile ändern
             Zeile = Zeilenarray(List_ModellParameter(i).ZeileNr - 1)
             'BUG 170: richtig wäre: Length = SpBis - SpVon + 1
-            Dim Length As Short = List_ModellParameter(i).SpBis - List_ModellParameter(i).SpVon
-            StrLeft = Microsoft.VisualBasic.Left(Zeile, List_ModellParameter(i).SpVon - 1)
-            StrRight = Microsoft.VisualBasic.Right(Zeile, Len(Zeile) - List_ModellParameter(i).SpBis + 1)
-
-            Wert = List_ModellParameter(i).Wert.ToString()
-            If (Wert.Length > Length) Then
-                'TODO: Parameter wird für erforderliche Stringlänge einfach abgeschnitten, sollte aber gerundet werden!
-                Wert = Wert.Substring(0, Length)
+            'Dim Length As Short = List_ModellParameter(i).SpBis - List_ModellParameter(i).SpVon
+            Dim Length As Short = List_ModellParameter(i).SpBis - List_ModellParameter(i).SpVon + 1 'wenn dann auch richtig dm 11.2007
+            StrLeft = Zeile.Substring(0, List_ModellParameter(i).SpVon - 1)
+            'StrRight = Microsoft.VisualBasic.Right(Zeile, Len(Zeile) - List_ModellParameter(i).SpBis +1)
+            If Len(Zeile) > List_ModellParameter(i).SpBis Then '*dm 11.2007
+                StrRight = Zeile.Substring(List_ModellParameter(i).SpBis) 'dm 11.2007
             Else
-                Wert = Wert.PadLeft(Length)
+                StrRight = ""
             End If
+            ' bestimmen des ganzzahligen Anteils, \-Operator ginge zwar theoretisch, ist aber für Zahlen < 1 nicht robust (warum auch immer) dm 11.2007
+            Wert = Convert.ToString(List_ModellParameter(i).Wert - List_ModellParameter(i).Wert Mod 1.0)
+            'Runden auf verfügbare Stellen: Anzahl der Stellen - Anzahl der Vorkommastellen - Komma
+            Wert = Convert.ToString(Math.Round(List_ModellParameter(i).Wert, Length - (Len(Wert) + 1)), provider)
+            If Wert.Length < Length Then
+                For j = 1 To Length - Wert.Length
+                    Wert &= " "
+                Next
+            End If
+            'Ersetzt durch direkte umwandlung mit Rundung auf richtige Länge entsprechend LENGTH
+            'If (Wert.Length > Length) Then
+            '    'TODO: Parameter wird für erforderliche Stringlänge einfach abgeschnitten, sollte aber gerundet werden!
+            '    Wert = Wert.Substring(0, Length)
+            'Else
+            '    Wert = Wert.PadLeft(Length)
+            'End If
             Zeilenarray(List_ModellParameter(i).ZeileNr - 1) = StrLeft & Wert & StrRight
 
             'Alle Zeilen wieder in Datei schreiben
             Dim StrWrite As StreamWriter = New StreamWriter(DateiPfad, False, System.Text.Encoding.GetEncoding("iso8859-1"))
+            Dim StrWriteSync As TextWriter = TextWriter.Synchronized(StrWrite)
+
             For j = 0 To AnzZeil - 1
                 StrWrite.WriteLine(Zeilenarray(j))
             Next
 
+            StrWriteSync.Close()
             StrWrite.Close()
 
         Next
@@ -1394,6 +1441,9 @@ Public MustInherit Class Sim
                 Throw New Exception("PRB als OptZiel geht z.Zt. nicht (siehe Bug 138)")
                 'QWert = QWert_PRB(OptZiel)
 
+            Case "ASC"
+                'QWert aus ASC-Datei
+                QWert = QWert_WEL(OptZiel)
             Case Else
                 'es wurde eine nicht unterstützte Ergebnisdatei angegeben
                 IsOK = False
@@ -1711,6 +1761,7 @@ Public MustInherit Class Sim
 
         Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Dim StrReadSync As TextReader = TextReader.Synchronized(StrRead)
 
         'Array redimensionieren
         ReDim PRB(AnzZeil - 1, 1)
@@ -1731,7 +1782,7 @@ Public MustInherit Class Sim
             PRB(j, 0) = Convert.ToDouble(Zeile.Substring(2, 10))        'X-Wert
             PRB(j, 1) = Convert.ToDouble(Zeile.Substring(13, 8))        'P(Jahr)
         Next
-
+        StrReadSync.Close()
         StrRead.Close()
         FiStr.Close()
 
@@ -1904,6 +1955,11 @@ Public MustInherit Class Sim
 
         Dim command As OleDbCommand = New OleDbCommand("", db)
 
+        Dim provider As NumberFormatInfo = New NumberFormatInfo() 'dm 11.2007
+        provider.NumberDecimalSeparator = "."
+        provider.NumberGroupSeparator = ","
+        provider.NumberGroupSizes = New Integer() {3}
+
         'Sim schreiben
         '-------------
         command.CommandText = "INSERT INTO Sim (Name) VALUES ('" & Me.Datensatz & "')"
@@ -1918,7 +1974,7 @@ Public MustInherit Class Sim
         Dim fieldvalues As String = ""
         For i = 0 To List_OptZiele.GetUpperBound(0)
             fieldnames &= ", [" & List_OptZiele(i).Bezeichnung & "]"
-            fieldvalues &= ", " & List_OptZiele(i).QWertTmp
+            fieldvalues &= ", " & Convert.ToString(List_OptZiele(i).QWertTmp, provider)
         Next
         command.CommandText = "INSERT INTO QWerte (Sim_ID" & fieldnames & ") VALUES (" & Sim_ID & fieldvalues & ")"
         command.ExecuteNonQuery()
@@ -1930,7 +1986,7 @@ Public MustInherit Class Sim
             fieldvalues = ""
             For i = 0 To Me.List_Constraints.GetUpperBound(0)
                 fieldnames &= ", [" & Me.List_Constraints(i).Bezeichnung & "]"
-                fieldvalues &= ", " & Me.List_Constraints(i).ConstTmp
+                fieldvalues &= ", " & Convert.ToString(Me.List_Constraints(i).ConstTmp, provider)
             Next
             command.CommandText = "INSERT INTO [Constraints] (Sim_ID" & fieldnames & ") VALUES (" & Sim_ID & fieldvalues & ")"
             command.ExecuteNonQuery()
@@ -1944,7 +2000,7 @@ Public MustInherit Class Sim
             fieldvalues = ""
             For i = 0 To Me.List_OptParameter.GetUpperBound(0)
                 fieldnames &= ", [" & Me.List_OptParameter(i).Bezeichnung & "]"
-                fieldvalues &= ", " & Me.List_OptParameter(i).Wert
+                fieldvalues &= ", " & Convert.ToString(Me.List_OptParameter(i).Wert, provider)
             Next
             command.CommandText = "INSERT INTO OptParameter (Sim_ID" & fieldnames & ") VALUES (" & Sim_ID & fieldvalues & ")"
             command.ExecuteNonQuery()
