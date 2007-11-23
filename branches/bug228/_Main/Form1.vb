@@ -1635,13 +1635,25 @@ Start_Evolutionsrunden:
     '***************************
     Private Sub clearSelection(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_clearSelection.Click
 
-        'Serie löschen
-        Dim serie As Steema.TeeChart.Styles.Series
-        serie = Me.DForm.Diag.getSeriesPoint("ausgewählte Lösungen")
-        serie.Dispose()
+        'Serie der ausgewählten Lösungen löschen
+        If (globalAnzZiel < 3) Then
+            '2D-Diagramm
+            '-----------
+            Dim serie As Steema.TeeChart.Styles.Series
+            serie = Me.DForm.Diag.getSeriesPoint("ausgewählte Lösungen")
+            serie.Dispose()
+        Else
+            '2D-Diagramm
+            '-----------
+            Dim serie3D As Steema.TeeChart.Styles.Points3D
+            serie3D = Me.DForm.Diag.getSeries3DPoint("ausgewählte Lösungen")
+            serie3D.Dispose()
+        End If
+
         'Annotation löschen
         Me.DForm.Diag.anno1.Text = ""
         Me.DForm.Diag.anno1.Active = False
+
         'Auswahl zurücksetzen
         Call Sim1.OptResult.clearSelectedSolutions()
 
