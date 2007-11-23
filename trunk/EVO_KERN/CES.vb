@@ -130,7 +130,7 @@ Public Class CES
                         x += 1
                     Next
                 Next
-                All_Para = array.Clone
+                All_DN = array.Clone
             End Get
 
             Set(ByVal Array As Double())
