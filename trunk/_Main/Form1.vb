@@ -1091,7 +1091,6 @@ Start_Evolutionsrunden:
         For PES1.PES_iAkt.iAktRunde = 0 To PES1.PES_Settings.NRunden - 1
 
             Call EVO_Opt_Verlauf1.Runden(PES1.PES_iAkt.iAktRunde + 1)
-            System.Windows.Forms.Application.DoEvents()
             Call PES1.EsResetPopBWSpeicher() 'Nur bei Komma Strategie
 
             'Über alle Populationen
@@ -1099,7 +1098,6 @@ Start_Evolutionsrunden:
             For PES1.PES_iAkt.iAktPop = 0 To PES1.PES_Settings.NPopul - 1
 
                 Call EVO_Opt_Verlauf1.Populationen(PES1.PES_iAkt.iAktPop + 1)
-                System.Windows.Forms.Application.DoEvents()
 
                 'POPULATIONS REPRODUKTIONSPROZESS
                 '################################
@@ -1116,7 +1114,6 @@ Start_Evolutionsrunden:
                 For PES1.PES_iAkt.iAktGen = 0 To PES1.PES_Settings.NGen - 1
 
                     Call EVO_Opt_Verlauf1.Generation(PES1.PES_iAkt.iAktGen + 1)
-                    System.Windows.Forms.Application.DoEvents()
                     Call PES1.EsResetBWSpeicher()  'Nur bei Komma Strategie
 
                     'Über alle Nachkommen
@@ -1124,7 +1121,6 @@ Start_Evolutionsrunden:
                     For PES1.PES_iAkt.iAktNachf = 0 To PES1.PES_Settings.NNachf - 1
 
                         Call EVO_Opt_Verlauf1.Nachfolger(PES1.PES_iAkt.iAktNachf + 1)
-                        System.Windows.Forms.Application.DoEvents()
 
                         durchlauf += 1
 

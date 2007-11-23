@@ -83,24 +83,28 @@ Public Partial Class EVO_Opt_Verlauf
         Eigenschaft.NRunden = NRunden
         ProgressBarRunde.Value = Eigenschaft.NRunden
         LabelaktRunde.Text = Eigenschaft.NRunden.ToString()
+        System.Windows.Forms.Application.DoEvents()
     End Sub
 
     Public Sub Populationen(ByRef NPopul As Short)
         Eigenschaft.NPopul = NPopul
         ProgressBarPop.Value = Eigenschaft.NPopul
         LabelaktPop.Text = Eigenschaft.NPopul.ToString()
+        System.Windows.Forms.Application.DoEvents()
     End Sub
 
     Public Sub Generation(ByRef NGen As Short)
         Eigenschaft.NGen = NGen
         ProgressBarGen.Value = Eigenschaft.NGen
         LabelaktGen.Text = Eigenschaft.NGen.ToString()
+        System.Windows.Forms.Application.DoEvents()
     End Sub
 
     Public Sub Nachfolger(ByRef NNachf As Short)
         Eigenschaft.NNachf = NNachf
         ProgressBarNach.Value = Eigenschaft.NNachf
         LabelaktNachf.Text = Eigenschaft.NNachf.ToString()
+        System.Windows.Forms.Application.DoEvents()
     End Sub
 
 End Class
