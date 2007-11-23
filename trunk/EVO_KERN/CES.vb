@@ -84,9 +84,10 @@ Public Class CES
 
         End Property
 
-        'Gibt ein Array mit den Parametern aller Locations zurück
-        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        Public ReadOnly Property All_Para() As Double()
+        'Gibt ein Array mit den Parametern aller Locations zurück !oder!
+        'Setzt die Zahl der locations auf 1 und schreibt dort alle Parameter rein
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        Public Property All_Para() As Double()
             Get
                 Dim i, j, x As Integer
                 Dim array() As Double = {}
@@ -101,7 +102,49 @@ Public Class CES
                 All_Para = array.Clone
             End Get
 
+            Set(ByVal Array As Double())
+                Dim i As Integer
+
+                ReDim Preserve Loc(0)
+                ReDim Preserve Loc(0).Loc_Para(1, Array.GetUpperBound(0))
+                For i = 0 To Loc(0).Loc_Para.GetUpperBound(1)
+                    Loc(0).Loc_Para(1, i) = Array(i)
+                Next
+            End Set
+
         End Property
+
+
+    'Gibt ein Array mit den DNs aller Locations zurück !oder!
+    'Setzt die Zahl der locations auf 1 und schreibt dort alle DNs rein
+    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        Public Property All_DN() As Double()
+            Get
+                Dim i, j, x As Integer
+                Dim array() As Double = {}
+                x = 0
+                For i = 0 To Loc.GetUpperBound(0)
+                    For j = 0 To Loc(i).Loc_Dn.GetUpperBound(0)
+                        ReDim Preserve array(x)
+                        array(x) = Loc(i).Loc_Dn(j)
+                        x += 1
+                    Next
+                Next
+                All_Para = array.Clone
+            End Get
+
+            Set(ByVal Array As Double())
+                Dim i As Integer
+
+                ReDim Preserve Loc(0)
+                ReDim Preserve Loc(0).Loc_Dn(Array.GetUpperBound(0))
+                For i = 0 To Loc(0).Loc_Dn.GetUpperBound(0)
+                    Loc(0).Loc_Dn(i) = Array(i)
+                Next
+            End Set
+
+        End Property
+
     End Structure
 
     'Informationen pro Location

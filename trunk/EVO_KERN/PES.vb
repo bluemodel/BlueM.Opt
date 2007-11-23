@@ -36,22 +36,22 @@ Public Class PES
         Dim NEltern As Integer                'Anzahl Eltern
         Dim NNachf As Integer                 'Anzahl Kinder
         Dim NGen As Integer                   'Anzahl Generationen
-        Dim iEvoTyp As EVO_STRATEGIE        'Typ der Evolutionsstrategie (+ oder ,)
-        Dim iPopEvoTyp As EVO_STRATEGIE     'Typ der Evolutionsstrategie (+ oder ,) auf Populationsebene
-        Dim iPopPenalty As EVO_POP_PENALTY  'Art der Beurteilung der Populationsgüte (Multiobjective)
-        Dim isPOPUL As Boolean              'Mit Populationen
-        Dim is_MO_Pareto As Boolean         'Multi-Objective mit Pareto Front
+        Dim iEvoTyp As EVO_STRATEGIE          'Typ der Evolutionsstrategie (+ oder ,)
+        Dim iPopEvoTyp As EVO_STRATEGIE       'Typ der Evolutionsstrategie (+ oder ,) auf Populationsebene
+        Dim iPopPenalty As EVO_POP_PENALTY    'Art der Beurteilung der Populationsgüte (Multiobjective)
+        Dim isPOPUL As Boolean                'Mit Populationen
+        Dim is_MO_Pareto As Boolean           'Multi-Objective mit Pareto Front
         Dim NRunden As Integer                'Anzahl Runden
         Dim NPopul As Integer                 'Anzahl Populationen
         Dim NPopEltern As Integer             'Anzahl Populationseltern
-        Dim iOptPopEltern As EVO_POP_ELTERN 'Ermittlung der Populationseltern
-        Dim iOptEltern As EVO_ELTERN        'Ermittlung der Individuum-Eltern
+        Dim iOptPopEltern As EVO_POP_ELTERN   'Ermittlung der Populationseltern
+        Dim iOptEltern As EVO_ELTERN          'Ermittlung der Individuum-Eltern
         Dim NRekombXY As Integer              'X/Y-Schema Rekombination
-        Dim DnStart As Single               'Startschrittweite
-        Dim iStartPar As EVO_STARTPARAMETER 'Startparameter
-        Dim isDnVektor As Boolean           'Soll ein Schrittweitenvektor benutzt werden
-        Dim interact As Integer               'Alle wieviel Generationen soll die aktuelle Population mit Mitgliedern der sekundären Population aufgefüllt werden
-        Dim isInteract As Boolean           'Mit Austausch zwischen Population und Sekundärer Population
+        Dim DnStart As Single                 'Startschrittweite
+        Dim iStartPar As EVO_STARTPARAMETER   'Startparameter
+        Dim isDnVektor As Boolean             'Soll ein Schrittweitenvektor benutzt werden
+        Dim NInteract As Integer               'Alle wieviel Generationen soll die aktuelle Population mit Mitgliedern der sekundären Population aufgefüllt werden
+        Dim isInteract As Boolean             'Mit Austausch zwischen Population und Sekundärer Population
         Dim NMemberSecondPop As Integer       'Maximale Anzahl Mitglieder der Sekundärpopulation
     End Structure
 
@@ -124,9 +124,9 @@ Public Class PES
     'Deklarationsteil für Non-Dominated Sorting
     '******************************************
     Private Structure Struct_NDSorting
-        Dim penalty() As Double             '01 Werte der Penaltyfunktion(en)
-        Dim constrain() As Double           '02 Werte der Randbedingung(en)
-        Dim feasible As Boolean             '03 Gültiges Ergebnis
+        Dim Penalty() As Double             '01 Werte der Penaltyfunktion(en)
+        Dim Constrain() As Double           '02 Werte der Randbedingung(en)
+        Dim feasible As Boolean             '03 Gültiges Ergebnis fehlt im Individuum
         Dim dominated As Boolean            '04 Kennzeichnung ob dominiert
         Dim Front As Integer                  '05 Nummer der Pareto Front
         Dim X() As Double                   '06 Wert der Variablen
@@ -406,7 +406,7 @@ Public Class PES
     'PES_Settings.iStartPar 2: Originalparameter    -> Schrittweite = Startschrittweite
     '                                               -> Parameterwert = Originalparameter
     '***********************************************************************************
-    Public Sub EsStartvalues(ByVal Parameter() As Double, ByVal beziehungen() as Beziehung)
+    Public Sub EsStartvalues(ByVal Parameter() As Double, ByVal beziehungen() As Beziehung)
 
         Dim i As Integer
 
@@ -1301,7 +1301,7 @@ StartMutation:
 
             '4: Sekundäre Population wird bestimmt und gespeichert
             '-----------------------------------------------------
-            SekundärQb_allocation(NFrontMember_aktuell, NDSResult)
+            SekundärQb_Allocation(NFrontMember_aktuell, NDSResult)
 
 
             '5: Neue Eltern werden gleich dem Bestwertspeicher gesetzt
@@ -1364,7 +1364,7 @@ StartMutation:
 
         'Prüfen, ob die Population jetzt mit Mitgliedern aus der Sekundären Population aufgefüllt werden soll
         '----------------------------------------------------------------------------------------------------
-        If (PES_iAkt.iAktGen Mod PES_Settings.interact) = 0 And PES_Settings.isInteract Then
+        If (PES_iAkt.iAktGen Mod PES_Settings.NInteract) = 0 And PES_Settings.isInteract Then
             NFrontMember_aktuell = Count_Front_Members(1, SekundärQb)
             If NFrontMember_aktuell > PES_Settings.NEltern Then
                 'Crowding Distance
