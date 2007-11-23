@@ -269,10 +269,10 @@ Public Class EVO_Einstellungen
         _settings.isDnVektor = CheckisDnVektor.Checked
         If (Val(TextInteract.Text) <= 0) Then
             _settings.isInteract = False
-            _settings.interact = 1
+            _settings.NInteract = 1
         Else
             _settings.isInteract = True
-            _settings.interact = Val(TextInteract.Text)
+            _settings.NInteract = Val(TextInteract.Text)
         End If
         _settings.NMemberSecondPop = Val(TextNMemberSecondPop.Text)
 
