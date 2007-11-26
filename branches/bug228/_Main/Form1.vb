@@ -67,6 +67,9 @@ Partial Class Form1
 
     Const eol As String = Chr(13) & Chr(10)             'Zeilenumbruch
 
+    'Dialog für Lösungsanzeige
+    Public WithEvents solutionDialog As SolutionDialog
+
 #End Region 'Eigenschaften
 
 #Region "Methoden"
@@ -127,8 +130,6 @@ Partial Class Form1
 
             'Ergebnis-Buttons
             Me.Button_openMDB.Enabled = False
-            Me.Button_clearSelection.Enabled = False
-            Me.Button_showWave.Enabled = False
             Me.Button_Scatterplot.Enabled = False
 
             'EVO_Settings zurücksetzen
@@ -228,8 +229,6 @@ Partial Class Form1
 
             'Ergebnis-Buttons
             Me.Button_openMDB.Enabled = False
-            Me.Button_clearSelection.Enabled = False
-            Me.Button_showWave.Enabled = False
             Me.Button_Scatterplot.Enabled = False
 
             'EVO_Einstellungen deaktivieren
@@ -1502,17 +1501,8 @@ Start_Evolutionsrunden:
 
             Dim xWert, yWert, zWert As Double
             Dim xAchse, yAchse, zAchse As String
-            Dim i, solID As Integer
+            Dim solutionID As Integer
             Dim sol As Solution
-            Dim ParamString As String                       'String für die Anzeige der OptParameter
-            Dim QWertString As String                       'String für die Anzeige der QWerte
-            Dim ConstrString As String                      'String für die Anzeige der Constraints
-
-            Const format As String = "G5"
-
-            ParamString = "OptParameter:"
-            QWertString = eol & eol & "QWerte:"
-            ConstrString = eol & eol & "Constraints:"
 
             'Punkt-Informationen bestimmen
             '-----------------------------
@@ -1523,13 +1513,13 @@ Start_Evolutionsrunden:
             xAchse = Me.DForm.Diag.Chart.Axes.Bottom.Title.Caption
             yAchse = Me.DForm.Diag.Chart.Axes.Left.Title.Caption
             'Solution-ID
-            solID = s.Labels(valueIndex)
+            solutionID = s.Labels(valueIndex)
 
             'Lösung holen
             '------------
-            sol = Sim1.OptResult.getSolution(solID)
+            sol = Sim1.OptResult.getSolution(solutionID)
 
-            If (sol.ID = solID) Then
+            If (sol.ID = solutionID) Then
 
                 'Lösung zu ausgewählten Lösungen hinzufügen
                 Call Sim1.OptResult.selectSolution(sol.ID)
@@ -1560,80 +1550,29 @@ Start_Evolutionsrunden:
                     serie3D.Marks.ArrowLength = 10
                 End If
 
-                'OptParameter String
-                '-------------------
-                Select Case Me.Method
-
-                    Case METH_PES, METH_SENSIPLOT
-
-                        For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
-                            ParamString &= eol & "* " & Sim1.List_OptParameter(i).Bezeichnung & ": " & sol.OptPara(i).ToString(format)
-                        Next
-
-                        'BUG 228: OptParameterStrings für CES
-
-                        'Case METH_CES
-
-                        '    'String für die Anzeige der Pfade wird generiert
-                        '    ParamString = eol & "Pfad: "
-                        '    For i = 0 To Sim1.Akt.Measures.GetUpperBound(0)
-                        '        ParamString &= eol & "* " & Sim1.List_Locations(i).Name & ": " & sol.Akt(i).Measures(i)
-                        '    Next
-
-
-                        'Case METH_CES_PES
-
-                        '    'String für die Anzeige von Pfad/OptParameter wird generiert
-                        '    ParamString = eol & "Pfad: "
-                        '    For i = 0 To Sim1.Akt.Measures.GetUpperBound(0)
-                        '        ParamString &= eol & "* " & Sim1.List_Locations(i).Name & ": " & sol.Akt(i).Measures(i)
-                        '    Next
-                        '    ParamString &= eol & eol & "OptParameter: "
-                        '    For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
-                        '        With Sim1.List_OptParameter(i)
-                        '            ParamString &= eol & "* " & .Bezeichnung & ": " & sol.OptPara(i).ToString(format)
-                        '        End With
-                        '    Next
-
-                End Select
-
-                'QWerte String
-                '-------------
-                For i = 0 To Sim1.List_OptZiele.GetUpperBound(0)
-                    QWertString &= eol & "* " & Sim1.List_OptZiele(i).Bezeichnung & ": " & sol.QWerte(i).ToString(format)
-                Next
-
-                'Constraints String
-                '------------------
-                If (Sim1.List_Constraints.GetLength(0) > 0) Then
-                    For i = 0 To Sim1.List_Constraints.GetUpperBound(0)
-                        ConstrString &= eol & "* " & Sim1.List_Constraints(i).Bezeichnung & ": " & sol.Constraints(i).ToString(format)
-                    Next
-                Else
-                    ConstrString = ""
+                'Lösungsdialog initialisieren
+                If (IsNothing(Me.solutionDialog)) Then
+                    Me.solutionDialog = New SolutionDialog(Sim1.List_OptParameter, Sim1.List_OptZiele, Sim1.List_Constraints)
                 End If
 
-                'Annotation anzeigen
-                '-------------------
-                If (Me.DForm.Diag.anno1.Text.Length > 0) Then Me.DForm.Diag.anno1.Text &= eol & eol
-                Me.DForm.Diag.anno1.Text &= "Lösung " & sol.ID & ":" & eol & "---------" & eol & ParamString & QWertString & ConstrString
-                Me.DForm.Diag.anno1.Active = True
+                'Lösungsdialog anzeigen
+                Call Me.solutionDialog.Show()
+
+                'Lösung zum Lösungsdialog hinzufügen
+                Call Me.solutionDialog.addSolution(sol)
+
+                'Lösungsdialog nach vorne bringen
+                Call Me.solutionDialog.BringToFront()
 
             End If
 
-        End If
-
-        'Ergebnis-Buttons
-        If (Sim1.OptResult.getSelectedSolutions().Length > 0) Then
-            Me.Button_clearSelection.Enabled = True
-            Me.Button_showWave.Enabled = True
         End If
 
     End Sub
 
     'Lösungsauswahl zurücksetzen
     '***************************
-    Private Sub clearSelection(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_clearSelection.Click
+    Public Sub clearSelection(ByVal sender As System.Object, ByVal e As System.EventArgs)
 
         'Serie der ausgewählten Lösungen löschen
         If (globalAnzZiel < 3) Then
@@ -1649,23 +1588,16 @@ Start_Evolutionsrunden:
             serie3D = Me.DForm.Diag.getSeries3DPoint("ausgewählte Lösungen")
             serie3D.Dispose()
         End If
-
-        'Annotation löschen
-        Me.DForm.Diag.anno1.Text = ""
-        Me.DForm.Diag.anno1.Active = False
+        Call Me.DForm.Diag.Refresh()
 
         'Auswahl zurücksetzen
         Call Sim1.OptResult.clearSelectedSolutions()
-
-        'Ergebnis-Buttons
-        Me.Button_clearSelection.Enabled = False
-        Me.Button_showWave.Enabled = False
 
     End Sub
 
     'ausgewählte Lösungen simulieren und in Wave anzeigen
     '****************************************************
-    Private Sub showWave(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_showWave.Click
+    Public Sub showWave(ByVal sender As System.Object, ByVal e As System.EventArgs)
 
         Dim i As Integer
         Dim isOK As Boolean
@@ -1731,13 +1663,6 @@ Start_Evolutionsrunden:
             Next
 
         Next sol
-
-        'Annotation anzeigen
-        '-------------------
-        Dim anno1 As New Steema.TeeChart.Tools.Annotation(Wave1.TChart1.Chart)
-        anno1.Text = Me.DForm.Diag.anno1.Text
-        anno1.Shape.Font.Name = "Courier New"
-        anno1.Position = Steema.TeeChart.Tools.AnnotationPositions.RightBottom
 
         'Wave anzeigen
         '-------------

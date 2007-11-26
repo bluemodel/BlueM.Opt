@@ -41,9 +41,10 @@ Public Class OptResult
     End Structure
 
     'Array von Sekundären Populationen
-    Private SekPops() As Struct_SekPop               'Array von Sekundären Populationen
+    Private SekPops() As Struct_SekPop
 
-    Private selSolutionIDs() As Integer             'ausgewählte Lösungen (für Wave)
+    'Array von ausgewählten Lösungen
+    Private selSolutionIDs() As Integer
 
     'Konstruktor
     '***********

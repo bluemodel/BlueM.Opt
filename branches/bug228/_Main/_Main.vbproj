@@ -146,6 +146,12 @@
     <Compile Include="Diagramm\MDBImportDialog.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Diagramm\SolutionDialog.Designer.vb">
+      <DependentUpon>SolutionDialog.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Diagramm\SolutionDialog.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="EVOMOD.vb" />
     <Compile Include="EVO_Einstellungen.Designer.vb">
       <DependentUpon>EVO_Einstellungen.vb</DependentUpon>
@@ -206,6 +212,10 @@
     <EmbeddedResource Include="Diagramm\MDBImportDialog.resx">
       <SubType>Designer</SubType>
       <DependentUpon>MDBImportDialog.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Diagramm\SolutionDialog.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>SolutionDialog.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="EVO_Einstellungen.resX">
       <DependentUpon>EVO_Einstellungen.vb</DependentUpon>

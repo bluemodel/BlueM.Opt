@@ -33,9 +33,6 @@ Partial Class Form1
         Me.Button_Start = New System.Windows.Forms.Button
         Me.Button_IniMethod = New System.Windows.Forms.Button
         Me.LinkLabel_WorkDir = New System.Windows.Forms.LinkLabel
-        Me.Button_Scatterplot = New System.Windows.Forms.Button
-        Me.Button_showWave = New System.Windows.Forms.Button
-        Me.Button_clearSelection = New System.Windows.Forms.Button
         Me.Button_openMDB = New System.Windows.Forms.Button
         Me.GroupBox_Anwendung = New System.Windows.Forms.GroupBox
         Me.Label_Methode = New System.Windows.Forms.Label
@@ -48,9 +45,8 @@ Partial Class Form1
         Me.EVO_Opt_Verlauf1 = New IHWB.EVO.EVO_Opt_Verlauf
         Me.EVO_Settings1 = New IHWB.EVO.EVO_Einstellungen
         Me.DForm = New IHWB.EVO.DiagrammForm
-        Me.GroupBox_Ergebnisse = New System.Windows.Forms.GroupBox
+        Me.Button_Scatterplot = New System.Windows.Forms.Button
         Me.GroupBox_Anwendung.SuspendLayout()
-        Me.GroupBox_Ergebnisse.SuspendLayout()
         Me.SuspendLayout()
         '
         'Button_Start
@@ -90,44 +86,11 @@ Partial Class Form1
         Me.LinkLabel_WorkDir.TabIndex = 9
         Me.ToolTip1.SetToolTip(Me.LinkLabel_WorkDir, "Datensatz ändern")
         '
-        'Button_Scatterplot
-        '
-        Me.Button_Scatterplot.Enabled = False
-        Me.Button_Scatterplot.Image = Global.IHWB.EVO.My.Resources.Resources.scatterplot
-        Me.Button_Scatterplot.Location = New System.Drawing.Point(99, 19)
-        Me.Button_Scatterplot.Name = "Button_Scatterplot"
-        Me.Button_Scatterplot.Size = New System.Drawing.Size(25, 25)
-        Me.Button_Scatterplot.TabIndex = 9
-        Me.ToolTip1.SetToolTip(Me.Button_Scatterplot, "Scatterplot-Matrix anzeigen")
-        Me.Button_Scatterplot.UseVisualStyleBackColor = True
-        '
-        'Button_showWave
-        '
-        Me.Button_showWave.Enabled = False
-        Me.Button_showWave.Image = Global.IHWB.EVO.My.Resources.Resources.wave
-        Me.Button_showWave.Location = New System.Drawing.Point(68, 19)
-        Me.Button_showWave.Name = "Button_showWave"
-        Me.Button_showWave.Size = New System.Drawing.Size(25, 25)
-        Me.Button_showWave.TabIndex = 11
-        Me.ToolTip1.SetToolTip(Me.Button_showWave, "Wave anzeigen")
-        Me.Button_showWave.UseVisualStyleBackColor = True
-        '
-        'Button_clearSelection
-        '
-        Me.Button_clearSelection.Enabled = False
-        Me.Button_clearSelection.Image = Global.IHWB.EVO.My.Resources.Resources.cancel
-        Me.Button_clearSelection.Location = New System.Drawing.Point(37, 19)
-        Me.Button_clearSelection.Name = "Button_clearSelection"
-        Me.Button_clearSelection.Size = New System.Drawing.Size(25, 25)
-        Me.Button_clearSelection.TabIndex = 12
-        Me.ToolTip1.SetToolTip(Me.Button_clearSelection, "Auswahl zurücksetzen")
-        Me.Button_clearSelection.UseVisualStyleBackColor = True
-        '
         'Button_openMDB
         '
         Me.Button_openMDB.Enabled = False
         Me.Button_openMDB.Image = Global.IHWB.EVO.My.Resources.Resources.page_white_database
-        Me.Button_openMDB.Location = New System.Drawing.Point(6, 19)
+        Me.Button_openMDB.Location = New System.Drawing.Point(500, 650)
         Me.Button_openMDB.Name = "Button_openMDB"
         Me.Button_openMDB.Size = New System.Drawing.Size(25, 25)
         Me.Button_openMDB.TabIndex = 13
@@ -235,25 +198,24 @@ Partial Class Form1
         Me.DForm.Size = New System.Drawing.Size(473, 625)
         Me.DForm.TabIndex = 8
         '
-        'GroupBox_Ergebnisse
+        'Button_Scatterplot
         '
-        Me.GroupBox_Ergebnisse.Controls.Add(Me.Button_openMDB)
-        Me.GroupBox_Ergebnisse.Controls.Add(Me.Button_Scatterplot)
-        Me.GroupBox_Ergebnisse.Controls.Add(Me.Button_clearSelection)
-        Me.GroupBox_Ergebnisse.Controls.Add(Me.Button_showWave)
-        Me.GroupBox_Ergebnisse.Location = New System.Drawing.Point(419, 631)
-        Me.GroupBox_Ergebnisse.Name = "GroupBox_Ergebnisse"
-        Me.GroupBox_Ergebnisse.Size = New System.Drawing.Size(132, 50)
-        Me.GroupBox_Ergebnisse.TabIndex = 14
-        Me.GroupBox_Ergebnisse.TabStop = False
-        Me.GroupBox_Ergebnisse.Text = "Ergebnisse"
+        Me.Button_Scatterplot.Enabled = False
+        Me.Button_Scatterplot.Image = Global.IHWB.EVO.My.Resources.Resources.scatterplot
+        Me.Button_Scatterplot.Location = New System.Drawing.Point(531, 649)
+        Me.Button_Scatterplot.Name = "Button_Scatterplot"
+        Me.Button_Scatterplot.Size = New System.Drawing.Size(25, 25)
+        Me.Button_Scatterplot.TabIndex = 9
+        Me.ToolTip1.SetToolTip(Me.Button_Scatterplot, "Scatterplot-Matrix anzeigen")
+        Me.Button_Scatterplot.UseVisualStyleBackColor = True
         '
         'Form1
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.BackColor = System.Drawing.SystemColors.Control
         Me.ClientSize = New System.Drawing.Size(706, 768)
-        Me.Controls.Add(Me.GroupBox_Ergebnisse)
+        Me.Controls.Add(Me.Button_Scatterplot)
+        Me.Controls.Add(Me.Button_openMDB)
         Me.Controls.Add(Me.Button_Start)
         Me.Controls.Add(Me.Testprobleme1)
         Me.Controls.Add(Me.GroupBox_Anwendung)
@@ -268,7 +230,6 @@ Partial Class Form1
         Me.Text = "Evolutionsstrategie"
         Me.GroupBox_Anwendung.ResumeLayout(False)
         Me.GroupBox_Anwendung.PerformLayout()
-        Me.GroupBox_Ergebnisse.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
@@ -283,10 +244,7 @@ Partial Class Form1
     Friend WithEvents ComboBox_Methode As System.Windows.Forms.ComboBox
     Friend WithEvents Label_Methode As System.Windows.Forms.Label
     Friend WithEvents OpenFileDialog_Datensatz As System.Windows.Forms.OpenFileDialog
-    Friend WithEvents Button_Scatterplot As System.Windows.Forms.Button
     Friend WithEvents OpenFileDialog_MDB As System.Windows.Forms.OpenFileDialog
-    Friend WithEvents Button_showWave As System.Windows.Forms.Button
-    Friend WithEvents Button_clearSelection As System.Windows.Forms.Button
     Friend WithEvents Button_openMDB As System.Windows.Forms.Button
-    Friend WithEvents GroupBox_Ergebnisse As System.Windows.Forms.GroupBox
+    Friend WithEvents Button_Scatterplot As System.Windows.Forms.Button
 End Class
