@@ -79,6 +79,9 @@
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Individuum.vb">
+      <CustomToolNamespace>Individ</CustomToolNamespace>
+    </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="PES.vb">
       <SubType>Code</SubType>
