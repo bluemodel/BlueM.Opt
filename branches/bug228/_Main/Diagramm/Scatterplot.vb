@@ -15,12 +15,17 @@ Partial Public Class Scatterplot
     '*******************************************************************************
 
     Private Diags(,) As Diagramm
-    Private OptResult As EVO.OptResult
-    Private nOptZiele As Integer
+    Private OptResult As IHWB.EVO.OptResult
+    Private SekPopOnly As Boolean
+    Private ReadOnly Property nOptZiele() As Integer
+        Get
+            Return Me.OptResult.List_OptZiele.Length()
+        End Get
+    End Property
 
     'Konstruktor
     '***********
-    Public Sub New(ByVal optres As EVO.OptResult)
+    Public Sub New(ByVal optres As IHWB.EVO.OptResult, ByVal _sekpoponly As Boolean)
 
         ' Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent()
@@ -29,7 +34,9 @@ Partial Public Class Scatterplot
 
         'Optimierungsergebnis übergeben
         Me.OptResult = optres
-        Me.nOptZiele = optres.List_OptZiele.Length()
+
+        'SekPop-Flag setzen
+        Me.SekPopOnly = _sekpoponly
 
         'Diagramme zeichnen
         Call Me.zeichnen()
@@ -43,7 +50,7 @@ Partial Public Class Scatterplot
         'Matrix dimensionieren
         Call Me.dimensionieren()
 
-        Dim i, j, n As Integer
+        Dim i, j As Integer
         Dim xAchse, yAchse As String
         Dim serie As Steema.TeeChart.Styles.Series
 
@@ -101,17 +108,27 @@ Partial Public Class Scatterplot
                     End If
 
                     'Punkte eintragen
-                    '----------------
-                    serie = .getSeriesPoint(xAchse & ", " & yAchse, "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-
-                    For n = 0 To OptResult.Solutions.GetUpperBound(0)
-                        'Constraintverletzung prüfen
-                        If (Not OptResult.Solutions(n).isValid) Then
-                            serie = .getSeriesPoint(xAchse & ", " & yAchse & " (ungültig)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                        End If
-                        'Zeichnen
-                        serie.Add(OptResult.Solutions(n).QWerte(i), OptResult.Solutions(n).QWerte(j))
-                    Next
+                    '================
+                    If (Me.SekPopOnly) Then
+                        'Nur Sekundäre Population
+                        '------------------------
+                        serie = .getSeriesPoint(xAchse & ", " & yAchse, "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        For Each sol As Solution In Me.OptResult.getSekPop()
+                            serie.Add(sol.QWerte(i), sol.QWerte(j), sol.ID)
+                        Next
+                    Else
+                        'Alle Lösungen
+                        '-------------
+                        serie = .getSeriesPoint(xAchse & ", " & yAchse, "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        For Each sol As Solution In Me.OptResult.Solutions
+                            'Constraintverletzung prüfen
+                            If (Not sol.isValid) Then
+                                serie = .getSeriesPoint(xAchse & ", " & yAchse & " (ungültig)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                            End If
+                            'Zeichnen
+                            serie.Add(sol.QWerte(i), sol.QWerte(j), sol.ID)
+                        Next
+                    End If
 
                     If (i = j) Then
                         'Diagramme auf der Diagonalen ausblenden

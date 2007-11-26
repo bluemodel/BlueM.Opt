@@ -1677,11 +1677,22 @@ Start_Evolutionsrunden:
     '****************************
     Private Sub showScatterplot(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Scatterplot.Click
 
+        Dim diagresult As DialogResult
+        Dim SekPopOnly As Boolean
+
+        'Abfrage, ob nur Sekundäre Population gezeichnet werden soll
+        '-----------------------------------------------------------
+        diagresult = MsgBox("Soll nur die Sekundäre Population angezeigt werden?", MsgBoxStyle.YesNo, "Scatterplot-Matrix")
+
+        If (diagresult = Windows.Forms.DialogResult.Yes) Then
+            SekPopOnly = True
+        End If
+
         Cursor = Cursors.WaitCursor
 
-        'Scatterplot
-        '-----------
-        Dim scatterplot1 As New Scatterplot(Sim1.OptResult)
+        'Scatterplot-Matrix
+        '------------------
+        Dim scatterplot1 As New Scatterplot(Sim1.OptResult, SekPopOnly)
         Call scatterplot1.Show()
 
         Cursor = Cursors.Default
