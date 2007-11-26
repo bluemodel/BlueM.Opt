@@ -67,8 +67,9 @@ Partial Class Form1
 
     Const eol As String = Chr(13) & Chr(10)             'Zeilenumbruch
 
-    'Dialog für Lösungsanzeige
+    'Dialoge
     Public WithEvents solutionDialog As SolutionDialog
+    Public WithEvents scatterplot1 As Scatterplot
 
 #End Region 'Eigenschaften
 
@@ -1550,23 +1551,32 @@ Start_Evolutionsrunden:
                     serie3D.Marks.ArrowLength = 10
                 End If
 
-                'Lösungsdialog initialisieren
-                If (IsNothing(Me.solutionDialog)) Then
-                    Me.solutionDialog = New SolutionDialog(Sim1.List_OptParameter, Sim1.List_OptZiele, Sim1.List_Constraints)
-                End If
-
-                'Lösungsdialog anzeigen
-                Call Me.solutionDialog.Show()
-
-                'Lösung zum Lösungsdialog hinzufügen
-                Call Me.solutionDialog.addSolution(sol)
-
-                'Lösungsdialog nach vorne bringen
-                Call Me.solutionDialog.BringToFront()
+                'Lösung auswählen
+                Call Me.selectSolution(sol)
 
             End If
 
         End If
+
+    End Sub
+
+    'Eine Lösung auswählen
+    '*********************
+    Public Sub selectSolution(ByVal sol As Solution) Handles scatterplot1.solutionSelected
+
+        'Lösungsdialog initialisieren
+        If (IsNothing(Me.solutionDialog)) Then
+            Me.solutionDialog = New SolutionDialog(Sim1.List_OptParameter, Sim1.List_OptZiele, Sim1.List_Constraints)
+        End If
+
+        'Lösungsdialog anzeigen
+        Call Me.solutionDialog.Show()
+
+        'Lösung zum Lösungsdialog hinzufügen
+        Call Me.solutionDialog.addSolution(sol)
+
+        'Lösungsdialog nach vorne bringen
+        Call Me.solutionDialog.BringToFront()
 
     End Sub
 
@@ -1575,6 +1585,10 @@ Start_Evolutionsrunden:
     Public Sub clearSelection(ByVal sender As System.Object, ByVal e As System.EventArgs)
 
         'Serie der ausgewählten Lösungen löschen
+        '=======================================
+
+        'Im Hauptdiagramm
+        '----------------
         If (globalAnzZiel < 3) Then
             '2D-Diagramm
             '-----------
@@ -1590,7 +1604,14 @@ Start_Evolutionsrunden:
         End If
         Call Me.DForm.Diag.Refresh()
 
-        'Auswahl zurücksetzen
+        'In der Scatterplot-Matrix
+        '-------------------------
+        If (Not IsNothing(Me.scatterplot1)) Then
+            Call scatterplot1.clearSelection()
+        End If
+
+        'Auswahl intern zurücksetzen
+        '===========================
         Call Sim1.OptResult.clearSelectedSolutions()
 
     End Sub
@@ -1692,7 +1713,7 @@ Start_Evolutionsrunden:
 
         'Scatterplot-Matrix
         '------------------
-        Dim scatterplot1 As New Scatterplot(Sim1.OptResult, SekPopOnly)
+        scatterplot1 = New Scatterplot(Sim1.OptResult, SekPopOnly)
         Call scatterplot1.Show()
 
         Cursor = Cursors.Default

@@ -22,6 +22,7 @@ Partial Public Class Scatterplot
             Return Me.OptResult.List_OptZiele.Length()
         End Get
     End Property
+    Public Event solutionSelected(sol As Solution)
 
     'Konstruktor
     '***********
@@ -137,8 +138,8 @@ Partial Public Class Scatterplot
                         serie.Cursor = Cursors.Default      'Kein Hand-Cursor
                         serie.Color = Color.Empty           'Punkte unsichtbar
                     Else
-                        'alle anderen kriegen Handler für highlightPoint
-                        AddHandler .ClickSeries, AddressOf Me.highlightPoint
+                        'alle anderen kriegen Handler für selectPoint
+                        AddHandler .ClickSeries, AddressOf Me.selectPoint
                     End If
 
                 End With
@@ -169,94 +170,70 @@ Partial Public Class Scatterplot
 
     End Sub
 
-    'Angeklickten Punkt in allen Diagrammen hervorheben
-    '**************************************************
-    Private Sub highlightPoint(ByVal sender As Object, ByVal s As Steema.TeeChart.Styles.Series, ByVal valueIndex As Integer, ByVal e As System.Windows.Forms.MouseEventArgs)
+    'Einen Punkt auswählen
+    '*********************
+    Private Sub selectPoint(ByVal sender As Object, ByVal s As Steema.TeeChart.Styles.Series, ByVal valueIndex As Integer, ByVal e As System.Windows.Forms.MouseEventArgs)
 
-        Dim i, j As Integer
-        Dim isOK As Boolean
-        Dim xWert, yWert As Double
-        Dim xAchse, yAchse As String
-        Dim iOptZielx, iOptZiely As Integer
-        Dim Solution As New Solution
+        Dim i, j, solutionID As Integer
+        Dim sol As New Solution
         Dim serie As Steema.TeeChart.Styles.Series
-        'Dim anno As Steema.TeeChart.Tools.Annotation
 
-        ReDim Solution.QWerte(Me.nOptZiele - 1)
+        ReDim sol.QWerte(Me.nOptZiele - 1)
 
         'Punkt-Informationen bestimmen
         '-----------------------------
-        'X und Y Werte
-        xWert = s.XValues(valueIndex)
-        yWert = s.YValues(valueIndex)
-        'X und Y Achsen (Zielfunktionen)
-        xAchse = sender.Axes.Bottom.Title.Caption
-        yAchse = sender.Axes.Left.Title.Caption
+        'Solution-ID
+        solutionID = s.Labels(valueIndex)
 
-        With Me.OptResult
-            'OptZiele zuordnen
-            '-----------------
-            iOptZielx = -1
-            iOptZiely = -1
-            For i = 0 To .List_OptZiele.GetUpperBound(0)
-                If (.List_OptZiele(i).Bezeichnung = xAchse) Then
-                    iOptZielx = i
-                ElseIf (.List_OptZiele(i).Bezeichnung = yAchse) Then
-                    iOptZiely = i
-                End If
-            Next
-            If (iOptZielx < 0 Or iOptZiely < 0) Then
-                'OptZiele konnten nicht zugeordnet werden
-                Exit Sub
-            End If
+        'Lösung holen
+        '------------
+        sol = Me.OptResult.getSolution(solutionID)
 
-            'Lösung identifizieren
-            '---------------------
-            isOK = False
-            For i = 0 To .Solutions.GetUpperBound(0)
-                If (.Solutions(i).QWerte(iOptZielx) = xWert And _
-                    .Solutions(i).QWerte(iOptZiely) = yWert) Then
-                    Solution = .Solutions(i)
-                    isOK = True
-                    Exit For
-                End If
-            Next
-            If (Not isOK) Then
-                'Lösung konnte nicht indentifiziert werden
-                Exit Sub
-            End If
+        If (sol.ID = solutionID) Then
 
-        End With
+            'Lösung in alle Diagramme eintragen
+            '----------------------------------
+            For i = 0 To Me.Diags.GetUpperBound(0)
+                For j = 0 To Me.Diags.GetUpperBound(1)
+                    With Me.Diags(i, j)
 
-        'Lösung in alle Diagramme eintragen
-        '----------------------------------
+                        'Roten Punkt zeichnen
+                        serie = .getSeriesPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
+                        serie.Add(sol.QWerte(i), sol.QWerte(j), sol.ID)
+
+                        'Mark anzeigen
+                        serie.Marks.Visible = True
+                        serie.Marks.Style = Steema.TeeChart.Styles.MarksStyles.Label
+                        serie.Marks.Transparency = 25
+                        serie.Marks.ArrowLength = 10
+                        serie.Marks.Arrow.Visible = False
+
+                    End With
+                Next j
+            Next i
+
+            'Lösung auswählen (wird von Form1.selectSolution() verarbeitet)
+            RaiseEvent solutionSelected(sol)
+
+        End If
+
+    End Sub
+
+    'Lösungsauswahl zurücksetzen
+    '***************************
+    Public Sub clearSelection()
+
+        Dim i, j As Integer
+        Dim serie as Steema.TeeChart.Styles.Series
+
         For i = 0 To Me.Diags.GetUpperBound(0)
             For j = 0 To Me.Diags.GetUpperBound(1)
                 With Me.Diags(i, j)
 
-                    'Roten Punkt zeichnen
-                    serie = .getSeriesPoint("Highlight", "red", Steema.TeeChart.Styles.PointerStyles.Circle, 4)
-                    serie.Clear()
-                    serie.Add(Solution.QWerte(i), Solution.QWerte(j))
+                    'Serie löschen
+                    serie = .getSeriesPoint("ausgewählte Lösungen")
+                    serie.Dispose()
 
-                    'Mark anzeigen
-                    serie.Marks.Visible = True
-                    serie.Marks.Style = Steema.TeeChart.Styles.MarksStyles.XY
-                    serie.Marks.MultiLine = True
-                    serie.Marks.Transparency = 25
-                    serie.Marks.ArrowLength = 10
-                    serie.Marks.Arrow.Visible = False
-                    If (i = j) Then
-                        serie.Marks.Style = Steema.TeeChart.Styles.MarksStyles.XValue
-                    End If
-
-                    ''Annotation anzeigen (funzt nicht so gut!)
-                    'Call .Tools.Clear(True)
-                    'anno = New Steema.TeeChart.Tools.Annotation(.Chart)
-                    'anno.Position = Steema.TeeChart.Tools.AnnotationPositions.RightTop
-                    'anno.Text = Me.OptResult.List_OptZiele(i).Bezeichnung & ": " & Solution.QWerte(i).ToString("g3")
-                    'anno.Text &= Chr(13) & Chr(10)
-                    'anno.Text &= Me.OptResult.List_OptZiele(j).Bezeichnung & ": " & Solution.QWerte(j).ToString("g3")
                 End With
             Next j
         Next i
@@ -275,8 +252,8 @@ Partial Public Class Scatterplot
     '***********
     Private Sub ScatterplotResize(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Resize
 
-        Me.matrix.Width = Me.Width - 10
-        Me.matrix.Height = Me.Height - 10 - 25
+        Me.matrix.Width = Me.ClientSize.Width
+        Me.matrix.Height = Me.ClientSize.Height
 
     End Sub
 
