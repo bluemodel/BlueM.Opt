@@ -160,7 +160,7 @@ Public Class OptResult
 
     'Sekundäre Population hinzufügen
     '*******************************
-    Public Sub addSekPop(ByVal _sekpop(,) As Double, ByVal _igen As Integer)
+    Public Sub setSekPop(ByVal _sekpop(,) As Double, ByVal _igen As Integer)
 
         Dim SekPop As Struct_SekPop
 
@@ -170,30 +170,45 @@ Public Class OptResult
         'SekPop aus DB lesen
         SekPop = db_getSekPop(_igen)
 
+        'SekPop zu OptResult hinzufügen
+        Call addSekPop(SekPop, _igen)
+
+    End Sub
+
+    'Sekundäre Population zu OptResult hinzufügen
+    '********************************************
+    Private Sub addSekPop(ByVal _sekpop As Struct_SekPop, ByVal _igen As Integer)
+
         'Array von Sekundären Populationen um eins erweitern
         ReDim Preserve Me.SekPops(_igen)
-        Me.SekPops(_igen) = SekPop
+        Me.SekPops(_igen) = _sekpop
 
     End Sub
 
     'Sekundäre Population holen
     '**************************
-    Public Function getSekPop(ByVal _igen As Integer) As Solution()
+    Public Function getSekPop(Optional ByVal _igen As Integer = -1) As Solution()
 
-        Dim i As Integer
-        Dim solutions() As Solution
+        Dim sekpopsolutions() As Solution
 
-        ReDim solutions(-1)
+        'Wenn keine Generation angegeben, dann letzte SekPop ausgeben
+        If (_igen = -1) Then
+            For Each sekpop As Struct_SekPop In Me.SekPops
+                If (sekpop.iGen > _igen) Then _igen = sekpop.iGen
+            Next
+        End If
+
+        ReDim sekpopsolutions(-1)
 
         'Alle Sekundären Populationen durchlaufen
-        For i = 0 To Me.SekPops.GetUpperBound(0)
-            If (Me.SekPops(i).iGen = _igen) Then
+        For Each sekpop As Struct_SekPop In Me.SekPops
+            If (sekpop.iGen = _igen) Then
                 'SekPop gefunden, Lösungen holen
-                solutions = getSolutions(Me.SekPops(i).SolutionIDs)
+                sekpopsolutions = getSolutions(sekpop.SolutionIDs)
             End If
         Next
 
-        Return solutions
+        Return sekpopsolutions
 
     End Function
 
@@ -658,7 +673,7 @@ Public Class OptResult
 
     'Optimierungsergebnis aus einer DB lesen
     '***************************************
-    Public Sub db_load(ByVal sourceFile As String, Optional ByVal onlySekPop As Boolean = True)
+    Public Sub db_load(ByVal sourceFile As String)
 
         '---------------------------------------------------------------------------
         'Hinweise:
@@ -676,27 +691,34 @@ Public Class OptResult
 
         'Read
         Dim q As String
-        If (onlySekPop) Then
-            'Nur die Lösungen aus der letzten Sekundären Population
-            q = "SELECT Sim.ID, SekPop.Generation, OptParameter.*, QWerte.*, Constraints.* FROM (((Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN OptParameter ON Sim.ID=OptParameter.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID) INNER JOIN SekPop ON Sim.ID=SekPop.Sim_ID WHERE (((SekPop.Generation)=(SELECT MAX(Generation) FROM SekPop)))"
-        Else
-            'Alle Lösungen
-            q = "SELECT Sim.ID, OptParameter.*, QWerte.*, Constraints.* FROM ((Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN OptParameter ON Sim.ID=OptParameter.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID ORDER BY Sim.ID"
-        End If
+        Dim numSolutions, igen As Integer
+
+        'Alle Lösungen
+        q = "SELECT Sim.ID, OptParameter.*, QWerte.*, Constraints.* FROM ((Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN OptParameter ON Sim.ID=OptParameter.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID ORDER BY Sim.ID"
 
         Dim adapter As OleDbDataAdapter = New OleDbDataAdapter(q, db)
 
         Dim ds As New DataSet("EVO")
-        Dim numRows As Integer = adapter.Fill(ds, "PESResult")
+        numSolutions = adapter.Fill(ds, "PESResult")
+
+        'Letzte SekPop-Generation bestimmen
+        Try
+            Dim command As New OleDbCommand("", db)
+            command.CommandText = "SELECT MAX(Generation) FROM SekPop"
+            igen = command.ExecuteScalar()
+        Catch ex As Exception
+            'Keine SekPop vorhanden
+            igen = -1
+        End Try
 
         'Disconnect
         Call db_disconnect()
 
-        'Werte einlesen
-        '==============
-        ReDim Me.Solutions(numRows - 1)
+        'Alle Lösungen übernehmen
+        '========================
+        ReDim Me.Solutions(numSolutions - 1)
 
-        For i = 0 To numRows - 1
+        For i = 0 To numSolutions - 1
 
             Me.Solutions(i) = New Solution()
 
@@ -723,7 +745,18 @@ Public Class OptResult
                     .Constraints(j) = ds.Tables(0).Rows(i).Item(Me.List_Constraints(j).Bezeichnung)
                 Next
             End With
+
         Next
+
+        'Sekundärpopulation übernehmen
+        '=============================
+        ReDim Me.SekPops(-1)
+
+        If (igen > -1) Then
+            Dim SekPop As Struct_SekPop
+            SekPop = db_getSekPop(igen)
+            Call Me.addSekPop(SekPop, igen)
+        End If
 
     End Sub
 

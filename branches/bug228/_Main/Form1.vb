@@ -1226,7 +1226,7 @@ Start_Evolutionsrunden:
                         SekPopulation = PES1.EsGetSekundärePopulation()
                         If (Not IsNothing(Sim1)) Then
                             'SekPop abspeichern
-                            Call Sim1.OptResult.addSekPop(SekPopulation, PES1.PES_iAkt.iAktGen)
+                            Call Sim1.OptResult.setSekPop(SekPopulation, PES1.PES_iAkt.iAktGen)
                             'SekPop mit Solution.IDs zeichnen
                             Call SekundärePopulationZeichnen(PES1.PES_iAkt.iAktGen)
                         Else
@@ -1692,7 +1692,6 @@ Start_Evolutionsrunden:
     '*************************************************
     Private Sub loadFromMDB(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_openMDB.Click
 
-        Dim i As Integer
         Dim diagresult As DialogResult
         Dim sourceFile As String
 
@@ -1704,14 +1703,19 @@ Start_Evolutionsrunden:
 
             sourceFile = Me.OpenFileDialog_MDB.FileName
 
-            'Abfragedialog
-            Dim Form2 As New MDBImportDialog()
+            'MDBImportDialog
+            '---------------
+            Dim importDialog As New MDBImportDialog()
             For Each OptZiel As Sim.Struct_OptZiel In Sim1.List_OptZiele
-                Form2.ListBox_OptZieleX.Items.Add(OptZiel.Bezeichnung)
-                Form2.ListBox_OptZieleY.Items.Add(OptZiel.Bezeichnung)
-                Form2.ListBox_OptZieleZ.Items.Add(OptZiel.Bezeichnung)
+                importDialog.ListBox_OptZieleX.Items.Add(OptZiel.Bezeichnung)
+                importDialog.ListBox_OptZieleY.Items.Add(OptZiel.Bezeichnung)
+                importDialog.ListBox_OptZieleZ.Items.Add(OptZiel.Bezeichnung)
             Next
-            diagresult = Form2.ShowDialog()
+            'Bei weniger als 3 Zielen Z-Achse ausblenden
+            If (Sim1.List_OptZiele.Length < 3) Then
+                importDialog.ListBox_OptZieleZ.Enabled = False
+            End If
+            diagresult = importDialog.ShowDialog()
 
             If (diagresult = Windows.Forms.DialogResult.OK) Then
 
@@ -1720,14 +1724,14 @@ Start_Evolutionsrunden:
 
                 'Daten einlesen
                 '==============
-                Call Sim1.OptResult.db_load(sourceFile, Form2.CheckBox_onlySekPop.Checked)
+                Call Sim1.OptResult.db_load(sourceFile)
 
                 'Hauptdiagramm
                 '=============
                 Dim OptZielIndexX, OptZielIndexY, OptZielIndexZ As Integer
-                OptZielIndexX = Form2.ListBox_OptZieleX.SelectedIndex
-                OptZielIndexY = Form2.ListBox_OptZieleY.SelectedIndex
-                OptZielIndexZ = Form2.ListBox_OptZieleZ.SelectedIndex
+                OptZielIndexX = importDialog.ListBox_OptZieleX.SelectedIndex
+                OptZielIndexY = importDialog.ListBox_OptZieleY.SelectedIndex
+                OptZielIndexZ = importDialog.ListBox_OptZieleZ.SelectedIndex
 
                 'Achsen
                 '------
@@ -1735,14 +1739,14 @@ Start_Evolutionsrunden:
                 Dim tmpAchse As EVO.Diagramm.Achse
                 tmpAchse.Auto = True
                 'X-Achse
-                tmpAchse.Name = Form2.ListBox_OptZieleX.SelectedItem
+                tmpAchse.Name = importDialog.ListBox_OptZieleX.SelectedItem
                 Achsen.Add(tmpAchse)
                 'Y-Achse
-                tmpAchse.Name = Form2.ListBox_OptZieleY.SelectedItem
+                tmpAchse.Name = importDialog.ListBox_OptZieleY.SelectedItem
                 Achsen.Add(tmpAchse)
                 If (Not OptZielIndexZ = -1) Then
                     'Z-Achse
-                    tmpAchse.Name = Form2.ListBox_OptZieleZ.SelectedItem
+                    tmpAchse.Name = importDialog.ListBox_OptZieleZ.SelectedItem
                     Achsen.Add(tmpAchse)
                 End If
 
@@ -1756,33 +1760,59 @@ Start_Evolutionsrunden:
                 Dim serie As Steema.TeeChart.Styles.Series
                 Dim serie3D As Steema.TeeChart.Styles.Points3D
 
-                For i = 0 To Sim1.OptResult.Solutions.GetUpperBound(0)
-                    With Sim1.OptResult.Solutions(i)
+                'Lösungen
+                '========
+                If (importDialog.ComboBox_SekPop.SelectedItem <> "ausschließlich") Then
+
+                    For Each sol As Solution In Sim1.OptResult.Solutions
+                        
+                            If (OptZielIndexZ = -1) Then
+                                '2D
+                                '--
+                                'Constraintverletzung prüfen
+                                If (sol.isValid) Then
+                                    serie = Me.DForm.Diag.getSeriesPoint("Population", "Orange")
+                                Else
+                                    serie = Me.DForm.Diag.getSeriesPoint("Population (ungültig)", "Gray")
+                                End If
+                                'Zeichnen
+                                serie.Add(sol.QWerte(OptZielIndexX), sol.QWerte(OptZielIndexY), sol.ID)
+                            Else
+                                '3D
+                                '--
+                                'Constraintverletzung prüfen
+                                If (sol.isValid) Then
+                                    serie3D = Me.DForm.Diag.getSeries3DPoint("Population", "Orange")
+                                Else
+                                    serie3D = Me.DForm.Diag.getSeries3DPoint("Population (ungültig)", "Gray")
+                                End If
+                                'Zeichnen
+                                serie3D.Add(sol.QWerte(OptZielIndexX), sol.QWerte(OptZielIndexY), sol.QWerte(OptZielIndexZ), sol.ID)
+                            End If
+
+                    Next
+
+                End If
+
+                'Sekundärpopulation
+                '==================
+                If (importDialog.ComboBox_SekPop.SelectedItem <> "keine") Then
+
+                    For Each sekpopsol As Solution In Sim1.OptResult.getSekPop()
                         If (OptZielIndexZ = -1) Then
                             '2D
                             '--
-                            'Constraintverletzung prüfen
-                            If (.isValid) Then
-                                serie = Me.DForm.Diag.getSeriesPoint("Population", "Orange")
-                            Else
-                                serie = Me.DForm.Diag.getSeriesPoint("Population (ungültig)", "Gray")
-                            End If
-                            'Zeichnen
-                            serie.Add(.QWerte(OptZielIndexX), .QWerte(OptZielIndexY), .ID)
+                            serie = Me.DForm.Diag.getSeriesPoint("Sekundäre Population", "Green")
+                            serie.Add(sekpopsol.QWerte(OptZielIndexX), sekpopsol.QWerte(OptZielIndexY), sekpopsol.ID)
                         Else
                             '3D
                             '--
-                            'Constraintverletzung prüfen
-                            If (.isValid) Then
-                                serie3D = Me.DForm.Diag.getSeries3DPoint("Population", "Orange")
-                            Else
-                                serie3D = Me.DForm.Diag.getSeries3DPoint("Population (ungültig)", "Gray")
-                            End If
-                            'Zeichnen
-                            serie3D.Add(.QWerte(OptZielIndexX), .QWerte(OptZielIndexY), .QWerte(OptZielIndexZ), .ID)
+                            serie3D = Me.DForm.Diag.getSeries3DPoint("Sekundäre Population", "Green")
+                            serie3D.Add(sekpopsol.QWerte(OptZielIndexX), sekpopsol.QWerte(OptZielIndexY), sekpopsol.QWerte(OptZielIndexZ), sekpopsol.ID)
                         End If
-                    End With
-                Next
+                    Next
+
+                End If
 
                 'Ergebnis-Buttons
                 Me.Button_Scatterplot.Enabled = True

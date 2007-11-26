@@ -1,5 +1,13 @@
 Public Class MDBImportDialog
 
+    'Form load
+    '*********
+    Private Sub MDBImportDialog_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+
+        Me.ComboBox_SekPop.SelectedIndex = 0
+
+    End Sub
+
     'Überprüfung der Benutzereingabe
     '*******************************
     Private Sub OK_Button_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OK_Button.Click

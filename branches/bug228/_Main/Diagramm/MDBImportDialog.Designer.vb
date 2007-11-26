@@ -32,7 +32,8 @@ Partial Class MDBImportDialog
         Me.ListBox_OptZieleZ = New System.Windows.Forms.ListBox
         Me.OK_Button = New System.Windows.Forms.Button
         Me.Cancel_Button = New System.Windows.Forms.Button
-        Me.CheckBox_onlySekPop = New System.Windows.Forms.CheckBox
+        Me.ComboBox_SekPop = New System.Windows.Forms.ComboBox
+        Me.Label_SekPop = New System.Windows.Forms.Label
         Me.GroupBox_Hauptdiagramm.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -123,29 +124,39 @@ Partial Class MDBImportDialog
         Me.Cancel_Button.TabIndex = 1
         Me.Cancel_Button.Text = "Abbrechen"
         '
-        'CheckBox_onlySekPop
+        'ComboBox_SekPop
         '
-        Me.CheckBox_onlySekPop.AutoSize = True
-        Me.CheckBox_onlySekPop.Location = New System.Drawing.Point(12, 258)
-        Me.CheckBox_onlySekPop.Name = "CheckBox_onlySekPop"
-        Me.CheckBox_onlySekPop.Size = New System.Drawing.Size(147, 17)
-        Me.CheckBox_onlySekPop.TabIndex = 12
-        Me.CheckBox_onlySekPop.Text = "nur sekundäre Population"
-        Me.CheckBox_onlySekPop.UseVisualStyleBackColor = True
+        Me.ComboBox_SekPop.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboBox_SekPop.FormattingEnabled = True
+        Me.ComboBox_SekPop.Items.AddRange(New Object() {"letzte", "keine", "ausschließlich"})
+        Me.ComboBox_SekPop.Location = New System.Drawing.Point(169, 256)
+        Me.ComboBox_SekPop.Name = "ComboBox_SekPop"
+        Me.ComboBox_SekPop.Size = New System.Drawing.Size(86, 21)
+        Me.ComboBox_SekPop.TabIndex = 13
         '
-        'HauptdiagrammDialog
+        'Label_SekPop
+        '
+        Me.Label_SekPop.AutoSize = True
+        Me.Label_SekPop.Location = New System.Drawing.Point(12, 259)
+        Me.Label_SekPop.Name = "Label_SekPop"
+        Me.Label_SekPop.Size = New System.Drawing.Size(151, 13)
+        Me.Label_SekPop.TabIndex = 14
+        Me.Label_SekPop.Text = "Sekundärpopulation anzeigen:"
+        '
+        'MDBImportDialog
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(436, 281)
-        Me.Controls.Add(Me.CheckBox_onlySekPop)
+        Me.Controls.Add(Me.Label_SekPop)
+        Me.Controls.Add(Me.ComboBox_SekPop)
         Me.Controls.Add(Me.Cancel_Button)
         Me.Controls.Add(Me.OK_Button)
         Me.Controls.Add(Me.GroupBox_Hauptdiagramm)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "HauptdiagrammDialog"
+        Me.Name = "MDBImportDialog"
         Me.Text = "Optimierungsergebnis laden"
         Me.GroupBox_Hauptdiagramm.ResumeLayout(False)
         Me.GroupBox_Hauptdiagramm.PerformLayout()
@@ -162,5 +173,6 @@ Partial Class MDBImportDialog
     Friend WithEvents ListBox_OptZieleZ As System.Windows.Forms.ListBox
     Friend WithEvents OK_Button As System.Windows.Forms.Button
     Friend WithEvents Cancel_Button As System.Windows.Forms.Button
-    Friend WithEvents CheckBox_onlySekPop As System.Windows.Forms.CheckBox
+    Friend WithEvents ComboBox_SekPop As System.Windows.Forms.ComboBox
+    Friend WithEvents Label_SekPop As System.Windows.Forms.Label
 End Class
