@@ -370,6 +370,9 @@ Partial Class Form1
                     CES1.TestModus = Sim1.Set_TestModus
                     CES1.n_Combinations = Sim1.No_of_Combinations
 
+                    'Die Variablen für die Individuuen werden gesetzt
+                    EVO.Kern.Individuum.Initialise(2, CES1.n_Locations, CES1.n_Penalty, CES1.n_Constrain)
+
                     'Bei Testmodus wird die Anzahl der Kinder und Generationen überschrieben
                     If CES1.TestModus = 1 Then
                         CES1.n_Childs = 1
@@ -715,9 +718,9 @@ Partial Class Form1
 
         'Parents und Childs werden Dimensioniert
         ReDim CES1.List_Parents(CES1.n_Parents - 1)
-        Call CES1.Individuum_Dim(CES1.List_Parents, "Parent")
+        Call Kern.Individuum.Dim_Array("Parent", CES1.List_Parents)
         ReDim CES1.List_Childs(CES1.n_Childs - 1)
-        Call CES1.Individuum_Dim(CES1.List_Childs, "Child")
+        Call Kern.Individuum.Dim_Array("Child", CES1.List_Childs)
 
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
@@ -892,7 +895,7 @@ Partial Class Form1
             '***********************************************
             If CES1.TestModus = 0 Then
                 'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
-                Call CES1.Individuum_Dim(CES1.List_Childs, "Child")
+                Call Kern.Individuum.Dim_Array("Child", CES1.List_Childs)
                 'Reproduktionsoperatoren, hier gehts dezent zur Sache
                 Call CES1.Reproduction_Control()
                 'Mutationsoperatoren
