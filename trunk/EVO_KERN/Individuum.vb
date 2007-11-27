@@ -41,6 +41,8 @@ Public Class Individuum
     Public mutated As Boolean              '06 Gibt an ob der Wert bereits mutiert ist oder nicht
 
     'Für ND Sorting -------------------------------------------------
+    Public PES_X() As Double               '06a Parameterarray für PES
+    Public PES_d() As Double               '06b Dn Array für PES
     Public dominated As Boolean            '07 Kennzeichnung ob Dominiert
     Public Front As Integer                '08 Nummer der Pareto Front
     Public Distance As Double              '09 Für crowding distance
@@ -78,7 +80,7 @@ Public Class Individuum
     'Gibt ein Array mit den Parametern aller Locations zurück !oder!
     'Setzt die Zahl der locations auf 1 und schreibt dort alle Parameter rein
     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    Public Property All_Para() As Double()
+    Public ReadOnly Property All_Para() As Double()
         Get
             Dim i, j, x As Integer
             Dim array() As Double = {}
@@ -93,22 +95,13 @@ Public Class Individuum
             All_Para = array.Clone
         End Get
 
-        Set(ByVal Array As Double())
-            Dim i As Integer
-
-            ReDim Preserve Loc(0)
-            ReDim Preserve Loc(0).Loc_Para(1, Array.GetUpperBound(0))
-            For i = 0 To Loc(0).Loc_Para.GetUpperBound(1)
-                Loc(0).Loc_Para(1, i) = Array(i)
-            Next
-        End Set
-
     End Property
+
 
     'Gibt ein Array mit den DNs aller Locations zurück !oder!
     'Setzt die Zahl der locations auf 1 und schreibt dort alle DNs rein
     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    Public Property All_DN() As Double()
+    Public ReadOnly Property All_DN() As Double()
         Get
             Dim i, j, x As Integer
             Dim array() As Double = {}
@@ -122,16 +115,6 @@ Public Class Individuum
             Next
             All_DN = array.Clone
         End Get
-
-        Set(ByVal Array As Double())
-            Dim i As Integer
-
-            ReDim Preserve Loc(0)
-            ReDim Preserve Loc(0).Loc_Dn(Array.GetUpperBound(0))
-            For i = 0 To Loc(0).Loc_Dn.GetUpperBound(0)
-                Loc(0).Loc_Dn(i) = Array(i)
-            Next
-        End Set
 
     End Property
 
@@ -205,6 +188,12 @@ Public Class Individuum
         '06 Gibt an ob der Wert bereits mutiert ist oder nicht
         Me.mutated = False
 
+        '06a Parameterarray für PES
+        'Me.PES_x(0) = 0 'wird am gleich Anfang im PES Dimensioniert
+
+        '06b Dn Array für PES
+        'Me.Pes_d(0) = 0 'wird am gleich Anfang im PES Dimensioniert
+
         '07 Kennzeichnung ob Dominiert
         Me.dominated = False
 
@@ -239,7 +228,10 @@ Public Class Individuum
             Next
 
             '11a Die Elemente die zur Location gehören
-            ReDim Me.Loc(i).Loc_Elem(-1)
+            ReDim Me.Loc(i).Loc_Elem(0)
+            For j = 0 To Me.Loc(i).Loc_Elem.GetUpperBound(0)
+                Me.Loc(i).Loc_Elem(j) = "Leer"
+            Next
         Next
 
         '12 Die Generation (eher zur Information)
@@ -291,6 +283,14 @@ Public Class Individuum
         '06 Gibt an ob der Wert bereits mutiert ist oder nicht
         Dest.mutated = Me.mutated
 
+        '06a Array für PES Parameter
+        ReDim Dest.PES_X(Me.PES_x.GetUpperBound(0))
+        Array.Copy(Me.PES_x, Dest.PES_x, Me.PES_x.GetLength(0))
+
+        '06b Array für PES DN
+        ReDim Dest.PES_d(Me.PES_d.GetUpperBound(0))
+        Array.Copy(Me.PES_d, Dest.PES_d, Me.PES_d.GetLength(0))
+
         '07 Kennzeichnung ob Dominiert
         Dest.dominated = Me.dominated
 
@@ -320,7 +320,7 @@ Public Class Individuum
             ReDim Dest.Loc(i).Loc_Dn(Me.Loc(i).Loc_Dn.GetUpperBound(0))
             Array.Copy(Me.Loc(i).Loc_Dn, Dest.Loc(i).Loc_Dn, Me.Loc(i).Loc_Dn.Length)
 
-            '11a Die Elemte die zur Location gehören
+            '11a Die Elemente die zur Location gehören
             ReDim Dest.Loc(i).Loc_Elem(Me.Loc(i).Loc_Elem.GetUpperBound(0))
             Array.Copy(Me.Loc(i).Loc_Elem, Dest.Loc(i).Loc_Elem, Me.Loc(i).Loc_Elem.Length)
         Next

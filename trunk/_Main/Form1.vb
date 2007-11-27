@@ -1086,6 +1086,9 @@ Partial Class Form1
             Call PrepareDiagramm()
         End If
 
+        'Individuum wird initialisiert
+        Call Kern.Individuum.Initialise(1, 1, globalAnzZiel, globalAnzRand)
+
         'Schritte 0: Objekt der Klasse PES wird erzeugt
         '**********************************************
         Dim PES1 As EVO.Kern.PES
