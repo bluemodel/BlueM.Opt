@@ -23,18 +23,54 @@ Partial Public Class SolutionDialog
 
         ' Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
+        Dim column As DataGridViewColumn
+        Dim cellstyle As DataGridViewCellStyle
+
         'Spalten einrichten
-        '------------------
+        '==================
+
+        'Allgemein
+        '---------
+        cellstyle = Me.DataGridView1.DefaultCellStyle.Clone()
+        cellstyle.Format = "G5"
+
+        'OptParameter
+        '------------
+        cellstyle.BackColor = Color.LightGray
+
         For Each OptPara As Sim.Struct_OptParameter In lOptPara
-            Me.DataGridView1.Columns.Add(OptPara.Bezeichnung, OptPara.Bezeichnung)
+            column = New DataGridViewTextBoxColumn()
+            column.HeaderText = OptPara.Bezeichnung
+            column.HeaderCell.ToolTipText = "OptParameter"
+            column.Name = OptPara.Bezeichnung
+            column.DefaultCellStyle = cellstyle.Clone()
+            Me.DataGridView1.Columns.Add(column)
         Next
+
+        'OptZiele
+        '--------
+        cellstyle.BackColor = Color.LightBlue
 
         For Each OptZiel As Sim.Struct_OptZiel In lOptZiele
-            Me.DataGridView1.Columns.Add(OptZiel.Bezeichnung, OptZiel.Bezeichnung)
+            column = New DataGridViewTextBoxColumn()
+            column.HeaderText = OptZiel.Bezeichnung
+            column.HeaderCell.ToolTipText = "OptZiel"
+            column.Name = OptZiel.Bezeichnung
+            column.DefaultCellStyle = cellstyle.Clone()
+            Me.DataGridView1.Columns.Add(column)
         Next
 
+        'Constraints
+        '-----------
+        cellstyle.BackColor = Color.LightCoral
+
         For Each Constraint As Sim.Struct_Constraint In lConst
-            Me.DataGridView1.Columns.Add(Constraint.Bezeichnung, Constraint.Bezeichnung)
+            column = New DataGridViewTextBoxColumn()
+            column.HeaderText = Constraint.Bezeichnung
+            column.HeaderCell.ToolTipText = "Constraint"
+            column.Name = Constraint.Bezeichnung
+            column.DefaultCellStyle = cellstyle.Clone()
+            Me.DataGridView1.Columns.Add(column)
         Next
 
         'Handler einrichten
@@ -76,6 +112,9 @@ Partial Public Class SolutionDialog
 
         'Zeile hinzufügen
         Me.DataGridView1.Rows.Add(row)
+
+        'Spalten anpassen
+        Call Me.DataGridView1.AutoResizeColumns()
 
     End Sub
 

@@ -24,11 +24,11 @@ Partial Class SolutionDialog
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(SolutionDialog))
         Me.DataGridView1 = New System.Windows.Forms.DataGridView
-        Me.ID = New System.Windows.Forms.DataGridViewTextBoxColumn
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip
         Me.ToolStripButton_Wave = New System.Windows.Forms.ToolStripButton
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator
         Me.ToolStripButton_Clear = New System.Windows.Forms.ToolStripButton
+        Me.ID = New System.Windows.Forms.DataGridViewTextBoxColumn
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ToolStrip1.SuspendLayout()
         Me.SuspendLayout()
@@ -44,12 +44,6 @@ Partial Class SolutionDialog
         Me.DataGridView1.ReadOnly = True
         Me.DataGridView1.Size = New System.Drawing.Size(601, 282)
         Me.DataGridView1.TabIndex = 0
-        '
-        'ID
-        '
-        Me.ID.HeaderText = "ID"
-        Me.ID.Name = "ID"
-        Me.ID.ReadOnly = True
         '
         'ToolStrip1
         '
@@ -83,6 +77,12 @@ Partial Class SolutionDialog
         Me.ToolStripButton_Clear.Size = New System.Drawing.Size(23, 22)
         Me.ToolStripButton_Clear.Text = "Lösungsauswahl zurücksetzen"
         '
+        'ID
+        '
+        Me.ID.HeaderText = "ID"
+        Me.ID.Name = "ID"
+        Me.ID.ReadOnly = True
+        '
         'SolutionDialog
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -101,9 +101,9 @@ Partial Class SolutionDialog
 
     End Sub
     Friend WithEvents DataGridView1 As System.Windows.Forms.DataGridView
-    Friend WithEvents ID As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents ToolStrip1 As System.Windows.Forms.ToolStrip
     Friend WithEvents ToolStripButton_Wave As System.Windows.Forms.ToolStripButton
     Friend WithEvents ToolStripSeparator1 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents ToolStripButton_Clear As System.Windows.Forms.ToolStripButton
+    Friend WithEvents ID As System.Windows.Forms.DataGridViewTextBoxColumn
 End Class
