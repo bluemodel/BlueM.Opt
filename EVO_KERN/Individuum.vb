@@ -253,7 +253,7 @@ Public Class Individuum
 
     End Sub
 
-    Public Shared Sub Dim_Array(ByVal _Type As String, ByRef Array() As Individuum)
+    Public Shared Sub New_Array(ByVal _Type As String, ByRef Array() As Individuum)
         Dim i As Integer
 
         For i = 0 To Array.GetUpperBound(0)
@@ -340,7 +340,7 @@ Public Class Individuum
 
     'Überladen Methode die ein Array aus Individuen kopiert
     '******************************************************
-    Public Shared Sub Copy(ByVal Source() As Individuum, ByRef Dest() As Individuum)
+    Public Shared Sub Copy_Array(ByVal Source() As Individuum, ByRef Dest() As Individuum)
         Dim i As Integer
 
         For i = 0 To Source.GetUpperBound(0)

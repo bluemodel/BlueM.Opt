@@ -718,9 +718,9 @@ Partial Class Form1
 
         'Parents und Childs werden Dimensioniert
         ReDim CES1.List_Parents(CES1.n_Parents - 1)
-        Call Kern.Individuum.Dim_Array("Parent", CES1.List_Parents)
+        Call Kern.Individuum.New_Array("Parent", CES1.List_Parents)
         ReDim CES1.List_Childs(CES1.n_Childs - 1)
-        Call Kern.Individuum.Dim_Array("Child", CES1.List_Childs)
+        Call Kern.Individuum.New_Array("Child", CES1.List_Childs)
 
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
@@ -895,7 +895,7 @@ Partial Class Form1
             '***********************************************
             If CES1.TestModus = 0 Then
                 'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
-                Call Kern.Individuum.Dim_Array("Child", CES1.List_Childs)
+                Call Kern.Individuum.New_Array("Child", CES1.List_Childs)
                 'Reproduktionsoperatoren, hier gehts dezent zur Sache
                 Call CES1.Reproduction_Control()
                 'Mutationsoperatoren
