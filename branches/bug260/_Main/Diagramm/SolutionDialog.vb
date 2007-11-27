@@ -14,6 +14,26 @@ Partial Public Class SolutionDialog
     '*******************************************************************************
     '*******************************************************************************
 
+    'Properties
+    '**********
+    Private ReadOnly Property checkedSolutions As Collection
+        Get
+            checkedSolutions = New Collection
+            For Each row As DataGridViewRow In Me.DataGridView1.Rows
+                If (row.Cells(0).Value = "True") Then
+                    checkedSolutions.Add(row.HeaderCell.Value, row.HeaderCell.Value)
+                End If
+            Next
+            Return checkedSolutions
+        End Get
+    End Property
+
+    'Events
+    '******
+    Public Event WaveClicked(ByVal checkedSolutions As Collection)
+    Public Event ClearClicked()
+
+
     'Konstruktor
     '***********
     Public Sub New(ByVal lOptPara() As Sim.Struct_OptParameter, ByVal lOptZiele() As Sim.Struct_OptZiel, ByVal lConst() As Sim.Struct_Constraint)
@@ -23,11 +43,11 @@ Partial Public Class SolutionDialog
 
         ' Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
-        Dim column As DataGridViewColumn
-        Dim cellstyle As DataGridViewCellStyle
-
         'Spalten einrichten
         '==================
+
+        Dim column As DataGridViewColumn
+        Dim cellstyle As DataGridViewCellStyle
 
         'Allgemein
         '---------
@@ -40,6 +60,7 @@ Partial Public Class SolutionDialog
 
         For Each OptPara As Sim.Struct_OptParameter In lOptPara
             column = New DataGridViewTextBoxColumn()
+            column.ReadOnly = True
             column.HeaderText = OptPara.Bezeichnung
             column.HeaderCell.ToolTipText = "OptParameter"
             column.Name = OptPara.Bezeichnung
@@ -53,6 +74,7 @@ Partial Public Class SolutionDialog
 
         For Each OptZiel As Sim.Struct_OptZiel In lOptZiele
             column = New DataGridViewTextBoxColumn()
+            column.ReadOnly = True
             column.HeaderText = OptZiel.Bezeichnung
             column.HeaderCell.ToolTipText = "OptZiel"
             column.Name = OptZiel.Bezeichnung
@@ -66,6 +88,7 @@ Partial Public Class SolutionDialog
 
         For Each Constraint As Sim.Struct_Constraint In lConst
             column = New DataGridViewTextBoxColumn()
+            column.ReadOnly = True
             column.HeaderText = Constraint.Bezeichnung
             column.HeaderCell.ToolTipText = "Constraint"
             column.Name = Constraint.Bezeichnung
@@ -74,9 +97,9 @@ Partial Public Class SolutionDialog
         Next
 
         'Handler einrichten
-        '------------------
-        AddHandler Me.ToolStripButton_Wave.Click, AddressOf Form1.showWave
-        AddHandler Me.ToolStripButton_Clear.Click, AddressOf Form1.clearSelection
+        '==================
+        AddHandler Me.WaveClicked, AddressOf Form1.showWave
+        AddHandler Me.ClearClicked, AddressOf Form1.clearSelection
 
     End Sub
 
@@ -85,36 +108,52 @@ Partial Public Class SolutionDialog
     Public Sub addSolution(ByVal sol As Solution)
 
         Dim i As Integer
-        Dim row() As Object
+        Dim cellvalues() As Object
+        Dim row As DataGridViewRow
 
-        'Daten in ein Array entpacken
-        '----------------------------
-        ReDim row(Me.DataGridView1.ColumnCount - 1)
+        'Daten zusammenstellen
+        '---------------------
+        ReDim cellvalues(Me.DataGridView1.ColumnCount - 1)
 
-        row(0) = sol.ID
+        cellvalues(0) = True
 
         i = 1
 
         For Each optpara As Double In sol.OptPara
-            row(i) = optpara
+            cellvalues(i) = optpara
             i += 1
         Next
 
         For Each optziel As Double In sol.QWerte
-            row(i) = optziel
+            cellvalues(i) = optziel
             i += 1
         Next
 
         For Each constraint As Double In sol.Constraints
-            row(i) = constraint
+            cellvalues(i) = constraint
             i += 1
         Next
+
+        'Zeile erstellen
+        row = New DataGridViewRow()
+        row.CreateCells(Me.DataGridView1, cellvalues)
+        row.HeaderCell.Value = sol.ID.ToString()
 
         'Zeile hinzufügen
         Me.DataGridView1.Rows.Add(row)
 
         'Spalten anpassen
         Call Me.DataGridView1.AutoResizeColumns()
+
+    End Sub
+
+    'Automatisches speichern von Zellenänderungen
+    '********************************************
+    Private Sub dataGridView1_CurrentCellDirtyStateChanged(ByVal sender As Object, ByVal e As EventArgs) Handles DataGridView1.CurrentCellDirtyStateChanged
+
+        If (DataGridView1.IsCurrentCellDirty) Then
+            DataGridView1.CommitEdit(DataGridViewDataErrorContexts.Commit)
+        End If
 
     End Sub
 
@@ -127,6 +166,24 @@ Partial Public Class SolutionDialog
 
         'Lösungsdialog verstecken
         Call Me.Hide()
+
+        'Event auslösen
+        RaiseEvent ClearClicked()
+
+    End Sub
+
+    'Wave anzeigen
+    '*************
+    Private Sub ToolStripButton_Wave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton_Wave.Click
+
+        'Cursor
+        Cursor = Cursors.WaitCursor
+
+        'Event auslösen
+        RaiseEvent WaveClicked(Me.checkedSolutions)
+
+        'Cursor
+        Cursor = Cursors.Default
 
     End Sub
 

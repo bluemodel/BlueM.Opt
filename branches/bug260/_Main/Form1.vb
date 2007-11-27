@@ -1618,7 +1618,7 @@ Start_Evolutionsrunden:
 
     'Lösungsauswahl zurücksetzen
     '***************************
-    Public Sub clearSelection(ByVal sender As System.Object, ByVal e As System.EventArgs)
+    Public Sub clearSelection()
 
         'Serie der ausgewählten Lösungen löschen
         '=======================================
@@ -1654,7 +1654,7 @@ Start_Evolutionsrunden:
 
     'ausgewählte Lösungen simulieren und in Wave anzeigen
     '****************************************************
-    Public Sub showWave(ByVal sender As System.Object, ByVal e As System.EventArgs)
+    Public Sub showWave(ByVal checkedSolutions As Collection)
 
         Dim i As Integer
         Dim isOK As Boolean
@@ -1672,6 +1672,12 @@ Start_Evolutionsrunden:
         'Alle ausgewählten Lösungen durchlaufen
         '======================================
         For Each sol As Solution In Sim1.OptResult.getSelectedSolutions()
+
+            'Lösung per Checkbox ausgewählt?
+            '-------------------------------
+            If (Not checkedSolutions.Contains(sol.ID.ToString())) Then
+                Continue For
+            End If
 
             'Simulation ausführen
             'xxxxxxxxxxxxxxxxxxxx

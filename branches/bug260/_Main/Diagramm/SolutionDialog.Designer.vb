@@ -24,11 +24,11 @@ Partial Class SolutionDialog
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(SolutionDialog))
         Me.DataGridView1 = New System.Windows.Forms.DataGridView
+        Me.Auswahl = New System.Windows.Forms.DataGridViewCheckBoxColumn
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip
         Me.ToolStripButton_Wave = New System.Windows.Forms.ToolStripButton
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator
         Me.ToolStripButton_Clear = New System.Windows.Forms.ToolStripButton
-        Me.ID = New System.Windows.Forms.DataGridViewTextBoxColumn
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ToolStrip1.SuspendLayout()
         Me.SuspendLayout()
@@ -37,13 +37,23 @@ Partial Class SolutionDialog
         '
         Me.DataGridView1.AllowUserToAddRows = False
         Me.DataGridView1.AllowUserToDeleteRows = False
+        Me.DataGridView1.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableAlwaysIncludeHeaderText
         Me.DataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.DataGridView1.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.ID})
+        Me.DataGridView1.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.Auswahl})
         Me.DataGridView1.Location = New System.Drawing.Point(0, 25)
         Me.DataGridView1.Name = "DataGridView1"
-        Me.DataGridView1.ReadOnly = True
+        Me.DataGridView1.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders
+        Me.DataGridView1.ShowEditingIcon = False
+        Me.DataGridView1.ShowRowErrors = False
         Me.DataGridView1.Size = New System.Drawing.Size(601, 282)
         Me.DataGridView1.TabIndex = 0
+        '
+        'Auswahl
+        '
+        Me.Auswahl.FalseValue = "False"
+        Me.Auswahl.HeaderText = "Auswahl"
+        Me.Auswahl.Name = "Auswahl"
+        Me.Auswahl.TrueValue = "True"
         '
         'ToolStrip1
         '
@@ -61,7 +71,7 @@ Partial Class SolutionDialog
         Me.ToolStripButton_Wave.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButton_Wave.Name = "ToolStripButton_Wave"
         Me.ToolStripButton_Wave.Size = New System.Drawing.Size(23, 22)
-        Me.ToolStripButton_Wave.Text = "Lösungen in Wave anzeigen"
+        Me.ToolStripButton_Wave.Text = "Ausgewählte Lösungen simulieren und in Wave anzeigen"
         '
         'ToolStripSeparator1
         '
@@ -76,12 +86,6 @@ Partial Class SolutionDialog
         Me.ToolStripButton_Clear.Name = "ToolStripButton_Clear"
         Me.ToolStripButton_Clear.Size = New System.Drawing.Size(23, 22)
         Me.ToolStripButton_Clear.Text = "Lösungsauswahl zurücksetzen"
-        '
-        'ID
-        '
-        Me.ID.HeaderText = "ID"
-        Me.ID.Name = "ID"
-        Me.ID.ReadOnly = True
         '
         'SolutionDialog
         '
@@ -105,5 +109,6 @@ Partial Class SolutionDialog
     Friend WithEvents ToolStripButton_Wave As System.Windows.Forms.ToolStripButton
     Friend WithEvents ToolStripSeparator1 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents ToolStripButton_Clear As System.Windows.Forms.ToolStripButton
-    Friend WithEvents ID As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents SpalteAuswahl As System.Windows.Forms.DataGridViewCheckBoxColumn
+    Friend WithEvents Auswahl As System.Windows.Forms.DataGridViewCheckBoxColumn
 End Class
