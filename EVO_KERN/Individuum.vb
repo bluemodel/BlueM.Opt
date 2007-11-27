@@ -1,5 +1,20 @@
 Public Class Individuum
 
+    '*******************************************************************************
+    '*******************************************************************************
+    '**** Shared Klasse Individuum für das Speichern eines Evaluierungssatzer   ****
+    '****                                                                       ****
+    '**** Christoph Hübner                                                      ****
+    '****                                                                       ****
+    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
+    '**** TU Darmstadt                                                          ****
+    '****                                                                       ****
+    '**** November 2007                                                         ****
+    '****                                                                       ****
+    '**** Letzte Änderung: November 2007                                        ****
+    '*******************************************************************************
+    '*******************************************************************************
+
     'Variablen der Klasse
     '********************
     Private Shared Individ_Type As Integer
