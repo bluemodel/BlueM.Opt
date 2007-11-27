@@ -240,9 +240,9 @@ Public Class EVO_Einstellungen
         Call FILLCOMBO_POPPENALTY(ComboPopPenalty)
     End Sub
 
-    'Speichern der Einstellungen
-    '***************************
-    Private Sub saveSettings()
+    'Einstellungen aus Form einlesen
+    '*******************************
+    Public Sub readSettings()
 
         _settings.NEltern = Val(TextAnzEltern.Text)
         _settings.NNachf = Val(TextAnzNachf.Text)
@@ -276,9 +276,6 @@ Public Class EVO_Einstellungen
         End If
         _settings.NMemberSecondPop = Val(TextNMemberSecondPop.Text)
 
-        'Flag setzen
-        Me.isSaved = True
-
     End Sub
 
 #Region "Schnittstelle"
@@ -299,9 +296,9 @@ Public Class EVO_Einstellungen
 
     Public ReadOnly Property PES_Settings() As PES.Struct_Settings
         Get
-            'Wenn Einstellungen noch nicht gespeichert, zuerst speichern
+            'Wenn Einstellungen noch nicht gespeichert, zuerst einlesen
             If (Not Me.isSaved) Then
-                Call saveSettings()
+                Call readSettings()
             End If
             PES_Settings = Me._settings
         End Get

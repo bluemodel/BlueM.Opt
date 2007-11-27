@@ -473,6 +473,10 @@ Partial Class Form1
             Me.isrun = True
             Me.Button_Start.Text = "||"
 
+            'EVO-Einstellungen speichern
+            Call Me.EVO_Settings1.readSettings()
+            Me.EVO_Settings1.isSaved = True
+
             'Try
 
             Select Case Anwendung
