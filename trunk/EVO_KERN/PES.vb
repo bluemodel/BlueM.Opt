@@ -1162,6 +1162,11 @@ StartMutation:
 
     End Sub
 
+    'Dieser Teil beschäftigt sich nur mit SekundärQb und NDSorting
+    '2. Die einzelnen Fronten werden bestimmt
+    '3. Der Bestwertspeicher wird entsprechend der Fronten oder der sekundären Population gefüllt
+    '4: Sekundäre Population wird bestimmt und gespeichert
+    '--------------------------------------------------------------------------------------------
     Private Sub EsEltern_Pareto_SekundärQb()
         Dim i As Integer
         Dim NFrontMember_aktuell As Integer
