@@ -1222,7 +1222,7 @@ StartMutation:
                 For i = NFrontMember_gesamt To NFrontMember_aktuell + NFrontMember_gesamt - 1
 
                     'NDSResult wird in den Bestwertspeicher kopiert
-                    Call Copy_Individuum_to_Bestwert(i, NDSResult)
+                    Call Write_Individuum_to_Bestwert(i, NDSResult)
 
                 Next i
                 NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
@@ -1236,7 +1236,7 @@ StartMutation:
                 For i = NFrontMember_gesamt To PES_Settings.NEltern - 1
 
                     'NDSResult wird in den Bestwertspeicher kopiert
-                    Call Copy_Individuum_to_Bestwert(i, NDSResult)
+                    Call Write_Individuum_to_Bestwert(i, NDSResult)
 
                 Next i
 
@@ -1299,7 +1299,7 @@ StartMutation:
                 For i = 0 To PES_Settings.NEltern - 1
 
                     'NDSResult wird in den Bestwertspeicher kopiert
-                    Call Copy_Individuum_to_Bestwert(i, SekundärQb)
+                    Call Write_Individuum_to_Bestwert(i, SekundärQb)
 
                 Next i
             End If
@@ -1604,6 +1604,12 @@ StartMutation:
             Db(v, i, PES_iAkt.iAktPop) = NDSorting_Struct(i).PES_d(v)
             Xb(v, i, PES_iAkt.iAktPop) = NDSorting_Struct(i).PES_X(v)
         Next v
+
+    End Sub
+
+    Public Shared Sub Write_Individuum_to_Bestwert(ByVal _i As Integer, ByVal _NDSorting_Struct As Individuum())
+
+        Call Write_Individuum_to_Bestwert(_i, _NDSorting_Struct)
 
     End Sub
 
