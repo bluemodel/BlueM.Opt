@@ -1253,31 +1253,6 @@ StartMutation:
         SekundärQb_Allocation(NFrontMember_aktuell, NDSResult)
     End Sub
 
-    'Kopiert ein Struct_NDSorting in den Bestwertspeicher
-    '----------------------------------------------------
-    Private Sub Copy_Individuum_to_Bestwert(ByVal i As Integer, ByVal NDSorting_Struct As Individuum())
-        Dim j, v As Integer
-
-        For j = 0 To NPenalty - 1
-            Qb(i, PES_iAkt.iAktPop, j) = NDSorting_Struct(i).Penalty(j)
-        Next j
-
-        If NConstrains > 0 Then
-            For j = 0 To NConstrains - 1
-                Rb(i, PES_iAkt.iAktPop, j) = NDSorting_Struct(i).Constrain(j)
-            Next j
-        End If
-
-        For v = 0 To NPara - 1
-            Db(v, i, PES_iAkt.iAktPop) = NDSorting_Struct(i).PES_d(v)
-            Xb(v, i, PES_iAkt.iAktPop) = NDSorting_Struct(i).PES_X(v)
-        Next v
-
-    End Sub
-
-    '****************************************************************************************
-    '****************************************************************************************
-
     '4: Sekundäre Population wird bestimmt und gespeichert ggf gespeichert
     '---------------------------------------------------------------------
     Private Sub SekundärQb_Allocation(ByVal NFrontMember_aktuell As Integer, ByVal NDSResult As Individuum())
@@ -1607,9 +1582,30 @@ StartMutation:
 
     End Sub
 
+    '**********************************************************************************************
+    '**********************************************************************************************
 
-    '**********************************************************************************************
-    '**********************************************************************************************
+    'Kopiert ein Struct_NDSorting in den Bestwertspeicher
+    '----------------------------------------------------
+    Private Sub Copy_Individuum_to_Bestwert(ByVal i As Integer, ByVal NDSorting_Struct As Individuum())
+        Dim j, v As Integer
+
+        For j = 0 To NPenalty - 1
+            Qb(i, PES_iAkt.iAktPop, j) = NDSorting_Struct(i).Penalty(j)
+        Next j
+
+        If NConstrains > 0 Then
+            For j = 0 To NConstrains - 1
+                Rb(i, PES_iAkt.iAktPop, j) = NDSorting_Struct(i).Constrain(j)
+            Next j
+        End If
+
+        For v = 0 To NPara - 1
+            Db(v, i, PES_iAkt.iAktPop) = NDSorting_Struct(i).PES_d(v)
+            Xb(v, i, PES_iAkt.iAktPop) = NDSorting_Struct(i).PES_X(v)
+        Next v
+
+    End Sub
 
     'ES_GET_SEKUNDÄRE_POPULATIONEN - Sekundäre Population speichert immer die angegebene
     'Anzahl von Bestwerten und kann den Bestwertspeicher alle x Generationen überschreiben
