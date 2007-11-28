@@ -478,6 +478,10 @@ Partial Class Form1
             'Ergebnis-Buttons
             Me.Button_Scatterplot.Enabled = True
 
+            'EVO-Einstellungen speichern
+            Call Me.EVO_Settings1.readSettings()
+            Me.EVO_Settings1.isSaved = True
+
             'Try
 
             Select Case Anwendung
@@ -727,9 +731,9 @@ Partial Class Form1
 
         'Parents und Childs werden Dimensioniert
         ReDim CES1.List_Parents(CES1.n_Parents - 1)
-        Call Kern.Individuum.Dim_Array("Parent", CES1.List_Parents)
+        Call Kern.Individuum.New_Array("Parent", CES1.List_Parents)
         ReDim CES1.List_Childs(CES1.n_Childs - 1)
-        Call Kern.Individuum.Dim_Array("Child", CES1.List_Childs)
+        Call Kern.Individuum.New_Array("Child", CES1.List_Childs)
 
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
@@ -904,7 +908,7 @@ Partial Class Form1
             '***********************************************
             If CES1.TestModus = 0 Then
                 'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
-                Call Kern.Individuum.Dim_Array("Child", CES1.List_Childs)
+                Call Kern.Individuum.New_Array("Child", CES1.List_Childs)
                 'Reproduktionsoperatoren, hier gehts dezent zur Sache
                 Call CES1.Reproduction_Control()
                 'Mutationsoperatoren
@@ -1090,6 +1094,9 @@ Partial Class Form1
         If (Not Me.Method = METH_CES_PES) Then
             Call PrepareDiagramm()
         End If
+
+        'Individuum wird initialisiert
+        Call Kern.Individuum.Initialise(1, 1, globalAnzZiel, globalAnzRand)
 
         'Schritte 0: Objekt der Klasse PES wird erzeugt
         '**********************************************

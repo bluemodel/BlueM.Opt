@@ -116,88 +116,13 @@ Public Class PES
     Private Distanceb() As Double           'Array mit Crowding-Distance (Neighbourhood-Rekomb.)
     Private PenaltyDistance(,) As Double    'Array für normierte Raumabstände (Neighbourhood-Rekomb.)
     '---------------------
-    Private SekundärQb() As Struct_NDSorting = {}   'Sekundäre Population
+    Private SekundärQb(-1) As Individuum    'Sekundäre Population wird mit -1 initialisiert dann länge 0
 
     Const galpha As Double = 1.3            'Faktor alpha=1.3 auf Generationsebene nach Rechenberg
     Const palpha As Double = 1.1            'Faktor alpha=1.1 auf Populationsebene nach Rechenberg
 
-    'Deklarationsteil für Non-Dominated Sorting
-    '******************************************
-    Private Structure Struct_NDSorting
-        Dim Penalty() As Double             '01 Werte der Penaltyfunktion(en)
-        Dim Constrain() As Double           '02 Werte der Randbedingung(en)
-        Dim feasible As Boolean             '03 Gültiges Ergebnis fehlt im Individuum
-        Dim dominated As Boolean            '04 Kennzeichnung ob dominiert
-        Dim Front As Integer                  '05 Nummer der Pareto Front
-        Dim X() As Double                   '06 Wert der Variablen
-        Dim d() As Double                   '07 Schrittweite der Variablen
-        Dim distance As Double              '08 Distanzwert für Crowding distance sort
-
-        'Überladene Methode um ein NDSorting zu Dimensionieren
-        Public Shared Sub Dimit(ByVal NPenalty As Integer, ByVal NConstrains As Integer, ByVal NPara As Integer, ByRef TMP As Struct_NDSorting)
-            Dim i As Integer
-
-            ReDim TMP.penalty(NPenalty - 1)                      '01 Werte der Penaltyfunktion(en)
-            For i = 0 To TMP.penalty.GetUpperBound(0)
-                TMP.penalty(i) = 1.0E+300
-            Next
-            'Bug 135
-            ReDim TMP.constrain(NConstrains - 1)                 '02 Werte der Randbedingung(en)
-            For i = 0 To TMP.constrain.GetUpperBound(0)
-                TMP.constrain(i) = -1.0E+300
-            Next
-            TMP.feasible = False                                 '03 Gültiges Ergebnis
-            TMP.dominated = False                                '04 Kennzeichnung ob dominiert
-            TMP.Front = 0                                        '05 Nummer der Pareto Front
-            ReDim TMP.X(NPara - 1)                               '06 Wert der Variablen
-            'Bug 135:
-            For i = 0 To TMP.X.GetUpperBound(0)
-                TMP.X(i) = 0
-            Next
-            ReDim TMP.d(NPara - 1)                               '07 Schrittweite der Variablen
-            'Bug 135:
-            For i = 0 To TMP.d.GetUpperBound(0)
-                TMP.d(i) = 0
-            Next
-            TMP.distance = 0                                     '08 Distanzwert für Crowding distance sort
-        End Sub
-
-        'Überladene Methode um ein Array aus NDSorting zu Dimensionieren
-        Public Shared Sub Dimit(ByVal NPenalty As Integer, ByVal NConstrains As Integer, ByVal NPara As Integer, ByRef TMP() As Struct_NDSorting)
-            Dim i As Integer
-
-            'Bug 135
-            For i = 0 To TMP.GetUpperBound(0)
-                Call Dimit(NPenalty, NConstrains, NPara, TMP(i))
-            Next
-
-        End Sub
-
-        'Überladen Methode die ein Struct NDSorting kopiert
-        Public Shared Sub Copy(ByVal Source As Struct_NDSorting, ByRef Dest As Struct_NDSorting)
-            Dest.penalty = Source.penalty.Clone       '01 Werte der Penaltyfunktion(en)
-            Dest.constrain = Source.constrain.Clone   '02 Werte der Randbedingung(en)
-            Dest.feasible = Source.feasible           '03 Gültiges Ergebnis ?
-            Dest.dominated = Source.dominated         '04 Kennzeichnung ob dominiert
-            Dest.Front = Source.Front                 '05 Nummer der Pareto Front
-            Dest.X = Source.X.Clone                   '06 Wert der Variablen
-            Dest.d = Source.d.Clone                   '07 Schrittweite der Variablen
-            Dest.distance = Source.distance           '08 Distanzwert für Crowding distance sort
-        End Sub
-
-        'Überladen Methode die ein Array aus Struct NDSorting kopiert
-        Public Shared Sub Copy(ByVal Source() As Struct_NDSorting, ByRef Dest() As Struct_NDSorting)
-            Dim i As Integer
-            'Bug 135:
-            For i = 0 To Source.GetUpperBound(0)
-                Call Copy(Source(i), Dest(i))
-            Next
-        End Sub
-
-    End Structure
-
-    Dim NDSorting() As Struct_NDSorting
-    Dim swap As Struct_NDSorting
+    Dim NDSorting() As Individuum
+    Dim swap As New Individuum("Swap", 0)
 
     Private Structure Struct_Sortierung
         Dim Index As Integer
@@ -337,11 +262,10 @@ Public Class PES
         'NDSorting wird nur benötigt, falls eine Paretofront approximiert wird
         If PES_Settings.is_MO_Pareto Then
             ReDim NDSorting(PES_Settings.NEltern + PES_Settings.NNachf - 1)
+            Call Individuum.New_Array("NDSorting", NDSorting)
             For i = 0 To PES_Settings.NEltern + PES_Settings.NNachf - 1
-                ReDim NDSorting(i).penalty(NPenalty - 1)
-                ReDim NDSorting(i).constrain(NConstrains - 1)
-                ReDim NDSorting(i).d(NPara - 1)
-                ReDim NDSorting(i).X(NPara - 1)
+                ReDim NDSorting(i).PES_d(NPara - 1)
+                ReDim NDSorting(i).PES_X(NPara - 1)
             Next i
             If PES_Settings.iOptEltern = EVO_ELTERN.Neighbourhood Then
                 ReDim PenaltyDistance(PES_Settings.NEltern - 1, PES_Settings.NEltern - 1)
@@ -1026,18 +950,18 @@ StartMutation:
             '----------------------
             With NDSorting(PES_iAkt.iAktNachf)
                 For i = 0 To NPenalty - 1
-                    .penalty(i) = QN(i)
+                    .Penalty(i) = QN(i)
                 Next i
                 .feasible = True
                 For i = 0 To NConstrains - 1
-                    .constrain(i) = RN(i)
-                    If .constrain(i) < 0 Then .feasible = False
+                    .Constrain(i) = RN(i)
+                    If .Constrain(i) < 0 Then .feasible = False
                 Next i
                 .dominated = False
                 .Front = 0
                 For v = 0 To NPara - 1
-                    .d(v) = AktPara.Dn(v)
-                    .X(v) = AktPara.Xn(v)
+                    .PES_d(v) = AktPara.Dn(v)
+                    .PES_X(v) = AktPara.Xn(v)
                 Next v
                 .distance = 0
             End With
@@ -1171,8 +1095,8 @@ StartMutation:
         Dim l, m, v, i As Integer
         Dim NFrontMember_aktuell, NFrontMember_gesamt As Integer
         Dim rang As Integer
-        Dim Temp() As Struct_NDSorting
-        Dim NDSResult() As Struct_NDSorting
+        Dim Temp() As Individuum
+        Dim NDSResult() As Individuum
         Dim aktuelle_Front As Integer
 
         If (Not PES_Settings.is_MO_Pareto) Then
@@ -1209,9 +1133,9 @@ StartMutation:
                     .Front = 0
                     For v = 0 To NPara - 1
                         'Die Schrittweite wird ebenfalls übernommen
-                        .d(v) = Db(v, m - PES_Settings.NNachf, PES_iAkt.iAktPop)
+                        .PES_d(v) = Db(v, m - PES_Settings.NNachf, PES_iAkt.iAktPop)
                         'Die eigentlichen Parameterwerte werden übernommen
-                        .X(v) = Xb(v, m - PES_Settings.NNachf, PES_iAkt.iAktPop)
+                        .PES_X(v) = Xb(v, m - PES_Settings.NNachf, PES_iAkt.iAktPop)
                     Next v
                     .distance = 0
                 End With
@@ -1225,20 +1149,11 @@ StartMutation:
             'Initialisierung von Temp (NDSorting)
             ReDim Temp(PES_Settings.NNachf + PES_Settings.NEltern - 1)
 
-            For i = 0 To (PES_Settings.NNachf + PES_Settings.NEltern - 1)
-                ReDim Temp(i).d(NPara - 1)
-                ReDim Temp(i).X(NPara - 1)
-            Next i
             'Initialisierung von NDSResult (NDSorting)
             ReDim NDSResult(PES_Settings.NNachf + PES_Settings.NEltern - 1)
 
-            For i = 0 To (PES_Settings.NNachf + PES_Settings.NEltern - 1)
-                ReDim NDSResult(i).d(NPara - 1)
-                ReDim NDSResult(i).X(NPara - 1)
-            Next i
-
             'NDSorting wird in Temp kopiert
-            Call PES.Struct_NDSorting.Copy(NDSorting, Temp)
+            Call Individuum.Copy_Array(NDSorting, Temp)
 
             'Schleife läuft über die Zahl der Fronten die hier auch bestimmt werden
             Do
@@ -1326,17 +1241,15 @@ StartMutation:
 
     '4: Sekundäre Population wird bestimmt und gespeichert ggf gespeichert
     '---------------------------------------------------------------------
-    Private Sub SekundärQb_Allocation(ByVal NFrontMember_aktuell As Integer, ByVal NDSResult As Struct_NDSorting())
+    Private Sub SekundärQb_Allocation(ByVal NFrontMember_aktuell As Integer, ByVal NDSResult As Individuum())
 
         Dim i As Integer
         Dim Member_Sekundärefront As Integer
 
         NFrontMember_aktuell = Count_Front_Members(1, NDSResult)
 
-        'BUG 135
-        'Weil wenn die Länge von SekundärQb 0 ist, gibt UBound -1 zurück!
-        'Problem: Upperbound liefert nicht die Anzahl! Was wird benötigt?
-        Member_Sekundärefront = Math.Max(SekundärQb.GetUpperBound(0), 0)
+        'Am Anfang wird SekundärQb mit -1 initialisiert
+        Member_Sekundärefront = SekundärQb.GetLength(0)
 
         'SekPop wird um die aktuelle Front erweitert
         ReDim Preserve SekundärQb(Member_Sekundärefront + NFrontMember_aktuell - 1)
@@ -1381,22 +1294,22 @@ StartMutation:
 
     'Kopiert ein Struct_NDSorting in den Bestwertspeicher
     '----------------------------------------------------
-    Private Sub Struct_NDSorting_to_Bestwert(ByVal i As Integer, ByVal NDSorting_Struct As Struct_NDSorting())
+    Private Sub Struct_NDSorting_to_Bestwert(ByVal i As Integer, ByVal NDSorting_Struct As Individuum())
         Dim j, v As Integer
 
         For j = 0 To NPenalty - 1
-            Qb(i, PES_iAkt.iAktPop, j) = NDSorting_Struct(i).penalty(j)
+            Qb(i, PES_iAkt.iAktPop, j) = NDSorting_Struct(i).Penalty(j)
         Next j
 
         If NConstrains > 0 Then
             For j = 0 To NConstrains - 1
-                Rb(i, PES_iAkt.iAktPop, j) = NDSorting_Struct(i).constrain(j)
+                Rb(i, PES_iAkt.iAktPop, j) = NDSorting_Struct(i).Constrain(j)
             Next j
         End If
 
         For v = 0 To NPara - 1
-            Db(v, i, PES_iAkt.iAktPop) = NDSorting_Struct(i).d(v)
-            Xb(v, i, PES_iAkt.iAktPop) = NDSorting_Struct(i).X(v)
+            Db(v, i, PES_iAkt.iAktPop) = NDSorting_Struct(i).PES_d(v)
+            Xb(v, i, PES_iAkt.iAktPop) = NDSorting_Struct(i).PES_X(v)
         Next v
 
     End Sub
@@ -1442,7 +1355,7 @@ StartMutation:
 
     'NON_DOMINATED_SORTING - Entscheidet welche Werte dominiert werden und welche nicht
     '**********************************************************************************
-    Private Sub Non_Dominated_Sorting(ByRef NDSorting() As Struct_NDSorting, ByVal rang As Integer)
+    Private Sub Non_Dominated_Sorting(ByRef NDSorting() As Individuum, ByVal rang As Integer)
 
         Dim j, i, k As Integer
         Dim isDominated As Boolean
@@ -1537,15 +1450,14 @@ StartMutation:
     'NON_DOMINATED_COUNT_AND_SORT - Sortiert die nicht dominanten Lösungen nach oben,
     'die dominanten nach unten, gibt die Zahl der dominanten Lösungen zurück (Front)
     '*******************************************************************************
-    Private Function Non_Dominated_Count_and_Sort(ByRef NDSorting() As Struct_NDSorting) As Integer
+    Private Function Non_Dominated_Count_and_Sort(ByRef NDSorting() As Individuum) As Integer
 
         Dim i As Integer
-        Dim Temp() As Struct_NDSorting
+        Dim Temp() As Individuum
         Dim counter As Integer
         Dim NFrontMember As Integer
 
         ReDim Temp(NDSorting.GetUpperBound(0))
-        Call PES.Struct_NDSorting.Dimit(NPenalty, NConstrains, NPara, Temp)
 
         NFrontMember = 0
         counter = 0
@@ -1554,7 +1466,7 @@ StartMutation:
         For i = 0 To NDSorting.GetUpperBound(0)
             If (NDSorting(i).dominated = True) Then
                 counter += 1
-                Call PES.Struct_NDSorting.Copy(NDSorting(i), Temp(counter - 1))
+                Temp(counter - 1) = NDSorting(i).Copy
             End If
         Next i
 
@@ -1565,11 +1477,11 @@ StartMutation:
         For i = 0 To NDSorting.GetUpperBound(0)
             If (NDSorting(i).dominated = False) Then
                 counter += 1
-                Call PES.Struct_NDSorting.Copy(NDSorting(i), Temp(counter - 1))
+                Temp(counter - 1) = NDSorting(i).Copy
             End If
         Next i
 
-        Call PES.Struct_NDSorting.Copy(Temp, NDSorting)
+        Call Individuum.Copy_Array(Temp, NDSorting)
 
         Return NFrontMember
 
@@ -1579,15 +1491,14 @@ StartMutation:
     'Sortiert die nicht dominanten Lösungen nach oben, die dominanten nach unten
     'Gibt die Zahl der dominanten Lösungen zurück (Front) hier für die Sekundäre Population
     '**************************************************************************************
-    Private Function Non_Dominated_Count_and_Sort_Sekundäre_Population(ByRef NDSorting() As Struct_NDSorting) As Integer
+    Private Function Non_Dominated_Count_and_Sort_Sekundäre_Population(ByRef NDSorting() As Individuum) As Integer
 
         Dim i As Integer
-        Dim Temp() As Struct_NDSorting
+        Dim Temp() As Individuum
         Dim counter As Integer
         Dim NFrontMember As Integer
 
         ReDim Temp(NDSorting.GetUpperBound(0))
-        Call PES.Struct_NDSorting.Dimit(NPenalty, NConstrains, NPara, Temp)
 
         NFrontMember = 0
         counter = 0
@@ -1595,7 +1506,7 @@ StartMutation:
         For i = 0 To NDSorting.GetUpperBound(0)
             If (NDSorting(i).dominated = False) Then
                 counter += 1
-                Call PES.Struct_NDSorting.Copy(NDSorting(i), Temp(counter - 1))
+                Temp(counter - 1) = NDSorting(i).Copy
             End If
         Next i
 
@@ -1604,11 +1515,11 @@ StartMutation:
         For i = 0 To NDSorting.GetUpperBound(0)
             If (NDSorting(i).dominated = True) Then
                 counter += 1
-                Call PES.Struct_NDSorting.Copy(NDSorting(i), Temp(counter - 1))
+                Temp(counter - 1) = NDSorting(i).Copy
             End If
         Next i
 
-        Call PES.Struct_NDSorting.Copy(Temp, NDSorting)
+        Call Individuum.Copy_Array(Temp, NDSorting)
 
         Return NFrontMember
 
@@ -1617,7 +1528,7 @@ StartMutation:
     'NON_DOMINATED_RESULT - Hier wird pro durchlauf die nicht dominierte Front in NDSResult
     'geschaufelt und die bereits klassifizierten Lösungen aus Temp Array gelöscht
     '**************************************************************************************
-    Private Sub Non_Dominated_Result(ByRef Temp() As Struct_NDSorting, ByRef NDSResult() As Struct_NDSorting, ByVal NFrontMember_aktuell As Integer, ByVal NFrontMember_gesamt As Integer)
+    Private Sub Non_Dominated_Result(ByRef Temp() As Individuum, ByRef NDSResult() As Individuum, ByVal NFrontMember_aktuell As Integer, ByVal NFrontMember_gesamt As Integer)
 
         Dim i, Position As Integer
 
@@ -1626,7 +1537,7 @@ StartMutation:
         'In NDSResult werden die nicht dominierten Lösungen eingefügt
         For i = Temp.GetLength(0) - NFrontMember_aktuell To Temp.GetUpperBound(0)
             'NDSResult alle bisher gefundene Fronten
-            Call PES.Struct_NDSorting.Copy(Temp(i), NDSResult(Position))
+            NDSResult(Position) = Temp(i).Copy
             Position += 1
         Next i
 
@@ -1643,7 +1554,7 @@ StartMutation:
 
     'COUNT_FRONT_MEMBERS
     '*******************
-    Private Function Count_Front_Members(ByVal aktuell_Front As Integer, ByVal NDSResult() As Struct_NDSorting) As Integer
+    Private Function Count_Front_Members(ByVal aktuell_Front As Integer, ByVal NDSResult() As Individuum) As Integer
 
         Dim i As Integer
         Count_Front_Members = 0
@@ -1658,13 +1569,11 @@ StartMutation:
 
     'NDS_Crowding_Distance_Sort
     '**************************
-    Private Sub NDS_Crowding_Distance_Sort(ByRef NDSorting() As Struct_NDSorting, ByVal StartIndex As Integer, ByVal EndIndex As Integer)
+    Private Sub NDS_Crowding_Distance_Sort(ByRef NDSorting() As Individuum, ByVal StartIndex As Integer, ByVal EndIndex As Integer)
 
         Dim i As Integer
         Dim j As Integer
         Dim k As Integer
-
-        Call PES.Struct_NDSorting.Dimit(NPenalty, NConstrains, NPara, swap)
 
         Dim fmin, fmax As Double
 
@@ -1672,9 +1581,9 @@ StartMutation:
             For i = StartIndex To EndIndex
                 For j = StartIndex To EndIndex
                     If (NDSorting(i).penalty(k) < NDSorting(j).penalty(k)) Then
-                        Call PES.Struct_NDSorting.Copy(NDSorting(i), swap)
-                        Call PES.Struct_NDSorting.Copy(NDSorting(j), NDSorting(i))
-                        Call PES.Struct_NDSorting.Copy(swap, NDSorting(j))
+                        swap = NDSorting(i).Copy
+                        NDSorting(i) = NDSorting(j).Copy
+                        NDSorting(j) = swap.Copy
                     End If
                 Next j
             Next i
@@ -1693,9 +1602,9 @@ StartMutation:
         For i = StartIndex To EndIndex
             For j = StartIndex To EndIndex
                 If (NDSorting(i).distance > NDSorting(j).distance) Then
-                    Call PES.Struct_NDSorting.Copy(NDSorting(i), swap)
-                    Call PES.Struct_NDSorting.Copy(NDSorting(j), NDSorting(i))
-                    Call PES.Struct_NDSorting.Copy(swap, NDSorting(j))
+                    swap = NDSorting(i).Copy
+                    NDSorting(i) = NDSorting(j).Copy
+                    NDSorting(j) = swap.Copy
                 End If
             Next j
         Next i

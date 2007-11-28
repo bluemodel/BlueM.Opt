@@ -559,7 +559,7 @@ Public Class CES
     Private Sub PES_Memory_Dubletten_loeschen(ByRef PES_Parents() As Individuum)
 
         Dim tmp(PES_Parents.GetUpperBound(0) - 1) As Individuum
-        Individuum.Dim_Array("tmp", tmp)
+        Individuum.New_Array("tmp", tmp)
         Dim isDouble As Boolean
         Dim i, j, x As Integer
 
@@ -752,7 +752,7 @@ Public Class CES
         'Dim Member_Sekundärefront As Short
 
         Dim NDSorting(n_Childs + n_Parents - 1) As Individuum
-        Call Individuum.Dim_Array("NDSorting", NDSorting)
+        Call Individuum.New_Array("NDSorting", NDSorting)
 
         '0. Eltern und Nachfolger werden gemeinsam betrachtet
         'Die Kinder werden NDSorting hinzugefügt
@@ -792,7 +792,7 @@ Public Class CES
             '    Next l
             'End If
 
-            NDSorting(i) = List_Parents(i - n_Childs).copy
+            NDSorting(i) = List_Parents(i - n_Childs).Copy
 
             NDSorting(i).dominated = False
             NDSorting(i).Front = 0
@@ -807,10 +807,10 @@ Public Class CES
 
         'Initialisierung von Temp (NDSorting)
         Dim Temp(n_Childs + n_Parents - 1) As Individuum
-        Call Individuum.Dim_Array("TMP_NDSorting", Temp)
+        Call Individuum.New_Array("TMP_NDSorting", Temp)
 
         'Initialisierung von NDSResult (NDSorting)
-        Call Individuum.Dim_Array("NDSResult", NDSResult)
+        Call Individuum.New_Array("NDSResult", NDSResult)
 
         'NDSorting wird in Temp kopiert
         For i = 0 To NDSorting.GetUpperBound(0)
@@ -1023,7 +1023,7 @@ Public Class CES
         Dim counter As Short
 
         Dim Temp(NDSorting.GetUpperBound(0)) As Individuum
-        Call Individuum.Dim_Array("Temp_NDSorting", Temp)
+        Call Individuum.New_Array("Temp_NDSorting", Temp)
 
         Non_Dominated_Count_and_Sort = 0
         counter = 0
