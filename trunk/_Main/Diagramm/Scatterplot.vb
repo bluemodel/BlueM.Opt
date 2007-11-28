@@ -78,6 +78,9 @@ Partial Public Class Scatterplot
                     .Axes.Bottom.Title.Caption = xAchse
                     .Axes.Left.Title.Caption = yAchse
 
+                    .Axes.Left.Labels.Style = Steema.TeeChart.AxisLabelStyle.Value
+                    .Axes.Bottom.Labels.Style = Steema.TeeChart.AxisLabelStyle.Value
+
                     .Axes.Left.Labels.ValueFormat = "0.00E+00"
                     .Axes.Bottom.Labels.ValueFormat = "0.00E+00"
 
