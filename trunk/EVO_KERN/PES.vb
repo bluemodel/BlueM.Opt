@@ -1091,12 +1091,7 @@ StartMutation:
     '*********************************************
     Public Sub EsEltern()
 
-        Dim l, m, v, i As Integer
-        Dim NFrontMember_aktuell, NFrontMember_gesamt As Integer
-        Dim rang As Integer
-        Dim Temp() As Individuum
-        Dim NDSResult() As Individuum
-        Dim aktuelle_Front As Integer
+        Dim l, m, v As Integer
 
         If (Not PES_Settings.is_MO_Pareto) Then
             'Standard ES nach Rechenberg
@@ -1141,82 +1136,11 @@ StartMutation:
             Next m
 
             '2. Die einzelnen Fronten werden bestimmt
-            '----------------------------------------
-            rang = 1
-            NFrontMember_gesamt = 0
-
-            'Initialisierung von Temp (NDSorting)
-            ReDim Temp(PES_Settings.NNachf + PES_Settings.NEltern - 1)
-
-            'Initialisierung von NDSResult (NDSorting)
-            ReDim NDSResult(PES_Settings.NNachf + PES_Settings.NEltern - 1)
-
-            'NDSorting wird in Temp kopiert
-            Call Individuum.Copy_Array(NDSorting, Temp)
-
-            'Schleife läuft über die Zahl der Fronten die hier auch bestimmt werden
-            Do
-                'Entscheidet welche Werte dominiert werden und welche nicht
-                Call Pareto_SekundärQb_Non_Dominated_Sorting(Temp, rang) 'aktualisiert auf n Objectives dm 10.05.05
-                'Sortiert die nicht dominanten Lösungen nach oben,
-                'die dominanten nach unten und zählt die Mitglieder der aktuellen Front
-                NFrontMember_aktuell = Pareto_Non_Dominated_Count_and_Sort(Temp)
-                'NFrontMember_aktuell: Anzahl der Mitglieder der gerade bestimmten Front
-                'NFrontMember_gesamt: Alle bisher als nicht dominiert klassifizierten Individuum
-                NFrontMember_gesamt += NFrontMember_aktuell
-                'Hier wird pro durchlauf die nicht dominierte Front in NDSResult geschaufelt
-                'und die bereits klassifizierten Lösungen aus Temp Array gelöscht
-                Call Pareto_Non_Dominated_Result(Temp, NDSResult, NFrontMember_aktuell, NFrontMember_gesamt)
-                'Rang ist hier die Nummer der Front
-                rang += 1
-            Loop While Not (NFrontMember_gesamt = PES_Settings.NEltern + PES_Settings.NNachf)
-
-            '3. Der Bestwertspeicher wird entsprechend der Fronten oder der
-            'sekundären Population gefüllt
-            '-------------------------------------------------------------
-            NFrontMember_aktuell = 0
-            NFrontMember_gesamt = 0
-            aktuelle_Front = 0
-
-            Do
-                NFrontMember_aktuell = Pareto_Count_Front_Members(aktuelle_Front, NDSResult)
-
-                'Es sind mehr Elterplätze für die nächste Generation verfügaber
-                '-> schiss wird einfach rüberkopiert
-                If NFrontMember_aktuell <= PES_Settings.NEltern - NFrontMember_gesamt Then
-                    For i = NFrontMember_gesamt To NFrontMember_aktuell + NFrontMember_gesamt - 1
-
-                        'NDSResult wird in den Bestwertspeicher kopiert
-                        Call Copy_Individuum_to_Bestwert(i, NDSResult)
-
-                    Next i
-                    NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
-
-                Else
-                    'Es sind weniger Elterplätze für die nächste Generation verfügber
-                    'als Mitglieder der aktuellen Front. Nur für diesen Rest wird crowding distance
-                    'gemacht um zu bestimmen wer noch mitspielen darf und wer noch a biserl was druff hat
-                    Call Pareto_Crowding_Distance_Sort(NDSResult, NFrontMember_gesamt, NFrontMember_gesamt + NFrontMember_aktuell - 1)
-
-                    For i = NFrontMember_gesamt To PES_Settings.NEltern - 1
-
-                        'NDSResult wird in den Bestwertspeicher kopiert
-                        Call Copy_Individuum_to_Bestwert(i, NDSResult)
-
-                    Next i
-
-                    NFrontMember_gesamt = PES_Settings.NEltern
-
-                End If
-
-                aktuelle_Front += 1
-
-            Loop While Not (NFrontMember_gesamt = PES_Settings.NEltern)
-
+            '3. Der Bestwertspeicher wird entsprechend der Fronten oder der sekundären Population gefüllt
             '4: Sekundäre Population wird bestimmt und gespeichert
-            '-----------------------------------------------------
-            SekundärQb_Allocation(NFrontMember_aktuell, NDSResult)
-
+            '--------------------------------
+            Call EsEltern_Pareto_SekundärQb()
+            '--------------------------------
 
             '5: Neue Eltern werden gleich dem Bestwertspeicher gesetzt
             '---------------------------------------------------------
@@ -1236,6 +1160,92 @@ StartMutation:
 
         End If
 
+    End Sub
+
+    Private Sub EsEltern_Pareto_SekundärQb()
+        Dim i As Integer
+        Dim NFrontMember_aktuell As Integer
+        Dim NFrontMember_gesamt As Integer
+        Dim rang As Integer
+        Dim aktuelle_Front As Integer
+        Dim Temp() As Individuum
+        Dim NDSResult() As Individuum
+
+        '2. Die einzelnen Fronten werden bestimmt
+        '----------------------------------------
+        rang = 1
+        NFrontMember_gesamt = 0
+
+        'Initialisierung von Temp (NDSorting)
+        ReDim Temp(PES_Settings.NNachf + PES_Settings.NEltern - 1)
+
+        'Initialisierung von NDSResult (NDSorting)
+        ReDim NDSResult(PES_Settings.NNachf + PES_Settings.NEltern - 1)
+
+        'NDSorting wird in Temp kopiert
+        Call Individuum.Copy_Array(NDSorting, Temp)
+
+        'Schleife läuft über die Zahl der Fronten die hier auch bestimmt werden
+        Do
+            'Entscheidet welche Werte dominiert werden und welche nicht
+            Call Pareto_SekundärQb_Non_Dominated_Sorting(Temp, rang) 'aktualisiert auf n Objectives dm 10.05.05
+            'Sortiert die nicht dominanten Lösungen nach oben,
+            'die dominanten nach unten und zählt die Mitglieder der aktuellen Front
+            NFrontMember_aktuell = Pareto_Non_Dominated_Count_and_Sort(Temp)
+            'NFrontMember_aktuell: Anzahl der Mitglieder der gerade bestimmten Front
+            'NFrontMember_gesamt: Alle bisher als nicht dominiert klassifizierten Individuum
+            NFrontMember_gesamt += NFrontMember_aktuell
+            'Hier wird pro durchlauf die nicht dominierte Front in NDSResult geschaufelt
+            'und die bereits klassifizierten Lösungen aus Temp Array gelöscht
+            Call Pareto_Non_Dominated_Result(Temp, NDSResult, NFrontMember_aktuell, NFrontMember_gesamt)
+            'Rang ist hier die Nummer der Front
+            rang += 1
+        Loop While Not (NFrontMember_gesamt = PES_Settings.NEltern + PES_Settings.NNachf)
+
+        '3. Der Bestwertspeicher wird entsprechend der Fronten oder der sekundären Population gefüllt
+        '--------------------------------------------------------------------------------------------
+        NFrontMember_aktuell = 0
+        NFrontMember_gesamt = 0
+        aktuelle_Front = 0
+
+        Do
+            NFrontMember_aktuell = Pareto_Count_Front_Members(aktuelle_Front, NDSResult)
+
+            'Es sind mehr Elterplätze für die nächste Generation verfügaber
+            '-> schiss wird einfach rüberkopiert
+            If NFrontMember_aktuell <= PES_Settings.NEltern - NFrontMember_gesamt Then
+                For i = NFrontMember_gesamt To NFrontMember_aktuell + NFrontMember_gesamt - 1
+
+                    'NDSResult wird in den Bestwertspeicher kopiert
+                    Call Copy_Individuum_to_Bestwert(i, NDSResult)
+
+                Next i
+                NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
+
+            Else
+                'Es sind weniger Elterplätze für die nächste Generation verfügber
+                'als Mitglieder der aktuellen Front. Nur für diesen Rest wird crowding distance
+                'gemacht um zu bestimmen wer noch mitspielen darf und wer noch a biserl was druff hat
+                Call Pareto_Crowding_Distance_Sort(NDSResult, NFrontMember_gesamt, NFrontMember_gesamt + NFrontMember_aktuell - 1)
+
+                For i = NFrontMember_gesamt To PES_Settings.NEltern - 1
+
+                    'NDSResult wird in den Bestwertspeicher kopiert
+                    Call Copy_Individuum_to_Bestwert(i, NDSResult)
+
+                Next i
+
+                NFrontMember_gesamt = PES_Settings.NEltern
+
+            End If
+
+            aktuelle_Front += 1
+
+        Loop While Not (NFrontMember_gesamt = PES_Settings.NEltern)
+
+        '4: Sekundäre Population wird bestimmt und gespeichert
+        '-----------------------------------------------------
+        SekundärQb_Allocation(NFrontMember_aktuell, NDSResult)
     End Sub
 
     'Kopiert ein Struct_NDSorting in den Bestwertspeicher
