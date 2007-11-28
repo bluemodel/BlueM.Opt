@@ -189,10 +189,12 @@ Public Class Individuum
         Me.mutated = False
 
         '06a Parameterarray für PES
-        'Me.PES_x(0) = 0 'wird am gleich Anfang im PES Dimensioniert
+        ReDim Me.PES_X(0)
+        Me.PES_x(0) = 0 'wird am gleich Anfang im PES neu Dimensioniert
 
         '06b Dn Array für PES
-        'Me.Pes_d(0) = 0 'wird am gleich Anfang im PES Dimensioniert
+        ReDim Me.PES_d(0)
+        Me.Pes_d(0) = 0 'wird am gleich Anfang im PES neu Dimensioniert
 
         '07 Kennzeichnung ob Dominiert
         Me.dominated = False
