@@ -122,6 +122,7 @@ Public Class PES
     Const palpha As Double = 1.1            'Faktor alpha=1.1 auf Populationsebene nach Rechenberg
 
     Dim NDSorting() As Individuum
+    Dim swap As New Individuum("Swap", 0)
 
     Private Structure Struct_Sortierung
         Dim Index As Integer
@@ -1090,7 +1091,13 @@ StartMutation:
     'ES_ELTERN - Die neuen Eltern werden generiert
     '*********************************************
     Public Sub EsEltern()
-        Dim m, v as Integer
+
+        Dim l, m, v, i As Integer
+        Dim NFrontMember_aktuell, NFrontMember_gesamt As Integer
+        Dim rang As Integer
+        Dim Temp() As Individuum
+        Dim NDSResult() As Individuum
+        Dim aktuelle_Front As Integer
 
         If (Not PES_Settings.is_MO_Pareto) Then
             'Standard ES nach Rechenberg
@@ -1107,131 +1114,132 @@ StartMutation:
         Else
             'Multi-Objective Pareto
             'xxxxxxxxxxxxxxxxxxxxxx
-            Call EsEltern_Pareto()
+            '1. Eltern und Nachfolger werden gemeinsam betrachtet
+            'Nur Eltern werden NDSorting hinzugefügt, Kinder sind schon oben drin
+            '--------------------------------------------------------------------
+            For m = PES_Settings.NNachf To PES_Settings.NNachf + PES_Settings.NEltern - 1
+                With NDSorting(m)
+                    For l = 0 To NPenalty - 1
+                        .penalty(l) = Qb(m - PES_Settings.NNachf, PES_iAkt.iAktPop, l)
+                    Next l
+                    If NConstrains > 0 Then
+                        .feasible = True
+                        For l = 0 To NConstrains - 1
+                            .constrain(l) = Rb(m - PES_Settings.NNachf, PES_iAkt.iAktPop, l)
+                            If .constrain(l) < 0 Then .feasible = False
+                        Next l
+                    End If
+                    .dominated = False
+                    .Front = 0
+                    For v = 0 To NPara - 1
+                        'Die Schrittweite wird ebenfalls übernommen
+                        .PES_d(v) = Db(v, m - PES_Settings.NNachf, PES_iAkt.iAktPop)
+                        'Die eigentlichen Parameterwerte werden übernommen
+                        .PES_X(v) = Xb(v, m - PES_Settings.NNachf, PES_iAkt.iAktPop)
+                    Next v
+                    .distance = 0
+                End With
+            Next m
 
-        End If
+            '2. Die einzelnen Fronten werden bestimmt
+            '----------------------------------------
+            rang = 1
+            NFrontMember_gesamt = 0
 
-    End Sub
+            'Initialisierung von Temp (NDSorting)
+            ReDim Temp(PES_Settings.NNachf + PES_Settings.NEltern - 1)
 
-    'Multi-Objective Pareto
-    'xxxxxxxxxxxxxxxxxxxxxx
-    '1. Eltern und Nachfolger werden gemeinsam betrachtet
-    'Nur Eltern werden NDSorting hinzugefügt, Kinder sind schon oben drin
-    '--------------------------------------------------------------------
-    Private Sub EsEltern_Pareto()
-        Dim i, m, v As Integer
-        Dim Temp() As Individuum
-        Dim NDSResult() As Individuum
-        Dim NFrontMember_aktuell As Integer
-        Dim NFrontMember_gesamt As Integer
-        Dim rang As Integer
-        Dim aktuelle_Front As Integer
+            'Initialisierung von NDSResult (NDSorting)
+            ReDim NDSResult(PES_Settings.NNachf + PES_Settings.NEltern - 1)
 
-        '1. Eltern und Nachfolger werden gemeinsam betrachtet
-        'Nur Eltern werden NDSorting hinzugefügt, Kinder sind schon oben drin
-        '--------------------------------------------------------------------
-        For m = PES_Settings.NNachf To PES_Settings.NNachf + PES_Settings.NEltern - 1
+            'NDSorting wird in Temp kopiert
+            Call Individuum.Copy_Array(NDSorting, Temp)
 
-            'Kopiert den Bestwertspeicher in ein Individuum
-            Call Copy_PES_Bestwert_to_Individuum(m, NDSorting(m))
+            'Schleife läuft über die Zahl der Fronten die hier auch bestimmt werden
+            Do
+                'Entscheidet welche Werte dominiert werden und welche nicht
+                Call Non_Dominated_Sorting(Temp, rang) 'aktualisiert auf n Objectives dm 10.05.05
+                'Sortiert die nicht dominanten Lösungen nach oben,
+                'die dominanten nach unten und zählt die Mitglieder der aktuellen Front
+                NFrontMember_aktuell = Non_Dominated_Count_and_Sort(Temp)
+                'NFrontMember_aktuell: Anzahl der Mitglieder der gerade bestimmten Front
+                'NFrontMember_gesamt: Alle bisher als nicht dominiert klassifizierten Individuum
+                NFrontMember_gesamt += NFrontMember_aktuell
+                'Hier wird pro durchlauf die nicht dominierte Front in NDSResult geschaufelt
+                'und die bereits klassifizierten Lösungen aus Temp Array gelöscht
+                Call Non_Dominated_Result(Temp, NDSResult, NFrontMember_aktuell, NFrontMember_gesamt)
+                'Rang ist hier die Nummer der Front
+                rang += 1
+            Loop While Not (NFrontMember_gesamt = PES_Settings.NEltern + PES_Settings.NNachf)
 
-        Next m
+            '3. Der Bestwertspeicher wird entsprechend der Fronten oder der
+            'sekundären Population gefüllt
+            '-------------------------------------------------------------
+            NFrontMember_aktuell = 0
+            NFrontMember_gesamt = 0
+            aktuelle_Front = 0
 
-        '2. Die einzelnen Fronten werden bestimmt
-        '----------------------------------------
-        rang = 1
-        NFrontMember_gesamt = 0
+            Do
+                NFrontMember_aktuell = Count_Front_Members(aktuelle_Front, NDSResult)
 
-        'Initialisierung von Temp (NDSorting)
-        ReDim Temp(PES_Settings.NNachf + PES_Settings.NEltern - 1)
+                'Es sind mehr Elterplätze für die nächste Generation verfügaber
+                '-> schiss wird einfach rüberkopiert
+                If NFrontMember_aktuell <= PES_Settings.NEltern - NFrontMember_gesamt Then
+                    For i = NFrontMember_gesamt To NFrontMember_aktuell + NFrontMember_gesamt - 1
 
-        'Initialisierung von NDSResult (NDSorting)
-        ReDim NDSResult(PES_Settings.NNachf + PES_Settings.NEltern - 1)
+                        'NDSResult wird in den Bestwertspeicher kopiert
+                        Call Struct_NDSorting_to_Bestwert(i, NDSResult)
 
-        'NDSorting wird in Temp kopiert
-        Call Individuum.Copy_Array(NDSorting, Temp)
+                    Next i
+                    NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
 
-        'Schleife läuft über die Zahl der Fronten die hier auch bestimmt werden
-        Do
-            'Entscheidet welche Werte dominiert werden und welche nicht
-            Call Non_Dominated_Sorting(Temp, rang) 'aktualisiert auf n Objectives dm 10.05.05
-            'Sortiert die nicht dominanten Lösungen nach oben,
-            'die dominanten nach unten und zählt die Mitglieder der aktuellen Front
-            NFrontMember_aktuell = Non_Dominated_Count_and_Sort(Temp)
-            'NFrontMember_aktuell: Anzahl der Mitglieder der gerade bestimmten Front
-            'NFrontMember_gesamt: Alle bisher als nicht dominiert klassifizierten Individuum
-            NFrontMember_gesamt += NFrontMember_aktuell
-            'Hier wird pro durchlauf die nicht dominierte Front in NDSResult geschaufelt
-            'und die bereits klassifizierten Lösungen aus Temp Array gelöscht
-            Call Non_Dominated_Result(Temp, NDSResult, NFrontMember_aktuell, NFrontMember_gesamt)
-            'Rang ist hier die Nummer der Front
-            rang += 1
-        Loop While Not (NFrontMember_gesamt = PES_Settings.NEltern + PES_Settings.NNachf)
+                Else
+                    'Es sind weniger Elterplätze für die nächste Generation verfügber
+                    'als Mitglieder der aktuellen Front. Nur für diesen Rest wird crowding distance
+                    'gemacht um zu bestimmen wer noch mitspielen darf und wer noch a biserl was druff hat
+                    Call NDS_Crowding_Distance_Sort(NDSResult, NFrontMember_gesamt, NFrontMember_gesamt + NFrontMember_aktuell - 1)
 
-        '3. Der Bestwertspeicher wird entsprechend der Fronten oder der sekundären Population gefüllt
-        '--------------------------------------------------------------------------------------------
-        NFrontMember_aktuell = 0
-        NFrontMember_gesamt = 0
-        aktuelle_Front = 0
+                    For i = NFrontMember_gesamt To PES_Settings.NEltern - 1
 
-        Do
-            NFrontMember_aktuell = Count_Front_Members(aktuelle_Front, NDSResult)
+                        'NDSResult wird in den Bestwertspeicher kopiert
+                        Call Struct_NDSorting_to_Bestwert(i, NDSResult)
 
-            'Es sind mehr Elterplätze für die nächste Generation verfügaber
-            '-> schiss wird einfach rüberkopiert
-            If NFrontMember_aktuell <= PES_Settings.NEltern - NFrontMember_gesamt Then
-                For i = NFrontMember_gesamt To NFrontMember_aktuell + NFrontMember_gesamt - 1
+                    Next i
 
-                    'NDSResult wird in den Bestwertspeicher kopiert
-                    Call Copy_PES_Individuum_to_Bestwert(i, NDSResult(i))
+                    NFrontMember_gesamt = PES_Settings.NEltern
 
-                Next i
-                NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
+                End If
 
-            Else
-                'Es sind weniger Elterplätze für die nächste Generation verfügber
-                'als Mitglieder der aktuellen Front. Nur für diesen Rest wird crowding distance
-                'gemacht um zu bestimmen wer noch mitspielen darf und wer noch a biserl was druff hat
-                Call NDS_Crowding_Distance_Sort(NDSResult, NFrontMember_gesamt, NFrontMember_gesamt + NFrontMember_aktuell - 1)
+                aktuelle_Front += 1
 
-                For i = NFrontMember_gesamt To PES_Settings.NEltern - 1
+            Loop While Not (NFrontMember_gesamt = PES_Settings.NEltern)
 
-                    'NDSResult wird in den Bestwertspeicher kopiert
-                    Call Copy_PES_Individuum_to_Bestwert(i, NDSResult(i))
+            '4: Sekundäre Population wird bestimmt und gespeichert
+            '-----------------------------------------------------
+            SekundärQb_Allocation(NFrontMember_aktuell, NDSResult)
 
-                Next i
 
-                NFrontMember_gesamt = PES_Settings.NEltern
+            '5: Neue Eltern werden gleich dem Bestwertspeicher gesetzt
+            '---------------------------------------------------------
+            For m = 0 To PES_Settings.NEltern - 1
+                For v = 0 To NPara - 1
+                    De(v, m, PES_iAkt.iAktPop) = Db(v, m, PES_iAkt.iAktPop)
+                    Xe(v, m, PES_iAkt.iAktPop) = Xb(v, m, PES_iAkt.iAktPop)
+                Next v
+            Next m
 
+            '6: Sortierung der Lösungen ist nur für Neighbourhood-Rekombination notwendig
+            '----------------------------------------------------------------------------
+            If (PES_Settings.iOptEltern = EVO_ELTERN.Neighbourhood) Then
+                Call Neighbourhood_AbstandsArray()
+                Call Neighbourhood_Crowding_Distance()
             End If
 
-            aktuelle_Front += 1
-
-        Loop While Not (NFrontMember_gesamt = PES_Settings.NEltern)
-
-        '4: Sekundäre Population wird bestimmt und gespeichert
-        '-----------------------------------------------------
-        SekundärQb_Allocation(NFrontMember_aktuell, NDSResult)
-
-        '5: Neue Eltern werden gleich dem Bestwertspeicher gesetzt
-        '---------------------------------------------------------
-        For m = 0 To PES_Settings.NEltern - 1
-            For v = 0 To NPara - 1
-                De(v, m, PES_iAkt.iAktPop) = Db(v, m, PES_iAkt.iAktPop)
-                Xe(v, m, PES_iAkt.iAktPop) = Xb(v, m, PES_iAkt.iAktPop)
-            Next v
-        Next m
-
-        '6: Sortierung der Lösungen ist nur für Neighbourhood-Rekombination notwendig
-        '----------------------------------------------------------------------------
-        If (PES_Settings.iOptEltern = EVO_ELTERN.Neighbourhood) Then
-            Call Neighbourhood_AbstandsArray()
-            Call Neighbourhood_Crowding_Distance()
         End If
+
     End Sub
 
     '4: Sekundäre Population wird bestimmt und gespeichert ggf gespeichert
-    'Aufrufe von: EsEltern_Pareto()
     '---------------------------------------------------------------------
     Private Sub SekundärQb_Allocation(ByVal NFrontMember_aktuell As Integer, ByVal NDSResult As Individuum())
 
@@ -1253,12 +1261,12 @@ StartMutation:
 
         Call Non_Dominated_Sorting(SekundärQb, 1)
 
-        NFrontMember_aktuell = Non_Dominated_Count_and_Sort_SekundärQb(SekundärQb)
+        NFrontMember_aktuell = Non_Dominated_Count_and_Sort_Sekundäre_Population(SekundärQb)
         ReDim Preserve SekundärQb(NFrontMember_aktuell - 1)
 
         'Dubletten werden gelöscht
         Call SekundärQb_Dubletten()
-        NFrontMember_aktuell = Non_Dominated_Count_and_Sort_SekundärQb(SekundärQb)
+        NFrontMember_aktuell = Non_Dominated_Count_and_Sort_Sekundäre_Population(SekundärQb)
         ReDim Preserve SekundärQb(NFrontMember_aktuell - 1)
 
         'Crowding Distance
@@ -1277,16 +1285,37 @@ StartMutation:
                 For i = 0 To PES_Settings.NEltern - 1
 
                     'NDSResult wird in den Bestwertspeicher kopiert
-                    Call Copy_PES_Individuum_to_Bestwert(i, SekundärQb(i))
+                    Call Struct_NDSorting_to_Bestwert(i, SekundärQb)
 
                 Next i
             End If
         End If
     End Sub
 
+    'Kopiert ein Struct_NDSorting in den Bestwertspeicher
+    '----------------------------------------------------
+    Private Sub Struct_NDSorting_to_Bestwert(ByVal i As Integer, ByVal NDSorting_Struct As Individuum())
+        Dim j, v As Integer
+
+        For j = 0 To NPenalty - 1
+            Qb(i, PES_iAkt.iAktPop, j) = NDSorting_Struct(i).Penalty(j)
+        Next j
+
+        If NConstrains > 0 Then
+            For j = 0 To NConstrains - 1
+                Rb(i, PES_iAkt.iAktPop, j) = NDSorting_Struct(i).Constrain(j)
+            Next j
+        End If
+
+        For v = 0 To NPara - 1
+            Db(v, i, PES_iAkt.iAktPop) = NDSorting_Struct(i).PES_d(v)
+            Xb(v, i, PES_iAkt.iAktPop) = NDSorting_Struct(i).PES_X(v)
+        Next v
+
+    End Sub
+
     'SekundärQb_Dubletten
-    'Aufrufe von: SekundärQb_Allocation()
-    '************************************
+    '********************
     Private Sub SekundärQb_Dubletten()
 
         Dim i, j, k As Integer
@@ -1296,7 +1325,7 @@ StartMutation:
             For j = i + 1 To SekundärQb.GetUpperBound(0)
                 Logical = True
                 For k = 0 To NPenalty - 1
-                    Logical = Logical And (SekundärQb(i).Penalty(k) = SekundärQb(j).Penalty(k))
+                    Logical = Logical And (SekundärQb(i).penalty(k) = SekundärQb(j).penalty(k))
                 Next k
                 If (Logical) Then SekundärQb(i).dominated = True
             Next j
@@ -1306,7 +1335,6 @@ StartMutation:
 
     'ES_GET_SEKUNDÄRE_POPULATIONEN - Sekundäre Population speichert immer die angegebene
     'Anzahl von Bestwerten und kann den Bestwertspeicher alle x Generationen überschreiben
-    'Aufrufe von: EsEltern_Pareto()
     '*************************************************************************************
     Public Function SekundärQb_Get() As Double(,)
 
@@ -1317,7 +1345,7 @@ StartMutation:
 
         For i = 0 To SekundärQb.GetUpperBound(0)
             For j = 0 To NPenalty - 1
-                SekPopulation(i, j) = SekundärQb(i).Penalty(j)
+                SekPopulation(i, j) = SekundärQb(i).penalty(j)
             Next j
         Next i
 
@@ -1325,60 +1353,7 @@ StartMutation:
 
     End Function
 
-    'Kopiert ein Individuum in den Bestwertspeicher
-    'Aufrufe von: EsEltern_Pareto(), SekundärQb_Allocation()
-    '----------------------------------------------------
-    Private Sub Copy_PES_Individuum_to_Bestwert(ByVal i As Integer, ByVal _Individuum As Individuum)
-        Dim j, v As Integer
-
-        For j = 0 To NPenalty - 1
-            Qb(i, PES_iAkt.iAktPop, j) = _Individuum.Penalty(j)
-        Next j
-
-        If NConstrains > 0 Then
-            For j = 0 To NConstrains - 1
-                Rb(i, PES_iAkt.iAktPop, j) = _Individuum.Constrain(j)
-            Next j
-        End If
-
-        For v = 0 To NPara - 1
-            Db(v, i, PES_iAkt.iAktPop) = _Individuum.PES_d(v)
-            Xb(v, i, PES_iAkt.iAktPop) = _Individuum.PES_X(v)
-        Next v
-
-    End Sub
-
-    'Kopiert den Bestwertspeicher in ein Individuum
-    'Aufrufe von: EsEltern_Pareto()
-    '----------------------------------------------
-    Private Sub Copy_PES_Bestwert_to_Individuum(ByVal m As Integer, ByRef _NDSorting As Individuum)
-        Dim l, v As Integer
-
-        With _NDSorting
-            For l = 0 To NPenalty - 1
-                .Penalty(l) = Qb(m - PES_Settings.NNachf, PES_iAkt.iAktPop, l)
-            Next l
-            If NConstrains > 0 Then
-                .feasible = True
-                For l = 0 To NConstrains - 1
-                    .Constrain(l) = Rb(m - PES_Settings.NNachf, PES_iAkt.iAktPop, l)
-                    If .Constrain(l) < 0 Then .feasible = False
-                Next l
-            End If
-            .dominated = False
-            .Front = 0
-            For v = 0 To NPara - 1
-                'Die Schrittweite wird ebenfalls übernommen
-                .PES_d(v) = Db(v, m - PES_Settings.NNachf, PES_iAkt.iAktPop)
-                'Die eigentlichen Parameterwerte werden übernommen
-                .PES_X(v) = Xb(v, m - PES_Settings.NNachf, PES_iAkt.iAktPop)
-            Next v
-            .Distance = 0
-        End With
-    End Sub
-
     'NON_DOMINATED_SORTING - Entscheidet welche Werte dominiert werden und welche nicht
-    'Aufrufe von: EsEltern_Pareto(), SekundärQb_Allocation
     '**********************************************************************************
     Private Sub Non_Dominated_Sorting(ByRef NDSorting() As Individuum, ByVal rang As Integer)
 
@@ -1408,11 +1383,11 @@ StartMutation:
                         Summe_Constrain(1) = 0
 
                         For k = 0 To NConstrains - 1
-                            If (NDSorting(i).Constrain(k) < 0) Then
-                                Summe_Constrain(0) += NDSorting(i).Constrain(k)
+                            If (NDSorting(i).constrain(k) < 0) Then
+                                Summe_Constrain(0) += NDSorting(i).constrain(k)
                             End If
-                            If (NDSorting(j).Constrain(k) < 0) Then
-                                Summe_Constrain(1) += NDSorting(j).Constrain(k)
+                            If (NDSorting(j).constrain(k) < 0) Then
+                                Summe_Constrain(1) += NDSorting(j).constrain(k)
                             End If
                         Next k
 
@@ -1427,11 +1402,11 @@ StartMutation:
                         isDominated = False
 
                         For k = 0 To NPenalty - 1
-                            isDominated = isDominated Or (NDSorting(i).Penalty(k) < NDSorting(j).Penalty(k))
+                            isDominated = isDominated Or (NDSorting(i).penalty(k) < NDSorting(j).penalty(k))
                         Next k
 
                         For k = 0 To NPenalty - 1
-                            isDominated = isDominated And (NDSorting(i).Penalty(k) <= NDSorting(j).Penalty(k))
+                            isDominated = isDominated And (NDSorting(i).penalty(k) <= NDSorting(j).penalty(k))
                         Next k
 
                         If (isDominated) Then
@@ -1451,11 +1426,11 @@ StartMutation:
                     isDominated = False
 
                     For k = 0 To NPenalty - 1
-                        isDominated = isDominated Or (NDSorting(i).Penalty(k) < NDSorting(j).Penalty(k))
+                        isDominated = isDominated Or (NDSorting(i).penalty(k) < NDSorting(j).penalty(k))
                     Next k
 
                     For k = 0 To NPenalty - 1
-                        isDominated = isDominated And (NDSorting(i).Penalty(k) <= NDSorting(j).Penalty(k))
+                        isDominated = isDominated And (NDSorting(i).penalty(k) <= NDSorting(j).penalty(k))
                     Next k
 
                     If (isDominated) Then
@@ -1474,7 +1449,6 @@ StartMutation:
 
     'NON_DOMINATED_COUNT_AND_SORT - Sortiert die nicht dominanten Lösungen nach oben,
     'die dominanten nach unten, gibt die Zahl der dominanten Lösungen zurück (Front)
-    'Aufrufe von: EsEltern_Pareto()
     '*******************************************************************************
     Private Function Non_Dominated_Count_and_Sort(ByRef NDSorting() As Individuum) As Integer
 
@@ -1516,9 +1490,8 @@ StartMutation:
     'NON_DOMINATED_COUNT_AND_SORT_SEKUNDÄRE_POPULATION
     'Sortiert die nicht dominanten Lösungen nach oben, die dominanten nach unten
     'Gibt die Zahl der dominanten Lösungen zurück (Front) hier für die Sekundäre Population
-    'Aufrufe von: SekundärQb_Allocation()
     '**************************************************************************************
-    Private Function Non_Dominated_Count_and_Sort_SekundärQb(ByRef NDSorting() As Individuum) As Integer
+    Private Function Non_Dominated_Count_and_Sort_Sekundäre_Population(ByRef NDSorting() As Individuum) As Integer
 
         Dim i As Integer
         Dim Temp() As Individuum
@@ -1554,7 +1527,6 @@ StartMutation:
 
     'NON_DOMINATED_RESULT - Hier wird pro durchlauf die nicht dominierte Front in NDSResult
     'geschaufelt und die bereits klassifizierten Lösungen aus Temp Array gelöscht
-    'Aufrufe von: EsEltern_Pareto()
     '**************************************************************************************
     Private Sub Non_Dominated_Result(ByRef Temp() As Individuum, ByRef NDSResult() As Individuum, ByVal NFrontMember_aktuell As Integer, ByVal NFrontMember_gesamt As Integer)
 
@@ -1581,8 +1553,7 @@ StartMutation:
     End Sub
 
     'COUNT_FRONT_MEMBERS
-    'Aufrufe von: EsEltern_Pareto(), SekundärQb_Allocation
-    '**********************************************
+    '*******************
     Private Function Count_Front_Members(ByVal aktuell_Front As Integer, ByVal NDSResult() As Individuum) As Integer
 
         Dim i As Integer
@@ -1597,14 +1568,13 @@ StartMutation:
     End Function
 
     'NDS_Crowding_Distance_Sort
-    'Aufrufe von: EsEltern_Pareto(), SekundärQb_Allocation()
-    '************************************************
+    '**************************
     Private Sub NDS_Crowding_Distance_Sort(ByRef NDSorting() As Individuum, ByVal StartIndex As Integer, ByVal EndIndex As Integer)
 
         Dim i As Integer
         Dim j As Integer
         Dim k As Integer
-        Dim swap As New Individuum("Swap", 0)
+
         Dim fmin, fmax As Double
 
         For k = 0 To NPenalty - 1
@@ -1641,100 +1611,7 @@ StartMutation:
 
     End Sub
 
-    'Neighbourhood_AbstandsArray - Bestimme Array der Raumabstände für Neighbourhood-Rekombination
-    'Aufrufe von: EsEltern_Pareto()
-    '*********************************************************************************************
-    Private Sub Neighbourhood_AbstandsArray()
-
-        Dim i As Integer
-        Dim j As Integer
-        Dim k As Integer
-        Dim MinMax() As Double
-        Dim Min, Max As Double
-        Dim TempDistance() As Double
-
-        'Bestimmen des Normierungsfaktors für jede Dimension des Lösungsraums (MinMax)
-        ReDim MinMax(NPenalty - 1)
-        For k = 0 To NPenalty - 1
-            MinMax(k) = 0
-            Min = Qb(0, PES_iAkt.iAktPop, k)
-            Max = Qb(0, PES_iAkt.iAktPop, k)
-            For j = 0 To PES_Settings.NEltern - 1
-                If (Min > Qb(j, PES_iAkt.iAktPop, k)) Then Min = Qb(j, PES_iAkt.iAktPop, k)
-                If (Max < Qb(j, PES_iAkt.iAktPop, k)) Then Max = Qb(j, PES_iAkt.iAktPop, k)
-            Next j
-            MinMax(k) = Max - Min
-        Next k
-
-        'Bestimmen der normierten Raumabstände zwischen allen Elternindividuen
-        ReDim TempDistance(NPenalty)
-
-        For i = 0 To PES_Settings.NEltern - 1
-            PenaltyDistance(i, i) = 0
-            For j = i + 1 To PES_Settings.NEltern - 1
-                PenaltyDistance(i, j) = 0
-                For k = 0 To NPenalty - 1
-                    TempDistance(k) = Qb(i, PES_iAkt.iAktPop, k) - Qb(j, PES_iAkt.iAktPop, k)
-                    TempDistance(k) = TempDistance(k) '/ MinMax(k)
-                    TempDistance(k) = TempDistance(k) * TempDistance(k)
-                    PenaltyDistance(i, j) = PenaltyDistance(i, j) + TempDistance(k)
-                Next k
-                PenaltyDistance(i, j) = System.Math.Sqrt(PenaltyDistance(i, j))
-                'Die obere Diagonale wird eigentlich nicht benötigt - dient nur der Sicherheit, falls Indizes vertauscht werden!!!
-                PenaltyDistance(j, i) = PenaltyDistance(i, j)
-            Next j
-        Next i
-
-    End Sub
-
-    'Neighbourhood_Crowding_Distance
-    'Bestimme die NAnzahlEltern mit geringsten Raumabständen für Neighbourhood-Rekombination
-    'Aufrufe von: EsEltern_Pareto()
-    '***************************************************************************************
-    Private Sub Neighbourhood_Crowding_Distance()
-
-        Dim i As Integer
-        Dim j As Integer
-        Dim k As Integer
-        Dim QbTemp(,,) As Double
-        Dim swap As Double
-        Dim fmin, fmax As Double
-
-        ReDim QbTemp(PES_Settings.NEltern - 1, PES_Settings.NPopul - 1, NPenalty - 1)
-
-        Array.Copy(Qb, QbTemp, Qb.GetLength(0))
-        For i = 0 To PES_Settings.NEltern - 1
-            Distanceb(i) = 0
-        Next i
-
-        For k = 0 To NPenalty - 1
-            For i = 0 To PES_Settings.NEltern - 1
-                For j = 0 To PES_Settings.NEltern - 1
-                    If (QbTemp(i, PES_iAkt.iAktPop, k) < QbTemp(j, PES_iAkt.iAktPop, k)) Then
-                        swap = QbTemp(i, PES_iAkt.iAktPop, k)
-                        QbTemp(i, PES_iAkt.iAktPop, k) = QbTemp(j, PES_iAkt.iAktPop, k)
-                        QbTemp(j, PES_iAkt.iAktPop, k) = swap
-                    End If
-                Next j
-            Next i
-
-            fmin = QbTemp(0, PES_iAkt.iAktPop, k)
-            fmax = QbTemp(PES_Settings.NEltern - 1, PES_iAkt.iAktPop, k)
-
-            Distanceb(0) = 1.0E+300
-            Distanceb(PES_Settings.NEltern - 1) = 1.0E+300
-
-            For i = 1 To PES_Settings.NEltern - 2
-                Distanceb(i) = Distanceb(i) + (QbTemp(i + 1, PES_iAkt.iAktPop, k) - QbTemp(i - 1, PES_iAkt.iAktPop, k)) / (fmax - fmin)
-            Next i
-        Next k
-
-    End Sub
-
-    '########################################################################################
-
     'NDS_Crowding_Distance_Count
-    'Aufrufe von: EsPopBest
     '***************************
     Private Function NDS_Crowding_Distance_Count(ByRef Spannweite As Double) As Double
 
@@ -1799,9 +1676,53 @@ StartMutation:
 
     End Function
 
+    'Neighbourhood_AbstandsArray - Bestimme Array der Raumabstände für Neighbourhood-Rekombination
+    '*********************************************************************************************
+    Private Sub Neighbourhood_AbstandsArray()
+
+        Dim i As Integer
+        Dim j As Integer
+        Dim k As Integer
+        Dim MinMax() As Double
+        Dim Min, Max As Double
+        Dim TempDistance() As Double
+
+        'Bestimmen des Normierungsfaktors für jede Dimension des Lösungsraums (MinMax)
+        ReDim MinMax(NPenalty - 1)
+        For k = 0 To NPenalty - 1
+            MinMax(k) = 0
+            Min = Qb(0, PES_iAkt.iAktPop, k)
+            Max = Qb(0, PES_iAkt.iAktPop, k)
+            For j = 0 To PES_Settings.NEltern - 1
+                If (Min > Qb(j, PES_iAkt.iAktPop, k)) Then Min = Qb(j, PES_iAkt.iAktPop, k)
+                If (Max < Qb(j, PES_iAkt.iAktPop, k)) Then Max = Qb(j, PES_iAkt.iAktPop, k)
+            Next j
+            MinMax(k) = Max - Min
+        Next k
+
+        'Bestimmen der normierten Raumabstände zwischen allen Elternindividuen
+        ReDim TempDistance(NPenalty)
+
+        For i = 0 To PES_Settings.NEltern - 1
+            PenaltyDistance(i, i) = 0
+            For j = i + 1 To PES_Settings.NEltern - 1
+                PenaltyDistance(i, j) = 0
+                For k = 0 To NPenalty - 1
+                    TempDistance(k) = Qb(i, PES_iAkt.iAktPop, k) - Qb(j, PES_iAkt.iAktPop, k)
+                    TempDistance(k) = TempDistance(k) '/ MinMax(k)
+                    TempDistance(k) = TempDistance(k) * TempDistance(k)
+                    PenaltyDistance(i, j) = PenaltyDistance(i, j) + TempDistance(k)
+                Next k
+                PenaltyDistance(i, j) = System.Math.Sqrt(PenaltyDistance(i, j))
+                'Die obere Diagonale wird eigentlich nicht benötigt - dient nur der Sicherheit, falls Indizes vertauscht werden!!!
+                PenaltyDistance(j, i) = PenaltyDistance(i, j)
+            Next j
+        Next i
+
+    End Sub
+
     'Neighbourhood_Eltern
     'Bestimme die NAnzahlEltern mit geringsten Raumabständen für Neighbourhood-Rekombination
-    'Aufrufe von: EsReproduktion()
     '***************************************************************************************
     Private Sub Neighbourhood_Eltern(ByVal IndexElter As Integer, ByRef IndexEltern() As Integer)
 
@@ -1838,8 +1759,50 @@ StartMutation:
 
     End Sub
 
+    'Neighbourhood_Crowding_Distance
+    'Bestimme die NAnzahlEltern mit geringsten Raumabständen für Neighbourhood-Rekombination
+    '***************************************************************************************
+    Private Sub Neighbourhood_Crowding_Distance()
+
+        Dim i As Integer
+        Dim j As Integer
+        Dim k As Integer
+        Dim QbTemp(,,) As Double
+        Dim swap As Double
+        Dim fmin, fmax As Double
+
+        ReDim QbTemp(PES_Settings.NEltern - 1, PES_Settings.NPopul - 1, NPenalty - 1)
+
+        Array.Copy(Qb, QbTemp, Qb.GetLength(0))
+        For i = 0 To PES_Settings.NEltern - 1
+            Distanceb(i) = 0
+        Next i
+
+        For k = 0 To NPenalty - 1
+            For i = 0 To PES_Settings.NEltern - 1
+                For j = 0 To PES_Settings.NEltern - 1
+                    If (QbTemp(i, PES_iAkt.iAktPop, k) < QbTemp(j, PES_iAkt.iAktPop, k)) Then
+                        swap = QbTemp(i, PES_iAkt.iAktPop, k)
+                        QbTemp(i, PES_iAkt.iAktPop, k) = QbTemp(j, PES_iAkt.iAktPop, k)
+                        QbTemp(j, PES_iAkt.iAktPop, k) = swap
+                    End If
+                Next j
+            Next i
+
+            fmin = QbTemp(0, PES_iAkt.iAktPop, k)
+            fmax = QbTemp(PES_Settings.NEltern - 1, PES_iAkt.iAktPop, k)
+
+            Distanceb(0) = 1.0E+300
+            Distanceb(PES_Settings.NEltern - 1) = 1.0E+300
+
+            For i = 1 To PES_Settings.NEltern - 2
+                Distanceb(i) = Distanceb(i) + (QbTemp(i + 1, PES_iAkt.iAktPop, k) - QbTemp(i - 1, PES_iAkt.iAktPop, k)) / (fmax - fmin)
+            Next i
+        Next k
+
+    End Sub
+
     'Einen Parameterwert auf Einhaltung der Beziehung überprüfen
-    'Aufegrufen von: EsMutation()
     '***********************************************************
     Private Function checkBeziehung(ByVal ipara As Integer, ByVal XnTemp() As Double) As Boolean
 
@@ -1871,7 +1834,6 @@ StartMutation:
     End Function
 
     'Einen Parameterwert auf Einhaltung der Beziehung überprüfen (Populationsebene)
-    'Aufgerufen von: EsPop_Mutation()
     '******************************************************************************
     Private Function checkBeziehungPop(ByVal ipara As Integer, ByVal iElter As Integer, ByVal XeTemp(,,) As Double) As Boolean
 
