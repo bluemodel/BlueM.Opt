@@ -5,16 +5,12 @@ Imports IHWB.BlueM.DllAdapter
 '*******************************************************************************
 '**** Klasse BlueM                                                          ****
 '****                                                                       ****
-'**** Funktionen zur Kontrolle des BlauenModells                            ****
+'**** Funktionen zur Kontrolle von BlueM                                    ****
 '****                                                                       ****
-'**** Christoph Huebner, Felix Froehlich                                    ****
+'**** Autoren: Christoph Huebner, Felix Froehlich                           ****
 '****                                                                       ****
 '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
 '**** TU Darmstadt                                                          ****
-'****                                                                       ****
-'**** Erstellt: Dezember 2006                                               ****
-'****                                                                       ****
-'**** Letzte Änderung: Juli 2007                                           ****
 '*******************************************************************************
 '*******************************************************************************
 

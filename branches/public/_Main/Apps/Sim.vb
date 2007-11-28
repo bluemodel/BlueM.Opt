@@ -1,5 +1,4 @@
 Imports System.IO
-Imports System.Data.OleDb
 
 '*******************************************************************************
 '*******************************************************************************
@@ -7,14 +6,10 @@ Imports System.Data.OleDb
 '****                                                                       ****
 '**** Basisklasse für Simulationsmodelle wie BlueM und SMUSI                ****
 '****                                                                       ****
-'**** Christoph Huebner, Felix Froehlich                                    ****
+'**** Autoren: Christoph Huebner, Felix Froehlich                           ****
 '****                                                                       ****
 '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
 '**** TU Darmstadt                                                          ****
-'****                                                                       ****
-'**** Erstellt: April 2006                                                  ****
-'****                                                                       ****
-'**** Letzte Änderung: Juli 2007                                            ****
 '*******************************************************************************
 '*******************************************************************************
 
@@ -53,13 +48,13 @@ Public MustInherit Class Sim
     'Optimierungsparameter
     '---------------------
     Public Structure Struct_OptParameter
-        '*| Bezeichnung | Einh. | Anfangsw. | Min | Max |
-        Public Bezeichnung As String                'Bezeichnung
-        Public Einheit As String                    'Einheit
-        Public Wert As Double                       'Parameterwert
-        Public Min As Double                        'Minimum
-        Public Max As Double                        'Maximum
-        Public Property SKWert() As Double          'skalierter Wert (0 bis 1)
+        Public Bezeichnung As String                        'Bezeichnung
+        Public Einheit As String                            'Einheit
+        Public Wert As Double                               'Parameterwert
+        Public Min As Double                                'Minimum
+        Public Max As Double                                'Maximum
+        Public Beziehung As EVO.Kern.PES.Beziehung          'Beziehung zum vorherigen OptParameter
+        Public Property SKWert() As Double                  'skalierter Wert (0 bis 1)
             Get
                 SKWert = (Wert - Min) / (Max - Min)
                 Exit Property
@@ -79,7 +74,6 @@ Public MustInherit Class Sim
     'ModellParameter
     '---------------
     Public Structure Struct_ModellParameter
-        '*| OptParameter | Bezeichnung  | Einh. | Datei | Zeile | von | bis | Faktor |
         Public OptParameter As String               'Optimierungsparameter, aus dem dieser Modellparameter errechnet wird
         Public Bezeichnung As String                'Bezeichnung
         Public Einheit As String                    'Einheit
@@ -138,11 +132,9 @@ Public MustInherit Class Sim
 
     Public List_Constraints() As Struct_Constraint = {} 'Liste der Constraints
 
-    'Ergebnisdatenbank
-    '-----------------
-    Public Ergebnisdb As Boolean = True             'Gibt an, ob die Ergebnisdatenbank geschrieben werden soll
-    Public db_path As String                        'Pfad zur Ergebnisdatenbank
-    Private db As OleDb.OleDbConnection
+    'Ergebnisspeicher
+    '----------------
+    Public OptResult As OptResult
 
     'Kombinatorik
     '------------
@@ -180,7 +172,7 @@ Public MustInherit Class Sim
         'Dezimaltrennzeichen überprüfen
         Call Me.checkDezimaltrennzeichen()
 
-        'EVO.ini Datei einlesen
+        'Benutzereinstellungen einlesen
         Call Me.ReadSettings()
 
     End Sub
@@ -256,11 +248,8 @@ Public MustInherit Class Sim
         Call Me.Validate_OPT_fits_to_MOD()
         'Prüfen der Anfangswerte
         Call Me.Validate_Startvalues()
-        'Datenbank vorbereiten
-        If Me.Ergebnisdb = True Then
-            Call Me.db_prepare()
-            Call Me.db_prepare_PES()
-        End If
+        'Ergebnisspeicher initialisieren
+        Me.OptResult = New OptResult(Me)
 
     End Sub
 
@@ -281,11 +270,8 @@ Public MustInherit Class Sim
         Call Me.Validate_Combinatoric()
         'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
         Call Me.Validate_CES_fits_to_VER()
-        'Datenbank vorbereiten
-        If Me.Ergebnisdb = True Then
-            Call Me.db_prepare()
-            Call Me.db_prepare_CES()
-        End If
+        'Ergebnisspeicher initialisieren
+        Me.OptResult = New OptResult(Me)
 
     End Sub
 
@@ -293,7 +279,7 @@ Public MustInherit Class Sim
 
         'CES vorbereiten
         'Erforderliche Dateien werden eingelesen
-        '***************************************
+        '---------------------------------------
         'Zielfunktionen einlesen
         Call Me.Read_OptZiele()
         'Constraints einlesen
@@ -310,7 +296,7 @@ Public MustInherit Class Sim
 
         'PES vorbereiten
         'zusätzliche Dateien werden eingelesen
-        '***************************************
+        '-------------------------------------
         'Simulationsdaten einlesen
         Call Me.Read_SimParameter()
         'Optimierungsparameter einlesen
@@ -322,13 +308,10 @@ Public MustInherit Class Sim
         'Prüfen der Anfangswerte
         Call Me.Validate_Startvalues()
 
-        'Datenbank vorbereiten
-        '*********************
-        If Me.Ergebnisdb = True Then
-            Call Me.db_prepare()
-            Call Me.db_prepare_PES()
-            Call Me.db_prepare_CES()
-        End If
+        'Ergebnisspeicher initialisieren
+        '-------------------------------
+        Me.OptResult = New OptResult(Me)
+
     End Sub
 
 
@@ -348,6 +331,11 @@ Public MustInherit Class Sim
     'Optimierungsparameter einlesen
     '******************************
     Private Sub Read_OptParameter()
+
+        'Format:
+        '*|--------------|-------|-----------|--------|--------|-----------|
+        '*| Bezeichnung  | Einh. | Anfangsw. |  Min   |  Max   | Beziehung |
+        '*|-<---------->-|-<--->-|-<------->-|-<---->-|-<---->-|-<------->-|
 
         Dim Datei As String = WorkDir & Datensatz & "." & OptParameter_Ext
 
@@ -372,6 +360,7 @@ Public MustInherit Class Sim
         FiStr.Seek(0, SeekOrigin.Begin)
 
         Dim array() As String
+        Dim Bez_str As String = ""
         Dim i As Integer = 0
         Do
             Zeile = StrRead.ReadLine.ToString()
@@ -383,6 +372,12 @@ Public MustInherit Class Sim
                 List_OptParameter(i).Wert = Convert.ToDouble(array(3).Trim())
                 List_OptParameter(i).Min = Convert.ToDouble(array(4).Trim())
                 List_OptParameter(i).Max = Convert.ToDouble(array(5).Trim())
+                'liegt eine Beziehung vor?
+                If (i > 0 And Not array(6).Trim() = "") Then
+                    Me.List_OptParameter(i).Beziehung = getBeziehung(array(6).Trim())
+                Else
+                    Me.List_OptParameter(i).Beziehung = EVO.Kern.PES.Beziehung.keine
+                End If
                 i += 1
             End If
         Loop Until StrRead.Peek() = -1
@@ -397,9 +392,31 @@ Public MustInherit Class Sim
 
     End Sub
 
+    'String in der Form < >, <=, >= in Beziehung umwandeln
+    '*****************************************************
+    Private Shared Function getBeziehung(ByVal bez_str As String) As EVO.Kern.PES.Beziehung
+        Select Case bez_str
+            Case "<"
+                Return EVO.Kern.PES.Beziehung.kleiner
+            Case "<="
+                Return EVO.Kern.PES.Beziehung.kleinergleich
+            Case ">"
+                Return EVO.Kern.PES.Beziehung.groesser
+            Case ">="
+                Return EVO.Kern.PES.Beziehung.groessergleich
+            Case Else
+                Throw New Exception("Beziehung '" & bez_str & "' nicht erkannt!")
+        End Select
+    End Function
+
     'Modellparameter einlesen
     '************************
     Private Sub Read_ModellParameter()
+
+        'Format:
+        '*|--------------|--------------|-------|-------|-------|-------|-----|-----|--------|
+        '*| OptParameter | Bezeichnung  | Einh. | Datei | Elem  | Zeile | von | bis | Faktor |
+        '*|-<---------->-|-<---------->-|-<--->-|-<--->-|-<--->-|-<--->-|-<->-|-<->-|-<---->-|
 
         Dim Datei As String = WorkDir & Datensatz & "." & ModParameter_Ext
 
@@ -959,12 +976,6 @@ Public MustInherit Class Sim
             End If
         Next
 
-        'Kopiert die aktuelle ElementeListe in dieses Aktuell_Element Array
-        'ToDo: sollte an eine bessere stelle!
-        If No_Loc = 0 Then ReDim SKos1.Aktuell_Elemente(-1)
-        ReDim Preserve SKos1.Aktuell_Elemente(SKos1.Aktuell_Elemente.GetUpperBound(0) + Elements.GetLength(0))
-        Array.Copy(Elements, 0, SKos1.Aktuell_Elemente, SKos1.Aktuell_Elemente.GetUpperBound(0) - Elements.GetUpperBound(0), Elements.GetLength(0))
-
         '3. Die Parameter werden Ermittelt
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         x = 0
@@ -983,7 +994,6 @@ Public MustInherit Class Sim
     End Sub
 
 
-
     'Struct und Methoden welche aktuellen Informationen zur Verfügung stellen
     '#########################################################################
     Public Structure Aktuell
@@ -996,10 +1006,13 @@ Public MustInherit Class Sim
 
     'Bereitet das SimModell für Kombinatorik Optimierung vor
     '*******************************************************
-    Public Sub PREPARE_Evaluation_CES(ByVal Path() As Integer)
+    Public Sub PREPARE_Evaluation_CES(ByVal Path() As Integer, byval Elements() as string)
 
         'Setzt den Aktuellen Pfad
         Akt.Path = Path
+
+        'Die elemente werden an die Kostenkalkulation übergeben
+        SKos1.Akt_Elemente = Elements
 
         'Ermittelt das aktuelle_ON_OFF array
         Call Prepare_Verzweigung_ON_OFF()
@@ -1072,14 +1085,7 @@ Public MustInherit Class Sim
 
         'Kopieren der Listen aus den Sicherungen
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        ReDim List_ModellParameter(List_ModellParameter_Save.GetUpperBound(0))
-        For i = 0 To List_ModellParameter_Save.GetUpperBound(0)
-            copy_Struct_ModellParemeter(List_ModellParameter_Save(i), List_ModellParameter(i))
-        Next
-        ReDim List_OptParameter(List_OptParameter_Save.GetUpperBound(0))
-        For i = 0 To List_OptParameter_Save.GetUpperBound(0)
-            copy_Struct_OptParameter(List_OptParameter_Save(i), List_OptParameter(i))
-        Next
+        Call Reset_OptPara_and_ModPara()
 
         'Reduzierung der ModParameter
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -1140,6 +1146,24 @@ Public MustInherit Class Sim
         End If
 
     End Function
+
+    'Setzt die Listen nach der Evaluierung wieder zurück auf alles was in den Eingabedateien steht
+    '*********************************************************************************************
+    Public Sub Reset_OptPara_and_ModPara()
+        Dim i As Integer
+
+        'Kopieren der Listen aus den Sicherungen
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        ReDim List_ModellParameter(List_ModellParameter_Save.GetUpperBound(0))
+        For i = 0 To List_ModellParameter_Save.GetUpperBound(0)
+            copy_Struct_ModellParemeter(List_ModellParameter_Save(i), List_ModellParameter(i))
+        Next
+        ReDim List_OptParameter(List_OptParameter_Save.GetUpperBound(0))
+        For i = 0 To List_OptParameter_Save.GetUpperBound(0)
+            copy_Struct_OptParameter(List_OptParameter_Save(i), List_OptParameter(i))
+        Next
+
+    End Sub
 
     'Schreibt die passenden OptParameter für jede Location ins Child
     'ToDo alles ist da!
@@ -1202,22 +1226,25 @@ Public MustInherit Class Sim
         Destination.Min = Source.Min
         Destination.Max = Source.Max
         Destination.SKWert = Source.SKWert
+        Destination.Beziehung = Source.Beziehung
 
     End Sub
 
     'EVO-Parameterübergabe die Standard Parameter werden aus den Listen der OptPara und OptZiele ermittelt
     '*****************************************************************************************************
-    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara() As Double)
+    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara() As Double, ByRef beziehungen() As EVO.Kern.PES.Beziehung)
 
         Dim i As Integer
 
         'Anzahl Optimierungsparameter übergeben
         globalAnzPar = Me.List_OptParameter.GetLength(0)
 
-        'Parameterwerte übergeben
+        'Parameterwerte und Beziehungen übergeben
         ReDim mypara(globalAnzPar - 1)
+        ReDim beziehungen(globalAnzPar - 1)
         For i = 0 To globalAnzPar  - 1
             mypara(i) = Me.List_OptParameter(i).SKWert
+            beziehungen(i) = Me.List_OptParameter(i).Beziehung
         Next
 
         'Anzahl Optimierungsziele übergeben
@@ -1248,6 +1275,7 @@ Public MustInherit Class Sim
     'Die ModellParameter in die Eingabedateien des SimModells schreiben
     '******************************************************************
     Public Sub Write_ModellParameter()
+
         Dim Wert As String
         Dim AnzZeil As Integer
         Dim j As Integer
@@ -1316,7 +1344,7 @@ Public MustInherit Class Sim
 
     'Evaluiert die Kinderchen mit Hilfe des Simulationsmodells
     '*********************************************************
-    Public Function SIM_Evaluierung(ByRef QN() As Double, ByRef RN() As Double) As Boolean
+    Public Function SIM_Evaluierung(ByVal ID As Integer, ByRef QN() As Double, ByRef RN() As Double) As Boolean
 
         Dim i As Short
 
@@ -1337,10 +1365,8 @@ Public MustInherit Class Sim
             RN(i) = List_Constraints(i).ConstTmp
         Next
 
-        'Lösung in DB speichern
-        If (Ergebnisdb = True) Then
-            Call Me.db_update()
-        End If
+        'Lösung abspeichern
+        Call Me.OptResult.addSolution(ID, Me.List_OptZiele, Me.List_Constraints, Me.List_OptParameter)
 
         SIM_Evaluierung = True
 
@@ -1763,474 +1789,6 @@ Public MustInherit Class Sim
 
 #End Region 'SimErgebnisse lesen
 
-#Region "Ergebnisdatenbank"
-
-    'Methoden für die Ergebnisdatenbank
-    '##################################
-
-    'Ergebnisdatenbank vorbereiten
-    '*****************************
-    Private Sub db_prepare()
-
-        'Leere/Neue Ergebnisdatenbank in Arbeitsverzeichnis kopieren
-        '-----------------------------------------------------------
-
-        'Pfad zur Vorlage
-        Dim db_path_source As String = System.Windows.Forms.Application.StartupPath() & "\EVO.mdb"
-        'Pfad zur Zieldatei
-        Dim db_path_target As String = Me.WorkDir & Me.Datensatz & "_EVO.mdb"
-        'Datei kopieren
-        My.Computer.FileSystem.CopyFile(db_path_source, db_path_target, True)
-
-        'Pfad setzen
-        Me.db_path = db_path_target
-
-        'Tabellen anpassen
-        '=================
-        Dim i As Integer
-
-        Call db_connect()
-        Dim command As OleDbCommand = New OleDbCommand("", db)
-
-        'Tabelle 'QWerte'
-        '----------------
-        'Spalten festlegen:
-        Dim fieldnames As String = ""
-        For i = 0 To List_OptZiele.GetUpperBound(0)
-            If (i > 0) Then
-                fieldnames &= ", "
-            End If
-            fieldnames &= "[" & List_OptZiele(i).Bezeichnung & "] DOUBLE"
-        Next
-        'Tabelle anpassen
-        command.CommandText = "ALTER TABLE QWerte ADD COLUMN " & fieldnames
-        command.ExecuteNonQuery()
-
-        'Tabelle 'Constraints'
-        '----------------
-        If (Me.List_Constraints.GetLength(0) > 0) Then
-            'Spalten festlegen:
-            fieldnames = ""
-            For i = 0 To Me.List_Constraints.GetUpperBound(0)
-                If (i > 0) Then
-                    fieldnames &= ", "
-                End If
-                fieldnames &= "[" & Me.List_Constraints(i).Bezeichnung & "] DOUBLE"
-            Next
-            'Tabelle anpassen
-            command.CommandText = "ALTER TABLE [Constraints] ADD COLUMN " & fieldnames
-            command.ExecuteNonQuery()
-        End If
-
-        Call db_disconnect()
-
-    End Sub
-
-    'Ergebnisdatenbank für PES vorbereiten
-    '*************************************
-    Private Sub db_prepare_PES()
-
-        Call db_connect()
-        Dim command As OleDbCommand = New OleDbCommand("", db)
-
-        'Tabelle 'OptParameter'
-        '----------------------
-        'Spalten festlegen:
-        Dim fieldnames As String = ""
-        Dim i As Integer
-
-        For i = 0 To List_OptParameter.GetUpperBound(0)
-            If (i > 0) Then
-                fieldnames &= ", "
-            End If
-            fieldnames &= "[" & List_OptParameter(i).Bezeichnung & "] DOUBLE"
-        Next
-        'Tabelle anpassen
-        command.CommandText = "ALTER TABLE OptParameter ADD COLUMN " & fieldnames
-        command.ExecuteNonQuery()
-
-        Call db_disconnect()
-
-    End Sub
-
-    'Ergebnisdatenbank für CES vorbereiten
-    '*************************************
-    Private Sub db_prepare_CES()
-
-        Call db_connect()
-        Dim command As OleDbCommand = New OleDbCommand("", db)
-
-        'Tabelle 'Pfad'
-        '--------------
-        'Spalten festlegen:
-        Dim fieldnames As String = ""
-        Dim i As Integer
-
-        For i = 0 To Me.List_Locations.GetUpperBound(0)
-            If (i > 0) Then
-                fieldnames &= ", "
-            End If
-            fieldnames &= "[" & Me.List_Locations(i).Name & "] TEXT"
-        Next
-        'Tabelle anpassen
-        command.CommandText = "ALTER TABLE Pfad ADD COLUMN " & fieldnames
-        command.ExecuteNonQuery()
-
-        Call db_disconnect()
-
-    End Sub
-
-    'Mit Ergebnisdatenbank verbinden
-    '*******************************
-    Private Sub db_connect()
-        Dim ConnectionString As String = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & Me.db_path
-        db = New OleDb.OleDbConnection(ConnectionString)
-        db.Open()
-    End Sub
-
-    'Verbindung zu Ergebnisdatenbank schließen
-    '*****************************************
-    Private Sub db_disconnect()
-        db.Close()
-    End Sub
-
-    'Update der ErgebnisDB mit QWerten und OptParametern
-    '***************************************************
-    Public Function db_update() As Boolean
-
-        Call db_connect()
-
-        Dim i As Integer
-
-        Dim command As OleDbCommand = New OleDbCommand("", db)
-
-        'Sim schreiben
-        '-------------
-        command.CommandText = "INSERT INTO Sim (Name) VALUES ('" & Me.Datensatz & "')"
-        command.ExecuteNonQuery()
-        'SimID holen
-        command.CommandText = "SELECT @@IDENTITY AS ID"
-        Dim Sim_ID As Integer = command.ExecuteScalar()
-
-        'QWerte schreiben 
-        '----------------
-        Dim fieldnames As String = ""
-        Dim fieldvalues As String = ""
-        For i = 0 To List_OptZiele.GetUpperBound(0)
-            fieldnames &= ", [" & List_OptZiele(i).Bezeichnung & "]"
-            fieldvalues &= ", " & List_OptZiele(i).QWertTmp
-        Next
-        command.CommandText = "INSERT INTO QWerte (Sim_ID" & fieldnames & ") VALUES (" & Sim_ID & fieldvalues & ")"
-        command.ExecuteNonQuery()
-
-        'Constraints schreiben 
-        '---------------------
-        If (Me.List_Constraints.GetLength(0) > 0) Then
-            fieldnames = ""
-            fieldvalues = ""
-            For i = 0 To Me.List_Constraints.GetUpperBound(0)
-                fieldnames &= ", [" & Me.List_Constraints(i).Bezeichnung & "]"
-                fieldvalues &= ", " & Me.List_Constraints(i).ConstTmp
-            Next
-            command.CommandText = "INSERT INTO [Constraints] (Sim_ID" & fieldnames & ") VALUES (" & Sim_ID & fieldvalues & ")"
-            command.ExecuteNonQuery()
-        End If
-
-        If (Me.Method = "PES" Or Me.Method = "CES + PES" Or Me.Method = "SensiPlot") Then
-
-            'OptParameter schreiben
-            '----------------------
-            fieldnames = ""
-            fieldvalues = ""
-            For i = 0 To Me.List_OptParameter.GetUpperBound(0)
-                fieldnames &= ", [" & Me.List_OptParameter(i).Bezeichnung & "]"
-                fieldvalues &= ", " & Me.List_OptParameter(i).Wert
-            Next
-            command.CommandText = "INSERT INTO OptParameter (Sim_ID" & fieldnames & ") VALUES (" & Sim_ID & fieldvalues & ")"
-            command.ExecuteNonQuery()
-
-        End If
-
-        If (Me.Method = "CES" Or Me.Method = "CES + PES") Then
-
-            'Pfad schreiben
-            '--------------
-            fieldnames = ""
-            fieldvalues = ""
-            For i = 0 To Me.List_Locations.GetUpperBound(0)
-                fieldnames &= ", [" & Me.List_Locations(i).Name & "]"
-                fieldvalues &= ", '" & Me.Akt.Measures(i) & "'"
-            Next
-            command.CommandText = "INSERT INTO Pfad (Sim_ID" & fieldnames & ") VALUES (" & Sim_ID & fieldvalues & ")"
-            command.ExecuteNonQuery()
-
-        End If
-
-        Call db_disconnect()
-
-    End Function
-
-    'Sekundäre Population in DB speichern
-    '************************************
-    Public Sub db_setSekPop(ByVal SekPop(,) As Double, ByVal igen As Integer)
-
-        Call db_connect()
-
-        Dim command As OleDbCommand = New OleDbCommand("", db)
-
-        ''Alte SekPop löschen
-        'command.CommandText = "DELETE FROM SekPop"
-        'command.ExecuteNonQuery()
-
-        'Neue SekPop speichern
-        Dim i, j As Integer
-        Dim bedingung As String
-        Dim Sim_ID As Integer
-        For i = 0 To SekPop.GetUpperBound(0)
-
-            'zugehörige Sim_ID bestimmen
-            bedingung = ""
-            For j = 0 To Me.List_OptZiele.GetUpperBound(0)
-                bedingung &= " AND QWerte.[" & Me.List_OptZiele(j).Bezeichnung & "] = " & SekPop(i, j)
-            Next
-            command.CommandText = "SELECT Sim.ID FROM Sim INNER JOIN QWerte ON Sim.ID = QWerte.Sim_ID WHERE (1=1" & bedingung & ")"
-            Sim_ID = command.ExecuteScalar()
-
-            If (Sim_ID > 0) Then
-                'SekPop Member speichern
-                command.CommandText = "INSERT INTO SekPop (Generation, Sim_ID) VALUES (" & igen & ", " & Sim_ID & ")"
-                command.ExecuteNonQuery()
-            End If
-        Next
-
-        Call db_disconnect()
-
-    End Sub
-
-    'Einen Parametersatz aus der DB übernehmen
-    '*****************************************
-    Public Function db_getPara(ByVal xAchse As String, ByVal xWert As Double, ByVal yAchse As String, ByVal yWert As Double) As Boolean
-
-        db_getPara = True
-        Dim q As String
-        Dim adapter As OleDbDataAdapter
-        Dim ds As DataSet
-        Dim numrows As Integer
-
-        Call db_connect()
-
-        'Fallunterscheidung nach Methode
-        Select Case Me.Method
-
-            Case "PES", "SensiPlot"
-
-                'Unterscheidung für SO und SensiPlot
-                If (Me.Method = "SensiPlot" Or Me.List_OptZiele.Length = 1) Then
-                    'Nur ein QWert, und zwar auf der xAchse
-                    q = "SELECT OptParameter.* FROM OptParameter INNER JOIN QWerte ON OptParameter.Sim_ID = QWerte.Sim_ID WHERE (QWerte.[" & xAchse & "] = " & xWert & ")"
-                Else
-                    'xAchse und yAchse sind beides QWerte
-                    q = "SELECT OptParameter.* FROM OptParameter INNER JOIN QWerte ON OptParameter.Sim_ID = QWerte.Sim_ID WHERE (QWerte.[" & xAchse & "] = " & xWert & " AND QWerte.[" & yAchse & "] = " & yWert & ")"
-                End If
-
-                adapter = New OleDbDataAdapter(q, db)
-
-                ds = New DataSet("EVO")
-                numrows = adapter.Fill(ds, "OptParameter")
-
-                'Anzahl Übereinstimmungen überprüfen
-                If (numrows = 0) Then
-                    MsgBox("Es wurde keine Übereinstimmung in der Datenbank gefunden!", MsgBoxStyle.Exclamation, "Problem")
-                    Return False
-                ElseIf (numrows > 1) Then
-                    MsgBox("Es wurden mehr als eine Entsprechung von OptParametern für den gewählten Punkt gefunden!" & Chr(13) & Chr(10) & "Es wird nur das erste Ergebnis verwendet!", MsgBoxStyle.Exclamation, "Problem")
-                End If
-
-                'OptParametersatz übernehmen
-                For i As Integer = 0 To Me.List_OptParameter.GetUpperBound(0)
-                    With Me.List_OptParameter(i)
-                        .Wert = ds.Tables("OptParameter").Rows(0).Item(.Bezeichnung)
-                    End With
-                Next
-
-                'Modellparameter schreiben
-                Call Me.Write_ModellParameter()
-
-
-            Case "CES"
-
-                q = "SELECT Pfad.* FROM Pfad INNER JOIN QWerte ON Pfad.Sim_ID = QWerte.Sim_ID WHERE (QWerte.[" & xAchse & "] = " & xWert & " AND QWerte.[" & yAchse & "] = " & yWert & ")"
-
-                adapter = New OleDbDataAdapter(q, db)
-
-                ds = New DataSet("EVO")
-                numrows = adapter.Fill(ds, "Pfad")
-
-                'Anzahl Übereinstimmungen überprüfen
-                If (numrows = 0) Then
-                    MsgBox("Es wurde keine Übereinstimmung in der Datenbank gefunden!", MsgBoxStyle.Exclamation, "Problem")
-                    Return False
-                ElseIf (numrows > 1) Then
-                    MsgBox("Es wurden mehr als eine Entsprechung von Pfaden für den gewählten Punkt gefunden!" & Chr(13) & Chr(10) & "Es wird nur das erste Ergebnis verwendet!", MsgBoxStyle.Exclamation, "Problem")
-                End If
-
-                'Pfad übernehmen
-                For i As Integer = 0 To Me.Akt.Measures.GetUpperBound(0)
-                    Me.Akt.Measures(i) = ds.Tables("Pfad").Rows(0).Item(List_Locations(i).Name)
-                Next
-
-                'Bereitet das BlaueModell für die Kombinatorik vor
-                Call Me.PREPARE_Evaluation_CES()
-
-
-            Case "CES + PES"
-
-                q = "SELECT OptParameter.*, Pfad.* FROM (((Sim LEFT JOIN Constraints ON Sim.ID = Constraints.Sim_ID) INNER JOIN OptParameter ON Sim.ID = OptParameter.Sim_ID) INNER JOIN Pfad ON Sim.ID = Pfad.Sim_ID) INNER JOIN QWerte ON Sim.ID = QWerte.Sim_ID WHERE (QWerte.[" & xAchse & "] = " & xWert & " AND QWerte.[" & yAchse & "] = " & yWert & ")"
-
-                adapter = New OleDbDataAdapter(q, db)
-
-                ds = New DataSet("EVO")
-                adapter.Fill(ds, "OptParameter_Pfad")
-
-                'Anzahl Übereinstimmungen überprüfen
-                numrows = ds.Tables("OptParameter_Pfad").Rows.Count
-
-                If (numrows = 0) Then
-                    MsgBox("Es wurde keine Übereinstimmung in der Datenbank gefunden!", MsgBoxStyle.Exclamation, "Problem")
-                    Return False
-                ElseIf (numrows > 1) Then
-                    MsgBox("Es wurden mehr als eine Entsprechung von OptParametern / Pfad für den gewählten Punkt gefunden!" & Chr(13) & Chr(10) & "Es wird nur das erste Ergebnis verwendet!", MsgBoxStyle.Exclamation, "Problem")
-                End If
-
-                'Pfad übernehmen
-                For i As Integer = 0 To Me.Akt.Measures.GetUpperBound(0)
-                    Me.Akt.Measures(i) = ds.Tables("OptParameter_Pfad").Rows(0).Item(List_Locations(i).Name)
-                Next
-
-                'Bereitet das BlaueModell für die Kombinatorik vor
-                Call Me.PREPARE_Evaluation_CES()
-
-                'OptParametersatz übernehmen
-                For i As Integer = 0 To Me.List_OptParameter.GetUpperBound(0)
-                    With Me.List_OptParameter(i)
-                        .Wert = ds.Tables("OptParameter_Pfad").Rows(0).Item(.Bezeichnung)
-                    End With
-                Next
-
-                'Modellparameter schreiben
-                Call Me.Write_ModellParameter()
-
-        End Select
-
-        Call db_disconnect()
-
-    End Function
-
-    'Optimierungsergebnis aus einer DB lesen
-    '***************************************
-    Public Function db_getOptResult(Optional ByVal onlySekPop As Boolean = True) As OptResult
-
-        '---------------------------------------------------------------------------
-        'Hinweise:
-        'Die EVO-Eingabedateien müssen eingelesen sein und mit der DB übereinstimmen
-        'Funktioniert momentan nur für PES
-        '---------------------------------------------------------------------------
-
-        Dim i, j As Integer
-        Dim OptResult As EVO.OptResult
-
-        'Connect
-        Call db_connect()
-
-        'Read
-        Dim q As String
-        If (onlySekPop) Then
-            'Nur die Lösungen aus der letzten Sekundären Population
-            q = "SELECT SekPop.Generation, OptParameter.*, QWerte.*, Constraints.* FROM (((Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN OptParameter ON Sim.ID=OptParameter.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID) INNER JOIN SekPop ON Sim.ID=SekPop.Sim_ID WHERE (((SekPop.Generation)=(SELECT MAX(Generation) FROM SekPop)))"
-        Else
-            'Alle Lösungen
-            q = "SELECT OptParameter.*, QWerte.*, Constraints.* FROM ((Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN OptParameter ON Sim.ID=OptParameter.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID ORDER BY Sim.ID"
-        End If
-
-        Dim adapter As OleDbDataAdapter = New OleDbDataAdapter(q, db)
-
-        Dim ds As New DataSet("EVO")
-        Dim numRows As Integer = adapter.Fill(ds, "PESResult")
-
-        'Disconnect
-        Call db_disconnect()
-
-        'Werte einlesen
-        '==============
-        OptResult = New EVO.OptResult()
-        OptResult.List_OptParameter = Me.List_OptParameter
-        OptResult.List_OptZiele = Me.List_OptZiele
-        OptResult.List_Constraints = Me.List_Constraints
-
-        ReDim OptResult.Solutions(numRows - 1)
-
-        For i = 0 To numRows - 1
-            With OptResult.Solutions(i)
-                'OptParameter
-                '------------
-                ReDim .OptPara(Me.List_OptParameter.GetUpperBound(0))
-                For j = 0 To Me.List_OptParameter.GetUpperBound(0)
-                    .OptPara(j) = ds.Tables(0).Rows(i).Item(Me.List_OptParameter(j).Bezeichnung)
-                Next
-                'QWerte
-                '------
-                ReDim .QWerte(Me.List_OptZiele.GetUpperBound(0))
-                For j = 0 To Me.List_OptZiele.GetUpperBound(0)
-                    .QWerte(j) = ds.Tables(0).Rows(i).Item(Me.List_OptZiele(j).Bezeichnung)
-                Next
-                'Constraints
-                '-----------
-                ReDim .Constraints(Me.List_Constraints.GetUpperBound(0))
-                For j = 0 To Me.List_Constraints.GetUpperBound(0)
-                    .Constraints(j) = ds.Tables(0).Rows(i).Item(Me.List_Constraints(j).Bezeichnung)
-                Next
-            End With
-        Next
-
-        Return OptResult
-
-    End Function
-
-#End Region 'Ergebnisdatenbank
-
 #End Region 'Methoden
-
-End Class
-
-'zusätzliche Klassen
-'###################
-
-'Klasse OptResult
-'enthält die Ergebnisse eines Optimierungslaufs
-'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-Public Class OptResult
-
-    'Optimierungsbedingungen
-    Public List_OptZiele() As Sim.Struct_OptZiel
-    Public List_OptParameter() As Sim.Struct_OptParameter
-    Public List_Constraints() As Sim.Struct_Constraint
-
-    'Structure einer Lösung
-    Public Structure Struct_Solution
-        Public QWerte() As Double
-        Public OptPara() As Double
-        Public Constraints() As Double
-        Public ReadOnly Property isValid() As Boolean
-            Get
-                For i As Integer = 0 To Me.Constraints.GetUpperBound(0)
-                    If (Me.Constraints(i) < 0) Then Return False
-                Next
-                Return True
-            End Get
-        End Property
-    End Structure
-
-    'Array von Lösungen
-    Public Solutions() As Struct_Solution
 
 End Class

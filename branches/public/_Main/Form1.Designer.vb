@@ -33,18 +33,19 @@ Partial Class Form1
         Me.Button_Start = New System.Windows.Forms.Button
         Me.Button_IniMethod = New System.Windows.Forms.Button
         Me.LinkLabel_WorkDir = New System.Windows.Forms.LinkLabel
-        Me.Button_Scatterplot = New System.Windows.Forms.Button
+        Me.Button_openMDB = New System.Windows.Forms.Button
         Me.GroupBox_Anwendung = New System.Windows.Forms.GroupBox
         Me.Label_Methode = New System.Windows.Forms.Label
         Me.ComboBox_Methode = New System.Windows.Forms.ComboBox
         Me.Label_Anwendung = New System.Windows.Forms.Label
         Me.ComboBox_Anwendung = New System.Windows.Forms.ComboBox
-        Me.EVO_Opt_Verlauf1 = New EVO.EVO_Opt_Verlauf
-        Me.EVO_Settings1 = New EVO.EVO_Einstellungen
-        Me.Testprobleme1 = New EVO.Testprobleme
         Me.OpenFileDialog_Datensatz = New System.Windows.Forms.OpenFileDialog
         Me.OpenFileDialog_MDB = New System.Windows.Forms.OpenFileDialog
-        Me.DForm = New EVO.DiagrammForm
+        Me.Testprobleme1 = New IHWB.EVO.Testprobleme
+        Me.EVO_Opt_Verlauf1 = New IHWB.EVO.EVO_Opt_Verlauf
+        Me.EVO_Settings1 = New IHWB.EVO.EVO_Einstellungen
+        Me.DForm = New IHWB.EVO.DiagrammForm
+        Me.Button_Scatterplot = New System.Windows.Forms.Button
         Me.GroupBox_Anwendung.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -55,7 +56,7 @@ Partial Class Form1
         Me.Button_Start.Enabled = False
         Me.Button_Start.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Button_Start.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.Button_Start.Location = New System.Drawing.Point(587, 648)
+        Me.Button_Start.Location = New System.Drawing.Point(572, 641)
         Me.Button_Start.Name = "Button_Start"
         Me.Button_Start.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.Button_Start.Size = New System.Drawing.Size(112, 40)
@@ -85,16 +86,16 @@ Partial Class Form1
         Me.LinkLabel_WorkDir.TabIndex = 9
         Me.ToolTip1.SetToolTip(Me.LinkLabel_WorkDir, "Datensatz ändern")
         '
-        'Button_Scatterplot
+        'Button_openMDB
         '
-        Me.Button_Scatterplot.Enabled = False
-        Me.Button_Scatterplot.Image = My.Resources.Resources.scatterplot
-        Me.Button_Scatterplot.Location = New System.Drawing.Point(546, 656)
-        Me.Button_Scatterplot.Name = "Button_Scatterplot"
-        Me.Button_Scatterplot.Size = New System.Drawing.Size(25, 25)
-        Me.Button_Scatterplot.TabIndex = 9
-        Me.ToolTip1.SetToolTip(Me.Button_Scatterplot, "Scatterplot-Matrix anzeigen")
-        Me.Button_Scatterplot.UseVisualStyleBackColor = True
+        Me.Button_openMDB.Enabled = False
+        Me.Button_openMDB.Image = Global.IHWB.EVO.My.Resources.Resources.page_white_database
+        Me.Button_openMDB.Location = New System.Drawing.Point(500, 650)
+        Me.Button_openMDB.Name = "Button_openMDB"
+        Me.Button_openMDB.Size = New System.Drawing.Size(25, 25)
+        Me.Button_openMDB.TabIndex = 13
+        Me.ToolTip1.SetToolTip(Me.Button_openMDB, "Optimierungsergebnis aus Datenbank laden")
+        Me.Button_openMDB.UseVisualStyleBackColor = True
         '
         'GroupBox_Anwendung
         '
@@ -106,7 +107,7 @@ Partial Class Form1
         Me.GroupBox_Anwendung.Controls.Add(Me.Button_IniMethod)
         Me.GroupBox_Anwendung.Controls.Add(Me.LinkLabel_WorkDir)
         Me.GroupBox_Anwendung.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.GroupBox_Anwendung.Location = New System.Drawing.Point(8, 12)
+        Me.GroupBox_Anwendung.Location = New System.Drawing.Point(4, 4)
         Me.GroupBox_Anwendung.Name = "GroupBox_Anwendung"
         Me.GroupBox_Anwendung.Size = New System.Drawing.Size(698, 50)
         Me.GroupBox_Anwendung.TabIndex = 0
@@ -151,34 +152,6 @@ Partial Class Form1
         Me.ComboBox_Anwendung.Size = New System.Drawing.Size(124, 21)
         Me.ComboBox_Anwendung.TabIndex = 0
         '
-        'EVO_Opt_Verlauf1
-        '
-        Me.EVO_Opt_Verlauf1.Location = New System.Drawing.Point(233, 698)
-        Me.EVO_Opt_Verlauf1.Name = "EVO_Opt_Verlauf1"
-        Me.EVO_Opt_Verlauf1.NGen = CType(0, Short)
-        Me.EVO_Opt_Verlauf1.NNachf = CType(0, Short)
-        Me.EVO_Opt_Verlauf1.NPopul = CType(0, Short)
-        Me.EVO_Opt_Verlauf1.NRunden = CType(0, Short)
-        Me.EVO_Opt_Verlauf1.Size = New System.Drawing.Size(489, 73)
-        Me.EVO_Opt_Verlauf1.TabIndex = 6
-        '
-        'EVO_Einstellungen1
-        '
-        Me.EVO_Settings1.Enabled = False
-        Me.EVO_Settings1.Location = New System.Drawing.Point(8, 187)
-        Me.EVO_Settings1.Name = "EVO_Einstellungen1"
-        Me.EVO_Settings1.OptModus = CType(0, Short)
-        Me.EVO_Settings1.Size = New System.Drawing.Size(225, 585)
-        Me.EVO_Settings1.TabIndex = 2
-        '
-        'Testprobleme1
-        '
-        Me.Testprobleme1.Enabled = False
-        Me.Testprobleme1.Location = New System.Drawing.Point(5, 68)
-        Me.Testprobleme1.Name = "Testprobleme1"
-        Me.Testprobleme1.Size = New System.Drawing.Size(225, 121)
-        Me.Testprobleme1.TabIndex = 7
-        '
         'OpenFileDialog_Datensatz
         '
         Me.OpenFileDialog_Datensatz.DefaultExt = "ALL"
@@ -190,19 +163,59 @@ Partial Class Form1
         Me.OpenFileDialog_MDB.Filter = "Access-Datenbanken|*.mdb"
         Me.OpenFileDialog_MDB.Title = "Ergebnisdatenbank auswählen"
         '
+        'Testprobleme1
+        '
+        Me.Testprobleme1.Enabled = False
+        Me.Testprobleme1.Location = New System.Drawing.Point(4, 60)
+        Me.Testprobleme1.Name = "Testprobleme1"
+        Me.Testprobleme1.Size = New System.Drawing.Size(225, 121)
+        Me.Testprobleme1.TabIndex = 7
+        '
+        'EVO_Opt_Verlauf1
+        '
+        Me.EVO_Opt_Verlauf1.Location = New System.Drawing.Point(231, 690)
+        Me.EVO_Opt_Verlauf1.Name = "EVO_Opt_Verlauf1"
+        Me.EVO_Opt_Verlauf1.NGen = CType(0, Short)
+        Me.EVO_Opt_Verlauf1.NNachf = CType(0, Short)
+        Me.EVO_Opt_Verlauf1.NPopul = CType(0, Short)
+        Me.EVO_Opt_Verlauf1.NRunden = CType(0, Short)
+        Me.EVO_Opt_Verlauf1.Size = New System.Drawing.Size(467, 73)
+        Me.EVO_Opt_Verlauf1.TabIndex = 6
+        '
+        'EVO_Settings1
+        '
+        Me.EVO_Settings1.Enabled = False
+        Me.EVO_Settings1.Location = New System.Drawing.Point(4, 179)
+        Me.EVO_Settings1.Name = "EVO_Settings1"
+        Me.EVO_Settings1.OptModus = CType(0, Short)
+        Me.EVO_Settings1.Size = New System.Drawing.Size(225, 585)
+        Me.EVO_Settings1.TabIndex = 2
+        '
         'DForm
         '
-        Me.DForm.Location = New System.Drawing.Point(233, 68)
+        Me.DForm.Location = New System.Drawing.Point(229, 60)
         Me.DForm.Name = "DForm"
         Me.DForm.Size = New System.Drawing.Size(473, 625)
         Me.DForm.TabIndex = 8
+        '
+        'Button_Scatterplot
+        '
+        Me.Button_Scatterplot.Enabled = False
+        Me.Button_Scatterplot.Image = Global.IHWB.EVO.My.Resources.Resources.scatterplot
+        Me.Button_Scatterplot.Location = New System.Drawing.Point(531, 649)
+        Me.Button_Scatterplot.Name = "Button_Scatterplot"
+        Me.Button_Scatterplot.Size = New System.Drawing.Size(25, 25)
+        Me.Button_Scatterplot.TabIndex = 9
+        Me.ToolTip1.SetToolTip(Me.Button_Scatterplot, "Scatterplot-Matrix anzeigen")
+        Me.Button_Scatterplot.UseVisualStyleBackColor = True
         '
         'Form1
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.BackColor = System.Drawing.SystemColors.Control
-        Me.ClientSize = New System.Drawing.Size(712, 780)
+        Me.ClientSize = New System.Drawing.Size(706, 768)
         Me.Controls.Add(Me.Button_Scatterplot)
+        Me.Controls.Add(Me.Button_openMDB)
         Me.Controls.Add(Me.Button_Start)
         Me.Controls.Add(Me.Testprobleme1)
         Me.Controls.Add(Me.GroupBox_Anwendung)
@@ -231,6 +244,7 @@ Partial Class Form1
     Friend WithEvents ComboBox_Methode As System.Windows.Forms.ComboBox
     Friend WithEvents Label_Methode As System.Windows.Forms.Label
     Friend WithEvents OpenFileDialog_Datensatz As System.Windows.Forms.OpenFileDialog
-    Friend WithEvents Button_Scatterplot As System.Windows.Forms.Button
     Friend WithEvents OpenFileDialog_MDB As System.Windows.Forms.OpenFileDialog
+    Friend WithEvents Button_openMDB As System.Windows.Forms.Button
+    Friend WithEvents Button_Scatterplot As System.Windows.Forms.Button
 End Class
