@@ -1090,93 +1090,28 @@ StartMutation:
     'ES_ELTERN - Die neuen Eltern werden generiert
     '*********************************************
     Public Sub EsEltern()
-
-        Dim m, v As Integer
+        Dim m, v as Integer
 
         If (Not PES_Settings.is_MO_Pareto) Then
             'Standard ES nach Rechenberg
             'xxxxxxxxxxxxxxxxxxxxxxxxxxx
             'Die Eltern werden gleich der besten Kinder gesetzt (Schrittweite und Parameterwert)
-            '----------------------------------------------------------------------------------
-            Call Copy_Db_to_De()
+            '---------------------------------------------------------------------
+            For m = 0 To PES_Settings.NEltern - 1
+                For v = 0 To NPara - 1
+                    De(v, m, PES_iAkt.iAktPop) = Db(v, m, PES_iAkt.iAktPop)
+                    Xe(v, m, PES_iAkt.iAktPop) = Xb(v, m, PES_iAkt.iAktPop)
+                Next v
+            Next m
+
         Else
             'Multi-Objective Pareto
             'xxxxxxxxxxxxxxxxxxxxxx
-            '1. Eltern und Nachfolger werden gemeinsam betrachtet
-            'Nur Eltern werden NDSorting hinzugefügt, Kinder sind schon oben drin
-            '--------------------------------------------------------------------
             Call EsEltern_Pareto()
 
         End If
 
     End Sub
-    'Standard ES nach Rechenberg
-    'xxxxxxxxxxxxxxxxxxxxxxxxxxx
-    'Die Eltern werden gleich der besten Kinder gesetzt (Schrittweite und Parameterwert)
-    '----------------------------------------------------------------------------------
-    Private Sub Copy_Db_to_De()
-        Dim m As Integer
-        Dim v As Integer
-        For m = 0 To PES_Settings.NEltern - 1
-            For v = 0 To NPara - 1
-                De(v, m, PES_iAkt.iAktPop) = Db(v, m, PES_iAkt.iAktPop)
-                Xe(v, m, PES_iAkt.iAktPop) = Xb(v, m, PES_iAkt.iAktPop)
-            Next v
-        Next m
-    End Sub
-
-    'Kopiert ein Individuum in den Bestwertspeicher
-    'Aufrufe von: EsEltern_Pareto(), SekundärQb_Allocation()
-    '----------------------------------------------------
-    Public Sub Copy_PES_Individuum_to_Bestwert(ByVal i As Integer, ByVal _Individuum As Individuum)
-        Dim j, v As Integer
-
-        For j = 0 To NPenalty - 1
-            Qb(i, PES_iAkt.iAktPop, j) = _Individuum.Penalty(j)
-        Next j
-
-        If NConstrains > 0 Then
-            For j = 0 To NConstrains - 1
-                Rb(i, PES_iAkt.iAktPop, j) = _Individuum.Constrain(j)
-            Next j
-        End If
-
-        For v = 0 To NPara - 1
-            Db(v, i, PES_iAkt.iAktPop) = _Individuum.PES_d(v)
-            Xb(v, i, PES_iAkt.iAktPop) = _Individuum.PES_X(v)
-        Next v
-
-    End Sub
-
-    'Kopiert den Bestwertspeicher in ein Individuum
-    'Aufrufe von: EsEltern_Pareto()
-    '----------------------------------------------
-    Public Sub Copy_PES_Bestwert_to_Individuum(ByVal m As Integer, ByRef _NDSorting As Individuum)
-        Dim l, v As Integer
-
-        With _NDSorting
-            For l = 0 To NPenalty - 1
-                .Penalty(l) = Qb(m - PES_Settings.NNachf, PES_iAkt.iAktPop, l)
-            Next l
-            If NConstrains > 0 Then
-                .feasible = True
-                For l = 0 To NConstrains - 1
-                    .Constrain(l) = Rb(m - PES_Settings.NNachf, PES_iAkt.iAktPop, l)
-                    If .Constrain(l) < 0 Then .feasible = False
-                Next l
-            End If
-            .dominated = False
-            .Front = 0
-            For v = 0 To NPara - 1
-                'Die Schrittweite wird ebenfalls übernommen
-                .PES_d(v) = Db(v, m - PES_Settings.NNachf, PES_iAkt.iAktPop)
-                'Die eigentlichen Parameterwerte werden übernommen
-                .PES_X(v) = Xb(v, m - PES_Settings.NNachf, PES_iAkt.iAktPop)
-            Next v
-            .Distance = 0
-        End With
-    End Sub
-
 
     'Multi-Objective Pareto
     'xxxxxxxxxxxxxxxxxxxxxx
@@ -1192,7 +1127,9 @@ StartMutation:
         Dim rang As Integer
         Dim aktuelle_Front As Integer
 
-
+        '1. Eltern und Nachfolger werden gemeinsam betrachtet
+        'Nur Eltern werden NDSorting hinzugefügt, Kinder sind schon oben drin
+        '--------------------------------------------------------------------
         For m = PES_Settings.NNachf To PES_Settings.NNachf + PES_Settings.NEltern - 1
 
             'Kopiert den Bestwertspeicher in ein Individuum
@@ -1276,10 +1213,14 @@ StartMutation:
         '-----------------------------------------------------
         SekundärQb_Allocation(NFrontMember_aktuell, NDSResult)
 
-
         '5: Neue Eltern werden gleich dem Bestwertspeicher gesetzt
         '---------------------------------------------------------
-        Call Copy_Db_to_De()
+        For m = 0 To PES_Settings.NEltern - 1
+            For v = 0 To NPara - 1
+                De(v, m, PES_iAkt.iAktPop) = Db(v, m, PES_iAkt.iAktPop)
+                Xe(v, m, PES_iAkt.iAktPop) = Xb(v, m, PES_iAkt.iAktPop)
+            Next v
+        Next m
 
         '6: Sortierung der Lösungen ist nur für Neighbourhood-Rekombination notwendig
         '----------------------------------------------------------------------------
@@ -1383,6 +1324,58 @@ StartMutation:
         Return SekPopulation
 
     End Function
+
+    'Kopiert ein Individuum in den Bestwertspeicher
+    'Aufrufe von: EsEltern_Pareto(), SekundärQb_Allocation()
+    '----------------------------------------------------
+    Private Sub Copy_PES_Individuum_to_Bestwert(ByVal i As Integer, ByVal _Individuum As Individuum)
+        Dim j, v As Integer
+
+        For j = 0 To NPenalty - 1
+            Qb(i, PES_iAkt.iAktPop, j) = _Individuum.Penalty(j)
+        Next j
+
+        If NConstrains > 0 Then
+            For j = 0 To NConstrains - 1
+                Rb(i, PES_iAkt.iAktPop, j) = _Individuum.Constrain(j)
+            Next j
+        End If
+
+        For v = 0 To NPara - 1
+            Db(v, i, PES_iAkt.iAktPop) = _Individuum.PES_d(v)
+            Xb(v, i, PES_iAkt.iAktPop) = _Individuum.PES_X(v)
+        Next v
+
+    End Sub
+
+    'Kopiert den Bestwertspeicher in ein Individuum
+    'Aufrufe von: EsEltern_Pareto()
+    '----------------------------------------------
+    Private Sub Copy_PES_Bestwert_to_Individuum(ByVal m As Integer, ByRef _NDSorting As Individuum)
+        Dim l, v As Integer
+
+        With _NDSorting
+            For l = 0 To NPenalty - 1
+                .Penalty(l) = Qb(m - PES_Settings.NNachf, PES_iAkt.iAktPop, l)
+            Next l
+            If NConstrains > 0 Then
+                .feasible = True
+                For l = 0 To NConstrains - 1
+                    .Constrain(l) = Rb(m - PES_Settings.NNachf, PES_iAkt.iAktPop, l)
+                    If .Constrain(l) < 0 Then .feasible = False
+                Next l
+            End If
+            .dominated = False
+            .Front = 0
+            For v = 0 To NPara - 1
+                'Die Schrittweite wird ebenfalls übernommen
+                .PES_d(v) = Db(v, m - PES_Settings.NNachf, PES_iAkt.iAktPop)
+                'Die eigentlichen Parameterwerte werden übernommen
+                .PES_X(v) = Xb(v, m - PES_Settings.NNachf, PES_iAkt.iAktPop)
+            Next v
+            .Distance = 0
+        End With
+    End Sub
 
     'NON_DOMINATED_SORTING - Entscheidet welche Werte dominiert werden und welche nicht
     'Aufrufe von: EsEltern_Pareto(), SekundärQb_Allocation
