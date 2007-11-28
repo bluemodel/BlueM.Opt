@@ -1135,7 +1135,7 @@ StartMutation:
         For m = PES_Settings.NNachf To PES_Settings.NNachf + PES_Settings.NEltern - 1
 
             'Kopiert den Bestwertspeicher in ein Individuum
-            Call Bestwert_to_Individuum(m, NDSorting(m))
+            Call Copy_PES_Bestwert_to_Individuum(m, NDSorting(m))
 
         Next m
 
@@ -1185,7 +1185,7 @@ StartMutation:
                 For i = NFrontMember_gesamt To NFrontMember_aktuell + NFrontMember_gesamt - 1
 
                     'NDSResult wird in den Bestwertspeicher kopiert
-                    Call Individuum_to_Bestwert(i, NDSResult(i))
+                    Call Copy_PES_Individuum_to_Bestwert(i, NDSResult(i))
 
                 Next i
                 NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
@@ -1199,7 +1199,7 @@ StartMutation:
                 For i = NFrontMember_gesamt To PES_Settings.NEltern - 1
 
                     'NDSResult wird in den Bestwertspeicher kopiert
-                    Call Individuum_to_Bestwert(i, NDSResult(i))
+                    Call Copy_PES_Individuum_to_Bestwert(i, NDSResult(i))
 
                 Next i
 
@@ -1280,7 +1280,7 @@ StartMutation:
                 For i = 0 To PES_Settings.NEltern - 1
 
                     'NDSResult wird in den Bestwertspeicher kopiert
-                    Call Individuum_to_Bestwert(i, SekundärQb(i))
+                    Call Copy_PES_Individuum_to_Bestwert(i, SekundärQb(i))
 
                 Next i
             End If
@@ -1331,7 +1331,7 @@ StartMutation:
     'Kopiert ein Individuum in den Bestwertspeicher
     'Aufrufe von: EsEltern_Pareto(), SekundärQb_Allocation()
     '----------------------------------------------------
-    Private Sub Individuum_to_Bestwert(ByVal i As Integer, ByVal _Individuum As Individuum)
+    Private Sub Copy_PES_Individuum_to_Bestwert(ByVal i As Integer, ByVal _Individuum As Individuum)
         Dim j, v As Integer
 
         For j = 0 To NPenalty - 1
@@ -1354,7 +1354,7 @@ StartMutation:
     'Kopiert den Bestwertspeicher in ein Individuum
     'Aufrufe von: EsEltern_Pareto()
     '----------------------------------------------
-    Private Sub Bestwert_to_Individuum(ByVal m As Integer, ByVal _NDSorting As Individuum)
+    Private Sub Copy_PES_Bestwert_to_Individuum(ByVal m As Integer, ByRef _NDSorting As Individuum)
         Dim l, v As Integer
 
         With _NDSorting
