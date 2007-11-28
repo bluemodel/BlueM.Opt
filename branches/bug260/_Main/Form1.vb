@@ -1565,9 +1565,6 @@ Start_Evolutionsrunden:
 
             If (sol.ID = solutionID) Then
 
-                'Lösung zu ausgewählten Lösungen hinzufügen
-                Call Sim1.OptResult.selectSolution(sol.ID)
-
                 'In Chart anzeigen
                 If (Not s.HasZValues) Then
                     '2D-Diagramm
@@ -1606,6 +1603,9 @@ Start_Evolutionsrunden:
     'Eine Lösung auswählen
     '*********************
     Public Sub selectSolution(ByVal sol As Solution) Handles scatterplot1.solutionSelected
+
+        'Lösung zu ausgewählten Lösungen hinzufügen
+        Call Sim1.OptResult.selectSolution(sol.ID)
 
         'Lösungsdialog initialisieren
         If (IsNothing(Me.solutionDialog)) Then
