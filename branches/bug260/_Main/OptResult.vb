@@ -448,7 +448,7 @@ Public Class OptResult
 
         End If
 
-        'BUG 228: db_insert für CES
+        'BUG 260: db_insert für CES
 
         'If (Me.Method = "CES" Or Me.Method = "CES + PES") Then
 
@@ -599,7 +599,7 @@ Public Class OptResult
 
                 Return isOK
 
-                'BUG 228: db_getPara für CES
+                'BUG 260: db_getPara für CES
 
 
                 'Case "CES"
