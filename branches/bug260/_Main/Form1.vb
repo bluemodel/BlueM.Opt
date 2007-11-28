@@ -860,18 +860,18 @@ Partial Class Form1
                     'SingleObjective
                     '---------------
                     serie = DForm.Diag.getSeriesPoint("Childs", "Orange")
-                    Call serie.Add(durchlauf_all, CES1.List_Childs(i).Penalty(0))
+                    Call serie.Add(durchlauf_all, CES1.List_Childs(i).Penalty(0), durchlauf_all.ToString())
                 ElseIf (CES1.n_Penalty = 2) Then
                     'MultiObjective 2D-Diagramm
                     '--------------------------
                     serie = DForm.Diag.getSeriesPoint("Childs", "Orange")
-                    Call serie.Add(CES1.List_Childs(i).Penalty(0), CES1.List_Childs(i).Penalty(1))
+                    Call serie.Add(CES1.List_Childs(i).Penalty(0), CES1.List_Childs(i).Penalty(1), durchlauf_all.ToString())
                 ElseIf (CES1.n_Penalty = 3) Then
                     'MultiObjective 3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
                     '---------------------------------------------------------------------------------------
                     Dim serie3D As Steema.TeeChart.Styles.Points3D
                     serie3D = DForm.Diag.getSeries3DPoint("Childs", "Orange")
-                    Call serie3D.Add(CES1.List_Childs(i).Penalty(0), CES1.List_Childs(i).Penalty(1), CES1.List_Childs(i).Penalty(2))
+                    Call serie3D.Add(CES1.List_Childs(i).Penalty(0), CES1.List_Childs(i).Penalty(1), CES1.List_Childs(i).Penalty(2), durchlauf_all.ToString())
                 End If
 
                 System.Windows.Forms.Application.DoEvents()
@@ -882,6 +882,7 @@ Partial Class Form1
 
             'MO oder SO SELEKTIONSPROZESS oder NDSorting SELEKTION
             '-----------------------------------------------------
+            'BUG 259: CES: Punkt-Labels der Sekundärpopulation fehlen noch!
             If CES1.n_Penalty = 1 Then
                 'Sortieren der Kinden anhand der Qualität
                 Call CES1.Sort_Individuum(CES1.List_Childs)
