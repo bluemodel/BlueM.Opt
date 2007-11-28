@@ -122,7 +122,6 @@ Public Class PES
     Const palpha As Double = 1.1            'Faktor alpha=1.1 auf Populationsebene nach Rechenberg
 
     Dim NDSorting() As Individuum
-    Dim swap As New Individuum("Swap", 0)
 
     Private Structure Struct_Sortierung
         Dim Index As Integer
@@ -1574,7 +1573,7 @@ StartMutation:
         Dim i As Integer
         Dim j As Integer
         Dim k As Integer
-
+        Dim swap As New Individuum("Swap", 0)
         Dim fmin, fmax As Double
 
         For k = 0 To NPenalty - 1
