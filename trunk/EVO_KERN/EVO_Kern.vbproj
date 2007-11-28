@@ -79,6 +79,7 @@
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Functions.vb" />
     <Compile Include="Individuum.vb">
       <CustomToolNamespace>Individ</CustomToolNamespace>
     </Compile>
