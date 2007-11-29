@@ -1226,7 +1226,7 @@ StartMutation:
                 For i = NFrontMember_gesamt To NFrontMember_aktuell + NFrontMember_gesamt - 1
 
                     'NDSResult wird in den Bestwertspeicher kopiert
-                    Call Write_Individuum_to_Bestwert(i, NDSResult)
+                    Call Copy_Individuum_to_Bestwert(i, NDSResult)
 
                 Next i
                 NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
@@ -1240,7 +1240,7 @@ StartMutation:
                 For i = NFrontMember_gesamt To PES_Settings.NEltern - 1
 
                     'NDSResult wird in den Bestwertspeicher kopiert
-                    Call Write_Individuum_to_Bestwert(i, NDSResult)
+                    Call Copy_Individuum_to_Bestwert(i, NDSResult)
 
                 Next i
 
@@ -1303,7 +1303,7 @@ StartMutation:
                 For i = 0 To PES_Settings.NEltern - 1
 
                     'NDSResult wird in den Bestwertspeicher kopiert
-                    Call Write_Individuum_to_Bestwert(i, SekundärQb)
+                    Call Copy_Individuum_to_Bestwert(i, SekundärQb)
 
                 Next i
             End If
@@ -1611,11 +1611,11 @@ StartMutation:
 
     End Sub
 
-    Public Shared Sub Write_Individuum_to_Bestwert(ByVal _i As Integer, ByVal _NDSorting_Struct As Individuum())
+    'Public Shared Sub Write_Individuum_to_Bestwert(ByVal _i As Integer, ByVal _NDSorting_Struct As Individuum())
 
-        Call Write_Individuum_to_Bestwert(_i, _NDSorting_Struct)
+    '    Call Copy_Individuum_to_Bestwert(_i, _NDSorting_Struct)
 
-    End Sub
+    'End Sub
 
     'ES_GET_SEKUNDÄRE_POPULATIONEN - Sekundäre Population speichert immer die angegebene
     'Anzahl von Bestwerten und kann den Bestwertspeicher alle x Generationen überschreiben
