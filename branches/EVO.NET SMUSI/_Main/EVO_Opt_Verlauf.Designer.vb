@@ -138,7 +138,7 @@ Partial Public Class EVO_Opt_Verlauf
         Me.lblNachfolger.BackColor = System.Drawing.SystemColors.Control
         Me.lblNachfolger.Cursor = System.Windows.Forms.Cursors.Default
         Me.lblNachfolger.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.lblNachfolger.Location = New System.Drawing.Point(226, 42)
+        Me.lblNachfolger.Location = New System.Drawing.Point(222, 42)
         Me.lblNachfolger.Name = "lblNachfolger"
         Me.lblNachfolger.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.lblNachfolger.Size = New System.Drawing.Size(59, 13)
@@ -151,7 +151,7 @@ Partial Public Class EVO_Opt_Verlauf
         Me.lblGeneration.BackColor = System.Drawing.SystemColors.Control
         Me.lblGeneration.Cursor = System.Windows.Forms.Cursors.Default
         Me.lblGeneration.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.lblGeneration.Location = New System.Drawing.Point(226, 24)
+        Me.lblGeneration.Location = New System.Drawing.Point(222, 24)
         Me.lblGeneration.Name = "lblGeneration"
         Me.lblGeneration.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.lblGeneration.Size = New System.Drawing.Size(59, 13)
@@ -190,7 +190,7 @@ Partial Public Class EVO_Opt_Verlauf
         Me.lblvon_4.BackColor = System.Drawing.SystemColors.Control
         Me.lblvon_4.Cursor = System.Windows.Forms.Cursors.Default
         Me.lblvon_4.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.lblvon_4.Location = New System.Drawing.Point(321, 42)
+        Me.lblvon_4.Location = New System.Drawing.Point(317, 42)
         Me.lblvon_4.Name = "lblvon_4"
         Me.lblvon_4.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.lblvon_4.Size = New System.Drawing.Size(25, 13)
@@ -203,7 +203,7 @@ Partial Public Class EVO_Opt_Verlauf
         Me.lblvon_3.BackColor = System.Drawing.SystemColors.Control
         Me.lblvon_3.Cursor = System.Windows.Forms.Cursors.Default
         Me.lblvon_3.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.lblvon_3.Location = New System.Drawing.Point(321, 24)
+        Me.lblvon_3.Location = New System.Drawing.Point(317, 24)
         Me.lblvon_3.Name = "lblvon_3"
         Me.lblvon_3.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.lblvon_3.Size = New System.Drawing.Size(25, 13)
@@ -241,10 +241,10 @@ Partial Public Class EVO_Opt_Verlauf
         Me.LabelaktNachf.BackColor = System.Drawing.Color.Transparent
         Me.LabelaktNachf.Cursor = System.Windows.Forms.Cursors.Default
         Me.LabelaktNachf.ForeColor = System.Drawing.Color.Blue
-        Me.LabelaktNachf.Location = New System.Drawing.Point(294, 42)
+        Me.LabelaktNachf.Location = New System.Drawing.Point(285, 42)
         Me.LabelaktNachf.Name = "LabelaktNachf"
         Me.LabelaktNachf.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.LabelaktNachf.Size = New System.Drawing.Size(23, 17)
+        Me.LabelaktNachf.Size = New System.Drawing.Size(30, 13)
         Me.LabelaktNachf.TabIndex = 12
         Me.LabelaktNachf.Text = "1"
         Me.LabelaktNachf.TextAlign = System.Drawing.ContentAlignment.TopRight
@@ -254,10 +254,10 @@ Partial Public Class EVO_Opt_Verlauf
         Me.LabelaktGen.BackColor = System.Drawing.Color.Transparent
         Me.LabelaktGen.Cursor = System.Windows.Forms.Cursors.Default
         Me.LabelaktGen.ForeColor = System.Drawing.Color.Blue
-        Me.LabelaktGen.Location = New System.Drawing.Point(294, 24)
+        Me.LabelaktGen.Location = New System.Drawing.Point(285, 24)
         Me.LabelaktGen.Name = "LabelaktGen"
         Me.LabelaktGen.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.LabelaktGen.Size = New System.Drawing.Size(23, 17)
+        Me.LabelaktGen.Size = New System.Drawing.Size(30, 13)
         Me.LabelaktGen.TabIndex = 11
         Me.LabelaktGen.Text = "1"
         Me.LabelaktGen.TextAlign = System.Drawing.ContentAlignment.TopRight
@@ -270,7 +270,7 @@ Partial Public Class EVO_Opt_Verlauf
         Me.LabelaktPop.Location = New System.Drawing.Point(59, 42)
         Me.LabelaktPop.Name = "LabelaktPop"
         Me.LabelaktPop.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.LabelaktPop.Size = New System.Drawing.Size(23, 17)
+        Me.LabelaktPop.Size = New System.Drawing.Size(23, 13)
         Me.LabelaktPop.TabIndex = 10
         Me.LabelaktPop.Text = "1"
         Me.LabelaktPop.TextAlign = System.Drawing.ContentAlignment.TopRight
@@ -283,7 +283,7 @@ Partial Public Class EVO_Opt_Verlauf
         Me.LabelaktRunde.Location = New System.Drawing.Point(59, 24)
         Me.LabelaktRunde.Name = "LabelaktRunde"
         Me.LabelaktRunde.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.LabelaktRunde.Size = New System.Drawing.Size(23, 17)
+        Me.LabelaktRunde.Size = New System.Drawing.Size(23, 13)
         Me.LabelaktRunde.TabIndex = 9
         Me.LabelaktRunde.Text = "1"
         Me.LabelaktRunde.TextAlign = System.Drawing.ContentAlignment.TopRight
@@ -293,10 +293,10 @@ Partial Public Class EVO_Opt_Verlauf
         Me.LabelAnzNachf.BackColor = System.Drawing.Color.Transparent
         Me.LabelAnzNachf.Cursor = System.Windows.Forms.Cursors.Default
         Me.LabelAnzNachf.ForeColor = System.Drawing.Color.Blue
-        Me.LabelAnzNachf.Location = New System.Drawing.Point(350, 42)
+        Me.LabelAnzNachf.Location = New System.Drawing.Point(346, 42)
         Me.LabelAnzNachf.Name = "LabelAnzNachf"
         Me.LabelAnzNachf.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.LabelAnzNachf.Size = New System.Drawing.Size(23, 17)
+        Me.LabelAnzNachf.Size = New System.Drawing.Size(30, 13)
         Me.LabelAnzNachf.TabIndex = 8
         Me.LabelAnzNachf.Text = "1"
         Me.LabelAnzNachf.TextAlign = System.Drawing.ContentAlignment.TopRight
@@ -306,10 +306,10 @@ Partial Public Class EVO_Opt_Verlauf
         Me.LabelAnzGen.BackColor = System.Drawing.Color.Transparent
         Me.LabelAnzGen.Cursor = System.Windows.Forms.Cursors.Default
         Me.LabelAnzGen.ForeColor = System.Drawing.Color.Blue
-        Me.LabelAnzGen.Location = New System.Drawing.Point(350, 24)
+        Me.LabelAnzGen.Location = New System.Drawing.Point(346, 24)
         Me.LabelAnzGen.Name = "LabelAnzGen"
         Me.LabelAnzGen.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.LabelAnzGen.Size = New System.Drawing.Size(23, 17)
+        Me.LabelAnzGen.Size = New System.Drawing.Size(30, 13)
         Me.LabelAnzGen.TabIndex = 7
         Me.LabelAnzGen.Text = "1"
         Me.LabelAnzGen.TextAlign = System.Drawing.ContentAlignment.TopRight
@@ -322,7 +322,7 @@ Partial Public Class EVO_Opt_Verlauf
         Me.LabelAnzPop.Location = New System.Drawing.Point(108, 42)
         Me.LabelAnzPop.Name = "LabelAnzPop"
         Me.LabelAnzPop.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.LabelAnzPop.Size = New System.Drawing.Size(23, 17)
+        Me.LabelAnzPop.Size = New System.Drawing.Size(23, 13)
         Me.LabelAnzPop.TabIndex = 6
         Me.LabelAnzPop.Text = "1"
         Me.LabelAnzPop.TextAlign = System.Drawing.ContentAlignment.TopRight
@@ -335,7 +335,7 @@ Partial Public Class EVO_Opt_Verlauf
         Me.LabelAnzRunden.Location = New System.Drawing.Point(108, 24)
         Me.LabelAnzRunden.Name = "LabelAnzRunden"
         Me.LabelAnzRunden.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.LabelAnzRunden.Size = New System.Drawing.Size(23, 17)
+        Me.LabelAnzRunden.Size = New System.Drawing.Size(23, 13)
         Me.LabelAnzRunden.TabIndex = 5
         Me.LabelAnzRunden.Text = "1"
         Me.LabelAnzRunden.TextAlign = System.Drawing.ContentAlignment.TopRight

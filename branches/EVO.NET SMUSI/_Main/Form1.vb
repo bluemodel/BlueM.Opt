@@ -14,7 +14,7 @@ Imports System.Management
 '****                                                                       ****
 '**** Erstellt: Dezember 2003                                               ****
 '****                                                                       ****
-'**** Letzte Änderung: Juli 2007                                           ****
+'**** Letzte Änderung: Juli 2007                                            ****
 '*******************************************************************************
 '*******************************************************************************
 
@@ -65,6 +65,12 @@ Partial Class Form1
     '**** Verschiedenes ****
     Dim isrun As Boolean = False                        'Optimierung läuft
     Dim ispause As Boolean = False                      'Optimierung ist pausiert
+
+    Const eol As String = Chr(13) & Chr(10)             'Zeilenumbruch
+
+    'Dialoge
+    Public WithEvents solutionDialog As SolutionDialog
+    Public WithEvents scatterplot1 As Scatterplot
 
 #End Region 'Eigenschaften
 
@@ -124,7 +130,8 @@ Partial Class Form1
             'Combobox Methode deaktivieren
             ComboBox_Methode.Enabled = False
 
-            'Scatterplot deaktivieren
+            'Ergebnis-Buttons
+            Me.Button_openMDB.Enabled = False
             Me.Button_Scatterplot.Enabled = False
 
             'EVO_Settings zurücksetzen
@@ -225,7 +232,8 @@ Partial Class Form1
             'Start Button deaktivieren
             Me.Button_Start.Enabled = False
 
-            'Scatterplot deaktivieren
+            'Ergebnis-Buttons
+            Me.Button_openMDB.Enabled = False
             Me.Button_Scatterplot.Enabled = False
 
             'EVO_Einstellungen deaktivieren
@@ -254,22 +262,18 @@ Partial Class Form1
                 Case METH_RESET 'Methode Reset
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'Ergebnisdatenbank ausschalten
-                    Sim1.Ergebnisdb = False
-
                     'Original ModellParameter schreiben
                     Call Sim1.Write_ModellParameter()
 
                     MsgBox("Die Startwerte der Optimierungsparameter wurden in die Eingabedateien geschrieben.", MsgBoxStyle.Information, "Info")
 
+                    'Ergebnis-Buttons
+                    Me.Button_openMDB.Enabled = True
 
                 Case METH_SENSIPLOT 'Methode SensiPlot
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     SensiPlot1 = New SensiPlot
-
-                    'Ergebnisdatenbank einschalten
-                    Sim1.Ergebnisdb = True
 
                     'SensiPlot für Sim vorbereiten
                     Call Sim1.read_and_valid_INI_Files_PES()
@@ -300,11 +304,8 @@ Partial Class Form1
                     'EVO_Einstellungen aktivieren
                     EVO_Settings1.Enabled = True
 
-                    'Ergebnisdatenbank einschalten
-                    Sim1.Ergebnisdb = True
-
-                    'Scatterplot aktivieren
-                    Me.Button_Scatterplot.Enabled = True
+                    'Ergebnis-Buttons
+                    Me.Button_openMDB.Enabled = True
 
                     'PES für Sim vorbereiten
                     Call Sim1.read_and_valid_INI_Files_PES()
@@ -325,13 +326,14 @@ Partial Class Form1
                 Case METH_CES, METH_CES_PES, METH_HYBRID 'Methode CES und Methode CES_PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
+                    'Ergebnis-Buttons
+                    Me.Button_openMDB.Enabled = True
+                    Me.Button_Scatterplot.Enabled = True
+
                     'Funktioniert nur bei BlueM!
                     If (Not Anwendung = ANW_BLUEM) Then
                         Throw New Exception("CES funktioniert bisher nur mit BlueM!")
                     End If
-
-                    'Ergebnisdatenbank einschalten
-                    Sim1.Ergebnisdb = True
 
                     'Fallunterscheidung CES oder CES_PES
                     Select Case Me.Method
@@ -364,11 +366,14 @@ Partial Class Form1
 
                     'Anzahl der Ziele, Locations und Verzeigungen wird an CES übergeben
                     CES1.n_Penalty = Sim1.List_OptZiele.GetLength(0)
-                    Ces1.n_Constrain = Sim1.List_Constraints.GetLength(0)
+                    CES1.n_Constrain = Sim1.List_Constraints.GetLength(0)
                     CES1.n_Locations = Sim1.List_Locations.GetLength(0)
                     CES1.n_Verzweig = Sim1.VerzweigungsDatei.GetLength(0)
                     CES1.TestModus = Sim1.Set_TestModus
                     CES1.n_Combinations = Sim1.No_of_Combinations
+
+                    'Die Variablen für die Individuuen werden gesetzt
+                    EVO.Kern.Individuum.Initialise(2, CES1.n_Locations, CES1.n_Penalty, CES1.n_Constrain)
 
                     'Bei Testmodus wird die Anzahl der Kinder und Generationen überschrieben
                     If CES1.TestModus = 1 Then
@@ -470,6 +475,13 @@ Partial Class Form1
             Me.isrun = True
             Me.Button_Start.Text = "||"
 
+            'Ergebnis-Buttons
+            Me.Button_Scatterplot.Enabled = True
+
+            'EVO-Einstellungen speichern
+            Call Me.EVO_Settings1.readSettings()
+            Me.EVO_Settings1.isSaved = True
+
             'Try
 
             Select Case Anwendung
@@ -545,7 +557,7 @@ Partial Class Form1
         'Wave deklarieren
         Dim Wave1 As New Wave.Wave
 
-        Dim i, j As Integer
+        Dim i, j, n As Integer
 
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
@@ -570,6 +582,8 @@ Partial Class Form1
         '-------------------
         Randomize()
 
+        n = 0
+
         'Äussere Schleife (2. OptParameter)
         '----------------------------------
         For i = 0 To ((SensiPlot1.Anz_Steps - 1) * (Me.globalAnzPar - 1))
@@ -582,6 +596,7 @@ Partial Class Form1
                     Case "Diskret"
                         Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).SKWert = i / SensiPlot1.Anz_Steps
                 End Select
+                n += 1
             End If
 
             'Innere Schleife (1. OptParameter)
@@ -595,6 +610,7 @@ Partial Class Form1
                     Case "Diskret"
                         Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).SKWert = j / SensiPlot1.Anz_Steps
                 End Select
+                n += 1
 
                 'Modellparameter schreiben
                 Call Sim1.Write_ModellParameter()
@@ -605,14 +621,16 @@ Partial Class Form1
                 'Qwert berechnen
                 Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).QWertTmp = Sim1.QWert(Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel))
 
+                'BUG 253: Constraints für SensiPlot fehlen noch
+
                 'Diagramm aktualisieren
                 If (Me.globalAnzPar = 1) Then
                     '1 Parameter
                     serie = DForm.Diag.getSeriesPoint("SensiPlot", "Orange")
-                    serie.Add(Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).QWertTmp, Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Wert, "")
+                    serie.Add(Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).QWertTmp, Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Wert, n)
                 Else
                     '2 Parameter
-                    surface.Add(Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Wert, Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).QWertTmp, Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Wert)
+                    surface.Add(Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Wert, Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).QWertTmp, Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Wert, n)
                 End If
 
                 'Simulationsergebnis in Wave laden
@@ -627,10 +645,8 @@ Partial Class Form1
                     Wave1.Display_Series(SimReihe)
                 End If
 
-                'Qualitätswerte und OptParameter in DB speichern
-                If (Sim1.Ergebnisdb = True) Then
-                    Call Sim1.db_update()
-                End If
+                'Lösung abspeichern
+                Call Sim1.OptResult.addSolution(n, Sim1.List_OptZiele, Sim1.List_Constraints, Sim1.List_OptParameter)
 
                 System.Windows.Forms.Application.DoEvents()
 
@@ -715,9 +731,9 @@ Partial Class Form1
 
         'Parents und Childs werden Dimensioniert
         ReDim CES1.List_Parents(CES1.n_Parents - 1)
-        Call CES1.Individuum_Dim(CES1.List_Parents, "Parent")
+        Call Kern.Individuum.New_Array("Parent", CES1.List_Parents)
         ReDim CES1.List_Childs(CES1.n_Childs - 1)
-        Call CES1.Individuum_Dim(CES1.List_Childs, "Child")
+        Call Kern.Individuum.New_Array("Child", CES1.List_Childs)
 
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
@@ -829,7 +845,7 @@ Partial Class Form1
                 End If
 
                 'Simulation *************************************************************************
-                Call Sim1.SIM_Evaluierung(CES1.List_Childs(i).Penalty, CES1.List_Childs(i).Constrain)
+                Call Sim1.SIM_Evaluierung(durchlauf_all, CES1.List_Childs(i).Penalty, CES1.List_Childs(i).Constrain)
                 '************************************************************************************
 
                 'HYBRID: Speichert die PES Erfahrung diesen Childs im PES Memory
@@ -844,18 +860,18 @@ Partial Class Form1
                     'SingleObjective
                     '---------------
                     serie = DForm.Diag.getSeriesPoint("Childs", "Orange")
-                    Call serie.Add(durchlauf_all, CES1.List_Childs(i).Penalty(0))
+                    Call serie.Add(durchlauf_all, CES1.List_Childs(i).Penalty(0), durchlauf_all.ToString())
                 ElseIf (CES1.n_Penalty = 2) Then
                     'MultiObjective 2D-Diagramm
                     '--------------------------
                     serie = DForm.Diag.getSeriesPoint("Childs", "Orange")
-                    Call serie.Add(CES1.List_Childs(i).Penalty(0), CES1.List_Childs(i).Penalty(1))
+                    Call serie.Add(CES1.List_Childs(i).Penalty(0), CES1.List_Childs(i).Penalty(1), durchlauf_all.ToString())
                 ElseIf (CES1.n_Penalty = 3) Then
                     'MultiObjective 3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
                     '---------------------------------------------------------------------------------------
                     Dim serie3D As Steema.TeeChart.Styles.Points3D
                     serie3D = DForm.Diag.getSeries3DPoint("Childs", "Orange")
-                    Call serie3D.Add(CES1.List_Childs(i).Penalty(0), CES1.List_Childs(i).Penalty(1), CES1.List_Childs(i).Penalty(2))
+                    Call serie3D.Add(CES1.List_Childs(i).Penalty(0), CES1.List_Childs(i).Penalty(1), CES1.List_Childs(i).Penalty(2), durchlauf_all.ToString())
                 End If
 
                 System.Windows.Forms.Application.DoEvents()
@@ -866,6 +882,7 @@ Partial Class Form1
 
             'MO oder SO SELEKTIONSPROZESS oder NDSorting SELEKTION
             '-----------------------------------------------------
+            'BUG 259: CES: Punkt-Labels der Sekundärpopulation fehlen noch!
             If CES1.n_Penalty = 1 Then
                 'Sortieren der Kinden anhand der Qualität
                 Call CES1.Sort_Individuum(CES1.List_Childs)
@@ -892,7 +909,7 @@ Partial Class Form1
             '***********************************************
             If CES1.TestModus = 0 Then
                 'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
-                Call CES1.Individuum_Dim(CES1.List_Childs, "Child")
+                Call Kern.Individuum.New_Array("Child", CES1.List_Childs)
                 'Reproduktionsoperatoren, hier gehts dezent zur Sache
                 Call CES1.Reproduction_Control()
                 'Mutationsoperatoren
@@ -1079,6 +1096,9 @@ Partial Class Form1
             Call PrepareDiagramm()
         End If
 
+        'Individuum wird initialisiert
+        Call Kern.Individuum.Initialise(1, 1, globalAnzZiel, globalAnzRand)
+
         'Schritte 0: Objekt der Klasse PES wird erzeugt
         '**********************************************
         Dim PES1 As EVO.Kern.PES
@@ -1170,7 +1190,7 @@ Start_Evolutionsrunden:
                                     Call Sim1.PREPARE_Evaluation_PES(myPara)
 
                                     'Evaluierung des Simulationsmodells (ToDo: Validätsprüfung fehlt)
-                                    SIM_Eval_is_OK = Sim1.SIM_Evaluierung(QN, RN)
+                                    SIM_Eval_is_OK = Sim1.SIM_Evaluierung(durchlauf, QN, RN)
 
                                     'Lösung im TeeChart einzeichnen
                                     '==============================
@@ -1187,35 +1207,39 @@ Start_Evolutionsrunden:
 
                                     If (globalAnzZiel = 1) Then
                                         'SingleObjective
-                                        '---------------
+                                        'xxxxxxxxxxxxxxx
                                         If (isInvalid) Then
                                             serie = DForm.Diag.getSeriesPoint("Population " & (PES1.PES_iAkt.iAktPop + 1).ToString() & " (ungültig)", "Gray")
                                         Else
                                             serie = DForm.Diag.getSeriesPoint("Population " & (PES1.PES_iAkt.iAktPop + 1).ToString())
                                         End If
-                                        Call serie.Add(durchlauf, QN(0))
-
-                                    ElseIf (globalAnzZiel = 2) Then
-                                        'MultiObjective 3D-Diagramm
-                                        '(Es werden die ersten drei Zielfunktionswerte eingezeichnet)
-                                        '------------------------------------------------------------
-                                        If (isInvalid) Then
-                                            serie = DForm.Diag.getSeriesPoint("Population" & " (ungültig)", "Gray")
-                                        Else
-                                            serie = DForm.Diag.getSeriesPoint("Population", "Orange")
-                                        End If
-                                        Call serie.Add(QN(0), QN(1))
+                                        Call serie.Add(durchlauf, QN(0), durchlauf.ToString())
 
                                     Else
-                                        '3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
-                                        '------------------------------------------------------------------------
-                                        Dim serie3D As Steema.TeeChart.Styles.Points3D
-                                        If (isInvalid) Then
-                                            serie3D = DForm.Diag.getSeries3DPoint("Population" & " (ungültig)", "Gray")
+                                        'MultiObjective
+                                        'xxxxxxxxxxxxxx
+                                        If (globalAnzZiel = 2) Then
+                                            '2D-Diagramm
+                                            '------------------------------------------------------------------------
+                                            If (isInvalid) Then
+                                                serie = DForm.Diag.getSeriesPoint("Population" & " (ungültig)", "Gray")
+                                            Else
+                                                serie = DForm.Diag.getSeriesPoint("Population", "Orange")
+                                            End If
+                                            Call serie.Add(QN(0), QN(1), durchlauf.ToString())
+
                                         Else
-                                            serie3D = DForm.Diag.getSeries3DPoint("Population", "Orange")
+                                            '3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
+                                            '------------------------------------------------------------------------
+                                            Dim serie3D As Steema.TeeChart.Styles.Points3D
+                                            If (isInvalid) Then
+                                                serie3D = DForm.Diag.getSeries3DPoint("Population" & " (ungültig)", "Gray")
+                                            Else
+                                                serie3D = DForm.Diag.getSeries3DPoint("Population", "Orange")
+                                            End If
+                                            Call serie3D.Add(QN(0), QN(1), QN(2), durchlauf.ToString())
+
                                         End If
-                                        Call serie3D.Add(QN(0), QN(1), QN(2))
                                     End If
 
                             End Select
@@ -1245,13 +1269,14 @@ Start_Evolutionsrunden:
                     'Sekundäre Population
                     If (EVO_Settings1.PES_Settings.is_MO_Pareto) Then
                         SekPopulation = PES1.SekundärQb_Get()
-                        'SekPop zeichnen
-                        Call SekundärePopulationZeichnen(SekPopulation)
-                        'SekPop in DB speichern
                         If (Not IsNothing(Sim1)) Then
-                            If (Sim1.Ergebnisdb) Then
-                                Call Sim1.db_setSekPop(SekPopulation, PES1.PES_iAkt.iAktGen)
-                            End If
+                            'SekPop abspeichern
+                            Call Sim1.OptResult.setSekPop(SekPopulation, PES1.PES_iAkt.iAktGen)
+                            'SekPop mit Solution.IDs zeichnen
+                            Call SekundärePopulationZeichnen(PES1.PES_iAkt.iAktGen)
+                        Else
+                            'SekPop einfach so zeichnen
+                            Call SekundärePopulationZeichnen(SekPopulation)
                         End If
                     End If
 
@@ -1289,24 +1314,57 @@ Start_Evolutionsrunden:
 
         Dim i As Short
         Dim serie As Steema.TeeChart.Styles.Series
+        Dim serie3D As Steema.TeeChart.Styles.Points3D
 
-        If (SekPop.GetLength(1) = 2) Then
+        If (globalAnzZiel = 2) Then
             '2 Zielfunktionen
             '----------------------------------------------------------------
-            serie = DForm.Diag.getSeriesPoint("Sekundäre Population", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+            serie = DForm.Diag.getSeriesPoint("Sekundäre Population", "Green")
             serie.Clear()
             For i = 0 To SekPop.GetUpperBound(0)
-                serie.Add(SekPop(i, 0), SekPop(i, 1), "")
+                serie.Add(SekPop(i, 0), SekPop(i, 1))
             Next i
 
-        ElseIf (SekPop.GetLength(1) >= 3) Then
+        ElseIf (globalAnzZiel >= 3) Then
             '3 oder mehr Zielfunktionen (es werden die ersten drei angezeigt)
             '----------------------------------------------------------------
-            Dim serie3D As Steema.TeeChart.Styles.Points3D
             serie3D = DForm.Diag.getSeries3DPoint("Sekundäre Population", "Green")
             serie3D.Clear()
             For i = 0 To SekPop.GetUpperBound(0)
                 serie3D.Add(SekPop(i, 0), SekPop(i, 1), SekPop(i, 2))
+            Next i
+        End If
+
+    End Sub
+
+    'Sekundäre Population anhand von Sim-Ergebnisspeicher zeichnen
+    '*************************************************************
+    Private Sub SekundärePopulationZeichnen(ByVal _igen as Integer)
+
+        Dim i As Short
+        Dim serie As Steema.TeeChart.Styles.Series
+        Dim serie3D As Steema.TeeChart.Styles.Points3D
+        Dim solutions() As IHWB.EVO.Solution
+
+        'SekPop holen
+        solutions = Sim1.OptResult.getSekPop(_igen)
+
+        If (globalAnzZiel = 2) Then
+            '2 Zielfunktionen
+            '----------------------------------------------------------------
+            serie = DForm.Diag.getSeriesPoint("Sekundäre Population", "Green")
+            serie.Clear()
+            For i = 0 To solutions.GetUpperBound(0)
+                serie.Add(solutions(i).QWerte(0), solutions(i).QWerte(1), solutions(i).ID)
+            Next i
+
+        ElseIf (globalAnzZiel >= 3) Then
+            '3 oder mehr Zielfunktionen (es werden die ersten drei angezeigt)
+            '----------------------------------------------------------------
+            serie3D = DForm.Diag.getSeries3DPoint("Sekundäre Population", "Green")
+            serie3D.Clear()
+            For i = 0 To solutions.GetUpperBound(0)
+                serie3D.Add(solutions(i).QWerte(0), solutions(i).QWerte(1), solutions(i).QWerte(2), solutions(i).ID)
             Next i
         End If
 
@@ -1472,9 +1530,11 @@ Start_Evolutionsrunden:
 
     End Sub
 
+#Region "UI"
+
     'Klick auf Serie in Diagramm
     '***************************
-    Public Sub showWave(ByVal sender As Object, ByVal s As Steema.TeeChart.Styles.Series, ByVal valueIndex As Integer, ByVal e As System.Windows.Forms.MouseEventArgs)
+    Public Sub selectPoint(ByVal sender As Object, ByVal s As Steema.TeeChart.Styles.Series, ByVal valueIndex As Integer, ByVal e As System.Windows.Forms.MouseEventArgs)
 
         'Notwendige Bedingungen überprüfen
         '---------------------------------
@@ -1482,22 +1542,12 @@ Start_Evolutionsrunden:
             'Anwendung != Sim
             MsgBox("Wave funktioniert nur bei Anwendungen BlueM oder SMUSI!", MsgBoxStyle.Information, "Info")
             Exit Sub
-
-        ElseIf (Not Sim1.Ergebnisdb) Then
-            'ErgebnisDB ist deaktiviert
-            MsgBox("Wave funktioniert nur bei angeschlossener Ergebnisdatenbank!", MsgBoxStyle.Information, "Info")
-            Exit Sub
-
         Else
 
-            Dim xWert, yWert As Double
-            Dim xAchse, yAchse As String
-            Dim i As Integer
-            Dim isOK As Boolean
-            Dim res As MsgBoxResult
-            Const eol As String = Chr(13) & Chr(10) 'Zeilenumbruch
-            Const format As String = "G5"           'Zahlenformat
-            Dim ParamString As String = ""          'String für die Anzeige der OptParameter / des Pfads
+            Dim xWert, yWert, zWert As Double
+            Dim xAchse, yAchse, zAchse As String
+            Dim solutionID As Integer
+            Dim sol As Solution
 
             'Punkt-Informationen bestimmen
             '-----------------------------
@@ -1507,128 +1557,43 @@ Start_Evolutionsrunden:
             'X und Y Achsen (Zielfunktionen)
             xAchse = Me.DForm.Diag.Chart.Axes.Bottom.Title.Caption
             yAchse = Me.DForm.Diag.Chart.Axes.Left.Title.Caption
+            'Solution-ID
+            solutionID = s.Labels(valueIndex)
 
-            'Parametersatz aus der DB übernehmen
-            '-----------------------------------
-            isOK = Sim1.db_getPara(xAchse, xWert, yAchse, yWert)
+            'Lösung holen
+            '------------
+            sol = Sim1.OptResult.getSolution(solutionID)
 
-            If (isOK) Then
+            If (sol.ID = solutionID) Then
 
-                'Unterscheidung für die Methoden
-                '-------------------------------
-                Select Case Me.Method
-
-                    Case METH_PES, METH_SENSIPLOT
-
-                        'String für die Anzeige der OptParameter wird generiert
-                        ParamString = eol & "OptParameter: "
-                        For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
-                            With Sim1.List_OptParameter(i)
-                                ParamString &= eol & "* " & .Bezeichnung & ": " & .Wert.ToString(format)
-                            End With
-                        Next
-
-
-                    Case METH_CES
-
-                        'String für die Anzeige der Pfade wird generiert
-                        ParamString = eol & "Pfad: "
-                        For i = 0 To Sim1.Akt.Measures.GetUpperBound(0)
-                            ParamString &= eol & "* " & Sim1.List_Locations(i).Name & ": " & Sim1.Akt.Measures(i)
-                        Next
-
-
-                    Case METH_CES_PES
-
-                        'String für die Anzeige von Pfad/OptParameter wird generiert
-                        ParamString = eol & "Pfad: "
-                        For i = 0 To Sim1.Akt.Measures.GetUpperBound(0)
-                            ParamString &= eol & "* " & Sim1.List_Locations(i).Name & ": " & Sim1.Akt.Measures(i)
-                        Next
-                        ParamString &= eol & eol & "OptParameter: "
-                        For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
-                            With Sim1.List_OptParameter(i)
-                                ParamString &= eol & "* " & .Bezeichnung & ": " & .Wert.ToString(format)
-                            End With
-                        Next
-
-                End Select
-
-                'MessageBox
-                res = MsgBox("Diesen Parametersatz simulieren?" & eol & ParamString, MsgBoxStyle.OkCancel, "Info")
-
-                If (res = MsgBoxResult.Ok) Then
-
-                    'Simulation ausführen
-                    'xxxxxxxxxxxxxxxxxxxx
-
-                    Dim SimSeries As New Collection                 'zu zeichnende Simulationsgrößen
-                    Dim RefSeries As New Collection                 'zu zeichnende Referenzreihen
-                    Dim QWertString As String                       'String für die Anzeige der QWerte
-                    Dim ConstrString As String = ""                 'String für die Anzeige der Constraints
-
-                    'Simulieren
-                    Sim1.launchSim()
-
-                    'Wave instanzieren
-                    Dim Wave1 As New Wave.Wave
-
-                    'QWerte berechnen, in String speichern und zugehörige Reihen anzeigen
-                    '--------------------------------------------------------------------
-                    QWertString = "QWerte: "
-
-                    'zu zeichnenden Reihen aus Liste der OptZiele raussuchen
-                    For i = 0 To Sim1.List_OptZiele.GetUpperBound(0)
-
-                        With Sim1.List_OptZiele(i)
-
-                            'Qualitätswert berechnen und an String anhängen
-                            .QWertTmp = Sim1.QWert(Sim1.List_OptZiele(i))
-                            QWertString &= eol & "* " & .Bezeichnung & ": " & .QWertTmp.ToString(format)
-
-                            'Simulationsgrößen nur jeweils ein Mal zeichnen
-                            If (Not SimSeries.Contains(.SimGr)) Then
-                                SimSeries.Add(.SimGr, .SimGr)
-                                'Simulationsergebnis in Wave laden
-                                Wave1.Display_Series(Sim1.SimErgebnis.getReihe(.SimGr))
-                            End If
-
-                            'ggf. Referenzreihe in Wave speichern
-                            If (.ZielTyp = "Reihe" Or .ZielTyp = "IHA") Then
-                                'Referenzreihen nur jeweils ein Mal zeichnen
-                                If (Not RefSeries.Contains(.ZielReiheDatei & .ZielGr)) Then
-                                    RefSeries.Add(.ZielGr, .ZielReiheDatei & .ZielGr)
-                                    'Referenzreihe in Wave laden
-                                    Wave1.Display_Series(.ZielReihe)
-                                End If
-                            End If
-
-                        End With
-                    Next
-
-                    'Constraints berechnen und in String speichern
-                    '---------------------------------------------
-                    If (Sim1.List_Constraints.GetLength(0) > 0) Then
-                        ConstrString = eol & eol & "Constraints: "
-                        For i = 0 To Sim1.List_Constraints.GetUpperBound(0)
-                            With Sim1.List_Constraints(i)
-                                .ConstTmp = Sim1.Constraint(Sim1.List_Constraints(i))
-                                ConstrString &= eol & "* " & .Bezeichnung & ": " & .ConstTmp.ToString(format)
-                            End With
-                        Next
-                    End If
-
-                    'Annotation anzeigen
-                    '-------------------
-                    Dim anno1 As New Steema.TeeChart.Tools.Annotation(Wave1.TChart1.Chart)
-                    anno1.Text = QWertString & eol & ParamString & ConstrString
-                    anno1.Position = Steema.TeeChart.Tools.AnnotationPositions.RightBottom
-
-                    'Wave anzeigen
-                    '-------------
-                    Call Wave1.Show()
-
+                'In Chart anzeigen
+                If (Not s.HasZValues) Then
+                    '2D-Diagramm
+                    '-----------
+                    Dim serie As Steema.TeeChart.Styles.Series
+                    serie = Me.DForm.Diag.getSeriesPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
+                    serie.Add(xWert, yWert, sol.ID.ToString())
+                    serie.Marks.Visible = True
+                    serie.Marks.Style = Steema.TeeChart.Styles.MarksStyles.Label
+                    serie.Marks.Transparency = 50
+                    serie.Marks.ArrowLength = 10
+                Else
+                    '3D-Diagramm
+                    '-----------
+                    Dim serie3D As Steema.TeeChart.Styles.Points3D
+                    serie3D = s
+                    zWert = serie3D.ZValues(valueIndex)
+                    zAchse = Me.DForm.Diag.Chart.Axes.Depth.Title.Caption
+                    serie3D = Me.DForm.Diag.getSeries3DPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
+                    serie3D.Add(xWert, yWert, zWert, sol.ID.ToString())
+                    serie3D.Marks.Visible = True
+                    serie3D.Marks.Style = Steema.TeeChart.Styles.MarksStyles.Label
+                    serie3D.Marks.Transparency = 50
+                    serie3D.Marks.ArrowLength = 10
                 End If
+
+                'Lösung auswählen
+                Call Me.selectSolution(sol)
 
             End If
 
@@ -1636,12 +1601,181 @@ Start_Evolutionsrunden:
 
     End Sub
 
-    'Daten aus DB laden und als Scatterplot-Matrix anzeigen
-    '*******************************************************
-    Private Sub showScatterplot(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Scatterplot.Click
+    'Eine Lösung auswählen
+    '*********************
+    Public Sub selectSolution(ByVal sol As Solution) Handles scatterplot1.solutionSelected
+
+        'Lösung zu ausgewählten Lösungen hinzufügen
+        Call Sim1.OptResult.selectSolution(sol.ID)
+
+        'Lösungsdialog initialisieren
+        If (IsNothing(Me.solutionDialog)) Then
+            Me.solutionDialog = New SolutionDialog(Sim1.List_OptParameter, Sim1.List_OptZiele, Sim1.List_Constraints)
+        End If
+
+        'Lösungsdialog anzeigen
+        Call Me.solutionDialog.Show()
+
+        'Lösung zum Lösungsdialog hinzufügen
+        Call Me.solutionDialog.addSolution(sol)
+
+        'Lösungsdialog nach vorne bringen
+        Call Me.solutionDialog.BringToFront()
+
+    End Sub
+
+    'Lösungsauswahl zurücksetzen
+    '***************************
+    Public Sub clearSelection()
+
+        'Serie der ausgewählten Lösungen löschen
+        '=======================================
+
+        'Im Hauptdiagramm
+        '----------------
+        If (globalAnzZiel < 3) Then
+            '2D-Diagramm
+            '-----------
+            Dim serie As Steema.TeeChart.Styles.Series
+            serie = Me.DForm.Diag.getSeriesPoint("ausgewählte Lösungen")
+            serie.Dispose()
+        Else
+            '2D-Diagramm
+            '-----------
+            Dim serie3D As Steema.TeeChart.Styles.Points3D
+            serie3D = Me.DForm.Diag.getSeries3DPoint("ausgewählte Lösungen")
+            serie3D.Dispose()
+        End If
+        Call Me.DForm.Diag.Refresh()
+
+        'In der Scatterplot-Matrix
+        '-------------------------
+        If (Not IsNothing(Me.scatterplot1)) Then
+            Call scatterplot1.clearSelection()
+        End If
+
+        'Auswahl intern zurücksetzen
+        '===========================
+        Call Sim1.OptResult.clearSelectedSolutions()
+
+    End Sub
+
+    'ausgewählte Lösungen simulieren und in Wave anzeigen
+    '****************************************************
+    Public Sub showWave(ByVal checkedSolutions As Collection)
 
         Dim i As Integer
+        Dim isOK As Boolean
+
+        Dim zre As Wave.Zeitreihe
+        Dim SimSeries As New Collection                 'zu zeichnende Simulationsreihen
+        Dim RefSeries As New Collection                 'zu zeichnende Referenzreihen
+
+        'Wait cursor
+        Cursor = Cursors.WaitCursor
+
+        'Wave instanzieren
+        Dim Wave1 As New Wave.Wave()
+
+        'Alle ausgewählten Lösungen durchlaufen
+        '======================================
+        For Each sol As Solution In Sim1.OptResult.getSelectedSolutions()
+
+            'Lösung per Checkbox ausgewählt?
+            '-------------------------------
+            If (Not checkedSolutions.Contains(sol.ID.ToString())) Then
+                Continue For
+            End If
+
+            'Simulation ausführen
+            'xxxxxxxxxxxxxxxxxxxx
+
+            'OptParameter übernehmen
+            For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
+                Sim1.List_OptParameter(i).Wert = sol.OptPara(i)
+            Next
+
+            'Modellparameter schreiben
+            Call Sim1.Write_ModellParameter()
+
+            'Simulieren
+            isOK = Sim1.launchSim()
+
+            'Zu zeichnenden Simulationsreihen zurücksetzen
+            SimSeries.Clear()
+
+            'zu zeichnenden Reihen aus Liste der OptZiele raussuchen
+            '-------------------------------------------------------
+            For i = 0 To Sim1.List_OptZiele.GetUpperBound(0)
+
+                With Sim1.List_OptZiele(i)
+
+                    'ggf. Referenzreihe in Wave laden
+                    If (.ZielTyp = "Reihe" Or .ZielTyp = "IHA") Then
+                        'Referenzreihen nur jeweils ein Mal zeichnen
+                        If (Not RefSeries.Contains(.ZielReiheDatei & .ZielGr)) Then
+                            RefSeries.Add(.ZielGr, .ZielReiheDatei & .ZielGr)
+                            'Referenzreihe in Wave laden
+                            Wave1.Display_Series(.ZielReihe)
+                        End If
+                    End If
+
+                    'Simulationsergebnis in Wave laden
+                    If (Not SimSeries.Contains(.SimGr)) Then
+                        SimSeries.Add(.SimGr, .SimGr)
+                        zre = Sim1.SimErgebnis.getReihe(.SimGr).copy()
+                        'Lösungsnummer an Titel anhängen
+                        zre.Title &= " (Lösung " & sol.ID.ToString() & ")"
+                        'Simreihe in Wave laden
+                        Wave1.Display_Series(zre)
+                    End If
+
+                End With
+            Next
+
+        Next sol
+
+        'Wave anzeigen
+        '-------------
+        Call Wave1.Show()
+
+        'Cursor
+        Cursor = Cursors.Default
+
+    End Sub
+
+    'Scatterplot-Matrix anzeigen
+    '****************************
+    Private Sub showScatterplot(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Scatterplot.Click
+
         Dim diagresult As DialogResult
+        Dim SekPopOnly As Boolean
+
+        'Abfrage, ob nur Sekundäre Population gezeichnet werden soll
+        '-----------------------------------------------------------
+        diagresult = MsgBox("Soll nur die Sekundäre Population angezeigt werden?", MsgBoxStyle.YesNo, "Scatterplot-Matrix")
+
+        If (diagresult = Windows.Forms.DialogResult.Yes) Then
+            SekPopOnly = True
+        End If
+
+        Cursor = Cursors.WaitCursor
+
+        'Scatterplot-Matrix
+        '------------------
+        scatterplot1 = New Scatterplot(Sim1.OptResult, SekPopOnly)
+        Call scatterplot1.Show()
+
+        Cursor = Cursors.Default
+
+    End Sub
+
+    'Optimierungsergebnis aus einer Datenbank einlesen
+    '*************************************************
+    Private Sub loadFromMDB(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_openMDB.Click
+
+        Dim diagresult As DialogResult
+        Dim sourceFile As String
 
         'Datei-öffnen Dialog anzeigen
         Me.OpenFileDialog_MDB.InitialDirectory = Sim1.WorkDir
@@ -1649,98 +1783,124 @@ Start_Evolutionsrunden:
 
         If (diagresult = Windows.Forms.DialogResult.OK) Then
 
-            'Neuen DB-Pfad speichern
-            Sim1.db_path = Me.OpenFileDialog_MDB.FileName
+            sourceFile = Me.OpenFileDialog_MDB.FileName
 
-            'Abfrageform
-            Dim Form2 As New ScatterplotAbfrage
+            'MDBImportDialog
+            '---------------
+            Dim importDialog As New MDBImportDialog()
             For Each OptZiel As Sim.Struct_OptZiel In Sim1.List_OptZiele
-                Form2.ListBox_OptZieleX.Items.Add(OptZiel.Bezeichnung)
-                Form2.ListBox_OptZieleY.Items.Add(OptZiel.Bezeichnung)
-                Form2.ListBox_OptZieleZ.Items.Add(OptZiel.Bezeichnung)
+                importDialog.ListBox_OptZieleX.Items.Add(OptZiel.Bezeichnung)
+                importDialog.ListBox_OptZieleY.Items.Add(OptZiel.Bezeichnung)
+                importDialog.ListBox_OptZieleZ.Items.Add(OptZiel.Bezeichnung)
             Next
-            diagresult = Form2.ShowDialog()
+            'Bei weniger als 3 Zielen Z-Achse ausblenden
+            If (Sim1.List_OptZiele.Length < 3) Then
+                importDialog.ListBox_OptZieleZ.Enabled = False
+            End If
+            diagresult = importDialog.ShowDialog()
 
             If (diagresult = Windows.Forms.DialogResult.OK) Then
 
-                'Daten einlesen
+                'Cursor Wait
                 Cursor = Cursors.WaitCursor
-                Dim OptResult As EVO.OptResult = Sim1.db_getOptResult(Form2.CheckBox_onlySekPop.Checked)
-                Cursor = Cursors.Default
 
-                If (Form2.CheckBox_Hauptdiagramm.Checked) Then
-                    'Hauptdiagramm
-                    '=============
-                    Dim OptZielIndexX, OptZielIndexY, OptZielIndexZ As Integer
-                    OptZielIndexX = Form2.ListBox_OptZieleX.SelectedIndex
-                    OptZielIndexY = Form2.ListBox_OptZieleY.SelectedIndex
-                    OptZielIndexZ = Form2.ListBox_OptZieleZ.SelectedIndex
+                'Daten einlesen
+                '==============
+                Call Sim1.OptResult.db_load(sourceFile)
 
-                    'Achsen
-                    '------
-                    Dim Achsen As New Collection
-                    Dim tmpAchse As EVO.Diagramm.Achse
-                    tmpAchse.Auto = True
-                    'X-Achse
-                    tmpAchse.Name = Form2.ListBox_OptZieleX.SelectedItem
+                'Hauptdiagramm
+                '=============
+                Dim OptZielIndexX, OptZielIndexY, OptZielIndexZ As Integer
+                OptZielIndexX = importDialog.ListBox_OptZieleX.SelectedIndex
+                OptZielIndexY = importDialog.ListBox_OptZieleY.SelectedIndex
+                OptZielIndexZ = importDialog.ListBox_OptZieleZ.SelectedIndex
+
+                'Achsen
+                '------
+                Dim Achsen As New Collection
+                Dim tmpAchse As EVO.Diagramm.Achse
+                tmpAchse.Auto = True
+                'X-Achse
+                tmpAchse.Name = importDialog.ListBox_OptZieleX.SelectedItem
+                Achsen.Add(tmpAchse)
+                'Y-Achse
+                tmpAchse.Name = importDialog.ListBox_OptZieleY.SelectedItem
+                Achsen.Add(tmpAchse)
+                If (Not OptZielIndexZ = -1) Then
+                    'Z-Achse
+                    tmpAchse.Name = importDialog.ListBox_OptZieleZ.SelectedItem
                     Achsen.Add(tmpAchse)
-                    'Y-Achse
-                    tmpAchse.Name = Form2.ListBox_OptZieleY.SelectedItem
-                    Achsen.Add(tmpAchse)
-                    If (Not OptZielIndexZ = -1) Then
-                        'Z-Achse
-                        tmpAchse.Name = Form2.ListBox_OptZieleZ.SelectedItem
-                        Achsen.Add(tmpAchse)
-                    End If
+                End If
 
-                    'Diagramm initialisieren
-                    '-----------------------
-                    Me.DForm.Diag.Clear()
-                    Me.DForm.Diag.DiagInitialise(Path.GetFileName(Sim1.db_path), Achsen)
+                'Diagramm initialisieren
+                '-----------------------
+                Me.DForm.Diag.Clear()
+                Me.DForm.Diag.DiagInitialise(Path.GetFileName(sourceFile), Achsen)
 
-                    'Punkte eintragen
-                    '----------------
-                    Dim serie As Steema.TeeChart.Styles.Series
-                    Dim serie3D As Steema.TeeChart.Styles.Points3D
+                'Punkte eintragen
+                '----------------
+                Dim serie As Steema.TeeChart.Styles.Series
+                Dim serie3D As Steema.TeeChart.Styles.Points3D
 
-                    For i = 0 To OptResult.Solutions.GetUpperBound(0)
-                        With OptResult.Solutions(i)
+                'Lösungen
+                '========
+                If (importDialog.ComboBox_SekPop.SelectedItem <> "ausschließlich") Then
+
+                    For Each sol As Solution In Sim1.OptResult.Solutions
+                        
                             If (OptZielIndexZ = -1) Then
                                 '2D
                                 '--
                                 'Constraintverletzung prüfen
-                                If (.isValid) Then
+                                If (sol.isValid) Then
                                     serie = Me.DForm.Diag.getSeriesPoint("Population", "Orange")
                                 Else
                                     serie = Me.DForm.Diag.getSeriesPoint("Population (ungültig)", "Gray")
                                 End If
                                 'Zeichnen
-                                serie.Add(.QWerte(OptZielIndexX), .QWerte(OptZielIndexY))
+                                serie.Add(sol.QWerte(OptZielIndexX), sol.QWerte(OptZielIndexY), sol.ID)
                             Else
                                 '3D
                                 '--
                                 'Constraintverletzung prüfen
-                                If (.isValid) Then
+                                If (sol.isValid) Then
                                     serie3D = Me.DForm.Diag.getSeries3DPoint("Population", "Orange")
                                 Else
                                     serie3D = Me.DForm.Diag.getSeries3DPoint("Population (ungültig)", "Gray")
                                 End If
                                 'Zeichnen
-                                serie3D.Add(.QWerte(OptZielIndexX), .QWerte(OptZielIndexY), .QWerte(OptZielIndexZ))
+                                serie3D.Add(sol.QWerte(OptZielIndexX), sol.QWerte(OptZielIndexY), sol.QWerte(OptZielIndexZ), sol.ID)
                             End If
-                        End With
+
                     Next
 
                 End If
 
-                If (Form2.CheckBox_Scatterplot.Checked) Then
-                    'Scatterplot
-                    '-----------
-                    Cursor = Cursors.WaitCursor
-                    Dim scatterplot1 As New Scatterplot(OptResult)
-                    Call scatterplot1.Show()
-                    Cursor = Cursors.Default
+                'Sekundärpopulation
+                '==================
+                If (importDialog.ComboBox_SekPop.SelectedItem <> "keine") Then
+
+                    For Each sekpopsol As Solution In Sim1.OptResult.getSekPop()
+                        If (OptZielIndexZ = -1) Then
+                            '2D
+                            '--
+                            serie = Me.DForm.Diag.getSeriesPoint("Sekundäre Population", "Green")
+                            serie.Add(sekpopsol.QWerte(OptZielIndexX), sekpopsol.QWerte(OptZielIndexY), sekpopsol.ID)
+                        Else
+                            '3D
+                            '--
+                            serie3D = Me.DForm.Diag.getSeries3DPoint("Sekundäre Population", "Green")
+                            serie3D.Add(sekpopsol.QWerte(OptZielIndexX), sekpopsol.QWerte(OptZielIndexY), sekpopsol.QWerte(OptZielIndexZ), sekpopsol.ID)
+                        End If
+                    Next
+
                 End If
+
+                'Ergebnis-Buttons
+                Me.Button_Scatterplot.Enabled = True
+
+                'Cursor Default
+                Cursor = Cursors.Default
 
             End If
 
@@ -1750,8 +1910,10 @@ Start_Evolutionsrunden:
 
 #End Region 'Diagrammfunktionen
 
-    'Ermittelt die beim Start die Anzahl der Physikalischen Prozessoren
-    '******************************************************************
+#End Region 'UI
+
+    'Ermittelt beim Start die Anzahl der Physikalischen Prozessoren
+    '**************************************************************
     Public Sub Anzahl_Prozessoren(ByRef PhysCPU As Integer, ByRef LogCPU As Integer)
         Dim mc As ManagementClass = New ManagementClass("Win32_Processor")
         Dim moc As ManagementObjectCollection = mc.GetInstances()

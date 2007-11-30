@@ -145,10 +145,16 @@
     <Compile Include="Diagramm\DiagrammForm.vb">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Diagramm\ScatterplotAbfrage.Designer.vb">
-      <DependentUpon>ScatterplotAbfrage.vb</DependentUpon>
+    <Compile Include="Diagramm\MDBImportDialog.Designer.vb">
+      <DependentUpon>MDBImportDialog.vb</DependentUpon>
     </Compile>
-    <Compile Include="Diagramm\ScatterplotAbfrage.vb">
+    <Compile Include="Diagramm\MDBImportDialog.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Diagramm\SolutionDialog.Designer.vb">
+      <DependentUpon>SolutionDialog.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Diagramm\SolutionDialog.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="EVOMOD.vb" />
@@ -195,6 +201,7 @@
     </Compile>
     <Compile Include="OptResult.vb" />
     <Compile Include="Settings.vb" />
+    <Compile Include="Solution.vb" />
     <EmbeddedResource Include="Apps\SensiPlot.resx">
       <DependentUpon>SensiPlot.vb</DependentUpon>
       <SubType>Designer</SubType>
@@ -207,9 +214,13 @@
       <SubType>Designer</SubType>
       <DependentUpon>DiagrammForm.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Diagramm\ScatterplotAbfrage.resx">
+    <EmbeddedResource Include="Diagramm\MDBImportDialog.resx">
       <SubType>Designer</SubType>
-      <DependentUpon>ScatterplotAbfrage.vb</DependentUpon>
+      <DependentUpon>MDBImportDialog.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Diagramm\SolutionDialog.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>SolutionDialog.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="EVO_Einstellungen.resX">
       <DependentUpon>EVO_Einstellungen.vb</DependentUpon>
@@ -262,8 +273,11 @@
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
     </Content>
+    <None Include="Resources\cancel.png" />
     <Content Include="Resources\EVO.ico" />
     <Content Include="Resources\icon_teechart.png" />
+    <None Include="Resources\page_white_database.png" />
+    <None Include="Resources\wave.ico" />
     <None Include="Resources\scatterplot.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />

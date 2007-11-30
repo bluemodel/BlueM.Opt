@@ -39,7 +39,7 @@ Partial Class Scatterplot
         Me.Controls.Add(Me.matrix)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "Scatterplot"
-        Me.Text = "Scatterplot"
+        Me.Text = "Scatterplot-Matrix"
         Me.ResumeLayout(False)
 
     End Sub

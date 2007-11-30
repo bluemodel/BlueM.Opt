@@ -39,335 +39,21 @@ Public Class CES
     Private Strategy As String = "plus"         '"plus" oder "minus" Strategie
     Private MutRate As Integer = 10              'Definiert die Wahrscheinlichkeit der Mutationsrate in %
 
-    'Individuum Struktur - enthält alles was für eine Evaluierung erforderlich ist
-    '****************************************************************************
-    Public Structure Individuum
-        Dim Type As String                  '01 Typ des Individuum
-        Dim ID As Integer                   '02 Nummer des Individuum
-        Dim Path() As Integer               '03 Der Pfad
-        Dim Penalty() As Double             '04 Werte der Penaltyfunktion(en)
-        Dim Constrain() As Double           '05 Wert der Randbedingung(en)
-        Dim mutated As Boolean              '06 Gibt an ob der Wert bereits mutiert ist oder nicht
-
-        'Für ND Sorting -------------------------------------------------
-        Dim dominated As Boolean            '07 Kennzeichnung ob Dominiert
-        Dim Front As Integer                '08 Nummer der Pareto Front
-        Dim Distance As Double              '09 Für crowding distance
-        Dim feasible As Boolean             '09a Gültiges Ergebnis
-
-        'Information pro Location ---------------------------------------
-        Dim Measures() As String            '09b Die Namen der Maßnahmen
-        Dim Loc() As Location_Data          '10 + 11a Information pro Location
-
-        'Für PES Memory -------------------------------------------------
-        Dim Generation As Integer           '12 Die Generation (eher zur Information)
-
-        'Für PES Parent -------------------------------------------------
-        Dim Memory_Rank As Integer          '13 MemoryRang des PES Elters
-        Dim iLocation As Integer            '14 Location des PES Parent
-
-        'Gibt ein Array mit den Elementen aller Locations zurück
-        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        Public ReadOnly Property All_Elem() As String()
-            Get
-                Dim i As Integer
-                Dim array() As String = {}
-                For i = 0 To Loc.GetUpperBound(0)
-                    If Loc(i).Loc_Elem.GetLength(0) = 0 Then
-                        Throw New Exception("Die Element Gesamtliste wurde abgerufen bevor die Elemente pro Location ermittelt wurden")
-                    End If
-                    ReDim Preserve array(array.GetUpperBound(0) + Loc(i).Loc_Elem.GetLength(0))
-                    System.Array.Copy(Loc(i).Loc_Elem, 0, array, array.GetUpperBound(0) - Loc(i).Loc_Elem.GetUpperBound(0), Loc(i).Loc_Elem.GetLength(0))
-                Next
-                All_Elem = array.Clone
-            End Get
-
-        End Property
-
-        'Gibt ein Array mit den Parametern aller Locations zurück !oder!
-        'Setzt die Zahl der locations auf 1 und schreibt dort alle Parameter rein
-        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        Public Property All_Para() As Double()
-            Get
-                Dim i, j, x As Integer
-                Dim array() As Double = {}
-                x = 0
-                For i = 0 To Loc.GetUpperBound(0)
-                    For j = 0 To Loc(i).Loc_Para.GetUpperBound(1)
-                        ReDim Preserve array(x)
-                        array(x) = Loc(i).Loc_Para(1, j)
-                        x += 1
-                    Next
-                Next
-                All_Para = array.Clone
-            End Get
-
-            Set(ByVal Array As Double())
-                Dim i As Integer
-
-                ReDim Preserve Loc(0)
-                ReDim Preserve Loc(0).Loc_Para(1, Array.GetUpperBound(0))
-                For i = 0 To Loc(0).Loc_Para.GetUpperBound(1)
-                    Loc(0).Loc_Para(1, i) = Array(i)
-                Next
-            End Set
-
-        End Property
-
-    'Gibt ein Array mit den DNs aller Locations zurück !oder!
-    'Setzt die Zahl der locations auf 1 und schreibt dort alle DNs rein
-    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        Public Property All_DN() As Double()
-            Get
-                Dim i, j, x As Integer
-                Dim array() As Double = {}
-                x = 0
-                For i = 0 To Loc.GetUpperBound(0)
-                    For j = 0 To Loc(i).Loc_Dn.GetUpperBound(0)
-                        ReDim Preserve array(x)
-                        array(x) = Loc(i).Loc_Dn(j)
-                        x += 1
-                    Next
-                Next
-                All_DN = array.Clone
-            End Get
-
-            Set(ByVal Array As Double())
-                Dim i As Integer
-
-                ReDim Preserve Loc(0)
-                ReDim Preserve Loc(0).Loc_Dn(Array.GetUpperBound(0))
-                For i = 0 To Loc(0).Loc_Dn.GetUpperBound(0)
-                    Loc(0).Loc_Dn(i) = Array(i)
-                Next
-            End Set
-
-        End Property
-
-        'Überladen Methode die ein AIndividuum kopiert
-        '*********************************************
-        Public Shared Sub Copy(ByVal Source As Individuum, ByRef Dest As Individuum)
-
-            Dim i As Integer
-
-            '01 Typ des Individuum
-            'Dest.Type Bleibt bestehen
-
-            '02 Nummer des Individuum
-            Dest.ID = Source.ID
-
-            '03 Der Pfad - zur Kontrolle wird falscher Pfad gesetzt
-            ReDim Dest.Path(Source.Path.GetUpperBound(0))
-            Array.Copy(Source.Path, Dest.Path, Source.Path.Length)
-
-            '04 Werte der Penaltyfunktion(en)
-            ReDim Dest.Penalty(Source.Penalty.GetUpperBound(0))
-            Array.Copy(Source.Penalty, Dest.Penalty, Source.Penalty.Length)
-
-            '05 Wert der Randbedingung(en)
-            If Not Source.Constrain.GetLength(0) = -1 Then
-                Array.Copy(Source.Constrain, Dest.Constrain, Source.Constrain.Length)
-            End If
-
-            '06 Gibt an ob der Wert bereits mutiert ist oder nicht
-            Dest.mutated = Source.mutated
-
-            '07 Kennzeichnung ob Dominiert
-            Dest.dominated = Source.dominated
-
-            '08 Nummer der Pareto Front
-            Dest.Front = Source.Front
-
-            '09 Für crowding distance
-            Dest.Distance = Source.Distance
-
-            '09a Gültiges Ergebnis
-            Dest.feasible = Source.feasible
-
-            '09b Die Namen der Maßnahmen
-            ReDim Dest.Measures(Source.Measures.GetUpperBound(0))
-            Array.Copy(Source.Measures, Dest.Measures, Source.Measures.Length)
-
-            '10 + 11 Die PES Informationen
-            ReDim Dest.Loc(Source.Loc.GetUpperBound(0))
-
-            For i = 0 To Source.Loc.GetUpperBound(0)
-
-                '10 Die Optimierungsparameter - wird dynamisch behandelt (Funzt auch für 2D Array)
-                ReDim Dest.Loc(i).Loc_Para(1, Source.Loc(i).Loc_Para.GetUpperBound(1))
-                Array.Copy(Source.Loc(i).Loc_Para, Dest.Loc(i).Loc_Para, Source.Loc(i).Loc_Para.Length)
-
-                '11 Das Dn für PES
-                ReDim Dest.Loc(i).Loc_Dn(Source.Loc(i).Loc_Dn.GetUpperBound(0))
-                Array.Copy(Source.Loc(i).Loc_Dn, Dest.Loc(i).Loc_Dn, Source.Loc(i).Loc_Dn.Length)
-
-                '11a Die Elemte die zur Location gehören
-                ReDim Dest.Loc(i).Loc_Elem(Source.Loc(i).Loc_Elem.GetUpperBound(0))
-                Array.Copy(Source.Loc(i).Loc_Elem, Dest.Loc(i).Loc_Elem, Source.Loc(i).Loc_Elem.Length)
-            Next
-
-            '12 Die Generation (eher zur Information)
-            Dest.Generation = Source.Generation
-
-            '13 MemoryRang des PES Elters
-            Dest.Memory_Rank = Source.Memory_Rank
-
-            '14 Location des PES Parent
-            Dest.iLocation = Source.iLocation
-
-        End Sub
-
-        'Überladen Methode die ein Array aus Individuen kopiert
-        '******************************************************
-        Public Shared Sub Copy(ByVal Source() As Individuum, ByRef Dest() As Individuum)
-            Dim i As Integer
-
-            For i = 0 To Source.GetUpperBound(0)
-                Call Copy(Source(i), Dest(i))
-            Next
-        End Sub
-
-    End Structure
-
-    'Informationen pro Location
-    '**************************
-    Public Structure Location_Data
-        Dim Loc_Para(,) As Object           '10 Die Optimierungsparameter für PES
-        Dim Loc_Dn() As Double              '11 Das Dn für PES
-        Dim Loc_Elem() As String            '11a Die Elemente die zur Location gehören
-
-        'Verändert die Parameter im Parameter Array
-        Public Property Parameter() As Double()
-            Get
-                Dim i As Integer
-                Dim Array(Loc_Para.GetUpperBound(1)) As Double
-                For i = 0 To Loc_Para.GetUpperBound(1)
-                    Array(i) = Loc_Para(1, i)
-                Next
-                Parameter = Array.Clone
-            End Get
-
-            Set(ByVal Parameter() As Double)
-                Dim i As Integer
-                For i = 0 To Loc_Para.GetUpperBound(1)
-                    Loc_Para(1, i) = Parameter(i)
-                Next
-            End Set
-
-        End Property
-
-    End Structure
-
     'Listen für die Individuen
     '*************************
-    Public List_Childs() As Individuum
-    Public List_Parents() As Individuum
-    Private SekundärQb() as Individuum
-    Public NDSorting(n_Childs + n_Parents - 1) As Individuum
-    Public NDSResult(n_Childs + n_Parents - 1) As Individuum
-    Public Memory() As Individuum
-    Public PES_Parents() As Individuum
+    Public List_Childs() As EVO.Kern.Individuum
+    Public List_Parents() As EVO.Kern.Individuum
+    Private SekundärQb() as EVO.Kern.Individuum
+    Public NDSorting(n_Childs + n_Parents - 1) As EVO.Kern.Individuum
+    Public NDSResult(n_Childs + n_Parents - 1) As EVO.Kern.Individuum
+    Public Memory() As EVO.Kern.Individuum
+    Public PES_Parents() As EVO.Kern.Individuum
 
 
 #End Region 'Eigenschaften
 
 #Region "Methoden"
     '#############
-
-    'Dimensionieren eines einzelnen Individuum (Überladen)
-    '****************************************************
-    Public Sub Individuum_Dim(ByRef TMP As Individuum, ByVal Type As String, ByVal No As Integer)
-
-        Dim i, j As Integer
-
-        '01 Typ des Individuum
-        TMP.Type = Type
-
-        '02 Nummer des Individuum
-        TMP.ID = No + 1
-
-        '03 Der Pfad - zur Kontrolle wird falscher Pfad gesetzt
-        ReDim TMP.Path(n_Locations - 1)
-        For j = 0 To TMP.Path.GetUpperBound(0)
-            TMP.Path(j) = 777
-        Next
-
-        '04 Werte der Penaltyfunktion(en)
-        ReDim TMP.Penalty(n_Penalty - 1)
-        For j = 0 To n_Penalty - 1
-            TMP.Penalty(j) = 1.0E+300
-        Next
-
-        '05 Wert der Randbedingung(en)
-        If n_Constrain = 0 Then
-            ReDim TMP.Constrain(-1)
-        Else
-            ReDim TMP.Constrain(n_Constrain - 1)
-            For j = 0 To TMP.Constrain.GetUpperBound(0)
-                TMP.Constrain(j) = -1.0E+300
-            Next
-        End If
-
-        '06 Gibt an ob der Wert bereits mutiert ist oder nicht
-        TMP.mutated = False
-
-        '07 Kennzeichnung ob Dominiert
-        TMP.dominated = False
-
-        '08 Nummer der Pareto Front
-        TMP.Front = 0
-
-        '09 Für crowding distance
-        TMP.Distance = 0
-
-        '09a Gültiges Ergebnis
-        TMP.feasible = False
-
-        '09b Die Namen der Maßnahmen
-        ReDim TMP.Measures(n_Locations - 1)
-
-        '11 + 10 Informationen pro Location
-        ReDim TMP.Loc(n_Locations - 1)
-
-        For i = 0 To TMP.Loc.GetUpperBound(0)
-
-            '10 Die Optimierungsparameter - wird dynamisch behandelt
-            ReDim TMP.Loc(i).Loc_Para(1, 0)
-            For j = 0 To TMP.Loc(i).Loc_Para.GetUpperBound(1)
-                TMP.Loc(i).Loc_Para(0, j) = "xxx"
-                TMP.Loc(i).Loc_Para(1, j) = 777
-            Next
-
-            '11 Das Dn für PES
-            ReDim TMP.Loc(i).Loc_Dn(0)
-            For j = 0 To TMP.Loc(i).Loc_Dn.GetUpperBound(0)
-                TMP.Loc(i).Loc_Dn(j) = 777
-            Next
-
-            '11a Die Elemente die zur Location gehören
-            ReDim TMP.Loc(i).Loc_Elem(-1)
-        Next
-
-        '12 Die Generation (eher zur Information)
-        TMP.Generation = 0
-
-        '13 MemoryRang des PES Elters
-        TMP.Memory_Rank = 777
-
-        '14 Location des PES Parent
-        TMP.iLocation = 777
-
-    End Sub
-
-    'Dim Individuum für ein Array (Überladen)
-    '***************************************
-    Public Sub Individuum_Dim(ByRef TMP() As Individuum, ByVal Type As String)
-        Dim i As Integer
-
-        For i = 0 To TMP.GetUpperBound(0)
-            Call Individuum_Dim(TMP(i), Type, i)
-        Next
-    End Sub
 
     'Normaler Modus: Generiert zufällige Paths für alle Kinder BM Problem
     '*********************************************************************
@@ -456,7 +142,7 @@ Public Class CES
         'xxxxxxxxxxxxxxx
         If Strategy = "minus" Then
             For i = 0 To n_Parents - 1
-                Call CES.Individuum.Copy(List_Childs(i), List_Parents(i))
+                List_Parents(i) = List_Childs(i).Copy
             Next i
 
             'Strategie PLUS
@@ -476,7 +162,7 @@ Public Class CES
 
                 'Falls der schlechteste Parent schlechter als der Child ist wird er durch den Child ersetzt
                 If List_Parents(bad_no).Penalty(0) > List_Childs(i).Penalty(0) Then
-                    Call CES.Individuum.Copy(List_Childs(i), List_Parents(bad_no))
+                    List_Parents(bad_no) = List_Childs(i).Copy
                 End If
             Next
 
@@ -792,9 +478,9 @@ Public Class CES
             neu = Memory.GetUpperBound(0)
         End If
 
-        Call Individuum_Dim(Memory(neu), "Memory", neu)
+        Memory(neu) = New Individuum("Memory", neu)
 
-        Call CES.Individuum.Copy(List_Childs(Child_No), Memory(neu))
+        Memory(neu) = List_Childs(Child_No).Copy
         Memory(neu).Generation = Gen_No
 
     End Sub
@@ -810,7 +496,7 @@ Public Class CES
         Dim count_c(n_Locations - 1) As Integer
 
         ReDim PES_Parents(0)
-        Call Individuum_Dim(PES_Parents(0), "PES_Parent", 0)
+        PES_Parents(0) = New Individuum("PES_Parent", 0)
 
         Dim akt As Integer = 0
 
@@ -826,9 +512,9 @@ Public Class CES
                 'Rank Nummer 1 (Lediglich Übereinstimmung in der Location selbst)
                 If Child.Path(j) = Memory(m).Path(j) Then
                     ReDim Preserve PES_Parents(PES_Parents.GetLength(0))
-                    Call Individuum_Dim(PES_Parents(PES_Parents.GetUpperBound(0)), "PES_Parent", PES_Parents.GetUpperBound(0))
+                    PES_Parents(PES_Parents.GetUpperBound(0)) = New Individuum("PES_Parent", PES_Parents.GetUpperBound(0))
                     akt = PES_Parents.GetUpperBound(0)
-                    Call CES.Individuum.Copy(Memory(m), PES_Parents(akt))
+                    PES_Parents(akt) = Memory(m).Copy
                     PES_Parents(akt).iLocation = j + 1
                     PES_Parents(akt).Memory_Rank = 1
                     count_a(j) += 1
@@ -838,9 +524,9 @@ Public Class CES
                 If Not j = n_Locations - 1 And n_Parts_of_Path > 1 Then
                     If Child.Path(j) = Memory(m).Path(j) And Child.Path(j + 1) = Memory(m).Path(j + 1) Then
                         ReDim Preserve PES_Parents(PES_Parents.GetLength(0))
-                        Call Individuum_Dim(PES_Parents(PES_Parents.GetUpperBound(0)), "PES_Parent", PES_Parents.GetUpperBound(0))
+                        PES_Parents(PES_Parents.GetUpperBound(0)) = New Individuum("PES_Parent", PES_Parents.GetUpperBound(0))
                         akt = PES_Parents.GetUpperBound(0)
-                        Call CES.Individuum.Copy(Memory(m), PES_Parents(akt))
+                        PES_Parents(akt) = Memory(m).Copy
                         PES_Parents(akt).iLocation = j + 1
                         PES_Parents(akt).Memory_Rank = 2
                         count_b(j) += 1
@@ -851,9 +537,9 @@ Public Class CES
                 If Not (j = n_Locations - 1 Or j = n_Locations - 2) And n_Parts_of_Path > 2 Then
                     If Child.Path(j) = Memory(m).Path(j) And Child.Path(j + 1) = Memory(m).Path(j + 1) And Child.Path(j + 2) = Memory(m).Path(j + 2) Then
                         ReDim Preserve PES_Parents(PES_Parents.GetLength(0))
-                        Call Individuum_Dim(PES_Parents(PES_Parents.GetUpperBound(0)), "PES_Parent", PES_Parents.GetUpperBound(0))
+                        PES_Parents(PES_Parents.GetUpperBound(0)) = New Individuum("PES_Parent", PES_Parents.GetUpperBound(0))
                         akt = PES_Parents.GetUpperBound(0)
-                        Call CES.Individuum.Copy(Memory(m), PES_Parents(akt))
+                        PES_Parents(akt) = Memory(m).Copy
                         PES_Parents(akt).iLocation = j + 1
                         PES_Parents(akt).Memory_Rank = 3
                         count_c(j) += 1
@@ -873,7 +559,7 @@ Public Class CES
     Private Sub PES_Memory_Dubletten_loeschen(ByRef PES_Parents() As Individuum)
 
         Dim tmp(PES_Parents.GetUpperBound(0) - 1) As Individuum
-        Call Individuum_Dim(tmp, "TMP")
+        Individuum.New_Array("tmp", tmp)
         Dim isDouble As Boolean
         Dim i, j, x As Integer
 
@@ -886,7 +572,7 @@ Public Class CES
                 End If
             Next
             If isDouble = False Then
-                CES.Individuum.Copy(PES_Parents(i), tmp(x))
+                tmp(x) = PES_Parents(i).Copy
                 x += 1
             End If
         Next
@@ -895,7 +581,7 @@ Public Class CES
         ReDim Preserve PES_Parents(x - 1)
 
         For i = 0 To tmp.GetUpperBound(0)
-            CES.Individuum.Copy(tmp(i), PES_Parents(i))
+            PES_Parents(i) = tmp(i).Copy
         Next
 
     End Sub
@@ -944,7 +630,7 @@ Public Class CES
     Public Sub Sort_Individuum(ByRef IndividuumList() As Individuum)
         'Sortiert die Fiksimile anhand des Abstandes
         Dim i, j As Integer
-        Dim swap As EVO.Kern.CES.Individuum
+        Dim swap As New EVO.Kern.Individuum("swap",0)
 
         For i = 0 To IndividuumList.GetUpperBound(0)
             For j = 0 To IndividuumList.GetUpperBound(0)
@@ -1066,7 +752,7 @@ Public Class CES
         'Dim Member_Sekundärefront As Short
 
         Dim NDSorting(n_Childs + n_Parents - 1) As Individuum
-        Call Individuum_Dim(NDSorting, "NDSorting")
+        Call Individuum.New_Array("NDSorting", NDSorting)
 
         '0. Eltern und Nachfolger werden gemeinsam betrachtet
         'Die Kinder werden NDSorting hinzugefügt
@@ -1083,7 +769,7 @@ Public Class CES
             '    Next l
             'End If
 
-            Call CES.Individuum.Copy(List_Childs(i), NDSorting(i))
+            NDSorting(i) = List_Childs(i).Copy
 
             NDSorting(i).dominated = False
             NDSorting(i).Front = 0
@@ -1106,7 +792,7 @@ Public Class CES
             '    Next l
             'End If
 
-            Call CES.Individuum.Copy(List_Parents(i - n_Childs), NDSorting(i))
+            NDSorting(i) = List_Parents(i - n_Childs).Copy
 
             NDSorting(i).dominated = False
             NDSorting(i).Front = 0
@@ -1121,14 +807,14 @@ Public Class CES
 
         'Initialisierung von Temp (NDSorting)
         Dim Temp(n_Childs + n_Parents - 1) As Individuum
-        Call Individuum_Dim(Temp, "TMP_NDSorting")
+        Call Individuum.New_Array("TMP_NDSorting", Temp)
 
         'Initialisierung von NDSResult (NDSorting)
-        Call Individuum_Dim(NDSResult, "NDSResult")
+        Call Individuum.New_Array("NDSResult", NDSResult)
 
         'NDSorting wird in Temp kopiert
         For i = 0 To NDSorting.GetUpperBound(0)
-            Call CES.Individuum.Copy(NDSorting(i), Temp(i))
+            Temp(i) = NDSorting(i).Copy
         Next
 
         'Schleife läuft über die Zahl der Fronten die hier auch bestimmte werden
@@ -1164,7 +850,7 @@ Public Class CES
             '-> schiss wird einfach rüberkopiert
             If NFrontMember_aktuell <= n_Parents - NFrontMember_gesamt Then
                 For i = NFrontMember_gesamt To NFrontMember_aktuell + NFrontMember_gesamt - 1
-                    Call CES.Individuum.Copy(NDSResult(i), List_Parents(i))
+                    List_Parents(i) = NDSResult(i).Copy
                 Next i
                 NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
 
@@ -1175,7 +861,7 @@ Public Class CES
                 Call NDS_Crowding_Distance_Sort(NDSResult, NFrontMember_gesamt, NFrontMember_gesamt + NFrontMember_aktuell - 1)
 
                 For i = NFrontMember_gesamt To n_Parents - 1
-                    Call CES.Individuum.Copy(NDSResult(i), List_Parents(i))
+                    List_Parents(i) = NDSResult(i).Copy
                 Next i
 
                 NFrontMember_gesamt = n_Parents
@@ -1337,7 +1023,7 @@ Public Class CES
         Dim counter As Short
 
         Dim Temp(NDSorting.GetUpperBound(0)) As Individuum
-        Call Individuum_Dim(Temp, "Temp_NDSorting")
+        Call Individuum.New_Array("Temp_NDSorting", Temp)
 
         Non_Dominated_Count_and_Sort = 0
         counter = 0
@@ -1345,7 +1031,7 @@ Public Class CES
         'Die nicht dominanten Lösungen werden nach oben kopiert
         For i = 0 To NDSorting.GetUpperBound(0)
             If NDSorting(i).dominated = True Then
-                Call CES.Individuum.Copy(NDSorting(i), Temp(counter))
+                Temp(counter) = NDSorting(i).Copy
                 counter = counter + 1
             End If
         Next i
@@ -1356,13 +1042,13 @@ Public Class CES
         'Die dominanten Lösungen werden nach unten kopiert
         For i = 0 To NDSorting.GetUpperBound(0)
             If NDSorting(i).dominated = False Then
-                Call CES.Individuum.Copy(NDSorting(i), Temp(counter))
+                Temp(counter) = NDSorting(i).Copy
                 counter = counter + 1
             End If
         Next i
 
         For i = 0 To Temp.GetUpperBound(0)
-            Call CES.Individuum.Copy(Temp(i), NDSorting(i))
+            NDSorting(i) = Temp(i).Copy
         Next
 
     End Function
@@ -1390,7 +1076,7 @@ Public Class CES
         'In NDSResult werden die nicht dominierten Lösungen eingefügt
         For i = Temp.GetUpperBound(0) + 1 - NFrontMember_aktuell To Temp.GetUpperBound(0)
             'NDSResult alle bisher gefundene Fronten
-            Call CES.Individuum.Copy(Temp(i), NDSResult(Position))
+            NDSResult(Position) = Temp(i).Copy
             Position = Position + 1
         Next i
 
@@ -1430,7 +1116,7 @@ Public Class CES
         Dim k As Integer
 
         Dim swap(0) As Individuum
-        Call Individuum_Dim(swap, "swap")
+        swap(0) = new Individuum("swap", 0)
 
         Dim fmin, fmax As Double
 
@@ -1438,9 +1124,9 @@ Public Class CES
             For i = start To ende
                 For j = start To ende
                     If NDSorting(i).Penalty(k) < NDSorting(j).Penalty(k) Then
-                        Call CES.Individuum.Copy(NDSorting(i), swap(0))
-                        Call CES.Individuum.Copy(NDSorting(j), NDSorting(i))
-                        Call CES.Individuum.Copy(swap(0), NDSorting(j))
+                        swap(0) = NDSorting(i).Copy
+                        NDSorting(i) = NDSorting(j).Copy
+                        NDSorting(j) = swap(0).Copy
                     End If
                 Next j
             Next i
@@ -1459,9 +1145,9 @@ Public Class CES
         For i = start To ende
             For j = start To ende
                 If NDSorting(i).Distance > NDSorting(j).Distance Then
-                    Call CES.Individuum.Copy(NDSorting(i), swap(0))
-                    Call CES.Individuum.Copy(NDSorting(j), NDSorting(i))
-                    Call CES.Individuum.Copy(swap(0), NDSorting(j))
+                    swap(0) = NDSorting(i).Copy
+                    NDSorting(i) = NDSorting(j).Copy
+                    NDSorting(j) = swap(0).Copy
                 End If
             Next j
         Next i
