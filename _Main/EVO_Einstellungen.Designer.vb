@@ -243,7 +243,7 @@ Partial Class EVO_Einstellungen
         Me.CheckisDnVektor.Location = New System.Drawing.Point(16, 120)
         Me.CheckisDnVektor.Name = "CheckisDnVektor"
         Me.CheckisDnVektor.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.CheckisDnVektor.Size = New System.Drawing.Size(144, 13)
+        Me.CheckisDnVektor.Size = New System.Drawing.Size(144, 18)
         Me.CheckisDnVektor.TabIndex = 3
         Me.CheckisDnVektor.Text = "mit Schrittweitenvektor"
         Me.CheckisDnVektor.UseVisualStyleBackColor = False
@@ -546,6 +546,20 @@ Partial Class EVO_Einstellungen
         Me.LabelAnzRunden.TabIndex = 6
         Me.LabelAnzRunden.Text = "Anzahl der Runden:"
         '
+        'TextAnzRunden
+        '
+        Me.TextAnzRunden.AcceptsReturn = True
+        Me.TextAnzRunden.BackColor = System.Drawing.SystemColors.Window
+        Me.TextAnzRunden.Cursor = System.Windows.Forms.Cursors.IBeam
+        Me.TextAnzRunden.ForeColor = System.Drawing.SystemColors.WindowText
+        Me.TextAnzRunden.Location = New System.Drawing.Point(140, 13)
+        Me.TextAnzRunden.MaxLength = 0
+        Me.TextAnzRunden.Name = "TextAnzRunden"
+        Me.TextAnzRunden.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.TextAnzRunden.Size = New System.Drawing.Size(43, 20)
+        Me.TextAnzRunden.TabIndex = 0
+        Me.TextAnzRunden.Text = "50"
+        Me.TextAnzRunden.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'LabelAnzPop
         '
@@ -574,21 +588,6 @@ Partial Class EVO_Einstellungen
         Me.TextAnzPop.TabIndex = 1
         Me.TextAnzPop.Text = "5"
         Me.TextAnzPop.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        '
-        'TextAnzRunden
-        '
-        Me.TextAnzRunden.AcceptsReturn = True
-        Me.TextAnzRunden.BackColor = System.Drawing.SystemColors.Window
-        Me.TextAnzRunden.Cursor = System.Windows.Forms.Cursors.IBeam
-        Me.TextAnzRunden.ForeColor = System.Drawing.SystemColors.WindowText
-        Me.TextAnzRunden.Location = New System.Drawing.Point(140, 13)
-        Me.TextAnzRunden.MaxLength = 0
-        Me.TextAnzRunden.Name = "TextAnzRunden"
-        Me.TextAnzRunden.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.TextAnzRunden.Size = New System.Drawing.Size(43, 20)
-        Me.TextAnzRunden.TabIndex = 0
-        Me.TextAnzRunden.Text = "50"
-        Me.TextAnzRunden.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'LabelAnzPopEltern
         '

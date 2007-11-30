@@ -554,9 +554,9 @@ Public Class PES
 
                     For n = 0 To PES_Settings.NEltern - 1
                         'Mittelung der Schrittweite,
-                        AktPara.Dn(v) = AktPara.Dn(v) + (De(v, n, PES_iAkt.iAktPop) / PES_Settings.NRekombXY)
+                        AktPara.Dn(v) = AktPara.Dn(v) + (De(v, n, PES_iAkt.iAktPop) / PES_Settings.NEltern)
                         'Mittelung der Eltern,
-                        AktPara.Xn(v) = AktPara.Xn(v) + (Xe(v, n, PES_iAkt.iAktPop) / PES_Settings.NRekombXY)
+                        AktPara.Xn(v) = AktPara.Xn(v) + (Xe(v, n, PES_iAkt.iAktPop) / PES_Settings.NEltern)
                     Next
                 Next v
 
