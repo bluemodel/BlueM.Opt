@@ -71,7 +71,7 @@ Public Class Functions
                 For i = NFrontMember_gesamt To NFrontMember_aktuell + NFrontMember_gesamt - 1
 
                     'NDSResult wird in den Bestwertspeicher kopiert
-                    Call PES.Write_Individuum_to_Bestwert(i, NDSResult)
+                    'Call PES.Write_Individuum_to_Bestwert(i, NDSResult)
 
                 Next i
                 NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
@@ -85,7 +85,7 @@ Public Class Functions
                 For i = NFrontMember_gesamt To PES_Settings.NEltern - 1
 
                     'NDSResult wird in den Bestwertspeicher kopiert
-                    Call PES.Write_Individuum_to_Bestwert(i, NDSResult)
+                    'Call PES.Write_Individuum_to_Bestwert(i, NDSResult)
 
                 Next i
 
@@ -148,7 +148,7 @@ Public Class Functions
                 For i = 0 To PES_Settings.NEltern - 1
 
                     'NDSResult wird in den Bestwertspeicher kopiert
-                    Call PES.Write_Individuum_to_Bestwert(i, SekundärQb)
+                    'Call PES.Write_Individuum_to_Bestwert(i, SekundärQb)
 
                 Next i
             End If
