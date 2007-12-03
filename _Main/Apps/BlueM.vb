@@ -310,13 +310,21 @@ Public Class BlueM
         '-------------------------------
         If (simOK) Then
 
+			'Altes Simulationsergebnis löschen
+            Me.SimErgebnis.Clear()
+
             'WEL-Datei einlesen
-            Me.SimErgebnis = New Wave.WEL(Me.WorkDir & Me.Datensatz & ".WEL", True)
+            Dim WELtmp As Wave.WEL = New Wave.WEL(Me.WorkDir & Me.Datensatz & ".WEL", True)
+
+            'Simulationsergebnis abspeichern
+            For Each zre As Wave.Zeitreihe In WELtmp.Zeitreihen
+                Me.SimErgebnis.Add(zre, zre.ToString())
+            Next
 
             'Bei IHA-Berechnung jetzt IHA-Software ausführen
             If (Me.isIHA) Then
                 Dim IHAReihe As Wave.Zeitreihe
-                IHAReihe = Me.SimErgebnis.getReihe(Me.IHA1.IHAZiel.SimGr)
+                IHAReihe = Me.SimErgebnis(Me.IHA1.IHAZiel.SimGr)
                 Call Me.IHA1.calculate_IHA(IHAReihe)
             End If
 
@@ -338,7 +346,7 @@ Public Class BlueM
 
         'Simulationsergebnis auslesen
         Dim SimReihe As Wave.Zeitreihe
-        SimReihe = Me.SimErgebnis.getReihe(OptZiel.SimGr)
+        SimReihe = Me.SimErgebnis(OptZiel.SimGr)
 
         'Fallunterscheidung Zieltyp
         '--------------------------

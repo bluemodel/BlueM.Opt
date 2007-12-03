@@ -637,7 +637,7 @@ Partial Class Form1
                 If (SensiPlot1.show_Wave) Then
                     'SimReihe auslesen
                     Dim SimReihe As Wave.Zeitreihe
-                    SimReihe = Sim1.SimErgebnis.getReihe(Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).SimGr)
+                    SimReihe = Sim1.SimErgebnis(Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).SimGr)
                     'OptParameter und -Wert an Titel anhängen
                     'TODO: bei 2-Parametern auch den Wert des 2. Parameters anhängen!
                     SimReihe.Title += " (" & Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Bezeichnung & ": " _
@@ -1723,7 +1723,7 @@ Start_Evolutionsrunden:
                     'Simulationsergebnis in Wave laden
                     If (Not SimSeries.Contains(.SimGr)) Then
                         SimSeries.Add(.SimGr, .SimGr)
-                        zre = Sim1.SimErgebnis.getReihe(.SimGr).copy()
+                        zre = Sim1.SimErgebnis(.SimGr).copy()
                         'Lösungsnummer an Titel anhängen
                         zre.Title &= " (Lösung " & sol.ID.ToString() & ")"
                         'Simreihe in Wave laden

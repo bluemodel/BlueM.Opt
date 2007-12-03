@@ -126,8 +126,38 @@ Public Class Smusi
             Call smusi_dll.Finish()
             Call smusi_dll.Dispose()
 
-
         End Try
+
+        'Simulationsergebnis verarbeiten
+        '-------------------------------
+        If (simOK) Then
+
+            Dim datei, element As String
+            Dim ASCtmp As Wave.ASC
+            Dim elemente As New Collection()
+
+            'Einzulesende Dateien zusammenstellen
+            For Each optziel As Struct_OptZiel In Me.List_OptZiele
+                element = optziel.SimGr.Substring(0, 4)
+                If (Not elemente.Contains(element)) Then
+                    elemente.Add(element, element)
+                End If
+            Next
+
+            'Altes SimErgebnis löschen
+            Me.SimErgebnis.Clear()
+
+            'Dateien einlesen
+            For Each elem As String In elemente
+                datei = elem & "_WEL.ASC"
+                ASCtmp = New Wave.ASC(Me.WorkDir & datei, True)
+                'Simulationsergebnis abspeichern
+                For Each zre As Wave.Zeitreihe In ASCtmp.Zeitreihen
+                    Me.SimErgebnis.Add(zre, elem & "_" & zre.ToString())
+                Next
+            Next
+
+        End If
 
         Return simOK
 
@@ -139,12 +169,9 @@ Public Class Smusi
     Protected Overrides Function QWert_WEL(ByVal OptZiel As Struct_OptZiel) As Double 'dm 11.2007
 
         Dim QWert As Double
+        Dim SimReihe As Wave.Zeitreihe
 
-        'Simulationsergebnis auslesen
-        Dim SimReihe As New Wave.Zeitreihe(OptZiel.SimGr.Substring(5))
-        Dim datei As String = OptZiel.SimGr.Substring(0, 4) & "_WEL.ASC"
-        Dim ASC As New Wave.ASC(WorkDir & datei, True)
-        SimReihe = ASC.getReihe(OptZiel.SimGr.Substring(5))
+        SimReihe = Me.SimErgebnis(OptZiel.SimGr)
 
         'Fallunterscheidung Zieltyp
         '--------------------------
