@@ -270,11 +270,11 @@ Public Class OptResult
         Call Me.db_prepare()
         'Methodenspezifische Anpassungen
         Select Case Me.Method
-            Case "PES"
+            Case "PES", "SensiPlot"
                 Call Me.db_prepare_PES()
             Case "CES"
                 Call Me.db_prepare_CES()
-            Case "CES + PES"
+            Case "CES + PES", "Hybrid"
                 Call Me.db_prepare_PES()
                 Call Me.db_prepare_CES()
         End Select
