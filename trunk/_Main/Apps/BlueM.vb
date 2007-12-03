@@ -338,14 +338,41 @@ Public Class BlueM
 
 #Region "Qualitätswertberechnung"
 
+    'Berechnung des Qualitätswerts (Zielwert)
+    '****************************************
+    Public Overrides Function QWert(ByVal OptZiel As Struct_OptZiel) As Double
+
+        QWert = 0
+
+        'Fallunterscheidung Ergebnisdatei
+        '--------------------------------
+        Select Case OptZiel.Datei
+
+            Case "WEL"
+                'QWert aus WEL-Datei
+                QWert = QWert_WEL(OptZiel)
+
+            Case "PRB"
+                'QWert aus PRB-Datei
+                'BUG 220: PRB geht nicht, weil keine Zeitreihe
+                Throw New Exception("PRB als OptZiel geht z.Zt. nicht (siehe Bug 138)")
+                'QWert = QWert_PRB(OptZiel)
+
+            Case Else
+                Throw New Exception("Der Wert '" & Optziel.Datei & "' für die Datei wird bei Optimierungszielen für BlueM nicht akzeptiert!")
+
+        End Select
+
+    End Function
+
     'Qualitätswert aus WEL-Datei
     '***************************
-    Protected Overrides Function QWert_WEL(ByVal OptZiel As Struct_OptZiel) As Double
+    Private Function QWert_WEL(ByVal OptZiel As Struct_OptZiel) As Double
 
         Dim QWert As Double
+        Dim SimReihe As Wave.Zeitreihe
 
         'Simulationsergebnis auslesen
-        Dim SimReihe As Wave.Zeitreihe
         SimReihe = Me.SimErgebnis(OptZiel.SimGr)
 
         'Fallunterscheidung Zieltyp
