@@ -1277,7 +1277,8 @@ Public MustInherit Class Sim
     '******************************************************************
     Public Sub Write_ModellParameter()
 
-        Dim Wert As String
+        Dim WertStr As String
+        Dim AnzZeichen As Short
         Dim AnzZeil As Integer
         Dim j As Integer
         Dim Zeilenarray() As String
@@ -1322,25 +1323,46 @@ Public MustInherit Class Sim
             StrRead.Close()
             FiStr.Close()
 
-            'Zeile ändern
+            'Anzahl verfügbarer Zeichen
+            AnzZeichen = List_ModellParameter(i).SpBis - List_ModellParameter(i).SpVon + 1
+
+            'Zeile einlesen und splitten
             Zeile = Zeilenarray(List_ModellParameter(i).ZeileNr - 1)
-            Dim Length As Short = List_ModellParameter(i).SpBis - List_ModellParameter(i).SpVon + 1
             StrLeft = Zeile.Substring(0, List_ModellParameter(i).SpVon - 1)
-            If Len(Zeile) > List_ModellParameter(i).SpBis Then
+            If (Zeile.Length > List_ModellParameter(i).SpBis) Then
                 StrRight = Zeile.Substring(List_ModellParameter(i).SpBis)
             Else
                 StrRight = ""
             End If
-            ' bestimmen des ganzzahligen Anteils, \-Operator ginge zwar theoretisch, ist aber für Zahlen < 1 nicht robust (warum auch immer) dm 11.2007
-            Wert = Convert.ToString(List_ModellParameter(i).Wert - List_ModellParameter(i).Wert Mod 1.0)
-            'Runden auf verfügbare Stellen: Anzahl der Stellen - Anzahl der Vorkommastellen - Komma
-            Wert = Convert.ToString(Math.Round(List_ModellParameter(i).Wert, Length - (Len(Wert) + 1)), provider)
-            If Wert.Length < Length Then
-                For j = 1 To Length - Wert.Length
-                    Wert &= " "
+
+            'Wert auf verfügbare Stellen kürzen
+            '----------------------------------
+            'bestimmen des ganzzahligen Anteils, \-Operator ginge zwar theoretisch, ist aber für Zahlen < 1 nicht robust (warum auch immer)
+            WertStr = (List_ModellParameter(i).Wert - List_ModellParameter(i).Wert Mod 1.0).ToString()
+            
+            If (WertStr.Length > AnzZeichen) Then
+                'Wert zu lang
+                Throw New Exception("Der Wert des Modellparameters '" & List_ModellParameter(i).Bezeichnung & "' (" & WertStr & ") ist länger als die zur Verfügung stehende Anzahl von Zeichen!")
+
+            ElseIf (WertStr.Length < AnzZeichen - 1) Then
+                'Runden auf verfügbare Stellen: Anzahl der Stellen - Anzahl der Vorkommastellen - Komma
+                WertStr = Convert.ToString(Math.Round(List_ModellParameter(i).Wert, AnzZeichen - WertStr.Length - 1), provider)
+
+            Else
+                'Ganzzahligen Wert benutzen
+            End If
+
+            'Falls erforderlich, Wert mit Leerzeichen füllen
+            If (WertStr.Length < AnzZeichen) Then
+                For j = 1 To AnzZeichen - WertStr.Length
+                    WertStr &= " "
                 Next
             End If
-            Zeilenarray(List_ModellParameter(i).ZeileNr - 1) = StrLeft & Wert & StrRight
+
+            'Zeile wieder zusammensetzen
+            Zeile = StrLeft & WertStr & StrRight
+
+            Zeilenarray(List_ModellParameter(i).ZeileNr - 1) = Zeile
 
             'Alle Zeilen wieder in Datei schreiben
             Dim StrWrite As StreamWriter = New StreamWriter(DateiPfad, False, System.Text.Encoding.GetEncoding("iso8859-1"))
