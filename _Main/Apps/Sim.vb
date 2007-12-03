@@ -36,7 +36,9 @@ Public MustInherit Class Sim
     Public SimEnde As DateTime                           'Enddatum der Simulation
     Public SimDT As TimeSpan                             'Zeitschrittweite der Simulation
 
-    Public SimErgebnis As Wave.WEL                    'Speichert das momentane Simulationsergebnis
+    Public SimErgebnis As Wave.WEL                       'Speichert das momentane Simulationsergebnis
+
+    Private FortranProvider As NumberFormatInfo          'Zahlenformatierungsanweisung für Fortran
 
     'Konstanten
     '----------
@@ -172,6 +174,12 @@ Public MustInherit Class Sim
 
         'Benutzereinstellungen einlesen
         Call Me.ReadSettings()
+
+        'Provider einrichten
+        FortranProvider = New NumberFormatInfo()
+        FortranProvider.NumberDecimalSeparator = "."
+        FortranProvider.NumberGroupSeparator = ""
+        FortranProvider.NumberGroupSizes = New Integer() {3}
 
     End Sub
 
@@ -325,12 +333,6 @@ Public MustInherit Class Sim
         Dim Zeile As String
         Dim AnzParam As Integer = 0
 
-        'Inputfiles müssen immer mit angelsächsischer Einstellung erstellt sein
-        Dim provider As NumberFormatInfo = New NumberFormatInfo()
-        provider.NumberDecimalSeparator = "."
-        provider.NumberGroupSeparator = ","
-        provider.NumberGroupSizes = New Integer() {3}
-
         'Anzahl der Parameter feststellen
         Do
             Zeile = StrRead.ReadLine.ToString()
@@ -355,9 +357,9 @@ Public MustInherit Class Sim
                 'Werte zuweisen
                 List_OptParameter(i).Bezeichnung = array(1).Trim()
                 List_OptParameter(i).Einheit = array(2).Trim()
-                List_OptParameter(i).Wert = Convert.ToDouble(array(3).Trim(), provider)
-                List_OptParameter(i).Min = Convert.ToDouble(array(4).Trim(), provider)
-                List_OptParameter(i).Max = Convert.ToDouble(array(5).Trim(), provider)
+                List_OptParameter(i).Wert = Convert.ToDouble(array(3).Trim(), FortranProvider)
+                List_OptParameter(i).Min = Convert.ToDouble(array(4).Trim(), FortranProvider)
+                List_OptParameter(i).Max = Convert.ToDouble(array(5).Trim(), FortranProvider)
                 'liegt eine Beziehung vor?
                 If (i > 0 And Not array(6).Trim() = "") Then
                     Me.List_OptParameter(i).Beziehung = getBeziehung(array(6).Trim())
@@ -429,12 +431,6 @@ Public MustInherit Class Sim
         Dim array() As String
         Dim i As Integer = 0
 
-        'Inputfiles müssen immer mit angelsächsischer Einstellung erstellt sein
-        Dim provider As NumberFormatInfo = New NumberFormatInfo()
-        provider.NumberDecimalSeparator = "."
-        provider.NumberGroupSeparator = ","
-        provider.NumberGroupSizes = New Integer() {3}
-
         Do
             Zeile = StrRead.ReadLine.ToString()
             If (Zeile.StartsWith("*") = False) Then
@@ -445,10 +441,10 @@ Public MustInherit Class Sim
                 List_ModellParameter(i).Einheit = array(3).Trim()
                 List_ModellParameter(i).Datei = array(4).Trim()
                 List_ModellParameter(i).Element = array(5).Trim()
-                List_ModellParameter(i).ZeileNr = Convert.ToInt16(array(6).Trim(), provider)
-                List_ModellParameter(i).SpVon = Convert.ToInt16(array(7).Trim(), provider)
-                List_ModellParameter(i).SpBis = Convert.ToInt16(array(8).Trim(), provider)
-                List_ModellParameter(i).Faktor = Convert.ToDouble(array(9).Trim(), provider)
+                List_ModellParameter(i).ZeileNr = Convert.ToInt16(array(6).Trim())
+                List_ModellParameter(i).SpVon = Convert.ToInt16(array(7).Trim())
+                List_ModellParameter(i).SpBis = Convert.ToInt16(array(8).Trim())
+                List_ModellParameter(i).Faktor = Convert.ToDouble(array(9).Trim(), FortranProvider)
                 i += 1
             End If
         Loop Until StrRead.Peek() = -1
@@ -477,11 +473,6 @@ Public MustInherit Class Sim
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
         Dim Zeile As String = ""
-
-        Dim provider As NumberFormatInfo = New NumberFormatInfo()
-        provider.NumberDecimalSeparator = "."
-        provider.NumberGroupSeparator = ","
-        provider.NumberGroupSizes = New Integer() {3}
 
         'Anzahl der Zielfunktionen feststellen
         Do
@@ -516,7 +507,7 @@ Public MustInherit Class Sim
                 List_OptZiele(i).SimGr = ZeilenArray(4).Trim()
                 List_OptZiele(i).ZielFkt = ZeilenArray(5).Trim()
                 List_OptZiele(i).WertTyp = ZeilenArray(6).Trim()
-                If ZeilenArray(7).Trim() <> "" Then List_OptZiele(i).ZielWert = Convert.ToDouble(ZeilenArray(7).Trim(), provider)
+                If (ZeilenArray(7).Trim() <> "") Then List_OptZiele(i).ZielWert = Convert.ToDouble(ZeilenArray(7).Trim(), FortranProvider)
                 List_OptZiele(i).ZielGr = ZeilenArray(8).Trim()
                 List_OptZiele(i).ZielReiheDatei = ZeilenArray(9).Trim()
                 i += 1
@@ -1007,7 +998,7 @@ Public MustInherit Class Sim
 
     'Bereitet das SimModell für Kombinatorik Optimierung vor
     '*******************************************************
-    Public Sub PREPARE_Evaluation_CES(ByVal Path() As Integer, byval Elements() as string)
+    Public Sub PREPARE_Evaluation_CES(ByVal Path() As Integer, ByVal Elements() As String)
 
         'Setzt den Aktuellen Pfad
         Akt.Path = Path
@@ -1243,7 +1234,7 @@ Public MustInherit Class Sim
         'Parameterwerte und Beziehungen übergeben
         ReDim mypara(globalAnzPar - 1)
         ReDim beziehungen(globalAnzPar - 1)
-        For i = 0 To globalAnzPar  - 1
+        For i = 0 To globalAnzPar - 1
             mypara(i) = Me.List_OptParameter(i).SKWert
             beziehungen(i) = Me.List_OptParameter(i).Beziehung
         Next
@@ -1286,11 +1277,6 @@ Public MustInherit Class Sim
         Dim StrLeft As String
         Dim StrRight As String
         Dim DateiPfad As String
-
-        Dim provider As NumberFormatInfo = New NumberFormatInfo() 'dm 11.2007
-        provider.NumberDecimalSeparator = "."
-        provider.NumberGroupSeparator = ","
-        provider.NumberGroupSizes = New Integer() {3}
 
         'ModellParameter aus OptParametern kalkulieren()
         Call OptParameter_to_ModellParameter()
@@ -1338,15 +1324,15 @@ Public MustInherit Class Sim
             'Wert auf verfügbare Stellen kürzen
             '----------------------------------
             'bestimmen des ganzzahligen Anteils, \-Operator ginge zwar theoretisch, ist aber für Zahlen < 1 nicht robust (warum auch immer)
-            WertStr = (List_ModellParameter(i).Wert - List_ModellParameter(i).Wert Mod 1.0).ToString()
-            
+            WertStr = Convert.ToString(List_ModellParameter(i).Wert - List_ModellParameter(i).Wert Mod 1.0, FortranProvider)
+
             If (WertStr.Length > AnzZeichen) Then
                 'Wert zu lang
                 Throw New Exception("Der Wert des Modellparameters '" & List_ModellParameter(i).Bezeichnung & "' (" & WertStr & ") ist länger als die zur Verfügung stehende Anzahl von Zeichen!")
 
             ElseIf (WertStr.Length < AnzZeichen - 1) Then
                 'Runden auf verfügbare Stellen: Anzahl der Stellen - Anzahl der Vorkommastellen - Komma
-                WertStr = Convert.ToString(Math.Round(List_ModellParameter(i).Wert, AnzZeichen - WertStr.Length - 1), provider)
+                WertStr = Convert.ToString(Math.Round(List_ModellParameter(i).Wert, AnzZeichen - WertStr.Length - 1), FortranProvider)
 
             Else
                 'Ganzzahligen Wert benutzen
