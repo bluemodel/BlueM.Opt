@@ -1427,63 +1427,7 @@ Public MustInherit Class Sim
 
     'Berechnung des Qualitätswerts (Zielwert)
     '****************************************
-    Public Function QWert(ByVal OptZiel As Struct_OptZiel) As Double
-
-        QWert = 0
-
-        Dim IsOK As Boolean
-
-        'Fallunterscheidung Ergebnisdatei
-        '--------------------------------
-        Select Case OptZiel.Datei
-
-            Case "WEL", "ASC"
-                'QWert aus WEL-Datei
-                QWert = QWert_WEL(OptZiel)
-
-            Case "PRB"
-                'QWert aus PRB-Datei
-                'BUG 220: PRB geht nicht, weil keine Zeitreihe
-                Throw New Exception("PRB als OptZiel geht z.Zt. nicht (siehe Bug 138)")
-                'QWert = QWert_PRB(OptZiel)
-
-            Case Else
-                'es wurde eine nicht unterstützte Ergebnisdatei angegeben
-                IsOK = False
-
-        End Select
-
-        If (IsOK = False) Then
-            'TODO: Fehlerbehandlung
-        End If
-
-    End Function
-
-    'Qualitätswert aus WEL-Datei
-    '***************************
-    Protected Overridable Function QWert_WEL(ByVal OptZiel As Struct_OptZiel) As Double
-
-        Dim QWert As Double
-
-        'Simulationsergebnis auslesen
-        Dim SimReihe As Wave.Zeitreihe
-        SimReihe = Me.SimErgebnis(OptZiel.SimGr)
-
-        'Fallunterscheidung Zieltyp
-        '--------------------------
-        Select Case OptZiel.ZielTyp
-
-            Case "Wert"
-                QWert = QWert_Wert(OptZiel, SimReihe)
-
-            Case "Reihe"
-                QWert = QWert_Reihe(OptZiel, SimReihe)
-
-        End Select
-
-        Return QWert
-
-    End Function
+    Public MustOverride Function QWert(ByVal OptZiel As Struct_OptZiel) As Double
 
     'Qualitätswert berechnen: Zieltyp = Reihe
     '****************************************

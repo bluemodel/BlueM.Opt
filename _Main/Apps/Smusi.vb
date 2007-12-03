@@ -118,7 +118,7 @@ Public Class Smusi
         Catch ex As Exception
 
             'Simulationsfehler aufgetreten
-            MsgBox(ex.Message, MsgBoxStyle.Exclamation, "BlueM")
+            MsgBox(ex.Message, MsgBoxStyle.Exclamation, "SMUSI")
             simOK = False
 
         Finally
@@ -163,14 +163,35 @@ Public Class Smusi
 
     End Function
 
+    'Berechnung des Qualitätswerts (Zielwert)
+    '****************************************
+    Public Overrides Function QWert(ByVal OptZiel As Struct_OptZiel) As Double
+
+        QWert = 0
+
+        'Fallunterscheidung Ergebnisdatei
+        '--------------------------------
+        Select Case OptZiel.Datei
+
+            Case "ASC"
+                'QWert aus ASC-Datei
+                QWert = QWert_ASC(OptZiel)
+
+            Case Else
+                Throw New Exception("Der Wert '" & OptZiel.Datei & "' für die Datei wird bei Optimierungszielen für SMUSI nicht akzeptiert!")
+
+        End Select
+
+    End Function
+
     'Qualitätswert aus ASC-Datei
     '***************************
-    'Protected Overrides Function QWert_WEL(ByVal OptZiel As Struct_OptZiel) As Double
-    Protected Overrides Function QWert_WEL(ByVal OptZiel As Struct_OptZiel) As Double 'dm 11.2007
+    Private Function QWert_ASC(ByVal OptZiel As Struct_OptZiel) As Double
 
         Dim QWert As Double
         Dim SimReihe As Wave.Zeitreihe
 
+        'Simulationsergebnis auslesen
         SimReihe = Me.SimErgebnis(OptZiel.SimGr)
 
         'Fallunterscheidung Zieltyp
