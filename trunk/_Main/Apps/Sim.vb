@@ -206,6 +206,7 @@ Public MustInherit Class Sim
             Me.WorkDir = Path.GetDirectoryName(Pfad) & "\"
             'Benutzereinstellungen speichern
             My.Settings.Datensatz = Pfad
+            Call My.Settings.Save()
         End If
 
         'Event auslösen (wird von Form1.displayWorkDir() verarbeitet)
