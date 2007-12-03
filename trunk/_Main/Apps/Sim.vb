@@ -36,7 +36,7 @@ Public MustInherit Class Sim
     Public SimEnde As DateTime                           'Enddatum der Simulation
     Public SimDT As TimeSpan                             'Zeitschrittweite der Simulation
 
-    Public SimErgebnis As Wave.WEL                       'Speichert das momentane Simulationsergebnis
+    Public SimErgebnis As Collection                     'Simulationsergebnis als Collection von Wave.Zeitreihe Objekten
 
     Private FortranProvider As NumberFormatInfo          'Zahlenformatierungsanweisung für Fortran
 
@@ -180,6 +180,9 @@ Public MustInherit Class Sim
         FortranProvider.NumberDecimalSeparator = "."
         FortranProvider.NumberGroupSeparator = ""
         FortranProvider.NumberGroupSizes = New Integer() {3}
+
+        'Simulationsergebnis instanzieren
+        Me.SimErgebnis = New Collection
 
     End Sub
 
@@ -1464,7 +1467,7 @@ Public MustInherit Class Sim
 
         'Simulationsergebnis auslesen
         Dim SimReihe As Wave.Zeitreihe
-        SimReihe = Me.SimErgebnis.getReihe(OptZiel.SimGr)
+        SimReihe = Me.SimErgebnis(OptZiel.SimGr)
 
         'Fallunterscheidung Zieltyp
         '--------------------------
@@ -1698,7 +1701,7 @@ Public MustInherit Class Sim
 
         'Simulationsergebnis auslesen
         Dim SimReihe As Wave.Zeitreihe
-        SimReihe = Me.SimErgebnis.getReihe(constr.SimGr)
+        SimReihe = Me.SimErgebnis(constr.SimGr)
 
         'Fallunterscheidung GrenzTyp (Wert/Reihe)
         Select Case constr.GrenzTyp
