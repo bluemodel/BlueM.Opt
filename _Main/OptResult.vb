@@ -76,12 +76,22 @@ Public Class OptResult
 
     'Eine Lösung auswählen
     '*********************
-    Public Sub selectSolution(ByVal ID As Integer)
+    Public Function selectSolution(ByVal ID As Integer) As Boolean
 
+        'Überprüfen, ob Lösung bereits ausgewählt ist      
+        For Each _id As Integer In Me.selSolutionIDs
+            If (_id = ID) Then
+                Return False
+            End If
+        Next
+
+        'Lösung zu Auswahl hinzufügen
         ReDim Preserve Me.selSolutionIDs(Me.selSolutionIDs.GetUpperBound(0) + 1)
         Me.selSolutionIDs(Me.selSolutionIDs.GetUpperBound(0)) = ID
 
-    End Sub
+        Return True
+
+    End Function
 
     'Ausgewählte Lösungen holen
     '**************************
