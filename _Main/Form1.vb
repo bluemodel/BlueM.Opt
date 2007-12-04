@@ -1456,33 +1456,7 @@ Start_Evolutionsrunden:
                         Call DForm.Diag.DiagInitialise(Anwendung, Achsen)
 
 
-                    Case METH_CES, METH_CES_PES, METH_HYBRID 'Methode CES
-                        'XXXXXXXXXXXXXXXXXXXXX
-
-                        'Achsen:
-                        '-------
-                        Dim Achse As Diagramm.Achse
-                        Dim Achsen As New Collection
-                        'Bei SO: X-Achse = Simulationen
-                        If (EVO_Settings1.PES_Settings.is_MO_Pareto = False) Then
-                            Achse.Name = "Simulation"
-                            Achse.Auto = False
-                            Achse.Max = CES1.n_Childs * CES1.n_Generations
-                            Achsen.Add(Achse)
-                        End If
-                        'für jede Zielfunktion eine weitere Achse hinzufügen
-                        'HACK: Diagramm-Achsen bisher nur für Anwendung BlueM!
-                        For i = 0 To Sim1.List_OptZiele.GetUpperBound(0)
-                            Achse.Name = Sim1.List_OptZiele(i).Bezeichnung
-                            Achse.Auto = True
-                            Achse.Max = 0
-                            Achsen.Add(Achse)
-                        Next
-
-                        'Diagramm initialisieren
-                        Call DForm.Diag.DiagInitialise(Anwendung, Achsen)
-
-                    Case METH_PES 'Methode PES
+                    Case Else 'PES, CES, CES + PES, HYBRID
                         'XXXXXXXXXXXXXXXXXXXXX
 
                         'Achsen:
@@ -1491,15 +1465,24 @@ Start_Evolutionsrunden:
                         Dim Achsen As New Collection
 
                         'Bei Single-Objective: X-Achse = Nr. der Simulation (Durchlauf)
-                        If (EVO_Settings1.PES_Settings.is_MO_Pareto = False) Then
+                        If (globalAnzZiel = 1) Then
 
                             Achse.Name = "Simulation"
                             Achse.Auto = False
-                            If EVO_Settings1.PES_Settings.isPOPUL Then
-                                Achse.Max = EVO_Settings1.PES_Settings.NGen * EVO_Settings1.PES_Settings.NNachf * EVO_Settings1.PES_Settings.NRunden + 1
+                            If (Me.Method = METH_PES) Then
+                                'Bei PES:
+                                '--------
+                                If (EVO_Settings1.PES_Settings.isPOPUL) Then
+                                    Achse.Max = EVO_Settings1.PES_Settings.NGen * EVO_Settings1.PES_Settings.NNachf * EVO_Settings1.PES_Settings.NRunden + 1
+                                Else
+                                    Achse.Max = EVO_Settings1.PES_Settings.NGen * EVO_Settings1.PES_Settings.NNachf + 1
+                                End If
                             Else
-                                Achse.Max = EVO_Settings1.PES_Settings.NGen * EVO_Settings1.PES_Settings.NNachf + 1
+                                'Bei CES etc.:
+                                '-------------
+                                Achse.Max = CES1.n_Childs * CES1.n_Generations
                             End If
+
                             Achsen.Add(Achse)
 
                         End If
@@ -1514,10 +1497,6 @@ Start_Evolutionsrunden:
 
                         'Diagramm initialisieren
                         Call DForm.Diag.DiagInitialise(Anwendung, Achsen)
-
-                    Case Else 'andere Anwendungen
-                        'XXXXXXXXXXXXXXXXXXXXXXXX
-                        Throw New Exception("Diese Funktion ist für die Anwendung '" & Anwendung & "' nicht vorgesehen")
 
                 End Select
 
