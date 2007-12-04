@@ -20,10 +20,10 @@ Partial Class Testprobleme
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.GroupBox_Testproblem = New System.Windows.Forms.GroupBox
-        Me.Combo_Testproblem = New System.Windows.Forms.ComboBox
+        Me.TextBox_Einstellung = New System.Windows.Forms.TextBox
         Me.Label_Beschreibung = New System.Windows.Forms.Label
         Me.Label_Einstellung = New System.Windows.Forms.Label
-        Me.TextBox_Einstellung = New System.Windows.Forms.TextBox
+        Me.Combo_Testproblem = New System.Windows.Forms.ComboBox
         Me.GroupBox_Testproblem.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -41,13 +41,14 @@ Partial Class Testprobleme
         Me.GroupBox_Testproblem.TabStop = False
         Me.GroupBox_Testproblem.Text = "Testprobleme"
         '
-        'Combo_Testproblem
+        'TextBox_Einstellung
         '
-        Me.Combo_Testproblem.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.Combo_Testproblem.Location = New System.Drawing.Point(7, 20)
-        Me.Combo_Testproblem.Name = "Combo_Testproblem"
-        Me.Combo_Testproblem.Size = New System.Drawing.Size(202, 21)
-        Me.Combo_Testproblem.TabIndex = 26
+        Me.TextBox_Einstellung.Location = New System.Drawing.Point(173, 86)
+        Me.TextBox_Einstellung.Name = "TextBox_Einstellung"
+        Me.TextBox_Einstellung.Size = New System.Drawing.Size(36, 20)
+        Me.TextBox_Einstellung.TabIndex = 29
+        Me.TextBox_Einstellung.Text = "50"
+        Me.TextBox_Einstellung.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'Label_Beschreibung
         '
@@ -66,14 +67,13 @@ Partial Class Testprobleme
         Me.Label_Einstellung.TabIndex = 28
         Me.Label_Einstellung.Text = "Anzahl Parameter:"
         '
-        'TextBox_Einstellung
+        'Combo_Testproblem
         '
-        Me.TextBox_Einstellung.Location = New System.Drawing.Point(173, 86)
-        Me.TextBox_Einstellung.Name = "TextBox_Einstellung"
-        Me.TextBox_Einstellung.Size = New System.Drawing.Size(36, 20)
-        Me.TextBox_Einstellung.TabIndex = 29
-        Me.TextBox_Einstellung.Text = "50"
-        Me.TextBox_Einstellung.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Combo_Testproblem.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.Combo_Testproblem.Location = New System.Drawing.Point(7, 20)
+        Me.Combo_Testproblem.Name = "Combo_Testproblem"
+        Me.Combo_Testproblem.Size = New System.Drawing.Size(202, 21)
+        Me.Combo_Testproblem.TabIndex = 26
         '
         'Testprobleme
         '
@@ -86,7 +86,6 @@ Partial Class Testprobleme
         Me.ResumeLayout(False)
 
     End Sub
-    Friend WithEvents GroupBox_Testproblem As System.Windows.Forms.GroupBox
     Private WithEvents Combo_Testproblem As System.Windows.Forms.ComboBox
 
     Public Sub New()
@@ -99,4 +98,5 @@ Partial Class Testprobleme
     Private WithEvents Label_Beschreibung As System.Windows.Forms.Label
     Private WithEvents Label_Einstellung As System.Windows.Forms.Label
     Private WithEvents TextBox_Einstellung As System.Windows.Forms.TextBox
+    Private WithEvents GroupBox_Testproblem As System.Windows.Forms.GroupBox
 End Class
