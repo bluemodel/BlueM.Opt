@@ -1589,19 +1589,25 @@ Start_Evolutionsrunden:
     '*********************
     Public Sub selectSolution(ByVal sol As Solution) Handles scatterplot1.solutionSelected
 
+        Dim isOK As Boolean
+
         'Lösung zu ausgewählten Lösungen hinzufügen
-        Call Sim1.OptResult.selectSolution(sol.ID)
+        isOK = Sim1.OptResult.selectSolution(sol.ID)
 
-        'Lösungsdialog initialisieren
-        If (IsNothing(Me.solutionDialog)) Then
-            Me.solutionDialog = New SolutionDialog(Sim1.List_OptParameter, Sim1.List_OptZiele, Sim1.List_Constraints)
+        If (isOK) Then
+
+            'Lösungsdialog initialisieren
+            If (IsNothing(Me.solutionDialog)) Then
+                Me.solutionDialog = New SolutionDialog(Sim1.List_OptParameter, Sim1.List_OptZiele, Sim1.List_Constraints)
+            End If
+
+            'Lösungsdialog anzeigen
+            Call Me.solutionDialog.Show()
+
+            'Lösung zum Lösungsdialog hinzufügen
+            Call Me.solutionDialog.addSolution(sol)
+
         End If
-
-        'Lösungsdialog anzeigen
-        Call Me.solutionDialog.Show()
-
-        'Lösung zum Lösungsdialog hinzufügen
-        Call Me.solutionDialog.addSolution(sol)
 
         'Lösungsdialog nach vorne bringen
         Call Me.solutionDialog.BringToFront()
