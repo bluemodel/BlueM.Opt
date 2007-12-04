@@ -138,8 +138,10 @@ Partial Public Class Scatterplot
                         'Diagramme auf der Diagonalen ausblenden
                         .Walls.Back.Transparent = False     'Grau anzeigen
                         .Tools.Clear(True)                  'Um MarksTips zu entfernen
-                        serie.Cursor = Cursors.Default      'Kein Hand-Cursor
-                        serie.Color = Color.Empty           'Punkte unsichtbar
+                        For Each s As Steema.TeeChart.Styles.Series In .Series
+                            s.Cursor = Cursors.Default      'Kein Hand-Cursor
+                            s.Color = Color.Empty           'Punkte unsichtbar
+                        Next
                     Else
                         'alle anderen kriegen Handler für selectPoint
                         AddHandler .ClickSeries, AddressOf Me.selectPoint
