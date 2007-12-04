@@ -1,110 +1,72 @@
-Option Strict Off
-Option Explicit On
-Public Partial Class EVO_Opt_Verlauf
+Partial Public Class EVO_Opt_Verlauf
     Inherits System.Windows.Forms.UserControl
 
-    Private Structure EigenschaftTyp
-        Dim NRunden As Short
-        Dim NPopul As Short
-        Dim NGen As Short
-        Dim NNachf As Short
-    End Structure
-
-    Dim Eigenschaft As EigenschaftTyp
+    Private NRunden As Short
+    Private NPopul As Short
+    Private NGen As Short
+    Private NNachf As Short
 
     '********************************************************************
     'Schnittstelle
     '********************************************************************
 
-    Public Property NRunden() As Short
-        Get
-            NRunden = Eigenschaft.NRunden
-        End Get
-        Set(ByVal Value As Short)
-            Eigenschaft.NRunden = Value
-        End Set
-    End Property
+    'Initialisieren
+    '**************
+    Public Sub Initialisieren(ByVal NRunden As Integer, ByVal NPopul As Integer, ByVal NGen As Integer, ByVal NNachf As Integer)
 
+        Me.NRunden = NRunden
+        Me.NPopul = NPopul
+        Me.NGen = NGen
+        Me.NNachf = NNachf
 
-    Public Property NPopul() As Short
-        Get
-            NPopul = Eigenschaft.NPopul
-        End Get
-        Set(ByVal Value As Short)
-            Eigenschaft.NPopul = Value
-        End Set
-    End Property
-
-
-    Public Property NGen() As Short
-        Get
-            NGen = Eigenschaft.NGen
-        End Get
-        Set(ByVal Value As Short)
-            Eigenschaft.NGen = Value
-        End Set
-    End Property
-
-
-    Public Property NNachf() As Short
-        Get
-            NNachf = Eigenschaft.NNachf
-        End Get
-        Set(ByVal Value As Short)
-            Eigenschaft.NNachf = Value
-        End Set
-    End Property
-
-    Public Sub Initialisieren()
-        LabelAnzRunden.Text = Eigenschaft.NRunden
-        LabelAnzPop.Text = Eigenschaft.NPopul
-        LabelAnzGen.Text = Eigenschaft.NGen
-        LabelAnzNachf.Text = Eigenschaft.NNachf
+        LabelAnzRunden.Text = Me.NRunden
+        LabelAnzPop.Text = Me.NPopul
+        LabelAnzGen.Text = Me.NGen
+        LabelAnzNachf.Text = Me.NNachf
 
         ProgressBarRunde.Minimum = 0
-        ProgressBarRunde.Maximum = Eigenschaft.NRunden
+        ProgressBarRunde.Maximum = Me.NRunden
         ProgressBarRunde.Value = 0
 
         ProgressBarPop.Minimum = 0
-        ProgressBarPop.Maximum = Eigenschaft.NPopul
+        ProgressBarPop.Maximum = Me.NPopul
         ProgressBarPop.Value = 0
 
         ProgressBarGen.Minimum = 0
-        ProgressBarGen.Maximum = Eigenschaft.NGen
+        ProgressBarGen.Maximum = Me.NGen
         ProgressBarGen.Value = 0
 
         ProgressBarNach.Minimum = 0
-        ProgressBarNach.Maximum = Eigenschaft.NNachf
+        ProgressBarNach.Maximum = Me.NNachf
         ProgressBarNach.Value = 0
 
     End Sub
 
-
-    Public Sub Runden(ByRef NRunden As Short)
-        Eigenschaft.NRunden = NRunden
-        ProgressBarRunde.Value = Eigenschaft.NRunden
-        LabelaktRunde.Text = Eigenschaft.NRunden.ToString()
+    Public Sub Runden(ByVal NRunden As Short)
+        Me.NRunden = NRunden
+        ProgressBarRunde.Value = Me.NRunden
+        LabelaktRunde.Text = Me.NRunden.ToString()
         System.Windows.Forms.Application.DoEvents()
     End Sub
 
-    Public Sub Populationen(ByRef NPopul As Short)
-        Eigenschaft.NPopul = NPopul
-        ProgressBarPop.Value = Eigenschaft.NPopul
-        LabelaktPop.Text = Eigenschaft.NPopul.ToString()
+    Public Sub Population(ByVal NPopul As Short)
+        Me.NPopul = NPopul
+        ProgressBarPop.Value = Me.NPopul
+        LabelaktPop.Text = Me.NPopul.ToString()
         System.Windows.Forms.Application.DoEvents()
     End Sub
 
-    Public Sub Generation(ByRef NGen As Short)
-        Eigenschaft.NGen = NGen
-        ProgressBarGen.Value = Eigenschaft.NGen
-        LabelaktGen.Text = Eigenschaft.NGen.ToString()
+    Public Sub Generation(ByVal NGen As Short)
+        Me.NGen = NGen
+        ProgressBarGen.Value = Me.NGen
+        LabelaktGen.Text = Me.NGen.ToString()
         System.Windows.Forms.Application.DoEvents()
     End Sub
 
-    Public Sub Nachfolger(ByRef NNachf As Short)
-        Eigenschaft.NNachf = NNachf
-        ProgressBarNach.Value = Eigenschaft.NNachf
-        LabelaktNachf.Text = Eigenschaft.NNachf.ToString()
+    Public Sub Nachfolger(ByVal NNachf As Short)
+        Me.NNachf = NNachf
+        ProgressBarNach.Value = Me.NNachf
+        LabelaktNachf.Text = Me.NNachf.ToString()
         System.Windows.Forms.Application.DoEvents()
     End Sub
 

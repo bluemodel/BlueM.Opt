@@ -207,7 +207,7 @@ Partial Class Form1
             End If
 
             'EVO_Verlauf zurücksetzen
-            Call Me.INI_Verlaufsanzeige(EVO_Settings1.PES_Settings.NRunden, EVO_Settings1.PES_Settings.NPopul, EVO_Settings1.PES_Settings.NGen, EVO_Settings1.PES_Settings.NNachf)
+            Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Settings1.PES_Settings.NRunden, EVO_Settings1.PES_Settings.NPopul, EVO_Settings1.PES_Settings.NGen, EVO_Settings1.PES_Settings.NNachf)
 
         End If
 
@@ -321,7 +321,7 @@ Partial Class Form1
                     Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
 
                     'EVO_Verlauf zurücksetzen
-                    Call Me.INI_Verlaufsanzeige(EVO_Settings1.PES_Settings.NRunden, EVO_Settings1.PES_Settings.NPopul, EVO_Settings1.PES_Settings.NGen, EVO_Settings1.PES_Settings.NNachf)
+                    Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Settings1.PES_Settings.NRunden, EVO_Settings1.PES_Settings.NPopul, EVO_Settings1.PES_Settings.NGen, EVO_Settings1.PES_Settings.NNachf)
 
                 Case METH_CES, METH_CES_PES, METH_HYBRID 'Methode CES und Methode CES_PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -395,7 +395,7 @@ Partial Class Form1
                     Next
 
                     'EVO_Verlauf zurücksetzen
-                    Call Me.INI_Verlaufsanzeige(1 , 1, CES1.n_Generations, CES1.n_Childs)
+                    Call Me.EVO_Opt_Verlauf1.Initialisieren(1 , 1, CES1.n_Generations, CES1.n_Childs)
 
             End Select
 
@@ -536,8 +536,18 @@ Partial Class Form1
         'geschrieben, und zwar mit den in der OPT-Datei angegebenen Startwerten
         '------------------------------------------------------------------------
 
+        Dim i, j, n, Anz_Sim As Integer
+        Dim QN(), RN() As Double
         Dim serie As Steema.TeeChart.Styles.Series
         Dim surface As New Steema.TeeChart.Styles.Surface
+        Dim SimReihe As Wave.Zeitreihe
+        Dim SimReihen As Collection
+        Dim Wave1 As Wave.Wave
+
+        'Instanzieren
+        ReDim QN(Sim1.List_OptZiele.GetUpperBound(0))
+        ReDim RN(Sim1.List_Constraints.GetUpperBound(0))
+        SimReihen = New Collection
 
         'Parameterübergabe an ES
         Me.globalAnzZiel = 1
@@ -545,7 +555,6 @@ Partial Class Form1
         Me.globalAnzPar = SensiPlot1.Selected_OptParameter.GetLength(0)
 
         'Anzahl Simulationen
-        Dim Anz_Sim As Integer
         If (Me.globalAnzPar = 1) Then
             '1 Parameter
             Anz_Sim = SensiPlot1.Anz_Steps
@@ -554,10 +563,11 @@ Partial Class Form1
             Anz_Sim = SensiPlot1.Anz_Steps ^ 2
         End If
 
-        'Wave deklarieren
-        Dim Wave1 As New Wave.Wave
-
-        Dim i, j, n As Integer
+        'Startwerte werden der Verlaufsanzeige zugewiesen
+        Call Me.EVO_Opt_Verlauf1.Initialisieren(1, 1, 1, Anz_Sim)
+        Call Me.EVO_Opt_Verlauf1.Runden(1)
+        Call Me.EVO_Opt_Verlauf1.Population(1)
+        Call Me.EVO_Opt_Verlauf1.Generation(1)
 
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
@@ -596,7 +606,6 @@ Partial Class Form1
                     Case "Diskret"
                         Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).SKWert = i / SensiPlot1.Anz_Steps
                 End Select
-                n += 1
             End If
 
             'Innere Schleife (1. OptParameter)
@@ -610,18 +619,19 @@ Partial Class Form1
                     Case "Diskret"
                         Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).SKWert = j / SensiPlot1.Anz_Steps
                 End Select
+
                 n += 1
 
                 'Modellparameter schreiben
                 Call Sim1.Write_ModellParameter()
 
-                'Simulieren
-                Call Sim1.launchSim()
+                'Verlauf aktualisieren
+                Me.EVO_Opt_Verlauf1.Nachfolger(n)
 
-                'Qwert berechnen
-                Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).QWertTmp = Sim1.QWert(Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel))
+                'Evaluieren
+                Call Sim1.SIM_Evaluierung(n, QN, RN)
 
-                'BUG 253: Constraints für SensiPlot fehlen noch
+                'BUG 253: Verletzte Constraints bei SensiPlot kenntlich machen?
 
                 'Diagramm aktualisieren
                 If (Me.globalAnzPar = 1) Then
@@ -636,17 +646,12 @@ Partial Class Form1
                 'Simulationsergebnis in Wave laden
                 If (SensiPlot1.show_Wave) Then
                     'SimReihe auslesen
-                    Dim SimReihe As Wave.Zeitreihe
                     SimReihe = Sim1.SimErgebnis(Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).SimGr)
-                    'OptParameter und -Wert an Titel anhängen
-                    'TODO: bei 2-Parametern auch den Wert des 2. Parameters anhängen!
-                    SimReihe.Title += " (" & Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Bezeichnung & ": " _
-                                                    & Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Wert & ")"
-                    Wave1.Display_Series(SimReihe)
+                    'Lösungs-ID an Titel anhängen
+                    SimReihe.Title += " (Lösung " & n.ToString() & ")"
+                    'SimReihe zu Collection hinzufügen
+                    SimReihen.Add(SimReihe)
                 End If
-
-                'Lösung abspeichern
-                Call Sim1.OptResult.addSolution(n, Sim1.List_OptZiele, Sim1.List_Constraints, Sim1.List_OptParameter)
 
                 System.Windows.Forms.Application.DoEvents()
 
@@ -656,6 +661,10 @@ Partial Class Form1
         'Wave Diagramm anzeigen:
         '-----------------------
         If (SensiPlot1.show_Wave) Then
+            Wave1 = New Wave.Wave()
+            For Each zre As Wave.Zeitreihe In SimReihen
+                Wave1.Display_Series(zre)
+            Next
             Call Wave1.Show()
         End If
 
@@ -816,8 +825,8 @@ Partial Class Form1
         End If
 
 
-        'Startwerte werden der Verlaufsanzeige werden zugewiesen
-        Call Me.INI_Verlaufsanzeige(1, 1, CES1.n_Generations, CES1.n_Childs)
+        'Startwerte werden der Verlaufsanzeige zugewiesen
+        Call Me.EVO_Opt_Verlauf1.Initialisieren(1, 1, CES1.n_Generations, CES1.n_Childs)
 
         'Generationsschleife CES
         'xxxxxxxxxxxxxxxxxxxxxxx
@@ -1108,8 +1117,8 @@ Partial Class Form1
         '**************************************************************
         Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen, Method)
 
-        'Startwerte werden der Verlaufsanzeige werden zugewiesen
-        Call Me.INI_Verlaufsanzeige(EVO_Settings1.PES_Settings.NRunden, EVO_Settings1.PES_Settings.NPopul, EVO_Settings1.PES_Settings.NGen, EVO_Settings1.PES_Settings.NNachf)
+        'Startwerte werden der Verlaufsanzeige zugewiesen
+        Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Settings1.PES_Settings.NRunden, EVO_Settings1.PES_Settings.NPopul, EVO_Settings1.PES_Settings.NGen, EVO_Settings1.PES_Settings.NNachf)
 
         durchlauf = 0
 
@@ -1126,7 +1135,7 @@ Start_Evolutionsrunden:
             'xxxxxxxxxxxxxxxxxxxxxx
             For PES1.PES_iAkt.iAktPop = 0 To PES1.PES_Settings.NPopul - 1
 
-                Call EVO_Opt_Verlauf1.Populationen(PES1.PES_iAkt.iAktPop + 1)
+                Call EVO_Opt_Verlauf1.Population(PES1.PES_iAkt.iAktPop + 1)
 
                 'POPULATIONS REPRODUKTIONSPROZESS
                 '################################
@@ -1369,18 +1378,6 @@ Start_Evolutionsrunden:
         End If
 
     End Sub
-
-    'Startwerte werden der Verlaufsanzeige werden zugewiesen
-    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-    Private Sub INI_Verlaufsanzeige(ByRef NRunden As Integer, ByRef NPopul As Integer, ByRef NGen As Integer, ByRef NNachf As Integer)
-        EVO_Opt_Verlauf1.NRunden = NRunden
-        EVO_Opt_Verlauf1.NPopul = NPopul
-        EVO_Opt_Verlauf1.NGen = NGen
-        EVO_Opt_Verlauf1.NNachf = NNachf
-        EVO_Opt_Verlauf1.Initialisieren()
-    End Sub
-
 
 #End Region 'Start Button Pressed
 
