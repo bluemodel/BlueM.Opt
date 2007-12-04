@@ -34,6 +34,7 @@ Partial Class Form1
         Me.Button_IniMethod = New System.Windows.Forms.Button
         Me.LinkLabel_WorkDir = New System.Windows.Forms.LinkLabel
         Me.Button_openMDB = New System.Windows.Forms.Button
+        Me.Button_Scatterplot = New System.Windows.Forms.Button
         Me.GroupBox_Anwendung = New System.Windows.Forms.GroupBox
         Me.Label_Methode = New System.Windows.Forms.Label
         Me.ComboBox_Methode = New System.Windows.Forms.ComboBox
@@ -45,7 +46,6 @@ Partial Class Form1
         Me.EVO_Opt_Verlauf1 = New IHWB.EVO.EVO_Opt_Verlauf
         Me.EVO_Settings1 = New IHWB.EVO.EVO_Einstellungen
         Me.DForm = New IHWB.EVO.DiagrammForm
-        Me.Button_Scatterplot = New System.Windows.Forms.Button
         Me.GroupBox_Anwendung.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -96,6 +96,17 @@ Partial Class Form1
         Me.Button_openMDB.TabIndex = 13
         Me.ToolTip1.SetToolTip(Me.Button_openMDB, "Optimierungsergebnis aus Datenbank laden")
         Me.Button_openMDB.UseVisualStyleBackColor = True
+        '
+        'Button_Scatterplot
+        '
+        Me.Button_Scatterplot.Enabled = False
+        Me.Button_Scatterplot.Image = Global.IHWB.EVO.My.Resources.Resources.scatterplot
+        Me.Button_Scatterplot.Location = New System.Drawing.Point(531, 649)
+        Me.Button_Scatterplot.Name = "Button_Scatterplot"
+        Me.Button_Scatterplot.Size = New System.Drawing.Size(25, 25)
+        Me.Button_Scatterplot.TabIndex = 9
+        Me.ToolTip1.SetToolTip(Me.Button_Scatterplot, "Scatterplot-Matrix anzeigen")
+        Me.Button_Scatterplot.UseVisualStyleBackColor = True
         '
         'GroupBox_Anwendung
         '
@@ -168,7 +179,7 @@ Partial Class Form1
         Me.Testprobleme1.Enabled = False
         Me.Testprobleme1.Location = New System.Drawing.Point(4, 60)
         Me.Testprobleme1.Name = "Testprobleme1"
-        Me.Testprobleme1.Size = New System.Drawing.Size(225, 121)
+        Me.Testprobleme1.Size = New System.Drawing.Size(223, 118)
         Me.Testprobleme1.TabIndex = 7
         '
         'EVO_Opt_Verlauf1
@@ -184,7 +195,7 @@ Partial Class Form1
         Me.EVO_Settings1.Location = New System.Drawing.Point(4, 179)
         Me.EVO_Settings1.Name = "EVO_Settings1"
         Me.EVO_Settings1.OptModus = CType(0, Short)
-        Me.EVO_Settings1.Size = New System.Drawing.Size(225, 585)
+        Me.EVO_Settings1.Size = New System.Drawing.Size(223, 585)
         Me.EVO_Settings1.TabIndex = 2
         '
         'DForm
@@ -193,17 +204,6 @@ Partial Class Form1
         Me.DForm.Name = "DForm"
         Me.DForm.Size = New System.Drawing.Size(473, 625)
         Me.DForm.TabIndex = 8
-        '
-        'Button_Scatterplot
-        '
-        Me.Button_Scatterplot.Enabled = False
-        Me.Button_Scatterplot.Image = Global.IHWB.EVO.My.Resources.Resources.scatterplot
-        Me.Button_Scatterplot.Location = New System.Drawing.Point(531, 649)
-        Me.Button_Scatterplot.Name = "Button_Scatterplot"
-        Me.Button_Scatterplot.Size = New System.Drawing.Size(25, 25)
-        Me.Button_Scatterplot.TabIndex = 9
-        Me.ToolTip1.SetToolTip(Me.Button_Scatterplot, "Scatterplot-Matrix anzeigen")
-        Me.Button_Scatterplot.UseVisualStyleBackColor = True
         '
         'Form1
         '
