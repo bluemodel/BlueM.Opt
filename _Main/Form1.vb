@@ -1580,9 +1580,17 @@ Start_Evolutionsrunden:
                 Else
                     '3D-Diagramm
                     '-----------
+                    If (TypeOf (s) Is Steema.TeeChart.Styles.Surface) Then
+                        Dim surface As Steema.TeeChart.Styles.Surface
+                        surface = s
+                        zWert = surface.ZValues(valueIndex)
+                    Else
+                        Dim points3D As Steema.TeeChart.Styles.Points3D
+                        points3D = s
+                        zWert = points3D.ZValues(valueIndex)
+                    End If
+
                     Dim serie3D As Steema.TeeChart.Styles.Points3D
-                    serie3D = s
-                    zWert = serie3D.ZValues(valueIndex)
                     zAchse = Me.DForm.Diag.Chart.Axes.Depth.Title.Caption
                     serie3D = Me.DForm.Diag.getSeries3DPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
                     serie3D.Add(xWert, yWert, zWert, sol.ID.ToString())
@@ -1633,19 +1641,21 @@ Start_Evolutionsrunden:
 
         'Im Hauptdiagramm
         '----------------
-        If (globalAnzZiel < 3) Then
+        Try
             '2D-Diagramm
             '-----------
             Dim serie As Steema.TeeChart.Styles.Series
             serie = Me.DForm.Diag.getSeriesPoint("ausgewählte Lösungen")
             serie.Dispose()
-        Else
-            '2D-Diagramm
+
+        Catch ex As Exception
+            '3D-Diagramm
             '-----------
             Dim serie3D As Steema.TeeChart.Styles.Points3D
             serie3D = Me.DForm.Diag.getSeries3DPoint("ausgewählte Lösungen")
             serie3D.Dispose()
-        End If
+        End Try
+
         Call Me.DForm.Diag.Refresh()
 
         'In der Scatterplot-Matrix
