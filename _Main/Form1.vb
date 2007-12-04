@@ -180,7 +180,7 @@ Partial Class Form1
                     EVO_Settings1.OptModus = Testprobleme1.OptModus
 
                     'Globale Parameter werden gesetzt
-                    Call Testprobleme1.Parameter_Uebergabe(Testprobleme1.Combo_Testproblem.Text, Testprobleme1.Text_Sinusfunktion_Par.Text, Testprobleme1.Text_Schwefel24_Par.Text, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
+                    Call Testprobleme1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
 
                     'Start-Button aktivieren (keine Methodenauswahl erforderlich)
                     Button_Start.Enabled = True
@@ -1191,7 +1191,7 @@ Start_Evolutionsrunden:
 
                                 Case ANW_TESTPROBLEME
 
-                                    Call Testprobleme1.Evaluierung_TestProbleme(Testprobleme1.Combo_Testproblem.Text, myPara, durchlauf, PES1.PES_iAkt.iAktPop, QN, RN, DForm.Diag)
+                                    Call Testprobleme1.Evaluierung_TestProbleme(myPara, durchlauf, PES1.PES_iAkt.iAktPop, QN, RN, DForm.Diag)
 
                                 Case ANW_BLUEM, ANW_SMUSI
 

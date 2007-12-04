@@ -7,6 +7,12 @@ Public Class Testprobleme
     Public OptModus As EVO_MODUS
     Event Testproblem_Changed(ByVal sender As Object, ByVal e As System.EventArgs)
 
+    Public ReadOnly Property AnzParameter() As Integer
+        Get
+            Return Convert.ToInt32(Me.TextBox_Einstellung.Text)
+        End Get
+    End Property
+
     Private Sub Testprobleme_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 
         'Combobox füllen
@@ -34,39 +40,62 @@ Public Class Testprobleme
         If IsInitializing = True Then
             Exit Sub
         Else
+            'zusätzliche Einstellungen erstmal ausblenden
+            Me.Label_Einstellung.Visible = False
+            Me.TextBox_Einstellung.Visible = False
+
             Select Case Combo_Testproblem.Text
+
                 Case "Sinus-Funktion"
-                    Problem_SinusFunktion.BringToFront()
+                    Me.Label_Beschreibung.Text = "Parameter an Sinusfunktion anpassen"
+                    Me.Label_Einstellung.Visible = True
+                    Me.Label_Einstellung.Text = "Anzahl Parameter:"
+                    Me.TextBox_Einstellung.Visible = True
+                    Me.TextBox_Einstellung.Text = "50"
                     OptModus = EVO_MODUS.Single_Objective
+
                 Case "Beale-Problem"
-                    Problem_BealeProblem.BringToFront()
+                    Me.Label_Beschreibung.Text = "Es wird das Minimum des Beale-Problems gesucht (x=(3, 0.5), F(x)=0)"
                     OptModus = EVO_MODUS.Single_Objective
+
                 Case "Schwefel 2.4-Problem"
-                    Problem_Schwefel24.BringToFront()
+                    Me.Label_Beschreibung.Text = "Minimum der Problemstellung wird gesucht (xi=1, F(x)=0)"
+                    Me.Label_Einstellung.Visible = True
+                    Me.Label_Einstellung.Text = "Anzahl Parameter:"
+                    Me.TextBox_Einstellung.Visible = True
+                    Me.TextBox_Einstellung.Text = "5"
                     OptModus = EVO_MODUS.Single_Objective
+
                 Case "Deb 1"
-                    Problem_D1Funktion.BringToFront()
+                    Me.Label_Beschreibung.Text = "Multikriterielles Testproblem (konvex)"
                     OptModus = EVO_MODUS.Multi_Objective
+
                 Case "Zitzler/Deb T1"
-                    Problem_T1Funktion.BringToFront()
+                    Me.Label_Beschreibung.Text = "Multikriterielles Testproblem (konvex)"
                     OptModus = EVO_MODUS.Multi_Objective
+
                 Case "Zitzler/Deb T2"
-                    Problem_T2Funktion.BringToFront()
+                    Me.Label_Beschreibung.Text = "Multikriterielles Testproblem (konkav)"
                     OptModus = EVO_MODUS.Multi_Objective
+
                 Case "Zitzler/Deb T3"
-                    Problem_T3Funktion.BringToFront()
+                    Me.Label_Beschreibung.Text = "Multikriterielles Testproblem (konvex, nicht stetig)"
                     OptModus = EVO_MODUS.Multi_Objective
+
                 Case "Zitzler/Deb T4"
-                    Problem_T4Funktion.BringToFront()
+                    Me.Label_Beschreibung.Text = "Multikriterielles Testproblem (konvex)"
                     OptModus = EVO_MODUS.Multi_Objective
+
                 Case "CONSTR"
-                    Problem_CONSTRFunktion.BringToFront()
+                    Me.Label_Beschreibung.Text = "Multikriterielles Testproblem (konvex) mit zwei Randbedingungen"
                     OptModus = EVO_MODUS.Multi_Objective
+
                 Case "Box"
-                    Problem_TKNFunktion.BringToFront()
+                    Me.Label_Beschreibung.Text = "Multikriterielles Testproblem (Kreis) mit zwei Randbedingungen"
                     OptModus = EVO_MODUS.Multi_Objective
+
                 Case "Abhängige Parameter"
-                    Problem_AbhParameter.BringToFront()
+                    Me.Label_Beschreibung.Text = "Bedingung: Y > X"
                     OptModus = EVO_MODUS.Single_Objective
 
             End Select
@@ -81,14 +110,14 @@ Public Class Testprobleme
     '************************************************************************************
 
     'Startparameter werden festgesetzt
-    Public Sub Parameter_Uebergabe(ByVal Testproblem As String, ByVal globAnzPar_Sin As String, ByVal globAnzPar_Schw As String, ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara() As Double, ByRef beziehungen() As EVO.Kern.PES.Beziehung)
+    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara() As Double, ByRef beziehungen() As EVO.Kern.PES.Beziehung)
 
         Dim i As Integer
 
-        Select Case Testproblem
+        Select Case Me.Combo_Testproblem.Text
 
             Case "Sinus-Funktion"
-                globalAnzPar = CShort(globAnzPar_Sin)
+                globalAnzPar = Me.AnzParameter
                 globalAnzZiel = 1
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
@@ -110,7 +139,7 @@ Public Class Testprobleme
                 Next
 
             Case "Schwefel 2.4-Problem" 'xi = [-10,10]
-                globalAnzPar = CShort(globAnzPar_Schw)
+                globalAnzPar = Me.AnzParameter
                 globalAnzZiel = 1
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
@@ -804,7 +833,7 @@ Public Class Testprobleme
 
     'Evaluierung und Zeichnen der Testprobleme
     '*****************************************
-    Public Sub Evaluierung_TestProbleme(ByRef Testproblem As String, ByVal mypara() As Double, ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN() As Double, ByRef RN() As Double, ByRef Diag As EVO.Diagramm)
+    Public Sub Evaluierung_TestProbleme(ByVal mypara() As Double, ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN() As Double, ByRef RN() As Double, ByRef Diag As EVO.Diagramm)
 
         Dim i As Short
         Dim Unterteilung_X As Double
@@ -815,7 +844,7 @@ Public Class Testprobleme
         Dim globalAnzPar As Short = mypara.GetLength(0)
         Dim serie As Steema.TeeChart.Styles.Series
 
-        Select Case Testproblem
+        Select Case Me.Combo_Testproblem.Text
 
             '*************************************
             '* Single-Objective Problemstellungen *
