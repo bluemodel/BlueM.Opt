@@ -175,10 +175,6 @@ Partial Class Form1
         '
         Me.EVO_Opt_Verlauf1.Location = New System.Drawing.Point(231, 690)
         Me.EVO_Opt_Verlauf1.Name = "EVO_Opt_Verlauf1"
-        Me.EVO_Opt_Verlauf1.NGen = CType(0, Short)
-        Me.EVO_Opt_Verlauf1.NNachf = CType(0, Short)
-        Me.EVO_Opt_Verlauf1.NPopul = CType(0, Short)
-        Me.EVO_Opt_Verlauf1.NRunden = CType(0, Short)
         Me.EVO_Opt_Verlauf1.Size = New System.Drawing.Size(467, 73)
         Me.EVO_Opt_Verlauf1.TabIndex = 6
         '
