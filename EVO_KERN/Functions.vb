@@ -1,22 +1,42 @@
 Public Class Functions
 
+    'Variablen und Structs werden im Konstruktor übergeben
+    '*****************************************************
+    'Statische
     Dim PES_Settings As PES.Struct_Settings
-    Dim NDSorting() As Individuum
-    Private SekundärQb(-1) As Individuum
-
+    Dim Anz As PES.Anzahl
     Dim iAktGen As Integer
 
-    '---Anzahlen-----------
-    Private NPara As Integer                  'Anzahl Parameter
-    Private NPenalty As Integer               'Anzahl der Penaltyfunktionen
-    Private NConstrains As Integer            'Anzahl der Randbedingungen
+    'Veränderliche:
+    Dim NDSorting() As Individuum
+    Dim SekundärQb() As Individuum
+
+    'Die Klasse selbst lediglich zum schreiben der Bestwerte
+    Dim PESF As PES
+    '*****************************************************
+
+    Public Sub New(ByVal _PES_Settings As PES.Struct_Settings, ByVal _Anz As PES.Anzahl, ByVal _iAktGen As Integer)
+
+        'Statische (ByVal)
+        PES_Settings = _PES_Settings
+        Anz = _Anz
+        iAktGen = _iAktGen
+
+    End Sub
 
     'Dieser Teil beschäftigt sich nur mit SekundärQb und NDSorting
     '2. Die einzelnen Fronten werden bestimmt
     '3. Der Bestwertspeicher wird entsprechend der Fronten oder der sekundären Population gefüllt
     '4: Sekundäre Population wird bestimmt und gespeichert
     '--------------------------------------------------------------------------------------------
-    Private Sub EsEltern_Pareto_SekundärQb()
+    Public Sub EsEltern_Pareto_SekundärQb(ByRef _PESF As PES, ByRef _NDSorting() As Individuum, ByRef _SekundärQb() As Individuum)
+
+        'Veränderliche (ByRef):
+        NDSorting = _NDSorting
+        SekundärQb = _SekundärQb
+        'die Klasse PES
+        PESF = _PESF
+
         Dim i As Integer
         Dim NFrontMember_aktuell As Integer
         Dim NFrontMember_gesamt As Integer
@@ -71,7 +91,7 @@ Public Class Functions
                 For i = NFrontMember_gesamt To NFrontMember_aktuell + NFrontMember_gesamt - 1
 
                     'NDSResult wird in den Bestwertspeicher kopiert
-                    'Call PES.Write_Individuum_to_Bestwert(i, NDSResult)
+                    Call PESF.Copy_Individuum_to_Bestwert(i, NDSResult)
 
                 Next i
                 NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
@@ -85,7 +105,7 @@ Public Class Functions
                 For i = NFrontMember_gesamt To PES_Settings.NEltern - 1
 
                     'NDSResult wird in den Bestwertspeicher kopiert
-                    'Call PES.Write_Individuum_to_Bestwert(i, NDSResult)
+                    Call PESF.Copy_Individuum_to_Bestwert(i, NDSResult)
 
                 Next i
 
@@ -100,6 +120,13 @@ Public Class Functions
         '4: Sekundäre Population wird bestimmt und gespeichert
         '-----------------------------------------------------
         SekundärQb_Allocation(NFrontMember_aktuell, NDSResult)
+
+        'Veränderliche (ByRef):
+        _NDSorting = NDSorting
+        _SekundärQb = SekundärQb
+        'die Klasse PES
+        _PESF = PESF
+
     End Sub
 
     '4: Sekundäre Population wird bestimmt und gespeichert ggf gespeichert
@@ -148,7 +175,7 @@ Public Class Functions
                 For i = 0 To PES_Settings.NEltern - 1
 
                     'NDSResult wird in den Bestwertspeicher kopiert
-                    'Call PES.Write_Individuum_to_Bestwert(i, SekundärQb)
+                    Call PESF.Copy_Individuum_to_Bestwert(i, SekundärQb)
 
                 Next i
             End If
@@ -165,7 +192,7 @@ Public Class Functions
         For i = 0 To SekundärQb.GetUpperBound(0) - 2
             For j = i + 1 To SekundärQb.GetUpperBound(0)
                 Logical = True
-                For k = 0 To NPenalty - 1
+                For k = 0 To Anz.Penalty - 1
                     Logical = Logical And (SekundärQb(i).Penalty(k) = SekundärQb(j).Penalty(k))
                 Next k
                 If (Logical) Then SekundärQb(i).dominated = True
@@ -219,7 +246,7 @@ Public Class Functions
         Dim isDominated As Boolean
         Dim Summe_Constrain(1) As Double
 
-        If (NConstrains > 0) Then
+        If (Anz.Constr > 0) Then
             'Mit Constraints
             '===============
             For i = 0 To NDSorting.GetUpperBound(0)
@@ -240,7 +267,7 @@ Public Class Functions
                         Summe_Constrain(0) = 0
                         Summe_Constrain(1) = 0
 
-                        For k = 0 To NConstrains - 1
+                        For k = 0 To Anz.Constr - 1
                             If (NDSorting(i).Constrain(k) < 0) Then
                                 Summe_Constrain(0) += NDSorting(i).Constrain(k)
                             End If
@@ -259,11 +286,11 @@ Public Class Functions
                         '------------
                         isDominated = False
 
-                        For k = 0 To NPenalty - 1
+                        For k = 0 To Anz.Penalty - 1
                             isDominated = isDominated Or (NDSorting(i).Penalty(k) < NDSorting(j).Penalty(k))
                         Next k
 
-                        For k = 0 To NPenalty - 1
+                        For k = 0 To Anz.Penalty - 1
                             isDominated = isDominated And (NDSorting(i).Penalty(k) <= NDSorting(j).Penalty(k))
                         Next k
 
@@ -283,11 +310,11 @@ Public Class Functions
 
                     isDominated = False
 
-                    For k = 0 To NPenalty - 1
+                    For k = 0 To Anz.Penalty - 1
                         isDominated = isDominated Or (NDSorting(i).Penalty(k) < NDSorting(j).Penalty(k))
                     Next k
 
-                    For k = 0 To NPenalty - 1
+                    For k = 0 To Anz.Penalty - 1
                         isDominated = isDominated And (NDSorting(i).Penalty(k) <= NDSorting(j).Penalty(k))
                     Next k
 
@@ -397,7 +424,7 @@ Public Class Functions
         Dim swap As New Individuum("Swap", 0)
         Dim fmin, fmax As Double
 
-        For k = 0 To NPenalty - 1
+        For k = 0 To Anz.Penalty - 1
             For i = StartIndex To EndIndex
                 For j = StartIndex To EndIndex
                     If (NDSorting(i).Penalty(k) < NDSorting(j).Penalty(k)) Then
