@@ -131,12 +131,12 @@ Public Class Functions
 
     '4: Sekundäre Population wird bestimmt und gespeichert ggf gespeichert
     '---------------------------------------------------------------------
-    Private Sub SekundärQb_Allocation(ByVal NFrontMember_aktuell As Integer, ByVal NDSResult As Individuum())
+    Private Sub SekundärQb_Allocation(ByVal NFrontMember_aktuell As Integer, ByVal _NDSResult As Individuum())
 
         Dim i As Integer
         Dim Member_Sekundärefront As Integer
 
-        NFrontMember_aktuell = Pareto_Count_Front_Members(1, NDSResult)
+        NFrontMember_aktuell = Pareto_Count_Front_Members(1, _NDSResult)
 
         'Am Anfang wird SekundärQb mit -1 initialisiert
         Member_Sekundärefront = SekundärQb.GetLength(0)
@@ -146,7 +146,7 @@ Public Class Functions
 
         'Neue Member der SekPop bestimmen
         For i = Member_Sekundärefront To Member_Sekundärefront + NFrontMember_aktuell - 1
-            SekundärQb(i) = NDSResult(i - Member_Sekundärefront)
+            SekundärQb(i) = _NDSResult(i - Member_Sekundärefront)
         Next i
 
         Call Pareto_SekundärQb_Non_Dominated_Sorting(SekundärQb, 1)
@@ -401,13 +401,13 @@ Public Class Functions
 
     'COUNT_FRONT_MEMBERS
     '*******************
-    Private Function Pareto_Count_Front_Members(ByVal aktuell_Front As Integer, ByVal NDSResult() As Individuum) As Integer
+    Private Function Pareto_Count_Front_Members(ByVal aktuell_Front As Integer, ByVal _Individ() As Individuum) As Integer
 
         Dim i As Integer
         Pareto_Count_Front_Members = 0
 
-        For i = 0 To NDSResult.GetUpperBound(0)
-            If (NDSResult(i).Front = aktuell_Front) Then
+        For i = 0 To _Individ.GetUpperBound(0)
+            If (_Individ(i).Front = aktuell_Front) Then
                 Pareto_Count_Front_Members += 1
             End If
         Next i
@@ -416,7 +416,7 @@ Public Class Functions
 
     'NDS_Crowding_Distance_Sort
     '**************************
-    Private Sub Pareto_Crowding_Distance_Sort(ByRef NDSorting() As Individuum, ByVal StartIndex As Integer, ByVal EndIndex As Integer)
+    Private Sub Pareto_Crowding_Distance_Sort(ByRef _Individ() As Individuum, ByVal StartIndex As Integer, ByVal EndIndex As Integer)
 
         Dim i As Integer
         Dim j As Integer
@@ -427,31 +427,31 @@ Public Class Functions
         For k = 0 To Anz.Penalty - 1
             For i = StartIndex To EndIndex
                 For j = StartIndex To EndIndex
-                    If (NDSorting(i).Penalty(k) < NDSorting(j).Penalty(k)) Then
-                        swap = NDSorting(i).Copy
-                        NDSorting(i) = NDSorting(j).Copy
-                        NDSorting(j) = swap.Copy
+                    If (_Individ(i).Penalty(k) < _Individ(j).Penalty(k)) Then
+                        swap = _Individ(i).Copy
+                        _Individ(i) = _Individ(j).Copy
+                        _Individ(j) = swap.Copy
                     End If
                 Next j
             Next i
 
-            fmin = NDSorting(StartIndex).Penalty(k)
-            fmax = NDSorting(EndIndex).Penalty(k)
+            fmin = _Individ(StartIndex).Penalty(k)
+            fmax = _Individ(EndIndex).Penalty(k)
 
-            NDSorting(StartIndex).Distance = 1.0E+300
-            NDSorting(EndIndex).Distance = 1.0E+300
+            _Individ(StartIndex).Distance = 1.0E+300
+            _Individ(EndIndex).Distance = 1.0E+300
 
             For i = StartIndex + 1 To EndIndex - 1
-                NDSorting(i).Distance = NDSorting(i).Distance + (NDSorting(i + 1).Penalty(k) - NDSorting(i - 1).Penalty(k)) / (fmax - fmin)
+                _Individ(i).Distance = _Individ(i).Distance + (_Individ(i + 1).Penalty(k) - _Individ(i - 1).Penalty(k)) / (fmax - fmin)
             Next i
         Next k
 
         For i = StartIndex To EndIndex
             For j = StartIndex To EndIndex
-                If (NDSorting(i).Distance > NDSorting(j).Distance) Then
-                    swap = NDSorting(i).Copy
-                    NDSorting(i) = NDSorting(j).Copy
-                    NDSorting(j) = swap.Copy
+                If (_Individ(i).Distance > _Individ(j).Distance) Then
+                    swap = _Individ(i).Copy
+                    _Individ(i) = _Individ(j).Copy
+                    _Individ(j) = swap.Copy
                 End If
             Next j
         Next i
