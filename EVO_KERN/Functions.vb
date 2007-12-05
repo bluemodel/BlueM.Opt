@@ -1,25 +1,37 @@
 Public Class Functions
 
-    'Variablen und Structs werden im Konstruktor übergeben
-    '*****************************************************
-    'Statische
-    Dim PES_Settings As PES.Struct_Settings
-    Dim Anz As PES.Anzahl
+    'Die Statische Variablen werden im Konstruktor übergeben
+    '*******************************************************
+    Dim NNachf As Integer
+    Dim NEltern As Integer
+    Dim NMemberSecondPop As Integer
+    Dim NInteract As Integer
+    Dim isInteract As Boolean
+    Dim NPenalty As Integer
+    Dim NConstr As Integer
     Dim iAktGen As Integer
+    Dim iAktPop As Integer
 
-    'Veränderliche:
+    'Die Veränderliochen Structs werden in der Funktion übergeben
+    '************************************************************
     Dim NDSorting() As Individuum
     Dim SekundärQb() As Individuum
 
-    'Die Klasse selbst lediglich zum schreiben der Bestwerte
-    Dim PESF As PES
-    '*****************************************************
+    'Bestwerte werden zurückgeben
+    Dim Best As PES.Bestwerte
+    '****************************
 
-    Public Sub New(ByVal _PES_Settings As PES.Struct_Settings, ByVal _Anz As PES.Anzahl, ByVal _iAktGen As Integer)
+    'Die Statische Variablen werden im Konstruktor übergeben
+    '*******************************************************
+    Public Sub New(ByVal _NNachf As Integer, ByVal _NEltern As Integer, ByVal _NMemberSecondPop As Integer, ByVal _NInteract As Integer, ByVal _isInteract As Boolean, ByVal _NPenalty As Integer, ByVal _NConstr As Integer, ByVal _iAktGen As Integer)
 
-        'Statische (ByVal)
-        PES_Settings = _PES_Settings
-        Anz = _Anz
+        NNachf = _NNachf
+        NEltern = _NEltern
+        NMemberSecondPop = _NMemberSecondPop
+        NInteract = _NInteract
+        isInteract = _isInteract
+        NPenalty = _NPenalty
+        NConstr = _NConstr
         iAktGen = _iAktGen
 
     End Sub
@@ -29,13 +41,12 @@ Public Class Functions
     '3. Der Bestwertspeicher wird entsprechend der Fronten oder der sekundären Population gefüllt
     '4: Sekundäre Population wird bestimmt und gespeichert
     '--------------------------------------------------------------------------------------------
-    Public Sub EsEltern_Pareto_SekundärQb(ByRef _PESF As PES, ByRef _NDSorting() As Individuum, ByRef _SekundärQb() As Individuum)
+    Public Sub EsEltern_Pareto_SekundärQb(ByRef _Best As PES.Bestwerte, ByRef _NDSorting() As Individuum, ByRef _SekundärQb() As Individuum)
 
         'Veränderliche (ByRef):
         NDSorting = _NDSorting
         SekundärQb = _SekundärQb
-        'die Klasse PES
-        PESF = _PESF
+        Best = _Best
 
         Dim i As Integer
         Dim NFrontMember_aktuell As Integer
@@ -51,10 +62,10 @@ Public Class Functions
         NFrontMember_gesamt = 0
 
         'Initialisierung von Temp (NDSorting)
-        ReDim Temp(PES_Settings.NNachf + PES_Settings.NEltern - 1)
+        ReDim Temp(NNachf + NEltern - 1)
 
         'Initialisierung von NDSResult (NDSorting)
-        ReDim NDSResult(PES_Settings.NNachf + PES_Settings.NEltern - 1)
+        ReDim NDSResult(NNachf + NEltern - 1)
 
         'NDSorting wird in Temp kopiert
         Call Individuum.Copy_Array(NDSorting, Temp)
@@ -74,7 +85,7 @@ Public Class Functions
             Call Pareto_Non_Dominated_Result(Temp, NDSResult, NFrontMember_aktuell, NFrontMember_gesamt)
             'Rang ist hier die Nummer der Front
             rang += 1
-        Loop While Not (NFrontMember_gesamt = PES_Settings.NEltern + PES_Settings.NNachf)
+        Loop While Not (NFrontMember_gesamt = NEltern + NNachf)
 
         '3. Der Bestwertspeicher wird entsprechend der Fronten oder der sekundären Population gefüllt
         '--------------------------------------------------------------------------------------------
@@ -87,11 +98,11 @@ Public Class Functions
 
             'Es sind mehr Elterplätze für die nächste Generation verfügaber
             '-> schiss wird einfach rüberkopiert
-            If NFrontMember_aktuell <= PES_Settings.NEltern - NFrontMember_gesamt Then
+            If NFrontMember_aktuell <= NEltern - NFrontMember_gesamt Then
                 For i = NFrontMember_gesamt To NFrontMember_aktuell + NFrontMember_gesamt - 1
 
                     'NDSResult wird in den Bestwertspeicher kopiert
-                    Call PESF.Copy_Individuum_to_Bestwert(i, NDSResult)
+                    Call Copy_Individuum_to_Bestwert(i, NDSResult)
 
                 Next i
                 NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
@@ -102,20 +113,20 @@ Public Class Functions
                 'gemacht um zu bestimmen wer noch mitspielen darf und wer noch a biserl was druff hat
                 Call Pareto_Crowding_Distance_Sort(NDSResult, NFrontMember_gesamt, NFrontMember_gesamt + NFrontMember_aktuell - 1)
 
-                For i = NFrontMember_gesamt To PES_Settings.NEltern - 1
+                For i = NFrontMember_gesamt To NEltern - 1
 
                     'NDSResult wird in den Bestwertspeicher kopiert
-                    Call PESF.Copy_Individuum_to_Bestwert(i, NDSResult)
+                    Call Copy_Individuum_to_Bestwert(i, NDSResult)
 
                 Next i
 
-                NFrontMember_gesamt = PES_Settings.NEltern
+                NFrontMember_gesamt = NEltern
 
             End If
 
             aktuelle_Front += 1
 
-        Loop While Not (NFrontMember_gesamt = PES_Settings.NEltern)
+        Loop While Not (NFrontMember_gesamt = NEltern)
 
         '4: Sekundäre Population wird bestimmt und gespeichert
         '-----------------------------------------------------
@@ -124,9 +135,8 @@ Public Class Functions
         'Veränderliche (ByRef):
         _NDSorting = NDSorting
         _SekundärQb = SekundärQb
-        'die Klasse PES
-        _PESF = PESF
-
+        'die Bestwerte PES
+        _Best = Best
     End Sub
 
     '4: Sekundäre Population wird bestimmt und gespeichert ggf gespeichert
@@ -160,22 +170,22 @@ Public Class Functions
         ReDim Preserve SekundärQb(NFrontMember_aktuell - 1)
 
         'Crowding Distance
-        If (SekundärQb.GetUpperBound(0) > PES_Settings.NMemberSecondPop - 1) Then
+        If (SekundärQb.GetUpperBound(0) > NMemberSecondPop - 1) Then
             Call Pareto_Crowding_Distance_Sort(SekundärQb, 0, SekundärQb.GetUpperBound(0))
-            ReDim Preserve SekundärQb(PES_Settings.NMemberSecondPop - 1)
+            ReDim Preserve SekundärQb(NMemberSecondPop - 1)
         End If
 
         'Prüfen, ob die Population jetzt mit Mitgliedern aus der Sekundären Population aufgefüllt werden soll
         '----------------------------------------------------------------------------------------------------
-        If (iAktGen Mod PES_Settings.NInteract) = 0 And PES_Settings.isInteract Then
+        If (iAktGen Mod NInteract) = 0 And isInteract Then
             NFrontMember_aktuell = Pareto_Count_Front_Members(1, SekundärQb)
-            If NFrontMember_aktuell > PES_Settings.NEltern Then
+            If NFrontMember_aktuell > NEltern Then
                 'Crowding Distance
                 Call Pareto_Crowding_Distance_Sort(SekundärQb, 0, SekundärQb.GetUpperBound(0))
-                For i = 0 To PES_Settings.NEltern - 1
+                For i = 0 To NEltern - 1
 
                     'NDSResult wird in den Bestwertspeicher kopiert
-                    Call PESF.Copy_Individuum_to_Bestwert(i, SekundärQb)
+                    Call Copy_Individuum_to_Bestwert(i, SekundärQb)
 
                 Next i
             End If
@@ -192,7 +202,7 @@ Public Class Functions
         For i = 0 To SekundärQb.GetUpperBound(0) - 2
             For j = i + 1 To SekundärQb.GetUpperBound(0)
                 Logical = True
-                For k = 0 To Anz.Penalty - 1
+                For k = 0 To NPenalty - 1
                     Logical = Logical And (SekundärQb(i).Penalty(k) = SekundärQb(j).Penalty(k))
                 Next k
                 If (Logical) Then SekundärQb(i).dominated = True
@@ -246,7 +256,7 @@ Public Class Functions
         Dim isDominated As Boolean
         Dim Summe_Constrain(1) As Double
 
-        If (Anz.Constr > 0) Then
+        If (NConstr > 0) Then
             'Mit Constraints
             '===============
             For i = 0 To NDSorting.GetUpperBound(0)
@@ -267,7 +277,7 @@ Public Class Functions
                         Summe_Constrain(0) = 0
                         Summe_Constrain(1) = 0
 
-                        For k = 0 To Anz.Constr - 1
+                        For k = 0 To NConstr - 1
                             If (NDSorting(i).Constrain(k) < 0) Then
                                 Summe_Constrain(0) += NDSorting(i).Constrain(k)
                             End If
@@ -286,11 +296,11 @@ Public Class Functions
                         '------------
                         isDominated = False
 
-                        For k = 0 To Anz.Penalty - 1
+                        For k = 0 To NPenalty - 1
                             isDominated = isDominated Or (NDSorting(i).Penalty(k) < NDSorting(j).Penalty(k))
                         Next k
 
-                        For k = 0 To Anz.Penalty - 1
+                        For k = 0 To NPenalty - 1
                             isDominated = isDominated And (NDSorting(i).Penalty(k) <= NDSorting(j).Penalty(k))
                         Next k
 
@@ -310,11 +320,11 @@ Public Class Functions
 
                     isDominated = False
 
-                    For k = 0 To Anz.Penalty - 1
+                    For k = 0 To NPenalty - 1
                         isDominated = isDominated Or (NDSorting(i).Penalty(k) < NDSorting(j).Penalty(k))
                     Next k
 
-                    For k = 0 To Anz.Penalty - 1
+                    For k = 0 To NPenalty - 1
                         isDominated = isDominated And (NDSorting(i).Penalty(k) <= NDSorting(j).Penalty(k))
                     Next k
 
@@ -389,8 +399,8 @@ Public Class Functions
         Next i
 
         'Die bereits klassifizierten Member werden aus dem Temp Array gelöscht
-        If (PES_Settings.NNachf + PES_Settings.NEltern - NFrontMember_gesamt > 0) Then
-            ReDim Preserve Temp(PES_Settings.NNachf + PES_Settings.NEltern - NFrontMember_gesamt - 1)
+        If (NNachf + NEltern - NFrontMember_gesamt > 0) Then
+            ReDim Preserve Temp(NNachf + NEltern - NFrontMember_gesamt - 1)
             'Der Flag wird zur klassifizierung in der nächsten Runde zurückgesetzt
             For i = 0 To Temp.GetUpperBound(0)
                 Temp(i).dominated = False
@@ -424,7 +434,7 @@ Public Class Functions
         Dim swap As New Individuum("Swap", 0)
         Dim fmin, fmax As Double
 
-        For k = 0 To Anz.Penalty - 1
+        For k = 0 To NPenalty - 1
             For i = StartIndex To EndIndex
                 For j = StartIndex To EndIndex
                     If (_Individ(i).Penalty(k) < _Individ(j).Penalty(k)) Then
@@ -455,6 +465,28 @@ Public Class Functions
                 End If
             Next j
         Next i
+
+    End Sub
+
+    'Kopiert ein Struct_NDSorting in den Bestwertspeicher
+    '----------------------------------------------------
+    Public Sub Copy_Individuum_to_Bestwert(ByVal i As Integer, ByVal NDSorting_Struct As Individuum())
+        Dim j, v As Integer
+
+        For j = 0 To NDSorting_Struct(i).Penalty.GetUpperBound(0)
+            Best.Qb(i, iAktPop, j) = NDSorting_Struct(i).Penalty(j)
+        Next j
+
+        If Not NDSorting_Struct(i).Constrain.GetLength(0) = -1 Then
+            For j = 0 To NDSorting_Struct(i).Constrain.GetUpperBound(0)
+                Best.Rb(i, iAktPop, j) = NDSorting_Struct(i).Constrain(j)
+            Next j
+        End If
+
+        For v = 0 To NDSorting_Struct(i).PES_d.GetUpperBound(0)
+            Best.Db(v, i, iAktPop) = NDSorting_Struct(i).PES_d(v)
+            Best.Xb(v, i, iAktPop) = NDSorting_Struct(i).PES_X(v)
+        Next v
 
     End Sub
 

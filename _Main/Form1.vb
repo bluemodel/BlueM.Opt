@@ -735,7 +735,7 @@ Partial Class Form1
         Dim serie As Steema.TeeChart.Styles.Series
 
         'Laufvariable für die Generationen
-        Dim gen As Integer
+        Dim i_gen As Integer
         Dim i, j, m As Integer
 
         'Parents und Childs werden Dimensioniert
@@ -830,9 +830,9 @@ Partial Class Form1
 
         'Generationsschleife CES
         'xxxxxxxxxxxxxxxxxxxxxxx
-        For gen = 0 To CES1.n_Generations - 1
+        For i_gen = 0 To CES1.n_Generations - 1
 
-            Call EVO_Opt_Verlauf1.Generation(gen + 1)
+            Call EVO_Opt_Verlauf1.Generation(i_gen + 1)
 
             'Child Schleife
             'xxxxxxxxxxxxxx
@@ -860,7 +860,7 @@ Partial Class Form1
                 'HYBRID: Speichert die PES Erfahrung diesen Childs im PES Memory
                 '***************************************************************
                 If Method = METH_HYBRID Then
-                    Call CES1.Memory_Store(i, gen)
+                    Call CES1.Memory_Store(i, i_gen)
                 End If
 
                 'Lösung im TeeChart einzeichnen
@@ -905,7 +905,7 @@ Partial Class Form1
                 Next
             Else
                 'NDSorting ******************
-                Call CES1.NDSorting_Control()
+                Call CES1.NDSorting_Control(i_gen)
                 'Zeichnen von NDSortingResult
                 Call DForm.Diag.DeleteSeries(CES1.n_Childs - 1, 1)
                 serie = DForm.Diag.getSeriesPoint("Front:" & 1, "green")
