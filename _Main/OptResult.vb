@@ -56,6 +56,9 @@ Public Class OptResult
         'Datensatzname speichern
         Me.Datensatz = Sim1.Datensatz
 
+        'Datenbankpfad speichern
+        Me.db_path = Sim1.WorkDir & Sim1.Datensatz & "_EVO.mdb"
+
         'Optimierungsbedingungen kopieren
         Me.List_OptZiele = Sim1.List_OptZiele
         Me.List_OptParameter = Sim1.List_OptParameter
@@ -67,8 +70,7 @@ Public Class OptResult
         ReDim Me.SekPops(-1)
 
         'DB initialiseren
-        Me.db_path = Me.Datensatz & ".mdb"
-        Call Me.db_init(Me.db_path)
+        Call Me.db_init()
 
     End Sub
 
@@ -246,20 +248,9 @@ Public Class OptResult
     'Methoden für die Ergebnisdatenbank
     '##################################
 
-    'Optimierungsergebnis in mdb-Datei abspeichern
-    '*********************************************
-    Public Sub db_save(ByVal targetFile As String)
-
-        Call db_init(targetFile)
-        For Each iSolution As Solution In Me.Solutions
-            Call db_insert(iSolution)
-        Next
-
-    End Sub
-
     'Datenbank vorbereiten
     '*********************
-    Private Sub db_init(ByVal targetFile As String)
+    Private Sub db_init()
 
         'Ergebnisdatenbank anlegen
         '-------------------------
@@ -268,10 +259,7 @@ Public Class OptResult
         Dim db_path_source As String = System.Windows.Forms.Application.StartupPath() & "\EVO.mdb"
 
         'Datei kopieren
-        My.Computer.FileSystem.CopyFile(db_path_source, targetFile, True)
-
-        'Pfad setzen
-        Me.db_path = targetFile
+        My.Computer.FileSystem.CopyFile(db_path_source, Me.db_path, True)
 
         'Tabellen anpassen
         '-----------------
@@ -425,7 +413,7 @@ Public Class OptResult
         Dim fieldvalues As String = ""
         For i = 0 To List_OptZiele.GetUpperBound(0)
             fieldnames &= ", [" & List_OptZiele(i).Bezeichnung & "]"
-            fieldvalues &= ", " & sol.QWerte(i)
+            fieldvalues &= ", " & sol.QWerte(i).ToString(Sim.FortranProvider)
         Next
         command.CommandText = "INSERT INTO QWerte (Sim_ID" & fieldnames & ") VALUES (" & sol.ID & fieldvalues & ")"
         command.ExecuteNonQuery()
@@ -437,7 +425,7 @@ Public Class OptResult
             fieldvalues = ""
             For i = 0 To Me.List_Constraints.GetUpperBound(0)
                 fieldnames &= ", [" & Me.List_Constraints(i).Bezeichnung & "]"
-                fieldvalues &= ", " & sol.Constraints(i)
+                fieldvalues &= ", " & sol.Constraints(i).ToString(Sim.FortranProvider)
             Next
             command.CommandText = "INSERT INTO [Constraints] (Sim_ID" & fieldnames & ") VALUES (" & sol.ID & fieldvalues & ")"
             command.ExecuteNonQuery()
@@ -451,7 +439,7 @@ Public Class OptResult
             fieldvalues = ""
             For i = 0 To Me.List_OptParameter.GetUpperBound(0)
                 fieldnames &= ", [" & Me.List_OptParameter(i).Bezeichnung & "]"
-                fieldvalues &= ", " & sol.OptPara(i)
+                fieldvalues &= ", " & sol.OptPara(i).ToString(Sim.FortranProvider)
             Next
             command.CommandText = "INSERT INTO OptParameter (Sim_ID" & fieldnames & ") VALUES (" & sol.ID & fieldvalues & ")"
             command.ExecuteNonQuery()
