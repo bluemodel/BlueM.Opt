@@ -1340,7 +1340,7 @@ Public MustInherit Class Sim
             'StrRight = Microsoft.VisualBasic.Right(Zeile, Len(Zeile) - List_ModellParameter(i).SpBis + 1) 
             StrRight = Microsoft.VisualBasic.Right(Zeile, Len(Zeile) - List_ModellParameter(i).SpBis)
 
-            Wert = CInt(List_ModellParameter(i).Wert.ToString())
+            Wert = CDbl(List_ModellParameter(i).Wert.ToString())
             If (Wert.Length > Length) Then
                 'TODO: Parameter wird für erforderliche Stringlänge einfach abgeschnitten, sollte aber gerundet werden!
                 Wert = Wert.Substring(0, Length)

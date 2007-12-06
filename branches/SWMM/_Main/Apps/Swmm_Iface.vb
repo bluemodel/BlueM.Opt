@@ -1,14 +1,14 @@
 Module swmm5_iface
 
-    Declare Function swmm_run Lib "D:\Data\Develop\Evo\_Main\Apps\swmm5.dll" (ByVal F1 As String, ByVal F2 As String, ByVal F3 As String) As Integer
-    Declare Function swmm_open Lib "D:\Data\Develop\Evo\_Main\Apps\swmm5.dll" (ByVal F1 As String, ByVal F2 As String, ByVal F3 As String) As Integer
-    Declare Function swmm_start Lib "D:\Data\Develop\Evo\_Main\Apps\swmm5.dll" (ByVal saveFlag As Integer) As Integer
-    Declare Function swmm_step Lib "D:\Data\Develop\Evo\_Main\Apps\swmm5.dll" (ByRef elapsedTime As Double) As Integer
-    Declare Function swmm_end Lib "D:\Data\Develop\Evo\_Main\Apps\swmm5.dll" () As Integer
-    Declare Function swmm_report Lib "D:\Data\Develop\Evo\_Main\Apps\swmm5.dll" () As Integer
-    Declare Function swmm_getMassBalErr Lib "D:\Data\Develop\Evo\_Main\Apps\swmm5.dll" (ByRef runoffErr As Single, ByRef flowErr As Single, ByRef qualErr As Single) As Integer
-    Declare Function swmm_close Lib "D:\Data\Develop\Evo\_Main\Apps\swmm5.dll" () As Integer
-    Declare Function swmm_getVersion Lib "D:\Data\Develop\Evo\_Main\Apps\swmm5.dll" () As Long
+    Declare Function swmm_run Lib "D:\-5- BMBF Odysseus\Develop\Evo\_Main\Apps\swmm5.dll" (ByVal F1 As String, ByVal F2 As String, ByVal F3 As String) As Integer
+    Declare Function swmm_open Lib "D:\-5- BMBF Odysseus\Develop\Evo\_Main\Apps\swmm5.dll" (ByVal F1 As String, ByVal F2 As String, ByVal F3 As String) As Integer
+    Declare Function swmm_start Lib "D:\-5- BMBF Odysseus\Develop\Evo\_Main\Apps\swmm5.dll" (ByVal saveFlag As Integer) As Integer
+    Declare Function swmm_step Lib "D:\-5- BMBF Odysseus\Develop\Evo\_Main\Apps\swmm5.dll" (ByRef elapsedTime As Double) As Integer
+    Declare Function swmm_end Lib "D:\-5- BMBF Odysseus\Develop\Evo\_Main\Apps\swmm5.dll" () As Integer
+    Declare Function swmm_report Lib "D:\-5- BMBF Odysseus\Develop\Evo\_Main\Apps\swmm5.dll" () As Integer
+    Declare Function swmm_getMassBalErr Lib "D:\-5- BMBF Odysseus\Develop\Evo\_Main\Apps\swmm5.dll" (ByRef runoffErr As Single, ByRef flowErr As Single, ByRef qualErr As Single) As Integer
+    Declare Function swmm_close Lib "D:\-5- BMBF Odysseus\Develop\Evo\_Main\Apps\swmm5.dll" () As Integer
+    Declare Function swmm_getVersion Lib "D:\-5- BMBF Odysseus\Develop\Evo\_Main\Apps\swmm5.dll" () As Long
 
     Private Structure STARTUPINFO
         Dim cb As Integer

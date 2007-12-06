@@ -367,8 +367,11 @@ Public Class SWMM
     Public Function QWert_RPT(ByVal OptZiel As Struct_OptZiel) As Double
 
         Dim QWert As Double
+        Dim FFreqEast As Double, FFreqGath As Double, FFreqWest As Double
+        Dim AvgFEast As Double, AvgFGath As Double, AvgFWest As Double
         Dim DateiPfad As String
         Dim Zeile As String
+        Dim i As Integer
 
         DateiPfad = WorkDir & Datensatz & ".RPT"
 
@@ -379,8 +382,22 @@ Public Class SWMM
         'Richtige Zeile ansteuern und Wert auslesen
         Do
             Zeile = StrRead.ReadLine.ToString
-            If (Zeile.StartsWith("  External Outflow")) Then
-                QWert = Trim(Zeile.Substring(49, 7))
+            If (Zeile.StartsWith("  Outfall Loading Summary")) Then
+                Do
+                    Zeile = StrRead.ReadLine.ToString
+                    If (Zeile.StartsWith("  EastOut")) Then
+                        FFreqEast = Trim(Zeile.Substring(24, 5))
+                        AvgFEast = Trim(Zeile.Substring(33, 6))
+                        Zeile = StrRead.ReadLine.ToString
+                        FFreqGath = Trim(Zeile.Substring(24, 5))
+                        AvgFGath = Trim(Zeile.Substring(33, 6))
+                        Zeile = StrRead.ReadLine.ToString
+                        FFreqWest = Trim(Zeile.Substring(24, 5))
+                        AvgFWest = Trim(Zeile.Substring(33, 6))
+                        Exit Do
+                    End If
+                Loop Until StrRead.Peek() = -1
+                QWert = (FFreqEast * AvgFEast) + (FFreqGath * AvgFGath) + (FFreqWest * AvgFWest)
                 Exit Do
             End If
         Loop Until StrRead.Peek() = -1
