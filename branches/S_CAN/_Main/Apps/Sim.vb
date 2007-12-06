@@ -537,7 +537,7 @@ Public MustInherit Class Sim
                             .ZielReihe = WEL.getReihe(.ZielGr)
                         Case ".ASC"
                             Dim ASC As New Wave.ASC(Me.WorkDir & .ZielReiheDatei, True)
-                            .ZielReihe = ASC.getReihe(.ZielGr.Substring(5))
+                            .ZielReihe = ASC.getReihe(.ZielGr)
                         Case ".ZRE"
                             Dim ZRE As New Wave.ZRE(Me.WorkDir & .ZielReiheDatei, True)
                             .ZielReihe = ZRE.Zeitreihen(0)

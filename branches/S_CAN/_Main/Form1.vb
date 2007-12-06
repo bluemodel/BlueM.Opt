@@ -351,6 +351,10 @@ Partial Class Form1
                             Call Sim1.read_and_valid_INI_Files_CES()
 
                         Case METH_CES_PES, METH_HYBRID
+
+                            'Original ModellParameter schreiben
+                            Call Sim1.Write_ModellParameter()
+
                             'EVO_Einstellungen aktiviern
                             EVO_Settings1.Enabled = True
 
@@ -914,13 +918,24 @@ Partial Class Form1
                 Next
             Else
                 'NDSorting ******************
-                Call CES1.NDSorting_Control()
-                'Zeichnen von NDSortingResult
-                Call DForm.Diag.DeleteSeries(CES1.n_Childs - 1, 1)
-                serie = DForm.Diag.getSeriesPoint("Front:" & 1, "green")
-                For i = 0 To CES1.n_Childs - 1
-                    Call serie.Add(CES1.NDSResult(i).Penalty(0), CES1.NDSResult(i).Penalty(1))
-                Next
+                Call CES1.NDSorting_Control(i_gen)
+                ''Zeichnen von NDSortingResult
+                'Call DForm.Diag.DeleteSeries(CES1.n_Childs - 1, 1)
+                'serie = DForm.Diag.getSeriesPoint("Front:" & 1, "green")
+                'For i = 0 To CES1.n_Childs - 1
+                '    Call serie.Add(CES1.NDSResult(i).Penalty(0), CES1.NDSResult(i).Penalty(1))
+                'Next
+                'Sekundäre Population
+                SekPopulation = CES1.SekundärQb_Get()
+                If (Not IsNothing(Sim1)) Then
+                    'SekPop abspeichern
+                    Call Sim1.OptResult.setSekPop(SekPopulation, i_gen)
+                    'SekPop mit Solution.IDs zeichnen
+                    Call SekundärePopulationZeichnen(i_gen)
+                Else
+                    'SekPop einfach so zeichnen
+                    Call SekundärePopulationZeichnen(SekPopulation)
+                End If
             End If
 
             'REPRODUKTION und MUTATION Nicht wenn Testmodus
@@ -1231,7 +1246,7 @@ Start_Evolutionsrunden:
                                         Else
                                             serie = DForm.Diag.getSeriesPoint("Population " & (PES1.PES_iAkt.iAktPop + 1).ToString())
                                         End If
-                                        Call serie.Add(durchlauf, QN(0), durchlauf.ToString())
+                                        Call serie.Add((PES1.PES_iAkt.iAktRunde + 1) * PES1.PES_iAkt.iAktGen * PES1.PES_Settings.NNachf + PES1.PES_iAkt.iAktNachf, QN(0), durchlauf.ToString())
 
                                     Else
                                         'MultiObjective
@@ -1789,15 +1804,23 @@ Start_Evolutionsrunden:
             'MDBImportDialog
             '---------------
             Dim importDialog As New MDBImportDialog()
+
             For Each OptZiel As Sim.Struct_OptZiel In Sim1.List_OptZiele
                 importDialog.ListBox_OptZieleX.Items.Add(OptZiel.Bezeichnung)
                 importDialog.ListBox_OptZieleY.Items.Add(OptZiel.Bezeichnung)
                 importDialog.ListBox_OptZieleZ.Items.Add(OptZiel.Bezeichnung)
             Next
+
+
             'Bei weniger als 3 Zielen Z-Achse ausblenden
             If (Sim1.List_OptZiele.Length < 3) Then
                 importDialog.ListBox_OptZieleZ.Enabled = False
             End If
+            'Bei weniger als 2 Zielen Y-Achse ausblenden
+            If (Sim1.List_OptZiele.Length < 2) Then
+                importDialog.ListBox_OptZieleY.Enabled = False
+            End If
+
             diagresult = importDialog.ShowDialog()
 
             If (diagresult = Windows.Forms.DialogResult.OK) Then
@@ -1821,16 +1844,25 @@ Start_Evolutionsrunden:
                 Dim Achsen As New Collection
                 Dim tmpAchse As EVO.Diagramm.Achse
                 tmpAchse.Auto = True
-                'X-Achse
-                tmpAchse.Name = importDialog.ListBox_OptZieleX.SelectedItem
-                Achsen.Add(tmpAchse)
-                'Y-Achse
-                tmpAchse.Name = importDialog.ListBox_OptZieleY.SelectedItem
-                Achsen.Add(tmpAchse)
-                If (Not OptZielIndexZ = -1) Then
-                    'Z-Achse
-                    tmpAchse.Name = importDialog.ListBox_OptZieleZ.SelectedItem
+                'Single-objective
+                If (OptZielIndexZ = -1 And OptZielIndexY = -1) Then
+                    tmpAchse.Name = "Simulation"
                     Achsen.Add(tmpAchse)
+                    tmpAchse.Name = importDialog.ListBox_OptZieleX.SelectedItem
+                    Achsen.Add(tmpAchse)
+                Else
+                    'Multi-objective
+                    'X-Achse
+                    tmpAchse.Name = importDialog.ListBox_OptZieleX.SelectedItem
+                    Achsen.Add(tmpAchse)
+                    'Y-Achse
+                    tmpAchse.Name = importDialog.ListBox_OptZieleY.SelectedItem
+                    Achsen.Add(tmpAchse)
+                    If (Not OptZielIndexZ = -1) Then
+                        'Z-Achse
+                        tmpAchse.Name = importDialog.ListBox_OptZieleZ.SelectedItem
+                        Achsen.Add(tmpAchse)
+                    End If
                 End If
 
                 'Diagramm initialisieren
@@ -1848,30 +1880,40 @@ Start_Evolutionsrunden:
                 If (importDialog.ComboBox_SekPop.SelectedItem <> "ausschließlich") Then
 
                     For Each sol As Solution In Sim1.OptResult.Solutions
-                        
-                            If (OptZielIndexZ = -1) Then
-                                '2D
-                                '--
-                                'Constraintverletzung prüfen
-                                If (sol.isValid) Then
-                                    serie = Me.DForm.Diag.getSeriesPoint("Population", "Orange")
-                                Else
-                                    serie = Me.DForm.Diag.getSeriesPoint("Population (ungültig)", "Gray")
-                                End If
-                                'Zeichnen
-                                serie.Add(sol.QWerte(OptZielIndexX), sol.QWerte(OptZielIndexY), sol.ID)
+
+                        If (OptZielIndexZ = -1 And OptZielIndexY = -1) Then
+                            '1D
+                            'Constraintverletzung prüfen
+                            If (sol.isValid) Then
+                                serie = Me.DForm.Diag.getSeriesPoint("Population", "red")
                             Else
-                                '3D
-                                '--
-                                'Constraintverletzung prüfen
-                                If (sol.isValid) Then
-                                    serie3D = Me.DForm.Diag.getSeries3DPoint("Population", "Orange")
-                                Else
-                                    serie3D = Me.DForm.Diag.getSeries3DPoint("Population (ungültig)", "Gray")
-                                End If
-                                'Zeichnen
-                                serie3D.Add(sol.QWerte(OptZielIndexX), sol.QWerte(OptZielIndexY), sol.QWerte(OptZielIndexZ), sol.ID)
+                                serie = Me.DForm.Diag.getSeriesPoint("Population (ungültig)", "Gray")
                             End If
+                            'Zeichnen
+                            serie.Add(sol.ID, sol.QWerte(OptZielIndexX), sol.ID)
+                        ElseIf (OptZielIndexZ = -1) Then
+                            '2D
+                            '--
+                            'Constraintverletzung prüfen
+                            If (sol.isValid) Then
+                                serie = Me.DForm.Diag.getSeriesPoint("Population", "Orange")
+                            Else
+                                serie = Me.DForm.Diag.getSeriesPoint("Population (ungültig)", "Gray")
+                            End If
+                            'Zeichnen
+                            serie.Add(sol.QWerte(OptZielIndexX), sol.QWerte(OptZielIndexY), sol.ID)
+                        Else
+                            '3D
+                            '--
+                            'Constraintverletzung prüfen
+                            If (sol.isValid) Then
+                                serie3D = Me.DForm.Diag.getSeries3DPoint("Population", "Orange")
+                            Else
+                                serie3D = Me.DForm.Diag.getSeries3DPoint("Population (ungültig)", "Gray")
+                            End If
+                            'Zeichnen
+                            serie3D.Add(sol.QWerte(OptZielIndexX), sol.QWerte(OptZielIndexY), sol.QWerte(OptZielIndexZ), sol.ID)
+                        End If
 
                     Next
 
@@ -1905,7 +1947,7 @@ Start_Evolutionsrunden:
 
             End If
 
-        End If
+            End If
 
     End Sub
 

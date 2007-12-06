@@ -20,6 +20,7 @@ Public Class CES
 
     'Public Variablen
     Public TestModus As Integer             'Gibt den Testmodus an
+
     Public n_Combinations As Integer        'Anzahl aller Kombinationen
     Public n_Locations As Integer           'Anzahl der Locations wird von außen gesetzt
     Public n_Penalty As Integer             'Anzahl der Ziele wird von außen gesetzt
@@ -30,8 +31,11 @@ Public Class CES
     'Eingabe
     Public n_Parts_of_Path As Integer = 3   'Länge des Gedächtnispfades Achtung Maximum ist 3
     Public n_Generations As Integer = 500   'Anzahl der Generationen
-    Public n_Parents As Integer = 13
-    Public n_Childs As Integer = 20
+    Public n_Parents As Integer = 3
+    Public n_Childs As Integer = 7
+    Public n_MemberSecondPop As Integer = 50
+    Public n_Interact As Integer = 3
+    Public is_Interact As Boolean = True
 
     'Private Variablen
     Private ReprodOperator As String = "Select_Random_Uniform"
@@ -43,7 +47,7 @@ Public Class CES
     '*************************
     Public List_Childs() As EVO.Kern.Individuum
     Public List_Parents() As EVO.Kern.Individuum
-    Private SekundärQb() as EVO.Kern.Individuum
+    Private SekundärQb(-1) as EVO.Kern.Individuum
     Public NDSorting(n_Childs + n_Parents - 1) As EVO.Kern.Individuum
     Public NDSResult(n_Childs + n_Parents - 1) As EVO.Kern.Individuum
     Public Memory() As EVO.Kern.Individuum
@@ -743,13 +747,8 @@ Public Class CES
 
     'Steuerung des NDSorting (Ursprünglich aus ES Eltern)
     '****************************************************
-    Public Sub NDSorting_Control()
+    Public Sub NDSorting_Control(ByVal iAktGen as Integer)
         Dim i As Short
-        Dim NFrontMember_aktuell, NFrontMember_gesamt As Short
-        Dim Durchlauf_Front As Short
-        'Dim Count as short
-        Dim aktuelle_Front As Short
-        'Dim Member_Sekundärefront As Short
 
         Dim NDSorting(n_Childs + n_Parents - 1) As Individuum
         Call Individuum.New_Array("NDSorting", NDSorting)
@@ -759,22 +758,10 @@ Public Class CES
         '-------------------------------------------
 
         For i = 0 To n_Childs - 1
-
-            ''NConstrains ********************************
-            'If Eigenschaft.NConstrains > 0 Then
-            '    NDSorting(i).Feasible = True
-            '    For l = 1 To Eigenschaft.NConstrains
-            '        NDSorting(i).Constrain(l) = Rb(m - Eigenschaft.NNachf, Eigenschaft.iaktuellePopulation, l)
-            '        If NDSorting(i).Constrain(l) < 0 Then NDSorting(i).Feasible = False
-            '    Next l
-            'End If
-
             NDSorting(i) = List_Childs(i).Copy
-
             NDSorting(i).dominated = False
             NDSorting(i).Front = 0
             NDSorting(i).Distance = 0
-
         Next i
 
         '1. Eltern und Nachfolger werden gemeinsam betrachtet
@@ -782,442 +769,58 @@ Public Class CES
         '--------------------------------------------------------------------
 
         For i = n_Childs To n_Childs + n_Parents - 1
-
-            ''NConstrains ********************************
-            'If Eigenschaft.NConstrains > 0 Then
-            '    NDSorting(i).Feasible = True
-            '    For l = 1 To Eigenschaft.NConstrains
-            '        NDSorting(i).Constrain(l) = Rb(m - Eigenschaft.NNachf, Eigenschaft.iaktuellePopulation, l)
-            '        If NDSorting(i).Constrain(l) < 0 Then NDSorting(i).Feasible = False
-            '    Next l
-            'End If
-
             NDSorting(i) = List_Parents(i - n_Childs).Copy
-
             NDSorting(i).dominated = False
             NDSorting(i).Front = 0
             NDSorting(i).Distance = 0
-
         Next i
 
+        '********************* Alles in der Klasse Functions ****************************************
         '2. Die einzelnen Fronten werden bestimmt
-        '----------------------------------------
-        Durchlauf_Front = 1
-        NFrontMember_gesamt = 0
+        '3. Der Bestwertspeicher wird entsprechend der Fronten oder der sekundären Population gefüllt
+        '4: Sekundäre Population wird bestimmt und gespeichert
+        '--------------------------------
+        Dim Func1 As New Kern.Functions(n_Childs, n_Parents, n_MemberSecondPop, n_Interact, is_Interact, n_Penalty, n_Constrain, iAktGen)
+        Call Func1.EsEltern_Pareto_SekundärQb(List_Parents, NDSorting, SekundärQb)
+        '********************************************************************************************
 
-        'Initialisierung von Temp (NDSorting)
-        Dim Temp(n_Childs + n_Parents - 1) As Individuum
-        Call Individuum.New_Array("TMP_NDSorting", Temp)
+        'Schritt 5 und 6 sind für CES noch nicht implementiert
 
-        'Initialisierung von NDSResult (NDSorting)
-        Call Individuum.New_Array("NDSResult", NDSResult)
+        ''5: Neue Eltern werden gleich dem Bestwertspeicher gesetzt
+        ''---------------------------------------------------------
+        'For i = 0 To PES_Settings.NEltern - 1
+        '    For v = 0 To Anz.Para - 1
+        '        De(v, i, PES_iAkt.iAktPop) = Best.Db(v, i, PES_iAkt.iAktPop)
+        '        Xe(v, i, PES_iAkt.iAktPop) = Best.Xb(v, i, PES_iAkt.iAktPop)
+        '    Next v
+        'Next i
 
-        'NDSorting wird in Temp kopiert
-        For i = 0 To NDSorting.GetUpperBound(0)
-            Temp(i) = NDSorting(i).Copy
-        Next
-
-        'Schleife läuft über die Zahl der Fronten die hier auch bestimmte werden
-        Do
-            'A: Entscheidet welche Werte dominiert werden und welche nicht
-            Call Non_Dominated_Sorting(Temp, Durchlauf_Front) 'aktuallisiert auf n Objectives dm 10.05.05
-
-            'B: Sortiert die nicht dominanten Lösungen nach oben,
-            'die dominanten nach unten und zählt die Mitglieder der aktuellen Front
-            NFrontMember_aktuell = Non_Dominated_Count_and_Sort(Temp)
-            'NFrontMember_aktuell: Anzahl der Mitglieder der gerade bestimmten Front
-            'NFrontMember_gesamt: Alle bisher als nicht dominiert klassifizierten Individuum
-            NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
-
-            'C: Hier wird pro durchlauf die nicht dominierte Front in NDSResult geschaufelt
-            'und die bereits klassifizierten Lösungen aus Temp Array gelöscht
-            Call Non_Dominated_Result(Temp, NDSResult, NFrontMember_aktuell, NFrontMember_gesamt)
-            'Durchlauf ist hier die Nummer der Front
-            Durchlauf_Front = Durchlauf_Front + 1
-        Loop While Not (NFrontMember_gesamt = n_Parents + n_Childs)
-
-        '3. Der Bestwertspeicher wird entsprechend der Fronten oder der
-        'sekundären Population gefüllt
-        '-------------------------------------------------------------
-        NFrontMember_aktuell = 0
-        NFrontMember_gesamt = 0
-        aktuelle_Front = 1
-
-        Do
-            NFrontMember_aktuell = Count_Front_Members(aktuelle_Front, NDSResult)
-
-            'Es sind mehr Elterplätze für die nächste Generation verfügaber
-            '-> schiss wird einfach rüberkopiert
-            If NFrontMember_aktuell <= n_Parents - NFrontMember_gesamt Then
-                For i = NFrontMember_gesamt To NFrontMember_aktuell + NFrontMember_gesamt - 1
-                    List_Parents(i) = NDSResult(i).Copy
-                Next i
-                NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
-
-            Else
-                'Es sind weniger Elterplätze für die nächste Generation verfügber
-                'als Mitglieder der aktuellen Front. Nur für diesen Rest wird crowding distance
-                'gemacht um zu bestimmen wer noch mitspielen darf und wer noch a biserl was druff hat
-                Call NDS_Crowding_Distance_Sort(NDSResult, NFrontMember_gesamt, NFrontMember_gesamt + NFrontMember_aktuell - 1)
-
-                For i = NFrontMember_gesamt To n_Parents - 1
-                    List_Parents(i) = NDSResult(i).Copy
-                Next i
-
-                NFrontMember_gesamt = n_Parents
-
-            End If
-
-            aktuelle_Front = aktuelle_Front + 1
-
-        Loop While Not (NFrontMember_gesamt = n_Parents)
-
-        '        '4: Sekundäre Population wird bestimmt und gespeichert
-        '        NFrontMember_aktuell = Count_Front_Members(1, NDSResult)
-
-        '        If Eigenschaft.iaktuelleRunde = 1 And Eigenschaft.iaktuellePopulation = 1 And Eigenschaft.iaktuelleGeneration = 1 Then
-        '            ReDim Preserve SekundärQb(Member_Sekundärefront + NFrontMember_aktuell)
-        '        Else
-        '            Member_Sekundärefront = UBound(SekundärQb)
-        '            ReDim Preserve SekundärQb(Member_Sekundärefront + NFrontMember_aktuell)
-        '        End If
-
-        '        For i = Member_Sekundärefront + 1 To Member_Sekundärefront + NFrontMember_aktuell
-        '            SekundärQb(i) = NDSResult(i - Member_Sekundärefront)
-        '        Next i
-
-        '        Call Non_Dominated_Sorting(SekundärQb, 1)
-        '        NFrontMember_aktuell = Non_Dominated_Count_and_Sort_Sekundäre_Population(SekundärQb)
-        '        ReDim Preserve SekundärQb(NFrontMember_aktuell)
-        '        Call SekundärQb_Duplettten(SekundärQb)
-        '        NFrontMember_aktuell = Non_Dominated_Count_and_Sort_Sekundäre_Population(SekundärQb)
-        '        ReDim Preserve SekundärQb(NFrontMember_aktuell)
-
-        '        If UBound(SekundärQb) > Eigenschaft.NMemberSecondPop Then
-        '            Call NDS_Crowding_Distance_Sort(SekundärQb, 1, UBound(SekundärQb))
-        '            ReDim Preserve SekundärQb(Eigenschaft.NMemberSecondPop)
-        '        End If
-
-        '        If (Eigenschaft.iaktuelleGeneration Mod Eigenschaft.interact) = 0 And Eigenschaft.isInteract Then
-        '            NFrontMember_aktuell = Count_Front_Members(1, SekundärQb)
-        '            If NFrontMember_aktuell > Eigenschaft.NEltern Then
-        '                Call NDS_Crowding_Distance_Sort(SekundärQb, 1, UBound(SekundärQb))
-        '                For i = 1 To Eigenschaft.NEltern
-
-        '                    For j = 1 To Eigenschaft.NPenalty
-        '                        Qb(i, Eigenschaft.iaktuellePopulation, j) = SekundärQb(i).penalty(j)
-        '                    Next j
-        '                    If Eigenschaft.NConstrains > 0 Then
-        '                        For j = 1 To Eigenschaft.NConstrains
-        '                            Rb(i, Eigenschaft.iaktuellePopulation, j) = SekundärQb(i).constrain(j)
-        '                        Next j
-        '                    End If
-        '                    For v = 1 To Eigenschaft.varanz
-        '                        Db(v, i, Eigenschaft.iaktuellePopulation) = SekundärQb(i).d(v)
-        '                        Xb(v, i, Eigenschaft.iaktuellePopulation) = SekundärQb(i).X(v)
-        '                    Next v
-
-        '                Next i
-        '            End If
-        '        End If
-
-        '        'Neue Eltern werden gleich dem Bestwertspeicher gesetzt
-        '        For m = 1 To Eigenschaft.NEltern
-        '            For v = 1 To Eigenschaft.varanz
-        '                De(v, m, Eigenschaft.iaktuellePopulation) = Db(v, m, Eigenschaft.iaktuellePopulation)
-        '                Xe(v, m, Eigenschaft.iaktuellePopulation) = Xb(v, m, Eigenschaft.iaktuellePopulation)
-        '            Next v
-        '        Next m
-
-        '        'Sortierung der Lösungen ist nur für Neighbourhood-Rekombination notwendig
-        '        If Eigenschaft.iOptEltern = EVO_ELTERN_Neighbourhood Then
-        '            Call Neighbourhood_AbstandsArray(PenaltyDistance, Qb)
-        '            Call Neighbourhood_Crowding_Distance(Distanceb, Qb)
-        '        End If
-
-        '        'End If
-
-        '        EsEltern = True
-        '        Exit Sub
-
-        'ES_ELTERN_ERROR:
-        '        Exit Sub
-
-    End Sub
-
-    'A: Non_Dominated_Sorting
-    'Entscheidet welche Werte dominiert werden und welche nicht
-    '*******************************************************************************
-    Private Sub Non_Dominated_Sorting(ByRef NDSorting() As Individuum, ByRef Durchlauf_Front As Short)
-
-        Dim j, i, k As Short
-        Dim Logical As Boolean
-        Dim Summe_Constrain(2) As Double
-
-        'If Eigenschaft.NConstrains > 0 Then
-        '    For i = 1 To UBound(NDSorting)
-        '        For j = 1 To UBound(NDSorting)
-        '            If NDSorting(i).Feasible And Not NDSorting(j).Feasible Then
-        '                If NDSorting(j).dominated = False Then NDSorting(j).dominated = True
-        '            ElseIf ((Not NDSorting(i).Feasible) And (Not NDSorting(j).Feasible)) Then
-        '                Summe_Constrain(1) = 0
-        '                Summe_Constrain(2) = 0
-        '                For k = 1 To Eigenschaft.NConstrains
-        '                    If NDSorting(i).Constrain(k) < 0 Then
-        '                        Summe_Constrain(1) = Summe_Constrain(1) + NDSorting(i).Constrain(k)
-        '                    End If
-        '                    If NDSorting(j).Constrain(k) < 0 Then
-        '                        Summe_Constrain(2) = Summe_Constrain(2) + NDSorting(j).Constrain(k)
-        '                    End If
-        '                Next k
-        '                If Summe_Constrain(1) > Summe_Constrain(2) Then
-        '                    If NDSorting(j).dominated = False Then NDSorting(j).dominated = True
-        '                End If
-        '            ElseIf (NDSorting(i).Feasible And NDSorting(j).Feasible) Then
-        '                Logical = False
-        '                For k = 1 To Eigenschaft.NPenalty
-        '                    Logical = Logical Or (NDSorting(i).penalty(k) < NDSorting(j).penalty(k))
-        '                Next k
-        '                For k = 1 To Eigenschaft.NPenalty
-        '                    Logical = Logical And (NDSorting(i).penalty(k) <= NDSorting(j).penalty(k))
-        '                Next k
-        '                If Logical Then
-        '                    If NDSorting(j).dominated = False Then NDSorting(j).dominated = True
-        '                End If
-        '            End If
-        '        Next j
-        '    Next i
-        'Else
-        For i = 0 To NDSorting.GetUpperBound(0)
-            For j = 0 To NDSorting.GetUpperBound(0)
-                Logical = False
-
-                For k = 0 To n_Penalty - 1
-                    Logical = Logical Or (NDSorting(i).Penalty(k) < NDSorting(j).Penalty(k))
-                Next k
-
-                For k = 0 To n_Penalty - 1
-                    Logical = Logical And (NDSorting(i).Penalty(k) <= NDSorting(j).Penalty(k))
-                Next k
-
-                If Logical Then
-                    If NDSorting(j).dominated = False Then NDSorting(j).dominated = True
-                End If
-            Next j
-        Next i
-
+        ''6: Sortierung der Lösungen ist nur für Neighbourhood-Rekombination notwendig
+        ''----------------------------------------------------------------------------
+        'If (PES_Settings.iOptEltern = EVO_ELTERN.Neighbourhood) Then
+        '    Call Neighbourhood_AbstandsArray()
+        '    Call Neighbourhood_Crowding_Distance()
         'End If
 
-        For i = 0 To NDSorting.GetUpperBound(0)
-            'Hier wird die Nummer der Front geschrieben
-            If NDSorting(i).dominated = False Then NDSorting(i).Front = Durchlauf_Front
-        Next i
-
     End Sub
 
-    'B: Non_Dominated_Count_and_Sort
-    'Sortiert die nicht dominanten Lösungen nach oben, die dominanten nach unten
-    '*******************************************************************************
-    Private Function Non_Dominated_Count_and_Sort(ByRef NDSorting() As Individuum) As Short
-        Dim i As Short
-        Dim counter As Short
+    'ES_GET_SEKUNDÄRE_POPULATIONEN - Sekundäre Population speichert immer die angegebene
+    'Anzahl von Bestwerten und kann den Bestwertspeicher alle x Generationen überschreiben
+    '*************************************************************************************
+    Public Function SekundärQb_Get() As Double(,)
 
-        Dim Temp(NDSorting.GetUpperBound(0)) As Individuum
-        Call Individuum.New_Array("Temp_NDSorting", Temp)
+        Dim j, i As Integer
+        Dim SekPopulation(,) As Double
 
-        Non_Dominated_Count_and_Sort = 0
-        counter = 0
+        ReDim SekPopulation(SekundärQb.GetUpperBound(0), SekundärQb(0).Penalty.GetUpperBound(0))
 
-        'Die nicht dominanten Lösungen werden nach oben kopiert
-        For i = 0 To NDSorting.GetUpperBound(0)
-            If NDSorting(i).dominated = True Then
-                Temp(counter) = NDSorting(i).Copy
-                counter = counter + 1
-            End If
-        Next i
-
-        'Zahl der dominanten wird errechnet und zurückgegeben
-        Non_Dominated_Count_and_Sort = NDSorting.GetLength(0) - counter
-
-        'Die dominanten Lösungen werden nach unten kopiert
-        For i = 0 To NDSorting.GetUpperBound(0)
-            If NDSorting(i).dominated = False Then
-                Temp(counter) = NDSorting(i).Copy
-                counter = counter + 1
-            End If
-        Next i
-
-        For i = 0 To Temp.GetUpperBound(0)
-            NDSorting(i) = Temp(i).Copy
-        Next
-
-    End Function
-
-    'Non_Dominated_Count_and_Sort_Sekundäre_Population
-    'Sortiert die nicht dominanten Lösungen nach oben, die dominanten nach unten
-    'hier für die Sekundäre Population
-    '*******************************************************************************
-
-    'Private Function Non_Dominated_Count_and_Sort_Sekundäre_Population(ByRef NDSorting() As NDSortingType) As Short
-
-    'End Function
-
-
-    'C: Non_Dominated_Result
-    'Hier wird pro durchlauf die nicht dominierte Front in NDSResult geschaufelt
-    'und die bereits klassifizierten Lösungen aus Temp Array gelöscht
-    '*******************************************************************************
-    Private Sub Non_Dominated_Result(ByRef Temp() As Individuum, ByRef NDSResult() As Individuum, ByRef NFrontMember_aktuell As Short, ByRef NFrontMember_gesamt As Short)
-
-        Dim i, Position As Short
-
-        Position = NFrontMember_gesamt - NFrontMember_aktuell
-
-        'In NDSResult werden die nicht dominierten Lösungen eingefügt
-        For i = Temp.GetUpperBound(0) + 1 - NFrontMember_aktuell To Temp.GetUpperBound(0)
-            'NDSResult alle bisher gefundene Fronten
-            NDSResult(Position) = Temp(i).Copy
-            Position = Position + 1
-        Next i
-
-        'Die bereits klassifizierten Member werden aus dem Temp Array gelöscht
-        If n_Childs + n_Parents - NFrontMember_gesamt > 0 Then
-
-            ReDim Preserve Temp(n_Childs + n_Parents - NFrontMember_gesamt - 1)
-            'Der Flag wird zur klassifizierung in der nächsten Runde zurückgesetzt
-            For i = 0 To Temp.GetUpperBound(0)
-                Temp(i).dominated = False
-            Next i
-        End If
-
-    End Sub
-
-    'Count_Front_Members
-    '*******************************************************************************
-    Private Function Count_Front_Members(ByVal aktuell_Front As Short, ByRef NDSResult() As Individuum) As Integer
-        Dim i As Short
-
-        Count_Front_Members = 0
-
-        For i = 0 To NDSResult.GetUpperBound(0)
-            If NDSResult(i).Front = aktuell_Front Then
-                Count_Front_Members = Count_Front_Members + 1
-            End If
-        Next i
-
-    End Function
-
-    'NDS_Crowding_Distance_Sort
-    '*******************************************************************************
-
-    Private Sub NDS_Crowding_Distance_Sort(ByRef NDSorting() As Individuum, ByRef start As Short, ByRef ende As Short)
-        Dim i As Integer
-        Dim j As Integer
-        Dim k As Integer
-
-        Dim swap(0) As Individuum
-        swap(0) = new Individuum("swap", 0)
-
-        Dim fmin, fmax As Double
-
-        For k = 0 To n_Penalty - 1
-            For i = start To ende
-                For j = start To ende
-                    If NDSorting(i).Penalty(k) < NDSorting(j).Penalty(k) Then
-                        swap(0) = NDSorting(i).Copy
-                        NDSorting(i) = NDSorting(j).Copy
-                        NDSorting(j) = swap(0).Copy
-                    End If
-                Next j
-            Next i
-
-            fmin = NDSorting(start).Penalty(k)
-            fmax = NDSorting(ende).Penalty(k)
-
-            NDSorting(start).Distance = 1.0E+300
-            NDSorting(ende).Distance = 1.0E+300
-
-            For i = start + 1 To ende - 1
-                NDSorting(i).Distance = NDSorting(i).Distance + (NDSorting(i + 1).Penalty(k) - NDSorting(i - 1).Penalty(k)) / (fmax - fmin)
-            Next i
-        Next k
-
-        For i = start To ende
-            For j = start To ende
-                If NDSorting(i).Distance > NDSorting(j).Distance Then
-                    swap(0) = NDSorting(i).Copy
-                    NDSorting(i) = NDSorting(j).Copy
-                    NDSorting(j) = swap(0).Copy
-                End If
+        For i = 0 To SekundärQb.GetUpperBound(0)
+            For j = 0 To SekundärQb(0).Penalty.GetUpperBound(0)
+                SekPopulation(i, j) = SekundärQb(i).Penalty(j)
             Next j
         Next i
 
-    End Sub
-
-    'NDS_Crowding_Distance_Count
-    '*******************************************************************************
-    Private Function NDS_Crowding_Distance_Count(ByRef Qb(,,) As Double, ByRef Spannweite As Double) As Double
-
-        Dim i As Short
-        Dim j As Short
-        Dim k As Short
-        Dim TempDistance() As Double
-        Dim PenaltyDistance(,) As Double
-
-        Dim d() As Double
-        Dim d_mean As Double
-
-        ReDim TempDistance(n_Penalty - 1)
-        ReDim PenaltyDistance(n_Parents - 1, n_Parents - 1)
-        ReDim d(n_Parents - 1)
-
-        'Bestimmen der normierten Raumabstände zwischen allen Elternindividuen
-        For i = 0 To n_Parents - 1
-            PenaltyDistance(i, i) = 0
-            For j = i + 1 To n_Parents - 1
-                PenaltyDistance(i, j) = 0
-                For k = 0 To n_Penalty - 1
-                    TempDistance(k) = List_Parents(i).Penalty(k) - List_Parents(j).Penalty(k)
-                    TempDistance(k) = TempDistance(k) * TempDistance(k)
-                    PenaltyDistance(i, j) = PenaltyDistance(i, j) + TempDistance(k)
-                Next k
-                PenaltyDistance(i, j) = System.Math.Sqrt(PenaltyDistance(i, j))
-                PenaltyDistance(j, i) = PenaltyDistance(i, j)
-            Next j
-        Next i
-
-        d_mean = 0
-
-        For i = 0 To n_Parents - 2
-            d(i) = 1.0E+300
-            For j = 0 To i - 1
-                If PenaltyDistance(i, j) < d(i) Then d(i) = PenaltyDistance(i, j)
-            Next j
-            For j = i + 1 To n_Parents - 1
-                If PenaltyDistance(i, j) < d(i) Then d(i) = PenaltyDistance(i, j)
-            Next j
-            d_mean = d_mean + d(i)
-        Next i
-
-        d_mean = d_mean / n_Parents
-
-        NDS_Crowding_Distance_Count = 0
-
-        For i = 0 To n_Parents - 2
-            NDS_Crowding_Distance_Count = NDS_Crowding_Distance_Count + (d_mean - d(i)) * (d_mean - d(i))
-        Next i
-
-        NDS_Crowding_Distance_Count = NDS_Crowding_Distance_Count / n_Parents
-
-        NDS_Crowding_Distance_Count = System.Math.Sqrt(NDS_Crowding_Distance_Count)
-
-        Spannweite = 0
-        For i = 0 To n_Parents - 1
-            'TODO: sollte hier nicht j = i + 1 stehen?
-            For j = i To n_Parents - 1
-                If PenaltyDistance(i, j) > Spannweite Then Spannweite = PenaltyDistance(i, j)
-            Next j
-        Next i
+        Return SekPopulation
 
     End Function
 
