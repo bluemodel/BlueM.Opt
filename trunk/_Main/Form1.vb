@@ -342,6 +342,10 @@ Partial Class Form1
                             Call Sim1.read_and_valid_INI_Files_CES()
 
                         Case METH_CES_PES, METH_HYBRID
+
+                            'Original ModellParameter schreiben
+                            Call Sim1.Write_ModellParameter()
+
                             'EVO_Einstellungen aktiviern
                             EVO_Settings1.Enabled = True
 
@@ -905,13 +909,24 @@ Partial Class Form1
                 Next
             Else
                 'NDSorting ******************
-                Call CES1.NDSorting_Control()
-                'Zeichnen von NDSortingResult
-                Call DForm.Diag.DeleteSeries(CES1.n_Childs - 1, 1)
-                serie = DForm.Diag.getSeriesPoint("Front:" & 1, "green")
-                For i = 0 To CES1.n_Childs - 1
-                    Call serie.Add(CES1.NDSResult(i).Penalty(0), CES1.NDSResult(i).Penalty(1))
-                Next
+                Call CES1.NDSorting_Control(i_gen)
+                ''Zeichnen von NDSortingResult
+                'Call DForm.Diag.DeleteSeries(CES1.n_Childs - 1, 1)
+                'serie = DForm.Diag.getSeriesPoint("Front:" & 1, "green")
+                'For i = 0 To CES1.n_Childs - 1
+                '    Call serie.Add(CES1.NDSResult(i).Penalty(0), CES1.NDSResult(i).Penalty(1))
+                'Next
+                'Sekundäre Population
+                SekPopulation = CES1.SekundärQb_Get()
+                If (Not IsNothing(Sim1)) Then
+                    'SekPop abspeichern
+                    Call Sim1.OptResult.setSekPop(SekPopulation, i_gen)
+                    'SekPop mit Solution.IDs zeichnen
+                    Call SekundärePopulationZeichnen(i_gen)
+                Else
+                    'SekPop einfach so zeichnen
+                    Call SekundärePopulationZeichnen(SekPopulation)
+                End If
             End If
 
             'REPRODUKTION und MUTATION Nicht wenn Testmodus
