@@ -425,7 +425,7 @@ Public Class OptResult
         Dim fieldvalues As String = ""
         For i = 0 To List_OptZiele.GetUpperBound(0)
             fieldnames &= ", [" & List_OptZiele(i).Bezeichnung & "]"
-            fieldvalues &= ", " & sol.QWerte(i)
+            fieldvalues &= ", " & sol.QWerte(i).ToString(Sim.FortranProvider)
         Next
         command.CommandText = "INSERT INTO QWerte (Sim_ID" & fieldnames & ") VALUES (" & sol.ID & fieldvalues & ")"
         command.ExecuteNonQuery()
@@ -437,7 +437,7 @@ Public Class OptResult
             fieldvalues = ""
             For i = 0 To Me.List_Constraints.GetUpperBound(0)
                 fieldnames &= ", [" & Me.List_Constraints(i).Bezeichnung & "]"
-                fieldvalues &= ", " & sol.Constraints(i)
+                fieldvalues &= ", " & sol.Constraints(i).ToString(Sim.FortranProvider)
             Next
             command.CommandText = "INSERT INTO [Constraints] (Sim_ID" & fieldnames & ") VALUES (" & sol.ID & fieldvalues & ")"
             command.ExecuteNonQuery()
@@ -451,7 +451,7 @@ Public Class OptResult
             fieldvalues = ""
             For i = 0 To Me.List_OptParameter.GetUpperBound(0)
                 fieldnames &= ", [" & Me.List_OptParameter(i).Bezeichnung & "]"
-                fieldvalues &= ", " & sol.OptPara(i)
+                fieldvalues &= ", " & sol.OptPara(i).ToString(Sim.FortranProvider)
             Next
             command.CommandText = "INSERT INTO OptParameter (Sim_ID" & fieldnames & ") VALUES (" & sol.ID & fieldvalues & ")"
             command.ExecuteNonQuery()

@@ -38,7 +38,7 @@ Public MustInherit Class Sim
 
     Public SimErgebnis As Collection                     'Simulationsergebnis als Collection von Wave.Zeitreihe Objekten
 
-    Private FortranProvider As NumberFormatInfo          'Zahlenformatierungsanweisung für Fortran
+    Public Shared FortranProvider As NumberFormatInfo    'Zahlenformatierungsanweisung für Fortran
 
     'Konstanten
     '----------
@@ -176,10 +176,10 @@ Public MustInherit Class Sim
         Call Me.ReadSettings()
 
         'Provider einrichten
-        FortranProvider = New NumberFormatInfo()
-        FortranProvider.NumberDecimalSeparator = "."
-        FortranProvider.NumberGroupSeparator = ""
-        FortranProvider.NumberGroupSizes = New Integer() {3}
+        Sim.FortranProvider = New NumberFormatInfo()
+        Sim.FortranProvider.NumberDecimalSeparator = "."
+        Sim.FortranProvider.NumberGroupSeparator = ""
+        Sim.FortranProvider.NumberGroupSizes = New Integer() {3}
 
         'Simulationsergebnis instanzieren
         Me.SimErgebnis = New Collection
@@ -361,9 +361,9 @@ Public MustInherit Class Sim
                 'Werte zuweisen
                 List_OptParameter(i).Bezeichnung = array(1).Trim()
                 List_OptParameter(i).Einheit = array(2).Trim()
-                List_OptParameter(i).Wert = Convert.ToDouble(array(3).Trim(), FortranProvider)
-                List_OptParameter(i).Min = Convert.ToDouble(array(4).Trim(), FortranProvider)
-                List_OptParameter(i).Max = Convert.ToDouble(array(5).Trim(), FortranProvider)
+                List_OptParameter(i).Wert = Convert.ToDouble(array(3).Trim(), Sim.FortranProvider)
+                List_OptParameter(i).Min = Convert.ToDouble(array(4).Trim(), Sim.FortranProvider)
+                List_OptParameter(i).Max = Convert.ToDouble(array(5).Trim(), Sim.FortranProvider)
                 'liegt eine Beziehung vor?
                 If (i > 0 And Not array(6).Trim() = "") Then
                     Me.List_OptParameter(i).Beziehung = getBeziehung(array(6).Trim())
@@ -448,7 +448,7 @@ Public MustInherit Class Sim
                 List_ModellParameter(i).ZeileNr = Convert.ToInt16(array(6).Trim())
                 List_ModellParameter(i).SpVon = Convert.ToInt16(array(7).Trim())
                 List_ModellParameter(i).SpBis = Convert.ToInt16(array(8).Trim())
-                List_ModellParameter(i).Faktor = Convert.ToDouble(array(9).Trim(), FortranProvider)
+                List_ModellParameter(i).Faktor = Convert.ToDouble(array(9).Trim(), Sim.FortranProvider)
                 i += 1
             End If
         Loop Until StrRead.Peek() = -1
@@ -511,7 +511,7 @@ Public MustInherit Class Sim
                 List_OptZiele(i).SimGr = ZeilenArray(4).Trim()
                 List_OptZiele(i).ZielFkt = ZeilenArray(5).Trim()
                 List_OptZiele(i).WertTyp = ZeilenArray(6).Trim()
-                If (ZeilenArray(7).Trim() <> "") Then List_OptZiele(i).ZielWert = Convert.ToDouble(ZeilenArray(7).Trim(), FortranProvider)
+                If (ZeilenArray(7).Trim() <> "") Then List_OptZiele(i).ZielWert = Convert.ToDouble(ZeilenArray(7).Trim(), Sim.FortranProvider)
                 List_OptZiele(i).ZielGr = ZeilenArray(8).Trim()
                 List_OptZiele(i).ZielReiheDatei = ZeilenArray(9).Trim()
                 i += 1
@@ -1328,7 +1328,7 @@ Public MustInherit Class Sim
             'Wert auf verfügbare Stellen kürzen
             '----------------------------------
             'bestimmen des ganzzahligen Anteils, \-Operator ginge zwar theoretisch, ist aber für Zahlen < 1 nicht robust (warum auch immer)
-            WertStr = Convert.ToString(List_ModellParameter(i).Wert - List_ModellParameter(i).Wert Mod 1.0, FortranProvider)
+            WertStr = Convert.ToString(List_ModellParameter(i).Wert - List_ModellParameter(i).Wert Mod 1.0, Sim.FortranProvider)
 
             If (WertStr.Length > AnzZeichen) Then
                 'Wert zu lang
@@ -1336,7 +1336,7 @@ Public MustInherit Class Sim
 
             ElseIf (WertStr.Length < AnzZeichen - 1) Then
                 'Runden auf verfügbare Stellen: Anzahl der Stellen - Anzahl der Vorkommastellen - Komma
-                WertStr = Convert.ToString(Math.Round(List_ModellParameter(i).Wert, AnzZeichen - WertStr.Length - 1), FortranProvider)
+                WertStr = Convert.ToString(Math.Round(List_ModellParameter(i).Wert, AnzZeichen - WertStr.Length - 1), Sim.FortranProvider)
 
             Else
                 'Ganzzahligen Wert benutzen
