@@ -120,6 +120,7 @@
     </Compile>
     <Compile Include="Apps\IHA.vb">
     </Compile>
+    <Compile Include="Apps\Scan.vb" />
     <Compile Include="Apps\SensiPlot.Designer.vb">
       <DependentUpon>SensiPlot.vb</DependentUpon>
     </Compile>
