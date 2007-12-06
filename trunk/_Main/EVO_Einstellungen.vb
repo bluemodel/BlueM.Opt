@@ -244,37 +244,37 @@ Public Class EVO_Einstellungen
     '*******************************
     Public Sub readSettings()
 
-        _settings.NEltern = Val(TextAnzEltern.Text)
-        _settings.NNachf = Val(TextAnzNachf.Text)
-        _settings.NGen = Val(TextAnzGen.Text)
-        _settings.iEvoTyp = VB6.GetItemData(ComboStrategie, ComboStrategie.SelectedIndex)
-        _settings.iPopEvoTyp = VB6.GetItemData(ComboPopStrategie, ComboPopStrategie.SelectedIndex)
-        _settings.iPopPenalty = VB6.GetItemData(ComboPopPenalty, ComboPopPenalty.SelectedIndex)
+        _settings.n_Eltern = Val(TextAnzEltern.Text)
+        _settings.n_Nachf = Val(TextAnzNachf.Text)
+        _settings.n_Gen = Val(TextAnzGen.Text)
+        _settings.ty_EvoTyp = VB6.GetItemData(ComboStrategie, ComboStrategie.SelectedIndex)
+        _settings.ty_PopEvoTyp = VB6.GetItemData(ComboPopStrategie, ComboPopStrategie.SelectedIndex)
+        _settings.ty_PopPenalty = VB6.GetItemData(ComboPopPenalty, ComboPopPenalty.SelectedIndex)
         _settings.is_MO_Pareto = isMultiObjectiveOptimierung
-        _settings.isPOPUL = CheckisPopul.Checked
-        If (_settings.isPOPUL) Then
-            _settings.NRunden = Val(TextAnzRunden.Text)
-            _settings.NPopul = Val(TextAnzPop.Text)
-            _settings.NPopEltern = Val(TextAnzPopEltern.Text)
+        _settings.is_POPUL = CheckisPopul.Checked
+        If (_settings.is_POPUL) Then
+            _settings.n_Runden = Val(TextAnzRunden.Text)
+            _settings.n_Popul = Val(TextAnzPop.Text)
+            _settings.n_PopEltern = Val(TextAnzPopEltern.Text)
         Else
-            _settings.NRunden = 1
-            _settings.NPopul = 1
-            _settings.NPopEltern = 1
+            _settings.n_Runden = 1
+            _settings.n_Popul = 1
+            _settings.n_PopEltern = 1
         End If
-        _settings.iOptEltern = VB6.GetItemData(ComboOptEltern, ComboOptEltern.SelectedIndex)
-        _settings.iOptPopEltern = VB6.GetItemData(ComboOptPopEltern, ComboOptPopEltern.SelectedIndex)
-        _settings.NRekombXY = Val(TextRekombxy.Text)
+        _settings.ty_OptEltern = VB6.GetItemData(ComboOptEltern, ComboOptEltern.SelectedIndex)
+        _settings.ty_OptPopEltern = VB6.GetItemData(ComboOptPopEltern, ComboOptPopEltern.SelectedIndex)
+        _settings.n_RekombXY = Val(TextRekombxy.Text)
         _settings.DnStart = Val(TextDeltaStart.Text)
-        _settings.iStartPar = VB6.GetItemData(ComboOptVorgabe, ComboOptVorgabe.SelectedIndex)
-        _settings.isDnVektor = CheckisDnVektor.Checked
+        _settings.ty_StartPar = VB6.GetItemData(ComboOptVorgabe, ComboOptVorgabe.SelectedIndex)
+        _settings.is_DnVektor = CheckisDnVektor.Checked
         If (Val(TextInteract.Text) <= 0) Then
-            _settings.isInteract = False
-            _settings.NInteract = 1
+            _settings.is_Interact = False
+            _settings.n_Interact = 1
         Else
-            _settings.isInteract = True
-            _settings.NInteract = Val(TextInteract.Text)
+            _settings.is_Interact = True
+            _settings.n_Interact = Val(TextInteract.Text)
         End If
-        _settings.NMemberSecondPop = Val(TextNMemberSecondPop.Text)
+        _settings.n_MemberSecondPop = Val(TextNMemberSecondPop.Text)
 
     End Sub
 

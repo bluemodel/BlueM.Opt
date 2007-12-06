@@ -335,10 +335,10 @@ Public Class Testprobleme
         Dim i As Short
         Dim serie As Steema.TeeChart.Styles.Series
 
-        If (PES_Settings.isPOPUL) Then
-            Anzahl_Kalkulationen = PES_Settings.NGen * PES_Settings.NNachf * PES_Settings.NRunden + 1
+        If (PES_Settings.is_POPUL) Then
+            Anzahl_Kalkulationen = PES_Settings.n_Gen * PES_Settings.n_Nachf * PES_Settings.n_Runden + 1
         Else
-            Anzahl_Kalkulationen = PES_Settings.NGen * PES_Settings.NNachf + 1
+            Anzahl_Kalkulationen = PES_Settings.n_Gen * PES_Settings.n_Nachf + 1
         End If
 
         'Ausgangswert berechnen
@@ -388,10 +388,10 @@ Public Class Testprobleme
         Dim X() As Double
         Dim serie As Steema.TeeChart.Styles.Series
 
-        If (PES_Settings.isPOPUL) Then
-            Anzahl_Kalkulationen = PES_Settings.NGen * PES_Settings.NNachf * PES_Settings.NRunden + 1
+        If (PES_Settings.is_POPUL) Then
+            Anzahl_Kalkulationen = PES_Settings.n_Gen * PES_Settings.n_Nachf * PES_Settings.n_Runden + 1
         Else
-            Anzahl_Kalkulationen = PES_Settings.NGen * PES_Settings.NNachf + 1
+            Anzahl_Kalkulationen = PES_Settings.n_Gen * PES_Settings.n_Nachf + 1
         End If
 
         'Ausgangswert berechnen
