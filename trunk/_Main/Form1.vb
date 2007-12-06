@@ -905,7 +905,7 @@ Partial Class Form1
                 Next
             Else
                 'NDSorting ******************
-                Call CES1.NDSorting_Control(i_gen)
+                Call CES1.NDSorting_Control()
                 'Zeichnen von NDSortingResult
                 Call DForm.Diag.DeleteSeries(CES1.n_Childs - 1, 1)
                 serie = DForm.Diag.getSeriesPoint("Front:" & 1, "green")
