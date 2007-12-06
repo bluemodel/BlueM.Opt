@@ -45,9 +45,9 @@ Public Class CES
 
     'Listen für die Individuen
     '*************************
-    Public List_Childs() As EVO.Kern.Individuum
-    Public List_Parents() As EVO.Kern.Individuum
-    Private SekundärQb(-1) as EVO.Kern.Individuum
+    Public Childs() As EVO.Kern.Individuum
+    Public Parents() As EVO.Kern.Individuum
+    Private SekundärQb(-1) As EVO.Kern.Individuum
     Public NDSorting(n_Childs + n_Parents - 1) As EVO.Kern.Individuum
     Public NDSResult(n_Childs + n_Parents - 1) As EVO.Kern.Individuum
     Public Memory() As EVO.Kern.Individuum
@@ -74,11 +74,11 @@ Public Class CES
                     upperb = n_PathDimension(j) - 1
                     'Randomize() nicht vergessen
                     tmp = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
-                    List_Childs(i).Path(j) = tmp
+                    Childs(i).Path(j) = tmp
                 Next
-                List_Childs(i).mutated = True
-                List_Childs(i).ID = i + 1
-            Loop While Is_Twin(i) = True Or approved(List_Childs(i).Path) = False
+                Childs(i).mutated = True
+                Childs(i).ID = i + 1
+            Loop While Is_Twin(i) = True Or approved(Childs(i).Path) = False
         Next
 
     End Sub
@@ -89,18 +89,18 @@ Public Class CES
         Dim i, j As Integer
 
         Dim array() As Integer
-        ReDim array(List_Childs(i).Path.GetUpperBound(0))
+        ReDim array(Childs(i).Path.GetUpperBound(0))
         For i = 0 To array.GetUpperBound(0)
             array(i) = 0
         Next
 
         For i = 0 To n_Childs - 1
-            For j = 0 To List_Childs(i).Path.GetUpperBound(0)
-                List_Childs(i).Path(j) = array(j)
+            For j = 0 To Childs(i).Path.GetUpperBound(0)
+                Childs(i).Path(j) = array(j)
             Next
             array(0) += 1
             If Not i = n_Childs - 1 Then
-                For j = 0 To List_Childs(i).Path.GetUpperBound(0)
+                For j = 0 To Childs(i).Path.GetUpperBound(0)
                     If array(j) > n_PathDimension(j) - 1 Then
                         array(j) = 0
                         array(j + 1) += 1
@@ -146,7 +146,7 @@ Public Class CES
         'xxxxxxxxxxxxxxx
         If Strategy = "minus" Then
             For i = 0 To n_Parents - 1
-                List_Parents(i) = List_Childs(i).Copy
+                Parents(i) = Childs(i).Copy
             Next i
 
             'Strategie PLUS
@@ -156,17 +156,17 @@ Public Class CES
             For i = 0 To n_Childs - 1
                 'Des schlechteste Elter wird bestimmt
                 Dim bad_no As Integer = 0
-                Dim bad_penalty As Double = List_Parents(0).Penalty(0)
+                Dim bad_penalty As Double = Parents(0).Penalty(0)
                 For j = 1 To n_Parents - 1
-                    If bad_penalty < List_Parents(j).Penalty(0) Then
+                    If bad_penalty < Parents(j).Penalty(0) Then
                         bad_no = j
-                        bad_penalty = List_Parents(j).Penalty(0)
+                        bad_penalty = Parents(j).Penalty(0)
                     End If
                 Next
 
                 'Falls der schlechteste Parent schlechter als der Child ist wird er durch den Child ersetzt
-                If List_Parents(bad_no).Penalty(0) > List_Childs(i).Penalty(0) Then
-                    List_Parents(bad_no) = List_Childs(i).Copy
+                If Parents(bad_no).Penalty(0) > Childs(i).Penalty(0) Then
+                    Parents(bad_no) = Childs(i).Copy
                 End If
             Next
 
@@ -190,14 +190,14 @@ Public Class CES
                 x = 0
                 y = 1
                 For i = 0 To n_Childs - 2 Step 2
-                    Call ReprodOp_Select_Random_Uniform(List_Parents(x).Path, List_Parents(y).Path, List_Childs(i).Path, List_Childs(i + 1).Path)
+                    Call ReprodOp_Select_Random_Uniform(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
                     x += 1
                     y += 1
                     If x = n_Parents - 1 Then x = 0
                     If y = n_Parents - 1 Then y = 0
                 Next i
                 If Even_Number(n_Childs) = False Then
-                    Call ReprodOp_Select_Random_Uniform(List_Parents(x).Path, List_Parents(y).Path, List_Childs(n_Childs - 1).Path, Einzelkind)
+                    Call ReprodOp_Select_Random_Uniform(Parents(x).Path, Parents(y).Path, Childs(n_Childs - 1).Path, Einzelkind)
                 End If
 
             Case "Order_Crossover (OX)"
@@ -205,28 +205,28 @@ Public Class CES
                 x = 0
                 y = 1
                 For i = 0 To n_Childs - 2 Step 2
-                    Call ReprodOp_Order_Crossover(List_Parents(x).Path, List_Parents(y).Path, List_Childs(i).Path, List_Childs(i + 1).Path)
+                    Call ReprodOp_Order_Crossover(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
                     x += 1
                     y += 1
                     If x = n_Parents - 1 Then x = 0
                     If y = n_Parents - 1 Then y = 0
                 Next i
                 If Even_Number(n_Childs) = False Then
-                    Call ReprodOp_Order_Crossover(List_Parents(x).Path, List_Parents(y).Path, List_Childs(n_Childs - 1).Path, Einzelkind)
+                    Call ReprodOp_Order_Crossover(Parents(x).Path, Parents(y).Path, Childs(n_Childs - 1).Path, Einzelkind)
                 End If
 
             Case "Partially_Mapped_Crossover"
                 x = 0
                 y = 1
                 For i = 0 To n_Childs - 2 Step 2
-                    Call ReprodOp_Part_Mapped_Crossover(List_Parents(x).Path, List_Parents(y).Path, List_Childs(i).Path, List_Childs(i + 1).Path)
+                    Call ReprodOp_Part_Mapped_Crossover(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
                     x += 1
                     y += 1
                     If x = n_Parents - 1 Then x = 0
                     If y = n_Parents - 1 Then y = 0
                 Next i
                 If Even_Number(n_Childs) = False Then
-                    Call ReprodOp_Part_Mapped_Crossover(List_Parents(x).Path, List_Parents(y).Path, List_Childs(n_Childs - 1).Path, Einzelkind)
+                    Call ReprodOp_Part_Mapped_Crossover(Parents(x).Path, Parents(y).Path, Childs(n_Childs - 1).Path, Einzelkind)
                 End If
 
         End Select
@@ -406,15 +406,15 @@ Public Class CES
                 Select Case MutOperator
                     Case "RND_Switch"
                         'Verändert zufällig ein gen des Paths
-                        Call MutOp_RND_Switch(List_Childs(i).Path)
+                        Call MutOp_RND_Switch(Childs(i).Path)
 
                     Case "Dyn_Switch"
                         'Verändert zufällig ein gen des Paths mit dynamisch erhöhter Mutationsrate
-                        Call MutOp_Dyn_Switch(List_Childs(i).Path, count)
+                        Call MutOp_Dyn_Switch(Childs(i).Path, count)
                 End Select
                 count += 1
-            Loop While Is_Twin(i) = True Or Is_Clone(i) = True Or approved(List_Childs(i).Path) = False
-            List_Childs(i).mutated = True
+            Loop While Is_Twin(i) = True Or Is_Clone(i) = True Or approved(Childs(i).Path) = False
+            Childs(i).mutated = True
         Next
 
     End Sub
@@ -484,7 +484,7 @@ Public Class CES
 
         Memory(neu) = New Individuum("Memory", neu)
 
-        Memory(neu) = List_Childs(Child_No).Copy
+        Memory(neu) = Childs(Child_No).Copy
         Memory(neu).Generation = Gen_No
 
     End Sub
@@ -634,7 +634,7 @@ Public Class CES
     Public Sub Sort_Individuum(ByRef IndividuumList() As Individuum)
         'Sortiert die Fiksimile anhand des Abstandes
         Dim i, j As Integer
-        Dim swap As New EVO.Kern.Individuum("swap",0)
+        Dim swap As New EVO.Kern.Individuum("swap", 0)
 
         For i = 0 To IndividuumList.GetUpperBound(0)
             For j = 0 To IndividuumList.GetUpperBound(0)
@@ -658,10 +658,10 @@ Public Class CES
         Is_Twin = False
 
         For i = 0 To n_Childs - 1
-            If ChildIndex <> i And List_Childs(i).mutated = True Then
+            If ChildIndex <> i And Childs(i).mutated = True Then
                 PathOK = False
-                For j = 0 To List_Childs(ChildIndex).Path.GetUpperBound(0)
-                    If List_Childs(ChildIndex).Path(j) <> List_Childs(i).Path(j) Then
+                For j = 0 To Childs(ChildIndex).Path.GetUpperBound(0)
+                    If Childs(ChildIndex).Path(j) <> Childs(i).Path(j) Then
                         PathOK = True
                     End If
                 Next
@@ -682,8 +682,8 @@ Public Class CES
 
         For i = 0 To n_Parents - 1
             PathOK = False
-            For j = 0 To List_Childs(ChildIndex).Path.GetUpperBound(0)
-                If List_Childs(ChildIndex).Path(j) <> List_Parents(i).Path(j) Then
+            For j = 0 To Childs(ChildIndex).Path.GetUpperBound(0)
+                If Childs(ChildIndex).Path(j) <> Parents(i).Path(j) Then
                     PathOK = True
                 End If
             Next
@@ -747,7 +747,7 @@ Public Class CES
 
     'Steuerung des NDSorting (Ursprünglich aus ES Eltern)
     '****************************************************
-    Public Sub NDSorting_Control(ByVal iAktGen as Integer)
+    Public Sub NDSorting_Control(ByVal iAktGen As Integer)
         Dim i As Short
 
         Dim NDSorting(n_Childs + n_Parents - 1) As Individuum
@@ -758,7 +758,7 @@ Public Class CES
         '-------------------------------------------
 
         For i = 0 To n_Childs - 1
-            NDSorting(i) = List_Childs(i).Copy
+            NDSorting(i) = Childs(i).Copy
             NDSorting(i).dominated = False
             NDSorting(i).Front = 0
             NDSorting(i).Distance = 0
@@ -769,7 +769,7 @@ Public Class CES
         '--------------------------------------------------------------------
 
         For i = n_Childs To n_Childs + n_Parents - 1
-            NDSorting(i) = List_Parents(i - n_Childs).Copy
+            NDSorting(i) = Parents(i - n_Childs).Copy
             NDSorting(i).dominated = False
             NDSorting(i).Front = 0
             NDSorting(i).Distance = 0
@@ -781,7 +781,7 @@ Public Class CES
         '4: Sekundäre Population wird bestimmt und gespeichert
         '--------------------------------
         Dim Func1 As New Kern.Functions(n_Childs, n_Parents, n_MemberSecondPop, n_Interact, is_Interact, n_Penalty, n_Constrain, iAktGen)
-        Call Func1.EsEltern_Pareto_SekundärQb(List_Parents, NDSorting, SekundärQb)
+        Call Func1.EsEltern_Pareto_SekundärQb(Parents, NDSorting, SekundärQb)
         '********************************************************************************************
 
         'Schritt 5 und 6 sind für CES noch nicht implementiert

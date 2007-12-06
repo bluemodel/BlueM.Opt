@@ -743,10 +743,10 @@ Partial Class Form1
         Dim i, j, m As Integer
 
         'Parents und Childs werden Dimensioniert
-        ReDim CES1.List_Parents(CES1.n_Parents - 1)
-        Call Kern.Individuum.New_Array("Parent", CES1.List_Parents)
-        ReDim CES1.List_Childs(CES1.n_Childs - 1)
-        Call Kern.Individuum.New_Array("Child", CES1.List_Childs)
+        ReDim CES1.Parents(CES1.n_Parents - 1)
+        Call Kern.Individuum.New_Array("Parent", CES1.Parents)
+        ReDim CES1.Childs(CES1.n_Childs - 1)
+        Call Kern.Individuum.New_Array("Child", CES1.Childs)
 
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
@@ -758,7 +758,7 @@ Partial Class Form1
             Call CES1.Generate_Random_Path()
         ElseIf CES1.TestModus = 1 Then
             'Testmodus 1: Funktion zum testen einer ausgewählten Kombinationen
-            Sim1.get_TestPath(CES1.List_Childs(0).Path)
+            Sim1.get_TestPath(CES1.Childs(0).Path)
         ElseIf CES1.TestModus = 2 Then
             'Testmodus 2: Funktion zum  testen aller Kombinationen
             Call CES1.Generate_All_Test_Paths()
@@ -772,7 +772,7 @@ Partial Class Form1
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         For i = 0 To CES1.n_Childs - 1
             For j = 0 To CES1.n_Locations - 1
-                Call Sim1.Identify_Measures_Elements_Parameters(j, CES1.List_Childs(i).Path(j), CES1.List_Childs(i).Measures(j), CES1.List_Childs(i).Loc(j).Loc_Elem, CES1.List_Childs(i).Loc(j).Loc_Para)
+                Call Sim1.Identify_Measures_Elements_Parameters(j, CES1.Childs(i).Path(j), CES1.Childs(i).Measures(j), CES1.Childs(i).Loc(j).Loc_Elem, CES1.Childs(i).Loc(j).Loc_Para)
             Next
         Next
 
@@ -792,18 +792,18 @@ Partial Class Form1
                 For j = 0 To CES1.n_Locations - 1
 
                     'Die Parameter (falls vorhanden) werden überschrieben
-                    If Not CES1.List_Childs(i).Loc(j).Loc_Para.GetLength(1) = 0 Then
+                    If Not CES1.Childs(i).Loc(j).Loc_Para.GetLength(1) = 0 Then
 
                         'Standard Parameter werden aus dem Sim besorgt
                         Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
 
                         'Die Zahl der Parameter wird überschrieben (AnzZiel und AnzRand sind OK)
                         'Anzahl der Parameter bezieht sich hier nur auf eine Location
-                        globalAnzPar = CES1.List_Childs(i).Loc(j).Loc_Para.GetLength(1)
+                        globalAnzPar = CES1.Childs(i).Loc(j).Loc_Para.GetLength(1)
 
-                        ReDim myPara(CES1.List_Childs(i).Loc(j).Loc_Para.GetUpperBound(1))
-                        For m = 0 To CES1.List_Childs(i).Loc(j).Loc_Para.GetUpperBound(1)
-                            myPara(m) = CES1.List_Childs(i).Loc(j).Loc_Para(1, m)
+                        ReDim myPara(CES1.Childs(i).Loc(j).Loc_Para.GetUpperBound(1))
+                        For m = 0 To CES1.Childs(i).Loc(j).Loc_Para.GetUpperBound(1)
+                            myPara(m) = CES1.Childs(i).Loc(j).Loc_Para(1, m)
                         Next
                         '1. EVO_Settings zurücksetzen; 2. Die Settings werden für Hybrid gesetzt
                         EVO_Settings1.isSaved = False
@@ -815,12 +815,12 @@ Partial Class Form1
 
                         'Dem Child wird der Schrittweitenvektor zugewiesen und gegebenenfalls der Parameter zufällig gewählt
                         'wird also nicht in PES.ESStarten gemacht
-                        ReDim CES1.List_Childs(i).Loc(j).Loc_Dn(CES1.List_Childs(i).Loc(j).Loc_Para.GetUpperBound(1))
-                        For m = 0 To CES1.List_Childs(i).Loc(j).Loc_Para.GetUpperBound(1)
-                            CES1.List_Childs(i).Loc(j).Loc_Dn(m) = EVO_Settings1.PES_Settings.DnStart
+                        ReDim CES1.Childs(i).Loc(j).Loc_Dn(CES1.Childs(i).Loc(j).Loc_Para.GetUpperBound(1))
+                        For m = 0 To CES1.Childs(i).Loc(j).Loc_Para.GetUpperBound(1)
+                            CES1.Childs(i).Loc(j).Loc_Dn(m) = EVO_Settings1.PES_Settings.DnStart
                             If EVO_Settings1.PES_Settings.iStartPar = Kern.EVO_STARTPARAMETER.Zufall Then
                                 Randomize()
-                                CES1.List_Childs(i).Loc(j).Loc_Para(1, m) = Rnd()
+                                CES1.Childs(i).Loc(j).Loc_Para(1, m) = Rnd()
                             End If
                         Next
                     End If
@@ -848,17 +848,17 @@ Partial Class Form1
                 '****************************************
                 'Aktueller Pfad wird an Sim zurückgegeben
                 'Bereitet das BlaueModell für die Kombinatorik vor
-                Call Sim1.PREPARE_Evaluation_CES(CES1.List_Childs(i).Path, CES1.List_Childs(i).All_Elem)
+                Call Sim1.PREPARE_Evaluation_CES(CES1.Childs(i).Path, CES1.Childs(i).All_Elem)
 
                 'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
                 '***************************************************************
                 If Method = METH_HYBRID Then
-                    Call Sim1.Reduce_OptPara_and_ModPara(CES1.List_Childs(i).All_Elem)
-                    Call Sim1.PREPARE_Evaluation_PES(CES1.List_Childs(i).All_Para)
+                    Call Sim1.Reduce_OptPara_and_ModPara(CES1.Childs(i).All_Elem)
+                    Call Sim1.PREPARE_Evaluation_PES(CES1.Childs(i).All_Para)
                 End If
 
                 'Simulation *************************************************************************
-                Call Sim1.SIM_Evaluierung(durchlauf_all, CES1.List_Childs(i).Penalty, CES1.List_Childs(i).Constrain)
+                Call Sim1.SIM_Evaluierung(durchlauf_all, CES1.Childs(i).Penalty, CES1.Childs(i).Constrain)
                 '************************************************************************************
 
                 'HYBRID: Speichert die PES Erfahrung diesen Childs im PES Memory
@@ -873,18 +873,18 @@ Partial Class Form1
                     'SingleObjective
                     '---------------
                     serie = DForm.Diag.getSeriesPoint("Childs", "Orange")
-                    Call serie.Add(durchlauf_all, CES1.List_Childs(i).Penalty(0), durchlauf_all.ToString())
+                    Call serie.Add(durchlauf_all, CES1.Childs(i).Penalty(0), durchlauf_all.ToString())
                 ElseIf (CES1.n_Penalty = 2) Then
                     'MultiObjective 2D-Diagramm
                     '--------------------------
                     serie = DForm.Diag.getSeriesPoint("Childs", "Orange")
-                    Call serie.Add(CES1.List_Childs(i).Penalty(0), CES1.List_Childs(i).Penalty(1), durchlauf_all.ToString())
+                    Call serie.Add(CES1.Childs(i).Penalty(0), CES1.Childs(i).Penalty(1), durchlauf_all.ToString())
                 ElseIf (CES1.n_Penalty = 3) Then
                     'MultiObjective 3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
                     '---------------------------------------------------------------------------------------
                     Dim serie3D As Steema.TeeChart.Styles.Points3D
                     serie3D = DForm.Diag.getSeries3DPoint("Childs", "Orange")
-                    Call serie3D.Add(CES1.List_Childs(i).Penalty(0), CES1.List_Childs(i).Penalty(1), CES1.List_Childs(i).Penalty(2), durchlauf_all.ToString())
+                    Call serie3D.Add(CES1.Childs(i).Penalty(0), CES1.Childs(i).Penalty(1), CES1.Childs(i).Penalty(2), durchlauf_all.ToString())
                 End If
 
                 System.Windows.Forms.Application.DoEvents()
@@ -898,14 +898,14 @@ Partial Class Form1
             'BUG 259: CES: Punkt-Labels der Sekundärpopulation fehlen noch!
             If CES1.n_Penalty = 1 Then
                 'Sortieren der Kinden anhand der Qualität
-                Call CES1.Sort_Individuum(CES1.List_Childs)
+                Call CES1.Sort_Individuum(CES1.Childs)
                 'Selectionsprozess je nach "plus" oder "minus" Strategie
                 Call CES1.Selection_Process()
                 'Zeichnen der besten Eltern
                 For i = 0 To CES1.n_Parents - 1
                     'durchlauf += 1
                     serie = DForm.Diag.getSeriesPoint("Parent", "green")
-                    Call serie.Add(durchlauf_all, CES1.List_Parents(i).Penalty(0))
+                    Call serie.Add(durchlauf_all, CES1.Parents(i).Penalty(0))
                 Next
             Else
                 'NDSorting ******************
@@ -933,7 +933,7 @@ Partial Class Form1
             '***********************************************
             If CES1.TestModus = 0 Then
                 'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
-                Call Kern.Individuum.New_Array("Child", CES1.List_Childs)
+                Call Kern.Individuum.New_Array("Child", CES1.Childs)
                 'Reproduktionsoperatoren, hier gehts dezent zur Sache
                 Call CES1.Reproduction_Control()
                 'Mutationsoperatoren
@@ -943,7 +943,7 @@ Partial Class Form1
             'Hier werden dem Child die passenden Elemente pro Location zugewiesen
             For i = 0 To CES1.n_Childs - 1
                 For j = 0 To CES1.n_Locations - 1
-                    Call Sim1.Identify_Measures_Elements_Parameters(j, CES1.List_Childs(i).Path(j), CES1.List_Childs(i).Measures(j), CES1.List_Childs(i).Loc(j).Loc_Elem, CES1.List_Childs(i).Loc(j).Loc_Para)
+                    Call Sim1.Identify_Measures_Elements_Parameters(j, CES1.Childs(i).Path(j), CES1.Childs(i).Measures(j), CES1.Childs(i).Loc(j).Loc_Elem, CES1.Childs(i).Loc(j).Loc_Para)
                 Next
             Next
 
@@ -952,17 +952,17 @@ Partial Class Form1
             If Method = METH_HYBRID Then
                 'pro Child
                 'xxxxxxxxx
-                For i = 0 To CES1.List_Childs.GetUpperBound(0)
+                For i = 0 To CES1.Childs.GetUpperBound(0)
 
                     'Ermittelt fuer jedes Child den PES Parent Satz
-                    Call CES1.Memory_Search(CES1.List_Childs(i))
+                    Call CES1.Memory_Search(CES1.Childs(i))
 
                     'und pro Location
                     'xxxxxxxxxxxxxxxx
                     For j = 0 To CES1.n_Locations - 1
 
                         'Die Parameter (falls vorhanden) werden überschrieben
-                        If Not CES1.List_Childs(i).Loc(j).Loc_Para.GetLength(1) = 0 Then
+                        If Not CES1.Childs(i).Loc(j).Loc_Para.GetLength(1) = 0 Then
 
                             '??????????????????????
                             PES1 = New EVO.Kern.PES
@@ -990,13 +990,13 @@ Partial Class Form1
                             'Die Kinder bekommen je nach Fall (Eltern keine Eltern) neue Parameter
                             If n_eltern = 0 Then
                                 'Falls noch keine Eltern vorhanden sind -> zufällige Werte
-                                ReDim CES1.List_Childs(i).Loc(j).Loc_Dn(CES1.List_Childs(i).Loc(j).Loc_Para.GetUpperBound(1))
-                                For m = 0 To CES1.List_Childs(i).Loc(j).Loc_Para.GetUpperBound(1)
-                                    CES1.List_Childs(i).Loc(j).Loc_Dn(m) = EVO_Settings1.PES_Settings.DnStart
+                                ReDim CES1.Childs(i).Loc(j).Loc_Dn(CES1.Childs(i).Loc(j).Loc_Para.GetUpperBound(1))
+                                For m = 0 To CES1.Childs(i).Loc(j).Loc_Para.GetUpperBound(1)
+                                    CES1.Childs(i).Loc(j).Loc_Dn(m) = EVO_Settings1.PES_Settings.DnStart
                                     'Falls zufällige Startwerte
                                     If EVO_Settings1.PES_Settings.iStartPar = Kern.EVO_STARTPARAMETER.Zufall Then
                                         Randomize()
-                                        CES1.List_Childs(i).Loc(j).Loc_Para(1, m) = Rnd()
+                                        CES1.Childs(i).Loc(j).Loc_Para(1, m) = Rnd()
                                     End If
                                 Next
                             Else
@@ -1021,8 +1021,8 @@ Partial Class Form1
                                 Call PES1.EsReproMut()
 
                                 'Auslesen der Variierten Parameter
-                                CES1.List_Childs(i).Loc(j).Parameter = PES1.EsGetParameter()
-                                CES1.List_Childs(i).Loc(j).Loc_Dn = PES1.EsGetDN()
+                                CES1.Childs(i).Loc(j).Parameter = PES1.EsGetParameter()
+                                CES1.Childs(i).Loc(j).Loc_Dn = PES1.EsGetDN()
 
 
 
@@ -1061,22 +1061,22 @@ Partial Class Form1
         Call EVO_Settings1.SetFor_CES_PES(1, 3, 5)
 
         For i = 0 To CES1.n_Parents - 1
-            If CES1.List_Parents(i).Front = 1 Then
+            If CES1.Parents(i).Front = 1 Then
 
                 '****************************************
                 'Aktueller Pfad wird an Sim zurückgegeben
                 'Bereitet das BlaueModell für die Kombinatorik vor
-                Call Sim1.PREPARE_Evaluation_CES(CES1.List_Childs(i).Path, CES1.List_Childs(i).All_Elem)
+                Call Sim1.PREPARE_Evaluation_CES(CES1.Childs(i).Path, CES1.Childs(i).All_Elem)
 
                 'Hier werden Child die passenden Elemente zugewiesen
                 Dim j As Integer
                 For j = 0 To CES1.n_Locations - 1
-                    Call Sim1.Identify_Measures_Elements_Parameters(j, CES1.List_Childs(i).Path(j), CES1.List_Childs(i).Measures(j), CES1.List_Childs(i).Loc(j).Loc_Elem, CES1.List_Childs(i).Loc(j).Loc_Para)
+                    Call Sim1.Identify_Measures_Elements_Parameters(j, CES1.Childs(i).Path(j), CES1.Childs(i).Measures(j), CES1.Childs(i).Loc(j).Loc_Elem, CES1.Childs(i).Loc(j).Loc_Para)
                 Next
 
                 'Reduktion der OptimierungsParameter und immer dann wenn nicht Nullvariante
                 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-                If Sim1.Reduce_OptPara_and_ModPara(CES1.List_Childs(i).All_Elem) Then
+                If Sim1.Reduce_OptPara_and_ModPara(CES1.Childs(i).All_Elem) Then
 
                     'Parameterübergabe an PES
                     '************************
