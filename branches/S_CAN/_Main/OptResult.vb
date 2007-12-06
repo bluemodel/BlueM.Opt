@@ -56,6 +56,9 @@ Public Class OptResult
         'Datensatzname speichern
         Me.Datensatz = Sim1.Datensatz
 
+        'Datenbankpfad speichern
+        Me.db_path = Sim1.WorkDir & Sim1.Datensatz & "_EVO.mdb"
+
         'Optimierungsbedingungen kopieren
         Me.List_OptZiele = Sim1.List_OptZiele
         Me.List_OptParameter = Sim1.List_OptParameter
@@ -67,8 +70,7 @@ Public Class OptResult
         ReDim Me.SekPops(-1)
 
         'DB initialiseren
-        Me.db_path = Me.Datensatz & ".mdb"
-        Call Me.db_init(Me.db_path)
+        Call Me.db_init()
 
     End Sub
 
@@ -246,20 +248,9 @@ Public Class OptResult
     'Methoden für die Ergebnisdatenbank
     '##################################
 
-    'Optimierungsergebnis in mdb-Datei abspeichern
-    '*********************************************
-    Public Sub db_save(ByVal targetFile As String)
-
-        Call db_init(targetFile)
-        For Each iSolution As Solution In Me.Solutions
-            Call db_insert(iSolution)
-        Next
-
-    End Sub
-
     'Datenbank vorbereiten
     '*********************
-    Private Sub db_init(ByVal targetFile As String)
+    Private Sub db_init()
 
         'Ergebnisdatenbank anlegen
         '-------------------------
@@ -268,10 +259,7 @@ Public Class OptResult
         Dim db_path_source As String = System.Windows.Forms.Application.StartupPath() & "\EVO.mdb"
 
         'Datei kopieren
-        My.Computer.FileSystem.CopyFile(db_path_source, targetFile, True)
-
-        'Pfad setzen
-        Me.db_path = targetFile
+        My.Computer.FileSystem.CopyFile(db_path_source, Me.db_path, True)
 
         'Tabellen anpassen
         '-----------------
