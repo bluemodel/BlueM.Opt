@@ -207,7 +207,7 @@ Partial Class Form1
             End If
 
             'EVO_Verlauf zurücksetzen
-            Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Settings1.PES_Settings.NRunden, EVO_Settings1.PES_Settings.NPopul, EVO_Settings1.PES_Settings.NGen, EVO_Settings1.PES_Settings.NNachf)
+            Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Settings1.PES_Settings.n_Runden, EVO_Settings1.PES_Settings.n_Popul, EVO_Settings1.PES_Settings.n_Gen, EVO_Settings1.PES_Settings.n_Nachf)
 
         End If
 
@@ -321,7 +321,7 @@ Partial Class Form1
                     Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
 
                     'EVO_Verlauf zurücksetzen
-                    Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Settings1.PES_Settings.NRunden, EVO_Settings1.PES_Settings.NPopul, EVO_Settings1.PES_Settings.NGen, EVO_Settings1.PES_Settings.NNachf)
+                    Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Settings1.PES_Settings.n_Runden, EVO_Settings1.PES_Settings.n_Popul, EVO_Settings1.PES_Settings.n_Gen, EVO_Settings1.PES_Settings.n_Nachf)
 
                 Case METH_CES, METH_CES_PES, METH_HYBRID 'Methode CES und Methode CES_PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -399,7 +399,7 @@ Partial Class Form1
                     Next
 
                     'EVO_Verlauf zurücksetzen
-                    Call Me.EVO_Opt_Verlauf1.Initialisieren(1 , 1, CES1.n_Generations, CES1.n_Childs)
+                    Call Me.EVO_Opt_Verlauf1.Initialisieren(1, 1, CES1.n_Generations, CES1.n_Childs)
 
             End Select
 
@@ -818,7 +818,7 @@ Partial Class Form1
                         ReDim CES1.Childs(i).Loc(j).Loc_Dn(CES1.Childs(i).Loc(j).Loc_Para.GetUpperBound(1))
                         For m = 0 To CES1.Childs(i).Loc(j).Loc_Para.GetUpperBound(1)
                             CES1.Childs(i).Loc(j).Loc_Dn(m) = EVO_Settings1.PES_Settings.DnStart
-                            If EVO_Settings1.PES_Settings.iStartPar = Kern.EVO_STARTPARAMETER.Zufall Then
+                            If EVO_Settings1.PES_Settings.ty_StartPar = Kern.EVO_STARTPARAMETER.Zufall Then
                                 Randomize()
                                 CES1.Childs(i).Loc(j).Loc_Para(1, m) = Rnd()
                             End If
@@ -994,7 +994,7 @@ Partial Class Form1
                                 For m = 0 To CES1.Childs(i).Loc(j).Loc_Para.GetUpperBound(1)
                                     CES1.Childs(i).Loc(j).Loc_Dn(m) = EVO_Settings1.PES_Settings.DnStart
                                     'Falls zufällige Startwerte
-                                    If EVO_Settings1.PES_Settings.iStartPar = Kern.EVO_STARTPARAMETER.Zufall Then
+                                    If EVO_Settings1.PES_Settings.ty_StartPar = Kern.EVO_STARTPARAMETER.Zufall Then
                                         Randomize()
                                         CES1.Childs(i).Loc(j).Loc_Para(1, m) = Rnd()
                                     End If
@@ -1133,7 +1133,7 @@ Partial Class Form1
         Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen, Method)
 
         'Startwerte werden der Verlaufsanzeige zugewiesen
-        Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Settings1.PES_Settings.NRunden, EVO_Settings1.PES_Settings.NPopul, EVO_Settings1.PES_Settings.NGen, EVO_Settings1.PES_Settings.NNachf)
+        Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Settings1.PES_Settings.n_Runden, EVO_Settings1.PES_Settings.n_Popul, EVO_Settings1.PES_Settings.n_Gen, EVO_Settings1.PES_Settings.n_Nachf)
 
         durchlauf = 0
 
@@ -1141,14 +1141,14 @@ Start_Evolutionsrunden:
 
         'Über alle Runden
         'xxxxxxxxxxxxxxxx
-        For PES1.PES_iAkt.iAktRunde = 0 To PES1.PES_Settings.NRunden - 1
+        For PES1.PES_iAkt.iAktRunde = 0 To PES1.PES_Settings.n_Runden - 1
 
             Call EVO_Opt_Verlauf1.Runden(PES1.PES_iAkt.iAktRunde + 1)
             Call PES1.EsResetPopBWSpeicher() 'Nur bei Komma Strategie
 
             'Über alle Populationen
             'xxxxxxxxxxxxxxxxxxxxxx
-            For PES1.PES_iAkt.iAktPop = 0 To PES1.PES_Settings.NPopul - 1
+            For PES1.PES_iAkt.iAktPop = 0 To PES1.PES_Settings.n_Popul - 1
 
                 Call EVO_Opt_Verlauf1.Population(PES1.PES_iAkt.iAktPop + 1)
 
@@ -1164,14 +1164,14 @@ Start_Evolutionsrunden:
 
                 'Über alle Generationen
                 'xxxxxxxxxxxxxxxxxxxxxx
-                For PES1.PES_iAkt.iAktGen = 0 To PES1.PES_Settings.NGen - 1
+                For PES1.PES_iAkt.iAktGen = 0 To PES1.PES_Settings.n_Gen - 1
 
                     Call EVO_Opt_Verlauf1.Generation(PES1.PES_iAkt.iAktGen + 1)
                     Call PES1.EsResetBWSpeicher()  'Nur bei Komma Strategie
 
                     'Über alle Nachkommen
                     'xxxxxxxxxxxxxxxxxxxxxxxxx
-                    For PES1.PES_iAkt.iAktNachf = 0 To PES1.PES_Settings.NNachf - 1
+                    For PES1.PES_iAkt.iAktNachf = 0 To PES1.PES_Settings.n_Nachf - 1
 
                         Call EVO_Opt_Verlauf1.Nachfolger(PES1.PES_iAkt.iAktNachf + 1)
 
@@ -1237,7 +1237,7 @@ Start_Evolutionsrunden:
                                         Else
                                             serie = DForm.Diag.getSeriesPoint("Population " & (PES1.PES_iAkt.iAktPop + 1).ToString())
                                         End If
-                                        Call serie.Add((PES1.PES_iAkt.iAktRunde + 1) * PES1.PES_iAkt.iAktGen * PES1.PES_Settings.NNachf + PES1.PES_iAkt.iAktNachf, QN(0), durchlauf.ToString())
+                                        Call serie.Add((PES1.PES_iAkt.iAktRunde + 1) * PES1.PES_iAkt.iAktGen * PES1.PES_Settings.n_Nachf + PES1.PES_iAkt.iAktNachf, QN(0), durchlauf.ToString())
 
                                     Else
                                         'MultiObjective
@@ -1363,7 +1363,7 @@ Start_Evolutionsrunden:
 
     'Sekundäre Population anhand von Sim-Ergebnisspeicher zeichnen
     '*************************************************************
-    Private Sub SekundärePopulationZeichnen(ByVal _igen as Integer)
+    Private Sub SekundärePopulationZeichnen(ByVal _igen As Integer)
 
         Dim i As Short
         Dim serie As Steema.TeeChart.Styles.Series
@@ -1487,10 +1487,10 @@ Start_Evolutionsrunden:
                             If (Me.Method = METH_PES) Then
                                 'Bei PES:
                                 '--------
-                                If (EVO_Settings1.PES_Settings.isPOPUL) Then
-                                    Achse.Max = EVO_Settings1.PES_Settings.NGen * EVO_Settings1.PES_Settings.NNachf * EVO_Settings1.PES_Settings.NRunden + 1
+                                If (EVO_Settings1.PES_Settings.is_POPUL) Then
+                                    Achse.Max = EVO_Settings1.PES_Settings.n_Gen * EVO_Settings1.PES_Settings.n_Nachf * EVO_Settings1.PES_Settings.n_Runden + 1
                                 Else
-                                    Achse.Max = EVO_Settings1.PES_Settings.NGen * EVO_Settings1.PES_Settings.NNachf + 1
+                                    Achse.Max = EVO_Settings1.PES_Settings.n_Gen * EVO_Settings1.PES_Settings.n_Nachf + 1
                                 End If
                             Else
                                 'Bei CES etc.:
@@ -1938,7 +1938,7 @@ Start_Evolutionsrunden:
 
             End If
 
-            End If
+        End If
 
     End Sub
 
