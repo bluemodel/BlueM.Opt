@@ -18,7 +18,7 @@ Public Class Functions
     Dim SekundärQb() As Individuum
 
     'Bestwerte werden zurückgeben
-    Dim Best As PES.Bestwerte
+    Dim Best() As Individuum
     '****************************
 
     'Die Statische Variablen werden im Konstruktor übergeben
@@ -41,7 +41,7 @@ Public Class Functions
     '3. Der Bestwertspeicher wird entsprechend der Fronten oder der sekundären Population gefüllt
     '4: Sekundäre Population wird bestimmt und gespeichert
     '--------------------------------------------------------------------------------------------
-    Public Sub EsEltern_Pareto_SekundärQb(ByRef _Best As PES.Bestwerte, ByRef _NDSorting() As Individuum, ByRef _SekundärQb() As Individuum)
+    Public Sub EsEltern_Pareto_SekundärQb(ByRef _Best() As Individuum, ByRef _NDSorting() As Individuum, ByRef _SekundärQb() As Individuum)
 
         'Veränderliche (ByRef):
         NDSorting = _NDSorting
@@ -102,7 +102,7 @@ Public Class Functions
                 For i = NFrontMember_gesamt To NFrontMember_aktuell + NFrontMember_gesamt - 1
 
                     'NDSResult wird in den Bestwertspeicher kopiert
-                    Call Copy_Individuum_to_Bestwert(i, NDSResult)
+                    Best(i) = NDSResult(i).Copy
 
                 Next i
                 NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
@@ -114,10 +114,8 @@ Public Class Functions
                 Call Pareto_Crowding_Distance_Sort(NDSResult, NFrontMember_gesamt, NFrontMember_gesamt + NFrontMember_aktuell - 1)
 
                 For i = NFrontMember_gesamt To NEltern - 1
-
                     'NDSResult wird in den Bestwertspeicher kopiert
-                    Call Copy_Individuum_to_Bestwert(i, NDSResult)
-
+                    Best(i) = NDSResult(i).Copy
                 Next i
 
                 NFrontMember_gesamt = NEltern
@@ -135,7 +133,6 @@ Public Class Functions
         'Veränderliche (ByRef):
         _NDSorting = NDSorting
         _SekundärQb = SekundärQb
-        'die Bestwerte PES
         _Best = Best
     End Sub
 
@@ -183,10 +180,8 @@ Public Class Functions
                 'Crowding Distance
                 Call Pareto_Crowding_Distance_Sort(SekundärQb, 0, SekundärQb.GetUpperBound(0))
                 For i = 0 To NEltern - 1
-
-                    'NDSResult wird in den Bestwertspeicher kopiert
-                    Call Copy_Individuum_to_Bestwert(i, SekundärQb)
-
+                    'SekundärQb wird in den Bestwertspeicher kopiert
+                    Best(i) = SekundärQb(i).Copy
                 Next i
             End If
         End If
@@ -465,28 +460,6 @@ Public Class Functions
                 End If
             Next j
         Next i
-
-    End Sub
-
-    'Kopiert ein Struct_NDSorting in den Bestwertspeicher
-    '----------------------------------------------------
-    Public Sub Copy_Individuum_to_Bestwert(ByVal i As Integer, ByVal NDSorting_Struct As Individuum())
-        Dim j, v As Integer
-
-        For j = 0 To NDSorting_Struct(i).Penalty.GetUpperBound(0)
-            Best.Qb(i, iAktPop, j) = NDSorting_Struct(i).Penalty(j)
-        Next j
-
-        If Not NDSorting_Struct(i).Constrain.GetLength(0) = -1 Then
-            For j = 0 To NDSorting_Struct(i).Constrain.GetUpperBound(0)
-                Best.Rb(i, iAktPop, j) = NDSorting_Struct(i).Constrain(j)
-            Next j
-        End If
-
-        For v = 0 To NDSorting_Struct(i).PES_d.GetUpperBound(0)
-            Best.Db(v, i, iAktPop) = NDSorting_Struct(i).PES_d(v)
-            Best.Xb(v, i, iAktPop) = NDSorting_Struct(i).PES_X(v)
-        Next v
 
     End Sub
 

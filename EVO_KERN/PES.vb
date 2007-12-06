@@ -118,7 +118,7 @@ Public Class PES
         Dim Rb(,,) As Double                'Restriktionen für eine Generation
     End Structure
 
-    Public Best as Bestwerte
+    Public Best As Bestwerte
 
 
     '---Stuff--------------
@@ -1096,20 +1096,20 @@ StartMutation:
     'ES_ELTERN - Die neuen Eltern werden generiert
     '*********************************************
     Public Sub EsEltern()
+        Dim i, v As Integer
 
-        Dim l, m, v As Integer
 
         If (Not PES_Settings.is_MO_Pareto) Then
             'Standard ES nach Rechenberg
             'xxxxxxxxxxxxxxxxxxxxxxxxxxx
             'Die Eltern werden gleich der besten Kinder gesetzt (Schrittweite und Parameterwert)
             '---------------------------------------------------------------------
-            For m = 0 To PES_Settings.NEltern - 1
+            For i = 0 To PES_Settings.NEltern - 1
                 For v = 0 To Anz.Para - 1
-                    De(v, m, PES_iAkt.iAktPop) = Best.Db(v, m, PES_iAkt.iAktPop)
-                    Xe(v, m, PES_iAkt.iAktPop) = Best.Xb(v, m, PES_iAkt.iAktPop)
+                    De(v, i, PES_iAkt.iAktPop) = Best.Db(v, i, PES_iAkt.iAktPop)
+                    Xe(v, i, PES_iAkt.iAktPop) = Best.Xb(v, i, PES_iAkt.iAktPop)
                 Next v
-            Next m
+            Next i
 
         Else
             'Multi-Objective Pareto
@@ -1117,47 +1117,44 @@ StartMutation:
             '1. Eltern und Nachfolger werden gemeinsam betrachtet
             'Nur Eltern werden NDSorting hinzugefügt, Kinder sind schon oben drin
             '--------------------------------------------------------------------
-            For m = PES_Settings.NNachf To PES_Settings.NNachf + PES_Settings.NEltern - 1
-                With NDSorting(m)
-                    For l = 0 To Anz.Penalty - 1
-                        .Penalty(l) = Best.Qb(m - PES_Settings.NNachf, PES_iAkt.iAktPop, l)
-                    Next l
-                    If Anz.Constr > 0 Then
-                        .feasible = True
-                        For l = 0 To Anz.Constr - 1
-                            .Constrain(l) = Best.Rb(m - PES_Settings.NNachf, PES_iAkt.iAktPop, l)
-                            If .Constrain(l) < 0 Then .feasible = False
-                        Next l
-                    End If
-                    .dominated = False
-                    .Front = 0
-                    For v = 0 To Anz.Para - 1
-                        'Die Schrittweite wird ebenfalls übernommen
-                        .PES_d(v) = Best.Db(v, m - PES_Settings.NNachf, PES_iAkt.iAktPop)
-                        'Die eigentlichen Parameterwerte werden übernommen
-                        .PES_X(v) = Best.Xb(v, m - PES_Settings.NNachf, PES_iAkt.iAktPop)
-                    Next v
-                    .Distance = 0
-                End With
-            Next m
+            For i = PES_Settings.NNachf To PES_Settings.NNachf + PES_Settings.NEltern - 1
+                Call Copy_Bestwert_to_Individuum(i, i - PES_Settings.NNachf, NDSorting)
+            Next i
 
             '********************* Alles in der Klasse Functions ****************************************
+            'Zu Beginn den Bestwertspeicher in ein Individuum packen
+            'Dimensionieren des Best_Indi
+            Dim Best_Indi(Best.Qb.GetUpperBound(0)) As Individuum
+            Individuum.New_Array("Bestwerte", Best_Indi)
+            For i = 0 To Best_Indi.GetUpperBound(0)
+                ReDim Best_Indi(i).PES_d(Anz.Para - 1)
+                ReDim Best_Indi(i).PES_X(Anz.Para - 1)
+            Next i
+            'Kopieren in Best_Indi
+            For i = 0 To Best.Qb.GetUpperBound(0)
+                Call Copy_Bestwert_to_Individuum(i, i, Best_Indi)
+            Next
+            '---------------------------------
             '2. Die einzelnen Fronten werden bestimmt
             '3. Der Bestwertspeicher wird entsprechend der Fronten oder der sekundären Population gefüllt
             '4: Sekundäre Population wird bestimmt und gespeichert
             '--------------------------------
             Dim Func1 As Kern.Functions = New Kern.Functions(PES_Settings.NNachf, PES_Settings.NEltern, PES_Settings.NMemberSecondPop, PES_Settings.NInteract, PES_Settings.isInteract, Anz.Penalty, Anz.Constr, PES_iAkt.iAktGen)
-            Call Func1.EsEltern_Pareto_SekundärQb(Best, NDSorting, SekundärQb)
+            Call Func1.EsEltern_Pareto_SekundärQb(Best_Indi, NDSorting, SekundärQb)
+            'Am ende die Bestwerte wieder zurück
+            For i = 0 To Best.Qb.GetUpperBound(0)
+                Call Copy_Individuum_to_Bestwert(i, Best_Indi)
+            Next
             '********************************************************************************************
 
             '5: Neue Eltern werden gleich dem Bestwertspeicher gesetzt
             '---------------------------------------------------------
-            For m = 0 To PES_Settings.NEltern - 1
+            For i = 0 To PES_Settings.NEltern - 1
                 For v = 0 To Anz.Para - 1
-                    De(v, m, PES_iAkt.iAktPop) = Best.Db(v, m, PES_iAkt.iAktPop)
-                    Xe(v, m, PES_iAkt.iAktPop) = Best.Xb(v, m, PES_iAkt.iAktPop)
+                    De(v, i, PES_iAkt.iAktPop) = Best.Db(v, i, PES_iAkt.iAktPop)
+                    Xe(v, i, PES_iAkt.iAktPop) = Best.Xb(v, i, PES_iAkt.iAktPop)
                 Next v
-            Next m
+            Next i
 
             '6: Sortierung der Lösungen ist nur für Neighbourhood-Rekombination notwendig
             '----------------------------------------------------------------------------
@@ -1167,6 +1164,56 @@ StartMutation:
             End If
 
         End If
+
+    End Sub
+
+    'Kopiert ein Individuum in den Bestwertspeicher
+    '----------------------------------------------
+    Public Sub Copy_Individuum_to_Bestwert(ByVal i As Integer, ByVal Individ As Individuum())
+        Dim j, v As Integer
+
+        For j = 0 To Anz.Penalty - 1
+            Best.Qb(i, PES_iAkt.iAktPop, j) = Individ(i).Penalty(j)
+        Next j
+
+        If Anz.Constr > 0 Then
+            For j = 0 To Anz.Constr - 1
+                Best.Rb(i, PES_iAkt.iAktPop, j) = Individ(i).Constrain(j)
+            Next j
+        End If
+
+        For v = 0 To Anz.Para - 1
+            Best.Db(v, i, PES_iAkt.iAktPop) = Individ(i).PES_d(v)
+            Best.Xb(v, i, PES_iAkt.iAktPop) = Individ(i).PES_X(v)
+        Next v
+
+    End Sub
+
+    'Kopiert den Bestwertspeicher in ein Individuum
+    '----------------------------------------------
+    Public Sub Copy_Bestwert_to_Individuum(ByVal i_indi As Integer, ByVal i_best As Integer, ByRef Individ As Individuum())
+        Dim j, v As Integer
+
+        For j = 0 To Anz.Penalty - 1
+            Individ(i_indi).Penalty(j) = Best.Qb(i_best, PES_iAkt.iAktPop, j)
+        Next j
+
+        If Anz.Constr > 0 Then
+            Individ(i_indi).feasible = True
+            For j = 0 To Anz.Constr - 1
+                Individ(i_indi).Constrain(j) = Best.Rb(i_best, PES_iAkt.iAktPop, j)
+                If Individ(i_indi).Constrain(j) < 0 Then Individ(i_indi).feasible = False
+            Next j
+        End If
+
+        For v = 0 To Anz.Para - 1
+            Individ(i_indi).PES_d(v) = Best.Db(v, i_best, PES_iAkt.iAktPop)
+            Individ(i_indi).PES_X(v) = Best.Xb(v, i_best, PES_iAkt.iAktPop)
+        Next v
+
+        Individ(i_indi).dominated = False
+        Individ(i_indi).Front = 0
+        Individ(i_indi).Distance = 0
 
     End Sub
 
