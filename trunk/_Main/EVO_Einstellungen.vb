@@ -1,5 +1,3 @@
-Option Strict Off
-Option Explicit On
 Imports IHWB.EVO.Kern
 
 Public Class EVO_Einstellungen
@@ -20,10 +18,10 @@ Public Class EVO_Einstellungen
             Case EVO_MODUS.Single_Objective
                 'Vorgaben und Anzeige
                 Label_OptModusValue.Text = "Single Objective"
-                TextAnzGen.Text = CStr(20)
-                TextAnzEltern.Text = CStr(3)
-                TextAnzNachf.Text = CStr(10)
-                TextAnzRunden.Text = CStr(10)
+                TextAnzGen.Value = 20
+                TextAnzEltern.Value = 3
+                TextAnzNachf.Value = 10
+                TextAnzRunden.Value = 10
                 'Modus
                 isMultiObjectiveOptimierung = False
                 'Strategie
@@ -41,10 +39,10 @@ Public Class EVO_Einstellungen
             Case EVO_MODUS.Multi_Objective
                 'Vorgaben und Anzeige
                 Label_OptModusValue.Text = "MultiObjective Pareto"
-                TextAnzGen.Text = CStr(250)
-                TextAnzEltern.Text = CStr(25)
-                TextAnzNachf.Text = CStr(75)
-                TextAnzRunden.Text = CStr(10)
+                TextAnzGen.Value = 250
+                TextAnzEltern.Value = 25
+                TextAnzNachf.Value = 75
+                TextAnzRunden.Value = 10
                 'Modus
                 isMultiObjectiveOptimierung = True
                 'Strategie
@@ -64,9 +62,11 @@ Public Class EVO_Einstellungen
 
         Call FILLCOMBO_OPTELTERN(ComboOptEltern)
         Call FILLCOMBO_POPPENALTY(ComboPopPenalty)
+
     End Sub
 
-    Public Sub SetFor_CES_PES(byVal AnzGen as integer, byVal AnzEltern as integer, byVal AnzNachf as integer)
+    Public Sub SetFor_CES_PES(ByVal AnzGen As Integer, ByVal AnzEltern As Integer, ByVal AnzNachf As Integer)
+
         'Vorgaben und Anzeige
         Label_OptModusValue.Text = "MultiObjective Pareto"
         TextAnzGen.Text = CStr(AnzGen)
@@ -78,6 +78,7 @@ Public Class EVO_Einstellungen
 
     'UPGRADE_WARNING: Das Ereignis ComboOptEltern.SelectedIndexChanged kann ausgelöst werden, wenn das Formular initialisiert wird. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup2075"'
     Private Sub ComboOptEltern_SelectedIndexChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles ComboOptEltern.SelectedIndexChanged
+
         Select Case VB6.GetItemData(ComboOptEltern, ComboOptEltern.SelectedIndex)
             Case EVO_ELTERN.XY_Diskret, EVO_ELTERN.XY_Mitteln, EVO_ELTERN.Neighbourhood
                 LabelRekombxy1.Enabled = True
@@ -88,90 +89,7 @@ Public Class EVO_Einstellungen
                 LabelRekombxy3.Enabled = False
                 TextRekombxy.Enabled = False
         End Select
-    End Sub
 
-    Private Sub TextAnzEltern_KeyPress(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.KeyPressEventArgs) Handles TextAnzEltern.KeyPress
-        Dim KeyAscii As Short = Asc(eventArgs.KeyChar)
-        'UPGRADE_ISSUE: Zuweisung wird nicht unterstützt: KeyAscii an Nicht-Null-Wert Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1058"'
-        KeyAscii = KEYOK(KeyAscii, AllowIntegerOnly)
-        If KeyAscii = 0 Then
-            eventArgs.Handled = True
-        End If
-    End Sub
-
-    Private Sub TextAnzGen_KeyPress(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.KeyPressEventArgs) Handles TextAnzGen.KeyPress
-        Dim KeyAscii As Short = Asc(eventArgs.KeyChar)
-        'UPGRADE_ISSUE: Zuweisung wird nicht unterstützt: KeyAscii an Nicht-Null-Wert Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1058"'
-        KeyAscii = KEYOK(KeyAscii, AllowIntegerOnly)
-        If KeyAscii = 0 Then
-            eventArgs.Handled = True
-        End If
-    End Sub
-
-    Private Sub TextAnzNachf_KeyPress(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.KeyPressEventArgs) Handles TextAnzNachf.KeyPress
-        Dim KeyAscii As Short = Asc(eventArgs.KeyChar)
-        'UPGRADE_ISSUE: Zuweisung wird nicht unterstützt: KeyAscii an Nicht-Null-Wert Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1058"'
-        KeyAscii = KEYOK(KeyAscii, AllowIntegerOnly)
-        If KeyAscii = 0 Then
-            eventArgs.Handled = True
-        End If
-    End Sub
-
-    Private Sub TextAnzPop_KeyPress(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.KeyPressEventArgs) Handles TextAnzPop.KeyPress
-        Dim KeyAscii As Short = Asc(eventArgs.KeyChar)
-        'UPGRADE_ISSUE: Zuweisung wird nicht unterstützt: KeyAscii an Nicht-Null-Wert Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1058"'
-        KeyAscii = KEYOK(KeyAscii, AllowIntegerOnly)
-        If KeyAscii = 0 Then
-            eventArgs.Handled = True
-        End If
-    End Sub
-
-    Private Sub TextAnzPopEltern_KeyPress(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.KeyPressEventArgs) Handles TextAnzPopEltern.KeyPress
-        Dim KeyAscii As Short = Asc(eventArgs.KeyChar)
-        'UPGRADE_ISSUE: Zuweisung wird nicht unterstützt: KeyAscii an Nicht-Null-Wert Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1058"'
-        KeyAscii = KEYOK(KeyAscii, AllowIntegerOnly)
-        If KeyAscii = 0 Then
-            eventArgs.Handled = True
-        End If
-    End Sub
-
-    Private Sub TextAnzRunden_KeyPress(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.KeyPressEventArgs) Handles TextAnzRunden.KeyPress
-        Dim KeyAscii As Short = Asc(eventArgs.KeyChar)
-        'UPGRADE_ISSUE: Zuweisung wird nicht unterstützt: KeyAscii an Nicht-Null-Wert Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1058"'
-        KeyAscii = KEYOK(KeyAscii, AllowIntegerOnly)
-        If KeyAscii = 0 Then
-            eventArgs.Handled = True
-        End If
-    End Sub
-
-    Private Sub TextDeltaStart_KeyPress(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.KeyPressEventArgs) Handles TextDeltaStart.KeyPress
-        Dim KeyAscii As Short = Asc(eventArgs.KeyChar)
-        'UPGRADE_ISSUE: Zuweisung wird nicht unterstützt: KeyAscii an Nicht-Null-Wert Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1058"'
-        KeyAscii = KEYOK(KeyAscii, AllowPositiveFigures)
-        If KeyAscii = 0 Then
-            eventArgs.Handled = True
-        End If
-    End Sub
-
-    Private Sub TextDeltaMin_KeyPress(ByRef KeyAscii As Short)
-        KeyAscii = KEYOK(KeyAscii, AllowPositiveFigures)
-    End Sub
-
-    Private Sub TextaDeltaStart_KeyPress(ByRef KeyAscii As Short)
-        KeyAscii = KEYOK(KeyAscii, AllowPositiveFigures)
-    End Sub
-
-    Private Sub TextaDeltaMin_KeyPress(ByRef KeyAscii As Short)
-        KeyAscii = KEYOK(KeyAscii, AllowPositiveFigures)
-    End Sub
-
-    Private Sub TextRekombxy_KeyPress(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.KeyPressEventArgs) Handles TextRekombxy.KeyPress
-        Dim KeyAscii As Short = Asc(eventArgs.KeyChar)
-        'UPGRADE_ISSUE: Zuweisung wird nicht unterstützt: KeyAscii an Nicht-Null-Wert Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1058"'
-        KeyAscii = KEYOK(KeyAscii, AllowIntegerOnly)
-        If KeyAscii = 0 Then
-            eventArgs.Handled = True
-        End If
     End Sub
 
     'UPGRADE_WARNING: Das Ereignis CheckisPopul.CheckStateChanged kann ausgelöst werden, wenn das Formular initialisiert wird. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup2075"'
