@@ -24,16 +24,16 @@ Partial Class EVO_Einstellungen
     Public ToolTip1 As System.Windows.Forms.ToolTip
     Friend WithEvents CheckisDnVektor As System.Windows.Forms.CheckBox
     Friend WithEvents ComboOptVorgabe As System.Windows.Forms.ComboBox
-    Friend WithEvents TextDeltaStart As System.Windows.Forms.TextBox
+    Friend WithEvents TextDeltaStart As System.Windows.Forms.NumericUpDown
     Friend WithEvents CheckisPopul As System.Windows.Forms.CheckBox
     Friend WithEvents ComboStrategie As System.Windows.Forms.ComboBox
-    Friend WithEvents TextNMemberSecondPop As System.Windows.Forms.TextBox
-    Friend WithEvents TextInteract As System.Windows.Forms.TextBox
-    Friend WithEvents TextRekombxy As System.Windows.Forms.TextBox
+    Friend WithEvents TextNMemberSecondPop As System.Windows.Forms.NumericUpDown
+    Friend WithEvents TextInteract As System.Windows.Forms.NumericUpDown
+    Friend WithEvents TextRekombxy As System.Windows.Forms.NumericUpDown
     Friend WithEvents ComboOptEltern As System.Windows.Forms.ComboBox
-    Friend WithEvents TextAnzNachf As System.Windows.Forms.TextBox
-    Friend WithEvents TextAnzEltern As System.Windows.Forms.TextBox
-    Friend WithEvents TextAnzGen As System.Windows.Forms.TextBox
+    Friend WithEvents TextAnzNachf As System.Windows.Forms.NumericUpDown
+    Friend WithEvents TextAnzEltern As System.Windows.Forms.NumericUpDown
+    Friend WithEvents TextAnzGen As System.Windows.Forms.NumericUpDown
     Friend WithEvents LabelNMemberSecondPop As System.Windows.Forms.Label
     Friend WithEvents LabelInteract As System.Windows.Forms.Label
     Friend WithEvents Line2 As System.Windows.Forms.Label
@@ -48,9 +48,9 @@ Partial Class EVO_Einstellungen
     Friend WithEvents ComboPopPenalty As System.Windows.Forms.ComboBox
     Friend WithEvents ComboPopStrategie As System.Windows.Forms.ComboBox
     Friend WithEvents ComboOptPopEltern As System.Windows.Forms.ComboBox
-    Friend WithEvents TextAnzPopEltern As System.Windows.Forms.TextBox
-    Friend WithEvents TextAnzPop As System.Windows.Forms.TextBox
-    Friend WithEvents TextAnzRunden As System.Windows.Forms.TextBox
+    Friend WithEvents TextAnzPopEltern As System.Windows.Forms.NumericUpDown
+    Friend WithEvents TextAnzPop As System.Windows.Forms.NumericUpDown
+    Friend WithEvents TextAnzRunden As System.Windows.Forms.NumericUpDown
     Friend WithEvents LabelPopPenalty As System.Windows.Forms.Label
     Friend WithEvents LabelPopStrategie As System.Windows.Forms.Label
     Friend WithEvents LabelOptPopEltern As System.Windows.Forms.Label
@@ -76,16 +76,16 @@ Partial Class EVO_Einstellungen
         Me.LabelStartwerte = New System.Windows.Forms.Label
         Me.ComboOptVorgabe = New System.Windows.Forms.ComboBox
         Me.LabelStartSchrittweite = New System.Windows.Forms.Label
-        Me.TextDeltaStart = New System.Windows.Forms.TextBox
+        Me.TextDeltaStart = New System.Windows.Forms.NumericUpDown
         Me.CheckisDnVektor = New System.Windows.Forms.CheckBox
         Me.GroupBox_Generationen = New System.Windows.Forms.GroupBox
-        Me.TextNMemberSecondPop = New System.Windows.Forms.TextBox
-        Me.TextInteract = New System.Windows.Forms.TextBox
-        Me.TextRekombxy = New System.Windows.Forms.TextBox
+        Me.TextNMemberSecondPop = New System.Windows.Forms.NumericUpDown
+        Me.TextInteract = New System.Windows.Forms.NumericUpDown
+        Me.TextRekombxy = New System.Windows.Forms.NumericUpDown
         Me.ComboOptEltern = New System.Windows.Forms.ComboBox
-        Me.TextAnzNachf = New System.Windows.Forms.TextBox
-        Me.TextAnzEltern = New System.Windows.Forms.TextBox
-        Me.TextAnzGen = New System.Windows.Forms.TextBox
+        Me.TextAnzNachf = New System.Windows.Forms.NumericUpDown
+        Me.TextAnzEltern = New System.Windows.Forms.NumericUpDown
+        Me.TextAnzGen = New System.Windows.Forms.NumericUpDown
         Me.LabelNMemberSecondPop = New System.Windows.Forms.Label
         Me.LabelInteract = New System.Windows.Forms.Label
         Me.Line2 = New System.Windows.Forms.Label
@@ -99,11 +99,11 @@ Partial Class EVO_Einstellungen
         Me.CheckisPopul = New System.Windows.Forms.CheckBox
         Me.GroupBox_Populationen = New System.Windows.Forms.GroupBox
         Me.LabelAnzRunden = New System.Windows.Forms.Label
-        Me.TextAnzRunden = New System.Windows.Forms.TextBox
+        Me.TextAnzRunden = New System.Windows.Forms.NumericUpDown
         Me.LabelAnzPop = New System.Windows.Forms.Label
-        Me.TextAnzPop = New System.Windows.Forms.TextBox
+        Me.TextAnzPop = New System.Windows.Forms.NumericUpDown
         Me.LabelAnzPopEltern = New System.Windows.Forms.Label
-        Me.TextAnzPopEltern = New System.Windows.Forms.TextBox
+        Me.TextAnzPopEltern = New System.Windows.Forms.NumericUpDown
         Me.LabelOptPopEltern = New System.Windows.Forms.Label
         Me.ComboOptPopEltern = New System.Windows.Forms.ComboBox
         Me.LabelPopStrategie = New System.Windows.Forms.Label
@@ -111,8 +111,18 @@ Partial Class EVO_Einstellungen
         Me.LabelPopPenalty = New System.Windows.Forms.Label
         Me.ComboPopPenalty = New System.Windows.Forms.ComboBox
         Me.GroupBox_Einstellungen.SuspendLayout()
+        CType(Me.TextDeltaStart, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox_Generationen.SuspendLayout()
+        CType(Me.TextNMemberSecondPop, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.TextInteract, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.TextRekombxy, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.TextAnzNachf, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.TextAnzEltern, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.TextAnzGen, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox_Populationen.SuspendLayout()
+        CType(Me.TextAnzRunden, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.TextAnzPop, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.TextAnzPopEltern, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'GroupBox_Einstellungen
@@ -200,13 +210,16 @@ Partial Class EVO_Einstellungen
         '
         'TextDeltaStart
         '
-        Me.TextDeltaStart.Location = New System.Drawing.Point(164, 96)
-        Me.TextDeltaStart.MaxLength = 0
+        Me.TextDeltaStart.DecimalPlaces = 2
+        Me.TextDeltaStart.Increment = New Decimal(New Integer() {1, 0, 0, 65536})
+        Me.TextDeltaStart.Location = New System.Drawing.Point(154, 96)
+        Me.TextDeltaStart.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
+        Me.TextDeltaStart.Minimum = New Decimal(New Integer() {1, 0, 0, 131072})
         Me.TextDeltaStart.Name = "TextDeltaStart"
-        Me.TextDeltaStart.Size = New System.Drawing.Size(43, 20)
+        Me.TextDeltaStart.Size = New System.Drawing.Size(53, 20)
         Me.TextDeltaStart.TabIndex = 2
-        Me.TextDeltaStart.Text = "0.1"
         Me.TextDeltaStart.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.TextDeltaStart.Value = New Decimal(New Integer() {1, 0, 0, 65536})
         '
         'CheckisDnVektor
         '
@@ -245,70 +258,73 @@ Partial Class EVO_Einstellungen
         'TextNMemberSecondPop
         '
         Me.TextNMemberSecondPop.Location = New System.Drawing.Point(140, 120)
-        Me.TextNMemberSecondPop.MaxLength = 0
+        Me.TextNMemberSecondPop.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
         Me.TextNMemberSecondPop.Name = "TextNMemberSecondPop"
-        Me.TextNMemberSecondPop.Size = New System.Drawing.Size(43, 20)
+        Me.TextNMemberSecondPop.Size = New System.Drawing.Size(53, 20)
         Me.TextNMemberSecondPop.TabIndex = 4
-        Me.TextNMemberSecondPop.Text = "50"
         Me.TextNMemberSecondPop.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.TextNMemberSecondPop.Value = New Decimal(New Integer() {50, 0, 0, 0})
         '
         'TextInteract
         '
         Me.TextInteract.Location = New System.Drawing.Point(140, 96)
-        Me.TextInteract.MaxLength = 0
+        Me.TextInteract.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
         Me.TextInteract.Name = "TextInteract"
-        Me.TextInteract.Size = New System.Drawing.Size(43, 20)
+        Me.TextInteract.Size = New System.Drawing.Size(53, 20)
         Me.TextInteract.TabIndex = 3
-        Me.TextInteract.Text = "10"
         Me.TextInteract.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.TextInteract.Value = New Decimal(New Integer() {10, 0, 0, 0})
         '
         'TextRekombxy
         '
         Me.TextRekombxy.Location = New System.Drawing.Point(32, 192)
-        Me.TextRekombxy.MaxLength = 0
+        Me.TextRekombxy.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.TextRekombxy.Name = "TextRekombxy"
-        Me.TextRekombxy.Size = New System.Drawing.Size(25, 20)
+        Me.TextRekombxy.Size = New System.Drawing.Size(40, 20)
         Me.TextRekombxy.TabIndex = 6
-        Me.TextRekombxy.Text = "2"
         Me.TextRekombxy.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.TextRekombxy.Value = New Decimal(New Integer() {2, 0, 0, 0})
         '
         'ComboOptEltern
         '
         Me.ComboOptEltern.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboOptEltern.Location = New System.Drawing.Point(64, 160)
         Me.ComboOptEltern.Name = "ComboOptEltern"
-        Me.ComboOptEltern.Size = New System.Drawing.Size(121, 21)
+        Me.ComboOptEltern.Size = New System.Drawing.Size(129, 21)
         Me.ComboOptEltern.TabIndex = 5
         '
         'TextAnzNachf
         '
         Me.TextAnzNachf.Location = New System.Drawing.Point(140, 61)
-        Me.TextAnzNachf.MaxLength = 0
+        Me.TextAnzNachf.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
+        Me.TextAnzNachf.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.TextAnzNachf.Name = "TextAnzNachf"
-        Me.TextAnzNachf.Size = New System.Drawing.Size(43, 20)
+        Me.TextAnzNachf.Size = New System.Drawing.Size(53, 20)
         Me.TextAnzNachf.TabIndex = 2
-        Me.TextAnzNachf.Text = "10"
         Me.TextAnzNachf.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.TextAnzNachf.Value = New Decimal(New Integer() {10, 0, 0, 0})
         '
         'TextAnzEltern
         '
         Me.TextAnzEltern.Location = New System.Drawing.Point(140, 39)
-        Me.TextAnzEltern.MaxLength = 0
+        Me.TextAnzEltern.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
+        Me.TextAnzEltern.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.TextAnzEltern.Name = "TextAnzEltern"
-        Me.TextAnzEltern.Size = New System.Drawing.Size(43, 20)
+        Me.TextAnzEltern.Size = New System.Drawing.Size(53, 20)
         Me.TextAnzEltern.TabIndex = 1
-        Me.TextAnzEltern.Text = "3"
         Me.TextAnzEltern.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.TextAnzEltern.Value = New Decimal(New Integer() {3, 0, 0, 0})
         '
         'TextAnzGen
         '
         Me.TextAnzGen.Location = New System.Drawing.Point(140, 16)
-        Me.TextAnzGen.MaxLength = 0
+        Me.TextAnzGen.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
+        Me.TextAnzGen.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.TextAnzGen.Name = "TextAnzGen"
-        Me.TextAnzGen.Size = New System.Drawing.Size(43, 20)
+        Me.TextAnzGen.Size = New System.Drawing.Size(53, 20)
         Me.TextAnzGen.TabIndex = 0
-        Me.TextAnzGen.Text = "1"
         Me.TextAnzGen.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.TextAnzGen.Value = New Decimal(New Integer() {1, 0, 0, 0})
         '
         'LabelNMemberSecondPop
         '
@@ -321,7 +337,7 @@ Partial Class EVO_Einstellungen
         'LabelInteract
         '
         Me.LabelInteract.AutoSize = True
-        Me.LabelInteract.Location = New System.Drawing.Point(8, 96)
+        Me.LabelInteract.Location = New System.Drawing.Point(8, 98)
         Me.LabelInteract.Name = "LabelInteract"
         Me.LabelInteract.Size = New System.Drawing.Size(121, 13)
         Me.LabelInteract.TabIndex = 38
@@ -337,9 +353,9 @@ Partial Class EVO_Einstellungen
         '
         'LabelRekombxy3
         '
-        Me.LabelRekombxy3.Location = New System.Drawing.Point(56, 195)
+        Me.LabelRekombxy3.Location = New System.Drawing.Point(74, 194)
         Me.LabelRekombxy3.Name = "LabelRekombxy3"
-        Me.LabelRekombxy3.Size = New System.Drawing.Size(129, 17)
+        Me.LabelRekombxy3.Size = New System.Drawing.Size(98, 17)
         Me.LabelRekombxy3.TabIndex = 25
         Me.LabelRekombxy3.Text = "-Rekombination"
         '
@@ -435,14 +451,14 @@ Partial Class EVO_Einstellungen
         '
         'TextAnzRunden
         '
-        Me.TextAnzRunden.AcceptsReturn = True
         Me.TextAnzRunden.Location = New System.Drawing.Point(140, 13)
-        Me.TextAnzRunden.MaxLength = 0
+        Me.TextAnzRunden.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
+        Me.TextAnzRunden.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.TextAnzRunden.Name = "TextAnzRunden"
-        Me.TextAnzRunden.Size = New System.Drawing.Size(43, 20)
+        Me.TextAnzRunden.Size = New System.Drawing.Size(53, 20)
         Me.TextAnzRunden.TabIndex = 0
-        Me.TextAnzRunden.Text = "50"
         Me.TextAnzRunden.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.TextAnzRunden.Value = New Decimal(New Integer() {50, 0, 0, 0})
         '
         'LabelAnzPop
         '
@@ -455,14 +471,14 @@ Partial Class EVO_Einstellungen
         '
         'TextAnzPop
         '
-        Me.TextAnzPop.AcceptsReturn = True
         Me.TextAnzPop.Location = New System.Drawing.Point(140, 36)
-        Me.TextAnzPop.MaxLength = 0
+        Me.TextAnzPop.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
+        Me.TextAnzPop.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.TextAnzPop.Name = "TextAnzPop"
-        Me.TextAnzPop.Size = New System.Drawing.Size(43, 20)
+        Me.TextAnzPop.Size = New System.Drawing.Size(53, 20)
         Me.TextAnzPop.TabIndex = 1
-        Me.TextAnzPop.Text = "5"
         Me.TextAnzPop.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.TextAnzPop.Value = New Decimal(New Integer() {5, 0, 0, 0})
         '
         'LabelAnzPopEltern
         '
@@ -475,14 +491,14 @@ Partial Class EVO_Einstellungen
         '
         'TextAnzPopEltern
         '
-        Me.TextAnzPopEltern.AcceptsReturn = True
         Me.TextAnzPopEltern.Location = New System.Drawing.Point(140, 58)
-        Me.TextAnzPopEltern.MaxLength = 0
+        Me.TextAnzPopEltern.Maximum = New Decimal(New Integer() {5, 0, 0, 0})
+        Me.TextAnzPopEltern.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.TextAnzPopEltern.Name = "TextAnzPopEltern"
-        Me.TextAnzPopEltern.Size = New System.Drawing.Size(43, 20)
+        Me.TextAnzPopEltern.Size = New System.Drawing.Size(53, 20)
         Me.TextAnzPopEltern.TabIndex = 2
-        Me.TextAnzPopEltern.Text = "2"
         Me.TextAnzPopEltern.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.TextAnzPopEltern.Value = New Decimal(New Integer() {2, 0, 0, 0})
         '
         'LabelOptPopEltern
         '
@@ -539,10 +555,20 @@ Partial Class EVO_Einstellungen
         Me.Size = New System.Drawing.Size(217, 586)
         Me.GroupBox_Einstellungen.ResumeLayout(False)
         Me.GroupBox_Einstellungen.PerformLayout()
+        CType(Me.TextDeltaStart, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox_Generationen.ResumeLayout(False)
         Me.GroupBox_Generationen.PerformLayout()
+        CType(Me.TextNMemberSecondPop, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.TextInteract, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.TextRekombxy, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.TextAnzNachf, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.TextAnzEltern, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.TextAnzGen, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox_Populationen.ResumeLayout(False)
         Me.GroupBox_Populationen.PerformLayout()
+        CType(Me.TextAnzRunden, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.TextAnzPop, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.TextAnzPopEltern, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
