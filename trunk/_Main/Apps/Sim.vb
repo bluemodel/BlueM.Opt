@@ -487,7 +487,7 @@ Public MustInherit Class Sim
         Loop Until StrRead.Peek() = -1
 
         If (AnzZiele > 3) Then
-            MsgBox("Die Anzahl der Ziele beträgt mehr als 3!" & Chr(13) & Chr(10) _
+            MsgBox("Die Anzahl der Ziele beträgt mehr als 3!" & eol _
                     & "Es werden nur die ersten drei Zielfunktionen im Hauptdiagramm angezeigt!", MsgBoxStyle.Information, "Info")
         End If
 

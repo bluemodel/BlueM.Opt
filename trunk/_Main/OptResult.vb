@@ -268,11 +268,11 @@ Public Class OptResult
         Call Me.db_prepare()
         'Methodenspezifische Anpassungen
         Select Case Me.Method
-            Case "PES", "SensiPlot"
+            Case METH_PES, METH_SENSIPLOT
                 Call Me.db_prepare_PES()
-            Case "CES"
+            Case METH_CES
                 Call Me.db_prepare_CES()
-            Case "CES + PES", "Hybrid"
+            Case METH_CES_PES, METH_HYBRID
                 Call Me.db_prepare_PES()
                 Call Me.db_prepare_CES()
         End Select
@@ -431,7 +431,7 @@ Public Class OptResult
             command.ExecuteNonQuery()
         End If
 
-        If (Me.Method = "PES" Or Me.Method = "CES + PES" Or Me.Method = "SensiPlot") Then
+        If (Me.Method = METH_PES Or Me.Method = METH_CES_PES Or Me.Method = METH_SENSIPLOT) Then
 
             'OptParameter schreiben
             '----------------------
@@ -561,10 +561,10 @@ Public Class OptResult
         'Fallunterscheidung nach Methode
         Select Case Me.Method
 
-            Case "PES", "SensiPlot"
+            Case METH_PES, METH_SENSIPLOT
 
                 'Unterscheidung
-                If (Me.Method = "SensiPlot") Then
+                If (Me.Method = METH_SENSIPLOT) Then
                     'xAchse ist QWert, yAchse ist OptPara
                     q = "SELECT OptParameter.* FROM OptParameter INNER JOIN QWerte ON OptParameter.Sim_ID = QWerte.Sim_ID WHERE (OptParameter.[" & yAchse & "] = " & yWert & " AND QWerte.[" & xAchse & "] = " & xWert & ")"
                 ElseIf (Me.List_OptZiele.Length = 1) Then
@@ -585,7 +585,7 @@ Public Class OptResult
                     MsgBox("Es wurde keine Übereinstimmung in der Datenbank gefunden!", MsgBoxStyle.Exclamation, "Problem")
                     Return False
                 ElseIf (numrows > 1) Then
-                    MsgBox("Es wurden mehr als eine Entsprechung von OptParametern für den gewählten Punkt gefunden!" & Chr(13) & Chr(10) & "Es wird nur das erste Ergebnis verwendet!", MsgBoxStyle.Exclamation, "Problem")
+                    MsgBox("Es wurden mehr als eine Entsprechung von OptParametern für den gewählten Punkt gefunden!" & eol & "Es wird nur das erste Ergebnis verwendet!", MsgBoxStyle.Exclamation, "Problem")
                 End If
 
                 'OptParametersatz übernehmen
@@ -600,7 +600,7 @@ Public Class OptResult
                 'BUG 260: db_getPara für CES
 
 
-                'Case "CES"
+                'Case METH_CES
 
                 '    q = "SELECT Pfad.* FROM Pfad INNER JOIN QWerte ON Pfad.Sim_ID = QWerte.Sim_ID WHERE (QWerte.[" & xAchse & "] = " & xWert & " AND QWerte.[" & yAchse & "] = " & yWert & ")"
 
@@ -614,7 +614,7 @@ Public Class OptResult
                 '        MsgBox("Es wurde keine Übereinstimmung in der Datenbank gefunden!", MsgBoxStyle.Exclamation, "Problem")
                 '        Return False
                 '    ElseIf (numrows > 1) Then
-                '        MsgBox("Es wurden mehr als eine Entsprechung von Pfaden für den gewählten Punkt gefunden!" & Chr(13) & Chr(10) & "Es wird nur das erste Ergebnis verwendet!", MsgBoxStyle.Exclamation, "Problem")
+                '        MsgBox("Es wurden mehr als eine Entsprechung von Pfaden für den gewählten Punkt gefunden!" & eol & "Es wird nur das erste Ergebnis verwendet!", MsgBoxStyle.Exclamation, "Problem")
                 '    End If
 
                 '    'Pfad übernehmen
@@ -626,7 +626,7 @@ Public Class OptResult
                 '    Call Me.PREPARE_Evaluation_CES()
 
 
-                'Case "CES + PES"
+                'Case METH_CES_PES
 
                 '    q = "SELECT OptParameter.*, Pfad.* FROM (((Sim LEFT JOIN Constraints ON Sim.ID = Constraints.Sim_ID) INNER JOIN OptParameter ON Sim.ID = OptParameter.Sim_ID) INNER JOIN Pfad ON Sim.ID = Pfad.Sim_ID) INNER JOIN QWerte ON Sim.ID = QWerte.Sim_ID WHERE (QWerte.[" & xAchse & "] = " & xWert & " AND QWerte.[" & yAchse & "] = " & yWert & ")"
 
@@ -642,7 +642,7 @@ Public Class OptResult
                 '        MsgBox("Es wurde keine Übereinstimmung in der Datenbank gefunden!", MsgBoxStyle.Exclamation, "Problem")
                 '        Return False
                 '    ElseIf (numrows > 1) Then
-                '        MsgBox("Es wurden mehr als eine Entsprechung von OptParametern / Pfad für den gewählten Punkt gefunden!" & Chr(13) & Chr(10) & "Es wird nur das erste Ergebnis verwendet!", MsgBoxStyle.Exclamation, "Problem")
+                '        MsgBox("Es wurden mehr als eine Entsprechung von OptParametern / Pfad für den gewählten Punkt gefunden!" & eol & "Es wird nur das erste Ergebnis verwendet!", MsgBoxStyle.Exclamation, "Problem")
                 '    End If
 
                 '    'Pfad übernehmen
