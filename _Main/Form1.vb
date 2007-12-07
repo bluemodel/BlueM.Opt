@@ -30,20 +30,9 @@ Partial Class Form1
 
     'Anwendung
     Private Anwendung As String
-    Private Const ANW_BLUEM As String = "BlueM"
-    Private Const ANW_SMUSI As String = "Smusi"
-    Private Const ANW_SCAN As String = "S:CAN"
-    Private Const ANW_TESTPROBLEME As String = "Testprobleme"
-    Private Const ANW_TSP As String = "Traveling Salesman"
 
     'Optimierungsmethode
     Private Method As String
-    Private Const METH_RESET As String = "Reset"
-    Private Const METH_PES As String = "PES"
-    Private Const METH_CES As String = "CES"
-    Private Const METH_CES_PES As String = "CES + PES"
-    Private Const METH_HYBRID As String = "HYBRID"
-    Private Const METH_SENSIPLOT As String = "SensiPlot"
 
     '**** Deklarationen der Module *****
     Public WithEvents Sim1 As Sim
@@ -66,8 +55,6 @@ Partial Class Form1
     '**** Verschiedenes ****
     Dim isrun As Boolean = False                        'Optimierung läuft
     Dim ispause As Boolean = False                      'Optimierung ist pausiert
-
-    Const eol As String = Chr(13) & Chr(10)             'Zeilenumbruch
 
     'Dialoge
     Public WithEvents solutionDialog As SolutionDialog
