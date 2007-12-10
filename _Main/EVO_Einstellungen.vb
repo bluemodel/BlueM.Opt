@@ -73,6 +73,8 @@ Public Class EVO_Einstellungen
         TextAnzEltern.Text = CStr(AnzEltern)
         TextAnzNachf.Text = CStr(AnzNachf)
 
+        System.Windows.Forms.Application.DoEvents()
+
     End Sub
 
 
