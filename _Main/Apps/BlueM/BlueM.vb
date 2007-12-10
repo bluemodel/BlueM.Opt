@@ -53,7 +53,7 @@ Public Class BlueM
         'BlueM DLL instanzieren
         '----------------------
         Dim dll_path As String
-        dll_path = System.Windows.Forms.Application.StartupPath() & "\Apps\BlueM.dll"
+        dll_path = System.Windows.Forms.Application.StartupPath() & "\Apps\BlueM\BlueM.dll"
 
         If (File.Exists(dll_path)) Then
             bluem_dll = New BlueM_EngineDotNetAccess(dll_path)

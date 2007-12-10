@@ -1,14 +1,14 @@
 Module swmm5_iface
 
-    Declare Function swmm_run Lib "Apps\swmm5.dll" (ByVal F1 As String, ByVal F2 As String, ByVal F3 As String) As Integer
-    Declare Function swmm_open Lib "Apps\swmm5.dll" (ByVal F1 As String, ByVal F2 As String, ByVal F3 As String) As Integer
-    Declare Function swmm_start Lib "Apps\swmm5.dll" (ByVal saveFlag As Integer) As Integer
-    Declare Function swmm_step Lib "Apps\swmm5.dll" (ByRef elapsedTime As Double) As Integer
-    Declare Function swmm_end Lib "Apps\swmm5.dll" () As Integer
-    Declare Function swmm_report Lib "Apps\swmm5.dll" () As Integer
-    Declare Function swmm_getMassBalErr Lib "Apps\swmm5.dll" (ByRef runoffErr As Single, ByRef flowErr As Single, ByRef qualErr As Single) As Integer
-    Declare Function swmm_close Lib "Apps\swmm5.dll" () As Integer
-    Declare Function swmm_getVersion Lib "Apps\swmm5.dll" () As Long
+    Declare Function swmm_run Lib "Apps\SWMM\swmm5.dll" (ByVal F1 As String, ByVal F2 As String, ByVal F3 As String) As Integer
+    Declare Function swmm_open Lib "Apps\SWMM\swmm5.dll" (ByVal F1 As String, ByVal F2 As String, ByVal F3 As String) As Integer
+    Declare Function swmm_start Lib "Apps\SWMM\swmm5.dll" (ByVal saveFlag As Integer) As Integer
+    Declare Function swmm_step Lib "Apps\SWMM\swmm5.dll" (ByRef elapsedTime As Double) As Integer
+    Declare Function swmm_end Lib "Apps\SWMM\swmm5.dll" () As Integer
+    Declare Function swmm_report Lib "Apps\SWMM\swmm5.dll" () As Integer
+    Declare Function swmm_getMassBalErr Lib "Apps\SWMM\swmm5.dll" (ByRef runoffErr As Single, ByRef flowErr As Single, ByRef qualErr As Single) As Integer
+    Declare Function swmm_close Lib "Apps\SWMM\swmm5.dll" () As Integer
+    Declare Function swmm_getVersion Lib "Apps\SWMM\swmm5.dll" () As Long
 
     Private Structure STARTUPINFO
         Dim cb As Integer
