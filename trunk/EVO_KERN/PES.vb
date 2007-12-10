@@ -47,7 +47,7 @@ Public Class PES
         Dim ty_OptPopEltern As EVO_POP_ELTERN   'Ermittlung der Populationseltern
         Dim ty_OptEltern As EVO_ELTERN          'Ermittlung der Individuum-Eltern
         Dim n_RekombXY As Integer               'X/Y-Schema Rekombination
-        Dim DnStart As Single                   'Startschrittweite
+        Dim DnStart As Double                   'Startschrittweite
         Dim ty_StartPar As EVO_STARTPARAMETER   'Startparameter
         Dim is_DnVektor As Boolean              'Soll ein Schrittweitenvektor benutzt werden
         Dim n_Interact As Integer               'Alle wieviel Generationen soll die aktuelle Population mit Mitgliedern der sekundären Population aufgefüllt werden
@@ -119,7 +119,6 @@ Public Class PES
     End Structure
 
     Public Best As Bestwerte
-
 
     '---Stuff--------------
     Private Distanceb() As Double           'Array mit Crowding-Distance (Neighbourhood-Rekomb.)
