@@ -371,8 +371,7 @@ Public Class SWMM
         Dim AvgFEast As Double, AvgFGath As Double, AvgFWest As Double
         Dim DateiPfad As String
         Dim Zeile As String
-        Dim i As Integer
-
+        
         DateiPfad = WorkDir & Datensatz & ".RPT"
 
         'RPT-Datei öffnen
