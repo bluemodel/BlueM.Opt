@@ -30,7 +30,7 @@
     </UpgradeBackupLocation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>..\bin\</OutputPath>
+    <OutputPath>..\bin\Debug\</OutputPath>
     <DocumentationFile>Evo.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <ConfigurationOverrideFile>
@@ -48,7 +48,7 @@
     <DebugType>full</DebugType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <OutputPath>..\bin\</OutputPath>
+    <OutputPath>..\bin\Release\</OutputPath>
     <DocumentationFile>Evo.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <ConfigurationOverrideFile>
@@ -67,6 +67,7 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Accessibility" />
     <Reference Include="IHWB.BlueM.DllAdapter, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualBasic.Compatibility">
       <Name>Microsoft.VisualBasic.Compatibility</Name>
@@ -95,6 +96,10 @@
       <Project>{58356A07-425E-4C91-ACB8-17B9286C9417}</Project>
       <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
     </ProjectReference>
+    <ProjectReference Include="..\SMUSI.DLLAdapter\IHWB.SMUSI.DllAdapter.csproj">
+      <Project>{5EF7B5ED-84AE-4302-9B76-E1B87D1AB306}</Project>
+      <Name>IHWB.SMUSI.DllAdapter</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Wave\Wave.vbproj">
       <Project>{BCD1BBE3-5AB2-4C3F-AC12-43EB977C6F6F}</Project>
       <Name>Wave</Name>
@@ -115,6 +120,7 @@
     </Compile>
     <Compile Include="Apps\IHA.vb">
     </Compile>
+    <Compile Include="Apps\Scan.vb" />
     <Compile Include="Apps\SensiPlot.Designer.vb">
       <DependentUpon>SensiPlot.vb</DependentUpon>
     </Compile>
@@ -142,10 +148,16 @@
     <Compile Include="Diagramm\DiagrammForm.vb">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Diagramm\ScatterplotAbfrage.Designer.vb">
-      <DependentUpon>ScatterplotAbfrage.vb</DependentUpon>
+    <Compile Include="Diagramm\MDBImportDialog.Designer.vb">
+      <DependentUpon>MDBImportDialog.vb</DependentUpon>
     </Compile>
-    <Compile Include="Diagramm\ScatterplotAbfrage.vb">
+    <Compile Include="Diagramm\MDBImportDialog.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Diagramm\SolutionDialog.Designer.vb">
+      <DependentUpon>SolutionDialog.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Diagramm\SolutionDialog.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="EVOMOD.vb" />
@@ -192,6 +204,7 @@
     </Compile>
     <Compile Include="OptResult.vb" />
     <Compile Include="Settings.vb" />
+    <Compile Include="Solution.vb" />
     <EmbeddedResource Include="Apps\SensiPlot.resx">
       <DependentUpon>SensiPlot.vb</DependentUpon>
       <SubType>Designer</SubType>
@@ -204,9 +217,13 @@
       <SubType>Designer</SubType>
       <DependentUpon>DiagrammForm.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Diagramm\ScatterplotAbfrage.resx">
+    <EmbeddedResource Include="Diagramm\MDBImportDialog.resx">
       <SubType>Designer</SubType>
-      <DependentUpon>ScatterplotAbfrage.vb</DependentUpon>
+      <DependentUpon>MDBImportDialog.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Diagramm\SolutionDialog.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>SolutionDialog.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="EVO_Einstellungen.resX">
       <DependentUpon>EVO_Einstellungen.vb</DependentUpon>
@@ -260,8 +277,11 @@
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
     </Content>
+    <None Include="Resources\cancel.png" />
     <Content Include="Resources\EVO.ico" />
     <Content Include="Resources\icon_teechart.png" />
+    <None Include="Resources\page_white_database.png" />
+    <None Include="Resources\wave.ico" />
     <None Include="Resources\scatterplot.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />

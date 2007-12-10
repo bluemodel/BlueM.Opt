@@ -310,13 +310,21 @@ Public Class BlueM
         '-------------------------------
         If (simOK) Then
 
+			'Altes Simulationsergebnis löschen
+            Me.SimErgebnis.Clear()
+
             'WEL-Datei einlesen
-            Me.SimErgebnis = New Wave.WEL(Me.WorkDir & Me.Datensatz & ".WEL", True)
+            Dim WELtmp As Wave.WEL = New Wave.WEL(Me.WorkDir & Me.Datensatz & ".WEL", True)
+
+            'Simulationsergebnis abspeichern
+            For Each zre As Wave.Zeitreihe In WELtmp.Zeitreihen
+                Me.SimErgebnis.Add(zre, zre.ToString())
+            Next
 
             'Bei IHA-Berechnung jetzt IHA-Software ausführen
             If (Me.isIHA) Then
                 Dim IHAReihe As Wave.Zeitreihe
-                IHAReihe = Me.SimErgebnis.getReihe(Me.IHA1.IHAZiel.SimGr)
+                IHAReihe = Me.SimErgebnis(Me.IHA1.IHAZiel.SimGr)
                 Call Me.IHA1.calculate_IHA(IHAReihe)
             End If
 
@@ -330,15 +338,42 @@ Public Class BlueM
 
 #Region "Qualitätswertberechnung"
 
+    'Berechnung des Qualitätswerts (Zielwert)
+    '****************************************
+    Public Overrides Function QWert(ByVal OptZiel As Struct_OptZiel) As Double
+
+        QWert = 0
+
+        'Fallunterscheidung Ergebnisdatei
+        '--------------------------------
+        Select Case OptZiel.Datei
+
+            Case "WEL"
+                'QWert aus WEL-Datei
+                QWert = QWert_WEL(OptZiel)
+
+            Case "PRB"
+                'QWert aus PRB-Datei
+                'BUG 220: PRB geht nicht, weil keine Zeitreihe
+                Throw New Exception("PRB als OptZiel geht z.Zt. nicht (siehe Bug 138)")
+                'QWert = QWert_PRB(OptZiel)
+
+            Case Else
+                Throw New Exception("Der Wert '" & Optziel.Datei & "' für die Datei wird bei Optimierungszielen für BlueM nicht akzeptiert!")
+
+        End Select
+
+    End Function
+
     'Qualitätswert aus WEL-Datei
     '***************************
-    Protected Overrides Function QWert_WEL(ByVal OptZiel As Struct_OptZiel) As Double
+    Private Function QWert_WEL(ByVal OptZiel As Struct_OptZiel) As Double
 
         Dim QWert As Double
+        Dim SimReihe As Wave.Zeitreihe
 
         'Simulationsergebnis auslesen
-        Dim SimReihe As Wave.Zeitreihe
-        SimReihe = Me.SimErgebnis.getReihe(OptZiel.SimGr)
+        SimReihe = Me.SimErgebnis(OptZiel.SimGr)
 
         'Fallunterscheidung Zieltyp
         '--------------------------

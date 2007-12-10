@@ -20,6 +20,7 @@ Public Class CES
 
     'Public Variablen
     Public TestModus As Integer             'Gibt den Testmodus an
+
     Public n_Combinations As Integer        'Anzahl aller Kombinationen
     Public n_Locations As Integer           'Anzahl der Locations wird von außen gesetzt
     Public n_Penalty As Integer             'Anzahl der Ziele wird von außen gesetzt
@@ -29,9 +30,12 @@ Public Class CES
 
     'Eingabe
     Public n_Parts_of_Path As Integer = 3   'Länge des Gedächtnispfades Achtung Maximum ist 3
-    Public n_Generations As Integer = 7     'Anzahl der Generationen
+    Public n_Generations As Integer = 500   'Anzahl der Generationen
     Public n_Parents As Integer = 3
-    Public n_Childs As Integer = 4
+    Public n_Childs As Integer = 7
+    Public n_MemberSecondPop As Integer = 50
+    Public n_Interact As Integer = 3
+    Public is_Interact As Boolean = True
 
     'Private Variablen
     Private ReprodOperator As String = "Select_Random_Uniform"
@@ -39,274 +43,21 @@ Public Class CES
     Private Strategy As String = "plus"         '"plus" oder "minus" Strategie
     Private MutRate As Integer = 10              'Definiert die Wahrscheinlichkeit der Mutationsrate in %
 
-    'Faksimile Struktur - enthält alles was für eine Evaluierung erforderlich ist
-    '****************************************************************************
-    Public Structure Faksimile
-        Dim Type As String                  '01 Typ des Faksimile
-        Dim No As Short                     '02 Nummer des Faksimile
-        Dim Path() As Integer               '03 Der Pfad
-        Dim Penalty() As Double             '04 Werte der Penaltyfunktion(en)
-        Dim Constrain() As Double           '05 Wert der Randbedingung(en)
-        Dim mutated As Boolean              '06 Gibt an ob der Wert bereits mutiert ist oder nicht
-
-        'Für ND Sorting -------------------------------------------------
-        Dim dominated As Boolean            '07 Kennzeichnung ob Dominiert
-        Dim Front As Short                  '08 Nummer der Pareto Front
-        Dim Distance As Double              '09 Für crowding distance
-        'Dim Feasible As Boolean            'Gültiges Ergebnis ?
-
-        'Information pro Location ---------------------------------------
-        Dim Measures() as String            '09a Die Namen der Maßnahmen
-        Dim Loc() As Location_Data          '10 + 11a Information pro Location
-
-        'Für PES Memory -------------------------------------------------
-        Dim Generation As Integer           '12 Die Generation (eher zur Information)
-
-        'Für PES Parent -------------------------------------------------
-        Dim Memory_Rank As Integer          '13 MemoryRang des PES Elters
-        Dim iLocation As Integer            '14 Location des PES Parent
-
-        'Gibt ein Array mit den Elementen aller Locations zurück
-        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        Public ReadOnly Property All_Elem() As String()
-            Get
-                Dim i As Integer
-                Dim array() As String = {}
-                For i = 0 To Loc.GetUpperBound(0)
-                    If Loc(i).Loc_Elem.GetLength(0) = 0 Then
-                        Throw New Exception("Die Element Gesamtliste wurde abgerufen bevor die Elemente pro Location ermittelt wurden")
-                    End If
-                    ReDim Preserve array(array.GetUpperBound(0) + Loc(i).Loc_Elem.GetLength(0))
-                    System.Array.Copy(Loc(i).Loc_Elem, 0, array, array.GetUpperBound(0) - Loc(i).Loc_Elem.GetUpperBound(0), Loc(i).Loc_Elem.GetLength(0))
-                Next
-                All_Elem = array.Clone
-            End Get
-
-        End Property
-
-        'Gibt ein Array mit den Parametern aller Locations zurück
-        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        Public ReadOnly Property All_Para() As Double()
-            Get
-                Dim i, j, x As Integer
-                Dim array() As Double = {}
-                x = 0
-                For i = 0 To Loc.GetUpperBound(0)
-                    For j = 0 To Loc(i).Loc_Para.GetUpperBound(1)
-                        ReDim Preserve array(x)
-                        array(x) = Loc(i).Loc_Para(1, j)
-                        x += 1
-                    Next
-                Next
-                All_Para = array.Clone
-            End Get
-
-        End Property
-    End Structure
-
-    'Informationen pro Location
-    '**************************
-    Public Structure Location_Data
-        Dim Loc_Para(,) As Object           '10 Die Optimierungsparameter für PES
-        Dim Loc_Dn() As Object              '11 Das Dn für PES
-        Dim Loc_Elem() As String            '11a Die Elemente die zur Location gehören
-
-        'Verändert die Parameter im Parameter Array
-        Public Property Parameter() As Double()
-            Get
-                Dim i As Integer
-                Dim Array(Loc_Para.GetUpperBound(1)) As Double
-                For i = 0 To Loc_Para.GetUpperBound(1)
-                    Array(i) = Loc_Para(1, i)
-                Next
-                Parameter = Array.Clone
-            End Get
-
-            Set(ByVal Parameter() As Double)
-                Dim i As Integer
-                For i = 0 To Loc_Para.GetUpperBound(1)
-                    Loc_Para(1, i) = Parameter(i)
-                Next
-            End Set
-
-        End Property
-
-    End Structure
-
-    Public List_Childs() As Faksimile
-    Public List_Parents() As Faksimile
-    Public NDSorting(n_Childs + n_Parents - 1) As Faksimile
-    Public NDSResult(n_Childs + n_Parents - 1) As Faksimile
-    Public Memory() As Faksimile
-    Public PES_Parents() As Faksimile
+    'Listen für die Individuen
+    '*************************
+    Public Childs() As EVO.Kern.Individuum
+    Public Parents() As EVO.Kern.Individuum
+    Private SekundärQb(-1) As EVO.Kern.Individuum
+    Public NDSorting(n_Childs + n_Parents - 1) As EVO.Kern.Individuum
+    Public NDSResult(n_Childs + n_Parents - 1) As EVO.Kern.Individuum
+    Public Memory() As EVO.Kern.Individuum
+    Public PES_Parents() As EVO.Kern.Individuum
 
 
 #End Region 'Eigenschaften
 
 #Region "Methoden"
     '#############
-
-    'Dimensionieren eines einzelnen Faksimile (Überladen)
-    '****************************************************
-    Public Sub Faksimile_Dim(ByRef TMP As Faksimile, ByVal Type As String, ByVal No As Integer)
-
-        Dim i, j As Integer
-
-        '01 Typ des Faksimile
-        TMP.Type = Type
-
-        '02 Nummer des Faksimile
-        TMP.No = No + 1
-
-        '03 Der Pfad - zur Kontrolle wird falscher Pfad gesetzt
-        ReDim TMP.Path(n_Locations - 1)
-        For j = 0 To TMP.Path.GetUpperBound(0)
-            TMP.Path(j) = 777
-        Next
-
-        '04 Werte der Penaltyfunktion(en)
-        ReDim TMP.Penalty(n_Penalty - 1)
-        For j = 0 To n_Penalty - 1
-            TMP.Penalty(j) = 1.0E+300
-        Next
-
-        '05 Wert der Randbedingung(en)
-        If n_Constrain = 0 Then
-            ReDim TMP.Constrain(-1)
-        Else
-            ReDim TMP.Constrain(n_Constrain - 1)
-            For j = 0 To TMP.Constrain.GetUpperBound(0)
-                TMP.Constrain(j) = -1.0E+300
-            Next
-        End If
-
-        '06 Gibt an ob der Wert bereits mutiert ist oder nicht
-        TMP.mutated = False
-
-        '07 Kennzeichnung ob Dominiert
-        TMP.dominated = False
-
-        '08 Nummer der Pareto Front
-        TMP.Front = 0
-
-        '09 Für crowding distance
-        TMP.Distance = 0
-
-        '09a Die Namen der Maßnahmen
-        Redim TMP.Measures(n_Locations - 1)
-
-        '11 + 10 Informationen pro Location
-        ReDim TMP.Loc(n_Locations - 1)
-
-        For i = 0 To TMP.Loc.GetUpperBound(0)
-
-            '10 Die Optimierungsparameter - wird dynamisch behandelt
-            ReDim TMP.Loc(i).Loc_Para(1, 0)
-            For j = 0 To TMP.Loc(i).Loc_Para.GetUpperBound(1)
-                TMP.Loc(i).Loc_Para(0, j) = "xxx"
-                TMP.Loc(i).Loc_Para(1, j) = 777
-            Next
-
-            '11 Das Dn für PES
-            ReDim TMP.Loc(i).Loc_Dn(0)
-            For j = 0 To TMP.Loc(i).Loc_Dn.GetUpperBound(0)
-                TMP.Loc(i).Loc_Dn(j) = 777
-            Next
-
-            '11a Die Elemente die zur Location gehören
-            ReDim TMP.Loc(i).Loc_Elem(-1)
-        Next
-
-        '12 Die Generation (eher zur Information)
-        TMP.Generation = 0
-
-        '13 MemoryRang des PES Elters
-        TMP.Memory_Rank = 777
-
-        '14 Location des PES Parent
-        TMP.iLocation = 777
-
-    End Sub
-
-    'Dim Faksimile für ein Array (Überladen)
-    '***************************************
-    Public Sub Faksimile_Dim(ByRef TMP() As Faksimile, ByVal Type As String)
-        Dim i As Integer
-
-        For i = 0 To TMP.GetUpperBound(0)
-            Call Faksimile_Dim(TMP(i), Type, i)
-        Next
-    End Sub
-
-    'Kopiert ein Faksimile
-    '*********************
-    Private Sub Faksimile_Copy(ByVal Source As Faksimile, ByRef Dest As Faksimile)
-
-        Dim i As Integer
-
-        '01 Typ des Faksimile
-        'Dest.Type Bleibt bestehen
-
-        '02 Nummer des Faksimile
-        Dest.No = Source.No
-
-        '03 Der Pfad - zur Kontrolle wird falscher Pfad gesetzt
-        ReDim Dest.Path(Source.Path.GetUpperBound(0))
-        Array.Copy(Source.Path, Dest.Path, Source.Path.Length)
-
-        '04 Werte der Penaltyfunktion(en)
-        ReDim Dest.Penalty(Source.Penalty.GetUpperBound(0))
-        Array.Copy(Source.Penalty, Dest.Penalty, Source.Penalty.Length)
-
-        '05 Wert der Randbedingung(en)
-        If Not n_Constrain = 0 Then
-            Array.Copy(Source.Constrain, Dest.Constrain, Source.Constrain.Length)
-        End If
-
-        '06 Gibt an ob der Wert bereits mutiert ist oder nicht
-        Dest.mutated = Source.mutated
-
-        '07 Kennzeichnung ob Dominiert
-        Dest.dominated = Source.dominated
-
-        '08 Nummer der Pareto Front
-        Dest.Front = Source.Front
-
-        '09 Für crowding distance
-        Dest.Distance = Source.Distance
-
-        '09a Die Namen der Maßnahmen
-        ReDim Dest.Measures(Source.Measures.GetUpperBound(0))
-        Array.Copy(Source.Measures, Dest.Measures, Source.Measures.Length)
-
-        '10 + 11 Die PES Informationen
-        ReDim Dest.Loc(Source.Loc.GetUpperBound(0))
-
-        For i = 0 To Source.Loc.GetUpperBound(0)
-
-            '10 Die Optimierungsparameter - wird dynamisch behandelt (Funzt auch für 2D Array)
-            ReDim Dest.Loc(i).Loc_Para(1, Source.Loc(i).Loc_Para.GetUpperBound(1))
-            Array.Copy(Source.Loc(i).Loc_Para, Dest.Loc(i).Loc_Para, Source.Loc(i).Loc_Para.Length)
-
-            '11 Das Dn für PES
-            ReDim Dest.Loc(i).Loc_Dn(Source.Loc(i).Loc_Dn.GetUpperBound(0))
-            Array.Copy(Source.Loc(i).Loc_Dn, Dest.Loc(i).Loc_Dn, Source.Loc(i).Loc_Dn.Length)
-
-            '11a Die Elemte die zur Location gehören
-            ReDim Dest.Loc(i).Loc_Elem(Source.Loc(i).Loc_Elem.GetUpperBound(0))
-            Array.Copy(Source.Loc(i).Loc_Elem, Dest.Loc(i).Loc_Elem, Source.Loc(i).Loc_Elem.Length)
-        Next
-
-        '12 Die Generation (eher zur Information)
-        Dest.Generation = Source.Generation
-
-        '13 MemoryRang des PES Elters
-        Dest.Memory_Rank = Source.Memory_Rank
-
-        '14 Location des PES Parent
-        Dest.iLocation = Source.iLocation
-
-    End Sub
 
     'Normaler Modus: Generiert zufällige Paths für alle Kinder BM Problem
     '*********************************************************************
@@ -323,11 +74,11 @@ Public Class CES
                     upperb = n_PathDimension(j) - 1
                     'Randomize() nicht vergessen
                     tmp = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
-                    List_Childs(i).Path(j) = tmp
+                    Childs(i).Path(j) = tmp
                 Next
-                List_Childs(i).mutated = True
-                List_Childs(i).No = i + 1
-            Loop While Is_Twin(i) = True Or approved(List_Childs(i).Path) = False
+                Childs(i).mutated = True
+                Childs(i).ID = i + 1
+            Loop While Is_Twin(i) = True Or approved(Childs(i).Path) = False
         Next
 
     End Sub
@@ -338,18 +89,18 @@ Public Class CES
         Dim i, j As Integer
 
         Dim array() As Integer
-        ReDim array(List_Childs(i).Path.GetUpperBound(0))
+        ReDim array(Childs(i).Path.GetUpperBound(0))
         For i = 0 To array.GetUpperBound(0)
             array(i) = 0
         Next
 
         For i = 0 To n_Childs - 1
-            For j = 0 To List_Childs(i).Path.GetUpperBound(0)
-                List_Childs(i).Path(j) = array(j)
+            For j = 0 To Childs(i).Path.GetUpperBound(0)
+                Childs(i).Path(j) = array(j)
             Next
             array(0) += 1
             If Not i = n_Childs - 1 Then
-                For j = 0 To List_Childs(i).Path.GetUpperBound(0)
+                For j = 0 To Childs(i).Path.GetUpperBound(0)
                     If array(j) > n_PathDimension(j) - 1 Then
                         array(j) = 0
                         array(j + 1) += 1
@@ -395,7 +146,7 @@ Public Class CES
         'xxxxxxxxxxxxxxx
         If Strategy = "minus" Then
             For i = 0 To n_Parents - 1
-                Call Faksimile_Copy(List_Childs(i), List_Parents(i))
+                Parents(i) = Childs(i).Copy
             Next i
 
             'Strategie PLUS
@@ -405,17 +156,17 @@ Public Class CES
             For i = 0 To n_Childs - 1
                 'Des schlechteste Elter wird bestimmt
                 Dim bad_no As Integer = 0
-                Dim bad_penalty As Double = List_Parents(0).Penalty(0)
+                Dim bad_penalty As Double = Parents(0).Penalty(0)
                 For j = 1 To n_Parents - 1
-                    If bad_penalty < List_Parents(j).Penalty(0) Then
+                    If bad_penalty < Parents(j).Penalty(0) Then
                         bad_no = j
-                        bad_penalty = List_Parents(j).Penalty(0)
+                        bad_penalty = Parents(j).Penalty(0)
                     End If
                 Next
 
                 'Falls der schlechteste Parent schlechter als der Child ist wird er durch den Child ersetzt
-                If List_Parents(bad_no).Penalty(0) > List_Childs(i).Penalty(0) Then
-                    Call Faksimile_Copy(List_Childs(i), List_Parents(bad_no))
+                If Parents(bad_no).Penalty(0) > Childs(i).Penalty(0) Then
+                    Parents(bad_no) = Childs(i).Copy
                 End If
             Next
 
@@ -439,14 +190,14 @@ Public Class CES
                 x = 0
                 y = 1
                 For i = 0 To n_Childs - 2 Step 2
-                    Call ReprodOp_Select_Random_Uniform(List_Parents(x).Path, List_Parents(y).Path, List_Childs(i).Path, List_Childs(i + 1).Path)
+                    Call ReprodOp_Select_Random_Uniform(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
                     x += 1
                     y += 1
                     If x = n_Parents - 1 Then x = 0
                     If y = n_Parents - 1 Then y = 0
                 Next i
                 If Even_Number(n_Childs) = False Then
-                    Call ReprodOp_Select_Random_Uniform(List_Parents(x).Path, List_Parents(y).Path, List_Childs(n_Childs - 1).Path, Einzelkind)
+                    Call ReprodOp_Select_Random_Uniform(Parents(x).Path, Parents(y).Path, Childs(n_Childs - 1).Path, Einzelkind)
                 End If
 
             Case "Order_Crossover (OX)"
@@ -454,28 +205,28 @@ Public Class CES
                 x = 0
                 y = 1
                 For i = 0 To n_Childs - 2 Step 2
-                    Call ReprodOp_Order_Crossover(List_Parents(x).Path, List_Parents(y).Path, List_Childs(i).Path, List_Childs(i + 1).Path)
+                    Call ReprodOp_Order_Crossover(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
                     x += 1
                     y += 1
                     If x = n_Parents - 1 Then x = 0
                     If y = n_Parents - 1 Then y = 0
                 Next i
                 If Even_Number(n_Childs) = False Then
-                    Call ReprodOp_Order_Crossover(List_Parents(x).Path, List_Parents(y).Path, List_Childs(n_Childs - 1).Path, Einzelkind)
+                    Call ReprodOp_Order_Crossover(Parents(x).Path, Parents(y).Path, Childs(n_Childs - 1).Path, Einzelkind)
                 End If
 
             Case "Partially_Mapped_Crossover"
                 x = 0
                 y = 1
                 For i = 0 To n_Childs - 2 Step 2
-                    Call ReprodOp_Part_Mapped_Crossover(List_Parents(x).Path, List_Parents(y).Path, List_Childs(i).Path, List_Childs(i + 1).Path)
+                    Call ReprodOp_Part_Mapped_Crossover(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
                     x += 1
                     y += 1
                     If x = n_Parents - 1 Then x = 0
                     If y = n_Parents - 1 Then y = 0
                 Next i
                 If Even_Number(n_Childs) = False Then
-                    Call ReprodOp_Part_Mapped_Crossover(List_Parents(x).Path, List_Parents(y).Path, List_Childs(n_Childs - 1).Path, Einzelkind)
+                    Call ReprodOp_Part_Mapped_Crossover(Parents(x).Path, Parents(y).Path, Childs(n_Childs - 1).Path, Einzelkind)
                 End If
 
         End Select
@@ -655,15 +406,15 @@ Public Class CES
                 Select Case MutOperator
                     Case "RND_Switch"
                         'Verändert zufällig ein gen des Paths
-                        Call MutOp_RND_Switch(List_Childs(i).Path)
+                        Call MutOp_RND_Switch(Childs(i).Path)
 
                     Case "Dyn_Switch"
                         'Verändert zufällig ein gen des Paths mit dynamisch erhöhter Mutationsrate
-                        Call MutOp_Dyn_Switch(List_Childs(i).Path, count)
+                        Call MutOp_Dyn_Switch(Childs(i).Path, count)
                 End Select
                 count += 1
-            Loop While Is_Twin(i) = True Or Is_Clone(i) = True Or approved(List_Childs(i).Path) = False
-            List_Childs(i).mutated = True
+            Loop While Is_Twin(i) = True Or Is_Clone(i) = True Or approved(Childs(i).Path) = False
+            Childs(i).mutated = True
         Next
 
     End Sub
@@ -731,9 +482,9 @@ Public Class CES
             neu = Memory.GetUpperBound(0)
         End If
 
-        Call Faksimile_Dim(Memory(neu), "Memory", neu)
+        Memory(neu) = New Individuum("Memory", neu)
 
-        Call Faksimile_Copy(List_Childs(Child_No), Memory(neu))
+        Memory(neu) = Childs(Child_No).Copy
         Memory(neu).Generation = Gen_No
 
     End Sub
@@ -741,7 +492,7 @@ Public Class CES
     'Durchsucht den Memory - Der PES_Parantsatz für jedes Child wird hier ermittelt
     'Eine Liste (PES_Parents) mit Eltern für ein Child incl. der Location Information wird erstellt
     '**********************************************************************************************
-    Sub Memory_Search(ByRef Child As Faksimile)
+    Sub Memory_Search(ByRef Child As Individuum)
 
         Dim j, m As Integer
         Dim count_a(n_Locations - 1) As Integer
@@ -749,7 +500,7 @@ Public Class CES
         Dim count_c(n_Locations - 1) As Integer
 
         ReDim PES_Parents(0)
-        Call Faksimile_Dim(PES_Parents(0), "PES_Parent", 0)
+        PES_Parents(0) = New Individuum("PES_Parent", 0)
 
         Dim akt As Integer = 0
 
@@ -765,9 +516,9 @@ Public Class CES
                 'Rank Nummer 1 (Lediglich Übereinstimmung in der Location selbst)
                 If Child.Path(j) = Memory(m).Path(j) Then
                     ReDim Preserve PES_Parents(PES_Parents.GetLength(0))
-                    Call Faksimile_Dim(PES_Parents(PES_Parents.GetUpperBound(0)), "PES_Parent", PES_Parents.GetUpperBound(0))
+                    PES_Parents(PES_Parents.GetUpperBound(0)) = New Individuum("PES_Parent", PES_Parents.GetUpperBound(0))
                     akt = PES_Parents.GetUpperBound(0)
-                    Call Faksimile_Copy(Memory(m), PES_Parents(akt))
+                    PES_Parents(akt) = Memory(m).Copy
                     PES_Parents(akt).iLocation = j + 1
                     PES_Parents(akt).Memory_Rank = 1
                     count_a(j) += 1
@@ -777,9 +528,9 @@ Public Class CES
                 If Not j = n_Locations - 1 And n_Parts_of_Path > 1 Then
                     If Child.Path(j) = Memory(m).Path(j) And Child.Path(j + 1) = Memory(m).Path(j + 1) Then
                         ReDim Preserve PES_Parents(PES_Parents.GetLength(0))
-                        Call Faksimile_Dim(PES_Parents(PES_Parents.GetUpperBound(0)), "PES_Parent", PES_Parents.GetUpperBound(0))
+                        PES_Parents(PES_Parents.GetUpperBound(0)) = New Individuum("PES_Parent", PES_Parents.GetUpperBound(0))
                         akt = PES_Parents.GetUpperBound(0)
-                        Call Faksimile_Copy(Memory(m), PES_Parents(akt))
+                        PES_Parents(akt) = Memory(m).Copy
                         PES_Parents(akt).iLocation = j + 1
                         PES_Parents(akt).Memory_Rank = 2
                         count_b(j) += 1
@@ -790,9 +541,9 @@ Public Class CES
                 If Not (j = n_Locations - 1 Or j = n_Locations - 2) And n_Parts_of_Path > 2 Then
                     If Child.Path(j) = Memory(m).Path(j) And Child.Path(j + 1) = Memory(m).Path(j + 1) And Child.Path(j + 2) = Memory(m).Path(j + 2) Then
                         ReDim Preserve PES_Parents(PES_Parents.GetLength(0))
-                        Call Faksimile_Dim(PES_Parents(PES_Parents.GetUpperBound(0)), "PES_Parent", PES_Parents.GetUpperBound(0))
+                        PES_Parents(PES_Parents.GetUpperBound(0)) = New Individuum("PES_Parent", PES_Parents.GetUpperBound(0))
                         akt = PES_Parents.GetUpperBound(0)
-                        Call Faksimile_Copy(Memory(m), PES_Parents(akt))
+                        PES_Parents(akt) = Memory(m).Copy
                         PES_Parents(akt).iLocation = j + 1
                         PES_Parents(akt).Memory_Rank = 3
                         count_c(j) += 1
@@ -809,10 +560,10 @@ Public Class CES
     'Löscht wenn ein Individuum bei der gleichen Lokation einmal als Rank 1 und einmal als Rank 2 definiert.
     'Bei Rank 2 entsprechnd Rank 3. Außerdem wird der erste leere Datensatz geloescht.
     '*******************************************************************************************************
-    Private Sub PES_Memory_Dubletten_loeschen(ByRef PES_Parents() As Faksimile)
+    Private Sub PES_Memory_Dubletten_loeschen(ByRef PES_Parents() As Individuum)
 
-        Dim tmp(PES_Parents.GetUpperBound(0) - 1) As Faksimile
-        Call Faksimile_Dim(tmp, "TMP")
+        Dim tmp(PES_Parents.GetUpperBound(0) - 1) As Individuum
+        Individuum.New_Array("tmp", tmp)
         Dim isDouble As Boolean
         Dim i, j, x As Integer
 
@@ -825,7 +576,7 @@ Public Class CES
                 End If
             Next
             If isDouble = False Then
-                Faksimile_Copy(PES_Parents(i), tmp(x))
+                tmp(x) = PES_Parents(i).Copy
                 x += 1
             End If
         Next
@@ -834,14 +585,14 @@ Public Class CES
         ReDim Preserve PES_Parents(x - 1)
 
         For i = 0 To tmp.GetUpperBound(0)
-            Faksimile_Copy(tmp(i), PES_Parents(i))
+            PES_Parents(i) = tmp(i).Copy
         Next
 
     End Sub
 
     'Prüft ob die beiden den gleichen Pfad und zur gleichen location gehören
     '***********************************************************************
-    Private Function is_PES_Double(ByVal First As Faksimile, ByVal Second As Faksimile) As Boolean
+    Private Function is_PES_Double(ByVal First As Individuum, ByVal Second As Individuum) As Boolean
         is_PES_Double = False
 
         Dim count As Integer = 0
@@ -878,19 +629,19 @@ Public Class CES
         Next
     End Function
 
-    'Hilfsfunktion zum sortieren der Faksimile
-    '*****************************************
-    Public Sub Sort_Faksimile(ByRef FaksimileList() As Faksimile)
+    'Hilfsfunktion zum sortieren der Individuum
+    '******************************************
+    Public Sub Sort_Individuum(ByRef IndividuumList() As Individuum)
         'Sortiert die Fiksimile anhand des Abstandes
         Dim i, j As Integer
-        Dim swap As EVO.Kern.CES.Faksimile
+        Dim swap As New EVO.Kern.Individuum("swap", 0)
 
-        For i = 0 To FaksimileList.GetUpperBound(0)
-            For j = 0 To FaksimileList.GetUpperBound(0)
-                If FaksimileList(i).Penalty(0) < FaksimileList(j).Penalty(0) Then
-                    swap = FaksimileList(i)
-                    FaksimileList(i) = FaksimileList(j)
-                    FaksimileList(j) = swap
+        For i = 0 To IndividuumList.GetUpperBound(0)
+            For j = 0 To IndividuumList.GetUpperBound(0)
+                If IndividuumList(i).Penalty(0) < IndividuumList(j).Penalty(0) Then
+                    swap = IndividuumList(i)
+                    IndividuumList(i) = IndividuumList(j)
+                    IndividuumList(j) = swap
                 End If
             Next j
         Next i
@@ -907,10 +658,10 @@ Public Class CES
         Is_Twin = False
 
         For i = 0 To n_Childs - 1
-            If ChildIndex <> i And List_Childs(i).mutated = True Then
+            If ChildIndex <> i And Childs(i).mutated = True Then
                 PathOK = False
-                For j = 0 To List_Childs(ChildIndex).Path.GetUpperBound(0)
-                    If List_Childs(ChildIndex).Path(j) <> List_Childs(i).Path(j) Then
+                For j = 0 To Childs(ChildIndex).Path.GetUpperBound(0)
+                    If Childs(ChildIndex).Path(j) <> Childs(i).Path(j) Then
                         PathOK = True
                     End If
                 Next
@@ -931,8 +682,8 @@ Public Class CES
 
         For i = 0 To n_Parents - 1
             PathOK = False
-            For j = 0 To List_Childs(ChildIndex).Path.GetUpperBound(0)
-                If List_Childs(ChildIndex).Path(j) <> List_Parents(i).Path(j) Then
+            For j = 0 To Childs(ChildIndex).Path.GetUpperBound(0)
+                If Childs(ChildIndex).Path(j) <> Parents(i).Path(j) Then
                     PathOK = True
                 End If
             Next
@@ -996,38 +747,21 @@ Public Class CES
 
     'Steuerung des NDSorting (Ursprünglich aus ES Eltern)
     '****************************************************
-    Public Sub NDSorting_Control()
+    Public Sub NDSorting_Control(ByVal iAktGen As Integer)
         Dim i As Short
-        Dim NFrontMember_aktuell, NFrontMember_gesamt As Short
-        Dim Durchlauf_Front As Short
-        'Dim Count as short
-        Dim aktuelle_Front As Short
-        'Dim Member_Sekundärefront As Short
 
-        Dim NDSorting(n_Childs + n_Parents - 1) As Faksimile
-        Call Faksimile_Dim(NDSorting, "NDSorting")
+        Dim NDSorting(n_Childs + n_Parents - 1) As Individuum
+        Call Individuum.New_Array("NDSorting", NDSorting)
 
         '0. Eltern und Nachfolger werden gemeinsam betrachtet
         'Die Kinder werden NDSorting hinzugefügt
         '-------------------------------------------
 
         For i = 0 To n_Childs - 1
-
-            ''NConstrains ********************************
-            'If Eigenschaft.NConstrains > 0 Then
-            '    NDSorting(i).Feasible = True
-            '    For l = 1 To Eigenschaft.NConstrains
-            '        NDSorting(i).Constrain(l) = Rb(m - Eigenschaft.NNachf, Eigenschaft.iaktuellePopulation, l)
-            '        If NDSorting(i).Constrain(l) < 0 Then NDSorting(i).Feasible = False
-            '    Next l
-            'End If
-
-            Call Faksimile_Copy(List_Childs(i), NDSorting(i))
-
+            NDSorting(i) = Childs(i).Copy
             NDSorting(i).dominated = False
             NDSorting(i).Front = 0
             NDSorting(i).Distance = 0
-
         Next i
 
         '1. Eltern und Nachfolger werden gemeinsam betrachtet
@@ -1035,442 +769,58 @@ Public Class CES
         '--------------------------------------------------------------------
 
         For i = n_Childs To n_Childs + n_Parents - 1
-
-            ''NConstrains ********************************
-            'If Eigenschaft.NConstrains > 0 Then
-            '    NDSorting(i).Feasible = True
-            '    For l = 1 To Eigenschaft.NConstrains
-            '        NDSorting(i).Constrain(l) = Rb(m - Eigenschaft.NNachf, Eigenschaft.iaktuellePopulation, l)
-            '        If NDSorting(i).Constrain(l) < 0 Then NDSorting(i).Feasible = False
-            '    Next l
-            'End If
-
-            Call Faksimile_Copy(List_Parents(i - n_Childs), NDSorting(i))
-
+            NDSorting(i) = Parents(i - n_Childs).Copy
             NDSorting(i).dominated = False
             NDSorting(i).Front = 0
             NDSorting(i).Distance = 0
-
         Next i
 
+        '********************* Alles in der Klasse Functions ****************************************
         '2. Die einzelnen Fronten werden bestimmt
-        '----------------------------------------
-        Durchlauf_Front = 1
-        NFrontMember_gesamt = 0
+        '3. Der Bestwertspeicher wird entsprechend der Fronten oder der sekundären Population gefüllt
+        '4: Sekundäre Population wird bestimmt und gespeichert
+        '--------------------------------
+        Dim Func1 As New Kern.Functions(n_Childs, n_Parents, n_MemberSecondPop, n_Interact, is_Interact, n_Penalty, n_Constrain, iAktGen)
+        Call Func1.EsEltern_Pareto_SekundärQb(Parents, NDSorting, SekundärQb)
+        '********************************************************************************************
 
-        'Initialisierung von Temp (NDSorting)
-        Dim Temp(n_Childs + n_Parents - 1) As Faksimile
-        Call Faksimile_Dim(Temp, "TMP_NDSorting")
+        'Schritt 5 und 6 sind für CES noch nicht implementiert
 
-        'Initialisierung von NDSResult (NDSorting)
-        Call Faksimile_Dim(NDSResult, "NDSResult")
+        ''5: Neue Eltern werden gleich dem Bestwertspeicher gesetzt
+        ''---------------------------------------------------------
+        'For i = 0 To PES_Settings.NEltern - 1
+        '    For v = 0 To Anz.Para - 1
+        '        De(v, i, PES_iAkt.iAktPop) = Best.Db(v, i, PES_iAkt.iAktPop)
+        '        Xe(v, i, PES_iAkt.iAktPop) = Best.Xb(v, i, PES_iAkt.iAktPop)
+        '    Next v
+        'Next i
 
-        'NDSorting wird in Temp kopiert
-        For i = 0 To NDSorting.GetUpperBound(0)
-            Call Faksimile_Copy(NDSorting(i), Temp(i))
-        Next
-
-        'Schleife läuft über die Zahl der Fronten die hier auch bestimmte werden
-        Do
-            'A: Entscheidet welche Werte dominiert werden und welche nicht
-            Call Non_Dominated_Sorting(Temp, Durchlauf_Front) 'aktuallisiert auf n Objectives dm 10.05.05
-
-            'B: Sortiert die nicht dominanten Lösungen nach oben,
-            'die dominanten nach unten und zählt die Mitglieder der aktuellen Front
-            NFrontMember_aktuell = Non_Dominated_Count_and_Sort(Temp)
-            'NFrontMember_aktuell: Anzahl der Mitglieder der gerade bestimmten Front
-            'NFrontMember_gesamt: Alle bisher als nicht dominiert klassifizierten Individuum
-            NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
-
-            'C: Hier wird pro durchlauf die nicht dominierte Front in NDSResult geschaufelt
-            'und die bereits klassifizierten Lösungen aus Temp Array gelöscht
-            Call Non_Dominated_Result(Temp, NDSResult, NFrontMember_aktuell, NFrontMember_gesamt)
-            'Durchlauf ist hier die Nummer der Front
-            Durchlauf_Front = Durchlauf_Front + 1
-        Loop While Not (NFrontMember_gesamt = n_Parents + n_Childs)
-
-        '3. Der Bestwertspeicher wird entsprechend der Fronten oder der
-        'sekundären Population gefüllt
-        '-------------------------------------------------------------
-        NFrontMember_aktuell = 0
-        NFrontMember_gesamt = 0
-        aktuelle_Front = 1
-
-        Do
-            NFrontMember_aktuell = Count_Front_Members(aktuelle_Front, NDSResult)
-
-            'Es sind mehr Elterplätze für die nächste Generation verfügaber
-            '-> schiss wird einfach rüberkopiert
-            If NFrontMember_aktuell <= n_Parents - NFrontMember_gesamt Then
-                For i = NFrontMember_gesamt To NFrontMember_aktuell + NFrontMember_gesamt - 1
-                    Call Faksimile_Copy(NDSResult(i), List_Parents(i))
-                Next i
-                NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
-
-            Else
-                'Es sind weniger Elterplätze für die nächste Generation verfügber
-                'als Mitglieder der aktuellen Front. Nur für diesen Rest wird crowding distance
-                'gemacht um zu bestimmen wer noch mitspielen darf und wer noch a biserl was druff hat
-                Call NDS_Crowding_Distance_Sort(NDSResult, NFrontMember_gesamt, NFrontMember_gesamt + NFrontMember_aktuell - 1)
-
-                For i = NFrontMember_gesamt To n_Parents - 1
-                    Call Faksimile_Copy(NDSResult(i), List_Parents(i))
-                Next i
-
-                NFrontMember_gesamt = n_Parents
-
-            End If
-
-            aktuelle_Front = aktuelle_Front + 1
-
-        Loop While Not (NFrontMember_gesamt = n_Parents)
-
-        '        '4: Sekundäre Population wird bestimmt und gespeichert
-        '        NFrontMember_aktuell = Count_Front_Members(1, NDSResult)
-
-        '        If Eigenschaft.iaktuelleRunde = 1 And Eigenschaft.iaktuellePopulation = 1 And Eigenschaft.iaktuelleGeneration = 1 Then
-        '            ReDim Preserve SekundärQb(Member_Sekundärefront + NFrontMember_aktuell)
-        '        Else
-        '            Member_Sekundärefront = UBound(SekundärQb)
-        '            ReDim Preserve SekundärQb(Member_Sekundärefront + NFrontMember_aktuell)
-        '        End If
-
-        '        For i = Member_Sekundärefront + 1 To Member_Sekundärefront + NFrontMember_aktuell
-        '            SekundärQb(i) = NDSResult(i - Member_Sekundärefront)
-        '        Next i
-
-        '        Call Non_Dominated_Sorting(SekundärQb, 1)
-        '        NFrontMember_aktuell = Non_Dominated_Count_and_Sort_Sekundäre_Population(SekundärQb)
-        '        ReDim Preserve SekundärQb(NFrontMember_aktuell)
-        '        Call SekundärQb_Duplettten(SekundärQb)
-        '        NFrontMember_aktuell = Non_Dominated_Count_and_Sort_Sekundäre_Population(SekundärQb)
-        '        ReDim Preserve SekundärQb(NFrontMember_aktuell)
-
-        '        If UBound(SekundärQb) > Eigenschaft.NMemberSecondPop Then
-        '            Call NDS_Crowding_Distance_Sort(SekundärQb, 1, UBound(SekundärQb))
-        '            ReDim Preserve SekundärQb(Eigenschaft.NMemberSecondPop)
-        '        End If
-
-        '        If (Eigenschaft.iaktuelleGeneration Mod Eigenschaft.interact) = 0 And Eigenschaft.isInteract Then
-        '            NFrontMember_aktuell = Count_Front_Members(1, SekundärQb)
-        '            If NFrontMember_aktuell > Eigenschaft.NEltern Then
-        '                Call NDS_Crowding_Distance_Sort(SekundärQb, 1, UBound(SekundärQb))
-        '                For i = 1 To Eigenschaft.NEltern
-
-        '                    For j = 1 To Eigenschaft.NPenalty
-        '                        Qb(i, Eigenschaft.iaktuellePopulation, j) = SekundärQb(i).penalty(j)
-        '                    Next j
-        '                    If Eigenschaft.NConstrains > 0 Then
-        '                        For j = 1 To Eigenschaft.NConstrains
-        '                            Rb(i, Eigenschaft.iaktuellePopulation, j) = SekundärQb(i).constrain(j)
-        '                        Next j
-        '                    End If
-        '                    For v = 1 To Eigenschaft.varanz
-        '                        Db(v, i, Eigenschaft.iaktuellePopulation) = SekundärQb(i).d(v)
-        '                        Xb(v, i, Eigenschaft.iaktuellePopulation) = SekundärQb(i).X(v)
-        '                    Next v
-
-        '                Next i
-        '            End If
-        '        End If
-
-        '        'Neue Eltern werden gleich dem Bestwertspeicher gesetzt
-        '        For m = 1 To Eigenschaft.NEltern
-        '            For v = 1 To Eigenschaft.varanz
-        '                De(v, m, Eigenschaft.iaktuellePopulation) = Db(v, m, Eigenschaft.iaktuellePopulation)
-        '                Xe(v, m, Eigenschaft.iaktuellePopulation) = Xb(v, m, Eigenschaft.iaktuellePopulation)
-        '            Next v
-        '        Next m
-
-        '        'Sortierung der Lösungen ist nur für Neighbourhood-Rekombination notwendig
-        '        If Eigenschaft.iOptEltern = EVO_ELTERN_Neighbourhood Then
-        '            Call Neighbourhood_AbstandsArray(PenaltyDistance, Qb)
-        '            Call Neighbourhood_Crowding_Distance(Distanceb, Qb)
-        '        End If
-
-        '        'End If
-
-        '        EsEltern = True
-        '        Exit Sub
-
-        'ES_ELTERN_ERROR:
-        '        Exit Sub
-
-    End Sub
-
-    'A: Non_Dominated_Sorting
-    'Entscheidet welche Werte dominiert werden und welche nicht
-    '*******************************************************************************
-    Private Sub Non_Dominated_Sorting(ByRef NDSorting() As Faksimile, ByRef Durchlauf_Front As Short)
-
-        Dim j, i, k As Short
-        Dim Logical As Boolean
-        Dim Summe_Constrain(2) As Double
-
-        'If Eigenschaft.NConstrains > 0 Then
-        '    For i = 1 To UBound(NDSorting)
-        '        For j = 1 To UBound(NDSorting)
-        '            If NDSorting(i).Feasible And Not NDSorting(j).Feasible Then
-        '                If NDSorting(j).dominated = False Then NDSorting(j).dominated = True
-        '            ElseIf ((Not NDSorting(i).Feasible) And (Not NDSorting(j).Feasible)) Then
-        '                Summe_Constrain(1) = 0
-        '                Summe_Constrain(2) = 0
-        '                For k = 1 To Eigenschaft.NConstrains
-        '                    If NDSorting(i).Constrain(k) < 0 Then
-        '                        Summe_Constrain(1) = Summe_Constrain(1) + NDSorting(i).Constrain(k)
-        '                    End If
-        '                    If NDSorting(j).Constrain(k) < 0 Then
-        '                        Summe_Constrain(2) = Summe_Constrain(2) + NDSorting(j).Constrain(k)
-        '                    End If
-        '                Next k
-        '                If Summe_Constrain(1) > Summe_Constrain(2) Then
-        '                    If NDSorting(j).dominated = False Then NDSorting(j).dominated = True
-        '                End If
-        '            ElseIf (NDSorting(i).Feasible And NDSorting(j).Feasible) Then
-        '                Logical = False
-        '                For k = 1 To Eigenschaft.NPenalty
-        '                    Logical = Logical Or (NDSorting(i).penalty(k) < NDSorting(j).penalty(k))
-        '                Next k
-        '                For k = 1 To Eigenschaft.NPenalty
-        '                    Logical = Logical And (NDSorting(i).penalty(k) <= NDSorting(j).penalty(k))
-        '                Next k
-        '                If Logical Then
-        '                    If NDSorting(j).dominated = False Then NDSorting(j).dominated = True
-        '                End If
-        '            End If
-        '        Next j
-        '    Next i
-        'Else
-        For i = 0 To NDSorting.GetUpperBound(0)
-            For j = 0 To NDSorting.GetUpperBound(0)
-                Logical = False
-
-                For k = 0 To n_Penalty - 1
-                    Logical = Logical Or (NDSorting(i).Penalty(k) < NDSorting(j).Penalty(k))
-                Next k
-
-                For k = 0 To n_Penalty - 1
-                    Logical = Logical And (NDSorting(i).Penalty(k) <= NDSorting(j).Penalty(k))
-                Next k
-
-                If Logical Then
-                    If NDSorting(j).dominated = False Then NDSorting(j).dominated = True
-                End If
-            Next j
-        Next i
-
+        ''6: Sortierung der Lösungen ist nur für Neighbourhood-Rekombination notwendig
+        ''----------------------------------------------------------------------------
+        'If (PES_Settings.iOptEltern = EVO_ELTERN.Neighbourhood) Then
+        '    Call Neighbourhood_AbstandsArray()
+        '    Call Neighbourhood_Crowding_Distance()
         'End If
 
-        For i = 0 To NDSorting.GetUpperBound(0)
-            'Hier wird die Nummer der Front geschrieben
-            If NDSorting(i).dominated = False Then NDSorting(i).Front = Durchlauf_Front
-        Next i
-
     End Sub
 
-    'B: Non_Dominated_Count_and_Sort
-    'Sortiert die nicht dominanten Lösungen nach oben, die dominanten nach unten
-    '*******************************************************************************
-    Private Function Non_Dominated_Count_and_Sort(ByRef NDSorting() As Faksimile) As Short
-        Dim i As Short
-        Dim counter As Short
+    'ES_GET_SEKUNDÄRE_POPULATIONEN - Sekundäre Population speichert immer die angegebene
+    'Anzahl von Bestwerten und kann den Bestwertspeicher alle x Generationen überschreiben
+    '*************************************************************************************
+    Public Function SekundärQb_Get() As Double(,)
 
-        Dim Temp(NDSorting.GetUpperBound(0)) As Faksimile
-        Call Faksimile_Dim(Temp, "Temp_NDSorting")
+        Dim j, i As Integer
+        Dim SekPopulation(,) As Double
 
-        Non_Dominated_Count_and_Sort = 0
-        counter = 0
+        ReDim SekPopulation(SekundärQb.GetUpperBound(0), SekundärQb(0).Penalty.GetUpperBound(0))
 
-        'Die nicht dominanten Lösungen werden nach oben kopiert
-        For i = 0 To NDSorting.GetUpperBound(0)
-            If NDSorting(i).dominated = True Then
-                Call Faksimile_Copy(NDSorting(i), Temp(counter))
-                counter = counter + 1
-            End If
-        Next i
-
-        'Zahl der dominanten wird errechnet und zurückgegeben
-        Non_Dominated_Count_and_Sort = NDSorting.GetLength(0) - counter
-
-        'Die dominanten Lösungen werden nach unten kopiert
-        For i = 0 To NDSorting.GetUpperBound(0)
-            If NDSorting(i).dominated = False Then
-                Call Faksimile_Copy(NDSorting(i), Temp(counter))
-                counter = counter + 1
-            End If
-        Next i
-
-        For i = 0 To Temp.GetUpperBound(0)
-            Call Faksimile_Copy(Temp(i), NDSorting(i))
-        Next
-
-    End Function
-
-    'Non_Dominated_Count_and_Sort_Sekundäre_Population
-    'Sortiert die nicht dominanten Lösungen nach oben, die dominanten nach unten
-    'hier für die Sekundäre Population
-    '*******************************************************************************
-
-    'Private Function Non_Dominated_Count_and_Sort_Sekundäre_Population(ByRef NDSorting() As NDSortingType) As Short
-
-    'End Function
-
-
-    'C: Non_Dominated_Result
-    'Hier wird pro durchlauf die nicht dominierte Front in NDSResult geschaufelt
-    'und die bereits klassifizierten Lösungen aus Temp Array gelöscht
-    '*******************************************************************************
-    Private Sub Non_Dominated_Result(ByRef Temp() As Faksimile, ByRef NDSResult() As Faksimile, ByRef NFrontMember_aktuell As Short, ByRef NFrontMember_gesamt As Short)
-
-        Dim i, Position As Short
-
-        Position = NFrontMember_gesamt - NFrontMember_aktuell
-
-        'In NDSResult werden die nicht dominierten Lösungen eingefügt
-        For i = Temp.GetUpperBound(0) + 1 - NFrontMember_aktuell To Temp.GetUpperBound(0)
-            'NDSResult alle bisher gefundene Fronten
-            Call Faksimile_Copy(Temp(i), NDSResult(Position))
-            Position = Position + 1
-        Next i
-
-        'Die bereits klassifizierten Member werden aus dem Temp Array gelöscht
-        If n_Childs + n_Parents - NFrontMember_gesamt > 0 Then
-
-            ReDim Preserve Temp(n_Childs + n_Parents - NFrontMember_gesamt - 1)
-            'Der Flag wird zur klassifizierung in der nächsten Runde zurückgesetzt
-            For i = 0 To Temp.GetUpperBound(0)
-                Temp(i).dominated = False
-            Next i
-        End If
-
-    End Sub
-
-    'Count_Front_Members
-    '*******************************************************************************
-    Private Function Count_Front_Members(ByVal aktuell_Front As Short, ByRef NDSResult() As Faksimile) As Integer
-        Dim i As Short
-
-        Count_Front_Members = 0
-
-        For i = 0 To NDSResult.GetUpperBound(0)
-            If NDSResult(i).Front = aktuell_Front Then
-                Count_Front_Members = Count_Front_Members + 1
-            End If
-        Next i
-
-    End Function
-
-    'NDS_Crowding_Distance_Sort
-    '*******************************************************************************
-
-    Private Sub NDS_Crowding_Distance_Sort(ByRef NDSorting() As Faksimile, ByRef start As Short, ByRef ende As Short)
-        Dim i As Integer
-        Dim j As Integer
-        Dim k As Integer
-
-        Dim swap(0) As Faksimile
-        Call Faksimile_Dim(swap, "swap")
-
-        Dim fmin, fmax As Double
-
-        For k = 0 To n_Penalty - 1
-            For i = start To ende
-                For j = start To ende
-                    If NDSorting(i).Penalty(k) < NDSorting(j).Penalty(k) Then
-                        Call Faksimile_Copy(NDSorting(i), swap(0))
-                        Call Faksimile_Copy(NDSorting(j), NDSorting(i))
-                        Call Faksimile_Copy(swap(0), NDSorting(j))
-                    End If
-                Next j
-            Next i
-
-            fmin = NDSorting(start).Penalty(k)
-            fmax = NDSorting(ende).Penalty(k)
-
-            NDSorting(start).Distance = 1.0E+300
-            NDSorting(ende).Distance = 1.0E+300
-
-            For i = start + 1 To ende - 1
-                NDSorting(i).Distance = NDSorting(i).Distance + (NDSorting(i + 1).Penalty(k) - NDSorting(i - 1).Penalty(k)) / (fmax - fmin)
-            Next i
-        Next k
-
-        For i = start To ende
-            For j = start To ende
-                If NDSorting(i).Distance > NDSorting(j).Distance Then
-                    Call Faksimile_Copy(NDSorting(i), swap(0))
-                    Call Faksimile_Copy(NDSorting(j), NDSorting(i))
-                    Call Faksimile_Copy(swap(0), NDSorting(j))
-                End If
+        For i = 0 To SekundärQb.GetUpperBound(0)
+            For j = 0 To SekundärQb(0).Penalty.GetUpperBound(0)
+                SekPopulation(i, j) = SekundärQb(i).Penalty(j)
             Next j
         Next i
 
-    End Sub
-
-    'NDS_Crowding_Distance_Count
-    '*******************************************************************************
-    Private Function NDS_Crowding_Distance_Count(ByRef Qb(,,) As Double, ByRef Spannweite As Double) As Double
-
-        Dim i As Short
-        Dim j As Short
-        Dim k As Short
-        Dim TempDistance() As Double
-        Dim PenaltyDistance(,) As Double
-
-        Dim d() As Double
-        Dim d_mean As Double
-
-        ReDim TempDistance(n_Penalty - 1)
-        ReDim PenaltyDistance(n_Parents - 1, n_Parents - 1)
-        ReDim d(n_Parents - 1)
-
-        'Bestimmen der normierten Raumabstände zwischen allen Elternindividuen
-        For i = 0 To n_Parents - 1
-            PenaltyDistance(i, i) = 0
-            For j = i + 1 To n_Parents - 1
-                PenaltyDistance(i, j) = 0
-                For k = 0 To n_Penalty - 1
-                    TempDistance(k) = List_Parents(i).Penalty(k) - List_Parents(j).Penalty(k)
-                    TempDistance(k) = TempDistance(k) * TempDistance(k)
-                    PenaltyDistance(i, j) = PenaltyDistance(i, j) + TempDistance(k)
-                Next k
-                PenaltyDistance(i, j) = System.Math.Sqrt(PenaltyDistance(i, j))
-                PenaltyDistance(j, i) = PenaltyDistance(i, j)
-            Next j
-        Next i
-
-        d_mean = 0
-
-        For i = 0 To n_Parents - 2
-            d(i) = 1.0E+300
-            For j = 0 To i - 1
-                If PenaltyDistance(i, j) < d(i) Then d(i) = PenaltyDistance(i, j)
-            Next j
-            For j = i + 1 To n_Parents - 1
-                If PenaltyDistance(i, j) < d(i) Then d(i) = PenaltyDistance(i, j)
-            Next j
-            d_mean = d_mean + d(i)
-        Next i
-
-        d_mean = d_mean / n_Parents
-
-        NDS_Crowding_Distance_Count = 0
-
-        For i = 0 To n_Parents - 2
-            NDS_Crowding_Distance_Count = NDS_Crowding_Distance_Count + (d_mean - d(i)) * (d_mean - d(i))
-        Next i
-
-        NDS_Crowding_Distance_Count = NDS_Crowding_Distance_Count / n_Parents
-
-        NDS_Crowding_Distance_Count = System.Math.Sqrt(NDS_Crowding_Distance_Count)
-
-        Spannweite = 0
-        For i = 0 To n_Parents - 1
-            'TODO: sollte hier nicht j = i + 1 stehen?
-            For j = i To n_Parents - 1
-                If PenaltyDistance(i, j) > Spannweite Then Spannweite = PenaltyDistance(i, j)
-            Next j
-        Next i
+        Return SekPopulation
 
     End Function
 

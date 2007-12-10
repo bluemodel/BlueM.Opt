@@ -7,6 +7,12 @@ Public Class Testprobleme
     Public OptModus As EVO_MODUS
     Event Testproblem_Changed(ByVal sender As Object, ByVal e As System.EventArgs)
 
+    Public ReadOnly Property AnzParameter() As Integer
+        Get
+            Return Convert.ToInt32(Me.TextBox_Einstellung.Text)
+        End Get
+    End Property
+
     Private Sub Testprobleme_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 
         'Combobox füllen
@@ -34,39 +40,62 @@ Public Class Testprobleme
         If IsInitializing = True Then
             Exit Sub
         Else
+            'zusätzliche Einstellungen erstmal ausblenden
+            Me.Label_Einstellung.Visible = False
+            Me.TextBox_Einstellung.Visible = False
+
             Select Case Combo_Testproblem.Text
+
                 Case "Sinus-Funktion"
-                    Problem_SinusFunktion.BringToFront()
+                    Me.Label_Beschreibung.Text = "Parameter an Sinusfunktion anpassen"
+                    Me.Label_Einstellung.Visible = True
+                    Me.Label_Einstellung.Text = "Anzahl Parameter:"
+                    Me.TextBox_Einstellung.Visible = True
+                    Me.TextBox_Einstellung.Text = "50"
                     OptModus = EVO_MODUS.Single_Objective
+
                 Case "Beale-Problem"
-                    Problem_BealeProblem.BringToFront()
+                    Me.Label_Beschreibung.Text = "Es wird das Minimum des Beale-Problems gesucht (x=(3, 0.5), F(x)=0)"
                     OptModus = EVO_MODUS.Single_Objective
+
                 Case "Schwefel 2.4-Problem"
-                    Problem_Schwefel24.BringToFront()
+                    Me.Label_Beschreibung.Text = "Minimum der Problemstellung wird gesucht (xi=1, F(x)=0)"
+                    Me.Label_Einstellung.Visible = True
+                    Me.Label_Einstellung.Text = "Anzahl Parameter:"
+                    Me.TextBox_Einstellung.Visible = True
+                    Me.TextBox_Einstellung.Text = "5"
                     OptModus = EVO_MODUS.Single_Objective
+
                 Case "Deb 1"
-                    Problem_D1Funktion.BringToFront()
+                    Me.Label_Beschreibung.Text = "Multikriterielles Testproblem (konvex)"
                     OptModus = EVO_MODUS.Multi_Objective
+
                 Case "Zitzler/Deb T1"
-                    Problem_T1Funktion.BringToFront()
+                    Me.Label_Beschreibung.Text = "Multikriterielles Testproblem (konvex)"
                     OptModus = EVO_MODUS.Multi_Objective
+
                 Case "Zitzler/Deb T2"
-                    Problem_T2Funktion.BringToFront()
+                    Me.Label_Beschreibung.Text = "Multikriterielles Testproblem (konkav)"
                     OptModus = EVO_MODUS.Multi_Objective
+
                 Case "Zitzler/Deb T3"
-                    Problem_T3Funktion.BringToFront()
+                    Me.Label_Beschreibung.Text = "Multikriterielles Testproblem (konvex, nicht stetig)"
                     OptModus = EVO_MODUS.Multi_Objective
+
                 Case "Zitzler/Deb T4"
-                    Problem_T4Funktion.BringToFront()
+                    Me.Label_Beschreibung.Text = "Multikriterielles Testproblem (konvex)"
                     OptModus = EVO_MODUS.Multi_Objective
+
                 Case "CONSTR"
-                    Problem_CONSTRFunktion.BringToFront()
+                    Me.Label_Beschreibung.Text = "Multikriterielles Testproblem (konvex) mit zwei Randbedingungen"
                     OptModus = EVO_MODUS.Multi_Objective
+
                 Case "Box"
-                    Problem_TKNFunktion.BringToFront()
+                    Me.Label_Beschreibung.Text = "Multikriterielles Testproblem (Kreis) mit zwei Randbedingungen"
                     OptModus = EVO_MODUS.Multi_Objective
+
                 Case "Abhängige Parameter"
-                    Problem_AbhParameter.BringToFront()
+                    Me.Label_Beschreibung.Text = "Bedingung: Y > X"
                     OptModus = EVO_MODUS.Single_Objective
 
             End Select
@@ -81,19 +110,21 @@ Public Class Testprobleme
     '************************************************************************************
 
     'Startparameter werden festgesetzt
-    Public Sub Parameter_Uebergabe(ByVal Testproblem As String, ByVal globAnzPar_Sin As String, ByVal globAnzPar_Schw As String, ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara() As Double, ByRef beziehungen() As EVO.Kern.PES.Beziehung)
+    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara() As Double, ByRef beziehungen() As EVO.Kern.PES.Beziehung)
 
         Dim i As Integer
 
-        Select Case Testproblem
+        Select Case Me.Combo_Testproblem.Text
 
             Case "Sinus-Funktion"
-                globalAnzPar = CShort(globAnzPar_Sin)
+                globalAnzPar = Me.AnzParameter
                 globalAnzZiel = 1
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
+                ReDim beziehungen(globalAnzPar - 1)
                 For i = 0 To globalAnzPar - 1
                     mypara(i) = 0
+                    beziehungen(i) = PES.Beziehung.keine
                 Next
 
             Case "Beale-Problem" 'x1 = [-5;5], x2=[-2;2]
@@ -101,93 +132,115 @@ Public Class Testprobleme
                 globalAnzZiel = 1
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
-                mypara(0) = 0.5
-                mypara(1) = 0.5
+                ReDim beziehungen(globalAnzPar - 1)
+                For i = 0 To globalAnzPar - 1
+                    mypara(i) = 0.5
+                    beziehungen(i) = PES.Beziehung.keine
+                Next
 
             Case "Schwefel 2.4-Problem" 'xi = [-10,10]
-                globalAnzPar = CShort(globAnzPar_Schw)
+                globalAnzPar = Me.AnzParameter
                 globalAnzZiel = 1
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
+                ReDim beziehungen(globalAnzPar - 1)
                 For i = 0 To globalAnzPar - 1
                     mypara(i) = 1
-                Next i
+                    beziehungen(i) = PES.Beziehung.keine
+                Next
 
             Case "Deb 1" 'x1 = [0.1;1], x2=[0;5]
                 globalAnzPar = 2
                 globalAnzZiel = 2
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
+                ReDim beziehungen(globalAnzPar - 1)
                 Randomize()
-                mypara(0) = Rnd()
-                mypara(1) = Rnd()
+                For i = 0 To globalAnzPar - 1
+                    mypara(i) = Rnd()
+                    beziehungen(i) = PES.Beziehung.keine
+                Next
 
             Case "Zitzler/Deb T1" 'xi = [0,1]
                 globalAnzPar = 30
                 globalAnzZiel = 2
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
+                ReDim beziehungen(globalAnzPar - 1)
                 Randomize()
                 For i = 0 To globalAnzPar - 1
                     mypara(i) = Rnd()
-                Next i
+                    beziehungen(i) = PES.Beziehung.keine
+                Next
 
             Case "Zitzler/Deb T2" 'xi = [0,1]
                 globalAnzPar = 30
                 globalAnzZiel = 2
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
+                ReDim beziehungen(globalAnzPar - 1)
                 Randomize()
                 For i = 0 To globalAnzPar - 1
                     mypara(i) = Rnd()
-                Next i
+                    beziehungen(i) = PES.Beziehung.keine
+                Next
 
             Case "Zitzler/Deb T3" 'xi = [0,1]
                 globalAnzPar = 15
                 globalAnzZiel = 2
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
+                ReDim beziehungen(globalAnzPar - 1)
                 Randomize()
                 For i = 0 To globalAnzPar - 1
                     mypara(i) = Rnd()
-                Next i
+                    beziehungen(i) = PES.Beziehung.keine
+                Next
 
             Case "Zitzler/Deb T4" 'x1 = [0,1], xi=[-5,5]
                 globalAnzPar = 10
                 globalAnzZiel = 2
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
+                ReDim beziehungen(globalAnzPar - 1)
                 Randomize()
                 For i = 0 To globalAnzPar - 1
                     mypara(i) = Rnd()
-                Next i
+                    beziehungen(i) = PES.Beziehung.keine
+                Next
 
             Case "CONSTR" 'x1 = [0.1;1], x2=[0;5]
                 globalAnzPar = 2
                 globalAnzZiel = 2
                 globalAnzRand = 2
                 ReDim mypara(globalAnzPar - 1)
+                ReDim beziehungen(globalAnzPar - 1)
                 Randomize()
-                mypara(0) = Rnd()
-                mypara(1) = Rnd()
+                For i = 0 To globalAnzPar - 1
+                    mypara(i) = Rnd()
+                    beziehungen(i) = PES.Beziehung.keine
+                Next
 
             Case "Box"
                 globalAnzPar = 3
                 globalAnzZiel = 3
                 globalAnzRand = 2
                 ReDim mypara(globalAnzPar - 1)
+                ReDim beziehungen(globalAnzPar - 1)
                 Randomize()
-                mypara(0) = Rnd()
-                mypara(1) = Rnd()
-                mypara(2) = Rnd()
+                For i = 0 To globalAnzPar - 1
+                    mypara(i) = Rnd()
+                    beziehungen(i) = PES.Beziehung.keine
+                Next
 
             Case "Abhängige Parameter"
                 globalAnzPar = 2
                 globalAnzZiel = 1
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
-                mypara(0) = 1
-                mypara(1) = 1
+                For i = 0 To globalAnzPar - 1
+                    mypara(i) = 1
+                Next
                 'Beziehungen
                 ReDim beziehungen(globalAnzPar - 1)
                 beziehungen(0) = EVO.Kern.PES.Beziehung.keine
@@ -282,10 +335,10 @@ Public Class Testprobleme
         Dim i As Short
         Dim serie As Steema.TeeChart.Styles.Series
 
-        If (PES_Settings.isPOPUL) Then
-            Anzahl_Kalkulationen = PES_Settings.NGen * PES_Settings.NNachf * PES_Settings.NRunden + 1
+        If (PES_Settings.is_POPUL) Then
+            Anzahl_Kalkulationen = PES_Settings.n_Gen * PES_Settings.n_Nachf * PES_Settings.n_Runden + 1
         Else
-            Anzahl_Kalkulationen = PES_Settings.NGen * PES_Settings.NNachf + 1
+            Anzahl_Kalkulationen = PES_Settings.n_Gen * PES_Settings.n_Nachf + 1
         End If
 
         'Ausgangswert berechnen
@@ -335,10 +388,10 @@ Public Class Testprobleme
         Dim X() As Double
         Dim serie As Steema.TeeChart.Styles.Series
 
-        If (PES_Settings.isPOPUL) Then
-            Anzahl_Kalkulationen = PES_Settings.NGen * PES_Settings.NNachf * PES_Settings.NRunden + 1
+        If (PES_Settings.is_POPUL) Then
+            Anzahl_Kalkulationen = PES_Settings.n_Gen * PES_Settings.n_Nachf * PES_Settings.n_Runden + 1
         Else
-            Anzahl_Kalkulationen = PES_Settings.NGen * PES_Settings.NNachf + 1
+            Anzahl_Kalkulationen = PES_Settings.n_Gen * PES_Settings.n_Nachf + 1
         End If
 
         'Ausgangswert berechnen
@@ -702,7 +755,7 @@ Public Class Testprobleme
             .Aspect.Elevation = 348
             .Aspect.Orthogonal = False
             .Aspect.Perspective = 62
-            .Aspect.Rotation = 329
+            .Aspect.Rotation = 360
             .Aspect.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality
             .Aspect.VertOffset = -20
             .Aspect.Zoom = 66
@@ -780,7 +833,7 @@ Public Class Testprobleme
 
     'Evaluierung und Zeichnen der Testprobleme
     '*****************************************
-    Public Sub Evaluierung_TestProbleme(ByRef Testproblem As String, ByVal mypara() As Double, ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN() As Double, ByRef RN() As Double, ByRef Diag As EVO.Diagramm)
+    Public Sub Evaluierung_TestProbleme(ByVal mypara() As Double, ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN() As Double, ByRef RN() As Double, ByRef Diag As EVO.Diagramm)
 
         Dim i As Short
         Dim Unterteilung_X As Double
@@ -791,7 +844,7 @@ Public Class Testprobleme
         Dim globalAnzPar As Short = mypara.GetLength(0)
         Dim serie As Steema.TeeChart.Styles.Series
 
-        Select Case Testproblem
+        Select Case Me.Combo_Testproblem.Text
 
             '*************************************
             '* Single-Objective Problemstellungen *
@@ -821,7 +874,7 @@ Public Class Testprobleme
                     array_y(i) = (-1 + mypara(i) * 2)
                 Next i
 
-                serie = Diag.getSeriesPoint("Population " & ipop)
+                serie = Diag.getSeriesPoint("Population " & ipop + 1)
                 serie.Add(array_x, array_y)
 
 
@@ -837,7 +890,7 @@ Public Class Testprobleme
 
                 'Zeichnen
                 '--------
-                serie = Diag.getSeriesPoint("Population " & ipop)
+                serie = Diag.getSeriesPoint("Population " & ipop + 1)
                 serie.Add(durchlauf, QN(0))
 
             Case "Schwefel 2.4-Problem"
@@ -856,7 +909,7 @@ Public Class Testprobleme
 
                 'Zeichnen
                 '--------
-                serie = Diag.getSeriesPoint("Population " & ipop)
+                serie = Diag.getSeriesPoint("Population " & ipop + 1)
                 serie.Add(durchlauf, QN(0))
 
                 '*************************************
@@ -1032,7 +1085,7 @@ Public Class Testprobleme
                 'Zeichnen
                 '--------
                 Dim serie3D As Steema.TeeChart.Styles.Points3D
-                serie3D = Diag.getSeries3DPoint("Population", "Orange")
+                serie3D = Diag.getSeries3DPoint("Population " & ipop + 1)
                 serie3D.Add(mypara(0), mypara(1), QN(0))
 
         End Select

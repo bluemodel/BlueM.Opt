@@ -1,10 +1,11 @@
 Imports System.IO
+Imports ihwb.SMUSI.DllAdapter
 
 '*******************************************************************************
 '*******************************************************************************
-'**** Klasse Smusi                                                          ****
+'**** Klasse SMUSI                                                          ****
 '****                                                                       ****
-'**** Funktionen zur Kontrolle von Smusi                                    ****
+'**** Funktionen zur Kontrolle von SMUSI                                    ****
 '****                                                                       ****
 '**** Autoren: Christoph Huebner, Felix Froehlich, Dirk Muschalla           ****
 '****                                                                       ****
@@ -21,12 +22,35 @@ Public Class Smusi
     'Eigenschaften
     '#############
 
+    'SMUSI DLL
+    '---------
+    Private smusi_dll As SMUSI_EngineDotNetAccess
+
 #End Region 'Eigenschaften
 
 #Region "Methoden"
 
     'Methoden
     '########
+
+    'Konstruktor
+    '***********
+    Public Sub New()
+
+        Call MyBase.New()
+
+        'SMUSI DLL instanzieren
+        '----------------------
+        Dim dll_path As String
+        dll_path = System.Windows.Forms.Application.StartupPath() & "\SMUSI.dll"
+
+        If (File.Exists(dll_path)) Then
+            SMUSI_dll = New SMUSI_EngineDotNetAccess(dll_path)
+        Else
+            Throw New Exception("SMUSI.dll nicht gefunden!")
+        End If
+
+    End Sub
 
     'Simulationsparameter einlesen
     '*****************************
@@ -41,6 +65,7 @@ Public Class Smusi
 
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Dim StrReadSync As TextReader = TextReader.Synchronized(StrRead)
 
         'Alle Zeilen durchlaufen
         Dim Zeile As String
@@ -51,9 +76,15 @@ Public Class Smusi
             If (Zeile.StartsWith("    SimBeginn - SimEnde")) Then
                 SimStart_str = Zeile.Substring(37, 16)
                 SimEnde_str = Zeile.Substring(56, 16)
+                Exit Do 'Sobald das Datum gefunden wurde, kann die schleife verlassen werden
             End If
 
         Loop Until StrRead.Peek() = -1
+
+        'Schließen der ALL-Datei
+        StrReadSync.Close()
+        StrRead.Close()
+        FiStr.Close()
 
         'SimStart und SimEnde in echtes Datum konvertieren
         Me.SimStart = New DateTime(SimStart_str.Substring(6, 4), SimStart_str.Substring(3, 2), SimStart_str.Substring(0, 2), SimStart_str.Substring(11, 2), SimStart_str.Substring(14, 2), 0)
@@ -68,54 +99,126 @@ Public Class Smusi
     '***********************************
     Public Overrides Function launchSim() As Boolean
 
-        'Aktuelles Verzeichnis bestimmen
-        Dim currentDir As String = CurDir()
-        'zum Arbeitsverzeichnis wechseln
-        ChDrive(Me.WorkDir)
-        ChDir(Me.WorkDir)
-        'EXE aufrufen
-        'TODO: SMUSI EXE muss dem Projekt hinzugefügt werden!
-        Dim ProcID As Integer = Shell("""smusi.exe"" " & Datensatz & ":", AppWinStyle.MinimizedNoFocus, True)
-        'zurück ins Ausgangsverzeichnis wechseln
-        ChDrive(currentDir)
-        ChDir(currentDir)
+        Dim simOK As Boolean
+        Dim SimCurrent, SimStart, SimEnde As DateTime
 
-        'überprüfen, ob Simulation erfolgreich
-        '-------------------------------------
-        If (File.Exists(WorkDir & Datensatz & ".FEL")) Then
+        'Falls vorher schon initialisiert wurde
+        Call smusi_dll.Finish()
+        Call smusi_dll.Dispose()
 
-            launchSim = False
-            Exit Function
+        Try
+
+            Call smusi_dll.Initialize(Me.WorkDir & Me.Datensatz)
+
+            'Dim SimEnde As DateTime = SMUSI_EngineDotNetAccess.DateTime(smusi_dll.GetSimulationEndDate())
+
+            ''Simulationszeitraum 
+            'Do While (SMUSI_EngineDotNetAccess.DateTime(smusi_dll.GetCurrentTime) < SimEnde)
+            '    Call smusi_dll.PerformTimeStep()
+            'Loop
+            'Simulationsdaten auslesen
+            SimStart = SMUSI_EngineDotNetAccess.DateTime(smusi_dll.GetSimulationStartDate())
+            SimEnde = SMUSI_EngineDotNetAccess.DateTime(smusi_dll.GetSimulationEndDate())
+            SimCurrent = SimStart
+            Do While (SimCurrent < SimEnde)
+
+                Call smusi_dll.PerformTimeStep()
+                'Me.ProgressBar1.PerformStep()
+
+                SimCurrent = SMUSI_EngineDotNetAccess.DateTime(smusi_dll.GetCurrentTime)
+
+                'If (SimCurrent.Hour = 0 And SimCurrent.Minute = 0) Then
+                '    'Nach Warnungen überprüfen
+                '    'Call checkForWarnings()
+                '    'Anzeige aktualisieren
+                '    Me.Label_SimDate.Text = SimCurrent
+                'End If
+
+                Application.DoEvents()
+
+            Loop
+
+            'Simulation erfolgreich
+            simOK = True
+
+        Catch ex As Exception
+
             'Simulationsfehler aufgetreten
-            'Dim DateiInhalt As String = ""
+            MsgBox(ex.Message, MsgBoxStyle.Exclamation, "SMUSI")
+            simOK = False
 
-            'Dim FiStr As FileStream = New FileStream(WorkDir & Datensatz & ".FEL", FileMode.Open, IO.FileAccess.Read)
-            'Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Finally
 
-            'Do
-            '    DateiInhalt = DateiInhalt & Chr(13) & Chr(10) & StrRead.ReadLine.ToString
-            'Loop Until StrRead.Peek() = -1
+            Call smusi_dll.Finish()
+            Call smusi_dll.Dispose()
 
-            'Throw New Exception("SMUSI hat einen Fehler zurückgegeben:" & Chr(13) & Chr(10) & DateiInhalt)
-        Else
+        End Try
 
-            launchSim = True
+        'Simulationsergebnis verarbeiten
+        '-------------------------------
+        If (simOK) Then
+
+            Dim datei, element As String
+            Dim ASCtmp As Wave.ASC
+            Dim elemente As New Collection()
+
+            'Einzulesende Dateien zusammenstellen
+            For Each optziel As Struct_OptZiel In Me.List_OptZiele
+                element = optziel.SimGr.Substring(0, 4)
+                If (Not elemente.Contains(element)) Then
+                    elemente.Add(element, element)
+                End If
+            Next
+
+            'Altes SimErgebnis löschen
+            Me.SimErgebnis.Clear()
+
+            'Dateien einlesen
+            For Each elem As String In elemente
+                datei = elem & "_WEL.ASC"
+                ASCtmp = New Wave.ASC(Me.WorkDir & datei, True)
+                'Simulationsergebnis abspeichern
+                For Each zre As Wave.Zeitreihe In ASCtmp.Zeitreihen
+                    Me.SimErgebnis.Add(zre, elem & "_" & zre.ToString())
+                Next
+            Next
 
         End If
 
+        Return simOK
+
     End Function
 
-    'Qualitätswert aus WEL-Datei
+    'Berechnung des Qualitätswerts (Zielwert)
+    '****************************************
+    Public Overrides Function QWert(ByVal OptZiel As Struct_OptZiel) As Double
+
+        QWert = 0
+
+        'Fallunterscheidung Ergebnisdatei
+        '--------------------------------
+        Select Case OptZiel.Datei
+
+            Case "ASC"
+                'QWert aus ASC-Datei
+                QWert = QWert_ASC(OptZiel)
+
+            Case Else
+                Throw New Exception("Der Wert '" & OptZiel.Datei & "' für die Datei wird bei Optimierungszielen für SMUSI nicht akzeptiert!")
+
+        End Select
+
+    End Function
+
+    'Qualitätswert aus ASC-Datei
     '***************************
-    Protected Overrides Function QWert_WEL(ByVal OptZiel As Struct_OptZiel) As Double
+    Private Function QWert_ASC(ByVal OptZiel As Struct_OptZiel) As Double
 
         Dim QWert As Double
+        Dim SimReihe As Wave.Zeitreihe
 
         'Simulationsergebnis auslesen
-        Dim SimReihe As New Wave.Zeitreihe(OptZiel.SimGr)
-        Dim datei As String = OptZiel.SimGr.Substring(0, 4) & "_WEL.ASC"
-        Dim ASC As New Wave.ASC(WorkDir & datei, True)
-        SimReihe = ASC.getReihe(OptZiel.SimGr)
+        SimReihe = Me.SimErgebnis(OptZiel.SimGr)
 
         'Fallunterscheidung Zieltyp
         '--------------------------
@@ -162,7 +265,4 @@ Public Class Smusi
 
 #End Region 'Methoden
 
-    Public Sub New()
-
-    End Sub
 End Class
