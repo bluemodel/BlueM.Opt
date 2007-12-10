@@ -116,10 +116,8 @@
     <Import Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Apps\BlueM.vb">
-    </Compile>
-    <Compile Include="Apps\IHA.vb">
-    </Compile>
+    <Compile Include="Apps\BlueM\BlueM.vb" />
+    <Compile Include="Apps\BlueM\IHA.vb" />
     <Compile Include="Apps\Scan.vb" />
     <Compile Include="Apps\SensiPlot.Designer.vb">
       <DependentUpon>SensiPlot.vb</DependentUpon>
@@ -129,13 +127,13 @@
     </Compile>
     <Compile Include="Apps\Sim.vb" />
     <Compile Include="Apps\SKos.vb" />
-    <Compile Include="Apps\Smusi.vb" />
-    <Compile Include="Apps\SWMM.vb" />
-    <Compile Include="Apps\Swmm_Iface.vb" />
-    <Compile Include="Apps\Testprobleme.Designer.vb">
+    <Compile Include="Apps\SMUSI\Smusi.vb" />
+    <Compile Include="Apps\SWMM\SWMM.vb" />
+    <Compile Include="Apps\SWMM\Swmm_Iface.vb" />
+    <Compile Include="Apps\Testprobleme\Testprobleme.Designer.vb">
       <DependentUpon>Testprobleme.vb</DependentUpon>
     </Compile>
-    <Compile Include="Apps\Testprobleme.vb">
+    <Compile Include="Apps\Testprobleme\Testprobleme.vb">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Apps\TSP.vb" />
@@ -209,7 +207,7 @@
       <DependentUpon>SensiPlot.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Apps\Testprobleme.resx">
+    <EmbeddedResource Include="Apps\Testprobleme\Testprobleme.resx">
       <DependentUpon>Testprobleme.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -261,14 +259,14 @@
     </None>
     <None Include="Resources\icon_png.png" />
     <None Include="Resources\icon_edit.png" />
-    <Content Include="Apps\BlueM.dll">
+    <Content Include="Apps\BlueM\BlueM.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Apps\IHA_Batchfor.exe">
+    <Content Include="Apps\BlueM\IHA_Batchfor.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Apps\IHWB.BlueM.DllAdapter.dll" />
-    <Content Include="Apps\SWMM5.dll">
+    <Content Include="Apps\BlueM\IHWB.BlueM.DllAdapter.dll" />
+    <Content Include="Apps\SWMM\SWMM5.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Diagramm\TeeChart.dll" />

@@ -93,7 +93,7 @@ Public Class IHA
 
         'Pfad zur EXE festlegen
         '----------------------
-        Me.exe_path = System.Windows.Forms.Application.StartupPath() & "\Apps\IHA_Batchfor.exe"
+        Me.exe_path = System.Windows.Forms.Application.StartupPath() & "\Apps\BlueM\IHA_Batchfor.exe"
         If (Not File.Exists(Me.exe_path)) Then
         	Throw New Exception("IHA_Batchfor.exe nicht gefunden!")
        	End If
