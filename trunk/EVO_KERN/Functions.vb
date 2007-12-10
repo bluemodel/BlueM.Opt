@@ -352,7 +352,7 @@ Public Class Functions
         NFrontMember = 0
         counter = 0
 
-        'Die nicht dominanten Lösungen werden nach oben kopiert
+        'Die nicht dominierten Lösungen werden nach oben kopiert
         For i = 0 To NDSorting.GetUpperBound(0)
             If (NDSorting(i).dominated = True) Then
                 counter += 1
@@ -363,7 +363,7 @@ Public Class Functions
         'Zahl der dominanten Lösungen wird errechnet
         NFrontMember = NDSorting.GetUpperBound(0) + 1 - counter
 
-        'Die dominanten Lösungen werden nach unten kopiert
+        'Die dominierten Lösungen werden nach unten kopiert
         For i = 0 To NDSorting.GetUpperBound(0)
             If (NDSorting(i).dominated = False) Then
                 counter += 1

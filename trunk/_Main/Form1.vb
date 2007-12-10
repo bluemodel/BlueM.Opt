@@ -957,12 +957,19 @@ Partial Class Form1
                 'xxxxxxxxx
                 For i = 0 To CES1.Childs.GetUpperBound(0)
 
-                    'Ermittelt fuer jedes Child den PES Parent Satz
-                    Call CES1.Memory_Search(CES1.Childs(i))
+                    'Ermittelt fuer jedes Child den PES Parent Satz (PES_Parents ist das Ergebnis)
+                    Call CES1.Memory_Search_per_Child(CES1.Childs(i))
 
                     'und pro Location
                     'xxxxxxxxxxxxxxxx
                     For j = 0 To CES1.n_Locations - 1
+
+                        'Ermittelt fuer jede Location den PES Parent Satz (PES_Parents ist das Ergebnis)
+                        Call CES1.Memory_Search_per_Location(j)
+                        'Führt das NDSorting für diesen Satz durch
+                        If CES1.PES_Parents_pLoc.GetLength(0) > ces1.n_PES_Parents
+                            Call CES1.Memory_NDSorting()
+                        End If
 
                         'Die Parameter (falls vorhanden) werden überschrieben
                         If Not CES1.Childs(i).Loc(j).Loc_Para.GetLength(1) = 0 Then
@@ -975,20 +982,11 @@ Partial Class Form1
 
                             'Die Zahl der Parameter wird überschrieben (AnzZiel und AnzRand sind OK)
                             'Anzahl der Parameter bezieht sich hier nur auf eine Location
-                            For m = 0 To CES1.PES_Parents.GetUpperBound(0)
-                                If CES1.PES_Parents(m).iLocation = j + 1 Then
-                                    globalAnzPar = CES1.PES_Parents(m).Loc(j).Loc_Para.GetLength(1)
-                                    Exit For
-                                End If
-                            Next
+                            globalAnzPar = CES1.Childs(i).Loc(j).Parameter.GetLength(0)
 
                             'Die Anzahl der Eltern wird bestimmt, bzw ob Eltern vorhanden
                             Dim n_eltern As Integer = 0
-                            For m = 0 To CES1.PES_Parents.GetUpperBound(0)
-                                If (j + 1) = CES1.PES_Parents(m).iLocation Then
-                                    n_eltern += 1
-                                End If
-                            Next
+                            n_eltern = CES1.PES_Parents_pLoc.GetLength(0)
 
                             'Die Kinder bekommen je nach Fall (Eltern keine Eltern) neue Parameter
                             If n_eltern = 0 Then
@@ -1011,13 +1009,9 @@ Partial Class Form1
                                 '**************************************************************
                                 Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen, Method)
 
-                                Dim Index As Integer = 0
-                                For m = 0 To CES1.PES_Parents.GetUpperBound(0)
-                                    If (j + 1) = CES1.PES_Parents(m).iLocation Then
-                                        'Die Startwerte werden überschrieben
-                                        Call PES1.EsStartvalues(CES1.PES_Parents(m).Loc(j).Loc_Dn, CES1.PES_Parents(m).Loc(j).Parameter, Index)
-                                        Index += 1
-                                    End If
+                                'Die PopulationsEltern des PES werden gefüllt
+                                For m = 0 To CES1.PES_Parents_pLoc.GetUpperBound(0)
+                                    Call PES1.EsStartvalues(CES1.PES_Parents_pLoc(m).Loc(j).Loc_Dn, CES1.PES_Parents_pLoc(m).Loc(j).Parameter, m)
                                 Next
 
                                 'Startet die Prozesse evolutionstheoretischen Prozesse nacheinander
@@ -1027,14 +1021,10 @@ Partial Class Form1
                                 CES1.Childs(i).Loc(j).Parameter = PES1.EsGetParameter()
                                 CES1.Childs(i).Loc(j).Loc_Dn = PES1.EsGetDN()
 
-
-
-
-
                                 'Es fehlt noch: !!!
-                                ' - erst Memory pro location
-                                ' - Das NDSorting für den PES Memory
-                                ' - Prüfen ob PES in dieser Form richtig arbeitet
+                                ' - erst Memory pro location -> OK
+                                ' - Das NDSorting für den PES Memory -> OK
+                                ' - Prüfen ob PES in dieser Form richtig arbeitet ToDo
                             End If
                         End If
                     Next
