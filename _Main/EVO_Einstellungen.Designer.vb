@@ -318,7 +318,7 @@ Partial Class EVO_Einstellungen
         'TextAnzGen
         '
         Me.TextAnzGen.Location = New System.Drawing.Point(140, 16)
-        Me.TextAnzGen.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
+        Me.TextAnzGen.Maximum = New Decimal(New Integer() {5000, 0, 0, 0})
         Me.TextAnzGen.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.TextAnzGen.Name = "TextAnzGen"
         Me.TextAnzGen.Size = New System.Drawing.Size(53, 20)
@@ -452,7 +452,7 @@ Partial Class EVO_Einstellungen
         'TextAnzRunden
         '
         Me.TextAnzRunden.Location = New System.Drawing.Point(140, 13)
-        Me.TextAnzRunden.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
+        Me.TextAnzRunden.Maximum = New Decimal(New Integer() {5000, 0, 0, 0})
         Me.TextAnzRunden.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.TextAnzRunden.Name = "TextAnzRunden"
         Me.TextAnzRunden.Size = New System.Drawing.Size(53, 20)
