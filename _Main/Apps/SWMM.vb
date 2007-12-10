@@ -37,11 +37,15 @@ Public Class SWMM
 
 #Region "Methoden"
 
+    'Konstruktor
+    '***********
     Public Sub New()
+
+        Call MyBase.New()
 
     End Sub
 
-
+    
     Public Overrides Function launchSim() As Boolean
 
         'Aktuelles Verzeichnis bestimmen
