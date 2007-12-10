@@ -3,6 +3,12 @@ Imports System.IO
 Public Class Scan
     Inherits Sim
 
+    Public Overrides ReadOnly Property Datensatzendung() As String
+        Get
+            Return ".ALL"
+        End Get
+    End Property
+
     Private input As Wave.WEL
 
     Public Overrides Function launchSim() As Boolean

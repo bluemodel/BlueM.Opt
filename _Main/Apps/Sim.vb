@@ -29,6 +29,7 @@ Public MustInherit Class Sim
     'Generelle Eigenschaften
     '-----------------------
     Public Datensatz As String                           'Name des zu simulierenden Datensatzes
+    Public MustOverride ReadOnly Property Datensatzendung() As String
     Public WorkDir As String                             'Arbeitsverzeichnis für das Blaue Modell
     Public Event WorkDirChange()                         'Event für Änderung des Arbeitsverzeichnisses
 
@@ -1290,7 +1291,7 @@ Public MustInherit Class Sim
 
             DateiPfad = WorkDir & Datensatz & "." & List_ModellParameter(i).Datei
             'Datei öffnen
-            Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.Read)
+            Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
             Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
             Dim StrReadSync As TextReader = TextReader.Synchronized(StrRead)
 

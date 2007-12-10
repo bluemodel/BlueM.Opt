@@ -22,6 +22,12 @@ Public Class BlueM
     'Eigenschaften
     '#############
 
+    Public Overrides ReadOnly Property Datensatzendung() As String
+        Get
+            Return ".ALL"
+        End Get
+    End Property
+
     'BlueM DLL
     '---------
     Private bluem_dll As BlueM_EngineDotNetAccess
