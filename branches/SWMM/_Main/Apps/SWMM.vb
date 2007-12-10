@@ -26,6 +26,11 @@ Public Class SWMM
 
     'Eigenschaften
     '#############
+    Public Overrides ReadOnly Property Datensatzendung() As String
+        Get
+            Return ".INP"
+        End Get
+    End Property
 
 #End Region 'Eigenschaften
 
@@ -94,11 +99,13 @@ Public Class SWMM
 
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        'Verhindert parallelisierung, d.h. Einlesen wird erst abgeschlossen
+        Dim StrReadSync As TextReader = TextReader.Synchronized(StrRead)
 
         'Alle Zeilen durchlaufen
         Dim Zeile As String
         Do
-            Zeile = StrRead.ReadLine.ToString()
+            Zeile = StrReadSync.ReadLine.ToString()
 
             'Simulationszeitraum auslesen
             If (Zeile.StartsWith("START_DATE")) Then
@@ -117,7 +124,7 @@ Public Class SWMM
                 SimEndeHour_str = Zeile.Substring(21, 5)
             End If
 
-        Loop Until StrRead.Peek() = -1
+        Loop Until StrReadSync.Peek() = -1
 
         'SimStart und SimEnde in echtes Datum konvertieren
         Me.SimStart = New DateTime(SimStartDay_str.Substring(6, 4), SimStartDay_str.Substring(0, 2), SimStartDay_str.Substring(3, 2), SimStartHour_str.Substring(0, 2), SimStartHour_str.Substring(3, 2), 0)
@@ -125,6 +132,10 @@ Public Class SWMM
 
         'Zeitschrittweite ist immer 1 Minute
         Me.SimDT = New TimeSpan(0, 1, 0)
+
+        StrReadSync.Close()
+        StrRead.Close()
+        FiStr.Close()
 
     End Sub
 

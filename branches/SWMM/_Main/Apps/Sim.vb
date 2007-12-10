@@ -29,6 +29,7 @@ Public MustInherit Class Sim
     'Generelle Eigenschaften
     '-----------------------
     Public Datensatz As String                           'Name des zu simulierenden Datensatzes
+    Public MustOverride ReadOnly Property Datensatzendung() As String
     Public WorkDir As String                             'Arbeitsverzeichnis für das Blaue Modell
     Public Event WorkDirChange()                         'Event für Änderung des Arbeitsverzeichnisses
 
