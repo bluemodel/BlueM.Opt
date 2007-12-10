@@ -166,7 +166,7 @@ Partial Class Form1
         'OpenFileDialog_Datensatz
         '
         Me.OpenFileDialog_Datensatz.DefaultExt = "ALL"
-        Me.OpenFileDialog_Datensatz.Filter = "ALL-Dateien (*.ALL)|*.ALL"
+        Me.OpenFileDialog_Datensatz.Filter = "ALL-Dateien (*.ALL)|*.ALL|INP-Dateien (*.INP)|*.INP"
         Me.OpenFileDialog_Datensatz.Title = "Datensatz auswählen"
         '
         'OpenFileDialog_MDB

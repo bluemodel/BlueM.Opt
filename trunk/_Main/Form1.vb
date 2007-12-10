@@ -75,7 +75,7 @@ Partial Class Form1
         System.Windows.Forms.Application.EnableVisualStyles()
 
         'Liste der Anwendungen in ComboBox schreiben und Anfangseinstellung wählen
-        ComboBox_Anwendung.Items.AddRange(New Object() {"", ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_TESTPROBLEME, ANW_TSP})
+        ComboBox_Anwendung.Items.AddRange(New Object() {"", ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM, ANW_TESTPROBLEME, ANW_TSP})
         ComboBox_Anwendung.SelectedIndex = 0
 
         'Liste der Methoden in ComboBox schreiben und Anfangseinstellung wählen
@@ -161,6 +161,13 @@ Partial Class Form1
 
                     'Objekt der Klasse Scan initialisieren
                     Sim1 = New Scan()
+                    Call Me.displayWorkDir()
+
+
+                Case ANW_SWMM   'Anwendung SWMM
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                    'Objekt der Klasse SWMM initialisieren
+                    Sim1 = New SWMM()
                     Call Me.displayWorkDir()
 
 
@@ -415,7 +422,7 @@ Partial Class Form1
 
         'Alten Datensatz dem Dialog zuweisen
         OpenFileDialog_Datensatz.InitialDirectory = Sim1.WorkDir
-        OpenFileDialog_Datensatz.FileName = Sim1.WorkDir & Sim1.Datensatz & ".ALL"
+        OpenFileDialog_Datensatz.FileName = Sim1.WorkDir & Sim1.Datensatz & Sim1.Datensatzendung
         'Dialog öffnen
         Dim DatensatzResult As DialogResult = OpenFileDialog_Datensatz.ShowDialog()
         'Neuen Datensatz speichern
@@ -486,7 +493,7 @@ Partial Class Form1
 
             Select Case Anwendung
 
-                Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN
+                Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM
 
                     Select Case Method
                         Case METH_RESET
@@ -1204,7 +1211,7 @@ Start_Evolutionsrunden:
 
                                     Call Testprobleme1.Evaluierung_TestProbleme(myPara, durchlauf, PES1.PES_iAkt.iAktPop, QN, RN, DForm.Diag)
 
-                                Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN
+                                Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM
 
                                     'Vorbereiten des Modelldatensatzes
                                     Call Sim1.PREPARE_Evaluation_PES(myPara)
@@ -1410,7 +1417,7 @@ Start_Evolutionsrunden:
 
                 Call Testprobleme1.DiagInitialise(Me.EVO_Settings1.PES_Settings, globalAnzPar, Me.DForm.Diag)
 
-            Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN 'BlueM oder SMUSI
+            Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
                 Select Case Method
