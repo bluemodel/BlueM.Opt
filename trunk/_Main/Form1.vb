@@ -439,7 +439,7 @@ Partial Class Form1
     Private Sub displayWorkDir() Handles Sim1.WorkDirChange
 
         Dim pfad As String
-        pfad = Sim1.WorkDir & Sim1.Datensatz & ".ALL"
+        pfad = Sim1.WorkDir & Sim1.Datensatz & Sim1.Datensatzendung
 
         'Datensatzanzeige aktualisieren
         If (File.Exists(pfad)) Then
