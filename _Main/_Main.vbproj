@@ -118,7 +118,7 @@
   <ItemGroup>
     <Compile Include="Apps\BlueM\BlueM.vb" />
     <Compile Include="Apps\BlueM\IHA.vb" />
-    <Compile Include="Apps\Scan.vb" />
+    <Compile Include="Apps\BlueM\SKos.vb" />
     <Compile Include="Apps\SensiPlot.Designer.vb">
       <DependentUpon>SensiPlot.vb</DependentUpon>
     </Compile>
@@ -126,10 +126,10 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Apps\Sim.vb" />
-    <Compile Include="Apps\SKos.vb" />
     <Compile Include="Apps\SMUSI\Smusi.vb" />
     <Compile Include="Apps\SWMM\SWMM.vb" />
     <Compile Include="Apps\SWMM\Swmm_Iface.vb" />
+    <Compile Include="Apps\S_CAN\Scan.vb" />
     <Compile Include="Apps\Testprobleme\Testprobleme.Designer.vb">
       <DependentUpon>Testprobleme.vb</DependentUpon>
     </Compile>
