@@ -1,13 +1,48 @@
+Imports System.IO
+Imports System.Xml
+Imports System.Xml.Serialization
 Imports IHWB.EVO.Kern
 
 Public Class EVO_Einstellungen
     Inherits System.Windows.Forms.UserControl
 
-    Private _settings As PES.Struct_Settings        'Sicherung sämtlicher Einstellungen
+    'Eigenschaften
+    '#############
+
+    Private _settings As EVO.Kern.PES_Settings      'Sicherung sämtlicher Einstellungen
     Public isSaved As Boolean = False               'Flag der anzeigt, ob die Einstellungen bereits gesichert wurden
 
     Private OptModusValue As Short = EVO_MODUS.Single_Objective
-    Dim isMultiObjectiveOptimierung As Boolean
+    Private isMultiObjectiveOptimierung As Boolean
+
+    'Methoden
+    '########
+
+    'Konstruktor
+    '***********
+    Public Sub New()
+
+        ' Dieser Aufruf ist für den Windows Form-Designer erforderlich.
+        Call Me.InitializeComponent()
+
+        ' Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+
+        'PES_Settings instanzieren
+        Me._settings = New EVO.Kern.PES_Settings()
+        'Form initialisieren
+        Call Me.UserControl_Initialize()
+
+    End Sub
+
+    'Laden des Formulars    
+    Private Sub EVO_Einstellungen_Load( ByVal sender As System.Object,  ByVal e As System.EventArgs) Handles MyBase.Load
+        
+        'EventHandler einrichten
+        AddHandler Me.Button_Load.Click, AddressOf Form1.Load_EVO_Settings
+        AddHandler Me.Button_Save.Click, AddressOf Form1.Save_EVO_Settings
+
+    End Sub
+
 
     'Optimierungsmodus wurde geändert
     '********************************
@@ -162,27 +197,27 @@ Public Class EVO_Einstellungen
 
     'Einstellungen aus Form einlesen
     '*******************************
-    Public Sub readSettings()
+    Private Sub readForm()
 
         _settings.n_Eltern = Val(TextAnzEltern.Text)
         _settings.n_Nachf = Val(TextAnzNachf.Text)
         _settings.n_Gen = Val(TextAnzGen.Text)
         _settings.ty_EvoTyp = VB6.GetItemData(ComboStrategie, ComboStrategie.SelectedIndex)
-        _settings.ty_PopEvoTyp = VB6.GetItemData(ComboPopStrategie, ComboPopStrategie.SelectedIndex)
-        _settings.ty_PopPenalty = VB6.GetItemData(ComboPopPenalty, ComboPopPenalty.SelectedIndex)
         _settings.is_MO_Pareto = isMultiObjectiveOptimierung
-        _settings.is_POPUL = CheckisPopul.Checked
-        If (_settings.is_POPUL) Then
-            _settings.n_Runden = Val(TextAnzRunden.Text)
-            _settings.n_Popul = Val(TextAnzPop.Text)
-            _settings.n_PopEltern = Val(TextAnzPopEltern.Text)
+        _settings.Pop.is_POPUL = CheckisPopul.Checked
+        _settings.Pop.ty_PopEvoTyp = VB6.GetItemData(ComboPopStrategie, ComboPopStrategie.SelectedIndex)
+        _settings.Pop.ty_PopPenalty = VB6.GetItemData(ComboPopPenalty, ComboPopPenalty.SelectedIndex)
+        _settings.Pop.ty_OptPopEltern = VB6.GetItemData(ComboOptPopEltern, ComboOptPopEltern.SelectedIndex)
+        If (_settings.Pop.is_POPUL) Then
+            _settings.Pop.n_Runden = Val(TextAnzRunden.Text)
+            _settings.Pop.n_Popul = Val(TextAnzPop.Text)
+            _settings.Pop.n_PopEltern = Val(TextAnzPopEltern.Text)
         Else
-            _settings.n_Runden = 1
-            _settings.n_Popul = 1
-            _settings.n_PopEltern = 1
+            _settings.Pop.n_Runden = 1
+            _settings.Pop.n_Popul = 1
+            _settings.Pop.n_PopEltern = 1
         End If
         _settings.ty_OptEltern = VB6.GetItemData(ComboOptEltern, ComboOptEltern.SelectedIndex)
-        _settings.ty_OptPopEltern = VB6.GetItemData(ComboOptPopEltern, ComboOptPopEltern.SelectedIndex)
         _settings.n_RekombXY = Val(TextRekombxy.Text)
         _settings.DnStart = Val(TextDeltaStart.Text)
         _settings.ty_StartPar = VB6.GetItemData(ComboOptVorgabe, ComboOptVorgabe.SelectedIndex)
@@ -194,7 +229,39 @@ Public Class EVO_Einstellungen
             _settings.is_Interact = True
             _settings.n_Interact = Val(TextInteract.Text)
         End If
-        _settings.n_MemberSecondPop = Val(TextNMemberSecondPop.Text)
+        _settings.n_MemberSekPop = Val(TextNMemberSecondPop.Text)
+
+    End Sub
+
+    'Einstellungen in Form schreiben
+    '*******************************
+    Private Sub writeForm()
+
+        Me.TextAnzEltern.Value = Me._settings.n_Eltern
+        Me.TextAnzNachf.Value = Me._settings.n_Nachf
+        Me.TextAnzGen.Value = Me._settings.n_Gen
+        Me.ComboStrategie.SelectedItem = Me._settings.ty_EvoTyp
+        Me.isMultiObjectiveOptimierung = Me._settings.is_MO_Pareto
+        Me.CheckisPopul.Checked = Me._settings.Pop.is_POPUL
+        Me.ComboPopStrategie.SelectedItem = Me._settings.Pop.ty_PopEvoTyp
+        Me.ComboPopPenalty.SelectedItem = Me._settings.Pop.ty_PopPenalty
+        Me.ComboOptPopEltern.SelectedItem = Me._settings.Pop.ty_OptPopEltern
+        Me.TextAnzRunden.Value = Me._settings.Pop.n_Runden
+        Me.TextAnzPop.Value = Me._settings.Pop.n_Popul
+        Me.TextAnzPopEltern.Value = Me._settings.Pop.n_PopEltern
+        Me.ComboOptEltern.SelectedItem = Me._settings.ty_OptEltern
+        Me.TextRekombxy.Value = Me._settings.n_RekombXY
+        Me.TextDeltaStart.Value = Me._settings.DnStart
+        Me.ComboOptVorgabe.SelectedItem = Me._settings.ty_StartPar
+        Me.CheckisDnVektor.Checked = Me._settings.is_DnVektor
+        If (Me._settings.is_Interact) Then
+            Me.TextInteract.Value = Me._settings.n_Interact
+        Else
+            Me.TextInteract.Value = 0
+        End If
+        Me.TextNMemberSecondPop.Value = Me._settings.n_MemberSekPop
+
+        Call Application.DoEvents()
 
     End Sub
 
@@ -214,15 +281,54 @@ Public Class EVO_Einstellungen
         End Set
     End Property
 
-    Public ReadOnly Property PES_Settings() As PES.Struct_Settings
+    'PES_Settings Property
+    '*********************
+    Public ReadOnly Property PES_Settings() As EVO.Kern.PES_Settings
         Get
-            'Wenn Einstellungen noch nicht gespeichert, zuerst einlesen
+            'Wenn Einstellungen noch nicht gespeichert, zuerst aus Form einlesen
             If (Not Me.isSaved) Then
-                Call readSettings()
+                Call Me.readForm()
             End If
             PES_Settings = Me._settings
         End Get
     End Property
+
+    'Speichern der PES_Settings in einer XML-Datei
+    '*********************************************
+    Public Sub saveSettings(ByVal filename As String)
+
+        Call Me.readForm()
+
+        Dim serializer As New XmlSerializer(GetType(EVO.Kern.PES_Settings))
+        Dim writer As New StreamWriter(filename)
+        serializer.Serialize(writer, Me._settings)
+        writer.Close()
+
+        Me.isSaved = True
+
+    End Sub
+
+    'Laden der PES_Settings aus einer XML-Datei
+    '******************************************
+    Public Sub loadSettings(ByVal filename As String)
+
+        Dim serializer As New XmlSerializer(GetType(EVO.Kern.PES_Settings))
+
+        ' If the XML document has been altered with unknown
+        ' nodes or attributes, handle them with the
+        ' UnknownNode and UnknownAttribute events.
+        'AddHandler serializer.UnknownNode, AddressOf serializer_UnknownNode
+        'AddHandler serializer.UnknownAttribute, AddressOf serializer_UnknownAttribute
+
+        'XML-Datei einlesen
+        Dim fs As New FileStream(filename, FileMode.Open)
+        Me._settings = CType(serializer.Deserialize(fs), EVO.Kern.PES_Settings)
+        fs.Close()
+
+        'Geladene Settings in Form schreiben
+        Call Me.writeForm()
+
+    End Sub
 
 #End Region 'Schnittstelle
 

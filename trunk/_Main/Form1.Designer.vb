@@ -40,12 +40,12 @@ Partial Class Form1
         Me.ComboBox_Methode = New System.Windows.Forms.ComboBox
         Me.Label_Anwendung = New System.Windows.Forms.Label
         Me.ComboBox_Anwendung = New System.Windows.Forms.ComboBox
-        Me.OpenFileDialog_Datensatz = New System.Windows.Forms.OpenFileDialog
-        Me.OpenFileDialog_MDB = New System.Windows.Forms.OpenFileDialog
+        Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog
         Me.Testprobleme1 = New IHWB.EVO.Testprobleme
         Me.EVO_Opt_Verlauf1 = New IHWB.EVO.EVO_Opt_Verlauf
         Me.EVO_Settings1 = New IHWB.EVO.EVO_Einstellungen
         Me.DForm = New IHWB.EVO.DiagrammForm
+        Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog
         Me.GroupBox_Anwendung.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -163,17 +163,6 @@ Partial Class Form1
         Me.ComboBox_Anwendung.Size = New System.Drawing.Size(124, 21)
         Me.ComboBox_Anwendung.TabIndex = 0
         '
-        'OpenFileDialog_Datensatz
-        '
-        Me.OpenFileDialog_Datensatz.DefaultExt = "ALL"
-        Me.OpenFileDialog_Datensatz.Filter = "ALL-Dateien (*.ALL)|*.ALL|INP-Dateien (*.INP)|*.INP"
-        Me.OpenFileDialog_Datensatz.Title = "Datensatz auswählen"
-        '
-        'OpenFileDialog_MDB
-        '
-        Me.OpenFileDialog_MDB.Filter = "Access-Datenbanken|*.mdb"
-        Me.OpenFileDialog_MDB.Title = "Ergebnisdatenbank auswählen"
-        '
         'Testprobleme1
         '
         Me.Testprobleme1.Enabled = False
@@ -239,8 +228,8 @@ Partial Class Form1
     Friend WithEvents LinkLabel_WorkDir As System.Windows.Forms.LinkLabel
     Friend WithEvents ComboBox_Methode As System.Windows.Forms.ComboBox
     Friend WithEvents Label_Methode As System.Windows.Forms.Label
-    Friend WithEvents OpenFileDialog_Datensatz As System.Windows.Forms.OpenFileDialog
-    Friend WithEvents OpenFileDialog_MDB As System.Windows.Forms.OpenFileDialog
+    Friend WithEvents OpenFileDialog1 As System.Windows.Forms.OpenFileDialog
     Friend WithEvents Button_openMDB As System.Windows.Forms.Button
     Friend WithEvents Button_Scatterplot As System.Windows.Forms.Button
+    Friend WithEvents SaveFileDialog1 As System.Windows.Forms.SaveFileDialog
 End Class

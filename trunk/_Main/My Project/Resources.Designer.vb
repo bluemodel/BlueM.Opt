@@ -67,10 +67,24 @@ Namespace My.Resources
             End Get
         End Property
         
+        Friend ReadOnly Property disk() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("disk", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
         Friend ReadOnly Property EVO() As System.Drawing.Icon
             Get
                 Dim obj As Object = ResourceManager.GetObject("EVO", resourceCulture)
                 Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        Friend ReadOnly Property folder() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("folder", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property
         

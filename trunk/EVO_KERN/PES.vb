@@ -2,7 +2,6 @@ Option Strict Off
 
 Public Class PES
 
-
     '*******************************************************************************
     '*******************************************************************************
     '**** Klasse PES (Parametric Evolution Strategy)                            ****
@@ -31,31 +30,7 @@ Public Class PES
     'Deklarationsteil Variablen und Strukturen
     '#########################################
 
-    'Structure zum Speichern aller Einstellungen aus dem Form
-    Public Structure Struct_Settings
-        Dim n_Eltern As Integer                 'Anzahl Eltern
-        Dim n_Nachf As Integer                  'Anzahl Kinder
-        Dim n_Gen As Integer                    'Anzahl Generationen
-        Dim ty_EvoTyp As EVO_STRATEGIE          'Typ der Evolutionsstrategie (+ oder ,)
-        Dim ty_PopEvoTyp As EVO_STRATEGIE       'Typ der Evolutionsstrategie (+ oder ,) auf Populationsebene
-        Dim ty_PopPenalty As EVO_POP_PENALTY    'Art der Beurteilung der Populationsgüte (Multiobjective)
-        Dim is_POPUL As Boolean                 'Mit Populationen
-        Dim is_MO_Pareto As Boolean             'Multi-Objective mit Pareto Front
-        Dim n_Runden As Integer                 'Anzahl Runden
-        Dim n_Popul As Integer                  'Anzahl Populationen
-        Dim n_PopEltern As Integer              'Anzahl Populationseltern
-        Dim ty_OptPopEltern As EVO_POP_ELTERN   'Ermittlung der Populationseltern
-        Dim ty_OptEltern As EVO_ELTERN          'Ermittlung der Individuum-Eltern
-        Dim n_RekombXY As Integer               'X/Y-Schema Rekombination
-        Dim DnStart As Double                   'Startschrittweite
-        Dim ty_StartPar As EVO_STARTPARAMETER   'Startparameter
-        Dim is_DnVektor As Boolean              'Soll ein Schrittweitenvektor benutzt werden
-        Dim n_Interact As Integer               'Alle wieviel Generationen soll die aktuelle Population mit Mitgliedern der sekundären Population aufgefüllt werden
-        Dim is_Interact As Boolean              'Mit Austausch zwischen Population und Sekundärer Population
-        Dim n_MemberSecondPop As Integer        'Maximale Anzahl Mitglieder der Sekundärpopulation
-    End Structure
-
-    Public PES_Settings As Struct_Settings
+    Public PES_Settings As PES_Settings
 
     'Beziehung
     '--------------
@@ -146,7 +121,7 @@ Public Class PES
 
     'Initialisierung der PES
     '***************************************
-    Public Sub PesInitialise(ByRef PES_Settings As Struct_Settings, ByVal AnzPara As Integer, ByVal AnzPenalty As Integer, ByVal AnzConstr As Integer, ByRef Parameter() As Double, ByVal beziehungen() As Beziehung, ByVal Method As String)
+    Public Sub PesInitialise(ByRef PES_Settings As PES_Settings, ByVal AnzPara As Integer, ByVal AnzPenalty As Integer, ByVal AnzConstr As Integer, ByRef Parameter() As Double, ByVal beziehungen() As Beziehung, ByVal Method As String)
 
         'Schritt 1: PES - ES_OPTIONS
         'Optionen der Evolutionsstrategie werden übergeben
@@ -165,26 +140,26 @@ Public Class PES
     'Schritt 1: ES_SETTINGS
     'Function ES_SETTINGS übergibt Optionen für Evolutionsstrategie und Prüft die eingestellten Optionen
     '***************************************************************************************************
-    Private Sub EsSettings(ByRef Settings As Struct_Settings, ByVal Method As String)
+    Private Sub EsSettings(ByRef Settings As PES_Settings, ByVal Method As String)
 
         'Überprüfung der Übergebenen Werte
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         If (Settings.ty_EvoTyp < 1 Or Settings.ty_EvoTyp > 2) Then
             Throw New Exception("Typ der Evolutionsstrategie ist nicht '+' oder ','")
         End If
-        If (Settings.ty_PopEvoTyp < 1 Or Settings.ty_PopEvoTyp > 2) Then
+        If (Settings.Pop.ty_PopEvoTyp < 1 Or Settings.Pop.ty_PopEvoTyp > 2) Then
             Throw New Exception("Typ der Evolutionsstrategie auf Pupulationsebene ist nicht '+' oder ','")
         End If
-        If (Settings.n_Runden < 1) Then
+        If (Settings.Pop.n_Runden < 1) Then
             Throw New Exception("Die Anzahl der Runden ist kleiner 1")
         End If
-        If (Settings.n_Popul < 1) Then
+        If (Settings.Pop.n_Popul < 1) Then
             Throw New Exception("Die Anzahl der Populationen ist kleiner 1")
         End If
-        If (Settings.n_PopEltern < 1) Then
+        If (Settings.Pop.n_PopEltern < 1) Then
             Throw New Exception("Die Anzahl der Populationseltern ist kleiner 1")
         End If
-        If (Settings.ty_OptPopEltern < 1 Or Settings.ty_OptPopEltern > 3) Then
+        If (Settings.Pop.ty_OptPopEltern < 1 Or Settings.Pop.ty_OptPopEltern > 3) Then
             Throw New Exception("Ermittlung der Populationseltern ist nicht Mittelwert, Rekombination oder Selektion!")
         End If
         If (Settings.ty_OptEltern < 1 Or Settings.ty_OptEltern > 6) Then
@@ -208,7 +183,7 @@ Public Class PES
         If (Settings.ty_StartPar < 1 Or Settings.ty_StartPar > 2) Then
             Throw New Exception("Die Startaparameter dürfen nur zufällig sein oder aus den Originalparameter bestehen!")
         End If
-        If (Settings.n_Popul < Settings.n_PopEltern) Then
+        If (Settings.Pop.n_Popul < Settings.Pop.n_PopEltern) Then
             Throw New Exception("Die Anzahl der Populationseltern darf nicht größer als die Anzahl der Populationen!")
         End If
         If (Settings.n_Nachf <= Settings.n_Eltern) And Not Method = "HYBRID" Then
@@ -249,19 +224,19 @@ Public Class PES
         ReDim AktPara.Dn(Anz.Para - 1)                'Schrittweitenvektor wird initialisiert
 
         'Parametervektoren initialisieren
-        ReDim Dp(Anz.Para - 1, PES_Settings.n_Eltern - 1, PES_Settings.n_PopEltern - 1)
-        ReDim Xp(Anz.Para - 1, PES_Settings.n_Eltern - 1, PES_Settings.n_PopEltern - 1)
-        ReDim Qbpop(PES_Settings.n_Popul - 1, Anz.Penalty - 1)
-        ReDim Dbpop(Anz.Para - 1, PES_Settings.n_Eltern - 1, PES_Settings.n_Popul - 1)
-        ReDim Xbpop(Anz.Para - 1, PES_Settings.n_Eltern - 1, PES_Settings.n_Popul - 1)
+        ReDim Dp(Anz.Para - 1, PES_Settings.n_Eltern - 1, PES_Settings.Pop.n_PopEltern - 1)
+        ReDim Xp(Anz.Para - 1, PES_Settings.n_Eltern - 1, PES_Settings.Pop.n_PopEltern - 1)
+        ReDim Qbpop(PES_Settings.Pop.n_Popul - 1, Anz.Penalty - 1)
+        ReDim Dbpop(Anz.Para - 1, PES_Settings.n_Eltern - 1, PES_Settings.Pop.n_Popul - 1)
+        ReDim Xbpop(Anz.Para - 1, PES_Settings.n_Eltern - 1, PES_Settings.Pop.n_Popul - 1)
         '---------------------
-        ReDim De(Anz.Para - 1, PES_Settings.n_Eltern - 1, PES_Settings.n_Popul - 1)
-        ReDim Xe(Anz.Para - 1, PES_Settings.n_Eltern - 1, PES_Settings.n_Popul - 1)
+        ReDim De(Anz.Para - 1, PES_Settings.n_Eltern - 1, PES_Settings.Pop.n_Popul - 1)
+        ReDim Xe(Anz.Para - 1, PES_Settings.n_Eltern - 1, PES_Settings.Pop.n_Popul - 1)
         '---------------------
-        ReDim Best.Db(Anz.Para - 1, PES_Settings.n_Eltern - 1, PES_Settings.n_Popul - 1)
-        ReDim Best.Xb(Anz.Para - 1, PES_Settings.n_Eltern - 1, PES_Settings.n_Popul - 1)
-        ReDim Best.Qb(PES_Settings.n_Eltern - 1, PES_Settings.n_Popul - 1, Anz.Penalty - 1)
-        ReDim Best.Rb(PES_Settings.n_Eltern - 1, PES_Settings.n_Popul - 1, Anz.Constr - 1)
+        ReDim Best.Db(Anz.Para - 1, PES_Settings.n_Eltern - 1, PES_Settings.Pop.n_Popul - 1)
+        ReDim Best.Xb(Anz.Para - 1, PES_Settings.n_Eltern - 1, PES_Settings.Pop.n_Popul - 1)
+        ReDim Best.Qb(PES_Settings.n_Eltern - 1, PES_Settings.Pop.n_Popul - 1, Anz.Penalty - 1)
+        ReDim Best.Rb(PES_Settings.n_Eltern - 1, PES_Settings.Pop.n_Popul - 1, Anz.Constr - 1)
 
         'NDSorting wird nur benötigt, falls eine Paretofront approximiert wird
         If PES_Settings.is_MO_Pareto Then
@@ -278,7 +253,7 @@ Public Class PES
         End If
 
         For n = 0 To PES_Settings.n_Eltern - 1
-            For m = 0 To PES_Settings.n_Popul - 1
+            For m = 0 To PES_Settings.Pop.n_Popul - 1
                 For l = 0 To Anz.Penalty - 1
                     'Qualität der Eltern (Anzahl = parents) wird auf sehr großen Wert gesetzt
                     Best.Qb(n, m, l) = 1.0E+300
@@ -294,9 +269,9 @@ Public Class PES
 
         'Falls NDSorting Crowding Distance wird initialisiert
         If PES_Settings.is_MO_Pareto Then
-            For n = 0 To PES_Settings.n_Popul - 1
+            For n = 0 To PES_Settings.Pop.n_Popul - 1
                 For m = 0 To Anz.Penalty - 1
-                    Select Case PES_Settings.ty_PopPenalty
+                    Select Case PES_Settings.Pop.ty_PopPenalty
 
                         Case EVO_POP_PENALTY.Crowding
                             'Qualität der Populationseltern wird auf sehr großen Wert gesetzt
@@ -309,7 +284,7 @@ Public Class PES
                 Next m
             Next n
         Else
-            For n = 0 To PES_Settings.n_Popul - 1
+            For n = 0 To PES_Settings.Pop.n_Popul - 1
                 For m = 0 To Anz.Penalty - 1
                     'Qualität der Populationseltern wird auf sehr großen Wert gesetzt
                     Qbpop(n, m) = 1.0E+300
@@ -359,7 +334,7 @@ Public Class PES
             Case EVO_STARTPARAMETER.Zufall 'Zufällige Startwerte
                 For v = 0 To Anz.Para - 1
                     For n = 0 To PES_Settings.n_Eltern - 1
-                        For m = 0 To PES_Settings.n_PopEltern - 1
+                        For m = 0 To PES_Settings.Pop.n_PopEltern - 1
                             'Startwert für die Elternschrittweite wird zugewiesen
                             Dp(v, n, m) = AktPara.Dn(0)
                             'Startwert für die Eltern werden zugewiesen
@@ -372,7 +347,7 @@ Public Class PES
             Case EVO_STARTPARAMETER.Original 'Originalparameter
                 For v = 0 To Anz.Para - 1
                     For n = 0 To PES_Settings.n_Eltern - 1
-                        For m = 0 To PES_Settings.n_PopEltern - 1
+                        For m = 0 To PES_Settings.Pop.n_PopEltern - 1
                             'Startwert für die Elternschrittweite wird zugewiesen
                             Dp(v, n, m) = AktPara.Dn(0)
                             'Startwert für die Eltern werden zugewiesen
@@ -470,11 +445,11 @@ Public Class PES
         Dim m, n, v As Integer
         Dim R As Integer                      'Zufälliger Integer Wert
 
-        Select Case PES_Settings.ty_OptPopEltern
+        Select Case PES_Settings.Pop.ty_OptPopEltern
 
             Case EVO_POP_ELTERN.Rekombination 'MultiRekombination über alle Eltern (x/x,y) oder (x/x+y)
                 For n = 0 To PES_Settings.n_Eltern - 1
-                    R = Int(PES_Settings.n_PopEltern * Rnd())
+                    R = Int(PES_Settings.Pop.n_PopEltern * Rnd())
                     For v = 0 To Anz.Para - 1
                         'Selektion der Schrittweite
                         De(v, n, PES_iAkt.iAktPop) = Dp(v, n, R)
@@ -489,17 +464,17 @@ Public Class PES
                     For n = 0 To PES_Settings.n_Eltern - 1
                         De(v, n, PES_iAkt.iAktPop) = 0
                         Xe(v, n, PES_iAkt.iAktPop) = 0
-                        For m = 0 To PES_Settings.n_PopEltern - 1
+                        For m = 0 To PES_Settings.Pop.n_PopEltern - 1
                             'Mittelung der Schrittweite,
-                            De(v, n, PES_iAkt.iAktPop) = De(v, n, PES_iAkt.iAktPop) + (Dp(v, n, m) / PES_Settings.n_PopEltern)
+                            De(v, n, PES_iAkt.iAktPop) = De(v, n, PES_iAkt.iAktPop) + (Dp(v, n, m) / PES_Settings.Pop.n_PopEltern)
                             'Mittelung der Eltern,
-                            Xe(v, n, PES_iAkt.iAktPop) = Xe(v, n, PES_iAkt.iAktPop) + (Xp(v, n, m) / PES_Settings.n_PopEltern)
+                            Xe(v, n, PES_iAkt.iAktPop) = Xe(v, n, PES_iAkt.iAktPop) + (Xp(v, n, m) / PES_Settings.Pop.n_PopEltern)
                         Next m
                     Next n
                 Next v
 
             Case EVO_POP_ELTERN.Selektion 'Zufallswahl über alle Eltern
-                R = Int(PES_Settings.n_PopEltern * Rnd()) 'Zufallszahl entscheidet welcher
+                R = Int(PES_Settings.Pop.n_PopEltern * Rnd()) 'Zufallszahl entscheidet welcher
                 'Elternteil vererbt wird
                 For v = 0 To Anz.Para - 1
                     For n = 0 To PES_Settings.n_Eltern - 1
@@ -672,8 +647,8 @@ Public Class PES
         Dim XeTemp(,,) As Double      'Temporäre Parameterwerte für Eltern
         Dim expo As Integer             'Exponent für Schrittweite (+/-1)
 
-        ReDim DeTemp(Anz.Para - 1, PES_Settings.n_Eltern - 1, PES_Settings.n_Popul - 1)
-        ReDim XeTemp(Anz.Para - 1, PES_Settings.n_Eltern - 1, PES_Settings.n_Popul - 1)
+        ReDim DeTemp(Anz.Para - 1, PES_Settings.n_Eltern - 1, PES_Settings.Pop.n_Popul - 1)
+        ReDim XeTemp(Anz.Para - 1, PES_Settings.n_Eltern - 1, PES_Settings.Pop.n_Popul - 1)
 
 StartMutation:
 
@@ -820,14 +795,14 @@ StartMutation:
         '(höchster Wert der Penaltyfunktion, niedrigster Wert der Crowding Distance)
         i = 0
         h1 = Qbpop(0, 0)
-        For m = 1 To PES_Settings.n_Popul - 1
+        For m = 1 To PES_Settings.Pop.n_Popul - 1
             If Not PES_Settings.is_MO_Pareto Then
                 If Qbpop(m, 0) > h1 Then
                     h1 = Qbpop(m, 0)
                     i = m
                 End If
             Else
-                Select Case PES_Settings.ty_PopPenalty
+                Select Case PES_Settings.Pop.ty_PopPenalty
 
                     Case EVO_POP_PENALTY.Crowding
                         If Qbpop(m, 0) > h1 Then
@@ -849,7 +824,7 @@ StartMutation:
         If PES_Settings.is_MO_Pareto Then
             j = 0
             h2 = Qbpop(0, 1)
-            For m = 2 To PES_Settings.n_Popul
+            For m = 2 To PES_Settings.Pop.n_Popul
                 If Qbpop(m, 1) < h2 Then
                     h2 = Qbpop(m, 1)
                     j = m
@@ -883,7 +858,7 @@ StartMutation:
                 Next m
             End If
         Else
-            Select Case PES_Settings.ty_PopPenalty
+            Select Case PES_Settings.Pop.ty_PopPenalty
 
                 Case EVO_POP_PENALTY.Crowding
                     If h1 < Qbpop(i, 0) Then
@@ -995,8 +970,8 @@ StartMutation:
     Public Sub EsResetPopBWSpeicher()
         Dim n, i As Integer
 
-        If (PES_Settings.ty_PopEvoTyp = EVO_STRATEGIE.Komma) Then
-            For n = 0 To PES_Settings.n_Popul - 1
+        If (PES_Settings.Pop.ty_PopEvoTyp = EVO_STRATEGIE.Komma) Then
+            For n = 0 To PES_Settings.Pop.n_Popul - 1
                 For i = 0 To Anz.Penalty - 1
                     Qbpop(n, i) = 1.0E+300
                 Next i
@@ -1014,17 +989,17 @@ StartMutation:
         Dim Realisierungsspeicher(,) As Double
         Dim Z As Integer
 
-        Select Case PES_Settings.ty_PopPenalty
+        Select Case PES_Settings.Pop.ty_PopPenalty
             Case EVO_POP_PENALTY.Crowding
                 Z = 0
             Case EVO_POP_PENALTY.Spannweite
                 Z = 1
         End Select
 
-        ReDim Realisierungsspeicher(PES_Settings.n_Popul - 1, 1)
+        ReDim Realisierungsspeicher(PES_Settings.Pop.n_Popul - 1, 1)
 
         'Die NPopEltern besten Individium-Sätze werden ermittelt
-        For m = 0 To PES_Settings.n_Popul - 1
+        For m = 0 To PES_Settings.Pop.n_Popul - 1
             Realisierungsspeicher(m, 0) = Qbpop(m, Z)
             Realisierungsspeicher(m, 1) = m
         Next m
@@ -1032,8 +1007,8 @@ StartMutation:
         If (Not PES_Settings.is_MO_Pareto) Then
             'Standard ES nach Rechenberg
             '---------------------------
-            For m = 0 To PES_Settings.n_Popul - 1
-                For n = m To PES_Settings.n_Popul - 1
+            For m = 0 To PES_Settings.Pop.n_Popul - 1
+                For n = m To PES_Settings.Pop.n_Popul - 1
                     If Realisierungsspeicher(m, 0) > Realisierungsspeicher(n, 0) Then
                         swap(0) = Realisierungsspeicher(m, 0)
                         swap(1) = Realisierungsspeicher(m, 1)
@@ -1048,11 +1023,11 @@ StartMutation:
         Else
             'Multi-Objective mit Paretofront
             '-------------------------------
-            Select Case PES_Settings.ty_PopPenalty
+            Select Case PES_Settings.Pop.ty_PopPenalty
 
                 Case EVO_POP_PENALTY.Crowding
-                    For m = 0 To PES_Settings.n_Popul - 1
-                        For n = m To PES_Settings.n_Popul - 1
+                    For m = 0 To PES_Settings.Pop.n_Popul - 1
+                        For n = m To PES_Settings.Pop.n_Popul - 1
                             If Realisierungsspeicher(m, 0) > Realisierungsspeicher(n, 0) Then
                                 swap(0) = Realisierungsspeicher(m, 0)
                                 swap(1) = Realisierungsspeicher(m, 1)
@@ -1065,8 +1040,8 @@ StartMutation:
                     Next
 
                 Case EVO_POP_PENALTY.Spannweite
-                    For m = 0 To PES_Settings.n_Popul - 1
-                        For n = m To PES_Settings.n_Popul - 1
+                    For m = 0 To PES_Settings.Pop.n_Popul - 1
+                        For n = m To PES_Settings.Pop.n_Popul - 1
                             If Realisierungsspeicher(m, 0) < Realisierungsspeicher(n, 0) Then
                                 swap(0) = Realisierungsspeicher(m, 0)
                                 swap(1) = Realisierungsspeicher(m, 1)
@@ -1081,7 +1056,7 @@ StartMutation:
         End If
 
         'Die Eltern werden gleich der besten Kinder gesetzt (Schrittweite und Parameterwert)
-        For m = 0 To PES_Settings.n_PopEltern - 1
+        For m = 0 To PES_Settings.Pop.n_PopEltern - 1
             For n = 0 To PES_Settings.n_Eltern - 1
                 For v = 0 To Anz.Para - 1
                     Dp(v, n, m) = Dbpop(v, n, Int(Realisierungsspeicher(m, 1)))
@@ -1138,7 +1113,7 @@ StartMutation:
             '3. Der Bestwertspeicher wird entsprechend der Fronten oder der sekundären Population gefüllt
             '4: Sekundäre Population wird bestimmt und gespeichert
             '--------------------------------
-            Dim Func1 As Kern.Functions = New Kern.Functions(PES_Settings.n_Nachf, PES_Settings.n_Eltern, PES_Settings.n_MemberSecondPop, PES_Settings.n_Interact, PES_Settings.is_Interact, Anz.Penalty, Anz.Constr, PES_iAkt.iAktGen)
+            Dim Func1 As Kern.Functions = New Kern.Functions(PES_Settings.n_Nachf, PES_Settings.n_Eltern, PES_Settings.n_MemberSekPop, PES_Settings.n_Interact, PES_Settings.is_Interact, Anz.Penalty, Anz.Constr, PES_iAkt.iAktGen)
             Call Func1.EsEltern_Pareto_SekundärQb(Best_Indi, NDSorting, SekundärQb)
             'Am ende die Bestwerte wieder zurück
             For i = 0 To Best.Qb.GetUpperBound(0)
@@ -1396,7 +1371,7 @@ StartMutation:
         Dim swap As Double
         Dim fmin, fmax As Double
 
-        ReDim QbTemp(PES_Settings.n_Eltern - 1, PES_Settings.n_Popul - 1, Anz.Penalty - 1)
+        ReDim QbTemp(PES_Settings.n_Eltern - 1, PES_Settings.Pop.n_Popul - 1, Anz.Penalty - 1)
 
         Array.Copy(Best.Qb, QbTemp, Best.Qb.GetLength(0))
         For i = 0 To PES_Settings.n_Eltern - 1

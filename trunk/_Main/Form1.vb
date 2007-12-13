@@ -210,7 +210,7 @@ Partial Class Form1
             End If
 
             'EVO_Verlauf zurücksetzen
-            Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Settings1.PES_Settings.n_Runden, EVO_Settings1.PES_Settings.n_Popul, EVO_Settings1.PES_Settings.n_Gen, EVO_Settings1.PES_Settings.n_Nachf)
+            Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Settings1.PES_Settings.Pop.n_Runden, EVO_Settings1.PES_Settings.Pop.n_Popul, EVO_Settings1.PES_Settings.n_Gen, EVO_Settings1.PES_Settings.n_Nachf)
 
         End If
 
@@ -324,7 +324,7 @@ Partial Class Form1
                     Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
 
                     'EVO_Verlauf zurücksetzen
-                    Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Settings1.PES_Settings.n_Runden, EVO_Settings1.PES_Settings.n_Popul, EVO_Settings1.PES_Settings.n_Gen, EVO_Settings1.PES_Settings.n_Nachf)
+                    Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Settings1.PES_Settings.Pop.n_Runden, EVO_Settings1.PES_Settings.Pop.n_Popul, EVO_Settings1.PES_Settings.n_Gen, EVO_Settings1.PES_Settings.n_Nachf)
 
                 Case METH_CES, METH_CES_PES, METH_HYBRID 'Methode CES und Methode CES_PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -420,15 +420,24 @@ Partial Class Form1
     '***********************************
     Private Sub changeDatensatz(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles LinkLabel_WorkDir.LinkClicked
 
+        Dim DiagResult As DialogResult
+
+        'Dialog vorbereiten
+        OpenFileDialog1.Filter = "ALL-Dateien (*.ALL)|*.ALL|INP-Dateien (*.INP)|*.INP"
+        OpenFileDialog1.Title = "Datensatz auswählen"
+
         'Alten Datensatz dem Dialog zuweisen
-        OpenFileDialog_Datensatz.InitialDirectory = Sim1.WorkDir
-        OpenFileDialog_Datensatz.FileName = Sim1.WorkDir & Sim1.Datensatz & Sim1.Datensatzendung
+        OpenFileDialog1.InitialDirectory = Sim1.WorkDir
+        OpenFileDialog1.FileName = Sim1.WorkDir & Sim1.Datensatz & Sim1.Datensatzendung
+
         'Dialog öffnen
-        Dim DatensatzResult As DialogResult = OpenFileDialog_Datensatz.ShowDialog()
+        DiagResult = OpenFileDialog1.ShowDialog()
+
         'Neuen Datensatz speichern
-        If (DatensatzResult = Windows.Forms.DialogResult.OK) Then
-            Call Sim1.saveDatensatz(OpenFileDialog_Datensatz.FileName)
+        If (DiagResult = Windows.Forms.DialogResult.OK) Then
+            Call Sim1.saveDatensatz(OpenFileDialog1.FileName)
         End If
+
         'Methodenauswahl wieder zurücksetzen (Der Benutzer muss zuerst Ini neu ausführen!)
         Me.ComboBox_Methode.SelectedItem = ""
 
@@ -450,6 +459,47 @@ Partial Class Form1
             Me.LinkLabel_WorkDir.Links(0).LinkData = CurDir()
         End If
 
+    End Sub
+
+    'EVO_Einstellungen laden
+    '***********************
+    Friend Sub Load_EVO_Settings(ByVal sender As Object, ByVal e as System.EventArgs)
+
+        'Dialog einrichten
+        OpenFileDialog1.Filter = "XML-Dateien (*.xml)|*.xml"
+        OpenFileDialog1.FileName = "PES_Settings.xml"
+        OpenFileDialog1.Title = "Einstellungsdatei auswählen"
+        If (Not isNothing(Sim1)) Then
+            OpenFileDialog1.InitialDirectory = Sim1.WorkDir
+        Else
+            OpenFileDialog1.InitialDirectory = CurDir()
+        End If
+
+        'Dialog anzeigen
+        If (OpenFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK) Then
+            Call EVO_Settings1.loadSettings(OpenFileDialog1.FileName)
+        End If
+    End Sub
+
+    'EVO_Einstellungen speichern
+    '***************************
+    Friend Sub Save_EVO_Settings(ByVal sender As Object, ByVal e As System.EventArgs)
+
+        'Dialog einrichten
+        SaveFileDialog1.Filter = "XML-Dateien (*.xml)|*.xml"
+        SaveFileDialog1.FileName = "PES_Settings.xml"
+        SaveFileDialog1.DefaultExt = "xml"
+        SaveFileDialog1.Title = "Einstellungsdatei speichern"
+        If (Not isNothing(Sim1)) Then
+            SaveFileDialog1.InitialDirectory = Sim1.WorkDir
+        Else
+            SaveFileDialog1.InitialDirectory = CurDir()
+        End If
+
+        'Dialog anzeigen
+        If (SaveFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK) Then
+            Call EVO_Settings1.saveSettings(SaveFileDialog1.FileName)
+        End If
     End Sub
 
 #End Region 'Initialisierung der Anwendungen
@@ -486,8 +536,13 @@ Partial Class Form1
             Me.Button_Scatterplot.Enabled = True
 
             'EVO-Einstellungen speichern
-            Call Me.EVO_Settings1.readSettings()
-            Me.EVO_Settings1.isSaved = True
+            Dim dir As String
+            If (Not IsNothing(Sim1)) Then
+                dir = Sim1.WorkDir
+            Else
+                dir = CurDir() & "\"
+            End If
+            Call Me.EVO_Settings1.saveSettings(dir & "PES_Settings.xml")
 
             'Try
 
@@ -967,7 +1022,7 @@ Partial Class Form1
                         'Ermittelt fuer jede Location den PES Parent Satz (PES_Parents ist das Ergebnis)
                         Call CES1.Memory_Search_per_Location(j)
                         'Führt das NDSorting für diesen Satz durch
-                        If CES1.PES_Parents_pLoc.GetLength(0) > ces1.n_PES_Parents
+                        If CES1.PES_Parents_pLoc.GetLength(0) > CES1.n_PES_Parents Then
                             Call CES1.Memory_NDSorting()
                         End If
 
@@ -1085,7 +1140,6 @@ Partial Class Form1
 
     'Anwendung Evolutionsstrategie für Parameter Optimierung - hier Steuerung       
     '************************************************************************
-
     Private Sub STARTEN_PES()
         '==========================
         Dim i As Integer
@@ -1126,7 +1180,7 @@ Partial Class Form1
         Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen, Method)
 
         'Startwerte werden der Verlaufsanzeige zugewiesen
-        Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Settings1.PES_Settings.n_Runden, EVO_Settings1.PES_Settings.n_Popul, EVO_Settings1.PES_Settings.n_Gen, EVO_Settings1.PES_Settings.n_Nachf)
+        Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Settings1.PES_Settings.Pop.n_Runden, EVO_Settings1.PES_Settings.Pop.n_Popul, EVO_Settings1.PES_Settings.n_Gen, EVO_Settings1.PES_Settings.n_Nachf)
 
         durchlauf = 0
 
@@ -1134,14 +1188,14 @@ Start_Evolutionsrunden:
 
         'Über alle Runden
         'xxxxxxxxxxxxxxxx
-        For PES1.PES_iAkt.iAktRunde = 0 To PES1.PES_Settings.n_Runden - 1
+        For PES1.PES_iAkt.iAktRunde = 0 To PES1.PES_Settings.Pop.n_Runden - 1
 
             Call EVO_Opt_Verlauf1.Runden(PES1.PES_iAkt.iAktRunde + 1)
             Call PES1.EsResetPopBWSpeicher() 'Nur bei Komma Strategie
 
             'Über alle Populationen
             'xxxxxxxxxxxxxxxxxxxxxx
-            For PES1.PES_iAkt.iAktPop = 0 To PES1.PES_Settings.n_Popul - 1
+            For PES1.PES_iAkt.iAktPop = 0 To PES1.PES_Settings.Pop.n_Popul - 1
 
                 Call EVO_Opt_Verlauf1.Population(PES1.PES_iAkt.iAktPop + 1)
 
@@ -1480,8 +1534,8 @@ Start_Evolutionsrunden:
                             If (Me.Method = METH_PES) Then
                                 'Bei PES:
                                 '--------
-                                If (EVO_Settings1.PES_Settings.is_POPUL) Then
-                                    Achse.Max = EVO_Settings1.PES_Settings.n_Gen * EVO_Settings1.PES_Settings.n_Nachf * EVO_Settings1.PES_Settings.n_Runden + 1
+                                If (EVO_Settings1.PES_Settings.Pop.is_POPUL) Then
+                                    Achse.Max = EVO_Settings1.PES_Settings.n_Gen * EVO_Settings1.PES_Settings.n_Nachf * EVO_Settings1.PES_Settings.Pop.n_Runden + 1
                                 Else
                                     Achse.Max = EVO_Settings1.PES_Settings.n_Gen * EVO_Settings1.PES_Settings.n_Nachf + 1
                                 End If
@@ -1778,12 +1832,15 @@ Start_Evolutionsrunden:
         Dim sourceFile As String
 
         'Datei-öffnen Dialog anzeigen
-        Me.OpenFileDialog_MDB.InitialDirectory = Sim1.WorkDir
-        diagresult = Me.OpenFileDialog_MDB.ShowDialog()
+        Me.OpenFileDialog1.Filter = "Access-Datenbanken (*.mdb)|*.mdb"
+        Me.OpenFileDialog1.Title = "Ergebnisdatenbank auswählen"
+        Me.OpenFileDialog1.FileName = ""
+        Me.OpenFileDialog1.InitialDirectory = Sim1.WorkDir
+        diagresult = Me.OpenFileDialog1.ShowDialog()
 
         If (diagresult = Windows.Forms.DialogResult.OK) Then
 
-            sourceFile = Me.OpenFileDialog_MDB.FileName
+            sourceFile = Me.OpenFileDialog1.FileName
 
             'MDBImportDialog
             '---------------
@@ -1794,7 +1851,6 @@ Start_Evolutionsrunden:
                 importDialog.ListBox_OptZieleY.Items.Add(OptZiel.Bezeichnung)
                 importDialog.ListBox_OptZieleZ.Items.Add(OptZiel.Bezeichnung)
             Next
-
 
             'Bei weniger als 3 Zielen Z-Achse ausblenden
             If (Sim1.List_OptZiele.Length < 3) Then
