@@ -35,10 +35,10 @@ Partial Class Form1
     Private Method As String
 
     '**** Deklarationen der Module *****
-    Public WithEvents Sim1 As Sim
-    Public SensiPlot1 As SensiPlot
-    Public CES1 As EVO.Kern.CES
-    Public TSP1 As TSP
+    Friend WithEvents Sim1 As Sim
+    Private SensiPlot1 As SensiPlot
+    Private CES1 As EVO.Kern.CES
+    Private TSP1 As TSP
 
     '**** Globale Parameter Parameter Optimierung ****
     'ToDo: diese Werte sollten eigentlich nur in CES bzw PES vorgehalten werden
@@ -57,8 +57,8 @@ Partial Class Form1
     Dim ispause As Boolean = False                      'Optimierung ist pausiert
 
     'Dialoge
-    Public WithEvents solutionDialog As SolutionDialog
-    Public WithEvents scatterplot1 As Scatterplot
+    Private WithEvents solutionDialog As SolutionDialog
+    Private WithEvents scatterplot1 As Scatterplot
 
 #End Region 'Eigenschaften
 
@@ -108,6 +108,9 @@ Partial Class Form1
 
             'Alles deaktivieren, danach je nach Anwendung aktivieren
             '-------------------------------------------------------
+
+            'Sim1 zerstören
+            Me.Sim1 = Nothing
 
             'Start Button deaktivieren
             Me.Button_Start.Enabled = False
@@ -192,7 +195,7 @@ Partial Class Form1
                 Case ANW_TSP 'Anwendung Traveling Salesman Problem (TSP)
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    TSP1 = New TSP
+                    TSP1 = New TSP()
 
                     Call TSP1.TSP_Initialize(DForm.Diag)
 
@@ -276,7 +279,7 @@ Partial Class Form1
                 Case METH_SENSIPLOT 'Methode SensiPlot
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    SensiPlot1 = New SensiPlot
+                    SensiPlot1 = New SensiPlot()
 
                     'SensiPlot für Sim vorbereiten
                     Call Sim1.read_and_valid_INI_Files_PES()
@@ -358,7 +361,7 @@ Partial Class Form1
                     End Select
 
                     'CES initialisieren
-                    CES1 = New EVO.Kern.CES
+                    CES1 = New EVO.Kern.CES()
                     'Prüft ob die Zahl mög. Kombinationen < Zahl Eltern + Nachfolger
                     If (CES1.n_Childs + CES1.n_Parents) > Sim1.No_of_Combinations Then
                         Throw New Exception("Die Zahl der Eltern + die Zahl der Kinder ist größer als die mögliche Zahl der Kombinationen.")
@@ -1169,7 +1172,7 @@ Partial Class Form1
         'Schritte 0: Objekt der Klasse PES wird erzeugt
         '**********************************************
         Dim PES1 As EVO.Kern.PES
-        PES1 = New EVO.Kern.PES
+        PES1 = New EVO.Kern.PES()
 
         'Schritte 1 - 3: ES wird initialisiert (Weiteres siehe dort ;-)
         '**************************************************************
