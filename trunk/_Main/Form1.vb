@@ -1066,20 +1066,16 @@ Partial Class Form1
 
                                 'Die PopulationsEltern des PES werden gefüllt
                                 For m = 0 To CES1.PES_Parents_pLoc.GetUpperBound(0)
-                                    Call PES1.EsStartvalues(CES1.PES_Parents_pLoc(m).Loc(j).Loc_Dn, CES1.PES_Parents_pLoc(m).Loc(j).Parameter, m)
+                                    Call PES1.EsStartvalues(ces1.is_Pop, CES1.PES_Parents_pLoc(m).Loc(j).Loc_Dn, CES1.PES_Parents_pLoc(m).Loc(j).Parameter, m)
                                 Next
 
                                 'Startet die Prozesse evolutionstheoretischen Prozesse nacheinander
-                                Call PES1.EsReproMut()
+                                Call PES1.EsReproMut(ces1.is_Pop)
 
                                 'Auslesen der Variierten Parameter
                                 CES1.Childs(i).Loc(j).Parameter = PES1.EsGetParameter()
                                 CES1.Childs(i).Loc(j).Loc_Dn = PES1.EsGetDN()
 
-                                'Es fehlt noch: !!!
-                                ' - erst Memory pro location -> OK
-                                ' - Das NDSorting für den PES Memory -> OK
-                                ' - Prüfen ob PES in dieser Form richtig arbeitet ToDo
                             End If
                         End If
                     Next
