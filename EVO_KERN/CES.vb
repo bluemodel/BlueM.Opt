@@ -31,24 +31,24 @@ Public Class CES
     'Eingabe CES
     Public n_Parts_of_Path As Integer = 3   'Länge des Gedächtnispfades Achtung Maximum ist 3
     Public n_Generations As Integer = 500   'Anzahl der Generationen
-    Public n_Parents As Integer = 3
-    Public n_Childs As Integer = 7
+    Public n_Parents As Integer = 5
+    Public n_Childs As Integer = 15
     Public n_MemberSecondPop As Integer = 50
-    Public n_Interact As Integer = 3
+    Public n_Interact As Integer = 5
     Public is_Interact As Boolean = True
 
     'Eingabe Hybrid
-    Public n_PES_Parents As Integer = 3            'Anzahl der Eltern für PES Hybrid
-    'Public n_PES_Childs As Integer = 7             'Anzahl der Kinder für PES Hybrid (ist das erforderlich? -> muss dynamisch gemacht werden s.u.)
+    Public n_PES_Parents As Integer = 5            'Anzahl der Eltern für PES Hybrid
     Public n_PES_MemberSecondPop As Integer = 50
     Public n_PES_Interact As Integer = 3
     Public is_PES_Interact As Boolean = False
+    Public is_Pop As Boolean = False            'Gibt an ob bei der Population oder bei den Eltern in die PES gestiegen wird.
 
     'Private Variablen
     Private ReprodOperator As String = "Select_Random_Uniform"
     Private MutOperator As String = "RND_Switch"
     Private Strategy As String = "plus"         '"plus" oder "minus" Strategie
-    Private MutRate As Integer = 10              'Definiert die Wahrscheinlichkeit der Mutationsrate in %
+    Private MutRate As Integer = 25              'Definiert die Wahrscheinlichkeit der Mutationsrate in %
 
     'Listen für die Individuen
     '*************************
@@ -93,7 +93,7 @@ Public Class CES
                 Next
                 Childs(i).mutated = True
                 Childs(i).ID = i + 1
-            Loop While Is_Twin(i) = True Or approved(Childs(i).Path) = False
+            Loop While Is_Twin(i) = True Or isnot_nullvariante(Childs(i).Path) = False
         Next
 
     End Sub
@@ -127,14 +127,15 @@ Public Class CES
     End Sub
     'Hier kann man Pfade wie z.B. Nullvarianten die nicht erlaubt sind hard vercoden (ToDo!)
     '***************************************************************************************
-    Public Function approved(ByVal path() As Integer) As Boolean
-        approved = True
+    Public Function isnot_nullvariante(ByVal path() As Integer) As Boolean
+        isnot_nullvariante = True
 
         Dim i, j As Integer
         Dim count As Integer = 0
 
         'Dim firstValues()() As Byte = {New Byte() {2, 1}, New Byte() {3, 0}}
-        Dim vector_array()() As Integer = {New Integer() {1, 1, 1}}
+        'Dim vector_array()() As Integer = {New Integer() {1, 1, 1}}
+        Dim vector_array()() As Integer = {New Integer() {0, 1, 1}}
 
         For i = 0 To vector_array.GetUpperBound(0)
             If vector_array(i).GetUpperBound(0) = path.GetUpperBound(0) Then
@@ -144,7 +145,7 @@ Public Class CES
                     End If
                 Next
                 If count = path.GetLength(0) Then
-                    approved = False
+                    isnot_nullvariante = False
                 End If
             End If
         Next
@@ -428,7 +429,7 @@ Public Class CES
                         Call MutOp_Dyn_Switch(Childs(i).Path, count)
                 End Select
                 count += 1
-            Loop While Is_Twin(i) = True Or Is_Clone(i) = True Or approved(Childs(i).Path) = False
+            Loop While Is_Twin(i) = True Or Is_Clone(i) = True Or isnot_nullvariante(Childs(i).Path) = False
             Childs(i).mutated = True
         Next
 

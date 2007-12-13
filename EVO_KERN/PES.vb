@@ -361,20 +361,28 @@ Public Class PES
     End Sub
 
     'Überladen: Falls Startwerte aus CES kommen!
-    Public Sub EsStartvalues(ByVal AktDn() As Double, ByVal AktXn() As Double, ByVal IndexElter As Integer)
+    Public Sub EsStartvalues(ByVal is_Pop As Boolean, ByVal AktDn() As Double, ByVal AktXn() As Double, ByVal IndexElter As Integer)
 
         Dim v As Integer
 
-        'Die Startparameter werden aus den PES_Parents aus der CES gesetzt
         For v = 0 To Anz.Para - 1
-            'Startwert für die Elternschrittweite wird zugewiesen
-            Dp(v, IndexElter, 0) = AktDn(v)
-            'Startwert für die Eltern werden zugewiesen
-            '(alle gleich Anfangswerte)
-            Xp(v, IndexElter, 0) = AktXn(v)
+            If is_Pop = True Then
+                'Startwert für die Elternschrittweite wird zugewiesen
+                Dp(v, IndexElter, 0) = AktDn(v)
+                'Startwert für die Eltern werden zugewiesen
+                '(alle gleich Anfangswerte)
+                Xp(v, IndexElter, 0) = AktXn(v)
+            Else
+                'Startwert für die Elternschrittweite wird zugewiesen
+                De(v, IndexElter, 0) = AktDn(v)
+                'Startwert für die Eltern werden zugewiesen
+                '(alle gleich Anfangswerte)
+                Xe(v, IndexElter, 0) = AktXn(v)
+
+            End If
         Next v
 
-
+        'Die Startparameter werden aus den PES_Parents aus der CES gesetzt
     End Sub
 
     'ES_GET_PARAMETER - dient zur Rückgabe der mutierten Parameter
@@ -414,17 +422,21 @@ Public Class PES
 
     'Function um PopReproduktion, PopMutation, Reproduktion und Mutio n direkt ablaufen zu lassen
     '********************************************************************************************
-    Public Sub EsReproMut()
+    Public Sub EsReproMut(ByVal is_Pop As Boolean)
 
-        'POPULATIONS REPRODUKTIONSPROZESS
-        '################################
-        'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern der Population
-        Call EsPopReproduktion()
+        If is_Pop = True Then
 
-        'POPULATIONS MUTATIONSPROZESS
-        '############################
-        'Mutieren der Ausgangswerte der Population
-        Call EsPopMutation()
+            'POPULATIONS REPRODUKTIONSPROZESS
+            '################################
+            'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern der Population
+            Call EsPopReproduktion()
+
+            'POPULATIONS MUTATIONSPROZESS
+            '############################
+            'Mutieren der Ausgangswerte der Population
+            Call EsPopMutation()
+
+        End If
 
         'REPRODUKTIONSPROZESS
         '####################
