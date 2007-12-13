@@ -71,6 +71,7 @@
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
+    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
@@ -91,6 +92,7 @@
     <Compile Include="Module_dll.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="PES_Settings.vb" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>

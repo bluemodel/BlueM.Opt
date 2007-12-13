@@ -3,13 +3,6 @@ Partial Class EVO_Einstellungen
 
     Inherits System.Windows.Forms.UserControl
 
-    Public Sub New()
-        MyBase.New()
-        'Dieser Aufruf ist für den Windows Form-Designer erforderlich.
-        InitializeComponent()
-        UserControl_Initialize()
-        System.Windows.Forms.Application.EnableVisualStyles()
-    End Sub
     'Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
     Protected Overloads Overrides Sub Dispose(ByVal Disposing As Boolean)
         If Disposing Then
@@ -21,53 +14,14 @@ Partial Class EVO_Einstellungen
     End Sub
     'Wird vom Windows Form-Designer benötigt.
     Private components As System.ComponentModel.IContainer
-    Public ToolTip1 As System.Windows.Forms.ToolTip
-    Friend WithEvents CheckisDnVektor As System.Windows.Forms.CheckBox
-    Friend WithEvents ComboOptVorgabe As System.Windows.Forms.ComboBox
-    Friend WithEvents TextDeltaStart As System.Windows.Forms.NumericUpDown
-    Friend WithEvents CheckisPopul As System.Windows.Forms.CheckBox
-    Friend WithEvents ComboStrategie As System.Windows.Forms.ComboBox
-    Friend WithEvents TextNMemberSecondPop As System.Windows.Forms.NumericUpDown
-    Friend WithEvents TextInteract As System.Windows.Forms.NumericUpDown
-    Friend WithEvents TextRekombxy As System.Windows.Forms.NumericUpDown
-    Friend WithEvents ComboOptEltern As System.Windows.Forms.ComboBox
-    Friend WithEvents TextAnzNachf As System.Windows.Forms.NumericUpDown
-    Friend WithEvents TextAnzEltern As System.Windows.Forms.NumericUpDown
-    Friend WithEvents TextAnzGen As System.Windows.Forms.NumericUpDown
-    Friend WithEvents LabelNMemberSecondPop As System.Windows.Forms.Label
-    Friend WithEvents LabelInteract As System.Windows.Forms.Label
-    Friend WithEvents Line2 As System.Windows.Forms.Label
-    Friend WithEvents LabelRekombxy3 As System.Windows.Forms.Label
-    Friend WithEvents LabelRekombxy1 As System.Windows.Forms.Label
-    Friend WithEvents Line1 As System.Windows.Forms.Label
-    Friend WithEvents Label2 As System.Windows.Forms.Label
-    Friend WithEvents LabelAnzNachf As System.Windows.Forms.Label
-    Friend WithEvents LabelAnzEltern As System.Windows.Forms.Label
-    Friend WithEvents LabelAnzGen As System.Windows.Forms.Label
-    Friend WithEvents GroupBox_Generationen As System.Windows.Forms.GroupBox
-    Friend WithEvents ComboPopPenalty As System.Windows.Forms.ComboBox
-    Friend WithEvents ComboPopStrategie As System.Windows.Forms.ComboBox
-    Friend WithEvents ComboOptPopEltern As System.Windows.Forms.ComboBox
-    Friend WithEvents TextAnzPopEltern As System.Windows.Forms.NumericUpDown
-    Friend WithEvents TextAnzPop As System.Windows.Forms.NumericUpDown
-    Friend WithEvents TextAnzRunden As System.Windows.Forms.NumericUpDown
-    Friend WithEvents LabelPopPenalty As System.Windows.Forms.Label
-    Friend WithEvents LabelPopStrategie As System.Windows.Forms.Label
-    Friend WithEvents LabelOptPopEltern As System.Windows.Forms.Label
-    Friend WithEvents LabelAnzPopEltern As System.Windows.Forms.Label
-    Friend WithEvents LabelAnzPop As System.Windows.Forms.Label
-    Friend WithEvents LabelAnzRunden As System.Windows.Forms.Label
-    Friend WithEvents GroupBox_Populationen As System.Windows.Forms.GroupBox
-    Friend WithEvents LabelStartwerte As System.Windows.Forms.Label
-    Friend WithEvents LabelStartSchrittweite As System.Windows.Forms.Label
-    Friend WithEvents LabelStrategie As System.Windows.Forms.Label
-    Friend WithEvents GroupBox_Einstellungen As System.Windows.Forms.GroupBox
     'Hinweis: Die folgende Prozedur wird vom Windows Form-Designer benötigt.
     'Das Verändern mit dem Windows Form-Designer ist nicht möglich.
     'Das Verändern mit dem Code-Editor ist nicht möglich.
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
+        Me.Button_Load = New System.Windows.Forms.Button
+        Me.Button_Save = New System.Windows.Forms.Button
         Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox
         Me.Label_OptModus = New System.Windows.Forms.Label
         Me.Label_OptModusValue = New System.Windows.Forms.Label
@@ -125,9 +79,31 @@ Partial Class EVO_Einstellungen
         CType(Me.TextAnzPopEltern, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
+        'Button_Load
+        '
+        Me.Button_Load.Image = Global.IHWB.EVO.My.Resources.Resources.folder
+        Me.Button_Load.Location = New System.Drawing.Point(10, 556)
+        Me.Button_Load.Name = "Button_Load"
+        Me.Button_Load.Size = New System.Drawing.Size(25, 25)
+        Me.Button_Load.TabIndex = 33
+        Me.ToolTip1.SetToolTip(Me.Button_Load, "Einstellungen laden")
+        Me.Button_Load.UseVisualStyleBackColor = False
+        '
+        'Button_Save
+        '
+        Me.Button_Save.Image = Global.IHWB.EVO.My.Resources.Resources.disk
+        Me.Button_Save.Location = New System.Drawing.Point(40, 556)
+        Me.Button_Save.Name = "Button_Save"
+        Me.Button_Save.Size = New System.Drawing.Size(25, 25)
+        Me.Button_Save.TabIndex = 34
+        Me.ToolTip1.SetToolTip(Me.Button_Save, "Einstellungen sichern")
+        Me.Button_Save.UseVisualStyleBackColor = False
+        '
         'GroupBox_Einstellungen
         '
         Me.GroupBox_Einstellungen.BackColor = System.Drawing.SystemColors.Control
+        Me.GroupBox_Einstellungen.Controls.Add(Me.Button_Save)
+        Me.GroupBox_Einstellungen.Controls.Add(Me.Button_Load)
         Me.GroupBox_Einstellungen.Controls.Add(Me.Label_OptModus)
         Me.GroupBox_Einstellungen.Controls.Add(Me.Label_OptModusValue)
         Me.GroupBox_Einstellungen.Controls.Add(Me.LabelStrategie)
@@ -435,7 +411,7 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Populationen.Enabled = False
         Me.GroupBox_Populationen.Location = New System.Drawing.Point(8, 392)
         Me.GroupBox_Populationen.Name = "GroupBox_Populationen"
-        Me.GroupBox_Populationen.Size = New System.Drawing.Size(199, 177)
+        Me.GroupBox_Populationen.Size = New System.Drawing.Size(199, 158)
         Me.GroupBox_Populationen.TabIndex = 6
         Me.GroupBox_Populationen.TabStop = False
         Me.GroupBox_Populationen.Text = "Populationen:"
@@ -502,7 +478,7 @@ Partial Class EVO_Einstellungen
         '
         'LabelOptPopEltern
         '
-        Me.LabelOptPopEltern.Location = New System.Drawing.Point(8, 86)
+        Me.LabelOptPopEltern.Location = New System.Drawing.Point(8, 80)
         Me.LabelOptPopEltern.Name = "LabelOptPopEltern"
         Me.LabelOptPopEltern.Size = New System.Drawing.Size(76, 28)
         Me.LabelOptPopEltern.TabIndex = 9
@@ -511,14 +487,14 @@ Partial Class EVO_Einstellungen
         'ComboOptPopEltern
         '
         Me.ComboOptPopEltern.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboOptPopEltern.Location = New System.Drawing.Point(85, 90)
+        Me.ComboOptPopEltern.Location = New System.Drawing.Point(85, 84)
         Me.ComboOptPopEltern.Name = "ComboOptPopEltern"
         Me.ComboOptPopEltern.Size = New System.Drawing.Size(108, 21)
         Me.ComboOptPopEltern.TabIndex = 3
         '
         'LabelPopStrategie
         '
-        Me.LabelPopStrategie.Location = New System.Drawing.Point(8, 116)
+        Me.LabelPopStrategie.Location = New System.Drawing.Point(8, 110)
         Me.LabelPopStrategie.Name = "LabelPopStrategie"
         Me.LabelPopStrategie.Size = New System.Drawing.Size(76, 17)
         Me.LabelPopStrategie.TabIndex = 31
@@ -527,14 +503,14 @@ Partial Class EVO_Einstellungen
         'ComboPopStrategie
         '
         Me.ComboPopStrategie.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboPopStrategie.Location = New System.Drawing.Point(85, 114)
+        Me.ComboPopStrategie.Location = New System.Drawing.Point(85, 108)
         Me.ComboPopStrategie.Name = "ComboPopStrategie"
         Me.ComboPopStrategie.Size = New System.Drawing.Size(108, 21)
         Me.ComboPopStrategie.TabIndex = 4
         '
         'LabelPopPenalty
         '
-        Me.LabelPopPenalty.Location = New System.Drawing.Point(8, 133)
+        Me.LabelPopPenalty.Location = New System.Drawing.Point(8, 127)
         Me.LabelPopPenalty.Name = "LabelPopPenalty"
         Me.LabelPopPenalty.Size = New System.Drawing.Size(76, 29)
         Me.LabelPopPenalty.TabIndex = 36
@@ -543,7 +519,7 @@ Partial Class EVO_Einstellungen
         'ComboPopPenalty
         '
         Me.ComboPopPenalty.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboPopPenalty.Location = New System.Drawing.Point(85, 138)
+        Me.ComboPopPenalty.Location = New System.Drawing.Point(85, 132)
         Me.ComboPopPenalty.Name = "ComboPopPenalty"
         Me.ComboPopPenalty.Size = New System.Drawing.Size(108, 21)
         Me.ComboPopPenalty.TabIndex = 5
@@ -572,6 +548,49 @@ Partial Class EVO_Einstellungen
         Me.ResumeLayout(False)
 
     End Sub
-    Friend WithEvents Label_OptModusValue As System.Windows.Forms.Label
-    Friend WithEvents Label_OptModus As System.Windows.Forms.Label
+    Private WithEvents ToolTip1 As System.Windows.Forms.ToolTip
+    Private WithEvents CheckisDnVektor As System.Windows.Forms.CheckBox
+    Private WithEvents ComboOptVorgabe As System.Windows.Forms.ComboBox
+    Private WithEvents TextDeltaStart As System.Windows.Forms.NumericUpDown
+    Private WithEvents CheckisPopul As System.Windows.Forms.CheckBox
+    Private WithEvents ComboStrategie As System.Windows.Forms.ComboBox
+    Private WithEvents TextNMemberSecondPop As System.Windows.Forms.NumericUpDown
+    Private WithEvents TextInteract As System.Windows.Forms.NumericUpDown
+    Private WithEvents TextRekombxy As System.Windows.Forms.NumericUpDown
+    Private WithEvents ComboOptEltern As System.Windows.Forms.ComboBox
+    Private WithEvents TextAnzNachf As System.Windows.Forms.NumericUpDown
+    Private WithEvents TextAnzEltern As System.Windows.Forms.NumericUpDown
+    Private WithEvents TextAnzGen As System.Windows.Forms.NumericUpDown
+    Private WithEvents LabelNMemberSecondPop As System.Windows.Forms.Label
+    Private WithEvents LabelInteract As System.Windows.Forms.Label
+    Private WithEvents Line2 As System.Windows.Forms.Label
+    Private WithEvents LabelRekombxy3 As System.Windows.Forms.Label
+    Private WithEvents LabelRekombxy1 As System.Windows.Forms.Label
+    Private WithEvents Line1 As System.Windows.Forms.Label
+    Private WithEvents Label2 As System.Windows.Forms.Label
+    Private WithEvents LabelAnzNachf As System.Windows.Forms.Label
+    Private WithEvents LabelAnzEltern As System.Windows.Forms.Label
+    Private WithEvents LabelAnzGen As System.Windows.Forms.Label
+    Private WithEvents GroupBox_Generationen As System.Windows.Forms.GroupBox
+    Private WithEvents ComboPopPenalty As System.Windows.Forms.ComboBox
+    Private WithEvents ComboPopStrategie As System.Windows.Forms.ComboBox
+    Private WithEvents ComboOptPopEltern As System.Windows.Forms.ComboBox
+    Private WithEvents TextAnzPopEltern As System.Windows.Forms.NumericUpDown
+    Private WithEvents TextAnzPop As System.Windows.Forms.NumericUpDown
+    Private WithEvents TextAnzRunden As System.Windows.Forms.NumericUpDown
+    Private WithEvents LabelPopPenalty As System.Windows.Forms.Label
+    Private WithEvents LabelPopStrategie As System.Windows.Forms.Label
+    Private WithEvents LabelOptPopEltern As System.Windows.Forms.Label
+    Private WithEvents LabelAnzPopEltern As System.Windows.Forms.Label
+    Private WithEvents LabelAnzPop As System.Windows.Forms.Label
+    Private WithEvents LabelAnzRunden As System.Windows.Forms.Label
+    Private WithEvents GroupBox_Populationen As System.Windows.Forms.GroupBox
+    Private WithEvents LabelStartwerte As System.Windows.Forms.Label
+    Private WithEvents LabelStartSchrittweite As System.Windows.Forms.Label
+    Private WithEvents LabelStrategie As System.Windows.Forms.Label
+    Private WithEvents GroupBox_Einstellungen As System.Windows.Forms.GroupBox
+    Private WithEvents Label_OptModusValue As System.Windows.Forms.Label
+    Private WithEvents Label_OptModus As System.Windows.Forms.Label
+    Private WithEvents Button_Load As System.Windows.Forms.Button
+    Private WithEvents Button_Save As System.Windows.Forms.Button
 End Class
