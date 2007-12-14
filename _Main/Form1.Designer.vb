@@ -21,7 +21,6 @@ Partial Class Form1
     Private components As System.ComponentModel.IContainer
     Public ToolTip1 As System.Windows.Forms.ToolTip
     Public WithEvents EVO_Opt_Verlauf1 As EVO_Opt_Verlauf
-    Public WithEvents EVO_Settings1 As EVO_Einstellungen
     Public WithEvents Button_Start As System.Windows.Forms.Button
     'Hinweis: Die folgende Prozedur wird vom Windows Form-Designer benötigt.
     'Das Verändern mit dem Windows Form-Designer ist nicht möglich.
@@ -41,11 +40,11 @@ Partial Class Form1
         Me.Label_Anwendung = New System.Windows.Forms.Label
         Me.ComboBox_Anwendung = New System.Windows.Forms.ComboBox
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog
+        Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog
+        Me.EVO_Settings1 = New IHWB.EVO.EVO_Einstellungen
         Me.Testprobleme1 = New IHWB.EVO.Testprobleme
         Me.EVO_Opt_Verlauf1 = New IHWB.EVO.EVO_Opt_Verlauf
-        Me.EVO_Settings1 = New IHWB.EVO.EVO_Einstellungen
         Me.DForm = New IHWB.EVO.DiagrammForm
-        Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog
         Me.GroupBox_Anwendung.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -163,12 +162,20 @@ Partial Class Form1
         Me.ComboBox_Anwendung.Size = New System.Drawing.Size(124, 21)
         Me.ComboBox_Anwendung.TabIndex = 0
         '
+        'EVO_Settings1
+        '
+        Me.EVO_Settings1.Enabled = False
+        Me.EVO_Settings1.Location = New System.Drawing.Point(4, 164)
+        Me.EVO_Settings1.Name = "EVO_Settings1"
+        Me.EVO_Settings1.Size = New System.Drawing.Size(219, 617)
+        Me.EVO_Settings1.TabIndex = 2
+        '
         'Testprobleme1
         '
         Me.Testprobleme1.Enabled = False
-        Me.Testprobleme1.Location = New System.Drawing.Point(4, 60)
+        Me.Testprobleme1.Location = New System.Drawing.Point(4, 57)
         Me.Testprobleme1.Name = "Testprobleme1"
-        Me.Testprobleme1.Size = New System.Drawing.Size(223, 118)
+        Me.Testprobleme1.Size = New System.Drawing.Size(223, 115)
         Me.Testprobleme1.TabIndex = 7
         '
         'EVO_Opt_Verlauf1
@@ -177,14 +184,6 @@ Partial Class Form1
         Me.EVO_Opt_Verlauf1.Name = "EVO_Opt_Verlauf1"
         Me.EVO_Opt_Verlauf1.Size = New System.Drawing.Size(467, 73)
         Me.EVO_Opt_Verlauf1.TabIndex = 6
-        '
-        'EVO_Settings1
-        '
-        Me.EVO_Settings1.Enabled = False
-        Me.EVO_Settings1.Location = New System.Drawing.Point(4, 179)
-        Me.EVO_Settings1.Name = "EVO_Settings1"
-        Me.EVO_Settings1.Size = New System.Drawing.Size(223, 585)
-        Me.EVO_Settings1.TabIndex = 2
         '
         'DForm
         '
@@ -201,10 +200,10 @@ Partial Class Form1
         Me.Controls.Add(Me.Button_Scatterplot)
         Me.Controls.Add(Me.Button_openMDB)
         Me.Controls.Add(Me.Button_Start)
+        Me.Controls.Add(Me.EVO_Settings1)
         Me.Controls.Add(Me.Testprobleme1)
         Me.Controls.Add(Me.GroupBox_Anwendung)
         Me.Controls.Add(Me.EVO_Opt_Verlauf1)
-        Me.Controls.Add(Me.EVO_Settings1)
         Me.Controls.Add(Me.DForm)
         Me.Cursor = System.Windows.Forms.Cursors.Default
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
@@ -231,4 +230,5 @@ Partial Class Form1
     Friend WithEvents Button_openMDB As System.Windows.Forms.Button
     Friend WithEvents Button_Scatterplot As System.Windows.Forms.Button
     Friend WithEvents SaveFileDialog1 As System.Windows.Forms.SaveFileDialog
+    Private WithEvents EVO_Settings1 As IHWB.EVO.EVO_Einstellungen
 End Class

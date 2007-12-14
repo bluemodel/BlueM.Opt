@@ -278,9 +278,7 @@
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
     </Content>
     <None Include="Resources\cancel.png" />
-    <None Include="Resources\disk.png" />
     <None Include="Resources\EVO.ico" />
-    <None Include="Resources\folder.png" />
     <None Include="Resources\icon_teechart.png" />
     <None Include="Resources\page_white_database.png" />
     <None Include="Resources\wave.ico" />
