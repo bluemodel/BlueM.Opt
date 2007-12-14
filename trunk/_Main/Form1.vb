@@ -35,6 +35,7 @@ Partial Class Form1
     Private Method As String
 
     '**** Deklarationen der Module *****
+    Private WithEvents Testprobleme1 As Testprobleme
     Friend WithEvents Sim1 As Sim
     Private SensiPlot1 As SensiPlot
     Private CES1 As EVO.Kern.CES
@@ -95,7 +96,7 @@ Partial Class Form1
 
     'Anwendung wurde ausgewählt
     '**************************
-    Private Sub INI_App(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Anwendung.SelectedIndexChanged, Testprobleme1.Testproblem_Changed
+    Friend Sub INI_App(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Anwendung.SelectedIndexChanged
 
         If (Me.IsInitializing = True) Then
 
@@ -114,9 +115,6 @@ Partial Class Form1
 
             'Start Button deaktivieren
             Me.Button_Start.Enabled = False
-
-            'Testprobleme deaktivieren
-            Testprobleme1.Enabled = False
 
             'Combobox Methode deaktivieren
             ComboBox_Methode.Enabled = False
@@ -177,8 +175,13 @@ Partial Class Form1
                 Case ANW_TESTPROBLEME 'Anwendung Testprobleme
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'Test-Probleme aktivieren
-                    Testprobleme1.Enabled = True
+                    'Testprobleme instanzieren
+                    If (isNothing(Testprobleme1)) Then
+                        Testprobleme1 = New Testprobleme()
+                    End If
+
+                    'Testprobleme anzeigen
+                    Call Me.Testprobleme1.Show()
 
                     'EVO_Einstellungen aktivieren
                     EVO_Settings1.Enabled = True
@@ -208,7 +211,7 @@ Partial Class Form1
             Cursor = Cursors.Default
 
             'Combobox Methode aktivieren
-            If (Not Anwendung = ANW_TESTPROBLEME And Not Anwendung = ANW_TSP) Then
+            If (Anwendung <> ANW_TESTPROBLEME And Anwendung <> ANW_TSP) Then
                 ComboBox_Methode.Enabled = True
             End If
 
@@ -221,7 +224,7 @@ Partial Class Form1
 
     'Methode wurde ausgewählt
     '************************
-    Private Sub INI_Method(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_IniMethod.Click, ComboBox_Methode.SelectedIndexChanged
+    Private Sub INI_Method(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Methode.SelectedIndexChanged
 
         If (Me.IsInitializing = True) Then
 

@@ -1,18 +1,26 @@
 Imports IHWB.EVO.Kern
 
-Public Class Testprobleme
-    Inherits System.Windows.Forms.UserControl
+Partial Public Class Testprobleme
+    Inherits System.Windows.Forms.Form
+
+    'Eigenschaften
+    '#############
 
     Private IsInitializing As Boolean
     Public OptModus As EVO_MODUS
-    Event Testproblem_Changed(ByVal sender As Object, ByVal e As System.EventArgs)
 
+    'Properties
+    '##########
     Public ReadOnly Property AnzParameter() As Integer
         Get
-            Return Convert.ToInt32(Me.TextBox_Einstellung.Text)
+            Return Convert.ToInt32(Me.TextBox_Einstellung.Value)
         End Get
     End Property
 
+#Region "Form behavior"
+
+    'Form laden
+    '**********
     Private Sub Testprobleme_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 
         'Combobox füllen
@@ -32,9 +40,14 @@ Public Class Testprobleme
 
         'Ende der Initialisierung
         IsInitializing = False
+
+        'Eventhandler einrichten
+        AddHandler Me.Combo_Testproblem.SelectedIndexChanged, AddressOf Form1.INI_App
+
     End Sub
 
-    'Steuerung des Testproblem Forms auf dem Form1
+    'Auswahl eines neuen Testproblems
+    '********************************
     Private Sub Combo_Testproblem_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles Combo_Testproblem.SelectedIndexChanged
 
         If IsInitializing = True Then
@@ -47,7 +60,7 @@ Public Class Testprobleme
             Select Case Combo_Testproblem.Text
 
                 Case "Sinus-Funktion"
-                    Me.Label_Beschreibung.Text = "Parameter an Sinusfunktion anpassen"
+                    Me.Label_Beschreibungstext.Text = "Parameter an Sinusfunktion anpassen"
                     Me.Label_Einstellung.Visible = True
                     Me.Label_Einstellung.Text = "Anzahl Parameter:"
                     Me.TextBox_Einstellung.Visible = True
@@ -55,11 +68,11 @@ Public Class Testprobleme
                     OptModus = EVO_MODUS.Single_Objective
 
                 Case "Beale-Problem"
-                    Me.Label_Beschreibung.Text = "Es wird das Minimum des Beale-Problems gesucht (x=(3, 0.5), F(x)=0)"
+                    Me.Label_Beschreibungstext.Text = "Es wird das Minimum des Beale-Problems gesucht (x=(3, 0.5), F(x)=0)"
                     OptModus = EVO_MODUS.Single_Objective
 
                 Case "Schwefel 2.4-Problem"
-                    Me.Label_Beschreibung.Text = "Minimum der Problemstellung wird gesucht (xi=1, F(x)=0)"
+                    Me.Label_Beschreibungstext.Text = "Minimum der Problemstellung wird gesucht (xi=1, F(x)=0)"
                     Me.Label_Einstellung.Visible = True
                     Me.Label_Einstellung.Text = "Anzahl Parameter:"
                     Me.TextBox_Einstellung.Visible = True
@@ -67,49 +80,59 @@ Public Class Testprobleme
                     OptModus = EVO_MODUS.Single_Objective
 
                 Case "Deb 1"
-                    Me.Label_Beschreibung.Text = "Multikriterielles Testproblem (konvex)"
+                    Me.Label_Beschreibungstext.Text = "Multikriterielles Testproblem (konvex)"
                     OptModus = EVO_MODUS.Multi_Objective
 
                 Case "Zitzler/Deb T1"
-                    Me.Label_Beschreibung.Text = "Multikriterielles Testproblem (konvex)"
+                    Me.Label_Beschreibungstext.Text = "Multikriterielles Testproblem (konvex)"
                     OptModus = EVO_MODUS.Multi_Objective
 
                 Case "Zitzler/Deb T2"
-                    Me.Label_Beschreibung.Text = "Multikriterielles Testproblem (konkav)"
+                    Me.Label_Beschreibungstext.Text = "Multikriterielles Testproblem (konkav)"
                     OptModus = EVO_MODUS.Multi_Objective
 
                 Case "Zitzler/Deb T3"
-                    Me.Label_Beschreibung.Text = "Multikriterielles Testproblem (konvex, nicht stetig)"
+                    Me.Label_Beschreibungstext.Text = "Multikriterielles Testproblem (konvex, nicht stetig)"
                     OptModus = EVO_MODUS.Multi_Objective
 
                 Case "Zitzler/Deb T4"
-                    Me.Label_Beschreibung.Text = "Multikriterielles Testproblem (konvex)"
+                    Me.Label_Beschreibungstext.Text = "Multikriterielles Testproblem (konvex)"
                     OptModus = EVO_MODUS.Multi_Objective
 
                 Case "CONSTR"
-                    Me.Label_Beschreibung.Text = "Multikriterielles Testproblem (konvex) mit zwei Randbedingungen"
+                    Me.Label_Beschreibungstext.Text = "Multikriterielles Testproblem (konvex) mit zwei Randbedingungen"
                     OptModus = EVO_MODUS.Multi_Objective
 
                 Case "Box"
-                    Me.Label_Beschreibung.Text = "Multikriterielles Testproblem (Kreis) mit zwei Randbedingungen"
+                    Me.Label_Beschreibungstext.Text = "Multikriterielles Testproblem (Kreis) mit zwei Randbedingungen"
                     OptModus = EVO_MODUS.Multi_Objective
 
                 Case "Abhängige Parameter"
-                    Me.Label_Beschreibung.Text = "Bedingung: Y > X"
+                    Me.Label_Beschreibungstext.Text = "Bedingung: Y > X"
                     OptModus = EVO_MODUS.Single_Objective
 
             End Select
 
-            RaiseEvent Testproblem_Changed(sender, e) 'wird in Form1 von IniApp() verarbeitet
-
         End If
     End Sub
 
-    '************************************************************************************
-    '                        Setzen der Anfangsparameter                                *
-    '************************************************************************************
+    'Form schließen
+    '**************
+    Private Sub Testprobleme_FormClosing(ByVal sender As System.Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles MyBase.FormClosing
 
-    'Startparameter werden festgesetzt
+        'verhindern, dass das Formular komplett gelöscht wird
+        e.Cancel = True
+
+        'Formular verstecken
+        Call Me.Hide()
+
+    End Sub
+
+
+#End Region 'Form behavior
+
+    'Parameterübergabe
+    '*****************
     Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara() As Double, ByRef beziehungen() As EVO.Kern.PES.Beziehung)
 
         Dim i As Integer
@@ -252,6 +275,8 @@ Public Class Testprobleme
 
 #Region "Diagrammfunktionen"
 
+    'Diagramm initialisieren
+    '***********************
     Public Sub DiagInitialise(ByVal PES_Settings As EVO.Kern.PES_Settings, ByVal globalAnzPar As Integer, ByRef Diag As EVO.Diagramm)
 
         Select Case Me.Combo_Testproblem.Text
@@ -1080,7 +1105,7 @@ Public Class Testprobleme
 
                 'Qualitätswerte berechnen
                 '------------------------
-                QN(0) = mypara(0)^2 + mypara(1)^2
+                QN(0) = mypara(0) ^ 2 + mypara(1) ^ 2
 
                 'Zeichnen
                 '--------
