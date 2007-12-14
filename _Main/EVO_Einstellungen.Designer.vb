@@ -91,10 +91,11 @@ Partial Class EVO_Einstellungen
         Me.TabControl1.Controls.Add(Me.TabPage_PES)
         Me.TabControl1.Controls.Add(Me.TabPage_CES)
         Me.TabControl1.Location = New System.Drawing.Point(0, 20)
+        Me.TabControl1.Margin = New System.Windows.Forms.Padding(0)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.Padding = New System.Drawing.Point(0, 0)
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(217, 597)
+        Me.TabControl1.Size = New System.Drawing.Size(220, 680)
         Me.TabControl1.TabIndex = 35
         '
         'TabPage_PES
@@ -116,7 +117,7 @@ Partial Class EVO_Einstellungen
         Me.TabPage_PES.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_PES.Margin = New System.Windows.Forms.Padding(0)
         Me.TabPage_PES.Name = "TabPage_PES"
-        Me.TabPage_PES.Size = New System.Drawing.Size(209, 571)
+        Me.TabPage_PES.Size = New System.Drawing.Size(212, 654)
         Me.TabPage_PES.TabIndex = 0
         Me.TabPage_PES.Text = "PES"
         '
@@ -538,7 +539,7 @@ Partial Class EVO_Einstellungen
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Padding = New System.Windows.Forms.Padding(0)
-        Me.ToolStrip1.Size = New System.Drawing.Size(209, 25)
+        Me.ToolStrip1.Size = New System.Drawing.Size(212, 25)
         Me.ToolStrip1.Stretch = True
         Me.ToolStrip1.TabIndex = 36
         Me.ToolStrip1.Text = "ToolStrip1"
@@ -576,7 +577,7 @@ Partial Class EVO_Einstellungen
         Me.Controls.Add(Me.Label_Einstellungen)
         Me.Controls.Add(Me.TabControl1)
         Me.Name = "EVO_Einstellungen"
-        Me.Size = New System.Drawing.Size(236, 632)
+        Me.Size = New System.Drawing.Size(236, 738)
         Me.TabControl1.ResumeLayout(False)
         Me.TabPage_PES.ResumeLayout(False)
         Me.TabPage_PES.PerformLayout()

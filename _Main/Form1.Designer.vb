@@ -30,7 +30,6 @@ Partial Class Form1
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.Button_Start = New System.Windows.Forms.Button
-        Me.Button_IniMethod = New System.Windows.Forms.Button
         Me.LinkLabel_WorkDir = New System.Windows.Forms.LinkLabel
         Me.Button_openMDB = New System.Windows.Forms.Button
         Me.Button_Scatterplot = New System.Windows.Forms.Button
@@ -42,9 +41,9 @@ Partial Class Form1
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog
         Me.EVO_Settings1 = New IHWB.EVO.EVO_Einstellungen
-        Me.Testprobleme1 = New IHWB.EVO.Testprobleme
         Me.EVO_Opt_Verlauf1 = New IHWB.EVO.EVO_Opt_Verlauf
         Me.DForm = New IHWB.EVO.DiagrammForm
+        Me.Label_Datensatz = New System.Windows.Forms.Label
         Me.GroupBox_Anwendung.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -64,22 +63,12 @@ Partial Class Form1
         Me.ToolTip1.SetToolTip(Me.Button_Start, "Optimierung starten")
         Me.Button_Start.UseVisualStyleBackColor = True
         '
-        'Button_IniMethod
-        '
-        Me.Button_IniMethod.Location = New System.Drawing.Point(357, 19)
-        Me.Button_IniMethod.Name = "Button_IniMethod"
-        Me.Button_IniMethod.Size = New System.Drawing.Size(35, 21)
-        Me.Button_IniMethod.TabIndex = 1
-        Me.Button_IniMethod.Text = "Ini"
-        Me.ToolTip1.SetToolTip(Me.Button_IniMethod, "Initialisieren")
-        Me.Button_IniMethod.UseVisualStyleBackColor = True
-        '
         'LinkLabel_WorkDir
         '
         Me.LinkLabel_WorkDir.AutoSize = True
         Me.LinkLabel_WorkDir.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.LinkLabel_WorkDir.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline
-        Me.LinkLabel_WorkDir.Location = New System.Drawing.Point(406, 23)
+        Me.LinkLabel_WorkDir.Location = New System.Drawing.Point(431, 22)
         Me.LinkLabel_WorkDir.Name = "LinkLabel_WorkDir"
         Me.LinkLabel_WorkDir.Size = New System.Drawing.Size(0, 13)
         Me.LinkLabel_WorkDir.TabIndex = 9
@@ -110,11 +99,11 @@ Partial Class Form1
         'GroupBox_Anwendung
         '
         Me.GroupBox_Anwendung.BackColor = System.Drawing.SystemColors.Control
-        Me.GroupBox_Anwendung.Controls.Add(Me.Label_Methode)
-        Me.GroupBox_Anwendung.Controls.Add(Me.ComboBox_Methode)
         Me.GroupBox_Anwendung.Controls.Add(Me.Label_Anwendung)
         Me.GroupBox_Anwendung.Controls.Add(Me.ComboBox_Anwendung)
-        Me.GroupBox_Anwendung.Controls.Add(Me.Button_IniMethod)
+        Me.GroupBox_Anwendung.Controls.Add(Me.Label_Methode)
+        Me.GroupBox_Anwendung.Controls.Add(Me.ComboBox_Methode)
+        Me.GroupBox_Anwendung.Controls.Add(Me.Label_Datensatz)
         Me.GroupBox_Anwendung.Controls.Add(Me.LinkLabel_WorkDir)
         Me.GroupBox_Anwendung.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.GroupBox_Anwendung.Location = New System.Drawing.Point(4, 4)
@@ -165,18 +154,10 @@ Partial Class Form1
         'EVO_Settings1
         '
         Me.EVO_Settings1.Enabled = False
-        Me.EVO_Settings1.Location = New System.Drawing.Point(4, 164)
+        Me.EVO_Settings1.Location = New System.Drawing.Point(4, 60)
         Me.EVO_Settings1.Name = "EVO_Settings1"
-        Me.EVO_Settings1.Size = New System.Drawing.Size(219, 617)
+        Me.EVO_Settings1.Size = New System.Drawing.Size(220, 700)
         Me.EVO_Settings1.TabIndex = 2
-        '
-        'Testprobleme1
-        '
-        Me.Testprobleme1.Enabled = False
-        Me.Testprobleme1.Location = New System.Drawing.Point(4, 57)
-        Me.Testprobleme1.Name = "Testprobleme1"
-        Me.Testprobleme1.Size = New System.Drawing.Size(223, 115)
-        Me.Testprobleme1.TabIndex = 7
         '
         'EVO_Opt_Verlauf1
         '
@@ -192,6 +173,15 @@ Partial Class Form1
         Me.DForm.Size = New System.Drawing.Size(473, 625)
         Me.DForm.TabIndex = 8
         '
+        'Label_Datensatz
+        '
+        Me.Label_Datensatz.AutoSize = True
+        Me.Label_Datensatz.Location = New System.Drawing.Point(367, 22)
+        Me.Label_Datensatz.Name = "Label_Datensatz"
+        Me.Label_Datensatz.Size = New System.Drawing.Size(58, 13)
+        Me.Label_Datensatz.TabIndex = 12
+        Me.Label_Datensatz.Text = "Datensatz:"
+        '
         'Form1
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
@@ -201,7 +191,6 @@ Partial Class Form1
         Me.Controls.Add(Me.Button_openMDB)
         Me.Controls.Add(Me.Button_Start)
         Me.Controls.Add(Me.EVO_Settings1)
-        Me.Controls.Add(Me.Testprobleme1)
         Me.Controls.Add(Me.GroupBox_Anwendung)
         Me.Controls.Add(Me.EVO_Opt_Verlauf1)
         Me.Controls.Add(Me.DForm)
@@ -220,8 +209,6 @@ Partial Class Form1
     Friend WithEvents GroupBox_Anwendung As System.Windows.Forms.GroupBox
     Friend WithEvents ComboBox_Anwendung As System.Windows.Forms.ComboBox
     Friend WithEvents Label_Anwendung As System.Windows.Forms.Label
-    Friend WithEvents Button_IniMethod As System.Windows.Forms.Button
-    Friend WithEvents Testprobleme1 As Testprobleme
     Friend WithEvents DForm As EVO.DiagrammForm
     Friend WithEvents LinkLabel_WorkDir As System.Windows.Forms.LinkLabel
     Friend WithEvents ComboBox_Methode As System.Windows.Forms.ComboBox
@@ -231,4 +218,5 @@ Partial Class Form1
     Friend WithEvents Button_Scatterplot As System.Windows.Forms.Button
     Friend WithEvents SaveFileDialog1 As System.Windows.Forms.SaveFileDialog
     Private WithEvents EVO_Settings1 As IHWB.EVO.EVO_Einstellungen
+    Friend WithEvents Label_Datensatz As System.Windows.Forms.Label
 End Class

@@ -134,7 +134,7 @@
       <DependentUpon>Testprobleme.vb</DependentUpon>
     </Compile>
     <Compile Include="Apps\Testprobleme\Testprobleme.vb">
-      <SubType>UserControl</SubType>
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Apps\TSP.vb" />
     <Compile Include="AssemblyInfo.vb">
