@@ -9,11 +9,8 @@ Public Class EVO_Einstellungen
     'Eigenschaften
     '#############
 
-    Private _settings As EVO.Kern.PES_Settings      'Sicherung sämtlicher Einstellungen
+    Private settings As EVO.Kern.PES_Settings      'Sicherung sämtlicher Einstellungen
     Public isSaved As Boolean = False               'Flag der anzeigt, ob die Einstellungen bereits gesichert wurden
-
-    Private OptModusValue As Short = EVO_MODUS.Single_Objective
-    Private isMultiObjectiveOptimierung As Boolean
 
     'Methoden
     '########
@@ -28,15 +25,17 @@ Public Class EVO_Einstellungen
         ' Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
         'PES_Settings instanzieren
-        Me._settings = New EVO.Kern.PES_Settings()
+        Me.settings = New EVO.Kern.PES_Settings()
+        'Standardmäßig Single-Objective Werte nehmen
+        Call Me.settings.setStandard(EVO_MODUS.Single_Objective)
         'Form initialisieren
         Call Me.UserControl_Initialize()
 
     End Sub
 
     'Laden des Formulars    
-    Private Sub EVO_Einstellungen_Load( ByVal sender As System.Object,  ByVal e As System.EventArgs) Handles MyBase.Load
-        
+    Private Sub EVO_Einstellungen_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+
         'EventHandler einrichten
         AddHandler Me.Button_Load.Click, AddressOf Form1.Load_EVO_Settings
         AddHandler Me.Button_Save.Click, AddressOf Form1.Save_EVO_Settings
@@ -48,17 +47,11 @@ Public Class EVO_Einstellungen
     '********************************
     Private Sub OptModus_Change()
 
-        Select Case Me.OptModus
+        Select Case Me.settings.ty_EvoModus
 
             Case EVO_MODUS.Single_Objective
                 'Vorgaben und Anzeige
                 Label_OptModusValue.Text = "Single Objective"
-                TextAnzGen.Value = 20
-                TextAnzEltern.Value = 3
-                TextAnzNachf.Value = 10
-                TextAnzRunden.Value = 10
-                'Modus
-                isMultiObjectiveOptimierung = False
                 'Strategie
                 ComboStrategie.Enabled = True
                 'Sekundäre Population
@@ -68,20 +61,11 @@ Public Class EVO_Einstellungen
                 TextNMemberSecondPop.Enabled = False
                 'Populationen
                 CheckisPopul.Enabled = True
-                CheckisPopul.Checked = False
-                GroupBox_Populationen.Enabled = False
 
             Case EVO_MODUS.Multi_Objective
                 'Vorgaben und Anzeige
                 Label_OptModusValue.Text = "MultiObjective Pareto"
-                TextAnzGen.Value = 250
-                TextAnzEltern.Value = 25
-                TextAnzNachf.Value = 75
-                TextAnzRunden.Value = 10
-                'Modus
-                isMultiObjectiveOptimierung = True
                 'Strategie
-                ComboStrategie.Text = "'+' (Eltern+Nachfolger)"
                 ComboStrategie.Enabled = False
                 'Sekundäre Population
                 LabelInteract.Enabled = True
@@ -160,7 +144,7 @@ Public Class EVO_Einstellungen
         Cntrl.Items.Add(New VB6.ListBoxItem("Rekomb x/x, mitteln", EVO_ELTERN.XX_Mitteln))
         Cntrl.Items.Add(New VB6.ListBoxItem("Rekomb x/y, diskret", EVO_ELTERN.XY_Diskret))
         Cntrl.Items.Add(New VB6.ListBoxItem("Rekomb x/y, mitteln", EVO_ELTERN.XY_Mitteln))
-        If (Me.OptModus = EVO_MODUS.Multi_Objective) Then
+        If (Me.settings.ty_EvoModus = EVO_MODUS.Multi_Objective) Then
             Cntrl.Items.Add(New VB6.ListBoxItem("Neighbourhood", EVO_ELTERN.Neighbourhood))
         End If
         Cntrl.SelectedIndex = 1
@@ -174,7 +158,7 @@ Public Class EVO_Einstellungen
 
     Private Sub FILLCOMBO_POPPENALTY(ByRef Cntrl As System.Windows.Forms.ComboBox)
         Cntrl.Items.Clear()
-        Select Case Me.OptModusValue
+        Select Case Me.settings.ty_EvoModus
             Case EVO.Kern.EVO_MODUS.Single_Objective
                 Cntrl.Items.Add(New VB6.ListBoxItem("Mittelwert", EVO_POP_PENALTY.Mittelwert))
                 Cntrl.Items.Add(New VB6.ListBoxItem("Schlechtester", EVO_POP_PENALTY.Schlechtester))
@@ -199,37 +183,36 @@ Public Class EVO_Einstellungen
     '*******************************
     Private Sub readForm()
 
-        _settings.n_Eltern = Val(TextAnzEltern.Text)
-        _settings.n_Nachf = Val(TextAnzNachf.Text)
-        _settings.n_Gen = Val(TextAnzGen.Text)
-        _settings.ty_EvoTyp = VB6.GetItemData(ComboStrategie, ComboStrategie.SelectedIndex)
-        _settings.is_MO_Pareto = isMultiObjectiveOptimierung
-        _settings.Pop.is_POPUL = CheckisPopul.Checked
-        _settings.Pop.ty_PopEvoTyp = VB6.GetItemData(ComboPopStrategie, ComboPopStrategie.SelectedIndex)
-        _settings.Pop.ty_PopPenalty = VB6.GetItemData(ComboPopPenalty, ComboPopPenalty.SelectedIndex)
-        _settings.Pop.ty_OptPopEltern = VB6.GetItemData(ComboOptPopEltern, ComboOptPopEltern.SelectedIndex)
-        If (_settings.Pop.is_POPUL) Then
-            _settings.Pop.n_Runden = Val(TextAnzRunden.Text)
-            _settings.Pop.n_Popul = Val(TextAnzPop.Text)
-            _settings.Pop.n_PopEltern = Val(TextAnzPopEltern.Text)
+        settings.n_Eltern = Val(TextAnzEltern.Text)
+        settings.n_Nachf = Val(TextAnzNachf.Text)
+        settings.n_Gen = Val(TextAnzGen.Text)
+        settings.ty_EvoStrategie = VB6.GetItemData(ComboStrategie, ComboStrategie.SelectedIndex)
+        settings.Pop.is_POPUL = CheckisPopul.Checked
+        settings.Pop.ty_PopEvoTyp = VB6.GetItemData(ComboPopStrategie, ComboPopStrategie.SelectedIndex)
+        settings.Pop.ty_PopPenalty = VB6.GetItemData(ComboPopPenalty, ComboPopPenalty.SelectedIndex)
+        settings.Pop.ty_OptPopEltern = VB6.GetItemData(ComboOptPopEltern, ComboOptPopEltern.SelectedIndex)
+        If (settings.Pop.is_POPUL) Then
+            settings.Pop.n_Runden = Val(TextAnzRunden.Text)
+            settings.Pop.n_Popul = Val(TextAnzPop.Text)
+            settings.Pop.n_PopEltern = Val(TextAnzPopEltern.Text)
         Else
-            _settings.Pop.n_Runden = 1
-            _settings.Pop.n_Popul = 1
-            _settings.Pop.n_PopEltern = 1
+            settings.Pop.n_Runden = 1
+            settings.Pop.n_Popul = 1
+            settings.Pop.n_PopEltern = 1
         End If
-        _settings.ty_OptEltern = VB6.GetItemData(ComboOptEltern, ComboOptEltern.SelectedIndex)
-        _settings.n_RekombXY = Val(TextRekombxy.Text)
-        _settings.DnStart = Val(TextDeltaStart.Text)
-        _settings.ty_StartPar = VB6.GetItemData(ComboOptVorgabe, ComboOptVorgabe.SelectedIndex)
-        _settings.is_DnVektor = CheckisDnVektor.Checked
+        settings.ty_OptEltern = VB6.GetItemData(ComboOptEltern, ComboOptEltern.SelectedIndex)
+        settings.n_RekombXY = Val(TextRekombxy.Text)
+        settings.DnStart = Val(TextDeltaStart.Text)
+        settings.ty_StartPar = VB6.GetItemData(ComboOptVorgabe, ComboOptVorgabe.SelectedIndex)
+        settings.is_DnVektor = CheckisDnVektor.Checked
         If (Val(TextInteract.Text) <= 0) Then
-            _settings.is_Interact = False
-            _settings.n_Interact = 1
+            settings.is_Interact = False
+            settings.n_Interact = 1
         Else
-            _settings.is_Interact = True
-            _settings.n_Interact = Val(TextInteract.Text)
+            settings.is_Interact = True
+            settings.n_Interact = Val(TextInteract.Text)
         End If
-        _settings.n_MemberSekPop = Val(TextNMemberSecondPop.Text)
+        settings.n_MemberSekPop = Val(TextNMemberSecondPop.Text)
 
     End Sub
 
@@ -237,29 +220,30 @@ Public Class EVO_Einstellungen
     '*******************************
     Private Sub writeForm()
 
-        Me.TextAnzEltern.Value = Me._settings.n_Eltern
-        Me.TextAnzNachf.Value = Me._settings.n_Nachf
-        Me.TextAnzGen.Value = Me._settings.n_Gen
-        Me.ComboStrategie.SelectedItem = Me._settings.ty_EvoTyp
-        Me.isMultiObjectiveOptimierung = Me._settings.is_MO_Pareto
-        Me.CheckisPopul.Checked = Me._settings.Pop.is_POPUL
-        Me.ComboPopStrategie.SelectedItem = Me._settings.Pop.ty_PopEvoTyp
-        Me.ComboPopPenalty.SelectedItem = Me._settings.Pop.ty_PopPenalty
-        Me.ComboOptPopEltern.SelectedItem = Me._settings.Pop.ty_OptPopEltern
-        Me.TextAnzRunden.Value = Me._settings.Pop.n_Runden
-        Me.TextAnzPop.Value = Me._settings.Pop.n_Popul
-        Me.TextAnzPopEltern.Value = Me._settings.Pop.n_PopEltern
-        Me.ComboOptEltern.SelectedItem = Me._settings.ty_OptEltern
-        Me.TextRekombxy.Value = Me._settings.n_RekombXY
-        Me.TextDeltaStart.Value = Me._settings.DnStart
-        Me.ComboOptVorgabe.SelectedItem = Me._settings.ty_StartPar
-        Me.CheckisDnVektor.Checked = Me._settings.is_DnVektor
-        If (Me._settings.is_Interact) Then
-            Me.TextInteract.Value = Me._settings.n_Interact
+        Call OptModus_Change()
+
+        Me.TextAnzEltern.Value = Me.settings.n_Eltern
+        Me.TextAnzNachf.Value = Me.settings.n_Nachf
+        Me.TextAnzGen.Value = Me.settings.n_Gen
+        Me.ComboStrategie.SelectedItem = Me.settings.ty_EvoStrategie
+        Me.CheckisPopul.Checked = Me.settings.Pop.is_POPUL
+        Me.ComboPopStrategie.SelectedItem = Me.settings.Pop.ty_PopEvoTyp
+        Me.ComboPopPenalty.SelectedItem = Me.settings.Pop.ty_PopPenalty
+        Me.ComboOptPopEltern.SelectedItem = Me.settings.Pop.ty_OptPopEltern
+        Me.TextAnzRunden.Value = Me.settings.Pop.n_Runden
+        Me.TextAnzPop.Value = Me.settings.Pop.n_Popul
+        Me.TextAnzPopEltern.Value = Me.settings.Pop.n_PopEltern
+        Me.ComboOptEltern.SelectedItem = Me.settings.ty_OptEltern
+        Me.TextRekombxy.Value = Me.settings.n_RekombXY
+        Me.TextDeltaStart.Value = Me.settings.DnStart
+        Me.ComboOptVorgabe.SelectedItem = Me.settings.ty_StartPar
+        Me.CheckisDnVektor.Checked = Me.settings.is_DnVektor
+        If (Me.settings.is_Interact) Then
+            Me.TextInteract.Value = Me.settings.n_Interact
         Else
             Me.TextInteract.Value = 0
         End If
-        Me.TextNMemberSecondPop.Value = Me._settings.n_MemberSekPop
+        Me.TextNMemberSecondPop.Value = Me.settings.n_MemberSekPop
 
         Call Application.DoEvents()
 
@@ -270,16 +254,12 @@ Public Class EVO_Einstellungen
     'Schnittstelle
     'XXXXXXXXXXXXX
 
-    'Dieses Property nicht ReadOnly weil die Anzahl der Zielfunktionen durch OptZiele bestimmt werden kann
-    Public Property OptModus() As Short
-        Get
-            OptModus = Me.OptModusValue
-        End Get
-        Set(ByVal Index As Short)
-            Me.OptModusValue = Index
-            Call OptModus_Change()
-        End Set
-    End Property
+    'Standardeinstellungen setzen
+    '****************************
+    Public Sub setStandard(ByVal modus As Kern.EVO_MODUS)
+        Call Me.settings.setStandard(modus)
+        Call Me.writeForm()
+    End Sub
 
     'PES_Settings Property
     '*********************
@@ -289,7 +269,7 @@ Public Class EVO_Einstellungen
             If (Not Me.isSaved) Then
                 Call Me.readForm()
             End If
-            PES_Settings = Me._settings
+            PES_Settings = Me.settings
         End Get
     End Property
 
@@ -301,7 +281,7 @@ Public Class EVO_Einstellungen
 
         Dim serializer As New XmlSerializer(GetType(EVO.Kern.PES_Settings))
         Dim writer As New StreamWriter(filename)
-        serializer.Serialize(writer, Me._settings)
+        serializer.Serialize(writer, Me.settings)
         writer.Close()
 
         Me.isSaved = True
@@ -322,7 +302,7 @@ Public Class EVO_Einstellungen
 
         'XML-Datei einlesen
         Dim fs As New FileStream(filename, FileMode.Open)
-        Me._settings = CType(serializer.Deserialize(fs), EVO.Kern.PES_Settings)
+        Me.settings = CType(serializer.Deserialize(fs), EVO.Kern.PES_Settings)
         fs.Close()
 
         'Geladene Settings in Form schreiben

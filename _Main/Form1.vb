@@ -183,7 +183,7 @@ Partial Class Form1
                     'EVO_Einstellungen aktivieren
                     EVO_Settings1.Enabled = True
 
-                    EVO_Settings1.OptModus = Testprobleme1.OptModus
+                    Call EVO_Settings1.setStandard(Testprobleme1.OptModus)
 
                     'Globale Parameter werden gesetzt
                     Call Testprobleme1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
@@ -318,9 +318,9 @@ Partial Class Form1
 
                     'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
                     If (Sim1.List_OptZiele.GetLength(0) = 1) Then
-                        EVO_Settings1.OptModus = 0
+                        Call EVO_Settings1.setStandard(Kern.EVO_MODUS.Single_Objective)
                     ElseIf (Sim1.List_OptZiele.GetLength(0) > 1) Then
-                        EVO_Settings1.OptModus = 1
+                        Call EVO_Settings1.setStandard(Kern.EVO_MODUS.Multi_Objective)
                     End If
 
                     'Parameterübergabe an PES
@@ -369,9 +369,9 @@ Partial Class Form1
 
                     'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
                     If (Sim1.List_OptZiele.GetLength(0) = 1) Then
-                        EVO_Settings1.OptModus = 0
+                        Call EVO_Settings1.setStandard(Kern.EVO_MODUS.Single_Objective)
                     ElseIf (Sim1.List_OptZiele.GetLength(0) > 1) Then
-                        EVO_Settings1.OptModus = 1
+                        Call EVO_Settings1.setStandard(Kern.EVO_MODUS.Multi_Objective)
                     End If
 
                     'Anzahl der Ziele, Locations und Verzeigungen wird an CES übergeben
@@ -1242,7 +1242,7 @@ Start_Evolutionsrunden:
                             myPara = PES1.EsGetParameter()
 
                             'Auslesen des Bestwertspeichers
-                            If (Not EVO_Settings1.PES_Settings.is_MO_Pareto) Then
+                            If (EVO_Settings1.PES_Settings.ty_EvoModus = Kern.EVO_MODUS.Single_Objective) Then
                                 Bestwert = PES1.EsGetBestwert()
                             End If
 
@@ -1337,7 +1337,7 @@ Start_Evolutionsrunden:
                     Call PES1.EsEltern()
 
                     'Sekundäre Population
-                    If (EVO_Settings1.PES_Settings.is_MO_Pareto) Then
+                    If (EVO_Settings1.PES_Settings.ty_EvoModus = Kern.EVO_MODUS.Multi_Objective) Then
                         SekPopulation = PES1.SekundärQb_Get()
                         If (Not IsNothing(Sim1)) Then
                             'SekPop abspeichern

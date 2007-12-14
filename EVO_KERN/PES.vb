@@ -144,11 +144,11 @@ Public Class PES
 
         'Überprüfung der Übergebenen Werte
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        If (Settings.ty_EvoTyp < 1 Or Settings.ty_EvoTyp > 2) Then
+        If (Settings.ty_EvoStrategie <> EVO_STRATEGIE.Komma And Settings.ty_EvoStrategie <> EVO_STRATEGIE.Plus) Then
             Throw New Exception("Typ der Evolutionsstrategie ist nicht '+' oder ','")
         End If
-        If (Settings.Pop.ty_PopEvoTyp < 1 Or Settings.Pop.ty_PopEvoTyp > 2) Then
-            Throw New Exception("Typ der Evolutionsstrategie auf Pupulationsebene ist nicht '+' oder ','")
+        If (Settings.Pop.ty_PopEvoTyp <> EVO_STRATEGIE.Komma And Settings.Pop.ty_PopEvoTyp <> EVO_STRATEGIE.Plus) Then
+            Throw New Exception("Typ der Evolutionsstrategie auf Populationsebene ist nicht '+' oder ','")
         End If
         If (Settings.Pop.n_Runden < 1) Then
             Throw New Exception("Die Anzahl der Runden ist kleiner 1")
@@ -181,12 +181,12 @@ Public Class PES
             Throw New Exception("Die Startschrittweite darf nicht kleiner 0 sein!")
         End If
         If (Settings.ty_StartPar < 1 Or Settings.ty_StartPar > 2) Then
-            Throw New Exception("Die Startaparameter dürfen nur zufällig sein oder aus den Originalparameter bestehen!")
+            Throw New Exception("Die Startparameter dürfen nur zufällig sein oder aus den Originalparameter bestehen!")
         End If
         If (Settings.Pop.n_Popul < Settings.Pop.n_PopEltern) Then
             Throw New Exception("Die Anzahl der Populationseltern darf nicht größer als die Anzahl der Populationen!")
         End If
-        If (Settings.n_Nachf <= Settings.n_Eltern) And Not Method = "HYBRID" Then
+        If (Settings.n_Nachf <= Settings.n_Eltern And Method <> "HYBRID") Then
             Throw New Exception("Die Anzahl der Eltern muss kleiner als die Anzahl der Nachfahren!" & Chr(13) & Chr(10) & "'Rechenberg 73' schlägt ein Verhältnis von 1:3 bis 1:5 vor.")
         End If
 
@@ -239,14 +239,14 @@ Public Class PES
         ReDim Best.Rb(PES_Settings.n_Eltern - 1, PES_Settings.Pop.n_Popul - 1, Anz.Constr - 1)
 
         'NDSorting wird nur benötigt, falls eine Paretofront approximiert wird
-        If PES_Settings.is_MO_Pareto Then
+        If (PES_Settings.ty_EvoModus = EVO_MODUS.Multi_Objective) Then
             ReDim NDSorting(PES_Settings.n_Eltern + PES_Settings.n_Nachf - 1)
             Call Individuum.New_Array("NDSorting", NDSorting)
             For i = 0 To PES_Settings.n_Eltern + PES_Settings.n_Nachf - 1
                 ReDim NDSorting(i).PES_d(Anz.Para - 1)
                 ReDim NDSorting(i).PES_X(Anz.Para - 1)
             Next i
-            If PES_Settings.ty_OptEltern = EVO_ELTERN.Neighbourhood Then
+            If (PES_Settings.ty_OptEltern = EVO_ELTERN.Neighbourhood) Then
                 ReDim PenaltyDistance(PES_Settings.n_Eltern - 1, PES_Settings.n_Eltern - 1)
                 ReDim Distanceb(PES_Settings.n_Eltern - 1)
             End If
@@ -268,7 +268,7 @@ Public Class PES
         Next
 
         'Falls NDSorting Crowding Distance wird initialisiert
-        If PES_Settings.is_MO_Pareto Then
+        If (PES_Settings.ty_EvoModus = EVO_MODUS.Multi_Objective) Then
             For n = 0 To PES_Settings.Pop.n_Popul - 1
                 For m = 0 To Anz.Penalty - 1
                     Select Case PES_Settings.Pop.ty_PopPenalty
@@ -808,7 +808,7 @@ StartMutation:
         i = 0
         h1 = Qbpop(0, 0)
         For m = 1 To PES_Settings.Pop.n_Popul - 1
-            If Not PES_Settings.is_MO_Pareto Then
+            If (PES_Settings.ty_EvoModus = EVO_MODUS.Single_Objective) Then
                 If Qbpop(m, 0) > h1 Then
                     h1 = Qbpop(m, 0)
                     i = m
@@ -833,7 +833,7 @@ StartMutation:
 
         'Der schlechtetste der besten Qualitätswerte wird bestimmt ; Position -> i
         '(höchster Wert der Kostenfunktion, niedrigster Wert der Spannweite)
-        If PES_Settings.is_MO_Pareto Then
+        If (PES_Settings.ty_EvoModus = EVO_MODUS.Multi_Objective) Then
             j = 0
             h2 = Qbpop(0, 1)
             For m = 2 To PES_Settings.Pop.n_Popul
@@ -846,7 +846,7 @@ StartMutation:
 
         'Qualität der aktuellen Population wird bestimmt
         h1 = 0
-        If Not PES_Settings.is_MO_Pareto Then
+        If (PES_Settings.ty_EvoModus = EVO_MODUS.Single_Objective) Then
             For m = 0 To PES_Settings.n_Eltern - 1
                 h1 = h1 + Best.Qb(m, PES_iAkt.iAktPop, 0) / PES_Settings.n_Eltern
             Next m
@@ -857,7 +857,7 @@ StartMutation:
 
         'Falls die Qualität des aktuellen Population besser ist (Penaltyfunktion geringer)
         'als die schlechteste im Bestwertspeicher, wird diese ersetzt
-        If Not PES_Settings.is_MO_Pareto Then
+        If (PES_Settings.ty_EvoModus = EVO_MODUS.Single_Objective) Then
             If h1 < Qbpop(i, 0) Then
                 Qbpop(i, 0) = h1
                 For m = 0 To Anz.Para - 1
@@ -909,7 +909,7 @@ StartMutation:
         Dim m, i, j, v As Integer
         Dim h As Double
 
-        If (Not PES_Settings.is_MO_Pareto) Then
+        If (PES_Settings.ty_EvoModus = EVO_MODUS.Single_Objective) Then
             'SO - Standard ES nach Rechenberg
             '--------------------------------
             'Der schlechteste der besten Qualitätswerte wird bestimmt ; Position -> j
@@ -966,7 +966,7 @@ StartMutation:
     Public Sub EsResetBWSpeicher()
         Dim n, i As Integer
 
-        If (PES_Settings.ty_EvoTyp = EVO_STRATEGIE.Komma) Then
+        If (PES_Settings.ty_EvoStrategie = EVO_STRATEGIE.Komma) Then
             For n = 0 To PES_Settings.n_Eltern - 1
                 For i = 0 To Anz.Penalty - 1
                     Best.Qb(n, PES_iAkt.iAktPop, i) = 1.0E+300
@@ -1016,7 +1016,7 @@ StartMutation:
             Realisierungsspeicher(m, 1) = m
         Next m
 
-        If (Not PES_Settings.is_MO_Pareto) Then
+        If (PES_Settings.ty_EvoModus = EVO_MODUS.Single_Objective) Then
             'Standard ES nach Rechenberg
             '---------------------------
             For m = 0 To PES_Settings.Pop.n_Popul - 1
@@ -1085,7 +1085,7 @@ StartMutation:
         Dim i, v As Integer
 
 
-        If (Not PES_Settings.is_MO_Pareto) Then
+        If (PES_Settings.ty_EvoModus = EVO_MODUS.Single_Objective) Then
             'Standard ES nach Rechenberg
             'xxxxxxxxxxxxxxxxxxxxxxxxxxx
             'Die Eltern werden gleich der besten Kinder gesetzt (Schrittweite und Parameterwert)

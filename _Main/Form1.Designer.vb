@@ -183,7 +183,6 @@ Partial Class Form1
         Me.EVO_Settings1.Enabled = False
         Me.EVO_Settings1.Location = New System.Drawing.Point(4, 179)
         Me.EVO_Settings1.Name = "EVO_Settings1"
-        Me.EVO_Settings1.OptModus = CType(0, Short)
         Me.EVO_Settings1.Size = New System.Drawing.Size(223, 585)
         Me.EVO_Settings1.TabIndex = 2
         '
