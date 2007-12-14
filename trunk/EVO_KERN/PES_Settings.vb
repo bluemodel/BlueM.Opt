@@ -12,9 +12,10 @@ Public Class PES_Settings
     '*******************************************************************************
     '*******************************************************************************
 
-    Public is_MO_Pareto As Boolean             'Multi-Objective mit Pareto Front
-    Public ty_EvoTyp As EVO_STRATEGIE          'Typ der Evolutionsstrategie (+ oder ,)
+    Public ty_EvoModus As EVO_MODUS            'Single- oder Multi-Objective
+    Public ty_EvoStrategie As EVO_STRATEGIE    'Typ der Evolutionsstrategie (+ oder ,)
     Public ty_StartPar As EVO_STARTPARAMETER   'Startparameter
+
     Public DnStart As Double                   'Startschrittweite
     Public is_DnVektor As Boolean              'Soll ein Schrittweitenvektor benutzt werden
 
@@ -41,5 +42,70 @@ Public Class PES_Settings
         Public ty_PopEvoTyp As EVO_STRATEGIE       'Typ der Evolutionsstrategie (+ oder ,) auf Populationsebene
         Public ty_PopPenalty As EVO_POP_PENALTY    'Art der Beurteilung der Populationsgüte (Multiobjective)
     End Structure
+
+    'Standardwerte setzen
+    '********************
+    Public Sub setStandard(ByVal modus As Kern.EVO_MODUS)
+
+        Select Case modus
+
+            Case EVO_MODUS.Single_Objective
+
+                Me.ty_EvoModus = EVO_MODUS.Single_Objective
+                Me.ty_EvoStrategie = EVO_STRATEGIE.Plus
+                Me.ty_StartPar = EVO_STARTPARAMETER.Original
+
+                Me.DnStart = 0.1
+                Me.is_DnVektor = False
+
+                Me.n_Gen = 20
+                Me.n_Eltern = 3
+                Me.n_Nachf = 10
+
+                Me.is_Interact = False
+                Me.n_Interact = 0
+                Me.n_MemberSekPop = 0
+
+                Me.ty_OptEltern = EVO_ELTERN.XX_Diskret
+                Me.n_RekombXY = 3
+
+                Me.Pop.is_POPUL = False
+                Me.Pop.n_Runden = 10
+                Me.Pop.n_Popul = 3
+                Me.Pop.n_PopEltern = 2
+                Me.Pop.ty_OptPopEltern = EVO_POP_ELTERN.Rekombination
+                Me.Pop.ty_PopEvoTyp = EVO_STRATEGIE.Plus
+                Me.Pop.ty_PopPenalty = EVO_POP_PENALTY.Mittelwert
+
+
+            Case EVO_MODUS.Multi_Objective
+
+                Me.ty_EvoModus = EVO_MODUS.Multi_Objective
+                Me.ty_EvoStrategie = EVO_STRATEGIE.Plus
+                Me.ty_StartPar = EVO_STARTPARAMETER.Original
+
+                Me.DnStart = 0.1
+                Me.is_DnVektor = False
+
+                Me.n_Gen = 100
+                Me.n_Eltern = 15
+                Me.n_Nachf = 50
+
+                Me.is_Interact = True
+                Me.n_Interact = 10
+                Me.n_MemberSekPop = 50
+
+                Me.ty_OptEltern = EVO_ELTERN.XX_Diskret
+                Me.n_RekombXY = 3
+
+                Me.Pop.is_POPUL = False
+                Me.Pop.n_Runden = 1
+                Me.Pop.n_Popul = 1
+                Me.Pop.n_PopEltern = 1
+                Me.Pop.ty_OptPopEltern = EVO_POP_ELTERN.Rekombination
+                Me.Pop.ty_PopEvoTyp = EVO_STRATEGIE.Plus
+                Me.Pop.ty_PopPenalty = EVO_POP_PENALTY.Mittelwert
+        End Select
+    End Sub
 
 End Class
