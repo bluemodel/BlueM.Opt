@@ -19,10 +19,10 @@ Partial Class EVO_Einstellungen
     'Das Verändern mit dem Code-Editor ist nicht möglich.
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(EVO_Einstellungen))
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
-        Me.Button_Load = New System.Windows.Forms.Button
-        Me.Button_Save = New System.Windows.Forms.Button
-        Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox
+        Me.TabControl1 = New System.Windows.Forms.TabControl
+        Me.TabPage_PES = New System.Windows.Forms.TabPage
         Me.Label_OptModus = New System.Windows.Forms.Label
         Me.Label_OptModusValue = New System.Windows.Forms.Label
         Me.LabelStrategie = New System.Windows.Forms.Label
@@ -64,7 +64,13 @@ Partial Class EVO_Einstellungen
         Me.ComboPopStrategie = New System.Windows.Forms.ComboBox
         Me.LabelPopPenalty = New System.Windows.Forms.Label
         Me.ComboPopPenalty = New System.Windows.Forms.ComboBox
-        Me.GroupBox_Einstellungen.SuspendLayout()
+        Me.TabPage_CES = New System.Windows.Forms.TabPage
+        Me.ToolStrip1 = New System.Windows.Forms.ToolStrip
+        Me.Label_Einstellungen = New System.Windows.Forms.Label
+        Me.ÖffnenToolStripButton = New System.Windows.Forms.ToolStripButton
+        Me.SpeichernToolStripButton = New System.Windows.Forms.ToolStripButton
+        Me.TabControl1.SuspendLayout()
+        Me.TabPage_PES.SuspendLayout()
         CType(Me.TextDeltaStart, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox_Generationen.SuspendLayout()
         CType(Me.TextNMemberSecondPop, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -77,56 +83,47 @@ Partial Class EVO_Einstellungen
         CType(Me.TextAnzRunden, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.TextAnzPop, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.TextAnzPopEltern, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.ToolStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
-        'Button_Load
+        'TabControl1
         '
-        Me.Button_Load.Image = Global.IHWB.EVO.My.Resources.Resources.folder
-        Me.Button_Load.Location = New System.Drawing.Point(10, 556)
-        Me.Button_Load.Name = "Button_Load"
-        Me.Button_Load.Size = New System.Drawing.Size(25, 25)
-        Me.Button_Load.TabIndex = 33
-        Me.ToolTip1.SetToolTip(Me.Button_Load, "Einstellungen laden")
-        Me.Button_Load.UseVisualStyleBackColor = False
+        Me.TabControl1.Controls.Add(Me.TabPage_PES)
+        Me.TabControl1.Controls.Add(Me.TabPage_CES)
+        Me.TabControl1.Location = New System.Drawing.Point(0, 20)
+        Me.TabControl1.Name = "TabControl1"
+        Me.TabControl1.Padding = New System.Drawing.Point(0, 0)
+        Me.TabControl1.SelectedIndex = 0
+        Me.TabControl1.Size = New System.Drawing.Size(217, 597)
+        Me.TabControl1.TabIndex = 35
         '
-        'Button_Save
+        'TabPage_PES
         '
-        Me.Button_Save.Image = Global.IHWB.EVO.My.Resources.Resources.disk
-        Me.Button_Save.Location = New System.Drawing.Point(40, 556)
-        Me.Button_Save.Name = "Button_Save"
-        Me.Button_Save.Size = New System.Drawing.Size(25, 25)
-        Me.Button_Save.TabIndex = 34
-        Me.ToolTip1.SetToolTip(Me.Button_Save, "Einstellungen sichern")
-        Me.Button_Save.UseVisualStyleBackColor = False
-        '
-        'GroupBox_Einstellungen
-        '
-        Me.GroupBox_Einstellungen.BackColor = System.Drawing.SystemColors.Control
-        Me.GroupBox_Einstellungen.Controls.Add(Me.Button_Save)
-        Me.GroupBox_Einstellungen.Controls.Add(Me.Button_Load)
-        Me.GroupBox_Einstellungen.Controls.Add(Me.Label_OptModus)
-        Me.GroupBox_Einstellungen.Controls.Add(Me.Label_OptModusValue)
-        Me.GroupBox_Einstellungen.Controls.Add(Me.LabelStrategie)
-        Me.GroupBox_Einstellungen.Controls.Add(Me.ComboStrategie)
-        Me.GroupBox_Einstellungen.Controls.Add(Me.LabelStartwerte)
-        Me.GroupBox_Einstellungen.Controls.Add(Me.ComboOptVorgabe)
-        Me.GroupBox_Einstellungen.Controls.Add(Me.LabelStartSchrittweite)
-        Me.GroupBox_Einstellungen.Controls.Add(Me.TextDeltaStart)
-        Me.GroupBox_Einstellungen.Controls.Add(Me.CheckisDnVektor)
-        Me.GroupBox_Einstellungen.Controls.Add(Me.GroupBox_Generationen)
-        Me.GroupBox_Einstellungen.Controls.Add(Me.CheckisPopul)
-        Me.GroupBox_Einstellungen.Controls.Add(Me.GroupBox_Populationen)
-        Me.GroupBox_Einstellungen.Location = New System.Drawing.Point(0, 0)
-        Me.GroupBox_Einstellungen.Name = "GroupBox_Einstellungen"
-        Me.GroupBox_Einstellungen.Size = New System.Drawing.Size(217, 585)
-        Me.GroupBox_Einstellungen.TabIndex = 0
-        Me.GroupBox_Einstellungen.TabStop = False
-        Me.GroupBox_Einstellungen.Text = "Einstellungen"
+        Me.TabPage_PES.BackColor = System.Drawing.SystemColors.Control
+        Me.TabPage_PES.Controls.Add(Me.ToolStrip1)
+        Me.TabPage_PES.Controls.Add(Me.Label_OptModus)
+        Me.TabPage_PES.Controls.Add(Me.Label_OptModusValue)
+        Me.TabPage_PES.Controls.Add(Me.LabelStrategie)
+        Me.TabPage_PES.Controls.Add(Me.ComboStrategie)
+        Me.TabPage_PES.Controls.Add(Me.LabelStartwerte)
+        Me.TabPage_PES.Controls.Add(Me.ComboOptVorgabe)
+        Me.TabPage_PES.Controls.Add(Me.LabelStartSchrittweite)
+        Me.TabPage_PES.Controls.Add(Me.TextDeltaStart)
+        Me.TabPage_PES.Controls.Add(Me.CheckisDnVektor)
+        Me.TabPage_PES.Controls.Add(Me.GroupBox_Generationen)
+        Me.TabPage_PES.Controls.Add(Me.CheckisPopul)
+        Me.TabPage_PES.Controls.Add(Me.GroupBox_Populationen)
+        Me.TabPage_PES.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage_PES.Margin = New System.Windows.Forms.Padding(0)
+        Me.TabPage_PES.Name = "TabPage_PES"
+        Me.TabPage_PES.Size = New System.Drawing.Size(209, 571)
+        Me.TabPage_PES.TabIndex = 0
+        Me.TabPage_PES.Text = "PES"
         '
         'Label_OptModus
         '
         Me.Label_OptModus.AutoSize = True
-        Me.Label_OptModus.Location = New System.Drawing.Point(16, 20)
+        Me.Label_OptModus.Location = New System.Drawing.Point(2, 32)
         Me.Label_OptModus.Name = "Label_OptModus"
         Me.Label_OptModus.Size = New System.Drawing.Size(42, 13)
         Me.Label_OptModus.TabIndex = 31
@@ -136,7 +133,7 @@ Partial Class EVO_Einstellungen
         '
         Me.Label_OptModusValue.AutoSize = True
         Me.Label_OptModusValue.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label_OptModusValue.Location = New System.Drawing.Point(84, 19)
+        Me.Label_OptModusValue.Location = New System.Drawing.Point(77, 31)
         Me.Label_OptModusValue.Name = "Label_OptModusValue"
         Me.Label_OptModusValue.Size = New System.Drawing.Size(0, 13)
         Me.Label_OptModusValue.TabIndex = 32
@@ -144,7 +141,7 @@ Partial Class EVO_Einstellungen
         'LabelStrategie
         '
         Me.LabelStrategie.AutoSize = True
-        Me.LabelStrategie.Location = New System.Drawing.Point(16, 46)
+        Me.LabelStrategie.Location = New System.Drawing.Point(2, 58)
         Me.LabelStrategie.Name = "LabelStrategie"
         Me.LabelStrategie.Size = New System.Drawing.Size(54, 13)
         Me.LabelStrategie.TabIndex = 19
@@ -153,7 +150,7 @@ Partial Class EVO_Einstellungen
         'ComboStrategie
         '
         Me.ComboStrategie.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboStrategie.Location = New System.Drawing.Point(84, 42)
+        Me.ComboStrategie.Location = New System.Drawing.Point(80, 57)
         Me.ComboStrategie.Name = "ComboStrategie"
         Me.ComboStrategie.Size = New System.Drawing.Size(123, 21)
         Me.ComboStrategie.TabIndex = 0
@@ -161,7 +158,7 @@ Partial Class EVO_Einstellungen
         'LabelStartwerte
         '
         Me.LabelStartwerte.AutoSize = True
-        Me.LabelStartwerte.Location = New System.Drawing.Point(16, 73)
+        Me.LabelStartwerte.Location = New System.Drawing.Point(2, 85)
         Me.LabelStartwerte.Name = "LabelStartwerte"
         Me.LabelStartwerte.Size = New System.Drawing.Size(58, 13)
         Me.LabelStartwerte.TabIndex = 29
@@ -170,7 +167,7 @@ Partial Class EVO_Einstellungen
         'ComboOptVorgabe
         '
         Me.ComboOptVorgabe.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboOptVorgabe.Location = New System.Drawing.Point(84, 69)
+        Me.ComboOptVorgabe.Location = New System.Drawing.Point(80, 84)
         Me.ComboOptVorgabe.Name = "ComboOptVorgabe"
         Me.ComboOptVorgabe.Size = New System.Drawing.Size(123, 21)
         Me.ComboOptVorgabe.TabIndex = 1
@@ -178,7 +175,7 @@ Partial Class EVO_Einstellungen
         'LabelStartSchrittweite
         '
         Me.LabelStartSchrittweite.AutoSize = True
-        Me.LabelStartSchrittweite.Location = New System.Drawing.Point(13, 99)
+        Me.LabelStartSchrittweite.Location = New System.Drawing.Point(2, 111)
         Me.LabelStartSchrittweite.Name = "LabelStartSchrittweite"
         Me.LabelStartSchrittweite.Size = New System.Drawing.Size(90, 13)
         Me.LabelStartSchrittweite.TabIndex = 27
@@ -188,7 +185,7 @@ Partial Class EVO_Einstellungen
         '
         Me.TextDeltaStart.DecimalPlaces = 2
         Me.TextDeltaStart.Increment = New Decimal(New Integer() {1, 0, 0, 131072})
-        Me.TextDeltaStart.Location = New System.Drawing.Point(154, 96)
+        Me.TextDeltaStart.Location = New System.Drawing.Point(150, 111)
         Me.TextDeltaStart.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
         Me.TextDeltaStart.Minimum = New Decimal(New Integer() {1, 0, 0, 131072})
         Me.TextDeltaStart.Name = "TextDeltaStart"
@@ -199,7 +196,7 @@ Partial Class EVO_Einstellungen
         '
         'CheckisDnVektor
         '
-        Me.CheckisDnVektor.Location = New System.Drawing.Point(16, 120)
+        Me.CheckisDnVektor.Location = New System.Drawing.Point(11, 136)
         Me.CheckisDnVektor.Name = "CheckisDnVektor"
         Me.CheckisDnVektor.Size = New System.Drawing.Size(144, 18)
         Me.CheckisDnVektor.TabIndex = 3
@@ -224,7 +221,7 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Generationen.Controls.Add(Me.LabelAnzNachf)
         Me.GroupBox_Generationen.Controls.Add(Me.LabelAnzEltern)
         Me.GroupBox_Generationen.Controls.Add(Me.LabelAnzGen)
-        Me.GroupBox_Generationen.Location = New System.Drawing.Point(8, 144)
+        Me.GroupBox_Generationen.Location = New System.Drawing.Point(5, 159)
         Me.GroupBox_Generationen.Name = "GroupBox_Generationen"
         Me.GroupBox_Generationen.Size = New System.Drawing.Size(199, 217)
         Me.GroupBox_Generationen.TabIndex = 4
@@ -388,7 +385,7 @@ Partial Class EVO_Einstellungen
         '
         'CheckisPopul
         '
-        Me.CheckisPopul.Location = New System.Drawing.Point(9, 370)
+        Me.CheckisPopul.Location = New System.Drawing.Point(5, 385)
         Me.CheckisPopul.Name = "CheckisPopul"
         Me.CheckisPopul.Size = New System.Drawing.Size(112, 18)
         Me.CheckisPopul.TabIndex = 5
@@ -409,7 +406,7 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Populationen.Controls.Add(Me.LabelPopPenalty)
         Me.GroupBox_Populationen.Controls.Add(Me.ComboPopPenalty)
         Me.GroupBox_Populationen.Enabled = False
-        Me.GroupBox_Populationen.Location = New System.Drawing.Point(8, 392)
+        Me.GroupBox_Populationen.Location = New System.Drawing.Point(5, 407)
         Me.GroupBox_Populationen.Name = "GroupBox_Populationen"
         Me.GroupBox_Populationen.Size = New System.Drawing.Size(199, 158)
         Me.GroupBox_Populationen.TabIndex = 6
@@ -524,13 +521,65 @@ Partial Class EVO_Einstellungen
         Me.ComboPopPenalty.Size = New System.Drawing.Size(108, 21)
         Me.ComboPopPenalty.TabIndex = 5
         '
+        'TabPage_CES
+        '
+        Me.TabPage_CES.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage_CES.Name = "TabPage_CES"
+        Me.TabPage_CES.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage_CES.Size = New System.Drawing.Size(209, 571)
+        Me.TabPage_CES.TabIndex = 1
+        Me.TabPage_CES.Text = "CES"
+        Me.TabPage_CES.UseVisualStyleBackColor = True
+        '
+        'ToolStrip1
+        '
+        Me.ToolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ÖffnenToolStripButton, Me.SpeichernToolStripButton})
+        Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
+        Me.ToolStrip1.Name = "ToolStrip1"
+        Me.ToolStrip1.Padding = New System.Windows.Forms.Padding(0)
+        Me.ToolStrip1.Size = New System.Drawing.Size(209, 25)
+        Me.ToolStrip1.Stretch = True
+        Me.ToolStrip1.TabIndex = 36
+        Me.ToolStrip1.Text = "ToolStrip1"
+        '
+        'Label_Einstellungen
+        '
+        Me.Label_Einstellungen.AutoSize = True
+        Me.Label_Einstellungen.ForeColor = System.Drawing.SystemColors.ActiveCaption
+        Me.Label_Einstellungen.Location = New System.Drawing.Point(0, 0)
+        Me.Label_Einstellungen.Name = "Label_Einstellungen"
+        Me.Label_Einstellungen.Size = New System.Drawing.Size(73, 13)
+        Me.Label_Einstellungen.TabIndex = 36
+        Me.Label_Einstellungen.Text = "Einstellungen:"
+        '
+        'ÖffnenToolStripButton
+        '
+        Me.ÖffnenToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ÖffnenToolStripButton.Image = CType(resources.GetObject("ÖffnenToolStripButton.Image"), System.Drawing.Image)
+        Me.ÖffnenToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ÖffnenToolStripButton.Name = "ÖffnenToolStripButton"
+        Me.ÖffnenToolStripButton.Size = New System.Drawing.Size(23, 22)
+        Me.ÖffnenToolStripButton.Text = "Ö&ffnen"
+        '
+        'SpeichernToolStripButton
+        '
+        Me.SpeichernToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.SpeichernToolStripButton.Image = CType(resources.GetObject("SpeichernToolStripButton.Image"), System.Drawing.Image)
+        Me.SpeichernToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.SpeichernToolStripButton.Name = "SpeichernToolStripButton"
+        Me.SpeichernToolStripButton.Size = New System.Drawing.Size(23, 22)
+        Me.SpeichernToolStripButton.Text = "&Speichern"
+        '
         'EVO_Einstellungen
         '
-        Me.Controls.Add(Me.GroupBox_Einstellungen)
+        Me.Controls.Add(Me.Label_Einstellungen)
+        Me.Controls.Add(Me.TabControl1)
         Me.Name = "EVO_Einstellungen"
-        Me.Size = New System.Drawing.Size(217, 586)
-        Me.GroupBox_Einstellungen.ResumeLayout(False)
-        Me.GroupBox_Einstellungen.PerformLayout()
+        Me.Size = New System.Drawing.Size(236, 632)
+        Me.TabControl1.ResumeLayout(False)
+        Me.TabPage_PES.ResumeLayout(False)
+        Me.TabPage_PES.PerformLayout()
         CType(Me.TextDeltaStart, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox_Generationen.ResumeLayout(False)
         Me.GroupBox_Generationen.PerformLayout()
@@ -545,15 +594,24 @@ Partial Class EVO_Einstellungen
         CType(Me.TextAnzRunden, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.TextAnzPop, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.TextAnzPopEltern, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.ToolStrip1.ResumeLayout(False)
+        Me.ToolStrip1.PerformLayout()
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
     Private WithEvents ToolTip1 As System.Windows.Forms.ToolTip
-    Private WithEvents CheckisDnVektor As System.Windows.Forms.CheckBox
-    Private WithEvents ComboOptVorgabe As System.Windows.Forms.ComboBox
-    Private WithEvents TextDeltaStart As System.Windows.Forms.NumericUpDown
-    Private WithEvents CheckisPopul As System.Windows.Forms.CheckBox
+    Private WithEvents TabPage_PES As System.Windows.Forms.TabPage
+    Private WithEvents Label_OptModus As System.Windows.Forms.Label
+    Private WithEvents Label_OptModusValue As System.Windows.Forms.Label
+    Private WithEvents LabelStrategie As System.Windows.Forms.Label
     Private WithEvents ComboStrategie As System.Windows.Forms.ComboBox
+    Private WithEvents LabelStartwerte As System.Windows.Forms.Label
+    Private WithEvents ComboOptVorgabe As System.Windows.Forms.ComboBox
+    Private WithEvents LabelStartSchrittweite As System.Windows.Forms.Label
+    Private WithEvents TextDeltaStart As System.Windows.Forms.NumericUpDown
+    Private WithEvents CheckisDnVektor As System.Windows.Forms.CheckBox
+    Private WithEvents GroupBox_Generationen As System.Windows.Forms.GroupBox
     Private WithEvents TextNMemberSecondPop As System.Windows.Forms.NumericUpDown
     Private WithEvents TextInteract As System.Windows.Forms.NumericUpDown
     Private WithEvents TextRekombxy As System.Windows.Forms.NumericUpDown
@@ -571,26 +629,24 @@ Partial Class EVO_Einstellungen
     Private WithEvents LabelAnzNachf As System.Windows.Forms.Label
     Private WithEvents LabelAnzEltern As System.Windows.Forms.Label
     Private WithEvents LabelAnzGen As System.Windows.Forms.Label
-    Private WithEvents GroupBox_Generationen As System.Windows.Forms.GroupBox
-    Private WithEvents ComboPopPenalty As System.Windows.Forms.ComboBox
-    Private WithEvents ComboPopStrategie As System.Windows.Forms.ComboBox
-    Private WithEvents ComboOptPopEltern As System.Windows.Forms.ComboBox
-    Private WithEvents TextAnzPopEltern As System.Windows.Forms.NumericUpDown
-    Private WithEvents TextAnzPop As System.Windows.Forms.NumericUpDown
-    Private WithEvents TextAnzRunden As System.Windows.Forms.NumericUpDown
-    Private WithEvents LabelPopPenalty As System.Windows.Forms.Label
-    Private WithEvents LabelPopStrategie As System.Windows.Forms.Label
-    Private WithEvents LabelOptPopEltern As System.Windows.Forms.Label
-    Private WithEvents LabelAnzPopEltern As System.Windows.Forms.Label
-    Private WithEvents LabelAnzPop As System.Windows.Forms.Label
-    Private WithEvents LabelAnzRunden As System.Windows.Forms.Label
+    Private WithEvents CheckisPopul As System.Windows.Forms.CheckBox
     Private WithEvents GroupBox_Populationen As System.Windows.Forms.GroupBox
-    Private WithEvents LabelStartwerte As System.Windows.Forms.Label
-    Private WithEvents LabelStartSchrittweite As System.Windows.Forms.Label
-    Private WithEvents LabelStrategie As System.Windows.Forms.Label
-    Private WithEvents GroupBox_Einstellungen As System.Windows.Forms.GroupBox
-    Private WithEvents Label_OptModusValue As System.Windows.Forms.Label
-    Private WithEvents Label_OptModus As System.Windows.Forms.Label
-    Private WithEvents Button_Load As System.Windows.Forms.Button
-    Private WithEvents Button_Save As System.Windows.Forms.Button
+    Private WithEvents LabelAnzRunden As System.Windows.Forms.Label
+    Private WithEvents TextAnzRunden As System.Windows.Forms.NumericUpDown
+    Private WithEvents LabelAnzPop As System.Windows.Forms.Label
+    Private WithEvents TextAnzPop As System.Windows.Forms.NumericUpDown
+    Private WithEvents LabelAnzPopEltern As System.Windows.Forms.Label
+    Private WithEvents TextAnzPopEltern As System.Windows.Forms.NumericUpDown
+    Private WithEvents LabelOptPopEltern As System.Windows.Forms.Label
+    Private WithEvents ComboOptPopEltern As System.Windows.Forms.ComboBox
+    Private WithEvents LabelPopStrategie As System.Windows.Forms.Label
+    Private WithEvents ComboPopStrategie As System.Windows.Forms.ComboBox
+    Private WithEvents LabelPopPenalty As System.Windows.Forms.Label
+    Private WithEvents ComboPopPenalty As System.Windows.Forms.ComboBox
+    Private WithEvents TabPage_CES As System.Windows.Forms.TabPage
+    Friend WithEvents ÖffnenToolStripButton As System.Windows.Forms.ToolStripButton
+    Friend WithEvents SpeichernToolStripButton As System.Windows.Forms.ToolStripButton
+    Private WithEvents TabControl1 As System.Windows.Forms.TabControl
+    Private WithEvents ToolStrip1 As System.Windows.Forms.ToolStrip
+    Friend WithEvents Label_Einstellungen As System.Windows.Forms.Label
 End Class

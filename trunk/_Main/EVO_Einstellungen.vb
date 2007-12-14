@@ -37,8 +37,8 @@ Public Class EVO_Einstellungen
     Private Sub EVO_Einstellungen_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
         'EventHandler einrichten
-        AddHandler Me.Button_Load.Click, AddressOf Form1.Load_EVO_Settings
-        AddHandler Me.Button_Save.Click, AddressOf Form1.Save_EVO_Settings
+        AddHandler Me.ÖffnenToolStripButton.Click, AddressOf Form1.Load_EVO_Settings
+        AddHandler Me.SpeichernToolStripButton.Click, AddressOf Form1.Save_EVO_Settings
 
     End Sub
 

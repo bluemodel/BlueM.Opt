@@ -36,14 +36,14 @@ Partial Class Testprobleme
         Me.GroupBox_Testproblem.Controls.Add(Me.Combo_Testproblem)
         Me.GroupBox_Testproblem.Location = New System.Drawing.Point(0, 0)
         Me.GroupBox_Testproblem.Name = "GroupBox_Testproblem"
-        Me.GroupBox_Testproblem.Size = New System.Drawing.Size(217, 113)
+        Me.GroupBox_Testproblem.Size = New System.Drawing.Size(217, 102)
         Me.GroupBox_Testproblem.TabIndex = 2
         Me.GroupBox_Testproblem.TabStop = False
         Me.GroupBox_Testproblem.Text = "Testprobleme"
         '
         'TextBox_Einstellung
         '
-        Me.TextBox_Einstellung.Location = New System.Drawing.Point(173, 86)
+        Me.TextBox_Einstellung.Location = New System.Drawing.Point(173, 76)
         Me.TextBox_Einstellung.Name = "TextBox_Einstellung"
         Me.TextBox_Einstellung.Size = New System.Drawing.Size(36, 20)
         Me.TextBox_Einstellung.TabIndex = 29
@@ -54,14 +54,14 @@ Partial Class Testprobleme
         '
         Me.Label_Beschreibung.Location = New System.Drawing.Point(6, 49)
         Me.Label_Beschreibung.Name = "Label_Beschreibung"
-        Me.Label_Beschreibung.Size = New System.Drawing.Size(203, 34)
+        Me.Label_Beschreibung.Size = New System.Drawing.Size(203, 32)
         Me.Label_Beschreibung.TabIndex = 27
         Me.Label_Beschreibung.Text = "Parameter an Sinusfunktion anpassen"
         '
         'Label_Einstellung
         '
         Me.Label_Einstellung.AutoSize = True
-        Me.Label_Einstellung.Location = New System.Drawing.Point(6, 89)
+        Me.Label_Einstellung.Location = New System.Drawing.Point(6, 79)
         Me.Label_Einstellung.Name = "Label_Einstellung"
         Me.Label_Einstellung.Size = New System.Drawing.Size(93, 13)
         Me.Label_Einstellung.TabIndex = 28
