@@ -268,7 +268,7 @@ Public Class OptResult
         Call Me.db_prepare()
         'Methodenspezifische Anpassungen
         Select Case Me.Method
-            Case METH_PES, METH_SENSIPLOT
+            Case METH_PES, METH_SENSIPLOT, METH_HOOKJEEVES
                 Call Me.db_prepare_PES()
             Case METH_CES
                 Call Me.db_prepare_CES()
