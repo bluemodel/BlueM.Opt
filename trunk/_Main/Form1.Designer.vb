@@ -34,16 +34,16 @@ Partial Class Form1
         Me.Button_openMDB = New System.Windows.Forms.Button
         Me.Button_Scatterplot = New System.Windows.Forms.Button
         Me.GroupBox_Anwendung = New System.Windows.Forms.GroupBox
-        Me.Label_Methode = New System.Windows.Forms.Label
-        Me.ComboBox_Methode = New System.Windows.Forms.ComboBox
         Me.Label_Anwendung = New System.Windows.Forms.Label
         Me.ComboBox_Anwendung = New System.Windows.Forms.ComboBox
+        Me.Label_Methode = New System.Windows.Forms.Label
+        Me.ComboBox_Methode = New System.Windows.Forms.ComboBox
+        Me.Label_Datensatz = New System.Windows.Forms.Label
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog
-        Me.EVO_Settings1 = New IHWB.EVO.EVO_Einstellungen
+        Me.EVO_Einstellungen1 = New IHWB.EVO.EVO_Einstellungen
         Me.EVO_Opt_Verlauf1 = New IHWB.EVO.EVO_Opt_Verlauf
         Me.DForm = New IHWB.EVO.DiagrammForm
-        Me.Label_Datensatz = New System.Windows.Forms.Label
         Me.GroupBox_Anwendung.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -113,24 +113,6 @@ Partial Class Form1
         Me.GroupBox_Anwendung.TabStop = False
         Me.GroupBox_Anwendung.Text = "Anwendung"
         '
-        'Label_Methode
-        '
-        Me.Label_Methode.AutoSize = True
-        Me.Label_Methode.Location = New System.Drawing.Point(172, 22)
-        Me.Label_Methode.Name = "Label_Methode"
-        Me.Label_Methode.Size = New System.Drawing.Size(52, 13)
-        Me.Label_Methode.TabIndex = 11
-        Me.Label_Methode.Text = "Methode:"
-        '
-        'ComboBox_Methode
-        '
-        Me.ComboBox_Methode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboBox_Methode.FormattingEnabled = True
-        Me.ComboBox_Methode.Location = New System.Drawing.Point(230, 19)
-        Me.ComboBox_Methode.Name = "ComboBox_Methode"
-        Me.ComboBox_Methode.Size = New System.Drawing.Size(121, 21)
-        Me.ComboBox_Methode.TabIndex = 10
-        '
         'Label_Anwendung
         '
         Me.Label_Anwendung.AutoSize = True
@@ -151,13 +133,40 @@ Partial Class Form1
         Me.ComboBox_Anwendung.Size = New System.Drawing.Size(124, 21)
         Me.ComboBox_Anwendung.TabIndex = 0
         '
+        'Label_Methode
+        '
+        Me.Label_Methode.AutoSize = True
+        Me.Label_Methode.Location = New System.Drawing.Point(172, 22)
+        Me.Label_Methode.Name = "Label_Methode"
+        Me.Label_Methode.Size = New System.Drawing.Size(52, 13)
+        Me.Label_Methode.TabIndex = 11
+        Me.Label_Methode.Text = "Methode:"
+        '
+        'ComboBox_Methode
+        '
+        Me.ComboBox_Methode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboBox_Methode.FormattingEnabled = True
+        Me.ComboBox_Methode.Location = New System.Drawing.Point(230, 19)
+        Me.ComboBox_Methode.Name = "ComboBox_Methode"
+        Me.ComboBox_Methode.Size = New System.Drawing.Size(121, 21)
+        Me.ComboBox_Methode.TabIndex = 10
+        '
+        'Label_Datensatz
+        '
+        Me.Label_Datensatz.AutoSize = True
+        Me.Label_Datensatz.Location = New System.Drawing.Point(367, 22)
+        Me.Label_Datensatz.Name = "Label_Datensatz"
+        Me.Label_Datensatz.Size = New System.Drawing.Size(58, 13)
+        Me.Label_Datensatz.TabIndex = 12
+        Me.Label_Datensatz.Text = "Datensatz:"
+        '
         'EVO_Settings1
         '
-        Me.EVO_Settings1.Enabled = False
-        Me.EVO_Settings1.Location = New System.Drawing.Point(4, 60)
-        Me.EVO_Settings1.Name = "EVO_Settings1"
-        Me.EVO_Settings1.Size = New System.Drawing.Size(220, 700)
-        Me.EVO_Settings1.TabIndex = 2
+        Me.EVO_Einstellungen1.Enabled = False
+        Me.EVO_Einstellungen1.Location = New System.Drawing.Point(4, 64)
+        Me.EVO_Einstellungen1.Name = "EVO_Settings1"
+        Me.EVO_Einstellungen1.Size = New System.Drawing.Size(220, 700)
+        Me.EVO_Einstellungen1.TabIndex = 2
         '
         'EVO_Opt_Verlauf1
         '
@@ -173,15 +182,6 @@ Partial Class Form1
         Me.DForm.Size = New System.Drawing.Size(473, 625)
         Me.DForm.TabIndex = 8
         '
-        'Label_Datensatz
-        '
-        Me.Label_Datensatz.AutoSize = True
-        Me.Label_Datensatz.Location = New System.Drawing.Point(367, 22)
-        Me.Label_Datensatz.Name = "Label_Datensatz"
-        Me.Label_Datensatz.Size = New System.Drawing.Size(58, 13)
-        Me.Label_Datensatz.TabIndex = 12
-        Me.Label_Datensatz.Text = "Datensatz:"
-        '
         'Form1
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
@@ -190,7 +190,7 @@ Partial Class Form1
         Me.Controls.Add(Me.Button_Scatterplot)
         Me.Controls.Add(Me.Button_openMDB)
         Me.Controls.Add(Me.Button_Start)
-        Me.Controls.Add(Me.EVO_Settings1)
+        Me.Controls.Add(Me.EVO_Einstellungen1)
         Me.Controls.Add(Me.GroupBox_Anwendung)
         Me.Controls.Add(Me.EVO_Opt_Verlauf1)
         Me.Controls.Add(Me.DForm)
@@ -217,6 +217,6 @@ Partial Class Form1
     Friend WithEvents Button_openMDB As System.Windows.Forms.Button
     Friend WithEvents Button_Scatterplot As System.Windows.Forms.Button
     Friend WithEvents SaveFileDialog1 As System.Windows.Forms.SaveFileDialog
-    Private WithEvents EVO_Settings1 As IHWB.EVO.EVO_Einstellungen
+    Private WithEvents EVO_Einstellungen1 As IHWB.EVO.EVO_Einstellungen
     Friend WithEvents Label_Datensatz As System.Windows.Forms.Label
 End Class

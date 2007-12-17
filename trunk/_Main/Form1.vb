@@ -124,7 +124,7 @@ Partial Class Form1
             Me.Button_Scatterplot.Enabled = False
 
             'EVO_Settings zurücksetzen
-            EVO_Settings1.isSaved = False
+            EVO_Einstellungen1.isSaved = False
 
             'Mauszeiger busy
             Cursor = Cursors.WaitCursor
@@ -184,9 +184,9 @@ Partial Class Form1
                     Call Me.Testprobleme1.Show()
 
                     'EVO_Einstellungen aktivieren
-                    EVO_Settings1.Enabled = True
+                    EVO_Einstellungen1.Enabled = True
 
-                    Call EVO_Settings1.setStandard(Testprobleme1.OptModus)
+                    Call EVO_Einstellungen1.setStandard(Testprobleme1.OptModus)
 
                     'Globale Parameter werden gesetzt
                     Call Testprobleme1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
@@ -216,7 +216,7 @@ Partial Class Form1
             End If
 
             'EVO_Verlauf zurücksetzen
-            Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Settings1.PES_Settings.Pop.n_Runden, EVO_Settings1.PES_Settings.Pop.n_Popul, EVO_Settings1.PES_Settings.n_Gen, EVO_Settings1.PES_Settings.n_Nachf)
+            Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
 
         End If
 
@@ -246,10 +246,10 @@ Partial Class Form1
             Me.Button_Scatterplot.Enabled = False
 
             'EVO_Einstellungen deaktivieren
-            EVO_Settings1.Enabled = False
+            EVO_Einstellungen1.Enabled = False
 
-            'EVO_Settings zurücksetzen
-            EVO_Settings1.isSaved = False
+            'EVO_Einstellungen zurücksetzen
+            EVO_Einstellungen1.isSaved = False
 
             'Mauszeiger busy
             Cursor = Cursors.WaitCursor
@@ -311,7 +311,7 @@ Partial Class Form1
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'EVO_Einstellungen aktivieren
-                    EVO_Settings1.Enabled = True
+                    EVO_Einstellungen1.Enabled = True
 
                     'Ergebnis-Buttons
                     Me.Button_openMDB.Enabled = True
@@ -321,16 +321,16 @@ Partial Class Form1
 
                     'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
                     If (Sim1.List_OptZiele.GetLength(0) = 1) Then
-                        Call EVO_Settings1.setStandard(Kern.EVO_MODUS.Single_Objective)
+                        Call EVO_Einstellungen1.setStandard(Kern.EVO_MODUS.Single_Objective)
                     ElseIf (Sim1.List_OptZiele.GetLength(0) > 1) Then
-                        Call EVO_Settings1.setStandard(Kern.EVO_MODUS.Multi_Objective)
+                        Call EVO_Einstellungen1.setStandard(Kern.EVO_MODUS.Multi_Objective)
                     End If
 
                     'Parameterübergabe an PES
                     Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
 
                     'EVO_Verlauf zurücksetzen
-                    Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Settings1.PES_Settings.Pop.n_Runden, EVO_Settings1.PES_Settings.Pop.n_Popul, EVO_Settings1.PES_Settings.n_Gen, EVO_Settings1.PES_Settings.n_Nachf)
+                    Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
 
                 Case METH_CES, METH_CES_PES, METH_HYBRID 'Methode CES und Methode CES_PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -356,7 +356,7 @@ Partial Class Form1
                             Call Sim1.Write_ModellParameter()
 
                             'EVO_Einstellungen aktiviern
-                            EVO_Settings1.Enabled = True
+                            EVO_Einstellungen1.Enabled = True
 
                             'CES für Sim vorbereiten (Files lesen und Validieren)
                             Call Sim1.read_and_valid_INI_Files_CES_PES()
@@ -372,9 +372,9 @@ Partial Class Form1
 
                     'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
                     If (Sim1.List_OptZiele.GetLength(0) = 1) Then
-                        Call EVO_Settings1.setStandard(Kern.EVO_MODUS.Single_Objective)
+                        Call EVO_Einstellungen1.setStandard(Kern.EVO_MODUS.Single_Objective)
                     ElseIf (Sim1.List_OptZiele.GetLength(0) > 1) Then
-                        Call EVO_Settings1.setStandard(Kern.EVO_MODUS.Multi_Objective)
+                        Call EVO_Einstellungen1.setStandard(Kern.EVO_MODUS.Multi_Objective)
                     End If
 
                     'Anzahl der Ziele, Locations und Verzeigungen wird an CES übergeben
@@ -469,11 +469,11 @@ Partial Class Form1
 
     'EVO_Einstellungen laden
     '***********************
-    Friend Sub Load_EVO_Settings(ByVal sender As Object, ByVal e as System.EventArgs)
+    Friend Sub Load_EVO_Settings(ByVal sender As Object, ByVal e As System.EventArgs)
 
         'Dialog einrichten
         OpenFileDialog1.Filter = "XML-Dateien (*.xml)|*.xml"
-        OpenFileDialog1.FileName = "PES_Settings.xml"
+        OpenFileDialog1.FileName = "EVO_Settings.xml"
         OpenFileDialog1.Title = "Einstellungsdatei auswählen"
         If (Not isNothing(Sim1)) Then
             OpenFileDialog1.InitialDirectory = Sim1.WorkDir
@@ -483,7 +483,7 @@ Partial Class Form1
 
         'Dialog anzeigen
         If (OpenFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK) Then
-            Call EVO_Settings1.loadSettings(OpenFileDialog1.FileName)
+            Call EVO_Einstellungen1.loadSettings(OpenFileDialog1.FileName)
         End If
     End Sub
 
@@ -493,7 +493,7 @@ Partial Class Form1
 
         'Dialog einrichten
         SaveFileDialog1.Filter = "XML-Dateien (*.xml)|*.xml"
-        SaveFileDialog1.FileName = "PES_Settings.xml"
+        SaveFileDialog1.FileName = "EVO_Settings.xml"
         SaveFileDialog1.DefaultExt = "xml"
         SaveFileDialog1.Title = "Einstellungsdatei speichern"
         If (Not isNothing(Sim1)) Then
@@ -504,7 +504,7 @@ Partial Class Form1
 
         'Dialog anzeigen
         If (SaveFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK) Then
-            Call EVO_Settings1.saveSettings(SaveFileDialog1.FileName)
+            Call EVO_Einstellungen1.saveSettings(SaveFileDialog1.FileName)
         End If
     End Sub
 
@@ -541,14 +541,14 @@ Partial Class Form1
             'Ergebnis-Buttons
             Me.Button_Scatterplot.Enabled = True
 
-            'EVO-Einstellungen speichern
+            'EVO_Einstellungen temporär speichern
             Dim dir As String
             If (Not IsNothing(Sim1)) Then
                 dir = Sim1.WorkDir
             Else
                 dir = CurDir() & "\"
             End If
-            Call Me.EVO_Settings1.saveSettings(dir & "PES_Settings.xml")
+            Call Me.EVO_Einstellungen1.saveSettings(dir & "EVO_Settings.xml")
 
             'Try
 
@@ -869,20 +869,20 @@ Partial Class Form1
                         For m = 0 To CES1.Childs(i).Loc(j).Loc_Para.GetUpperBound(1)
                             myPara(m) = CES1.Childs(i).Loc(j).Loc_Para(1, m)
                         Next
-                        '1. EVO_Settings zurücksetzen; 2. Die Settings werden für Hybrid gesetzt
-                        EVO_Settings1.isSaved = False
-                        Call EVO_Settings1.SetFor_CES_PES(1, 1, 1)
+                        '1. EVO_Einstellungen zurücksetzen; 2. Die Settings werden für Hybrid gesetzt
+                        EVO_Einstellungen1.isSaved = False
+                        Call EVO_Einstellungen1.SetFor_CES_PES(1, 1, 1)
 
                         'Schritte 1 - 3: PES wird initialisiert (Weiteres siehe dort ;-)
                         '**************************************************************
-                        Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen, Method)
+                        Call PES1.PesInitialise(EVO_Einstellungen1.Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen, Method)
 
                         'Dem Child wird der Schrittweitenvektor zugewiesen und gegebenenfalls der Parameter zufällig gewählt
                         'wird also nicht in PES.ESStarten gemacht
                         ReDim CES1.Childs(i).Loc(j).Loc_Dn(CES1.Childs(i).Loc(j).Loc_Para.GetUpperBound(1))
                         For m = 0 To CES1.Childs(i).Loc(j).Loc_Para.GetUpperBound(1)
-                            CES1.Childs(i).Loc(j).Loc_Dn(m) = EVO_Settings1.PES_Settings.DnStart
-                            If EVO_Settings1.PES_Settings.ty_StartPar = Kern.EVO_STARTPARAMETER.Zufall Then
+                            CES1.Childs(i).Loc(j).Loc_Dn(m) = EVO_Einstellungen1.Settings.PES.DnStart
+                            If EVO_Einstellungen1.Settings.PES.ty_StartPar = Kern.EVO_STARTPARAMETER.Zufall Then
                                 Randomize()
                                 CES1.Childs(i).Loc(j).Loc_Para(1, m) = Rnd()
                             End If
@@ -1054,21 +1054,21 @@ Partial Class Form1
                                 'Falls noch keine Eltern vorhanden sind -> zufällige Werte
                                 ReDim CES1.Childs(i).Loc(j).Loc_Dn(CES1.Childs(i).Loc(j).Loc_Para.GetUpperBound(1))
                                 For m = 0 To CES1.Childs(i).Loc(j).Loc_Para.GetUpperBound(1)
-                                    CES1.Childs(i).Loc(j).Loc_Dn(m) = EVO_Settings1.PES_Settings.DnStart
+                                    CES1.Childs(i).Loc(j).Loc_Dn(m) = EVO_Einstellungen1.Settings.PES.DnStart
                                     'Falls zufällige Startwerte
-                                    If EVO_Settings1.PES_Settings.ty_StartPar = Kern.EVO_STARTPARAMETER.Zufall Then
+                                    If EVO_Einstellungen1.Settings.PES.ty_StartPar = Kern.EVO_STARTPARAMETER.Zufall Then
                                         Randomize()
                                         CES1.Childs(i).Loc(j).Loc_Para(1, m) = Rnd()
                                     End If
                                 Next
                             Else
                                 'Falls Eltern vorhanden -> auf Basis des Memory
-                                EVO_Settings1.isSaved = False
-                                Call EVO_Settings1.SetFor_CES_PES(1, n_eltern, 1)
+                                EVO_Einstellungen1.isSaved = False
+                                Call EVO_Einstellungen1.SetFor_CES_PES(1, n_eltern, 1)
 
                                 'Schritte 1 - 3: PES wird initialisiert (Weiteres siehe dort ;-)
                                 '**************************************************************
-                                Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen, Method)
+                                Call PES1.PesInitialise(EVO_Einstellungen1.Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen, Method)
 
                                 'Die PopulationsEltern des PES werden gefüllt
                                 For m = 0 To CES1.PES_Parents_pLoc.GetUpperBound(0)
@@ -1107,8 +1107,8 @@ Partial Class Form1
         Dim i As Integer
 
         '1. EVO_Settings zurücksetzen; 2. Einstellungen für PES werden gesetzt (AnzGen, AnzEltern, AnzNachf)
-        EVO_Settings1.isSaved = False
-        Call EVO_Settings1.SetFor_CES_PES(1, 3, 5)
+        EVO_Einstellungen1.isSaved = False
+        Call EVO_Einstellungen1.SetFor_CES_PES(1, 3, 5)
 
         For i = 0 To CES1.n_Parents - 1
             If CES1.Parents(i).Front = 1 Then
@@ -1179,10 +1179,10 @@ Partial Class Form1
 
         'Schritte 1 - 3: ES wird initialisiert (Weiteres siehe dort ;-)
         '**************************************************************
-        Call PES1.PesInitialise(EVO_Settings1.PES_Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen, Method)
+        Call PES1.PesInitialise(EVO_Einstellungen1.Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen, Method)
 
         'Startwerte werden der Verlaufsanzeige zugewiesen
-        Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Settings1.PES_Settings.Pop.n_Runden, EVO_Settings1.PES_Settings.Pop.n_Popul, EVO_Settings1.PES_Settings.n_Gen, EVO_Settings1.PES_Settings.n_Nachf)
+        Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
 
         durchlauf = 0
 
@@ -1190,14 +1190,14 @@ Start_Evolutionsrunden:
 
         'Über alle Runden
         'xxxxxxxxxxxxxxxx
-        For PES1.PES_iAkt.iAktRunde = 0 To PES1.PES_Settings.Pop.n_Runden - 1
+        For PES1.PES_iAkt.iAktRunde = 0 To PES1.Settings.PES.Pop.n_Runden - 1
 
             Call EVO_Opt_Verlauf1.Runden(PES1.PES_iAkt.iAktRunde + 1)
             Call PES1.EsResetPopBWSpeicher() 'Nur bei Komma Strategie
 
             'Über alle Populationen
             'xxxxxxxxxxxxxxxxxxxxxx
-            For PES1.PES_iAkt.iAktPop = 0 To PES1.PES_Settings.Pop.n_Popul - 1
+            For PES1.PES_iAkt.iAktPop = 0 To PES1.Settings.PES.Pop.n_Popul - 1
 
                 Call EVO_Opt_Verlauf1.Population(PES1.PES_iAkt.iAktPop + 1)
 
@@ -1213,14 +1213,14 @@ Start_Evolutionsrunden:
 
                 'Über alle Generationen
                 'xxxxxxxxxxxxxxxxxxxxxx
-                For PES1.PES_iAkt.iAktGen = 0 To PES1.PES_Settings.n_Gen - 1
+                For PES1.PES_iAkt.iAktGen = 0 To PES1.Settings.PES.n_Gen - 1
 
                     Call EVO_Opt_Verlauf1.Generation(PES1.PES_iAkt.iAktGen + 1)
                     Call PES1.EsResetBWSpeicher()  'Nur bei Komma Strategie
 
                     'Über alle Nachkommen
                     'xxxxxxxxxxxxxxxxxxxxxxxxx
-                    For PES1.PES_iAkt.iAktNachf = 0 To PES1.PES_Settings.n_Nachf - 1
+                    For PES1.PES_iAkt.iAktNachf = 0 To PES1.Settings.PES.n_Nachf - 1
 
                         Call EVO_Opt_Verlauf1.Nachfolger(PES1.PES_iAkt.iAktNachf + 1)
 
@@ -1245,7 +1245,7 @@ Start_Evolutionsrunden:
                             myPara = PES1.EsGetParameter()
 
                             'Auslesen des Bestwertspeichers
-                            If (EVO_Settings1.PES_Settings.ty_EvoModus = Kern.EVO_MODUS.Single_Objective) Then
+                            If (EVO_Einstellungen1.Settings.PES.ty_EvoModus = Kern.EVO_MODUS.Single_Objective) Then
                                 Bestwert = PES1.EsGetBestwert()
                             End If
 
@@ -1286,7 +1286,7 @@ Start_Evolutionsrunden:
                                         Else
                                             serie = DForm.Diag.getSeriesPoint("Population " & (PES1.PES_iAkt.iAktPop + 1).ToString())
                                         End If
-                                        Call serie.Add((PES1.PES_iAkt.iAktRunde + 1) * PES1.PES_iAkt.iAktGen * PES1.PES_Settings.n_Nachf + PES1.PES_iAkt.iAktNachf, QN(0), durchlauf.ToString())
+                                        Call serie.Add((PES1.PES_iAkt.iAktRunde + 1) * PES1.PES_iAkt.iAktGen * PES1.Settings.PES.n_Nachf + PES1.PES_iAkt.iAktNachf, QN(0), durchlauf.ToString())
 
                                     Else
                                         'MultiObjective
@@ -1340,7 +1340,7 @@ Start_Evolutionsrunden:
                     Call PES1.EsEltern()
 
                     'Sekundäre Population
-                    If (EVO_Settings1.PES_Settings.ty_EvoModus = Kern.EVO_MODUS.Multi_Objective) Then
+                    If (EVO_Einstellungen1.Settings.PES.ty_EvoModus = Kern.EVO_MODUS.Multi_Objective) Then
                         SekPopulation = PES1.SekundärQb_Get()
                         If (Not IsNothing(Sim1)) Then
                             'SekPop abspeichern
@@ -1461,7 +1461,7 @@ Start_Evolutionsrunden:
             Case ANW_TESTPROBLEME 'Testprobleme
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-                Call Testprobleme1.DiagInitialise(Me.EVO_Settings1.PES_Settings, globalAnzPar, Me.DForm.Diag)
+                Call Testprobleme1.DiagInitialise(Me.EVO_Einstellungen1.Settings, globalAnzPar, Me.DForm.Diag)
 
             Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -1536,10 +1536,10 @@ Start_Evolutionsrunden:
                             If (Me.Method = METH_PES) Then
                                 'Bei PES:
                                 '--------
-                                If (EVO_Settings1.PES_Settings.Pop.is_POPUL) Then
-                                    Achse.Max = EVO_Settings1.PES_Settings.n_Gen * EVO_Settings1.PES_Settings.n_Nachf * EVO_Settings1.PES_Settings.Pop.n_Runden + 1
+                                If (EVO_Einstellungen1.Settings.PES.Pop.is_POPUL) Then
+                                    Achse.Max = EVO_Einstellungen1.Settings.PES.n_Gen * EVO_Einstellungen1.Settings.PES.n_Nachf * EVO_Einstellungen1.Settings.PES.Pop.n_Runden + 1
                                 Else
-                                    Achse.Max = EVO_Settings1.PES_Settings.n_Gen * EVO_Settings1.PES_Settings.n_Nachf + 1
+                                    Achse.Max = EVO_Einstellungen1.Settings.PES.n_Gen * EVO_Einstellungen1.Settings.PES.n_Nachf + 1
                                 End If
                             Else
                                 'Bei CES etc.:
