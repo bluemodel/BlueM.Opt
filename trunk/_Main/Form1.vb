@@ -80,7 +80,7 @@ Partial Class Form1
         ComboBox_Anwendung.SelectedIndex = 0
 
         'Liste der Methoden in ComboBox schreiben und Anfangseinstellung wählen
-        ComboBox_Methode.Items.AddRange(New Object() {"", METH_RESET, METH_PES, METH_CES, METH_CES_PES, METH_HYBRID, METH_SENSIPLOT})
+        ComboBox_Methode.Items.AddRange(New Object() {"", METH_RESET, METH_PES, METH_CES, METH_CES_PES, METH_HYBRID, METH_SENSIPLOT, METH_HOOKJEEVES})
         ComboBox_Methode.SelectedIndex = 0
         ComboBox_Methode.Enabled = False
 
@@ -332,6 +332,19 @@ Partial Class Form1
                     'EVO_Verlauf zurücksetzen
                     Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
 
+                Case METH_HOOKJEEVES
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                    'todo eigenen Settings für HookJeeves
+                    EVO_Einstellungen1.Enabled = True
+                    'todo eigenen read and valid methode für hookJeeves
+                    Call Sim1.read_and_valid_INI_Files_PES()
+                    'Nur SO möglich
+                    If Sim1.List_OptZiele.GetLength(0) > 1 Then
+                        Throw New Exception("Methode von Hook und Jeeves erlaubt nur SO-Optimierung!")
+                    End If
+                    'to do eigenen Parameterübergabe an HookJeeves (evtl.überladen von Parameter_Uebergabe)
+                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
+
                 Case METH_CES, METH_CES_PES, METH_HYBRID 'Methode CES und Methode CES_PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
@@ -569,6 +582,8 @@ Partial Class Form1
                             Call STARTEN_CES_or_CES_PES()
                         Case METH_HYBRID
                             Call STARTEN_CES_or_CES_PES()
+                        Case METH_HOOKJEEVES
+                            Call STARTEN_HookJeeves()
                     End Select
 
                 Case ANW_TESTPROBLEME
@@ -1139,7 +1154,119 @@ Partial Class Form1
             End If
         Next
     End Sub
+    'Anwendung des Verfahrens von Hook und Jeeves zur Parameteroptimierung
+    '*********************************************************************
 
+    Private Sub STARTEN_HookJeeves()
+        Dim i As Integer
+        Dim j As Integer
+        Dim k As Integer
+        Dim b As Boolean
+        Dim QN() As Double = {}
+        Dim QNBest() As Double = {}
+        Dim QBest() As Double = {}
+        Dim RN() As Double
+        Dim aktuellePara(globalAnzPar) As Double
+        Dim SIM_Eval_is_OK As Boolean
+        Dim durchlauf As Long
+
+        Dim HookJeeves As EVO.Kern.HookeAndJeeves = New EVO.Kern.HookeAndJeeves(globalAnzPar, EVO_Einstellungen1.Settings.PES.DnStart, 0.001)
+
+        ReDim QN(globalAnzZiel - 1)
+        ReDim QNBest(globalAnzZiel - 1)
+        ReDim QBest(globalAnzZiel - 1)
+        ReDim RN(-1)
+
+        'Diagramm vorbereiten und initialisieren
+
+        Call PrepareDiagramm()
+
+        durchlauf = 0
+        b = False
+
+        Call HookJeeves.Initialize(myPara)
+        'Initialisierungssimulation
+        myPara.CopyTo(aktuellePara, 0)
+        QNBest(0) = 1.79E+308
+        QBest(0) = 1.79E+308
+        k = 0
+        Do While (HookJeeves.AktuelleSchrittweite > HookJeeves.MinimaleSchrittweite)
+
+            'Bestimmen der Ausgangsgüte
+            'Vorbereiten des Modelldatensatzes
+            Call Sim1.PREPARE_Evaluation_PES(aktuellePara)
+            'Evaluierung des Simulationsmodells (ToDo: Validätsprüfung fehlt)
+            durchlauf += 1
+            SIM_Eval_is_OK = Sim1.SIM_Evaluierung(durchlauf, QN, RN)
+            'Lösung im TeeChart einzeichnen
+            '==============================
+            Dim serie As Steema.TeeChart.Styles.Series
+            serie = DForm.Diag.getSeriesPoint("Hook and Jeeves".ToString())
+            Call serie.Add(durchlauf, QN(0), durchlauf.ToString())
+            QN.CopyTo(QNBest, 0)
+
+            'Tastschritte
+            For j = 0 To HookJeeves.AnzahlParameter - 1
+                aktuellePara = HookJeeves.Tastschritt(j, Kern.HookeAndJeeves.TastschrittRichtung.Vorwärts)
+                'Vorbereiten des Modelldatensatzes
+                Call Sim1.PREPARE_Evaluation_PES(aktuellePara)
+                'Evaluierung des Simulationsmodells
+                durchlauf += 1
+                SIM_Eval_is_OK = Sim1.SIM_Evaluierung(durchlauf, QN, RN)
+                serie = DForm.Diag.getSeriesPoint("Hook and Jeeves".ToString())
+                Call serie.Add(durchlauf, QN(0), durchlauf.ToString())
+                If QN(0) >= QNBest(0) Then
+                    aktuellePara = HookJeeves.Tastschritt(j, Kern.HookeAndJeeves.TastschrittRichtung.Rückwärts)
+                    'Vorbereiten des Modelldatensatzes
+                    Call Sim1.PREPARE_Evaluation_PES(aktuellePara)
+                    'Evaluierung des Simulationsmodells
+                    durchlauf += 1
+                    SIM_Eval_is_OK = Sim1.SIM_Evaluierung(durchlauf, QN, RN)
+                    serie = DForm.Diag.getSeriesPoint("Hook and Jeeves".ToString())
+                    Call serie.Add(durchlauf, QN(0), durchlauf.ToString())
+                    If QN(0) >= QNBest(0) Then
+                        aktuellePara = HookJeeves.TastschrittResetParameter(j)
+                    Else
+                        QN.CopyTo(QNBest, 0)
+                    End If
+                Else
+                    QN.CopyTo(QNBest, 0)
+                End If
+            Next
+
+            'Extrapolationsschritt
+            If QN(0) < QBest(0) Then
+                QNBest.CopyTo(QBest, 0)
+                Call HookJeeves.Extrapolationsschritt()
+                k += 1
+                aktuellePara = HookJeeves.getLetzteParameter
+                For i = 0 To HookJeeves.AnzahlParameter - 1
+                    If aktuellePara(i) < 0 Or aktuellePara(i) > 1 Then
+                        HookJeeves.Rueckschritt()
+                        k += -1
+                        HookJeeves.Schrittweitenhalbierung()
+                        aktuellePara = HookJeeves.getLetzteParameter
+                        Exit For
+                    End If
+                Next
+                b = True
+            Else
+                'If b Then
+                '    HookJeeves.Rueckschritt()
+                '    b = False
+                'Else
+                '    HookJeeves.Schrittweitenhalbierung()
+                'End If
+                If k > 0 Then
+                    HookJeeves.Rueckschritt()
+                    HookJeeves.Schrittweitenhalbierung()
+                    aktuellePara = HookJeeves.getLetzteParameter
+                Else
+                    HookJeeves.Schrittweitenhalbierung()
+                End If
+            End If
+        Loop
+    End Sub
     'Anwendung Evolutionsstrategie für Parameter Optimierung - hier Steuerung       
     '************************************************************************
     Private Sub STARTEN_PES()
@@ -1516,6 +1643,24 @@ Start_Evolutionsrunden:
 
                         End If
 
+                        'Diagramm initialisieren
+                        Call DForm.Diag.DiagInitialise(Anwendung, Achsen)
+
+                    Case METH_HOOKJEEVES
+                        'Achsen:
+                        '-------
+                        Dim Achse As Diagramm.Achse
+                        Dim Achsen As New Collection
+                        Achse.Name = "Simulation"
+                        Achse.Auto = True
+                        Achsen.Add(Achse)
+                        'für jede Zielfunktion eine weitere Achse hinzufügen
+                        For i = 0 To Sim1.List_OptZiele.GetUpperBound(0)
+                            Achse.Name = Sim1.List_OptZiele(i).Bezeichnung
+                            Achse.Auto = True
+                            Achse.Max = 0
+                            Achsen.Add(Achse)
+                        Next
                         'Diagramm initialisieren
                         Call DForm.Diag.DiagInitialise(Anwendung, Achsen)
 
