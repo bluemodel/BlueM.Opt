@@ -32,7 +32,7 @@
     </UpgradeBackupLocation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>bin\</OutputPath>
+    <OutputPath>..\..\BIN\Debug\</OutputPath>
     <DocumentationFile>EVO.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <ConfigurationOverrideFile>
@@ -82,6 +82,7 @@
   <ItemGroup>
     <Compile Include="EVO_Settings.vb" />
     <Compile Include="Functions.vb" />
+    <Compile Include="HookeAndJeeves.vb" />
     <Compile Include="Individuum.vb">
       <CustomToolNamespace>Individ</CustomToolNamespace>
     </Compile>
