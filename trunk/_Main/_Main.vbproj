@@ -91,11 +91,6 @@
     <Reference Include="TeeChart, Version=2.0.2652.22325, Culture=neutral, PublicKeyToken=9c8126276c77bdb7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <ProjectReference Include="..\EVO_KERN\EVO_Kern.vbproj">
-      <Name>EVO_Kern</Name>
-      <Project>{58356A07-425E-4C91-ACB8-17B9286C9417}</Project>
-      <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
-    </ProjectReference>
     <ProjectReference Include="..\..\SMUSI.DLLAdapter\IHWB.SMUSI.DllAdapter\IHWB.SMUSI.DllAdapter.csproj">
       <Project>{5EF7B5ED-84AE-4302-9B76-E1B87D1AB306}</Project>
       <Name>IHWB.SMUSI.DllAdapter</Name>
@@ -103,6 +98,10 @@
     <ProjectReference Include="..\..\Wave\Wave.vbproj">
       <Project>{BCD1BBE3-5AB2-4C3F-AC12-43EB977C6F6F}</Project>
       <Name>Wave</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EVO.Kern\EVO.Kern.vbproj">
+      <Project>{58356A07-425E-4C91-ACB8-17B9286C9417}</Project>
+      <Name>EVO.Kern</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
