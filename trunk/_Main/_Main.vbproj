@@ -282,7 +282,6 @@
     <None Include="Resources\cancel.png" />
     <None Include="Resources\EVO.ico" />
     <None Include="Resources\icon_teechart.png" />
-    <None Include="Resources\page_white_database.png" />
     <None Include="Resources\wave.ico" />
     <None Include="Resources\scatterplot.ico" />
   </ItemGroup>
