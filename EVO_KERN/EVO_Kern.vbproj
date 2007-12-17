@@ -80,6 +80,7 @@
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EVO_Settings.vb" />
     <Compile Include="Functions.vb" />
     <Compile Include="Individuum.vb">
       <CustomToolNamespace>Individ</CustomToolNamespace>
@@ -92,7 +93,6 @@
     <Compile Include="Module_dll.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="PES_Settings.vb" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>

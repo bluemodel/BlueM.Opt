@@ -23,6 +23,9 @@ Partial Class EVO_Einstellungen
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.TabControl1 = New System.Windows.Forms.TabControl
         Me.TabPage_PES = New System.Windows.Forms.TabPage
+        Me.ToolStrip1 = New System.Windows.Forms.ToolStrip
+        Me.ÖffnenToolStripButton = New System.Windows.Forms.ToolStripButton
+        Me.SpeichernToolStripButton = New System.Windows.Forms.ToolStripButton
         Me.Label_OptModus = New System.Windows.Forms.Label
         Me.Label_OptModusValue = New System.Windows.Forms.Label
         Me.LabelStrategie = New System.Windows.Forms.Label
@@ -65,12 +68,10 @@ Partial Class EVO_Einstellungen
         Me.LabelPopPenalty = New System.Windows.Forms.Label
         Me.ComboPopPenalty = New System.Windows.Forms.ComboBox
         Me.TabPage_CES = New System.Windows.Forms.TabPage
-        Me.ToolStrip1 = New System.Windows.Forms.ToolStrip
-        Me.Label_Einstellungen = New System.Windows.Forms.Label
-        Me.ÖffnenToolStripButton = New System.Windows.Forms.ToolStripButton
-        Me.SpeichernToolStripButton = New System.Windows.Forms.ToolStripButton
+        Me.GroupBox_AllgSettings = New System.Windows.Forms.GroupBox
         Me.TabControl1.SuspendLayout()
         Me.TabPage_PES.SuspendLayout()
+        Me.ToolStrip1.SuspendLayout()
         CType(Me.TextDeltaStart, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox_Generationen.SuspendLayout()
         CType(Me.TextNMemberSecondPop, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -83,19 +84,18 @@ Partial Class EVO_Einstellungen
         CType(Me.TextAnzRunden, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.TextAnzPop, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.TextAnzPopEltern, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.ToolStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
         'TabControl1
         '
         Me.TabControl1.Controls.Add(Me.TabPage_PES)
         Me.TabControl1.Controls.Add(Me.TabPage_CES)
-        Me.TabControl1.Location = New System.Drawing.Point(0, 20)
+        Me.TabControl1.Location = New System.Drawing.Point(0, 105)
         Me.TabControl1.Margin = New System.Windows.Forms.Padding(0)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.Padding = New System.Drawing.Point(0, 0)
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(220, 680)
+        Me.TabControl1.Size = New System.Drawing.Size(220, 595)
         Me.TabControl1.TabIndex = 35
         '
         'TabPage_PES
@@ -117,9 +117,39 @@ Partial Class EVO_Einstellungen
         Me.TabPage_PES.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_PES.Margin = New System.Windows.Forms.Padding(0)
         Me.TabPage_PES.Name = "TabPage_PES"
-        Me.TabPage_PES.Size = New System.Drawing.Size(212, 654)
+        Me.TabPage_PES.Size = New System.Drawing.Size(212, 569)
         Me.TabPage_PES.TabIndex = 0
         Me.TabPage_PES.Text = "PES"
+        '
+        'ToolStrip1
+        '
+        Me.ToolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ÖffnenToolStripButton, Me.SpeichernToolStripButton})
+        Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
+        Me.ToolStrip1.Name = "ToolStrip1"
+        Me.ToolStrip1.Padding = New System.Windows.Forms.Padding(0)
+        Me.ToolStrip1.Size = New System.Drawing.Size(212, 25)
+        Me.ToolStrip1.Stretch = True
+        Me.ToolStrip1.TabIndex = 36
+        Me.ToolStrip1.Text = "ToolStrip1"
+        '
+        'ÖffnenToolStripButton
+        '
+        Me.ÖffnenToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ÖffnenToolStripButton.Image = CType(resources.GetObject("ÖffnenToolStripButton.Image"), System.Drawing.Image)
+        Me.ÖffnenToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ÖffnenToolStripButton.Name = "ÖffnenToolStripButton"
+        Me.ÖffnenToolStripButton.Size = New System.Drawing.Size(23, 22)
+        Me.ÖffnenToolStripButton.Text = "Ö&ffnen"
+        '
+        'SpeichernToolStripButton
+        '
+        Me.SpeichernToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.SpeichernToolStripButton.Image = CType(resources.GetObject("SpeichernToolStripButton.Image"), System.Drawing.Image)
+        Me.SpeichernToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.SpeichernToolStripButton.Name = "SpeichernToolStripButton"
+        Me.SpeichernToolStripButton.Size = New System.Drawing.Size(23, 22)
+        Me.SpeichernToolStripButton.Text = "&Speichern"
         '
         'Label_OptModus
         '
@@ -527,60 +557,31 @@ Partial Class EVO_Einstellungen
         Me.TabPage_CES.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_CES.Name = "TabPage_CES"
         Me.TabPage_CES.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage_CES.Size = New System.Drawing.Size(209, 571)
+        Me.TabPage_CES.Size = New System.Drawing.Size(212, 654)
         Me.TabPage_CES.TabIndex = 1
         Me.TabPage_CES.Text = "CES"
         Me.TabPage_CES.UseVisualStyleBackColor = True
         '
-        'ToolStrip1
+        'GroupBox_AllgSettings
         '
-        Me.ToolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ÖffnenToolStripButton, Me.SpeichernToolStripButton})
-        Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
-        Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Padding = New System.Windows.Forms.Padding(0)
-        Me.ToolStrip1.Size = New System.Drawing.Size(212, 25)
-        Me.ToolStrip1.Stretch = True
-        Me.ToolStrip1.TabIndex = 36
-        Me.ToolStrip1.Text = "ToolStrip1"
-        '
-        'Label_Einstellungen
-        '
-        Me.Label_Einstellungen.AutoSize = True
-        Me.Label_Einstellungen.ForeColor = System.Drawing.SystemColors.ActiveCaption
-        Me.Label_Einstellungen.Location = New System.Drawing.Point(0, 0)
-        Me.Label_Einstellungen.Name = "Label_Einstellungen"
-        Me.Label_Einstellungen.Size = New System.Drawing.Size(73, 13)
-        Me.Label_Einstellungen.TabIndex = 36
-        Me.Label_Einstellungen.Text = "Einstellungen:"
-        '
-        'ÖffnenToolStripButton
-        '
-        Me.ÖffnenToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ÖffnenToolStripButton.Image = CType(resources.GetObject("ÖffnenToolStripButton.Image"), System.Drawing.Image)
-        Me.ÖffnenToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ÖffnenToolStripButton.Name = "ÖffnenToolStripButton"
-        Me.ÖffnenToolStripButton.Size = New System.Drawing.Size(23, 22)
-        Me.ÖffnenToolStripButton.Text = "Ö&ffnen"
-        '
-        'SpeichernToolStripButton
-        '
-        Me.SpeichernToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.SpeichernToolStripButton.Image = CType(resources.GetObject("SpeichernToolStripButton.Image"), System.Drawing.Image)
-        Me.SpeichernToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.SpeichernToolStripButton.Name = "SpeichernToolStripButton"
-        Me.SpeichernToolStripButton.Size = New System.Drawing.Size(23, 22)
-        Me.SpeichernToolStripButton.Text = "&Speichern"
+        Me.GroupBox_AllgSettings.Location = New System.Drawing.Point(0, 0)
+        Me.GroupBox_AllgSettings.Name = "GroupBox_AllgSettings"
+        Me.GroupBox_AllgSettings.Size = New System.Drawing.Size(220, 102)
+        Me.GroupBox_AllgSettings.TabIndex = 37
+        Me.GroupBox_AllgSettings.TabStop = False
+        Me.GroupBox_AllgSettings.Text = "Allgemeine Einstellungen"
         '
         'EVO_Einstellungen
         '
-        Me.Controls.Add(Me.Label_Einstellungen)
+        Me.Controls.Add(Me.GroupBox_AllgSettings)
         Me.Controls.Add(Me.TabControl1)
         Me.Name = "EVO_Einstellungen"
         Me.Size = New System.Drawing.Size(236, 738)
         Me.TabControl1.ResumeLayout(False)
         Me.TabPage_PES.ResumeLayout(False)
         Me.TabPage_PES.PerformLayout()
+        Me.ToolStrip1.ResumeLayout(False)
+        Me.ToolStrip1.PerformLayout()
         CType(Me.TextDeltaStart, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox_Generationen.ResumeLayout(False)
         Me.GroupBox_Generationen.PerformLayout()
@@ -595,10 +596,7 @@ Partial Class EVO_Einstellungen
         CType(Me.TextAnzRunden, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.TextAnzPop, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.TextAnzPopEltern, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.ToolStrip1.ResumeLayout(False)
-        Me.ToolStrip1.PerformLayout()
         Me.ResumeLayout(False)
-        Me.PerformLayout()
 
     End Sub
     Private WithEvents ToolTip1 As System.Windows.Forms.ToolTip
@@ -649,5 +647,5 @@ Partial Class EVO_Einstellungen
     Friend WithEvents SpeichernToolStripButton As System.Windows.Forms.ToolStripButton
     Private WithEvents TabControl1 As System.Windows.Forms.TabControl
     Private WithEvents ToolStrip1 As System.Windows.Forms.ToolStrip
-    Friend WithEvents Label_Einstellungen As System.Windows.Forms.Label
+    Friend WithEvents GroupBox_AllgSettings As System.Windows.Forms.GroupBox
 End Class

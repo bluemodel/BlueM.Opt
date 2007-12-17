@@ -277,7 +277,7 @@ Partial Public Class Testprobleme
 
     'Diagramm initialisieren
     '***********************
-    Public Sub DiagInitialise(ByVal PES_Settings As EVO.Kern.PES_Settings, ByVal globalAnzPar As Integer, ByRef Diag As EVO.Diagramm)
+    Public Sub DiagInitialise(ByVal PES_Settings As EVO.Kern.EVO_Settings, ByVal globalAnzPar As Integer, ByRef Diag As EVO.Diagramm)
 
         Select Case Me.Combo_Testproblem.Text
 
@@ -351,7 +351,7 @@ Partial Public Class Testprobleme
 
     'Diagramm für Beale-Problem initialisieren
     '*****************************************
-    Private Sub DiagInitialise_BealeProblem(ByVal PES_Settings As EVO.Kern.PES_Settings, ByVal globalAnzPar As Short, ByRef Diag As EVO.Diagramm)
+    Private Sub DiagInitialise_BealeProblem(ByVal PES_Settings As EVO.Kern.EVO_Settings, ByVal globalAnzPar As Short, ByRef Diag As EVO.Diagramm)
 
         Dim array_x() As Double = {}
         Dim array_y() As Double = {}
@@ -360,10 +360,10 @@ Partial Public Class Testprobleme
         Dim i As Short
         Dim serie As Steema.TeeChart.Styles.Series
 
-        If (PES_Settings.Pop.is_POPUL) Then
-            Anzahl_Kalkulationen = PES_Settings.n_Gen * PES_Settings.n_Nachf * PES_Settings.Pop.n_Runden + 1
+        If (PES_Settings.PES.Pop.is_POPUL) Then
+            Anzahl_Kalkulationen = PES_Settings.PES.n_Gen * PES_Settings.PES.n_Nachf * PES_Settings.PES.Pop.n_Runden + 1
         Else
-            Anzahl_Kalkulationen = PES_Settings.n_Gen * PES_Settings.n_Nachf + 1
+            Anzahl_Kalkulationen = PES_Settings.PES.n_Gen * PES_Settings.PES.n_Nachf + 1
         End If
 
         'Ausgangswert berechnen
@@ -403,7 +403,7 @@ Partial Public Class Testprobleme
 
     'Diagramm für Schwefel-Problem initialisieren
     '********************************************
-    Private Sub DiagInitialise_SchwefelProblem(ByVal PES_Settings As EVO.Kern.PES_Settings, ByVal globalAnzPar As Short, ByRef Diag As EVO.Diagramm)
+    Private Sub DiagInitialise_SchwefelProblem(ByVal PES_Settings As EVO.Kern.EVO_Settings, ByVal globalAnzPar As Short, ByRef Diag As EVO.Diagramm)
 
         Dim array_x() As Double = {}
         Dim array_y() As Double = {}
@@ -413,10 +413,10 @@ Partial Public Class Testprobleme
         Dim X() As Double
         Dim serie As Steema.TeeChart.Styles.Series
 
-        If (PES_Settings.Pop.is_POPUL) Then
-            Anzahl_Kalkulationen = PES_Settings.n_Gen * PES_Settings.n_Nachf * PES_Settings.Pop.n_Runden + 1
+        If (PES_Settings.PES.Pop.is_POPUL) Then
+            Anzahl_Kalkulationen = PES_Settings.PES.n_Gen * PES_Settings.PES.n_Nachf * PES_Settings.PES.Pop.n_Runden + 1
         Else
-            Anzahl_Kalkulationen = PES_Settings.n_Gen * PES_Settings.n_Nachf + 1
+            Anzahl_Kalkulationen = PES_Settings.PES.n_Gen * PES_Settings.PES.n_Nachf + 1
         End If
 
         'Ausgangswert berechnen
@@ -465,7 +465,7 @@ Partial Public Class Testprobleme
 
     'Diagramm für MultiObjective-Probleme initialisieren
     '***************************************************
-    Private Sub DiagInitialise_MultiTestProb(ByVal PES_Settings As EVO.Kern.PES_Settings, ByRef Diag As EVO.Diagramm)
+    Private Sub DiagInitialise_MultiTestProb(ByVal PES_Settings As EVO.Kern.EVO_Settings, ByRef Diag As EVO.Diagramm)
 
         Dim i, j As Short
         Dim serie As Steema.TeeChart.Styles.Series
@@ -637,7 +637,7 @@ Partial Public Class Testprobleme
 
     'Diagramm für Box-Problem (3D) initialisieren
     '********************************************
-    Private Sub DiagInitialise_3D_Box(ByVal PES_Settings As EVO.Kern.PES_Settings, ByVal AnzPar As Integer, ByRef Diag As EVO.Diagramm)
+    Private Sub DiagInitialise_3D_Box(ByVal PES_Settings As EVO.Kern.EVO_Settings, ByVal AnzPar As Integer, ByRef Diag As EVO.Diagramm)
 
         Dim i, j, n As Integer
         Dim ArrayX() As Double
@@ -769,7 +769,7 @@ Partial Public Class Testprobleme
 
     'Diagramm für Abhängige Parameter initialisieren
     '***********************************************
-    Private Sub DiagInitialise_AbhParameter(ByVal PES_Settings As EVO.Kern.PES_Settings, ByVal AnzPar As Integer, ByRef Diag As EVO.Diagramm)
+    Private Sub DiagInitialise_AbhParameter(ByVal PES_Settings As EVO.Kern.EVO_Settings, ByVal AnzPar As Integer, ByRef Diag As EVO.Diagramm)
 
         With Diag
             .Clear()
