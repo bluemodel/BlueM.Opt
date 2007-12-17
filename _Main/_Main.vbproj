@@ -30,7 +30,7 @@
     </UpgradeBackupLocation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>..\bin\Debug\</OutputPath>
+    <OutputPath>..\..\bin\Debug\</OutputPath>
     <DocumentationFile>Evo.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <ConfigurationOverrideFile>
@@ -96,11 +96,11 @@
       <Project>{58356A07-425E-4C91-ACB8-17B9286C9417}</Project>
       <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
     </ProjectReference>
-    <ProjectReference Include="..\SMUSI.DLLAdapter\IHWB.SMUSI.DllAdapter.csproj">
+    <ProjectReference Include="..\..\SMUSI.DLLAdapter\IHWB.SMUSI.DllAdapter\IHWB.SMUSI.DllAdapter.csproj">
       <Project>{5EF7B5ED-84AE-4302-9B76-E1B87D1AB306}</Project>
       <Name>IHWB.SMUSI.DllAdapter</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Wave\Wave.vbproj">
+    <ProjectReference Include="..\..\Wave\Wave.vbproj">
       <Project>{BCD1BBE3-5AB2-4C3F-AC12-43EB977C6F6F}</Project>
       <Name>Wave</Name>
     </ProjectReference>
