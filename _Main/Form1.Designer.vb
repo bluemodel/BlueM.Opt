@@ -33,6 +33,7 @@ Partial Class Form1
         Me.LinkLabel_WorkDir = New System.Windows.Forms.LinkLabel
         Me.Button_openMDB = New System.Windows.Forms.Button
         Me.Button_Scatterplot = New System.Windows.Forms.Button
+        Me.Button_saveMDB = New System.Windows.Forms.Button
         Me.GroupBox_Anwendung = New System.Windows.Forms.GroupBox
         Me.Label_Anwendung = New System.Windows.Forms.Label
         Me.ComboBox_Anwendung = New System.Windows.Forms.ComboBox
@@ -44,7 +45,9 @@ Partial Class Form1
         Me.EVO_Einstellungen1 = New IHWB.EVO.EVO_Einstellungen
         Me.EVO_Opt_Verlauf1 = New IHWB.EVO.EVO_Opt_Verlauf
         Me.DForm = New IHWB.EVO.DiagrammForm
+        Me.GroupBox_ErgebnisDB = New System.Windows.Forms.GroupBox
         Me.GroupBox_Anwendung.SuspendLayout()
+        Me.GroupBox_ErgebnisDB.SuspendLayout()
         Me.SuspendLayout()
         '
         'Button_Start
@@ -54,7 +57,7 @@ Partial Class Form1
         Me.Button_Start.Enabled = False
         Me.Button_Start.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Button_Start.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.Button_Start.Location = New System.Drawing.Point(572, 641)
+        Me.Button_Start.Location = New System.Drawing.Point(582, 638)
         Me.Button_Start.Name = "Button_Start"
         Me.Button_Start.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.Button_Start.Size = New System.Drawing.Size(112, 40)
@@ -77,8 +80,8 @@ Partial Class Form1
         'Button_openMDB
         '
         Me.Button_openMDB.Enabled = False
-        Me.Button_openMDB.Image = Global.IHWB.EVO.My.Resources.Resources.page_white_database
-        Me.Button_openMDB.Location = New System.Drawing.Point(500, 650)
+        Me.Button_openMDB.Image = Global.IHWB.EVO.My.Resources.Resources.database_connect
+        Me.Button_openMDB.Location = New System.Drawing.Point(37, 17)
         Me.Button_openMDB.Name = "Button_openMDB"
         Me.Button_openMDB.Size = New System.Drawing.Size(25, 25)
         Me.Button_openMDB.TabIndex = 13
@@ -89,12 +92,23 @@ Partial Class Form1
         '
         Me.Button_Scatterplot.Enabled = False
         Me.Button_Scatterplot.Image = Global.IHWB.EVO.My.Resources.Resources.scatterplot
-        Me.Button_Scatterplot.Location = New System.Drawing.Point(531, 649)
+        Me.Button_Scatterplot.Location = New System.Drawing.Point(68, 17)
         Me.Button_Scatterplot.Name = "Button_Scatterplot"
         Me.Button_Scatterplot.Size = New System.Drawing.Size(25, 25)
         Me.Button_Scatterplot.TabIndex = 9
         Me.ToolTip1.SetToolTip(Me.Button_Scatterplot, "Scatterplot-Matrix anzeigen")
         Me.Button_Scatterplot.UseVisualStyleBackColor = True
+        '
+        'Button_saveMDB
+        '
+        Me.Button_saveMDB.Enabled = False
+        Me.Button_saveMDB.Image = Global.IHWB.EVO.My.Resources.Resources.database_save
+        Me.Button_saveMDB.Location = New System.Drawing.Point(6, 16)
+        Me.Button_saveMDB.Name = "Button_saveMDB"
+        Me.Button_saveMDB.Size = New System.Drawing.Size(25, 25)
+        Me.Button_saveMDB.TabIndex = 14
+        Me.ToolTip1.SetToolTip(Me.Button_saveMDB, "Ergebnisdatenbank speichern")
+        Me.Button_saveMDB.UseVisualStyleBackColor = True
         '
         'GroupBox_Anwendung
         '
@@ -160,11 +174,11 @@ Partial Class Form1
         Me.Label_Datensatz.TabIndex = 12
         Me.Label_Datensatz.Text = "Datensatz:"
         '
-        'EVO_Settings1
+        'EVO_Einstellungen1
         '
         Me.EVO_Einstellungen1.Enabled = False
         Me.EVO_Einstellungen1.Location = New System.Drawing.Point(4, 64)
-        Me.EVO_Einstellungen1.Name = "EVO_Settings1"
+        Me.EVO_Einstellungen1.Name = "EVO_Einstellungen1"
         Me.EVO_Einstellungen1.Size = New System.Drawing.Size(220, 700)
         Me.EVO_Einstellungen1.TabIndex = 2
         '
@@ -182,13 +196,24 @@ Partial Class Form1
         Me.DForm.Size = New System.Drawing.Size(473, 625)
         Me.DForm.TabIndex = 8
         '
+        'GroupBox_ErgebnisDB
+        '
+        Me.GroupBox_ErgebnisDB.Controls.Add(Me.Button_saveMDB)
+        Me.GroupBox_ErgebnisDB.Controls.Add(Me.Button_openMDB)
+        Me.GroupBox_ErgebnisDB.Controls.Add(Me.Button_Scatterplot)
+        Me.GroupBox_ErgebnisDB.Location = New System.Drawing.Point(425, 631)
+        Me.GroupBox_ErgebnisDB.Name = "GroupBox_ErgebnisDB"
+        Me.GroupBox_ErgebnisDB.Size = New System.Drawing.Size(101, 50)
+        Me.GroupBox_ErgebnisDB.TabIndex = 14
+        Me.GroupBox_ErgebnisDB.TabStop = False
+        Me.GroupBox_ErgebnisDB.Text = "Ergebnis"
+        '
         'Form1
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.BackColor = System.Drawing.SystemColors.Control
         Me.ClientSize = New System.Drawing.Size(706, 768)
-        Me.Controls.Add(Me.Button_Scatterplot)
-        Me.Controls.Add(Me.Button_openMDB)
+        Me.Controls.Add(Me.GroupBox_ErgebnisDB)
         Me.Controls.Add(Me.Button_Start)
         Me.Controls.Add(Me.EVO_Einstellungen1)
         Me.Controls.Add(Me.GroupBox_Anwendung)
@@ -202,6 +227,7 @@ Partial Class Form1
         Me.Text = "Evolutionsstrategie"
         Me.GroupBox_Anwendung.ResumeLayout(False)
         Me.GroupBox_Anwendung.PerformLayout()
+        Me.GroupBox_ErgebnisDB.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
@@ -214,9 +240,11 @@ Partial Class Form1
     Friend WithEvents ComboBox_Methode As System.Windows.Forms.ComboBox
     Friend WithEvents Label_Methode As System.Windows.Forms.Label
     Friend WithEvents OpenFileDialog1 As System.Windows.Forms.OpenFileDialog
-    Friend WithEvents Button_openMDB As System.Windows.Forms.Button
-    Friend WithEvents Button_Scatterplot As System.Windows.Forms.Button
     Friend WithEvents SaveFileDialog1 As System.Windows.Forms.SaveFileDialog
     Private WithEvents EVO_Einstellungen1 As IHWB.EVO.EVO_Einstellungen
     Friend WithEvents Label_Datensatz As System.Windows.Forms.Label
+    Private WithEvents GroupBox_ErgebnisDB As System.Windows.Forms.GroupBox
+    Private WithEvents Button_saveMDB As System.Windows.Forms.Button
+    Private WithEvents Button_openMDB As System.Windows.Forms.Button
+    Private WithEvents Button_Scatterplot As System.Windows.Forms.Button
 End Class

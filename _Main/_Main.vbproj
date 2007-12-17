@@ -277,6 +277,8 @@
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
     </Content>
+    <Content Include="Resources\database_connect.png" />
+    <Content Include="Resources\database_save.png" />
     <None Include="Resources\cancel.png" />
     <None Include="Resources\EVO.ico" />
     <None Include="Resources\icon_teechart.png" />

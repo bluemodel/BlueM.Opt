@@ -67,6 +67,20 @@ Namespace My.Resources
             End Get
         End Property
         
+        Friend ReadOnly Property database_connect() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("database_connect", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        Friend ReadOnly Property database_save() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("database_save", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
         Friend ReadOnly Property EVO() As System.Drawing.Icon
             Get
                 Dim obj As Object = ResourceManager.GetObject("EVO", resourceCulture)
@@ -98,13 +112,6 @@ Namespace My.Resources
         Friend ReadOnly Property icon_teechart() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("icon_teechart", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        Friend ReadOnly Property page_white_database() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("page_white_database", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property
