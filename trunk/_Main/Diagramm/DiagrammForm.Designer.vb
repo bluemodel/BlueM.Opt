@@ -27,7 +27,7 @@ Partial Class DiagrammForm
         Me.Button_TChart2Excel = New System.Windows.Forms.Button
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
-        Me.Diag = New EVO.Diagramm
+        Me.Diag = New IHWB.EVO.Diagramm
         Me.GroupBox_TChartButtons.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -39,14 +39,14 @@ Partial Class DiagrammForm
         Me.GroupBox_TChartButtons.Controls.Add(Me.Button_TChart2Excel)
         Me.GroupBox_TChartButtons.Location = New System.Drawing.Point(3, 570)
         Me.GroupBox_TChartButtons.Name = "GroupBox_TChartButtons"
-        Me.GroupBox_TChartButtons.Size = New System.Drawing.Size(143, 49)
+        Me.GroupBox_TChartButtons.Size = New System.Drawing.Size(143, 50)
         Me.GroupBox_TChartButtons.TabIndex = 5
         Me.GroupBox_TChartButtons.TabStop = False
         Me.GroupBox_TChartButtons.Text = "Diagramm"
         '
         'Button_TChartEdit
         '
-        Me.Button_TChartEdit.Image = My.Resources.Resources.icon_edit
+        Me.Button_TChartEdit.Image = Global.IHWB.EVO.My.Resources.Resources.icon_edit
         Me.Button_TChartEdit.Location = New System.Drawing.Point(6, 19)
         Me.Button_TChartEdit.Name = "Button_TChartEdit"
         Me.Button_TChartEdit.Size = New System.Drawing.Size(25, 25)
@@ -56,7 +56,7 @@ Partial Class DiagrammForm
         '
         'Button_TChart2PNG
         '
-        Me.Button_TChart2PNG.Image = My.Resources.Resources.icon_png
+        Me.Button_TChart2PNG.Image = Global.IHWB.EVO.My.Resources.Resources.icon_png
         Me.Button_TChart2PNG.Location = New System.Drawing.Point(111, 19)
         Me.Button_TChart2PNG.Name = "Button_TChart2PNG"
         Me.Button_TChart2PNG.Size = New System.Drawing.Size(25, 25)
@@ -66,7 +66,7 @@ Partial Class DiagrammForm
         '
         'Button_TChartSave
         '
-        Me.Button_TChartSave.Image = My.Resources.Resources.icon_teechart
+        Me.Button_TChartSave.Image = Global.IHWB.EVO.My.Resources.Resources.icon_teechart
         Me.Button_TChartSave.Location = New System.Drawing.Point(80, 19)
         Me.Button_TChartSave.Name = "Button_TChartSave"
         Me.Button_TChartSave.Size = New System.Drawing.Size(25, 25)
@@ -77,7 +77,7 @@ Partial Class DiagrammForm
         'Button_TChart2Excel
         '
         Me.Button_TChart2Excel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
-        Me.Button_TChart2Excel.Image = My.Resources.Resources.icon_excel
+        Me.Button_TChart2Excel.Image = Global.IHWB.EVO.My.Resources.Resources.icon_excel
         Me.Button_TChart2Excel.Location = New System.Drawing.Point(49, 19)
         Me.Button_TChart2Excel.Name = "Button_TChart2Excel"
         Me.Button_TChart2Excel.Size = New System.Drawing.Size(25, 25)

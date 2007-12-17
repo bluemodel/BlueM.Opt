@@ -120,6 +120,7 @@ Partial Class Form1
             ComboBox_Methode.Enabled = False
 
             'Ergebnis-Buttons
+            Me.Button_saveMDB.Enabled = False
             Me.Button_openMDB.Enabled = False
             Me.Button_Scatterplot.Enabled = False
 
@@ -242,6 +243,7 @@ Partial Class Form1
             Me.Button_Start.Enabled = False
 
             'Ergebnis-Buttons
+            Me.Button_saveMDB.Enabled = False
             Me.Button_openMDB.Enabled = False
             Me.Button_Scatterplot.Enabled = False
 
@@ -350,7 +352,6 @@ Partial Class Form1
 
                     'Ergebnis-Buttons
                     Me.Button_openMDB.Enabled = True
-                    Me.Button_Scatterplot.Enabled = True
 
                     'Funktioniert nur bei BlueM!
                     If (Not Anwendung = ANW_BLUEM) Then
@@ -552,15 +553,12 @@ Partial Class Form1
             Me.Button_Start.Text = "||"
 
             'Ergebnis-Buttons
+            Me.Button_saveMDB.Enabled = True
             Me.Button_Scatterplot.Enabled = True
 
             'EVO_Einstellungen temporär speichern
             Dim dir As String
-            If (Not IsNothing(Sim1)) Then
-                dir = Sim1.WorkDir
-            Else
-                dir = CurDir() & "\"
-            End If
+            dir = My.Computer.FileSystem.SpecialDirectories.Temp & "\"
             Call Me.EVO_Einstellungen1.saveSettings(dir & "EVO_Settings.xml")
 
             'Try
@@ -1945,6 +1943,29 @@ Start_Evolutionsrunden:
 
     End Sub
 
+    'Ergebnisdatenbank speichern
+    '***************************
+    Private Sub saveMDB(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_saveMDB.Click
+
+        Dim diagresult As DialogResult
+
+        'Datei-speichern Dialog anzeigen
+        Me.SaveFileDialog1.Filter = "Access-Datenbanken (*.mdb)|*.mdb"
+        Me.SaveFileDialog1.DefaultExt = "mdb"
+        Me.SaveFileDialog1.Title = "Ergebnisdatenbank speichern unter..."
+        Me.SaveFileDialog1.FileName = Sim1.Datensatz & "_EVO.mdb"
+        Me.SaveFileDialog1.InitialDirectory = Sim1.WorkDir
+        diagresult = Me.SaveFileDialog1.ShowDialog()
+
+        If (diagresult = Windows.Forms.DialogResult.OK) Then
+
+            'Ergebnisdatenbank speichern
+            Call Sim1.OptResult.db_save(Me.SaveFileDialog1.FileName)
+
+        End If
+
+    End Sub
+
     'Scatterplot-Matrix anzeigen
     '****************************
     Private Sub showScatterplot(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Scatterplot.Click
@@ -2128,6 +2149,9 @@ Start_Evolutionsrunden:
 
                 'Ergebnis-Buttons
                 Me.Button_Scatterplot.Enabled = True
+
+                'Start-Button deaktivieren
+                Me.Button_Start.Enabled = False
 
                 'Cursor Default
                 Cursor = Cursors.Default

@@ -56,9 +56,6 @@ Public Class OptResult
         'Datensatzname speichern
         Me.Datensatz = Sim1.Datensatz
 
-        'Datenbankpfad speichern
-        Me.db_path = Sim1.WorkDir & Sim1.Datensatz & "_EVO.mdb"
-
         'Optimierungsbedingungen kopieren
         Me.List_OptZiele = Sim1.List_OptZiele
         Me.List_OptParameter = Sim1.List_OptParameter
@@ -252,14 +249,17 @@ Public Class OptResult
     '*********************
     Private Sub db_init()
 
-        'Ergebnisdatenbank anlegen
-        '-------------------------
+        'Ergebnisdatenbank in temporärem Verzeichnis anlegen
+        '---------------------------------------------------
+
+        'Datenbankpfad
+        Me.db_path = My.Computer.FileSystem.SpecialDirectories.Temp & "\EVO.mdb"
 
         'Pfad zur Vorlage
-        Dim db_path_source As String = System.Windows.Forms.Application.StartupPath() & "\EVO.mdb"
+        Dim db_source_path As String = System.Windows.Forms.Application.StartupPath() & "\EVO.mdb"
 
         'Datei kopieren
-        My.Computer.FileSystem.CopyFile(db_path_source, Me.db_path, True)
+        My.Computer.FileSystem.CopyFile(db_source_path, Me.db_path, True)
 
         'Tabellen anpassen
         '-----------------
@@ -382,6 +382,14 @@ Public Class OptResult
     '*******************************
     Private Sub db_connect()
         Dim ConnectionString As String = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & Me.db_path
+        db = New OleDb.OleDbConnection(ConnectionString)
+        db.Open()
+    End Sub
+
+    'Mit einer benutzerdefinierten Ergebnisdatenbank verbinden
+    '*********************************************************
+    Private Sub db_connect(ByVal file As String)
+        Dim ConnectionString As String = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & file
         db = New OleDb.OleDbConnection(ConnectionString)
         db.Open()
     End Sub
@@ -669,6 +677,18 @@ Public Class OptResult
 
     End Function
 
+    'Ergebnisdatenbank abspeichern (kopieren)
+    '****************************************
+    Public Sub db_save(ByVal targetFile As String)
+
+        'Datei kopieren
+        My.Computer.FileSystem.CopyFile(Me.db_path, targetFile, True)
+
+        'Neuen Dateipfad speichern
+        Me.db_path = targetFile
+
+    End Sub
+
     'Optimierungsergebnis aus einer DB lesen
     '***************************************
     Public Sub db_load(ByVal sourceFile As String)
@@ -680,28 +700,31 @@ Public Class OptResult
         '---------------------------------------------------------------------------
 
         Dim i, j As Integer
+        Dim numSolutions, igen As Integer
+        Dim q As String
+        Dim adapter As OleDbDataAdapter
+        Dim ds As DataSet
+        Dim command As OleDbCommand
 
-        'Pfad setzen
+        'Neuen Dateipfad speichern
         Me.db_path = sourceFile
 
         'Connect
         Call db_connect()
 
         'Read
-        Dim q As String
-        Dim numSolutions, igen As Integer
-
+        '----
         'Alle Lösungen
         q = "SELECT Sim.ID, OptParameter.*, QWerte.*, Constraints.* FROM ((Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN OptParameter ON Sim.ID=OptParameter.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID ORDER BY Sim.ID"
 
-        Dim adapter As OleDbDataAdapter = New OleDbDataAdapter(q, db)
+        adapter = New OleDbDataAdapter(q, db)
 
-        Dim ds As New DataSet("EVO")
+        ds = New DataSet("EVO")
         numSolutions = adapter.Fill(ds, "PESResult")
 
         'Letzte SekPop-Generation bestimmen
         Try
-            Dim command As New OleDbCommand("", db)
+            command = New OleDbCommand("", db)
             command.CommandText = "SELECT MAX(Generation) FROM SekPop"
             igen = command.ExecuteScalar()
         Catch ex As Exception
