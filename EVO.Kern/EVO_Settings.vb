@@ -36,6 +36,7 @@ Public Class EVO_Settings
         Public n_RekombXY As Integer               'X/Y-Schema Rekombination
 
         Public Pop As Struct_Pop_Settings
+
         Public Structure Struct_Pop_Settings
             <XmlAttribute()> _
             Public is_POPUL As Boolean                 'Mit Populationen
@@ -113,7 +114,21 @@ Public Class EVO_Settings
         End Sub
 
     End Structure
+    Public Structure HookJeeves_Settings
+        Public DnStart As Double                   'Startschrittweite
+        Public is_DnVektor As Boolean              'Soll ein Schrittweitenvektor benutzt werden
+        Public DnFinish As Double                  'Abbruchschrittweite
+
+        'Standardwerte setzen
+        '********************
+        Public Sub setStandard()
+            Me.DnStart = 0.1
+            Me.is_DnVektor = False
+            Me.DnFinish = 0.0001
+        End Sub
+
+    End Structure
 
     Public PES As PES_Settings
-
+    Public HookJeeves As HookJeeves_Settings
 End Class

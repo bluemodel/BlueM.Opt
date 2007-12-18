@@ -214,6 +214,10 @@ Public Class EVO_Einstellungen
         End If
         msettings.PES.n_MemberSekPop = Val(TextNMemberSecondPop.Text)
 
+        msettings.HookJeeves.DnStart = Val(Me.TextDeltaStartHJ.Text)
+        msettings.HookJeeves.DnFinish = Val(Me.TextDeltaFinishHJ.Text)
+        msettings.HookJeeves.is_DnVektor = Val(Me.CheckBoxDNVektorHJ.Checked)
+
     End Sub
 
     'Einstellungen in Form schreiben
@@ -245,6 +249,10 @@ Public Class EVO_Einstellungen
         End If
         Me.TextNMemberSecondPop.Value = Me.msettings.PES.n_MemberSekPop
 
+        Me.TextDeltaStartHJ.Value = Me.msettings.HookJeeves.DnStart
+        Me.TextDeltaFinishHJ.Value = Me.msettings.HookJeeves.DnFinish
+        Me.CheckBoxDNVektorHJ.Checked = Me.msettings.HookJeeves.is_DnVektor
+
         Call Application.DoEvents()
 
     End Sub
@@ -258,6 +266,12 @@ Public Class EVO_Einstellungen
     '****************************
     Public Sub setStandard(ByVal modus As Kern.EVO_MODUS)
         Call Me.msettings.PES.setStandard(modus)
+        Call Me.writeForm()
+    End Sub
+    'Standardeinstellungen setzen für HJ
+    '***********************************
+    Public Sub setStandard()
+        Call Me.msettings.HookJeeves.setStandard()
         Call Me.writeForm()
     End Sub
 
