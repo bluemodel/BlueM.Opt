@@ -333,6 +333,7 @@ Partial Class Form1
 
                     'EVO_Verlauf zurücksetzen
                     Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
+                    Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_PES
 
                 Case METH_HOOKJEEVES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -341,11 +342,14 @@ Partial Class Form1
                     'todo eigenen read and valid methode für hookJeeves
                     Call Sim1.read_and_valid_INI_Files_PES()
                     'Nur SO möglich
-                    If Sim1.List_OptZiele.GetLength(0) > 1 Then
+                    If (Sim1.List_OptZiele.GetLength(0) = 1) Then
+                        Call EVO_Einstellungen1.setStandard()
+                    ElseIf Sim1.List_OptZiele.GetLength(0) > 1 Then
                         Throw New Exception("Methode von Hook und Jeeves erlaubt nur SO-Optimierung!")
                     End If
                     'to do eigenen Parameterübergabe an HookJeeves (evtl.überladen von Parameter_Uebergabe)
                     Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
+                    Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_HookJeeves
 
                 Case METH_CES, METH_CES_PES, METH_HYBRID 'Methode CES und Methode CES_PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -1168,7 +1172,7 @@ Partial Class Form1
         Dim SIM_Eval_is_OK As Boolean
         Dim durchlauf As Long
 
-        Dim HookJeeves As EVO.Kern.HookeAndJeeves = New EVO.Kern.HookeAndJeeves(globalAnzPar, EVO_Einstellungen1.Settings.PES.DnStart, 0.001)
+        Dim HookJeeves As EVO.Kern.HookeAndJeeves = New EVO.Kern.HookeAndJeeves(globalAnzPar, EVO_Einstellungen1.Settings.HookJeeves.DnStart, EVO_Einstellungen1.Settings.HookJeeves.DnFinish)
 
         ReDim QN(globalAnzZiel - 1)
         ReDim QNBest(globalAnzZiel - 1)
@@ -2188,4 +2192,7 @@ Start_Evolutionsrunden:
 
 #End Region 'Methoden
 
+    Private Sub EVO_Einstellungen1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles EVO_Einstellungen1.Load
+
+    End Sub
 End Class

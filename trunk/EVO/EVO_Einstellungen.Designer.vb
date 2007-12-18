@@ -20,7 +20,6 @@ Partial Class EVO_Einstellungen
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(EVO_Einstellungen))
-        Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.TabControl1 = New System.Windows.Forms.TabControl
         Me.TabPage_PES = New System.Windows.Forms.TabPage
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip
@@ -68,6 +67,13 @@ Partial Class EVO_Einstellungen
         Me.LabelPopPenalty = New System.Windows.Forms.Label
         Me.ComboPopPenalty = New System.Windows.Forms.ComboBox
         Me.TabPage_CES = New System.Windows.Forms.TabPage
+        Me.TabPage_HookJeeves = New System.Windows.Forms.TabPage
+        Me.Label3 = New System.Windows.Forms.Label
+        Me.TextDeltaFinishHJ = New System.Windows.Forms.NumericUpDown
+        Me.Label1 = New System.Windows.Forms.Label
+        Me.TextDeltaStartHJ = New System.Windows.Forms.NumericUpDown
+        Me.CheckBoxDNVektorHJ = New System.Windows.Forms.CheckBox
+        Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.GroupBox_AllgSettings = New System.Windows.Forms.GroupBox
         Me.TabControl1.SuspendLayout()
         Me.TabPage_PES.SuspendLayout()
@@ -84,19 +90,23 @@ Partial Class EVO_Einstellungen
         CType(Me.TextAnzRunden, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.TextAnzPop, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.TextAnzPopEltern, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.TabPage_HookJeeves.SuspendLayout()
+        CType(Me.TextDeltaFinishHJ, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.TextDeltaStartHJ, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'TabControl1
         '
         Me.TabControl1.Controls.Add(Me.TabPage_PES)
         Me.TabControl1.Controls.Add(Me.TabPage_CES)
+        Me.TabControl1.Controls.Add(Me.TabPage_HookJeeves)
         Me.TabControl1.Location = New System.Drawing.Point(0, 105)
         Me.TabControl1.Margin = New System.Windows.Forms.Padding(0)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.Padding = New System.Drawing.Point(0, 0)
         Me.TabControl1.SelectedIndex = 0
         Me.TabControl1.Size = New System.Drawing.Size(220, 595)
-        Me.TabControl1.TabIndex = 35
+        Me.TabControl1.TabIndex = 1
         '
         'TabPage_PES
         '
@@ -557,10 +567,78 @@ Partial Class EVO_Einstellungen
         Me.TabPage_CES.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_CES.Name = "TabPage_CES"
         Me.TabPage_CES.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage_CES.Size = New System.Drawing.Size(212, 654)
+        Me.TabPage_CES.Size = New System.Drawing.Size(212, 569)
         Me.TabPage_CES.TabIndex = 1
         Me.TabPage_CES.Text = "CES"
         Me.TabPage_CES.UseVisualStyleBackColor = True
+        '
+        'TabPage_HookJeeves
+        '
+        Me.TabPage_HookJeeves.BackColor = System.Drawing.SystemColors.Control
+        Me.TabPage_HookJeeves.Controls.Add(Me.Label3)
+        Me.TabPage_HookJeeves.Controls.Add(Me.TextDeltaFinishHJ)
+        Me.TabPage_HookJeeves.Controls.Add(Me.Label1)
+        Me.TabPage_HookJeeves.Controls.Add(Me.TextDeltaStartHJ)
+        Me.TabPage_HookJeeves.Controls.Add(Me.CheckBoxDNVektorHJ)
+        Me.TabPage_HookJeeves.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage_HookJeeves.Name = "TabPage_HookJeeves"
+        Me.TabPage_HookJeeves.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage_HookJeeves.Size = New System.Drawing.Size(212, 569)
+        Me.TabPage_HookJeeves.TabIndex = 2
+        Me.TabPage_HookJeeves.Text = "HookJeeves"
+        '
+        'Label3
+        '
+        Me.Label3.AutoSize = True
+        Me.Label3.Location = New System.Drawing.Point(6, 43)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(87, 13)
+        Me.Label3.TabIndex = 32
+        Me.Label3.Text = "End-Schrittweite:"
+        '
+        'TextDeltaFinishHJ
+        '
+        Me.TextDeltaFinishHJ.DecimalPlaces = 5
+        Me.TextDeltaFinishHJ.Increment = New Decimal(New Integer() {1, 0, 0, 327680})
+        Me.TextDeltaFinishHJ.Location = New System.Drawing.Point(142, 39)
+        Me.TextDeltaFinishHJ.Maximum = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.TextDeltaFinishHJ.Minimum = New Decimal(New Integer() {1, 0, 0, 327680})
+        Me.TextDeltaFinishHJ.Name = "TextDeltaFinishHJ"
+        Me.TextDeltaFinishHJ.Size = New System.Drawing.Size(65, 20)
+        Me.TextDeltaFinishHJ.TabIndex = 1
+        Me.TextDeltaFinishHJ.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.TextDeltaFinishHJ.Value = New Decimal(New Integer() {1, 0, 0, 262144})
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(6, 13)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(90, 13)
+        Me.Label1.TabIndex = 30
+        Me.Label1.Text = "Start-Schrittweite:"
+        '
+        'TextDeltaStartHJ
+        '
+        Me.TextDeltaStartHJ.DecimalPlaces = 2
+        Me.TextDeltaStartHJ.Increment = New Decimal(New Integer() {1, 0, 0, 131072})
+        Me.TextDeltaStartHJ.Location = New System.Drawing.Point(142, 9)
+        Me.TextDeltaStartHJ.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
+        Me.TextDeltaStartHJ.Minimum = New Decimal(New Integer() {1, 0, 0, 131072})
+        Me.TextDeltaStartHJ.Name = "TextDeltaStartHJ"
+        Me.TextDeltaStartHJ.Size = New System.Drawing.Size(65, 20)
+        Me.TextDeltaStartHJ.TabIndex = 0
+        Me.TextDeltaStartHJ.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.TextDeltaStartHJ.Value = New Decimal(New Integer() {1, 0, 0, 65536})
+        '
+        'CheckBoxDNVektorHJ
+        '
+        Me.CheckBoxDNVektorHJ.Enabled = False
+        Me.CheckBoxDNVektorHJ.Location = New System.Drawing.Point(15, 76)
+        Me.CheckBoxDNVektorHJ.Name = "CheckBoxDNVektorHJ"
+        Me.CheckBoxDNVektorHJ.Size = New System.Drawing.Size(144, 18)
+        Me.CheckBoxDNVektorHJ.TabIndex = 2
+        Me.CheckBoxDNVektorHJ.Text = "mit Schrittweitenvektor"
         '
         'GroupBox_AllgSettings
         '
@@ -596,11 +674,14 @@ Partial Class EVO_Einstellungen
         CType(Me.TextAnzRunden, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.TextAnzPop, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.TextAnzPopEltern, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.TabPage_HookJeeves.ResumeLayout(False)
+        Me.TabPage_HookJeeves.PerformLayout()
+        CType(Me.TextDeltaFinishHJ, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.TextDeltaStartHJ, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
     Private WithEvents ToolTip1 As System.Windows.Forms.ToolTip
-    Private WithEvents TabPage_PES As System.Windows.Forms.TabPage
     Private WithEvents Label_OptModus As System.Windows.Forms.Label
     Private WithEvents Label_OptModusValue As System.Windows.Forms.Label
     Private WithEvents LabelStrategie As System.Windows.Forms.Label
@@ -645,7 +726,14 @@ Partial Class EVO_Einstellungen
     Private WithEvents TabPage_CES As System.Windows.Forms.TabPage
     Friend WithEvents ÖffnenToolStripButton As System.Windows.Forms.ToolStripButton
     Friend WithEvents SpeichernToolStripButton As System.Windows.Forms.ToolStripButton
-    Private WithEvents TabControl1 As System.Windows.Forms.TabControl
     Private WithEvents ToolStrip1 As System.Windows.Forms.ToolStrip
     Friend WithEvents GroupBox_AllgSettings As System.Windows.Forms.GroupBox
+    Friend WithEvents TabPage_HookJeeves As System.Windows.Forms.TabPage
+    Private WithEvents Label3 As System.Windows.Forms.Label
+    Private WithEvents TextDeltaFinishHJ As System.Windows.Forms.NumericUpDown
+    Private WithEvents Label1 As System.Windows.Forms.Label
+    Private WithEvents TextDeltaStartHJ As System.Windows.Forms.NumericUpDown
+    Private WithEvents CheckBoxDNVektorHJ As System.Windows.Forms.CheckBox
+    Public WithEvents TabPage_PES As System.Windows.Forms.TabPage
+    Public WithEvents TabControl1 As System.Windows.Forms.TabControl
 End Class
