@@ -281,6 +281,7 @@ Partial Class Form1
                     'Ergebnis-Buttons
                     Me.Button_openMDB.Enabled = True
 
+
                 Case METH_SENSIPLOT 'Methode SensiPlot
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
@@ -312,16 +313,15 @@ Partial Class Form1
                 Case METH_PES 'Methode PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'EVO_Einstellungen aktivieren
-                    EVO_Einstellungen1.Enabled = True
-
                     'Ergebnis-Buttons
                     Me.Button_openMDB.Enabled = True
 
                     'PES für Sim vorbereiten
                     Call Sim1.read_and_valid_INI_Files_PES()
 
-                    'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
+                    'EVO_Einstellungen einrichten
+                    EVO_Einstellungen1.Enabled = True
+                    Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_PES
                     If (Sim1.List_OptZiele.GetLength(0) = 1) Then
                         Call EVO_Einstellungen1.setStandard(Kern.EVO_MODUS.Single_Objective)
                     ElseIf (Sim1.List_OptZiele.GetLength(0) > 1) Then
@@ -333,23 +333,27 @@ Partial Class Form1
 
                     'EVO_Verlauf zurücksetzen
                     Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
-                    Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_PES
+
 
                 Case METH_HOOKJEEVES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-                    'todo eigenen Settings für HookJeeves
-                    EVO_Einstellungen1.Enabled = True
-                    'todo eigenen read and valid methode für hookJeeves
-                    Call Sim1.read_and_valid_INI_Files_PES()
+
+                    'EVO_Einstellungen einrichten
+                    Me.EVO_Einstellungen1.Enabled = True
+                    Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_HookJeeves
                     'Nur SO möglich
                     If (Sim1.List_OptZiele.GetLength(0) = 1) Then
                         Call EVO_Einstellungen1.setStandard()
                     ElseIf Sim1.List_OptZiele.GetLength(0) > 1 Then
                         Throw New Exception("Methode von Hook und Jeeves erlaubt nur SO-Optimierung!")
                     End If
-                    'to do eigenen Parameterübergabe an HookJeeves (evtl.überladen von Parameter_Uebergabe)
+
+                    'TODO: eigenen read and valid methode für hookJeeves
+                    Call Sim1.read_and_valid_INI_Files_PES()
+
+                    'TODO: eigenen Parameterübergabe an HookJeeves (evtl.überladen von Parameter_Uebergabe)
                     Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
-                    Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_HookJeeves
+
 
                 Case METH_CES, METH_CES_PES, METH_HYBRID 'Methode CES und Methode CES_PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

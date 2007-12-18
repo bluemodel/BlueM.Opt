@@ -184,40 +184,52 @@ Public Class EVO_Einstellungen
     '*******************************
     Private Sub readForm()
 
-        msettings.PES.n_Eltern = Val(TextAnzEltern.Text)
-        msettings.PES.n_Nachf = Val(TextAnzNachf.Text)
-        msettings.PES.n_Gen = Val(TextAnzGen.Text)
-        msettings.PES.ty_EvoStrategie = VB6.GetItemData(ComboStrategie, ComboStrategie.SelectedIndex)
-        msettings.PES.Pop.is_POPUL = CheckisPopul.Checked
-        msettings.PES.Pop.ty_PopEvoTyp = VB6.GetItemData(ComboPopStrategie, ComboPopStrategie.SelectedIndex)
-        msettings.PES.Pop.ty_PopPenalty = VB6.GetItemData(ComboPopPenalty, ComboPopPenalty.SelectedIndex)
-        msettings.PES.Pop.ty_OptPopEltern = VB6.GetItemData(ComboOptPopEltern, ComboOptPopEltern.SelectedIndex)
-        If (msettings.PES.Pop.is_POPUL) Then
-            msettings.PES.Pop.n_Runden = Val(TextAnzRunden.Text)
-            msettings.PES.Pop.n_Popul = Val(TextAnzPop.Text)
-            msettings.PES.Pop.n_PopEltern = Val(TextAnzPopEltern.Text)
-        Else
-            msettings.PES.Pop.n_Runden = 1
-            msettings.PES.Pop.n_Popul = 1
-            msettings.PES.Pop.n_PopEltern = 1
-        End If
-        msettings.PES.ty_OptEltern = VB6.GetItemData(ComboOptEltern, ComboOptEltern.SelectedIndex)
-        msettings.PES.n_RekombXY = Val(TextRekombxy.Text)
-        msettings.PES.DnStart = Val(TextDeltaStart.Text)
-        msettings.PES.ty_StartPar = VB6.GetItemData(ComboOptVorgabe, ComboOptVorgabe.SelectedIndex)
-        msettings.PES.is_DnVektor = CheckisDnVektor.Checked
-        If (Val(TextInteract.Text) <= 0) Then
-            msettings.PES.is_Interact = False
-            msettings.PES.n_Interact = 1
-        Else
-            msettings.PES.is_Interact = True
-            msettings.PES.n_Interact = Val(TextInteract.Text)
-        End If
-        msettings.PES.n_MemberSekPop = Val(TextNMemberSecondPop.Text)
+        'PES
+        '---
+        With Me.msettings.PES
 
-        msettings.HookJeeves.DnStart = Val(Me.TextDeltaStartHJ.Text)
-        msettings.HookJeeves.DnFinish = Val(Me.TextDeltaFinishHJ.Text)
-        msettings.HookJeeves.is_DnVektor = Val(Me.CheckBoxDNVektorHJ.Checked)
+            .n_Eltern = TextAnzEltern.Value
+            .n_Nachf = TextAnzNachf.Value
+            .n_Gen = TextAnzGen.Value
+            .ty_EvoStrategie = VB6.GetItemData(ComboStrategie, ComboStrategie.SelectedIndex)
+            .Pop.is_POPUL = CheckisPopul.Checked
+            .Pop.ty_PopEvoTyp = VB6.GetItemData(ComboPopStrategie, ComboPopStrategie.SelectedIndex)
+            .Pop.ty_PopPenalty = VB6.GetItemData(ComboPopPenalty, ComboPopPenalty.SelectedIndex)
+            .Pop.ty_OptPopEltern = VB6.GetItemData(ComboOptPopEltern, ComboOptPopEltern.SelectedIndex)
+            If (.Pop.is_POPUL) Then
+                .Pop.n_Runden = TextAnzRunden.Value
+                .Pop.n_Popul = TextAnzPop.Value
+                .Pop.n_PopEltern = TextAnzPopEltern.Value
+            Else
+                .Pop.n_Runden = 1
+                .Pop.n_Popul = 1
+                .Pop.n_PopEltern = 1
+            End If
+            .ty_OptEltern = VB6.GetItemData(ComboOptEltern, ComboOptEltern.SelectedIndex)
+            .n_RekombXY = TextRekombxy.Value
+            .DnStart = TextDeltaStart.Value
+            .ty_StartPar = VB6.GetItemData(ComboOptVorgabe, ComboOptVorgabe.SelectedIndex)
+            .is_DnVektor = CheckisDnVektor.Checked
+            If (Val(TextInteract.Text) <= 0) Then
+                .is_Interact = False
+                .n_Interact = 1
+            Else
+                .is_Interact = True
+                .n_Interact = TextInteract.Value
+            End If
+            .n_MemberSekPop = TextNMemberSecondPop.Value
+
+        End With
+
+        'Hooke and Jeeves
+        '----------------
+        With Me.msettings.HookJeeves
+
+            .DnStart = Me.TextDeltaStartHJ.Value
+            .DnFinish = Me.TextDeltaFinishHJ.Value
+            .is_DnVektor = Me.CheckBoxDNVektorHJ.Checked
+
+        End With
 
     End Sub
 
@@ -225,34 +237,46 @@ Public Class EVO_Einstellungen
     '*******************************
     Private Sub writeForm()
 
-        Call OptModus_Change()
+        'PES
+        '---
+        With Me.msettings.PES
 
-        Me.TextAnzEltern.Value = Me.msettings.PES.n_Eltern
-        Me.TextAnzNachf.Value = Me.msettings.PES.n_Nachf
-        Me.TextAnzGen.Value = Me.msettings.PES.n_Gen
-        Me.ComboStrategie.SelectedItem = Me.msettings.PES.ty_EvoStrategie
-        Me.CheckisPopul.Checked = Me.msettings.PES.Pop.is_POPUL
-        Me.ComboPopStrategie.SelectedItem = Me.msettings.PES.Pop.ty_PopEvoTyp
-        Me.ComboPopPenalty.SelectedItem = Me.msettings.PES.Pop.ty_PopPenalty
-        Me.ComboOptPopEltern.SelectedItem = Me.msettings.PES.Pop.ty_OptPopEltern
-        Me.TextAnzRunden.Value = Me.msettings.PES.Pop.n_Runden
-        Me.TextAnzPop.Value = Me.msettings.PES.Pop.n_Popul
-        Me.TextAnzPopEltern.Value = Me.msettings.PES.Pop.n_PopEltern
-        Me.ComboOptEltern.SelectedItem = Me.msettings.PES.ty_OptEltern
-        Me.TextRekombxy.Value = Me.msettings.PES.n_RekombXY
-        Me.TextDeltaStart.Value = Me.msettings.PES.DnStart
-        Me.ComboOptVorgabe.SelectedItem = Me.msettings.PES.ty_StartPar
-        Me.CheckisDnVektor.Checked = Me.msettings.PES.is_DnVektor
-        If (Me.msettings.PES.is_Interact) Then
-            Me.TextInteract.Value = Me.msettings.PES.n_Interact
-        Else
-            Me.TextInteract.Value = 0
-        End If
-        Me.TextNMemberSecondPop.Value = Me.msettings.PES.n_MemberSekPop
+            Call OptModus_Change()
 
-        Me.TextDeltaStartHJ.Value = Me.msettings.HookJeeves.DnStart
-        Me.TextDeltaFinishHJ.Value = Me.msettings.HookJeeves.DnFinish
-        Me.CheckBoxDNVektorHJ.Checked = Me.msettings.HookJeeves.is_DnVektor
+            Me.TextAnzEltern.Value = .n_Eltern
+            Me.TextAnzNachf.Value = .n_Nachf
+            Me.TextAnzGen.Value = .n_Gen
+            Me.ComboStrategie.SelectedItem = .ty_EvoStrategie
+            Me.CheckisPopul.Checked = .Pop.is_POPUL
+            Me.ComboPopStrategie.SelectedItem = .Pop.ty_PopEvoTyp
+            Me.ComboPopPenalty.SelectedItem = .Pop.ty_PopPenalty
+            Me.ComboOptPopEltern.SelectedItem = .Pop.ty_OptPopEltern
+            Me.TextAnzRunden.Value = .Pop.n_Runden
+            Me.TextAnzPop.Value = .Pop.n_Popul
+            Me.TextAnzPopEltern.Value = .Pop.n_PopEltern
+            Me.ComboOptEltern.SelectedItem = .ty_OptEltern
+            Me.TextRekombxy.Value = .n_RekombXY
+            Me.TextDeltaStart.Value = .DnStart
+            Me.ComboOptVorgabe.SelectedItem = .ty_StartPar
+            Me.CheckisDnVektor.Checked = .is_DnVektor
+            If (Me.msettings.PES.is_Interact) Then
+                Me.TextInteract.Value = .n_Interact
+            Else
+                Me.TextInteract.Value = 0
+            End If
+            Me.TextNMemberSecondPop.Value = .n_MemberSekPop
+
+        End With
+
+        'Hook and Jeeves
+        '---------------
+        With Me.msettings.HookJeeves
+
+            Me.TextDeltaStartHJ.Value = .DnStart
+            Me.TextDeltaFinishHJ.Value = .DnFinish
+            Me.CheckBoxDNVektorHJ.Checked = .is_DnVektor
+
+        End With
 
         Call Application.DoEvents()
 
@@ -263,12 +287,13 @@ Public Class EVO_Einstellungen
     'Schnittstelle
     'XXXXXXXXXXXXX
 
-    'Standardeinstellungen setzen
-    '****************************
+    'Standardeinstellungen setzen (PES)
+    '**********************************
     Public Sub setStandard(ByVal modus As Kern.EVO_MODUS)
         Call Me.msettings.PES.setStandard(modus)
         Call Me.writeForm()
     End Sub
+
     'Standardeinstellungen setzen für HJ
     '***********************************
     Public Sub setStandard()
