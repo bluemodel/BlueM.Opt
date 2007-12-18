@@ -2196,7 +2196,4 @@ Start_Evolutionsrunden:
 
 #End Region 'Methoden
 
-    Private Sub EVO_Einstellungen1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles EVO_Einstellungen1.Load
-
-    End Sub
 End Class
