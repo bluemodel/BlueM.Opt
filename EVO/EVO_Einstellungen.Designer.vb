@@ -74,7 +74,7 @@ Partial Class EVO_Einstellungen
         Me.TextDeltaStartHJ = New System.Windows.Forms.NumericUpDown
         Me.CheckBoxDNVektorHJ = New System.Windows.Forms.CheckBox
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
-        Me.GroupBox_AllgSettings = New System.Windows.Forms.GroupBox
+        Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox
         Me.TabControl1.SuspendLayout()
         Me.TabPage_PES.SuspendLayout()
         Me.ToolStrip1.SuspendLayout()
@@ -93,6 +93,7 @@ Partial Class EVO_Einstellungen
         Me.TabPage_HookJeeves.SuspendLayout()
         CType(Me.TextDeltaFinishHJ, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.TextDeltaStartHJ, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.GroupBox_Einstellungen.SuspendLayout()
         Me.SuspendLayout()
         '
         'TabControl1
@@ -100,18 +101,17 @@ Partial Class EVO_Einstellungen
         Me.TabControl1.Controls.Add(Me.TabPage_PES)
         Me.TabControl1.Controls.Add(Me.TabPage_CES)
         Me.TabControl1.Controls.Add(Me.TabPage_HookJeeves)
-        Me.TabControl1.Location = New System.Drawing.Point(0, 105)
+        Me.TabControl1.Location = New System.Drawing.Point(1, 105)
         Me.TabControl1.Margin = New System.Windows.Forms.Padding(0)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.Padding = New System.Drawing.Point(0, 0)
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(220, 595)
+        Me.TabControl1.Size = New System.Drawing.Size(218, 592)
         Me.TabControl1.TabIndex = 1
         '
         'TabPage_PES
         '
         Me.TabPage_PES.BackColor = System.Drawing.SystemColors.Control
-        Me.TabPage_PES.Controls.Add(Me.ToolStrip1)
         Me.TabPage_PES.Controls.Add(Me.Label_OptModus)
         Me.TabPage_PES.Controls.Add(Me.Label_OptModusValue)
         Me.TabPage_PES.Controls.Add(Me.LabelStrategie)
@@ -127,7 +127,7 @@ Partial Class EVO_Einstellungen
         Me.TabPage_PES.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_PES.Margin = New System.Windows.Forms.Padding(0)
         Me.TabPage_PES.Name = "TabPage_PES"
-        Me.TabPage_PES.Size = New System.Drawing.Size(212, 569)
+        Me.TabPage_PES.Size = New System.Drawing.Size(210, 566)
         Me.TabPage_PES.TabIndex = 0
         Me.TabPage_PES.Text = "PES"
         '
@@ -135,10 +135,10 @@ Partial Class EVO_Einstellungen
         '
         Me.ToolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ÖffnenToolStripButton, Me.SpeichernToolStripButton})
-        Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
+        Me.ToolStrip1.Location = New System.Drawing.Point(3, 16)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Padding = New System.Windows.Forms.Padding(0)
-        Me.ToolStrip1.Size = New System.Drawing.Size(212, 25)
+        Me.ToolStrip1.Size = New System.Drawing.Size(214, 25)
         Me.ToolStrip1.Stretch = True
         Me.ToolStrip1.TabIndex = 36
         Me.ToolStrip1.Text = "ToolStrip1"
@@ -164,7 +164,7 @@ Partial Class EVO_Einstellungen
         'Label_OptModus
         '
         Me.Label_OptModus.AutoSize = True
-        Me.Label_OptModus.Location = New System.Drawing.Point(2, 32)
+        Me.Label_OptModus.Location = New System.Drawing.Point(2, 9)
         Me.Label_OptModus.Name = "Label_OptModus"
         Me.Label_OptModus.Size = New System.Drawing.Size(42, 13)
         Me.Label_OptModus.TabIndex = 31
@@ -174,7 +174,7 @@ Partial Class EVO_Einstellungen
         '
         Me.Label_OptModusValue.AutoSize = True
         Me.Label_OptModusValue.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label_OptModusValue.Location = New System.Drawing.Point(77, 31)
+        Me.Label_OptModusValue.Location = New System.Drawing.Point(77, 8)
         Me.Label_OptModusValue.Name = "Label_OptModusValue"
         Me.Label_OptModusValue.Size = New System.Drawing.Size(0, 13)
         Me.Label_OptModusValue.TabIndex = 32
@@ -182,7 +182,7 @@ Partial Class EVO_Einstellungen
         'LabelStrategie
         '
         Me.LabelStrategie.AutoSize = True
-        Me.LabelStrategie.Location = New System.Drawing.Point(2, 58)
+        Me.LabelStrategie.Location = New System.Drawing.Point(2, 35)
         Me.LabelStrategie.Name = "LabelStrategie"
         Me.LabelStrategie.Size = New System.Drawing.Size(54, 13)
         Me.LabelStrategie.TabIndex = 19
@@ -191,7 +191,7 @@ Partial Class EVO_Einstellungen
         'ComboStrategie
         '
         Me.ComboStrategie.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboStrategie.Location = New System.Drawing.Point(80, 57)
+        Me.ComboStrategie.Location = New System.Drawing.Point(80, 34)
         Me.ComboStrategie.Name = "ComboStrategie"
         Me.ComboStrategie.Size = New System.Drawing.Size(123, 21)
         Me.ComboStrategie.TabIndex = 0
@@ -199,7 +199,7 @@ Partial Class EVO_Einstellungen
         'LabelStartwerte
         '
         Me.LabelStartwerte.AutoSize = True
-        Me.LabelStartwerte.Location = New System.Drawing.Point(2, 85)
+        Me.LabelStartwerte.Location = New System.Drawing.Point(2, 62)
         Me.LabelStartwerte.Name = "LabelStartwerte"
         Me.LabelStartwerte.Size = New System.Drawing.Size(58, 13)
         Me.LabelStartwerte.TabIndex = 29
@@ -208,7 +208,7 @@ Partial Class EVO_Einstellungen
         'ComboOptVorgabe
         '
         Me.ComboOptVorgabe.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboOptVorgabe.Location = New System.Drawing.Point(80, 84)
+        Me.ComboOptVorgabe.Location = New System.Drawing.Point(80, 61)
         Me.ComboOptVorgabe.Name = "ComboOptVorgabe"
         Me.ComboOptVorgabe.Size = New System.Drawing.Size(123, 21)
         Me.ComboOptVorgabe.TabIndex = 1
@@ -216,7 +216,7 @@ Partial Class EVO_Einstellungen
         'LabelStartSchrittweite
         '
         Me.LabelStartSchrittweite.AutoSize = True
-        Me.LabelStartSchrittweite.Location = New System.Drawing.Point(2, 111)
+        Me.LabelStartSchrittweite.Location = New System.Drawing.Point(2, 88)
         Me.LabelStartSchrittweite.Name = "LabelStartSchrittweite"
         Me.LabelStartSchrittweite.Size = New System.Drawing.Size(90, 13)
         Me.LabelStartSchrittweite.TabIndex = 27
@@ -226,7 +226,7 @@ Partial Class EVO_Einstellungen
         '
         Me.TextDeltaStart.DecimalPlaces = 2
         Me.TextDeltaStart.Increment = New Decimal(New Integer() {1, 0, 0, 131072})
-        Me.TextDeltaStart.Location = New System.Drawing.Point(150, 111)
+        Me.TextDeltaStart.Location = New System.Drawing.Point(150, 88)
         Me.TextDeltaStart.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
         Me.TextDeltaStart.Minimum = New Decimal(New Integer() {1, 0, 0, 131072})
         Me.TextDeltaStart.Name = "TextDeltaStart"
@@ -237,7 +237,7 @@ Partial Class EVO_Einstellungen
         '
         'CheckisDnVektor
         '
-        Me.CheckisDnVektor.Location = New System.Drawing.Point(11, 136)
+        Me.CheckisDnVektor.Location = New System.Drawing.Point(11, 113)
         Me.CheckisDnVektor.Name = "CheckisDnVektor"
         Me.CheckisDnVektor.Size = New System.Drawing.Size(144, 18)
         Me.CheckisDnVektor.TabIndex = 3
@@ -262,7 +262,7 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Generationen.Controls.Add(Me.LabelAnzNachf)
         Me.GroupBox_Generationen.Controls.Add(Me.LabelAnzEltern)
         Me.GroupBox_Generationen.Controls.Add(Me.LabelAnzGen)
-        Me.GroupBox_Generationen.Location = New System.Drawing.Point(5, 159)
+        Me.GroupBox_Generationen.Location = New System.Drawing.Point(5, 136)
         Me.GroupBox_Generationen.Name = "GroupBox_Generationen"
         Me.GroupBox_Generationen.Size = New System.Drawing.Size(199, 217)
         Me.GroupBox_Generationen.TabIndex = 4
@@ -426,7 +426,7 @@ Partial Class EVO_Einstellungen
         '
         'CheckisPopul
         '
-        Me.CheckisPopul.Location = New System.Drawing.Point(5, 385)
+        Me.CheckisPopul.Location = New System.Drawing.Point(5, 362)
         Me.CheckisPopul.Name = "CheckisPopul"
         Me.CheckisPopul.Size = New System.Drawing.Size(112, 18)
         Me.CheckisPopul.TabIndex = 5
@@ -447,7 +447,7 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Populationen.Controls.Add(Me.LabelPopPenalty)
         Me.GroupBox_Populationen.Controls.Add(Me.ComboPopPenalty)
         Me.GroupBox_Populationen.Enabled = False
-        Me.GroupBox_Populationen.Location = New System.Drawing.Point(5, 407)
+        Me.GroupBox_Populationen.Location = New System.Drawing.Point(5, 384)
         Me.GroupBox_Populationen.Name = "GroupBox_Populationen"
         Me.GroupBox_Populationen.Size = New System.Drawing.Size(199, 158)
         Me.GroupBox_Populationen.TabIndex = 6
@@ -583,7 +583,7 @@ Partial Class EVO_Einstellungen
         Me.TabPage_HookJeeves.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_HookJeeves.Name = "TabPage_HookJeeves"
         Me.TabPage_HookJeeves.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage_HookJeeves.Size = New System.Drawing.Size(212, 569)
+        Me.TabPage_HookJeeves.Size = New System.Drawing.Size(210, 566)
         Me.TabPage_HookJeeves.TabIndex = 2
         Me.TabPage_HookJeeves.Text = "HookJeeves"
         '
@@ -640,19 +640,20 @@ Partial Class EVO_Einstellungen
         Me.CheckBoxDNVektorHJ.TabIndex = 2
         Me.CheckBoxDNVektorHJ.Text = "mit Schrittweitenvektor"
         '
-        'GroupBox_AllgSettings
+        'GroupBox_Einstellungen
         '
-        Me.GroupBox_AllgSettings.Location = New System.Drawing.Point(0, 0)
-        Me.GroupBox_AllgSettings.Name = "GroupBox_AllgSettings"
-        Me.GroupBox_AllgSettings.Size = New System.Drawing.Size(220, 102)
-        Me.GroupBox_AllgSettings.TabIndex = 37
-        Me.GroupBox_AllgSettings.TabStop = False
-        Me.GroupBox_AllgSettings.Text = "Allgemeine Einstellungen"
+        Me.GroupBox_Einstellungen.Controls.Add(Me.ToolStrip1)
+        Me.GroupBox_Einstellungen.Controls.Add(Me.TabControl1)
+        Me.GroupBox_Einstellungen.Location = New System.Drawing.Point(0, 0)
+        Me.GroupBox_Einstellungen.Name = "GroupBox_Einstellungen"
+        Me.GroupBox_Einstellungen.Size = New System.Drawing.Size(220, 700)
+        Me.GroupBox_Einstellungen.TabIndex = 37
+        Me.GroupBox_Einstellungen.TabStop = False
+        Me.GroupBox_Einstellungen.Text = "Einstellungen:"
         '
         'EVO_Einstellungen
         '
-        Me.Controls.Add(Me.GroupBox_AllgSettings)
-        Me.Controls.Add(Me.TabControl1)
+        Me.Controls.Add(Me.GroupBox_Einstellungen)
         Me.Name = "EVO_Einstellungen"
         Me.Size = New System.Drawing.Size(236, 738)
         Me.TabControl1.ResumeLayout(False)
@@ -678,6 +679,8 @@ Partial Class EVO_Einstellungen
         Me.TabPage_HookJeeves.PerformLayout()
         CType(Me.TextDeltaFinishHJ, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.TextDeltaStartHJ, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.GroupBox_Einstellungen.ResumeLayout(False)
+        Me.GroupBox_Einstellungen.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -727,7 +730,7 @@ Partial Class EVO_Einstellungen
     Friend WithEvents ÖffnenToolStripButton As System.Windows.Forms.ToolStripButton
     Friend WithEvents SpeichernToolStripButton As System.Windows.Forms.ToolStripButton
     Private WithEvents ToolStrip1 As System.Windows.Forms.ToolStrip
-    Friend WithEvents GroupBox_AllgSettings As System.Windows.Forms.GroupBox
+    Friend WithEvents GroupBox_Einstellungen As System.Windows.Forms.GroupBox
     Friend WithEvents TabPage_HookJeeves As System.Windows.Forms.TabPage
     Private WithEvents Label3 As System.Windows.Forms.Label
     Private WithEvents TextDeltaFinishHJ As System.Windows.Forms.NumericUpDown

@@ -42,10 +42,10 @@ Partial Class Form1
         Me.Label_Datensatz = New System.Windows.Forms.Label
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog
+        Me.GroupBox_ErgebnisDB = New System.Windows.Forms.GroupBox
         Me.EVO_Einstellungen1 = New IHWB.EVO.EVO_Einstellungen
         Me.EVO_Opt_Verlauf1 = New IHWB.EVO.EVO_Opt_Verlauf
         Me.DForm = New IHWB.EVO.DiagrammForm
-        Me.GroupBox_ErgebnisDB = New System.Windows.Forms.GroupBox
         Me.GroupBox_Anwendung.SuspendLayout()
         Me.GroupBox_ErgebnisDB.SuspendLayout()
         Me.SuspendLayout()
@@ -174,10 +174,22 @@ Partial Class Form1
         Me.Label_Datensatz.TabIndex = 12
         Me.Label_Datensatz.Text = "Datensatz:"
         '
+        'GroupBox_ErgebnisDB
+        '
+        Me.GroupBox_ErgebnisDB.Controls.Add(Me.Button_saveMDB)
+        Me.GroupBox_ErgebnisDB.Controls.Add(Me.Button_openMDB)
+        Me.GroupBox_ErgebnisDB.Controls.Add(Me.Button_Scatterplot)
+        Me.GroupBox_ErgebnisDB.Location = New System.Drawing.Point(425, 631)
+        Me.GroupBox_ErgebnisDB.Name = "GroupBox_ErgebnisDB"
+        Me.GroupBox_ErgebnisDB.Size = New System.Drawing.Size(101, 50)
+        Me.GroupBox_ErgebnisDB.TabIndex = 14
+        Me.GroupBox_ErgebnisDB.TabStop = False
+        Me.GroupBox_ErgebnisDB.Text = "Ergebnis"
+        '
         'EVO_Einstellungen1
         '
         Me.EVO_Einstellungen1.Enabled = False
-        Me.EVO_Einstellungen1.Location = New System.Drawing.Point(4, 64)
+        Me.EVO_Einstellungen1.Location = New System.Drawing.Point(4, 61)
         Me.EVO_Einstellungen1.Name = "EVO_Einstellungen1"
         Me.EVO_Einstellungen1.Size = New System.Drawing.Size(220, 700)
         Me.EVO_Einstellungen1.TabIndex = 2
@@ -195,18 +207,6 @@ Partial Class Form1
         Me.DForm.Name = "DForm"
         Me.DForm.Size = New System.Drawing.Size(473, 625)
         Me.DForm.TabIndex = 8
-        '
-        'GroupBox_ErgebnisDB
-        '
-        Me.GroupBox_ErgebnisDB.Controls.Add(Me.Button_saveMDB)
-        Me.GroupBox_ErgebnisDB.Controls.Add(Me.Button_openMDB)
-        Me.GroupBox_ErgebnisDB.Controls.Add(Me.Button_Scatterplot)
-        Me.GroupBox_ErgebnisDB.Location = New System.Drawing.Point(425, 631)
-        Me.GroupBox_ErgebnisDB.Name = "GroupBox_ErgebnisDB"
-        Me.GroupBox_ErgebnisDB.Size = New System.Drawing.Size(101, 50)
-        Me.GroupBox_ErgebnisDB.TabIndex = 14
-        Me.GroupBox_ErgebnisDB.TabStop = False
-        Me.GroupBox_ErgebnisDB.Text = "Ergebnis"
         '
         'Form1
         '
