@@ -116,8 +116,13 @@ Partial Class Form1
             'Start Button deaktivieren
             Me.Button_Start.Enabled = False
 
-            'Combobox Methode deaktivieren
-            ComboBox_Methode.Enabled = False
+            'Datensatz deaktivieren
+            Me.Label_Datensatz.Enabled = False
+            Me.LinkLabel_WorkDir.Enabled = False
+
+            'Methode deaktivieren
+            Me.Label_Methode.Enabled = False
+            Me.ComboBox_Methode.Enabled = False
 
             'Ergebnis-Buttons
             Me.Button_saveMDB.Enabled = False
@@ -125,7 +130,8 @@ Partial Class Form1
             Me.Button_Scatterplot.Enabled = False
 
             'EVO_Settings zurücksetzen
-            EVO_Einstellungen1.isSaved = False
+            Me.EVO_Einstellungen1.Enabled = False
+            Me.EVO_Einstellungen1.isSaved = False
 
             'Mauszeiger busy
             Cursor = Cursors.WaitCursor
@@ -147,7 +153,6 @@ Partial Class Form1
 
                     'Objekt der Klasse BlueM initialisieren
                     Sim1 = New BlueM()
-                    Call Me.displayWorkDir()
 
 
                 Case ANW_SMUSI 'Anwendung Smusi
@@ -155,7 +160,6 @@ Partial Class Form1
 
                     'Objekt der Klasse Smusi initialisieren
                     Sim1 = New Smusi()
-                    Call Me.displayWorkDir()
 
 
                 Case ANW_SCAN 'Anwendung S:CAN
@@ -163,14 +167,13 @@ Partial Class Form1
 
                     'Objekt der Klasse Scan initialisieren
                     Sim1 = New Scan()
-                    Call Me.displayWorkDir()
 
 
                 Case ANW_SWMM   'Anwendung SWMM
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
                     'Objekt der Klasse SWMM initialisieren
                     Sim1 = New SWMM()
-                    Call Me.displayWorkDir()
 
 
                 Case ANW_TESTPROBLEME 'Anwendung Testprobleme
@@ -208,16 +211,26 @@ Partial Class Form1
 
             End Select
 
-            'Mauszeiger wieder normal
-            Cursor = Cursors.Default
+            'Bei Simulationsanwendungen
+            If (Me.Anwendung <> ANW_TESTPROBLEME And Anwendung <> ANW_TSP) Then
+                
+                'Datensatz aktivieren
+                Me.Label_Datensatz.Enabled = True
+                Me.LinkLabel_WorkDir.Enabled = True
 
-            'Combobox Methode aktivieren
-            If (Anwendung <> ANW_TESTPROBLEME And Anwendung <> ANW_TSP) Then
-                ComboBox_Methode.Enabled = True
+                'Datensatz anzeigen
+                Call Me.displayWorkDir()
+
+                'Methode aktivieren
+                Me.Label_Methode.Enabled = True
+                Me.ComboBox_Methode.Enabled = True
             End If
 
             'EVO_Verlauf zurücksetzen
             Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
+
+            'Mauszeiger wieder normal
+            Cursor = Cursors.Default
 
         End If
 
