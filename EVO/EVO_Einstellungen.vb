@@ -28,6 +28,7 @@ Public Class EVO_Einstellungen
         Me.msettings = New EVO.Kern.EVO_Settings()
         'Standardm‰ﬂig Single-Objective Werte nehmen
         Call Me.msettings.PES.setStandard(EVO_MODUS.Single_Objective)
+        Call Me.msettings.HookJeeves.setStandard()
         'Form initialisieren
         Call Me.UserControl_Initialize()
 
