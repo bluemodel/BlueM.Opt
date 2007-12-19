@@ -89,10 +89,10 @@ Public Class HookeAndJeeves
                 Throw New Exception("Der Startparameter " & i & " liegt nicht zwischen 0 und 1. Sie müssen hier skaliert vorliegen")
             End If
             dblStartparameter(i) = Parameter(i)
-            dblStartparameter.CopyTo(dblLetzteParameter, 0)
-            dblStartparameter.CopyTo(dblLetzteParameterBackup, 0)
-            dblStartparameter.CopyTo(dblAktuelleParameter, 0)
         Next
+        dblStartparameter.CopyTo(dblLetzteParameter, 0)
+        dblStartparameter.CopyTo(dblLetzteParameterBackup, 0)
+        dblStartparameter.CopyTo(dblAktuelleParameter, 0)
         'Startschrittweite wird übergeben
         dblAktuelleSchrittweite = dblStartSchrittweite
 
@@ -132,17 +132,18 @@ Public Class HookeAndJeeves
         'Bestimmen und Durchführen des Extrapolationsschrittes
         For i = 0 To intAnzahlParameter - 1
             'Bestimmen des Schrittes
-            dblExtrapolationsschritt(i) = dblAktuelleParameter(i) - dblLetzteParameterBackup(i)
+            dblExtrapolationsschritt(i) = Math.Round((dblAktuelleParameter(i) - dblLetzteParameterBackup(i)), 7)
             'Durchführen des Extrapolationsschrittes
             dblLetzteParameter(i) = dblAktuelleParameter(i) + dblExtrapolationsschritt(i)
         Next
         'Backup des letzten Schrittes, falls Rückschritt erforderlich
         dblAktuelleParameter.CopyTo(dblLetzteParameterBackup, 0)
-
+        dblLetzteParameter.CopyTo(dblAktuelleParameter, 0)
     End Sub
 
     Public Sub Rueckschritt()
         dblLetzteParameterBackup.CopyTo(dblLetzteParameter, 0)
+        dblLetzteParameterBackup.CopyTo(dblAktuelleParameter, 0)
     End Sub
 
     Public Function getAktuelleParameter() As Double()
