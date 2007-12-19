@@ -1185,9 +1185,14 @@ Partial Class Form1
         Dim QNBest() As Double = {}
         Dim QBest() As Double = {}
         Dim RN() As Double
-        Dim aktuellePara(globalAnzPar) As Double
+        Dim aktuellePara(globalAnzPar - 1) As Double
         Dim SIM_Eval_is_OK As Boolean
         Dim durchlauf As Long
+        Dim Iterationen As Long
+        Dim Tastschritte_aktuell As Long
+        Dim Tastschritte_gesamt As Long
+        Dim Extrapolationsschritte As Long
+        Dim Rueckschritte As Long
 
         Dim HookJeeves As EVO.Kern.HookeAndJeeves = New EVO.Kern.HookeAndJeeves(globalAnzPar, EVO_Einstellungen1.Settings.HookJeeves.DnStart, EVO_Einstellungen1.Settings.HookJeeves.DnFinish)
 
@@ -1201,6 +1206,11 @@ Partial Class Form1
         Call PrepareDiagramm()
 
         durchlauf = 0
+        Tastschritte_aktuell = 0
+        Tastschritte_gesamt = 0
+        Extrapolationsschritte = 0
+        Rueckschritte = 0
+        Iterationen = 0
         b = False
 
         Call HookJeeves.Initialize(myPara)
@@ -1210,7 +1220,7 @@ Partial Class Form1
         QBest(0) = 1.79E+308
         k = 0
         Do While (HookJeeves.AktuelleSchrittweite > HookJeeves.MinimaleSchrittweite)
-
+            Iterationen += 1
             'Bestimmen der Ausgangsgüte
             'Vorbereiten des Modelldatensatzes
             Call Sim1.PREPARE_Evaluation_PES(aktuellePara)
@@ -1227,6 +1237,8 @@ Partial Class Form1
             'Tastschritte
             For j = 0 To HookJeeves.AnzahlParameter - 1
                 aktuellePara = HookJeeves.Tastschritt(j, Kern.HookeAndJeeves.TastschrittRichtung.Vorwärts)
+                Tastschritte_aktuell += 1
+                Me.EVO_Einstellungen1.LabelTSHJaktuelle.Text = Tastschritte_aktuell.ToString
                 'Vorbereiten des Modelldatensatzes
                 Call Sim1.PREPARE_Evaluation_PES(aktuellePara)
                 'Evaluierung des Simulationsmodells
@@ -1236,6 +1248,8 @@ Partial Class Form1
                 Call serie.Add(durchlauf, QN(0), durchlauf.ToString())
                 If QN(0) >= QNBest(0) Then
                     aktuellePara = HookJeeves.Tastschritt(j, Kern.HookeAndJeeves.TastschrittRichtung.Rückwärts)
+                    Tastschritte_aktuell += 1
+                    Me.EVO_Einstellungen1.LabelTSHJaktuelle.Text = Tastschritte_aktuell.ToString
                     'Vorbereiten des Modelldatensatzes
                     Call Sim1.PREPARE_Evaluation_PES(aktuellePara)
                     'Evaluierung des Simulationsmodells
@@ -1253,15 +1267,29 @@ Partial Class Form1
                 End If
             Next
 
+            Tastschritte_gesamt += Tastschritte_aktuell
+            Me.EVO_Einstellungen1.LabelTSHJgesamt.Text = Tastschritte_gesamt.ToString
+            Tastschritte_aktuell = 0
+            Me.EVO_Einstellungen1.LabelTSHJaktuelle.Text = Tastschritte_aktuell.ToString
+            Me.EVO_Einstellungen1.LabelTSHJmittel.Text = Math.Round((Tastschritte_gesamt / Iterationen), 2).ToString
+
             'Extrapolationsschritt
-            If QN(0) < QBest(0) Then
+            If QNBest(0) < QBest(0) Then
+
+                serie = DForm.Diag.getSeriesPoint("Hook and Jeeves Best".ToString(), "GREEN")
+                Call serie.Add(durchlauf, QN(0), durchlauf.ToString())
+
                 QNBest.CopyTo(QBest, 0)
                 Call HookJeeves.Extrapolationsschritt()
+                Extrapolationsschritte += 1
+                Me.EVO_Einstellungen1.LabelESHJ.Text = Extrapolationsschritte.ToString
                 k += 1
                 aktuellePara = HookJeeves.getLetzteParameter
                 For i = 0 To HookJeeves.AnzahlParameter - 1
                     If aktuellePara(i) < 0 Or aktuellePara(i) > 1 Then
                         HookJeeves.Rueckschritt()
+                        Rueckschritte += 1
+                        Me.EVO_Einstellungen1.LabelRSHJ.Text = Rueckschritte.ToString
                         k += -1
                         HookJeeves.Schrittweitenhalbierung()
                         aktuellePara = HookJeeves.getLetzteParameter
@@ -1278,6 +1306,7 @@ Partial Class Form1
                 'End If
                 If k > 0 Then
                     HookJeeves.Rueckschritt()
+                    Me.EVO_Einstellungen1.LabelRSHJ.Text = Rueckschritte.ToString
                     HookJeeves.Schrittweitenhalbierung()
                     aktuellePara = HookJeeves.getLetzteParameter
                 Else

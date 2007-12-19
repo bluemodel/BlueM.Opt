@@ -75,6 +75,16 @@ Partial Class EVO_Einstellungen
         Me.CheckBoxDNVektorHJ = New System.Windows.Forms.CheckBox
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox
+        Me.Label4 = New System.Windows.Forms.Label
+        Me.LabelTSHJaktuelle = New System.Windows.Forms.Label
+        Me.Label6 = New System.Windows.Forms.Label
+        Me.Label7 = New System.Windows.Forms.Label
+        Me.Label8 = New System.Windows.Forms.Label
+        Me.Label9 = New System.Windows.Forms.Label
+        Me.LabelTSHJmittel = New System.Windows.Forms.Label
+        Me.LabelTSHJgesamt = New System.Windows.Forms.Label
+        Me.LabelESHJ = New System.Windows.Forms.Label
+        Me.LabelRSHJ = New System.Windows.Forms.Label
         Me.TabControl1.SuspendLayout()
         Me.TabPage_PES.SuspendLayout()
         Me.ToolStrip1.SuspendLayout()
@@ -575,6 +585,16 @@ Partial Class EVO_Einstellungen
         'TabPage_HookJeeves
         '
         Me.TabPage_HookJeeves.BackColor = System.Drawing.SystemColors.Control
+        Me.TabPage_HookJeeves.Controls.Add(Me.LabelRSHJ)
+        Me.TabPage_HookJeeves.Controls.Add(Me.LabelESHJ)
+        Me.TabPage_HookJeeves.Controls.Add(Me.LabelTSHJgesamt)
+        Me.TabPage_HookJeeves.Controls.Add(Me.LabelTSHJmittel)
+        Me.TabPage_HookJeeves.Controls.Add(Me.Label9)
+        Me.TabPage_HookJeeves.Controls.Add(Me.Label8)
+        Me.TabPage_HookJeeves.Controls.Add(Me.Label7)
+        Me.TabPage_HookJeeves.Controls.Add(Me.Label6)
+        Me.TabPage_HookJeeves.Controls.Add(Me.LabelTSHJaktuelle)
+        Me.TabPage_HookJeeves.Controls.Add(Me.Label4)
         Me.TabPage_HookJeeves.Controls.Add(Me.Label3)
         Me.TabPage_HookJeeves.Controls.Add(Me.TextDeltaFinishHJ)
         Me.TabPage_HookJeeves.Controls.Add(Me.Label1)
@@ -650,6 +670,111 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Einstellungen.TabIndex = 37
         Me.GroupBox_Einstellungen.TabStop = False
         Me.GroupBox_Einstellungen.Text = "Einstellungen:"
+        '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.ForeColor = System.Drawing.Color.Blue
+        Me.Label4.Location = New System.Drawing.Point(6, 127)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(96, 13)
+        Me.Label4.TabIndex = 33
+        Me.Label4.Text = "Tastschritte aktuell"
+        '
+        'LabelTSHJaktuelle
+        '
+        Me.LabelTSHJaktuelle.AutoSize = True
+        Me.LabelTSHJaktuelle.ForeColor = System.Drawing.Color.Blue
+        Me.LabelTSHJaktuelle.Location = New System.Drawing.Point(139, 127)
+        Me.LabelTSHJaktuelle.Name = "LabelTSHJaktuelle"
+        Me.LabelTSHJaktuelle.Size = New System.Drawing.Size(13, 13)
+        Me.LabelTSHJaktuelle.TabIndex = 34
+        Me.LabelTSHJaktuelle.Text = "0"
+        Me.LabelTSHJaktuelle.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'Label6
+        '
+        Me.Label6.AutoSize = True
+        Me.Label6.ForeColor = System.Drawing.Color.Blue
+        Me.Label6.Location = New System.Drawing.Point(6, 151)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(89, 13)
+        Me.Label6.TabIndex = 35
+        Me.Label6.Text = "Tastschritte mittel"
+        '
+        'Label7
+        '
+        Me.Label7.AutoSize = True
+        Me.Label7.ForeColor = System.Drawing.Color.Blue
+        Me.Label7.Location = New System.Drawing.Point(6, 175)
+        Me.Label7.Name = "Label7"
+        Me.Label7.Size = New System.Drawing.Size(99, 13)
+        Me.Label7.TabIndex = 36
+        Me.Label7.Text = "Tastschritte gesamt"
+        '
+        'Label8
+        '
+        Me.Label8.AutoSize = True
+        Me.Label8.ForeColor = System.Drawing.Color.Blue
+        Me.Label8.Location = New System.Drawing.Point(6, 199)
+        Me.Label8.Name = "Label8"
+        Me.Label8.Size = New System.Drawing.Size(107, 13)
+        Me.Label8.TabIndex = 37
+        Me.Label8.Text = "Extrapolationsschritte"
+        '
+        'Label9
+        '
+        Me.Label9.AutoSize = True
+        Me.Label9.ForeColor = System.Drawing.Color.Blue
+        Me.Label9.Location = New System.Drawing.Point(6, 223)
+        Me.Label9.Name = "Label9"
+        Me.Label9.Size = New System.Drawing.Size(67, 13)
+        Me.Label9.TabIndex = 38
+        Me.Label9.Text = "Rückschritte"
+        '
+        'LabelTSHJmittel
+        '
+        Me.LabelTSHJmittel.AutoSize = True
+        Me.LabelTSHJmittel.ForeColor = System.Drawing.Color.Blue
+        Me.LabelTSHJmittel.Location = New System.Drawing.Point(139, 151)
+        Me.LabelTSHJmittel.Name = "LabelTSHJmittel"
+        Me.LabelTSHJmittel.Size = New System.Drawing.Size(13, 13)
+        Me.LabelTSHJmittel.TabIndex = 39
+        Me.LabelTSHJmittel.Text = "0"
+        Me.LabelTSHJmittel.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'LabelTSHJgesamt
+        '
+        Me.LabelTSHJgesamt.AutoSize = True
+        Me.LabelTSHJgesamt.ForeColor = System.Drawing.Color.Blue
+        Me.LabelTSHJgesamt.Location = New System.Drawing.Point(139, 175)
+        Me.LabelTSHJgesamt.Name = "LabelTSHJgesamt"
+        Me.LabelTSHJgesamt.Size = New System.Drawing.Size(13, 13)
+        Me.LabelTSHJgesamt.TabIndex = 40
+        Me.LabelTSHJgesamt.Text = "0"
+        Me.LabelTSHJgesamt.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'LabelESHJ
+        '
+        Me.LabelESHJ.AutoSize = True
+        Me.LabelESHJ.ForeColor = System.Drawing.Color.Blue
+        Me.LabelESHJ.Location = New System.Drawing.Point(139, 199)
+        Me.LabelESHJ.Name = "LabelESHJ"
+        Me.LabelESHJ.Size = New System.Drawing.Size(13, 13)
+        Me.LabelESHJ.TabIndex = 41
+        Me.LabelESHJ.Text = "0"
+        Me.LabelESHJ.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'LabelRSHJ
+        '
+        Me.LabelRSHJ.AutoSize = True
+        Me.LabelRSHJ.ForeColor = System.Drawing.Color.Blue
+        Me.LabelRSHJ.Location = New System.Drawing.Point(139, 223)
+        Me.LabelRSHJ.Name = "LabelRSHJ"
+        Me.LabelRSHJ.Size = New System.Drawing.Size(13, 13)
+        Me.LabelRSHJ.TabIndex = 42
+        Me.LabelRSHJ.Text = "0"
+        Me.LabelRSHJ.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'EVO_Einstellungen
         '
@@ -739,4 +864,14 @@ Partial Class EVO_Einstellungen
     Private WithEvents CheckBoxDNVektorHJ As System.Windows.Forms.CheckBox
     Public WithEvents TabPage_PES As System.Windows.Forms.TabPage
     Public WithEvents TabControl1 As System.Windows.Forms.TabControl
+    Friend WithEvents Label6 As System.Windows.Forms.Label
+    Friend WithEvents Label4 As System.Windows.Forms.Label
+    Friend WithEvents Label9 As System.Windows.Forms.Label
+    Friend WithEvents Label8 As System.Windows.Forms.Label
+    Friend WithEvents Label7 As System.Windows.Forms.Label
+    Public WithEvents LabelTSHJaktuelle As System.Windows.Forms.Label
+    Public WithEvents LabelRSHJ As System.Windows.Forms.Label
+    Public WithEvents LabelESHJ As System.Windows.Forms.Label
+    Public WithEvents LabelTSHJgesamt As System.Windows.Forms.Label
+    Public WithEvents LabelTSHJmittel As System.Windows.Forms.Label
 End Class
