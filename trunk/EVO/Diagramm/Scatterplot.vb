@@ -53,7 +53,7 @@ Partial Public Class Scatterplot
 
         Dim i, j As Integer
         Dim xAchse, yAchse As String
-        Dim serie As Steema.TeeChart.Styles.Series
+        Dim serie, serie_inv As Steema.TeeChart.Styles.Series
 
         'Schleife über Spalten
         For i = 0 To Me.matrix.ColumnCount - 1
@@ -124,13 +124,16 @@ Partial Public Class Scatterplot
                         'Alle Lösungen
                         '-------------
                         serie = .getSeriesPoint(xAchse & ", " & yAchse, "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        serie_inv = .getSeriesPoint(xAchse & ", " & yAchse & " (ungültig)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 2)                        
                         For Each sol As Solution In Me.OptResult.Solutions
                             'Constraintverletzung prüfen
-                            If (Not sol.isValid) Then
-                                serie = .getSeriesPoint(xAchse & ", " & yAchse & " (ungültig)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                            If (sol.isValid) Then
+                                'gültige Lösung Zeichnen
+                                serie.Add(sol.QWerte(i), sol.QWerte(j), sol.ID)
+                            Else
+                                'ungültige Lösung zeichnen
+                                serie_inv.Add(sol.QWerte(i), sol.QWerte(j), sol.ID)
                             End If
-                            'Zeichnen
-                            serie.Add(sol.QWerte(i), sol.QWerte(j), sol.ID)
                         Next
                     End If
 
