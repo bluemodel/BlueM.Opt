@@ -162,7 +162,7 @@ Public Class PES
         If (settings.PES.Pop.ty_OptPopEltern < 1 Or settings.PES.Pop.ty_OptPopEltern > 3) Then
             Throw New Exception("Ermittlung der Populationseltern ist nicht Mittelwert, Rekombination oder Selektion!")
         End If
-        If (settings.PES.ty_OptEltern < 1 Or settings.PES.ty_OptEltern > 6) Then
+        If (settings.PES.ty_OptEltern < 1 Or settings.PES.ty_OptEltern > 8) Then
             Throw New Exception("Strategie zur Ermittlung der Eltern ist nicht möglich!")
         End If
         If (settings.PES.n_Eltern < 1) Then
@@ -548,47 +548,71 @@ Public Class PES
                     Next
                 Next v
 
-            Case EVO_ELTERN.XY_Diskret 'Multi-Rekombination nach X/Y-Schema, diskrete Vertauschung
-
-                ReDim Realisierungsspeicher(Settings.PES.n_RekombXY)
-                ReDim Elternspeicher(Settings.PES.n_Eltern)
-
-                For i = 0 To Settings.PES.n_Eltern - 1
-                    Elternspeicher(i) = i
-                Next i
-
-                For i = 0 To Settings.PES.n_RekombXY - 1
-                    R = Int((Settings.PES.n_Eltern - (i)) * Rnd())
-                    Realisierungsspeicher(i) = Elternspeicher(R)
-
-                    For j = R To Settings.PES.n_Eltern - 1
-                        Elternspeicher(R) = Elternspeicher(R + 1)
-                    Next j
-
-                Next i
-
+            Case EVO_ELTERN.XX_Mitteln_Diskret
                 For v = 0 To Anz.Para - 1
-                    R = Int(Settings.PES.n_RekombXY * Rnd())
+                    AktPara.Dn(v) = 0
+                    R = Int(Settings.PES.n_Eltern * Rnd())
+                    'Mittelung der Schrittweite
+                    For n = 0 To Settings.PES.n_Eltern - 1
+                        AktPara.Dn(v) = AktPara.Dn(v) + (De(v, n, PES_iAkt.iAktPop) / Settings.PES.n_Eltern)
+                    Next
+                    'Selektion des Elter
+                    AktPara.Xn(v) = Xe(v, R, PES_iAkt.iAktPop)
+                Next v
+
+
+            Case EVO_ELTERN.XY_Diskret 'Multi-Rekombination nach X/Y-Schema, diskrete Vertauschung
+                'Realisierungsspeicher und Elternspeicher initialisieren
+                'Anzahl der benötigten Eltern (Y)
+                ReDim Realisierungsspeicher(Settings.PES.n_RekombXY - 1)
+                'Anzahl der Verfügbaren Eltern (n_Eltern)
+                ReDim Elternspeicher(Settings.PES.n_Eltern - 1) 
+                'Setzen der Eltern Indizes
+                For i = 0 To (Settings.PES.n_Eltern - 1)
+                    Elternspeicher(i) = i
+                Next
+                'Auswahl der Y-Eltern
+                For i = 0 To Settings.PES.n_RekombXY - 1
+                    '1. Runde erlaubt Auswahl aus allen Eltern
+                    '2. Runde hat nur noch n_Eltern - 1 zur Verfügung
+                    'usw.
+                    'Kein Elter darf doppelt gezogen werden
+                    R = CInt(Int((Settings.PES.n_Eltern - (i)) * Rnd()))
+                    Realisierungsspeicher(i) = Elternspeicher(R)
+                    For j = R To Settings.PES.n_Eltern - 2
+                        Elternspeicher(j) = Elternspeicher(j + 1)
+                    Next j
+                Next i
+                For v = 0 To Anz.Para - 1
+                    R = cint(Int(Settings.PES.n_RekombXY * Rnd()))
                     'Selektion der Schrittweite
                     AktPara.Dn(v) = De(v, Realisierungsspeicher(R), PES_iAkt.iAktPop)
                     'Selektion des Elter
                     AktPara.Xn(v) = Xe(v, Realisierungsspeicher(R), PES_iAkt.iAktPop)
                 Next v
 
+
             Case EVO_ELTERN.XY_Mitteln 'Multi-Rekombination nach X/Y-Schema, Mittelung der Gene
 
-                ReDim Realisierungsspeicher(Settings.PES.n_RekombXY)
-                ReDim Elternspeicher(Settings.PES.n_Eltern)
-
-                For i = 0 To Settings.PES.n_Eltern - 1
+                'Realisierungsspeicher und Elternspeicher initialisieren
+                'Anzahl der benötigten Eltern (Y)
+                ReDim Realisierungsspeicher(Settings.PES.n_RekombXY - 1)
+                'Anzahl der Verfügbaren Eltern (n_Eltern)
+                ReDim Elternspeicher(Settings.PES.n_Eltern - 1)
+                'Setzen der Eltern Indizes
+                For i = 0 To (Settings.PES.n_Eltern - 1)
                     Elternspeicher(i) = i
-                Next i
-
+                Next
+                'Auswahl der Y-Eltern
                 For i = 0 To Settings.PES.n_RekombXY - 1
-                    R = Int((Settings.PES.n_Eltern - (i)) * Rnd())
+                    '1. Runde erlaubt Auswahl aus allen Eltern
+                    '2. Runde hat nur noch n_Eltern - 1 zur Verfügung
+                    'usw.
+                    'Kein Elter darf doppelt gezogen werden
+                    R = CInt(Int((Settings.PES.n_Eltern - (i)) * Rnd()))
                     Realisierungsspeicher(i) = Elternspeicher(R)
-                    For j = R To (Settings.PES.n_Eltern - 2)
-                        Elternspeicher(R) = Elternspeicher(R + 1)
+                    For j = R To Settings.PES.n_Eltern - 2
+                        Elternspeicher(j) = Elternspeicher(j + 1)
                     Next j
                 Next i
 
@@ -597,11 +621,45 @@ Public Class PES
                     AktPara.Xn(v) = 0
                     For n = 0 To Settings.PES.n_RekombXY - 1
                         'Mittelung der Schrittweite,
-                        AktPara.Dn(v) = AktPara.Dn(v) + (De(v, Elternspeicher(n), PES_iAkt.iAktPop) / Settings.PES.n_RekombXY)
+                        AktPara.Dn(v) = AktPara.Dn(v) + (De(v, Realisierungsspeicher(n), PES_iAkt.iAktPop) / Settings.PES.n_RekombXY)
                         'Mittelung der Eltern,
-                        AktPara.Xn(v) = AktPara.Xn(v) + (Xe(v, Elternspeicher(n), PES_iAkt.iAktPop) / Settings.PES.n_RekombXY)
+                        AktPara.Xn(v) = AktPara.Xn(v) + (Xe(v, Realisierungsspeicher(n), PES_iAkt.iAktPop) / Settings.PES.n_RekombXY)
                     Next
                 Next v
+
+            Case EVO_ELTERN.XY_Mitteln_Diskret
+                'Realisierungsspeicher und Elternspeicher initialisieren
+                'Anzahl der benötigten Eltern (Y)
+                ReDim Realisierungsspeicher(Settings.PES.n_RekombXY - 1)
+                'Anzahl der Verfügbaren Eltern (n_Eltern)
+                ReDim Elternspeicher(Settings.PES.n_Eltern - 1)
+                'Setzen der Eltern Indizes
+                For i = 0 To (Settings.PES.n_Eltern - 1)
+                    Elternspeicher(i) = i
+                Next
+                'Auswahl der Y-Eltern
+                For i = 0 To Settings.PES.n_RekombXY - 1
+                    '1. Runde erlaubt Auswahl aus allen Eltern
+                    '2. Runde hat nur noch n_Eltern - 1 zur Verfügung
+                    'usw.
+                    'Kein Elter darf doppelt gezogen werden
+                    R = CInt(Int((Settings.PES.n_Eltern - (i)) * Rnd()))
+                    Realisierungsspeicher(i) = Elternspeicher(R)
+                    For j = R To Settings.PES.n_Eltern - 2
+                        Elternspeicher(j) = Elternspeicher(j + 1)
+                    Next j
+                Next i
+                For v = 0 To Anz.Para - 1
+                    AktPara.Dn(v) = 0
+                    R = CInt(Int(Settings.PES.n_RekombXY * Rnd()))
+                    'Mittelung der Schrittweite
+                    For n = 0 To Settings.PES.n_RekombXY - 1
+                        AktPara.Dn(v) = AktPara.Dn(v) + (De(v, Realisierungsspeicher(n), PES_iAkt.iAktPop) / Settings.PES.n_RekombXY)
+                    Next
+                    'Selektion des Elter
+                    AktPara.Xn(v) = Xe(v, Realisierungsspeicher(R), PES_iAkt.iAktPop)
+                Next v
+
 
             Case EVO_ELTERN.Neighbourhood 'Neighbourhood Rekombination
 
@@ -667,6 +725,7 @@ StartMutation:
         'Einheitliche Schrittweite
         '-------------------------
         If (Not Settings.PES.is_DnVektor) Then
+
             '+/-1
             expo = (2 * Int(Rnd() + 0.5) - 1)
             'Schrittweite wird mutiert
@@ -677,6 +736,9 @@ StartMutation:
                     DeTemp(v, n, PES_iAkt.iAktPop) = DeTemp(0, 0, PES_iAkt.iAktPop)
                 Next
             Next
+
+
+
         End If
 
 
@@ -731,9 +793,14 @@ StartMutation:
     Public Sub EsMutation()
 
         Dim v, i As Integer
+        Dim Z As Double
+   
         Dim DnTemp() As Double             'Temporäre Schrittweiten für Nachkomme
         Dim XnTemp() As Double             'Temporäre Parameterwerte für Nachkomme
         Dim expo As Integer                  'Exponent für Schrittweite (+/-1)
+        Dim tau As Double
+        Dim taufix As Double
+        dim ZFix as double
 
         ReDim DnTemp(Anz.Para - 1)
         ReDim XnTemp(Anz.Para - 1)
@@ -743,18 +810,32 @@ StartMutation:
         'Einheitliche Schrittweite
         '-------------------------
         If (Not Settings.PES.is_DnVektor) Then
-            '+/-1
-            expo = (2 * Int(Rnd() + 0.5) - 1)
-            'Schrittweite wird mutiert
-            DnTemp(0) = AktPara.Dn(0) * galpha ^ expo
+            If (Settings.PES.ty_DNMutation = EVO_DNMutation.Rechenberg) Then
+                '+/-1
+                expo = (2 * Int(Rnd() + 0.5) - 1)
+                'Schrittweite wird mutiert
+                DnTemp(0) = AktPara.Dn(0) * galpha ^ expo
+            ElseIf (Settings.PES.ty_DNMutation = EVO_DNMutation.Schwefel) Then
+                tau = Settings.PES.DNC / Math.Sqrt(Anz.Para)
+                'Normalverteilte Zufallszahl (SD = 1, mean = 0)
+                Z = Me.NormalDistributationRND(1.0, 0.0)
+                'Neue Schrittweite
+                DnTemp(0) = AktPara.Dn(0) * Math.Exp(tau * Z)
+                'Mindestschrittweite muss eingehalten werden
+                If dntemp(0) < settings.PES.DNepsilon Then dntemp(0) = settings.PES.DNepsilon
+            End If
             'Schrittweite für alle übernehmen
             For v = 1 To Anz.Para - 1
                 DnTemp(v) = DnTemp(0)
-            Next
+            Next v
         End If
 
         'Mutation
         '--------
+        If (Settings.PES.is_DnVektor And Settings.PES.ty_DNMutation = EVO_DNMutation.Schwefel) Then
+            taufix = Settings.PES.DNC / Math.Sqrt(2*Anz.Para)
+            ZFix = Me.NormalDistributationRND(1.0, 0.0)
+        End If
         For v = 0 To Anz.Para - 1
             i = 0
             Do
@@ -770,15 +851,33 @@ StartMutation:
                 'Schrittweitenvektor
                 '-------------------
                 If (Settings.PES.is_DnVektor) Then
-                    '+/-1
-                    expo = (2 * Int(Rnd() + 0.5) - 1)
-                    'Schrittweite wird mutiert
-                    DnTemp(v) = AktPara.Dn(v) * galpha ^ expo
+
+                    If (Settings.PES.ty_DNMutation = EVO_DNMutation.Rechenberg) Then
+                        '+/-1
+                        expo = (2 * Int(Rnd() + 0.5) - 1)
+                        'Schrittweite wird mutiert
+                        DnTemp(v) = AktPara.Dn(v) * galpha ^ expo
+                    ElseIf (Settings.PES.ty_DNMutation = EVO_DNMutation.Schwefel) Then
+                        tau = Settings.PES.DNC / Math.Sqrt(2*math.Sqrt(Anz.Para))
+                        'Normalverteilte Zufallszahl (SD = 1, mean = 0)
+                        Z = Me.NormalDistributationRND(1.0, 0.0)
+                        'Neue Schrittweite
+                        DnTemp(v) = AktPara.Dn(v) * Math.Exp(taufix * ZFix + tau * Z)
+                        'Mindestschrittweite muss eingehalten werden
+                        If DnTemp(v) < Settings.PES.DNepsilon Then DnTemp(v) = Settings.PES.DNepsilon
+                    End If
                 End If
 
                 'Normalverteilte Zufallszahl mit Standardabweichung 1/sqr(varanz)
-                Dim Z As Double
-                Z = System.Math.Sqrt(-2 * System.Math.Log(1 - Rnd()) / Anz.Para) * System.Math.Sin(6.2832 * Rnd())
+
+                'Z = System.Math.Sqrt(-2 * System.Math.Log(1 - Rnd()) / Anz.Para) * System.Math.Sin(6.2832 * Rnd())
+                If (Settings.PES.ty_DNMutation = EVO_DNMutation.Rechenberg) Then
+                    'Normalverteilte Zufallszahl mit Standardabweichung 1/sqr(var.anz), , Mittelwert 0
+                    Z = Me.NormalDistributationRND(1 / Math.Sqrt(Anz.Para), 0.0)
+                ElseIf (Settings.PES.ty_DNMutation = EVO_DNMutation.Schwefel) Then
+                    'Normalverteilte Zufallszahl mit Standardabweichung 1, Mittelwert 0
+                    Z = Me.NormalDistributationRND(1.0, 0.0)
+                End If
                 'Mutation wird durchgeführt
                 XnTemp(v) = AktPara.Xn(v) + DnTemp(v) * Z
 
@@ -795,6 +894,23 @@ StartMutation:
         Next v
 
     End Sub
+
+    Public Function NormalDistributationRND(ByVal sd As Double, ByVal mean As Double) As Double
+        Dim fac As Double
+        Dim r As Double
+        Dim V1 As Double
+        Dim V2 As Double
+        Dim gauss As Double
+        Do
+            V1 = 2 * Rnd() - 1
+            V2 = 2 * Rnd() - 1
+            r = V1 ^ 2 + V2 ^ 2
+        Loop While (r >= 1)
+        fac = Math.Sqrt(-2 * Math.Log(r) / r)
+        gauss = V2 * fac
+        gauss = gauss * sd + mean
+        Return gauss
+    End Function
 
     'ES_POP_BEST - Einordnen der Qualitätsfunktion im PopulationsBestwertspeicher
     '****************************************************************************
