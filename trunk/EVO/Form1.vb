@@ -1331,6 +1331,12 @@ Partial Class Form1
         Dim QN() As Double = {}
         Dim RN() As Double = {}
         '--------------------------
+
+        Dim Hypervolume As EVO.Kern.Hypervolumen
+        Hypervolume = New EVO.Kern.Hypervolumen
+        Hypervolume.Dimension = globalAnzZiel
+        Hypervolume.Normalisiert = True
+
         'TODO: If (ipop + igen + inachf + irunde) > 4 Then GoTo Start_Evolutionsrunden '????? Wie?
         'Werte an Variablen übergeben auskommentiert Werte finden sich im PES werden hier aber nicht zugewiesen
         'Kann der Kommentar nicht weg?
@@ -1347,6 +1353,7 @@ Partial Class Form1
         'Individuum wird initialisiert
         Call Kern.Individuum.Initialise(1, 1, globalAnzZiel, globalAnzRand)
 
+
         'Schritte 0: Objekt der Klasse PES wird erzeugt
         '**********************************************
         Dim PES1 As EVO.Kern.PES
@@ -1360,6 +1367,9 @@ Partial Class Form1
         Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
 
         durchlauf = 0
+
+        'Hypervolume wird initialisiert
+
 
 Start_Evolutionsrunden:
 
@@ -1461,7 +1471,7 @@ Start_Evolutionsrunden:
                                         Else
                                             serie = DForm.Diag.getSeriesPoint("Population " & (PES1.PES_iAkt.iAktPop + 1).ToString())
                                         End If
-                                        Call serie.Add((PES1.PES_iAkt.iAktRunde + 1) * PES1.PES_iAkt.iAktGen * PES1.Settings.PES.n_Nachf + PES1.PES_iAkt.iAktNachf, QN(0), durchlauf.ToString())
+                                        Call serie.Add(PES1.PES_iAkt.iAktRunde * PES1.Settings.PES.n_Gen * PES1.Settings.PES.n_Nachf + PES1.PES_iAkt.iAktGen*PES1.Settings.PES.n_Nachf + PES1.PES_iAkt.iAktNachf, QN(0), durchlauf.ToString())
 
                                     Else
                                         'MultiObjective
