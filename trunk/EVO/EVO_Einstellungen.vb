@@ -102,7 +102,7 @@ Public Class EVO_Einstellungen
     Private Sub ComboOptEltern_SelectedIndexChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles ComboOptEltern.SelectedIndexChanged
 
         Select Case VB6.GetItemData(ComboOptEltern, ComboOptEltern.SelectedIndex)
-            Case EVO_ELTERN.XY_Diskret, EVO_ELTERN.XY_Mitteln, EVO_ELTERN.Neighbourhood
+            Case EVO_ELTERN.XY_Diskret, EVO_ELTERN.XY_Mitteln, EVO_ELTERN.Neighbourhood, EVO_ELTERN.XX_Mitteln_Diskret, EVO_ELTERN.XY_Mitteln_Diskret
                 LabelRekombxy1.Enabled = True
                 LabelRekombxy3.Enabled = True
                 TextRekombxy.Enabled = True
@@ -145,6 +145,8 @@ Public Class EVO_Einstellungen
         Cntrl.Items.Add(New VB6.ListBoxItem("Rekomb x/x, mitteln", EVO_ELTERN.XX_Mitteln))
         Cntrl.Items.Add(New VB6.ListBoxItem("Rekomb x/y, diskret", EVO_ELTERN.XY_Diskret))
         Cntrl.Items.Add(New VB6.ListBoxItem("Rekomb x/y, mitteln", EVO_ELTERN.XY_Mitteln))
+        Cntrl.Items.Add(New VB6.ListBoxItem("Rekomb x/x, dis/mitt", EVO_ELTERN.XX_Mitteln_Diskret))
+        Cntrl.Items.Add(New VB6.ListBoxItem("Rekomb x/y, dis/mitt", EVO_ELTERN.XY_Mitteln_Diskret))
         If (Me.msettings.PES.ty_EvoModus = EVO_MODUS.Multi_Objective) Then
             Cntrl.Items.Add(New VB6.ListBoxItem("Neighbourhood", EVO_ELTERN.Neighbourhood))
         End If
