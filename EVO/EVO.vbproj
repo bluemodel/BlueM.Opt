@@ -68,6 +68,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Accessibility" />
+    <Reference Include="EVO.Kern, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\EVO.Kern\EVO.Kern.dll</HintPath>
+    </Reference>
     <Reference Include="IHWB.BlueM.DllAdapter, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualBasic.Compatibility">
       <Name>Microsoft.VisualBasic.Compatibility</Name>
@@ -98,10 +102,6 @@
     <ProjectReference Include="..\..\Wave\Wave.vbproj">
       <Project>{BCD1BBE3-5AB2-4C3F-AC12-43EB977C6F6F}</Project>
       <Name>Wave</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\EVO.Kern\EVO.Kern.vbproj">
-      <Project>{58356A07-425E-4C91-ACB8-17B9286C9417}</Project>
-      <Name>EVO.Kern</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
