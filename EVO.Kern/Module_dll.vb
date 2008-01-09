@@ -29,7 +29,15 @@ Public Module Constants
         XY_Diskret = 4                          'Rekombination nach x/y-Schema, diskretes vertauschen der Gene
         XY_Mitteln = 5                          'Rekombination nach x/y-Schema, mittelwertbildung der Gene über y-Eltern
         Neighbourhood = 6                       'Neighboorghood-Rekombination
+        XX_Mitteln_Diskret = 7                  'Rekombination nach x/x-Schema, diskretes vertauschen der Gene, miteln der Strategieparameter 
+        XY_Mitteln_Diskret = 8                  'Rekombination nach x/y-Schema, diskretes vertauschen der Gene, miteln der Strategieparameter
     End Enum
+
+    Public Enum EVO_DNMutation As Integer
+        Rechenberg = 1
+        Schwefel = 2
+    End Enum
+
 
     'Option zur Erzeugung der Pop-Eltern
     Public Enum EVO_POP_ELTERN As Integer
