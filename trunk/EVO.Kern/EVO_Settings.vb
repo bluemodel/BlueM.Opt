@@ -21,7 +21,10 @@ Public Class EVO_Settings
         Public ty_StartPar As EVO_STARTPARAMETER   'Startparameter
 
         Public DnStart As Double                   'Startschrittweite
+        Public DNepsilon As Double              'Minimale Schrittweite
         Public is_DnVektor As Boolean              'Soll ein Schrittweitenvektor benutzt werden
+        Public ty_DNMutation As EVO_DNMutation   'Art der Mutation
+        Public DNC As Double                       'Skalierung des learning Parameters
 
         Public n_Gen As Integer                    'Anzahl Generationen
         Public n_Eltern As Integer                 'Anzahl Eltern
@@ -60,10 +63,13 @@ Public Class EVO_Settings
                     Me.ty_EvoStrategie = EVO_STRATEGIE.Plus
                     Me.ty_StartPar = EVO_STARTPARAMETER.Original
 
+                    Me.ty_DNMutation = EVO_DNMutation.Schwefel
                     Me.DnStart = 0.1
+                    Me.DNepsilon = 0.001
                     Me.is_DnVektor = False
+                    Me.DNC = 1.0
 
-                    Me.n_Gen = 20
+                    Me.n_Gen = 100
                     Me.n_Eltern = 3
                     Me.n_Nachf = 10
 
@@ -71,7 +77,7 @@ Public Class EVO_Settings
                     Me.n_Interact = 0
                     Me.n_MemberSekPop = 0
 
-                    Me.ty_OptEltern = EVO_ELTERN.XX_Diskret
+                    Me.ty_OptEltern = EVO_ELTERN.XX_Mitteln_Diskret
                     Me.n_RekombXY = 3
 
                     Me.Pop.is_POPUL = False
@@ -91,6 +97,8 @@ Public Class EVO_Settings
 
                     Me.DnStart = 0.1
                     Me.is_DnVektor = False
+                    Me.is_DnVektor = False
+                    Me.DNC = 1.0
 
                     Me.n_Gen = 100
                     Me.n_Eltern = 15
