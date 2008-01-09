@@ -1540,6 +1540,40 @@ Start_Evolutionsrunden:
 
                     System.Windows.Forms.Application.DoEvents()
 
+                    'Serie im TeeChart löschen
+                    '==============================
+                    If PES1.Settings.PES.is_paint_constraint Then
+                        Dim serie As Steema.TeeChart.Styles.Series
+
+                        If (globalAnzZiel = 1) Then
+                            'SingleObjective
+                            'xxxxxxxxxxxxxxx
+                            serie = DForm.Diag.getSeriesPoint("Population " & (PES1.PES_iAkt.iAktPop + 1).ToString() & " (ungültig)", "Gray")
+                            serie.Clear()
+                            serie = DForm.Diag.getSeriesPoint("Population " & (PES1.PES_iAkt.iAktPop + 1).ToString())
+                            serie.Clear()
+                        Else
+                            'MultiObjective
+                            'xxxxxxxxxxxxxx
+                            If (globalAnzZiel = 2) Then
+                                '2D-Diagramm
+                                '------------------------------------------------------------------------
+                                serie = DForm.Diag.getSeriesPoint("Population" & " (ungültig)", "Gray")
+                                serie.Clear()
+                                serie = DForm.Diag.getSeriesPoint("Population", "Orange")
+                                serie.Clear()
+                            Else
+                                '3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
+                                '------------------------------------------------------------------------
+                                Dim serie3D As Steema.TeeChart.Styles.Points3D
+                                serie3D = DForm.Diag.getSeries3DPoint("Population" & " (ungültig)", "Gray")
+                                serie3D.Clear()
+                                serie3D = DForm.Diag.getSeries3DPoint("Population", "Orange")
+                                serie3D.Clear()
+                            End If
+                        End If
+                    End If
+
                 Next 'Ende alle Generatione
                 'xxxxxxxxxxxxxxxxxxxxxxxxxxx
                 System.Windows.Forms.Application.DoEvents()
