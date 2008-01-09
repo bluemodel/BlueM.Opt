@@ -38,6 +38,8 @@ Public Class EVO_Settings
         Public ty_OptEltern As EVO_ELTERN          'Ermittlung der Individuum-Eltern
         Public n_RekombXY As Integer               'X/Y-Schema Rekombination
 
+        Public is_paint_constraint As Boolean      'Nur die Individuuen der aktuellen Generation werden gezeichnet
+
         Public Pop As Struct_Pop_Settings
 
         Public Structure Struct_Pop_Settings
@@ -87,6 +89,8 @@ Public Class EVO_Settings
                     Me.Pop.ty_OptPopEltern = EVO_POP_ELTERN.Rekombination
                     Me.Pop.ty_PopEvoTyp = EVO_STRATEGIE.Plus
                     Me.Pop.ty_PopPenalty = EVO_POP_PENALTY.Mittelwert
+
+                    Me.is_paint_constraint = True
 
 
                 Case EVO_MODUS.Multi_Objective
