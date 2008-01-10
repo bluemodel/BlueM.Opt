@@ -102,15 +102,20 @@ Public Class EVO_Einstellungen
     Private Sub ComboOptEltern_SelectedIndexChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles ComboOptEltern.SelectedIndexChanged
 
         Select Case VB6.GetItemData(ComboOptEltern, ComboOptEltern.SelectedIndex)
-            Case EVO_ELTERN.XY_Diskret, EVO_ELTERN.XY_Mitteln, EVO_ELTERN.Neighbourhood, EVO_ELTERN.XX_Mitteln_Diskret, EVO_ELTERN.XY_Mitteln_Diskret
+            Case EVO_ELTERN.XY_Diskret, EVO_ELTERN.XY_Mitteln, EVO_ELTERN.Neighbourhood, EVO_ELTERN.XY_Mitteln_Diskret
                 LabelRekombxy1.Enabled = True
                 LabelRekombxy3.Enabled = True
                 TextRekombxy.Enabled = True
+                CheckisTournamentSelection.Enabled = True
+                CheckisTournamentSelection.Checked = True
             Case Else
                 LabelRekombxy1.Enabled = False
                 LabelRekombxy3.Enabled = False
                 TextRekombxy.Enabled = False
+                CheckisTournamentSelection.Enabled = False
+                CheckisTournamentSelection.Checked = False
         End Select
+
 
     End Sub
 
@@ -173,6 +178,12 @@ Public Class EVO_Einstellungen
         End Select
     End Sub
 
+    Private Sub FILLCOMBO_MUTATION(ByRef Cntrl As System.Windows.Forms.ComboBox)
+        Cntrl.Items.Add(New VB6.ListBoxItem("Rechenberg", EVO_DNMutation.Rechenberg))
+        Cntrl.Items.Add(New VB6.ListBoxItem("Schwefel", EVO_DNMutation.Schwefel))
+        Cntrl.SelectedIndex = 1
+    End Sub
+
     Private Sub UserControl_Initialize()
         Call FILLCOMBO_STRATEGIE(ComboStrategie)
         Call FILLCOMBO_STRATEGIE(ComboPopStrategie)
@@ -180,6 +191,7 @@ Public Class EVO_Einstellungen
         Call FILLCOMBO_OPTELTERN(ComboOptEltern)
         Call FILLCOMBO_OPTVORGABE(ComboOptVorgabe)
         Call FILLCOMBO_POPPENALTY(ComboPopPenalty)
+        Call FILLCOMBO_MUTATION(ComboMutation)
     End Sub
 
     'Einstellungen aus Form einlesen
@@ -212,6 +224,7 @@ Public Class EVO_Einstellungen
             .DnStart = TextDeltaStart.Value
             .ty_StartPar = VB6.GetItemData(ComboOptVorgabe, ComboOptVorgabe.SelectedIndex)
             .is_DnVektor = CheckisDnVektor.Checked
+            .ty_DNMutation = VB6.GetItemData(ComboMutation, ComboMutation.SelectedIndex)
             If (Val(TextInteract.Text) <= 0) Then
                 .is_Interact = False
                 .n_Interact = 1
@@ -220,8 +233,8 @@ Public Class EVO_Einstellungen
                 .n_Interact = TextInteract.Value
             End If
             .n_MemberSekPop = TextNMemberSecondPop.Value
-
             .is_paint_constraint = checkpaintconstrained.Checked
+            .is_diversity_tournement = CheckisTournamentSelection.Checked
 
         End With
 
@@ -262,6 +275,7 @@ Public Class EVO_Einstellungen
             Me.TextRekombxy.Value = .n_RekombXY
             Me.TextDeltaStart.Value = .DnStart
             Me.ComboOptVorgabe.SelectedItem = .ty_StartPar
+            Me.ComboMutation.SelectedItem = .ty_DNMutation
             Me.CheckisDnVektor.Checked = .is_DnVektor
             If (Me.msettings.PES.is_Interact) Then
                 Me.TextInteract.Value = .n_Interact
@@ -270,6 +284,7 @@ Public Class EVO_Einstellungen
             End If
             Me.TextNMemberSecondPop.Value = .n_MemberSekPop
             Me.checkpaintconstrained.Checked = .is_paint_constraint
+            Me.CheckisTournamentSelection.Checked = .is_diversity_tournement
 
         End With
 

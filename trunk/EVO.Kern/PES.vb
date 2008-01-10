@@ -748,17 +748,51 @@ Public Class PES
 
             Case EVO_ELTERN.Neighbourhood 'Neighbourhood Rekombination
 
-                Z1 = Int(Settings.PES.n_Eltern * Rnd())
-                Do
-                    Z2 = Int(Settings.PES.n_Eltern * Rnd())
-                Loop While Z1 = Z2
+                'Z1 = Int(Settings.PES.n_Eltern * Rnd())
+                'Do
+                '    Z2 = Int(Settings.PES.n_Eltern * Rnd())
+                'Loop While Z1 = Z2
 
-                'Tournament über Crowding Distance
-                If Distanceb(Z1) > Distanceb(Z2) Then
-                    Elter = Z1
+                ''Tournament über Crowding Distance
+                'If Distanceb(Z1) > Distanceb(Z2) Then
+                '    Elter = Z1
+                'Else
+                '    Elter = Z2
+                'End If
+
+                'Anzahl der Verfügbaren Eltern (n_Eltern)
+                ReDim Elternspeicher(Settings.PES.n_Eltern - 1)
+                'Setzen der Eltern Indizes
+                For i = 0 To (Settings.PES.n_Eltern - 1)
+                    Elternspeicher(i) = i
+                Next
+                If (Settings.PES.is_diversity_tournement) Then
+
+                    R = CInt(Int((Settings.PES.n_Eltern) * Rnd()))
+                    TournamentElter1 = Elternspeicher(R)
+
+                    Do
+                        R = CInt(Int((Settings.PES.n_Eltern) * Rnd()))
+                    Loop While (R = TournamentElter1)
+                    TournamentElter2 = Elternspeicher(R)
+
+                    If Div(TournamentElter1, PES_iAkt.iAktPop) > Div(TournamentElter1, PES_iAkt.iAktPop) Then
+                        R = TournamentElter1
+                    ElseIf Div(TournamentElter1, PES_iAkt.iAktPop) = Div(TournamentElter2, PES_iAkt.iAktPop) Then
+                        R = CInt(Int(2 * Rnd())) 'Zufallsszahl zwischen 0 und 1 
+                        If R = 0 Then
+                            R = TournamentElter1
+                        Else
+                            R = TournamentElter2
+                        End If
+                    Else
+                        R = TournamentElter2
+                    End If
                 Else
-                    Elter = Z2
+                    R = CInt(Int((Settings.PES.n_Eltern) * Rnd()))
                 End If
+
+                Elter = R
 
                 If (Elter = 0 Or Elter = Settings.PES.n_Eltern - 1) Then
                     For v = 0 To Anz.Para - 1
