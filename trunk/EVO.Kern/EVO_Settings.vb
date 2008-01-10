@@ -39,6 +39,7 @@ Public Class EVO_Settings
         Public n_RekombXY As Integer               'X/Y-Schema Rekombination
 
         Public is_paint_constraint As Boolean      'Nur die Individuuen der aktuellen Generation werden gezeichnet
+        Public is_diversity_tournement As Boolean  'Vor der eigentlichen Auswahl eines Elter wird zunächst nach der besseren Diversity geschaut
 
         Public Pop As Struct_Pop_Settings
 
@@ -90,7 +91,8 @@ Public Class EVO_Settings
                     Me.Pop.ty_PopEvoTyp = EVO_STRATEGIE.Plus
                     Me.Pop.ty_PopPenalty = EVO_POP_PENALTY.Mittelwert
 
-                    Me.is_paint_constraint = True
+                    Me.is_paint_constraint = False
+                    Me.is_diversity_tournement = False
 
 
                 Case EVO_MODUS.Multi_Objective
@@ -122,6 +124,10 @@ Public Class EVO_Settings
                     Me.Pop.ty_OptPopEltern = EVO_POP_ELTERN.Rekombination
                     Me.Pop.ty_PopEvoTyp = EVO_STRATEGIE.Plus
                     Me.Pop.ty_PopPenalty = EVO_POP_PENALTY.Mittelwert
+
+                    Me.is_paint_constraint = True
+                    Me.is_diversity_tournement = True
+
             End Select
         End Sub
 
