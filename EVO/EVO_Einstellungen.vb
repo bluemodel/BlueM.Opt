@@ -179,8 +179,8 @@ Public Class EVO_Einstellungen
     End Sub
 
     Private Sub FILLCOMBO_MUTATION(ByRef Cntrl As System.Windows.Forms.ComboBox)
-        Cntrl.Items.Add(New VB6.ListBoxItem("Rechenberg", EVO_DNMutation.Rechenberg))
-        Cntrl.Items.Add(New VB6.ListBoxItem("Schwefel", EVO_DNMutation.Schwefel))
+        Cntrl.Items.Add(New VB6.ListBoxItem("Rechenberg", EVO_DnMutation.Rechenberg))
+        Cntrl.Items.Add(New VB6.ListBoxItem("Schwefel", EVO_DnMutation.Schwefel))
         Cntrl.SelectedIndex = 1
     End Sub
 
@@ -206,6 +206,7 @@ Public Class EVO_Einstellungen
             .n_Nachf = TextAnzNachf.Value
             .n_Gen = TextAnzGen.Value
             .ty_EvoStrategie = VB6.GetItemData(ComboStrategie, ComboStrategie.SelectedIndex)
+            .ty_StartPar = VB6.GetItemData(ComboOptVorgabe, ComboOptVorgabe.SelectedIndex)
             .Pop.is_POPUL = CheckisPopul.Checked
             .Pop.ty_PopEvoTyp = VB6.GetItemData(ComboPopStrategie, ComboPopStrategie.SelectedIndex)
             .Pop.ty_PopPenalty = VB6.GetItemData(ComboPopPenalty, ComboPopPenalty.SelectedIndex)
@@ -221,10 +222,9 @@ Public Class EVO_Einstellungen
             End If
             .ty_OptEltern = VB6.GetItemData(ComboOptEltern, ComboOptEltern.SelectedIndex)
             .n_RekombXY = TextRekombxy.Value
-            .DnStart = TextDeltaStart.Value
-            .ty_StartPar = VB6.GetItemData(ComboOptVorgabe, ComboOptVorgabe.SelectedIndex)
-            .is_DnVektor = CheckisDnVektor.Checked
-            .ty_DNMutation = VB6.GetItemData(ComboMutation, ComboMutation.SelectedIndex)
+            .Schrittweite.DnStart = TextDeltaStart.Value
+            .Schrittweite.is_DnVektor = CheckisDnVektor.Checked
+            .Schrittweite.ty_DnMutation = VB6.GetItemData(ComboMutation, ComboMutation.SelectedIndex)
             If (Val(TextInteract.Text) <= 0) Then
                 .is_Interact = False
                 .n_Interact = 1
@@ -234,7 +234,7 @@ Public Class EVO_Einstellungen
             End If
             .n_MemberSekPop = TextNMemberSecondPop.Value
             .is_paint_constraint = checkpaintconstrained.Checked
-            .is_diversity_tournement = CheckisTournamentSelection.Checked
+            .is_DiversityTournament = CheckisTournamentSelection.Checked
 
         End With
 
@@ -264,6 +264,7 @@ Public Class EVO_Einstellungen
             Me.TextAnzNachf.Value = .n_Nachf
             Me.TextAnzGen.Value = .n_Gen
             Me.ComboStrategie.SelectedItem = .ty_EvoStrategie
+            Me.ComboOptVorgabe.SelectedItem = .ty_StartPar
             Me.CheckisPopul.Checked = .Pop.is_POPUL
             Me.ComboPopStrategie.SelectedItem = .Pop.ty_PopEvoTyp
             Me.ComboPopPenalty.SelectedItem = .Pop.ty_PopPenalty
@@ -273,10 +274,9 @@ Public Class EVO_Einstellungen
             Me.TextAnzPopEltern.Value = .Pop.n_PopEltern
             Me.ComboOptEltern.SelectedItem = .ty_OptEltern
             Me.TextRekombxy.Value = .n_RekombXY
-            Me.TextDeltaStart.Value = .DnStart
-            Me.ComboOptVorgabe.SelectedItem = .ty_StartPar
-            Me.ComboMutation.SelectedItem = .ty_DNMutation
-            Me.CheckisDnVektor.Checked = .is_DnVektor
+            Me.TextDeltaStart.Value = .Schrittweite.DnStart
+            Me.ComboMutation.SelectedItem = .Schrittweite.ty_DnMutation
+            Me.CheckisDnVektor.Checked = .Schrittweite.is_DnVektor
             If (Me.msettings.PES.is_Interact) Then
                 Me.TextInteract.Value = .n_Interact
             Else
@@ -284,7 +284,7 @@ Public Class EVO_Einstellungen
             End If
             Me.TextNMemberSecondPop.Value = .n_MemberSekPop
             Me.checkpaintconstrained.Checked = .is_paint_constraint
-            Me.CheckisTournamentSelection.Checked = .is_diversity_tournement
+            Me.CheckisTournamentSelection.Checked = .is_DiversityTournament
 
         End With
 

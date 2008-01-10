@@ -15,7 +15,7 @@ Module EVOMOD
     Public Const METH_CES_PES As String = "CES + PES"
     Public Const METH_HYBRID As String = "HYBRID"
     Public Const METH_SENSIPLOT As String = "SensiPlot"
-    Public Const METH_HOOKJEEVES As String = "HookJeeves"
+    Public Const METH_HOOKJEEVES As String = "Hooke & Jeeves"
 
     'Verschiedenes
     Public Const eol As String = Chr(13) & Chr(10)             'Zeilenumbruch

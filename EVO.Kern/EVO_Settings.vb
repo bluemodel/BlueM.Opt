@@ -20,11 +20,15 @@ Public Class EVO_Settings
         Public ty_EvoStrategie As EVO_STRATEGIE    'Typ der Evolutionsstrategie (+ oder ,)
         Public ty_StartPar As EVO_STARTPARAMETER   'Startparameter
 
-        Public DnStart As Double                   'Startschrittweite
-        Public DNepsilon As Double                 'Minimale Schrittweite
-        Public is_DnVektor As Boolean              'Soll ein Schrittweitenvektor benutzt werden
-        Public ty_DNMutation As EVO_DNMutation     'Art der Mutation
-        Public DNC As Double                       'Skalierung des learning Parameters
+        Public Schrittweite As Struct_Schrittweite
+
+        Public Structure Struct_Schrittweite
+            Public DnStart As Double                   'Startschrittweite
+            Public DnEpsilon As Double                 'Minimale Schrittweite
+            Public is_DnVektor As Boolean              'Soll ein Schrittweitenvektor benutzt werden
+            Public ty_DnMutation As EVO_DnMutation     'Art der Mutation
+            Public DnC As Double                       'Skalierung des learning Parameters
+        End Structure
 
         Public n_Gen As Integer                    'Anzahl Generationen
         Public n_Eltern As Integer                 'Anzahl Eltern
@@ -37,9 +41,7 @@ Public Class EVO_Settings
 
         Public ty_OptEltern As EVO_ELTERN          'Ermittlung der Individuum-Eltern
         Public n_RekombXY As Integer               'X/Y-Schema Rekombination
-
-        Public is_paint_constraint As Boolean      'Nur die Individuuen der aktuellen Generation werden gezeichnet
-        Public is_diversity_tournement As Boolean  'Vor der eigentlichen Auswahl eines Elter wird zunächst nach der besseren Diversity geschaut
+        Public is_DiversityTournament As Boolean   'Vor der eigentlichen Auswahl eines Elter wird zunächst nach der besseren Diversity geschaut
 
         Public Pop As Struct_Pop_Settings
 
@@ -54,6 +56,8 @@ Public Class EVO_Settings
             Public ty_PopPenalty As EVO_POP_PENALTY    'Art der Beurteilung der Populationsgüte (Multiobjective)
         End Structure
 
+        Public is_paint_constraint As Boolean      'Nur die Individuuen der aktuellen Generation werden gezeichnet
+
         'Standardwerte setzen
         '********************
         Public Sub setStandard(ByVal modus As Kern.EVO_MODUS)
@@ -66,11 +70,11 @@ Public Class EVO_Settings
                     Me.ty_EvoStrategie = EVO_STRATEGIE.Plus
                     Me.ty_StartPar = EVO_STARTPARAMETER.Original
 
-                    Me.ty_DNMutation = EVO_DNMutation.Schwefel
-                    Me.DnStart = 0.1
-                    Me.DNepsilon = 0.001
-                    Me.is_DnVektor = False
-                    Me.DNC = 1.0
+                    Me.Schrittweite.ty_DnMutation = EVO_DnMutation.Schwefel
+                    Me.Schrittweite.DnStart = 0.1
+                    Me.Schrittweite.DnEpsilon = 0.001
+                    Me.Schrittweite.is_DnVektor = False
+                    Me.Schrittweite.DnC = 1.0
 
                     Me.n_Gen = 100
                     Me.n_Eltern = 3
@@ -92,7 +96,7 @@ Public Class EVO_Settings
                     Me.Pop.ty_PopPenalty = EVO_POP_PENALTY.Mittelwert
 
                     Me.is_paint_constraint = False
-                    Me.is_diversity_tournement = False
+                    Me.is_DiversityTournament = False
 
 
                 Case EVO_MODUS.Multi_Objective
@@ -101,10 +105,10 @@ Public Class EVO_Settings
                     Me.ty_EvoStrategie = EVO_STRATEGIE.Plus
                     Me.ty_StartPar = EVO_STARTPARAMETER.Original
 
-                    Me.DnStart = 0.1
-                    Me.is_DnVektor = False
-                    Me.is_DnVektor = False
-                    Me.DNC = 1.0
+                    Me.Schrittweite.DnStart = 0.1
+                    Me.Schrittweite.is_DnVektor = False
+                    Me.Schrittweite.is_DnVektor = False
+                    Me.Schrittweite.DnC = 1.0
 
                     Me.n_Gen = 100
                     Me.n_Eltern = 15
@@ -126,7 +130,7 @@ Public Class EVO_Settings
                     Me.Pop.ty_PopPenalty = EVO_POP_PENALTY.Mittelwert
 
                     Me.is_paint_constraint = True
-                    Me.is_diversity_tournement = True
+                    Me.is_DiversityTournament = True
 
             End Select
         End Sub

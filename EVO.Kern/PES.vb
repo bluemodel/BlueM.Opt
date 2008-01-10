@@ -179,7 +179,7 @@ Public Class PES
         If (settings.PES.n_RekombXY < 1) Then
             Throw New Exception("Der Wert für die X/Y-Schema Rekombination ist kleiner 1!")
         End If
-        If (settings.PES.DnStart < 0) Then
+        If (settings.PES.Schrittweite.DnStart < 0) Then
             Throw New Exception("Die Startschrittweite darf nicht kleiner 0 sein!")
         End If
         If (settings.PES.ty_StartPar < 1 Or settings.PES.ty_StartPar > 2) Then
@@ -324,7 +324,7 @@ Public Class PES
             End If
             AktPara.Xn(i) = Parameter(i)
             AktPara.Bez(i) = beziehungen(i)
-            AktPara.Dn(i) = Settings.PES.DnStart
+            AktPara.Dn(i) = Settings.PES.Schrittweite.DnStart
         Next
 
         Dim n, v, m As Integer
@@ -583,7 +583,7 @@ Public Class PES
                     '2. Runde hat nur noch n_Eltern - 1 zur Verfügung
                     'usw.
                     'Kein Elter darf doppelt gezogen werden
-                    If (Settings.PES.is_diversity_tournement) Then
+                    If (Settings.PES.is_DiversityTournament) Then
 
                         R = CInt(Int((Settings.PES.n_Eltern - i) * Rnd()))
                         TournamentElter1 = Elternspeicher(R)
@@ -641,7 +641,7 @@ Public Class PES
                     '2. Runde hat nur noch n_Eltern - 1 zur Verfügung
                     'usw.
                     'Kein Elter darf doppelt gezogen werden
-                    If (Settings.PES.is_diversity_tournement) Then
+                    If (Settings.PES.is_DiversityTournament) Then
 
                         R = CInt(Int((Settings.PES.n_Eltern - i) * Rnd()))
                         TournamentElter1 = Elternspeicher(R)
@@ -701,7 +701,7 @@ Public Class PES
                     '2. Runde hat nur noch n_Eltern - 1 zur Verfügung
                     'usw.
                     'Kein Elter darf doppelt gezogen werden
-                    If (Settings.PES.is_diversity_tournement) Then
+                    If (Settings.PES.is_DiversityTournament) Then
 
                         R = CInt(Int((Settings.PES.n_Eltern - i) * Rnd()))
                         TournamentElter1 = Elternspeicher(R)
@@ -766,7 +766,7 @@ Public Class PES
                 For i = 0 To (Settings.PES.n_Eltern - 1)
                     Elternspeicher(i) = i
                 Next
-                If (Settings.PES.is_diversity_tournement) Then
+                If (Settings.PES.is_DiversityTournament) Then
 
                     R = CInt(Int((Settings.PES.n_Eltern) * Rnd()))
                     TournamentElter1 = Elternspeicher(R)
@@ -843,7 +843,7 @@ StartMutation:
 
         'Einheitliche Schrittweite
         '-------------------------
-        If (Not Settings.PES.is_DnVektor) Then
+        If (Not Settings.PES.Schrittweite.is_DnVektor) Then
 
             '+/-1
             expo = (2 * Int(Rnd() + 0.5) - 1)
@@ -878,7 +878,7 @@ StartMutation:
 
                     'Schrittweitenvektor
                     '-------------------
-                    If (Settings.PES.is_DnVektor) Then
+                    If (Settings.PES.Schrittweite.is_DnVektor) Then
                         '+/-1
                         expo = (2 * Int(Rnd() + 0.5) - 1)
                         'Schrittweite wird mutiert
@@ -930,20 +930,20 @@ StartMutation:
 
         'Einheitliche Schrittweite
         '-------------------------
-        If (Not Settings.PES.is_DnVektor) Then
-            If (Settings.PES.ty_DNMutation = EVO_DNMutation.Rechenberg) Then
+        If (Not Settings.PES.Schrittweite.is_DnVektor) Then
+            If (Settings.PES.Schrittweite.ty_DnMutation = EVO_DnMutation.Rechenberg) Then
                 '+/-1
                 expo = (2 * Int(Rnd() + 0.5) - 1)
                 'Schrittweite wird mutiert
                 DnTemp(0) = AktPara.Dn(0) * galpha ^ expo
-            ElseIf (Settings.PES.ty_DNMutation = EVO_DNMutation.Schwefel) Then
-                tau = Settings.PES.DNC / Math.Sqrt(Anz.Para)
+            ElseIf (Settings.PES.Schrittweite.ty_DnMutation = EVO_DnMutation.Schwefel) Then
+                tau = Settings.PES.Schrittweite.DnC / Math.Sqrt(Anz.Para)
                 'Normalverteilte Zufallszahl (SD = 1, mean = 0)
                 Z = Me.NormalDistributationRND(1.0, 0.0)
                 'Neue Schrittweite
                 DnTemp(0) = AktPara.Dn(0) * Math.Exp(tau * Z)
                 'Mindestschrittweite muss eingehalten werden
-                If dntemp(0) < settings.PES.DNepsilon Then dntemp(0) = settings.PES.DNepsilon
+                If dntemp(0) < Settings.PES.Schrittweite.DnEpsilon Then dntemp(0) = Settings.PES.Schrittweite.DnEpsilon
             End If
             'Schrittweite für alle übernehmen
             For v = 1 To Anz.Para - 1
@@ -953,8 +953,8 @@ StartMutation:
 
         'Mutation
         '--------
-        If (Settings.PES.is_DnVektor And Settings.PES.ty_DNMutation = EVO_DNMutation.Schwefel) Then
-            taufix = Settings.PES.DNC / Math.Sqrt(2*Anz.Para)
+        If (Settings.PES.Schrittweite.is_DnVektor And Settings.PES.Schrittweite.ty_DnMutation = EVO_DnMutation.Schwefel) Then
+            taufix = Settings.PES.Schrittweite.DnC / Math.Sqrt(2*Anz.Para)
             ZFix = Me.NormalDistributationRND(1.0, 0.0)
         End If
         For v = 0 To Anz.Para - 1
@@ -971,31 +971,31 @@ StartMutation:
 
                 'Schrittweitenvektor
                 '-------------------
-                If (Settings.PES.is_DnVektor) Then
+                If (Settings.PES.Schrittweite.is_DnVektor) Then
 
-                    If (Settings.PES.ty_DNMutation = EVO_DNMutation.Rechenberg) Then
+                    If (Settings.PES.Schrittweite.ty_DnMutation = EVO_DnMutation.Rechenberg) Then
                         '+/-1
                         expo = (2 * Int(Rnd() + 0.5) - 1)
                         'Schrittweite wird mutiert
                         DnTemp(v) = AktPara.Dn(v) * galpha ^ expo
-                    ElseIf (Settings.PES.ty_DNMutation = EVO_DNMutation.Schwefel) Then
-                        tau = Settings.PES.DNC / Math.Sqrt(2*math.Sqrt(Anz.Para))
+                    ElseIf (Settings.PES.Schrittweite.ty_DnMutation = EVO_DnMutation.Schwefel) Then
+                        tau = Settings.PES.Schrittweite.DnC / Math.Sqrt(2*math.Sqrt(Anz.Para))
                         'Normalverteilte Zufallszahl (SD = 1, mean = 0)
                         Z = Me.NormalDistributationRND(1.0, 0.0)
                         'Neue Schrittweite
                         DnTemp(v) = AktPara.Dn(v) * Math.Exp(taufix * ZFix + tau * Z)
                         'Mindestschrittweite muss eingehalten werden
-                        If DnTemp(v) < Settings.PES.DNepsilon Then DnTemp(v) = Settings.PES.DNepsilon
+                        If DnTemp(v) < Settings.PES.Schrittweite.DnEpsilon Then DnTemp(v) = Settings.PES.Schrittweite.DnEpsilon
                     End If
                 End If
 
                 'Normalverteilte Zufallszahl mit Standardabweichung 1/sqr(varanz)
 
                 'Z = System.Math.Sqrt(-2 * System.Math.Log(1 - Rnd()) / Anz.Para) * System.Math.Sin(6.2832 * Rnd())
-                If (Settings.PES.ty_DNMutation = EVO_DNMutation.Rechenberg) Then
+                If (Settings.PES.Schrittweite.ty_DnMutation = EVO_DnMutation.Rechenberg) Then
                     'Normalverteilte Zufallszahl mit Standardabweichung 1/sqr(var.anz), , Mittelwert 0
                     Z = Me.NormalDistributationRND(1 / Math.Sqrt(Anz.Para), 0.0)
-                ElseIf (Settings.PES.ty_DNMutation = EVO_DNMutation.Schwefel) Then
+                ElseIf (Settings.PES.Schrittweite.ty_DnMutation = EVO_DnMutation.Schwefel) Then
                     'Normalverteilte Zufallszahl mit Standardabweichung 1, Mittelwert 0
                     Z = Me.NormalDistributationRND(1.0, 0.0)
                 End If
@@ -1366,7 +1366,7 @@ StartMutation:
             Call Func1.EsEltern_Pareto_SekundärQb(Best_Indi, NDSorting, SekundärQb)
             'Bestimmen der Crowding Distance falls Diversity-Tournament
             '----------------------------------------------------------
-            If (Settings.PES.is_diversity_tournement) Then
+            If (Settings.PES.is_DiversityTournament) Then
                 Call Func1.Pareto_Crowding_Distance(Best_Indi)
             End If
 
@@ -1383,7 +1383,7 @@ StartMutation:
                     De(v, i, PES_iAkt.iAktPop) = Best.Db(v, i, PES_iAkt.iAktPop)
                     Xe(v, i, PES_iAkt.iAktPop) = Best.Xb(v, i, PES_iAkt.iAktPop)
                 Next v
-                If (Settings.PES.is_diversity_tournement) Then
+                If (Settings.PES.is_DiversityTournament) Then
                     Div(i, PES_iAkt.iAktPop) = Best.Div(i, PES_iAkt.iAktPop)
                 End If
             Next i
@@ -1419,7 +1419,7 @@ StartMutation:
             Best.Db(v, i, PES_iAkt.iAktPop) = Individ(i).PES_d(v)
             Best.Xb(v, i, PES_iAkt.iAktPop) = Individ(i).PES_X(v)
         Next v
-        If (Settings.PES.is_diversity_tournement) Then
+        If (Settings.PES.is_DiversityTournament) Then
             Best.Div(i, PES_iAkt.iAktPop) = Individ(i).Distance
         End If
     End Sub

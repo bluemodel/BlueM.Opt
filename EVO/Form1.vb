@@ -353,7 +353,7 @@ Partial Class Form1
 
                     'EVO_Einstellungen einrichten
                     Me.EVO_Einstellungen1.Enabled = True
-                    Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_HookJeeves
+                    Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_HookeJeeves
                     'Nur SO möglich
                     If (Sim1.List_OptZiele.GetLength(0) = 1) Then
                         Call EVO_Einstellungen1.setStandard()
@@ -915,7 +915,7 @@ Partial Class Form1
                         'wird also nicht in PES.ESStarten gemacht
                         ReDim CES1.Childs(i).Loc(j).Loc_Dn(CES1.Childs(i).Loc(j).Loc_Para.GetUpperBound(1))
                         For m = 0 To CES1.Childs(i).Loc(j).Loc_Para.GetUpperBound(1)
-                            CES1.Childs(i).Loc(j).Loc_Dn(m) = EVO_Einstellungen1.Settings.PES.DnStart
+                            CES1.Childs(i).Loc(j).Loc_Dn(m) = EVO_Einstellungen1.Settings.PES.Schrittweite.DnStart
                             If EVO_Einstellungen1.Settings.PES.ty_StartPar = Kern.EVO_STARTPARAMETER.Zufall Then
                                 Randomize()
                                 CES1.Childs(i).Loc(j).Loc_Para(1, m) = Rnd()
@@ -1088,7 +1088,7 @@ Partial Class Form1
                                 'Falls noch keine Eltern vorhanden sind -> zufällige Werte
                                 ReDim CES1.Childs(i).Loc(j).Loc_Dn(CES1.Childs(i).Loc(j).Loc_Para.GetUpperBound(1))
                                 For m = 0 To CES1.Childs(i).Loc(j).Loc_Para.GetUpperBound(1)
-                                    CES1.Childs(i).Loc(j).Loc_Dn(m) = EVO_Einstellungen1.Settings.PES.DnStart
+                                    CES1.Childs(i).Loc(j).Loc_Dn(m) = EVO_Einstellungen1.Settings.PES.Schrittweite.DnStart
                                     'Falls zufällige Startwerte
                                     If EVO_Einstellungen1.Settings.PES.ty_StartPar = Kern.EVO_STARTPARAMETER.Zufall Then
                                         Randomize()
@@ -1315,6 +1315,7 @@ Partial Class Form1
             End If
         Loop
     End Sub
+
     'Anwendung Evolutionsstrategie für Parameter Optimierung - hier Steuerung       
     '************************************************************************
     Private Sub STARTEN_PES()

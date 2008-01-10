@@ -22,6 +22,8 @@ Partial Class EVO_Einstellungen
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(EVO_Einstellungen))
         Me.TabControl1 = New System.Windows.Forms.TabControl
         Me.TabPage_PES = New System.Windows.Forms.TabPage
+        Me.ComboMutation = New System.Windows.Forms.ComboBox
+        Me.Label_Mutation = New System.Windows.Forms.Label
         Me.checkpaintconstrained = New System.Windows.Forms.CheckBox
         Me.Label_OptModus = New System.Windows.Forms.Label
         Me.Label_OptModusValue = New System.Windows.Forms.Label
@@ -33,6 +35,7 @@ Partial Class EVO_Einstellungen
         Me.TextDeltaStart = New System.Windows.Forms.NumericUpDown
         Me.CheckisDnVektor = New System.Windows.Forms.CheckBox
         Me.GroupBox_Generationen = New System.Windows.Forms.GroupBox
+        Me.CheckisTournamentSelection = New System.Windows.Forms.CheckBox
         Me.TextNMemberSecondPop = New System.Windows.Forms.NumericUpDown
         Me.TextInteract = New System.Windows.Forms.NumericUpDown
         Me.TextRekombxy = New System.Windows.Forms.NumericUpDown
@@ -65,7 +68,7 @@ Partial Class EVO_Einstellungen
         Me.LabelPopPenalty = New System.Windows.Forms.Label
         Me.ComboPopPenalty = New System.Windows.Forms.ComboBox
         Me.TabPage_CES = New System.Windows.Forms.TabPage
-        Me.TabPage_HookJeeves = New System.Windows.Forms.TabPage
+        Me.TabPage_HookeJeeves = New System.Windows.Forms.TabPage
         Me.LabelRSHJ = New System.Windows.Forms.Label
         Me.LabelESHJ = New System.Windows.Forms.Label
         Me.LabelTSHJgesamt = New System.Windows.Forms.Label
@@ -86,9 +89,6 @@ Partial Class EVO_Einstellungen
         Me.SpeichernToolStripButton = New System.Windows.Forms.ToolStripButton
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox
-        Me.CheckisTournamentSelection = New System.Windows.Forms.CheckBox
-        Me.Label5 = New System.Windows.Forms.Label
-        Me.ComboMutation = New System.Windows.Forms.ComboBox
         Me.TabControl1.SuspendLayout()
         Me.TabPage_PES.SuspendLayout()
         CType(Me.TextDeltaStart, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -103,7 +103,7 @@ Partial Class EVO_Einstellungen
         CType(Me.TextAnzRunden, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.TextAnzPop, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.TextAnzPopEltern, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.TabPage_HookJeeves.SuspendLayout()
+        Me.TabPage_HookeJeeves.SuspendLayout()
         CType(Me.TextDeltaFinishHJ, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.TextDeltaStartHJ, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ToolStrip1.SuspendLayout()
@@ -114,7 +114,7 @@ Partial Class EVO_Einstellungen
         '
         Me.TabControl1.Controls.Add(Me.TabPage_PES)
         Me.TabControl1.Controls.Add(Me.TabPage_CES)
-        Me.TabControl1.Controls.Add(Me.TabPage_HookJeeves)
+        Me.TabControl1.Controls.Add(Me.TabPage_HookeJeeves)
         Me.TabControl1.Location = New System.Drawing.Point(1, 41)
         Me.TabControl1.Margin = New System.Windows.Forms.Padding(0)
         Me.TabControl1.Name = "TabControl1"
@@ -127,8 +127,7 @@ Partial Class EVO_Einstellungen
         '
         Me.TabPage_PES.BackColor = System.Drawing.SystemColors.Control
         Me.TabPage_PES.Controls.Add(Me.ComboMutation)
-        Me.TabPage_PES.Controls.Add(Me.Label5)
-        Me.TabPage_PES.Controls.Add(Me.checkpaintconstrained)
+        Me.TabPage_PES.Controls.Add(Me.Label_Mutation)
         Me.TabPage_PES.Controls.Add(Me.Label_OptModus)
         Me.TabPage_PES.Controls.Add(Me.Label_OptModusValue)
         Me.TabPage_PES.Controls.Add(Me.LabelStrategie)
@@ -140,6 +139,7 @@ Partial Class EVO_Einstellungen
         Me.TabPage_PES.Controls.Add(Me.CheckisDnVektor)
         Me.TabPage_PES.Controls.Add(Me.GroupBox_Generationen)
         Me.TabPage_PES.Controls.Add(Me.CheckisPopul)
+        Me.TabPage_PES.Controls.Add(Me.checkpaintconstrained)
         Me.TabPage_PES.Controls.Add(Me.GroupBox_Populationen)
         Me.TabPage_PES.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_PES.Margin = New System.Windows.Forms.Padding(0)
@@ -147,6 +147,24 @@ Partial Class EVO_Einstellungen
         Me.TabPage_PES.Size = New System.Drawing.Size(210, 630)
         Me.TabPage_PES.TabIndex = 0
         Me.TabPage_PES.Text = "PES"
+        '
+        'ComboMutation
+        '
+        Me.ComboMutation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboMutation.FormattingEnabled = True
+        Me.ComboMutation.Location = New System.Drawing.Point(80, 88)
+        Me.ComboMutation.Name = "ComboMutation"
+        Me.ComboMutation.Size = New System.Drawing.Size(123, 21)
+        Me.ComboMutation.TabIndex = 35
+        '
+        'Label_Mutation
+        '
+        Me.Label_Mutation.AutoSize = True
+        Me.Label_Mutation.Location = New System.Drawing.Point(2, 91)
+        Me.Label_Mutation.Name = "Label_Mutation"
+        Me.Label_Mutation.Size = New System.Drawing.Size(51, 13)
+        Me.Label_Mutation.TabIndex = 34
+        Me.Label_Mutation.Text = "Mutation:"
         '
         'checkpaintconstrained
         '
@@ -156,6 +174,7 @@ Partial Class EVO_Einstellungen
         Me.checkpaintconstrained.Size = New System.Drawing.Size(133, 17)
         Me.checkpaintconstrained.TabIndex = 33
         Me.checkpaintconstrained.Text = "Reduzierte Darstellung"
+        Me.ToolTip1.SetToolTip(Me.checkpaintconstrained, "Nur die Individuuen der aktuellen Generation werden gezeichnet")
         Me.checkpaintconstrained.UseVisualStyleBackColor = True
         '
         'Label_OptModus
@@ -179,7 +198,7 @@ Partial Class EVO_Einstellungen
         'LabelStrategie
         '
         Me.LabelStrategie.AutoSize = True
-        Me.LabelStrategie.Location = New System.Drawing.Point(2, 35)
+        Me.LabelStrategie.Location = New System.Drawing.Point(2, 37)
         Me.LabelStrategie.Name = "LabelStrategie"
         Me.LabelStrategie.Size = New System.Drawing.Size(54, 13)
         Me.LabelStrategie.TabIndex = 19
@@ -196,7 +215,7 @@ Partial Class EVO_Einstellungen
         'LabelStartwerte
         '
         Me.LabelStartwerte.AutoSize = True
-        Me.LabelStartwerte.Location = New System.Drawing.Point(1, 61)
+        Me.LabelStartwerte.Location = New System.Drawing.Point(2, 64)
         Me.LabelStartwerte.Name = "LabelStartwerte"
         Me.LabelStartwerte.Size = New System.Drawing.Size(58, 13)
         Me.LabelStartwerte.TabIndex = 29
@@ -224,7 +243,7 @@ Partial Class EVO_Einstellungen
         Me.TextDeltaStart.DecimalPlaces = 2
         Me.TextDeltaStart.Increment = New Decimal(New Integer() {1, 0, 0, 131072})
         Me.TextDeltaStart.Location = New System.Drawing.Point(151, 115)
-        Me.TextDeltaStart.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
+        Me.TextDeltaStart.Maximum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.TextDeltaStart.Minimum = New Decimal(New Integer() {1, 0, 0, 131072})
         Me.TextDeltaStart.Name = "TextDeltaStart"
         Me.TextDeltaStart.Size = New System.Drawing.Size(53, 20)
@@ -266,6 +285,16 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Generationen.TabIndex = 4
         Me.GroupBox_Generationen.TabStop = False
         Me.GroupBox_Generationen.Text = "Generationen:"
+        '
+        'CheckisTournamentSelection
+        '
+        Me.CheckisTournamentSelection.AutoSize = True
+        Me.CheckisTournamentSelection.Location = New System.Drawing.Point(10, 218)
+        Me.CheckisTournamentSelection.Name = "CheckisTournamentSelection"
+        Me.CheckisTournamentSelection.Size = New System.Drawing.Size(130, 17)
+        Me.CheckisTournamentSelection.TabIndex = 43
+        Me.CheckisTournamentSelection.Text = "Tournament Selection"
+        Me.CheckisTournamentSelection.UseVisualStyleBackColor = True
         '
         'TextNMemberSecondPop
         '
@@ -565,35 +594,35 @@ Partial Class EVO_Einstellungen
         Me.TabPage_CES.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_CES.Name = "TabPage_CES"
         Me.TabPage_CES.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage_CES.Size = New System.Drawing.Size(210, 603)
+        Me.TabPage_CES.Size = New System.Drawing.Size(210, 630)
         Me.TabPage_CES.TabIndex = 1
         Me.TabPage_CES.Text = "CES"
         Me.TabPage_CES.UseVisualStyleBackColor = True
         '
-        'TabPage_HookJeeves
+        'TabPage_HookeJeeves
         '
-        Me.TabPage_HookJeeves.BackColor = System.Drawing.SystemColors.Control
-        Me.TabPage_HookJeeves.Controls.Add(Me.LabelRSHJ)
-        Me.TabPage_HookJeeves.Controls.Add(Me.LabelESHJ)
-        Me.TabPage_HookJeeves.Controls.Add(Me.LabelTSHJgesamt)
-        Me.TabPage_HookJeeves.Controls.Add(Me.LabelTSHJmittel)
-        Me.TabPage_HookJeeves.Controls.Add(Me.Label9)
-        Me.TabPage_HookJeeves.Controls.Add(Me.Label8)
-        Me.TabPage_HookJeeves.Controls.Add(Me.Label7)
-        Me.TabPage_HookJeeves.Controls.Add(Me.Label6)
-        Me.TabPage_HookJeeves.Controls.Add(Me.LabelTSHJaktuelle)
-        Me.TabPage_HookJeeves.Controls.Add(Me.Label4)
-        Me.TabPage_HookJeeves.Controls.Add(Me.Label3)
-        Me.TabPage_HookJeeves.Controls.Add(Me.TextDeltaFinishHJ)
-        Me.TabPage_HookJeeves.Controls.Add(Me.Label1)
-        Me.TabPage_HookJeeves.Controls.Add(Me.TextDeltaStartHJ)
-        Me.TabPage_HookJeeves.Controls.Add(Me.CheckBoxDNVektorHJ)
-        Me.TabPage_HookJeeves.Location = New System.Drawing.Point(4, 22)
-        Me.TabPage_HookJeeves.Name = "TabPage_HookJeeves"
-        Me.TabPage_HookJeeves.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage_HookJeeves.Size = New System.Drawing.Size(210, 617)
-        Me.TabPage_HookJeeves.TabIndex = 2
-        Me.TabPage_HookJeeves.Text = "HookJeeves"
+        Me.TabPage_HookeJeeves.BackColor = System.Drawing.SystemColors.Control
+        Me.TabPage_HookeJeeves.Controls.Add(Me.LabelRSHJ)
+        Me.TabPage_HookeJeeves.Controls.Add(Me.LabelESHJ)
+        Me.TabPage_HookeJeeves.Controls.Add(Me.LabelTSHJgesamt)
+        Me.TabPage_HookeJeeves.Controls.Add(Me.LabelTSHJmittel)
+        Me.TabPage_HookeJeeves.Controls.Add(Me.Label9)
+        Me.TabPage_HookeJeeves.Controls.Add(Me.Label8)
+        Me.TabPage_HookeJeeves.Controls.Add(Me.Label7)
+        Me.TabPage_HookeJeeves.Controls.Add(Me.Label6)
+        Me.TabPage_HookeJeeves.Controls.Add(Me.LabelTSHJaktuelle)
+        Me.TabPage_HookeJeeves.Controls.Add(Me.Label4)
+        Me.TabPage_HookeJeeves.Controls.Add(Me.Label3)
+        Me.TabPage_HookeJeeves.Controls.Add(Me.TextDeltaFinishHJ)
+        Me.TabPage_HookeJeeves.Controls.Add(Me.Label1)
+        Me.TabPage_HookeJeeves.Controls.Add(Me.TextDeltaStartHJ)
+        Me.TabPage_HookeJeeves.Controls.Add(Me.CheckBoxDNVektorHJ)
+        Me.TabPage_HookeJeeves.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage_HookeJeeves.Name = "TabPage_HookeJeeves"
+        Me.TabPage_HookeJeeves.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage_HookeJeeves.Size = New System.Drawing.Size(210, 630)
+        Me.TabPage_HookeJeeves.TabIndex = 2
+        Me.TabPage_HookeJeeves.Text = "Hooke & Jeeves"
         '
         'LabelRSHJ
         '
@@ -794,33 +823,6 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Einstellungen.TabStop = False
         Me.GroupBox_Einstellungen.Text = "Einstellungen:"
         '
-        'CheckisTournamentSelection
-        '
-        Me.CheckisTournamentSelection.AutoSize = True
-        Me.CheckisTournamentSelection.Location = New System.Drawing.Point(10, 218)
-        Me.CheckisTournamentSelection.Name = "CheckisTournamentSelection"
-        Me.CheckisTournamentSelection.Size = New System.Drawing.Size(130, 17)
-        Me.CheckisTournamentSelection.TabIndex = 43
-        Me.CheckisTournamentSelection.Text = "Tournament Selection"
-        Me.CheckisTournamentSelection.UseVisualStyleBackColor = True
-        '
-        'Label5
-        '
-        Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(2, 88)
-        Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(51, 13)
-        Me.Label5.TabIndex = 34
-        Me.Label5.Text = "Mutation:"
-        '
-        'ComboMutation
-        '
-        Me.ComboMutation.FormattingEnabled = True
-        Me.ComboMutation.Location = New System.Drawing.Point(80, 88)
-        Me.ComboMutation.Name = "ComboMutation"
-        Me.ComboMutation.Size = New System.Drawing.Size(123, 21)
-        Me.ComboMutation.TabIndex = 35
-        '
         'EVO_Einstellungen
         '
         Me.Controls.Add(Me.GroupBox_Einstellungen)
@@ -843,8 +845,8 @@ Partial Class EVO_Einstellungen
         CType(Me.TextAnzRunden, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.TextAnzPop, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.TextAnzPopEltern, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.TabPage_HookJeeves.ResumeLayout(False)
-        Me.TabPage_HookJeeves.PerformLayout()
+        Me.TabPage_HookeJeeves.ResumeLayout(False)
+        Me.TabPage_HookeJeeves.PerformLayout()
         CType(Me.TextDeltaFinishHJ, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.TextDeltaStartHJ, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ToolStrip1.ResumeLayout(False)
@@ -901,7 +903,7 @@ Partial Class EVO_Einstellungen
     Friend WithEvents SpeichernToolStripButton As System.Windows.Forms.ToolStripButton
     Private WithEvents ToolStrip1 As System.Windows.Forms.ToolStrip
     Friend WithEvents GroupBox_Einstellungen As System.Windows.Forms.GroupBox
-    Friend WithEvents TabPage_HookJeeves As System.Windows.Forms.TabPage
+    Friend WithEvents TabPage_HookeJeeves As System.Windows.Forms.TabPage
     Private WithEvents Label3 As System.Windows.Forms.Label
     Private WithEvents TextDeltaFinishHJ As System.Windows.Forms.NumericUpDown
     Private WithEvents Label1 As System.Windows.Forms.Label
@@ -922,5 +924,5 @@ Partial Class EVO_Einstellungen
     Friend WithEvents checkpaintconstrained As System.Windows.Forms.CheckBox
     Friend WithEvents CheckisTournamentSelection As System.Windows.Forms.CheckBox
     Friend WithEvents ComboMutation As System.Windows.Forms.ComboBox
-    Private WithEvents Label5 As System.Windows.Forms.Label
+    Private WithEvents Label_Mutation As System.Windows.Forms.Label
 End Class
