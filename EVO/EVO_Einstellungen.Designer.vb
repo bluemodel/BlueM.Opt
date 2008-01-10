@@ -22,9 +22,6 @@ Partial Class EVO_Einstellungen
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(EVO_Einstellungen))
         Me.TabControl1 = New System.Windows.Forms.TabControl
         Me.TabPage_PES = New System.Windows.Forms.TabPage
-        Me.ToolStrip1 = New System.Windows.Forms.ToolStrip
-        Me.ÖffnenToolStripButton = New System.Windows.Forms.ToolStripButton
-        Me.SpeichernToolStripButton = New System.Windows.Forms.ToolStripButton
         Me.Label_OptModus = New System.Windows.Forms.Label
         Me.Label_OptModusValue = New System.Windows.Forms.Label
         Me.LabelStrategie = New System.Windows.Forms.Label
@@ -68,26 +65,29 @@ Partial Class EVO_Einstellungen
         Me.ComboPopPenalty = New System.Windows.Forms.ComboBox
         Me.TabPage_CES = New System.Windows.Forms.TabPage
         Me.TabPage_HookJeeves = New System.Windows.Forms.TabPage
+        Me.LabelRSHJ = New System.Windows.Forms.Label
+        Me.LabelESHJ = New System.Windows.Forms.Label
+        Me.LabelTSHJgesamt = New System.Windows.Forms.Label
+        Me.LabelTSHJmittel = New System.Windows.Forms.Label
+        Me.Label9 = New System.Windows.Forms.Label
+        Me.Label8 = New System.Windows.Forms.Label
+        Me.Label7 = New System.Windows.Forms.Label
+        Me.Label6 = New System.Windows.Forms.Label
+        Me.LabelTSHJaktuelle = New System.Windows.Forms.Label
+        Me.Label4 = New System.Windows.Forms.Label
         Me.Label3 = New System.Windows.Forms.Label
         Me.TextDeltaFinishHJ = New System.Windows.Forms.NumericUpDown
         Me.Label1 = New System.Windows.Forms.Label
         Me.TextDeltaStartHJ = New System.Windows.Forms.NumericUpDown
         Me.CheckBoxDNVektorHJ = New System.Windows.Forms.CheckBox
+        Me.ToolStrip1 = New System.Windows.Forms.ToolStrip
+        Me.ÖffnenToolStripButton = New System.Windows.Forms.ToolStripButton
+        Me.SpeichernToolStripButton = New System.Windows.Forms.ToolStripButton
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox
-        Me.Label4 = New System.Windows.Forms.Label
-        Me.LabelTSHJaktuelle = New System.Windows.Forms.Label
-        Me.Label6 = New System.Windows.Forms.Label
-        Me.Label7 = New System.Windows.Forms.Label
-        Me.Label8 = New System.Windows.Forms.Label
-        Me.Label9 = New System.Windows.Forms.Label
-        Me.LabelTSHJmittel = New System.Windows.Forms.Label
-        Me.LabelTSHJgesamt = New System.Windows.Forms.Label
-        Me.LabelESHJ = New System.Windows.Forms.Label
-        Me.LabelRSHJ = New System.Windows.Forms.Label
+        Me.checkpaintconstrained = New System.Windows.Forms.CheckBox
         Me.TabControl1.SuspendLayout()
         Me.TabPage_PES.SuspendLayout()
-        Me.ToolStrip1.SuspendLayout()
         CType(Me.TextDeltaStart, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox_Generationen.SuspendLayout()
         CType(Me.TextNMemberSecondPop, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -103,6 +103,7 @@ Partial Class EVO_Einstellungen
         Me.TabPage_HookJeeves.SuspendLayout()
         CType(Me.TextDeltaFinishHJ, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.TextDeltaStartHJ, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.ToolStrip1.SuspendLayout()
         Me.GroupBox_Einstellungen.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -111,17 +112,18 @@ Partial Class EVO_Einstellungen
         Me.TabControl1.Controls.Add(Me.TabPage_PES)
         Me.TabControl1.Controls.Add(Me.TabPage_CES)
         Me.TabControl1.Controls.Add(Me.TabPage_HookJeeves)
-        Me.TabControl1.Location = New System.Drawing.Point(1, 105)
+        Me.TabControl1.Location = New System.Drawing.Point(1, 68)
         Me.TabControl1.Margin = New System.Windows.Forms.Padding(0)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.Padding = New System.Drawing.Point(0, 0)
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(218, 592)
+        Me.TabControl1.Size = New System.Drawing.Size(218, 629)
         Me.TabControl1.TabIndex = 1
         '
         'TabPage_PES
         '
         Me.TabPage_PES.BackColor = System.Drawing.SystemColors.Control
+        Me.TabPage_PES.Controls.Add(Me.checkpaintconstrained)
         Me.TabPage_PES.Controls.Add(Me.Label_OptModus)
         Me.TabPage_PES.Controls.Add(Me.Label_OptModusValue)
         Me.TabPage_PES.Controls.Add(Me.LabelStrategie)
@@ -137,39 +139,9 @@ Partial Class EVO_Einstellungen
         Me.TabPage_PES.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_PES.Margin = New System.Windows.Forms.Padding(0)
         Me.TabPage_PES.Name = "TabPage_PES"
-        Me.TabPage_PES.Size = New System.Drawing.Size(210, 566)
+        Me.TabPage_PES.Size = New System.Drawing.Size(210, 603)
         Me.TabPage_PES.TabIndex = 0
         Me.TabPage_PES.Text = "PES"
-        '
-        'ToolStrip1
-        '
-        Me.ToolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ÖffnenToolStripButton, Me.SpeichernToolStripButton})
-        Me.ToolStrip1.Location = New System.Drawing.Point(3, 16)
-        Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Padding = New System.Windows.Forms.Padding(0)
-        Me.ToolStrip1.Size = New System.Drawing.Size(214, 25)
-        Me.ToolStrip1.Stretch = True
-        Me.ToolStrip1.TabIndex = 36
-        Me.ToolStrip1.Text = "ToolStrip1"
-        '
-        'ÖffnenToolStripButton
-        '
-        Me.ÖffnenToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ÖffnenToolStripButton.Image = CType(resources.GetObject("ÖffnenToolStripButton.Image"), System.Drawing.Image)
-        Me.ÖffnenToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ÖffnenToolStripButton.Name = "ÖffnenToolStripButton"
-        Me.ÖffnenToolStripButton.Size = New System.Drawing.Size(23, 22)
-        Me.ÖffnenToolStripButton.Text = "Ö&ffnen"
-        '
-        'SpeichernToolStripButton
-        '
-        Me.SpeichernToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.SpeichernToolStripButton.Image = CType(resources.GetObject("SpeichernToolStripButton.Image"), System.Drawing.Image)
-        Me.SpeichernToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.SpeichernToolStripButton.Name = "SpeichernToolStripButton"
-        Me.SpeichernToolStripButton.Size = New System.Drawing.Size(23, 22)
-        Me.SpeichernToolStripButton.Text = "&Speichern"
         '
         'Label_OptModus
         '
@@ -577,7 +549,7 @@ Partial Class EVO_Einstellungen
         Me.TabPage_CES.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_CES.Name = "TabPage_CES"
         Me.TabPage_CES.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage_CES.Size = New System.Drawing.Size(212, 569)
+        Me.TabPage_CES.Size = New System.Drawing.Size(210, 566)
         Me.TabPage_CES.TabIndex = 1
         Me.TabPage_CES.Text = "CES"
         Me.TabPage_CES.UseVisualStyleBackColor = True
@@ -606,6 +578,111 @@ Partial Class EVO_Einstellungen
         Me.TabPage_HookJeeves.Size = New System.Drawing.Size(210, 566)
         Me.TabPage_HookJeeves.TabIndex = 2
         Me.TabPage_HookJeeves.Text = "HookJeeves"
+        '
+        'LabelRSHJ
+        '
+        Me.LabelRSHJ.AutoSize = True
+        Me.LabelRSHJ.ForeColor = System.Drawing.Color.Blue
+        Me.LabelRSHJ.Location = New System.Drawing.Point(139, 223)
+        Me.LabelRSHJ.Name = "LabelRSHJ"
+        Me.LabelRSHJ.Size = New System.Drawing.Size(13, 13)
+        Me.LabelRSHJ.TabIndex = 42
+        Me.LabelRSHJ.Text = "0"
+        Me.LabelRSHJ.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'LabelESHJ
+        '
+        Me.LabelESHJ.AutoSize = True
+        Me.LabelESHJ.ForeColor = System.Drawing.Color.Blue
+        Me.LabelESHJ.Location = New System.Drawing.Point(139, 199)
+        Me.LabelESHJ.Name = "LabelESHJ"
+        Me.LabelESHJ.Size = New System.Drawing.Size(13, 13)
+        Me.LabelESHJ.TabIndex = 41
+        Me.LabelESHJ.Text = "0"
+        Me.LabelESHJ.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'LabelTSHJgesamt
+        '
+        Me.LabelTSHJgesamt.AutoSize = True
+        Me.LabelTSHJgesamt.ForeColor = System.Drawing.Color.Blue
+        Me.LabelTSHJgesamt.Location = New System.Drawing.Point(139, 175)
+        Me.LabelTSHJgesamt.Name = "LabelTSHJgesamt"
+        Me.LabelTSHJgesamt.Size = New System.Drawing.Size(13, 13)
+        Me.LabelTSHJgesamt.TabIndex = 40
+        Me.LabelTSHJgesamt.Text = "0"
+        Me.LabelTSHJgesamt.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'LabelTSHJmittel
+        '
+        Me.LabelTSHJmittel.AutoSize = True
+        Me.LabelTSHJmittel.ForeColor = System.Drawing.Color.Blue
+        Me.LabelTSHJmittel.Location = New System.Drawing.Point(139, 151)
+        Me.LabelTSHJmittel.Name = "LabelTSHJmittel"
+        Me.LabelTSHJmittel.Size = New System.Drawing.Size(13, 13)
+        Me.LabelTSHJmittel.TabIndex = 39
+        Me.LabelTSHJmittel.Text = "0"
+        Me.LabelTSHJmittel.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'Label9
+        '
+        Me.Label9.AutoSize = True
+        Me.Label9.ForeColor = System.Drawing.Color.Blue
+        Me.Label9.Location = New System.Drawing.Point(6, 223)
+        Me.Label9.Name = "Label9"
+        Me.Label9.Size = New System.Drawing.Size(67, 13)
+        Me.Label9.TabIndex = 38
+        Me.Label9.Text = "Rückschritte"
+        '
+        'Label8
+        '
+        Me.Label8.AutoSize = True
+        Me.Label8.ForeColor = System.Drawing.Color.Blue
+        Me.Label8.Location = New System.Drawing.Point(6, 199)
+        Me.Label8.Name = "Label8"
+        Me.Label8.Size = New System.Drawing.Size(107, 13)
+        Me.Label8.TabIndex = 37
+        Me.Label8.Text = "Extrapolationsschritte"
+        '
+        'Label7
+        '
+        Me.Label7.AutoSize = True
+        Me.Label7.ForeColor = System.Drawing.Color.Blue
+        Me.Label7.Location = New System.Drawing.Point(6, 175)
+        Me.Label7.Name = "Label7"
+        Me.Label7.Size = New System.Drawing.Size(99, 13)
+        Me.Label7.TabIndex = 36
+        Me.Label7.Text = "Tastschritte gesamt"
+        '
+        'Label6
+        '
+        Me.Label6.AutoSize = True
+        Me.Label6.ForeColor = System.Drawing.Color.Blue
+        Me.Label6.Location = New System.Drawing.Point(6, 151)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(89, 13)
+        Me.Label6.TabIndex = 35
+        Me.Label6.Text = "Tastschritte mittel"
+        '
+        'LabelTSHJaktuelle
+        '
+        Me.LabelTSHJaktuelle.AutoSize = True
+        Me.LabelTSHJaktuelle.ForeColor = System.Drawing.Color.Blue
+        Me.LabelTSHJaktuelle.Location = New System.Drawing.Point(139, 127)
+        Me.LabelTSHJaktuelle.Name = "LabelTSHJaktuelle"
+        Me.LabelTSHJaktuelle.Size = New System.Drawing.Size(13, 13)
+        Me.LabelTSHJaktuelle.TabIndex = 34
+        Me.LabelTSHJaktuelle.Text = "0"
+        Me.LabelTSHJaktuelle.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.ForeColor = System.Drawing.Color.Blue
+        Me.Label4.Location = New System.Drawing.Point(6, 127)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(96, 13)
+        Me.Label4.TabIndex = 33
+        Me.Label4.Text = "Tastschritte aktuell"
         '
         'Label3
         '
@@ -660,6 +737,36 @@ Partial Class EVO_Einstellungen
         Me.CheckBoxDNVektorHJ.TabIndex = 2
         Me.CheckBoxDNVektorHJ.Text = "mit Schrittweitenvektor"
         '
+        'ToolStrip1
+        '
+        Me.ToolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ÖffnenToolStripButton, Me.SpeichernToolStripButton})
+        Me.ToolStrip1.Location = New System.Drawing.Point(3, 16)
+        Me.ToolStrip1.Name = "ToolStrip1"
+        Me.ToolStrip1.Padding = New System.Windows.Forms.Padding(0)
+        Me.ToolStrip1.Size = New System.Drawing.Size(214, 25)
+        Me.ToolStrip1.Stretch = True
+        Me.ToolStrip1.TabIndex = 36
+        Me.ToolStrip1.Text = "ToolStrip1"
+        '
+        'ÖffnenToolStripButton
+        '
+        Me.ÖffnenToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ÖffnenToolStripButton.Image = CType(resources.GetObject("ÖffnenToolStripButton.Image"), System.Drawing.Image)
+        Me.ÖffnenToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ÖffnenToolStripButton.Name = "ÖffnenToolStripButton"
+        Me.ÖffnenToolStripButton.Size = New System.Drawing.Size(23, 22)
+        Me.ÖffnenToolStripButton.Text = "Ö&ffnen"
+        '
+        'SpeichernToolStripButton
+        '
+        Me.SpeichernToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.SpeichernToolStripButton.Image = CType(resources.GetObject("SpeichernToolStripButton.Image"), System.Drawing.Image)
+        Me.SpeichernToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.SpeichernToolStripButton.Name = "SpeichernToolStripButton"
+        Me.SpeichernToolStripButton.Size = New System.Drawing.Size(23, 22)
+        Me.SpeichernToolStripButton.Text = "&Speichern"
+        '
         'GroupBox_Einstellungen
         '
         Me.GroupBox_Einstellungen.Controls.Add(Me.ToolStrip1)
@@ -671,110 +778,15 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Einstellungen.TabStop = False
         Me.GroupBox_Einstellungen.Text = "Einstellungen:"
         '
-        'Label4
+        'checkpaintconstrained
         '
-        Me.Label4.AutoSize = True
-        Me.Label4.ForeColor = System.Drawing.Color.Blue
-        Me.Label4.Location = New System.Drawing.Point(6, 127)
-        Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(96, 13)
-        Me.Label4.TabIndex = 33
-        Me.Label4.Text = "Tastschritte aktuell"
-        '
-        'LabelTSHJaktuelle
-        '
-        Me.LabelTSHJaktuelle.AutoSize = True
-        Me.LabelTSHJaktuelle.ForeColor = System.Drawing.Color.Blue
-        Me.LabelTSHJaktuelle.Location = New System.Drawing.Point(139, 127)
-        Me.LabelTSHJaktuelle.Name = "LabelTSHJaktuelle"
-        Me.LabelTSHJaktuelle.Size = New System.Drawing.Size(13, 13)
-        Me.LabelTSHJaktuelle.TabIndex = 34
-        Me.LabelTSHJaktuelle.Text = "0"
-        Me.LabelTSHJaktuelle.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-        '
-        'Label6
-        '
-        Me.Label6.AutoSize = True
-        Me.Label6.ForeColor = System.Drawing.Color.Blue
-        Me.Label6.Location = New System.Drawing.Point(6, 151)
-        Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(89, 13)
-        Me.Label6.TabIndex = 35
-        Me.Label6.Text = "Tastschritte mittel"
-        '
-        'Label7
-        '
-        Me.Label7.AutoSize = True
-        Me.Label7.ForeColor = System.Drawing.Color.Blue
-        Me.Label7.Location = New System.Drawing.Point(6, 175)
-        Me.Label7.Name = "Label7"
-        Me.Label7.Size = New System.Drawing.Size(99, 13)
-        Me.Label7.TabIndex = 36
-        Me.Label7.Text = "Tastschritte gesamt"
-        '
-        'Label8
-        '
-        Me.Label8.AutoSize = True
-        Me.Label8.ForeColor = System.Drawing.Color.Blue
-        Me.Label8.Location = New System.Drawing.Point(6, 199)
-        Me.Label8.Name = "Label8"
-        Me.Label8.Size = New System.Drawing.Size(107, 13)
-        Me.Label8.TabIndex = 37
-        Me.Label8.Text = "Extrapolationsschritte"
-        '
-        'Label9
-        '
-        Me.Label9.AutoSize = True
-        Me.Label9.ForeColor = System.Drawing.Color.Blue
-        Me.Label9.Location = New System.Drawing.Point(6, 223)
-        Me.Label9.Name = "Label9"
-        Me.Label9.Size = New System.Drawing.Size(67, 13)
-        Me.Label9.TabIndex = 38
-        Me.Label9.Text = "Rückschritte"
-        '
-        'LabelTSHJmittel
-        '
-        Me.LabelTSHJmittel.AutoSize = True
-        Me.LabelTSHJmittel.ForeColor = System.Drawing.Color.Blue
-        Me.LabelTSHJmittel.Location = New System.Drawing.Point(139, 151)
-        Me.LabelTSHJmittel.Name = "LabelTSHJmittel"
-        Me.LabelTSHJmittel.Size = New System.Drawing.Size(13, 13)
-        Me.LabelTSHJmittel.TabIndex = 39
-        Me.LabelTSHJmittel.Text = "0"
-        Me.LabelTSHJmittel.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-        '
-        'LabelTSHJgesamt
-        '
-        Me.LabelTSHJgesamt.AutoSize = True
-        Me.LabelTSHJgesamt.ForeColor = System.Drawing.Color.Blue
-        Me.LabelTSHJgesamt.Location = New System.Drawing.Point(139, 175)
-        Me.LabelTSHJgesamt.Name = "LabelTSHJgesamt"
-        Me.LabelTSHJgesamt.Size = New System.Drawing.Size(13, 13)
-        Me.LabelTSHJgesamt.TabIndex = 40
-        Me.LabelTSHJgesamt.Text = "0"
-        Me.LabelTSHJgesamt.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-        '
-        'LabelESHJ
-        '
-        Me.LabelESHJ.AutoSize = True
-        Me.LabelESHJ.ForeColor = System.Drawing.Color.Blue
-        Me.LabelESHJ.Location = New System.Drawing.Point(139, 199)
-        Me.LabelESHJ.Name = "LabelESHJ"
-        Me.LabelESHJ.Size = New System.Drawing.Size(13, 13)
-        Me.LabelESHJ.TabIndex = 41
-        Me.LabelESHJ.Text = "0"
-        Me.LabelESHJ.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-        '
-        'LabelRSHJ
-        '
-        Me.LabelRSHJ.AutoSize = True
-        Me.LabelRSHJ.ForeColor = System.Drawing.Color.Blue
-        Me.LabelRSHJ.Location = New System.Drawing.Point(139, 223)
-        Me.LabelRSHJ.Name = "LabelRSHJ"
-        Me.LabelRSHJ.Size = New System.Drawing.Size(13, 13)
-        Me.LabelRSHJ.TabIndex = 42
-        Me.LabelRSHJ.Text = "0"
-        Me.LabelRSHJ.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.checkpaintconstrained.AutoSize = True
+        Me.checkpaintconstrained.Location = New System.Drawing.Point(5, 548)
+        Me.checkpaintconstrained.Name = "checkpaintconstrained"
+        Me.checkpaintconstrained.Size = New System.Drawing.Size(133, 17)
+        Me.checkpaintconstrained.TabIndex = 33
+        Me.checkpaintconstrained.Text = "Reduzierte Darstellung"
+        Me.checkpaintconstrained.UseVisualStyleBackColor = True
         '
         'EVO_Einstellungen
         '
@@ -784,8 +796,6 @@ Partial Class EVO_Einstellungen
         Me.TabControl1.ResumeLayout(False)
         Me.TabPage_PES.ResumeLayout(False)
         Me.TabPage_PES.PerformLayout()
-        Me.ToolStrip1.ResumeLayout(False)
-        Me.ToolStrip1.PerformLayout()
         CType(Me.TextDeltaStart, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox_Generationen.ResumeLayout(False)
         Me.GroupBox_Generationen.PerformLayout()
@@ -804,6 +814,8 @@ Partial Class EVO_Einstellungen
         Me.TabPage_HookJeeves.PerformLayout()
         CType(Me.TextDeltaFinishHJ, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.TextDeltaStartHJ, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.ToolStrip1.ResumeLayout(False)
+        Me.ToolStrip1.PerformLayout()
         Me.GroupBox_Einstellungen.ResumeLayout(False)
         Me.GroupBox_Einstellungen.PerformLayout()
         Me.ResumeLayout(False)
@@ -874,4 +886,5 @@ Partial Class EVO_Einstellungen
     Public WithEvents LabelESHJ As System.Windows.Forms.Label
     Public WithEvents LabelTSHJgesamt As System.Windows.Forms.Label
     Public WithEvents LabelTSHJmittel As System.Windows.Forms.Label
+    Friend WithEvents checkpaintconstrained As System.Windows.Forms.CheckBox
 End Class

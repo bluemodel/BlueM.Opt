@@ -221,6 +221,8 @@ Public Class EVO_Einstellungen
             End If
             .n_MemberSekPop = TextNMemberSecondPop.Value
 
+            .is_paint_constraint = checkpaintconstrained.Checked
+
         End With
 
         'Hooke and Jeeves
@@ -267,6 +269,7 @@ Public Class EVO_Einstellungen
                 Me.TextInteract.Value = 0
             End If
             Me.TextNMemberSecondPop.Value = .n_MemberSekPop
+            Me.checkpaintconstrained.Checked = .is_paint_constraint
 
         End With
 
