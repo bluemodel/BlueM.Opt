@@ -33,7 +33,8 @@ Public Module Constants
         XY_Mitteln_Diskret = 8                  'Rekombination nach x/y-Schema, diskretes vertauschen der Gene, miteln der Strategieparameter
     End Enum
 
-    Public Enum EVO_DNMutation As Integer
+    'Option für die Mutation
+    Public Enum EVO_DnMutation As Integer
         Rechenberg = 1
         Schwefel = 2
     End Enum
