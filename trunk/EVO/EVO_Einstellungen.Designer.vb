@@ -126,21 +126,21 @@ Partial Class EVO_Einstellungen
         'TabPage_PES
         '
         Me.TabPage_PES.BackColor = System.Drawing.SystemColors.Control
-        Me.TabPage_PES.Controls.Add(Me.ComboMutation)
-        Me.TabPage_PES.Controls.Add(Me.Label_Mutation)
         Me.TabPage_PES.Controls.Add(Me.Label_OptModus)
         Me.TabPage_PES.Controls.Add(Me.Label_OptModusValue)
         Me.TabPage_PES.Controls.Add(Me.LabelStrategie)
         Me.TabPage_PES.Controls.Add(Me.ComboStrategie)
         Me.TabPage_PES.Controls.Add(Me.LabelStartwerte)
         Me.TabPage_PES.Controls.Add(Me.ComboOptVorgabe)
+        Me.TabPage_PES.Controls.Add(Me.Label_Mutation)
+        Me.TabPage_PES.Controls.Add(Me.ComboMutation)
         Me.TabPage_PES.Controls.Add(Me.LabelStartSchrittweite)
         Me.TabPage_PES.Controls.Add(Me.TextDeltaStart)
         Me.TabPage_PES.Controls.Add(Me.CheckisDnVektor)
         Me.TabPage_PES.Controls.Add(Me.GroupBox_Generationen)
         Me.TabPage_PES.Controls.Add(Me.CheckisPopul)
-        Me.TabPage_PES.Controls.Add(Me.checkpaintconstrained)
         Me.TabPage_PES.Controls.Add(Me.GroupBox_Populationen)
+        Me.TabPage_PES.Controls.Add(Me.checkpaintconstrained)
         Me.TabPage_PES.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_PES.Margin = New System.Windows.Forms.Padding(0)
         Me.TabPage_PES.Name = "TabPage_PES"
