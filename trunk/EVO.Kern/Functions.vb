@@ -463,4 +463,47 @@ Public Class Functions
 
     End Sub
 
+    'NDS_Crowding_Distance
+    '**************************
+    Public Sub Pareto_Crowding_Distance(ByRef _Individ() As Individuum)
+
+        Dim i As Integer
+        Dim j As Integer
+        Dim k As Integer
+        Dim swap As New Individuum("Swap", 0)
+        Dim fmin, fmax As Double
+        Dim StartIndex As Integer
+        Dim EndIndex As Integer
+
+        StartIndex = 0
+        EndIndex = _Individ.GetUpperBound(0)
+        For i = StartIndex To EndIndex
+            _Individ(i).Distance = 0.0
+        Next i
+
+        For k = 0 To NPenalty - 1
+            For i = StartIndex To EndIndex
+                For j = StartIndex To EndIndex
+                    If (_Individ(i).Penalty(k) < _Individ(j).Penalty(k)) Then
+                        swap = _Individ(i).Copy
+                        _Individ(i) = _Individ(j).Copy
+                        _Individ(j) = swap.Copy
+                    End If
+                Next j
+            Next i
+
+            fmin = _Individ(StartIndex).Penalty(k)
+            fmax = _Individ(EndIndex).Penalty(k)
+
+            _Individ(StartIndex).Distance = 1.0E+300
+            _Individ(EndIndex).Distance = 1.0E+300
+
+            For i = StartIndex + 1 To EndIndex - 1
+                If Not _Individ(i).Distance = 1.0E+300 Then
+                    _Individ(i).Distance = _Individ(i).Distance + (_Individ(i + 1).Penalty(k) - _Individ(i - 1).Penalty(k)) / (fmax - fmin)
+                End If
+            Next i
+        Next k
+    End Sub
+
 End Class

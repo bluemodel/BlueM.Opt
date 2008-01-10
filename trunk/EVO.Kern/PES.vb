@@ -84,6 +84,7 @@ Public Class PES
     '---Elternwerte--------
     Private Xe(,,) As Double                'Elternwerte der Variablen
     Private De(,,) As Double                'Elternschrittweite
+    Private Div(,) As Double                'Diversitätsmass
 
     '---Bestwerte----------
     Public Structure Bestwerte
@@ -91,6 +92,7 @@ Public Class PES
         Dim Db(,,) As Double                'Bestwertspeicher Schrittweite für eine Generation
         Dim Qb(,,) As Double                'Bestwertspeicher für eine Generation
         Dim Rb(,,) As Double                'Restriktionen für eine Generation
+        Dim Div(,) As Double                'Diversität der Individuen für eine Generation
     End Structure
 
     Public Best As Bestwerte
@@ -232,11 +234,13 @@ Public Class PES
         '---------------------
         ReDim De(Anz.Para - 1, Settings.PES.n_Eltern - 1, Settings.PES.Pop.n_Popul - 1)
         ReDim Xe(Anz.Para - 1, Settings.PES.n_Eltern - 1, Settings.PES.Pop.n_Popul - 1)
+        ReDim Div(Settings.PES.n_Eltern - 1, Settings.PES.Pop.n_Popul - 1)
         '---------------------
         ReDim Best.Db(Anz.Para - 1, Settings.PES.n_Eltern - 1, Settings.PES.Pop.n_Popul - 1)
         ReDim Best.Xb(Anz.Para - 1, Settings.PES.n_Eltern - 1, Settings.PES.Pop.n_Popul - 1)
         ReDim Best.Qb(Settings.PES.n_Eltern - 1, Settings.PES.Pop.n_Popul - 1, Anz.Penalty - 1)
         ReDim Best.Rb(Settings.PES.n_Eltern - 1, Settings.PES.Pop.n_Popul - 1, Anz.Constr - 1)
+        ReDim Best.Div(Settings.PES.n_Eltern - 1, Settings.PES.Pop.n_Popul - 1)
 
         'NDSorting wird nur benötigt, falls eine Paretofront approximiert wird
         If (Settings.PES.ty_EvoModus = EVO_MODUS.Multi_Objective) Then
@@ -510,6 +514,8 @@ Public Class PES
         Dim Realisierungsspeicher() As Integer
         Dim Elternspeicher() As Integer
         Dim Z1, Elter, Z2 As Integer
+        Dim TournamentElter1 As Integer
+        Dim TournamentElter2 As Integer
 
         Select Case Settings.PES.ty_OptEltern
 
@@ -577,7 +583,33 @@ Public Class PES
                     '2. Runde hat nur noch n_Eltern - 1 zur Verfügung
                     'usw.
                     'Kein Elter darf doppelt gezogen werden
-                    R = CInt(Int((Settings.PES.n_Eltern - (i)) * Rnd()))
+                    If (Settings.PES.is_diversity_tournement) Then
+
+                        R = CInt(Int((Settings.PES.n_Eltern - i) * Rnd()))
+                        TournamentElter1 = Elternspeicher(R)
+
+                        Do
+                            R = CInt(Int((Settings.PES.n_Eltern - i) * Rnd()))
+                        Loop While (R = TournamentElter1)
+                        TournamentElter2 = Elternspeicher(R)
+
+                        If Div(TournamentElter1, PES_iAkt.iAktPop) > Div(TournamentElter1, PES_iAkt.iAktPop) Then
+                            R = TournamentElter1
+                        ElseIf Div(TournamentElter1, PES_iAkt.iAktPop) = Div(TournamentElter2, PES_iAkt.iAktPop) Then
+                            R = CInt(Int(2 * Rnd())) 'Zufallsszahl zwischen 0 und 1 
+                            If R = 0 Then
+                                R = TournamentElter1
+                            Else
+                                R = TournamentElter2
+                            End If
+                        Else
+                            R = TournamentElter2
+                        End If
+
+                    Else
+                        R = CInt(Int((Settings.PES.n_Eltern - (i)) * Rnd()))
+                    End If
+                    'Kein Elter darf doppelt gezogen werden
                     Realisierungsspeicher(i) = Elternspeicher(R)
                     For j = R To Settings.PES.n_Eltern - 2
                         Elternspeicher(j) = Elternspeicher(j + 1)
@@ -609,7 +641,33 @@ Public Class PES
                     '2. Runde hat nur noch n_Eltern - 1 zur Verfügung
                     'usw.
                     'Kein Elter darf doppelt gezogen werden
-                    R = CInt(Int((Settings.PES.n_Eltern - (i)) * Rnd()))
+                    If (Settings.PES.is_diversity_tournement) Then
+
+                        R = CInt(Int((Settings.PES.n_Eltern - i) * Rnd()))
+                        TournamentElter1 = Elternspeicher(R)
+
+                        Do
+                            R = CInt(Int((Settings.PES.n_Eltern - i) * Rnd()))
+                        Loop While (R = TournamentElter1)
+                        TournamentElter2 = Elternspeicher(R)
+
+                        If Div(TournamentElter1, PES_iAkt.iAktPop) > Div(TournamentElter1, PES_iAkt.iAktPop) Then
+                            R = TournamentElter1
+                        ElseIf Div(TournamentElter1, PES_iAkt.iAktPop) = Div(TournamentElter2, PES_iAkt.iAktPop) Then
+                            R = CInt(Int(2 * Rnd())) 'Zufallsszahl zwischen 0 und 1 
+                            If R = 0 Then
+                                R = TournamentElter1
+                            Else
+                                R = TournamentElter2
+                            End If
+                        Else
+                            R = TournamentElter2
+                        End If
+
+                    Else
+                        R = CInt(Int((Settings.PES.n_Eltern - (i)) * Rnd()))
+                    End If
+                    'Kein Elter darf doppelt gezogen werden
                     Realisierungsspeicher(i) = Elternspeicher(R)
                     For j = R To Settings.PES.n_Eltern - 2
                         Elternspeicher(j) = Elternspeicher(j + 1)
@@ -643,11 +701,38 @@ Public Class PES
                     '2. Runde hat nur noch n_Eltern - 1 zur Verfügung
                     'usw.
                     'Kein Elter darf doppelt gezogen werden
-                    R = CInt(Int((Settings.PES.n_Eltern - (i)) * Rnd()))
+                    If (Settings.PES.is_diversity_tournement) Then
+
+                        R = CInt(Int((Settings.PES.n_Eltern - i) * Rnd()))
+                        TournamentElter1 = Elternspeicher(R)
+
+                        Do
+                            R = CInt(Int((Settings.PES.n_Eltern - i) * Rnd()))
+                        Loop While (R = TournamentElter1)
+                        TournamentElter2 = Elternspeicher(R)
+
+                        If Div(TournamentElter1, PES_iAkt.iAktPop) > Div(TournamentElter1, PES_iAkt.iAktPop) Then
+                            R = TournamentElter1
+                        ElseIf Div(TournamentElter1, PES_iAkt.iAktPop) = Div(TournamentElter2, PES_iAkt.iAktPop) Then
+                            R = CInt(Int(2 * Rnd())) 'Zufallsszahl zwischen 0 und 1 
+                            If R = 0 Then
+                                R = TournamentElter1
+                            Else
+                                R = TournamentElter2
+                            End If
+                        Else
+                            R = TournamentElter2
+                        End If
+
+                    Else
+                        R = CInt(Int((Settings.PES.n_Eltern - (i)) * Rnd()))
+                    End If
+                    'Kein Elter darf doppelt gezogen werden
                     Realisierungsspeicher(i) = Elternspeicher(R)
                     For j = R To Settings.PES.n_Eltern - 2
                         Elternspeicher(j) = Elternspeicher(j + 1)
                     Next j
+
                 Next i
                 For v = 0 To Anz.Para - 1
                     AktPara.Dn(v) = 0
@@ -783,6 +868,8 @@ StartMutation:
                 De(v, n, PES_iAkt.iAktPop) = DeTemp(v, n, PES_iAkt.iAktPop)
                 Xe(v, n, PES_iAkt.iAktPop) = XeTemp(v, n, PES_iAkt.iAktPop)
             Next v
+
+            Div(n, PES_iAkt.iAktPop) = 0 'Diversität wird erst nach der ersten Generation bestimmt
 
         Next n
 
@@ -1243,6 +1330,12 @@ StartMutation:
             '--------------------------------
             Dim Func1 As Kern.Functions = New Kern.Functions(Settings.PES.n_Nachf, Settings.PES.n_Eltern, Settings.PES.n_MemberSekPop, Settings.PES.n_Interact, Settings.PES.is_Interact, Anz.Penalty, Anz.Constr, PES_iAkt.iAktGen)
             Call Func1.EsEltern_Pareto_SekundärQb(Best_Indi, NDSorting, SekundärQb)
+            'Bestimmen der Crowding Distance falls Diversity-Tournament
+            '----------------------------------------------------------
+            If (Settings.PES.is_diversity_tournement) Then
+                Call Func1.Pareto_Crowding_Distance(Best_Indi)
+            End If
+
             'Am ende die Bestwerte wieder zurück
             For i = 0 To Best.Qb.GetUpperBound(0)
                 Call Copy_Individuum_to_Bestwert(i, Best_Indi)
@@ -1256,6 +1349,9 @@ StartMutation:
                     De(v, i, PES_iAkt.iAktPop) = Best.Db(v, i, PES_iAkt.iAktPop)
                     Xe(v, i, PES_iAkt.iAktPop) = Best.Xb(v, i, PES_iAkt.iAktPop)
                 Next v
+                If (Settings.PES.is_diversity_tournement) Then
+                    Div(i, PES_iAkt.iAktPop) = Best.Div(i, PES_iAkt.iAktPop)
+                End If
             Next i
 
             '6: Sortierung der Lösungen ist nur für Neighbourhood-Rekombination notwendig
@@ -1264,6 +1360,7 @@ StartMutation:
                 Call Neighbourhood_AbstandsArray()
                 Call Neighbourhood_Crowding_Distance()
             End If
+
 
         End If
 
@@ -1288,7 +1385,9 @@ StartMutation:
             Best.Db(v, i, PES_iAkt.iAktPop) = Individ(i).PES_d(v)
             Best.Xb(v, i, PES_iAkt.iAktPop) = Individ(i).PES_X(v)
         Next v
-
+        If (Settings.PES.is_diversity_tournement) Then
+            Best.Div(i, PES_iAkt.iAktPop) = Individ(i).Distance
+        End If
     End Sub
 
     'Kopiert den Bestwertspeicher in ein Individuum
