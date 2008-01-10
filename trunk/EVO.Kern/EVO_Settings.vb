@@ -21,9 +21,9 @@ Public Class EVO_Settings
         Public ty_StartPar As EVO_STARTPARAMETER   'Startparameter
 
         Public DnStart As Double                   'Startschrittweite
-        Public DNepsilon As Double              'Minimale Schrittweite
+        Public DNepsilon As Double                 'Minimale Schrittweite
         Public is_DnVektor As Boolean              'Soll ein Schrittweitenvektor benutzt werden
-        Public ty_DNMutation As EVO_DNMutation   'Art der Mutation
+        Public ty_DNMutation As EVO_DNMutation     'Art der Mutation
         Public DNC As Double                       'Skalierung des learning Parameters
 
         Public n_Gen As Integer                    'Anzahl Generationen
