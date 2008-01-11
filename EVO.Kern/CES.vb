@@ -18,46 +18,25 @@ Public Class CES
 #Region "Eigenschaften"
     '##################
 
+    Public CES_Settings As Evo_Settings.CES_Settings
+    
     'Public Variablen
     Public TestModus As Integer             'Gibt den Testmodus an
-
-    Public n_Combinations As Integer        'Anzahl aller Kombinationen
     Public n_Locations As Integer           'Anzahl der Locations wird von außen gesetzt
-    Public n_Penalty As Integer             'Anzahl der Ziele wird von außen gesetzt
-    Public n_Constrain as integer           'Anzahl der Rabdbedingungen
+    Public n_Combinations As Integer        'Anzahl aller Kombinationen
     Public n_Verzweig As Integer            'Anzahl der Verzweigungen in der Verzweigungsdatei
+    Public n_Penalty As Integer             'Anzahl der Ziele wird von außen gesetzt
+    Public n_Constrain As Integer           'Anzahl der Rabdbedingungen
     Public n_PathDimension() As Integer     'Anzahl der Maßnahmen an jeder Stelle
-
-    'Eingabe CES
-    Public n_Parts_of_Path As Integer = 3   'Länge des Gedächtnispfades Achtung Maximum ist 3
-    Public n_Generations As Integer = 500   'Anzahl der Generationen
-    Public n_Parents As Integer = 5
-    Public n_Childs As Integer = 15
-    Public n_MemberSecondPop As Integer = 50
-    Public n_Interact As Integer = 5
-    Public is_Interact As Boolean = True
-
-    'Eingabe Hybrid
-    Public n_PES_Parents As Integer = 5            'Anzahl der Eltern für PES Hybrid
-    Public n_PES_MemberSecondPop As Integer = 50
-    Public n_PES_Interact As Integer = 3
-    Public is_PES_Interact As Boolean = False
-    Public is_Pop As Boolean = False            'Gibt an ob bei der Population oder bei den Eltern in die PES gestiegen wird.
-
-    'Private Variablen
-    Private ReprodOperator As String = "Select_Random_Uniform"
-    Private MutOperator As String = "RND_Switch"
-    Private Strategy As String = "plus"         '"plus" oder "minus" Strategie
-    Private MutRate As Integer = 25              'Definiert die Wahrscheinlichkeit der Mutationsrate in %
 
     'Listen für die Individuen
     '*************************
     Public Childs() As EVO.Kern.Individuum
     Public Parents() As EVO.Kern.Individuum
     Private SekundärQb(-1) As EVO.Kern.Individuum
-    Public NDSorting(n_Childs + n_Parents - 1) As EVO.Kern.Individuum
+    Public NDSorting(CES_Settings.n_Childs + CES_Settings.n_Parents - 1) As EVO.Kern.Individuum
     'Checken ob es verwendet wird
-    Public NDSResult(n_Childs + n_Parents - 1) As EVO.Kern.Individuum
+    Public NDSResult(CES_Settings.n_Childs + CES_Settings.n_Parents - 1) As EVO.Kern.Individuum
 
     'Für Hybrid
     Public Memory() As EVO.Kern.Individuum
@@ -74,6 +53,74 @@ Public Class CES
 #Region "Methoden"
     '#############
 
+    'Initialisierung der PES
+    '***************************************
+    Public Sub CesInitialise(ByRef Settings As evo_settings.CES_Settings, ByVal AnzPenalty As Integer, ByVal AnzConstr As Integer, ByVal Method As String)
+
+        'Schritt 1: PES - ES_SETTINGS
+        'Optionen der Evolutionsstrategie werden übergeben
+        Call ESSettings(Settings, Method)
+
+    End Sub
+
+    'Schritt 1: ES_SETTINGS
+    'Function ES_SETTINGS übergibt Optionen für Evolutionsstrategie und Prüft die eingestellten Optionen
+    '***************************************************************************************************
+    Private Sub EsSettings(ByRef Settings As Evo_Settings.CES_Settings, ByVal Method As String)
+
+        'Überprüfung der Übergebenen Werte
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        If (CES_Settings.n_Parents < 1) Then
+            Throw New Exception("Die Anzahl der Eltern ist kleiner 1!")
+        End If
+        If (CES_Settings.n_Childs < 1) Then
+            Throw New Exception("Die Anzahl der Nachfahren ist kleiner 1!")
+        End If
+        If (CES_Settings.n_Generations < 1) Then
+            Throw New Exception("Die Anzahl der Generationen ist kleiner 1!")
+        End If
+        If (CES_Settings.n_Childs <= CES_Settings.n_Parents And Method <> "HYBRID") Then
+            Throw New Exception("Die Anzahl der Eltern muss kleiner als die Anzahl der Nachfahren!" & Chr(13) & Chr(10) & "'Rechenberg 73' schlägt ein Verhältnis von 1:3 bis 1:5 vor.")
+        End If
+        If (CES_Settings.ty_Strategy <> EVO_STRATEGIE.Komma And CES_Settings.ty_Strategy <> EVO_STRATEGIE.Plus) Then
+            Throw New Exception("Typ der Evolutionsstrategie ist nicht '+' oder ','")
+        End If
+        If (CES_Settings.ty_ReprodOp <> CES_REPRODOP.Select_Random_Uniform And CES_REPRODOP.Order_Crossover_OX AND CES_REPRODOP.Partially_Mapped_Crossover)
+            Throw New Exception("Typ der Reproduction ist nicht richtig!")
+        End If        
+        If (CES_Settings.ty_MutOperator <> CES_MUTATION.RND_Switch And CES_MUTATION.Dyn_Switch)
+            Throw New Exception("Typ der Mutation ist nicht richtig!")
+        End If
+        If (CES_Settings.n_MemberSecondPop < 1)
+            Throw New Exception("Die Zahl der Mitglieder der sekundären Population ist kleiner 1!")
+        End If
+        If (CES_Settings.n_PartsMem < 1 or CES_Settings.n_PartsMem > 3)
+            Throw New Exception("Die Zahl der Memory Parts muss zwischen 1und 3 liegen!")
+        End If
+        If (CES_Settings.n_Interact < 1) Then
+            Throw New Exception("Die Anzahl der Mitglieder des sekundären Population muss mindestens 1 sein!")
+        End If
+        If (CES_Settings.pr_MutRate < 1 or CES_Settings.pr_MutRate > 100) Then
+            Throw New Exception("Der Prozentsatz der Mutationrate muss zwischen 1 und 100 liegen!")
+        End If
+        If (CES_Settings.n_PES_MaxParents < 1) Then
+            Throw New Exception("Die Anzahl der Eltern für PES muss mindestens 1 sein!")
+        End If
+        If (CES_Settings.n_PES_MemSecPop < 1) Then
+            Throw New Exception("Die Anzahl der Memeber für PES sekundäre Population muss mindestens 1 sein!")
+        End If
+        If (CES_Settings.n_PES_Interact < 1) Then
+            Throw New Exception("Der Austausch mit der sekundären Population von PES muss mindestens 1 sein!")
+        End If
+
+        'Übergabe der Optionen
+        'xxxxxxxxxxxxxxxxxxxxx
+
+        Me.CES_Settings = Settings
+
+    End Sub
+
+
     'Normaler Modus: Generiert zufällige Paths für alle Kinder BM Problem
     '*********************************************************************
     Public Sub Generate_Random_Path()
@@ -83,7 +130,7 @@ Public Class CES
         Dim upperb As Integer
         Randomize()
 
-        For i = 0 To n_Childs - 1
+        For i = 0 To CES_Settings.n_Childs - 1
             Do
                 For j = 0 To n_Locations - 1
                     upperb = n_PathDimension(j) - 1
@@ -109,12 +156,12 @@ Public Class CES
             array(i) = 0
         Next
 
-        For i = 0 To n_Childs - 1
+        For i = 0 To CES_Settings.n_Childs - 1
             For j = 0 To Childs(i).Path.GetUpperBound(0)
                 Childs(i).Path(j) = array(j)
             Next
             array(0) += 1
-            If Not i = n_Childs - 1 Then
+            If Not i = CES_Settings.n_Childs - 1 Then
                 For j = 0 To Childs(i).Path.GetUpperBound(0)
                     If array(j) > n_PathDimension(j) - 1 Then
                         array(j) = 0
@@ -160,20 +207,20 @@ Public Class CES
 
         'Strategie MINUS
         'xxxxxxxxxxxxxxx
-        If Strategy = "minus" Then
-            For i = 0 To n_Parents - 1
+        If CES_Settings.ty_Strategy = "minus" Then
+            For i = 0 To CES_Settings.n_Parents - 1
                 Parents(i) = Childs(i).Copy
             Next i
 
             'Strategie PLUS
             'xxxxxxxxxxxxxx
-        ElseIf Strategy = "plus" Then
+        ElseIf CES_Settings.ty_Strategy = "plus" Then
 
-            For i = 0 To n_Childs - 1
+            For i = 0 To CES_Settings.n_Childs - 1
                 'Des schlechteste Elter wird bestimmt
                 Dim bad_no As Integer = 0
                 Dim bad_penalty As Double = Parents(0).Penalty(0)
-                For j = 1 To n_Parents - 1
+                For j = 1 To CES_Settings.n_Parents - 1
                     If bad_penalty < Parents(j).Penalty(0) Then
                         bad_no = j
                         bad_penalty = Parents(j).Penalty(0)
@@ -200,49 +247,49 @@ Public Class CES
         Dim x, y As Integer
         Dim Einzelkind(n_Locations - 1) As Integer
 
-        Select Case ReprodOperator
+        Select Case CES_Settings.ty_ReprodOp
             'UPGRADE: Eltern werden nicht zufällig gewählt sondern immer in Top Down Reihenfolge
-            Case "Select_Random_Uniform"
+            Case CES_REPRODOP.Select_Random_Uniform
                 x = 0
                 y = 1
-                For i = 0 To n_Childs - 2 Step 2
+                For i = 0 To CES_Settings.n_Childs - 2 Step 2
                     Call ReprodOp_Select_Random_Uniform(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
                     x += 1
                     y += 1
-                    If x = n_Parents - 1 Then x = 0
-                    If y = n_Parents - 1 Then y = 0
+                    If x = CES_Settings.n_Parents - 1 Then x = 0
+                    If y = CES_Settings.n_Parents - 1 Then y = 0
                 Next i
-                If Even_Number(n_Childs) = False Then
-                    Call ReprodOp_Select_Random_Uniform(Parents(x).Path, Parents(y).Path, Childs(n_Childs - 1).Path, Einzelkind)
+                If Even_Number(CES_Settings.n_Childs) = False Then
+                    Call ReprodOp_Select_Random_Uniform(Parents(x).Path, Parents(y).Path, Childs(CES_Settings.n_Childs - 1).Path, Einzelkind)
                 End If
 
-            Case "Order_Crossover (OX)"
+            Case CES_REPRODOP.Order_Crossover_OX
 
                 x = 0
                 y = 1
-                For i = 0 To n_Childs - 2 Step 2
+                For i = 0 To CES_Settings.n_Childs - 2 Step 2
                     Call ReprodOp_Order_Crossover(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
                     x += 1
                     y += 1
-                    If x = n_Parents - 1 Then x = 0
-                    If y = n_Parents - 1 Then y = 0
+                    If x = CES_Settings.n_Parents - 1 Then x = 0
+                    If y = CES_Settings.n_Parents - 1 Then y = 0
                 Next i
-                If Even_Number(n_Childs) = False Then
-                    Call ReprodOp_Order_Crossover(Parents(x).Path, Parents(y).Path, Childs(n_Childs - 1).Path, Einzelkind)
+                If Even_Number(CES_Settings.n_Childs) = False Then
+                    Call ReprodOp_Order_Crossover(Parents(x).Path, Parents(y).Path, Childs(CES_Settings.n_Childs - 1).Path, Einzelkind)
                 End If
 
-            Case "Partially_Mapped_Crossover"
+            Case CES_REPRODOP.Partially_Mapped_Crossover
                 x = 0
                 y = 1
-                For i = 0 To n_Childs - 2 Step 2
+                For i = 0 To CES_Settings.n_Childs - 2 Step 2
                     Call ReprodOp_Part_Mapped_Crossover(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
                     x += 1
                     y += 1
-                    If x = n_Parents - 1 Then x = 0
-                    If y = n_Parents - 1 Then y = 0
+                    If x = CES_Settings.n_Parents - 1 Then x = 0
+                    If y = CES_Settings.n_Parents - 1 Then y = 0
                 Next i
-                If Even_Number(n_Childs) = False Then
-                    Call ReprodOp_Part_Mapped_Crossover(Parents(x).Path, Parents(y).Path, Childs(n_Childs - 1).Path, Einzelkind)
+                If Even_Number(CES_Settings.n_Childs) = False Then
+                    Call ReprodOp_Part_Mapped_Crossover(Parents(x).Path, Parents(y).Path, Childs(CES_Settings.n_Childs - 1).Path, Einzelkind)
                 End If
 
         End Select
@@ -416,15 +463,15 @@ Public Class CES
     Public Sub Mutation_Control()
         Dim i As Integer
 
-        For i = 0 To n_Childs - 1
+        For i = 0 To CES_Settings.n_Childs - 1
             Dim count As Integer = 0
             Do
-                Select Case MutOperator
-                    Case "RND_Switch"
+                Select Case CES_Settings.ty_MutOperator
+                    Case CES_MUTATION.RND_Switch
                         'Verändert zufällig ein gen des Paths
                         Call MutOp_RND_Switch(Childs(i).Path)
 
-                    Case "Dyn_Switch"
+                    Case CES_MUTATION.Dyn_Switch
                         'Verändert zufällig ein gen des Paths mit dynamisch erhöhter Mutationsrate
                         Call MutOp_Dyn_Switch(Childs(i).Path, count)
                 End Select
@@ -450,7 +497,7 @@ Public Class CES
 
         For i = 0 To Path.GetUpperBound(0)
             Tmp_a = CInt(Int((upperb_a - lowerb_a + 1) * Rnd() + lowerb_a))
-            If Tmp_a <= MutRate Then
+            If Tmp_a <= CES_Settings.pr_MutRate Then
                 upperb_b = n_PathDimension(i) - 1
                 'Randomize() nicht vergessen
                 Tmp_b = CInt(Int((upperb_b - lowerb_b + 1) * Rnd() + lowerb_b))
@@ -541,7 +588,7 @@ Public Class CES
                 End If
 
                 'Rank Nummer 2 (Übereinstimmung in Location 1 und 2)
-                If Not j = n_Locations - 1 And n_Parts_of_Path > 1 Then
+                If Not j = n_Locations - 1 And CES_Settings.n_PartsMem > 1 Then
                     If Child.Path(j) = Memory(m).Path(j) And Child.Path(j + 1) = Memory(m).Path(j + 1) Then
                         ReDim Preserve PES_Parents_pChild(PES_Parents_pChild.GetLength(0))
                         PES_Parents_pChild(PES_Parents_pChild.GetUpperBound(0)) = New Individuum("PES_Parent", PES_Parents_pChild.GetUpperBound(0))
@@ -554,7 +601,7 @@ Public Class CES
                 End If
 
                 'Rank Nummer 3 (Übereinstimmung in Location 1, 2 und 3)
-                If Not (j = n_Locations - 1 Or j = n_Locations - 2) And n_Parts_of_Path > 2 Then
+                If Not (j = n_Locations - 1 Or j = n_Locations - 2) And CES_Settings.n_PartsMem > 2 Then
                     If Child.Path(j) = Memory(m).Path(j) And Child.Path(j + 1) = Memory(m).Path(j + 1) And Child.Path(j + 2) = Memory(m).Path(j + 2) Then
                         ReDim Preserve PES_Parents_pChild(PES_Parents_pChild.GetLength(0))
                         PES_Parents_pChild(PES_Parents_pChild.GetUpperBound(0)) = New Individuum("PES_Parent", PES_Parents_pChild.GetUpperBound(0))
@@ -581,7 +628,7 @@ Public Class CES
         Dim i As Integer
         ReDim PES_Parents_pLoc(-1)
 
-        Dim x as Integer = 0 
+        Dim x As Integer = 0
         For i = 0 To PES_Parents_pChild.GetUpperBound(0)
             If PES_Parents_pChild(i).iLocation = iLoc + 1 Then
                 ReDim Preserve PES_Parents_pLoc(x)
@@ -609,17 +656,17 @@ Public Class CES
 
         'Die Anzahlen werden hier speziell errechnet
         Dim n_PES_Childs As Integer
-        n_PES_Childs = PES_Parents_pLoc.GetLength(0) - n_PES_Parents
+        n_PES_Childs = PES_Parents_pLoc.GetLength(0) - CES_Settings.n_PES_MaxParents
 
         'Die Eltern werden zurückgesetzt
-        ReDim PES_Parents_pLoc(n_PES_Parents - 1)
+        ReDim PES_Parents_pLoc(CES_Settings.n_PES_MaxParents - 1)
 
         '********************* Alles in der Klasse Functions ****************************************
         '2. Die einzelnen Fronten werden bestimmt
         '3. Der Bestwertspeicher wird entsprechend der Fronten oder der sekundären Population gefüllt
         '4: Sekundäre Population wird bestimmt und gespeichert
         '--------------------------------
-        Dim Func1 As New Kern.Functions(n_PES_Childs, n_PES_Parents, n_PES_MemberSecondPop, n_PES_Interact, is_PES_Interact, n_Penalty, n_Constrain, 1)
+        Dim Func1 As New Kern.Functions(n_PES_Childs, CES_Settings.n_PES_MaxParents, CES_Settings.n_PES_MemSecPop, CES_Settings.n_PES_Interact, CES_Settings.is_PES_SecPop, n_Penalty, n_Constrain, 1)
         Call Func1.EsEltern_Pareto_SekundärQb(PES_Parents_pLoc, NDSorting, PES_SekundärQb)
         '********************************************************************************************
 
@@ -727,7 +774,7 @@ Public Class CES
         PathOK = False
         Is_Twin = False
 
-        For i = 0 To n_Childs - 1
+        For i = 0 To CES_Settings.n_Childs - 1
             If ChildIndex <> i And Childs(i).mutated = True Then
                 PathOK = False
                 For j = 0 To Childs(ChildIndex).Path.GetUpperBound(0)
@@ -750,7 +797,7 @@ Public Class CES
         PathOK = False
         Is_Clone = False
 
-        For i = 0 To n_Parents - 1
+        For i = 0 To CES_Settings.n_Parents - 1
             PathOK = False
             For j = 0 To Childs(ChildIndex).Path.GetUpperBound(0)
                 If Childs(ChildIndex).Path(j) <> Parents(i).Path(j) Then
@@ -820,14 +867,14 @@ Public Class CES
     Public Sub NDSorting_Control(ByVal iAktGen As Integer)
         Dim i As Short
 
-        Dim NDSorting(n_Childs + n_Parents - 1) As Individuum
+        Dim NDSorting(CES_Settings.n_Childs + CES_Settings.n_Parents - 1) As Individuum
         Call Individuum.New_Array("NDSorting", NDSorting)
 
         '0. Eltern und Nachfolger werden gemeinsam betrachtet
         'Die Kinder werden NDSorting hinzugefügt
         '-------------------------------------------
 
-        For i = 0 To n_Childs - 1
+        For i = 0 To CES_Settings.n_Childs - 1
             NDSorting(i) = Childs(i).Copy
             NDSorting(i).dominated = False
             NDSorting(i).Front = 0
@@ -838,8 +885,8 @@ Public Class CES
         'Nur Eltern werden NDSorting hinzugefügt, Kinder sind schon oben drin
         '--------------------------------------------------------------------
 
-        For i = n_Childs To n_Childs + n_Parents - 1
-            NDSorting(i) = Parents(i - n_Childs).Copy
+        For i = CES_Settings.n_Childs To CES_Settings.n_Childs + CES_Settings.n_Parents - 1
+            NDSorting(i) = Parents(i - CES_Settings.n_Childs).Copy
             NDSorting(i).dominated = False
             NDSorting(i).Front = 0
             NDSorting(i).Distance = 0
@@ -850,7 +897,7 @@ Public Class CES
         '3. Der Bestwertspeicher wird entsprechend der Fronten oder der sekundären Population gefüllt
         '4: Sekundäre Population wird bestimmt und gespeichert
         '--------------------------------
-        Dim Func1 As New Kern.Functions(n_Childs, n_Parents, n_MemberSecondPop, n_Interact, is_Interact, n_Penalty, n_Constrain, iAktGen)
+        Dim Func1 As New Kern.Functions(CES_Settings.n_Childs, CES_Settings.n_Parents, CES_Settings.n_MemberSecondPop, CES_Settings.n_Interact, CES_Settings.is_SecPop, n_Penalty, n_Constrain, iAktGen)
         Call Func1.EsEltern_Pareto_SekundärQb(Parents, NDSorting, SekundärQb)
         '********************************************************************************************
 
@@ -897,5 +944,6 @@ Public Class CES
 #End Region 'Methoden
 
 End Class
+
 
 

@@ -125,7 +125,7 @@ Public Class PES
     '***************************************
     Public Sub PesInitialise(ByRef settings As EVO_Settings, ByVal AnzPara As Integer, ByVal AnzPenalty As Integer, ByVal AnzConstr As Integer, ByRef Parameter() As Double, ByVal beziehungen() As Beziehung, ByVal Method As String)
 
-        'Schritt 1: PES - ES_OPTIONS
+        'Schritt 1: PES - ES_SETTINGS
         'Optionen der Evolutionsstrategie werden übergeben
         Call EsSettings(settings, Method)
 

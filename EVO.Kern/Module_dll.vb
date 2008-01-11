@@ -21,6 +21,19 @@ Public Module Constants
         Komma = 2                               'nur Nachfolger
     End Enum
 
+    'Reproduktionsoperator
+    Public Enum CES_REPRODOP as Integer
+        Select_Random_Uniform = 1
+        Order_Crossover_OX = 2
+        Partially_Mapped_Crossover = 3
+    End Enum
+
+    'Mutationsoperator
+    Public Enum CES_MUTATION as Integer
+        RND_Switch = 1
+        Dyn_Switch = 2
+    End Enum
+
     'Option zur Erzeugung der Eltern
     Public Enum EVO_ELTERN As Integer
         Selektion = 1                           'zufällige Selektion as Bestwertspeicher
