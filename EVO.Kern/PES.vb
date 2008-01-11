@@ -1025,8 +1025,8 @@ StartMutation:
         Do
             V1 = 2 * Rnd() - 1
             V2 = 2 * Rnd() - 1
-            r = V1 ^ 2 + V2 ^ 2
-        Loop While (r >= 1)
+            r = V1 * V1 + V2 * V2
+        Loop Until (r <= 1)
         fac = Math.Sqrt(-2 * Math.Log(r) / r)
         gauss = V2 * fac
         gauss = gauss * sd + mean
