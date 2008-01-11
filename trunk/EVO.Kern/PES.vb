@@ -85,6 +85,7 @@ Public Class PES
     Private Xe(,,) As Double                'Elternwerte der Variablen
     Private De(,,) As Double                'Elternschrittweite
     Private Div(,) As Double                'Diversitätsmass
+    Private Front(,) As Integer             'Front
 
     '---Bestwerte----------
     Public Structure Bestwerte
@@ -93,6 +94,7 @@ Public Class PES
         Dim Qb(,,) As Double                'Bestwertspeicher für eine Generation
         Dim Rb(,,) As Double                'Restriktionen für eine Generation
         Dim Div(,) As Double                'Diversität der Individuen für eine Generation
+        Dim Front(,) As Double              'Front der Individuen
     End Structure
 
     Public Best As Bestwerte
@@ -235,12 +237,14 @@ Public Class PES
         ReDim De(Anz.Para - 1, Settings.PES.n_Eltern - 1, Settings.PES.Pop.n_Popul - 1)
         ReDim Xe(Anz.Para - 1, Settings.PES.n_Eltern - 1, Settings.PES.Pop.n_Popul - 1)
         ReDim Div(Settings.PES.n_Eltern - 1, Settings.PES.Pop.n_Popul - 1)
+        ReDim Front(Settings.PES.n_Eltern - 1, Settings.PES.Pop.n_Popul - 1)
         '---------------------
         ReDim Best.Db(Anz.Para - 1, Settings.PES.n_Eltern - 1, Settings.PES.Pop.n_Popul - 1)
         ReDim Best.Xb(Anz.Para - 1, Settings.PES.n_Eltern - 1, Settings.PES.Pop.n_Popul - 1)
         ReDim Best.Qb(Settings.PES.n_Eltern - 1, Settings.PES.Pop.n_Popul - 1, Anz.Penalty - 1)
         ReDim Best.Rb(Settings.PES.n_Eltern - 1, Settings.PES.Pop.n_Popul - 1, Anz.Constr - 1)
         ReDim Best.Div(Settings.PES.n_Eltern - 1, Settings.PES.Pop.n_Popul - 1)
+        ReDim Best.Front(Settings.PES.n_Eltern - 1, Settings.PES.Pop.n_Popul - 1)
 
         'NDSorting wird nur benötigt, falls eine Paretofront approximiert wird
         If (Settings.PES.ty_EvoModus = EVO_MODUS.Multi_Objective) Then
@@ -593,17 +597,23 @@ Public Class PES
                         Loop While (R = TournamentElter1)
                         TournamentElter2 = Elternspeicher(R)
 
-                        If Div(TournamentElter1, PES_iAkt.iAktPop) > Div(TournamentElter1, PES_iAkt.iAktPop) Then
+                        If Front(TournamentElter1, PES_iAkt.iAktPop) < Front(TournamentElter2, PES_iAkt.iAktPop) Then
                             R = TournamentElter1
-                        ElseIf Div(TournamentElter1, PES_iAkt.iAktPop) = Div(TournamentElter2, PES_iAkt.iAktPop) Then
-                            R = CInt(Int(2 * Rnd())) 'Zufallsszahl zwischen 0 und 1 
-                            If R = 0 Then
+                        ElseIf Front(TournamentElter1, PES_iAkt.iAktPop) > Front(TournamentElter2, PES_iAkt.iAktPop) Then
+                            R = TournamentElter2
+                        Else
+                            If Div(TournamentElter1, PES_iAkt.iAktPop) > Div(TournamentElter2, PES_iAkt.iAktPop) Then
                                 R = TournamentElter1
+                            ElseIf Div(TournamentElter1, PES_iAkt.iAktPop) = Div(TournamentElter2, PES_iAkt.iAktPop) Then
+                                R = CInt(Int(2 * Rnd())) 'Zufallsszahl zwischen 0 und 1 
+                                If R = 0 Then
+                                    R = TournamentElter1
+                                Else
+                                    R = TournamentElter2
+                                End If
                             Else
                                 R = TournamentElter2
                             End If
-                        Else
-                            R = TournamentElter2
                         End If
 
                     Else
@@ -651,27 +661,33 @@ Public Class PES
                         Loop While (R = TournamentElter1)
                         TournamentElter2 = Elternspeicher(R)
 
-                        If Div(TournamentElter1, PES_iAkt.iAktPop) > Div(TournamentElter1, PES_iAkt.iAktPop) Then
+                        If Front(TournamentElter1, PES_iAkt.iAktPop) < Front(TournamentElter2, PES_iAkt.iAktPop) Then
                             R = TournamentElter1
-                        ElseIf Div(TournamentElter1, PES_iAkt.iAktPop) = Div(TournamentElter2, PES_iAkt.iAktPop) Then
-                            R = CInt(Int(2 * Rnd())) 'Zufallsszahl zwischen 0 und 1 
-                            If R = 0 Then
+                        ElseIf Front(TournamentElter1, PES_iAkt.iAktPop) > Front(TournamentElter2, PES_iAkt.iAktPop) Then
+                            R = TournamentElter2
+                        Else
+                            If Div(TournamentElter1, PES_iAkt.iAktPop) > Div(TournamentElter2, PES_iAkt.iAktPop) Then
                                 R = TournamentElter1
+                            ElseIf Div(TournamentElter1, PES_iAkt.iAktPop) = Div(TournamentElter2, PES_iAkt.iAktPop) Then
+                                R = CInt(Int(2 * Rnd())) 'Zufallsszahl zwischen 0 und 1 
+                                If R = 0 Then
+                                    R = TournamentElter1
+                                Else
+                                    R = TournamentElter2
+                                End If
                             Else
                                 R = TournamentElter2
                             End If
-                        Else
-                            R = TournamentElter2
                         End If
 
                     Else
                         R = CInt(Int((Settings.PES.n_Eltern - (i)) * Rnd()))
                     End If
-                    'Kein Elter darf doppelt gezogen werden
-                    Realisierungsspeicher(i) = Elternspeicher(R)
-                    For j = R To Settings.PES.n_Eltern - 2
-                        Elternspeicher(j) = Elternspeicher(j + 1)
-                    Next j
+                        'Kein Elter darf doppelt gezogen werden
+                        Realisierungsspeicher(i) = Elternspeicher(R)
+                        For j = R To Settings.PES.n_Eltern - 2
+                            Elternspeicher(j) = Elternspeicher(j + 1)
+                        Next j
                 Next i
 
                 For v = 0 To Anz.Para - 1
@@ -711,27 +727,33 @@ Public Class PES
                         Loop While (R = TournamentElter1)
                         TournamentElter2 = Elternspeicher(R)
 
-                        If Div(TournamentElter1, PES_iAkt.iAktPop) > Div(TournamentElter1, PES_iAkt.iAktPop) Then
+                        If Front(TournamentElter1, PES_iAkt.iAktPop) < Front(TournamentElter2, PES_iAkt.iAktPop) Then
                             R = TournamentElter1
-                        ElseIf Div(TournamentElter1, PES_iAkt.iAktPop) = Div(TournamentElter2, PES_iAkt.iAktPop) Then
-                            R = CInt(Int(2 * Rnd())) 'Zufallsszahl zwischen 0 und 1 
-                            If R = 0 Then
+                        ElseIf Front(TournamentElter1, PES_iAkt.iAktPop) > Front(TournamentElter2, PES_iAkt.iAktPop) Then
+                            R = TournamentElter2
+                        Else
+                            If Div(TournamentElter1, PES_iAkt.iAktPop) > Div(TournamentElter2, PES_iAkt.iAktPop) Then
                                 R = TournamentElter1
+                            ElseIf Div(TournamentElter1, PES_iAkt.iAktPop) = Div(TournamentElter2, PES_iAkt.iAktPop) Then
+                                R = CInt(Int(2 * Rnd())) 'Zufallsszahl zwischen 0 und 1 
+                                If R = 0 Then
+                                    R = TournamentElter1
+                                Else
+                                    R = TournamentElter2
+                                End If
                             Else
                                 R = TournamentElter2
                             End If
-                        Else
-                            R = TournamentElter2
                         End If
 
                     Else
                         R = CInt(Int((Settings.PES.n_Eltern - (i)) * Rnd()))
                     End If
-                    'Kein Elter darf doppelt gezogen werden
-                    Realisierungsspeicher(i) = Elternspeicher(R)
-                    For j = R To Settings.PES.n_Eltern - 2
-                        Elternspeicher(j) = Elternspeicher(j + 1)
-                    Next j
+                        'Kein Elter darf doppelt gezogen werden
+                        Realisierungsspeicher(i) = Elternspeicher(R)
+                        For j = R To Settings.PES.n_Eltern - 2
+                            Elternspeicher(j) = Elternspeicher(j + 1)
+                        Next j
 
                 Next i
                 For v = 0 To Anz.Para - 1
@@ -776,53 +798,59 @@ Public Class PES
                     Loop While (R = TournamentElter1)
                     TournamentElter2 = Elternspeicher(R)
 
-                    If Div(TournamentElter1, PES_iAkt.iAktPop) > Div(TournamentElter1, PES_iAkt.iAktPop) Then
+                    If Front(TournamentElter1, PES_iAkt.iAktPop) < Front(TournamentElter2, PES_iAkt.iAktPop) Then
                         R = TournamentElter1
-                    ElseIf Div(TournamentElter1, PES_iAkt.iAktPop) = Div(TournamentElter2, PES_iAkt.iAktPop) Then
-                        R = CInt(Int(2 * Rnd())) 'Zufallsszahl zwischen 0 und 1 
-                        If R = 0 Then
+                    ElseIf Front(TournamentElter1, PES_iAkt.iAktPop) > Front(TournamentElter2, PES_iAkt.iAktPop) Then
+                        R = TournamentElter2
+                    Else
+                        If Div(TournamentElter1, PES_iAkt.iAktPop) > Div(TournamentElter2, PES_iAkt.iAktPop) Then
                             R = TournamentElter1
+                        ElseIf Div(TournamentElter1, PES_iAkt.iAktPop) = Div(TournamentElter2, PES_iAkt.iAktPop) Then
+                            R = CInt(Int(2 * Rnd())) 'Zufallsszahl zwischen 0 und 1 
+                            If R = 0 Then
+                                R = TournamentElter1
+                            Else
+                                R = TournamentElter2
+                            End If
                         Else
                             R = TournamentElter2
                         End If
-                    Else
-                        R = TournamentElter2
                     End If
                 Else
                     R = CInt(Int((Settings.PES.n_Eltern) * Rnd()))
                 End If
 
-                Elter = R
+                    Elter = R
 
-                If (Elter = 0 Or Elter = Settings.PES.n_Eltern - 1) Then
-                    For v = 0 To Anz.Para - 1
-                        'Selektion der Schrittweite
-                        AktPara.Dn(v) = De(v, Elter, PES_iAkt.iAktPop)
-                        'Selektion des Elter
-                        AktPara.Xn(v) = Xe(v, Elter, PES_iAkt.iAktPop)
-                    Next
-                Else
-                    'BUG 135
-                    Dim IndexEltern(Settings.PES.n_Eltern - 1) As Integer          'Array mit Index der Eltern (Neighbourhood-Rekomb.)
-                    Call Neighbourhood_Eltern(Elter, IndexEltern)
-                    For v = 0 To Anz.Para - 1
-                        'Do
-                        '    Faktor = Rnd
-                        '    Faktor = (-1) * Eigenschaft.d + Faktor * (1 + Eigenschaft.d)
-                        '    'Selektion der Schrittweite
-                        '    Eigenschaft.Dn(v) = De(v, IndexEltern(1), Eigenschaft.iaktuellePopulation) * Faktor + _
-                        '                     De(v, IndexEltern(2), Eigenschaft.iaktuellePopulation) * (1 - Faktor)
-                        '    Eigenschaft.Xn(v) = Xe(v, IndexEltern(1), Eigenschaft.iaktuellePopulation) * Faktor + _
-                        '                     Xe(v, IndexEltern(2), Eigenschaft.iaktuellePopulation) * (1 - Faktor)
-                        'Loop While (Eigenschaft.Xn(v) <= Eigenschaft.Xmin(v) Or Eigenschaft.Xn(v) > Eigenschaft.Xmax(v))
+                    If (Elter = 0 Or Elter = Settings.PES.n_Eltern - 1) Then
+                        For v = 0 To Anz.Para - 1
+                            'Selektion der Schrittweite
+                            AktPara.Dn(v) = De(v, Elter, PES_iAkt.iAktPop)
+                            'Selektion des Elter
+                            AktPara.Xn(v) = Xe(v, Elter, PES_iAkt.iAktPop)
+                        Next
+                    Else
+                        'BUG 135
+                        Dim IndexEltern(Settings.PES.n_Eltern - 1) As Integer          'Array mit Index der Eltern (Neighbourhood-Rekomb.)
+                        Call Neighbourhood_Eltern(Elter, IndexEltern)
+                        For v = 0 To Anz.Para - 1
+                            'Do
+                            '    Faktor = Rnd
+                            '    Faktor = (-1) * Eigenschaft.d + Faktor * (1 + Eigenschaft.d)
+                            '    'Selektion der Schrittweite
+                            '    Eigenschaft.Dn(v) = De(v, IndexEltern(1), Eigenschaft.iaktuellePopulation) * Faktor + _
+                            '                     De(v, IndexEltern(2), Eigenschaft.iaktuellePopulation) * (1 - Faktor)
+                            '    Eigenschaft.Xn(v) = Xe(v, IndexEltern(1), Eigenschaft.iaktuellePopulation) * Faktor + _
+                            '                     Xe(v, IndexEltern(2), Eigenschaft.iaktuellePopulation) * (1 - Faktor)
+                            'Loop While (Eigenschaft.Xn(v) <= Eigenschaft.Xmin(v) Or Eigenschaft.Xn(v) > Eigenschaft.Xmax(v))
 
-                        R = Int(Settings.PES.n_RekombXY * Rnd())
-                        'Selektion der Schrittweite
-                        AktPara.Dn(v) = De(v, IndexEltern(R), PES_iAkt.iAktPop)
-                        'Selektion des Elter
-                        AktPara.Xn(v) = Xe(v, IndexEltern(R), PES_iAkt.iAktPop)
-                    Next
-                End If
+                            R = Int(Settings.PES.n_RekombXY * Rnd())
+                            'Selektion der Schrittweite
+                            AktPara.Dn(v) = De(v, IndexEltern(R), PES_iAkt.iAktPop)
+                            'Selektion des Elter
+                            AktPara.Xn(v) = Xe(v, IndexEltern(R), PES_iAkt.iAktPop)
+                        Next
+                    End If
         End Select
 
     End Sub
@@ -1385,6 +1413,7 @@ StartMutation:
                 Next v
                 If (Settings.PES.is_DiversityTournament) Then
                     Div(i, PES_iAkt.iAktPop) = Best.Div(i, PES_iAkt.iAktPop)
+                    Front(i, PES_iAkt.iAktPop) = Best.Front(i, PES_iAkt.iAktPop)
                 End If
             Next i
 
@@ -1421,6 +1450,7 @@ StartMutation:
         Next v
         If (Settings.PES.is_DiversityTournament) Then
             Best.Div(i, PES_iAkt.iAktPop) = Individ(i).Distance
+            Best.Front(i, PES_iAkt.iAktPop) = Individ(i).Front
         End If
     End Sub
 
