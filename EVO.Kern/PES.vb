@@ -148,10 +148,10 @@ Public Class PES
 
         'Überprüfung der Übergebenen Werte
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        If (settings.PES.ty_EvoStrategie <> EVO_STRATEGIE.Komma And settings.PES.ty_EvoStrategie <> EVO_STRATEGIE.Plus) Then
+        If (settings.PES.ty_EvoStrategie <> EVO_STRATEGIE.Komma_Strategy And settings.PES.ty_EvoStrategie <> EVO_STRATEGIE.Plus_Strategy) Then
             Throw New Exception("Typ der Evolutionsstrategie ist nicht '+' oder ','")
         End If
-        If (settings.PES.Pop.ty_PopEvoTyp <> EVO_STRATEGIE.Komma And settings.PES.Pop.ty_PopEvoTyp <> EVO_STRATEGIE.Plus) Then
+        If (settings.PES.Pop.ty_PopEvoTyp <> EVO_STRATEGIE.Komma_Strategy And settings.PES.Pop.ty_PopEvoTyp <> EVO_STRATEGIE.Plus_Strategy) Then
             Throw New Exception("Typ der Evolutionsstrategie auf Populationsebene ist nicht '+' oder ','")
         End If
         If (settings.PES.Pop.n_Runden < 1) Then
@@ -1231,7 +1231,7 @@ StartMutation:
     Public Sub EsResetBWSpeicher()
         Dim n, i As Integer
 
-        If (Settings.PES.ty_EvoStrategie = EVO_STRATEGIE.Komma) Then
+        If (Settings.PES.ty_EvoStrategie = EVO_STRATEGIE.Komma_Strategy) Then
             For n = 0 To Settings.PES.n_Eltern - 1
                 For i = 0 To Anz.Penalty - 1
                     Best.Qb(n, PES_iAkt.iAktPop, i) = 1.0E+300
@@ -1247,7 +1247,7 @@ StartMutation:
     Public Sub EsResetPopBWSpeicher()
         Dim n, i As Integer
 
-        If (Settings.PES.Pop.ty_PopEvoTyp = EVO_STRATEGIE.Komma) Then
+        If (Settings.PES.Pop.ty_PopEvoTyp = EVO_STRATEGIE.Komma_Strategy) Then
             For n = 0 To Settings.PES.Pop.n_Popul - 1
                 For i = 0 To Anz.Penalty - 1
                     Qbpop(n, i) = 1.0E+300
