@@ -123,14 +123,11 @@ Partial Class EVO_Einstellungen
         Me.Label1 = New System.Windows.Forms.Label
         Me.TextDeltaStartHJ = New System.Windows.Forms.NumericUpDown
         Me.CheckBoxDNVektorHJ = New System.Windows.Forms.CheckBox
-        Me.CESREPRODOPBindingSource = New System.Windows.Forms.BindingSource(Me.components)
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip
         Me.ÖffnenToolStripButton = New System.Windows.Forms.ToolStripButton
         Me.SpeichernToolStripButton = New System.Windows.Forms.ToolStripButton
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox
-        Me.EVOSTRATEGIEBindingSource = New System.Windows.Forms.BindingSource(Me.components)
-        Me.EVOSTRATEGIEBindingSource1 = New System.Windows.Forms.BindingSource(Me.components)
         Me.TabControl1.SuspendLayout()
         Me.TabPage_PES.SuspendLayout()
         CType(Me.TextDeltaStart, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -161,11 +158,8 @@ Partial Class EVO_Einstellungen
         Me.TabPage_HookeJeeves.SuspendLayout()
         CType(Me.TextDeltaFinishHJ, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.TextDeltaStartHJ, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.CESREPRODOPBindingSource, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ToolStrip1.SuspendLayout()
         Me.GroupBox_Einstellungen.SuspendLayout()
-        CType(Me.EVOSTRATEGIEBindingSource, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.EVOSTRATEGIEBindingSource1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'TabControl1
@@ -889,9 +883,8 @@ Partial Class EVO_Einstellungen
         '
         'ComboCESReproduction
         '
-        Me.ComboCESReproduction.DataSource = New IHWB.EVO.Kern.Constants.CES_REPRODOP() {IHWB.EVO.Kern.Constants.CES_REPRODOP.Selt_Rand_Uniform, IHWB.EVO.Kern.Constants.CES_REPRODOP.Order_Crossover, IHWB.EVO.Kern.Constants.CES_REPRODOP.Part_Mapped_Cross}
+        Me.ComboCESReproduction.DataSource = System.Enum.GetValues(GetType(EVO.Kern.Constants.CES_REPRODOP))
         Me.ComboCESReproduction.FormattingEnabled = True
-        Me.ComboCESReproduction.Items.AddRange(New Object() {IHWB.EVO.Kern.Constants.CES_REPRODOP.Selt_Rand_Uniform, IHWB.EVO.Kern.Constants.CES_REPRODOP.Order_Crossover, IHWB.EVO.Kern.Constants.CES_REPRODOP.Part_Mapped_Cross})
         Me.ComboCESReproduction.Location = New System.Drawing.Point(69, 124)
         Me.ComboCESReproduction.Name = "ComboCESReproduction"
         Me.ComboCESReproduction.Size = New System.Drawing.Size(123, 21)
@@ -967,10 +960,8 @@ Partial Class EVO_Einstellungen
         '
         'ComboCESMutation
         '
-        Me.ComboCESMutation.DataSource = New IHWB.EVO.Kern.Constants.CES_MUTATION() {IHWB.EVO.Kern.Constants.CES_MUTATION.RND_Switch, IHWB.EVO.Kern.Constants.CES_MUTATION.Dyn_Switch}
+        Me.ComboCESMutation.DataSource = System.Enum.GetValues(GetType(EVO.Kern.Constants.CES_MUTATION))
         Me.ComboCESMutation.FormattingEnabled = True
-        Me.ComboCESMutation.Items.AddRange(New Object() {IHWB.EVO.Kern.Constants.CES_MUTATION.RND_Switch, IHWB.EVO.Kern.Constants.CES_MUTATION.Dyn_Switch})
-        Me.ComboCESMutation.SelectedIndex = 2
         Me.ComboCESMutation.Location = New System.Drawing.Point(69, 151)
         Me.ComboCESMutation.Name = "ComboCESMutation"
         Me.ComboCESMutation.Size = New System.Drawing.Size(123, 21)
@@ -989,12 +980,12 @@ Partial Class EVO_Einstellungen
         '
         'ComboCESSelection
         '
+        Me.ComboCESSelection.DataSource = System.Enum.GetValues(GetType(EVO.Kern.Constants.EVO_STRATEGIE))
         Me.ComboCESSelection.FormattingEnabled = True
         Me.ComboCESSelection.Location = New System.Drawing.Point(69, 97)
         Me.ComboCESSelection.Name = "ComboCESSelection"
         Me.ComboCESSelection.Size = New System.Drawing.Size(123, 21)
         Me.ComboCESSelection.TabIndex = 6
-        Me.ComboCESSelection.Text = "Plus_Strategy"
         '
         'Label_n_childs
         '
@@ -1250,10 +1241,6 @@ Partial Class EVO_Einstellungen
         Me.CheckBoxDNVektorHJ.TabIndex = 2
         Me.CheckBoxDNVektorHJ.Text = "mit Schrittweitenvektor"
         '
-        'CESREPRODOPBindingSource
-        '
-        Me.CESREPRODOPBindingSource.DataSource = GetType(IHWB.EVO.Kern.Constants.CES_REPRODOP)
-        '
         'ToolStrip1
         '
         Me.ToolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
@@ -1294,14 +1281,6 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Einstellungen.TabIndex = 37
         Me.GroupBox_Einstellungen.TabStop = False
         Me.GroupBox_Einstellungen.Text = "Einstellungen:"
-        '
-        'EVOSTRATEGIEBindingSource
-        '
-        Me.EVOSTRATEGIEBindingSource.DataSource = GetType(IHWB.EVO.Kern.Constants.EVO_STRATEGIE)
-        '
-        'EVOSTRATEGIEBindingSource1
-        '
-        Me.EVOSTRATEGIEBindingSource1.DataSource = GetType(IHWB.EVO.Kern.Constants.EVO_STRATEGIE)
         '
         'EVO_Einstellungen
         '
@@ -1345,13 +1324,10 @@ Partial Class EVO_Einstellungen
         Me.TabPage_HookeJeeves.PerformLayout()
         CType(Me.TextDeltaFinishHJ, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.TextDeltaStartHJ, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.CESREPRODOPBindingSource, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ToolStrip1.ResumeLayout(False)
         Me.ToolStrip1.PerformLayout()
         Me.GroupBox_Einstellungen.ResumeLayout(False)
         Me.GroupBox_Einstellungen.PerformLayout()
-        CType(Me.EVOSTRATEGIEBindingSource, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.EVOSTRATEGIEBindingSource1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -1463,7 +1439,4 @@ Partial Class EVO_Einstellungen
     Friend WithEvents CheckBox2 As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBox_use_sec_pop_PES As System.Windows.Forms.CheckBox
     Friend WithEvents Use_ As System.Windows.Forms.CheckBox
-    Friend WithEvents EVOSTRATEGIEBindingSource As System.Windows.Forms.BindingSource
-    Friend WithEvents CESREPRODOPBindingSource As System.Windows.Forms.BindingSource
-    Friend WithEvents EVOSTRATEGIEBindingSource1 As System.Windows.Forms.BindingSource
 End Class
