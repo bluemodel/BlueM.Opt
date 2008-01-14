@@ -17,15 +17,15 @@ Public Module Constants
 
     'Evo-Strategie-Typ
     Public Enum EVO_STRATEGIE As Integer
-        Plus = 1                                'Eltern + Nachfolger
-        Komma = 2                               'nur Nachfolger
+        Plus_Strategy = 1                                'Eltern + Nachfolger
+        Komma_Strategy = 2                               'nur Nachfolger
     End Enum
 
     'Reproduktionsoperator
     Public Enum CES_REPRODOP as Integer
-        Select_Random_Uniform = 1
-        Order_Crossover_OX = 2
-        Partially_Mapped_Crossover = 3
+        Selt_Rand_Uniform = 1
+        Order_Crossover = 2
+        Part_Mapped_Cross = 3
     End Enum
 
     'Mutationsoperator

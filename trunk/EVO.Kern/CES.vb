@@ -82,10 +82,10 @@ Public Class CES
         If (CES_Settings.n_Childs <= CES_Settings.n_Parents And Method <> "HYBRID") Then
             Throw New Exception("Die Anzahl der Eltern muss kleiner als die Anzahl der Nachfahren!" & Chr(13) & Chr(10) & "'Rechenberg 73' schlägt ein Verhältnis von 1:3 bis 1:5 vor.")
         End If
-        If (CES_Settings.ty_Strategy <> EVO_STRATEGIE.Komma And CES_Settings.ty_Strategy <> EVO_STRATEGIE.Plus) Then
+        If (CES_Settings.ty_Strategy <> EVO_STRATEGIE.Komma_Strategy And CES_Settings.ty_Strategy <> EVO_STRATEGIE.Plus_Strategy) Then
             Throw New Exception("Typ der Evolutionsstrategie ist nicht '+' oder ','")
         End If
-        If (CES_Settings.ty_ReprodOp <> CES_REPRODOP.Select_Random_Uniform And CES_REPRODOP.Order_Crossover_OX AND CES_REPRODOP.Partially_Mapped_Crossover)
+        If (CES_Settings.ty_ReprodOp <> CES_REPRODOP.Selt_Rand_Uniform And CES_REPRODOP.Order_Crossover AND CES_REPRODOP.Part_Mapped_Cross)
             Throw New Exception("Typ der Reproduction ist nicht richtig!")
         End If        
         If (CES_Settings.ty_MutOperator <> CES_MUTATION.RND_Switch And CES_MUTATION.Dyn_Switch)
@@ -100,7 +100,7 @@ Public Class CES
         If (CES_Settings.n_Interact < 1) Then
             Throw New Exception("Die Anzahl der Mitglieder des sekundären Population muss mindestens 1 sein!")
         End If
-        If (CES_Settings.pr_MutRate < 1 or CES_Settings.pr_MutRate > 100) Then
+        If (CES_Settings.pr_MutRate < 0 or CES_Settings.pr_MutRate > 100) Then
             Throw New Exception("Der Prozentsatz der Mutationrate muss zwischen 1 und 100 liegen!")
         End If
         If (CES_Settings.n_PES_MaxParents < 1) Then
@@ -249,7 +249,7 @@ Public Class CES
 
         Select Case CES_Settings.ty_ReprodOp
             'UPGRADE: Eltern werden nicht zufällig gewählt sondern immer in Top Down Reihenfolge
-            Case CES_REPRODOP.Select_Random_Uniform
+            Case CES_REPRODOP.Selt_Rand_Uniform
                 x = 0
                 y = 1
                 For i = 0 To CES_Settings.n_Childs - 2 Step 2
@@ -263,7 +263,7 @@ Public Class CES
                     Call ReprodOp_Select_Random_Uniform(Parents(x).Path, Parents(y).Path, Childs(CES_Settings.n_Childs - 1).Path, Einzelkind)
                 End If
 
-            Case CES_REPRODOP.Order_Crossover_OX
+            Case CES_REPRODOP.Order_Crossover
 
                 x = 0
                 y = 1
@@ -278,7 +278,7 @@ Public Class CES
                     Call ReprodOp_Order_Crossover(Parents(x).Path, Parents(y).Path, Childs(CES_Settings.n_Childs - 1).Path, Einzelkind)
                 End If
 
-            Case CES_REPRODOP.Partially_Mapped_Crossover
+            Case CES_REPRODOP.Part_Mapped_Cross
                 x = 0
                 y = 1
                 For i = 0 To CES_Settings.n_Childs - 2 Step 2

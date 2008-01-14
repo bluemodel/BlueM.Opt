@@ -67,7 +67,7 @@ Public Class EVO_Settings
                 Case EVO_MODUS.Single_Objective
 
                     Me.ty_EvoModus = EVO_MODUS.Single_Objective
-                    Me.ty_EvoStrategie = EVO_STRATEGIE.Plus
+                    Me.ty_EvoStrategie = EVO_STRATEGIE.Plus_Strategy
                     Me.ty_StartPar = EVO_STARTPARAMETER.Original
 
                     Me.Schrittweite.ty_DnMutation = EVO_DnMutation.Schwefel
@@ -92,7 +92,7 @@ Public Class EVO_Settings
                     Me.Pop.n_Popul = 3
                     Me.Pop.n_PopEltern = 2
                     Me.Pop.ty_OptPopEltern = EVO_POP_ELTERN.Rekombination
-                    Me.Pop.ty_PopEvoTyp = EVO_STRATEGIE.Plus
+                    Me.Pop.ty_PopEvoTyp = EVO_STRATEGIE.Plus_Strategy
                     Me.Pop.ty_PopPenalty = EVO_POP_PENALTY.Mittelwert
 
                     Me.is_paint_constraint = False
@@ -102,7 +102,7 @@ Public Class EVO_Settings
                 Case EVO_MODUS.Multi_Objective
 
                     Me.ty_EvoModus = EVO_MODUS.Multi_Objective
-                    Me.ty_EvoStrategie = EVO_STRATEGIE.Plus
+                    Me.ty_EvoStrategie = EVO_STRATEGIE.Plus_Strategy
                     Me.ty_StartPar = EVO_STARTPARAMETER.Original
 
                     Me.Schrittweite.DnStart = 0.1
@@ -126,7 +126,7 @@ Public Class EVO_Settings
                     Me.Pop.n_Popul = 1
                     Me.Pop.n_PopEltern = 1
                     Me.Pop.ty_OptPopEltern = EVO_POP_ELTERN.Rekombination
-                    Me.Pop.ty_PopEvoTyp = EVO_STRATEGIE.Plus
+                    Me.Pop.ty_PopEvoTyp = EVO_STRATEGIE.Plus_Strategy
                     Me.Pop.ty_PopPenalty = EVO_POP_PENALTY.Mittelwert
 
                     Me.is_paint_constraint = True
@@ -142,24 +142,26 @@ Public Class EVO_Settings
     Public Structure CES_Settings
 
         'CES
+        Public n_Generations As Integer  
         Public n_Parents As Integer
         Public n_Childs As Integer
-        Public n_Generations As Integer             'Anzahl der Generationen
         Public ty_Strategy As EVO_STRATEGIE                   '"plus" oder "minus" Strategie
         Public ty_ReprodOp As CES_REPRODOP
         Public ty_MutOperator As CES_MUTATION
         Public pr_MutRate As Integer                   'Definiert die Wahrscheinlichkeit der Mutationsrate in %
-
+        
+        Public is_SecPop As Boolean
         Public n_MemberSecondPop As Integer
         Public n_Interact As Integer
-        Public is_SecPop As Boolean
 
         'Hybrid
         Public n_PartsMem As Integer           'Länge des Gedächtnispfades Achtung Maximum ist 3
         Public n_PES_MaxParents As Integer             'Anzahl der Eltern für PES Hybrid
+        
+        Public is_PES_SecPop As Boolean
         Public n_PES_MemSecPop As Integer
         Public n_PES_Interact As Integer
-        Public is_PES_SecPop As Boolean
+
         Public is_PopMutStart As Boolean                    'Gibt an ob bei der Population oder bei den Eltern in die PES gestiegen wird.
 
         'Standardwerte setzen
@@ -171,45 +173,51 @@ Public Class EVO_Settings
                 Case EVO_MODUS.Single_Objective
 
                     'CES
-                    Me.n_PartsMem = 3
                     Me.n_Generations = 500
                     Me.n_Parents = 5
                     Me.n_Childs = 15
+                    Me.ty_Strategy = EVO_STRATEGIE.Plus_Strategy
+                    Me.ty_ReprodOp = CES_REPRODOP.Selt_Rand_Uniform
+                    Me.ty_MutOperator = CES_MUTATION.RND_Switch
+                    Me.pr_MutRate = 25
+        
+                    Me.is_SecPop = True
                     Me.n_MemberSecondPop = 50
                     Me.n_Interact = 5
-                    Me.is_SecPop = True
-                    Me.ty_ReprodOp = "Select_Random_Uniform"
-                    Me.ty_MutOperator = "RND_Switch"
-                    Me.ty_Strategy = "plus"
-                    Me.pr_MutRate = 25
 
                     'Hybrid
+                    Me.n_PartsMem = 3
                     Me.n_PES_MaxParents = 5
-                    Me.n_PES_MemSecPop = 50
-                    Me.n_PES_Interact = 3
+        
                     Me.is_PES_SecPop = False
+                    Me.n_PES_MemSecPop = 50
+                    Me.n_PES_Interact = 5
+
                     Me.is_PopMutStart = False
 
                 Case EVO_MODUS.Multi_Objective
 
                     'CES
-                    Me.n_PartsMem = 3
                     Me.n_Generations = 500
                     Me.n_Parents = 5
                     Me.n_Childs = 15
+                    Me.ty_Strategy = EVO_STRATEGIE.Plus_Strategy
+                    Me.ty_ReprodOp = CES_REPRODOP.Selt_Rand_Uniform
+                    Me.ty_MutOperator = CES_MUTATION.RND_Switch
+                    Me.pr_MutRate = 25
+        
+                    Me.is_SecPop = True
                     Me.n_MemberSecondPop = 50
                     Me.n_Interact = 5
-                    Me.is_SecPop = True
-                    Me.ty_ReprodOp = "Select_Random_Uniform"
-                    Me.ty_MutOperator = "RND_Switch"
-                    Me.ty_Strategy = "plus"
-                    Me.pr_MutRate = 25
 
                     'Hybrid
+                    Me.n_PartsMem = 3
                     Me.n_PES_MaxParents = 5
-                    Me.n_PES_MemSecPop = 50
-                    Me.n_PES_Interact = 3
+        
                     Me.is_PES_SecPop = False
+                    Me.n_PES_MemSecPop = 50
+                    Me.n_PES_Interact = 5
+
                     Me.is_PopMutStart = False
 
             End Select
