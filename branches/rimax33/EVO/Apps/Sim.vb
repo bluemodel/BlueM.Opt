@@ -335,45 +335,72 @@ Public MustInherit Class Sim
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-        Dim Zeile As String
+        Dim Zeile, array() As String
         Dim AnzParam As Integer = 0
+        Dim i As Integer = 0
+        Dim Bez_str As String = ""
+        Dim k As Integer
 
         'Anzahl der Parameter feststellen
-        Do
-            Zeile = StrRead.ReadLine.ToString()
-            If (Zeile.StartsWith("*") = False) Then
-                AnzParam += 1
-            End If
-        Loop Until StrRead.Peek() = -1
-
-        ReDim List_OptParameter(AnzParam - 1)
-        ReDim List_OptParameter_Save(AnzParam - 1)
-
-        'Zurück zum Dateianfang und lesen
-        FiStr.Seek(0, SeekOrigin.Begin)
-
-        Dim array() As String
-        Dim Bez_str As String = ""
-        Dim i As Integer = 0
+        '---------------------------------
         Do
             Zeile = StrRead.ReadLine.ToString()
             If (Zeile.StartsWith("*") = False) Then
                 array = Zeile.Split("|")
-                'Werte zuweisen
-                List_OptParameter(i).Bezeichnung = array(1).Trim()
-                List_OptParameter(i).Einheit = array(2).Trim()
-                List_OptParameter(i).Wert = Convert.ToDouble(array(3).Trim(), Sim.FortranProvider)
-                List_OptParameter(i).Min = Convert.ToDouble(array(4).Trim(), Sim.FortranProvider)
-                List_OptParameter(i).Max = Convert.ToDouble(array(5).Trim(), Sim.FortranProvider)
-                'liegt eine Beziehung vor?
-                If (i > 0 And Not array(6).Trim() = "") Then
-                    Me.List_OptParameter(i).Beziehung = getBeziehung(array(6).Trim())
+                If (array(1).Trim().StartsWith("Zeitreihe")) Then
+                    AnzParam += Convert.ToInt16(array(2).Trim(), Sim.FortranProvider)
                 Else
-                    Me.List_OptParameter(i).Beziehung = EVO.Kern.PES.Beziehung.keine
+                    AnzParam += 1
                 End If
-                i += 1
             End If
         Loop Until StrRead.Peek() = -1
+  
+        ReDim List_OptParameter(AnzParam - 1)
+        ReDim List_OptParameter_Save(AnzParam - 1)
+
+        'Zurück zum Dateianfang und lesen
+        '---------------------------------
+        FiStr.Seek(0, SeekOrigin.Begin)
+
+        i = 0
+        Do
+            Zeile = StrRead.ReadLine.ToString()
+            If (Zeile.StartsWith("*") = False) Then
+                array = Zeile.Split("|")
+
+                'Werte zuweisen
+
+                If (array(1).Trim().StartsWith("Zeitreihe")) Then
+                    For k = 0 To AnzParam - 1
+                        List_OptParameter(k).Bezeichnung = "Zeitreihe" + k.ToString
+                        List_OptParameter(k).Einheit = "-"
+                        List_OptParameter(k).Wert = Convert.ToDouble(array(3).Trim(), Sim.FortranProvider)
+                        List_OptParameter(k).Min = Convert.ToDouble(array(4).Trim(), Sim.FortranProvider)
+                        List_OptParameter(k).Max = Convert.ToDouble(array(5).Trim(), Sim.FortranProvider)
+                    Next
+
+                    Exit Do
+                    
+                Else
+
+                    List_OptParameter(i).Bezeichnung = array(1).Trim()
+                    List_OptParameter(i).Einheit = array(2).Trim()
+                    List_OptParameter(i).Wert = Convert.ToDouble(array(3).Trim(), Sim.FortranProvider)
+                    List_OptParameter(i).Min = Convert.ToDouble(array(4).Trim(), Sim.FortranProvider)
+                    List_OptParameter(i).Max = Convert.ToDouble(array(5).Trim(), Sim.FortranProvider)
+                    'liegt eine Beziehung vor?
+                    If (i > 0 And Not array(6).Trim() = "") Then
+                        Me.List_OptParameter(i).Beziehung = getBeziehung(array(6).Trim())
+                    Else
+                        Me.List_OptParameter(i).Beziehung = EVO.Kern.PES.Beziehung.keine
+                    End If
+                    i += 1
+                End If
+            End If
+        Loop Until StrRead.Peek() = -1
+
+
+        '-----------------------------------------------------------------------------------------
 
         StrRead.Close()
         FiStr.Close()
@@ -384,6 +411,7 @@ Public MustInherit Class Sim
         Next
 
     End Sub
+
 
     'String in der Form < >, <=, >= in Beziehung umwandeln
     '*****************************************************
@@ -412,18 +440,29 @@ Public MustInherit Class Sim
         '*|-<---------->-|-<---------->-|-<--->-|-<--->-|-<--->-|-<--->-|-<->-|-<->-|-<---->-|
 
         Dim Datei As String = WorkDir & Datensatz & "." & ModParameter_Ext
-
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-        Dim Zeile As String
+        Dim Zeile, Zeile2 As String
         Dim AnzParam As Integer = 0
 
+        Dim array(), array2() As String
+        Dim i As Integer = 0
+        Dim k As Integer = 0
+        Dim nZRE As Integer = 0 'Anzahl der Zeitreihen
+  
         'Anzahl der Parameter feststellen
+        '------------------------------------
         Do
             Zeile = StrRead.ReadLine.ToString()
             If (Zeile.StartsWith("*") = False) Then
-                AnzParam += 1
+                array = Zeile.Split("|")
+                If (array(1).Trim().StartsWith("Zeitreihe")) Then
+                    AnzParam += Convert.ToInt16(array(3).Trim())
+                    nZRE += 1
+                Else
+                    AnzParam += 1
+                End If
             End If
         Loop Until StrRead.Peek() = -1
 
@@ -431,31 +470,72 @@ Public MustInherit Class Sim
         ReDim List_ModellParameter_Save(AnzParam - 1)
 
         'Zurück zum Dateianfang und lesen
+        '------------------------------------
         FiStr.Seek(0, SeekOrigin.Begin)
-
-        Dim array() As String
-        Dim i As Integer = 0
-
+        
         Do
             Zeile = StrRead.ReadLine.ToString()
+
             If (Zeile.StartsWith("*") = False) Then
                 array = Zeile.Split("|")
+
                 'Werte zuweisen
-                List_ModellParameter(i).OptParameter = array(1).Trim()
-                List_ModellParameter(i).Bezeichnung = array(2).Trim()
-                List_ModellParameter(i).Einheit = array(3).Trim()
-                List_ModellParameter(i).Datei = array(4).Trim()
-                List_ModellParameter(i).Element = array(5).Trim()
-                List_ModellParameter(i).ZeileNr = Convert.ToInt16(array(6).Trim())
-                List_ModellParameter(i).SpVon = Convert.ToInt16(array(7).Trim())
-                List_ModellParameter(i).SpBis = Convert.ToInt16(array(8).Trim())
-                List_ModellParameter(i).Faktor = Convert.ToDouble(array(9).Trim(), Sim.FortranProvider)
+                If (array(1).Trim().StartsWith("Zeitreihe")) Then
+
+                    'nur bei Zeile 1
+                    If i = 0 Then
+                        For k = 0 To AnzParam - 1
+                            List_ModellParameter(k).OptParameter = "Zeitreihe" + k.ToString
+                            List_ModellParameter(k).Bezeichnung = ""
+                            List_ModellParameter(k).Element = nZRE
+                            List_ModellParameter(k).Faktor = 1.0
+                        Next
+                    End If
+
+                    List_ModellParameter(i).Datei = array(4).Trim()
+                    List_ModellParameter(i).Bezeichnung = array(2).Trim()
+
+                Else
+                    List_ModellParameter(i).OptParameter = array(1).Trim()
+                    List_ModellParameter(i).Bezeichnung = array(2).Trim()
+                    List_ModellParameter(i).Einheit = array(3).Trim()
+                    List_ModellParameter(i).Datei = array(4).Trim()
+                    List_ModellParameter(i).Element = array(5).Trim()
+                    List_ModellParameter(i).ZeileNr = Convert.ToInt16(array(6).Trim())
+                    List_ModellParameter(i).SpVon = Convert.ToInt16(array(7).Trim())
+                    List_ModellParameter(i).SpBis = Convert.ToInt16(array(8).Trim())
+                    List_ModellParameter(i).Faktor = Convert.ToDouble(array(9).Trim(), Sim.FortranProvider)
+                End If
+
                 i += 1
             End If
+
+
         Loop Until StrRead.Peek() = -1
+
+        'Öffne *.EXT um Pfade zu lesen
+        Dim DateiZRE As String = WorkDir & Datensatz & ".EXT"
+        Dim FiStrZRE As FileStream = New FileStream(DateiZRE, FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim StrReadZRE As StreamReader = New StreamReader(FiStrZRE, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+        Do
+            Zeile2 = StrReadZRE.ReadLine.ToString()
+            If (Zeile2.StartsWith("*") = False) Then
+                array2 = Zeile2.Split("|")
+                For i = 0 To AnzParam - 1
+                    If (array2(1).Trim() = List_ModellParameter(i).Bezeichnung) Then
+                        List_ModellParameter(i).Datei = array2(4).Trim()
+                    End If
+                Next i
+            End If
+        Loop Until StrReadZRE.Peek() = -1
+
 
         StrRead.Close()
         FiStr.Close()
+
+        StrReadZRE.Close()
+        FiStrZRE.Close()
 
         'ModellParameter werden hier gesichert
         For i = 0 To List_ModellParameter.GetUpperBound(0)
@@ -1268,7 +1348,6 @@ Public MustInherit Class Sim
 
     End Sub
 
-
     'Die ModellParameter in die Eingabedateien des SimModells schreiben
     '******************************************************************
     Public Sub Write_ModellParameter()
@@ -1283,90 +1362,176 @@ Public MustInherit Class Sim
         Dim StrRight As String
         Dim DateiPfad As String
 
-        'ModellParameter aus OptParametern kalkulieren()
-        Call OptParameter_to_ModellParameter()
+        Dim jend, nZRE, ndauer, istart, k, n As Integer
+        Dim AnzParam, param As Integer
+        Dim Zeitpunkt(1000), SumZeit As Double
+        Dim SumFaktor As Double
+        Dim PfadZRE, ZREStart_str As String
+        Dim Qab(1000), tmp As Double
+        Dim Text As String
+        Dim i As Integer
+        Dim actDate, date2 As DateTime
 
-        'Alle ModellParameter durchlaufen
-        For i As Integer = 0 To List_ModellParameter.GetUpperBound(0)
+        'Evaluiere ob Zeitreihe
+        If List_OptParameter(0).Bezeichnung.Contains("Zeitreihe") Then
 
-            DateiPfad = WorkDir & Datensatz & "." & List_ModellParameter(i).Datei
-            'Datei öffnen
-            Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-            Dim StrReadSync As TextReader = TextReader.Synchronized(StrRead)
+            'ermittle Anzahl der Zeitreihen
+            nZRE = List_ModellParameter(0).Element
 
-            'Anzahl der Zeilen feststellen
-            AnzZeil = 0
-            Do
-                Zeile = StrRead.ReadLine.ToString
-                AnzZeil += 1
-            Loop Until StrRead.Peek() = -1
+            AnzParam = List_ModellParameter.Length
+            
+            'Loop über alle Zeitreihen
+            For n = 0 To nZRE - 1
 
-            ReDim Zeilenarray(AnzZeil - 1)
+                'Settings
+                ndauer = 60
+                istart = 72 - ndauer
 
-            'Datei komplett einlesen
-            FiStr.Seek(0, SeekOrigin.Begin)
-            For j = 0 To AnzZeil - 1
-                Zeilenarray(j) = StrRead.ReadLine.ToString
+                jend = (AnzParam / nZRE - 1) / 2
+
+                For j = 1 To jend
+                    param += 1
+                    tmp = tmp + List_OptParameter(param - 1).SKWert
+                    Zeitpunkt(j) = tmp
+                Next j
+
+                For j = 1 To jend
+                    SumZeit = SumZeit + Zeitpunkt(j)
+                Next j
+
+                SumFaktor = ndauer / SumZeit
+
+                For j = 1 To jend
+                    Zeitpunkt(j) = Zeitpunkt(j) * SumFaktor
+                    Zeitpunkt(j) = Math.Round(Zeitpunkt(j), 0)
+                Next j
+
+                'erster und letzter Zeitschritt
+                Zeitpunkt(0) = 1
+                Zeitpunkt(jend + 1) = 60
+                If jend = 1 Then Zeitpunkt(1) = Math.Round(List_ModellParameter(param - 1).Wert * 60, 0)
+
+                '2.Q eintragen
+                For k = 0 To jend
+                    param += 1
+                    For j = Zeitpunkt(k) To Zeitpunkt(k + 1)
+                        Qab(j) = List_OptParameter(param - 1).SKWert * List_OptParameter(n).Max
+                    Next j
+                Next k
+
+                '---------------------------
+                'ZRE-Datei schreiben
+
+                i = 0
+              
+                Text = "*ZRE" + vbCrLf
+                Text += "ZRE-Format m3/s   1" + vbCrLf
+                Text += "1 1   1" + vbCrLf
+                Text += Me.SimStart.ToString("yyyyMMdd HH:mm") + " " + Me.SimEnde.ToString("yyyyMMdd HH:mm") + vbCrLf
+
+                actDate = Me.SimStart
+                date2 = actDate
+
+                While date2 <= Me.SimEnde
+                    i += 1
+                    Text += date2.ToString("yyyyMMdd HH:mm") + " " + Math.Round(Qab(i), 3).ToString + vbCrLf
+                    date2 = date2.Add(Me.SimDT)
+                End While
+
+                'Pfad für jede Zeitreihe aus *.EXT ermitteln
+                PfadZRE = get_path_EXT(List_ModellParameter(n).Datei)
+                Dim StrWri As StreamWriter = New StreamWriter(PfadZRE)
+                StrWri.Write(Text)
+                StrWri.Close()
             Next
+        Else
 
-            StrReadSync.Close()
-            StrRead.Close()
-            FiStr.Close()
+            'ModellParameter aus OptParametern kalkulieren()
+            Call OptParameter_to_ModellParameter()
 
-            'Anzahl verfügbarer Zeichen
-            AnzZeichen = List_ModellParameter(i).SpBis - List_ModellParameter(i).SpVon + 1
+            'Alle ModellParameter durchlaufen
+            For i = 0 To List_ModellParameter.GetUpperBound(0)
 
-            'Zeile einlesen und splitten
-            Zeile = Zeilenarray(List_ModellParameter(i).ZeileNr - 1)
-            StrLeft = Zeile.Substring(0, List_ModellParameter(i).SpVon - 1)
-            If (Zeile.Length > List_ModellParameter(i).SpBis) Then
-                StrRight = Zeile.Substring(List_ModellParameter(i).SpBis)
-            Else
-                StrRight = ""
-            End If
+                DateiPfad = WorkDir & Datensatz & "." & List_ModellParameter(i).Datei
+                'Datei öffnen
+                Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
+                Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+                Dim StrReadSync As TextReader = TextReader.Synchronized(StrRead)
 
-            'Wert auf verfügbare Stellen kürzen
-            '----------------------------------
-            'bestimmen des ganzzahligen Anteils, \-Operator ginge zwar theoretisch, ist aber für Zahlen < 1 nicht robust (warum auch immer)
-            WertStr = Convert.ToString(List_ModellParameter(i).Wert - List_ModellParameter(i).Wert Mod 1.0, Sim.FortranProvider)
+                'Anzahl der Zeilen feststellen
+                AnzZeil = 0
+                Do
+                    Zeile = StrRead.ReadLine.ToString
+                    AnzZeil += 1
+                Loop Until StrRead.Peek() = -1
 
-            If (WertStr.Length > AnzZeichen) Then
-                'Wert zu lang
-                Throw New Exception("Der Wert des Modellparameters '" & List_ModellParameter(i).Bezeichnung & "' (" & WertStr & ") ist länger als die zur Verfügung stehende Anzahl von Zeichen!")
+                ReDim Zeilenarray(AnzZeil - 1)
 
-            ElseIf (WertStr.Length < AnzZeichen - 1) Then
-                'Runden auf verfügbare Stellen: Anzahl der Stellen - Anzahl der Vorkommastellen - Komma
-                WertStr = Convert.ToString(Math.Round(List_ModellParameter(i).Wert, AnzZeichen - WertStr.Length - 1), Sim.FortranProvider)
-
-            Else
-                'Ganzzahligen Wert benutzen
-            End If
-
-            'Falls erforderlich, Wert mit Leerzeichen füllen
-            If (WertStr.Length < AnzZeichen) Then
-                For j = 1 To AnzZeichen - WertStr.Length
-                    WertStr &= " "
+                'Datei komplett einlesen
+                FiStr.Seek(0, SeekOrigin.Begin)
+                For j = 0 To AnzZeil - 1
+                    Zeilenarray(j) = StrRead.ReadLine.ToString
                 Next
-            End If
 
-            'Zeile wieder zusammensetzen
-            Zeile = StrLeft & WertStr & StrRight
+                StrReadSync.Close()
+                StrRead.Close()
+                FiStr.Close()
 
-            Zeilenarray(List_ModellParameter(i).ZeileNr - 1) = Zeile
+                'Anzahl verfügbarer Zeichen
+                AnzZeichen = List_ModellParameter(i).SpBis - List_ModellParameter(i).SpVon + 1
 
-            'Alle Zeilen wieder in Datei schreiben
-            Dim StrWrite As StreamWriter = New StreamWriter(DateiPfad, False, System.Text.Encoding.GetEncoding("iso8859-1"))
-            Dim StrWriteSync As TextWriter = TextWriter.Synchronized(StrWrite)
+                'Zeile einlesen und splitten
+                Zeile = Zeilenarray(List_ModellParameter(i).ZeileNr - 1)
+                StrLeft = Zeile.Substring(0, List_ModellParameter(i).SpVon - 1)
+                If (Zeile.Length > List_ModellParameter(i).SpBis) Then
+                    StrRight = Zeile.Substring(List_ModellParameter(i).SpBis)
+                Else
+                    StrRight = ""
+                End If
 
-            For j = 0 To AnzZeil - 1
-                StrWrite.WriteLine(Zeilenarray(j))
+                'Wert auf verfügbare Stellen kürzen
+                '----------------------------------
+                'bestimmen des ganzzahligen Anteils, \-Operator ginge zwar theoretisch, ist aber für Zahlen < 1 nicht robust (warum auch immer)
+                WertStr = Convert.ToString(List_ModellParameter(i).Wert - List_ModellParameter(i).Wert Mod 1.0, Sim.FortranProvider)
+
+                If (WertStr.Length > AnzZeichen) Then
+                    'Wert zu lang
+                    Throw New Exception("Der Wert des Modellparameters '" & List_ModellParameter(i).Bezeichnung & "' (" & WertStr & ") ist länger als die zur Verfügung stehende Anzahl von Zeichen!")
+
+                ElseIf (WertStr.Length < AnzZeichen - 1) Then
+                    'Runden auf verfügbare Stellen: Anzahl der Stellen - Anzahl der Vorkommastellen - Komma
+                    WertStr = Convert.ToString(Math.Round(List_ModellParameter(i).Wert, AnzZeichen - WertStr.Length - 1), Sim.FortranProvider)
+
+                Else
+                    'Ganzzahligen Wert benutzen
+                End If
+
+                'Falls erforderlich, Wert mit Leerzeichen füllen
+                If (WertStr.Length < AnzZeichen) Then
+                    For j = 1 To AnzZeichen - WertStr.Length
+                        WertStr &= " "
+                    Next
+                End If
+
+                'Zeile wieder zusammensetzen
+                Zeile = StrLeft & WertStr & StrRight
+
+                Zeilenarray(List_ModellParameter(i).ZeileNr - 1) = Zeile
+
+                'Alle Zeilen wieder in Datei schreiben
+                Dim StrWrite As StreamWriter = New StreamWriter(DateiPfad, False, System.Text.Encoding.GetEncoding("iso8859-1"))
+                Dim StrWriteSync As TextWriter = TextWriter.Synchronized(StrWrite)
+
+                For j = 0 To AnzZeil - 1
+                    StrWrite.WriteLine(Zeilenarray(j))
+                Next
+
+                StrWriteSync.Close()
+                StrWrite.Close()
+
             Next
 
-            StrWriteSync.Close()
-            StrWrite.Close()
-
-        Next
+        End If
 
     End Sub
 
@@ -1409,10 +1574,38 @@ Public MustInherit Class Sim
             For j = 0 To List_OptParameter.GetUpperBound(0)
                 If List_ModellParameter(i).OptParameter = List_OptParameter(j).Bezeichnung Then
                     List_ModellParameter(i).Wert = List_OptParameter(j).Wert * List_ModellParameter(i).Faktor
+                    Console.Out.WriteLine(List_OptParameter(j).Wert.ToString + " " + List_ModellParameter(i).Faktor.ToString)
                 End If
             Next
         Next
     End Sub
+
+    'Ermittelt Pfad aus *.EXT-Datei 
+    '*******************************************
+    Public Function get_path_EXT(ByVal num As Integer) As String
+        Dim Zeile As String
+        Dim Array() As String
+        Dim Pfad As String = ""
+
+        Dim Datei As String = WorkDir & Datensatz & ".EXT"
+        Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+        Do
+            Zeile = StrRead.ReadLine.ToString()
+            If (Zeile.StartsWith("*") = False) Then
+                Array = Zeile.Split("|")
+                If (Array(1).Trim() = num) Then
+                    Pfad = Array(4).Trim()
+                    Exit Do
+                End If
+            End If
+        Loop Until StrRead.Peek() = -1
+
+        StrRead.Close()
+        FiStr.Close()
+        Return Pfad
+    End Function
 
 
     'SimModell ausführen (simulieren)
