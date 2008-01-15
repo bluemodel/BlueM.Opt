@@ -36,6 +36,7 @@ Public Class BlueM
     '---
     Private isIHA As Boolean = False
     Private IHA1 As IHA
+    Private Damage1 As Damage
 
 #End Region 'Eigenschaften
 
@@ -396,6 +397,10 @@ Public Class BlueM
 
             Case "IHA"
                 QWert = Me.IHA1.QWert_IHA(OptZiel)
+
+            Case "Schaden"
+                'QWert = Me.Damage1.QWert_Damage(OptZiel)
+                QWert = 200.0
 
         End Select
 

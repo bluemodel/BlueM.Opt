@@ -116,6 +116,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Apps\BlueM\BlueM.vb" />
+    <Compile Include="Apps\BlueM\Damage.vb" />
     <Compile Include="Apps\BlueM\IHA.vb" />
     <Compile Include="Apps\BlueM\SKos.vb" />
     <Compile Include="Apps\SensiPlot.Designer.vb">
@@ -251,6 +252,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="ClassDiagram1.cd" />
     <None Include="My Project\Settings.settings">
       <CustomToolNamespace>My</CustomToolNamespace>
       <Generator>SettingsSingleFileGenerator</Generator>

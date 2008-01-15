@@ -151,7 +151,7 @@ Public Class IHA
             Directory.CreateDirectory(Me.IHADir)
         End If
 
-        'Datume bestimmen
+        'Datum bestimmen
         '-----------------------------
         'Referenz-Zeitreihe raussuchen
         Dim RefReihe As New Wave.Zeitreihe("")
