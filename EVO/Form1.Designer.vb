@@ -46,6 +46,8 @@ Partial Class Form1
         Me.EVO_Einstellungen1 = New IHWB.EVO.EVO_Einstellungen
         Me.EVO_Opt_Verlauf1 = New IHWB.EVO.EVO_Opt_Verlauf
         Me.DForm = New IHWB.EVO.DiagrammForm
+        Me.LabelZeitHeader = New System.Windows.Forms.Label
+        Me.LabelZeit = New System.Windows.Forms.Label
         Me.GroupBox_Anwendung.SuspendLayout()
         Me.GroupBox_ErgebnisDB.SuspendLayout()
         Me.SuspendLayout()
@@ -200,7 +202,7 @@ Partial Class Form1
         '
         Me.EVO_Opt_Verlauf1.Location = New System.Drawing.Point(231, 690)
         Me.EVO_Opt_Verlauf1.Name = "EVO_Opt_Verlauf1"
-        Me.EVO_Opt_Verlauf1.Size = New System.Drawing.Size(467, 73)
+        Me.EVO_Opt_Verlauf1.Size = New System.Drawing.Size(471, 73)
         Me.EVO_Opt_Verlauf1.TabIndex = 6
         '
         'DForm
@@ -210,11 +212,32 @@ Partial Class Form1
         Me.DForm.Size = New System.Drawing.Size(473, 625)
         Me.DForm.TabIndex = 8
         '
+        'LabelZeitHeader
+        '
+        Me.LabelZeitHeader.AutoSize = True
+        Me.LabelZeitHeader.Location = New System.Drawing.Point(704, 701)
+        Me.LabelZeitHeader.Name = "LabelZeitHeader"
+        Me.LabelZeitHeader.Size = New System.Drawing.Size(78, 13)
+        Me.LabelZeitHeader.TabIndex = 15
+        Me.LabelZeitHeader.Text = "Zeit [hh:mm:ss]"
+        '
+        'LabelZeit
+        '
+        Me.LabelZeit.AutoSize = True
+        Me.LabelZeit.ForeColor = System.Drawing.SystemColors.MenuHighlight
+        Me.LabelZeit.Location = New System.Drawing.Point(719, 723)
+        Me.LabelZeit.Name = "LabelZeit"
+        Me.LabelZeit.Size = New System.Drawing.Size(49, 13)
+        Me.LabelZeit.TabIndex = 16
+        Me.LabelZeit.Text = "00:00:00"
+        '
         'Form1
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.BackColor = System.Drawing.SystemColors.Control
-        Me.ClientSize = New System.Drawing.Size(706, 768)
+        Me.ClientSize = New System.Drawing.Size(819, 768)
+        Me.Controls.Add(Me.LabelZeit)
+        Me.Controls.Add(Me.LabelZeitHeader)
         Me.Controls.Add(Me.GroupBox_ErgebnisDB)
         Me.Controls.Add(Me.Button_Start)
         Me.Controls.Add(Me.EVO_Einstellungen1)
@@ -231,6 +254,7 @@ Partial Class Form1
         Me.GroupBox_Anwendung.PerformLayout()
         Me.GroupBox_ErgebnisDB.ResumeLayout(False)
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 
@@ -249,4 +273,6 @@ Partial Class Form1
     Private WithEvents Label_Anwendung As System.Windows.Forms.Label
     Private WithEvents ComboBox_Methode As System.Windows.Forms.ComboBox
     Private WithEvents Label_Methode As System.Windows.Forms.Label
+    Private WithEvents LabelZeitHeader As System.Windows.Forms.Label
+    Private WithEvents LabelZeit As System.Windows.Forms.Label
 End Class
