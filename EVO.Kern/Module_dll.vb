@@ -17,8 +17,8 @@ Public Module Constants
 
     'Evo-Strategie-Typ
     Public Enum EVO_STRATEGIE As Integer
-        Plus_Strategy = 1                                'Eltern + Nachfolger
-        Komma_Strategy = 2                               'nur Nachfolger
+        Plus_Strategie = 1                                'Eltern + Nachfolger
+        Komma_Strategie = 2                               'nur Nachfolger
     End Enum
 
     'Reproduktionsoperator

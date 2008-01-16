@@ -919,7 +919,7 @@ Partial Class Form1
                         ReDim CES1.Childs(i).Loc(j).Loc_Dn(CES1.Childs(i).Loc(j).Loc_Para.GetUpperBound(1))
                         For m = 0 To CES1.Childs(i).Loc(j).Loc_Para.GetUpperBound(1)
                             CES1.Childs(i).Loc(j).Loc_Dn(m) = EVO_Einstellungen1.Settings.PES.Schrittweite.DnStart
-                            If EVO_Einstellungen1.Settings.PES.ty_StartPar = Kern.EVO_STARTPARAMETER.Zufall Then
+                            If EVO_Einstellungen1.Settings.PES.OptStartparameter = Kern.EVO_STARTPARAMETER.Zufall Then
                                 Randomize()
                                 CES1.Childs(i).Loc(j).Loc_Para(1, m) = Rnd()
                             End If
@@ -1093,7 +1093,7 @@ Partial Class Form1
                                 For m = 0 To CES1.Childs(i).Loc(j).Loc_Para.GetUpperBound(1)
                                     CES1.Childs(i).Loc(j).Loc_Dn(m) = EVO_Einstellungen1.Settings.PES.Schrittweite.DnStart
                                     'Falls zufällige Startwerte
-                                    If EVO_Einstellungen1.Settings.PES.ty_StartPar = Kern.EVO_STARTPARAMETER.Zufall Then
+                                    If EVO_Einstellungen1.Settings.PES.OptStartparameter = Kern.EVO_STARTPARAMETER.Zufall Then
                                         Randomize()
                                         CES1.Childs(i).Loc(j).Loc_Para(1, m) = Rnd()
                                     End If
@@ -1434,7 +1434,7 @@ Start_Evolutionsrunden:
                             myPara = PES1.EsGetParameter()
 
                             'Auslesen des Bestwertspeichers
-                            If (EVO_Einstellungen1.Settings.PES.ty_EvoModus = Kern.EVO_MODUS.Single_Objective) Then
+                            If (EVO_Einstellungen1.Settings.PES.OptModus = Kern.EVO_MODUS.Single_Objective) Then
                                 Bestwert = PES1.EsGetBestwert()
                             End If
 
@@ -1529,7 +1529,7 @@ Start_Evolutionsrunden:
                     Call PES1.EsEltern()
 
                     'Sekundäre Population
-                    If (EVO_Einstellungen1.Settings.PES.ty_EvoModus = Kern.EVO_MODUS.Multi_Objective) Then
+                    If (EVO_Einstellungen1.Settings.PES.OptModus = Kern.EVO_MODUS.Multi_Objective) Then
                         SekPopulation = PES1.SekundärQb_Get()
                         If (Not IsNothing(Sim1)) Then
                             'SekPop abspeichern
