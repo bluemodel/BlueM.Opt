@@ -148,12 +148,43 @@ Public Class PES
 
         'Überprüfung der Übergebenen Werte
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        If (settings.PES.OptStrategie <> EVO_STRATEGIE.Komma_Strategie And settings.PES.OptStrategie <> EVO_STRATEGIE.Plus_Strategie) Then
-            Throw New Exception("Typ der Evolutionsstrategie ist nicht '+' oder ','")
+        If (Not System.Enum.IsDefined(GetType(EVO_STRATEGIE), settings.PES.OptStrategie)) Then
+            Throw New Exception("Ungültige Einstellung für 'Strategie'!")
         End If
-        If (settings.PES.Pop.OptPopStrategie <> EVO_STRATEGIE.Komma_Strategie And settings.PES.Pop.OptPopStrategie <> EVO_STRATEGIE.Plus_Strategie) Then
-            Throw New Exception("Typ der Evolutionsstrategie auf Populationsebene ist nicht '+' oder ','")
+        If (Not System.Enum.IsDefined(GetType(EVO_STARTPARAMETER), settings.PES.OptStartparameter)) Then
+            Throw New Exception("Ungültige Einstellung für 'Startparameter'!")
         End If
+        'Schrittweite
+        If (Not System.Enum.IsDefined(GetType(EVO_DnMutation), settings.PES.Schrittweite.OptDnMutation)) Then
+            Throw New Exception("Ungültige Einstellung für 'Mutation'!")
+        End If
+        If (settings.PES.Schrittweite.DnStart < 0) Then
+            Throw New Exception("Die Startschrittweite darf nicht kleiner 0 sein!")
+        End If
+        'Generationen
+        If (settings.PES.n_Gen < 1) Then
+            Throw New Exception("Die Anzahl der Generationen ist kleiner 1!")
+        End If
+        If (settings.PES.n_Eltern < 1) Then
+            Throw New Exception("Die Anzahl der Eltern ist kleiner 1!")
+        End If
+        If (settings.PES.n_Nachf <= settings.PES.n_Eltern And method <> "HYBRID") Then
+            Throw New Exception("Die Anzahl der Eltern muss kleiner als die Anzahl der Nachfahren!" & Chr(13) & Chr(10) & "'Rechenberg 73' schlägt ein Verhältnis von 1:3 bis 1:5 vor.")
+        End If
+        If (settings.PES.n_Nachf < 1) Then
+            Throw New Exception("Die Anzahl der Nachfahren ist kleiner 1!")
+        End If
+        'Eltern
+        If (Not System.Enum.IsDefined(GetType(EVO_ELTERN), settings.PES.OptEltern)) Then
+            Throw New Exception("Ungültige Einstellung für die Ermittlung der Eltern!")
+        End If
+        If (settings.PES.OptModus = EVO_MODUS.Single_Objective And settings.PES.OptEltern = EVO_ELTERN.Neighbourhood) Then
+            Throw New Exception("Die Option 'Neighbourhood' für die Ermittlung der Eltern ist bei Single-Objective nicht zulässig!")
+        End If
+        If (settings.PES.n_RekombXY < 1) Then
+            Throw New Exception("Der Wert für die X/Y-Schema Rekombination ist kleiner 1!")
+        End If
+        'Populationen
         If (settings.PES.Pop.n_Runden < 1) Then
             Throw New Exception("Die Anzahl der Runden ist kleiner 1")
         End If
@@ -163,38 +194,14 @@ Public Class PES
         If (settings.PES.Pop.n_PopEltern < 1) Then
             Throw New Exception("Die Anzahl der Populationseltern ist kleiner 1")
         End If
-        If (settings.PES.Pop.OptPopEltern < 1 Or settings.PES.Pop.OptPopEltern > 3) Then
-            Throw New Exception("Ermittlung der Populationseltern ist nicht Mittelwert, Rekombination oder Selektion!")
-        End If
-        If (settings.PES.OptEltern < 1 Or settings.PES.OptEltern > 8) Then
-            Throw New Exception("Strategie zur Ermittlung der Eltern ist nicht möglich!")
-        End If
-        If (settings.PES.OptModus = EVO_MODUS.Single_Objective And settings.PES.OptEltern = EVO_ELTERN.Neighbourhood) Then
-            Throw New Exception("Die Option 'Neighbourhood' für die Ermittlung der Eltern ist bei Single-Objective nicht zulässig!")
-        End If
-        If (settings.PES.n_Eltern < 1) Then
-            Throw New Exception("Die Anzahl der Eltern ist kleiner 1!")
-        End If
-        If (settings.PES.n_Nachf < 1) Then
-            Throw New Exception("Die Anzahl der Nachfahren ist kleiner 1!")
-        End If
-        If (settings.PES.n_Gen < 1) Then
-            Throw New Exception("Die Anzahl der Generationen ist kleiner 1!")
-        End If
-        If (settings.PES.n_RekombXY < 1) Then
-            Throw New Exception("Der Wert für die X/Y-Schema Rekombination ist kleiner 1!")
-        End If
-        If (settings.PES.Schrittweite.DnStart < 0) Then
-            Throw New Exception("Die Startschrittweite darf nicht kleiner 0 sein!")
-        End If
-        If (settings.PES.OptStartparameter < 1 Or settings.PES.OptStartparameter > 2) Then
-            Throw New Exception("Die Startparameter dürfen nur zufällig sein oder aus den Originalparameter bestehen!")
-        End If
         If (settings.PES.Pop.n_Popul < settings.PES.Pop.n_PopEltern) Then
             Throw New Exception("Die Anzahl der Populationseltern darf nicht größer als die Anzahl der Populationen!")
         End If
-        If (settings.PES.n_Nachf <= settings.PES.n_Eltern And method <> "HYBRID") Then
-            Throw New Exception("Die Anzahl der Eltern muss kleiner als die Anzahl der Nachfahren!" & Chr(13) & Chr(10) & "'Rechenberg 73' schlägt ein Verhältnis von 1:3 bis 1:5 vor.")
+        If (Not System.Enum.IsDefined(GetType(EVO_POP_ELTERN), settings.PES.Pop.OptPopEltern)) Then
+            Throw New Exception("Ungültige Einstellung für die Ermittlung der Populationseltern!")
+        End If
+        If (Not System.Enum.IsDefined(GetType(EVO_STRATEGIE), settings.PES.Pop.OptPopStrategie)) Then
+            Throw New Exception("Ungültige Einstellung für 'Selektion' auf Populationsebene!")
         End If
 
         'Übergabe der Optionen
