@@ -1323,6 +1323,9 @@ Partial Class Form1
         '--------------------------
         Dim durchlauf As Integer
         '--------------------------
+        Dim StartDate As Date
+        Dim actDate As Date
+        '--------------------------
         'Dimensionierung der Variablen für Optionen Evostrategie
         'Das Struct aus PES wird hier verwendet
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -1358,6 +1361,8 @@ Partial Class Form1
 
         'Startwerte werden der Verlaufsanzeige zugewiesen
         Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
+
+        StartDate = System.DateTime.Now
 
         durchlauf = 0
 
@@ -1396,6 +1401,9 @@ Start_Evolutionsrunden:
                     'Über alle Nachkommen
                     'xxxxxxxxxxxxxxxxxxxxxxxxx
                     For PES1.PES_iAkt.iAktNachf = 0 To PES1.Settings.PES.n_Nachf - 1
+
+                        actDate = System.DateTime.Now
+                        Me.LabelZeit.Text = (actDate - StartDate).ToString.Substring(0, 8)
 
                         Call EVO_Opt_Verlauf1.Nachfolger(PES1.PES_iAkt.iAktNachf + 1)
 
@@ -2238,4 +2246,5 @@ Start_Evolutionsrunden:
 
 #End Region 'Methoden
 
+    
 End Class
