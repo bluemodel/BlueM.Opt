@@ -29,7 +29,7 @@ Public Class EVO_Einstellungen
         'Standardmäßig Single-Objective Werte nehmen
         Call Me.msettings.PES.setStandard(EVO_MODUS.Single_Objective)
         Call Me.msettings.HookJeeves.setStandard()
-        'Form initialisieren
+        'Comboboxen füllen
         Call Me.InitComboboxes()
 
     End Sub
@@ -55,7 +55,7 @@ Public Class EVO_Einstellungen
                 'Vorgaben und Anzeige
                 Label_OptModusValue.Text = "Single Objective"
                 'Strategie
-                ComboStrategie.Enabled = True
+                ComboOptStrategie.Enabled = True
                 'Sekundäre Population
                 LabelInteract.Enabled = False
                 TextInteract.Enabled = False
@@ -63,12 +63,14 @@ Public Class EVO_Einstellungen
                 TextNMemberSecondPop.Enabled = False
                 'Populationen
                 CheckisPopul.Enabled = True
+                'Neuen Standardwert für PopPenalty setzen
+                Me.msettings.PES.Pop.OptPopPenalty = EVO_POP_PENALTY.Mittelwert
 
             Case EVO_MODUS.Multi_Objective
                 'Vorgaben und Anzeige
                 Label_OptModusValue.Text = "MultiObjective Pareto"
                 'Strategie
-                ComboStrategie.Enabled = False
+                ComboOptStrategie.Enabled = False
                 'Sekundäre Population
                 LabelInteract.Enabled = True
                 TextInteract.Enabled = True
@@ -78,10 +80,12 @@ Public Class EVO_Einstellungen
                 CheckisPopul.Enabled = False
                 CheckisPopul.Checked = False
                 GroupBox_Populationen.Enabled = False
+                'Neuen Standardwert für PopPenalty setzen
+                Me.msettings.PES.Pop.OptPopPenalty = EVO_POP_PENALTY.Crowding
 
         End Select
 
-        Call FILLCOMBO_POPPENALTY(ComboPopPenalty) 'BUG 266
+        Call FILLCOMBO_POPPENALTY(ComboOptPopPenalty)
 
     End Sub
 
@@ -135,13 +139,13 @@ Public Class EVO_Einstellungen
 
         'PES
         '---
-        Me.ComboStrategie.DataSource = System.Enum.GetValues(GetType(EVO_STRATEGIE))
-        Me.ComboStartparameter.DataSource = System.Enum.GetValues(GetType(EVO_STARTPARAMETER))
-        Me.ComboMutation.DataSource = System.Enum.GetValues(GetType(EVO_DnMutation))
+        Me.ComboOptStrategie.DataSource = System.Enum.GetValues(GetType(EVO_STRATEGIE))
+        Me.ComboOptStartparameter.DataSource = System.Enum.GetValues(GetType(EVO_STARTPARAMETER))
+        Me.ComboOptDnMutation.DataSource = System.Enum.GetValues(GetType(EVO_DnMutation))
         Me.ComboOptEltern.DataSource = System.Enum.GetValues(GetType(EVO_ELTERN))
         Me.ComboOptPopEltern.DataSource = System.Enum.GetValues(GetType(EVO_POP_ELTERN))
-        Me.ComboPopStrategie.DataSource = System.Enum.GetValues(GetType(EVO_STRATEGIE))
-        Call FILLCOMBO_POPPENALTY(ComboPopPenalty)
+        Me.ComboOptPopStrategie.DataSource = System.Enum.GetValues(GetType(EVO_STRATEGIE))
+        Call FILLCOMBO_POPPENALTY(ComboOptPopPenalty)
 
         'CES
         '---
@@ -157,15 +161,13 @@ Public Class EVO_Einstellungen
         Select Case Me.msettings.PES.OptModus
 
             Case EVO.Kern.EVO_MODUS.Single_Objective
-                Cntrl.Items.Add(New VB6.ListBoxItem("Mittelwert", EVO_POP_PENALTY.Mittelwert))
-                Cntrl.Items.Add(New VB6.ListBoxItem("Schlechtester", EVO_POP_PENALTY.Schlechtester))
-                Cntrl.SelectedIndex = 0
+                Cntrl.Items.Add(EVO_POP_PENALTY.Mittelwert)
+                Cntrl.Items.Add(EVO_POP_PENALTY.Schlechtester)
 
             Case EVO.Kern.EVO_MODUS.Multi_Objective
                 'BUG 264: Popgüte bei MultiObjective überflüssig?
-                Cntrl.Items.Add(New VB6.ListBoxItem("Crowding", EVO_POP_PENALTY.Crowding))
-                Cntrl.Items.Add(New VB6.ListBoxItem("Spannweite", EVO_POP_PENALTY.Spannweite))
-                Cntrl.SelectedIndex = 0
+                Cntrl.Items.Add(EVO_POP_PENALTY.Crowding)
+                Cntrl.Items.Add(EVO_POP_PENALTY.Spannweite)
         End Select
 
     End Sub
@@ -178,10 +180,10 @@ Public Class EVO_Einstellungen
         '---
         With Me.msettings.PES
 
-            .OptStrategie = ComboStrategie.SelectedItem
-            .OptStartparameter = ComboStartparameter.SelectedItem
+            .OptStrategie = ComboOptStrategie.SelectedItem
+            .OptStartparameter = ComboOptStartparameter.SelectedItem
             'Schrittweite
-            .Schrittweite.OptDnMutation = ComboMutation.SelectedItem
+            .Schrittweite.OptDnMutation = ComboOptDnMutation.SelectedItem
             .Schrittweite.DnStart = TextDeltaStart.Value
             .Schrittweite.is_DnVektor = CheckisDnVektor.Checked
             'Generationen
@@ -203,8 +205,8 @@ Public Class EVO_Einstellungen
             .is_DiversityTournament = CheckisTournamentSelection.Checked
             'Populationen
             .Pop.is_POPUL = CheckisPopul.Checked
-            .Pop.OptPopStrategie = ComboPopStrategie.SelectedItem
-            .Pop.OptPopPenalty = VB6.GetItemData(ComboPopPenalty, ComboPopPenalty.SelectedIndex) 'BUG 266
+            .Pop.OptPopStrategie = ComboOptPopStrategie.SelectedItem
+            .Pop.OptPopPenalty = ComboOptPopPenalty.SelectedItem
             .Pop.OptPopEltern = ComboOptPopEltern.SelectedItem
             If (.Pop.is_POPUL) Then
                 .Pop.n_Runden = TextAnzRunden.Value
@@ -242,11 +244,11 @@ Public Class EVO_Einstellungen
 
             Call OptModus_Change()
 
-            Me.ComboStrategie.SelectedItem = .OptStrategie
-            Me.ComboStartparameter.SelectedItem = .OptStartparameter
+            Me.ComboOptStrategie.SelectedItem = .OptStrategie
+            Me.ComboOptStartparameter.SelectedItem = .OptStartparameter
             'Schrittweite
             Me.TextDeltaStart.Value = .Schrittweite.DnStart
-            Me.ComboMutation.SelectedItem = .Schrittweite.OptDnMutation
+            Me.ComboOptDnMutation.SelectedItem = .Schrittweite.OptDnMutation
             Me.CheckisDnVektor.Checked = .Schrittweite.is_DnVektor
             'Generationen
             Me.TextAnzGen.Value = .n_Gen
@@ -265,8 +267,8 @@ Public Class EVO_Einstellungen
             Me.CheckisTournamentSelection.Checked = .is_DiversityTournament
             'Populationen
             Me.CheckisPopul.Checked = .Pop.is_POPUL
-            Me.ComboPopStrategie.SelectedItem = .Pop.OptPopStrategie
-            Me.ComboPopPenalty.SelectedItem = .Pop.OptPopPenalty 'BUG 266
+            Me.ComboOptPopStrategie.SelectedItem = .Pop.OptPopStrategie
+            Me.ComboOptPopPenalty.SelectedItem = .Pop.OptPopPenalty
             Me.ComboOptPopEltern.SelectedItem = .Pop.OptPopEltern
             Me.TextAnzRunden.Value = .Pop.n_Runden
             Me.TextAnzPop.Value = .Pop.n_Popul
