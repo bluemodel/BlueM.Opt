@@ -64,8 +64,8 @@ Public Module Constants
     Public Enum EVO_POP_PENALTY As Integer
         Mittelwert = 1                          'SingleObjective
         Schlechtester = 2                       'SingleObjective
-        Crowding = 1                            'MultiObjective
-        Spannweite = 2                          'MultiObjective
+        Crowding = 3                            'MultiObjective
+        Spannweite = 4                          'MultiObjective
     End Enum
 
 End Module

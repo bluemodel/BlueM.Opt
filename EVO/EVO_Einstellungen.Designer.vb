@@ -25,11 +25,11 @@ Partial Class EVO_Einstellungen
         Me.Label_OptModus = New System.Windows.Forms.Label
         Me.Label_OptModusValue = New System.Windows.Forms.Label
         Me.LabelStrategie = New System.Windows.Forms.Label
-        Me.ComboStrategie = New System.Windows.Forms.ComboBox
+        Me.ComboOptStrategie = New System.Windows.Forms.ComboBox
         Me.LabelStartwerte = New System.Windows.Forms.Label
-        Me.ComboStartparameter = New System.Windows.Forms.ComboBox
+        Me.ComboOptStartparameter = New System.Windows.Forms.ComboBox
         Me.LabelMutation = New System.Windows.Forms.Label
-        Me.ComboMutation = New System.Windows.Forms.ComboBox
+        Me.ComboOptDnMutation = New System.Windows.Forms.ComboBox
         Me.LabelStartSchrittweite = New System.Windows.Forms.Label
         Me.TextDeltaStart = New System.Windows.Forms.NumericUpDown
         Me.CheckisDnVektor = New System.Windows.Forms.CheckBox
@@ -63,9 +63,9 @@ Partial Class EVO_Einstellungen
         Me.LabelOptPopEltern = New System.Windows.Forms.Label
         Me.ComboOptPopEltern = New System.Windows.Forms.ComboBox
         Me.LabelPopStrategie = New System.Windows.Forms.Label
-        Me.ComboPopStrategie = New System.Windows.Forms.ComboBox
+        Me.ComboOptPopStrategie = New System.Windows.Forms.ComboBox
         Me.LabelPopPenalty = New System.Windows.Forms.Label
-        Me.ComboPopPenalty = New System.Windows.Forms.ComboBox
+        Me.ComboOptPopPenalty = New System.Windows.Forms.ComboBox
         Me.checkpaintconstrained = New System.Windows.Forms.CheckBox
         Me.TabPage_CES = New System.Windows.Forms.TabPage
         Me.GroupBox_Hybrid = New System.Windows.Forms.GroupBox
@@ -181,11 +181,11 @@ Partial Class EVO_Einstellungen
         Me.TabPage_PES.Controls.Add(Me.Label_OptModus)
         Me.TabPage_PES.Controls.Add(Me.Label_OptModusValue)
         Me.TabPage_PES.Controls.Add(Me.LabelStrategie)
-        Me.TabPage_PES.Controls.Add(Me.ComboStrategie)
+        Me.TabPage_PES.Controls.Add(Me.ComboOptStrategie)
         Me.TabPage_PES.Controls.Add(Me.LabelStartwerte)
-        Me.TabPage_PES.Controls.Add(Me.ComboStartparameter)
+        Me.TabPage_PES.Controls.Add(Me.ComboOptStartparameter)
         Me.TabPage_PES.Controls.Add(Me.LabelMutation)
-        Me.TabPage_PES.Controls.Add(Me.ComboMutation)
+        Me.TabPage_PES.Controls.Add(Me.ComboOptDnMutation)
         Me.TabPage_PES.Controls.Add(Me.LabelStartSchrittweite)
         Me.TabPage_PES.Controls.Add(Me.TextDeltaStart)
         Me.TabPage_PES.Controls.Add(Me.CheckisDnVektor)
@@ -227,13 +227,13 @@ Partial Class EVO_Einstellungen
         Me.LabelStrategie.TabIndex = 19
         Me.LabelStrategie.Text = "Selektion:"
         '
-        'ComboStrategie
+        'ComboOptStrategie
         '
-        Me.ComboStrategie.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboStrategie.Location = New System.Drawing.Point(80, 34)
-        Me.ComboStrategie.Name = "ComboStrategie"
-        Me.ComboStrategie.Size = New System.Drawing.Size(123, 21)
-        Me.ComboStrategie.TabIndex = 0
+        Me.ComboOptStrategie.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboOptStrategie.Location = New System.Drawing.Point(80, 34)
+        Me.ComboOptStrategie.Name = "ComboOptStrategie"
+        Me.ComboOptStrategie.Size = New System.Drawing.Size(123, 21)
+        Me.ComboOptStrategie.TabIndex = 0
         '
         'LabelStartwerte
         '
@@ -244,13 +244,13 @@ Partial Class EVO_Einstellungen
         Me.LabelStartwerte.TabIndex = 29
         Me.LabelStartwerte.Text = "Startwerte:"
         '
-        'ComboStartparameter
+        'ComboOptStartparameter
         '
-        Me.ComboStartparameter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboStartparameter.Location = New System.Drawing.Point(80, 61)
-        Me.ComboStartparameter.Name = "ComboStartparameter"
-        Me.ComboStartparameter.Size = New System.Drawing.Size(123, 21)
-        Me.ComboStartparameter.TabIndex = 1
+        Me.ComboOptStartparameter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboOptStartparameter.Location = New System.Drawing.Point(80, 61)
+        Me.ComboOptStartparameter.Name = "ComboOptStartparameter"
+        Me.ComboOptStartparameter.Size = New System.Drawing.Size(123, 21)
+        Me.ComboOptStartparameter.TabIndex = 1
         '
         'LabelMutation
         '
@@ -261,14 +261,14 @@ Partial Class EVO_Einstellungen
         Me.LabelMutation.TabIndex = 34
         Me.LabelMutation.Text = "Mutation:"
         '
-        'ComboMutation
+        'ComboOptDnMutation
         '
-        Me.ComboMutation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboMutation.FormattingEnabled = True
-        Me.ComboMutation.Location = New System.Drawing.Point(80, 88)
-        Me.ComboMutation.Name = "ComboMutation"
-        Me.ComboMutation.Size = New System.Drawing.Size(123, 21)
-        Me.ComboMutation.TabIndex = 35
+        Me.ComboOptDnMutation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboOptDnMutation.FormattingEnabled = True
+        Me.ComboOptDnMutation.Location = New System.Drawing.Point(80, 88)
+        Me.ComboOptDnMutation.Name = "ComboOptDnMutation"
+        Me.ComboOptDnMutation.Size = New System.Drawing.Size(123, 21)
+        Me.ComboOptDnMutation.TabIndex = 35
         '
         'LabelStartSchrittweite
         '
@@ -511,9 +511,9 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Populationen.Controls.Add(Me.LabelOptPopEltern)
         Me.GroupBox_Populationen.Controls.Add(Me.ComboOptPopEltern)
         Me.GroupBox_Populationen.Controls.Add(Me.LabelPopStrategie)
-        Me.GroupBox_Populationen.Controls.Add(Me.ComboPopStrategie)
+        Me.GroupBox_Populationen.Controls.Add(Me.ComboOptPopStrategie)
         Me.GroupBox_Populationen.Controls.Add(Me.LabelPopPenalty)
-        Me.GroupBox_Populationen.Controls.Add(Me.ComboPopPenalty)
+        Me.GroupBox_Populationen.Controls.Add(Me.ComboOptPopPenalty)
         Me.GroupBox_Populationen.Enabled = False
         Me.GroupBox_Populationen.Location = New System.Drawing.Point(5, 442)
         Me.GroupBox_Populationen.Name = "GroupBox_Populationen"
@@ -606,13 +606,13 @@ Partial Class EVO_Einstellungen
         Me.LabelPopStrategie.TabIndex = 31
         Me.LabelPopStrategie.Text = "Selektion:"
         '
-        'ComboPopStrategie
+        'ComboOptPopStrategie
         '
-        Me.ComboPopStrategie.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboPopStrategie.Location = New System.Drawing.Point(85, 108)
-        Me.ComboPopStrategie.Name = "ComboPopStrategie"
-        Me.ComboPopStrategie.Size = New System.Drawing.Size(108, 21)
-        Me.ComboPopStrategie.TabIndex = 4
+        Me.ComboOptPopStrategie.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboOptPopStrategie.Location = New System.Drawing.Point(85, 108)
+        Me.ComboOptPopStrategie.Name = "ComboOptPopStrategie"
+        Me.ComboOptPopStrategie.Size = New System.Drawing.Size(108, 21)
+        Me.ComboOptPopStrategie.TabIndex = 4
         '
         'LabelPopPenalty
         '
@@ -622,13 +622,13 @@ Partial Class EVO_Einstellungen
         Me.LabelPopPenalty.TabIndex = 36
         Me.LabelPopPenalty.Text = "Ermittlung der Pop-Güte:"
         '
-        'ComboPopPenalty
+        'ComboOptPopPenalty
         '
-        Me.ComboPopPenalty.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboPopPenalty.Location = New System.Drawing.Point(85, 132)
-        Me.ComboPopPenalty.Name = "ComboPopPenalty"
-        Me.ComboPopPenalty.Size = New System.Drawing.Size(108, 21)
-        Me.ComboPopPenalty.TabIndex = 5
+        Me.ComboOptPopPenalty.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboOptPopPenalty.Location = New System.Drawing.Point(85, 132)
+        Me.ComboOptPopPenalty.Name = "ComboOptPopPenalty"
+        Me.ComboOptPopPenalty.Size = New System.Drawing.Size(108, 21)
+        Me.ComboOptPopPenalty.TabIndex = 5
         '
         'checkpaintconstrained
         '
@@ -1332,9 +1332,9 @@ Partial Class EVO_Einstellungen
     Private WithEvents Label_OptModus As System.Windows.Forms.Label
     Private WithEvents Label_OptModusValue As System.Windows.Forms.Label
     Private WithEvents LabelStrategie As System.Windows.Forms.Label
-    Private WithEvents ComboStrategie As System.Windows.Forms.ComboBox
+    Private WithEvents ComboOptStrategie As System.Windows.Forms.ComboBox
     Private WithEvents LabelStartwerte As System.Windows.Forms.Label
-    Private WithEvents ComboStartparameter As System.Windows.Forms.ComboBox
+    Private WithEvents ComboOptStartparameter As System.Windows.Forms.ComboBox
     Private WithEvents LabelStartSchrittweite As System.Windows.Forms.Label
     Private WithEvents TextDeltaStart As System.Windows.Forms.NumericUpDown
     Private WithEvents CheckisDnVektor As System.Windows.Forms.CheckBox
@@ -1367,9 +1367,9 @@ Partial Class EVO_Einstellungen
     Private WithEvents LabelOptPopEltern As System.Windows.Forms.Label
     Private WithEvents ComboOptPopEltern As System.Windows.Forms.ComboBox
     Private WithEvents LabelPopStrategie As System.Windows.Forms.Label
-    Private WithEvents ComboPopStrategie As System.Windows.Forms.ComboBox
+    Private WithEvents ComboOptPopStrategie As System.Windows.Forms.ComboBox
     Private WithEvents LabelPopPenalty As System.Windows.Forms.Label
-    Private WithEvents ComboPopPenalty As System.Windows.Forms.ComboBox
+    Private WithEvents ComboOptPopPenalty As System.Windows.Forms.ComboBox
     Private WithEvents TabPage_CES As System.Windows.Forms.TabPage
     Friend WithEvents ÖffnenToolStripButton As System.Windows.Forms.ToolStripButton
     Friend WithEvents SpeichernToolStripButton As System.Windows.Forms.ToolStripButton
@@ -1395,7 +1395,7 @@ Partial Class EVO_Einstellungen
     Public WithEvents LabelTSHJmittel As System.Windows.Forms.Label
     Friend WithEvents checkpaintconstrained As System.Windows.Forms.CheckBox
     Friend WithEvents CheckisTournamentSelection As System.Windows.Forms.CheckBox
-    Friend WithEvents ComboMutation As System.Windows.Forms.ComboBox
+    Friend WithEvents ComboOptDnMutation As System.Windows.Forms.ComboBox
     Private WithEvents LabelMutation As System.Windows.Forms.Label
     Friend WithEvents Label_CES_OptModus As System.Windows.Forms.Label
     Friend WithEvents LabelCESMutation As System.Windows.Forms.Label
