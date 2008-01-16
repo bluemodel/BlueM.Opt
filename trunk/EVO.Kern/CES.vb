@@ -82,13 +82,13 @@ Public Class CES
         If (CES_Settings.n_Childs <= CES_Settings.n_Parents And Method <> "HYBRID") Then
             Throw New Exception("Die Anzahl der Eltern muss kleiner als die Anzahl der Nachfahren!" & Chr(13) & Chr(10) & "'Rechenberg 73' schlägt ein Verhältnis von 1:3 bis 1:5 vor.")
         End If
-        If (CES_Settings.ty_Strategy <> EVO_STRATEGIE.Komma_Strategy And CES_Settings.ty_Strategy <> EVO_STRATEGIE.Plus_Strategy) Then
+        If (CES_Settings.OptStrategie <> EVO_STRATEGIE.Komma_Strategie And CES_Settings.OptStrategie <> EVO_STRATEGIE.Plus_Strategie) Then
             Throw New Exception("Typ der Evolutionsstrategie ist nicht '+' oder ','")
         End If
-        If (CES_Settings.ty_ReprodOp <> CES_REPRODOP.Selt_Rand_Uniform And CES_REPRODOP.Order_Crossover AND CES_REPRODOP.Part_Mapped_Cross)
+        If (CES_Settings.OptReprodOp <> CES_REPRODOP.Selt_Rand_Uniform And CES_REPRODOP.Order_Crossover AND CES_REPRODOP.Part_Mapped_Cross)
             Throw New Exception("Typ der Reproduction ist nicht richtig!")
         End If        
-        If (CES_Settings.ty_MutOperator <> CES_MUTATION.RND_Switch And CES_MUTATION.Dyn_Switch)
+        If (CES_Settings.OptMutOperator <> CES_MUTATION.RND_Switch And CES_MUTATION.Dyn_Switch)
             Throw New Exception("Typ der Mutation ist nicht richtig!")
         End If
         If (CES_Settings.n_MemberSecondPop < 1)
@@ -207,14 +207,14 @@ Public Class CES
 
         'Strategie MINUS
         'xxxxxxxxxxxxxxx
-        If CES_Settings.ty_Strategy = "minus" Then
+        If CES_Settings.OptStrategie = "minus" Then 'CHECK: sollte das nicht = EVO_STRATEGIE.Komma_Strategie sein?
             For i = 0 To CES_Settings.n_Parents - 1
                 Parents(i) = Childs(i).Copy
             Next i
 
             'Strategie PLUS
             'xxxxxxxxxxxxxx
-        ElseIf CES_Settings.ty_Strategy = "plus" Then
+        ElseIf CES_Settings.OptStrategie = "plus" Then 'CHECK: sollte das nicht = EVO_STRATEGIE.Plus_Strategie sein?
 
             For i = 0 To CES_Settings.n_Childs - 1
                 'Des schlechteste Elter wird bestimmt
@@ -247,7 +247,7 @@ Public Class CES
         Dim x, y As Integer
         Dim Einzelkind(n_Locations - 1) As Integer
 
-        Select Case CES_Settings.ty_ReprodOp
+        Select Case CES_Settings.OptReprodOp
             'UPGRADE: Eltern werden nicht zufällig gewählt sondern immer in Top Down Reihenfolge
             Case CES_REPRODOP.Selt_Rand_Uniform
                 x = 0
@@ -466,7 +466,7 @@ Public Class CES
         For i = 0 To CES_Settings.n_Childs - 1
             Dim count As Integer = 0
             Do
-                Select Case CES_Settings.ty_MutOperator
+                Select Case CES_Settings.OptMutOperator
                     Case CES_MUTATION.RND_Switch
                         'Verändert zufällig ein gen des Paths
                         Call MutOp_RND_Switch(Childs(i).Path)

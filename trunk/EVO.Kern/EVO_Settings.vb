@@ -16,9 +16,9 @@ Public Class EVO_Settings
     '---------------------------
     Public Structure PES_Settings
 
-        Public ty_EvoModus As EVO_MODUS            'Single- oder Multi-Objective
-        Public ty_EvoStrategie As EVO_STRATEGIE    'Typ der Evolutionsstrategie (+ oder ,)
-        Public ty_StartPar As EVO_STARTPARAMETER   'Startparameter
+        Public OptModus As EVO_MODUS                       'Single- oder Multi-Objective
+        Public OptStrategie As EVO_STRATEGIE               'Typ der Evolutionsstrategie (+ oder ,)
+        Public OptStartparameter As EVO_STARTPARAMETER     'Startparameter
 
         Public Schrittweite As Struct_Schrittweite
 
@@ -26,7 +26,7 @@ Public Class EVO_Settings
             Public DnStart As Double                   'Startschrittweite
             Public DnEpsilon As Double                 'Minimale Schrittweite
             Public is_DnVektor As Boolean              'Soll ein Schrittweitenvektor benutzt werden
-            Public ty_DnMutation As EVO_DnMutation     'Art der Mutation
+            Public OptDnMutation As EVO_DnMutation     'Art der Mutation
             Public DnC As Double                       'Skalierung des learning Parameters
         End Structure
 
@@ -39,7 +39,7 @@ Public Class EVO_Settings
 
         Public n_MemberSekPop As Integer           'Maximale Anzahl Mitglieder der Sekundärpopulation
 
-        Public ty_OptEltern As EVO_ELTERN          'Ermittlung der Individuum-Eltern
+        Public OptEltern As EVO_ELTERN             'Ermittlung der Individuum-Eltern
         Public n_RekombXY As Integer               'X/Y-Schema Rekombination
         Public is_DiversityTournament As Boolean   'Vor der eigentlichen Auswahl eines Elter wird zunächst nach der besseren Diversity geschaut
 
@@ -47,13 +47,13 @@ Public Class EVO_Settings
 
         Public Structure Struct_Pop_Settings
             <XmlAttribute()> _
-            Public is_POPUL As Boolean                 'Mit Populationen
-            Public n_Runden As Integer                 'Anzahl Runden
-            Public n_Popul As Integer                  'Anzahl Populationen
-            Public n_PopEltern As Integer              'Anzahl Populationseltern
-            Public ty_OptPopEltern As EVO_POP_ELTERN   'Ermittlung der Populationseltern
-            Public ty_PopEvoTyp As EVO_STRATEGIE       'Typ der Evolutionsstrategie (+ oder ,) auf Populationsebene
-            Public ty_PopPenalty As EVO_POP_PENALTY    'Art der Beurteilung der Populationsgüte (Multiobjective)
+            Public is_POPUL As Boolean                  'Mit Populationen
+            Public n_Runden As Integer                  'Anzahl Runden
+            Public n_Popul As Integer                   'Anzahl Populationen
+            Public n_PopEltern As Integer               'Anzahl Populationseltern
+            Public OptPopEltern As EVO_POP_ELTERN       'Ermittlung der Populationseltern
+            Public OptPopStrategie As EVO_STRATEGIE     'Typ der Evolutionsstrategie (+ oder ,) auf Populationsebene
+            Public OptPopPenalty As EVO_POP_PENALTY     'Art der Beurteilung der Populationsgüte (Multiobjective)
         End Structure
 
         Public is_paint_constraint As Boolean      'Nur die Individuuen der aktuellen Generation werden gezeichnet
@@ -66,11 +66,11 @@ Public Class EVO_Settings
 
                 Case EVO_MODUS.Single_Objective
 
-                    Me.ty_EvoModus = EVO_MODUS.Single_Objective
-                    Me.ty_EvoStrategie = EVO_STRATEGIE.Plus_Strategy
-                    Me.ty_StartPar = EVO_STARTPARAMETER.Original
+                    Me.OptModus = EVO_MODUS.Single_Objective
+                    Me.OptStrategie = EVO_STRATEGIE.Plus_Strategie
+                    Me.OptStartparameter = EVO_STARTPARAMETER.Original
 
-                    Me.Schrittweite.ty_DnMutation = EVO_DnMutation.Schwefel
+                    Me.Schrittweite.OptDnMutation = EVO_DnMutation.Schwefel
                     Me.Schrittweite.DnStart = 0.1
                     Me.Schrittweite.DnEpsilon = 0.001
                     Me.Schrittweite.is_DnVektor = False
@@ -84,26 +84,26 @@ Public Class EVO_Settings
                     Me.n_Interact = 0
                     Me.n_MemberSekPop = 0
 
-                    Me.ty_OptEltern = EVO_ELTERN.XX_Mitteln_Diskret
+                    Me.OptEltern = EVO_ELTERN.XX_Mitteln_Diskret
                     Me.n_RekombXY = 3
+                    Me.is_DiversityTournament = False
 
                     Me.Pop.is_POPUL = False
                     Me.Pop.n_Runden = 10
                     Me.Pop.n_Popul = 3
                     Me.Pop.n_PopEltern = 2
-                    Me.Pop.ty_OptPopEltern = EVO_POP_ELTERN.Rekombination
-                    Me.Pop.ty_PopEvoTyp = EVO_STRATEGIE.Plus_Strategy
-                    Me.Pop.ty_PopPenalty = EVO_POP_PENALTY.Mittelwert
+                    Me.Pop.OptPopEltern = EVO_POP_ELTERN.Rekombination
+                    Me.Pop.OptPopStrategie = EVO_STRATEGIE.Plus_Strategie
+                    Me.Pop.OptPopPenalty = EVO_POP_PENALTY.Mittelwert
 
                     Me.is_paint_constraint = False
-                    Me.is_DiversityTournament = False
 
 
                 Case EVO_MODUS.Multi_Objective
 
-                    Me.ty_EvoModus = EVO_MODUS.Multi_Objective
-                    Me.ty_EvoStrategie = EVO_STRATEGIE.Plus_Strategy
-                    Me.ty_StartPar = EVO_STARTPARAMETER.Original
+                    Me.OptModus = EVO_MODUS.Multi_Objective
+                    Me.OptStrategie = EVO_STRATEGIE.Plus_Strategie
+                    Me.OptStartparameter = EVO_STARTPARAMETER.Original
 
                     Me.Schrittweite.DnStart = 0.1
                     Me.Schrittweite.is_DnVektor = False
@@ -118,19 +118,19 @@ Public Class EVO_Settings
                     Me.n_Interact = 10
                     Me.n_MemberSekPop = 50
 
-                    Me.ty_OptEltern = EVO_ELTERN.XX_Diskret
+                    Me.OptEltern = EVO_ELTERN.XX_Mitteln_Diskret
                     Me.n_RekombXY = 3
+                    Me.is_DiversityTournament = True
 
                     Me.Pop.is_POPUL = False
                     Me.Pop.n_Runden = 1
                     Me.Pop.n_Popul = 1
                     Me.Pop.n_PopEltern = 1
-                    Me.Pop.ty_OptPopEltern = EVO_POP_ELTERN.Rekombination
-                    Me.Pop.ty_PopEvoTyp = EVO_STRATEGIE.Plus_Strategy
-                    Me.Pop.ty_PopPenalty = EVO_POP_PENALTY.Mittelwert
+                    Me.Pop.OptPopEltern = EVO_POP_ELTERN.Rekombination
+                    Me.Pop.OptPopStrategie = EVO_STRATEGIE.Plus_Strategie
+                    Me.Pop.OptPopPenalty = EVO_POP_PENALTY.Mittelwert
 
                     Me.is_paint_constraint = True
-                    Me.is_DiversityTournament = True
 
             End Select
         End Sub
@@ -145,9 +145,9 @@ Public Class EVO_Settings
         Public n_Generations As Integer  
         Public n_Parents As Integer
         Public n_Childs As Integer
-        Public ty_Strategy As EVO_STRATEGIE                   '"plus" oder "minus" Strategie
-        Public ty_ReprodOp As CES_REPRODOP
-        Public ty_MutOperator As CES_MUTATION
+        Public OptStrategie As EVO_STRATEGIE           '"plus" oder "minus" Strategie
+        Public OptReprodOp As CES_REPRODOP
+        Public OptMutOperator As CES_MUTATION
         Public pr_MutRate As Integer                   'Definiert die Wahrscheinlichkeit der Mutationsrate in %
         
         Public is_SecPop As Boolean
@@ -176,9 +176,9 @@ Public Class EVO_Settings
                     Me.n_Generations = 500
                     Me.n_Parents = 5
                     Me.n_Childs = 15
-                    Me.ty_Strategy = EVO_STRATEGIE.Plus_Strategy
-                    Me.ty_ReprodOp = CES_REPRODOP.Selt_Rand_Uniform
-                    Me.ty_MutOperator = CES_MUTATION.RND_Switch
+                    Me.OptStrategie = EVO_STRATEGIE.Plus_Strategie
+                    Me.OptReprodOp = CES_REPRODOP.Selt_Rand_Uniform
+                    Me.OptMutOperator = CES_MUTATION.RND_Switch
                     Me.pr_MutRate = 25
         
                     Me.is_SecPop = True
@@ -201,9 +201,9 @@ Public Class EVO_Settings
                     Me.n_Generations = 500
                     Me.n_Parents = 5
                     Me.n_Childs = 15
-                    Me.ty_Strategy = EVO_STRATEGIE.Plus_Strategy
-                    Me.ty_ReprodOp = CES_REPRODOP.Selt_Rand_Uniform
-                    Me.ty_MutOperator = CES_MUTATION.RND_Switch
+                    Me.OptStrategie = EVO_STRATEGIE.Plus_Strategie
+                    Me.OptReprodOp = CES_REPRODOP.Selt_Rand_Uniform
+                    Me.OptMutOperator = CES_MUTATION.RND_Switch
                     Me.pr_MutRate = 25
         
                     Me.is_SecPop = True

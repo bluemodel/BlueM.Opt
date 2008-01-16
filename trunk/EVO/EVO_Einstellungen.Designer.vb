@@ -27,7 +27,7 @@ Partial Class EVO_Einstellungen
         Me.LabelStrategie = New System.Windows.Forms.Label
         Me.ComboStrategie = New System.Windows.Forms.ComboBox
         Me.LabelStartwerte = New System.Windows.Forms.Label
-        Me.ComboOptVorgabe = New System.Windows.Forms.ComboBox
+        Me.ComboStartparameter = New System.Windows.Forms.ComboBox
         Me.LabelMutation = New System.Windows.Forms.Label
         Me.ComboMutation = New System.Windows.Forms.ComboBox
         Me.LabelStartSchrittweite = New System.Windows.Forms.Label
@@ -183,7 +183,7 @@ Partial Class EVO_Einstellungen
         Me.TabPage_PES.Controls.Add(Me.LabelStrategie)
         Me.TabPage_PES.Controls.Add(Me.ComboStrategie)
         Me.TabPage_PES.Controls.Add(Me.LabelStartwerte)
-        Me.TabPage_PES.Controls.Add(Me.ComboOptVorgabe)
+        Me.TabPage_PES.Controls.Add(Me.ComboStartparameter)
         Me.TabPage_PES.Controls.Add(Me.LabelMutation)
         Me.TabPage_PES.Controls.Add(Me.ComboMutation)
         Me.TabPage_PES.Controls.Add(Me.LabelStartSchrittweite)
@@ -244,13 +244,13 @@ Partial Class EVO_Einstellungen
         Me.LabelStartwerte.TabIndex = 29
         Me.LabelStartwerte.Text = "Startwerte:"
         '
-        'ComboOptVorgabe
+        'ComboStartparameter
         '
-        Me.ComboOptVorgabe.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboOptVorgabe.Location = New System.Drawing.Point(80, 61)
-        Me.ComboOptVorgabe.Name = "ComboOptVorgabe"
-        Me.ComboOptVorgabe.Size = New System.Drawing.Size(123, 21)
-        Me.ComboOptVorgabe.TabIndex = 1
+        Me.ComboStartparameter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboStartparameter.Location = New System.Drawing.Point(80, 61)
+        Me.ComboStartparameter.Name = "ComboStartparameter"
+        Me.ComboStartparameter.Size = New System.Drawing.Size(123, 21)
+        Me.ComboStartparameter.TabIndex = 1
         '
         'LabelMutation
         '
@@ -883,7 +883,6 @@ Partial Class EVO_Einstellungen
         '
         'ComboCESReproduction
         '
-        Me.ComboCESReproduction.DataSource = System.Enum.GetValues(GetType(EVO.Kern.Constants.CES_REPRODOP))
         Me.ComboCESReproduction.FormattingEnabled = True
         Me.ComboCESReproduction.Location = New System.Drawing.Point(69, 124)
         Me.ComboCESReproduction.Name = "ComboCESReproduction"
@@ -960,7 +959,6 @@ Partial Class EVO_Einstellungen
         '
         'ComboCESMutation
         '
-        Me.ComboCESMutation.DataSource = System.Enum.GetValues(GetType(EVO.Kern.Constants.CES_MUTATION))
         Me.ComboCESMutation.FormattingEnabled = True
         Me.ComboCESMutation.Location = New System.Drawing.Point(69, 151)
         Me.ComboCESMutation.Name = "ComboCESMutation"
@@ -980,7 +978,6 @@ Partial Class EVO_Einstellungen
         '
         'ComboCESSelection
         '
-        Me.ComboCESSelection.DataSource = System.Enum.GetValues(GetType(EVO.Kern.Constants.EVO_STRATEGIE))
         Me.ComboCESSelection.FormattingEnabled = True
         Me.ComboCESSelection.Location = New System.Drawing.Point(69, 97)
         Me.ComboCESSelection.Name = "ComboCESSelection"
@@ -1337,7 +1334,7 @@ Partial Class EVO_Einstellungen
     Private WithEvents LabelStrategie As System.Windows.Forms.Label
     Private WithEvents ComboStrategie As System.Windows.Forms.ComboBox
     Private WithEvents LabelStartwerte As System.Windows.Forms.Label
-    Private WithEvents ComboOptVorgabe As System.Windows.Forms.ComboBox
+    Private WithEvents ComboStartparameter As System.Windows.Forms.ComboBox
     Private WithEvents LabelStartSchrittweite As System.Windows.Forms.Label
     Private WithEvents TextDeltaStart As System.Windows.Forms.NumericUpDown
     Private WithEvents CheckisDnVektor As System.Windows.Forms.CheckBox

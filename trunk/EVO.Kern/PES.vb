@@ -148,10 +148,10 @@ Public Class PES
 
         'Überprüfung der Übergebenen Werte
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        If (settings.PES.ty_EvoStrategie <> EVO_STRATEGIE.Komma_Strategy And settings.PES.ty_EvoStrategie <> EVO_STRATEGIE.Plus_Strategy) Then
+        If (settings.PES.OptStrategie <> EVO_STRATEGIE.Komma_Strategie And settings.PES.OptStrategie <> EVO_STRATEGIE.Plus_Strategie) Then
             Throw New Exception("Typ der Evolutionsstrategie ist nicht '+' oder ','")
         End If
-        If (settings.PES.Pop.ty_PopEvoTyp <> EVO_STRATEGIE.Komma_Strategy And settings.PES.Pop.ty_PopEvoTyp <> EVO_STRATEGIE.Plus_Strategy) Then
+        If (settings.PES.Pop.OptPopStrategie <> EVO_STRATEGIE.Komma_Strategie And settings.PES.Pop.OptPopStrategie <> EVO_STRATEGIE.Plus_Strategie) Then
             Throw New Exception("Typ der Evolutionsstrategie auf Populationsebene ist nicht '+' oder ','")
         End If
         If (settings.PES.Pop.n_Runden < 1) Then
@@ -163,11 +163,14 @@ Public Class PES
         If (settings.PES.Pop.n_PopEltern < 1) Then
             Throw New Exception("Die Anzahl der Populationseltern ist kleiner 1")
         End If
-        If (settings.PES.Pop.ty_OptPopEltern < 1 Or settings.PES.Pop.ty_OptPopEltern > 3) Then
+        If (settings.PES.Pop.OptPopEltern < 1 Or settings.PES.Pop.OptPopEltern > 3) Then
             Throw New Exception("Ermittlung der Populationseltern ist nicht Mittelwert, Rekombination oder Selektion!")
         End If
-        If (settings.PES.ty_OptEltern < 1 Or settings.PES.ty_OptEltern > 8) Then
+        If (settings.PES.OptEltern < 1 Or settings.PES.OptEltern > 8) Then
             Throw New Exception("Strategie zur Ermittlung der Eltern ist nicht möglich!")
+        End If
+        If (settings.PES.OptModus = EVO_MODUS.Single_Objective And settings.PES.OptEltern = EVO_ELTERN.Neighbourhood) Then
+            Throw New Exception("Die Option 'Neighbourhood' für die Ermittlung der Eltern ist bei Single-Objective nicht zulässig!")
         End If
         If (settings.PES.n_Eltern < 1) Then
             Throw New Exception("Die Anzahl der Eltern ist kleiner 1!")
@@ -184,7 +187,7 @@ Public Class PES
         If (settings.PES.Schrittweite.DnStart < 0) Then
             Throw New Exception("Die Startschrittweite darf nicht kleiner 0 sein!")
         End If
-        If (settings.PES.ty_StartPar < 1 Or settings.PES.ty_StartPar > 2) Then
+        If (settings.PES.OptStartparameter < 1 Or settings.PES.OptStartparameter > 2) Then
             Throw New Exception("Die Startparameter dürfen nur zufällig sein oder aus den Originalparameter bestehen!")
         End If
         If (settings.PES.Pop.n_Popul < settings.PES.Pop.n_PopEltern) Then
@@ -247,14 +250,14 @@ Public Class PES
         ReDim Best.Front(Settings.PES.n_Eltern - 1, Settings.PES.Pop.n_Popul - 1)
 
         'NDSorting wird nur benötigt, falls eine Paretofront approximiert wird
-        If (Settings.PES.ty_EvoModus = EVO_MODUS.Multi_Objective) Then
+        If (Settings.PES.OptModus = EVO_MODUS.Multi_Objective) Then
             ReDim NDSorting(Settings.PES.n_Eltern + Settings.PES.n_Nachf - 1)
             Call Individuum.New_Array("NDSorting", NDSorting)
             For i = 0 To Settings.PES.n_Eltern + Settings.PES.n_Nachf - 1
                 ReDim NDSorting(i).PES_d(Anz.Para - 1)
                 ReDim NDSorting(i).PES_X(Anz.Para - 1)
             Next i
-            If (Settings.PES.ty_OptEltern = EVO_ELTERN.Neighbourhood) Then
+            If (Settings.PES.OptEltern = EVO_ELTERN.Neighbourhood) Then
                 ReDim PenaltyDistance(Settings.PES.n_Eltern - 1, Settings.PES.n_Eltern - 1)
                 ReDim Distanceb(Settings.PES.n_Eltern - 1)
             End If
@@ -276,10 +279,10 @@ Public Class PES
         Next
 
         'Falls NDSorting Crowding Distance wird initialisiert
-        If (Settings.PES.ty_EvoModus = EVO_MODUS.Multi_Objective) Then
+        If (Settings.PES.OptModus = EVO_MODUS.Multi_Objective) Then
             For n = 0 To Settings.PES.Pop.n_Popul - 1
                 For m = 0 To Anz.Penalty - 1
-                    Select Case Settings.PES.Pop.ty_PopPenalty
+                    Select Case Settings.PES.Pop.OptPopPenalty
 
                         Case EVO_POP_PENALTY.Crowding
                             'Qualität der Populationseltern wird auf sehr großen Wert gesetzt
@@ -337,7 +340,7 @@ Public Class PES
         Randomize()
 
         'Die Startparameter für die Eltern werden gesetzt
-        Select Case Settings.PES.ty_StartPar
+        Select Case Settings.PES.OptStartparameter
 
             Case EVO_STARTPARAMETER.Zufall 'Zufällige Startwerte
                 For v = 0 To Anz.Para - 1
@@ -465,7 +468,7 @@ Public Class PES
         Dim m, n, v As Integer
         Dim R As Integer                      'Zufälliger Integer Wert
 
-        Select Case Settings.PES.Pop.ty_OptPopEltern
+        Select Case Settings.PES.Pop.OptPopEltern
 
             Case EVO_POP_ELTERN.Rekombination 'MultiRekombination über alle Eltern (x/x,y) oder (x/x+y)
                 For n = 0 To Settings.PES.n_Eltern - 1
@@ -521,7 +524,7 @@ Public Class PES
         Dim TournamentElter1 As Integer
         Dim TournamentElter2 As Integer
 
-        Select Case Settings.PES.ty_OptEltern
+        Select Case Settings.PES.OptEltern
 
             Case EVO_ELTERN.Selektion 'Zufallswahl über alle Eltern
 
@@ -959,12 +962,12 @@ StartMutation:
         'Einheitliche Schrittweite
         '-------------------------
         If (Not Settings.PES.Schrittweite.is_DnVektor) Then
-            If (Settings.PES.Schrittweite.ty_DnMutation = EVO_DnMutation.Rechenberg) Then
+            If (Settings.PES.Schrittweite.OptDnMutation = EVO_DnMutation.Rechenberg) Then
                 '+/-1
                 expo = (2 * Int(Rnd() + 0.5) - 1)
                 'Schrittweite wird mutiert
                 DnTemp(0) = AktPara.Dn(0) * galpha ^ expo
-            ElseIf (Settings.PES.Schrittweite.ty_DnMutation = EVO_DnMutation.Schwefel) Then
+            ElseIf (Settings.PES.Schrittweite.OptDnMutation = EVO_DnMutation.Schwefel) Then
                 tau = Settings.PES.Schrittweite.DnC / Math.Sqrt(Anz.Para)
                 'Normalverteilte Zufallszahl (SD = 1, mean = 0)
                 Z = Me.NormalDistributationRND(1.0, 0.0)
@@ -981,7 +984,7 @@ StartMutation:
 
         'Mutation
         '--------
-        If (Settings.PES.Schrittweite.is_DnVektor And Settings.PES.Schrittweite.ty_DnMutation = EVO_DnMutation.Schwefel) Then
+        If (Settings.PES.Schrittweite.is_DnVektor And Settings.PES.Schrittweite.OptDnMutation = EVO_DnMutation.Schwefel) Then
             taufix = Settings.PES.Schrittweite.DnC / Math.Sqrt(2*Anz.Para)
             ZFix = Me.NormalDistributationRND(1.0, 0.0)
         End If
@@ -1001,12 +1004,12 @@ StartMutation:
                 '-------------------
                 If (Settings.PES.Schrittweite.is_DnVektor) Then
 
-                    If (Settings.PES.Schrittweite.ty_DnMutation = EVO_DnMutation.Rechenberg) Then
+                    If (Settings.PES.Schrittweite.OptDnMutation = EVO_DnMutation.Rechenberg) Then
                         '+/-1
                         expo = (2 * Int(Rnd() + 0.5) - 1)
                         'Schrittweite wird mutiert
                         DnTemp(v) = AktPara.Dn(v) * galpha ^ expo
-                    ElseIf (Settings.PES.Schrittweite.ty_DnMutation = EVO_DnMutation.Schwefel) Then
+                    ElseIf (Settings.PES.Schrittweite.OptDnMutation = EVO_DnMutation.Schwefel) Then
                         tau = Settings.PES.Schrittweite.DnC / Math.Sqrt(2*math.Sqrt(Anz.Para))
                         'Normalverteilte Zufallszahl (SD = 1, mean = 0)
                         Z = Me.NormalDistributationRND(1.0, 0.0)
@@ -1020,10 +1023,10 @@ StartMutation:
                 'Normalverteilte Zufallszahl mit Standardabweichung 1/sqr(varanz)
 
                 'Z = System.Math.Sqrt(-2 * System.Math.Log(1 - Rnd()) / Anz.Para) * System.Math.Sin(6.2832 * Rnd())
-                If (Settings.PES.Schrittweite.ty_DnMutation = EVO_DnMutation.Rechenberg) Then
+                If (Settings.PES.Schrittweite.OptDnMutation = EVO_DnMutation.Rechenberg) Then
                     'Normalverteilte Zufallszahl mit Standardabweichung 1/sqr(var.anz), , Mittelwert 0
                     Z = Me.NormalDistributationRND(1 / Math.Sqrt(Anz.Para), 0.0)
-                ElseIf (Settings.PES.Schrittweite.ty_DnMutation = EVO_DnMutation.Schwefel) Then
+                ElseIf (Settings.PES.Schrittweite.OptDnMutation = EVO_DnMutation.Schwefel) Then
                     'Normalverteilte Zufallszahl mit Standardabweichung 1, Mittelwert 0
                     Z = Me.NormalDistributationRND(1.0, 0.0)
                 End If
@@ -1073,13 +1076,13 @@ StartMutation:
         i = 0
         h1 = Qbpop(0, 0)
         For m = 1 To Settings.PES.Pop.n_Popul - 1
-            If (Settings.PES.ty_EvoModus = EVO_MODUS.Single_Objective) Then
+            If (Settings.PES.OptModus = EVO_MODUS.Single_Objective) Then
                 If Qbpop(m, 0) > h1 Then
                     h1 = Qbpop(m, 0)
                     i = m
                 End If
             Else
-                Select Case Settings.PES.Pop.ty_PopPenalty
+                Select Case Settings.PES.Pop.OptPopPenalty
 
                     Case EVO_POP_PENALTY.Crowding
                         If Qbpop(m, 0) > h1 Then
@@ -1098,7 +1101,7 @@ StartMutation:
 
         'Der schlechtetste der besten Qualitätswerte wird bestimmt ; Position -> i
         '(höchster Wert der Kostenfunktion, niedrigster Wert der Spannweite)
-        If (Settings.PES.ty_EvoModus = EVO_MODUS.Multi_Objective) Then
+        If (Settings.PES.OptModus = EVO_MODUS.Multi_Objective) Then
             j = 0
             h2 = Qbpop(0, 1)
             For m = 2 To Settings.PES.Pop.n_Popul
@@ -1111,7 +1114,7 @@ StartMutation:
 
         'Qualität der aktuellen Population wird bestimmt
         h1 = 0
-        If (Settings.PES.ty_EvoModus = EVO_MODUS.Single_Objective) Then
+        If (Settings.PES.OptModus = EVO_MODUS.Single_Objective) Then
             For m = 0 To Settings.PES.n_Eltern - 1
                 h1 = h1 + Best.Qb(m, PES_iAkt.iAktPop, 0) / Settings.PES.n_Eltern
             Next m
@@ -1122,7 +1125,7 @@ StartMutation:
 
         'Falls die Qualität des aktuellen Population besser ist (Penaltyfunktion geringer)
         'als die schlechteste im Bestwertspeicher, wird diese ersetzt
-        If (Settings.PES.ty_EvoModus = EVO_MODUS.Single_Objective) Then
+        If (Settings.PES.OptModus = EVO_MODUS.Single_Objective) Then
             If h1 < Qbpop(i, 0) Then
                 Qbpop(i, 0) = h1
                 For m = 0 To Anz.Para - 1
@@ -1135,7 +1138,7 @@ StartMutation:
                 Next m
             End If
         Else
-            Select Case Settings.PES.Pop.ty_PopPenalty
+            Select Case Settings.PES.Pop.OptPopPenalty
 
                 Case EVO_POP_PENALTY.Crowding
                     If h1 < Qbpop(i, 0) Then
@@ -1174,7 +1177,7 @@ StartMutation:
         Dim m, i, j, v As Integer
         Dim h As Double
 
-        If (Settings.PES.ty_EvoModus = EVO_MODUS.Single_Objective) Then
+        If (Settings.PES.OptModus = EVO_MODUS.Single_Objective) Then
             'SO - Standard ES nach Rechenberg
             '--------------------------------
             'Der schlechteste der besten Qualitätswerte wird bestimmt ; Position -> j
@@ -1231,7 +1234,7 @@ StartMutation:
     Public Sub EsResetBWSpeicher()
         Dim n, i As Integer
 
-        If (Settings.PES.ty_EvoStrategie = EVO_STRATEGIE.Komma_Strategy) Then
+        If (Settings.PES.OptStrategie = EVO_STRATEGIE.Komma_Strategie) Then
             For n = 0 To Settings.PES.n_Eltern - 1
                 For i = 0 To Anz.Penalty - 1
                     Best.Qb(n, PES_iAkt.iAktPop, i) = 1.0E+300
@@ -1247,7 +1250,7 @@ StartMutation:
     Public Sub EsResetPopBWSpeicher()
         Dim n, i As Integer
 
-        If (Settings.PES.Pop.ty_PopEvoTyp = EVO_STRATEGIE.Komma_Strategy) Then
+        If (Settings.PES.Pop.OptPopStrategie = EVO_STRATEGIE.Komma_Strategie) Then
             For n = 0 To Settings.PES.Pop.n_Popul - 1
                 For i = 0 To Anz.Penalty - 1
                     Qbpop(n, i) = 1.0E+300
@@ -1266,7 +1269,7 @@ StartMutation:
         Dim Realisierungsspeicher(,) As Double
         Dim Z As Integer
 
-        Select Case Settings.PES.Pop.ty_PopPenalty
+        Select Case Settings.PES.Pop.OptPopPenalty
             Case EVO_POP_PENALTY.Crowding
                 Z = 0
             Case EVO_POP_PENALTY.Spannweite
@@ -1281,7 +1284,7 @@ StartMutation:
             Realisierungsspeicher(m, 1) = m
         Next m
 
-        If (Settings.PES.ty_EvoModus = EVO_MODUS.Single_Objective) Then
+        If (Settings.PES.OptModus = EVO_MODUS.Single_Objective) Then
             'Standard ES nach Rechenberg
             '---------------------------
             For m = 0 To Settings.PES.Pop.n_Popul - 1
@@ -1300,7 +1303,7 @@ StartMutation:
         Else
             'Multi-Objective mit Paretofront
             '-------------------------------
-            Select Case Settings.PES.Pop.ty_PopPenalty
+            Select Case Settings.PES.Pop.OptPopPenalty
 
                 Case EVO_POP_PENALTY.Crowding
                     For m = 0 To Settings.PES.Pop.n_Popul - 1
@@ -1350,7 +1353,7 @@ StartMutation:
         Dim i, v As Integer
 
 
-        If (Settings.PES.ty_EvoModus = EVO_MODUS.Single_Objective) Then
+        If (Settings.PES.OptModus = EVO_MODUS.Single_Objective) Then
             'Standard ES nach Rechenberg
             'xxxxxxxxxxxxxxxxxxxxxxxxxxx
             'Die Eltern werden gleich der besten Kinder gesetzt (Schrittweite und Parameterwert)
@@ -1419,7 +1422,7 @@ StartMutation:
 
             '6: Sortierung der Lösungen ist nur für Neighbourhood-Rekombination notwendig
             '----------------------------------------------------------------------------
-            If (Settings.PES.ty_OptEltern = EVO_ELTERN.Neighbourhood) Then
+            If (Settings.PES.OptEltern = EVO_ELTERN.Neighbourhood) Then
                 Call Neighbourhood_AbstandsArray()
                 Call Neighbourhood_Crowding_Distance()
             End If
