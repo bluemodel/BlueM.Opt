@@ -337,69 +337,55 @@ Public MustInherit Class Sim
 
         Dim Zeile, array() As String
         Dim AnzParam As Integer = 0
+        Dim AnzParam0 As Integer = 0
         Dim i As Integer = 0
+        Dim k As Integer = 0
         Dim Bez_str As String = ""
-        Dim k As Integer
-
+        Dim nZRE, tmp As Integer
+       
         'Anzahl der Parameter feststellen
         '---------------------------------
         Do
             Zeile = StrRead.ReadLine.ToString()
             If (Zeile.StartsWith("*") = False) Then
                 array = Zeile.Split("|")
-                If (array(1).Trim().StartsWith("Zeitreihe")) Then
-                    AnzParam += Convert.ToInt16(array(2).Trim(), Sim.FortranProvider)
-                Else
-                    AnzParam += 1
-                End If
-            End If
-        Loop Until StrRead.Peek() = -1
-  
-        ReDim List_OptParameter(AnzParam - 1)
-        ReDim List_OptParameter_Save(AnzParam - 1)
-
-        'Zurück zum Dateianfang und lesen
-        '---------------------------------
-        FiStr.Seek(0, SeekOrigin.Begin)
-
-        i = 0
-        Do
-            Zeile = StrRead.ReadLine.ToString()
-            If (Zeile.StartsWith("*") = False) Then
-                array = Zeile.Split("|")
-
-                'Werte zuweisen
 
                 If (array(1).Trim().StartsWith("Zeitreihe")) Then
-                    For k = 0 To AnzParam - 1
+                    tmp = Convert.ToInt16(array(2).Trim(), Sim.FortranProvider)
+                    AnzParam = AnzParam + tmp + tmp - 1 'ermitteln der Parameteranzahl nAbschn + nAbschn - 1
+                    If AnzParam > 0 Then ReDim Preserve List_OptParameter(AnzParam - 1)
+                    If AnzParam > 0 Then ReDim Preserve List_OptParameter_Save(AnzParam - 1)
+                    For k = AnzParam0 To AnzParam - 1
                         List_OptParameter(k).Bezeichnung = "Zeitreihe" + k.ToString
-                        List_OptParameter(k).Einheit = "-"
                         List_OptParameter(k).Wert = Convert.ToDouble(array(3).Trim(), Sim.FortranProvider)
                         List_OptParameter(k).Min = Convert.ToDouble(array(4).Trim(), Sim.FortranProvider)
                         List_OptParameter(k).Max = Convert.ToDouble(array(5).Trim(), Sim.FortranProvider)
                     Next
+                    AnzParam0 = AnzParam
 
-                    Exit Do
-                    
                 Else
+                    If i > 0 Then ReDim Preserve List_OptParameter(i)
+                    If i > 0 Then ReDim Preserve List_OptParameter_Save(i)
 
                     List_OptParameter(i).Bezeichnung = array(1).Trim()
                     List_OptParameter(i).Einheit = array(2).Trim()
                     List_OptParameter(i).Wert = Convert.ToDouble(array(3).Trim(), Sim.FortranProvider)
                     List_OptParameter(i).Min = Convert.ToDouble(array(4).Trim(), Sim.FortranProvider)
                     List_OptParameter(i).Max = Convert.ToDouble(array(5).Trim(), Sim.FortranProvider)
+
                     'liegt eine Beziehung vor?
                     If (i > 0 And Not array(6).Trim() = "") Then
                         Me.List_OptParameter(i).Beziehung = getBeziehung(array(6).Trim())
                     Else
                         Me.List_OptParameter(i).Beziehung = EVO.Kern.PES.Beziehung.keine
                     End If
+
                     i += 1
+
                 End If
             End If
         Loop Until StrRead.Peek() = -1
-
-
+  
         '-----------------------------------------------------------------------------------------
 
         StrRead.Close()
@@ -443,59 +429,40 @@ Public MustInherit Class Sim
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-        Dim Zeile, Zeile2 As String
+        Dim Zeile As String
         Dim AnzParam As Integer = 0
+        Dim AnzParam0 As Integer = 0
 
-        Dim array(), array2() As String
+        Dim array() As String
         Dim i As Integer = 0
         Dim k As Integer = 0
-        Dim nZRE As Integer = 0 'Anzahl der Zeitreihen
+        Dim tmp As Integer = 0
   
         'Anzahl der Parameter feststellen
         '------------------------------------
         Do
             Zeile = StrRead.ReadLine.ToString()
             If (Zeile.StartsWith("*") = False) Then
-                array = Zeile.Split("|")
-                If (array(1).Trim().StartsWith("Zeitreihe")) Then
-                    AnzParam += Convert.ToInt16(array(3).Trim())
-                    nZRE += 1
-                Else
-                    AnzParam += 1
-                End If
-            End If
-        Loop Until StrRead.Peek() = -1
 
-        ReDim List_ModellParameter(AnzParam - 1)
-        ReDim List_ModellParameter_Save(AnzParam - 1)
-
-        'Zurück zum Dateianfang und lesen
-        '------------------------------------
-        FiStr.Seek(0, SeekOrigin.Begin)
-        
-        Do
-            Zeile = StrRead.ReadLine.ToString()
-
-            If (Zeile.StartsWith("*") = False) Then
                 array = Zeile.Split("|")
 
-                'Werte zuweisen
                 If (array(1).Trim().StartsWith("Zeitreihe")) Then
-
-                    'nur bei Zeile 1
-                    If i = 0 Then
-                        For k = 0 To AnzParam - 1
-                            List_ModellParameter(k).OptParameter = "Zeitreihe" + k.ToString
-                            List_ModellParameter(k).Bezeichnung = ""
-                            List_ModellParameter(k).Element = nZRE
-                            List_ModellParameter(k).Faktor = 1.0
-                        Next
-                    End If
-
+                    tmp = Convert.ToInt16(array(3).Trim(), Sim.FortranProvider)
+                    AnzParam = AnzParam + tmp + tmp - 1 'ermitteln der Parameteranzahl nAbschn + nAbschn - 1
+                    If AnzParam > 0 Then ReDim Preserve List_ModellParameter(AnzParam - 1)
+                    If AnzParam > 0 Then ReDim Preserve List_ModellParameter_Save(AnzParam - 1)
+                    For k = AnzParam0 To AnzParam - 1
+                        List_ModellParameter(k).OptParameter = "Zeitreihe" + k.ToString
+                        List_ModellParameter(k).Element = i + 1
+                        List_ModellParameter(k).Faktor = Convert.ToDouble(array(9).Trim(), Sim.FortranProvider)
+                        List_ModellParameter(k).Bezeichnung = array(2).Trim()
+                        List_ModellParameter(i).ZeileNr = Convert.ToInt16(array(3).Trim(), Sim.FortranProvider)
+                    Next
+                    AnzParam0 = AnzParam
                     List_ModellParameter(i).Datei = array(4).Trim()
-                    List_ModellParameter(i).Bezeichnung = array(2).Trim()
-
                 Else
+                    If i > 0 Then ReDim Preserve List_ModellParameter(i)
+                    If i > 0 Then ReDim Preserve List_ModellParameter_Save(i)
                     List_ModellParameter(i).OptParameter = array(1).Trim()
                     List_ModellParameter(i).Bezeichnung = array(2).Trim()
                     List_ModellParameter(i).Einheit = array(3).Trim()
@@ -508,34 +475,13 @@ Public MustInherit Class Sim
                 End If
 
                 i += 1
+
             End If
-
-
         Loop Until StrRead.Peek() = -1
-
-        'Öffne *.EXT um Pfade zu lesen
-        Dim DateiZRE As String = WorkDir & Datensatz & ".EXT"
-        Dim FiStrZRE As FileStream = New FileStream(DateiZRE, FileMode.Open, IO.FileAccess.ReadWrite)
-        Dim StrReadZRE As StreamReader = New StreamReader(FiStrZRE, System.Text.Encoding.GetEncoding("iso8859-1"))
-
-        Do
-            Zeile2 = StrReadZRE.ReadLine.ToString()
-            If (Zeile2.StartsWith("*") = False) Then
-                array2 = Zeile2.Split("|")
-                For i = 0 To AnzParam - 1
-                    If (array2(1).Trim() = List_ModellParameter(i).Bezeichnung) Then
-                        List_ModellParameter(i).Datei = array2(4).Trim()
-                    End If
-                Next i
-            End If
-        Loop Until StrReadZRE.Peek() = -1
 
 
         StrRead.Close()
         FiStr.Close()
-
-        StrReadZRE.Close()
-        FiStrZRE.Close()
 
         'ModellParameter werden hier gesichert
         For i = 0 To List_ModellParameter.GetUpperBound(0)
@@ -1375,20 +1321,33 @@ Public MustInherit Class Sim
         'Evaluiere ob Zeitreihe
         If List_OptParameter(0).Bezeichnung.Contains("Zeitreihe") Then
 
-            'ermittle Anzahl der Zeitreihen
-            nZRE = List_ModellParameter(0).Element
-
             AnzParam = List_ModellParameter.Length
-            
+
+            'ermittle Anzahl der Zeitreihen
+            For n = 0 To AnzParam - 1
+                If List_ModellParameter(n).OptParameter.Contains("Zeitreihe") Then
+                    If List_ModellParameter(n).Element > nZRE Then nZRE = List_ModellParameter(n).Element
+                End If
+            Next
+
+            'Bestimmen der Simulationschritte
+            actDate = Me.SimStart
+            date2 = actDate
+
+            While date2 <= Me.SimEnde
+                ndauer += 1
+                date2 = date2.Add(Me.SimDT)
+            End While
+
             'Loop über alle Zeitreihen
             For n = 0 To nZRE - 1
+                jend = List_ModellParameter(n).ZeileNr - 1 'nZeit
 
-                'Settings
-                ndauer = 60
-                istart = 72 - ndauer
+                'erster und letzter Zeitschritt
+                Zeitpunkt(0) = 1
+                Zeitpunkt(jend + 1) = ndauer
 
-                jend = (AnzParam / nZRE - 1) / 2
-
+                tmp = 0.0
                 For j = 1 To jend
                     param += 1
                     tmp = tmp + List_OptParameter(param - 1).SKWert
@@ -1400,17 +1359,14 @@ Public MustInherit Class Sim
                 Next j
 
                 SumFaktor = ndauer / SumZeit
+                If j = 1 Then SumFaktor = ndauer
 
                 For j = 1 To jend
                     Zeitpunkt(j) = Zeitpunkt(j) * SumFaktor
                     Zeitpunkt(j) = Math.Round(Zeitpunkt(j), 0)
                 Next j
 
-                'erster und letzter Zeitschritt
-                Zeitpunkt(0) = 1
-                Zeitpunkt(jend + 1) = 60
-                If jend = 1 Then Zeitpunkt(1) = Math.Round(List_ModellParameter(param - 1).Wert * 60, 0)
-
+               
                 '2.Q eintragen
                 For k = 0 To jend
                     param += 1
@@ -1423,7 +1379,7 @@ Public MustInherit Class Sim
                 'ZRE-Datei schreiben
 
                 i = 0
-              
+
                 Text = "*ZRE" + vbCrLf
                 Text += "ZRE-Format m3/s   1" + vbCrLf
                 Text += "1 1   1" + vbCrLf
