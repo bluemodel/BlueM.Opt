@@ -38,6 +38,7 @@ Public Class BlueM
     Private IHA1 As IHA
     Private Damage1 As Damage
 
+
 #End Region 'Eigenschaften
 
 #Region "Methoden"
@@ -378,7 +379,8 @@ Public Class BlueM
 
         Dim QWert As Double
         Dim SimReihe As Wave.Zeitreihe
-
+        Dim Datei As String
+        
         'Simulationsergebnis auslesen
         SimReihe = Me.SimErgebnis(OptZiel.SimGr)
 
@@ -399,9 +401,9 @@ Public Class BlueM
                 QWert = Me.IHA1.QWert_IHA(OptZiel)
 
             Case "Schaden"
-                'QWert = Me.Damage1.QWert_Damage(OptZiel)
-                QWert = 200.0
-
+                Datei = WorkDir & Datensatz & ".wel"
+                Me.Damage1 = New Damage()
+                QWert = Me.Damage1.QWert_Damage(Datei)
         End Select
 
         Return QWert

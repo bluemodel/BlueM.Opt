@@ -341,7 +341,7 @@ Public MustInherit Class Sim
         Dim i As Integer = 0
         Dim k As Integer = 0
         Dim Bez_str As String = ""
-        Dim nZRE, tmp As Integer
+        Dim tmp As Integer
        
         'Anzahl der Parameter feststellen
         '---------------------------------
@@ -457,6 +457,7 @@ Public MustInherit Class Sim
                         List_ModellParameter(k).Faktor = Convert.ToDouble(array(9).Trim(), Sim.FortranProvider)
                         List_ModellParameter(k).Bezeichnung = array(2).Trim()
                         List_ModellParameter(i).ZeileNr = Convert.ToInt16(array(3).Trim(), Sim.FortranProvider)
+                        List_ModellParameter(i).SpVon = Convert.ToInt16(array(7).Trim())
                     Next
                     AnzParam0 = AnzParam
                     List_ModellParameter(i).Datei = array(4).Trim()
@@ -1308,15 +1309,15 @@ Public MustInherit Class Sim
         Dim StrRight As String
         Dim DateiPfad As String
 
-        Dim jend, nZRE, ndauer, istart, k, n As Integer
+        Dim jend, nZRE, ndauer, k, n As Integer
         Dim AnzParam, param As Integer
         Dim Zeitpunkt(1000), SumZeit As Double
         Dim SumFaktor As Double
-        Dim PfadZRE, ZREStart_str As String
+        Dim PfadZRE As String
         Dim Qab(1000), tmp As Double
-        Dim Text As String
-        Dim i As Integer
+        Dim i, m As Integer
         Dim actDate, date2 As DateTime
+        Dim Q1, Q2, dQ, dt As Double
 
         'Evaluiere ob Zeitreihe
         If List_OptParameter(0).Bezeichnung.Contains("Zeitreihe") Then
@@ -1341,6 +1342,7 @@ Public MustInherit Class Sim
 
             'Loop über alle Zeitreihen
             For n = 0 To nZRE - 1
+
                 jend = List_ModellParameter(n).ZeileNr - 1 'nZeit
 
                 'erster und letzter Zeitschritt
@@ -1366,39 +1368,39 @@ Public MustInherit Class Sim
                     Zeitpunkt(j) = Math.Round(Zeitpunkt(j), 0)
                 Next j
 
-               
                 '2.Q eintragen
-                For k = 0 To jend
-                    param += 1
-                    For j = Zeitpunkt(k) To Zeitpunkt(k + 1)
-                        Qab(j) = List_OptParameter(param - 1).SKWert * List_OptParameter(n).Max
-                    Next j
-                Next k
+                If List_ModellParameter(n).SpVon = 0 Then
 
-                '---------------------------
-                'ZRE-Datei schreiben
+                    For k = 0 To jend
+                        param += 1
+                        For j = Zeitpunkt(k) To Zeitpunkt(k + 1)
+                            Qab(j) = List_OptParameter(param - 1).SKWert * List_OptParameter(n).Max
+                        Next j
+                    Next k
 
-                i = 0
+                ElseIf List_ModellParameter(n).SpVon = 1 Then
 
-                Text = "*ZRE" + vbCrLf
-                Text += "ZRE-Format m3/s   1" + vbCrLf
-                Text += "1 1   1" + vbCrLf
-                Text += Me.SimStart.ToString("yyyyMMdd HH:mm") + " " + Me.SimEnde.ToString("yyyyMMdd HH:mm") + vbCrLf
-
-                actDate = Me.SimStart
-                date2 = actDate
-
-                While date2 <= Me.SimEnde
-                    i += 1
-                    Text += date2.ToString("yyyyMMdd HH:mm") + " " + Math.Round(Qab(i), 3).ToString + vbCrLf
-                    date2 = date2.Add(Me.SimDT)
-                End While
+                    For k = 0 To jend
+                        param += 1
+                        Q1 = List_OptParameter(param - 2).SKWert * List_OptParameter(n).Max
+                        Q2 = List_OptParameter(param - 1).SKWert * List_OptParameter(n).Max
+                        dt = Zeitpunkt(k + 1) - Zeitpunkt(k)
+                        If dt <> 0 Then dQ = (Q2 - Q1) / dt
+                        m = 0
+                        For j = Zeitpunkt(k) To Zeitpunkt(k + 1)
+                            Qab(j) = Q1 + dQ * m
+                            m += 1
+                        Next j
+                    Next k
+                End If
 
                 'Pfad für jede Zeitreihe aus *.EXT ermitteln
                 PfadZRE = get_path_EXT(List_ModellParameter(n).Datei)
-                Dim StrWri As StreamWriter = New StreamWriter(PfadZRE)
-                StrWri.Write(Text)
-                StrWri.Close()
+
+                'ZRE-Datei schreiben
+
+                Call writeZRE(Qab, PfadZRE)
+
             Next
         Else
 
@@ -1536,7 +1538,7 @@ Public MustInherit Class Sim
         Next
     End Sub
 
-    'Ermittelt Pfad aus *.EXT-Datei 
+    'Ermittelt Pfad von Nummer aus *.EXT-Datei 
     '*******************************************
     Public Function get_path_EXT(ByVal num As Integer) As String
         Dim Zeile As String
@@ -1562,6 +1564,32 @@ Public MustInherit Class Sim
         FiStr.Close()
         Return Pfad
     End Function
+
+    'Schreibt ZRE Datei
+    '*******************************************
+    Public Sub writeZRE(ByVal Qab() As Double, ByVal PfadZRE As String)
+        Dim i As Integer = 0
+        Dim Text As String = ""
+        Dim actDAte, date2 As Date
+
+        Text = "*ZRE" + vbCrLf
+        Text += "ZRE-Format m3/s   1" + vbCrLf
+        Text += "1 1   1" + vbCrLf
+        Text += Me.SimStart.ToString("yyyyMMdd HH:mm") + " " + Me.SimEnde.ToString("yyyyMMdd HH:mm") + vbCrLf
+
+        actDAte = Me.SimStart
+        date2 = actDAte
+
+        While date2 <= Me.SimEnde
+            i += 1
+            Text += date2.ToString("yyyyMMdd HH:mm") + " " + Math.Round(Qab(i), 3).ToString + vbCrLf
+            date2 = date2.Add(Me.SimDT)
+        End While
+
+        Dim StrWri As StreamWriter = New StreamWriter(PfadZRE)
+        StrWri.Write(Text)
+        StrWri.Close()
+    End Sub
 
 
     'SimModell ausführen (simulieren)
