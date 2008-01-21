@@ -251,8 +251,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="My Project\DataSources\IHWB.EVO.Kern.Constants+CES_REPRODOP.datasource" />
-    <None Include="My Project\DataSources\IHWB.EVO.Kern.Constants+EVO_STRATEGIE.datasource" />
     <None Include="My Project\Settings.settings">
       <CustomToolNamespace>My</CustomToolNamespace>
       <Generator>SettingsSingleFileGenerator</Generator>
