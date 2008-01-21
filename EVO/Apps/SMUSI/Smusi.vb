@@ -1,5 +1,5 @@
 Imports System.IO
-Imports ihwb.SMUSI.DllAdapter
+imports ihwb.SMUSI.DllAdapter
 
 '*******************************************************************************
 '*******************************************************************************
@@ -31,6 +31,7 @@ Public Class Smusi
     'SMUSI DLL
     '---------
     Private smusi_dll As SMUSI_EngineDotNetAccess
+
 
 #End Region 'Eigenschaften
 

@@ -29,12 +29,13 @@ Public Class EVO_Einstellungen
         'Standardmäßig Single-Objective Werte nehmen
         Call Me.msettings.PES.setStandard(EVO_MODUS.Single_Objective)
         Call Me.msettings.HookJeeves.setStandard()
-        'Form initialisieren
-        Call Me.UserControl_Initialize()
+        'Comboboxen füllen
+        Call Me.InitComboboxes()
 
     End Sub
 
-    'Laden des Formulars    
+    'Laden des Formulars
+    '*******************
     Private Sub EVO_Einstellungen_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
         'EventHandler einrichten
@@ -48,13 +49,13 @@ Public Class EVO_Einstellungen
     '********************************
     Private Sub OptModus_Change()
 
-        Select Case Me.msettings.PES.ty_EvoModus
+        Select Case Me.msettings.PES.OptModus
 
             Case EVO_MODUS.Single_Objective
                 'Vorgaben und Anzeige
                 Label_OptModusValue.Text = "Single Objective"
                 'Strategie
-                ComboStrategie.Enabled = True
+                ComboOptStrategie.Enabled = True
                 'Sekundäre Population
                 LabelInteract.Enabled = False
                 TextInteract.Enabled = False
@@ -62,12 +63,14 @@ Public Class EVO_Einstellungen
                 TextNMemberSecondPop.Enabled = False
                 'Populationen
                 CheckisPopul.Enabled = True
+                'Neuen Standardwert für PopPenalty setzen
+                Me.msettings.PES.Pop.OptPopPenalty = EVO_POP_PENALTY.Mittelwert
 
             Case EVO_MODUS.Multi_Objective
                 'Vorgaben und Anzeige
                 Label_OptModusValue.Text = "MultiObjective Pareto"
                 'Strategie
-                ComboStrategie.Enabled = False
+                ComboOptStrategie.Enabled = False
                 'Sekundäre Population
                 LabelInteract.Enabled = True
                 TextInteract.Enabled = True
@@ -77,11 +80,12 @@ Public Class EVO_Einstellungen
                 CheckisPopul.Enabled = False
                 CheckisPopul.Checked = False
                 GroupBox_Populationen.Enabled = False
+                'Neuen Standardwert für PopPenalty setzen
+                Me.msettings.PES.Pop.OptPopPenalty = EVO_POP_PENALTY.Crowding
 
         End Select
 
-        Call FILLCOMBO_OPTELTERN(ComboOptEltern)
-        Call FILLCOMBO_POPPENALTY(ComboPopPenalty)
+        Call FILLCOMBO_POPPENALTY(ComboOptPopPenalty)
 
     End Sub
 
@@ -101,15 +105,19 @@ Public Class EVO_Einstellungen
     'UPGRADE_WARNING: Das Ereignis ComboOptEltern.SelectedIndexChanged kann ausgelöst werden, wenn das Formular initialisiert wird. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup2075"'
     Private Sub ComboOptEltern_SelectedIndexChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles ComboOptEltern.SelectedIndexChanged
 
-        Select Case VB6.GetItemData(ComboOptEltern, ComboOptEltern.SelectedIndex)
-            Case EVO_ELTERN.XY_Diskret, EVO_ELTERN.XY_Mitteln, EVO_ELTERN.Neighbourhood
+        Select Case CType(ComboOptEltern.SelectedItem, EVO_ELTERN)
+            Case EVO_ELTERN.XY_Diskret, EVO_ELTERN.XY_Mitteln, EVO_ELTERN.Neighbourhood, EVO_ELTERN.XY_Mitteln_Diskret
                 LabelRekombxy1.Enabled = True
                 LabelRekombxy3.Enabled = True
                 TextRekombxy.Enabled = True
+                CheckisTournamentSelection.Enabled = True
+                CheckisTournamentSelection.Checked = True
             Case Else
                 LabelRekombxy1.Enabled = False
                 LabelRekombxy3.Enabled = False
                 TextRekombxy.Enabled = False
+                CheckisTournamentSelection.Enabled = False
+                CheckisTournamentSelection.Checked = False
         End Select
 
     End Sub
@@ -122,65 +130,49 @@ Public Class EVO_Einstellungen
         Else
             GroupBox_Populationen.Enabled = False
         End If
+
     End Sub
 
+    'Comboboxen füllen
+    '*****************
+    Private Sub InitComboboxes()
 
-    Private Sub FILLCOMBO_STRATEGIE(ByRef Cntrl As System.Windows.Forms.ComboBox)
-        Cntrl.Items.Add(New VB6.ListBoxItem("'+' (Eltern+Nachfolger)", EVO_STRATEGIE.Plus))
-        Cntrl.Items.Add(New VB6.ListBoxItem("',' (nur Nachfolger)", EVO_STRATEGIE.Komma))
-        Cntrl.SelectedIndex = 0
+        'PES
+        '---
+        Me.ComboOptStrategie.DataSource = System.Enum.GetValues(GetType(EVO_STRATEGIE))
+        Me.ComboOptStartparameter.DataSource = System.Enum.GetValues(GetType(EVO_STARTPARAMETER))
+        Me.ComboOptDnMutation.DataSource = System.Enum.GetValues(GetType(EVO_DnMutation))
+        Me.ComboOptEltern.DataSource = System.Enum.GetValues(GetType(EVO_ELTERN))
+        Me.ComboOptPopEltern.DataSource = System.Enum.GetValues(GetType(EVO_POP_ELTERN))
+        Me.ComboOptPopStrategie.DataSource = System.Enum.GetValues(GetType(EVO_STRATEGIE))
+        Call FILLCOMBO_POPPENALTY(ComboOptPopPenalty)
+
+        'CES
+        '---
+        Me.ComboCESReproduction.DataSource = System.Enum.GetValues(GetType(CES_REPRODOP))
+        Me.ComboCESMutation.DataSource = System.Enum.GetValues(GetType(CES_MUTATION))
+        Me.ComboCESSelection.DataSource = System.Enum.GetValues(GetType(EVO_STRATEGIE))
+        
     End Sub
 
-    Private Sub FILLCOMBO_OPTPOPELTERN(ByRef Cntrl As System.Windows.Forms.ComboBox)
-        Cntrl.Items.Add(New VB6.ListBoxItem("mit Rekombination", EVO_POP_ELTERN.Rekombination))
-        Cntrl.Items.Add(New VB6.ListBoxItem("Mittelwerte", EVO_POP_ELTERN.Mittelwert))
-        Cntrl.Items.Add(New VB6.ListBoxItem("Selektion", EVO_POP_ELTERN.Selektion))
-        Cntrl.SelectedIndex = 0
-    End Sub
+     Private Sub FILLCOMBO_POPPENALTY(ByRef Cntrl As System.Windows.Forms.ComboBox)
 
-    Private Sub FILLCOMBO_OPTELTERN(ByRef Cntrl As System.Windows.Forms.ComboBox)
         Cntrl.Items.Clear()
-        Cntrl.Items.Add(New VB6.ListBoxItem("Selektion", EVO_ELTERN.Selektion))
-        Cntrl.Items.Add(New VB6.ListBoxItem("Rekomb x/x, diskret", EVO_ELTERN.XX_Diskret))
-        Cntrl.Items.Add(New VB6.ListBoxItem("Rekomb x/x, mitteln", EVO_ELTERN.XX_Mitteln))
-        Cntrl.Items.Add(New VB6.ListBoxItem("Rekomb x/y, diskret", EVO_ELTERN.XY_Diskret))
-        Cntrl.Items.Add(New VB6.ListBoxItem("Rekomb x/y, mitteln", EVO_ELTERN.XY_Mitteln))
-        If (Me.msettings.PES.ty_EvoModus = EVO_MODUS.Multi_Objective) Then
-            Cntrl.Items.Add(New VB6.ListBoxItem("Neighbourhood", EVO_ELTERN.Neighbourhood))
-        End If
-        Cntrl.SelectedIndex = 1
-    End Sub
+        Select Case Me.msettings.PES.OptModus
 
-    Private Sub FILLCOMBO_OPTVORGABE(ByRef Cntrl As System.Windows.Forms.ComboBox)
-        Cntrl.Items.Add(New VB6.ListBoxItem("Zufällig", EVO_STARTPARAMETER.Zufall))
-        Cntrl.Items.Add(New VB6.ListBoxItem("Originalparameter", EVO_STARTPARAMETER.Original))
-        Cntrl.SelectedIndex = 1
-    End Sub
-
-    Private Sub FILLCOMBO_POPPENALTY(ByRef Cntrl As System.Windows.Forms.ComboBox)
-        Cntrl.Items.Clear()
-        Select Case Me.msettings.PES.ty_EvoModus
             Case EVO.Kern.EVO_MODUS.Single_Objective
-                Cntrl.Items.Add(New VB6.ListBoxItem("Mittelwert", EVO_POP_PENALTY.Mittelwert))
-                Cntrl.Items.Add(New VB6.ListBoxItem("Schlechtester", EVO_POP_PENALTY.Schlechtester))
-                Cntrl.SelectedIndex = 0
+                Cntrl.Items.Add(EVO_POP_PENALTY.Mittelwert)
+                Cntrl.Items.Add(EVO_POP_PENALTY.Schlechtester)
+
             Case EVO.Kern.EVO_MODUS.Multi_Objective
-                Cntrl.Items.Add(New VB6.ListBoxItem("Crowding", EVO_POP_PENALTY.Crowding))
-                Cntrl.Items.Add(New VB6.ListBoxItem("Spannweite", EVO_POP_PENALTY.Spannweite))
-                Cntrl.SelectedIndex = 0
+                'BUG 264: Popgüte bei MultiObjective überflüssig?
+                Cntrl.Items.Add(EVO_POP_PENALTY.Crowding)
+                Cntrl.Items.Add(EVO_POP_PENALTY.Spannweite)
         End Select
+
     End Sub
 
-    Private Sub UserControl_Initialize()
-        Call FILLCOMBO_STRATEGIE(ComboStrategie)
-        Call FILLCOMBO_STRATEGIE(ComboPopStrategie)
-        Call FILLCOMBO_OPTPOPELTERN(ComboOptPopEltern)
-        Call FILLCOMBO_OPTELTERN(ComboOptEltern)
-        Call FILLCOMBO_OPTVORGABE(ComboOptVorgabe)
-        Call FILLCOMBO_POPPENALTY(ComboPopPenalty)
-    End Sub
-
-    'Einstellungen aus Form einlesen
+   'Einstellungen aus Form einlesen
     '*******************************
     Private Sub readForm()
 
@@ -188,14 +180,34 @@ Public Class EVO_Einstellungen
         '---
         With Me.msettings.PES
 
+            .OptStrategie = ComboOptStrategie.SelectedItem
+            .OptStartparameter = ComboOptStartparameter.SelectedItem
+            'Schrittweite
+            .Schrittweite.OptDnMutation = ComboOptDnMutation.SelectedItem
+            .Schrittweite.DnStart = TextDeltaStart.Value
+            .Schrittweite.is_DnVektor = CheckisDnVektor.Checked
+            'Generationen
+            .n_Gen = TextAnzGen.Value
             .n_Eltern = TextAnzEltern.Value
             .n_Nachf = TextAnzNachf.Value
-            .n_Gen = TextAnzGen.Value
-            .ty_EvoStrategie = VB6.GetItemData(ComboStrategie, ComboStrategie.SelectedIndex)
+            'SekPop
+            If (TextInteract.Value <= 0) Then
+                .is_Interact = False
+                .n_Interact = 1
+            Else
+                .is_Interact = True
+                .n_Interact = TextInteract.Value
+            End If
+            .n_MemberSekPop = TextNMemberSecondPop.Value
+            'Eltern
+            .OptEltern = ComboOptEltern.SelectedItem
+            .n_RekombXY = TextRekombxy.Value
+            .is_DiversityTournament = CheckisTournamentSelection.Checked
+            'Populationen
             .Pop.is_POPUL = CheckisPopul.Checked
-            .Pop.ty_PopEvoTyp = VB6.GetItemData(ComboPopStrategie, ComboPopStrategie.SelectedIndex)
-            .Pop.ty_PopPenalty = VB6.GetItemData(ComboPopPenalty, ComboPopPenalty.SelectedIndex)
-            .Pop.ty_OptPopEltern = VB6.GetItemData(ComboOptPopEltern, ComboOptPopEltern.SelectedIndex)
+            .Pop.OptPopStrategie = ComboOptPopStrategie.SelectedItem
+            .Pop.OptPopPenalty = ComboOptPopPenalty.SelectedItem
+            .Pop.OptPopEltern = ComboOptPopEltern.SelectedItem
             If (.Pop.is_POPUL) Then
                 .Pop.n_Runden = TextAnzRunden.Value
                 .Pop.n_Popul = TextAnzPop.Value
@@ -205,19 +217,8 @@ Public Class EVO_Einstellungen
                 .Pop.n_Popul = 1
                 .Pop.n_PopEltern = 1
             End If
-            .ty_OptEltern = VB6.GetItemData(ComboOptEltern, ComboOptEltern.SelectedIndex)
-            .n_RekombXY = TextRekombxy.Value
-            .DnStart = TextDeltaStart.Value
-            .ty_StartPar = VB6.GetItemData(ComboOptVorgabe, ComboOptVorgabe.SelectedIndex)
-            .is_DnVektor = CheckisDnVektor.Checked
-            If (Val(TextInteract.Text) <= 0) Then
-                .is_Interact = False
-                .n_Interact = 1
-            Else
-                .is_Interact = True
-                .n_Interact = TextInteract.Value
-            End If
-            .n_MemberSekPop = TextNMemberSecondPop.Value
+            'Reduzierte Darstellung
+            .is_paint_constraint = checkpaintconstrained.Checked
 
         End With
 
@@ -243,28 +244,37 @@ Public Class EVO_Einstellungen
 
             Call OptModus_Change()
 
+            Me.ComboOptStrategie.SelectedItem = .OptStrategie
+            Me.ComboOptStartparameter.SelectedItem = .OptStartparameter
+            'Schrittweite
+            Me.TextDeltaStart.Value = .Schrittweite.DnStart
+            Me.ComboOptDnMutation.SelectedItem = .Schrittweite.OptDnMutation
+            Me.CheckisDnVektor.Checked = .Schrittweite.is_DnVektor
+            'Generationen
+            Me.TextAnzGen.Value = .n_Gen
             Me.TextAnzEltern.Value = .n_Eltern
             Me.TextAnzNachf.Value = .n_Nachf
-            Me.TextAnzGen.Value = .n_Gen
-            Me.ComboStrategie.SelectedItem = .ty_EvoStrategie
-            Me.CheckisPopul.Checked = .Pop.is_POPUL
-            Me.ComboPopStrategie.SelectedItem = .Pop.ty_PopEvoTyp
-            Me.ComboPopPenalty.SelectedItem = .Pop.ty_PopPenalty
-            Me.ComboOptPopEltern.SelectedItem = .Pop.ty_OptPopEltern
-            Me.TextAnzRunden.Value = .Pop.n_Runden
-            Me.TextAnzPop.Value = .Pop.n_Popul
-            Me.TextAnzPopEltern.Value = .Pop.n_PopEltern
-            Me.ComboOptEltern.SelectedItem = .ty_OptEltern
-            Me.TextRekombxy.Value = .n_RekombXY
-            Me.TextDeltaStart.Value = .DnStart
-            Me.ComboOptVorgabe.SelectedItem = .ty_StartPar
-            Me.CheckisDnVektor.Checked = .is_DnVektor
+            'SekPop
             If (Me.msettings.PES.is_Interact) Then
                 Me.TextInteract.Value = .n_Interact
             Else
                 Me.TextInteract.Value = 0
             End If
             Me.TextNMemberSecondPop.Value = .n_MemberSekPop
+            'Eltern
+            Me.ComboOptEltern.SelectedItem = .OptEltern
+            Me.TextRekombxy.Value = .n_RekombXY
+            Me.CheckisTournamentSelection.Checked = .is_DiversityTournament
+            'Populationen
+            Me.CheckisPopul.Checked = .Pop.is_POPUL
+            Me.ComboOptPopStrategie.SelectedItem = .Pop.OptPopStrategie
+            Me.ComboOptPopPenalty.SelectedItem = .Pop.OptPopPenalty
+            Me.ComboOptPopEltern.SelectedItem = .Pop.OptPopEltern
+            Me.TextAnzRunden.Value = .Pop.n_Runden
+            Me.TextAnzPop.Value = .Pop.n_Popul
+            Me.TextAnzPopEltern.Value = .Pop.n_PopEltern
+            'Reduzierte Darstellung
+            Me.checkpaintconstrained.Checked = .is_paint_constraint
 
         End With
 
