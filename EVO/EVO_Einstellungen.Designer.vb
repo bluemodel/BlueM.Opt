@@ -124,6 +124,8 @@ Partial Class EVO_Einstellungen
         Me.TextDeltaStartHJ = New System.Windows.Forms.NumericUpDown
         Me.CheckBoxDNVektorHJ = New System.Windows.Forms.CheckBox
         Me.TabPage_MCS = New System.Windows.Forms.TabPage
+        Me.Numeric_Anzahl_MCS = New System.Windows.Forms.NumericUpDown
+        Me.Label_Anzahl_MCS = New System.Windows.Forms.Label
         Me.Numeric_LadeP = New System.Windows.Forms.NumericUpDown
         Me.Label_LadeP = New System.Windows.Forms.Label
         Me.Button_LadeP = New System.Windows.Forms.Button
@@ -135,8 +137,6 @@ Partial Class EVO_Einstellungen
         Me.SpeichernToolStripButton = New System.Windows.Forms.ToolStripButton
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox
-        Me.Label_Anzahl_MCS = New System.Windows.Forms.Label
-        Me.Numeric_Anzahl_MCS = New System.Windows.Forms.NumericUpDown
         Me.TabControl1.SuspendLayout()
         Me.TabPage_PES.SuspendLayout()
         CType(Me.TextDeltaStart, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -168,11 +168,11 @@ Partial Class EVO_Einstellungen
         CType(Me.TextDeltaFinishHJ, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.TextDeltaStartHJ, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabPage_MCS.SuspendLayout()
+        CType(Me.Numeric_Anzahl_MCS, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Numeric_LadeP, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Numeric_NP, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ToolStrip1.SuspendLayout()
         Me.GroupBox_Einstellungen.SuspendLayout()
-        CType(Me.Numeric_Anzahl_MCS, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'TabControl1
@@ -1268,6 +1268,26 @@ Partial Class EVO_Einstellungen
         Me.TabPage_MCS.TabIndex = 3
         Me.TabPage_MCS.Text = "MCS"
         '
+        'Numeric_Anzahl_MCS
+        '
+        Me.Numeric_Anzahl_MCS.Location = New System.Drawing.Point(133, 65)
+        Me.Numeric_Anzahl_MCS.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
+        Me.Numeric_Anzahl_MCS.Name = "Numeric_Anzahl_MCS"
+        Me.Numeric_Anzahl_MCS.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.Numeric_Anzahl_MCS.Size = New System.Drawing.Size(69, 20)
+        Me.Numeric_Anzahl_MCS.TabIndex = 9
+        Me.Numeric_Anzahl_MCS.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_Anzahl_MCS.Value = New Decimal(New Integer() {1000, 0, 0, 0})
+        '
+        'Label_Anzahl_MCS
+        '
+        Me.Label_Anzahl_MCS.AutoSize = True
+        Me.Label_Anzahl_MCS.Location = New System.Drawing.Point(12, 67)
+        Me.Label_Anzahl_MCS.Name = "Label_Anzahl_MCS"
+        Me.Label_Anzahl_MCS.Size = New System.Drawing.Size(115, 13)
+        Me.Label_Anzahl_MCS.TabIndex = 8
+        Me.Label_Anzahl_MCS.Text = "Anzahl der Durchläufe:"
+        '
         'Numeric_LadeP
         '
         Me.Numeric_LadeP.Location = New System.Drawing.Point(109, 403)
@@ -1364,25 +1384,6 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Einstellungen.TabStop = False
         Me.GroupBox_Einstellungen.Text = "Einstellungen:"
         '
-        'Label_Anzahl_MCS
-        '
-        Me.Label_Anzahl_MCS.AutoSize = True
-        Me.Label_Anzahl_MCS.Location = New System.Drawing.Point(12, 67)
-        Me.Label_Anzahl_MCS.Name = "Label_Anzahl_MCS"
-        Me.Label_Anzahl_MCS.Size = New System.Drawing.Size(115, 13)
-        Me.Label_Anzahl_MCS.TabIndex = 8
-        Me.Label_Anzahl_MCS.Text = "Anzahl der Durchläufe:"
-        '
-        'Numeric_Anzahl_MCS
-        '
-        Me.Numeric_Anzahl_MCS.Location = New System.Drawing.Point(133, 65)
-        Me.Numeric_Anzahl_MCS.Name = "Numeric_Anzahl_MCS"
-        Me.Numeric_Anzahl_MCS.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.Numeric_Anzahl_MCS.Size = New System.Drawing.Size(69, 20)
-        Me.Numeric_Anzahl_MCS.TabIndex = 9
-        Me.Numeric_Anzahl_MCS.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.Numeric_Anzahl_MCS.Value = New Decimal(New Integer() {1, 0, 0, 0})
-        '
         'EVO_Einstellungen
         '
         Me.Controls.Add(Me.GroupBox_Einstellungen)
@@ -1427,13 +1428,13 @@ Partial Class EVO_Einstellungen
         CType(Me.TextDeltaStartHJ, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabPage_MCS.ResumeLayout(False)
         Me.TabPage_MCS.PerformLayout()
+        CType(Me.Numeric_Anzahl_MCS, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.Numeric_LadeP, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.Numeric_NP, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ToolStrip1.ResumeLayout(False)
         Me.ToolStrip1.PerformLayout()
         Me.GroupBox_Einstellungen.ResumeLayout(False)
         Me.GroupBox_Einstellungen.PerformLayout()
-        CType(Me.Numeric_Anzahl_MCS, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
