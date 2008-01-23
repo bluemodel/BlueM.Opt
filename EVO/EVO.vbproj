@@ -140,6 +140,7 @@
     <Compile Include="AssemblyInfo.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Apps\BlueM\MCS.vb" />
     <Compile Include="Diagramm\DiagrammForm.Designer.vb">
       <DependentUpon>DiagrammForm.vb</DependentUpon>
     </Compile>

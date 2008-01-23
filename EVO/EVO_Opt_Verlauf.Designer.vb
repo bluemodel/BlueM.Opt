@@ -76,7 +76,7 @@ Partial Public Class EVO_Opt_Verlauf
         Me.Anzeige_Verlauf.Controls.Add(Me.LabelAnzRunden)
         Me.Anzeige_Verlauf.Location = New System.Drawing.Point(0, 0)
         Me.Anzeige_Verlauf.Name = "Anzeige_Verlauf"
-        Me.Anzeige_Verlauf.Size = New System.Drawing.Size(465, 73)
+        Me.Anzeige_Verlauf.Size = New System.Drawing.Size(468, 73)
         Me.Anzeige_Verlauf.TabIndex = 0
         Me.Anzeige_Verlauf.TabStop = False
         Me.Anzeige_Verlauf.Text = "Verlauf der Optimierung"
@@ -258,7 +258,7 @@ Partial Public Class EVO_Opt_Verlauf
         '
         Me.Controls.Add(Me.Anzeige_Verlauf)
         Me.Name = "EVO_Opt_Verlauf"
-        Me.Size = New System.Drawing.Size(467, 75)
+        Me.Size = New System.Drawing.Size(471, 75)
         Me.Anzeige_Verlauf.ResumeLayout(False)
         Me.Anzeige_Verlauf.PerformLayout()
         Me.ResumeLayout(False)

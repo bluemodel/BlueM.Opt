@@ -640,12 +640,4 @@ Public Class Damage
 
     End Function
 
-
-    Public Sub get_damage(ByVal Pfad1 As String, ByVal AnwName1 As String)
-
-
-        
-
-    End Sub
-
 End Class

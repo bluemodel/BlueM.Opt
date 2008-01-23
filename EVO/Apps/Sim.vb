@@ -1311,13 +1311,16 @@ Public MustInherit Class Sim
 
         Dim jend, nZRE, ndauer, k, n As Integer
         Dim AnzParam, param As Integer
-        Dim Zeitpunkt(1000), SumZeit As Double
-        Dim SumFaktor As Double
+        Dim Zeitpunkt(1000) As Double
         Dim PfadZRE As String
-        Dim Qab(1000), tmp As Double
+        Dim Qab(1000) As Double
         Dim i, m As Integer
         Dim actDate, date2 As DateTime
-        Dim Q1, Q2, dQ, dt As Double
+        Dim Q1, Q2, dQ, dt, tmin, tmax As Double
+
+        Dim Vorlaufzeit As Integer = 47
+
+
 
         'Evaluiere ob Zeitreihe
         If List_OptParameter(0).Bezeichnung.Contains("Zeitreihe") Then
@@ -1333,12 +1336,18 @@ Public MustInherit Class Sim
 
             'Bestimmen der Simulationschritte
             actDate = Me.SimStart
-            date2 = actDate
+            date2 = actDate.AddHours(Vorlaufzeit)
 
             While date2 <= Me.SimEnde
                 ndauer += 1
                 date2 = date2.Add(Me.SimDT)
             End While
+
+            For j = 0 To Vorlaufzeit
+                Qab(j) = 1.0
+            Next j
+
+            param = 0
 
             'Loop über alle Zeitreihen
             For n = 0 To nZRE - 1
@@ -1349,32 +1358,22 @@ Public MustInherit Class Sim
                 Zeitpunkt(0) = 1
                 Zeitpunkt(jend + 1) = ndauer
 
-                tmp = 0.0
                 For j = 1 To jend
                     param += 1
-                    tmp = tmp + List_OptParameter(param - 1).SKWert
-                    Zeitpunkt(j) = tmp
-                Next j
-
-                For j = 1 To jend
-                    SumZeit = SumZeit + Zeitpunkt(j)
-                Next j
-
-                SumFaktor = ndauer / SumZeit
-                If j = 1 Then SumFaktor = ndauer
-
-                For j = 1 To jend
-                    Zeitpunkt(j) = Zeitpunkt(j) * SumFaktor
+                    tmin = Zeitpunkt(j - 1) + 1
+                    tmax = ndauer - jend + j - 1
+                    Zeitpunkt(j) = tmin + List_OptParameter(param - 1).SKWert * (tmax - tmin)
                     Zeitpunkt(j) = Math.Round(Zeitpunkt(j), 0)
+                    'Console.Out.WriteLine(Zeitpunkt(j))
                 Next j
-
+            
                 '2.Q eintragen
                 If List_ModellParameter(n).SpVon = 0 Then
-
                     For k = 0 To jend
                         param += 1
-                        For j = Zeitpunkt(k) To Zeitpunkt(k + 1)
+                        For j = Zeitpunkt(k) + Vorlaufzeit To Zeitpunkt(k + 1) + Vorlaufzeit
                             Qab(j) = List_OptParameter(param - 1).SKWert * List_OptParameter(n).Max
+                            'Console.Out.WriteLine(Qab(j))
                         Next j
                     Next k
 

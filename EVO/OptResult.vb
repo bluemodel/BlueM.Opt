@@ -1,4 +1,5 @@
 Imports System.Data.OleDb
+Imports System.IO
 
 Public Class OptResult
 
@@ -21,7 +22,7 @@ Public Class OptResult
     Private Datensatz As String
 
     'Ergebnisdatenbank
-    Public Ergebnisdb As Boolean = True              'Gibt an, ob die Ergebnisdatenbank geschrieben werden soll
+    Public Ergebnisdb As Boolean = False             'Gibt an, ob die Ergebnisdatenbank geschrieben werden soll
     Private db_path As String                        'Pfad zur Ergebnisdatenbank
     Private db As OleDb.OleDbConnection
 
@@ -248,7 +249,7 @@ Public Class OptResult
     'Datenbank vorbereiten
     '*********************
     Private Sub db_init()
-
+      
         'Ergebnisdatenbank in temporärem Verzeichnis anlegen
         '---------------------------------------------------
 
@@ -268,7 +269,7 @@ Public Class OptResult
         Call Me.db_prepare()
         'Methodenspezifische Anpassungen
         Select Case Me.Method
-            Case METH_PES, METH_SENSIPLOT, METH_HOOKJEEVES
+            Case METH_PES, METH_SENSIPLOT, METH_HOOKJEEVES, METH_MCS
                 Call Me.db_prepare_PES()
             Case METH_CES
                 Call Me.db_prepare_CES()
@@ -282,14 +283,15 @@ Public Class OptResult
     'Ergebnisdatenbank vorbereiten
     '*****************************
     Private Sub db_prepare()
-
+      
         'Tabellen anpassen
         '=================
         Dim i As Integer
 
         Call db_connect()
         Dim command As OleDbCommand = New OleDbCommand("", db)
-
+       
+     
         'Tabelle 'QWerte'
         '----------------
         'Spalten festlegen:
@@ -300,6 +302,7 @@ Public Class OptResult
             End If
             fieldnames &= "[" & List_OptZiele(i).Bezeichnung & "] DOUBLE"
         Next
+
         'Tabelle anpassen
         command.CommandText = "ALTER TABLE QWerte ADD COLUMN " & fieldnames
         command.ExecuteNonQuery()
@@ -403,7 +406,7 @@ Public Class OptResult
     'Eine Lösung in die ErgebnisDB schreiben
     '***************************************
     Private Function db_insert(ByVal sol As Solution) As Boolean
-
+      
         Call db_connect()
 
         Dim i As Integer
@@ -412,6 +415,7 @@ Public Class OptResult
 
         'Sim schreiben
         '-------------
+
         command.CommandText = "INSERT INTO Sim (ID, Name) VALUES (" & sol.ID & ", '" & Me.Datensatz & "')"
         command.ExecuteNonQuery()
 
@@ -439,7 +443,7 @@ Public Class OptResult
             command.ExecuteNonQuery()
         End If
 
-        If (Me.Method = METH_PES Or Me.Method = METH_CES_PES Or Me.Method = METH_SENSIPLOT) Then
+        If (Me.Method = METH_PES Or Me.Method = METH_CES_PES Or Me.Method = METH_SENSIPLOT Or Me.Method = METH_MCS) Then
 
             'OptParameter schreiben
             '----------------------
