@@ -22,7 +22,7 @@ Partial Public Class Scatterplot
             Return Me.OptResult.List_OptZiele.Length()
         End Get
     End Property
-    Public Event solutionSelected(sol As Solution)
+    Public Event pointSelected(ByVal sol As Solution)
 
     'Konstruktor
     '***********
@@ -124,7 +124,7 @@ Partial Public Class Scatterplot
                         'Alle Lösungen
                         '-------------
                         serie = .getSeriesPoint(xAchse & ", " & yAchse, "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                        serie_inv = .getSeriesPoint(xAchse & ", " & yAchse & " (ungültig)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 2)                        
+                        serie_inv = .getSeriesPoint(xAchse & ", " & yAchse & " (ungültig)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         For Each sol As Solution In Me.OptResult.Solutions
                             'Constraintverletzung prüfen
                             If (sol.isValid) Then
@@ -146,8 +146,8 @@ Partial Public Class Scatterplot
                             s.Color = Color.Empty           'Punkte unsichtbar
                         Next
                     Else
-                        'alle anderen kriegen Handler für selectPoint
-                        AddHandler .ClickSeries, AddressOf Me.selectPoint
+                        'alle anderen kriegen Handler für seriesClick
+                        AddHandler .ClickSeries, AddressOf Me.seriesClick
                     End If
 
                 End With
@@ -178,76 +178,6 @@ Partial Public Class Scatterplot
 
     End Sub
 
-    'Einen Punkt auswählen
-    '*********************
-    Private Sub selectPoint(ByVal sender As Object, ByVal s As Steema.TeeChart.Styles.Series, ByVal valueIndex As Integer, ByVal e As System.Windows.Forms.MouseEventArgs)
-
-        Dim i, j, solutionID As Integer
-        Dim sol As New Solution
-        Dim serie As Steema.TeeChart.Styles.Series
-
-        ReDim sol.QWerte(Me.nOptZiele - 1)
-
-        'Punkt-Informationen bestimmen
-        '-----------------------------
-        'Solution-ID
-        solutionID = s.Labels(valueIndex)
-
-        'Lösung holen
-        '------------
-        sol = Me.OptResult.getSolution(solutionID)
-
-        If (sol.ID = solutionID) Then
-
-            'Lösung in alle Diagramme eintragen
-            '----------------------------------
-            For i = 0 To Me.Diags.GetUpperBound(0)
-                For j = 0 To Me.Diags.GetUpperBound(1)
-                    With Me.Diags(i, j)
-
-                        'Roten Punkt zeichnen
-                        serie = .getSeriesPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
-                        serie.Add(sol.QWerte(i), sol.QWerte(j), sol.ID)
-
-                        'Mark anzeigen
-                        serie.Marks.Visible = True
-                        serie.Marks.Style = Steema.TeeChart.Styles.MarksStyles.Label
-                        serie.Marks.Transparency = 25
-                        serie.Marks.ArrowLength = 10
-                        serie.Marks.Arrow.Visible = False
-
-                    End With
-                Next j
-            Next i
-
-            'Lösung auswählen (wird von Form1.selectSolution() verarbeitet)
-            RaiseEvent solutionSelected(sol)
-
-        End If
-
-    End Sub
-
-    'Lösungsauswahl zurücksetzen
-    '***************************
-    Public Sub clearSelection()
-
-        Dim i, j As Integer
-        Dim serie as Steema.TeeChart.Styles.Series
-
-        For i = 0 To Me.Diags.GetUpperBound(0)
-            For j = 0 To Me.Diags.GetUpperBound(1)
-                With Me.Diags(i, j)
-
-                    'Serie löschen
-                    serie = .getSeriesPoint("ausgewählte Lösungen")
-                    serie.Dispose()
-
-                End With
-            Next j
-        Next i
-
-    End Sub
-
     'Ruft bei Doppelklick auf Diagramm den TeeChart Editor auf
     '*********************************************************
     Private Sub ShowEditor(ByVal sender As Object, ByVal e As System.EventArgs)
@@ -264,5 +194,87 @@ Partial Public Class Scatterplot
         Me.matrix.Height = Me.ClientSize.Height
 
     End Sub
+
+#Region "Lösungsauswahl"
+
+    'Einen Punkt auswählen
+    '*********************
+    Private Sub seriesClick(ByVal sender As Object, ByVal s As Steema.TeeChart.Styles.Series, ByVal valueIndex As Integer, ByVal e As System.Windows.Forms.MouseEventArgs)
+
+        Dim solutionID As Integer
+        Dim sol As New Solution
+
+        ReDim sol.QWerte(Me.nOptZiele - 1)
+
+        'Punkt-Informationen bestimmen
+        '-----------------------------
+        'Solution-ID
+        solutionID = s.Labels(valueIndex)
+
+        'Lösung holen
+        '------------
+        sol = Me.OptResult.getSolution(solutionID)
+
+        If (sol.ID = solutionID) Then
+
+            'Lösung auswählen (wird von Form1.selectSolution() verarbeitet)
+            RaiseEvent pointSelected(sol)
+
+        End If
+
+    End Sub
+
+    'Eine ausgewählte Lösung in den Diagrammen anzeigen
+    'wird von Form1.selectSolution() aufgerufen
+    '**************************************************
+    Friend Sub showSelectedSolution(ByVal sol As Solution)
+
+        Dim serie As Steema.TeeChart.Styles.Series
+        Dim i, j As Integer
+
+        'Lösung in alle Diagramme eintragen
+        '----------------------------------
+        For i = 0 To Me.Diags.GetUpperBound(0)
+            For j = 0 To Me.Diags.GetUpperBound(1)
+                With Me.Diags(i, j)
+
+                    'Roten Punkt zeichnen
+                    serie = .getSeriesPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
+                    serie.Add(sol.QWerte(i), sol.QWerte(j), sol.ID)
+
+                    'Mark anzeigen
+                    serie.Marks.Visible = True
+                    serie.Marks.Style = Steema.TeeChart.Styles.MarksStyles.Label
+                    serie.Marks.Transparency = 25
+                    serie.Marks.ArrowLength = 10
+                    serie.Marks.Arrow.Visible = False
+
+                End With
+            Next j
+        Next i
+    End Sub
+
+    'Serie der ausgewählten Lösungen löschen
+    '***************************************
+    Public Sub clearSelection()
+
+        Dim i, j As Integer
+        Dim serie As Steema.TeeChart.Styles.Series
+
+        For i = 0 To Me.Diags.GetUpperBound(0)
+            For j = 0 To Me.Diags.GetUpperBound(1)
+                With Me.Diags(i, j)
+
+                    'Serie löschen
+                    serie = .getSeriesPoint("ausgewählte Lösungen")
+                    serie.Dispose()
+
+                End With
+            Next j
+        Next i
+
+    End Sub
+
+#End Region 'Lösungsauswahl
 
 End Class
