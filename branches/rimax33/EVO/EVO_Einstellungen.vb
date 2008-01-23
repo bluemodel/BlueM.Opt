@@ -362,4 +362,15 @@ Public Class EVO_Einstellungen
 
 #End Region 'Schnittstelle
 
+    Sub ButtonGenP_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonGenP.Click
+        Dim gen As New MCS
+        gen.erstelle_Niederschlag(Me.Numeric_NP.Value)
+    End Sub
+
+    'läd einzelnes schon vorhandes P-Ereignis mit vorzugebener Nummer
+    '******************************************************************
+    Private Sub Button_LadeP_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_LadeP.Click
+        Dim gen As New MCS
+        gen.MonteCarlo(Me.Numeric_LadeP.Value)
+    End Sub
 End Class

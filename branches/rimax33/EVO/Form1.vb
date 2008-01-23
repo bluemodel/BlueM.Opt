@@ -52,6 +52,7 @@ Partial Class Form1
     Dim SekPopulation(,) As Double
     Dim myPara() As Double
     Dim beziehungen() As EVO.Kern.PES.Beziehung
+    Dim QWertMin As Double
 
     '**** Verschiedenes ****
     Dim isrun As Boolean = False                        'Optimierung läuft
@@ -80,7 +81,7 @@ Partial Class Form1
         ComboBox_Anwendung.SelectedIndex = 0
 
         'Liste der Methoden in ComboBox schreiben und Anfangseinstellung wählen
-        ComboBox_Methode.Items.AddRange(New Object() {"", METH_RESET, METH_PES, METH_CES, METH_CES_PES, METH_HYBRID, METH_SENSIPLOT, METH_HOOKJEEVES})
+        ComboBox_Methode.Items.AddRange(New Object() {"", METH_RESET, METH_PES, METH_CES, METH_CES_PES, METH_HYBRID, METH_SENSIPLOT, METH_HOOKJEEVES, METH_MCS})
         ComboBox_Methode.SelectedIndex = 0
         ComboBox_Methode.Enabled = False
 
@@ -112,7 +113,7 @@ Partial Class Form1
 
             'Sim1 zerstören
             Me.Sim1 = Nothing
-
+            
             'Start Button deaktivieren
             Me.Button_Start.Enabled = False
 
@@ -347,6 +348,29 @@ Partial Class Form1
                     'EVO_Verlauf zurücksetzen
                     Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
 
+                Case METH_MCS 'Methode MCS
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'Ergebnis-Buttons
+                    Me.Button_openMDB.Enabled = True
+
+                    'PES für Sim vorbereiten
+                    Call Sim1.read_and_valid_INI_Files_PES()
+
+                    'EVO_Einstellungen einrichten
+                    EVO_Einstellungen1.Enabled = True
+                    Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_PES
+                    If (Sim1.List_OptZiele.GetLength(0) = 1) Then
+                        Call EVO_Einstellungen1.setStandard(Kern.EVO_MODUS.Single_Objective)
+                    ElseIf (Sim1.List_OptZiele.GetLength(0) > 1) Then
+                        Call EVO_Einstellungen1.setStandard(Kern.EVO_MODUS.Multi_Objective)
+                    End If
+
+                    'Parameterübergabe an PES
+                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
+
+                    'EVO_Verlauf zurücksetzen
+                    Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
 
                 Case METH_HOOKJEEVES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -598,6 +622,8 @@ Partial Class Form1
                             Call STARTEN_SensiPlot()
                         Case METH_PES
                             Call STARTEN_PES()
+                        Case METH_MCS
+                            Call MonteCarloSimulation()
                         Case METH_CES
                             Call STARTEN_CES_or_CES_PES()
                         Case METH_CES_PES
@@ -1421,6 +1447,7 @@ Start_Evolutionsrunden:
 
                         Call EVO_Opt_Verlauf1.Nachfolger(PES1.PES_iAkt.iAktNachf + 1)
 
+                        QWertMin = 9999999999999
                         durchlauf += 1
 
                         'Um Modellfehler bzw. Evaluierungsabbrüche abzufangen
@@ -1484,7 +1511,7 @@ Start_Evolutionsrunden:
                                             serie = DForm.Diag.getSeriesPoint("Population " & (PES1.PES_iAkt.iAktPop + 1).ToString())
                                         End If
                                         Call serie.Add(PES1.PES_iAkt.iAktRunde * PES1.Settings.PES.n_Gen * PES1.Settings.PES.n_Nachf + PES1.PES_iAkt.iAktGen*PES1.Settings.PES.n_Nachf + PES1.PES_iAkt.iAktNachf, QN(0), durchlauf.ToString())
-
+                                        If QN(0) < QWertMin Then QWertMin = QN(0)
                                     Else
                                         'MultiObjective
                                         'xxxxxxxxxxxxxx
@@ -1782,7 +1809,7 @@ Start_Evolutionsrunden:
 
                             Achse.Name = "Simulation"
                             Achse.Auto = False
-                            If (Me.Method = METH_PES) Then
+                            If (Me.Method = METH_PES Or Me.Method = METH_MCS) Then
                                 'Bei PES:
                                 '--------
                                 If (EVO_Einstellungen1.Settings.PES.Pop.is_POPUL) Then
@@ -2292,7 +2319,30 @@ Start_Evolutionsrunden:
 
     End Sub
 
+    Public Sub MonteCarloSimulation()
+        Dim i, nLauf As New Integer
+        Dim mcs As New MCS
+
+        nLauf = Me.EVO_Einstellungen1.Numeric_Anzahl_MCS.Value
+
+        For i = 1 To nLauf
+
+            mcs.MonteCarlo(i)
+
+            Call STARTEN_PES()
+
+            Console.Out.WriteLine(QWertMin)
+
+            'speicher vorhergehendes Ergebnis ab
+            Sim1.OptResult.db_save(Sim1.WorkDir + "result_" + i.ToString + ".mdb")
+
+            'erstelle neues Objekt von OptResult
+            Sim1.OptResult = New OptResult(Sim1)
+
+        Next i
+    End Sub
+
 #End Region 'Methoden
 
-    
+
 End Class

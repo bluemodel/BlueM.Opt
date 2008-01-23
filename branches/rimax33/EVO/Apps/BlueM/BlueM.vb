@@ -38,7 +38,6 @@ Public Class BlueM
     Private IHA1 As IHA
     Private Damage1 As Damage
 
-
 #End Region 'Eigenschaften
 
 #Region "Methoden"
@@ -81,54 +80,62 @@ Public Class BlueM
         'ALL-Datei öffnen
         '----------------
         Dim Datei As String = Me.WorkDir & Me.Datensatz & ".ALL"
+        Try
 
-        Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
-        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+            Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
+            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+       
+            'Alle Zeilen durchlaufen
+            Dim Zeile As String
+            Do
+                Zeile = StrRead.ReadLine.ToString()
 
-        'Alle Zeilen durchlaufen
-        Dim Zeile As String
-        Do
-            Zeile = StrRead.ReadLine.ToString()
+                'Simulationszeitraum auslesen
+                If (Zeile.StartsWith(" SimBeginn - SimEnde ............:")) Then
+                    SimStart_str = Zeile.Substring(35, 16)
+                    SimEnde_str = Zeile.Substring(54, 16)
+                End If
 
-            'Simulationszeitraum auslesen
-            If (Zeile.StartsWith(" SimBeginn - SimEnde ............:")) Then
-                SimStart_str = Zeile.Substring(35, 16)
-                SimEnde_str = Zeile.Substring(54, 16)
+                'Zeitschrittweite auslesen
+                If (Zeile.StartsWith(" Zeitschrittlaenge [min] ........:")) Then
+                    SimDT_str = Zeile.Substring(35).Trim
+                End If
+
+                'Überprüfen ob die Ganglinien (.WEL Datei) ausgegeben wird
+                If (Zeile.StartsWith(" Ganglinienausgabe ....... [J/N] :")) Then
+                    Ganglinie = Zeile.Substring(35).Trim
+                End If
+
+                'Überprüfen ob CSV Format eingeschaltet ist
+                If (Zeile.StartsWith(" ... CSV-Format .......... [J/N] :")) Then
+                    CSV_Format = Zeile.Substring(35).Trim
+                End If
+
+            Loop Until StrRead.Peek() = -1
+
+            'SimStart und SimEnde in echtes Datum konvertieren
+            Me.SimStart = New DateTime(SimStart_str.Substring(6, 4), SimStart_str.Substring(3, 2), SimStart_str.Substring(0, 2), SimStart_str.Substring(11, 2), SimStart_str.Substring(14, 2), 0)
+            Me.SimEnde = New DateTime(SimEnde_str.Substring(6, 4), SimEnde_str.Substring(3, 2), SimEnde_str.Substring(0, 2), SimEnde_str.Substring(11, 2), SimEnde_str.Substring(14, 2), 0)
+
+            'Zeitschrittweite in echte Dauer konvertieren
+            Me.SimDT = New TimeSpan(0, Convert.ToInt16(SimDT_str), 0)
+
+            'Fehlermeldung Ganglinie nicht eingeschaltet
+            If Ganglinie <> "J" Then
+                Throw New Exception("Die Ganglinienausgabe (.WEL Datei) ist nicht eingeschaltet. Bitte in .ALL Datei unter 'Ganglinienausgabe' einschalten")
             End If
 
-            'Zeitschrittweite auslesen
-            If (Zeile.StartsWith(" Zeitschrittlaenge [min] ........:")) Then
-                SimDT_str = Zeile.Substring(35).Trim
+            'Fehlermeldung CSv Format nicht eingeschaltet
+            If CSV_Format <> "J" Then
+                Throw New Exception("Das CSV Format für die .WEL Datei ist nicht eingeschaltet. Bitte in .ALL unter '... CSV-Format' einschalten.")
             End If
+            FiStr.Close()
+            StrRead.Close()
 
-            'Überprüfen ob die Ganglinien (.WEL Datei) ausgegeben wird
-            If (Zeile.StartsWith(" Ganglinienausgabe ....... [J/N] :")) Then
-                Ganglinie = Zeile.Substring(35).Trim
-            End If
+        Catch except As Exception
+            MsgBox("Kann " + Datei + " nicht finden, stürze ab :-( !", MsgBoxStyle.Information)
+        End Try
 
-            'Überprüfen ob CSV Format eingeschaltet ist
-            If (Zeile.StartsWith(" ... CSV-Format .......... [J/N] :")) Then
-                CSV_Format = Zeile.Substring(35).Trim
-            End If
-
-        Loop Until StrRead.Peek() = -1
-
-        'SimStart und SimEnde in echtes Datum konvertieren
-        Me.SimStart = New DateTime(SimStart_str.Substring(6, 4), SimStart_str.Substring(3, 2), SimStart_str.Substring(0, 2), SimStart_str.Substring(11, 2), SimStart_str.Substring(14, 2), 0)
-        Me.SimEnde = New DateTime(SimEnde_str.Substring(6, 4), SimEnde_str.Substring(3, 2), SimEnde_str.Substring(0, 2), SimEnde_str.Substring(11, 2), SimEnde_str.Substring(14, 2), 0)
-
-        'Zeitschrittweite in echte Dauer konvertieren
-        Me.SimDT = New TimeSpan(0, Convert.ToInt16(SimDT_str), 0)
-
-        'Fehlermeldung Ganglinie nicht eingeschaltet
-        If Ganglinie <> "J" Then
-            Throw New Exception("Die Ganglinienausgabe (.WEL Datei) ist nicht eingeschaltet. Bitte in .ALL Datei unter 'Ganglinienausgabe' einschalten")
-        End If
-
-        'Fehlermeldung CSv Format nicht eingeschaltet
-        If CSV_Format <> "J" Then
-            Throw New Exception("Das CSV Format für die .WEL Datei ist nicht eingeschaltet. Bitte in .ALL unter '... CSV-Format' einschalten.")
-        End If
 
 
     End Sub

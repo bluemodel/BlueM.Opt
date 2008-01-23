@@ -123,11 +123,20 @@ Partial Class EVO_Einstellungen
         Me.Label1 = New System.Windows.Forms.Label
         Me.TextDeltaStartHJ = New System.Windows.Forms.NumericUpDown
         Me.CheckBoxDNVektorHJ = New System.Windows.Forms.CheckBox
+        Me.TabPage_MCS = New System.Windows.Forms.TabPage
+        Me.Numeric_LadeP = New System.Windows.Forms.NumericUpDown
+        Me.Label_LadeP = New System.Windows.Forms.Label
+        Me.Button_LadeP = New System.Windows.Forms.Button
+        Me.Numeric_NP = New System.Windows.Forms.NumericUpDown
+        Me.LabelNP = New System.Windows.Forms.Label
+        Me.ButtonGenP = New System.Windows.Forms.Button
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip
         Me.ÖffnenToolStripButton = New System.Windows.Forms.ToolStripButton
         Me.SpeichernToolStripButton = New System.Windows.Forms.ToolStripButton
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox
+        Me.Label_Anzahl_MCS = New System.Windows.Forms.Label
+        Me.Numeric_Anzahl_MCS = New System.Windows.Forms.NumericUpDown
         Me.TabControl1.SuspendLayout()
         Me.TabPage_PES.SuspendLayout()
         CType(Me.TextDeltaStart, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -158,8 +167,12 @@ Partial Class EVO_Einstellungen
         Me.TabPage_HookeJeeves.SuspendLayout()
         CType(Me.TextDeltaFinishHJ, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.TextDeltaStartHJ, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.TabPage_MCS.SuspendLayout()
+        CType(Me.Numeric_LadeP, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.Numeric_NP, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ToolStrip1.SuspendLayout()
         Me.GroupBox_Einstellungen.SuspendLayout()
+        CType(Me.Numeric_Anzahl_MCS, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'TabControl1
@@ -167,6 +180,7 @@ Partial Class EVO_Einstellungen
         Me.TabControl1.Controls.Add(Me.TabPage_PES)
         Me.TabControl1.Controls.Add(Me.TabPage_CES)
         Me.TabControl1.Controls.Add(Me.TabPage_HookeJeeves)
+        Me.TabControl1.Controls.Add(Me.TabPage_MCS)
         Me.TabControl1.Location = New System.Drawing.Point(1, 41)
         Me.TabControl1.Margin = New System.Windows.Forms.Padding(0)
         Me.TabControl1.Name = "TabControl1"
@@ -1078,7 +1092,7 @@ Partial Class EVO_Einstellungen
         Me.TabPage_HookeJeeves.Padding = New System.Windows.Forms.Padding(3)
         Me.TabPage_HookeJeeves.Size = New System.Drawing.Size(210, 630)
         Me.TabPage_HookeJeeves.TabIndex = 2
-        Me.TabPage_HookeJeeves.Text = "Hooke & Jeeves"
+        Me.TabPage_HookeJeeves.Text = "H & J"
         '
         'LabelRSHJ
         '
@@ -1238,6 +1252,77 @@ Partial Class EVO_Einstellungen
         Me.CheckBoxDNVektorHJ.TabIndex = 2
         Me.CheckBoxDNVektorHJ.Text = "mit Schrittweitenvektor"
         '
+        'TabPage_MCS
+        '
+        Me.TabPage_MCS.Controls.Add(Me.Numeric_Anzahl_MCS)
+        Me.TabPage_MCS.Controls.Add(Me.Label_Anzahl_MCS)
+        Me.TabPage_MCS.Controls.Add(Me.Numeric_LadeP)
+        Me.TabPage_MCS.Controls.Add(Me.Label_LadeP)
+        Me.TabPage_MCS.Controls.Add(Me.Button_LadeP)
+        Me.TabPage_MCS.Controls.Add(Me.Numeric_NP)
+        Me.TabPage_MCS.Controls.Add(Me.LabelNP)
+        Me.TabPage_MCS.Controls.Add(Me.ButtonGenP)
+        Me.TabPage_MCS.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage_MCS.Name = "TabPage_MCS"
+        Me.TabPage_MCS.Size = New System.Drawing.Size(210, 630)
+        Me.TabPage_MCS.TabIndex = 3
+        Me.TabPage_MCS.Text = "MCS"
+        '
+        'Numeric_LadeP
+        '
+        Me.Numeric_LadeP.Location = New System.Drawing.Point(109, 403)
+        Me.Numeric_LadeP.Name = "Numeric_LadeP"
+        Me.Numeric_LadeP.Size = New System.Drawing.Size(68, 20)
+        Me.Numeric_LadeP.TabIndex = 7
+        Me.Numeric_LadeP.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_LadeP.Value = New Decimal(New Integer() {1, 0, 0, 0})
+        '
+        'Label_LadeP
+        '
+        Me.Label_LadeP.AutoSize = True
+        Me.Label_LadeP.Location = New System.Drawing.Point(12, 405)
+        Me.Label_LadeP.Name = "Label_LadeP"
+        Me.Label_LadeP.Size = New System.Drawing.Size(84, 13)
+        Me.Label_LadeP.TabIndex = 6
+        Me.Label_LadeP.Text = "Lade P-Ereignis:"
+        '
+        'Button_LadeP
+        '
+        Me.Button_LadeP.Location = New System.Drawing.Point(108, 429)
+        Me.Button_LadeP.Name = "Button_LadeP"
+        Me.Button_LadeP.Size = New System.Drawing.Size(69, 23)
+        Me.Button_LadeP.TabIndex = 5
+        Me.Button_LadeP.Text = "lade P"
+        Me.Button_LadeP.UseVisualStyleBackColor = True
+        '
+        'Numeric_NP
+        '
+        Me.Numeric_NP.Location = New System.Drawing.Point(108, 314)
+        Me.Numeric_NP.Name = "Numeric_NP"
+        Me.Numeric_NP.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.Numeric_NP.Size = New System.Drawing.Size(69, 20)
+        Me.Numeric_NP.TabIndex = 4
+        Me.Numeric_NP.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_NP.Value = New Decimal(New Integer() {1, 0, 0, 0})
+        '
+        'LabelNP
+        '
+        Me.LabelNP.AutoSize = True
+        Me.LabelNP.Location = New System.Drawing.Point(12, 317)
+        Me.LabelNP.Name = "LabelNP"
+        Me.LabelNP.Size = New System.Drawing.Size(93, 13)
+        Me.LabelNP.TabIndex = 3
+        Me.LabelNP.Text = "Anzahl Ereignisse:"
+        '
+        'ButtonGenP
+        '
+        Me.ButtonGenP.Location = New System.Drawing.Point(108, 340)
+        Me.ButtonGenP.Name = "ButtonGenP"
+        Me.ButtonGenP.Size = New System.Drawing.Size(69, 23)
+        Me.ButtonGenP.TabIndex = 2
+        Me.ButtonGenP.Text = "Generiere"
+        Me.ButtonGenP.UseVisualStyleBackColor = True
+        '
         'ToolStrip1
         '
         Me.ToolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
@@ -1278,6 +1363,25 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Einstellungen.TabIndex = 37
         Me.GroupBox_Einstellungen.TabStop = False
         Me.GroupBox_Einstellungen.Text = "Einstellungen:"
+        '
+        'Label_Anzahl_MCS
+        '
+        Me.Label_Anzahl_MCS.AutoSize = True
+        Me.Label_Anzahl_MCS.Location = New System.Drawing.Point(12, 67)
+        Me.Label_Anzahl_MCS.Name = "Label_Anzahl_MCS"
+        Me.Label_Anzahl_MCS.Size = New System.Drawing.Size(115, 13)
+        Me.Label_Anzahl_MCS.TabIndex = 8
+        Me.Label_Anzahl_MCS.Text = "Anzahl der Durchläufe:"
+        '
+        'Numeric_Anzahl_MCS
+        '
+        Me.Numeric_Anzahl_MCS.Location = New System.Drawing.Point(133, 65)
+        Me.Numeric_Anzahl_MCS.Name = "Numeric_Anzahl_MCS"
+        Me.Numeric_Anzahl_MCS.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.Numeric_Anzahl_MCS.Size = New System.Drawing.Size(69, 20)
+        Me.Numeric_Anzahl_MCS.TabIndex = 9
+        Me.Numeric_Anzahl_MCS.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_Anzahl_MCS.Value = New Decimal(New Integer() {1, 0, 0, 0})
         '
         'EVO_Einstellungen
         '
@@ -1321,10 +1425,15 @@ Partial Class EVO_Einstellungen
         Me.TabPage_HookeJeeves.PerformLayout()
         CType(Me.TextDeltaFinishHJ, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.TextDeltaStartHJ, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.TabPage_MCS.ResumeLayout(False)
+        Me.TabPage_MCS.PerformLayout()
+        CType(Me.Numeric_LadeP, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.Numeric_NP, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ToolStrip1.ResumeLayout(False)
         Me.ToolStrip1.PerformLayout()
         Me.GroupBox_Einstellungen.ResumeLayout(False)
         Me.GroupBox_Einstellungen.PerformLayout()
+        CType(Me.Numeric_Anzahl_MCS, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -1376,6 +1485,7 @@ Partial Class EVO_Einstellungen
     Private WithEvents ToolStrip1 As System.Windows.Forms.ToolStrip
     Friend WithEvents GroupBox_Einstellungen As System.Windows.Forms.GroupBox
     Friend WithEvents TabPage_HookeJeeves As System.Windows.Forms.TabPage
+    Friend WithEvents TabPage_MCS As System.Windows.Forms.TabPage
     Private WithEvents Label3 As System.Windows.Forms.Label
     Private WithEvents TextDeltaFinishHJ As System.Windows.Forms.NumericUpDown
     Private WithEvents Label1 As System.Windows.Forms.Label
@@ -1436,4 +1546,12 @@ Partial Class EVO_Einstellungen
     Friend WithEvents CheckBox2 As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBox_use_sec_pop_PES As System.Windows.Forms.CheckBox
     Friend WithEvents Use_ As System.Windows.Forms.CheckBox
+    Friend WithEvents LabelNP As System.Windows.Forms.Label
+    Friend WithEvents ButtonGenP As System.Windows.Forms.Button
+    Friend WithEvents Numeric_NP As System.Windows.Forms.NumericUpDown
+    Friend WithEvents Numeric_LadeP As System.Windows.Forms.NumericUpDown
+    Friend WithEvents Label_LadeP As System.Windows.Forms.Label
+    Friend WithEvents Button_LadeP As System.Windows.Forms.Button
+    Friend WithEvents Numeric_Anzahl_MCS As System.Windows.Forms.NumericUpDown
+    Friend WithEvents Label_Anzahl_MCS As System.Windows.Forms.Label
 End Class
