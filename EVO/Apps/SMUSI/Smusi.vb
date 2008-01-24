@@ -46,17 +46,6 @@ Public Class Smusi
 
         Call MyBase.New()
 
-        'SMUSI DLL instanzieren
-        '----------------------
-        Dim dll_path As String
-        dll_path = System.Windows.Forms.Application.StartupPath() & "\SMUSI.dll"
-
-        If (File.Exists(dll_path)) Then
-            SMUSI_dll = New SMUSI_EngineDotNetAccess(dll_path)
-        Else
-            Throw New Exception("SMUSI.dll nicht gefunden!")
-        End If
-
     End Sub
 
     'Simulationsparameter einlesen
@@ -108,6 +97,19 @@ Public Class Smusi
 
         Dim simOK As Boolean
         Dim SimCurrent, SimStart, SimEnde As DateTime
+
+        'SMUSI DLL instanzieren
+        '----------------------
+        Dim dll_path As String
+        dll_path = System.Windows.Forms.Application.StartupPath() & "\SMUSI.dll"
+
+        smusi_dll = Nothing
+
+        If (File.Exists(dll_path)) Then
+            smusi_dll = New SMUSI_EngineDotNetAccess(dll_path)
+        Else
+            Throw New Exception("SMUSI.dll nicht gefunden!")
+        End If
 
         'Falls vorher schon initialisiert wurde
         Call smusi_dll.Finish()
@@ -161,6 +163,8 @@ Public Class Smusi
 
         End Try
 
+        smusi_dll = Nothing
+
         'Simulationsergebnis verarbeiten
         '-------------------------------
         If (simOK) Then
@@ -188,8 +192,10 @@ Public Class Smusi
                 For Each zre As Wave.Zeitreihe In ASCtmp.Zeitreihen
                     Me.SimErgebnis.Add(zre, elem & "_" & zre.ToString())
                 Next
+                ASCtmp = nothing
             Next
 
+            elemente = nothing
         End If
 
         Return simOK
