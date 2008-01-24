@@ -1336,10 +1336,11 @@ Partial Class Form1
         Dim RN() As Double = {}
         '--------------------------
 
-        Dim Hypervolume As EVO.Kern.Hypervolumen
-        Hypervolume = New EVO.Kern.Hypervolumen
-        Hypervolume.Dimension = globalAnzZiel
-        Hypervolume.Normalisiert = True
+        'Dim Hypervolume As EVO.Kern.Hypervolumen
+        'Hypervolume = New EVO.Kern.Hypervolumen
+        'Hypervolume.Dimension = globalAnzZiel
+        'Hypervolume.Normalisiert = True
+        'Dim HV as double
 
         'TODO: If (ipop + igen + inachf + irunde) > 4 Then GoTo Start_Evolutionsrunden '????? Wie?
         'Werte an Variablen übergeben auskommentiert Werte finden sich im PES werden hier aber nicht zugewiesen
@@ -1576,6 +1577,24 @@ Start_Evolutionsrunden:
                                 serie3D.Clear()
                             End If
                         End If
+                    End If
+                    If PES1.PES_iAkt.iAktRunde = 0 And PES1.PES_iAkt.iAktPop = 0 And PES1.PES_iAkt.iAktGen = 0 Then
+                        'Referenzpunkt für Hypervolumen ermitteln
+                        Dim j As Integer
+                        Dim k As Integer
+                        Dim Referenzpunkt(globalAnzZiel - 1) As Double
+
+                        For j = 0 To globalAnzZiel - 1
+                            Referenzpunkt(j) = 0
+                            For k = 0 To UBound(SekPopulation)
+                                If SekPopulation(k, j) > Referenzpunkt(j) Then
+                                    Referenzpunkt(j) = SekPopulation(k, j)
+                                End If
+                            Next
+                        Next
+                        'Hypervolume.Referenzpunkt = Referenzpunkt
+                    else
+                        'HV = Hypervolume.GetHypervolume(UBound(SekPopulation), SekPopulation)
                     End If
 
                 Next 'Ende alle Generatione
