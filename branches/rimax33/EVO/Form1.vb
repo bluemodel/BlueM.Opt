@@ -1365,10 +1365,11 @@ Partial Class Form1
         Dim RN() As Double = {}
         '--------------------------
 
-        Dim Hypervolume As EVO.Kern.Hypervolumen
-        Hypervolume = New EVO.Kern.Hypervolumen
-        Hypervolume.Dimension = globalAnzZiel
-        Hypervolume.Normalisiert = True
+        'Dim Hypervolume As EVO.Kern.Hypervolumen
+        'Hypervolume = New EVO.Kern.Hypervolumen
+        'Hypervolume.Dimension = globalAnzZiel
+        'Hypervolume.Normalisiert = True
+        'Dim HV as double
 
         'TODO: If (ipop + igen + inachf + irunde) > 4 Then GoTo Start_Evolutionsrunden '????? Wie?
         'Werte an Variablen übergeben auskommentiert Werte finden sich im PES werden hier aber nicht zugewiesen
@@ -1612,6 +1613,24 @@ Start_Evolutionsrunden:
                             End If
                         End If
                     End If
+                    If PES1.PES_iAkt.iAktRunde = 0 And PES1.PES_iAkt.iAktPop = 0 And PES1.PES_iAkt.iAktGen = 0 Then
+                        'Referenzpunkt für Hypervolumen ermitteln
+                        Dim j As Integer
+                        Dim k As Integer
+                        Dim Referenzpunkt(globalAnzZiel - 1) As Double
+
+                        For j = 0 To globalAnzZiel - 1
+                            Referenzpunkt(j) = 0
+                            For k = 0 To UBound(SekPopulation)
+                                If SekPopulation(k, j) > Referenzpunkt(j) Then
+                                    Referenzpunkt(j) = SekPopulation(k, j)
+                                End If
+                            Next
+                        Next
+                        'Hypervolume.Referenzpunkt = Referenzpunkt
+                    else
+                        'HV = Hypervolume.GetHypervolume(UBound(SekPopulation), SekPopulation)
+                    End If
 
                 Next 'Ende alle Generatione
                 'xxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -1846,75 +1865,56 @@ Start_Evolutionsrunden:
 
     End Sub
 
-#Region "UI"
+    'Scatterplot-Matrix anzeigen
+    '****************************
+    Private Sub showScatterplot(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Scatterplot.Click
+
+        Dim diagresult As DialogResult
+        Dim SekPopOnly As Boolean
+
+        'Abfrage, ob nur Sekundäre Population gezeichnet werden soll
+        '-----------------------------------------------------------
+        diagresult = MsgBox("Soll nur die Sekundäre Population angezeigt werden?", MsgBoxStyle.YesNo, "Scatterplot-Matrix")
+
+        If (diagresult = Windows.Forms.DialogResult.Yes) Then
+            SekPopOnly = True
+        End If
+
+        Cursor = Cursors.WaitCursor
+
+        'Scatterplot-Matrix
+        '------------------
+        scatterplot1 = New Scatterplot(Sim1.OptResult, SekPopOnly)
+        Call scatterplot1.Show()
+
+        Cursor = Cursors.Default
+
+    End Sub
+
+#Region "Lösungsauswahl"
 
     'Klick auf Serie in Diagramm
     '***************************
-    Public Sub selectPoint(ByVal sender As Object, ByVal s As Steema.TeeChart.Styles.Series, ByVal valueIndex As Integer, ByVal e As System.Windows.Forms.MouseEventArgs)
+    Public Sub seriesClick(ByVal sender As Object, ByVal s As Steema.TeeChart.Styles.Series, ByVal valueIndex As Integer, ByVal e As System.Windows.Forms.MouseEventArgs)
 
         'Notwendige Bedingungen überprüfen
         '---------------------------------
         If (IsNothing(Sim1)) Then
             'Anwendung != Sim
-            MsgBox("Wave funktioniert nur bei Anwendungen BlueM oder SMUSI!", MsgBoxStyle.Information, "Info")
+            MsgBox("Lösungsauswahl funktioniert nur bei Simulationsanwendungen!", MsgBoxStyle.Information, "Info")
             Exit Sub
         Else
 
-            Dim xWert, yWert, zWert As Double
-            Dim xAchse, yAchse, zAchse As String
             Dim solutionID As Integer
             Dim sol As Solution
 
-            'Punkt-Informationen bestimmen
-            '-----------------------------
-            'X und Y Werte
-            xWert = s.XValues(valueIndex)
-            yWert = s.YValues(valueIndex)
-            'X und Y Achsen (Zielfunktionen)
-            xAchse = Me.DForm.Diag.Chart.Axes.Bottom.Title.Caption
-            yAchse = Me.DForm.Diag.Chart.Axes.Left.Title.Caption
             'Solution-ID
             solutionID = s.Labels(valueIndex)
 
             'Lösung holen
-            '------------
             sol = Sim1.OptResult.getSolution(solutionID)
 
             If (sol.ID = solutionID) Then
-
-                'In Chart anzeigen
-                If (Not s.HasZValues) Then
-                    '2D-Diagramm
-                    '-----------
-                    Dim serie As Steema.TeeChart.Styles.Series
-                    serie = Me.DForm.Diag.getSeriesPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
-                    serie.Add(xWert, yWert, sol.ID.ToString())
-                    serie.Marks.Visible = True
-                    serie.Marks.Style = Steema.TeeChart.Styles.MarksStyles.Label
-                    serie.Marks.Transparency = 50
-                    serie.Marks.ArrowLength = 10
-                Else
-                    '3D-Diagramm
-                    '-----------
-                    If (TypeOf (s) Is Steema.TeeChart.Styles.Surface) Then
-                        Dim surface As Steema.TeeChart.Styles.Surface
-                        surface = s
-                        zWert = surface.ZValues(valueIndex)
-                    Else
-                        Dim points3D As Steema.TeeChart.Styles.Points3D
-                        points3D = s
-                        zWert = points3D.ZValues(valueIndex)
-                    End If
-
-                    Dim serie3D As Steema.TeeChart.Styles.Points3D
-                    zAchse = Me.DForm.Diag.Chart.Axes.Depth.Title.Caption
-                    serie3D = Me.DForm.Diag.getSeries3DPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
-                    serie3D.Add(xWert, yWert, zWert, sol.ID.ToString())
-                    serie3D.Marks.Visible = True
-                    serie3D.Marks.Style = Steema.TeeChart.Styles.MarksStyles.Label
-                    serie3D.Marks.Transparency = 50
-                    serie3D.Marks.ArrowLength = 10
-                End If
 
                 'Lösung auswählen
                 Call Me.selectSolution(sol)
@@ -1927,7 +1927,7 @@ Start_Evolutionsrunden:
 
     'Eine Lösung auswählen
     '*********************
-    Public Sub selectSolution(ByVal sol As Solution) Handles scatterplot1.solutionSelected
+    Private Sub selectSolution(ByVal sol As Solution) Handles scatterplot1.pointSelected
 
         Dim isOK As Boolean
 
@@ -1947,6 +1947,14 @@ Start_Evolutionsrunden:
             'Lösung zum Lösungsdialog hinzufügen
             Call Me.solutionDialog.addSolution(sol)
 
+            'Lösung im Hauptdiagramm anzeigen
+            Call Me.DForm.Diag.showSelectedSolution(Me.Sim1.List_OptZiele, sol)
+
+            'Lösung im Scatterplot anzeigen
+            If (Not IsNothing(Me.scatterplot1)) Then
+                Call Me.scatterplot1.showSelectedSolution(sol)
+            End If
+
         End If
 
         'Lösungsdialog nach vorne bringen
@@ -1963,22 +1971,7 @@ Start_Evolutionsrunden:
 
         'Im Hauptdiagramm
         '----------------
-        Try
-            '2D-Diagramm
-            '-----------
-            Dim serie As Steema.TeeChart.Styles.Series
-            serie = Me.DForm.Diag.getSeriesPoint("ausgewählte Lösungen")
-            serie.Dispose()
-
-        Catch ex As Exception
-            '3D-Diagramm
-            '-----------
-            Dim serie3D As Steema.TeeChart.Styles.Points3D
-            serie3D = Me.DForm.Diag.getSeries3DPoint("ausgewählte Lösungen")
-            serie3D.Dispose()
-        End Try
-
-        Call Me.DForm.Diag.Refresh()
+        Call Me.DForm.Diag.clearSelection()
 
         'In der Scatterplot-Matrix
         '-------------------------
@@ -2076,6 +2069,12 @@ Start_Evolutionsrunden:
 
     End Sub
 
+#End Region 'Lösungsauswahl
+
+#End Region 'Diagrammfunktionen
+
+#Region "Ergebnisdatenbank"
+
     'Ergebnisdatenbank speichern
     '***************************
     Private Sub saveMDB(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_saveMDB.Click
@@ -2096,32 +2095,6 @@ Start_Evolutionsrunden:
             Call Sim1.OptResult.db_save(Me.SaveFileDialog1.FileName)
 
         End If
-
-    End Sub
-
-    'Scatterplot-Matrix anzeigen
-    '****************************
-    Private Sub showScatterplot(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Scatterplot.Click
-
-        Dim diagresult As DialogResult
-        Dim SekPopOnly As Boolean
-
-        'Abfrage, ob nur Sekundäre Population gezeichnet werden soll
-        '-----------------------------------------------------------
-        diagresult = MsgBox("Soll nur die Sekundäre Population angezeigt werden?", MsgBoxStyle.YesNo, "Scatterplot-Matrix")
-
-        If (diagresult = Windows.Forms.DialogResult.Yes) Then
-            SekPopOnly = True
-        End If
-
-        Cursor = Cursors.WaitCursor
-
-        'Scatterplot-Matrix
-        '------------------
-        scatterplot1 = New Scatterplot(Sim1.OptResult, SekPopOnly)
-        Call scatterplot1.Show()
-
-        Cursor = Cursors.Default
 
     End Sub
 
@@ -2295,9 +2268,7 @@ Start_Evolutionsrunden:
 
     End Sub
 
-#End Region 'Diagrammfunktionen
-
-#End Region 'UI
+#End Region 'Ergebnisdatenbank
 
     'Ermittelt beim Start die Anzahl der Physikalischen Prozessoren
     '**************************************************************

@@ -14,6 +14,8 @@ Public Class Diagramm
     '*******************************************************************************
     '*******************************************************************************
 
+    Public is3D As Boolean              'Flag, der anzeigt, ob es sich um ein 3D-Diagramm handelt
+
     Public Structure Achse
         Public Name As String
         Public Auto As Boolean
@@ -38,7 +40,9 @@ Public Class Diagramm
     Public Sub DiagInitialise(ByVal Titel As String, ByVal Achsen As Collection)
 
         With Me
+
             .Clear()
+            .is3D = False
             .Header.Text = Titel
             .Aspect.View3D = False
             .Legend.Visible = False
@@ -62,6 +66,8 @@ Public Class Diagramm
             '---------------------------------
             If (Achsen.Count > 2) Then
 
+                .is3D = True
+
                 'Z-Achse:
                 .Chart.Axes.Depth.Title.Caption = Achsen(3).Name
                 .Chart.Axes.Depth.Automatic = Achsen(3).Auto
@@ -82,7 +88,7 @@ Public Class Diagramm
                 .Chart.Aspect.Zoom = 66
 
                 'Rotate Tool
-                Dim rotate as New Steema.TeeChart.Tools.Rotate(.Chart)
+                Dim rotate As New Steema.TeeChart.Tools.Rotate(.Chart)
                 rotate.Button = Windows.Forms.MouseButtons.Right
 
             End If
@@ -228,5 +234,92 @@ Public Class Diagramm
         tmpMarksTip.Style = Steema.TeeChart.Styles.MarksStyles.XY
 
     End Sub
+
+#Region "Lösungsauswahl"
+
+    'ausgewählte Lösung anzeigen
+    '***************************
+    Friend Sub showSelectedSolution(ByVal List_OptZiele() As Sim.Struct_OptZiel, ByVal sol As Solution)
+
+        Dim xAchse, yAchse, zAchse As String
+        Dim xWert, yWert, zWert As Double
+        Dim i As Integer
+
+        'angezeigte X und Y Achsen bestimmen
+        xAchse = Me.Chart.Axes.Bottom.Title.Caption
+        yAchse = Me.Chart.Axes.Left.Title.Caption
+
+        'QWerte zu Achsen zuordnen
+        For i = 0 To List_OptZiele.GetUpperBound(0)
+            If (List_OptZiele(i).Bezeichnung = xAchse) Then
+                xWert = sol.QWerte(i)
+            ElseIf (List_OptZiele(i).Bezeichnung = yAchse) Then
+                yWert = sol.QWerte(i)
+            End If
+        Next
+
+        '2D oder 3D?
+        If (Not Me.is3D) Then
+
+            '2D-Diagramm
+            '-----------
+            Dim serie As Steema.TeeChart.Styles.Series
+            serie = Me.getSeriesPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
+            serie.Add(xWert, yWert, sol.ID.ToString())
+            serie.Marks.Visible = True
+            serie.Marks.Style = Steema.TeeChart.Styles.MarksStyles.Label
+            serie.Marks.Transparency = 50
+            serie.Marks.ArrowLength = 10
+
+        Else
+            '3D-Diagramm
+            '-----------
+            'Z Achse bestimmen
+            zAchse = Me.Chart.Axes.Depth.Title.Caption
+
+            'QWert zu Achse zuordnen
+            For i = 0 To List_OptZiele.GetUpperBound(0)
+                If (List_OptZiele(i).Bezeichnung = zAchse) Then
+                    zWert = sol.QWerte(i)
+                End If
+            Next
+
+            Dim serie3D As Steema.TeeChart.Styles.Points3D
+            serie3D = Me.getSeries3DPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
+            serie3D.Add(xWert, yWert, zWert, sol.ID.ToString())
+            serie3D.Marks.Visible = True
+            serie3D.Marks.Style = Steema.TeeChart.Styles.MarksStyles.Label
+            serie3D.Marks.Transparency = 50
+            serie3D.Marks.ArrowLength = 10
+
+        End If
+
+    End Sub
+
+    'Serie der ausgewählten Lösungen löschen
+    '***************************************
+    Friend Sub clearSelection()
+
+        If (Not Me.is3D) Then
+            '2D-Diagramm
+            '-----------
+            Dim serie As Steema.TeeChart.Styles.Series
+            serie = Me.getSeriesPoint("ausgewählte Lösungen")
+            serie.Dispose()
+
+        Else
+            '3D-Diagramm
+            '-----------
+            Dim serie3D As Steema.TeeChart.Styles.Points3D
+            serie3D = Me.getSeries3DPoint("ausgewählte Lösungen")
+            serie3D.Dispose()
+        End If
+
+        Call Me.Refresh()
+
+    End Sub
+
+
+#End Region
 
 End Class
