@@ -66,6 +66,9 @@ Public Class IHA
 
     Private IHARes As IHAResult
 
+    Private isComparison As Boolean                     'Gibt an, ob mit bestehenden RVA-Werten verglichen werden soll
+    Private IHAResRef As IHAResult                      'zu vergleichendes IHA-Ergebnis
+
     'IHA-Software-Parameter
     '----------------------
     Private Const BegWatrYr As Integer = 275            '1. Okt.
@@ -105,6 +108,37 @@ Public Class IHA
         'IHA-Parametergruppen definieren
         '-------------------------------
         With Me.IHARes
+
+            ReDim .IHAParamGroups(4)
+
+            'Parameter group #1
+            .IHAParamGroups(0).No = 1
+            .IHAParamGroups(0).GName = "Quantity"
+            ReDim .IHAParamGroups(0).IHAParams(11)
+
+            'Parameter group #2
+            .IHAParamGroups(1).No = 2
+            .IHAParamGroups(1).GName = "Extremes"
+            ReDim .IHAParamGroups(1).IHAParams(11)
+
+            'Parameter group #3
+            .IHAParamGroups(2).No = 3
+            .IHAParamGroups(2).GName = "Timing"
+            ReDim .IHAParamGroups(2).IHAParams(1)
+
+            'Parameter group #4
+            .IHAParamGroups(3).No = 4
+            .IHAParamGroups(3).GName = "Frequency"
+            ReDim .IHAParamGroups(3).IHAParams(3)
+
+            'Parameter group #5
+            .IHAParamGroups(4).No = 5
+            .IHAParamGroups(4).GName = "Rate"
+            ReDim .IHAParamGroups(4).IHAParams(2)
+
+        End With
+
+        With Me.IHAResRef
 
             ReDim .IHAParamGroups(4)
 
@@ -225,6 +259,17 @@ Public Class IHA
         'input.par Datei schreiben
         '-------------------------
         Call write_InputPar(BlueM1.Datensatz)
+
+        'Falls vorhanden, Referenz RVA-Werte einlesen
+        '--------------------------------------------
+        Dim reffile As String = BlueM1.WorkDir & BlueM1.Datensatz & ".rva"
+        If (File.Exists(reffile)) Then
+
+            Me.isComparison = True
+            
+            Call IHA.read_IHAResults(reffile, Me.IHAResRef)
+
+        End If
 
     End Sub
 
@@ -364,7 +409,7 @@ Public Class IHA
 
         'IHA-Ergebnisse einlesen
         '-----------------------
-        Call read_IHAResults()
+        Call IHA.read_IHAResults(Me.IHADir & "output.rva", Me.IHARes)
 
     End Sub
 
@@ -373,25 +418,48 @@ Public Class IHA
     Public Function QWert_IHA(ByVal OptZiel As Sim.Struct_OptZiel) As Double
 
         Dim QWert As Double
-        Dim fx_HA As Double
+        Dim fx_HA, diff As Double
         Dim i As Integer
 
-        'fx(HA) Wert bestimmen
-        '-----------------
-        If (OptZiel.ZielFkt = "") Then
-            'fx(HA) Gesamtmittelwert
-            fx_HA = Me.IHARes.GAvg_fx_HA
-        Else
-            'fx(HA) Mittelwert einer Parametergruppe
-            For i = 0 To Me.IHARes.IHAParamGroups.GetUpperBound(0)
-                If (OptZiel.ZielFkt = Me.IHARes.IHAParamGroups(i).GName) Then
-                    fx_HA = Me.IHARes.IHAParamGroups(i).Avg_fx_HA
-                    Exit For
-                End If
-            Next
-        End If
+        If (Me.isComparison) Then
 
-        QWert = 1 - fx_HA
+            'RVA-Werte vergleichen
+            '---------------------
+            If (OptZiel.ZielFkt = "") Then
+                'Gesamtmittelwert
+                diff = Me.IHAResRef.GAvg_fx_HA - Me.IHARes.GAvg_fx_HA
+            Else
+                'fx(HA) Mittelwert einer Parametergruppe
+                For i = 0 To Me.IHARes.IHAParamGroups.GetUpperBound(0)
+                    If (OptZiel.ZielFkt = Me.IHARes.IHAParamGroups(i).GName) Then
+                        diff = Me.IHAResRef.IHAParamGroups(i).Avg_fx_HA - Me.IHARes.IHAParamGroups(i).Avg_fx_HA
+                        Exit For
+                    End If
+                Next
+            End If
+
+            QWert = 1 - diff
+
+        Else
+
+            'fx(HA) Wert bestimmen
+            '-----------------
+            If (OptZiel.ZielFkt = "") Then
+                'fx(HA) Gesamtmittelwert
+                fx_HA = Me.IHARes.GAvg_fx_HA
+            Else
+                'fx(HA) Mittelwert einer Parametergruppe
+                For i = 0 To Me.IHARes.IHAParamGroups.GetUpperBound(0)
+                    If (OptZiel.ZielFkt = Me.IHARes.IHAParamGroups(i).GName) Then
+                        fx_HA = Me.IHARes.IHAParamGroups(i).Avg_fx_HA
+                        Exit For
+                    End If
+                Next
+            End If
+
+            QWert = 1 - fx_HA
+
+        End If
 
         Return QWert
 
@@ -414,12 +482,11 @@ Public Class IHA
 
     'IHA Ergebnisse einlesen
     '***********************
-    Private Sub read_IHAResults()
+    Private Shared Sub read_IHAResults(ByVal rvafile as String, ByRef IHARes As IHAResult)
 
         'RVA-Datei öffnen und einlesen
         '-----------------------------
-
-        Dim FiStr As FileStream = New FileStream(Me.IHADir & "output.rva", FileMode.Open, IO.FileAccess.Read)
+        Dim FiStr As FileStream = New FileStream(rvafile, FileMode.Open, IO.FileAccess.Read)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
         Dim StrReadSync As TextReader = TextReader.Synchronized(StrRead)
 
@@ -434,7 +501,7 @@ Public Class IHA
 
             'Ergebnisse einer Parametergruppe einlesen
             '-----------------------------------------
-            With Me.IHARes.IHAParamGroups(i)
+            With IHARes.IHAParamGroups(i)
 
                 Do
                     Zeile = StrReadSync.ReadLine.ToString
@@ -468,7 +535,7 @@ Public Class IHA
 
         'Mittelwert aller Parametergruppen berechnen
         '-------------------------------------------
-        Me.IHARes.GAvg_fx_HA = Gsum / Me.IHARes.IHAParamGroups.GetLength(0)
+        IHARes.GAvg_fx_HA = Gsum / IHARes.IHAParamGroups.GetLength(0)
 
     End Sub
 
