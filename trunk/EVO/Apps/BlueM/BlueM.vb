@@ -34,8 +34,8 @@ Public Class BlueM
 
     'IHA
     '---
-    Private isIHA As Boolean = False
-    Private IHA1 As IHA
+    Friend isIHA As Boolean = False
+    Friend IHA1 As IHA
 
 #End Region 'Eigenschaften
 
