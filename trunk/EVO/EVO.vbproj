@@ -91,6 +91,10 @@
     <Reference Include="TeeChart, Version=2.0.2652.22325, Culture=neutral, PublicKeyToken=9c8126276c77bdb7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <ProjectReference Include="..\..\IHA.Win\IHA.Win.vbproj">
+      <Project>{7A7828C7-812B-45C0-AC5A-AE2DB74B7CD8}</Project>
+      <Name>IHA.Win</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\SMUSI.DLLAdapter\IHWB.SMUSI.DllAdapter\IHWB.SMUSI.DllAdapter.csproj">
       <Project>{5EF7B5ED-84AE-4302-9B76-E1B87D1AB306}</Project>
       <Name>IHWB.SMUSI.DllAdapter</Name>
@@ -116,7 +120,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Apps\BlueM\BlueM.vb" />
-    <Compile Include="Apps\BlueM\IHA.vb" />
     <Compile Include="Apps\BlueM\SKos.vb" />
     <Compile Include="Apps\SensiPlot.Designer.vb">
       <DependentUpon>SensiPlot.vb</DependentUpon>
@@ -259,9 +262,6 @@
     <None Include="Resources\icon_png.png" />
     <None Include="Resources\icon_edit.png" />
     <Content Include="Apps\BlueM\BlueM.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Apps\BlueM\IHA_Batchfor.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Apps\BlueM\IHWB.BlueM.DllAdapter.dll" />
