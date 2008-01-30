@@ -34,8 +34,8 @@ Public Class BlueM
 
     'IHA
     '---
-    Private isIHA As Boolean = False
-    Private IHA1 As IHA
+    Friend isIHA As Boolean = False
+    Friend IHA1 As IHWB.IHA.IHAAnalysis
     Private Damage1 As Damage
 
 #End Region 'Eigenschaften
@@ -156,10 +156,10 @@ Public Class BlueM
                 'HACK: es wird immer das erste IHA-Ziel verwendet!
                 'IHA-Berechnung einschalten
                 Me.isIHA = True
-                'IHA-Objekt instanziieren
-                Me.IHA1 = New IHA(Me.List_OptZiele(i))
+                'IHA-Objekt instanzieren
+                Me.IHA1 = New IHWB.IHA.IHAAnalysis(Me.List_OptZiele(i).ZielReihe)
                 'IHA-Berechnung vorbereiten
-                Call Me.IHA1.prepare_IHA(Me)
+                Call Me.IHA1.prepare_IHA(Me.WorkDir & "IHA\", Me.SimStart, Me.SimEnde)
                 Exit For
             End If
         Next
@@ -293,6 +293,7 @@ Public Class BlueM
     Public Overrides Function launchSim() As Boolean
 
         Dim simOK As Boolean
+        Dim i As Integer
 
         Try
 
@@ -325,7 +326,7 @@ Public Class BlueM
         '-------------------------------
         If (simOK) Then
 
-			'Altes Simulationsergebnis löschen
+            'Altes Simulationsergebnis löschen
             Me.SimErgebnis.Clear()
 
             'WEL-Datei einlesen
@@ -338,9 +339,14 @@ Public Class BlueM
 
             'Bei IHA-Berechnung jetzt IHA-Software ausführen
             If (Me.isIHA) Then
-                Dim IHAReihe As Wave.Zeitreihe
-                IHAReihe = Me.SimErgebnis(Me.IHA1.IHAZiel.SimGr)
-                Call Me.IHA1.calculate_IHA(IHAReihe)
+                'IHA-Ziel raussuchen und Simulationsreihe übergeben
+                'HACK: es wird immer das erste IHA-Ziel verwendet!
+                For i = 0 To Me.List_OptZiele.GetUpperBound(0)
+                    If (Me.List_OptZiele(i).ZielTyp = "IHA") Then
+                        Call Me.IHA1.calculate_IHA(Me.SimErgebnis(Me.List_OptZiele(i).SimGr))
+                        Exit For
+                    End If
+                Next
             End If
 
         End If
@@ -405,13 +411,65 @@ Public Class BlueM
                 QWert = Me.SKos1.calculate_costs(Me)
 
             Case "IHA"
-                QWert = Me.IHA1.QWert_IHA(OptZiel)
+                QWert = Me.QWert_IHA(OptZiel)
 
             Case "Schaden"
                 Datei = WorkDir & Datensatz & ".wel"
                 Me.Damage1 = New Damage()
                 QWert = Me.Damage1.QWert_Damage(Datei)
         End Select
+
+        Return QWert
+
+    End Function
+
+    'QWert aus IHA-Ergebnissen berechnen
+    '***********************************
+    Private Function QWert_IHA(ByVal OptZiel As Sim.Struct_OptZiel) As Double
+
+        Dim QWert As Double
+        Dim fx_HA, diff As Double
+        Dim i As Integer
+
+        If (Me.IHA1.isComparison) Then
+
+            'RVA-Werte vergleichen
+            '---------------------
+            If (OptZiel.ZielFkt = "") Then
+                'Gesamtmittelwert
+                diff = Me.IHA1.RVAResultBase.GAvg_fx_HA - Me.IHA1.RVAResult.GAvg_fx_HA
+            Else
+                'fx(HA) Mittelwert einer Parametergruppe
+                For i = 0 To Me.IHA1.RVAResult.IHAParamGroups.GetUpperBound(0)
+                    If (OptZiel.ZielFkt = Me.IHA1.RVAResult.IHAParamGroups(i).GName) Then
+                        diff = Me.IHA1.RVAResultBase.IHAParamGroups(i).Avg_fx_HA - Me.IHA1.RVAResult.IHAParamGroups(i).Avg_fx_HA
+                        Exit For
+                    End If
+                Next
+            End If
+
+            QWert = 1 - diff
+
+        Else
+
+            'fx(HA) Wert bestimmen
+            '-----------------
+            If (OptZiel.ZielFkt = "") Then
+                'fx(HA) Gesamtmittelwert
+                fx_HA = Me.IHA1.RVAResult.GAvg_fx_HA
+            Else
+                'fx(HA) Mittelwert einer Parametergruppe
+                For i = 0 To Me.IHA1.RVAResult.IHAParamGroups.GetUpperBound(0)
+                    If (OptZiel.ZielFkt = Me.IHA1.RVAResult.IHAParamGroups(i).GName) Then
+                        fx_HA = Me.IHA1.RVAResult.IHAParamGroups(i).Avg_fx_HA
+                        Exit For
+                    End If
+                Next
+            End If
+
+            QWert = 1 - fx_HA
+
+        End If
 
         Return QWert
 
