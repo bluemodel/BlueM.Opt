@@ -2024,10 +2024,9 @@ Start_Evolutionsrunden:
                     'Simulationsergebnis in Wave laden
                     '---------------------------------
                     If (.ZielTyp = "IHA") Then
-                        'Sonderfall IHA-Ziel
-                        Dim RVA As New Wave.RVA(CType(Me.Sim1, IHWB.EVO.BlueM).IHA1.IHADir & "output.rva")
+                        'Sonderfall IHA-Ziel:
                         'RVA-Ergebnis in Wave2 laden
-                        Wave2.Display_RVA(RVA.RVAValues, "Lösung " & sol.ID.ToString())
+                        Wave2.Display_RVA(CType(Me.Sim1, IHWB.EVO.BlueM).IHA1.RVAResult, "Lösung " & sol.ID.ToString())
                     Else
                         'Normale Zeitreihe
                         If (Not SimSeries.Contains(.SimGr)) Then
