@@ -24,10 +24,11 @@ Public Class EVO_Einstellungen
 
         ' Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
-        'PES_Settings instanzieren
+        'Settings instanzieren
         Me.msettings = New EVO.Kern.EVO_Settings()
-        'Standardmäßig Single-Objective Werte nehmen
+        'Standard-Settings setzen
         Call Me.msettings.PES.setStandard(EVO_MODUS.Single_Objective)
+        Call Me.msettings.CES.setStandard(EVO_MODUS.Single_Objective)
         Call Me.msettings.HookJeeves.setStandard()
         'Comboboxen füllen
         Call Me.InitComboboxes()
