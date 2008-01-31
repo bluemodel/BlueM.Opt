@@ -142,27 +142,27 @@ Public Class EVO_Settings
     Public Structure CES_Settings
 
         'CES
-        Public n_Generations As Integer  
-        Public n_Parents As Integer
-        Public n_Childs As Integer
-        Public OptStrategie As EVO_STRATEGIE           '"plus" oder "minus" Strategie
-        Public OptReprodOp As CES_REPRODOP
-        Public OptMutOperator As CES_MUTATION
-        Public pr_MutRate As Integer                   'Definiert die Wahrscheinlichkeit der Mutationsrate in %
+        Public n_Generations As Integer         'Anzahl der Generationen
+        Public n_Parents As Integer             'Anzahl der Eltern
+        Public n_Childs As Integer              'Anzahl der Kinder
+        Public OptStrategie As EVO_STRATEGIE    '"plus" oder "minus" Strategie
+        Public OptReprodOp As CES_REPRODOP      'Reprofuktionaoperator
+        Public OptMutOperator As CES_MUTATION   'Mutationsoperator
+        Public pr_MutRate As Integer            'Definiert die Wahrscheinlichkeit der Mutationsrate in %
         
-        Public is_SecPop As Boolean
-        Public n_MemberSecondPop As Integer
-        Public n_Interact As Integer
+        Public is_SecPop As Boolean             'SekundärePopulation an oder aus
+        Public n_MemberSecondPop As Integer     'Anzahl der Mitglieder der Sekundären Population
+        Public n_Interact As Integer            'Austausch mit SekPop nach n Generationen
 
         'Hybrid
-        Public n_PartsMem As Integer           'Länge des Gedächtnispfades Achtung Maximum ist 3
-        Public n_PES_MaxParents As Integer             'Anzahl der Eltern für PES Hybrid
+        Public n_PartsMem As Integer            'Länge des Gedächtnispfades Achtung Maximum ist 3
+        Public n_PES_MaxParents As Integer      'Anzahl der Eltern für PES Hybrid
         
-        Public is_PES_SecPop As Boolean
-        Public n_PES_MemSecPop As Integer
-        Public n_PES_Interact As Integer
+        Public is_PES_SecPop As Boolean         'SekundärePopulation für PES an oder aus
+        Public n_PES_MemSecPop As Integer       'Anzahl der Mitglieder der Sekundären Population für PES
+        Public n_PES_Interact As Integer        'Austausch mit SekPop für PES nach n Generationen
 
-        Public is_PopMutStart As Boolean                    'Gibt an ob bei der Population oder bei den Eltern in die PES gestiegen wird.
+        Public is_PopMutStart As Boolean        'Gibt an ob die PES bei der Population oder bei den Eltern gestartet wird.
 
         'Standardwerte setzen
         '********************
@@ -205,7 +205,7 @@ Public Class EVO_Settings
                     Me.OptReprodOp = CES_REPRODOP.Selt_Rand_Uniform
                     Me.OptMutOperator = CES_MUTATION.RND_Switch
                     Me.pr_MutRate = 25
-        
+
                     Me.is_SecPop = True
                     Me.n_MemberSecondPop = 50
                     Me.n_Interact = 5
@@ -241,5 +241,6 @@ Public Class EVO_Settings
     End Structure
 
     Public PES As PES_Settings
+    Public CES As CES_Settings
     Public HookJeeves As HookJeeves_Settings
 End Class
