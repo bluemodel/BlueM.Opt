@@ -1956,6 +1956,7 @@ Start_Evolutionsrunden:
 
         Dim i As Integer
         Dim isOK As Boolean
+        Dim isIHA As Boolean
 
         Dim zre As Wave.Zeitreihe
         Dim SimSeries As New Collection                 'zu zeichnende Simulationsreihen
@@ -1967,13 +1968,19 @@ Start_Evolutionsrunden:
         'Wave instanzieren
         Dim Wave1 As New Wave.Wave()
 
-        'Bei BlueM mit IHA-Berechnung 
+        'Sonderfall BlueM mit IHA-Berechnung 
         'ein 2. Wave für RVA-Diagramme instanzieren
         Dim Wave2 As Wave.Wave = Nothing
         If (TypeOf Me.Sim1 Is IHWB.EVO.BlueM) Then
             If (CType(Me.Sim1, IHWB.EVO.BlueM).isIHA) Then
+                isIHA = True
                 Wave2 = New Wave.Wave()
                 Call Wave2.PrepareChart_RVA()
+                'IHA-Vergleichsmodus?
+                If (CType(Me.Sim1, IHWB.EVO.BlueM).IHAProc.isComparison) Then
+                    'Referenz-RVAErgebnis in Wave2 laden
+                    Call Wave2.Display_RVA(CType(Me.Sim1, IHWB.EVO.BlueM).IHAProc.RVABase)
+                End If
             End If
         End If
 
@@ -2004,6 +2011,16 @@ Start_Evolutionsrunden:
             'Zu zeichnende Simulationsreihen zurücksetzen
             SimSeries.Clear()
 
+            'Sonderfall IHA-Berechnung
+            If (isIHA) Then
+                'RVA-Ergebnis in Wave2 laden
+                Dim RVAResult As Wave.RVA.Struct_RVAValues
+                RVAResult = CType(Me.Sim1, IHWB.EVO.BlueM).IHASys.RVAResult
+                'Lösungsnummer an Titel anhängen
+                RVAResult.Title = "Lösung " & sol.ID.ToString()
+                Call Wave2.Display_RVA(RVAResult)
+            End If
+
             'zu zeichnenden Reihen aus Liste der OptZiele raussuchen
             '-------------------------------------------------------
             For i = 0 To Sim1.List_OptZiele.GetUpperBound(0)
@@ -2012,7 +2029,7 @@ Start_Evolutionsrunden:
 
                     'Referenzreihe in Wave laden
                     '---------------------------
-                    If (.ZielTyp = "Reihe") Then
+                    If (.ZielTyp = "Reihe" Or .ZielTyp = "IHA") Then
                         'Referenzreihen nur jeweils ein Mal zeichnen
                         If (Not RefSeries.Contains(.ZielReiheDatei & .ZielGr)) Then
                             RefSeries.Add(.ZielGr, .ZielReiheDatei & .ZielGr)
@@ -2023,21 +2040,14 @@ Start_Evolutionsrunden:
 
                     'Simulationsergebnis in Wave laden
                     '---------------------------------
-                    If (.ZielTyp = "IHA") Then
-                        'Sonderfall IHA-Ziel:
-                        'RVA-Ergebnis in Wave2 laden
-                        Wave2.Display_RVA(CType(Me.Sim1, IHWB.EVO.BlueM).IHA1.RVAResult, "Lösung " & sol.ID.ToString())
-                    Else
-                        'Normale Zeitreihe
-                        If (Not SimSeries.Contains(.SimGr)) Then
-                            SimSeries.Add(.SimGr, .SimGr)
-                            zre = Sim1.SimErgebnis(.SimGr).copy()
-                            'Lösungsnummer an Titel anhängen
-                            zre.Title &= " (Lösung " & sol.ID.ToString() & ")"
-                            'Simreihe in Wave laden
-                            Wave1.Display_Series(zre)
-                        End If
-
+                    'Simulationsreihen nur jeweils ein Mal zeichnen
+                    If (Not SimSeries.Contains(.SimGr)) Then
+                        Call SimSeries.Add(.SimGr, .SimGr)
+                        zre = Sim1.SimErgebnis(.SimGr).copy()
+                        'Lösungsnummer an Titel anhängen
+                        zre.Title &= " (Lösung " & sol.ID.ToString() & ")"
+                        'Simreihe in Wave laden
+                        Call Wave1.Display_Series(zre)
                     End If
 
                 End With
