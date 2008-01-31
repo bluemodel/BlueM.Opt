@@ -121,6 +121,7 @@
   <ItemGroup>
     <Compile Include="Apps\BlueM\BlueM.vb" />
     <Compile Include="Apps\BlueM\Damage.vb" />
+    <Compile Include="Apps\BlueM\IHAProcessor.vb" />
     <Compile Include="Apps\BlueM\SKos.vb" />
     <Compile Include="Apps\SensiPlot.Designer.vb">
       <DependentUpon>SensiPlot.vb</DependentUpon>
