@@ -48,7 +48,10 @@ Public Class EVO_Einstellungen
 
     'Optimierungsmodus wurde geändert
     '********************************
-    Private Sub OptModus_Change()
+
+    'PES
+    '---
+    Private Sub OptModus_Change_ActDeact_PES()
 
         Select Case Me.msettings.PES.OptModus
 
@@ -89,6 +92,23 @@ Public Class EVO_Einstellungen
         Call FILLCOMBO_POPPENALTY(ComboOptPopPenalty)
 
     End Sub
+
+    'CES
+    '---
+    Private Sub OptModus_Change_ActDeact_CES()
+
+        Select Case Me.msettings.PES.OptModus
+
+            Case EVO_MODUS.Single_Objective
+
+
+            Case EVO_MODUS.Multi_Objective
+
+
+        End Select
+
+    End sub
+
 
     Public Sub SetFor_CES_PES(ByVal AnzGen As Integer, ByVal AnzEltern As Integer, ByVal AnzNachf As Integer)
 
@@ -150,9 +170,11 @@ Public Class EVO_Einstellungen
 
         'CES
         '---
-        Me.ComboCESReproduction.DataSource = System.Enum.GetValues(GetType(CES_REPRODOP))
-        Me.ComboCESMutation.DataSource = System.Enum.GetValues(GetType(CES_MUTATION))
-        Me.ComboCESSelection.DataSource = System.Enum.GetValues(GetType(EVO_STRATEGIE))
+        Me.Combo_CES_Reproduction.DataSource = System.Enum.GetValues(GetType(CES_REPRODOP))
+        Me.Combo_CES_Mutation.DataSource = System.Enum.GetValues(GetType(CES_MUTATION))
+        Me.Combo_CES_Selection.DataSource = System.Enum.GetValues(GetType(EVO_STRATEGIE))
+        Me.Combo_CES_IniValues.DataSource = system.Enum.GetValues(gettype(EVO_STARTPARAMETER))
+        me.Combo_CES_HybridType.DataSource = system.Enum.GetValues(gettype(HYBRID_TYPE))
         
     End Sub
 
@@ -243,7 +265,7 @@ Public Class EVO_Einstellungen
         '---
         With Me.msettings.PES
 
-            Call OptModus_Change()
+            Call OptModus_Change_ActDeact_PES()
 
             Me.ComboOptStrategie.SelectedItem = .OptStrategie
             Me.ComboOptStartparameter.SelectedItem = .OptStartparameter
@@ -279,6 +301,35 @@ Public Class EVO_Einstellungen
 
         End With
 
+        'PES
+        '---
+        With Me.msettings.CES
+
+            Call OptModus_Change_ActDeact_CES()
+
+            'me.Combo_CES_IniValues.SelectedItem = .
+            me.Numeric_CES_n_Generations.Value = .n_Generations
+            me.Numeric_CES_n_Parents.Value = .n_Parents
+            me.Numeric_CES_n_childs.Value = .n_Childs
+            me.Combo_CES_Selection.SelectedItem = .OptStrategie
+            me.Combo_CES_Reproduction.SelectedItem = .OptReprodOp 
+            me.Combo_CES_Mutation.SelectedItem = .OptMutOperator
+            me.Numeric_CES_MutRate.Value = .pr_MutRate
+            me.CheckBox_CES_UseSecPop_CES.Checked = .is_SecPop
+            me.Numeric_CES_n_exchange_SecPop.Value = .n_Interact
+            me.Numeric_CES_n_member_SecPop.Value = .n_MemberSecondPop
+            'hängt vom Datensatz ab
+            me.CheckBox_CES_RealOptimisation.Checked = False
+            'me.Combo_CES_HybridType.SelectedItem
+            me.Numeric_CES_mem_Strength.Value = .n_PartsMem
+            me.Numeric_CES_max_PES_Parents.Value = .n_PES_MaxParents
+            me.CheckBox_CES_StartPESPop.Checked = .is_PopMutStart
+            me.CheckBox_CES_UseSecPop_PES.Checked = .is_PES_SecPop
+            me.Numeric_CES_n_exchange_SecPop_PES.Value = .n_PES_Interact
+            me.Numeric_CES_n_member_SecPop_PES.Value = .n_PES_MemSecPop
+
+        End With
+
         'Hook and Jeeves
         '---------------
         With Me.msettings.HookJeeves
@@ -300,14 +351,21 @@ Public Class EVO_Einstellungen
 
     'Standardeinstellungen setzen (PES)
     '**********************************
-    Public Sub setStandard(ByVal modus As Kern.EVO_MODUS)
+    Public Sub setStandard_PES(ByVal modus As Kern.EVO_MODUS)
         Call Me.msettings.PES.setStandard(modus)
+        Call Me.writeForm()
+    End Sub
+
+    'Standardeinstellungen setzen (CES)
+    '**********************************
+    Public Sub setStandard_CES(ByVal modus As Kern.EVO_MODUS)
+        Call Me.msettings.CES.setStandard(modus)
         Call Me.writeForm()
     End Sub
 
     'Standardeinstellungen setzen für HJ
     '***********************************
-    Public Sub setStandard()
+    Public Sub setStandard_HJ()
         Call Me.msettings.HookJeeves.setStandard()
         Call Me.writeForm()
     End Sub

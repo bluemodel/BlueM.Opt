@@ -68,4 +68,10 @@ Public Module Constants
         Spannweite = 4                          'MultiObjective
     End Enum
 
+    'Option zur Wahl des Hybrid Verfahrens
+    Public Enum HYBRID_TYPE as Integer
+        Mixed_Integer = 1                       'Mixed Integer durch Memory
+        Sequencial_1 = 2                        'Erst CES dann PES
+    End Enum
+
 End Module

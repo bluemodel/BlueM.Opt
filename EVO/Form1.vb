@@ -190,7 +190,7 @@ Partial Class Form1
                     'EVO_Einstellungen aktivieren
                     EVO_Einstellungen1.Enabled = True
 
-                    Call EVO_Einstellungen1.setStandard(Testprobleme1.OptModus)
+                    Call EVO_Einstellungen1.setStandard_PES(Testprobleme1.OptModus)
 
                     'Globale Parameter werden gesetzt
                     Call Testprobleme1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
@@ -336,9 +336,9 @@ Partial Class Form1
                     EVO_Einstellungen1.Enabled = True
                     Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_PES
                     If (Sim1.List_OptZiele.GetLength(0) = 1) Then
-                        Call EVO_Einstellungen1.setStandard(Kern.EVO_MODUS.Single_Objective)
+                        Call EVO_Einstellungen1.setStandard_PES(Kern.EVO_MODUS.Single_Objective)
                     ElseIf (Sim1.List_OptZiele.GetLength(0) > 1) Then
-                        Call EVO_Einstellungen1.setStandard(Kern.EVO_MODUS.Multi_Objective)
+                        Call EVO_Einstellungen1.setStandard_PES(Kern.EVO_MODUS.Multi_Objective)
                     End If
 
                     'Parameterübergabe an PES
@@ -356,7 +356,7 @@ Partial Class Form1
                     Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_HookeJeeves
                     'Nur SO möglich
                     If (Sim1.List_OptZiele.GetLength(0) = 1) Then
-                        Call EVO_Einstellungen1.setStandard()
+                        Call EVO_Einstellungen1.setStandard_HJ()
                     ElseIf Sim1.List_OptZiele.GetLength(0) > 1 Then
                         Throw New Exception("Methode von Hook und Jeeves erlaubt nur SO-Optimierung!")
                     End If
@@ -395,57 +395,50 @@ Partial Class Form1
 
                             'CES für Sim vorbereiten (Files lesen und Validieren)
                             Call Sim1.read_and_valid_INI_Files_CES_PES()
-
                     End Select
 
-                    'CES initialisieren
-                    CES1 = New EVO.Kern.CES()
-                    'Prüft ob die Zahl mög. Kombinationen < Zahl Eltern + Nachfolger
-                    If (CES1.Settings.CES.n_Childs + CES1.Settings.CES.n_Parents) > Sim1.No_of_Combinations Then
-                        Throw New Exception("Die Zahl der Eltern + die Zahl der Kinder ist größer als die mögliche Zahl der Kombinationen.")
-                    End If
+                    'EVO_Einstellungen einrichten
+                    '****************************
+                    EVO_Einstellungen1.Enabled = True
+                    Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_CES
 
-                    'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten
+                    'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten CES
                     If (Sim1.List_OptZiele.GetLength(0) = 1) Then
-                        Call EVO_Einstellungen1.setStandard(Kern.EVO_MODUS.Single_Objective)
+                        Call EVO_Einstellungen1.setStandard_CES(Kern.EVO_MODUS.Single_Objective)
                     ElseIf (Sim1.List_OptZiele.GetLength(0) > 1) Then
-                        Call EVO_Einstellungen1.setStandard(Kern.EVO_MODUS.Multi_Objective)
+                        Call EVO_Einstellungen1.setStandard_CES(Kern.EVO_MODUS.Multi_Objective)
+                    End If
+                    'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten PES
+                    If (Sim1.List_OptZiele.GetLength(0) = 1) Then
+                        Call EVO_Einstellungen1.setStandard_PES(Kern.EVO_MODUS.Single_Objective)
+                    ElseIf (Sim1.List_OptZiele.GetLength(0) > 1) Then
+                        Call EVO_Einstellungen1.setStandard_PES(Kern.EVO_MODUS.Multi_Objective)
                     End If
 
-                    'Anzahl der Ziele, Locations und Verzeigungen wird an CES übergeben
-                    'Call ces1.CesInitialise(
-                    CES1.n_Penalty = Sim1.List_OptZiele.GetLength(0)
-                    CES1.n_Constrain = Sim1.List_Constraints.GetLength(0)
-                    CES1.n_Locations = Sim1.List_Locations.GetLength(0)
-                    CES1.n_Verzweig = Sim1.VerzweigungsDatei.GetLength(0)
-                    CES1.TestModus = Sim1.Set_TestModus
-                    CES1.n_Combinations = Sim1.No_of_Combinations
+                    'CES initialisieren
+                    '******************
+                    CES1 = New EVO.Kern.CES()
 
-                    '*************************************************************************************
-
+                    Call Ces1.CESInitialise(EVO_Einstellungen1.Settings, Method, Sim1.List_OptZiele.GetLength(0), Sim1.List_Constraints.GetLength(0), Sim1.List_Locations.GetLength(0), Sim1.VerzweigungsDatei.GetLength(0), Sim1.No_of_Combinations, Sim1.Set_TestModus, sim1.n_PathDimension)
+                    
                     'Die Variablen für die Individuuen werden gesetzt
-                    EVO.Kern.Individuum.Initialise(2, CES1.n_Locations, CES1.n_Penalty, CES1.n_Constrain)
+                    EVO.Kern.Individuum.Initialise(2, CES1.ModSett.n_Locations, CES1.ModSett.n_Penalty, CES1.ModSett.n_Constrain)
 
                     'Bei Testmodus wird die Anzahl der Kinder und Generationen überschrieben
-                    If CES1.TestModus = 1 Then
+                    '***********************************************************************
+                    If CES1.ModSett.TestModus = 1 Then
                         CES1.Settings.CES.n_Childs = 1
                         CES1.Settings.CES.n_Parents = 1
                         CES1.Settings.CES.n_Generations = 1
                         ReDim CES1.NDSResult(CES1.Settings.CES.n_Childs + CES1.Settings.CES.n_Parents - 1)
-                    ElseIf CES1.TestModus = 2 Then
-                        CES1.Settings.CES.n_Childs = CES1.n_Combinations
+                    ElseIf CES1.ModSett.TestModus = 2 Then
+                        CES1.Settings.CES.n_Childs = CES1.ModSett.n_Combinations
                         CES1.Settings.CES.n_Generations = 1
                         ReDim CES1.NDSResult(CES1.Settings.CES.n_Childs + CES1.Settings.CES.n_Parents - 1)
                     End If
 
-                    'Gibt die PathSize an für jede Pfadstelle
-                    Dim i As Integer
-                    ReDim CES1.n_PathDimension(CES1.n_Locations - 1)
-                    For i = 0 To CES1.n_Locations - 1
-                        CES1.n_PathDimension(i) = Sim1.List_Locations(i).List_Massnahmen.GetLength(0)
-                    Next
-
                     'EVO_Verlauf zurücksetzen
+                    '************************
                     Call Me.EVO_Opt_Verlauf1.Initialisieren(1, 1, CES1.Settings.CES.n_Generations, CES1.Settings.CES.n_Childs)
 
             End Select
@@ -854,13 +847,13 @@ Partial Class Form1
 
         'Die verschiedenen Modi
         'xxxxxxxxxxxxxxxxxxxxxx
-        If CES1.TestModus = 0 Then
+        If CES1.ModSett.TestModus = 0 Then
             'Normaler Modus: Zufällige Kinderpfade werden generiert
             Call CES1.Generate_Random_Path()
-        ElseIf CES1.TestModus = 1 Then
+        ElseIf CES1.ModSett.TestModus = 1 Then
             'Testmodus 1: Funktion zum testen einer ausgewählten Kombinationen
             Sim1.get_TestPath(CES1.Childs(0).Path)
-        ElseIf CES1.TestModus = 2 Then
+        ElseIf CES1.ModSett.TestModus = 2 Then
             'Testmodus 2: Funktion zum  testen aller Kombinationen
             Call CES1.Generate_All_Test_Paths()
         End If
@@ -872,7 +865,7 @@ Partial Class Form1
         'Hier werden dem Child die passenden Massnahmen und deren Elemente pro Location zugewiesen
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         For i = 0 To CES1.Settings.CES.n_Childs - 1
-            For j = 0 To CES1.n_Locations - 1
+            For j = 0 To CES1.ModSett.n_Locations - 1
                 Call Sim1.Identify_Measures_Elements_Parameters(j, CES1.Childs(i).Path(j), CES1.Childs(i).Measures(j), CES1.Childs(i).Loc(j).Loc_Elem, CES1.Childs(i).Loc(j).Loc_Para)
             Next
         Next
@@ -890,7 +883,7 @@ Partial Class Form1
             For i = 0 To CES1.Settings.CES.n_Childs - 1
                 'Und pro Location
                 'xxxxxxxxxxxxxxxx
-                For j = 0 To CES1.n_Locations - 1
+                For j = 0 To CES1.ModSett.n_Locations - 1
 
                     'Die Parameter (falls vorhanden) werden überschrieben
                     If Not CES1.Childs(i).Loc(j).Loc_Para.GetLength(1) = 0 Then
@@ -970,17 +963,17 @@ Partial Class Form1
 
                 'Lösung im TeeChart einzeichnen
                 '==============================
-                If (CES1.n_Penalty = 1) Then
+                If (CES1.ModSett.n_Penalty = 1) Then
                     'SingleObjective
                     '---------------
                     serie = DForm.Diag.getSeriesPoint("Childs", "Orange")
                     Call serie.Add(durchlauf_all, CES1.Childs(i).Penalty(0), durchlauf_all.ToString())
-                ElseIf (CES1.n_Penalty = 2) Then
+                ElseIf (CES1.ModSett.n_Penalty = 2) Then
                     'MultiObjective 2D-Diagramm
                     '--------------------------
                     serie = DForm.Diag.getSeriesPoint("Childs", "Orange")
                     Call serie.Add(CES1.Childs(i).Penalty(0), CES1.Childs(i).Penalty(1), durchlauf_all.ToString())
-                ElseIf (CES1.n_Penalty = 3) Then
+                ElseIf (CES1.ModSett.n_Penalty = 3) Then
                     'MultiObjective 3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
                     '---------------------------------------------------------------------------------------
                     Dim serie3D As Steema.TeeChart.Styles.Points3D
@@ -997,7 +990,7 @@ Partial Class Form1
             'MO oder SO SELEKTIONSPROZESS oder NDSorting SELEKTION
             '-----------------------------------------------------
             'BUG 259: CES: Punkt-Labels der Sekundärpopulation fehlen noch!
-            If CES1.n_Penalty = 1 Then
+            If CES1.ModSett.n_Penalty = 1 Then
                 'Sortieren der Kinden anhand der Qualität
                 Call CES1.Sort_Individuum(CES1.Childs)
                 'Selectionsprozess je nach "plus" oder "minus" Strategie
@@ -1032,7 +1025,7 @@ Partial Class Form1
 
             'REPRODUKTION und MUTATION Nicht wenn Testmodus
             '***********************************************
-            If CES1.TestModus = 0 Then
+            If CES1.ModSett.TestModus = 0 Then
                 'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
                 Call Kern.Individuum.New_Array("Child", CES1.Childs)
                 'Reproduktionsoperatoren, hier gehts dezent zur Sache
@@ -1043,7 +1036,7 @@ Partial Class Form1
 
             'Hier werden dem Child die passenden Elemente pro Location zugewiesen
             For i = 0 To CES1.Settings.CES.n_Childs - 1
-                For j = 0 To CES1.n_Locations - 1
+                For j = 0 To CES1.ModSett.n_Locations - 1
                     Call Sim1.Identify_Measures_Elements_Parameters(j, CES1.Childs(i).Path(j), CES1.Childs(i).Measures(j), CES1.Childs(i).Loc(j).Loc_Elem, CES1.Childs(i).Loc(j).Loc_Para)
                 Next
             Next
@@ -1060,7 +1053,7 @@ Partial Class Form1
 
                     'und pro Location
                     'xxxxxxxxxxxxxxxx
-                    For j = 0 To CES1.n_Locations - 1
+                    For j = 0 To CES1.ModSett.n_Locations - 1
 
                         'Ermittelt fuer jede Location den PES Parent Satz (PES_Parents ist das Ergebnis)
                         Call CES1.Memory_Search_per_Location(j)
@@ -1157,7 +1150,7 @@ Partial Class Form1
 
                 'Hier werden Child die passenden Elemente zugewiesen
                 Dim j As Integer
-                For j = 0 To CES1.n_Locations - 1
+                For j = 0 To CES1.ModSett.n_Locations - 1
                     Call Sim1.Identify_Measures_Elements_Parameters(j, CES1.Childs(i).Path(j), CES1.Childs(i).Measures(j), CES1.Childs(i).Loc(j).Loc_Elem, CES1.Childs(i).Loc(j).Loc_Para)
                 Next
 

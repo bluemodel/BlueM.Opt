@@ -173,7 +173,7 @@ Public Class EVO_Settings
                 Case EVO_MODUS.Single_Objective
 
                     'CES
-                    Me.n_Generations = 500
+                    Me.n_Generations = 100
                     Me.n_Parents = 5
                     Me.n_Childs = 15
                     Me.OptStrategie = EVO_STRATEGIE.Plus_Strategie
