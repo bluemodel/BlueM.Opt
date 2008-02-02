@@ -127,24 +127,24 @@ Public Class PES
     '***************************************
     Public Sub PesInitialise(ByRef settings As EVO_Settings, ByVal AnzPara As Integer, ByVal AnzPenalty As Integer, ByVal AnzConstr As Integer, ByRef Parameter() As Double, ByVal beziehungen() As Beziehung, ByVal Method As String)
 
-        'Schritt 1: PES - ES_SETTINGS
+        'Schritt 1: PES - SETTINGS
         'Optionen der Evolutionsstrategie werden übergeben
-        Call EsSettings(settings, Method)
+        Call PES_Form_Settings(settings, Method)
 
-        'Schritt 2: PES - ES_PREPARE
+        'Schritt 2: PES - PREPARE
         'Interne Variablen werden initialisiert, Zufallsgenerator wird initialisiert
-        Call EsPrepare(AnzPara, AnzPenalty, AnzConstr)
+        Call PES_Prepare(AnzPara, AnzPenalty, AnzConstr)
 
-        'Schritt 3: PES - ES_STARTVALUES
+        'Schritt 3: PES - STARTVALUES
         'Startwerte werden zugewiesen
-        Call EsStartvalues(Parameter, beziehungen)
+        Call PES_Startvalues(Parameter, beziehungen)
 
     End Sub
 
-    'Schritt 1: ES_SETTINGS
+    'Schritt 1: SETTINGS
     'Function ES_SETTINGS übergibt Optionen für Evolutionsstrategie und Prüft die eingestellten Optionen
     '***************************************************************************************************
-    Private Sub EsSettings(ByRef settings As EVO_Settings, ByVal method As String)
+    Private Sub PES_Form_Settings(ByRef settings As EVO_Settings, ByVal method As String)
 
         'Überprüfung der Übergebenen Werte
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -211,13 +211,13 @@ Public Class PES
 
     End Sub
 
-    'Schritt 2: ES_PREPARE
+    'Schritt 2: PREPARE
     'Initialisiert benötigte dynamische Arrays und legt Anzahl der Zielfunktionen fest
     'Initialisiert alle internen Arrays und setzt den
     'Bestwertspeicher auf sehr großen Wert (Strategie minimiert in dieser Umsetzung)
     'TODO: ESPrepare Für Paretooptimierung noch nicht fertig!!!!
     '*******************************************************************************
-    Private Sub EsPrepare(ByVal AnzPara As Integer, ByVal AnzPenalty As Integer, ByVal AnzConstr As Integer)
+    Private Sub PES_Prepare(ByVal AnzPara As Integer, ByVal AnzPenalty As Integer, ByVal AnzConstr As Integer)
         Dim m, n, l, i As Integer
 
         'Überprüfung der Eingabeparameter (es muss mindestens ein Parameter variiert und eine
@@ -327,7 +327,7 @@ Public Class PES
     'PES_Settings.iStartPar 2: Originalparameter    -> Schrittweite = Startschrittweite
     '                                               -> Parameterwert = Originalparameter
     '***********************************************************************************
-    Public Sub EsStartvalues(ByVal Parameter() As Double, ByVal beziehungen() As Beziehung)
+    Public Sub PES_Startvalues(ByVal Parameter() As Double, ByVal beziehungen() As Beziehung)
 
         Dim i As Integer
 

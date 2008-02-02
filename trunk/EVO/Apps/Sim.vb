@@ -157,7 +157,11 @@ Public MustInherit Class Sim
         Public List_Massnahmen() As Struct_Massnahme
     End Structure
 
+
     Public List_Locations() As Struct_Lokation
+
+    'Gibt die PathSize an für jede Pfadstelle
+
     Public VerzweigungsDatei(,) As String
 
 #End Region 'Eigenschaften
@@ -849,6 +853,25 @@ Public MustInherit Class Sim
 
     'Kombinatorik
     '############
+
+    'Gibt die Pfad Dimensionen zurück
+    '********************************
+    Public function n_PathDimension() As integer ()
+        Dim i As Integer
+        Dim Array() as Integer = {}
+
+        If List_Locations.GetLength(0) = 0 Then
+            Throw New Exception("Die Element Gesamtliste wurde abgerufen bevor die Elemente pro Location ermittelt wurden")
+        End If
+
+        ReDim Array(List_Locations.GetUpperBound(0))
+        For i = 0 To List_Locations.GetUpperBound(0)
+            Array(i) = List_Locations(i).List_Massnahmen.GetLength(0)
+        Next
+        
+        n_PathDimension = array.Clone
+
+    End Function
 
     'Berechnet die Anzahl maximal möglicher Kombinationen
     '****************************************************
