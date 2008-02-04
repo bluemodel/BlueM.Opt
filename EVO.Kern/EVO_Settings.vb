@@ -155,47 +155,22 @@ Public Class EVO_Settings
         Public n_Interact As Integer            'Austausch mit SekPop nach n Generationen
 
         'Hybrid
+        Public is_RealOpt as Boolean            'gibt an ob auch die Real Parameter optimiert werden sollen
+        Public ty_Hybrid as HYBRID_TYPE         'gibt den Hybrid Typ an
         Public n_PartsMem As Integer            'Länge des Gedächtnispfades Achtung Maximum ist 3
         Public n_PES_MaxParents As Integer      'Anzahl der Eltern für PES Hybrid
-        
         Public is_PES_SecPop As Boolean         'SekundärePopulation für PES an oder aus
         Public n_PES_MemSecPop As Integer       'Anzahl der Mitglieder der Sekundären Population für PES
         Public n_PES_Interact As Integer        'Austausch mit SekPop für PES nach n Generationen
-
         Public is_PopMutStart As Boolean        'Gibt an ob die PES bei der Population oder bei den Eltern gestartet wird.
 
         'Standardwerte setzen
         '********************
-        Public Sub setStandard(ByVal modus As Kern.EVO_MODUS)
+        Public Sub setStandard(ByVal Method As String)
 
-            Select Case modus
+            Select Case Method
 
-                Case EVO_MODUS.Single_Objective
-
-                    'CES
-                    Me.n_Generations = 100
-                    Me.n_Parents = 5
-                    Me.n_Childs = 15
-                    Me.OptStrategie = EVO_STRATEGIE.Plus_Strategie
-                    Me.OptReprodOp = CES_REPRODOP.Selt_Rand_Uniform
-                    Me.OptMutOperator = CES_MUTATION.RND_Switch
-                    Me.pr_MutRate = 25
-        
-                    Me.is_SecPop = True
-                    Me.n_MemberSecondPop = 50
-                    Me.n_Interact = 5
-
-                    'Hybrid
-                    Me.n_PartsMem = 3
-                    Me.n_PES_MaxParents = 5
-        
-                    Me.is_PES_SecPop = False
-                    Me.n_PES_MemSecPop = 50
-                    Me.n_PES_Interact = 5
-
-                    Me.is_PopMutStart = False
-
-                Case EVO_MODUS.Multi_Objective
+                Case "CES"
 
                     'CES
                     Me.n_Generations = 500
@@ -205,19 +180,46 @@ Public Class EVO_Settings
                     Me.OptReprodOp = CES_REPRODOP.Selt_Rand_Uniform
                     Me.OptMutOperator = CES_MUTATION.RND_Switch
                     Me.pr_MutRate = 25
-
+        
                     Me.is_SecPop = True
                     Me.n_MemberSecondPop = 50
                     Me.n_Interact = 5
 
                     'Hybrid
+                    me.is_RealOpt = False
+                    me.ty_Hybrid = HYBRID_TYPE.Mixed_Integer
                     Me.n_PartsMem = 3
                     Me.n_PES_MaxParents = 5
         
                     Me.is_PES_SecPop = False
                     Me.n_PES_MemSecPop = 50
                     Me.n_PES_Interact = 5
+                    Me.is_PopMutStart = False
 
+                Case "HYBRID"
+
+                    'CES
+                    Me.n_Generations = 100
+                    Me.n_Parents = 5
+                    Me.n_Childs = 15
+                    Me.OptStrategie = EVO_STRATEGIE.Plus_Strategie
+                    Me.OptReprodOp = CES_REPRODOP.Selt_Rand_Uniform
+                    Me.OptMutOperator = CES_MUTATION.RND_Switch
+                    Me.pr_MutRate = 25
+
+                    Me.is_SecPop = True
+                    Me.n_MemberSecondPop = 50
+                    Me.n_Interact = 5
+
+                    'Hybrid
+                    me.is_RealOpt = True
+                    me.ty_Hybrid = HYBRID_TYPE.Mixed_Integer
+                    Me.n_PartsMem = 3
+                    Me.n_PES_MaxParents = 5
+        
+                    Me.is_PES_SecPop = False
+                    Me.n_PES_MemSecPop = 50
+                    Me.n_PES_Interact = 5
                     Me.is_PopMutStart = False
 
             End Select
