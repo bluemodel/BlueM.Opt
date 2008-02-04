@@ -80,7 +80,7 @@ Partial Class Form1
         ComboBox_Anwendung.SelectedIndex = 0
 
         'Liste der Methoden in ComboBox schreiben und Anfangseinstellung wählen
-        ComboBox_Methode.Items.AddRange(New Object() {"", METH_RESET, METH_PES, METH_CES, METH_CES_PES, METH_HYBRID, METH_SENSIPLOT, METH_HOOKJEEVES})
+        ComboBox_Methode.Items.AddRange(New Object() {"", METH_RESET, METH_PES, METH_CES, METH_HYBRID, METH_SENSIPLOT, METH_HOOKJEEVES})
         ComboBox_Methode.SelectedIndex = 0
         ComboBox_Methode.Enabled = False
 
@@ -190,7 +190,7 @@ Partial Class Form1
                     'EVO_Einstellungen aktivieren
                     EVO_Einstellungen1.Enabled = True
 
-                    Call EVO_Einstellungen1.setStandard_PES(Testprobleme1.OptModus)
+                    Call EVO_Einstellungen1.setStandard_PES(Testprobleme1.OptModus, Method)
 
                     'Globale Parameter werden gesetzt
                     Call Testprobleme1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
@@ -336,9 +336,9 @@ Partial Class Form1
                     EVO_Einstellungen1.Enabled = True
                     Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_PES
                     If (Sim1.List_OptZiele.GetLength(0) = 1) Then
-                        Call EVO_Einstellungen1.setStandard_PES(Kern.EVO_MODUS.Single_Objective)
+                        Call EVO_Einstellungen1.setStandard_PES(Kern.EVO_MODUS.Single_Objective, Method)
                     ElseIf (Sim1.List_OptZiele.GetLength(0) > 1) Then
-                        Call EVO_Einstellungen1.setStandard_PES(Kern.EVO_MODUS.Multi_Objective)
+                        Call EVO_Einstellungen1.setStandard_PES(Kern.EVO_MODUS.Multi_Objective, Method)
                     End If
 
                     'Parameterübergabe an PES
@@ -356,7 +356,7 @@ Partial Class Form1
                     Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_HookeJeeves
                     'Nur SO möglich
                     If (Sim1.List_OptZiele.GetLength(0) = 1) Then
-                        Call EVO_Einstellungen1.setStandard_HJ()
+                        Call EVO_Einstellungen1.setStandard_HJ(Method)
                     ElseIf Sim1.List_OptZiele.GetLength(0) > 1 Then
                         Throw New Exception("Methode von Hook und Jeeves erlaubt nur SO-Optimierung!")
                     End If
@@ -368,7 +368,7 @@ Partial Class Form1
                     Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
 
 
-                Case METH_CES, METH_CES_PES, METH_HYBRID 'Methode CES und Methode CES_PES
+                Case METH_CES, METH_HYBRID 'Methode CES und Methode CES_PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Ergebnis-Buttons
@@ -379,13 +379,13 @@ Partial Class Form1
                         Throw New Exception("CES funktioniert bisher nur mit BlueM!")
                     End If
 
-                    'Fallunterscheidung CES oder CES_PES
+                    'Fallunterscheidung CES oder Hybrid
                     Select Case Me.Method
                         Case METH_CES
                             'CES für Sim vorbereiten (Files lesen und Validieren)
                             Call Sim1.read_and_valid_INI_Files_CES()
 
-                        Case METH_CES_PES, METH_HYBRID
+                        Case METH_HYBRID
 
                             'Original ModellParameter schreiben
                             Call Sim1.Write_ModellParameter()
@@ -402,17 +402,14 @@ Partial Class Form1
                     EVO_Einstellungen1.Enabled = True
                     Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_CES
 
-                    'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten CES
-                    If (Sim1.List_OptZiele.GetLength(0) = 1) Then
-                        Call EVO_Einstellungen1.setStandard_CES(Kern.EVO_MODUS.Single_Objective)
-                    ElseIf (Sim1.List_OptZiele.GetLength(0) > 1) Then
-                        Call EVO_Einstellungen1.setStandard_CES(Kern.EVO_MODUS.Multi_Objective)
-                    End If
+                    'Je nach Methode nur CES oder HYBRID
+                    Call EVO_Einstellungen1.setStandard_CES(METHOD)
+
                     'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten PES
                     If (Sim1.List_OptZiele.GetLength(0) = 1) Then
-                        Call EVO_Einstellungen1.setStandard_PES(Kern.EVO_MODUS.Single_Objective)
+                        Call EVO_Einstellungen1.setStandard_PES(Kern.EVO_MODUS.Single_Objective, Method)
                     ElseIf (Sim1.List_OptZiele.GetLength(0) > 1) Then
-                        Call EVO_Einstellungen1.setStandard_PES(Kern.EVO_MODUS.Multi_Objective)
+                        Call EVO_Einstellungen1.setStandard_PES(Kern.EVO_MODUS.Multi_Objective, Method)
                     End If
 
                     'CES initialisieren
@@ -514,7 +511,7 @@ Partial Class Form1
 
         'Dialog anzeigen
         If (OpenFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK) Then
-            Call EVO_Einstellungen1.loadSettings(OpenFileDialog1.FileName)
+            Call EVO_Einstellungen1.loadSettings(OpenFileDialog1.FileName, Method)
         End If
     End Sub
 
@@ -592,11 +589,9 @@ Partial Class Form1
                         Case METH_PES
                             Call STARTEN_PES()
                         Case METH_CES
-                            Call STARTEN_CES_or_CES_PES()
-                        Case METH_CES_PES
-                            Call STARTEN_CES_or_CES_PES()
+                            Call STARTEN_CES_or_HYBRID()
                         Case METH_HYBRID
-                            Call STARTEN_CES_or_CES_PES()
+                            Call STARTEN_CES_or_HYBRID()
                         Case METH_HOOKJEEVES
                             Call STARTEN_HookJeeves()
                     End Select
@@ -822,7 +817,7 @@ Partial Class Form1
 
     'Anwendung CES und CES_PES             
     '*************************
-    Private Sub STARTEN_CES_or_CES_PES()
+    Private Sub STARTEN_CES_or_HYBRID()
 
         'Fehlerabfragen
         'If (Sim1.List_OptZiele.GetLength(0) > 2) Then
@@ -877,7 +872,7 @@ Partial Class Form1
 
         'Falls HYBRID werden entprechend der Einstellung im PES die Parameter auf Zufällig oder Start gesetzt
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        If Method = METH_HYBRID Then
+        If Method = METH_HYBRID AND ces1.Settings.CES.ty_Hybrid = EVO.Kern.HYBRID_TYPE.Mixed_Integer Then
             'pro Child
             'xxxxxxxxx
             For i = 0 To CES1.Settings.CES.n_Childs - 1
@@ -946,7 +941,7 @@ Partial Class Form1
 
                 'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
                 '***************************************************************
-                If Method = METH_HYBRID Then
+                If Method = METH_HYBRID AND ces1.Settings.CES.ty_Hybrid = EVO.Kern.HYBRID_TYPE.Mixed_Integer Then
                     Call Sim1.Reduce_OptPara_and_ModPara(CES1.Childs(i).All_Elem)
                     Call Sim1.PREPARE_Evaluation_PES(CES1.Childs(i).All_Para)
                 End If
@@ -957,7 +952,7 @@ Partial Class Form1
 
                 'HYBRID: Speichert die PES Erfahrung diesen Childs im PES Memory
                 '***************************************************************
-                If Method = METH_HYBRID Then
+                If Method = METH_HYBRID AND ces1.Settings.CES.ty_Hybrid = EVO.Kern.HYBRID_TYPE.Mixed_Integer Then
                     Call CES1.Memory_Store(i, i_gen)
                 End If
 
@@ -1043,7 +1038,7 @@ Partial Class Form1
 
             'HYBRID: REPRODUKTION und MUTATION
             '*********************************
-            If Method = METH_HYBRID Then
+            If Method = METH_HYBRID AND ces1.Settings.CES.ty_Hybrid = EVO.Kern.HYBRID_TYPE.Mixed_Integer Then
                 'pro Child
                 'xxxxxxxxx
                 For i = 0 To CES1.Childs.GetUpperBound(0)
@@ -1124,7 +1119,7 @@ Partial Class Form1
         'Falls jetzt noch PES ausgeführt werden soll
         'Starten der PES mit der Front von CES
         '*******************************************
-        If Method = METH_CES_PES Then
+        If Method = METH_HYBRID AND ces1.Settings.CES.ty_Hybrid = EVO.Kern.HYBRID_TYPE.Sequencial_1
             Call Start_PES_after_CES()
         End If
 
@@ -1344,7 +1339,7 @@ Partial Class Form1
         ReDim RN(globalAnzRand - 1)
 
         'Diagramm vorbereiten und initialisieren
-        If (Not Me.Method = METH_CES_PES) Then
+        If (NOT Me.Method = METH_HYBRID AND Not ces1.Settings.CES.ty_Hybrid = EVO.Kern.HYBRID_TYPE.Sequencial_1) Then
             Call PrepareDiagramm()
         End If
 

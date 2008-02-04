@@ -272,7 +272,7 @@ Public Class OptResult
                 Call Me.db_prepare_PES()
             Case METH_CES
                 Call Me.db_prepare_CES()
-            Case METH_CES_PES, METH_HYBRID
+            Case METH_HYBRID
                 Call Me.db_prepare_PES()
                 Call Me.db_prepare_CES()
         End Select
@@ -439,7 +439,7 @@ Public Class OptResult
             command.ExecuteNonQuery()
         End If
 
-        If (Me.Method = METH_PES Or Me.Method = METH_CES_PES Or Me.Method = METH_SENSIPLOT) Then
+        If (Me.Method = METH_PES Or Me.Method = METH_SENSIPLOT) Then
 
             'OptParameter schreiben
             '----------------------

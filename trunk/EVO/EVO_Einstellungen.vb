@@ -21,14 +21,14 @@ Public Class EVO_Einstellungen
 
         ' Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         Call Me.InitializeComponent()
-
+        
         ' Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
         'Settings instanzieren
         Me.msettings = New EVO.Kern.EVO_Settings()
         'Standard-Settings setzen
         Call Me.msettings.PES.setStandard(EVO_MODUS.Single_Objective)
-        Call Me.msettings.CES.setStandard(EVO_MODUS.Single_Objective)
+        Call Me.msettings.CES.setStandard("CES")
         Call Me.msettings.HookJeeves.setStandard()
         'Comboboxen füllen
         Call Me.InitComboboxes()
@@ -95,15 +95,15 @@ Public Class EVO_Einstellungen
 
     'CES
     '---
-    Private Sub OptModus_Change_ActDeact_CES()
+    Private Sub OptModus_Change_ActDeact_CES(byval Method as String)
 
-        Select Case Me.msettings.PES.OptModus
+        Select Case Method
 
-            Case EVO_MODUS.Single_Objective
+            Case evo.METH_CES
+                GroupBox_Hybrid.Enabled = false
 
-
-            Case EVO_MODUS.Multi_Objective
-
+            Case evo.METH_HYBRID
+                GroupBox_Hybrid.Enabled = True
 
         End Select
 
@@ -259,7 +259,7 @@ Public Class EVO_Einstellungen
 
     'Einstellungen in Form schreiben
     '*******************************
-    Private Sub writeForm()
+    Private Sub writeForm(byVal Method as String)
         
         'PES
         '---
@@ -305,7 +305,7 @@ Public Class EVO_Einstellungen
         '---
         With Me.msettings.CES
 
-            Call OptModus_Change_ActDeact_CES()
+            Call OptModus_Change_ActDeact_CES(Method)
 
             'me.Combo_CES_IniValues.SelectedItem = .
             me.Numeric_CES_n_Generations.Value = .n_Generations
@@ -318,9 +318,10 @@ Public Class EVO_Einstellungen
             me.CheckBox_CES_UseSecPop_CES.Checked = .is_SecPop
             me.Numeric_CES_n_exchange_SecPop.Value = .n_Interact
             me.Numeric_CES_n_member_SecPop.Value = .n_MemberSecondPop
-            'hängt vom Datensatz ab
-            me.CheckBox_CES_RealOptimisation.Checked = False
-            'me.Combo_CES_HybridType.SelectedItem
+
+            'HYBRID hängt von der Methode ab
+            me.CheckBox_CES_RealOptimisation.Checked = .is_RealOpt
+            me.Combo_CES_HybridType.SelectedItem = .ty_Hybrid
             me.Numeric_CES_mem_Strength.Value = .n_PartsMem
             me.Numeric_CES_max_PES_Parents.Value = .n_PES_MaxParents
             me.CheckBox_CES_StartPESPop.Checked = .is_PopMutStart
@@ -351,23 +352,23 @@ Public Class EVO_Einstellungen
 
     'Standardeinstellungen setzen (PES)
     '**********************************
-    Public Sub setStandard_PES(ByVal modus As Kern.EVO_MODUS)
+    Public Sub setStandard_PES(ByVal modus As Kern.EVO_MODUS, byVal Method as String)
         Call Me.msettings.PES.setStandard(modus)
-        Call Me.writeForm()
+        Call Me.writeForm(Method)
     End Sub
 
     'Standardeinstellungen setzen (CES)
     '**********************************
-    Public Sub setStandard_CES(ByVal modus As Kern.EVO_MODUS)
-        Call Me.msettings.CES.setStandard(modus)
-        Call Me.writeForm()
+    Public Sub setStandard_CES(ByVal Method As String)
+        Call Me.msettings.CES.setStandard(Method)
+        Call Me.writeForm(Method)
     End Sub
 
     'Standardeinstellungen setzen für HJ
     '***********************************
-    Public Sub setStandard_HJ()
+    Public Sub setStandard_HJ(ByVal Method As String)
         Call Me.msettings.HookJeeves.setStandard()
-        Call Me.writeForm()
+        Call Me.writeForm(Method)
     End Sub
 
     'PES_Settings Property
@@ -399,7 +400,7 @@ Public Class EVO_Einstellungen
 
     'Laden der EVO_Settings aus einer XML-Datei
     '******************************************
-    Public Sub loadSettings(ByVal filename As String)
+    Public Sub loadSettings(ByVal filename As String, byval Method as String)
 
         Dim serializer As New XmlSerializer(GetType(EVO.Kern.EVO_Settings))
 
@@ -415,7 +416,7 @@ Public Class EVO_Einstellungen
         fs.Close()
 
         'Geladene Settings in Form schreiben
-        Call Me.writeForm()
+        Call Me.writeForm(Method)
 
     End Sub
 
