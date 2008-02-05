@@ -1566,8 +1566,16 @@ Start_Evolutionsrunden:
                             End If
                         End If
                     End If
-                    If PES1.PES_iAkt.iAktRunde = 0 And PES1.PES_iAkt.iAktPop = 0 And PES1.PES_iAkt.iAktGen = 0 Then
+
+                    'Hypervolumenberechnung
+                    '======================
+                    If (EVO_Einstellungen1.Settings.PES.OptModus = Kern.EVO_MODUS.Multi_Objective _
+                        And PES1.PES_iAkt.iAktRunde = 0 _
+                        And PES1.PES_iAkt.iAktPop = 0 _
+                        And PES1.PES_iAkt.iAktGen = 0) Then
+
                         'Referenzpunkt für Hypervolumen ermitteln
+                        '----------------------------------------
                         Dim j As Integer
                         Dim k As Integer
                         Dim Referenzpunkt(globalAnzZiel - 1) As Double
@@ -1581,11 +1589,14 @@ Start_Evolutionsrunden:
                             Next
                         Next
                         'Hypervolume.Referenzpunkt = Referenzpunkt
-                    else
+
+                    Else
+                        'Hypervolumen berechnen
+                        '----------------------
                         'HV = Hypervolume.GetHypervolume(UBound(SekPopulation), SekPopulation)
                     End If
 
-                Next 'Ende alle Generatione
+                Next 'Ende alle Generationen
                 'xxxxxxxxxxxxxxxxxxxxxxxxxxx
                 System.Windows.Forms.Application.DoEvents()
 
