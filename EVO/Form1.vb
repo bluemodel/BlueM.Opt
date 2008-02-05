@@ -1339,7 +1339,7 @@ Partial Class Form1
         ReDim RN(globalAnzRand - 1)
 
         'Diagramm vorbereiten und initialisieren
-        If (NOT Me.Method = METH_HYBRID AND Not ces1.Settings.CES.ty_Hybrid = EVO.Kern.HYBRID_TYPE.Sequencial_1) Then
+        If (Not Me.Method = METH_HYBRID And Not EVO_Einstellungen1.Settings.CES.ty_Hybrid = EVO.Kern.HYBRID_TYPE.Sequencial_1) Then
             Call PrepareDiagramm()
         End If
 
