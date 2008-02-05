@@ -30,7 +30,7 @@ Public Class PES
     'Deklarationsteil Variablen und Strukturen
     '#########################################
 
-    Public Settings As EVO_Settings
+    Private Settings As EVO_Settings
 
     'Beziehung
     '--------------
