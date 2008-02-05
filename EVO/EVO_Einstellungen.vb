@@ -245,6 +245,34 @@ Public Class EVO_Einstellungen
 
         End With
 
+        'CES
+        '---
+        With Me.msettings.CES
+
+            ' = me.Combo_CES_IniValues.SelectedItem
+            .n_Generations = me.Numeric_CES_n_Generations.Value
+            .n_Parents = me.Numeric_CES_n_Parents.Value
+            .n_Childs = me.Numeric_CES_n_childs.Value
+            .OptStrategie = me.Combo_CES_Selection.SelectedItem
+            .OptReprodOp = me.Combo_CES_Reproduction.SelectedItem
+            .OptMutOperator = me.Combo_CES_Mutation.SelectedItem
+            .pr_MutRate = me.Numeric_CES_MutRate.Value
+            .is_SecPop = me.CheckBox_CES_UseSecPop_CES.Checked
+            .n_Interact = me.Numeric_CES_n_exchange_SecPop.Value
+            .n_MemberSecondPop = me.Numeric_CES_n_member_SecPop.Value
+
+            'HYBRID hängt von der Methode ab
+            .is_RealOpt = me.CheckBox_CES_RealOptimisation.Checked
+            .ty_Hybrid = me.Combo_CES_HybridType.SelectedItem
+            .n_PartsMem = me.Numeric_CES_mem_Strength.Value
+            .n_PES_MaxParents = me.Numeric_CES_max_PES_Parents.Value
+            .is_PopMutStart = me.CheckBox_CES_StartPESPop.Checked
+            .is_PES_SecPop = me.CheckBox_CES_UseSecPop_PES.Checked
+            .n_PES_Interact = me.Numeric_CES_n_exchange_SecPop_PES.Value
+            .n_PES_MemSecPop = me.Numeric_CES_n_member_SecPop_PES.Value
+
+        End With
+
         'Hooke and Jeeves
         '----------------
         With Me.msettings.HookJeeves
