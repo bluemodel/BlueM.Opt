@@ -42,13 +42,14 @@ Partial Class Form1
     Private TSP1 As TSP
 
     '**** Globale Parameter Parameter Optimierung ****
-    'ToDo: diese Werte sollten eigentlich nur in CES bzw PES vorgehalten werden
+    'TODO: diese Werte sollten eigentlich nur in CES bzw PES vorgehalten werden
     Dim globalAnzPar As Short
     Dim globalAnzZiel As Short
     Dim globalAnzRand As Short
     Dim array_x() As Double
     Dim array_y() As Double
-    Dim Bestwert(,) As Double = {}
+    'TODO: Bestwertspeicher wird nicht genutzt!
+    'Dim Bestwert(,) As Double
     Dim SekPopulation(,) As Double
     Dim myPara() As Double
     Dim beziehungen() As EVO.Kern.PES.Beziehung
@@ -1423,9 +1424,10 @@ Start_Evolutionsrunden:
                             myPara = PES1.EsGetParameter()
 
                             'Auslesen des Bestwertspeichers
-                            If (EVO_Einstellungen1.Settings.PES.OptModus = Kern.EVO_MODUS.Single_Objective) Then
-                                Bestwert = PES1.EsGetBestwert()
-                            End If
+                            'TODO: Bestwertspeicher wird nicht genutzt!
+                            'If (EVO_Einstellungen1.Settings.PES.OptModus = Kern.EVO_MODUS.Single_Objective) Then
+                            '    Bestwert = PES1.EsGetBestwert()
+                            'End If
 
                             'Ansteuerung der zu optimierenden Anwendung
                             'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
