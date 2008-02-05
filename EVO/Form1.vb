@@ -424,19 +424,19 @@ Partial Class Form1
                     'Bei Testmodus wird die Anzahl der Kinder und Generationen überschrieben
                     '***********************************************************************
                     If CES1.ModSett.TestModus = 1 Then
-                        CES1.Settings.CES.n_Childs = 1
-                        CES1.Settings.CES.n_Parents = 1
-                        CES1.Settings.CES.n_Generations = 1
-                        ReDim CES1.NDSResult(CES1.Settings.CES.n_Childs + CES1.Settings.CES.n_Parents - 1)
+                        EVO_Einstellungen1.Settings.CES.n_Childs = 1
+                        EVO_Einstellungen1.Settings.CES.n_Parents = 1
+                        EVO_Einstellungen1.Settings.CES.n_Generations = 1
+                        ReDim CES1.NDSResult(EVO_Einstellungen1.Settings.CES.n_Childs + EVO_Einstellungen1.Settings.CES.n_Parents - 1)
                     ElseIf CES1.ModSett.TestModus = 2 Then
-                        CES1.Settings.CES.n_Childs = CES1.ModSett.n_Combinations
-                        CES1.Settings.CES.n_Generations = 1
-                        ReDim CES1.NDSResult(CES1.Settings.CES.n_Childs + CES1.Settings.CES.n_Parents - 1)
+                        EVO_Einstellungen1.Settings.CES.n_Childs = CES1.ModSett.n_Combinations
+                        EVO_Einstellungen1.Settings.CES.n_Generations = 1
+                        ReDim CES1.NDSResult(EVO_Einstellungen1.Settings.CES.n_Childs + EVO_Einstellungen1.Settings.CES.n_Parents - 1)
                     End If
 
                     'EVO_Verlauf zurücksetzen
                     '************************
-                    Call Me.EVO_Opt_Verlauf1.Initialisieren(1, 1, CES1.Settings.CES.n_Generations, CES1.Settings.CES.n_Childs)
+                    Call Me.EVO_Opt_Verlauf1.Initialisieren(1, 1, EVO_Einstellungen1.Settings.CES.n_Generations, EVO_Einstellungen1.Settings.CES.n_Childs)
 
             End Select
 
@@ -832,9 +832,9 @@ Partial Class Form1
         Dim i, j, m As Integer
 
         'Parents und Childs werden Dimensioniert
-        ReDim CES1.Parents(CES1.Settings.CES.n_Parents - 1)
+        ReDim CES1.Parents(EVO_Einstellungen1.Settings.CES.n_Parents - 1)
         Call Kern.Individuum.New_Array("Parent", CES1.Parents)
-        ReDim CES1.Childs(CES1.Settings.CES.n_Childs - 1)
+        ReDim CES1.Childs(EVO_Einstellungen1.Settings.CES.n_Childs - 1)
         Call Kern.Individuum.New_Array("Child", CES1.Childs)
 
         'Diagramm vorbereiten und initialisieren
@@ -859,7 +859,7 @@ Partial Class Form1
 
         'Hier werden dem Child die passenden Massnahmen und deren Elemente pro Location zugewiesen
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        For i = 0 To CES1.Settings.CES.n_Childs - 1
+        For i = 0 To EVO_Einstellungen1.Settings.CES.n_Childs - 1
             For j = 0 To CES1.ModSett.n_Locations - 1
                 Call Sim1.Identify_Measures_Elements_Parameters(j, CES1.Childs(i).Path(j), CES1.Childs(i).Measures(j), CES1.Childs(i).Loc(j).Loc_Elem, CES1.Childs(i).Loc(j).Loc_Para)
             Next
@@ -872,10 +872,10 @@ Partial Class Form1
 
         'Falls HYBRID werden entprechend der Einstellung im PES die Parameter auf Zufällig oder Start gesetzt
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        If Method = METH_HYBRID AND ces1.Settings.CES.ty_Hybrid = EVO.Kern.HYBRID_TYPE.Mixed_Integer Then
+        If Method = METH_HYBRID AND EVO_Einstellungen1.Settings.CES.ty_Hybrid = EVO.Kern.HYBRID_TYPE.Mixed_Integer Then
             'pro Child
             'xxxxxxxxx
-            For i = 0 To CES1.Settings.CES.n_Childs - 1
+            For i = 0 To EVO_Einstellungen1.Settings.CES.n_Childs - 1
                 'Und pro Location
                 'xxxxxxxxxxxxxxxx
                 For j = 0 To CES1.ModSett.n_Locations - 1
@@ -919,17 +919,17 @@ Partial Class Form1
 
 
         'Startwerte werden der Verlaufsanzeige zugewiesen
-        Call Me.EVO_Opt_Verlauf1.Initialisieren(1, 1, CES1.Settings.CES.n_Generations, CES1.Settings.CES.n_Childs)
+        Call Me.EVO_Opt_Verlauf1.Initialisieren(1, 1, EVO_Einstellungen1.Settings.CES.n_Generations, EVO_Einstellungen1.Settings.CES.n_Childs)
 
         'Generationsschleife CES
         'xxxxxxxxxxxxxxxxxxxxxxx
-        For i_gen = 0 To CES1.Settings.CES.n_Generations - 1
+        For i_gen = 0 To EVO_Einstellungen1.Settings.CES.n_Generations - 1
 
             Call EVO_Opt_Verlauf1.Generation(i_gen + 1)
 
             'Child Schleife
             'xxxxxxxxxxxxxx
-            For i = 0 To CES1.Settings.CES.n_Childs - 1
+            For i = 0 To EVO_Einstellungen1.Settings.CES.n_Childs - 1
                 durchlauf_all += 1
 
                 Call EVO_Opt_Verlauf1.Nachfolger(i + 1)
@@ -941,7 +941,7 @@ Partial Class Form1
 
                 'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
                 '***************************************************************
-                If Method = METH_HYBRID AND ces1.Settings.CES.ty_Hybrid = EVO.Kern.HYBRID_TYPE.Mixed_Integer Then
+                If Method = METH_HYBRID AND EVO_Einstellungen1.Settings.CES.ty_Hybrid = EVO.Kern.HYBRID_TYPE.Mixed_Integer Then
                     Call Sim1.Reduce_OptPara_and_ModPara(CES1.Childs(i).All_Elem)
                     Call Sim1.PREPARE_Evaluation_PES(CES1.Childs(i).All_Para)
                 End If
@@ -952,7 +952,7 @@ Partial Class Form1
 
                 'HYBRID: Speichert die PES Erfahrung diesen Childs im PES Memory
                 '***************************************************************
-                If Method = METH_HYBRID AND ces1.Settings.CES.ty_Hybrid = EVO.Kern.HYBRID_TYPE.Mixed_Integer Then
+                If Method = METH_HYBRID AND EVO_Einstellungen1.Settings.CES.ty_Hybrid = EVO.Kern.HYBRID_TYPE.Mixed_Integer Then
                     Call CES1.Memory_Store(i, i_gen)
                 End If
 
@@ -991,7 +991,7 @@ Partial Class Form1
                 'Selectionsprozess je nach "plus" oder "minus" Strategie
                 Call CES1.Selection_Process()
                 'Zeichnen der besten Eltern
-                For i = 0 To CES1.Settings.CES.n_Parents - 1
+                For i = 0 To EVO_Einstellungen1.Settings.CES.n_Parents - 1
                     'durchlauf += 1
                     serie = DForm.Diag.getSeriesPoint("Parent", "green")
                     Call serie.Add(durchlauf_all, CES1.Parents(i).Penalty(0))
@@ -1030,7 +1030,7 @@ Partial Class Form1
             End If
 
             'Hier werden dem Child die passenden Elemente pro Location zugewiesen
-            For i = 0 To CES1.Settings.CES.n_Childs - 1
+            For i = 0 To EVO_Einstellungen1.Settings.CES.n_Childs - 1
                 For j = 0 To CES1.ModSett.n_Locations - 1
                     Call Sim1.Identify_Measures_Elements_Parameters(j, CES1.Childs(i).Path(j), CES1.Childs(i).Measures(j), CES1.Childs(i).Loc(j).Loc_Elem, CES1.Childs(i).Loc(j).Loc_Para)
                 Next
@@ -1038,7 +1038,7 @@ Partial Class Form1
 
             'HYBRID: REPRODUKTION und MUTATION
             '*********************************
-            If Method = METH_HYBRID AND ces1.Settings.CES.ty_Hybrid = EVO.Kern.HYBRID_TYPE.Mixed_Integer Then
+            If Method = METH_HYBRID AND EVO_Einstellungen1.Settings.CES.ty_Hybrid = EVO.Kern.HYBRID_TYPE.Mixed_Integer Then
                 'pro Child
                 'xxxxxxxxx
                 For i = 0 To CES1.Childs.GetUpperBound(0)
@@ -1053,7 +1053,7 @@ Partial Class Form1
                         'Ermittelt fuer jede Location den PES Parent Satz (PES_Parents ist das Ergebnis)
                         Call CES1.Memory_Search_per_Location(j)
                         'Führt das NDSorting für diesen Satz durch
-                        If CES1.PES_Parents_pLoc.GetLength(0) > CES1.Settings.CES.n_PES_MaxParents Then
+                        If CES1.PES_Parents_pLoc.GetLength(0) > EVO_Einstellungen1.Settings.CES.n_PES_MaxParents Then
                             Call CES1.Memory_NDSorting()
                         End If
 
@@ -1097,11 +1097,11 @@ Partial Class Form1
 
                                 'Die PopulationsEltern des PES werden gefüllt
                                 For m = 0 To CES1.PES_Parents_pLoc.GetUpperBound(0)
-                                    Call PES1.EsStartvalues(ces1.Settings.CES.is_PopMutStart, CES1.PES_Parents_pLoc(m).Loc(j).Loc_Dn, CES1.PES_Parents_pLoc(m).Loc(j).Parameter, m)
+                                    Call PES1.EsStartvalues(EVO_Einstellungen1.Settings.CES.is_PopMutStart, CES1.PES_Parents_pLoc(m).Loc(j).Loc_Dn, CES1.PES_Parents_pLoc(m).Loc(j).Parameter, m)
                                 Next
 
                                 'Startet die Prozesse evolutionstheoretischen Prozesse nacheinander
-                                Call PES1.EsReproMut(ces1.Settings.CES.is_PopMutStart)
+                                Call PES1.EsReproMut(EVO_Einstellungen1.Settings.CES.is_PopMutStart)
 
                                 'Auslesen der Variierten Parameter
                                 CES1.Childs(i).Loc(j).Parameter = PES1.EsGetParameter()
@@ -1119,7 +1119,7 @@ Partial Class Form1
         'Falls jetzt noch PES ausgeführt werden soll
         'Starten der PES mit der Front von CES
         '*******************************************
-        If Method = METH_HYBRID AND ces1.Settings.CES.ty_Hybrid = EVO.Kern.HYBRID_TYPE.Sequencial_1
+        If Method = METH_HYBRID AND EVO_Einstellungen1.Settings.CES.ty_Hybrid = EVO.Kern.HYBRID_TYPE.Sequencial_1
             Call Start_PES_after_CES()
         End If
 
@@ -1135,7 +1135,7 @@ Partial Class Form1
         EVO_Einstellungen1.isSaved = False
         Call EVO_Einstellungen1.SetFor_CES_PES(1, 3, 5)
 
-        For i = 0 To CES1.Settings.CES.n_Parents - 1
+        For i = 0 To EVO_Einstellungen1.Settings.CES.n_Parents - 1
             If CES1.Parents(i).Front = 1 Then
 
                 '****************************************
@@ -1803,7 +1803,7 @@ Start_Evolutionsrunden:
                             Else
                                 'Bei CES etc.:
                                 '-------------
-                                Achse.Max = CES1.Settings.CES.n_Childs * CES1.Settings.CES.n_Generations
+                                Achse.Max = EVO_Einstellungen1.Settings.CES.n_Childs * EVO_Einstellungen1.Settings.CES.n_Generations
                             End If
 
                             Achsen.Add(Achse)
