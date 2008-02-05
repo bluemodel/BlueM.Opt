@@ -1218,10 +1218,8 @@ StartMutation:
                 For i = 0 To Anz.Penalty - 1
                     .Penalty(i) = QN(i)
                 Next i
-                .feasible = True
                 For i = 0 To Anz.Constr - 1
                     .Constrain(i) = RN(i)
-                    If .Constrain(i) < 0 Then .feasible = False
                 Next i
                 .dominated = False
                 .Front = 0
@@ -1474,10 +1472,8 @@ StartMutation:
         Next j
 
         If Anz.Constr > 0 Then
-            Individ(i_indi).feasible = True
             For j = 0 To Anz.Constr - 1
                 Individ(i_indi).Constrain(j) = Best.Rb(i_best, PES_iAkt.iAktPop, j)
-                If Individ(i_indi).Constrain(j) < 0 Then Individ(i_indi).feasible = False
             Next j
         End If
 
