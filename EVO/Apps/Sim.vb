@@ -72,8 +72,8 @@ Public MustInherit Class Sim
         End Function
     End Structure
 
-    Public List_OptParameter() As Struct_OptParameter = {} 'Liste der Optimierungsparameter
-    Public List_OptParameter_Save() As Struct_OptParameter = {} 'Liste der Optimierungsparameter die nicht verändert wird
+    Public List_OptParameter() As Struct_OptParameter       'Liste der Optimierungsparameter
+    Public List_OptParameter_Save() As Struct_OptParameter  'Liste der Optimierungsparameter die nicht verändert wird
 
     'ModellParameter
     '---------------
@@ -90,8 +90,8 @@ Public MustInherit Class Sim
         Public Wert As Double                       'Aus OptParameter errechneter Wert
     End Structure
 
-    Public List_ModellParameter() As Struct_ModellParameter = {}      'Liste der Modellparameter
-    Public List_ModellParameter_Save() As Struct_ModellParameter = {} 'Liste der Modellparameter die nicht verändert wird
+    Public List_ModellParameter() As Struct_ModellParameter      'Liste der Modellparameter
+    Public List_ModellParameter_Save() As Struct_ModellParameter 'Liste der Modellparameter die nicht verändert wird
 
     'Optimierungsziele
     '-----------------
@@ -113,7 +113,7 @@ Public MustInherit Class Sim
         End Function
     End Structure
 
-    Public List_OptZiele() As Struct_OptZiel = {}   'Liste der Zielfunktionen
+    Public List_OptZiele() As Struct_OptZiel        'Liste der Zielfunktionen
 
     'Constraints
     '-----------
@@ -134,7 +134,7 @@ Public MustInherit Class Sim
         End Function
     End Structure
 
-    Public List_Constraints() As Struct_Constraint = {} 'Liste der Constraints
+    Public List_Constraints() As Struct_Constraint  'Liste der Constraints
 
     'Ergebnisspeicher
     '----------------
@@ -177,17 +177,29 @@ Public MustInherit Class Sim
     '***********
     Public Sub New()
 
+        'Datenstrukturen initialisieren
+        '------------------------------
+        ReDim Me.List_OptParameter(-1)
+        ReDim Me.List_OptParameter_Save(-1)
+        ReDim Me.List_ModellParameter(-1)
+        ReDim Me.List_ModellParameter_Save(-1)
+        ReDim Me.List_OptZiele(-1)
+        ReDim Me.List_Constraints(-1)
+        ReDim Me.List_Locations(-1)
+
+        'Simulationsergebnis instanzieren
+        Me.SimErgebnis = New Collection
+
         'Benutzereinstellungen einlesen
+        '------------------------------
         Call Me.ReadSettings()
 
         'Provider einrichten
+        '-------------------
         Sim.FortranProvider = New NumberFormatInfo()
         Sim.FortranProvider.NumberDecimalSeparator = "."
         Sim.FortranProvider.NumberGroupSeparator = ""
         Sim.FortranProvider.NumberGroupSizes = New Integer() {3}
-
-        'Simulationsergebnis instanzieren
-        Me.SimErgebnis = New Collection
 
     End Sub
 
