@@ -1368,14 +1368,14 @@ Start_Evolutionsrunden:
 
         'Über alle Runden
         'xxxxxxxxxxxxxxxx
-        For PES1.PES_iAkt.iAktRunde = 0 To PES1.Settings.PES.Pop.n_Runden - 1
+        For PES1.PES_iAkt.iAktRunde = 0 To EVO_Einstellungen1.Settings.PES.Pop.n_Runden - 1
 
             Call EVO_Opt_Verlauf1.Runden(PES1.PES_iAkt.iAktRunde + 1)
             Call PES1.EsResetPopBWSpeicher() 'Nur bei Komma Strategie
 
             'Über alle Populationen
             'xxxxxxxxxxxxxxxxxxxxxx
-            For PES1.PES_iAkt.iAktPop = 0 To PES1.Settings.PES.Pop.n_Popul - 1
+            For PES1.PES_iAkt.iAktPop = 0 To EVO_Einstellungen1.Settings.PES.Pop.n_Popul - 1
 
                 Call EVO_Opt_Verlauf1.Population(PES1.PES_iAkt.iAktPop + 1)
 
@@ -1391,14 +1391,14 @@ Start_Evolutionsrunden:
 
                 'Über alle Generationen
                 'xxxxxxxxxxxxxxxxxxxxxx
-                For PES1.PES_iAkt.iAktGen = 0 To PES1.Settings.PES.n_Gen - 1
+                For PES1.PES_iAkt.iAktGen = 0 To EVO_Einstellungen1.Settings.PES.n_Gen - 1
 
                     Call EVO_Opt_Verlauf1.Generation(PES1.PES_iAkt.iAktGen + 1)
                     Call PES1.EsResetBWSpeicher()  'Nur bei Komma Strategie
 
                     'Über alle Nachkommen
                     'xxxxxxxxxxxxxxxxxxxxxxxxx
-                    For PES1.PES_iAkt.iAktNachf = 0 To PES1.Settings.PES.n_Nachf - 1
+                    For PES1.PES_iAkt.iAktNachf = 0 To EVO_Einstellungen1.Settings.PES.n_Nachf - 1
 
                         Call EVO_Opt_Verlauf1.Nachfolger(PES1.PES_iAkt.iAktNachf + 1)
 
@@ -1464,7 +1464,7 @@ Start_Evolutionsrunden:
                                         Else
                                             serie = DForm.Diag.getSeriesPoint("Population " & (PES1.PES_iAkt.iAktPop + 1).ToString())
                                         End If
-                                        Call serie.Add(PES1.PES_iAkt.iAktRunde * PES1.Settings.PES.n_Gen * PES1.Settings.PES.n_Nachf + PES1.PES_iAkt.iAktGen*PES1.Settings.PES.n_Nachf + PES1.PES_iAkt.iAktNachf, QN(0), durchlauf.ToString())
+                                        Call serie.Add(PES1.PES_iAkt.iAktRunde * EVO_Einstellungen1.Settings.PES.n_Gen * EVO_Einstellungen1.Settings.PES.n_Nachf + PES1.PES_iAkt.iAktGen * EVO_Einstellungen1.Settings.PES.n_Nachf + PES1.PES_iAkt.iAktNachf, QN(0), durchlauf.ToString())
 
                                     Else
                                         'MultiObjective
@@ -1535,7 +1535,7 @@ Start_Evolutionsrunden:
 
                     'Serie im TeeChart löschen
                     '==============================
-                    If PES1.Settings.PES.is_paint_constraint Then
+                    If EVO_Einstellungen1.Settings.PES.is_paint_constraint Then
                         Dim serie As Steema.TeeChart.Styles.Series
 
                         If (globalAnzZiel = 1) Then
