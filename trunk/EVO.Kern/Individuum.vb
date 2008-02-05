@@ -46,10 +46,9 @@ Public Class Individuum
     Public dominated As Boolean            '07 Kennzeichnung ob Dominiert
     Public Front As Integer                '08 Nummer der Pareto Front
     Public Distance As Double              '09 Für crowding distance
-    Public feasible As Boolean             '09a Gültiges Ergebnis
 
     'Information pro Location ---------------------------------------
-    Public Measures() As String            '09b Die Namen der Maßnahmen
+    Public Measures() As String            '09a Die Namen der Maßnahmen
     Public Loc() As Location_Data          '10 + 11a Information pro Location
 
     'Für PES Memory -------------------------------------------------
@@ -58,6 +57,17 @@ Public Class Individuum
     'Für PES Parent -------------------------------------------------
     Public Memory_Rank As Integer          '13 MemoryRang des PES Elters
     Public iLocation As Integer            '14 Location des PES Parent
+
+    'Gibt zurück ob Individuum gültig ist
+    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    Public ReadOnly Property feasible() As Boolean
+        Get
+            For i As Integer = 0 To Me.Constrain.GetUpperBound(0)
+                If (Me.Constrain(i) < 0) Then Return False
+            Next
+            Return True
+        End Get
+    End Property
 
     'Gibt ein Array mit den Elementen aller Locations zurück
     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -205,10 +215,7 @@ Public Class Individuum
         '09 Für crowding distance
         Me.Distance = 0
 
-        '09a Gültiges Ergebnis
-        Me.feasible = False
-
-        '09b Die Namen der Maßnahmen
+        '09a Die Namen der Maßnahmen
         ReDim Me.Measures(n_Locations - 1)
 
         '11 + 10 Informationen pro Location
@@ -302,10 +309,7 @@ Public Class Individuum
         '09 Für crowding distance
         Dest.Distance = Me.Distance
 
-        '09a Gültiges Ergebnis
-        Dest.feasible = Me.feasible
-
-        '09b Die Namen der Maßnahmen
+        '09a Die Namen der Maßnahmen
         ReDim Dest.Measures(Me.Measures.GetUpperBound(0))
         Array.Copy(Me.Measures, Dest.Measures, Me.Measures.Length)
 
