@@ -239,7 +239,7 @@ Public Class Diagramm
 
     'ausgewählte Lösung anzeigen
     '***************************
-    Friend Sub showSelectedSolution(ByVal List_OptZiele() As Sim.Struct_OptZiel, ByVal sol As Kern.Individuum)
+    Friend Sub showSelectedSolution(ByVal List_OptZiele() As Sim.Struct_OptZiel, ByVal ind As Kern.Individuum)
 
         Dim xAchse, yAchse, zAchse As String
         Dim xWert, yWert, zWert As Double
@@ -252,9 +252,9 @@ Public Class Diagramm
         'QWerte zu Achsen zuordnen
         For i = 0 To List_OptZiele.GetUpperBound(0)
             If (List_OptZiele(i).Bezeichnung = xAchse) Then
-                xWert = sol.Penalty(i)
+                xWert = ind.Penalty(i)
             ElseIf (List_OptZiele(i).Bezeichnung = yAchse) Then
-                yWert = sol.Penalty(i)
+                yWert = ind.Penalty(i)
             End If
         Next
 
@@ -265,7 +265,7 @@ Public Class Diagramm
             '-----------
             Dim serie As Steema.TeeChart.Styles.Series
             serie = Me.getSeriesPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
-            serie.Add(xWert, yWert, sol.ID.ToString())
+            serie.Add(xWert, yWert, ind.ID.ToString())
             serie.Marks.Visible = True
             serie.Marks.Style = Steema.TeeChart.Styles.MarksStyles.Label
             serie.Marks.Transparency = 50
@@ -280,13 +280,13 @@ Public Class Diagramm
             'QWert zu Achse zuordnen
             For i = 0 To List_OptZiele.GetUpperBound(0)
                 If (List_OptZiele(i).Bezeichnung = zAchse) Then
-                    zWert = sol.Penalty(i)
+                    zWert = ind.Penalty(i)
                 End If
             Next
 
             Dim serie3D As Steema.TeeChart.Styles.Points3D
             serie3D = Me.getSeries3DPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
-            serie3D.Add(xWert, yWert, zWert, sol.ID.ToString())
+            serie3D.Add(xWert, yWert, zWert, ind.ID.ToString())
             serie3D.Marks.Visible = True
             serie3D.Marks.Style = Steema.TeeChart.Styles.MarksStyles.Label
             serie3D.Marks.Transparency = 50

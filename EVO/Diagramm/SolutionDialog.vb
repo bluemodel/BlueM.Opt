@@ -105,7 +105,7 @@ Partial Public Class SolutionDialog
 
     'Eine Lösung hinzufügen
     '**********************
-    Public Sub addSolution(ByVal sol As Kern.Individuum)
+    Public Sub addSolution(ByVal ind As Kern.Individuum)
 
         Dim i As Integer
         Dim cellvalues() As Object
@@ -119,17 +119,17 @@ Partial Public Class SolutionDialog
 
         i = 1
 
-        For Each optpara As Double In sol.PES_X
+        For Each optpara As Double In ind.PES_X
             cellvalues(i) = optpara
             i += 1
         Next
 
-        For Each optziel As Double In sol.Penalty
+        For Each optziel As Double In ind.Penalty
             cellvalues(i) = optziel
             i += 1
         Next
 
-        For Each constraint As Double In sol.Constrain
+        For Each constraint As Double In ind.Constrain
             cellvalues(i) = constraint
             i += 1
         Next
@@ -137,7 +137,7 @@ Partial Public Class SolutionDialog
         'Zeile erstellen
         row = New DataGridViewRow()
         row.CreateCells(Me.DataGridView1, cellvalues)
-        row.HeaderCell.Value = sol.ID.ToString()
+        row.HeaderCell.Value = ind.ID.ToString()
 
         'Zeile hinzufügen
         Me.DataGridView1.Rows.Add(row)
