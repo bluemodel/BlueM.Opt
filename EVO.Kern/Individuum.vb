@@ -354,4 +354,21 @@ Public Class Individuum
         Next
     End Sub
 
+    Public Shared Function QN_RN_Indi(byval n as Integer, byref QN() as Double, byref RN() as Double, Byval MyPara() as double) as Individuum
+
+        Dim Indi as New Individuum("QN_RN_Indi", 0)
+
+        'Achtung hier wird bewust per Reference!
+        Indi.Penalty = QN
+        Indi.Constrain = RN
+
+        'Hier nicht per Reference!
+        Indi.ID = n
+        Indi.PES_X = MyPara.Clone
+
+        'Hier per Reference
+        QN_RN_Indi = Indi
+ 
+    End Function
+
 End Class

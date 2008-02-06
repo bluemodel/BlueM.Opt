@@ -75,6 +75,20 @@ Public MustInherit Class Sim
     Public List_OptParameter() As Struct_OptParameter       'Liste der Optimierungsparameter
     Public List_OptParameter_Save() As Struct_OptParameter  'Liste der Optimierungsparameter die nicht verändert wird
 
+    'Gibt die OptParameter als Array zurück
+    '**************************************
+    Public Function MyPara as Double()
+        Dim i as Integer
+        Dim Array(-1) as Double
+
+        For i = 0 To List_OptParameter.GetUpperBound(0)
+            Redim preserve MyPara(MyPara.GetUpperBound(0) + 1)
+            MyPara(i) = List_OptParameter(i).SKWert
+        Next
+
+        MyPara = Array.Clone
+    End Function
+
     'ModellParameter
     '---------------
     Public Structure Struct_ModellParameter
@@ -1407,7 +1421,7 @@ Public MustInherit Class Sim
 
     'Evaluiert die Kinderchen mit Hilfe des Simulationsmodells
     '*********************************************************
-    Public Function SIM_Evaluierung(ByVal ID As Integer, ByRef QN() As Double, ByRef RN() As Double) As Boolean
+    Public Function SIM_Evaluierung(byref Indi as Kern.Individuum) As Boolean
 
         Dim i As Short
 
@@ -1419,17 +1433,17 @@ Public MustInherit Class Sim
         'Qualitätswerte berechnen
         For i = 0 To Me.List_OptZiele.GetUpperBound(0)
             List_OptZiele(i).QWertTmp = QWert(List_OptZiele(i))
-            QN(i) = List_OptZiele(i).QWertTmp
+            indi.Penalty(i) = List_OptZiele(i).QWertTmp
         Next
 
         'Constraints berechnen
         For i = 0 To Me.List_Constraints.GetUpperBound(0)
             List_Constraints(i).ConstTmp = Constraint(List_Constraints(i))
-            RN(i) = List_Constraints(i).ConstTmp
+            Indi.Constrain(i) = List_Constraints(i).ConstTmp
         Next
 
         'Lösung abspeichern
-        Call Me.OptResult.addSolution(ID, Me.List_OptZiele, Me.List_Constraints, Me.List_OptParameter)
+        Call Me.OptResult.addSolution(Indi)
 
         SIM_Evaluierung = True
 
