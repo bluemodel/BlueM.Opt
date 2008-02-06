@@ -723,7 +723,7 @@ Partial Class Form1
                 Me.EVO_Opt_Verlauf1.Nachfolger(n)
 
                 'Evaluieren
-                Call Sim1.SIM_Evaluierung(n, QN, RN)
+                Call Sim1.SIM_Evaluierung(kern.Individuum.QN_RN_Indi(n, QN, RN, sim1.MyPara))
 
                 'BUG 253: Verletzte Constraints bei SensiPlot kenntlich machen?
 
@@ -948,7 +948,7 @@ Partial Class Form1
                 End If
 
                 'Simulation *************************************************************************
-                Call Sim1.SIM_Evaluierung(durchlauf_all, CES1.Childs(i).Penalty, CES1.Childs(i).Constrain)
+                Call Sim1.SIM_Evaluierung(CES1.Childs(i))
                 '************************************************************************************
 
                 'HYBRID: Speichert die PES Erfahrung diesen Childs im PES Memory
@@ -1218,7 +1218,7 @@ Partial Class Form1
             Call Sim1.PREPARE_Evaluation_PES(aktuellePara)
             'Evaluierung des Simulationsmodells (ToDo: Validätsprüfung fehlt)
             durchlauf += 1
-            SIM_Eval_is_OK = Sim1.SIM_Evaluierung(durchlauf, QN, RN)
+            SIM_Eval_is_OK = Sim1.SIM_Evaluierung(Kern.Individuum.QN_RN_Indi(durchlauf, QN, RN, aktuellePara))
             'Lösung im TeeChart einzeichnen
             '==============================
             Dim serie As Steema.TeeChart.Styles.Series
@@ -1235,7 +1235,7 @@ Partial Class Form1
                 Call Sim1.PREPARE_Evaluation_PES(aktuellePara)
                 'Evaluierung des Simulationsmodells
                 durchlauf += 1
-                SIM_Eval_is_OK = Sim1.SIM_Evaluierung(durchlauf, QN, RN)
+                SIM_Eval_is_OK = Sim1.SIM_Evaluierung(Kern.Individuum.QN_RN_Indi(durchlauf, QN, RN, aktuellePara))
                 serie = DForm.Diag.getSeriesPoint("Hook and Jeeves".ToString())
                 Call serie.Add(durchlauf, QN(0), durchlauf.ToString())
                 If QN(0) >= QNBest(0) Then
@@ -1246,7 +1246,7 @@ Partial Class Form1
                     Call Sim1.PREPARE_Evaluation_PES(aktuellePara)
                     'Evaluierung des Simulationsmodells
                     durchlauf += 1
-                    SIM_Eval_is_OK = Sim1.SIM_Evaluierung(durchlauf, QN, RN)
+                    SIM_Eval_is_OK = Sim1.SIM_Evaluierung(Kern.Individuum.QN_RN_Indi(durchlauf, QN, RN, aktuellePara))
                     serie = DForm.Diag.getSeriesPoint("Hook and Jeeves".ToString())
                     Call serie.Add(durchlauf, QN(0), durchlauf.ToString())
                     If QN(0) >= QNBest(0) Then
@@ -1443,7 +1443,7 @@ Start_Evolutionsrunden:
                                     Call Sim1.PREPARE_Evaluation_PES(myPara)
 
                                     'Evaluierung des Simulationsmodells (ToDo: Validätsprüfung fehlt)
-                                    SIM_Eval_is_OK = Sim1.SIM_Evaluierung(durchlauf, QN, RN)
+                                    SIM_Eval_is_OK = Sim1.SIM_Evaluierung(kern.Individuum.QN_RN_Indi(durchlauf, QN, RN, myPara))
 
                                     'Lösung im TeeChart einzeichnen
                                     '==============================

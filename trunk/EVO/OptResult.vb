@@ -114,41 +114,14 @@ Public Class OptResult
 
     'Eine Lösung zum Optimierungsergebnis hinzufügen
     '***********************************************
-    Public Sub addSolution(ByVal ID As Integer, ByVal lOptZiele() As Sim.Struct_OptZiel, ByVal lConstraints() As Sim.Struct_Constraint, ByVal lOptParameter() As Sim.Struct_OptParameter)
-
-        Dim i As Integer
-        Dim ind As Kern.Individuum
-
-        'Lösung übernehmen
-        Me.List_OptParameter = lOptParameter
-        Me.List_OptZiele = lOptZiele
-        Me.List_Constraints = lConstraints
-
-        'Lösung instanzieren und Werte übergeben
-        ind = New Kern.Individuum("Solution", ID)
-
-        ReDim ind.PES_X(Me.List_OptParameter.GetUpperBound(0))
-        ReDim ind.Penalty(Me.List_OptZiele.GetUpperBound(0))
-        ReDim ind.Constrain(Me.List_Constraints.GetUpperBound(0))
-
-        For i = 0 To Me.List_OptParameter.GetUpperBound(0)
-            ind.PES_X(i) = Me.List_OptParameter(i).Wert
-        Next
-
-        For i = 0 To Me.List_OptZiele.GetUpperBound(0)
-            ind.Penalty(i) = Me.List_OptZiele(i).QWertTmp
-        Next
-
-        For i = 0 To Me.List_Constraints.GetUpperBound(0)
-            ind.Constrain(i) = Me.List_Constraints(i).ConstTmp
-        Next
+    Public Sub addSolution(ByVal Ind as Kern.Individuum)
 
         'Lösung zu OptResult hinzufügen
         ReDim Preserve Me.Solutions(Me.Solutions.GetUpperBound(0) + 1)
-        Me.Solutions(Me.Solutions.GetUpperBound(0)) = ind
+        Me.Solutions(Me.Solutions.GetUpperBound(0)) = Ind.Copy
 
         'In DB speichern
-        Call Me.db_insert(ind)
+        Call Me.db_insert(Ind)
 
     End Sub
 
