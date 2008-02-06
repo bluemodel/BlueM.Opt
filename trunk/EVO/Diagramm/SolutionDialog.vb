@@ -105,7 +105,7 @@ Partial Public Class SolutionDialog
 
     'Eine Lösung hinzufügen
     '**********************
-    Public Sub addSolution(ByVal sol As Solution)
+    Public Sub addSolution(ByVal sol As Kern.Individuum)
 
         Dim i As Integer
         Dim cellvalues() As Object
@@ -119,17 +119,17 @@ Partial Public Class SolutionDialog
 
         i = 1
 
-        For Each optpara As Double In sol.OptPara
+        For Each optpara As Double In sol.PES_X
             cellvalues(i) = optpara
             i += 1
         Next
 
-        For Each optziel As Double In sol.QWerte
+        For Each optziel As Double In sol.Penalty
             cellvalues(i) = optziel
             i += 1
         Next
 
-        For Each constraint As Double In sol.Constraints
+        For Each constraint As Double In sol.Constrain
             cellvalues(i) = constraint
             i += 1
         Next

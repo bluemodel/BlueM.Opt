@@ -1,5 +1,24 @@
 Public Class Functions
 
+    
+    '*******************************************************************************
+    '*******************************************************************************
+    '**** Klasse Functions                                                      ****
+    '****                                                                       ****
+    '**** Wird derzeit für das NDSorting verwendet um es für die verschiedenen  ****
+    '**** Kerne anwenden zu können                                              ****
+    '****                                                                       ****
+    '**** Christoph Hübner                                                      ****
+    '****                                                                       ****
+    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
+    '**** TU Darmstadt                                                          ****
+    '****                                                                       ****
+    '**** Februar 2007                                                          ****
+    '****                                                                       ****
+    '**** Letzte Änderung: März 2007                                            ****
+    '*******************************************************************************
+    '*******************************************************************************
+
     'Die Statische Variablen werden im Konstruktor übergeben
     '*******************************************************
     Dim NNachf As Integer
