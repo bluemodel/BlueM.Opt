@@ -1871,19 +1871,19 @@ Start_Evolutionsrunden:
             Exit Sub
         Else
 
-            Dim solutionID As Integer
-            Dim sol As Kern.Individuum
+            Dim indID_clicked As Integer
+            Dim ind As Kern.Individuum
 
             'Solution-ID
-            solutionID = s.Labels(valueIndex)
+            indID_clicked = s.Labels(valueIndex)
 
             'Lösung holen
-            sol = Sim1.OptResult.getSolution(solutionID)
+            ind = Sim1.OptResult.getSolution(indID_clicked)
 
-            If (sol.ID = solutionID) Then
+            If (ind.ID = indID_clicked) Then
 
                 'Lösung auswählen
-                Call Me.selectSolution(sol)
+                Call Me.selectSolution(ind)
 
             End If
 
@@ -1893,12 +1893,12 @@ Start_Evolutionsrunden:
 
     'Eine Lösung auswählen
     '*********************
-    Private Sub selectSolution(ByVal sol As Kern.Individuum) Handles scatterplot1.pointSelected
+    Private Sub selectSolution(ByVal ind As Kern.Individuum) Handles scatterplot1.pointSelected
 
         Dim isOK As Boolean
 
         'Lösung zu ausgewählten Lösungen hinzufügen
-        isOK = Sim1.OptResult.selectSolution(sol.ID)
+        isOK = Sim1.OptResult.selectSolution(ind.ID)
 
         If (isOK) Then
 
@@ -1911,14 +1911,14 @@ Start_Evolutionsrunden:
             Call Me.solutionDialog.Show()
 
             'Lösung zum Lösungsdialog hinzufügen
-            Call Me.solutionDialog.addSolution(sol)
+            Call Me.solutionDialog.addSolution(ind)
 
             'Lösung im Hauptdiagramm anzeigen
-            Call Me.DForm.Diag.showSelectedSolution(Me.Sim1.List_OptZiele, sol)
+            Call Me.DForm.Diag.showSelectedSolution(Me.Sim1.List_OptZiele, ind)
 
             'Lösung im Scatterplot anzeigen
             If (Not IsNothing(Me.scatterplot1)) Then
-                Call Me.scatterplot1.showSelectedSolution(sol)
+                Call Me.scatterplot1.showSelectedSolution(ind)
             End If
 
         End If
@@ -1987,11 +1987,11 @@ Start_Evolutionsrunden:
 
         'Alle ausgewählten Lösungen durchlaufen
         '======================================
-        For Each sol As Kern.Individuum In Sim1.OptResult.getSelectedSolutions()
+        For Each ind As Kern.Individuum In Sim1.OptResult.getSelectedSolutions()
 
             'Lösung per Checkbox ausgewählt?
             '-------------------------------
-            If (Not checkedSolutions.Contains(sol.ID.ToString())) Then
+            If (Not checkedSolutions.Contains(ind.ID.ToString())) Then
                 Continue For
             End If
 
@@ -2000,7 +2000,7 @@ Start_Evolutionsrunden:
 
             'OptParameter übernehmen
             For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
-                Sim1.List_OptParameter(i).Wert = sol.PES_X(i)
+                Sim1.List_OptParameter(i).Wert = ind.PES_X(i)
             Next
 
             'Modellparameter schreiben
@@ -2018,7 +2018,7 @@ Start_Evolutionsrunden:
                 Dim RVAResult As Wave.RVA.Struct_RVAValues
                 RVAResult = CType(Me.Sim1, IHWB.EVO.BlueM).IHASys.RVAResult
                 'Lösungsnummer an Titel anhängen
-                RVAResult.Title = "Lösung " & sol.ID.ToString()
+                RVAResult.Title = "Lösung " & ind.ID.ToString()
                 Call Wave2.Display_RVA(RVAResult)
             End If
 
@@ -2046,7 +2046,7 @@ Start_Evolutionsrunden:
                         Call SimSeries.Add(.SimGr, .SimGr)
                         zre = Sim1.SimErgebnis(.SimGr).copy()
                         'Lösungsnummer an Titel anhängen
-                        zre.Title &= " (Lösung " & sol.ID.ToString() & ")"
+                        zre.Title &= " (Lösung " & ind.ID.ToString() & ")"
                         'Simreihe in Wave laden
                         Call Wave1.Display_Series(zre)
                     End If
@@ -2054,7 +2054,7 @@ Start_Evolutionsrunden:
                 End With
             Next
 
-        Next sol
+        Next ind
 
         'Wave anzeigen
         '-------------
@@ -2190,40 +2190,40 @@ Start_Evolutionsrunden:
                 '========
                 If (importDialog.ComboBox_SekPop.SelectedItem <> "ausschließlich") Then
 
-                    For Each sol As Kern.Individuum In Sim1.OptResult.Solutions
+                    For Each ind As Kern.Individuum In Sim1.OptResult.Solutions
 
                         If (OptZielIndexZ = -1 And OptZielIndexY = -1) Then
                             '1D
                             'Constraintverletzung prüfen
-                            If (sol.feasible) Then
+                            If (ind.feasible) Then
                                 serie = Me.DForm.Diag.getSeriesPoint("Population", "red")
                             Else
                                 serie = Me.DForm.Diag.getSeriesPoint("Population (ungültig)", "Gray")
                             End If
                             'Zeichnen
-                            serie.Add(sol.ID, sol.Penalty(OptZielIndexX), sol.ID)
+                            serie.Add(ind.ID, ind.Penalty(OptZielIndexX), ind.ID)
                         ElseIf (OptZielIndexZ = -1) Then
                             '2D
                             '--
                             'Constraintverletzung prüfen
-                            If (sol.feasible) Then
+                            If (ind.feasible) Then
                                 serie = Me.DForm.Diag.getSeriesPoint("Population", "Orange")
                             Else
                                 serie = Me.DForm.Diag.getSeriesPoint("Population (ungültig)", "Gray")
                             End If
                             'Zeichnen
-                            serie.Add(sol.Penalty(OptZielIndexX), sol.Penalty(OptZielIndexY), sol.ID)
+                            serie.Add(ind.Penalty(OptZielIndexX), ind.Penalty(OptZielIndexY), ind.ID)
                         Else
                             '3D
                             '--
                             'Constraintverletzung prüfen
-                            If (sol.feasible) Then
+                            If (ind.feasible) Then
                                 serie3D = Me.DForm.Diag.getSeries3DPoint("Population", "Orange")
                             Else
                                 serie3D = Me.DForm.Diag.getSeries3DPoint("Population (ungültig)", "Gray")
                             End If
                             'Zeichnen
-                            serie3D.Add(sol.Penalty(OptZielIndexX), sol.Penalty(OptZielIndexY), sol.Penalty(OptZielIndexZ), sol.ID)
+                            serie3D.Add(ind.Penalty(OptZielIndexX), ind.Penalty(OptZielIndexY), ind.Penalty(OptZielIndexZ), ind.ID)
                         End If
 
                     Next
@@ -2234,17 +2234,17 @@ Start_Evolutionsrunden:
                 '==================
                 If (importDialog.ComboBox_SekPop.SelectedItem <> "keine") Then
 
-                    For Each sekpopsol As Kern.Individuum In Sim1.OptResult.getSekPop()
+                    For Each sekpopind As Kern.Individuum In Sim1.OptResult.getSekPop()
                         If (OptZielIndexZ = -1) Then
                             '2D
                             '--
                             serie = Me.DForm.Diag.getSeriesPoint("Sekundäre Population", "Green")
-                            serie.Add(sekpopsol.Penalty(OptZielIndexX), sekpopsol.Penalty(OptZielIndexY), sekpopsol.ID)
+                            serie.Add(sekpopind.Penalty(OptZielIndexX), sekpopind.Penalty(OptZielIndexY), sekpopind.ID)
                         Else
                             '3D
                             '--
                             serie3D = Me.DForm.Diag.getSeries3DPoint("Sekundäre Population", "Green")
-                            serie3D.Add(sekpopsol.Penalty(OptZielIndexX), sekpopsol.Penalty(OptZielIndexY), sekpopsol.Penalty(OptZielIndexZ), sekpopsol.ID)
+                            serie3D.Add(sekpopind.Penalty(OptZielIndexX), sekpopind.Penalty(OptZielIndexY), sekpopind.Penalty(OptZielIndexZ), sekpopind.ID)
                         End If
                     Next
 

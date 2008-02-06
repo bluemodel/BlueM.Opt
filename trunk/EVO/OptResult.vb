@@ -117,37 +117,38 @@ Public Class OptResult
     Public Sub addSolution(ByVal ID As Integer, ByVal lOptZiele() As Sim.Struct_OptZiel, ByVal lConstraints() As Sim.Struct_Constraint, ByVal lOptParameter() As Sim.Struct_OptParameter)
 
         Dim i As Integer
-        Dim sol As Kern.Individuum
+        Dim ind As Kern.Individuum
 
         'Lösung übernehmen
         Me.List_OptParameter = lOptParameter
         Me.List_OptZiele = lOptZiele
         Me.List_Constraints = lConstraints
 
-        'Lösung hinzufügen
-        sol = New Kern.Individuum("Solution", 0)
-        sol.ID = ID
-        ReDim sol.PES_X(Me.List_OptParameter.GetUpperBound(0))
-        ReDim sol.Penalty(Me.List_OptZiele.GetUpperBound(0))
-        ReDim sol.Constrain(Me.List_Constraints.GetUpperBound(0))
+        'Lösung instanzieren und Werte übergeben
+        ind = New Kern.Individuum("Solution", ID)
+
+        ReDim ind.PES_X(Me.List_OptParameter.GetUpperBound(0))
+        ReDim ind.Penalty(Me.List_OptZiele.GetUpperBound(0))
+        ReDim ind.Constrain(Me.List_Constraints.GetUpperBound(0))
 
         For i = 0 To Me.List_OptParameter.GetUpperBound(0)
-            sol.PES_X(i) = Me.List_OptParameter(i).Wert
+            ind.PES_X(i) = Me.List_OptParameter(i).Wert
         Next
 
         For i = 0 To Me.List_OptZiele.GetUpperBound(0)
-            sol.Penalty(i) = Me.List_OptZiele(i).QWertTmp
+            ind.Penalty(i) = Me.List_OptZiele(i).QWertTmp
         Next
 
         For i = 0 To Me.List_Constraints.GetUpperBound(0)
-            sol.Constrain(i) = Me.List_Constraints(i).ConstTmp
+            ind.Constrain(i) = Me.List_Constraints(i).ConstTmp
         Next
 
+        'Lösung zu OptResult hinzufügen
         ReDim Preserve Me.Solutions(Me.Solutions.GetUpperBound(0) + 1)
-        Me.Solutions(Me.Solutions.GetUpperBound(0)) = sol
+        Me.Solutions(Me.Solutions.GetUpperBound(0)) = ind
 
         'In DB speichern
-        Call Me.db_insert(sol)
+        Call Me.db_insert(ind)
 
     End Sub
 
@@ -402,7 +403,7 @@ Public Class OptResult
 
     'Eine Lösung in die ErgebnisDB schreiben
     '***************************************
-    Private Function db_insert(ByVal sol As Kern.Individuum) As Boolean
+    Private Function db_insert(ByVal ind As Kern.Individuum) As Boolean
 
         Call db_connect()
 
@@ -412,7 +413,7 @@ Public Class OptResult
 
         'Sim schreiben
         '-------------
-        command.CommandText = "INSERT INTO Sim (ID, Name) VALUES (" & sol.ID & ", '" & Me.Datensatz & "')"
+        command.CommandText = "INSERT INTO Sim (ID, Name) VALUES (" & ind.ID & ", '" & Me.Datensatz & "')"
         command.ExecuteNonQuery()
 
         'QWerte schreiben 
@@ -421,9 +422,9 @@ Public Class OptResult
         Dim fieldvalues As String = ""
         For i = 0 To List_OptZiele.GetUpperBound(0)
             fieldnames &= ", [" & List_OptZiele(i).Bezeichnung & "]"
-            fieldvalues &= ", " & sol.Penalty(i).ToString(Sim.FortranProvider)
+            fieldvalues &= ", " & ind.Penalty(i).ToString(Sim.FortranProvider)
         Next
-        command.CommandText = "INSERT INTO QWerte (Sim_ID" & fieldnames & ") VALUES (" & sol.ID & fieldvalues & ")"
+        command.CommandText = "INSERT INTO QWerte (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
         command.ExecuteNonQuery()
 
         'Constraints schreiben 
@@ -433,9 +434,9 @@ Public Class OptResult
             fieldvalues = ""
             For i = 0 To Me.List_Constraints.GetUpperBound(0)
                 fieldnames &= ", [" & Me.List_Constraints(i).Bezeichnung & "]"
-                fieldvalues &= ", " & sol.Constrain(i).ToString(Sim.FortranProvider)
+                fieldvalues &= ", " & ind.Constrain(i).ToString(Sim.FortranProvider)
             Next
-            command.CommandText = "INSERT INTO [Constraints] (Sim_ID" & fieldnames & ") VALUES (" & sol.ID & fieldvalues & ")"
+            command.CommandText = "INSERT INTO [Constraints] (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
             command.ExecuteNonQuery()
         End If
 
@@ -447,9 +448,9 @@ Public Class OptResult
             fieldvalues = ""
             For i = 0 To Me.List_OptParameter.GetUpperBound(0)
                 fieldnames &= ", [" & Me.List_OptParameter(i).Bezeichnung & "]"
-                fieldvalues &= ", " & sol.PES_X(i).ToString(Sim.FortranProvider)
+                fieldvalues &= ", " & ind.PES_X(i).ToString(Sim.FortranProvider)
             Next
-            command.CommandText = "INSERT INTO OptParameter (Sim_ID" & fieldnames & ") VALUES (" & sol.ID & fieldvalues & ")"
+            command.CommandText = "INSERT INTO OptParameter (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
             command.ExecuteNonQuery()
 
         End If
@@ -464,9 +465,9 @@ Public Class OptResult
         '    fieldvalues = ""
         '    For i = 0 To Me.List_Locations.GetUpperBound(0)
         '        fieldnames &= ", [" & Me.List_Locations(i).Name & "]"
-        '        fieldvalues &= ", '" & sol.Akt(i).Measures(i) & "'"
+        '        fieldvalues &= ", '" & ind.Akt(i).Measures(i) & "'"
         '    Next
-        '    command.CommandText = "INSERT INTO Pfad (Sim_ID" & fieldnames & ") VALUES (" & sol.ID & fieldvalues & ")"
+        '    command.CommandText = "INSERT INTO Pfad (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
         '    command.ExecuteNonQuery()
 
         'End If
@@ -552,8 +553,9 @@ Public Class OptResult
     End Function
 
     'Einen Parametersatz aus der DB übernehmen
-    '*****************************************
-    Private Function db_getPara(ByRef Solution As Kern.Individuum, ByVal xAchse As String, ByVal xWert As Double, ByVal yAchse As String, ByVal yWert As Double) As Boolean
+    'TODO: Funktion db_getPara wird nicht mehr genutzt!
+    '**************************************************
+    Private Function db_getPara(ByRef ind As Kern.Individuum, ByVal xAchse As String, ByVal xWert As Double, ByVal yAchse As String, ByVal yWert As Double) As Boolean
 
         Dim isOK As Boolean = False
         Dim q As String
@@ -561,8 +563,9 @@ Public Class OptResult
         Dim ds As DataSet
         Dim numrows As Integer
 
-        Solution = New Kern.Individuum("Solution", 0)
-        ReDim Solution.PES_X(Me.List_OptParameter.GetUpperBound(0))
+        'TODO: eigentlich müsste die ID aus der db übernommen werden
+        ind = New Kern.Individuum("Solution", 0)
+        ReDim ind.PES_X(Me.List_OptParameter.GetUpperBound(0))
 
         Call db_connect()
 
@@ -598,7 +601,7 @@ Public Class OptResult
 
                 'OptParametersatz übernehmen
                 For i As Integer = 0 To Me.List_OptParameter.GetUpperBound(0)
-                    Solution.PES_X(i) = ds.Tables("OptParameter").Rows(0).Item(Me.List_OptParameter(i).Bezeichnung)
+                    ind.PES_X(i) = ds.Tables("OptParameter").Rows(0).Item(Me.List_OptParameter(i).Bezeichnung)
                 Next
 
                 isOK = True
