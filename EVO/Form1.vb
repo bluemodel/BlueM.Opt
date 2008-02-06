@@ -1660,7 +1660,7 @@ Start_Evolutionsrunden:
         Dim i As Short
         Dim serie As Steema.TeeChart.Styles.Series
         Dim serie3D As Steema.TeeChart.Styles.Points3D
-        Dim solutions() As IHWB.EVO.Solution
+        Dim solutions() As Kern.Individuum
 
         'SekPop holen
         solutions = Sim1.OptResult.getSekPop(_igen)
@@ -1671,7 +1671,7 @@ Start_Evolutionsrunden:
             serie = DForm.Diag.getSeriesPoint("Sekundäre Population", "Green")
             serie.Clear()
             For i = 0 To solutions.GetUpperBound(0)
-                serie.Add(solutions(i).QWerte(0), solutions(i).QWerte(1), solutions(i).ID)
+                serie.Add(solutions(i).Penalty(0), solutions(i).Penalty(1), solutions(i).ID)
             Next i
 
         ElseIf (globalAnzZiel >= 3) Then
@@ -1680,7 +1680,7 @@ Start_Evolutionsrunden:
             serie3D = DForm.Diag.getSeries3DPoint("Sekundäre Population", "Green")
             serie3D.Clear()
             For i = 0 To solutions.GetUpperBound(0)
-                serie3D.Add(solutions(i).QWerte(0), solutions(i).QWerte(1), solutions(i).QWerte(2), solutions(i).ID)
+                serie3D.Add(solutions(i).Penalty(0), solutions(i).Penalty(1), solutions(i).Penalty(2), solutions(i).ID)
             Next i
         End If
 
@@ -1872,7 +1872,7 @@ Start_Evolutionsrunden:
         Else
 
             Dim solutionID As Integer
-            Dim sol As Solution
+            Dim sol As Kern.Individuum
 
             'Solution-ID
             solutionID = s.Labels(valueIndex)
@@ -1893,7 +1893,7 @@ Start_Evolutionsrunden:
 
     'Eine Lösung auswählen
     '*********************
-    Private Sub selectSolution(ByVal sol As Solution) Handles scatterplot1.pointSelected
+    Private Sub selectSolution(ByVal sol As Kern.Individuum) Handles scatterplot1.pointSelected
 
         Dim isOK As Boolean
 
@@ -1987,7 +1987,7 @@ Start_Evolutionsrunden:
 
         'Alle ausgewählten Lösungen durchlaufen
         '======================================
-        For Each sol As Solution In Sim1.OptResult.getSelectedSolutions()
+        For Each sol As Kern.Individuum In Sim1.OptResult.getSelectedSolutions()
 
             'Lösung per Checkbox ausgewählt?
             '-------------------------------
@@ -2000,7 +2000,7 @@ Start_Evolutionsrunden:
 
             'OptParameter übernehmen
             For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
-                Sim1.List_OptParameter(i).Wert = sol.OptPara(i)
+                Sim1.List_OptParameter(i).Wert = sol.PES_X(i)
             Next
 
             'Modellparameter schreiben
@@ -2190,40 +2190,40 @@ Start_Evolutionsrunden:
                 '========
                 If (importDialog.ComboBox_SekPop.SelectedItem <> "ausschließlich") Then
 
-                    For Each sol As Solution In Sim1.OptResult.Solutions
+                    For Each sol As Kern.Individuum In Sim1.OptResult.Solutions
 
                         If (OptZielIndexZ = -1 And OptZielIndexY = -1) Then
                             '1D
                             'Constraintverletzung prüfen
-                            If (sol.isValid) Then
+                            If (sol.feasible) Then
                                 serie = Me.DForm.Diag.getSeriesPoint("Population", "red")
                             Else
                                 serie = Me.DForm.Diag.getSeriesPoint("Population (ungültig)", "Gray")
                             End If
                             'Zeichnen
-                            serie.Add(sol.ID, sol.QWerte(OptZielIndexX), sol.ID)
+                            serie.Add(sol.ID, sol.Penalty(OptZielIndexX), sol.ID)
                         ElseIf (OptZielIndexZ = -1) Then
                             '2D
                             '--
                             'Constraintverletzung prüfen
-                            If (sol.isValid) Then
+                            If (sol.feasible) Then
                                 serie = Me.DForm.Diag.getSeriesPoint("Population", "Orange")
                             Else
                                 serie = Me.DForm.Diag.getSeriesPoint("Population (ungültig)", "Gray")
                             End If
                             'Zeichnen
-                            serie.Add(sol.QWerte(OptZielIndexX), sol.QWerte(OptZielIndexY), sol.ID)
+                            serie.Add(sol.Penalty(OptZielIndexX), sol.Penalty(OptZielIndexY), sol.ID)
                         Else
                             '3D
                             '--
                             'Constraintverletzung prüfen
-                            If (sol.isValid) Then
+                            If (sol.feasible) Then
                                 serie3D = Me.DForm.Diag.getSeries3DPoint("Population", "Orange")
                             Else
                                 serie3D = Me.DForm.Diag.getSeries3DPoint("Population (ungültig)", "Gray")
                             End If
                             'Zeichnen
-                            serie3D.Add(sol.QWerte(OptZielIndexX), sol.QWerte(OptZielIndexY), sol.QWerte(OptZielIndexZ), sol.ID)
+                            serie3D.Add(sol.Penalty(OptZielIndexX), sol.Penalty(OptZielIndexY), sol.Penalty(OptZielIndexZ), sol.ID)
                         End If
 
                     Next
@@ -2234,17 +2234,17 @@ Start_Evolutionsrunden:
                 '==================
                 If (importDialog.ComboBox_SekPop.SelectedItem <> "keine") Then
 
-                    For Each sekpopsol As Solution In Sim1.OptResult.getSekPop()
+                    For Each sekpopsol As Kern.Individuum In Sim1.OptResult.getSekPop()
                         If (OptZielIndexZ = -1) Then
                             '2D
                             '--
                             serie = Me.DForm.Diag.getSeriesPoint("Sekundäre Population", "Green")
-                            serie.Add(sekpopsol.QWerte(OptZielIndexX), sekpopsol.QWerte(OptZielIndexY), sekpopsol.ID)
+                            serie.Add(sekpopsol.Penalty(OptZielIndexX), sekpopsol.Penalty(OptZielIndexY), sekpopsol.ID)
                         Else
                             '3D
                             '--
                             serie3D = Me.DForm.Diag.getSeries3DPoint("Sekundäre Population", "Green")
-                            serie3D.Add(sekpopsol.QWerte(OptZielIndexX), sekpopsol.QWerte(OptZielIndexY), sekpopsol.QWerte(OptZielIndexZ), sekpopsol.ID)
+                            serie3D.Add(sekpopsol.Penalty(OptZielIndexX), sekpopsol.Penalty(OptZielIndexY), sekpopsol.Penalty(OptZielIndexZ), sekpopsol.ID)
                         End If
                     Next
 

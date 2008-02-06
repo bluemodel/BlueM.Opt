@@ -239,7 +239,7 @@ Public Class Diagramm
 
     'ausgewählte Lösung anzeigen
     '***************************
-    Friend Sub showSelectedSolution(ByVal List_OptZiele() As Sim.Struct_OptZiel, ByVal sol As Solution)
+    Friend Sub showSelectedSolution(ByVal List_OptZiele() As Sim.Struct_OptZiel, ByVal sol As Kern.Individuum)
 
         Dim xAchse, yAchse, zAchse As String
         Dim xWert, yWert, zWert As Double
@@ -252,9 +252,9 @@ Public Class Diagramm
         'QWerte zu Achsen zuordnen
         For i = 0 To List_OptZiele.GetUpperBound(0)
             If (List_OptZiele(i).Bezeichnung = xAchse) Then
-                xWert = sol.QWerte(i)
+                xWert = sol.Penalty(i)
             ElseIf (List_OptZiele(i).Bezeichnung = yAchse) Then
-                yWert = sol.QWerte(i)
+                yWert = sol.Penalty(i)
             End If
         Next
 
@@ -280,7 +280,7 @@ Public Class Diagramm
             'QWert zu Achse zuordnen
             For i = 0 To List_OptZiele.GetUpperBound(0)
                 If (List_OptZiele(i).Bezeichnung = zAchse) Then
-                    zWert = sol.QWerte(i)
+                    zWert = sol.Penalty(i)
                 End If
             Next
 

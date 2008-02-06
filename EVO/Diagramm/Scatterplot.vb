@@ -22,7 +22,7 @@ Partial Public Class Scatterplot
             Return Me.OptResult.List_OptZiele.Length()
         End Get
     End Property
-    Public Event pointSelected(ByVal sol As Solution)
+    Public Event pointSelected(ByVal sol As Kern.Individuum)
 
     'Konstruktor
     '***********
@@ -117,22 +117,22 @@ Partial Public Class Scatterplot
                         'Nur Sekundäre Population
                         '------------------------
                         serie = .getSeriesPoint(xAchse & ", " & yAchse, "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                        For Each sol As Solution In Me.OptResult.getSekPop()
-                            serie.Add(sol.QWerte(i), sol.QWerte(j), sol.ID)
+                        For Each sol As Kern.Individuum In Me.OptResult.getSekPop()
+                            serie.Add(sol.Penalty(i), sol.Penalty(j), sol.ID)
                         Next
                     Else
                         'Alle Lösungen
                         '-------------
                         serie = .getSeriesPoint(xAchse & ", " & yAchse, "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         serie_inv = .getSeriesPoint(xAchse & ", " & yAchse & " (ungültig)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                        For Each sol As Solution In Me.OptResult.Solutions
+                        For Each sol As Kern.Individuum In Me.OptResult.Solutions
                             'Constraintverletzung prüfen
-                            If (sol.isValid) Then
+                            If (sol.feasible) Then
                                 'gültige Lösung Zeichnen
-                                serie.Add(sol.QWerte(i), sol.QWerte(j), sol.ID)
+                                serie.Add(sol.Penalty(i), sol.Penalty(j), sol.ID)
                             Else
                                 'ungültige Lösung zeichnen
-                                serie_inv.Add(sol.QWerte(i), sol.QWerte(j), sol.ID)
+                                serie_inv.Add(sol.Penalty(i), sol.Penalty(j), sol.ID)
                             End If
                         Next
                     End If
@@ -202,9 +202,9 @@ Partial Public Class Scatterplot
     Private Sub seriesClick(ByVal sender As Object, ByVal s As Steema.TeeChart.Styles.Series, ByVal valueIndex As Integer, ByVal e As System.Windows.Forms.MouseEventArgs)
 
         Dim solutionID As Integer
-        Dim sol As New Solution
+        Dim sol As New Kern.Individuum("Solution", 0)
 
-        ReDim sol.QWerte(Me.nOptZiele - 1)
+        ReDim sol.Penalty(Me.nOptZiele - 1)
 
         'Punkt-Informationen bestimmen
         '-----------------------------
@@ -227,7 +227,7 @@ Partial Public Class Scatterplot
     'Eine ausgewählte Lösung in den Diagrammen anzeigen
     'wird von Form1.selectSolution() aufgerufen
     '**************************************************
-    Friend Sub showSelectedSolution(ByVal sol As Solution)
+    Friend Sub showSelectedSolution(ByVal sol As Kern.Individuum)
 
         Dim serie As Steema.TeeChart.Styles.Series
         Dim i, j As Integer
@@ -240,7 +240,7 @@ Partial Public Class Scatterplot
 
                     'Roten Punkt zeichnen
                     serie = .getSeriesPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
-                    serie.Add(sol.QWerte(i), sol.QWerte(j), sol.ID)
+                    serie.Add(sol.Penalty(i), sol.Penalty(j), sol.ID)
 
                     'Mark anzeigen
                     serie.Marks.Visible = True

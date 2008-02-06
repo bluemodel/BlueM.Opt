@@ -32,7 +32,7 @@ Public Class OptResult
     Public List_Locations()As Sim.Struct_Lokation
 
     'Array von Lösungen
-    Public Solutions() As Solution
+    Public Solutions() As Kern.Individuum
 
     'Structure für Sekundäre Population
     Public Structure Struct_SekPop
@@ -94,9 +94,9 @@ Public Class OptResult
 
     'Ausgewählte Lösungen holen
     '**************************
-    Public Function getSelectedSolutions() As Solution()
+    Public Function getSelectedSolutions() As Kern.Individuum()
 
-        Dim solutions() As Solution
+        Dim solutions() As Kern.Individuum
 
         solutions = getSolutions(Me.selSolutionIDs)
 
@@ -117,7 +117,7 @@ Public Class OptResult
     Public Sub addSolution(ByVal ID As Integer, ByVal lOptZiele() As Sim.Struct_OptZiel, ByVal lConstraints() As Sim.Struct_Constraint, ByVal lOptParameter() As Sim.Struct_OptParameter)
 
         Dim i As Integer
-        Dim sol As Solution
+        Dim sol As Kern.Individuum
 
         'Lösung übernehmen
         Me.List_OptParameter = lOptParameter
@@ -125,22 +125,22 @@ Public Class OptResult
         Me.List_Constraints = lConstraints
 
         'Lösung hinzufügen
-        sol = New Solution()
+        sol = New Kern.Individuum("Solution", 0)
         sol.ID = ID
-        ReDim sol.OptPara(Me.List_OptParameter.GetUpperBound(0))
-        ReDim sol.QWerte(Me.List_OptZiele.GetUpperBound(0))
-        ReDim sol.Constraints(Me.List_Constraints.GetUpperBound(0))
+        ReDim sol.PES_X(Me.List_OptParameter.GetUpperBound(0))
+        ReDim sol.Penalty(Me.List_OptZiele.GetUpperBound(0))
+        ReDim sol.Constrain(Me.List_Constraints.GetUpperBound(0))
 
         For i = 0 To Me.List_OptParameter.GetUpperBound(0)
-            sol.OptPara(i) = Me.List_OptParameter(i).Wert
+            sol.PES_X(i) = Me.List_OptParameter(i).Wert
         Next
 
         For i = 0 To Me.List_OptZiele.GetUpperBound(0)
-            sol.QWerte(i) = Me.List_OptZiele(i).QWertTmp
+            sol.Penalty(i) = Me.List_OptZiele(i).QWertTmp
         Next
 
         For i = 0 To Me.List_Constraints.GetUpperBound(0)
-            sol.Constraints(i) = Me.List_Constraints(i).ConstTmp
+            sol.Constrain(i) = Me.List_Constraints(i).ConstTmp
         Next
 
         ReDim Preserve Me.Solutions(Me.Solutions.GetUpperBound(0) + 1)
@@ -153,7 +153,7 @@ Public Class OptResult
 
     'Eine Lösung identifizieren
     '**************************
-    Public Function getSolution(ByVal ID As Integer) As Solution
+    Public Function getSolution(ByVal ID As Integer) As Kern.Individuum
 
         Dim i As Integer
 
@@ -163,7 +163,7 @@ Public Class OptResult
             End If
         Next
 
-        Return New Solution() 'TODO: Fehlerbehandlung
+        Return New Kern.Individuum("Solution", 0) 'TODO: Fehlerbehandlung
 
     End Function
 
@@ -196,9 +196,9 @@ Public Class OptResult
 
     'Sekundäre Population holen
     '**************************
-    Public Function getSekPop(Optional ByVal _igen As Integer = -1) As Solution()
+    Public Function getSekPop(Optional ByVal _igen As Integer = -1) As Kern.Individuum()
 
-        Dim sekpopsolutions() As Solution
+        Dim sekpopsolutions() As Kern.Individuum
 
         'Wenn keine Generation angegeben, dann letzte SekPop ausgeben
         If (_igen = -1) Then
@@ -223,10 +223,10 @@ Public Class OptResult
 
     'Lösungen anhand von IDs holen
     '*****************************
-    Private Function getSolutions(ByVal IDs() As Integer) As Solution()
+    Private Function getSolutions(ByVal IDs() As Integer) As Kern.Individuum()
 
         Dim i As Integer
-        Dim solutions() As Solution
+        Dim solutions() As Kern.Individuum
 
         ReDim solutions(IDs.GetUpperBound(0))
 
@@ -402,7 +402,7 @@ Public Class OptResult
 
     'Eine Lösung in die ErgebnisDB schreiben
     '***************************************
-    Private Function db_insert(ByVal sol As Solution) As Boolean
+    Private Function db_insert(ByVal sol As Kern.Individuum) As Boolean
 
         Call db_connect()
 
@@ -421,7 +421,7 @@ Public Class OptResult
         Dim fieldvalues As String = ""
         For i = 0 To List_OptZiele.GetUpperBound(0)
             fieldnames &= ", [" & List_OptZiele(i).Bezeichnung & "]"
-            fieldvalues &= ", " & sol.QWerte(i).ToString(Sim.FortranProvider)
+            fieldvalues &= ", " & sol.Penalty(i).ToString(Sim.FortranProvider)
         Next
         command.CommandText = "INSERT INTO QWerte (Sim_ID" & fieldnames & ") VALUES (" & sol.ID & fieldvalues & ")"
         command.ExecuteNonQuery()
@@ -433,7 +433,7 @@ Public Class OptResult
             fieldvalues = ""
             For i = 0 To Me.List_Constraints.GetUpperBound(0)
                 fieldnames &= ", [" & Me.List_Constraints(i).Bezeichnung & "]"
-                fieldvalues &= ", " & sol.Constraints(i).ToString(Sim.FortranProvider)
+                fieldvalues &= ", " & sol.Constrain(i).ToString(Sim.FortranProvider)
             Next
             command.CommandText = "INSERT INTO [Constraints] (Sim_ID" & fieldnames & ") VALUES (" & sol.ID & fieldvalues & ")"
             command.ExecuteNonQuery()
@@ -447,7 +447,7 @@ Public Class OptResult
             fieldvalues = ""
             For i = 0 To Me.List_OptParameter.GetUpperBound(0)
                 fieldnames &= ", [" & Me.List_OptParameter(i).Bezeichnung & "]"
-                fieldvalues &= ", " & sol.OptPara(i).ToString(Sim.FortranProvider)
+                fieldvalues &= ", " & sol.PES_X(i).ToString(Sim.FortranProvider)
             Next
             command.CommandText = "INSERT INTO OptParameter (Sim_ID" & fieldnames & ") VALUES (" & sol.ID & fieldvalues & ")"
             command.ExecuteNonQuery()
@@ -553,7 +553,7 @@ Public Class OptResult
 
     'Einen Parametersatz aus der DB übernehmen
     '*****************************************
-    Private Function db_getPara(ByRef Solution As Solution, ByVal xAchse As String, ByVal xWert As Double, ByVal yAchse As String, ByVal yWert As Double) As Boolean
+    Private Function db_getPara(ByRef Solution As Kern.Individuum, ByVal xAchse As String, ByVal xWert As Double, ByVal yAchse As String, ByVal yWert As Double) As Boolean
 
         Dim isOK As Boolean = False
         Dim q As String
@@ -561,8 +561,8 @@ Public Class OptResult
         Dim ds As DataSet
         Dim numrows As Integer
 
-        Solution = New Solution()
-        ReDim Solution.OptPara(Me.List_OptParameter.GetUpperBound(0))
+        Solution = New Kern.Individuum("Solution", 0)
+        ReDim Solution.PES_X(Me.List_OptParameter.GetUpperBound(0))
 
         Call db_connect()
 
@@ -598,7 +598,7 @@ Public Class OptResult
 
                 'OptParametersatz übernehmen
                 For i As Integer = 0 To Me.List_OptParameter.GetUpperBound(0)
-                    Solution.OptPara(i) = ds.Tables("OptParameter").Rows(0).Item(Me.List_OptParameter(i).Bezeichnung)
+                    Solution.PES_X(i) = ds.Tables("OptParameter").Rows(0).Item(Me.List_OptParameter(i).Bezeichnung)
                 Next
 
                 isOK = True
@@ -741,7 +741,7 @@ Public Class OptResult
 
         For i = 0 To numSolutions - 1
 
-            Me.Solutions(i) = New Solution()
+            Me.Solutions(i) = New Kern.Individuum("Solution", i)
 
             With Me.Solutions(i)
                 'ID
@@ -749,21 +749,21 @@ Public Class OptResult
                 .ID = ds.Tables(0).Rows(i).Item("Sim.ID")
                 'OptParameter
                 '------------
-                ReDim .OptPara(Me.List_OptParameter.GetUpperBound(0))
+                ReDim .PES_X(Me.List_OptParameter.GetUpperBound(0))
                 For j = 0 To Me.List_OptParameter.GetUpperBound(0)
-                    .OptPara(j) = ds.Tables(0).Rows(i).Item(Me.List_OptParameter(j).Bezeichnung)
+                    .PES_X(j) = ds.Tables(0).Rows(i).Item(Me.List_OptParameter(j).Bezeichnung)
                 Next
                 'QWerte
                 '------
-                ReDim .QWerte(Me.List_OptZiele.GetUpperBound(0))
+                ReDim .Penalty(Me.List_OptZiele.GetUpperBound(0))
                 For j = 0 To Me.List_OptZiele.GetUpperBound(0)
-                    .QWerte(j) = ds.Tables(0).Rows(i).Item(Me.List_OptZiele(j).Bezeichnung)
+                    .Penalty(j) = ds.Tables(0).Rows(i).Item(Me.List_OptZiele(j).Bezeichnung)
                 Next
                 'Constraints
                 '-----------
-                ReDim .Constraints(Me.List_Constraints.GetUpperBound(0))
+                ReDim .Constrain(Me.List_Constraints.GetUpperBound(0))
                 For j = 0 To Me.List_Constraints.GetUpperBound(0)
-                    .Constraints(j) = ds.Tables(0).Rows(i).Item(Me.List_Constraints(j).Bezeichnung)
+                    .Constrain(j) = ds.Tables(0).Rows(i).Item(Me.List_Constraints(j).Bezeichnung)
                 Next
             End With
 

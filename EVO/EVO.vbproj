@@ -205,7 +205,6 @@
     </Compile>
     <Compile Include="OptResult.vb" />
     <Compile Include="Settings.vb" />
-    <Compile Include="Solution.vb" />
     <EmbeddedResource Include="Apps\SensiPlot.resx">
       <DependentUpon>SensiPlot.vb</DependentUpon>
       <SubType>Designer</SubType>
