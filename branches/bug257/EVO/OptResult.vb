@@ -27,7 +27,7 @@ Public Class OptResult
 
     'Optimierungsbedingungen
     Public List_OptZiele() As Sim.Struct_OptZiel
-    Public List_OptParameter() As Sim.Struct_OptParameter
+    Public List_OptParameter() As EVO.Kern.OptParameter
     Public List_Constraints() As Sim.Struct_Constraint
     Public List_Locations()As Sim.Struct_Lokation
 
@@ -421,7 +421,7 @@ Public Class OptResult
             fieldvalues = ""
             For i = 0 To Me.List_OptParameter.GetUpperBound(0)
                 fieldnames &= ", [" & Me.List_OptParameter(i).Bezeichnung & "]"
-                fieldvalues &= ", " & ind.PES_X(i).ToString(Sim.FortranProvider)
+                fieldvalues &= ", " & ind.PES_OptParas(i).RWert.ToString(Sim.FortranProvider)
             Next
             command.CommandText = "INSERT INTO OptParameter (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
             command.ExecuteNonQuery()
@@ -538,7 +538,7 @@ Public Class OptResult
 
         'TODO: eigentlich müsste die ID aus der db übernommen werden
         ind = New Kern.Individuum("Solution", 0)
-        ReDim ind.PES_X(Me.List_OptParameter.GetUpperBound(0))
+        ReDim ind.PES_OptParas(Me.List_OptParameter.GetUpperBound(0))
 
         Call db_connect()
 
@@ -574,7 +574,7 @@ Public Class OptResult
 
                 'OptParametersatz übernehmen
                 For i As Integer = 0 To Me.List_OptParameter.GetUpperBound(0)
-                    ind.PES_X(i) = ds.Tables("OptParameter").Rows(0).Item(Me.List_OptParameter(i).Bezeichnung)
+                    ind.PES_OptParas(i) = ds.Tables("OptParameter").Rows(0).Item(Me.List_OptParameter(i).Bezeichnung)
                 Next
 
                 isOK = True
@@ -725,9 +725,9 @@ Public Class OptResult
                 .ID = ds.Tables(0).Rows(i).Item("Sim.ID")
                 'OptParameter
                 '------------
-                ReDim .PES_X(Me.List_OptParameter.GetUpperBound(0))
+                ReDim .PES_OptParas(Me.List_OptParameter.GetUpperBound(0))
                 For j = 0 To Me.List_OptParameter.GetUpperBound(0)
-                    .PES_X(j) = ds.Tables(0).Rows(i).Item(Me.List_OptParameter(j).Bezeichnung)
+                    .PES_OptParas(j) = ds.Tables(0).Rows(i).Item(Me.List_OptParameter(j).Bezeichnung)
                 Next
                 'QWerte
                 '------

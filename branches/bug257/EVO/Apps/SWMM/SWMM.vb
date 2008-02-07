@@ -422,41 +422,10 @@ Public Class SWMM
 
     End Function
 
-
-    'Kopiert ein Strukt_OptParameter
-    '**********************************
-    Private Sub copy_Struct_OptParameter(ByVal Source As Struct_OptParameter, ByRef Destination As Struct_OptParameter)
-
-        Destination.Bezeichnung = Source.Bezeichnung
-        Destination.Einheit = Source.Einheit
-        Destination.Wert = Source.Wert
-        Destination.Min = Source.Min
-        Destination.Max = Source.Max
-        Destination.SKWert = Source.SKWert
-
-    End Sub
-
-    'Kopiert ein Strukt_ModellParameter
-    '**********************************
-    Private Sub copy_Struct_ModellParameter(ByVal Source As Struct_ModellParameter, ByRef Destination As Struct_ModellParameter)
-
-        Destination.OptParameter = Source.OptParameter
-        Destination.Bezeichnung = Source.Bezeichnung
-        Destination.Einheit = Source.Einheit
-        Destination.Datei = Source.Datei
-        Destination.Element = Source.Element
-        Destination.ZeileNr = Source.ZeileNr
-        Destination.SpVon = Source.SpVon
-        Destination.SpBis = Source.SpBis
-        Destination.Faktor = Source.Faktor
-        Destination.Wert = Source.Wert
-
-    End Sub
-
 #End Region
-
 
     Protected Overrides Sub Finalize()
         MyBase.Finalize()
     End Sub
+
 End Class

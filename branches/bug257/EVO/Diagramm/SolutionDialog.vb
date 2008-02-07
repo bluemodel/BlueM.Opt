@@ -36,7 +36,7 @@ Partial Public Class SolutionDialog
 
     'Konstruktor
     '***********
-    Public Sub New(ByVal lOptPara() As Sim.Struct_OptParameter, ByVal lOptZiele() As Sim.Struct_OptZiel, ByVal lConst() As Sim.Struct_Constraint)
+    Public Sub New(ByVal lOptPara() As EVO.Kern.OptParameter, ByVal lOptZiele() As Sim.Struct_OptZiel, ByVal lConst() As Sim.Struct_Constraint)
 
         ' Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent()
@@ -58,7 +58,7 @@ Partial Public Class SolutionDialog
         '------------
         cellstyle.BackColor = Color.LightGray
 
-        For Each OptPara As Sim.Struct_OptParameter In lOptPara
+        For Each OptPara As EVO.Kern.OptParameter In lOptPara
             column = New DataGridViewTextBoxColumn()
             column.ReadOnly = True
             column.HeaderText = OptPara.Bezeichnung
@@ -119,8 +119,8 @@ Partial Public Class SolutionDialog
 
         i = 1
 
-        For Each optpara As Double In ind.PES_X
-            cellvalues(i) = optpara
+        For Each optpara As Kern.OptParameter In ind.PES_OptParas
+            cellvalues(i) = optpara.RWert
             i += 1
         Next
 
