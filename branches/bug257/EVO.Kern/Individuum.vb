@@ -201,11 +201,7 @@ Public Class Individuum
 
         For i = 0 To Me.Loc.GetUpperBound(0)
 
-            'For j = 0 To Me.Loc(i).PES_OptPara.GetUpperBound(0)
-            '    Me.Loc(i).PES_OptPara(j).Xn = 777
-            '    Me.Loc(i).PES_OptPara(j).Bezeichnung = "xxx"
-            '    Me.Loc(i).PES_OptPara(j).Dn = 777
-            'Next
+            ReDim Me.Loc(i).PES_OptPara(-1)
 
             '11a Die Elemente die zur Location gehören
             ReDim Me.Loc(i).Loc_Elem(0)
@@ -264,9 +260,13 @@ Public Class Individuum
         Dest.mutated = Me.mutated
 
         '06a Array für PES Parameter
-        'TODO: OptParameter.Clone() Funktion nutzen?
-        ReDim Dest.PES_OptParas(Me.PES_OptParas.GetUpperBound(0))
-        Array.Copy(Me.PES_OptParas, Dest.PES_OptParas, Me.PES_OptParas.GetLength(0))
+        If me.PES_OptParas.GetUpperBound(0) = -1
+            Redim Dest.PES_OptParas(-1)
+        else
+            For j = 0 to me.loc(i).PES_OptPara.GetUpperBound(0)
+                Dest.PES_OptParas(j) = me.PES_OptParas(j).Clone
+            Next
+        End If
 
         '07 Kennzeichnung ob Dominiert
         Dest.dominated = Me.dominated
@@ -285,15 +285,18 @@ Public Class Individuum
         ReDim Dest.Loc(Me.Loc.GetUpperBound(0))
 
         For i = 0 To Me.Loc.GetUpperBound(0)
-            Redim Dest.PES_OptParas(Me.Loc(i).PES_OptPara.GetUpperBound(0))
 
-            For j = 0 to Me.Loc(i).PES_OptPara.GetUpperBound(0)
-
-                dest.PES_OptParas(i).Xn = Me.Loc(i).PES_OptPara(j).Xn
-                dest.PES_OptParas(i).Dn = Me.Loc(i).PES_OptPara(j).Dn
-                dest.PES_OptParas(i).Bezeichnung = Me.Loc(i).PES_OptPara(j).Bezeichnung
-
-            Next
+            'Falls nur CES gibt es keine OptParameter
+            If me.loc(i).PES_OptPara.GetUpperBound(0) = -1
+                Redim Dest.loc(i).PES_OptPara(-1)
+            else
+                Redim Dest.PES_OptParas(Me.Loc(i).PES_OptPara.GetUpperBound(0))
+                For j = 0 to Me.Loc(i).PES_OptPara.GetUpperBound(0)
+                    dest.PES_OptParas(i).Xn = Me.Loc(i).PES_OptPara(j).Xn
+                    dest.PES_OptParas(i).Dn = Me.Loc(i).PES_OptPara(j).Dn
+                    dest.PES_OptParas(i).Bezeichnung = Me.Loc(i).PES_OptPara(j).Bezeichnung
+                Next
+            End If
 
             '11a Die Elemente die zur Location gehören
             ReDim Dest.Loc(i).Loc_Elem(Me.Loc(i).Loc_Elem.GetUpperBound(0))
