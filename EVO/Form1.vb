@@ -930,7 +930,9 @@ Partial Class Form1
             'Child Schleife
             'xxxxxxxxxxxxxx
             For i = 0 To EVO_Einstellungen1.Settings.CES.n_Childs - 1
+
                 durchlauf_all += 1
+                CES1.Childs(i).ID = durchlauf_all
 
                 Call EVO_Opt_Verlauf1.Nachfolger(i + 1)
 
