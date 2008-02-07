@@ -28,7 +28,7 @@ Public Class EVO_Einstellungen
         Me.msettings = New EVO.Kern.EVO_Settings()
         'Standard-Settings setzen
         Call Me.msettings.PES.setStandard(EVO_MODUS.Single_Objective)
-        Call Me.msettings.CES.setStandard("CES")
+        Call Me.msettings.CES.setStandard(Evo.METH_CES)
         Call Me.msettings.HookJeeves.setStandard()
         'Comboboxen füllen
         Call Me.InitComboboxes()
@@ -95,9 +95,9 @@ Public Class EVO_Einstellungen
 
     'CES
     '---
-    Private Sub OptModus_Change_ActDeact_CES(byval Method as String)
+    Private Sub OptModus_Change_ActDeact_CES()
 
-        Select Case Method
+        Select Case Evo.Form1.Method
 
             Case evo.METH_CES
                 GroupBox_Hybrid.Enabled = false
@@ -287,7 +287,7 @@ Public Class EVO_Einstellungen
 
     'Einstellungen in Form schreiben
     '*******************************
-    Private Sub writeForm(byVal Method as String)
+    Private Sub writeForm()
         
         'PES
         '---
@@ -333,7 +333,7 @@ Public Class EVO_Einstellungen
         '---
         With Me.msettings.CES
 
-            Call OptModus_Change_ActDeact_CES(Method)
+            Call OptModus_Change_ActDeact_CES()
 
             'me.Combo_CES_IniValues.SelectedItem = .
             me.Numeric_CES_n_Generations.Value = .n_Generations
@@ -380,23 +380,23 @@ Public Class EVO_Einstellungen
 
     'Standardeinstellungen setzen (PES)
     '**********************************
-    Public Sub setStandard_PES(ByVal modus As Kern.EVO_MODUS, byVal Method as String)
+    Public Sub setStandard_PES(ByVal modus As Kern.EVO_MODUS)
         Call Me.msettings.PES.setStandard(modus)
-        Call Me.writeForm(Method)
+        Call Me.writeForm()
     End Sub
 
     'Standardeinstellungen setzen (CES)
     '**********************************
-    Public Sub setStandard_CES(ByVal Method As String)
-        Call Me.msettings.CES.setStandard(Method)
-        Call Me.writeForm(Method)
+    Public Sub setStandard_CES()
+        Call Me.msettings.CES.setStandard(Evo.Form1.Method)
+        Call Me.writeForm()
     End Sub
 
     'Standardeinstellungen setzen für HJ
     '***********************************
-    Public Sub setStandard_HJ(ByVal Method As String)
+    Public Sub setStandard_HJ()
         Call Me.msettings.HookJeeves.setStandard()
-        Call Me.writeForm(Method)
+        Call Me.writeForm()
     End Sub
 
     'PES_Settings Property
@@ -428,7 +428,7 @@ Public Class EVO_Einstellungen
 
     'Laden der EVO_Settings aus einer XML-Datei
     '******************************************
-    Public Sub loadSettings(ByVal filename As String, byval Method as String)
+    Public Sub loadSettings(ByVal filename As String)
 
         Dim serializer As New XmlSerializer(GetType(EVO.Kern.EVO_Settings))
 
@@ -444,7 +444,7 @@ Public Class EVO_Einstellungen
         fs.Close()
 
         'Geladene Settings in Form schreiben
-        Call Me.writeForm(Method)
+        Call Me.writeForm()
 
     End Sub
 
