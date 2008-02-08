@@ -47,44 +47,23 @@ Public MustInherit Class Sim
     Public Const Constraints_Ext As String = "CON"       'Erweiterung der Datei mit den Constraints (*.CON)
     Public Const Combi_Ext As String = "CES"             'Erweiterung der Datei mit der Kombinatorik  (*.CES)
 
-    'Optimierungsparameter
-    '---------------------
-    Public Structure Struct_OptParameter
-        Public Bezeichnung As String                        'Bezeichnung
-        Public Einheit As String                            'Einheit
-        Public Wert As Double                               'Parameterwert
-        Public Min As Double                                'Minimum
-        Public Max As Double                                'Maximum
-        Public Beziehung As EVO.Kern.PES.Beziehung          'Beziehung zum vorherigen OptParameter
-        Public Property SKWert() As Double                  'skalierter Wert (0 bis 1)
-            Get
-                SKWert = (Wert - Min) / (Max - Min)
-                Exit Property
-            End Get
-            Set(ByVal value As Double)
-                Wert = value * (Max - Min) + Min
-            End Set
-        End Property
-        Public Overrides Function toString() As String
-            Return Bezeichnung
-        End Function
-    End Structure
-
-    Public List_OptParameter() As Struct_OptParameter       'Liste der Optimierungsparameter
-    Public List_OptParameter_Save() As Struct_OptParameter  'Liste der Optimierungsparameter die nicht verändert wird
+    Public List_OptParameter() As EVO.Kern.OptParameter             'Liste der Optimierungsparameter
+    Public List_OptParameter_Save() As EVO.Kern.OptParameter        'Liste der Optimierungsparameter die nicht verändert wird
 
     'Gibt die OptParameter als Array zurück
     '**************************************
     Public Function MyPara as Double()
-        Dim i as Integer
-        Dim Array(-1) as Double
+
+        Dim i As Integer
+
+        ReDim MyPara(Me.List_OptParameter.GetUpperBound(0))
 
         For i = 0 To List_OptParameter.GetUpperBound(0)
-            Redim preserve MyPara(MyPara.GetUpperBound(0) + 1)
-            MyPara(i) = List_OptParameter(i).SKWert
+            MyPara(i) = List_OptParameter(i).Xn
         Next
 
-        MyPara = Array.Clone
+        Return MyPara
+
     End Function
 
     'ModellParameter
@@ -386,11 +365,13 @@ Public MustInherit Class Sim
         Do
             Zeile = StrRead.ReadLine.ToString()
             If (Zeile.StartsWith("*") = False) Then
+                'OptParameter instanzieren
+                List_OptParameter(i) = New EVO.Kern.OptParameter()
                 array = Zeile.Split("|")
                 'Werte zuweisen
                 List_OptParameter(i).Bezeichnung = array(1).Trim()
                 List_OptParameter(i).Einheit = array(2).Trim()
-                List_OptParameter(i).Wert = Convert.ToDouble(array(3).Trim(), Sim.FortranProvider)
+                List_OptParameter(i).StartWert = Convert.ToDouble(array(3).Trim(), Sim.FortranProvider)
                 List_OptParameter(i).Min = Convert.ToDouble(array(4).Trim(), Sim.FortranProvider)
                 List_OptParameter(i).Max = Convert.ToDouble(array(5).Trim(), Sim.FortranProvider)
                 'liegt eine Beziehung vor?
@@ -408,7 +389,7 @@ Public MustInherit Class Sim
 
         'OptParameter werden hier gesichert
         For i = 0 To List_OptParameter.GetUpperBound(0)
-            Call copy_Struct_OptParameter(List_OptParameter(i), List_OptParameter_Save(i))
+            List_OptParameter_Save(i) = List_OptParameter(i).Clone()
         Next
 
     End Sub
@@ -862,7 +843,7 @@ Public MustInherit Class Sim
         Dim i As Integer
 
         For i = 0 To List_OptParameter.GetUpperBound(0)
-            If Not List_OptParameter(i).Wert <= List_OptParameter(i).Max Or Not List_OptParameter(i).Wert >= List_OptParameter(i).Min Then
+            If Not List_OptParameter(i).RWert <= List_OptParameter(i).Max Or Not List_OptParameter(i).RWert >= List_OptParameter(i).Min Then
                 Throw New Exception("Der Optimierungsparameter " & List_OptParameter(i).Bezeichnung & " in der .OPT Datei liegt nicht innerhalb der dort genannten Grenzen.")
             End If
         Next
@@ -997,7 +978,7 @@ Public MustInherit Class Sim
 
     'Die Elemente werden pro Location im Child gespeichert
     '*****************************************************
-    Public Sub Identify_Measures_Elements_Parameters(ByVal No_Loc As Integer, ByVal No_Measure As Integer, ByRef Measure As String, ByRef Elements() As String, ByRef Para(,) As Object)
+    Public Sub Identify_Measures_Elements_Parameters(ByVal No_Loc As Integer, ByVal No_Measure As Integer, ByRef Measure As String, ByRef Elements() As String, ByRef PES_OptPara() As kern.OptParameter)
 
         Dim i, j As Integer
         Dim x As Integer
@@ -1026,14 +1007,15 @@ Public MustInherit Class Sim
         For i = 0 To Elements.GetUpperBound(0)
             For j = 0 To List_OptParameter.GetUpperBound(0)
                 If Elements(i) = Left(List_OptParameter(j).Bezeichnung, 4) Then
-                    ReDim Preserve Para(1, x)
-                    Para(0, x) = List_OptParameter(j).Bezeichnung
-                    Para(1, x) = List_OptParameter(j).SKWert
+                    ReDim Preserve PES_OptPara(x)
+                    PES_OptPara(x) = New Kern.OptParameter
+                    PES_OptPara(x).Bezeichnung = List_OptParameter(j).Bezeichnung
+                    PES_OptPara(x).Xn = List_OptParameter(j).Xn
                     x += 1
                 End If
             Next
         Next
-        If x = 0 Then ReDim Preserve Para(1, -1)
+        If x = 0 Then ReDim Preserve PES_OptPara(-1)
 
     End Sub
 
@@ -1161,14 +1143,14 @@ Public MustInherit Class Sim
 
             'Reduzierung der OptParameter
             'xxxxxxxxxxxxxxxxxxxxxxxxxxxx
-            Dim TMP_OptPara() As Struct_OptParameter
+            Dim TMP_OptPara() As EVO.Kern.OptParameter
             ReDim TMP_OptPara(List_OptParameter.GetUpperBound(0))
 
             count = 0
             For i = 0 To List_OptParameter.GetUpperBound(0)
                 For j = 0 To List_ModellParameter.GetUpperBound(0)
                     If List_OptParameter(i).Bezeichnung = List_ModellParameter(j).OptParameter Then
-                        Call copy_Struct_OptParameter(List_OptParameter(i), TMP_OptPara(count))
+                        TMP_OptPara(count) = List_OptParameter(i).Clone()
                         count += 1
                         j = List_ModellParameter.GetUpperBound(0)
                     End If
@@ -1184,7 +1166,7 @@ Public MustInherit Class Sim
             Array.Resize(List_OptParameter, count)
 
             For i = 0 To TMP_OptPara.GetUpperBound(0)
-                Call copy_Struct_OptParameter(TMP_OptPara(i), List_OptParameter(i))
+                List_OptParameter(i) = TMP_OptPara(i).Clone()
             Next
 
         End If
@@ -1204,7 +1186,7 @@ Public MustInherit Class Sim
         Next
         ReDim List_OptParameter(List_OptParameter_Save.GetUpperBound(0))
         For i = 0 To List_OptParameter_Save.GetUpperBound(0)
-            copy_Struct_OptParameter(List_OptParameter_Save(i), List_OptParameter(i))
+            List_OptParameter(i) = List_OptParameter_Save(i).Clone()
         Next
 
     End Sub
@@ -1225,7 +1207,7 @@ Public MustInherit Class Sim
             For j = 0 To List_Locations(Loc).List_Massnahmen(Measure).Bauwerke.GetUpperBound(0)
                 If Left(List_OptParameter(i).Bezeichnung, 4) = List_Locations(Loc).List_Massnahmen(Measure).Bauwerke(j) Then
                     Parameter(0, x) = List_OptParameter(i).Bezeichnung
-                    Parameter(1, x) = List_OptParameter(i).SKWert
+                    Parameter(1, x) = List_OptParameter(i).Xn
                     x += 1
                     ReDim Preserve Parameter(1, x)
                 End If
@@ -1260,35 +1242,19 @@ Public MustInherit Class Sim
 
     End Sub
 
-    'Kopiert ein Strukt_OptParameter
-    '**********************************
-    Private Sub copy_Struct_OptParameter(ByVal Source As Struct_OptParameter, ByRef Destination As Struct_OptParameter)
-
-        Destination.Bezeichnung = Source.Bezeichnung
-        Destination.Einheit = Source.Einheit
-        Destination.Wert = Source.Wert
-        Destination.Min = Source.Min
-        Destination.Max = Source.Max
-        Destination.SKWert = Source.SKWert
-        Destination.Beziehung = Source.Beziehung
-
-    End Sub
-
     'EVO-Parameterübergabe die Standard Parameter werden aus den Listen der OptPara und OptZiele ermittelt
     '*****************************************************************************************************
-    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara() As Double, ByRef beziehungen() As EVO.Kern.PES.Beziehung)
+    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara() As EVO.Kern.OptParameter)
 
         Dim i As Integer
 
         'Anzahl Optimierungsparameter übergeben
         globalAnzPar = Me.List_OptParameter.GetLength(0)
 
-        'Parameterwerte und Beziehungen übergeben
+        'Parameter übergeben
         ReDim mypara(globalAnzPar - 1)
-        ReDim beziehungen(globalAnzPar - 1)
         For i = 0 To globalAnzPar - 1
-            mypara(i) = Me.List_OptParameter(i).SKWert
-            beziehungen(i) = Me.List_OptParameter(i).Beziehung
+            mypara(i) = Me.List_OptParameter(i).Clone()
         Next
 
         'Anzahl Optimierungsziele übergeben
@@ -1301,13 +1267,13 @@ Public MustInherit Class Sim
 
     'Evaluierung des SimModells für ParameterOptimierung - Steuerungseinheit
     '***********************************************************************
-    Public Sub PREPARE_Evaluation_PES(ByVal myPara() As Double)
+    Public Sub PREPARE_Evaluation_PES(ByVal myPara() As EVO.Kern.OptParameter)
 
         Dim i As Short
 
         'Mutierte Parameter an OptParameter übergeben
         For i = 0 To Me.List_OptParameter.GetUpperBound(0)
-            List_OptParameter(i).SKWert = myPara(i)
+            List_OptParameter(i).Xn = myPara(i).Xn
         Next
 
         'Mutierte Parameter in Eingabedateien schreiben
@@ -1315,6 +1281,22 @@ Public MustInherit Class Sim
 
     End Sub
 
+    'Evaluierung des SimModells für ParameterOptimierung - Steuerungseinheit
+    'HACK: Überladene Methode für altes Parameterarray (BUG 257)
+    '***********************************************************************
+    Public Sub PREPARE_Evaluation_PES(ByVal myPara() As Double)
+
+        Dim i As Short
+
+        'Mutierte Parameter an OptParameter übergeben
+        For i = 0 To Me.List_OptParameter.GetUpperBound(0)
+            List_OptParameter(i).Xn = myPara(i)
+        Next
+
+        'Mutierte Parameter in Eingabedateien schreiben
+        Call Write_ModellParameter()
+
+    End Sub
 
     'Die ModellParameter in die Eingabedateien des SimModells schreiben
     '******************************************************************
@@ -1455,7 +1437,7 @@ Public MustInherit Class Sim
         For i = 0 To List_ModellParameter.GetUpperBound(0)
             For j = 0 To List_OptParameter.GetUpperBound(0)
                 If List_ModellParameter(i).OptParameter = List_OptParameter(j).Bezeichnung Then
-                    List_ModellParameter(i).Wert = List_OptParameter(j).Wert * List_ModellParameter(i).Faktor
+                    List_ModellParameter(i).Wert = List_OptParameter(j).RWert * List_ModellParameter(i).Faktor
                 End If
             Next
         Next
