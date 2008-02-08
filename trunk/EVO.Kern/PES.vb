@@ -49,7 +49,7 @@ Public Class PES
         Dim Bez() As Beziehung              'Beziehungen
     End Structure
 
-    Private AktPara As Struct_AktPara
+    Private AktPara() As OptParameter
 
     'Diese Struktur speichert den aktuellen Zustand
     'ToDo: Könnte man auch entfernen wenn man die Schleifenkontrolle ins Form legt
@@ -125,7 +125,7 @@ Public Class PES
 
     'Initialisierung der PES
     '***************************************
-    Public Sub PesInitialise(ByRef settings As EVO_Settings, ByVal AnzPara As Integer, ByVal AnzPenalty As Integer, ByVal AnzConstr As Integer, ByRef Parameter() As Double, ByVal beziehungen() As Beziehung, ByVal Method As String)
+    Public Sub PesInitialise(ByRef settings As EVO_Settings, ByVal AnzPara As Integer, ByVal AnzPenalty As Integer, ByVal AnzConstr As Integer, ByRef Parameter() As OptParameter, ByVal Method As String)
 
         'Schritt 1: PES - SETTINGS
         'Optionen der Evolutionsstrategie werden übergeben
@@ -137,7 +137,7 @@ Public Class PES
 
         'Schritt 3: PES - STARTVALUES
         'Startwerte werden zugewiesen
-        Call PES_Startvalues(Parameter, beziehungen)
+        Call PES_Startvalues(Parameter)
 
     End Sub
 
@@ -230,12 +230,10 @@ Public Class PES
         'Anzahlen werden gesetzt
         Anz.Para = AnzPara                         'Anzahl der Parameter wird übergeben
         Anz.Penalty = AnzPenalty                   'Anzahl der Zielfunktionen wird übergeben
-        Anz.Constr = AnzConstr                 'Anzahl der Randbedingungen wird übergeben
+        Anz.Constr = AnzConstr                     'Anzahl der Randbedingungen wird übergeben
 
         'Dynamisches Array Initialisieren
-        ReDim AktPara.Xn(Anz.Para - 1)                'Variablenvektor wird initialisiert
-        ReDim AktPara.Bez(Anz.Para - 1)
-        ReDim AktPara.Dn(Anz.Para - 1)                'Schrittweitenvektor wird initialisiert
+        ReDim AktPara(Anz.Para - 1)                'Variablenvektor wird initialisiert
 
         'Parametervektoren initialisieren
         ReDim Dp(Anz.Para - 1, Settings.PES.n_Eltern - 1, Settings.PES.Pop.n_PopEltern - 1)
@@ -260,10 +258,6 @@ Public Class PES
         If (Settings.PES.OptModus = EVO_MODUS.Multi_Objective) Then
             ReDim NDSorting(Settings.PES.n_Eltern + Settings.PES.n_Nachf - 1)
             Call Individuum.New_Array("NDSorting", NDSorting)
-            For i = 0 To Settings.PES.n_Eltern + Settings.PES.n_Nachf - 1
-                ReDim NDSorting(i).PES_d(Anz.Para - 1)
-                ReDim NDSorting(i).PES_X(Anz.Para - 1)
-            Next i
             If (Settings.PES.OptEltern = EVO_ELTERN.Neighbourhood) Then
                 ReDim PenaltyDistance(Settings.PES.n_Eltern - 1, Settings.PES.n_Eltern - 1)
                 ReDim Distanceb(Settings.PES.n_Eltern - 1)
@@ -327,18 +321,23 @@ Public Class PES
     'PES_Settings.iStartPar 2: Originalparameter    -> Schrittweite = Startschrittweite
     '                                               -> Parameterwert = Originalparameter
     '***********************************************************************************
-    Public Sub PES_Startvalues(ByVal Parameter() As Double, ByVal beziehungen() As Beziehung)
+    Public Sub PES_Startvalues(ByVal Parameter() As OptParameter)
 
         Dim i As Integer
 
+        'Check
+        If (Parameter.Length <> Anz.Para) Then
+            Throw New Exception("Falsche Anzahl Parameter übergeben!")
+        End If
+
         'Dynamisches Array wird mit Werten belegt
         For i = 0 To Anz.Para - 1
-            If Parameter(i) < 0 Or Parameter(i) > 1 Then
-                Throw New Exception("Der Startparameter " & i & " liegt nicht zwischen 0 und 1. Sie müssen hier skaliert vorliegen")
+            If (Parameter(i).Xn < 0 Or Parameter(i).Xn > 1) Then
+                Throw New Exception("Der Startparameter '" & Parameter(i).Bezeichnung & "' liegt nicht zwischen 0 und 1. Sie müssen hier skaliert vorliegen")
             End If
-            AktPara.Xn(i) = Parameter(i)
-            AktPara.Bez(i) = beziehungen(i)
-            AktPara.Dn(i) = Settings.PES.Schrittweite.DnStart
+            AktPara(i) = Parameter(i).Clone()
+            'Startschrittweite übernehmen
+            AktPara(i).Dn = Settings.PES.Schrittweite.DnStart
         Next
 
         Dim n, v, m As Integer
@@ -354,7 +353,7 @@ Public Class PES
                     For n = 0 To Settings.PES.n_Eltern - 1
                         For m = 0 To Settings.PES.Pop.n_PopEltern - 1
                             'Startwert für die Elternschrittweite wird zugewiesen
-                            Dp(v, n, m) = AktPara.Dn(0)
+                            Dp(v, n, m) = AktPara(0).Dn
                             'Startwert für die Eltern werden zugewiesen
                             '(Zufallszahl zwischen 0 und 1)
                             Xp(v, n, m) = Rnd()
@@ -367,10 +366,10 @@ Public Class PES
                     For n = 0 To Settings.PES.n_Eltern - 1
                         For m = 0 To Settings.PES.Pop.n_PopEltern - 1
                             'Startwert für die Elternschrittweite wird zugewiesen
-                            Dp(v, n, m) = AktPara.Dn(0)
+                            Dp(v, n, m) = AktPara(0).Dn
                             'Startwert für die Eltern werden zugewiesen
                             '(alle gleich Anfangswerte)
-                            Xp(v, n, m) = AktPara.Xn(v)
+                            Xp(v, n, m) = AktPara(v).Xn
                         Next m
                     Next n
                 Next v
@@ -379,23 +378,23 @@ Public Class PES
     End Sub
 
     'Überladen: Falls Startwerte aus CES kommen!
-    Public Sub EsStartvalues(ByVal is_Pop As Boolean, ByVal AktDn() As Double, ByVal AktXn() As Double, ByVal IndexElter As Integer)
+    Public Sub EsStartvalues(ByVal is_Pop As Boolean, ByVal Parameter() As OptParameter, ByVal IndexElter As Integer)
 
         Dim v As Integer
 
         For v = 0 To Anz.Para - 1
             If is_Pop = True Then
                 'Startwert für die Elternschrittweite wird zugewiesen
-                Dp(v, IndexElter, 0) = AktDn(v)
+                Dp(v, IndexElter, 0) = Parameter(v).Dn
                 'Startwert für die Eltern werden zugewiesen
                 '(alle gleich Anfangswerte)
-                Xp(v, IndexElter, 0) = AktXn(v)
+                Xp(v, IndexElter, 0) = Parameter(v).Xn
             Else
                 'Startwert für die Elternschrittweite wird zugewiesen
-                De(v, IndexElter, 0) = AktDn(v)
+                De(v, IndexElter, 0) = Parameter(v).Dn
                 'Startwert für die Eltern werden zugewiesen
                 '(alle gleich Anfangswerte)
-                Xe(v, IndexElter, 0) = AktXn(v)
+                Xe(v, IndexElter, 0) = Parameter(v).Xn
 
             End If
         Next v
@@ -405,17 +404,9 @@ Public Class PES
 
     'ES_GET_PARAMETER - dient zur Rückgabe der mutierten Parameter
     '*************************************************************
-    Public Function EsGetParameter() As Double()
+    Public Function EsGetParameter() As OptParameter()
 
-        Return AktPara.Xn
-
-    End Function
-
-    'ES_GET_DN - dient zur Rückgabe der Schrittweite
-    '*************************************************************
-    Public Function EsGetDN() As Double()
-
-        Return AktPara.Dn
+        Return AktPara
 
     End Function
 
@@ -539,9 +530,9 @@ Public Class PES
                 'welcher Enternteil vererbt wird
                 For v = 0 To Anz.Para - 1
                     'Selektion der Schrittweite
-                    AktPara.Dn(v) = De(v, R, PES_iAkt.iAktPop)
+                    AktPara(v).Dn = De(v, R, PES_iAkt.iAktPop)
                     'Selektion des Elter
-                    AktPara.Xn(v) = Xe(v, R, PES_iAkt.iAktPop)
+                    AktPara(v).Xn = Xe(v, R, PES_iAkt.iAktPop)
                 Next v
 
             Case EVO_ELTERN.XX_Diskret 'Multi-Rekombination, diskret
@@ -549,35 +540,35 @@ Public Class PES
                 For v = 0 To Anz.Para - 1
                     R = Int(Settings.PES.n_Eltern * Rnd())
                     'Selektion der Schrittweite
-                    AktPara.Dn(v) = De(v, R, PES_iAkt.iAktPop)
+                    AktPara(v).Dn = De(v, R, PES_iAkt.iAktPop)
                     'Selektion des Elter
-                    AktPara.Xn(v) = Xe(v, R, PES_iAkt.iAktPop)
+                    AktPara(v).Xn = Xe(v, R, PES_iAkt.iAktPop)
                 Next v
 
             Case EVO_ELTERN.XX_Mitteln 'Multi-Rekombination, gemittelt
 
                 For v = 0 To Anz.Para - 1
-                    AktPara.Dn(v) = 0
-                    AktPara.Xn(v) = 0
+                    AktPara(v).Dn = 0
+                    AktPara(v).Xn = 0
 
                     For n = 0 To Settings.PES.n_Eltern - 1
                         'Mittelung der Schrittweite,
-                        AktPara.Dn(v) = AktPara.Dn(v) + (De(v, n, PES_iAkt.iAktPop) / Settings.PES.n_Eltern)
+                        AktPara(v).Dn = AktPara(v).Dn + (De(v, n, PES_iAkt.iAktPop) / Settings.PES.n_Eltern)
                         'Mittelung der Eltern,
-                        AktPara.Xn(v) = AktPara.Xn(v) + (Xe(v, n, PES_iAkt.iAktPop) / Settings.PES.n_Eltern)
+                        AktPara(v).Xn = AktPara(v).Xn + (Xe(v, n, PES_iAkt.iAktPop) / Settings.PES.n_Eltern)
                     Next
                 Next v
 
             Case EVO_ELTERN.XX_Mitteln_Diskret
                 For v = 0 To Anz.Para - 1
-                    AktPara.Dn(v) = 0
+                    AktPara(v).Dn = 0
                     R = Int(Settings.PES.n_Eltern * Rnd())
                     'Mittelung der Schrittweite
                     For n = 0 To Settings.PES.n_Eltern - 1
-                        AktPara.Dn(v) = AktPara.Dn(v) + (De(v, n, PES_iAkt.iAktPop) / Settings.PES.n_Eltern)
+                        AktPara(v).Dn = AktPara(v).Dn + (De(v, n, PES_iAkt.iAktPop) / Settings.PES.n_Eltern)
                     Next
                     'Selektion des Elter
-                    AktPara.Xn(v) = Xe(v, R, PES_iAkt.iAktPop)
+                    AktPara(v).Xn = Xe(v, R, PES_iAkt.iAktPop)
                 Next v
 
 
@@ -586,7 +577,7 @@ Public Class PES
                 'Anzahl der benötigten Eltern (Y)
                 ReDim Realisierungsspeicher(Settings.PES.n_RekombXY - 1)
                 'Anzahl der Verfügbaren Eltern (n_Eltern)
-                ReDim Elternspeicher(Settings.PES.n_Eltern - 1) 
+                ReDim Elternspeicher(Settings.PES.n_Eltern - 1)
                 'Setzen der Eltern Indizes
                 For i = 0 To (Settings.PES.n_Eltern - 1)
                     Elternspeicher(i) = i
@@ -636,11 +627,11 @@ Public Class PES
                     Next j
                 Next i
                 For v = 0 To Anz.Para - 1
-                    R = cint(Int(Settings.PES.n_RekombXY * Rnd()))
+                    R = CInt(Int(Settings.PES.n_RekombXY * Rnd()))
                     'Selektion der Schrittweite
-                    AktPara.Dn(v) = De(v, Realisierungsspeicher(R), PES_iAkt.iAktPop)
+                    AktPara(v).Dn = De(v, Realisierungsspeicher(R), PES_iAkt.iAktPop)
                     'Selektion des Elter
-                    AktPara.Xn(v) = Xe(v, Realisierungsspeicher(R), PES_iAkt.iAktPop)
+                    AktPara(v).Xn = Xe(v, Realisierungsspeicher(R), PES_iAkt.iAktPop)
                 Next v
 
 
@@ -693,21 +684,21 @@ Public Class PES
                     Else
                         R = CInt(Int((Settings.PES.n_Eltern - (i)) * Rnd()))
                     End If
-                        'Kein Elter darf doppelt gezogen werden
-                        Realisierungsspeicher(i) = Elternspeicher(R)
-                        For j = R To Settings.PES.n_Eltern - 2
-                            Elternspeicher(j) = Elternspeicher(j + 1)
-                        Next j
+                    'Kein Elter darf doppelt gezogen werden
+                    Realisierungsspeicher(i) = Elternspeicher(R)
+                    For j = R To Settings.PES.n_Eltern - 2
+                        Elternspeicher(j) = Elternspeicher(j + 1)
+                    Next j
                 Next i
 
                 For v = 0 To Anz.Para - 1
-                    AktPara.Dn(v) = 0
-                    AktPara.Xn(v) = 0
+                    AktPara(v).Dn = 0
+                    AktPara(v).Xn = 0
                     For n = 0 To Settings.PES.n_RekombXY - 1
                         'Mittelung der Schrittweite,
-                        AktPara.Dn(v) = AktPara.Dn(v) + (De(v, Realisierungsspeicher(n), PES_iAkt.iAktPop) / Settings.PES.n_RekombXY)
+                        AktPara(v).Dn = AktPara(v).Dn + (De(v, Realisierungsspeicher(n), PES_iAkt.iAktPop) / Settings.PES.n_RekombXY)
                         'Mittelung der Eltern,
-                        AktPara.Xn(v) = AktPara.Xn(v) + (Xe(v, Realisierungsspeicher(n), PES_iAkt.iAktPop) / Settings.PES.n_RekombXY)
+                        AktPara(v).Xn = AktPara(v).Xn + (Xe(v, Realisierungsspeicher(n), PES_iAkt.iAktPop) / Settings.PES.n_RekombXY)
                     Next
                 Next v
 
@@ -759,22 +750,22 @@ Public Class PES
                     Else
                         R = CInt(Int((Settings.PES.n_Eltern - (i)) * Rnd()))
                     End If
-                        'Kein Elter darf doppelt gezogen werden
-                        Realisierungsspeicher(i) = Elternspeicher(R)
-                        For j = R To Settings.PES.n_Eltern - 2
-                            Elternspeicher(j) = Elternspeicher(j + 1)
-                        Next j
+                    'Kein Elter darf doppelt gezogen werden
+                    Realisierungsspeicher(i) = Elternspeicher(R)
+                    For j = R To Settings.PES.n_Eltern - 2
+                        Elternspeicher(j) = Elternspeicher(j + 1)
+                    Next j
 
                 Next i
                 For v = 0 To Anz.Para - 1
-                    AktPara.Dn(v) = 0
+                    AktPara(v).Dn = 0
                     R = CInt(Int(Settings.PES.n_RekombXY * Rnd()))
                     'Mittelung der Schrittweite
                     For n = 0 To Settings.PES.n_RekombXY - 1
-                        AktPara.Dn(v) = AktPara.Dn(v) + (De(v, Realisierungsspeicher(n), PES_iAkt.iAktPop) / Settings.PES.n_RekombXY)
+                        AktPara(v).Dn = AktPara(v).Dn + (De(v, Realisierungsspeicher(n), PES_iAkt.iAktPop) / Settings.PES.n_RekombXY)
                     Next
                     'Selektion des Elter
-                    AktPara.Xn(v) = Xe(v, Realisierungsspeicher(R), PES_iAkt.iAktPop)
+                    AktPara(v).Xn = Xe(v, Realisierungsspeicher(R), PES_iAkt.iAktPop)
                 Next v
 
 
@@ -830,37 +821,37 @@ Public Class PES
                     R = CInt(Int((Settings.PES.n_Eltern) * Rnd()))
                 End If
 
-                    Elter = R
+                Elter = R
 
-                    If (Elter = 0 Or Elter = Settings.PES.n_Eltern - 1) Then
-                        For v = 0 To Anz.Para - 1
-                            'Selektion der Schrittweite
-                            AktPara.Dn(v) = De(v, Elter, PES_iAkt.iAktPop)
-                            'Selektion des Elter
-                            AktPara.Xn(v) = Xe(v, Elter, PES_iAkt.iAktPop)
-                        Next
-                    Else
-                        'BUG 135
-                        Dim IndexEltern(Settings.PES.n_Eltern - 1) As Integer          'Array mit Index der Eltern (Neighbourhood-Rekomb.)
-                        Call Neighbourhood_Eltern(Elter, IndexEltern)
-                        For v = 0 To Anz.Para - 1
-                            'Do
-                            '    Faktor = Rnd
-                            '    Faktor = (-1) * Eigenschaft.d + Faktor * (1 + Eigenschaft.d)
-                            '    'Selektion der Schrittweite
-                            '    Eigenschaft.Dn(v) = De(v, IndexEltern(1), Eigenschaft.iaktuellePopulation) * Faktor + _
-                            '                     De(v, IndexEltern(2), Eigenschaft.iaktuellePopulation) * (1 - Faktor)
-                            '    Eigenschaft.Xn(v) = Xe(v, IndexEltern(1), Eigenschaft.iaktuellePopulation) * Faktor + _
-                            '                     Xe(v, IndexEltern(2), Eigenschaft.iaktuellePopulation) * (1 - Faktor)
-                            'Loop While (Eigenschaft.Xn(v) <= Eigenschaft.Xmin(v) Or Eigenschaft.Xn(v) > Eigenschaft.Xmax(v))
+                If (Elter = 0 Or Elter = Settings.PES.n_Eltern - 1) Then
+                    For v = 0 To Anz.Para - 1
+                        'Selektion der Schrittweite
+                        AktPara(v).Dn = De(v, Elter, PES_iAkt.iAktPop)
+                        'Selektion des Elter
+                        AktPara(v).Xn = Xe(v, Elter, PES_iAkt.iAktPop)
+                    Next
+                Else
+                    'BUG 135
+                    Dim IndexEltern(Settings.PES.n_Eltern - 1) As Integer          'Array mit Index der Eltern (Neighbourhood-Rekomb.)
+                    Call Neighbourhood_Eltern(Elter, IndexEltern)
+                    For v = 0 To Anz.Para - 1
+                        'Do
+                        '    Faktor = Rnd
+                        '    Faktor = (-1) * Eigenschaft.d + Faktor * (1 + Eigenschaft.d)
+                        '    'Selektion der Schrittweite
+                        '    Eigenschaft.Dn(v) = De(v, IndexEltern(1), Eigenschaft.iaktuellePopulation) * Faktor + _
+                        '                     De(v, IndexEltern(2), Eigenschaft.iaktuellePopulation) * (1 - Faktor)
+                        '    Eigenschaft.Xn(v) = Xe(v, IndexEltern(1), Eigenschaft.iaktuellePopulation) * Faktor + _
+                        '                     Xe(v, IndexEltern(2), Eigenschaft.iaktuellePopulation) * (1 - Faktor)
+                        'Loop While (Eigenschaft.Xn(v) <= Eigenschaft.Xmin(v) Or Eigenschaft.Xn(v) > Eigenschaft.Xmax(v))
 
-                            R = Int(Settings.PES.n_RekombXY * Rnd())
-                            'Selektion der Schrittweite
-                            AktPara.Dn(v) = De(v, IndexEltern(R), PES_iAkt.iAktPop)
-                            'Selektion des Elter
-                            AktPara.Xn(v) = Xe(v, IndexEltern(R), PES_iAkt.iAktPop)
-                        Next
-                    End If
+                        R = Int(Settings.PES.n_RekombXY * Rnd())
+                        'Selektion der Schrittweite
+                        AktPara(v).Dn = De(v, IndexEltern(R), PES_iAkt.iAktPop)
+                        'Selektion des Elter
+                        AktPara(v).Xn = Xe(v, IndexEltern(R), PES_iAkt.iAktPop)
+                    Next
+                End If
         End Select
 
     End Sub
@@ -953,13 +944,13 @@ StartMutation:
 
         Dim v, i As Integer
         Dim Z As Double
-   
+
         Dim DnTemp() As Double             'Temporäre Schrittweiten für Nachkomme
         Dim XnTemp() As Double             'Temporäre Parameterwerte für Nachkomme
         Dim expo As Integer                  'Exponent für Schrittweite (+/-1)
         Dim tau As Double
         Dim taufix As Double
-        dim ZFix as double
+        Dim ZFix As Double
 
         ReDim DnTemp(Anz.Para - 1)
         ReDim XnTemp(Anz.Para - 1)
@@ -973,13 +964,13 @@ StartMutation:
                 '+/-1
                 expo = (2 * Int(Rnd() + 0.5) - 1)
                 'Schrittweite wird mutiert
-                DnTemp(0) = AktPara.Dn(0) * galpha ^ expo
+                DnTemp(0) = AktPara(0).Dn * galpha ^ expo
             ElseIf (Settings.PES.Schrittweite.OptDnMutation = EVO_DnMutation.Schwefel) Then
                 tau = Settings.PES.Schrittweite.DnC / Math.Sqrt(Anz.Para)
                 'Normalverteilte Zufallszahl (SD = 1, mean = 0)
                 Z = Me.NormalDistributationRND(1.0, 0.0)
                 'Neue Schrittweite
-                DnTemp(0) = AktPara.Dn(0) * Math.Exp(tau * Z)
+                DnTemp(0) = AktPara(0).Dn * Math.Exp(tau * Z)
                 'Mindestschrittweite muss eingehalten werden
                 If dntemp(0) < Settings.PES.Schrittweite.DnEpsilon Then dntemp(0) = Settings.PES.Schrittweite.DnEpsilon
             End If
@@ -992,7 +983,7 @@ StartMutation:
         'Mutation
         '--------
         If (Settings.PES.Schrittweite.is_DnVektor And Settings.PES.Schrittweite.OptDnMutation = EVO_DnMutation.Schwefel) Then
-            taufix = Settings.PES.Schrittweite.DnC / Math.Sqrt(2*Anz.Para)
+            taufix = Settings.PES.Schrittweite.DnC / Math.Sqrt(2 * Anz.Para)
             ZFix = Me.NormalDistributationRND(1.0, 0.0)
         End If
         For v = 0 To Anz.Para - 1
@@ -1015,13 +1006,13 @@ StartMutation:
                         '+/-1
                         expo = (2 * Int(Rnd() + 0.5) - 1)
                         'Schrittweite wird mutiert
-                        DnTemp(v) = AktPara.Dn(v) * galpha ^ expo
+                        DnTemp(v) = AktPara(v).Dn * galpha ^ expo
                     ElseIf (Settings.PES.Schrittweite.OptDnMutation = EVO_DnMutation.Schwefel) Then
-                        tau = Settings.PES.Schrittweite.DnC / Math.Sqrt(2*math.Sqrt(Anz.Para))
+                        tau = Settings.PES.Schrittweite.DnC / Math.Sqrt(2 * math.Sqrt(Anz.Para))
                         'Normalverteilte Zufallszahl (SD = 1, mean = 0)
                         Z = Me.NormalDistributationRND(1.0, 0.0)
                         'Neue Schrittweite
-                        DnTemp(v) = AktPara.Dn(v) * Math.Exp(taufix * ZFix + tau * Z)
+                        DnTemp(v) = AktPara(v).Dn * Math.Exp(taufix * ZFix + tau * Z)
                         'Mindestschrittweite muss eingehalten werden
                         If DnTemp(v) < Settings.PES.Schrittweite.DnEpsilon Then DnTemp(v) = Settings.PES.Schrittweite.DnEpsilon
                     End If
@@ -1038,7 +1029,7 @@ StartMutation:
                     Z = Me.NormalDistributationRND(1.0, 0.0)
                 End If
                 'Mutation wird durchgeführt
-                XnTemp(v) = AktPara.Xn(v) + DnTemp(v) * Z
+                XnTemp(v) = AktPara(v).Xn + DnTemp(v) * Z
 
                 'Restriktion für die mutierten Werte
             Loop While (XnTemp(v) <= 0 Or XnTemp(v) > 1 Or Not checkBeziehung(v, XnTemp))
@@ -1048,8 +1039,8 @@ StartMutation:
         'Mutierte Werte übernehmen
         '-------------------------
         For v = 0 To Anz.Para - 1
-            AktPara.Dn(v) = DnTemp(v)
-            AktPara.Xn(v) = XnTemp(v)
+            AktPara(v).Dn = DnTemp(v)
+            AktPara(v).Xn = XnTemp(v)
         Next v
 
     End Sub
@@ -1205,9 +1196,9 @@ StartMutation:
                 Best.Qb(j, PES_iAkt.iAktPop, 0) = QN(0)
                 For v = 0 To Anz.Para - 1
                     'Die Schrittweite wird ebenfalls übernommen
-                    Best.Db(v, j, PES_iAkt.iAktPop) = AktPara.Dn(v)
+                    Best.Db(v, j, PES_iAkt.iAktPop) = AktPara(v).Dn
                     'Die eigentlichen Parameterwerte werden übernommen
-                    Best.Xb(v, j, PES_iAkt.iAktPop) = AktPara.Xn(v)
+                    Best.Xb(v, j, PES_iAkt.iAktPop) = AktPara(v).Xn
                 Next v
             End If
 
@@ -1224,8 +1215,8 @@ StartMutation:
                 .dominated = False
                 .Front = 0
                 For v = 0 To Anz.Para - 1
-                    .PES_d(v) = AktPara.Dn(v)
-                    .PES_X(v) = AktPara.Xn(v)
+                    .PES_OptParas(v).Dn = AktPara(v).Dn
+                    .PES_OptParas(v).Xn = AktPara(v).Xn
                 Next v
                 .Distance = 0
             End With
@@ -1385,10 +1376,6 @@ StartMutation:
             'Dimensionieren des Best_Indi
             Dim Best_Indi(Best.Qb.GetUpperBound(0)) As Individuum
             Individuum.New_Array("Bestwerte", Best_Indi)
-            For i = 0 To Best_Indi.GetUpperBound(0)
-                ReDim Best_Indi(i).PES_d(Anz.Para - 1)
-                ReDim Best_Indi(i).PES_X(Anz.Para - 1)
-            Next i
             'Kopieren in Best_Indi
             For i = 0 To Best.Qb.GetUpperBound(0)
                 Call Copy_Bestwert_to_Individuum(i, i, Best_Indi)
@@ -1453,8 +1440,8 @@ StartMutation:
         End If
 
         For v = 0 To Anz.Para - 1
-            Best.Db(v, i, PES_iAkt.iAktPop) = Individ(i).PES_d(v)
-            Best.Xb(v, i, PES_iAkt.iAktPop) = Individ(i).PES_X(v)
+            Best.Db(v, i, PES_iAkt.iAktPop) = Individ(i).PES_OptParas(v).Dn
+            Best.Xb(v, i, PES_iAkt.iAktPop) = Individ(i).PES_OptParas(v).Xn
         Next v
         If (Settings.PES.is_DiversityTournament) Then
             Best.Div(i, PES_iAkt.iAktPop) = Individ(i).Distance
@@ -1478,8 +1465,8 @@ StartMutation:
         End If
 
         For v = 0 To Anz.Para - 1
-            Individ(i_indi).PES_d(v) = Best.Db(v, i_best, PES_iAkt.iAktPop)
-            Individ(i_indi).PES_X(v) = Best.Xb(v, i_best, PES_iAkt.iAktPop)
+            Individ(i_indi).PES_OptParas(v).Dn = Best.Db(v, i_best, PES_iAkt.iAktPop)
+            Individ(i_indi).PES_OptParas(v).Xn = Best.Xb(v, i_best, PES_iAkt.iAktPop)
         Next v
 
         Individ(i_indi).dominated = False
@@ -1704,17 +1691,17 @@ StartMutation:
     Private Function checkBeziehung(ByVal ipara As Integer, ByVal XnTemp() As Double) As Boolean
 
         'ipara ist der Index des zu überprüfenden Parameters,
-        'XnTemp() die aktuellen Werte
+        'XnTemp() die zu prüfenden (skalierten) Werte
 
         Dim isOK As Boolean = False
-        If (AktPara.Bez(ipara) = Beziehung.keine) Then
+        If (AktPara(ipara).Beziehung = Beziehung.keine) Then
             'Keine Beziehung vorhanden
             isOK = True
         Else
-            'Referenzierten Parameterwert vergleichen
-            Dim wert As Double = XnTemp(ipara)
-            Dim ref As Double = XnTemp(ipara - 1)
-            Select Case AktPara.Bez(ipara)
+            'Referenzierten Parameterwert vergleichen (reelle Werte!)
+            Dim wert As Double = AktPara(ipara).Min + (AktPara(ipara).Max - AktPara(ipara).Min) * XnTemp(ipara)
+            Dim ref As Double = AktPara(ipara - 1).Min + (AktPara(ipara - 1).Max - AktPara(ipara - 1).Min) * XnTemp(ipara - 1)
+            Select Case AktPara(ipara).Beziehung
                 Case Beziehung.kleiner
                     If (wert < ref) Then isOK = True
                 Case Beziehung.kleinergleich
@@ -1739,25 +1726,26 @@ StartMutation:
         'XeTemp die aktuellen Werte
 
         Dim isOK As Boolean = False
-        If (AktPara.Bez(ipara) = Beziehung.keine) Then
-            'Keine Beziehung vorhanden
-            isOK = True
-        Else
-            'Referenzierten Parameterwert vergleichen
-            Dim wert As Double = XeTemp(ipara, iElter, PES_iAkt.iAktPop)
-            Dim ref As Double = XeTemp(ipara - 1, iElter, PES_iAkt.iAktPop)
-            Select Case AktPara.Bez(ipara)
-                Case Beziehung.kleiner
-                    If (wert < ref) Then isOK = True
-                Case Beziehung.kleinergleich
-                    If (wert <= ref) Then isOK = True
-                Case Beziehung.groesser
-                    If (wert > ref) Then isOK = True
-                Case Beziehung.groessergleich
-                    If (wert >= ref) Then isOK = True
-            End Select
-        End If
+        'If (AktPara.Bez(ipara) = Beziehung.keine) Then
+        '    'Keine Beziehung vorhanden
+        '    isOK = True
+        'Else
+        '    'Referenzierten Parameterwert vergleichen
+        '    Dim wert As Double = XeTemp(ipara, iElter, PES_iAkt.iAktPop)
+        '    Dim ref As Double = XeTemp(ipara - 1, iElter, PES_iAkt.iAktPop)
+        '    Select Case AktPara.Bez(ipara)
+        '        Case Beziehung.kleiner
+        '            If (wert < ref) Then isOK = True
+        '        Case Beziehung.kleinergleich
+        '            If (wert <= ref) Then isOK = True
+        '        Case Beziehung.groesser
+        '            If (wert > ref) Then isOK = True
+        '        Case Beziehung.groessergleich
+        '            If (wert >= ref) Then isOK = True
+        '    End Select
+        'End If
 
+        isOK = True
         Return isOK
 
     End Function

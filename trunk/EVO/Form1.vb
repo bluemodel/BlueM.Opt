@@ -51,8 +51,7 @@ Partial Class Form1
     'TODO: Bestwertspeicher wird nicht genutzt!
     'Dim Bestwert(,) As Double
     Dim SekPopulation(,) As Double
-    Dim myPara() As Double
-    Dim beziehungen() As EVO.Kern.PES.Beziehung
+    Dim myPara() As EVO.Kern.OptParameter
 
     '**** Verschiedenes ****
     Dim isrun As Boolean = False                        'Optimierung läuft
@@ -194,7 +193,7 @@ Partial Class Form1
                     Call EVO_Einstellungen1.setStandard_PES(Testprobleme1.OptModus)
 
                     'Globale Parameter werden gesetzt
-                    Call Testprobleme1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
+                    Call Testprobleme1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
 
                     'Start-Button aktivieren (keine Methodenauswahl erforderlich)
                     Button_Start.Enabled = True
@@ -342,7 +341,7 @@ Partial Class Form1
                     End If
 
                     'Parameterübergabe an PES
-                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
+                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
 
                     'EVO_Verlauf zurücksetzen
                     Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
@@ -365,7 +364,7 @@ Partial Class Form1
                     Call Sim1.read_and_valid_INI_Files_PES()
 
                     'TODO: eigenen Parameterübergabe an HookJeeves (evtl.überladen von Parameter_Uebergabe)
-                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
+                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
 
 
                 Case METH_CES, METH_HYBRID 'Methode CES und Methode CES_PES
@@ -419,7 +418,7 @@ Partial Class Form1
                     Call Ces1.CESInitialise(EVO_Einstellungen1.Settings, Method, Sim1.List_OptZiele.GetLength(0), Sim1.List_Constraints.GetLength(0), Sim1.List_Locations.GetLength(0), Sim1.VerzweigungsDatei.GetLength(0), Sim1.No_of_Combinations, Sim1.Set_TestModus, sim1.n_PathDimension)
                     
                     'Die Variablen für die Individuuen werden gesetzt
-                    EVO.Kern.Individuum.Initialise(2, CES1.ModSett.n_Locations, CES1.ModSett.n_Penalty, CES1.ModSett.n_Constrain)
+                    EVO.Kern.Individuum.Initialise(2, CES1.ModSett.n_Locations, 0, CES1.ModSett.n_Penalty, CES1.ModSett.n_Constrain)
 
                     'Bei Testmodus wird die Anzahl der Kinder und Generationen überschrieben
                     '***********************************************************************
@@ -567,8 +566,10 @@ Partial Class Form1
             Me.Button_Start.Text = "||"
 
             'Ergebnis-Buttons
-            Me.Button_saveMDB.Enabled = True
-            Me.Button_Scatterplot.Enabled = True
+            If (Not isNothing(Sim1)) Then
+                Me.Button_saveMDB.Enabled = True
+                Me.Button_Scatterplot.Enabled = True
+            End If
 
             'EVO_Einstellungen temporär speichern
             Dim dir As String
@@ -695,9 +696,9 @@ Partial Class Form1
             If (Me.globalAnzPar > 1) Then
                 Select Case SensiPlot1.Selected_SensiType
                     Case "Gleichverteilt"
-                        Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).SKWert = Rnd()
+                        Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Xn = Rnd()
                     Case "Diskret"
-                        Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).SKWert = i / SensiPlot1.Anz_Steps
+                        Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Xn = i / SensiPlot1.Anz_Steps
                 End Select
             End If
 
@@ -708,9 +709,9 @@ Partial Class Form1
                 '1. OptParameterwert variieren
                 Select Case SensiPlot1.Selected_SensiType
                     Case "Gleichverteilt"
-                        Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).SKWert = Rnd()
+                        Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Xn = Rnd()
                     Case "Diskret"
-                        Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).SKWert = j / SensiPlot1.Anz_Steps
+                        Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Xn = j / SensiPlot1.Anz_Steps
                 End Select
 
                 n += 1
@@ -722,7 +723,7 @@ Partial Class Form1
                 Me.EVO_Opt_Verlauf1.Nachfolger(n)
 
                 'Evaluieren
-                Call Sim1.SIM_Evaluierung(kern.Individuum.QN_RN_Indi(n, QN, RN, sim1.MyPara))
+                Call Sim1.SIM_Evaluierung(kern.Individuum.QN_RN_Indi(n, QN, RN, sim1.List_OptParameter))
 
                 'BUG 253: Verletzte Constraints bei SensiPlot kenntlich machen?
 
@@ -730,10 +731,10 @@ Partial Class Form1
                 If (Me.globalAnzPar = 1) Then
                     '1 Parameter
                     serie = DForm.Diag.getSeriesPoint("SensiPlot", "Orange")
-                    serie.Add(Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).QWertTmp, Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Wert, n)
+                    serie.Add(Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).QWertTmp, Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).RWert, n)
                 Else
                     '2 Parameter
-                    surface.Add(Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Wert, Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).QWertTmp, Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Wert, n)
+                    surface.Add(Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).RWert, Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).QWertTmp, Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).RWert, n)
                 End If
 
                 'Simulationsergebnis in Wave laden
@@ -861,7 +862,7 @@ Partial Class Form1
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         For i = 0 To EVO_Einstellungen1.Settings.CES.n_Childs - 1
             For j = 0 To CES1.ModSett.n_Locations - 1
-                Call Sim1.Identify_Measures_Elements_Parameters(j, CES1.Childs(i).Path(j), CES1.Childs(i).Measures(j), CES1.Childs(i).Loc(j).Loc_Elem, CES1.Childs(i).Loc(j).Loc_Para)
+                Call Sim1.Identify_Measures_Elements_Parameters(j, CES1.Childs(i).Path(j), CES1.Childs(i).Measures(j), CES1.Childs(i).Loc(j).Loc_Elem, CES1.Childs(i).Loc(j).PES_OptPara)
             Next
         Next
 
@@ -881,18 +882,18 @@ Partial Class Form1
                 For j = 0 To CES1.ModSett.n_Locations - 1
 
                     'Die Parameter (falls vorhanden) werden überschrieben
-                    If Not CES1.Childs(i).Loc(j).Loc_Para.GetLength(1) = 0 Then
+                    If Not CES1.Childs(i).Loc(j).PES_OptPara.GetLength(0) = 0 Then
 
                         'Standard Parameter werden aus dem Sim besorgt
-                        Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
+                        Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
 
                         'Die Zahl der Parameter wird überschrieben (AnzZiel und AnzRand sind OK)
                         'Anzahl der Parameter bezieht sich hier nur auf eine Location
-                        globalAnzPar = CES1.Childs(i).Loc(j).Loc_Para.GetLength(1)
+                        globalAnzPar = CES1.Childs(i).Loc(j).PES_OptPara.GetLength(0)
 
-                        ReDim myPara(CES1.Childs(i).Loc(j).Loc_Para.GetUpperBound(1))
-                        For m = 0 To CES1.Childs(i).Loc(j).Loc_Para.GetUpperBound(1)
-                            myPara(m) = CES1.Childs(i).Loc(j).Loc_Para(1, m)
+                        ReDim myPara(CES1.Childs(i).Loc(j).PES_OptPara.GetUpperBound(0))
+                        For m = 0 To CES1.Childs(i).Loc(j).PES_OptPara.GetUpperBound(0)
+                            myPara(m) = CES1.Childs(i).Loc(j).PES_OptPara(m)
                         Next
                         '1. EVO_Einstellungen zurücksetzen; 2. Die Settings werden für Hybrid gesetzt
                         EVO_Einstellungen1.isSaved = False
@@ -900,16 +901,17 @@ Partial Class Form1
 
                         'Schritte 1 - 3: PES wird initialisiert (Weiteres siehe dort ;-)
                         '**************************************************************
-                        Call PES1.PesInitialise(EVO_Einstellungen1.Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen, Method)
+                        Call PES1.PesInitialise(EVO_Einstellungen1.Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, Method)
 
                         'Dem Child wird der Schrittweitenvektor zugewiesen und gegebenenfalls der Parameter zufällig gewählt
                         'wird also nicht in PES.ESStarten gemacht
-                        ReDim CES1.Childs(i).Loc(j).Loc_Dn(CES1.Childs(i).Loc(j).Loc_Para.GetUpperBound(1))
-                        For m = 0 To CES1.Childs(i).Loc(j).Loc_Para.GetUpperBound(1)
-                            CES1.Childs(i).Loc(j).Loc_Dn(m) = EVO_Einstellungen1.Settings.PES.Schrittweite.DnStart
+                        ReDim CES1.Childs(i).Loc(j).PES_OptPara(CES1.Childs(i).Loc(j).PES_OptPara.GetUpperBound(0))
+                        For m = 0 To CES1.Childs(i).Loc(j).PES_OptPara.GetUpperBound(0)
+                            CES1.Childs(i).Loc(j).PES_OptPara(m) = new Kern.OptParameter
+                            CES1.Childs(i).Loc(j).PES_OptPara(m).Dn = EVO_Einstellungen1.Settings.PES.Schrittweite.DnStart
                             If EVO_Einstellungen1.Settings.PES.OptStartparameter = Kern.EVO_STARTPARAMETER.Zufall Then
                                 Randomize()
-                                CES1.Childs(i).Loc(j).Loc_Para(1, m) = Rnd()
+                                CES1.Childs(i).Loc(j).PES_OptPara(m).Xn = Rnd()
                             End If
                         Next
                     End If
@@ -1034,7 +1036,7 @@ Partial Class Form1
             'Hier werden dem Child die passenden Elemente pro Location zugewiesen
             For i = 0 To EVO_Einstellungen1.Settings.CES.n_Childs - 1
                 For j = 0 To CES1.ModSett.n_Locations - 1
-                    Call Sim1.Identify_Measures_Elements_Parameters(j, CES1.Childs(i).Path(j), CES1.Childs(i).Measures(j), CES1.Childs(i).Loc(j).Loc_Elem, CES1.Childs(i).Loc(j).Loc_Para)
+                    Call Sim1.Identify_Measures_Elements_Parameters(j, CES1.Childs(i).Path(j), CES1.Childs(i).Measures(j), CES1.Childs(i).Loc(j).Loc_Elem, CES1.Childs(i).Loc(j).PES_OptPara)
                 Next
             Next
 
@@ -1060,17 +1062,17 @@ Partial Class Form1
                         End If
 
                         'Die Parameter (falls vorhanden) werden überschrieben
-                        If Not CES1.Childs(i).Loc(j).Loc_Para.GetLength(1) = 0 Then
+                        If Not CES1.Childs(i).Loc(j).PES_OptPara.GetLength(0) = 0 Then
 
                             '??????????????????????
                             PES1 = New EVO.Kern.PES
 
                             'Standard Parameter werden aus dem Sim besorgt
-                            Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
+                            Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
 
                             'Die Zahl der Parameter wird überschrieben (AnzZiel und AnzRand sind OK)
                             'Anzahl der Parameter bezieht sich hier nur auf eine Location
-                            globalAnzPar = CES1.Childs(i).Loc(j).Parameter.GetLength(0)
+                            globalAnzPar = CES1.Childs(i).Loc(j).PES_OptPara.GetLength(0)
 
                             'Die Anzahl der Eltern wird bestimmt, bzw ob Eltern vorhanden
                             Dim n_eltern As Integer = 0
@@ -1079,13 +1081,13 @@ Partial Class Form1
                             'Die Kinder bekommen je nach Fall (Eltern keine Eltern) neue Parameter
                             If n_eltern = 0 Then
                                 'Falls noch keine Eltern vorhanden sind -> zufällige Werte
-                                ReDim CES1.Childs(i).Loc(j).Loc_Dn(CES1.Childs(i).Loc(j).Loc_Para.GetUpperBound(1))
-                                For m = 0 To CES1.Childs(i).Loc(j).Loc_Para.GetUpperBound(1)
-                                    CES1.Childs(i).Loc(j).Loc_Dn(m) = EVO_Einstellungen1.Settings.PES.Schrittweite.DnStart
+                                ReDim CES1.Childs(i).Loc(j).PES_OptPara(CES1.Childs(i).Loc(j).PES_OptPara.GetUpperBound(0))
+                                For m = 0 To CES1.Childs(i).Loc(j).PES_OptPara.GetUpperBound(0)
+                                    CES1.Childs(i).Loc(j).PES_OptPara(m).Dn = EVO_Einstellungen1.Settings.PES.Schrittweite.DnStart
                                     'Falls zufällige Startwerte
                                     If EVO_Einstellungen1.Settings.PES.OptStartparameter = Kern.EVO_STARTPARAMETER.Zufall Then
                                         Randomize()
-                                        CES1.Childs(i).Loc(j).Loc_Para(1, m) = Rnd()
+                                        CES1.Childs(i).Loc(j).PES_OptPara(m).Xn = Rnd()
                                     End If
                                 Next
                             Else
@@ -1095,19 +1097,18 @@ Partial Class Form1
 
                                 'Schritte 1 - 3: PES wird initialisiert (Weiteres siehe dort ;-)
                                 '**************************************************************
-                                Call PES1.PesInitialise(EVO_Einstellungen1.Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen, Method)
+                                Call PES1.PesInitialise(EVO_Einstellungen1.Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, Method)
 
                                 'Die PopulationsEltern des PES werden gefüllt
                                 For m = 0 To CES1.PES_Parents_pLoc.GetUpperBound(0)
-                                    Call PES1.EsStartvalues(EVO_Einstellungen1.Settings.CES.is_PopMutStart, CES1.PES_Parents_pLoc(m).Loc(j).Loc_Dn, CES1.PES_Parents_pLoc(m).Loc(j).Parameter, m)
+                                    Call PES1.EsStartvalues(EVO_Einstellungen1.Settings.CES.is_PopMutStart, CES1.PES_Parents_pLoc(m).Loc(j).PES_OptPara, m)
                                 Next
 
                                 'Startet die Prozesse evolutionstheoretischen Prozesse nacheinander
                                 Call PES1.EsReproMut(EVO_Einstellungen1.Settings.CES.is_PopMutStart)
 
                                 'Auslesen der Variierten Parameter
-                                CES1.Childs(i).Loc(j).Parameter = PES1.EsGetParameter()
-                                CES1.Childs(i).Loc(j).Loc_Dn = PES1.EsGetDN()
+                                CES1.Childs(i).Loc(j).PES_OptPara = PES1.EsGetParameter()
 
                             End If
                         End If
@@ -1148,7 +1149,7 @@ Partial Class Form1
                 'Hier werden Child die passenden Elemente zugewiesen
                 Dim j As Integer
                 For j = 0 To CES1.ModSett.n_Locations - 1
-                    Call Sim1.Identify_Measures_Elements_Parameters(j, CES1.Childs(i).Path(j), CES1.Childs(i).Measures(j), CES1.Childs(i).Loc(j).Loc_Elem, CES1.Childs(i).Loc(j).Loc_Para)
+                    Call Sim1.Identify_Measures_Elements_Parameters(j, CES1.Childs(i).Path(j), CES1.Childs(i).Measures(j), CES1.Childs(i).Loc(j).Loc_Elem, CES1.Childs(i).Loc(j).PES_OptPara)
                 Next
 
                 'Reduktion der OptimierungsParameter und immer dann wenn nicht Nullvariante
@@ -1157,7 +1158,7 @@ Partial Class Form1
 
                     'Parameterübergabe an PES
                     '************************
-                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen)
+                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
                     'Starten der PES
                     '***************
                     Call STARTEN_PES()
@@ -1206,12 +1207,14 @@ Partial Class Form1
         Iterationen = 0
         b = False
 
-        Call HookJeeves.Initialize(myPara)
+        Call HookJeeves.Initialize(Kern.OptParameter.MyParaDouble(myPara))
         'Initialisierungssimulation
         myPara.CopyTo(aktuellePara, 0)
         QNBest(0) = 1.79E+308
         QBest(0) = 1.79E+308
         k = 0
+
+        'TODO: Wie kannst du hier 2 Arrays miteinander vergleichen?
         Do While (HookJeeves.AktuelleSchrittweite > HookJeeves.MinimaleSchrittweite)
             Iterationen += 1
             'Bestimmen der Ausgangsgüte
@@ -1346,7 +1349,7 @@ Partial Class Form1
         End If
 
         'Individuum wird initialisiert
-        Call Kern.Individuum.Initialise(1, 1, globalAnzZiel, globalAnzRand)
+        Call Kern.Individuum.Initialise(1, 0, globalAnzPar, globalAnzZiel, globalAnzRand)
 
 
         'Schritte 0: Objekt der Klasse PES wird erzeugt
@@ -1356,7 +1359,7 @@ Partial Class Form1
 
         'Schritte 1 - 3: ES wird initialisiert (Weiteres siehe dort ;-)
         '**************************************************************
-        Call PES1.PesInitialise(EVO_Einstellungen1.Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, beziehungen, Method)
+        Call PES1.PesInitialise(EVO_Einstellungen1.Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, Method)
 
         'Startwerte werden der Verlaufsanzeige zugewiesen
         Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
@@ -1905,7 +1908,7 @@ Start_Evolutionsrunden:
 
             'Lösungsdialog initialisieren
             If (IsNothing(Me.solutionDialog)) Then
-                Me.solutionDialog = New SolutionDialog(Sim1.List_OptParameter, Sim1.List_OptZiele, Sim1.List_Constraints)
+                Me.solutionDialog = New SolutionDialog(Sim1.List_OptParameter_Save, Sim1.List_OptZiele, Sim1.List_Constraints, Sim1.List_Locations)
             End If
 
             'Lösungsdialog anzeigen
@@ -2001,7 +2004,7 @@ Start_Evolutionsrunden:
 
             'OptParameter übernehmen
             For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
-                Sim1.List_OptParameter(i).Wert = ind.PES_X(i)
+                Sim1.List_OptParameter(i).Xn = ind.PES_OptParas(i).Xn
             Next
 
             'Modellparameter schreiben

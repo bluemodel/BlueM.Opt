@@ -96,6 +96,7 @@
     <Compile Include="Module_dll.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="OptParameter.vb" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
