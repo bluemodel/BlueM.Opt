@@ -263,8 +263,8 @@ Public Class Individuum
         If me.PES_OptParas.GetUpperBound(0) = -1
             Redim Dest.PES_OptParas(-1)
         else
-            For j = 0 to me.loc(i).PES_OptPara.GetUpperBound(0)
-                Dest.PES_OptParas(j) = me.PES_OptParas(j).Clone
+            For i = 0 to me.PES_OptParas.GetUpperBound(0)
+                Dest.PES_OptParas(i) = me.PES_OptParas(i).Clone
             Next
         End If
 
@@ -290,11 +290,12 @@ Public Class Individuum
             If me.loc(i).PES_OptPara.GetUpperBound(0) = -1
                 Redim Dest.loc(i).PES_OptPara(-1)
             else
-                Redim Dest.PES_OptParas(Me.Loc(i).PES_OptPara.GetUpperBound(0))
+                Redim Dest.loc(i).PES_OptPara(Me.Loc(i).PES_OptPara.GetUpperBound(0))
+
                 For j = 0 to Me.Loc(i).PES_OptPara.GetUpperBound(0)
-                    dest.PES_OptParas(i).Xn = Me.Loc(i).PES_OptPara(j).Xn
-                    dest.PES_OptParas(i).Dn = Me.Loc(i).PES_OptPara(j).Dn
-                    dest.PES_OptParas(i).Bezeichnung = Me.Loc(i).PES_OptPara(j).Bezeichnung
+                    dest.Loc(i).PES_OptPara(j).Xn = Me.Loc(i).PES_OptPara(j).Xn
+                    dest.Loc(i).PES_OptPara(j).Dn = Me.Loc(i).PES_OptPara(j).Dn
+                    dest.Loc(i).PES_OptPara(j).Bezeichnung = Me.Loc(i).PES_OptPara(j).Bezeichnung
                 Next
             End If
 
@@ -326,6 +327,7 @@ Public Class Individuum
         Next
     End Sub
 
+    'Achtung Überladen!
     Public Shared Function QN_RN_Indi(ByVal n As Integer, ByRef QN() As Double, ByRef RN() As Double, ByVal MyPara() As Kern.OptParameter) As Individuum
 
         Dim Indi As New Individuum("QN_RN_Indi", 0)
@@ -343,6 +345,7 @@ Public Class Individuum
 
     End Function
 
+    'Achtung Überladen!
     Public Shared Function QN_RN_Indi(ByVal n As Integer, ByRef QN() As Double, ByRef RN() As Double, ByVal MyPara() As Double) As Individuum
         Dim i As Integer
         Dim Indi As New Individuum("QN_RN_Indi", 0)
