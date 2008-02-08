@@ -47,29 +47,6 @@ Public MustInherit Class Sim
     Public Const Constraints_Ext As String = "CON"       'Erweiterung der Datei mit den Constraints (*.CON)
     Public Const Combi_Ext As String = "CES"             'Erweiterung der Datei mit der Kombinatorik  (*.CES)
 
-    ''Optimierungsparameter
-    ''---------------------
-    'Public Structure Struct_OptParameter
-    '    Public Bezeichnung As String                        'Bezeichnung
-    '    Public Einheit As String                            'Einheit
-    '    Public Wert As Double                               'Parameterwert
-    '    Public Min As Double                                'Minimum
-    '    Public Max As Double                                'Maximum
-    '    Public Beziehung As EVO.Kern.PES.Beziehung          'Beziehung zum vorherigen OptParameter
-    '    Public Property SKWert() As Double                  'skalierter Wert (0 bis 1)
-    '        Get
-    '            SKWert = (Wert - Min) / (Max - Min)
-    '            Exit Property
-    '        End Get
-    '        Set(ByVal value As Double)
-    '            Wert = value * (Max - Min) + Min
-    '        End Set
-    '    End Property
-    '    Public Overrides Function toString() As String
-    '        Return Bezeichnung
-    '    End Function
-    'End Structure
-
     Public List_OptParameter() As EVO.Kern.OptParameter             'Liste der Optimierungsparameter
     Public List_OptParameter_Save() As EVO.Kern.OptParameter        'Liste der Optimierungsparameter die nicht verändert wird
 
@@ -1031,6 +1008,7 @@ Public MustInherit Class Sim
             For j = 0 To List_OptParameter.GetUpperBound(0)
                 If Elements(i) = Left(List_OptParameter(j).Bezeichnung, 4) Then
                     ReDim Preserve PES_OptPara(x)
+                    PES_OptPara(x) = New Kern.OptParameter
                     PES_OptPara(x).Bezeichnung = List_OptParameter(j).Bezeichnung
                     PES_OptPara(x).Xn = List_OptParameter(j).Xn
                     x += 1

@@ -907,6 +907,7 @@ Partial Class Form1
                         'wird also nicht in PES.ESStarten gemacht
                         ReDim CES1.Childs(i).Loc(j).PES_OptPara(CES1.Childs(i).Loc(j).PES_OptPara.GetUpperBound(0))
                         For m = 0 To CES1.Childs(i).Loc(j).PES_OptPara.GetUpperBound(0)
+                            CES1.Childs(i).Loc(j).PES_OptPara(m) = new Kern.OptParameter
                             CES1.Childs(i).Loc(j).PES_OptPara(m).Dn = EVO_Einstellungen1.Settings.PES.Schrittweite.DnStart
                             If EVO_Einstellungen1.Settings.PES.OptStartparameter = Kern.EVO_STARTPARAMETER.Zufall Then
                                 Randomize()
@@ -1061,7 +1062,7 @@ Partial Class Form1
                         End If
 
                         'Die Parameter (falls vorhanden) werden überschrieben
-                        If Not CES1.Childs(i).Loc(j).PES_OptPara.GetLength(1) = 0 Then
+                        If Not CES1.Childs(i).Loc(j).PES_OptPara.GetLength(0) = 0 Then
 
                             '??????????????????????
                             PES1 = New EVO.Kern.PES
@@ -1907,7 +1908,7 @@ Start_Evolutionsrunden:
 
             'Lösungsdialog initialisieren
             If (IsNothing(Me.solutionDialog)) Then
-                Me.solutionDialog = New SolutionDialog(Sim1.List_OptParameter, Sim1.List_OptZiele, Sim1.List_Constraints)
+                Me.solutionDialog = New SolutionDialog(Sim1.List_OptParameter_Save, Sim1.List_OptZiele, Sim1.List_Constraints, Sim1.List_Locations)
             End If
 
             'Lösungsdialog anzeigen

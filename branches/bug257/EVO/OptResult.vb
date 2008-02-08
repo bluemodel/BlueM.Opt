@@ -426,20 +426,20 @@ Public Class OptResult
 
         'BUG 260: db_insert für CES
 
-        'If (Me.Method = "CES" Or Me.Method = "CES + PES") Then
+        If (EVO.Form1.Method = METH_CES) Then
 
-        '    'Pfad schreiben
-        '    '--------------
-        '    fieldnames = ""
-        '    fieldvalues = ""
-        '    For i = 0 To Me.List_Locations.GetUpperBound(0)
-        '        fieldnames &= ", [" & Me.List_Locations(i).Name & "]"
-        '        fieldvalues &= ", '" & ind.Akt(i).Measures(i) & "'"
-        '    Next
-        '    command.CommandText = "INSERT INTO Pfad (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
-        '    command.ExecuteNonQuery()
+            'Pfad schreiben
+            '--------------
+            fieldnames = ""
+            fieldvalues = ""
+            For i = 0 To Me.List_Locations.GetUpperBound(0)
+                fieldnames &= ", [" & Me.List_Locations(i).Name & "]"
+                fieldvalues &= ", '" & ind.Measures(i) & "'"
+            Next
+            command.CommandText = "INSERT INTO Pfad (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
+            command.ExecuteNonQuery()
 
-        'End If
+        End If
 
         Call db_disconnect()
 

@@ -97,7 +97,7 @@ Public Class Individuum
             Dim array(-1) As Double
             x = 0
             For i = 0 To Loc.GetUpperBound(0)
-                For j = 0 To Loc(i).PES_OptPara.GetUpperBound(1)
+                For j = 0 To Loc(i).PES_OptPara.GetUpperBound(0)
                     ReDim Preserve array(x)
                     array(x) = Loc(i).PES_OptPara(j).Xn
                     x += 1
@@ -291,11 +291,11 @@ Public Class Individuum
                 Redim Dest.loc(i).PES_OptPara(-1)
             else
                 Redim Dest.loc(i).PES_OptPara(Me.Loc(i).PES_OptPara.GetUpperBound(0))
-
-                For j = 0 to Me.Loc(i).PES_OptPara.GetUpperBound(0)
-                    dest.Loc(i).PES_OptPara(j).Xn = Me.Loc(i).PES_OptPara(j).Xn
-                    dest.Loc(i).PES_OptPara(j).Dn = Me.Loc(i).PES_OptPara(j).Dn
-                    dest.Loc(i).PES_OptPara(j).Bezeichnung = Me.Loc(i).PES_OptPara(j).Bezeichnung
+                For j = 0 To Me.Loc(i).PES_OptPara.GetUpperBound(0)
+                    Dest.loc(i).PES_OptPara(j) = new Kern.OptParameter
+                    Dest.Loc(i).PES_OptPara(j).Xn = Me.Loc(i).PES_OptPara(j).Xn
+                    Dest.Loc(i).PES_OptPara(j).Dn = Me.Loc(i).PES_OptPara(j).Dn
+                    Dest.Loc(i).PES_OptPara(j).Bezeichnung = Me.Loc(i).PES_OptPara(j).Bezeichnung
                 Next
             End If
 
