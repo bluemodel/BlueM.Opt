@@ -47,24 +47,10 @@ Public MustInherit Class Sim
     Public Const Constraints_Ext As String = "CON"       'Erweiterung der Datei mit den Constraints (*.CON)
     Public Const Combi_Ext As String = "CES"             'Erweiterung der Datei mit der Kombinatorik  (*.CES)
 
+	'OptParameter
+	'------------
     Public List_OptParameter() As EVO.Kern.OptParameter             'Liste der Optimierungsparameter
     Public List_OptParameter_Save() As EVO.Kern.OptParameter        'Liste der Optimierungsparameter die nicht verändert wird
-
-    'Gibt die OptParameter als Array zurück
-    '**************************************
-    Public Function MyPara as Double()
-
-        Dim i As Integer
-
-        ReDim MyPara(Me.List_OptParameter.GetUpperBound(0))
-
-        For i = 0 To List_OptParameter.GetUpperBound(0)
-            MyPara(i) = List_OptParameter(i).Xn
-        Next
-
-        Return MyPara
-
-    End Function
 
     'ModellParameter
     '---------------
@@ -861,9 +847,9 @@ Public MustInherit Class Sim
 
     'Gibt die Pfad Dimensionen zurück
     '********************************
-    Public function n_PathDimension() As integer ()
+    Public Function n_PathDimension() As Integer()
         Dim i As Integer
-        Dim Array() as Integer = {}
+        Dim Array() As Integer = {}
 
         If List_Locations.GetLength(0) = 0 Then
             Throw New Exception("Die Element Gesamtliste wurde abgerufen bevor die Elemente pro Location ermittelt wurden")
@@ -873,8 +859,8 @@ Public MustInherit Class Sim
         For i = 0 To List_Locations.GetUpperBound(0)
             Array(i) = List_Locations(i).List_Massnahmen.GetLength(0)
         Next
-        
-        n_PathDimension = array.Clone
+
+        n_PathDimension = Array.Clone
 
     End Function
 
@@ -1401,7 +1387,7 @@ Public MustInherit Class Sim
 
     'Evaluiert die Kinderchen mit Hilfe des Simulationsmodells
     '*********************************************************
-    Public Function SIM_Evaluierung(byref Indi as Kern.Individuum) As Boolean
+    Public Function SIM_Evaluierung(ByRef Indi As Kern.Individuum) As Boolean
 
         Dim i As Short
 
@@ -1413,7 +1399,7 @@ Public MustInherit Class Sim
         'Qualitätswerte berechnen
         For i = 0 To Me.List_OptZiele.GetUpperBound(0)
             List_OptZiele(i).QWertTmp = QWert(List_OptZiele(i))
-            indi.Penalty(i) = List_OptZiele(i).QWertTmp
+            Indi.Penalty(i) = List_OptZiele(i).QWertTmp
         Next
 
         'Constraints berechnen
