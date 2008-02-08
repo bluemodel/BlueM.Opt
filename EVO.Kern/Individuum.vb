@@ -263,9 +263,10 @@ Public Class Individuum
         '06a Array für PES Parameter
         If me.PES_OptParas.GetUpperBound(0) = -1
             Redim Dest.PES_OptParas(-1)
-        else
-            For i = 0 to me.PES_OptParas.GetUpperBound(0)
-                Dest.PES_OptParas(i) = me.PES_OptParas(i).Clone
+        Else
+            ReDim Dest.PES_OptParas(Me.PES_OptParas.GetUpperBound(0))
+            For i = 0 To Me.PES_OptParas.GetUpperBound(0)
+                Dest.PES_OptParas(i) = Me.PES_OptParas(i).Clone
             Next
         End If
 
