@@ -32,7 +32,7 @@ Partial Class Form1
     Private Anwendung As String
 
     'Optimierungsmethode
-    Friend Method As String
+    Public Shared Method As String
 
     '**** Deklarationen der Module *****
     Private WithEvents Testprobleme1 As Testprobleme
@@ -269,10 +269,10 @@ Partial Class Form1
             'Mauszeiger busy
             Cursor = Cursors.WaitCursor
 
-            'Methode setzen und an Sim übergeben
-            Me.Method = ComboBox_Methode.SelectedItem
+            'Methode setzen
+            Form1.Method = ComboBox_Methode.SelectedItem
 
-            Select Case Me.Method
+            Select Case Form1.Method
 
                 Case "" 'Keine Methode ausgewählt
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -379,7 +379,7 @@ Partial Class Form1
                     End If
 
                     'Fallunterscheidung CES oder Hybrid
-                    Select Case Me.Method
+                    Select Case Form1.Method
                         Case METH_CES
                             'CES für Sim vorbereiten (Files lesen und Validieren)
                             Call Sim1.read_and_valid_INI_Files_CES()
@@ -1344,7 +1344,7 @@ Partial Class Form1
         ReDim RN(globalAnzRand - 1)
 
         'Diagramm vorbereiten und initialisieren
-        If (Not Me.Method = METH_HYBRID And Not EVO_Einstellungen1.Settings.CES.ty_Hybrid = EVO.Kern.HYBRID_TYPE.Sequencial_1) Then
+        If (Not Form1.Method = METH_HYBRID And Not EVO_Einstellungen1.Settings.CES.ty_Hybrid = EVO.Kern.HYBRID_TYPE.Sequencial_1) Then
             Call PrepareDiagramm()
         End If
 
@@ -1798,7 +1798,7 @@ Start_Evolutionsrunden:
 
                             Achse.Name = "Simulation"
                             Achse.Auto = False
-                            If (Me.Method = METH_PES) Then
+                            If (Form1.Method = METH_PES) Then
                                 'Bei PES:
                                 '--------
                                 If (EVO_Einstellungen1.Settings.PES.Pop.is_POPUL) Then
