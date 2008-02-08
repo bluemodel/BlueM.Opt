@@ -193,6 +193,8 @@ Public Class EVO_Einstellungen
                 Cntrl.Items.Add(EVO_POP_PENALTY.Spannweite)
         End Select
 
+        Cntrl.SelectedIndex = 0
+
     End Sub
 
    'Einstellungen aus Form einlesen
