@@ -252,6 +252,7 @@ Public Class Individuum
         Array.Copy(Me.Penalty, Dest.Penalty, Me.Penalty.Length)
 
         '05 Wert der Randbedingung(en)
+        ReDim Dest.Constrain(Me.Constrain.GetUpperBound(0))
         If Not Me.Constrain.GetLength(0) = -1 Then
             Array.Copy(Me.Constrain, Dest.Constrain, Me.Constrain.Length)
         End If
