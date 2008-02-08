@@ -24,8 +24,6 @@ Public MustInherit Class Sim
     'Information
     '-----------
 
-    Public Method as String                              'Verwendete Methode
-
     'Generelle Eigenschaften
     '-----------------------
     Public Datensatz As String                           'Name des zu simulierenden Datensatzes

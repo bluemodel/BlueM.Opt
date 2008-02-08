@@ -32,7 +32,7 @@ Partial Class Form1
     Private Anwendung As String
 
     'Optimierungsmethode
-    Private Method As String
+    Friend Method As String
 
     '**** Deklarationen der Module *****
     Private WithEvents Testprobleme1 As Testprobleme
@@ -190,7 +190,7 @@ Partial Class Form1
                     'EVO_Einstellungen aktivieren
                     EVO_Einstellungen1.Enabled = True
 
-                    Call EVO_Einstellungen1.setStandard_PES(Testprobleme1.OptModus, Method)
+                    Call EVO_Einstellungen1.setStandard_PES(Testprobleme1.OptModus)
 
                     'Globale Parameter werden gesetzt
                     Call Testprobleme1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
@@ -271,7 +271,6 @@ Partial Class Form1
 
             'Methode setzen und an Sim übergeben
             Me.Method = ComboBox_Methode.SelectedItem
-            Sim1.Method = Me.Method
 
             Select Case Me.Method
 
@@ -336,9 +335,9 @@ Partial Class Form1
                     EVO_Einstellungen1.Enabled = True
                     Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_PES
                     If (Sim1.List_OptZiele.GetLength(0) = 1) Then
-                        Call EVO_Einstellungen1.setStandard_PES(Kern.EVO_MODUS.Single_Objective, Method)
+                        Call EVO_Einstellungen1.setStandard_PES(Kern.EVO_MODUS.Single_Objective)
                     ElseIf (Sim1.List_OptZiele.GetLength(0) > 1) Then
-                        Call EVO_Einstellungen1.setStandard_PES(Kern.EVO_MODUS.Multi_Objective, Method)
+                        Call EVO_Einstellungen1.setStandard_PES(Kern.EVO_MODUS.Multi_Objective)
                     End If
 
                     'Parameterübergabe an PES
@@ -356,7 +355,7 @@ Partial Class Form1
                     Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_HookeJeeves
                     'Nur SO möglich
                     If (Sim1.List_OptZiele.GetLength(0) = 1) Then
-                        Call EVO_Einstellungen1.setStandard_HJ(Method)
+                        Call EVO_Einstellungen1.setStandard_HJ()
                     ElseIf Sim1.List_OptZiele.GetLength(0) > 1 Then
                         Throw New Exception("Methode von Hook und Jeeves erlaubt nur SO-Optimierung!")
                     End If
@@ -403,13 +402,13 @@ Partial Class Form1
                     Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_CES
 
                     'Je nach Methode nur CES oder HYBRID
-                    Call EVO_Einstellungen1.setStandard_CES(METHOD)
+                    Call EVO_Einstellungen1.setStandard_CES()
 
                     'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten PES
                     If (Sim1.List_OptZiele.GetLength(0) = 1) Then
-                        Call EVO_Einstellungen1.setStandard_PES(Kern.EVO_MODUS.Single_Objective, Method)
+                        Call EVO_Einstellungen1.setStandard_PES(Kern.EVO_MODUS.Single_Objective)
                     ElseIf (Sim1.List_OptZiele.GetLength(0) > 1) Then
-                        Call EVO_Einstellungen1.setStandard_PES(Kern.EVO_MODUS.Multi_Objective, Method)
+                        Call EVO_Einstellungen1.setStandard_PES(Kern.EVO_MODUS.Multi_Objective)
                     End If
 
                     'CES initialisieren
@@ -511,7 +510,7 @@ Partial Class Form1
 
         'Dialog anzeigen
         If (OpenFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK) Then
-            Call EVO_Einstellungen1.loadSettings(OpenFileDialog1.FileName, Method)
+            Call EVO_Einstellungen1.loadSettings(OpenFileDialog1.FileName)
         End If
     End Sub
 
@@ -932,7 +931,9 @@ Partial Class Form1
             'Child Schleife
             'xxxxxxxxxxxxxx
             For i = 0 To EVO_Einstellungen1.Settings.CES.n_Childs - 1
+
                 durchlauf_all += 1
+                CES1.Childs(i).ID = durchlauf_all
 
                 Call EVO_Opt_Verlauf1.Nachfolger(i + 1)
 

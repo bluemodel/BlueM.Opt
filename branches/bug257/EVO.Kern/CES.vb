@@ -80,11 +80,11 @@ Public Class CES
 
         'Überprüfung der Übergebenen Werte
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        If (Settings.CES.n_Parents < 1) Then
-            Throw New Exception("Die Anzahl der Eltern ist kleiner 1!")
+        If (Settings.CES.n_Parents < 3) Then
+            Throw New Exception("Die Anzahl muss mindestens 3 sein!")
         End If
-        If (Settings.CES.n_Childs < 1) Then
-            Throw New Exception("Die Anzahl der Nachfahren ist kleiner 1!")
+        If (Settings.CES.n_Childs < 3) Then
+            Throw New Exception("Die Anzahl der Nachfahren muss mindestens 3 sein!")
         End If
         If (Settings.CES.n_Generations < 1) Then
             Throw New Exception("Die Anzahl der Generationen ist kleiner 1!")

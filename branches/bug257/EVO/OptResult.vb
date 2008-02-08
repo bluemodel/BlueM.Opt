@@ -17,7 +17,6 @@ Public Class OptResult
     '*******************************************************************************
 
     'Allgemeine Einstellungen
-    Private Method As String
     Private Datensatz As String
 
     'Ergebnisdatenbank
@@ -49,9 +48,6 @@ Public Class OptResult
     'Konstruktor
     '***********
     Public Sub New(ByVal Sim1 As Sim)
-
-        'Methode speichern
-        Me.Method = Sim1.Method
 
         'Datensatzname speichern
         Me.Datensatz = Sim1.Datensatz
@@ -241,7 +237,7 @@ Public Class OptResult
         'Allgemeine Anpassungen
         Call Me.db_prepare()
         'Methodenspezifische Anpassungen
-        Select Case Me.Method
+        Select Case Evo.Form1.Method
             Case METH_PES, METH_SENSIPLOT, METH_HOOKJEEVES
                 Call Me.db_prepare_PES()
             Case METH_CES
@@ -413,7 +409,7 @@ Public Class OptResult
             command.ExecuteNonQuery()
         End If
 
-        If (Me.Method = METH_PES Or Me.Method = METH_SENSIPLOT) Then
+        If (Evo.Form1.Method = METH_PES Or Evo.Form1.Method = METH_SENSIPLOT) Then
 
             'OptParameter schreiben
             '----------------------
@@ -543,12 +539,12 @@ Public Class OptResult
         Call db_connect()
 
         'Fallunterscheidung nach Methode
-        Select Case Me.Method
+        Select Case Evo.Form1.Method
 
             Case METH_PES, METH_SENSIPLOT
 
                 'Unterscheidung
-                If (Me.Method = METH_SENSIPLOT) Then
+                If (Evo.Form1.Method = METH_SENSIPLOT) Then
                     'xAchse ist QWert, yAchse ist OptPara
                     q = "SELECT OptParameter.* FROM OptParameter INNER JOIN QWerte ON OptParameter.Sim_ID = QWerte.Sim_ID WHERE (OptParameter.[" & yAchse & "] = " & yWert & " AND QWerte.[" & xAchse & "] = " & xWert & ")"
                 ElseIf (Me.List_OptZiele.Length = 1) Then

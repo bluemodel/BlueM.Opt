@@ -939,7 +939,7 @@ Partial Class EVO_Einstellungen
         '
         Me.Numeric_CES_n_childs.Location = New System.Drawing.Point(139, 72)
         Me.Numeric_CES_n_childs.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
-        Me.Numeric_CES_n_childs.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.Numeric_CES_n_childs.Minimum = New Decimal(New Integer() {3, 0, 0, 0})
         Me.Numeric_CES_n_childs.Name = "Numeric_CES_n_childs"
         Me.Numeric_CES_n_childs.Size = New System.Drawing.Size(53, 20)
         Me.Numeric_CES_n_childs.TabIndex = 5
@@ -950,7 +950,7 @@ Partial Class EVO_Einstellungen
         '
         Me.Numeric_CES_n_Parents.Location = New System.Drawing.Point(139, 46)
         Me.Numeric_CES_n_Parents.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
-        Me.Numeric_CES_n_Parents.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.Numeric_CES_n_Parents.Minimum = New Decimal(New Integer() {3, 0, 0, 0})
         Me.Numeric_CES_n_Parents.Name = "Numeric_CES_n_Parents"
         Me.Numeric_CES_n_Parents.Size = New System.Drawing.Size(53, 20)
         Me.Numeric_CES_n_Parents.TabIndex = 4
