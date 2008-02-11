@@ -1004,12 +1004,7 @@ Partial Class Form1
             Else
                 'NDSorting ******************
                 Call CES1.NDSorting_Control(i_gen)
-                ''Zeichnen von NDSortingResult
-                'Call DForm.Diag.DeleteSeries(CES1.n_Childs - 1, 1)
-                'serie = DForm.Diag.getSeriesPoint("Front:" & 1, "green")
-                'For i = 0 To CES1.n_Childs - 1
-                '    Call serie.Add(CES1.NDSResult(i).Penalty(0), CES1.NDSResult(i).Penalty(1))
-                'Next
+
                 'Sekundäre Population
                 SekPopulation = CES1.SekundärQb_Get()
                 If (Not IsNothing(Sim1)) Then
@@ -1075,6 +1070,12 @@ Partial Class Form1
                             'Anzahl der Parameter bezieht sich hier nur auf eine Location
                             globalAnzPar = CES1.Childs(i).Loc(j).PES_OptPara.GetLength(0)
 
+                            'MyPara wird gefüllt
+                            ReDim myPara(CES1.Childs(i).Loc(j).PES_OptPara.GetUpperBound(0))
+                            For m = 0 To CES1.Childs(i).Loc(j).PES_OptPara.GetUpperBound(0)
+                                myPara(m) = CES1.Childs(i).Loc(j).PES_OptPara(m)
+                            Next
+
                             'Die Anzahl der Eltern wird bestimmt, bzw ob Eltern vorhanden
                             Dim n_eltern As Integer = 0
                             n_eltern = CES1.PES_Parents_pLoc.GetLength(0)
@@ -1092,6 +1093,7 @@ Partial Class Form1
                                     End If
                                 Next
                             Else
+
                                 'Falls Eltern vorhanden -> auf Basis des Memory
                                 EVO_Einstellungen1.isSaved = False
                                 Call EVO_Einstellungen1.SetFor_CES_PES(1, n_eltern, 1)
