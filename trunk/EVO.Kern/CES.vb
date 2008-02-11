@@ -183,7 +183,7 @@ Public Class CES
                 Next
                 Childs(i).mutated = True
                 Childs(i).ID = i + 1
-            Loop While Is_Twin(i) = True Or isnot_nullvariante(Childs(i).Path) = False
+            Loop While Is_Twin(i) = True Or is_nullvariante(Childs(i).Path) = True
         Next
 
     End Sub
@@ -217,8 +217,8 @@ Public Class CES
     End Sub
     'Hier kann man Pfade wie z.B. Nullvarianten die nicht erlaubt sind hard vercoden (ToDo!)
     '***************************************************************************************
-    Public Function isnot_nullvariante(ByVal path() As Integer) As Boolean
-        isnot_nullvariante = True
+    Public Function is_nullvariante(ByVal path() As Integer) As Boolean
+        is_nullvariante = False
 
         Dim i, j As Integer
         Dim count As Integer = 0
@@ -235,7 +235,7 @@ Public Class CES
                     End If
                 Next
                 If count = path.GetLength(0) Then
-                    isnot_nullvariante = False
+                    is_nullvariante = True
                 End If
             End If
         Next
@@ -519,7 +519,7 @@ Public Class CES
                         Call MutOp_Dyn_Switch(Childs(i).Path, count)
                 End Select
                 count += 1
-            Loop While Is_Twin(i) = True Or Is_Clone(i) = True Or isnot_nullvariante(Childs(i).Path) = False
+            Loop While Is_Twin(i) = True Or Is_Clone(i) = True Or is_nullvariante(Childs(i).Path) = True
             Childs(i).mutated = True
         Next
 
