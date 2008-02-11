@@ -295,9 +295,7 @@ Public Class Individuum
                 Redim Dest.loc(i).PES_OptPara(Me.Loc(i).PES_OptPara.GetUpperBound(0))
                 For j = 0 To Me.Loc(i).PES_OptPara.GetUpperBound(0)
                     Dest.loc(i).PES_OptPara(j) = new Kern.OptParameter
-                    Dest.Loc(i).PES_OptPara(j).Xn = Me.Loc(i).PES_OptPara(j).Xn
-                    Dest.Loc(i).PES_OptPara(j).Dn = Me.Loc(i).PES_OptPara(j).Dn
-                    Dest.Loc(i).PES_OptPara(j).Bezeichnung = Me.Loc(i).PES_OptPara(j).Bezeichnung
+                    Dest.Loc(i).PES_OptPara(j) = Me.Loc(i).PES_OptPara(j).Clone
                 Next
             End If
 
