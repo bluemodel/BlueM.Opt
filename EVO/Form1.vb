@@ -947,8 +947,9 @@ Partial Class Form1
                 'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
                 '***************************************************************
                 If Method = METH_HYBRID AND EVO_Einstellungen1.Settings.CES.ty_Hybrid = EVO.Kern.HYBRID_TYPE.Mixed_Integer Then
-                    Call Sim1.Reduce_OptPara_and_ModPara(CES1.Childs(i).All_Elem)
-                    Call Sim1.PREPARE_Evaluation_PES(CES1.Childs(i).All_Para)
+                    if Sim1.Reduce_OptPara_and_ModPara(CES1.Childs(i).All_Elem) then
+                        Call Sim1.PREPARE_Evaluation_PES(CES1.Childs(i).All_Para)
+                    End If
                 End If
 
                 'Simulation *************************************************************************
