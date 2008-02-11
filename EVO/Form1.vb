@@ -419,6 +419,8 @@ Partial Class Form1
                     
                     'Die Variablen für die Individuuen werden gesetzt
                     EVO.Kern.Individuum.Initialise(2, CES1.ModSett.n_Locations, 0, CES1.ModSett.n_Penalty, CES1.ModSett.n_Constrain)
+                    globalAnzZiel = CES1.ModSett.n_Penalty
+                    globalAnzRand = CES1.ModSett.n_Constrain
 
                     'Bei Testmodus wird die Anzahl der Kinder und Generationen überschrieben
                     '***********************************************************************
@@ -837,7 +839,7 @@ Partial Class Form1
         Call Kern.Individuum.New_Array("Parent", CES1.Parents)
         ReDim CES1.Childs(EVO_Einstellungen1.Settings.CES.n_Childs - 1)
         Call Kern.Individuum.New_Array("Child", CES1.Childs)
-
+        
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
 
@@ -918,7 +920,6 @@ Partial Class Form1
                 Next
             Next
         End If
-
 
         'Startwerte werden der Verlaufsanzeige zugewiesen
         Call Me.EVO_Opt_Verlauf1.Initialisieren(1, 1, EVO_Einstellungen1.Settings.CES.n_Generations, EVO_Einstellungen1.Settings.CES.n_Childs)
@@ -1653,6 +1654,8 @@ Start_Evolutionsrunden:
             For i = 0 To SekPop.GetUpperBound(0)
                 serie3D.Add(SekPop(i, 0), SekPop(i, 1), SekPop(i, 2))
             Next i
+        Else
+            Throw New Exception("Der Parameter 'globalAnzZiel' weist ungültige Parameter auf.")
         End If
 
     End Sub
@@ -1686,6 +1689,8 @@ Start_Evolutionsrunden:
             For i = 0 To solutions.GetUpperBound(0)
                 serie3D.Add(solutions(i).Penalty(0), solutions(i).Penalty(1), solutions(i).Penalty(2), solutions(i).ID)
             Next i
+        Else
+            Throw New Exception("Der Parameter 'globalAnzZiel' weist ungültige Parameter auf.")
         End If
 
     End Sub
