@@ -2004,10 +2004,10 @@ Start_Evolutionsrunden:
                 Continue For
             End If
 
-            'Simulation ausführen
-            'xxxxxxxxxxxxxxxxxxxx
+            'Simulation vorbereiten
+            'xxxxxxxxxxxxxxxxxxxxxx
 
-            Select form1.Method
+            Select Case Form1.Method
 
                 Case METH_PES
 
@@ -2019,12 +2019,6 @@ Start_Evolutionsrunden:
                     'Modellparameter schreiben
                     Call Sim1.Write_ModellParameter()
 
-                    'Simulieren
-                    isOK = Sim1.launchSim()
-
-                    'Zu zeichnende Simulationsreihen zurücksetzen
-                    SimSeries.Clear()
-
                 Case METH_CES, METH_HYBRID
 
                     'Aktueller Pfad wird an Sim zurückgegeben
@@ -2032,18 +2026,18 @@ Start_Evolutionsrunden:
                     Call Sim1.PREPARE_Evaluation_CES(ind.Path, ind.All_Elem)
 
                     'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
-                    If Method = METH_HYBRID AND EVO_Einstellungen1.Settings.CES.ty_Hybrid = EVO.Kern.HYBRID_TYPE.Mixed_Integer Then
+                    If Form1.Method = METH_HYBRID And EVO_Einstellungen1.Settings.CES.ty_Hybrid = EVO.Kern.HYBRID_TYPE.Mixed_Integer Then
                         Call Sim1.Reduce_OptPara_and_ModPara(ind.All_Elem)
                         Call Sim1.PREPARE_Evaluation_PES(ind.All_Para)
                     End If
 
-                    'Simulieren
-                    isOK = Sim1.launchSim()
-
-                    'Zu zeichnende Simulationsreihen zurücksetzen
-                    SimSeries.Clear()
-
             End Select
+
+            'Simulation ausführen
+            'xxxxxxxxxxxxxxxxxxxx
+
+            'Simulieren
+            isOK = Sim1.launchSim()
 
             'Sonderfall IHA-Berechnung
             If (isIHA) Then
@@ -2054,6 +2048,9 @@ Start_Evolutionsrunden:
                 RVAResult.Title = "Lösung " & ind.ID.ToString()
                 Call Wave2.Display_RVA(RVAResult)
             End If
+
+            'Zu zeichnenden Simulationsreihen zurücksetzen
+            SimSeries.Clear()
 
             'zu zeichnenden Reihen aus Liste der OptZiele raussuchen
             '-------------------------------------------------------
