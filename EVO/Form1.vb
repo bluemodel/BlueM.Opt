@@ -2002,19 +2002,43 @@ Start_Evolutionsrunden:
             'Simulation ausführen
             'xxxxxxxxxxxxxxxxxxxx
 
-            'OptParameter übernehmen
-            For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
-                Sim1.List_OptParameter(i).Xn = ind.PES_OptParas(i).Xn
-            Next
+            Select form1.Method
 
-            'Modellparameter schreiben
-            Call Sim1.Write_ModellParameter()
+                Case METH_PES
 
-            'Simulieren
-            isOK = Sim1.launchSim()
+                    'OptParameter übernehmen
+                    For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
+                        Sim1.List_OptParameter(i).Xn = ind.PES_OptParas(i).Xn
+                    Next
 
-            'Zu zeichnende Simulationsreihen zurücksetzen
-            SimSeries.Clear()
+                    'Modellparameter schreiben
+                    Call Sim1.Write_ModellParameter()
+
+                    'Simulieren
+                    isOK = Sim1.launchSim()
+
+                    'Zu zeichnende Simulationsreihen zurücksetzen
+                    SimSeries.Clear()
+
+                Case METH_CES, METH_HYBRID
+
+                    'Aktueller Pfad wird an Sim zurückgegeben
+                    'Bereitet das BlaueModell für die Kombinatorik vor
+                    Call Sim1.PREPARE_Evaluation_CES(ind.Path, ind.All_Elem)
+
+                    'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
+                    If Method = METH_HYBRID AND EVO_Einstellungen1.Settings.CES.ty_Hybrid = EVO.Kern.HYBRID_TYPE.Mixed_Integer Then
+                        Call Sim1.Reduce_OptPara_and_ModPara(ind.All_Elem)
+                        Call Sim1.PREPARE_Evaluation_PES(ind.All_Para)
+                    End If
+
+                    'Simulieren
+                    isOK = Sim1.launchSim()
+
+                    'Zu zeichnende Simulationsreihen zurücksetzen
+                    SimSeries.Clear()
+
+            End Select
 
             'Sonderfall IHA-Berechnung
             If (isIHA) Then
