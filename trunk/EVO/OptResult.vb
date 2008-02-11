@@ -371,6 +371,7 @@ Public Class OptResult
     End Sub
 
     'Eine Lösung in die ErgebnisDB schreiben
+    'BUG 260: db_insert für METH_HYBRID fehlt noch!
     '***************************************
     Private Function db_insert(ByVal ind As Kern.Individuum) As Boolean
 
@@ -423,8 +424,6 @@ Public Class OptResult
             command.ExecuteNonQuery()
 
         End If
-
-        'BUG 260: db_insert für CES
 
         If (EVO.Form1.Method = METH_CES) Then
 
@@ -521,134 +520,6 @@ Public Class OptResult
 
     End Function
 
-    'Einen Parametersatz aus der DB übernehmen
-    'TODO: Funktion db_getPara wird nicht mehr genutzt!
-    '**************************************************
-    Private Function db_getPara(ByRef ind As Kern.Individuum, ByVal xAchse As String, ByVal xWert As Double, ByVal yAchse As String, ByVal yWert As Double) As Boolean
-
-        Dim isOK As Boolean = False
-        Dim q As String
-        Dim adapter As OleDbDataAdapter
-        Dim ds As DataSet
-        Dim numrows As Integer
-
-        'TODO: eigentlich müsste die ID aus der db übernommen werden
-        ind = New Kern.Individuum("Solution", 0)
-        ReDim ind.PES_OptParas(Me.List_OptParameter.GetUpperBound(0))
-
-        Call db_connect()
-
-        'Fallunterscheidung nach Methode
-        Select Case Evo.Form1.Method
-
-            Case METH_PES, METH_SENSIPLOT
-
-                'Unterscheidung
-                If (Evo.Form1.Method = METH_SENSIPLOT) Then
-                    'xAchse ist QWert, yAchse ist OptPara
-                    q = "SELECT OptParameter.* FROM OptParameter INNER JOIN QWerte ON OptParameter.Sim_ID = QWerte.Sim_ID WHERE (OptParameter.[" & yAchse & "] = " & yWert & " AND QWerte.[" & xAchse & "] = " & xWert & ")"
-                ElseIf (Me.List_OptZiele.Length = 1) Then
-                    'nur yAchse ist QWert
-                    q = "SELECT OptParameter.* FROM OptParameter INNER JOIN QWerte ON OptParameter.Sim_ID = QWerte.Sim_ID WHERE (QWerte.[" & yAchse & "] = " & yWert & ")"
-                Else
-                    'xAchse und yAchse sind beides QWerte
-                    q = "SELECT OptParameter.* FROM OptParameter INNER JOIN QWerte ON OptParameter.Sim_ID = QWerte.Sim_ID WHERE (QWerte.[" & xAchse & "] = " & xWert & " AND QWerte.[" & yAchse & "] = " & yWert & ")"
-                End If
-
-                adapter = New OleDbDataAdapter(q, db)
-
-                ds = New DataSet("EVO")
-                numrows = adapter.Fill(ds, "OptParameter")
-
-                'Anzahl Übereinstimmungen überprüfen
-                If (numrows = 0) Then
-                    MsgBox("Es wurde keine Übereinstimmung in der Datenbank gefunden!", MsgBoxStyle.Exclamation, "Problem")
-                    Return False
-                ElseIf (numrows > 1) Then
-                    MsgBox("Es wurden mehr als eine Entsprechung von OptParametern für den gewählten Punkt gefunden!" & eol & "Es wird nur das erste Ergebnis verwendet!", MsgBoxStyle.Exclamation, "Problem")
-                End If
-
-                'OptParametersatz übernehmen
-                For i As Integer = 0 To Me.List_OptParameter.GetUpperBound(0)
-                    ind.PES_OptParas(i) = ds.Tables("OptParameter").Rows(0).Item(Me.List_OptParameter(i).Bezeichnung)
-                Next
-
-                isOK = True
-
-                Return isOK
-
-                'BUG 260: db_getPara für CES
-
-
-                'Case METH_CES
-
-                '    q = "SELECT Pfad.* FROM Pfad INNER JOIN QWerte ON Pfad.Sim_ID = QWerte.Sim_ID WHERE (QWerte.[" & xAchse & "] = " & xWert & " AND QWerte.[" & yAchse & "] = " & yWert & ")"
-
-                '    adapter = New OleDbDataAdapter(q, db)
-
-                '    ds = New DataSet("EVO")
-                '    numrows = adapter.Fill(ds, "Pfad")
-
-                '    'Anzahl Übereinstimmungen überprüfen
-                '    If (numrows = 0) Then
-                '        MsgBox("Es wurde keine Übereinstimmung in der Datenbank gefunden!", MsgBoxStyle.Exclamation, "Problem")
-                '        Return False
-                '    ElseIf (numrows > 1) Then
-                '        MsgBox("Es wurden mehr als eine Entsprechung von Pfaden für den gewählten Punkt gefunden!" & eol & "Es wird nur das erste Ergebnis verwendet!", MsgBoxStyle.Exclamation, "Problem")
-                '    End If
-
-                '    'Pfad übernehmen
-                '    For i As Integer = 0 To Me.Akt.Measures.GetUpperBound(0)
-                '        Me.Akt.Measures(i) = ds.Tables("Pfad").Rows(0).Item(List_Locations(i).Name)
-                '    Next
-
-                '    'Bereitet das BlaueModell für die Kombinatorik vor
-                '    Call Me.PREPARE_Evaluation_CES()
-
-
-                'Case METH_CES_PES
-
-                '    q = "SELECT OptParameter.*, Pfad.* FROM (((Sim LEFT JOIN Constraints ON Sim.ID = Constraints.Sim_ID) INNER JOIN OptParameter ON Sim.ID = OptParameter.Sim_ID) INNER JOIN Pfad ON Sim.ID = Pfad.Sim_ID) INNER JOIN QWerte ON Sim.ID = QWerte.Sim_ID WHERE (QWerte.[" & xAchse & "] = " & xWert & " AND QWerte.[" & yAchse & "] = " & yWert & ")"
-
-                '    adapter = New OleDbDataAdapter(q, db)
-
-                '    ds = New DataSet("EVO")
-                '    adapter.Fill(ds, "OptParameter_Pfad")
-
-                '    'Anzahl Übereinstimmungen überprüfen
-                '    numrows = ds.Tables("OptParameter_Pfad").Rows.Count
-
-                '    If (numrows = 0) Then
-                '        MsgBox("Es wurde keine Übereinstimmung in der Datenbank gefunden!", MsgBoxStyle.Exclamation, "Problem")
-                '        Return False
-                '    ElseIf (numrows > 1) Then
-                '        MsgBox("Es wurden mehr als eine Entsprechung von OptParametern / Pfad für den gewählten Punkt gefunden!" & eol & "Es wird nur das erste Ergebnis verwendet!", MsgBoxStyle.Exclamation, "Problem")
-                '    End If
-
-                '    'Pfad übernehmen
-                '    For i As Integer = 0 To Me.Akt.Measures.GetUpperBound(0)
-                '        Me.Akt.Measures(i) = ds.Tables("OptParameter_Pfad").Rows(0).Item(List_Locations(i).Name)
-                '    Next
-
-                '    'Bereitet das BlaueModell für die Kombinatorik vor
-                '    Call Me.PREPARE_Evaluation_CES()
-
-                '    'OptParametersatz übernehmen
-                '    For i As Integer = 0 To Me.List_OptParameter.GetUpperBound(0)
-                '        With Me.List_OptParameter(i)
-                '            .Wert = ds.Tables("OptParameter_Pfad").Rows(0).Item(.Bezeichnung)
-                '        End With
-                '    Next
-
-                '    'Modellparameter schreiben
-                '    Call Me.Write_ModellParameter()
-
-        End Select
-
-        Call db_disconnect()
-
-    End Function
-
     'Ergebnisdatenbank abspeichern (kopieren)
     '****************************************
     Public Sub db_save(ByVal targetFile As String)
@@ -662,13 +533,13 @@ Public Class OptResult
     End Sub
 
     'Optimierungsergebnis aus einer DB lesen
-    '***************************************
+    'BUG 260: db_load für METH_CES und METH_HYBRID fehlen!
+    '*****************************************************
     Public Sub db_load(ByVal sourceFile As String)
 
         '---------------------------------------------------------------------------
         'Hinweise:
         'Die EVO-Eingabedateien müssen eingelesen sein und mit der DB übereinstimmen
-        'Funktioniert momentan nur für PES
         '---------------------------------------------------------------------------
 
         Dim i, j As Integer
