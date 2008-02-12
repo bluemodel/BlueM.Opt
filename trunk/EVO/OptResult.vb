@@ -620,18 +620,26 @@ Public Class OptResult
                 'ID
                 '--
                 .ID = ds.Tables(0).Rows(i).Item("Sim.ID")
+                
+                ReDim .PES_OptParas(Me.List_OptParameter_Save.GetUpperBound(0))
+
                 'OptParameter
                 '------------
-                ReDim .PES_OptParas(Me.List_OptParameter.GetUpperBound(0))
-                For j = 0 To Me.List_OptParameter.GetUpperBound(0)
-                    .PES_OptParas(j) = ds.Tables(0).Rows(i).Item(Me.List_OptParameter(j).Bezeichnung)
+                For j = 0 To Me.List_OptParameter_Save.GetUpperBound(0)
+
+                    .PES_OptParas(j) = new Kern.OptParameter
+                    .PES_OptParas(j) = Me.List_OptParameter_Save(j).Clone
+
+                    .PES_OptParas(j).RWert = ds.Tables(0).Rows(i).Item(Me.List_OptParameter_Save(j).Bezeichnung)
                 Next
+
                 'QWerte
                 '------
                 ReDim .Penalty(Me.List_OptZiele.GetUpperBound(0))
                 For j = 0 To Me.List_OptZiele.GetUpperBound(0)
                     .Penalty(j) = ds.Tables(0).Rows(i).Item(Me.List_OptZiele(j).Bezeichnung)
                 Next
+
                 'Constraints
                 '-----------
                 ReDim .Constrain(Me.List_Constraints.GetUpperBound(0))
