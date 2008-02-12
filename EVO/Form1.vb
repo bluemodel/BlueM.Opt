@@ -907,9 +907,7 @@ Partial Class Form1
 
                         'Dem Child wird der Schrittweitenvektor zugewiesen und gegebenenfalls der Parameter zufällig gewählt
                         'wird also nicht in PES.ESStarten gemacht
-                        ReDim CES1.Childs(i).Loc(j).PES_OptPara(CES1.Childs(i).Loc(j).PES_OptPara.GetUpperBound(0))
                         For m = 0 To CES1.Childs(i).Loc(j).PES_OptPara.GetUpperBound(0)
-                            CES1.Childs(i).Loc(j).PES_OptPara(m) = new Kern.OptParameter
                             CES1.Childs(i).Loc(j).PES_OptPara(m).Dn = EVO_Einstellungen1.Settings.PES.Schrittweite.DnStart
                             If EVO_Einstellungen1.Settings.PES.OptStartparameter = Kern.EVO_STARTPARAMETER.Zufall Then
                                 Randomize()
@@ -1084,9 +1082,7 @@ Partial Class Form1
                             'Die Kinder bekommen je nach Fall (Eltern keine Eltern) neue Parameter
                             If n_eltern = 0 Then
                                 'Falls noch keine Eltern vorhanden sind -> zufällige Werte
-                                ReDim CES1.Childs(i).Loc(j).PES_OptPara(CES1.Childs(i).Loc(j).PES_OptPara.GetUpperBound(0))
                                 For m = 0 To CES1.Childs(i).Loc(j).PES_OptPara.GetUpperBound(0)
-                                    CES1.Childs(i).Loc(j).PES_OptPara(m).Dn = EVO_Einstellungen1.Settings.PES.Schrittweite.DnStart
                                     'Falls zufällige Startwerte
                                     If EVO_Einstellungen1.Settings.PES.OptStartparameter = Kern.EVO_STARTPARAMETER.Zufall Then
                                         Randomize()
