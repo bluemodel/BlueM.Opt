@@ -170,7 +170,8 @@ Public Class CES
         Dim i, j As Integer
         Dim tmp As Integer
         Dim lowerb As Integer = 0
-        Dim upperb As Integer
+        Dim upperb As Integer 
+        Dim LoopCount As Integer = 0
         Randomize()
 
         For i = 0 To Settings.CES.n_Childs - 1
@@ -183,7 +184,11 @@ Public Class CES
                 Next
                 Childs(i).mutated = True
                 Childs(i).ID = i + 1
-            Loop While Is_Twin(i) = True Or is_nullvariante(Childs(i).Path) = True
+                LoopCount += 1
+            'If LoopCount = 100000 then
+            '    throw new Exception("100000")
+            'End If
+            Loop While (Is_Twin(i) = True Or is_nullvariante(Childs(i).Path) = True) And Not LoopCount >= 1000
         Next
 
     End Sub
@@ -220,25 +225,25 @@ Public Class CES
     Public Function is_nullvariante(ByVal path() As Integer) As Boolean
         is_nullvariante = False
 
-        Dim i, j As Integer
-        Dim count As Integer = 0
+        'Dim i, j As Integer
+        'Dim count As Integer = 0
 
-        'Dim firstValues()() As Byte = {New Byte() {2, 1}, New Byte() {3, 0}}
-        'Dim vector_array()() As Integer = {New Integer() {1, 1, 1}}
-        Dim vector_array()() As Integer = {New Integer() {0, 1, 1}}
+        ''Dim firstValues()() As Byte = {New Byte() {2, 1}, New Byte() {3, 0}}
+        ''Dim vector_array()() As Integer = {New Integer() {1, 1, 1}}
+        'Dim vector_array()() As Integer = {New Integer() {0, 1, 1}}
 
-        For i = 0 To vector_array.GetUpperBound(0)
-            If vector_array(i).GetUpperBound(0) = path.GetUpperBound(0) Then
-                For j = 0 To vector_array(i).GetUpperBound(0)
-                    If vector_array(i)(j) = path(j) Then
-                        count += 1
-                    End If
-                Next
-                If count = path.GetLength(0) Then
-                    is_nullvariante = True
-                End If
-            End If
-        Next
+        'For i = 0 To vector_array.GetUpperBound(0)
+        '    If vector_array(i).GetUpperBound(0) = path.GetUpperBound(0) Then
+        '        For j = 0 To vector_array(i).GetUpperBound(0)
+        '            If vector_array(i)(j) = path(j) Then
+        '                count += 1
+        '            End If
+        '        Next
+        '        If count = path.GetLength(0) Then
+        '            is_nullvariante = True
+        '        End If
+        '    End If
+        'Next
     End Function
 
     'Selectionsprozess je nach "plus" oder "minus" Strategie (Die beiden Listen sind schon vorsortiert!)
@@ -513,13 +518,12 @@ Public Class CES
                     Case CES_MUTATION.RND_Switch
                         'Verändert zufällig ein gen des Paths
                         Call MutOp_RND_Switch(Childs(i).Path)
-
                     Case CES_MUTATION.Dyn_Switch
                         'Verändert zufällig ein gen des Paths mit dynamisch erhöhter Mutationsrate
                         Call MutOp_Dyn_Switch(Childs(i).Path, count)
                 End Select
                 count += 1
-            Loop While Is_Twin(i) = True Or Is_Clone(i) = True Or is_nullvariante(Childs(i).Path) = True
+            Loop While (Is_Twin(i) = True Or Is_Clone(i) = True Or is_nullvariante(Childs(i).Path) = True) and not count >= 1000
             Childs(i).mutated = True
         Next
 
