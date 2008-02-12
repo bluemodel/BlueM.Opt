@@ -97,73 +97,110 @@ Public Class Smusi
 
         Dim simOK As Boolean
         Dim SimCurrent, SimStart, SimEnde As DateTime
+        Dim EXE_DLL As Boolean 'true = EXE, false = DLL
 
-        'SMUSI DLL instanzieren
-        '----------------------
-        Dim dll_path As String
-        dll_path = System.Windows.Forms.Application.StartupPath() & "\SMUSI.dll"
+        EXE_DLL = True
 
-        smusi_dll = Nothing
+        If EXE_DLL Then
+            Dim exe_path As String
+            Dim String1 As String
+            Dim String3 As String
+            dim String4 as string
 
-        If (File.Exists(dll_path)) Then
-            smusi_dll = New SMUSI_EngineDotNetAccess(dll_path)
+            exe_path = System.Windows.Forms.Application.StartupPath() & "\SMUSI.WIN.exe"
+            String1 = exe_path
+            String3 = Me.WorkDir & Me.Datensatz & ".all"
+            String4 = """
+
+            Dim ExterneAnwendung As New System.Diagnostics.Process()
+
+            externeanwendung.StartInfo.FileName = string1
+            ExterneAnwendung.StartInfo.Arguments = String4 & String3 & String4
+            externeanwendung.StartInfo.CreateNoWindow = True
+            ExterneAnwendung.Start()
+            ExterneAnwendung.WaitForExit()
+            If not ExterneAnwendung.HasExited Then
+                ExterneAnwendung.Kill()
+            End If
+            ExterneAnwendung = Nothing
+
+
+            If (File.Exists(Me.WorkDir & Me.Datensatz & ".sum")) Then
+                simOK = True
+            Else
+                simOK = False
+            End If
         Else
-            Throw New Exception("SMUSI.dll nicht gefunden!")
-        End If
 
-        'Falls vorher schon initialisiert wurde
-        Call smusi_dll.Finish()
-        Call smusi_dll.Dispose()
+            'SMUSI DLL instanzieren
+            '----------------------
+            Dim dll_path As String
+            dll_path = System.Windows.Forms.Application.StartupPath() & "\SMUSI.dll"
 
-        Try
+            smusi_dll = Nothing
 
-            Call smusi_dll.Initialize(Me.WorkDir & Me.Datensatz)
+            If (File.Exists(dll_path)) Then
+                smusi_dll = New SMUSI_EngineDotNetAccess(dll_path)
+            Else
+                Throw New Exception("SMUSI.dll nicht gefunden!")
+            End If
 
-            'Dim SimEnde As DateTime = SMUSI_EngineDotNetAccess.DateTime(smusi_dll.GetSimulationEndDate())
-
-            ''Simulationszeitraum 
-            'Do While (SMUSI_EngineDotNetAccess.DateTime(smusi_dll.GetCurrentTime) < SimEnde)
-            '    Call smusi_dll.PerformTimeStep()
-            'Loop
-            'Simulationsdaten auslesen
-            SimStart = SMUSI_EngineDotNetAccess.DateTime(smusi_dll.GetSimulationStartDate())
-            SimEnde = SMUSI_EngineDotNetAccess.DateTime(smusi_dll.GetSimulationEndDate())
-            SimCurrent = SimStart
-            Do While (SimCurrent < SimEnde)
-
-                Call smusi_dll.PerformTimeStep()
-                'Me.ProgressBar1.PerformStep()
-
-                SimCurrent = SMUSI_EngineDotNetAccess.DateTime(smusi_dll.GetCurrentTime)
-
-                'If (SimCurrent.Hour = 0 And SimCurrent.Minute = 0) Then
-                '    'Nach Warnungen überprüfen
-                '    'Call checkForWarnings()
-                '    'Anzeige aktualisieren
-                '    Me.Label_SimDate.Text = SimCurrent
-                'End If
-
-                Application.DoEvents()
-
-            Loop
-
-            'Simulation erfolgreich
-            simOK = True
-
-        Catch ex As Exception
-
-            'Simulationsfehler aufgetreten
-            MsgBox(ex.Message, MsgBoxStyle.Exclamation, "SMUSI")
-            simOK = False
-
-        Finally
-
+            'Falls vorher schon initialisiert wurde
             Call smusi_dll.Finish()
             Call smusi_dll.Dispose()
 
-        End Try
+            Try
 
-        smusi_dll = Nothing
+                Call smusi_dll.Initialize(Me.WorkDir & Me.Datensatz)
+
+                'Dim SimEnde As DateTime = SMUSI_EngineDotNetAccess.DateTime(smusi_dll.GetSimulationEndDate())
+
+                ''Simulationszeitraum 
+                'Do While (SMUSI_EngineDotNetAccess.DateTime(smusi_dll.GetCurrentTime) < SimEnde)
+                '    Call smusi_dll.PerformTimeStep()
+                'Loop
+                'Simulationsdaten auslesen
+                SimStart = SMUSI_EngineDotNetAccess.DateTime(smusi_dll.GetSimulationStartDate())
+                SimEnde = SMUSI_EngineDotNetAccess.DateTime(smusi_dll.GetSimulationEndDate())
+                SimCurrent = SimStart
+                Do While (SimCurrent < SimEnde)
+
+                    Call smusi_dll.PerformTimeStep()
+                    'Me.ProgressBar1.PerformStep()
+
+                    SimCurrent = SMUSI_EngineDotNetAccess.DateTime(smusi_dll.GetCurrentTime)
+
+                    'If (SimCurrent.Hour = 0 And SimCurrent.Minute = 0) Then
+                    '    'Nach Warnungen überprüfen
+                    '    'Call checkForWarnings()
+                    '    'Anzeige aktualisieren
+                    '    Me.Label_SimDate.Text = SimCurrent
+                    'End If
+
+                    Application.DoEvents()
+
+                Loop
+
+                'Simulation erfolgreich
+                simOK = True
+
+            Catch ex As Exception
+
+                'Simulationsfehler aufgetreten
+                MsgBox(ex.Message, MsgBoxStyle.Exclamation, "SMUSI")
+                simOK = False
+
+            Finally
+
+                Call smusi_dll.Finish()
+                Call smusi_dll.Dispose()
+
+            End Try
+
+            smusi_dll = Nothing
+
+        End If
+
 
         'Simulationsergebnis verarbeiten
         '-------------------------------
@@ -192,10 +229,10 @@ Public Class Smusi
                 For Each zre As Wave.Zeitreihe In ASCtmp.Zeitreihen
                     Me.SimErgebnis.Add(zre, elem & "_" & zre.ToString())
                 Next
-                ASCtmp = nothing
+                ASCtmp = Nothing
             Next
 
-            elemente = nothing
+            elemente = Nothing
         End If
 
         Return simOK
