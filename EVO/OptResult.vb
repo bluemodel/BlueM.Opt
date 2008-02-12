@@ -27,6 +27,7 @@ Public Class OptResult
     'Optimierungsbedingungen
     Public List_OptZiele() As Sim.Struct_OptZiel
     Public List_OptParameter() As EVO.Kern.OptParameter
+    Public List_OptParameter_Save() As EVO.Kern.OptParameter
     Public List_Constraints() As Sim.Struct_Constraint
     Public List_Locations()As Sim.Struct_Lokation
 
@@ -55,6 +56,7 @@ Public Class OptResult
         'Optimierungsbedingungen kopieren
         Me.List_OptZiele = Sim1.List_OptZiele
         Me.List_OptParameter = Sim1.List_OptParameter
+        Me.List_OptParameter_Save = sim1.List_OptParameter_Save
         Me.List_Constraints = Sim1.List_Constraints
         Me.List_Locations = Sim1.List_Locations
 
@@ -307,11 +309,11 @@ Public Class OptResult
         Dim fieldnames As String = ""
         Dim i As Integer
 
-        For i = 0 To List_OptParameter.GetUpperBound(0)
+        For i = 0 To List_OptParameter_Save.GetUpperBound(0)
             If (i > 0) Then
                 fieldnames &= ", "
             End If
-            fieldnames &= "[" & List_OptParameter(i).Bezeichnung & "] DOUBLE"
+            fieldnames &= "[" & List_OptParameter_Save(i).Bezeichnung & "] DOUBLE"
         Next
         'Tabelle anpassen
         command.CommandText = "ALTER TABLE OptParameter ADD COLUMN " & fieldnames
@@ -377,7 +379,7 @@ Public Class OptResult
 
         Call db_connect()
 
-        Dim i As Integer
+        Dim i, x, y As Integer
 
         Dim command As OleDbCommand = New OleDbCommand("", db)
 
@@ -425,7 +427,7 @@ Public Class OptResult
 
         End If
 
-        If (EVO.Form1.Method = METH_CES) Then
+        If (EVO.Form1.Method = METH_CES or EVO.Form1.Method = METH_HYBRID) Then
 
             'Pfad schreiben
             '--------------
@@ -436,6 +438,34 @@ Public Class OptResult
                 fieldvalues &= ", '" & ind.Measures(i) & "'"
             Next
             command.CommandText = "INSERT INTO Pfad (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
+            command.ExecuteNonQuery()
+
+        End If
+
+        If (EVO.Form1.Method = METH_HYBRID) Then
+
+            Dim found as Boolean
+
+            'OptParameter schreiben
+            '----------------------
+            fieldnames = ""
+            fieldvalues = ""
+            For i = 0 To Me.List_OptParameter_Save.GetUpperBound(0)
+                found  = False
+                fieldnames &= ", [" & Me.List_OptParameter_Save(i).Bezeichnung & "]"
+                For x = 0 to Ind.Loc.GetUpperBound(0)
+                    For y = 0 to Ind.Loc(x).PES_OptPara.GetUpperBound(0)
+                        If Ind.Loc(x).PES_OptPara(y).Bezeichnung = Me.List_OptParameter_Save(i).Bezeichnung then
+                            fieldvalues &= ", " & Ind.Loc(x).PES_OptPara(y).RWert.ToString(Sim.FortranProvider)
+                            found = True
+                        End If
+                    Next
+                Next
+                If found = False
+                    fieldvalues &= ", " & "-7"
+                End If
+            Next
+            command.CommandText = "INSERT INTO OptParameter (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
             command.ExecuteNonQuery()
 
         End If
