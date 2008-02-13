@@ -361,12 +361,11 @@ Public MustInherit Class Sim
                 List_OptParameter(i).Min = Convert.ToDouble(array(4).Trim(), Sim.FortranProvider)
                 List_OptParameter(i).Max = Convert.ToDouble(array(5).Trim(), Sim.FortranProvider)
                 'liegt eine Beziehung vor?
-                List_OptParameter(i).RWert = List_OptParameter(i).StartWert
                 If (i > 0 And Not array(6).Trim() = "") Then
                     Me.List_OptParameter(i).Beziehung = getBeziehung(array(6).Trim())
-                Else
-                    Me.List_OptParameter(i).Beziehung = EVO.Kern.PES.Beziehung.keine
                 End If
+                'Eingelesenen Startwert setzen
+                List_OptParameter(i).RWert = List_OptParameter(i).StartWert
                 i += 1
             End If
         Loop Until StrRead.Peek() = -1
@@ -995,8 +994,7 @@ Public MustInherit Class Sim
             For j = 0 To List_OptParameter.GetUpperBound(0)
                 If Elements(i) = Left(List_OptParameter(j).Bezeichnung, 4) Then
                     ReDim Preserve PES_OptPara(x)
-                    PES_OptPara(x) = New Kern.OptParameter
-                    PES_OptPara(x) = List_OptParameter(j).Clone
+                    PES_OptPara(x) = List_OptParameter(j).Clone()
                     x += 1
                 End If
             Next

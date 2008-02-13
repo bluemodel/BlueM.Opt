@@ -121,7 +121,7 @@ Public Class Functions
                 For i = NFrontMember_gesamt To NFrontMember_aktuell + NFrontMember_gesamt - 1
 
                     'NDSResult wird in den Bestwertspeicher kopiert
-                    Best(i) = NDSResult(i).Copy
+                    Best(i) = NDSResult(i).Clone()
 
                 Next i
                 NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
@@ -134,7 +134,7 @@ Public Class Functions
 
                 For i = NFrontMember_gesamt To NEltern - 1
                     'NDSResult wird in den Bestwertspeicher kopiert
-                    Best(i) = NDSResult(i).Copy
+                    Best(i) = NDSResult(i).Clone()
                 Next i
 
                 NFrontMember_gesamt = NEltern
@@ -200,7 +200,7 @@ Public Class Functions
                 Call Pareto_Crowding_Distance_Sort(SekundärQb, 0, SekundärQb.GetUpperBound(0))
                 For i = 0 To NEltern - 1
                     'SekundärQb wird in den Bestwertspeicher kopiert
-                    Best(i) = SekundärQb(i).Copy
+                    Best(i) = SekundärQb(i).Clone()
                 Next i
             End If
         End If
@@ -243,7 +243,7 @@ Public Class Functions
         For i = 0 To _SekundärQb.GetUpperBound(0)
             If (_SekundärQb(i).dominated = False) Then
                 counter += 1
-                Temp(counter - 1) = _SekundärQb(i).Copy
+                Temp(counter - 1) = _SekundärQb(i).Clone()
             End If
         Next i
 
@@ -252,7 +252,7 @@ Public Class Functions
         For i = 0 To _SekundärQb.GetUpperBound(0)
             If (_SekundärQb(i).dominated = True) Then
                 counter += 1
-                Temp(counter - 1) = _SekundärQb(i).Copy
+                Temp(counter - 1) = _SekundärQb(i).Clone()
             End If
         Next i
 
@@ -375,7 +375,7 @@ Public Class Functions
         For i = 0 To NDSorting.GetUpperBound(0)
             If (NDSorting(i).dominated = True) Then
                 counter += 1
-                Temp(counter - 1) = NDSorting(i).Copy
+                Temp(counter - 1) = NDSorting(i).Clone()
             End If
         Next i
 
@@ -386,7 +386,7 @@ Public Class Functions
         For i = 0 To NDSorting.GetUpperBound(0)
             If (NDSorting(i).dominated = False) Then
                 counter += 1
-                Temp(counter - 1) = NDSorting(i).Copy
+                Temp(counter - 1) = NDSorting(i).Clone()
             End If
         Next i
 
@@ -408,7 +408,7 @@ Public Class Functions
         'In NDSResult werden die nicht dominierten Lösungen eingefügt
         For i = Temp.GetLength(0) - NFrontMember_aktuell To Temp.GetUpperBound(0)
             'NDSResult alle bisher gefundene Fronten
-            NDSResult(Position) = Temp(i).Copy
+            NDSResult(Position) = Temp(i).Clone()
             Position += 1
         Next i
 
@@ -452,9 +452,9 @@ Public Class Functions
             For i = StartIndex To EndIndex
                 For j = StartIndex To EndIndex
                     If (_Individ(i).Penalty(k) < _Individ(j).Penalty(k)) Then
-                        swap = _Individ(i).Copy
-                        _Individ(i) = _Individ(j).Copy
-                        _Individ(j) = swap.Copy
+                        swap = _Individ(i).Clone()
+                        _Individ(i) = _Individ(j).Clone()
+                        _Individ(j) = swap.Clone()
                     End If
                 Next j
             Next i
@@ -473,9 +473,9 @@ Public Class Functions
         For i = StartIndex To EndIndex
             For j = StartIndex To EndIndex
                 If (_Individ(i).Distance > _Individ(j).Distance) Then
-                    swap = _Individ(i).Copy
-                    _Individ(i) = _Individ(j).Copy
-                    _Individ(j) = swap.Copy
+                    swap = _Individ(i).Clone()
+                    _Individ(i) = _Individ(j).Clone()
+                    _Individ(j) = swap.Clone()
                 End If
             Next j
         Next i
@@ -504,9 +504,9 @@ Public Class Functions
             For i = StartIndex To EndIndex
                 For j = StartIndex To EndIndex
                     If (_Individ(i).Penalty(k) < _Individ(j).Penalty(k)) Then
-                        swap = _Individ(i).Copy
-                        _Individ(i) = _Individ(j).Copy
-                        _Individ(j) = swap.Copy
+                        swap = _Individ(i).Clone()
+                        _Individ(i) = _Individ(j).Clone()
+                        _Individ(j) = swap.Clone()
                     End If
                 Next j
             Next i

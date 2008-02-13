@@ -15,6 +15,8 @@ Public Class Individuum
     '*******************************************************************************
     '*******************************************************************************
 
+#Region "Eigenschaften"
+
     'Variablen der Klasse
     '********************
     Private Shared Individ_Type As Integer
@@ -138,11 +140,15 @@ Public Class Individuum
 
     End Structure
 
-    'Methoden
-    '********
+#End Region 'Eigenschaften
 
-    'Dimensionieren eines einzelnen Individuum (Überladen)
-    '****************************************************
+#Region "Methoden"
+
+    'Methoden
+    '########
+
+    'Konstruktor
+    '***********
     Public Sub New(ByVal _Type As String, ByVal _ID As Integer)
 
         Dim i, j As Integer
@@ -232,7 +238,7 @@ Public Class Individuum
 
     'Überladen Methode die ein Individuum kopiert
     '*********************************************
-    Public Function Copy() As Individuum
+    Public Function Clone() As Individuum
 
         Dim i, j As Integer
         Dim Dest As New Individuum(Me.Type, Me.ID)
@@ -261,8 +267,8 @@ Public Class Individuum
         Dest.mutated = Me.mutated
 
         '06a Array für PES Parameter
-        If me.PES_OptParas.GetUpperBound(0) = -1
-            Redim Dest.PES_OptParas(-1)
+        If Me.PES_OptParas.GetUpperBound(0) = -1 Then
+            ReDim Dest.PES_OptParas(-1)
         Else
             ReDim Dest.PES_OptParas(Me.PES_OptParas.GetUpperBound(0))
             For i = 0 To Me.PES_OptParas.GetUpperBound(0)
@@ -289,13 +295,12 @@ Public Class Individuum
         For i = 0 To Me.Loc.GetUpperBound(0)
 
             'Falls nur CES gibt es keine OptParameter
-            If me.loc(i).PES_OptPara.GetUpperBound(0) = -1
-                Redim Dest.loc(i).PES_OptPara(-1)
-            else
-                Redim Dest.loc(i).PES_OptPara(Me.Loc(i).PES_OptPara.GetUpperBound(0))
+            If (Me.loc(i).PES_OptPara.GetUpperBound(0) = -1) Then
+                ReDim Dest.loc(i).PES_OptPara(-1)
+            Else
+                ReDim Dest.loc(i).PES_OptPara(Me.Loc(i).PES_OptPara.GetUpperBound(0))
                 For j = 0 To Me.Loc(i).PES_OptPara.GetUpperBound(0)
-                    Dest.loc(i).PES_OptPara(j) = new Kern.OptParameter
-                    Dest.Loc(i).PES_OptPara(j) = Me.Loc(i).PES_OptPara(j).Clone
+                    Dest.Loc(i).PES_OptPara(j) = Me.Loc(i).PES_OptPara(j).Clone()
                 Next
             End If
 
@@ -323,7 +328,7 @@ Public Class Individuum
         Dim i As Integer
 
         For i = 0 To Source.GetUpperBound(0)
-            Dest(i) = Source(i).Copy
+            Dest(i) = Source(i).Clone()
         Next
     End Sub
 
@@ -364,5 +369,7 @@ Public Class Individuum
         QN_RN_Indi = Indi
 
     End Function
+
+#End Region 'Methoden
 
 End Class

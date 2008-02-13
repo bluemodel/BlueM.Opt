@@ -147,7 +147,6 @@ Partial Public Class Testprobleme
                 For i = 0 To globalAnzPar - 1
                     mypara(i) = New EVO.Kern.OptParameter()
                     mypara(i).Xn = 0
-                    mypara(i).Beziehung = PES.Beziehung.keine
                 Next
 
             Case "Beale-Problem" 'x1 = [-5;5], x2=[-2;2]
@@ -158,7 +157,6 @@ Partial Public Class Testprobleme
                 For i = 0 To globalAnzPar - 1
                     mypara(i) = New EVO.Kern.OptParameter()
                     mypara(i).Xn = 0.5
-                    mypara(i).Beziehung = PES.Beziehung.keine
                 Next
 
             Case "Schwefel 2.4-Problem" 'xi = [-10,10]
@@ -169,7 +167,6 @@ Partial Public Class Testprobleme
                 For i = 0 To globalAnzPar - 1
                     mypara(i) = New EVO.Kern.OptParameter()
                     mypara(i).Xn = 1
-                    mypara(i).Beziehung = PES.Beziehung.keine
                 Next
 
             Case "Deb 1" 'x1 = [0.1;1], x2=[0;5]
@@ -181,7 +178,6 @@ Partial Public Class Testprobleme
                 For i = 0 To globalAnzPar - 1
                     mypara(i) = New EVO.Kern.OptParameter()
                     mypara(i).Xn = Rnd()
-                    mypara(i).Beziehung = PES.Beziehung.keine
                 Next
 
             Case "Zitzler/Deb T1" 'xi = [0,1]
@@ -193,7 +189,6 @@ Partial Public Class Testprobleme
                 For i = 0 To globalAnzPar - 1
                     mypara(i) = New EVO.Kern.OptParameter()
                     mypara(i).Xn = Rnd()
-                    mypara(i).Beziehung = PES.Beziehung.keine
                 Next
 
             Case "Zitzler/Deb T2" 'xi = [0,1]
@@ -205,7 +200,6 @@ Partial Public Class Testprobleme
                 For i = 0 To globalAnzPar - 1
                     mypara(i) = New EVO.Kern.OptParameter()
                     mypara(i).Xn = Rnd()
-                    mypara(i).Beziehung = PES.Beziehung.keine
                 Next
 
             Case "Zitzler/Deb T3" 'xi = [0,1]
@@ -217,7 +211,6 @@ Partial Public Class Testprobleme
                 For i = 0 To globalAnzPar - 1
                     mypara(i) = New EVO.Kern.OptParameter()
                     mypara(i).Xn = Rnd()
-                    mypara(i).Beziehung = PES.Beziehung.keine
                 Next
 
             Case "Zitzler/Deb T4" 'x1 = [0,1], xi=[-5,5]
@@ -229,7 +222,6 @@ Partial Public Class Testprobleme
                 For i = 0 To globalAnzPar - 1
                     mypara(i) = New EVO.Kern.OptParameter()
                     mypara(i).Xn = Rnd()
-                    mypara(i).Beziehung = PES.Beziehung.keine
                 Next
 
             Case "CONSTR" 'x1 = [0.1;1], x2=[0;5]
@@ -241,7 +233,6 @@ Partial Public Class Testprobleme
                 For i = 0 To globalAnzPar - 1
                     mypara(i) = New EVO.Kern.OptParameter()
                     mypara(i).Xn = Rnd()
-                    mypara(i).Beziehung = PES.Beziehung.keine
                 Next
 
             Case "Box"
@@ -253,7 +244,6 @@ Partial Public Class Testprobleme
                 For i = 0 To globalAnzPar - 1
                     mypara(i) = New EVO.Kern.OptParameter()
                     mypara(i).Xn = Rnd()
-                    mypara(i).Beziehung = PES.Beziehung.keine
                 Next
 
             Case "Abhängige Parameter"
