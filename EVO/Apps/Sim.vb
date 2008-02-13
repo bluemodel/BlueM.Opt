@@ -261,7 +261,7 @@ Public MustInherit Class Sim
 
     End Sub
 
-    Public Sub read_and_valid_INI_Files_CES_PES()
+    Public Sub read_and_valid_INI_Files_HYBRID()
 
         'CES vorbereiten
         'Erforderliche Dateien werden eingelesen

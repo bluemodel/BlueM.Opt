@@ -393,7 +393,7 @@ Partial Class Form1
                             EVO_Einstellungen1.Enabled = True
 
                             'CES für Sim vorbereiten (Files lesen und Validieren)
-                            Call Sim1.read_and_valid_INI_Files_CES_PES()
+                            Call Sim1.read_and_valid_INI_Files_HYBRID()
                     End Select
 
                     'EVO_Einstellungen einrichten

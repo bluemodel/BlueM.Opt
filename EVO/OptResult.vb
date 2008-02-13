@@ -588,7 +588,12 @@ Public Class OptResult
         'Read
         '----
         'Alle Lösungen
-        q = "SELECT Sim.ID, OptParameter.*, QWerte.*, Constraints.* FROM ((Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN OptParameter ON Sim.ID=OptParameter.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID ORDER BY Sim.ID"
+        Select form1.Method
+            case METH_HOOKJEEVES, METH_HYBRID, METH_RESET, METH_SENSIPLOT, METH_PES
+                q = "SELECT Sim.ID, OptParameter.*, QWerte.*, Constraints.* FROM ((Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN OptParameter ON Sim.ID=OptParameter.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID ORDER BY Sim.ID"
+            case METH_CES
+                q = "SELECT Sim.ID, Pfad.*, QWerte.*, Constraints.* FROM ((Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN Pfad ON Sim.ID=Pfad.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID"
+        End Select
 
         adapter = New OleDbDataAdapter(q, db)
 
@@ -643,6 +648,14 @@ Public Class OptResult
                 For j = 0 To Me.List_Constraints.GetUpperBound(0)
                     .Constrain(j) = ds.Tables(0).Rows(i).Item(Me.List_Constraints(j).Bezeichnung)
                 Next
+
+                'Pfad
+                '----
+                ReDim .Measures(Me.List_Locations.GetUpperBound(0))
+                For j = 0 To Me.List_Locations.GetUpperBound(0)
+                    .Measures(j) = ds.Tables(0).Rows(i).Item(Me.List_Locations(j).Name)
+                Next
+
             End With
 
         Next
