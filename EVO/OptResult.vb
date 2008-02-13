@@ -116,7 +116,7 @@ Public Class OptResult
 
         'Lösung zu OptResult hinzufügen
         ReDim Preserve Me.Solutions(Me.Solutions.GetUpperBound(0) + 1)
-        Me.Solutions(Me.Solutions.GetUpperBound(0)) = Ind.Copy
+        Me.Solutions(Me.Solutions.GetUpperBound(0)) = Ind.Clone()
 
         'In DB speichern
         Call Me.db_insert(Ind)
@@ -626,10 +626,7 @@ Public Class OptResult
                 'OptParameter
                 '------------
                 For j = 0 To Me.List_OptParameter_Save.GetUpperBound(0)
-
-                    .PES_OptParas(j) = new Kern.OptParameter
-                    .PES_OptParas(j) = Me.List_OptParameter_Save(j).Clone
-
+                    .PES_OptParas(j) = Me.List_OptParameter_Save(j).Clone()
                     .PES_OptParas(j).RWert = ds.Tables(0).Rows(i).Item(Me.List_OptParameter_Save(j).Bezeichnung)
                 Next
 

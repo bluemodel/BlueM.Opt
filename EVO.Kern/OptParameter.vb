@@ -1,18 +1,34 @@
 Public Class OptParameter
 
+    '*******************************************************************************
+    '*******************************************************************************
+    '**** Klasse OptParameter                                                   ****
+    '**** für das Speichern eines Optimierungsparameters                        ****
+    '**** und zugehöriger Informationen                                         ****
+    '****                                                                       ****
+    '**** Autoren:                                                              ****
+    '**** Felix Froehlich                                                       ****
+    '****                                                                       ****
+    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
+    '**** TU Darmstadt                                                          ****
+    '*******************************************************************************
+    '*******************************************************************************
+
+#Region "Eigenschaften"
+
     'Metadaten
-    Public Bezeichnung as String
+    Public Bezeichnung As String
     Public Einheit As String
 
     'Parameterwerte
     Public Xn As Double                         'Skalierter Parameterwert
     Public Min As Double                        'Minwert für die Umrechnung in reellen Parameterwert
-    Public Max as Double                        'Maxwert für die Umrechnung in reellen Parameterwert
-    Public Property RWert As Double             'Reeller Parameterwert
+    Public Max As Double                        'Maxwert für die Umrechnung in reellen Parameterwert
+    Public Property RWert() As Double           'Reeller Parameterwert
         Get
             Return Me.Min + (Me.Max - Me.Min) * Me.Xn
         End Get
-        Set (value As Double)
+        Set(ByVal value As Double)
             Me.Xn = (value - Me.Min) / (Me.Max - Me.Min)
         End Set
     End Property
@@ -24,12 +40,39 @@ Public Class OptParameter
     'Beziehung
     Public Beziehung As EVO.Kern.PES.Beziehung
 
+#End Region 'Eigenschaften
+
+#Region "Methoden"
+
+    'Methoden
+    '########
+
+    'Konstruktor
+    '***********
+    Public Sub New()
+
+        'Default Werte setzen
+        Me.Bezeichnung = "[nicht gesetzt]"
+        Me.Einheit = "[-]"
+        Me.Min = 0
+        Me.Max = 1
+        Me.Xn = 0.5
+        Me.StartWert = 0.5
+        Me.Dn = 0.1
+        Me.Beziehung = PES.Beziehung.keine
+
+    End Sub
+
+    'ToString
+    '********
     Public Overrides Function ToString() As String
         Return Me.Bezeichnung
     End Function
 
+    'Duplizieren eines OptParameters
+    '*******************************
     Public Function Clone() As OptParameter
-        
+
         Clone = New OptParameter()
 
         Clone.Bezeichnung = Me.Bezeichnung
@@ -45,6 +88,8 @@ Public Class OptParameter
 
     End Function
 
+    'Konvertiert eine Liste von OptParametern in ein Array von Doubles (Xn)
+    '**********************************************************************
     Public Shared Function MyParaDouble(ByVal OptParamer() As EVO.Kern.OptParameter) As Double()
         Dim i As Integer
         Dim Array(-1) As Double
@@ -54,7 +99,10 @@ Public Class OptParameter
             ReDim Preserve Array(Array.GetUpperBound(0))
             Array(i) = OptParamer(i).Xn
         Next
-        MyParaDouble = Array.Clone
+        MyParaDouble = Array.Clone()
+
     End Function
+
+#End Region 'Methoden
 
 End Class
