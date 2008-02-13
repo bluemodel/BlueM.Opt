@@ -589,16 +589,18 @@ Public Class OptResult
         '----
         'Alle Lösungen
         Select form1.Method
-            case METH_HOOKJEEVES, METH_HYBRID, METH_RESET, METH_SENSIPLOT, METH_PES
+            case METH_HOOKJEEVES, METH_RESET, METH_SENSIPLOT, METH_PES
                 q = "SELECT Sim.ID, OptParameter.*, QWerte.*, Constraints.* FROM ((Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN OptParameter ON Sim.ID=OptParameter.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID ORDER BY Sim.ID"
             case METH_CES
                 q = "SELECT Sim.ID, Pfad.*, QWerte.*, Constraints.* FROM ((Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN Pfad ON Sim.ID=Pfad.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID"
+            case METH_HYBRID
+                q = "SELECT Sim.ID, Pfad.*, OptParameter.*, QWerte.*, Constraints.* FROM (((Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN Pfad ON Sim.ID=Pfad.Sim_ID) INNER JOIN OptParameter ON Sim.ID=OptParameter.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID ORDER BY Sim.ID"
         End Select
 
         adapter = New OleDbDataAdapter(q, db)
 
         ds = New DataSet("EVO")
-        numSolutions = adapter.Fill(ds, "PESResult")
+        numSolutions = adapter.Fill(ds, "Result")
 
         'Letzte SekPop-Generation bestimmen
         Try
