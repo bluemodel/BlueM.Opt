@@ -411,34 +411,6 @@ Partial Class Form1
                         Call EVO_Einstellungen1.setStandard_PES(Kern.EVO_MODUS.Multi_Objective)
                     End If
 
-                    'CES initialisieren
-                    '******************
-                    CES1 = New EVO.Kern.CES()
-
-                    Call Ces1.CESInitialise(EVO_Einstellungen1.Settings, Method, Sim1.List_OptZiele.GetLength(0), Sim1.List_Constraints.GetLength(0), Sim1.List_Locations.GetLength(0), Sim1.VerzweigungsDatei.GetLength(0), Sim1.No_of_Combinations, Sim1.Set_TestModus, sim1.n_PathDimension)
-                    
-                    'Die Variablen für die Individuuen werden gesetzt
-                    EVO.Kern.Individuum.Initialise(2, CES1.ModSett.n_Locations, 0, CES1.ModSett.n_Penalty, CES1.ModSett.n_Constrain)
-                    globalAnzZiel = CES1.ModSett.n_Penalty
-                    globalAnzRand = CES1.ModSett.n_Constrain
-
-                    'Bei Testmodus wird die Anzahl der Kinder und Generationen überschrieben
-                    '***********************************************************************
-                    If CES1.ModSett.TestModus = 1 Then
-                        EVO_Einstellungen1.Settings.CES.n_Childs = 1
-                        EVO_Einstellungen1.Settings.CES.n_Parents = 1
-                        EVO_Einstellungen1.Settings.CES.n_Generations = 1
-                        ReDim CES1.NDSResult(EVO_Einstellungen1.Settings.CES.n_Childs + EVO_Einstellungen1.Settings.CES.n_Parents - 1)
-                    ElseIf CES1.ModSett.TestModus = 2 Then
-                        EVO_Einstellungen1.Settings.CES.n_Childs = CES1.ModSett.n_Combinations
-                        EVO_Einstellungen1.Settings.CES.n_Generations = 1
-                        ReDim CES1.NDSResult(EVO_Einstellungen1.Settings.CES.n_Childs + EVO_Einstellungen1.Settings.CES.n_Parents - 1)
-                    End If
-
-                    'EVO_Verlauf zurücksetzen
-                    '************************
-                    Call Me.EVO_Opt_Verlauf1.Initialisieren(1, 1, EVO_Einstellungen1.Settings.CES.n_Generations, EVO_Einstellungen1.Settings.CES.n_Childs)
-
             End Select
 
             'IniApp OK -> Start Button aktivieren
@@ -615,7 +587,7 @@ Partial Class Form1
             'Optimierung beendet
             '-------------------
             Me.isrun = False
-            Me.Button_Start.Text = ">"
+            Me.Button_Start.Text = "is running"
             Me.Button_Start.Enabled = False
 
         End If
@@ -822,10 +794,34 @@ Partial Class Form1
     '*************************
     Private Sub STARTEN_CES_or_HYBRID()
 
-        'Fehlerabfragen
-        'If (Sim1.List_OptZiele.GetLength(0) > 2) Then
-        '    Throw New Exception("Zu viele Ziele für CES. Max=2")
-        'End If
+        'CES initialisieren
+        '******************
+        CES1 = New EVO.Kern.CES()
+
+        Call Ces1.CESInitialise(EVO_Einstellungen1.Settings, Method, Sim1.List_OptZiele.GetLength(0), Sim1.List_Constraints.GetLength(0), Sim1.List_Locations.GetLength(0), Sim1.VerzweigungsDatei.GetLength(0), Sim1.No_of_Combinations, Sim1.Set_TestModus, sim1.n_PathDimension)
+        
+        'Die Variablen für die Individuuen werden gesetzt
+        EVO.Kern.Individuum.Initialise(2, CES1.ModSett.n_Locations, 0, CES1.ModSett.n_Penalty, CES1.ModSett.n_Constrain)
+        globalAnzZiel = CES1.ModSett.n_Penalty
+        globalAnzRand = CES1.ModSett.n_Constrain
+
+        'Bei Testmodus wird die Anzahl der Kinder und Generationen überschrieben
+        '***********************************************************************
+        If CES1.ModSett.TestModus = 1 Then
+            EVO_Einstellungen1.Settings.CES.n_Childs = 1
+            EVO_Einstellungen1.Settings.CES.n_Parents = 1
+            EVO_Einstellungen1.Settings.CES.n_Generations = 1
+            ReDim CES1.NDSResult(EVO_Einstellungen1.Settings.CES.n_Childs + EVO_Einstellungen1.Settings.CES.n_Parents - 1)
+        ElseIf CES1.ModSett.TestModus = 2 Then
+            EVO_Einstellungen1.Settings.CES.n_Childs = CES1.ModSett.n_Combinations
+            EVO_Einstellungen1.Settings.CES.n_Generations = 1
+            ReDim CES1.NDSResult(EVO_Einstellungen1.Settings.CES.n_Childs + EVO_Einstellungen1.Settings.CES.n_Parents - 1)
+        End If
+
+        'EVO_Verlauf zurücksetzen
+        '************************
+        Call Me.EVO_Opt_Verlauf1.Initialisieren(1, 1, EVO_Einstellungen1.Settings.CES.n_Generations, EVO_Einstellungen1.Settings.CES.n_Childs)
+
 
         Dim durchlauf_all As Integer = 0
         Dim serie As Steema.TeeChart.Styles.Series

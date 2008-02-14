@@ -65,7 +65,7 @@ Public Class CES
 
         'Schritt 2: CES - MODELL SETTINGS
         'Optionen der Evolutionsstrategie werden übergeben
-        Call CES_Modell_Settings(AnzPenalty, AnzConstr, AnzLocations, AnzVerzweig, AnzCombinations, TypeTestModus, AnzPathDimension)
+        Call CES_Modell_Settings(AnzPenalty, AnzConstr, AnzLocations, AnzVerzweig, AnzCombinations, TypeTestModus, AnzPathDimension, Method)
 
         'Schritt 3: CES - ReDim
         'Einige ReDims die erst mit den FormSetting oder ModelSetting möglich sind
@@ -134,10 +134,10 @@ Public Class CES
     'A: Prüfung der ModellSetting in Kombination mit den Form Setting
     'B: Übergabe der ModellSettings
     '****************************************************************
-    private Sub CES_Modell_Settings(ByVal AnzPenalty As Integer, ByVal AnzConstr As Integer, byval AnzLocations as Integer, byval AnzVerzweig as Integer, byval AnzCombinations as Integer, byval TypeTestModus as Integer, byval AnzPathDimension() as integer)
+    private Sub CES_Modell_Settings(ByVal AnzPenalty As Integer, ByVal AnzConstr As Integer, byval AnzLocations as Integer, byval AnzVerzweig as Integer, byval AnzCombinations as Integer, byval TypeTestModus as Integer, byval AnzPathDimension() as integer, ByVal Method as String)
 
         'Prüft ob die Zahl mög. Kombinationen < Zahl Eltern + Nachfolger
-        If (Settings.CES.n_Childs + Settings.CES.n_Parents) > AnzCombinations Then
+        If (Settings.CES.n_Childs + Settings.CES.n_Parents) > AnzCombinations and not Method = "HYBRID"  Then
             Throw New Exception("Die Zahl der Eltern + die Zahl der Kinder ist größer als die mögliche Zahl der Kombinationen.")
         End If
         
