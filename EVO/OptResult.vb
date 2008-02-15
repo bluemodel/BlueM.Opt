@@ -373,7 +373,6 @@ Public Class OptResult
     End Sub
 
     'Eine Lösung in die ErgebnisDB schreiben
-    'BUG 260: db_insert für METH_HYBRID fehlt noch!
     '***************************************
     Private Function db_insert(ByVal ind As Kern.Individuum) As Boolean
 
@@ -412,7 +411,9 @@ Public Class OptResult
             command.ExecuteNonQuery()
         End If
 
-        If (Evo.Form1.Method = METH_PES Or Evo.Form1.Method = METH_SENSIPLOT) Then
+        If (Evo.Form1.Method = METH_PES _
+            Or Evo.Form1.Method = METH_SENSIPLOT _
+            Or EVO.Form1.Method = METH_HOOKJEEVES) Then
 
             'OptParameter schreiben
             '----------------------
@@ -427,7 +428,8 @@ Public Class OptResult
 
         End If
 
-        If (EVO.Form1.Method = METH_CES or EVO.Form1.Method = METH_HYBRID) Then
+        If (EVO.Form1.Method = METH_CES _
+            Or EVO.Form1.Method = METH_HYBRID) Then
 
             'Pfad schreiben
             '--------------
@@ -563,7 +565,6 @@ Public Class OptResult
     End Sub
 
     'Optimierungsergebnis aus einer DB lesen
-    'BUG 260: db_load für METH_CES und METH_HYBRID fehlen!
     '*****************************************************
     Public Sub db_load(ByVal sourceFile As String)
 
@@ -589,11 +590,11 @@ Public Class OptResult
         '----
         'Alle Lösungen
         Select form1.Method
-            case METH_HOOKJEEVES, METH_RESET, METH_SENSIPLOT, METH_PES
+            Case METH_PES, METH_SENSIPLOT, METH_HOOKJEEVES
                 q = "SELECT Sim.ID, OptParameter.*, QWerte.*, Constraints.* FROM ((Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN OptParameter ON Sim.ID=OptParameter.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID ORDER BY Sim.ID"
-            case METH_CES
+            Case METH_CES
                 q = "SELECT Sim.ID, Pfad.*, QWerte.*, Constraints.* FROM ((Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN Pfad ON Sim.ID=Pfad.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID"
-            case METH_HYBRID
+            Case METH_HYBRID
                 q = "SELECT Sim.ID, Pfad.*, OptParameter.*, QWerte.*, Constraints.* FROM (((Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN Pfad ON Sim.ID=Pfad.Sim_ID) INNER JOIN OptParameter ON Sim.ID=OptParameter.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID ORDER BY Sim.ID"
         End Select
 
