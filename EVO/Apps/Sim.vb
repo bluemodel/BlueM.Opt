@@ -1413,11 +1413,55 @@ Public MustInherit Class Sim
 
     End Function
 
+    'VG_ Test Tagesganglinie mit Autokalibrierung
+    'VG *****************************************
+    'VG Beta-Version - erlaubt Kalirbierung der Tagesganlinie
+    'VG dafür muss für den jeweiligen Tagesgangwert in der .mod Datei in der Spalte "Elem" "TGG_QH" eingetragen werden
+    'VG Vorschlag: Aktivierung der kalibrierung des Tagesganlinie über einen Schalter, damit diese Funktion nicht bei jeder optimierung aufgerufen wird
+    Protected Sub VG_Kalibrierung_Tagesganglinie()
+        Dim i, j As Integer
+        Dim VG_sum_TGG As Double
+        Dim VG_check_24 As Integer
+        Dim VG_Faktor As Double
+
+        VG_check_24 = 0
+        VG_sum_TGG = 0
+
+        'Bestimmen der Paramterersumme zum berechenen des notwendigen Faktors um auf 24 zu kommen
+        For i = 0 To List_ModellParameter.GetUpperBound(0)
+            If Trim(List_ModellParameter(i).Element) = "TGG_QH" Then
+                VG_check_24 = VG_check_24 + 1
+
+                For j = 0 To List_OptParameter.GetUpperBound(0)
+                    If Trim(List_OptParameter(j).Bezeichnung) = Trim(List_ModellParameter(i).OptParameter) Then 'Parameter gefunden
+                        VG_sum_TGG = VG_sum_TGG + List_OptParameter(j).RWert 'aufsummieren
+                    End If
+                Next
+            End If
+        Next
+        'Überprüft ob 24 Werte zugeordnet wurden
+        If VG_check_24 = 24 Then
+            'Faktor um auf 24 zu kommen:Xi = Xsim,i * n/Summe(Xi,Sim)
+            VG_Faktor = VG_check_24 / VG_sum_TGG
+            For i = 0 To List_ModellParameter.GetUpperBound(0)
+                If Trim(List_ModellParameter(i).Element) = "TGG_QH" Then
+                    List_ModellParameter(i).Faktor = VG_Faktor 'setzt den Faktor für den jeweiligen Tagesgangwert
+                End If
+            Next
+        Else
+        End If
+    End Sub
+
     'ModellParameter aus OptParametern errechnen
     '*******************************************
     Protected Sub OptParameter_to_ModellParameter()
         Dim i As Integer
         Dim j As Integer
+
+        'VG ---------- Zusatzroutine für kalibrierung des Tagesgangs
+        VG_Kalibrierung_Tagesganglinie()
+        'VG ---------- Ende
+
         For i = 0 To List_ModellParameter.GetUpperBound(0)
             For j = 0 To List_OptParameter.GetUpperBound(0)
                 If List_ModellParameter(i).OptParameter = List_OptParameter(j).Bezeichnung Then
@@ -1520,6 +1564,25 @@ Public MustInherit Class Sim
                     End If
                 Next
                 QWert = sUeber
+
+                'VG Nash Suttcliff
+                '--------------------------------------------
+            Case "NashSutt"
+                'Mittelwert bilden
+                Dim VG_Qobs_quer As Double
+                For i = 0 To SimReihe.Length - 1
+                    VG_Qobs_quer += OptZiel.ZielReihe.YWerte(i)
+                Next
+                VG_Qobs_quer = VG_Qobs_quer / (SimReihe.Length - 1)
+                Dim VG_zaehler As Double
+                Dim VG_Nenner As Double
+                For i = 0 To SimReihe.Length - 1
+                    VG_zaehler += (OptZiel.ZielReihe.YWerte(i) - SimReihe.YWerte(i)) * (OptZiel.ZielReihe.YWerte(i) - SimReihe.YWerte(i))
+                    VG_Nenner += (OptZiel.ZielReihe.YWerte(i) - VG_Qobs_quer) * (OptZiel.ZielReihe.YWerte(i) - VG_Qobs_quer)
+                Next
+                'abgeänderte Nash-Sutcliffe Formel: 0 als Zielwert (1- weggelassen)
+                QWert = VG_zaehler / VG_Nenner
+                '-----------------------------------------------
 
             Case Else
                 Throw New Exception("Die Zielfunktion '" & OptZiel.ZielFkt & "' wird nicht unterstützt!")
