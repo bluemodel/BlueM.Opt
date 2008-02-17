@@ -1359,7 +1359,7 @@ Public MustInherit Class Sim
             'Falls erforderlich, Wert mit Leerzeichen füllen
             If (WertStr.Length < AnzZeichen) Then
                 For j = 1 To AnzZeichen - WertStr.Length
-                    WertStr &= " "
+                    WertStr = " " & WertStr
                 Next
             End If
 
