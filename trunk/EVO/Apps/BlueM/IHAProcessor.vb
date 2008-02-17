@@ -94,12 +94,12 @@ Public Class IHAProcessor
 
                 If (OptZiel.ZielFkt = "") Then
                     'fx(HA) Gesamtmittelwert
-                    diff = Me.RVAfxBase.All_Avg_fx - RVAfx.All_Avg_fx
+                    diff = RVAfx.All_Avg_fx - Me.RVAfxBase.All_Avg_fx
                 Else
                     'fx(HA) Mittelwert einer Parametergruppe
                     For i = 0 To RVAResult.NGroups - 1
                         If (OptZiel.ZielFkt = RVAResult.IHAParamGroups(i).GName) Then
-                            diff = Me.RVAfxBase.PGroup_Avg_fx(i) - RVAfx.PGroup_Avg_fx(i)
+                            diff = RVAfx.PGroup_Avg_fx(i) - Me.RVAfxBase.PGroup_Avg_fx(i)
                             Exit For
                         End If
                     Next
