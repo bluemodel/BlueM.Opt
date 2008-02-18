@@ -166,15 +166,14 @@ Partial Public Class SolutionDialog
                 For Each optpara As Kern.OptParameter In loc.PES_OptPara
                     If optpara.Bezeichnung = Me.DataGridView1.Columns(i).HeaderText Then
                         cellvalues(i) = optpara.RWert
-                        i += 1
                         found = True
                     End If
                 Next
             Next
             If Not found Then
                 cellvalues(i) = "---"
-                i += 1
             End If
+            i += 1
         Loop
 
         'Zeile erstellen
