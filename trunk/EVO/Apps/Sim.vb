@@ -1310,10 +1310,15 @@ Public MustInherit Class Sim
 
             'Anzahl der Zeilen feststellen
             AnzZeil = 0
-            Do
-                Zeile = StrRead.ReadLine.ToString
-                AnzZeil += 1
-            Loop Until StrRead.Peek() = -1
+            On Error GoTo Handler
+                Do
+                    Zeile = StrRead.ReadLine.ToString
+                    AnzZeil += 1
+                Loop Until StrRead.Peek() = -1
+            Handler:
+                If AnzZeil = 0 Then
+                    throw new Exception("Fehler beim lesen der Transportstreckendatei (.TRS). Sie könnte leer sein.")
+                End If
 
             ReDim Zeilenarray(AnzZeil - 1)
 
