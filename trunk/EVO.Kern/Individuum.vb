@@ -74,7 +74,7 @@ Public Class Individuum
 
     'Gibt ein Array mit den Elementen aller Locations zurück
     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    Public ReadOnly Property All_Elem() As String()
+    Public ReadOnly Property All_Elem() As String ()
         Get
             Dim i As Integer
             Dim array() As String = {}
@@ -87,7 +87,6 @@ Public Class Individuum
             Next
             All_Elem = array.Clone
         End Get
-
     End Property
 
     'Gibt ein Array mit den Parametern aller Locations zurück !oder!
@@ -107,8 +106,22 @@ Public Class Individuum
             Next
             All_Para = array.Clone
         End Get
-
     End Property
+
+    'Schreibt alle Parameter aus der DB zurück ins Individuum
+    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    Public WriteOnly Property SetAll_Para() as double()
+        Set (Array() as Double)
+            Dim i, j, x as Integer
+            For i = 0 To Loc.GetUpperBound(0)
+                For j = 0 to loc(i).PES_OptPara.GetUpperBound(0)
+                    loc(i).PES_OptPara(j).Xn = array(x)
+                    x += 1
+                Next
+            Next
+        End Set
+    End Property
+
 
     'Gibt ein Array mit den DNs aller Locations zurück !oder!
     'Setzt die Zahl der locations auf 1 und schreibt dort alle DNs rein
