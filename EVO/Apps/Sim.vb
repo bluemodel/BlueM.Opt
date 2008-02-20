@@ -1032,29 +1032,7 @@ Public MustInherit Class Sim
 
     End Sub
 
-    'ToDo: nicht besonders hübsch überladen
-    '*************************************
-    Public Sub PREPARE_Evaluation_CES()
-
-        'Wandelt die Maßnahmen Namen wieder in einen Pfad zurück
-        Dim i, j As Integer
-        For i = 0 To Akt.Measures.GetUpperBound(0)
-            For j = 0 To List_Locations(i).List_Massnahmen.GetUpperBound(0)
-                If (List_Locations(i).List_Massnahmen(j).Name = Akt.Measures(i)) Then
-                    Akt.Path(i) = j
-                End If
-            Next
-        Next
-
-        'Ermittelt das aktuelle_ON_OFF array
-        Call Prepare_Verzweigung_ON_OFF()
-
-        'Schreibt die neuen Verzweigungen
-        Call Write_Verzweigungen()
-
-    End Sub
-
-    'Ermittelt das aktuelle Verzweigungsarray
+     'Ermittelt das aktuelle Verzweigungsarray
     '****************************************
     Private Sub Prepare_Verzweigung_ON_OFF()
         Dim j, x, y, z As Integer
