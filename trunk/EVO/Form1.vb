@@ -942,7 +942,7 @@ Partial Class Form1
                 '***************************************************************
                 If Method = METH_HYBRID AND EVO_Einstellungen1.Settings.CES.ty_Hybrid = EVO.Kern.HYBRID_TYPE.Mixed_Integer Then
                     if Sim1.Reduce_OptPara_and_ModPara(CES1.Childs(i).All_Elem) then
-                        Call Sim1.PREPARE_Evaluation_PES(CES1.Childs(i).All_Para)
+                        Call Sim1.PREPARE_Evaluation_PES(CES1.Childs(i).All_Loc_Para)
                     End If
                 End If
 
@@ -2006,13 +2006,8 @@ Start_Evolutionsrunden:
 
                 Case METH_PES
 
-                    'OptParameter übernehmen
-                    For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
-                        Sim1.List_OptParameter(i).Xn = ind.PES_OptParas(i).Xn
-                    Next
-
-                    'Modellparameter schreiben
-                    Call Sim1.Write_ModellParameter()
+                    'Bereitet das BlueM für PES vor
+                    Call Sim1.PREPARE_Evaluation_PES(ind.All_PES_Para)
 
                 Case METH_CES, METH_HYBRID
 
@@ -2023,7 +2018,7 @@ Start_Evolutionsrunden:
                     'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
                     If Form1.Method = METH_HYBRID And EVO_Einstellungen1.Settings.CES.ty_Hybrid = EVO.Kern.HYBRID_TYPE.Mixed_Integer Then
                         Call Sim1.Reduce_OptPara_and_ModPara(ind.All_Elem)
-                        Call Sim1.PREPARE_Evaluation_PES(ind.All_Para)
+                        Call Sim1.PREPARE_Evaluation_PES(ind.All_Loc_Para)
                     End If
 
             End Select

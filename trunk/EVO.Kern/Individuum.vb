@@ -92,7 +92,23 @@ Public Class Individuum
     'Gibt ein Array mit den Parametern aller Locations zurück !oder!
     'Setzt die Zahl der locations auf 1 und schreibt dort alle Parameter rein
     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    Public ReadOnly Property All_Para() As Double()
+    Public ReadOnly Property All_PES_Para() As Double()
+        Get
+            Dim i As Integer
+            Dim Array(-1) As Double
+            For i = 0 To PES_OptParas.GetUpperBound(0)
+                ReDim Preserve Array(Array.GetLength(0))
+                Array(Array.GetUpperBound(0)) = PES_OptParas(i).Xn
+            Next
+            All_PES_Para = Array.Clone
+        End Get
+    End Property
+
+
+    'Gibt ein Array mit den Parametern aller Locations zurück !oder!
+    'Setzt die Zahl der locations auf 1 und schreibt dort alle Parameter rein
+    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    Public ReadOnly Property All_Loc_Para() As Double()
         Get
             Dim i, j, x As Integer
             Dim array(-1) As Double
@@ -104,7 +120,7 @@ Public Class Individuum
                     x += 1
                 Next
             Next
-            All_Para = array.Clone
+            All_Loc_Para = array.Clone
         End Get
     End Property
 
