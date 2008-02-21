@@ -218,7 +218,7 @@ Public Class PES
     'TODO: ESPrepare Für Paretooptimierung noch nicht fertig!!!!
     '*******************************************************************************
     Private Sub PES_Prepare(ByVal AnzPara As Integer, ByVal AnzPenalty As Integer, ByVal AnzConstr As Integer)
-        Dim m, n, l, i As Integer
+        Dim m, n, l As Integer
 
         'Überprüfung der Eingabeparameter (es muss mindestens ein Parameter variiert und eine
         'Penaltyfunktion ausgewertet werden)
@@ -518,7 +518,7 @@ Public Class PES
         Dim R As Integer                                   'Zufälliger Integer Wert
         Dim Realisierungsspeicher() As Integer
         Dim Elternspeicher() As Integer
-        Dim Z1, Elter, Z2 As Integer
+        Dim Elter As Integer
         Dim TournamentElter1 As Integer
         Dim TournamentElter2 As Integer
 
