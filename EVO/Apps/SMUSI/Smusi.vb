@@ -118,8 +118,13 @@ Public Class Smusi
             ExterneAnwendung.StartInfo.Arguments = String4 & String3 & String4
             externeanwendung.StartInfo.CreateNoWindow = True
             ExterneAnwendung.Start()
-            ExterneAnwendung.WaitForExit()
-            If not ExterneAnwendung.HasExited Then
+
+            Do While (Not ExterneAnwendung.HasExited)
+                ExterneAnwendung.WaitForExit(250)
+                My.Application.DoEvents()
+            Loop
+
+            If Not ExterneAnwendung.HasExited Then
                 ExterneAnwendung.Kill()
             End If
             ExterneAnwendung = Nothing
