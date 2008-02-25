@@ -587,7 +587,7 @@ Partial Class Form1
             'Optimierung beendet
             '-------------------
             Me.isrun = False
-            Me.Button_Start.Text = "is running"
+            Me.Button_Start.Text = ">"
             Me.Button_Start.Enabled = False
 
         End If
