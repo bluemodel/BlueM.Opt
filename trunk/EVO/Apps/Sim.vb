@@ -1531,9 +1531,9 @@ Public MustInherit Class Sim
 
 
             Case "Diff"
-                    'Summe der Fehler
-                    For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteZiel
-                    QWert += Math.Abs(OptZiel.ZielReihe.YWerte(i) - SimReihe.YWerte(i+j))
+                'Summe der Fehler
+                For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteZiel
+                    QWert += Math.Abs(OptZiel.ZielReihe.YWerte(i) - SimReihe.YWerte(i + j))
                 Next
 
             Case "Volf"
@@ -1558,7 +1558,7 @@ Public MustInherit Class Sim
                         nUnter += 1
                     End If
                 Next
-                QWert = nUnter / SimReihe.Length * 100
+                QWert = nUnter / ZeitschritteZiel * 100
 
             Case "sUnter"
                 'Summe der Unterschreitungen
