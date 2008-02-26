@@ -873,7 +873,6 @@ StartMutation:
         'Einheitliche Schrittweite
         '-------------------------
         If (Not Settings.PES.Schrittweite.is_DnVektor) Then
-
             '+/-1
             expo = (2 * Int(Rnd() + 0.5) - 1)
             'Schrittweite wird mutiert
@@ -884,11 +883,7 @@ StartMutation:
                     DeTemp(v, n, PES_iAkt.iAktPop) = DeTemp(0, 0, PES_iAkt.iAktPop)
                 Next
             Next
-
-
-
         End If
-
 
         'Mutation
         '--------
@@ -1726,26 +1721,25 @@ StartMutation:
         'XeTemp die aktuellen Werte
 
         Dim isOK As Boolean = False
-        'If (AktPara.Bez(ipara) = Beziehung.keine) Then
-        '    'Keine Beziehung vorhanden
-        '    isOK = True
-        'Else
-        '    'Referenzierten Parameterwert vergleichen
-        '    Dim wert As Double = XeTemp(ipara, iElter, PES_iAkt.iAktPop)
-        '    Dim ref As Double = XeTemp(ipara - 1, iElter, PES_iAkt.iAktPop)
-        '    Select Case AktPara.Bez(ipara)
-        '        Case Beziehung.kleiner
-        '            If (wert < ref) Then isOK = True
-        '        Case Beziehung.kleinergleich
-        '            If (wert <= ref) Then isOK = True
-        '        Case Beziehung.groesser
-        '            If (wert > ref) Then isOK = True
-        '        Case Beziehung.groessergleich
-        '            If (wert >= ref) Then isOK = True
-        '    End Select
-        'End If
+        If (AktPara(ipara).Beziehung = Beziehung.keine) Then
+            'Keine Beziehung vorhanden
+            isOK = True
+        Else
+            'Referenzierten Parameterwert vergleichen
+            Dim wert As Double = AktPara(ipara).Min + (AktPara(ipara).Max - AktPara(ipara).Min) * XeTemp(ipara, iElter, PES_iAkt.iAktPop)
+            Dim ref As Double = AktPara(ipara - 1).Min + (AktPara(ipara - 1).Max - AktPara(ipara - 1).Min) * XeTemp(ipara - 1, iElter, PES_iAkt.iAktPop)
+            Select Case AktPara(ipara).Beziehung
+                Case Beziehung.kleiner
+                    If (wert < ref) Then isOK = True
+                Case Beziehung.kleinergleich
+                    If (wert <= ref) Then isOK = True
+                Case Beziehung.groesser
+                    If (wert > ref) Then isOK = True
+                Case Beziehung.groessergleich
+                    If (wert >= ref) Then isOK = True
+            End Select
+        End If
 
-        isOK = True
         Return isOK
 
     End Function
