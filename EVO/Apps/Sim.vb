@@ -246,6 +246,8 @@ Public MustInherit Class Sim
     '***************************************
     Public Sub read_and_valid_INI_Files_CES()
 
+        'Simulationsdaten einlesen
+        Call Me.Read_SimParameter()
         'Zielfunktionen einlesen
         Call Me.Read_OptZiele()
         'Constraints einlesen
@@ -264,6 +266,9 @@ Public MustInherit Class Sim
     End Sub
 
     Public Sub read_and_valid_INI_Files_HYBRID()
+
+        'Simulationsdaten einlesen
+        Call Me.Read_SimParameter()
 
         'CES vorbereiten
         'Erforderliche Dateien werden eingelesen
@@ -285,8 +290,6 @@ Public MustInherit Class Sim
         'PES vorbereiten
         'zusätzliche Dateien werden eingelesen
         '-------------------------------------
-        'Simulationsdaten einlesen
-        Call Me.Read_SimParameter()
         'Optimierungsparameter einlesen
         Call Me.Read_OptParameter()
         'ModellParameter einlesen
