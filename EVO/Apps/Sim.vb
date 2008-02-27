@@ -906,7 +906,7 @@ Public MustInherit Class Sim
     'Überprüft ob und welcher TestModus aktiv ist
     'Beschreibung:
     '********************************************
-    Public Function Set_TestModus() As Integer
+    Public Function Set_TestModus() As Kern.Constants.CES_T_MODUS
 
         Dim i, j As Integer
         Dim count_A As Integer
@@ -927,7 +927,7 @@ Public MustInherit Class Sim
         Next
 
         If count_A = count_B Then
-            Set_TestModus = 0
+            Set_TestModus = kern.CES_T_MODUS._0_No_Test
             Exit Function
         End If
 
@@ -945,7 +945,7 @@ Public MustInherit Class Sim
         Next
 
         If count_A = count_B Then
-            Set_TestModus = 1
+            Set_TestModus = kern.CES_T_MODUS._1_One_Combi
             Exit Function
         End If
 
@@ -963,7 +963,7 @@ Public MustInherit Class Sim
         Next
 
         If count_A = count_B Then
-            Set_TestModus = 2
+            Set_TestModus = kern.CES_T_MODUS._2_All_Combis
             Exit Function
         End If
 

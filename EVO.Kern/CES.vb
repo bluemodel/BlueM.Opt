@@ -29,7 +29,7 @@ Public Class CES
         Public n_Verzweig As Integer            'Anzahl der Verzweigungen in der Verzweigungsdatei
         Public n_Combinations As Integer        'Anzahl aller Kombinationen
         'Test Modus müsste als ENUM abgelegt werden
-        Public TestModus As Integer             'Gibt den Testmodus
+        Public TestModus As CES_T_MODUS             'Gibt den Testmodus
         Public n_PathDimension() As Integer     'Anzahl der Maßnahmen an jedem Ort
     End Structure
 
@@ -57,7 +57,7 @@ Public Class CES
 
     'Initialisierung der PES
     '***************************************
-    Public Sub CESInitialise(ByRef Settings As evo_settings, ByVal Method As String, ByVal AnzPenalty As Integer, ByVal AnzConstr As Integer, byval AnzLocations as Integer, byval AnzVerzweig as Integer, byval AnzCombinations as Integer, byval TypeTestModus as Integer, byval AnzPathDimension() as Integer)
+    Public Sub CESInitialise(ByRef Settings As evo_settings, ByVal Method As String, ByVal AnzPenalty As Integer, ByVal AnzConstr As Integer, byval AnzLocations as Integer, byval AnzVerzweig as Integer, byval AnzCombinations as Integer, byval TypeTestModus as CES_T_MODUS, byval AnzPathDimension() as Integer)
 
         'Schritt 1: CES - FORM SETTINGS
         'Optionen der Evolutionsstrategie werden übergeben
@@ -131,7 +131,7 @@ Public Class CES
     'A: Prüfung der ModellSetting in Kombination mit den Form Setting
     'B: Übergabe der ModellSettings
     '****************************************************************
-    private Sub CES_Modell_Settings(ByVal AnzPenalty As Integer, ByVal AnzConstr As Integer, byval AnzLocations as Integer, byval AnzVerzweig as Integer, byval AnzCombinations as Integer, byval TypeTestModus as Integer, byval AnzPathDimension() as integer, ByVal Method as String)
+    private Sub CES_Modell_Settings(ByVal AnzPenalty As Integer, ByVal AnzConstr As Integer, byval AnzLocations as Integer, byval AnzVerzweig as Integer, byval AnzCombinations as Integer, byval TypeTestModus as CES_T_MODUS, byval AnzPathDimension() as integer, ByVal Method as String)
 
         'Prüft ob die Zahl mög. Kombinationen < Zahl Eltern + Nachfolger
         If (Settings.CES.n_Childs + Settings.CES.n_Parents) > AnzCombinations and not Method = "HYBRID"  Then

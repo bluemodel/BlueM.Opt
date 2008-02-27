@@ -807,12 +807,12 @@ Partial Class Form1
 
         'Bei Testmodus wird die Anzahl der Kinder und Generationen überschrieben
         '***********************************************************************
-        If CES1.ModSett.TestModus = 1 Then
+        If CES1.ModSett.TestModus = Kern.CES_T_MODUS._1_One_Combi Then
             EVO_Einstellungen1.Settings.CES.n_Childs = 1
             EVO_Einstellungen1.Settings.CES.n_Parents = 1
             EVO_Einstellungen1.Settings.CES.n_Generations = 1
             ReDim CES1.NDSResult(EVO_Einstellungen1.Settings.CES.n_Childs + EVO_Einstellungen1.Settings.CES.n_Parents - 1)
-        ElseIf CES1.ModSett.TestModus = 2 Then
+        ElseIf CES1.ModSett.TestModus = Kern.CES_T_MODUS._2_All_Combis Then
             EVO_Einstellungen1.Settings.CES.n_Childs = CES1.ModSett.n_Combinations
             EVO_Einstellungen1.Settings.CES.n_Generations = 1
             ReDim CES1.NDSResult(EVO_Einstellungen1.Settings.CES.n_Childs + EVO_Einstellungen1.Settings.CES.n_Parents - 1)
@@ -841,13 +841,15 @@ Partial Class Form1
 
         'Die verschiedenen Modi
         'xxxxxxxxxxxxxxxxxxxxxx
-        If CES1.ModSett.TestModus = 0 Then
+
+
+        If CES1.ModSett.TestModus = kern.CES_T_MODUS._0_No_Test Then
             'Normaler Modus: Zufällige Kinderpfade werden generiert
             Call CES1.Generate_Random_Path()
-        ElseIf CES1.ModSett.TestModus = 1 Then
+        ElseIf CES1.ModSett.TestModus = kern.CES_T_MODUS._1_One_Combi Then
             'Testmodus 1: Funktion zum testen einer ausgewählten Kombinationen
             Sim1.get_TestPath(CES1.Childs(0).Path)
-        ElseIf CES1.ModSett.TestModus = 2 Then
+        ElseIf CES1.ModSett.TestModus = kern.CES_T_MODUS._2_All_Combis Then
             'Testmodus 2: Funktion zum  testen aller Kombinationen
             Call CES1.Generate_All_Test_Paths()
         End If
@@ -1008,7 +1010,7 @@ Partial Class Form1
 
             'REPRODUKTION und MUTATION Nicht wenn Testmodus
             '***********************************************
-            If CES1.ModSett.TestModus = 0 Then
+            If CES1.ModSett.TestModus = kern.CES_T_MODUS._0_No_Test Then
                 'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
                 Call Kern.Individuum.New_Array("Child", CES1.Childs)
                 'Reproduktionsoperatoren, hier gehts dezent zur Sache
