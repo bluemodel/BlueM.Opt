@@ -73,9 +73,7 @@ Partial Class EVO_Einstellungen
         Me.Label10 = New System.Windows.Forms.Label
         Me.CheckBox_CES_StartPESPop = New System.Windows.Forms.CheckBox
         Me.Numeric_CES_n_member_SecPop_PES = New System.Windows.Forms.NumericUpDown
-        Me.Numeric_CES_max_PES_Parents = New System.Windows.Forms.NumericUpDown
         Me.Numeric_CES_n_exchange_SecPop_PES = New System.Windows.Forms.NumericUpDown
-        Me.Label_max_PES_Parents = New System.Windows.Forms.Label
         Me.Label_n_memebers_SecPop_PES = New System.Windows.Forms.Label
         Me.Numeric_CES_mem_Strength = New System.Windows.Forms.NumericUpDown
         Me.Label_n_exchange_secPop_PES = New System.Windows.Forms.Label
@@ -145,7 +143,6 @@ Partial Class EVO_Einstellungen
         Me.TabPage_CES.SuspendLayout()
         Me.GroupBox_Hybrid.SuspendLayout()
         CType(Me.Numeric_CES_n_member_SecPop_PES, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.Numeric_CES_max_PES_Parents, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Numeric_CES_n_exchange_SecPop_PES, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Numeric_CES_mem_Strength, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBoxCES.SuspendLayout()
@@ -470,18 +467,18 @@ Partial Class EVO_Einstellungen
         Me.LabelAnzNachf.AutoSize = True
         Me.LabelAnzNachf.Location = New System.Drawing.Point(8, 64)
         Me.LabelAnzNachf.Name = "LabelAnzNachf"
-        Me.LabelAnzNachf.Size = New System.Drawing.Size(97, 13)
+        Me.LabelAnzNachf.Size = New System.Drawing.Size(115, 13)
         Me.LabelAnzNachf.TabIndex = 16
-        Me.LabelAnzNachf.Text = "Anzahl Nachfolger:"
+        Me.LabelAnzNachf.Text = "Anzahl der Nachfolger:"
         '
         'LabelAnzEltern
         '
         Me.LabelAnzEltern.AutoSize = True
         Me.LabelAnzEltern.Location = New System.Drawing.Point(7, 42)
         Me.LabelAnzEltern.Name = "LabelAnzEltern"
-        Me.LabelAnzEltern.Size = New System.Drawing.Size(72, 13)
+        Me.LabelAnzEltern.Size = New System.Drawing.Size(90, 13)
         Me.LabelAnzEltern.TabIndex = 15
-        Me.LabelAnzEltern.Text = "Anzahl Eltern:"
+        Me.LabelAnzEltern.Text = "Anzahl der Eltern:"
         '
         'LabelAnzGen
         '
@@ -663,9 +660,7 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Hybrid.Controls.Add(Me.Label10)
         Me.GroupBox_Hybrid.Controls.Add(Me.CheckBox_CES_StartPESPop)
         Me.GroupBox_Hybrid.Controls.Add(Me.Numeric_CES_n_member_SecPop_PES)
-        Me.GroupBox_Hybrid.Controls.Add(Me.Numeric_CES_max_PES_Parents)
         Me.GroupBox_Hybrid.Controls.Add(Me.Numeric_CES_n_exchange_SecPop_PES)
-        Me.GroupBox_Hybrid.Controls.Add(Me.Label_max_PES_Parents)
         Me.GroupBox_Hybrid.Controls.Add(Me.Label_n_memebers_SecPop_PES)
         Me.GroupBox_Hybrid.Controls.Add(Me.Numeric_CES_mem_Strength)
         Me.GroupBox_Hybrid.Controls.Add(Me.Label_n_exchange_secPop_PES)
@@ -719,16 +714,6 @@ Partial Class EVO_Einstellungen
         Me.Numeric_CES_n_member_SecPop_PES.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         Me.Numeric_CES_n_member_SecPop_PES.Value = New Decimal(New Integer() {50, 0, 0, 0})
         '
-        'Numeric_CES_max_PES_Parents
-        '
-        Me.Numeric_CES_max_PES_Parents.Location = New System.Drawing.Point(140, 77)
-        Me.Numeric_CES_max_PES_Parents.Maximum = New Decimal(New Integer() {500, 0, 0, 0})
-        Me.Numeric_CES_max_PES_Parents.Name = "Numeric_CES_max_PES_Parents"
-        Me.Numeric_CES_max_PES_Parents.Size = New System.Drawing.Size(53, 20)
-        Me.Numeric_CES_max_PES_Parents.TabIndex = 53
-        Me.Numeric_CES_max_PES_Parents.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.Numeric_CES_max_PES_Parents.Value = New Decimal(New Integer() {12, 0, 0, 0})
-        '
         'Numeric_CES_n_exchange_SecPop_PES
         '
         Me.Numeric_CES_n_exchange_SecPop_PES.Location = New System.Drawing.Point(139, 161)
@@ -738,15 +723,6 @@ Partial Class EVO_Einstellungen
         Me.Numeric_CES_n_exchange_SecPop_PES.TabIndex = 51
         Me.Numeric_CES_n_exchange_SecPop_PES.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         Me.Numeric_CES_n_exchange_SecPop_PES.Value = New Decimal(New Integer() {10, 0, 0, 0})
-        '
-        'Label_max_PES_Parents
-        '
-        Me.Label_max_PES_Parents.AutoSize = True
-        Me.Label_max_PES_Parents.Location = New System.Drawing.Point(3, 79)
-        Me.Label_max_PES_Parents.Name = "Label_max_PES_Parents"
-        Me.Label_max_PES_Parents.Size = New System.Drawing.Size(116, 13)
-        Me.Label_max_PES_Parents.TabIndex = 52
-        Me.Label_max_PES_Parents.Text = "Maximal No of Parents:"
         '
         'Label_n_memebers_SecPop_PES
         '
@@ -1306,7 +1282,6 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Hybrid.ResumeLayout(False)
         Me.GroupBox_Hybrid.PerformLayout()
         CType(Me.Numeric_CES_n_member_SecPop_PES, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.Numeric_CES_max_PES_Parents, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.Numeric_CES_n_exchange_SecPop_PES, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.Numeric_CES_mem_Strength, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBoxCES.ResumeLayout(False)
@@ -1424,8 +1399,6 @@ Partial Class EVO_Einstellungen
     Friend WithEvents Label_Hybrid_Type As System.Windows.Forms.Label
     Friend WithEvents Numeric_CES_mem_Strength As System.Windows.Forms.NumericUpDown
     Friend WithEvents Label_MemStrength As System.Windows.Forms.Label
-    Friend WithEvents Numeric_CES_max_PES_Parents As System.Windows.Forms.NumericUpDown
-    Friend WithEvents Label_max_PES_Parents As System.Windows.Forms.Label
     Private WithEvents Numeric_CES_n_member_SecPop_PES As System.Windows.Forms.NumericUpDown
     Private WithEvents Numeric_CES_n_exchange_SecPop_PES As System.Windows.Forms.NumericUpDown
     Private WithEvents Label_n_memebers_SecPop_PES As System.Windows.Forms.Label

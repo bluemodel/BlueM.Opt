@@ -113,9 +113,6 @@ Public Class CES
         If (Settings.CES.pr_MutRate < 0 or Settings.CES.pr_MutRate > 100) Then
             Throw New Exception("Der Prozentsatz der Mutationrate muss zwischen 1 und 100 liegen!")
         End If
-        If (Settings.CES.n_PES_MaxParents < 1) Then
-            Throw New Exception("Die Anzahl der Eltern für PES muss mindestens 1 sein!")
-        End If
         If (Settings.CES.n_PES_MemSecPop < 1) Then
             Throw New Exception("Die Anzahl der Memeber für PES sekundäre Population muss mindestens 1 sein!")
         End If
@@ -703,17 +700,17 @@ Public Class CES
 
         'Die Anzahlen werden hier speziell errechnet
         Dim n_PES_Childs As Integer
-        n_PES_Childs = PES_Parents_pLoc.GetLength(0) - Settings.CES.n_PES_MaxParents
+        n_PES_Childs = PES_Parents_pLoc.GetLength(0) - Settings.PES.n_Eltern
 
         'Die Eltern werden zurückgesetzt
-        ReDim PES_Parents_pLoc(Settings.CES.n_PES_MaxParents - 1)
+        ReDim PES_Parents_pLoc(Settings.PES.n_Eltern - 1)
 
         '********************* Alles in der Klasse Functions ****************************************
         '2. Die einzelnen Fronten werden bestimmt
         '3. Der Bestwertspeicher wird entsprechend der Fronten oder der sekundären Population gefüllt
         '4: Sekundäre Population wird bestimmt und gespeichert
         '--------------------------------
-        Dim Func1 As New Kern.Functions(n_PES_Childs, Settings.CES.n_PES_MaxParents, Settings.CES.n_PES_MemSecPop, Settings.CES.n_PES_Interact, Settings.CES.is_PES_SecPop, ModSett.n_Penalty, ModSett.n_Constrain, 1)
+        Dim Func1 As New Kern.Functions(n_PES_Childs, Settings.PES.n_Eltern, Settings.CES.n_PES_MemSecPop, Settings.CES.n_PES_Interact, Settings.CES.is_PES_SecPop, ModSett.n_Penalty, ModSett.n_Constrain, 1)
         Call Func1.EsEltern_Pareto_SekundärQb(PES_Parents_pLoc, NDSorting, PES_SekundärQb)
         '********************************************************************************************
 

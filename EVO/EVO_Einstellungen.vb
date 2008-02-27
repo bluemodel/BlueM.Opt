@@ -105,6 +105,10 @@ Public Class EVO_Einstellungen
             Case evo.METH_HYBRID
                 GroupBox_Hybrid.Enabled = True
 
+                Dim sender as Object = 1
+                Dim e as system.EventArgs = system.EventArgs.Empty
+                call Combo_CES_HybridType_SelectedIndexChanged(sender, e)
+
         End Select
 
     End sub
@@ -113,7 +117,6 @@ Public Class EVO_Einstellungen
     Public Sub SetFor_CES_PES(ByVal AnzGen As Integer, ByVal AnzEltern As Integer, ByVal AnzNachf As Integer)
 
         'Vorgaben und Anzeige
-        Label_OptModusValue.Text = "MultiObjective Pareto"
         TextAnzGen.Text = CStr(AnzGen)
         TextAnzEltern.Text = CStr(AnzEltern)
         TextAnzNachf.Text = CStr(AnzNachf)
@@ -267,7 +270,6 @@ Public Class EVO_Einstellungen
             .is_RealOpt = me.CheckBox_CES_RealOptimisation.Checked
             .ty_Hybrid = me.Combo_CES_HybridType.SelectedItem
             .n_PartsMem = me.Numeric_CES_mem_Strength.Value
-            .n_PES_MaxParents = me.Numeric_CES_max_PES_Parents.Value
             .is_PopMutStart = me.CheckBox_CES_StartPESPop.Checked
             .is_PES_SecPop = me.CheckBox_CES_UseSecPop_PES.Checked
             .n_PES_Interact = me.Numeric_CES_n_exchange_SecPop_PES.Value
@@ -286,6 +288,55 @@ Public Class EVO_Einstellungen
         End With
 
     End Sub
+
+    'Setzt/Aktiviert/Deaktiviert die Einstellungen auf den PES Settings
+    '******************************************************************
+    Private Sub Combo_CES_HybridType_SelectedIndexChanged( ByVal sender As System.Object,  ByVal e As System.EventArgs) Handles Combo_CES_HybridType.SelectedIndexChanged
+
+
+        If Form1.Method = Evo.METH_HYBRID Then
+
+            Dim Item as HYBRID_TYPE
+            Item = Me.Combo_CES_HybridType.SelectedItem
+
+            Select Case Item
+
+                case HYBRID_TYPE.Mixed_Integer
+
+                    'Generationen
+                    me.TextAnzGen.Text = 1
+                    me.TextAnzGen.Enabled = False
+
+                    'Eltern
+                    me.TextAnzEltern.text = 5
+                    me.TextAnzEltern.Enabled = True
+                    me.LabelAnzEltern.Text = "Maximal Zahl der Eltern:"
+
+                    'Childs
+                    me.TextAnzNachf.Text = 1
+                    me.TextAnzNachf.Enabled = False
+
+                case HYBRID_TYPE.Sequencial_1
+
+                    'Generationen
+                    me.TextAnzGen.Text = 10
+                    me.TextAnzGen.Enabled = True
+
+                    'Eltern
+                    me.TextAnzEltern.text = 5
+                    me.TextAnzEltern.Enabled = True
+                    me.LabelAnzEltern.Text = "Anzahl der Eltern:"
+
+                    'Childs
+                    me.TextAnzNachf.Text = 15
+                    me.TextAnzNachf.Enabled = True
+
+            End Select
+
+        End If
+
+    End Sub
+
 
     'Einstellungen in Form schreiben
     '*******************************
@@ -353,7 +404,6 @@ Public Class EVO_Einstellungen
             me.CheckBox_CES_RealOptimisation.Checked = .is_RealOpt
             me.Combo_CES_HybridType.SelectedItem = .ty_Hybrid
             me.Numeric_CES_mem_Strength.Value = .n_PartsMem
-            me.Numeric_CES_max_PES_Parents.Value = .n_PES_MaxParents
             me.CheckBox_CES_StartPESPop.Checked = .is_PopMutStart
             me.CheckBox_CES_UseSecPop_PES.Checked = .is_PES_SecPop
             me.Numeric_CES_n_exchange_SecPop_PES.Value = .n_PES_Interact
