@@ -893,13 +893,6 @@ Partial Class Form1
                         For m = 0 To CES1.Childs(i).Loc(j).PES_OptPara.GetUpperBound(0)
                             myPara(m) = CES1.Childs(i).Loc(j).PES_OptPara(m)
                         Next
-                        '1. EVO_Einstellungen zurücksetzen; 2. Die Settings werden für Hybrid gesetzt
-                        EVO_Einstellungen1.isSaved = False
-                        Call EVO_Einstellungen1.SetFor_CES_PES(1, 1, 1)
-
-                        'Schritte 1 - 3: PES wird initialisiert (Weiteres siehe dort ;-)
-                        '**************************************************************
-                        Call PES1.PesInitialise(EVO_Einstellungen1.Settings, globalAnzPar, globalAnzZiel, globalAnzRand, myPara, Method)
 
                         'Dem Child wird der Schrittweitenvektor zugewiesen und gegebenenfalls der Parameter zufällig gewählt
                         'wird also nicht in PES.ESStarten gemacht
@@ -1048,7 +1041,7 @@ Partial Class Form1
                         'Ermittelt fuer jede Location den PES Parent Satz (PES_Parents ist das Ergebnis)
                         Call CES1.Memory_Search_per_Location(j)
                         'Führt das NDSorting für diesen Satz durch
-                        If CES1.PES_Parents_pLoc.GetLength(0) > EVO_Einstellungen1.Settings.CES.n_PES_MaxParents Then
+                        If CES1.PES_Parents_pLoc.GetLength(0) > EVO_Einstellungen1.Settings.PES.n_Eltern Then
                             Call CES1.Memory_NDSorting()
                         End If
 
@@ -1129,10 +1122,6 @@ Partial Class Form1
     '*************************************************************************
     Private Sub Start_PES_after_CES()
         Dim i As Integer
-
-        '1. EVO_Settings zurücksetzen; 2. Einstellungen für PES werden gesetzt (AnzGen, AnzEltern, AnzNachf)
-        EVO_Einstellungen1.isSaved = False
-        Call EVO_Einstellungen1.SetFor_CES_PES(1, 3, 5)
 
         For i = 0 To EVO_Einstellungen1.Settings.CES.n_Parents - 1
             If CES1.Parents(i).Front = 1 Then

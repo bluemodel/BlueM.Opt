@@ -158,7 +158,6 @@ Public Class EVO_Settings
         Public is_RealOpt as Boolean            'gibt an ob auch die Real Parameter optimiert werden sollen
         Public ty_Hybrid as HYBRID_TYPE         'gibt den Hybrid Typ an
         Public n_PartsMem As Integer            'Länge des Gedächtnispfades Achtung Maximum ist 3
-        Public n_PES_MaxParents As Integer      'Anzahl der Eltern für PES Hybrid
         Public is_PES_SecPop As Boolean         'SekundärePopulation für PES an oder aus
         Public n_PES_MemSecPop As Integer       'Anzahl der Mitglieder der Sekundären Population für PES
         Public n_PES_Interact As Integer        'Austausch mit SekPop für PES nach n Generationen
@@ -189,7 +188,6 @@ Public Class EVO_Settings
                     me.is_RealOpt = False
                     me.ty_Hybrid = HYBRID_TYPE.Mixed_Integer
                     Me.n_PartsMem = 3
-                    Me.n_PES_MaxParents = 5
         
                     Me.is_PES_SecPop = False
                     Me.n_PES_MemSecPop = 50
@@ -215,7 +213,6 @@ Public Class EVO_Settings
                     me.is_RealOpt = True
                     me.ty_Hybrid = HYBRID_TYPE.Mixed_Integer
                     Me.n_PartsMem = 3
-                    Me.n_PES_MaxParents = 5
         
                     Me.is_PES_SecPop = False
                     Me.n_PES_MemSecPop = 50
