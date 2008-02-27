@@ -10,7 +10,8 @@ Public Class EVO_Einstellungen
     '#############
 
     Private msettings As EVO.Kern.EVO_Settings       'Sicherung sämtlicher Einstellungen
-    Public isSaved As Boolean = False               'Flag der anzeigt, ob die Einstellungen bereits gesichert wurden
+    Public isSaved As Boolean = False                'Flag der anzeigt, ob die Einstellungen bereits gesichert wurden
+    Public isLoad As Boolean = False                 'Flag der anzeigt, ob die Settings aus einer XML Datei gelesen werden
 
     'Methoden
     '########
@@ -294,7 +295,7 @@ Public Class EVO_Einstellungen
     Private Sub Combo_CES_HybridType_SelectedIndexChanged( ByVal sender As System.Object,  ByVal e As System.EventArgs) Handles Combo_CES_HybridType.SelectedIndexChanged
 
 
-        If Form1.Method = Evo.METH_HYBRID Then
+        If Form1.Method = Evo.METH_HYBRID And not isLoad Then
 
             Dim Item as HYBRID_TYPE
             Item = Me.Combo_CES_HybridType.SelectedItem
@@ -496,7 +497,9 @@ Public Class EVO_Einstellungen
         fs.Close()
 
         'Geladene Settings in Form schreiben
+        isLoad = True
         Call Me.writeForm()
+        isLoad = False
 
     End Sub
 
