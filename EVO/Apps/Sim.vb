@@ -974,15 +974,14 @@ Public MustInherit Class Sim
     'Holt sich im Falle des Testmodus 1 den Pfad aus der .CES Datei
     '**************************************************************
     Public Sub get_TestPath(ByRef Path() As Integer)
-        Dim i, j, counter As Integer
+        Dim i, j As Integer
 
         For i = 0 To Path.GetUpperBound(0)
-            counter = 0
+            Path(i) = -7
             For j = 0 To List_Locations(i).List_Massnahmen.GetUpperBound(0)
                 If List_Locations(i).List_Massnahmen(j).TestModus = 1 Then
-                    Path(i) = counter
+                    Path(i) = j
                 End If
-                counter += 1
             Next
         Next
 
