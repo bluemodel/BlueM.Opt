@@ -140,6 +140,7 @@ Public MustInherit Class Sim
 
     Public VerzweigungsDatei(,) As String       'Gibt die PathSize an für jede Pfadstelle
     Public CES_T_Modus As kern.CES_T_MODUS      'Zeigt ob der TestModus aktiv ist
+    Public n_Combinations As Integer            'Die Anzahl der Möglichen Kombinationen
     
 
 #End Region 'Eigenschaften
@@ -259,6 +260,10 @@ Public MustInherit Class Sim
         Call Me.Validate_Combinatoric()
         'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
         Call Me.Validate_CES_fits_to_VER()
+        'Testmodus wird ermittelt
+        CES_T_Modus = Set_TestModus
+        'Die Zahl der Kombinationen wird ermittelt
+        n_combinations = No_of_Combinations
         'Ergebnisspeicher initialisieren
         Me.OptResult = New OptResult(Me)
 
@@ -284,6 +289,10 @@ Public MustInherit Class Sim
         Call Me.Validate_Combinatoric()
         'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
         Call Me.Validate_CES_fits_to_VER()
+        'Testmodus wird ermittelt
+        CES_T_Modus = Set_TestModus
+        'Die Zahl der Kombinationen wird ermittelt
+        n_combinations = No_of_Combinations
         'Datenbank vorbereiten
 
         'PES vorbereiten
@@ -892,13 +901,16 @@ Public MustInherit Class Sim
     'Berechnet die Anzahl maximal möglicher Kombinationen
     '****************************************************
     Public Function No_of_Combinations() As Integer
-        Dim i As Integer
 
-        No_of_Combinations = List_Locations(0).List_Massnahmen.GetLength(0)
-
-        For i = 1 To List_Locations.GetUpperBound(0)
-            No_of_Combinations = No_of_Combinations * List_Locations(i).List_Massnahmen.GetLength(0)
-        Next
+        If CES_T_MODUS = Kern.CES_T_MODUS.One_Combi Then
+            No_of_Combinations = 1
+        else
+            Dim i As Integer
+            No_of_Combinations = List_Locations(0).List_Massnahmen.GetLength(0)
+            For i = 1 To List_Locations.GetUpperBound(0)
+                No_of_Combinations = No_of_Combinations * List_Locations(i).List_Massnahmen.GetLength(0)
+            Next
+        End If
 
     End Function
 
@@ -926,7 +938,7 @@ Public MustInherit Class Sim
         Next
 
         If count_A = count_B Then
-            Set_TestModus = kern.CES_T_MODUS._0_No_Test
+            Set_TestModus = kern.CES_T_MODUS.No_Test
             Exit Function
         End If
 
@@ -944,7 +956,7 @@ Public MustInherit Class Sim
         Next
 
         If count_A = count_B Then
-            Set_TestModus = kern.CES_T_MODUS._1_One_Combi
+            Set_TestModus = kern.CES_T_MODUS.One_Combi
             Exit Function
         End If
 
@@ -962,7 +974,7 @@ Public MustInherit Class Sim
         Next
 
         If count_A = count_B Then
-            Set_TestModus = kern.CES_T_MODUS._2_All_Combis
+            Set_TestModus = kern.CES_T_MODUS.All_Combis
             Exit Function
         End If
 
@@ -985,6 +997,31 @@ Public MustInherit Class Sim
         Next
 
     End Sub
+
+
+    'Holt sich im Falle des Testmodus 1 den Pfad aus der .CES Datei
+    '**************************************************************
+    Public Function TestPath As Integer ()
+
+        Dim Array(List_Locations.GetUpperBound(0)) As Integer
+ 
+        Dim i, j As Integer
+    
+        For i = 0 To Array.GetUpperBound(0)
+            Dim count as Integer = 0
+            Array(i) = -7
+            For j = 0 To List_Locations(i).List_Massnahmen.GetUpperBound(0)
+                If List_Locations(i).List_Massnahmen(j).TestModus = 1 Then
+                    Array(i) = j
+                    count += 1
+                End If
+            Next
+            If count > 1 then Array(i) = -7
+        Next
+
+        TestPath = Array.Clone
+
+    End Function
 
     'Die Elemente werden pro Location im Child gespeichert
     '*****************************************************
