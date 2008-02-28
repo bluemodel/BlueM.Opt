@@ -384,7 +384,7 @@ Public Class MCS
         Dim actDate, date2, dateVor As Date
 
         Text = "*ZRE" + vbCrLf
-        Text += "ZRE-Format mm/h   1" + vbCrLf
+        Text += "Beschreibung   mm/h   1" + vbCrLf
         Text += "1 1   1" + vbCrLf
         Text += Me.SimStart.ToString("yyyyMMdd HH:mm") + " " + Me.SimEnde.ToString("yyyyMMdd HH:mm") + vbCrLf
 

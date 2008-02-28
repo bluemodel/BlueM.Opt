@@ -1613,24 +1613,24 @@ Start_Evolutionsrunden:
                             End If
                         End If
                     End If
-                    If PES1.PES_iAkt.iAktRunde = 0 And PES1.PES_iAkt.iAktPop = 0 And PES1.PES_iAkt.iAktGen = 0 Then
-                        'Referenzpunkt für Hypervolumen ermitteln
-                        Dim j As Integer
-                        Dim k As Integer
-                        Dim Referenzpunkt(globalAnzZiel - 1) As Double
+                    'If PES1.PES_iAkt.iAktRunde = 0 And PES1.PES_iAkt.iAktPop = 0 And PES1.PES_iAkt.iAktGen = 0 Then
+                    '    'Referenzpunkt für Hypervolumen ermitteln
+                    '    Dim j As Integer
+                    '    Dim k As Integer
+                    '    Dim Referenzpunkt(globalAnzZiel - 1) As Double
 
-                        For j = 0 To globalAnzZiel - 1
-                            Referenzpunkt(j) = 0
-                            For k = 0 To UBound(SekPopulation)
-                                If SekPopulation(k, j) > Referenzpunkt(j) Then
-                                    Referenzpunkt(j) = SekPopulation(k, j)
-                                End If
-                            Next
-                        Next
-                        'Hypervolume.Referenzpunkt = Referenzpunkt
-                    else
-                        'HV = Hypervolume.GetHypervolume(UBound(SekPopulation), SekPopulation)
-                    End If
+                    '    For j = 0 To globalAnzZiel - 1
+                    '        Referenzpunkt(j) = 0
+                    '        For k = 0 To UBound(SekPopulation)
+                    '            If SekPopulation(k, j) > Referenzpunkt(j) Then
+                    '                Referenzpunkt(j) = SekPopulation(k, j)
+                    '            End If
+                    '        Next
+                    '    Next
+                    '    'Hypervolume.Referenzpunkt = Referenzpunkt
+                    'else
+                    '    'HV = Hypervolume.GetHypervolume(UBound(SekPopulation), SekPopulation)
+                    'End If
 
                 Next 'Ende alle Generatione
                 'xxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -2340,7 +2340,6 @@ Start_Evolutionsrunden:
 
             'erstelle neues Objekt von OptResult
             Sim1.OptResult = New OptResult(Sim1)
-
         Next i
     End Sub
 
