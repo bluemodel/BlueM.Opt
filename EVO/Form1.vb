@@ -2049,7 +2049,7 @@ Start_Evolutionsrunden:
                     'Simulationsreihen nur jeweils ein Mal zeichnen
                     If (Not SimSeries.Contains(.SimGr)) Then
                         Call SimSeries.Add(.SimGr, .SimGr)
-                        zre = Sim1.SimErgebnis(.SimGr).copy()
+                        zre = Sim1.SimErgebnis(.SimGr).Clone()
                         'Lösungsnummer an Titel anhängen
                         zre.Title &= " (Lösung " & ind.ID.ToString() & ")"
                         'Simreihe in Wave laden

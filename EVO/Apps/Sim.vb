@@ -581,7 +581,7 @@ Public MustInherit Class Sim
                             Throw New Exception("Die Zielreihe '" & .ZielReiheDatei & "' deckt den Evaluierungszeitraum nicht ab!")
                         Else
                             'Zielreihe auf Evaluierungszeitraum kürzen
-                            Call .ZielReihe.cut(.EvalStart, .EvalEnde)
+                            Call .ZielReihe.Cut(.EvalStart, .EvalEnde)
                         End If
 
                     End If
@@ -690,7 +690,7 @@ Public MustInherit Class Sim
                             Throw New Exception("Die Grenzwertreihe '" & .GrenzReiheDatei & "' deckt den Simulationszeitraum nicht ab!")
                         Else
                             'Zielreihe auf Simulationszeitraum kürzen
-                            Call .GrenzReihe.cut(Me.SimStart, Me.SimEnde)
+                            Call .GrenzReihe.Cut(Me.SimStart, Me.SimEnde)
                         End If
 
                         'Grenzwertreihe umbenennen
@@ -1641,7 +1641,7 @@ Handler:
         Dim i As Integer
 
         'Simulationsreihe auf Evaluierungszeitraum kürzen
-        Call SimReihe.cut(OptZiel.EvalStart, OptZiel.EvalEnde)
+        Call SimReihe.Cut(OptZiel.EvalStart, OptZiel.EvalEnde)
 
         'Simulationswert aus Simulationsergebnis berechnen
         Dim SimWert As Double
