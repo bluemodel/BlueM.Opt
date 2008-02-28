@@ -804,8 +804,7 @@ Partial Class Form1
         CES1 = New EVO.Kern.CES()
         Call Ces1.CESInitialise(EVO_Einstellungen1.Settings, Method, sim1.CES_T_Modus, Sim1.List_OptZiele.GetLength(0), Sim1.List_Constraints.GetLength(0), Sim1.List_Locations.GetLength(0), Sim1.VerzweigungsDatei.GetLength(0), sim1.n_Combinations, sim1.n_PathDimension)
         
-        'Die Variablen für die Individuuen werden gesetzt
-        EVO.Kern.Individuum.Initialise(2, CES1.ModSett.n_Locations, 0, CES1.ModSett.n_Penalty, CES1.ModSett.n_Constrain)
+        'Die alten Bekannten
         globalAnzZiel = CES1.ModSett.n_Penalty
         globalAnzRand = CES1.ModSett.n_Constrain
 
@@ -819,23 +818,18 @@ Partial Class Form1
         'Laufvariable für die Generationen
         Dim i_gen As Integer
         Dim i, j, m As Integer
-
-        'Parents und Childs werden Dimensioniert
-        ReDim CES1.Parents(EVO_Einstellungen1.Settings.CES.n_Parents - 1)
-        Call Kern.Individuum.New_Array("Parent", CES1.Parents)
-        ReDim CES1.Childs(EVO_Einstellungen1.Settings.CES.n_Childs - 1)
-        Call Kern.Individuum.New_Array("Child", CES1.Childs)
         
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
 
         'Zufällige Kinderpfade werden generiert
+        '**************************************
         Call CES1.Generate_Random_Path()
-
         'Falls TESTMODUS werden sie überschrieben
         If Not Sim1.CES_T_Modus = Kern.CES_T_MODUS.No_Test
             Call CES1.Generate_Paths_for_Tests(sim1.TestPath, sim1.CES_T_Modus)
         End If
+        '**************************************
 
         'Hier werden dem Child die passenden Massnahmen und deren Elemente pro Location zugewiesen
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

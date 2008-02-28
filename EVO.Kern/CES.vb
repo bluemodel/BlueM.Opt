@@ -158,8 +158,22 @@ Public Class CES
     '*************************************************************************
     Private Sub CES_ReDim()
 
+        'Die Variablen für die Individuuen werden gesetzt
+        '************************************************
+        EVO.Kern.Individuum.Initialise(2, ModSett.n_Locations, 0, ModSett.n_Penalty, ModSett.n_Constrain)
+        
+        'Parents werden dimensioniert
+        ReDim Parents(Settings.CES.n_Parents - 1)
+        Call Kern.Individuum.New_Array("Parent", Parents)
+
+        'Childs werden dimensioniert
+        ReDim Childs(Settings.CES.n_Childs - 1)
+        Call Kern.Individuum.New_Array("Child", Childs)
+
+        'NDSorting wird dimensioniert
         Redim NDSorting(Settings.CES.n_Childs + Settings.CES.n_Parents - 1)
-        'Checken ob es verwendet wird
+
+        'NDSResult - Checken ob es verwendet wird
         Redim NDSResult(Settings.CES.n_Childs + Settings.CES.n_Parents - 1)
         
     End Sub
