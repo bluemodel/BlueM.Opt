@@ -833,44 +833,23 @@ Partial Class Form1
 
         'Hier werden dem Child die passenden Massnahmen und deren Elemente pro Location zugewiesen
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        For i = 0 To EVO_Einstellungen1.Settings.CES.n_Childs - 1
+        For i = 0 To CES1.Settings.CES.n_Childs - 1
             For j = 0 To CES1.ModSett.n_Locations - 1
                 Call Sim1.Identify_Measures_Elements_Parameters(j, CES1.Childs(i).Path(j), CES1.Childs(i).Measures(j), CES1.Childs(i).Loc(j).Loc_Elem, CES1.Childs(i).Loc(j).PES_OptPara)
             Next
         Next
 
-        'Schritt 0: PES - Objekt der Klasse PES wird erzeugt PES wird erzeugt
-        '*********************************************************************
-        Dim PES1 As EVO.Kern.PES
-        PES1 = New EVO.Kern.PES
-
         'Falls HYBRID werden entprechend der Einstellung im PES die Parameter auf Zufällig oder Start gesetzt
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         If Method = METH_HYBRID AND EVO_Einstellungen1.Settings.CES.ty_Hybrid = EVO.Kern.HYBRID_TYPE.Mixed_Integer Then
             'pro Child
-            'xxxxxxxxx
-            For i = 0 To EVO_Einstellungen1.Settings.CES.n_Childs - 1
-                'Und pro Location
-                'xxxxxxxxxxxxxxxx
+            For i = 0 To CES1.Settings.CES.n_Childs - 1
+                'und pro Location
                 For j = 0 To CES1.ModSett.n_Locations - 1
-
                     'Die Parameter (falls vorhanden) werden überschrieben
                     If Not CES1.Childs(i).Loc(j).PES_OptPara.GetLength(0) = 0 Then
-
-                        'Standard Parameter werden aus dem Sim besorgt
-                        Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
-
-                        'Die Zahl der Parameter wird überschrieben (AnzZiel und AnzRand sind OK)
-                        'Anzahl der Parameter bezieht sich hier nur auf eine Location
-                        globalAnzPar = CES1.Childs(i).Loc(j).PES_OptPara.GetLength(0)
-
-                        ReDim myPara(CES1.Childs(i).Loc(j).PES_OptPara.GetUpperBound(0))
-                        For m = 0 To CES1.Childs(i).Loc(j).PES_OptPara.GetUpperBound(0)
-                            myPara(m) = CES1.Childs(i).Loc(j).PES_OptPara(m)
-                        Next
-
                         'Dem Child wird der Schrittweitenvektor zugewiesen und gegebenenfalls der Parameter zufällig gewählt
-                        'wird also nicht in PES.ESStarten gemacht
+                        '***************************************************************************************************
                         For m = 0 To CES1.Childs(i).Loc(j).PES_OptPara.GetUpperBound(0)
                             CES1.Childs(i).Loc(j).PES_OptPara(m).Dn = EVO_Einstellungen1.Settings.PES.Schrittweite.DnStart
                             If EVO_Einstellungen1.Settings.PES.OptStartparameter = Kern.EVO_STARTPARAMETER.Zufall Then
@@ -1023,9 +1002,6 @@ Partial Class Form1
                         'Die Parameter (falls vorhanden) werden überschrieben
                         If Not CES1.Childs(i).Loc(j).PES_OptPara.GetLength(0) = 0 Then
 
-                            '??????????????????????
-                            PES1 = New EVO.Kern.PES
-
                             'Standard Parameter werden aus dem Sim besorgt
                             Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
 
@@ -1058,6 +1034,11 @@ Partial Class Form1
                                 'Falls Eltern vorhanden -> auf Basis des Memory
                                 EVO_Einstellungen1.isSaved = False
                                 Call EVO_Einstellungen1.SetFor_CES_PES(1, n_eltern, 1)
+
+                                'Schritt 0: PES - Objekt der Klasse PES wird erzeugt PES wird erzeugt
+                                '*********************************************************************
+                                Dim PES1 As EVO.Kern.PES
+                                PES1 = New EVO.Kern.PES
 
                                 'Schritte 1 - 3: PES wird initialisiert (Weiteres siehe dort ;-)
                                 '**************************************************************

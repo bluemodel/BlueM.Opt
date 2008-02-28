@@ -19,7 +19,7 @@ Public Class CES
     '##################
 
     'Die Settings für alles aus dem Form
-    Private Settings As Evo_Settings             'TODO: sollte private sein!
+    Public Settings As Evo_Settings             'TODO: sollte private sein!
     
     'Modell Setting
     Public Structure ModSettings
