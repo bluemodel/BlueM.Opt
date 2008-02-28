@@ -136,12 +136,11 @@ Public MustInherit Class Sim
         Public List_Massnahmen() As Struct_Massnahme
     End Structure
 
-
     Public List_Locations() As Struct_Lokation
 
-    'Gibt die PathSize an für jede Pfadstelle
-
-    Public VerzweigungsDatei(,) As String
+    Public VerzweigungsDatei(,) As String       'Gibt die PathSize an für jede Pfadstelle
+    Public CES_T_Modus As kern.CES_T_MODUS      'Zeigt ob der TestModus aktiv ist
+    
 
 #End Region 'Eigenschaften
 
