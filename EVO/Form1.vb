@@ -411,6 +411,11 @@ Partial Class Form1
                         Call EVO_Einstellungen1.setStandard_PES(Kern.EVO_MODUS.Multi_Objective)
                     End If
 
+                    'Bei Testmodus wird die Anzahl der Kinder und Generationen überschrieben
+                    If Not Sim1.CES_T_Modus = Kern.CES_T_MODUS.No_Test
+                        call EVO_Einstellungen1.setTestModus(Sim1.CES_T_Modus, Sim1.TestPath, 1 ,1 ,Sim1.n_Combinations)
+                    End If
+
             End Select
 
             'IniApp OK -> Start Button aktivieren
@@ -797,31 +802,16 @@ Partial Class Form1
         'CES initialisieren
         '******************
         CES1 = New EVO.Kern.CES()
-
-        Call Ces1.CESInitialise(EVO_Einstellungen1.Settings, Method, Sim1.List_OptZiele.GetLength(0), Sim1.List_Constraints.GetLength(0), Sim1.List_Locations.GetLength(0), Sim1.VerzweigungsDatei.GetLength(0), Sim1.No_of_Combinations, sim1.n_PathDimension)
+        Call Ces1.CESInitialise(EVO_Einstellungen1.Settings, Method, sim1.CES_T_Modus, Sim1.List_OptZiele.GetLength(0), Sim1.List_Constraints.GetLength(0), Sim1.List_Locations.GetLength(0), Sim1.VerzweigungsDatei.GetLength(0), sim1.n_Combinations, sim1.n_PathDimension)
         
         'Die Variablen für die Individuuen werden gesetzt
         EVO.Kern.Individuum.Initialise(2, CES1.ModSett.n_Locations, 0, CES1.ModSett.n_Penalty, CES1.ModSett.n_Constrain)
         globalAnzZiel = CES1.ModSett.n_Penalty
         globalAnzRand = CES1.ModSett.n_Constrain
 
-        'Bei Testmodus wird die Anzahl der Kinder und Generationen überschrieben
-        '***********************************************************************
-        If Sim1.CES_T_Modus = Kern.CES_T_MODUS._1_One_Combi Then
-            EVO_Einstellungen1.Settings.CES.n_Childs = 1
-            EVO_Einstellungen1.Settings.CES.n_Parents = 1
-            EVO_Einstellungen1.Settings.CES.n_Generations = 1
-            ReDim CES1.NDSResult(EVO_Einstellungen1.Settings.CES.n_Childs + EVO_Einstellungen1.Settings.CES.n_Parents - 1)
-        ElseIf sim1.CES_T_Modus = Kern.CES_T_MODUS._2_All_Combis Then
-            EVO_Einstellungen1.Settings.CES.n_Childs = CES1.ModSett.n_Combinations
-            EVO_Einstellungen1.Settings.CES.n_Generations = 1
-            ReDim CES1.NDSResult(EVO_Einstellungen1.Settings.CES.n_Childs + EVO_Einstellungen1.Settings.CES.n_Parents - 1)
-        End If
-
         'EVO_Verlauf zurücksetzen
         '************************
         Call Me.EVO_Opt_Verlauf1.Initialisieren(1, 1, EVO_Einstellungen1.Settings.CES.n_Generations, EVO_Einstellungen1.Settings.CES.n_Childs)
-
 
         Dim durchlauf_all As Integer = 0
         Dim serie As Steema.TeeChart.Styles.Series
@@ -839,17 +829,12 @@ Partial Class Form1
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
 
-        'Die verschiedenen TestModi
-        'xxxxxxxxxxxxxxxxxxxxxxxxxx
-        If sim1.CES_T_Modus = kern.CES_T_MODUS._0_No_Test Then
-            'Normaler Modus: Zufällige Kinderpfade werden generiert
-            Call CES1.Generate_Random_Path()
-        ElseIf sim1.CES_T_Modus = kern.CES_T_MODUS._1_One_Combi Then
-            'Testmodus 1: Funktion zum testen einer ausgewählten Kombinationen
-            Sim1.get_TestPath(CES1.Childs(0).Path)
-        ElseIf sim1.CES_T_Modus = kern.CES_T_MODUS._2_All_Combis Then
-            'Testmodus 2: Funktion zum  testen aller Kombinationen
-            Call CES1.Generate_All_Test_Paths()
+        'Zufällige Kinderpfade werden generiert
+        Call CES1.Generate_Random_Path()
+
+        'Falls TESTMODUS werden sie überschrieben
+        If Not Sim1.CES_T_Modus = Kern.CES_T_MODUS.No_Test
+            Call CES1.Generate_Paths_for_Tests(sim1.TestPath, sim1.CES_T_Modus)
         End If
 
         'Hier werden dem Child die passenden Massnahmen und deren Elemente pro Location zugewiesen
@@ -1004,7 +989,7 @@ Partial Class Form1
 
             'REPRODUKTION und MUTATION Nicht wenn Testmodus
             '***********************************************
-            If sim1.CES_T_Modus = kern.CES_T_MODUS._0_No_Test Then
+            If sim1.CES_T_Modus = kern.CES_T_MODUS.No_Test Then
                 'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
                 Call Kern.Individuum.New_Array("Child", CES1.Childs)
                 'Reproduktionsoperatoren, hier gehts dezent zur Sache

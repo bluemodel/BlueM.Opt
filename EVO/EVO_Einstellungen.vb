@@ -426,6 +426,33 @@ Public Class EVO_Einstellungen
 
     End Sub
 
+    'Settings für TestModus
+    '**********************
+    Public Sub setTestModus(byVal Modus as CES_T_MODUS,byVal Path() as Integer, byVal nGen as Integer,byVal nParents as Integer,byVal NChilds as Integer)
+        
+        Dim i as Integer
+        Dim PathStr as String
+
+        If nChilds = 1 then
+            PathStr = "   Path: "
+            For i = 0 to Path.GetUpperBound(0)
+                PathStr = PathStr & Path(i) & " "
+            Next
+            PathStr = PathStr.Trimend
+        Else
+            PathStr = "   n_combi: "
+            PathStr = PathStr & nChilds
+        End If
+
+        me.Label_CES_OptModus.Text = "Modus: " & Modus.ToString & PathStr
+        me.Numeric_CES_n_Generations.Value = nGen
+        me.Numeric_CES_n_Parents.Minimum = 1
+        me.Numeric_CES_n_Parents.Value = nParents
+        me.Numeric_CES_n_childs.Minimum = 1
+        me.Numeric_CES_n_childs.Value = nChilds
+
+    End Sub
+
 #Region "Schnittstelle"
 
     'Schnittstelle

@@ -239,9 +239,6 @@ Public Class BlueM
         StrRead.Close()
         FiStr.Close()
 
-        'Testmodus wird ermittelt
-        CES_T_Modus = Set_TestModus
-
     End Sub
 
     'Liest die Verzweigungen aus BlueM in ein Array ein

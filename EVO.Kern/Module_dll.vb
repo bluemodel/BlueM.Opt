@@ -76,9 +76,9 @@ Public Module Constants
 
     'Option zur Wahl des Hybrid Verfahrens
     Public Enum CES_T_MODUS as Integer
-        _0_No_Test = 0                       'Mixed Integer durch Memory
-        _1_One_Combi = 1                        'Erst CES dann PES
-        _2_All_Combis = 2                        'Erst CES dann PES
+        No_Test = 0                       'Mixed Integer durch Memory
+        One_Combi = 1                        'Erst CES dann PES
+        All_Combis = 2                        'Erst CES dann PES
     End Enum
 
 End Module

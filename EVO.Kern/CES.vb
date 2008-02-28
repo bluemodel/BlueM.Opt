@@ -27,7 +27,6 @@ Public Class CES
         Public n_Constrain As Integer           'Anzahl der Randbedingungen
         Public n_Locations As Integer           'Anzahl der Locations
         Public n_Verzweig As Integer            'Anzahl der Verzweigungen in der Verzweigungsdatei
-        Public n_Combinations As Integer        'Anzahl aller Kombinationen
         Public n_PathDimension() As Integer     'Anzahl der Maßnahmen an jedem Ort
     End Structure
 
@@ -55,15 +54,15 @@ Public Class CES
 
     'Initialisierung der PES
     '***************************************
-    Public Sub CESInitialise(ByRef Settings As evo_settings, ByVal Method As String, ByVal AnzPenalty As Integer, ByVal AnzConstr As Integer, byval AnzLocations as Integer, byval AnzVerzweig as Integer, byval AnzCombinations as Integer, byval AnzPathDimension() as Integer)
+    Public Sub CESInitialise(ByRef Settings As evo_settings, ByVal Method As String, ByVal TestModus as CES_T_MODUS, ByVal AnzPenalty As Integer, ByVal AnzConstr As Integer, byval AnzLocations as Integer, byval AnzVerzweig as Integer, byval AnzCombinations as Integer, byval AnzPathDimension() as Integer)
 
         'Schritt 1: CES - FORM SETTINGS
         'Optionen der Evolutionsstrategie werden übergeben
-        Call CES_Form_Settings(Settings, Method)
+        Call CES_Form_Settings(Settings, Method, TestModus)
 
         'Schritt 2: CES - MODELL SETTINGS
         'Optionen der Evolutionsstrategie werden übergeben
-        Call CES_Modell_Settings(AnzPenalty, AnzConstr, AnzLocations, AnzVerzweig, AnzCombinations, AnzPathDimension, Method)
+        Call CES_Modell_Settings(TestModus, AnzPenalty, AnzConstr, AnzLocations, AnzVerzweig, AnzCombinations, AnzPathDimension, Method)
 
         'Schritt 3: CES - ReDim
         'Einige ReDims die erst mit den FormSetting oder ModelSetting möglich sind
@@ -74,21 +73,26 @@ Public Class CES
     'Schritt 1: FORM SETTINGS
     'Function Form SETTINGS übergibt Optionen für Evolutionsstrategie und Prüft die eingestellten Optionen
     '***************************************************************************************************
-    Private Sub CES_Form_Settings(ByRef Settings As Evo_Settings, ByVal Method As String)
+    Private Sub CES_Form_Settings(ByRef Settings As Evo_Settings, ByVal Method As String, ByVAl TestModus as CES_T_MODUS)
 
         'Überprüfung der Übergebenen Werte
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        If (Settings.CES.n_Parents < 3) Then
-            Throw New Exception("Die Anzahl muss mindestens 3 sein!")
+        If TestModus = CES_T_MODUS.No_Test
+
+            If (Settings.CES.n_Parents < 3) Then
+                Throw New Exception("Die Anzahl muss mindestens 3 sein!")
+            End If
+            If (Settings.CES.n_Childs < 3) Then
+                Throw New Exception("Die Anzahl der Nachfahren muss mindestens 3 sein!")
+            End If
+            If (Settings.CES.n_Childs <= Settings.CES.n_Parents And Method <> "HYBRID") Then
+                Throw New Exception("Die Anzahl der Eltern muss kleiner als die Anzahl der Nachfahren!" & Chr(13) & Chr(10) & "'Rechenberg 73' schlägt ein Verhältnis von 1:3 bis 1:5 vor.")
+            End If
+
         End If
-        If (Settings.CES.n_Childs < 3) Then
-            Throw New Exception("Die Anzahl der Nachfahren muss mindestens 3 sein!")
-        End If
+
         If (Settings.CES.n_Generations < 1) Then
             Throw New Exception("Die Anzahl der Generationen ist kleiner 1!")
-        End If
-        If (Settings.CES.n_Childs <= Settings.CES.n_Parents And Method <> "HYBRID") Then
-            Throw New Exception("Die Anzahl der Eltern muss kleiner als die Anzahl der Nachfahren!" & Chr(13) & Chr(10) & "'Rechenberg 73' schlägt ein Verhältnis von 1:3 bis 1:5 vor.")
         End If
         If (Settings.CES.OptStrategie <> EVO_STRATEGIE.Komma_Strategie And Settings.CES.OptStrategie <> EVO_STRATEGIE.Plus_Strategie) Then
             Throw New Exception("Typ der Evolutionsstrategie ist nicht '+' oder ','")
@@ -129,19 +133,22 @@ Public Class CES
     'A: Prüfung der ModellSetting in Kombination mit den Form Setting
     'B: Übergabe der ModellSettings
     '****************************************************************
-    private Sub CES_Modell_Settings(ByVal AnzPenalty As Integer, ByVal AnzConstr As Integer, byval AnzLocations as Integer, byval AnzVerzweig as Integer, byval AnzCombinations as Integer, byval AnzPathDimension() as integer, ByVal Method as String)
+    private Sub CES_Modell_Settings(ByVal TestModus as CES_T_MODUS, ByVal AnzPenalty As Integer, ByVal AnzConstr As Integer, byval AnzLocations as Integer, byval AnzVerzweig as Integer, byval AnzCombinations as Integer, byval AnzPathDimension() as integer, ByVal Method as String)
 
-        'Prüft ob die Zahl mög. Kombinationen < Zahl Eltern + Nachfolger
-        If (Settings.CES.n_Childs + Settings.CES.n_Parents) > AnzCombinations and not Method = "HYBRID"  Then
-            Throw New Exception("Die Zahl der Eltern + die Zahl der Kinder ist größer als die mögliche Zahl der Kombinationen.")
+        If TestModus = CES_T_MODUS.No_Test
+
+            'Prüft ob die Zahl mög. Kombinationen < Zahl Eltern + Nachfolger
+            If (Settings.CES.n_Childs + Settings.CES.n_Parents) > AnzCombinations and not Method = "HYBRID"  Then
+                Throw New Exception("Die Zahl der Eltern + die Zahl der Kinder ist größer als die mögliche Zahl der Kombinationen.")
+            End If
+
         End If
-        
+
         'Übergabe
         ModSett.n_Penalty = AnzPenalty
         modsett.n_Constrain = AnzConstr
         modsett.n_Locations = AnzLocations
         modsett.n_Verzweig = AnzVerzweig
-        modsett.n_Combinations = AnzCombinations
         modsett.n_PathDimension = AnzPathDimension.Clone
 
     End Sub
@@ -188,30 +195,43 @@ Public Class CES
     End Sub
 
     'Testmodus 2: Funktion zum testen aller Kombinationen
-    '***************************************************
-    Public Sub Generate_All_Test_Paths()
-        Dim i, j As Integer
+    '****************************************************
+    Public Sub Generate_Paths_for_Tests(ByVal Path() as Integer, ByVal Modus as CES_T_MODUS)
 
-        Dim array() As Integer
-        ReDim array(Childs(i).Path.GetUpperBound(0))
-        For i = 0 To array.GetUpperBound(0)
-            array(i) = 0
-        Next
+        Select Modus
 
-        For i = 0 To Settings.CES.n_Childs - 1
-            For j = 0 To Childs(i).Path.GetUpperBound(0)
-                Childs(i).Path(j) = array(j)
-            Next
-            array(0) += 1
-            If Not i = Settings.CES.n_Childs - 1 Then
-                For j = 0 To Childs(i).Path.GetUpperBound(0)
-                    If array(j) > ModSett.n_PathDimension(j) - 1 Then
-                        array(j) = 0
-                        array(j + 1) += 1
+            Case CES_T_MODUS.One_Combi
+                'Testmodus 1: Funktion zum testen einer Kombination
+                '**************************************************
+                Childs(0).Path = Path.Clone
+
+            Case CES_T_MODUS.All_Combis
+                'Testmodus 2: Funktion zum testen aller Kombinationen
+                '****************************************************
+                Dim i, j As Integer
+
+                Dim array() As Integer
+                ReDim array(Childs(i).Path.GetUpperBound(0))
+                For i = 0 To array.GetUpperBound(0)
+                    array(i) = 0
+                Next
+
+                For i = 0 To Settings.CES.n_Childs - 1
+                    For j = 0 To Childs(i).Path.GetUpperBound(0)
+                        Childs(i).Path(j) = array(j)
+                    Next
+                    array(0) += 1
+                    If Not i = Settings.CES.n_Childs - 1 Then
+                        For j = 0 To Childs(i).Path.GetUpperBound(0)
+                            If array(j) > ModSett.n_PathDimension(j) - 1 Then
+                                array(j) = 0
+                                array(j + 1) += 1
+                            End If
+                        Next
                     End If
                 Next
-            End If
-        Next
+
+        End Select
 
     End Sub
     'Hier kann man Pfade wie z.B. Nullvarianten die nicht erlaubt sind hard vercoden (ToDo!)
