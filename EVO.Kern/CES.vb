@@ -720,6 +720,39 @@ Public Class CES
 
     End Sub
 
+    'Löscht wenn ein Individuum bei der gleichen Lokation einmal als Rank 1 und einmal als Rank 2 definiert.
+    'Bei Rank 2 entsprechnd Rank 3. Außerdem wird der erste leere Datensatz geloescht.
+    '*******************************************************************************************************
+    Private Sub PES_Memory_Dubletten_loeschen(ByRef PES_Parents_pChild() As Individuum)
+
+        Dim tmp(PES_Parents_pChild.GetUpperBound(0) - 1) As Individuum
+        Individuum.New_Array("tmp", tmp)
+        Dim isDouble As Boolean
+        Dim i, j, x As Integer
+
+        x = 0
+        For i = 1 To PES_Parents_pChild.GetUpperBound(0)
+            isDouble = False
+            For j = 1 To PES_Parents_pChild.GetUpperBound(0)
+                If i <> j And PES_Parents_pChild(i).iLocation And is_PES_Double(PES_Parents_pChild(i), PES_Parents_pChild(j)) Then
+                    isDouble = True
+                End If
+            Next
+            If isDouble = False Then
+                tmp(x) = PES_Parents_pChild(i).Clone()
+                x += 1
+            End If
+        Next
+
+        ReDim Preserve tmp(x - 1)
+        ReDim Preserve PES_Parents_pChild(x - 1)
+
+        For i = 0 To tmp.GetUpperBound(0)
+            PES_Parents_pChild(i) = tmp(i).Clone()
+        Next
+
+    End Sub
+
     'Durchsucht des PES_Perent_pChild - Der PES_Parantsatz für jede Location wird hier ermittelt
     'Eine Liste (PES_Parents_pLoc) für jede Location wird erstellt
     '**********************************************************************************************
@@ -771,39 +804,6 @@ Public Class CES
         '********************************************************************************************
 
         'SekundärQB Mach tin dieser Form noch keinen Sinn !!!!!!!!!!!!!!!!!!!
-
-    End Sub
-
-    'Löscht wenn ein Individuum bei der gleichen Lokation einmal als Rank 1 und einmal als Rank 2 definiert.
-    'Bei Rank 2 entsprechnd Rank 3. Außerdem wird der erste leere Datensatz geloescht.
-    '*******************************************************************************************************
-    Private Sub PES_Memory_Dubletten_loeschen(ByRef PES_Parents_pChild() As Individuum)
-
-        Dim tmp(PES_Parents_pChild.GetUpperBound(0) - 1) As Individuum
-        Individuum.New_Array("tmp", tmp)
-        Dim isDouble As Boolean
-        Dim i, j, x As Integer
-
-        x = 0
-        For i = 1 To PES_Parents_pChild.GetUpperBound(0)
-            isDouble = False
-            For j = 1 To PES_Parents_pChild.GetUpperBound(0)
-                If i <> j And PES_Parents_pChild(i).iLocation And is_PES_Double(PES_Parents_pChild(i), PES_Parents_pChild(j)) Then
-                    isDouble = True
-                End If
-            Next
-            If isDouble = False Then
-                tmp(x) = PES_Parents_pChild(i).Clone()
-                x += 1
-            End If
-        Next
-
-        ReDim Preserve tmp(x - 1)
-        ReDim Preserve PES_Parents_pChild(x - 1)
-
-        For i = 0 To tmp.GetUpperBound(0)
-            PES_Parents_pChild(i) = tmp(i).Clone()
-        Next
 
     End Sub
 
