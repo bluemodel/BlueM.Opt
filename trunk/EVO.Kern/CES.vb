@@ -715,6 +715,7 @@ Public Class CES
         Next
 
         'Die Doppelten niedrigeren Ränge werden gelöscht - und der erste leere Datensatz
+        '!Die Liste kann größer als die Liste des Momory sein, ein eine Lösung für verschiedene Lokations verwendet werden kann
         Call PES_Memory_Dubletten_loeschen(PES_Parents_pChild)
 
     End Sub
