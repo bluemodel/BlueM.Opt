@@ -716,14 +716,14 @@ Public Class CES
 
         'Die Doppelten niedrigeren Ränge werden gelöscht - und der erste leere Datensatz
         '!Die Liste kann größer als die Liste des Momory sein, ein eine Lösung für verschiedene Lokations verwendet werden kann
-        Call PES_Memory_Dubletten_loeschen(PES_Parents_pChild)
+        Call Memory_Dubletten_loeschen(PES_Parents_pChild)
 
     End Sub
 
     'Löscht wenn ein Individuum bei der gleichen Lokation einmal als Rank 1 und einmal als Rank 2 definiert.
     'Bei Rank 2 entsprechnd Rank 3. Außerdem wird der erste leere Datensatz geloescht.
     '*******************************************************************************************************
-    Private Sub PES_Memory_Dubletten_loeschen(ByRef PES_Parents_pChild() As Individuum)
+    Private Sub Memory_Dubletten_loeschen(ByRef PES_Parents_pChild() As Individuum)
 
         Dim tmp(PES_Parents_pChild.GetUpperBound(0) - 1) As Individuum
         Individuum.New_Array("tmp", tmp)
