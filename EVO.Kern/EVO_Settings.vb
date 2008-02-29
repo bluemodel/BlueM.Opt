@@ -197,9 +197,9 @@ Public Class EVO_Settings
                 Case "HYBRID"
 
                     'CES
-                    Me.n_Generations = 10
-                    Me.n_Parents = 5
-                    Me.n_Childs = 15
+                    Me.n_Generations = 100
+                    Me.n_Parents = 20
+                    Me.n_Childs = 60
                     Me.OptStrategie = EVO_STRATEGIE.Plus_Strategie
                     Me.OptReprodOp = CES_REPRODOP.Selt_Rand_Uniform
                     Me.OptMutOperator = CES_MUTATION.RND_Switch
