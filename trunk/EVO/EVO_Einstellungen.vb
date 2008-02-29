@@ -177,9 +177,10 @@ Public Class EVO_Einstellungen
         Me.Combo_CES_Reproduction.DataSource = System.Enum.GetValues(GetType(CES_REPRODOP))
         Me.Combo_CES_Mutation.DataSource = System.Enum.GetValues(GetType(CES_MUTATION))
         Me.Combo_CES_Selection.DataSource = System.Enum.GetValues(GetType(EVO_STRATEGIE))
-        Me.Combo_CES_IniValues.DataSource = system.Enum.GetValues(gettype(EVO_STARTPARAMETER))
-        me.Combo_CES_HybridType.DataSource = system.Enum.GetValues(gettype(HYBRID_TYPE))
-        
+        Me.Combo_CES_IniValues.DataSource = System.Enum.GetValues(gettype(EVO_STARTPARAMETER))
+        Me.Combo_CES_HybridType.DataSource = System.Enum.GetValues(gettype(HYBRID_TYPE))
+        Me.Combo_CES_MemStrategy.DataSource = System.Enum.GetValues(gettype(MEMORY_STRATEGY))
+
     End Sub
 
      Private Sub FILLCOMBO_POPPENALTY(ByRef Cntrl As System.Windows.Forms.ComboBox)
@@ -270,7 +271,7 @@ Public Class EVO_Einstellungen
             'HYBRID hängt von der Methode ab
             .is_RealOpt = me.CheckBox_CES_RealOptimisation.Checked
             .ty_Hybrid = me.Combo_CES_HybridType.SelectedItem
-            .n_PartsMem = me.Numeric_CES_mem_Strength.Value
+            .Mem_Strategy = me.Combo_CES_MemStrategy.SelectedItem
             .is_PopMutStart = me.CheckBox_CES_StartPESPop.Checked
             .is_PES_SecPop = me.CheckBox_CES_UseSecPop_PES.Checked
             .n_PES_Interact = me.Numeric_CES_n_exchange_SecPop_PES.Value
@@ -404,7 +405,7 @@ Public Class EVO_Einstellungen
             'HYBRID hängt von der Methode ab
             me.CheckBox_CES_RealOptimisation.Checked = .is_RealOpt
             me.Combo_CES_HybridType.SelectedItem = .ty_Hybrid
-            me.Numeric_CES_mem_Strength.Value = .n_PartsMem
+            me.Combo_CES_MemStrategy.SelectedItem = .Mem_Strategy
             me.CheckBox_CES_StartPESPop.Checked = .is_PopMutStart
             me.CheckBox_CES_UseSecPop_PES.Checked = .is_PES_SecPop
             me.Numeric_CES_n_exchange_SecPop_PES.Value = .n_PES_Interact

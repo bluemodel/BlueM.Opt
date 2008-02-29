@@ -157,7 +157,7 @@ Public Class EVO_Settings
         'Hybrid
         Public is_RealOpt as Boolean            'gibt an ob auch die Real Parameter optimiert werden sollen
         Public ty_Hybrid as HYBRID_TYPE         'gibt den Hybrid Typ an
-        Public n_PartsMem As Integer            'Länge des Gedächtnispfades Achtung Maximum ist 3
+        Public Mem_Strategy as MEMORY_STRATEGY  'Gibt die Memory Strategy an
         Public is_PES_SecPop As Boolean         'SekundärePopulation für PES an oder aus
         Public n_PES_MemSecPop As Integer       'Anzahl der Mitglieder der Sekundären Population für PES
         Public n_PES_Interact As Integer        'Austausch mit SekPop für PES nach n Generationen
@@ -185,9 +185,9 @@ Public Class EVO_Settings
                     Me.n_Interact = 5
 
                     'Hybrid
-                    me.is_RealOpt = False
-                    me.ty_Hybrid = HYBRID_TYPE.Mixed_Integer
-                    Me.n_PartsMem = 3
+                    Me.is_RealOpt = False
+                    Me.ty_Hybrid = HYBRID_TYPE.Mixed_Integer
+                    Me.Mem_Strategy = MEMORY_STRATEGY.C_This_Loc
         
                     Me.is_PES_SecPop = False
                     Me.n_PES_MemSecPop = 50
@@ -198,8 +198,8 @@ Public Class EVO_Settings
 
                     'CES
                     Me.n_Generations = 100
-                    Me.n_Parents = 20
-                    Me.n_Childs = 60
+                    Me.n_Parents = 3
+                    Me.n_Childs = 7
                     Me.OptStrategie = EVO_STRATEGIE.Plus_Strategie
                     Me.OptReprodOp = CES_REPRODOP.Selt_Rand_Uniform
                     Me.OptMutOperator = CES_MUTATION.RND_Switch
@@ -210,9 +210,9 @@ Public Class EVO_Settings
                     Me.n_Interact = 5
 
                     'Hybrid
-                    me.is_RealOpt = True
-                    me.ty_Hybrid = HYBRID_TYPE.Mixed_Integer
-                    Me.n_PartsMem = 3
+                    Me.is_RealOpt = True
+                    Me.ty_Hybrid = HYBRID_TYPE.Mixed_Integer
+                    Me.Mem_Strategy = MEMORY_STRATEGY.C_This_Loc
         
                     Me.is_PES_SecPop = False
                     Me.n_PES_MemSecPop = 50

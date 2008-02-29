@@ -106,9 +106,6 @@ Public Class CES
         If (Settings.CES.n_MemberSecondPop < 1)
             Throw New Exception("Die Zahl der Mitglieder der sekundären Population ist kleiner 1!")
         End If
-        If (Settings.CES.n_PartsMem < 1 or Settings.CES.n_PartsMem > 3)
-            Throw New Exception("Die Zahl der Memory Parts muss zwischen 1und 3 liegen!")
-        End If
         If (Settings.CES.n_Interact < 1) Then
             Throw New Exception("Die Anzahl der Mitglieder des sekundären Population muss mindestens 1 sein!")
         End If
@@ -682,32 +679,32 @@ Public Class CES
                     akt = PES_Parents_pChild.GetUpperBound(0)
                     PES_Parents_pChild(akt) = Memory(m).Clone()
                     PES_Parents_pChild(akt).iLocation = j + 1
-                    PES_Parents_pChild(akt).Memory_Rank = 1
+                    PES_Parents_pChild(akt).Memory_Rank = 0
                     count_a(j) += 1
                 End If
 
                 'Rank Nummer 2 (Übereinstimmung in Location 1 und 2)
-                If Not j = ModSett.n_Locations - 1 And Settings.CES.n_PartsMem > 1 Then
+                If Not j = ModSett.n_Locations - 1 And Settings.CES.Mem_Strategy > 0 Then
                     If Child.Path(j) = Memory(m).Path(j) And Child.Path(j + 1) = Memory(m).Path(j + 1) Then
                         ReDim Preserve PES_Parents_pChild(PES_Parents_pChild.GetLength(0))
                         PES_Parents_pChild(PES_Parents_pChild.GetUpperBound(0)) = New Individuum("PES_Parent", PES_Parents_pChild.GetUpperBound(0))
                         akt = PES_Parents_pChild.GetUpperBound(0)
                         PES_Parents_pChild(akt) = Memory(m).Clone()
                         PES_Parents_pChild(akt).iLocation = j + 1
-                        PES_Parents_pChild(akt).Memory_Rank = 2
+                        PES_Parents_pChild(akt).Memory_Rank = 1
                         count_b(j) += 1
                     End If
                 End If
 
                 'Rank Nummer 3 (Übereinstimmung in Location 1, 2 und 3)
-                If Not (j = ModSett.n_Locations - 1 Or j = ModSett.n_Locations - 2) And Settings.CES.n_PartsMem > 2 Then
+                If Not (j = ModSett.n_Locations - 1 Or j = ModSett.n_Locations - 2) And Settings.CES.Mem_Strategy > 1 Then
                     If Child.Path(j) = Memory(m).Path(j) And Child.Path(j + 1) = Memory(m).Path(j + 1) And Child.Path(j + 2) = Memory(m).Path(j + 2) Then
                         ReDim Preserve PES_Parents_pChild(PES_Parents_pChild.GetLength(0))
                         PES_Parents_pChild(PES_Parents_pChild.GetUpperBound(0)) = New Individuum("PES_Parent", PES_Parents_pChild.GetUpperBound(0))
                         akt = PES_Parents_pChild.GetUpperBound(0)
                         PES_Parents_pChild(akt) = Memory(m).Clone()
                         PES_Parents_pChild(akt).iLocation = j + 1
-                        PES_Parents_pChild(akt).Memory_Rank = 3
+                        PES_Parents_pChild(akt).Memory_Rank = 2
                         count_c(j) += 1
                     End If
                 End If
@@ -717,6 +714,8 @@ Public Class CES
         'Die Doppelten niedrigeren Ränge werden gelöscht - und der erste leere Datensatz
         '!Die Liste kann größer als die Liste des Momory sein, ein eine Lösung für verschiedene Lokations verwendet werden kann
         Call Memory_Dubletten_loeschen(PES_Parents_pChild)
+
+        Call Memory_Delete_too_weak(PES_Parents_pChild)
 
     End Sub
 
@@ -751,6 +750,51 @@ Public Class CES
             PES_Parents_pChild(i) = tmp(i).Clone()
         Next
 
+    End Sub
+
+    'Die die nicht die entsprechende Memory Strategy haben werden aussortiert
+    '************************************************************************
+    Private Sub Memory_Delete_too_weak(ByRef PES_Parents_pChild() As Individuum)
+
+        Dim i as Integer
+        Dim Tmp(-1) As Individuum
+
+        For i = 0 to PES_Parents_pChild.GetUpperBound(0)
+
+            Select settings.CES.Mem_Strategy
+
+                case MEMORY_STRATEGY.A_Two_Loc_Up
+                    'ToDo
+
+                case MEMORY_STRATEGY.B_One_Loc_Up
+                    'ToDo
+
+                case MEMORY_STRATEGY.C_This_Loc
+                    'Alles bleibt drin
+
+                case MEMORY_STRATEGY.D_One_Loc_Down, MEMORY_STRATEGY.E_Two_Loc_Down
+                    'DOWNSTREAM
+                    If PES_Parents_pChild(i).Memory_Rank >= settings.CES.Mem_Strategy + Math.Min(0, Modsett.n_Locations - settings.CES.Mem_Strategy - PES_Parents_pChild(i).iLocation) then
+                        Redim Preserve Tmp(Tmp.GetLength(0))
+                        Tmp(Tmp.GetUpperBound(0)) = new Individuum("PES_Parent", Tmp.GetUpperBound(0))
+                        Tmp(Tmp.GetUpperBound(0)) = PES_Parents_pChild(i).Clone
+                    End If
+
+            End Select
+        Next
+
+        dim x as Integer = 0
+        for i = 0 to tmp.GetUpperBound(0)
+            x = tmp(i).Memory_Rank
+        Next
+
+
+
+
+
+
+        PES_Parents_pChild = Tmp.Clone
+        
     End Sub
 
     'Durchsucht des PES_Perent_pChild - Der PES_Parantsatz für jede Location wird hier ermittelt
