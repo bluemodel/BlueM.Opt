@@ -94,18 +94,18 @@ Public Class IHAProcessor
 
                 If (OptZiel.ZielFkt = "") Then
                     'fx(HA) Gesamtmittelwert
-                    diff = Me.RVAfxBase.All_Avg_fx - RVAfx.All_Avg_fx
+                    diff = RVAfx.All_Avg_fx - Me.RVAfxBase.All_Avg_fx
                 Else
                     'fx(HA) Mittelwert einer Parametergruppe
                     For i = 0 To RVAResult.NGroups - 1
                         If (OptZiel.ZielFkt = RVAResult.IHAParamGroups(i).GName) Then
-                            diff = Me.RVAfxBase.PGroup_Avg_fx(i) - RVAfx.PGroup_Avg_fx(i)
+                            diff = RVAfx.PGroup_Avg_fx(i) - Me.RVAfxBase.PGroup_Avg_fx(i)
                             Exit For
                         End If
                     Next
                 End If
 
-                QWert = 1 - diff
+                QWert = (1 - diff) ^ 2
 
         End Select
 
@@ -133,10 +133,14 @@ Public Class IHAProcessor
             For j = 0 To RVAResult.IHAParamGroups(i).NParams - 1
                 PGroup_Sum_fx(i) += fx(RVAResult.IHAParamGroups(i).IHAParams(j).HAMiddle)
             Next
+
+            'Mittelwert für eine Parametergruppe
             RVAfx.PGroup_Avg_fx(i) = PGroup_Sum_fx(i) / RVAResult.IHAParamGroups(i).NParams
 
             All_Sum_fx += RVAfx.PGroup_Avg_fx(i)
         Next
+
+        'Mittelwert über alle Parametergruppen
         RVAfx.All_Avg_fx = All_Sum_fx / RVAResult.NGroups
 
         Return RVAfx
@@ -147,7 +151,7 @@ Public Class IHAProcessor
     '***************************************************************************************
     Private Shared Function fx(ByVal HA As Double) As Double
 
-        'Parameter für Normalverteilung mit f(0) ~= 1, f(-1) ~= 0
+        'Parameter für Normalverteilung mit fx(0) ~= 1 und fx(-1) = fx(1) ~= 0
         '[EXCEL:] 1/(std*WURZEL(2*PI()))*EXP(-1/2*((X-avg)/std)^2)
         Dim std As Double = 0.398942423706863                   'Standardabweichung
         Dim avg As Double = 0                                   'Erwartungswert
