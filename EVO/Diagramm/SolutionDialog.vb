@@ -36,7 +36,7 @@ Partial Public Class SolutionDialog
 
     'Konstruktor
     '***********
-    Public Sub New(ByVal lOptPara() As Sim.Struct_OptParameter, ByVal lOptZiele() As Sim.Struct_OptZiel, ByVal lConst() As Sim.Struct_Constraint)
+    Public Sub New(ByVal lOptPara() As EVO.Kern.OptParameter, ByVal lOptZiele() As Sim.Struct_OptZiel, ByVal lConst() As Sim.Struct_Constraint, ByVal lLoc() As Sim.Struct_Lokation)
 
         ' Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent()
@@ -53,20 +53,6 @@ Partial Public Class SolutionDialog
         '---------
         cellstyle = Me.DataGridView1.DefaultCellStyle.Clone()
         cellstyle.Format = "G5"
-
-        'OptParameter
-        '------------
-        cellstyle.BackColor = Color.LightGray
-
-        For Each OptPara As Sim.Struct_OptParameter In lOptPara
-            column = New DataGridViewTextBoxColumn()
-            column.ReadOnly = True
-            column.HeaderText = OptPara.Bezeichnung
-            column.HeaderCell.ToolTipText = "OptParameter"
-            column.Name = OptPara.Bezeichnung
-            column.DefaultCellStyle = cellstyle.Clone()
-            Me.DataGridView1.Columns.Add(column)
-        Next
 
         'OptZiele
         '--------
@@ -96,6 +82,34 @@ Partial Public Class SolutionDialog
             Me.DataGridView1.Columns.Add(column)
         Next
 
+        'Locations
+        '---------
+        cellstyle.BackColor = Color.AliceBlue
+
+        For Each Location As Sim.Struct_Lokation In lLoc
+            column = New DataGridViewTextBoxColumn()
+            column.ReadOnly = True
+            column.HeaderText = Location.Name
+            column.HeaderCell.ToolTipText = "Location"
+            column.Name = Location.Name
+            column.DefaultCellStyle = cellstyle.Clone()
+            Me.DataGridView1.Columns.Add(column)
+        Next
+
+        'OptParameter
+        '------------
+        cellstyle.BackColor = Color.LightGray
+
+        For Each OptPara As EVO.Kern.OptParameter In lOptPara
+            column = New DataGridViewTextBoxColumn()
+            column.ReadOnly = True
+            column.HeaderText = OptPara.Bezeichnung
+            column.HeaderCell.ToolTipText = "OptParameter"
+            column.Name = OptPara.Bezeichnung
+            column.DefaultCellStyle = cellstyle.Clone()
+            Me.DataGridView1.Columns.Add(column)
+        Next
+
         'Handler einrichten
         '==================
         AddHandler Me.WaveClicked, AddressOf Form1.showWave
@@ -105,7 +119,7 @@ Partial Public Class SolutionDialog
 
     'Eine Lösung hinzufügen
     '**********************
-    Public Sub addSolution(ByVal sol As Solution)
+    Public Sub addSolution(ByVal ind As Kern.Individuum)
 
         Dim i As Integer
         Dim cellvalues() As Object
@@ -119,25 +133,53 @@ Partial Public Class SolutionDialog
 
         i = 1
 
-        For Each optpara As Double In sol.OptPara
-            cellvalues(i) = optpara
-            i += 1
-        Next
-
-        For Each optziel As Double In sol.QWerte
+        'OptZiele
+        For Each optziel As Double In ind.Penalty
             cellvalues(i) = optziel
             i += 1
         Next
 
-        For Each constraint As Double In sol.Constraints
+        'Constraints
+        For Each constraint As Double In ind.Constrain
             cellvalues(i) = constraint
             i += 1
         Next
 
+        'Measures
+        For Each measure As String In ind.Measures
+            cellvalues(i) = measure
+            i += 1
+        Next
+
+        'OptParameter PES
+        For Each optpara As Kern.OptParameter In ind.PES_OptParas
+            cellvalues(i) = optpara.RWert
+            i += 1
+        Next
+
+        'OptParameter CES
+        Dim found As Boolean
+
+        Do While i < Me.DataGridView1.ColumnCount
+            found = False
+            For Each loc As Kern.Individuum.Location_Data In ind.Loc
+                For Each optpara As Kern.OptParameter In loc.PES_OptPara
+                    If optpara.Bezeichnung = Me.DataGridView1.Columns(i).HeaderText Then
+                        cellvalues(i) = optpara.RWert
+                        found = True
+                    End If
+                Next
+            Next
+            If Not found Then
+                cellvalues(i) = "---"
+            End If
+            i += 1
+        Loop
+
         'Zeile erstellen
         row = New DataGridViewRow()
         row.CreateCells(Me.DataGridView1, cellvalues)
-        row.HeaderCell.Value = sol.ID.ToString()
+        row.HeaderCell.Value = ind.ID.ToString()
 
         'Zeile hinzufügen
         Me.DataGridView1.Rows.Add(row)

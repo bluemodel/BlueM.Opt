@@ -69,42 +69,40 @@ Partial Class EVO_Einstellungen
         Me.checkpaintconstrained = New System.Windows.Forms.CheckBox
         Me.TabPage_CES = New System.Windows.Forms.TabPage
         Me.GroupBox_Hybrid = New System.Windows.Forms.GroupBox
-        Me.CheckBox_use_sec_pop_PES = New System.Windows.Forms.CheckBox
+        Me.CheckBox_CES_UseSecPop_PES = New System.Windows.Forms.CheckBox
         Me.Label10 = New System.Windows.Forms.Label
-        Me.CheckBox2 = New System.Windows.Forms.CheckBox
-        Me.Numeric_n_member_SecPop_PES = New System.Windows.Forms.NumericUpDown
-        Me.Numeric_max_PES_Parents = New System.Windows.Forms.NumericUpDown
-        Me.Numeric_n_exchange_SecPop_PES = New System.Windows.Forms.NumericUpDown
-        Me.Label_max_PES_Parents = New System.Windows.Forms.Label
+        Me.CheckBox_CES_StartPESPop = New System.Windows.Forms.CheckBox
+        Me.Numeric_CES_n_member_SecPop_PES = New System.Windows.Forms.NumericUpDown
+        Me.Numeric_CES_n_exchange_SecPop_PES = New System.Windows.Forms.NumericUpDown
         Me.Label_n_memebers_SecPop_PES = New System.Windows.Forms.Label
-        Me.Numeric_mem_Strength = New System.Windows.Forms.NumericUpDown
+        Me.Numeric_CES_mem_Strength = New System.Windows.Forms.NumericUpDown
         Me.Label_n_exchange_secPop_PES = New System.Windows.Forms.Label
         Me.Label12 = New System.Windows.Forms.Label
-        Me.ComboBox_Hybrid_Type = New System.Windows.Forms.ComboBox
+        Me.Combo_CES_HybridType = New System.Windows.Forms.ComboBox
         Me.Label_MemStrength = New System.Windows.Forms.Label
         Me.Label_Hybrid_Type = New System.Windows.Forms.Label
-        Me.CheckBox_Use_Sec_Pop = New System.Windows.Forms.CheckBox
+        Me.CheckBox_CES_RealOptimisation = New System.Windows.Forms.CheckBox
         Me.GroupBoxCES = New System.Windows.Forms.GroupBox
-        Me.Use_ = New System.Windows.Forms.CheckBox
-        Me.Numeric_MutRate = New System.Windows.Forms.NumericUpDown
+        Me.CheckBox_CES_UseSecPop_CES = New System.Windows.Forms.CheckBox
+        Me.Numeric_CES_MutRate = New System.Windows.Forms.NumericUpDown
         Me.Label_MutationRate = New System.Windows.Forms.Label
-        Me.ComboCESReproduction = New System.Windows.Forms.ComboBox
+        Me.Combo_CES_Reproduction = New System.Windows.Forms.ComboBox
         Me.LabelCESReproduction = New System.Windows.Forms.Label
-        Me.Numeric_n_member_SecPop = New System.Windows.Forms.NumericUpDown
-        Me.Numeric_n_exchange_SecPop = New System.Windows.Forms.NumericUpDown
+        Me.Numeric_CES_n_member_SecPop = New System.Windows.Forms.NumericUpDown
+        Me.Numeric_CES_n_exchange_SecPop = New System.Windows.Forms.NumericUpDown
         Me.Label_n_memebers_SecPop = New System.Windows.Forms.Label
         Me.Label_n_exchange_secPop = New System.Windows.Forms.Label
-        Me.Numeric_n_childs = New System.Windows.Forms.NumericUpDown
-        Me.Numeric_n_Parents = New System.Windows.Forms.NumericUpDown
-        Me.ComboCESMutation = New System.Windows.Forms.ComboBox
-        Me.Numeric_n_Generations = New System.Windows.Forms.NumericUpDown
-        Me.ComboCESSelection = New System.Windows.Forms.ComboBox
+        Me.Numeric_CES_n_childs = New System.Windows.Forms.NumericUpDown
+        Me.Numeric_CES_n_Parents = New System.Windows.Forms.NumericUpDown
+        Me.Combo_CES_Mutation = New System.Windows.Forms.ComboBox
+        Me.Numeric_CES_n_Generations = New System.Windows.Forms.NumericUpDown
+        Me.Combo_CES_Selection = New System.Windows.Forms.ComboBox
         Me.Label_n_childs = New System.Windows.Forms.Label
         Me.Label_n_parents = New System.Windows.Forms.Label
         Me.Label_n_Generations = New System.Windows.Forms.Label
         Me.LabelCESMutation = New System.Windows.Forms.Label
         Me.LabelCESSelection = New System.Windows.Forms.Label
-        Me.ComboCESIniValues = New System.Windows.Forms.ComboBox
+        Me.Combo_CES_IniValues = New System.Windows.Forms.ComboBox
         Me.LabelCESIniValues = New System.Windows.Forms.Label
         Me.Label_CES_OptModus = New System.Windows.Forms.Label
         Me.TabPage_HookeJeeves = New System.Windows.Forms.TabPage
@@ -153,17 +151,16 @@ Partial Class EVO_Einstellungen
         CType(Me.TextAnzPopEltern, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabPage_CES.SuspendLayout()
         Me.GroupBox_Hybrid.SuspendLayout()
-        CType(Me.Numeric_n_member_SecPop_PES, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.Numeric_max_PES_Parents, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.Numeric_n_exchange_SecPop_PES, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.Numeric_mem_Strength, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.Numeric_CES_n_member_SecPop_PES, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.Numeric_CES_n_exchange_SecPop_PES, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.Numeric_CES_mem_Strength, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBoxCES.SuspendLayout()
-        CType(Me.Numeric_MutRate, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.Numeric_n_member_SecPop, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.Numeric_n_exchange_SecPop, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.Numeric_n_childs, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.Numeric_n_Parents, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.Numeric_n_Generations, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.Numeric_CES_MutRate, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.Numeric_CES_n_member_SecPop, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.Numeric_CES_n_exchange_SecPop, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.Numeric_CES_n_childs, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.Numeric_CES_n_Parents, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.Numeric_CES_n_Generations, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabPage_HookeJeeves.SuspendLayout()
         CType(Me.TextDeltaFinishHJ, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.TextDeltaStartHJ, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -484,18 +481,18 @@ Partial Class EVO_Einstellungen
         Me.LabelAnzNachf.AutoSize = True
         Me.LabelAnzNachf.Location = New System.Drawing.Point(8, 64)
         Me.LabelAnzNachf.Name = "LabelAnzNachf"
-        Me.LabelAnzNachf.Size = New System.Drawing.Size(97, 13)
+        Me.LabelAnzNachf.Size = New System.Drawing.Size(115, 13)
         Me.LabelAnzNachf.TabIndex = 16
-        Me.LabelAnzNachf.Text = "Anzahl Nachfolger:"
+        Me.LabelAnzNachf.Text = "Anzahl der Nachfolger:"
         '
         'LabelAnzEltern
         '
         Me.LabelAnzEltern.AutoSize = True
         Me.LabelAnzEltern.Location = New System.Drawing.Point(7, 42)
         Me.LabelAnzEltern.Name = "LabelAnzEltern"
-        Me.LabelAnzEltern.Size = New System.Drawing.Size(72, 13)
+        Me.LabelAnzEltern.Size = New System.Drawing.Size(90, 13)
         Me.LabelAnzEltern.TabIndex = 15
-        Me.LabelAnzEltern.Text = "Anzahl Eltern:"
+        Me.LabelAnzEltern.Text = "Anzahl der Eltern:"
         '
         'LabelAnzGen
         '
@@ -659,9 +656,9 @@ Partial Class EVO_Einstellungen
         '
         Me.TabPage_CES.BackColor = System.Drawing.SystemColors.Control
         Me.TabPage_CES.Controls.Add(Me.GroupBox_Hybrid)
-        Me.TabPage_CES.Controls.Add(Me.CheckBox_Use_Sec_Pop)
+        Me.TabPage_CES.Controls.Add(Me.CheckBox_CES_RealOptimisation)
         Me.TabPage_CES.Controls.Add(Me.GroupBoxCES)
-        Me.TabPage_CES.Controls.Add(Me.ComboCESIniValues)
+        Me.TabPage_CES.Controls.Add(Me.Combo_CES_IniValues)
         Me.TabPage_CES.Controls.Add(Me.LabelCESIniValues)
         Me.TabPage_CES.Controls.Add(Me.Label_CES_OptModus)
         Me.TabPage_CES.Location = New System.Drawing.Point(4, 22)
@@ -673,18 +670,16 @@ Partial Class EVO_Einstellungen
         '
         'GroupBox_Hybrid
         '
-        Me.GroupBox_Hybrid.Controls.Add(Me.CheckBox_use_sec_pop_PES)
+        Me.GroupBox_Hybrid.Controls.Add(Me.CheckBox_CES_UseSecPop_PES)
         Me.GroupBox_Hybrid.Controls.Add(Me.Label10)
-        Me.GroupBox_Hybrid.Controls.Add(Me.CheckBox2)
-        Me.GroupBox_Hybrid.Controls.Add(Me.Numeric_n_member_SecPop_PES)
-        Me.GroupBox_Hybrid.Controls.Add(Me.Numeric_max_PES_Parents)
-        Me.GroupBox_Hybrid.Controls.Add(Me.Numeric_n_exchange_SecPop_PES)
-        Me.GroupBox_Hybrid.Controls.Add(Me.Label_max_PES_Parents)
+        Me.GroupBox_Hybrid.Controls.Add(Me.CheckBox_CES_StartPESPop)
+        Me.GroupBox_Hybrid.Controls.Add(Me.Numeric_CES_n_member_SecPop_PES)
+        Me.GroupBox_Hybrid.Controls.Add(Me.Numeric_CES_n_exchange_SecPop_PES)
         Me.GroupBox_Hybrid.Controls.Add(Me.Label_n_memebers_SecPop_PES)
-        Me.GroupBox_Hybrid.Controls.Add(Me.Numeric_mem_Strength)
+        Me.GroupBox_Hybrid.Controls.Add(Me.Numeric_CES_mem_Strength)
         Me.GroupBox_Hybrid.Controls.Add(Me.Label_n_exchange_secPop_PES)
         Me.GroupBox_Hybrid.Controls.Add(Me.Label12)
-        Me.GroupBox_Hybrid.Controls.Add(Me.ComboBox_Hybrid_Type)
+        Me.GroupBox_Hybrid.Controls.Add(Me.Combo_CES_HybridType)
         Me.GroupBox_Hybrid.Controls.Add(Me.Label_MemStrength)
         Me.GroupBox_Hybrid.Controls.Add(Me.Label_Hybrid_Type)
         Me.GroupBox_Hybrid.Location = New System.Drawing.Point(6, 407)
@@ -694,16 +689,16 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Hybrid.TabStop = False
         Me.GroupBox_Hybrid.Text = "Hybrid Options"
         '
-        'CheckBox_use_sec_pop_PES
+        'CheckBox_CES_UseSecPop_PES
         '
-        Me.CheckBox_use_sec_pop_PES.AutoSize = True
-        Me.CheckBox_use_sec_pop_PES.Location = New System.Drawing.Point(17, 138)
-        Me.CheckBox_use_sec_pop_PES.Name = "CheckBox_use_sec_pop_PES"
-        Me.CheckBox_use_sec_pop_PES.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-        Me.CheckBox_use_sec_pop_PES.Size = New System.Drawing.Size(153, 17)
-        Me.CheckBox_use_sec_pop_PES.TabIndex = 13
-        Me.CheckBox_use_sec_pop_PES.Text = "Use secondary Population:"
-        Me.CheckBox_use_sec_pop_PES.UseVisualStyleBackColor = True
+        Me.CheckBox_CES_UseSecPop_PES.AutoSize = True
+        Me.CheckBox_CES_UseSecPop_PES.Location = New System.Drawing.Point(17, 138)
+        Me.CheckBox_CES_UseSecPop_PES.Name = "CheckBox_CES_UseSecPop_PES"
+        Me.CheckBox_CES_UseSecPop_PES.RightToLeft = System.Windows.Forms.RightToLeft.Yes
+        Me.CheckBox_CES_UseSecPop_PES.Size = New System.Drawing.Size(153, 17)
+        Me.CheckBox_CES_UseSecPop_PES.TabIndex = 13
+        Me.CheckBox_CES_UseSecPop_PES.Text = "Use secondary Population:"
+        Me.CheckBox_CES_UseSecPop_PES.UseVisualStyleBackColor = True
         '
         'Label10
         '
@@ -713,54 +708,35 @@ Partial Class EVO_Einstellungen
         Me.Label10.TabIndex = 55
         Me.Label10.Text = "Start with Pop Mutation:"
         '
-        'CheckBox2
+        'CheckBox_CES_StartPESPop
         '
-        Me.CheckBox2.AutoSize = True
-        Me.CheckBox2.Location = New System.Drawing.Point(177, 103)
-        Me.CheckBox2.Name = "CheckBox2"
-        Me.CheckBox2.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-        Me.CheckBox2.Size = New System.Drawing.Size(15, 14)
-        Me.CheckBox2.TabIndex = 13
-        Me.CheckBox2.UseVisualStyleBackColor = True
+        Me.CheckBox_CES_StartPESPop.AutoSize = True
+        Me.CheckBox_CES_StartPESPop.Location = New System.Drawing.Point(177, 103)
+        Me.CheckBox_CES_StartPESPop.Name = "CheckBox_CES_StartPESPop"
+        Me.CheckBox_CES_StartPESPop.RightToLeft = System.Windows.Forms.RightToLeft.Yes
+        Me.CheckBox_CES_StartPESPop.Size = New System.Drawing.Size(15, 14)
+        Me.CheckBox_CES_StartPESPop.TabIndex = 13
+        Me.CheckBox_CES_StartPESPop.UseVisualStyleBackColor = True
         '
-        'Numeric_n_member_SecPop_PES
+        'Numeric_CES_n_member_SecPop_PES
         '
-        Me.Numeric_n_member_SecPop_PES.Location = New System.Drawing.Point(139, 187)
-        Me.Numeric_n_member_SecPop_PES.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
-        Me.Numeric_n_member_SecPop_PES.Name = "Numeric_n_member_SecPop_PES"
-        Me.Numeric_n_member_SecPop_PES.Size = New System.Drawing.Size(53, 20)
-        Me.Numeric_n_member_SecPop_PES.TabIndex = 52
-        Me.Numeric_n_member_SecPop_PES.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.Numeric_n_member_SecPop_PES.Value = New Decimal(New Integer() {50, 0, 0, 0})
+        Me.Numeric_CES_n_member_SecPop_PES.Location = New System.Drawing.Point(139, 187)
+        Me.Numeric_CES_n_member_SecPop_PES.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
+        Me.Numeric_CES_n_member_SecPop_PES.Name = "Numeric_CES_n_member_SecPop_PES"
+        Me.Numeric_CES_n_member_SecPop_PES.Size = New System.Drawing.Size(53, 20)
+        Me.Numeric_CES_n_member_SecPop_PES.TabIndex = 52
+        Me.Numeric_CES_n_member_SecPop_PES.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_CES_n_member_SecPop_PES.Value = New Decimal(New Integer() {50, 0, 0, 0})
         '
-        'Numeric_max_PES_Parents
+        'Numeric_CES_n_exchange_SecPop_PES
         '
-        Me.Numeric_max_PES_Parents.Location = New System.Drawing.Point(140, 77)
-        Me.Numeric_max_PES_Parents.Maximum = New Decimal(New Integer() {500, 0, 0, 0})
-        Me.Numeric_max_PES_Parents.Name = "Numeric_max_PES_Parents"
-        Me.Numeric_max_PES_Parents.Size = New System.Drawing.Size(53, 20)
-        Me.Numeric_max_PES_Parents.TabIndex = 53
-        Me.Numeric_max_PES_Parents.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.Numeric_max_PES_Parents.Value = New Decimal(New Integer() {12, 0, 0, 0})
-        '
-        'Numeric_n_exchange_SecPop_PES
-        '
-        Me.Numeric_n_exchange_SecPop_PES.Location = New System.Drawing.Point(139, 161)
-        Me.Numeric_n_exchange_SecPop_PES.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
-        Me.Numeric_n_exchange_SecPop_PES.Name = "Numeric_n_exchange_SecPop_PES"
-        Me.Numeric_n_exchange_SecPop_PES.Size = New System.Drawing.Size(53, 20)
-        Me.Numeric_n_exchange_SecPop_PES.TabIndex = 51
-        Me.Numeric_n_exchange_SecPop_PES.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.Numeric_n_exchange_SecPop_PES.Value = New Decimal(New Integer() {10, 0, 0, 0})
-        '
-        'Label_max_PES_Parents
-        '
-        Me.Label_max_PES_Parents.AutoSize = True
-        Me.Label_max_PES_Parents.Location = New System.Drawing.Point(3, 79)
-        Me.Label_max_PES_Parents.Name = "Label_max_PES_Parents"
-        Me.Label_max_PES_Parents.Size = New System.Drawing.Size(116, 13)
-        Me.Label_max_PES_Parents.TabIndex = 52
-        Me.Label_max_PES_Parents.Text = "Maximal No of Parents:"
+        Me.Numeric_CES_n_exchange_SecPop_PES.Location = New System.Drawing.Point(139, 161)
+        Me.Numeric_CES_n_exchange_SecPop_PES.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
+        Me.Numeric_CES_n_exchange_SecPop_PES.Name = "Numeric_CES_n_exchange_SecPop_PES"
+        Me.Numeric_CES_n_exchange_SecPop_PES.Size = New System.Drawing.Size(53, 20)
+        Me.Numeric_CES_n_exchange_SecPop_PES.TabIndex = 51
+        Me.Numeric_CES_n_exchange_SecPop_PES.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_CES_n_exchange_SecPop_PES.Value = New Decimal(New Integer() {10, 0, 0, 0})
         '
         'Label_n_memebers_SecPop_PES
         '
@@ -770,16 +746,16 @@ Partial Class EVO_Einstellungen
         Me.Label_n_memebers_SecPop_PES.TabIndex = 54
         Me.Label_n_memebers_SecPop_PES.Text = "No of members SecPop:"
         '
-        'Numeric_mem_Strength
+        'Numeric_CES_mem_Strength
         '
-        Me.Numeric_mem_Strength.Location = New System.Drawing.Point(140, 51)
-        Me.Numeric_mem_Strength.Maximum = New Decimal(New Integer() {3, 0, 0, 0})
-        Me.Numeric_mem_Strength.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
-        Me.Numeric_mem_Strength.Name = "Numeric_mem_Strength"
-        Me.Numeric_mem_Strength.Size = New System.Drawing.Size(53, 20)
-        Me.Numeric_mem_Strength.TabIndex = 51
-        Me.Numeric_mem_Strength.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.Numeric_mem_Strength.Value = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.Numeric_CES_mem_Strength.Location = New System.Drawing.Point(140, 51)
+        Me.Numeric_CES_mem_Strength.Maximum = New Decimal(New Integer() {3, 0, 0, 0})
+        Me.Numeric_CES_mem_Strength.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.Numeric_CES_mem_Strength.Name = "Numeric_CES_mem_Strength"
+        Me.Numeric_CES_mem_Strength.Size = New System.Drawing.Size(53, 20)
+        Me.Numeric_CES_mem_Strength.TabIndex = 51
+        Me.Numeric_CES_mem_Strength.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_CES_mem_Strength.Value = New Decimal(New Integer() {1, 0, 0, 0})
         '
         'Label_n_exchange_secPop_PES
         '
@@ -798,13 +774,13 @@ Partial Class EVO_Einstellungen
         Me.Label12.Size = New System.Drawing.Size(165, 1)
         Me.Label12.TabIndex = 50
         '
-        'ComboBox_Hybrid_Type
+        'Combo_CES_HybridType
         '
-        Me.ComboBox_Hybrid_Type.FormattingEnabled = True
-        Me.ComboBox_Hybrid_Type.Location = New System.Drawing.Point(69, 24)
-        Me.ComboBox_Hybrid_Type.Name = "ComboBox_Hybrid_Type"
-        Me.ComboBox_Hybrid_Type.Size = New System.Drawing.Size(123, 21)
-        Me.ComboBox_Hybrid_Type.TabIndex = 13
+        Me.Combo_CES_HybridType.FormattingEnabled = True
+        Me.Combo_CES_HybridType.Location = New System.Drawing.Point(69, 24)
+        Me.Combo_CES_HybridType.Name = "Combo_CES_HybridType"
+        Me.Combo_CES_HybridType.Size = New System.Drawing.Size(123, 21)
+        Me.Combo_CES_HybridType.TabIndex = 13
         '
         'Label_MemStrength
         '
@@ -824,33 +800,33 @@ Partial Class EVO_Einstellungen
         Me.Label_Hybrid_Type.TabIndex = 0
         Me.Label_Hybrid_Type.Text = "Hybrid Type:"
         '
-        'CheckBox_Use_Sec_Pop
+        'CheckBox_CES_RealOptimisation
         '
-        Me.CheckBox_Use_Sec_Pop.AutoSize = True
-        Me.CheckBox_Use_Sec_Pop.Location = New System.Drawing.Point(22, 384)
-        Me.CheckBox_Use_Sec_Pop.Name = "CheckBox_Use_Sec_Pop"
-        Me.CheckBox_Use_Sec_Pop.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-        Me.CheckBox_Use_Sec_Pop.Size = New System.Drawing.Size(157, 17)
-        Me.CheckBox_Use_Sec_Pop.TabIndex = 11
-        Me.CheckBox_Use_Sec_Pop.Text = "Including Real Optimisation:"
-        Me.CheckBox_Use_Sec_Pop.UseVisualStyleBackColor = True
+        Me.CheckBox_CES_RealOptimisation.AutoSize = True
+        Me.CheckBox_CES_RealOptimisation.Location = New System.Drawing.Point(22, 384)
+        Me.CheckBox_CES_RealOptimisation.Name = "CheckBox_CES_RealOptimisation"
+        Me.CheckBox_CES_RealOptimisation.RightToLeft = System.Windows.Forms.RightToLeft.Yes
+        Me.CheckBox_CES_RealOptimisation.Size = New System.Drawing.Size(157, 17)
+        Me.CheckBox_CES_RealOptimisation.TabIndex = 11
+        Me.CheckBox_CES_RealOptimisation.Text = "Including Real Optimisation:"
+        Me.CheckBox_CES_RealOptimisation.UseVisualStyleBackColor = True
         '
         'GroupBoxCES
         '
-        Me.GroupBoxCES.Controls.Add(Me.Use_)
-        Me.GroupBoxCES.Controls.Add(Me.Numeric_MutRate)
+        Me.GroupBoxCES.Controls.Add(Me.CheckBox_CES_UseSecPop_CES)
+        Me.GroupBoxCES.Controls.Add(Me.Numeric_CES_MutRate)
         Me.GroupBoxCES.Controls.Add(Me.Label_MutationRate)
-        Me.GroupBoxCES.Controls.Add(Me.ComboCESReproduction)
+        Me.GroupBoxCES.Controls.Add(Me.Combo_CES_Reproduction)
         Me.GroupBoxCES.Controls.Add(Me.LabelCESReproduction)
-        Me.GroupBoxCES.Controls.Add(Me.Numeric_n_member_SecPop)
-        Me.GroupBoxCES.Controls.Add(Me.Numeric_n_exchange_SecPop)
+        Me.GroupBoxCES.Controls.Add(Me.Numeric_CES_n_member_SecPop)
+        Me.GroupBoxCES.Controls.Add(Me.Numeric_CES_n_exchange_SecPop)
         Me.GroupBoxCES.Controls.Add(Me.Label_n_memebers_SecPop)
         Me.GroupBoxCES.Controls.Add(Me.Label_n_exchange_secPop)
-        Me.GroupBoxCES.Controls.Add(Me.Numeric_n_childs)
-        Me.GroupBoxCES.Controls.Add(Me.Numeric_n_Parents)
-        Me.GroupBoxCES.Controls.Add(Me.ComboCESMutation)
-        Me.GroupBoxCES.Controls.Add(Me.Numeric_n_Generations)
-        Me.GroupBoxCES.Controls.Add(Me.ComboCESSelection)
+        Me.GroupBoxCES.Controls.Add(Me.Numeric_CES_n_childs)
+        Me.GroupBoxCES.Controls.Add(Me.Numeric_CES_n_Parents)
+        Me.GroupBoxCES.Controls.Add(Me.Combo_CES_Mutation)
+        Me.GroupBoxCES.Controls.Add(Me.Numeric_CES_n_Generations)
+        Me.GroupBoxCES.Controls.Add(Me.Combo_CES_Selection)
         Me.GroupBoxCES.Controls.Add(Me.Label_n_childs)
         Me.GroupBoxCES.Controls.Add(Me.Label_n_parents)
         Me.GroupBoxCES.Controls.Add(Me.Label_n_Generations)
@@ -863,28 +839,28 @@ Partial Class EVO_Einstellungen
         Me.GroupBoxCES.TabStop = False
         Me.GroupBoxCES.Text = "Mixed Integer Evolution Strategy"
         '
-        'Use_
+        'CheckBox_CES_UseSecPop_CES
         '
-        Me.Use_.AutoSize = True
-        Me.Use_.Checked = True
-        Me.Use_.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.Use_.Location = New System.Drawing.Point(17, 218)
-        Me.Use_.Name = "Use_"
-        Me.Use_.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-        Me.Use_.Size = New System.Drawing.Size(153, 17)
-        Me.Use_.TabIndex = 56
-        Me.Use_.Text = "Use secondary Population:"
-        Me.Use_.UseVisualStyleBackColor = True
+        Me.CheckBox_CES_UseSecPop_CES.AutoSize = True
+        Me.CheckBox_CES_UseSecPop_CES.Checked = True
+        Me.CheckBox_CES_UseSecPop_CES.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.CheckBox_CES_UseSecPop_CES.Location = New System.Drawing.Point(17, 218)
+        Me.CheckBox_CES_UseSecPop_CES.Name = "CheckBox_CES_UseSecPop_CES"
+        Me.CheckBox_CES_UseSecPop_CES.RightToLeft = System.Windows.Forms.RightToLeft.Yes
+        Me.CheckBox_CES_UseSecPop_CES.Size = New System.Drawing.Size(153, 17)
+        Me.CheckBox_CES_UseSecPop_CES.TabIndex = 56
+        Me.CheckBox_CES_UseSecPop_CES.Text = "Use secondary Population:"
+        Me.CheckBox_CES_UseSecPop_CES.UseVisualStyleBackColor = True
         '
-        'Numeric_MutRate
+        'Numeric_CES_MutRate
         '
-        Me.Numeric_MutRate.Increment = New Decimal(New Integer() {5, 0, 0, 0})
-        Me.Numeric_MutRate.Location = New System.Drawing.Point(139, 178)
-        Me.Numeric_MutRate.Name = "Numeric_MutRate"
-        Me.Numeric_MutRate.Size = New System.Drawing.Size(53, 20)
-        Me.Numeric_MutRate.TabIndex = 49
-        Me.Numeric_MutRate.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.Numeric_MutRate.Value = New Decimal(New Integer() {25, 0, 0, 0})
+        Me.Numeric_CES_MutRate.Increment = New Decimal(New Integer() {5, 0, 0, 0})
+        Me.Numeric_CES_MutRate.Location = New System.Drawing.Point(139, 178)
+        Me.Numeric_CES_MutRate.Name = "Numeric_CES_MutRate"
+        Me.Numeric_CES_MutRate.Size = New System.Drawing.Size(53, 20)
+        Me.Numeric_CES_MutRate.TabIndex = 49
+        Me.Numeric_CES_MutRate.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_CES_MutRate.Value = New Decimal(New Integer() {25, 0, 0, 0})
         '
         'Label_MutationRate
         '
@@ -895,13 +871,13 @@ Partial Class EVO_Einstellungen
         Me.Label_MutationRate.TabIndex = 48
         Me.Label_MutationRate.Text = "Mutation Rate:"
         '
-        'ComboCESReproduction
+        'Combo_CES_Reproduction
         '
-        Me.ComboCESReproduction.FormattingEnabled = True
-        Me.ComboCESReproduction.Location = New System.Drawing.Point(69, 124)
-        Me.ComboCESReproduction.Name = "ComboCESReproduction"
-        Me.ComboCESReproduction.Size = New System.Drawing.Size(123, 21)
-        Me.ComboCESReproduction.TabIndex = 8
+        Me.Combo_CES_Reproduction.FormattingEnabled = True
+        Me.Combo_CES_Reproduction.Location = New System.Drawing.Point(69, 124)
+        Me.Combo_CES_Reproduction.Name = "Combo_CES_Reproduction"
+        Me.Combo_CES_Reproduction.Size = New System.Drawing.Size(123, 21)
+        Me.Combo_CES_Reproduction.TabIndex = 8
         '
         'LabelCESReproduction
         '
@@ -912,25 +888,25 @@ Partial Class EVO_Einstellungen
         Me.LabelCESReproduction.TabIndex = 4
         Me.LabelCESReproduction.Text = "Reproduct.:"
         '
-        'Numeric_n_member_SecPop
+        'Numeric_CES_n_member_SecPop
         '
-        Me.Numeric_n_member_SecPop.Location = New System.Drawing.Point(139, 267)
-        Me.Numeric_n_member_SecPop.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
-        Me.Numeric_n_member_SecPop.Name = "Numeric_n_member_SecPop"
-        Me.Numeric_n_member_SecPop.Size = New System.Drawing.Size(53, 20)
-        Me.Numeric_n_member_SecPop.TabIndex = 45
-        Me.Numeric_n_member_SecPop.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.Numeric_n_member_SecPop.Value = New Decimal(New Integer() {50, 0, 0, 0})
+        Me.Numeric_CES_n_member_SecPop.Location = New System.Drawing.Point(139, 267)
+        Me.Numeric_CES_n_member_SecPop.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
+        Me.Numeric_CES_n_member_SecPop.Name = "Numeric_CES_n_member_SecPop"
+        Me.Numeric_CES_n_member_SecPop.Size = New System.Drawing.Size(53, 20)
+        Me.Numeric_CES_n_member_SecPop.TabIndex = 45
+        Me.Numeric_CES_n_member_SecPop.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_CES_n_member_SecPop.Value = New Decimal(New Integer() {50, 0, 0, 0})
         '
-        'Numeric_n_exchange_SecPop
+        'Numeric_CES_n_exchange_SecPop
         '
-        Me.Numeric_n_exchange_SecPop.Location = New System.Drawing.Point(139, 241)
-        Me.Numeric_n_exchange_SecPop.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
-        Me.Numeric_n_exchange_SecPop.Name = "Numeric_n_exchange_SecPop"
-        Me.Numeric_n_exchange_SecPop.Size = New System.Drawing.Size(53, 20)
-        Me.Numeric_n_exchange_SecPop.TabIndex = 44
-        Me.Numeric_n_exchange_SecPop.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.Numeric_n_exchange_SecPop.Value = New Decimal(New Integer() {10, 0, 0, 0})
+        Me.Numeric_CES_n_exchange_SecPop.Location = New System.Drawing.Point(139, 241)
+        Me.Numeric_CES_n_exchange_SecPop.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
+        Me.Numeric_CES_n_exchange_SecPop.Name = "Numeric_CES_n_exchange_SecPop"
+        Me.Numeric_CES_n_exchange_SecPop.Size = New System.Drawing.Size(53, 20)
+        Me.Numeric_CES_n_exchange_SecPop.TabIndex = 44
+        Me.Numeric_CES_n_exchange_SecPop.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_CES_n_exchange_SecPop.Value = New Decimal(New Integer() {10, 0, 0, 0})
         '
         'Label_n_memebers_SecPop
         '
@@ -949,54 +925,54 @@ Partial Class EVO_Einstellungen
         Me.Label_n_exchange_secPop.TabIndex = 46
         Me.Label_n_exchange_secPop.Text = "Exchange with SecPop:"
         '
-        'Numeric_n_childs
+        'Numeric_CES_n_childs
         '
-        Me.Numeric_n_childs.Location = New System.Drawing.Point(139, 72)
-        Me.Numeric_n_childs.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
-        Me.Numeric_n_childs.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
-        Me.Numeric_n_childs.Name = "Numeric_n_childs"
-        Me.Numeric_n_childs.Size = New System.Drawing.Size(53, 20)
-        Me.Numeric_n_childs.TabIndex = 5
-        Me.Numeric_n_childs.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.Numeric_n_childs.Value = New Decimal(New Integer() {15, 0, 0, 0})
+        Me.Numeric_CES_n_childs.Location = New System.Drawing.Point(139, 72)
+        Me.Numeric_CES_n_childs.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
+        Me.Numeric_CES_n_childs.Minimum = New Decimal(New Integer() {3, 0, 0, 0})
+        Me.Numeric_CES_n_childs.Name = "Numeric_CES_n_childs"
+        Me.Numeric_CES_n_childs.Size = New System.Drawing.Size(53, 20)
+        Me.Numeric_CES_n_childs.TabIndex = 5
+        Me.Numeric_CES_n_childs.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_CES_n_childs.Value = New Decimal(New Integer() {15, 0, 0, 0})
         '
-        'Numeric_n_Parents
+        'Numeric_CES_n_Parents
         '
-        Me.Numeric_n_Parents.Location = New System.Drawing.Point(139, 46)
-        Me.Numeric_n_Parents.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
-        Me.Numeric_n_Parents.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
-        Me.Numeric_n_Parents.Name = "Numeric_n_Parents"
-        Me.Numeric_n_Parents.Size = New System.Drawing.Size(53, 20)
-        Me.Numeric_n_Parents.TabIndex = 4
-        Me.Numeric_n_Parents.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.Numeric_n_Parents.Value = New Decimal(New Integer() {5, 0, 0, 0})
+        Me.Numeric_CES_n_Parents.Location = New System.Drawing.Point(139, 46)
+        Me.Numeric_CES_n_Parents.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
+        Me.Numeric_CES_n_Parents.Minimum = New Decimal(New Integer() {3, 0, 0, 0})
+        Me.Numeric_CES_n_Parents.Name = "Numeric_CES_n_Parents"
+        Me.Numeric_CES_n_Parents.Size = New System.Drawing.Size(53, 20)
+        Me.Numeric_CES_n_Parents.TabIndex = 4
+        Me.Numeric_CES_n_Parents.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_CES_n_Parents.Value = New Decimal(New Integer() {5, 0, 0, 0})
         '
-        'ComboCESMutation
+        'Combo_CES_Mutation
         '
-        Me.ComboCESMutation.FormattingEnabled = True
-        Me.ComboCESMutation.Location = New System.Drawing.Point(69, 151)
-        Me.ComboCESMutation.Name = "ComboCESMutation"
-        Me.ComboCESMutation.Size = New System.Drawing.Size(123, 21)
-        Me.ComboCESMutation.TabIndex = 7
+        Me.Combo_CES_Mutation.FormattingEnabled = True
+        Me.Combo_CES_Mutation.Location = New System.Drawing.Point(69, 151)
+        Me.Combo_CES_Mutation.Name = "Combo_CES_Mutation"
+        Me.Combo_CES_Mutation.Size = New System.Drawing.Size(123, 21)
+        Me.Combo_CES_Mutation.TabIndex = 7
         '
-        'Numeric_n_Generations
+        'Numeric_CES_n_Generations
         '
-        Me.Numeric_n_Generations.Location = New System.Drawing.Point(139, 20)
-        Me.Numeric_n_Generations.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
-        Me.Numeric_n_Generations.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
-        Me.Numeric_n_Generations.Name = "Numeric_n_Generations"
-        Me.Numeric_n_Generations.Size = New System.Drawing.Size(53, 20)
-        Me.Numeric_n_Generations.TabIndex = 3
-        Me.Numeric_n_Generations.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.Numeric_n_Generations.Value = New Decimal(New Integer() {500, 0, 0, 0})
+        Me.Numeric_CES_n_Generations.Location = New System.Drawing.Point(139, 20)
+        Me.Numeric_CES_n_Generations.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
+        Me.Numeric_CES_n_Generations.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.Numeric_CES_n_Generations.Name = "Numeric_CES_n_Generations"
+        Me.Numeric_CES_n_Generations.Size = New System.Drawing.Size(53, 20)
+        Me.Numeric_CES_n_Generations.TabIndex = 3
+        Me.Numeric_CES_n_Generations.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_CES_n_Generations.Value = New Decimal(New Integer() {500, 0, 0, 0})
         '
-        'ComboCESSelection
+        'Combo_CES_Selection
         '
-        Me.ComboCESSelection.FormattingEnabled = True
-        Me.ComboCESSelection.Location = New System.Drawing.Point(69, 97)
-        Me.ComboCESSelection.Name = "ComboCESSelection"
-        Me.ComboCESSelection.Size = New System.Drawing.Size(123, 21)
-        Me.ComboCESSelection.TabIndex = 6
+        Me.Combo_CES_Selection.FormattingEnabled = True
+        Me.Combo_CES_Selection.Location = New System.Drawing.Point(69, 97)
+        Me.Combo_CES_Selection.Name = "Combo_CES_Selection"
+        Me.Combo_CES_Selection.Size = New System.Drawing.Size(123, 21)
+        Me.Combo_CES_Selection.TabIndex = 6
         '
         'Label_n_childs
         '
@@ -1043,13 +1019,13 @@ Partial Class EVO_Einstellungen
         Me.LabelCESSelection.TabIndex = 1
         Me.LabelCESSelection.Text = "Selection:"
         '
-        'ComboCESIniValues
+        'Combo_CES_IniValues
         '
-        Me.ComboCESIniValues.FormattingEnabled = True
-        Me.ComboCESIniValues.Location = New System.Drawing.Point(80, 32)
-        Me.ComboCESIniValues.Name = "ComboCESIniValues"
-        Me.ComboCESIniValues.Size = New System.Drawing.Size(123, 21)
-        Me.ComboCESIniValues.TabIndex = 5
+        Me.Combo_CES_IniValues.FormattingEnabled = True
+        Me.Combo_CES_IniValues.Location = New System.Drawing.Point(80, 32)
+        Me.Combo_CES_IniValues.Name = "Combo_CES_IniValues"
+        Me.Combo_CES_IniValues.Size = New System.Drawing.Size(123, 21)
+        Me.Combo_CES_IniValues.TabIndex = 5
         '
         'LabelCESIniValues
         '
@@ -1410,18 +1386,17 @@ Partial Class EVO_Einstellungen
         Me.TabPage_CES.PerformLayout()
         Me.GroupBox_Hybrid.ResumeLayout(False)
         Me.GroupBox_Hybrid.PerformLayout()
-        CType(Me.Numeric_n_member_SecPop_PES, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.Numeric_max_PES_Parents, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.Numeric_n_exchange_SecPop_PES, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.Numeric_mem_Strength, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.Numeric_CES_n_member_SecPop_PES, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.Numeric_CES_n_exchange_SecPop_PES, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.Numeric_CES_mem_Strength, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBoxCES.ResumeLayout(False)
         Me.GroupBoxCES.PerformLayout()
-        CType(Me.Numeric_MutRate, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.Numeric_n_member_SecPop, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.Numeric_n_exchange_SecPop, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.Numeric_n_childs, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.Numeric_n_Parents, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.Numeric_n_Generations, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.Numeric_CES_MutRate, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.Numeric_CES_n_member_SecPop, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.Numeric_CES_n_exchange_SecPop, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.Numeric_CES_n_childs, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.Numeric_CES_n_Parents, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.Numeric_CES_n_Generations, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabPage_HookeJeeves.ResumeLayout(False)
         Me.TabPage_HookeJeeves.PerformLayout()
         CType(Me.TextDeltaFinishHJ, System.ComponentModel.ISupportInitialize).EndInit()
@@ -1480,7 +1455,6 @@ Partial Class EVO_Einstellungen
     Private WithEvents ComboOptPopStrategie As System.Windows.Forms.ComboBox
     Private WithEvents LabelPopPenalty As System.Windows.Forms.Label
     Private WithEvents ComboOptPopPenalty As System.Windows.Forms.ComboBox
-    Private WithEvents TabPage_CES As System.Windows.Forms.TabPage
     Friend WithEvents ÖffnenToolStripButton As System.Windows.Forms.ToolStripButton
     Friend WithEvents SpeichernToolStripButton As System.Windows.Forms.ToolStripButton
     Private WithEvents ToolStrip1 As System.Windows.Forms.ToolStrip
@@ -1513,40 +1487,39 @@ Partial Class EVO_Einstellungen
     Friend WithEvents LabelCESIniValues As System.Windows.Forms.Label
     Friend WithEvents LabelCESSelection As System.Windows.Forms.Label
     Friend WithEvents LabelCESReproduction As System.Windows.Forms.Label
-    Friend WithEvents ComboCESSelection As System.Windows.Forms.ComboBox
-    Friend WithEvents ComboCESIniValues As System.Windows.Forms.ComboBox
-    Friend WithEvents ComboCESReproduction As System.Windows.Forms.ComboBox
-    Friend WithEvents ComboCESMutation As System.Windows.Forms.ComboBox
+    Friend WithEvents Combo_CES_Selection As System.Windows.Forms.ComboBox
+    Friend WithEvents Combo_CES_IniValues As System.Windows.Forms.ComboBox
+    Friend WithEvents Combo_CES_Reproduction As System.Windows.Forms.ComboBox
+    Friend WithEvents Combo_CES_Mutation As System.Windows.Forms.ComboBox
     Friend WithEvents GroupBoxCES As System.Windows.Forms.GroupBox
     Friend WithEvents Label_n_childs As System.Windows.Forms.Label
     Friend WithEvents Label_n_parents As System.Windows.Forms.Label
     Friend WithEvents Label_n_Generations As System.Windows.Forms.Label
-    Friend WithEvents Numeric_n_childs As System.Windows.Forms.NumericUpDown
-    Friend WithEvents Numeric_n_Parents As System.Windows.Forms.NumericUpDown
-    Friend WithEvents Numeric_n_Generations As System.Windows.Forms.NumericUpDown
-    Private WithEvents Numeric_n_member_SecPop As System.Windows.Forms.NumericUpDown
-    Private WithEvents Numeric_n_exchange_SecPop As System.Windows.Forms.NumericUpDown
+    Friend WithEvents Numeric_CES_n_childs As System.Windows.Forms.NumericUpDown
+    Friend WithEvents Numeric_CES_n_Parents As System.Windows.Forms.NumericUpDown
+    Friend WithEvents Numeric_CES_n_Generations As System.Windows.Forms.NumericUpDown
+    Private WithEvents Numeric_CES_n_member_SecPop As System.Windows.Forms.NumericUpDown
+    Private WithEvents Numeric_CES_n_exchange_SecPop As System.Windows.Forms.NumericUpDown
     Private WithEvents Label_n_memebers_SecPop As System.Windows.Forms.Label
     Private WithEvents Label_n_exchange_secPop As System.Windows.Forms.Label
-    Friend WithEvents CheckBox_Use_Sec_Pop As System.Windows.Forms.CheckBox
+    Friend WithEvents CheckBox_CES_RealOptimisation As System.Windows.Forms.CheckBox
     Friend WithEvents GroupBox_Hybrid As System.Windows.Forms.GroupBox
-    Private WithEvents Numeric_MutRate As System.Windows.Forms.NumericUpDown
+    Private WithEvents Numeric_CES_MutRate As System.Windows.Forms.NumericUpDown
     Friend WithEvents Label_MutationRate As System.Windows.Forms.Label
-    Friend WithEvents ComboBox_Hybrid_Type As System.Windows.Forms.ComboBox
+    Friend WithEvents Combo_CES_HybridType As System.Windows.Forms.ComboBox
     Friend WithEvents Label_Hybrid_Type As System.Windows.Forms.Label
-    Friend WithEvents Numeric_mem_Strength As System.Windows.Forms.NumericUpDown
+    Friend WithEvents Numeric_CES_mem_Strength As System.Windows.Forms.NumericUpDown
     Friend WithEvents Label_MemStrength As System.Windows.Forms.Label
-    Friend WithEvents Numeric_max_PES_Parents As System.Windows.Forms.NumericUpDown
-    Friend WithEvents Label_max_PES_Parents As System.Windows.Forms.Label
-    Private WithEvents Numeric_n_member_SecPop_PES As System.Windows.Forms.NumericUpDown
-    Private WithEvents Numeric_n_exchange_SecPop_PES As System.Windows.Forms.NumericUpDown
+    Private WithEvents Numeric_CES_n_member_SecPop_PES As System.Windows.Forms.NumericUpDown
+    Private WithEvents Numeric_CES_n_exchange_SecPop_PES As System.Windows.Forms.NumericUpDown
     Private WithEvents Label_n_memebers_SecPop_PES As System.Windows.Forms.Label
     Private WithEvents Label_n_exchange_secPop_PES As System.Windows.Forms.Label
     Private WithEvents Label12 As System.Windows.Forms.Label
     Private WithEvents Label10 As System.Windows.Forms.Label
-    Friend WithEvents CheckBox2 As System.Windows.Forms.CheckBox
-    Friend WithEvents CheckBox_use_sec_pop_PES As System.Windows.Forms.CheckBox
-    Friend WithEvents Use_ As System.Windows.Forms.CheckBox
+    Friend WithEvents CheckBox_CES_StartPESPop As System.Windows.Forms.CheckBox
+    Friend WithEvents CheckBox_CES_UseSecPop_PES As System.Windows.Forms.CheckBox
+    Friend WithEvents CheckBox_CES_UseSecPop_CES As System.Windows.Forms.CheckBox
+    Public WithEvents TabPage_CES As System.Windows.Forms.TabPage
     Friend WithEvents LabelNP As System.Windows.Forms.Label
     Friend WithEvents ButtonGenP As System.Windows.Forms.Button
     Friend WithEvents Numeric_NP As System.Windows.Forms.NumericUpDown

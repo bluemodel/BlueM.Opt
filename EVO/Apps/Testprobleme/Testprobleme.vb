@@ -133,7 +133,7 @@ Partial Public Class Testprobleme
 
     'Parameterübergabe
     '*****************
-    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara() As Double, ByRef beziehungen() As EVO.Kern.PES.Beziehung)
+    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara() As EVO.Kern.OptParameter)
 
         Dim i As Integer
 
@@ -144,10 +144,9 @@ Partial Public Class Testprobleme
                 globalAnzZiel = 1
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
-                ReDim beziehungen(globalAnzPar - 1)
                 For i = 0 To globalAnzPar - 1
-                    mypara(i) = 0
-                    beziehungen(i) = PES.Beziehung.keine
+                    mypara(i) = New EVO.Kern.OptParameter()
+                    mypara(i).Xn = 0
                 Next
 
             Case "Beale-Problem" 'x1 = [-5;5], x2=[-2;2]
@@ -155,10 +154,9 @@ Partial Public Class Testprobleme
                 globalAnzZiel = 1
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
-                ReDim beziehungen(globalAnzPar - 1)
                 For i = 0 To globalAnzPar - 1
-                    mypara(i) = 0.5
-                    beziehungen(i) = PES.Beziehung.keine
+                    mypara(i) = New EVO.Kern.OptParameter()
+                    mypara(i).Xn = 0.5
                 Next
 
             Case "Schwefel 2.4-Problem" 'xi = [-10,10]
@@ -166,10 +164,9 @@ Partial Public Class Testprobleme
                 globalAnzZiel = 1
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
-                ReDim beziehungen(globalAnzPar - 1)
                 For i = 0 To globalAnzPar - 1
-                    mypara(i) = 1
-                    beziehungen(i) = PES.Beziehung.keine
+                    mypara(i) = New EVO.Kern.OptParameter()
+                    mypara(i).Xn = 1
                 Next
 
             Case "Deb 1" 'x1 = [0.1;1], x2=[0;5]
@@ -177,11 +174,10 @@ Partial Public Class Testprobleme
                 globalAnzZiel = 2
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
-                ReDim beziehungen(globalAnzPar - 1)
                 Randomize()
                 For i = 0 To globalAnzPar - 1
-                    mypara(i) = Rnd()
-                    beziehungen(i) = PES.Beziehung.keine
+                    mypara(i) = New EVO.Kern.OptParameter()
+                    mypara(i).Xn = Rnd()
                 Next
 
             Case "Zitzler/Deb T1" 'xi = [0,1]
@@ -189,11 +185,10 @@ Partial Public Class Testprobleme
                 globalAnzZiel = 2
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
-                ReDim beziehungen(globalAnzPar - 1)
                 Randomize()
                 For i = 0 To globalAnzPar - 1
-                    mypara(i) = Rnd()
-                    beziehungen(i) = PES.Beziehung.keine
+                    mypara(i) = New EVO.Kern.OptParameter()
+                    mypara(i).Xn = Rnd()
                 Next
 
             Case "Zitzler/Deb T2" 'xi = [0,1]
@@ -201,11 +196,10 @@ Partial Public Class Testprobleme
                 globalAnzZiel = 2
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
-                ReDim beziehungen(globalAnzPar - 1)
                 Randomize()
                 For i = 0 To globalAnzPar - 1
-                    mypara(i) = Rnd()
-                    beziehungen(i) = PES.Beziehung.keine
+                    mypara(i) = New EVO.Kern.OptParameter()
+                    mypara(i).Xn = Rnd()
                 Next
 
             Case "Zitzler/Deb T3" 'xi = [0,1]
@@ -213,11 +207,10 @@ Partial Public Class Testprobleme
                 globalAnzZiel = 2
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
-                ReDim beziehungen(globalAnzPar - 1)
                 Randomize()
                 For i = 0 To globalAnzPar - 1
-                    mypara(i) = Rnd()
-                    beziehungen(i) = PES.Beziehung.keine
+                    mypara(i) = New EVO.Kern.OptParameter()
+                    mypara(i).Xn = Rnd()
                 Next
 
             Case "Zitzler/Deb T4" 'x1 = [0,1], xi=[-5,5]
@@ -225,11 +218,10 @@ Partial Public Class Testprobleme
                 globalAnzZiel = 2
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
-                ReDim beziehungen(globalAnzPar - 1)
                 Randomize()
                 For i = 0 To globalAnzPar - 1
-                    mypara(i) = Rnd()
-                    beziehungen(i) = PES.Beziehung.keine
+                    mypara(i) = New EVO.Kern.OptParameter()
+                    mypara(i).Xn = Rnd()
                 Next
 
             Case "CONSTR" 'x1 = [0.1;1], x2=[0;5]
@@ -237,11 +229,10 @@ Partial Public Class Testprobleme
                 globalAnzZiel = 2
                 globalAnzRand = 2
                 ReDim mypara(globalAnzPar - 1)
-                ReDim beziehungen(globalAnzPar - 1)
                 Randomize()
                 For i = 0 To globalAnzPar - 1
-                    mypara(i) = Rnd()
-                    beziehungen(i) = PES.Beziehung.keine
+                    mypara(i) = New EVO.Kern.OptParameter()
+                    mypara(i).Xn = Rnd()
                 Next
 
             Case "Box"
@@ -249,11 +240,10 @@ Partial Public Class Testprobleme
                 globalAnzZiel = 3
                 globalAnzRand = 2
                 ReDim mypara(globalAnzPar - 1)
-                ReDim beziehungen(globalAnzPar - 1)
                 Randomize()
                 For i = 0 To globalAnzPar - 1
-                    mypara(i) = Rnd()
-                    beziehungen(i) = PES.Beziehung.keine
+                    mypara(i) = New EVO.Kern.OptParameter()
+                    mypara(i).Xn = Rnd()
                 Next
 
             Case "Abhängige Parameter"
@@ -262,12 +252,12 @@ Partial Public Class Testprobleme
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
                 For i = 0 To globalAnzPar - 1
-                    mypara(i) = 1
+                    mypara(i) = New EVO.Kern.OptParameter()
+                    mypara(i).Xn = 1
                 Next
                 'Beziehungen
-                ReDim beziehungen(globalAnzPar - 1)
-                beziehungen(0) = EVO.Kern.PES.Beziehung.keine
-                beziehungen(1) = EVO.Kern.PES.Beziehung.groesser
+                mypara(0).Beziehung = EVO.Kern.PES.Beziehung.keine
+                mypara(1).Beziehung = EVO.Kern.PES.Beziehung.groesser
 
         End Select
 
@@ -858,7 +848,7 @@ Partial Public Class Testprobleme
 
     'Evaluierung und Zeichnen der Testprobleme
     '*****************************************
-    Public Sub Evaluierung_TestProbleme(ByVal mypara() As Double, ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN() As Double, ByRef RN() As Double, ByRef Diag As EVO.Diagramm)
+    Public Sub Evaluierung_TestProbleme(ByVal mypara() As OptParameter, ByVal durchlauf As Integer, ByVal ipop As Short, ByRef QN() As Double, ByRef RN() As Double, ByRef Diag As EVO.Diagramm)
 
         Dim i As Short
         Dim Unterteilung_X As Double
@@ -884,7 +874,7 @@ Partial Public Class Testprobleme
 
                 QN(0) = 0
                 For i = 0 To globalAnzPar - 1
-                    QN(0) += (Math.Sin(i * Unterteilung_X) - (-1 + (mypara(i) * 2))) ^ 2
+                    QN(0) += (Math.Sin(i * Unterteilung_X) - (-1 + (mypara(i).Xn * 2))) ^ 2
                 Next i
 
                 'Zeichnen
@@ -896,7 +886,7 @@ Partial Public Class Testprobleme
                 ReDim array_y(globalAnzPar - 1)
                 For i = 0 To globalAnzPar - 1
                     array_x(i) = Math.Round(i * Unterteilung_X, 2)
-                    array_y(i) = (-1 + mypara(i) * 2)
+                    array_y(i) = (-1 + mypara(i).Xn * 2)
                 Next i
 
                 serie = Diag.getSeriesPoint("Population " & ipop + 1)
@@ -908,8 +898,8 @@ Partial Public Class Testprobleme
 
                 'Qualitätswert berechnen
                 '-----------------------
-                x1 = -5 + (mypara(0) * 10)
-                x2 = -2 + (mypara(1) * 4)
+                x1 = -5 + (mypara(0).Xn * 10)
+                x2 = -2 + (mypara(1).Xn * 4)
 
                 QN(0) = (1.5 - x1 * (1 - x2)) ^ 2 + (2.25 - x1 * (1 - x2) ^ 2) ^ 2 + (2.625 - x1 * (1 - x2) ^ 3) ^ 2
 
@@ -925,7 +915,7 @@ Partial Public Class Testprobleme
                 '-----------------------
                 ReDim X(globalAnzPar - 1)
                 For i = 0 To globalAnzPar - 1
-                    X(i) = -10 + mypara(i) * 20
+                    X(i) = -10 + mypara(i).Xn * 20
                 Next i
                 QN(0) = 0
                 For i = 0 To globalAnzPar - 1
@@ -946,8 +936,8 @@ Partial Public Class Testprobleme
 
                 'Qualitätswert berechnen
                 '-----------------------
-                f1 = mypara(0) * (9 / 10) + 0.1
-                f2 = (1 + 5 * mypara(1)) / (mypara(0) * (9 / 10) + 0.1)
+                f1 = mypara(0).Xn * (9 / 10) + 0.1
+                f2 = (1 + 5 * mypara(1).Xn) / (mypara(0).Xn * (9 / 10) + 0.1)
                 QN(0) = f1
                 QN(1) = f2
 
@@ -961,10 +951,10 @@ Partial Public Class Testprobleme
 
                 'Qualitätswert berechnen
                 '-----------------------
-                f1 = mypara(0)
+                f1 = mypara(0).Xn
                 f2 = 0
                 For i = 1 To globalAnzPar - 1
-                    f2 = f2 + mypara(i)
+                    f2 = f2 + mypara(i).Xn
                 Next i
                 f2 = 1 + 9 / (globalAnzPar - 1) * f2
                 f2 = f2 * (1 - System.Math.Sqrt(f1 / f2))
@@ -981,10 +971,10 @@ Partial Public Class Testprobleme
 
                 'Qualitätswerte berechnen
                 '------------------------
-                f1 = mypara(0)
+                f1 = mypara(0).Xn
                 f2 = 0
                 For i = 1 To globalAnzPar - 1
-                    f2 = f2 + mypara(i)
+                    f2 = f2 + mypara(i).Xn
                 Next i
                 f2 = 1 + 9 / (globalAnzPar - 1) * f2
                 f2 = f2 * (1 - (f1 / f2) * (f1 / f2))
@@ -1001,10 +991,10 @@ Partial Public Class Testprobleme
 
                 'Qualitätswerte berechnen
                 '------------------------
-                f1 = mypara(0)
+                f1 = mypara(0).Xn
                 f2 = 0
                 For i = 1 To globalAnzPar - 1
-                    f2 = f2 + mypara(i)
+                    f2 = f2 + mypara(i).Xn
                 Next i
                 f2 = 1 + 9 / (globalAnzPar - 1) * f2
                 f2 = f2 * (1 - Math.Sqrt(f1 / f2) - (f1 / f2) * Math.Sin(10 * Math.PI * f1))
@@ -1021,10 +1011,10 @@ Partial Public Class Testprobleme
 
                 'Qualitätswerte berechnen
                 '------------------------
-                f1 = mypara(0)
+                f1 = mypara(0).Xn
                 f2 = 0
                 For i = 1 To globalAnzPar - 1
-                    x2 = -5 + (mypara(i) * 10)
+                    x2 = -5 + (mypara(i).Xn * 10)
                     f2 = f2 + (x2 * x2 - 10 * Math.Cos(4 * Math.PI * x2))
                 Next i
                 f2 = 1 + 10 * (globalAnzPar - 1) + f2
@@ -1042,16 +1032,16 @@ Partial Public Class Testprobleme
 
                 'Qualitätswerte berechnen
                 '------------------------
-                f1 = mypara(0) * (9 / 10) + 0.1
-                f2 = (1 + 5 * mypara(1)) / (mypara(0) * (9 / 10) + 0.1)
+                f1 = mypara(0).Xn * (9 / 10) + 0.1
+                f2 = (1 + 5 * mypara(1).Xn) / (mypara(0).Xn * (9 / 10) + 0.1)
 
                 QN(0) = f1
                 QN(1) = f2
 
                 'Constraints berechnen
                 '---------------------
-                g1 = (5 * mypara(1)) + 9 * (mypara(0) * (9 / 10) + 0.1) - 6
-                g2 = (-1) * (5 * mypara(1)) + 9 * (mypara(0) * (9 / 10) + 0.1) - 1
+                g1 = (5 * mypara(1).Xn) + 9 * (mypara(0).Xn * (9 / 10) + 0.1) - 6
+                g2 = (-1) * (5 * mypara(1).Xn) + 9 * (mypara(0).Xn * (9 / 10) + 0.1) - 1
 
                 RN(0) = g1
                 RN(1) = g2
@@ -1072,9 +1062,9 @@ Partial Public Class Testprobleme
 
                 'Qualitätswerte berechnen
                 '------------------------
-                f1 = mypara(0)
-                f2 = mypara(1)
-                f3 = mypara(2)
+                f1 = mypara(0).Xn
+                f2 = mypara(1).Xn
+                f3 = mypara(2).Xn
 
                 QN(0) = f1
                 QN(1) = f2
@@ -1082,8 +1072,8 @@ Partial Public Class Testprobleme
 
                 'Constraints berechnen
                 '---------------------
-                g1 = mypara(0) + mypara(1) - 0.5
-                g2 = mypara(0) + mypara(1) + mypara(2) - 0.8
+                g1 = mypara(0).Xn + mypara(1).Xn - 0.5
+                g2 = mypara(0).Xn + mypara(1).Xn + mypara(2).Xn - 0.8
 
                 RN(0) = g1
                 RN(1) = g2
@@ -1105,13 +1095,13 @@ Partial Public Class Testprobleme
 
                 'Qualitätswerte berechnen
                 '------------------------
-                QN(0) = mypara(0) ^ 2 + mypara(1) ^ 2
+                QN(0) = mypara(0).Xn ^ 2 + mypara(1).Xn ^ 2
 
                 'Zeichnen
                 '--------
                 Dim serie3D As Steema.TeeChart.Styles.Points3D
                 serie3D = Diag.getSeries3DPoint("Population " & ipop + 1)
-                serie3D.Add(mypara(0), mypara(1), QN(0))
+                serie3D.Add(mypara(0).Xn, mypara(1).Xn, QN(0))
 
         End Select
 

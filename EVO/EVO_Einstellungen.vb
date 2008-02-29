@@ -10,7 +10,8 @@ Public Class EVO_Einstellungen
     '#############
 
     Private msettings As EVO.Kern.EVO_Settings       'Sicherung sämtlicher Einstellungen
-    Public isSaved As Boolean = False               'Flag der anzeigt, ob die Einstellungen bereits gesichert wurden
+    Public isSaved As Boolean = False                'Flag der anzeigt, ob die Einstellungen bereits gesichert wurden
+    Public isLoad As Boolean = False                 'Flag der anzeigt, ob die Settings aus einer XML Datei gelesen werden
 
     'Methoden
     '########
@@ -21,14 +22,14 @@ Public Class EVO_Einstellungen
 
         ' Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         Call Me.InitializeComponent()
-
+        
         ' Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
         'Settings instanzieren
         Me.msettings = New EVO.Kern.EVO_Settings()
         'Standard-Settings setzen
         Call Me.msettings.PES.setStandard(EVO_MODUS.Single_Objective)
-        Call Me.msettings.CES.setStandard(EVO_MODUS.Single_Objective)
+        Call Me.msettings.CES.setStandard(Evo.METH_CES)
         Call Me.msettings.HookJeeves.setStandard()
         'Comboboxen füllen
         Call Me.InitComboboxes()
@@ -48,7 +49,10 @@ Public Class EVO_Einstellungen
 
     'Optimierungsmodus wurde geändert
     '********************************
-    Private Sub OptModus_Change()
+
+    'PES
+    '---
+    Private Sub OptModus_Change_ActDeact_PES()
 
         Select Case Me.msettings.PES.OptModus
 
@@ -90,10 +94,30 @@ Public Class EVO_Einstellungen
 
     End Sub
 
+    'CES
+    '---
+    Private Sub OptModus_Change_ActDeact_CES()
+
+        Select Case Evo.Form1.Method
+
+            Case evo.METH_CES
+                GroupBox_Hybrid.Enabled = false
+
+            Case evo.METH_HYBRID
+                GroupBox_Hybrid.Enabled = True
+
+                Dim sender as Object = 1
+                Dim e as system.EventArgs = system.EventArgs.Empty
+                call Combo_CES_HybridType_SelectedIndexChanged(sender, e)
+
+        End Select
+
+    End sub
+
+
     Public Sub SetFor_CES_PES(ByVal AnzGen As Integer, ByVal AnzEltern As Integer, ByVal AnzNachf As Integer)
 
         'Vorgaben und Anzeige
-        Label_OptModusValue.Text = "MultiObjective Pareto"
         TextAnzGen.Text = CStr(AnzGen)
         TextAnzEltern.Text = CStr(AnzEltern)
         TextAnzNachf.Text = CStr(AnzNachf)
@@ -150,9 +174,11 @@ Public Class EVO_Einstellungen
 
         'CES
         '---
-        Me.ComboCESReproduction.DataSource = System.Enum.GetValues(GetType(CES_REPRODOP))
-        Me.ComboCESMutation.DataSource = System.Enum.GetValues(GetType(CES_MUTATION))
-        Me.ComboCESSelection.DataSource = System.Enum.GetValues(GetType(EVO_STRATEGIE))
+        Me.Combo_CES_Reproduction.DataSource = System.Enum.GetValues(GetType(CES_REPRODOP))
+        Me.Combo_CES_Mutation.DataSource = System.Enum.GetValues(GetType(CES_MUTATION))
+        Me.Combo_CES_Selection.DataSource = System.Enum.GetValues(GetType(EVO_STRATEGIE))
+        Me.Combo_CES_IniValues.DataSource = system.Enum.GetValues(gettype(EVO_STARTPARAMETER))
+        me.Combo_CES_HybridType.DataSource = system.Enum.GetValues(gettype(HYBRID_TYPE))
         
     End Sub
 
@@ -170,6 +196,8 @@ Public Class EVO_Einstellungen
                 Cntrl.Items.Add(EVO_POP_PENALTY.Crowding)
                 Cntrl.Items.Add(EVO_POP_PENALTY.Spannweite)
         End Select
+
+        Cntrl.SelectedIndex = 0
 
     End Sub
 
@@ -223,6 +251,33 @@ Public Class EVO_Einstellungen
 
         End With
 
+        'CES
+        '---
+        With Me.msettings.CES
+
+            ' = me.Combo_CES_IniValues.SelectedItem
+            .n_Generations = me.Numeric_CES_n_Generations.Value
+            .n_Parents = me.Numeric_CES_n_Parents.Value
+            .n_Childs = me.Numeric_CES_n_childs.Value
+            .OptStrategie = me.Combo_CES_Selection.SelectedItem
+            .OptReprodOp = me.Combo_CES_Reproduction.SelectedItem
+            .OptMutOperator = me.Combo_CES_Mutation.SelectedItem
+            .pr_MutRate = me.Numeric_CES_MutRate.Value
+            .is_SecPop = me.CheckBox_CES_UseSecPop_CES.Checked
+            .n_Interact = me.Numeric_CES_n_exchange_SecPop.Value
+            .n_MemberSecondPop = me.Numeric_CES_n_member_SecPop.Value
+
+            'HYBRID hängt von der Methode ab
+            .is_RealOpt = me.CheckBox_CES_RealOptimisation.Checked
+            .ty_Hybrid = me.Combo_CES_HybridType.SelectedItem
+            .n_PartsMem = me.Numeric_CES_mem_Strength.Value
+            .is_PopMutStart = me.CheckBox_CES_StartPESPop.Checked
+            .is_PES_SecPop = me.CheckBox_CES_UseSecPop_PES.Checked
+            .n_PES_Interact = me.Numeric_CES_n_exchange_SecPop_PES.Value
+            .n_PES_MemSecPop = me.Numeric_CES_n_member_SecPop_PES.Value
+
+        End With
+
         'Hooke and Jeeves
         '----------------
         With Me.msettings.HookJeeves
@@ -235,6 +290,55 @@ Public Class EVO_Einstellungen
 
     End Sub
 
+    'Setzt/Aktiviert/Deaktiviert die Einstellungen auf den PES Settings
+    '******************************************************************
+    Private Sub Combo_CES_HybridType_SelectedIndexChanged( ByVal sender As System.Object,  ByVal e As System.EventArgs) Handles Combo_CES_HybridType.SelectedIndexChanged
+
+
+        If Form1.Method = Evo.METH_HYBRID And not isLoad Then
+
+            Dim Item as HYBRID_TYPE
+            Item = Me.Combo_CES_HybridType.SelectedItem
+
+            Select Case Item
+
+                case HYBRID_TYPE.Mixed_Integer
+
+                    'Generationen
+                    me.TextAnzGen.Text = 1
+                    me.TextAnzGen.Enabled = False
+
+                    'Eltern
+                    me.TextAnzEltern.text = 5
+                    me.TextAnzEltern.Enabled = True
+                    me.LabelAnzEltern.Text = "Maximal Zahl der Eltern:"
+
+                    'Childs
+                    me.TextAnzNachf.Text = 1
+                    me.TextAnzNachf.Enabled = False
+
+                case HYBRID_TYPE.Sequencial_1
+
+                    'Generationen
+                    me.TextAnzGen.Text = 10
+                    me.TextAnzGen.Enabled = True
+
+                    'Eltern
+                    me.TextAnzEltern.text = 5
+                    me.TextAnzEltern.Enabled = True
+                    me.LabelAnzEltern.Text = "Anzahl der Eltern:"
+
+                    'Childs
+                    me.TextAnzNachf.Text = 15
+                    me.TextAnzNachf.Enabled = True
+
+            End Select
+
+        End If
+
+    End Sub
+
+
     'Einstellungen in Form schreiben
     '*******************************
     Private Sub writeForm()
@@ -243,7 +347,7 @@ Public Class EVO_Einstellungen
         '---
         With Me.msettings.PES
 
-            Call OptModus_Change()
+            Call OptModus_Change_ActDeact_PES()
 
             Me.ComboOptStrategie.SelectedItem = .OptStrategie
             Me.ComboOptStartparameter.SelectedItem = .OptStartparameter
@@ -279,6 +383,35 @@ Public Class EVO_Einstellungen
 
         End With
 
+        'PES
+        '---
+        With Me.msettings.CES
+
+            Call OptModus_Change_ActDeact_CES()
+
+            'me.Combo_CES_IniValues.SelectedItem = .
+            me.Numeric_CES_n_Generations.Value = .n_Generations
+            me.Numeric_CES_n_Parents.Value = .n_Parents
+            me.Numeric_CES_n_childs.Value = .n_Childs
+            me.Combo_CES_Selection.SelectedItem = .OptStrategie
+            me.Combo_CES_Reproduction.SelectedItem = .OptReprodOp 
+            me.Combo_CES_Mutation.SelectedItem = .OptMutOperator
+            me.Numeric_CES_MutRate.Value = .pr_MutRate
+            me.CheckBox_CES_UseSecPop_CES.Checked = .is_SecPop
+            me.Numeric_CES_n_exchange_SecPop.Value = .n_Interact
+            me.Numeric_CES_n_member_SecPop.Value = .n_MemberSecondPop
+
+            'HYBRID hängt von der Methode ab
+            me.CheckBox_CES_RealOptimisation.Checked = .is_RealOpt
+            me.Combo_CES_HybridType.SelectedItem = .ty_Hybrid
+            me.Numeric_CES_mem_Strength.Value = .n_PartsMem
+            me.CheckBox_CES_StartPESPop.Checked = .is_PopMutStart
+            me.CheckBox_CES_UseSecPop_PES.Checked = .is_PES_SecPop
+            me.Numeric_CES_n_exchange_SecPop_PES.Value = .n_PES_Interact
+            me.Numeric_CES_n_member_SecPop_PES.Value = .n_PES_MemSecPop
+
+        End With
+
         'Hook and Jeeves
         '---------------
         With Me.msettings.HookJeeves
@@ -293,6 +426,33 @@ Public Class EVO_Einstellungen
 
     End Sub
 
+    'Settings für TestModus
+    '**********************
+    Public Sub setTestModus(byVal Modus as CES_T_MODUS,byVal Path() as Integer, byVal nGen as Integer,byVal nParents as Integer,byVal NChilds as Integer)
+        
+        Dim i as Integer
+        Dim PathStr as String
+
+        If nChilds = 1 then
+            PathStr = "   Path: "
+            For i = 0 to Path.GetUpperBound(0)
+                PathStr = PathStr & Path(i) & " "
+            Next
+            PathStr = PathStr.Trimend
+        Else
+            PathStr = "   n_combi: "
+            PathStr = PathStr & nChilds
+        End If
+
+        me.Label_CES_OptModus.Text = "Modus: " & Modus.ToString & PathStr
+        me.Numeric_CES_n_Generations.Value = nGen
+        me.Numeric_CES_n_Parents.Minimum = 1
+        me.Numeric_CES_n_Parents.Value = nParents
+        me.Numeric_CES_n_childs.Minimum = 1
+        me.Numeric_CES_n_childs.Value = nChilds
+
+    End Sub
+
 #Region "Schnittstelle"
 
     'Schnittstelle
@@ -300,14 +460,21 @@ Public Class EVO_Einstellungen
 
     'Standardeinstellungen setzen (PES)
     '**********************************
-    Public Sub setStandard(ByVal modus As Kern.EVO_MODUS)
+    Public Sub setStandard_PES(ByVal modus As Kern.EVO_MODUS)
         Call Me.msettings.PES.setStandard(modus)
+        Call Me.writeForm()
+    End Sub
+
+    'Standardeinstellungen setzen (CES)
+    '**********************************
+    Public Sub setStandard_CES()
+        Call Me.msettings.CES.setStandard(Evo.Form1.Method)
         Call Me.writeForm()
     End Sub
 
     'Standardeinstellungen setzen für HJ
     '***********************************
-    Public Sub setStandard()
+    Public Sub setStandard_HJ()
         Call Me.msettings.HookJeeves.setStandard()
         Call Me.writeForm()
     End Sub
@@ -357,7 +524,9 @@ Public Class EVO_Einstellungen
         fs.Close()
 
         'Geladene Settings in Form schreiben
+        isLoad = True
         Call Me.writeForm()
+        isLoad = False
 
     End Sub
 

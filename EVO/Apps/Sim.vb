@@ -24,8 +24,6 @@ Public MustInherit Class Sim
     'Information
     '-----------
 
-    Public Method as String                              'Verwendete Methode
-
     'Generelle Eigenschaften
     '-----------------------
     Public Datensatz As String                           'Name des zu simulierenden Datensatzes
@@ -49,31 +47,10 @@ Public MustInherit Class Sim
     Public Const Constraints_Ext As String = "CON"       'Erweiterung der Datei mit den Constraints (*.CON)
     Public Const Combi_Ext As String = "CES"             'Erweiterung der Datei mit der Kombinatorik  (*.CES)
 
-    'Optimierungsparameter
-    '---------------------
-    Public Structure Struct_OptParameter
-        Public Bezeichnung As String                        'Bezeichnung
-        Public Einheit As String                            'Einheit
-        Public Wert As Double                               'Parameterwert
-        Public Min As Double                                'Minimum
-        Public Max As Double                                'Maximum
-        Public Beziehung As EVO.Kern.PES.Beziehung          'Beziehung zum vorherigen OptParameter
-        Public Property SKWert() As Double                  'skalierter Wert (0 bis 1)
-            Get
-                SKWert = (Wert - Min) / (Max - Min)
-                Exit Property
-            End Get
-            Set(ByVal value As Double)
-                Wert = value * (Max - Min) + Min
-            End Set
-        End Property
-        Public Overrides Function toString() As String
-            Return Bezeichnung
-        End Function
-    End Structure
-
-    Public List_OptParameter() As Struct_OptParameter = {} 'Liste der Optimierungsparameter
-    Public List_OptParameter_Save() As Struct_OptParameter = {} 'Liste der Optimierungsparameter die nicht verändert wird
+	'OptParameter
+	'------------
+    Public List_OptParameter() As EVO.Kern.OptParameter             'Liste der Optimierungsparameter
+    Public List_OptParameter_Save() As EVO.Kern.OptParameter        'Liste der Optimierungsparameter die nicht verändert wird
 
     'ModellParameter
     '---------------
@@ -90,12 +67,12 @@ Public MustInherit Class Sim
         Public Wert As Double                       'Aus OptParameter errechneter Wert
     End Structure
 
-    Public List_ModellParameter() As Struct_ModellParameter = {}      'Liste der Modellparameter
-    Public List_ModellParameter_Save() As Struct_ModellParameter = {} 'Liste der Modellparameter die nicht verändert wird
+    Public List_ModellParameter() As Struct_ModellParameter      'Liste der Modellparameter
+    Public List_ModellParameter_Save() As Struct_ModellParameter 'Liste der Modellparameter die nicht verändert wird
 
     'Optimierungsziele
     '-----------------
-    '*| Bezeichnung   | ZielTyp  | Datei |  SimGröße | ZielFkt  | WertTyp  | ZielWert | ZielGröße  | PfadReihe
+    '*| Bezeichnung   | ZielTyp  | Datei |  SimGröße | ZielFkt  | WertTyp  | ZielWert | ZielGröße  | PfadReihe | Start | Ende |
     Public Structure Struct_OptZiel
         Public Bezeichnung As String                'Bezeichnung
         Public ZielTyp As String                    'Gibt an ob es sich um einen Wert oder um eine Reihe handelt
@@ -108,12 +85,14 @@ Public MustInherit Class Sim
         Public ZielGr As String                     'Spalte der .wel Datei falls ZielReihe .wel Datei ist
         Public ZielReihe As Wave.Zeitreihe          'Die Werte der Zielreihe
         Public QWertTmp As Double                   'Qualitätswert der letzten Simulation wird hier zwischengespeichert 
+        Public EvalStart As DateTime                'Start des Evaluierungszeitraums
+        Public EvalEnde As DateTime                 'Ende des Evaluierungszeitraums
         Public Overrides Function toString() As String
             Return Bezeichnung
         End Function
     End Structure
 
-    Public List_OptZiele() As Struct_OptZiel = {}   'Liste der Zielfunktionen
+    Public List_OptZiele() As Struct_OptZiel        'Liste der Zielfunktionen
 
     'Constraints
     '-----------
@@ -134,7 +113,7 @@ Public MustInherit Class Sim
         End Function
     End Structure
 
-    Public List_Constraints() As Struct_Constraint = {} 'Liste der Constraints
+    Public List_Constraints() As Struct_Constraint  'Liste der Constraints
 
     'Ergebnisspeicher
     '----------------
@@ -158,7 +137,11 @@ Public MustInherit Class Sim
     End Structure
 
     Public List_Locations() As Struct_Lokation
-    Public VerzweigungsDatei(,) As String
+
+    Public VerzweigungsDatei(,) As String       'Gibt die PathSize an für jede Pfadstelle
+    Public CES_T_Modus As kern.CES_T_MODUS      'Zeigt ob der TestModus aktiv ist
+    Public n_Combinations As Integer            'Die Anzahl der Möglichen Kombinationen
+    
 
 #End Region 'Eigenschaften
 
@@ -173,17 +156,29 @@ Public MustInherit Class Sim
     '***********
     Public Sub New()
 
+        'Datenstrukturen initialisieren
+        '------------------------------
+        ReDim Me.List_OptParameter(-1)
+        ReDim Me.List_OptParameter_Save(-1)
+        ReDim Me.List_ModellParameter(-1)
+        ReDim Me.List_ModellParameter_Save(-1)
+        ReDim Me.List_OptZiele(-1)
+        ReDim Me.List_Constraints(-1)
+        ReDim Me.List_Locations(-1)
+
+        'Simulationsergebnis instanzieren
+        Me.SimErgebnis = New Collection
+
         'Benutzereinstellungen einlesen
+        '------------------------------
         Call Me.ReadSettings()
 
         'Provider einrichten
+        '-------------------
         Sim.FortranProvider = New NumberFormatInfo()
         Sim.FortranProvider.NumberDecimalSeparator = "."
         Sim.FortranProvider.NumberGroupSeparator = ""
         Sim.FortranProvider.NumberGroupSizes = New Integer() {3}
-
-        'Simulationsergebnis instanzieren
-        Me.SimErgebnis = New Collection
 
     End Sub
 
@@ -251,6 +246,8 @@ Public MustInherit Class Sim
     '***************************************
     Public Sub read_and_valid_INI_Files_CES()
 
+        'Simulationsdaten einlesen
+        Call Me.Read_SimParameter()
         'Zielfunktionen einlesen
         Call Me.Read_OptZiele()
         'Constraints einlesen
@@ -263,12 +260,19 @@ Public MustInherit Class Sim
         Call Me.Validate_Combinatoric()
         'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
         Call Me.Validate_CES_fits_to_VER()
+        'Testmodus wird ermittelt
+        CES_T_Modus = Set_TestModus
+        'Die Zahl der Kombinationen wird ermittelt
+        n_combinations = No_of_Combinations
         'Ergebnisspeicher initialisieren
         Me.OptResult = New OptResult(Me)
 
     End Sub
 
-    Public Sub read_and_valid_INI_Files_CES_PES()
+    Public Sub read_and_valid_INI_Files_HYBRID()
+
+        'Simulationsdaten einlesen
+        Call Me.Read_SimParameter()
 
         'CES vorbereiten
         'Erforderliche Dateien werden eingelesen
@@ -285,13 +289,15 @@ Public MustInherit Class Sim
         Call Me.Validate_Combinatoric()
         'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
         Call Me.Validate_CES_fits_to_VER()
+        'Testmodus wird ermittelt
+        CES_T_Modus = Set_TestModus
+        'Die Zahl der Kombinationen wird ermittelt
+        n_combinations = No_of_Combinations
         'Datenbank vorbereiten
 
         'PES vorbereiten
         'zusätzliche Dateien werden eingelesen
         '-------------------------------------
-        'Simulationsdaten einlesen
-        Call Me.Read_SimParameter()
         'Optimierungsparameter einlesen
         Call Me.Read_OptParameter()
         'ModellParameter einlesen
@@ -340,64 +346,61 @@ Public MustInherit Class Sim
         Dim AnzParam0 As Integer = 0
         Dim i As Integer = 0
         Dim k As Integer = 0
-        Dim Bez_str As String = ""
         Dim tmp As Integer
-       
-        'Anzahl der Parameter feststellen
-        '---------------------------------
+
         Do
             Zeile = StrRead.ReadLine.ToString()
             If (Zeile.StartsWith("*") = False) Then
                 array = Zeile.Split("|")
-
+                'Sonderfall Zeitreihe
+                '---------------------
                 If (array(1).Trim().StartsWith("Zeitreihe")) Then
                     tmp = Convert.ToInt16(array(2).Trim(), Sim.FortranProvider)
                     AnzParam = AnzParam + tmp + tmp - 1 'ermitteln der Parameteranzahl nAbschn + nAbschn - 1
                     If AnzParam > 0 Then ReDim Preserve List_OptParameter(AnzParam - 1)
-                    If AnzParam > 0 Then ReDim Preserve List_OptParameter_Save(AnzParam - 1)
                     For k = AnzParam0 To AnzParam - 1
+                        'OptParameter instanzieren
+                        List_OptParameter(k) = New EVO.Kern.OptParameter()
                         List_OptParameter(k).Bezeichnung = "Zeitreihe" + k.ToString
-                        List_OptParameter(k).Wert = Convert.ToDouble(array(3).Trim(), Sim.FortranProvider)
+                        List_OptParameter(k).StartWert = Convert.ToDouble(array(3).Trim(), Sim.FortranProvider)
                         List_OptParameter(k).Min = Convert.ToDouble(array(4).Trim(), Sim.FortranProvider)
                         List_OptParameter(k).Max = Convert.ToDouble(array(5).Trim(), Sim.FortranProvider)
+                        'Eingelesenen Startwert setzen
+                        List_OptParameter(k).RWert = List_OptParameter(k).StartWert
                     Next
                     AnzParam0 = AnzParam
-
+                    '-------------------
                 Else
-                    If i > 0 Then ReDim Preserve List_OptParameter(i)
-                    If i > 0 Then ReDim Preserve List_OptParameter_Save(i)
-
+                    ReDim Preserve List_OptParameter(i)
+                    'OptParameter instanzieren
+                    List_OptParameter(i) = New EVO.Kern.OptParameter()
+                    'Werte zuweisen
                     List_OptParameter(i).Bezeichnung = array(1).Trim()
                     List_OptParameter(i).Einheit = array(2).Trim()
-                    List_OptParameter(i).Wert = Convert.ToDouble(array(3).Trim(), Sim.FortranProvider)
+                    List_OptParameter(i).StartWert = Convert.ToDouble(array(3).Trim(), Sim.FortranProvider)
                     List_OptParameter(i).Min = Convert.ToDouble(array(4).Trim(), Sim.FortranProvider)
                     List_OptParameter(i).Max = Convert.ToDouble(array(5).Trim(), Sim.FortranProvider)
-
                     'liegt eine Beziehung vor?
                     If (i > 0 And Not array(6).Trim() = "") Then
                         Me.List_OptParameter(i).Beziehung = getBeziehung(array(6).Trim())
-                    Else
-                        Me.List_OptParameter(i).Beziehung = EVO.Kern.PES.Beziehung.keine
                     End If
-
-                    i += 1
-
+                    'Eingelesenen Startwert setzen
+                    List_OptParameter(i).RWert = List_OptParameter(i).StartWert
                 End If
+                i += 1
             End If
         Loop Until StrRead.Peek() = -1
-  
-        '-----------------------------------------------------------------------------------------
 
         StrRead.Close()
         FiStr.Close()
 
         'OptParameter werden hier gesichert
+        ReDim List_OptParameter_Save(List_OptParameter.GetUpperBound(0))
         For i = 0 To List_OptParameter.GetUpperBound(0)
-            Call copy_Struct_OptParameter(List_OptParameter(i), List_OptParameter_Save(i))
+            List_OptParameter_Save(i) = List_OptParameter(i).Clone()
         Next
 
     End Sub
-
 
     'String in der Form < >, <=, >= in Beziehung umwandeln
     '*****************************************************
@@ -437,20 +440,17 @@ Public MustInherit Class Sim
         Dim i As Integer = 0
         Dim k As Integer = 0
         Dim tmp As Integer = 0
-  
-        'Anzahl der Parameter feststellen
-        '------------------------------------
+
         Do
             Zeile = StrRead.ReadLine.ToString()
             If (Zeile.StartsWith("*") = False) Then
-
                 array = Zeile.Split("|")
-
+                'Sonderfall Zeitreihe
+                '--------------------
                 If (array(1).Trim().StartsWith("Zeitreihe")) Then
                     tmp = Convert.ToInt16(array(3).Trim(), Sim.FortranProvider)
                     AnzParam = AnzParam + tmp + tmp - 1 'ermitteln der Parameteranzahl nAbschn + nAbschn - 1
                     If AnzParam > 0 Then ReDim Preserve List_ModellParameter(AnzParam - 1)
-                    If AnzParam > 0 Then ReDim Preserve List_ModellParameter_Save(AnzParam - 1)
                     For k = AnzParam0 To AnzParam - 1
                         List_ModellParameter(k).OptParameter = "Zeitreihe" + k.ToString
                         List_ModellParameter(k).Element = i + 1
@@ -461,30 +461,29 @@ Public MustInherit Class Sim
                     Next
                     AnzParam0 = AnzParam
                     List_ModellParameter(i).Datei = array(4).Trim()
+                    '------------------
                 Else
-                    If i > 0 Then ReDim Preserve List_ModellParameter(i)
-                    If i > 0 Then ReDim Preserve List_ModellParameter_Save(i)
-                    List_ModellParameter(i).OptParameter = array(1).Trim()
-                    List_ModellParameter(i).Bezeichnung = array(2).Trim()
-                    List_ModellParameter(i).Einheit = array(3).Trim()
-                    List_ModellParameter(i).Datei = array(4).Trim()
-                    List_ModellParameter(i).Element = array(5).Trim()
-                    List_ModellParameter(i).ZeileNr = Convert.ToInt16(array(6).Trim())
-                    List_ModellParameter(i).SpVon = Convert.ToInt16(array(7).Trim())
-                    List_ModellParameter(i).SpBis = Convert.ToInt16(array(8).Trim())
-                    List_ModellParameter(i).Faktor = Convert.ToDouble(array(9).Trim(), Sim.FortranProvider)
+                    ReDim Preserve List_ModellParameter(i)
+                    'Werte zuweisen
+	                List_ModellParameter(i).OptParameter = array(1).Trim()
+	                List_ModellParameter(i).Bezeichnung = array(2).Trim()
+	                List_ModellParameter(i).Einheit = array(3).Trim()
+	                List_ModellParameter(i).Datei = array(4).Trim()
+	                List_ModellParameter(i).Element = array(5).Trim()
+	                List_ModellParameter(i).ZeileNr = Convert.ToInt16(array(6).Trim())
+	                List_ModellParameter(i).SpVon = Convert.ToInt16(array(7).Trim())
+	                List_ModellParameter(i).SpBis = Convert.ToInt16(array(8).Trim())
+	                List_ModellParameter(i).Faktor = Convert.ToDouble(array(9).Trim(), Sim.FortranProvider)
                 End If
-
                 i += 1
-
             End If
         Loop Until StrRead.Peek() = -1
-
 
         StrRead.Close()
         FiStr.Close()
 
         'ModellParameter werden hier gesichert
+        ReDim List_ModellParameter_Save(List_ModellParameter.GetUpperBound(0))
         For i = 0 To List_ModellParameter.GetUpperBound(0)
             Call copy_Struct_ModellParemeter(List_ModellParameter(i), List_ModellParameter_Save(i))
         Next
@@ -495,21 +494,27 @@ Public MustInherit Class Sim
     '**************************
     Protected Overridable Sub Read_OptZiele()
 
+        'Format:
+        '*|---------------|---------|-------|----------|---------|--------------|--------------------|---------------------------|
+        '*| Bezeichnung   | ZielTyp | Datei | SimGröße | ZielFkt | EvalZeitraum |       Zielwert   ODER      Zielreihe           |
+        '*|               |         |       |          |         | Start | Ende | WertTyp | ZielWert | ZielGröße | Datei         |
+        '*|---------------|---------|-------|----------|---------|-------|------|---------|----------|-----------|---------------|
+
         Dim AnzZiele As Integer = 0
         Dim ext As String
         Dim i As Integer
+        Dim Zeile As String
+        Dim ZeilenArray() As String
 
         Dim Datei As String = WorkDir & Datensatz & "." & OptZiele_Ext
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
 
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-        Dim Zeile As String = ""
-
         'Anzahl der Zielfunktionen feststellen
         Do
             Zeile = StrRead.ReadLine.ToString()
-            If (Zeile.StartsWith("*") = False) Then
+            If (Zeile.StartsWith("*") = False And Zeile.Contains("|")) Then
                 AnzZiele += 1
             End If
         Loop Until StrRead.Peek() = -1
@@ -525,23 +530,37 @@ Public MustInherit Class Sim
         FiStr.Seek(0, SeekOrigin.Begin)
 
         'Einlesen der Zeile und übergeben an die OptimierungsZiele Liste
-        Dim ZeilenArray(9) As String
-
         i = 0
         Do
             Zeile = StrRead.ReadLine.ToString()
-            If (Zeile.StartsWith("*") = False) Then
+            If (Zeile.StartsWith("*") = False And Zeile.Contains("|")) Then
                 ZeilenArray = Zeile.Split("|")
+                'Kontrolle
+                If (ZeilenArray.GetUpperBound(0) <> 12) Then
+                    Throw New Exception("Die ZIE-Datei hat die falsche Anzahl Spalten!")
+                End If
                 'Werte zuweisen
-                List_OptZiele(i).Bezeichnung = ZeilenArray(1).Trim()
-                List_OptZiele(i).ZielTyp = ZeilenArray(2).Trim()
-                List_OptZiele(i).Datei = ZeilenArray(3).Trim()
-                List_OptZiele(i).SimGr = ZeilenArray(4).Trim()
-                List_OptZiele(i).ZielFkt = ZeilenArray(5).Trim()
-                List_OptZiele(i).WertTyp = ZeilenArray(6).Trim()
-                If (ZeilenArray(7).Trim() <> "") Then List_OptZiele(i).ZielWert = Convert.ToDouble(ZeilenArray(7).Trim(), Sim.FortranProvider)
-                List_OptZiele(i).ZielGr = ZeilenArray(8).Trim()
-                List_OptZiele(i).ZielReiheDatei = ZeilenArray(9).Trim()
+                With List_OptZiele(i)
+                    .Bezeichnung = ZeilenArray(1).Trim()
+                    .ZielTyp = ZeilenArray(2).Trim()
+                    .Datei = ZeilenArray(3).Trim()
+                    .SimGr = ZeilenArray(4).Trim()
+                    .ZielFkt = ZeilenArray(5).Trim()
+                    If (ZeilenArray(6).Trim() <> "") Then
+                        .EvalStart = ZeilenArray(6).Trim()
+                    Else
+                        .EvalStart = Me.SimStart
+                    End If
+                    If ZeilenArray(7).Trim() <> "" Then
+                        .EvalEnde = ZeilenArray(7).Trim()
+                    Else
+                        .EvalEnde = Me.SimEnde
+                    End If
+                    .WertTyp = ZeilenArray(8).Trim()
+                    If (ZeilenArray(9).Trim() <> "") Then .ZielWert = Convert.ToDouble(ZeilenArray(9).Trim(), Sim.FortranProvider)
+                    .ZielGr = ZeilenArray(10).Trim()
+                    .ZielReiheDatei = ZeilenArray(11).Trim()
+                End With
                 i += 1
             End If
         Loop Until StrRead.Peek() = -1
@@ -558,6 +577,7 @@ Public MustInherit Class Sim
                 If (.ZielTyp = "Reihe" Or .ZielTyp = "IHA") Then
 
                     'Dateiendung der Zielreihendatei bestimmen und Reihe einlesen
+                    '------------------------------------------------------------
                     ext = Path.GetExtension(.ZielReiheDatei)
                     Select Case (ext.ToUpper)
                         Case ".WEL"
@@ -569,11 +589,11 @@ Public MustInherit Class Sim
                         Case ".ZRE"
                             Dim ZRE As New Wave.ZRE(Me.WorkDir & .ZielReiheDatei, True)
                             .ZielReihe = ZRE.Zeitreihen(0)
-                        Case ".PRB"
+                        'Case ".PRB"
                             'BUG 183: geht nicht mehr, weil PRB-Dateien keine Zeitreihen sind!
                             'IsOK = Read_PRB(Me.WorkDir & .ZielReiheDatei, .ZielGr, .ZielReihe)
                         Case Else
-                            Throw New Exception("Das Format der Zielreihe '" & .ZielReiheDatei & "' wurde nicht erkannt!")
+                            Throw New Exception("Das Format der Zielreihe '" & .ZielReiheDatei & "' wird nicht unterstützt!")
                     End Select
 
                     'Zeitraum der Zielreihe überprüfen (nur bei WEL und ZRE)
@@ -583,12 +603,12 @@ Public MustInherit Class Sim
                         ZielStart = .ZielReihe.XWerte(0)
                         ZielEnde = .ZielReihe.XWerte(.ZielReihe.Length - 1)
 
-                        If (ZielStart > Me.SimStart Or ZielEnde < Me.SimEnde) Then
-                            'Zielreihe deckt Simulationszeitraum nicht ab
-                            Throw New Exception("Die Zielreihe '" & .ZielReiheDatei & "' deckt den Simulationszeitraum nicht ab!")
+                        If (ZielStart > .EvalStart Or ZielEnde < .EvalEnde) Then
+                            'Zielreihe deckt Evaluierungszeitraum nicht ab
+                            Throw New Exception("Die Zielreihe '" & .ZielReiheDatei & "' deckt den Evaluierungszeitraum nicht ab!")
                         Else
-                            'Zielreihe auf Simulationszeitraum kürzen
-                            Call .ZielReihe.cut(Me.SimStart, Me.SimEnde)
+                            'Zielreihe auf Evaluierungszeitraum kürzen
+                            Call .ZielReihe.Cut(.EvalStart, .EvalEnde)
                         End If
 
                     End If
@@ -697,7 +717,7 @@ Public MustInherit Class Sim
                             Throw New Exception("Die Grenzwertreihe '" & .GrenzReiheDatei & "' deckt den Simulationszeitraum nicht ab!")
                         Else
                             'Zielreihe auf Simulationszeitraum kürzen
-                            Call .GrenzReihe.cut(Me.SimStart, Me.SimEnde)
+                            Call .GrenzReihe.Cut(Me.SimStart, Me.SimEnde)
                         End If
 
                         'Grenzwertreihe umbenennen
@@ -861,7 +881,7 @@ Public MustInherit Class Sim
         Dim i As Integer
 
         For i = 0 To List_OptParameter.GetUpperBound(0)
-            If Not List_OptParameter(i).Wert <= List_OptParameter(i).Max Or Not List_OptParameter(i).Wert >= List_OptParameter(i).Min Then
+            If Not List_OptParameter(i).RWert <= List_OptParameter(i).Max Or Not List_OptParameter(i).RWert >= List_OptParameter(i).Min Then
                 Throw New Exception("Der Optimierungsparameter " & List_OptParameter(i).Bezeichnung & " in der .OPT Datei liegt nicht innerhalb der dort genannten Grenzen.")
             End If
         Next
@@ -877,23 +897,45 @@ Public MustInherit Class Sim
     'Kombinatorik
     '############
 
+    'Gibt die Pfad Dimensionen zurück
+    '********************************
+    Public Function n_PathDimension() As Integer()
+        Dim i As Integer
+        Dim Array() As Integer = {}
+
+        If List_Locations.GetLength(0) = 0 Then
+            Throw New Exception("Die Element Gesamtliste wurde abgerufen bevor die Elemente pro Location ermittelt wurden")
+        End If
+
+        ReDim Array(List_Locations.GetUpperBound(0))
+        For i = 0 To List_Locations.GetUpperBound(0)
+            Array(i) = List_Locations(i).List_Massnahmen.GetLength(0)
+        Next
+
+        n_PathDimension = Array.Clone
+
+    End Function
+
     'Berechnet die Anzahl maximal möglicher Kombinationen
     '****************************************************
     Public Function No_of_Combinations() As Integer
-        Dim i As Integer
 
-        No_of_Combinations = List_Locations(0).List_Massnahmen.GetLength(0)
-
-        For i = 1 To List_Locations.GetUpperBound(0)
-            No_of_Combinations = No_of_Combinations * List_Locations(i).List_Massnahmen.GetLength(0)
-        Next
+        If CES_T_MODUS = Kern.CES_T_MODUS.One_Combi Then
+            No_of_Combinations = 1
+        else
+            Dim i As Integer
+            No_of_Combinations = List_Locations(0).List_Massnahmen.GetLength(0)
+            For i = 1 To List_Locations.GetUpperBound(0)
+                No_of_Combinations = No_of_Combinations * List_Locations(i).List_Massnahmen.GetLength(0)
+            Next
+        End If
 
     End Function
 
     'Überprüft ob und welcher TestModus aktiv ist
     'Beschreibung:
     '********************************************
-    Public Function Set_TestModus() As Integer
+    Public Function Set_TestModus() As Kern.Constants.CES_T_MODUS
 
         Dim i, j As Integer
         Dim count_A As Integer
@@ -914,7 +956,7 @@ Public MustInherit Class Sim
         Next
 
         If count_A = count_B Then
-            Set_TestModus = 0
+            Set_TestModus = kern.CES_T_MODUS.No_Test
             Exit Function
         End If
 
@@ -932,7 +974,7 @@ Public MustInherit Class Sim
         Next
 
         If count_A = count_B Then
-            Set_TestModus = 1
+            Set_TestModus = kern.CES_T_MODUS.One_Combi
             Exit Function
         End If
 
@@ -950,7 +992,7 @@ Public MustInherit Class Sim
         Next
 
         If count_A = count_B Then
-            Set_TestModus = 2
+            Set_TestModus = kern.CES_T_MODUS.All_Combis
             Exit Function
         End If
 
@@ -961,23 +1003,47 @@ Public MustInherit Class Sim
     'Holt sich im Falle des Testmodus 1 den Pfad aus der .CES Datei
     '**************************************************************
     Public Sub get_TestPath(ByRef Path() As Integer)
-        Dim i, j, counter As Integer
+        Dim i, j As Integer
 
         For i = 0 To Path.GetUpperBound(0)
-            counter = 0
+            Path(i) = -7
             For j = 0 To List_Locations(i).List_Massnahmen.GetUpperBound(0)
                 If List_Locations(i).List_Massnahmen(j).TestModus = 1 Then
-                    Path(i) = counter
+                    Path(i) = j
                 End If
-                counter += 1
             Next
         Next
 
     End Sub
 
+
+    'Holt sich im Falle des Testmodus 1 den Pfad aus der .CES Datei
+    '**************************************************************
+    Public Function TestPath As Integer ()
+
+        Dim Array(List_Locations.GetUpperBound(0)) As Integer
+ 
+        Dim i, j As Integer
+    
+        For i = 0 To Array.GetUpperBound(0)
+            Dim count as Integer = 0
+            Array(i) = -7
+            For j = 0 To List_Locations(i).List_Massnahmen.GetUpperBound(0)
+                If List_Locations(i).List_Massnahmen(j).TestModus = 1 Then
+                    Array(i) = j
+                    count += 1
+                End If
+            Next
+            If count > 1 then Array(i) = -7
+        Next
+
+        TestPath = Array.Clone
+
+    End Function
+
     'Die Elemente werden pro Location im Child gespeichert
     '*****************************************************
-    Public Sub Identify_Measures_Elements_Parameters(ByVal No_Loc As Integer, ByVal No_Measure As Integer, ByRef Measure As String, ByRef Elements() As String, ByRef Para(,) As Object)
+    Public Sub Identify_Measures_Elements_Parameters(ByVal No_Loc As Integer, ByVal No_Measure As Integer, ByRef Measure As String, ByRef Elements() As String, ByRef PES_OptPara() As kern.OptParameter)
 
         Dim i, j As Integer
         Dim x As Integer
@@ -1006,14 +1072,13 @@ Public MustInherit Class Sim
         For i = 0 To Elements.GetUpperBound(0)
             For j = 0 To List_OptParameter.GetUpperBound(0)
                 If Elements(i) = Left(List_OptParameter(j).Bezeichnung, 4) Then
-                    ReDim Preserve Para(1, x)
-                    Para(0, x) = List_OptParameter(j).Bezeichnung
-                    Para(1, x) = List_OptParameter(j).SKWert
+                    ReDim Preserve PES_OptPara(x)
+                    PES_OptPara(x) = List_OptParameter(j).Clone()
                     x += 1
                 End If
             Next
         Next
-        If x = 0 Then ReDim Preserve Para(1, -1)
+        If x = 0 Then ReDim Preserve PES_OptPara(-1)
 
     End Sub
 
@@ -1043,28 +1108,6 @@ Public MustInherit Class Sim
 
         'Schreibt die neuen Verzweigungen
         Call Me.Write_Verzweigungen()
-
-    End Sub
-
-    'ToDo: nicht besonders hübsch überladen
-    '*************************************
-    Public Sub PREPARE_Evaluation_CES()
-
-        'Wandelt die Maßnahmen Namen wieder in einen Pfad zurück
-        Dim i, j As Integer
-        For i = 0 To Akt.Measures.GetUpperBound(0)
-            For j = 0 To List_Locations(i).List_Massnahmen.GetUpperBound(0)
-                If (List_Locations(i).List_Massnahmen(j).Name = Akt.Measures(i)) Then
-                    Akt.Path(i) = j
-                End If
-            Next
-        Next
-
-        'Ermittelt das aktuelle_ON_OFF array
-        Call Prepare_Verzweigung_ON_OFF()
-
-        'Schreibt die neuen Verzweigungen
-        Call Write_Verzweigungen()
 
     End Sub
 
@@ -1141,14 +1184,14 @@ Public MustInherit Class Sim
 
             'Reduzierung der OptParameter
             'xxxxxxxxxxxxxxxxxxxxxxxxxxxx
-            Dim TMP_OptPara() As Struct_OptParameter
+            Dim TMP_OptPara() As EVO.Kern.OptParameter
             ReDim TMP_OptPara(List_OptParameter.GetUpperBound(0))
 
             count = 0
             For i = 0 To List_OptParameter.GetUpperBound(0)
                 For j = 0 To List_ModellParameter.GetUpperBound(0)
                     If List_OptParameter(i).Bezeichnung = List_ModellParameter(j).OptParameter Then
-                        Call copy_Struct_OptParameter(List_OptParameter(i), TMP_OptPara(count))
+                        TMP_OptPara(count) = List_OptParameter(i).Clone()
                         count += 1
                         j = List_ModellParameter.GetUpperBound(0)
                     End If
@@ -1164,7 +1207,7 @@ Public MustInherit Class Sim
             Array.Resize(List_OptParameter, count)
 
             For i = 0 To TMP_OptPara.GetUpperBound(0)
-                Call copy_Struct_OptParameter(TMP_OptPara(i), List_OptParameter(i))
+                List_OptParameter(i) = TMP_OptPara(i).Clone()
             Next
 
         End If
@@ -1184,7 +1227,7 @@ Public MustInherit Class Sim
         Next
         ReDim List_OptParameter(List_OptParameter_Save.GetUpperBound(0))
         For i = 0 To List_OptParameter_Save.GetUpperBound(0)
-            copy_Struct_OptParameter(List_OptParameter_Save(i), List_OptParameter(i))
+            List_OptParameter(i) = List_OptParameter_Save(i).Clone()
         Next
 
     End Sub
@@ -1205,7 +1248,7 @@ Public MustInherit Class Sim
             For j = 0 To List_Locations(Loc).List_Massnahmen(Measure).Bauwerke.GetUpperBound(0)
                 If Left(List_OptParameter(i).Bezeichnung, 4) = List_Locations(Loc).List_Massnahmen(Measure).Bauwerke(j) Then
                     Parameter(0, x) = List_OptParameter(i).Bezeichnung
-                    Parameter(1, x) = List_OptParameter(i).SKWert
+                    Parameter(1, x) = List_OptParameter(i).Xn
                     x += 1
                     ReDim Preserve Parameter(1, x)
                 End If
@@ -1240,35 +1283,19 @@ Public MustInherit Class Sim
 
     End Sub
 
-    'Kopiert ein Strukt_OptParameter
-    '**********************************
-    Private Sub copy_Struct_OptParameter(ByVal Source As Struct_OptParameter, ByRef Destination As Struct_OptParameter)
-
-        Destination.Bezeichnung = Source.Bezeichnung
-        Destination.Einheit = Source.Einheit
-        Destination.Wert = Source.Wert
-        Destination.Min = Source.Min
-        Destination.Max = Source.Max
-        Destination.SKWert = Source.SKWert
-        Destination.Beziehung = Source.Beziehung
-
-    End Sub
-
     'EVO-Parameterübergabe die Standard Parameter werden aus den Listen der OptPara und OptZiele ermittelt
     '*****************************************************************************************************
-    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara() As Double, ByRef beziehungen() As EVO.Kern.PES.Beziehung)
+    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara() As EVO.Kern.OptParameter)
 
         Dim i As Integer
 
         'Anzahl Optimierungsparameter übergeben
         globalAnzPar = Me.List_OptParameter.GetLength(0)
 
-        'Parameterwerte und Beziehungen übergeben
+        'Parameter übergeben
         ReDim mypara(globalAnzPar - 1)
-        ReDim beziehungen(globalAnzPar - 1)
         For i = 0 To globalAnzPar - 1
-            mypara(i) = Me.List_OptParameter(i).SKWert
-            beziehungen(i) = Me.List_OptParameter(i).Beziehung
+            mypara(i) = Me.List_OptParameter(i).Clone()
         Next
 
         'Anzahl Optimierungsziele übergeben
@@ -1281,13 +1308,30 @@ Public MustInherit Class Sim
 
     'Evaluierung des SimModells für ParameterOptimierung - Steuerungseinheit
     '***********************************************************************
+    Public Sub PREPARE_Evaluation_PES(ByVal myPara() As EVO.Kern.OptParameter)
+
+        Dim i As Short
+
+        'Mutierte Parameter an OptParameter übergeben
+        For i = 0 To Me.List_OptParameter.GetUpperBound(0)
+            List_OptParameter(i).Xn = myPara(i).Xn
+        Next
+
+        'Mutierte Parameter in Eingabedateien schreiben
+        Call Write_ModellParameter()
+
+    End Sub
+
+    'Evaluierung des SimModells für ParameterOptimierung - Steuerungseinheit
+    'HACK: Überladene Methode für altes Parameterarray (BUG 257)
+    '***********************************************************************
     Public Sub PREPARE_Evaluation_PES(ByVal myPara() As Double)
 
         Dim i As Short
 
         'Mutierte Parameter an OptParameter übergeben
         For i = 0 To Me.List_OptParameter.GetUpperBound(0)
-            List_OptParameter(i).SKWert = myPara(i)
+            List_OptParameter(i).Xn = myPara(i)
         Next
 
         'Mutierte Parameter in Eingabedateien schreiben
@@ -1320,9 +1364,8 @@ Public MustInherit Class Sim
 
         Dim Vorlaufzeit As Integer = 47
 
-
-
-        'Evaluiere ob Zeitreihe
+        'Sonderfall Zeitreihe
+        'xxxxxxxxxxxxxxxxxxxx
         If List_OptParameter(0).Bezeichnung.Contains("Zeitreihe") Then
 
             AnzParam = List_ModellParameter.Length
@@ -1362,7 +1405,7 @@ Public MustInherit Class Sim
                     param += 1
                     tmin = Zeitpunkt(j - 1) + 1
                     tmax = ndauer - jend + j - 1
-                    Zeitpunkt(j) = tmin + List_OptParameter(param - 1).SKWert * (tmax - tmin)
+                    Zeitpunkt(j) = tmin + List_OptParameter(param - 1).Xn * (tmax - tmin)
                     Zeitpunkt(j) = Math.Round(Zeitpunkt(j), 0)
                     'Console.Out.WriteLine(Zeitpunkt(j))
                 Next j
@@ -1372,7 +1415,7 @@ Public MustInherit Class Sim
                     For k = 0 To jend
                         param += 1
                         For j = Zeitpunkt(k) + Vorlaufzeit To Zeitpunkt(k + 1) + Vorlaufzeit
-                            Qab(j) = List_OptParameter(param - 1).SKWert * List_OptParameter(n).Max
+                            Qab(j) = List_OptParameter(param - 1).Xn * List_OptParameter(n).Max
                             'Console.Out.WriteLine(Qab(j))
                         Next j
                     Next k
@@ -1381,8 +1424,8 @@ Public MustInherit Class Sim
 
                     For k = 0 To jend
                         param += 1
-                        Q1 = List_OptParameter(param - 2).SKWert * List_OptParameter(n).Max
-                        Q2 = List_OptParameter(param - 1).SKWert * List_OptParameter(n).Max
+                        Q1 = List_OptParameter(param - 2).Xn * List_OptParameter(n).Max
+                        Q2 = List_OptParameter(param - 1).Xn * List_OptParameter(n).Max
                         dt = Zeitpunkt(k + 1) - Zeitpunkt(k)
                         If dt <> 0 Then dQ = (Q2 - Q1) / dt
                         m = 0
@@ -1397,96 +1440,103 @@ Public MustInherit Class Sim
                 PfadZRE = Me.WorkDir & get_path_EXT(List_ModellParameter(n).Datei)
 
                 'ZRE-Datei schreiben
-
                 Call writeZRE(Qab, PfadZRE)
 
             Next
         Else
+        
+        'Normale OptParameter
+        'xxxxxxxxxxxxxxxxxxxx
 
-            'ModellParameter aus OptParametern kalkulieren()
-            Call OptParameter_to_ModellParameter()
+        'ModellParameter aus OptParametern kalkulieren()
+        Call OptParameter_to_ModellParameter()
 
-            'Alle ModellParameter durchlaufen
-            For i = 0 To List_ModellParameter.GetUpperBound(0)
+        'Alle ModellParameter durchlaufen
+        For i = 0 To List_ModellParameter.GetUpperBound(0)
 
-                DateiPfad = WorkDir & Datensatz & "." & List_ModellParameter(i).Datei
-                'Datei öffnen
-                Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
-                Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-                Dim StrReadSync As TextReader = TextReader.Synchronized(StrRead)
+            DateiPfad = WorkDir & Datensatz & "." & List_ModellParameter(i).Datei
+            'Datei öffnen
+            Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
+            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+            Dim StrReadSync As TextReader = TextReader.Synchronized(StrRead)
 
-                'Anzahl der Zeilen feststellen
-                AnzZeil = 0
-                Do
-                    Zeile = StrRead.ReadLine.ToString
-                    AnzZeil += 1
-                Loop Until StrRead.Peek() = -1
+            'Anzahl der Zeilen feststellen
+            AnzZeil = 0
+            On Error GoTo Handler
+            Do
+                Zeile = StrRead.ReadLine.ToString
+                AnzZeil += 1
+            Loop Until StrRead.Peek() = -1
+Handler:
+            If AnzZeil = 0 Then
+                Throw New Exception("Fehler beim lesen der Transportstreckendatei (.TRS). Sie könnte leer sein.")
+            End If
 
-                ReDim Zeilenarray(AnzZeil - 1)
+            ReDim Zeilenarray(AnzZeil - 1)
 
-                'Datei komplett einlesen
-                FiStr.Seek(0, SeekOrigin.Begin)
-                For j = 0 To AnzZeil - 1
-                    Zeilenarray(j) = StrRead.ReadLine.ToString
-                Next
-
-                StrReadSync.Close()
-                StrRead.Close()
-                FiStr.Close()
-
-                'Anzahl verfügbarer Zeichen
-                AnzZeichen = List_ModellParameter(i).SpBis - List_ModellParameter(i).SpVon + 1
-
-                'Zeile einlesen und splitten
-                Zeile = Zeilenarray(List_ModellParameter(i).ZeileNr - 1)
-                StrLeft = Zeile.Substring(0, List_ModellParameter(i).SpVon - 1)
-                If (Zeile.Length > List_ModellParameter(i).SpBis) Then
-                    StrRight = Zeile.Substring(List_ModellParameter(i).SpBis)
-                Else
-                    StrRight = ""
-                End If
-
-                'Wert auf verfügbare Stellen kürzen
-                '----------------------------------
-                'bestimmen des ganzzahligen Anteils, \-Operator ginge zwar theoretisch, ist aber für Zahlen < 1 nicht robust (warum auch immer)
-                WertStr = Convert.ToString(List_ModellParameter(i).Wert - List_ModellParameter(i).Wert Mod 1.0, Sim.FortranProvider)
-
-                If (WertStr.Length > AnzZeichen) Then
-                    'Wert zu lang
-                    Throw New Exception("Der Wert des Modellparameters '" & List_ModellParameter(i).Bezeichnung & "' (" & WertStr & ") ist länger als die zur Verfügung stehende Anzahl von Zeichen!")
-
-                ElseIf (WertStr.Length < AnzZeichen - 1) Then
-                    'Runden auf verfügbare Stellen: Anzahl der Stellen - Anzahl der Vorkommastellen - Komma
-                    WertStr = Convert.ToString(Math.Round(List_ModellParameter(i).Wert, AnzZeichen - WertStr.Length - 1), Sim.FortranProvider)
-
-                Else
-                    'Ganzzahligen Wert benutzen
-                End If
-
-                'Falls erforderlich, Wert mit Leerzeichen füllen
-                If (WertStr.Length < AnzZeichen) Then
-                    For j = 1 To AnzZeichen - WertStr.Length
-                        WertStr &= " "
-                    Next
-                End If
-
-                'Zeile wieder zusammensetzen
-                Zeile = StrLeft & WertStr & StrRight
-
-                Zeilenarray(List_ModellParameter(i).ZeileNr - 1) = Zeile
-
-                'Alle Zeilen wieder in Datei schreiben
-                Dim StrWrite As StreamWriter = New StreamWriter(DateiPfad, False, System.Text.Encoding.GetEncoding("iso8859-1"))
-                Dim StrWriteSync As TextWriter = TextWriter.Synchronized(StrWrite)
-
-                For j = 0 To AnzZeil - 1
-                    StrWrite.WriteLine(Zeilenarray(j))
-                Next
-
-                StrWriteSync.Close()
-                StrWrite.Close()
-
+            'Datei komplett einlesen
+            FiStr.Seek(0, SeekOrigin.Begin)
+            For j = 0 To AnzZeil - 1
+                Zeilenarray(j) = StrRead.ReadLine.ToString
             Next
+
+            StrReadSync.Close()
+            StrRead.Close()
+            FiStr.Close()
+
+            'Anzahl verfügbarer Zeichen
+            AnzZeichen = List_ModellParameter(i).SpBis - List_ModellParameter(i).SpVon + 1
+
+            'Zeile einlesen und splitten
+            Zeile = Zeilenarray(List_ModellParameter(i).ZeileNr - 1)
+            StrLeft = Zeile.Substring(0, List_ModellParameter(i).SpVon - 1)
+            If (Zeile.Length > List_ModellParameter(i).SpBis) Then
+                StrRight = Zeile.Substring(List_ModellParameter(i).SpBis)
+            Else
+                StrRight = ""
+            End If
+
+            'Wert auf verfügbare Stellen kürzen
+            '----------------------------------
+            'bestimmen des ganzzahligen Anteils, \-Operator ginge zwar theoretisch, ist aber für Zahlen < 1 nicht robust (warum auch immer)
+            WertStr = Convert.ToString(List_ModellParameter(i).Wert - List_ModellParameter(i).Wert Mod 1.0, Sim.FortranProvider)
+
+            If (WertStr.Length > AnzZeichen) Then
+                'Wert zu lang
+                Throw New Exception("Der Wert des Modellparameters '" & List_ModellParameter(i).Bezeichnung & "' (" & WertStr & ") ist länger als die zur Verfügung stehende Anzahl von Zeichen!")
+
+            ElseIf (WertStr.Length < AnzZeichen - 1) Then
+                'Runden auf verfügbare Stellen: Anzahl der Stellen - Anzahl der Vorkommastellen - Komma
+                WertStr = Convert.ToString(Math.Round(List_ModellParameter(i).Wert, AnzZeichen - WertStr.Length - 1), Sim.FortranProvider)
+
+            Else
+                'Ganzzahligen Wert benutzen
+            End If
+
+            'Falls erforderlich, Wert mit Leerzeichen füllen
+            If (WertStr.Length < AnzZeichen) Then
+                For j = 1 To AnzZeichen - WertStr.Length
+                    WertStr = " " & WertStr
+                Next
+            End If
+
+            'Zeile wieder zusammensetzen
+            Zeile = StrLeft & WertStr & StrRight
+
+            Zeilenarray(List_ModellParameter(i).ZeileNr - 1) = Zeile
+
+            'Alle Zeilen wieder in Datei schreiben
+            Dim StrWrite As StreamWriter = New StreamWriter(DateiPfad, False, System.Text.Encoding.GetEncoding("iso8859-1"))
+            Dim StrWriteSync As TextWriter = TextWriter.Synchronized(StrWrite)
+
+            For j = 0 To AnzZeil - 1
+                StrWrite.WriteLine(Zeilenarray(j))
+            Next
+
+            StrWriteSync.Close()
+            StrWrite.Close()
+
+        Next
 
         End If
 
@@ -1494,7 +1544,7 @@ Public MustInherit Class Sim
 
     'Evaluiert die Kinderchen mit Hilfe des Simulationsmodells
     '*********************************************************
-    Public Function SIM_Evaluierung(ByVal ID As Integer, ByRef QN() As Double, ByRef RN() As Double) As Boolean
+    Public Function SIM_Evaluierung(ByRef Indi As Kern.Individuum) As Boolean
 
         Dim i As Short
 
@@ -1506,32 +1556,75 @@ Public MustInherit Class Sim
         'Qualitätswerte berechnen
         For i = 0 To Me.List_OptZiele.GetUpperBound(0)
             List_OptZiele(i).QWertTmp = QWert(List_OptZiele(i))
-            QN(i) = List_OptZiele(i).QWertTmp
+            Indi.Penalty(i) = List_OptZiele(i).QWertTmp
         Next
 
         'Constraints berechnen
         For i = 0 To Me.List_Constraints.GetUpperBound(0)
             List_Constraints(i).ConstTmp = Constraint(List_Constraints(i))
-            RN(i) = List_Constraints(i).ConstTmp
+            Indi.Constrain(i) = List_Constraints(i).ConstTmp
         Next
 
         'Lösung abspeichern
-        Call Me.OptResult.addSolution(ID, Me.List_OptZiele, Me.List_Constraints, Me.List_OptParameter)
+        Call Me.OptResult.addSolution(Indi)
 
         SIM_Evaluierung = True
 
     End Function
+
+    'VG_ Test Tagesganglinie mit Autokalibrierung
+    'VG *****************************************
+    'VG Beta-Version - erlaubt Kalirbierung der Tagesganlinie
+    'VG dafür muss für den jeweiligen Tagesgangwert in der .mod Datei in der Spalte "Elem" "TGG_QH" eingetragen werden
+    'VG Vorschlag: Aktivierung der kalibrierung des Tagesganlinie über einen Schalter, damit diese Funktion nicht bei jeder optimierung aufgerufen wird
+    Protected Sub VG_Kalibrierung_Tagesganglinie()
+        Dim i, j As Integer
+        Dim VG_sum_TGG As Double
+        Dim VG_check_24 As Integer
+        Dim VG_Faktor As Double
+
+        VG_check_24 = 0
+        VG_sum_TGG = 0
+
+        'Bestimmen der Paramterersumme zum berechenen des notwendigen Faktors um auf 24 zu kommen
+        For i = 0 To List_ModellParameter.GetUpperBound(0)
+            If Trim(List_ModellParameter(i).Element) = "TGG_QH" Then
+                VG_check_24 = VG_check_24 + 1
+
+                For j = 0 To List_OptParameter.GetUpperBound(0)
+                    If Trim(List_OptParameter(j).Bezeichnung) = Trim(List_ModellParameter(i).OptParameter) Then 'Parameter gefunden
+                        VG_sum_TGG = VG_sum_TGG + List_OptParameter(j).RWert 'aufsummieren
+                    End If
+                Next
+            End If
+        Next
+        'Überprüft ob 24 Werte zugeordnet wurden
+        If VG_check_24 = 24 Then
+            'Faktor um auf 24 zu kommen:Xi = Xsim,i * n/Summe(Xi,Sim)
+            VG_Faktor = VG_check_24 / VG_sum_TGG
+            For i = 0 To List_ModellParameter.GetUpperBound(0)
+                If Trim(List_ModellParameter(i).Element) = "TGG_QH" Then
+                    List_ModellParameter(i).Faktor = VG_Faktor 'setzt den Faktor für den jeweiligen Tagesgangwert
+                End If
+            Next
+        Else
+        End If
+    End Sub
 
     'ModellParameter aus OptParametern errechnen
     '*******************************************
     Protected Sub OptParameter_to_ModellParameter()
         Dim i As Integer
         Dim j As Integer
+
+        'VG ---------- Zusatzroutine für kalibrierung des Tagesgangs
+        VG_Kalibrierung_Tagesganglinie()
+        'VG ---------- Ende
+
         For i = 0 To List_ModellParameter.GetUpperBound(0)
             For j = 0 To List_OptParameter.GetUpperBound(0)
                 If List_ModellParameter(i).OptParameter = List_OptParameter(j).Bezeichnung Then
-                    List_ModellParameter(i).Wert = List_OptParameter(j).Wert * List_ModellParameter(i).Faktor
-                    Console.Out.WriteLine(List_OptParameter(j).Wert.ToString + " " + List_ModellParameter(i).Faktor.ToString)
+                    List_ModellParameter(i).Wert = List_OptParameter(j).RWert * List_ModellParameter(i).Faktor
                 End If
             Next
         Next
@@ -1589,8 +1682,7 @@ Public MustInherit Class Sim
         StrWri.Write(Text)
         StrWri.Close()
     End Sub
-
-
+    
     'SimModell ausführen (simulieren)
     '********************************
     Public MustOverride Function launchSim() As Boolean
@@ -1612,7 +1704,36 @@ Public MustInherit Class Sim
     Protected Function QWert_Reihe(ByVal OptZiel As Struct_OptZiel, ByVal SimReihe As Wave.Zeitreihe) As Double
 
         Dim QWert As Double
-        Dim i As Integer
+        Dim i, j As Integer
+        Dim ZeitschritteBisStart As Long
+        Dim ZeitschritteEval As Long
+        Dim Versatz As Long
+
+        'Bestimmen der Zeitschritte bis Start des Evaluierungszeitraums
+        ZeitschritteBisStart = (OptZiel.EvalStart - OptZiel.ZielReihe.XWerte(0)).TotalMinutes / Me.SimDT.TotalMinutes
+        'Bestimmen der Zeitschritte des Evaluierungszeitraums
+        ZeitschritteEval = (OptZiel.EvalEnde - OptZiel.EvalStart).TotalMinutes / Me.SimDT.TotalMinutes
+
+        'Überprüfen ob simulierte Zeitreihe evtl. anderen Startzeitpunkt 
+        'als Simulations Startzeitpunkt hat (kann bei SMUSI vorkommen!)
+        '
+        'Falls ein Versatz der beiden Zeitreihen vorliegt wird j
+        'zum entsprechenden Verschieben der Laufvariable i benutzt
+        '---------------------------------------------------------------
+        'Fallunterscheidung je nach Zeitschrittweite
+        If (Me.SimDT.TotalMinutes >= 1440) Then
+            'Bei dt >= 1d ist Versatz unerheblich
+            j = 0
+        Else
+            Versatz = (SimReihe.XWerte(0) - OptZiel.ZielReihe.XWerte(0)).TotalMinutes / Me.SimDT.TotalMinutes
+            If Versatz < 0 Then
+                j = -1 * Versatz
+            ElseIf Versatz = 0 Then
+                j = 0
+            Else
+                j = Versatz
+            End If
+        End If
 
         'Fallunterscheidung Zielfunktion
         '-------------------------------
@@ -1620,22 +1741,25 @@ Public MustInherit Class Sim
 
             Case "AbQuad"
                 'Summe der Fehlerquadrate
-                For i = 0 To SimReihe.Length - 1
-                    QWert += (OptZiel.ZielReihe.YWerte(i) - SimReihe.YWerte(i)) * (OptZiel.ZielReihe.YWerte(i) - SimReihe.YWerte(i))
+                '------------------------
+                For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
+                    QWert += (OptZiel.ZielReihe.YWerte(i) - SimReihe.YWerte(i + j)) * (OptZiel.ZielReihe.YWerte(i) - SimReihe.YWerte(i + j))
                 Next
 
             Case "Diff"
                 'Summe der Fehler
-                For i = 0 To SimReihe.Length - 1
-                    QWert += Math.Abs(OptZiel.ZielReihe.YWerte(i) - SimReihe.YWerte(i))
+                '----------------
+                For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
+                    QWert += Math.Abs(OptZiel.ZielReihe.YWerte(i) - SimReihe.YWerte(i + j))
                 Next
 
             Case "Volf"
                 'Volumenfehler
+                '-------------
                 Dim VolSim As Double = 0
                 Dim VolZiel As Double = 0
-                For i = 0 To SimReihe.Length - 1
-                    VolSim += SimReihe.YWerte(i)
+                For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
+                    VolSim += SimReihe.YWerte(i + j)
                     VolZiel += OptZiel.ZielReihe.YWerte(i)
                 Next
                 'Umrechnen in echtes Volumen
@@ -1646,43 +1770,63 @@ Public MustInherit Class Sim
 
             Case "nUnter"
                 'Relative Anzahl der Zeitschritte mit Unterschreitungen (in Prozent)
+                '-------------------------------------------------------------------
                 Dim nUnter As Integer = 0
-                For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) < OptZiel.ZielReihe.YWerte(i)) Then
+                For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
+                    If (SimReihe.YWerte(i + j) < OptZiel.ZielReihe.YWerte(i)) Then
                         nUnter += 1
                     End If
                 Next
-                QWert = nUnter / SimReihe.Length * 100
+                QWert = nUnter / ZeitschritteEval * 100
 
             Case "sUnter"
                 'Summe der Unterschreitungen
+                '---------------------------
                 Dim sUnter As Integer = 0
-                For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) < OptZiel.ZielReihe.YWerte(i)) Then
-                        sUnter += OptZiel.ZielReihe.YWerte(i) - SimReihe.YWerte(i)
+                For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
+                    If (SimReihe.YWerte(i + j) < OptZiel.ZielReihe.YWerte(i)) Then
+                        sUnter += OptZiel.ZielReihe.YWerte(i) - SimReihe.YWerte(i + j)
                     End If
                 Next
                 QWert = sUnter
 
             Case "nÜber"
                 'Relative Anzahl der Zeitschritte mit Überschreitungen (in Prozent)
+                '------------------------------------------------------------------
                 Dim nUeber As Integer = 0
-                For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) > OptZiel.ZielReihe.YWerte(i)) Then
+                For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
+                    If (SimReihe.YWerte(i + j) > OptZiel.ZielReihe.YWerte(i)) Then
                         nUeber += 1
                     End If
                 Next
-                QWert = nUeber / SimReihe.Length * 100
+                QWert = nUeber / ZeitschritteEval * 100
 
             Case "sÜber"
                 'Summe der Überschreitungen
+                '--------------------------
                 Dim sUeber As Integer = 0
-                For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) > OptZiel.ZielReihe.YWerte(i)) Then
-                        sUeber += SimReihe.YWerte(i) - OptZiel.ZielReihe.YWerte(i)
+                For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
+                    If (SimReihe.YWerte(i + j) > OptZiel.ZielReihe.YWerte(i)) Then
+                        sUeber += SimReihe.YWerte(i + j) - OptZiel.ZielReihe.YWerte(i)
                     End If
                 Next
                 QWert = sUeber
+
+            Case "NashSutt"
+                'Nash Sutcliffe
+                '--------------
+                'Mittelwert bilden
+                Dim Qobs_quer, zaehler, nenner As Double
+                For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
+                    Qobs_quer += OptZiel.ZielReihe.YWerte(i)
+                Next
+                Qobs_quer = Qobs_quer / (ZeitschritteEval)
+                For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
+                    zaehler += (OptZiel.ZielReihe.YWerte(i) - SimReihe.YWerte(i + j)) * (OptZiel.ZielReihe.YWerte(i) - SimReihe.YWerte(i + j))
+                    nenner += (OptZiel.ZielReihe.YWerte(i) - Qobs_quer) * (OptZiel.ZielReihe.YWerte(i) - Qobs_quer)
+                Next
+                'abgeänderte Nash-Sutcliffe Formel: 0 als Zielwert (1- weggelassen)
+                QWert = zaehler / nenner
 
             Case Else
                 Throw New Exception("Die Zielfunktion '" & OptZiel.ZielFkt & "' wird nicht unterstützt!")
@@ -1699,6 +1843,9 @@ Public MustInherit Class Sim
 
         Dim QWert As Double
         Dim i As Integer
+
+        'Simulationsreihe auf Evaluierungszeitraum kürzen
+        Call SimReihe.Cut(OptZiel.EvalStart, OptZiel.EvalEnde)
 
         'Simulationswert aus Simulationsergebnis berechnen
         Dim SimWert As Double
