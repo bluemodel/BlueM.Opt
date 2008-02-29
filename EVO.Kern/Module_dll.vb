@@ -81,4 +81,13 @@ Public Module Constants
         All_Combis = 2                        'Erst CES dann PES
     End Enum
 
+    'Option zur Wahl des Hybrid Verfahrens
+    Public Enum MEMORY_STRATEGY as Integer
+        A_Two_Loc_Up = -2
+        B_One_Loc_Up = -1
+        C_This_Loc = 0
+        D_One_Loc_Down = 1
+        E_Two_Loc_Down = 2
+    End Enum
+
 End Module
