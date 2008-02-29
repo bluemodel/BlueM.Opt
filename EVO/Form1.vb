@@ -842,42 +842,25 @@ Partial Class Form1
         'Falls HYBRID werden entprechend der Einstellung im PES die Parameter auf Zufällig oder Start gesetzt
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         If Method = METH_HYBRID AND EVO_Einstellungen1.Settings.CES.ty_Hybrid = EVO.Kern.HYBRID_TYPE.Mixed_Integer Then
-            'pro Child
-            For i = 0 To CES1.Settings.CES.n_Childs - 1
-                'und pro Location
-                For j = 0 To CES1.ModSett.n_Locations - 1
-                    'Die Parameter (falls vorhanden) werden überschrieben
-                    If Not CES1.Childs(i).Loc(j).PES_OptPara.GetLength(0) = 0 Then
-                        'Dem Child wird der Schrittweitenvektor zugewiesen und gegebenenfalls der Parameter zufällig gewählt
-                        '***************************************************************************************************
-                        For m = 0 To CES1.Childs(i).Loc(j).PES_OptPara.GetUpperBound(0)
-                            CES1.Childs(i).Loc(j).PES_OptPara(m).Dn = EVO_Einstellungen1.Settings.PES.Schrittweite.DnStart
-                            If EVO_Einstellungen1.Settings.PES.OptStartparameter = Kern.EVO_STARTPARAMETER.Zufall Then
-                                Randomize()
-                                CES1.Childs(i).Loc(j).PES_OptPara(m).Xn = Rnd()
-                            End If
-                        Next
-                    End If
-                Next
-            Next
+            CES1.Set_Xn_And_Dn_per_Location()
         End If
 
         'Startwerte werden der Verlaufsanzeige zugewiesen
         Call Me.EVO_Opt_Verlauf1.Initialisieren(1, 1, EVO_Einstellungen1.Settings.CES.n_Generations, EVO_Einstellungen1.Settings.CES.n_Childs)
 
+        'xxxx Optimierung xxxxxx
         'Generationsschleife CES
         'xxxxxxxxxxxxxxxxxxxxxxx
-        For i_gen = 0 To EVO_Einstellungen1.Settings.CES.n_Generations - 1
+        For i_gen = 0 To CES1.Settings.CES.n_Generations - 1
 
             Call EVO_Opt_Verlauf1.Generation(i_gen + 1)
 
             'Child Schleife
             'xxxxxxxxxxxxxx
-            For i = 0 To EVO_Einstellungen1.Settings.CES.n_Childs - 1
+            For i = 0 To CES1.Settings.CES.n_Childs - 1
 
                 durchlauf_all += 1
                 CES1.Childs(i).ID = durchlauf_all
-
                 Call EVO_Opt_Verlauf1.Nachfolger(i + 1)
 
                 '****************************************
@@ -925,12 +908,15 @@ Partial Class Form1
 
                 System.Windows.Forms.Application.DoEvents()
             Next
+            '^ ENDE der Child Schleife
+            'xxxxxxxxxxxxxxxxxxxxxxx
 
             'Die Listen müssen nach der letzten Evaluierung wieder zurückgesetzt werden
+            'Sicher ob das benötigt wird?
             Call Sim1.Reset_OptPara_and_ModPara()
 
             'MO oder SO SELEKTIONSPROZESS oder NDSorting SELEKTION
-            '-----------------------------------------------------
+            'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
             'BUG 259: CES: Punkt-Labels der Sekundärpopulation fehlen noch!
             If CES1.ModSett.n_Penalty = 1 Then
                 'Sortieren der Kinden anhand der Qualität
@@ -959,9 +945,11 @@ Partial Class Form1
                     Call SekundärePopulationZeichnen(SekPopulation)
                 End If
             End If
+            '^ ENDE Selectionsprozess
+            'xxxxxxxxxxxxxxxxxxxxxxxx
 
             'REPRODUKTION und MUTATION Nicht wenn Testmodus
-            '***********************************************
+            'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
             If sim1.CES_T_Modus = kern.CES_T_MODUS.No_Test Then
                 'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
                 Call Kern.Individuum.New_Array("Child", CES1.Childs)
@@ -971,7 +959,8 @@ Partial Class Form1
                 Call CES1.Mutation_Control()
             End If
 
-            'Hier werden dem Child die passenden Elemente pro Location zugewiesen
+            'Hier werden dem Child die passenden Massnahmen und deren Elemente pro Location zugewiesen
+            'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
             For i = 0 To EVO_Einstellungen1.Settings.CES.n_Childs - 1
                 For j = 0 To CES1.ModSett.n_Locations - 1
                     Call Sim1.Identify_Measures_Elements_Parameters(j, CES1.Childs(i).Path(j), CES1.Childs(i).Measures(j), CES1.Childs(i).Loc(j).Loc_Elem, CES1.Childs(i).Loc(j).PES_OptPara)
@@ -1002,19 +991,6 @@ Partial Class Form1
                         'Die Parameter (falls vorhanden) werden überschrieben
                         If Not CES1.Childs(i).Loc(j).PES_OptPara.GetLength(0) = 0 Then
 
-                            'Standard Parameter werden aus dem Sim besorgt
-                            Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzZiel, globalAnzRand, myPara)
-
-                            'Die Zahl der Parameter wird überschrieben (AnzZiel und AnzRand sind OK)
-                            'Anzahl der Parameter bezieht sich hier nur auf eine Location
-                            globalAnzPar = CES1.Childs(i).Loc(j).PES_OptPara.GetLength(0)
-
-                            'MyPara wird gefüllt
-                            ReDim myPara(CES1.Childs(i).Loc(j).PES_OptPara.GetUpperBound(0))
-                            For m = 0 To CES1.Childs(i).Loc(j).PES_OptPara.GetUpperBound(0)
-                                myPara(m) = CES1.Childs(i).Loc(j).PES_OptPara(m)
-                            Next
-
                             'Die Anzahl der Eltern wird bestimmt, bzw ob Eltern vorhanden
                             Dim n_eltern As Integer = 0
                             n_eltern = CES1.PES_Parents_pLoc.GetLength(0)
@@ -1023,6 +999,7 @@ Partial Class Form1
                             If n_eltern = 0 Then
                                 'Falls noch keine Eltern vorhanden sind -> zufällige Werte
                                 For m = 0 To CES1.Childs(i).Loc(j).PES_OptPara.GetUpperBound(0)
+                                    CES1.Childs(i).Loc(j).PES_OptPara(m).Dn = EVO_Einstellungen1.Settings.PES.Schrittweite.DnStart
                                     'Falls zufällige Startwerte
                                     If EVO_Einstellungen1.Settings.PES.OptStartparameter = Kern.EVO_STARTPARAMETER.Zufall Then
                                         Randomize()
@@ -1035,6 +1012,13 @@ Partial Class Form1
                                 EVO_Einstellungen1.isSaved = False
                                 Call EVO_Einstellungen1.SetFor_CES_PES(1, n_eltern, 1)
 
+                                'Die Zahl der Parameter wird überschrieben (AnzZiel und AnzRand sind OK)
+                                'Anzahl der Parameter bezieht sich hier nur auf eine Location
+                                globalAnzPar = CES1.Childs(i).Loc(j).PES_OptPara.GetLength(0)
+
+                                'MyPara wird gefüllt
+                                myPara = CES1.Childs(i).Loc(j).PES_OptPara.Clone
+
                                 'Schritt 0: PES - Objekt der Klasse PES wird erzeugt PES wird erzeugt
                                 '*********************************************************************
                                 Dim PES1 As EVO.Kern.PES
@@ -1046,7 +1030,7 @@ Partial Class Form1
 
                                 'Die PopulationsEltern des PES werden gefüllt
                                 For m = 0 To CES1.PES_Parents_pLoc.GetUpperBound(0)
-                                    Call PES1.EsStartvalues(EVO_Einstellungen1.Settings.CES.is_PopMutStart, CES1.PES_Parents_pLoc(m).Loc(j).PES_OptPara, m)
+                                    Call PES1.EsStartvalues(CES1.Settings.CES.is_PopMutStart, CES1.PES_Parents_pLoc(m).Loc(j).PES_OptPara, m)
                                 Next
 
                                 'Startet die Prozesse evolutionstheoretischen Prozesse nacheinander
@@ -1108,9 +1092,9 @@ Partial Class Form1
             End If
         Next
     End Sub
+
     'Anwendung des Verfahrens von Hook und Jeeves zur Parameteroptimierung
     '*********************************************************************
-
     Private Sub STARTEN_HookJeeves()
         Dim i As Integer
         Dim j As Integer

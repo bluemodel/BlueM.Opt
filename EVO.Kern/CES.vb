@@ -274,6 +274,30 @@ Public Class CES
         'Next
     End Function
 
+    'Setzt das Xn auf originale oder zufällige Parameter; und den Dn auf den Wert aus PES
+    '************************************************************************************
+    Public Sub Set_Xn_And_Dn_per_Location()
+        Dim i, j, m As Integer
+        'pro Child
+        For i = 0 To Settings.CES.n_Childs - 1
+            'und pro Location
+            For j = 0 To ModSett.n_Locations - 1
+                'Die Parameter (falls vorhanden) werden überschrieben
+                If Not Childs(i).Loc(j).PES_OptPara.GetLength(0) = 0 Then
+                    'Dem Child wird der Schrittweitenvektor zugewiesen und gegebenenfalls der Parameter zufällig gewählt
+                    '***************************************************************************************************
+                    For m = 0 To Childs(i).Loc(j).PES_OptPara.GetUpperBound(0)
+                        Childs(i).Loc(j).PES_OptPara(m).Dn = Settings.PES.Schrittweite.DnStart
+                        If Settings.PES.OptStartparameter = Kern.EVO_STARTPARAMETER.Zufall Then
+                            Randomize()
+                            Childs(i).Loc(j).PES_OptPara(m).Xn = Rnd()
+                        End If
+                    Next
+                End If
+            Next
+        Next
+    End Sub
+
     'Selectionsprozess je nach "plus" oder "minus" Strategie (Die beiden Listen sind schon vorsortiert!)
     '***************************************************************************************************
     Public Sub Selection_Process()
