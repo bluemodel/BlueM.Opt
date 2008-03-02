@@ -770,7 +770,7 @@ Public Class CES
                     'ToDo
 
                 case MEMORY_STRATEGY.C_This_Loc
-                    'Alles bleibt drin
+                    Tmp = PES_Parents_pChild.Clone
 
                 case MEMORY_STRATEGY.D_One_Loc_Down, MEMORY_STRATEGY.E_Two_Loc_Down
                     'DOWNSTREAM
@@ -782,16 +782,6 @@ Public Class CES
 
             End Select
         Next
-
-        dim x as Integer = 0
-        for i = 0 to tmp.GetUpperBound(0)
-            x = tmp(i).Memory_Rank
-        Next
-
-
-
-
-
 
         PES_Parents_pChild = Tmp.Clone
         
@@ -848,6 +838,23 @@ Public Class CES
         '********************************************************************************************
 
         'SekundärQB Mach tin dieser Form noch keinen Sinn !!!!!!!!!!!!!!!!!!!
+
+    End Sub
+
+    'Füllt die PES Parents per Location auf die erforderliche Anzahl auf
+    '*******************************************************************
+    Public Sub fill_Parents_per_Loc(ByRef Parents_pLoc() as Individuum, ByVal n_eltern as Integer)
+
+        Dim i, x as Integer
+        Dim n as Integer = Parents_pLoc.GetLength(0)
+        ReDim Preserve Parents_pLoc(n_eltern - 1)
+
+        x = 0
+        For i = n to n_eltern - 1
+            Parents_pLoc(i) = Parents_pLoc(x)
+            x += 1
+            If x = n -1 then x = 0
+        Next
 
     End Sub
 
