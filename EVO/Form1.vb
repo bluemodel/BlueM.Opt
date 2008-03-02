@@ -1020,6 +1020,7 @@ Partial Class Form1
                                     PES1 = New EVO.Kern.PES
 
                                     'Vorbereitung um das PES zu initieren
+                                    '************************************
                                     globalAnzPar = CES1.Childs(i).Loc(j).PES_OptPara.GetLength(0)
                                     myPara = CES1.Childs(i).Loc(j).PES_OptPara.Clone
 
