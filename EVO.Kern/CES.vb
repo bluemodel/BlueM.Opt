@@ -851,9 +851,9 @@ Public Class CES
 
         x = 0
         For i = n to n_eltern - 1
-            Parents_pLoc(i) = Parents_pLoc(x)
+            Parents_pLoc(i) = Parents_pLoc(x).Clone
             x += 1
-            If x = n -1 then x = 0
+            If x = n then x = 0
         Next
 
     End Sub
