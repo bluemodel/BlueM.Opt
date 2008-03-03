@@ -72,8 +72,8 @@ Public MustInherit Class Sim
 
     'Optimierungsziele
     '-----------------
-    '*| Bezeichnung   | ZielTyp  | Datei |  SimGröße | ZielFkt  | WertTyp  | ZielWert | ZielGröße  | PfadReihe | Start | Ende |
     Public Structure Struct_OptZiel
+        Public isOpt As Boolean                     'Gibt an ob es sich um ein OptZiel oder ein SekZiel handelt
         Public Bezeichnung As String                'Bezeichnung
         Public ZielTyp As String                    'Gibt an ob es sich um einen Wert oder um eine Reihe handelt
         Public Datei As String                      'Die Ergebnisdatei, aus der das Simulationsergebnis ausgelesen werden soll [WEL, BIL, PRB]
@@ -93,6 +93,7 @@ Public MustInherit Class Sim
     End Structure
 
     Public List_OptZiele() As Struct_OptZiel        'Liste der Zielfunktionen
+    Public List_SekZiele() As Struct_OptZiel        'Liste der Sekundären Zielfunktionen
 
     'Constraints
     '-----------
@@ -163,6 +164,7 @@ Public MustInherit Class Sim
         ReDim Me.List_ModellParameter(-1)
         ReDim Me.List_ModellParameter_Save(-1)
         ReDim Me.List_OptZiele(-1)
+        ReDim Me.List_SekZiele(-1)
         ReDim Me.List_Constraints(-1)
         ReDim Me.List_Locations(-1)
 
@@ -225,13 +227,13 @@ Public MustInherit Class Sim
         'Simulationsdaten einlesen
         Call Me.Read_SimParameter()
         'Zielfunktionen einlesen
-        Call Me.Read_OptZiele()
+        Call Me.Read_ZIE()
         'Constraints einlesen
-        Call Me.Read_Constraints()
+        Call Me.Read_CON()
         'Optimierungsparameter einlesen
-        Call Me.Read_OptParameter()
+        Call Me.Read_OPT()
         'ModellParameter einlesen
-        Call Me.Read_ModellParameter()
+        Call Me.Read_MOD()
         'Modell-/Optparameter validieren
         Call Me.Validate_OPT_fits_to_MOD()
         'Prüfen der Anfangswerte
@@ -249,9 +251,9 @@ Public MustInherit Class Sim
         'Simulationsdaten einlesen
         Call Me.Read_SimParameter()
         'Zielfunktionen einlesen
-        Call Me.Read_OptZiele()
+        Call Me.Read_ZIE()
         'Constraints einlesen
-        Call Me.Read_Constraints()
+        Call Me.Read_CON()
         'Kombinatorik Datei einlesen
         Call Me.Read_Kombinatorik()
         'Verzweigungs Datei einlesen
@@ -278,9 +280,9 @@ Public MustInherit Class Sim
         'Erforderliche Dateien werden eingelesen
         '---------------------------------------
         'Zielfunktionen einlesen
-        Call Me.Read_OptZiele()
+        Call Me.Read_ZIE()
         'Constraints einlesen
-        Call Me.Read_Constraints()
+        Call Me.Read_CON()
         'Kombinatorik Datei einlesen
         Call Me.Read_Kombinatorik()
         'Verzweigungs Datei einlesen
@@ -299,9 +301,9 @@ Public MustInherit Class Sim
         'zusätzliche Dateien werden eingelesen
         '-------------------------------------
         'Optimierungsparameter einlesen
-        Call Me.Read_OptParameter()
+        Call Me.Read_OPT()
         'ModellParameter einlesen
-        Call Me.Read_ModellParameter()
+        Call Me.Read_MOD()
         'Modell-/Optparameter validieren
         Call Me.Validate_OPT_fits_to_MOD()
         'Prüfen der Anfangswerte
@@ -329,7 +331,7 @@ Public MustInherit Class Sim
 
     'Optimierungsparameter einlesen
     '******************************
-    Private Sub Read_OptParameter()
+    Private Sub Read_OPT()
 
         'Format:
         '*|--------------|-------|-----------|--------|--------|-----------|
@@ -412,7 +414,7 @@ Public MustInherit Class Sim
 
     'Modellparameter einlesen
     '************************
-    Private Sub Read_ModellParameter()
+    Private Sub Read_MOD()
 
         'Format:
         '*|--------------|--------------|-------|-------|-------|-------|-----|-----|--------|
@@ -474,74 +476,66 @@ Public MustInherit Class Sim
 
     'Optimierungsziele einlesen
     '**************************
-    Protected Overridable Sub Read_OptZiele()
+    Protected Overridable Sub Read_ZIE()
 
         'Format:
-        '*|---------------|---------|-------|----------|---------|--------------|--------------------|---------------------------|
-        '*| Bezeichnung   | ZielTyp | Datei | SimGröße | ZielFkt | EvalZeitraum |       Zielwert   ODER      Zielreihe           |
-        '*|               |         |       |          |         | Start | Ende | WertTyp | ZielWert | ZielGröße | Datei         |
-        '*|---------------|---------|-------|----------|---------|-------|------|---------|----------|-----------|---------------|
+        '*|------|---------------|---------|-------|----------|---------|--------------|--------------------|---------------------------|
+        '*| Opt  | Bezeichnung   | ZielTyp | Datei | SimGröße | ZielFkt | EvalZeitraum |       Zielwert   ODER      Zielreihe           |
+        '*|      |               |         |       |          |         | Start | Ende | WertTyp | ZielWert | ZielGröße | Datei         |
+        '*|------|---------------|---------|-------|----------|---------|-------|------|---------|----------|-----------|---------------|
 
-        Dim AnzZiele As Integer = 0
-        Dim ext As String
+        Const AnzSpalten As Integer = 12                       'Anzahl Spalten in der ZIE-Datei
+        Dim tmpZiele() As Struct_OptZiel
         Dim i As Integer
         Dim Zeile As String
-        Dim ZeilenArray() As String
+        Dim WerteArray() As String
 
+        ReDim tmpZiele(-1)
+
+        'Einlesen aller Ziele und Speichern in tmpZiele
+        '##############################################
         Dim Datei As String = WorkDir & Datensatz & "." & OptZiele_Ext
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
 
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-        'Anzahl der Zielfunktionen feststellen
-        Do
-            Zeile = StrRead.ReadLine.ToString()
-            If (Zeile.StartsWith("*") = False And Zeile.Contains("|")) Then
-                AnzZiele += 1
-            End If
-        Loop Until StrRead.Peek() = -1
-
-        If (AnzZiele > 3) Then
-            MsgBox("Die Anzahl der Ziele beträgt mehr als 3!" & eol _
-                    & "Es werden nur die ersten drei Zielfunktionen im Hauptdiagramm angezeigt!", MsgBoxStyle.Information, "Info")
-        End If
-
-        ReDim List_OptZiele(AnzZiele - 1)
-
-        'Zurück zum Dateianfang und lesen
-        FiStr.Seek(0, SeekOrigin.Begin)
-
-        'Einlesen der Zeile und übergeben an die OptimierungsZiele Liste
         i = 0
         Do
             Zeile = StrRead.ReadLine.ToString()
             If (Zeile.StartsWith("*") = False And Zeile.Contains("|")) Then
-                ZeilenArray = Zeile.Split("|")
+                WerteArray = Zeile.Split("|")
                 'Kontrolle
-                If (ZeilenArray.GetUpperBound(0) <> 12) Then
+                If (WerteArray.GetUpperBound(0) <> AnzSpalten + 1) Then
                     Throw New Exception("Die ZIE-Datei hat die falsche Anzahl Spalten!")
                 End If
-                'Werte zuweisen
-                With List_OptZiele(i)
-                    .Bezeichnung = ZeilenArray(1).Trim()
-                    .ZielTyp = ZeilenArray(2).Trim()
-                    .Datei = ZeilenArray(3).Trim()
-                    .SimGr = ZeilenArray(4).Trim()
-                    .ZielFkt = ZeilenArray(5).Trim()
-                    If (ZeilenArray(6).Trim() <> "") Then
-                        .EvalStart = ZeilenArray(6).Trim()
+                'Neues Ziel anlegen
+                ReDim Preserve tmpZiele(i)
+                'Werte einlesen
+                With tmpZiele(i)
+                    If (WerteArray(1).Trim().ToUpper() = "J") Then
+                        .isOpt = True
+                    Else
+                        .isOpt = False
+                    End If
+                    .Bezeichnung = WerteArray(2).Trim()
+                    .ZielTyp = WerteArray(3).Trim()
+                    .Datei = WerteArray(4).Trim()
+                    .SimGr = WerteArray(5).Trim()
+                    .ZielFkt = WerteArray(6).Trim()
+                    If (WerteArray(7).Trim() <> "") Then
+                        .EvalStart = WerteArray(7).Trim()
                     Else
                         .EvalStart = Me.SimStart
                     End If
-                    If ZeilenArray(7).Trim() <> "" Then
-                        .EvalEnde = ZeilenArray(7).Trim()
+                    If WerteArray(8).Trim() <> "" Then
+                        .EvalEnde = WerteArray(8).Trim()
                     Else
                         .EvalEnde = Me.SimEnde
                     End If
-                    .WertTyp = ZeilenArray(8).Trim()
-                    If (ZeilenArray(9).Trim() <> "") Then .ZielWert = Convert.ToDouble(ZeilenArray(9).Trim(), Sim.FortranProvider)
-                    .ZielGr = ZeilenArray(10).Trim()
-                    .ZielReiheDatei = ZeilenArray(11).Trim()
+                    .WertTyp = WerteArray(9).Trim()
+                    If (WerteArray(10).Trim() <> "") Then .ZielWert = Convert.ToDouble(WerteArray(9).Trim(), Sim.FortranProvider)
+                    .ZielGr = WerteArray(11).Trim()
+                    .ZielReiheDatei = WerteArray(12).Trim()
                 End With
                 i += 1
             End If
@@ -550,12 +544,14 @@ Public MustInherit Class Sim
         StrRead.Close()
         FiStr.Close()
 
-        'Falls mit Reihen verglichen werden soll werden hier die Reihen eingelesen
+        'Bei ZielReihen Reihen einlesen
+        '##############################
         Dim ZielStart As Date
         Dim ZielEnde As Date
+        Dim ext As String
 
-        For i = 0 To AnzZiele - 1
-            With List_OptZiele(i)
+        For i = 0 To tmpZiele.GetUpperBound(0)
+            With tmpZiele(i)
                 If (.ZielTyp = "Reihe" Or .ZielTyp = "IHA") Then
 
                     'Dateiendung der Zielreihendatei bestimmen und Reihe einlesen
@@ -571,7 +567,7 @@ Public MustInherit Class Sim
                         Case ".ZRE"
                             Dim ZRE As New Wave.ZRE(Me.WorkDir & .ZielReiheDatei, True)
                             .ZielReihe = ZRE.Zeitreihen(0)
-                        'Case ".PRB"
+                            'Case ".PRB"
                             'BUG 183: geht nicht mehr, weil PRB-Dateien keine Zeitreihen sind!
                             'IsOK = Read_PRB(Me.WorkDir & .ZielReiheDatei, .ZielGr, .ZielReihe)
                         Case Else
@@ -601,11 +597,38 @@ Public MustInherit Class Sim
                 End If
             End With
         Next
+
+        'Aufteilen der tmpZiele in OptZiele und SekZiele
+        '###############################################
+        For i = 0 To tmpZiele.GetUpperBound(0)
+            If (tmpZiele(i).isOpt) Then
+                'OptZiel
+                '-------
+                'Liste um 1 erweitern
+                ReDim Preserve Me.List_OptZiele(Me.List_OptZiele.GetUpperBound(0) + 1)
+                'Ziel kopieren
+                Me.List_OptZiele(Me.List_OptZiele.GetUpperBound(0)) = tmpZiele(i)
+            Else
+                'SekZiel
+                '-------
+                'Liste um 1 erweitern
+                ReDim Preserve Me.List_SekZiele(Me.List_SekZiele.GetUpperBound(0) + 1)
+                'Ziel kopieren
+                Me.List_SekZiele(Me.List_SekZiele.GetUpperBound(0)) = tmpZiele(i)
+            End If
+        Next i
+
+        'ggf. Warnung wegen maximal 3 Dimensionen in Diagramm ausgeben 
+        If (Me.List_OptZiele.Length > 3) Then
+            MsgBox("Die Anzahl der OptZiele beträgt mehr als 3!" & eol _
+                    & "Es werden nur die ersten drei Zielfunktionen im Hauptdiagramm angezeigt!", MsgBoxStyle.Information, "Info")
+        End If
+
     End Sub
 
     'Constraints einlesen
     '********************
-    Private Sub Read_Constraints()
+    Private Sub Read_CON()
 
         Dim AnzConst As Integer = 0
         Dim ext As String
@@ -1440,8 +1463,13 @@ Handler:
 
         'Qualitätswerte berechnen
         For i = 0 To Me.List_OptZiele.GetUpperBound(0)
-            List_OptZiele(i).QWertTmp = QWert(List_OptZiele(i))
-            Indi.Penalty(i) = List_OptZiele(i).QWertTmp
+            Me.List_OptZiele(i).QWertTmp = QWert(Me.List_OptZiele(i))
+            Indi.Penalty(i) = Me.List_OptZiele(i).QWertTmp
+        Next
+
+        'Sekundäre Ziele evaluieren
+        For i = 0 To Me.List_SekZiele.GetUpperBound(0)
+            Me.List_SekZiele(i).QWertTmp = QWert(Me.List_SekZiele(i))
         Next
 
         'Constraints berechnen
@@ -1451,6 +1479,7 @@ Handler:
         Next
 
         'Lösung abspeichern
+        'BUG 274: SekZiele werden noch nicht gespeichert!
         Call Me.OptResult.addSolution(Indi)
 
         SIM_Evaluierung = True

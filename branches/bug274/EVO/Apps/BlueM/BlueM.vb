@@ -134,43 +134,68 @@ Public Class BlueM
 
     'Optimierungsziele einlesen
     '**************************
-    Protected Overrides Sub Read_OptZiele()
+    Protected Overrides Sub Read_ZIE()
 
-        Call MyBase.Read_OptZiele()
+        Call MyBase.Read_ZIE()
 
         'Weiterverarbeitung von ZielReihen:
+        'BUG 274!
         '----------------------------------
         Dim i As Integer
+        Dim IHAZielReihe As Wave.Zeitreihe
+        Dim IHAStart, IHAEnde As DateTime
+
+        IHAZielReihe = New Wave.Zeitreihe("new")
 
         'Gibt es eine IHA-Zielfunktion?
+        'HACK: es wird immer nur das erste IHA-Ziel verwendet!
+        '------------------------------
         For i = 0 To Me.List_OptZiele.GetUpperBound(0)
             If (Me.List_OptZiele(i).ZielTyp = "IHA") Then
-                'HACK: es wird immer nur das erste IHA-Ziel verwendet!
-
                 'IHA-Berechnung einschalten
                 Me.isIHA = True
-
-                'IHAAnalyse-Objekt instanzieren
-                Me.IHASys = New IHWB.IHA.IHAAnalysis(Me.WorkDir & "IHA\", Me.List_OptZiele(i).ZielReihe, Me.SimStart, Me.SimEnde)
-
-                'IHAProcessor-Objekt instanzieren
-                Me.IHAProc = New IHWB.EVO.IHAProcessor()
-
-                'IHA-Vergleichsmodus?
-                '--------------------
-                Dim reffile As String = Me.WorkDir & Me.Datensatz & ".rva"
-                If (File.Exists(reffile)) Then
-
-                    Dim RVABase As New Wave.RVA(reffile)
-
-                    'Vergleichsmodus aktivieren
-                    Call Me.IHAProc.setComparisonMode(RVABase.RVAValues)
-                End If
-
+                IHAZielReihe = Me.List_OptZiele(i).ZielReihe
+                IHAStart = Me.List_OptZiele(i).EvalStart
+                IHAEnde = Me.List_OptZiele(i).EvalEnde
                 Exit For
             End If
-        Next
+        Next i
 
+        'Falls noch keins gefunden auch SekZiele durchsuchen
+        If (Not Me.isIHA) Then
+            For i = 0 To Me.List_SekZiele.GetUpperBound(0)
+                If (Me.List_SekZiele(i).ZielTyp = "IHA") Then
+                    'IHA-Berechnung einschalten
+                    Me.isIHA = True
+                    IHAZielReihe = Me.List_SekZiele(i).ZielReihe
+                    IHAStart = Me.List_SekZiele(i).EvalStart
+                    IHAEnde = Me.List_SekZiele(i).EvalEnde
+                    Exit For
+                End If
+            Next i
+        End If
+
+        'IHA-Berechnung vorbereiten
+        '--------------------------
+        If (Me.isIHA) Then
+            'IHAAnalyse-Objekt instanzieren
+            Me.IHASys = New IHWB.IHA.IHAAnalysis(Me.WorkDir & "IHA\", IHAZielreihe, IHAStart, IHAEnde)
+
+            'IHAProcessor-Objekt instanzieren
+            Me.IHAProc = New IHWB.EVO.IHAProcessor()
+
+            'IHA-Vergleichsmodus?
+            '--------------------
+            Dim reffile As String = Me.WorkDir & Me.Datensatz & ".rva"
+            If (File.Exists(reffile)) Then
+
+                Dim RVABase As New Wave.RVA(reffile)
+
+                'Vergleichsmodus aktivieren
+                Call Me.IHAProc.setComparisonMode(RVABase.RVAValues)
+            End If
+
+        End If
 
     End Sub
 
