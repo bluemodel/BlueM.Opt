@@ -17,11 +17,6 @@ Partial Public Class Scatterplot
     Private Diags(,) As Diagramm
     Private OptResult As IHWB.EVO.OptResult
     Private SekPopOnly As Boolean
-    Private ReadOnly Property nOptZiele() As Integer
-        Get
-            Return Me.OptResult.List_OptZiele.Length()
-        End Get
-    End Property
     Public Event pointSelected(ByVal ind As Kern.Individuum)
 
     'Konstruktor
@@ -72,8 +67,8 @@ Partial Public Class Scatterplot
 
                     'Achsen
                     '------
-                    xAchse = OptResult.List_OptZiele(i).Bezeichnung
-                    yAchse = OptResult.List_OptZiele(j).Bezeichnung
+                    xAchse = Common.Manager.List_OptZiele(i).Bezeichnung
+                    yAchse = Common.Manager.List_OptZiele(j).Bezeichnung
 
                     .Axes.Bottom.Title.Caption = xAchse
                     .Axes.Left.Title.Caption = yAchse
@@ -89,7 +84,7 @@ Partial Public Class Scatterplot
                     'YAchsen
                     If (i = 0) Then
                         'Achse standardm‰ﬂig anzeigen
-                    ElseIf (i = Me.nOptZiele - 1) Then
+                    ElseIf (i = Common.Manager.AnzOptZiele - 1) Then
                         'Achse rechts anzeigen
                         .Axes.Left.OtherSide = True
                     Else
@@ -102,7 +97,7 @@ Partial Public Class Scatterplot
                     If (j = 0) Then
                         'Achse oben anzeigen
                         .Axes.Bottom.OtherSide = True
-                    ElseIf (j = Me.nOptZiele - 1) Then
+                    ElseIf (j = Common.Manager.AnzOptZiele - 1) Then
                         'Achse standardm‰ﬂig anzeigen
                     Else
                         'Achse verstecken
@@ -160,20 +155,20 @@ Partial Public Class Scatterplot
     '*********************
     Private Sub dimensionieren()
 
-        ReDim Me.Diags(Me.nOptZiele - 1, Me.nOptZiele - 1)
+        ReDim Me.Diags(Common.Manager.AnzOptZiele - 1, Common.Manager.AnzOptZiele - 1)
 
         Dim i As Integer
 
         Me.matrix.Name = "Matrix"
 
-        Me.matrix.ColumnCount = Me.nOptZiele
-        For i = 1 To Me.nOptZiele
-            Me.matrix.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100 / Me.nOptZiele))
+        Me.matrix.ColumnCount = Common.Manager.AnzOptZiele
+        For i = 1 To Common.Manager.AnzOptZiele
+            Me.matrix.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100 / Common.Manager.AnzOptZiele))
         Next
 
-        Me.matrix.RowCount = Me.nOptZiele
-        For i = 1 To Me.nOptZiele
-            Me.matrix.RowStyles.Add(New RowStyle(SizeType.Percent, 100 / Me.nOptZiele))
+        Me.matrix.RowCount = Common.Manager.AnzOptZiele
+        For i = 1 To Common.Manager.AnzOptZiele
+            Me.matrix.RowStyles.Add(New RowStyle(SizeType.Percent, 100 / Common.Manager.AnzOptZiele))
         Next
 
     End Sub

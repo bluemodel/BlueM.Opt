@@ -1,4 +1,4 @@
-Public Class OptZiel
+Public Class Ziel
 
     Public isOpt As Boolean                     'Gibt an ob es sich um ein OptZiel oder ein SekZiel handelt
     Public Bezeichnung As String                'Bezeichnung
@@ -11,11 +11,10 @@ Public Class OptZiel
     Public ZielReiheDatei As String             'Der Dateiname der Zielreihe
     Public ZielGr As String                     'Spalte der .wel Datei falls ZielReihe .wel Datei ist
     Public ZielReihe As Wave.Zeitreihe          'Die Werte der Zielreihe
-    Public QWertTmp As Double                   'Qualitätswert der letzten Simulation wird hier zwischengespeichert 
     Public EvalStart As DateTime                'Start des Evaluierungszeitraums
     Public EvalEnde As DateTime                 'Ende des Evaluierungszeitraums
 
-    Public Overrides Function toString() As String
+    Public Overrides Function ToString() As String
         Return Bezeichnung
     End Function
 

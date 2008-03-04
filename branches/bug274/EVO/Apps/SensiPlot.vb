@@ -25,8 +25,8 @@ Partial Public Class SensiPlot
         ListBox_OptParameter.Items.Add(OptParameter)
     End Sub
 
-    Public Sub ListBox_OptZiele_add(ByVal OptZiel As Common.OptZiel)
-        ListBox_OptZiele.Items.Add(OptZiel)
+    Public Sub ListBox_OptZiele_add(ByVal ziel As Common.Ziel)
+        ListBox_OptZiele.Items.Add(ziel)
     End Sub
 
     'Überprüfung und Anwendung der Einstellungen

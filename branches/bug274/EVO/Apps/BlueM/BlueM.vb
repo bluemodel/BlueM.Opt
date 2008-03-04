@@ -139,9 +139,7 @@ Public Class BlueM
         Call MyBase.Read_ZIE()
 
         'Weiterverarbeitung von ZielReihen:
-        'BUG 274!
         '----------------------------------
-        Dim i As Integer
         Dim IHAZielReihe As Wave.Zeitreihe
         Dim IHAStart, IHAEnde As DateTime
 
@@ -150,30 +148,16 @@ Public Class BlueM
         'Gibt es eine IHA-Zielfunktion?
         'HACK: es wird immer nur das erste IHA-Ziel verwendet!
         '------------------------------
-        For i = 0 To Me.OptZielMgr.List_OptZiele.GetUpperBound(0)
-            If (Me.OptZielMgr.List_OptZiele(i).ZielTyp = "IHA") Then
+        For Each ziel As Common.Ziel In Common.Manager.List_Ziele
+            If (ziel.ZielTyp = "IHA") Then
                 'IHA-Berechnung einschalten
                 Me.isIHA = True
-                IHAZielReihe = Me.OptZielMgr.List_OptZiele(i).ZielReihe
-                IHAStart = Me.OptZielMgr.List_OptZiele(i).EvalStart
-                IHAEnde = Me.OptZielMgr.List_OptZiele(i).EvalEnde
+                IHAZielReihe = ziel.ZielReihe
+                IHAStart = ziel.EvalStart
+                IHAEnde = ziel.EvalEnde
                 Exit For
             End If
-        Next i
-
-        'Falls noch keins gefunden auch SekZiele durchsuchen
-        If (Not Me.isIHA) Then
-            For i = 0 To Me.OptZielMgr.List_SekZiele.GetUpperBound(0)
-                If (Me.OptZielMgr.List_SekZiele(i).ZielTyp = "IHA") Then
-                    'IHA-Berechnung einschalten
-                    Me.isIHA = True
-                    IHAZielReihe = Me.OptZielMgr.List_SekZiele(i).ZielReihe
-                    IHAStart = Me.OptZielMgr.List_SekZiele(i).EvalStart
-                    IHAEnde = Me.OptZielMgr.List_SekZiele(i).EvalEnde
-                    Exit For
-                End If
-            Next i
-        End If
+        Next
 
         'IHA-Berechnung vorbereiten
         '--------------------------
@@ -325,7 +309,6 @@ Public Class BlueM
     Public Overrides Function launchSim() As Boolean
 
         Dim simOK As Boolean
-        Dim i As Integer
 
         Try
 
@@ -373,9 +356,9 @@ Public Class BlueM
             If (Me.isIHA) Then
                 'IHA-Ziel raussuchen und Simulationsreihe übergeben
                 'HACK: es wird immer das erste IHA-Ziel verwendet!
-                For i = 0 To Me.OptZielMgr.List_OptZiele.GetUpperBound(0)
-                    If (Me.OptZielMgr.List_OptZiele(i).ZielTyp = "IHA") Then
-                        Call Me.IHASys.calculate_IHA(Me.SimErgebnis(Me.OptZielMgr.List_OptZiele(i).SimGr))
+                For Each ziel As Common.Ziel In Common.Manager.List_Ziele
+                    If (ziel.ZielTyp = "IHA") Then
+                        Call Me.IHASys.calculate_IHA(Me.SimErgebnis(ziel.SimGr))
                         Exit For
                     End If
                 Next
@@ -393,17 +376,17 @@ Public Class BlueM
 
     'Berechnung des Qualitätswerts (Zielwert)
     '****************************************
-    Public Overrides Function QWert(ByVal OptZiel As Common.OptZiel) As Double
+    Public Overrides Function QWert(ByVal ziel As Common.Ziel) As Double
 
         QWert = 0
 
         'Fallunterscheidung Ergebnisdatei
         '--------------------------------
-        Select Case OptZiel.Datei
+        Select Case ziel.Datei
 
             Case "WEL"
                 'QWert aus WEL-Datei
-                QWert = QWert_WEL(OptZiel)
+                QWert = QWert_WEL(ziel)
 
             Case "PRB"
                 'QWert aus PRB-Datei
@@ -412,7 +395,7 @@ Public Class BlueM
                 'QWert = QWert_PRB(OptZiel)
 
             Case Else
-                Throw New Exception("Der Wert '" & Optziel.Datei & "' für die Datei wird bei Optimierungszielen für BlueM nicht akzeptiert!")
+                Throw New Exception("Der Wert '" & ziel.Datei & "' für die Datei wird bei Optimierungszielen für BlueM nicht akzeptiert!")
 
         End Select
 
@@ -420,29 +403,29 @@ Public Class BlueM
 
     'Qualitätswert aus WEL-Datei
     '***************************
-    Private Function QWert_WEL(ByVal OptZiel As Common.OptZiel) As Double
+    Private Function QWert_WEL(ByVal ziel As Common.Ziel) As Double
 
         Dim QWert As Double
         Dim SimReihe As Wave.Zeitreihe
 
         'Simulationsergebnis auslesen
-        SimReihe = Me.SimErgebnis(OptZiel.SimGr)
+        SimReihe = Me.SimErgebnis(ziel.SimGr)
 
         'Fallunterscheidung Zieltyp
         '--------------------------
-        Select Case OptZiel.ZielTyp
+        Select Case ziel.ZielTyp
 
             Case "Wert"
-                QWert = MyBase.QWert_Wert(OptZiel, SimReihe)
+                QWert = MyBase.QWert_Wert(ziel, SimReihe)
 
             Case "Reihe"
-                QWert = MyBase.QWert_Reihe(OptZiel, SimReihe)
+                QWert = MyBase.QWert_Reihe(ziel, SimReihe)
 
             Case "Kosten"
                 QWert = Me.SKos1.calculate_costs(Me)
 
             Case "IHA"
-                QWert = Me.IHAProc.QWert_IHA(OptZiel, Me.IHASys.RVAResult)
+                QWert = Me.IHAProc.QWert_IHA(ziel, Me.IHASys.RVAResult)
 
         End Select
 

@@ -216,8 +216,8 @@ Public Class Smusi
             Dim elemente As New Collection()
 
             'Einzulesende Dateien zusammenstellen
-            For Each optziel As Common.OptZiel In Me.OptZielMgr.List_OptZiele
-                element = optziel.SimGr.Substring(0, 4)
+            For Each ziel As Common.Ziel In Common.Manager.List_Ziele
+                element = ziel.SimGr.Substring(0, 4)
                 If (Not elemente.Contains(element)) Then
                     elemente.Add(element, element)
                 End If
@@ -246,20 +246,20 @@ Public Class Smusi
 
     'Berechnung des Qualitätswerts (Zielwert)
     '****************************************
-    Public Overrides Function QWert(ByVal OptZiel As Common.OptZiel) As Double
+    Public Overrides Function QWert(ByVal ziel As Common.Ziel) As Double
 
         QWert = 0
 
         'Fallunterscheidung Ergebnisdatei
         '--------------------------------
-        Select Case OptZiel.Datei
+        Select Case ziel.Datei
 
             Case "ASC"
                 'QWert aus ASC-Datei
-                QWert = QWert_ASC(OptZiel)
+                QWert = QWert_ASC(ziel)
 
             Case Else
-                Throw New Exception("Der Wert '" & OptZiel.Datei & "' für die Datei wird bei Optimierungszielen für SMUSI nicht akzeptiert!")
+                Throw New Exception("Der Wert '" & ziel.Datei & "' für die Datei wird bei Optimierungszielen für SMUSI nicht akzeptiert!")
 
         End Select
 
@@ -267,23 +267,23 @@ Public Class Smusi
 
     'Qualitätswert aus ASC-Datei
     '***************************
-    Private Function QWert_ASC(ByVal OptZiel As Common.OptZiel) As Double
+    Private Function QWert_ASC(ByVal ziel As Common.Ziel) As Double
 
         Dim QWert As Double
         Dim SimReihe As Wave.Zeitreihe
 
         'Simulationsergebnis auslesen
-        SimReihe = Me.SimErgebnis(OptZiel.SimGr)
+        SimReihe = Me.SimErgebnis(ziel.SimGr)
 
         'Fallunterscheidung Zieltyp
         '--------------------------
-        Select Case OptZiel.ZielTyp
+        Select Case ziel.ZielTyp
 
             Case "Wert"
-                QWert = MyBase.QWert_Wert(OptZiel, SimReihe)
+                QWert = MyBase.QWert_Wert(ziel, SimReihe)
 
             Case "Reihe"
-                QWert = MyBase.QWert_Reihe(OptZiel, SimReihe)
+                QWert = MyBase.QWert_Reihe(ziel, SimReihe)
 
         End Select
 

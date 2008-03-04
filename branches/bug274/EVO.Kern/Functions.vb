@@ -26,7 +26,6 @@ Public Class Functions
     Dim NMemberSecondPop As Integer
     Dim NInteract As Integer
     Dim isInteract As Boolean
-    Dim NPenalty As Integer
     Dim NConstr As Integer
     Dim iAktGen As Integer
     Dim iAktPop As Integer
@@ -42,14 +41,13 @@ Public Class Functions
 
     'Die Statische Variablen werden im Konstruktor übergeben
     '*******************************************************
-    Public Sub New(ByVal _NNachf As Integer, ByVal _NEltern As Integer, ByVal _NMemberSecondPop As Integer, ByVal _NInteract As Integer, ByVal _isInteract As Boolean, ByVal _NPenalty As Integer, ByVal _NConstr As Integer, ByVal _iAktGen As Integer)
+    Public Sub New(ByVal _NNachf As Integer, ByVal _NEltern As Integer, ByVal _NMemberSecondPop As Integer, ByVal _NInteract As Integer, ByVal _isInteract As Boolean, ByVal _NConstr As Integer, ByVal _iAktGen As Integer)
 
         NNachf = _NNachf
         NEltern = _NEltern
         NMemberSecondPop = _NMemberSecondPop
         NInteract = _NInteract
         isInteract = _isInteract
-        NPenalty = _NPenalty
         NConstr = _NConstr
         iAktGen = _iAktGen
 
@@ -216,7 +214,7 @@ Public Class Functions
         For i = 0 To SekundärQb.GetUpperBound(0) - 2
             For j = i + 1 To SekundärQb.GetUpperBound(0)
                 Logical = True
-                For k = 0 To NPenalty - 1
+                For k = 0 To Common.Manager.AnzOptZiele - 1
                     Logical = Logical And (SekundärQb(i).Penalty(k) = SekundärQb(j).Penalty(k))
                 Next k
                 If (Logical) Then SekundärQb(i).dominated = True
@@ -310,11 +308,11 @@ Public Class Functions
                         '------------
                         isDominated = False
 
-                        For k = 0 To NPenalty - 1
+                        For k = 0 To Common.Manager.AnzOptZiele - 1
                             isDominated = isDominated Or (NDSorting(i).Penalty(k) < NDSorting(j).Penalty(k))
                         Next k
 
-                        For k = 0 To NPenalty - 1
+                        For k = 0 To Common.Manager.AnzOptZiele - 1
                             isDominated = isDominated And (NDSorting(i).Penalty(k) <= NDSorting(j).Penalty(k))
                         Next k
 
@@ -334,11 +332,11 @@ Public Class Functions
 
                     isDominated = False
 
-                    For k = 0 To NPenalty - 1
+                    For k = 0 To Common.Manager.AnzOptZiele - 1
                         isDominated = isDominated Or (NDSorting(i).Penalty(k) < NDSorting(j).Penalty(k))
                     Next k
 
-                    For k = 0 To NPenalty - 1
+                    For k = 0 To Common.Manager.AnzOptZiele - 1
                         isDominated = isDominated And (NDSorting(i).Penalty(k) <= NDSorting(j).Penalty(k))
                     Next k
 
@@ -448,7 +446,7 @@ Public Class Functions
         Dim swap As New Individuum("Swap", 0)
         Dim fmin, fmax As Double
 
-        For k = 0 To NPenalty - 1
+        For k = 0 To Common.Manager.AnzOptZiele - 1
             For i = StartIndex To EndIndex
                 For j = StartIndex To EndIndex
                     If (_Individ(i).Penalty(k) < _Individ(j).Penalty(k)) Then
@@ -500,7 +498,7 @@ Public Class Functions
             _Individ(i).Distance = 0.0
         Next i
 
-        For k = 0 To NPenalty - 1
+        For k = 0 To Common.Manager.AnzOptZiele - 1
             For i = StartIndex To EndIndex
                 For j = StartIndex To EndIndex
                     If (_Individ(i).Penalty(k) < _Individ(j).Penalty(k)) Then

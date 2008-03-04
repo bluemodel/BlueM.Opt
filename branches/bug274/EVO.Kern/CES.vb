@@ -23,7 +23,6 @@ Public Class CES
     
     'Modell Setting
     Public Structure ModSettings
-        Public n_Penalty As Integer             'Anzahl der Ziele
         Public n_Constrain As Integer           'Anzahl der Randbedingungen
         Public n_Locations As Integer           'Anzahl der Locations
         Public n_Verzweig As Integer            'Anzahl der Verzweigungen in der Verzweigungsdatei
@@ -142,8 +141,7 @@ Public Class CES
         End If
 
         'Übergabe
-        ModSett.n_Penalty = AnzPenalty
-        modsett.n_Constrain = AnzConstr
+        ModSett.n_Constrain = AnzConstr
         modsett.n_Locations = AnzLocations
         modsett.n_Verzweig = AnzVerzweig
         modsett.n_PathDimension = AnzPathDimension.Clone
@@ -157,7 +155,7 @@ Public Class CES
 
         'Die Variablen für die Individuuen werden gesetzt
         '************************************************
-        EVO.Kern.Individuum.Initialise(2, ModSett.n_Locations, 0, ModSett.n_Penalty, ModSett.n_Constrain)
+        EVO.Kern.Individuum.Initialise(2, ModSett.n_Locations, 0, ModSett.n_Constrain)
         
         'Parents werden dimensioniert
         ReDim Parents(Settings.CES.n_Parents - 1)
@@ -833,7 +831,7 @@ Public Class CES
         '3. Der Bestwertspeicher wird entsprechend der Fronten oder der sekundären Population gefüllt
         '4: Sekundäre Population wird bestimmt und gespeichert
         '--------------------------------
-        Dim Func1 As New Kern.Functions(n_PES_Childs, Settings.PES.n_Eltern, Settings.CES.n_PES_MemSecPop, Settings.CES.n_PES_Interact, Settings.CES.is_PES_SecPop, ModSett.n_Penalty, ModSett.n_Constrain, 1)
+        Dim Func1 As New Kern.Functions(n_PES_Childs, Settings.PES.n_Eltern, Settings.CES.n_PES_MemSecPop, Settings.CES.n_PES_Interact, Settings.CES.is_PES_SecPop, ModSett.n_Constrain, 1)
         Call Func1.EsEltern_Pareto_SekundärQb(PES_Parents_pLoc, NDSorting, PES_SekundärQb)
         '********************************************************************************************
 
@@ -1048,7 +1046,7 @@ Public Class CES
         '3. Der Bestwertspeicher wird entsprechend der Fronten oder der sekundären Population gefüllt
         '4: Sekundäre Population wird bestimmt und gespeichert
         '--------------------------------
-        Dim Func1 As New Kern.Functions(Settings.CES.n_Childs, Settings.CES.n_Parents, Settings.CES.n_MemberSecondPop, Settings.CES.n_Interact, Settings.CES.is_SecPop, ModSett.n_Penalty, ModSett.n_Constrain, iAktGen)
+        Dim Func1 As New Kern.Functions(Settings.CES.n_Childs, Settings.CES.n_Parents, Settings.CES.n_MemberSecondPop, Settings.CES.n_Interact, Settings.CES.is_SecPop, ModSett.n_Constrain, iAktGen)
         Call Func1.EsEltern_Pareto_SekundärQb(Parents, NDSorting, SekundärQb)
         '********************************************************************************************
 

@@ -3,7 +3,7 @@ Public Class MDBImportDialog
     'Form load
     '*********
     Private Sub MDBImportDialog_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
-        If Form1.Sim1.OptZielMgr.AnzOptZiele < 2 Then
+        If (Common.Manager.AnzOptZiele < 2) Then
             Me.ComboBox_SekPop.SelectedIndex = 1
         Else
             Me.ComboBox_SekPop.SelectedIndex = 0

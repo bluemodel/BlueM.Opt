@@ -25,7 +25,6 @@ Public Class OptResult
     Private db As OleDb.OleDbConnection
 
     'Optimierungsbedingungen
-    Public List_OptZiele() As Common.OptZiel
     Public List_OptParameter() As EVO.Kern.OptParameter
     Public List_OptParameter_Save() As EVO.Kern.OptParameter
     Public List_Constraints() As Sim.Struct_Constraint
@@ -54,7 +53,6 @@ Public Class OptResult
         Me.Datensatz = Sim1.Datensatz
 
         'Optimierungsbedingungen kopieren
-        Me.List_OptZiele = Sim1.OptZielMgr.List_OptZiele
         Me.List_OptParameter = Sim1.List_OptParameter
         Me.List_OptParameter_Save = sim1.List_OptParameter_Save
         Me.List_Constraints = Sim1.List_Constraints
@@ -266,11 +264,11 @@ Public Class OptResult
         '----------------
         'Spalten festlegen:
         Dim fieldnames As String = ""
-        For i = 0 To List_OptZiele.GetUpperBound(0)
+        For i = 0 To Common.Manager.AnzGesZiele - 1
             If (i > 0) Then
                 fieldnames &= ", "
             End If
-            fieldnames &= "[" & List_OptZiele(i).Bezeichnung & "] DOUBLE"
+            fieldnames &= "[" & Common.Manager.List_Ziele(i).Bezeichnung & "] DOUBLE"
         Next
         'Tabelle anpassen
         command.CommandText = "ALTER TABLE QWerte ADD COLUMN " & fieldnames
@@ -391,9 +389,9 @@ Public Class OptResult
         '----------------
         Dim fieldnames As String = ""
         Dim fieldvalues As String = ""
-        For i = 0 To List_OptZiele.GetUpperBound(0)
-            fieldnames &= ", [" & List_OptZiele(i).Bezeichnung & "]"
-            fieldvalues &= ", " & ind.Penalty(i).ToString(Common.Provider.FortranProvider)
+        For i = 0 To Common.Manager.AnzGesZiele - 1
+            fieldnames &= ", [" & Common.Manager.List_Ziele(i).Bezeichnung & "]"
+            fieldvalues &= ", " & ind.QWerte(i).ToString(Common.Provider.FortranProvider)
         Next
         command.CommandText = "INSERT INTO QWerte (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
         command.ExecuteNonQuery()
@@ -496,8 +494,8 @@ Public Class OptResult
 
             'zugehörige Sim_ID bestimmen
             bedingung = ""
-            For j = 0 To Me.List_OptZiele.GetUpperBound(0)
-                bedingung &= " AND QWerte.[" & Me.List_OptZiele(j).Bezeichnung & "] = " & SekPop(i, j).ToString(EVO.Common.Provider.FortranProvider)
+            For j = 0 To Common.Manager.AnzGesZiele - 1
+                bedingung &= " AND QWerte.[" & Common.Manager.List_Ziele(j).Bezeichnung & "] = " & SekPop(i, j).ToString(Common.Provider.FortranProvider)
             Next
             command.CommandText = "SELECT Sim.ID FROM Sim INNER JOIN QWerte ON Sim.ID = QWerte.Sim_ID WHERE (1=1" & bedingung & ")"
             Sim_ID = command.ExecuteScalar()
@@ -589,7 +587,7 @@ Public Class OptResult
         'Read
         '----
         'Alle Lösungen
-        Select form1.Method
+        Select Case Form1.Method
             Case METH_PES, METH_SENSIPLOT, METH_HOOKJEEVES
                 q = "SELECT Sim.ID, OptParameter.*, QWerte.*, Constraints.* FROM ((Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN OptParameter ON Sim.ID=OptParameter.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID ORDER BY Sim.ID"
             Case METH_CES
@@ -628,7 +626,7 @@ Public Class OptResult
                 'ID
                 '--
                 .ID = ds.Tables(0).Rows(i).Item("Sim.ID")
-                
+
                 ReDim .PES_OptParas(Me.List_OptParameter_Save.GetUpperBound(0))
 
                 'OptParameter
@@ -640,9 +638,8 @@ Public Class OptResult
 
                 'QWerte
                 '------
-                ReDim .Penalty(Me.List_OptZiele.GetUpperBound(0))
-                For j = 0 To Me.List_OptZiele.GetUpperBound(0)
-                    .Penalty(j) = ds.Tables(0).Rows(i).Item(Me.List_OptZiele(j).Bezeichnung)
+                For j = 0 To Common.Manager.AnzGesZiele - 1
+                    .QWerte(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Ziele(j).Bezeichnung)
                 Next
 
                 'Constraints

@@ -133,15 +133,15 @@ Partial Public Class Testprobleme
 
     'Parameterübergabe
     '*****************
-    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzZiel As Short, ByRef globalAnzRand As Short, ByRef mypara() As EVO.Kern.OptParameter)
+    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzRand As Short, ByRef mypara() As EVO.Kern.OptParameter)
 
-        Dim i As Integer
+        Dim i, AnzZiele As Integer
 
         Select Case Me.Combo_Testproblem.Text
 
             Case "Sinus-Funktion"
                 globalAnzPar = Me.AnzParameter
-                globalAnzZiel = 1
+                AnzZiele = 1
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
                 For i = 0 To globalAnzPar - 1
@@ -151,7 +151,7 @@ Partial Public Class Testprobleme
 
             Case "Beale-Problem" 'x1 = [-5;5], x2=[-2;2]
                 globalAnzPar = 2
-                globalAnzZiel = 1
+                AnzZiele = 1
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
                 For i = 0 To globalAnzPar - 1
@@ -161,7 +161,7 @@ Partial Public Class Testprobleme
 
             Case "Schwefel 2.4-Problem" 'xi = [-10,10]
                 globalAnzPar = Me.AnzParameter
-                globalAnzZiel = 1
+                AnzZiele = 1
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
                 For i = 0 To globalAnzPar - 1
@@ -171,7 +171,7 @@ Partial Public Class Testprobleme
 
             Case "Deb 1" 'x1 = [0.1;1], x2=[0;5]
                 globalAnzPar = 2
-                globalAnzZiel = 2
+                AnzZiele = 2
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
                 Randomize()
@@ -182,7 +182,7 @@ Partial Public Class Testprobleme
 
             Case "Zitzler/Deb T1" 'xi = [0,1]
                 globalAnzPar = 30
-                globalAnzZiel = 2
+                AnzZiele = 2
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
                 Randomize()
@@ -193,7 +193,7 @@ Partial Public Class Testprobleme
 
             Case "Zitzler/Deb T2" 'xi = [0,1]
                 globalAnzPar = 30
-                globalAnzZiel = 2
+                AnzZiele = 2
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
                 Randomize()
@@ -204,7 +204,7 @@ Partial Public Class Testprobleme
 
             Case "Zitzler/Deb T3" 'xi = [0,1]
                 globalAnzPar = 15
-                globalAnzZiel = 2
+                AnzZiele = 2
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
                 Randomize()
@@ -215,7 +215,7 @@ Partial Public Class Testprobleme
 
             Case "Zitzler/Deb T4" 'x1 = [0,1], xi=[-5,5]
                 globalAnzPar = 10
-                globalAnzZiel = 2
+                AnzZiele = 2
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
                 Randomize()
@@ -226,7 +226,7 @@ Partial Public Class Testprobleme
 
             Case "CONSTR" 'x1 = [0.1;1], x2=[0;5]
                 globalAnzPar = 2
-                globalAnzZiel = 2
+                AnzZiele = 2
                 globalAnzRand = 2
                 ReDim mypara(globalAnzPar - 1)
                 Randomize()
@@ -237,7 +237,7 @@ Partial Public Class Testprobleme
 
             Case "Box"
                 globalAnzPar = 3
-                globalAnzZiel = 3
+                AnzZiele = 3
                 globalAnzRand = 2
                 ReDim mypara(globalAnzPar - 1)
                 Randomize()
@@ -248,7 +248,7 @@ Partial Public Class Testprobleme
 
             Case "Abhängige Parameter"
                 globalAnzPar = 2
-                globalAnzZiel = 1
+                AnzZiele = 1
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
                 For i = 0 To globalAnzPar - 1
@@ -260,6 +260,9 @@ Partial Public Class Testprobleme
                 mypara(1).Beziehung = EVO.Kern.PES.Beziehung.groesser
 
         End Select
+
+        'Anzahl Ziele dem Manager mitteilen
+        ReDim Common.Manager.List_Ziele(AnzZiele - 1)
 
     End Sub
 
