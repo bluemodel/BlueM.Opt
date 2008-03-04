@@ -1,20 +1,20 @@
 Imports System.Globalization
 
-Public Class Provider
+Public Module Provider
 
-    Public Shared Function FortranProvider() As NumberFormatInfo
+    Public ReadOnly Property FortranProvider() As NumberFormatInfo
+        Get
+            'Fortran Provider einrichten
+            '---------------------------
+            Dim provider As New NumberFormatInfo()
 
-        'Fortran Provider einrichten
-        '-------------------
-        Dim provider As NumberFormatInfo
+            provider.NumberDecimalSeparator = "."
+            provider.NumberGroupSeparator = ""
+            provider.NumberGroupSizes = New Integer() {3}
 
-        provider = New NumberFormatInfo()
-        provider.NumberDecimalSeparator = "."
-        provider.NumberGroupSeparator = ""
-        provider.NumberGroupSizes = New Integer() {3}
+            Return provider
+        End Get
 
-        Return provider
+    End Property
 
-    End Function
-
-End Class
+End Module
