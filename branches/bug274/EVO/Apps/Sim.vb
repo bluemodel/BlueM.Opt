@@ -453,7 +453,7 @@ Public MustInherit Class Sim
         Call Me.OptZielMgr.Read_ZIE(ZIE_Datei)
 
         'ggf. Warnung wegen maximal 3 Dimensionen in Diagramm ausgeben 
-        If (Me.OptZielMgr.List_OptZiele.Length > 3) Then
+        If (Me.OptZielMgr.AnzOptZiele > 3) Then
             MsgBox("Die Anzahl der OptZiele beträgt mehr als 3!" & eol _
                     & "Es werden nur die ersten drei Zielfunktionen im Hauptdiagramm angezeigt!", MsgBoxStyle.Information, "Info")
         End If
@@ -1138,7 +1138,7 @@ Public MustInherit Class Sim
         Next
 
         'Anzahl Optimierungsziele übergeben
-        globalAnzZiel = Me.OptZielMgr.List_OptZiele.GetLength(0)
+        globalAnzZiel = Me.OptZielMgr.AnzOptZiele
 
         'Anzahl Randbedingungen übergeben
         globalAnzRand = Me.List_Constraints.GetLength(0)

@@ -7,6 +7,12 @@ Public Class ObjectiveManager
     Public List_OptZiele() As OptZiel          'Liste der Zielfunktionen
     Public List_SekZiele() As OptZiel          'Liste der Sekundären Zielfunktionen
 
+    Public ReadOnly Property AnzOptZiele() As Integer
+        Get
+            Return Me.List_OptZiele.Length()
+        End Get
+    End Property
+
     'Konstruktor
     '***********
     Public Sub New(ByVal start As DateTime, ByVal ende As DateTime)

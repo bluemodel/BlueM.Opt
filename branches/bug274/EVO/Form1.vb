@@ -334,9 +334,11 @@ Partial Class Form1
                     'EVO_Einstellungen einrichten
                     EVO_Einstellungen1.Enabled = True
                     Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_PES
-                    If (Sim1.OptZielMgr.List_OptZiele.GetLength(0) = 1) Then
+                    If (Sim1.OptZielMgr.AnzOptZiele = 1) Then
+                        'Single-Objective
                         Call EVO_Einstellungen1.setStandard_PES(Kern.EVO_MODUS.Single_Objective)
-                    ElseIf (Sim1.OptZielMgr.List_OptZiele.GetLength(0) > 1) Then
+                    ElseIf (Sim1.OptZielMgr.AnzOptZiele > 1) Then
+                        'Multi-Objective
                         Call EVO_Einstellungen1.setStandard_PES(Kern.EVO_MODUS.Multi_Objective)
                     End If
 
@@ -354,9 +356,9 @@ Partial Class Form1
                     Me.EVO_Einstellungen1.Enabled = True
                     Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_HookeJeeves
                     'Nur SO möglich
-                    If (Sim1.OptZielMgr.List_OptZiele.GetLength(0) = 1) Then
+                    If (Sim1.OptZielMgr.AnzOptZiele = 1) Then
                         Call EVO_Einstellungen1.setStandard_HJ()
-                    ElseIf Sim1.OptZielMgr.List_OptZiele.GetLength(0) > 1 Then
+                    ElseIf Sim1.OptZielMgr.AnzOptZiele > 1 Then
                         Throw New Exception("Methode von Hook und Jeeves erlaubt nur SO-Optimierung!")
                     End If
 
@@ -405,9 +407,11 @@ Partial Class Form1
                     Call EVO_Einstellungen1.setStandard_CES()
 
                     'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten PES
-                    If (Sim1.OptZielMgr.List_OptZiele.GetLength(0) = 1) Then
+                    If (Sim1.OptZielMgr.AnzOptZiele = 1) Then
+                        'Single-Objective
                         Call EVO_Einstellungen1.setStandard_PES(Kern.EVO_MODUS.Single_Objective)
-                    ElseIf (Sim1.OptZielMgr.List_OptZiele.GetLength(0) > 1) Then
+                    ElseIf (Sim1.OptZielMgr.AnzOptZiele > 1) Then
+                        'Multi-Objective
                         Call EVO_Einstellungen1.setStandard_PES(Kern.EVO_MODUS.Multi_Objective)
                     End If
 
@@ -618,7 +622,7 @@ Partial Class Form1
         Dim Wave1 As Wave.Wave
 
         'Instanzieren
-        ReDim QN(Sim1.OptZielMgr.List_OptZiele.GetUpperBound(0))
+        ReDim QN(Sim1.OptZielMgr.AnzOptZiele - 1)
         ReDim RN(Sim1.List_Constraints.GetUpperBound(0))
         SimReihen = New Collection
 
@@ -802,7 +806,7 @@ Partial Class Form1
         'CES initialisieren
         '******************
         CES1 = New EVO.Kern.CES()
-        Call Ces1.CESInitialise(EVO_Einstellungen1.Settings, Method, sim1.CES_T_Modus, Sim1.OptZielMgr.List_OptZiele.GetLength(0), Sim1.List_Constraints.GetLength(0), Sim1.List_Locations.GetLength(0), Sim1.VerzweigungsDatei.GetLength(0), sim1.n_Combinations, sim1.n_PathDimension)
+        Call Ces1.CESInitialise(EVO_Einstellungen1.Settings, Method, sim1.CES_T_Modus, Sim1.OptZielMgr.AnzOptZiele, Sim1.List_Constraints.GetLength(0), Sim1.List_Locations.GetLength(0), Sim1.VerzweigungsDatei.GetLength(0), sim1.n_Combinations, sim1.n_PathDimension)
         
         'Die alten Bekannten
         globalAnzZiel = CES1.ModSett.n_Penalty
@@ -2073,11 +2077,11 @@ Start_Evolutionsrunden:
             Next
 
             'Bei weniger als 3 Zielen Z-Achse ausblenden
-            If (Sim1.OptZielMgr.List_OptZiele.Length < 3) Then
+            If (Sim1.OptZielMgr.AnzOptZiele < 3) Then
                 importDialog.ListBox_OptZieleZ.Enabled = False
             End If
             'Bei weniger als 2 Zielen Y-Achse ausblenden
-            If (Sim1.OptZielMgr.List_OptZiele.Length < 2) Then
+            If (Sim1.OptZielMgr.AnzOptZiele < 2) Then
                 importDialog.ListBox_OptZieleY.Enabled = False
             End If
 
