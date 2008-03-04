@@ -45,7 +45,7 @@ Public Class CES
     Public Memory() As EVO.Kern.Individuum
     Public PES_Parents_pChild() As EVO.Kern.Individuum
     Public PES_Parents_pLoc() As EVO.Kern.Individuum
-    Private PES_SekundärQb(-1) As EVO.Kern.Individuum
+    'Private PES_SekundärQb(-1) As EVO.Kern.Individuum
 
 #End Region 'Eigenschaften
 
@@ -878,42 +878,6 @@ Public Class CES
         Next
     End Sub
 
-    Sub Memory_NDSorting()
-
-        Dim i As Short
-
-        Dim NDSorting(PES_Parents_pLoc.GetUpperBound(0)) As Individuum
-        Call Individuum.New_Array("NDSorting", NDSorting)
-
-        '1. ALLE werden reinkopiert (anders als beim normalen Verfahren)
-        '---------------------------------------------------------------
-        For i = 0 To PES_Parents_pLoc.GetUpperBound(0)
-            NDSorting(i) = PES_Parents_pLoc(i).Clone()
-            NDSorting(i).dominated = False
-            NDSorting(i).Front = 0
-            NDSorting(i).Distance = 0
-        Next i
-
-        'Die Anzahlen werden hier speziell errechnet
-        Dim n_PES_Childs As Integer
-        n_PES_Childs = PES_Parents_pLoc.GetLength(0) - Settings.PES.n_Eltern
-
-        'Die Eltern werden zurückgesetzt
-        ReDim PES_Parents_pLoc(Settings.PES.n_Eltern - 1)
-
-        '********************* Alles in der Klasse Functions ****************************************
-        '2. Die einzelnen Fronten werden bestimmt
-        '3. Der Bestwertspeicher wird entsprechend der Fronten oder der sekundären Population gefüllt
-        '4: Sekundäre Population wird bestimmt und gespeichert
-        '--------------------------------
-        Dim Func1 As New Kern.Functions(n_PES_Childs, Settings.PES.n_Eltern, Settings.CES.n_PES_MemSecPop, Settings.CES.n_PES_Interact, Settings.CES.is_PES_SecPop, ModSett.n_Penalty, ModSett.n_Constrain, 1)
-        Call Func1.EsEltern_Pareto(PES_Parents_pLoc, NDSorting, PES_SekundärQb)
-        '********************************************************************************************
-
-        'SekundärQB macht in dieser Form noch keinen Sinn !!!!!!!!!!!!!!!!!!!
-
-    End Sub
-
     'Füllt die PES Parents per Location auf die erforderliche Anzahl auf
     '*******************************************************************
     Public Sub fill_Parents_per_Loc(ByRef Parents_pLoc() as Individuum, ByVal n_eltern as Integer)
@@ -1065,7 +1029,7 @@ Public Class CES
 
     'Steuerung des NDSorting (Ursprünglich aus ES Eltern)
     '****************************************************
-    Public Sub NDSorting_Control(ByVal iAktGen As Integer)
+    Public Sub NDSorting_CES_Control(ByVal iAktGen As Integer)
         Dim i As Short
 
         Dim NDSorting(Settings.CES.n_Childs + Settings.CES.n_Parents - 1) As Individuum
@@ -1124,6 +1088,48 @@ Public Class CES
         'End If
 
     End Sub
+
+        'Sortiert das PES Parents per Location
+        'Sekundär_QB wird hier nicht berücksichtigt (schlicht ausgeschaltet mit no_interact)
+        '***********************************************************************************
+        Sub NDSorting_PES_Parents_per_Loc(ByVal iAktGen As Integer)
+
+        Dim i As Short
+
+        Dim NDSorting(PES_Parents_pLoc.GetUpperBound(0)) As Individuum
+        Call Individuum.New_Array("NDSorting", NDSorting)
+
+        '1. ALLE werden reinkopiert (anders als beim normalen Verfahren)
+        '---------------------------------------------------------------
+        For i = 0 To PES_Parents_pLoc.GetUpperBound(0)
+            NDSorting(i) = PES_Parents_pLoc(i).Clone()
+            NDSorting(i).dominated = False
+            NDSorting(i).Front = 0
+            NDSorting(i).Distance = 0
+        Next i
+
+        'Die Anzahlen werden hier speziell errechnet
+        Dim n_PES_Childs As Integer
+        n_PES_Childs = PES_Parents_pLoc.GetLength(0) - Settings.PES.n_Eltern
+
+        'Die Eltern werden zurückgesetzt
+        ReDim PES_Parents_pLoc(Settings.PES.n_Eltern - 1)
+
+        '********************* Alles in der Klasse Functions ****************************************
+        '2. Die einzelnen Fronten werden bestimmt
+        '3. Der Bestwertspeicher wird entsprechend der Fronten oder der sekundären Population gefüllt
+        '4: Sekundäre Population wird bestimmt und gespeichert
+        '--------------------------------
+
+        '! Sekundär_QB wird hier nicht berücksichtigt da die PES Generationen !
+        '! wegen der reduzierung auf Locations entkoppelt ist                 !
+        Dim Fake_SekundärQb(-1) as Individuum
+        Dim Func1 As New Kern.Functions(n_PES_Childs, Settings.PES.n_Eltern, Settings.CES.n_PES_MemSecPop, Settings.CES.n_PES_Interact, False, ModSett.n_Penalty, ModSett.n_Constrain, iAktGen)
+        Call Func1.EsEltern_Pareto(PES_Parents_pLoc, NDSorting, Fake_SekundärQb)
+        '********************************************************************************************
+
+    End Sub
+
 
     'ES_GET_SEKUNDÄRE_POPULATIONEN - Sekundäre Population speichert immer die angegebene
     'Anzahl von Bestwerten und kann den Bestwertspeicher alle x Generationen überschreiben

@@ -931,7 +931,7 @@ Partial Class Form1
                 Next
             Else
                 'NDSorting ******************
-                Call CES1.NDSorting_Control(i_gen)
+                Call CES1.NDSorting_CES_Control(i_gen)
 
                 'Sekundäre Population
                 SekPopulation = CES1.SekundärQb_Get()
@@ -991,7 +991,7 @@ Partial Class Form1
                             'Führt das NDSorting für diesen Satz durch
                             '*****************************************
                             If CES1.PES_Parents_pLoc.GetLength(0) > CES1.Settings.PES.n_Eltern Then
-                                Call CES1.Memory_NDSorting()
+                                Call CES1.NDSorting_PES_Parents_per_Loc(i_gen)
                             End If
 
                             Select CES1.PES_Parents_pLoc.GetLength(0)
