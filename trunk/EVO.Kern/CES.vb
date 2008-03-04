@@ -652,66 +652,93 @@ Public Class CES
     'Eine Liste (PES_Parents_pChild) mit Eltern für ein Child incl. der Location Information wird erstellt
     '**********************************************************************************************
     Sub Memory_Search_per_Child(ByVal Child As Individuum)
+        
+        Dim i_loc, i_mem As Integer
+        Dim akt As Integer = 0
 
+        ReDim PES_Parents_pChild(0)
+        PES_Parents_pChild(0) = New Individuum("PES_Parent", 0)
+        
         Select settings.CES.Mem_Strategy
 
             Case MEMORY_STRATEGY.B_One_Loc_Up, MEMORY_STRATEGY.A_Two_Loc_Up
 
-            Case MEMORY_STRATEGY.C_This_Loc, MEMORY_STRATEGY.D_One_Loc_Down, MEMORY_STRATEGY.E_Two_Loc_Down
-                
-                Dim j, m As Integer
-                Dim count_a(ModSett.n_Locations - 1) As Integer
-                Dim count_b(ModSett.n_Locations - 1) As Integer
-                Dim count_c(ModSett.n_Locations - 1) As Integer
+                For i_loc = 0 To ModSett.n_Locations - 1
+                    For i_mem = 0 To Memory.GetUpperBound(0)
 
-                ReDim PES_Parents_pChild(0)
-                PES_Parents_pChild(0) = New Individuum("PES_Parent", 0)
-
-                Dim akt As Integer = 0
-
-                For j = 0 To ModSett.n_Locations - 1
-                    count_a(j) = 0
-                    count_b(j) = 0
-                    count_c(j) = 0
-                Next
-
-                For j = 0 To ModSett.n_Locations - 1
-                    For m = 0 To Memory.GetUpperBound(0)
-
-                        'Rank Nummer 1 (Lediglich Übereinstimmung in der Location selbst)
-                        If Child.Path(j) = Memory(m).Path(j) Then
+                        'Rank Nummer 0 (Lediglich Übereinstimmung in der Location selbst)
+                        If Child.Path(i_loc) = Memory(i_mem).Path(i_loc) Then
                             ReDim Preserve PES_Parents_pChild(PES_Parents_pChild.GetLength(0))
-                            PES_Parents_pChild(PES_Parents_pChild.GetUpperBound(0)) = New Individuum("PES_Parent", PES_Parents_pChild.GetUpperBound(0))
                             akt = PES_Parents_pChild.GetUpperBound(0)
-                            PES_Parents_pChild(akt) = Memory(m).Clone()
-                            PES_Parents_pChild(akt).iLocation = j + 1
-                            PES_Parents_pChild(akt).Memory_Rank = 0
-                            count_a(j) += 1
+                            PES_Parents_pChild(akt) = New Individuum("PES_Parent", PES_Parents_pChild.GetUpperBound(0))
+                            PES_Parents_pChild(akt) = Memory(i_mem).Clone()
+                            PES_Parents_pChild(akt).iLocation = i_loc + 1
+                            PES_Parents_pChild(akt).Memory_Strat = MEMORY_STRATEGY.C_This_Loc
                         End If
 
-                        'Rank Nummer 2 (Übereinstimmung in Location 1 und 2)
-                        If Not j = ModSett.n_Locations - 1 And Settings.CES.Mem_Strategy > 0 Then
-                            If Child.Path(j) = Memory(m).Path(j) And Child.Path(j + 1) = Memory(m).Path(j + 1) Then
+                        'Rank Nummer -1 (Übereinstimmung in der Downsteam Location 1 und 2)
+                        If Not i_loc = 0 And Settings.CES.Mem_Strategy < 0 Then
+                            If Child.Path(i_loc) = Memory(i_mem).Path(i_loc) And Child.Path(i_loc - 1) = Memory(i_mem).Path(i_loc - 1) Then
                                 ReDim Preserve PES_Parents_pChild(PES_Parents_pChild.GetLength(0))
-                                PES_Parents_pChild(PES_Parents_pChild.GetUpperBound(0)) = New Individuum("PES_Parent", PES_Parents_pChild.GetUpperBound(0))
                                 akt = PES_Parents_pChild.GetUpperBound(0)
-                                PES_Parents_pChild(akt) = Memory(m).Clone()
-                                PES_Parents_pChild(akt).iLocation = j + 1
-                                PES_Parents_pChild(akt).Memory_Rank = 1
-                                count_b(j) += 1
+                                PES_Parents_pChild(akt) = New Individuum("PES_Parent", PES_Parents_pChild.GetUpperBound(0))
+                                PES_Parents_pChild(akt) = Memory(i_mem).Clone()
+                                PES_Parents_pChild(akt).iLocation = i_loc + 1
+                                PES_Parents_pChild(akt).Memory_Strat = MEMORY_STRATEGY.B_One_Loc_Up
                             End If
                         End If
 
-                        'Rank Nummer 3 (Übereinstimmung in Location 1, 2 und 3)
-                        If Not (j = ModSett.n_Locations - 1 Or j = ModSett.n_Locations - 2) And Settings.CES.Mem_Strategy > 1 Then
-                            If Child.Path(j) = Memory(m).Path(j) And Child.Path(j + 1) = Memory(m).Path(j + 1) And Child.Path(j + 2) = Memory(m).Path(j + 2) Then
+                        'Rank Nummer -2 (Übereinstimmung in Downstream Location 1, 2 und 3)
+                        If Not (i_loc = 0 Or i_loc = 1) And Settings.CES.Mem_Strategy < -1 Then
+                            If Child.Path(i_loc) = Memory(i_mem).Path(i_loc) And Child.Path(i_loc - 1) = Memory(i_mem).Path(i_loc - 1) And Child.Path(i_loc - 2) = Memory(i_mem).Path(i_loc - 2) Then
                                 ReDim Preserve PES_Parents_pChild(PES_Parents_pChild.GetLength(0))
-                                PES_Parents_pChild(PES_Parents_pChild.GetUpperBound(0)) = New Individuum("PES_Parent", PES_Parents_pChild.GetUpperBound(0))
                                 akt = PES_Parents_pChild.GetUpperBound(0)
-                                PES_Parents_pChild(akt) = Memory(m).Clone()
-                                PES_Parents_pChild(akt).iLocation = j + 1
-                                PES_Parents_pChild(akt).Memory_Rank = 2
-                                count_c(j) += 1
+                                PES_Parents_pChild(akt) = New Individuum("PES_Parent", PES_Parents_pChild.GetUpperBound(0))
+                                PES_Parents_pChild(akt) = Memory(i_mem).Clone()
+                                PES_Parents_pChild(akt).iLocation = i_loc + 1
+                                PES_Parents_pChild(akt).Memory_Strat = MEMORY_STRATEGY.A_Two_Loc_Up
+                            End If
+                        End If
+
+                    Next
+                Next
+
+            Case MEMORY_STRATEGY.C_This_Loc, MEMORY_STRATEGY.D_One_Loc_Down, MEMORY_STRATEGY.E_Two_Loc_Down
+                
+                For i_loc = 0 To ModSett.n_Locations - 1
+                    For i_mem = 0 To Memory.GetUpperBound(0)
+
+                        'Strategy Nummer 0 (Lediglich Übereinstimmung in der Location selbst)
+                        If Child.Path(i_loc) = Memory(i_mem).Path(i_loc) Then
+                            ReDim Preserve PES_Parents_pChild(PES_Parents_pChild.GetLength(0))
+                            akt = PES_Parents_pChild.GetUpperBound(0)
+                            PES_Parents_pChild(akt) = New Individuum("PES_Parent", PES_Parents_pChild.GetUpperBound(0))
+                            PES_Parents_pChild(akt) = Memory(i_mem).Clone()
+                            PES_Parents_pChild(akt).iLocation = i_loc + 1
+                            PES_Parents_pChild(akt).Memory_Strat = MEMORY_STRATEGY.C_This_Loc
+                        End If
+
+                        'Strategy Nummer 1 (Übereinstimmung in der Downsteam Location 1 und 2)
+                        If Not i_loc = ModSett.n_Locations - 1 And Settings.CES.Mem_Strategy > 0 Then
+                            If Child.Path(i_loc) = Memory(i_mem).Path(i_loc) And Child.Path(i_loc + 1) = Memory(i_mem).Path(i_loc + 1) Then
+                                ReDim Preserve PES_Parents_pChild(PES_Parents_pChild.GetLength(0))
+                                akt = PES_Parents_pChild.GetUpperBound(0)
+                                PES_Parents_pChild(akt) = New Individuum("PES_Parent", PES_Parents_pChild.GetUpperBound(0))
+                                PES_Parents_pChild(akt) = Memory(i_mem).Clone()
+                                PES_Parents_pChild(akt).iLocation = i_loc + 1
+                                PES_Parents_pChild(akt).Memory_Strat = MEMORY_STRATEGY.D_One_Loc_Down
+                            End If
+                        End If
+
+                        'Strategy Nummer 3 (Übereinstimmung in Downstream Location 1, 2 und 3)
+                        If Not (i_loc = ModSett.n_Locations - 1 Or i_loc = ModSett.n_Locations - 2) And Settings.CES.Mem_Strategy > 1 Then
+                            If Child.Path(i_loc) = Memory(i_mem).Path(i_loc) And Child.Path(i_loc + 1) = Memory(i_mem).Path(i_loc + 1) And Child.Path(i_loc + 2) = Memory(i_mem).Path(i_loc + 2) Then
+                                ReDim Preserve PES_Parents_pChild(PES_Parents_pChild.GetLength(0))
+                                akt = PES_Parents_pChild.GetUpperBound(0)
+                                PES_Parents_pChild(akt) = New Individuum("PES_Parent", PES_Parents_pChild.GetUpperBound(0))
+                                PES_Parents_pChild(akt) = Memory(i_mem).Clone()
+                                PES_Parents_pChild(akt).iLocation = i_loc + 1
+                                PES_Parents_pChild(akt).Memory_Strat = MEMORY_STRATEGY.E_Two_Loc_Down
                             End If
                         End If
                     Next
@@ -742,7 +769,7 @@ Public Class CES
         For i = 1 To PES_Parents_pChild.GetUpperBound(0)
             isDouble = False
             For j = 1 To PES_Parents_pChild.GetUpperBound(0)
-                If i <> j And PES_Parents_pChild(i).iLocation And is_PES_Double(PES_Parents_pChild(i), PES_Parents_pChild(j)) Then
+                If i <> j And PES_Parents_pChild(i).iLocation And Memory_is_PES_Double(PES_Parents_pChild(i), PES_Parents_pChild(j)) Then
                     isDouble = True
                 End If
             Next
@@ -761,6 +788,42 @@ Public Class CES
 
     End Sub
 
+    'Prüft ob die beiden den gleichen Pfad und zur gleichen location gehören
+    '***********************************************************************
+    Private Function Memory_is_PES_Double(ByVal First As Individuum, ByVal Second As Individuum) As Boolean
+        Memory_is_PES_Double = False
+
+        Dim count As Integer = 0
+        Dim i As Integer
+
+        'Prüfung ob beide den gleichen Pfad haben, und lediglich die Memory Strategy unterschiedlich ist
+        For i = 0 To First.Path.GetUpperBound(0)
+            If First.Path(i) = Second.Path(i) Then
+                count += 1
+            End If
+        Next
+
+        'Falls der Pfad der gleiche ist und die Location die gleiche ist wird einer aussortiert
+        If count = First.Path.GetLength(0) Then
+            If First.iLocation = Second.iLocation
+                'Fallunterscheidung
+                Select settings.CES.Mem_Strategy
+                    Case MEMORY_STRATEGY.B_One_Loc_Up, MEMORY_STRATEGY.A_Two_Loc_Up
+                        'UPSTREAM
+                        If First.Memory_Strat > Second.Memory_Strat Then
+                            Memory_is_PES_Double = True
+                        End If
+                    Case MEMORY_STRATEGY.C_This_Loc, MEMORY_STRATEGY.D_One_Loc_Down, MEMORY_STRATEGY.E_Two_Loc_Down
+                        'DOWNSTREAM
+                        If First.Memory_Strat < Second.Memory_Strat Then
+                            Memory_is_PES_Double = True
+                        End If
+                End Select
+            End If
+        End If
+
+    End Function
+
     'Die die nicht die entsprechende Memory Strategy haben werden aussortiert
     '************************************************************************
     Private Sub Memory_Delete_too_weak(ByRef PES_Parents_pChild() As Individuum)
@@ -772,23 +835,24 @@ Public Class CES
 
             Select settings.CES.Mem_Strategy
 
-                case MEMORY_STRATEGY.A_Two_Loc_Up
-                    'ToDo
-
-                case MEMORY_STRATEGY.B_One_Loc_Up
-                    'ToDo
+                case MEMORY_STRATEGY.B_One_Loc_Up, MEMORY_STRATEGY.A_Two_Loc_Up
+                    'UPSTREAM
+                    If PES_Parents_pChild(i).Memory_Strat <= settings.CES.Mem_Strategy - Math.Min(0, PES_Parents_pChild(i).iLocation + settings.CES.Mem_Strategy - 1) then
+                        Redim Preserve Tmp(Tmp.GetLength(0))
+                        Tmp(Tmp.GetUpperBound(0)) = new Individuum("PES_Parent", Tmp.GetUpperBound(0))
+                        Tmp(Tmp.GetUpperBound(0)) = PES_Parents_pChild(i).Clone
+                    End If
 
                 case MEMORY_STRATEGY.C_This_Loc
                     Tmp = PES_Parents_pChild.Clone
 
                 case MEMORY_STRATEGY.D_One_Loc_Down, MEMORY_STRATEGY.E_Two_Loc_Down
                     'DOWNSTREAM
-                    If PES_Parents_pChild(i).Memory_Rank >= settings.CES.Mem_Strategy + Math.Min(0, Modsett.n_Locations - settings.CES.Mem_Strategy - PES_Parents_pChild(i).iLocation) then
+                    If PES_Parents_pChild(i).Memory_Strat >= settings.CES.Mem_Strategy + Math.Min(0, Modsett.n_Locations - settings.CES.Mem_Strategy - PES_Parents_pChild(i).iLocation) then
                         Redim Preserve Tmp(Tmp.GetLength(0))
                         Tmp(Tmp.GetUpperBound(0)) = new Individuum("PES_Parent", Tmp.GetUpperBound(0))
                         Tmp(Tmp.GetUpperBound(0)) = PES_Parents_pChild(i).Clone
                     End If
-
             End Select
         Next
 
@@ -846,7 +910,7 @@ Public Class CES
         Call Func1.EsEltern_Pareto_SekundärQb(PES_Parents_pLoc, NDSorting, PES_SekundärQb)
         '********************************************************************************************
 
-        'SekundärQB Mach tin dieser Form noch keinen Sinn !!!!!!!!!!!!!!!!!!!
+        'SekundärQB macht in dieser Form noch keinen Sinn !!!!!!!!!!!!!!!!!!!
 
     End Sub
 
@@ -866,29 +930,6 @@ Public Class CES
         Next
 
     End Sub
-
-    'Prüft ob die beiden den gleichen Pfad und zur gleichen location gehören
-    '***********************************************************************
-    Private Function is_PES_Double(ByVal First As Individuum, ByVal Second As Individuum) As Boolean
-        is_PES_Double = False
-
-        Dim count As Integer = 0
-        Dim i As Integer
-
-        For i = 0 To First.Path.GetUpperBound(0)
-            If First.Path(i) = Second.Path(i) Then
-                count += 1
-            End If
-        Next
-
-        If count = First.Path.GetLength(0) Then
-            If First.iLocation = Second.iLocation And First.Memory_Rank < Second.Memory_Rank Then
-                is_PES_Double = True
-            End If
-        End If
-
-    End Function
-
 
     'Hilfsfunktionen
     'XXXXXXXXXXXXXXX
