@@ -72,28 +72,8 @@ Public MustInherit Class Sim
 
     'Optimierungsziele
     '-----------------
-    Public Structure Struct_OptZiel
-        Public isOpt As Boolean                     'Gibt an ob es sich um ein OptZiel oder ein SekZiel handelt
-        Public Bezeichnung As String                'Bezeichnung
-        Public ZielTyp As String                    'Gibt an ob es sich um einen Wert oder um eine Reihe handelt
-        Public Datei As String                      'Die Ergebnisdatei, aus der das Simulationsergebnis ausgelesen werden soll [WEL, BIL, PRB]
-        Public SimGr As String                      'Die Simulationsgröße, auf dessen Basis der Qualitätswert berechnet werden soll
-        Public ZielFkt As String                    'Zielfunktion
-        Public WertTyp As String                    'Gibt an wie der Wert, der mit dem Zielwert verglichen werden soll, aus dem Simulationsergebnis berechnet werden soll.
-        Public ZielWert As Double                   'Der vorgegeben Zielwert - muss doch eigentlich ein double sein dm 11.2007??
-        Public ZielReiheDatei As String             'Der Dateiname der Zielreihe
-        Public ZielGr As String                     'Spalte der .wel Datei falls ZielReihe .wel Datei ist
-        Public ZielReihe As Wave.Zeitreihe          'Die Werte der Zielreihe
-        Public QWertTmp As Double                   'Qualitätswert der letzten Simulation wird hier zwischengespeichert 
-        Public EvalStart As DateTime                'Start des Evaluierungszeitraums
-        Public EvalEnde As DateTime                 'Ende des Evaluierungszeitraums
-        Public Overrides Function toString() As String
-            Return Bezeichnung
-        End Function
-    End Structure
-
-    Public List_OptZiele() As Struct_OptZiel        'Liste der Zielfunktionen
-    Public List_SekZiele() As Struct_OptZiel        'Liste der Sekundären Zielfunktionen
+    Public List_OptZiele() As Kern.OptZiel          'Liste der Zielfunktionen
+    Public List_SekZiele() As Kern.OptZiel          'Liste der Sekundären Zielfunktionen
 
     'Constraints
     '-----------
@@ -485,7 +465,7 @@ Public MustInherit Class Sim
         '*|------|---------------|---------|-------|----------|---------|-------|------|---------|----------|-----------|---------------|
 
         Const AnzSpalten As Integer = 12                       'Anzahl Spalten in der ZIE-Datei
-        Dim tmpZiele() As Struct_OptZiel
+        Dim tmpZiele() As Kern.OptZiel
         Dim i As Integer
         Dim Zeile As String
         Dim WerteArray() As String
@@ -510,6 +490,7 @@ Public MustInherit Class Sim
                 End If
                 'Neues Ziel anlegen
                 ReDim Preserve tmpZiele(i)
+                tmpZiele(i) = New Kern.OptZiel()
                 'Werte einlesen
                 With tmpZiele(i)
                     If (WerteArray(1).Trim().ToUpper() = "J") Then
@@ -1558,12 +1539,12 @@ Handler:
 
     'Berechnung des Qualitätswerts (Zielwert)
     '****************************************
-    Public MustOverride Function QWert(ByVal OptZiel As Struct_OptZiel) As Double
+    Public MustOverride Function QWert(ByVal OptZiel As Kern.OptZiel) As Double
 
     'Qualitätswert berechnen: Zieltyp = Reihe
     '****************************************
     'BUG 218: Konstante und gleiche Zeitschrittweiten vorausgesetzt!
-    Protected Function QWert_Reihe(ByVal OptZiel As Struct_OptZiel, ByVal SimReihe As Wave.Zeitreihe) As Double
+    Protected Function QWert_Reihe(ByVal OptZiel As Kern.OptZiel, ByVal SimReihe As Wave.Zeitreihe) As Double
 
         Dim QWert As Double
         Dim i, j As Integer
@@ -1701,7 +1682,7 @@ Handler:
 
     'Qualitätswert berechnen: Zieltyp = Wert
     '***************************************
-    Protected Function QWert_Wert(ByVal OptZiel As Struct_OptZiel, ByVal SimReihe As Wave.Zeitreihe) As Double
+    Protected Function QWert_Wert(ByVal OptZiel As Kern.OptZiel, ByVal SimReihe As Wave.Zeitreihe) As Double
 
         Dim QWert As Double
         Dim i As Integer
@@ -1757,7 +1738,7 @@ Handler:
 
     'Qualitätswert aus PRB-Datei
     '***************************
-    Private Function QWert_PRB(ByVal OptZiel As Struct_OptZiel) As Double
+    Private Function QWert_PRB(ByVal OptZiel As Kern.OptZiel) As Double
 
         'BUG 220: PRB geht nicht, weil keine Zeitreihe
         'Dim i As Integer

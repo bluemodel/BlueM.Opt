@@ -353,7 +353,7 @@ Public Class SWMM
 
     'Berechnung des Qualitätswerts (Zielwert)
     '****************************************
-    Public Overrides Function QWert(ByVal OptZiel As Struct_OptZiel) As Double
+    Public Overrides Function QWert(ByVal OptZiel As Kern.OptZiel) As Double
 
         QWert = 0
 
@@ -379,7 +379,7 @@ Public Class SWMM
 
     End Function
 
-    Public Function QWert_RPT(ByVal OptZiel As Struct_OptZiel) As Double
+    Public Function QWert_RPT(ByVal OptZiel As Kern.OptZiel) As Double
 
         Dim QWert As Double
         Dim FFreqEast As Double, FFreqGath As Double, FFreqWest As Double

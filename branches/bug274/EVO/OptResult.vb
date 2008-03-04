@@ -25,7 +25,7 @@ Public Class OptResult
     Private db As OleDb.OleDbConnection
 
     'Optimierungsbedingungen
-    Public List_OptZiele() As Sim.Struct_OptZiel
+    Public List_OptZiele() As Kern.OptZiel
     Public List_OptParameter() As EVO.Kern.OptParameter
     Public List_OptParameter_Save() As EVO.Kern.OptParameter
     Public List_Constraints() As Sim.Struct_Constraint

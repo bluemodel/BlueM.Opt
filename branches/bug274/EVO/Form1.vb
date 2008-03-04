@@ -2066,7 +2066,7 @@ Start_Evolutionsrunden:
             '---------------
             Dim importDialog As New MDBImportDialog()
 
-            For Each OptZiel As Sim.Struct_OptZiel In Sim1.List_OptZiele
+            For Each OptZiel As Kern.OptZiel In Sim1.List_OptZiele
                 importDialog.ListBox_OptZieleX.Items.Add(OptZiel.Bezeichnung)
                 importDialog.ListBox_OptZieleY.Items.Add(OptZiel.Bezeichnung)
                 importDialog.ListBox_OptZieleZ.Items.Add(OptZiel.Bezeichnung)

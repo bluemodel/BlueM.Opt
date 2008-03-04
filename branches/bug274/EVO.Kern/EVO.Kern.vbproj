@@ -89,6 +89,7 @@
       <CustomToolNamespace>Individ</CustomToolNamespace>
     </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="OptZiel.vb" />
     <Compile Include="PES.vb">
       <SubType>Code</SubType>
     </Compile>
@@ -97,6 +98,12 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="OptParameter.vb" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Wave\Wave.vbproj">
+      <Project>{BCD1BBE3-5AB2-4C3F-AC12-43EB977C6F6F}</Project>
+      <Name>Wave</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>

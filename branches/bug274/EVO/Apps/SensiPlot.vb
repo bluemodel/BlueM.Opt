@@ -25,7 +25,7 @@ Partial Public Class SensiPlot
         ListBox_OptParameter.Items.Add(OptParameter)
     End Sub
 
-    Public Sub ListBox_OptZiele_add(ByVal OptZiel As Sim.Struct_OptZiel)
+    Public Sub ListBox_OptZiele_add(ByVal OptZiel As Kern.OptZiel)
         ListBox_OptZiele.Items.Add(OptZiel)
     End Sub
 
