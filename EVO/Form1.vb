@@ -970,6 +970,12 @@ Partial Class Form1
             'HYBRID: REPRODUKTION und MUTATION
             '*********************************
             If Method = METH_HYBRID AND EVO_Einstellungen1.Settings.CES.ty_Hybrid = EVO.Kern.HYBRID_TYPE.Mixed_Integer Then
+                'NDSorting für den PES Memory
+                '****************************
+                If CES1.PES_Memory.GetLength(0) > ces1.Settings.CES.n_PES_MemSize
+                    Call CES1.NDSorting_Memory(i_gen)
+                End If
+
                 'pro Child
                 'xxxxxxxxx
                 For i_ch = 0 To CES1.Childs.GetUpperBound(0)
