@@ -69,6 +69,7 @@ Partial Class EVO_Einstellungen
         Me.checkpaintconstrained = New System.Windows.Forms.CheckBox
         Me.TabPage_CES = New System.Windows.Forms.TabPage
         Me.GroupBox_Hybrid = New System.Windows.Forms.GroupBox
+        Me.Combo_CES_MemStrategy = New System.Windows.Forms.ComboBox
         Me.CheckBox_CES_UseSecPop_PES = New System.Windows.Forms.CheckBox
         Me.Label10 = New System.Windows.Forms.Label
         Me.CheckBox_CES_StartPESPop = New System.Windows.Forms.CheckBox
@@ -125,7 +126,8 @@ Partial Class EVO_Einstellungen
         Me.SpeichernToolStripButton = New System.Windows.Forms.ToolStripButton
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox
-        Me.Combo_CES_MemStrategy = New System.Windows.Forms.ComboBox
+        Me.Label_MemSize = New System.Windows.Forms.Label
+        Me.Numeric_CES_n_MemSize = New System.Windows.Forms.NumericUpDown
         Me.TabControl1.SuspendLayout()
         Me.TabPage_PES.SuspendLayout()
         CType(Me.TextDeltaStart, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -156,6 +158,7 @@ Partial Class EVO_Einstellungen
         CType(Me.TextDeltaStartHJ, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ToolStrip1.SuspendLayout()
         Me.GroupBox_Einstellungen.SuspendLayout()
+        CType(Me.Numeric_CES_n_MemSize, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'TabControl1
@@ -655,6 +658,8 @@ Partial Class EVO_Einstellungen
         '
         'GroupBox_Hybrid
         '
+        Me.GroupBox_Hybrid.Controls.Add(Me.Numeric_CES_n_MemSize)
+        Me.GroupBox_Hybrid.Controls.Add(Me.Label_MemSize)
         Me.GroupBox_Hybrid.Controls.Add(Me.Combo_CES_MemStrategy)
         Me.GroupBox_Hybrid.Controls.Add(Me.CheckBox_CES_UseSecPop_PES)
         Me.GroupBox_Hybrid.Controls.Add(Me.Label10)
@@ -673,6 +678,15 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Hybrid.TabIndex = 12
         Me.GroupBox_Hybrid.TabStop = False
         Me.GroupBox_Hybrid.Text = "Hybrid Options"
+        '
+        'Combo_CES_MemStrategy
+        '
+        Me.Combo_CES_MemStrategy.FormattingEnabled = True
+        Me.Combo_CES_MemStrategy.Location = New System.Drawing.Point(88, 50)
+        Me.Combo_CES_MemStrategy.Name = "Combo_CES_MemStrategy"
+        Me.Combo_CES_MemStrategy.Size = New System.Drawing.Size(104, 21)
+        Me.Combo_CES_MemStrategy.Sorted = True
+        Me.Combo_CES_MemStrategy.TabIndex = 56
         '
         'CheckBox_CES_UseSecPop_PES
         '
@@ -1243,14 +1257,25 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Einstellungen.TabStop = False
         Me.GroupBox_Einstellungen.Text = "Einstellungen:"
         '
-        'Combo_CES_MemStrategy
+        'Label_MemSize
         '
-        Me.Combo_CES_MemStrategy.FormattingEnabled = True
-        Me.Combo_CES_MemStrategy.Location = New System.Drawing.Point(88, 50)
-        Me.Combo_CES_MemStrategy.Name = "Combo_CES_MemStrategy"
-        Me.Combo_CES_MemStrategy.Size = New System.Drawing.Size(104, 21)
-        Me.Combo_CES_MemStrategy.Sorted = True
-        Me.Combo_CES_MemStrategy.TabIndex = 56
+        Me.Label_MemSize.AutoSize = True
+        Me.Label_MemSize.Location = New System.Drawing.Point(3, 79)
+        Me.Label_MemSize.Name = "Label_MemSize"
+        Me.Label_MemSize.Size = New System.Drawing.Size(70, 13)
+        Me.Label_MemSize.TabIndex = 57
+        Me.Label_MemSize.Text = "Memory Size:"
+        '
+        'Numeric_CES_n_MemSize
+        '
+        Me.Numeric_CES_n_MemSize.Location = New System.Drawing.Point(138, 77)
+        Me.Numeric_CES_n_MemSize.Maximum = New Decimal(New Integer() {100000, 0, 0, 0})
+        Me.Numeric_CES_n_MemSize.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.Numeric_CES_n_MemSize.Name = "Numeric_CES_n_MemSize"
+        Me.Numeric_CES_n_MemSize.Size = New System.Drawing.Size(53, 20)
+        Me.Numeric_CES_n_MemSize.TabIndex = 57
+        Me.Numeric_CES_n_MemSize.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_CES_n_MemSize.Value = New Decimal(New Integer() {50, 0, 0, 0})
         '
         'EVO_Einstellungen
         '
@@ -1296,6 +1321,7 @@ Partial Class EVO_Einstellungen
         Me.ToolStrip1.PerformLayout()
         Me.GroupBox_Einstellungen.ResumeLayout(False)
         Me.GroupBox_Einstellungen.PerformLayout()
+        CType(Me.Numeric_CES_n_MemSize, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -1405,4 +1431,6 @@ Partial Class EVO_Einstellungen
     Friend WithEvents CheckBox_CES_UseSecPop_CES As System.Windows.Forms.CheckBox
     Public WithEvents TabPage_CES As System.Windows.Forms.TabPage
     Friend WithEvents Combo_CES_MemStrategy As System.Windows.Forms.ComboBox
+    Private WithEvents Numeric_CES_n_MemSize As System.Windows.Forms.NumericUpDown
+    Friend WithEvents Label_MemSize As System.Windows.Forms.Label
 End Class
