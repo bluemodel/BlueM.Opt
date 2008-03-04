@@ -945,8 +945,8 @@ Partial Class Form1
                     Call SekundärePopulationZeichnen(SekPopulation)
                 End If
             End If
-            '^ ENDE Selectionsprozess
-            'xxxxxxxxxxxxxxxxxxxxxxxx
+            ' ^ ENDE Selectionsprozess
+            'xxxxxxxxxxxxxxxxxxxxxxxxx
 
             'REPRODUKTION und MUTATION Nicht wenn Testmodus
             'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -985,9 +985,11 @@ Partial Class Form1
                         If Not CES1.Childs(i_ch).Loc(i_loc).PES_OptPara.GetLength(0) = 0 Then
 
                             'Ermittelt fuer jede Location den PES Parent Satz (PES_Parents ist das Ergebnis)
+                            '*******************************************************************************
                             Call CES1.Memory_Search_per_Location(i_loc)
 
                             'Führt das NDSorting für diesen Satz durch
+                            '*****************************************
                             If CES1.PES_Parents_pLoc.GetLength(0) > CES1.Settings.PES.n_Eltern Then
                                 Call CES1.Memory_NDSorting()
                             End If
@@ -1044,6 +1046,8 @@ Partial Class Form1
                     Next
                 Next
             End If
+            ' ^ Ende der HYBRID PES Schleife
+            'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
         Next
         'Ende der Generationsschleife CES
