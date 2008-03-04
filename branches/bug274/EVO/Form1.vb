@@ -309,8 +309,8 @@ Partial Class Form1
                     For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
                         Call SensiPlot1.ListBox_OptParameter_add(Sim1.List_OptParameter(i))
                     Next
-                    For i = 0 To Sim1.List_OptZiele.GetUpperBound(0)
-                        Call SensiPlot1.ListBox_OptZiele_add(Sim1.List_OptZiele(i))
+                    For i = 0 To Sim1.OptZielMgr.List_OptZiele.GetUpperBound(0)
+                        Call SensiPlot1.ListBox_OptZiele_add(Sim1.OptZielMgr.List_OptZiele(i))
                     Next
                     'Dialog anzeigen
                     Dim SensiPlotDiagResult As Windows.Forms.DialogResult
@@ -334,9 +334,9 @@ Partial Class Form1
                     'EVO_Einstellungen einrichten
                     EVO_Einstellungen1.Enabled = True
                     Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_PES
-                    If (Sim1.List_OptZiele.GetLength(0) = 1) Then
+                    If (Sim1.OptZielMgr.List_OptZiele.GetLength(0) = 1) Then
                         Call EVO_Einstellungen1.setStandard_PES(Kern.EVO_MODUS.Single_Objective)
-                    ElseIf (Sim1.List_OptZiele.GetLength(0) > 1) Then
+                    ElseIf (Sim1.OptZielMgr.List_OptZiele.GetLength(0) > 1) Then
                         Call EVO_Einstellungen1.setStandard_PES(Kern.EVO_MODUS.Multi_Objective)
                     End If
 
@@ -354,9 +354,9 @@ Partial Class Form1
                     Me.EVO_Einstellungen1.Enabled = True
                     Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_HookeJeeves
                     'Nur SO möglich
-                    If (Sim1.List_OptZiele.GetLength(0) = 1) Then
+                    If (Sim1.OptZielMgr.List_OptZiele.GetLength(0) = 1) Then
                         Call EVO_Einstellungen1.setStandard_HJ()
-                    ElseIf Sim1.List_OptZiele.GetLength(0) > 1 Then
+                    ElseIf Sim1.OptZielMgr.List_OptZiele.GetLength(0) > 1 Then
                         Throw New Exception("Methode von Hook und Jeeves erlaubt nur SO-Optimierung!")
                     End If
 
@@ -405,9 +405,9 @@ Partial Class Form1
                     Call EVO_Einstellungen1.setStandard_CES()
 
                     'Je nach Anzahl der Zielfunktionen von MO auf SO umschalten PES
-                    If (Sim1.List_OptZiele.GetLength(0) = 1) Then
+                    If (Sim1.OptZielMgr.List_OptZiele.GetLength(0) = 1) Then
                         Call EVO_Einstellungen1.setStandard_PES(Kern.EVO_MODUS.Single_Objective)
-                    ElseIf (Sim1.List_OptZiele.GetLength(0) > 1) Then
+                    ElseIf (Sim1.OptZielMgr.List_OptZiele.GetLength(0) > 1) Then
                         Call EVO_Einstellungen1.setStandard_PES(Kern.EVO_MODUS.Multi_Objective)
                     End If
 
@@ -618,7 +618,7 @@ Partial Class Form1
         Dim Wave1 As Wave.Wave
 
         'Instanzieren
-        ReDim QN(Sim1.List_OptZiele.GetUpperBound(0))
+        ReDim QN(Sim1.OptZielMgr.List_OptZiele.GetUpperBound(0))
         ReDim RN(Sim1.List_Constraints.GetUpperBound(0))
         SimReihen = New Collection
 
@@ -710,16 +710,16 @@ Partial Class Form1
                 If (Me.globalAnzPar = 1) Then
                     '1 Parameter
                     serie = DForm.Diag.getSeriesPoint("SensiPlot", "Orange")
-                    serie.Add(Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).QWertTmp, Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).RWert, n)
+                    serie.Add(Sim1.OptZielMgr.List_OptZiele(SensiPlot1.Selected_OptZiel).QWertTmp, Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).RWert, n)
                 Else
                     '2 Parameter
-                    surface.Add(Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).RWert, Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).QWertTmp, Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).RWert, n)
+                    surface.Add(Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).RWert, Sim1.OptZielMgr.List_OptZiele(SensiPlot1.Selected_OptZiel).QWertTmp, Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).RWert, n)
                 End If
 
                 'Simulationsergebnis in Wave laden
                 If (SensiPlot1.show_Wave) Then
                     'SimReihe auslesen
-                    SimReihe = Sim1.SimErgebnis(Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).SimGr)
+                    SimReihe = Sim1.SimErgebnis(Sim1.OptZielMgr.List_OptZiele(SensiPlot1.Selected_OptZiel).SimGr)
                     'Lösungs-ID an Titel anhängen
                     SimReihe.Title += " (Lösung " & n.ToString() & ")"
                     'SimReihe zu Collection hinzufügen
@@ -802,7 +802,7 @@ Partial Class Form1
         'CES initialisieren
         '******************
         CES1 = New EVO.Kern.CES()
-        Call Ces1.CESInitialise(EVO_Einstellungen1.Settings, Method, sim1.CES_T_Modus, Sim1.List_OptZiele.GetLength(0), Sim1.List_Constraints.GetLength(0), Sim1.List_Locations.GetLength(0), Sim1.VerzweigungsDatei.GetLength(0), sim1.n_Combinations, sim1.n_PathDimension)
+        Call Ces1.CESInitialise(EVO_Einstellungen1.Settings, Method, sim1.CES_T_Modus, Sim1.OptZielMgr.List_OptZiele.GetLength(0), Sim1.List_Constraints.GetLength(0), Sim1.List_Locations.GetLength(0), Sim1.VerzweigungsDatei.GetLength(0), sim1.n_Combinations, sim1.n_PathDimension)
         
         'Die alten Bekannten
         globalAnzZiel = CES1.ModSett.n_Penalty
@@ -1658,7 +1658,7 @@ Start_Evolutionsrunden:
                             'Achsen:
                             '-------
                             'X-Achse = QWert
-                            Achse.Name = Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).Bezeichnung
+                            Achse.Name = Sim1.OptZielMgr.List_OptZiele(SensiPlot1.Selected_OptZiel).Bezeichnung
                             Achse.Auto = True
                             Achse.Max = 0
                             Achsen.Add(Achse)
@@ -1680,7 +1680,7 @@ Start_Evolutionsrunden:
                             Achse.Max = 0
                             Achsen.Add(Achse)
                             'Y-Achse = QWert
-                            Achse.Name = Sim1.List_OptZiele(SensiPlot1.Selected_OptZiel).Bezeichnung
+                            Achse.Name = Sim1.OptZielMgr.List_OptZiele(SensiPlot1.Selected_OptZiel).Bezeichnung
                             Achse.Auto = True
                             Achse.Max = 0
                             Achsen.Add(Achse)
@@ -1704,8 +1704,8 @@ Start_Evolutionsrunden:
                         Achse.Auto = True
                         Achsen.Add(Achse)
                         'für jede Zielfunktion eine weitere Achse hinzufügen
-                        For i = 0 To Sim1.List_OptZiele.GetUpperBound(0)
-                            Achse.Name = Sim1.List_OptZiele(i).Bezeichnung
+                        For i = 0 To Sim1.OptZielMgr.List_OptZiele.GetUpperBound(0)
+                            Achse.Name = Sim1.OptZielMgr.List_OptZiele(i).Bezeichnung
                             Achse.Auto = True
                             Achse.Max = 0
                             Achsen.Add(Achse)
@@ -1746,8 +1746,8 @@ Start_Evolutionsrunden:
                         End If
 
                         'für jede Zielfunktion eine weitere Achse hinzufügen
-                        For i = 0 To Sim1.List_OptZiele.GetUpperBound(0)
-                            Achse.Name = Sim1.List_OptZiele(i).Bezeichnung
+                        For i = 0 To Sim1.OptZielMgr.List_OptZiele.GetUpperBound(0)
+                            Achse.Name = Sim1.OptZielMgr.List_OptZiele(i).Bezeichnung
                             Achse.Auto = True
                             Achse.Max = 0
                             Achsen.Add(Achse)
@@ -1837,7 +1837,7 @@ Start_Evolutionsrunden:
 
             'Lösungsdialog initialisieren
             If (IsNothing(Me.solutionDialog)) Then
-                Me.solutionDialog = New SolutionDialog(Sim1.List_OptParameter_Save, Sim1.List_OptZiele, Sim1.List_Constraints, Sim1.List_Locations)
+                Me.solutionDialog = New SolutionDialog(Sim1.List_OptParameter_Save, Sim1.OptZielMgr.List_OptZiele, Sim1.List_Constraints, Sim1.List_Locations)
             End If
 
             'Lösungsdialog anzeigen
@@ -1847,7 +1847,7 @@ Start_Evolutionsrunden:
             Call Me.solutionDialog.addSolution(ind)
 
             'Lösung im Hauptdiagramm anzeigen
-            Call Me.DForm.Diag.showSelectedSolution(Me.Sim1.List_OptZiele, ind)
+            Call Me.DForm.Diag.showSelectedSolution(Me.Sim1.OptZielMgr.List_OptZiele, ind)
 
             'Lösung im Scatterplot anzeigen
             If (Not IsNothing(Me.scatterplot1)) Then
@@ -1973,9 +1973,9 @@ Start_Evolutionsrunden:
 
             'zu zeichnenden Reihen aus Liste der OptZiele raussuchen
             '-------------------------------------------------------
-            For i = 0 To Sim1.List_OptZiele.GetUpperBound(0)
+            For i = 0 To Sim1.OptZielMgr.List_OptZiele.GetUpperBound(0)
 
-                With Sim1.List_OptZiele(i)
+                With Sim1.OptZielMgr.List_OptZiele(i)
 
                     'Referenzreihe in Wave laden
                     '---------------------------
@@ -2066,18 +2066,18 @@ Start_Evolutionsrunden:
             '---------------
             Dim importDialog As New MDBImportDialog()
 
-            For Each OptZiel As Kern.OptZiel In Sim1.List_OptZiele
+            For Each OptZiel As Common.OptZiel In Sim1.OptZielMgr.List_OptZiele
                 importDialog.ListBox_OptZieleX.Items.Add(OptZiel.Bezeichnung)
                 importDialog.ListBox_OptZieleY.Items.Add(OptZiel.Bezeichnung)
                 importDialog.ListBox_OptZieleZ.Items.Add(OptZiel.Bezeichnung)
             Next
 
             'Bei weniger als 3 Zielen Z-Achse ausblenden
-            If (Sim1.List_OptZiele.Length < 3) Then
+            If (Sim1.OptZielMgr.List_OptZiele.Length < 3) Then
                 importDialog.ListBox_OptZieleZ.Enabled = False
             End If
             'Bei weniger als 2 Zielen Y-Achse ausblenden
-            If (Sim1.List_OptZiele.Length < 2) Then
+            If (Sim1.OptZielMgr.List_OptZiele.Length < 2) Then
                 importDialog.ListBox_OptZieleY.Enabled = False
             End If
 

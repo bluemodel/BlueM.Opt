@@ -60,7 +60,7 @@ Public Class Scan
                 tmp = ZeilenArray(i).Split(";")
                 Dim werte As New Collection()
                 For j = 1 To tmp.GetUpperBound(0)
-                    werte.Add(Convert.ToDouble(tmp(j).Trim(), FortranProvider), stoffe(j))
+                    werte.Add(Convert.ToDouble(tmp(j).Trim(), Common.Provider.FortranProvider), stoffe(j))
                 Next
                 Parameter.Add(werte, tmp(0))
             End If
@@ -102,7 +102,7 @@ Public Class Scan
 
     End Function
 
-    Public Overrides Function QWert(ByVal OptZiel As Kern.OptZiel) As Double
+    Public Overrides Function QWert(ByVal OptZiel As Common.OptZiel) As Double
 
         QWert = QWert_Reihe(OptZiel, Me.SimErgebnis(OptZiel.SimGr))
 

@@ -150,26 +150,26 @@ Public Class BlueM
         'Gibt es eine IHA-Zielfunktion?
         'HACK: es wird immer nur das erste IHA-Ziel verwendet!
         '------------------------------
-        For i = 0 To Me.List_OptZiele.GetUpperBound(0)
-            If (Me.List_OptZiele(i).ZielTyp = "IHA") Then
+        For i = 0 To Me.OptZielMgr.List_OptZiele.GetUpperBound(0)
+            If (Me.OptZielMgr.List_OptZiele(i).ZielTyp = "IHA") Then
                 'IHA-Berechnung einschalten
                 Me.isIHA = True
-                IHAZielReihe = Me.List_OptZiele(i).ZielReihe
-                IHAStart = Me.List_OptZiele(i).EvalStart
-                IHAEnde = Me.List_OptZiele(i).EvalEnde
+                IHAZielReihe = Me.OptZielMgr.List_OptZiele(i).ZielReihe
+                IHAStart = Me.OptZielMgr.List_OptZiele(i).EvalStart
+                IHAEnde = Me.OptZielMgr.List_OptZiele(i).EvalEnde
                 Exit For
             End If
         Next i
 
         'Falls noch keins gefunden auch SekZiele durchsuchen
         If (Not Me.isIHA) Then
-            For i = 0 To Me.List_SekZiele.GetUpperBound(0)
-                If (Me.List_SekZiele(i).ZielTyp = "IHA") Then
+            For i = 0 To Me.OptZielMgr.List_SekZiele.GetUpperBound(0)
+                If (Me.OptZielMgr.List_SekZiele(i).ZielTyp = "IHA") Then
                     'IHA-Berechnung einschalten
                     Me.isIHA = True
-                    IHAZielReihe = Me.List_SekZiele(i).ZielReihe
-                    IHAStart = Me.List_SekZiele(i).EvalStart
-                    IHAEnde = Me.List_SekZiele(i).EvalEnde
+                    IHAZielReihe = Me.OptZielMgr.List_SekZiele(i).ZielReihe
+                    IHAStart = Me.OptZielMgr.List_SekZiele(i).EvalStart
+                    IHAEnde = Me.OptZielMgr.List_SekZiele(i).EvalEnde
                     Exit For
                 End If
             Next i
@@ -373,9 +373,9 @@ Public Class BlueM
             If (Me.isIHA) Then
                 'IHA-Ziel raussuchen und Simulationsreihe übergeben
                 'HACK: es wird immer das erste IHA-Ziel verwendet!
-                For i = 0 To Me.List_OptZiele.GetUpperBound(0)
-                    If (Me.List_OptZiele(i).ZielTyp = "IHA") Then
-                        Call Me.IHASys.calculate_IHA(Me.SimErgebnis(Me.List_OptZiele(i).SimGr))
+                For i = 0 To Me.OptZielMgr.List_OptZiele.GetUpperBound(0)
+                    If (Me.OptZielMgr.List_OptZiele(i).ZielTyp = "IHA") Then
+                        Call Me.IHASys.calculate_IHA(Me.SimErgebnis(Me.OptZielMgr.List_OptZiele(i).SimGr))
                         Exit For
                     End If
                 Next
@@ -393,7 +393,7 @@ Public Class BlueM
 
     'Berechnung des Qualitätswerts (Zielwert)
     '****************************************
-    Public Overrides Function QWert(ByVal OptZiel As Kern.OptZiel) As Double
+    Public Overrides Function QWert(ByVal OptZiel As Common.OptZiel) As Double
 
         QWert = 0
 
@@ -420,7 +420,7 @@ Public Class BlueM
 
     'Qualitätswert aus WEL-Datei
     '***************************
-    Private Function QWert_WEL(ByVal OptZiel As Kern.OptZiel) As Double
+    Private Function QWert_WEL(ByVal OptZiel As Common.OptZiel) As Double
 
         Dim QWert As Double
         Dim SimReihe As Wave.Zeitreihe

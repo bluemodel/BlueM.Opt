@@ -25,7 +25,7 @@ Public Class OptResult
     Private db As OleDb.OleDbConnection
 
     'Optimierungsbedingungen
-    Public List_OptZiele() As Kern.OptZiel
+    Public List_OptZiele() As Common.OptZiel
     Public List_OptParameter() As EVO.Kern.OptParameter
     Public List_OptParameter_Save() As EVO.Kern.OptParameter
     Public List_Constraints() As Sim.Struct_Constraint
@@ -54,7 +54,7 @@ Public Class OptResult
         Me.Datensatz = Sim1.Datensatz
 
         'Optimierungsbedingungen kopieren
-        Me.List_OptZiele = Sim1.List_OptZiele
+        Me.List_OptZiele = Sim1.OptZielMgr.List_OptZiele
         Me.List_OptParameter = Sim1.List_OptParameter
         Me.List_OptParameter_Save = sim1.List_OptParameter_Save
         Me.List_Constraints = Sim1.List_Constraints
@@ -393,7 +393,7 @@ Public Class OptResult
         Dim fieldvalues As String = ""
         For i = 0 To List_OptZiele.GetUpperBound(0)
             fieldnames &= ", [" & List_OptZiele(i).Bezeichnung & "]"
-            fieldvalues &= ", " & ind.Penalty(i).ToString(Sim.FortranProvider)
+            fieldvalues &= ", " & ind.Penalty(i).ToString(Common.Provider.FortranProvider)
         Next
         command.CommandText = "INSERT INTO QWerte (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
         command.ExecuteNonQuery()
@@ -405,7 +405,7 @@ Public Class OptResult
             fieldvalues = ""
             For i = 0 To Me.List_Constraints.GetUpperBound(0)
                 fieldnames &= ", [" & Me.List_Constraints(i).Bezeichnung & "]"
-                fieldvalues &= ", " & ind.Constrain(i).ToString(Sim.FortranProvider)
+                fieldvalues &= ", " & ind.Constrain(i).ToString(Common.Provider.FortranProvider)
             Next
             command.CommandText = "INSERT INTO [Constraints] (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
             command.ExecuteNonQuery()
@@ -421,7 +421,7 @@ Public Class OptResult
             fieldvalues = ""
             For i = 0 To Me.List_OptParameter.GetUpperBound(0)
                 fieldnames &= ", [" & Me.List_OptParameter(i).Bezeichnung & "]"
-                fieldvalues &= ", " & ind.PES_OptParas(i).RWert.ToString(Sim.FortranProvider)
+                fieldvalues &= ", " & ind.PES_OptParas(i).RWert.ToString(Common.Provider.FortranProvider)
             Next
             command.CommandText = "INSERT INTO OptParameter (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
             command.ExecuteNonQuery()
@@ -446,24 +446,24 @@ Public Class OptResult
 
         If (EVO.Form1.Method = METH_HYBRID) Then
 
-            Dim found as Boolean
+            Dim found As Boolean
 
             'OptParameter schreiben
             '----------------------
             fieldnames = ""
             fieldvalues = ""
             For i = 0 To Me.List_OptParameter_Save.GetUpperBound(0)
-                found  = False
+                found = False
                 fieldnames &= ", [" & Me.List_OptParameter_Save(i).Bezeichnung & "]"
-                For x = 0 to Ind.Loc.GetUpperBound(0)
-                    For y = 0 to Ind.Loc(x).PES_OptPara.GetUpperBound(0)
-                        If Ind.Loc(x).PES_OptPara(y).Bezeichnung = Me.List_OptParameter_Save(i).Bezeichnung then
-                            fieldvalues &= ", " & Ind.Loc(x).PES_OptPara(y).RWert.ToString(Sim.FortranProvider)
+                For x = 0 To Ind.Loc.GetUpperBound(0)
+                    For y = 0 To Ind.Loc(x).PES_OptPara.GetUpperBound(0)
+                        If Ind.Loc(x).PES_OptPara(y).Bezeichnung = Me.List_OptParameter_Save(i).Bezeichnung Then
+                            fieldvalues &= ", " & Ind.Loc(x).PES_OptPara(y).RWert.ToString(Common.Provider.FortranProvider)
                             found = True
                         End If
                     Next
                 Next
-                If found = False
+                If found = False Then
                     fieldvalues &= ", " & "-7"
                 End If
             Next
@@ -497,7 +497,7 @@ Public Class OptResult
             'zugehörige Sim_ID bestimmen
             bedingung = ""
             For j = 0 To Me.List_OptZiele.GetUpperBound(0)
-                bedingung &= " AND QWerte.[" & Me.List_OptZiele(j).Bezeichnung & "] = " & SekPop(i, j).ToString(EVO.Sim.FortranProvider)
+                bedingung &= " AND QWerte.[" & Me.List_OptZiele(j).Bezeichnung & "] = " & SekPop(i, j).ToString(EVO.Common.Provider.FortranProvider)
             Next
             command.CommandText = "SELECT Sim.ID FROM Sim INNER JOIN QWerte ON Sim.ID = QWerte.Sim_ID WHERE (1=1" & bedingung & ")"
             Sim_ID = command.ExecuteScalar()

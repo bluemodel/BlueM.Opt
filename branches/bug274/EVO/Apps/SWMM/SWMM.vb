@@ -353,7 +353,7 @@ Public Class SWMM
 
     'Berechnung des Qualitätswerts (Zielwert)
     '****************************************
-    Public Overrides Function QWert(ByVal OptZiel As Kern.OptZiel) As Double
+    Public Overrides Function QWert(ByVal OptZiel As Common.OptZiel) As Double
 
         QWert = 0
 
@@ -379,14 +379,14 @@ Public Class SWMM
 
     End Function
 
-    Public Function QWert_RPT(ByVal OptZiel As Kern.OptZiel) As Double
+    Public Function QWert_RPT(ByVal OptZiel As Common.OptZiel) As Double
 
         Dim QWert As Double
         Dim FFreqEast As Double, FFreqGath As Double, FFreqWest As Double
         Dim AvgFEast As Double, AvgFGath As Double, AvgFWest As Double
         Dim DateiPfad As String
         Dim Zeile As String
-        
+
         DateiPfad = WorkDir & Datensatz & ".RPT"
 
         'RPT-Datei öffnen

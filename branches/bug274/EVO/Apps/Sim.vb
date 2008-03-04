@@ -37,8 +37,6 @@ Public MustInherit Class Sim
 
     Public SimErgebnis As Collection                     'Simulationsergebnis als Collection von Wave.Zeitreihe Objekten
 
-    Public Shared FortranProvider As NumberFormatInfo    'Zahlenformatierungsanweisung für Fortran
-
     'Konstanten
     '----------
     Public Const OptParameter_Ext As String = "OPT"      'Erweiterung der Datei mit den Optimierungsparametern (*.OPT)
@@ -72,8 +70,7 @@ Public MustInherit Class Sim
 
     'Optimierungsziele
     '-----------------
-    Public List_OptZiele() As Kern.OptZiel          'Liste der Zielfunktionen
-    Public List_SekZiele() As Kern.OptZiel          'Liste der Sekundären Zielfunktionen
+    Public OptZielMgr As Common.ObjectiveManager
 
     'Constraints
     '-----------
@@ -143,8 +140,6 @@ Public MustInherit Class Sim
         ReDim Me.List_OptParameter_Save(-1)
         ReDim Me.List_ModellParameter(-1)
         ReDim Me.List_ModellParameter_Save(-1)
-        ReDim Me.List_OptZiele(-1)
-        ReDim Me.List_SekZiele(-1)
         ReDim Me.List_Constraints(-1)
         ReDim Me.List_Locations(-1)
 
@@ -154,13 +149,6 @@ Public MustInherit Class Sim
         'Benutzereinstellungen einlesen
         '------------------------------
         Call Me.ReadSettings()
-
-        'Provider einrichten
-        '-------------------
-        Sim.FortranProvider = New NumberFormatInfo()
-        Sim.FortranProvider.NumberDecimalSeparator = "."
-        Sim.FortranProvider.NumberGroupSeparator = ""
-        Sim.FortranProvider.NumberGroupSizes = New Integer() {3}
 
     End Sub
 
@@ -352,9 +340,9 @@ Public MustInherit Class Sim
                 'Werte zuweisen
                 List_OptParameter(i).Bezeichnung = array(1).Trim()
                 List_OptParameter(i).Einheit = array(2).Trim()
-                List_OptParameter(i).StartWert = Convert.ToDouble(array(3).Trim(), Sim.FortranProvider)
-                List_OptParameter(i).Min = Convert.ToDouble(array(4).Trim(), Sim.FortranProvider)
-                List_OptParameter(i).Max = Convert.ToDouble(array(5).Trim(), Sim.FortranProvider)
+                List_OptParameter(i).StartWert = Convert.ToDouble(array(3).Trim(), Common.Provider.FortranProvider)
+                List_OptParameter(i).Min = Convert.ToDouble(array(4).Trim(), Common.Provider.FortranProvider)
+                List_OptParameter(i).Max = Convert.ToDouble(array(5).Trim(), Common.Provider.FortranProvider)
                 'liegt eine Beziehung vor?
                 If (i > 0 And Not array(6).Trim() = "") Then
                     Me.List_OptParameter(i).Beziehung = getBeziehung(array(6).Trim())
@@ -439,7 +427,7 @@ Public MustInherit Class Sim
                 List_ModellParameter(i).ZeileNr = Convert.ToInt16(array(6).Trim())
                 List_ModellParameter(i).SpVon = Convert.ToInt16(array(7).Trim())
                 List_ModellParameter(i).SpBis = Convert.ToInt16(array(8).Trim())
-                List_ModellParameter(i).Faktor = Convert.ToDouble(array(9).Trim(), Sim.FortranProvider)
+                List_ModellParameter(i).Faktor = Convert.ToDouble(array(9).Trim(), Common.Provider.FortranProvider)
                 i += 1
             End If
         Loop Until StrRead.Peek() = -1
@@ -458,149 +446,14 @@ Public MustInherit Class Sim
     '**************************
     Protected Overridable Sub Read_ZIE()
 
-        'Format:
-        '*|------|---------------|---------|-------|----------|---------|--------------|--------------------|---------------------------|
-        '*| Opt  | Bezeichnung   | ZielTyp | Datei | SimGröße | ZielFkt | EvalZeitraum |       Zielwert   ODER      Zielreihe           |
-        '*|      |               |         |       |          |         | Start | Ende | WertTyp | ZielWert | ZielGröße | Datei         |
-        '*|------|---------------|---------|-------|----------|---------|-------|------|---------|----------|-----------|---------------|
+        Dim ZIE_Datei As String = Me.WorkDir & Me.Datensatz & "." & OptZiele_Ext
 
-        Const AnzSpalten As Integer = 12                       'Anzahl Spalten in der ZIE-Datei
-        Dim tmpZiele() As Kern.OptZiel
-        Dim i As Integer
-        Dim Zeile As String
-        Dim WerteArray() As String
+        Me.OptZielMgr = New Common.ObjectiveManager(Me.SimStart, Me.SimEnde)
 
-        ReDim tmpZiele(-1)
-
-        'Einlesen aller Ziele und Speichern in tmpZiele
-        '##############################################
-        Dim Datei As String = WorkDir & Datensatz & "." & OptZiele_Ext
-        Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
-
-        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-
-        i = 0
-        Do
-            Zeile = StrRead.ReadLine.ToString()
-            If (Zeile.StartsWith("*") = False And Zeile.Contains("|")) Then
-                WerteArray = Zeile.Split("|")
-                'Kontrolle
-                If (WerteArray.GetUpperBound(0) <> AnzSpalten + 1) Then
-                    Throw New Exception("Die ZIE-Datei hat die falsche Anzahl Spalten!")
-                End If
-                'Neues Ziel anlegen
-                ReDim Preserve tmpZiele(i)
-                tmpZiele(i) = New Kern.OptZiel()
-                'Werte einlesen
-                With tmpZiele(i)
-                    If (WerteArray(1).Trim().ToUpper() = "J") Then
-                        .isOpt = True
-                    Else
-                        .isOpt = False
-                    End If
-                    .Bezeichnung = WerteArray(2).Trim()
-                    .ZielTyp = WerteArray(3).Trim()
-                    .Datei = WerteArray(4).Trim()
-                    .SimGr = WerteArray(5).Trim()
-                    .ZielFkt = WerteArray(6).Trim()
-                    If (WerteArray(7).Trim() <> "") Then
-                        .EvalStart = WerteArray(7).Trim()
-                    Else
-                        .EvalStart = Me.SimStart
-                    End If
-                    If WerteArray(8).Trim() <> "" Then
-                        .EvalEnde = WerteArray(8).Trim()
-                    Else
-                        .EvalEnde = Me.SimEnde
-                    End If
-                    .WertTyp = WerteArray(9).Trim()
-                    If (WerteArray(10).Trim() <> "") Then .ZielWert = Convert.ToDouble(WerteArray(9).Trim(), Sim.FortranProvider)
-                    .ZielGr = WerteArray(11).Trim()
-                    .ZielReiheDatei = WerteArray(12).Trim()
-                End With
-                i += 1
-            End If
-        Loop Until StrRead.Peek() = -1
-
-        StrRead.Close()
-        FiStr.Close()
-
-        'Bei ZielReihen Reihen einlesen
-        '##############################
-        Dim ZielStart As Date
-        Dim ZielEnde As Date
-        Dim ext As String
-
-        For i = 0 To tmpZiele.GetUpperBound(0)
-            With tmpZiele(i)
-                If (.ZielTyp = "Reihe" Or .ZielTyp = "IHA") Then
-
-                    'Dateiendung der Zielreihendatei bestimmen und Reihe einlesen
-                    '------------------------------------------------------------
-                    ext = Path.GetExtension(.ZielReiheDatei)
-                    Select Case (ext.ToUpper)
-                        Case ".WEL"
-                            Dim WEL As New Wave.WEL(Me.WorkDir & .ZielReiheDatei, True)
-                            .ZielReihe = WEL.getReihe(.ZielGr)
-                        Case ".ASC"
-                            Dim ASC As New Wave.ASC(Me.WorkDir & .ZielReiheDatei, True)
-                            .ZielReihe = ASC.getReihe(.ZielGr)
-                        Case ".ZRE"
-                            Dim ZRE As New Wave.ZRE(Me.WorkDir & .ZielReiheDatei, True)
-                            .ZielReihe = ZRE.Zeitreihen(0)
-                            'Case ".PRB"
-                            'BUG 183: geht nicht mehr, weil PRB-Dateien keine Zeitreihen sind!
-                            'IsOK = Read_PRB(Me.WorkDir & .ZielReiheDatei, .ZielGr, .ZielReihe)
-                        Case Else
-                            Throw New Exception("Das Format der Zielreihe '" & .ZielReiheDatei & "' wird nicht unterstützt!")
-                    End Select
-
-                    'Zeitraum der Zielreihe überprüfen (nur bei WEL und ZRE)
-                    '-------------------------------------------------------
-                    If (ext.ToUpper = ".WEL" Or ext.ToUpper = ".ZRE" Or ext.ToUpper = ".ASC") Then
-
-                        ZielStart = .ZielReihe.XWerte(0)
-                        ZielEnde = .ZielReihe.XWerte(.ZielReihe.Length - 1)
-
-                        If (ZielStart > .EvalStart Or ZielEnde < .EvalEnde) Then
-                            'Zielreihe deckt Evaluierungszeitraum nicht ab
-                            Throw New Exception("Die Zielreihe '" & .ZielReiheDatei & "' deckt den Evaluierungszeitraum nicht ab!")
-                        Else
-                            'Zielreihe auf Evaluierungszeitraum kürzen
-                            Call .ZielReihe.Cut(.EvalStart, .EvalEnde)
-                        End If
-
-                    End If
-
-                    'Zielreihe umbenennen
-                    .ZielReihe.Title += " (Referenz)"
-
-                End If
-            End With
-        Next
-
-        'Aufteilen der tmpZiele in OptZiele und SekZiele
-        '###############################################
-        For i = 0 To tmpZiele.GetUpperBound(0)
-            If (tmpZiele(i).isOpt) Then
-                'OptZiel
-                '-------
-                'Liste um 1 erweitern
-                ReDim Preserve Me.List_OptZiele(Me.List_OptZiele.GetUpperBound(0) + 1)
-                'Ziel kopieren
-                Me.List_OptZiele(Me.List_OptZiele.GetUpperBound(0)) = tmpZiele(i)
-            Else
-                'SekZiel
-                '-------
-                'Liste um 1 erweitern
-                ReDim Preserve Me.List_SekZiele(Me.List_SekZiele.GetUpperBound(0) + 1)
-                'Ziel kopieren
-                Me.List_SekZiele(Me.List_SekZiele.GetUpperBound(0)) = tmpZiele(i)
-            End If
-        Next i
+        Call Me.OptZielMgr.Read_ZIE(ZIE_Datei)
 
         'ggf. Warnung wegen maximal 3 Dimensionen in Diagramm ausgeben 
-        If (Me.List_OptZiele.Length > 3) Then
+        If (Me.OptZielMgr.List_OptZiele.Length > 3) Then
             MsgBox("Die Anzahl der OptZiele beträgt mehr als 3!" & eol _
                     & "Es werden nur die ersten drei Zielfunktionen im Hauptdiagramm angezeigt!", MsgBoxStyle.Information, "Info")
         End If
@@ -906,9 +759,9 @@ Public MustInherit Class Sim
     '****************************************************
     Public Function No_of_Combinations() As Integer
 
-        If CES_T_MODUS = Kern.CES_T_MODUS.One_Combi Then
+        If CES_T_Modus = Kern.CES_T_MODUS.One_Combi Then
             No_of_Combinations = 1
-        else
+        Else
             Dim i As Integer
             No_of_Combinations = List_Locations(0).List_Massnahmen.GetLength(0)
             For i = 1 To List_Locations.GetUpperBound(0)
@@ -942,7 +795,7 @@ Public MustInherit Class Sim
         Next
 
         If count_A = count_B Then
-            Set_TestModus = kern.CES_T_MODUS.No_Test
+            Set_TestModus = Kern.CES_T_MODUS.No_Test
             Exit Function
         End If
 
@@ -960,7 +813,7 @@ Public MustInherit Class Sim
         Next
 
         If count_A = count_B Then
-            Set_TestModus = kern.CES_T_MODUS.One_Combi
+            Set_TestModus = Kern.CES_T_MODUS.One_Combi
             Exit Function
         End If
 
@@ -978,7 +831,7 @@ Public MustInherit Class Sim
         Next
 
         If count_A = count_B Then
-            Set_TestModus = kern.CES_T_MODUS.All_Combis
+            Set_TestModus = Kern.CES_T_MODUS.All_Combis
             Exit Function
         End If
 
@@ -1005,14 +858,14 @@ Public MustInherit Class Sim
 
     'Holt sich im Falle des Testmodus 1 den Pfad aus der .CES Datei
     '**************************************************************
-    Public Function TestPath As Integer ()
+    Public Function TestPath() As Integer()
 
         Dim Array(List_Locations.GetUpperBound(0)) As Integer
- 
+
         Dim i, j As Integer
-    
+
         For i = 0 To Array.GetUpperBound(0)
-            Dim count as Integer = 0
+            Dim count As Integer = 0
             Array(i) = -7
             For j = 0 To List_Locations(i).List_Massnahmen.GetUpperBound(0)
                 If List_Locations(i).List_Massnahmen(j).TestModus = 1 Then
@@ -1020,7 +873,7 @@ Public MustInherit Class Sim
                     count += 1
                 End If
             Next
-            If count > 1 then Array(i) = -7
+            If count > 1 Then Array(i) = -7
         Next
 
         TestPath = Array.Clone
@@ -1029,7 +882,7 @@ Public MustInherit Class Sim
 
     'Die Elemente werden pro Location im Child gespeichert
     '*****************************************************
-    Public Sub Identify_Measures_Elements_Parameters(ByVal No_Loc As Integer, ByVal No_Measure As Integer, ByRef Measure As String, ByRef Elements() As String, ByRef PES_OptPara() As kern.OptParameter)
+    Public Sub Identify_Measures_Elements_Parameters(ByVal No_Loc As Integer, ByVal No_Measure As Integer, ByRef Measure As String, ByRef Elements() As String, ByRef PES_OptPara() As Kern.OptParameter)
 
         Dim i, j As Integer
         Dim x As Integer
@@ -1285,7 +1138,7 @@ Public MustInherit Class Sim
         Next
 
         'Anzahl Optimierungsziele übergeben
-        globalAnzZiel = Me.List_OptZiele.GetLength(0)
+        globalAnzZiel = Me.OptZielMgr.List_OptZiele.GetLength(0)
 
         'Anzahl Randbedingungen übergeben
         globalAnzRand = Me.List_Constraints.GetLength(0)
@@ -1390,7 +1243,7 @@ Handler:
             'Wert auf verfügbare Stellen kürzen
             '----------------------------------
             'bestimmen des ganzzahligen Anteils, \-Operator ginge zwar theoretisch, ist aber für Zahlen < 1 nicht robust (warum auch immer)
-            WertStr = Convert.ToString(List_ModellParameter(i).Wert - List_ModellParameter(i).Wert Mod 1.0, Sim.FortranProvider)
+            WertStr = Convert.ToString(List_ModellParameter(i).Wert - List_ModellParameter(i).Wert Mod 1.0, Common.Provider.FortranProvider)
 
             If (WertStr.Length > AnzZeichen) Then
                 'Wert zu lang
@@ -1398,7 +1251,7 @@ Handler:
 
             ElseIf (WertStr.Length < AnzZeichen - 1) Then
                 'Runden auf verfügbare Stellen: Anzahl der Stellen - Anzahl der Vorkommastellen - Komma
-                WertStr = Convert.ToString(Math.Round(List_ModellParameter(i).Wert, AnzZeichen - WertStr.Length - 1), Sim.FortranProvider)
+                WertStr = Convert.ToString(Math.Round(List_ModellParameter(i).Wert, AnzZeichen - WertStr.Length - 1), Common.Provider.FortranProvider)
 
             Else
                 'Ganzzahligen Wert benutzen
@@ -1443,14 +1296,14 @@ Handler:
         If Not launchSim() Then Exit Function
 
         'Qualitätswerte berechnen
-        For i = 0 To Me.List_OptZiele.GetUpperBound(0)
-            Me.List_OptZiele(i).QWertTmp = QWert(Me.List_OptZiele(i))
-            Indi.Penalty(i) = Me.List_OptZiele(i).QWertTmp
+        For i = 0 To Me.OptZielMgr.List_OptZiele.GetUpperBound(0)
+            Me.OptZielMgr.List_OptZiele(i).QWertTmp = QWert(Me.OptZielMgr.List_OptZiele(i))
+            Indi.Penalty(i) = Me.OptZielMgr.List_OptZiele(i).QWertTmp
         Next
 
         'Sekundäre Ziele evaluieren
-        For i = 0 To Me.List_SekZiele.GetUpperBound(0)
-            Me.List_SekZiele(i).QWertTmp = QWert(Me.List_SekZiele(i))
+        For i = 0 To Me.OptZielMgr.List_SekZiele.GetUpperBound(0)
+            Me.OptZielMgr.List_SekZiele(i).QWertTmp = QWert(Me.OptZielMgr.List_SekZiele(i))
         Next
 
         'Constraints berechnen
@@ -1539,12 +1392,12 @@ Handler:
 
     'Berechnung des Qualitätswerts (Zielwert)
     '****************************************
-    Public MustOverride Function QWert(ByVal OptZiel As Kern.OptZiel) As Double
+    Public MustOverride Function QWert(ByVal OptZiel As Common.OptZiel) As Double
 
     'Qualitätswert berechnen: Zieltyp = Reihe
     '****************************************
     'BUG 218: Konstante und gleiche Zeitschrittweiten vorausgesetzt!
-    Protected Function QWert_Reihe(ByVal OptZiel As Kern.OptZiel, ByVal SimReihe As Wave.Zeitreihe) As Double
+    Protected Function QWert_Reihe(ByVal OptZiel As Common.OptZiel, ByVal SimReihe As Wave.Zeitreihe) As Double
 
         Dim QWert As Double
         Dim i, j As Integer
@@ -1682,7 +1535,7 @@ Handler:
 
     'Qualitätswert berechnen: Zieltyp = Wert
     '***************************************
-    Protected Function QWert_Wert(ByVal OptZiel As Kern.OptZiel, ByVal SimReihe As Wave.Zeitreihe) As Double
+    Protected Function QWert_Wert(ByVal OptZiel As Common.OptZiel, ByVal SimReihe As Wave.Zeitreihe) As Double
 
         Dim QWert As Double
         Dim i As Integer
@@ -1738,7 +1591,7 @@ Handler:
 
     'Qualitätswert aus PRB-Datei
     '***************************
-    Private Function QWert_PRB(ByVal OptZiel As Kern.OptZiel) As Double
+    Private Function QWert_PRB(ByVal OptZiel As Common.OptZiel) As Double
 
         'BUG 220: PRB geht nicht, weil keine Zeitreihe
         'Dim i As Integer

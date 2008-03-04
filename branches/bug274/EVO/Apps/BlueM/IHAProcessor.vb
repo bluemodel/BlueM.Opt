@@ -54,7 +54,7 @@ Public Class IHAProcessor
 
     'QWert aus IHA-Ergebnissen berechnen
     '***********************************
-    Public Function QWert_IHA(ByVal OptZiel As Kern.OptZiel, ByVal RVAResult As Wave.RVA.Struct_RVAValues) As Double
+    Public Function QWert_IHA(ByVal OptZiel As Common.OptZiel, ByVal RVAResult As Wave.RVA.Struct_RVAValues) As Double
 
         Dim QWert As Double
         Dim i As Integer

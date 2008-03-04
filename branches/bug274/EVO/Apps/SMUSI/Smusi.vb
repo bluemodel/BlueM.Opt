@@ -216,7 +216,7 @@ Public Class Smusi
             Dim elemente As New Collection()
 
             'Einzulesende Dateien zusammenstellen
-            For Each optziel As Kern.OptZiel In Me.List_OptZiele
+            For Each optziel As Common.OptZiel In Me.OptZielMgr.List_OptZiele
                 element = optziel.SimGr.Substring(0, 4)
                 If (Not elemente.Contains(element)) Then
                     elemente.Add(element, element)
@@ -246,7 +246,7 @@ Public Class Smusi
 
     'Berechnung des Qualitätswerts (Zielwert)
     '****************************************
-    Public Overrides Function QWert(ByVal OptZiel As Kern.OptZiel) As Double
+    Public Overrides Function QWert(ByVal OptZiel As Common.OptZiel) As Double
 
         QWert = 0
 
@@ -267,7 +267,7 @@ Public Class Smusi
 
     'Qualitätswert aus ASC-Datei
     '***************************
-    Private Function QWert_ASC(ByVal OptZiel As Kern.OptZiel) As Double
+    Private Function QWert_ASC(ByVal OptZiel As Common.OptZiel) As Double
 
         Dim QWert As Double
         Dim SimReihe As Wave.Zeitreihe
