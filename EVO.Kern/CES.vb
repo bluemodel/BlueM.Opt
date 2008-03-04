@@ -653,68 +653,77 @@ Public Class CES
     '**********************************************************************************************
     Sub Memory_Search_per_Child(ByVal Child As Individuum)
 
-        Dim j, m As Integer
-        Dim count_a(ModSett.n_Locations - 1) As Integer
-        Dim count_b(ModSett.n_Locations - 1) As Integer
-        Dim count_c(ModSett.n_Locations - 1) As Integer
+        Select settings.CES.Mem_Strategy
 
-        ReDim PES_Parents_pChild(0)
-        PES_Parents_pChild(0) = New Individuum("PES_Parent", 0)
+            Case MEMORY_STRATEGY.B_One_Loc_Up, MEMORY_STRATEGY.A_Two_Loc_Up
 
-        Dim akt As Integer = 0
+            Case MEMORY_STRATEGY.C_This_Loc, MEMORY_STRATEGY.D_One_Loc_Down, MEMORY_STRATEGY.E_Two_Loc_Down
+                
+                Dim j, m As Integer
+                Dim count_a(ModSett.n_Locations - 1) As Integer
+                Dim count_b(ModSett.n_Locations - 1) As Integer
+                Dim count_c(ModSett.n_Locations - 1) As Integer
 
-        For j = 0 To ModSett.n_Locations - 1
-            count_a(j) = 0
-            count_b(j) = 0
-            count_c(j) = 0
-        Next
+                ReDim PES_Parents_pChild(0)
+                PES_Parents_pChild(0) = New Individuum("PES_Parent", 0)
 
-        For j = 0 To ModSett.n_Locations - 1
-            For m = 0 To Memory.GetUpperBound(0)
+                Dim akt As Integer = 0
 
-                'Rank Nummer 1 (Lediglich Übereinstimmung in der Location selbst)
-                If Child.Path(j) = Memory(m).Path(j) Then
-                    ReDim Preserve PES_Parents_pChild(PES_Parents_pChild.GetLength(0))
-                    PES_Parents_pChild(PES_Parents_pChild.GetUpperBound(0)) = New Individuum("PES_Parent", PES_Parents_pChild.GetUpperBound(0))
-                    akt = PES_Parents_pChild.GetUpperBound(0)
-                    PES_Parents_pChild(akt) = Memory(m).Clone()
-                    PES_Parents_pChild(akt).iLocation = j + 1
-                    PES_Parents_pChild(akt).Memory_Rank = 0
-                    count_a(j) += 1
-                End If
+                For j = 0 To ModSett.n_Locations - 1
+                    count_a(j) = 0
+                    count_b(j) = 0
+                    count_c(j) = 0
+                Next
 
-                'Rank Nummer 2 (Übereinstimmung in Location 1 und 2)
-                If Not j = ModSett.n_Locations - 1 And Settings.CES.Mem_Strategy > 0 Then
-                    If Child.Path(j) = Memory(m).Path(j) And Child.Path(j + 1) = Memory(m).Path(j + 1) Then
-                        ReDim Preserve PES_Parents_pChild(PES_Parents_pChild.GetLength(0))
-                        PES_Parents_pChild(PES_Parents_pChild.GetUpperBound(0)) = New Individuum("PES_Parent", PES_Parents_pChild.GetUpperBound(0))
-                        akt = PES_Parents_pChild.GetUpperBound(0)
-                        PES_Parents_pChild(akt) = Memory(m).Clone()
-                        PES_Parents_pChild(akt).iLocation = j + 1
-                        PES_Parents_pChild(akt).Memory_Rank = 1
-                        count_b(j) += 1
-                    End If
-                End If
+                For j = 0 To ModSett.n_Locations - 1
+                    For m = 0 To Memory.GetUpperBound(0)
 
-                'Rank Nummer 3 (Übereinstimmung in Location 1, 2 und 3)
-                If Not (j = ModSett.n_Locations - 1 Or j = ModSett.n_Locations - 2) And Settings.CES.Mem_Strategy > 1 Then
-                    If Child.Path(j) = Memory(m).Path(j) And Child.Path(j + 1) = Memory(m).Path(j + 1) And Child.Path(j + 2) = Memory(m).Path(j + 2) Then
-                        ReDim Preserve PES_Parents_pChild(PES_Parents_pChild.GetLength(0))
-                        PES_Parents_pChild(PES_Parents_pChild.GetUpperBound(0)) = New Individuum("PES_Parent", PES_Parents_pChild.GetUpperBound(0))
-                        akt = PES_Parents_pChild.GetUpperBound(0)
-                        PES_Parents_pChild(akt) = Memory(m).Clone()
-                        PES_Parents_pChild(akt).iLocation = j + 1
-                        PES_Parents_pChild(akt).Memory_Rank = 2
-                        count_c(j) += 1
-                    End If
-                End If
-            Next
-        Next
+                        'Rank Nummer 1 (Lediglich Übereinstimmung in der Location selbst)
+                        If Child.Path(j) = Memory(m).Path(j) Then
+                            ReDim Preserve PES_Parents_pChild(PES_Parents_pChild.GetLength(0))
+                            PES_Parents_pChild(PES_Parents_pChild.GetUpperBound(0)) = New Individuum("PES_Parent", PES_Parents_pChild.GetUpperBound(0))
+                            akt = PES_Parents_pChild.GetUpperBound(0)
+                            PES_Parents_pChild(akt) = Memory(m).Clone()
+                            PES_Parents_pChild(akt).iLocation = j + 1
+                            PES_Parents_pChild(akt).Memory_Rank = 0
+                            count_a(j) += 1
+                        End If
+
+                        'Rank Nummer 2 (Übereinstimmung in Location 1 und 2)
+                        If Not j = ModSett.n_Locations - 1 And Settings.CES.Mem_Strategy > 0 Then
+                            If Child.Path(j) = Memory(m).Path(j) And Child.Path(j + 1) = Memory(m).Path(j + 1) Then
+                                ReDim Preserve PES_Parents_pChild(PES_Parents_pChild.GetLength(0))
+                                PES_Parents_pChild(PES_Parents_pChild.GetUpperBound(0)) = New Individuum("PES_Parent", PES_Parents_pChild.GetUpperBound(0))
+                                akt = PES_Parents_pChild.GetUpperBound(0)
+                                PES_Parents_pChild(akt) = Memory(m).Clone()
+                                PES_Parents_pChild(akt).iLocation = j + 1
+                                PES_Parents_pChild(akt).Memory_Rank = 1
+                                count_b(j) += 1
+                            End If
+                        End If
+
+                        'Rank Nummer 3 (Übereinstimmung in Location 1, 2 und 3)
+                        If Not (j = ModSett.n_Locations - 1 Or j = ModSett.n_Locations - 2) And Settings.CES.Mem_Strategy > 1 Then
+                            If Child.Path(j) = Memory(m).Path(j) And Child.Path(j + 1) = Memory(m).Path(j + 1) And Child.Path(j + 2) = Memory(m).Path(j + 2) Then
+                                ReDim Preserve PES_Parents_pChild(PES_Parents_pChild.GetLength(0))
+                                PES_Parents_pChild(PES_Parents_pChild.GetUpperBound(0)) = New Individuum("PES_Parent", PES_Parents_pChild.GetUpperBound(0))
+                                akt = PES_Parents_pChild.GetUpperBound(0)
+                                PES_Parents_pChild(akt) = Memory(m).Clone()
+                                PES_Parents_pChild(akt).iLocation = j + 1
+                                PES_Parents_pChild(akt).Memory_Rank = 2
+                                count_c(j) += 1
+                            End If
+                        End If
+                    Next
+                Next
+
+        End Select
 
         'Die Doppelten niedrigeren Ränge werden gelöscht - und der erste leere Datensatz
         '!Die Liste kann größer als die Liste des Momory sein, ein eine Lösung für verschiedene Lokations verwendet werden kann
         Call Memory_Dubletten_loeschen(PES_Parents_pChild)
 
+        'Die die nicht der eingestellten Memory Strategy entsprechen werden entfernt
         Call Memory_Delete_too_weak(PES_Parents_pChild)
 
     End Sub
@@ -1052,7 +1061,8 @@ Public Class CES
         Call Func1.EsEltern_Pareto_SekundärQb(Parents, NDSorting, SekundärQb)
         '********************************************************************************************
 
-        'Schritt 5 und 6 sind für CES noch nicht implementiert
+        'Schritt 5: ist für CES nicht notwenig, da die Parents ByRef zurückgegeben werden
+        'und das rüberschreiebn der SekundärQB in Functions erfolgt
 
         ''5: Neue Eltern werden gleich dem Bestwertspeicher gesetzt
         ''---------------------------------------------------------
@@ -1062,6 +1072,8 @@ Public Class CES
         '        Xe(v, i, PES_iAkt.iAktPop) = Best.Xb(v, i, PES_iAkt.iAktPop)
         '    Next v
         'Next i
+
+        'Schritt 6: nicht so spannend
 
         ''6: Sortierung der Lösungen ist nur für Neighbourhood-Rekombination notwendig
         ''----------------------------------------------------------------------------
