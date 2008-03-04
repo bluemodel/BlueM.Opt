@@ -572,7 +572,7 @@ Public Class CES
                         Call MutOp_Dyn_Switch(Childs(i).Path, count)
                 End Select
                 count += 1
-            Loop While (Is_Twin(i) = True Or Is_Clone(i) = True Or is_nullvariante(Childs(i).Path) = True) And Not count >= 1000
+            Loop While is_nullvariante(Childs(i).Path) = True And Not count >= 1000
             Childs(i).mutated = True
         Next
 
@@ -907,7 +907,7 @@ Public Class CES
         '4: Sekundäre Population wird bestimmt und gespeichert
         '--------------------------------
         Dim Func1 As New Kern.Functions(n_PES_Childs, Settings.PES.n_Eltern, Settings.CES.n_PES_MemSecPop, Settings.CES.n_PES_Interact, Settings.CES.is_PES_SecPop, ModSett.n_Penalty, ModSett.n_Constrain, 1)
-        Call Func1.EsEltern_Pareto_SekundärQb(PES_Parents_pLoc, NDSorting, PES_SekundärQb)
+        Call Func1.EsEltern_Pareto(PES_Parents_pLoc, NDSorting, PES_SekundärQb)
         '********************************************************************************************
 
         'SekundärQB macht in dieser Form noch keinen Sinn !!!!!!!!!!!!!!!!!!!
@@ -966,8 +966,8 @@ Public Class CES
 
     End Sub
 
-    'Hilfsfunktion checkt ob die neuen Childs Zwillinge sind
-    '*******************************************************
+    'Hilfsfunktion checkt ob die neuen Childs Zwillinge sind. Nur beim Generieren der ersten Pfade.
+    '**********************************************************************************************
     Private Function Is_Twin(ByVal ChildIndex As Integer) As Boolean
         Dim n As Integer = 0
         Dim i, j As Integer
@@ -990,8 +990,8 @@ Public Class CES
         Next
     End Function
 
-    'Hilfsfunktion checkt ob die neuen Childs Klone sind
-    '***************************************************
+    'Hilfsfunktion checkt ob die neuen Childs Klone sind - Deaktiviert!
+    '******************************************************************
     Private Function Is_Clone(ByVal ChildIndex As Integer) As Boolean
         Dim i, j As Integer
         Dim PathOK As Boolean
@@ -1099,7 +1099,7 @@ Public Class CES
         '4: Sekundäre Population wird bestimmt und gespeichert
         '--------------------------------
         Dim Func1 As New Kern.Functions(Settings.CES.n_Childs, Settings.CES.n_Parents, Settings.CES.n_MemberSecondPop, Settings.CES.n_Interact, Settings.CES.is_SecPop, ModSett.n_Penalty, ModSett.n_Constrain, iAktGen)
-        Call Func1.EsEltern_Pareto_SekundärQb(Parents, NDSorting, SekundärQb)
+        Call Func1.EsEltern_Pareto(Parents, NDSorting, SekundärQb)
         '********************************************************************************************
 
         'Schritt 5: ist für CES nicht notwenig, da die Parents ByRef zurückgegeben werden
