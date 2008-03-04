@@ -58,7 +58,7 @@ Public Class Individuum
     Public Generation As Integer           '12 Die Generation (eher zur Information)
 
     'Für PES Parent -------------------------------------------------
-    Public Memory_Rank As Integer          '13 MemoryRang des PES Elters
+    Public Memory_Strat As MEMORY_STRATEGY '13 Memory_Strategie des PES Elters
     Public iLocation As Integer            '14 Location des PES Parent
 
     'Gibt zurück ob Individuum gültig ist
@@ -249,7 +249,7 @@ Public Class Individuum
         Me.Generation = 0
 
         '13 MemoryRang des PES Elters
-        Me.Memory_Rank = 777
+        Me.Memory_Strat = 777
 
         '14 Location des PES Parent
         Me.iLocation = 777
@@ -342,7 +342,7 @@ Public Class Individuum
         Dest.Generation = Me.Generation
 
         '13 MemoryRang des PES Elters
-        Dest.Memory_Rank = Me.Memory_Rank
+        Dest.Memory_Strat = Me.Memory_Strat
 
         '14 Location des PES Parent
         Dest.iLocation = Me.iLocation
