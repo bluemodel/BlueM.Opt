@@ -967,7 +967,7 @@ StartMutation:
                 'Neue Schrittweite
                 DnTemp(0) = AktPara(0).Dn * Math.Exp(tau * Z)
                 'Mindestschrittweite muss eingehalten werden
-                If dntemp(0) < Settings.PES.Schrittweite.DnEpsilon Then dntemp(0) = Settings.PES.Schrittweite.DnEpsilon
+                If DnTemp(0) < Settings.PES.Schrittweite.DnEpsilon Then DnTemp(0) = Settings.PES.Schrittweite.DnEpsilon
             End If
             'Schrittweite für alle übernehmen
             For v = 1 To Anz.Para - 1
@@ -1003,7 +1003,7 @@ StartMutation:
                         'Schrittweite wird mutiert
                         DnTemp(v) = AktPara(v).Dn * galpha ^ expo
                     ElseIf (Settings.PES.Schrittweite.OptDnMutation = EVO_DnMutation.Schwefel) Then
-                        tau = Settings.PES.Schrittweite.DnC / Math.Sqrt(2 * math.Sqrt(Anz.Para))
+                        tau = Settings.PES.Schrittweite.DnC / Math.Sqrt(2 * Math.Sqrt(Anz.Para))
                         'Normalverteilte Zufallszahl (SD = 1, mean = 0)
                         Z = Me.NormalDistributationRND(1.0, 0.0)
                         'Neue Schrittweite
@@ -1165,7 +1165,7 @@ StartMutation:
 
     'ES_BEST - Einordnen der Qualitätsfunktion im Bestwertspeicher
     '*************************************************************
-    Public Sub EsBest(ByVal QN() As Double, ByVal RN() As Double)
+    Public Sub EsBest(ByVal ind As Kern.Individuum)
 
         Dim m, i, j, v As Integer
         Dim h As Double
@@ -1187,13 +1187,13 @@ StartMutation:
 
             'Falls die Qualität des aktuellen Nachkommen besser ist (Penaltyfunktion geringer)
             'als die schlechteste im Bestwertspeicher, wird dieser ersetzt
-            If QN(0) < Best.Qb(j, PES_iAkt.iAktPop, 0) Then
-                Best.Qb(j, PES_iAkt.iAktPop, 0) = QN(0)
+            If ind.Penalty(0) < Best.Qb(j, PES_iAkt.iAktPop, 0) Then
+                Best.Qb(j, PES_iAkt.iAktPop, 0) = ind.Penalty(0)
                 For v = 0 To Anz.Para - 1
                     'Die Schrittweite wird ebenfalls übernommen
                     Best.Db(v, j, PES_iAkt.iAktPop) = AktPara(v).Dn
                     'Die eigentlichen Parameterwerte werden übernommen
-                    Best.Xb(v, j, PES_iAkt.iAktPop) = AktPara(v).Xn
+                    Best.Xb(v, j, PES_iAkt.iAktPop) = AktPara(v).Xn 'TODO: Hier die OptPara des übergebenen Individuums nehmen? 
                 Next v
             End If
 
@@ -1201,16 +1201,16 @@ StartMutation:
             'Multi-Objective Pareto
             '----------------------
             With NDSorting(PES_iAkt.iAktNachf)
-                For i = 0 To Anz.Penalty - 1
-                    .Penalty(i) = QN(i)
+                For i = 0 To Common.Manager.AnzGesZiele - 1
+                    .QWerte(i) = ind.Qwerte(i)
                 Next i
                 For i = 0 To Anz.Constr - 1
-                    .Constrain(i) = RN(i)
+                    .Constrain(i) = ind.Constrain(i)
                 Next i
                 .dominated = False
                 .Front = 0
                 For v = 0 To Anz.Para - 1
-                    .PES_OptParas(v).Dn = AktPara(v).Dn
+                    .PES_OptParas(v).Dn = AktPara(v).Dn 'TODO: Hier die OptPara des übergebenen Individuums nehmen? 
                     .PES_OptParas(v).Xn = AktPara(v).Xn
                 Next v
                 .Distance = 0
@@ -1447,11 +1447,17 @@ StartMutation:
     'Kopiert den Bestwertspeicher in ein Individuum
     '----------------------------------------------
     Public Sub Copy_Bestwert_to_Individuum(ByVal i_indi As Integer, ByVal i_best As Integer, ByRef Individ As Individuum())
-        Dim j, v As Integer
 
-        For j = 0 To Anz.Penalty - 1
-            Individ(i_indi).Penalty(j) = Best.Qb(i_best, PES_iAkt.iAktPop, j)
-        Next j
+        Dim i, j, v As Integer
+
+        j = 0
+        For i = 0 To Common.AnzGesZiele - 1
+            'HACK: Nur QWerte von OptZielen (d.h. Penalty) werden kopiert!
+            If (Common.Manager.List_Ziele(i).isOpt) Then
+                Individ(i_indi).QWerte(i) = Best.Qb(i_best, PES_iAkt.iAktPop, j)
+                j += 1
+            End If
+        Next i
 
         If Anz.Constr > 0 Then
             For j = 0 To Anz.Constr - 1
@@ -1478,10 +1484,10 @@ StartMutation:
         Dim j, i As Integer
         Dim SekPopulation(,) As Double
 
-        ReDim SekPopulation(SekundärQb.GetUpperBound(0), SekundärQb(0).Penalty.GetUpperBound(0))
+        ReDim SekPopulation(SekundärQb.GetUpperBound(0), Common.Manager.AnzOptZiele - 1)
 
         For i = 0 To SekundärQb.GetUpperBound(0)
-            For j = 0 To SekundärQb(0).Penalty.GetUpperBound(0)
+            For j = 0 To Common.Manager.AnzOptZiele - 1
                 SekPopulation(i, j) = SekundärQb(i).Penalty(j)
             Next j
         Next i

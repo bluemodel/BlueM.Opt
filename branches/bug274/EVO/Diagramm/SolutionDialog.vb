@@ -134,8 +134,8 @@ Partial Public Class SolutionDialog
         i = 1
 
         'OptZiele
-        For Each optziel As Double In ind.Penalty
-            cellvalues(i) = optziel
+        For Each penalty As Double In ind.Penalty
+            cellvalues(i) = penalty
             i += 1
         Next
 

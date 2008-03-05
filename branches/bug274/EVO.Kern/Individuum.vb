@@ -41,7 +41,7 @@ Public Class Individuum
 
     Public QWerte() As Double              'Array der QWerte (für alle Zielfunktionen)
     'Penalty-Werte                         '(= QWerte nur von OptZielen!)
-    Public ReadOnly Property Penalty() As Double()
+    Public Property Penalty() As Double()
         Get
             Dim i As Integer
             Dim array() As Double
@@ -57,6 +57,18 @@ Public Class Individuum
 
             Return array
         End Get
+
+        Set(ByVal value As Double()) 'TODO: kein Set!
+            Dim i, j As Integer
+            j = 0
+            For i = 0 To Common.Manager.AnzGesZiele - 1
+                'Nur die QWerte von OptZielen schreiben
+                If (Common.Manager.List_Ziele(i).isOpt) Then
+                    Me.QWerte(i) = value(j)
+                    j += 1
+                End If
+            Next
+        End Set
     End Property
 
 
@@ -380,25 +392,8 @@ Public Class Individuum
     End Sub
 
     'Achtung Überladen!
-    Public Shared Function QN_RN_Indi(ByVal n As Integer, ByRef QN() As Double, ByRef RN() As Double, ByVal MyPara() As Kern.OptParameter) As Individuum
-
-        Dim Indi As New Individuum("QN_RN_Indi", 0)
-
-        'Achtung hier wird bewust per Reference!
-        Indi.Penalty = QN
-        Indi.Constrain = RN
-
-        'Hier nicht per Reference!
-        Indi.ID = n
-        Indi.PES_OptParas = MyPara.Clone
-
-        'Hier per Reference
-        QN_RN_Indi = Indi
-
-    End Function
-
-    'Achtung Überladen!
     Public Shared Function QN_RN_Indi(ByVal n As Integer, ByRef QN() As Double, ByRef RN() As Double, ByVal MyPara() As Double) As Individuum
+
         Dim i As Integer
         Dim Indi As New Individuum("QN_RN_Indi", 0)
 

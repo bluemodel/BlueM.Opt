@@ -1261,7 +1261,7 @@ Public MustInherit Class Sim
 
         'Mutierte Parameter an OptParameter übergeben
         For i = 0 To Me.List_OptParameter.GetUpperBound(0)
-            List_OptParameter(i).Xn = myPara(i).Xn
+            Me.List_OptParameter(i).Xn = myPara(i).Xn
         Next
 
         'Mutierte Parameter in Eingabedateien schreiben

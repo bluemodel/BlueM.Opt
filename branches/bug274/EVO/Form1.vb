@@ -612,8 +612,9 @@ Partial Class Form1
         'geschrieben, und zwar mit den in der OPT-Datei angegebenen Startwerten
         '------------------------------------------------------------------------
 
-        Dim i, j, n, Anz_Sim As Integer
-        Dim QN(), RN() As Double
+        Dim i, j, n, Anz_SensiPara, Anz_Sim As Integer
+        Dim isOK As Boolean
+        Dim ind As Kern.Individuum
         Dim serie As Steema.TeeChart.Styles.Series
         Dim surface As New Steema.TeeChart.Styles.Surface
         Dim SimReihe As Wave.Zeitreihe
@@ -621,16 +622,18 @@ Partial Class Form1
         Dim Wave1 As Wave.Wave
 
         'Instanzieren
-        ReDim QN(Common.Manager.AnzOptZiele - 1)
-        ReDim RN(Sim1.List_Constraints.GetUpperBound(0))
         SimReihen = New Collection
 
-        'Parameterübergabe an ES
+        'Parameter
         Me.globalAnzRand = 0
-        Me.globalAnzPar = SensiPlot1.Selected_OptParameter.GetLength(0)
+        Me.globalAnzPar = Sim1.List_OptParameter.Length
+        Anz_SensiPara = SensiPlot1.Selected_OptParameter.GetLength(0)
+
+        'Individuum wird initialisiert
+        Call Kern.Individuum.Initialise(1, 0, Me.globalAnzPar, Me.globalAnzRand)
 
         'Anzahl Simulationen
-        If (Me.globalAnzPar = 1) Then
+        If (Anz_SensiPara = 1) Then
             '1 Parameter
             Anz_Sim = SensiPlot1.Anz_Steps
         Else
@@ -648,7 +651,7 @@ Partial Class Form1
         Call PrepareDiagramm()
 
         'Oberflächendiagramm
-        If (Me.globalAnzPar > 1) Then
+        If (Anz_SensiPara > 1) Then
             surface = New Steema.TeeChart.Styles.Surface(Me.DForm.Diag.Chart)
             surface.IrregularGrid = True
             surface.NumXValues = SensiPlot1.Anz_Steps
@@ -671,7 +674,7 @@ Partial Class Form1
 
         'Äussere Schleife (2. OptParameter)
         '----------------------------------
-        For i = 0 To ((SensiPlot1.Anz_Steps - 1) * (Me.globalAnzPar - 1))
+        For i = 0 To ((SensiPlot1.Anz_Steps - 1) * (Anz_SensiPara - 1))
 
             '2. OptParameterwert variieren
             If (Me.globalAnzPar > 1) Then
@@ -679,7 +682,7 @@ Partial Class Form1
                     Case "Gleichverteilt"
                         Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Xn = Rnd()
                     Case "Diskret"
-                        Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Xn = i / SensiPlot1.Anz_Steps
+                        Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Xn = i / (SensiPlot1.Anz_Steps - 1)
                 End Select
             End If
 
@@ -692,30 +695,37 @@ Partial Class Form1
                     Case "Gleichverteilt"
                         Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Xn = Rnd()
                     Case "Diskret"
-                        Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Xn = j / SensiPlot1.Anz_Steps
+                        Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Xn = j / (SensiPlot1.Anz_Steps - 1)
                 End Select
 
                 n += 1
 
-                'Modellparameter schreiben
-                Call Sim1.Write_ModellParameter()
-
                 'Verlaufsanzeige aktualisieren
                 Me.EVO_Opt_Verlauf1.Nachfolger(n)
 
+                'Individuum instanzieren
+                ind = New Kern.Individuum("SensiPlot", n)
+
+                'OptParameter ins Individuum kopieren
+                ind.PES_OptParas = Sim1.List_OptParameter
+
+                'Modellparameter schreiben
+                Call Sim1.Write_ModellParameter()
+
                 'Evaluieren
-                Call Sim1.SIM_Evaluierung(kern.Individuum.QN_RN_Indi(n, QN, RN, sim1.List_OptParameter))
+                'TODO: Fehlerbehandlung bei Simulationsfehler
+                isOK = Sim1.SIM_Evaluierung(ind)
 
                 'BUG 253: Verletzte Constraints bei SensiPlot kenntlich machen?
 
                 'Diagramm aktualisieren
-                If (Me.globalAnzPar = 1) Then
+                If (Anz_SensiPara = 1) Then
                     '1 Parameter
                     serie = DForm.Diag.getSeriesPoint("SensiPlot", "Orange")
-                    serie.Add(Common.Manager.List_OptZiele(SensiPlot1.Selected_OptZiel).QWertTmp, Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).RWert, n)
+                    serie.Add(ind.Penalty(SensiPlot1.Selected_OptZiel), Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).RWert, n)
                 Else
                     '2 Parameter
-                    surface.Add(Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).RWert, Common.Manager.List_OptZiele(SensiPlot1.Selected_OptZiel).QWertTmp, Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).RWert, n)
+                    surface.Add(Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).RWert, ind.Penalty(SensiPlot1.Selected_OptZiel), Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).RWert, n)
                 End If
 
                 'Simulationsergebnis in Wave laden
@@ -1241,33 +1251,26 @@ Partial Class Form1
     'Anwendung Evolutionsstrategie für Parameter Optimierung - hier Steuerung       
     '************************************************************************
     Private Sub STARTEN_PES()
-        '==========================
-        Dim i As Integer
-        '--------------------------
+
         Dim durchlauf As Integer
+        Dim ind As Kern.Individuum
+        Dim PES1 As EVO.Kern.PES
+
+        'Dim Hypervolume As EVO.Kern.Hypervolumen
+        'Hypervolume = New EVO.Kern.Hypervolumen
+        'Hypervolume.Dimension = Common.Manager.AnzOptZiele
+        'Hypervolume.Normalisiert = True
+        'Dim HV as double
+
         '--------------------------
         'Dimensionierung der Variablen für Optionen Evostrategie
         'Das Struct aus PES wird hier verwendet
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-        'Check!
-        Dim QN() As Double = {}
-        Dim RN() As Double = {}
-        '--------------------------
-
-        'Dim Hypervolume As EVO.Kern.Hypervolumen
-        'Hypervolume = New EVO.Kern.Hypervolumen
-        'Hypervolume.Dimension = globalAnzZiel
-        'Hypervolume.Normalisiert = True
-        'Dim HV as double
-
         'TODO: If (ipop + igen + inachf + irunde) > 4 Then GoTo Start_Evolutionsrunden '????? Wie?
         'Werte an Variablen übergeben auskommentiert Werte finden sich im PES werden hier aber nicht zugewiesen
         'Kann der Kommentar nicht weg?
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-        ReDim QN(Common.Manager.AnzOptZiele - 1)
-        ReDim RN(globalAnzRand - 1)
 
         'Diagramm vorbereiten und initialisieren
         If (Not Form1.Method = METH_HYBRID And Not EVO_Einstellungen1.Settings.CES.ty_Hybrid = EVO.Kern.HYBRID_TYPE.Sequencial_1) Then
@@ -1279,7 +1282,6 @@ Partial Class Form1
 
         'Schritte 0: Objekt der Klasse PES wird erzeugt
         '**********************************************
-        Dim PES1 As EVO.Kern.PES
         PES1 = New EVO.Kern.PES()
 
         'Schritte 1 - 3: ES wird initialisiert (Weiteres siehe dort ;-)
@@ -1339,6 +1341,9 @@ Start_Evolutionsrunden:
                         Dim Eval_Count As Integer = 0
                         Dim SIM_Eval_is_OK As Boolean = True
                         Do
+                            'Neues Individuum instanzieren
+                            ind = New Kern.Individuum("PES", durchlauf)
+
                             'REPRODUKTIONSPROZESS
                             '####################
                             'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
@@ -1352,6 +1357,9 @@ Start_Evolutionsrunden:
                             'Auslesen der Variierten Parameter
                             myPara = PES1.EsGetParameter()
 
+                            'OptParameter in Individuum kopieren
+                            ind.PES_OptParas = myPara
+
                             'Auslesen des Bestwertspeichers
                             'TODO: Bestwertspeicher wird nicht genutzt!
                             'If (EVO_Einstellungen1.Settings.PES.OptModus = Kern.EVO_MODUS.Single_Objective) Then
@@ -1364,38 +1372,30 @@ Start_Evolutionsrunden:
 
                                 Case ANW_TESTPROBLEME
 
-                                    Call Testprobleme1.Evaluierung_TestProbleme(myPara, durchlauf, PES1.PES_iAkt.iAktPop, QN, RN, DForm.Diag)
+                                    Call Testprobleme1.Evaluierung_TestProbleme(ind, PES1.PES_iAkt.iAktPop, DForm.Diag)
 
                                 Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM
 
                                     'Vorbereiten des Modelldatensatzes
                                     Call Sim1.PREPARE_Evaluation_PES(myPara)
 
-                                    'Evaluierung des Simulationsmodells (ToDo: Validätsprüfung fehlt)
-                                    SIM_Eval_is_OK = Sim1.SIM_Evaluierung(kern.Individuum.QN_RN_Indi(durchlauf, QN, RN, myPara))
+                                    'Evaluierung des Simulationsmodells
+                                    SIM_Eval_is_OK = Sim1.SIM_Evaluierung(ind)
 
                                     'Lösung im TeeChart einzeichnen
+                                    'TODO: If (Not SIM_Eval_is_OK) Then [nicht zeichnen!]
                                     '==============================
                                     Dim serie As Steema.TeeChart.Styles.Series
-
-                                    'Constraintverletzung prüfen
-                                    Dim isInvalid As Boolean = False
-                                    For i = 0 To globalAnzRand - 1
-                                        If (RN(i) < 0) Then
-                                            isInvalid = True
-                                            Exit For
-                                        End If
-                                    Next
 
                                     If (Common.Manager.AnzOptZiele = 1) Then
                                         'SingleObjective
                                         'xxxxxxxxxxxxxxx
-                                        If (isInvalid) Then
+                                        If (Not ind.feasible) Then
                                             serie = DForm.Diag.getSeriesPoint("Population " & (PES1.PES_iAkt.iAktPop + 1).ToString() & " (ungültig)", "Gray")
                                         Else
                                             serie = DForm.Diag.getSeriesPoint("Population " & (PES1.PES_iAkt.iAktPop + 1).ToString())
                                         End If
-                                        Call serie.Add(PES1.PES_iAkt.iAktRunde * EVO_Einstellungen1.Settings.PES.n_Gen * EVO_Einstellungen1.Settings.PES.n_Nachf + PES1.PES_iAkt.iAktGen * EVO_Einstellungen1.Settings.PES.n_Nachf + PES1.PES_iAkt.iAktNachf, QN(0), durchlauf.ToString())
+                                        Call serie.Add(PES1.PES_iAkt.iAktRunde * EVO_Einstellungen1.Settings.PES.n_Gen * EVO_Einstellungen1.Settings.PES.n_Nachf + PES1.PES_iAkt.iAktGen * EVO_Einstellungen1.Settings.PES.n_Nachf + PES1.PES_iAkt.iAktNachf, ind.Penalty(0), durchlauf.ToString())
 
                                     Else
                                         'MultiObjective
@@ -1403,23 +1403,23 @@ Start_Evolutionsrunden:
                                         If (Common.Manager.AnzOptZiele = 2) Then
                                             '2D-Diagramm
                                             '------------------------------------------------------------------------
-                                            If (isInvalid) Then
+                                            If (Not ind.feasible) Then
                                                 serie = DForm.Diag.getSeriesPoint("Population" & " (ungültig)", "Gray")
                                             Else
                                                 serie = DForm.Diag.getSeriesPoint("Population", "Orange")
                                             End If
-                                            Call serie.Add(QN(0), QN(1), durchlauf.ToString())
+                                            Call serie.Add(ind.Penalty(0), ind.Penalty(1), durchlauf.ToString())
 
                                         Else
                                             '3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
                                             '------------------------------------------------------------------------
                                             Dim serie3D As Steema.TeeChart.Styles.Points3D
-                                            If (isInvalid) Then
+                                            If (Not ind.feasible) Then
                                                 serie3D = DForm.Diag.getSeries3DPoint("Population" & " (ungültig)", "Gray")
                                             Else
                                                 serie3D = DForm.Diag.getSeries3DPoint("Population", "Orange")
                                             End If
-                                            Call serie3D.Add(QN(0), QN(1), QN(2), durchlauf.ToString())
+                                            Call serie3D.Add(ind.Penalty(0), ind.Penalty(1), ind.Penalty(2), durchlauf.ToString())
 
                                         End If
                                     End If
@@ -1437,7 +1437,7 @@ Start_Evolutionsrunden:
                         '###########################
                         'Einordnen der Qualitätsfunktion im Bestwertspeicher bei SO
                         'Falls MO Einordnen der Qualitätsfunktion in NDSorting
-                        Call PES1.EsBest(QN, RN)
+                        Call PES1.EsBest(ind)
 
                         System.Windows.Forms.Application.DoEvents()
 
