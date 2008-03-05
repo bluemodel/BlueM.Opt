@@ -354,15 +354,16 @@ Partial Class Form1
                     'EVO_Einstellungen einrichten
                     Me.EVO_Einstellungen1.Enabled = True
                     Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_HookeJeeves
-                    'Nur SO möglich
+
+                    'TODO: eigenen read and valid methode für hookJeeves
+                    Call Sim1.read_and_valid_INI_Files_PES()
+
+                    'Kontrolle: Nur SO möglich!
                     If (Common.Manager.AnzOptZiele = 1) Then
                         Call EVO_Einstellungen1.setStandard_HJ()
                     ElseIf (Common.Manager.AnzOptZiele > 1) Then
                         Throw New Exception("Methode von Hook und Jeeves erlaubt nur SO-Optimierung!")
                     End If
-
-                    'TODO: eigenen read and valid methode für hookJeeves
-                    Call Sim1.read_and_valid_INI_Files_PES()
 
                     'TODO: eigenen Parameterübergabe an HookJeeves (evtl.überladen von Parameter_Uebergabe)
                     Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzRand, myPara)
@@ -1107,15 +1108,15 @@ Partial Class Form1
     'Anwendung des Verfahrens von Hook und Jeeves zur Parameteroptimierung
     '*********************************************************************
     Private Sub STARTEN_HookJeeves()
+
         Dim i As Integer
         Dim j As Integer
         Dim k As Integer
         Dim b As Boolean
-        Dim QN() As Double = {}
+        Dim ind As Kern.Individuum
         Dim QNBest() As Double = {}
         Dim QBest() As Double = {}
-        Dim RN() As Double
-        Dim aktuellePara(globalAnzPar - 1) As Double
+        Dim aktuellePara(Me.globalAnzPar - 1) As Double
         Dim SIM_Eval_is_OK As Boolean
         Dim durchlauf As Long
         Dim Iterationen As Long
@@ -1126,13 +1127,13 @@ Partial Class Form1
 
         Dim HookJeeves As EVO.Kern.HookeAndJeeves = New EVO.Kern.HookeAndJeeves(globalAnzPar, EVO_Einstellungen1.Settings.HookJeeves.DnStart, EVO_Einstellungen1.Settings.HookJeeves.DnFinish)
 
-        ReDim QN(Common.Manager.AnzOptZiele - 1)
+        'Individuum wird initialisiert
+        Call Kern.Individuum.Initialise(1, 0, Me.globalAnzPar, Me.globalAnzRand)
+
         ReDim QNBest(Common.Manager.AnzOptZiele - 1)
         ReDim QBest(Common.Manager.AnzOptZiele - 1)
-        ReDim RN(-1)
 
         'Diagramm vorbereiten und initialisieren
-
         Call PrepareDiagramm()
 
         durchlauf = 0
@@ -1144,58 +1145,112 @@ Partial Class Form1
         b = False
 
         Call HookJeeves.Initialize(Kern.OptParameter.MyParaDouble(myPara))
+
         'Initialisierungssimulation
-        myPara.CopyTo(aktuellePara, 0)
+        Call Kern.OptParameter.MyParaDouble(myPara).CopyTo(aktuellePara, 0)
         QNBest(0) = 1.79E+308
         QBest(0) = 1.79E+308
         k = 0
 
-        'TODO: Wie kannst du hier 2 Arrays miteinander vergleichen?
         Do While (HookJeeves.AktuelleSchrittweite > HookJeeves.MinimaleSchrittweite)
+
             Iterationen += 1
+            durchlauf += 1
+
             'Bestimmen der Ausgangsgüte
+            '==========================
+            'Individuum instanzieren
+            ind = New Kern.Individuum("HJ", durchlauf)
+
+            'HACK: OptParameter ins Individuum kopieren
+            For i = 0 To ind.PES_OptParas.Length - 1
+                ind.PES_OptParas(i).Xn = aktuellePara(i)
+            Next
+
             'Vorbereiten des Modelldatensatzes
             Call Sim1.PREPARE_Evaluation_PES(aktuellePara)
+
             'Evaluierung des Simulationsmodells (ToDo: Validätsprüfung fehlt)
-            durchlauf += 1
-            SIM_Eval_is_OK = Sim1.SIM_Evaluierung(Kern.Individuum.QN_RN_Indi(durchlauf, QN, RN, aktuellePara))
+            SIM_Eval_is_OK = Sim1.SIM_Evaluierung(ind)
+
             'Lösung im TeeChart einzeichnen
-            '==============================
+            '------------------------------
             Dim serie As Steema.TeeChart.Styles.Series
-            serie = DForm.Diag.getSeriesPoint("Hook and Jeeves".ToString())
-            Call serie.Add(durchlauf, QN(0), durchlauf.ToString())
-            QN.CopyTo(QNBest, 0)
+            serie = DForm.Diag.getSeriesPoint("Hook and Jeeves")
+            Call serie.Add(durchlauf, ind.Penalty(0), durchlauf.ToString())
+
+            Call My.Application.DoEvents()
+
+            'Penalties in Bestwert kopieren
+            Call ind.Penalty.CopyTo(QNBest, 0)
 
             'Tastschritte
+            '============
             For j = 0 To HookJeeves.AnzahlParameter - 1
+
                 aktuellePara = HookJeeves.Tastschritt(j, Kern.HookeAndJeeves.TastschrittRichtung.Vorwärts)
+
                 Tastschritte_aktuell += 1
+                durchlauf += 1
                 Me.EVO_Einstellungen1.LabelTSHJaktuelle.Text = Tastschritte_aktuell.ToString
+
+                'Individuum instanzieren
+                ind = New Kern.Individuum("HJ", durchlauf)
+
+                'HACK: OptParameter ins Individuum kopieren
+                For i = 0 To ind.PES_OptParas.Length - 1
+                    ind.PES_OptParas(i).Xn = aktuellePara(i)
+                Next
+
                 'Vorbereiten des Modelldatensatzes
                 Call Sim1.PREPARE_Evaluation_PES(aktuellePara)
+
                 'Evaluierung des Simulationsmodells
-                durchlauf += 1
-                SIM_Eval_is_OK = Sim1.SIM_Evaluierung(Kern.Individuum.QN_RN_Indi(durchlauf, QN, RN, aktuellePara))
-                serie = DForm.Diag.getSeriesPoint("Hook and Jeeves".ToString())
-                Call serie.Add(durchlauf, QN(0), durchlauf.ToString())
-                If QN(0) >= QNBest(0) Then
+                SIM_Eval_is_OK = Sim1.SIM_Evaluierung(ind)
+
+                'Lösung im TeeChart einzeichnen
+                '------------------------------
+                serie = DForm.Diag.getSeriesPoint("Hook and Jeeves")
+                Call serie.Add(durchlauf, ind.Penalty(0), durchlauf.ToString())
+
+                Call My.Application.DoEvents()
+
+                If (ind.Penalty(0) >= QNBest(0)) Then
+
                     aktuellePara = HookJeeves.Tastschritt(j, Kern.HookeAndJeeves.TastschrittRichtung.Rückwärts)
+
                     Tastschritte_aktuell += 1
+                    durchlauf += 1
                     Me.EVO_Einstellungen1.LabelTSHJaktuelle.Text = Tastschritte_aktuell.ToString
+
+                    'Individuum instanzieren
+                    ind = New Kern.Individuum("HJ", durchlauf)
+
+                    'HACK: OptParameter ins Individuum kopieren
+                    For i = 0 To ind.PES_OptParas.Length - 1
+                        ind.PES_OptParas(i).Xn = aktuellePara(i)
+                    Next
+
                     'Vorbereiten des Modelldatensatzes
                     Call Sim1.PREPARE_Evaluation_PES(aktuellePara)
+
                     'Evaluierung des Simulationsmodells
-                    durchlauf += 1
-                    SIM_Eval_is_OK = Sim1.SIM_Evaluierung(Kern.Individuum.QN_RN_Indi(durchlauf, QN, RN, aktuellePara))
-                    serie = DForm.Diag.getSeriesPoint("Hook and Jeeves".ToString())
-                    Call serie.Add(durchlauf, QN(0), durchlauf.ToString())
-                    If QN(0) >= QNBest(0) Then
+                    SIM_Eval_is_OK = Sim1.SIM_Evaluierung(ind)
+
+                    'Lösung im TeeChart einzeichnen
+                    '------------------------------
+                    serie = DForm.Diag.getSeriesPoint("Hook and Jeeves")
+                    Call serie.Add(durchlauf, ind.Penalty(0), durchlauf.ToString())
+
+                    Call My.Application.DoEvents()
+
+                    If (ind.Penalty(0) >= QNBest(0)) Then
                         aktuellePara = HookJeeves.TastschrittResetParameter(j)
                     Else
-                        QN.CopyTo(QNBest, 0)
+                        Call ind.Penalty.CopyTo(QNBest, 0)
                     End If
                 Else
-                    QN.CopyTo(QNBest, 0)
+                    Call ind.Penalty.CopyTo(QNBest, 0)
                 End If
             Next
 
@@ -1205,26 +1260,34 @@ Partial Class Form1
             Me.EVO_Einstellungen1.LabelTSHJaktuelle.Text = Tastschritte_aktuell.ToString
             Me.EVO_Einstellungen1.LabelTSHJmittel.Text = Math.Round((Tastschritte_gesamt / Iterationen), 2).ToString
 
+            Call My.Application.DoEvents()
+
             'Extrapolationsschritt
-            If QNBest(0) < QBest(0) Then
+            If (QNBest(0) < QBest(0)) Then
 
-                serie = DForm.Diag.getSeriesPoint("Hook and Jeeves Best".ToString(), "GREEN")
-                Call serie.Add(durchlauf, QN(0), durchlauf.ToString())
+                'Lösung im TeeChart einzeichnen
+                '------------------------------
+                serie = DForm.Diag.getSeriesPoint("Hook and Jeeves Best", "Green")
+                Call serie.Add(durchlauf, ind.Penalty(0), durchlauf.ToString())
 
-                QNBest.CopyTo(QBest, 0)
+                Call My.Application.DoEvents()
+
+                Call QNBest.CopyTo(QBest, 0)
                 Call HookJeeves.Extrapolationsschritt()
                 Extrapolationsschritte += 1
                 Me.EVO_Einstellungen1.LabelESHJ.Text = Extrapolationsschritte.ToString
+                Call My.Application.DoEvents()
                 k += 1
                 aktuellePara = HookJeeves.getLetzteParameter
                 For i = 0 To HookJeeves.AnzahlParameter - 1
                     If aktuellePara(i) < 0 Or aktuellePara(i) > 1 Then
                         HookJeeves.Rueckschritt()
                         Rueckschritte += 1
-                        Me.EVO_Einstellungen1.LabelRSHJ.Text = Rueckschritte.ToString
+                        Me.EVO_Einstellungen1.LabelRSHJ.Text = Rueckschritte.ToString()
+                        Call My.Application.DoEvents()
                         k += -1
                         HookJeeves.Schrittweitenhalbierung()
-                        aktuellePara = HookJeeves.getLetzteParameter
+                        aktuellePara = HookJeeves.getLetzteParameter()
                         Exit For
                     End If
                 Next
@@ -1238,9 +1301,10 @@ Partial Class Form1
                 'End If
                 If k > 0 Then
                     HookJeeves.Rueckschritt()
-                    Me.EVO_Einstellungen1.LabelRSHJ.Text = Rueckschritte.ToString
+                    Me.EVO_Einstellungen1.LabelRSHJ.Text = Rueckschritte.ToString()
+                    Call My.Application.DoEvents()
                     HookJeeves.Schrittweitenhalbierung()
-                    aktuellePara = HookJeeves.getLetzteParameter
+                    aktuellePara = HookJeeves.getLetzteParameter()
                 Else
                     HookJeeves.Schrittweitenhalbierung()
                 End If
@@ -1707,7 +1771,7 @@ Start_Evolutionsrunden:
 
                             Achse.Name = "Simulation"
                             Achse.Auto = False
-                            If (Form1.Method = METH_PES Or Form1.Method = METH_HOOKJEEVES) Then
+                            If (Form1.Method = METH_PES) Then
                                 'Bei PES:
                                 '--------
                                 If (EVO_Einstellungen1.Settings.PES.Pop.is_POPUL) Then
@@ -1715,6 +1779,12 @@ Start_Evolutionsrunden:
                                 Else
                                     Achse.Max = EVO_Einstellungen1.Settings.PES.n_Gen * EVO_Einstellungen1.Settings.PES.n_Nachf + 1
                                 End If
+
+                            ElseIf (Form1.Method = METH_HOOKJEEVES) Then
+                                'Bei Hooke & Jeeves:
+                                '-------------------
+                                Achse.Auto = True
+                                
                             Else
                                 'Bei CES etc.:
                                 '-------------

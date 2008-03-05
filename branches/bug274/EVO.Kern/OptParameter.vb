@@ -96,7 +96,7 @@ Public Class OptParameter
         ReDim MyParaDouble(-1)
 
         For i = 0 To OptParamer.GetUpperBound(0)
-            ReDim Preserve Array(Array.GetUpperBound(0))
+            ReDim Preserve Array(Array.GetUpperBound(0) + 1)
             Array(i) = OptParamer(i).Xn
         Next
         MyParaDouble = Array.Clone()
