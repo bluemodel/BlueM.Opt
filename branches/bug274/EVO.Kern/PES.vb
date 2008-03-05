@@ -1,5 +1,7 @@
 Option Strict Off
 
+Imports IHWB.EVO.Common
+
 Public Class PES
 
     '*******************************************************************************
@@ -31,16 +33,6 @@ Public Class PES
     '#########################################
 
     Private Settings As EVO_Settings
-
-    'Beziehung
-    '--------------
-    Public Enum Beziehung As Integer
-        keine = 0
-        kleiner = 1
-        kleinergleich = 2
-        groesser = 3
-        groessergleich = 4
-    End Enum
 
     'Structure zum Speichern der Werte die aus den OptDateien generiert werden
     Private Structure Struct_AktPara
@@ -1165,7 +1157,7 @@ StartMutation:
 
     'ES_BEST - Einordnen der Qualitätsfunktion im Bestwertspeicher
     '*************************************************************
-    Public Sub EsBest(ByVal ind As Kern.Individuum)
+    Public Sub EsBest(ByVal ind As Individuum)
 
         Dim m, i, j, v As Integer
         Dim h As Double
@@ -1201,8 +1193,8 @@ StartMutation:
             'Multi-Objective Pareto
             '----------------------
             With NDSorting(PES_iAkt.iAktNachf)
-                For i = 0 To Common.Manager.AnzGesZiele - 1
-                    .QWerte(i) = ind.Qwerte(i)
+                For i = 0 To Manager.AnzGesZiele - 1
+                    .QWerte(i) = ind.QWerte(i)
                 Next i
                 For i = 0 To Anz.Constr - 1
                     .Constrain(i) = ind.Constrain(i)
@@ -1370,7 +1362,7 @@ StartMutation:
             'Zu Beginn den Bestwertspeicher in ein Individuum packen
             'Dimensionieren des Best_Indi
             Dim Best_Indi(Best.Qb.GetUpperBound(0)) As Individuum
-            Individuum.New_Array("Bestwerte", Best_Indi)
+            Call Individuum.New_Array("Bestwerte", Best_Indi)
             'Kopieren in Best_Indi
             For i = 0 To Best.Qb.GetUpperBound(0)
                 Call Copy_Bestwert_to_Individuum(i, i, Best_Indi)
@@ -1421,7 +1413,7 @@ StartMutation:
 
     'Kopiert ein Individuum in den Bestwertspeicher
     '----------------------------------------------
-    Public Sub Copy_Individuum_to_Bestwert(ByVal i As Integer, ByVal Individ As Individuum())
+    Public Sub Copy_Individuum_to_Bestwert(ByVal i As Integer, ByVal Individ() As Individuum)
         Dim j, v As Integer
 
         For j = 0 To Anz.Penalty - 1
@@ -1451,9 +1443,9 @@ StartMutation:
         Dim i, j, v As Integer
 
         j = 0
-        For i = 0 To Common.AnzGesZiele - 1
+        For i = 0 To Manager.AnzGesZiele - 1
             'HACK: Nur QWerte von OptZielen (d.h. Penalty) werden kopiert!
-            If (Common.Manager.List_Ziele(i).isOpt) Then
+            If (Manager.List_Ziele(i).isOpt) Then
                 Individ(i_indi).QWerte(i) = Best.Qb(i_best, PES_iAkt.iAktPop, j)
                 j += 1
             End If
@@ -1484,10 +1476,10 @@ StartMutation:
         Dim j, i As Integer
         Dim SekPopulation(,) As Double
 
-        ReDim SekPopulation(SekundärQb.GetUpperBound(0), Common.Manager.AnzOptZiele - 1)
+        ReDim SekPopulation(SekundärQb.GetUpperBound(0), Manager.AnzOptZiele - 1)
 
         For i = 0 To SekundärQb.GetUpperBound(0)
-            For j = 0 To Common.Manager.AnzOptZiele - 1
+            For j = 0 To Manager.AnzOptZiele - 1
                 SekPopulation(i, j) = SekundärQb(i).Penalty(j)
             Next j
         Next i

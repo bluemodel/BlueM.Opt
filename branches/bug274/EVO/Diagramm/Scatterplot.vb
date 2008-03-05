@@ -17,7 +17,7 @@ Partial Public Class Scatterplot
     Private Diags(,) As Diagramm
     Private OptResult As IHWB.EVO.OptResult
     Private SekPopOnly As Boolean
-    Public Event pointSelected(ByVal ind As Kern.Individuum)
+    Public Event pointSelected(ByVal ind As Common.Individuum)
 
     'Konstruktor
     '***********
@@ -112,7 +112,7 @@ Partial Public Class Scatterplot
                         'Nur Sekundäre Population
                         '------------------------
                         serie = .getSeriesPoint(xAchse & ", " & yAchse, "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                        For Each ind As Kern.Individuum In Me.OptResult.getSekPop()
+                        For Each ind As Common.Individuum In Me.OptResult.getSekPop()
                             serie.Add(ind.Penalty(i), ind.Penalty(j), ind.ID)
                         Next
                     Else
@@ -120,7 +120,7 @@ Partial Public Class Scatterplot
                         '-------------
                         serie = .getSeriesPoint(xAchse & ", " & yAchse, "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         serie_inv = .getSeriesPoint(xAchse & ", " & yAchse & " (ungültig)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                        For Each ind As Kern.Individuum In Me.OptResult.Solutions
+                        For Each ind As Common.Individuum In Me.OptResult.Solutions
                             'Constraintverletzung prüfen
                             If (ind.feasible) Then
                                 'gültige Lösung Zeichnen
@@ -197,7 +197,7 @@ Partial Public Class Scatterplot
     Private Sub seriesClick(ByVal sender As Object, ByVal s As Steema.TeeChart.Styles.Series, ByVal valueIndex As Integer, ByVal e As System.Windows.Forms.MouseEventArgs)
 
         Dim indID_clicked As Integer
-        Dim ind As Kern.Individuum
+        Dim ind As Common.Individuum
 
         'Punkt-Informationen bestimmen
         '-----------------------------
@@ -220,7 +220,7 @@ Partial Public Class Scatterplot
     'Eine ausgewählte Lösung in den Diagrammen anzeigen
     'wird von Form1.selectSolution() aufgerufen
     '**************************************************
-    Friend Sub showSelectedSolution(ByVal ind As Kern.Individuum)
+    Friend Sub showSelectedSolution(ByVal ind As Common.Individuum)
 
         Dim serie As Steema.TeeChart.Styles.Series
         Dim i, j As Integer

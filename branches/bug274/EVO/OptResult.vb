@@ -25,13 +25,13 @@ Public Class OptResult
     Private db As OleDb.OleDbConnection
 
     'Optimierungsbedingungen
-    Public List_OptParameter() As EVO.Kern.OptParameter
-    Public List_OptParameter_Save() As EVO.Kern.OptParameter
+    Public List_OptParameter() As EVO.Common.OptParameter
+    Public List_OptParameter_Save() As EVO.Common.OptParameter
     Public List_Constraints() As Sim.Struct_Constraint
     Public List_Locations()As Sim.Struct_Lokation
 
     'Array von Lösungen
-    Public Solutions() As Kern.Individuum
+    Public Solutions() As Common.Individuum
 
     'Structure für Sekundäre Population
     Public Structure Struct_SekPop
@@ -90,9 +90,9 @@ Public Class OptResult
 
     'Ausgewählte Lösungen holen
     '**************************
-    Public Function getSelectedSolutions() As Kern.Individuum()
+    Public Function getSelectedSolutions() As Common.Individuum()
 
-        Dim solutions() As Kern.Individuum
+        Dim solutions() As Common.Individuum
 
         solutions = getSolutions(Me.selSolutionIDs)
 
@@ -110,7 +110,7 @@ Public Class OptResult
 
     'Eine Lösung zum Optimierungsergebnis hinzufügen
     '***********************************************
-    Public Sub addSolution(ByVal Ind as Kern.Individuum)
+    Public Sub addSolution(ByVal Ind As Common.Individuum)
 
         'Lösung zu OptResult hinzufügen
         ReDim Preserve Me.Solutions(Me.Solutions.GetUpperBound(0) + 1)
@@ -123,7 +123,7 @@ Public Class OptResult
 
     'Eine Lösung identifizieren
     '**************************
-    Public Function getSolution(ByVal ID As Integer) As Kern.Individuum
+    Public Function getSolution(ByVal ID As Integer) As Common.Individuum
 
         Dim i As Integer
 
@@ -133,7 +133,7 @@ Public Class OptResult
             End If
         Next
 
-        Return New Kern.Individuum("Solution", 0) 'TODO: Fehlerbehandlung
+        Return New Common.Individuum("Solution", 0) 'TODO: Fehlerbehandlung
 
     End Function
 
@@ -166,9 +166,9 @@ Public Class OptResult
 
     'Sekundäre Population holen
     '**************************
-    Public Function getSekPop(Optional ByVal _igen As Integer = -1) As Kern.Individuum()
+    Public Function getSekPop(Optional ByVal _igen As Integer = -1) As Common.Individuum()
 
-        Dim sekpopsolutions() As Kern.Individuum
+        Dim sekpopsolutions() As Common.Individuum
 
         'Wenn keine Generation angegeben, dann letzte SekPop ausgeben
         If (_igen = -1) Then
@@ -193,10 +193,10 @@ Public Class OptResult
 
     'Lösungen anhand von IDs holen
     '*****************************
-    Private Function getSolutions(ByVal IDs() As Integer) As Kern.Individuum()
+    Private Function getSolutions(ByVal IDs() As Integer) As Common.Individuum()
 
         Dim i As Integer
-        Dim solutions() As Kern.Individuum
+        Dim solutions() As Common.Individuum
 
         ReDim solutions(IDs.GetUpperBound(0))
 
@@ -372,7 +372,7 @@ Public Class OptResult
 
     'Eine Lösung in die ErgebnisDB schreiben
     '***************************************
-    Private Function db_insert(ByVal ind As Kern.Individuum) As Boolean
+    Private Function db_insert(ByVal ind As Common.Individuum) As Boolean
 
         Call db_connect()
 
@@ -620,7 +620,7 @@ Public Class OptResult
 
         For i = 0 To numSolutions - 1
 
-            Me.Solutions(i) = New Kern.Individuum("Solution", i)
+            Me.Solutions(i) = New Common.Individuum("Solution", i)
 
             With Me.Solutions(i)
                 'ID

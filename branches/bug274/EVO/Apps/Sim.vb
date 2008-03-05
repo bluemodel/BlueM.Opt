@@ -47,8 +47,8 @@ Public MustInherit Class Sim
 
 	'OptParameter
 	'------------
-    Public List_OptParameter() As EVO.Kern.OptParameter             'Liste der Optimierungsparameter
-    Public List_OptParameter_Save() As EVO.Kern.OptParameter        'Liste der Optimierungsparameter die nicht verändert wird
+    Public List_OptParameter() As EVO.Common.OptParameter             'Liste der Optimierungsparameter
+    Public List_OptParameter_Save() As EVO.Common.OptParameter        'Liste der Optimierungsparameter die nicht verändert wird
 
     'ModellParameter
     '---------------
@@ -112,9 +112,9 @@ Public MustInherit Class Sim
 
     Public List_Locations() As Struct_Lokation
 
-    Public VerzweigungsDatei(,) As String       'Gibt die PathSize an für jede Pfadstelle
-    Public CES_T_Modus As kern.CES_T_MODUS      'Zeigt ob der TestModus aktiv ist
-    Public n_Combinations As Integer            'Die Anzahl der Möglichen Kombinationen
+    Public VerzweigungsDatei(,) As String       			'Gibt die PathSize an für jede Pfadstelle
+    Public CES_T_Modus As Common.Constants.CES_T_MODUS      'Zeigt ob der TestModus aktiv ist
+    Public n_Combinations As Integer            			'Die Anzahl der Möglichen Kombinationen
 
 
 #End Region 'Eigenschaften
@@ -227,9 +227,9 @@ Public MustInherit Class Sim
         'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
         Call Me.Validate_CES_fits_to_VER()
         'Testmodus wird ermittelt
-        CES_T_Modus = Set_TestModus
+        CES_T_Modus = Set_TestModus()
         'Die Zahl der Kombinationen wird ermittelt
-        n_combinations = No_of_Combinations
+        n_Combinations = No_of_Combinations()
         'Ergebnisspeicher initialisieren
         Me.OptResult = New OptResult(Me)
 
@@ -256,9 +256,9 @@ Public MustInherit Class Sim
         'Prüfen ob Kombinatorik und Verzweigungsdatei zusammenpassen
         Call Me.Validate_CES_fits_to_VER()
         'Testmodus wird ermittelt
-        CES_T_Modus = Set_TestModus
+        CES_T_Modus = Set_TestModus()
         'Die Zahl der Kombinationen wird ermittelt
-        n_combinations = No_of_Combinations
+        n_Combinations = No_of_Combinations()
         'Datenbank vorbereiten
 
         'PES vorbereiten
@@ -331,7 +331,7 @@ Public MustInherit Class Sim
             Zeile = StrRead.ReadLine.ToString()
             If (Zeile.StartsWith("*") = False) Then
                 'OptParameter instanzieren
-                List_OptParameter(i) = New EVO.Kern.OptParameter()
+                List_OptParameter(i) = New EVO.Common.OptParameter()
                 array = Zeile.Split("|")
                 'Werte zuweisen
                 List_OptParameter(i).Bezeichnung = array(1).Trim()
@@ -341,7 +341,7 @@ Public MustInherit Class Sim
                 List_OptParameter(i).Max = Convert.ToDouble(array(5).Trim(), Common.Provider.FortranProvider)
                 'liegt eine Beziehung vor?
                 If (i > 0 And Not array(6).Trim() = "") Then
-                    Me.List_OptParameter(i).Beziehung = getBeziehung(array(6).Trim())
+                    Me.List_OptParameter(i).Beziehung = Common.Constants.getBeziehung(array(6).Trim())
                 End If
                 'Eingelesenen Startwert setzen
                 List_OptParameter(i).RWert = List_OptParameter(i).StartWert
@@ -358,23 +358,6 @@ Public MustInherit Class Sim
         Next
 
     End Sub
-
-    'String in der Form < >, <=, >= in Beziehung umwandeln
-    '*****************************************************
-    Private Shared Function getBeziehung(ByVal bez_str As String) As EVO.Kern.PES.Beziehung
-        Select Case bez_str
-            Case "<"
-                Return EVO.Kern.PES.Beziehung.kleiner
-            Case "<="
-                Return EVO.Kern.PES.Beziehung.kleinergleich
-            Case ">"
-                Return EVO.Kern.PES.Beziehung.groesser
-            Case ">="
-                Return EVO.Kern.PES.Beziehung.groessergleich
-            Case Else
-                Throw New Exception("Beziehung '" & bez_str & "' nicht erkannt!")
-        End Select
-    End Function
 
     'Modellparameter einlesen
     '************************
@@ -870,7 +853,7 @@ Public MustInherit Class Sim
     '****************************************************
     Public Function No_of_Combinations() As Integer
 
-        If CES_T_Modus = Kern.CES_T_MODUS.One_Combi Then
+        If CES_T_Modus = Common.Constants.CES_T_MODUS.One_Combi Then
             No_of_Combinations = 1
         Else
             Dim i As Integer
@@ -885,7 +868,7 @@ Public MustInherit Class Sim
     'Überprüft ob und welcher TestModus aktiv ist
     'Beschreibung:
     '********************************************
-    Public Function Set_TestModus() As Kern.Constants.CES_T_MODUS
+    Public Function Set_TestModus() As Common.Constants.CES_T_MODUS
 
         Dim i, j As Integer
         Dim count_A As Integer
@@ -906,7 +889,7 @@ Public MustInherit Class Sim
         Next
 
         If count_A = count_B Then
-            Set_TestModus = Kern.CES_T_MODUS.No_Test
+            Set_TestModus = Common.Constants.CES_T_MODUS.No_Test
             Exit Function
         End If
 
@@ -924,7 +907,7 @@ Public MustInherit Class Sim
         Next
 
         If count_A = count_B Then
-            Set_TestModus = Kern.CES_T_MODUS.One_Combi
+            Set_TestModus = Common.Constants.CES_T_MODUS.One_Combi
             Exit Function
         End If
 
@@ -942,7 +925,7 @@ Public MustInherit Class Sim
         Next
 
         If count_A = count_B Then
-            Set_TestModus = Kern.CES_T_MODUS.All_Combis
+            Set_TestModus = Common.Constants.CES_T_MODUS.All_Combis
             Exit Function
         End If
 
@@ -993,7 +976,7 @@ Public MustInherit Class Sim
 
     'Die Elemente werden pro Location im Child gespeichert
     '*****************************************************
-    Public Sub Identify_Measures_Elements_Parameters(ByVal No_Loc As Integer, ByVal No_Measure As Integer, ByRef Measure As String, ByRef Elements() As String, ByRef PES_OptPara() As Kern.OptParameter)
+    Public Sub Identify_Measures_Elements_Parameters(ByVal No_Loc As Integer, ByVal No_Measure As Integer, ByRef Measure As String, ByRef Elements() As String, ByRef PES_OptPara() As Common.OptParameter)
 
         Dim i, j As Integer
         Dim x As Integer
@@ -1134,7 +1117,7 @@ Public MustInherit Class Sim
 
             'Reduzierung der OptParameter
             'xxxxxxxxxxxxxxxxxxxxxxxxxxxx
-            Dim TMP_OptPara() As EVO.Kern.OptParameter
+            Dim TMP_OptPara() As EVO.Common.OptParameter
             ReDim TMP_OptPara(List_OptParameter.GetUpperBound(0))
 
             count = 0
@@ -1235,7 +1218,7 @@ Public MustInherit Class Sim
 
     'EVO-Parameterübergabe die Standard Parameter werden aus den Listen der OptPara und OptZiele ermittelt
     '*****************************************************************************************************
-    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzRand As Short, ByRef mypara() As EVO.Kern.OptParameter)
+    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzRand As Short, ByRef mypara() As EVO.Common.OptParameter)
 
         Dim i As Integer
 
@@ -1255,7 +1238,7 @@ Public MustInherit Class Sim
 
     'Evaluierung des SimModells für ParameterOptimierung - Steuerungseinheit
     '***********************************************************************
-    Public Sub PREPARE_Evaluation_PES(ByVal myPara() As EVO.Kern.OptParameter)
+    Public Sub PREPARE_Evaluation_PES(ByVal myPara() As EVO.Common.OptParameter)
 
         Dim i As Short
 
@@ -1394,7 +1377,7 @@ Handler:
 
     'Evaluiert die Kinderchen mit Hilfe des Simulationsmodells
     '*********************************************************
-    Public Function SIM_Evaluierung(ByRef Indi As Kern.Individuum) As Boolean
+    Public Function SIM_Evaluierung(ByRef Indi As Common.Individuum) As Boolean
 
         Dim i As Short
 

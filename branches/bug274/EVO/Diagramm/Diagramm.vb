@@ -239,7 +239,7 @@ Public Class Diagramm
 
     'ausgewählte Lösung anzeigen
     '***************************
-    Friend Sub showSelectedSolution(ByVal ind As Kern.Individuum)
+    Friend Sub showSelectedSolution(ByVal ind As Common.Individuum)
 
         Dim xAchse, yAchse, zAchse As String
         Dim xWert, yWert, zWert As Double

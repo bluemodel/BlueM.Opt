@@ -1,3 +1,5 @@
+Imports IHWB.EVO.Common
+
 Public Class CES
 
     '*******************************************************************************
@@ -19,8 +21,8 @@ Public Class CES
     '##################
 
     'Die Settings für alles aus dem Form
-    Public Settings As Evo_Settings             'TODO: sollte private sein!
-    
+    Public Settings As EVO_Settings             'TODO: sollte private sein!
+
     'Modell Setting
     Public Structure ModSettings
         Public n_Constrain As Integer           'Anzahl der Randbedingungen
@@ -29,22 +31,22 @@ Public Class CES
         Public n_PathDimension() As Integer     'Anzahl der Maßnahmen an jedem Ort
     End Structure
 
-    Public ModSett as ModSettings
+    Public ModSett As ModSettings
 
     'Listen für die Individuen
     '*************************
-    Public Childs() As EVO.Kern.Individuum
-    Public Parents() As EVO.Kern.Individuum
-    Private SekundärQb(-1) As EVO.Kern.Individuum
-    Public NDSorting() As EVO.Kern.Individuum
+    Public Childs() As Individuum
+    Public Parents() As Individuum
+    Private SekundärQb(-1) As Individuum
+    Public NDSorting() As Individuum
     'Checken ob es verwendet wird
-    Public NDSResult() As EVO.Kern.Individuum
+    Public NDSResult() As Individuum
 
     'Für Hybrid
-    Public Memory() As EVO.Kern.Individuum
-    Public PES_Parents_pChild() As EVO.Kern.Individuum
-    Public PES_Parents_pLoc() As EVO.Kern.Individuum
-    Private PES_SekundärQb(-1) As EVO.Kern.Individuum
+    Public Memory() As Individuum
+    Public PES_Parents_pChild() As Individuum
+    Public PES_Parents_pLoc() As Individuum
+    Private PES_SekundärQb(-1) As Individuum
 
 #End Region 'Eigenschaften
 
@@ -53,7 +55,7 @@ Public Class CES
 
     'Initialisierung der PES
     '***************************************
-    Public Sub CESInitialise(ByRef Settings As evo_settings, ByVal Method As String, ByVal TestModus as CES_T_MODUS, ByVal AnzPenalty As Integer, ByVal AnzConstr As Integer, byval AnzLocations as Integer, byval AnzVerzweig as Integer, byval AnzCombinations as Integer, byval AnzPathDimension() as Integer)
+    Public Sub CESInitialise(ByRef Settings As EVO_Settings, ByVal Method As String, ByVal TestModus As CES_T_MODUS, ByVal AnzPenalty As Integer, ByVal AnzConstr As Integer, ByVal AnzLocations As Integer, ByVal AnzVerzweig As Integer, ByVal AnzCombinations As Integer, ByVal AnzPathDimension() As Integer)
 
         'Schritt 1: CES - FORM SETTINGS
         'Optionen der Evolutionsstrategie werden übergeben
@@ -72,11 +74,11 @@ Public Class CES
     'Schritt 1: FORM SETTINGS
     'Function Form SETTINGS übergibt Optionen für Evolutionsstrategie und Prüft die eingestellten Optionen
     '***************************************************************************************************
-    Private Sub CES_Form_Settings(ByRef Settings As Evo_Settings, ByVal Method As String, ByVAl TestModus as CES_T_MODUS)
+    Private Sub CES_Form_Settings(ByRef Settings As EVO_Settings, ByVal Method As String, ByVal TestModus As CES_T_MODUS)
 
         'Überprüfung der Übergebenen Werte
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        If TestModus = CES_T_MODUS.No_Test
+        If TestModus = CES_T_MODUS.No_Test Then
 
             If (Settings.CES.n_Parents < 3) Then
                 Throw New Exception("Die Anzahl muss mindestens 3 sein!")
@@ -96,19 +98,19 @@ Public Class CES
         If (Settings.CES.OptStrategie <> EVO_STRATEGIE.Komma_Strategie And Settings.CES.OptStrategie <> EVO_STRATEGIE.Plus_Strategie) Then
             Throw New Exception("Typ der Evolutionsstrategie ist nicht '+' oder ','")
         End If
-        If (Settings.CES.OptReprodOp <> CES_REPRODOP.Selt_Rand_Uniform And CES_REPRODOP.Order_Crossover AND CES_REPRODOP.Part_Mapped_Cross)
+        If (Settings.CES.OptReprodOp <> CES_REPRODOP.Selt_Rand_Uniform And CES_REPRODOP.Order_Crossover And CES_REPRODOP.Part_Mapped_Cross) Then
             Throw New Exception("Typ der Reproduction ist nicht richtig!")
-        End If        
-        If (Settings.CES.OptMutOperator <> CES_MUTATION.RND_Switch And CES_MUTATION.Dyn_Switch)
+        End If
+        If (Settings.CES.OptMutOperator <> CES_MUTATION.RND_Switch And CES_MUTATION.Dyn_Switch) Then
             Throw New Exception("Typ der Mutation ist nicht richtig!")
         End If
-        If (Settings.CES.n_MemberSecondPop < 1)
+        If (Settings.CES.n_MemberSecondPop < 1) Then
             Throw New Exception("Die Zahl der Mitglieder der sekundären Population ist kleiner 1!")
         End If
         If (Settings.CES.n_Interact < 1) Then
             Throw New Exception("Die Anzahl der Mitglieder des sekundären Population muss mindestens 1 sein!")
         End If
-        If (Settings.CES.pr_MutRate < 0 or Settings.CES.pr_MutRate > 100) Then
+        If (Settings.CES.pr_MutRate < 0 Or Settings.CES.pr_MutRate > 100) Then
             Throw New Exception("Der Prozentsatz der Mutationrate muss zwischen 1 und 100 liegen!")
         End If
         If (Settings.CES.n_PES_MemSecPop < 1) Then
@@ -129,12 +131,12 @@ Public Class CES
     'A: Prüfung der ModellSetting in Kombination mit den Form Setting
     'B: Übergabe der ModellSettings
     '****************************************************************
-    private Sub CES_Modell_Settings(ByVal TestModus as CES_T_MODUS, ByVal AnzPenalty As Integer, ByVal AnzConstr As Integer, byval AnzLocations as Integer, byval AnzVerzweig as Integer, byval AnzCombinations as Integer, byval AnzPathDimension() as integer, ByVal Method as String)
+    Private Sub CES_Modell_Settings(ByVal TestModus As CES_T_MODUS, ByVal AnzPenalty As Integer, ByVal AnzConstr As Integer, ByVal AnzLocations As Integer, ByVal AnzVerzweig As Integer, ByVal AnzCombinations As Integer, ByVal AnzPathDimension() As Integer, ByVal Method As String)
 
-        If TestModus = CES_T_MODUS.No_Test
+        If TestModus = CES_T_MODUS.No_Test Then
 
             'Prüft ob die Zahl mög. Kombinationen < Zahl Eltern + Nachfolger
-            If (Settings.CES.n_Childs + Settings.CES.n_Parents) > AnzCombinations and not Method = "HYBRID"  Then
+            If (Settings.CES.n_Childs + Settings.CES.n_Parents) > AnzCombinations And Not Method = "HYBRID" Then
                 Throw New Exception("Die Zahl der Eltern + die Zahl der Kinder ist größer als die mögliche Zahl der Kombinationen.")
             End If
 
@@ -142,9 +144,9 @@ Public Class CES
 
         'Übergabe
         ModSett.n_Constrain = AnzConstr
-        modsett.n_Locations = AnzLocations
-        modsett.n_Verzweig = AnzVerzweig
-        modsett.n_PathDimension = AnzPathDimension.Clone
+        ModSett.n_Locations = AnzLocations
+        ModSett.n_Verzweig = AnzVerzweig
+        ModSett.n_PathDimension = AnzPathDimension.Clone
 
     End Sub
 
@@ -155,22 +157,22 @@ Public Class CES
 
         'Die Variablen für die Individuuen werden gesetzt
         '************************************************
-        EVO.Kern.Individuum.Initialise(2, ModSett.n_Locations, 0, ModSett.n_Constrain)
-        
+        Call Individuum.Initialise(2, ModSett.n_Locations, 0, ModSett.n_Constrain)
+
         'Parents werden dimensioniert
         ReDim Parents(Settings.CES.n_Parents - 1)
-        Call Kern.Individuum.New_Array("Parent", Parents)
+        Call Individuum.New_Array("Parent", Parents)
 
         'Childs werden dimensioniert
         ReDim Childs(Settings.CES.n_Childs - 1)
-        Call Kern.Individuum.New_Array("Child", Childs)
+        Call Individuum.New_Array("Child", Childs)
 
         'NDSorting wird dimensioniert
-        Redim NDSorting(Settings.CES.n_Childs + Settings.CES.n_Parents - 1)
+        ReDim NDSorting(Settings.CES.n_Childs + Settings.CES.n_Parents - 1)
 
         'NDSResult - Checken ob es verwendet wird
-        Redim NDSResult(Settings.CES.n_Childs + Settings.CES.n_Parents - 1)
-        
+        ReDim NDSResult(Settings.CES.n_Childs + Settings.CES.n_Parents - 1)
+
     End Sub
 
 
@@ -180,7 +182,7 @@ Public Class CES
         Dim i, j As Integer
         Dim tmp As Integer
         Dim lowerb As Integer = 0
-        Dim upperb As Integer 
+        Dim upperb As Integer
         Dim LoopCount As Integer = 0
         Randomize()
 
@@ -195,9 +197,9 @@ Public Class CES
                 Childs(i).mutated = True
                 Childs(i).ID = i + 1
                 LoopCount += 1
-            'If LoopCount = 100000 then
-            '    throw new Exception("100000")
-            'End If
+                'If LoopCount = 100000 then
+                '    throw new Exception("100000")
+                'End If
             Loop While (Is_Twin(i) = True Or is_nullvariante(Childs(i).Path) = True) And Not LoopCount >= 1000
         Next
 
@@ -205,9 +207,9 @@ Public Class CES
 
     'Testmodus 2: Funktion zum testen aller Kombinationen
     '****************************************************
-    Public Sub Generate_Paths_for_Tests(ByVal Path() as Integer, ByVal Modus as CES_T_MODUS)
+    Public Sub Generate_Paths_for_Tests(ByVal Path() As Integer, ByVal Modus As CES_T_MODUS)
 
-        Select Modus
+        Select Case Modus
 
             Case CES_T_MODUS.One_Combi
                 'Testmodus 1: Funktion zum testen einer Kombination
@@ -283,7 +285,7 @@ Public Class CES
                     '***************************************************************************************************
                     For m = 0 To Childs(i).Loc(j).PES_OptPara.GetUpperBound(0)
                         Childs(i).Loc(j).PES_OptPara(m).Dn = Settings.PES.Schrittweite.DnStart
-                        If Settings.PES.OptStartparameter = Kern.EVO_STARTPARAMETER.Zufall Then
+                        If Settings.PES.OptStartparameter = EVO_STARTPARAMETER.Zufall Then
                             Randomize()
                             Childs(i).Loc(j).PES_OptPara(m).Xn = Rnd()
                         End If
@@ -723,7 +725,7 @@ Public Class CES
     Private Sub Memory_Dubletten_loeschen(ByRef PES_Parents_pChild() As Individuum)
 
         Dim tmp(PES_Parents_pChild.GetUpperBound(0) - 1) As Individuum
-        Individuum.New_Array("tmp", tmp)
+        Call Individuum.New_Array("tmp", tmp)
         Dim isDouble As Boolean
         Dim i, j, x As Integer
 
@@ -754,27 +756,27 @@ Public Class CES
     '************************************************************************
     Private Sub Memory_Delete_too_weak(ByRef PES_Parents_pChild() As Individuum)
 
-        Dim i as Integer
+        Dim i As Integer
         Dim Tmp(-1) As Individuum
 
-        For i = 0 to PES_Parents_pChild.GetUpperBound(0)
+        For i = 0 To PES_Parents_pChild.GetUpperBound(0)
 
-            Select settings.CES.Mem_Strategy
+            Select Case Settings.CES.Mem_Strategy
 
-                case MEMORY_STRATEGY.A_Two_Loc_Up
+                Case MEMORY_STRATEGY.A_Two_Loc_Up
                     'ToDo
 
-                case MEMORY_STRATEGY.B_One_Loc_Up
+                Case MEMORY_STRATEGY.B_One_Loc_Up
                     'ToDo
 
-                case MEMORY_STRATEGY.C_This_Loc
+                Case MEMORY_STRATEGY.C_This_Loc
                     Tmp = PES_Parents_pChild.Clone
 
-                case MEMORY_STRATEGY.D_One_Loc_Down, MEMORY_STRATEGY.E_Two_Loc_Down
+                Case MEMORY_STRATEGY.D_One_Loc_Down, MEMORY_STRATEGY.E_Two_Loc_Down
                     'DOWNSTREAM
-                    If PES_Parents_pChild(i).Memory_Rank >= settings.CES.Mem_Strategy + Math.Min(0, Modsett.n_Locations - settings.CES.Mem_Strategy - PES_Parents_pChild(i).iLocation) then
-                        Redim Preserve Tmp(Tmp.GetLength(0))
-                        Tmp(Tmp.GetUpperBound(0)) = new Individuum("PES_Parent", Tmp.GetUpperBound(0))
+                    If PES_Parents_pChild(i).Memory_Rank >= Settings.CES.Mem_Strategy + Math.Min(0, ModSett.n_Locations - Settings.CES.Mem_Strategy - PES_Parents_pChild(i).iLocation) Then
+                        ReDim Preserve Tmp(Tmp.GetLength(0))
+                        Tmp(Tmp.GetUpperBound(0)) = New Individuum("PES_Parent", Tmp.GetUpperBound(0))
                         Tmp(Tmp.GetUpperBound(0)) = PES_Parents_pChild(i).Clone
                     End If
 
@@ -782,7 +784,7 @@ Public Class CES
         Next
 
         PES_Parents_pChild = Tmp.Clone
-        
+
     End Sub
 
     'Durchsucht des PES_Perent_pChild - Der PES_Parantsatz für jede Location wird hier ermittelt
@@ -841,17 +843,17 @@ Public Class CES
 
     'Füllt die PES Parents per Location auf die erforderliche Anzahl auf
     '*******************************************************************
-    Public Sub fill_Parents_per_Loc(ByRef Parents_pLoc() as Individuum, ByVal n_eltern as Integer)
+    Public Sub fill_Parents_per_Loc(ByRef Parents_pLoc() As Individuum, ByVal n_eltern As Integer)
 
-        Dim i, x as Integer
-        Dim n as Integer = Parents_pLoc.GetLength(0)
+        Dim i, x As Integer
+        Dim n As Integer = Parents_pLoc.GetLength(0)
         ReDim Preserve Parents_pLoc(n_eltern - 1)
 
         x = 0
-        For i = n to n_eltern - 1
+        For i = n To n_eltern - 1
             Parents_pLoc(i) = Parents_pLoc(x).Clone
             x += 1
-            If x = n then x = 0
+            If x = n Then x = 0
         Next
 
     End Sub
@@ -900,7 +902,7 @@ Public Class CES
     Public Sub Sort_Individuum(ByRef IndividuumList() As Individuum)
         'Sortiert die Fiksimile anhand des Abstandes
         Dim i, j As Integer
-        Dim swap As New EVO.Kern.Individuum("swap", 0)
+        Dim swap As New Individuum("swap", 0)
 
         For i = 0 To IndividuumList.GetUpperBound(0)
             For j = 0 To IndividuumList.GetUpperBound(0)
@@ -1078,10 +1080,10 @@ Public Class CES
         Dim j, i As Integer
         Dim SekPopulation(,) As Double
 
-        ReDim SekPopulation(SekundärQb.GetUpperBound(0), Common.Manager.AnzOptZiele - 1)
+        ReDim SekPopulation(SekundärQb.GetUpperBound(0), Manager.AnzOptZiele - 1)
 
         For i = 0 To SekundärQb.GetUpperBound(0)
-            For j = 0 To Common.Manager.AnzOptZiele - 1
+            For j = 0 To Manager.AnzOptZiele - 1
                 SekPopulation(i, j) = SekundärQb(i).Penalty(j)
             Next j
         Next i

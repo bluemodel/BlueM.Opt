@@ -44,7 +44,12 @@
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants.vb" />
+    <Compile Include="EVO_Settings.vb" />
+    <Compile Include="Individuum.vb">
+    </Compile>
     <Compile Include="Manager.vb" />
+    <Compile Include="OptParameter.vb" />
     <Compile Include="Provider.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

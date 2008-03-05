@@ -36,7 +36,7 @@ Partial Public Class SolutionDialog
 
     'Konstruktor
     '***********
-    Public Sub New(ByVal lOptPara() As EVO.Kern.OptParameter, ByVal lConst() As Sim.Struct_Constraint, ByVal lLoc() As Sim.Struct_Lokation)
+    Public Sub New(ByVal lOptPara() As EVO.Common.OptParameter, ByVal lConst() As Sim.Struct_Constraint, ByVal lLoc() As Sim.Struct_Lokation)
 
         ' Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent()
@@ -100,7 +100,7 @@ Partial Public Class SolutionDialog
         '------------
         cellstyle.BackColor = Color.LightGray
 
-        For Each OptPara As EVO.Kern.OptParameter In lOptPara
+        For Each OptPara As EVO.Common.OptParameter In lOptPara
             column = New DataGridViewTextBoxColumn()
             column.ReadOnly = True
             column.HeaderText = OptPara.Bezeichnung
@@ -119,7 +119,7 @@ Partial Public Class SolutionDialog
 
     'Eine Lösung hinzufügen
     '**********************
-    Public Sub addSolution(ByVal ind As Kern.Individuum)
+    Public Sub addSolution(ByVal ind As Common.Individuum)
 
         Dim i As Integer
         Dim cellvalues() As Object
@@ -152,7 +152,7 @@ Partial Public Class SolutionDialog
         Next
 
         'OptParameter PES
-        For Each optpara As Kern.OptParameter In ind.PES_OptParas
+        For Each optpara As Common.OptParameter In ind.PES_OptParas
             cellvalues(i) = optpara.RWert
             i += 1
         Next
@@ -162,8 +162,8 @@ Partial Public Class SolutionDialog
 
         Do While i < Me.DataGridView1.ColumnCount
             found = False
-            For Each loc As Kern.Individuum.Location_Data In ind.Loc
-                For Each optpara As Kern.OptParameter In loc.PES_OptPara
+            For Each loc As Common.Individuum.Location_Data In ind.Loc
+                For Each optpara As Common.OptParameter In loc.PES_OptPara
                     If optpara.Bezeichnung = Me.DataGridView1.Columns(i).HeaderText Then
                         cellvalues(i) = optpara.RWert
                         found = True

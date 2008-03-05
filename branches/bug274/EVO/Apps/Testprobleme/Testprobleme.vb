@@ -1,4 +1,4 @@
-Imports IHWB.EVO.Kern
+Imports IHWB.EVO.Common.Constants
 
 Partial Public Class Testprobleme
     Inherits System.Windows.Forms.Form
@@ -133,7 +133,7 @@ Partial Public Class Testprobleme
 
     'Parameterübergabe
     '*****************
-    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzRand As Short, ByRef mypara() As EVO.Kern.OptParameter)
+    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzRand As Short, ByRef mypara() As EVO.Common.OptParameter)
 
         Dim i, AnzZiele As Integer
 
@@ -145,7 +145,7 @@ Partial Public Class Testprobleme
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
                 For i = 0 To globalAnzPar - 1
-                    mypara(i) = New EVO.Kern.OptParameter()
+                    mypara(i) = New EVO.Common.OptParameter()
                     mypara(i).Xn = 0
                 Next
 
@@ -155,7 +155,7 @@ Partial Public Class Testprobleme
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
                 For i = 0 To globalAnzPar - 1
-                    mypara(i) = New EVO.Kern.OptParameter()
+                    mypara(i) = New EVO.Common.OptParameter()
                     mypara(i).Xn = 0.5
                 Next
 
@@ -165,7 +165,7 @@ Partial Public Class Testprobleme
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
                 For i = 0 To globalAnzPar - 1
-                    mypara(i) = New EVO.Kern.OptParameter()
+                    mypara(i) = New EVO.Common.OptParameter()
                     mypara(i).Xn = 1
                 Next
 
@@ -176,7 +176,7 @@ Partial Public Class Testprobleme
                 ReDim mypara(globalAnzPar - 1)
                 Randomize()
                 For i = 0 To globalAnzPar - 1
-                    mypara(i) = New EVO.Kern.OptParameter()
+                    mypara(i) = New EVO.Common.OptParameter()
                     mypara(i).Xn = Rnd()
                 Next
 
@@ -187,7 +187,7 @@ Partial Public Class Testprobleme
                 ReDim mypara(globalAnzPar - 1)
                 Randomize()
                 For i = 0 To globalAnzPar - 1
-                    mypara(i) = New EVO.Kern.OptParameter()
+                    mypara(i) = New EVO.Common.OptParameter()
                     mypara(i).Xn = Rnd()
                 Next
 
@@ -198,7 +198,7 @@ Partial Public Class Testprobleme
                 ReDim mypara(globalAnzPar - 1)
                 Randomize()
                 For i = 0 To globalAnzPar - 1
-                    mypara(i) = New EVO.Kern.OptParameter()
+                    mypara(i) = New EVO.Common.OptParameter()
                     mypara(i).Xn = Rnd()
                 Next
 
@@ -209,7 +209,7 @@ Partial Public Class Testprobleme
                 ReDim mypara(globalAnzPar - 1)
                 Randomize()
                 For i = 0 To globalAnzPar - 1
-                    mypara(i) = New EVO.Kern.OptParameter()
+                    mypara(i) = New EVO.Common.OptParameter()
                     mypara(i).Xn = Rnd()
                 Next
 
@@ -220,7 +220,7 @@ Partial Public Class Testprobleme
                 ReDim mypara(globalAnzPar - 1)
                 Randomize()
                 For i = 0 To globalAnzPar - 1
-                    mypara(i) = New EVO.Kern.OptParameter()
+                    mypara(i) = New EVO.Common.OptParameter()
                     mypara(i).Xn = Rnd()
                 Next
 
@@ -231,7 +231,7 @@ Partial Public Class Testprobleme
                 ReDim mypara(globalAnzPar - 1)
                 Randomize()
                 For i = 0 To globalAnzPar - 1
-                    mypara(i) = New EVO.Kern.OptParameter()
+                    mypara(i) = New EVO.Common.OptParameter()
                     mypara(i).Xn = Rnd()
                 Next
 
@@ -242,7 +242,7 @@ Partial Public Class Testprobleme
                 ReDim mypara(globalAnzPar - 1)
                 Randomize()
                 For i = 0 To globalAnzPar - 1
-                    mypara(i) = New EVO.Kern.OptParameter()
+                    mypara(i) = New EVO.Common.OptParameter()
                     mypara(i).Xn = Rnd()
                 Next
 
@@ -252,12 +252,12 @@ Partial Public Class Testprobleme
                 globalAnzRand = 0
                 ReDim mypara(globalAnzPar - 1)
                 For i = 0 To globalAnzPar - 1
-                    mypara(i) = New EVO.Kern.OptParameter()
+                    mypara(i) = New EVO.Common.OptParameter()
                     mypara(i).Xn = 1
                 Next
                 'Beziehungen
-                mypara(0).Beziehung = EVO.Kern.PES.Beziehung.keine
-                mypara(1).Beziehung = EVO.Kern.PES.Beziehung.groesser
+                mypara(0).Beziehung = Common.Constants.Beziehung.keine
+                mypara(1).Beziehung = Common.Constants.Beziehung.groesser
 
         End Select
 
@@ -274,7 +274,7 @@ Partial Public Class Testprobleme
 
     'Diagramm initialisieren
     '***********************
-    Public Sub DiagInitialise(ByVal PES_Settings As EVO.Kern.EVO_Settings, ByVal globalAnzPar As Integer, ByRef Diag As EVO.Diagramm)
+    Public Sub DiagInitialise(ByVal PES_Settings As Common.EVO_Settings, ByVal globalAnzPar As Integer, ByRef Diag As EVO.Diagramm)
 
         Select Case Me.Combo_Testproblem.Text
 
@@ -348,7 +348,7 @@ Partial Public Class Testprobleme
 
     'Diagramm für Beale-Problem initialisieren
     '*****************************************
-    Private Sub DiagInitialise_BealeProblem(ByVal PES_Settings As EVO.Kern.EVO_Settings, ByVal globalAnzPar As Short, ByRef Diag As EVO.Diagramm)
+    Private Sub DiagInitialise_BealeProblem(ByVal PES_Settings As Common.EVO_Settings, ByVal globalAnzPar As Short, ByRef Diag As EVO.Diagramm)
 
         Dim array_x() As Double = {}
         Dim array_y() As Double = {}
@@ -400,7 +400,7 @@ Partial Public Class Testprobleme
 
     'Diagramm für Schwefel-Problem initialisieren
     '********************************************
-    Private Sub DiagInitialise_SchwefelProblem(ByVal PES_Settings As EVO.Kern.EVO_Settings, ByVal globalAnzPar As Short, ByRef Diag As EVO.Diagramm)
+    Private Sub DiagInitialise_SchwefelProblem(ByVal PES_Settings As Common.EVO_Settings, ByVal globalAnzPar As Short, ByRef Diag As EVO.Diagramm)
 
         Dim array_x() As Double = {}
         Dim array_y() As Double = {}
@@ -462,7 +462,7 @@ Partial Public Class Testprobleme
 
     'Diagramm für MultiObjective-Probleme initialisieren
     '***************************************************
-    Private Sub DiagInitialise_MultiTestProb(ByVal PES_Settings As EVO.Kern.EVO_Settings, ByRef Diag As EVO.Diagramm)
+    Private Sub DiagInitialise_MultiTestProb(ByVal PES_Settings As Common.EVO_Settings, ByRef Diag As EVO.Diagramm)
 
         Dim i, j As Short
         Dim serie As Steema.TeeChart.Styles.Series
@@ -634,7 +634,7 @@ Partial Public Class Testprobleme
 
     'Diagramm für Box-Problem (3D) initialisieren
     '********************************************
-    Private Sub DiagInitialise_3D_Box(ByVal PES_Settings As EVO.Kern.EVO_Settings, ByVal AnzPar As Integer, ByRef Diag As EVO.Diagramm)
+    Private Sub DiagInitialise_3D_Box(ByVal PES_Settings As Common.EVO_Settings, ByVal AnzPar As Integer, ByRef Diag As EVO.Diagramm)
 
         Dim i, j, n As Integer
         Dim ArrayX() As Double
@@ -766,7 +766,7 @@ Partial Public Class Testprobleme
 
     'Diagramm für Abhängige Parameter initialisieren
     '***********************************************
-    Private Sub DiagInitialise_AbhParameter(ByVal PES_Settings As EVO.Kern.EVO_Settings, ByVal AnzPar As Integer, ByRef Diag As EVO.Diagramm)
+    Private Sub DiagInitialise_AbhParameter(ByVal PES_Settings As Common.EVO_Settings, ByVal AnzPar As Integer, ByRef Diag As EVO.Diagramm)
 
         With Diag
             .Clear()
@@ -855,7 +855,7 @@ Partial Public Class Testprobleme
 
     'Evaluierung und Zeichnen der Testprobleme
     '*****************************************
-    Public Sub Evaluierung_TestProbleme(ByRef ind As Kern.Individuum, ByVal ipop As Short, ByRef Diag As EVO.Diagramm)
+    Public Sub Evaluierung_TestProbleme(ByRef ind As Common.Individuum, ByVal ipop As Short, ByRef Diag As EVO.Diagramm)
 
         Dim i As Short
         Dim Unterteilung_X As Double
