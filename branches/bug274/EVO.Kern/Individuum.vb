@@ -59,7 +59,6 @@ Public Class Individuum
         End Get
     End Property
 
-
     Public Constrain() As Double           '05 Werte der Randbedingung(en)
     Public mutated As Boolean              '06 Gibt an ob der Wert bereits mutiert ist oder nicht
 
@@ -149,8 +148,8 @@ Public Class Individuum
         Set(ByVal Array() As Double)
             Dim i, j, x As Integer
             For i = 0 To Loc.GetUpperBound(0)
-                For j = 0 To loc(i).PES_OptPara.GetUpperBound(0)
-                    loc(i).PES_OptPara(j).Xn = array(x)
+                For j = 0 To Loc(i).PES_OptPara.GetUpperBound(0)
+                    Loc(i).PES_OptPara(j).Xn = Array(x)
                     x += 1
                 Next
             Next
@@ -342,10 +341,10 @@ Public Class Individuum
         For i = 0 To Me.Loc.GetUpperBound(0)
 
             'Falls nur CES gibt es keine OptParameter
-            If (Me.loc(i).PES_OptPara.GetUpperBound(0) = -1) Then
-                ReDim Dest.loc(i).PES_OptPara(-1)
+            If (Me.Loc(i).PES_OptPara.GetUpperBound(0) = -1) Then
+                ReDim Dest.Loc(i).PES_OptPara(-1)
             Else
-                ReDim Dest.loc(i).PES_OptPara(Me.Loc(i).PES_OptPara.GetUpperBound(0))
+                ReDim Dest.Loc(i).PES_OptPara(Me.Loc(i).PES_OptPara.GetUpperBound(0))
                 For j = 0 To Me.Loc(i).PES_OptPara.GetUpperBound(0)
                     Dest.Loc(i).PES_OptPara(j) = Me.Loc(i).PES_OptPara(j).Clone()
                 Next
