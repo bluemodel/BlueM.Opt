@@ -1193,7 +1193,7 @@ StartMutation:
             'Multi-Objective Pareto
             '----------------------
             With NDSorting(PES_iAkt.iAktNachf)
-                For i = 0 To Manager.AnzGesZiele - 1
+                For i = 0 To Manager.AnzZiele - 1
                     .QWerte(i) = ind.QWerte(i)
                 Next i
                 For i = 0 To Anz.Constr - 1
@@ -1443,7 +1443,7 @@ StartMutation:
         Dim i, j, v As Integer
 
         j = 0
-        For i = 0 To Manager.AnzGesZiele - 1
+        For i = 0 To Manager.AnzZiele - 1
             'HACK: Nur QWerte von OptZielen (d.h. Penalty) werden kopiert!
             If (Manager.List_Ziele(i).isOpt) Then
                 Individ(i_indi).QWerte(i) = Best.Qb(i_best, PES_iAkt.iAktPop, j)
@@ -1476,10 +1476,10 @@ StartMutation:
         Dim j, i As Integer
         Dim SekPopulation(,) As Double
 
-        ReDim SekPopulation(SekundärQb.GetUpperBound(0), Manager.AnzOptZiele - 1)
+        ReDim SekPopulation(SekundärQb.GetUpperBound(0), Manager.AnzPenalty - 1)
 
         For i = 0 To SekundärQb.GetUpperBound(0)
-            For j = 0 To Manager.AnzOptZiele - 1
+            For j = 0 To Manager.AnzPenalty - 1
                 SekPopulation(i, j) = SekundärQb(i).Penalty(j)
             Next j
         Next i

@@ -547,7 +547,7 @@ Public MustInherit Class Sim
         Next
 
         'ggf. Warnung wegen maximal 3 Dimensionen in Diagramm ausgeben 
-        If (Common.Manager.AnzOptZiele > 3) Then
+        If (Common.Manager.AnzPenalty > 3) Then
             MsgBox("Die Anzahl der OptZiele beträgt mehr als 3!" & eol _
                     & "Es werden nur die ersten drei Zielfunktionen im Hauptdiagramm angezeigt!", MsgBoxStyle.Information, "Info")
         End If
@@ -1387,7 +1387,7 @@ Handler:
         If Not launchSim() Then Exit Function
 
         'Qualitätswerte berechnen
-        For i = 0 To Common.Manager.AnzGesZiele - 1
+        For i = 0 To Common.Manager.AnzZiele - 1
             Indi.QWerte(i) = QWert(Common.Manager.List_Ziele(i))
         Next
 

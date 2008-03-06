@@ -333,10 +333,10 @@ Partial Class Form1
                     'EVO_Einstellungen einrichten
                     EVO_Einstellungen1.Enabled = True
                     Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_PES
-                    If (Common.Manager.AnzOptZiele = 1) Then
+                    If (Common.Manager.AnzPenalty = 1) Then
                         'Single-Objective
                         Call EVO_Einstellungen1.setStandard_PES(Common.Constants.EVO_MODUS.Single_Objective)
-                    ElseIf (Common.Manager.AnzOptZiele > 1) Then
+                    ElseIf (Common.Manager.AnzPenalty > 1) Then
                         'Multi-Objective
                         Call EVO_Einstellungen1.setStandard_PES(Common.Constants.EVO_MODUS.Multi_Objective)
                     End If
@@ -359,9 +359,9 @@ Partial Class Form1
                     Call Sim1.read_and_valid_INI_Files_PES()
 
                     'Kontrolle: Nur SO möglich!
-                    If (Common.Manager.AnzOptZiele = 1) Then
+                    If (Common.Manager.AnzPenalty = 1) Then
                         Call EVO_Einstellungen1.setStandard_HJ()
-                    ElseIf (Common.Manager.AnzOptZiele > 1) Then
+                    ElseIf (Common.Manager.AnzPenalty > 1) Then
                         Throw New Exception("Methode von Hook und Jeeves erlaubt nur SO-Optimierung!")
                     End If
 
@@ -407,10 +407,10 @@ Partial Class Form1
                     Call EVO_Einstellungen1.setStandard_CES()
 
                     'Je nach Anzahl der OptZiele von MO auf SO umschalten PES
-                    If (Common.Manager.AnzOptZiele = 1) Then
+                    If (Common.Manager.AnzPenalty = 1) Then
                         'Single-Objective
                         Call EVO_Einstellungen1.setStandard_PES(Common.Constants.EVO_MODUS.Single_Objective)
-                    ElseIf (Common.Manager.AnzOptZiele > 1) Then
+                    ElseIf (Common.Manager.AnzPenalty > 1) Then
                         'Multi-Objective
                         Call EVO_Einstellungen1.setStandard_PES(Common.Constants.EVO_MODUS.Multi_Objective)
                     End If
@@ -815,7 +815,7 @@ Partial Class Form1
         'CES initialisieren
         '******************
         CES1 = New EVO.Kern.CES()
-        Call Ces1.CESInitialise(EVO_Einstellungen1.Settings, Method, sim1.CES_T_Modus, Common.Manager.AnzOptZiele, Sim1.List_Constraints.GetLength(0), Sim1.List_Locations.GetLength(0), Sim1.VerzweigungsDatei.GetLength(0), sim1.n_Combinations, sim1.n_PathDimension)
+        Call Ces1.CESInitialise(EVO_Einstellungen1.Settings, Method, sim1.CES_T_Modus, Common.Manager.AnzPenalty, Sim1.List_Constraints.GetLength(0), Sim1.List_Locations.GetLength(0), Sim1.VerzweigungsDatei.GetLength(0), sim1.n_Combinations, sim1.n_PathDimension)
 
         'Die alten Bekannten
         globalAnzRand = CES1.ModSett.n_Constrain
@@ -900,17 +900,17 @@ Partial Class Form1
 
                 'Lösung im TeeChart einzeichnen
                 '==============================
-                If (Common.Manager.AnzOptZiele = 1) Then
+                If (Common.Manager.AnzPenalty = 1) Then
                     'SingleObjective
                     '---------------
                     serie = DForm.Diag.getSeriesPoint("Childs", "Orange")
                     Call serie.Add(durchlauf_all, CES1.Childs(i_ch).Penalty(0), durchlauf_all.ToString())
-                ElseIf (Common.Manager.AnzOptZiele = 2) Then
+                ElseIf (Common.Manager.AnzPenalty = 2) Then
                     'MultiObjective 2D-Diagramm
                     '--------------------------
                     serie = DForm.Diag.getSeriesPoint("Childs", "Orange")
                     Call serie.Add(CES1.Childs(i_ch).Penalty(0), CES1.Childs(i_ch).Penalty(1), durchlauf_all.ToString())
-                ElseIf (Common.Manager.AnzOptZiele = 3) Then
+                ElseIf (Common.Manager.AnzPenalty = 3) Then
                     'MultiObjective 3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
                     '---------------------------------------------------------------------------------------
                     Dim serie3D As Steema.TeeChart.Styles.Points3D
@@ -930,7 +930,7 @@ Partial Class Form1
             'MO oder SO SELEKTIONSPROZESS oder NDSorting SELEKTION
             'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
             'BUG 259: CES: Punkt-Labels der Sekundärpopulation fehlen noch!
-            If (Common.Manager.AnzOptZiele = 1) Then
+            If (Common.Manager.AnzPenalty = 1) Then
                 'Sortieren der Kinden anhand der Qualität
                 Call CES1.Sort_Individuum(CES1.Childs)
                 'Selectionsprozess je nach "plus" oder "minus" Strategie
@@ -1038,7 +1038,7 @@ Partial Class Form1
 
                                     'Schritte 1 - 3: PES wird initialisiert (Weiteres siehe dort ;-)
                                     '**************************************************************
-                                    Call PES1.PesInitialise(EVO_Einstellungen1.Settings, globalAnzPar, Common.Manager.AnzOptZiele, globalAnzRand, myPara, Method)
+                                    Call PES1.PesInitialise(EVO_Einstellungen1.Settings, globalAnzPar, Common.Manager.AnzPenalty, globalAnzRand, myPara, Method)
 
                                     'Die PopulationsEltern des PES werden gefüllt
                                     For m = 0 To CES1.PES_Parents_pLoc.GetUpperBound(0)
@@ -1130,8 +1130,8 @@ Partial Class Form1
         'Individuum wird initialisiert
         Call Common.Individuum.Initialise(1, 0, Me.globalAnzPar, Me.globalAnzRand)
 
-        ReDim QNBest(Common.Manager.AnzOptZiele - 1)
-        ReDim QBest(Common.Manager.AnzOptZiele - 1)
+        ReDim QNBest(Common.Manager.AnzPenalty - 1)
+        ReDim QBest(Common.Manager.AnzPenalty - 1)
 
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
@@ -1350,7 +1350,7 @@ Partial Class Form1
 
         'Schritte 1 - 3: ES wird initialisiert (Weiteres siehe dort ;-)
         '**************************************************************
-        Call PES1.PesInitialise(EVO_Einstellungen1.Settings, globalAnzPar, Common.Manager.AnzOptZiele, globalAnzRand, myPara, Method)
+        Call PES1.PesInitialise(EVO_Einstellungen1.Settings, globalAnzPar, Common.Manager.AnzPenalty, globalAnzRand, myPara, Method)
 
         'Startwerte werden der Verlaufsanzeige zugewiesen
         Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
@@ -1451,7 +1451,7 @@ Start_Evolutionsrunden:
                                     '==============================
                                     Dim serie As Steema.TeeChart.Styles.Series
 
-                                    If (Common.Manager.AnzOptZiele = 1) Then
+                                    If (Common.Manager.AnzPenalty = 1) Then
                                         'SingleObjective
                                         'xxxxxxxxxxxxxxx
                                         If (Not ind.feasible) Then
@@ -1464,7 +1464,7 @@ Start_Evolutionsrunden:
                                     Else
                                         'MultiObjective
                                         'xxxxxxxxxxxxxx
-                                        If (Common.Manager.AnzOptZiele = 2) Then
+                                        If (Common.Manager.AnzPenalty = 2) Then
                                             '2D-Diagramm
                                             '------------------------------------------------------------------------
                                             If (Not ind.feasible) Then
@@ -1533,7 +1533,7 @@ Start_Evolutionsrunden:
                     If EVO_Einstellungen1.Settings.PES.is_paint_constraint Then
                         Dim serie As Steema.TeeChart.Styles.Series
 
-                        If (Common.Manager.AnzOptZiele = 1) Then
+                        If (Common.Manager.AnzPenalty = 1) Then
                             'SingleObjective
                             'xxxxxxxxxxxxxxx
                             serie = DForm.Diag.getSeriesPoint("Population " & (PES1.PES_iAkt.iAktPop + 1).ToString() & " (ungültig)", "Gray")
@@ -1543,7 +1543,7 @@ Start_Evolutionsrunden:
                         Else
                             'MultiObjective
                             'xxxxxxxxxxxxxx
-                            If (Common.Manager.AnzOptZiele = 2) Then
+                            If (Common.Manager.AnzPenalty = 2) Then
                                 '2D-Diagramm
                                 '------------------------------------------------------------------------
                                 serie = DForm.Diag.getSeriesPoint("Population" & " (ungültig)", "Gray")
@@ -1573,9 +1573,9 @@ Start_Evolutionsrunden:
                         '----------------------------------------
                         Dim j As Integer
                         Dim k As Integer
-                        Dim Referenzpunkt(Common.Manager.AnzOptZiele - 1) As Double
+                        Dim Referenzpunkt(Common.Manager.AnzPenalty - 1) As Double
 
-                        For j = 0 To Common.Manager.AnzOptZiele - 1
+                        For j = 0 To Common.Manager.AnzPenalty - 1
                             Referenzpunkt(j) = 0
                             For k = 0 To UBound(SekPopulation)
                                 If SekPopulation(k, j) > Referenzpunkt(j) Then
@@ -1625,7 +1625,7 @@ Start_Evolutionsrunden:
         Dim serie As Steema.TeeChart.Styles.Series
         Dim serie3D As Steema.TeeChart.Styles.Points3D
 
-        If (Common.Manager.AnzOptZiele = 2) Then
+        If (Common.Manager.AnzPenalty = 2) Then
             '2 Zielfunktionen
             '----------------------------------------------------------------
             serie = DForm.Diag.getSeriesPoint("Sekundäre Population", "Green")
@@ -1634,7 +1634,7 @@ Start_Evolutionsrunden:
                 serie.Add(SekPop(i, 0), SekPop(i, 1))
             Next i
 
-        ElseIf (Common.Manager.AnzOptZiele >= 3) Then
+        ElseIf (Common.Manager.AnzPenalty >= 3) Then
             '3 oder mehr Zielfunktionen (es werden die ersten drei angezeigt)
             '----------------------------------------------------------------
             serie3D = DForm.Diag.getSeries3DPoint("Sekundäre Population", "Green")
@@ -1660,7 +1660,7 @@ Start_Evolutionsrunden:
         'SekPop holen
         solutions = Sim1.OptResult.getSekPop(_igen)
 
-        If (Common.Manager.AnzOptZiele = 2) Then
+        If (Common.Manager.AnzPenalty = 2) Then
             '2 Zielfunktionen
             '----------------------------------------------------------------
             serie = DForm.Diag.getSeriesPoint("Sekundäre Population", "Green")
@@ -1669,7 +1669,7 @@ Start_Evolutionsrunden:
                 serie.Add(solutions(i).Penalty(0), solutions(i).Penalty(1), solutions(i).ID)
             Next i
 
-        ElseIf (Common.Manager.AnzOptZiele >= 3) Then
+        ElseIf (Common.Manager.AnzPenalty >= 3) Then
             '3 oder mehr Zielfunktionen (es werden die ersten drei angezeigt)
             '----------------------------------------------------------------
             serie3D = DForm.Diag.getSeries3DPoint("Sekundäre Population", "Green")
@@ -1767,7 +1767,7 @@ Start_Evolutionsrunden:
                         Dim Achsen As New Collection
 
                         'Bei Single-Objective: X-Achse = Nr. der Simulation (Durchlauf)
-                        If (Common.Manager.AnzOptZiele = 1) Then
+                        If (Common.Manager.AnzPenalty = 1) Then
 
                             Achse.Name = "Simulation"
                             Achse.Auto = False
@@ -2115,21 +2115,6 @@ Start_Evolutionsrunden:
             '---------------
             Dim importDialog As New MDBImportDialog()
 
-            For Each optziel As Common.Ziel In Common.Manager.List_OptZiele
-                importDialog.ListBox_OptZieleX.Items.Add(optziel.Bezeichnung)
-                importDialog.ListBox_OptZieleY.Items.Add(optziel.Bezeichnung)
-                importDialog.ListBox_OptZieleZ.Items.Add(optziel.Bezeichnung)
-            Next
-
-            'Bei weniger als 3 Zielen Z-Achse ausblenden
-            If (Common.Manager.AnzOptZiele < 3) Then
-                importDialog.ListBox_OptZieleZ.Enabled = False
-            End If
-            'Bei weniger als 2 Zielen Y-Achse ausblenden
-            If (Common.Manager.AnzOptZiele < 2) Then
-                importDialog.ListBox_OptZieleY.Enabled = False
-            End If
-
             diagresult = importDialog.ShowDialog()
 
             If (diagresult = Windows.Forms.DialogResult.OK) Then
@@ -2143,33 +2128,37 @@ Start_Evolutionsrunden:
 
                 'Hauptdiagramm
                 '=============
-                Dim OptZielIndexX, OptZielIndexY, OptZielIndexZ As Integer
-                OptZielIndexX = importDialog.ListBox_OptZieleX.SelectedIndex
-                OptZielIndexY = importDialog.ListBox_OptZieleY.SelectedIndex
-                OptZielIndexZ = importDialog.ListBox_OptZieleZ.SelectedIndex
+                Dim ZielIndexX, ZielIndexY, ZielIndexZ As Integer
+                ZielIndexX = importDialog.ListBox_ZieleX.SelectedIndex
+                ZielIndexY = importDialog.ListBox_ZieleY.SelectedIndex
+                ZielIndexZ = importDialog.ListBox_ZieleZ.SelectedIndex
 
                 'Achsen
                 '------
                 Dim Achsen As New Collection
                 Dim tmpAchse As EVO.Diagramm.Achse
                 tmpAchse.Auto = True
-                'Single-objective
-                If (OptZielIndexZ = -1 And OptZielIndexY = -1) Then
+                If (ZielIndexZ = -1 And ZielIndexY = -1) Then
+                    'Single-objective
+                    '----------------
+                    'X-Achse
                     tmpAchse.Name = "Simulation"
                     Achsen.Add(tmpAchse)
-                    tmpAchse.Name = importDialog.ListBox_OptZieleX.SelectedItem
+                    'Y-Achse
+                    tmpAchse.Name = Common.Manager.List_Ziele(ZielIndexX).Bezeichnung
                     Achsen.Add(tmpAchse)
                 Else
                     'Multi-objective
+                    '---------------
                     'X-Achse
-                    tmpAchse.Name = importDialog.ListBox_OptZieleX.SelectedItem
+                    tmpAchse.Name = Common.Manager.List_Ziele(ZielIndexX).Bezeichnung
                     Achsen.Add(tmpAchse)
                     'Y-Achse
-                    tmpAchse.Name = importDialog.ListBox_OptZieleY.SelectedItem
+                    tmpAchse.Name = Common.Manager.List_Ziele(ZielIndexY).Bezeichnung
                     Achsen.Add(tmpAchse)
-                    If (Not OptZielIndexZ = -1) Then
+                    If (Not ZielIndexZ = -1) Then
                         'Z-Achse
-                        tmpAchse.Name = importDialog.ListBox_OptZieleZ.SelectedItem
+                        tmpAchse.Name = Common.Manager.List_Ziele(ZielIndexZ).Bezeichnung
                         Achsen.Add(tmpAchse)
                     End If
                 End If
@@ -2190,8 +2179,9 @@ Start_Evolutionsrunden:
 
                     For Each ind As Common.Individuum In Sim1.OptResult.Solutions
 
-                        If (OptZielIndexZ = -1 And OptZielIndexY = -1) Then
+                        If (ZielIndexZ = -1 And ZielIndexY = -1) Then
                             '1D
+                            '--
                             'Constraintverletzung prüfen
                             If (ind.feasible) Then
                                 serie = Me.DForm.Diag.getSeriesPoint("Population", "red")
@@ -2199,8 +2189,8 @@ Start_Evolutionsrunden:
                                 serie = Me.DForm.Diag.getSeriesPoint("Population (ungültig)", "Gray")
                             End If
                             'Zeichnen
-                            serie.Add(ind.ID, ind.Penalty(OptZielIndexX), ind.ID)
-                        ElseIf (OptZielIndexZ = -1) Then
+                            serie.Add(ind.ID, ind.QWerte(ZielIndexX), ind.ID)
+                        ElseIf (ZielIndexZ = -1) Then
                             '2D
                             '--
                             'Constraintverletzung prüfen
@@ -2210,7 +2200,7 @@ Start_Evolutionsrunden:
                                 serie = Me.DForm.Diag.getSeriesPoint("Population (ungültig)", "Gray")
                             End If
                             'Zeichnen
-                            serie.Add(ind.Penalty(OptZielIndexX), ind.Penalty(OptZielIndexY), ind.ID)
+                            serie.Add(ind.QWerte(ZielIndexX), ind.QWerte(ZielIndexY), ind.ID)
                         Else
                             '3D
                             '--
@@ -2221,7 +2211,7 @@ Start_Evolutionsrunden:
                                 serie3D = Me.DForm.Diag.getSeries3DPoint("Population (ungültig)", "Gray")
                             End If
                             'Zeichnen
-                            serie3D.Add(ind.Penalty(OptZielIndexX), ind.Penalty(OptZielIndexY), ind.Penalty(OptZielIndexZ), ind.ID)
+                            serie3D.Add(ind.QWerte(ZielIndexX), ind.QWerte(ZielIndexY), ind.QWerte(ZielIndexZ), ind.ID)
                         End If
 
                     Next
@@ -2233,16 +2223,16 @@ Start_Evolutionsrunden:
                 If (importDialog.ComboBox_SekPop.SelectedItem <> "keine") Then
 
                     For Each sekpopind As Common.Individuum In Sim1.OptResult.getSekPop()
-                        If (OptZielIndexZ = -1) Then
+                        If (ZielIndexZ = -1) Then
                             '2D
                             '--
                             serie = Me.DForm.Diag.getSeriesPoint("Sekundäre Population", "Green")
-                            serie.Add(sekpopind.Penalty(OptZielIndexX), sekpopind.Penalty(OptZielIndexY), sekpopind.ID)
+                            serie.Add(sekpopind.QWerte(ZielIndexX), sekpopind.QWerte(ZielIndexY), sekpopind.ID)
                         Else
                             '3D
                             '--
                             serie3D = Me.DForm.Diag.getSeries3DPoint("Sekundäre Population", "Green")
-                            serie3D.Add(sekpopind.Penalty(OptZielIndexX), sekpopind.Penalty(OptZielIndexY), sekpopind.Penalty(OptZielIndexZ), sekpopind.ID)
+                            serie3D.Add(sekpopind.QWerte(ZielIndexX), sekpopind.QWerte(ZielIndexY), sekpopind.QWerte(ZielIndexZ), sekpopind.ID)
                         End If
                     Next
 

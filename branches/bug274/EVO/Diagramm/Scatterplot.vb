@@ -84,7 +84,7 @@ Partial Public Class Scatterplot
                     'YAchsen
                     If (i = 0) Then
                         'Achse standardm‰ﬂig anzeigen
-                    ElseIf (i = Common.Manager.AnzOptZiele - 1) Then
+                    ElseIf (i = Common.Manager.AnzPenalty - 1) Then
                         'Achse rechts anzeigen
                         .Axes.Left.OtherSide = True
                     Else
@@ -97,7 +97,7 @@ Partial Public Class Scatterplot
                     If (j = 0) Then
                         'Achse oben anzeigen
                         .Axes.Bottom.OtherSide = True
-                    ElseIf (j = Common.Manager.AnzOptZiele - 1) Then
+                    ElseIf (j = Common.Manager.AnzPenalty - 1) Then
                         'Achse standardm‰ﬂig anzeigen
                     Else
                         'Achse verstecken
@@ -155,20 +155,20 @@ Partial Public Class Scatterplot
     '*********************
     Private Sub dimensionieren()
 
-        ReDim Me.Diags(Common.Manager.AnzOptZiele - 1, Common.Manager.AnzOptZiele - 1)
+        ReDim Me.Diags(Common.Manager.AnzPenalty - 1, Common.Manager.AnzPenalty - 1)
 
         Dim i As Integer
 
         Me.matrix.Name = "Matrix"
 
-        Me.matrix.ColumnCount = Common.Manager.AnzOptZiele
-        For i = 1 To Common.Manager.AnzOptZiele
-            Me.matrix.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100 / Common.Manager.AnzOptZiele))
+        Me.matrix.ColumnCount = Common.Manager.AnzPenalty
+        For i = 1 To Common.Manager.AnzPenalty
+            Me.matrix.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100 / Common.Manager.AnzPenalty))
         Next
 
-        Me.matrix.RowCount = Common.Manager.AnzOptZiele
-        For i = 1 To Common.Manager.AnzOptZiele
-            Me.matrix.RowStyles.Add(New RowStyle(SizeType.Percent, 100 / Common.Manager.AnzOptZiele))
+        Me.matrix.RowCount = Common.Manager.AnzPenalty
+        For i = 1 To Common.Manager.AnzPenalty
+            Me.matrix.RowStyles.Add(New RowStyle(SizeType.Percent, 100 / Common.Manager.AnzPenalty))
         Next
 
     End Sub

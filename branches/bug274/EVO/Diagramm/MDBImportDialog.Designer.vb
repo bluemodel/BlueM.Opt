@@ -27,9 +27,9 @@ Partial Class MDBImportDialog
         Me.Label_XAchse = New System.Windows.Forms.Label
         Me.Label_YAchse = New System.Windows.Forms.Label
         Me.Label_ZAchse = New System.Windows.Forms.Label
-        Me.ListBox_OptZieleX = New System.Windows.Forms.ListBox
-        Me.ListBox_OptZieleY = New System.Windows.Forms.ListBox
-        Me.ListBox_OptZieleZ = New System.Windows.Forms.ListBox
+        Me.ListBox_ZieleX = New System.Windows.Forms.ListBox
+        Me.ListBox_ZieleY = New System.Windows.Forms.ListBox
+        Me.ListBox_ZieleZ = New System.Windows.Forms.ListBox
         Me.OK_Button = New System.Windows.Forms.Button
         Me.Cancel_Button = New System.Windows.Forms.Button
         Me.ComboBox_SekPop = New System.Windows.Forms.ComboBox
@@ -42,9 +42,9 @@ Partial Class MDBImportDialog
         Me.GroupBox_Hauptdiagramm.Controls.Add(Me.Label_XAchse)
         Me.GroupBox_Hauptdiagramm.Controls.Add(Me.Label_YAchse)
         Me.GroupBox_Hauptdiagramm.Controls.Add(Me.Label_ZAchse)
-        Me.GroupBox_Hauptdiagramm.Controls.Add(Me.ListBox_OptZieleX)
-        Me.GroupBox_Hauptdiagramm.Controls.Add(Me.ListBox_OptZieleY)
-        Me.GroupBox_Hauptdiagramm.Controls.Add(Me.ListBox_OptZieleZ)
+        Me.GroupBox_Hauptdiagramm.Controls.Add(Me.ListBox_ZieleX)
+        Me.GroupBox_Hauptdiagramm.Controls.Add(Me.ListBox_ZieleY)
+        Me.GroupBox_Hauptdiagramm.Controls.Add(Me.ListBox_ZieleZ)
         Me.GroupBox_Hauptdiagramm.Location = New System.Drawing.Point(12, 12)
         Me.GroupBox_Hauptdiagramm.Name = "GroupBox_Hauptdiagramm"
         Me.GroupBox_Hauptdiagramm.Size = New System.Drawing.Size(418, 236)
@@ -80,29 +80,29 @@ Partial Class MDBImportDialog
         Me.Label_ZAchse.TabIndex = 14
         Me.Label_ZAchse.Text = "Z-Achse (optional):"
         '
-        'ListBox_OptZieleX
+        'ListBox_ZieleX
         '
-        Me.ListBox_OptZieleX.FormattingEnabled = True
-        Me.ListBox_OptZieleX.Location = New System.Drawing.Point(9, 41)
-        Me.ListBox_OptZieleX.Name = "ListBox_OptZieleX"
-        Me.ListBox_OptZieleX.Size = New System.Drawing.Size(130, 186)
-        Me.ListBox_OptZieleX.TabIndex = 5
+        Me.ListBox_ZieleX.FormattingEnabled = True
+        Me.ListBox_ZieleX.Location = New System.Drawing.Point(9, 41)
+        Me.ListBox_ZieleX.Name = "ListBox_ZieleX"
+        Me.ListBox_ZieleX.Size = New System.Drawing.Size(130, 186)
+        Me.ListBox_ZieleX.TabIndex = 5
         '
-        'ListBox_OptZieleY
+        'ListBox_ZieleY
         '
-        Me.ListBox_OptZieleY.FormattingEnabled = True
-        Me.ListBox_OptZieleY.Location = New System.Drawing.Point(144, 41)
-        Me.ListBox_OptZieleY.Name = "ListBox_OptZieleY"
-        Me.ListBox_OptZieleY.Size = New System.Drawing.Size(130, 186)
-        Me.ListBox_OptZieleY.TabIndex = 10
+        Me.ListBox_ZieleY.FormattingEnabled = True
+        Me.ListBox_ZieleY.Location = New System.Drawing.Point(144, 41)
+        Me.ListBox_ZieleY.Name = "ListBox_ZieleY"
+        Me.ListBox_ZieleY.Size = New System.Drawing.Size(130, 186)
+        Me.ListBox_ZieleY.TabIndex = 10
         '
-        'ListBox_OptZieleZ
+        'ListBox_ZieleZ
         '
-        Me.ListBox_OptZieleZ.FormattingEnabled = True
-        Me.ListBox_OptZieleZ.Location = New System.Drawing.Point(280, 41)
-        Me.ListBox_OptZieleZ.Name = "ListBox_OptZieleZ"
-        Me.ListBox_OptZieleZ.Size = New System.Drawing.Size(130, 186)
-        Me.ListBox_OptZieleZ.TabIndex = 13
+        Me.ListBox_ZieleZ.FormattingEnabled = True
+        Me.ListBox_ZieleZ.Location = New System.Drawing.Point(280, 41)
+        Me.ListBox_ZieleZ.Name = "ListBox_ZieleZ"
+        Me.ListBox_ZieleZ.Size = New System.Drawing.Size(130, 186)
+        Me.ListBox_ZieleZ.TabIndex = 13
         '
         'OK_Button
         '
@@ -164,15 +164,15 @@ Partial Class MDBImportDialog
         Me.PerformLayout()
 
     End Sub
-    Friend WithEvents GroupBox_Hauptdiagramm As System.Windows.Forms.GroupBox
-    Friend WithEvents Label_XAchse As System.Windows.Forms.Label
-    Friend WithEvents Label_YAchse As System.Windows.Forms.Label
-    Friend WithEvents Label_ZAchse As System.Windows.Forms.Label
-    Friend WithEvents ListBox_OptZieleX As System.Windows.Forms.ListBox
-    Friend WithEvents ListBox_OptZieleY As System.Windows.Forms.ListBox
-    Friend WithEvents ListBox_OptZieleZ As System.Windows.Forms.ListBox
-    Friend WithEvents OK_Button As System.Windows.Forms.Button
-    Friend WithEvents Cancel_Button As System.Windows.Forms.Button
+    Private WithEvents GroupBox_Hauptdiagramm As System.Windows.Forms.GroupBox
+    Private WithEvents Label_XAchse As System.Windows.Forms.Label
+    Private WithEvents Label_YAchse As System.Windows.Forms.Label
+    Private WithEvents Label_ZAchse As System.Windows.Forms.Label
+    Private WithEvents OK_Button As System.Windows.Forms.Button
+    Private WithEvents Cancel_Button As System.Windows.Forms.Button
+    Private WithEvents Label_SekPop As System.Windows.Forms.Label
+    Friend WithEvents ListBox_ZieleX As System.Windows.Forms.ListBox
+    Friend WithEvents ListBox_ZieleY As System.Windows.Forms.ListBox
+    Friend WithEvents ListBox_ZieleZ As System.Windows.Forms.ListBox
     Friend WithEvents ComboBox_SekPop As System.Windows.Forms.ComboBox
-    Friend WithEvents Label_SekPop As System.Windows.Forms.Label
 End Class

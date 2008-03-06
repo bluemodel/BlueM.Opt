@@ -1,5 +1,3 @@
-Imports System.IO
-
 Public Module Manager
 
     'Eigenschaften
@@ -12,7 +10,7 @@ Public Module Manager
 
     'Gibt die Gesamtanzahl der Ziele zurück
     '**************************************
-    Public ReadOnly Property AnzGesZiele() As Integer
+    Public ReadOnly Property AnzZiele() As Integer
         Get
             Return Manager.List_Ziele.Length
         End Get
@@ -20,7 +18,7 @@ Public Module Manager
 
     'Gibt die Anzahl der OptimierungsZiele zurück
     '********************************************
-    Public ReadOnly Property AnzOptZiele() As Integer
+    Public ReadOnly Property AnzPenalty() As Integer
         Get
             Dim n As Integer
 
@@ -40,9 +38,9 @@ Public Module Manager
             Dim i As Integer
             Dim array() As Ziel
 
-            ReDim array(Manager.AnzOptZiele - 1)
+            ReDim array(Manager.AnzPenalty - 1)
 
-            For i = 0 To Manager.AnzGesZiele - 1
+            For i = 0 To Manager.AnzZiele - 1
                 If (Manager.List_Ziele(i).isOpt) Then
                     array(i) = Manager.List_Ziele(i)
                 End If

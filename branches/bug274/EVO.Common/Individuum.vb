@@ -46,9 +46,9 @@ Public Class Individuum
             Dim i As Integer
             Dim array() As Double
 
-            ReDim array(Common.Manager.AnzOptZiele - 1)
+            ReDim array(Common.Manager.AnzPenalty - 1)
 
-            For i = 0 To Common.Manager.AnzGesZiele - 1
+            For i = 0 To Common.Manager.AnzZiele - 1
                 'Nur die QWerte von OptZielen zurückgeben!
                 If (Common.Manager.List_Ziele(i).isOpt) Then
                     array(i) = Me.QWerte(i)
@@ -213,8 +213,8 @@ Public Class Individuum
         Next
 
         '04 QWerte
-        ReDim Me.QWerte(Common.Manager.AnzGesZiele - 1)
-        For j = 0 To Common.Manager.AnzGesZiele - 1
+        ReDim Me.QWerte(Common.Manager.AnzZiele - 1)
+        For j = 0 To Common.Manager.AnzZiele - 1
             Me.QWerte(j) = Double.MaxValue
         Next
 

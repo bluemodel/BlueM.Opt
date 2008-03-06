@@ -263,7 +263,7 @@ Partial Public Class Testprobleme
 
         'HACK: Ziele dem Manager mitteilen (geht auch schöner!)
         ReDim Common.Manager.List_Ziele(AnzZiele - 1)
-        For i = 0 To Common.Manager.AnzGesZiele - 1
+        For i = 0 To Common.Manager.AnzZiele - 1
             Common.Manager.List_Ziele(i) = New Common.Ziel()
             Common.Manager.List_Ziele(i).isOpt = True
         Next
