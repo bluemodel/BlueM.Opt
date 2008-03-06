@@ -159,6 +159,12 @@
     <Compile Include="Diagramm\MDBImportDialog.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Diagramm\ScatterplotDialog.Designer.vb">
+      <DependentUpon>ScatterplotDialog.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Diagramm\ScatterplotDialog.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Diagramm\SolutionDialog.Designer.vb">
       <DependentUpon>SolutionDialog.vb</DependentUpon>
     </Compile>
@@ -224,6 +230,10 @@
     <EmbeddedResource Include="Diagramm\MDBImportDialog.resx">
       <SubType>Designer</SubType>
       <DependentUpon>MDBImportDialog.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Diagramm\ScatterplotDialog.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>ScatterplotDialog.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Diagramm\SolutionDialog.resx">
       <SubType>Designer</SubType>
