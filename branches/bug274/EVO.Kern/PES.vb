@@ -1476,10 +1476,10 @@ StartMutation:
         Dim j, i As Integer
         Dim SekPopulation(,) As Double
 
-        ReDim SekPopulation(SekundärQb.GetUpperBound(0), Manager.AnzPenalty - 1)
+        ReDim SekPopulation(SekundärQb.GetUpperBound(0), Anz.Penalty - 1)
 
         For i = 0 To SekundärQb.GetUpperBound(0)
-            For j = 0 To Manager.AnzPenalty - 1
+            For j = 0 To Anz.Penalty - 1
                 SekPopulation(i, j) = SekundärQb(i).Penalty(j)
             Next j
         Next i
