@@ -37,6 +37,11 @@ Partial Public Class Scatterplot
         'Diagramme zeichnen
         Call Me.zeichnen()
 
+        'Bereits ausgewählte Lösungen anzeigen
+        For Each ind As Common.Individuum In Me.OptResult.getSelectedSolutions
+            Call Me.showSelectedSolution(ind)
+        Next
+
     End Sub
 
     'Diagramme zeichnen
