@@ -90,15 +90,15 @@ Public Class OptResult
 
     'Ausgewählte Lösungen holen
     '**************************
-    Public Function getSelectedSolutions() As Common.Individuum()
+    Public ReadOnly Property getSelectedSolutions() As Common.Individuum()
+        Get
+            Dim solutions() As Common.Individuum
 
-        Dim solutions() As Common.Individuum
+            solutions = getSolutions(Me.selSolutionIDs)
 
-        solutions = getSolutions(Me.selSolutionIDs)
-
-        Return solutions
-
-    End Function
+            Return solutions
+        End Get
+    End Property
 
     'Lösungsauswahl zurücksetzen
     '***************************
@@ -237,7 +237,7 @@ Public Class OptResult
         'Allgemeine Anpassungen
         Call Me.db_prepare()
         'Methodenspezifische Anpassungen
-        Select Case Evo.Form1.Method
+        Select Case EVO.Form1.Method
             Case METH_PES, METH_SENSIPLOT, METH_HOOKJEEVES
                 Call Me.db_prepare_PES()
             Case METH_CES
@@ -409,8 +409,8 @@ Public Class OptResult
             command.ExecuteNonQuery()
         End If
 
-        If (Evo.Form1.Method = METH_PES _
-            Or Evo.Form1.Method = METH_SENSIPLOT _
+        If (EVO.Form1.Method = METH_PES _
+            Or EVO.Form1.Method = METH_SENSIPLOT _
             Or EVO.Form1.Method = METH_HOOKJEEVES) Then
 
             'OptParameter schreiben
@@ -453,10 +453,10 @@ Public Class OptResult
             For i = 0 To Me.List_OptParameter_Save.GetUpperBound(0)
                 found = False
                 fieldnames &= ", [" & Me.List_OptParameter_Save(i).Bezeichnung & "]"
-                For x = 0 To Ind.Loc.GetUpperBound(0)
-                    For y = 0 To Ind.Loc(x).PES_OptPara.GetUpperBound(0)
-                        If Ind.Loc(x).PES_OptPara(y).Bezeichnung = Me.List_OptParameter_Save(i).Bezeichnung Then
-                            fieldvalues &= ", " & Ind.Loc(x).PES_OptPara(y).RWert.ToString(Common.Provider.FortranProvider)
+                For x = 0 To ind.Loc.GetUpperBound(0)
+                    For y = 0 To ind.Loc(x).PES_OptPara.GetUpperBound(0)
+                        If ind.Loc(x).PES_OptPara(y).Bezeichnung = Me.List_OptParameter_Save(i).Bezeichnung Then
+                            fieldvalues &= ", " & ind.Loc(x).PES_OptPara(y).RWert.ToString(Common.Provider.FortranProvider)
                             found = True
                         End If
                     Next
