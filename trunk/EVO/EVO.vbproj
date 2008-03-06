@@ -103,6 +103,10 @@
       <Project>{BCD1BBE3-5AB2-4C3F-AC12-43EB977C6F6F}</Project>
       <Name>Wave</Name>
     </ProjectReference>
+    <ProjectReference Include="..\EVO.Common\EVO.Common.vbproj">
+      <Project>{CAA1CE91-0973-4BE7-9BD8-16B5D40BC93C}</Project>
+      <Name>EVO.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EVO.Kern\EVO.Kern.vbproj">
       <Project>{58356A07-425E-4C91-ACB8-17B9286C9417}</Project>
       <Name>EVO.Kern</Name>
@@ -153,6 +157,12 @@
       <DependentUpon>MDBImportDialog.vb</DependentUpon>
     </Compile>
     <Compile Include="Diagramm\MDBImportDialog.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Diagramm\ScatterplotDialog.Designer.vb">
+      <DependentUpon>ScatterplotDialog.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Diagramm\ScatterplotDialog.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Diagramm\SolutionDialog.Designer.vb">
@@ -220,6 +230,10 @@
     <EmbeddedResource Include="Diagramm\MDBImportDialog.resx">
       <SubType>Designer</SubType>
       <DependentUpon>MDBImportDialog.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Diagramm\ScatterplotDialog.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>ScatterplotDialog.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Diagramm\SolutionDialog.resx">
       <SubType>Designer</SubType>

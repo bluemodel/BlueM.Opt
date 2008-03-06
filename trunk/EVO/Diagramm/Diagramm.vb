@@ -239,7 +239,7 @@ Public Class Diagramm
 
     'ausgewählte Lösung anzeigen
     '***************************
-    Friend Sub showSelectedSolution(ByVal List_OptZiele() As Sim.Struct_OptZiel, ByVal ind As Kern.Individuum)
+    Friend Sub showSelectedSolution(ByVal ind As Common.Individuum)
 
         Dim xAchse, yAchse, zAchse As String
         Dim xWert, yWert, zWert As Double
@@ -250,11 +250,11 @@ Public Class Diagramm
         yAchse = Me.Chart.Axes.Left.Title.Caption
 
         'QWerte zu Achsen zuordnen
-        For i = 0 To List_OptZiele.GetUpperBound(0)
-            If (List_OptZiele(i).Bezeichnung = xAchse) Then
-                xWert = ind.Penalty(i)
-            ElseIf (List_OptZiele(i).Bezeichnung = yAchse) Then
-                yWert = ind.Penalty(i)
+        For i = 0 To Common.Manager.AnzZiele - 1
+            If (Common.Manager.List_Ziele(i).Bezeichnung = xAchse) Then
+                xWert = ind.QWerte(i)
+            ElseIf (Common.Manager.List_Ziele(i).Bezeichnung = yAchse) Then
+                yWert = ind.QWerte(i)
             End If
         Next
 
@@ -277,10 +277,10 @@ Public Class Diagramm
             'Z Achse bestimmen
             zAchse = Me.Chart.Axes.Depth.Title.Caption
 
-            'QWert zu Achse zuordnen
-            For i = 0 To List_OptZiele.GetUpperBound(0)
-                If (List_OptZiele(i).Bezeichnung = zAchse) Then
-                    zWert = ind.Penalty(i)
+            'QWert zu Z-Achse zuordnen
+            For i = 0 To Common.Manager.AnzZiele - 1
+                If (Common.Manager.List_Ziele(i).Bezeichnung = zAchse) Then
+                    zWert = ind.QWerte(i)
                 End If
             Next
 

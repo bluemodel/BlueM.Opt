@@ -16,17 +16,13 @@ Partial Public Class Scatterplot
 
     Private Diags(,) As Diagramm
     Private OptResult As IHWB.EVO.OptResult
+    Private Zielauswahl() As Integer
     Private SekPopOnly As Boolean
-    Private ReadOnly Property nOptZiele() As Integer
-        Get
-            Return Me.OptResult.List_OptZiele.Length()
-        End Get
-    End Property
-    Public Event pointSelected(ByVal ind As Kern.Individuum)
+    Public Event pointSelected(ByVal ind As Common.Individuum)
 
     'Konstruktor
     '***********
-    Public Sub New(ByVal optres As IHWB.EVO.OptResult, ByVal _sekpoponly As Boolean)
+    Public Sub New(ByVal optres As IHWB.EVO.OptResult, _zielauswahl() As Integer, _sekpoponly As Boolean)
 
         ' Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent()
@@ -39,8 +35,16 @@ Partial Public Class Scatterplot
         'SekPop-Flag setzen
         Me.SekPopOnly = _sekpoponly
 
+        'Zielauswahl speichern
+        Me.Zielauswahl = _zielauswahl
+
         'Diagramme zeichnen
         Call Me.zeichnen()
+
+        'Bereits ausgewählte Lösungen anzeigen
+        For Each ind As Common.Individuum In Me.OptResult.getSelectedSolutions
+            Call Me.showSelectedSolution(ind)
+        Next
 
     End Sub
 
@@ -72,8 +76,8 @@ Partial Public Class Scatterplot
 
                     'Achsen
                     '------
-                    xAchse = OptResult.List_OptZiele(i).Bezeichnung
-                    yAchse = OptResult.List_OptZiele(j).Bezeichnung
+                    xAchse = Common.Manager.List_Ziele(Me.Zielauswahl(i)).Bezeichnung
+                    yAchse = Common.Manager.List_Ziele(Me.Zielauswahl(j)).Bezeichnung
 
                     .Axes.Bottom.Title.Caption = xAchse
                     .Axes.Left.Title.Caption = yAchse
@@ -89,7 +93,7 @@ Partial Public Class Scatterplot
                     'YAchsen
                     If (i = 0) Then
                         'Achse standardmäßig anzeigen
-                    ElseIf (i = Me.nOptZiele - 1) Then
+                    ElseIf (i = Me.Zielauswahl.Length - 1) Then
                         'Achse rechts anzeigen
                         .Axes.Left.OtherSide = True
                     Else
@@ -102,7 +106,7 @@ Partial Public Class Scatterplot
                     If (j = 0) Then
                         'Achse oben anzeigen
                         .Axes.Bottom.OtherSide = True
-                    ElseIf (j = Me.nOptZiele - 1) Then
+                    ElseIf (j = Me.Zielauswahl.Length - 1) Then
                         'Achse standardmäßig anzeigen
                     Else
                         'Achse verstecken
@@ -117,22 +121,22 @@ Partial Public Class Scatterplot
                         'Nur Sekundäre Population
                         '------------------------
                         serie = .getSeriesPoint(xAchse & ", " & yAchse, "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                        For Each ind As Kern.Individuum In Me.OptResult.getSekPop()
-                            serie.Add(ind.Penalty(i), ind.Penalty(j), ind.ID)
+                        For Each ind As Common.Individuum In Me.OptResult.getSekPop()
+                            serie.Add(ind.QWerte(Me.Zielauswahl(i)), ind.QWerte(Me.Zielauswahl(j)), ind.ID)
                         Next
                     Else
                         'Alle Lösungen
                         '-------------
                         serie = .getSeriesPoint(xAchse & ", " & yAchse, "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         serie_inv = .getSeriesPoint(xAchse & ", " & yAchse & " (ungültig)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                        For Each ind As Kern.Individuum In Me.OptResult.Solutions
+                        For Each ind As Common.Individuum In Me.OptResult.Solutions
                             'Constraintverletzung prüfen
                             If (ind.feasible) Then
                                 'gültige Lösung Zeichnen
-                                serie.Add(ind.Penalty(i), ind.Penalty(j), ind.ID)
+                                serie.Add(ind.QWerte(Me.Zielauswahl(i)), ind.QWerte(Me.Zielauswahl(j)), ind.ID)
                             Else
                                 'ungültige Lösung zeichnen
-                                serie_inv.Add(ind.Penalty(i), ind.Penalty(j), ind.ID)
+                                serie_inv.Add(ind.QWerte(Me.Zielauswahl(i)), ind.QWerte(Me.Zielauswahl(j)), ind.ID)
                             End If
                         Next
                     End If
@@ -160,20 +164,20 @@ Partial Public Class Scatterplot
     '*********************
     Private Sub dimensionieren()
 
-        ReDim Me.Diags(Me.nOptZiele - 1, Me.nOptZiele - 1)
+        ReDim Me.Diags(Me.Zielauswahl.Length - 1, Me.Zielauswahl.Length - 1)
 
         Dim i As Integer
 
         Me.matrix.Name = "Matrix"
 
-        Me.matrix.ColumnCount = Me.nOptZiele
-        For i = 1 To Me.nOptZiele
-            Me.matrix.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100 / Me.nOptZiele))
+        Me.matrix.ColumnCount = Me.Zielauswahl.Length
+        For i = 1 To Me.Zielauswahl.Length
+            Me.matrix.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100 / Me.Zielauswahl.Length))
         Next
 
-        Me.matrix.RowCount = Me.nOptZiele
-        For i = 1 To Me.nOptZiele
-            Me.matrix.RowStyles.Add(New RowStyle(SizeType.Percent, 100 / Me.nOptZiele))
+        Me.matrix.RowCount = Me.Zielauswahl.Length
+        For i = 1 To Me.Zielauswahl.Length
+            Me.matrix.RowStyles.Add(New RowStyle(SizeType.Percent, 100 / Me.Zielauswahl.Length))
         Next
 
     End Sub
@@ -202,7 +206,7 @@ Partial Public Class Scatterplot
     Private Sub seriesClick(ByVal sender As Object, ByVal s As Steema.TeeChart.Styles.Series, ByVal valueIndex As Integer, ByVal e As System.Windows.Forms.MouseEventArgs)
 
         Dim indID_clicked As Integer
-        Dim ind As Kern.Individuum
+        Dim ind As Common.Individuum
 
         'Punkt-Informationen bestimmen
         '-----------------------------
@@ -225,7 +229,7 @@ Partial Public Class Scatterplot
     'Eine ausgewählte Lösung in den Diagrammen anzeigen
     'wird von Form1.selectSolution() aufgerufen
     '**************************************************
-    Friend Sub showSelectedSolution(ByVal ind As Kern.Individuum)
+    Friend Sub showSelectedSolution(ByVal ind As Common.Individuum)
 
         Dim serie As Steema.TeeChart.Styles.Series
         Dim i, j As Integer
@@ -238,7 +242,7 @@ Partial Public Class Scatterplot
 
                     'Roten Punkt zeichnen
                     serie = .getSeriesPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
-                    serie.Add(ind.Penalty(i), ind.Penalty(j), ind.ID)
+                    serie.Add(ind.QWerte(Me.Zielauswahl(i)), ind.QWerte(Me.Zielauswahl(j)), ind.ID)
 
                     'Mark anzeigen
                     serie.Marks.Visible = True

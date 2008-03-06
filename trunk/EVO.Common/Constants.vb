@@ -90,4 +90,30 @@ Public Module Constants
         E_Two_Loc_Down = 2
     End Enum
 
+    'Beziehung
+    Public Enum Beziehung As Integer
+        keine = 0
+        kleiner = 1
+        kleinergleich = 2
+        groesser = 3
+        groessergleich = 4
+    End Enum
+
+    'String in der Form < >, <=, >= in Beziehung umwandeln
+    '*****************************************************
+    Public Function getBeziehung(ByVal bez_str As String) As Beziehung
+        Select Case bez_str
+            Case "<"
+                Return Beziehung.kleiner
+            Case "<="
+                Return Beziehung.kleinergleich
+            Case ">"
+                Return Beziehung.groesser
+            Case ">="
+                Return Beziehung.groessergleich
+            Case Else
+                Throw New Exception("Beziehung '" & bez_str & "' nicht erkannt!")
+        End Select
+    End Function
+
 End Module
