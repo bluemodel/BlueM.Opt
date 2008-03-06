@@ -943,7 +943,7 @@ Partial Class Form1
                 Next
             Else
                 'NDSorting ******************
-                Call CES1.NDSorting_Control(i_gen)
+                Call CES1.NDSorting_CES_Control(i_gen)
 
                 'Sekundäre Population
                 SekPopulation = CES1.SekundärQb_Get()
@@ -957,8 +957,8 @@ Partial Class Form1
                     Call SekundärePopulationZeichnen(SekPopulation)
                 End If
             End If
-            '^ ENDE Selectionsprozess
-            'xxxxxxxxxxxxxxxxxxxxxxxx
+            ' ^ ENDE Selectionsprozess
+            'xxxxxxxxxxxxxxxxxxxxxxxxx
 
             'REPRODUKTION und MUTATION Nicht wenn Testmodus
             'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -982,6 +982,12 @@ Partial Class Form1
             'HYBRID: REPRODUKTION und MUTATION
             '*********************************
             If Method = METH_HYBRID And EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer Then
+                'NDSorting für den PES Memory
+                '****************************
+                If CES1.PES_Memory.GetLength(0) > ces1.Settings.CES.n_PES_MemSize
+                    Call CES1.NDSorting_Memory(i_gen)
+                End If
+
                 'pro Child
                 'xxxxxxxxx
                 For i_ch = 0 To CES1.Childs.GetUpperBound(0)
@@ -997,11 +1003,13 @@ Partial Class Form1
                         If Not CES1.Childs(i_ch).Loc(i_loc).PES_OptPara.GetLength(0) = 0 Then
 
                             'Ermittelt fuer jede Location den PES Parent Satz (PES_Parents ist das Ergebnis)
+                            '*******************************************************************************
                             Call CES1.Memory_Search_per_Location(i_loc)
 
                             'Führt das NDSorting für diesen Satz durch
+                            '*****************************************
                             If CES1.PES_Parents_pLoc.GetLength(0) > CES1.Settings.PES.n_Eltern Then
-                                Call CES1.Memory_NDSorting()
+                                Call CES1.NDSorting_PES_Parents_per_Loc(i_gen)
                             End If
 
                             Select Case CES1.PES_Parents_pLoc.GetLength(0)
@@ -1056,6 +1064,8 @@ Partial Class Form1
                     Next
                 Next
             End If
+            ' ^ Ende der HYBRID PES Schleife
+            'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
         Next
         'Ende der Generationsschleife CES

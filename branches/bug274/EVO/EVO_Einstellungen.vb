@@ -272,6 +272,7 @@ Public Class EVO_Einstellungen
             .is_RealOpt = me.CheckBox_CES_RealOptimisation.Checked
             .ty_Hybrid = me.Combo_CES_HybridType.SelectedItem
             .Mem_Strategy = me.Combo_CES_MemStrategy.SelectedItem
+            .n_PES_MemSize = me.Numeric_CES_n_MemSize.Value
             .is_PopMutStart = me.CheckBox_CES_StartPESPop.Checked
             .is_PES_SecPop = me.CheckBox_CES_UseSecPop_PES.Checked
             .n_PES_Interact = me.Numeric_CES_n_exchange_SecPop_PES.Value
@@ -406,6 +407,7 @@ Public Class EVO_Einstellungen
             me.CheckBox_CES_RealOptimisation.Checked = .is_RealOpt
             me.Combo_CES_HybridType.SelectedItem = .ty_Hybrid
             me.Combo_CES_MemStrategy.SelectedItem = .Mem_Strategy
+            me.Numeric_CES_n_MemSize.Value = .n_PES_MemSize
             me.CheckBox_CES_StartPESPop.Checked = .is_PopMutStart
             me.CheckBox_CES_UseSecPop_PES.Checked = .is_PES_SecPop
             me.Numeric_CES_n_exchange_SecPop_PES.Value = .n_PES_Interact
