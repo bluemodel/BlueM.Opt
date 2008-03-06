@@ -481,7 +481,7 @@ Public MustInherit Class Sim
                         .EvalEnde = Me.SimEnde
                     End If
                     .WertTyp = WerteArray(9).Trim()
-                    If (WerteArray(10).Trim() <> "") Then .ZielWert = Convert.ToDouble(WerteArray(9).Trim(), Common.Provider.FortranProvider)
+                    If (WerteArray(10).Trim() <> "") Then .ZielWert = Convert.ToDouble(WerteArray(10).Trim(), Common.Provider.FortranProvider)
                     .ZielGr = WerteArray(11).Trim()
                     .ZielReiheDatei = WerteArray(12).Trim()
                 End With
