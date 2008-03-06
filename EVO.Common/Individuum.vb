@@ -22,14 +22,12 @@ Public Class Individuum
     Private Shared Individ_Type As Integer
     Private Shared n_Locations As Integer
     Private Shared n_Para As Integer
-    Private Shared n_Penalty As Integer
     Private Shared n_Constrain As Integer
 
-    Public Shared Sub Initialise(ByVal _Individ_Type As Integer, ByVal _n_Locations As Integer, ByVal _n_Para As Integer, ByVal _n_Penalty As Integer, ByVal _n_Constrain As Integer)
+    Public Shared Sub Initialise(ByVal _Individ_Type As Integer, ByVal _n_Locations As Integer, ByVal _n_Para As Integer, ByVal _n_Constrain As Integer)
         Individuum.Individ_Type = _Individ_Type
         Individuum.n_Locations = _n_Locations
         Individuum.n_Para = _n_Para
-        Individuum.n_Penalty = _n_Penalty
         Individuum.n_Constrain = _n_Constrain
     End Sub
 
@@ -40,8 +38,29 @@ Public Class Individuum
     Public Type As String                  '01 Typ des Individuum
     Public ID As Integer                   '02 Nummer des Individuum
     Public Path() As Integer               '03 Der Pfad
-    Public Penalty() As Double             '04 Werte der Penaltyfunktion(en)
-    Public Constrain() As Double           '05 Wert der Randbedingung(en)
+
+    Public QWerte() As Double              'Array der QWerte (für alle Zielfunktionen)
+    
+    'Penalty-Werte                         '(= QWerte nur von OptZielen!)
+    Public ReadOnly Property Penalty() As Double()
+        Get
+            Dim i As Integer
+            Dim array() As Double
+
+            ReDim array(Common.Manager.AnzPenalty - 1)
+
+            For i = 0 To Common.Manager.AnzZiele - 1
+                'Nur die QWerte von OptZielen zurückgeben!
+                If (Common.Manager.List_Ziele(i).isOpt) Then
+                    array(i) = Me.QWerte(i)
+                End If
+            Next
+
+            Return array
+        End Get
+    End Property
+
+    Public Constrain() As Double           '05 Werte der Randbedingung(en)
     Public mutated As Boolean              '06 Gibt an ob der Wert bereits mutiert ist oder nicht
 
     'Für ND Sorting -------------------------------------------------
@@ -74,7 +93,7 @@ Public Class Individuum
 
     'Gibt ein Array mit den Elementen aller Locations zurück
     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    Public ReadOnly Property All_Elem() As String ()
+    Public ReadOnly Property All_Elem() As String()
         Get
             Dim i As Integer
             Dim array() As String = {}
@@ -126,12 +145,12 @@ Public Class Individuum
 
     'Schreibt alle Parameter aus der DB zurück ins Individuum
     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    Public WriteOnly Property SetAll_Para() as double()
-        Set (Array() as Double)
-            Dim i, j, x as Integer
+    Public WriteOnly Property SetAll_Para() As Double()
+        Set(ByVal Array() As Double)
+            Dim i, j, x As Integer
             For i = 0 To Loc.GetUpperBound(0)
-                For j = 0 to loc(i).PES_OptPara.GetUpperBound(0)
-                    loc(i).PES_OptPara(j).Xn = array(x)
+                For j = 0 To Loc(i).PES_OptPara.GetUpperBound(0)
+                    Loc(i).PES_OptPara(j).Xn = Array(x)
                     x += 1
                 Next
             Next
@@ -194,10 +213,10 @@ Public Class Individuum
             Me.Path(j) = 777
         Next
 
-        '04 Werte der Penaltyfunktion(en)
-        ReDim Me.Penalty(n_Penalty - 1)
-        For j = 0 To n_Penalty - 1
-            Me.Penalty(j) = 1.0E+300
+        '04 QWerte
+        ReDim Me.QWerte(Common.Manager.AnzZiele - 1)
+        For j = 0 To Common.Manager.AnzZiele - 1
+            Me.QWerte(j) = Double.MaxValue
         Next
 
         '05 Wert der Randbedingung(en)
@@ -282,9 +301,8 @@ Public Class Individuum
         ReDim Dest.Path(Me.Path.GetUpperBound(0))
         Array.Copy(Me.Path, Dest.Path, Me.Path.Length)
 
-        '04 Werte der Penaltyfunktion(en)
-        ReDim Dest.Penalty(Me.Penalty.GetUpperBound(0))
-        Array.Copy(Me.Penalty, Dest.Penalty, Me.Penalty.Length)
+        '04 QWerte
+        Call Array.Copy(Me.QWerte, Dest.QWerte, Me.QWerte.Length)
 
         '05 Wert der Randbedingung(en)
         ReDim Dest.Constrain(Me.Constrain.GetUpperBound(0))
@@ -324,10 +342,10 @@ Public Class Individuum
         For i = 0 To Me.Loc.GetUpperBound(0)
 
             'Falls nur CES gibt es keine OptParameter
-            If (Me.loc(i).PES_OptPara.GetUpperBound(0) = -1) Then
-                ReDim Dest.loc(i).PES_OptPara(-1)
+            If (Me.Loc(i).PES_OptPara.GetUpperBound(0) = -1) Then
+                ReDim Dest.Loc(i).PES_OptPara(-1)
             Else
-                ReDim Dest.loc(i).PES_OptPara(Me.Loc(i).PES_OptPara.GetUpperBound(0))
+                ReDim Dest.Loc(i).PES_OptPara(Me.Loc(i).PES_OptPara.GetUpperBound(0))
                 For j = 0 To Me.Loc(i).PES_OptPara.GetUpperBound(0)
                     Dest.Loc(i).PES_OptPara(j) = Me.Loc(i).PES_OptPara(j).Clone()
                 Next
@@ -360,44 +378,6 @@ Public Class Individuum
             Dest(i) = Source(i).Clone()
         Next
     End Sub
-
-    'Achtung Überladen!
-    Public Shared Function QN_RN_Indi(ByVal n As Integer, ByRef QN() As Double, ByRef RN() As Double, ByVal MyPara() As Kern.OptParameter) As Individuum
-
-        Dim Indi As New Individuum("QN_RN_Indi", 0)
-
-        'Achtung hier wird bewust per Reference!
-        Indi.Penalty = QN
-        Indi.Constrain = RN
-
-        'Hier nicht per Reference!
-        Indi.ID = n
-        Indi.PES_OptParas = MyPara.Clone
-
-        'Hier per Reference
-        QN_RN_Indi = Indi
-
-    End Function
-
-    'Achtung Überladen!
-    Public Shared Function QN_RN_Indi(ByVal n As Integer, ByRef QN() As Double, ByRef RN() As Double, ByVal MyPara() As Double) As Individuum
-        Dim i As Integer
-        Dim Indi As New Individuum("QN_RN_Indi", 0)
-
-        'Achtung hier wird bewust per Reference!
-        Indi.Penalty = QN
-        Indi.Constrain = RN
-
-        'Hier nicht per Reference!
-        Indi.ID = n
-        For i = 0 To MyPara.GetUpperBound(0)
-            Indi.PES_OptParas(i).Xn = MyPara(i)
-        Next
-
-        'Hier per Reference
-        QN_RN_Indi = Indi
-
-    End Function
 
 #End Region 'Methoden
 

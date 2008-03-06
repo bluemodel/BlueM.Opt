@@ -60,7 +60,7 @@ Public Class EVO_Settings
 
         'Standardwerte setzen
         '********************
-        Public Sub setStandard(ByVal modus As Kern.EVO_MODUS)
+        Public Sub setStandard(ByVal modus As EVO_MODUS)
 
             Select Case modus
 

@@ -38,7 +38,7 @@ Public Class OptParameter
     Public Dn As Double
 
     'Beziehung
-    Public Beziehung As EVO.Kern.PES.Beziehung
+    Public Beziehung As Common.Constants.Beziehung
 
 #End Region 'Eigenschaften
 
@@ -59,7 +59,7 @@ Public Class OptParameter
         Me.Xn = 0.5
         Me.StartWert = 0.5
         Me.Dn = 0.1
-        Me.Beziehung = PES.Beziehung.keine
+        Me.Beziehung = Constants.Beziehung.keine
 
     End Sub
 
@@ -90,13 +90,13 @@ Public Class OptParameter
 
     'Konvertiert eine Liste von OptParametern in ein Array von Doubles (Xn)
     '**********************************************************************
-    Public Shared Function MyParaDouble(ByVal OptParamer() As EVO.Kern.OptParameter) As Double()
+    Public Shared Function MyParaDouble(ByVal OptParamer() As EVO.Common.OptParameter) As Double()
         Dim i As Integer
         Dim Array(-1) As Double
         ReDim MyParaDouble(-1)
 
         For i = 0 To OptParamer.GetUpperBound(0)
-            ReDim Preserve Array(Array.GetUpperBound(0))
+            ReDim Preserve Array(Array.GetUpperBound(0) + 1)
             Array(i) = OptParamer(i).Xn
         Next
         MyParaDouble = Array.Clone()
