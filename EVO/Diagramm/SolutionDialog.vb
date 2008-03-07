@@ -54,16 +54,21 @@ Partial Public Class SolutionDialog
         cellstyle = Me.DataGridView1.DefaultCellStyle.Clone()
         cellstyle.Format = "G5"
 
-        'OptZiele
+        'Ziele
         '--------
-        cellstyle.BackColor = Color.LightBlue
-
-        For Each OptZiel As Common.Ziel In Common.Manager.List_OptZiele
+        For Each ziel As Common.Ziel In Common.Manager.List_Ziele
             column = New DataGridViewTextBoxColumn()
+            If (ziel.isOpt) Then
+                cellstyle.BackColor = Color.LightGreen
+                column.HeaderText = ziel.Bezeichnung & " (*)"
+                column.HeaderCell.ToolTipText = "OptZiel"
+            Else
+                cellstyle.BackColor = Color.LightBlue
+                column.HeaderText = ziel.Bezeichnung
+                column.HeaderCell.ToolTipText = "SekZiel"
+            End If
             column.ReadOnly = True
-            column.HeaderText = OptZiel.Bezeichnung
-            column.HeaderCell.ToolTipText = "OptZiel"
-            column.Name = OptZiel.Bezeichnung
+            column.Name = ziel.Bezeichnung
             column.DefaultCellStyle = cellstyle.Clone()
             Me.DataGridView1.Columns.Add(column)
         Next
@@ -133,9 +138,9 @@ Partial Public Class SolutionDialog
 
         i = 1
 
-        'OptZiele
-        For Each penalty As Double In ind.Penalty
-            cellvalues(i) = penalty
+        'Ziele
+        For Each qwert As Double In ind.QWerte
+            cellvalues(i) = qwert
             i += 1
         Next
 
