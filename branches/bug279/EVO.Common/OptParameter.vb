@@ -21,21 +21,9 @@ Public Class OptParameter
     Public Einheit As String
 
     'Parameterwerte
-    Public Xn As Double                         'Skalierter Parameterwert
     Public Min As Double                        'Minwert für die Umrechnung in reellen Parameterwert
     Public Max As Double                        'Maxwert für die Umrechnung in reellen Parameterwert
-    Public Property RWert() As Double           'Reeller Parameterwert
-        Get
-            Return Me.Min + (Me.Max - Me.Min) * Me.Xn
-        End Get
-        Set(ByVal value As Double)
-            Me.Xn = (value - Me.Min) / (Me.Max - Me.Min)
-        End Set
-    End Property
     Public StartWert As Double                  'Reeller Startwert
-
-    'Schrittweite
-    Public Dn As Double
 
     'Beziehung
     Public Beziehung As Common.Constants.Beziehung

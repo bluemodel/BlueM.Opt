@@ -45,11 +45,6 @@ Public MustInherit Class Sim
     Public Const Constraints_Ext As String = "CON"       'Erweiterung der Datei mit den Constraints (*.CON)
     Public Const Combi_Ext As String = "CES"             'Erweiterung der Datei mit der Kombinatorik  (*.CES)
 
-	'OptParameter
-	'------------
-    Public List_OptParameter() As EVO.Common.OptParameter             'Liste der Optimierungsparameter
-    Public List_OptParameter_Save() As EVO.Common.OptParameter        'Liste der Optimierungsparameter die nicht verändert wird
-
     'ModellParameter
     '---------------
     Public Structure Struct_ModellParameter
@@ -132,8 +127,6 @@ Public MustInherit Class Sim
 
         'Datenstrukturen initialisieren
         '------------------------------
-        ReDim Me.List_OptParameter(-1)
-        ReDim Me.List_OptParameter_Save(-1)
         ReDim Me.List_ModellParameter(-1)
         ReDim Me.List_ModellParameter_Save(-1)
         ReDim Me.List_Constraints(-1)
@@ -302,49 +295,41 @@ Public MustInherit Class Sim
         '*| Bezeichnung  | Einh. | Anfangsw. |  Min   |  Max   | Beziehung |
         '*|-<---------->-|-<--->-|-<------->-|-<---->-|-<---->-|-<------->-|
 
+        Dim array() As String
+        Dim Zeile As String
+        Dim i As Integer
+
         Dim Datei As String = WorkDir & Datensatz & "." & OptParameter_Ext
 
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-        Dim Zeile As String
-        Dim AnzParam As Integer = 0
+        'Liste zurücksetzen
+        ReDim Common.Manager.List_OptParameter(-1)
 
-        'Anzahl der Parameter feststellen
+        i = 0
         Do
             Zeile = StrRead.ReadLine.ToString()
-            If (Zeile.StartsWith("*") = False) Then
-                AnzParam += 1
-            End If
-        Loop Until StrRead.Peek() = -1
-
-        ReDim List_OptParameter(AnzParam - 1)
-        ReDim List_OptParameter_Save(AnzParam - 1)
-
-        'Zurück zum Dateianfang und lesen
-        FiStr.Seek(0, SeekOrigin.Begin)
-
-        Dim array() As String
-        Dim Bez_str As String = ""
-        Dim i As Integer = 0
-        Do
-            Zeile = StrRead.ReadLine.ToString()
-            If (Zeile.StartsWith("*") = False) Then
+            If (Zeile.StartsWith("*") = False And Zeile.Contains("|")) Then
+                'Liste um eins erweitern
+                ReDim Preserve Common.Manager.List_OptParameter(i)
                 'OptParameter instanzieren
-                List_OptParameter(i) = New EVO.Common.OptParameter()
-                array = Zeile.Split("|")
+                Common.Manager.List_OptParameter(i) = New Common.OptParameter()
                 'Werte zuweisen
-                List_OptParameter(i).Bezeichnung = array(1).Trim()
-                List_OptParameter(i).Einheit = array(2).Trim()
-                List_OptParameter(i).StartWert = Convert.ToDouble(array(3).Trim(), Common.Provider.FortranProvider)
-                List_OptParameter(i).Min = Convert.ToDouble(array(4).Trim(), Common.Provider.FortranProvider)
-                List_OptParameter(i).Max = Convert.ToDouble(array(5).Trim(), Common.Provider.FortranProvider)
-                'liegt eine Beziehung vor?
-                If (i > 0 And Not array(6).Trim() = "") Then
-                    Me.List_OptParameter(i).Beziehung = Common.Constants.getBeziehung(array(6).Trim())
-                End If
-                'Eingelesenen Startwert setzen
-                List_OptParameter(i).RWert = List_OptParameter(i).StartWert
+                With Common.Manager.List_OptParameter(i)
+                    array = Zeile.Split("|")
+                    .Bezeichnung = array(1).Trim()
+                    .Einheit = array(2).Trim()
+                    .StartWert = Convert.ToDouble(array(3).Trim(), Common.Provider.FortranProvider)
+                    .Min = Convert.ToDouble(array(4).Trim(), Common.Provider.FortranProvider)
+                    .Max = Convert.ToDouble(array(5).Trim(), Common.Provider.FortranProvider)
+                    'liegt eine Beziehung vor?
+                    If (i > 0 And Not array(6).Trim() = "") Then
+                        .Beziehung = Common.Constants.getBeziehung(array(6).Trim())
+                    End If
+                    'Eingelesenen Startwert setzen
+                    'XXX: .RWert = .StartWert
+                End With
                 i += 1
             End If
         Loop Until StrRead.Peek() = -1
@@ -353,8 +338,9 @@ Public MustInherit Class Sim
         FiStr.Close()
 
         'OptParameter werden hier gesichert
-        For i = 0 To List_OptParameter.GetUpperBound(0)
-            List_OptParameter_Save(i) = List_OptParameter(i).Clone()
+        ReDim Common.Manager.List_OptParameter_Save(Common.Manager.AnzPara - 1)
+        For i = 0 To Common.Manager.AnzPara - 1
+            Common.Manager.List_OptParameter_Save(i) = Common.Manager.List_OptParameter(i).Clone()
         Next
 
     End Sub
@@ -680,10 +666,10 @@ Public MustInherit Class Sim
         Dim isValid As Boolean = False
 
         'A: Prüfung ob für jeden OptParameter mindestens ein Modellparameter existiert
-        For i = 0 To List_OptParameter.GetUpperBound(0)
+        For i = 0 To Common.Manager.AnzPara - 1
             isValid = False
-            For j = 0 To List_ModellParameter.GetUpperBound(0)
-                If List_OptParameter(i).Bezeichnung = List_ModellParameter(j).OptParameter Then
+            For j = 0 To Me.List_ModellParameter.GetUpperBound(0)
+                If Common.Manager.List_OptParameter(i).Bezeichnung = Me.List_ModellParameter(j).OptParameter Then
                     isValid = True
                 End If
             Next
@@ -693,10 +679,10 @@ Public MustInherit Class Sim
         Next
 
         'B: Prüfung ob jeder ModellParameter einem richtigen OptParameter zugewiesen ist.
-        For i = 0 To List_ModellParameter.GetUpperBound(0)
+        For i = 0 To Me.List_ModellParameter.GetUpperBound(0)
             isValid = False
-            For j = 0 To List_OptParameter.GetUpperBound(0)
-                If List_ModellParameter(i).OptParameter = List_OptParameter(j).Bezeichnung Then
+            For j = 0 To Common.Manager.AnzPara - 1
+                If List_ModellParameter(i).OptParameter = Common.Manager.List_OptParameter(j).Bezeichnung Then
                     isValid = True
                 End If
             Next
@@ -813,14 +799,14 @@ Public MustInherit Class Sim
     Public Sub Validate_Startvalues()
         Dim i As Integer
 
-        For i = 0 To List_OptParameter.GetUpperBound(0)
-            If Not List_OptParameter(i).RWert <= List_OptParameter(i).Max Or Not List_OptParameter(i).RWert >= List_OptParameter(i).Min Then
-                Throw New Exception("Der Optimierungsparameter " & List_OptParameter(i).Bezeichnung & " in der .OPT Datei liegt nicht innerhalb der dort genannten Grenzen.")
-            End If
+        For i = 0 To Common.Manager.AnzPenalty - 1
+            With Common.Manager.List_OptParameter(i)
+                If Not .StartWert <= .Max Or Not .StartWert >= .Min Then
+                    Throw New Exception("Der Startwert des Optimierungsparameters '" & .Bezeichnung & "' in der .OPT Datei liegt nicht innerhalb der dort genannten Grenzen.")
+                End If
+            End With
         Next
     End Sub
-
-
 
 
 #End Region 'Prüfung der Eingabedateien
@@ -1158,9 +1144,10 @@ Public MustInherit Class Sim
         For i = 0 To List_ModellParameter_Save.GetUpperBound(0)
             copy_Struct_ModellParemeter(List_ModellParameter_Save(i), List_ModellParameter(i))
         Next
-        ReDim List_OptParameter(List_OptParameter_Save.GetUpperBound(0))
-        For i = 0 To List_OptParameter_Save.GetUpperBound(0)
-            List_OptParameter(i) = List_OptParameter_Save(i).Clone()
+        'XXX:
+        ReDim Common.Manager.List_OptParameter(Common.Manager.List_OptParameter_Save.GetUpperBound(0))
+        For i = 0 To Common.Manager.AnzPara - 1
+            Common.Manager.List_OptParameter(i) = Common.Manager.List_OptParameter_Save(i).Clone()
         Next
 
     End Sub
@@ -1218,37 +1205,10 @@ Public MustInherit Class Sim
 
     'EVO-Parameterübergabe die Standard Parameter werden aus den Listen der OptPara und OptZiele ermittelt
     '*****************************************************************************************************
-    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzRand As Short, ByRef mypara() As EVO.Common.OptParameter)
-
-        Dim i As Integer
-
-        'Anzahl Optimierungsparameter übergeben
-        globalAnzPar = Me.List_OptParameter.GetLength(0)
-
-        'Parameter übergeben
-        ReDim mypara(globalAnzPar - 1)
-        For i = 0 To globalAnzPar - 1
-            mypara(i) = Me.List_OptParameter(i).Clone()
-        Next
+    Public Sub Parameter_Uebergabe(ByRef globalAnzRand As Short)
 
         'Anzahl Randbedingungen übergeben
         globalAnzRand = Me.List_Constraints.GetLength(0)
-
-    End Sub
-
-    'Evaluierung des SimModells für ParameterOptimierung - Steuerungseinheit
-    '***********************************************************************
-    Public Sub PREPARE_Evaluation_PES(ByVal myPara() As EVO.Common.OptParameter)
-
-        Dim i As Short
-
-        'Mutierte Parameter an OptParameter übergeben
-        For i = 0 To Me.List_OptParameter.GetUpperBound(0)
-            Me.List_OptParameter(i).Xn = myPara(i).Xn
-        Next
-
-        'Mutierte Parameter in Eingabedateien schreiben
-        Call Write_ModellParameter()
 
     End Sub
 
@@ -1260,18 +1220,18 @@ Public MustInherit Class Sim
         Dim i As Short
 
         'Mutierte Parameter an OptParameter übergeben
-        For i = 0 To Me.List_OptParameter.GetUpperBound(0)
+        For i = 0 To Common.Manager.AnzPara - 1
             List_OptParameter(i).Xn = myPara(i)
         Next
 
         'Mutierte Parameter in Eingabedateien schreiben
-        Call Write_ModellParameter()
+        Call Write_ModellParameter(ind)
 
     End Sub
 
     'Die ModellParameter in die Eingabedateien des SimModells schreiben
     '******************************************************************
-    Public Sub Write_ModellParameter()
+    Public Sub Write_ModellParameter(ByVal RWerte() As Double)
 
         Dim WertStr As String
         Dim AnzZeichen As Short
@@ -1284,10 +1244,10 @@ Public MustInherit Class Sim
         Dim DateiPfad As String
 
         'ModellParameter aus OptParametern kalkulieren()
-        Call OptParameter_to_ModellParameter()
+        Call OptParameter_to_ModellParameter(RWerte)
 
         'Alle ModellParameter durchlaufen
-        For i As Integer = 0 To List_ModellParameter.GetUpperBound(0)
+        For i As Integer = 0 To Me.List_ModellParameter.GetUpperBound(0)
 
             DateiPfad = WorkDir & Datensatz & "." & List_ModellParameter(i).Datei
             'Datei öffnen
@@ -1409,7 +1369,7 @@ Handler:
     'VG Beta-Version - erlaubt Kalirbierung der Tagesganlinie
     'VG dafür muss für den jeweiligen Tagesgangwert in der .mod Datei in der Spalte "Elem" "TGG_QH" eingetragen werden
     'VG Vorschlag: Aktivierung der kalibrierung des Tagesganlinie über einen Schalter, damit diese Funktion nicht bei jeder optimierung aufgerufen wird
-    Protected Sub VG_Kalibrierung_Tagesganglinie()
+    Protected Sub VG_Kalibrierung_Tagesganglinie(ByVal RWerte() As Double)
         Dim i, j As Integer
         Dim VG_sum_TGG As Double
         Dim VG_check_24 As Integer
@@ -1423,9 +1383,9 @@ Handler:
             If Trim(List_ModellParameter(i).Element) = "TGG_QH" Then
                 VG_check_24 = VG_check_24 + 1
 
-                For j = 0 To List_OptParameter.GetUpperBound(0)
-                    If Trim(List_OptParameter(j).Bezeichnung) = Trim(List_ModellParameter(i).OptParameter) Then 'Parameter gefunden
-                        VG_sum_TGG = VG_sum_TGG + List_OptParameter(j).RWert 'aufsummieren
+                For j = 0 To Common.Manager.AnzPara - 1
+                    If (Common.Manager.List_OptParameter(j).Bezeichnung = Me.List_ModellParameter(i).OptParameter) Then 'Parameter gefunden
+                        VG_sum_TGG = VG_sum_TGG + RWerte(j) 'aufsummieren
                     End If
                 Next
             End If
@@ -1445,18 +1405,19 @@ Handler:
 
     'ModellParameter aus OptParametern errechnen
     '*******************************************
-    Protected Sub OptParameter_to_ModellParameter()
+    Protected Sub OptParameter_to_ModellParameter(ByVal RWerte() As Double)
+
         Dim i As Integer
         Dim j As Integer
 
         'VG ---------- Zusatzroutine für kalibrierung des Tagesgangs
-        VG_Kalibrierung_Tagesganglinie()
+        VG_Kalibrierung_Tagesganglinie(RWerte)
         'VG ---------- Ende
 
         For i = 0 To List_ModellParameter.GetUpperBound(0)
-            For j = 0 To List_OptParameter.GetUpperBound(0)
-                If List_ModellParameter(i).OptParameter = List_OptParameter(j).Bezeichnung Then
-                    List_ModellParameter(i).Wert = List_OptParameter(j).RWert * List_ModellParameter(i).Faktor
+            For j = 0 To Common.Manager.AnzPara - 1
+                If List_ModellParameter(i).OptParameter = Common.Manager.List_OptParameter(j).Bezeichnung Then
+                    List_ModellParameter(i).Wert = RWerte(j) * List_ModellParameter(i).Faktor
                 End If
             Next
         Next

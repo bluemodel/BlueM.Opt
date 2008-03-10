@@ -21,13 +21,11 @@ Public Class Individuum
     '********************
     Private Shared Individ_Type As Integer
     Private Shared n_Locations As Integer
-    Private Shared n_Para As Integer
     Private Shared n_Constrain As Integer
 
-    Public Shared Sub Initialise(ByVal _Individ_Type As Integer, ByVal _n_Locations As Integer, ByVal _n_Para As Integer, ByVal _n_Constrain As Integer)
+    Public Shared Sub Initialise(ByVal _Individ_Type As Integer, ByVal _n_Locations As Integer, ByVal _n_Constrain As Integer)
         Individuum.Individ_Type = _Individ_Type
         Individuum.n_Locations = _n_Locations
-        Individuum.n_Para = _n_Para
         Individuum.n_Constrain = _n_Constrain
     End Sub
 
@@ -63,8 +61,34 @@ Public Class Individuum
     Public Constrain() As Double           '05 Werte der Randbedingung(en)
     Public mutated As Boolean              '06 Gibt an ob der Wert bereits mutiert ist oder nicht
 
+    'Public Structure Struct_ParaWerte
+    '    Public Xn As Double
+    '    Public Dn As Double
+    '    Public ReadOnly Property RWerte() As Double()
+    '        Get
+    '            Dim i As Integer
+    '            Dim array() As Double
+
+    '            ReDim array(Common.Manager.AnzPara - 1)
+
+    '            For i = 0 To Common.Manager.AnzPara - 1
+    '                With Common.Manager.List_OptParameter(i)
+    '                    array(i) = Me.Xn * (.Max - .Min) + .Min
+    '                End With
+    '            Next
+
+    '            Return array
+    '        End Get
+    '    End Property
+
+    'End Structure
+
     'Für ND Sorting -------------------------------------------------
-    Public PES_OptParas() As OptParameter  '06a Parameterarray für PES
+    Public Xn() As Double
+
+    'Schrittweite
+    Public Dn() As Double
+
     Public dominated As Boolean            '07 Kennzeichnung ob Dominiert
     Public Front As Integer                '08 Nummer der Pareto Front
     Public Distance As Double              '09 Für crowding distance
@@ -113,13 +137,7 @@ Public Class Individuum
     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     Public ReadOnly Property All_PES_Para() As Double()
         Get
-            Dim i As Integer
-            Dim Array(-1) As Double
-            For i = 0 To PES_OptParas.GetUpperBound(0)
-                ReDim Preserve Array(Array.GetLength(0))
-                Array(Array.GetUpperBound(0)) = PES_OptParas(i).Xn
-            Next
-            All_PES_Para = Array.Clone
+            Return Me.Xn
         End Get
     End Property
 
@@ -133,9 +151,9 @@ Public Class Individuum
             Dim array(-1) As Double
             x = 0
             For i = 0 To Loc.GetUpperBound(0)
-                For j = 0 To Loc(i).PES_OptPara.GetUpperBound(0)
+                For j = 0 To Loc(i).Loc_Elem.GetUpperBound(0)
                     ReDim Preserve array(x)
-                    array(x) = Loc(i).PES_OptPara(j).Xn
+                    array(x) = Loc(i).Xn(j)
                     x += 1
                 Next
             Next
@@ -149,8 +167,8 @@ Public Class Individuum
         Set(ByVal Array() As Double)
             Dim i, j, x As Integer
             For i = 0 To Loc.GetUpperBound(0)
-                For j = 0 To Loc(i).PES_OptPara.GetUpperBound(0)
-                    Loc(i).PES_OptPara(j).Xn = Array(x)
+                For j = 0 To Loc(i).Loc_Elem.GetUpperBound(0)
+                    Loc(i).Xn(j) = Array(x)
                     x += 1
                 Next
             Next
@@ -167,13 +185,13 @@ Public Class Individuum
             Dim array(-1) As Double
             x = 0
             For i = 0 To Loc.GetUpperBound(0)
-                For j = 0 To Loc(i).PES_OptPara.GetUpperBound(0)
+                For j = 0 To Loc(i).Loc_Elem.GetUpperBound(0)
                     ReDim Preserve array(x)
-                    array(x) = Loc(i).PES_OptPara(j).Dn
+                    array(x) = Loc(i).Dn(j)
                     x += 1
                 Next
             Next
-            All_DN = array.Clone
+            All_DN = array.Clone()
         End Get
 
     End Property
@@ -184,7 +202,8 @@ Public Class Individuum
     Public Structure Location_Data
 
         Dim Loc_Elem() As String            '11a Die Elemente die zur Location gehören
-        Dim PES_OptPara() As OptParameter   'Array für das Speicherrn der PES Parameter
+        Dim Xn() As Double
+        Dim Dn() As Double
 
     End Structure
 
@@ -233,10 +252,8 @@ Public Class Individuum
         Me.mutated = False
 
         '06a Parameterarray für PES
-        ReDim Me.PES_OptParas(n_Para - 1)
-        For i = 0 To Me.PES_OptParas.GetUpperBound(0)
-            Me.PES_OptParas(i) = New OptParameter()
-        Next
+        ReDim Me.Xn(Manager.AnzPara - 1)
+        ReDim Me.Dn(Manager.AnzPara - 1)
 
         '07 Kennzeichnung ob Dominiert
         Me.dominated = False
@@ -255,7 +272,8 @@ Public Class Individuum
 
         For i = 0 To Me.Loc.GetUpperBound(0)
 
-            ReDim Me.Loc(i).PES_OptPara(-1)
+            ReDim Me.Loc(i).Xn(-1)
+            ReDim Me.Loc(i).Dn(-1)
 
             '11a Die Elemente die zur Location gehören
             ReDim Me.Loc(i).Loc_Elem(0)
