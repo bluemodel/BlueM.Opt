@@ -732,7 +732,7 @@ Partial Class Form1
                 'Simulationsergebnis in Wave laden
                 If (SensiPlot1.show_Wave) Then
                     'SimReihe auslesen
-                    SimReihe = Sim1.SimErgebnis(Common.Manager.List_OptZiele(SensiPlot1.Selected_OptZiel).SimGr)
+                    SimReihe = Sim1.SimErgebnis(Common.Manager.List_OptZiele(SensiPlot1.Selected_OptZiel).SimReihe.Datei.Spalte)
                     'Lösungs-ID an Titel anhängen
                     SimReihe.Title += " (Lösung " & n.ToString() & ")"
                     'SimReihe zu Collection hinzufügen
@@ -2057,19 +2057,19 @@ Start_Evolutionsrunden:
                     '---------------------------
                     If (.ZielTyp = "Reihe" Or .ZielTyp = "IHA") Then
                         'Referenzreihen nur jeweils ein Mal zeichnen
-                        If (Not RefSeries.Contains(.ZielReiheDatei & .ZielGr)) Then
-                            RefSeries.Add(.ZielGr, .ZielReiheDatei & .ZielGr)
+                        If (Not RefSeries.Contains(.ZielReihe.Datei.Pfad & .ZielReihe.Datei.Spalte)) Then
+                            RefSeries.Add(.ZielReihe.Datei.Spalte, .ZielReihe.Datei.Pfad & .ZielReihe.Datei.Spalte)
                             'Referenzreihe in Wave laden
-                            Wave1.Display_Series(.ZielReihe)
+                            Wave1.Display_Series(.ZielReihe.ZRE)
                         End If
                     End If
 
                     'Simulationsergebnis in Wave laden
                     '---------------------------------
                     'Simulationsreihen nur jeweils ein Mal zeichnen
-                    If (Not SimSeries.Contains(.SimGr)) Then
-                        Call SimSeries.Add(.SimGr, .SimGr)
-                        zre = Sim1.SimErgebnis(.SimGr).Clone()
+                    If (Not SimSeries.Contains(.SimReihe.Datei.Pfad)) Then
+                        Call SimSeries.Add(.SimReihe.Datei.Pfad, .SimReihe.Datei.Pfad)
+                        zre = Sim1.SimErgebnis(.SimReihe.Datei.Pfad).Clone()
                         'Lösungsnummer an Titel anhängen
                         zre.Title &= " (Lösung " & ind.ID.ToString() & ")"
                         'Simreihe in Wave laden
@@ -2304,4 +2304,15 @@ Start_Evolutionsrunden:
 
 #End Region 'Methoden
 
+    'Speichert die Ziele im XML-Format
+    '*********************************
+    Private Sub ButtonZIE2XML_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_saveZIE.Click
+        If (IsNothing(Common.Manager.List_Ziele)) Then 
+            MsgBox("Ziele sind noch nicht eingelesen!", MsgBoxStyle.Exclamation, "Fehler")
+            Exit Sub
+        Else
+            Call Common.Manager.saveZIE(Sim1.WorkDir & "ZIE.xml")
+            MsgBox("Datei '" & Sim1.WorkDir & "ZIE.xml' gespeichert!", MsgBoxStyle.Information, "Info")
+        End If
+   End Sub
 End Class

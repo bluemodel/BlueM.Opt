@@ -35,6 +35,7 @@ Partial Class Form1
         Me.Button_Scatterplot = New System.Windows.Forms.Button
         Me.Button_saveMDB = New System.Windows.Forms.Button
         Me.GroupBox_Anwendung = New System.Windows.Forms.GroupBox
+        Me.Button_saveZIE = New System.Windows.Forms.Button
         Me.Label_Anwendung = New System.Windows.Forms.Label
         Me.ComboBox_Anwendung = New System.Windows.Forms.ComboBox
         Me.Label_Methode = New System.Windows.Forms.Label
@@ -70,10 +71,10 @@ Partial Class Form1
         '
         Me.LinkLabel_WorkDir.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.LinkLabel_WorkDir.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline
-        Me.LinkLabel_WorkDir.Location = New System.Drawing.Point(208, 22)
+        Me.LinkLabel_WorkDir.Location = New System.Drawing.Point(217, 22)
         Me.LinkLabel_WorkDir.MaximumSize = New System.Drawing.Size(5000, 13)
         Me.LinkLabel_WorkDir.Name = "LinkLabel_WorkDir"
-        Me.LinkLabel_WorkDir.Size = New System.Drawing.Size(325, 12)
+        Me.LinkLabel_WorkDir.Size = New System.Drawing.Size(244, 13)
         Me.LinkLabel_WorkDir.TabIndex = 9
         Me.ToolTip1.SetToolTip(Me.LinkLabel_WorkDir, "Datensatz ändern")
         '
@@ -113,6 +114,7 @@ Partial Class Form1
         'GroupBox_Anwendung
         '
         Me.GroupBox_Anwendung.BackColor = System.Drawing.SystemColors.Control
+        Me.GroupBox_Anwendung.Controls.Add(Me.Button_saveZIE)
         Me.GroupBox_Anwendung.Controls.Add(Me.Label_Anwendung)
         Me.GroupBox_Anwendung.Controls.Add(Me.ComboBox_Anwendung)
         Me.GroupBox_Anwendung.Controls.Add(Me.Label_Methode)
@@ -126,6 +128,16 @@ Partial Class Form1
         Me.GroupBox_Anwendung.TabIndex = 0
         Me.GroupBox_Anwendung.TabStop = False
         Me.GroupBox_Anwendung.Text = "Anwendung"
+        '
+        'Button_saveZIE
+        '
+        Me.Button_saveZIE.Location = New System.Drawing.Point(631, 17)
+        Me.Button_saveZIE.Name = "Button_saveZIE"
+        Me.Button_saveZIE.Size = New System.Drawing.Size(61, 23)
+        Me.Button_saveZIE.TabIndex = 15
+        Me.Button_saveZIE.Text = "ZIE2XML"
+        Me.ToolTip1.SetToolTip(Me.Button_saveZIE, "Liste der Ziele im XML-Format abspeichern")
+        Me.Button_saveZIE.UseVisualStyleBackColor = True
         '
         'Label_Anwendung
         '
@@ -151,7 +163,7 @@ Partial Class Form1
         '
         Me.Label_Methode.AutoSize = True
         Me.Label_Methode.Enabled = False
-        Me.Label_Methode.Location = New System.Drawing.Point(532, 22)
+        Me.Label_Methode.Location = New System.Drawing.Point(467, 22)
         Me.Label_Methode.Name = "Label_Methode"
         Me.Label_Methode.Size = New System.Drawing.Size(37, 13)
         Me.Label_Methode.TabIndex = 11
@@ -161,7 +173,7 @@ Partial Class Form1
         '
         Me.ComboBox_Methode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox_Methode.FormattingEnabled = True
-        Me.ComboBox_Methode.Location = New System.Drawing.Point(569, 19)
+        Me.ComboBox_Methode.Location = New System.Drawing.Point(504, 19)
         Me.ComboBox_Methode.Name = "ComboBox_Methode"
         Me.ComboBox_Methode.Size = New System.Drawing.Size(121, 21)
         Me.ComboBox_Methode.TabIndex = 10
@@ -249,4 +261,5 @@ Partial Class Form1
     Private WithEvents Label_Anwendung As System.Windows.Forms.Label
     Private WithEvents ComboBox_Methode As System.Windows.Forms.ComboBox
     Private WithEvents Label_Methode As System.Windows.Forms.Label
+    Friend WithEvents Button_saveZIE As System.Windows.Forms.Button
 End Class

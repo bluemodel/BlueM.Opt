@@ -102,9 +102,9 @@ Public Class Scan
 
     End Function
 
-    Public Overrides Function QWert(ByVal OptZiel As Common.Ziel) As Double
+    Public Overrides Function QWert(ByVal ziel As Common.Ziel) As Double
 
-        QWert = QWert_Reihe(OptZiel, Me.SimErgebnis(OptZiel.SimGr))
+        QWert = QWert_Reihe(ziel, Me.SimErgebnis(ziel.SimReihe.Datei.Spalte))
 
     End Function
 

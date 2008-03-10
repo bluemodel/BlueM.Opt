@@ -361,7 +361,7 @@ Public Class SWMM
 
         'Fallunterscheidung Ergebnisdatei
         '--------------------------------
-        Select Case OptZiel.Datei
+        Select Case OptZiel.SimReihe.Datei.Pfad
 
             Case "RPT"
                 'SWMM-Ergebnisse aus RPT-Datei auslesen

@@ -217,7 +217,7 @@ Public Class Smusi
 
             'Einzulesende Dateien zusammenstellen
             For Each ziel As Common.Ziel In Common.Manager.List_Ziele
-                element = ziel.SimGr.Substring(0, 4)
+                element = ziel.SimReihe.Datei.Spalte.Substring(0, 4)
                 If (Not elemente.Contains(element)) Then
                     elemente.Add(element, element)
                 End If
@@ -252,14 +252,14 @@ Public Class Smusi
 
         'Fallunterscheidung Ergebnisdatei
         '--------------------------------
-        Select Case ziel.Datei
+        Select Case ziel.SimReihe.Datei.Pfad
 
             Case "ASC"
                 'QWert aus ASC-Datei
                 QWert = QWert_ASC(ziel)
 
             Case Else
-                Throw New Exception("Der Wert '" & ziel.Datei & "' für die Datei wird bei Optimierungszielen für SMUSI nicht akzeptiert!")
+                Throw New Exception("Der Wert '" & ziel.SimReihe.Datei.Pfad & "' für die Datei wird bei Optimierungszielen für SMUSI nicht akzeptiert!")
 
         End Select
 
@@ -273,7 +273,7 @@ Public Class Smusi
         Dim SimReihe As Wave.Zeitreihe
 
         'Simulationsergebnis auslesen
-        SimReihe = Me.SimErgebnis(ziel.SimGr)
+        SimReihe = Me.SimErgebnis(ziel.SimReihe.Datei)
 
         'Fallunterscheidung Zieltyp
         '--------------------------
