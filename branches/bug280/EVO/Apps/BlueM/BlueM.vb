@@ -143,7 +143,7 @@ Public Class BlueM
         Dim IHAZielReihe As Wave.Zeitreihe
         Dim IHAStart, IHAEnde As DateTime
 
-        IHAZielReihe = New Wave.Zeitreihe("new")
+        IHAZielReihe = New Wave.Zeitreihe()
 
         'Gibt es eine IHA-Zielfunktion?
         'HACK: es wird immer nur das erste IHA-Ziel verwendet!
@@ -152,9 +152,9 @@ Public Class BlueM
             If (ziel.ZielTyp = "IHA") Then
                 'IHA-Berechnung einschalten
                 Me.isIHA = True
-                IHAZielReihe = ziel.ZielReihe
-                IHAStart = ziel.EvalStart
-                IHAEnde = ziel.EvalEnde
+                IHAZielReihe = ziel.ZielReihe.ZRE
+                IHAStart = ziel.Eval.Start
+                IHAEnde = ziel.Eval.Ende
                 Exit For
             End If
         Next
@@ -358,7 +358,7 @@ Public Class BlueM
                 'HACK: es wird immer das erste IHA-Ziel verwendet!
                 For Each ziel As Common.Ziel In Common.Manager.List_Ziele
                     If (ziel.ZielTyp = "IHA") Then
-                        Call Me.IHASys.calculate_IHA(Me.SimErgebnis(ziel.SimGr))
+                        Call Me.IHASys.calculate_IHA(Me.SimErgebnis(ziel.Simreihe.Datei.Spalte))
                         Exit For
                     End If
                 Next
@@ -382,7 +382,7 @@ Public Class BlueM
 
         'Fallunterscheidung Ergebnisdatei
         '--------------------------------
-        Select Case ziel.Datei
+        Select Case ziel.SimReihe.Datei.Pfad
 
             Case "WEL"
                 'QWert aus WEL-Datei
@@ -395,7 +395,7 @@ Public Class BlueM
                 'QWert = QWert_PRB(OptZiel)
 
             Case Else
-                Throw New Exception("Der Wert '" & ziel.Datei & "' für die Datei wird bei Optimierungszielen für BlueM nicht akzeptiert!")
+                Throw New Exception("Der Wert '" & ziel.Simreihe.Datei.Pfad & "' für die Datei wird bei Optimierungszielen für BlueM nicht akzeptiert!")
 
         End Select
 
@@ -409,7 +409,7 @@ Public Class BlueM
         Dim SimReihe As Wave.Zeitreihe
 
         'Simulationsergebnis auslesen
-        SimReihe = Me.SimErgebnis(ziel.SimGr)
+        SimReihe = Me.SimErgebnis(ziel.Simreihe.Datei.Spalte)
 
         'Fallunterscheidung Zieltyp
         '--------------------------

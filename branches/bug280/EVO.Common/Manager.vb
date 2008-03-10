@@ -1,3 +1,7 @@
+Imports System.IO
+Imports System.Xml
+Imports System.Xml.Serialization
+
 Public Module Manager
 
     'Eigenschaften
@@ -49,5 +53,22 @@ Public Module Manager
             Return array
         End Get
     End Property
+
+    'Speichern der Zielliste in einer XML-Datei
+    '******************************************
+    Public Sub saveZIE(ByVal filename As String)
+
+        ' Create an XmlRootAttribute, and set its properties.
+        Dim xRoot As New XmlRootAttribute()
+        xRoot.ElementName = "Zielliste"
+        xRoot.Namespace = "http://130.83.196.154/BlueM"
+
+        Dim serializer As New XmlSerializer(GetType(Common.Ziel()), xRoot)
+        Dim writer As New StreamWriter(filename)
+        serializer.Serialize(writer, Manager.List_Ziele)
+        writer.Close()
+
+    End Sub
+
 
 End Module
