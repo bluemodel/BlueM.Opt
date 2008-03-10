@@ -157,7 +157,7 @@ Public Class CES
 
         'Die Variablen für die Individuuen werden gesetzt
         '************************************************
-        Call Individuum.Initialise(2, ModSett.n_Locations, 0, ModSett.n_Constrain)
+        Call Individuum.Initialise(2, ModSett.n_Locations, ModSett.n_Constrain)
 
         'Parents werden dimensioniert
         ReDim Parents(Settings.CES.n_Parents - 1)
@@ -280,14 +280,14 @@ Public Class CES
             'und pro Location
             For j = 0 To ModSett.n_Locations - 1
                 'Die Parameter (falls vorhanden) werden überschrieben
-                If Not Childs(i).Loc(j).PES_OptPara.GetLength(0) = 0 Then
+                If Not Childs(i).Loc(j).Loc_Elem.GetLength(0) = 0 Then
                     'Dem Child wird der Schrittweitenvektor zugewiesen und gegebenenfalls der Parameter zufällig gewählt
                     '***************************************************************************************************
-                    For m = 0 To Childs(i).Loc(j).PES_OptPara.GetUpperBound(0)
-                        Childs(i).Loc(j).PES_OptPara(m).Dn = Settings.PES.Schrittweite.DnStart
+                    For m = 0 To Childs(i).Loc(j).Loc_Elem.GetUpperBound(0)
+                        Childs(i).Loc(j).Dn(m) = Settings.PES.Schrittweite.DnStart
                         If Settings.PES.OptStartparameter = EVO_STARTPARAMETER.Zufall Then
                             Randomize()
-                            Childs(i).Loc(j).PES_OptPara(m).Xn = Rnd()
+                            Childs(i).Loc(j).Xn(m) = Rnd()
                         End If
                     Next
                 End If

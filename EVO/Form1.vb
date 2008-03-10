@@ -43,7 +43,6 @@ Partial Class Form1
 
     '**** Globale Parameter Parameter Optimierung ****
     'TODO: diese Werte sollten eigentlich nur in CES bzw PES vorgehalten werden
-    Dim globalAnzPar As Short
     Dim globalAnzRand As Short
     Dim array_x() As Double
     Dim array_y() As Double
@@ -192,7 +191,8 @@ Partial Class Form1
                     Call EVO_Einstellungen1.setStandard_PES(Testprobleme1.OptModus)
 
                     'Globale Parameter werden gesetzt
-                    Call Testprobleme1.Parameter_Uebergabe(globalAnzPar, globalAnzRand, myPara)
+                    'XXX
+                    'Call Testprobleme1.Parameter_Uebergabe(globalAnzPar, globalAnzRand, myPara)
 
                     'Start-Button aktivieren (keine Methodenauswahl erforderlich)
                     Button_Start.Enabled = True
@@ -285,7 +285,8 @@ Partial Class Form1
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Original ModellParameter schreiben
-                    Call Sim1.Write_ModellParameter()
+                    'XXX:
+                    'Call Sim1.Write_ModellParameter()
 
                     MsgBox("Die Startwerte der Optimierungsparameter wurden in die Eingabedateien geschrieben.", MsgBoxStyle.Information, "Info")
 
@@ -302,14 +303,15 @@ Partial Class Form1
                     Call Sim1.read_and_valid_INI_Files_PES()
 
                     'SensiPlot Dialog anzeigen:
+                    'XXX:
                     '--------------------------
                     'List_Boxen füllen
                     Dim i As Integer
-                    For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
-                        Call SensiPlot1.ListBox_OptParameter_add(Sim1.List_OptParameter(i))
+                    For i = 0 To Common.Manager.AnzPara - 1
+                        'Call SensiPlot1.ListBox_OptParameter_add(Sim1.List_OptParameter(i))
                     Next
                     For Each optziel As Common.Ziel In Common.Manager.List_OptZiele
-                        Call SensiPlot1.ListBox_OptZiele_add(optziel)
+                        'Call SensiPlot1.ListBox_OptZiele_add(optziel)
                     Next
                     'Dialog anzeigen
                     Dim SensiPlotDiagResult As Windows.Forms.DialogResult
@@ -342,7 +344,7 @@ Partial Class Form1
                     End If
 
                     'Parameterübergabe an PES
-                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzRand, myPara)
+                    Call Sim1.Parameter_Uebergabe(globalAnzRand)
 
                     'EVO_Verlauf zurücksetzen
                     Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
@@ -366,7 +368,7 @@ Partial Class Form1
                     End If
 
                     'TODO: eigenen Parameterübergabe an HookJeeves (evtl.überladen von Parameter_Uebergabe)
-                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzRand, myPara)
+                    Call Sim1.Parameter_Uebergabe(globalAnzRand)
 
 
                 Case METH_CES, METH_HYBRID 'Methode CES und Methode CES_PES
@@ -389,7 +391,8 @@ Partial Class Form1
                         Case METH_HYBRID
 
                             'Original ModellParameter schreiben
-                            Call Sim1.Write_ModellParameter()
+                            'XXX:
+                            'Call Sim1.Write_ModellParameter()
 
                             'EVO_Einstellungen aktiviern
                             EVO_Einstellungen1.Enabled = True
@@ -627,11 +630,10 @@ Partial Class Form1
 
         'Parameter
         Me.globalAnzRand = 0
-        Me.globalAnzPar = Sim1.List_OptParameter.Length
         Anz_SensiPara = SensiPlot1.Selected_OptParameter.GetLength(0)
 
         'Individuum wird initialisiert
-        Call Common.Individuum.Initialise(1, 0, Me.globalAnzPar, Me.globalAnzRand)
+        Call Common.Individuum.Initialise(1, 0, Me.globalAnzRand)
 
         'Anzahl Simulationen
         If (Anz_SensiPara = 1) Then
@@ -668,6 +670,7 @@ Partial Class Form1
         End If
 
         'Simulationsschleife
+        'XXX:
         '-------------------
         Randomize()
 
@@ -678,12 +681,12 @@ Partial Class Form1
         For i = 0 To ((SensiPlot1.Anz_Steps - 1) * (Anz_SensiPara - 1))
 
             '2. OptParameterwert variieren
-            If (Me.globalAnzPar > 1) Then
+            If (Common.Manager.AnzPara > 1) Then
                 Select Case SensiPlot1.Selected_SensiType
                     Case "Gleichverteilt"
-                        Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Xn = Rnd()
+                        'Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Xn = Rnd()
                     Case "Diskret"
-                        Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Xn = i / (SensiPlot1.Anz_Steps - 1)
+                        'Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Xn = i / (SensiPlot1.Anz_Steps - 1)
                 End Select
             End If
 
@@ -694,9 +697,9 @@ Partial Class Form1
                 '1. OptParameterwert variieren
                 Select Case SensiPlot1.Selected_SensiType
                     Case "Gleichverteilt"
-                        Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Xn = Rnd()
+                        'Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Xn = Rnd()
                     Case "Diskret"
-                        Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Xn = j / (SensiPlot1.Anz_Steps - 1)
+                        'Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Xn = j / (SensiPlot1.Anz_Steps - 1)
                 End Select
 
                 n += 1
@@ -708,10 +711,10 @@ Partial Class Form1
                 ind = New Common.Individuum("SensiPlot", n)
 
                 'OptParameter ins Individuum kopieren
-                ind.PES_OptParas = Sim1.List_OptParameter
+                'ind.PES_OptParas = Sim1.List_OptParameter
 
                 'Modellparameter schreiben
-                Call Sim1.Write_ModellParameter()
+                Call Sim1.Write_ModellParameter(ind.RWert)
 
                 'Evaluieren
                 'TODO: Fehlerbehandlung bei Simulationsfehler
@@ -723,10 +726,10 @@ Partial Class Form1
                 If (Anz_SensiPara = 1) Then
                     '1 Parameter
                     serie = DForm.Diag.getSeriesPoint("SensiPlot", "Orange")
-                    serie.Add(ind.Penalty(SensiPlot1.Selected_OptZiel), Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).RWert, n)
+                    serie.Add(ind.Penalty(SensiPlot1.Selected_OptZiel), ind.RWert(SensiPlot1.Selected_OptParameter(0)), n)
                 Else
                     '2 Parameter
-                    surface.Add(Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).RWert, ind.Penalty(SensiPlot1.Selected_OptZiel), Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).RWert, n)
+                    surface.Add(ind.RWert(SensiPlot1.Selected_OptParameter(0)), ind.Penalty(SensiPlot1.Selected_OptZiel), ind.RWert(SensiPlot1.Selected_OptParameter(1)), n)
                 End If
 
                 'Simulationsergebnis in Wave laden
@@ -1024,11 +1027,11 @@ Partial Class Form1
                                     'Noch keine Eltern vorhanden (die Child Location bekommt neue - zufällige Werte oder original Parameter)
                                     '*******************************************************************************************************
                                     For m = 0 To CES1.Childs(i_ch).Loc(i_loc).PES_OptPara.GetUpperBound(0)
-                                        CES1.Childs(i_ch).Loc(i_loc).PES_OptPara(m).Dn = CES1.Settings.PES.Schrittweite.DnStart
+                                        CES1.Childs(i_ch).Loc(i_loc).Dn(m) = CES1.Settings.PES.Schrittweite.DnStart
                                         'Falls zufällige Startwerte
                                         If CES1.Settings.PES.OptStartparameter = Common.Constants.EVO_STARTPARAMETER.Zufall Then
                                             Randomize()
-                                            CES1.Childs(i_ch).Loc(i_loc).PES_OptPara(m).Xn = Rnd()
+                                            CES1.Childs(i_ch).Loc(i_loc).Xn(m) = Rnd()
                                         End If
                                     Next
 
@@ -1047,12 +1050,12 @@ Partial Class Form1
 
                                     'Vorbereitung um das PES zu initieren
                                     '************************************
-                                    globalAnzPar = CES1.Childs(i_ch).Loc(i_loc).PES_OptPara.GetLength(0)
+                                    Dim AnzPar As Integer = CES1.Childs(i_ch).Loc(i_loc).PES_OptPara.GetLength(0)
                                     myPara = CES1.Childs(i_ch).Loc(i_loc).PES_OptPara.Clone
 
                                     'Schritte 1 - 3: PES wird initialisiert (Weiteres siehe dort ;-)
                                     '**************************************************************
-                                    Call PES1.PesInitialise(EVO_Einstellungen1.Settings, globalAnzPar, Common.Manager.AnzPenalty, globalAnzRand, myPara, Method)
+                                    Call PES1.PesInitialise(EVO_Einstellungen1.Settings, AnzPar, Common.Manager.AnzPenalty, globalAnzRand, myPara, Method)
 
                                     'Die PopulationsEltern des PES werden gefüllt
                                     For m = 0 To CES1.PES_Parents_pLoc.GetUpperBound(0)

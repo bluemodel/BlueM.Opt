@@ -3,7 +3,9 @@ Public Module Manager
     'Eigenschaften
     '#############
 
-    Public List_Ziele() As Ziel                 'Liste der Zielfunktionen
+    Public List_Ziele() As Ziel                     'Liste der Zielfunktionen
+    Public List_OptParameter() As OptParameter      'Liste der OptParameter
+    Public List_OptParameter_Save() As OptParameter 'Liste der Optimierungsparameter die nicht verändert wird
 
     'Properties
     '##########
@@ -47,6 +49,12 @@ Public Module Manager
             Next
 
             Return array
+        End Get
+    End Property
+
+    Public ReadOnly Property AnzPara() As Integer
+        Get
+            Return Manager.List_OptParameter.Length
         End Get
     End Property
 
