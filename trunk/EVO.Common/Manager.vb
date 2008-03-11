@@ -40,9 +40,11 @@ Public Module Manager
 
             ReDim array(Manager.AnzPenalty - 1)
 
-            For i = 0 To Manager.AnzZiele - 1
-                If (Manager.List_Ziele(i).isOpt) Then
-                    array(i) = Manager.List_Ziele(i)
+            i = 0
+            For Each ziel As Ziel In Manager.List_Ziele
+                If (ziel.isOpt) Then
+                    array(i) = ziel
+                    i += 1
                 End If
             Next
 

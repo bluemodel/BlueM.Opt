@@ -44,15 +44,17 @@ Public Class Individuum
     'Penalty-Werte                         '(= QWerte nur von OptZielen!)
     Public ReadOnly Property Penalty() As Double()
         Get
-            Dim i As Integer
+            Dim i, j As Integer
             Dim array() As Double
 
             ReDim array(Common.Manager.AnzPenalty - 1)
 
+            j = 0
             For i = 0 To Common.Manager.AnzZiele - 1
                 'Nur die QWerte von OptZielen zurückgeben!
                 If (Common.Manager.List_Ziele(i).isOpt) Then
-                    array(i) = Me.QWerte(i)
+                    array(j) = Me.QWerte(i)
+                    j += 1
                 End If
             Next
 
