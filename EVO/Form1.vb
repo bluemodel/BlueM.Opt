@@ -1521,13 +1521,14 @@ Start_Evolutionsrunden:
 
                         'Hypervolumen berechnen
                         '----------------------
-                        Hypervolume.update_dataset(SekPopulation)
-                        indicator = Math.Abs(Hypervolume.calc_indicator)
+                        Call Hypervolume.update_dataset(SekPopulation)
+                        indicator = Math.Abs(Hypervolume.calc_indicator())
                         nadir = Hypervolume.nadir
-                        'Hypervolumen in Indikator-Diagramm eintragen
-                        Dim serie As Steema.TeeChart.Styles.Line
-                        serie = Me.DForm.DiagIndicator.getSeriesLine("Hypervolumen", "Red")
-                        serie.Add(PES1.PES_iAkt.iAktGen, indicator, PES1.PES_iAkt.iAktGen.ToString())
+
+                        'Hypervolumen zeichnen
+                        '---------------------
+                        Call Me.HyperVolumenZeichnen(PES1.PES_iAkt.iAktGen, indicator, nadir)
+
                     End If
 
                     'ggf. alte Generation im Diagramm löschen
@@ -1676,6 +1677,34 @@ Start_Evolutionsrunden:
             Next i
         Else
             Throw New Exception("Der Parameter 'globalAnzZiel' weist ungültige Parameter auf.")
+        End If
+
+    End Sub
+
+    'Ergebnisse der Hypervolumenberechnung anzeigen
+    '**********************************************
+    Private Sub HyperVolumenZeichnen(ByVal gen As Integer, ByVal indicator As Double, ByVal nadir() As Double)
+
+        'Indicator in Indikatordiagramm eintragen
+        Dim serie1 As Steema.TeeChart.Styles.Line
+        serie1 = Me.DForm.DiagIndicator.getSeriesLine("Hypervolumen", "Red")
+        serie1.Add(gen, indicator, gen.ToString())
+
+        'Nadirpunkt in Hauptdiagramm anzeigen
+        If (Common.Manager.AnzPenalty = 2) Then
+            '2D
+            '--
+            Dim serie2 As Steema.TeeChart.Styles.Points
+            serie2 = Me.DForm.Diag.getSeriesPoint("Nadirpunkt", "Blue", Steema.TeeChart.Styles.PointerStyles.Diamond)
+            serie2.Clear()
+            serie2.Add(nadir(0), nadir(1), "Nadirpunkt")
+        Else
+            '3D
+            '--
+            Dim serie3 As Steema.TeeChart.Styles.Points3D
+            serie3 = Me.DForm.Diag.getSeries3DPoint("Nadirpunkt", "Blue", Steema.TeeChart.Styles.PointerStyles.Diamond)
+            serie3.Clear()
+            serie3.Add(nadir(0), nadir(1), nadir(2), "Nadirpunkt")
         End If
 
     End Sub

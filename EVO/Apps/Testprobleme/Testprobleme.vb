@@ -475,10 +475,12 @@ Partial Public Class Testprobleme
             .Chart.Axes.Bottom.Maximum = 1
             .Chart.Axes.Bottom.Minimum = 0
             .Chart.Axes.Bottom.Increment = 0.1
+            .Chart.Axes.Bottom.Labels.Style = Steema.TeeChart.AxisLabelStyle.Value
             .Chart.Axes.Left.Automatic = False
             .Chart.Axes.Left.Maximum = 10
             .Chart.Axes.Left.Minimum = 0
             .Chart.Axes.Left.Increment = 2
+            .Chart.Axes.Left.Labels.Style = Steema.TeeChart.AxisLabelStyle.Value
         End With
 
         Select Case Me.Combo_Testproblem.Text
