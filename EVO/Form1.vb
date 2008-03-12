@@ -661,7 +661,7 @@ Partial Class Form1
             Dim rotate1 As New Steema.TeeChart.Tools.Rotate
             rotate1.Button = Windows.Forms.MouseButtons.Right
             Me.DForm.Diag.Tools.Add(rotate1)
-            'Punkte anklicken (linker Mausbutton)
+            'MarksTips
             Me.DForm.Diag.add_MarksTips(surface)
             surface.Title = "SensiPlot"
             surface.Cursor = Cursors.Hand
