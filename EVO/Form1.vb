@@ -1471,48 +1471,10 @@ Start_Evolutionsrunden:
                                     'Evaluierung des Simulationsmodells
                                     SIM_Eval_is_OK = Sim1.SIM_Evaluierung(ind)
 
-                                    'Lösung im TeeChart einzeichnen
-                                    'TODO: If (Not SIM_Eval_is_OK) Then [nicht zeichnen!]
-                                    '==============================
-                                    Dim serie As Steema.TeeChart.Styles.Series
-
-                                    If (Common.Manager.AnzPenalty = 1) Then
-                                        'SingleObjective
-                                        'xxxxxxxxxxxxxxx
-                                        If (Not ind.feasible) Then
-                                            serie = DForm.Diag.getSeriesPoint("Population " & (PES1.PES_iAkt.iAktPop + 1).ToString() & " (ungültig)", "Gray")
-                                        Else
-                                            serie = DForm.Diag.getSeriesPoint("Population " & (PES1.PES_iAkt.iAktPop + 1).ToString())
-                                        End If
-                                        Call serie.Add(PES1.PES_iAkt.iAktRunde * EVO_Einstellungen1.Settings.PES.n_Gen * EVO_Einstellungen1.Settings.PES.n_Nachf + PES1.PES_iAkt.iAktGen * EVO_Einstellungen1.Settings.PES.n_Nachf + PES1.PES_iAkt.iAktNachf, ind.Penalty(0), durchlauf.ToString())
-
-                                    Else
-                                        'MultiObjective
-                                        'xxxxxxxxxxxxxx
-                                        If (Common.Manager.AnzPenalty = 2) Then
-                                            '2D-Diagramm
-                                            '------------------------------------------------------------------------
-                                            If (Not ind.feasible) Then
-                                                serie = DForm.Diag.getSeriesPoint("Population" & " (ungültig)", "Gray")
-                                            Else
-                                                serie = DForm.Diag.getSeriesPoint("Population", "Orange")
-                                            End If
-                                            Call serie.Add(ind.Penalty(0), ind.Penalty(1), durchlauf.ToString())
-
-                                        Else
-                                            '3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
-                                            '------------------------------------------------------------------------
-                                            Dim serie3D As Steema.TeeChart.Styles.Points3D
-                                            If (Not ind.feasible) Then
-                                                serie3D = DForm.Diag.getSeries3DPoint("Population" & " (ungültig)", "Gray")
-                                            Else
-                                                serie3D = DForm.Diag.getSeries3DPoint("Population", "Orange")
-                                            End If
-                                            Call serie3D.Add(ind.Penalty(0), ind.Penalty(1), ind.Penalty(2), durchlauf.ToString())
-
-                                        End If
+                                    'Lösung zeichnen
+                                    If (SIM_Eval_is_OK) Then
+                                        Call Me.LösungZeichnen(ind, PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, PES1.PES_iAkt.iAktNachf)
                                     End If
-
                             End Select
 
                             Eval_Count += 1
@@ -1568,41 +1530,12 @@ Start_Evolutionsrunden:
                         serie.Add(PES1.PES_iAkt.iAktGen, indicator, PES1.PES_iAkt.iAktGen.ToString())
                     End If
 
-                    System.Windows.Forms.Application.DoEvents()
-
-                    'Alte Generation im TeeChart löschen
-                    '===================================
-                    If EVO_Einstellungen1.Settings.PES.is_paint_constraint Then
-                        Dim serie As Steema.TeeChart.Styles.Series
-
-                        If (Common.Manager.AnzPenalty = 1) Then
-                            'SingleObjective
-                            'xxxxxxxxxxxxxxx
-                            serie = DForm.Diag.getSeriesPoint("Population " & (PES1.PES_iAkt.iAktPop + 1).ToString() & " (ungültig)", "Gray")
-                            serie.Clear()
-                            serie = DForm.Diag.getSeriesPoint("Population " & (PES1.PES_iAkt.iAktPop + 1).ToString())
-                            serie.Clear()
-                        Else
-                            'MultiObjective
-                            'xxxxxxxxxxxxxx
-                            If (Common.Manager.AnzPenalty = 2) Then
-                                '2D-Diagramm
-                                '------------------------------------------------------------------------
-                                serie = DForm.Diag.getSeriesPoint("Population" & " (ungültig)", "Gray")
-                                serie.Clear()
-                                serie = DForm.Diag.getSeriesPoint("Population", "Orange")
-                                serie.Clear()
-                            Else
-                                '3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
-                                '------------------------------------------------------------------------
-                                Dim serie3D As Steema.TeeChart.Styles.Points3D
-                                serie3D = DForm.Diag.getSeries3DPoint("Population" & " (ungültig)", "Gray")
-                                serie3D.Clear()
-                                serie3D = DForm.Diag.getSeries3DPoint("Population", "Orange")
-                                serie3D.Clear()
-                            End If
-                        End If
+                    'ggf. alte Generation im Diagramm löschen
+                    If (EVO_Einstellungen1.Settings.PES.is_paint_constraint) Then
+                        Call Me.ClearLastGeneration(PES1.PES_iAkt.iAktPop)
                     End If
+
+                    System.Windows.Forms.Application.DoEvents()
 
                 Next 'Ende alle Generationen
                 'xxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -1627,8 +1560,59 @@ Start_Evolutionsrunden:
 
     End Sub
 
+#End Region 'Start Button Pressed
+
+#Region "Diagrammfunktionen"
+
+    'Diagrammfunktionen
+    '###################
+
     'Zeichenfunktionen
     'XXXXXXXXXXXXXXXXX
+
+    'Lösung im Hauptdiagramm eintragen
+    '**********************************
+    Private Sub LösungZeichnen(ByVal ind As Common.Individuum, ByVal runde As Integer, ByVal pop As Integer, ByVal gen As Integer, ByVal nachf As Integer)
+
+        Dim serie As Steema.TeeChart.Styles.Series
+
+        If (Common.Manager.AnzPenalty = 1) Then
+            'SingleObjective
+            'xxxxxxxxxxxxxxx
+            If (Not ind.feasible) Then
+                serie = DForm.Diag.getSeriesPoint("Population " & (pop + 1).ToString() & " (ungültig)", "Gray")
+            Else
+                serie = DForm.Diag.getSeriesPoint("Population " & (pop + 1).ToString())
+            End If
+            Call serie.Add(runde * EVO_Einstellungen1.Settings.PES.n_Gen * EVO_Einstellungen1.Settings.PES.n_Nachf + gen * EVO_Einstellungen1.Settings.PES.n_Nachf + nachf, ind.Penalty(0), ind.ID.ToString())
+
+        Else
+            'MultiObjective
+            'xxxxxxxxxxxxxx
+            If (Common.Manager.AnzPenalty = 2) Then
+                '2D-Diagramm
+                '------------------------------------------------------------------------
+                If (Not ind.feasible) Then
+                    serie = DForm.Diag.getSeriesPoint("Population" & " (ungültig)", "Gray")
+                Else
+                    serie = DForm.Diag.getSeriesPoint("Population", "Orange")
+                End If
+                Call serie.Add(ind.Penalty(0), ind.Penalty(1), ind.ID.ToString())
+
+            Else
+                '3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
+                '------------------------------------------------------------------------
+                Dim serie3D As Steema.TeeChart.Styles.Points3D
+                If (Not ind.feasible) Then
+                    serie3D = DForm.Diag.getSeries3DPoint("Population" & " (ungültig)", "Gray")
+                Else
+                    serie3D = DForm.Diag.getSeries3DPoint("Population", "Orange")
+                End If
+                Call serie3D.Add(ind.Penalty(0), ind.Penalty(1), ind.Penalty(2), ind.ID.ToString())
+
+            End If
+        End If
+    End Sub
 
     'Sekundäre Population zeichnen
     '*****************************
@@ -1696,12 +1680,41 @@ Start_Evolutionsrunden:
 
     End Sub
 
-#End Region 'Start Button Pressed
+    'Alte Generation im Hauptdiagramm löschen
+    '****************************************
+    Private Sub ClearLastGeneration(ByVal pop As Integer)
 
-#Region "Diagrammfunktionen"
+        Dim serie As Steema.TeeChart.Styles.Series
 
-    'Diagrammfunktionen
-    '###################
+        If (Common.Manager.AnzPenalty = 1) Then
+            'SingleObjective
+            'xxxxxxxxxxxxxxx
+            serie = DForm.Diag.getSeriesPoint("Population " & (pop + 1).ToString() & " (ungültig)", "Gray")
+            serie.Clear()
+            serie = DForm.Diag.getSeriesPoint("Population " & (pop + 1).ToString())
+            serie.Clear()
+        Else
+            'MultiObjective
+            'xxxxxxxxxxxxxx
+            If (Common.Manager.AnzPenalty = 2) Then
+                '2D-Diagramm
+                '------------------------------------------------------------------------
+                serie = DForm.Diag.getSeriesPoint("Population" & " (ungültig)", "Gray")
+                serie.Clear()
+                serie = DForm.Diag.getSeriesPoint("Population", "Orange")
+                serie.Clear()
+            Else
+                '3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
+                '------------------------------------------------------------------------
+                Dim serie3D As Steema.TeeChart.Styles.Points3D
+                serie3D = DForm.Diag.getSeries3DPoint("Population" & " (ungültig)", "Gray")
+                serie3D.Clear()
+                serie3D = DForm.Diag.getSeries3DPoint("Population", "Orange")
+                serie3D.Clear()
+            End If
+        End If
+
+    End Sub
 
     'Achsen und Standard-Series initialisieren
     '*****************************************
@@ -1855,9 +1868,9 @@ Start_Evolutionsrunden:
         'Einstellungen übernehmen
         sekpoponly = Dialog.CheckBox_SekPopOnly.Checked
         ReDim zielauswahl(-1)
-        For Each indexChecked As Integer in Dialog.CheckedListBox_Ziele.CheckedIndices
+        For Each indexChecked As Integer In Dialog.CheckedListBox_Ziele.CheckedIndices
             ReDim Preserve zielauswahl(zielauswahl.GetUpperBound(0) + 1)
-            zielauswahl(zielauswahl.getUpperBound(0)) = indexChecked
+            zielauswahl(zielauswahl.GetUpperBound(0)) = indexChecked
         Next
 
         'Scatterplot-Matrix anzeigen
