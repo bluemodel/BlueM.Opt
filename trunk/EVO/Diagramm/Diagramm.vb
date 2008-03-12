@@ -162,7 +162,7 @@ Public Class Diagramm
             serie.Color = Drawing.Color.FromName(colorName)
         End If
 
-        Call Me.add_MarksTips(serie)
+        Call Me.add_MarksTips(serie, Steema.TeeChart.Styles.MarksStyles.XY)
 
         Return serie
 
@@ -224,14 +224,14 @@ Public Class Diagramm
 
     'MarksTips zu einer Serie hinzufügen
     '***********************************
-    Public Sub add_MarksTips(ByVal serie As Steema.TeeChart.Styles.Series)
+    Public Sub add_MarksTips(ByVal serie As Steema.TeeChart.Styles.Series, Optional ByVal style As Steema.TeeChart.Styles.MarksStyles = Steema.TeeChart.Styles.MarksStyles.Label)
 
-        Dim tmpMarksTip As Steema.TeeChart.Tools.MarksTip
-        tmpMarksTip = New Steema.TeeChart.Tools.MarksTip(Me.Chart)
-        tmpMarksTip.Series = serie
-        tmpMarksTip.MouseAction = Steema.TeeChart.Tools.MarksTipMouseAction.Move
-        tmpMarksTip.MouseDelay = 10 'millisekunden
-        tmpMarksTip.Style = Steema.TeeChart.Styles.MarksStyles.XY
+        Dim myMarksTip As Steema.TeeChart.Tools.MarksTip
+        myMarksTip = New Steema.TeeChart.Tools.MarksTip(Me.Chart)
+        myMarksTip.Series = serie
+        myMarksTip.MouseAction = Steema.TeeChart.Tools.MarksTipMouseAction.Move
+        myMarksTip.MouseDelay = 10 'millisekunden
+        myMarksTip.Style = style
 
     End Sub
 
