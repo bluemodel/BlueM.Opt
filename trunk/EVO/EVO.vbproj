@@ -91,6 +91,10 @@
     <Reference Include="TeeChart, Version=2.0.2887.28040, Culture=neutral, PublicKeyToken=9c8126276c77bdb7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <ProjectReference Include="..\..\EVO.MO_Indicators\MO_Indicators\EVO.MO_Indicators.csproj">
+      <Project>{A56DFA12-8680-4C7A-B6BB-406D4D3FE156}</Project>
+      <Name>EVO.MO_Indicators</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\IHA.Win\IHA.Win.vbproj">
       <Project>{7A7828C7-812B-45C0-AC5A-AE2DB74B7CD8}</Project>
       <Name>IHA.Win</Name>
@@ -252,6 +256,7 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Diagramm\licenses.licx" />
+    <EmbeddedResource Include="My Project\licenses.licx" />
     <EmbeddedResource Include="My Project\Resources.resx">
       <SubType>Designer</SubType>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>

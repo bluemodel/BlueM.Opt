@@ -1332,15 +1332,24 @@ Partial Class Form1
     '************************************************************************
     Private Sub STARTEN_PES()
 
-        Dim durchlauf As Integer
+        Dim i, durchlauf As Integer
         Dim ind As Common.Individuum
         Dim PES1 As EVO.Kern.PES
 
-        'Dim Hypervolume As EVO.Kern.Hypervolumen
-        'Hypervolume = New EVO.Kern.Hypervolumen
-        'Hypervolume.Dimension = Common.Manager.AnzOptZiele
-        'Hypervolume.Normalisiert = True
-        'Dim HV as double
+        'Hypervolumen instanzieren
+        '-------------------------
+        Dim Hypervolume As EVO.MO_Indicators.Indicators
+        Dim indicator As Double
+        Dim minmax() As Boolean
+        Dim nadir() As Double
+        ReDim minmax(Common.Manager.AnzPenalty - 1)
+        ReDim nadir(Common.Manager.AnzPenalty - 1)
+        For i = 0 To Common.Manager.AnzPenalty - 1
+            minmax(i) = False       'Alle Zielfunktionen sind zu minimieren
+            nadir(i) = 0            'Anfangswert für Nadirpunkt im Koordinatenursprung
+        Next
+        Hypervolume = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(EVO.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, minmax, nadir)
+        Hypervolume.dimension = Common.Manager.AnzPenalty
 
         '--------------------------
         'Dimensionierung der Variablen für Optionen Evostrategie
@@ -1529,8 +1538,15 @@ Start_Evolutionsrunden:
                     Call PES1.EsEltern()
 
                     'Sekundäre Population
+                    '====================
                     If (EVO_Einstellungen1.Settings.PES.OptModus = Common.Constants.EVO_MODUS.Multi_Objective) Then
+
+                        'SekPop holen
+                        '------------
                         SekPopulation = PES1.SekundärQb_Get()
+
+                        'Sekpop zeichnen
+                        '---------------
                         If (Not IsNothing(Sim1)) Then
                             'SekPop abspeichern
                             Call Sim1.OptResult.setSekPop(SekPopulation, PES1.PES_iAkt.iAktGen)
@@ -1540,12 +1556,22 @@ Start_Evolutionsrunden:
                             'SekPop einfach so zeichnen
                             Call SekundärePopulationZeichnen(SekPopulation)
                         End If
+
+                        'Hypervolumen berechnen
+                        '----------------------
+                        Hypervolume.update_dataset(SekPopulation)
+                        indicator = Math.Abs(Hypervolume.calc_indicator)
+                        nadir = Hypervolume.nadir
+                        'Hypervolumen in Indikator-Diagramm eintragen
+                        Dim serie As Steema.TeeChart.Styles.Line
+                        serie = Me.DForm.DiagIndicator.getSeriesLine("Hypervolumen", "Red")
+                        serie.Add(PES1.PES_iAkt.iAktGen, indicator, PES1.PES_iAkt.iAktGen.ToString())
                     End If
 
                     System.Windows.Forms.Application.DoEvents()
 
-                    'Serie im TeeChart löschen
-                    '==============================
+                    'Alte Generation im TeeChart löschen
+                    '===================================
                     If EVO_Einstellungen1.Settings.PES.is_paint_constraint Then
                         Dim serie As Steema.TeeChart.Styles.Series
 
@@ -1576,35 +1602,6 @@ Start_Evolutionsrunden:
                                 serie3D.Clear()
                             End If
                         End If
-                    End If
-
-                    'Hypervolumenberechnung
-                    '======================
-                    If (EVO_Einstellungen1.Settings.PES.OptModus = Common.Constants.EVO_MODUS.Multi_Objective _
-                        And PES1.PES_iAkt.iAktRunde = 0 _
-                        And PES1.PES_iAkt.iAktPop = 0 _
-                        And PES1.PES_iAkt.iAktGen = 0) Then
-
-                        'Referenzpunkt für Hypervolumen ermitteln
-                        '----------------------------------------
-                        Dim j As Integer
-                        Dim k As Integer
-                        Dim Referenzpunkt(Common.Manager.AnzPenalty - 1) As Double
-
-                        For j = 0 To Common.Manager.AnzPenalty - 1
-                            Referenzpunkt(j) = 0
-                            For k = 0 To UBound(SekPopulation)
-                                If SekPopulation(k, j) > Referenzpunkt(j) Then
-                                    Referenzpunkt(j) = SekPopulation(k, j)
-                                End If
-                            Next
-                        Next
-                        'Hypervolume.Referenzpunkt = Referenzpunkt
-
-                    Else
-                        'Hypervolumen berechnen
-                        '----------------------
-                        'HV = Hypervolume.GetHypervolume(UBound(SekPopulation), SekPopulation)
                     End If
 
                 Next 'Ende alle Generationen
@@ -1825,6 +1822,14 @@ Start_Evolutionsrunden:
                 End Select
 
         End Select
+
+        'Bei MultiObjective Indicator-Diagramm initialisieren
+        If (Common.Manager.AnzPenalty > 1 _
+            And Form1.Method <> METH_SENSIPLOT _
+            And Form1.Method <> METH_RESET) Then
+            Me.DForm.Diag.Height = Me.DForm.Diag.Height - 70
+            Me.DForm.DiagIndicator.Visible = True
+        End If
 
         Call Application.DoEvents()
 

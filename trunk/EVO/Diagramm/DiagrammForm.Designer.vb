@@ -27,6 +27,7 @@ Partial Class DiagrammForm
         Me.Button_TChart2Excel = New System.Windows.Forms.Button
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
+        Me.DiagIndicator = New IHWB.EVO.Diagramm
         Me.Diag = New IHWB.EVO.Diagramm
         Me.GroupBox_TChartButtons.SuspendLayout()
         Me.SuspendLayout()
@@ -88,6 +89,146 @@ Partial Class DiagrammForm
         'SaveFileDialog1
         '
         Me.SaveFileDialog1.Title = "Datei speichern"
+        '
+        'DiagIndicator
+        '
+        '
+        '
+        '
+        Me.DiagIndicator.Aspect.ElevationFloat = 345
+        Me.DiagIndicator.Aspect.RotationFloat = 345
+        Me.DiagIndicator.Aspect.View3D = False
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.DiagIndicator.Axes.Bottom.Automatic = True
+        '
+        '
+        '
+        Me.DiagIndicator.Axes.Bottom.Grid.Style = System.Drawing.Drawing2D.DashStyle.Dash
+        Me.DiagIndicator.Axes.Bottom.Grid.ZPosition = 0
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.DiagIndicator.Axes.Bottom.Labels.Font.Size = 6
+        Me.DiagIndicator.Axes.Bottom.Labels.Font.SizeFloat = 6.0!
+        '
+        '
+        '
+        Me.DiagIndicator.Axes.Depth.Automatic = True
+        '
+        '
+        '
+        Me.DiagIndicator.Axes.Depth.Grid.Style = System.Drawing.Drawing2D.DashStyle.Dash
+        Me.DiagIndicator.Axes.Depth.Grid.ZPosition = 0
+        '
+        '
+        '
+        Me.DiagIndicator.Axes.DepthTop.Automatic = True
+        '
+        '
+        '
+        Me.DiagIndicator.Axes.DepthTop.Grid.Style = System.Drawing.Drawing2D.DashStyle.Dash
+        Me.DiagIndicator.Axes.DepthTop.Grid.ZPosition = 0
+        '
+        '
+        '
+        Me.DiagIndicator.Axes.Left.Automatic = True
+        '
+        '
+        '
+        Me.DiagIndicator.Axes.Left.Grid.Style = System.Drawing.Drawing2D.DashStyle.Dash
+        Me.DiagIndicator.Axes.Left.Grid.ZPosition = 0
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.DiagIndicator.Axes.Left.Labels.Font.Size = 6
+        Me.DiagIndicator.Axes.Left.Labels.Font.SizeFloat = 6.0!
+        '
+        '
+        '
+        Me.DiagIndicator.Axes.Right.Automatic = True
+        '
+        '
+        '
+        Me.DiagIndicator.Axes.Right.Grid.Style = System.Drawing.Drawing2D.DashStyle.Dash
+        Me.DiagIndicator.Axes.Right.Grid.ZPosition = 0
+        '
+        '
+        '
+        Me.DiagIndicator.Axes.Top.Automatic = True
+        '
+        '
+        '
+        Me.DiagIndicator.Axes.Top.Grid.Style = System.Drawing.Drawing2D.DashStyle.Dash
+        Me.DiagIndicator.Axes.Top.Grid.ZPosition = 0
+        Me.DiagIndicator.Cursor = System.Windows.Forms.Cursors.Default
+        '
+        '
+        '
+        Me.DiagIndicator.Header.Lines = New String() {"TeeChart"}
+        Me.DiagIndicator.Header.Visible = False
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.DiagIndicator.Legend.Shadow.Visible = True
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.DiagIndicator.Legend.Title.Font.Bold = True
+        '
+        '
+        '
+        Me.DiagIndicator.Legend.Title.Pen.Visible = False
+        Me.DiagIndicator.Legend.Visible = False
+        Me.DiagIndicator.Location = New System.Drawing.Point(0, 496)
+        Me.DiagIndicator.Name = "DiagIndicator"
+        '
+        '
+        '
+        Me.DiagIndicator.Panel.MarginTop = 20
+        '
+        '
+        '
+        Me.DiagIndicator.Panning.Allow = Steema.TeeChart.ScrollModes.None
+        Me.DiagIndicator.Size = New System.Drawing.Size(473, 70)
+        Me.DiagIndicator.TabIndex = 6
+        Me.ToolTip1.SetToolTip(Me.DiagIndicator, "Hypervolumen")
+        Me.DiagIndicator.Visible = False
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.DiagIndicator.Walls.Back.AutoHide = False
+        '
+        '
+        '
+        Me.DiagIndicator.Walls.Bottom.AutoHide = False
+        '
+        '
+        '
+        Me.DiagIndicator.Walls.Left.AutoHide = False
+        '
+        '
+        '
+        Me.DiagIndicator.Walls.Right.AutoHide = False
         '
         'Diag
         '
@@ -154,6 +295,7 @@ Partial Class DiagrammForm
         '
         Me.Diag.Axes.Top.Grid.Style = System.Drawing.Drawing2D.DashStyle.Dash
         Me.Diag.Axes.Top.Grid.ZPosition = 0
+        Me.Diag.Cursor = System.Windows.Forms.Cursors.Default
         '
         '
         '
@@ -178,7 +320,7 @@ Partial Class DiagrammForm
         Me.Diag.Legend.Title.Pen.Visible = False
         Me.Diag.Location = New System.Drawing.Point(0, 0)
         Me.Diag.Name = "Diag"
-        Me.Diag.Size = New System.Drawing.Size(473, 564)
+        Me.Diag.Size = New System.Drawing.Size(473, 566)
         Me.Diag.TabIndex = 0
         '
         '
@@ -205,6 +347,7 @@ Partial Class DiagrammForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.Controls.Add(Me.DiagIndicator)
         Me.Controls.Add(Me.GroupBox_TChartButtons)
         Me.Controls.Add(Me.Diag)
         Me.Name = "DiagrammForm"
@@ -221,5 +364,6 @@ Partial Class DiagrammForm
     Friend WithEvents Button_TChart2Excel As System.Windows.Forms.Button
     Friend WithEvents SaveFileDialog1 As System.Windows.Forms.SaveFileDialog
     Friend WithEvents ToolTip1 As System.Windows.Forms.ToolTip
+    Friend WithEvents DiagIndicator As EVO.Diagramm
 
 End Class

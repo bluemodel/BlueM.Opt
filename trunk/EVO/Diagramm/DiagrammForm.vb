@@ -68,5 +68,10 @@ Partial Public Class DiagrammForm
         End If
     End Sub
 
+    'Doppelklick auf Indicator-Chart
+    '*******************************
+    Private Sub DiagIndicator_DoubleClick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles DiagIndicator.DoubleClick
+        Call Me.DiagIndicator.ShowEditor()
+    End Sub
 
 End Class
