@@ -1382,9 +1382,6 @@ Partial Class Form1
 
         durchlauf = 0
 
-        'Hypervolume wird initialisiert
-
-
 Start_Evolutionsrunden:
 
         'Über alle Runden
