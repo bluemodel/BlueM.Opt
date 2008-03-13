@@ -37,7 +37,7 @@ Public Class CES
     '*************************
     Public Childs() As Individuum
     Public Parents() As Individuum
-    Private SekundärQb(-1) As Individuum
+    Public SekundärQb(-1) As Individuum
     Public NDSorting() As Individuum
     'Checken ob es verwendet wird
     Public NDSResult() As Individuum
@@ -1166,27 +1166,6 @@ Public Class CES
         '********************************************************************************************
 
     End Sub
-
-
-    'ES_GET_SEKUNDÄRE_POPULATIONEN - Sekundäre Population speichert immer die angegebene
-    'Anzahl von Bestwerten und kann den Bestwertspeicher alle x Generationen überschreiben
-    '*************************************************************************************
-    Public Function SekundärQb_Get() As Double(,)
-
-        Dim j, i As Integer
-        Dim SekPopulation(,) As Double
-
-        ReDim SekPopulation(SekundärQb.GetUpperBound(0), Manager.AnzPenalty - 1)
-
-        For i = 0 To SekundärQb.GetUpperBound(0)
-            For j = 0 To Manager.AnzPenalty - 1
-                SekPopulation(i, j) = SekundärQb(i).Get_Penalty(j)
-            Next j
-        Next i
-
-        Return SekPopulation
-
-    End Function
 
 #End Region 'Methoden
 
