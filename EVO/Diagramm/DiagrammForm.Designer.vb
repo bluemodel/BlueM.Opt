@@ -28,7 +28,9 @@ Partial Class DiagrammForm
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.DiagIndicator = New IHWB.EVO.Diagramm
+        Me.Line_Hypervolume = New Steema.TeeChart.Styles.Line
         Me.Diag = New IHWB.EVO.Diagramm
+        Me.MarksTip_Hypervolume = New Steema.TeeChart.Tools.MarksTip
         Me.GroupBox_TChartButtons.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -118,6 +120,7 @@ Partial Class DiagrammForm
         '
         Me.DiagIndicator.Axes.Bottom.Labels.Font.Size = 6
         Me.DiagIndicator.Axes.Bottom.Labels.Font.SizeFloat = 6.0!
+        Me.DiagIndicator.Axes.Bottom.Labels.Style = Steema.TeeChart.AxisLabelStyle.Value
         '
         '
         '
@@ -153,6 +156,7 @@ Partial Class DiagrammForm
         '
         Me.DiagIndicator.Axes.Left.Labels.Font.Size = 6
         Me.DiagIndicator.Axes.Left.Labels.Font.SizeFloat = 6.0!
+        Me.DiagIndicator.Axes.Left.MaximumOffset = 1
         '
         '
         '
@@ -206,8 +210,10 @@ Partial Class DiagrammForm
         '
         '
         Me.DiagIndicator.Panning.Allow = Steema.TeeChart.ScrollModes.None
+        Me.DiagIndicator.Series.Add(Me.Line_Hypervolume)
         Me.DiagIndicator.Size = New System.Drawing.Size(473, 70)
         Me.DiagIndicator.TabIndex = 6
+        Me.DiagIndicator.Tools.Add(Me.MarksTip_Hypervolume)
         Me.ToolTip1.SetToolTip(Me.DiagIndicator, "Hypervolumen")
         Me.DiagIndicator.Visible = False
         '
@@ -229,6 +235,71 @@ Partial Class DiagrammForm
         '
         '
         Me.DiagIndicator.Walls.Right.AutoHide = False
+        '
+        'Line_Hypervolume
+        '
+        '
+        '
+        '
+        Me.Line_Hypervolume.Brush.Color = System.Drawing.Color.Red
+        '
+        '
+        '
+        Me.Line_Hypervolume.LinePen.Color = System.Drawing.Color.FromArgb(CType(CType(153, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Line_Hypervolume.Marks.Callout.ArrowHead = Steema.TeeChart.Styles.ArrowHeadStyles.None
+        Me.Line_Hypervolume.Marks.Callout.ArrowHeadSize = 8
+        '
+        '
+        '
+        Me.Line_Hypervolume.Marks.Callout.Brush.Color = System.Drawing.Color.Black
+        Me.Line_Hypervolume.Marks.Callout.Distance = 0
+        Me.Line_Hypervolume.Marks.Callout.Draw3D = False
+        Me.Line_Hypervolume.Marks.Callout.Length = 10
+        Me.Line_Hypervolume.Marks.Callout.Style = Steema.TeeChart.Styles.PointerStyles.Rectangle
+        '
+        '
+        '
+        Me.Line_Hypervolume.Marks.Shadow.Visible = True
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Line_Hypervolume.Marks.Symbol.Shadow.Visible = True
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Line_Hypervolume.Pointer.Brush.Color = System.Drawing.Color.Red
+        Me.Line_Hypervolume.Pointer.Dark3D = False
+        Me.Line_Hypervolume.Pointer.Draw3D = False
+        Me.Line_Hypervolume.Pointer.HorizSize = 2
+        '
+        '
+        '
+        Me.Line_Hypervolume.Pointer.Pen.Visible = False
+        Me.Line_Hypervolume.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+        Me.Line_Hypervolume.Pointer.VertSize = 2
+        Me.Line_Hypervolume.Pointer.Visible = True
+        Me.Line_Hypervolume.Title = "Hypervolumen"
+        '
+        '
+        '
+        Me.Line_Hypervolume.XValues.DataMember = "X"
+        Me.Line_Hypervolume.XValues.Order = Steema.TeeChart.Styles.ValueListOrder.Ascending
+        '
+        '
+        '
+        Me.Line_Hypervolume.YValues.DataMember = "Y"
         '
         'Diag
         '
@@ -343,6 +414,12 @@ Partial Class DiagrammForm
         Me.Diag.Walls.Right.AutoHide = False
         Me.Diag.Walls.View3D = False
         '
+        'MarksTip_Hypervolume
+        '
+        Me.MarksTip_Hypervolume.MouseDelay = 10
+        Me.MarksTip_Hypervolume.Series = Me.Line_Hypervolume
+        Me.MarksTip_Hypervolume.Style = Steema.TeeChart.Styles.MarksStyles.XY
+        '
         'DiagrammForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -365,5 +442,7 @@ Partial Class DiagrammForm
     Friend WithEvents SaveFileDialog1 As System.Windows.Forms.SaveFileDialog
     Friend WithEvents ToolTip1 As System.Windows.Forms.ToolTip
     Friend WithEvents DiagIndicator As EVO.Diagramm
+    Friend WithEvents Line_Hypervolume As Steema.TeeChart.Styles.Line
+    Friend WithEvents MarksTip_Hypervolume As Steema.TeeChart.Tools.MarksTip
 
 End Class
