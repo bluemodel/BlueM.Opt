@@ -95,7 +95,7 @@ Public Class PES
     Private Distanceb() As Double           'Array mit Crowding-Distance (Neighbourhood-Rekomb.)
     Private PenaltyDistance(,) As Double    'Array für normierte Raumabstände (Neighbourhood-Rekomb.)
     '---------------------
-    Private SekundärQb(-1) As Individuum    'Sekundäre Population wird mit -1 initialisiert dann länge 0
+    Public SekundärQb(-1) As Individuum    'Sekundäre Population wird mit -1 initialisiert dann länge 0
 
     Const galpha As Double = 1.3            'Faktor alpha = 1.3 auf Generationsebene nach Rechenberg
     Const palpha As Double = 1.1            'Faktor alpha = 1.1 auf Populationsebene nach Rechenberg
@@ -1467,26 +1467,6 @@ StartMutation:
         Individ(i_indi).Distance = 0
 
     End Sub
-
-    'ES_GET_SEKUNDÄRE_POPULATIONEN - Sekundäre Population speichert immer die angegebene
-    'Anzahl von Bestwerten und kann den Bestwertspeicher alle x Generationen überschreiben
-    '*************************************************************************************
-    Public Function SekundärQb_Get() As Double(,)
-
-        Dim j, i As Integer
-        Dim SekPopulation(,) As Double
-
-        ReDim SekPopulation(SekundärQb.GetUpperBound(0), Anz.Penalty - 1)
-
-        For i = 0 To SekundärQb.GetUpperBound(0)
-            For j = 0 To Anz.Penalty - 1
-                SekPopulation(i, j) = SekundärQb(i).Get_Penalty(j)
-            Next j
-        Next i
-
-        Return SekPopulation
-
-    End Function
 
     'NDS_Crowding_Distance_Count
     '***************************

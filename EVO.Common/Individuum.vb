@@ -269,7 +269,6 @@ Public Class Individuum
 
         '14 Location des PES Parent
         Me.iLocation = 777
-
     End Sub
 
     'Konstruktor für ein Array von Individen
@@ -377,6 +376,23 @@ Public Class Individuum
             Dest(i) = Source(i).Clone_Indi()
         Next
     End Sub
+
+    'ES_GET_SEKUNDÄRE_POPULATIONEN - Sekundäre Population speichert immer die angegebene
+    'Anzahl von Bestwerten und kann den Bestwertspeicher alle x Generationen überschreiben
+    '*************************************************************************************
+    Public Shared Function Get_All_Penalty_of_Array(ByVal Indi_Array() as Individuum) As Double(,)
+        Dim j, i As Integer
+        Dim Array(,) As Double
+
+        ReDim Array(Indi_Array.GetUpperBound(0), Manager.AnzPenalty - 1)
+
+        For i = 0 To Indi_Array.GetUpperBound(0)
+            For j = 0 To Manager.AnzPenalty - 1
+                Array(i, j) = Indi_Array(i).Get_Penalty(j)
+            Next j
+        Next i
+        Return Array
+    End Function
 
 #End Region 'Methoden
 

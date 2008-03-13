@@ -47,9 +47,6 @@ Partial Class Form1
     Dim globalAnzRand As Short
     Dim array_x() As Double
     Dim array_y() As Double
-    'TODO: Bestwertspeicher wird nicht genutzt!
-    'Dim Bestwert(,) As Double
-    Dim SekPopulation(,) As Double
     Dim myPara() As EVO.Common.OptParameter
 
     '**** Verschiedenes ****
@@ -946,15 +943,14 @@ Partial Class Form1
                 Call CES1.NDSorting_CES_Control(i_gen)
 
                 'Sekundäre Population
-                SekPopulation = CES1.SekundärQb_Get()
                 If (Not IsNothing(Sim1)) Then
                     'SekPop abspeichern
-                    Call Sim1.OptResult.setSekPop(SekPopulation, i_gen)
+                    Call Sim1.OptResult.setSekPop(Common.Individuum.Get_All_Penalty_of_Array(CES1.SekundärQb), i_gen)
                     'SekPop mit Solution.IDs zeichnen
                     Call SekundärePopulationZeichnen(i_gen)
                 Else
                     'SekPop einfach so zeichnen
-                    Call SekundärePopulationZeichnen(SekPopulation)
+                    Call SekundärePopulationZeichnen(Common.Individuum.Get_All_Penalty_of_Array(CES1.SekundärQb))
                 End If
             End If
             ' ^ ENDE Selectionsprozess
@@ -1500,25 +1496,21 @@ Start_Evolutionsrunden:
                     '====================
                     If (EVO_Einstellungen1.Settings.PES.OptModus = Common.Constants.EVO_MODUS.Multi_Objective) Then
 
-                        'SekPop holen
-                        '------------
-                        SekPopulation = PES1.SekundärQb_Get()
-
                         'Sekpop zeichnen
                         '---------------
                         If (Not IsNothing(Sim1)) Then
                             'SekPop abspeichern
-                            Call Sim1.OptResult.setSekPop(SekPopulation, PES1.PES_iAkt.iAktGen)
+                            Call Sim1.OptResult.setSekPop(Common.Individuum.Get_All_Penalty_of_Array(pes1.SekundärQb), PES1.PES_iAkt.iAktGen)
                             'SekPop mit Solution.IDs zeichnen
                             Call SekundärePopulationZeichnen(PES1.PES_iAkt.iAktGen)
                         Else
                             'SekPop einfach so zeichnen
-                            Call SekundärePopulationZeichnen(SekPopulation)
+                            Call SekundärePopulationZeichnen(Common.Individuum.Get_All_Penalty_of_Array(pes1.SekundärQb))
                         End If
 
                         'Hypervolumen berechnen
                         '----------------------
-                        Call Hypervolume.update_dataset(SekPopulation)
+                        Call Hypervolume.update_dataset(Common.Individuum.Get_All_Penalty_of_Array(pes1.SekundärQb))
                         indicator = Math.Abs(Hypervolume.calc_indicator())
                         nadir = Hypervolume.nadir
 
