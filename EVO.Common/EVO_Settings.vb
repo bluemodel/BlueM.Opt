@@ -7,8 +7,14 @@ Public Class EVO_Settings
     '**** Klasse EVO_Settings                                                   ****
     '**** zum Speichern aller EVO-Einstellungen aus dem Form                    ****
     '****                                                                       ****
+    '**** Autoren: Christoph Hübner, Felix Fröhlich                             ****
+    '****                                                                       ****
     '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
     '**** TU Darmstadt                                                          ****
+    '****                                                                       ****
+    '**** November 2007                                                         ****
+    '****                                                                       ****
+    '**** Letzte Änderung: März 2008                                            ****
     '*******************************************************************************
     '*******************************************************************************
 

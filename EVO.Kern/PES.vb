@@ -18,7 +18,7 @@ Public Class PES
     '**** 3) Deb, Kalyanmoy, Multi-Objective Optimization using Evolutionary    ****
     '****    Algorithms, Wiley, 2001                                            ****
     '****                                                                       ****
-    '**** Dirk Muschalla, Christoph Huebner                                     ****
+    '**** Autoren: Dirk Muschalla, Christoph Hübner                             ****
     '****                                                                       ****
     '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
     '**** TU Darmstadt                                                          ****
@@ -249,7 +249,7 @@ Public Class PES
         'NDSorting wird nur benötigt, falls eine Paretofront approximiert wird
         If (Settings.PES.OptModus = EVO_MODUS.Multi_Objective) Then
             ReDim NDSorting(Settings.PES.n_Eltern + Settings.PES.n_Nachf - 1)
-            Call Individuum.New_Array("NDSorting", NDSorting)
+            Call Individuum.New_Indi_Array("NDSorting", NDSorting)
             If (Settings.PES.OptEltern = EVO_ELTERN.Neighbourhood) Then
                 ReDim PenaltyDistance(Settings.PES.n_Eltern - 1, Settings.PES.n_Eltern - 1)
                 ReDim Distanceb(Settings.PES.n_Eltern - 1)
@@ -1179,8 +1179,8 @@ StartMutation:
 
             'Falls die Qualität des aktuellen Nachkommen besser ist (Penaltyfunktion geringer)
             'als die schlechteste im Bestwertspeicher, wird dieser ersetzt
-            If ind.Penalty(0) < Best.Qb(j, PES_iAkt.iAktPop, 0) Then
-                Best.Qb(j, PES_iAkt.iAktPop, 0) = ind.Penalty(0)
+            If ind.Get_Penalty(0) < Best.Qb(j, PES_iAkt.iAktPop, 0) Then
+                Best.Qb(j, PES_iAkt.iAktPop, 0) = ind.Get_Penalty(0)
                 For v = 0 To Anz.Para - 1
                     'Die Schrittweite wird ebenfalls übernommen
                     Best.Db(v, j, PES_iAkt.iAktPop) = AktPara(v).Dn
@@ -1194,7 +1194,7 @@ StartMutation:
             '----------------------
             With NDSorting(PES_iAkt.iAktNachf)
                 For i = 0 To Manager.AnzZiele - 1
-                    .QWerte(i) = ind.QWerte(i)
+                    .Penalty(i) = ind.Penalty(i)
                 Next i
                 For i = 0 To Anz.Constr - 1
                     .Constrain(i) = ind.Constrain(i)
@@ -1362,7 +1362,7 @@ StartMutation:
             'Zu Beginn den Bestwertspeicher in ein Individuum packen
             'Dimensionieren des Best_Indi
             Dim Best_Indi(Best.Qb.GetUpperBound(0)) As Individuum
-            Call Individuum.New_Array("Bestwerte", Best_Indi)
+            Call Individuum.New_Indi_Array("Bestwerte", Best_Indi)
             'Kopieren in Best_Indi
             For i = 0 To Best.Qb.GetUpperBound(0)
                 Call Copy_Bestwert_to_Individuum(i, i, Best_Indi)
@@ -1417,7 +1417,7 @@ StartMutation:
         Dim j, v As Integer
 
         For j = 0 To Anz.Penalty - 1
-            Best.Qb(i, PES_iAkt.iAktPop, j) = Individ(i).Penalty(j)
+            Best.Qb(i, PES_iAkt.iAktPop, j) = Individ(i).Get_Penalty(j)
         Next j
 
         If Anz.Constr > 0 Then
@@ -1446,7 +1446,7 @@ StartMutation:
         For i = 0 To Manager.AnzZiele - 1
             'HACK: Nur QWerte von OptZielen (d.h. Penalty) werden kopiert!
             If (Manager.List_Ziele(i).isOpt) Then
-                Individ(i_indi).QWerte(i) = Best.Qb(i_best, PES_iAkt.iAktPop, j)
+                Individ(i_indi).Penalty(i) = Best.Qb(i_best, PES_iAkt.iAktPop, j)
                 j += 1
             End If
         Next i
@@ -1480,7 +1480,7 @@ StartMutation:
 
         For i = 0 To SekundärQb.GetUpperBound(0)
             For j = 0 To Anz.Penalty - 1
-                SekPopulation(i, j) = SekundärQb(i).Penalty(j)
+                SekPopulation(i, j) = SekundärQb(i).Get_Penalty(j)
             Next j
         Next i
 

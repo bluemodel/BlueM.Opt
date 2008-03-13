@@ -4,7 +4,7 @@ Public Class TSP
     '*******************************************************************************
     '**** Klasse TSP Traveling Salesman Problem                                 ****
     '****                                                                       ****
-    '**** Christoph Hübner                                                      ****
+    '**** Autor: Christoph Hübner                                               ****
     '****                                                                       ****
     '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
     '**** TU Darmstadt                                                          ****

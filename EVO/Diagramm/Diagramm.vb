@@ -252,9 +252,9 @@ Public Class Diagramm
         'QWerte zu Achsen zuordnen
         For i = 0 To Common.Manager.AnzZiele - 1
             If (Common.Manager.List_Ziele(i).Bezeichnung = xAchse) Then
-                xWert = ind.QWerte(i)
+                xWert = ind.Penalty(i)
             ElseIf (Common.Manager.List_Ziele(i).Bezeichnung = yAchse) Then
-                yWert = ind.QWerte(i)
+                yWert = ind.Penalty(i)
             End If
         Next
 
@@ -280,7 +280,7 @@ Public Class Diagramm
             'QWert zu Z-Achse zuordnen
             For i = 0 To Common.Manager.AnzZiele - 1
                 If (Common.Manager.List_Ziele(i).Bezeichnung = zAchse) Then
-                    zWert = ind.QWerte(i)
+                    zWert = ind.Penalty(i)
                 End If
             Next
 
