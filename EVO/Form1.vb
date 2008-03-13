@@ -1687,7 +1687,7 @@ Start_Evolutionsrunden:
 
         'Indicator in Indikatordiagramm eintragen
         Dim serie1 As Steema.TeeChart.Styles.Line
-        serie1 = Me.DForm.DiagIndicator.getSeriesLine("Hypervolumen", "Red")
+        serie1 = Me.DForm.DiagIndicator.getSeriesLine("Hypervolume")
         serie1.Add(gen, indicator, gen.ToString())
 
         'Nadirpunkt in Hauptdiagramm anzeigen
@@ -1871,6 +1871,7 @@ Start_Evolutionsrunden:
             And Form1.Method <> METH_RESET) Then
             Me.DForm.Diag.Height = Me.DForm.Diag.Height - 70
             Me.DForm.DiagIndicator.Visible = True
+            Call Me.DForm.DiagIndicator.getSeriesLine("Hypervolume").Clear()
         End If
 
         Call Application.DoEvents()
@@ -2321,7 +2322,7 @@ Start_Evolutionsrunden:
                     'Indicator-Diagramm anzeigen
                     Me.DForm.Diag.Height = Me.DForm.Diag.Height - 70
                     Me.DForm.DiagIndicator.Visible = True
-                    Me.DForm.DiagIndicator.Clear()
+                    Call Me.DForm.DiagIndicator.getSeriesLine("Hypervolume").Clear()
 
                     'Hypervolumen instanzieren
                     Dim Hypervolume As EVO.MO_Indicators.Indicators

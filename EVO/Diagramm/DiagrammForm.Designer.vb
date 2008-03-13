@@ -29,8 +29,8 @@ Partial Class DiagrammForm
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.DiagIndicator = New IHWB.EVO.Diagramm
         Me.Line_Hypervolume = New Steema.TeeChart.Styles.Line
-        Me.Diag = New IHWB.EVO.Diagramm
         Me.MarksTip_Hypervolume = New Steema.TeeChart.Tools.MarksTip
+        Me.Diag = New IHWB.EVO.Diagramm
         Me.GroupBox_TChartButtons.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -290,7 +290,7 @@ Partial Class DiagrammForm
         Me.Line_Hypervolume.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
         Me.Line_Hypervolume.Pointer.VertSize = 2
         Me.Line_Hypervolume.Pointer.Visible = True
-        Me.Line_Hypervolume.Title = "Hypervolumen"
+        Me.Line_Hypervolume.Title = "Hypervolume"
         '
         '
         '
@@ -300,6 +300,10 @@ Partial Class DiagrammForm
         '
         '
         Me.Line_Hypervolume.YValues.DataMember = "Y"
+        '
+        'MarksTip_Hypervolume
+        '
+        Me.MarksTip_Hypervolume.Style = Steema.TeeChart.Styles.MarksStyles.XY
         '
         'Diag
         '
@@ -413,12 +417,6 @@ Partial Class DiagrammForm
         '
         Me.Diag.Walls.Right.AutoHide = False
         Me.Diag.Walls.View3D = False
-        '
-        'MarksTip_Hypervolume
-        '
-        Me.MarksTip_Hypervolume.MouseDelay = 10
-        Me.MarksTip_Hypervolume.Series = Me.Line_Hypervolume
-        Me.MarksTip_Hypervolume.Style = Steema.TeeChart.Styles.MarksStyles.XY
         '
         'DiagrammForm
         '
