@@ -2312,6 +2312,44 @@ Start_Evolutionsrunden:
 
                 End If
 
+                'Hypervolumen
+                '============
+                If (Common.Manager.AnzPenalty > 1) Then
+
+                    Dim i As Integer
+
+                    'Indicator-Diagramm anzeigen
+                    Me.DForm.Diag.Height = Me.DForm.Diag.Height - 70
+                    Me.DForm.DiagIndicator.Visible = True
+                    Me.DForm.DiagIndicator.Clear()
+
+                    'Hypervolumen instanzieren
+                    Dim Hypervolume As EVO.MO_Indicators.Indicators
+                    Dim indicator As Double
+                    Dim minmax() As Boolean
+                    Dim nadir() As Double
+                    ReDim minmax(Common.Manager.AnzPenalty - 1)
+                    ReDim nadir(Common.Manager.AnzPenalty - 1)
+                    For i = 0 To Common.Manager.AnzPenalty - 1
+                        minmax(i) = False       'Alle Zielfunktionen sind zu minimieren
+                        nadir(i) = 0            'Anfangswert für Nadirpunkt im Koordinatenursprung
+                    Next
+                    Hypervolume = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(EVO.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, minmax, nadir)
+                    Hypervolume.dimension = Common.Manager.AnzPenalty
+
+                    'Alle Generationen durchlaufen
+                    For Each sekpop As OptResult.Struct_SekPop In Sim1.OptResult.SekPops
+
+                        'Hypervolumen berechnen
+                        Call Hypervolume.update_dataset(Sim1.OptResult.getSekPopValues(sekpop.iGen))
+                        indicator = Math.Abs(Hypervolume.calc_indicator())
+                        nadir = Hypervolume.nadir
+
+                        'Hypervolumen zeichnen
+                        Call Me.HyperVolumenZeichnen(sekpop.iGen, indicator, nadir)
+                    Next
+                End If
+
                 'Ergebnis-Buttons
                 Me.Button_Scatterplot.Enabled = True
 

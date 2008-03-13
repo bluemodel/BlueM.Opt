@@ -40,7 +40,7 @@ Public Class OptResult
     End Structure
 
     'Array von Sekundären Populationen
-    Private SekPops() As Struct_SekPop
+    Public SekPops() As Struct_SekPop
 
     'Array von ausgewählten Lösungen
     Private selSolutionIDs() As Integer
@@ -54,7 +54,7 @@ Public Class OptResult
 
         'Optimierungsbedingungen kopieren
         Me.List_OptParameter = Sim1.List_OptParameter
-        Me.List_OptParameter_Save = sim1.List_OptParameter_Save
+        Me.List_OptParameter_Save = Sim1.List_OptParameter_Save
         Me.List_Constraints = Sim1.List_Constraints
         Me.List_Locations = Sim1.List_Locations
 
@@ -150,17 +150,18 @@ Public Class OptResult
         SekPop = db_getSekPop(_igen)
 
         'SekPop zu OptResult hinzufügen
-        Call addSekPop(SekPop, _igen)
+        Call addSekPop(SekPop)
 
     End Sub
 
     'Sekundäre Population zu OptResult hinzufügen
     '********************************************
-    Private Sub addSekPop(ByVal _sekpop As Struct_SekPop, ByVal _igen As Integer)
+    Private Sub addSekPop(ByVal _sekpop As Struct_SekPop)
 
         'Array von Sekundären Populationen um eins erweitern
-        ReDim Preserve Me.SekPops(_igen)
-        Me.SekPops(_igen) = _sekpop
+        ReDim Preserve Me.SekPops(Me.SekPops.GetUpperBound(0) + 1)
+        'SekPop hinzufügen
+        Me.SekPops(Me.SekPops.getUpperBound(0)) = _sekpop
 
     End Sub
 
@@ -188,6 +189,28 @@ Public Class OptResult
         Next
 
         Return sekpopsolutions
+
+    End Function
+
+    'Gibt die Penalty-Werte einer Sekundären Population zurück
+    '*********************************************************
+    Public Function getSekPopValues(ByVal igen As Integer) As Double(,)
+
+        Dim inds() As Common.Individuum
+        Dim values(,) As Double
+        Dim i, j As Integer
+
+        inds = Me.getSekPop(igen)
+
+        ReDim values(inds.GetUpperBound(0), Common.Manager.AnzPenalty - 1)
+
+        For i = 0 To inds.GetUpperBound(0)
+            For j = 0 To Common.Manager.AnzPenalty - 1
+                values(i, j) = inds(i).Penalty(j)
+            Next
+        Next
+
+        Return values
 
     End Function
 
@@ -550,6 +573,32 @@ Public Class OptResult
 
     End Function
 
+    'Letzte Generation bestimmen
+    '***************************
+    Private Function db_getLastGenNo() As Integer
+
+        Dim command As OleDbCommand
+        Dim igen As Integer
+
+        'Connect
+        Call db_connect()
+
+        Try
+            command = New OleDbCommand("", db)
+            command.CommandText = "SELECT MAX(Generation) FROM SekPop"
+            igen = command.ExecuteScalar()
+        Catch ex As Exception
+            'Keine SekPop vorhanden
+            igen = -1
+        End Try
+
+        'Disconnect
+        Call db_disconnect()
+
+        Return igen
+
+    End Function
+
     'Ergebnisdatenbank abspeichern (kopieren)
     '****************************************
     Public Sub db_save(ByVal targetFile As String)
@@ -576,7 +625,6 @@ Public Class OptResult
         Dim q As String
         Dim adapter As OleDbDataAdapter
         Dim ds As DataSet
-        Dim command As OleDbCommand
 
         'Neuen Dateipfad speichern
         Me.db_path = sourceFile
@@ -600,16 +648,6 @@ Public Class OptResult
 
         ds = New DataSet("EVO")
         numSolutions = adapter.Fill(ds, "Result")
-
-        'Letzte SekPop-Generation bestimmen
-        Try
-            command = New OleDbCommand("", db)
-            command.CommandText = "SELECT MAX(Generation) FROM SekPop"
-            igen = command.ExecuteScalar()
-        Catch ex As Exception
-            'Keine SekPop vorhanden
-            igen = -1
-        End Try
 
         'Disconnect
         Call db_disconnect()
@@ -660,15 +698,19 @@ Public Class OptResult
 
         Next
 
-        'Sekundärpopulation übernehmen
-        '=============================
+        'Alle Sekundärpopulationen übernehmen
+        '====================================
+
+        'Letzte SekPop-Generation bestimmen
+        igen = db_getLastGenNo()
+
         ReDim Me.SekPops(-1)
 
-        If (igen > -1) Then
+        For i = 0 To igen
             Dim SekPop As Struct_SekPop
-            SekPop = db_getSekPop(igen)
-            Call Me.addSekPop(SekPop, igen)
-        End If
+            SekPop = db_getSekPop(i)
+            Call Me.addSekPop(SekPop)
+        Next
 
     End Sub
 
