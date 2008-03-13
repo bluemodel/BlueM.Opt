@@ -622,7 +622,7 @@ Public Class OptResult
 
         Dim i, j As Integer
         Dim numSolutions, igen As Integer
-        Dim q As String
+        Dim q As String = ""
         Dim adapter As OleDbDataAdapter
         Dim ds As DataSet
 
