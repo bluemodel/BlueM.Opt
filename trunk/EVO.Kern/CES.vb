@@ -6,7 +6,7 @@ Public Class CES
     '*******************************************************************************
     '**** Klasse CES Kombinatorische Evolutionsstrategie                        ****
     '****                                                                       ****
-    '**** Christoph Hübner                                                      ****
+    '**** Autor: Christoph Hübner                                               ****
     '****                                                                       ****
     '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
     '**** TU Darmstadt                                                          ****
@@ -161,11 +161,11 @@ Public Class CES
 
         'Parents werden dimensioniert
         ReDim Parents(Settings.CES.n_Parents - 1)
-        Call Individuum.New_Array("Parent", Parents)
+        Call Individuum.New_Indi_Array("Parent", Parents)
 
         'Childs werden dimensioniert
         ReDim Childs(Settings.CES.n_Childs - 1)
-        Call Individuum.New_Array("Child", Childs)
+        Call Individuum.New_Indi_Array("Child", Childs)
 
         'NDSorting wird dimensioniert
         ReDim NDSorting(Settings.CES.n_Childs + Settings.CES.n_Parents - 1)
@@ -306,7 +306,7 @@ Public Class CES
         'xxxxxxxxxxxxxxx
         If Settings.CES.OptStrategie = "minus" Then 'CHECK: sollte das nicht = EVO_STRATEGIE.Komma_Strategie sein?
             For i = 0 To Settings.CES.n_Parents - 1
-                Parents(i) = Childs(i).Clone()
+                Parents(i) = Childs(i).Clone_Indi()
             Next i
 
             'Strategie PLUS
@@ -316,17 +316,17 @@ Public Class CES
             For i = 0 To Settings.CES.n_Childs - 1
                 'Des schlechteste Elter wird bestimmt
                 Dim bad_no As Integer = 0
-                Dim bad_penalty As Double = Parents(0).Penalty(0)
+                Dim bad_penalty As Double = Parents(0).Get_Penalty(0)
                 For j = 1 To Settings.CES.n_Parents - 1
-                    If bad_penalty < Parents(j).Penalty(0) Then
+                    If bad_penalty < Parents(j).Get_Penalty(0) Then
                         bad_no = j
-                        bad_penalty = Parents(j).Penalty(0)
+                        bad_penalty = Parents(j).Get_Penalty(0)
                     End If
                 Next
 
                 'Falls der schlechteste Parent schlechter als der Child ist wird er durch den Child ersetzt
-                If Parents(bad_no).Penalty(0) > Childs(i).Penalty(0) Then
-                    Parents(bad_no) = Childs(i).Clone()
+                If Parents(bad_no).Get_Penalty(0) > Childs(i).Get_Penalty(0) Then
+                    Parents(bad_no) = Childs(i).Clone_Indi()
                 End If
             Next
 
@@ -643,7 +643,7 @@ Public Class CES
 
         PES_Memory(neu) = New Individuum("Memory", neu)
 
-        PES_Memory(neu) = Childs(Child_No).Clone()
+        PES_Memory(neu) = Childs(Child_No).Clone_Indi()
         PES_Memory(neu).Generation = Gen_No
 
     End Sub
@@ -671,7 +671,7 @@ Public Class CES
                             ReDim Preserve PES_Parents_pChild(PES_Parents_pChild.GetLength(0))
                             akt = PES_Parents_pChild.GetUpperBound(0)
                             PES_Parents_pChild(akt) = New Individuum("PES_Parent", PES_Parents_pChild.GetUpperBound(0))
-                            PES_Parents_pChild(akt) = PES_Memory(i_mem).Clone()
+                            PES_Parents_pChild(akt) = PES_Memory(i_mem).Clone_Indi()
                             PES_Parents_pChild(akt).iLocation = i_loc + 1
                             PES_Parents_pChild(akt).Memory_Strat = MEMORY_STRATEGY.C_This_Loc
                         End If
@@ -682,7 +682,7 @@ Public Class CES
                                 ReDim Preserve PES_Parents_pChild(PES_Parents_pChild.GetLength(0))
                                 akt = PES_Parents_pChild.GetUpperBound(0)
                                 PES_Parents_pChild(akt) = New Individuum("PES_Parent", PES_Parents_pChild.GetUpperBound(0))
-                                PES_Parents_pChild(akt) = PES_Memory(i_mem).Clone()
+                                PES_Parents_pChild(akt) = PES_Memory(i_mem).Clone_Indi()
                                 PES_Parents_pChild(akt).iLocation = i_loc + 1
                                 PES_Parents_pChild(akt).Memory_Strat = MEMORY_STRATEGY.B_One_Loc_Up
                             End If
@@ -694,7 +694,7 @@ Public Class CES
                                 ReDim Preserve PES_Parents_pChild(PES_Parents_pChild.GetLength(0))
                                 akt = PES_Parents_pChild.GetUpperBound(0)
                                 PES_Parents_pChild(akt) = New Individuum("PES_Parent", PES_Parents_pChild.GetUpperBound(0))
-                                PES_Parents_pChild(akt) = PES_Memory(i_mem).Clone()
+                                PES_Parents_pChild(akt) = PES_Memory(i_mem).Clone_Indi()
                                 PES_Parents_pChild(akt).iLocation = i_loc + 1
                                 PES_Parents_pChild(akt).Memory_Strat = MEMORY_STRATEGY.A_Two_Loc_Up
                             End If
@@ -713,7 +713,7 @@ Public Class CES
                             ReDim Preserve PES_Parents_pChild(PES_Parents_pChild.GetLength(0))
                             akt = PES_Parents_pChild.GetUpperBound(0)
                             PES_Parents_pChild(akt) = New Individuum("PES_Parent", PES_Parents_pChild.GetUpperBound(0))
-                            PES_Parents_pChild(akt) = PES_Memory(i_mem).Clone()
+                            PES_Parents_pChild(akt) = PES_Memory(i_mem).Clone_Indi()
                             PES_Parents_pChild(akt).iLocation = i_loc + 1
                             PES_Parents_pChild(akt).Memory_Strat = MEMORY_STRATEGY.C_This_Loc
                         End If
@@ -724,7 +724,7 @@ Public Class CES
                                 ReDim Preserve PES_Parents_pChild(PES_Parents_pChild.GetLength(0))
                                 akt = PES_Parents_pChild.GetUpperBound(0)
                                 PES_Parents_pChild(akt) = New Individuum("PES_Parent", PES_Parents_pChild.GetUpperBound(0))
-                                PES_Parents_pChild(akt) = PES_Memory(i_mem).Clone()
+                                PES_Parents_pChild(akt) = PES_Memory(i_mem).Clone_Indi()
                                 PES_Parents_pChild(akt).iLocation = i_loc + 1
                                 PES_Parents_pChild(akt).Memory_Strat = MEMORY_STRATEGY.D_One_Loc_Down
                             End If
@@ -736,7 +736,7 @@ Public Class CES
                                 ReDim Preserve PES_Parents_pChild(PES_Parents_pChild.GetLength(0))
                                 akt = PES_Parents_pChild.GetUpperBound(0)
                                 PES_Parents_pChild(akt) = New Individuum("PES_Parent", PES_Parents_pChild.GetUpperBound(0))
-                                PES_Parents_pChild(akt) = PES_Memory(i_mem).Clone()
+                                PES_Parents_pChild(akt) = PES_Memory(i_mem).Clone_Indi()
                                 PES_Parents_pChild(akt).iLocation = i_loc + 1
                                 PES_Parents_pChild(akt).Memory_Strat = MEMORY_STRATEGY.E_Two_Loc_Down
                             End If
@@ -761,7 +761,7 @@ Public Class CES
     Private Sub Memory_Dubletten_loeschen(ByRef PES_Parents_pChild() As Individuum)
 
         Dim tmp(PES_Parents_pChild.GetUpperBound(0) - 1) As Individuum
-        Call Individuum.New_Array("tmp", tmp)
+        Call Individuum.New_Indi_Array("tmp", tmp)
         Dim isDouble As Boolean
         Dim i, j, x As Integer
 
@@ -774,7 +774,7 @@ Public Class CES
                 End If
             Next
             If isDouble = False Then
-                tmp(x) = PES_Parents_pChild(i).Clone()
+                tmp(x) = PES_Parents_pChild(i).Clone_Indi()
                 x += 1
             End If
         Next
@@ -783,7 +783,7 @@ Public Class CES
         ReDim Preserve PES_Parents_pChild(x - 1)
 
         For i = 0 To tmp.GetUpperBound(0)
-            PES_Parents_pChild(i) = tmp(i).Clone()
+            PES_Parents_pChild(i) = tmp(i).Clone_Indi()
         Next
 
     End Sub
@@ -840,7 +840,7 @@ Public Class CES
                     If PES_Parents_pChild(i).Memory_Strat <= settings.CES.Mem_Strategy - Math.Min(0, PES_Parents_pChild(i).iLocation + settings.CES.Mem_Strategy - 1) then
                         Redim Preserve Tmp(Tmp.GetLength(0))
                         Tmp(Tmp.GetUpperBound(0)) = new Individuum("PES_Parent", Tmp.GetUpperBound(0))
-                        Tmp(Tmp.GetUpperBound(0)) = PES_Parents_pChild(i).Clone
+                        Tmp(Tmp.GetUpperBound(0)) = PES_Parents_pChild(i).Clone_Indi
                     End If
 
                 Case MEMORY_STRATEGY.C_This_Loc
@@ -851,7 +851,7 @@ Public Class CES
                     If PES_Parents_pChild(i).Memory_Strat >= settings.CES.Mem_Strategy + Math.Min(0, Modsett.n_Locations - settings.CES.Mem_Strategy - PES_Parents_pChild(i).iLocation) then
                         Redim Preserve Tmp(Tmp.GetLength(0))
                         Tmp(Tmp.GetUpperBound(0)) = new Individuum("PES_Parent", Tmp.GetUpperBound(0))
-                        Tmp(Tmp.GetUpperBound(0)) = PES_Parents_pChild(i).Clone
+                        Tmp(Tmp.GetUpperBound(0)) = PES_Parents_pChild(i).Clone_Indi
                     End If
             End Select
         Next
@@ -872,7 +872,7 @@ Public Class CES
         For i = 0 To PES_Parents_pChild.GetUpperBound(0)
             If PES_Parents_pChild(i).iLocation = iLoc + 1 Then
                 ReDim Preserve PES_Parents_pLoc(x)
-                PES_Parents_pLoc(x) = PES_Parents_pChild(i).Clone()
+                PES_Parents_pLoc(x) = PES_Parents_pChild(i).Clone_Indi()
                 x += 1
             End If
         Next
@@ -888,7 +888,7 @@ Public Class CES
 
         x = 0
         For i = n To n_eltern - 1
-            Parents_pLoc(i) = Parents_pLoc(x).Clone
+            Parents_pLoc(i) = Parents_pLoc(x).Clone_Indi
             x += 1
             If x = n Then x = 0
         Next
@@ -920,7 +920,7 @@ Public Class CES
 
         For i = 0 To IndividuumList.GetUpperBound(0)
             For j = 0 To IndividuumList.GetUpperBound(0)
-                If IndividuumList(i).Penalty(0) < IndividuumList(j).Penalty(0) Then
+                If IndividuumList(i).Get_Penalty(0) < IndividuumList(j).Get_Penalty(0) Then
                     swap = IndividuumList(i)
                     IndividuumList(i) = IndividuumList(j)
                     IndividuumList(j) = swap
@@ -1033,14 +1033,14 @@ Public Class CES
         Dim i As Short
 
         Dim NDSorting(Settings.CES.n_Childs + Settings.CES.n_Parents - 1) As Individuum
-        Call Individuum.New_Array("NDSorting", NDSorting)
+        Call Individuum.New_Indi_Array("NDSorting", NDSorting)
 
         '0. Eltern und Nachfolger werden gemeinsam betrachtet
         'Die Kinder werden NDSorting hinzugefügt
         '-------------------------------------------
 
         For i = 0 To Settings.CES.n_Childs - 1
-            NDSorting(i) = Childs(i).Clone()
+            NDSorting(i) = Childs(i).Clone_Indi()
             NDSorting(i).dominated = False
             NDSorting(i).Front = 0
             NDSorting(i).Distance = 0
@@ -1051,7 +1051,7 @@ Public Class CES
         '--------------------------------------------------------------------
 
         For i = Settings.CES.n_Childs To Settings.CES.n_Childs + Settings.CES.n_Parents - 1
-            NDSorting(i) = Parents(i - Settings.CES.n_Childs).Clone()
+            NDSorting(i) = Parents(i - Settings.CES.n_Childs).Clone_Indi()
             NDSorting(i).dominated = False
             NDSorting(i).Front = 0
             NDSorting(i).Distance = 0
@@ -1097,12 +1097,12 @@ Public Class CES
         Dim i As Short
 
         Dim NDSorting(PES_Parents_pLoc.GetUpperBound(0)) As Individuum
-        Call Individuum.New_Array("NDSorting", NDSorting)
+        Call Individuum.New_Indi_Array("NDSorting", NDSorting)
 
         '1. ALLE werden reinkopiert (anders als beim normalen Verfahren)
         '---------------------------------------------------------------
         For i = 0 To PES_Parents_pLoc.GetUpperBound(0)
-            NDSorting(i) = PES_Parents_pLoc(i).Clone()
+            NDSorting(i) = PES_Parents_pLoc(i).Clone_Indi()
             NDSorting(i).dominated = False
             NDSorting(i).Front = 0
             NDSorting(i).Distance = 0
@@ -1137,12 +1137,12 @@ Public Class CES
         Dim i As Short
 
         Dim NDSorting(PES_Memory.GetUpperBound(0)) As Individuum
-        Call Individuum.New_Array("NDSorting", NDSorting)
+        Call Individuum.New_Indi_Array("NDSorting", NDSorting)
 
         '1. ALLE werden reinkopiert (anders als beim normalen Verfahren, aber wie bei per Location)
         '------------------------------------------------------------------------------------------
         For i = 0 To PES_Memory.GetUpperBound(0)
-            NDSorting(i) = PES_Memory(i).Clone()
+            NDSorting(i) = PES_Memory(i).Clone_Indi()
             NDSorting(i).dominated = False
             NDSorting(i).Front = 0
             NDSorting(i).Distance = 0
@@ -1180,7 +1180,7 @@ Public Class CES
 
         For i = 0 To SekundärQb.GetUpperBound(0)
             For j = 0 To Manager.AnzPenalty - 1
-                SekPopulation(i, j) = SekundärQb(i).Penalty(j)
+                SekPopulation(i, j) = SekundärQb(i).Get_Penalty(j)
             Next j
         Next i
 

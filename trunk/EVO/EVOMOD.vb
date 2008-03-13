@@ -1,5 +1,20 @@
 Module EVOMOD
 
+    '*******************************************************************************
+    '*******************************************************************************
+    '**** Klasse EVOMOD                                                        ****
+    '****                                                                       ****
+    '**** Autoren: Christoph Hübner, Felix Fröhlich, Dirk Muschalla             ****
+    '****                                                                       ****
+    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
+    '**** TU Darmstadt                                                          ****
+    '****                                                                       ****
+    '**** November 2007                                                         ****
+    '****                                                                       ****
+    '**** Letzte Änderung: November 2007                                        ****
+    '*******************************************************************************
+    '*******************************************************************************
+
     'Anwendungen
     Public Const ANW_BLUEM As String = "BlueM"
     Public Const ANW_SMUSI As String = "SMUSI"

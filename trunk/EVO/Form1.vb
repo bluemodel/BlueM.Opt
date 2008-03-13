@@ -723,10 +723,10 @@ Partial Class Form1
                 If (Anz_SensiPara = 1) Then
                     '1 Parameter
                     serie = DForm.Diag.getSeriesPoint("SensiPlot", "Orange")
-                    serie.Add(ind.Penalty(SensiPlot1.Selected_OptZiel), Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).RWert, n)
+                    serie.Add(ind.Get_Penalty(SensiPlot1.Selected_OptZiel), Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).RWert, n)
                 Else
                     '2 Parameter
-                    surface.Add(Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).RWert, ind.Penalty(SensiPlot1.Selected_OptZiel), Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).RWert, n)
+                    surface.Add(Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).RWert, ind.Get_Penalty(SensiPlot1.Selected_OptZiel), Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).RWert, n)
                 End If
 
                 'Simulationsergebnis in Wave laden
@@ -878,13 +878,13 @@ Partial Class Form1
                 '****************************************
                 'Aktueller Pfad wird an Sim zurückgegeben
                 'Bereitet das BlaueModell für die Kombinatorik vor
-                Call Sim1.PREPARE_Evaluation_CES(CES1.Childs(i_ch).Path, CES1.Childs(i_ch).All_Elem)
+                Call Sim1.PREPARE_Evaluation_CES(CES1.Childs(i_ch).Path, CES1.Childs(i_ch).Get_All_Loc_Elem)
 
                 'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
                 '***************************************************************
                 If Method = METH_HYBRID And EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer Then
-                    If Sim1.Reduce_OptPara_and_ModPara(CES1.Childs(i_ch).All_Elem) Then
-                        Call Sim1.PREPARE_Evaluation_PES(CES1.Childs(i_ch).All_Loc_Para)
+                    If Sim1.Reduce_OptPara_and_ModPara(CES1.Childs(i_ch).Get_All_Loc_Elem) Then
+                        Call Sim1.PREPARE_Evaluation_PES(CES1.Childs(i_ch).Get_All_Loc_PES_Para)
                     End If
                 End If
 
@@ -904,18 +904,18 @@ Partial Class Form1
                     'SingleObjective
                     '---------------
                     serie = DForm.Diag.getSeriesPoint("Childs", "Orange")
-                    Call serie.Add(durchlauf_all, CES1.Childs(i_ch).Penalty(0), durchlauf_all.ToString())
+                    Call serie.Add(durchlauf_all, CES1.Childs(i_ch).Get_Penalty(0), durchlauf_all.ToString())
                 ElseIf (Common.Manager.AnzPenalty = 2) Then
                     'MultiObjective 2D-Diagramm
                     '--------------------------
                     serie = DForm.Diag.getSeriesPoint("Childs", "Orange")
-                    Call serie.Add(CES1.Childs(i_ch).Penalty(0), CES1.Childs(i_ch).Penalty(1), durchlauf_all.ToString())
+                    Call serie.Add(CES1.Childs(i_ch).Get_Penalty(0), CES1.Childs(i_ch).Get_Penalty(1), durchlauf_all.ToString())
                 ElseIf (Common.Manager.AnzPenalty = 3) Then
                     'MultiObjective 3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
                     '---------------------------------------------------------------------------------------
                     Dim serie3D As Steema.TeeChart.Styles.Points3D
                     serie3D = DForm.Diag.getSeries3DPoint("Childs", "Orange")
-                    Call serie3D.Add(CES1.Childs(i_ch).Penalty(0), CES1.Childs(i_ch).Penalty(1), CES1.Childs(i_ch).Penalty(2), durchlauf_all.ToString())
+                    Call serie3D.Add(CES1.Childs(i_ch).Get_Penalty(0), CES1.Childs(i_ch).Get_Penalty(1), CES1.Childs(i_ch).Get_Penalty(2), durchlauf_all.ToString())
                 End If
 
                 System.Windows.Forms.Application.DoEvents()
@@ -939,7 +939,7 @@ Partial Class Form1
                 For i_ch = 0 To EVO_Einstellungen1.Settings.CES.n_Parents - 1
                     'durchlauf += 1
                     serie = DForm.Diag.getSeriesPoint("Parent", "green")
-                    Call serie.Add(durchlauf_all, CES1.Parents(i_ch).Penalty(0))
+                    Call serie.Add(durchlauf_all, CES1.Parents(i_ch).Get_Penalty(0))
                 Next
             Else
                 'NDSorting ******************
@@ -964,7 +964,7 @@ Partial Class Form1
             'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
             If sim1.CES_T_Modus = Common.Constants.CES_T_MODUS.No_Test Then
                 'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
-                Call Common.Individuum.New_Array("Child", CES1.Childs)
+                Call Common.Individuum.New_Indi_Array("Child", CES1.Childs)
                 'Reproduktionsoperatoren, hier gehts dezent zur Sache
                 Call CES1.Reproduction_Control()
                 'Mutationsoperatoren
@@ -1097,7 +1097,7 @@ Partial Class Form1
                 '****************************************
                 'Aktueller Pfad wird an Sim zurückgegeben
                 'Bereitet das BlaueModell für die Kombinatorik vor
-                Call Sim1.PREPARE_Evaluation_CES(CES1.Childs(i).Path, CES1.Childs(i).All_Elem)
+                Call Sim1.PREPARE_Evaluation_CES(CES1.Childs(i).Path, CES1.Childs(i).Get_All_Loc_Elem)
 
                 'Hier werden Child die passenden Elemente zugewiesen
                 Dim j As Integer
@@ -1107,7 +1107,7 @@ Partial Class Form1
 
                 'Reduktion der OptimierungsParameter und immer dann wenn nicht Nullvariante
                 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-                If Sim1.Reduce_OptPara_and_ModPara(CES1.Childs(i).All_Elem) Then
+                If Sim1.Reduce_OptPara_and_ModPara(CES1.Childs(i).Get_All_Loc_Elem) Then
 
                     'Parameterübergabe an PES
                     '************************
@@ -1193,12 +1193,12 @@ Partial Class Form1
             '------------------------------
             Dim serie As Steema.TeeChart.Styles.Series
             serie = DForm.Diag.getSeriesPoint("Hook and Jeeves")
-            Call serie.Add(durchlauf, ind.Penalty(0), durchlauf.ToString())
+            Call serie.Add(durchlauf, ind.Get_Penalty(0), durchlauf.ToString())
 
             Call My.Application.DoEvents()
 
             'Penalties in Bestwert kopieren
-            Call ind.Penalty.CopyTo(QNBest, 0)
+            Call ind.Get_Penalty.CopyTo(QNBest, 0)
 
             'Tastschritte
             '============
@@ -1227,11 +1227,11 @@ Partial Class Form1
                 'Lösung im TeeChart einzeichnen
                 '------------------------------
                 serie = DForm.Diag.getSeriesPoint("Hook and Jeeves")
-                Call serie.Add(durchlauf, ind.Penalty(0), durchlauf.ToString())
+                Call serie.Add(durchlauf, ind.Get_Penalty(0), durchlauf.ToString())
 
                 Call My.Application.DoEvents()
 
-                If (ind.Penalty(0) >= QNBest(0)) Then
+                If (ind.Get_Penalty(0) >= QNBest(0)) Then
 
                     aktuellePara = HookJeeves.Tastschritt(j, Kern.HookeAndJeeves.TastschrittRichtung.Rückwärts)
 
@@ -1256,17 +1256,17 @@ Partial Class Form1
                     'Lösung im TeeChart einzeichnen
                     '------------------------------
                     serie = DForm.Diag.getSeriesPoint("Hook and Jeeves")
-                    Call serie.Add(durchlauf, ind.Penalty(0), durchlauf.ToString())
+                    Call serie.Add(durchlauf, ind.Get_Penalty(0), durchlauf.ToString())
 
                     Call My.Application.DoEvents()
 
-                    If (ind.Penalty(0) >= QNBest(0)) Then
+                    If (ind.Get_Penalty(0) >= QNBest(0)) Then
                         aktuellePara = HookJeeves.TastschrittResetParameter(j)
                     Else
-                        Call ind.Penalty.CopyTo(QNBest, 0)
+                        Call ind.Get_Penalty.CopyTo(QNBest, 0)
                     End If
                 Else
-                    Call ind.Penalty.CopyTo(QNBest, 0)
+                    Call ind.Get_Penalty.CopyTo(QNBest, 0)
                 End If
             Next
 
@@ -1284,7 +1284,7 @@ Partial Class Form1
                 'Lösung im TeeChart einzeichnen
                 '------------------------------
                 serie = DForm.Diag.getSeriesPoint("Hook and Jeeves Best", "Green")
-                Call serie.Add(durchlauf, ind.Penalty(0), durchlauf.ToString())
+                Call serie.Add(durchlauf, ind.Get_Penalty(0), durchlauf.ToString())
 
                 Call My.Application.DoEvents()
 
@@ -1577,12 +1577,12 @@ Start_Evolutionsrunden:
         If (Common.Manager.AnzPenalty = 1) Then
             'SingleObjective
             'xxxxxxxxxxxxxxx
-            If (Not ind.feasible) Then
+            If (Not ind.Is_Feasible) Then
                 serie = DForm.Diag.getSeriesPoint("Population " & (pop + 1).ToString() & " (ungültig)", "Gray")
             Else
                 serie = DForm.Diag.getSeriesPoint("Population " & (pop + 1).ToString())
             End If
-            Call serie.Add(runde * EVO_Einstellungen1.Settings.PES.n_Gen * EVO_Einstellungen1.Settings.PES.n_Nachf + gen * EVO_Einstellungen1.Settings.PES.n_Nachf + nachf, ind.Penalty(0), ind.ID.ToString())
+            Call serie.Add(runde * EVO_Einstellungen1.Settings.PES.n_Gen * EVO_Einstellungen1.Settings.PES.n_Nachf + gen * EVO_Einstellungen1.Settings.PES.n_Nachf + nachf, ind.Get_Penalty(0), ind.ID.ToString())
 
         Else
             'MultiObjective
@@ -1590,23 +1590,23 @@ Start_Evolutionsrunden:
             If (Common.Manager.AnzPenalty = 2) Then
                 '2D-Diagramm
                 '------------------------------------------------------------------------
-                If (Not ind.feasible) Then
+                If (Not ind.Is_Feasible) Then
                     serie = DForm.Diag.getSeriesPoint("Population" & " (ungültig)", "Gray")
                 Else
                     serie = DForm.Diag.getSeriesPoint("Population", "Orange")
                 End If
-                Call serie.Add(ind.Penalty(0), ind.Penalty(1), ind.ID.ToString())
+                Call serie.Add(ind.Get_Penalty(0), ind.Get_Penalty(1), ind.ID.ToString())
 
             Else
                 '3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
                 '------------------------------------------------------------------------
                 Dim serie3D As Steema.TeeChart.Styles.Points3D
-                If (Not ind.feasible) Then
+                If (Not ind.Is_Feasible) Then
                     serie3D = DForm.Diag.getSeries3DPoint("Population" & " (ungültig)", "Gray")
                 Else
                     serie3D = DForm.Diag.getSeries3DPoint("Population", "Orange")
                 End If
-                Call serie3D.Add(ind.Penalty(0), ind.Penalty(1), ind.Penalty(2), ind.ID.ToString())
+                Call serie3D.Add(ind.Get_Penalty(0), ind.Get_Penalty(1), ind.Get_Penalty(2), ind.ID.ToString())
 
             End If
         End If
@@ -1661,7 +1661,7 @@ Start_Evolutionsrunden:
             serie = DForm.Diag.getSeriesPoint("Sekundäre Population", "Green")
             serie.Clear()
             For i = 0 To solutions.GetUpperBound(0)
-                serie.Add(solutions(i).Penalty(0), solutions(i).Penalty(1), solutions(i).ID)
+                serie.Add(solutions(i).Get_Penalty(0), solutions(i).Get_Penalty(1), solutions(i).ID)
             Next i
 
         ElseIf (Common.Manager.AnzPenalty >= 3) Then
@@ -1670,7 +1670,7 @@ Start_Evolutionsrunden:
             serie3D = DForm.Diag.getSeries3DPoint("Sekundäre Population", "Green")
             serie3D.Clear()
             For i = 0 To solutions.GetUpperBound(0)
-                serie3D.Add(solutions(i).Penalty(0), solutions(i).Penalty(1), solutions(i).Penalty(2), solutions(i).ID)
+                serie3D.Add(solutions(i).Get_Penalty(0), solutions(i).Get_Penalty(1), solutions(i).Get_Penalty(2), solutions(i).ID)
             Next i
         Else
             Throw New Exception("Der Parameter 'globalAnzZiel' weist ungültige Parameter auf.")
@@ -2057,18 +2057,18 @@ Start_Evolutionsrunden:
                 Case METH_PES
 
                     'Bereitet das BlueM für PES vor
-                    Call Sim1.PREPARE_Evaluation_PES(ind.All_PES_Para)
+                    Call Sim1.PREPARE_Evaluation_PES(ind.Get_All_PES_Para)
 
                 Case METH_CES, METH_HYBRID
 
                     'Aktueller Pfad wird an Sim zurückgegeben
                     'Bereitet das BlaueModell für die Kombinatorik vor
-                    Call Sim1.PREPARE_Evaluation_CES(ind.Path, ind.All_Elem)
+                    Call Sim1.PREPARE_Evaluation_CES(ind.Path, ind.Get_All_Loc_Elem)
 
                     'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
                     If Form1.Method = METH_HYBRID And EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer Then
-                        Call Sim1.Reduce_OptPara_and_ModPara(ind.All_Elem)
-                        Call Sim1.PREPARE_Evaluation_PES(ind.All_Loc_Para)
+                        Call Sim1.Reduce_OptPara_and_ModPara(ind.Get_All_Loc_Elem)
+                        Call Sim1.PREPARE_Evaluation_PES(ind.Get_All_Loc_PES_Para)
                     End If
 
             End Select
@@ -2255,35 +2255,35 @@ Start_Evolutionsrunden:
                             '1D
                             '--
                             'Constraintverletzung prüfen
-                            If (ind.feasible) Then
+                            If (ind.Is_Feasible) Then
                                 serie = Me.DForm.Diag.getSeriesPoint("Population", "red")
                             Else
                                 serie = Me.DForm.Diag.getSeriesPoint("Population (ungültig)", "Gray")
                             End If
                             'Zeichnen
-                            serie.Add(ind.ID, ind.QWerte(ZielIndexX), ind.ID)
+                            serie.Add(ind.ID, ind.Penalty(ZielIndexX), ind.ID)
                         ElseIf (ZielIndexZ = -1) Then
                             '2D
                             '--
                             'Constraintverletzung prüfen
-                            If (ind.feasible) Then
+                            If (ind.Is_Feasible) Then
                                 serie = Me.DForm.Diag.getSeriesPoint("Population", "Orange")
                             Else
                                 serie = Me.DForm.Diag.getSeriesPoint("Population (ungültig)", "Gray")
                             End If
                             'Zeichnen
-                            serie.Add(ind.QWerte(ZielIndexX), ind.QWerte(ZielIndexY), ind.ID)
+                            serie.Add(ind.Penalty(ZielIndexX), ind.Penalty(ZielIndexY), ind.ID)
                         Else
                             '3D
                             '--
                             'Constraintverletzung prüfen
-                            If (ind.feasible) Then
+                            If (ind.Is_Feasible) Then
                                 serie3D = Me.DForm.Diag.getSeries3DPoint("Population", "Orange")
                             Else
                                 serie3D = Me.DForm.Diag.getSeries3DPoint("Population (ungültig)", "Gray")
                             End If
                             'Zeichnen
-                            serie3D.Add(ind.QWerte(ZielIndexX), ind.QWerte(ZielIndexY), ind.QWerte(ZielIndexZ), ind.ID)
+                            serie3D.Add(ind.Penalty(ZielIndexX), ind.Penalty(ZielIndexY), ind.Penalty(ZielIndexZ), ind.ID)
                         End If
 
                     Next
@@ -2299,12 +2299,12 @@ Start_Evolutionsrunden:
                             '2D
                             '--
                             serie = Me.DForm.Diag.getSeriesPoint("Sekundäre Population", "Green")
-                            serie.Add(sekpopind.QWerte(ZielIndexX), sekpopind.QWerte(ZielIndexY), sekpopind.ID)
+                            serie.Add(sekpopind.Penalty(ZielIndexX), sekpopind.Penalty(ZielIndexY), sekpopind.ID)
                         Else
                             '3D
                             '--
                             serie3D = Me.DForm.Diag.getSeries3DPoint("Sekundäre Population", "Green")
-                            serie3D.Add(sekpopind.QWerte(ZielIndexX), sekpopind.QWerte(ZielIndexY), sekpopind.QWerte(ZielIndexZ), sekpopind.ID)
+                            serie3D.Add(sekpopind.Penalty(ZielIndexX), sekpopind.Penalty(ZielIndexY), sekpopind.Penalty(ZielIndexZ), sekpopind.ID)
                         End If
                     Next
 

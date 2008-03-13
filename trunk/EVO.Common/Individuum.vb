@@ -4,7 +4,7 @@ Public Class Individuum
     '*******************************************************************************
     '**** Klasse Individuum für das Speichern eines Evaluierungssatzes          ****
     '****                                                                       ****
-    '**** Christoph Hübner                                                      ****
+    '**** Autoren: Christoph Hübner, Felix Fröhlich                             ****
     '****                                                                       ****
     '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
     '**** TU Darmstadt                                                          ****
@@ -24,14 +24,6 @@ Public Class Individuum
     Private Shared n_Para As Integer
     Private Shared n_Constrain As Integer
 
-    Public Shared Sub Initialise(ByVal _Individ_Type As Integer, ByVal _n_Locations As Integer, ByVal _n_Para As Integer, ByVal _n_Constrain As Integer)
-        Individuum.Individ_Type = _Individ_Type
-        Individuum.n_Locations = _n_Locations
-        Individuum.n_Para = _n_Para
-        Individuum.n_Constrain = _n_Constrain
-    End Sub
-
-
     'Strukturen der Klasse
     '*********************
 
@@ -39,29 +31,7 @@ Public Class Individuum
     Public ID As Integer                   '02 Nummer des Individuum
     Public Path() As Integer               '03 Der Pfad
 
-    Public QWerte() As Double              'Array der QWerte (für alle Zielfunktionen)
-    
-    'Penalty-Werte                         '(= QWerte nur von OptZielen!)
-    Public ReadOnly Property Penalty() As Double()
-        Get
-            Dim i, j As Integer
-            Dim array() As Double
-
-            ReDim array(Common.Manager.AnzPenalty - 1)
-
-            j = 0
-            For i = 0 To Common.Manager.AnzZiele - 1
-                'Nur die QWerte von OptZielen zurückgeben!
-                If (Common.Manager.List_Ziele(i).isOpt) Then
-                    array(j) = Me.QWerte(i)
-                    j += 1
-                End If
-            Next
-
-            Return array
-        End Get
-    End Property
-
+    Public Penalty() As Double              'Array der QWerte (für alle Zielfunktionen)
     Public Constrain() As Double           '05 Werte der Randbedingung(en)
     Public mutated As Boolean              '06 Gibt an ob der Wert bereits mutiert ist oder nicht
 
@@ -82,9 +52,53 @@ Public Class Individuum
     Public Memory_Strat As MEMORY_STRATEGY '13 Memory_Strategie des PES Elters
     Public iLocation As Integer            '14 Location des PES Parent
 
-    'Gibt zurück ob Individuum gültig ist
-    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    Public ReadOnly Property feasible() As Boolean
+    'Informationen pro Location
+    '**************************
+    Public Structure Location_Data
+
+        Dim Loc_Elem() As String            '11a Die Elemente die zur Location gehören
+        Dim PES_OptPara() As OptParameter   'Array für das Speicherrn der PES Parameter
+
+    End Structure
+
+    'Gibt die Array mit den Penalties zurück
+    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    Public ReadOnly Property Get_Penalty() As Double()
+        Get
+            Dim i, j As Integer
+            Dim Array() As Double
+
+            ReDim Array(Common.Manager.AnzPenalty - 1)
+
+            j = 0
+            For i = 0 To Common.Manager.AnzZiele - 1
+                'Nur die QWerte von OptZielen zurückgeben!
+                If (Common.Manager.List_Ziele(i).isOpt) Then
+                    Array(j) = Me.Penalty(i)
+                    j += 1
+                End If
+            Next
+            Return Array
+        End Get
+    End Property
+
+    'Gibt ein Array mit den PES Parametern zurück
+    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    Public ReadOnly Property Get_All_PES_Para() As Double()
+        Get
+            Dim i As Integer
+            Dim Array(-1) As Double
+            For i = 0 To PES_OptParas.GetUpperBound(0)
+                ReDim Preserve Array(Array.GetLength(0))
+                Array(Array.GetUpperBound(0)) = PES_OptParas(i).Xn
+            Next
+            Return Array
+        End Get
+    End Property
+
+    'Gibt zurück ob Individuum feasable ist
+    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    Public ReadOnly Property Is_Feasible() As Boolean
         Get
             For i As Integer = 0 To Me.Constrain.GetUpperBound(0)
                 If (Me.Constrain(i) < 0) Then Return False
@@ -93,43 +107,9 @@ Public Class Individuum
         End Get
     End Property
 
-    'Gibt ein Array mit den Elementen aller Locations zurück
-    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    Public ReadOnly Property All_Elem() As String()
-        Get
-            Dim i As Integer
-            Dim array() As String = {}
-            For i = 0 To Loc.GetUpperBound(0)
-                If Loc(i).Loc_Elem.GetLength(0) = 0 Then
-                    Throw New Exception("Die Element Gesamtliste wurde abgerufen bevor die Elemente pro Location ermittelt wurden")
-                End If
-                ReDim Preserve array(array.GetUpperBound(0) + Loc(i).Loc_Elem.GetLength(0))
-                System.Array.Copy(Loc(i).Loc_Elem, 0, array, array.GetUpperBound(0) - Loc(i).Loc_Elem.GetUpperBound(0), Loc(i).Loc_Elem.GetLength(0))
-            Next
-            All_Elem = array.Clone
-        End Get
-    End Property
-
-    'Gibt ein Array mit den Parametern aller Locations zurück !oder!
-    'Setzt die Zahl der locations auf 1 und schreibt dort alle Parameter rein
-    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    Public ReadOnly Property All_PES_Para() As Double()
-        Get
-            Dim i As Integer
-            Dim Array(-1) As Double
-            For i = 0 To PES_OptParas.GetUpperBound(0)
-                ReDim Preserve Array(Array.GetLength(0))
-                Array(Array.GetUpperBound(0)) = PES_OptParas(i).Xn
-            Next
-            All_PES_Para = Array.Clone
-        End Get
-    End Property
-
-
-    'Gibt ein Array mit den Parametern aller Locations zurück !oder!
-    'Setzt die Zahl der locations auf 1 und schreibt dort alle Parameter rein
-    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    Public ReadOnly Property All_Loc_Para() As Double()
+    'Gibt ein Array mit den PES Parametern aller Locations zurück
+    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    Public ReadOnly Property Get_All_Loc_PES_Para() As Double()
         Get
             Dim i, j, x As Integer
             Dim array(-1) As Double
@@ -141,9 +121,46 @@ Public Class Individuum
                     x += 1
                 Next
             Next
-            All_Loc_Para = array.Clone
+            Return Array
         End Get
     End Property
+
+    'Gibt ein Array mit den DNs Parametern aller Locations zurück
+    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    Public ReadOnly Property Get_All_Loc_PES_Dn() As Double()
+        Get
+            Dim i, j, x As Integer
+            Dim Array(-1) As Double
+            x = 0
+            For i = 0 To Loc.GetUpperBound(0)
+                For j = 0 To Loc(i).PES_OptPara.GetUpperBound(0)
+                    ReDim Preserve Array(x)
+                    Array(x) = Loc(i).PES_OptPara(j).Dn
+                    x += 1
+                Next
+            Next
+            Return Array
+        End Get
+
+    End Property
+
+    'Gibt ein Array mit den Elementen aller Locations zurück
+    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    Public ReadOnly Property Get_All_Loc_Elem() As String()
+        Get
+            Dim i As Integer
+            Dim Array() As String = {}
+            For i = 0 To Loc.GetUpperBound(0)
+                If Loc(i).Loc_Elem.GetLength(0) = 0 Then
+                    Throw New Exception("Die Element Gesamtliste wurde abgerufen bevor die Elemente pro Location ermittelt wurden")
+                End If
+                ReDim Preserve Array(Array.GetUpperBound(0) + Loc(i).Loc_Elem.GetLength(0))
+                System.Array.Copy(Loc(i).Loc_Elem, 0, Array, Array.GetUpperBound(0) - Loc(i).Loc_Elem.GetUpperBound(0), Loc(i).Loc_Elem.GetLength(0))
+            Next
+            Return Array
+        End Get
+    End Property
+
 
     'Schreibt alle Parameter aus der DB zurück ins Individuum
     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -159,37 +176,6 @@ Public Class Individuum
         End Set
     End Property
 
-
-    'Gibt ein Array mit den DNs aller Locations zurück !oder!
-    'Setzt die Zahl der locations auf 1 und schreibt dort alle DNs rein
-    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    Public ReadOnly Property All_DN() As Double()
-        Get
-            Dim i, j, x As Integer
-            Dim array(-1) As Double
-            x = 0
-            For i = 0 To Loc.GetUpperBound(0)
-                For j = 0 To Loc(i).PES_OptPara.GetUpperBound(0)
-                    ReDim Preserve array(x)
-                    array(x) = Loc(i).PES_OptPara(j).Dn
-                    x += 1
-                Next
-            Next
-            All_DN = array.Clone
-        End Get
-
-    End Property
-
-
-    'Informationen pro Location
-    '**************************
-    Public Structure Location_Data
-
-        Dim Loc_Elem() As String            '11a Die Elemente die zur Location gehören
-        Dim PES_OptPara() As OptParameter   'Array für das Speicherrn der PES Parameter
-
-    End Structure
-
 #End Region 'Eigenschaften
 
 #Region "Methoden"
@@ -197,9 +183,18 @@ Public Class Individuum
     'Methoden
     '########
 
-    'Konstruktor
-    '***********
-    Public Sub New(ByVal _Type As String, ByVal _ID As Integer)
+    'Initialisiert ein Individuum
+    '****************************
+    Public Shared Sub Initialise(ByVal _Individ_Type As Integer, ByVal _n_Locations As Integer, ByVal _n_Para As Integer, ByVal _n_Constrain As Integer)
+        Individuum.Individ_Type = _Individ_Type
+        Individuum.n_Locations = _n_Locations
+        Individuum.n_Para = _n_Para
+        Individuum.n_Constrain = _n_Constrain
+    End Sub
+
+    'Konstruktor für ein Individuum
+    '******************************
+    Public Sub New (ByVal _Type As String, ByVal _ID As Integer)
 
         Dim i, j As Integer
 
@@ -216,9 +211,9 @@ Public Class Individuum
         Next
 
         '04 QWerte
-        ReDim Me.QWerte(Common.Manager.AnzZiele - 1)
+        ReDim Me.Penalty(Common.Manager.AnzZiele - 1)
         For j = 0 To Common.Manager.AnzZiele - 1
-            Me.QWerte(j) = Double.MaxValue
+            Me.Penalty(j) = Double.MaxValue
         Next
 
         '05 Wert der Randbedingung(en)
@@ -277,7 +272,9 @@ Public Class Individuum
 
     End Sub
 
-    Public Shared Sub New_Array(ByVal _Type As String, ByRef Array() As Individuum)
+    'Konstruktor für ein Array von Individen
+    '***************************************
+    Public Shared Sub New_Indi_Array(ByVal _Type As String, ByRef Array() As Individuum)
         Dim i As Integer
 
         For i = 0 To Array.GetUpperBound(0)
@@ -286,9 +283,9 @@ Public Class Individuum
     End Sub
 
 
-    'Überladen Methode die ein Individuum kopiert
-    '*********************************************
-    Public Function Clone() As Individuum
+    'Kopiert ein Individuum
+    '**********************
+    Public Function Clone_Indi() As Individuum
 
         Dim i, j As Integer
         Dim Dest As New Individuum(Me.Type, Me.ID)
@@ -304,7 +301,7 @@ Public Class Individuum
         Array.Copy(Me.Path, Dest.Path, Me.Path.Length)
 
         '04 QWerte
-        Call Array.Copy(Me.QWerte, Dest.QWerte, Me.QWerte.Length)
+        Call Array.Copy(Me.Penalty, Dest.Penalty, Me.Penalty.Length)
 
         '05 Wert der Randbedingung(en)
         ReDim Dest.Constrain(Me.Constrain.GetUpperBound(0))
@@ -371,13 +368,13 @@ Public Class Individuum
 
     End Function
 
-    'Überladen Methode die ein Array aus Individuen kopiert
-    '******************************************************
-    Public Shared Sub Copy_Array(ByVal Source() As Individuum, ByRef Dest() As Individuum)
+    'Kopiert ein Array von Individuuen
+    '*********************************
+    Public Shared Sub Clone_Indi_Array(ByVal Source() As Individuum, ByRef Dest() As Individuum)
         Dim i As Integer
 
         For i = 0 To Source.GetUpperBound(0)
-            Dest(i) = Source(i).Clone()
+            Dest(i) = Source(i).Clone_Indi()
         Next
     End Sub
 

@@ -3,6 +3,21 @@ Option Explicit On
 
 Public Module Constants
 
+    '*******************************************************************************
+    '*******************************************************************************
+    '**** Klasse Constants                                                      ****
+    '****                                                                       ****
+    '**** Autoren: Felix Fröhlich, Christoph Hübner                             ****
+    '****                                                                       ****
+    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
+    '**** TU Darmstadt                                                          ****
+    '****                                                                       ****
+    '**** November 2007                                                         ****
+    '****                                                                       ****
+    '**** Letzte Änderung: März 2008                                            ****
+    '*******************************************************************************
+    '*******************************************************************************
+
     'Option für Startvorgabe für Optimierung
     Public Enum EVO_STARTPARAMETER As Integer
         Zufall = 1

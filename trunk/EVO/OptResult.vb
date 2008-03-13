@@ -9,7 +9,7 @@ Public Class OptResult
     '**** Speichert und verwaltet die Ergebnisse eines Optimierungslaufs,       ****
     '**** schreibt die Ergebnisse in eine Datenbank                             ****
     '****                                                                       ****
-    '**** Autoren: Felix Froehlich                                              ****
+    '**** Autoren: Felix Froehlich, Christoph Hübner                            ****
     '****                                                                       ****
     '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
     '**** TU Darmstadt                                                          ****
@@ -114,7 +114,7 @@ Public Class OptResult
 
         'Lösung zu OptResult hinzufügen
         ReDim Preserve Me.Solutions(Me.Solutions.GetUpperBound(0) + 1)
-        Me.Solutions(Me.Solutions.GetUpperBound(0)) = Ind.Clone()
+        Me.Solutions(Me.Solutions.GetUpperBound(0)) = Ind.Clone_Indi()
 
         'In DB speichern
         Call Me.db_insert(Ind)
@@ -206,7 +206,7 @@ Public Class OptResult
 
         For i = 0 To inds.GetUpperBound(0)
             For j = 0 To Common.Manager.AnzPenalty - 1
-                values(i, j) = inds(i).Penalty(j)
+                values(i, j) = inds(i).Get_Penalty(j)
             Next
         Next
 
@@ -414,7 +414,7 @@ Public Class OptResult
         Dim fieldvalues As String = ""
         For i = 0 To Common.Manager.AnzZiele - 1
             fieldnames &= ", [" & Common.Manager.List_Ziele(i).Bezeichnung & "]"
-            fieldvalues &= ", " & ind.QWerte(i).ToString(Common.Provider.FortranProvider)
+            fieldvalues &= ", " & ind.Penalty(i).ToString(Common.Provider.FortranProvider)
         Next
         command.CommandText = "INSERT INTO QWerte (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
         command.ExecuteNonQuery()
@@ -677,7 +677,7 @@ Public Class OptResult
                 'QWerte
                 '------
                 For j = 0 To Common.Manager.AnzZiele - 1
-                    .QWerte(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Ziele(j).Bezeichnung)
+                    .Penalty(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Ziele(j).Bezeichnung)
                 Next
 
                 'Constraints

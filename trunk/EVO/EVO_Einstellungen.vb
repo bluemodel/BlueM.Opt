@@ -6,6 +6,21 @@ Imports IHWB.EVO.Common.Constants
 Public Class EVO_Einstellungen
     Inherits System.Windows.Forms.UserControl
 
+    '*******************************************************************************
+    '*******************************************************************************
+    '**** Klasse EVO_Einstellungen                                              ****
+    '****                                                                       ****
+    '**** Autoren: Christoph Hübner, Felix Fröhlich, Dirk Muschalla             ****
+    '****                                                                       ****
+    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
+    '**** TU Darmstadt                                                          ****
+    '****                                                                       ****
+    '**** November 2007                                                         ****
+    '****                                                                       ****
+    '**** Letzte Änderung: November 2007                                        ****
+    '*******************************************************************************
+    '*******************************************************************************
+
     'Eigenschaften
     '#############
 
