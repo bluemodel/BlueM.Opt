@@ -507,13 +507,13 @@ Public MustInherit Class Sim
                     ext = Path.GetExtension(.ZielReiheDatei)
                     Select Case (ext.ToUpper)
                         Case ".WEL"
-                            Dim WEL As New Wave.WEL(Me.WorkDir & .ZielReiheDatei, True)
+                            Dim WEL As New Wave.WEL(Me.WorkDir & .ZielReiheDatei)
                             .ZielReihe = WEL.getReihe(.ZielGr)
                         Case ".ASC"
-                            Dim ASC As New Wave.ASC(Me.WorkDir & .ZielReiheDatei, True)
+                            Dim ASC As New Wave.ASC(Me.WorkDir & .ZielReiheDatei)
                             .ZielReihe = ASC.getReihe(.ZielGr)
                         Case ".ZRE"
-                            Dim ZRE As New Wave.ZRE(Me.WorkDir & .ZielReiheDatei, True)
+                            Dim ZRE As New Wave.ZRE(Me.WorkDir & .ZielReiheDatei)
                             .ZielReihe = ZRE.Zeitreihen(0)
                             'Case ".PRB"
                             'BUG 183: geht nicht mehr, weil PRB-Dateien keine Zeitreihen sind!
@@ -631,10 +631,10 @@ Public MustInherit Class Sim
                         ext = Path.GetExtension(.GrenzReiheDatei)
                         Select Case (ext.ToUpper)
                             Case ".WEL"
-                                Dim WEL As New Wave.WEL(Me.WorkDir & .GrenzReiheDatei, True)
+                                Dim WEL As New Wave.WEL(Me.WorkDir & .GrenzReiheDatei)
                                 .GrenzReihe = WEL.getReihe(.GrenzGr)
                             Case ".ZRE"
-                                Dim ZRE As New Wave.ZRE(Me.WorkDir & .GrenzReiheDatei, True)
+                                Dim ZRE As New Wave.ZRE(Me.WorkDir & .GrenzReiheDatei)
                                 .GrenzReihe = ZRE.Zeitreihen(0)
                             Case Else
                                 Throw New Exception("Das Format der Grenzwertreihe '" & .GrenzReiheDatei & "' wurde nicht erkannt!")
