@@ -1442,12 +1442,6 @@ Start_Evolutionsrunden:
                             'OptParameter in Individuum kopieren
                             ind.PES_OptParas = myPara
 
-                            'Auslesen des Bestwertspeichers
-                            'TODO: Bestwertspeicher wird nicht genutzt!
-                            'If (EVO_Einstellungen1.Settings.PES.OptModus = Kern.EVO_MODUS.Single_Objective) Then
-                            '    Bestwert = PES1.EsGetBestwert()
-                            'End If
-
                             'Ansteuerung der zu optimierenden Anwendung
                             'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
                             Select Case Anwendung
