@@ -24,4 +24,14 @@ Public Class ScatterplotDialog
         End If
     End Sub
 
+    Private Sub LinkLabel_CheckAll_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles LinkLabel_CheckAll.LinkClicked
+
+        Dim i As Integer
+
+        'Alle Ziele auswählen
+        For i = 0 To Me.CheckedListBox_Ziele.Items.Count - 1
+            Me.CheckedListBox_Ziele.SetItemCheckState(i, CheckState.Checked)
+        Next
+
+    End Sub
 End Class

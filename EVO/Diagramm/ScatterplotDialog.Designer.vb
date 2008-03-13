@@ -29,6 +29,7 @@ Partial Class ScatterplotDialog
         Me.CheckedListBox_Ziele = New System.Windows.Forms.CheckedListBox
         Me.CheckBox_SekPopOnly = New System.Windows.Forms.CheckBox
         Me.GroupBox2 = New System.Windows.Forms.GroupBox
+        Me.LinkLabel_CheckAll = New System.Windows.Forms.LinkLabel
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.SuspendLayout()
@@ -55,10 +56,11 @@ Partial Class ScatterplotDialog
         '
         'GroupBox1
         '
+        Me.GroupBox1.Controls.Add(Me.LinkLabel_CheckAll)
         Me.GroupBox1.Controls.Add(Me.CheckedListBox_Ziele)
         Me.GroupBox1.Location = New System.Drawing.Point(12, 12)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(164, 171)
+        Me.GroupBox1.Size = New System.Drawing.Size(164, 201)
         Me.GroupBox1.TabIndex = 1
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Zielauswahl"
@@ -69,12 +71,14 @@ Partial Class ScatterplotDialog
         Me.CheckedListBox_Ziele.FormattingEnabled = True
         Me.CheckedListBox_Ziele.Location = New System.Drawing.Point(6, 19)
         Me.CheckedListBox_Ziele.Name = "CheckedListBox_Ziele"
-        Me.CheckedListBox_Ziele.Size = New System.Drawing.Size(148, 139)
+        Me.CheckedListBox_Ziele.Size = New System.Drawing.Size(148, 154)
         Me.CheckedListBox_Ziele.TabIndex = 0
         '
         'CheckBox_SekPopOnly
         '
         Me.CheckBox_SekPopOnly.AutoSize = True
+        Me.CheckBox_SekPopOnly.Checked = True
+        Me.CheckBox_SekPopOnly.CheckState = System.Windows.Forms.CheckState.Checked
         Me.CheckBox_SekPopOnly.Location = New System.Drawing.Point(9, 19)
         Me.CheckBox_SekPopOnly.Name = "CheckBox_SekPopOnly"
         Me.CheckBox_SekPopOnly.Size = New System.Drawing.Size(128, 17)
@@ -91,6 +95,16 @@ Partial Class ScatterplotDialog
         Me.GroupBox2.TabIndex = 3
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Sekundäre Population"
+        '
+        'LinkLabel_CheckAll
+        '
+        Me.LinkLabel_CheckAll.AutoSize = True
+        Me.LinkLabel_CheckAll.Location = New System.Drawing.Point(6, 179)
+        Me.LinkLabel_CheckAll.Name = "LinkLabel_CheckAll"
+        Me.LinkLabel_CheckAll.Size = New System.Drawing.Size(78, 13)
+        Me.LinkLabel_CheckAll.TabIndex = 1
+        Me.LinkLabel_CheckAll.TabStop = True
+        Me.LinkLabel_CheckAll.Text = "Alle auswählen"
         '
         'ScatterplotDialog
         '
@@ -112,6 +126,7 @@ Partial Class ScatterplotDialog
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = "Scatterplot-Matrix"
         Me.GroupBox1.ResumeLayout(False)
+        Me.GroupBox1.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
         Me.ResumeLayout(False)
@@ -123,5 +138,6 @@ Partial Class ScatterplotDialog
     Friend WithEvents CheckedListBox_Ziele As System.Windows.Forms.CheckedListBox
     Friend WithEvents CheckBox_SekPopOnly As System.Windows.Forms.CheckBox
     Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
+    Friend WithEvents LinkLabel_CheckAll As System.Windows.Forms.LinkLabel
 
 End Class
