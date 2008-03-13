@@ -57,6 +57,14 @@ Partial Class Form1
     Private WithEvents solutionDialog As SolutionDialog
     Private WithEvents scatterplot1 As Scatterplot
 
+    'Hypervolumen instanzieren Part 1
+    '--------------------------------
+    Dim i as Integer
+    Dim Hypervolume As EVO.MO_Indicators.Indicators
+    Dim indicator As Double
+    Dim minmax() As Boolean
+    Dim nadir() As Double
+
 #End Region 'Eigenschaften
 
 #Region "Methoden"
@@ -523,7 +531,7 @@ Partial Class Form1
     'XXXXXXXXXXXXXXXXXXXXXXXXXX
 
     Private Sub STARTEN_Button_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Button_Start.Click
-
+    
         If (Me.isrun And Not Me.ispause) Then
             'Optimierung pausieren
             '---------------------
@@ -805,9 +813,26 @@ Partial Class Form1
 
     End Sub
 
+    'Dimesnioniert das Hypervolume
+    '*****************************
+    Private Sub Dim_Hypervolume()
+        ReDim minmax(Common.Manager.AnzPenalty - 1)
+        ReDim nadir(Common.Manager.AnzPenalty - 1)
+        For i = 0 To Common.Manager.AnzPenalty - 1
+            minmax(i) = False       'Alle Zielfunktionen sind zu minimieren
+            nadir(i) = 0            'Anfangswert für Nadirpunkt im Koordinatenursprung
+        Next
+    End Sub
+    
     'Anwendung CES und CES_PES             
     '*************************
     Private Sub STARTEN_CES_or_HYBRID()
+
+        'Hypervolumen instanzieren
+        '-------------------------
+        Call Dim_Hypervolume()
+        Hypervolume = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(EVO.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, minmax, nadir)
+        Hypervolume.dimension = Common.Manager.AnzPenalty
 
         'CES initialisieren
         '******************
@@ -952,6 +977,15 @@ Partial Class Form1
                     'SekPop einfach so zeichnen
                     Call SekundärePopulationZeichnen(Common.Individuum.Get_All_Penalty_of_Array(CES1.SekundärQb))
                 End If
+
+                'Hypervolumen berechnen
+                '----------------------
+                Call Hypervolume.update_dataset(Common.Individuum.Get_All_Penalty_of_Array(CES1.SekundärQb))
+                indicator = Math.Abs(Hypervolume.calc_indicator())
+
+                'Hypervolumen zeichnen
+                '---------------------
+                Call Me.HyperVolumenZeichnen(i_gen, indicator, Hypervolume.nadir)
             End If
             ' ^ ENDE Selectionsprozess
             'xxxxxxxxxxxxxxxxxxxxxxxxx
@@ -1328,22 +1362,13 @@ Partial Class Form1
     '************************************************************************
     Private Sub STARTEN_PES()
 
-        Dim i, durchlauf As Integer
+        Dim durchlauf As Integer
         Dim ind As Common.Individuum
         Dim PES1 As EVO.Kern.PES
 
         'Hypervolumen instanzieren
         '-------------------------
-        Dim Hypervolume As EVO.MO_Indicators.Indicators
-        Dim indicator As Double
-        Dim minmax() As Boolean
-        Dim nadir() As Double
-        ReDim minmax(Common.Manager.AnzPenalty - 1)
-        ReDim nadir(Common.Manager.AnzPenalty - 1)
-        For i = 0 To Common.Manager.AnzPenalty - 1
-            minmax(i) = False       'Alle Zielfunktionen sind zu minimieren
-            nadir(i) = 0            'Anfangswert für Nadirpunkt im Koordinatenursprung
-        Next
+        Call Dim_Hypervolume()
         Hypervolume = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(EVO.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, minmax, nadir)
         Hypervolume.dimension = Common.Manager.AnzPenalty
 
@@ -1506,11 +1531,10 @@ Start_Evolutionsrunden:
                         '----------------------
                         Call Hypervolume.update_dataset(Common.Individuum.Get_All_Penalty_of_Array(pes1.SekundärQb))
                         indicator = Math.Abs(Hypervolume.calc_indicator())
-                        nadir = Hypervolume.nadir
 
                         'Hypervolumen zeichnen
                         '---------------------
-                        Call Me.HyperVolumenZeichnen(PES1.PES_iAkt.iAktGen, indicator, nadir)
+                        Call Me.HyperVolumenZeichnen(PES1.PES_iAkt.iAktGen, indicator, Hypervolume.nadir)
 
                     End If
 
