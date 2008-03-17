@@ -1276,18 +1276,20 @@ Public MustInherit Class Sim
         Dim WertStr As String
         Dim AnzZeichen As Short
         Dim AnzZeil As Integer
-        Dim j As Integer
+        Dim i, j As Integer
         Dim Zeilenarray() As String
         Dim Zeile As String
         Dim StrLeft As String
         Dim StrRight As String
         Dim DateiPfad As String
+        Dim WriteCheck As Boolean = False
 
         'ModellParameter aus OptParametern kalkulieren()
         Call OptParameter_to_ModellParameter()
 
         'Alle ModellParameter durchlaufen
-        For i As Integer = 0 To List_ModellParameter.GetUpperBound(0)
+        For i = 0 To List_ModellParameter.GetUpperBound(0)
+            WriteCheck = True
 
             DateiPfad = WorkDir & Datensatz & "." & List_ModellParameter(i).Datei
             'Datei öffnen
@@ -1370,8 +1372,11 @@ Handler:
 
             StrWriteSync.Close()
             StrWrite.Close()
-
         Next
+
+        If Not WriteCheck Then
+            Throw New Exception("Es wurde kein Parameter geschrieben.")
+        End If
 
     End Sub
 
