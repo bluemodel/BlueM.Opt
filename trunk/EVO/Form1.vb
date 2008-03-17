@@ -831,7 +831,6 @@ Partial Class Form1
 
         'Laufvariable für die Generationen
         Dim i_gen, i_ch, i_loc As Integer
-        Dim m As Integer
 
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
@@ -874,12 +873,10 @@ Partial Class Form1
             For i_ch = 0 To CES1.Settings.CES.n_Childs - 1
                 durchlauf_all += 1
 
-                'Um Modellfehler bzw. Evaluierungsabbrüche abzufangen
-                'TODO: noch nicht fertig das Ergebnis wird noch nicht auf Fehler ueberprueft
+                'Do Schleife: Um Modellfehler bzw. Evaluierungsabbrüche abzufangen
                 Dim Eval_Count As Integer = 0
                 Dim SIM_Eval_is_OK As Boolean = True
                 Do
-
                     CES1.Childs(i_ch).ID = durchlauf_all
                     Call EVO_Opt_Verlauf1.Nachfolger(i_ch + 1)
 
@@ -987,96 +984,8 @@ Partial Class Form1
             'HYBRID: REPRODUKTION und MUTATION
             '*********************************
             If Method = METH_HYBRID And EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer Then
-                'NDSorting für den PES Memory
-                '****************************
-                If CES1.PES_Memory.GetLength(0) > ces1.Settings.CES.n_PES_MemSize
-                    Call CES1.NDSorting_Memory(i_gen)
-                End If
-
-                'NDSorting für den PES Memory
-                '****************************
-                If CES1.PES_Memory.GetLength(0) > ces1.Settings.CES.n_PES_MemSize
-                    Call CES1.NDSorting_Memory(i_gen)
-                End If
-
-                'pro Child
-                'xxxxxxxxx
-                For i_ch = 0 To CES1.Childs.GetUpperBound(0)
-
-                    'Ermittelt fuer jedes Child den PES Parent Satz (PES_Parents ist das Ergebnis)
-                    Call CES1.Memory_Search_per_Child(CES1.Childs(i_ch))
-
-                    'und pro Location
-                    'xxxxxxxxxxxxxxxx
-                    For i_loc = 0 To CES1.ModSett.n_Locations - 1
-
-                        'Die Parameter (falls vorhanden) werden überschrieben
-                        If Not CES1.Childs(i_ch).Loc(i_loc).PES_OptPara.GetLength(0) = 0 Then
-
-                            'Ermittelt fuer jede Location den PES Parent Satz (PES_Parents ist das Ergebnis)
-                            '*******************************************************************************
-                            Call CES1.Memory_Search_per_Location(i_loc)
-
-                            'Führt das NDSorting für diesen Satz durch
-                            '*****************************************
-                            If CES1.PES_Parents_pLoc.GetLength(0) > CES1.Settings.PES.n_Eltern Then
-                                Call CES1.NDSorting_PES_Parents_per_Loc(i_gen)
-                            End If
-
-                            Select Case CES1.PES_Parents_pLoc.GetLength(0)
-
-                                Case Is = 0
-                                    'Noch keine Eltern vorhanden (die Child Location bekommt neue - zufällige Werte oder original Parameter)
-                                    '*******************************************************************************************************
-                                    For m = 0 To CES1.Childs(i_ch).Loc(i_loc).PES_OptPara.GetUpperBound(0)
-                                        CES1.Childs(i_ch).Loc(i_loc).PES_OptPara(m).Dn = CES1.Settings.PES.Schrittweite.DnStart
-                                        'Falls zufällige Startwerte
-                                        If CES1.Settings.PES.OptStartparameter = Common.Constants.EVO_STARTPARAMETER.Zufall Then
-                                            Randomize()
-                                            CES1.Childs(i_ch).Loc(i_loc).PES_OptPara(m).Xn = Rnd()
-                                        End If
-                                    Next
-
-                                Case Is > 0
-                                    'Eltern vorhanden (das PES wird gestartet)
-                                    '*****************************************
-                                    If CES1.PES_Parents_pLoc.GetLength(0) < CES1.Settings.PES.n_Eltern Then
-                                        'Falls es zu wenige sind wird mit den vorhandenen aufgefüllt
-                                        Call CES1.fill_Parents_per_Loc(CES1.PES_Parents_pLoc, CES1.Settings.PES.n_Eltern)
-                                    End If
-
-                                    'Schritt 0: PES - Objekt der Klasse PES wird erzeugt PES wird erzeugt
-                                    '*********************************************************************
-                                    Dim PES1 As EVO.Kern.PES
-                                    PES1 = New EVO.Kern.PES
-
-                                    'Vorbereitung um das PES zu initieren
-                                    '************************************
-                                    globalAnzPar = CES1.Childs(i_ch).Loc(i_loc).PES_OptPara.GetLength(0)
-                                    myPara = CES1.Childs(i_ch).Loc(i_loc).PES_OptPara.Clone
-
-                                    'Schritte 1 - 3: PES wird initialisiert (Weiteres siehe dort ;-)
-                                    '**************************************************************
-                                    Call PES1.PesInitialise(EVO_Einstellungen1.Settings, globalAnzPar, Common.Manager.AnzPenalty, globalAnzRand, myPara, Method)
-
-                                    'Die PopulationsEltern des PES werden gefüllt
-                                    For m = 0 To CES1.PES_Parents_pLoc.GetUpperBound(0)
-                                        Call PES1.EsStartvalues(CES1.Settings.CES.is_PopMutStart, CES1.PES_Parents_pLoc(m).Loc(i_loc).PES_OptPara, m)
-                                    Next
-
-                                    'Startet die Prozesse evolutionstheoretischen Prozesse nacheinander
-                                    Call PES1.EsReproMut(EVO_Einstellungen1.Settings.CES.is_PopMutStart)
-
-                                    'Auslesen der Variierten Parameter
-                                    CES1.Childs(i_ch).Loc(i_loc).PES_OptPara = PES1.EsGetParameter()
-
-                            End Select
-                        End If
-                    Next
-                Next
+                Call Mixed_Integer_PES(i_gen)
             End If
-            ' ^ Ende der HYBRID PES Schleife
-            'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
         Next
         'Ende der Generationsschleife CES
@@ -1088,6 +997,96 @@ Partial Class Form1
             Call Start_PES_after_CES()
         End If
 
+    End Sub
+
+    'Mixed_Integer Teil ermittelt die PES Parameter für jedes neues Child und jede Location
+    '**************************************************************************************
+    Private Sub Mixed_Integer_PES(ByVal i_gen As Integer)
+
+        Dim i_ch, i_loc as Integer
+
+        'NDSorting für den PES Memory
+        '****************************
+        If CES1.PES_Memory.GetLength(0) > CES1.Settings.CES.n_PES_MemSize Then
+            Call CES1.NDSorting_Memory(i_gen)
+        End If
+
+        'pro Child
+        'xxxxxxxxx
+        For i_ch = 0 To CES1.Childs.GetUpperBound(0)
+
+            'Ermittelt fuer jedes Child den PES Parent Satz (PES_Parents ist das Ergebnis)
+            Call CES1.Memory_Search_per_Child(CES1.Childs(i_ch))
+
+            'und pro Location
+            'xxxxxxxxxxxxxxxx
+            For i_loc = 0 To CES1.ModSett.n_Locations - 1
+
+                'Die Parameter (falls vorhanden) werden überschrieben
+                If Not CES1.Childs(i_ch).Loc(i_loc).PES_OptPara.GetLength(0) = 0 Then
+
+                    'Ermittelt fuer jede Location den PES Parent Satz (PES_Parents ist das Ergebnis)
+                    '*******************************************************************************
+                    Call CES1.Memory_Search_per_Location(i_loc)
+
+                    'Führt das NDSorting für diesen Satz durch
+                    '*****************************************
+                    If CES1.PES_Parents_pLoc.GetLength(0) > CES1.Settings.PES.n_Eltern Then
+                        Call CES1.NDSorting_PES_Parents_per_Loc(i_gen)
+                    End If
+
+                    Dim m As Integer
+                    Select Case CES1.PES_Parents_pLoc.GetLength(0)
+
+                        Case Is = 0
+                            'Noch keine Eltern vorhanden (die Child Location bekommt neue - zufällige Werte oder original Parameter)
+                            '*******************************************************************************************************
+                            For m = 0 To CES1.Childs(i_ch).Loc(i_loc).PES_OptPara.GetUpperBound(0)
+                                CES1.Childs(i_ch).Loc(i_loc).PES_OptPara(m).Dn = CES1.Settings.PES.Schrittweite.DnStart
+                                'Falls zufällige Startwerte
+                                If CES1.Settings.PES.OptStartparameter = Common.Constants.EVO_STARTPARAMETER.Zufall Then
+                                    Randomize()
+                                    CES1.Childs(i_ch).Loc(i_loc).PES_OptPara(m).Xn = Rnd()
+                                End If
+                            Next
+
+                        Case Is > 0
+                            'Eltern vorhanden (das PES wird gestartet)
+                            '*****************************************
+                            If CES1.PES_Parents_pLoc.GetLength(0) < CES1.Settings.PES.n_Eltern Then
+                                'Falls es zu wenige sind wird mit den vorhandenen aufgefüllt
+                                Call CES1.fill_Parents_per_Loc(CES1.PES_Parents_pLoc, CES1.Settings.PES.n_Eltern)
+                            End If
+
+                            'Schritt 0: PES - Objekt der Klasse PES wird erzeugt PES wird erzeugt
+                            '*********************************************************************
+                            Dim PES1 As EVO.Kern.PES
+                            PES1 = New EVO.Kern.PES
+
+                            'Vorbereitung um das PES zu initieren
+                            '************************************
+                            globalAnzPar = CES1.Childs(i_ch).Loc(i_loc).PES_OptPara.GetLength(0)
+                            myPara = CES1.Childs(i_ch).Loc(i_loc).PES_OptPara.Clone
+
+                            'Schritte 1 - 3: PES wird initialisiert (Weiteres siehe dort ;-)
+                            '**************************************************************
+                            Call PES1.PesInitialise(EVO_Einstellungen1.Settings, globalAnzPar, Common.Manager.AnzPenalty, globalAnzRand, myPara, Method)
+
+                            'Die PopulationsEltern des PES werden gefüllt
+                            For m = 0 To CES1.PES_Parents_pLoc.GetUpperBound(0)
+                                Call PES1.EsStartvalues(CES1.Settings.CES.is_PopMutStart, CES1.PES_Parents_pLoc(m).Loc(i_loc).PES_OptPara, m)
+                            Next
+
+                            'Startet die Prozesse evolutionstheoretischen Prozesse nacheinander
+                            Call PES1.EsReproMut(EVO_Einstellungen1.Settings.CES.is_PopMutStart)
+
+                            'Auslesen der Variierten Parameter
+                            CES1.Childs(i_ch).Loc(i_loc).PES_OptPara = PES1.EsGetParameter()
+
+                    End Select
+                End If
+            Next
+        Next
     End Sub
 
     'Starten der PES mit der Front von CES
@@ -1416,8 +1415,7 @@ Start_Evolutionsrunden:
                         Call EVO_Opt_Verlauf1.Nachfolger(PES1.PES_iAkt.iAktNachf + 1)
                         durchlauf += 1
 
-                        'Um Modellfehler bzw. Evaluierungsabbrüche abzufangen
-                        'TODO: noch nicht fertig das Ergebnis wird noch nicht auf Fehler ueberprueft
+                        'Do Schleife: Um Modellfehler bzw. Evaluierungsabbrüche abzufangen
                         Dim Eval_Count As Integer = 0
                         Dim SIM_Eval_is_OK As Boolean = True
                         Do
