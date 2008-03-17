@@ -908,22 +908,8 @@ Partial Class Form1
 
                     'Lösung im TeeChart einzeichnen
                     '==============================
-                    If (Common.Manager.AnzPenalty = 1) Then
-                        'SingleObjective
-                        '---------------
-                        serie = DForm.Diag.getSeriesPoint("Childs", "Orange")
-                        Call serie.Add(durchlauf_all, CES1.Childs(i_ch).Get_Penalty(0), durchlauf_all.ToString())
-                    ElseIf (Common.Manager.AnzPenalty = 2) Then
-                        'MultiObjective 2D-Diagramm
-                        '--------------------------
-                        serie = DForm.Diag.getSeriesPoint("Childs", "Orange")
-                        Call serie.Add(CES1.Childs(i_ch).Get_Penalty(0), CES1.Childs(i_ch).Get_Penalty(1), durchlauf_all.ToString())
-                    ElseIf (Common.Manager.AnzPenalty = 3) Then
-                        'MultiObjective 3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
-                        '---------------------------------------------------------------------------------------
-                        Dim serie3D As Steema.TeeChart.Styles.Points3D
-                        serie3D = DForm.Diag.getSeries3DPoint("Childs", "Orange")
-                        Call serie3D.Add(CES1.Childs(i_ch).Get_Penalty(0), CES1.Childs(i_ch).Get_Penalty(1), CES1.Childs(i_ch).Get_Penalty(2), durchlauf_all.ToString())
+                    If (SIM_Eval_is_OK) Then
+                        Call Me.LösungZeichnen(CES1.Childs(i_ch), 0, 0, i_gen, i_ch)
                     End If
 
                     Eval_Count += 1
