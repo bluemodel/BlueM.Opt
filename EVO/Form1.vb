@@ -872,53 +872,66 @@ Partial Class Form1
             'Child Schleife
             'xxxxxxxxxxxxxx
             For i_ch = 0 To CES1.Settings.CES.n_Childs - 1
-
                 durchlauf_all += 1
-                CES1.Childs(i_ch).ID = durchlauf_all
-                Call EVO_Opt_Verlauf1.Nachfolger(i_ch + 1)
 
-                '****************************************
-                'Aktueller Pfad wird an Sim zurückgegeben
-                'Bereitet das BlaueModell für die Kombinatorik vor
-                Call Sim1.PREPARE_Evaluation_CES(CES1.Childs(i_ch).Path, CES1.Childs(i_ch).Get_All_Loc_Elem)
+                'Um Modellfehler bzw. Evaluierungsabbrüche abzufangen
+                'TODO: noch nicht fertig das Ergebnis wird noch nicht auf Fehler ueberprueft
+                Dim Eval_Count As Integer = 0
+                Dim SIM_Eval_is_OK As Boolean = True
+                Do
 
-                'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
-                '***************************************************************
-                If Method = METH_HYBRID And EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer Then
-                    If Sim1.Reduce_OptPara_and_ModPara(CES1.Childs(i_ch).Get_All_Loc_Elem) Then
-                        Call Sim1.PREPARE_Evaluation_PES(CES1.Childs(i_ch).Get_All_Loc_PES_Para)
+                    CES1.Childs(i_ch).ID = durchlauf_all
+                    Call EVO_Opt_Verlauf1.Nachfolger(i_ch + 1)
+
+                    '****************************************
+                    'Aktueller Pfad wird an Sim zurückgegeben
+                    'Bereitet das BlaueModell für die Kombinatorik vor
+                    Call Sim1.PREPARE_Evaluation_CES(CES1.Childs(i_ch).Path, CES1.Childs(i_ch).Get_All_Loc_Elem)
+
+                    'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
+                    '***************************************************************
+                    If Method = METH_HYBRID And EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer Then
+                        If Sim1.Reduce_OptPara_and_ModPara(CES1.Childs(i_ch).Get_All_Loc_Elem) Then
+                            Call Sim1.PREPARE_Evaluation_PES(CES1.Childs(i_ch).Get_All_Loc_PES_Para)
+                        End If
                     End If
-                End If
 
-                'Simulation *************************************************************************
-                Call Sim1.SIM_Evaluierung(CES1.Childs(i_ch))
-                '************************************************************************************
+                    'Simulation *************************************************************************
+                    SIM_Eval_is_OK = Sim1.SIM_Evaluierung(CES1.Childs(i_ch))
+                    '************************************************************************************
 
-                'HYBRID: Speichert die PES Erfahrung diesen Childs im PES Memory
-                '***************************************************************
-                If Method = METH_HYBRID And EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer Then
-                    Call CES1.Memory_Store(i_ch, i_gen)
-                End If
+                    'HYBRID: Speichert die PES Erfahrung diesen Childs im PES Memory
+                    '***************************************************************
+                    If Method = METH_HYBRID And EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer Then
+                        Call CES1.Memory_Store(i_ch, i_gen)
+                    End If
 
-                'Lösung im TeeChart einzeichnen
-                '==============================
-                If (Common.Manager.AnzPenalty = 1) Then
-                    'SingleObjective
-                    '---------------
-                    serie = DForm.Diag.getSeriesPoint("Childs", "Orange")
-                    Call serie.Add(durchlauf_all, CES1.Childs(i_ch).Get_Penalty(0), durchlauf_all.ToString())
-                ElseIf (Common.Manager.AnzPenalty = 2) Then
-                    'MultiObjective 2D-Diagramm
-                    '--------------------------
-                    serie = DForm.Diag.getSeriesPoint("Childs", "Orange")
-                    Call serie.Add(CES1.Childs(i_ch).Get_Penalty(0), CES1.Childs(i_ch).Get_Penalty(1), durchlauf_all.ToString())
-                ElseIf (Common.Manager.AnzPenalty = 3) Then
-                    'MultiObjective 3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
-                    '---------------------------------------------------------------------------------------
-                    Dim serie3D As Steema.TeeChart.Styles.Points3D
-                    serie3D = DForm.Diag.getSeries3DPoint("Childs", "Orange")
-                    Call serie3D.Add(CES1.Childs(i_ch).Get_Penalty(0), CES1.Childs(i_ch).Get_Penalty(1), CES1.Childs(i_ch).Get_Penalty(2), durchlauf_all.ToString())
-                End If
+                    'Lösung im TeeChart einzeichnen
+                    '==============================
+                    If (Common.Manager.AnzPenalty = 1) Then
+                        'SingleObjective
+                        '---------------
+                        serie = DForm.Diag.getSeriesPoint("Childs", "Orange")
+                        Call serie.Add(durchlauf_all, CES1.Childs(i_ch).Get_Penalty(0), durchlauf_all.ToString())
+                    ElseIf (Common.Manager.AnzPenalty = 2) Then
+                        'MultiObjective 2D-Diagramm
+                        '--------------------------
+                        serie = DForm.Diag.getSeriesPoint("Childs", "Orange")
+                        Call serie.Add(CES1.Childs(i_ch).Get_Penalty(0), CES1.Childs(i_ch).Get_Penalty(1), durchlauf_all.ToString())
+                    ElseIf (Common.Manager.AnzPenalty = 3) Then
+                        'MultiObjective 3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
+                        '---------------------------------------------------------------------------------------
+                        Dim serie3D As Steema.TeeChart.Styles.Points3D
+                        serie3D = DForm.Diag.getSeries3DPoint("Childs", "Orange")
+                        Call serie3D.Add(CES1.Childs(i_ch).Get_Penalty(0), CES1.Childs(i_ch).Get_Penalty(1), CES1.Childs(i_ch).Get_Penalty(2), durchlauf_all.ToString())
+                    End If
+
+                    Eval_Count += 1
+                    If (Eval_Count >= 10) Then
+                        Throw New Exception("Es konnte kein gültiger Datensatz erzeugt werden!")
+                    End If
+
+                Loop While SIM_Eval_is_OK = False
 
                 System.Windows.Forms.Application.DoEvents()
             Next
@@ -1415,7 +1428,6 @@ Start_Evolutionsrunden:
                     For PES1.PES_iAkt.iAktNachf = 0 To EVO_Einstellungen1.Settings.PES.n_Nachf - 1
 
                         Call EVO_Opt_Verlauf1.Nachfolger(PES1.PES_iAkt.iAktNachf + 1)
-
                         durchlauf += 1
 
                         'Um Modellfehler bzw. Evaluierungsabbrüche abzufangen
