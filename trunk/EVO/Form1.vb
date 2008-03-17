@@ -385,14 +385,14 @@ Partial Class Form1
 
                         Case METH_HYBRID
 
-                            'Original ModellParameter schreiben
-                            Call Sim1.Write_ModellParameter()
-
                             'EVO_Einstellungen aktiviern
                             EVO_Einstellungen1.Enabled = True
 
                             'CES für Sim vorbereiten (Files lesen und Validieren)
                             Call Sim1.read_and_valid_INI_Files_HYBRID()
+
+                            'Original ModellParameter schreiben
+                            Call Sim1.Write_ModellParameter()
                     End Select
 
                     'EVO_Einstellungen einrichten
