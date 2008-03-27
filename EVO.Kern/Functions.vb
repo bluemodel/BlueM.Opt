@@ -121,7 +121,7 @@ Public Class Functions
                 For i = NFrontMember_gesamt To NFrontMember_aktuell + NFrontMember_gesamt - 1
 
                     'NDSResult wird in den Bestwertspeicher kopiert
-                    Best(i) = NDSResult(i).Clone_Indi()
+                    Best(i) = NDSResult(i).Clone()
 
                 Next i
                 NFrontMember_gesamt = NFrontMember_gesamt + NFrontMember_aktuell
@@ -134,7 +134,7 @@ Public Class Functions
 
                 For i = NFrontMember_gesamt To NEltern - 1
                     'NDSResult wird in den Bestwertspeicher kopiert
-                    Best(i) = NDSResult(i).Clone_Indi()
+                    Best(i) = NDSResult(i).Clone()
                 Next i
 
                 NFrontMember_gesamt = NEltern
@@ -204,11 +204,11 @@ Public Class Functions
                         isDominated = False
 
                         For k = 0 To Manager.AnzPenalty - 1
-                            isDominated = isDominated Or (NDSorting(i).Get_Penalty(k) < NDSorting(j).Get_Penalty(k))
+                            isDominated = isDominated Or (NDSorting(i).Penalties(k) < NDSorting(j).Penalties(k))
                         Next k
 
                         For k = 0 To Manager.AnzPenalty - 1
-                            isDominated = isDominated And (NDSorting(i).Get_Penalty(k) <= NDSorting(j).Get_Penalty(k))
+                            isDominated = isDominated And (NDSorting(i).Penalties(k) <= NDSorting(j).Penalties(k))
                         Next k
 
                         If (isDominated) Then
@@ -228,11 +228,11 @@ Public Class Functions
                     isDominated = False
 
                     For k = 0 To Manager.AnzPenalty - 1
-                        isDominated = isDominated Or (NDSorting(i).Get_Penalty(k) < NDSorting(j).Get_Penalty(k))
+                        isDominated = isDominated Or (NDSorting(i).Penalties(k) < NDSorting(j).Penalties(k))
                     Next k
 
                     For k = 0 To Manager.AnzPenalty - 1
-                        isDominated = isDominated And (NDSorting(i).Get_Penalty(k) <= NDSorting(j).Get_Penalty(k))
+                        isDominated = isDominated And (NDSorting(i).Penalties(k) <= NDSorting(j).Penalties(k))
                     Next k
 
                     If (isDominated) Then
@@ -268,7 +268,7 @@ Public Class Functions
         For i = 0 To NDSorting.GetUpperBound(0)
             If (NDSorting(i).dominated = True) Then
                 counter += 1
-                Temp(counter - 1) = NDSorting(i).Clone_Indi()
+                Temp(counter - 1) = NDSorting(i).Clone()
             End If
         Next i
 
@@ -279,7 +279,7 @@ Public Class Functions
         For i = 0 To NDSorting.GetUpperBound(0)
             If (NDSorting(i).dominated = False) Then
                 counter += 1
-                Temp(counter - 1) = NDSorting(i).Clone_Indi()
+                Temp(counter - 1) = NDSorting(i).Clone()
             End If
         Next i
 
@@ -301,7 +301,7 @@ Public Class Functions
         'In NDSResult werden die nicht dominierten Lösungen eingefügt
         For i = Temp.GetLength(0) - NFrontMember_aktuell To Temp.GetUpperBound(0)
             'NDSResult alle bisher gefundene Fronten
-            NDSResult(Position) = Temp(i).Clone_Indi()
+            NDSResult(Position) = Temp(i).Clone()
             Position += 1
         Next i
 
@@ -344,31 +344,31 @@ Public Class Functions
         For k = 0 To Manager.AnzPenalty - 1
             For i = StartIndex To EndIndex
                 For j = StartIndex To EndIndex
-                    If (_Individ(i).Get_Penalty(k) < _Individ(j).Get_Penalty(k)) Then
-                        swap = _Individ(i).Clone_Indi()
-                        _Individ(i) = _Individ(j).Clone_Indi()
-                        _Individ(j) = swap.Clone_Indi()
+                    If (_Individ(i).Penalties(k) < _Individ(j).Penalties(k)) Then
+                        swap = _Individ(i).Clone()
+                        _Individ(i) = _Individ(j).Clone()
+                        _Individ(j) = swap.Clone()
                     End If
                 Next j
             Next i
 
-            fmin = _Individ(StartIndex).Get_Penalty(k)
-            fmax = _Individ(EndIndex).Get_Penalty(k)
+            fmin = _Individ(StartIndex).Penalties(k)
+            fmax = _Individ(EndIndex).Penalties(k)
 
             _Individ(StartIndex).Distance = 1.0E+300
             _Individ(EndIndex).Distance = 1.0E+300
 
             For i = StartIndex + 1 To EndIndex - 1
-                _Individ(i).Distance = _Individ(i).Distance + (_Individ(i + 1).Get_Penalty(k) - _Individ(i - 1).Get_Penalty(k)) / (fmax - fmin)
+                _Individ(i).Distance = _Individ(i).Distance + (_Individ(i + 1).Penalties(k) - _Individ(i - 1).Penalties(k)) / (fmax - fmin)
             Next i
         Next k
 
         For i = StartIndex To EndIndex
             For j = StartIndex To EndIndex
                 If (_Individ(i).Distance > _Individ(j).Distance) Then
-                    swap = _Individ(i).Clone_Indi()
-                    _Individ(i) = _Individ(j).Clone_Indi()
-                    _Individ(j) = swap.Clone_Indi()
+                    swap = _Individ(i).Clone()
+                    _Individ(i) = _Individ(j).Clone()
+                    _Individ(j) = swap.Clone()
                 End If
             Next j
         Next i
@@ -396,23 +396,23 @@ Public Class Functions
         For k = 0 To Manager.AnzPenalty - 1
             For i = StartIndex To EndIndex
                 For j = StartIndex To EndIndex
-                    If (_Individ(i).Get_Penalty(k) < _Individ(j).Get_Penalty(k)) Then
-                        swap = _Individ(i).Clone_Indi()
-                        _Individ(i) = _Individ(j).Clone_Indi()
-                        _Individ(j) = swap.Clone_Indi()
+                    If (_Individ(i).Penalties(k) < _Individ(j).Penalties(k)) Then
+                        swap = _Individ(i).Clone()
+                        _Individ(i) = _Individ(j).Clone()
+                        _Individ(j) = swap.Clone()
                     End If
                 Next j
             Next i
 
-            fmin = _Individ(StartIndex).Get_Penalty(k)
-            fmax = _Individ(EndIndex).Get_Penalty(k)
+            fmin = _Individ(StartIndex).Penalties(k)
+            fmax = _Individ(EndIndex).Penalties(k)
 
             _Individ(StartIndex).Distance = 1.0E+300
             _Individ(EndIndex).Distance = 1.0E+300
 
             For i = StartIndex + 1 To EndIndex - 1
                 If Not _Individ(i).Distance = 1.0E+300 Then
-                    _Individ(i).Distance = _Individ(i).Distance + (_Individ(i + 1).Get_Penalty(k) - _Individ(i - 1).Get_Penalty(k)) / (fmax - fmin)
+                    _Individ(i).Distance = _Individ(i).Distance + (_Individ(i + 1).Penalties(k) - _Individ(i - 1).Penalties(k)) / (fmax - fmin)
                 End If
             Next i
         Next k
@@ -463,7 +463,7 @@ Public Class Functions
                 Call Pareto_Crowding_Distance_Sort(SekundärQb, 0, SekundärQb.GetUpperBound(0))
                 For i = 0 To NEltern - 1
                     'SekundärQb wird in den Bestwertspeicher kopiert
-                    Best(i) = SekundärQb(i).Clone_Indi()
+                    Best(i) = SekundärQb(i).Clone()
                 Next i
             End If
         End If
@@ -480,7 +480,7 @@ Public Class Functions
             For j = i + 1 To SekundärQb.GetUpperBound(0)
                 Logical = True
                 For k = 0 To Manager.AnzPenalty - 1
-                    Logical = Logical And (SekundärQb(i).Get_Penalty(k) = SekundärQb(j).Get_Penalty(k))
+                    Logical = Logical And (SekundärQb(i).Penalties(k) = SekundärQb(j).Penalties(k))
                 Next k
                 If (Logical) Then SekundärQb(i).dominated = True
             Next j
@@ -506,7 +506,7 @@ Public Class Functions
         For i = 0 To _SekundärQb.GetUpperBound(0)
             If (_SekundärQb(i).dominated = False) Then
                 counter += 1
-                Temp(counter - 1) = _SekundärQb(i).Clone_Indi()
+                Temp(counter - 1) = _SekundärQb(i).Clone()
             End If
         Next i
 
@@ -515,7 +515,7 @@ Public Class Functions
         For i = 0 To _SekundärQb.GetUpperBound(0)
             If (_SekundärQb(i).dominated = True) Then
                 counter += 1
-                Temp(counter - 1) = _SekundärQb(i).Clone_Indi()
+                Temp(counter - 1) = _SekundärQb(i).Clone()
             End If
         Next i
 

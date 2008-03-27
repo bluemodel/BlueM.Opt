@@ -95,7 +95,7 @@ Public Class PES
     Private Distanceb() As Double           'Array mit Crowding-Distance (Neighbourhood-Rekomb.)
     Private PenaltyDistance(,) As Double    'Array für normierte Raumabstände (Neighbourhood-Rekomb.)
     '---------------------
-    Public SekundärQb(-1) As Individuum    'Sekundäre Population wird mit -1 initialisiert dann länge 0
+    Public SekundärQb(-1) As Individuum     'Sekundäre Population wird mit -1 initialisiert dann länge 0
 
     Const galpha As Double = 1.3            'Faktor alpha = 1.3 auf Generationsebene nach Rechenberg
     Const palpha As Double = 1.1            'Faktor alpha = 1.1 auf Populationsebene nach Rechenberg
@@ -1179,8 +1179,8 @@ StartMutation:
 
             'Falls die Qualität des aktuellen Nachkommen besser ist (Penaltyfunktion geringer)
             'als die schlechteste im Bestwertspeicher, wird dieser ersetzt
-            If ind.Get_Penalty(0) < Best.Qb(j, PES_iAkt.iAktPop, 0) Then
-                Best.Qb(j, PES_iAkt.iAktPop, 0) = ind.Get_Penalty(0)
+            If ind.Penalties(0) < Best.Qb(j, PES_iAkt.iAktPop, 0) Then
+                Best.Qb(j, PES_iAkt.iAktPop, 0) = ind.Penalties(0)
                 For v = 0 To Anz.Para - 1
                     'Die Schrittweite wird ebenfalls übernommen
                     Best.Db(v, j, PES_iAkt.iAktPop) = AktPara(v).Dn
@@ -1194,7 +1194,7 @@ StartMutation:
             '----------------------
             With NDSorting(PES_iAkt.iAktNachf)
                 For i = 0 To Manager.AnzZiele - 1
-                    .Penalty(i) = ind.Penalty(i)
+                    .Zielwerte(i) = ind.Zielwerte(i)
                 Next i
                 For i = 0 To Anz.Constr - 1
                     .Constrain(i) = ind.Constrain(i)
@@ -1417,7 +1417,7 @@ StartMutation:
         Dim j, v As Integer
 
         For j = 0 To Anz.Penalty - 1
-            Best.Qb(i, PES_iAkt.iAktPop, j) = Individ(i).Get_Penalty(j)
+            Best.Qb(i, PES_iAkt.iAktPop, j) = Individ(i).Penalties(j)
         Next j
 
         If Anz.Constr > 0 Then
@@ -1444,9 +1444,9 @@ StartMutation:
 
         j = 0
         For i = 0 To Manager.AnzZiele - 1
-            'HACK: Nur QWerte von OptZielen (d.h. Penalty) werden kopiert!
+            'HACK: Nur Zielwerte von OptZielen (d.h. Penalty) werden kopiert!
             If (Manager.List_Ziele(i).isOpt) Then
-                Individ(i_indi).Penalty(i) = Best.Qb(i_best, PES_iAkt.iAktPop, j)
+                Individ(i_indi).Zielwerte(i) = Best.Qb(i_best, PES_iAkt.iAktPop, j)
                 j += 1
             End If
         Next i
