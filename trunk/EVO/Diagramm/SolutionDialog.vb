@@ -139,7 +139,7 @@ Partial Public Class SolutionDialog
         i = 1
 
         'Ziele
-        For Each qwert As Double In ind.Penalty
+        For Each qwert As Double In ind.Zielwerte
             cellvalues(i) = qwert
             i += 1
         Next

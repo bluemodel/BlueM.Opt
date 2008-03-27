@@ -1393,7 +1393,7 @@ Handler:
 
         'Qualitätswerte berechnen
         For i = 0 To Common.Manager.AnzZiele - 1
-            Indi.Penalty(i) = QWert(Common.Manager.List_Ziele(i))
+            Indi.Zielwerte(i) = QWert(Common.Manager.List_Ziele(i))
         Next
 
         'Constraints berechnen

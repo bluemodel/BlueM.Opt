@@ -8,10 +8,6 @@ Public Class Individuum
     '****                                                                       ****
     '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
     '**** TU Darmstadt                                                          ****
-    '****                                                                       ****
-    '**** November 2007                                                         ****
-    '****                                                                       ****
-    '**** Letzte Änderung: November 2007                                        ****
     '*******************************************************************************
     '*******************************************************************************
 
@@ -31,8 +27,8 @@ Public Class Individuum
     Public ID As Integer                   '02 Nummer des Individuum
     Public Path() As Integer               '03 Der Pfad
 
-    Public Penalty() As Double              'Array der QWerte (für alle Zielfunktionen)
-    Public Constrain() As Double           '05 Werte der Randbedingung(en)
+    Public Zielwerte() As Double           '04 Array aller Zielfunktionswerte (inkl. sekundär)
+    Public Constrain() As Double           '05 Werte der Randbedingungen
     Public mutated As Boolean              '06 Gibt an ob der Wert bereits mutiert ist oder nicht
 
     'Für ND Sorting -------------------------------------------------
@@ -62,8 +58,9 @@ Public Class Individuum
     End Structure
 
     'Gibt die Array mit den Penalties zurück
-    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    Public ReadOnly Property Get_Penalty() As Double()
+    '(d.h. Zielfunktionswerte nur von OptZielen)
+    '*******************************************
+    Public ReadOnly Property Penalties() As Double()
         Get
             Dim i, j As Integer
             Dim Array() As Double
@@ -72,9 +69,9 @@ Public Class Individuum
 
             j = 0
             For i = 0 To Common.Manager.AnzZiele - 1
-                'Nur die QWerte von OptZielen zurückgeben!
+                'Nur die Zielfunktionswerte von OptZielen zurückgeben!
                 If (Common.Manager.List_Ziele(i).isOpt) Then
-                    Array(j) = Me.Penalty(i)
+                    Array(j) = Me.Zielwerte(i)
                     j += 1
                 End If
             Next
@@ -96,7 +93,7 @@ Public Class Individuum
         End Get
     End Property
 
-    'Gibt zurück ob Individuum feasable ist
+    'Gibt zurück ob Individuum feasible ist
     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     Public ReadOnly Property Is_Feasible() As Boolean
         Get
@@ -194,7 +191,7 @@ Public Class Individuum
 
     'Konstruktor für ein Individuum
     '******************************
-    Public Sub New (ByVal _Type As String, ByVal _ID As Integer)
+    Public Sub New(ByVal _Type As String, ByVal _ID As Integer)
 
         Dim i, j As Integer
 
@@ -210,10 +207,10 @@ Public Class Individuum
             Me.Path(j) = 777
         Next
 
-        '04 QWerte
-        ReDim Me.Penalty(Common.Manager.AnzZiele - 1)
+        '04 Zielfunktionswerte
+        ReDim Me.Zielwerte(Common.Manager.AnzZiele - 1)
         For j = 0 To Common.Manager.AnzZiele - 1
-            Me.Penalty(j) = Double.MaxValue
+            Me.Zielwerte(j) = Double.MaxValue          'mit maximalem Double-Wert initialisieren
         Next
 
         '05 Wert der Randbedingung(en)
@@ -284,7 +281,7 @@ Public Class Individuum
 
     'Kopiert ein Individuum
     '**********************
-    Public Function Clone_Indi() As Individuum
+    Public Function Clone() As Individuum
 
         Dim i, j As Integer
         Dim Dest As New Individuum(Me.Type, Me.ID)
@@ -299,8 +296,8 @@ Public Class Individuum
         ReDim Dest.Path(Me.Path.GetUpperBound(0))
         Array.Copy(Me.Path, Dest.Path, Me.Path.Length)
 
-        '04 QWerte
-        Call Array.Copy(Me.Penalty, Dest.Penalty, Me.Penalty.Length)
+        '04 Zielfunktionswerte
+        Call Array.Copy(Me.Zielwerte, Dest.Zielwerte, Me.Zielwerte.Length)
 
         '05 Wert der Randbedingung(en)
         ReDim Dest.Constrain(Me.Constrain.GetUpperBound(0))
@@ -373,14 +370,14 @@ Public Class Individuum
         Dim i As Integer
 
         For i = 0 To Source.GetUpperBound(0)
-            Dest(i) = Source(i).Clone_Indi()
+            Dest(i) = Source(i).Clone()
         Next
     End Sub
 
     'ES_GET_SEKUNDÄRE_POPULATIONEN - Sekundäre Population speichert immer die angegebene
     'Anzahl von Bestwerten und kann den Bestwertspeicher alle x Generationen überschreiben
     '*************************************************************************************
-    Public Shared Function Get_All_Penalty_of_Array(ByVal Indi_Array() as Individuum) As Double(,)
+    Public Shared Function Get_All_Penalty_of_Array(ByVal Indi_Array() As Individuum) As Double(,)
         Dim j, i As Integer
         Dim Array(,) As Double
 
@@ -388,7 +385,7 @@ Public Class Individuum
 
         For i = 0 To Indi_Array.GetUpperBound(0)
             For j = 0 To Manager.AnzPenalty - 1
-                Array(i, j) = Indi_Array(i).Get_Penalty(j)
+                Array(i, j) = Indi_Array(i).Penalties(j)
             Next j
         Next i
         Return Array

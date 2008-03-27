@@ -881,9 +881,9 @@ Partial Public Class Testprobleme
                 '----------------------------------------
                 Unterteilung_X = 2 * Math.PI / (globalAnzPar - 1)
 
-                ind.Penalty(0) = 0
+                ind.Zielwerte(0) = 0
                 For i = 0 To globalAnzPar - 1
-                    ind.Penalty(0) += (Math.Sin(i * Unterteilung_X) - (-1 + (ind.PES_OptParas(i).Xn * 2))) ^ 2
+                    ind.Zielwerte(0) += (Math.Sin(i * Unterteilung_X) - (-1 + (ind.PES_OptParas(i).Xn * 2))) ^ 2
                 Next i
 
                 'Zeichnen
@@ -910,12 +910,12 @@ Partial Public Class Testprobleme
                 x1 = -5 + (ind.PES_OptParas(0).Xn * 10)
                 x2 = -2 + (ind.PES_OptParas(1).Xn * 4)
 
-                ind.Penalty(0) = (1.5 - x1 * (1 - x2)) ^ 2 + (2.25 - x1 * (1 - x2) ^ 2) ^ 2 + (2.625 - x1 * (1 - x2) ^ 3) ^ 2
+                ind.Zielwerte(0) = (1.5 - x1 * (1 - x2)) ^ 2 + (2.25 - x1 * (1 - x2) ^ 2) ^ 2 + (2.625 - x1 * (1 - x2) ^ 3) ^ 2
 
                 'Zeichnen
                 '--------
                 serie = Diag.getSeriesPoint("Population " & ipop + 1)
-                serie.Add(ind.ID, ind.Penalty(0))
+                serie.Add(ind.ID, ind.Zielwerte(0))
 
             Case "Schwefel 2.4-Problem"
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -926,15 +926,15 @@ Partial Public Class Testprobleme
                 For i = 0 To globalAnzPar - 1
                     X(i) = -10 + ind.PES_OptParas(i).Xn * 20
                 Next i
-                ind.Penalty(0) = 0
+                ind.Zielwerte(0) = 0
                 For i = 0 To globalAnzPar - 1
-                    ind.Penalty(0) += ((X(0) - X(i) ^ 2) ^ 2 + (X(i) - 1) ^ 2)
+                    ind.Zielwerte(0) += ((X(0) - X(i) ^ 2) ^ 2 + (X(i) - 1) ^ 2)
                 Next i
 
                 'Zeichnen
                 '--------
                 serie = Diag.getSeriesPoint("Population " & ipop + 1)
-                serie.Add(ind.ID, ind.Penalty(0))
+                serie.Add(ind.ID, ind.Zielwerte(0))
 
                 '*************************************
                 '* Multi-Objective Problemstellungen *
@@ -945,13 +945,13 @@ Partial Public Class Testprobleme
 
                 'Qualitätswert berechnen
                 '-----------------------
-                ind.Penalty(0) = ind.PES_OptParas(0).Xn * (9 / 10) + 0.1
-                ind.Penalty(1) = (1 + 5 * ind.PES_OptParas(1).Xn) / (ind.PES_OptParas(0).Xn * (9 / 10) + 0.1)
+                ind.Zielwerte(0) = ind.PES_OptParas(0).Xn * (9 / 10) + 0.1
+                ind.Zielwerte(1) = (1 + 5 * ind.PES_OptParas(1).Xn) / (ind.PES_OptParas(0).Xn * (9 / 10) + 0.1)
 
                 'Zeichnen
                 '--------
                 serie = Diag.getSeriesPoint("Population", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                serie.Add(ind.Penalty(0), ind.Penalty(1))
+                serie.Add(ind.Zielwerte(0), ind.Zielwerte(1))
 
             Case "Zitzler/Deb T1" 'Zitzler/Deb/Thiele 2000, T1 (Konvexe Pareto-Front)
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -965,13 +965,13 @@ Partial Public Class Testprobleme
                 Next i
                 f2 = 1 + 9 / (globalAnzPar - 1) * f2
                 f2 = f2 * (1 - System.Math.Sqrt(f1 / f2))
-                ind.Penalty(0) = f1
-                ind.Penalty(1) = f2
+                ind.Zielwerte(0) = f1
+                ind.Zielwerte(1) = f2
 
                 'Zeichnen
                 '--------
                 serie = Diag.getSeriesPoint("Population", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                serie.Add(ind.Penalty(0), ind.Penalty(1))
+                serie.Add(ind.Zielwerte(0), ind.Zielwerte(1))
 
             Case "Zitzler/Deb T2" 'Zitzler/Deb/Thiele 2000, T2 (Non-Konvexe Pareto-Front)
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -985,13 +985,13 @@ Partial Public Class Testprobleme
                 Next i
                 f2 = 1 + 9 / (globalAnzPar - 1) * f2
                 f2 = f2 * (1 - (f1 / f2) * (f1 / f2))
-                ind.Penalty(0) = f1
-                ind.Penalty(1) = f2
+                ind.Zielwerte(0) = f1
+                ind.Zielwerte(1) = f2
 
                 'Zeichnen
                 '--------
                 serie = Diag.getSeriesPoint("Population", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                serie.Add(ind.Penalty(0), ind.Penalty(1))
+                serie.Add(ind.Zielwerte(0), ind.Zielwerte(1))
 
             Case "Zitzler/Deb T3" 'Zitzler/Deb/Thiele 2000, T3 (disconected Pareto-Front)
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -1005,13 +1005,13 @@ Partial Public Class Testprobleme
                 Next i
                 f2 = 1 + 9 / (globalAnzPar - 1) * f2
                 f2 = f2 * (1 - Math.Sqrt(f1 / f2) - (f1 / f2) * Math.Sin(10 * Math.PI * f1))
-                ind.Penalty(0) = f1
-                ind.Penalty(1) = f2
+                ind.Zielwerte(0) = f1
+                ind.Zielwerte(1) = f2
 
                 'Zeichnen
                 '--------
                 serie = Diag.getSeriesPoint("Population", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                serie.Add(ind.Penalty(0), ind.Penalty(1))
+                serie.Add(ind.Zielwerte(0), ind.Zielwerte(1))
 
             Case "Zitzler/Deb T4" 'Zitzler/Deb/Thiele 2000, T4 (local/global Pareto-Fronts)
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -1026,13 +1026,13 @@ Partial Public Class Testprobleme
                 Next i
                 f2 = 1 + 10 * (globalAnzPar - 1) + f2
                 f2 = f2 * (1 - System.Math.Sqrt(f1 / f2))
-                ind.Penalty(0) = f1
-                ind.Penalty(1) = f2
+                ind.Zielwerte(0) = f1
+                ind.Zielwerte(1) = f2
 
                 'Zeichnen
                 '--------
                 serie = Diag.getSeriesPoint("Population", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                serie.Add(ind.Penalty(0), ind.Penalty(1))
+                serie.Add(ind.Zielwerte(0), ind.Zielwerte(1))
 
             Case "CONSTR"
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -1042,8 +1042,8 @@ Partial Public Class Testprobleme
                 f1 = ind.PES_OptParas(0).Xn * (9 / 10) + 0.1
                 f2 = (1 + 5 * ind.PES_OptParas(1).Xn) / (ind.PES_OptParas(0).Xn * (9 / 10) + 0.1)
 
-                ind.Penalty(0) = f1
-                ind.Penalty(1) = f2
+                ind.Zielwerte(0) = f1
+                ind.Zielwerte(1) = f2
 
                 'Constraints berechnen
                 '---------------------
@@ -1062,16 +1062,16 @@ Partial Public Class Testprobleme
                     'Gültige Lösung
                     serie = Diag.getSeriesPoint("Population", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                 End If
-                serie.Add(ind.Penalty(0), ind.Penalty(1))
+                serie.Add(ind.Zielwerte(0), ind.Zielwerte(1))
 
             Case "Box"
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
                 'Qualitätswerte berechnen
                 '------------------------
-                ind.Penalty(0) = ind.PES_OptParas(0).Xn
-                ind.Penalty(1) = ind.PES_OptParas(1).Xn
-                ind.Penalty(2) = ind.PES_OptParas(2).Xn
+                ind.Zielwerte(0) = ind.PES_OptParas(0).Xn
+                ind.Zielwerte(1) = ind.PES_OptParas(1).Xn
+                ind.Zielwerte(2) = ind.PES_OptParas(2).Xn
 
                 'Constraints berechnen
                 '---------------------
@@ -1088,20 +1088,20 @@ Partial Public Class Testprobleme
                     'Gültige Lösung
                     serie3D = Diag.getSeries3DPoint("Population", "Orange")
                 End If
-                serie3D.Add(ind.Penalty(0), ind.Penalty(1), ind.Penalty(2))
+                serie3D.Add(ind.Zielwerte(0), ind.Zielwerte(1), ind.Zielwerte(2))
 
             Case "Abhängige Parameter"
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
                 'Qualitätswerte berechnen
                 '------------------------
-                ind.Penalty(0) = ind.PES_OptParas(0).Xn ^ 2 + ind.PES_OptParas(1).Xn ^ 2
+                ind.Zielwerte(0) = ind.PES_OptParas(0).Xn ^ 2 + ind.PES_OptParas(1).Xn ^ 2
 
                 'Zeichnen
                 '--------
                 Dim serie3D As Steema.TeeChart.Styles.Points3D
                 serie3D = Diag.getSeries3DPoint("Population " & ipop + 1)
-                serie3D.Add(ind.PES_OptParas(0).Xn, ind.PES_OptParas(1).Xn, ind.Penalty(0))
+                serie3D.Add(ind.PES_OptParas(0).Xn, ind.PES_OptParas(1).Xn, ind.Zielwerte(0))
 
         End Select
 

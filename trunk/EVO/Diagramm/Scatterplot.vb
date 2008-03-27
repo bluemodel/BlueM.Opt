@@ -122,7 +122,7 @@ Partial Public Class Scatterplot
                         '------------------------
                         serie = .getSeriesPoint(xAchse & ", " & yAchse, "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         For Each ind As Common.Individuum In Me.OptResult.getSekPop()
-                            serie.Add(ind.Penalty(Me.Zielauswahl(i)), ind.Penalty(Me.Zielauswahl(j)), ind.ID)
+                            serie.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID)
                         Next
                     Else
                         'Alle Lösungen
@@ -133,10 +133,10 @@ Partial Public Class Scatterplot
                             'Constraintverletzung prüfen
                             If (ind.Is_Feasible) Then
                                 'gültige Lösung Zeichnen
-                                serie.Add(ind.Penalty(Me.Zielauswahl(i)), ind.Penalty(Me.Zielauswahl(j)), ind.ID)
+                                serie.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID)
                             Else
                                 'ungültige Lösung zeichnen
-                                serie_inv.Add(ind.Penalty(Me.Zielauswahl(i)), ind.Penalty(Me.Zielauswahl(j)), ind.ID)
+                                serie_inv.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID)
                             End If
                         Next
                     End If
@@ -242,7 +242,7 @@ Partial Public Class Scatterplot
 
                     'Roten Punkt zeichnen
                     serie = .getSeriesPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
-                    serie.Add(ind.Penalty(Me.Zielauswahl(i)), ind.Penalty(Me.Zielauswahl(j)), ind.ID)
+                    serie.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID)
 
                     'Mark anzeigen
                     serie.Marks.Visible = True
