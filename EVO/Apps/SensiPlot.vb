@@ -21,12 +21,12 @@ Partial Public Class SensiPlot
     Public Anz_Steps As Integer
     Public show_Wave As Boolean
 
-    Public Sub ListBox_OptParameter_add(ByVal OptParameter As EVO.Kern.OptParameter)
+    Public Sub ListBox_OptParameter_add(ByVal OptParameter As EVO.Common.OptParameter)
         ListBox_OptParameter.Items.Add(OptParameter)
     End Sub
 
-    Public Sub ListBox_OptZiele_add(ByVal OptZiel As Sim.Struct_OptZiel)
-        ListBox_OptZiele.Items.Add(OptZiel)
+    Public Sub ListBox_OptZiele_add(ByVal ziel As Common.Ziel)
+        ListBox_OptZiele.Items.Add(ziel)
     End Sub
 
     'Überprüfung und Anwendung der Einstellungen

@@ -143,43 +143,52 @@ Public Class BlueM
 
     'Optimierungsziele einlesen
     '**************************
-    Protected Overrides Sub Read_OptZiele()
+    Protected Overrides Sub Read_ZIE()
 
-        Call MyBase.Read_OptZiele()
+        Call MyBase.Read_ZIE()
 
         'Weiterverarbeitung von ZielReihen:
         '----------------------------------
-        Dim i As Integer
+        Dim IHAZielReihe As Wave.Zeitreihe
+        Dim IHAStart, IHAEnde As DateTime
+
+        IHAZielReihe = New Wave.Zeitreihe("new")
 
         'Gibt es eine IHA-Zielfunktion?
-        For i = 0 To Me.List_OptZiele.GetUpperBound(0)
-            If (Me.List_OptZiele(i).ZielTyp = "IHA") Then
-                'HACK: es wird immer nur das erste IHA-Ziel verwendet!
-
+        'HACK: es wird immer nur das erste IHA-Ziel verwendet!
+        '------------------------------
+        For Each ziel As Common.Ziel In Common.Manager.List_Ziele
+            If (ziel.ZielTyp = "IHA") Then
                 'IHA-Berechnung einschalten
                 Me.isIHA = True
-
-                'IHAAnalyse-Objekt instanzieren
-                Me.IHASys = New IHWB.IHA.IHAAnalysis(Me.WorkDir & "IHA\", Me.List_OptZiele(i).ZielReihe, Me.SimStart, Me.SimEnde)
-
-                'IHAProcessor-Objekt instanzieren
-                Me.IHAProc = New IHWB.EVO.IHAProcessor()
-
-                'IHA-Vergleichsmodus?
-                '--------------------
-                Dim reffile As String = Me.WorkDir & Me.Datensatz & ".rva"
-                If (File.Exists(reffile)) Then
-
-                    Dim RVABase As New Wave.RVA(reffile)
-
-                    'Vergleichsmodus aktivieren
-                    Call Me.IHAProc.setComparisonMode(RVABase.RVAValues)
-                End If
-
+                IHAZielReihe = ziel.ZielReihe
+                IHAStart = ziel.EvalStart
+                IHAEnde = ziel.EvalEnde
                 Exit For
             End If
         Next
 
+        'IHA-Berechnung vorbereiten
+        '--------------------------
+        If (Me.isIHA) Then
+            'IHAAnalyse-Objekt instanzieren
+            Me.IHASys = New IHWB.IHA.IHAAnalysis(Me.WorkDir & "IHA\", IHAZielreihe, IHAStart, IHAEnde)
+
+            'IHAProcessor-Objekt instanzieren
+            Me.IHAProc = New IHWB.EVO.IHAProcessor()
+
+            'IHA-Vergleichsmodus?
+            '--------------------
+            Dim reffile As String = Me.WorkDir & Me.Datensatz & ".rva"
+            If (File.Exists(reffile)) Then
+
+                Dim RVABase As New Wave.RVA(reffile)
+
+                'Vergleichsmodus aktivieren
+                Call Me.IHAProc.setComparisonMode(RVABase.RVAValues)
+            End If
+
+        End If
 
     End Sub
 
@@ -309,7 +318,6 @@ Public Class BlueM
     Public Overrides Function launchSim() As Boolean
 
         Dim simOK As Boolean
-        Dim i As Integer
 
         Try
 
@@ -357,9 +365,9 @@ Public Class BlueM
             If (Me.isIHA) Then
                 'IHA-Ziel raussuchen und Simulationsreihe übergeben
                 'HACK: es wird immer das erste IHA-Ziel verwendet!
-                For i = 0 To Me.List_OptZiele.GetUpperBound(0)
-                    If (Me.List_OptZiele(i).ZielTyp = "IHA") Then
-                        Call Me.IHASys.calculate_IHA(Me.SimErgebnis(Me.List_OptZiele(i).SimGr))
+                For Each ziel As Common.Ziel In Common.Manager.List_Ziele
+                    If (ziel.ZielTyp = "IHA") Then
+                        Call Me.IHASys.calculate_IHA(Me.SimErgebnis(ziel.SimGr))
                         Exit For
                     End If
                 Next
@@ -377,17 +385,17 @@ Public Class BlueM
 
     'Berechnung des Qualitätswerts (Zielwert)
     '****************************************
-    Public Overrides Function QWert(ByVal OptZiel As Struct_OptZiel) As Double
+    Public Overrides Function QWert(ByVal ziel As Common.Ziel) As Double
 
         QWert = 0
 
         'Fallunterscheidung Ergebnisdatei
         '--------------------------------
-        Select Case OptZiel.Datei
+        Select Case ziel.Datei
 
             Case "WEL"
                 'QWert aus WEL-Datei
-                QWert = QWert_WEL(OptZiel)
+                QWert = QWert_WEL(ziel)
 
             Case "PRB"
                 'QWert aus PRB-Datei
@@ -396,7 +404,7 @@ Public Class BlueM
                 'QWert = QWert_PRB(OptZiel)
 
             Case Else
-                Throw New Exception("Der Wert '" & Optziel.Datei & "' für die Datei wird bei Optimierungszielen für BlueM nicht akzeptiert!")
+                Throw New Exception("Der Wert '" & ziel.Datei & "' für die Datei wird bei Optimierungszielen für BlueM nicht akzeptiert!")
 
         End Select
 
@@ -404,30 +412,30 @@ Public Class BlueM
 
     'Qualitätswert aus WEL-Datei
     '***************************
-    Private Function QWert_WEL(ByVal OptZiel As Struct_OptZiel) As Double
+    Private Function QWert_WEL(ByVal ziel As Common.Ziel) As Double
 
         Dim QWert As Double
         Dim SimReihe As Wave.Zeitreihe
         Dim Datei As String
         
         'Simulationsergebnis auslesen
-        SimReihe = Me.SimErgebnis(OptZiel.SimGr)
+        SimReihe = Me.SimErgebnis(ziel.SimGr)
 
         'Fallunterscheidung Zieltyp
         '--------------------------
-        Select Case OptZiel.ZielTyp
+        Select Case ziel.ZielTyp
 
             Case "Wert"
-                QWert = MyBase.QWert_Wert(OptZiel, SimReihe)
+                QWert = MyBase.QWert_Wert(ziel, SimReihe)
 
             Case "Reihe"
-                QWert = MyBase.QWert_Reihe(OptZiel, SimReihe)
+                QWert = MyBase.QWert_Reihe(ziel, SimReihe)
 
             Case "Kosten"
                 QWert = Me.SKos1.calculate_costs(Me)
 
             Case "IHA"
-                QWert = Me.IHAProc.QWert_IHA(OptZiel, Me.IHASys.RVAResult)
+                QWert = Me.IHAProc.QWert_IHA(ziel, Me.IHASys.RVAResult)
 
             Case "Schaden"
                 Datei = WorkDir & Datensatz & ".wel"
