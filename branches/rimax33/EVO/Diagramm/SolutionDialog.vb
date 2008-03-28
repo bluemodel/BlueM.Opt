@@ -36,7 +36,7 @@ Partial Public Class SolutionDialog
 
     'Konstruktor
     '***********
-    Public Sub New(ByVal lOptPara() As EVO.Kern.OptParameter, ByVal lOptZiele() As Sim.Struct_OptZiel, ByVal lConst() As Sim.Struct_Constraint, ByVal lLoc() As Sim.Struct_Lokation)
+    Public Sub New(ByVal lOptPara() As EVO.Common.OptParameter, ByVal lConst() As Sim.Struct_Constraint, ByVal lLoc() As Sim.Struct_Lokation)
 
         ' Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent()
@@ -54,16 +54,21 @@ Partial Public Class SolutionDialog
         cellstyle = Me.DataGridView1.DefaultCellStyle.Clone()
         cellstyle.Format = "G5"
 
-        'OptZiele
+        'Ziele
         '--------
-        cellstyle.BackColor = Color.LightBlue
-
-        For Each OptZiel As Sim.Struct_OptZiel In lOptZiele
+        For Each ziel As Common.Ziel In Common.Manager.List_Ziele
             column = New DataGridViewTextBoxColumn()
+            If (ziel.isOpt) Then
+                cellstyle.BackColor = Color.LightGreen
+                column.HeaderText = ziel.Bezeichnung & " (*)"
+                column.HeaderCell.ToolTipText = "OptZiel"
+            Else
+                cellstyle.BackColor = Color.LightBlue
+                column.HeaderText = ziel.Bezeichnung
+                column.HeaderCell.ToolTipText = "SekZiel"
+            End If
             column.ReadOnly = True
-            column.HeaderText = OptZiel.Bezeichnung
-            column.HeaderCell.ToolTipText = "OptZiel"
-            column.Name = OptZiel.Bezeichnung
+            column.Name = ziel.Bezeichnung
             column.DefaultCellStyle = cellstyle.Clone()
             Me.DataGridView1.Columns.Add(column)
         Next
@@ -100,7 +105,7 @@ Partial Public Class SolutionDialog
         '------------
         cellstyle.BackColor = Color.LightGray
 
-        For Each OptPara As EVO.Kern.OptParameter In lOptPara
+        For Each OptPara As EVO.Common.OptParameter In lOptPara
             column = New DataGridViewTextBoxColumn()
             column.ReadOnly = True
             column.HeaderText = OptPara.Bezeichnung
@@ -119,7 +124,7 @@ Partial Public Class SolutionDialog
 
     'Eine Lösung hinzufügen
     '**********************
-    Public Sub addSolution(ByVal ind As Kern.Individuum)
+    Public Sub addSolution(ByVal ind As Common.Individuum)
 
         Dim i As Integer
         Dim cellvalues() As Object
@@ -133,9 +138,9 @@ Partial Public Class SolutionDialog
 
         i = 1
 
-        'OptZiele
-        For Each optziel As Double In ind.Penalty
-            cellvalues(i) = optziel
+        'Ziele
+        For Each qwert As Double In ind.Zielwerte
+            cellvalues(i) = qwert
             i += 1
         Next
 
@@ -152,7 +157,7 @@ Partial Public Class SolutionDialog
         Next
 
         'OptParameter PES
-        For Each optpara As Kern.OptParameter In ind.PES_OptParas
+        For Each optpara As Common.OptParameter In ind.PES_OptParas
             cellvalues(i) = optpara.RWert
             i += 1
         Next
@@ -162,8 +167,8 @@ Partial Public Class SolutionDialog
 
         Do While i < Me.DataGridView1.ColumnCount
             found = False
-            For Each loc As Kern.Individuum.Location_Data In ind.Loc
-                For Each optpara As Kern.OptParameter In loc.PES_OptPara
+            For Each loc As Common.Individuum.Location_Data In ind.Loc
+                For Each optpara As Common.OptParameter In loc.PES_OptPara
                     If optpara.Bezeichnung = Me.DataGridView1.Columns(i).HeaderText Then
                         cellvalues(i) = optpara.RWert
                         found = True

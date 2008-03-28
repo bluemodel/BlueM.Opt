@@ -16,17 +16,13 @@ Partial Public Class Scatterplot
 
     Private Diags(,) As Diagramm
     Private OptResult As IHWB.EVO.OptResult
+    Private Zielauswahl() As Integer
     Private SekPopOnly As Boolean
-    Private ReadOnly Property nOptZiele() As Integer
-        Get
-            Return Me.OptResult.List_OptZiele.Length()
-        End Get
-    End Property
-    Public Event pointSelected(ByVal ind As Kern.Individuum)
+    Public Event pointSelected(ByVal ind As Common.Individuum)
 
     'Konstruktor
     '***********
-    Public Sub New(ByVal optres As IHWB.EVO.OptResult, ByVal _sekpoponly As Boolean)
+    Public Sub New(ByVal optres As IHWB.EVO.OptResult, _zielauswahl() As Integer, _sekpoponly As Boolean)
 
         ' Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent()
@@ -39,8 +35,16 @@ Partial Public Class Scatterplot
         'SekPop-Flag setzen
         Me.SekPopOnly = _sekpoponly
 
+        'Zielauswahl speichern
+        Me.Zielauswahl = _zielauswahl
+
         'Diagramme zeichnen
         Call Me.zeichnen()
+
+        'Bereits ausgewählte Lösungen anzeigen
+        For Each ind As Common.Individuum In Me.OptResult.getSelectedSolutions
+            Call Me.showSelectedSolution(ind)
+        Next
 
     End Sub
 
@@ -86,8 +90,8 @@ Partial Public Class Scatterplot
 
                     'Achsen
                     '------
-                    xAchse = OptResult.List_OptZiele(i).Bezeichnung
-                    yAchse = OptResult.List_OptZiele(j).Bezeichnung
+                    xAchse = Common.Manager.List_Ziele(Me.Zielauswahl(i)).Bezeichnung
+                    yAchse = Common.Manager.List_Ziele(Me.Zielauswahl(j)).Bezeichnung
 
                     If (xAchse.StartsWith("f")) Then
                         .Axes.Bottom.Labels.ValueFormat = "   0.0"
@@ -114,9 +118,9 @@ Partial Public Class Scatterplot
                     'YAchsen
                     If (i = 0) Then
                         'Achse standardmäßig anzeigen
-                        'ElseIf (i = Me.nOptZiele - 1) Then
-                        '    'Achse rechts anzeigen
-                        '    .Axes.Left.OtherSide = True
+                    	'ElseIf (i = Me.Zielauswahl.Length - 1) Then
+                        '	'Achse rechts anzeigen
+                        '	.Axes.Left.OtherSide = True
                     Else
                         'Achse verstecken
                         .Axes.Left.Title.Visible = False
@@ -142,12 +146,12 @@ Partial Public Class Scatterplot
                         'Nur Sekundäre Population
                         '------------------------
                         serie = .getSeriesPoint(xAchse & ", " & yAchse, "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                        For Each ind As Kern.Individuum In Me.OptResult.getSekPop()
-                            serie.Add(ind.Penalty(i), ind.Penalty(j), ind.ID)
-                            If ind.Penalty(i) < serieMin_i Then serieMin_i = ind.Penalty(i)
-                            If ind.Penalty(i) > serieMax_i Then serieMax_i = ind.Penalty(i)
-                            If ind.Penalty(j) < serieMin_j Then serieMin_j = ind.Penalty(j)
-                            If ind.Penalty(j) > serieMax_j Then serieMax_j = ind.Penalty(j)
+                        For Each ind As Common.Individuum In Me.OptResult.getSekPop()
+                            serie.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID)
+                            If ind.Zielwerte(Me.Zielauswahl(i)) < serieMin_i Then serieMin_i = ind.Zielwerte(Me.Zielauswahl(i))
+                            If ind.Zielwerte(Me.Zielauswahl(i)) > serieMax_i Then serieMax_i = ind.Zielwerte(Me.Zielauswahl(i))
+                            If ind.Zielwerte(Me.Zielauswahl(j)) < serieMin_j Then serieMin_j = ind.Zielwerte(Me.Zielauswahl(j))
+                            If ind.Zielwerte(Me.Zielauswahl(j)) > serieMax_j Then serieMax_j = ind.Zielwerte(Me.Zielauswahl(j))
                         Next
 
                         'Freibord einzeichnen - horizontal
@@ -155,17 +159,17 @@ Partial Public Class Scatterplot
                         serieFh = .getSeriesLine("line", "Red")
                         serieFh.LinePen.Width = 2
 
-                        If (OptResult.List_OptZiele(j).Bezeichnung.StartsWith("fMalter")) Then
+                        If (Common.List_Ziele(Me.Zielauswahl(j)).Bezeichnung.StartsWith("fMalter")) Then
                             serieFh.Add(serieMin_i, 334, "freibord")
                             serieFh.Add(serieMax_i, 334, "freibord")
                         End If
                         '---
-                        If (OptResult.List_OptZiele(j).Bezeichnung.StartsWith("fLehnm")) Then
+                        If (Common.List_Ziele(Me.Zielauswahl(j)).Bezeichnung.StartsWith("fLehnm")) Then
                             serieFh.Add(serieMin_i, 525.5, "freibord")
                             serieFh.Add(serieMax_i, 525.5, "freibord")
                         End If
                         '---
-                        If (OptResult.List_OptZiele(j).Bezeichnung.StartsWith("fKling")) Then
+                        If (Common.List_Ziele(Me.Zielauswahl(j)).Bezeichnung.StartsWith("fKling")) Then
                             serieFh.Add(serieMin_i, 393, "freibord")
                             serieFh.Add(serieMax_i, 393, "freibord")
                         End If
@@ -175,17 +179,17 @@ Partial Public Class Scatterplot
                         serieFv = .getSeriesLine("line2", "Red")
                         serieFv.LinePen.Width = 2
 
-                        If (OptResult.List_OptZiele(i).Bezeichnung.StartsWith("fMalter")) Then
+                        If (Common.List_Ziele(Me.Zielauswahl(i)).Bezeichnung.StartsWith("fMalter")) Then
                             serieFv.Add(334, serieMin_j, "freibord")
                             serieFv.Add(334, serieMax_j, "freibord")
                         End If
                         '---
-                        If (OptResult.List_OptZiele(i).Bezeichnung.StartsWith("fLehnm")) Then
+                        If (Common.List_Ziele(Me.Zielauswahl(i)).Bezeichnung.StartsWith("fLehnm")) Then
                             serieFv.Add(526, serieMin_j, "freibord")
                             serieFv.Add(526, serieMax_j, "freibord")
                         End If
                         '---
-                        If (OptResult.List_OptZiele(i).Bezeichnung.StartsWith("fKling")) Then
+                        If (Common.List_Ziele(Me.Zielauswahl(i)).Bezeichnung.StartsWith("fKling")) Then
                             serieFv.Add(393, serieMin_j, "freibord")
                             serieFv.Add(393, serieMax_j, "freibord")
                         End If
@@ -195,27 +199,27 @@ Partial Public Class Scatterplot
                         serieIst = .getSeriesLine("line3", "Black")
                         serieIst.LinePen.Width = 2
                         '---
-                        If (OptResult.List_OptZiele(j).Bezeichnung.StartsWith("fMalter")) Then
+                        If (Common.List_Ziele(Me.Zielauswahl(j)).Bezeichnung.StartsWith("fMalter")) Then
                             serieIst.Add(serieMin_i, 334.12, "status quo")
                             serieIst.Add(serieMax_i, 334.12, "status quo")
                         End If
                         '---
-                        If (OptResult.List_OptZiele(j).Bezeichnung.StartsWith("fLehnm")) Then
+                        If (Common.List_Ziele(Me.Zielauswahl(j)).Bezeichnung.StartsWith("fLehnm")) Then
                             serieIst.Add(serieMin_i, 525.07, "status quo")
                             serieIst.Add(serieMax_i, 525.07, "status quo")
                         End If
                         '---
-                        If (OptResult.List_OptZiele(j).Bezeichnung.StartsWith("fKling")) Then
+                        If (Common.List_Ziele(Me.Zielauswahl(j)).Bezeichnung.StartsWith("fKling")) Then
                             serieIst.Add(serieMin_i, 393.78, "status quo")
                             serieIst.Add(serieMax_i, 393.78, "status quo")
                         End If
                         '---
-                        If (OptResult.List_OptZiele(j).Bezeichnung.StartsWith("Gesamt")) Then
+                        If (Common.List_Ziele(Me.Zielauswahl(j)).Bezeichnung.StartsWith("Gesamt")) Then
                             serieIst.Add(serieMin_i, 108064362, "status quo")
                             serieIst.Add(serieMax_i, 108064362, "status quo")
                         End If
                         '---
-                        If (OptResult.List_OptZiele(j).Bezeichnung.StartsWith("GA")) Then
+                        If (Common.List_Ziele(Me.Zielauswahl(j)).Bezeichnung.StartsWith("GA")) Then
                             serieIst.Add(serieMin_i, 10188634, "status quo")
                             serieIst.Add(serieMax_i, 10188634, "status quo")
                         End If
@@ -223,12 +227,12 @@ Partial Public Class Scatterplot
                         serieIst = .getSeriesLine("line4", "Black")
                         serieIst.LinePen.Width = 2
                         '---
-                        If (OptResult.List_OptZiele(i).Bezeichnung.StartsWith("Gesamt")) Then
+                        If (Common.List_Ziele(Me.Zielauswahl(i)).Bezeichnung.StartsWith("Gesamt")) Then
                             serieIst.Add(108064362, serieMin_j, "status quo")
                             serieIst.Add(108064362, serieMax_j, "status quo")
                         End If
                         '---
-                        If (OptResult.List_OptZiele(i).Bezeichnung.StartsWith("GA")) Then
+                        If (Common.List_Ziele(Me.Zielauswahl(i)).Bezeichnung.StartsWith("GA")) Then
                             serieIst.Add(10188634, serieMin_j, "status quo")
                             serieIst.Add(10188634, serieMax_j, "status quo")
                         End If
@@ -240,14 +244,14 @@ Partial Public Class Scatterplot
                         '-------------
                         serie = .getSeriesPoint(xAchse & ", " & yAchse, "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         serie_inv = .getSeriesPoint(xAchse & ", " & yAchse & " (ungültig)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                        For Each ind As Kern.Individuum In Me.OptResult.Solutions
+                        For Each ind As Common.Individuum In Me.OptResult.Solutions
                             'Constraintverletzung prüfen
-                            If (ind.feasible) Then
+                            If (ind.Is_Feasible) Then
                                 'gültige Lösung Zeichnen
-                                serie.Add(ind.Penalty(i), ind.Penalty(j), ind.ID)
+                                serie.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID)
                             Else
                                 'ungültige Lösung zeichnen
-                                serie_inv.Add(ind.Penalty(i), ind.Penalty(j), ind.ID)
+                                serie_inv.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID)
                             End If
                         Next
                     End If
@@ -279,36 +283,36 @@ Partial Public Class Scatterplot
     '*********************
     Private Sub dimensionieren()
 
-        ReDim Me.Diags(Me.nOptZiele - 1, Me.nOptZiele - 1)
+        ReDim Me.Diags(Me.Zielauswahl.Length - 1, Me.Zielauswahl.Length - 1)
 
         Dim i, fstColFac As Integer
 
         Me.matrix.Name = "Matrix"
 
-        fstColFac = 100 / Me.nOptZiele * 0.15
+        fstColFac = 100 / Me.Zielauswahl.Length * 0.15
 
-        Me.matrix.ColumnCount = Me.nOptZiele
-        For i = 1 To Me.nOptZiele
-            Me.matrix.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100 / Me.nOptZiele))
-            Console.Out.WriteLine(100 / Me.nOptZiele)
+        Me.matrix.ColumnCount = Me.Zielauswahl.Length
+        For i = 1 To Me.Zielauswahl.Length
+            Me.matrix.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100 / Me.Zielauswahl.Length))
+            Console.Out.WriteLine(100 / Me.Zielauswahl.Length)
             'If i = 1 Then 'erste Spalte
-            'Me.matrix.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100 / Me.nOptZiele + fstColFac))
-            'Console.Out.WriteLine(SizeType.Percent, 100 / Me.nOptZiele + fstColFac)
+            'Me.matrix.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100 / Me.Zielauswahl.Length + fstColFac))
+            'Console.Out.WriteLine(SizeType.Percent, 100 / Me.Zielauswahl.Length + fstColFac)
             ' Else
-            'Me.matrix.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100 - (100 / Me.nOptZiele + fstColFac) / (Me.nOptZiele - 1)))
-            'Console.Out.WriteLine(100 - (100 / Me.nOptZiele + fstColFac) / (Me.nOptZiele - 1))
+            'Me.matrix.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100 - (100 / Me.Zielauswahl.Length + fstColFac) / (Me.Zielauswahl.Length - 1)))
+            'Console.Out.WriteLine(100 - (100 / Me.Zielauswahl.Length + fstColFac) / (Me.Zielauswahl.Length - 1))
             'End If
         Next
 
-        Me.matrix.RowCount = Me.nOptZiele
-        For i = 1 To Me.nOptZiele
-            Me.matrix.RowStyles.Add(New RowStyle(SizeType.Percent, 100 / Me.nOptZiele))
-            Console.Out.WriteLine(100 / Me.nOptZiele)
+        Me.matrix.RowCount = Me.Zielauswahl.Length
+        For i = 1 To Me.Zielauswahl.Length
+            Me.matrix.RowStyles.Add(New RowStyle(SizeType.Percent, 100 / Me.Zielauswahl.Length))
+            Console.Out.WriteLine(100 / Me.Zielauswahl.Length)
 
             'If i = 2 Then
-            'Me.matrix.RowStyles.Add(New RowStyle(SizeType.Percent, 100 / Me.nOptZiele + fstColFac))
+            'Me.matrix.RowStyles.Add(New RowStyle(SizeType.Percent, 100 / Me.Zielauswahl.Length + fstColFac))
             ' Else
-            'Me.matrix.RowStyles.Add(New RowStyle(SizeType.Percent, 100 - (100 / Me.nOptZiele + fstColFac) / Me.nOptZiele))
+            'Me.matrix.RowStyles.Add(New RowStyle(SizeType.Percent, 100 - (100 / Me.Zielauswahl.Length + fstColFac) / Me.Zielauswahl.Length))
             ' End If
         Next
 
@@ -338,7 +342,7 @@ Partial Public Class Scatterplot
     Private Sub seriesClick(ByVal sender As Object, ByVal s As Steema.TeeChart.Styles.Series, ByVal valueIndex As Integer, ByVal e As System.Windows.Forms.MouseEventArgs)
 
         Dim indID_clicked As Integer
-        Dim ind As Kern.Individuum
+        Dim ind As Common.Individuum
 
         'Punkt-Informationen bestimmen
         '-----------------------------
@@ -361,7 +365,7 @@ Partial Public Class Scatterplot
     'Eine ausgewählte Lösung in den Diagrammen anzeigen
     'wird von Form1.selectSolution() aufgerufen
     '**************************************************
-    Friend Sub showSelectedSolution(ByVal ind As Kern.Individuum)
+    Friend Sub showSelectedSolution(ByVal ind As Common.Individuum)
 
         Dim serie As Steema.TeeChart.Styles.Series
         Dim i, j As Integer
@@ -374,7 +378,7 @@ Partial Public Class Scatterplot
                     If (i < j) Then
                         'Roten Punkt zeichnen
                         serie = .getSeriesPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
-                        serie.Add(ind.Penalty(i), ind.Penalty(j), ind.ID)
+                        serie.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID)
 
                         'Mark anzeigen
                         serie.Marks.Visible = True
@@ -383,7 +387,6 @@ Partial Public Class Scatterplot
                         serie.Marks.ArrowLength = 10
                         serie.Marks.Arrow.Visible = False
                     End If
-
                 End With
             Next j
         Next i

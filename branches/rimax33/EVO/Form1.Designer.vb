@@ -72,10 +72,10 @@ Partial Class Form1
         '
         Me.LinkLabel_WorkDir.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.LinkLabel_WorkDir.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline
-        Me.LinkLabel_WorkDir.Location = New System.Drawing.Point(235, 23)
-        Me.LinkLabel_WorkDir.MaximumSize = New System.Drawing.Size(270, 13)
+        Me.LinkLabel_WorkDir.Location = New System.Drawing.Point(208, 22)
+        Me.LinkLabel_WorkDir.MaximumSize = New System.Drawing.Size(5000, 13)
         Me.LinkLabel_WorkDir.Name = "LinkLabel_WorkDir"
-        Me.LinkLabel_WorkDir.Size = New System.Drawing.Size(270, 13)
+        Me.LinkLabel_WorkDir.Size = New System.Drawing.Size(325, 12)
         Me.LinkLabel_WorkDir.TabIndex = 9
         Me.ToolTip1.SetToolTip(Me.LinkLabel_WorkDir, "Datensatz ändern")
         '
@@ -144,7 +144,7 @@ Partial Class Form1
         Me.ComboBox_Anwendung.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox_Anwendung.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
         Me.ComboBox_Anwendung.FormattingEnabled = True
-        Me.ComboBox_Anwendung.Location = New System.Drawing.Point(42, 19)
+        Me.ComboBox_Anwendung.Location = New System.Drawing.Point(36, 19)
         Me.ComboBox_Anwendung.Name = "ComboBox_Anwendung"
         Me.ComboBox_Anwendung.Size = New System.Drawing.Size(124, 21)
         Me.ComboBox_Anwendung.TabIndex = 0
@@ -153,11 +153,11 @@ Partial Class Form1
         '
         Me.Label_Methode.AutoSize = True
         Me.Label_Methode.Enabled = False
-        Me.Label_Methode.Location = New System.Drawing.Point(511, 22)
+        Me.Label_Methode.Location = New System.Drawing.Point(532, 22)
         Me.Label_Methode.Name = "Label_Methode"
-        Me.Label_Methode.Size = New System.Drawing.Size(52, 13)
+        Me.Label_Methode.Size = New System.Drawing.Size(37, 13)
         Me.Label_Methode.TabIndex = 11
-        Me.Label_Methode.Text = "Methode:"
+        Me.Label_Methode.Text = "Meth.:"
         '
         'ComboBox_Methode
         '
@@ -172,11 +172,11 @@ Partial Class Form1
         '
         Me.Label_Datensatz.AutoSize = True
         Me.Label_Datensatz.Enabled = False
-        Me.Label_Datensatz.Location = New System.Drawing.Point(172, 22)
+        Me.Label_Datensatz.Location = New System.Drawing.Point(164, 22)
         Me.Label_Datensatz.Name = "Label_Datensatz"
-        Me.Label_Datensatz.Size = New System.Drawing.Size(58, 13)
+        Me.Label_Datensatz.Size = New System.Drawing.Size(47, 13)
         Me.Label_Datensatz.TabIndex = 12
-        Me.Label_Datensatz.Text = "Datensatz:"
+        Me.Label_Datensatz.Text = "Datens.:"
         '
         'GroupBox_ErgebnisDB
         '

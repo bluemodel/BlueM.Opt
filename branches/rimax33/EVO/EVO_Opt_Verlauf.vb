@@ -1,6 +1,21 @@
 Partial Public Class EVO_Opt_Verlauf
     Inherits System.Windows.Forms.UserControl
 
+    '*******************************************************************************
+    '*******************************************************************************
+    '**** Klasse EVO_Opt_Verlauf                                                ****
+    '****                                                                       ****
+    '**** Autoren: Christoph Hübner, Felix Fröhlich, Dirk Muschalla             ****
+    '****                                                                       ****
+    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
+    '**** TU Darmstadt                                                          ****
+    '****                                                                       ****
+    '**** November 2007                                                         ****
+    '****                                                                       ****
+    '**** Letzte Änderung: November 2007                                        ****
+    '*******************************************************************************
+    '*******************************************************************************
+
     Private NRunden As Short
     Private NPopul As Short
     Private NGen As Short

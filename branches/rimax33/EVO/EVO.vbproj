@@ -95,6 +95,10 @@
     <Reference Include="TeeChart, Version=2.0.2887.28040, Culture=neutral, PublicKeyToken=9c8126276c77bdb7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <ProjectReference Include="..\..\EVO.MO_Indicators\MO_Indicators\EVO.MO_Indicators.csproj">
+      <Project>{A56DFA12-8680-4C7A-B6BB-406D4D3FE156}</Project>
+      <Name>EVO.MO_Indicators</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\IHA.Win\IHA.Win.vbproj">
       <Project>{7A7828C7-812B-45C0-AC5A-AE2DB74B7CD8}</Project>
       <Name>IHA.Win</Name>
@@ -106,6 +110,14 @@
     <ProjectReference Include="..\..\Wave\Wave.vbproj">
       <Project>{BCD1BBE3-5AB2-4C3F-AC12-43EB977C6F6F}</Project>
       <Name>Wave</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EVO.Common\EVO.Common.vbproj">
+      <Project>{CAA1CE91-0973-4BE7-9BD8-16B5D40BC93C}</Project>
+      <Name>EVO.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EVO.Kern\EVO.Kern.vbproj">
+      <Project>{58356A07-425E-4C91-ACB8-17B9286C9417}</Project>
+      <Name>EVO.Kern</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -155,6 +167,12 @@
       <DependentUpon>MDBImportDialog.vb</DependentUpon>
     </Compile>
     <Compile Include="Diagramm\MDBImportDialog.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Diagramm\ScatterplotDialog.Designer.vb">
+      <DependentUpon>ScatterplotDialog.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Diagramm\ScatterplotDialog.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Diagramm\SolutionDialog.Designer.vb">
@@ -222,6 +240,10 @@
     <EmbeddedResource Include="Diagramm\MDBImportDialog.resx">
       <SubType>Designer</SubType>
       <DependentUpon>MDBImportDialog.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Diagramm\ScatterplotDialog.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>ScatterplotDialog.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Diagramm\SolutionDialog.resx">
       <SubType>Designer</SubType>
