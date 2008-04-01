@@ -152,7 +152,7 @@ Public Class BlueM
             If (ziel.ZielTyp = "IHA") Then
                 'IHA-Berechnung einschalten
                 Me.isIHA = True
-                IHAZielReihe = ziel.ZielReihe
+                IHAZielReihe = ziel.RefReihe
                 IHAStart = ziel.EvalStart
                 IHAEnde = ziel.EvalEnde
                 Exit For

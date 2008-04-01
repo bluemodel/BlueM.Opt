@@ -428,10 +428,10 @@ Public MustInherit Class Sim
         Dim ZIE_Datei As String = Me.WorkDir & Me.Datensatz & "." & OptZiele_Ext
 
         'Format:
-        '*|------|---------------|---------|-------|----------|---------|--------------|--------------------|---------------------------|
-        '*| Opt  | Bezeichnung   | ZielTyp | Datei | SimGröße | ZielFkt | EvalZeitraum |       Zielwert   ODER      Zielreihe           |
-        '*|      |               |         |       |          |         | Start | Ende | WertTyp | ZielWert | ZielGröße | Datei         |
-        '*|------|---------------|---------|-------|----------|---------|-------|------|---------|----------|-----------|---------------|
+        '*|------|---------------|---------|-------|----------|---------|--------------|-------------------|--------------------------|
+        '*| Opt  | Bezeichnung   | ZielTyp | Datei | SimGröße | ZielFkt | EvalZeitraum |    Referenzwert  ODER    Referenzreihe       |
+        '*|      |               |         |       |          |         | Start | Ende | WertTyp | RefWert | RefGröße | Datei         |
+        '*|------|---------------|---------|-------|----------|---------|-------|------|---------|---------|----------|---------------|
 
         Const AnzSpalten As Integer = 12                       'Anzahl Spalten in der ZIE-Datei
         Dim i As Integer
@@ -481,9 +481,9 @@ Public MustInherit Class Sim
                         .EvalEnde = Me.SimEnde
                     End If
                     .WertTyp = WerteArray(9).Trim()
-                    If (WerteArray(10).Trim() <> "") Then .ZielWert = Convert.ToDouble(WerteArray(10).Trim(), Common.Provider.FortranProvider)
-                    .ZielGr = WerteArray(11).Trim()
-                    .ZielReiheDatei = WerteArray(12).Trim()
+                    If (WerteArray(10).Trim() <> "") Then .RefWert = Convert.ToDouble(WerteArray(10).Trim(), Common.Provider.FortranProvider)
+                    .RefGr = WerteArray(11).Trim()
+                    .RefReiheDatei = WerteArray(12).Trim()
                 End With
                 i += 1
             End If
@@ -492,8 +492,8 @@ Public MustInherit Class Sim
         StrRead.Close()
         FiStr.Close()
 
-        'Bei ZielReihen jeweilige Zeitreihen einlesen
-        '############################################
+        'Referenzreihen einlesen
+        '#######################
         Dim ZielStart As Date
         Dim ZielEnde As Date
         Dim ext As String
@@ -502,45 +502,45 @@ Public MustInherit Class Sim
             With Common.Manager.List_Ziele(i)
                 If (.ZielTyp = "Reihe" Or .ZielTyp = "IHA") Then
 
-                    'Dateiendung der Zielreihendatei bestimmen und Reihe einlesen
-                    '------------------------------------------------------------
-                    ext = Path.GetExtension(.ZielReiheDatei)
+                    'Dateiendung der Referenzreihendatei bestimmen und Reihe einlesen
+                    '----------------------------------------------------------------
+                    ext = Path.GetExtension(.RefReiheDatei)
                     Select Case (ext.ToUpper)
                         Case ".WEL"
-                            Dim WEL As New Wave.WEL(Me.WorkDir & .ZielReiheDatei)
-                            .ZielReihe = WEL.getReihe(.ZielGr)
+                            Dim WEL As New Wave.WEL(Me.WorkDir & .RefReiheDatei)
+                            .RefReihe = WEL.getReihe(.RefGr)
                         Case ".ASC"
-                            Dim ASC As New Wave.ASC(Me.WorkDir & .ZielReiheDatei)
-                            .ZielReihe = ASC.getReihe(.ZielGr)
+                            Dim ASC As New Wave.ASC(Me.WorkDir & .RefReiheDatei)
+                            .RefReihe = ASC.getReihe(.RefGr)
                         Case ".ZRE"
-                            Dim ZRE As New Wave.ZRE(Me.WorkDir & .ZielReiheDatei)
-                            .ZielReihe = ZRE.Zeitreihen(0)
+                            Dim ZRE As New Wave.ZRE(Me.WorkDir & .RefReiheDatei)
+                            .RefReihe = ZRE.Zeitreihen(0)
                             'Case ".PRB"
                             'BUG 183: geht nicht mehr, weil PRB-Dateien keine Zeitreihen sind!
-                            'IsOK = Read_PRB(Me.WorkDir & .ZielReiheDatei, .ZielGr, .ZielReihe)
+                            'IsOK = Read_PRB(Me.WorkDir & .RefReiheDatei, .RefGr, .RefReihe)
                         Case Else
-                            Throw New Exception("Das Format der Zielreihe '" & .ZielReiheDatei & "' wird nicht unterstützt!")
+                            Throw New Exception("Das Format der Referenzreihe '" & .RefReiheDatei & "' wird nicht unterstützt!")
                     End Select
 
-                    'Zeitraum der Zielreihe überprüfen (nur bei WEL und ZRE)
-                    '-------------------------------------------------------
+                    'Zeitraum der Referenzreihe überprüfen (nur bei WEL und ZRE)
+                    '-----------------------------------------------------------
                     If (ext.ToUpper = ".WEL" Or ext.ToUpper = ".ZRE" Or ext.ToUpper = ".ASC") Then
 
-                        ZielStart = .ZielReihe.XWerte(0)
-                        ZielEnde = .ZielReihe.XWerte(.ZielReihe.Length - 1)
+                        ZielStart = .RefReihe.XWerte(0)
+                        ZielEnde = .RefReihe.XWerte(.RefReihe.Length - 1)
 
                         If (ZielStart > .EvalStart Or ZielEnde < .EvalEnde) Then
-                            'Zielreihe deckt Evaluierungszeitraum nicht ab
-                            Throw New Exception("Die Zielreihe '" & .ZielReiheDatei & "' deckt den Evaluierungszeitraum nicht ab!")
+                            'Referenzreihe deckt Evaluierungszeitraum nicht ab
+                            Throw New Exception("Die Referenzreihe '" & .RefReiheDatei & "' deckt den Evaluierungszeitraum nicht ab!")
                         Else
-                            'Zielreihe auf Evaluierungszeitraum kürzen
-                            Call .ZielReihe.Cut(.EvalStart, .EvalEnde)
+                            'Referenzreihe auf Evaluierungszeitraum kürzen
+                            Call .RefReihe.Cut(.EvalStart, .EvalEnde)
                         End If
 
                     End If
 
-                    'Zielreihe umbenennen
-                    .ZielReihe.Title += " (Referenz)"
+                    'Referenzreihe umbenennen
+                    .RefReihe.Title += " (Referenz)"
 
                 End If
             End With
@@ -1495,7 +1495,7 @@ Handler:
         Dim Versatz As Long
 
         'Bestimmen der Zeitschritte bis Start des Evaluierungszeitraums
-        ZeitschritteBisStart = (ziel.EvalStart - ziel.ZielReihe.XWerte(0)).TotalMinutes / Me.SimDT.TotalMinutes
+        ZeitschritteBisStart = (ziel.EvalStart - ziel.RefReihe.XWerte(0)).TotalMinutes / Me.SimDT.TotalMinutes
         'Bestimmen der Zeitschritte des Evaluierungszeitraums
         ZeitschritteEval = (ziel.EvalEnde - ziel.EvalStart).TotalMinutes / Me.SimDT.TotalMinutes
 
@@ -1510,7 +1510,7 @@ Handler:
             'Bei dt >= 1d ist Versatz unerheblich
             j = 0
         Else
-            Versatz = (SimReihe.XWerte(0) - ziel.ZielReihe.XWerte(0)).TotalMinutes / Me.SimDT.TotalMinutes
+            Versatz = (SimReihe.XWerte(0) - ziel.RefReihe.XWerte(0)).TotalMinutes / Me.SimDT.TotalMinutes
             If Versatz < 0 Then
                 j = -1 * Versatz
             ElseIf Versatz = 0 Then
@@ -1528,14 +1528,14 @@ Handler:
                 'Summe der Fehlerquadrate
                 '------------------------
                 For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    QWert += (ziel.ZielReihe.YWerte(i) - SimReihe.YWerte(i + j)) * (ziel.ZielReihe.YWerte(i) - SimReihe.YWerte(i + j))
+                    QWert += (ziel.RefReihe.YWerte(i) - SimReihe.YWerte(i + j)) * (ziel.RefReihe.YWerte(i) - SimReihe.YWerte(i + j))
                 Next
 
             Case "Diff"
                 'Summe der Fehler
                 '----------------
                 For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    QWert += Math.Abs(ziel.ZielReihe.YWerte(i) - SimReihe.YWerte(i + j))
+                    QWert += Math.Abs(ziel.RefReihe.YWerte(i) - SimReihe.YWerte(i + j))
                 Next
 
             Case "Volf"
@@ -1545,7 +1545,7 @@ Handler:
                 Dim VolZiel As Double = 0
                 For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
                     VolSim += SimReihe.YWerte(i + j)
-                    VolZiel += ziel.ZielReihe.YWerte(i)
+                    VolZiel += ziel.RefReihe.YWerte(i)
                 Next
                 'Umrechnen in echtes Volumen
                 VolSim *= Me.SimDT.TotalSeconds
@@ -1558,7 +1558,7 @@ Handler:
                 '-------------------------------------------------------------------
                 Dim nUnter As Integer = 0
                 For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    If (SimReihe.YWerte(i + j) < ziel.ZielReihe.YWerte(i)) Then
+                    If (SimReihe.YWerte(i + j) < ziel.RefReihe.YWerte(i)) Then
                         nUnter += 1
                     End If
                 Next
@@ -1569,8 +1569,8 @@ Handler:
                 '---------------------------
                 Dim sUnter As Integer = 0
                 For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    If (SimReihe.YWerte(i + j) < ziel.ZielReihe.YWerte(i)) Then
-                        sUnter += ziel.ZielReihe.YWerte(i) - SimReihe.YWerte(i + j)
+                    If (SimReihe.YWerte(i + j) < ziel.RefReihe.YWerte(i)) Then
+                        sUnter += ziel.RefReihe.YWerte(i) - SimReihe.YWerte(i + j)
                     End If
                 Next
                 QWert = sUnter
@@ -1580,7 +1580,7 @@ Handler:
                 '------------------------------------------------------------------
                 Dim nUeber As Integer = 0
                 For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    If (SimReihe.YWerte(i + j) > ziel.ZielReihe.YWerte(i)) Then
+                    If (SimReihe.YWerte(i + j) > ziel.RefReihe.YWerte(i)) Then
                         nUeber += 1
                     End If
                 Next
@@ -1591,8 +1591,8 @@ Handler:
                 '--------------------------
                 Dim sUeber As Integer = 0
                 For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    If (SimReihe.YWerte(i + j) > ziel.ZielReihe.YWerte(i)) Then
-                        sUeber += SimReihe.YWerte(i + j) - ziel.ZielReihe.YWerte(i)
+                    If (SimReihe.YWerte(i + j) > ziel.RefReihe.YWerte(i)) Then
+                        sUeber += SimReihe.YWerte(i + j) - ziel.RefReihe.YWerte(i)
                     End If
                 Next
                 QWert = sUeber
@@ -1603,12 +1603,12 @@ Handler:
                 'Mittelwert bilden
                 Dim Qobs_quer, zaehler, nenner As Double
                 For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    Qobs_quer += ziel.ZielReihe.YWerte(i)
+                    Qobs_quer += ziel.RefReihe.YWerte(i)
                 Next
                 Qobs_quer = Qobs_quer / (ZeitschritteEval)
                 For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    zaehler += (ziel.ZielReihe.YWerte(i) - SimReihe.YWerte(i + j)) * (ziel.ZielReihe.YWerte(i) - SimReihe.YWerte(i + j))
-                    nenner += (ziel.ZielReihe.YWerte(i) - Qobs_quer) * (ziel.ZielReihe.YWerte(i) - Qobs_quer)
+                    zaehler += (ziel.RefReihe.YWerte(i) - SimReihe.YWerte(i + j)) * (ziel.RefReihe.YWerte(i) - SimReihe.YWerte(i + j))
+                    nenner += (ziel.RefReihe.YWerte(i) - Qobs_quer) * (ziel.RefReihe.YWerte(i) - Qobs_quer)
                 Next
                 'abgeänderte Nash-Sutcliffe Formel: 0 als Zielwert (1- weggelassen)
                 QWert = zaehler / nenner
@@ -1643,17 +1643,17 @@ Handler:
 
             Case "AbQuad"
                 'Summe der Fehlerquadrate
-                QWert = (ziel.ZielWert - SimWert) * (ziel.ZielWert - SimWert)
+                QWert = (ziel.RefWert - SimWert) * (ziel.RefWert - SimWert)
 
             Case "Diff"
                 'Summe der Fehler
-                QWert = Math.Abs(ziel.ZielWert - SimWert)
+                QWert = Math.Abs(ziel.RefWert - SimWert)
 
             Case "nUnter"
                 'Relative Anzahl der Zeitschritte mit Unterschreitungen (in Prozent)
                 Dim nUnter As Integer = 0
                 For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) < ziel.ZielWert) Then
+                    If (SimReihe.YWerte(i) < ziel.RefWert) Then
                         nUnter += 1
                     End If
                 Next
@@ -1663,7 +1663,7 @@ Handler:
                 'Relative Anzahl der Zeitschritte mit Überschreitungen (in Prozent)
                 Dim nUeber As Integer = 0
                 For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) > ziel.ZielWert) Then
+                    If (SimReihe.YWerte(i) > ziel.RefWert) Then
                         nUeber += 1
                     End If
                 Next

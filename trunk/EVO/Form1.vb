@@ -2079,10 +2079,10 @@ Start_Evolutionsrunden:
                     '---------------------------
                     If (.ZielTyp = "Reihe" Or .ZielTyp = "IHA") Then
                         'Referenzreihen nur jeweils ein Mal zeichnen
-                        If (Not RefSeries.Contains(.ZielReiheDatei & .ZielGr)) Then
-                            RefSeries.Add(.ZielGr, .ZielReiheDatei & .ZielGr)
+                        If (Not RefSeries.Contains(.RefReiheDatei & .RefGr)) Then
+                            RefSeries.Add(.RefGr, .RefReiheDatei & .RefGr)
                             'Referenzreihe in Wave laden
-                            Wave1.Display_Series(.ZielReihe)
+                            Wave1.Display_Series(.RefReihe)
                         End If
                     End If
 
