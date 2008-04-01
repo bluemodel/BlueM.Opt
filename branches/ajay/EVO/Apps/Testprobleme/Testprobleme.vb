@@ -35,6 +35,7 @@ Partial Public Class Testprobleme
         Combo_Testproblem.Items.Add("CONSTR")
         Combo_Testproblem.Items.Add("Box")
         Combo_Testproblem.Items.Add("Abhängige Parameter")
+        Combo_Testproblem.Items.Add("Flood Mitigation")
 
         Combo_Testproblem.SelectedIndex = 0
 
@@ -110,6 +111,10 @@ Partial Public Class Testprobleme
                 Case "Abhängige Parameter"
                     Me.Label_Beschreibungstext.Text = "Bedingung: Y > X"
                     OptModus = EVO_MODUS.Single_Objective
+
+                Case "Flood Mitigation"
+                    Me.Label_Beschreibungstext.Text = "Multicriteria Problem Flood Mitigation and Hydropower Generation"
+                    OptModus = EVO_MODUS.Multi_Objective
 
             End Select
 
@@ -258,6 +263,17 @@ Partial Public Class Testprobleme
                 'Beziehungen
                 mypara(0).Beziehung = Common.Constants.Beziehung.keine
                 mypara(1).Beziehung = Common.Constants.Beziehung.groesser
+
+            Case "Flood Mitigation" 'Ajay
+                globalAnzPar = 30               'Parameters
+                AnzZiele = 2                    'Objective
+                globalAnzRand = 0               'Constraints
+                ReDim mypara(globalAnzPar - 1)
+                Randomize()
+                For i = 0 To globalAnzPar - 1
+                    mypara(i) = New EVO.Common.OptParameter()
+                    mypara(i).Xn = Rnd()
+                Next
 
         End Select
 
@@ -629,6 +645,22 @@ Partial Public Class Testprobleme
                 Next j
                 serie = Diag.getSeriesLine("Grenze 4", "Red")
                 serie.Add(Array4X, Array4Y)
+
+            Case "Flood Mitigation"
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                Dim ArrayX(1000) As Double
+                Dim ArrayY(1000) As Double
+                Diag.Header.Text = "Zitzler/Deb/Theile T1"
+                Diag.Chart.Axes.Left.Maximum = 7
+                Diag.Chart.Axes.Left.Increment = 0.5
+
+                'Paretofront berechnen und zeichnen
+                For j = 0 To 1000
+                    ArrayX(j) = j / 1000
+                    ArrayY(j) = 1 - Math.Sqrt(ArrayX(j))
+                Next j
+                serie = Diag.getSeriesLine("Paretofront", "Green")
+                serie.Add(ArrayX, ArrayY)
 
         End Select
 
@@ -1102,6 +1134,26 @@ Partial Public Class Testprobleme
                 Dim serie3D As Steema.TeeChart.Styles.Points3D
                 serie3D = Diag.getSeries3DPoint("Population " & ipop + 1)
                 serie3D.Add(ind.PES_OptParas(0).Xn, ind.PES_OptParas(1).Xn, ind.Zielwerte(0))
+
+            Case "Flood Mitigation"
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+                'Qualitätswert berechnen
+                '-----------------------
+                f1 = ind.PES_OptParas(0).Xn
+                f2 = 0
+                For i = 1 To globalAnzPar - 1
+                    f2 = f2 + ind.PES_OptParas(i).Xn
+                Next i
+                f2 = 1 + 9 / (globalAnzPar - 1) * f2
+                f2 = f2 * (1 - System.Math.Sqrt(f1 / f2))
+                ind.Zielwerte(0) = f1
+                ind.Zielwerte(1) = f2
+
+                'Zeichnen
+                '--------
+                serie = Diag.getSeriesPoint("Population", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                serie.Add(ind.Zielwerte(0), ind.Zielwerte(1))
 
         End Select
 
