@@ -547,8 +547,8 @@ Public MustInherit Class Sim
         Next
 
         'ggf. Warnung wegen maximal 3 Dimensionen in Diagramm ausgeben 
-        If (Common.Manager.AnzPenalty > 3) Then
-            MsgBox("Die Anzahl der OptZiele beträgt mehr als 3!" & eol _
+        If (Common.Manager.AnzZiele > 3) Then
+            MsgBox("Die Anzahl der Ziele beträgt mehr als 3!" & eol _
                     & "Es werden nur die ersten drei Zielfunktionen im Hauptdiagramm angezeigt!", MsgBoxStyle.Information, "Info")
         End If
 
