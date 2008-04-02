@@ -133,16 +133,16 @@ Partial Public Class Testprobleme
 
     'Parameterübergabe
     '*****************
-    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzRand As Short, ByRef mypara() As EVO.Common.OptParameter)
+    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef mypara() As EVO.Common.OptParameter)
 
-        Dim i, AnzZiele As Integer
+        Dim i, AnzZiele, AnzConstraints As Integer
 
         Select Case Me.Combo_Testproblem.Text
 
             Case "Sinus-Funktion"
                 globalAnzPar = Me.AnzParameter
                 AnzZiele = 1
-                globalAnzRand = 0
+                AnzConstraints = 0
                 ReDim mypara(globalAnzPar - 1)
                 For i = 0 To globalAnzPar - 1
                     mypara(i) = New EVO.Common.OptParameter()
@@ -152,7 +152,7 @@ Partial Public Class Testprobleme
             Case "Beale-Problem" 'x1 = [-5;5], x2=[-2;2]
                 globalAnzPar = 2
                 AnzZiele = 1
-                globalAnzRand = 0
+                AnzConstraints = 0
                 ReDim mypara(globalAnzPar - 1)
                 For i = 0 To globalAnzPar - 1
                     mypara(i) = New EVO.Common.OptParameter()
@@ -162,7 +162,7 @@ Partial Public Class Testprobleme
             Case "Schwefel 2.4-Problem" 'xi = [-10,10]
                 globalAnzPar = Me.AnzParameter
                 AnzZiele = 1
-                globalAnzRand = 0
+                AnzConstraints = 0
                 ReDim mypara(globalAnzPar - 1)
                 For i = 0 To globalAnzPar - 1
                     mypara(i) = New EVO.Common.OptParameter()
@@ -172,7 +172,7 @@ Partial Public Class Testprobleme
             Case "Deb 1" 'x1 = [0.1;1], x2=[0;5]
                 globalAnzPar = 2
                 AnzZiele = 2
-                globalAnzRand = 0
+                AnzConstraints = 0
                 ReDim mypara(globalAnzPar - 1)
                 Randomize()
                 For i = 0 To globalAnzPar - 1
@@ -183,7 +183,7 @@ Partial Public Class Testprobleme
             Case "Zitzler/Deb T1" 'xi = [0,1]
                 globalAnzPar = 30
                 AnzZiele = 2
-                globalAnzRand = 0
+                AnzConstraints = 0
                 ReDim mypara(globalAnzPar - 1)
                 Randomize()
                 For i = 0 To globalAnzPar - 1
@@ -194,7 +194,7 @@ Partial Public Class Testprobleme
             Case "Zitzler/Deb T2" 'xi = [0,1]
                 globalAnzPar = 30
                 AnzZiele = 2
-                globalAnzRand = 0
+                AnzConstraints = 0
                 ReDim mypara(globalAnzPar - 1)
                 Randomize()
                 For i = 0 To globalAnzPar - 1
@@ -205,7 +205,7 @@ Partial Public Class Testprobleme
             Case "Zitzler/Deb T3" 'xi = [0,1]
                 globalAnzPar = 15
                 AnzZiele = 2
-                globalAnzRand = 0
+                AnzConstraints = 0
                 ReDim mypara(globalAnzPar - 1)
                 Randomize()
                 For i = 0 To globalAnzPar - 1
@@ -216,7 +216,7 @@ Partial Public Class Testprobleme
             Case "Zitzler/Deb T4" 'x1 = [0,1], xi=[-5,5]
                 globalAnzPar = 10
                 AnzZiele = 2
-                globalAnzRand = 0
+                AnzConstraints = 0
                 ReDim mypara(globalAnzPar - 1)
                 Randomize()
                 For i = 0 To globalAnzPar - 1
@@ -227,7 +227,7 @@ Partial Public Class Testprobleme
             Case "CONSTR" 'x1 = [0.1;1], x2=[0;5]
                 globalAnzPar = 2
                 AnzZiele = 2
-                globalAnzRand = 2
+                AnzConstraints = 2
                 ReDim mypara(globalAnzPar - 1)
                 Randomize()
                 For i = 0 To globalAnzPar - 1
@@ -238,7 +238,7 @@ Partial Public Class Testprobleme
             Case "Box"
                 globalAnzPar = 3
                 AnzZiele = 3
-                globalAnzRand = 2
+                AnzConstraints = 2
                 ReDim mypara(globalAnzPar - 1)
                 Randomize()
                 For i = 0 To globalAnzPar - 1
@@ -249,7 +249,7 @@ Partial Public Class Testprobleme
             Case "Abhängige Parameter"
                 globalAnzPar = 2
                 AnzZiele = 1
-                globalAnzRand = 0
+                AnzConstraints = 0
                 ReDim mypara(globalAnzPar - 1)
                 For i = 0 To globalAnzPar - 1
                     mypara(i) = New EVO.Common.OptParameter()
@@ -261,11 +261,15 @@ Partial Public Class Testprobleme
 
         End Select
 
-        'HACK: Ziele dem Manager mitteilen (geht auch schöner!)
+        'HACK: Ziele und Contraints dem Manager mitteilen (geht auch schöner!)
         ReDim Common.Manager.List_Ziele(AnzZiele - 1)
         For i = 0 To Common.Manager.AnzZiele - 1
             Common.Manager.List_Ziele(i) = New Common.Ziel()
             Common.Manager.List_Ziele(i).isOpt = True
+        Next
+        ReDim Common.Manager.List_Constraints(AnzConstraints - 1)
+        For i = 0 To Common.Manager.AnzConstraints - 1
+            Common.Manager.List_Constraints(i) = New Common.Constraint()
         Next
 
     End Sub

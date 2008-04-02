@@ -28,7 +28,6 @@ Public Class Functions
     Dim NMemberSecondPop As Integer
     Dim NInteract As Integer
     Dim isInteract As Boolean
-    Dim NConstr As Integer
     Dim iAktGen As Integer
     Dim iAktPop As Integer
 
@@ -43,14 +42,13 @@ Public Class Functions
 
     'Die Statische Variablen werden im Konstruktor übergeben
     '*******************************************************
-    Public Sub New(ByVal _NNachf As Integer, ByVal _NEltern As Integer, ByVal _NMemberSecondPop As Integer, ByVal _NInteract As Integer, ByVal _isInteract As Boolean, ByVal _NConstr As Integer, ByVal _iAktGen As Integer)
+    Public Sub New(ByVal _NNachf As Integer, ByVal _NEltern As Integer, ByVal _NMemberSecondPop As Integer, ByVal _NInteract As Integer, ByVal _isInteract As Boolean, ByVal _iAktGen As Integer)
 
         NNachf = _NNachf
         NEltern = _NEltern
         NMemberSecondPop = _NMemberSecondPop
         NInteract = _NInteract
         isInteract = _isInteract
-        NConstr = _NConstr
         iAktGen = _iAktGen
 
     End Sub
@@ -163,7 +161,7 @@ Public Class Functions
         Dim isDominated As Boolean
         Dim Summe_Constrain(1) As Double
 
-        If (NConstr > 0) Then
+        If (Common.Manager.AnzConstraints > 0) Then
             'Mit Constraints
             '===============
             For i = 0 To NDSorting.GetUpperBound(0)
@@ -184,7 +182,7 @@ Public Class Functions
                         Summe_Constrain(0) = 0
                         Summe_Constrain(1) = 0
 
-                        For k = 0 To NConstr - 1
+                        For k = 0 To Common.Manager.AnzConstraints - 1
                             If (NDSorting(i).Constrain(k) < 0) Then
                                 Summe_Constrain(0) += NDSorting(i).Constrain(k)
                             End If

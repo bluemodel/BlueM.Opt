@@ -19,6 +19,7 @@ Public Module Manager
     '#############
 
     Public List_Ziele() As Ziel                 'Liste der Zielfunktionen
+    Public List_Constraints() As Constraint     'Liste der Constraints
 
     'Properties
     '##########
@@ -64,6 +65,14 @@ Public Module Manager
             Next
 
             Return array
+        End Get
+    End Property
+
+    'Bibt die Anzahl Constraints zurück
+    '**********************************
+    Public ReadOnly Property AnzConstraints() As Integer
+        Get
+            Return Manager.List_Constraints.Length
         End Get
     End Property
 
