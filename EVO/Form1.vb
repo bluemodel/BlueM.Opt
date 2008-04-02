@@ -2069,11 +2069,11 @@ Start_Evolutionsrunden:
             'Zu zeichnenden Simulationsreihen zurücksetzen
             SimSeries.Clear()
 
-            'zu zeichnenden Reihen aus Liste der OptZiele raussuchen
-            '-------------------------------------------------------
-            For Each optziel As Common.Ziel In Common.Manager.List_OptZiele
+            'zu zeichnenden Reihen aus Liste der Ziele raussuchen
+            '----------------------------------------------------
+            For Each ziel As Common.Ziel In Common.Manager.List_Ziele
 
-                With optziel
+                With ziel
 
                     'Referenzreihe in Wave laden
                     '---------------------------
