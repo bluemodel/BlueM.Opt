@@ -27,8 +27,7 @@ Public Class OptResult
     'Optimierungsbedingungen
     Public List_OptParameter() As EVO.Common.OptParameter
     Public List_OptParameter_Save() As EVO.Common.OptParameter
-    Public List_Constraints() As Sim.Struct_Constraint
-    Public List_Locations()As Sim.Struct_Lokation
+    Public List_Locations() As Sim.Struct_Lokation
 
     'Array von Lösungen
     Public Solutions() As Common.Individuum
@@ -55,7 +54,6 @@ Public Class OptResult
         'Optimierungsbedingungen kopieren
         Me.List_OptParameter = Sim1.List_OptParameter
         Me.List_OptParameter_Save = Sim1.List_OptParameter_Save
-        Me.List_Constraints = Sim1.List_Constraints
         Me.List_Locations = Sim1.List_Locations
 
         ReDim Me.Solutions(-1)
@@ -299,14 +297,14 @@ Public Class OptResult
 
         'Tabelle 'Constraints'
         '----------------
-        If (Me.List_Constraints.GetLength(0) > 0) Then
+        If (Common.Manager.AnzConstraints > 0) Then
             'Spalten festlegen:
             fieldnames = ""
-            For i = 0 To Me.List_Constraints.GetUpperBound(0)
+            For i = 0 To Common.Manager.AnzConstraints - 1
                 If (i > 0) Then
                     fieldnames &= ", "
                 End If
-                fieldnames &= "[" & Me.List_Constraints(i).Bezeichnung & "] DOUBLE"
+                fieldnames &= "[" & Common.Manager.List_Constraints(i).Bezeichnung & "] DOUBLE"
             Next
             'Tabelle anpassen
             command.CommandText = "ALTER TABLE [Constraints] ADD COLUMN " & fieldnames
@@ -421,11 +419,11 @@ Public Class OptResult
 
         'Constraints schreiben 
         '---------------------
-        If (Me.List_Constraints.GetLength(0) > 0) Then
+        If (Common.Manager.AnzConstraints > 0) Then
             fieldnames = ""
             fieldvalues = ""
-            For i = 0 To Me.List_Constraints.GetUpperBound(0)
-                fieldnames &= ", [" & Me.List_Constraints(i).Bezeichnung & "]"
+            For i = 0 To Common.Manager.AnzConstraints - 1
+                fieldnames &= ", [" & Common.Manager.List_Constraints(i).Bezeichnung & "]"
                 fieldvalues &= ", " & ind.Constrain(i).ToString(Common.Provider.FortranProvider)
             Next
             command.CommandText = "INSERT INTO [Constraints] (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
@@ -682,9 +680,8 @@ Public Class OptResult
 
                 'Constraints
                 '-----------
-                ReDim .Constrain(Me.List_Constraints.GetUpperBound(0))
-                For j = 0 To Me.List_Constraints.GetUpperBound(0)
-                    .Constrain(j) = ds.Tables(0).Rows(i).Item(Me.List_Constraints(j).Bezeichnung)
+                For j = 0 To Common.Manager.AnzConstraints - 1
+                    .Constrain(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Constraints(j).Bezeichnung)
                 Next
 
                 'Pfad

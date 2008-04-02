@@ -68,27 +68,6 @@ Public MustInherit Class Sim
     Public List_ModellParameter() As Struct_ModellParameter      'Liste der Modellparameter
     Public List_ModellParameter_Save() As Struct_ModellParameter 'Liste der Modellparameter die nicht verändert wird
 
-    'Constraints
-    '-----------
-    Public Structure Struct_Constraint
-        Public Bezeichnung As String                'Bezeichnung
-        Public GrenzTyp As String                   'Gibt an ob es sich um einen Wert oder um eine Reihe handelt
-        Public Datei As String                      'Die Ergebnisdatei, aus der das Simulationsergebnis ausgelesen werden soll [WEL]
-        Public SimGr As String                      'Die Simulationsgröße, die auf Verletzung der Grenze überprüft werden soll
-        Public GrenzPos As String                   'Grenzposition (Ober-/Untergrenze)
-        Public WertTyp As String                    'Gibt an wie der Wert, der mit dem Grenzwert verglichen werden soll, aus dem Simulationsergebnis berechnet werden soll
-        Public GrenzWert As String                  'Der vorgegeben Grenzwert
-        Public GrenzReiheDatei As String            'Der Dateiname der Grenzwertreihe
-        Public GrenzGr As String                    'Spalte der .wel Datei falls Grenzwertreihe .wel Datei ist
-        Public GrenzReihe As Wave.Zeitreihe         'Die Werte der Grenzwertreihe
-        Public ConstTmp As Double                   'Constraintwert der letzten Simulation wird hier zwischengespeichert 
-        Public Overrides Function toString() As String
-            Return Bezeichnung
-        End Function
-    End Structure
-
-    Public List_Constraints() As Struct_Constraint  'Liste der Constraints
-
     'Ergebnisspeicher
     '----------------
     Public OptResult As OptResult
@@ -136,7 +115,6 @@ Public MustInherit Class Sim
         ReDim Me.List_OptParameter_Save(-1)
         ReDim Me.List_ModellParameter(-1)
         ReDim Me.List_ModellParameter_Save(-1)
-        ReDim Me.List_Constraints(-1)
         ReDim Me.List_Locations(-1)
 
         'Simulationsergebnis instanzieren
@@ -558,9 +536,17 @@ Public MustInherit Class Sim
     '********************
     Private Sub Read_CON()
 
-        Dim AnzConst As Integer = 0
+        'Format:
+        '*|---------------|----------|-------|-----------|------------|----------------------|-----------------------------|
+        '*|               |          |       |           |            |      Grenzwert       |        Grenzreihe           |
+        '*| Bezeichnung   | GrenzTyp | Datei | SimGröße  | Oben/Unten | WertTyp  | Grenzwert | Grenzgröße | Datei          |
+        '*|---------------|----------|-------|-----------|------------|----------|-----------|------------|----------------|
+
         Dim ext As String
         Dim i As Integer
+        Dim Zeile As String
+        Dim WerteArray() As String
+        Const AnzSpalten As Integer = 9
 
         Dim Datei As String = WorkDir & Datensatz & "." & Constraints_Ext
 
@@ -569,39 +555,33 @@ Public MustInherit Class Sim
             Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.Read)
             Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-            Dim Zeile As String = ""
-
-            'Anzahl der Constraints feststellen
-            Do
-                Zeile = StrRead.ReadLine.ToString()
-                If (Zeile.StartsWith("*") = False) Then
-                    AnzConst += 1
-                End If
-            Loop Until StrRead.Peek() = -1
-
-            ReDim List_Constraints(AnzConst - 1)
-
-            'Zurück zum Dateianfang und lesen
-            FiStr.Seek(0, SeekOrigin.Begin)
-
-            'Einlesen der Zeile und übergeben an die Constraints Liste
-            Dim ZeilenArray(9) As String
-
             i = 0
             Do
+                'Zeile einlesen
                 Zeile = StrRead.ReadLine.ToString()
-                If (Zeile.StartsWith("*") = False) Then
-                    ZeilenArray = Zeile.Split("|")
+                If (Not Zeile.StartsWith("*") And Zeile.Contains("|")) Then
+                    WerteArray = Zeile.Split("|")
+                    'Kontrolle
+                    If (WerteArray.GetUpperBound(0) <> AnzSpalten + 1) Then
+                        Throw New Exception("Die CON-Datei hat die falsche Anzahl Spalten!")
+                    End If
+                    'Neues Constraint anlegen
+                    ReDim Preserve Common.Manager.List_Constraints(i)
+                    Common.Manager.List_Constraints(i) = New Common.Constraint()
                     'Werte zuweisen
-                    List_Constraints(i).Bezeichnung = ZeilenArray(1).Trim()
-                    List_Constraints(i).GrenzTyp = ZeilenArray(2).Trim()
-                    List_Constraints(i).Datei = ZeilenArray(3).Trim()
-                    List_Constraints(i).SimGr = ZeilenArray(4).Trim()
-                    List_Constraints(i).GrenzPos = ZeilenArray(5).Trim()
-                    List_Constraints(i).WertTyp = ZeilenArray(6).Trim()
-                    List_Constraints(i).GrenzWert = ZeilenArray(7).Trim()
-                    List_Constraints(i).GrenzGr = ZeilenArray(8).Trim()
-                    List_Constraints(i).GrenzReiheDatei = ZeilenArray(9).Trim()
+                    With Common.Manager.List_Constraints(i)
+                        .Bezeichnung = WerteArray(1).Trim()
+                        .GrenzTyp = WerteArray(2).Trim()
+                        .Datei = WerteArray(3).Trim()
+                        .SimGr = WerteArray(4).Trim()
+                        .GrenzPos = WerteArray(5).Trim()
+                        .WertTyp = WerteArray(6).Trim()
+                        If (WerteArray(7).Trim() <> "") Then
+                            .GrenzWert = Convert.ToDouble(WerteArray(7).Trim(), Common.Provider.FortranProvider)
+                        End If
+                        .GrenzGr = WerteArray(8).Trim()
+                        .GrenzReiheDatei = WerteArray(9).Trim()
+                    End With
                     i += 1
                 End If
             Loop Until StrRead.Peek() = -1
@@ -611,9 +591,9 @@ Public MustInherit Class Sim
 
             'Kontrolle
             '---------
-            For i = 0 To Me.List_Constraints.GetUpperBound(0)
-                With Me.List_Constraints(i)
-                    If (Not .GrenzTyp = "Wert" And Not .GrenzTyp = "Reihe") Then Throw New Exception("Constraints: GrenzTxyp muss entweder 'Wert' oder 'Reihe' sein!")
+            For i = 0 To Common.Manager.AnzConstraints - 1
+                With Common.Manager.List_Constraints(i)
+                    If (Not .GrenzTyp = "Wert" And Not .GrenzTyp = "Reihe") Then Throw New Exception("Constraints: GrenzTyp muss entweder 'Wert' oder 'Reihe' sein!")
                     If (Not .Datei = "WEL") Then Throw New Exception("Constraints: Als Datei wird momentan nur 'WEL' unterstützt!")
                     If (Not .GrenzPos = "Obergrenze" And Not .GrenzPos = "Untergrenze") Then Throw New Exception("Constraints: Für Oben/Unten muss entweder 'Obergrenze' oder 'Untergrenze' angegeben sein!")
                 End With
@@ -623,8 +603,8 @@ Public MustInherit Class Sim
             Dim GrenzStart As Date
             Dim GrenzEnde As Date
 
-            For i = 0 To AnzConst - 1
-                With List_Constraints(i)
+            For i = 0 To Common.Manager.AnzConstraints - 1
+                With Common.Manager.List_Constraints(i)
                     If (.GrenzTyp = "Reihe") Then
 
                         'Dateiendung der Grenzwertdatei bestimmen und Reihe einlesen
@@ -662,7 +642,7 @@ Public MustInherit Class Sim
 
         Else
             'CON-Datei existiert nicht
-            ReDim List_Constraints(-1)
+            ReDim Common.Manager.List_Constraints(-1)
         End If
 
     End Sub
@@ -1218,7 +1198,7 @@ Public MustInherit Class Sim
 
     'EVO-Parameterübergabe die Standard Parameter werden aus den Listen der OptPara und OptZiele ermittelt
     '*****************************************************************************************************
-    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzRand As Short, ByRef mypara() As EVO.Common.OptParameter)
+    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef mypara() As EVO.Common.OptParameter)
 
         Dim i As Integer
 
@@ -1230,9 +1210,6 @@ Public MustInherit Class Sim
         For i = 0 To globalAnzPar - 1
             mypara(i) = Me.List_OptParameter(i).Clone()
         Next
-
-        'Anzahl Randbedingungen übergeben
-        globalAnzRand = Me.List_Constraints.GetLength(0)
 
     End Sub
 
@@ -1397,9 +1374,8 @@ Handler:
         Next
 
         'Constraints berechnen
-        For i = 0 To Me.List_Constraints.GetUpperBound(0)
-            List_Constraints(i).ConstTmp = Constraint(List_Constraints(i))
-            Indi.Constrain(i) = List_Constraints(i).ConstTmp
+        For i = 0 To Common.Manager.AnzConstraints - 1
+            Indi.Constrain(i) = Constraint(Common.Manager.List_Constraints(i))
         Next
 
         'Lösung abspeichern
@@ -1748,7 +1724,7 @@ Handler:
 
     'Constraint berechnen (Constraint < 0 ist Grenzverletzung)
     '****************************************************
-    Public Function Constraint(ByVal constr As Struct_Constraint) As Double
+    Public Function Constraint(ByVal constr As Common.Constraint) As Double
 
         Dim i As Integer
 

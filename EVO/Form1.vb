@@ -44,7 +44,6 @@ Partial Class Form1
     '**** Globale Parameter Parameter Optimierung ****
     'TODO: diese Werte sollten eigentlich nur in CES bzw PES vorgehalten werden
     Dim globalAnzPar As Short
-    Dim globalAnzRand As Short
     Dim array_x() As Double
     Dim array_y() As Double
     Dim myPara() As EVO.Common.OptParameter
@@ -189,7 +188,7 @@ Partial Class Form1
                     Call EVO_Einstellungen1.setStandard_PES(Testprobleme1.OptModus)
 
                     'Globale Parameter werden gesetzt
-                    Call Testprobleme1.Parameter_Uebergabe(globalAnzPar, globalAnzRand, myPara)
+                    Call Testprobleme1.Parameter_Uebergabe(globalAnzPar, myPara)
 
                     'Start-Button aktivieren (keine Methodenauswahl erforderlich)
                     Button_Start.Enabled = True
@@ -339,7 +338,7 @@ Partial Class Form1
                     End If
 
                     'Parameterübergabe an PES
-                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzRand, myPara)
+                    Call Sim1.Parameter_Uebergabe(globalAnzPar, myPara)
 
                     'EVO_Verlauf zurücksetzen
                     Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
@@ -363,7 +362,7 @@ Partial Class Form1
                     End If
 
                     'TODO: eigenen Parameterübergabe an HookJeeves (evtl.überladen von Parameter_Uebergabe)
-                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzRand, myPara)
+                    Call Sim1.Parameter_Uebergabe(globalAnzPar, myPara)
 
 
                 Case METH_CES, METH_HYBRID 'Methode CES und Methode CES_PES
@@ -623,12 +622,11 @@ Partial Class Form1
         SimReihen = New Collection
 
         'Parameter
-        Me.globalAnzRand = 0
         Me.globalAnzPar = Sim1.List_OptParameter.Length
         Anz_SensiPara = SensiPlot1.Selected_OptParameter.GetLength(0)
 
         'Individuum wird initialisiert
-        Call Common.Individuum.Initialise(1, 0, Me.globalAnzPar, Me.globalAnzRand)
+        Call Common.Individuum.Initialise(1, 0, Me.globalAnzPar)
 
         'Anzahl Simulationen
         If (Anz_SensiPara = 1) Then
@@ -817,10 +815,7 @@ Partial Class Form1
         'CES initialisieren
         '******************
         CES1 = New EVO.Kern.CES()
-        Call Ces1.CESInitialise(EVO_Einstellungen1.Settings, Method, sim1.CES_T_Modus, Common.Manager.AnzPenalty, Sim1.List_Constraints.GetLength(0), Sim1.List_Locations.GetLength(0), Sim1.VerzweigungsDatei.GetLength(0), sim1.n_Combinations, sim1.n_PathDimension)
-
-        'Die alten Bekannten
-        globalAnzRand = CES1.ModSett.n_Constrain
+        Call Ces1.CESInitialise(EVO_Einstellungen1.Settings, Method, sim1.CES_T_Modus, Common.Manager.AnzPenalty, Common.Manager.AnzConstraints, Sim1.List_Locations.GetLength(0), Sim1.VerzweigungsDatei.GetLength(0), sim1.n_Combinations, sim1.n_PathDimension)
 
         'EVO_Verlauf zurücksetzen
         '************************
@@ -1070,7 +1065,7 @@ Partial Class Form1
 
                             'Schritte 1 - 3: PES wird initialisiert (Weiteres siehe dort ;-)
                             '**************************************************************
-                            Call PES1.PesInitialise(EVO_Einstellungen1.Settings, globalAnzPar, Common.Manager.AnzPenalty, globalAnzRand, myPara, Method)
+                            Call PES1.PesInitialise(EVO_Einstellungen1.Settings, globalAnzPar, Common.Manager.AnzPenalty, Common.Manager.AnzConstraints, myPara, Method)
 
                             'Die PopulationsEltern des PES werden gefüllt
                             For m = 0 To CES1.PES_Parents_pLoc.GetUpperBound(0)
@@ -1115,7 +1110,7 @@ Partial Class Form1
 
                     'Parameterübergabe an PES
                     '************************
-                    Call Sim1.Parameter_Uebergabe(globalAnzPar, globalAnzRand, myPara)
+                    Call Sim1.Parameter_Uebergabe(globalAnzPar, myPara)
                     'Starten der PES
                     '***************
                     Call STARTEN_PES()
@@ -1148,7 +1143,7 @@ Partial Class Form1
         Dim HookJeeves As EVO.Kern.HookeAndJeeves = New EVO.Kern.HookeAndJeeves(globalAnzPar, EVO_Einstellungen1.Settings.HookJeeves.DnStart, EVO_Einstellungen1.Settings.HookJeeves.DnFinish)
 
         'Individuum wird initialisiert
-        Call Common.Individuum.Initialise(1, 0, Me.globalAnzPar, Me.globalAnzRand)
+        Call Common.Individuum.Initialise(1, 0, Me.globalAnzPar)
 
         ReDim QNBest(Common.Manager.AnzPenalty - 1)
         ReDim QBest(Common.Manager.AnzPenalty - 1)
@@ -1361,7 +1356,7 @@ Partial Class Form1
         End If
 
         'Individuum wird initialisiert
-        Call Common.Individuum.Initialise(1, 0, globalAnzPar, globalAnzRand)
+        Call Common.Individuum.Initialise(1, 0, globalAnzPar)
 
         'Schritte 0: Objekt der Klasse PES wird erzeugt
         '**********************************************
@@ -1369,7 +1364,7 @@ Partial Class Form1
 
         'Schritte 1 - 3: ES wird initialisiert (Weiteres siehe dort ;-)
         '**************************************************************
-        Call PES1.PesInitialise(EVO_Einstellungen1.Settings, globalAnzPar, Common.Manager.AnzPenalty, globalAnzRand, myPara, Method)
+        Call PES1.PesInitialise(EVO_Einstellungen1.Settings, globalAnzPar, Common.Manager.AnzPenalty, Common.Manager.AnzConstraints, myPara, Method)
 
         'Startwerte werden der Verlaufsanzeige zugewiesen
         Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
@@ -1936,7 +1931,7 @@ Start_Evolutionsrunden:
 
             'Lösungsdialog initialisieren
             If (IsNothing(Me.solutionDialog)) Then
-                Me.solutionDialog = New SolutionDialog(Sim1.List_OptParameter_Save, Sim1.List_Constraints, Sim1.List_Locations)
+                Me.solutionDialog = New SolutionDialog(Sim1.List_OptParameter_Save, Sim1.List_Locations)
             End If
 
             'Lösungsdialog anzeigen
