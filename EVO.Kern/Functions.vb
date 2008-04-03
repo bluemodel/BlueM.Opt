@@ -25,28 +25,19 @@ Public Class Functions
     '*******************************************************
     Dim NNachf As Integer
     Dim NEltern As Integer
-    Dim NMemberSecondPop As Integer
+    Dim MaxMemberSekPop As Integer
     Dim NInteract As Integer
     Dim isInteract As Boolean
     Dim iAktGen As Integer
     Dim iAktPop As Integer
 
-    'Die Veränderliochen Structs werden in der Funktion übergeben
-    '************************************************************
-    Dim NDSorting() As Individuum
-    Dim SekundärQb() As Individuum
-
-    'Bestwerte werden zurückgeben
-    Dim Best() As Individuum
-    '****************************
-
     'Die Statische Variablen werden im Konstruktor übergeben
     '*******************************************************
-    Public Sub New(ByVal _NNachf As Integer, ByVal _NEltern As Integer, ByVal _NMemberSecondPop As Integer, ByVal _NInteract As Integer, ByVal _isInteract As Boolean, ByVal _iAktGen As Integer)
+    Public Sub New(ByVal _NNachf As Integer, ByVal _NEltern As Integer, ByVal _MaxMemberSekPop As Integer, ByVal _NInteract As Integer, ByVal _isInteract As Boolean, ByVal _iAktGen As Integer)
 
         NNachf = _NNachf
         NEltern = _NEltern
-        NMemberSecondPop = _NMemberSecondPop
+        MaxMemberSekPop = _MaxMemberSekPop
         NInteract = _NInteract
         isInteract = _isInteract
         iAktGen = _iAktGen
@@ -58,12 +49,7 @@ Public Class Functions
     '3. Der Bestwertspeicher wird entsprechend der Fronten oder der sekundären Population gefüllt
     '4: Sekundäre Population wird bestimmt und gespeichert
     '--------------------------------------------------------------------------------------------
-    Public Sub EsEltern_Pareto(ByRef _Best() As Individuum, ByRef _NDSorting() As Individuum, ByRef _SekundärQb() As Individuum)
-
-        'Veränderliche (ByRef):
-        NDSorting = _NDSorting
-        SekundärQb = _SekundärQb
-        Best = _Best
+    Public Sub EsEltern_Pareto(ByRef NDSorting() As Individuum, ByRef SekundärQb() As Individuum, ByRef Best() As Individuum)
 
         Dim i As Integer
         Dim NFrontMember_aktuell As Integer
@@ -90,7 +76,7 @@ Public Class Functions
         'Schleife läuft über die Zahl der Fronten die hier auch bestimmt werden
         Do
             'Entscheidet welche Werte dominiert werden und welche nicht
-            Call Pareto_SekundärQb_Non_Dominated_Sorting(Temp, rang) 'aktualisiert auf n Objectives dm 10.05.05
+            Call Pareto_Non_Dominated_Sorting(Temp, rang)
             'Sortiert die nicht dominanten Lösungen nach oben,
             'die dominanten nach unten und zählt die Mitglieder der aktuellen Front
             NFrontMember_aktuell = Pareto_Non_Dominated_Count_and_Sort(Temp)
@@ -143,19 +129,29 @@ Public Class Functions
 
         Loop While Not (NFrontMember_gesamt = NEltern)
 
-        '4: Sekundäre Population wird bestimmt und gespeichert
-        '-----------------------------------------------------
-        SekundärQb_Allocation(NFrontMember_aktuell, NDSResult)
+        '4: Sekundäre Population wird aktualisiert
+        '-----------------------------------------
+        Call SekundärQb_Allocation(NDSResult, SekundärQb)
 
-        'Veränderliche (ByRef):
-        _NDSorting = NDSorting
-        _SekundärQb = SekundärQb
-        _Best = Best
+        'Prüfen, ob die Population jetzt mit Mitgliedern aus der Sekundären Population aufgefüllt werden soll
+        '----------------------------------------------------------------------------------------------------
+        If (iAktGen Mod NInteract) = 0 And isInteract Then
+            NFrontMember_aktuell = Pareto_Count_Front_Members(1, SekundärQb)
+            If NFrontMember_aktuell > NEltern Then
+                'Crowding Distance
+                Call Pareto_Crowding_Distance_Sort(SekundärQb, 0, SekundärQb.GetUpperBound(0))
+                'Anzahl Eltern wird aus SekundärQb in den Bestwertspeicher kopiert
+                For i = 0 To NEltern - 1
+                    Best(i) = SekundärQb(i).Clone()
+                Next i
+            End If
+        End If
+
     End Sub
 
     'NON_DOMINATED_SORTING - Entscheidet welche Werte dominiert werden und welche nicht
     '**********************************************************************************
-    Private Sub Pareto_SekundärQb_Non_Dominated_Sorting(ByRef NDSorting() As Individuum, ByVal rang As Integer)
+    Private Sub Pareto_Non_Dominated_Sorting(ByRef NDSorting() As Individuum, ByVal rang As Integer)
 
         Dim j, i, k As Integer
         Dim isDominated As Boolean
@@ -262,7 +258,7 @@ Public Class Functions
         NFrontMember = 0
         counter = 0
 
-        'Die nicht dominierten Lösungen werden nach oben kopiert
+        'Die dominierten Lösungen werden nach oben kopiert
         For i = 0 To NDSorting.GetUpperBound(0)
             If (NDSorting(i).dominated = True) Then
                 counter += 1
@@ -273,7 +269,7 @@ Public Class Functions
         'Zahl der dominanten Lösungen wird errechnet
         NFrontMember = NDSorting.GetUpperBound(0) + 1 - counter
 
-        'Die dominierten Lösungen werden nach unten kopiert
+        'Die nicht dominierten Lösungen werden nach unten kopiert
         For i = 0 To NDSorting.GetUpperBound(0)
             If (NDSorting(i).dominated = False) Then
                 counter += 1
@@ -416,108 +412,98 @@ Public Class Functions
         Next k
     End Sub
 
-    '4: Sekundäre Population wird bestimmt und gespeichert ggf gespeichert
-    '---------------------------------------------------------------------
-    Private Sub SekundärQb_Allocation(ByVal NFrontMember_aktuell As Integer, ByVal _NDSResult As Individuum())
+    '4: Sekundäre Population wird aktualisiert
+    '-----------------------------------------
+    Private Sub SekundärQb_Allocation(ByVal NDSResult() As Common.Individuum, ByRef SekundärQb() As Common.Individuum)
 
-        Dim i As Integer
-        Dim Member_Sekundärefront As Integer
+        Dim i, NFrontMember_aktuell, NMember_SekPop As Integer
 
-        NFrontMember_aktuell = Pareto_Count_Front_Members(1, _NDSResult)
+        'Anzahl Frontmember in NDSResult bestimmen
+        NFrontMember_aktuell = Pareto_Count_Front_Members(1, NDSResult)
 
-        'Am Anfang wird SekundärQb mit -1 initialisiert
-        Member_Sekundärefront = SekundärQb.GetLength(0)
+        'Aktuelle Anzahl Mitglieder in SekPop bestimmen
+        NMember_SekPop = SekundärQb.GetLength(0)
 
-        'SekPop wird um die aktuelle Front erweitert
-        ReDim Preserve SekundärQb(Member_Sekundärefront + NFrontMember_aktuell - 1)
-
-        'Neue Member der SekPop bestimmen
-        For i = Member_Sekundärefront To Member_Sekundärefront + NFrontMember_aktuell - 1
-            SekundärQb(i) = _NDSResult(i - Member_Sekundärefront)
+        'SekPop um die aktuelle Front erweitern
+        ReDim Preserve SekundärQb(NMember_SekPop + NFrontMember_aktuell - 1)
+        For i = NMember_SekPop To NMember_SekPop + NFrontMember_aktuell - 1
+            SekundärQb(i) = NDSResult(i - NMember_SekPop)
         Next i
 
-        Call Pareto_SekundärQb_Non_Dominated_Sorting(SekundärQb, 1)
-
+        'SekPop neu sortieren und hinteren Ränge entfernen
+        Call Pareto_Non_Dominated_Sorting(SekundärQb, 1)
         NFrontMember_aktuell = SekundärQb_Non_Dominated_Count_and_Sort(SekundärQb)
         ReDim Preserve SekundärQb(NFrontMember_aktuell - 1)
 
-        'Dubletten werden gelöscht
-        Call SekundärQb_Dubletten()
+        'Dubletten aus SekPop entfernen
+        Call SekundärQb_Dubletten(SekundärQb)
         NFrontMember_aktuell = SekundärQb_Non_Dominated_Count_and_Sort(SekundärQb)
         ReDim Preserve SekundärQb(NFrontMember_aktuell - 1)
 
-        'Crowding Distance
-        If (SekundärQb.GetUpperBound(0) > NMemberSecondPop - 1) Then
+        'SekPop auf Maximalanzahl Mitglieder begrenzen (mit Crowding Distance)
+        If (SekundärQb.GetLength(0) > Me.MaxMemberSekPop) Then
             Call Pareto_Crowding_Distance_Sort(SekundärQb, 0, SekundärQb.GetUpperBound(0))
-            ReDim Preserve SekundärQb(NMemberSecondPop - 1)
+            ReDim Preserve SekundärQb(Me.MaxMemberSekPop - 1)
         End If
 
-        'Prüfen, ob die Population jetzt mit Mitgliedern aus der Sekundären Population aufgefüllt werden soll
-        '----------------------------------------------------------------------------------------------------
-        If (iAktGen Mod NInteract) = 0 And isInteract Then
-            NFrontMember_aktuell = Pareto_Count_Front_Members(1, SekundärQb)
-            If NFrontMember_aktuell > NEltern Then
-                'Crowding Distance
-                Call Pareto_Crowding_Distance_Sort(SekundärQb, 0, SekundärQb.GetUpperBound(0))
-                For i = 0 To NEltern - 1
-                    'SekundärQb wird in den Bestwertspeicher kopiert
-                    Best(i) = SekundärQb(i).Clone()
-                Next i
-            End If
-        End If
     End Sub
 
-    'SekundärQb_Dubletten
-    '********************
-    Private Sub SekundärQb_Dubletten()
+    'Individuen mit identischen Penalties als dominiert markieren
+    '************************************************************
+    Private Sub SekundärQb_Dubletten(ByRef SekundärQb() As Common.Individuum)
 
         Dim i, j, k As Integer
         Dim Logical As Boolean
 
-        For i = 0 To SekundärQb.GetUpperBound(0) - 2
+        For i = 0 To SekundärQb.GetUpperBound(0) - 1
             For j = i + 1 To SekundärQb.GetUpperBound(0)
                 Logical = True
                 For k = 0 To Manager.AnzPenalty - 1
                     Logical = Logical And (SekundärQb(i).Penalties(k) = SekundärQb(j).Penalties(k))
                 Next k
-                If (Logical) Then SekundärQb(i).dominated = True
+                If (Logical) Then
+                    'Duplikat gefunden: als dominiert markieren
+                    SekundärQb(i).dominated = True
+                End If
             Next j
         Next i
     End Sub
 
     'NON_DOMINATED_COUNT_AND_SORT_SEKUNDÄRE_POPULATION
-    'Sortiert die nicht dominanten Lösungen nach oben, die dominanten nach unten
+    'Sortiert die dominanten Lösungen nach oben, die nicht dominanten nach unten
     'Gibt die Zahl der dominanten Lösungen zurück (Front) hier für die Sekundäre Population
     '**************************************************************************************
-    Private Function SekundärQb_Non_Dominated_Count_and_Sort(ByRef _SekundärQb() As Individuum) As Integer
+    Private Function SekundärQb_Non_Dominated_Count_and_Sort(ByRef SekundärQb() As Individuum) As Integer
 
         Dim i As Integer
         Dim Temp() As Individuum
         Dim counter As Integer
         Dim NFrontMember As Integer
 
-        ReDim Temp(_SekundärQb.GetUpperBound(0))
+        ReDim Temp(SekundärQb.GetUpperBound(0))
 
         NFrontMember = 0
         counter = 0
 
-        For i = 0 To _SekundärQb.GetUpperBound(0)
-            If (_SekundärQb(i).dominated = False) Then
+        'Die nicht dominierten Lösungen werden nach oben kopiert
+        For i = 0 To SekundärQb.GetUpperBound(0)
+            If (SekundärQb(i).dominated = False) Then
                 counter += 1
-                Temp(counter - 1) = _SekundärQb(i).Clone()
+                Temp(counter - 1) = SekundärQb(i).Clone()
             End If
         Next i
 
         NFrontMember = counter
 
-        For i = 0 To _SekundärQb.GetUpperBound(0)
-            If (_SekundärQb(i).dominated = True) Then
+        'Die dominierten Lösungen werden nach unten kopiert
+        For i = 0 To SekundärQb.GetUpperBound(0)
+            If (SekundärQb(i).dominated = True) Then
                 counter += 1
-                Temp(counter - 1) = _SekundärQb(i).Clone()
+                Temp(counter - 1) = SekundärQb(i).Clone()
             End If
         Next i
 
-        Call Individuum.Clone_Indi_Array(Temp, _SekundärQb)
+        Call Individuum.Clone_Indi_Array(Temp, SekundärQb)
 
         Return NFrontMember
 

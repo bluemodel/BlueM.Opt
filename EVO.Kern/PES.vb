@@ -1373,7 +1373,7 @@ StartMutation:
             '4: Sekundäre Population wird bestimmt und gespeichert
             '--------------------------------
             Dim Func1 As Kern.Functions = New Kern.Functions(Settings.PES.n_Nachf, Settings.PES.n_Eltern, Settings.PES.n_MemberSekPop, Settings.PES.n_Interact, Settings.PES.is_Interact, PES_iAkt.iAktGen)
-            Call Func1.EsEltern_Pareto(Best_Indi, NDSorting, SekundärQb)
+            Call Func1.EsEltern_Pareto(NDSorting, SekundärQb, Best_Indi)
             'Bestimmen der Crowding Distance falls Diversity-Tournament
             '----------------------------------------------------------
             If (Settings.PES.is_DiversityTournament) Then
