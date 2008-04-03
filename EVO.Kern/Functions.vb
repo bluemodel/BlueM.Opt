@@ -10,14 +10,10 @@ Public Class Functions
     '**** Wird derzeit für das NDSorting verwendet um es für die verschiedenen  ****
     '**** Kerne anwenden zu können                                              ****
     '****                                                                       ****
-    '**** Autor: Christoph Hübner                                               ****
+    '**** Autoren: Christoph Hübner, Felix Froehlich                            ****
     '****                                                                       ****
     '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
     '**** TU Darmstadt                                                          ****
-    '****                                                                       ****
-    '**** Februar 2007                                                          ****
-    '****                                                                       ****
-    '**** Letzte Änderung: März 2007                                            ****
     '*******************************************************************************
     '*******************************************************************************
 
@@ -25,7 +21,8 @@ Public Class Functions
     '*******************************************************
     Dim NNachf As Integer
     Dim NEltern As Integer
-    Dim MaxMemberSekPop As Integer
+    Dim isSekPopBegrenzung As Boolean
+    Dim NMaxMemberSekPop As Integer
     Dim NInteract As Integer
     Dim isInteract As Boolean
     Dim iAktGen As Integer
@@ -33,11 +30,12 @@ Public Class Functions
 
     'Die Statische Variablen werden im Konstruktor übergeben
     '*******************************************************
-    Public Sub New(ByVal _NNachf As Integer, ByVal _NEltern As Integer, ByVal _MaxMemberSekPop As Integer, ByVal _NInteract As Integer, ByVal _isInteract As Boolean, ByVal _iAktGen As Integer)
+    Public Sub New(ByVal _NNachf As Integer, ByVal _NEltern As Integer, ByVal _isSekPopBegrenzung As Boolean, ByVal _NMaxMemberSekPop As Integer, ByVal _NInteract As Integer, ByVal _isInteract As Boolean, ByVal _iAktGen As Integer)
 
         NNachf = _NNachf
         NEltern = _NEltern
-        MaxMemberSekPop = _MaxMemberSekPop
+        isSekPopBegrenzung = _isSekPopBegrenzung
+        NMaxMemberSekPop = _NMaxMemberSekPop
         NInteract = _NInteract
         isInteract = _isInteract
         iAktGen = _iAktGen
@@ -440,10 +438,10 @@ Public Class Functions
         NFrontMember_aktuell = SekundärQb_Non_Dominated_Count_and_Sort(SekundärQb)
         ReDim Preserve SekundärQb(NFrontMember_aktuell - 1)
 
-        'SekPop auf Maximalanzahl Mitglieder begrenzen (mit Crowding Distance)
-        If (SekundärQb.GetLength(0) > Me.MaxMemberSekPop) Then
+        'SekPop ggf. auf Maximalanzahl Mitglieder begrenzen (mit Crowding Distance)
+        If (Me.isSekPopBegrenzung And SekundärQb.GetLength(0) > Me.NMaxMemberSekPop) Then
             Call Pareto_Crowding_Distance_Sort(SekundärQb, 0, SekundärQb.GetUpperBound(0))
-            ReDim Preserve SekundärQb(Me.MaxMemberSekPop - 1)
+            ReDim Preserve SekundärQb(Me.NMaxMemberSekPop - 1)
         End If
 
     End Sub
