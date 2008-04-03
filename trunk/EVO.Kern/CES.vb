@@ -1061,7 +1061,7 @@ Public Class CES
         '4: Sekundäre Population wird bestimmt und gespeichert
         '--------------------------------
         Dim Func1 As New Kern.Functions(Settings.CES.n_Childs, Settings.CES.n_Parents, Settings.CES.n_MemberSecondPop, Settings.CES.n_Interact, Settings.CES.is_SecPop, iAktGen + 1)
-        Call Func1.EsEltern_Pareto(Parents, NDSorting, SekundärQb)
+        Call Func1.EsEltern_Pareto(NDSorting, SekundärQb, Parents)
         '********************************************************************************************
 
         'Schritt 5: ist für CES nicht notwenig, da die Parents ByRef zurückgegeben werden
@@ -1123,7 +1123,7 @@ Public Class CES
         '! wegen der reduzierung auf Locations entkoppelt ist                 !
         Dim Fake_SekundärQb(-1) As Individuum
         Dim Func1 As New Kern.Functions(n_PES_Childs, Settings.PES.n_Eltern, Settings.CES.n_PES_MemSecPop, Settings.CES.n_PES_Interact, False, iAktGen + 1)
-        Call Func1.EsEltern_Pareto(PES_Parents_pLoc, NDSorting, Fake_SekundärQb)
+        Call Func1.EsEltern_Pareto(NDSorting, Fake_SekundärQb, PES_Parents_pLoc)
         '********************************************************************************************
 
     End Sub
@@ -1160,7 +1160,7 @@ Public Class CES
         '--------------------------------
         'Sekundär_QB wird hier berücksichtigt!
         Dim Func1 As New Kern.Functions(n_PES_Mem_Childs, Settings.CES.n_PES_MemSize, Settings.PES.n_MemberSekPop, Settings.PES.n_Interact, Settings.PES.is_Interact, iAktGen + 1)
-        Call Func1.EsEltern_Pareto(PES_Memory, NDSorting, PES_Mem_SekundärQb)
+        Call Func1.EsEltern_Pareto(NDSorting, PES_Mem_SekundärQb, PES_Memory)
         '********************************************************************************************
 
     End Sub
