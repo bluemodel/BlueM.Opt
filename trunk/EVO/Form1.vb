@@ -1207,7 +1207,7 @@ Partial Class Form1
 
                 Tastschritte_aktuell += 1
                 durchlauf += 1
-                Me.EVO_Einstellungen1.LabelTSHJaktuelle.Text = Tastschritte_aktuell.ToString
+                Me.EVO_Einstellungen1.Label_HJ_TSaktuelle.Text = Tastschritte_aktuell.ToString
 
                 'Individuum instanzieren
                 ind = New Common.Individuum("HJ", durchlauf)
@@ -1236,7 +1236,7 @@ Partial Class Form1
 
                     Tastschritte_aktuell += 1
                     durchlauf += 1
-                    Me.EVO_Einstellungen1.LabelTSHJaktuelle.Text = Tastschritte_aktuell.ToString
+                    Me.EVO_Einstellungen1.Label_HJ_TSaktuelle.Text = Tastschritte_aktuell.ToString
 
                     'Individuum instanzieren
                     ind = New Common.Individuum("HJ", durchlauf)
@@ -1270,10 +1270,10 @@ Partial Class Form1
             Next
 
             Tastschritte_gesamt += Tastschritte_aktuell
-            Me.EVO_Einstellungen1.LabelTSHJgesamt.Text = Tastschritte_gesamt.ToString
+            Me.EVO_Einstellungen1.Label_HJ_TSgesamt.Text = Tastschritte_gesamt.ToString
             Tastschritte_aktuell = 0
-            Me.EVO_Einstellungen1.LabelTSHJaktuelle.Text = Tastschritte_aktuell.ToString
-            Me.EVO_Einstellungen1.LabelTSHJmittel.Text = Math.Round((Tastschritte_gesamt / Iterationen), 2).ToString
+            Me.EVO_Einstellungen1.Label_HJ_TSaktuelle.Text = Tastschritte_aktuell.ToString
+            Me.EVO_Einstellungen1.Label_HJ_TSmittel.Text = Math.Round((Tastschritte_gesamt / Iterationen), 2).ToString
 
             Call My.Application.DoEvents()
 
@@ -1290,7 +1290,7 @@ Partial Class Form1
                 Call QNBest.CopyTo(QBest, 0)
                 Call HookJeeves.Extrapolationsschritt()
                 Extrapolationsschritte += 1
-                Me.EVO_Einstellungen1.LabelESHJ.Text = Extrapolationsschritte.ToString
+                Me.EVO_Einstellungen1.Label_HJ_ES.Text = Extrapolationsschritte.ToString
                 Call My.Application.DoEvents()
                 k += 1
                 aktuellePara = HookJeeves.getLetzteParameter
@@ -1298,7 +1298,7 @@ Partial Class Form1
                     If aktuellePara(i) < 0 Or aktuellePara(i) > 1 Then
                         HookJeeves.Rueckschritt()
                         Rueckschritte += 1
-                        Me.EVO_Einstellungen1.LabelRSHJ.Text = Rueckschritte.ToString()
+                        Me.EVO_Einstellungen1.Label_HJ_RS.Text = Rueckschritte.ToString()
                         Call My.Application.DoEvents()
                         k += -1
                         HookJeeves.Schrittweitenhalbierung()
@@ -1316,7 +1316,7 @@ Partial Class Form1
                 'End If
                 If k > 0 Then
                     HookJeeves.Rueckschritt()
-                    Me.EVO_Einstellungen1.LabelRSHJ.Text = Rueckschritte.ToString()
+                    Me.EVO_Einstellungen1.Label_HJ_RS.Text = Rueckschritte.ToString()
                     Call My.Application.DoEvents()
                     HookJeeves.Schrittweitenhalbierung()
                     aktuellePara = HookJeeves.getLetzteParameter()

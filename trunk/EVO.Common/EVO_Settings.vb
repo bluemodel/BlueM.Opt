@@ -40,10 +40,14 @@ Public Class EVO_Settings
         Public n_Eltern As Integer                 'Anzahl Eltern
         Public n_Nachf As Integer                  'Anzahl Kinder
 
-        Public is_Interact As Boolean              'Mit Austausch zwischen Population und Sekundärer Population
-        Public n_Interact As Integer               'Alle wieviel Generationen soll die aktuelle Population mit Mitgliedern der sekundären Population aufgefüllt werden
+        Public SekPop As Struct_SekPop
 
-        Public n_MemberSekPop As Integer           'Maximale Anzahl Mitglieder der Sekundärpopulation
+        Public Structure Struct_SekPop
+            Public is_Interact As Boolean              'Mit Austausch zwischen Population und Sekundärer Population
+            Public n_Interact As Integer               'Alle wieviel Generationen soll die aktuelle Population mit Mitgliedern der sekundären Population aufgefüllt werden
+            Public is_Begrenzung As Boolean            'Soll die Anzahl Mitglieder in der SekPop begrenzt werden?
+            Public n_MaxMembers As Integer             'Maximale Anzahl Mitglieder der Sekundärpopulation
+        End Structure
 
         Public OptEltern As EVO_ELTERN             'Ermittlung der Individuum-Eltern
         Public n_RekombXY As Integer               'X/Y-Schema Rekombination
@@ -86,9 +90,10 @@ Public Class EVO_Settings
                     Me.n_Eltern = 3
                     Me.n_Nachf = 10
 
-                    Me.is_Interact = False
-                    Me.n_Interact = 0
-                    Me.n_MemberSekPop = 0
+                    Me.SekPop.is_Interact = False
+                    Me.SekPop.n_Interact = 0
+                    Me.SekPop.is_Begrenzung = False
+                    Me.SekPop.n_MaxMembers = 0
 
                     Me.OptEltern = EVO_ELTERN.XX_Mitteln_Diskret
                     Me.n_RekombXY = 3
@@ -120,9 +125,10 @@ Public Class EVO_Settings
                     Me.n_Eltern = 15
                     Me.n_Nachf = 50
 
-                    Me.is_Interact = True
-                    Me.n_Interact = 10
-                    Me.n_MemberSekPop = 50
+                    Me.SekPop.is_Interact = True
+                    Me.SekPop.n_Interact = 10
+                    Me.SekPop.is_Begrenzung = True
+                    Me.SekPop.n_MaxMembers = 50
 
                     Me.OptEltern = EVO_ELTERN.XX_Mitteln_Diskret
                     Me.n_RekombXY = 3
@@ -157,7 +163,8 @@ Public Class EVO_Settings
         Public pr_MutRate As Integer            'Definiert die Wahrscheinlichkeit der Mutationsrate in %
         
         Public is_SecPop As Boolean             'SekundärePopulation an oder aus
-        Public n_MemberSecondPop As Integer     'Anzahl der Mitglieder der Sekundären Population
+        Public is_SecPopRestriction As Boolean  'Sekundäre Population begrenzen
+        Public n_MemberSecondPop As Integer     'Max Anzahl der Mitglieder der Sekundären Population
         Public n_Interact As Integer            'Austausch mit SekPop nach n Generationen
 
         'Hybrid
@@ -188,6 +195,7 @@ Public Class EVO_Settings
                     Me.pr_MutRate = 25
         
                     Me.is_SecPop = True
+                    Me.is_SecPopRestriction = True
                     Me.n_MemberSecondPop = 50
                     Me.n_Interact = 5
 
@@ -214,6 +222,7 @@ Public Class EVO_Settings
                     Me.pr_MutRate = 25
 
                     Me.is_SecPop = True
+                    Me.is_SecPopRestriction = True
                     Me.n_MemberSecondPop = 50
                     Me.n_Interact = 5
 
