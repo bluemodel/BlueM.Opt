@@ -939,15 +939,14 @@ Partial Class Form1
                 Call CES1.NDSorting_CES_Control(i_gen)
 
                 'Sekundäre Population
+                '--------------------
                 If (Not IsNothing(Sim1)) Then
                     'SekPop abspeichern
-                    Call Sim1.OptResult.setSekPop(Common.Individuum.Get_All_Penalty_of_Array(CES1.SekundärQb), i_gen)
-                    'SekPop mit Solution.IDs zeichnen
-                    Call SekundärePopulationZeichnen(i_gen)
-                Else
-                    'SekPop einfach so zeichnen
-                    Call SekundärePopulationZeichnen(Common.Individuum.Get_All_Penalty_of_Array(CES1.SekundärQb))
+                    Call Sim1.OptResult.setSekPop(CES1.SekundärQb, i_gen)
                 End If
+
+                'SekPop zeichnen
+                Call PopulationZeichnen(CES1.SekundärQb)
 
                 'Hypervolumen berechnen und zeichnen
                 '-----------------------------------
@@ -1481,17 +1480,15 @@ Start_Evolutionsrunden:
                     '====================
                     If (EVO_Einstellungen1.Settings.PES.OptModus = Common.Constants.EVO_MODUS.Multi_Objective) Then
 
-                        'Sekpop zeichnen
+                        'SekPop abspeichern
                         '---------------
                         If (Not IsNothing(Sim1)) Then
-                            'SekPop abspeichern
-                            Call Sim1.OptResult.setSekPop(Common.Individuum.Get_All_Penalty_of_Array(pes1.SekundärQb), PES1.PES_iAkt.iAktGen)
-                            'SekPop mit Solution.IDs zeichnen
-                            Call SekundärePopulationZeichnen(PES1.PES_iAkt.iAktGen)
-                        Else
-                            'SekPop einfach so zeichnen
-                            Call SekundärePopulationZeichnen(Common.Individuum.Get_All_Penalty_of_Array(pes1.SekundärQb))
+                            Call Sim1.OptResult.setSekPop(PES1.SekundärQb, PES1.PES_iAkt.iAktGen)
                         End If
+
+                        'SekPop zeichnen
+                        '---------------
+                        Call PopulationZeichnen(PES1.SekundärQb)
 
                         'Hypervolumen berechnen und Zeichnen
                         '-----------------------------------
@@ -1584,21 +1581,25 @@ Start_Evolutionsrunden:
         End If
     End Sub
 
-    'Sekundäre Population zeichnen
-    '*****************************
-    Private Sub SekundärePopulationZeichnen(ByVal SekPop(,) As Double)
+    'Population zeichnen
+    '*******************
+    Private Sub PopulationZeichnen(ByVal pop() As Common.Individuum)
 
         Dim i As Short
         Dim serie As Steema.TeeChart.Styles.Series
         Dim serie3D As Steema.TeeChart.Styles.Points3D
+        Dim values(,) As Double
+
+        'Population in Array von Penalties transformieren
+        values = Common.Individuum.Get_All_Penalty_of_Array(pop)
 
         If (Common.Manager.AnzPenalty = 2) Then
             '2 Zielfunktionen
             '----------------------------------------------------------------
             serie = DForm.Diag.getSeriesPoint("Sekundäre Population", "Green")
             serie.Clear()
-            For i = 0 To SekPop.GetUpperBound(0)
-                serie.Add(SekPop(i, 0), SekPop(i, 1))
+            For i = 0 To values.GetUpperBound(0)
+                serie.Add(values(i, 0), values(i, 1))
             Next i
 
         ElseIf (Common.Manager.AnzPenalty >= 3) Then
@@ -1606,46 +1607,9 @@ Start_Evolutionsrunden:
             '----------------------------------------------------------------
             serie3D = DForm.Diag.getSeries3DPoint("Sekundäre Population", "Green")
             serie3D.Clear()
-            For i = 0 To SekPop.GetUpperBound(0)
-                serie3D.Add(SekPop(i, 0), SekPop(i, 1), SekPop(i, 2))
+            For i = 0 To values.GetUpperBound(0)
+                serie3D.Add(values(i, 0), values(i, 1), values(i, 2))
             Next i
-        Else
-            Throw New Exception("Der Parameter 'globalAnzZiel' weist ungültige Parameter auf.")
-        End If
-
-    End Sub
-
-    'Sekundäre Population anhand von Sim-Ergebnisspeicher zeichnen
-    '*************************************************************
-    Private Sub SekundärePopulationZeichnen(ByVal _igen As Integer)
-
-        Dim i As Short
-        Dim serie As Steema.TeeChart.Styles.Series
-        Dim serie3D As Steema.TeeChart.Styles.Points3D
-        Dim solutions() As Common.Individuum
-
-        'SekPop holen
-        solutions = Sim1.OptResult.getSekPop(_igen)
-
-        If (Common.Manager.AnzPenalty = 2) Then
-            '2 Zielfunktionen
-            '----------------------------------------------------------------
-            serie = DForm.Diag.getSeriesPoint("Sekundäre Population", "Green")
-            serie.Clear()
-            For i = 0 To solutions.GetUpperBound(0)
-                serie.Add(solutions(i).Penalties(0), solutions(i).Penalties(1), solutions(i).ID)
-            Next i
-
-        ElseIf (Common.Manager.AnzPenalty >= 3) Then
-            '3 oder mehr Zielfunktionen (es werden die ersten drei angezeigt)
-            '----------------------------------------------------------------
-            serie3D = DForm.Diag.getSeries3DPoint("Sekundäre Population", "Green")
-            serie3D.Clear()
-            For i = 0 To solutions.GetUpperBound(0)
-                serie3D.Add(solutions(i).Penalties(0), solutions(i).Penalties(1), solutions(i).Penalties(2), solutions(i).ID)
-            Next i
-        Else
-            Throw New Exception("Der Parameter 'globalAnzZiel' weist ungültige Parameter auf.")
         End If
 
     End Sub
