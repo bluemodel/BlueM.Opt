@@ -1827,6 +1827,12 @@ Start_Evolutionsrunden:
                             Achsen.Add(Achse)
                         Next
 
+                        'Warnung bei mehr als 3 Achsen
+                        If (Achsen.Count > 3) Then
+                            MsgBox("Die Anzahl der Optimierungsziele beträgt mehr als 3!" & eol _
+                                    & "Es werden nur die ersten drei Zielfunktionen im Hauptdiagramm angezeigt!", MsgBoxStyle.Information, "Info")
+                        End If
+
                         'Diagramm initialisieren
                         Call DForm.Diag.DiagInitialise(Anwendung, Achsen)
 
