@@ -1697,15 +1697,15 @@ Start_Evolutionsrunden:
             If (Common.Manager.AnzPenalty = 2) Then
                 '2D-Diagramm
                 '------------------------------------------------------------------------
-                serie = DForm.Diag.getSeriesPoint("Population" & " (ungültig)", "Gray")
+                serie = DForm.Diag.getSeriesPoint("Population (ungültig)", "Gray")
                 serie.Clear()
                 serie = DForm.Diag.getSeriesPoint("Population", "Orange")
                 serie.Clear()
             Else
-                '3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
-                '------------------------------------------------------------------------
+                '3D-Diagramm
+                '-----------
                 Dim serie3D As Steema.TeeChart.Styles.Points3D
-                serie3D = DForm.Diag.getSeries3DPoint("Population" & " (ungültig)", "Gray")
+                serie3D = DForm.Diag.getSeries3DPoint("Population (ungültig)", "Gray")
                 serie3D.Clear()
                 serie3D = DForm.Diag.getSeries3DPoint("Population", "Orange")
                 serie3D.Clear()
