@@ -1613,14 +1613,17 @@ Handler:
 
             Case "AbQuad"
                 'Summe der Fehlerquadrate
+                '------------------------
                 QWert = (ziel.RefWert - SimWert) * (ziel.RefWert - SimWert)
 
             Case "Diff"
                 'Summe der Fehler
+                '----------------
                 QWert = Math.Abs(ziel.RefWert - SimWert)
 
             Case "nUnter"
                 'Relative Anzahl der Zeitschritte mit Unterschreitungen (in Prozent)
+                '-------------------------------------------------------------------
                 Dim nUnter As Integer = 0
                 For i = 0 To SimReihe.Length - 1
                     If (SimReihe.YWerte(i) < ziel.RefWert) Then
@@ -1631,6 +1634,7 @@ Handler:
 
             Case "nÜber"
                 'Relative Anzahl der Zeitschritte mit Überschreitungen (in Prozent)
+                '------------------------------------------------------------------
                 Dim nUeber As Integer = 0
                 For i = 0 To SimReihe.Length - 1
                     If (SimReihe.YWerte(i) > ziel.RefWert) Then
@@ -1638,6 +1642,28 @@ Handler:
                     End If
                 Next
                 QWert = nUeber / SimReihe.Length * 100
+
+            Case "sUnter"
+                'Summe der Unterschreitungen
+                '---------------------------
+                Dim sUnter As Integer = 0
+                For i = 0 To SimReihe.Length - 1
+                    If (SimReihe.YWerte(i) < ziel.RefWert) Then
+                        sUnter += ziel.RefWert - SimReihe.YWerte(i)
+                    End If
+                Next
+                QWert = sUnter
+
+            Case "sÜber"
+                'Summe der Überschreitungen
+                '--------------------------
+                Dim sUeber As Integer = 0
+                For i = 0 To SimReihe.Length - 1
+                    If (SimReihe.YWerte(i) > ziel.RefWert) Then
+                        sUeber += SimReihe.YWerte(i) - ziel.RefWert
+                    End If
+                Next
+                QWert = sUeber
 
             Case Else
                 Throw New Exception("Die Zielfunktion '" & ziel.ZielFkt & "' wird für Werte nicht unterstützt!")
