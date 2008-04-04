@@ -137,18 +137,22 @@ Public Class OptResult
 
     'Sekundäre Population hinzufügen
     '*******************************
-    Public Sub setSekPop(ByVal _sekpop(,) As Double, ByVal _igen As Integer)
+    Public Sub setSekPop(ByVal pop() As Common.Individuum, ByVal _igen As Integer)
 
         Dim SekPop As Struct_SekPop
+        Dim sekpopvalues(,) As Double
+
+        'Population in Array von Penalty-Werten transformieren
+        sekpopvalues = Common.Individuum.Get_All_Penalty_of_Array(pop)
 
         'SekPop in DB speichern
-        Call Me.db_setSekPop(_sekpop, _igen)
+        Call Me.db_setSekPop(sekpopvalues, _igen)
 
         'SekPop aus DB lesen
-        SekPop = db_getSekPop(_igen)
+        SekPop = Me.db_getSekPop(_igen)
 
         'SekPop zu OptResult hinzufügen
-        Call addSekPop(SekPop)
+        Call Me.addSekPop(SekPop)
 
     End Sub
 
