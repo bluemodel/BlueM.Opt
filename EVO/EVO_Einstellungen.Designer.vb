@@ -614,7 +614,7 @@ Partial Class EVO_Einstellungen
         '
         Me.TextDeltaStart.DecimalPlaces = 2
         Me.TextDeltaStart.Increment = New Decimal(New Integer() {1, 0, 0, 131072})
-        Me.TextDeltaStart.Location = New System.Drawing.Point(151, 115)
+        Me.TextDeltaStart.Location = New System.Drawing.Point(150, 115)
         Me.TextDeltaStart.Maximum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.TextDeltaStart.Minimum = New Decimal(New Integer() {1, 0, 0, 131072})
         Me.TextDeltaStart.Name = "TextDeltaStart"
