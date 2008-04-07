@@ -5,16 +5,12 @@ Public Module Constants
 
     '*******************************************************************************
     '*******************************************************************************
-    '**** Klasse Constants                                                      ****
+    '**** Modul mit Konstanten                                                  ****
     '****                                                                       ****
     '**** Autoren: Felix Fröhlich, Christoph Hübner                             ****
     '****                                                                       ****
     '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
     '**** TU Darmstadt                                                          ****
-    '****                                                                       ****
-    '**** November 2007                                                         ****
-    '****                                                                       ****
-    '**** Letzte Änderung: März 2008                                            ****
     '*******************************************************************************
     '*******************************************************************************
 
@@ -130,5 +126,11 @@ Public Module Constants
                 Throw New Exception("Beziehung '" & bez_str & "' nicht erkannt!")
         End Select
     End Function
+
+    'Richtung einer Zielfunktion
+    Public Enum EVO_RICHTUNG As Integer
+        Minimierung = 1
+        Maximierung = -1
+    End Enum
 
 End Module
