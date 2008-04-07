@@ -406,12 +406,12 @@ Public MustInherit Class Sim
         Dim ZIE_Datei As String = Me.WorkDir & Me.Datensatz & "." & OptZiele_Ext
 
         'Format:
-        '*|------|---------------|---------|-------|----------|---------|--------------|-------------------|--------------------------|
-        '*| Opt  | Bezeichnung   | ZielTyp | Datei | SimGröße | ZielFkt | EvalZeitraum |    Referenzwert  ODER    Referenzreihe       |
-        '*|      |               |         |       |          |         | Start | Ende | WertTyp | RefWert | RefGröße | Datei         |
-        '*|------|---------------|---------|-------|----------|---------|-------|------|---------|---------|----------|---------------|
+        '*|-----|-------------|---|---------|-------|----------|---------|--------------|-------------------|--------------------|
+        '*| Opt | Bezeichnung | R | ZielTyp | Datei | SimGröße | ZielFkt | EvalZeitraum |    Referenzwert  ODER    Referenzreihe |
+        '*|     |             |   |         |       |          |         | Start | Ende | WertTyp | RefWert | RefGröße | Datei   |
+        '*|-----|-------------|---|---------|-------|----------|---------|-------|------|---------|---------|----------|---------|
 
-        Const AnzSpalten As Integer = 12                       'Anzahl Spalten in der ZIE-Datei
+        Const AnzSpalten As Integer = 13                       'Anzahl Spalten in der ZIE-Datei
         Dim i As Integer
         Dim Zeile As String
         Dim WerteArray() As String
@@ -444,24 +444,31 @@ Public MustInherit Class Sim
                         .isOpt = False
                     End If
                     .Bezeichnung = WerteArray(2).Trim()
-                    .ZielTyp = WerteArray(3).Trim()
-                    .Datei = WerteArray(4).Trim()
-                    .SimGr = WerteArray(5).Trim()
-                    .ZielFkt = WerteArray(6).Trim()
-                    If (WerteArray(7).Trim() <> "") Then
-                        .EvalStart = WerteArray(7).Trim()
+                    If (WerteArray(3).Trim() = "+") Then 
+                    	.Richtung = Common.EVO_RICHTUNG.Maximierung
+                    Else
+                    	.Richtung = Common.EVO_RICHTUNG.Minimierung
+                    End If
+                    .ZielTyp = WerteArray(4).Trim()
+                    .Datei = WerteArray(5).Trim()
+                    .SimGr = WerteArray(6).Trim()
+                    .ZielFkt = WerteArray(7).Trim()
+                    If (WerteArray(8).Trim() <> "") Then
+                        .EvalStart = WerteArray(8).Trim()
                     Else
                         .EvalStart = Me.SimStart
                     End If
-                    If WerteArray(8).Trim() <> "" Then
-                        .EvalEnde = WerteArray(8).Trim()
+                    If WerteArray(9).Trim() <> "" Then
+                        .EvalEnde = WerteArray(9).Trim()
                     Else
                         .EvalEnde = Me.SimEnde
                     End If
-                    .WertTyp = WerteArray(9).Trim()
-                    If (WerteArray(10).Trim() <> "") Then .RefWert = Convert.ToDouble(WerteArray(10).Trim(), Common.Provider.FortranProvider)
-                    .RefGr = WerteArray(11).Trim()
-                    .RefReiheDatei = WerteArray(12).Trim()
+                    .WertTyp = WerteArray(10).Trim()
+                    If (WerteArray(11).Trim() <> "") Then 
+                        .RefWert = Convert.ToDouble(WerteArray(11).Trim(), Common.Provider.FortranProvider)
+                    End If
+                    .RefGr = WerteArray(12).Trim()
+                    .RefReiheDatei = WerteArray(13).Trim()
                 End With
                 i += 1
             End If

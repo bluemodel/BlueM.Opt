@@ -418,6 +418,9 @@ Public Class BlueM
 
         End Select
 
+        'Zielrichtung berücksichtigen
+        QWert *= ziel.Richtung
+
     End Function
 
     'Qualitätswert aus WEL-Datei
