@@ -1,3 +1,5 @@
+Imports System.IO
+
 Partial Public Class Scatterplot
     Inherits System.Windows.Forms.Form
 
@@ -20,9 +22,25 @@ Partial Public Class Scatterplot
     Private SekPopOnly As Boolean
     Public Event pointSelected(ByVal ind As Common.Individuum)
 
+
+    Public Datensatz As String
+    Public WorkDir As String
+
+
+    Public Structure Struct_UserInput
+        Public Type As String
+        Public OptParameter As String
+        Public Title As String
+        Public Value As Double
+        Public Colour As String
+        Public Style As String
+        Public Width As Integer
+    End Structure
+
+    Public ListUserInput() As Struct_UserInput        'Liste der Zielfunktionen
     'Konstruktor
     '***********
-    Public Sub New(ByVal optres As IHWB.EVO.OptResult, _zielauswahl() As Integer, _sekpoponly As Boolean)
+    Public Sub New(ByVal optres As IHWB.EVO.OptResult, ByVal _zielauswahl() As Integer, ByVal _sekpoponly As Boolean)
 
         ' Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent()
@@ -48,23 +66,92 @@ Partial Public Class Scatterplot
 
     End Sub
 
+    'Nutzereingaben einlesen
+    '**************************
+    Protected Overridable Sub Read_UserInput()
+
+        'Format:
+        '*|-------|-----------------------|-----------------------|-------------|-------|----------|----------|
+        '*| Type  | OptParameter          | Axis title            | Value       | Colour| Style    | Width    |
+        '*|-------|-----------------------|-----------------------|-------------|-------|----------|----------|
+
+        Dim AnzEingaben As Integer = 0
+        Dim i As Integer
+        Dim Zeile As String
+        Dim ZeilenArray() As String
+
+        Dim Datei As String = WorkDir & Me.Datensatz & "." & "SCA"
+        Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+        'Anzahl der Eingaben feststellen
+        Do
+            Zeile = StrRead.ReadLine.ToString()
+            If (Zeile.StartsWith("*") = False And Zeile.Contains("|")) Then
+                AnzEingaben += 1
+            End If
+        Loop Until StrRead.Peek() = -1
+
+        ReDim ListUserInput(AnzEingaben - 1)
+
+        'Zurück zum Dateianfang und lesen
+        FiStr.Seek(0, SeekOrigin.Begin)
+
+        'Einlesen der Zeile und übergeben an die Liste
+        i = 0
+        Do
+            Zeile = StrRead.ReadLine.ToString()
+            If (Zeile.StartsWith("*") = False And Zeile.Contains("|")) Then
+                ZeilenArray = Zeile.Split("|")
+                'Kontrolle
+                If (ZeilenArray.GetUpperBound(0) <> 8) Then
+                    Throw New Exception("Die SCA-Datei hat die falsche Anzahl Spalten!")
+                End If
+                'Werte zuweisen
+                With ListUserInput(i)
+                    .Type = ZeilenArray(1).Trim()
+                    .OptParameter = ZeilenArray(2).Trim()
+                    .Title = ZeilenArray(3).Trim()
+                    .Value = ZeilenArray(4).Trim()
+                    .Colour = ZeilenArray(5).Trim()
+                    If ZeilenArray(1).Trim() = "point" Then
+                        .Style = ZeilenArray(6).Trim()
+                    End If
+                    If ZeilenArray(1).Trim() = "line" Then
+                        .Width = ZeilenArray(7).Trim()
+                    End If
+                End With
+                i += 1
+            End If
+        Loop Until StrRead.Peek() = -1
+
+        StrRead.Close()
+        FiStr.Close()
+
+
+    End Sub
+
     'Diagramme zeichnen
     '******************
     Private Sub zeichnen()
 
         'Matrix dimensionieren
         Call Me.dimensionieren()
+        Call Me.getPath()
+        Call Me.Read_UserInput()
 
-        Dim i, j As Integer
+        Dim i, j, j1 As Integer
         Dim xAchse, yAchse As String
         Dim serieMin_i As Double = 99999999999
         Dim serieMax_i As Double = 0
         Dim serieMin_j As Double = 99999999999
         Dim serieMax_j As Double = 0
+        Dim ivgl, jvgl As Double
 
-        Dim serie, serie_inv As Steema.TeeChart.Styles.Series
-        Dim serieFh, serieFv, serieIst As Steema.TeeChart.Styles.Line
-     
+        Dim serie, serie_inv, serieIstp As Steema.TeeChart.Styles.Series
+        Dim serieIstv, serieIsth, serieIsth2, serieIstv2 As Steema.TeeChart.Styles.Line
+        Dim freeboard As Boolean
+
         'Schleife über Spalten
         For i = 0 To Me.matrix.ColumnCount - 2
             serieMin_i = 99999999999
@@ -79,6 +166,7 @@ Partial Public Class Scatterplot
                 'Neues Diagramm erstellen
                 Me.Diags(i, j) = New Diagramm
                 Me.matrix.Controls.Add(Me.Diags(i, j), i, j)
+                Me.Diags(i, j).BackColor = Color.White
 
                 With Me.Diags(i, j)
                     'Diagramm
@@ -92,6 +180,59 @@ Partial Public Class Scatterplot
                     '------
                     xAchse = Common.Manager.List_Ziele(Me.Zielauswahl(i)).Bezeichnung
                     yAchse = Common.Manager.List_Ziele(Me.Zielauswahl(j)).Bezeichnung
+
+                    'langfristige Parameter einzeichnen
+                    '----------------------------------
+                    For j1 = 0 To Me.ListUserInput.Length - 1
+                        If (Common.Manager.List_OptZiele(j).Bezeichnung.StartsWith(Me.ListUserInput(j1).OptParameter)) Then
+                            jvgl = Me.ListUserInput(j1).Value
+                            yAchse = Me.ListUserInput(j1).Title
+                        End If
+                        If (Common.Manager.List_OptZiele(i).Bezeichnung.StartsWith(Me.ListUserInput(j1).OptParameter)) Then
+                            jvgl = Me.ListUserInput(j1).Value
+                            yAchse = Me.ListUserInput(j1).Title
+                        End If
+                    Next j1
+
+
+
+
+                    'Kurzfristige Parameter einzeichnen
+                    '----------------------------------
+
+                    If (Common.Manager.List_OptZiele(j).Bezeichnung.StartsWith("fMalter")) Then
+                        jvgl = 334.12
+                        yAchse = "Z Malter [mNN]"
+                    ElseIf (Common.Manager.List_OptZiele(j).Bezeichnung.StartsWith("fLehnm")) Then
+                        jvgl = 525.07
+                        yAchse = "Z Lehnmuehle [mNN]"
+                    ElseIf (Common.Manager.List_OptZiele(j).Bezeichnung.StartsWith("fKling")) Then
+                        jvgl = 393.78
+                        yAchse = "Z Klingenberg [mNN]"
+                    ElseIf (Common.Manager.List_OptZiele(j).Bezeichnung.StartsWith("GA")) Then
+                        jvgl = 10188634
+                        yAchse = "V outlets [m³]"
+                    ElseIf (Common.Manager.List_OptZiele(j).Bezeichnung.StartsWith("Gesamt")) Then
+                        jvgl = 108064362
+                        yAchse = "damage [Euro]"
+                    End If
+
+                    If (Common.Manager.List_OptZiele(i).Bezeichnung.StartsWith("fMalter")) Then
+                        ivgl = 334.12
+                        xAchse = "Z Malter [mNN]"
+                    ElseIf (Common.Manager.List_OptZiele(i).Bezeichnung.StartsWith("fLehnm")) Then
+                        ivgl = 525.07
+                        xAchse = "Z Lehnmuehle [mNN]"
+                    ElseIf (Common.Manager.List_OptZiele(i).Bezeichnung.StartsWith("fKling")) Then
+                        ivgl = 393.78
+                        xAchse = "Z Klingenberg [mNN]"
+                    ElseIf (Common.Manager.List_OptZiele(i).Bezeichnung.StartsWith("GA")) Then
+                        ivgl = 10188634
+                        xAchse = "V outlets [m³]"
+                    ElseIf (Common.Manager.List_OptZiele(i).Bezeichnung.StartsWith("Gesamt")) Then
+                        ivgl = 108064362
+                        xAchse = "damage [Euro]"
+                    End If
 
                     If (xAchse.StartsWith("f")) Then
                         .Axes.Bottom.Labels.ValueFormat = "   0.0"
@@ -130,9 +271,9 @@ Partial Public Class Scatterplot
                     'XAchsen
                     .Axes.Bottom.Labels.Angle = 90
 
-                    If (j = 1) Then
+                    If (j = matrix.RowCount - 1) Then
                         'Achse oben anzeigen
-                        .Axes.Bottom.OtherSide = True
+                        .Axes.Bottom.OtherSide = False
                     Else
                         'Achse verstecken
                         .Axes.Bottom.Title.Visible = False
@@ -146,6 +287,7 @@ Partial Public Class Scatterplot
                         'Nur Sekundäre Population
                         '------------------------
                         serie = .getSeriesPoint(xAchse & ", " & yAchse, "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+
                         For Each ind As Common.Individuum In Me.OptResult.getSekPop()
                             serie.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID)
                             If ind.Zielwerte(Me.Zielauswahl(i)) < serieMin_i Then serieMin_i = ind.Zielwerte(Me.Zielauswahl(i))
@@ -154,87 +296,32 @@ Partial Public Class Scatterplot
                             If ind.Zielwerte(Me.Zielauswahl(j)) > serieMax_j Then serieMax_j = ind.Zielwerte(Me.Zielauswahl(j))
                         Next
 
-                        'Freibord einzeichnen - horizontal
-                        '----------------------------------
-                        serieFh = .getSeriesLine("line", "Red")
-                        serieFh.LinePen.Width = 2
 
-                        If (Common.List_Ziele(Me.Zielauswahl(j)).Bezeichnung.StartsWith("fMalter")) Then
-                            serieFh.Add(serieMin_i, 334, "freibord")
-                            serieFh.Add(serieMax_i, 334, "freibord")
-                        End If
-                        '---
-                        If (Common.List_Ziele(Me.Zielauswahl(j)).Bezeichnung.StartsWith("fLehnm")) Then
-                            serieFh.Add(serieMin_i, 525.5, "freibord")
-                            serieFh.Add(serieMax_i, 525.5, "freibord")
-                        End If
-                        '---
-                        If (Common.List_Ziele(Me.Zielauswahl(j)).Bezeichnung.StartsWith("fKling")) Then
-                            serieFh.Add(serieMin_i, 393, "freibord")
-                            serieFh.Add(serieMax_i, 393, "freibord")
-                        End If
-                        '---
-                        'vertikal
+                        serieIstp = .getSeriesPoint(xAchse & ", " & yAchse & " (status quo)", "Black", Steema.TeeChart.Styles.PointerStyles.Rectangle, 3)
 
-                        serieFv = .getSeriesLine("line2", "Red")
-                        serieFv.LinePen.Width = 2
+                        serieIsth = .getSeriesLine("line3", "Gray")
+                        serieIsth.LinePen.Width = 2
+                        serieIstv = .getSeriesLine("line4", "Gray")
+                        serieIstv.LinePen.Width = 2
 
-                        If (Common.List_Ziele(Me.Zielauswahl(i)).Bezeichnung.StartsWith("fMalter")) Then
-                            serieFv.Add(334, serieMin_j, "freibord")
-                            serieFv.Add(334, serieMax_j, "freibord")
-                        End If
-                        '---
-                        If (Common.List_Ziele(Me.Zielauswahl(i)).Bezeichnung.StartsWith("fLehnm")) Then
-                            serieFv.Add(526, serieMin_j, "freibord")
-                            serieFv.Add(526, serieMax_j, "freibord")
-                        End If
-                        '---
-                        If (Common.List_Ziele(Me.Zielauswahl(i)).Bezeichnung.StartsWith("fKling")) Then
-                            serieFv.Add(393, serieMin_j, "freibord")
-                            serieFv.Add(393, serieMax_j, "freibord")
-                        End If
+                        serieIsth2 = .getSeriesLine("line5", "Black")
+                        serieIsth2.LinePen.Width = 2
+                        serieIstv2 = .getSeriesLine("line6", "Black")
+                        serieIstv2.LinePen.Width = 2
 
-                        'Ist-Zustand 2002 einzeichnen
-                        '-----------------------------
-                        serieIst = .getSeriesLine("line3", "Black")
-                        serieIst.LinePen.Width = 2
-                        '---
-                        If (Common.List_Ziele(Me.Zielauswahl(j)).Bezeichnung.StartsWith("fMalter")) Then
-                            serieIst.Add(serieMin_i, 334.12, "status quo")
-                            serieIst.Add(serieMax_i, 334.12, "status quo")
-                        End If
-                        '---
-                        If (Common.List_Ziele(Me.Zielauswahl(j)).Bezeichnung.StartsWith("fLehnm")) Then
-                            serieIst.Add(serieMin_i, 525.07, "status quo")
-                            serieIst.Add(serieMax_i, 525.07, "status quo")
-                        End If
-                        '---
-                        If (Common.List_Ziele(Me.Zielauswahl(j)).Bezeichnung.StartsWith("fKling")) Then
-                            serieIst.Add(serieMin_i, 393.78, "status quo")
-                            serieIst.Add(serieMax_i, 393.78, "status quo")
-                        End If
-                        '---
-                        If (Common.List_Ziele(Me.Zielauswahl(j)).Bezeichnung.StartsWith("Gesamt")) Then
-                            serieIst.Add(serieMin_i, 108064362, "status quo")
-                            serieIst.Add(serieMax_i, 108064362, "status quo")
-                        End If
-                        '---
-                        If (Common.List_Ziele(Me.Zielauswahl(j)).Bezeichnung.StartsWith("GA")) Then
-                            serieIst.Add(serieMin_i, 10188634, "status quo")
-                            serieIst.Add(serieMax_i, 10188634, "status quo")
-                        End If
+                        serieIstv.Add(ivgl, serieMin_j, "status quo")
+                        serieIstv.Add(ivgl, jvgl, "status quo")
+                        serieIsth.Add(serieMin_i, jvgl, "status quo")
+                        serieIsth.Add(ivgl, jvgl, "status quo")
+                        serieIstp.Add(ivgl, jvgl)
 
-                        serieIst = .getSeriesLine("line4", "Black")
-                        serieIst.LinePen.Width = 2
-                        '---
-                        If (Common.List_Ziele(Me.Zielauswahl(i)).Bezeichnung.StartsWith("Gesamt")) Then
-                            serieIst.Add(108064362, serieMin_j, "status quo")
-                            serieIst.Add(108064362, serieMax_j, "status quo")
-                        End If
-                        '---
-                        If (Common.List_Ziele(Me.Zielauswahl(i)).Bezeichnung.StartsWith("GA")) Then
-                            serieIst.Add(10188634, serieMin_j, "status quo")
-                            serieIst.Add(10188634, serieMax_j, "status quo")
+                     
+
+                        If freeboard Then
+                            serieIsth2.Add(serieMin_i, jvgl, "status quo")
+                            serieIsth2.Add(ivgl, jvgl, "status quo")
+                            serieIstv2.Add(ivgl, serieMin_j, "status quo")
+                            serieIstv2.Add(ivgl, jvgl, "status quo")
                         End If
 
 
@@ -289,31 +376,30 @@ Partial Public Class Scatterplot
 
         Me.matrix.Name = "Matrix"
 
-        fstColFac = 100 / Me.Zielauswahl.Length * 0.15
+        fstColFac = 100 / Me.Zielauswahl.Length * 0.25
 
         Me.matrix.ColumnCount = Me.Zielauswahl.Length
+
         For i = 1 To Me.Zielauswahl.Length
-            Me.matrix.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100 / Me.Zielauswahl.Length))
-            Console.Out.WriteLine(100 / Me.Zielauswahl.Length)
-            'If i = 1 Then 'erste Spalte
-            'Me.matrix.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100 / Me.Zielauswahl.Length + fstColFac))
-            'Console.Out.WriteLine(SizeType.Percent, 100 / Me.Zielauswahl.Length + fstColFac)
-            ' Else
-            'Me.matrix.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100 - (100 / Me.Zielauswahl.Length + fstColFac) / (Me.Zielauswahl.Length - 1)))
-            'Console.Out.WriteLine(100 - (100 / Me.Zielauswahl.Length + fstColFac) / (Me.Zielauswahl.Length - 1))
-            'End If
+            If i = 1 Then 'erste Spalte
+                Me.matrix.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100 / Me.Zielauswahl.Length + fstColFac))
+                'Console.Out.WriteLine(SizeType.Percent, 100 / Me.nOptZiele + fstColFac)
+            Else
+                Me.matrix.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, (100 - (100 / Me.Zielauswahl.Length + fstColFac)) / (Me.Zielauswahl.Length - 1)))
+                'Console.Out.WriteLine((100 - (100 / Me.nOptZiele + fstColFac)) / (Me.nOptZiele - 1))
+            End If
         Next
 
         Me.matrix.RowCount = Me.Zielauswahl.Length
         For i = 1 To Me.Zielauswahl.Length
-            Me.matrix.RowStyles.Add(New RowStyle(SizeType.Percent, 100 / Me.Zielauswahl.Length))
-            Console.Out.WriteLine(100 / Me.Zielauswahl.Length)
+            'Me.matrix.RowStyles.Add(New RowStyle(SizeType.Percent, 100 / Me.nOptZiele))
+            'Console.Out.WriteLine(100 / Me.nOptZiele)
 
-            'If i = 2 Then
-            'Me.matrix.RowStyles.Add(New RowStyle(SizeType.Percent, 100 / Me.Zielauswahl.Length + fstColFac))
-            ' Else
-            'Me.matrix.RowStyles.Add(New RowStyle(SizeType.Percent, 100 - (100 / Me.Zielauswahl.Length + fstColFac) / Me.Zielauswahl.Length))
-            ' End If
+            If i = Me.Zielauswahl.Length Then
+                Me.matrix.RowStyles.Add(New RowStyle(SizeType.Percent, 100 / Me.Zielauswahl.Length + fstColFac))
+            Else
+                Me.matrix.RowStyles.Add(New RowStyle(SizeType.Percent, (100 - (100 / Me.Zielauswahl.Length + fstColFac)) / (Me.Zielauswahl.Length - 1)))
+            End If
         Next
 
     End Sub
@@ -335,6 +421,26 @@ Partial Public Class Scatterplot
 
     End Sub
 
+    'Pfad zum Datensatz verarbeiten und speichern
+    '********************************************
+    Public Sub getPath()
+
+        'Datensatz
+        '---------
+        Dim pfad As String
+        pfad = My.Settings.Datensatz
+
+        If (File.Exists(pfad)) Then
+            'Datensatzname bestimmen
+            Me.Datensatz = Path.GetFileNameWithoutExtension(pfad)
+            'Arbeitsverzeichnis bestimmen
+            Me.WorkDir = Path.GetDirectoryName(pfad) & "\"
+        End If
+
+
+    End Sub
+
+
 #Region "Lösungsauswahl"
 
     'Einen Punkt auswählen
@@ -348,6 +454,7 @@ Partial Public Class Scatterplot
         '-----------------------------
         'Solution-ID
         indID_clicked = s.Labels(valueIndex)
+
 
         'Lösung holen
         '------------
