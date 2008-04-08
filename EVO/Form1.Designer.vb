@@ -34,6 +34,8 @@ Partial Class Form1
         Me.Button_openMDB = New System.Windows.Forms.Button
         Me.Button_Scatterplot = New System.Windows.Forms.Button
         Me.Button_saveMDB = New System.Windows.Forms.Button
+        Me.Button_MCS = New System.Windows.Forms.Button
+        Me.Button_genP = New System.Windows.Forms.Button
         Me.GroupBox_Anwendung = New System.Windows.Forms.GroupBox
         Me.Label_Anwendung = New System.Windows.Forms.Label
         Me.ComboBox_Anwendung = New System.Windows.Forms.ComboBox
@@ -48,8 +50,14 @@ Partial Class Form1
         Me.DForm = New IHWB.EVO.DiagrammForm
         Me.LabelZeitHeader = New System.Windows.Forms.Label
         Me.LabelZeit = New System.Windows.Forms.Label
+        Me.Numeric_MCS_bis = New System.Windows.Forms.NumericUpDown
+        Me.Numeric_MCS_von = New System.Windows.Forms.NumericUpDown
+        Me.Label_Anzahl_MCS = New System.Windows.Forms.Label
+        Me.Label1 = New System.Windows.Forms.Label
         Me.GroupBox_Anwendung.SuspendLayout()
         Me.GroupBox_ErgebnisDB.SuspendLayout()
+        CType(Me.Numeric_MCS_bis, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.Numeric_MCS_von, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'Button_Start
@@ -111,6 +119,37 @@ Partial Class Form1
         Me.Button_saveMDB.TabIndex = 14
         Me.ToolTip1.SetToolTip(Me.Button_saveMDB, "Ergebnisdatenbank speichern")
         Me.Button_saveMDB.UseVisualStyleBackColor = True
+        '
+        'Button_MCS
+        '
+        Me.Button_MCS.BackColor = System.Drawing.SystemColors.Control
+        Me.Button_MCS.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Button_MCS.Enabled = False
+        Me.Button_MCS.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Button_MCS.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.Button_MCS.Location = New System.Drawing.Point(722, 648)
+        Me.Button_MCS.Name = "Button_MCS"
+        Me.Button_MCS.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.Button_MCS.Size = New System.Drawing.Size(82, 31)
+        Me.Button_MCS.TabIndex = 17
+        Me.Button_MCS.Text = "> MCS"
+        Me.ToolTip1.SetToolTip(Me.Button_MCS, "Optimierung starten")
+        Me.Button_MCS.UseVisualStyleBackColor = True
+        '
+        'Button_genP
+        '
+        Me.Button_genP.BackColor = System.Drawing.SystemColors.Control
+        Me.Button_genP.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Button_genP.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Button_genP.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.Button_genP.Location = New System.Drawing.Point(745, 590)
+        Me.Button_genP.Name = "Button_genP"
+        Me.Button_genP.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.Button_genP.Size = New System.Drawing.Size(59, 23)
+        Me.Button_genP.TabIndex = 22
+        Me.Button_genP.Text = "gen. P"
+        Me.ToolTip1.SetToolTip(Me.Button_genP, "Optimierung starten")
+        Me.Button_genP.UseVisualStyleBackColor = True
         '
         'GroupBox_Anwendung
         '
@@ -215,7 +254,7 @@ Partial Class Form1
         'LabelZeitHeader
         '
         Me.LabelZeitHeader.AutoSize = True
-        Me.LabelZeitHeader.Location = New System.Drawing.Point(704, 701)
+        Me.LabelZeitHeader.Location = New System.Drawing.Point(719, 701)
         Me.LabelZeitHeader.Name = "LabelZeitHeader"
         Me.LabelZeitHeader.Size = New System.Drawing.Size(78, 13)
         Me.LabelZeitHeader.TabIndex = 15
@@ -225,17 +264,63 @@ Partial Class Form1
         '
         Me.LabelZeit.AutoSize = True
         Me.LabelZeit.ForeColor = System.Drawing.SystemColors.MenuHighlight
-        Me.LabelZeit.Location = New System.Drawing.Point(719, 723)
+        Me.LabelZeit.Location = New System.Drawing.Point(719, 731)
         Me.LabelZeit.Name = "LabelZeit"
         Me.LabelZeit.Size = New System.Drawing.Size(49, 13)
         Me.LabelZeit.TabIndex = 16
         Me.LabelZeit.Text = "00:00:00"
         '
+        'Numeric_MCS_bis
+        '
+        Me.Numeric_MCS_bis.Location = New System.Drawing.Point(748, 553)
+        Me.Numeric_MCS_bis.Maximum = New Decimal(New Integer() {100000, 0, 0, 0})
+        Me.Numeric_MCS_bis.Name = "Numeric_MCS_bis"
+        Me.Numeric_MCS_bis.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.Numeric_MCS_bis.Size = New System.Drawing.Size(56, 20)
+        Me.Numeric_MCS_bis.TabIndex = 18
+        Me.Numeric_MCS_bis.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_MCS_bis.Value = New Decimal(New Integer() {1000, 0, 0, 0})
+        '
+        'Numeric_MCS_von
+        '
+        Me.Numeric_MCS_von.Location = New System.Drawing.Point(748, 527)
+        Me.Numeric_MCS_von.Maximum = New Decimal(New Integer() {100000, 0, 0, 0})
+        Me.Numeric_MCS_von.Name = "Numeric_MCS_von"
+        Me.Numeric_MCS_von.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.Numeric_MCS_von.Size = New System.Drawing.Size(56, 20)
+        Me.Numeric_MCS_von.TabIndex = 19
+        Me.Numeric_MCS_von.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_MCS_von.Value = New Decimal(New Integer() {1, 0, 0, 0})
+        '
+        'Label_Anzahl_MCS
+        '
+        Me.Label_Anzahl_MCS.AutoSize = True
+        Me.Label_Anzahl_MCS.Location = New System.Drawing.Point(714, 529)
+        Me.Label_Anzahl_MCS.Name = "Label_Anzahl_MCS"
+        Me.Label_Anzahl_MCS.Size = New System.Drawing.Size(28, 13)
+        Me.Label_Anzahl_MCS.TabIndex = 20
+        Me.Label_Anzahl_MCS.Text = "von:"
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(714, 555)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(23, 13)
+        Me.Label1.TabIndex = 21
+        Me.Label1.Text = "bis:"
+        '
         'Form1
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.BackColor = System.Drawing.SystemColors.Control
-        Me.ClientSize = New System.Drawing.Size(819, 768)
+        Me.ClientSize = New System.Drawing.Size(819, 753)
+        Me.Controls.Add(Me.Button_genP)
+        Me.Controls.Add(Me.Label1)
+        Me.Controls.Add(Me.Label_Anzahl_MCS)
+        Me.Controls.Add(Me.Numeric_MCS_von)
+        Me.Controls.Add(Me.Numeric_MCS_bis)
+        Me.Controls.Add(Me.Button_MCS)
         Me.Controls.Add(Me.LabelZeit)
         Me.Controls.Add(Me.LabelZeitHeader)
         Me.Controls.Add(Me.GroupBox_ErgebnisDB)
@@ -253,6 +338,8 @@ Partial Class Form1
         Me.GroupBox_Anwendung.ResumeLayout(False)
         Me.GroupBox_Anwendung.PerformLayout()
         Me.GroupBox_ErgebnisDB.ResumeLayout(False)
+        CType(Me.Numeric_MCS_bis, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.Numeric_MCS_von, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -275,4 +362,10 @@ Partial Class Form1
     Private WithEvents Label_Methode As System.Windows.Forms.Label
     Private WithEvents LabelZeitHeader As System.Windows.Forms.Label
     Private WithEvents LabelZeit As System.Windows.Forms.Label
+    Public WithEvents Button_MCS As System.Windows.Forms.Button
+    Friend WithEvents Numeric_MCS_bis As System.Windows.Forms.NumericUpDown
+    Friend WithEvents Numeric_MCS_von As System.Windows.Forms.NumericUpDown
+    Friend WithEvents Label_Anzahl_MCS As System.Windows.Forms.Label
+    Friend WithEvents Label1 As System.Windows.Forms.Label
+    Public WithEvents Button_genP As System.Windows.Forms.Button
 End Class

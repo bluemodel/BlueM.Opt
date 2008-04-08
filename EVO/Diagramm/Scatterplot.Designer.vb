@@ -41,6 +41,7 @@ Partial Class Scatterplot
         Me.Name = "Scatterplot"
         Me.Text = "Scatterplot-Matrix"
         Me.ResumeLayout(False)
+        Me.matrix.BackColor = Color.White
 
     End Sub
     Friend WithEvents matrix As System.Windows.Forms.TableLayoutPanel

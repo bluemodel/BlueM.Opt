@@ -262,7 +262,7 @@ Public Class OptResult
         Call Me.db_prepare()
         'Methodenspezifische Anpassungen
         Select Case EVO.Form1.Method
-            Case METH_PES, METH_SENSIPLOT, METH_HOOKJEEVES, METH_MCS
+            Case METH_PES, METH_SENSIPLOT, METH_HOOKJEEVES, METH_PESMCS
                 Call Me.db_prepare_PES()
             Case METH_CES
                 Call Me.db_prepare_CES()
@@ -438,7 +438,7 @@ Public Class OptResult
         If (EVO.Form1.Method = METH_PES _
             Or EVO.Form1.Method = METH_SENSIPLOT _
             Or EVO.Form1.Method = METH_HOOKJEEVES _
-				Or EVO.Form1.Method = METH_MCS) Then
+    Or EVO.Form1.Method = METH_PESMCS) Then
 
             'OptParameter schreiben
             '----------------------

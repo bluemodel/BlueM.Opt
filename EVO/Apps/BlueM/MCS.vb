@@ -1,18 +1,34 @@
 Imports System.IO
+Imports IHWB.BlueM.DllAdapter
 
 Public Class MCS
 
     Dim Pstd(10000) As Double 'Basisniederschlagsvektor
-    Dim Dauer As Integer
+    Dim Dauer, Lauf As Integer
     Dim P_Menge, P_Area, P_area_ohTS As Double
-    Dim StFac(10000) As Double
-  
+    Dim StFac(10000), Schaden As Double
+    Dim rand(2000), Teibereiche As Double
+    Dim Parray(2000) As Double
+    Dim Qzu_Lehn(2000), Qzu_Kling(2000), Qzu_Malter(2000) As Double
+    Dim Qab_Lehn(2000), Qab_Kling(2000), Qab_Malter(2000), Qab_Cotta(2000), Qab_Ammel(2000) As Double
+    Public MAE, RMSE, NS, QReheSum, QReheSumB, QPegel(10000), QReheMaxB As Double
+    Dim WSP_Malter, WSP_Lehn, WSP_Kling As Double
+    Dim QAmmelSum, QDippsSum, QzuSum, QsimAmmel(10000), QsimRehefeld(10000), QsimDipps(10000) As Double
+    Dim damage, damage_ww, damage_rw, damage_vw, P_Dauer, QSKLI As Double
+    Dim QmaxLehn, QmaxKling, QmaxMalter, VmaxLehn, VmaxKling, VmaxMalter, QmaxAmmel, QmaxDipps As Double
+    Dim QmaxAbLehn, QmaxAbKling, QmaxAbMalter, QmaxCotta, Dmin, Dmax, VAmmel, VDipps, Qschwell As Double
+    Dim vary_V0, vary_VR, read_P, solve_BlueM, Polder, pol_kli, pol_mal, pol_leh As Boolean
+    Dim HWE_LEH, HWE_KLI, HWE_MAL As Boolean
+    Dim SummeP, Text3, V0Lehn, V0Kling, V0Malter As String
+    
     Public Datensatz As String                           'Name des zu simulierenden Datensatzes
     Public WorkDir As String                             'Arbeitsverzeichnis für das Blaue Modell
     Public SimStart As DateTime                          'Anfangsdatum der Simulation
     Public SimEnde As DateTime                           'Enddatum der Simulation
     Public SimDT As TimeSpan                             'Zeitschrittweite der Simulation
 
+    Private bluem_dll As BlueM_EngineDotNetAccess
+    Private Damage1 As Damage
  
     '#######################################################################
     '# Einstellungen
@@ -20,9 +36,8 @@ Public Class MCS
 
     Dim nTeilbereiche As Integer = 4
     Dim nStationen As Integer = 15
-    Dim Lauf As Integer = 1
-
-    Public Vorlaufzeit As Integer = 47 '!Auch in Sim.vb/ Write_ModellParameter() festlegen!!
+   
+    Public Vorlaufzeit As Integer  '!Auch in Sim.vb/ Write_ModellParameter() festlegen!!
 
     Dim Pmin As Double = 100
     Dim Pmax As Double = 500
@@ -56,7 +71,10 @@ Public Class MCS
     '#######################################################################
 
 
-    Public Sub MonteCarlo(ByVal iLauf As Integer)
+    Public Sub MonteCarlo(ByVal iLauf As Integer, ByVal nt As Integer,ByVal evo as Boolean)
+
+        Vorlaufzeit = nt
+        Lauf = iLauf
 
         Call getPath() 'ermittle Arbeitsverzeichnis
         Call readDate() 'Simulationszeitraum ermitteln
@@ -79,32 +97,36 @@ Public Class MCS
         writeZRE("TharandtGrillenburg.zre", StFac(14))
         writeZRE("ZinnwaldGeorgenfeld.zre", StFac(15))
 
-        modify_TS_V0("Lehnmuehle", iLauf)
-        modify_TS_V0("Klingenberg", iLauf)
-        modify_TS_V0("Malter", iLauf)
+        modify_TS_V0("/../ZRE/S0.txt", "Lehnmuehle", iLauf)
+        modify_TS_V0("/../ZRE/S0.txt", "Klingenberg", iLauf)
+        modify_TS_V0("/../ZRE/S0.txt", "Malter", iLauf)
+
+        If Not evo Then
+            'runBluem()
+            'readWel(Me.WorkDir, Me.Datensatz)
+            'Me.Damage1 = New Damage()
+            'Schaden = Me.Damage1.QWert_Damage(WorkDir & Datensatz & ".wel")
+            output(iLauf)
+        End If
 
     End Sub
 
     '* allgemeine Niederschlagsdatei erstellen
     '*****************************************************
-    Public Sub erstelle_Niederschlag(ByVal nLauf As Integer)
+    Public Sub erstelle_Niederschlag(ByVal iStart As Integer, ByVal iEnde As Integer)
 
         Dim i As Integer = 0
         Dim k As Integer
-     
-        Dim DistMax As Double
+
         Dim GradMax As Double
         Dim StNr, Grad As Double
-
 
         Call getPath() 'ermittle Arbeitsverzeichnis
         Call readDate() 'Simulationszeitraum ermitteln
 
         Dim out As String = ""
 
-       
-
-        For Lauf = 1 To nLauf
+        For Lauf = iStart To iEnde
 
             Dauer = Zufallsdauer()
 
@@ -112,6 +134,8 @@ Public Class MCS
 
 100:        P_Menge = NiedGen(P_Matrix(0), P_Matrix(1), Lauf)
 
+
+           
             If CheckPSum(1) > P_Matrix(2) Then GoTo 100
             If CheckPSum(12) > P_Matrix(3) Then GoTo 100
             If CheckPSum(24) > P_Matrix(4) Then GoTo 100
@@ -120,6 +144,8 @@ Public Class MCS
             '*****************************************
             '* räumlichen Abmindungsfaktor ermitteln *
             '*****************************************
+
+            'Console.Out.WriteLine(P_Menge)
 
             GradMax = P_Menge / DistMax
 
@@ -131,7 +157,9 @@ Public Class MCS
             StNr = CDbl(Int(Rnd() * (nStationen - 1)))
 
             For i = 1 To nStationen
+
                 StFac(i) = (P_Menge - Grad * StDist(i - 1, StNr)) / P_Menge
+                'Console.Out.WriteLine(StFac(i))
             Next
 
             '*****************************************
@@ -140,12 +168,12 @@ Public Class MCS
 
             Dim StrWri As StreamWriter = New StreamWriter(WorkDir + "ZRE/Nied_" + Lauf.ToString + ".txt", False, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-            out = "# Stationsfaktoren" + vbCrLf
+            out = ""
             'Faktoren für räumliche Verteilung zuerst
             For k = 1 To nStationen
                 out += StFac(k).ToString + vbCrLf
             Next k
-            out += "# Niederschlagsdaten" + vbCrLf
+            'out += "# Niederschlagsdaten" + vbCrLf
             For k = 1 To 72 + 24
                 out += Pstd(k).ToString + vbCrLf
             Next k
@@ -155,7 +183,7 @@ Public Class MCS
 
             '*****************************************
 
-            read_Nied(Lauf) 'if readP-erneut
+            'read_Nied(Lauf) 'if readP-erneut
         Next Lauf
 
 
@@ -209,7 +237,7 @@ Public Class MCS
         Dim n, m, k, L_Tb, n_Tb, P_Sum, ctrsum As Integer
         Dim out As String
         Dim Pmax1h, Pmax12h As Double
-        Dim P_Menge As Double
+        Dim PP As Double
 
         For k = 1 To 72 + 24
             Pstd(k) = 0.0
@@ -292,13 +320,14 @@ Public Class MCS
 
         For k = 1 To 72 + 24
             out = out + Pstd(k).ToString + vbCrLf
-            P_Menge = P_Menge + Pstd(k)
+            PP = PP + Pstd(k)
+            'Console.Out.WriteLine(PP)
         Next k
 
         StrWri.Write(out)
         StrWri.Close()
 
-        Return P_Menge
+        Return PP
 
     End Function
 
@@ -324,13 +353,13 @@ Public Class MCS
     Public Sub read_Nied(ByVal number As Integer)
         Dim Text As String
 
-
-        Dim FiStr As FileStream = New FileStream(WorkDir + "ZRE/Nied_" + number.ToString + ".txt", FileMode.Open, FileAccess.ReadWrite)
+        Dim FiStr As FileStream = New FileStream(WorkDir + "/../ZRE/Nied_" + number.ToString + ".txt", FileMode.Open, FileAccess.ReadWrite)
         Dim StrRe As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
         Dim n, k As Integer
 
         Dauer = 0.0
         P_Menge = 0.0
+        P_Dauer = 0.0
         n = 0
         k = 0
 
@@ -346,13 +375,40 @@ Public Class MCS
             If n > nStationen Then
                 k += 1
                 Pstd(k) = CDbl(Text.Trim)
-                P_Menge = P_Menge + Pstd(n)
+                'Console.Out.WriteLine(Pstd(k))
+                P_Menge += Pstd(k)
+                If Pstd(k) > 0.0 Then P_Dauer = k
+                'If Pstd(k) > 0.0 Then Console.Out.WriteLine(Pstd(k))
             End If
 
         Loop Until StrRe.Peek() = -1
 
         StrRe.Close()
         FiStr.Close()
+
+        '**************************************
+        '* zur INFO: Gebietsniederschlag ausrechnen 
+        '**************************************
+        ' basiert auf Polygonmethode
+
+        P_Area = 0.0
+
+        For k = 1 To nStationen
+            P_Area += P_Menge * StFac(k) * PolyFac(k - 1)
+        Next k
+
+        '* oberhalb der TS
+        '**************************************
+        P_area_ohTS = 0.0
+
+        P_area_ohTS += P_Menge * StFac(1) * PolyFac_ohTS(1 - 1)
+        P_area_ohTS += P_Menge * StFac(2) * PolyFac_ohTS(2 - 1)
+        P_area_ohTS += P_Menge * StFac(3) * PolyFac_ohTS(3 - 1)
+        P_area_ohTS += P_Menge * StFac(7) * PolyFac_ohTS(7 - 1)
+        P_area_ohTS += P_Menge * StFac(9) * PolyFac_ohTS(9 - 1)
+        P_area_ohTS += P_Menge * StFac(13) * PolyFac_ohTS(13 - 1)
+        P_area_ohTS += P_Menge * StFac(14) * PolyFac_ohTS(14 - 1)
+        P_area_ohTS += P_Menge * StFac(15) * PolyFac_ohTS(15 - 1)
 
     End Sub
 
@@ -384,7 +440,7 @@ Public Class MCS
         Dim actDate, date2, dateVor As Date
 
         Text = "*ZRE" + vbCrLf
-        Text += "Beschreibung   mm/h   1" + vbCrLf
+        Text += "ZRE-Format     mm/h" + vbCrLf
         Text += "1 1   1" + vbCrLf
         Text += Me.SimStart.ToString("yyyyMMdd HH:mm") + " " + Me.SimEnde.ToString("yyyyMMdd HH:mm") + vbCrLf
 
@@ -404,7 +460,7 @@ Public Class MCS
             date2 = date2.Add(Me.SimDT)
         End While
 
-        Dim StrWri As StreamWriter = New StreamWriter(WorkDir + "ZRE/" + zreName)
+        Dim StrWri As StreamWriter = New StreamWriter(WorkDir + "/../ZRE/" + zreName)
         StrWri.Write(Text)
         StrWri.Close()
 
@@ -479,7 +535,7 @@ Public Class MCS
 
     'verändere TS V0
     '********************************************
-    Private Sub modify_TS_V0(ByVal TS As String, ByVal iLauf As Integer)
+    Private Sub modify_TS_V0(ByVal PfadSO As String, ByVal TS As String, ByVal iLauf As Integer)
         Dim Text, TextVol, TextBla, Textnew, fill As String
         Dim Vmax, Vmin, izeile, iread, V0_new As Integer
 
@@ -505,11 +561,10 @@ Public Class MCS
 
         'Randomize() 'Initialisiert den Zufallszahlengenerator
         'Dim V0_new As Integer = Vmin + Int(Rnd() * (Vmax - Vmin)) 'ganzzahlige Zufallszahl
-
         'lese V0-Zufallszahlen:
 
         Try
-            Dim FiStr As FileStream = New FileStream(WorkDir + "ZRE/S0" + ".txt", FileMode.Open, FileAccess.ReadWrite)
+            Dim FiStr As FileStream = New FileStream(WorkDir + PfadSO, FileMode.Open, FileAccess.ReadWrite)
             Dim StrRe As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
             Dim i As Integer
 
@@ -526,6 +581,18 @@ Public Class MCS
 
             StrRe.Close()
             FiStr.Close()
+
+            If TS = "Lehnmuehle" Then
+                V0Lehn = V0_new.ToString
+            End If
+            If TS = "Klingenberg" Then
+                V0Kling = V0_new.ToString
+            End If
+            If TS = "Malter" Then
+                V0Malter = V0_new.ToString
+            End If
+
+
 
         Catch except As Exception
             MsgBox(except.Message, "Fehler in modify_TS_V0", MsgBoxStyle.Exclamation)
@@ -576,6 +643,8 @@ Public Class MCS
             StrWri.Close()
 
             
+
+
         Catch except As Exception
             MsgBox(except.Message, "Fehler in modify_TS_V0", MsgBoxStyle.Exclamation)
         End Try
@@ -584,5 +653,361 @@ Public Class MCS
 
     End Sub
 
+    'schreibe output.xls
+    '********************************************
+    Public Sub output(ByVal iLauf As Integer)
+
+        Dim outpu, header As String
+
+        outpu = ""
+
+        If (iLauf = 1) Then
+            Console.Out.WriteLine(Me.WorkDir & Me.Datensatz & ".ALL")
+            header = "Lauf" + Chr(9) + "V0Lehn" + Chr(9) _
+                                    + "V0Kling" + Chr(9) _
+                                    + "V0Malter" + Chr(9) _
+                                    + "WSP_Lehn" + Chr(9) _
+                                    + "WSP_Kling" + Chr(9) _
+                                    + "WSP_Malter" + Chr(9) _
+                                    + "HWE_Lehn" + Chr(9) _
+                                    + "HWE_Kling" + Chr(9) _
+                                    + "HWE_Malter" + Chr(9) _
+                                    + "QmaxLehn" + Chr(9) _
+                                    + "QmaxKling" + Chr(9) _
+                                    + "QmaxMalter" + Chr(9) _
+                                    + "QmaxAbLehn" + Chr(9) _
+                                    + "QmaxAbKling" + Chr(9) _
+                                    + "QmaxAbMalter" + Chr(9) _
+                                    + "QmaxCotta" + Chr(9) _
+                                    + "VmaxLehn" + Chr(9) _
+                                    + "VmaxKling" + Chr(9) _
+                                    + "VmaxMalter" + Chr(9) _
+                                    + "Schaden" + Chr(9) _
+                                    + "QS_TS_KLI" + Chr(9) _
+                                    + "QmaxAmmel" + Chr(9) _
+                                    + "VAmmel" + Chr(9) _
+                                    + "QmaxDipps" + Chr(9) _
+                                    + "VDipps" + Chr(9) _
+                                    + "P_Dauer" + Chr(9) _
+                                    + "hN_max" + Chr(9) _
+                                    + "hN_area" + Chr(9) _
+                                    + "hN_area_ohTS" + Chr(9)
+
+
+            Console.Out.WriteLine(header)
+            Dim sFilePathe1 As String = Me.WorkDir & "output.xls"
+            Dim streami1 As FileStream = New FileStream(sFilePathe1, FileMode.Create)
+            Dim StrWri1 As StreamWriter = New StreamWriter(streami1, System.Text.Encoding.Default)
+            StrWri1.Write(header + vbCrLf)
+            StrWri1.Close()
+        End If
+
+        If (iLauf >= 1) Then
+
+            outpu = Lauf.ToString + Chr(9) + V0Lehn.ToString + Chr(9) _
+                                           + V0Kling.ToString + Chr(9) _
+                                           + V0Malter.ToString + Chr(9) _
+                                           + WSP_Lehn.ToString + Chr(9) _
+                                           + WSP_Kling.ToString + Chr(9) _
+                                           + WSP_Malter.ToString + Chr(9) _
+                                           + HWE_LEH.ToString + Chr(9) _
+                                           + HWE_KLI.ToString + Chr(9) _
+                                                   + HWE_MAL.ToString + Chr(9) _
+                                                    + QmaxLehn.ToString + Chr(9) _
+                                                    + QmaxKling.ToString + Chr(9) _
+                                                    + QmaxMalter.ToString + Chr(9) _
+                                                    + QmaxAbLehn.ToString + Chr(9) _
+                                                    + QmaxAbKling.ToString + Chr(9) _
+                                                    + QmaxAbMalter.ToString + Chr(9) _
+                                                    + QmaxCotta.ToString + Chr(9) _
+                                                    + VmaxLehn.ToString + Chr(9) _
+                                                    + VmaxKling.ToString + Chr(9) _
+                                                    + VmaxMalter.ToString + Chr(9) _
+                                                    + Schaden.ToString + Chr(9) _
+                                                    + QSKLI.ToString + Chr(9) _
+                                                    + QmaxAmmel.ToString + Chr(9) _
+                                                    + VAmmel.ToString + Chr(9) _
+                                                    + QmaxDipps.ToString + Chr(9) _
+                                                    + VDipps.ToString + Chr(9) _
+                                                    + P_Dauer.ToString + Chr(9) _
+                                                    + P_Menge.ToString + Chr(9) _
+                                                    + P_Area.ToString + Chr(9) _
+                                                    + P_area_ohTS.ToString
+
+
+            Console.Out.WriteLine(outpu)
+
+            Dim sFilePathe2 As String = Me.WorkDir & "output.xls"
+            Dim streami2 As FileStream = New FileStream(sFilePathe2, FileMode.Append)
+            Dim StrWri2 As StreamWriter = New StreamWriter(streami2, System.Text.Encoding.Default)
+            StrWri2.Write(outpu + vbCrLf)
+            StrWri2.Close()
+
+
+            'copyFile(Me.WorkDir, Me.Datensatz + ".wel", Lauf)
+
+        End If
+
+    End Sub
+
+    'kopiere *.wel nach final/
+    '********************************************
+    Sub copyFile(ByVal Pfad1 As String, ByVal AnwName1 As String, ByVal iLauf As Integer)
+        Dim FiStr As FileStream = New FileStream(Pfad1 + AnwName1, FileMode.Open, FileAccess.ReadWrite)
+        Dim StrRe As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Dim Text As String
+        Text = ""
+        Do
+            Text = Text + StrRe.ReadLine.ToString + vbCrLf
+        Loop Until StrRe.Peek() = -1
+        StrRe.Close()
+        FiStr.Close()
+
+        Dim StrWri As StreamWriter = New StreamWriter(Pfad1 + "final\" + Lauf.ToString + "_" + AnwName1, False, System.Text.Encoding.GetEncoding("iso8859-1"))
+        StrWri.Write(Text)
+        StrWri.Close()
+    End Sub
+
+    Public Sub readWel(ByVal Pfad1 As String, ByVal AnwName1 As String)
+        Dim FiStr As FileStream = New FileStream(Pfad1 + AnwName1 + ".wel", FileMode.Open, FileAccess.ReadWrite)
+        Dim StrRe As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Dim zeile, kp, kzulehn, kzukling, kzumalter, kablehn, kabkling, kabmalter, kabcotta, ksammel, kaammel, kdipps As Integer
+        Dim k_mal_wsp, k_leh_wsp, k_kli_wsp As Integer
+        Dim k_QH1, k_QH2, k_QH3, k_TKLI_QS1 As Integer
+        Dim outQzuLehn, outQzuKling, outQzuMalter, outQabLehn, outQabKling, outQabMalter As String
+        Dim Text, outP As String
+
+        Try
+            zeile = 0
+            kp = 1
+            kzulehn = 1
+            kzukling = 1
+            kzumalter = 1
+            kablehn = 1
+            kabkling = 1
+            kabmalter = 1
+            kabcotta = 1
+            ksammel = 1
+            kaammel = 1
+            kdipps = 1
+            k_mal_wsp = 1
+            k_leh_wsp = 1
+            k_kli_wsp = 1
+            k_QH1 = 1
+            k_QH2 = 1
+            k_QH3 = 1
+            k_TKLI_QS1 = 1
+
+            HWE_LEH = False
+            HWE_KLI = False
+            HWE_MAL = False
+
+            outP = ""
+            outQzuLehn = ""
+            outQzuKling = ""
+            outQzuMalter = ""
+
+            outQabLehn = ""
+            outQabKling = ""
+            outQabMalter = ""
+
+            QmaxLehn = 0.0
+            QmaxKling = 0.0
+            QmaxMalter = 0.0
+
+            QmaxAmmel = 0.0
+            QmaxDipps = 0.0
+
+            QmaxAbLehn = 0.0
+            QmaxAbKling = 0.0
+            QmaxAbMalter = 0.0
+            QmaxCotta = 0.0
+
+            VmaxLehn = 0.0
+            VmaxKling = 0.0
+            VmaxMalter = 0.0
+
+            WSP_Malter = 0.0
+            WSP_Lehn = 0.0
+            WSP_Kling = 0.0
+
+            VAmmel = 0.0
+            VDipps = 0.0
+
+            QSKLI = 0.0
+
+            Do
+                Text = StrRe.ReadLine.ToString
+                zeile += 1
+
+                If zeile = 2 Then
+                    Dim strarray() As String = Text.Split(";"c)
+
+                    Do While strarray(k_TKLI_QS1).Trim <> "TKLI_QS1"
+                        k_TKLI_QS1 = k_TKLI_QS1 + 1
+                    Loop
+
+                    Do While strarray(k_QH1).Trim <> "TLEH_QH1"
+                        k_QH1 = k_QH1 + 1
+                    Loop
+
+                    Do While strarray(k_QH2).Trim <> "TKLI_QH1"
+                        k_QH2 = k_QH2 + 1
+                    Loop
+
+                    Do While strarray(k_QH3).Trim <> "TMAL_QH6"
+                        k_QH3 = k_QH3 + 1
+                    Loop
+
+                    Do While strarray(k_mal_wsp).Trim <> "TMAL_WSP"
+                        k_mal_wsp = k_mal_wsp + 1
+                    Loop
+                    Do While strarray(k_leh_wsp).Trim <> "TLEH_WSP"
+                        k_leh_wsp = k_leh_wsp + 1
+                    Loop
+                    Do While strarray(k_kli_wsp).Trim <> "TKLI_WSP"
+                        k_kli_wsp = k_kli_wsp + 1
+                    Loop
+
+                    Do While strarray(kzulehn).Trim <> "TLEH_1ZU"
+                        kzulehn = kzulehn + 1
+                    Loop
+                    Do While strarray(kzukling).Trim <> "TKLI_1ZU"
+                        kzukling = kzukling + 1
+                    Loop
+                    Do While strarray(kzumalter).Trim <> "TMAL_1ZU"
+                        kzumalter = kzumalter + 1
+                    Loop
+                    '***
+                    Do While strarray(kablehn).Trim <> "S109_1ZU"
+                        kablehn = kablehn + 1
+                    Loop
+                    Do While strarray(ksammel).Trim <> "S100_1AB"
+                        ksammel = ksammel + 1
+                    Loop
+                    Do While strarray(kaammel).Trim <> "A100_1AB"
+                        kaammel = kaammel + 1
+                    Loop
+                    Do While strarray(kabkling).Trim <> "S118_1ZU"
+                        kabkling = kabkling + 1
+                    Loop
+                    Do While strarray(kabmalter).Trim <> "S31 _1ZU"
+                        kabmalter = kabmalter + 1
+                    Loop
+                    Do While strarray(kabcotta).Trim <> "S209_1AB"
+                        kabcotta = kabcotta + 1
+                    Loop
+                    Do While strarray(kdipps).Trim <> "SH2 _1AB"
+                        kdipps = kdipps + 1
+                    Loop
+                    '***
+                    Do While strarray(kp).Trim <> "A102_NIE"
+                        kp = kp + 1
+                    Loop
+                End If
+                'Console.Out.WriteLine("hallo")
+
+                If zeile > 3 Then
+                    Dim strarray() As String = Text.Split(";"c)
+                    QSKLI += CDbl(strarray(k_TKLI_QS1)) * 3600.0
+                    If (CDbl(strarray(k_mal_wsp)) > WSP_Malter) Then WSP_Malter = CDbl(strarray(k_mal_wsp))
+                    If (CDbl(strarray(k_leh_wsp)) > WSP_Lehn) Then WSP_Lehn = CDbl(strarray(k_leh_wsp))
+                    If (CDbl(strarray(k_kli_wsp)) > WSP_Kling) Then WSP_Kling = CDbl(strarray(k_kli_wsp))
+
+                    If CDbl(strarray(k_QH1) > 0) Then HWE_LEH = True
+                    If CDbl(strarray(k_QH2) > 0) Then HWE_KLI = True
+                    If CDbl(strarray(k_QH3) > 0) Then HWE_MAL = True
+
+                    Qzu_Lehn(zeile - 3) = CDbl(strarray(kzulehn))
+                    Qzu_Kling(zeile - 3) = CDbl(strarray(kzukling))
+                    Qzu_Malter(zeile - 3) = CDbl(strarray(kzumalter))
+
+                    Qab_Lehn(zeile - 3) = CDbl(strarray(kablehn))
+                    Qab_Kling(zeile - 3) = CDbl(strarray(kabkling))
+                    Qab_Malter(zeile - 3) = CDbl(strarray(kabmalter))
+
+                    Qab_Ammel(zeile - 3) = CDbl(strarray(kaammel)) + CDbl(strarray(ksammel))
+
+                    Qab_Cotta(zeile - 3) = CDbl(strarray(kabcotta))
+
+                    Parray(zeile - 3) = CDbl(strarray(kp))
+
+                    'Berechne Qmax
+                    If Qzu_Lehn(zeile - 3) > QmaxLehn Then QmaxLehn = Qzu_Lehn(zeile - 3)
+                    If Qzu_Kling(zeile - 3) > QmaxKling Then QmaxKling = Qzu_Kling(zeile - 3)
+                    If Qzu_Malter(zeile - 3) > QmaxMalter Then QmaxMalter = Qzu_Malter(zeile - 3)
+
+                    If Qab_Lehn(zeile - 3) > QmaxAbLehn Then QmaxAbLehn = Qab_Lehn(zeile - 3)
+                    If Qab_Kling(zeile - 3) > QmaxAbKling Then QmaxAbKling = Qab_Kling(zeile - 3)
+                    If Qab_Malter(zeile - 3) > QmaxAbMalter Then QmaxAbMalter = Qab_Malter(zeile - 3)
+
+                    If Qab_Cotta(zeile - 3) > QmaxCotta Then QmaxCotta = Qab_Cotta(zeile - 3)
+
+                    If CDbl(strarray(kdipps)) > QmaxDipps Then QmaxDipps = CDbl(strarray(kdipps))
+                    If Qab_Ammel(zeile - 3) > QmaxAmmel Then QmaxAmmel = Qab_Ammel(zeile - 3)
+
+                    'Berechne maximale TS-Füllung 
+                    VmaxLehn = Qzu_Lehn(zeile - 3) * 3600.0
+                    VmaxKling = Qzu_Kling(zeile - 3) * 3600.0
+                    VmaxMalter = Qzu_Malter(zeile - 3) * 3600.0
+
+                    'Berechne Wellenvolumen 
+                    If (Qzu_Lehn(zeile - 3) > 5.0) Then VAmmel += Qab_Ammel(zeile - 3) * 3600.0 / 1000000.0
+                    If (CDbl(strarray(kdipps)) > 5.0) Then VDipps += CDbl(strarray(kdipps)) * 3600.0 / 1000000.0
+                End If
+
+            Loop Until StrRe.Peek() = -1
+
+            StrRe.Close()
+            FiStr.Close()
+
+        Catch except As Exception
+            MsgBox(except.Message, "Fehler in readWel", MsgBoxStyle.Exclamation)
+        End Try
+
+
+
+    End Sub
+
+
+
+    Public Sub runBluem()
+        'BlueM DLL instanzieren
+        '----------------------
+        Dim dll_path As String
+        dll_path = System.Windows.Forms.Application.StartupPath() & "\Apps\BlueM\BlueM.dll"
+
+        If (File.Exists(dll_path)) Then
+            bluem_dll = New BlueM_EngineDotNetAccess(dll_path)
+        Else
+            Throw New Exception("BlueM.dll nicht gefunden!")
+        End If
+
+        Try
+
+            Call bluem_dll.Initialize(Me.WorkDir & Me.Datensatz)
+
+            Dim SimEnde As DateTime = BlueM_EngineDotNetAccess.DateTime(bluem_dll.GetSimulationEndDate())
+
+            'Simulationszeitraum 
+            Do While (BlueM_EngineDotNetAccess.DateTime(bluem_dll.GetCurrentTime) <= SimEnde)
+                Call bluem_dll.PerformTimeStep()
+            Loop
+
+            'Simulation erfolgreich
+  
+        Catch ex As Exception
+
+            'Simulationsfehler aufgetreten
+            MsgBox(ex.Message, MsgBoxStyle.Exclamation, "BlueM")
+  
+        Finally
+
+            Call bluem_dll.Finish()
+            Call bluem_dll.Dispose()
+
+        End Try
+
+    End Sub
 
 End Class
