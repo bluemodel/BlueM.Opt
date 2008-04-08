@@ -1462,7 +1462,7 @@ Start_Evolutionsrunden:
 
                         Call EVO_Opt_Verlauf1.Nachfolger(PES1.PES_iAkt.iAktNachf + 1)
                         'QWertMin = 9999999999999
-                        'durchlauf += 1
+                        durchlauf += 1
 
                         'Do Schleife: Um Modellfehler bzw. Evaluierungsabbrüche abzufangen
                         Dim Eval_Count As Integer = 0
