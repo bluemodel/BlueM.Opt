@@ -1311,7 +1311,7 @@ Public MustInherit Class Sim
         Dim actDate, date2 As DateTime
         Dim Q1, Q2, dQ, dt, tmin, tmax As Double
 
-        Dim Vorlaufzeit As Integer = 47
+        Dim Vorlaufzeit As Integer = 0
 
         'Sonderfall Zeitreihe
         'xxxxxxxxxxxxxxxxxxxx
@@ -1386,7 +1386,7 @@ Public MustInherit Class Sim
                 End If
 
                 'Pfad für jede Zeitreihe aus *.EXT ermitteln
-                PfadZRE = Me.WorkDir & get_path_EXT(List_ModellParameter(n).Datei)
+                PfadZRE = get_path_EXT(List_ModellParameter(n).Datei)
 
                 'ZRE-Datei schreiben
                 Call writeZRE(Qab, PfadZRE)
@@ -1616,7 +1616,7 @@ Handler:
         Dim actDAte, date2 As Date
 
         Text = "*ZRE" + vbCrLf
-        Text += "Beschreibung   m3/s" + vbCrLf
+        Text += "ZRE-Format     m3/s" + vbCrLf
         Text += "1 1   1" + vbCrLf
         Text += Me.SimStart.ToString("yyyyMMdd HH:mm") + " " + Me.SimEnde.ToString("yyyyMMdd HH:mm") + vbCrLf
 

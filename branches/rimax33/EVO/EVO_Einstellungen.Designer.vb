@@ -122,13 +122,13 @@ Partial Class EVO_Einstellungen
         Me.TextDeltaStartHJ = New System.Windows.Forms.NumericUpDown
         Me.CheckBoxDNVektorHJ = New System.Windows.Forms.CheckBox
         Me.TabPage_MCS = New System.Windows.Forms.TabPage
-        Me.Numeric_Anzahl_MCS = New System.Windows.Forms.NumericUpDown
+        Me.Numeric_StarteBeiLauf = New System.Windows.Forms.NumericUpDown
+        Me.LabelStartnMCS = New System.Windows.Forms.Label
+        Me.Numeric_EndeBeiLauf = New System.Windows.Forms.NumericUpDown
         Me.Label_Anzahl_MCS = New System.Windows.Forms.Label
         Me.Numeric_LadeP = New System.Windows.Forms.NumericUpDown
         Me.Label_LadeP = New System.Windows.Forms.Label
         Me.Button_LadeP = New System.Windows.Forms.Button
-        Me.Numeric_NP = New System.Windows.Forms.NumericUpDown
-        Me.LabelNP = New System.Windows.Forms.Label
         Me.ButtonGenP = New System.Windows.Forms.Button
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip
         Me.ÖffnenToolStripButton = New System.Windows.Forms.ToolStripButton
@@ -166,9 +166,9 @@ Partial Class EVO_Einstellungen
         CType(Me.TextDeltaFinishHJ, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.TextDeltaStartHJ, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabPage_MCS.SuspendLayout()
-        CType(Me.Numeric_Anzahl_MCS, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.Numeric_StarteBeiLauf, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.Numeric_EndeBeiLauf, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Numeric_LadeP, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.Numeric_NP, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ToolStrip1.SuspendLayout()
         Me.GroupBox_Einstellungen.SuspendLayout()
         CType(Me.Numeric_CES_n_MemSize, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -1232,13 +1232,13 @@ Partial Class EVO_Einstellungen
         '
         'TabPage_MCS
         '
-        Me.TabPage_MCS.Controls.Add(Me.Numeric_Anzahl_MCS)
+        Me.TabPage_MCS.Controls.Add(Me.Numeric_StarteBeiLauf)
+        Me.TabPage_MCS.Controls.Add(Me.LabelStartnMCS)
+        Me.TabPage_MCS.Controls.Add(Me.Numeric_EndeBeiLauf)
         Me.TabPage_MCS.Controls.Add(Me.Label_Anzahl_MCS)
         Me.TabPage_MCS.Controls.Add(Me.Numeric_LadeP)
         Me.TabPage_MCS.Controls.Add(Me.Label_LadeP)
         Me.TabPage_MCS.Controls.Add(Me.Button_LadeP)
-        Me.TabPage_MCS.Controls.Add(Me.Numeric_NP)
-        Me.TabPage_MCS.Controls.Add(Me.LabelNP)
         Me.TabPage_MCS.Controls.Add(Me.ButtonGenP)
         Me.TabPage_MCS.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_MCS.Name = "TabPage_MCS"
@@ -1246,25 +1246,45 @@ Partial Class EVO_Einstellungen
         Me.TabPage_MCS.TabIndex = 3
         Me.TabPage_MCS.Text = "MCS"
         '
-        'Numeric_Anzahl_MCS
+        'Numeric_StarteBeiLauf
         '
-        Me.Numeric_Anzahl_MCS.Location = New System.Drawing.Point(133, 65)
-        Me.Numeric_Anzahl_MCS.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
-        Me.Numeric_Anzahl_MCS.Name = "Numeric_Anzahl_MCS"
-        Me.Numeric_Anzahl_MCS.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.Numeric_Anzahl_MCS.Size = New System.Drawing.Size(69, 20)
-        Me.Numeric_Anzahl_MCS.TabIndex = 9
-        Me.Numeric_Anzahl_MCS.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.Numeric_Anzahl_MCS.Value = New Decimal(New Integer() {1000, 0, 0, 0})
+        Me.Numeric_StarteBeiLauf.Location = New System.Drawing.Point(109, 96)
+        Me.Numeric_StarteBeiLauf.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
+        Me.Numeric_StarteBeiLauf.Name = "Numeric_StarteBeiLauf"
+        Me.Numeric_StarteBeiLauf.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.Numeric_StarteBeiLauf.Size = New System.Drawing.Size(69, 20)
+        Me.Numeric_StarteBeiLauf.TabIndex = 11
+        Me.Numeric_StarteBeiLauf.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_StarteBeiLauf.Value = New Decimal(New Integer() {1, 0, 0, 0})
+        '
+        'LabelStartnMCS
+        '
+        Me.LabelStartnMCS.AutoSize = True
+        Me.LabelStartnMCS.Location = New System.Drawing.Point(12, 96)
+        Me.LabelStartnMCS.Name = "LabelStartnMCS"
+        Me.LabelStartnMCS.Size = New System.Drawing.Size(79, 13)
+        Me.LabelStartnMCS.TabIndex = 10
+        Me.LabelStartnMCS.Text = "Starte bei Lauf:"
+        '
+        'Numeric_EndeBeiLauf
+        '
+        Me.Numeric_EndeBeiLauf.Location = New System.Drawing.Point(108, 65)
+        Me.Numeric_EndeBeiLauf.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
+        Me.Numeric_EndeBeiLauf.Name = "Numeric_EndeBeiLauf"
+        Me.Numeric_EndeBeiLauf.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.Numeric_EndeBeiLauf.Size = New System.Drawing.Size(69, 20)
+        Me.Numeric_EndeBeiLauf.TabIndex = 9
+        Me.Numeric_EndeBeiLauf.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_EndeBeiLauf.Value = New Decimal(New Integer() {1000, 0, 0, 0})
         '
         'Label_Anzahl_MCS
         '
         Me.Label_Anzahl_MCS.AutoSize = True
         Me.Label_Anzahl_MCS.Location = New System.Drawing.Point(12, 67)
         Me.Label_Anzahl_MCS.Name = "Label_Anzahl_MCS"
-        Me.Label_Anzahl_MCS.Size = New System.Drawing.Size(115, 13)
+        Me.Label_Anzahl_MCS.Size = New System.Drawing.Size(76, 13)
         Me.Label_Anzahl_MCS.TabIndex = 8
-        Me.Label_Anzahl_MCS.Text = "Anzahl der Durchläufe:"
+        Me.Label_Anzahl_MCS.Text = "Ende bei Lauf:"
         '
         'Numeric_LadeP
         '
@@ -1293,32 +1313,13 @@ Partial Class EVO_Einstellungen
         Me.Button_LadeP.Text = "lade P"
         Me.Button_LadeP.UseVisualStyleBackColor = True
         '
-        'Numeric_NP
-        '
-        Me.Numeric_NP.Location = New System.Drawing.Point(108, 314)
-        Me.Numeric_NP.Name = "Numeric_NP"
-        Me.Numeric_NP.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.Numeric_NP.Size = New System.Drawing.Size(69, 20)
-        Me.Numeric_NP.TabIndex = 4
-        Me.Numeric_NP.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.Numeric_NP.Value = New Decimal(New Integer() {1, 0, 0, 0})
-        '
-        'LabelNP
-        '
-        Me.LabelNP.AutoSize = True
-        Me.LabelNP.Location = New System.Drawing.Point(12, 317)
-        Me.LabelNP.Name = "LabelNP"
-        Me.LabelNP.Size = New System.Drawing.Size(93, 13)
-        Me.LabelNP.TabIndex = 3
-        Me.LabelNP.Text = "Anzahl Ereignisse:"
-        '
         'ButtonGenP
         '
-        Me.ButtonGenP.Location = New System.Drawing.Point(108, 340)
+        Me.ButtonGenP.Location = New System.Drawing.Point(16, 139)
         Me.ButtonGenP.Name = "ButtonGenP"
-        Me.ButtonGenP.Size = New System.Drawing.Size(69, 23)
+        Me.ButtonGenP.Size = New System.Drawing.Size(162, 23)
         Me.ButtonGenP.TabIndex = 2
-        Me.ButtonGenP.Text = "Generiere"
+        Me.ButtonGenP.Text = "Generiere P Ereignisse"
         Me.ButtonGenP.UseVisualStyleBackColor = True
         '
         'ToolStrip1
@@ -1424,9 +1425,9 @@ Partial Class EVO_Einstellungen
         CType(Me.TextDeltaStartHJ, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabPage_MCS.ResumeLayout(False)
         Me.TabPage_MCS.PerformLayout()
-        CType(Me.Numeric_Anzahl_MCS, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.Numeric_StarteBeiLauf, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.Numeric_EndeBeiLauf, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.Numeric_LadeP, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.Numeric_NP, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ToolStrip1.ResumeLayout(False)
         Me.ToolStrip1.PerformLayout()
         Me.GroupBox_Einstellungen.ResumeLayout(False)
@@ -1541,15 +1542,18 @@ Partial Class EVO_Einstellungen
     Friend WithEvents CheckBox_CES_UseSecPop_PES As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBox_CES_UseSecPop_CES As System.Windows.Forms.CheckBox
     Public WithEvents TabPage_CES As System.Windows.Forms.TabPage
-    Friend WithEvents LabelNP As System.Windows.Forms.Label
     Friend WithEvents ButtonGenP As System.Windows.Forms.Button
-    Friend WithEvents Numeric_NP As System.Windows.Forms.NumericUpDown
     Friend WithEvents Numeric_LadeP As System.Windows.Forms.NumericUpDown
     Friend WithEvents Label_LadeP As System.Windows.Forms.Label
     Friend WithEvents Button_LadeP As System.Windows.Forms.Button
-    Friend WithEvents Numeric_Anzahl_MCS As System.Windows.Forms.NumericUpDown
+    Friend WithEvents Numeric_EndeBeiLauf As System.Windows.Forms.NumericUpDown
     Friend WithEvents Label_Anzahl_MCS As System.Windows.Forms.Label
+    Friend WithEvents Numeric_StarteBeiLauf As System.Windows.Forms.NumericUpDown
+    Friend WithEvents LabelStartnMCS As System.Windows.Forms.Label
+
     Friend WithEvents Combo_CES_MemStrategy As System.Windows.Forms.ComboBox
-    Private WithEvents Numeric_CES_n_MemSize As System.Windows.Forms.NumericUpDown
     Friend WithEvents Label_MemSize As System.Windows.Forms.Label
+    Friend WithEvents Numeric_CES_n_MemSize As System.Windows.Forms.NumericUpDown
+
+
 End Class
