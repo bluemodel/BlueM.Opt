@@ -2182,6 +2182,8 @@ Start_Evolutionsrunden:
                 Me.DForm.Diag.Clear()
                 Me.DForm.Diag.DiagInitialise(Path.GetFileName(sourceFile), Achsen)
 
+                Call My.Application.DoEvents()
+
                 'Punkte eintragen
                 '----------------
                 Dim serie As Steema.TeeChart.Styles.Series
@@ -2232,6 +2234,8 @@ Start_Evolutionsrunden:
 
                 End If
 
+                Call My.Application.DoEvents()
+
                 'Sekundärpopulation
                 '==================
                 If (importDialog.ComboBox_SekPop.SelectedItem <> "keine") Then
@@ -2252,11 +2256,11 @@ Start_Evolutionsrunden:
 
                 End If
 
+                Call My.Application.DoEvents()
+
                 'Hypervolumen
                 '============
-                If (Common.Manager.AnzPenalty > 1) Then
-
-                    Dim i As Integer
+                If (importDialog.CheckBox_Hypervol.Checked) Then
 
                     'Indicator-Diagramm anzeigen
                     Me.DForm.Diag.Height = Me.DForm.Diag.Height - 70
@@ -2265,17 +2269,9 @@ Start_Evolutionsrunden:
 
                     'Hypervolumen instanzieren
                     Dim Hypervolume As EVO.MO_Indicators.Indicators
+                    Hypervolume = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(EVO.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, Common.Manager.AnzPenalty)
                     Dim indicator As Double
-                    Dim minmax() As Boolean
                     Dim nadir() As Double
-                    ReDim minmax(Common.Manager.AnzPenalty - 1)
-                    ReDim nadir(Common.Manager.AnzPenalty - 1)
-                    For i = 0 To Common.Manager.AnzPenalty - 1
-                        minmax(i) = False       'Alle Zielfunktionen sind zu minimieren
-                        nadir(i) = 0            'Anfangswert für Nadirpunkt im Koordinatenursprung
-                    Next
-                    Hypervolume = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(EVO.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, minmax, nadir)
-                    Hypervolume.dimension = Common.Manager.AnzPenalty
 
                     'Alle Generationen durchlaufen
                     For Each sekpop As OptResult.Struct_SekPop In Sim1.OptResult.SekPops
@@ -2287,6 +2283,9 @@ Start_Evolutionsrunden:
 
                         'Hypervolumen zeichnen
                         Call Me.HyperVolumenZeichnen(sekpop.iGen, indicator, nadir)
+
+                        Call My.Application.DoEvents()
+
                     Next
                 End If
 
