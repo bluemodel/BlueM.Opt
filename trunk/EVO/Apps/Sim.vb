@@ -406,12 +406,12 @@ Public MustInherit Class Sim
         Dim ZIE_Datei As String = Me.WorkDir & Me.Datensatz & "." & OptZiele_Ext
 
         'Format:
-        '*|-----|-------------|---|---------|-------|----------|---------|--------------|-------------------|--------------------|
-        '*| Opt | Bezeichnung | R | ZielTyp | Datei | SimGröße | ZielFkt | EvalZeitraum |    Referenzwert  ODER    Referenzreihe |
-        '*|     |             |   |         |       |          |         | Start | Ende | WertTyp | RefWert | RefGröße | Datei   |
-        '*|-----|-------------|---|---------|-------|----------|---------|-------|------|---------|---------|----------|---------|
+        '*|-----|-------------|---|---------|-------|----------|---------|--------------|-------------------|--------------------|---------|
+        '*| Opt | Bezeichnung | R | ZielTyp | Datei | SimGröße | ZielFkt | EvalZeitraum |    Referenzwert  ODER    Referenzreihe | IstWert |
+        '*|     |             |   |         |       |          |         | Start | Ende | WertTyp | RefWert | RefGröße | Datei   |         |
+        '*|-----|-------------|---|---------|-------|----------|---------|-------|------|---------|---------|----------|---------|---------|
 
-        Const AnzSpalten As Integer = 13                       'Anzahl Spalten in der ZIE-Datei
+        Const AnzSpalten As Integer = 14                       'Anzahl Spalten in der ZIE-Datei
         Dim i As Integer
         Dim Zeile As String
         Dim WerteArray() As String
@@ -469,6 +469,12 @@ Public MustInherit Class Sim
                     End If
                     .RefGr = WerteArray(12).Trim()
                     .RefReiheDatei = WerteArray(13).Trim()
+                    If (WerteArray(14).Trim() <> "") Then
+                        .hasIstWert = True
+                        .IstWert = Convert.ToDouble(WerteArray(14).Trim(), Common.Provider.FortranProvider)
+                    Else
+                        .hasIstWert = False
+                    End If
                 End With
                 i += 1
             End If
