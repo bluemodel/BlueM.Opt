@@ -22,8 +22,6 @@ Public Class Diagramm
         Public Max As Double
     End Structure
 
-    Public anno1 As Steema.TeeChart.Tools.Annotation
-
     'TeeChart zurücksetzen
     '*********************
     Public Sub Reset()
@@ -92,11 +90,6 @@ Public Class Diagramm
                 rotate.Button = Windows.Forms.MouseButtons.Right
 
             End If
-
-            anno1 = New Steema.TeeChart.Tools.Annotation(.Chart)
-            anno1.Shape.Font.Name = "Courier New"
-            anno1.Position = Steema.TeeChart.Tools.AnnotationPositions.RightBottom
-            anno1.Active = False
 
         End With
 
