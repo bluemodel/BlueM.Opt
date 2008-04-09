@@ -14,6 +14,8 @@ Public Class Ziel
     Public RefReihe As Wave.Zeitreihe           'Die Referenzreihe
     Public EvalStart As DateTime                'Start des Evaluierungszeitraums
     Public EvalEnde As DateTime                 'Ende des Evaluierungszeitraums
+    Public hasIstWert As Boolean                'Gibt an, ob die Zielfunktion einen IstWert besitzt
+    Public IstWert As Double                    'Zielwert im Istzustand
 
     Public Overrides Function ToString() As String
         Return Bezeichnung
