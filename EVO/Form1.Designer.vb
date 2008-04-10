@@ -34,6 +34,7 @@ Partial Class Form1
         Me.Button_openMDB = New System.Windows.Forms.Button
         Me.Button_Scatterplot = New System.Windows.Forms.Button
         Me.Button_saveMDB = New System.Windows.Forms.Button
+        Me.Button_loadRefResult = New System.Windows.Forms.Button
         Me.GroupBox_Anwendung = New System.Windows.Forms.GroupBox
         Me.Label_Anwendung = New System.Windows.Forms.Label
         Me.ComboBox_Anwendung = New System.Windows.Forms.ComboBox
@@ -110,6 +111,17 @@ Partial Class Form1
         Me.ToolTip1.SetToolTip(Me.Button_saveMDB, "Ergebnisdatenbank speichern")
         Me.Button_saveMDB.UseVisualStyleBackColor = True
         '
+        'Button_loadRefResult
+        '
+        Me.Button_loadRefResult.Enabled = False
+        Me.Button_loadRefResult.Image = Global.IHWB.EVO.My.Resources.Resources.database_go
+        Me.Button_loadRefResult.Location = New System.Drawing.Point(99, 17)
+        Me.Button_loadRefResult.Name = "Button_loadRefResult"
+        Me.Button_loadRefResult.Size = New System.Drawing.Size(25, 25)
+        Me.Button_loadRefResult.TabIndex = 9
+        Me.ToolTip1.SetToolTip(Me.Button_loadRefResult, "Vergleichsergebnis aud Ergebnisdatenbank laden")
+        Me.Button_loadRefResult.UseVisualStyleBackColor = True
+        '
         'GroupBox_Anwendung
         '
         Me.GroupBox_Anwendung.BackColor = System.Drawing.SystemColors.Control
@@ -180,10 +192,11 @@ Partial Class Form1
         '
         Me.GroupBox_ErgebnisDB.Controls.Add(Me.Button_saveMDB)
         Me.GroupBox_ErgebnisDB.Controls.Add(Me.Button_openMDB)
+        Me.GroupBox_ErgebnisDB.Controls.Add(Me.Button_loadRefResult)
         Me.GroupBox_ErgebnisDB.Controls.Add(Me.Button_Scatterplot)
-        Me.GroupBox_ErgebnisDB.Location = New System.Drawing.Point(437, 631)
+        Me.GroupBox_ErgebnisDB.Location = New System.Drawing.Point(431, 631)
         Me.GroupBox_ErgebnisDB.Name = "GroupBox_ErgebnisDB"
-        Me.GroupBox_ErgebnisDB.Size = New System.Drawing.Size(101, 50)
+        Me.GroupBox_ErgebnisDB.Size = New System.Drawing.Size(131, 50)
         Me.GroupBox_ErgebnisDB.TabIndex = 14
         Me.GroupBox_ErgebnisDB.TabStop = False
         Me.GroupBox_ErgebnisDB.Text = "Ergebnis"
@@ -249,4 +262,5 @@ Partial Class Form1
     Private WithEvents Label_Anwendung As System.Windows.Forms.Label
     Private WithEvents ComboBox_Methode As System.Windows.Forms.ComboBox
     Private WithEvents Label_Methode As System.Windows.Forms.Label
+    Private WithEvents Button_loadRefResult As System.Windows.Forms.Button
 End Class
