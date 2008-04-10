@@ -46,6 +46,14 @@ Public Class OptResult
 
     'Konstruktor
     '***********
+    Public Sub New()
+
+        ReDim Me.Solutions(-1)
+        ReDim Me.selSolutionIDs(-1)
+        ReDim Me.SekPops(-1)
+
+    End Sub
+
     Public Sub New(ByVal Sim1 As Sim)
 
         'Datensatzname speichern
@@ -131,7 +139,7 @@ Public Class OptResult
             End If
         Next
 
-        Return New Common.Individuum("Solution", 0) 'TODO: Fehlerbehandlung
+        Throw New Exception("Konnte Lösung nicht identifizieren!")
 
     End Function
 
@@ -163,7 +171,7 @@ Public Class OptResult
         'Array von Sekundären Populationen um eins erweitern
         ReDim Preserve Me.SekPops(Me.SekPops.GetUpperBound(0) + 1)
         'SekPop hinzufügen
-        Me.SekPops(Me.SekPops.getUpperBound(0)) = _sekpop
+        Me.SekPops(Me.SekPops.GetUpperBound(0)) = _sekpop
 
     End Sub
 
@@ -615,7 +623,7 @@ Public Class OptResult
 
     'Optimierungsergebnis aus einer DB lesen
     '*****************************************************
-    Public Sub db_load(ByVal sourceFile As String)
+    Public Sub db_load(ByVal sourceFile As String, Optional ByVal QWerteOnly As Boolean = False)
 
         '---------------------------------------------------------------------------
         'Hinweise:
@@ -623,7 +631,7 @@ Public Class OptResult
         '---------------------------------------------------------------------------
 
         Dim i, j As Integer
-        Dim numSolutions, igen As Integer
+        Dim numSolutions As Integer
         Dim q As String = ""
         Dim adapter As OleDbDataAdapter
         Dim ds As DataSet
@@ -667,14 +675,31 @@ Public Class OptResult
                 '--
                 .ID = ds.Tables(0).Rows(i).Item("Sim.ID")
 
-                ReDim .PES_OptParas(Me.List_OptParameter_Save.GetUpperBound(0))
+                If (Not QWerteOnly) Then
 
-                'OptParameter
-                '------------
-                For j = 0 To Me.List_OptParameter_Save.GetUpperBound(0)
-                    .PES_OptParas(j) = Me.List_OptParameter_Save(j).Clone()
-                    .PES_OptParas(j).RWert = ds.Tables(0).Rows(i).Item(Me.List_OptParameter_Save(j).Bezeichnung)
-                Next
+                    ReDim .PES_OptParas(Me.List_OptParameter_Save.GetUpperBound(0))
+
+                    'OptParameter
+                    '------------
+                    For j = 0 To Me.List_OptParameter_Save.GetUpperBound(0)
+                        .PES_OptParas(j) = Me.List_OptParameter_Save(j).Clone()
+                        .PES_OptParas(j).RWert = ds.Tables(0).Rows(i).Item(Me.List_OptParameter_Save(j).Bezeichnung)
+                    Next
+
+                    'Constraints
+                    '-----------
+                    For j = 0 To Common.Manager.AnzConstraints - 1
+                        .Constrain(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Constraints(j).Bezeichnung)
+                    Next
+
+                    'Pfad
+                    '----
+                    ReDim .Measures(Me.List_Locations.GetUpperBound(0))
+                    For j = 0 To Me.List_Locations.GetUpperBound(0)
+                        .Measures(j) = ds.Tables(0).Rows(i).Item(Me.List_Locations(j).Name)
+                    Next
+
+                End If
 
                 'QWerte
                 '------
@@ -682,33 +707,30 @@ Public Class OptResult
                     .Zielwerte(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Ziele(j).Bezeichnung)
                 Next
 
-                'Constraints
-                '-----------
-                For j = 0 To Common.Manager.AnzConstraints - 1
-                    .Constrain(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Constraints(j).Bezeichnung)
-                Next
-
-                'Pfad
-                '----
-                ReDim .Measures(Me.List_Locations.GetUpperBound(0))
-                For j = 0 To Me.List_Locations.GetUpperBound(0)
-                    .Measures(j) = ds.Tables(0).Rows(i).Item(Me.List_Locations(j).Name)
-                Next
-
             End With
 
         Next
 
-        'Alle Sekundärpopulationen übernehmen
-        '====================================
+        'Sekundärpopulationen laden
+        Call Me.db_loadSekPops()
+
+    End Sub
+
+
+    'Sekundärpopulationen aus DB laden
+    '*********************************
+    Private Sub db_loadSekPops()
+
+        Dim i, igen As Integer
+        Dim SekPop As Struct_SekPop
+
+        ReDim Me.SekPops(-1)
 
         'Letzte SekPop-Generation bestimmen
         igen = db_getLastGenNo()
 
-        ReDim Me.SekPops(-1)
-
+        'Alle SekPops durchlaufen und einlesen
         For i = 0 To igen
-            Dim SekPop As Struct_SekPop
             SekPop = db_getSekPop(i)
             Call Me.addSekPop(SekPop)
         Next

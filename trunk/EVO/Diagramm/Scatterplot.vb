@@ -138,9 +138,9 @@ Partial Public Class Scatterplot
                     .Axes.Left.MinimumOffset = 2
                     .Axes.Left.MaximumOffset = 2
 
-                    'Format vereinheitlichen
-                    .Axes.Left.Labels.ValueFormat = "0.00E+00"
-                    .Axes.Bottom.Labels.ValueFormat = "0.00E+00"
+                    'Beschriftungsformat
+                    If (max(i) >= 1000 Or min(i) <= -1000) Then .Axes.Bottom.Labels.ValueFormat = "0.##E0"
+                    If (max(j) >= 1000 Or min(j) <= -1000) Then .Axes.Left.Labels.ValueFormat = "0.##E0"
 
                     'Achsen nur an den Rändern anzeigen
                     '----------------------------------
@@ -313,7 +313,7 @@ Partial Public Class Scatterplot
 
             End If
         Catch
-
+            MsgBox("Lösung nicht auswählbar!", MsgBoxStyle.Exclamation, "Error")
         End Try
 
     End Sub
