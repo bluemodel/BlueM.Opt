@@ -161,7 +161,7 @@ Public Class BlueM
             If (ziel.ZielTyp = "IHA") Then
                 'IHA-Berechnung einschalten
                 Me.isIHA = True
-                IHAZielReihe = ziel.ZielReihe
+                IHAZielReihe = ziel.RefReihe
                 IHAStart = ziel.EvalStart
                 IHAEnde = ziel.EvalEnde
                 Exit For
@@ -354,14 +354,33 @@ Public Class BlueM
             Me.SimErgebnis.Clear()
 
             'WEL-Datei einlesen
+            '------------------
             Dim WELtmp As Wave.WEL = New Wave.WEL(Me.WorkDir & Me.Datensatz & ".WEL", True)
 
-            'Simulationsergebnis abspeichern
+            'Reihen zu Simulationsergebnis hinzufügen
             For Each zre As Wave.Zeitreihe In WELtmp.Zeitreihen
                 Me.SimErgebnis.Add(zre, zre.ToString())
             Next
 
+            'ggf. KWL-Datei einlesen
+            '-----------------------
+            'TODO: Man könnte noch überprüfen, 
+            ' ob es überhaupt eine Zielfunktion gibt, 
+            ' die auf KWL-Ergebnisse zugreift
+            Dim KWLpath As String = Me.WorkDir & Me.Datensatz & ".KWL"
+            If (File.Exists(KWLpath)) Then
+
+                Dim KWLtmp As Wave.WEL = New Wave.WEL(KWLpath, True)
+
+                'Reihen zu Simulationsergebnis hinzufügen
+                For Each zre As Wave.Zeitreihe In KWLtmp.Zeitreihen
+                    Me.SimErgebnis.Add(zre, zre.ToString())
+                Next
+
+            End If
+
             'Bei IHA-Berechnung jetzt IHA-Software ausführen
+            '-----------------------------------------------
             If (Me.isIHA) Then
                 'IHA-Ziel raussuchen und Simulationsreihe übergeben
                 'HACK: es wird immer das erste IHA-Ziel verwendet!
@@ -393,8 +412,8 @@ Public Class BlueM
         '--------------------------------
         Select Case ziel.Datei
 
-            Case "WEL"
-                'QWert aus WEL-Datei
+            Case "WEL", "KWL"
+                'QWert aus WEL- oder KWL-Datei
                 QWert = QWert_WEL(ziel)
 
             Case "PRB"
@@ -407,6 +426,9 @@ Public Class BlueM
                 Throw New Exception("Der Wert '" & ziel.Datei & "' für die Datei wird bei Optimierungszielen für BlueM nicht akzeptiert!")
 
         End Select
+
+        'Zielrichtung berücksichtigen
+        QWert *= ziel.Richtung
 
     End Function
 

@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.vb" />
+    <Compile Include="Constraint.vb" />
     <Compile Include="EVO_Settings.vb" />
     <Compile Include="Individuum.vb">
     </Compile>

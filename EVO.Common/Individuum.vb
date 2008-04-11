@@ -18,7 +18,6 @@ Public Class Individuum
     Private Shared Individ_Type As Integer
     Private Shared n_Locations As Integer
     Private Shared n_Para As Integer
-    Private Shared n_Constrain As Integer
 
     'Strukturen der Klasse
     '*********************
@@ -182,11 +181,10 @@ Public Class Individuum
 
     'Initialisiert ein Individuum
     '****************************
-    Public Shared Sub Initialise(ByVal _Individ_Type As Integer, ByVal _n_Locations As Integer, ByVal _n_Para As Integer, ByVal _n_Constrain As Integer)
+    Public Shared Sub Initialise(ByVal _Individ_Type As Integer, ByVal _n_Locations As Integer, ByVal _n_Para As Integer)
         Individuum.Individ_Type = _Individ_Type
         Individuum.n_Locations = _n_Locations
         Individuum.n_Para = _n_Para
-        Individuum.n_Constrain = _n_Constrain
     End Sub
 
     'Konstruktor für ein Individuum
@@ -210,18 +208,14 @@ Public Class Individuum
         '04 Zielfunktionswerte
         ReDim Me.Zielwerte(Common.Manager.AnzZiele - 1)
         For j = 0 To Common.Manager.AnzZiele - 1
-            Me.Zielwerte(j) = Double.MaxValue          'mit maximalem Double-Wert initialisieren
+            Me.Zielwerte(j) = Double.MaxValue           'mit maximalem Double-Wert initialisieren
         Next
 
         '05 Wert der Randbedingung(en)
-        If n_Constrain = 0 Then
-            ReDim Me.Constrain(-1)
-        Else
-            ReDim Me.Constrain(n_Constrain - 1)
-            For j = 0 To Me.Constrain.GetUpperBound(0)
-                Me.Constrain(j) = -1.0E+300
-            Next
-        End If
+        ReDim Me.Constrain(Common.Manager.AnzConstraints - 1)
+        For j = 0 To Common.Manager.AnzConstraints - 1
+            Me.Constrain(j) = Double.MinValue           'mit minimalem Double-Wert initialisieren
+        Next
 
         '06 Gibt an ob der Wert bereits mutiert ist oder nicht
         Me.mutated = False

@@ -353,7 +353,7 @@ Public Class SWMM
 
     'Berechnung des Qualitätswerts (Zielwert)
     '****************************************
-    Public Overrides Function QWert(ByVal OptZiel As Common.Ziel) As Double
+    Public Overrides Function QWert(ByVal ziel As Common.Ziel) As Double
 
         QWert = 0
 
@@ -361,11 +361,11 @@ Public Class SWMM
 
         'Fallunterscheidung Ergebnisdatei
         '--------------------------------
-        Select Case OptZiel.Datei
+        Select Case ziel.Datei
 
             Case "RPT"
                 'SWMM-Ergebnisse aus RPT-Datei auslesen
-                QWert = QWert_RPT(OptZiel)
+                QWert = QWert_RPT(ziel)
 
             Case Else
                 'es wurde eine nicht unterstützte Ergebnisdatei angegeben
@@ -376,6 +376,9 @@ Public Class SWMM
         If (IsOK = False) Then
             'TODO: Fehlerbehandlung
         End If
+
+        'Zielrichtung berücksichtigen
+        QWert *= ziel.Richtung
 
     End Function
 

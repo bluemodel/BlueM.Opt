@@ -14,7 +14,13 @@ Public Class Diagramm
     '*******************************************************************************
     '*******************************************************************************
 
-    Public is3D As Boolean              'Flag, der anzeigt, ob es sich um ein 3D-Diagramm handelt
+#Region "Eigenschaften"
+
+    'Zuordnung zwischen Zielfunktionen und Achsen
+    Public ZielIndexX, ZielIndexY, ZielIndexZ As Integer
+
+    'Flag, der anzeigt, ob es sich um ein 3D-Diagramm handelt
+    Public is3D As Boolean
 
     Public Structure Achse
         Public Name As String
@@ -22,7 +28,7 @@ Public Class Diagramm
         Public Max As Double
     End Structure
 
-    Public anno1 As Steema.TeeChart.Tools.Annotation
+#End Region
 
     'TeeChart zurücksetzen
     '*********************
@@ -92,11 +98,6 @@ Public Class Diagramm
                 rotate.Button = Windows.Forms.MouseButtons.Right
 
             End If
-
-            anno1 = New Steema.TeeChart.Tools.Annotation(.Chart)
-            anno1.Shape.Font.Name = "Courier New"
-            anno1.Position = Steema.TeeChart.Tools.AnnotationPositions.RightBottom
-            anno1.Active = False
 
         End With
 
@@ -241,23 +242,6 @@ Public Class Diagramm
     '***************************
     Friend Sub showSelectedSolution(ByVal ind As Common.Individuum)
 
-        Dim xAchse, yAchse, zAchse As String
-        Dim xWert, yWert, zWert As Double
-        Dim i As Integer
-
-        'angezeigte X und Y Achsen bestimmen
-        xAchse = Me.Chart.Axes.Bottom.Title.Caption
-        yAchse = Me.Chart.Axes.Left.Title.Caption
-
-        'QWerte zu Achsen zuordnen
-        For i = 0 To Common.Manager.AnzZiele - 1
-            If (Common.Manager.List_Ziele(i).Bezeichnung = xAchse) Then
-                xWert = ind.Zielwerte(i)
-            ElseIf (Common.Manager.List_Ziele(i).Bezeichnung = yAchse) Then
-                yWert = ind.Zielwerte(i)
-            End If
-        Next
-
         '2D oder 3D?
         If (Not Me.is3D) Then
 
@@ -265,7 +249,7 @@ Public Class Diagramm
             '-----------
             Dim serie As Steema.TeeChart.Styles.Series
             serie = Me.getSeriesPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
-            serie.Add(xWert, yWert, ind.ID.ToString())
+            serie.Add(ind.Zielwerte(Me.ZielIndexX), ind.Zielwerte(Me.ZielIndexY), ind.ID.ToString())
             serie.Marks.Visible = True
             serie.Marks.Style = Steema.TeeChart.Styles.MarksStyles.Label
             serie.Marks.Transparency = 50
@@ -274,19 +258,9 @@ Public Class Diagramm
         Else
             '3D-Diagramm
             '-----------
-            'Z Achse bestimmen
-            zAchse = Me.Chart.Axes.Depth.Title.Caption
-
-            'QWert zu Z-Achse zuordnen
-            For i = 0 To Common.Manager.AnzZiele - 1
-                If (Common.Manager.List_Ziele(i).Bezeichnung = zAchse) Then
-                    zWert = ind.Zielwerte(i)
-                End If
-            Next
-
             Dim serie3D As Steema.TeeChart.Styles.Points3D
             serie3D = Me.getSeries3DPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
-            serie3D.Add(xWert, yWert, zWert, ind.ID.ToString())
+            serie3D.Add(ind.Zielwerte(Me.ZielIndexX), ind.Zielwerte(Me.ZielIndexY), ind.Zielwerte(Me.ZielIndexZ), ind.ID.ToString())
             serie3D.Marks.Visible = True
             serie3D.Marks.Style = Steema.TeeChart.Styles.MarksStyles.Label
             serie3D.Marks.Transparency = 50

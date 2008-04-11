@@ -68,30 +68,10 @@ Public MustInherit Class Sim
     Public List_ModellParameter() As Struct_ModellParameter      'Liste der Modellparameter
     Public List_ModellParameter_Save() As Struct_ModellParameter 'Liste der Modellparameter die nicht verändert wird
 
-    'Constraints
-    '-----------
-    Public Structure Struct_Constraint
-        Public Bezeichnung As String                'Bezeichnung
-        Public GrenzTyp As String                   'Gibt an ob es sich um einen Wert oder um eine Reihe handelt
-        Public Datei As String                      'Die Ergebnisdatei, aus der das Simulationsergebnis ausgelesen werden soll [WEL]
-        Public SimGr As String                      'Die Simulationsgröße, die auf Verletzung der Grenze überprüft werden soll
-        Public GrenzPos As String                   'Grenzposition (Ober-/Untergrenze)
-        Public WertTyp As String                    'Gibt an wie der Wert, der mit dem Grenzwert verglichen werden soll, aus dem Simulationsergebnis berechnet werden soll
-        Public GrenzWert As String                  'Der vorgegeben Grenzwert
-        Public GrenzReiheDatei As String            'Der Dateiname der Grenzwertreihe
-        Public GrenzGr As String                    'Spalte der .wel Datei falls Grenzwertreihe .wel Datei ist
-        Public GrenzReihe As Wave.Zeitreihe         'Die Werte der Grenzwertreihe
-        Public ConstTmp As Double                   'Constraintwert der letzten Simulation wird hier zwischengespeichert 
-        Public Overrides Function toString() As String
-            Return Bezeichnung
-        End Function
-    End Structure
-
-    Public List_Constraints() As Struct_Constraint  'Liste der Constraints
-
     'Ergebnisspeicher
     '----------------
-    Public OptResult As OptResult
+    Public OptResult As OptResult                   'Optimierungsergebnis
+    Public OptResultRef As OptResult                'Vergleichsergebnis
 
     'Kombinatorik
     '------------
@@ -136,7 +116,6 @@ Public MustInherit Class Sim
         ReDim Me.List_OptParameter_Save(-1)
         ReDim Me.List_ModellParameter(-1)
         ReDim Me.List_ModellParameter_Save(-1)
-        ReDim Me.List_Constraints(-1)
         ReDim Me.List_Locations(-1)
 
         'Simulationsergebnis instanzieren
@@ -446,12 +425,12 @@ Public MustInherit Class Sim
         Dim ZIE_Datei As String = Me.WorkDir & Me.Datensatz & "." & OptZiele_Ext
 
         'Format:
-        '*|------|---------------|---------|-------|----------|---------|--------------|--------------------|---------------------------|
-        '*| Opt  | Bezeichnung   | ZielTyp | Datei | SimGröße | ZielFkt | EvalZeitraum |       Zielwert   ODER      Zielreihe           |
-        '*|      |               |         |       |          |         | Start | Ende | WertTyp | ZielWert | ZielGröße | Datei         |
-        '*|------|---------------|---------|-------|----------|---------|-------|------|---------|----------|-----------|---------------|
+        '*|-----|-------------|---|---------|-------|----------|---------|--------------|-------------------|--------------------|---------|
+        '*| Opt | Bezeichnung | R | ZielTyp | Datei | SimGröße | ZielFkt | EvalZeitraum |    Referenzwert  ODER    Referenzreihe | IstWert |
+        '*|     |             |   |         |       |          |         | Start | Ende | WertTyp | RefWert | RefGröße | Datei   |         |
+        '*|-----|-------------|---|---------|-------|----------|---------|-------|------|---------|---------|----------|---------|---------|
 
-        Const AnzSpalten As Integer = 12                       'Anzahl Spalten in der ZIE-Datei
+        Const AnzSpalten As Integer = 14                       'Anzahl Spalten in der ZIE-Datei
         Dim i As Integer
         Dim Zeile As String
         Dim WerteArray() As String
@@ -484,24 +463,37 @@ Public MustInherit Class Sim
                         .isOpt = False
                     End If
                     .Bezeichnung = WerteArray(2).Trim()
-                    .ZielTyp = WerteArray(3).Trim()
-                    .Datei = WerteArray(4).Trim()
-                    .SimGr = WerteArray(5).Trim()
-                    .ZielFkt = WerteArray(6).Trim()
-                    If (WerteArray(7).Trim() <> "") Then
-                        .EvalStart = WerteArray(7).Trim()
+                    If (WerteArray(3).Trim() = "+") Then 
+                    	.Richtung = Common.EVO_RICHTUNG.Maximierung
+                    Else
+                    	.Richtung = Common.EVO_RICHTUNG.Minimierung
+                    End If
+                    .ZielTyp = WerteArray(4).Trim()
+                    .Datei = WerteArray(5).Trim()
+                    .SimGr = WerteArray(6).Trim()
+                    .ZielFkt = WerteArray(7).Trim()
+                    If (WerteArray(8).Trim() <> "") Then
+                        .EvalStart = WerteArray(8).Trim()
                     Else
                         .EvalStart = Me.SimStart
                     End If
-                    If WerteArray(8).Trim() <> "" Then
-                        .EvalEnde = WerteArray(8).Trim()
+                    If WerteArray(9).Trim() <> "" Then
+                        .EvalEnde = WerteArray(9).Trim()
                     Else
                         .EvalEnde = Me.SimEnde
                     End If
-                    .WertTyp = WerteArray(9).Trim()
-                    If (WerteArray(10).Trim() <> "") Then .ZielWert = Convert.ToDouble(WerteArray(10).Trim(), Common.Provider.FortranProvider)
-                    .ZielGr = WerteArray(11).Trim()
-                    .ZielReiheDatei = WerteArray(12).Trim()
+                    .WertTyp = WerteArray(10).Trim()
+                    If (WerteArray(11).Trim() <> "") Then 
+                        .RefWert = Convert.ToDouble(WerteArray(11).Trim(), Common.Provider.FortranProvider)
+                    End If
+                    .RefGr = WerteArray(12).Trim()
+                    .RefReiheDatei = WerteArray(13).Trim()
+                    If (WerteArray(14).Trim() <> "") Then
+                        .hasIstWert = True
+                        .IstWert = Convert.ToDouble(WerteArray(14).Trim(), Common.Provider.FortranProvider)
+                    Else
+                        .hasIstWert = False
+                    End If
                 End With
                 i += 1
             End If
@@ -510,8 +502,8 @@ Public MustInherit Class Sim
         StrRead.Close()
         FiStr.Close()
 
-        'Bei ZielReihen jeweilige Zeitreihen einlesen
-        '############################################
+        'Referenzreihen einlesen
+        '#######################
         Dim ZielStart As Date
         Dim ZielEnde As Date
         Dim ext As String
@@ -520,55 +512,49 @@ Public MustInherit Class Sim
             With Common.Manager.List_Ziele(i)
                 If (.ZielTyp = "Reihe" Or .ZielTyp = "IHA") Then
 
-                    'Dateiendung der Zielreihendatei bestimmen und Reihe einlesen
-                    '------------------------------------------------------------
-                    ext = Path.GetExtension(.ZielReiheDatei)
+                    'Dateiendung der Referenzreihendatei bestimmen und Reihe einlesen
+                    '----------------------------------------------------------------
+                    ext = Path.GetExtension(.RefReiheDatei)
                     Select Case (ext.ToUpper)
                         Case ".WEL"
-                            Dim WEL As New Wave.WEL(Me.WorkDir & .ZielReiheDatei)
-                            .ZielReihe = WEL.getReihe(.ZielGr)
+                            Dim WEL As New Wave.WEL(Me.WorkDir & .RefReiheDatei)
+                            .RefReihe = WEL.getReihe(.RefGr)
                         Case ".ASC"
-                            Dim ASC As New Wave.ASC(Me.WorkDir & .ZielReiheDatei)
-                            .ZielReihe = ASC.getReihe(.ZielGr)
+                            Dim ASC As New Wave.ASC(Me.WorkDir & .RefReiheDatei)
+                            .RefReihe = ASC.getReihe(.RefGr)
                         Case ".ZRE"
-                            Dim ZRE As New Wave.ZRE(Me.WorkDir & .ZielReiheDatei)
-                            .ZielReihe = ZRE.Zeitreihen(0)
+                            Dim ZRE As New Wave.ZRE(Me.WorkDir & .RefReiheDatei)
+                            .RefReihe = ZRE.Zeitreihen(0)
                             'Case ".PRB"
                             'BUG 183: geht nicht mehr, weil PRB-Dateien keine Zeitreihen sind!
-                            'IsOK = Read_PRB(Me.WorkDir & .ZielReiheDatei, .ZielGr, .ZielReihe)
+                            'IsOK = Read_PRB(Me.WorkDir & .RefReiheDatei, .RefGr, .RefReihe)
                         Case Else
-                            Throw New Exception("Das Format der Zielreihe '" & .ZielReiheDatei & "' wird nicht unterstützt!")
+                            Throw New Exception("Das Format der Referenzreihe '" & .RefReiheDatei & "' wird nicht unterstützt!")
                     End Select
 
-                    'Zeitraum der Zielreihe überprüfen (nur bei WEL und ZRE)
-                    '-------------------------------------------------------
+                    'Zeitraum der Referenzreihe überprüfen (nur bei WEL und ZRE)
+                    '-----------------------------------------------------------
                     If (ext.ToUpper = ".WEL" Or ext.ToUpper = ".ZRE" Or ext.ToUpper = ".ASC") Then
 
-                        ZielStart = .ZielReihe.XWerte(0)
-                        ZielEnde = .ZielReihe.XWerte(.ZielReihe.Length - 1)
+                        ZielStart = .RefReihe.XWerte(0)
+                        ZielEnde = .RefReihe.XWerte(.RefReihe.Length - 1)
 
                         If (ZielStart > .EvalStart Or ZielEnde < .EvalEnde) Then
-                            'Zielreihe deckt Evaluierungszeitraum nicht ab
-                            Throw New Exception("Die Zielreihe '" & .ZielReiheDatei & "' deckt den Evaluierungszeitraum nicht ab!")
+                            'Referenzreihe deckt Evaluierungszeitraum nicht ab
+                            Throw New Exception("Die Referenzreihe '" & .RefReiheDatei & "' deckt den Evaluierungszeitraum nicht ab!")
                         Else
-                            'Zielreihe auf Evaluierungszeitraum kürzen
-                            Call .ZielReihe.Cut(.EvalStart, .EvalEnde)
+                            'Referenzreihe auf Evaluierungszeitraum kürzen
+                            Call .RefReihe.Cut(.EvalStart, .EvalEnde)
                         End If
 
                     End If
 
-                    'Zielreihe umbenennen
-                    .ZielReihe.Title += " (Referenz)"
+                    'Referenzreihe umbenennen
+                    .RefReihe.Title += " (Referenz)"
 
                 End If
             End With
         Next
-
-        'ggf. Warnung wegen maximal 3 Dimensionen in Diagramm ausgeben 
-        If (Common.Manager.AnzPenalty > 3) Then
-            MsgBox("Die Anzahl der OptZiele beträgt mehr als 3!" & eol _
-                    & "Es werden nur die ersten drei Zielfunktionen im Hauptdiagramm angezeigt!", MsgBoxStyle.Information, "Info")
-        End If
 
     End Sub
 
@@ -576,9 +562,17 @@ Public MustInherit Class Sim
     '********************
     Private Sub Read_CON()
 
-        Dim AnzConst As Integer = 0
+        'Format:
+        '*|---------------|----------|-------|-----------|------------|----------------------|-----------------------------|
+        '*|               |          |       |           |            |      Grenzwert       |        Grenzreihe           |
+        '*| Bezeichnung   | GrenzTyp | Datei | SimGröße  | Oben/Unten | WertTyp  | Grenzwert | Grenzgröße | Datei          |
+        '*|---------------|----------|-------|-----------|------------|----------|-----------|------------|----------------|
+
         Dim ext As String
         Dim i As Integer
+        Dim Zeile As String
+        Dim WerteArray() As String
+        Const AnzSpalten As Integer = 9
 
         Dim Datei As String = WorkDir & Datensatz & "." & Constraints_Ext
 
@@ -587,39 +581,33 @@ Public MustInherit Class Sim
             Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.Read)
             Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-            Dim Zeile As String = ""
-
-            'Anzahl der Constraints feststellen
-            Do
-                Zeile = StrRead.ReadLine.ToString()
-                If (Zeile.StartsWith("*") = False) Then
-                    AnzConst += 1
-                End If
-            Loop Until StrRead.Peek() = -1
-
-            ReDim List_Constraints(AnzConst - 1)
-
-            'Zurück zum Dateianfang und lesen
-            FiStr.Seek(0, SeekOrigin.Begin)
-
-            'Einlesen der Zeile und übergeben an die Constraints Liste
-            Dim ZeilenArray(9) As String
-
             i = 0
             Do
+                'Zeile einlesen
                 Zeile = StrRead.ReadLine.ToString()
-                If (Zeile.StartsWith("*") = False) Then
-                    ZeilenArray = Zeile.Split("|")
+                If (Not Zeile.StartsWith("*") And Zeile.Contains("|")) Then
+                    WerteArray = Zeile.Split("|")
+                    'Kontrolle
+                    If (WerteArray.GetUpperBound(0) <> AnzSpalten + 1) Then
+                        Throw New Exception("Die CON-Datei hat die falsche Anzahl Spalten!")
+                    End If
+                    'Neues Constraint anlegen
+                    ReDim Preserve Common.Manager.List_Constraints(i)
+                    Common.Manager.List_Constraints(i) = New Common.Constraint()
                     'Werte zuweisen
-                    List_Constraints(i).Bezeichnung = ZeilenArray(1).Trim()
-                    List_Constraints(i).GrenzTyp = ZeilenArray(2).Trim()
-                    List_Constraints(i).Datei = ZeilenArray(3).Trim()
-                    List_Constraints(i).SimGr = ZeilenArray(4).Trim()
-                    List_Constraints(i).GrenzPos = ZeilenArray(5).Trim()
-                    List_Constraints(i).WertTyp = ZeilenArray(6).Trim()
-                    List_Constraints(i).GrenzWert = ZeilenArray(7).Trim()
-                    List_Constraints(i).GrenzGr = ZeilenArray(8).Trim()
-                    List_Constraints(i).GrenzReiheDatei = ZeilenArray(9).Trim()
+                    With Common.Manager.List_Constraints(i)
+                        .Bezeichnung = WerteArray(1).Trim()
+                        .GrenzTyp = WerteArray(2).Trim()
+                        .Datei = WerteArray(3).Trim()
+                        .SimGr = WerteArray(4).Trim()
+                        .GrenzPos = WerteArray(5).Trim()
+                        .WertTyp = WerteArray(6).Trim()
+                        If (WerteArray(7).Trim() <> "") Then
+                            .GrenzWert = Convert.ToDouble(WerteArray(7).Trim(), Common.Provider.FortranProvider)
+                        End If
+                        .GrenzGr = WerteArray(8).Trim()
+                        .GrenzReiheDatei = WerteArray(9).Trim()
+                    End With
                     i += 1
                 End If
             Loop Until StrRead.Peek() = -1
@@ -629,9 +617,9 @@ Public MustInherit Class Sim
 
             'Kontrolle
             '---------
-            For i = 0 To Me.List_Constraints.GetUpperBound(0)
-                With Me.List_Constraints(i)
-                    If (Not .GrenzTyp = "Wert" And Not .GrenzTyp = "Reihe") Then Throw New Exception("Constraints: GrenzTxyp muss entweder 'Wert' oder 'Reihe' sein!")
+            For i = 0 To Common.Manager.AnzConstraints - 1
+                With Common.Manager.List_Constraints(i)
+                    If (Not .GrenzTyp = "Wert" And Not .GrenzTyp = "Reihe") Then Throw New Exception("Constraints: GrenzTyp muss entweder 'Wert' oder 'Reihe' sein!")
                     If (Not .Datei = "WEL") Then Throw New Exception("Constraints: Als Datei wird momentan nur 'WEL' unterstützt!")
                     If (Not .GrenzPos = "Obergrenze" And Not .GrenzPos = "Untergrenze") Then Throw New Exception("Constraints: Für Oben/Unten muss entweder 'Obergrenze' oder 'Untergrenze' angegeben sein!")
                 End With
@@ -641,8 +629,8 @@ Public MustInherit Class Sim
             Dim GrenzStart As Date
             Dim GrenzEnde As Date
 
-            For i = 0 To AnzConst - 1
-                With List_Constraints(i)
+            For i = 0 To Common.Manager.AnzConstraints - 1
+                With Common.Manager.List_Constraints(i)
                     If (.GrenzTyp = "Reihe") Then
 
                         'Dateiendung der Grenzwertdatei bestimmen und Reihe einlesen
@@ -680,7 +668,7 @@ Public MustInherit Class Sim
 
         Else
             'CON-Datei existiert nicht
-            ReDim List_Constraints(-1)
+            ReDim Common.Manager.List_Constraints(-1)
         End If
 
     End Sub
@@ -1236,7 +1224,7 @@ Public MustInherit Class Sim
 
     'EVO-Parameterübergabe die Standard Parameter werden aus den Listen der OptPara und OptZiele ermittelt
     '*****************************************************************************************************
-    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef globalAnzRand As Short, ByRef mypara() As EVO.Common.OptParameter)
+    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef mypara() As EVO.Common.OptParameter)
 
         Dim i As Integer
 
@@ -1248,9 +1236,6 @@ Public MustInherit Class Sim
         For i = 0 To globalAnzPar - 1
             mypara(i) = Me.List_OptParameter(i).Clone()
         Next
-
-        'Anzahl Randbedingungen übergeben
-        globalAnzRand = Me.List_Constraints.GetLength(0)
 
     End Sub
 
@@ -1511,9 +1496,8 @@ Handler:
         Next
 
         'Constraints berechnen
-        For i = 0 To Me.List_Constraints.GetUpperBound(0)
-            List_Constraints(i).ConstTmp = Constraint(List_Constraints(i))
-            Indi.Constrain(i) = List_Constraints(i).ConstTmp
+        For i = 0 To Common.Manager.AnzConstraints - 1
+            Indi.Constrain(i) = Constraint(Common.Manager.List_Constraints(i))
         Next
 
         'Lösung abspeichern
@@ -1661,7 +1645,7 @@ Handler:
         Dim Versatz As Long
 
         'Bestimmen der Zeitschritte bis Start des Evaluierungszeitraums
-        ZeitschritteBisStart = (ziel.EvalStart - ziel.ZielReihe.XWerte(0)).TotalMinutes / Me.SimDT.TotalMinutes
+        ZeitschritteBisStart = (ziel.EvalStart - ziel.RefReihe.XWerte(0)).TotalMinutes / Me.SimDT.TotalMinutes
         'Bestimmen der Zeitschritte des Evaluierungszeitraums
         ZeitschritteEval = (ziel.EvalEnde - ziel.EvalStart).TotalMinutes / Me.SimDT.TotalMinutes
 
@@ -1676,7 +1660,7 @@ Handler:
             'Bei dt >= 1d ist Versatz unerheblich
             j = 0
         Else
-            Versatz = (SimReihe.XWerte(0) - ziel.ZielReihe.XWerte(0)).TotalMinutes / Me.SimDT.TotalMinutes
+            Versatz = (SimReihe.XWerte(0) - ziel.RefReihe.XWerte(0)).TotalMinutes / Me.SimDT.TotalMinutes
             If Versatz < 0 Then
                 j = -1 * Versatz
             ElseIf Versatz = 0 Then
@@ -1694,14 +1678,14 @@ Handler:
                 'Summe der Fehlerquadrate
                 '------------------------
                 For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    QWert += (ziel.ZielReihe.YWerte(i) - SimReihe.YWerte(i + j)) * (ziel.ZielReihe.YWerte(i) - SimReihe.YWerte(i + j))
+                    QWert += (ziel.RefReihe.YWerte(i) - SimReihe.YWerte(i + j)) * (ziel.RefReihe.YWerte(i) - SimReihe.YWerte(i + j))
                 Next
 
             Case "Diff"
                 'Summe der Fehler
                 '----------------
                 For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    QWert += Math.Abs(ziel.ZielReihe.YWerte(i) - SimReihe.YWerte(i + j))
+                    QWert += Math.Abs(ziel.RefReihe.YWerte(i) - SimReihe.YWerte(i + j))
                 Next
 
             Case "Volf"
@@ -1711,7 +1695,7 @@ Handler:
                 Dim VolZiel As Double = 0
                 For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
                     VolSim += SimReihe.YWerte(i + j)
-                    VolZiel += ziel.ZielReihe.YWerte(i)
+                    VolZiel += ziel.RefReihe.YWerte(i)
                 Next
                 'Umrechnen in echtes Volumen
                 VolSim *= Me.SimDT.TotalSeconds
@@ -1724,7 +1708,7 @@ Handler:
                 '-------------------------------------------------------------------
                 Dim nUnter As Integer = 0
                 For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    If (SimReihe.YWerte(i + j) < ziel.ZielReihe.YWerte(i)) Then
+                    If (SimReihe.YWerte(i + j) < ziel.RefReihe.YWerte(i)) Then
                         nUnter += 1
                     End If
                 Next
@@ -1735,8 +1719,8 @@ Handler:
                 '---------------------------
                 Dim sUnter As Integer = 0
                 For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    If (SimReihe.YWerte(i + j) < ziel.ZielReihe.YWerte(i)) Then
-                        sUnter += ziel.ZielReihe.YWerte(i) - SimReihe.YWerte(i + j)
+                    If (SimReihe.YWerte(i + j) < ziel.RefReihe.YWerte(i)) Then
+                        sUnter += ziel.RefReihe.YWerte(i) - SimReihe.YWerte(i + j)
                     End If
                 Next
                 QWert = sUnter
@@ -1746,7 +1730,7 @@ Handler:
                 '------------------------------------------------------------------
                 Dim nUeber As Integer = 0
                 For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    If (SimReihe.YWerte(i + j) > ziel.ZielReihe.YWerte(i)) Then
+                    If (SimReihe.YWerte(i + j) > ziel.RefReihe.YWerte(i)) Then
                         nUeber += 1
                     End If
                 Next
@@ -1757,8 +1741,8 @@ Handler:
                 '--------------------------
                 Dim sUeber As Integer = 0
                 For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    If (SimReihe.YWerte(i + j) > ziel.ZielReihe.YWerte(i)) Then
-                        sUeber += SimReihe.YWerte(i + j) - ziel.ZielReihe.YWerte(i)
+                    If (SimReihe.YWerte(i + j) > ziel.RefReihe.YWerte(i)) Then
+                        sUeber += SimReihe.YWerte(i + j) - ziel.RefReihe.YWerte(i)
                     End If
                 Next
                 QWert = sUeber
@@ -1769,12 +1753,12 @@ Handler:
                 'Mittelwert bilden
                 Dim Qobs_quer, zaehler, nenner As Double
                 For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    Qobs_quer += ziel.ZielReihe.YWerte(i)
+                    Qobs_quer += ziel.RefReihe.YWerte(i)
                 Next
                 Qobs_quer = Qobs_quer / (ZeitschritteEval)
                 For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    zaehler += (ziel.ZielReihe.YWerte(i) - SimReihe.YWerte(i + j)) * (ziel.ZielReihe.YWerte(i) - SimReihe.YWerte(i + j))
-                    nenner += (ziel.ZielReihe.YWerte(i) - Qobs_quer) * (ziel.ZielReihe.YWerte(i) - Qobs_quer)
+                    zaehler += (ziel.RefReihe.YWerte(i) - SimReihe.YWerte(i + j)) * (ziel.RefReihe.YWerte(i) - SimReihe.YWerte(i + j))
+                    nenner += (ziel.RefReihe.YWerte(i) - Qobs_quer) * (ziel.RefReihe.YWerte(i) - Qobs_quer)
                 Next
                 'abgeänderte Nash-Sutcliffe Formel: 0 als Zielwert (1- weggelassen)
                 QWert = zaehler / nenner
@@ -1809,17 +1793,20 @@ Handler:
 
             Case "AbQuad"
                 'Summe der Fehlerquadrate
-                QWert = (ziel.ZielWert - SimWert) * (ziel.ZielWert - SimWert)
+                '------------------------
+                QWert = (ziel.RefWert - SimWert) * (ziel.RefWert - SimWert)
 
             Case "Diff"
                 'Summe der Fehler
-                QWert = Math.Abs(ziel.ZielWert - SimWert)
+                '----------------
+                QWert = Math.Abs(ziel.RefWert - SimWert)
 
             Case "nUnter"
                 'Relative Anzahl der Zeitschritte mit Unterschreitungen (in Prozent)
+                '-------------------------------------------------------------------
                 Dim nUnter As Integer = 0
                 For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) < ziel.ZielWert) Then
+                    If (SimReihe.YWerte(i) < ziel.RefWert) Then
                         nUnter += 1
                     End If
                 Next
@@ -1827,13 +1814,36 @@ Handler:
 
             Case "nÜber"
                 'Relative Anzahl der Zeitschritte mit Überschreitungen (in Prozent)
+                '------------------------------------------------------------------
                 Dim nUeber As Integer = 0
                 For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) > ziel.ZielWert) Then
+                    If (SimReihe.YWerte(i) > ziel.RefWert) Then
                         nUeber += 1
                     End If
                 Next
                 QWert = nUeber / SimReihe.Length * 100
+
+            Case "sUnter"
+                'Summe der Unterschreitungen
+                '---------------------------
+                Dim sUnter As Integer = 0
+                For i = 0 To SimReihe.Length - 1
+                    If (SimReihe.YWerte(i) < ziel.RefWert) Then
+                        sUnter += ziel.RefWert - SimReihe.YWerte(i)
+                    End If
+                Next
+                QWert = sUnter
+
+            Case "sÜber"
+                'Summe der Überschreitungen
+                '--------------------------
+                Dim sUeber As Integer = 0
+                For i = 0 To SimReihe.Length - 1
+                    If (SimReihe.YWerte(i) > ziel.RefWert) Then
+                        sUeber += SimReihe.YWerte(i) - ziel.RefWert
+                    End If
+                Next
+                QWert = sUeber
 
             Case Else
                 Throw New Exception("Die Zielfunktion '" & ziel.ZielFkt & "' wird für Werte nicht unterstützt!")
@@ -1914,7 +1924,7 @@ Handler:
 
     'Constraint berechnen (Constraint < 0 ist Grenzverletzung)
     '****************************************************
-    Public Function Constraint(ByVal constr As Struct_Constraint) As Double
+    Public Function Constraint(ByVal constr As Common.Constraint) As Double
 
         Dim i As Integer
 

@@ -23,47 +23,60 @@ Partial Class ScatterplotDialog
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(ScatterplotDialog))
-        Me.OK_Button = New System.Windows.Forms.Button
-        Me.Cancel_Button = New System.Windows.Forms.Button
-        Me.GroupBox1 = New System.Windows.Forms.GroupBox
+        Me.Button_OK = New System.Windows.Forms.Button
+        Me.Button_Cancel = New System.Windows.Forms.Button
+        Me.GroupBox_Zielauswahl = New System.Windows.Forms.GroupBox
+        Me.LinkLabel_CheckAll = New System.Windows.Forms.LinkLabel
         Me.CheckedListBox_Ziele = New System.Windows.Forms.CheckedListBox
         Me.CheckBox_SekPopOnly = New System.Windows.Forms.CheckBox
-        Me.GroupBox2 = New System.Windows.Forms.GroupBox
-        Me.LinkLabel_CheckAll = New System.Windows.Forms.LinkLabel
-        Me.GroupBox1.SuspendLayout()
-        Me.GroupBox2.SuspendLayout()
+        Me.GroupBox_SekPop = New System.Windows.Forms.GroupBox
+        Me.GroupBox_Ref = New System.Windows.Forms.GroupBox
+        Me.CheckBox_showRef = New System.Windows.Forms.CheckBox
+        Me.GroupBox_Zielauswahl.SuspendLayout()
+        Me.GroupBox_SekPop.SuspendLayout()
+        Me.GroupBox_Ref.SuspendLayout()
         Me.SuspendLayout()
         '
-        'OK_Button
+        'Button_OK
         '
-        Me.OK_Button.Anchor = System.Windows.Forms.AnchorStyles.None
-        Me.OK_Button.DialogResult = System.Windows.Forms.DialogResult.OK
-        Me.OK_Button.Location = New System.Drawing.Point(188, 190)
-        Me.OK_Button.Name = "OK_Button"
-        Me.OK_Button.Size = New System.Drawing.Size(67, 23)
-        Me.OK_Button.TabIndex = 0
-        Me.OK_Button.Text = "OK"
+        Me.Button_OK.Anchor = System.Windows.Forms.AnchorStyles.None
+        Me.Button_OK.DialogResult = System.Windows.Forms.DialogResult.OK
+        Me.Button_OK.Location = New System.Drawing.Point(188, 190)
+        Me.Button_OK.Name = "Button_OK"
+        Me.Button_OK.Size = New System.Drawing.Size(67, 23)
+        Me.Button_OK.TabIndex = 0
+        Me.Button_OK.Text = "OK"
         '
-        'Cancel_Button
+        'Button_Cancel
         '
-        Me.Cancel_Button.Anchor = System.Windows.Forms.AnchorStyles.None
-        Me.Cancel_Button.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.Cancel_Button.Location = New System.Drawing.Point(261, 190)
-        Me.Cancel_Button.Name = "Cancel_Button"
-        Me.Cancel_Button.Size = New System.Drawing.Size(67, 23)
-        Me.Cancel_Button.TabIndex = 1
-        Me.Cancel_Button.Text = "Abbrechen"
+        Me.Button_Cancel.Anchor = System.Windows.Forms.AnchorStyles.None
+        Me.Button_Cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.Button_Cancel.Location = New System.Drawing.Point(261, 190)
+        Me.Button_Cancel.Name = "Button_Cancel"
+        Me.Button_Cancel.Size = New System.Drawing.Size(67, 23)
+        Me.Button_Cancel.TabIndex = 1
+        Me.Button_Cancel.Text = "Abbrechen"
         '
-        'GroupBox1
+        'GroupBox_Zielauswahl
         '
-        Me.GroupBox1.Controls.Add(Me.LinkLabel_CheckAll)
-        Me.GroupBox1.Controls.Add(Me.CheckedListBox_Ziele)
-        Me.GroupBox1.Location = New System.Drawing.Point(12, 12)
-        Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(164, 201)
-        Me.GroupBox1.TabIndex = 1
-        Me.GroupBox1.TabStop = False
-        Me.GroupBox1.Text = "Zielauswahl"
+        Me.GroupBox_Zielauswahl.Controls.Add(Me.LinkLabel_CheckAll)
+        Me.GroupBox_Zielauswahl.Controls.Add(Me.CheckedListBox_Ziele)
+        Me.GroupBox_Zielauswahl.Location = New System.Drawing.Point(12, 12)
+        Me.GroupBox_Zielauswahl.Name = "GroupBox_Zielauswahl"
+        Me.GroupBox_Zielauswahl.Size = New System.Drawing.Size(164, 201)
+        Me.GroupBox_Zielauswahl.TabIndex = 1
+        Me.GroupBox_Zielauswahl.TabStop = False
+        Me.GroupBox_Zielauswahl.Text = "Zielauswahl"
+        '
+        'LinkLabel_CheckAll
+        '
+        Me.LinkLabel_CheckAll.AutoSize = True
+        Me.LinkLabel_CheckAll.Location = New System.Drawing.Point(6, 179)
+        Me.LinkLabel_CheckAll.Name = "LinkLabel_CheckAll"
+        Me.LinkLabel_CheckAll.Size = New System.Drawing.Size(78, 13)
+        Me.LinkLabel_CheckAll.TabIndex = 1
+        Me.LinkLabel_CheckAll.TabStop = True
+        Me.LinkLabel_CheckAll.Text = "Alle auswählen"
         '
         'CheckedListBox_Ziele
         '
@@ -86,37 +99,47 @@ Partial Class ScatterplotDialog
         Me.CheckBox_SekPopOnly.Text = "nur SekPop anzeigen"
         Me.CheckBox_SekPopOnly.UseVisualStyleBackColor = True
         '
-        'GroupBox2
+        'GroupBox_SekPop
         '
-        Me.GroupBox2.Controls.Add(Me.CheckBox_SekPopOnly)
-        Me.GroupBox2.Location = New System.Drawing.Point(182, 12)
-        Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(146, 171)
-        Me.GroupBox2.TabIndex = 3
-        Me.GroupBox2.TabStop = False
-        Me.GroupBox2.Text = "Sekundäre Population"
+        Me.GroupBox_SekPop.Controls.Add(Me.CheckBox_SekPopOnly)
+        Me.GroupBox_SekPop.Location = New System.Drawing.Point(182, 12)
+        Me.GroupBox_SekPop.Name = "GroupBox_SekPop"
+        Me.GroupBox_SekPop.Size = New System.Drawing.Size(146, 45)
+        Me.GroupBox_SekPop.TabIndex = 3
+        Me.GroupBox_SekPop.TabStop = False
+        Me.GroupBox_SekPop.Text = "Sekundäre Population"
         '
-        'LinkLabel_CheckAll
+        'GroupBox_Ref
         '
-        Me.LinkLabel_CheckAll.AutoSize = True
-        Me.LinkLabel_CheckAll.Location = New System.Drawing.Point(6, 179)
-        Me.LinkLabel_CheckAll.Name = "LinkLabel_CheckAll"
-        Me.LinkLabel_CheckAll.Size = New System.Drawing.Size(78, 13)
-        Me.LinkLabel_CheckAll.TabIndex = 1
-        Me.LinkLabel_CheckAll.TabStop = True
-        Me.LinkLabel_CheckAll.Text = "Alle auswählen"
+        Me.GroupBox_Ref.Controls.Add(Me.CheckBox_showRef)
+        Me.GroupBox_Ref.Location = New System.Drawing.Point(182, 64)
+        Me.GroupBox_Ref.Name = "GroupBox_Ref"
+        Me.GroupBox_Ref.Size = New System.Drawing.Size(146, 57)
+        Me.GroupBox_Ref.TabIndex = 4
+        Me.GroupBox_Ref.TabStop = False
+        Me.GroupBox_Ref.Text = "Vergleichsergebnis"
+        '
+        'CheckBox_showRef
+        '
+        Me.CheckBox_showRef.Location = New System.Drawing.Point(9, 20)
+        Me.CheckBox_showRef.Name = "CheckBox_showRef"
+        Me.CheckBox_showRef.Size = New System.Drawing.Size(128, 31)
+        Me.CheckBox_showRef.TabIndex = 0
+        Me.CheckBox_showRef.Text = "Vergleichsergebnis anzeigen"
+        Me.CheckBox_showRef.UseVisualStyleBackColor = True
         '
         'ScatterplotDialog
         '
-        Me.AcceptButton = Me.OK_Button
+        Me.AcceptButton = Me.Button_OK
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.CancelButton = Me.Cancel_Button
+        Me.CancelButton = Me.Button_Cancel
         Me.ClientSize = New System.Drawing.Size(336, 219)
-        Me.Controls.Add(Me.Cancel_Button)
-        Me.Controls.Add(Me.OK_Button)
-        Me.Controls.Add(Me.GroupBox2)
-        Me.Controls.Add(Me.GroupBox1)
+        Me.Controls.Add(Me.GroupBox_Zielauswahl)
+        Me.Controls.Add(Me.GroupBox_SekPop)
+        Me.Controls.Add(Me.GroupBox_Ref)
+        Me.Controls.Add(Me.Button_Cancel)
+        Me.Controls.Add(Me.Button_OK)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MaximizeBox = False
@@ -125,19 +148,22 @@ Partial Class ScatterplotDialog
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = "Scatterplot-Matrix"
-        Me.GroupBox1.ResumeLayout(False)
-        Me.GroupBox1.PerformLayout()
-        Me.GroupBox2.ResumeLayout(False)
-        Me.GroupBox2.PerformLayout()
+        Me.GroupBox_Zielauswahl.ResumeLayout(False)
+        Me.GroupBox_Zielauswahl.PerformLayout()
+        Me.GroupBox_SekPop.ResumeLayout(False)
+        Me.GroupBox_SekPop.PerformLayout()
+        Me.GroupBox_Ref.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
-    Friend WithEvents OK_Button As System.Windows.Forms.Button
-    Friend WithEvents Cancel_Button As System.Windows.Forms.Button
-    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
+    Friend WithEvents Button_OK As System.Windows.Forms.Button
+    Friend WithEvents Button_Cancel As System.Windows.Forms.Button
+    Friend WithEvents GroupBox_Zielauswahl As System.Windows.Forms.GroupBox
     Friend WithEvents CheckedListBox_Ziele As System.Windows.Forms.CheckedListBox
     Friend WithEvents CheckBox_SekPopOnly As System.Windows.Forms.CheckBox
-    Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
+    Friend WithEvents GroupBox_SekPop As System.Windows.Forms.GroupBox
     Friend WithEvents LinkLabel_CheckAll As System.Windows.Forms.LinkLabel
+    Friend WithEvents GroupBox_Ref As System.Windows.Forms.GroupBox
+    Friend WithEvents CheckBox_showRef As System.Windows.Forms.CheckBox
 
 End Class
