@@ -82,7 +82,7 @@ Partial Class Form1
         '
         Me.Button_openMDB.Enabled = False
         Me.Button_openMDB.Image = Global.IHWB.EVO.My.Resources.Resources.database_connect
-        Me.Button_openMDB.Location = New System.Drawing.Point(37, 17)
+        Me.Button_openMDB.Location = New System.Drawing.Point(37, 16)
         Me.Button_openMDB.Name = "Button_openMDB"
         Me.Button_openMDB.Size = New System.Drawing.Size(25, 25)
         Me.Button_openMDB.TabIndex = 13
@@ -93,7 +93,7 @@ Partial Class Form1
         '
         Me.Button_Scatterplot.Enabled = False
         Me.Button_Scatterplot.Image = Global.IHWB.EVO.My.Resources.Resources.scatterplot
-        Me.Button_Scatterplot.Location = New System.Drawing.Point(68, 17)
+        Me.Button_Scatterplot.Location = New System.Drawing.Point(99, 16)
         Me.Button_Scatterplot.Name = "Button_Scatterplot"
         Me.Button_Scatterplot.Size = New System.Drawing.Size(25, 25)
         Me.Button_Scatterplot.TabIndex = 9
@@ -115,7 +115,7 @@ Partial Class Form1
         '
         Me.Button_loadRefResult.Enabled = False
         Me.Button_loadRefResult.Image = Global.IHWB.EVO.My.Resources.Resources.database_go
-        Me.Button_loadRefResult.Location = New System.Drawing.Point(99, 17)
+        Me.Button_loadRefResult.Location = New System.Drawing.Point(68, 16)
         Me.Button_loadRefResult.Name = "Button_loadRefResult"
         Me.Button_loadRefResult.Size = New System.Drawing.Size(25, 25)
         Me.Button_loadRefResult.TabIndex = 9
