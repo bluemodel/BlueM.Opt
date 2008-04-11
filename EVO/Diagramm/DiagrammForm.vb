@@ -68,8 +68,19 @@ Partial Public Class DiagrammForm
         End If
     End Sub
 
-    'Doppelklick auf Indicator-Chart
-    '*******************************
+    'Indicatordiagramm anzeigen
+    '**************************
+    Public Sub showIndicatorDiagramm()
+
+        If (Me.DiagIndicator.Visible = False)
+            Me.Diag.Height -= 70
+            Me.DiagIndicator.Visible = True
+        End If
+
+    End Sub
+
+    'Doppelklick auf Indicatordiagramm
+    '*********************************
     Private Sub DiagIndicator_DoubleClick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles DiagIndicator.DoubleClick
         Call Me.DiagIndicator.ShowEditor()
     End Sub

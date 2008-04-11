@@ -1828,8 +1828,7 @@ Start_Evolutionsrunden:
 
             'Indicator-Diagramm initialisieren
             '---------------------------------
-            Me.Hauptdiagramm.Height = Me.Hauptdiagramm.Height - 70
-            Me.Indicatordiagramm.Visible = True
+            Call Me.DForm.showIndicatorDiagramm()
             Call Me.Indicatordiagramm.getSeriesLine("Hypervolume").Clear()
 
             'Achsenzuordnung speichern
@@ -2308,8 +2307,7 @@ Start_Evolutionsrunden:
                 If (importDialog.CheckBox_Hypervol.Checked) Then
 
                     'Indicator-Diagramm anzeigen
-                    Me.Hauptdiagramm.Height = Me.Hauptdiagramm.Height - 70
-                    Me.Indicatordiagramm.Visible = True
+                    Call Me.DForm.showIndicatorDiagramm()
                     Call Me.Indicatordiagramm.getSeriesLine("Hypervolume").Clear()
 
                     'Hypervolumen instanzieren
@@ -2395,6 +2393,65 @@ Start_Evolutionsrunden:
                     serie3D.Add(sekpopind.Zielwerte(Me.Hauptdiagramm.ZielIndexX), sekpopind.Zielwerte(Me.Hauptdiagramm.ZielIndexY), sekpopind.Zielwerte(Me.Hauptdiagramm.ZielIndexZ), sekpopind.ID & " (Vergleichsergebnis)")
                 End If
             Next
+
+            'Hypervolumen
+            '============
+            Dim i As Integer
+            Dim sekpopvalues(,), sekpopvaluesRef(,) As Double
+            Dim HypervolumeDiff, HypervolumeRef As EVO.MO_Indicators.Hypervolume
+            Dim nadir() As Double
+            Dim minmax() As Boolean
+            Dim indicatorDiff, indicatorRef As Double
+
+            'Vorbereitungen
+            ReDim nadir(Common.Manager.AnzPenalty - 1)
+            ReDim minmax(Common.Manager.AnzPenalty - 1)
+            For i = 0 To Common.Manager.AnzPenalty - 1
+                nadir(i) = 0
+                minmax(i) = False
+            Next
+            sekpopvalues = Sim1.OptResult.getSekPopValues()
+            sekpopvaluesRef = OptResult2.getSekPopValues()
+
+            'Hypervolumendifferenz
+            '---------------------
+            If (sekpopvalues.Length > 0) Then
+
+                'Instanzierung
+                HypervolumeDiff = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, minmax, nadir, sekpopvalues, sekpopvaluesRef)
+
+                'Berechnung
+                indicatorDiff = -HypervolumeDiff.calc_indicator()
+
+                'Nadir-Punkt holen (für spätere Verwendung bei Referenz-Hypervolumen)
+                nadir = HypervolumeDiff.nadir
+
+                'In Zwischenablage kopieren
+                Call Clipboard.SetDataObject(indicatorDiff, True)
+
+                'Anzeige in Messagebox
+                MsgBox("Hypervolumendifferenz zum Vergleichsergebnis:" & eol _
+                        & indicatorDiff.ToString() & eol _
+                        & "(Wert wurde in die Zwischenablage kopiert)", MsgBoxStyle.Information, "Hypervolumen")
+
+            End If
+
+            'Referenz-Hypervolumen
+            '---------------------
+            If (Me.Indicatordiagramm.Visible) Then
+                
+                'Instanzierung
+                HypervolumeRef = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, minmax, nadir, sekpopvaluesRef)
+                indicatorRef = -HypervolumeRef.calc_indicator()
+
+                'Anzeige in IndicatorDiagramm
+                Dim colorline1 As New Steema.TeeChart.Tools.ColorLine(Me.Indicatordiagramm.Chart)
+                colorline1.Pen.Color = Color.Blue
+                colorline1.Pen.Width = 2
+                colorline1.AllowDrag = False
+                colorline1.Axis = Me.Indicatordiagramm.Axes.Left
+                colorline1.Value = indicatorRef
+            End If
 
             'Cursor Default
             Cursor = Cursors.Default
