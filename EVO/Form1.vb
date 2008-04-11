@@ -2029,7 +2029,7 @@ Start_Evolutionsrunden:
             Call Me.solutionDialog.addSolution(ind)
 
             'Lösung im Hauptdiagramm anzeigen
-            Call Me.DForm.Diag.showSelectedSolution(ind)
+            Call Me.Hauptdiagramm.showSelectedSolution(ind)
 
             'Lösung im Scatterplot anzeigen
             If (Not IsNothing(Me.scatterplot1)) Then
