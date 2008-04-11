@@ -16,10 +16,10 @@ Partial Public Class Scatterplot
     '*******************************************************************************
     '*******************************************************************************
 
-    Private Diags(,) As Diagramm
-    Private OptResult As IHWB.EVO.OptResult
+    Private Diags(,) As EVO.Diagramm
+    Private OptResult, OptResultRef As EVO.OptResult
     Private Zielauswahl() As Integer
-    Private SekPopOnly As Boolean
+    Private SekPopOnly, ShowRef As Boolean
     Public Event pointSelected(ByVal ind As Common.Individuum)
 
 
@@ -40,7 +40,7 @@ Partial Public Class Scatterplot
     Public ListUserInput() As Struct_UserInput        'Liste der Zielfunktionen
     'Konstruktor
     '***********
-    Public Sub New(ByVal optres As IHWB.EVO.OptResult, ByVal _zielauswahl() As Integer, ByVal _sekpoponly As Boolean)
+    Public Sub New(ByVal optres As EVO.OptResult, ByVal optresref As EVO.OptResult, ByVal _zielauswahl() As Integer, ByVal _sekpoponly As Boolean, ByVal _showRef As Boolean)
 
         ' Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent()
@@ -49,9 +49,11 @@ Partial Public Class Scatterplot
 
         'Optimierungsergebnis übergeben
         Me.OptResult = optres
+        Me.OptResultRef = optresref
 
-        'SekPop-Flag setzen
+        'Optionen übernehmen
         Me.SekPopOnly = _sekpoponly
+        Me.ShowRef = _showref
 
         'Zielauswahl speichern
         Me.Zielauswahl = _zielauswahl
@@ -135,28 +137,71 @@ Partial Public Class Scatterplot
     '******************
     Private Sub zeichnen()
 
+        Dim i, j As Integer
+        Dim xAchse, yAchse As String
+        Dim min() As Double
+        Dim max() As Double
+        Dim serie, serie_inv, serie_ist As Steema.TeeChart.Styles.Series
+        Dim colorline1 As Steema.TeeChart.Tools.ColorLine
+
         'Matrix dimensionieren
+        '---------------------
         Call Me.dimensionieren()
         Call Me.getPath()
         Call Me.Read_UserInput()
 
-        Dim i, j, j1 As Integer
-        Dim xAchse, yAchse As String
+        'Min und Max für Achsen bestimmen
+        '--------------------------------
+        ReDim min(Me.Zielauswahl.GetUpperBound(0))
+        ReDim max(Me.Zielauswahl.GetUpperBound(0))
+        For i = 0 To Me.Zielauswahl.GetUpperBound(0)
+            min(i) = Double.MaxValue
+            max(i) = Double.MinValue
+            If (Me.SekPopOnly) Then
+                'Nur Sekundäre Population
+                For Each ind As Common.Individuum In Me.OptResult.getSekPop()
+                    min(i) = Math.Min(ind.Zielwerte(Me.Zielauswahl(i)), min(i))
+                    max(i) = Math.Max(ind.Zielwerte(Me.Zielauswahl(i)), max(i))
+                Next
+            Else
+                'Alle Lösungen
+                For Each ind As Common.Individuum In Me.OptResult.Solutions
+                    min(i) = Math.Min(ind.Zielwerte(Me.Zielauswahl(i)), min(i))
+                    max(i) = Math.Max(ind.Zielwerte(Me.Zielauswahl(i)), max(i))
+                Next
+            End If
+            'IstWerte
+            If (Common.Manager.List_Ziele(Me.Zielauswahl(i)).hasIstWert) Then
+                min(i) = Math.Min(Common.Manager.List_Ziele(Me.Zielauswahl(i)).IstWert, min(i))
+                max(i) = Math.Max(Common.Manager.List_Ziele(Me.Zielauswahl(i)).IstWert, max(i))
+            End If
+            'Vergleichsergebnis
+            If (Me.ShowRef)
+                For Each ind As Common.Individuum In Me.OptResultRef.getSekPop()
+                    min(i) = Math.Min(ind.Zielwerte(Me.Zielauswahl(i)), min(i))
+                    max(i) = Math.Max(ind.Zielwerte(Me.Zielauswahl(i)), max(i))
+                Next
+            End If
+        Next
+
+        Dim j1 As Integer
         Dim serieMin_i As Double = 99999999999
         Dim serieMax_i As Double = 0
         Dim serieMin_j As Double = 99999999999
         Dim serieMax_j As Double = 0
         Dim ivgl, jvgl As Double
 
-        Dim serie, serie_inv, serieIstp As Steema.TeeChart.Styles.Series
+        Dim serieIstp As Steema.TeeChart.Styles.Series
         Dim serieIstv, serieIsth, serieIsth2, serieIstv2 As Steema.TeeChart.Styles.Line
         Dim freeboard As Boolean
 
         'Schleife über Spalten
+        '---------------------
         For i = 0 To Me.matrix.ColumnCount - 2
             serieMin_i = 99999999999
             serieMax_i = 0
             'Schleife über Reihen
+            '--------------------
             For j = 1 To Me.matrix.RowCount - 1
                 'Console.Out.WriteLine(matrix.ColumnCount.ToString + " " + matrix.RowCount.ToString)
                 serieMin_j = 99999999999
@@ -164,20 +209,23 @@ Partial Public Class Scatterplot
                 'Console.Out.WriteLine(i.ToString + " " + j.ToString)
 
                 'Neues Diagramm erstellen
-                Me.Diags(i, j) = New Diagramm
+                Me.Diags(i, j) = New EVO.Diagramm()
                 Me.matrix.Controls.Add(Me.Diags(i, j), i, j)
                 Me.Diags(i, j).BackColor = Color.White
 
                 With Me.Diags(i, j)
-                    'Diagramm
-                    '--------
+
+                    AddHandler .DoubleClick, AddressOf Me.ShowEditor
+
+                    'Diagramm formatieren
+                    '====================
                     .Header.Visible = False
                     .Aspect.View3D = False
                     .Legend.Visible = False
-                    AddHandler .DoubleClick, AddressOf Me.ShowEditor
 
                     'Achsen
                     '------
+                    'Titel
                     xAchse = Common.Manager.List_Ziele(Me.Zielauswahl(i)).Bezeichnung
                     yAchse = Common.Manager.List_Ziele(Me.Zielauswahl(j)).Bezeichnung
 
@@ -250,9 +298,26 @@ Partial Public Class Scatterplot
                     .Axes.Bottom.Title.Caption = xAchse
                     .Axes.Left.Title.Caption = yAchse
 
+                    'Labels
                     .Axes.Left.Labels.Style = Steema.TeeChart.AxisLabelStyle.Value
                     .Axes.Bottom.Labels.Style = Steema.TeeChart.AxisLabelStyle.Value
 
+                    'Min und Max
+                    .Axes.Bottom.Automatic = False
+                    .Axes.Bottom.Minimum = min(i)
+                    .Axes.Bottom.Maximum = max(i)
+                    .Axes.Bottom.MinimumOffset = 2
+                    .Axes.Bottom.MaximumOffset = 2
+
+                    .Axes.Left.Automatic = False
+                    .Axes.Left.Minimum = min(j)
+                    .Axes.Left.Maximum = max(j)
+                    .Axes.Left.MinimumOffset = 2
+                    .Axes.Left.MaximumOffset = 2
+
+                    'Beschriftungsformat
+                    If (max(i) >= 1000 Or min(i) <= -1000) Then .Axes.Bottom.Labels.ValueFormat = "0.##E0"
+                    If (max(j) >= 1000 Or min(j) <= -1000) Then .Axes.Left.Labels.ValueFormat = "0.##E0"
 
                     'Achsen nur an den Rändern anzeigen
                     '----------------------------------
@@ -340,6 +405,48 @@ Partial Public Class Scatterplot
                                 'ungültige Lösung zeichnen
                                 serie_inv.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID)
                             End If
+                        Next
+                    End If
+
+                    'IstWerte eintragen
+                    '==================
+                    If (Common.Manager.List_Ziele(Me.Zielauswahl(i)).hasIstWert And Common.Manager.List_Ziele(Me.Zielauswahl(j)).hasIstWert) Then
+                        'X und Y: LinePoint
+                        '------------------
+                        serie_ist = New Steema.TeeChart.Styles.LinePoint(.Chart)
+                        serie_ist.Color = Color.Empty
+                        serie_ist.Title = "IstWert"
+                        Call .add_MarksTips(serie_ist, Steema.TeeChart.Styles.MarksStyles.XY)
+                        serie_ist.Add(Common.Manager.List_Ziele(Me.Zielauswahl(i)).IstWert, Common.Manager.List_Ziele(Me.Zielauswahl(j)).IstWert)
+
+                    ElseIf (Common.Manager.List_Ziele(Me.Zielauswahl(i)).hasIstWert) Then
+                        'Nur X: Colorline
+                        '----------------
+                        colorline1 = New Steema.TeeChart.Tools.ColorLine(.Chart)
+                        colorline1.Pen.Color = Color.Red
+                        colorline1.Axis = .Axes.Bottom
+                        colorline1.AllowDrag = False
+                        colorline1.NoLimitDrag = True
+                        colorline1.Value = Common.Manager.List_Ziele(Me.Zielauswahl(i)).IstWert
+
+                    ElseIf (Common.Manager.List_Ziele(Me.Zielauswahl(j)).hasIstWert) Then
+                        'Nur Y: Colorline
+                        '----------------
+                        colorline1 = New Steema.TeeChart.Tools.ColorLine(.Chart)
+                        colorline1.Pen.Color = Color.Red
+                        colorline1.Axis = .Axes.Left
+                        colorline1.AllowDrag = False
+                        colorline1.NoLimitDrag = True
+                        colorline1.Value = Common.Manager.List_Ziele(Me.Zielauswahl(j)).IstWert
+
+                    End If
+
+                    'Vergleichsergebnis anzeigen
+                    '===========================
+                    If (Me.ShowRef) Then
+                        serie = .getSeriesPoint(xAchse & ", " & yAchse & " (Vergleichsergebnis)", "Blue", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        For Each ind As Common.Individuum In Me.OptResultRef.getSekPop()
+                            serie.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID & " (Vergleichsergebnis)")
                         Next
                     End If
 
@@ -452,20 +559,24 @@ Partial Public Class Scatterplot
 
         'Punkt-Informationen bestimmen
         '-----------------------------
-        'Solution-ID
-        indID_clicked = s.Labels(valueIndex)
+        Try
+            'Solution-ID
+            indID_clicked = s.Labels(valueIndex)
 
 
-        'Lösung holen
-        '------------
-        ind = Me.OptResult.getSolution(indID_clicked)
+            'Lösung holen
+            '------------
+            ind = Me.OptResult.getSolution(indID_clicked)
 
-        If (ind.ID = indID_clicked) Then
+            If (ind.ID = indID_clicked) Then
 
-            'Lösung auswählen (wird von Form1.selectSolution() verarbeitet)
-            RaiseEvent pointSelected(ind)
+                'Lösung auswählen (wird von Form1.selectSolution() verarbeitet)
+                RaiseEvent pointSelected(ind)
 
-        End If
+            End If
+        Catch
+            MsgBox("Lösung nicht auswählbar!", MsgBoxStyle.Exclamation, "Error")
+        End Try
 
     End Sub
 

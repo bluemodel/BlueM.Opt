@@ -19,9 +19,10 @@ Public Class MDBImportDialog
         If (Common.Manager.AnzZiele < 3) Then
             Me.ListBox_ZieleZ.Enabled = False
         End If
-        'Bei weniger als 2 Zielen Y-Achse ausblenden
+        'Bei weniger als 2 Zielen Y-Achse und SekPop-Optionen ausblenden
         If (Common.Manager.AnzZiele < 2) Then
             Me.ListBox_ZieleY.Enabled = False
+            Me.GroupBox_SekPop.Enabled = False
         End If
 
         'SekPop Combobox
