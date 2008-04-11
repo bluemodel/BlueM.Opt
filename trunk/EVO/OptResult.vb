@@ -204,11 +204,22 @@ Public Class OptResult
 
     'Gibt die Penalty-Werte einer Sekundären Population zurück
     '*********************************************************
-    Public Function getSekPopValues(ByVal igen As Integer) As Double(,)
+    Public Function getSekPopValues(Optional ByVal igen As Integer = -1) As Double(,)
 
         Dim inds() As Common.Individuum
         Dim values(,) As Double
         Dim i, j As Integer
+
+        'Wenn keine Generation angegeben, dann letzte SekPop ausgeben
+        If (igen = -1) Then
+            igen = Me.db_getLastGenNo()
+        End If
+
+        'Wenn es keine Sekundäre Population in der DB gibt, abbrechen
+        If (igen = -1) Then
+            ReDim values(-1, -1)
+            Return values
+        End If
 
         inds = Me.getSekPop(igen)
 

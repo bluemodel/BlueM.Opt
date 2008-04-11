@@ -119,7 +119,7 @@ Partial Class Form1
         Me.Button_loadRefResult.Name = "Button_loadRefResult"
         Me.Button_loadRefResult.Size = New System.Drawing.Size(25, 25)
         Me.Button_loadRefResult.TabIndex = 9
-        Me.ToolTip1.SetToolTip(Me.Button_loadRefResult, "Vergleichsergebnis aud Ergebnisdatenbank laden")
+        Me.ToolTip1.SetToolTip(Me.Button_loadRefResult, "Vergleichsergebnis aus Ergebnisdatenbank laden")
         Me.Button_loadRefResult.UseVisualStyleBackColor = True
         '
         'GroupBox_Anwendung
