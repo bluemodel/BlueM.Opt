@@ -70,7 +70,8 @@ Public MustInherit Class Sim
 
     'Ergebnisspeicher
     '----------------
-    Public OptResult As OptResult
+    Public OptResult As OptResult                   'Optimierungsergebnis
+    Public OptResultRef As OptResult                'Vergleichsergebnis
 
     'Kombinatorik
     '------------

@@ -1865,11 +1865,12 @@ Start_Evolutionsrunden:
 
         Dim Dialog As ScatterplotDialog
         Dim diagresult As DialogResult
-        Dim sekpoponly As Boolean
+        Dim sekpoponly, showRef As Boolean
         Dim zielauswahl() As Integer
 
         'Scatterplot-Dialog aufrufen
         Dialog = New ScatterplotDialog()
+        If (IsNothing(Sim1.OptResultRef)) Then Dialog.GroupBox_Ref.Enabled = False
         diagresult = Dialog.ShowDialog()
 
         If (Not diagresult = Windows.Forms.DialogResult.OK) Then
@@ -1878,6 +1879,7 @@ Start_Evolutionsrunden:
 
         'Einstellungen übernehmen
         sekpoponly = Dialog.CheckBox_SekPopOnly.Checked
+        showRef = Dialog.CheckBox_showRef.Checked
         ReDim zielauswahl(-1)
         For Each indexChecked As Integer In Dialog.CheckedListBox_Ziele.CheckedIndices
             ReDim Preserve zielauswahl(zielauswahl.GetUpperBound(0) + 1)
@@ -1887,7 +1889,7 @@ Start_Evolutionsrunden:
         'Scatterplot-Matrix anzeigen
         Cursor = Cursors.WaitCursor
 
-        scatterplot1 = New Scatterplot(Sim1.OptResult, zielauswahl, sekpoponly)
+        scatterplot1 = New Scatterplot(Sim1.OptResult, Sim1.OptResultRef, zielauswahl, sekpoponly, showRef)
         Call scatterplot1.Show()
 
         Cursor = Cursors.Default
@@ -2348,13 +2350,12 @@ Start_Evolutionsrunden:
 
     End Sub
 
-    'Mit einem 2. Optimierungsergebnis vergleichen
-    '*********************************************
-    Private Sub loadComparisonFromMDB(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_loadRefResult.Click
+    'Vergleichsergebnis aus Datenbank laden
+    '**************************************
+    Private Sub loadRefFromMDB(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_loadRefResult.Click
 
         Dim diagresult As DialogResult
         Dim sourceFile As String
-        Dim OptResult2 As EVO.OptResult
 
         'Datei-öffnen Dialog anzeigen
         Me.OpenFileDialog1.Filter = "Access-Datenbanken (*.mdb)|*.mdb"
@@ -2372,15 +2373,15 @@ Start_Evolutionsrunden:
 
             'Daten einlesen
             '==============
-            OptResult2 = New EVO.OptResult()
-            Call OptResult2.db_load(sourceFile, True)
+            Sim1.OptResultRef = New EVO.OptResult()
+            Call Sim1.OptResultRef.db_load(sourceFile, True)
 
             'In Diagramm anzeigen
             '====================
             Dim serie As Steema.TeeChart.Styles.Points
             Dim serie3D As Steema.TeeChart.Styles.Points3D
 
-            For Each sekpopind As Common.Individuum In OptResult2.getSekPop()
+            For Each sekpopind As Common.Individuum In Sim1.OptResultRef.getSekPop()
                 If (Me.Hauptdiagramm.ZielIndexZ = -1) Then
                     '2D
                     '--
@@ -2411,7 +2412,7 @@ Start_Evolutionsrunden:
                 minmax(i) = False
             Next
             sekpopvalues = Sim1.OptResult.getSekPopValues()
-            sekpopvaluesRef = OptResult2.getSekPopValues()
+            sekpopvaluesRef = Sim1.OptResultRef.getSekPopValues()
 
             'Hypervolumendifferenz
             '---------------------
@@ -2439,7 +2440,7 @@ Start_Evolutionsrunden:
             'Referenz-Hypervolumen
             '---------------------
             If (Me.Indicatordiagramm.Visible) Then
-                
+
                 'Instanzierung
                 HypervolumeRef = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, minmax, nadir, sekpopvaluesRef)
                 indicatorRef = -HypervolumeRef.calc_indicator()

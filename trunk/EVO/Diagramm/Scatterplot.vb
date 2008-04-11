@@ -15,14 +15,14 @@ Partial Public Class Scatterplot
     '*******************************************************************************
 
     Private Diags(,) As EVO.Diagramm
-    Private OptResult As EVO.OptResult
+    Private OptResult, OptResultRef As EVO.OptResult
     Private Zielauswahl() As Integer
-    Private SekPopOnly As Boolean
+    Private SekPopOnly, ShowRef As Boolean
     Public Event pointSelected(ByVal ind As Common.Individuum)
 
     'Konstruktor
     '***********
-    Public Sub New(ByVal optres As IHWB.EVO.OptResult, _zielauswahl() As Integer, _sekpoponly As Boolean)
+    Public Sub New(ByVal optres As EVO.OptResult, ByVal optresref As EVO.OptResult, ByVal _zielauswahl() As Integer, ByVal _sekpoponly As Boolean, ByVal _showRef As Boolean)
 
         ' Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent()
@@ -31,9 +31,11 @@ Partial Public Class Scatterplot
 
         'Optimierungsergebnis übergeben
         Me.OptResult = optres
+        Me.OptResultRef = optresref
 
-        'SekPop-Flag setzen
+        'Optionen übernehmen
         Me.SekPopOnly = _sekpoponly
+        Me.ShowRef = _showref
 
         'Zielauswahl speichern
         Me.Zielauswahl = _zielauswahl
@@ -52,9 +54,6 @@ Partial Public Class Scatterplot
     '******************
     Private Sub zeichnen()
 
-        'Matrix dimensionieren
-        Call Me.dimensionieren()
-
         Dim i, j As Integer
         Dim xAchse, yAchse As String
         Dim min() As Double
@@ -62,7 +61,12 @@ Partial Public Class Scatterplot
         Dim serie, serie_inv, serie_ist As Steema.TeeChart.Styles.Series
         Dim colorline1 As Steema.TeeChart.Tools.ColorLine
 
+        'Matrix dimensionieren
+        '---------------------
+        Call Me.dimensionieren()
+
         'Min und Max für Achsen bestimmen
+        '--------------------------------
         ReDim min(Me.Zielauswahl.GetUpperBound(0))
         ReDim max(Me.Zielauswahl.GetUpperBound(0))
         For i = 0 To Me.Zielauswahl.GetUpperBound(0)
@@ -70,14 +74,12 @@ Partial Public Class Scatterplot
             max(i) = Double.MinValue
             If (Me.SekPopOnly) Then
                 'Nur Sekundäre Population
-                '------------------------
                 For Each ind As Common.Individuum In Me.OptResult.getSekPop()
                     min(i) = Math.Min(ind.Zielwerte(Me.Zielauswahl(i)), min(i))
                     max(i) = Math.Max(ind.Zielwerte(Me.Zielauswahl(i)), max(i))
                 Next
             Else
                 'Alle Lösungen
-                '-------------
                 For Each ind As Common.Individuum In Me.OptResult.Solutions
                     min(i) = Math.Min(ind.Zielwerte(Me.Zielauswahl(i)), min(i))
                     max(i) = Math.Max(ind.Zielwerte(Me.Zielauswahl(i)), max(i))
@@ -87,6 +89,13 @@ Partial Public Class Scatterplot
             If (Common.Manager.List_Ziele(Me.Zielauswahl(i)).hasIstWert) Then
                 min(i) = Math.Min(Common.Manager.List_Ziele(Me.Zielauswahl(i)).IstWert, min(i))
                 max(i) = Math.Max(Common.Manager.List_Ziele(Me.Zielauswahl(i)).IstWert, max(i))
+            End If
+            'Vergleichsergebnis
+            If (Me.ShowRef)
+                For Each ind As Common.Individuum In Me.OptResultRef.getSekPop()
+                    min(i) = Math.Min(ind.Zielwerte(Me.Zielauswahl(i)), min(i))
+                    max(i) = Math.Max(ind.Zielwerte(Me.Zielauswahl(i)), max(i))
+                Next
             End If
 
         Next
@@ -227,6 +236,16 @@ Partial Public Class Scatterplot
                         colorline1.Value = Common.Manager.List_Ziele(Me.Zielauswahl(j)).IstWert
 
                     End If
+
+                    'Vergleichsergebnis anzeigen
+                    '===========================
+                    If (Me.ShowRef) Then
+                        serie = .getSeriesPoint(xAchse & ", " & yAchse & " (Vergleichsergebnis)", "Blue", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        For Each ind As Common.Individuum In Me.OptResultRef.getSekPop()
+                            serie.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID & " (Vergleichsergebnis)")
+                        Next
+                    End If
+
 
                     'Diagramme auf der Diagonalen ausblenden
                     '=======================================

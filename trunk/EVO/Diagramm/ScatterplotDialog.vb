@@ -15,7 +15,7 @@ Public Class ScatterplotDialog
 
     End Sub
 
-    Private Sub OK_Button_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OK_Button.Click
+    Private Sub OK_Button_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_OK.Click
         'Mindestens 2 Ziele müssen ausgewählt sein
         If (Me.CheckedListBox_Ziele.CheckedIndices.Count < 2) Then
             MsgBox("Bitte mindestens 2 Ziele auswählen!", MsgBoxStyle.Exclamation, "Fehler")
