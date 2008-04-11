@@ -1694,10 +1694,22 @@ Start_Evolutionsrunden:
 
     End Sub
 
-    'Achsen und Standard-Series initialisieren
-    '*****************************************
+    'Hauptdiagramm vorbereiten
+    '*************************
     Private Sub PrepareDiagramm()
 
+        Dim i, j, tmpZielindex() As Integer
+        Dim Achse As Diagramm.Achse
+        Dim Achsen As New Collection
+
+        ReDim tmpZielindex(2)                       'Maximal 3 Achsen
+        'Zunächst keine Achsenzuordnung (-1)
+        For i = 0 To tmpZielindex.GetUpperBound(0)
+            tmpZielIndex(i) = -1                    
+        Next
+
+        'Fallunterscheidung Methode
+        'XXXXXXXXXXXXXXXXXXXXXXXXXX
         Select Case Anwendung
 
             Case ANW_TESTPROBLEME 'Testprobleme
@@ -1712,9 +1724,6 @@ Start_Evolutionsrunden:
 
                     Case METH_SENSIPLOT 'SensiPlot
                         'XXXXXXXXXXXXXXXXXXXXXXXXX
-
-                        Dim Achse As Diagramm.Achse
-                        Dim Achsen As New Collection
 
                         If (SensiPlot1.Selected_OptParameter.GetLength(0) = 1) Then
 
@@ -1767,17 +1776,17 @@ Start_Evolutionsrunden:
 
                         'Achsen:
                         '-------
-                        Dim Achse As Diagramm.Achse
-                        Dim Achsen As New Collection
-
-                        'Bei Single-Objective: X-Achse = Nr. der Simulation (Durchlauf)
                         If (Common.Manager.AnzPenalty = 1) Then
 
+                            'Single-Objective
+                            '================
+
+                            'X-Achse (Nr. der Simulation (Durchlauf))
+                            '----------------------------------------
                             Achse.Name = "Simulation"
                             Achse.Auto = False
                             If (Form1.Method = METH_PES) Then
                                 'Bei PES:
-                                '--------
                                 If (EVO_Einstellungen1.Settings.PES.Pop.is_POPUL) Then
                                     Achse.Max = EVO_Einstellungen1.Settings.PES.n_Gen * EVO_Einstellungen1.Settings.PES.n_Nachf * EVO_Einstellungen1.Settings.PES.Pop.n_Runden + 1
                                 Else
@@ -1786,35 +1795,73 @@ Start_Evolutionsrunden:
 
                             ElseIf (Form1.Method = METH_HOOKJEEVES) Then
                                 'Bei Hooke & Jeeves:
-                                '-------------------
                                 Achse.Auto = True
 
                             Else
                                 'Bei CES etc.:
-                                '-------------
                                 Achse.Max = EVO_Einstellungen1.Settings.CES.n_Childs * EVO_Einstellungen1.Settings.CES.n_Generations
                             End If
 
                             Achsen.Add(Achse)
 
-                        End If
+                            'Y-Achse: erste (und einzige) Zielfunktion
+                            '-----------------------------------------
+                            For i = 0 To Common.Manager.AnzZiele - 1
+                                If (Common.Manager.List_Ziele(i).isOpt) Then
+                                    Achse.Name = Common.Manager.List_Ziele(i).Bezeichnung
+                                    Achse.Auto = True
+                                    Achse.Max = 0
+                                    Achsen.Add(Achse)
+                                    Exit For 'Abbruch nach erstem OptZiel
+                                End If
+                            Next
 
-                        'für jedes OptZiel eine weitere Achse hinzufügen
-                        For Each optziel As Common.Ziel In Common.Manager.List_OptZiele
-                            Achse.Name = optziel.Bezeichnung
-                            Achse.Auto = True
-                            Achse.Max = 0
                             Achsen.Add(Achse)
-                        Next
 
-                        'Warnung bei mehr als 3 Achsen
-                        If (Achsen.Count > 3) Then
-                            MsgBox("Die Anzahl der Optimierungsziele beträgt mehr als 3!" & eol _
-                                    & "Es werden nur die ersten drei Zielfunktionen im Hauptdiagramm angezeigt!", MsgBoxStyle.Information, "Info")
+                            'Achsenzuordnung speichern
+                            '-------------------------
+                            Me.Hauptdiagramm.ZielIndexX = -1
+                            Me.Hauptdiagramm.ZielIndexY = i
+                            Me.Hauptdiagramm.ZielIndexZ = -1
+
+                        Else
+
+                            'Multi-Objective
+                            '===============
+
+                            'für jedes OptZiel eine Achse hinzufügen
+                            j = 0
+                            For i = 0 To Common.Manager.AnzZiele - 1
+                                If (Common.Manager.List_Ziele(i).isOpt) Then
+                                    Achse.Name = Common.Manager.List_Ziele(i).Bezeichnung
+                                    Achse.Auto = True
+                                    Achse.Max = 0
+                                    Achsen.Add(Achse)
+                                    tmpZielindex(j) = i
+                                    j += 1
+                                    If (j > 2) Then Exit For 'Maximal 3 Achsen
+                                End If
+                            Next
+
+                            'Achsenzuordnung speichern:
+                            '-------------------------
+                            Me.Hauptdiagramm.ZielIndexX = tmpZielindex(0)
+                            Me.Hauptdiagramm.ZielIndexY = tmpZielindex(1)
+                            Me.Hauptdiagramm.ZielIndexZ = tmpZielindex(2)
+
+                            'Warnung bei mehr als 3 OptZielen
+                            If (Common.Manager.AnzPenalty > 3) Then
+                                MsgBox("Die Anzahl der Optimierungsziele beträgt mehr als 3!" & eol _
+                                        & "Es werden nur die ersten drei Zielfunktionen im Hauptdiagramm angezeigt!", MsgBoxStyle.Information, "Info")
+                            End If
+
                         End If
 
                         'Diagramm initialisieren
                         Call Me.Hauptdiagramm.DiagInitialise(Anwendung, Achsen)
+
+                        'IstWerte in Diagramm einzeichnen
+                        Call Me.drawIstWerte()
 
                 End Select
 
@@ -1831,31 +1878,58 @@ Start_Evolutionsrunden:
             Call Me.DForm.showIndicatorDiagramm()
             Call Me.Indicatordiagramm.getSeriesLine("Hypervolume").Clear()
 
-            'Achsenzuordnung speichern
-            '(die ersten 3 OptZiele wurden als Achsen verwendet)
-            '---------------------------------------------------
-            Dim i, j, zielindex() As Integer
-            ReDim zielindex(Common.Manager.AnzPenalty - 1)
-            j = 0
-            'Indizes der OptZiele finden
-            For i = 0 To Common.Manager.AnzZiele - 1
-                If (Common.Manager.List_Ziele(i).isOpt) Then
-                    zielindex(j) = i
-                    j += 1
-                End If
-            Next
-            'Indizes übergeben
-            Me.Hauptdiagramm.ZielIndexX = zielindex(0)
-            Me.Hauptdiagramm.ZielIndexY = zielindex(1)
-            If (Common.Manager.AnzPenalty > 2) Then
-                Me.Hauptdiagramm.ZielIndexZ = zielindex(2)
-            Else
-                Me.Hauptdiagramm.ZielIndexZ = -1
-            End If
-
         End If
 
         Call Application.DoEvents()
+
+    End Sub
+
+    'IstWerte im Hauptdiagramm darstellen
+    '************************************
+    Private Sub drawIstWerte()
+
+        'Hinweis:
+        'Die Zuordnung von Achsen zu Zielfunktionen 
+        'muss im Diagramm bereits hinterlegt sein!
+        '-------------------------------------------
+
+        Dim colorline1 As Steema.TeeChart.Tools.ColorLine
+
+        'X-Achse:
+        If (Me.Hauptdiagramm.ZielIndexX <> -1) Then
+            If (Common.Manager.List_Ziele(Me.Hauptdiagramm.ZielIndexX).hasIstWert) Then
+                colorline1 = New Steema.TeeChart.Tools.ColorLine(Me.Hauptdiagramm.Chart)
+                colorline1.Pen.Color = Color.Red
+                colorline1.AllowDrag = False
+                colorline1.Draw3D = True
+                colorline1.Axis = Me.Hauptdiagramm.Axes.Bottom
+                colorline1.Value = Common.Manager.List_Ziele(Me.Hauptdiagramm.ZielIndexX).IstWert
+            End If
+        End If
+
+        'Y-Achse:
+        If (Me.Hauptdiagramm.ZielIndexY <> -1) Then
+            If (Common.Manager.List_Ziele(Me.Hauptdiagramm.ZielIndexY).hasIstWert) Then
+                colorline1 = New Steema.TeeChart.Tools.ColorLine(Me.Hauptdiagramm.Chart)
+                colorline1.Pen.Color = Color.Red
+                colorline1.AllowDrag = False
+                colorline1.Draw3D = True
+                colorline1.Axis = Me.Hauptdiagramm.Axes.Left
+                colorline1.Value = Common.Manager.List_Ziele(Me.Hauptdiagramm.ZielIndexY).IstWert
+            End If
+        End If
+
+        'Z-Achse:
+        If (Me.Hauptdiagramm.ZielIndexZ <> -1) Then
+            If (Common.Manager.List_Ziele(Me.Hauptdiagramm.ZielIndexZ).hasIstWert) Then
+                colorline1 = New Steema.TeeChart.Tools.ColorLine(Me.Hauptdiagramm.Chart)
+                colorline1.Pen.Color = Color.Red
+                colorline1.AllowDrag = False
+                colorline1.Draw3D = True
+                colorline1.Axis = Me.Hauptdiagramm.Axes.Depth
+                colorline1.Value = Common.Manager.List_Ziele(Me.Hauptdiagramm.ZielIndexZ).IstWert
+            End If
+        End If
 
     End Sub
 
@@ -2186,7 +2260,7 @@ Start_Evolutionsrunden:
 
                 'Hauptdiagramm
                 '=============
-                
+
                 'Achsenzuordnung
                 '---------------
                 Me.Hauptdiagramm.ZielIndexX = importDialog.ListBox_ZieleX.SelectedIndex
@@ -2227,6 +2301,9 @@ Start_Evolutionsrunden:
                 '-----------------------
                 Me.Hauptdiagramm.Clear()
                 Me.Hauptdiagramm.DiagInitialise(Path.GetFileName(sourceFile), Achsen)
+
+                'IstWerte in Diagramm einzeichnen
+                Call Me.drawIstWerte()
 
                 Call My.Application.DoEvents()
 
