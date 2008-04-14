@@ -25,7 +25,11 @@ Partial Public Class DiagrammForm
     'Chart bearbeiten
     '****************
     Private Sub TChartEdit(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_TChartEdit.Click
-        Me.Diag.ShowEditor()
+        Try
+            Me.Diag.ShowEditor()
+        Catch ex As Exception
+            MsgBox("Fehler in TeeChart!" & eol & ex.Message, MsgBoxStyle.Critical, "Fehler")
+        End Try
     End Sub
 
     'Chart nach Excel exportieren
