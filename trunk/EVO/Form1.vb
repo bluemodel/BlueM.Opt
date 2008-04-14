@@ -1922,12 +1922,14 @@ Start_Evolutionsrunden:
         'Z-Achse:
         If (Me.Hauptdiagramm.ZielIndexZ <> -1) Then
             If (Common.Manager.List_Ziele(Me.Hauptdiagramm.ZielIndexZ).hasIstWert) Then
-                colorline1 = New Steema.TeeChart.Tools.ColorLine(Me.Hauptdiagramm.Chart)
-                colorline1.Pen.Color = Color.Red
-                colorline1.AllowDrag = False
-                colorline1.Draw3D = True
-                colorline1.Axis = Me.Hauptdiagramm.Axes.Depth
-                colorline1.Value = Common.Manager.List_Ziele(Me.Hauptdiagramm.ZielIndexZ).IstWert
+                'BUG 317: ColorLine auf Depth-Axis geht nicht!
+                MsgBox("Der IstWert auf der Z-Achse (" & Common.Manager.List_Ziele(Me.Hauptdiagramm.ZielIndexZ).Bezeichnung & ") kann leider nicht angezeigt werden (Bug 317)", MsgBoxStyle.Information, "Info")
+                'colorline1 = New Steema.TeeChart.Tools.ColorLine(Me.Hauptdiagramm.Chart)
+                'colorline1.Pen.Color = Color.Red
+                'colorline1.AllowDrag = False
+                'colorline1.Draw3D = True
+                'colorline1.Axis = Me.Hauptdiagramm.Axes.Depth
+                'colorline1.Value = Common.Manager.List_Ziele(Me.Hauptdiagramm.ZielIndexZ).IstWert
             End If
         End If
 
@@ -1999,7 +2001,7 @@ Start_Evolutionsrunden:
                 'Lösung auswählen
                 Call Me.selectSolution(ind)
             Catch
-                MsgBox("Lösung nicht auswählbar!", MsgBoxStyle.Exclamation, "Error")
+                MsgBox("Lösung nicht auswählbar!", MsgBoxStyle.Information, "Info")
             End Try
 
         End If
