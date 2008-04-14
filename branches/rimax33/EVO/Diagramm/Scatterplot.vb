@@ -575,7 +575,7 @@ Partial Public Class Scatterplot
 
             End If
         Catch
-            MsgBox("Lösung nicht auswählbar!", MsgBoxStyle.Exclamation, "Error")
+            MsgBox("Lösung nicht auswählbar!", MsgBoxStyle.Information, "Info")
         End Try
 
     End Sub
