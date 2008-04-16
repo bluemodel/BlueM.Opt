@@ -206,28 +206,20 @@ Partial Public Class Scatterplot
 
                     'IstWerte eintragen
                     '==================
-                    If (Common.Manager.List_Ziele(Me.Zielauswahl(i)).hasIstWert And Common.Manager.List_Ziele(Me.Zielauswahl(j)).hasIstWert) Then
-                        'X und Y: LinePoint
-                        '------------------
-                        serie_ist = New Steema.TeeChart.Styles.LinePoint(.Chart)
-                        serie_ist.Color = Color.Empty
-                        serie_ist.Title = "IstWert"
-                        Call .add_MarksTips(serie_ist, Steema.TeeChart.Styles.MarksStyles.XY)
-                        serie_ist.Add(Common.Manager.List_Ziele(Me.Zielauswahl(i)).IstWert, Common.Manager.List_Ziele(Me.Zielauswahl(j)).IstWert)
-
-                    ElseIf (Common.Manager.List_Ziele(Me.Zielauswahl(i)).hasIstWert) Then
-                        'Nur X: Colorline
-                        '----------------
+                    If (Common.Manager.List_Ziele(Me.Zielauswahl(i)).hasIstWert) Then
+                        'X-Achse:
+                        '--------
                         colorline1 = New Steema.TeeChart.Tools.ColorLine(.Chart)
                         colorline1.Pen.Color = Color.Red
                         colorline1.Axis = .Axes.Bottom
                         colorline1.AllowDrag = False
                         colorline1.NoLimitDrag = True
                         colorline1.Value = Common.Manager.List_Ziele(Me.Zielauswahl(i)).IstWert
+                    End If
 
-                    ElseIf (Common.Manager.List_Ziele(Me.Zielauswahl(j)).hasIstWert) Then
-                        'Nur Y: Colorline
-                        '----------------
+                    If (Common.Manager.List_Ziele(Me.Zielauswahl(j)).hasIstWert) Then
+                        'Y-Achse:
+                        '--------
                         colorline1 = New Steema.TeeChart.Tools.ColorLine(.Chart)
                         colorline1.Pen.Color = Color.Red
                         colorline1.Axis = .Axes.Left
