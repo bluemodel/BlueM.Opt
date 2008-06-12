@@ -58,7 +58,7 @@ Partial Public Class Scatterplot
         Dim xAchse, yAchse As String
         Dim min() As Double
         Dim max() As Double
-        Dim serie, serie_inv, serie_ist As Steema.TeeChart.Styles.Series
+        Dim serie, serie_inv As Steema.TeeChart.Styles.Series
         Dim colorline1 As Steema.TeeChart.Tools.ColorLine
 
         'Matrix dimensionieren
@@ -185,7 +185,7 @@ Partial Public Class Scatterplot
                         '------------------------
                         serie = .getSeriesPoint(xAchse & ", " & yAchse, "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         For Each ind As Common.Individuum In Me.OptResult.getSekPop()
-                            serie.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID)
+                            serie.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID.ToString())
                         Next
                     Else
                         'Alle Lösungen
@@ -196,10 +196,10 @@ Partial Public Class Scatterplot
                             'Constraintverletzung prüfen
                             If (ind.Is_Feasible) Then
                                 'gültige Lösung Zeichnen
-                                serie.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID)
+                                serie.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID.ToString())
                             Else
                                 'ungültige Lösung zeichnen
-                                serie_inv.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID)
+                                serie_inv.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID.ToString())
                             End If
                         Next
                     End If
@@ -242,8 +242,12 @@ Partial Public Class Scatterplot
                     'Diagramme auf der Diagonalen ausblenden
                     '=======================================
                     If (i = j) Then
-                        .Walls.Back.Transparent = False     'Grau anzeigen
-                        .Tools.Clear(True)                  'Um MarksTips zu entfernen
+                        'Hintergrund grau anzeigen
+                        .Walls.Back.Transparent = False
+                        .Walls.Back.Gradient.Visible = False
+                        'MarksTips entfernen
+                        .Tools.Clear(True)
+                        'Serien unsichtbar machen
                         For Each s As Steema.TeeChart.Styles.Series In .Series
                             s.Cursor = Cursors.Default      'Kein Hand-Cursor
                             s.Color = Color.Empty           'Punkte unsichtbar
@@ -345,7 +349,7 @@ Partial Public Class Scatterplot
 
                     'Roten Punkt zeichnen
                     serie = .getSeriesPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
-                    serie.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID)
+                    serie.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID.ToString())
 
                     'Mark anzeigen
                     serie.Marks.Visible = True
