@@ -734,10 +734,10 @@ Partial Class Form1
                 If (Anz_SensiPara = 1) Then
                     '1 Parameter
                     serie = Me.Hauptdiagramm.getSeriesPoint("SensiPlot", "Orange")
-                    serie.Add(ind.Penalties(SensiPlot1.Selected_OptZiel), Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).RWert, n)
+                    serie.Add(ind.Penalties(SensiPlot1.Selected_OptZiel), Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).RWert, n.ToString())
                 Else
                     '2 Parameter
-                    surface.Add(Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).RWert, ind.Penalties(SensiPlot1.Selected_OptZiel), Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).RWert, n)
+                    surface.Add(Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).RWert, ind.Penalties(SensiPlot1.Selected_OptZiel), Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).RWert, n.ToString())
                 End If
 
                 'Simulationsergebnis in Wave laden
@@ -2330,7 +2330,7 @@ Start_Evolutionsrunden:
                                 serie = Me.Hauptdiagramm.getSeriesPoint("Population (ungültig)", "Gray")
                             End If
                             'Zeichnen
-                            serie.Add(ind.ID, ind.Zielwerte(Me.Hauptdiagramm.ZielIndexX), ind.ID)
+                            serie.Add(ind.ID, ind.Zielwerte(Me.Hauptdiagramm.ZielIndexX), ind.ID.ToString())
                         ElseIf (Me.Hauptdiagramm.ZielIndexZ = -1) Then
                             '2D
                             '--
@@ -2341,7 +2341,7 @@ Start_Evolutionsrunden:
                                 serie = Me.Hauptdiagramm.getSeriesPoint("Population (ungültig)", "Gray")
                             End If
                             'Zeichnen
-                            serie.Add(ind.Zielwerte(Me.Hauptdiagramm.ZielIndexX), ind.Zielwerte(Me.Hauptdiagramm.ZielIndexY), ind.ID)
+                            serie.Add(ind.Zielwerte(Me.Hauptdiagramm.ZielIndexX), ind.Zielwerte(Me.Hauptdiagramm.ZielIndexY), ind.ID.ToString())
                         Else
                             '3D
                             '--
@@ -2352,7 +2352,7 @@ Start_Evolutionsrunden:
                                 serie3D = Me.Hauptdiagramm.getSeries3DPoint("Population (ungültig)", "Gray")
                             End If
                             'Zeichnen
-                            serie3D.Add(ind.Zielwerte(Me.Hauptdiagramm.ZielIndexX), ind.Zielwerte(Me.Hauptdiagramm.ZielIndexY), ind.Zielwerte(Me.Hauptdiagramm.ZielIndexZ), ind.ID)
+                            serie3D.Add(ind.Zielwerte(Me.Hauptdiagramm.ZielIndexX), ind.Zielwerte(Me.Hauptdiagramm.ZielIndexY), ind.Zielwerte(Me.Hauptdiagramm.ZielIndexZ), ind.ID.ToString())
                         End If
 
                     Next
@@ -2370,12 +2370,12 @@ Start_Evolutionsrunden:
                             '2D
                             '--
                             serie = Me.Hauptdiagramm.getSeriesPoint("Sekundäre Population", "Green")
-                            serie.Add(sekpopind.Zielwerte(Me.Hauptdiagramm.ZielIndexX), sekpopind.Zielwerte(Me.Hauptdiagramm.ZielIndexY), sekpopind.ID)
+                            serie.Add(sekpopind.Zielwerte(Me.Hauptdiagramm.ZielIndexX), sekpopind.Zielwerte(Me.Hauptdiagramm.ZielIndexY), sekpopind.ID.ToString())
                         Else
                             '3D
                             '--
                             serie3D = Me.Hauptdiagramm.getSeries3DPoint("Sekundäre Population", "Green")
-                            serie3D.Add(sekpopind.Zielwerte(Me.Hauptdiagramm.ZielIndexX), sekpopind.Zielwerte(Me.Hauptdiagramm.ZielIndexY), sekpopind.Zielwerte(Me.Hauptdiagramm.ZielIndexZ), sekpopind.ID)
+                            serie3D.Add(sekpopind.Zielwerte(Me.Hauptdiagramm.ZielIndexX), sekpopind.Zielwerte(Me.Hauptdiagramm.ZielIndexY), sekpopind.Zielwerte(Me.Hauptdiagramm.ZielIndexZ), sekpopind.ID.ToString())
                         End If
                     Next
 
