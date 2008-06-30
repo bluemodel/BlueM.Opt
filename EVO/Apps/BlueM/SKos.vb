@@ -19,10 +19,11 @@ Public Class SKos
     '*******************************************************************************
 
     Public Akt_Elemente() As String
-
+    Public Save_TRS(,) as String
+    
     'Funktion für die Kalkulation der Kosten
     '***************************************
-    Public Function calculate_costs(ByVal BlueM1 As BlueM) As Double
+    Public Function Calculate_Costs(ByVal BlueM1 As BlueM) As Double
         Dim costs As Double = 0
         Dim Elementliste(0, 1) As Object
         Dim TRS_Array(,) As Object = {}
@@ -32,9 +33,9 @@ Public Class SKos
         Call create_Elementliste(BlueM1, Elementliste)
 
         'Ermitteln der massgeblichen Größen
-        Call Read_TRS(BlueM1, TRS_Array)
+        Call Read_TRS_Flaeche(BlueM1, TRS_Array)
         Call Read_TAL(BlueM1, TAL_Array)
-
+        
         'Kalkulieren der Kosten für jedes Bauwerk
         Call Acquire_Costs(TRS_Array, TAL_Array, Elementliste)
 
@@ -99,7 +100,75 @@ Public Class SKos
 
     'Länge der Transportstrecken einlesen
     '************************************
-    Private Sub Read_TRS(ByVal BlueM1 As BlueM, ByRef TRS_Array(,) As Object)
+    Private Sub Read_TRS_Laenge(ByVal BlueM1 As BlueM, ByRef TRS_Array(,) As Object)
+
+        'Dim TRS_Array(,) As Object = {}
+        Dim Datei As String = BlueM1.WorkDir & BlueM1.Datensatz & ".TRS"
+
+        Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+        Dim Zeile As String
+        Dim Anz As Integer = 0
+
+        'Anzahl der Zeilen feststellen
+        Do
+            Zeile = StrRead.ReadLine.ToString()
+            If (Zeile.StartsWith("*") = False) Then
+                Anz += 1
+            End If
+        Loop Until StrRead.Peek() = -1
+
+        Dim i As Integer = -1
+        Dim j As Integer = 0
+        ReDim TRS_Array(Anz - 1, 1)
+
+        'Zurück zum Dateianfang und lesen
+        FiStr.Seek(0, SeekOrigin.Begin)
+
+        Dim array() As String
+        Do
+            Zeile = StrRead.ReadLine.ToString()
+            If (Zeile.StartsWith("*") = False) Then
+                array = Zeile.Split("|")
+                'Werte zuweisen
+                TRS_Array(j, 0) = array(1).Trim()
+                TRS_Array(j, 1) = array(3).Trim()
+                j += 1
+            End If
+
+        Loop Until StrRead.Peek() = -1
+
+        StrRead.Close()
+        FiStr.Close()
+
+        'Array bereinigen
+        Dim x, y As Integer
+        Dim TmpArray(TRS_Array.GetUpperBound(0), 1) As String
+        System.Array.Copy(TRS_Array, TmpArray, TRS_Array.Length)
+        x = 0
+
+        For y = 0 To TmpArray.GetUpperBound(0)
+            If Not TmpArray(y, 0) = "" Then
+                If String.Compare(TmpArray(y, 0), 1, "S", 1, 1, True) Then
+                    TmpArray(x, 0) = TmpArray(y, 0)
+                    TmpArray(x, 1) = TmpArray(y, 1)
+                    x += 1
+                End If
+            End If
+        Next
+
+        ReDim TRS_Array(x - 1, 1)
+        For y = 0 To x - 1
+            TRS_Array(y, 0) = TmpArray(y, 0)
+            TRS_Array(y, 1) = TmpArray(y, 1)
+        Next
+
+    End Sub
+
+    'Flächen der Transportstrecken einlesen
+    '**************************************
+    Public Shared Sub Read_TRS_Flaeche(ByVal BlueM1 As BlueM, ByRef TRS_Array(,) As Object)
 
         'Dim TRS_Array(,) As Object = {}
         Dim Datei As String = BlueM1.WorkDir & BlueM1.Datensatz & ".TRS"
@@ -166,7 +235,8 @@ Public Class SKos
     End Sub
 
     'Volumen der Talsperren einlesen
-    Private Sub Read_TAL(ByVal BlueM1 As BlueM, ByRef TAl_Array(,) As Object)
+    '*******************************
+    Public Sub Read_TAL(ByVal BlueM1 As BlueM, ByRef TAl_Array(,) As Object)
 
         'Dim TAL_Array(,) As Object = {}
         Dim Datei As String = BlueM1.WorkDir & BlueM1.Datensatz & ".TAL"
