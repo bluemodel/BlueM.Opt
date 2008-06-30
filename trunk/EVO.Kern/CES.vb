@@ -1120,7 +1120,7 @@ Public Class CES
         '--------------------------------
 
         '! Sekundär_QB wird hier nicht berücksichtigt da die PES Generationen !
-        '! wegen der reduzierung auf Locations entkoppelt ist                 !
+        '! wegen der Reduzierung auf Locations entkoppelt                     !
         Dim Fake_SekundärQb(-1) As Individuum
         Dim Func1 As New Kern.Functions(n_PES_Childs, Settings.PES.n_Eltern, Settings.PES.SekPop.is_Begrenzung, Settings.CES.n_PES_MemSecPop, Settings.CES.n_PES_Interact, False, iAktGen + 1)
         Call Func1.EsEltern_Pareto(NDSorting, Fake_SekundärQb, PES_Parents_pLoc)
