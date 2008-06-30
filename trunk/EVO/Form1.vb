@@ -407,6 +407,9 @@ Partial Class Form1
 
                             'Original ModellParameter schreiben
                             Call Sim1.Write_ModellParameter()
+
+                            'Die Original Gerinneflaechen für SKos einlesen
+                            'Call Sim1.skos.
                     End Select
 
                     'EVO_Einstellungen einrichten
