@@ -20,6 +20,28 @@ Public Class SKos
 
     Public Akt_Elemente() As String
     Public Save_TRS(,) as String
+
+    Public Structure TRS
+
+        Dim Name as String
+        Dim Laenge as Double
+
+        Dim A_Breite_Sohle as Double
+
+        Dim B1_Höhe_Gerinne as Double
+        Dim B2_Breite_Ufer as Double
+
+        Dim C1_Höhe_FPlain as Double
+        Dim C2_Breite_Vorl as Double
+
+        Dim D1_Höhe_Rand as Double
+        Dim D2_Breite_Rand as Double
+
+    End Structure
+
+    Dim TRS_Orig(-1) as TRS
+    Dim TRS_Akt(-1) as TRS
+
     
     'Funktion für die Kalkulation der Kosten
     '***************************************
@@ -33,7 +55,7 @@ Public Class SKos
         Call create_Elementliste(BlueM1, Elementliste)
 
         'Ermitteln der massgeblichen Größen
-        Call Read_TRS_Flaeche(BlueM1, TRS_Array)
+        Call Read_TRS_Laenge(BlueM1, TRS_Array)
         Call Read_TAL(BlueM1, TAL_Array)
         
         'Kalkulieren der Kosten für jedes Bauwerk
@@ -166,9 +188,18 @@ Public Class SKos
 
     End Sub
 
+    'Flächen der Original Transportstrecken einlesen
+    '***********************************************
+    Public Sub Read_TRS_Orig_Daten(ByVal BlueM1 As BlueM)
+
+        Call Read_TRS_Daten(BlueM1, TRS_Orig)
+
+    End Sub
+
+
     'Flächen der Transportstrecken einlesen
     '**************************************
-    Public Shared Sub Read_TRS_Flaeche(ByVal BlueM1 As BlueM, ByRef TRS_Array(,) As Object)
+    Public Shared Sub Read_TRS_Daten(ByVal BlueM1 As BlueM, ByRef TRS_Array() As TRS)
 
         'Dim TRS_Array(,) As Object = {}
         Dim Datei As String = BlueM1.WorkDir & BlueM1.Datensatz & ".TRS"
@@ -188,49 +219,63 @@ Public Class SKos
         Loop Until StrRead.Peek() = -1
 
         Dim i As Integer = -1
-        Dim j As Integer = 0
-        ReDim TRS_Array(Anz - 1, 1)
+        Dim j As Integer = -1
+        Dim count as Integer = 0
 
         'Zurück zum Dateianfang und lesen
         FiStr.Seek(0, SeekOrigin.Begin)
 
-        Dim array() As String
+        Dim Array1() As String
+        Dim Array2() As String
+
         Do
             Zeile = StrRead.ReadLine.ToString()
             If (Zeile.StartsWith("*") = False) Then
-                array = Zeile.Split("|")
+                Array1 = Zeile.Split("|")
+                Array2 = Split(Array1(6))
+
+                'Filtert das Array auf leere Einträge
+                Dim LastNonEmpty As Integer = -1
+                For t As Integer = 0 To Array2.Length - 1
+                    If Array2(t) <> "" Then
+                        LastNonEmpty += 1
+                        Array2(LastNonEmpty) = Array2(t)
+                    End If
+                Next
+                ReDim Preserve Array2(LastNonEmpty)
+
                 'Werte zuweisen
-                TRS_Array(j, 0) = array(1).Trim()
-                TRS_Array(j, 1) = array(3).Trim()
-                j += 1
+                'Prüfen ob neues Element
+                If Array1(1).Trim() <> "" then
+                    j += 1
+                    count = 0
+                    Redim TRS_Array(TRS_Array.GetLength(0))
+                    TRS_Array(j).Name = Array1(1).Trim()
+                    TRS_Array(j).Laenge = Array1(3).Trim()
+                    TRS_Array(j).A_Breite_Sohle = array2(1).Trim()
+                else
+                    count += 1
+                End If
+
+                If count = 1 then
+                    TRS_Array(j).B1_Höhe_Gerinne = Array2(0).Trim()
+                    TRS_Array(j).B2_Breite_Ufer = Array2(1).Trim()
+                else if count = 2
+                    TRS_Array(j).C1_Höhe_FPlain = Array2(1).Trim()
+                    TRS_Array(j).C2_Breite_Vorl = Array2(2).Trim()
+                else if count = 3
+                    TRS_Array(j).D1_Höhe_Rand = Array2(1).Trim()
+                    TRS_Array(j).D2_Breite_Rand = Array2(2).Trim()
+                End If
+
+                'TRS_Array(j, 0) = array(1).Trim()
+                'TRS_Array(j, 1) = array(3).Trim()
+
             End If
 
         Loop Until StrRead.Peek() = -1
 
-        StrRead.Close()
-        FiStr.Close()
 
-        'Array bereinigen
-        Dim x, y As Integer
-        Dim TmpArray(TRS_Array.GetUpperBound(0), 1) As String
-        System.Array.Copy(TRS_Array, TmpArray, TRS_Array.Length)
-        x = 0
-
-        For y = 0 To TmpArray.GetUpperBound(0)
-            If Not TmpArray(y, 0) = "" Then
-                If String.Compare(TmpArray(y, 0), 1, "S", 1, 1, True) Then
-                    TmpArray(x, 0) = TmpArray(y, 0)
-                    TmpArray(x, 1) = TmpArray(y, 1)
-                    x += 1
-                End If
-            End If
-        Next
-
-        ReDim TRS_Array(x - 1, 1)
-        For y = 0 To x - 1
-            TRS_Array(y, 0) = TmpArray(y, 0)
-            TRS_Array(y, 1) = TmpArray(y, 1)
-        Next
 
     End Sub
 
