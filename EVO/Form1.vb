@@ -408,6 +408,9 @@ Partial Class Form1
                             'Original ModellParameter schreiben
                             Call Sim1.Write_ModellParameter()
 
+                            'Original Transportstrecken einlesen
+                            Call Sim1.SKos1.Read_TRS_Orig_Daten(Sim1)
+
                             'Die Original Gerinneflaechen für SKos einlesen
                             'Call Sim1.skos.
                     End Select

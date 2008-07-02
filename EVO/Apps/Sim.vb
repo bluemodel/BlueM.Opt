@@ -75,7 +75,7 @@ Public MustInherit Class Sim
 
     'Kombinatorik
     '------------
-    Protected SKos1 As New SKos()
+    Public SKos1 As New SKos()
 
     Public Structure Struct_Massnahme
         Public Name As String
