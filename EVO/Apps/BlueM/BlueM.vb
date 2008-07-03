@@ -32,9 +32,13 @@ Public Class BlueM
     '---------
     Private bluem_dll As BlueM_EngineDotNetAccess
 
+    'Misc
+    '----
+    Private useKWL As Boolean       'gibt an, ob die KWL-Datei benutzt wird
+
     'IHA
     '---
-    Friend isIHA As Boolean = False
+    Friend isIHA As Boolean
     Friend IHASys As IHWB.IHA.IHAAnalysis
     Friend IHAProc As IHWB.EVO.IHAProcessor
 
@@ -50,6 +54,11 @@ Public Class BlueM
     Public Sub New()
 
         Call MyBase.New()
+
+        'Daten belegen
+        '-------------
+        Me.useKWL = False
+        Me.isIHA = False
 
         'BlueM DLL instanzieren
         '----------------------
@@ -138,8 +147,21 @@ Public Class BlueM
 
         Call MyBase.Read_ZIE()
 
-        'Weiterverarbeitung von ZielReihen:
-        '----------------------------------
+        'BlueM-spezifische Weiterverarbeitung von ZielReihen:
+        '====================================================
+        Dim ziel As Common.Ziel
+
+        'KWL: Feststellen, ob irgendeine Zielfunktion die KWL-Datei benutzt
+        '------------------------------------------------------------------
+        For Each ziel In Common.Manager.List_Ziele
+            If (ziel.Datei = "KWL") Then
+                Me.useKWL = True
+                Exit For
+            End If
+        Next
+
+        'IHA
+        '---
         Dim IHAZielReihe As Wave.Zeitreihe
         Dim IHAStart, IHAEnde As DateTime
 
@@ -148,7 +170,7 @@ Public Class BlueM
         'Gibt es eine IHA-Zielfunktion?
         'HACK: es wird immer nur das erste IHA-Ziel verwendet!
         '------------------------------
-        For Each ziel As Common.Ziel In Common.Manager.List_Ziele
+        For Each ziel In Common.Manager.List_Ziele
             If (ziel.ZielTyp = "IHA") Then
                 'IHA-Berechnung einschalten
                 Me.isIHA = True
@@ -163,7 +185,7 @@ Public Class BlueM
         '--------------------------
         If (Me.isIHA) Then
             'IHAAnalyse-Objekt instanzieren
-            Me.IHASys = New IHWB.IHA.IHAAnalysis(Me.WorkDir & "IHA\", IHAZielreihe, IHAStart, IHAEnde)
+            Me.IHASys = New IHWB.IHA.IHAAnalysis(Me.WorkDir & "IHA\", IHAZielReihe, IHAStart, IHAEnde)
 
             'IHAProcessor-Objekt instanzieren
             Me.IHAProc = New IHWB.EVO.IHAProcessor()
@@ -355,11 +377,9 @@ Public Class BlueM
 
             'ggf. KWL-Datei einlesen
             '-----------------------
-            'TODO: Man könnte noch überprüfen, 
-            ' ob es überhaupt eine Zielfunktion gibt, 
-            ' die auf KWL-Ergebnisse zugreift
-            Dim KWLpath As String = Me.WorkDir & Me.Datensatz & ".KWL"
-            If (File.Exists(KWLpath)) Then
+            If (Me.useKWL) Then
+
+                Dim KWLpath As String = Me.WorkDir & Me.Datensatz & ".KWL"
 
                 Dim KWLtmp As Wave.WEL = New Wave.WEL(KWLpath, True)
 
