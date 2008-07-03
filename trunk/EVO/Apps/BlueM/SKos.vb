@@ -246,14 +246,14 @@ Public Class SKos
 
                 'Werte zuweisen
                 'Prüfen ob neues Element
-                If Array1(1).Trim() <> "" then
+                If Array1(1).Trim() <> "" And Array1(2).trim = "3" then
                     j += 1
                     count = 0
-                    Redim TRS_Array(TRS_Array.GetLength(0))
+                    ReDim Preserve TRS_Array(TRS_Array.GetLength(0))
                     TRS_Array(j).Name = Array1(1).Trim()
                     TRS_Array(j).Laenge = Array1(3).Trim()
                     TRS_Array(j).A_Breite_Sohle = array2(1).Trim()
-                else
+                ElseIf Array1(1).Trim() = "" Then
                     count += 1
                 End If
 
@@ -266,16 +266,10 @@ Public Class SKos
                 else if count = 3
                     TRS_Array(j).D1_Höhe_Rand = Array2(1).Trim()
                     TRS_Array(j).D2_Breite_Rand = Array2(2).Trim()
+                    count = 0
                 End If
-
-                'TRS_Array(j, 0) = array(1).Trim()
-                'TRS_Array(j, 1) = array(3).Trim()
-
             End If
-
         Loop Until StrRead.Peek() = -1
-
-
 
     End Sub
 
