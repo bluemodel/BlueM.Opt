@@ -64,12 +64,15 @@ Public Class SKos
         'Bauwerksliste wird erstellt
         Call create_Elementliste(BlueM1, Elementliste)
 
-        'Ermitteln der massgeblichen Größen
+        'Ermitteln der massgeblichen Größen aus den Dateien
         Call Read_TAL(BlueM1, TAL_Array)
         Call Read_TRS_Daten(BlueM1, TRS_Akt)
 
+        'Berechnen der Volumen Differenzen aus der Original TRS und der Aktuellen TRS
+        Call Calc_Volume(TRS_Orig, TRS_Akt)
+
         'Kalkulieren der Kosten für jedes Bauwerk
-        Call Acquire_Costs(TRS_Array, TAL_Array, TRS_Akt, Elementliste)
+        Call Acquire_Costs(TAL_Array, TRS_Akt, Elementliste)
 
         'Kosten aufsummieren
         Dim i, j As Integer
@@ -212,7 +215,7 @@ Public Class SKos
                 ElseIf count = 3 Then
                     TRS_Array(j).D0_Hoehe_Rand = Array2(1)
                     TRS_Array(j).D1_Breite_Rand_L = Array2(2)
-                    TRS_Array(j).D1_Breite_Rand_L = Array2(4)
+                    TRS_Array(j).D2_Breite_Rand_R = Array2(4)
                     count = 0
                 End If
             End If
@@ -228,7 +231,8 @@ Public Class SKos
     Private Sub Calc_Volume(ByVal TRS_Orig() As TRS, ByVal TRS_Act() As TRS)
 
         Dim i  As Integer
-        Dim L1, L2, H1, H2, F1, F2, Fges_orig, Fges_Act, Delta_L, Delta_R, Delta_Ges As Double
+        Dim L1, L2, H1, H2, F1, F2 As Double
+        Dim FLinks_orig, FLinks_Act, FRechts_orig, FRechts_Act, Delta_L, Delta_R, Delta_Ges As Double
 
         For i = 0 To TRS_Orig.GetUpperBound(0)
 
@@ -242,21 +246,7 @@ Public Class SKos
             F1 = L1 * H1
             F2 = L2 * H2
 
-            Fges_orig = F1 + F2
-
-            'Linke Seite Aktuell
-            '*******************
-            L1 = TRS_Act(i).C1_Breite_Vorl_L - TRS_Act(i).B1_Breite_Ufer_L
-            L2 = TRS_Act(i).D1_Breite_Rand_L - TRS_Act(i).C1_Breite_Vorl_L
-            H1 = (TRS_Act(i).B0_Hoehe_Gerinne + TRS_Act(i).C0_Hoehe_FPlain) / 2
-            H2 = (TRS_Act(i).C0_Hoehe_FPlain + TRS_Act(i).D0_Hoehe_Rand) / 2
-
-            F1 = L1 * H1
-            F2 = L2 * H2
-
-            Fges_Act = F1 + F2
-
-            Delta_L = Fges_orig - Fges_Act
+            FLinks_orig = F1 + F2
 
             'Rechte Seite Original
             '*********************
@@ -268,7 +258,19 @@ Public Class SKos
             F1 = L1 * H1
             F2 = L2 * H2
 
-            Fges_orig = F1 + F2
+            FRechts_orig = F1 + F2
+
+            'Linke Seite Aktuell
+            '*******************
+            L1 = TRS_Act(i).C1_Breite_Vorl_L - TRS_Act(i).B1_Breite_Ufer_L
+            L2 = TRS_Act(i).D1_Breite_Rand_L - TRS_Act(i).C1_Breite_Vorl_L
+            H1 = (TRS_Act(i).B0_Hoehe_Gerinne + TRS_Act(i).C0_Hoehe_FPlain) / 2
+            H2 = (TRS_Act(i).C0_Hoehe_FPlain + TRS_Act(i).D0_Hoehe_Rand) / 2
+
+            F1 = L1 * H1
+            F2 = L2 * H2
+
+            FLinks_Act = F1 + F2
 
             'Rechte Seite Aktuell
             '********************
@@ -280,9 +282,10 @@ Public Class SKos
             F1 = L1 * H1
             F2 = L2 * H2
 
-            Fges_Act = F1 + F2
+            FRechts_Act = F1 + F2
 
-            Delta_R = Fges_orig - Fges_Act
+            Delta_L = FLinks_orig - FLinks_Act
+            Delta_R = FRechts_orig - FRechts_Act
 
             Delta_Ges = Delta_L + Delta_R
 
@@ -368,7 +371,7 @@ Public Class SKos
 
     'Weist den Bauwerken die Kosten zu
     '*********************************
-    Private Sub Acquire_Costs(ByVal TRS_Array(,) As Object, ByVal TAL_Array(,) As Object, ByVal TRS_act As TRS(), ByVal Bauwerksliste(,) As Object)
+    Private Sub Acquire_Costs(ByVal TAL_Array(,) As Object, ByVal TRS_act As TRS(), ByVal Bauwerksliste(,) As Object)
 
         Dim i, j As Integer
         Dim gefunden As Boolean = False
