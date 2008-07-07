@@ -27,7 +27,7 @@ Public Class SKos
 
         Dim Name as String
         Dim Laenge As Double
-        Dim Volume As Double
+        Dim DeltaVolume As Double
         Dim Costs As Double
 
         Dim A0_Hoehe_Sohle As Double
@@ -230,7 +230,7 @@ Public Class SKos
     '**************************************************************
     Private Sub Calc_Volume(ByVal TRS_Orig() As TRS, ByVal TRS_Act() As TRS)
 
-        Dim i  As Integer
+        Dim i As Integer
         Dim L1, L2, H1, H2, F1, F2 As Double
         Dim FLinks_orig, FLinks_Act, FRechts_orig, FRechts_Act, Delta_L, Delta_R, Delta_Ges As Double
 
@@ -289,7 +289,7 @@ Public Class SKos
 
             Delta_Ges = Delta_L + Delta_R
 
-            TRS_Act(i).Volume = Delta_Ges * TRS_Act(i).Laenge
+            TRS_Act(i).DeltaVolume = Delta_Ges * TRS_Act(i).Laenge
 
         Next
 
@@ -376,7 +376,6 @@ Public Class SKos
         Dim i, j As Integer
         Dim gefunden As Boolean = False
         Dim Volumen As Double
-        Dim Laenge As Double
 
         For i = 0 To Bauwerksliste.GetUpperBound(0)
             If Bauwerksliste(i, 0).Startswith("T") Then
@@ -389,11 +388,23 @@ Public Class SKos
                     End If
                 Next
             ElseIf Bauwerksliste(i, 0).Startswith("S") Then
+
+                'Länge fürs Meandern wird nicht mehr berechnet
+                '*********************************************
+                'For j = 0 To TRS_act.GetUpperBound(0)
+                '    If Bauwerksliste(i, 0) = TRS_act(j).Name Then
+                '        Laenge = TRS_act(j).Laenge
+                '        'Kalkulation: 100€/lfm
+                '        Bauwerksliste(i, 1) = Laenge * 200
+                '        gefunden = True
+                '    End If
+                'Next
+
+                'Kosten für den Aushub bei Vorland Abgrabungen
                 For j = 0 To TRS_act.GetUpperBound(0)
                     If Bauwerksliste(i, 0) = TRS_act(j).Name Then
-                        Laenge = TRS_act(j).Laenge
-                        'Kalkulation: 100€/lfm
-                        Bauwerksliste(i, 1) = Laenge * 200
+                        'Kalkulation: 20€/m³
+                        Bauwerksliste(i, 1) = TRS_act(j).DeltaVolume * 20
                         gefunden = True
                     End If
                 Next
