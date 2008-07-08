@@ -845,6 +845,7 @@ Partial Class Form1
 
         Dim durchlauf_all As Integer = 0
         Dim serie As Steema.TeeChart.Styles.Series
+        Dim ColorArray(CES1.ModSett.n_Locations, -1) As Object
 
         'Laufvariable für die Generationen
         Dim i_gen, i_ch, i_loc As Integer
@@ -922,8 +923,8 @@ Partial Class Form1
 
                     'Lösung im TeeChart einzeichnen
                     '==============================
-                    If (SIM_Eval_is_OK) Then
-                        Call Me.LösungZeichnen(CES1.Childs(i_ch), 0, 0, i_gen, i_ch)
+                    If (SIM_Eval_is_OK) Then 
+                        Call Me.LösungZeichnen(CES1.Childs(i_ch), 0, 0, i_gen, i_ch, ColorManagement(ColorArray, CES1.Childs(i_ch)))
                     End If
 
                     Eval_Count += 1
@@ -1472,7 +1473,7 @@ Start_Evolutionsrunden:
 
                                     'Lösung zeichnen
                                     If (SIM_Eval_is_OK) Then
-                                        Call Me.LösungZeichnen(ind, PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, PES1.PES_iAkt.iAktNachf)
+                                        Call Me.LösungZeichnen(ind, PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, PES1.PES_iAkt.iAktNachf, Color.Orange)
                                     End If
                             End Select
 
@@ -1561,7 +1562,8 @@ Start_Evolutionsrunden:
 
     'Lösung im Hauptdiagramm eintragen
     '**********************************
-    Private Sub LösungZeichnen(ByVal ind As Common.Individuum, ByVal runde As Integer, ByVal pop As Integer, ByVal gen As Integer, ByVal nachf As Integer)
+    Private Sub LösungZeichnen(ByVal ind As Common.Individuum, ByVal runde As Integer, ByVal pop As Integer, ByVal gen As Integer, ByVal nachf As Integer, _
+                               ByVal Farbe As Color, Optional ByVal ColEach As Boolean = False)
 
         Dim serie As Steema.TeeChart.Styles.Series
 
@@ -1569,9 +1571,9 @@ Start_Evolutionsrunden:
             'SingleObjective
             'xxxxxxxxxxxxxxx
             If (Not ind.Is_Feasible) Then
-                serie = Me.Hauptdiagramm.getSeriesPoint("Population " & (pop + 1).ToString() & " (ungültig)", "Gray")
+                serie = Me.Hauptdiagramm.getSeriesPoint("Population " & (pop + 1).ToString() & " (ungültig)", "Gray", , , ColEach)
             Else
-                serie = Me.Hauptdiagramm.getSeriesPoint("Population " & (pop + 1).ToString())
+                serie = Me.Hauptdiagramm.getSeriesPoint("Population " & (pop + 1).ToString(), , , , ColEach)
             End If
             Call serie.Add(runde * EVO_Einstellungen1.Settings.PES.n_Gen * EVO_Einstellungen1.Settings.PES.n_Nachf + gen * EVO_Einstellungen1.Settings.PES.n_Nachf + nachf, ind.Penalties(0), ind.ID.ToString())
 
@@ -1582,23 +1584,22 @@ Start_Evolutionsrunden:
                 '2D-Diagramm
                 '------------------------------------------------------------------------
                 If (Not ind.Is_Feasible) Then
-                    serie = Me.Hauptdiagramm.getSeriesPoint("Population" & " (ungültig)", "Gray")
+                    serie = Me.Hauptdiagramm.getSeriesPoint("Population" & " (ungültig)", "Gray", , , ColEach)
                 Else
-                    serie = Me.Hauptdiagramm.getSeriesPoint("Population", "Orange")
+                    serie = Me.Hauptdiagramm.getSeriesPoint("Population", "Orange", , , ColEach)
                 End If
-                Call serie.Add(ind.Penalties(0), ind.Penalties(1), ind.ID.ToString())
+                Call serie.Add(ind.Penalties(0), ind.Penalties(1), ind.ID.ToString(), Farbe)
 
             Else
                 '3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
                 '------------------------------------------------------------------------
                 Dim serie3D As Steema.TeeChart.Styles.Points3D
                 If (Not ind.Is_Feasible) Then
-                    serie3D = Me.Hauptdiagramm.getSeries3DPoint("Population" & " (ungültig)", "Gray")
+                    serie3D = Me.Hauptdiagramm.getSeries3DPoint("Population" & " (ungültig)", "Gray", , , ColEach)
                 Else
-                    serie3D = Me.Hauptdiagramm.getSeries3DPoint("Population", "Orange")
+                    serie3D = Me.Hauptdiagramm.getSeries3DPoint("Population", "Orange", , , ColEach)
                 End If
-                Call serie3D.Add(ind.Penalties(0), ind.Penalties(1), ind.Penalties(2), ind.ID.ToString())
-
+                Call serie3D.Add(ind.Penalties(0), ind.Penalties(1), ind.Penalties(2), ind.ID.ToString(), Farbe)
             End If
         End If
     End Sub
@@ -2001,6 +2002,55 @@ Start_Evolutionsrunden:
         Call scatterplot1.BringToFront()
 
     End Sub
+
+    'Speichert die verwendeten Farben für die bisherigen Pfade und generiert neue, falls erforderlich
+    '************************************************************************************************
+    Private Function ColorManagement(ByRef ColorAray(,) As Object, ByVal ind As Common.Individuum) as Color
+        Dim i, j As Integer
+        Dim count As Integer
+        Dim Farbe As Color = Color.White
+
+        'Falls der Pfad schon vorhanden ist wird diese Farbe verwendet
+        For i = 0 To ColorAray.GetUpperBound(1)
+            count = 0
+            For j = 1 To ColorAray.GetUpperBound(0)
+                If ColorAray(j, i) = ind.Path(j - 1) Then
+                    count += 1
+                End If
+            Next
+            If count = ind.Path.GetLength(0) Then
+                Farbe = ColorAray(0, i)
+            End If
+        Next
+
+        'Falls der Pfad nicht vorhanden ist wird eine neue generiert
+        If Farbe = Color.White Then
+            ReDim Preserve ColorAray(ColorAray.GetUpperBound(0), ColorAray.GetLength(1))
+            Dim NeueFarbe As Boolean = True
+            Dim CountFarbe As Integer = 0
+            Do
+                Randomize()
+                Farbe = Drawing.Color.FromArgb(255, CInt(Int((25 * Rnd()) + 1)) * 10, _
+                                                    CInt(Int((25 * Rnd()) + 1)) * 10, _
+                                                    CInt(Int((25 * Rnd()) + 1)) * 10)
+                For i = 0 To ColorAray.GetUpperBound(1)
+                    If Farbe = ColorAray(0, i) Then
+                        NeueFarbe = False
+                    End If
+                Next
+                CountFarbe += 1
+                If CountFarbe > 15000 Then Throw New Exception("Die Anzahl der farben für die verschiedenen Pfade ist erschöpft")
+            Loop Until NeueFarbe = True
+            ColorAray(0, ColorAray.GetUpperBound(1)) = Farbe
+            For i = 1 To ColorAray.GetUpperBound(0)
+                ColorAray(i, ColorAray.GetUpperBound(1)) = ind.Path(i - 1)
+            Next
+        End If
+
+        Return Farbe
+
+    End Function
+
 
 #Region "Lösungsauswahl"
 

@@ -109,7 +109,8 @@ Public Class Diagramm
     Public Function getSeriesPoint(ByVal title As String, _
                                       Optional ByVal colorName As String = "", _
                                       Optional ByVal style As Steema.TeeChart.Styles.PointerStyles = Steema.TeeChart.Styles.PointerStyles.Circle, _
-                                      Optional ByVal size As Integer = 3) As Steema.TeeChart.Styles.Points
+                                      Optional ByVal size As Integer = 3, _
+                                      Optional ByVal ColEach As Boolean = False) As Steema.TeeChart.Styles.Points
 
         Dim i As Integer
         Dim serie As Steema.TeeChart.Styles.Points
@@ -128,6 +129,7 @@ Public Class Diagramm
         serie.Pointer.Style = style
         serie.Pointer.HorizSize = size
         serie.Pointer.VertSize = size
+        serie.ColorEach = ColEach
         If (Not colorName = "") Then
             serie.Color = Drawing.Color.FromName(colorName)
         End If
@@ -175,7 +177,8 @@ Public Class Diagramm
     Public Function getSeries3DPoint(ByVal title As String, _
                                       Optional ByVal colorName As String = "", _
                                       Optional ByVal style As Steema.TeeChart.Styles.PointerStyles = Steema.TeeChart.Styles.PointerStyles.Circle, _
-                                      Optional ByVal size As Integer = 3) As Steema.TeeChart.Styles.Points3D
+                                      Optional ByVal size As Integer = 3, _
+                                      Optional ByVal ColEach As Boolean = False) As Steema.TeeChart.Styles.Points3D
 
         Dim i As Integer
         Dim serie As New Steema.TeeChart.Styles.Points3D
@@ -197,7 +200,7 @@ Public Class Diagramm
         serie.Pointer.Draw3D = True
         serie.Depth = size
         serie.LinePen.Visible = False
-        serie.ColorEach = False
+        serie.ColorEach = ColEach
         If (Not colorName = "") Then
             serie.Color = Drawing.Color.FromName(colorName)
         End If
