@@ -2,6 +2,7 @@ Option Strict Off ' Off ist Default
 Option Explicit On
 Imports System.IO
 Imports System.Management
+Imports IHWB.EVO.Common
 
 '*******************************************************************************
 '*******************************************************************************
@@ -49,6 +50,7 @@ Partial Class Form1
     Dim myPara() As EVO.Common.OptParameter
 
     '**** Verschiedenes ****
+    Dim SIM_Eval_is_OK As Boolean
     Dim isrun As Boolean = False                        'Optimierung läuft
     Dim ispause As Boolean = False                      'Optimierung ist pausiert
 
@@ -893,7 +895,6 @@ Partial Class Form1
 
                 'Do Schleife: Um Modellfehler bzw. Evaluierungsabbrüche abzufangen
                 Dim Eval_Count As Integer = 0
-                Dim SIM_Eval_is_OK As Boolean = True
                 Do
                     CES1.Childs(i_ch).ID = durchlauf_all
                     Call EVO_Opt_Verlauf1.Nachfolger(i_ch + 1)
@@ -912,7 +913,14 @@ Partial Class Form1
                     End If
 
                     'Simulation *************************************************************************
-                    SIM_Eval_is_OK = Sim1.SIM_Evaluierung(CES1.Childs(i_ch))
+                    SIM_Eval_is_OK = False
+
+                    'Der BackgroundWorker startet die Simulation **********
+                    Call BackgroundWorker1.RunWorkerAsync(CES1.Childs(i_ch))
+
+                    While Me.BackgroundWorker1.IsBusy
+                        Application.DoEvents
+                    End While
                     '************************************************************************************
 
                     'HYBRID: Speichert die PES Erfahrung diesen Childs im PES Memory
@@ -2639,6 +2647,59 @@ Start_Evolutionsrunden:
         PhysCPU = PhysCPUarray.Count
 
     End Sub
+
+#Region "BackgroundWorker"
+
+    'BackgroundWorker1 DoWork
+    '************************
+    Private Sub BackgroundWorker1_DoWork(ByVal sender As System.Object, ByVal e As System.ComponentModel.DoWorkEventArgs) _
+                                                    Handles BackgroundWorker1.DoWork
+        Dim SIM_Eval_is_OK As Boolean
+
+        'Retrieve the input arguments *********************************************************
+        Dim Input As Individuum = CType(e.Argument, Individuum)
+        '**************************************************************************************
+
+        'Priority
+        System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.BelowNormal
+
+        ''Settings für den Backgroundworker
+        'BackgroundWorker1.WorkerReportsProgress = True
+        'BackgroundWorker1.WorkerSupportsCancellation = True
+
+        'Job **************************************
+        SIM_Eval_is_OK = Sim1.SIM_Evaluierung(Input)
+
+        ''Progress ********************************
+        'Call BackgroundWorker1.ReportProgress(100)
+        ''*****************************************
+
+        'Return the complete string ******
+        e.Result = SIM_Eval_is_OK
+        '*********************************
+
+    End Sub
+
+        'BackgroundWorker1 RunWorkerCompleted
+    '************************************
+    Private Sub BackgroundWorker1_RunWorkerCompleted(ByVal sender As System.Object, _
+                                                     ByVal e As System.ComponentModel.RunWorkerCompletedEventArgs) _
+                                                     Handles BackgroundWorker1.RunWorkerCompleted
+        SIM_Eval_is_OK = CType(e.Result, Boolean)
+
+    End Sub
+
+    ''BackgroundWorker1 ProgressChanged
+    ''*********************************
+    'Private Sub BackgroundWorker1_ProgressChanged(ByVal sender As System.Object, _
+    '                                              ByVal e As System.ComponentModel.ProgressChangedEventArgs) _
+    '                                              Handles BackgroundWorker1.ProgressChanged
+
+    '    SIM_Eval_is_OK = e.ProgressPercentage
+
+    'End Sub
+
+#End Region 'BackgroundWorker
 
 #End Region 'Methoden
 
