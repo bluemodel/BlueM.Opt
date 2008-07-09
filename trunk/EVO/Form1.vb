@@ -1442,7 +1442,6 @@ Start_Evolutionsrunden:
 
                         'Do Schleife: Um Modellfehler bzw. Evaluierungsabbrüche abzufangen
                         Dim Eval_Count As Integer = 0
-                        Dim SIM_Eval_is_OK As Boolean = True
                         Do
                             'Neues Individuum instanzieren
                             ind = New Common.Individuum("PES", durchlauf)
@@ -1476,8 +1475,16 @@ Start_Evolutionsrunden:
                                     'Vorbereiten des Modelldatensatzes
                                     Call Sim1.PREPARE_Evaluation_PES(myPara)
 
-                                    'Evaluierung des Simulationsmodells
-                                    SIM_Eval_is_OK = Sim1.SIM_Evaluierung(ind)
+                                    'Simulation *************************************************************************
+                                    SIM_Eval_is_OK = False
+
+                                    'Der BackgroundWorker startet die Simulation **********
+                                    Call BackgroundWorker1.RunWorkerAsync(ind)   '*********
+
+                                    While Me.BackgroundWorker1.IsBusy
+                                        Application.DoEvents
+                                    End While
+                                    '************************************************************************************
 
                                     'Lösung zeichnen
                                     If (SIM_Eval_is_OK) Then
