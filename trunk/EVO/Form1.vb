@@ -3,6 +3,7 @@ Option Explicit On
 Imports System.IO
 Imports System.Management
 Imports IHWB.EVO.Common
+Imports System.ComponentModel
 
 '*******************************************************************************
 '*******************************************************************************
@@ -47,11 +48,14 @@ Partial Class Form1
     Dim myPara() As EVO.Common.OptParameter
 
     '**** Verschiedenes ****
-    Dim SIM_Eval_is_OK As Boolean
-    Private PhysCPU As Integer                          'Anzahl physikalischer Prozessoren
-    Private LogCPU As Integer                           'Anzahl logischer Prozessoren
     Dim isrun As Boolean = False                        'Optimierung läuft
     Dim ispause As Boolean = False                      'Optimierung ist pausiert
+
+    '**** Multithreading ****
+    Dim SIM_Eval_is_OK As Boolean
+    Dim BackgroundWorker1 as System.ComponentModel.BackgroundWorker 'Threads für Backgroundworker
+    Private PhysCPU As Integer                                      'Anzahl physikalischer Prozessoren
+    Private LogCPU As Integer                                       'Anzahl logischer Prozessoren
 
     'Dialoge
     Private WithEvents solutionDialog As SolutionDialog
@@ -578,7 +582,11 @@ Partial Class Form1
             dir = My.Computer.FileSystem.SpecialDirectories.Temp & "\"
             Call Me.EVO_Einstellungen1.saveSettings(dir & "EVO_Settings.xml")
 
-            'Try
+            'BackgroundWorker für Multithreading einrichten
+            BackgroundWorker1  = new System.ComponentModel.BackgroundWorker
+            AddHandler BackgroundWorker1.DoWork, AddressOf BackgroundWorker1_DoWork
+            AddHandler BackgroundWorker1.RunWorkerCompleted, AddressOf BackgroundWorker1_RunWorkerCompleted
+            'AddHandler BackgroundWorker1.ProgressChanged, AddressOf BackgroundWorker1_ProgressChanged
 
             Select Case Anwendung
 
@@ -2658,8 +2666,8 @@ Start_Evolutionsrunden:
 
     'BackgroundWorker1 DoWork
     '************************
-    Private Sub BackgroundWorker1_DoWork(ByVal sender As System.Object, ByVal e As System.ComponentModel.DoWorkEventArgs) _
-                                                    Handles BackgroundWorker1.DoWork
+    Private Sub BackgroundWorker1_DoWork(ByVal sender As System.Object, ByVal e As System.ComponentModel.DoWorkEventArgs)
+
         Dim SIM_Eval_is_OK As Boolean
 
         'Retrieve the input arguments *********************************************************
@@ -2689,8 +2697,8 @@ Start_Evolutionsrunden:
         'BackgroundWorker1 RunWorkerCompleted
     '************************************
     Private Sub BackgroundWorker1_RunWorkerCompleted(ByVal sender As System.Object, _
-                                                     ByVal e As System.ComponentModel.RunWorkerCompletedEventArgs) _
-                                                     Handles BackgroundWorker1.RunWorkerCompleted
+                                                     ByVal e As System.ComponentModel.RunWorkerCompletedEventArgs)
+
         SIM_Eval_is_OK = CType(e.Result, Boolean)
 
     End Sub
@@ -2698,8 +2706,7 @@ Start_Evolutionsrunden:
     ''BackgroundWorker1 ProgressChanged
     ''*********************************
     'Private Sub BackgroundWorker1_ProgressChanged(ByVal sender As System.Object, _
-    '                                              ByVal e As System.ComponentModel.ProgressChangedEventArgs) _
-    '                                              Handles BackgroundWorker1.ProgressChanged
+    '                                              ByVal e As System.ComponentModel.ProgressChangedEventArgs)
 
     '    SIM_Eval_is_OK = e.ProgressPercentage
 
