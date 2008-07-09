@@ -47,6 +47,7 @@ Partial Class Form1
         Me.EVO_Einstellungen1 = New IHWB.EVO.EVO_Einstellungen
         Me.EVO_Opt_Verlauf1 = New IHWB.EVO.EVO_Opt_Verlauf
         Me.DForm = New IHWB.EVO.DiagrammForm
+        Me.BackgroundWorker1 = New System.ComponentModel.BackgroundWorker
         Me.GroupBox_Anwendung.SuspendLayout()
         Me.GroupBox_ErgebnisDB.SuspendLayout()
         Me.SuspendLayout()
@@ -263,4 +264,5 @@ Partial Class Form1
     Private WithEvents ComboBox_Methode As System.Windows.Forms.ComboBox
     Private WithEvents Label_Methode As System.Windows.Forms.Label
     Private WithEvents Button_loadRefResult As System.Windows.Forms.Button
+    Friend WithEvents BackgroundWorker1 As System.ComponentModel.BackgroundWorker
 End Class
