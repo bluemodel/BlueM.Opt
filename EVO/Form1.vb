@@ -26,9 +26,6 @@ Partial Class Form1
 
     Private IsInitializing As Boolean
 
-    Private PhysCPU As Integer                              'Anzahl physikalischer Prozessoren
-    Private LogCPU As Integer                               'Anzahl logischer Prozessoren
-
     'Anwendung
     Private Anwendung As String
 
@@ -51,6 +48,8 @@ Partial Class Form1
 
     '**** Verschiedenes ****
     Dim SIM_Eval_is_OK As Boolean
+    Private PhysCPU As Integer                          'Anzahl physikalischer Prozessoren
+    Private LogCPU As Integer                           'Anzahl logischer Prozessoren
     Dim isrun As Boolean = False                        'Optimierung läuft
     Dim ispause As Boolean = False                      'Optimierung ist pausiert
 
