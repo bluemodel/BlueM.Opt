@@ -334,6 +334,7 @@ Public Class BlueM
 
         Try
 
+            'Datensatz übergeben und initialisieren
             Call bluem_dll.Initialize(Me.WorkDir & Me.Datensatz)
 
             Dim SimEnde As DateTime = BlueM_EngineDotNetAccess.DateTime(bluem_dll.GetSimulationEndDate())
@@ -343,6 +344,9 @@ Public Class BlueM
                 Call bluem_dll.PerformTimeStep()
             Loop
 
+            'Simulation abschliessen
+            Call bluem_dll.Finish()
+
             'Simulation erfolgreich
             simOK = True
 
@@ -350,11 +354,16 @@ Public Class BlueM
 
             'Simulationsfehler aufgetreten
             MsgBox(ex.Message, MsgBoxStyle.Exclamation, "BlueM")
+
+            'Simulation abschliessen
+            Call bluem_dll.Finish()
+
+            'Simulation nicht erfolgreich
             simOK = False
 
         Finally
 
-            Call bluem_dll.Finish()
+            'Ressourcen deallokieren
             Call bluem_dll.Dispose()
 
         End Try
