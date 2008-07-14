@@ -926,7 +926,7 @@ Partial Class Form1
                     Call BackgroundWorker1.RunWorkerAsync(CES1.Childs(i_ch))
 
                     While Me.BackgroundWorker1.IsBusy
-                        System.Threading.Thread.Sleep(100)
+                        System.Threading.Thread.Sleep(20)
                         Application.DoEvents
                     End While
                     '************************************************************************************
@@ -1490,6 +1490,7 @@ Start_Evolutionsrunden:
                                     Call BackgroundWorker1.RunWorkerAsync(ind)   '*********
 
                                     While Me.BackgroundWorker1.IsBusy
+                                        System.Threading.Thread.Sleep(20)
                                         Application.DoEvents
                                     End While
                                     '************************************************************************************

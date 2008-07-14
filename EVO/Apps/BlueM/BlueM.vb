@@ -337,10 +337,10 @@ Public Class BlueM
             'Datensatz übergeben und initialisieren
             Call bluem_dll.Initialize(Me.WorkDir & Me.Datensatz)
 
-            Dim SimEnde As DateTime = BlueM_EngineDotNetAccess.DateTime(bluem_dll.GetSimulationEndDate())
+            Dim SimEnde As DateTime = BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll.GetSimulationEndDate())
 
             'Simulationszeitraum 
-            Do While (BlueM_EngineDotNetAccess.DateTime(bluem_dll.GetCurrentTime) <= SimEnde)
+            Do While (BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll.GetCurrentTime) <= SimEnde)
                 Call bluem_dll.PerformTimeStep()
             Loop
 
