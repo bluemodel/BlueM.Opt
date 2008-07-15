@@ -29,6 +29,8 @@ Public MustInherit Class Sim
     Public Datensatz As String                           'Name des zu simulierenden Datensatzes
     Public MustOverride ReadOnly Property Datensatzendung() As String
     Public WorkDir As String                             'Arbeitsverzeichnis für das Blaue Modell
+    Public WorkDirSave As String                         'Arbeitsverzeichnis für das Blaue Modell
+
     Public Event WorkDirChange()                         'Event für Änderung des Arbeitsverzeichnisses
 
     Public SimStart As DateTime                          'Anfangsdatum der Simulation
@@ -148,6 +150,7 @@ Public MustInherit Class Sim
             Me.Datensatz = Path.GetFileNameWithoutExtension(Pfad)
             'Arbeitsverzeichnis bestimmen
             Me.WorkDir = Path.GetDirectoryName(Pfad) & "\"
+            Me.WorkDirSave = Path.GetDirectoryName(Pfad) & "\"
             'Benutzereinstellungen speichern
             My.Settings.Datensatz = Pfad
             Call My.Settings.Save()
@@ -1367,14 +1370,9 @@ Handler:
 
     'Evaluiert die Kinderchen mit Hilfe des Simulationsmodells
     '*********************************************************
-    Public Function SIM_Evaluierung(ByRef Indi As Common.Individuum) As Boolean
+    Public Sub SIM_Auswertung(ByRef Indi As Common.Individuum)
 
         Dim i As Short
-
-        SIM_Evaluierung = False
-
-        'Modell Starten
-        If Not launchSim() Then Exit Function
 
         'Qualitätswerte berechnen
         For i = 0 To Common.Manager.AnzZiele - 1
@@ -1389,9 +1387,7 @@ Handler:
         'Lösung abspeichern
         Call Me.OptResult.addSolution(Indi)
 
-        SIM_Evaluierung = True
-
-    End Function
+    End Sub
 
     'VG_ Test Tagesganglinie mit Autokalibrierung
     'VG *****************************************
@@ -1454,7 +1450,11 @@ Handler:
 
     'SimModell ausführen (simulieren)
     '********************************
-    Public MustOverride Function launchSim() As Boolean
+    Public MustOverride Function launchSim(ByVal WorkFolder As String, Optional ByVal Thread_ID As Integer = 0) As Boolean
+    
+    'Simulationsergebnis verarbeiten
+    '-------------------------------
+    Public MustOverride Sub launchSimVerarbeiten()
 
 #End Region 'Evaluierung
 
@@ -1879,6 +1879,65 @@ Handler:
     End Function
 
 #End Region 'SimErgebnisse lesen
+
+#Region "Multithreading"
+
+    'Datensätze für Multithreading kopieren
+    '**************************************
+    Public Sub coppyDatensatz(byVal n_Proz As Integer)
+        Dim i As Integer = 1
+        For i = 1 to n_Proz - 1
+            Dim Source As String = WorkDir
+            Dim Dest As String = WorkDir & "Thread_" & i & "\"
+            Dim Name As String
+            
+            'Löschen um den Inhalt zu entsorgen
+            If Directory.Exists(Dest) Then
+                Directory.Delete(Dest, True)
+            End If
+
+            'Anlegen
+            Directory.CreateDirectory(Dest)
+
+            'Kopieren
+            For Each foundFile As String In My.Computer.FileSystem.GetFiles(Source, _
+                                                                            FileIO.SearchOption.SearchTopLevelOnly, "*.*")
+                Name = foundfile.Remove(0,foundFile.LastIndexOf("\") + 1)
+                My.Computer.FileSystem.CopyFile(foundFile, Dest & Name)
+            Next
+        Next
+    End Sub
+
+    'Datensätze für Multithreading löschen
+    '*************************************
+    Public Sub deleteDatensatz(byVal n_Proz As Integer)
+        Dim i As Integer
+        For i = 1 to n_Proz - 1
+
+            If Directory.Exists(WorkDir & "Thread_" & i) Then
+                Directory.Delete(WorkDir & "Thread_" & i, True)
+            End If
+        Next
+    End Sub
+
+    'Gibt den aktuellen Datensatz zurück
+    '***********************************
+    Public Function getWorkDir(ByVal Thread_ID as Integer) As String
+
+        getWorkDir = ""
+        
+        'Nulle setzt den Pfad zurück
+        If Thread_ID = 0 then
+            getWorkDir = Me.WorkDirSave
+        Else If Thread_ID > 0 then
+            getWorkDir = Me.WorkDirSave & "Thread_" & Thread_ID & "\"
+        End If
+
+        Return getWorkDir
+        
+    End Function
+
+#End Region  'Multithreading
 
 #End Region 'Methoden
 

@@ -11,7 +11,7 @@ Public Class Scan
 
     Private input As Wave.WEL
 
-    Public Overrides Function launchSim() As Boolean
+    Public Overrides Function launchSim(ByVal WorkFolder As String, Optional ByVal Thread_ID As Integer = 0) As Boolean
 
         Dim i, j, k, AnzZeil As Integer
         Dim parameterdatei, Zeile, ZeilenArray(), stoffe(), tmp() As String
@@ -101,6 +101,12 @@ Public Class Scan
         Return True
 
     End Function
+        
+    'Simulationsergebnis verarbeiten
+    '-------------------------------
+    Public Overrides Sub launchSimVerarbeiten()
+
+    End Sub
 
     Public Overrides Function QWert(ByVal ziel As Common.Ziel) As Double
 

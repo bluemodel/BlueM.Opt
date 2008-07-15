@@ -28,9 +28,9 @@ Public Class BlueM
         End Get
     End Property
 
-    'BlueM DLL
-    '---------
-    Private bluem_dll As BlueM_EngineDotNetAccess
+    ''BlueM DLL
+    ''---------
+    'Private bluem_dll() As BlueM_EngineDotNetAccess
 
     'Misc
     '----
@@ -51,7 +51,7 @@ Public Class BlueM
 
     'Konstruktor
     '***********
-    Public Sub New()
+    Public Sub New(byVal n_Proz As Integer)
 
         Call MyBase.New()
 
@@ -60,16 +60,21 @@ Public Class BlueM
         Me.useKWL = False
         Me.isIHA = False
 
-        'BlueM DLL instanzieren
-        '----------------------
-        Dim dll_path As String
-        dll_path = System.Windows.Forms.Application.StartupPath() & "\Apps\BlueM\BlueM.dll"
+        'Dim dll_path As String
+        'dll_path = System.Windows.Forms.Application.StartupPath() & "\Apps\BlueM\BlueM.dll"
 
-        If (File.Exists(dll_path)) Then
-            bluem_dll = New BlueM_EngineDotNetAccess(dll_path)
-        Else
-            Throw New Exception("BlueM.dll nicht gefunden!")
-        End If
+        ''BlueM DLL instanzieren je nach Anzahl der Prozessoren
+        ''-----------------------------------------------------
+        'ReDim bluem_dll(n_Proz - 1)
+        'Dim i As Integer
+
+        'For i = 0 to n_Proz - 1
+        '    If (File.Exists(dll_path)) Then
+        '        bluem_dll(i) = New BlueM_EngineDotNetAccess(dll_path)
+        '    Else
+        '        Throw New Exception("BlueM.dll nicht gefunden!")
+        '    End If
+        'Next
 
     End Sub
 
@@ -328,95 +333,95 @@ Public Class BlueM
 
     'BlauesModell ausführen (simulieren)
     '***********************************
-    Public Overrides Function launchSim() As Boolean
+    Public Overrides Function launchSim(ByVal WorkFolder As String, Optional ByVal Thread_ID As Integer = 0) As Boolean
 
-        Dim simOK As Boolean
+        'Dim simOK As Boolean
 
-        Try
+        'Try
 
-            'Datensatz übergeben und initialisieren
-            Call bluem_dll.Initialize(Me.WorkDir & Me.Datensatz)
+        '    'Datensatz übergeben und initialisieren
+        '    Call bluem_dll(Thread_ID).Initialize(WorkFolder & Me.Datensatz)
 
-            Dim SimEnde As DateTime = BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll.GetSimulationEndDate())
+        '    Dim SimEnde As DateTime = BlueM_EngineDotNetAccess.DateTime(bluem_dll(Thread_ID).GetSimulationEndDate())
 
-            'Simulationszeitraum 
-            Do While (BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll.GetCurrentTime) <= SimEnde)
-                Call bluem_dll.PerformTimeStep()
-            Loop
+        '    'Simulationszeitraum 
+        '    Do While (BlueM_EngineDotNetAccess.DateTime(bluem_dll(Thread_ID).GetCurrentTime) <= SimEnde)
+        '        Call bluem_dll(Thread_ID).PerformTimeStep()
+        '    Loop
 
-            'Simulation abschliessen
-            Call bluem_dll.Finish()
+        '    'Simulation abschliessen
+        '    Call bluem_dll(Thread_ID).Finish()
 
-            'Simulation erfolgreich
-            simOK = True
+        '    'Simulation erfolgreich
+        '    simOK = True
 
-        Catch ex As Exception
+        'Catch ex As Exception
 
-            'Simulationsfehler aufgetreten
-            MsgBox(ex.Message, MsgBoxStyle.Exclamation, "BlueM")
+        '    'Simulationsfehler aufgetreten
+        '    MsgBox(ex.Message, MsgBoxStyle.Exclamation, "BlueM")
 
-            'Simulation abschliessen
-            Call bluem_dll.Finish()
+        '    'Simulation abschliessen
+        '    Call bluem_dll(Thread_ID).Finish()
 
-            'Simulation nicht erfolgreich
-            simOK = False
+        '    'Simulation nicht erfolgreich
+        '    simOK = False
 
-        Finally
+        'Finally
 
-            'Ressourcen deallokieren
-            Call bluem_dll.Dispose()
+        '    'Ressourcen deallokieren
+        '    Call bluem_dll(Thread_ID).Dispose()
 
-        End Try
+        'End Try
 
-        'Simulationsergebnis verarbeiten
-        '-------------------------------
-        If (simOK) Then
+        'Return simOK
 
-            'Altes Simulationsergebnis löschen
-            Me.SimErgebnis.Clear()
+    End Function
 
-            'WEL-Datei einlesen
-            '------------------
-            Dim WELtmp As Wave.WEL = New Wave.WEL(Me.WorkDir & Me.Datensatz & ".WEL", True)
+    'Simulationsergebnis verarbeiten
+    '-------------------------------
+    Public Overrides Sub launchSimVerarbeiten()
+    
+        'Altes Simulationsergebnis löschen
+        Me.SimErgebnis.Clear()
+
+        'WEL-Datei einlesen
+        '------------------
+        Dim WELtmp As Wave.WEL = New Wave.WEL(Me.WorkDir & Me.Datensatz & ".WEL", True)
+
+        'Reihen zu Simulationsergebnis hinzufügen
+        For Each zre As Wave.Zeitreihe In WELtmp.Zeitreihen
+            Me.SimErgebnis.Add(zre, zre.ToString())
+        Next
+
+        'ggf. KWL-Datei einlesen
+        '-----------------------
+        If (Me.useKWL) Then
+
+            Dim KWLpath As String = Me.WorkDir & Me.Datensatz & ".KWL"
+
+            Dim KWLtmp As Wave.WEL = New Wave.WEL(KWLpath, True)
 
             'Reihen zu Simulationsergebnis hinzufügen
-            For Each zre As Wave.Zeitreihe In WELtmp.Zeitreihen
+            For Each zre As Wave.Zeitreihe In KWLtmp.Zeitreihen
                 Me.SimErgebnis.Add(zre, zre.ToString())
             Next
 
-            'ggf. KWL-Datei einlesen
-            '-----------------------
-            If (Me.useKWL) Then
-
-                Dim KWLpath As String = Me.WorkDir & Me.Datensatz & ".KWL"
-
-                Dim KWLtmp As Wave.WEL = New Wave.WEL(KWLpath, True)
-
-                'Reihen zu Simulationsergebnis hinzufügen
-                For Each zre As Wave.Zeitreihe In KWLtmp.Zeitreihen
-                    Me.SimErgebnis.Add(zre, zre.ToString())
-                Next
-
-            End If
-
-            'Bei IHA-Berechnung jetzt IHA-Software ausführen
-            '-----------------------------------------------
-            If (Me.isIHA) Then
-                'IHA-Ziel raussuchen und Simulationsreihe übergeben
-                'HACK: es wird immer das erste IHA-Ziel verwendet!
-                For Each ziel As Common.Ziel In Common.Manager.List_Ziele
-                    If (ziel.ZielTyp = "IHA") Then
-                        Call Me.IHASys.calculate_IHA(Me.SimErgebnis(ziel.SimGr))
-                        Exit For
-                    End If
-                Next
-            End If
-
         End If
 
-        Return simOK
+        'Bei IHA-Berechnung jetzt IHA-Software ausführen
+        '-----------------------------------------------
+        If (Me.isIHA) Then
+            'IHA-Ziel raussuchen und Simulationsreihe übergeben
+            'HACK: es wird immer das erste IHA-Ziel verwendet!
+            For Each ziel As Common.Ziel In Common.Manager.List_Ziele
+                If (ziel.ZielTyp = "IHA") Then
+                    Call Me.IHASys.calculate_IHA(Me.SimErgebnis(ziel.SimGr))
+                    Exit For
+                End If
+            Next
+        End If
 
-    End Function
+    End Sub
 
 #End Region 'Evaluierung
 

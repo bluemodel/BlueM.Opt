@@ -4,6 +4,7 @@ Imports System.IO
 Imports System.Management
 Imports IHWB.EVO.Common
 Imports System.ComponentModel
+Imports IHWB.BlueM.DllAdapter
 
 '*******************************************************************************
 '*******************************************************************************
@@ -52,10 +53,15 @@ Partial Class Form1
     Dim ispause As Boolean = False                      'Optimierung ist pausiert
 
     '**** Multithreading ****
-    Dim SIM_Eval_is_OK As Boolean
+    Dim SIM_Eval_is_OK() As Boolean
     Dim BackgroundWorker1 as System.ComponentModel.BackgroundWorker 'Threads für Backgroundworker
+    Dim BackgroundWorker2 as System.ComponentModel.BackgroundWorker 'Threads für Backgroundworker
     Private PhysCPU As Integer                                      'Anzahl physikalischer Prozessoren
     Private LogCPU As Integer                                       'Anzahl logischer Prozessoren
+    Private Progress_BW_1 As Integer = 0
+    Private Progress_BW_2 As Integer = 0
+    'BlueM DLL
+    Public bluem_dll() As BlueM_EngineDotNetAccess
 
     'Dialoge
     Private WithEvents solutionDialog As SolutionDialog
@@ -85,6 +91,7 @@ Partial Class Form1
 
         'Anzahl der Prozessoren wird ermittelt
         Anzahl_Prozessoren(PhysCPU, LogCPU)
+        Redim SIM_Eval_is_OK(PhysCPU - 1)
 
         'XP-look
         System.Windows.Forms.Application.EnableVisualStyles()
@@ -100,6 +107,24 @@ Partial Class Form1
 
         'Ende der Initialisierung
         IsInitializing = False
+
+        '*******************************
+        'BluM_DLL
+        Dim dll_path As String
+        dll_path = System.Windows.Forms.Application.StartupPath() & "\Apps\BlueM\BlueM.dll"
+
+        'BlueM DLL instanzieren je nach Anzahl der Prozessoren
+        '-----------------------------------------------------
+        ReDim bluem_dll(PhysCPU - 1)
+        Dim i As Integer
+
+        For i = 0 to PhysCPU - 1
+            If (File.Exists(dll_path)) Then
+                bluem_dll(i) = New BlueM_EngineDotNetAccess(dll_path)
+            Else
+                Throw New Exception("BlueM.dll nicht gefunden!")
+            End If
+        Next
 
     End Sub
 
@@ -167,7 +192,7 @@ Partial Class Form1
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Objekt der Klasse BlueM initialisieren
-                    Sim1 = New BlueM()
+                    Sim1 = New BlueM(PhysCPU)
 
 
                 Case ANW_SMUSI 'Anwendung Smusi
@@ -584,8 +609,13 @@ Partial Class Form1
 
             'BackgroundWorker für Multithreading einrichten
             BackgroundWorker1  = new System.ComponentModel.BackgroundWorker
-            AddHandler BackgroundWorker1.DoWork, AddressOf BackgroundWorker1_DoWork
-            AddHandler BackgroundWorker1.RunWorkerCompleted, AddressOf BackgroundWorker1_RunWorkerCompleted
+            AddHandler BackgroundWorker1.DoWork, AddressOf BackgroundWorker1_DoWork_1
+            AddHandler BackgroundWorker1.RunWorkerCompleted, AddressOf BackgroundWorker1_RunWorkerCompleted_1
+            'AddHandler BackgroundWorker1.ProgressChanged, AddressOf BackgroundWorker1_ProgressChanged
+
+            BackgroundWorker2  = new System.ComponentModel.BackgroundWorker
+            AddHandler BackgroundWorker2.DoWork, AddressOf BackgroundWorker2_DoWork_2
+            AddHandler BackgroundWorker2.RunWorkerCompleted, AddressOf BackgroundWorker2_RunWorkerCompleted_2
             'AddHandler BackgroundWorker1.ProgressChanged, AddressOf BackgroundWorker1_ProgressChanged
 
             Select Case Anwendung
@@ -594,7 +624,8 @@ Partial Class Form1
 
                     Select Case Method
                         Case METH_RESET
-                            Call Sim1.launchSim()
+                            Call Sim1.launchSim(me.Sim1.WorkDirSave)
+                            Call Sim1.launchSimVerarbeiten()
                         Case METH_SENSIPLOT
                             Call STARTEN_SensiPlot()
                         Case METH_PES
@@ -741,7 +772,9 @@ Partial Class Form1
 
                 'Evaluieren
                 'TODO: Fehlerbehandlung bei Simulationsfehler
-                isOK = Sim1.SIM_Evaluierung(ind)
+                isOK = Sim1.launchSim(Sim1.WorkDirSave)
+                If isOK then Sim1.launchSimVerarbeiten()
+                If isOK then Sim1.SIM_Auswertung(ind)
 
                 'BUG 253: Verletzte Constraints bei SensiPlot kenntlich machen?
 
@@ -839,9 +872,15 @@ Partial Class Form1
     Private Sub STARTEN_CES_or_HYBRID()
 
         'Hypervolumen instanzieren
-        '-------------------------
+        '*************************
         Dim Hypervolume As EVO.MO_Indicators.Indicators
         Hypervolume = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(EVO.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, Common.Manager.AnzPenalty)
+
+        'Datensätze für Multithreading kopieren
+        '**************************************
+        If PhysCPU > 1 then
+            Call sim1.coppyDatensatz(PhysCPU)
+        End If
 
         'CES initialisieren
         '******************
@@ -897,60 +936,90 @@ Partial Class Form1
 
             'Child Schleife
             'xxxxxxxxxxxxxx
-            For i_ch = 0 To CES1.Settings.CES.n_Childs - 1
-                durchlauf_all += 1
-
+            For i_ch = 0 To CES1.Settings.CES.n_Childs - 1 step 2
+                
+                Dim Thread As Integer
                 'Do Schleife: Um Modellfehler bzw. Evaluierungsabbrüche abzufangen
                 Dim Eval_Count As Integer = 0
                 Do
-                    CES1.Childs(i_ch).ID = durchlauf_all
-                    Call EVO_Opt_Verlauf1.Nachfolger(i_ch + 1)
+                    For Thread = 0 to PhysCPU - 1
 
-                    '****************************************
-                    'Aktueller Pfad wird an Sim zurückgegeben
-                    'Bereitet das BlaueModell für die Kombinatorik vor
-                    Call Sim1.PREPARE_Evaluation_CES(CES1.Childs(i_ch).Path, CES1.Childs(i_ch).Get_All_Loc_Elem)
+                        durchlauf_all += 1
+                        Sim1.WorkDir = Sim1.getWorkDir(Thread)
+                        CES1.Childs(i_ch + Thread).Thread_Folder = Sim1.getWorkDir(Thread)
+                        CES1.Childs(i_ch + Thread).Thread_ID = Thread
 
-                    'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
-                    '***************************************************************
-                    If Method = METH_HYBRID And EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer Then
-                        If Sim1.Reduce_OptPara_and_ModPara(CES1.Childs(i_ch).Get_All_Loc_Elem) Then
-                            Call Sim1.PREPARE_Evaluation_PES(CES1.Childs(i_ch).Get_All_Loc_PES_Para)
+                        CES1.Childs(i_ch + Thread).ID = durchlauf_all
+                        Call EVO_Opt_Verlauf1.Nachfolger(i_ch + Thread + 1)
+
+                        '****************************************
+                        'Aktueller Pfad wird an Sim zurückgegeben
+                        'Bereitet das BlaueModell für die Kombinatorik vor
+                        Call Sim1.PREPARE_Evaluation_CES(CES1.Childs(i_ch + Thread).Path, CES1.Childs(i_ch + Thread).Get_All_Loc_Elem)
+
+                        'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
+                        '***************************************************************
+                        If Method = METH_HYBRID And EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer Then
+                            If Sim1.Reduce_OptPara_and_ModPara(CES1.Childs(i_ch + Thread).Get_All_Loc_Elem) Then
+                                Call Sim1.PREPARE_Evaluation_PES(CES1.Childs(i_ch + Thread).Get_All_Loc_PES_Para)
+                            End If
                         End If
-                    End If
 
-                    'Simulation *************************************************************************
-                    SIM_Eval_is_OK = False
+                        'Der BackgroundWorker startet die Simulation **********
+                        If Thread = 0
+                            SIM_Eval_is_OK(Thread) = False
+                            Call BackgroundWorker1.RunWorkerAsync(CES1.Childs(i_ch + Thread))
+                        Else
+                            SIM_Eval_is_OK(Thread) = False
+                            Call BackgroundWorker2.RunWorkerAsync(CES1.Childs(i_ch + Thread))
+                        End If
 
-                    'Der BackgroundWorker startet die Simulation **********
-                    Call BackgroundWorker1.RunWorkerAsync(CES1.Childs(i_ch))
+                        'Für ungerade Kinder Zahlen
+                        if (i_ch + Thread) = CES1.Settings.CES.n_Childs - 1 then
+                            Exit For
+                        End If
 
-                    While Me.BackgroundWorker1.IsBusy
+                    Next
+
+                    While Me.BackgroundWorker1.IsBusy or Me.BackgroundWorker2.IsBusy 
                         System.Threading.Thread.Sleep(20)
                         Application.DoEvents
                     End While
-                    '************************************************************************************
 
-                    'HYBRID: Speichert die PES Erfahrung diesen Childs im PES Memory
-                    '***************************************************************
-                    If Method = METH_HYBRID And EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer Then
-                        Call CES1.Memory_Store(i_ch, i_gen)
-                    End If
-
-                    'Lösung im TeeChart einzeichnen
-                    '==============================
-                    If (SIM_Eval_is_OK) Then 
-                        Call Me.LösungZeichnen(CES1.Childs(i_ch), 0, 0, i_gen, i_ch, ColorManagement(ColorArray, CES1.Childs(i_ch)))
-                    End If
-
-                    Eval_Count += 1
+                    Eval_Count += 2
                     If (Eval_Count >= 10) Then
                         Throw New Exception("Es konnte kein gültiger Datensatz erzeugt werden!")
                     End If
 
-                Loop While SIM_Eval_is_OK = False
+                Loop While SIM_Eval_is_OK(0)= False or SIM_Eval_is_OK(1) = False
 
-                System.Windows.Forms.Application.DoEvents()
+                '************************************************************************************
+                For Thread = 0 to PhysCPU - 1
+
+                    Sim1.WorkDir = Sim1.getWorkDir(Thread)
+
+                    If SIM_Eval_is_OK(Thread) then Sim1.launchSimVerarbeiten()
+                    If SIM_Eval_is_OK(Thread) then Sim1.SIM_Auswertung(CES1.Childs(i_ch + Thread))
+
+                    'HYBRID: Speichert die PES Erfahrung diesen Childs im PES Memory
+                    '***************************************************************
+                    If Method = METH_HYBRID And EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer Then
+                        Call CES1.Memory_Store(i_ch + Thread, i_gen)
+                    End If
+
+                    'Lösung im TeeChart einzeichnen
+                    '==============================
+                    If (SIM_Eval_is_OK(Thread)) Then 
+                        Call Me.LösungZeichnen(CES1.Childs(i_ch + Thread), 0, 0, i_gen, i_ch + Thread, ColorManagement(ColorArray, CES1.Childs(i_ch + Thread)))
+                    End If
+
+                    System.Windows.Forms.Application.DoEvents()
+
+                    'Für ungerade Kinder Zahlen
+                    If (i_ch + Thread) = CES1.Settings.CES.n_Childs - 1 then
+                        Exit For
+                    End If
+                Next
             Next
             '^ ENDE der Child Schleife
             'xxxxxxxxxxxxxxxxxxxxxxx
@@ -1029,6 +1098,10 @@ Partial Class Form1
         If Method = METH_HYBRID And EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Sequencial_1 Then
             Call Start_PES_after_CES()
         End If
+
+        'Datensätze für Multithreading löschen
+        '*************************************
+        Call sim1.deleteDatensatz(PhysCPU)
 
     End Sub
 
@@ -1224,7 +1297,9 @@ Partial Class Form1
             Call Sim1.PREPARE_Evaluation_PES(aktuellePara)
 
             'Evaluierung des Simulationsmodells (ToDo: Validätsprüfung fehlt)
-            SIM_Eval_is_OK = Sim1.SIM_Evaluierung(ind)
+            SIM_Eval_is_OK = Sim1.launchSim(sim1.WorkDirSave)
+            If SIM_Eval_is_OK then Call Sim1.launchSimVerarbeiten()
+            If SIM_Eval_is_OK then Call Sim1.SIM_Auswertung(ind)
 
             'Lösung im TeeChart einzeichnen
             '------------------------------
@@ -1259,7 +1334,9 @@ Partial Class Form1
                 Call Sim1.PREPARE_Evaluation_PES(aktuellePara)
 
                 'Evaluierung des Simulationsmodells
-                SIM_Eval_is_OK = Sim1.SIM_Evaluierung(ind)
+                SIM_Eval_is_OK = Sim1.launchSim(sim1.WorkDirSave)
+                If SIM_Eval_is_OK then Call Sim1.launchSimVerarbeiten()
+                If SIM_Eval_is_OK then Call Sim1.SIM_Auswertung(ind)
 
                 'Lösung im TeeChart einzeichnen
                 '------------------------------
@@ -1288,7 +1365,7 @@ Partial Class Form1
                     Call Sim1.PREPARE_Evaluation_PES(aktuellePara)
 
                     'Evaluierung des Simulationsmodells
-                    SIM_Eval_is_OK = Sim1.SIM_Evaluierung(ind)
+                    Call Sim1.SIM_Auswertung(ind)
 
                     'Lösung im TeeChart einzeichnen
                     '------------------------------
@@ -1484,7 +1561,7 @@ Start_Evolutionsrunden:
                                     Call Sim1.PREPARE_Evaluation_PES(myPara)
 
                                     'Simulation *************************************************************************
-                                    SIM_Eval_is_OK = False
+                                    SIM_Eval_is_OK(0) = False
 
                                     'Der BackgroundWorker startet die Simulation **********
                                     Call BackgroundWorker1.RunWorkerAsync(ind)   '*********
@@ -1495,8 +1572,11 @@ Start_Evolutionsrunden:
                                     End While
                                     '************************************************************************************
 
+                                    If SIM_Eval_is_OK(0) then Sim1.launchSimVerarbeiten()
+                                    If SIM_Eval_is_OK(0) then Sim1.SIM_Auswertung(ind)
+
                                     'Lösung zeichnen
-                                    If (SIM_Eval_is_OK) Then
+                                    If (SIM_Eval_is_OK(0)) Then
                                         Call Me.LösungZeichnen(ind, PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, PES1.PES_iAkt.iAktNachf, Color.Orange)
                                     End If
                             End Select
@@ -1506,7 +1586,7 @@ Start_Evolutionsrunden:
                                 Throw New Exception("Es konnte kein gültiger Datensatz erzeugt werden!")
                             End If
 
-                        Loop While SIM_Eval_is_OK = False
+                        Loop While SIM_Eval_is_OK(0) = False
 
                         'SELEKTIONSPROZESS Schritt 1
                         '###########################
@@ -2241,7 +2321,8 @@ Start_Evolutionsrunden:
             'xxxxxxxxxxxxxxxxxxxx
 
             'Simulieren
-            isOK = Sim1.launchSim()
+            isOK = Sim1.launchSim(Sim1.WorkDirSave)
+            If isOK then call Sim1.launchSimVerarbeiten()
 
             'Sonderfall IHA-Berechnung
             If (isIHA) Then
@@ -2662,13 +2743,26 @@ Start_Evolutionsrunden:
         Next
         PhysCPU = PhysCPUarray.Count
 
+        'HACK -----
+        LogCPU = 2
+        PhysCPU = 2
+        '----------
+
     End Sub
 
 #Region "BackgroundWorker"
 
     'BackgroundWorker1 DoWork
     '************************
-    Private Sub BackgroundWorker1_DoWork(ByVal sender As System.Object, ByVal e As System.ComponentModel.DoWorkEventArgs)
+    Private Sub BackgroundWorker1_DoWork_1(ByVal sender As System.Object, ByVal e As System.ComponentModel.DoWorkEventArgs)
+
+        'Progress **************************
+        Progress_BW_1 = 0
+        '***********************************
+
+        'Settings für den Backgroundworker
+        BackgroundWorker1.WorkerReportsProgress = True
+        'BackgroundWorker1.WorkerSupportsCancellation = True
 
         Dim SIM_Eval_is_OK As Boolean
 
@@ -2676,19 +2770,62 @@ Start_Evolutionsrunden:
         Dim Input As Individuum = CType(e.Argument, Individuum)
         '**************************************************************************************
 
+        'Warten auf den zweiten
+        While progress_BW_2 = 10
+                System.Threading.Thread.Sleep(100)
+        End While
+
+        'Progress **************************
+        Progress_BW_1 = 10
+        '***********************************
+
         'Priority
         System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.BelowNormal
 
-        ''Settings für den Backgroundworker
-        'BackgroundWorker1.WorkerReportsProgress = True
-        'BackgroundWorker1.WorkerSupportsCancellation = True
+        Try
 
-        'Job **************************************
-        SIM_Eval_is_OK = Sim1.SIM_Evaluierung(Input)
+            'Datensatz übergeben und initialisieren
+            Call bluem_dll(input.Thread_ID).Initialize(input.Thread_Folder & "tsim")
 
-        ''Progress ********************************
-        'Call BackgroundWorker1.ReportProgress(100)
-        ''*****************************************
+            Dim SimEnde As DateTime = BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll(input.Thread_ID).GetSimulationEndDate())
+
+            'Progress **************************
+            BackgroundWorker1.ReportProgress(20)
+            Progress_BW_1 = 20
+            '***********************************
+
+            'Simulationszeitraum 
+            Do While (BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll(input.Thread_ID).GetCurrentTime) <= SimEnde)
+                Call bluem_dll(input.Thread_ID).PerformTimeStep()
+            Loop
+
+            'Simulation abschliessen
+            Call bluem_dll(input.Thread_ID).Finish()
+
+            'Simulation erfolgreich
+            SIM_Eval_is_OK = True
+
+        Catch ex As Exception
+
+            'Simulationsfehler aufgetreten
+            MsgBox(ex.Message, MsgBoxStyle.Exclamation, "BlueM")
+
+            'Simulation abschliessen
+            Call bluem_dll(input.Thread_ID).Finish()
+
+            'Simulation nicht erfolgreich
+            SIM_Eval_is_OK = False
+
+        Finally
+
+            'Ressourcen deallokieren
+            Call bluem_dll(input.Thread_ID).Dispose()
+
+        End Try
+
+        'Progress **************************
+        Progress_BW_1 = 100
+        '***********************************
 
         'Return the complete string ******
         e.Result = SIM_Eval_is_OK
@@ -2698,22 +2835,123 @@ Start_Evolutionsrunden:
 
         'BackgroundWorker1 RunWorkerCompleted
     '************************************
-    Private Sub BackgroundWorker1_RunWorkerCompleted(ByVal sender As System.Object, _
+    Private Sub BackgroundWorker1_RunWorkerCompleted_1(ByVal sender As System.Object, _
                                                      ByVal e As System.ComponentModel.RunWorkerCompletedEventArgs)
 
-        SIM_Eval_is_OK = CType(e.Result, Boolean)
+        SIM_Eval_is_OK(0) = CType(e.Result, Boolean)
 
     End Sub
 
-    ''BackgroundWorker1 ProgressChanged
-    ''*********************************
-    'Private Sub BackgroundWorker1_ProgressChanged(ByVal sender As System.Object, _
-    '                                              ByVal e As System.ComponentModel.ProgressChangedEventArgs)
+    'BackgroundWorker1 ProgressChanged
+    '*********************************
+    Private Sub BackgroundWorker1_ProgressChanged_1(ByVal sender As System.Object, _
+                                                  ByVal e As System.ComponentModel.ProgressChangedEventArgs)
 
-    '    SIM_Eval_is_OK = e.ProgressPercentage
+        Progress_BW_1 = e.ProgressPercentage
 
-    'End Sub
+    End Sub
 
+
+    'BackgroundWorker2 DoWork
+    '************************
+    Private Sub BackgroundWorker2_DoWork_2(ByVal sender As System.Object, ByVal e As System.ComponentModel.DoWorkEventArgs)
+        
+        'Progress **************************
+        Progress_BW_2 = 0
+        '***********************************
+
+        'Settings für den Backgroundworker
+        BackgroundWorker2.WorkerReportsProgress = True
+        'BackgroundWorker2.WorkerSupportsCancellation = True
+
+        Dim SIM_Eval_is_OK As Boolean
+
+        'Retrieve the input arguments *********************************************************
+        Dim Input As Individuum = CType(e.Argument, Individuum)
+        '**************************************************************************************
+        
+        'Warten auf den ersten
+        While progress_BW_1 = 10
+                System.Threading.Thread.Sleep(100)
+        End While
+
+        'Progress **************************
+        Progress_BW_2 = 10
+        '***********************************
+
+        'Priorit
+        System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.BelowNormal
+
+        'Job **************************************
+        'SIM_Eval_is_OK = Sim1.launchSim(Input.Thread_Folder, input.ThreadI_ID)
+
+        Try
+
+            'Datensatz übergeben und initialisieren
+            Call bluem_dll(input.Thread_ID).Initialize(input.Thread_Folder & "tsim")
+
+            Dim SimEnde As DateTime = BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll(input.Thread_ID).GetSimulationEndDate())
+
+            'Progress **************************
+            Progress_BW_2 = 20
+            '***********************************
+
+            'Simulationszeitraum 
+            Do While (BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll(input.Thread_ID).GetCurrentTime) <= SimEnde)
+                Call bluem_dll(input.Thread_ID).PerformTimeStep()
+            Loop
+
+            'Simulation abschliessen
+            Call bluem_dll(input.Thread_ID).Finish()
+
+            'Simulation erfolgreich
+            SIM_Eval_is_OK = True
+
+        Catch ex As Exception
+
+            'Simulationsfehler aufgetreten
+            MsgBox(ex.Message, MsgBoxStyle.Exclamation, "BlueM")
+
+            'Simulation abschliessen
+            Call bluem_dll(input.Thread_ID).Finish()
+
+            'Simulation nicht erfolgreich
+            SIM_Eval_is_OK = False
+
+        Finally
+
+            'Ressourcen deallokieren
+            Call bluem_dll(input.Thread_ID).Dispose()
+
+        End Try
+
+        'Progress **************************
+        Progress_BW_2 = 100
+        '***********************************
+
+        'Return the complete string ******
+        e.Result = SIM_Eval_is_OK
+        '*********************************
+
+    End Sub
+
+    'BackgroundWorker2 RunWorkerCompleted
+    '************************************
+    Private Sub BackgroundWorker2_RunWorkerCompleted_2(ByVal sender As System.Object, _
+                                                     ByVal e As System.ComponentModel.RunWorkerCompletedEventArgs)
+
+        SIM_Eval_is_OK(1) = CType(e.Result, Boolean)
+
+    End Sub
+
+    'BackgroundWorker2 ProgressChanged
+    '*********************************
+    Private Sub BackgroundWorker2_ProgressChanged_2(ByVal sender As System.Object, _
+                                                  ByVal e As System.ComponentModel.ProgressChangedEventArgs)
+        
+        Progress_BW_2 = e.ProgressPercentage
+
+    End Sub
 #End Region 'BackgroundWorker
 
 #End Region 'Methoden

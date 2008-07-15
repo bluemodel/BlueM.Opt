@@ -46,7 +46,7 @@ Public Class SWMM
     End Sub
 
     
-    Public Overrides Function launchSim() As Boolean
+    Public Overrides Function launchSim(ByVal WorkFolder As String, Optional ByVal Thread_ID As Integer = 0) As Boolean
 
         'Aktuelles Verzeichnis bestimmen
         Dim currentDir As String = CurDir()
@@ -85,6 +85,12 @@ Public Class SWMM
         FiStr.Close()
 
     End Function
+
+    'Simulationsergebnis verarbeiten
+    '-------------------------------
+    Public Overrides Sub launchSimVerarbeiten()
+
+    End Sub
 
     Protected Overrides Sub Read_Kombinatorik()
 
