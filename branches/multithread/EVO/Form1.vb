@@ -58,8 +58,6 @@ Partial Class Form1
     Dim BackgroundWorker2 as System.ComponentModel.BackgroundWorker 'Threads für Backgroundworker
     Private PhysCPU As Integer                                      'Anzahl physikalischer Prozessoren
     Private LogCPU As Integer                                       'Anzahl logischer Prozessoren
-    Private Progress_BW_1 As Integer = 0
-    Private Progress_BW_2 As Integer = 0
     'BlueM DLL
     Public bluem_dll() As BlueM_EngineDotNetAccess
 
@@ -982,7 +980,7 @@ Partial Class Form1
                     Next
 
                     While Me.BackgroundWorker1.IsBusy or Me.BackgroundWorker2.IsBusy 
-                        System.Threading.Thread.Sleep(20)
+                        System.Threading.Thread.Sleep(100)
                         Application.DoEvents
                     End While
 
@@ -2756,12 +2754,8 @@ Start_Evolutionsrunden:
     '************************
     Private Sub BackgroundWorker1_DoWork_1(ByVal sender As System.Object, ByVal e As System.ComponentModel.DoWorkEventArgs)
 
-        'Progress **************************
-        Progress_BW_1 = 0
-        '***********************************
-
-        'Settings für den Backgroundworker
-        BackgroundWorker1.WorkerReportsProgress = True
+        'Settings für den Backgroundworker *****************
+        'BackgroundWorker1.WorkerReportsProgress = True
         'BackgroundWorker1.WorkerSupportsCancellation = True
 
         Dim SIM_Eval_is_OK As Boolean
@@ -2770,29 +2764,16 @@ Start_Evolutionsrunden:
         Dim Input As Individuum = CType(e.Argument, Individuum)
         '**************************************************************************************
 
-        'Warten auf den zweiten
-        While progress_BW_2 = 10
-                System.Threading.Thread.Sleep(100)
-        End While
-
-        'Progress **************************
-        Progress_BW_1 = 10
-        '***********************************
-
         'Priority
         System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.BelowNormal
 
         Try
-
-            'Datensatz übergeben und initialisieren
-            Call bluem_dll(input.Thread_ID).Initialize(input.Thread_Folder & "tsim")
+            SyncLock bluem_dll
+                'Datensatz übergeben und initialisieren
+                Call bluem_dll(input.Thread_ID).Initialize(input.Thread_Folder & "tsim")
+            End SyncLock
 
             Dim SimEnde As DateTime = BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll(input.Thread_ID).GetSimulationEndDate())
-
-            'Progress **************************
-            BackgroundWorker1.ReportProgress(20)
-            Progress_BW_1 = 20
-            '***********************************
 
             'Simulationszeitraum 
             Do While (BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll(input.Thread_ID).GetCurrentTime) <= SimEnde)
@@ -2822,10 +2803,6 @@ Start_Evolutionsrunden:
             Call bluem_dll(input.Thread_ID).Dispose()
 
         End Try
-
-        'Progress **************************
-        Progress_BW_1 = 100
-        '***********************************
 
         'Return the complete string ******
         e.Result = SIM_Eval_is_OK
@@ -2847,7 +2824,7 @@ Start_Evolutionsrunden:
     Private Sub BackgroundWorker1_ProgressChanged_1(ByVal sender As System.Object, _
                                                   ByVal e As System.ComponentModel.ProgressChangedEventArgs)
 
-        Progress_BW_1 = e.ProgressPercentage
+        'Progress_BW_1 = e.ProgressPercentage
 
     End Sub
 
@@ -2856,12 +2833,8 @@ Start_Evolutionsrunden:
     '************************
     Private Sub BackgroundWorker2_DoWork_2(ByVal sender As System.Object, ByVal e As System.ComponentModel.DoWorkEventArgs)
         
-        'Progress **************************
-        Progress_BW_2 = 0
-        '***********************************
-
         'Settings für den Backgroundworker
-        BackgroundWorker2.WorkerReportsProgress = True
+        'BackgroundWorker2.WorkerReportsProgress = True
         'BackgroundWorker2.WorkerSupportsCancellation = True
 
         Dim SIM_Eval_is_OK As Boolean
@@ -2869,15 +2842,6 @@ Start_Evolutionsrunden:
         'Retrieve the input arguments *********************************************************
         Dim Input As Individuum = CType(e.Argument, Individuum)
         '**************************************************************************************
-        
-        'Warten auf den ersten
-        While progress_BW_1 = 10
-                System.Threading.Thread.Sleep(100)
-        End While
-
-        'Progress **************************
-        Progress_BW_2 = 10
-        '***********************************
 
         'Priorit
         System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.BelowNormal
@@ -2887,14 +2851,12 @@ Start_Evolutionsrunden:
 
         Try
 
-            'Datensatz übergeben und initialisieren
-            Call bluem_dll(input.Thread_ID).Initialize(input.Thread_Folder & "tsim")
-
+            SyncLock bluem_dll
+                'Datensatz übergeben und initialisieren
+                Call bluem_dll(input.Thread_ID).Initialize(input.Thread_Folder & "tsim")
+            End SyncLock
+            
             Dim SimEnde As DateTime = BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll(input.Thread_ID).GetSimulationEndDate())
-
-            'Progress **************************
-            Progress_BW_2 = 20
-            '***********************************
 
             'Simulationszeitraum 
             Do While (BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll(input.Thread_ID).GetCurrentTime) <= SimEnde)
@@ -2925,10 +2887,6 @@ Start_Evolutionsrunden:
 
         End Try
 
-        'Progress **************************
-        Progress_BW_2 = 100
-        '***********************************
-
         'Return the complete string ******
         e.Result = SIM_Eval_is_OK
         '*********************************
@@ -2949,7 +2907,7 @@ Start_Evolutionsrunden:
     Private Sub BackgroundWorker2_ProgressChanged_2(ByVal sender As System.Object, _
                                                   ByVal e As System.ComponentModel.ProgressChangedEventArgs)
         
-        Progress_BW_2 = e.ProgressPercentage
+        'Progress_BW_2 = e.ProgressPercentage
 
     End Sub
 #End Region 'BackgroundWorker
