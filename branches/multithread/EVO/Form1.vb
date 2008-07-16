@@ -5,6 +5,7 @@ Imports System.Management
 Imports IHWB.EVO.Common
 Imports System.ComponentModel
 Imports IHWB.BlueM.DllAdapter
+Imports System.Threading
 
 '*******************************************************************************
 '*******************************************************************************
@@ -54,8 +55,8 @@ Partial Class Form1
 
     '**** Multithreading ****
     Dim SIM_Eval_is_OK() As Boolean
-    Dim BackgroundWorker1 as System.ComponentModel.BackgroundWorker 'Threads für Backgroundworker
-    Dim BackgroundWorker2 as System.ComponentModel.BackgroundWorker 'Threads für Backgroundworker
+    Dim My_C_Thread() As CThread
+    Dim MyThread() As Thread
     Private PhysCPU As Integer                                      'Anzahl physikalischer Prozessoren
     Private LogCPU As Integer                                       'Anzahl logischer Prozessoren
     'BlueM DLL
@@ -124,6 +125,9 @@ Partial Class Form1
             End If
         Next
 
+        'Anzahl der Threads
+        ReDim My_C_Thread(PhysCPU - 1)
+        ReDim MyThread(PhysCPU - 1)
     End Sub
 
 #Region "Initialisierung der Anwendungen"
@@ -605,17 +609,6 @@ Partial Class Form1
             dir = My.Computer.FileSystem.SpecialDirectories.Temp & "\"
             Call Me.EVO_Einstellungen1.saveSettings(dir & "EVO_Settings.xml")
 
-            'BackgroundWorker für Multithreading einrichten
-            BackgroundWorker1  = new System.ComponentModel.BackgroundWorker
-            AddHandler BackgroundWorker1.DoWork, AddressOf BackgroundWorker1_DoWork_1
-            AddHandler BackgroundWorker1.RunWorkerCompleted, AddressOf BackgroundWorker1_RunWorkerCompleted_1
-            'AddHandler BackgroundWorker1.ProgressChanged, AddressOf BackgroundWorker1_ProgressChanged
-
-            BackgroundWorker2  = new System.ComponentModel.BackgroundWorker
-            AddHandler BackgroundWorker2.DoWork, AddressOf BackgroundWorker2_DoWork_2
-            AddHandler BackgroundWorker2.RunWorkerCompleted, AddressOf BackgroundWorker2_RunWorkerCompleted_2
-            'AddHandler BackgroundWorker1.ProgressChanged, AddressOf BackgroundWorker1_ProgressChanged
-
             Select Case Anwendung
 
                 Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM
@@ -963,15 +956,12 @@ Partial Class Form1
                             End If
                         End If
 
-                        'Der BackgroundWorker startet die Simulation **********
-                        If Thread = 0
-                            SIM_Eval_is_OK(Thread) = False
-                            Call BackgroundWorker1.RunWorkerAsync(CES1.Childs(i_ch + Thread))
-                        Else
-                            SIM_Eval_is_OK(Thread) = False
-                            Call BackgroundWorker2.RunWorkerAsync(CES1.Childs(i_ch + Thread))
-                        End If
-
+                        SIM_Eval_is_OK(Thread) = False
+                        My_C_Thread(Thread) = new CThread(CES1.Childs(i_ch + Thread).Thread_Folder, bluem_dll(thread))
+                        MyThread(Thread) = new Thread(AddressOf My_C_Thread(Thread).Thread)
+                        MyThread(Thread).IsBackground = True
+                        MyThread(Thread).Start()
+                        
                         'Für ungerade Kinder Zahlen
                         if (i_ch + Thread) = CES1.Settings.CES.n_Childs - 1 then
                             Exit For
@@ -979,10 +969,18 @@ Partial Class Form1
 
                     Next
 
-                    While Me.BackgroundWorker1.IsBusy or Me.BackgroundWorker2.IsBusy 
-                        System.Threading.Thread.Sleep(100)
+                    While MyThread(MyThread.GetUpperBound(0)).IsAlive
+                        System.Threading.Thread.Sleep(20)
                         Application.DoEvents
                     End While
+
+                    For Each Thr As thread In MyThread
+                        Thr.Join
+                    Next
+
+                    For Thread = 0 to SIM_Eval_is_OK.GetUpperBound(0)
+                        SIM_Eval_is_OK(Thread) = My_C_Thread(Thread).Sim_Is_OK
+                    Next
 
                     Eval_Count += 2
                     If (Eval_Count >= 10) Then
@@ -1555,19 +1553,27 @@ Start_Evolutionsrunden:
 
                                 Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM
 
+                                    Sim1.WorkDir = Sim1.getWorkDir(0)
+                                    ind.Thread_Folder = Sim1.getWorkDir(0)
+                                    ind.Thread_ID = 0
+
                                     'Vorbereiten des Modelldatensatzes
                                     Call Sim1.PREPARE_Evaluation_PES(myPara)
-
                                     'Simulation *************************************************************************
+
                                     SIM_Eval_is_OK(0) = False
+                                    My_C_Thread(0) = new CThread(ind.Thread_Folder, bluem_dll(0))
+                                    MyThread(0) = new Thread(AddressOf My_C_Thread(0).Thread)
+                                    MyThread(0).IsBackground = True
+                                    MyThread(0).Start()
 
-                                    'Der BackgroundWorker startet die Simulation **********
-                                    Call BackgroundWorker1.RunWorkerAsync(ind)   '*********
-
-                                    While Me.BackgroundWorker1.IsBusy
+                                    While MyThread(0).IsAlive
                                         System.Threading.Thread.Sleep(20)
                                         Application.DoEvents
                                     End While
+
+                                    MyThread(0).Join
+
                                     '************************************************************************************
 
                                     If SIM_Eval_is_OK(0) then Sim1.launchSimVerarbeiten()
@@ -2748,169 +2754,73 @@ Start_Evolutionsrunden:
 
     End Sub
 
-#Region "BackgroundWorker"
+#Region "Threading"
 
-    'BackgroundWorker1 DoWork
-    '************************
-    Private Sub BackgroundWorker1_DoWork_1(ByVal sender As System.Object, ByVal e As System.ComponentModel.DoWorkEventArgs)
+    Public Class CThread
 
-        'Settings für den Backgroundworker *****************
-        'BackgroundWorker1.WorkerReportsProgress = True
-        'BackgroundWorker1.WorkerSupportsCancellation = True
+        'Private Thread_ID As Integer
+        Private WorkFolder As String
+        Private bluem_dll As BlueM_EngineDotNetAccess
+        Private Is_OK As Boolean
 
-        Dim SIM_Eval_is_OK As Boolean
+        Public Sub New(ByVal _WorkFolder As String, ByRef _bluem_dll As BlueM_EngineDotNetAccess)
+            Me.WorkFolder = _WorkFolder
+            Me.bluem_dll = _bluem_dll
+        End Sub
 
-        'Retrieve the input arguments *********************************************************
-        Dim Input As Individuum = CType(e.Argument, Individuum)
-        '**************************************************************************************
-
-        'Priority
-        System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.BelowNormal
-
-        Try
-            SyncLock bluem_dll
-                'Datensatz übergeben und initialisieren
-                Call bluem_dll(input.Thread_ID).Initialize(input.Thread_Folder & "tsim")
-            End SyncLock
-
-            Dim SimEnde As DateTime = BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll(input.Thread_ID).GetSimulationEndDate())
-
-            'Simulationszeitraum 
-            Do While (BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll(input.Thread_ID).GetCurrentTime) <= SimEnde)
-                Call bluem_dll(input.Thread_ID).PerformTimeStep()
-            Loop
-
-            'Simulation abschliessen
-            Call bluem_dll(input.Thread_ID).Finish()
-
-            'Simulation erfolgreich
-            SIM_Eval_is_OK = True
-
-        Catch ex As Exception
-
-            'Simulationsfehler aufgetreten
-            MsgBox(ex.Message, MsgBoxStyle.Exclamation, "BlueM")
-
-            'Simulation abschliessen
-            Call bluem_dll(input.Thread_ID).Finish()
-
-            'Simulation nicht erfolgreich
-            SIM_Eval_is_OK = False
-
-        Finally
-
-            'Ressourcen deallokieren
-            Call bluem_dll(input.Thread_ID).Dispose()
-
-        End Try
-
-        'Return the complete string ******
-        e.Result = SIM_Eval_is_OK
-        '*********************************
-
-    End Sub
-
-        'BackgroundWorker1 RunWorkerCompleted
-    '************************************
-    Private Sub BackgroundWorker1_RunWorkerCompleted_1(ByVal sender As System.Object, _
-                                                     ByVal e As System.ComponentModel.RunWorkerCompletedEventArgs)
-
-        SIM_Eval_is_OK(0) = CType(e.Result, Boolean)
-
-    End Sub
-
-    'BackgroundWorker1 ProgressChanged
-    '*********************************
-    Private Sub BackgroundWorker1_ProgressChanged_1(ByVal sender As System.Object, _
-                                                  ByVal e As System.ComponentModel.ProgressChangedEventArgs)
-
-        'Progress_BW_1 = e.ProgressPercentage
-
-    End Sub
-
-
-    'BackgroundWorker2 DoWork
-    '************************
-    Private Sub BackgroundWorker2_DoWork_2(ByVal sender As System.Object, ByVal e As System.ComponentModel.DoWorkEventArgs)
-        
-        'Settings für den Backgroundworker
-        'BackgroundWorker2.WorkerReportsProgress = True
-        'BackgroundWorker2.WorkerSupportsCancellation = True
-
-        Dim SIM_Eval_is_OK As Boolean
-
-        'Retrieve the input arguments *********************************************************
-        Dim Input As Individuum = CType(e.Argument, Individuum)
-        '**************************************************************************************
-
-        'Priorit
-        System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.BelowNormal
-
-        'Job **************************************
-        'SIM_Eval_is_OK = Sim1.launchSim(Input.Thread_Folder, input.ThreadI_ID)
-
-        Try
-
-            SyncLock bluem_dll
-                'Datensatz übergeben und initialisieren
-                Call bluem_dll(input.Thread_ID).Initialize(input.Thread_Folder & "tsim")
-            End SyncLock
+        Public Sub Thread()
             
-            Dim SimEnde As DateTime = BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll(input.Thread_ID).GetSimulationEndDate())
+            'Priority
+            System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.BelowNormal
 
-            'Simulationszeitraum 
-            Do While (BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll(input.Thread_ID).GetCurrentTime) <= SimEnde)
-                Call bluem_dll(input.Thread_ID).PerformTimeStep()
-            Loop
+            Try
+                SyncLock bluem_dll
+                    'Datensatz übergeben und initialisieren
+                    Call bluem_dll.Initialize(WorkFolder & "tsim")
+                End SyncLock
 
-            'Simulation abschliessen
-            Call bluem_dll(input.Thread_ID).Finish()
+                Dim SimEnde As DateTime = BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll.GetSimulationEndDate())
 
-            'Simulation erfolgreich
-            SIM_Eval_is_OK = True
+                'Simulationszeitraum 
+                Do While (BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll.GetCurrentTime) <= SimEnde)
+                    Call bluem_dll.PerformTimeStep()
+                Loop
 
-        Catch ex As Exception
+                'Simulation abschliessen
+                Call bluem_dll.Finish()
 
-            'Simulationsfehler aufgetreten
-            MsgBox(ex.Message, MsgBoxStyle.Exclamation, "BlueM")
+                'Simulation erfolgreich
+                me.Is_OK = True
 
-            'Simulation abschliessen
-            Call bluem_dll(input.Thread_ID).Finish()
+            Catch ex As Exception
 
-            'Simulation nicht erfolgreich
-            SIM_Eval_is_OK = False
+                'Simulationsfehler aufgetreten
+                MsgBox(ex.Message, MsgBoxStyle.Exclamation, "BlueM")
 
-        Finally
+                'Simulation abschliessen
+                Call bluem_dll.Finish()
 
-            'Ressourcen deallokieren
-            Call bluem_dll(input.Thread_ID).Dispose()
+                'Simulation nicht erfolgreich
+                me.Is_OK = False
 
-        End Try
+            Finally
 
-        'Return the complete string ******
-        e.Result = SIM_Eval_is_OK
-        '*********************************
+                'Ressourcen deallokieren
+                Call bluem_dll.Dispose()
 
-    End Sub
+            End Try
 
-    'BackgroundWorker2 RunWorkerCompleted
-    '************************************
-    Private Sub BackgroundWorker2_RunWorkerCompleted_2(ByVal sender As System.Object, _
-                                                     ByVal e As System.ComponentModel.RunWorkerCompletedEventArgs)
+        End Sub
 
-        SIM_Eval_is_OK(1) = CType(e.Result, Boolean)
+        Public Function Sim_Is_OK As Boolean
 
-    End Sub
+            Sim_Is_OK = Me.Is_OK
 
-    'BackgroundWorker2 ProgressChanged
-    '*********************************
-    Private Sub BackgroundWorker2_ProgressChanged_2(ByVal sender As System.Object, _
-                                                  ByVal e As System.ComponentModel.ProgressChangedEventArgs)
-        
-        'Progress_BW_2 = e.ProgressPercentage
+        End Function
 
-    End Sub
-#End Region 'BackgroundWorker
+    End Class
+
+#End Region 'Threading
 
 #End Region 'Methoden
 
