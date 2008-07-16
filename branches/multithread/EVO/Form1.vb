@@ -957,7 +957,7 @@ Partial Class Form1
                         End If
 
                         SIM_Eval_is_OK(Thread) = False
-                        My_C_Thread(Thread) = new CThread(CES1.Childs(i_ch + Thread).Thread_Folder, bluem_dll(thread))
+                        My_C_Thread(Thread) = new CThread(CES1.Childs(i_ch + Thread).Thread_Folder, Sim1.Datensatz, bluem_dll(thread))
                         MyThread(Thread) = new Thread(AddressOf My_C_Thread(Thread).Thread)
                         MyThread(Thread).IsBackground = True
                         MyThread(Thread).Start()
@@ -1562,7 +1562,7 @@ Start_Evolutionsrunden:
                                     'Simulation *************************************************************************
 
                                     SIM_Eval_is_OK(0) = False
-                                    My_C_Thread(0) = new CThread(ind.Thread_Folder, bluem_dll(0))
+                                    My_C_Thread(0) = new CThread(ind.Thread_Folder, Sim1.Datensatz, bluem_dll(0))
                                     MyThread(0) = new Thread(AddressOf My_C_Thread(0).Thread)
                                     MyThread(0).IsBackground = True
                                     MyThread(0).Start()
@@ -2760,11 +2760,13 @@ Start_Evolutionsrunden:
 
         'Private Thread_ID As Integer
         Private WorkFolder As String
+        Private DS_Name As String
         Private bluem_dll As BlueM_EngineDotNetAccess
         Private Is_OK As Boolean
 
-        Public Sub New(ByVal _WorkFolder As String, ByRef _bluem_dll As BlueM_EngineDotNetAccess)
+        Public Sub New(ByVal _WorkFolder As String, ByVal _DS_Name as String, ByRef _bluem_dll As BlueM_EngineDotNetAccess)
             Me.WorkFolder = _WorkFolder
+            Me.DS_Name = _DS_Name
             Me.bluem_dll = _bluem_dll
         End Sub
 
@@ -2776,7 +2778,7 @@ Start_Evolutionsrunden:
             Try
                 SyncLock bluem_dll
                     'Datensatz übergeben und initialisieren
-                    Call bluem_dll.Initialize(WorkFolder & "tsim")
+                    Call bluem_dll.Initialize(Me.WorkFolder & Me.DS_Name)
                 End SyncLock
 
                 Dim SimEnde As DateTime = BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll.GetSimulationEndDate())
