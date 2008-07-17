@@ -1574,6 +1574,8 @@ Start_Evolutionsrunden:
 
                                     MyThread(0).Join
 
+                                    SIM_Eval_is_OK(0) = My_C_Thread(0).Sim_Is_OK
+
                                     '************************************************************************************
 
                                     If SIM_Eval_is_OK(0) then Sim1.launchSimVerarbeiten()
@@ -2748,8 +2750,8 @@ Start_Evolutionsrunden:
         PhysCPU = PhysCPUarray.Count
 
         'HACK -----
-        LogCPU = 2
-        PhysCPU = 2
+        LogCPU = 4
+        PhysCPU = 4
         '----------
 
     End Sub
@@ -2783,7 +2785,7 @@ Start_Evolutionsrunden:
 
                 Dim SimEnde As DateTime = BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll.GetSimulationEndDate())
 
-                'Simulationszeitraum 
+                'Simulationszeitraum
                 Do While (BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll.GetCurrentTime) <= SimEnde)
                     Call bluem_dll.PerformTimeStep()
                 Loop
