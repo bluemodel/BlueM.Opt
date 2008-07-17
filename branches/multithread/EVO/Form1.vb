@@ -887,7 +887,7 @@ Partial Class Form1
         End If
 
         'Startwerte werden der Verlaufsanzeige zugewiesen
-        Call Me.EVO_Opt_Verlauf1.Initialisieren(1, 1, EVO_Einstellungen1.Settings.CES.n_Generations, EVO_Einstellungen1.Settings.CES.n_Childs)
+        Call Me.EVO_Opt_Verlauf1.Initialisieren(0, 0, EVO_Einstellungen1.Settings.CES.n_Generations, EVO_Einstellungen1.Settings.CES.n_Childs)
 
         'xxxx Optimierung xxxxxx
         'Generationsschleife CES
@@ -930,10 +930,11 @@ Partial Class Form1
 
                     Next
 
-                    SIM_Eval_is_OK = False
-                    SIM_Eval_is_OK = Sim1.launchSim(Thr_count)
-
-                    Thr_count = 0
+                    ' Simulation ********************************
+                    SIM_Eval_is_OK = False                     '*
+                    SIM_Eval_is_OK = Sim1.launchSim(Thr_count) '*
+                    Thr_count = 0                              '*
+                    '********************************************
 
                     Eval_Count += 2
                     If (Eval_Count >= 10) Then
@@ -1444,14 +1445,11 @@ Start_Evolutionsrunden:
         'xxxxxxxxxxxxxxxx
         For PES1.PES_iAkt.iAktRunde = 0 To EVO_Einstellungen1.Settings.PES.Pop.n_Runden - 1
 
-            Call EVO_Opt_Verlauf1.Runden(PES1.PES_iAkt.iAktRunde + 1)
             Call PES1.EsResetPopBWSpeicher() 'Nur bei Komma Strategie
 
             'Über alle Populationen
             'xxxxxxxxxxxxxxxxxxxxxx
             For PES1.PES_iAkt.iAktPop = 0 To EVO_Einstellungen1.Settings.PES.Pop.n_Popul - 1
-
-                Call EVO_Opt_Verlauf1.Population(PES1.PES_iAkt.iAktPop + 1)
 
                 'POPULATIONS REPRODUKTIONSPROZESS
                 '################################
@@ -1467,18 +1465,17 @@ Start_Evolutionsrunden:
                 'xxxxxxxxxxxxxxxxxxxxxx
                 For PES1.PES_iAkt.iAktGen = 0 To EVO_Einstellungen1.Settings.PES.n_Gen - 1
 
-                    Call EVO_Opt_Verlauf1.Generation(PES1.PES_iAkt.iAktGen + 1)
                     Call PES1.EsResetBWSpeicher()  'Nur bei Komma Strategie
 
                     'Über alle Nachkommen
                     'xxxxxxxxxxxxxxxxxxxxxxxxx
                     For PES1.PES_iAkt.iAktNachf = 0 To EVO_Einstellungen1.Settings.PES.n_Nachf - 1
 
-                        Call EVO_Opt_Verlauf1.Nachfolger(PES1.PES_iAkt.iAktNachf + 1)
                         durchlauf += 1
 
                         'Do Schleife: Um Modellfehler bzw. Evaluierungsabbrüche abzufangen
                         Dim Eval_Count As Integer = 0
+                        Dim Thr_count As Integer = 0
                         Do
                             'Neues Individuum instanzieren
                             ind = New Common.Individuum("PES", durchlauf)
@@ -1515,24 +1512,13 @@ Start_Evolutionsrunden:
 
                                     'Vorbereiten des Modelldatensatzes
                                     Call Sim1.PREPARE_Evaluation_PES(myPara)
-                                    'Simulation *************************************************************************
 
-                                    ' ''SIM_Eval_is_OK(0) = False
-                                    ' ''My_C_Thread(0) = new CThread(ind.Thread_Folder, Sim1.Datensatz, bluem_dll(0))
-                                    ' ''MyThread(0) = new Thread(AddressOf My_C_Thread(0).Thread)
-                                    ' ''MyThread(0).IsBackground = True
-                                    ' ''MyThread(0).Start()
-
-                                    ' ''While MyThread(0).IsAlive
-                                    ' ''    System.Threading.Thread.Sleep(20)
-                                    ' ''    Application.DoEvents
-                                    ' ''End While
-
-                                    ' ''MyThread(0).Join
-
-                                    ' ''SIM_Eval_is_OK(0) = My_C_Thread(0).Sim_Is_OK
-
-                                    '************************************************************************************
+                                    Thr_Count += 1
+                                    ' Simulation ********************************
+                                    SIM_Eval_is_OK = False                     '*
+                                    SIM_Eval_is_OK = Sim1.launchSim(Thr_count) '*
+                                    Thr_count = 0                              '*
+                                    '********************************************
 
                                     If SIM_Eval_is_OK then Sim1.SIM_Ergebnis_auswerten(ind)
 
@@ -1554,7 +1540,8 @@ Start_Evolutionsrunden:
                         'Einordnen der Qualitätsfunktion im Bestwertspeicher bei SO
                         'Falls MO Einordnen der Qualitätsfunktion in NDSorting
                         Call PES1.EsBest(ind)
-
+                        
+                        Call EVO_Opt_Verlauf1.Nachfolger(PES1.PES_iAkt.iAktNachf + 1)
                         System.Windows.Forms.Application.DoEvents()
 
                     Next 'Ende Schleife über alle Nachkommen
@@ -1589,7 +1576,8 @@ Start_Evolutionsrunden:
                     If (EVO_Einstellungen1.Settings.PES.is_paint_constraint) Then
                         Call Me.ClearLastGeneration(PES1.PES_iAkt.iAktPop)
                     End If
-
+                    
+                    Call EVO_Opt_Verlauf1.Generation(PES1.PES_iAkt.iAktGen + 1)
                     System.Windows.Forms.Application.DoEvents()
 
                 Next 'Ende alle Generationen
@@ -1600,6 +1588,7 @@ Start_Evolutionsrunden:
                 '########################################
                 'Einordnen der Qualitätsfunktion im PopulationsBestwertspeicher
                 Call PES1.EsPopBest()
+                Call EVO_Opt_Verlauf1.Population(PES1.PES_iAkt.iAktPop + 1)
 
             Next 'Ende alle Populationen
             'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -1609,6 +1598,7 @@ Start_Evolutionsrunden:
             'Die neuen Populationseltern werden generiert
             Call PES1.EsPopEltern()
             System.Windows.Forms.Application.DoEvents()
+            Call EVO_Opt_Verlauf1.Runden(PES1.PES_iAkt.iAktRunde + 1)
 
         Next 'Ende alle Runden
         'xxxxxxxxxxxxxxxxxxxxx

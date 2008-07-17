@@ -189,7 +189,7 @@ Partial Public Class EVO_Opt_Verlauf
         Me.LabelaktNachf.Name = "LabelaktNachf"
         Me.LabelaktNachf.Size = New System.Drawing.Size(30, 13)
         Me.LabelaktNachf.TabIndex = 12
-        Me.LabelaktNachf.Text = "1"
+        Me.LabelaktNachf.Text = "0"
         '
         'LabelaktGen
         '
@@ -198,7 +198,7 @@ Partial Public Class EVO_Opt_Verlauf
         Me.LabelaktGen.Name = "LabelaktGen"
         Me.LabelaktGen.Size = New System.Drawing.Size(30, 13)
         Me.LabelaktGen.TabIndex = 11
-        Me.LabelaktGen.Text = "1"
+        Me.LabelaktGen.Text = "0"
         '
         'LabelaktPop
         '
@@ -207,7 +207,7 @@ Partial Public Class EVO_Opt_Verlauf
         Me.LabelaktPop.Name = "LabelaktPop"
         Me.LabelaktPop.Size = New System.Drawing.Size(23, 13)
         Me.LabelaktPop.TabIndex = 10
-        Me.LabelaktPop.Text = "1"
+        Me.LabelaktPop.Text = "0"
         '
         'LabelaktRunde
         '
@@ -216,7 +216,7 @@ Partial Public Class EVO_Opt_Verlauf
         Me.LabelaktRunde.Name = "LabelaktRunde"
         Me.LabelaktRunde.Size = New System.Drawing.Size(23, 13)
         Me.LabelaktRunde.TabIndex = 9
-        Me.LabelaktRunde.Text = "1"
+        Me.LabelaktRunde.Text = "0"
         '
         'LabelAnzNachf
         '
@@ -225,7 +225,7 @@ Partial Public Class EVO_Opt_Verlauf
         Me.LabelAnzNachf.Name = "LabelAnzNachf"
         Me.LabelAnzNachf.Size = New System.Drawing.Size(30, 13)
         Me.LabelAnzNachf.TabIndex = 8
-        Me.LabelAnzNachf.Text = "1"
+        Me.LabelAnzNachf.Text = "0"
         '
         'LabelAnzGen
         '
@@ -234,7 +234,7 @@ Partial Public Class EVO_Opt_Verlauf
         Me.LabelAnzGen.Name = "LabelAnzGen"
         Me.LabelAnzGen.Size = New System.Drawing.Size(30, 13)
         Me.LabelAnzGen.TabIndex = 7
-        Me.LabelAnzGen.Text = "1"
+        Me.LabelAnzGen.Text = "0"
         '
         'LabelAnzPop
         '
@@ -243,7 +243,7 @@ Partial Public Class EVO_Opt_Verlauf
         Me.LabelAnzPop.Name = "LabelAnzPop"
         Me.LabelAnzPop.Size = New System.Drawing.Size(23, 13)
         Me.LabelAnzPop.TabIndex = 6
-        Me.LabelAnzPop.Text = "1"
+        Me.LabelAnzPop.Text = "0"
         '
         'LabelAnzRunden
         '
@@ -252,7 +252,7 @@ Partial Public Class EVO_Opt_Verlauf
         Me.LabelAnzRunden.Name = "LabelAnzRunden"
         Me.LabelAnzRunden.Size = New System.Drawing.Size(23, 13)
         Me.LabelAnzRunden.TabIndex = 5
-        Me.LabelAnzRunden.Text = "1"
+        Me.LabelAnzRunden.Text = "0"
         '
         'EVO_Opt_Verlauf
         '
