@@ -47,10 +47,6 @@ Public Class Individuum
     Public Memory_Strat As MEMORY_STRATEGY '13 Memory_Strategie des PES Elters
     Public iLocation As Integer            '14 Location des PES Parent
 
-    'Für Multithreading ---------------------------------------------
-    Public Thread_ID As Integer           '15 Dem Backgroundworker kann nur ein Objekt übergeben werden
-    Public Thread_Folder As String            '16 Ordner des Simulationsdatensatzes
-
     'Informationen pro Location
     '**************************
     Public Structure Location_Data
@@ -265,12 +261,6 @@ Public Class Individuum
         '14 Location des PES Parent
         Me.iLocation = 777
 
-        '15 Für Multithreading
-        Me.Thread_ID = 0
-
-        '16 Pfad zum Datensatz
-        Me.Thread_Folder = ""
-
     End Sub
 
     'Konstruktor für ein Array von Individen
@@ -364,12 +354,6 @@ Public Class Individuum
 
         '14 Location des PES Parent
         Dest.iLocation = Me.iLocation
-
-        '15 Für Multithreading
-        Dest.Thread_ID = Me.Thread_ID
-        
-        '16 Pfad zum Datensatz
-        Dest.Thread_Folder = Me.Thread_Folder
 
         Return Dest
 

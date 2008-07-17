@@ -1507,8 +1507,6 @@ Start_Evolutionsrunden:
                                 Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM
 
                                     Sim1.WorkDir = Sim1.getWorkDir(0)
-                                    ind.Thread_Folder = Sim1.getWorkDir(0)
-                                    ind.Thread_ID = 0
 
                                     'Vorbereiten des Modelldatensatzes
                                     Call Sim1.PREPARE_Evaluation_PES(myPara)
