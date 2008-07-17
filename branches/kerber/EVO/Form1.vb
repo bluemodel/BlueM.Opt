@@ -42,7 +42,7 @@ Partial Class Form1
     Private TSP1 As TSP
 
     'New'
-    'Dim hybrid2008 As EVO.Hybrid2008.Main.cs
+    Dim hybrid2008 As EVO.HybridAlgo.HybridAlgo
 
     '**** Globale Parameter Parameter Optimierung ****
     'TODO: diese Werte sollten eigentlich nur in CES bzw PES vorgehalten werden

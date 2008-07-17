@@ -112,6 +112,10 @@
       <Project>{CAA1CE91-0973-4BE7-9BD8-16B5D40BC93C}</Project>
       <Name>EVO.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\EVO.HybridAlgo\EVO.HybridAlgo.csproj">
+      <Project>{85403900-E545-4122-B1A0-8C30AE0D0F3C}</Project>
+      <Name>EVO.HybridAlgo</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EVO.Kern\EVO.Kern.vbproj">
       <Project>{58356A07-425E-4C91-ACB8-17B9286C9417}</Project>
       <Name>EVO.Kern</Name>
