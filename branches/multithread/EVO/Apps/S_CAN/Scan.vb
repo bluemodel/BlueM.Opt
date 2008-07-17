@@ -11,7 +11,7 @@ Public Class Scan
 
     Private input As Wave.WEL
 
-    Public Overrides Function launchSim(ByVal WorkFolder As String, Optional ByVal Thread_ID As Integer = 0) As Boolean
+    Public Overrides Function launchSim(Byval n_sims As Integer) As Boolean
 
         Dim i, j, k, AnzZeil As Integer
         Dim parameterdatei, Zeile, ZeilenArray(), stoffe(), tmp() As String

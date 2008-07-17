@@ -93,7 +93,7 @@ Public Class Smusi
 
     'SMUSI ausführen (simulieren)
     '***********************************
-    Public Overrides Function launchSim(ByVal WorkFolder As String, Optional ByVal Thread_ID As Integer = 0) As Boolean
+    Public Overrides Function launchSim(Byval n_sims As Integer) As Boolean
 
         Dim simOK As Boolean
         Dim SimCurrent, SimStart, SimEnde As DateTime

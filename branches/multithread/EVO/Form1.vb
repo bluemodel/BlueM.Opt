@@ -4,8 +4,6 @@ Imports System.IO
 Imports System.Management
 Imports IHWB.EVO.Common
 Imports System.ComponentModel
-Imports IHWB.BlueM.DllAdapter
-Imports System.Threading
 
 '*******************************************************************************
 '*******************************************************************************
@@ -54,13 +52,9 @@ Partial Class Form1
     Dim ispause As Boolean = False                      'Optimierung ist pausiert
 
     '**** Multithreading ****
-    Dim SIM_Eval_is_OK() As Boolean
-    Dim My_C_Thread() As CThread
-    Dim MyThread() As Thread
+    Dim SIM_Eval_is_OK As Boolean
     Private PhysCPU As Integer                                      'Anzahl physikalischer Prozessoren
     Private LogCPU As Integer                                       'Anzahl logischer Prozessoren
-    'BlueM DLL
-    Public bluem_dll() As BlueM_EngineDotNetAccess
 
     'Dialoge
     Private WithEvents solutionDialog As SolutionDialog
@@ -90,7 +84,6 @@ Partial Class Form1
 
         'Anzahl der Prozessoren wird ermittelt
         Anzahl_Prozessoren(PhysCPU, LogCPU)
-        Redim SIM_Eval_is_OK(PhysCPU - 1)
 
         'XP-look
         System.Windows.Forms.Application.EnableVisualStyles()
@@ -107,27 +100,6 @@ Partial Class Form1
         'Ende der Initialisierung
         IsInitializing = False
 
-        '*******************************
-        'BluM_DLL
-        Dim dll_path As String
-        dll_path = System.Windows.Forms.Application.StartupPath() & "\Apps\BlueM\BlueM.dll"
-
-        'BlueM DLL instanzieren je nach Anzahl der Prozessoren
-        '-----------------------------------------------------
-        ReDim bluem_dll(PhysCPU - 1)
-        Dim i As Integer
-
-        For i = 0 to PhysCPU - 1
-            If (File.Exists(dll_path)) Then
-                bluem_dll(i) = New BlueM_EngineDotNetAccess(dll_path)
-            Else
-                Throw New Exception("BlueM.dll nicht gefunden!")
-            End If
-        Next
-
-        'Anzahl der Threads
-        ReDim My_C_Thread(PhysCPU - 1)
-        ReDim MyThread(PhysCPU - 1)
     End Sub
 
 #Region "Initialisierung der Anwendungen"
@@ -615,7 +587,7 @@ Partial Class Form1
 
                     Select Case Method
                         Case METH_RESET
-                            Call Sim1.launchSim(me.Sim1.WorkDirSave)
+                            Call Sim1.launchSim(1)
                             Call Sim1.WelDateiVerwursten()
                         Case METH_SENSIPLOT
                             Call STARTEN_SensiPlot()
@@ -763,7 +735,7 @@ Partial Class Form1
 
                 'Evaluieren
                 'TODO: Fehlerbehandlung bei Simulationsfehler
-                isOK = Sim1.launchSim(Sim1.WorkDirSave)
+                isOK = Sim1.launchSim(1)
                 If isOK then Sim1.SIM_Ergebnis_auswerten(ind)
 
                 'BUG 253: Verletzte Constraints bei SensiPlot kenntlich machen?
@@ -922,25 +894,20 @@ Partial Class Form1
         'xxxxxxxxxxxxxxxxxxxxxxx
         For i_gen = 0 To CES1.Settings.CES.n_Generations - 1
 
-            Call EVO_Opt_Verlauf1.Generation(i_gen + 1)
-
             'Child Schleife
             'xxxxxxxxxxxxxx
-            For i_ch = 0 To CES1.Settings.CES.n_Childs - 1 step 2
+            For i_ch = 0 To CES1.Settings.CES.n_Childs - 1 step PhysCPU
                 
                 Dim Thread As Integer
                 'Do Schleife: Um Modellfehler bzw. Evaluierungsabbrüche abzufangen
                 Dim Eval_Count As Integer = 0
+                Dim Thr_Count As Integer = 0
                 Do
                     For Thread = 0 to PhysCPU - 1
 
                         durchlauf_all += 1
                         Sim1.WorkDir = Sim1.getWorkDir(Thread)
-                        CES1.Childs(i_ch + Thread).Thread_Folder = Sim1.getWorkDir(Thread)
-                        CES1.Childs(i_ch + Thread).Thread_ID = Thread
-
                         CES1.Childs(i_ch + Thread).ID = durchlauf_all
-                        Call EVO_Opt_Verlauf1.Nachfolger(i_ch + Thread + 1)
 
                         '****************************************
                         'Aktueller Pfad wird an Sim zurückgegeben
@@ -955,45 +922,32 @@ Partial Class Form1
                             End If
                         End If
 
-                        SIM_Eval_is_OK(Thread) = False
-                        My_C_Thread(Thread) = new CThread(CES1.Childs(i_ch + Thread).Thread_Folder, Sim1.Datensatz, bluem_dll(thread))
-                        MyThread(Thread) = new Thread(AddressOf My_C_Thread(Thread).Thread)
-                        MyThread(Thread).IsBackground = True
-                        MyThread(Thread).Start()
-                        
-                        'Für ungerade Kinder Zahlen
+                        Thr_Count += 1
+
                         if (i_ch + Thread) = CES1.Settings.CES.n_Childs - 1 then
                             Exit For
                         End If
 
                     Next
 
-                    While MyThread(MyThread.GetUpperBound(0)).IsAlive
-                        System.Threading.Thread.Sleep(20)
-                        Application.DoEvents
-                    End While
+                    SIM_Eval_is_OK = False
+                    SIM_Eval_is_OK = Sim1.launchSim(Thr_count)
 
-                    For Each Thr As thread In MyThread
-                        Thr.Join
-                    Next
-
-                    For Thread = 0 to SIM_Eval_is_OK.GetUpperBound(0)
-                        SIM_Eval_is_OK(Thread) = My_C_Thread(Thread).Sim_Is_OK
-                    Next
+                    Thr_count = 0
 
                     Eval_Count += 2
                     If (Eval_Count >= 10) Then
                         Throw New Exception("Es konnte kein gültiger Datensatz erzeugt werden!")
                     End If
 
-                Loop While SIM_Eval_is_OK(0)= False or SIM_Eval_is_OK(1) = False
+                Loop While SIM_Eval_is_OK = False
 
                 '************************************************************************************
                 For Thread = 0 to PhysCPU - 1
 
                     Sim1.WorkDir = Sim1.getWorkDir(Thread)
 
-                    If SIM_Eval_is_OK(Thread) then Sim1.SIM_Ergebnis_auswerten(CES1.Childs(i_ch + Thread))
+                    If SIM_Eval_is_OK then Sim1.SIM_Ergebnis_auswerten(CES1.Childs(i_ch + Thread))
 
                     'HYBRID: Speichert die PES Erfahrung diesen Childs im PES Memory
                     '***************************************************************
@@ -1003,11 +957,13 @@ Partial Class Form1
 
                     'Lösung im TeeChart einzeichnen
                     '==============================
-                    If (SIM_Eval_is_OK(Thread)) Then 
+                    If SIM_Eval_is_OK Then 
                         Call Me.LösungZeichnen(CES1.Childs(i_ch + Thread), 0, 0, i_gen, i_ch + Thread, ColorManagement(ColorArray, CES1.Childs(i_ch + Thread)))
                     End If
 
                     System.Windows.Forms.Application.DoEvents()
+
+                    Call EVO_Opt_Verlauf1.Nachfolger(i_ch + Thread + 1)
 
                     'Für ungerade Kinder Zahlen
                     If (i_ch + Thread) = CES1.Settings.CES.n_Childs - 1 then
@@ -1015,6 +971,9 @@ Partial Class Form1
                     End If
                 Next
             Next
+
+            Call EVO_Opt_Verlauf1.Generation(i_gen + 1)
+
             '^ ENDE der Child Schleife
             'xxxxxxxxxxxxxxxxxxxxxxx
 
@@ -1291,7 +1250,7 @@ Partial Class Form1
             Call Sim1.PREPARE_Evaluation_PES(aktuellePara)
 
             'Evaluierung des Simulationsmodells (ToDo: Validätsprüfung fehlt)
-            SIM_Eval_is_OK = Sim1.launchSim(sim1.WorkDirSave)
+            SIM_Eval_is_OK = Sim1.launchSim(1)
             If SIM_Eval_is_OK then Call Sim1.SIM_Ergebnis_auswerten(ind)
 
             'Lösung im TeeChart einzeichnen
@@ -1327,7 +1286,7 @@ Partial Class Form1
                 Call Sim1.PREPARE_Evaluation_PES(aktuellePara)
 
                 'Evaluierung des Simulationsmodells
-                SIM_Eval_is_OK = Sim1.launchSim(sim1.WorkDirSave)
+                SIM_Eval_is_OK = Sim1.launchSim(1)
                 If SIM_Eval_is_OK then Call Sim1.SIM_Ergebnis_auswerten(ind)
 
                 'Lösung im TeeChart einzeichnen
@@ -1357,7 +1316,7 @@ Partial Class Form1
                     Call Sim1.PREPARE_Evaluation_PES(aktuellePara)
 
                     'Evaluierung des Simulationsmodells
-                    SIM_Eval_is_OK = Sim1.launchSim(sim1.WorkDirSave)
+                    SIM_Eval_is_OK = Sim1.launchSim(1)
                     If SIM_Eval_is_OK then Call Sim1.SIM_Ergebnis_auswerten(ind)
 
                     'Lösung im TeeChart einzeichnen
@@ -1558,27 +1517,27 @@ Start_Evolutionsrunden:
                                     Call Sim1.PREPARE_Evaluation_PES(myPara)
                                     'Simulation *************************************************************************
 
-                                    SIM_Eval_is_OK(0) = False
-                                    My_C_Thread(0) = new CThread(ind.Thread_Folder, Sim1.Datensatz, bluem_dll(0))
-                                    MyThread(0) = new Thread(AddressOf My_C_Thread(0).Thread)
-                                    MyThread(0).IsBackground = True
-                                    MyThread(0).Start()
+                                    ' ''SIM_Eval_is_OK(0) = False
+                                    ' ''My_C_Thread(0) = new CThread(ind.Thread_Folder, Sim1.Datensatz, bluem_dll(0))
+                                    ' ''MyThread(0) = new Thread(AddressOf My_C_Thread(0).Thread)
+                                    ' ''MyThread(0).IsBackground = True
+                                    ' ''MyThread(0).Start()
 
-                                    While MyThread(0).IsAlive
-                                        System.Threading.Thread.Sleep(20)
-                                        Application.DoEvents
-                                    End While
+                                    ' ''While MyThread(0).IsAlive
+                                    ' ''    System.Threading.Thread.Sleep(20)
+                                    ' ''    Application.DoEvents
+                                    ' ''End While
 
-                                    MyThread(0).Join
+                                    ' ''MyThread(0).Join
 
-                                    SIM_Eval_is_OK(0) = My_C_Thread(0).Sim_Is_OK
+                                    ' ''SIM_Eval_is_OK(0) = My_C_Thread(0).Sim_Is_OK
 
                                     '************************************************************************************
 
-                                    If SIM_Eval_is_OK(0) then Sim1.SIM_Ergebnis_auswerten(ind)
+                                    If SIM_Eval_is_OK then Sim1.SIM_Ergebnis_auswerten(ind)
 
                                     'Lösung zeichnen
-                                    If (SIM_Eval_is_OK(0)) Then
+                                    If SIM_Eval_is_OK Then
                                         Call Me.LösungZeichnen(ind, PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, PES1.PES_iAkt.iAktNachf, Color.Orange)
                                     End If
                             End Select
@@ -1588,7 +1547,7 @@ Start_Evolutionsrunden:
                                 Throw New Exception("Es konnte kein gültiger Datensatz erzeugt werden!")
                             End If
 
-                        Loop While SIM_Eval_is_OK(0) = False
+                        Loop While SIM_Eval_is_OK = False
 
                         'SELEKTIONSPROZESS Schritt 1
                         '###########################
@@ -2323,7 +2282,7 @@ Start_Evolutionsrunden:
             'xxxxxxxxxxxxxxxxxxxx
 
             'Simulieren
-            isOK = Sim1.launchSim(Sim1.WorkDirSave)
+            isOK = Sim1.launchSim(1)
             If isOK then call Sim1.WelDateiVerwursten()
 
             'Sonderfall IHA-Berechnung
@@ -2751,76 +2710,6 @@ Start_Evolutionsrunden:
         '----------
 
     End Sub
-
-#Region "Threading"
-
-    Public Class CThread
-
-        'Private Thread_ID As Integer
-        Private WorkFolder As String
-        Private DS_Name As String
-        Private bluem_dll As BlueM_EngineDotNetAccess
-        Private Is_OK As Boolean
-
-        Public Sub New(ByVal _WorkFolder As String, ByVal _DS_Name as String, ByRef _bluem_dll As BlueM_EngineDotNetAccess)
-            Me.WorkFolder = _WorkFolder
-            Me.DS_Name = _DS_Name
-            Me.bluem_dll = _bluem_dll
-        End Sub
-
-        Public Sub Thread()
-            
-            'Priority
-            System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.BelowNormal
-
-            Try
-                SyncLock bluem_dll
-                    'Datensatz übergeben und initialisieren
-                    Call bluem_dll.Initialize(Me.WorkFolder & Me.DS_Name)
-                End SyncLock
-
-                Dim SimEnde As DateTime = BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll.GetSimulationEndDate())
-
-                'Simulationszeitraum
-                Do While (BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll.GetCurrentTime) <= SimEnde)
-                    Call bluem_dll.PerformTimeStep()
-                Loop
-
-                'Simulation abschliessen
-                Call bluem_dll.Finish()
-
-                'Simulation erfolgreich
-                me.Is_OK = True
-
-            Catch ex As Exception
-
-                'Simulationsfehler aufgetreten
-                MsgBox(ex.Message, MsgBoxStyle.Exclamation, "BlueM")
-
-                'Simulation abschliessen
-                Call bluem_dll.Finish()
-
-                'Simulation nicht erfolgreich
-                me.Is_OK = False
-
-            Finally
-
-                'Ressourcen deallokieren
-                Call bluem_dll.Dispose()
-
-            End Try
-
-        End Sub
-
-        Public Function Sim_Is_OK As Boolean
-
-            Sim_Is_OK = Me.Is_OK
-
-        End Function
-
-    End Class
-
-#End Region 'Threading
 
 #End Region 'Methoden
 

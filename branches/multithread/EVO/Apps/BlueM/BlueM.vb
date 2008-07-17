@@ -1,5 +1,6 @@
 Imports System.IO
 Imports IHWB.BlueM.DllAdapter
+Imports System.Threading
 
 '*******************************************************************************
 '*******************************************************************************
@@ -42,6 +43,12 @@ Public Class BlueM
     Friend IHASys As IHWB.IHA.IHAAnalysis
     Friend IHAProc As IHWB.EVO.IHAProcessor
 
+    '**** Multithreading ****
+    Dim My_C_Thread() As CThread
+    Dim MyThread() As Thread
+    'BlueM DLL Aray
+    Public bluem_dll() As BlueM_EngineDotNetAccess
+
 #End Region 'Eigenschaften
 
 #Region "Methoden"
@@ -60,21 +67,22 @@ Public Class BlueM
         Me.useKWL = False
         Me.isIHA = False
 
-        'Dim dll_path As String
-        'dll_path = System.Windows.Forms.Application.StartupPath() & "\Apps\BlueM\BlueM.dll"
+        'BluM_DLL
+        Dim dll_path As String
+        dll_path = System.Windows.Forms.Application.StartupPath() & "\Apps\BlueM\BlueM.dll"
 
-        ''BlueM DLL instanzieren je nach Anzahl der Prozessoren
-        ''-----------------------------------------------------
-        'ReDim bluem_dll(n_Proz - 1)
-        'Dim i As Integer
+        'BlueM DLL instanzieren je nach Anzahl der Prozessoren
+        '-----------------------------------------------------
+        ReDim bluem_dll(n_Proz - 1)
+        Dim i As Integer
 
-        'For i = 0 to n_Proz - 1
-        '    If (File.Exists(dll_path)) Then
-        '        bluem_dll(i) = New BlueM_EngineDotNetAccess(dll_path)
-        '    Else
-        '        Throw New Exception("BlueM.dll nicht gefunden!")
-        '    End If
-        'Next
+        For i = 0 to n_Proz - 1
+            If (File.Exists(dll_path)) Then
+                bluem_dll(i) = New BlueM_EngineDotNetAccess(dll_path)
+            Else
+                Throw New Exception("BlueM.dll nicht gefunden!")
+            End If
+        Next
 
     End Sub
 
@@ -333,49 +341,48 @@ Public Class BlueM
 
     'BlauesModell ausführen (simulieren)
     '***********************************
-    Public Overrides Function launchSim(ByVal WorkFolder As String, Optional ByVal Thread_ID As Integer = 0) As Boolean
+    Public Overrides Function launchSim(Byval n_sims As Integer) As Boolean
 
-        'Dim simOK As Boolean
+        launchSim = False
+        Dim Folder As String
+        Dim i As Integer
 
-        'Try
+        'Anzahl der Threads
+        ReDim My_C_Thread(n_sims - 1)
+        ReDim MyThread(n_sims - 1)
+        
+        For i = 0 to n_sims - 1
+            Folder = getWorkDir(i)
+            My_C_Thread(i) = new CThread(Folder, Datensatz, bluem_dll(i))
+            MyThread(i) = new Thread(AddressOf My_C_Thread(i).Thread)
+            MyThread(i).IsBackground = True
+            MyThread(i).Start()
+            While My_C_Thread(i).is_Initialized = False
+                System.Threading.Thread.Sleep(3)
+            End While
+        Next
 
-        '    'Datensatz übergeben und initialisieren
-        '    Call bluem_dll(Thread_ID).Initialize(WorkFolder & Me.Datensatz)
+        While My_C_Thread(My_C_Thread.GetUpperBound(0)).Sim_Is_OK = false
+            System.Threading.Thread.Sleep(20)
+            Application.DoEvents
+        End While
 
-        '    Dim SimEnde As DateTime = BlueM_EngineDotNetAccess.DateTime(bluem_dll(Thread_ID).GetSimulationEndDate())
+        For Each Thr As thread In MyThread
+            Thr.Join
+        Next
 
-        '    'Simulationszeitraum 
-        '    Do While (BlueM_EngineDotNetAccess.DateTime(bluem_dll(Thread_ID).GetCurrentTime) <= SimEnde)
-        '        Call bluem_dll(Thread_ID).PerformTimeStep()
-        '    Loop
+        Dim count_OK As Integer = 0
+        For Each Thr_C As CThread In My_C_Thread
+            If Thr_C.Sim_Is_OK = True then
+                count_OK += 1
+            End If
+        Next
 
-        '    'Simulation abschliessen
-        '    Call bluem_dll(Thread_ID).Finish()
+        If count_OK = n_sims then launchSim = True
 
-        '    'Simulation erfolgreich
-        '    simOK = True
+        Return launchSim
 
-        'Catch ex As Exception
-
-        '    'Simulationsfehler aufgetreten
-        '    MsgBox(ex.Message, MsgBoxStyle.Exclamation, "BlueM")
-
-        '    'Simulation abschliessen
-        '    Call bluem_dll(Thread_ID).Finish()
-
-        '    'Simulation nicht erfolgreich
-        '    simOK = False
-
-        'Finally
-
-        '    'Ressourcen deallokieren
-        '    Call bluem_dll(Thread_ID).Dispose()
-
-        'End Try
-
-        'Return simOK
-
-    End Function
+    End function
 
     'Simulationsergebnis verarbeiten
     '-------------------------------
@@ -579,6 +586,86 @@ Public Class BlueM
             End If
         Next
     End Function
+
+#Region "Threading"
+
+    Public Class CThread
+
+        'Private Thread_ID As Integer
+        Private WorkFolder As String
+        Private DS_Name As String
+        Private bluem_dll As BlueM_EngineDotNetAccess
+        Private is_Ini As Boolean
+        Private Is_OK As Boolean
+
+        Public Sub New(ByVal _WorkFolder As String, ByVal _DS_Name as String, ByRef _bluem_dll As BlueM_EngineDotNetAccess)
+            Me.WorkFolder = _WorkFolder
+            Me.DS_Name = _DS_Name
+            Me.bluem_dll = _bluem_dll
+        End Sub
+
+        Public Sub Thread()
+            
+            Me.is_Ini = False
+
+            'Priority
+            System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.BelowNormal
+
+            Try
+                SyncLock bluem_dll
+                    'Datensatz übergeben und initialisieren
+                    Call bluem_dll.Initialize(Me.WorkFolder & Me.DS_Name)
+                End SyncLock
+                Me.is_Ini = True
+
+                Dim SimEnde As DateTime = BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll.GetSimulationEndDate())
+
+                'Simulationszeitraum
+                Do While (BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll.GetCurrentTime) <= SimEnde)
+                    Call bluem_dll.PerformTimeStep()
+                Loop
+
+                'Simulation abschliessen
+                Call bluem_dll.Finish()
+
+                'Simulation erfolgreich
+                me.Is_OK = True
+
+            Catch ex As Exception
+
+                'Simulationsfehler aufgetreten
+                MsgBox(ex.Message, MsgBoxStyle.Exclamation, "BlueM")
+
+                'Simulation abschliessen
+                Call bluem_dll.Finish()
+
+                'Simulation nicht erfolgreich
+                me.Is_OK = False
+
+            Finally
+
+                'Ressourcen deallokieren
+                Call bluem_dll.Dispose()
+
+            End Try
+
+        End Sub
+
+        Public Function Sim_Is_OK As Boolean
+
+            Sim_Is_OK = Me.Is_OK
+
+        End Function
+
+        Public Function is_Initialized As Boolean
+
+            is_Initialized = Me.is_Ini
+
+        End Function
+
+    End Class
+
+#End Region 'Threading
 
 #End Region 'Methoden
 

@@ -1453,7 +1453,7 @@ Handler:
 
     'SimModell ausführen (simulieren)
     '********************************
-    Public MustOverride Function launchSim(ByVal WorkFolder As String, Optional ByVal Thread_ID As Integer = 0) As Boolean
+    Public MustOverride Function launchSim(Byval n_sims As Integer) As Boolean
     
     'Simulationsergebnis verarbeiten
     '-------------------------------
