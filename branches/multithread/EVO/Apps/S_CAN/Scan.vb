@@ -104,7 +104,7 @@ Public Class Scan
         
     'Simulationsergebnis verarbeiten
     '-------------------------------
-    Public Overrides Sub launchSimVerarbeiten()
+    Public Overrides Sub WelDateiVerwursten()
 
     End Sub
 

@@ -212,7 +212,7 @@ Public Class Smusi
 
     'Simulationsergebnis verarbeiten
     '-------------------------------
-    Public Overrides Sub launchSimVerarbeiten()
+    Public Overrides Sub WelDateiVerwursten()
 
         Dim datei, element As String
         Dim ASCtmp As Wave.ASC

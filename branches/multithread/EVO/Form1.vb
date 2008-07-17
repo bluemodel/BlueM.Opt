@@ -616,7 +616,7 @@ Partial Class Form1
                     Select Case Method
                         Case METH_RESET
                             Call Sim1.launchSim(me.Sim1.WorkDirSave)
-                            Call Sim1.launchSimVerarbeiten()
+                            Call Sim1.WelDateiVerwursten()
                         Case METH_SENSIPLOT
                             Call STARTEN_SensiPlot()
                         Case METH_PES
@@ -764,8 +764,7 @@ Partial Class Form1
                 'Evaluieren
                 'TODO: Fehlerbehandlung bei Simulationsfehler
                 isOK = Sim1.launchSim(Sim1.WorkDirSave)
-                If isOK then Sim1.launchSimVerarbeiten()
-                If isOK then Sim1.SIM_Auswertung(ind)
+                If isOK then Sim1.SIM_Ergebnis_auswerten(ind)
 
                 'BUG 253: Verletzte Constraints bei SensiPlot kenntlich machen?
 
@@ -994,8 +993,7 @@ Partial Class Form1
 
                     Sim1.WorkDir = Sim1.getWorkDir(Thread)
 
-                    If SIM_Eval_is_OK(Thread) then Sim1.launchSimVerarbeiten()
-                    If SIM_Eval_is_OK(Thread) then Sim1.SIM_Auswertung(CES1.Childs(i_ch + Thread))
+                    If SIM_Eval_is_OK(Thread) then Sim1.SIM_Ergebnis_auswerten(CES1.Childs(i_ch + Thread))
 
                     'HYBRID: Speichert die PES Erfahrung diesen Childs im PES Memory
                     '***************************************************************
@@ -1294,8 +1292,7 @@ Partial Class Form1
 
             'Evaluierung des Simulationsmodells (ToDo: Validätsprüfung fehlt)
             SIM_Eval_is_OK = Sim1.launchSim(sim1.WorkDirSave)
-            If SIM_Eval_is_OK then Call Sim1.launchSimVerarbeiten()
-            If SIM_Eval_is_OK then Call Sim1.SIM_Auswertung(ind)
+            If SIM_Eval_is_OK then Call Sim1.SIM_Ergebnis_auswerten(ind)
 
             'Lösung im TeeChart einzeichnen
             '------------------------------
@@ -1331,8 +1328,7 @@ Partial Class Form1
 
                 'Evaluierung des Simulationsmodells
                 SIM_Eval_is_OK = Sim1.launchSim(sim1.WorkDirSave)
-                If SIM_Eval_is_OK then Call Sim1.launchSimVerarbeiten()
-                If SIM_Eval_is_OK then Call Sim1.SIM_Auswertung(ind)
+                If SIM_Eval_is_OK then Call Sim1.SIM_Ergebnis_auswerten(ind)
 
                 'Lösung im TeeChart einzeichnen
                 '------------------------------
@@ -1361,7 +1357,8 @@ Partial Class Form1
                     Call Sim1.PREPARE_Evaluation_PES(aktuellePara)
 
                     'Evaluierung des Simulationsmodells
-                    Call Sim1.SIM_Auswertung(ind)
+                    SIM_Eval_is_OK = Sim1.launchSim(sim1.WorkDirSave)
+                    If SIM_Eval_is_OK then Call Sim1.SIM_Ergebnis_auswerten(ind)
 
                     'Lösung im TeeChart einzeichnen
                     '------------------------------
@@ -1578,8 +1575,7 @@ Start_Evolutionsrunden:
 
                                     '************************************************************************************
 
-                                    If SIM_Eval_is_OK(0) then Sim1.launchSimVerarbeiten()
-                                    If SIM_Eval_is_OK(0) then Sim1.SIM_Auswertung(ind)
+                                    If SIM_Eval_is_OK(0) then Sim1.SIM_Ergebnis_auswerten(ind)
 
                                     'Lösung zeichnen
                                     If (SIM_Eval_is_OK(0)) Then
@@ -2328,7 +2324,7 @@ Start_Evolutionsrunden:
 
             'Simulieren
             isOK = Sim1.launchSim(Sim1.WorkDirSave)
-            If isOK then call Sim1.launchSimVerarbeiten()
+            If isOK then call Sim1.WelDateiVerwursten()
 
             'Sonderfall IHA-Berechnung
             If (isIHA) Then

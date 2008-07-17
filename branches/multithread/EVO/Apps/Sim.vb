@@ -1370,10 +1370,13 @@ Handler:
 
     'Evaluiert die Kinderchen mit Hilfe des Simulationsmodells
     '*********************************************************
-    Public Sub SIM_Auswertung(ByRef Indi As Common.Individuum)
+    Public Sub SIM_Ergebnis_auswerten(ByRef Indi As Common.Individuum)
 
         Dim i As Short
 
+        'Lesen der Relevanten Parameter aus der wel Datei
+        Call WelDateiVerwursten()
+        
         'Qualitätswerte berechnen
         For i = 0 To Common.Manager.AnzZiele - 1
             Indi.Zielwerte(i) = QWert(Common.Manager.List_Ziele(i))
@@ -1454,7 +1457,7 @@ Handler:
     
     'Simulationsergebnis verarbeiten
     '-------------------------------
-    Public MustOverride Sub launchSimVerarbeiten()
+    Public MustOverride Sub WelDateiVerwursten()
 
 #End Region 'Evaluierung
 

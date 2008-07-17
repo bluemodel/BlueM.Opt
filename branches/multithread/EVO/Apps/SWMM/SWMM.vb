@@ -88,7 +88,7 @@ Public Class SWMM
 
     'Simulationsergebnis verarbeiten
     '-------------------------------
-    Public Overrides Sub launchSimVerarbeiten()
+    Public Overrides Sub WelDateiVerwursten()
 
     End Sub
 

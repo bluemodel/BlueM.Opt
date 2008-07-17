@@ -379,7 +379,7 @@ Public Class BlueM
 
     'Simulationsergebnis verarbeiten
     '-------------------------------
-    Public Overrides Sub launchSimVerarbeiten()
+    Public Overrides Sub WelDateiVerwursten()
     
         'Altes Simulationsergebnis löschen
         Me.SimErgebnis.Clear()
