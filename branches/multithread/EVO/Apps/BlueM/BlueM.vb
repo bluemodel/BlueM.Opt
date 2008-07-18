@@ -29,9 +29,9 @@ Public Class BlueM
         End Get
     End Property
 
-    ''BlueM DLL
-    ''---------
-    'Private bluem_dll() As BlueM_EngineDotNetAccess
+    'BlueM DLL
+    '---------
+    Private bluem_dll() As BlueM_EngineDotNetAccess
 
     'Misc
     '----
@@ -46,8 +46,6 @@ Public Class BlueM
     '**** Multithreading ****
     Dim My_C_Thread() As CThread
     Dim MyThread() As Thread
-    'BlueM DLL Aray
-    Public bluem_dll() As BlueM_EngineDotNetAccess
 
 #End Region 'Eigenschaften
 
@@ -83,6 +81,14 @@ Public Class BlueM
                 Throw New Exception("BlueM.dll nicht gefunden!")
             End If
         Next
+
+        'Anzahl der Threads
+        ReDim My_C_Thread(n_Proz - 1)
+        For i = 0 to n_Proz - 1
+            My_C_Thread(i) = new CThread(i, -1, "Folder", Datensatz, bluem_dll(i))
+            My_C_Thread(i).set_is_OK
+        Next
+        ReDim MyThread(n_Proz - 1)
 
     End Sub
 
@@ -341,48 +347,53 @@ Public Class BlueM
 
     'BlauesModell ausführen (simulieren)
     '***********************************
-    Public Overrides Function launchSim(Byval n_sims As Integer) As Boolean
+    Public Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
 
         launchSim = False
         Dim Folder As String
-        Dim i As Integer
-
-        'Anzahl der Threads
-        ReDim My_C_Thread(n_sims - 1)
-        ReDim MyThread(n_sims - 1)
-        
-        For i = 0 to n_sims - 1
-            Folder = getWorkDir(i)
-            My_C_Thread(i) = new CThread(Folder, Datensatz, bluem_dll(i))
-            MyThread(i) = new Thread(AddressOf My_C_Thread(i).Thread)
-            MyThread(i).IsBackground = True
-            MyThread(i).Start()
-            While My_C_Thread(i).is_Initialized = False
-                System.Threading.Thread.Sleep(3)
-            End While
-        Next
-
-        While My_C_Thread(My_C_Thread.GetUpperBound(0)).Sim_Is_OK = false
-            System.Threading.Thread.Sleep(20)
-            Application.DoEvents
+                       
+        Folder = getWorkDir(Thread_ID)
+        My_C_Thread(Thread_ID) = new CThread(Thread_ID, Child_ID, Folder, Datensatz, bluem_dll(Thread_ID))
+        MyThread(Thread_ID) = new Thread(AddressOf My_C_Thread(Thread_ID).Thread)
+        MyThread(Thread_ID).IsBackground = True
+        MyThread(Thread_ID).Start()
+        While My_C_Thread(Thread_ID).is_Initialized = False
+            System.Threading.Thread.Sleep(3)
         End While
-
-        For Each Thr As thread In MyThread
-            Thr.Join
-        Next
-
-        Dim count_OK As Integer = 0
-        For Each Thr_C As CThread In My_C_Thread
-            If Thr_C.Sim_Is_OK = True then
-                count_OK += 1
-            End If
-        Next
-
-        If count_OK = n_sims then launchSim = True
+        launchSim = True
 
         Return launchSim
 
     End function
+
+    Public Overrides Function launchFree(ByRef Thread_ID As Integer) As Boolean
+        launchFree = False
+
+        For Each Thr_C As CThread In My_C_Thread
+            If Thr_C.Sim_Is_OK = True then
+                launchFree = True
+                Thread_ID = Thr_C.get_Thread_ID
+                System.Threading.Thread.Sleep(3)
+                Exit For
+            End If
+        Next
+        
+    End Function
+    Public Overrides Function launchReady(ByRef Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
+        launchReady = False
+
+        For Each Thr_C As CThread In My_C_Thread
+            If Thr_C.Sim_Is_OK = True And Thr_C.get_Child_ID = Child_ID then
+                launchReady = True
+                Thread_ID = Thr_C.get_Thread_ID
+                MyThread(Thread_ID).Join
+                My_C_Thread(Thread_ID) = new CThread(Thread_ID, -1, "Folder", Datensatz, bluem_dll(Thread_ID))
+                My_C_Thread(Thread_ID).set_is_OK
+            End If
+        Next
+
+    End Function
+
 
     'Simulationsergebnis verarbeiten
     '-------------------------------
@@ -591,14 +602,17 @@ Public Class BlueM
 
     Public Class CThread
 
-        'Private Thread_ID As Integer
+        Private Thread_ID As Integer
+        Private Child_ID As Integer
         Private WorkFolder As String
         Private DS_Name As String
         Private bluem_dll As BlueM_EngineDotNetAccess
         Private is_Ini As Boolean
         Private Is_OK As Boolean
 
-        Public Sub New(ByVal _WorkFolder As String, ByVal _DS_Name as String, ByRef _bluem_dll As BlueM_EngineDotNetAccess)
+        Public Sub New(ByVal _Thread_ID As Integer, ByVal _Child_ID As Integer, ByVal _WorkFolder As String, ByVal _DS_Name as String, ByRef _bluem_dll As BlueM_EngineDotNetAccess)
+            Me.Thread_ID = _Thread_ID
+            Me.Child_ID = _Child_ID
             Me.WorkFolder = _WorkFolder
             Me.DS_Name = _DS_Name
             Me.bluem_dll = _bluem_dll
@@ -654,13 +668,26 @@ Public Class BlueM
         Public Function Sim_Is_OK As Boolean
 
             Sim_Is_OK = Me.Is_OK
-
         End Function
+
+        Public Sub set_is_OK()
+
+            Me.Is_OK = True
+        End Sub
 
         Public Function is_Initialized As Boolean
 
             is_Initialized = Me.is_Ini
+        End Function
 
+        Public Function get_Thread_ID As Integer
+
+            get_Thread_ID = Me.Thread_ID
+        End Function
+
+        Public Function get_Child_ID As Integer
+
+            get_Child_ID = Me.Child_ID
         End Function
 
     End Class

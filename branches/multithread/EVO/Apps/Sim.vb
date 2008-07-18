@@ -1453,8 +1453,11 @@ Handler:
 
     'SimModell ausführen (simulieren)
     '********************************
-    Public MustOverride Function launchSim(Byval n_sims As Integer) As Boolean
-    
+    Public MustOverride Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
+    Public MustOverride Function launchFree(ByRef Thread_ID As Integer) As Boolean
+    Public MustOverride Function launchReady(ByRef Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
+
+
     'Simulationsergebnis verarbeiten
     '-------------------------------
     Public MustOverride Sub WelDateiVerwursten()

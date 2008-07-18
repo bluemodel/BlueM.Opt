@@ -587,7 +587,7 @@ Partial Class Form1
 
                     Select Case Method
                         Case METH_RESET
-                            Call Sim1.launchSim(1)
+                            Call Sim1.launchSim(0, 0)
                             Call Sim1.WelDateiVerwursten()
                         Case METH_SENSIPLOT
                             Call STARTEN_SensiPlot()
@@ -735,7 +735,7 @@ Partial Class Form1
 
                 'Evaluieren
                 'TODO: Fehlerbehandlung bei Simulationsfehler
-                isOK = Sim1.launchSim(1)
+                isOK = Sim1.launchSim(0, 0)
                 If isOK then Sim1.SIM_Ergebnis_auswerten(ind)
 
                 'BUG 253: Verletzte Constraints bei SensiPlot kenntlich machen?
@@ -896,87 +896,73 @@ Partial Class Form1
 
             'Child Schleife
             'xxxxxxxxxxxxxx
-            For i_ch = 0 To CES1.Settings.CES.n_Childs - 1 step PhysCPU
-                
-                Dim Thread As Integer
-                'Do Schleife: Um Modellfehler bzw. Evaluierungsabbrüche abzufangen
-                Dim Eval_Count As Integer = 0
-                Dim Thr_Count As Integer = 0
-                Do
-                    For Thread = 0 to PhysCPU - 1
+            Dim Thread_Free As integer = 0
+            Dim Thread_Ready As Integer = 0
+            Dim Child_Run As Integer = 0
+            Dim Child_Ready As Integer = 0
+            Dim Ready As Boolean = false
+            Do
+                If Sim1.launchFree(Thread_Free) and Child_Run < CES1.Settings.CES.n_Childs and (Child_Ready + PhysCPU > Child_Run) then
 
-                        durchlauf_all += 1
-                        Sim1.WorkDir = Sim1.getWorkDir(Thread)
-                        CES1.Childs(i_ch + Thread).ID = durchlauf_all
+                    durchlauf_all += 1
+                    Sim1.WorkDir = Sim1.getWorkDir(Thread_Free)
+                    CES1.Childs(Child_Run).ID = durchlauf_all
 
-                        '****************************************
-                        'Aktueller Pfad wird an Sim zurückgegeben
-                        'Bereitet das BlaueModell für die Kombinatorik vor
-                        Call Sim1.PREPARE_Evaluation_CES(CES1.Childs(i_ch + Thread).Path, CES1.Childs(i_ch + Thread).Get_All_Loc_Elem)
+                    '****************************************
+                    'Aktueller Pfad wird an Sim zurückgegeben
+                    'Bereitet das BlaueModell für die Kombinatorik vor
+                    Call Sim1.PREPARE_Evaluation_CES(CES1.Childs(Child_Run).Path, CES1.Childs(Child_Run).Get_All_Loc_Elem)
 
-                        'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
-                        '***************************************************************
-                        If Method = METH_HYBRID And EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer Then
-                            If Sim1.Reduce_OptPara_and_ModPara(CES1.Childs(i_ch + Thread).Get_All_Loc_Elem) Then
-                                Call Sim1.PREPARE_Evaluation_PES(CES1.Childs(i_ch + Thread).Get_All_Loc_PES_Para)
-                            End If
+                    'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
+                    '***************************************************************
+                    If Method = METH_HYBRID And EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer Then
+                        If Sim1.Reduce_OptPara_and_ModPara(CES1.Childs(Child_Run).Get_All_Loc_Elem) Then
+                            Call Sim1.PREPARE_Evaluation_PES(CES1.Childs(Child_Run).Get_All_Loc_PES_Para)
                         End If
-
-                        Thr_Count += 1
-
-                        if (i_ch + Thread) = CES1.Settings.CES.n_Childs - 1 then
-                            Exit For
-                        End If
-
-                    Next
-
-                    ' Simulation ********************************
-                    SIM_Eval_is_OK = False                     '*
-                    SIM_Eval_is_OK = Sim1.launchSim(Thr_count) '*
-                    Thr_count = 0                              '*
-                    '********************************************
-
-                    Eval_Count += 2
-                    If (Eval_Count >= 10) Then
-                        Throw New Exception("Es konnte kein gültiger Datensatz erzeugt werden!")
                     End If
 
-                Loop While SIM_Eval_is_OK = False
+                    ' Simulation ******************************************
+                    SIM_Eval_is_OK = Sim1.launchSim(Thread_Free, Child_Run)
+                    '******************************************************
 
-                '************************************************************************************
-                For Thread = 0 to PhysCPU - 1
+                    Child_Run += 1
 
-                    Sim1.WorkDir = Sim1.getWorkDir(Thread)
+                ElseIf Sim1.launchReady(Thread_Ready, Child_Ready)
 
-                    If SIM_Eval_is_OK then Sim1.SIM_Ergebnis_auswerten(CES1.Childs(i_ch + Thread))
+                    SIM_Eval_is_OK = True
+                    Sim1.WorkDir = Sim1.getWorkDir(Thread_Ready)
+                    If SIM_Eval_is_OK then Sim1.SIM_Ergebnis_auswerten(CES1.Childs(Child_Ready))
 
                     'HYBRID: Speichert die PES Erfahrung diesen Childs im PES Memory
                     '***************************************************************
                     If Method = METH_HYBRID And EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer Then
-                        Call CES1.Memory_Store(i_ch + Thread, i_gen)
+                        Call CES1.Memory_Store(Child_Ready, i_gen)
                     End If
 
                     'Lösung im TeeChart einzeichnen
                     '==============================
                     If SIM_Eval_is_OK Then 
-                        Call Me.LösungZeichnen(CES1.Childs(i_ch + Thread), 0, 0, i_gen, i_ch + Thread, ColorManagement(ColorArray, CES1.Childs(i_ch + Thread)))
+                        Call Me.LösungZeichnen(CES1.Childs(Child_Ready), 0, 0, i_gen, Child_Ready, ColorManagement(ColorArray, CES1.Childs(Child_Ready)))
                     End If
 
                     System.Windows.Forms.Application.DoEvents()
+                    Call EVO_Opt_Verlauf1.Nachfolger(Child_Ready + 1)
+                    If Child_Ready = CES1.Settings.CES.n_Childs - 1 then Ready = true
 
-                    Call EVO_Opt_Verlauf1.Nachfolger(i_ch + Thread + 1)
+                    Child_Ready += 1
+                Else
 
-                    'Für ungerade Kinder Zahlen
-                    If (i_ch + Thread) = CES1.Settings.CES.n_Childs - 1 then
-                        Exit For
-                    End If
-                Next
-            Next
+                    System.Threading.Thread.Sleep(200)
+                    Application.DoEvents
 
-            Call EVO_Opt_Verlauf1.Generation(i_gen + 1)
+                End If
+
+            Loop While Ready = False
 
             '^ ENDE der Child Schleife
             'xxxxxxxxxxxxxxxxxxxxxxx
+
+            Call EVO_Opt_Verlauf1.Generation(i_gen + 1)
 
             'Die Listen müssen nach der letzten Evaluierung wieder zurückgesetzt werden
             'Sicher ob das benötigt wird?
@@ -1251,7 +1237,7 @@ Partial Class Form1
             Call Sim1.PREPARE_Evaluation_PES(aktuellePara)
 
             'Evaluierung des Simulationsmodells (ToDo: Validätsprüfung fehlt)
-            SIM_Eval_is_OK = Sim1.launchSim(1)
+            SIM_Eval_is_OK = Sim1.launchSim(0, 0)
             If SIM_Eval_is_OK then Call Sim1.SIM_Ergebnis_auswerten(ind)
 
             'Lösung im TeeChart einzeichnen
@@ -1287,7 +1273,7 @@ Partial Class Form1
                 Call Sim1.PREPARE_Evaluation_PES(aktuellePara)
 
                 'Evaluierung des Simulationsmodells
-                SIM_Eval_is_OK = Sim1.launchSim(1)
+                SIM_Eval_is_OK = Sim1.launchSim(0, 0)
                 If SIM_Eval_is_OK then Call Sim1.SIM_Ergebnis_auswerten(ind)
 
                 'Lösung im TeeChart einzeichnen
@@ -1317,7 +1303,7 @@ Partial Class Form1
                     Call Sim1.PREPARE_Evaluation_PES(aktuellePara)
 
                     'Evaluierung des Simulationsmodells
-                    SIM_Eval_is_OK = Sim1.launchSim(1)
+                    SIM_Eval_is_OK = Sim1.launchSim(0, 0)
                     If SIM_Eval_is_OK then Call Sim1.SIM_Ergebnis_auswerten(ind)
 
                     'Lösung im TeeChart einzeichnen
@@ -1514,7 +1500,7 @@ Start_Evolutionsrunden:
                                     Thr_Count += 1
                                     ' Simulation ********************************
                                     SIM_Eval_is_OK = False                     '*
-                                    SIM_Eval_is_OK = Sim1.launchSim(Thr_count) '*
+                                    SIM_Eval_is_OK = Sim1.launchSim(0, 0) '*
                                     Thr_count = 0                              '*
                                     '********************************************
 
@@ -2270,7 +2256,7 @@ Start_Evolutionsrunden:
             'xxxxxxxxxxxxxxxxxxxx
 
             'Simulieren
-            isOK = Sim1.launchSim(1)
+            isOK = Sim1.launchSim(0, 0)
             If isOK then call Sim1.WelDateiVerwursten()
 
             'Sonderfall IHA-Berechnung

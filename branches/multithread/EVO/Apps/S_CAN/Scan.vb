@@ -11,7 +11,7 @@ Public Class Scan
 
     Private input As Wave.WEL
 
-    Public Overrides Function launchSim(Byval n_sims As Integer) As Boolean
+    Public Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
 
         Dim i, j, k, AnzZeil As Integer
         Dim parameterdatei, Zeile, ZeilenArray(), stoffe(), tmp() As String
@@ -99,6 +99,13 @@ Public Class Scan
         Next
 
         Return True
+
+    End Function
+
+    Public Overrides Function launchFree(ByRef Thread_ID As Integer) As Boolean
+
+    End Function
+    Public Overrides Function launchReady(ByRef Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
 
     End Function
         
