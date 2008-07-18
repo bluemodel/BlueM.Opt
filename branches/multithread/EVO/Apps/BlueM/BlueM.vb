@@ -370,7 +370,7 @@ Public Class BlueM
         launchFree = False
 
         For Each Thr_C As CThread In My_C_Thread
-            If Thr_C.Sim_Is_OK = True then
+            If Thr_C.Sim_Is_OK = True and Thr_C.get_Child_ID = -1 then
                 launchFree = True
                 Thread_ID = Thr_C.get_Thread_ID
                 System.Threading.Thread.Sleep(3)
@@ -623,7 +623,7 @@ Public Class BlueM
             Me.is_Ini = False
 
             'Priority
-            System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.BelowNormal
+            System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
 
             Try
                 SyncLock bluem_dll

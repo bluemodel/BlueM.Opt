@@ -892,7 +892,13 @@ Partial Class Form1
         'xxxx Optimierung xxxxxx
         'Generationsschleife CES
         'xxxxxxxxxxxxxxxxxxxxxxx
+        Dim Time(CES1.Settings.CES.n_Generations - 1) As Timespan
+        Dim Stoppuhr As New Stopwatch()
+        
+
         For i_gen = 0 To CES1.Settings.CES.n_Generations - 1
+            Stoppuhr.Reset
+            Stoppuhr.Start
 
             'Child Schleife
             'xxxxxxxxxxxxxx
@@ -901,6 +907,8 @@ Partial Class Form1
             Dim Child_Run As Integer = 0
             Dim Child_Ready As Integer = 0
             Dim Ready As Boolean = false
+            System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.BelowNormal
+
             Do
                 If Sim1.launchFree(Thread_Free) and Child_Run < CES1.Settings.CES.n_Childs and (Child_Ready + PhysCPU > Child_Run) then
 
@@ -952,12 +960,17 @@ Partial Class Form1
                     Child_Ready += 1
                 Else
 
-                    System.Threading.Thread.Sleep(200)
+                    System.Threading.Thread.Sleep(10)
                     Application.DoEvents
 
                 End If
 
             Loop While Ready = False
+            
+            Stoppuhr.Stop
+            Time(i_gen) = Stoppuhr.Elapsed
+
+            System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
 
             '^ ENDE der Child Schleife
             'xxxxxxxxxxxxxxxxxxxxxxx
@@ -1028,7 +1041,6 @@ Partial Class Form1
             If Method = METH_HYBRID And EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer Then
                 Call Mixed_Integer_PES(i_gen)
             End If
-
         Next
         'Ende der Generationsschleife CES
 
@@ -2679,8 +2691,8 @@ Start_Evolutionsrunden:
         PhysCPU = PhysCPUarray.Count
 
         'HACK -----
-        LogCPU = 4
-        PhysCPU = 4
+        LogCPU = 5
+        PhysCPU = 5
         '----------
 
     End Sub
