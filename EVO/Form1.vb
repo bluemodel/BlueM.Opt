@@ -9,14 +9,14 @@ Imports System.ComponentModel
 '*******************************************************************************
 '**** ihwb Optimierung                                                      ****
 '****                                                                       ****
-'**** Christoph Huebner, Felix Froehlich, Dirk Muschalla                    ****
+'**** Christoph Huebner, Felix Froehlich, Dirk Muschalla, Dominik Kerber    ****
 '****                                                                       ****
 '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
 '**** TU Darmstadt                                                          ****
 '****                                                                       ****
 '**** Erstellt: Dezember 2003                                               ****
 '****                                                                       ****
-'**** Letzte Änderung: Juli 2007                                            ****
+'**** Letzte Änderung: Juli 2008                                            ****
 '*******************************************************************************
 '*******************************************************************************
 
@@ -39,6 +39,9 @@ Partial Class Form1
     Private SensiPlot1 As SensiPlot
     Private CES1 As EVO.Kern.CES
     Private TSP1 As TSP
+
+    'New'
+    'Dim hybrid2008 As EVO.Hybrid2008.Main.cs
 
     '**** Globale Parameter Parameter Optimierung ****
     'TODO: diese Werte sollten eigentlich nur in CES bzw PES vorgehalten werden
@@ -202,16 +205,13 @@ Partial Class Form1
                     'Testprobleme anzeigen
                     Call Me.Testprobleme1.Show()
 
-                    'EVO_Einstellungen aktivieren
-                    EVO_Einstellungen1.Enabled = True
+                    '### DK: Methodenauswahl ist erforderlich 
+                    ComboBox_Methode.Items.Clear()
+                    ComboBox_Methode.Items.AddRange(New Object() {"", METH_PES, METH_Hybrid2008})
 
-                    Call EVO_Einstellungen1.setStandard_PES(Testprobleme1.OptModus)
-
-                    'Globale Parameter werden gesetzt
-                    Call Testprobleme1.Parameter_Uebergabe(globalAnzPar, myPara)
-
-                    'Start-Button aktivieren (keine Methodenauswahl erforderlich)
-                    Button_Start.Enabled = True
+                    'Methode aktivieren
+                    Me.Label_Methode.Enabled = True
+                    Me.ComboBox_Methode.Enabled = True
 
 
                 Case ANW_TSP 'Anwendung Traveling Salesman Problem (TSP)
@@ -294,8 +294,9 @@ Partial Class Form1
 
                     'Mauszeiger wieder normal
                     Cursor = Cursors.Default
-                    Exit Sub
 
+                    'Ende
+                    Exit Sub
 
                 Case METH_RESET 'Methode Reset
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -307,6 +308,12 @@ Partial Class Form1
 
                     'Ergebnis-Buttons
                     Me.Button_openMDB.Enabled = True
+
+                    'Mauszeiger wieder normal
+                    Cursor = Cursors.Default
+
+                    'Ende
+                    Exit Sub
 
 
                 Case METH_SENSIPLOT 'Methode SensiPlot
@@ -340,25 +347,51 @@ Partial Class Form1
                 Case METH_PES 'Methode PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'Ergebnis-Buttons
-                    Me.Button_openMDB.Enabled = True
-
-                    'PES für Sim vorbereiten
-                    Call Sim1.read_and_valid_INI_Files_PES()
-
-                    'EVO_Einstellungen einrichten
+                    'EVO_Einstellungen aktivieren
                     EVO_Einstellungen1.Enabled = True
-                    Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_PES
-                    If (Common.Manager.AnzPenalty = 1) Then
-                        'Single-Objective
-                        Call EVO_Einstellungen1.setStandard_PES(Common.Constants.EVO_MODUS.Single_Objective)
-                    ElseIf (Common.Manager.AnzPenalty > 1) Then
-                        'Multi-Objective
-                        Call EVO_Einstellungen1.setStandard_PES(Common.Constants.EVO_MODUS.Multi_Objective)
-                    End If
 
-                    'Parameterübergabe an PES
-                    Call Sim1.Parameter_Uebergabe(globalAnzPar, myPara)
+                    'Tabcontrols entfernen die man nicht braucht
+                    With EVO_Einstellungen1
+                        .TabControl1.TabPages.Remove(.TabPage_CES)
+                        .TabControl1.TabPages.Remove(.TabPage_HookeJeeves)
+                        .TabControl1.TabPages.Remove(.TabPage_Hybrid2008)
+                    End With
+
+                    'Fallunterscheidung Anwendung
+                    '============================
+                    If (Me.Anwendung = ANW_TESTPROBLEME) Then
+                        'Testprobleme
+                        '------------
+
+                        'EVO_Einstellungen einrichten
+                        Call EVO_Einstellungen1.setStandard_PES(Testprobleme1.OptModus)
+
+                        'Globale Parameter werden gesetzt
+                        Call Testprobleme1.Parameter_Uebergabe(globalAnzPar, myPara)
+
+                    Else
+                        'Alle SIM-Anwendungen
+                        '--------------------
+
+                        'Ergebnis-Buttons
+                        Me.Button_openMDB.Enabled = True
+
+                        'PES für Sim vorbereiten
+                        Call Sim1.read_and_valid_INI_Files_PES()
+
+                        'EVO_Einstellungen einrichten
+                        If (Common.Manager.AnzPenalty = 1) Then
+                            'Single-Objective
+                            Call EVO_Einstellungen1.setStandard_PES(Common.Constants.EVO_MODUS.Single_Objective)
+                        ElseIf (Common.Manager.AnzPenalty > 1) Then
+                            'Multi-Objective
+                            Call EVO_Einstellungen1.setStandard_PES(Common.Constants.EVO_MODUS.Multi_Objective)
+                        End If
+
+                        'Parameterübergabe an PES
+                        Call Sim1.Parameter_Uebergabe(globalAnzPar, myPara)
+
+                    End If
 
                     'EVO_Verlauf zurücksetzen
                     Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
@@ -367,9 +400,15 @@ Partial Class Form1
                 Case METH_HOOKJEEVES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'EVO_Einstellungen einrichten
-                    Me.EVO_Einstellungen1.Enabled = True
-                    Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_HookeJeeves
+                    'EVO_Einstellungen aktivieren
+                    EVO_Einstellungen1.Enabled = True
+
+                    'Tabcontrols entfernen die man nicht braucht
+                    With EVO_Einstellungen1
+                        .TabControl1.TabPages.Remove(.TabPage_PES)
+                        .TabControl1.TabPages.Remove(.TabPage_CES)
+                        .TabControl1.TabPages.Remove(.TabPage_Hybrid2008)
+                    End With
 
                     'TODO: eigenen read and valid methode für hookJeeves
                     Call Sim1.read_and_valid_INI_Files_PES()
@@ -388,24 +427,36 @@ Partial Class Form1
                 Case METH_CES, METH_HYBRID 'Methode CES und Methode CES_PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'Ergebnis-Buttons
-                    Me.Button_openMDB.Enabled = True
-
                     'Funktioniert nur bei BlueM!
                     If (Not Anwendung = ANW_BLUEM) Then
                         Throw New Exception("CES funktioniert bisher nur mit BlueM!")
                     End If
 
+                    'EVO_Einstellungen aktivieren
+                    EVO_Einstellungen1.Enabled = True
+
+                    'Tabcontrols entfernen die man nicht braucht
+                    With EVO_Einstellungen1
+                        .TabControl1.TabPages.Remove(.TabPage_HookeJeeves)
+                        .TabControl1.TabPages.Remove(.TabPage_Hybrid2008)
+                    End With
+
+                    'Ergebnis-Buttons
+                    Me.Button_openMDB.Enabled = True
+
                     'Fallunterscheidung CES oder Hybrid
                     Select Case Form1.Method
                         Case METH_CES
+
+                            'Tabcontrol PES auch entfernen
+                            With EVO_Einstellungen1
+                                .TabControl1.TabPages.Remove(.TabPage_PES)
+                            End With
+
                             'CES für Sim vorbereiten (Files lesen und Validieren)
                             Call Sim1.read_and_valid_INI_Files_CES()
 
                         Case METH_HYBRID
-
-                            'EVO_Einstellungen aktiviern
-                            EVO_Einstellungen1.Enabled = True
 
                             'CES für Sim vorbereiten (Files lesen und Validieren)
                             Call Sim1.read_and_valid_INI_Files_HYBRID()
@@ -418,13 +469,11 @@ Partial Class Form1
 
                             'Die Original Gerinneflaechen für SKos einlesen
                             'Call Sim1.skos.
+
                     End Select
 
                     'EVO_Einstellungen einrichten
-                    '****************************
-                    EVO_Einstellungen1.Enabled = True
-                    Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_CES
-
+                    '----------------------------
                     'Je nach Methode nur CES oder HYBRID
                     Call EVO_Einstellungen1.setStandard_CES()
 
@@ -442,9 +491,56 @@ Partial Class Form1
                         Call EVO_Einstellungen1.setTestModus(Sim1.CES_T_Modus, Sim1.TestPath, 1, 1, Sim1.n_Combinations)
                     End If
 
+
+                Case METH_Hybrid2008
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'EVO_Einstellungen aktivieren
+                    EVO_Einstellungen1.Enabled = True
+
+                    'Tabcontrols entfernen die man nicht braucht
+                    With EVO_Einstellungen1
+                        .TabControl1.TabPages.Remove(.TabPage_PES)
+                        .TabControl1.TabPages.Remove(.TabPage_CES)
+                        .TabControl1.TabPages.Remove(.TabPage_HookeJeeves)
+                    End With
+
+                    If (Me.Anwendung = ANW_TESTPROBLEME) Then
+                        'Testprobleme mit Hybrid2008 Verfahren berechnen
+                        MsgBox("Berechnung der Testprobleme mit Hybrid2008", MsgBoxStyle.Information, "Info")
+
+                    Else
+                        'Modelle mit Hybrid2008 berechnen
+                        MsgBox("Berechnung der Modelle mit Hybrid2008", MsgBoxStyle.Information, "Info")
+
+
+                    End If
+
+                    'Ergebnis-Buttons
+                    'Me.Button_openMDB.Enabled = True
+
+                    'PES für Sim vorbereiten
+                    'Call Sim1.read_and_valid_INI_Files_PES()
+
+                    'EVO_Einstellungen einrichten
+                    'Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_PES
+                    'If (Common.Manager.AnzPenalty = 1) Then
+                    'Single-Objective
+                    'Call EVO_Einstellungen1.setStandard_PES(Common.Constants.EVO_MODUS.Single_Objective)
+                    'ElseIf (Common.Manager.AnzPenalty > 1) Then
+                    'Multi-Objective
+                    'Call EVO_Einstellungen1.setStandard_PES(Common.Constants.EVO_MODUS.Multi_Objective)
+                    'End If
+
+                    'Parameterübergabe an PES
+                    'Call Sim1.Parameter_Uebergabe(globalAnzPar, myPara)
+
+                    'EVO_Verlauf zurücksetzen
+                    'Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
+
             End Select
 
-            'IniApp OK -> Start Button aktivieren
+            'IniMethod OK -> Start Button aktivieren
             Me.Button_Start.Enabled = True
 
             'Mauszeiger wieder normal

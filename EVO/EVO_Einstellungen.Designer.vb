@@ -130,6 +130,7 @@ Partial Class EVO_Einstellungen
         Me.SpeichernToolStripButton = New System.Windows.Forms.ToolStripButton
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox
+        Me.TabPage_Hybrid2008 = New System.Windows.Forms.TabPage
         Label_CES_MemSize = New System.Windows.Forms.Label
         Label_CES_NMembers_SecPop_PES = New System.Windows.Forms.Label
         Label_CES_NExchange_secPop_PES = New System.Windows.Forms.Label
@@ -540,6 +541,8 @@ Partial Class EVO_Einstellungen
         Me.TabControl1.Controls.Add(Me.TabPage_PES)
         Me.TabControl1.Controls.Add(Me.TabPage_CES)
         Me.TabControl1.Controls.Add(Me.TabPage_HookeJeeves)
+        Me.TabControl1.Controls.Add(Me.TabPage_Hybrid2008)
+        Me.TabControl1.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TabControl1.Location = New System.Drawing.Point(1, 41)
         Me.TabControl1.Margin = New System.Windows.Forms.Padding(0)
         Me.TabControl1.Name = "TabControl1"
@@ -569,6 +572,7 @@ Partial Class EVO_Einstellungen
         Me.TabPage_PES.Controls.Add(Me.CheckisPopul)
         Me.TabPage_PES.Controls.Add(Me.GroupBox_Populationen)
         Me.TabPage_PES.Controls.Add(Me.checkpaintconstrained)
+        Me.TabPage_PES.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TabPage_PES.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_PES.Margin = New System.Windows.Forms.Padding(0)
         Me.TabPage_PES.Name = "TabPage_PES"
@@ -914,6 +918,7 @@ Partial Class EVO_Einstellungen
         Me.TabPage_CES.Controls.Add(Me.Combo_CES_IniValues)
         Me.TabPage_CES.Controls.Add(Label_CES_IniValues)
         Me.TabPage_CES.Controls.Add(Me.Label_CES_OptModus)
+        Me.TabPage_CES.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TabPage_CES.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_CES.Margin = New System.Windows.Forms.Padding(0)
         Me.TabPage_CES.Name = "TabPage_CES"
@@ -1221,12 +1226,13 @@ Partial Class EVO_Einstellungen
         Me.TabPage_HookeJeeves.Controls.Add(Label1)
         Me.TabPage_HookeJeeves.Controls.Add(Me.Numeric_HJ_DeltaStart)
         Me.TabPage_HookeJeeves.Controls.Add(Me.CheckBox_HJ_DNVektor)
+        Me.TabPage_HookeJeeves.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TabPage_HookeJeeves.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_HookeJeeves.Name = "TabPage_HookeJeeves"
         Me.TabPage_HookeJeeves.Padding = New System.Windows.Forms.Padding(3)
         Me.TabPage_HookeJeeves.Size = New System.Drawing.Size(222, 630)
         Me.TabPage_HookeJeeves.TabIndex = 2
-        Me.TabPage_HookeJeeves.Text = "Hooke & Jeeves"
+        Me.TabPage_HookeJeeves.Text = "Hooke&Jeeves"
         '
         'Label_HJ_RS
         '
@@ -1360,6 +1366,17 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Einstellungen.TabStop = False
         Me.GroupBox_Einstellungen.Text = "Einstellungen:"
         '
+        'TabPage_Hybrid2008
+        '
+        Me.TabPage_Hybrid2008.BackColor = System.Drawing.SystemColors.Control
+        Me.TabPage_Hybrid2008.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.TabPage_Hybrid2008.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage_Hybrid2008.Name = "TabPage_Hybrid2008"
+        Me.TabPage_Hybrid2008.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage_Hybrid2008.Size = New System.Drawing.Size(222, 630)
+        Me.TabPage_Hybrid2008.TabIndex = 3
+        Me.TabPage_Hybrid2008.Text = "Hybrid2008"
+        '
         'EVO_Einstellungen
         '
         Me.Controls.Add(Me.GroupBox_Einstellungen)
@@ -1448,7 +1465,6 @@ Partial Class EVO_Einstellungen
     Private WithEvents Numeric_HJ_DeltaStart As System.Windows.Forms.NumericUpDown
     Private WithEvents CheckBox_HJ_DNVektor As System.Windows.Forms.CheckBox
     Public WithEvents TabPage_PES As System.Windows.Forms.TabPage
-    Public WithEvents TabControl1 As System.Windows.Forms.TabControl
     Public WithEvents Label_HJ_TSaktuelle As System.Windows.Forms.Label
     Public WithEvents Label_HJ_RS As System.Windows.Forms.Label
     Public WithEvents Label_HJ_ES As System.Windows.Forms.Label
@@ -1487,4 +1503,6 @@ Partial Class EVO_Einstellungen
     Private WithEvents CheckBox_CES_RealOptimisation As System.Windows.Forms.CheckBox
     Private WithEvents LabelAnzEltern As System.Windows.Forms.Label
     Private WithEvents CheckBox_CES_StartPESPop As System.Windows.Forms.CheckBox
+    Friend WithEvents TabPage_Hybrid2008 As System.Windows.Forms.TabPage
+    Public WithEvents TabControl1 As System.Windows.Forms.TabControl
 End Class
