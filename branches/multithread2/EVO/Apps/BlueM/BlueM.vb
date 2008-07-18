@@ -22,11 +22,6 @@ Public Class BlueM
     'Eigenschaften
     '#############
 
-    Public Overrides ReadOnly Property Datensatzendung() As String
-        Get
-            Return ".ALL"
-        End Get
-    End Property
 
     'BlueM DLL
     '---------
@@ -55,8 +50,26 @@ Public Class BlueM
 
         Call MyBase.New()
 
-        'Daten belegen
-        '-------------
+        Call Me.Init()
+
+    End Sub
+
+    'Copy-Konstruktor
+    '****************
+    Public Sub New(ByVal bluem1 As BlueM)
+
+        Call MyBase.New(CType(bluem1, Sim))
+
+        Call Me.Init()
+
+    End Sub
+
+    'Daten belegen
+    '*************
+    Private Sub Init()
+
+        Me.mDatensatzendung = ".ALL"
+
         Me.useKWL = False
         Me.isIHA = False
 
@@ -65,6 +78,8 @@ Public Class BlueM
         Dim dll_path As String
         dll_path = System.Windows.Forms.Application.StartupPath() & "\Apps\BlueM\BlueM.dll"
 
+        'BlueM DLL instanzieren
+        '----------------------
         If (File.Exists(dll_path)) Then
             bluem_dll = New BlueM_EngineDotNetAccess(dll_path)
         Else
@@ -328,9 +343,11 @@ Public Class BlueM
 
     'BlauesModell ausführen (simulieren)
     '***********************************
-    Public Overrides Function launchSim() As Boolean
+    Public Overrides Function SIM_launch() As Boolean
 
         Dim simOK As Boolean
+
+        Console.WriteLine("Starte Simulation in " & Me.WorkDir)
 
         Try
 
@@ -368,25 +385,33 @@ Public Class BlueM
 
         End Try
 
-        'Simulationsergebnis verarbeiten
-        '-------------------------------
-        If (simOK) Then
+        Console.WriteLine("Ende Simulation in " & Me.WorkDir)
 
-            'Altes Simulationsergebnis löschen
-            Me.SimErgebnis.Clear()
+        Return simOK
 
-            'WEL-Datei einlesen
-            '------------------
-            Dim WELtmp As Wave.WEL = New Wave.WEL(Me.WorkDir & Me.Datensatz & ".WEL", True)
+    End Function
 
-            'Reihen zu Simulationsergebnis hinzufügen
-            For Each zre As Wave.Zeitreihe In WELtmp.Zeitreihen
-                Me.SimErgebnis.Add(zre, zre.ToString())
-            Next
+    'Simulationsergebnis einlesen
+    '----------------------------
+    Public Overrides Sub SIM_readResults()
 
-            'ggf. KWL-Datei einlesen
-            '-----------------------
-            If (Me.useKWL) Then
+        Console.WriteLine("Lese Simulationsergebnis in " & Me.WorkDir)
+
+        'Altes Simulationsergebnis löschen
+        Me.SimErgebnis.Clear()
+
+        'WEL-Datei einlesen
+        '------------------
+        Dim WELtmp As Wave.WEL = New Wave.WEL(Me.WorkDir & Me.Datensatz & ".WEL", True)
+
+        'Reihen zu Simulationsergebnis hinzufügen
+        For Each zre As Wave.Zeitreihe In WELtmp.Zeitreihen
+            Me.SimErgebnis.Add(zre, zre.ToString())
+        Next
+
+        'ggf. KWL-Datei einlesen
+        '-----------------------
+        If (Me.useKWL) Then
 
                 Dim KWLpath As String = Me.WorkDir & Me.Datensatz & ".KWL"
 
@@ -412,11 +437,7 @@ Public Class BlueM
                 Next
             End If
 
-        End If
-
-        Return simOK
-
-    End Function
+    End Sub
 
 #End Region 'Evaluierung
 
@@ -434,13 +455,13 @@ Public Class BlueM
 
             Case "WEL", "KWL"
                 'QWert aus WEL- oder KWL-Datei
-                QWert = QWert_WEL(ziel)
+                QWert = Me.QWert_WEL(ziel)
 
             Case "PRB"
                 'QWert aus PRB-Datei
                 'BUG 220: PRB geht nicht, weil keine Zeitreihe
                 Throw New Exception("PRB als OptZiel geht z.Zt. nicht (siehe Bug 138)")
-                'QWert = QWert_PRB(OptZiel)
+                'QWert = Me.QWert_PRB(OptZiel)
 
             Case Else
                 Throw New Exception("Der Wert '" & ziel.Datei & "' für die Datei wird bei Optimierungszielen für BlueM nicht akzeptiert!")
@@ -473,7 +494,7 @@ Public Class BlueM
                 QWert = MyBase.QWert_Reihe(ziel, SimReihe)
 
             Case "Kosten"
-                QWert = Me.SKos1.calculate_costs(Me)
+                QWert = Me.SKos1.Calculate_Costs(Me)
 
             Case "IHA"
                 QWert = Me.IHAProc.QWert_IHA(ziel, Me.IHASys.RVAResult)

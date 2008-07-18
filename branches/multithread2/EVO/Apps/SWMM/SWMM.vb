@@ -26,11 +26,6 @@ Public Class SWMM
 
     'Eigenschaften
     '#############
-    Public Overrides ReadOnly Property Datensatzendung() As String
-        Get
-            Return ".INP"
-        End Get
-    End Property
 
 #End Region 'Eigenschaften
 
@@ -43,10 +38,12 @@ Public Class SWMM
 
         Call MyBase.New()
 
+        Me.mDatensatzendung = ".INP"
+
     End Sub
 
     
-    Public Overrides Function launchSim() As Boolean
+    Public Overrides Function SIM_launch() As Boolean
 
         'Aktuelles Verzeichnis bestimmen
         Dim currentDir As String = CurDir()
@@ -71,11 +68,11 @@ Public Class SWMM
 
         'Alle Zeilen durchlaufen
         Dim Zeile As String
-        launchSim = False
+        SIM_launch = False
         Do
             Zeile = StrRead.ReadLine.ToString()
             If (Zeile.StartsWith("  Runoff Quantity Continuity")) Then
-                launchSim = True
+                SIM_launch = True
                 Exit Do
             End If
 
@@ -85,6 +82,12 @@ Public Class SWMM
         FiStr.Close()
 
     End Function
+
+    'Simulationsergebnis verarbeiten
+    '-------------------------------
+    Public Overrides Sub SIM_readResults()
+
+    End Sub
 
     Protected Overrides Sub Read_Kombinatorik()
 

@@ -27,7 +27,13 @@ Public MustInherit Class Sim
     'Generelle Eigenschaften
     '-----------------------
     Public Datensatz As String                           'Name des zu simulierenden Datensatzes
-    Public MustOverride ReadOnly Property Datensatzendung() As String
+    Protected mDatensatzendung As String
+    Public ReadOnly Property Datensatzendung() As String
+        Get
+            Return Me.mDatensatzendung
+        End Get
+    End Property
+
     Public WorkDir As String                             'Arbeitsverzeichnis für das Blaue Modell
     Public Event WorkDirChange()                         'Event für Änderung des Arbeitsverzeichnisses
 
@@ -70,8 +76,10 @@ Public MustInherit Class Sim
 
     'Ergebnisspeicher
     '----------------
-    Public OptResult As OptResult                   'Optimierungsergebnis
-    Public OptResultRef As OptResult                'Vergleichsergebnis
+    Public mResultManager As ResultManager                   'ResultManager
+
+    'Klon-Instanzen-Zähler
+    Private Shared nSim As Integer = 0
 
     'Kombinatorik
     '------------
@@ -83,18 +91,45 @@ Public MustInherit Class Sim
         Public KostenTyp As Integer
         Public Bauwerke() As String
         Public TestModus As Integer
+        Public Function Clone() As Struct_Massnahme
+            Dim i, j As Integer
+            Dim m As Struct_Massnahme
+            m.Name = Me.Name
+            ReDim m.Schaltung(Me.Schaltung.GetUpperBound(0), Me.Schaltung.GetUpperBound(1))
+            For i = 0 To Me.Schaltung.GetUpperBound(0)
+                For j = 0 To Me.Schaltung.GetUpperBound(1)
+                    m.Schaltung(i, j) = Me.Schaltung(i, j)
+                Next
+            Next
+            m.KostenTyp = Me.KostenTyp
+            ReDim m.Bauwerke(Me.Bauwerke.GetUpperBound(0))
+            For i = 0 To Me.Bauwerke.GetUpperBound(0)
+                m.Bauwerke(i) = Me.Bauwerke(i)
+            Next
+            m.TestModus = Me.TestModus
+            Return m
+        End Function
     End Structure
 
     Public Structure Struct_Lokation
         Public Name As String
         Public List_Massnahmen() As Struct_Massnahme
+        Public Function Clone() As Struct_Lokation
+            Dim loc As Struct_Lokation
+            loc.Name = Me.Name
+            ReDim loc.List_Massnahmen(Me.List_Massnahmen.GetUpperBound(0))
+            For i As Integer = 0 To Me.List_Massnahmen.GetUpperBound(0)
+                loc.List_Massnahmen(i) = Me.List_Massnahmen(i).Clone()
+            Next
+            Return loc
+        End Function
     End Structure
 
     Public List_Locations() As Struct_Lokation
 
-    Public VerzweigungsDatei(,) As String       			'Gibt die PathSize an für jede Pfadstelle
+    Public VerzweigungsDatei(,) As String                   'Gibt die PathSize an für jede Pfadstelle
     Public CES_T_Modus As Common.Constants.CES_T_MODUS      'Zeigt ob der TestModus aktiv ist
-    Public n_Combinations As Integer            			'Die Anzahl der Möglichen Kombinationen
+    Public n_Combinations As Integer                        'Die Anzahl der Möglichen Kombinationen
 
 
 #End Region 'Eigenschaften
@@ -110,8 +145,108 @@ Public MustInherit Class Sim
     '***********
     Public Sub New()
 
+        Dim i As Integer
+        Dim binpath, tmppath As String
+
+        'Temporäre Datensätze löschen
+        '----------------------------
+        binpath = System.Windows.Forms.Application.StartupPath()
+        For i = 0 To 99
+
+            tmppath = binpath & "\tmp_" & i.ToString("00") & "\"
+
+            If (Directory.Exists(tmppath)) Then
+
+                'Purge Read-Only status
+                Call Common.Helpers.purgeReadOnly(tmppath)
+
+                'Delete
+                Directory.Delete(tmppath, True)
+            End If
+        Next
+
         'Datenstrukturen initialisieren
         '------------------------------
+        Call Me.Init()
+
+        'Benutzereinstellungen einlesen 
+        '(z.Zt. nur letzter benutzter Datensatz)
+        '---------------------------------------
+        Call Me.ReadSettings()
+
+    End Sub
+
+    'Copy-Constructor
+    '****************
+    Public Sub New(ByVal sim1 As Sim)
+
+        Dim i, j As Integer
+
+        Sim.nSim += 1
+
+        Call Me.Init()
+
+        'Eigenschaften kopieren
+        '----------------------
+        Me.Datensatz = sim1.Datensatz
+        Me.mDatensatzendung = sim1.mDatensatzendung
+
+        Me.WorkDir = System.Windows.Forms.Application.StartupPath() & "\tmp_" & Sim.nSim.ToString("00") & "\"
+        My.Computer.FileSystem.CopyDirectory(sim1.WorkDir, Me.WorkDir, True)
+
+        Me.SimStart = sim1.SimStart
+        Me.SimEnde = sim1.SimEnde
+        Me.SimDT = sim1.SimDT
+
+        ReDim Me.List_OptParameter(sim1.List_OptParameter.GetUpperBound(0))
+        For i = 0 To Me.List_OptParameter.GetUpperBound(0)
+            Me.List_OptParameter(i) = sim1.List_OptParameter(i).Clone
+        Next
+
+        ReDim Me.List_OptParameter_Save(sim1.List_OptParameter_Save.GetUpperBound(0))
+        For i = 0 To Me.List_OptParameter_Save.GetUpperBound(0)
+            Me.List_OptParameter_Save(i) = sim1.List_OptParameter_Save(i).Clone
+        Next
+
+        ReDim Me.List_ModellParameter(sim1.List_ModellParameter.GetUpperBound(0))
+        For i = 0 To Me.List_ModellParameter.GetUpperBound(0)
+            Call copy_Struct_ModellParemeter(sim1.List_ModellParameter(i), Me.List_ModellParameter(i))
+        Next
+
+        ReDim Me.List_ModellParameter_Save(sim1.List_ModellParameter_Save.GetUpperBound(0))
+        For i = 0 To Me.List_ModellParameter_Save.GetUpperBound(0)
+            Call copy_Struct_ModellParemeter(sim1.List_ModellParameter_Save(i), Me.List_ModellParameter_Save(i))
+        Next
+
+        Me.mResultManager = New ResultManager(sim1.mResultManager)
+
+        'CES-Zeug
+        Me.SKos1 = sim1.SKos1.Clone()
+
+        ReDim Me.List_Locations(sim1.List_Locations.GetUpperBound(0))
+        For i = 0 To sim1.List_Locations.GetUpperBound(0)
+            Me.List_Locations(i) = sim1.List_Locations(i).Clone()
+        Next
+
+        If (Not IsNothing(sim1.VerzweigungsDatei)) Then
+            ReDim Me.VerzweigungsDatei(sim1.VerzweigungsDatei.GetUpperBound(0), sim1.VerzweigungsDatei.GetUpperBound(1))
+            For i = 0 To sim1.VerzweigungsDatei.GetUpperBound(0)
+                For j = 0 To sim1.VerzweigungsDatei.GetUpperBound(1)
+                    Me.VerzweigungsDatei(i, j) = sim1.VerzweigungsDatei(i, j)
+                Next
+            Next
+        End If
+
+        Me.CES_T_Modus = sim1.CES_T_Modus
+
+        Me.n_Combinations = sim1.n_Combinations
+
+    End Sub
+
+    'Datenstrukturen initialisieren
+    '******************************
+    Private Sub Init()
+
         ReDim Me.List_OptParameter(-1)
         ReDim Me.List_OptParameter_Save(-1)
         ReDim Me.List_ModellParameter(-1)
@@ -120,10 +255,6 @@ Public MustInherit Class Sim
 
         'Simulationsergebnis instanzieren
         Me.SimErgebnis = New Collection
-
-        'Benutzereinstellungen einlesen
-        '------------------------------
-        Call Me.ReadSettings()
 
     End Sub
 
@@ -182,7 +313,7 @@ Public MustInherit Class Sim
         'Prüfen der Anfangswerte
         Call Me.Validate_Startvalues()
         'Ergebnisspeicher initialisieren
-        Me.OptResult = New OptResult(Me)
+        Me.mResultManager = New ResultManager(Me)
 
     End Sub
 
@@ -210,7 +341,7 @@ Public MustInherit Class Sim
         'Die Zahl der Kombinationen wird ermittelt
         n_Combinations = No_of_Combinations()
         'Ergebnisspeicher initialisieren
-        Me.OptResult = New OptResult(Me)
+        Me.mResultManager = New ResultManager(Me)
 
     End Sub
 
@@ -254,7 +385,7 @@ Public MustInherit Class Sim
 
         'Ergebnisspeicher initialisieren
         '-------------------------------
-        Me.OptResult = New OptResult(Me)
+        Me.mResultManager = New ResultManager(Me)
 
     End Sub
 
@@ -445,10 +576,10 @@ Public MustInherit Class Sim
                         .isOpt = False
                     End If
                     .Bezeichnung = WerteArray(2).Trim()
-                    If (WerteArray(3).Trim() = "+") Then 
-                    	.Richtung = Common.EVO_RICHTUNG.Maximierung
+                    If (WerteArray(3).Trim() = "+") Then
+                        .Richtung = Common.EVO_RICHTUNG.Maximierung
                     Else
-                    	.Richtung = Common.EVO_RICHTUNG.Minimierung
+                        .Richtung = Common.EVO_RICHTUNG.Minimierung
                     End If
                     .ZielTyp = WerteArray(4).Trim()
                     .Datei = WerteArray(5).Trim()
@@ -465,7 +596,7 @@ Public MustInherit Class Sim
                         .EvalEnde = Me.SimEnde
                     End If
                     .WertTyp = WerteArray(10).Trim()
-                    If (WerteArray(11).Trim() <> "") Then 
+                    If (WerteArray(11).Trim() <> "") Then
                         .RefWert = Convert.ToDouble(WerteArray(11).Trim(), Common.Provider.FortranProvider)
                     End If
                     .RefGr = WerteArray(12).Trim()
@@ -1221,6 +1352,49 @@ Public MustInherit Class Sim
 
     End Sub
 
+    'Kompletter Evaluierungsvorgang (PES)
+    '************************************
+    Public Function SIM_PES(ByVal o As Object) As Boolean
+
+        Dim ind As Common.Individuum
+        Dim isOK As Boolean
+
+        isOK = False
+        ind = CType(o, Common.Individuum)
+
+        Call Me.PREPARE_Evaluation_PES(ind.PES_OptParas)
+
+        isOK = Me.SIM_launch()
+
+        Call Me.SIM_readResults()
+
+        Call Me.SIM_EvalResults(ind)
+
+        Return isOK
+
+    End Function
+
+    '(fast) Kompletter Evaluierungsvorgang (CES/HYBRID)
+    'Prepare_Evaluation muss vorher geschehen
+    '**************************************************
+    Public Function SIM_CES_HYBRID(ByVal o As Object) As Boolean
+
+        Dim ind As Common.Individuum
+        Dim isOK As Boolean
+
+        isOK = False
+        ind = CType(o, Common.Individuum)
+
+        isOK = Me.SIM_launch()
+
+        Call Me.SIM_readResults()
+
+        Call Me.SIM_EvalResults(ind)
+
+        Return isOK
+
+    End Function
+
     'Evaluierung des SimModells für ParameterOptimierung - Steuerungseinheit
     '***********************************************************************
     Public Sub PREPARE_Evaluation_PES(ByVal myPara() As EVO.Common.OptParameter)
@@ -1273,7 +1447,7 @@ Public MustInherit Class Sim
         Call OptParameter_to_ModellParameter()
 
         'Alle ModellParameter durchlaufen
-        For i = 0 To List_ModellParameter.GetUpperBound(0)
+        For i = 0 To Me.List_ModellParameter.GetUpperBound(0)
             WriteCheck = True
 
             DateiPfad = WorkDir & Datensatz & "." & List_ModellParameter(i).Datei
@@ -1367,31 +1541,24 @@ Handler:
 
     'Evaluiert die Kinderchen mit Hilfe des Simulationsmodells
     '*********************************************************
-    Public Function SIM_Evaluierung(ByRef Indi As Common.Individuum) As Boolean
+    Public Sub SIM_EvalResults(ByRef Indi As Common.Individuum)
 
         Dim i As Short
 
-        SIM_Evaluierung = False
-
-        'Modell Starten
-        If Not launchSim() Then Exit Function
-
         'Qualitätswerte berechnen
         For i = 0 To Common.Manager.AnzZiele - 1
-            Indi.Zielwerte(i) = QWert(Common.Manager.List_Ziele(i))
+            Indi.Zielwerte(i) = Me.QWert(Common.Manager.List_Ziele(i))
         Next
 
         'Constraints berechnen
         For i = 0 To Common.Manager.AnzConstraints - 1
-            Indi.Constrain(i) = Constraint(Common.Manager.List_Constraints(i))
+            Indi.Constrain(i) = Me.Constraint(Common.Manager.List_Constraints(i))
         Next
 
         'Lösung abspeichern
-        Call Me.OptResult.addSolution(Indi)
+        Call Me.mResultManager.addSolution(Indi)
 
-        SIM_Evaluierung = True
-
-    End Function
+    End Sub
 
     'VG_ Test Tagesganglinie mit Autokalibrierung
     'VG *****************************************
@@ -1454,7 +1621,11 @@ Handler:
 
     'SimModell ausführen (simulieren)
     '********************************
-    Public MustOverride Function launchSim() As Boolean
+    Public MustOverride Function SIM_launch() As Boolean
+
+    'Simulationsergebnis einlesen
+    '----------------------------
+    Public MustOverride Sub SIM_readResults()
 
 #End Region 'Evaluierung
 
@@ -1810,75 +1981,75 @@ Handler:
 
 #End Region 'Constraintberechnung
 
-#Region "SimErgebnisse lesen"
+    '#Region "SimErgebnisse lesen"
 
-    'SimErgebnisse lesen
-    '###################
+    '    'SimErgebnisse lesen
+    '    '###################
 
-    'Ein Ergebnis aus einer PRB-Datei einlesen
-    '*****************************************
-    Public Shared Function Read_PRB(ByVal DateiPfad As String, ByVal ZielGr As String, ByRef PRB(,) As Object) As Boolean
+    '    'Ein Ergebnis aus einer PRB-Datei einlesen
+    '    '*****************************************
+    '    Public Shared Function Read_PRB(ByVal DateiPfad As String, ByVal ZielGr As String, ByRef PRB(,) As Object) As Boolean
 
-        Dim ZeileStart As Integer = 0
-        Dim AnzZeil As Integer = 26                   'Anzahl der Zeilen ist immer 26, definiert durch MAXSTZ in BM
-        Dim j As Integer = 0
-        Dim Zeile As String
-        Read_PRB = True
+    '        Dim ZeileStart As Integer = 0
+    '        Dim AnzZeil As Integer = 26                   'Anzahl der Zeilen ist immer 26, definiert durch MAXSTZ in BM
+    '        Dim j As Integer = 0
+    '        Dim Zeile As String
+    '        Read_PRB = True
 
-        Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
-        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-        Dim StrReadSync As TextReader = TextReader.Synchronized(StrRead)
+    '        Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
+    '        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+    '        Dim StrReadSync As TextReader = TextReader.Synchronized(StrRead)
 
-        'Array redimensionieren
-        ReDim PRB(AnzZeil - 1, 1)
+    '        'Array redimensionieren
+    '        ReDim PRB(AnzZeil - 1, 1)
 
-        'Anfangszeile suchen
-        Do
-            Zeile = StrRead.ReadLine.ToString
-            If (Zeile.Contains("+ Wahrscheinlichkeitskeitsverteilung: " & ZielGr)) Then
-                Exit Do
-            End If
-        Loop Until StrRead.Peek() = -1
+    '        'Anfangszeile suchen
+    '        Do
+    '            Zeile = StrRead.ReadLine.ToString
+    '            If (Zeile.Contains("+ Wahrscheinlichkeitskeitsverteilung: " & ZielGr)) Then
+    '                Exit Do
+    '            End If
+    '        Loop Until StrRead.Peek() = -1
 
-        'Zeile mit Spaltenüberschriften überspringen
-        Zeile = StrRead.ReadLine.ToString
+    '        'Zeile mit Spaltenüberschriften überspringen
+    '        Zeile = StrRead.ReadLine.ToString
 
-        For j = 0 To AnzZeil - 1
-            Zeile = StrRead.ReadLine.ToString()
-            PRB(j, 0) = Convert.ToDouble(Zeile.Substring(2, 10))        'X-Wert
-            PRB(j, 1) = Convert.ToDouble(Zeile.Substring(13, 8))        'P(Jahr)
-        Next
-        StrReadSync.Close()
-        StrRead.Close()
-        FiStr.Close()
+    '        For j = 0 To AnzZeil - 1
+    '            Zeile = StrRead.ReadLine.ToString()
+    '            PRB(j, 0) = Convert.ToDouble(Zeile.Substring(2, 10))        'X-Wert
+    '            PRB(j, 1) = Convert.ToDouble(Zeile.Substring(13, 8))        'P(Jahr)
+    '        Next
+    '        StrReadSync.Close()
+    '        StrRead.Close()
+    '        FiStr.Close()
 
-        'Überflüssige Stützstellen (P) entfernen
-        '---------------------------------------
-        'Anzahl Stützstellen bestimmen
-        Dim stuetz As Integer = 0
-        Dim P_vorher As Double = -99
-        For j = 0 To PRB.GetUpperBound(0)
-            If (j = 0 Or Not PRB(j, 1) = P_vorher) Then
-                stuetz += 1
-                P_vorher = PRB(j, 1)
-            End If
-        Next
-        'Werte in neues Array schreiben
-        Dim PRBtmp(stuetz - 1, 1) As Object
-        stuetz = 0
-        For j = 0 To PRB.GetUpperBound(0)
-            If (j = 0 Or Not PRB(j, 1) = P_vorher) Then
-                PRBtmp(stuetz, 0) = PRB(j, 0)
-                PRBtmp(stuetz, 1) = PRB(j, 1)
-                P_vorher = PRB(j, 1)
-                stuetz += 1
-            End If
-        Next
-        PRB = PRBtmp
+    '        'Überflüssige Stützstellen (P) entfernen
+    '        '---------------------------------------
+    '        'Anzahl Stützstellen bestimmen
+    '        Dim stuetz As Integer = 0
+    '        Dim P_vorher As Double = -99
+    '        For j = 0 To PRB.GetUpperBound(0)
+    '            If (j = 0 Or Not PRB(j, 1) = P_vorher) Then
+    '                stuetz += 1
+    '                P_vorher = PRB(j, 1)
+    '            End If
+    '        Next
+    '        'Werte in neues Array schreiben
+    '        Dim PRBtmp(stuetz - 1, 1) As Object
+    '        stuetz = 0
+    '        For j = 0 To PRB.GetUpperBound(0)
+    '            If (j = 0 Or Not PRB(j, 1) = P_vorher) Then
+    '                PRBtmp(stuetz, 0) = PRB(j, 0)
+    '                PRBtmp(stuetz, 1) = PRB(j, 1)
+    '                P_vorher = PRB(j, 1)
+    '                stuetz += 1
+    '            End If
+    '        Next
+    '        PRB = PRBtmp
 
-    End Function
+    '    End Function
 
-#End Region 'SimErgebnisse lesen
+    '#End Region 'SimErgebnisse lesen
 
 #End Region 'Methoden
 

@@ -46,11 +46,76 @@ Public Class SKos
         Dim D1_Breite_Rand_L As Double
         Dim D2_Breite_Rand_R As Double
 
+        Public Function Clone() As TRS
+
+            Dim TRS1 As TRS
+
+            TRS1.Name = Me.Name
+            TRS1.Laenge = Me.Laenge
+            TRS1.DeltaVolume = Me.DeltaVolume
+            TRS1.Costs = Me.Costs
+
+            TRS1.A0_Hoehe_Sohle = Me.A0_Hoehe_Sohle
+            TRS1.A1_Breite_Sohle_L = Me.A1_Breite_Sohle_L
+            TRS1.A2_Breite_Sohle_R = Me.A2_Breite_Sohle_R
+
+            TRS1.B0_Hoehe_Gerinne = Me.B0_Hoehe_Gerinne
+            TRS1.B1_Breite_Ufer_L = Me.B1_Breite_Ufer_L
+            TRS1.B2_Breite_Ufer_R = Me.B2_Breite_Ufer_R
+
+            TRS1.C0_Hoehe_FPlain = Me.C0_Hoehe_FPlain
+            TRS1.C1_Breite_Vorl_L = Me.C1_Breite_Vorl_L
+            TRS1.C2_Breite_Vorl_R = Me.C2_Breite_Vorl_R
+
+            TRS1.D0_Hoehe_Rand = Me.D0_Hoehe_Rand
+            TRS1.D1_Breite_Rand_L = Me.D1_Breite_Rand_L
+            TRS1.D2_Breite_Rand_R = Me.D2_Breite_Rand_R
+
+            Return TRS1
+
+        End Function
 
     End Structure
 
     Dim TRS_Orig(-1) As TRS
     Dim TRS_Akt(-1) As TRS
+
+    'Klont das Objekt
+    '****************
+    Public Function Clone() As SKos
+
+        Dim i, j As Integer
+        Dim skos1 As New SKos()
+
+        If (Not IsNothing(Me.Akt_Elemente)) Then
+            ReDim skos1.Akt_Elemente(Me.Akt_Elemente.GetUpperBound(0))
+            For i = 0 To Me.Akt_Elemente.GetUpperBound(0)
+                skos1.Akt_Elemente(i) = Me.Akt_Elemente(i)
+            Next
+        End If
+
+        If (Not IsNothing(Me.Save_TRS)) Then
+            ReDim skos1.Save_TRS(Me.Save_TRS.GetUpperBound(0), Me.Save_TRS.GetUpperBound(1))
+            For i = 0 To Me.Save_TRS.GetUpperBound(0)
+                For j = 0 To Me.Save_TRS.GetUpperBound(1)
+                    skos1.Save_TRS(i, j) = Me.Save_TRS(i, j)
+                Next
+            Next
+        End If
+
+        ReDim skos1.TRS_Orig(Me.TRS_Orig.GetUpperBound(0))
+        For i = 0 To Me.TRS_Orig.GetUpperBound(0)
+            skos1.TRS_Orig(i) = Me.TRS_Orig(i).Clone()
+        Next
+
+        ReDim skos1.TRS_Akt(Me.TRS_Akt.GetUpperBound(0))
+        For i = 0 To Me.TRS_Akt.GetUpperBound(0)
+            skos1.TRS_Akt(i) = Me.TRS_Akt(i).Clone()
+        Next
+
+        Return skos1
+
+    End Function
 
 
     'Funktion für die Kalkulation der Kosten
@@ -86,6 +151,7 @@ Public Class SKos
 
         Return costs
     End Function
+
     'Funktion zum erstellen der Elementliste
     'Alle Elemente aus der CES datei werden hier in die Liste gesetzt
     '****************************************************************

@@ -1157,7 +1157,7 @@ StartMutation:
 
     'ES_BEST - Einordnen der Qualitätsfunktion im Bestwertspeicher
     '*************************************************************
-    Public Sub EsBest(ByVal ind As Individuum)
+    Public Sub EsBest(ByVal ind As Individuum, ByVal i_Nachf As Integer)
 
         Dim m, i, j, v As Integer
         Dim h As Double
@@ -1192,7 +1192,7 @@ StartMutation:
         Else
             'Multi-Objective Pareto
             '----------------------
-            With NDSorting(PES_iAkt.iAktNachf)
+            With NDSorting(i_Nachf)
                 For i = 0 To Manager.AnzZiele - 1
                     .Zielwerte(i) = ind.Zielwerte(i)
                 Next i

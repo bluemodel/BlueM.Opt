@@ -218,7 +218,8 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="OptResult.vb" />
+    <Compile Include="ResultStore.vb" />
+    <Compile Include="ResultManager.vb" />
     <Compile Include="Settings.vb" />
     <EmbeddedResource Include="Apps\SensiPlot.resx">
       <DependentUpon>SensiPlot.vb</DependentUpon>
@@ -280,9 +281,9 @@
     </None>
     <None Include="Resources\icon_png.png" />
     <None Include="Resources\icon_edit.png" />
-    <Content Include="Apps\BlueM\BlueM.dll">
+    <EmbeddedResource Include="Apps\BlueM\BlueM.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </EmbeddedResource>
     <Content Include="Apps\BlueM\IHWB.BlueM.DllAdapter.dll" />
     <Content Include="Apps\SWMM\SWMM5.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

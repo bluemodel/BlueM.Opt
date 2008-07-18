@@ -15,23 +15,18 @@ Partial Public Class Scatterplot
     '*******************************************************************************
 
     Private Diags(,) As EVO.Diagramm
-    Private OptResult, OptResultRef As EVO.OptResult
     Private Zielauswahl() As Integer
     Private SekPopOnly, ShowRef As Boolean
     Public Event pointSelected(ByVal ind As Common.Individuum)
 
     'Konstruktor
     '***********
-    Public Sub New(ByVal optres As EVO.OptResult, ByVal optresref As EVO.OptResult, ByVal _zielauswahl() As Integer, ByVal _sekpoponly As Boolean, ByVal _showRef As Boolean)
+    Public Sub New(ByVal _zielauswahl() As Integer, ByVal _sekpoponly As Boolean, ByVal _showRef As Boolean)
 
         ' Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent()
 
         ' Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-
-        'Optimierungsergebnis übergeben
-        Me.OptResult = optres
-        Me.OptResultRef = optresref
 
         'Optionen übernehmen
         Me.SekPopOnly = _sekpoponly
@@ -44,7 +39,7 @@ Partial Public Class Scatterplot
         Call Me.zeichnen()
 
         'Bereits ausgewählte Lösungen anzeigen
-        For Each ind As Common.Individuum In Me.OptResult.getSelectedSolutions
+        For Each ind As Common.Individuum In ResultManager.getSelectedSolutions
             Call Me.showSelectedSolution(ind)
         Next
 
@@ -74,13 +69,13 @@ Partial Public Class Scatterplot
             max(i) = Double.MinValue
             If (Me.SekPopOnly) Then
                 'Nur Sekundäre Population
-                For Each ind As Common.Individuum In Me.OptResult.getSekPop()
+                For Each ind As Common.Individuum In ResultManager.OptResult.getSekPop()
                     min(i) = Math.Min(ind.Zielwerte(Me.Zielauswahl(i)), min(i))
                     max(i) = Math.Max(ind.Zielwerte(Me.Zielauswahl(i)), max(i))
                 Next
             Else
                 'Alle Lösungen
-                For Each ind As Common.Individuum In Me.OptResult.Solutions
+                For Each ind As Common.Individuum In ResultManager.OptResult.Solutions
                     min(i) = Math.Min(ind.Zielwerte(Me.Zielauswahl(i)), min(i))
                     max(i) = Math.Max(ind.Zielwerte(Me.Zielauswahl(i)), max(i))
                 Next
@@ -91,8 +86,8 @@ Partial Public Class Scatterplot
                 max(i) = Math.Max(Common.Manager.List_Ziele(Me.Zielauswahl(i)).IstWert, max(i))
             End If
             'Vergleichsergebnis
-            If (Me.ShowRef)
-                For Each ind As Common.Individuum In Me.OptResultRef.getSekPop()
+            If (Me.ShowRef) Then
+                For Each ind As Common.Individuum In ResultManager.OptResultRef.getSekPop()
                     min(i) = Math.Min(ind.Zielwerte(Me.Zielauswahl(i)), min(i))
                     max(i) = Math.Max(ind.Zielwerte(Me.Zielauswahl(i)), max(i))
                 Next
@@ -184,7 +179,7 @@ Partial Public Class Scatterplot
                         'Nur Sekundäre Population
                         '------------------------
                         serie = .getSeriesPoint(xAchse & ", " & yAchse, "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                        For Each ind As Common.Individuum In Me.OptResult.getSekPop()
+                        For Each ind As Common.Individuum In ResultManager.OptResult.getSekPop()
                             serie.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID.ToString())
                         Next
                     Else
@@ -192,7 +187,7 @@ Partial Public Class Scatterplot
                         '-------------
                         serie = .getSeriesPoint(xAchse & ", " & yAchse, "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         serie_inv = .getSeriesPoint(xAchse & ", " & yAchse & " (ungültig)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                        For Each ind As Common.Individuum In Me.OptResult.Solutions
+                        For Each ind As Common.Individuum In ResultManager.OptResult.Solutions
                             'Constraintverletzung prüfen
                             If (ind.Is_Feasible) Then
                                 'gültige Lösung Zeichnen
@@ -233,7 +228,7 @@ Partial Public Class Scatterplot
                     '===========================
                     If (Me.ShowRef) Then
                         serie = .getSeriesPoint(xAchse & ", " & yAchse & " (Vergleichsergebnis)", "Blue", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                        For Each ind As Common.Individuum In Me.OptResultRef.getSekPop()
+                        For Each ind As Common.Individuum In ResultManager.OptResultRef.getSekPop()
                             serie.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID & " (Vergleichsergebnis)")
                         Next
                     End If
@@ -319,7 +314,7 @@ Partial Public Class Scatterplot
 
             'Lösung holen
             '------------
-            ind = Me.OptResult.getSolution(indID_clicked)
+            ind = ResultManager.OptResult.getSolution(indID_clicked)
 
             If (ind.ID = indID_clicked) Then
 

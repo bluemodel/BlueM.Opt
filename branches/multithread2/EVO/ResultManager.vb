@@ -1,6 +1,6 @@
 Imports System.Data.OleDb
 
-Public Class OptResult
+Public Class ResultManager
 
     '*******************************************************************************
     '*******************************************************************************
@@ -20,41 +20,43 @@ Public Class OptResult
     Private Datensatz As String
 
     'Ergebnisdatenbank
-    Public Ergebnisdb As Boolean = True              'Gibt an, ob die Ergebnisdatenbank geschrieben werden soll
-    Private db_path As String                        'Pfad zur Ergebnisdatenbank
-    Private db As OleDb.OleDbConnection
+    Public Shared Ergebnisdb As Boolean = True              'Gibt an, ob die Ergebnisdatenbank geschrieben werden soll
+    Private Shared db_path As String                        'Pfad zur Ergebnisdatenbank
+    Private _dbconnection As OleDbConnection
+    Private ReadOnly Property mydbconnection() As OleDbConnection
+        Get
+            If (_dbconnection.State = ConnectionState.Closed) Then
+                Call Me.db_connect()
+            End If
+            Return _dbconnection
+        End Get
+    End Property
+
+    'Anzahl Manager-Instanzen
+    Shared nManagers As Integer = 0
 
     'Optimierungsbedingungen
     Public List_OptParameter() As EVO.Common.OptParameter
     Public List_OptParameter_Save() As EVO.Common.OptParameter
     Public List_Locations() As Sim.Struct_Lokation
 
-    'Array von Lösungen
-    Public Solutions() As Common.Individuum
-
-    'Structure für Sekundäre Population
-    Public Structure Struct_SekPop
-        Public iGen As Integer                      'Generationsnummer
-        Public SolutionIDs() As Integer             'Array von Solution-IDs
-    End Structure
-
-    'Array von Sekundären Populationen
-    Public SekPops() As Struct_SekPop
+    'Ergebnisspeicher
+    Public Shared OptResult As ResultStore
+    Public Shared OptResultRef As ResultStore                       'Vergleichsergebnis
 
     'Array von ausgewählten Lösungen
-    Private selSolutionIDs() As Integer
+    Private Shared selSolutionIDs() As Integer
 
     'Konstruktor
     '***********
-    Public Sub New()
-
-        ReDim Me.Solutions(-1)
-        ReDim Me.selSolutionIDs(-1)
-        ReDim Me.SekPops(-1)
-
-    End Sub
-
     Public Sub New(ByVal Sim1 As Sim)
+
+        If (nManagers = 0) Then
+            ResultManager.OptResult = New ResultStore()
+            ReDim selSolutionIDs(-1)
+        End If
+
+        nManagers += 1
 
         'Datensatzname speichern
         Me.Datensatz = Sim1.Datensatz
@@ -64,12 +66,38 @@ Public Class OptResult
         Me.List_OptParameter_Save = Sim1.List_OptParameter_Save
         Me.List_Locations = Sim1.List_Locations
 
-        ReDim Me.Solutions(-1)
-        ReDim Me.selSolutionIDs(-1)
-        ReDim Me.SekPops(-1)
-
         'DB initialiseren
+        _dbconnection = New OleDbConnection()
         Call Me.db_init()
+
+    End Sub
+
+    'Copy-Constructor
+    '****************
+    Public Sub New(ByVal optresult As ResultManager)
+
+        Dim i As Integer
+
+        nManagers += 1
+
+        'neue DB-Connection!
+        Me._dbconnection = New OleDbConnection()
+
+        'Den Rest kopieren
+        ReDim Me.List_OptParameter(optresult.List_OptParameter.GetUpperBound(0))
+        For i = 0 To optresult.List_OptParameter.GetUpperBound(0)
+            Me.List_OptParameter(i) = optresult.List_OptParameter(i).Clone()
+        Next
+
+        ReDim Me.List_OptParameter_Save(optresult.List_OptParameter_Save.GetUpperBound(0))
+        For i = 0 To optresult.List_OptParameter_Save.GetUpperBound(0)
+            Me.List_OptParameter_Save(i) = optresult.List_OptParameter_Save(i).Clone()
+        Next
+
+        ReDim Me.List_Locations(optresult.List_Locations.GetUpperBound(0))
+        For i = 0 To optresult.List_Locations.GetUpperBound(0)
+            Me.List_Locations(i) = optresult.List_Locations(i).Clone()
+        Next
 
     End Sub
 
@@ -80,15 +108,15 @@ Public Class OptResult
     Public Function selectSolution(ByVal ID As Integer) As Boolean
 
         'Überprüfen, ob Lösung bereits ausgewählt ist      
-        For Each _id As Integer In Me.selSolutionIDs
+        For Each _id As Integer In selSolutionIDs
             If (_id = ID) Then
                 Return False
             End If
         Next
 
         'Lösung zu Auswahl hinzufügen
-        ReDim Preserve Me.selSolutionIDs(Me.selSolutionIDs.GetUpperBound(0) + 1)
-        Me.selSolutionIDs(Me.selSolutionIDs.GetUpperBound(0)) = ID
+        ReDim Preserve selSolutionIDs(selSolutionIDs.GetUpperBound(0) + 1)
+        selSolutionIDs(selSolutionIDs.GetUpperBound(0)) = ID
 
         Return True
 
@@ -96,11 +124,11 @@ Public Class OptResult
 
     'Ausgewählte Lösungen holen
     '**************************
-    Public ReadOnly Property getSelectedSolutions() As Common.Individuum()
+    Public Shared ReadOnly Property getSelectedSolutions() As Common.Individuum()
         Get
             Dim solutions() As Common.Individuum
 
-            solutions = getSolutions(Me.selSolutionIDs)
+            solutions = OptResult.getSolutions(selSolutionIDs)
 
             Return solutions
         End Get
@@ -110,7 +138,7 @@ Public Class OptResult
     '***************************
     Public Sub clearSelectedSolutions()
 
-        ReDim Me.selSolutionIDs(-1)
+        ReDim selSolutionIDs(-1)
 
     End Sub
 
@@ -118,139 +146,35 @@ Public Class OptResult
     '***********************************************
     Public Sub addSolution(ByVal Ind As Common.Individuum)
 
-        'Lösung zu OptResult hinzufügen
-        ReDim Preserve Me.Solutions(Me.Solutions.GetUpperBound(0) + 1)
-        Me.Solutions(Me.Solutions.GetUpperBound(0)) = Ind.Clone()
-
         'In DB speichern
         Call Me.db_insert(Ind)
 
+        'Lösung zu OptResult hinzufügen
+        ReDim Preserve OptResult.Solutions(OptResult.Solutions.GetUpperBound(0) + 1)
+        OptResult.Solutions(OptResult.Solutions.GetUpperBound(0)) = Ind.Clone()
+
     End Sub
-
-    'Eine Lösung identifizieren
-    '**************************
-    Public Function getSolution(ByVal ID As Integer) As Common.Individuum
-
-        Dim i As Integer
-
-        For i = 0 To Me.Solutions.GetUpperBound(0)
-            If (Me.Solutions(i).ID = ID) Then
-                Return Me.Solutions(i)
-            End If
-        Next
-
-        Throw New Exception("Konnte Lösung nicht identifizieren!")
-
-    End Function
 
     'Sekundäre Population hinzufügen
     '*******************************
     Public Sub setSekPop(ByVal pop() As Common.Individuum, ByVal _igen As Integer)
 
-        Dim SekPop As Struct_SekPop
-        Dim sekpopvalues(,) As Double
+        Dim tmpsekpop As ResultStore.Struct_SekPop
+        Dim tmpsekpopvalues(,) As Double
 
         'Population in Array von Penalty-Werten transformieren
-        sekpopvalues = Common.Individuum.Get_All_Penalty_of_Array(pop)
+        tmpsekpopvalues = Common.Individuum.Get_All_Penalty_of_Array(pop)
 
         'SekPop in DB speichern
-        Call Me.db_setSekPop(sekpopvalues, _igen)
+        Call Me.db_setSekPop(tmpsekpopvalues, _igen)
 
         'SekPop aus DB lesen
-        SekPop = Me.db_getSekPop(_igen)
+        tmpsekpop = Me.db_getSekPop(_igen)
 
         'SekPop zu OptResult hinzufügen
-        Call Me.addSekPop(SekPop)
+        Call OptResult.addSekPop(tmpsekpop)
 
     End Sub
-
-    'Sekundäre Population zu OptResult hinzufügen
-    '********************************************
-    Private Sub addSekPop(ByVal _sekpop As Struct_SekPop)
-
-        'Array von Sekundären Populationen um eins erweitern
-        ReDim Preserve Me.SekPops(Me.SekPops.GetUpperBound(0) + 1)
-        'SekPop hinzufügen
-        Me.SekPops(Me.SekPops.GetUpperBound(0)) = _sekpop
-
-    End Sub
-
-    'Sekundäre Population holen
-    '**************************
-    Public Function getSekPop(Optional ByVal _igen As Integer = -1) As Common.Individuum()
-
-        Dim sekpopsolutions() As Common.Individuum
-
-        'Wenn keine Generation angegeben, dann letzte SekPop ausgeben
-        If (_igen = -1) Then
-            For Each sekpop As Struct_SekPop In Me.SekPops
-                If (sekpop.iGen > _igen) Then _igen = sekpop.iGen
-            Next
-        End If
-
-        ReDim sekpopsolutions(-1)
-
-        'Alle Sekundären Populationen durchlaufen
-        For Each sekpop As Struct_SekPop In Me.SekPops
-            If (sekpop.iGen = _igen) Then
-                'SekPop gefunden, Lösungen holen
-                sekpopsolutions = getSolutions(sekpop.SolutionIDs)
-            End If
-        Next
-
-        Return sekpopsolutions
-
-    End Function
-
-    'Gibt die Penalty-Werte einer Sekundären Population zurück
-    '*********************************************************
-    Public Function getSekPopValues(Optional ByVal igen As Integer = -1) As Double(,)
-
-        Dim inds() As Common.Individuum
-        Dim values(,) As Double
-        Dim i, j As Integer
-
-        'Wenn keine Generation angegeben, dann letzte SekPop ausgeben
-        If (igen = -1) Then
-            igen = Me.db_getLastGenNo()
-        End If
-
-        'Wenn es keine Sekundäre Population in der DB gibt, abbrechen
-        If (igen = -1) Then
-            ReDim values(-1, -1)
-            Return values
-        End If
-
-        inds = Me.getSekPop(igen)
-
-        ReDim values(inds.GetUpperBound(0), Common.Manager.AnzPenalty - 1)
-
-        For i = 0 To inds.GetUpperBound(0)
-            For j = 0 To Common.Manager.AnzPenalty - 1
-                values(i, j) = inds(i).Penalties(j)
-            Next
-        Next
-
-        Return values
-
-    End Function
-
-    'Lösungen anhand von IDs holen
-    '*****************************
-    Private Function getSolutions(ByVal IDs() As Integer) As Common.Individuum()
-
-        Dim i As Integer
-        Dim solutions() As Common.Individuum
-
-        ReDim solutions(IDs.GetUpperBound(0))
-
-        For i = 0 To solutions.GetUpperBound(0)
-            solutions(i) = getSolution(IDs(i))
-        Next
-
-        Return solutions
-
-    End Function
 
 #End Region 'Ergebnisspeicher
 
@@ -267,13 +191,13 @@ Public Class OptResult
         '---------------------------------------------------
 
         'Datenbankpfad
-        Me.db_path = My.Computer.FileSystem.SpecialDirectories.Temp & "\EVO.mdb"
+        db_path = My.Computer.FileSystem.SpecialDirectories.Temp & "\EVO.mdb"
 
         'Pfad zur Vorlage
         Dim db_source_path As String = System.Windows.Forms.Application.StartupPath() & "\EVO.mdb"
 
         'Datei kopieren
-        My.Computer.FileSystem.CopyFile(db_source_path, Me.db_path, True)
+        My.Computer.FileSystem.CopyFile(db_source_path, db_path, True)
 
         'Tabellen anpassen
         '-----------------
@@ -301,8 +225,7 @@ Public Class OptResult
         '=================
         Dim i As Integer
 
-        Call db_connect()
-        Dim command As OleDbCommand = New OleDbCommand("", db)
+        Dim command As OleDbCommand = New OleDbCommand("", mydbconnection)
 
         'Tabelle 'QWerte'
         '----------------
@@ -334,16 +257,13 @@ Public Class OptResult
             command.ExecuteNonQuery()
         End If
 
-        Call db_disconnect()
-
     End Sub
 
     'Ergebnisdatenbank für PES vorbereiten
     '*************************************
     Private Sub db_prepare_PES()
 
-        Call db_connect()
-        Dim command As OleDbCommand = New OleDbCommand("", db)
+        Dim command As OleDbCommand = New OleDbCommand("", mydbconnection)
 
         'Tabelle 'OptParameter'
         '----------------------
@@ -361,16 +281,13 @@ Public Class OptResult
         command.CommandText = "ALTER TABLE OptParameter ADD COLUMN " & fieldnames
         command.ExecuteNonQuery()
 
-        Call db_disconnect()
-
     End Sub
 
     'Ergebnisdatenbank für CES vorbereiten
     '*************************************
     Private Sub db_prepare_CES()
 
-        Call db_connect()
-        Dim command As OleDbCommand = New OleDbCommand("", db)
+        Dim command As OleDbCommand = New OleDbCommand("", mydbconnection)
 
         'Tabelle 'Pfad'
         '--------------
@@ -388,41 +305,33 @@ Public Class OptResult
         command.CommandText = "ALTER TABLE Pfad ADD COLUMN " & fieldnames
         command.ExecuteNonQuery()
 
-        Call db_disconnect()
-
     End Sub
 
     'Mit Ergebnisdatenbank verbinden
     '*******************************
     Private Sub db_connect()
-        Dim ConnectionString As String = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & Me.db_path
-        db = New OleDb.OleDbConnection(ConnectionString)
-        db.Open()
-    End Sub
-
-    'Mit einer benutzerdefinierten Ergebnisdatenbank verbinden
-    '*********************************************************
-    Private Sub db_connect(ByVal file As String)
-        Dim ConnectionString As String = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & file
-        db = New OleDb.OleDbConnection(ConnectionString)
-        db.Open()
+        Dim ConnectionString As String = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & db_path
+        _dbconnection = New OleDb.OleDbConnection(ConnectionString)
+        _dbconnection.Open()
     End Sub
 
     'Verbindung zu Ergebnisdatenbank schließen
     '*****************************************
     Private Sub db_disconnect()
-        db.Close()
+        _dbconnection.Close()
     End Sub
 
     'Eine Lösung in die ErgebnisDB schreiben
     '***************************************
     Private Function db_insert(ByVal ind As Common.Individuum) As Boolean
 
-        Call db_connect()
-
         Dim i, x, y As Integer
+        Dim command As OleDbCommand
+        Dim transaction As OleDbTransaction
 
-        Dim command As OleDbCommand = New OleDbCommand("", db)
+        'Start the transaction
+        transaction = Me.mydbconnection.BeginTransaction()
+        command = New OleDbCommand("", Me.mydbconnection, transaction)
 
         'Sim schreiben
         '-------------
@@ -514,7 +423,8 @@ Public Class OptResult
 
         End If
 
-        Call db_disconnect()
+        'Commit the transaction
+        Call transaction.Commit()
 
     End Function
 
@@ -522,9 +432,10 @@ Public Class OptResult
     '************************************
     Private Sub db_setSekPop(ByVal SekPop(,) As Double, ByVal igen As Integer)
 
-        Call db_connect()
+        Dim command As OleDbCommand
 
-        Dim command As OleDbCommand = New OleDbCommand("", db)
+        'Start the transaction
+        command = New OleDbCommand("", Me.mydbconnection)
 
         ''Alte SekPop löschen
         'command.CommandText = "DELETE FROM SekPop"
@@ -548,49 +459,45 @@ Public Class OptResult
                 'SekPop Member speichern
                 command.CommandText = "INSERT INTO SekPop (Generation, Sim_ID) VALUES (" & igen & ", " & Sim_ID & ")"
                 command.ExecuteNonQuery()
+            Else
+                Throw New Exception("Konnte Lösung der sekundären Population nicht in DB identifizieren!")
             End If
         Next
-
-        Call db_disconnect()
 
     End Sub
 
     'SekPop aus DB lesen
     '*******************
-    Private Function db_getSekPop(ByVal igen As Integer) As Struct_SekPop
+    Private Function db_getSekPop(ByVal igen As Integer) As ResultStore.Struct_SekPop
 
         Dim i As Integer
         Dim q As String
         Dim adapter As OleDbDataAdapter
         Dim ds As DataSet
         Dim numrows As Integer
-        Dim SekPop As Struct_SekPop
-
-        Call db_connect()
+        Dim tmpsekpop As ResultStore.Struct_SekPop
 
         q = "SELECT Sim_ID FROM SekPop WHERE Generation = " & igen
 
-        adapter = New OleDbDataAdapter(q, db)
+        adapter = New OleDbDataAdapter(q, mydbconnection)
 
         ds = New DataSet("EVO")
         numrows = adapter.Fill(ds, "SekPop")
 
-        Call db_disconnect()
-
         If (numrows > 0) Then
 
-            SekPop.iGen = igen
-            ReDim SekPop.SolutionIDs(numrows - 1)
+            tmpsekpop.iGen = igen
+            ReDim tmpsekpop.SolutionIDs(numrows - 1)
 
             For i = 0 To numrows - 1
-                SekPop.SolutionIDs(i) = ds.Tables("SekPop").Rows(i).Item("Sim_ID")
+                tmpsekpop.SolutionIDs(i) = ds.Tables("SekPop").Rows(i).Item("Sim_ID")
             Next
 
         Else
             Throw New Exception("Sekundäre Population nicht in DB vorhanden!")
         End If
 
-        Return SekPop
+        Return tmpsekpop
 
     End Function
 
@@ -601,20 +508,14 @@ Public Class OptResult
         Dim command As OleDbCommand
         Dim igen As Integer
 
-        'Connect
-        Call db_connect()
-
         Try
-            command = New OleDbCommand("", db)
+            command = New OleDbCommand("", mydbconnection)
             command.CommandText = "SELECT MAX(Generation) FROM SekPop"
             igen = command.ExecuteScalar()
         Catch ex As Exception
             'Keine SekPop vorhanden
             igen = -1
         End Try
-
-        'Disconnect
-        Call db_disconnect()
 
         Return igen
 
@@ -625,16 +526,16 @@ Public Class OptResult
     Public Sub db_save(ByVal targetFile As String)
 
         'Datei kopieren
-        My.Computer.FileSystem.CopyFile(Me.db_path, targetFile, True)
+        My.Computer.FileSystem.CopyFile(db_path, targetFile, True)
 
         'Neuen Dateipfad speichern
-        Me.db_path = targetFile
+        db_path = targetFile
 
     End Sub
 
     'Optimierungsergebnis aus einer DB lesen
     '*****************************************************
-    Public Sub db_load(ByVal sourceFile As String, Optional ByVal QWerteOnly As Boolean = False)
+    Public Function db_load(ByVal sourceFile As String, Optional ByVal QWerteOnly As Boolean = False) As ResultStore
 
         '---------------------------------------------------------------------------
         'Hinweise:
@@ -646,12 +547,10 @@ Public Class OptResult
         Dim q As String = ""
         Dim adapter As OleDbDataAdapter
         Dim ds As DataSet
+        Dim tmpresult As New ResultStore()
 
         'Neuen Dateipfad speichern
-        Me.db_path = sourceFile
-
-        'Connect
-        Call db_connect()
+        db_path = sourceFile
 
         'Read
         '----
@@ -665,23 +564,20 @@ Public Class OptResult
                 q = "SELECT Sim.ID, Pfad.*, OptParameter.*, QWerte.*, Constraints.* FROM (((Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN Pfad ON Sim.ID=Pfad.Sim_ID) INNER JOIN OptParameter ON Sim.ID=OptParameter.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID ORDER BY Sim.ID"
         End Select
 
-        adapter = New OleDbDataAdapter(q, db)
+        adapter = New OleDbDataAdapter(q, mydbconnection)
 
         ds = New DataSet("EVO")
         numSolutions = adapter.Fill(ds, "Result")
 
-        'Disconnect
-        Call db_disconnect()
-
         'Alle Lösungen übernehmen
         '========================
-        ReDim Me.Solutions(numSolutions - 1)
+        ReDim tmpresult.Solutions(numSolutions - 1)
 
         For i = 0 To numSolutions - 1
 
-            Me.Solutions(i) = New Common.Individuum("Solution", i)
+            tmpresult.Solutions(i) = New Common.Individuum("Solution", i)
 
-            With Me.Solutions(i)
+            With tmpresult.Solutions(i)
                 'ID
                 '--
                 .ID = ds.Tables(0).Rows(i).Item("Sim.ID")
@@ -723,30 +619,33 @@ Public Class OptResult
         Next
 
         'Sekundärpopulationen laden
-        Call Me.db_loadSekPops()
+        tmpresult.SekPops = Me.db_loadSekPops()
 
-    End Sub
+        Return tmpresult
+
+    End Function
 
 
     'Sekundärpopulationen aus DB laden
     '*********************************
-    Private Sub db_loadSekPops()
+    Private Function db_loadSekPops() As ResultStore.Struct_SekPop()
 
         Dim i, igen As Integer
-        Dim SekPop As Struct_SekPop
-
-        ReDim Me.SekPops(-1)
+        Dim tmpSekPops() As ResultStore.Struct_SekPop
 
         'Letzte SekPop-Generation bestimmen
         igen = db_getLastGenNo()
 
+        ReDim tmpSekPops(igen)
+
         'Alle SekPops durchlaufen und einlesen
         For i = 0 To igen
-            SekPop = db_getSekPop(i)
-            Call Me.addSekPop(SekPop)
+            tmpSekPops(i) = db_getSekPop(i)
         Next
 
-    End Sub
+        Return tmpSekPops
+
+    End Function
 
 #End Region 'Ergebnisdatenbank
 
