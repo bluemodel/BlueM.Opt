@@ -280,10 +280,10 @@
     </None>
     <None Include="Resources\icon_png.png" />
     <None Include="Resources\icon_edit.png" />
-    <Content Include="Apps\BlueM\BlueM.dll">
+    <EmbeddedResource Include="Apps\BlueM\BlueM.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Apps\BlueM\IHWB.BlueM.DllAdapter.dll" />
+    </EmbeddedResource>
+    <None Include="Apps\BlueM\IHWB.BlueM.DllAdapter.dll" />
     <Content Include="Apps\SWMM\SWMM5.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

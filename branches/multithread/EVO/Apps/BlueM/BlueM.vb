@@ -626,10 +626,8 @@ Public Class BlueM
             System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
 
             Try
-                SyncLock bluem_dll
-                    'Datensatz übergeben und initialisieren
-                    Call bluem_dll.Initialize(Me.WorkFolder & Me.DS_Name)
-                End SyncLock
+                'Datensatz übergeben und initialisieren
+                Call bluem_dll.Initialize(Me.WorkFolder & Me.DS_Name)
                 Me.is_Ini = True
 
                 Dim SimEnde As DateTime = BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll.GetSimulationEndDate())
@@ -643,7 +641,7 @@ Public Class BlueM
                 Call bluem_dll.Finish()
 
                 'Simulation erfolgreich
-                me.Is_OK = True
+                Me.Is_OK = True
 
             Catch ex As Exception
 
@@ -654,7 +652,7 @@ Public Class BlueM
                 Call bluem_dll.Finish()
 
                 'Simulation nicht erfolgreich
-                me.Is_OK = False
+                Me.Is_OK = False
 
             Finally
 
