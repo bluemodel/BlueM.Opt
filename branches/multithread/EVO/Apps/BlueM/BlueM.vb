@@ -357,9 +357,6 @@ Public Class BlueM
         MyThread(Thread_ID) = new Thread(AddressOf My_C_Thread(Thread_ID).Thread)
         MyThread(Thread_ID).IsBackground = True
         MyThread(Thread_ID).Start()
-        While My_C_Thread(Thread_ID).is_Initialized = False
-            System.Threading.Thread.Sleep(3)
-        End While
         launchSim = True
 
         Return launchSim
@@ -373,7 +370,6 @@ Public Class BlueM
             If Thr_C.Sim_Is_OK = True and Thr_C.get_Child_ID = -1 then
                 launchFree = True
                 Thread_ID = Thr_C.get_Thread_ID
-                System.Threading.Thread.Sleep(3)
                 Exit For
             End If
         Next

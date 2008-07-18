@@ -554,6 +554,7 @@ Partial Class Form1
             Me.ispause = True
             Me.Button_Start.Text = ">"
             Do While (Me.ispause)
+                System.Threading.Thread.Sleep(20)
                 Application.DoEvents()
             Loop
 
@@ -960,7 +961,7 @@ Partial Class Form1
                     Child_Ready += 1
                 Else
 
-                    System.Threading.Thread.Sleep(10)
+                    System.Threading.Thread.Sleep(400)
                     Application.DoEvents
 
                 End If
@@ -970,7 +971,7 @@ Partial Class Form1
             Stoppuhr.Stop
             Time(i_gen) = Stoppuhr.Elapsed
 
-            System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
+            System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.BelowNormal
 
             '^ ENDE der Child Schleife
             'xxxxxxxxxxxxxxxxxxxxxxx
@@ -2692,8 +2693,8 @@ Start_Evolutionsrunden:
         PhysCPU = PhysCPUarray.Count
 
         'HACK -----
-        LogCPU = 5
-        PhysCPU = 5
+        LogCPU = 3
+        PhysCPU = 3
         '----------
 
     End Sub
