@@ -1124,6 +1124,7 @@ Partial Class Form1
                             'Vorbereitung um das PES zu initieren
                             '************************************
                             globalAnzPar = CES1.Childs(i_ch).Loc(i_loc).PES_OptPara.GetLength(0)
+                            'XXX: folgende Zeile führt nur einen "shallow copy" aus! macht nichts?
                             myPara = CES1.Childs(i_ch).Loc(i_loc).PES_OptPara.Clone
 
                             'Schritte 1 - 3: PES wird initialisiert (Weiteres siehe dort ;-)
