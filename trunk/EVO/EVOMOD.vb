@@ -1,19 +1,19 @@
 Module EVOMOD
 
-    '*******************************************************************************
-    '*******************************************************************************
-    '**** Klasse EVOMOD                                                        ****
-    '****                                                                       ****
-    '**** Autoren: Christoph Hübner, Felix Fröhlich, Dirk Muschalla             ****
-    '****                                                                       ****
-    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
-    '**** TU Darmstadt                                                          ****
-    '****                                                                       ****
-    '**** November 2007                                                         ****
-    '****                                                                       ****
-    '**** Letzte Änderung: November 2007                                        ****
-    '*******************************************************************************
-    '*******************************************************************************
+    '***********************************************************************************
+    '***********************************************************************************
+    '**** Klasse EVOMOD                                                             ****
+    '****                                                                           ****
+    '**** Autoren: Christoph Hübner, Felix Fröhlich, Dirk Muschalla, Dominik Kerber ****
+    '****                                                                           ****
+    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung                  ****
+    '**** TU Darmstadt                                                              ****
+    '****                                                                           ****
+    '**** November 2007                                                             ****
+    '****                                                                           ****
+    '**** Letzte Änderung: November 2007                                            ****
+    '***********************************************************************************
+    '***********************************************************************************
 
     'Anwendungen
     Public Const ANW_BLUEM As String = "BlueM"
@@ -30,6 +30,7 @@ Module EVOMOD
     Public Const METH_HYBRID As String = "HYBRID"
     Public Const METH_SENSIPLOT As String = "SensiPlot"
     Public Const METH_HOOKJEEVES As String = "Hooke & Jeeves"
+    Public Const METH_Hybrid2008 As String = "Hybrid2008"
 
     'Verschiedenes
     Public Const eol As String = Chr(13) & Chr(10)             'Zeilenumbruch
