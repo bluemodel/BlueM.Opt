@@ -1,7 +1,6 @@
 Option Strict Off ' Off ist Default
 Option Explicit On
 Imports System.IO
-Imports System.Management
 Imports IHWB.EVO.Common
 Imports System.ComponentModel
 
@@ -53,8 +52,7 @@ Partial Class Form1
 
     '**** Multithreading ****
     Dim SIM_Eval_is_OK As Boolean
-    Private PhysCPU As Integer                                      'Anzahl physikalischer Prozessoren
-    Private LogCPU As Integer                                       'Anzahl logischer Prozessoren
+    Private n_Threads As Integer                        'Anzahl der Threads
 
     'Dialoge
     Private WithEvents solutionDialog As SolutionDialog
@@ -83,7 +81,7 @@ Partial Class Form1
     Private Sub Form1_Load(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles MyBase.Load
 
         'Anzahl der Prozessoren wird ermittelt
-        Anzahl_Prozessoren(PhysCPU, LogCPU)
+        Anzahl_Prozessoren(n_Threads)
 
         'XP-look
         System.Windows.Forms.Application.EnableVisualStyles()
@@ -166,7 +164,7 @@ Partial Class Form1
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Objekt der Klasse BlueM initialisieren
-                    Sim1 = New BlueM(PhysCPU)
+                    Sim1 = New BlueM(n_Threads)
 
 
                 Case ANW_SMUSI 'Anwendung Smusi
@@ -841,8 +839,8 @@ Partial Class Form1
 
         'Datensätze für Multithreading kopieren
         '**************************************
-        If PhysCPU > 1 then
-            Call sim1.coppyDatensatz(PhysCPU)
+        If n_Threads > 1 then
+            Call sim1.coppyDatensatz(n_Threads)
         End If
 
         'CES initialisieren
@@ -911,7 +909,7 @@ Partial Class Form1
             System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.BelowNormal
 
             Do
-                If Sim1.launchFree(Thread_Free) and Child_Run < CES1.Settings.CES.n_Childs and (Child_Ready + PhysCPU > Child_Run) then
+                If Sim1.launchFree(Thread_Free) and Child_Run < CES1.Settings.CES.n_Childs and (Child_Ready + n_Threads > Child_Run) then
 
                     durchlauf_all += 1
                     Sim1.WorkDir = Sim1.getWorkDir(Thread_Free)
@@ -1054,7 +1052,7 @@ Partial Class Form1
 
         'Datensätze für Multithreading löschen
         '*************************************
-        Call sim1.deleteDatensatz(PhysCPU)
+        Call sim1.deleteDatensatz(n_Threads)
 
     End Sub
 
@@ -2676,26 +2674,18 @@ Start_Evolutionsrunden:
 
     'Ermittelt beim Start die Anzahl der Physikalischen Prozessoren
     '**************************************************************
-    Public Sub Anzahl_Prozessoren(ByRef PhysCPU As Integer, ByRef LogCPU As Integer)
-        Dim mc As ManagementClass = New ManagementClass("Win32_Processor")
-        Dim moc As ManagementObjectCollection = mc.GetInstances()
-        Dim SocketDesignation As String = String.Empty
-        Dim PhysCPUarray As ArrayList = New ArrayList
+    Public Sub Anzahl_Prozessoren(ByRef n_Threads As Integer)
 
-        Dim mo As ManagementObject
-        For Each mo In moc
-            LogCPU += 1
-            SocketDesignation = mo.Properties("SocketDesignation").Value.ToString()
-            If Not PhysCPUarray.Contains(SocketDesignation) Then
-                PhysCPUarray.Add(SocketDesignation)
-            End If
-        Next
-        PhysCPU = PhysCPUarray.Count
+        Dim LogCPU As Integer = 0
+        LogCPU = Environment.ProcessorCount
 
-        'HACK -----
-        LogCPU = 3
-        PhysCPU = 3
-        '----------
+        If LogCPU = 1 then
+            n_Threads = 2
+        Else If LogCPU = 2 then
+            n_Threads = 3
+        Else If LogCPU = 4 then
+            n_Threads = 6
+        End If
 
     End Sub
 
