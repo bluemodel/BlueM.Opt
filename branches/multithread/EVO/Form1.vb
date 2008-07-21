@@ -833,23 +833,19 @@ Partial Class Form1
     Private Sub STARTEN_CES_or_HYBRID()
 
         'Hypervolumen instanzieren
-        '*************************
         Dim Hypervolume As EVO.MO_Indicators.Indicators
         Hypervolume = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(EVO.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, Common.Manager.AnzPenalty)
 
         'Datensätze für Multithreading kopieren
-        '**************************************
         If n_Threads > 1 then
             Call sim1.coppyDatensatz(n_Threads)
         End If
 
         'CES initialisieren
-        '******************
         CES1 = New EVO.Kern.CES()
         Call CES1.CESInitialise(EVO_Einstellungen1.Settings, Method, Sim1.CES_T_Modus, Common.Manager.AnzPenalty, Common.Manager.AnzConstraints, Sim1.List_Locations.GetLength(0), Sim1.VerzweigungsDatei.GetLength(0), Sim1.n_Combinations, Sim1.n_PathDimension)
 
         'EVO_Verlauf zurücksetzen
-        '************************
         Call Me.EVO_Opt_Verlauf1.Initialisieren(1, 1, EVO_Einstellungen1.Settings.CES.n_Generations, EVO_Einstellungen1.Settings.CES.n_Childs)
 
         Dim durchlauf_all As Integer = 0
@@ -1402,9 +1398,13 @@ Partial Class Form1
         Dim PES1 As EVO.Kern.PES
 
         'Hypervolumen instanzieren
-        '-------------------------
         Dim Hypervolume As EVO.MO_Indicators.Indicators
         Hypervolume = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(EVO.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, Common.Manager.AnzPenalty)
+
+        'Datensätze für Multithreading kopieren
+        If n_Threads > 1 then
+            Call sim1.coppyDatensatz(n_Threads)
+        End If
 
         'Diagramm vorbereiten und initialisieren
         If (Not Form1.Method = METH_HYBRID And Not EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Sequencial_1) Then
@@ -1466,6 +1466,7 @@ Start_Evolutionsrunden:
                         ''Do Schleife: Um Modellfehler bzw. Evaluierungsabbrüche abzufangen
                         'Dim Eval_Count As Integer = 0
                         'Do
+
                         'Neues Individuum instanzieren
                         ind(i) = New Common.Individuum("PES", durchlauf)
                         ind(i).ID = durchlauf
@@ -1484,7 +1485,7 @@ Start_Evolutionsrunden:
                         myPara = PES1.EsGetParameter()
 
                         'OptParameter in Individuum kopieren
-                        ind(i).PES_OptParas = myPara
+                        Call OptParameter.Clone_OptPara_Array(myPara, ind(i).PES_OptParas)
 
                         If Anwendung = ANW_TESTPROBLEME
                             
@@ -1500,7 +1501,7 @@ Start_Evolutionsrunden:
 
                     Next
 
-                    If (Anwendung = (ANW_BLUEM or ANW_SMUSI or ANW_SCAN or ANW_SWMM)) then
+                    If Anwendung = ANW_BLUEM or Anwendung = ANW_SMUSI or Anwendung = ANW_SCAN or Anwendung = ANW_SWMM then
                         
                         Dim Thread_Free As integer = 0
                         Dim Thread_Ready As Integer = 0
@@ -1544,7 +1545,7 @@ Start_Evolutionsrunden:
                                 
                                 Call EVO_Opt_Verlauf1.Nachfolger(Child_Ready + 1)
                                 System.Windows.Forms.Application.DoEvents()
-                                If Child_Ready = CES1.Settings.CES.n_Childs - 1 then Ready = true
+                                If Child_Ready = EVO_Einstellungen1.Settings.PES.n_Nachf - 1 then Ready = true
 
                                 Child_Ready += 1
                             Else
@@ -1557,7 +1558,6 @@ Start_Evolutionsrunden:
                         Loop While Ready = False
 
                     End If
-
 
                         'Eval_Count += 1
                         'If (Eval_Count >= 10) Then

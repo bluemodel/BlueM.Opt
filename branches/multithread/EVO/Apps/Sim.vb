@@ -1891,27 +1891,24 @@ Handler:
     'Datensätze für Multithreading kopieren
     '**************************************
     Public Sub coppyDatensatz(byVal n_Proz As Integer)
+
         Dim i As Integer = 1
-        For i = 1 to n_Proz - 1
+
+        For i = 0 to n_Proz - 1
             Dim Source As String = WorkDir
-            Dim Dest As String = WorkDir & "Thread_" & i & "\"
-            Dim Name As String
-            
+            Dim Dest As String = System.Windows.Forms.Application.StartupPath() & "\Thread_" & i & "\"
+
             'Löschen um den Inhalt zu entsorgen
             If Directory.Exists(Dest) Then
                 Directory.Delete(Dest, True)
             End If
+            
+            My.Computer.FileSystem.CopyDirectory(Source, Dest, True)
+            purgeReadOnly(Dest)
+            Directory.Delete(Dest & "\.svn", true)
 
-            'Anlegen
-            Directory.CreateDirectory(Dest)
-
-            'Kopieren
-            For Each foundFile As String In My.Computer.FileSystem.GetFiles(Source, _
-                                                                            FileIO.SearchOption.SearchTopLevelOnly, "*.*")
-                Name = foundfile.Remove(0,foundFile.LastIndexOf("\") + 1)
-                My.Computer.FileSystem.CopyFile(foundFile, Dest & Name)
-            Next
         Next
+
     End Sub
 
     'Datensätze für Multithreading löschen
@@ -1920,8 +1917,8 @@ Handler:
         Dim i As Integer
         For i = 1 to n_Proz - 1
 
-            If Directory.Exists(WorkDir & "Thread_" & i) Then
-                Directory.Delete(WorkDir & "Thread_" & i, True)
+            If Directory.Exists(System.Windows.Forms.Application.StartupPath() & "\Thread_" & i) Then
+                Directory.Delete(System.Windows.Forms.Application.StartupPath() & "\Thread_" & i, True)
             End If
         Next
     End Sub
@@ -1932,16 +1929,43 @@ Handler:
 
         getWorkDir = ""
         
-        'Nulle setzt den Pfad zurück
-        If Thread_ID = 0 then
-            getWorkDir = Me.WorkDirSave
-        Else If Thread_ID > 0 then
-            getWorkDir = Me.WorkDirSave & "Thread_" & Thread_ID & "\"
-        End If
+        getWorkDir = System.Windows.Forms.Application.StartupPath() & "\Thread_" & Thread_ID & "\"
 
         Return getWorkDir
         
     End Function
+
+    'Ändert rekursiv die Attribute von Dateien und Unterverzeichnissen von Read-Only zu Normal
+    '*****************************************************************************************
+    Public Sub purgeReadOnly(ByVal path As String)
+
+        Dim mainDir As New DirectoryInfo(path)
+        Dim fInfo As IO.FileInfo() = mainDir.GetFiles("*.*")
+
+        'now loop through all the files and change the file attributes to normal
+        Dim file As IO.FileInfo
+
+        For Each file In fInfo
+            If (file.Attributes And FileAttributes.ReadOnly) Then
+                file.Attributes = FileAttributes.Normal
+            End If
+        Next
+
+        'do the same for the directories
+        Dim dInfo As DirectoryInfo() = mainDir.GetDirectories("*.*")
+        Dim dir As DirectoryInfo
+
+        For Each dir In dInfo
+            If (dir.Attributes And FileAttributes.ReadOnly) Then
+                dir.Attributes = FileAttributes.Normal
+            End If
+
+            'Call method recursively
+            Call purgeReadOnly(dir.FullName)
+        Next
+
+    End Sub
+
 
 #End Region  'Multithreading
 
