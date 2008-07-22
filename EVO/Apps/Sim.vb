@@ -28,8 +28,7 @@ Public MustInherit Class Sim
     '-----------------------
     Public Datensatz As String                           'Name des zu simulierenden Datensatzes
     Public MustOverride ReadOnly Property Datensatzendung() As String
-    Public WorkDir As String                             'Arbeitsverzeichnis für das Blaue Modell
-    Public Event WorkDirChange()                         'Event für Änderung des Arbeitsverzeichnisses
+    Public WorkDir As String                             'Arbeitsverzeichnis/Datensatz für BlueM
 
     Public SimStart As DateTime                          'Anfangsdatum der Simulation
     Public SimEnde As DateTime                           'Enddatum der Simulation
@@ -45,8 +44,8 @@ Public MustInherit Class Sim
     Public Const Constraints_Ext As String = "CON"       'Erweiterung der Datei mit den Constraints (*.CON)
     Public Const Combi_Ext As String = "CES"             'Erweiterung der Datei mit der Kombinatorik  (*.CES)
 
-	'OptParameter
-	'------------
+    'OptParameter
+    '------------
     Public List_OptParameter() As EVO.Common.OptParameter             'Liste der Optimierungsparameter
     Public List_OptParameter_Save() As EVO.Common.OptParameter        'Liste der Optimierungsparameter die nicht verändert wird
 
@@ -92,9 +91,9 @@ Public MustInherit Class Sim
 
     Public List_Locations() As Struct_Lokation
 
-    Public VerzweigungsDatei(,) As String       			'Gibt die PathSize an für jede Pfadstelle
+    Public VerzweigungsDatei(,) As String                   'Gibt die PathSize an für jede Pfadstelle
     Public CES_T_Modus As Common.Constants.CES_T_MODUS      'Zeigt ob der TestModus aktiv ist
-    Public n_Combinations As Integer            			'Die Anzahl der Möglichen Kombinationen
+    Public n_Combinations As Integer                        'Die Anzahl der Möglichen Kombinationen
 
 
 #End Region 'Eigenschaften
@@ -119,42 +118,22 @@ Public MustInherit Class Sim
         ReDim Me.List_Locations(-1)
 
         'Simulationsergebnis instanzieren
-        Me.SimErgebnis = New Collection
-
-        'Benutzereinstellungen einlesen
-        '------------------------------
-        Call Me.ReadSettings()
-
-    End Sub
-
-    'Benutzereinstellungen einlesen 
-    '******************************
-    Public Sub ReadSettings()
-
-        'Datensatz
-        '---------
-        Dim pfad As String
-        pfad = My.Settings.Datensatz
-        Call Me.saveDatensatz(pfad)
+        Me.SimErgebnis = New Collection()
 
     End Sub
 
     'Pfad zum Datensatz verarbeiten und speichern
     '********************************************
-    Public Sub saveDatensatz(ByVal Pfad As String)
+    Public Sub setDatensatz(ByVal pfad As String)
 
-        If (File.Exists(Pfad)) Then
+        If (File.Exists(pfad)) Then
             'Datensatzname bestimmen
-            Me.Datensatz = Path.GetFileNameWithoutExtension(Pfad)
+            Me.Datensatz = Path.GetFileNameWithoutExtension(pfad)
             'Arbeitsverzeichnis bestimmen
-            Me.WorkDir = Path.GetDirectoryName(Pfad) & "\"
-            'Benutzereinstellungen speichern
-            My.Settings.Datensatz = Pfad
-            Call My.Settings.Save()
+            Me.WorkDir = Path.GetDirectoryName(pfad) & "\"
+        Else
+            Throw New Exception("Der Datensatz '" & pfad & "' existiert nicht!")
         End If
-
-        'Event auslösen (wird von Form1.displayWorkDir() verarbeitet)
-        RaiseEvent WorkDirChange()
 
     End Sub
 
@@ -445,10 +424,10 @@ Public MustInherit Class Sim
                         .isOpt = False
                     End If
                     .Bezeichnung = WerteArray(2).Trim()
-                    If (WerteArray(3).Trim() = "+") Then 
-                    	.Richtung = Common.EVO_RICHTUNG.Maximierung
+                    If (WerteArray(3).Trim() = "+") Then
+                        .Richtung = Common.EVO_RICHTUNG.Maximierung
                     Else
-                    	.Richtung = Common.EVO_RICHTUNG.Minimierung
+                        .Richtung = Common.EVO_RICHTUNG.Minimierung
                     End If
                     .ZielTyp = WerteArray(4).Trim()
                     .Datei = WerteArray(5).Trim()
@@ -465,7 +444,7 @@ Public MustInherit Class Sim
                         .EvalEnde = Me.SimEnde
                     End If
                     .WertTyp = WerteArray(10).Trim()
-                    If (WerteArray(11).Trim() <> "") Then 
+                    If (WerteArray(11).Trim() <> "") Then
                         .RefWert = Convert.ToDouble(WerteArray(11).Trim(), Common.Provider.FortranProvider)
                     End If
                     .RefGr = WerteArray(12).Trim()

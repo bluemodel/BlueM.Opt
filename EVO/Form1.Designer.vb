@@ -30,12 +30,13 @@ Partial Class Form1
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.Button_Start = New System.Windows.Forms.Button
-        Me.LinkLabel_WorkDir = New System.Windows.Forms.LinkLabel
         Me.Button_openMDB = New System.Windows.Forms.Button
         Me.Button_Scatterplot = New System.Windows.Forms.Button
         Me.Button_saveMDB = New System.Windows.Forms.Button
         Me.Button_loadRefResult = New System.Windows.Forms.Button
         Me.GroupBox_Anwendung = New System.Windows.Forms.GroupBox
+        Me.Button_BrowseDatensatz = New System.Windows.Forms.Button
+        Me.ComboBox_Datensatz = New System.Windows.Forms.ComboBox
         Me.Label_Anwendung = New System.Windows.Forms.Label
         Me.ComboBox_Anwendung = New System.Windows.Forms.ComboBox
         Me.Label_Methode = New System.Windows.Forms.Label
@@ -66,17 +67,6 @@ Partial Class Form1
         Me.Button_Start.Text = ">"
         Me.ToolTip1.SetToolTip(Me.Button_Start, "Optimierung starten")
         Me.Button_Start.UseVisualStyleBackColor = True
-        '
-        'LinkLabel_WorkDir
-        '
-        Me.LinkLabel_WorkDir.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.LinkLabel_WorkDir.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline
-        Me.LinkLabel_WorkDir.Location = New System.Drawing.Point(208, 22)
-        Me.LinkLabel_WorkDir.MaximumSize = New System.Drawing.Size(5000, 13)
-        Me.LinkLabel_WorkDir.Name = "LinkLabel_WorkDir"
-        Me.LinkLabel_WorkDir.Size = New System.Drawing.Size(336, 13)
-        Me.LinkLabel_WorkDir.TabIndex = 9
-        Me.ToolTip1.SetToolTip(Me.LinkLabel_WorkDir, "Datensatz ändern")
         '
         'Button_openMDB
         '
@@ -125,12 +115,13 @@ Partial Class Form1
         'GroupBox_Anwendung
         '
         Me.GroupBox_Anwendung.BackColor = System.Drawing.SystemColors.Control
+        Me.GroupBox_Anwendung.Controls.Add(Me.Button_BrowseDatensatz)
+        Me.GroupBox_Anwendung.Controls.Add(Me.ComboBox_Datensatz)
         Me.GroupBox_Anwendung.Controls.Add(Me.Label_Anwendung)
         Me.GroupBox_Anwendung.Controls.Add(Me.ComboBox_Anwendung)
         Me.GroupBox_Anwendung.Controls.Add(Me.Label_Methode)
         Me.GroupBox_Anwendung.Controls.Add(Me.ComboBox_Methode)
         Me.GroupBox_Anwendung.Controls.Add(Me.Label_Datensatz)
-        Me.GroupBox_Anwendung.Controls.Add(Me.LinkLabel_WorkDir)
         Me.GroupBox_Anwendung.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.GroupBox_Anwendung.Location = New System.Drawing.Point(4, 4)
         Me.GroupBox_Anwendung.Name = "GroupBox_Anwendung"
@@ -138,6 +129,26 @@ Partial Class Form1
         Me.GroupBox_Anwendung.TabIndex = 0
         Me.GroupBox_Anwendung.TabStop = False
         Me.GroupBox_Anwendung.Text = "Anwendung"
+        '
+        'Button_BrowseDatensatz
+        '
+        Me.Button_BrowseDatensatz.Enabled = False
+        Me.Button_BrowseDatensatz.Location = New System.Drawing.Point(516, 17)
+        Me.Button_BrowseDatensatz.Name = "Button_BrowseDatensatz"
+        Me.Button_BrowseDatensatz.Size = New System.Drawing.Size(24, 23)
+        Me.Button_BrowseDatensatz.TabIndex = 14
+        Me.Button_BrowseDatensatz.Text = "..."
+        Me.Button_BrowseDatensatz.UseVisualStyleBackColor = True
+        '
+        'ComboBox_Datensatz
+        '
+        Me.ComboBox_Datensatz.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboBox_Datensatz.Enabled = False
+        Me.ComboBox_Datensatz.FormattingEnabled = True
+        Me.ComboBox_Datensatz.Location = New System.Drawing.Point(206, 18)
+        Me.ComboBox_Datensatz.Name = "ComboBox_Datensatz"
+        Me.ComboBox_Datensatz.Size = New System.Drawing.Size(304, 21)
+        Me.ComboBox_Datensatz.TabIndex = 13
         '
         'Label_Anwendung
         '
@@ -154,9 +165,9 @@ Partial Class Form1
         Me.ComboBox_Anwendung.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox_Anwendung.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
         Me.ComboBox_Anwendung.FormattingEnabled = True
-        Me.ComboBox_Anwendung.Location = New System.Drawing.Point(36, 19)
+        Me.ComboBox_Anwendung.Location = New System.Drawing.Point(36, 18)
         Me.ComboBox_Anwendung.Name = "ComboBox_Anwendung"
-        Me.ComboBox_Anwendung.Size = New System.Drawing.Size(124, 21)
+        Me.ComboBox_Anwendung.Size = New System.Drawing.Size(100, 21)
         Me.ComboBox_Anwendung.TabIndex = 0
         '
         'Label_Methode
@@ -165,28 +176,29 @@ Partial Class Form1
         Me.Label_Methode.Enabled = False
         Me.Label_Methode.Location = New System.Drawing.Point(546, 22)
         Me.Label_Methode.Name = "Label_Methode"
-        Me.Label_Methode.Size = New System.Drawing.Size(37, 13)
+        Me.Label_Methode.Size = New System.Drawing.Size(52, 13)
         Me.Label_Methode.TabIndex = 11
-        Me.Label_Methode.Text = "Meth.:"
+        Me.Label_Methode.Text = "Methode:"
         '
         'ComboBox_Methode
         '
         Me.ComboBox_Methode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboBox_Methode.Enabled = False
         Me.ComboBox_Methode.FormattingEnabled = True
-        Me.ComboBox_Methode.Location = New System.Drawing.Point(583, 19)
+        Me.ComboBox_Methode.Location = New System.Drawing.Point(604, 18)
         Me.ComboBox_Methode.Name = "ComboBox_Methode"
-        Me.ComboBox_Methode.Size = New System.Drawing.Size(121, 21)
+        Me.ComboBox_Methode.Size = New System.Drawing.Size(100, 21)
         Me.ComboBox_Methode.TabIndex = 10
         '
         'Label_Datensatz
         '
         Me.Label_Datensatz.AutoSize = True
         Me.Label_Datensatz.Enabled = False
-        Me.Label_Datensatz.Location = New System.Drawing.Point(164, 22)
+        Me.Label_Datensatz.Location = New System.Drawing.Point(142, 22)
         Me.Label_Datensatz.Name = "Label_Datensatz"
-        Me.Label_Datensatz.Size = New System.Drawing.Size(47, 13)
+        Me.Label_Datensatz.Size = New System.Drawing.Size(58, 13)
         Me.Label_Datensatz.TabIndex = 12
-        Me.Label_Datensatz.Text = "Datens.:"
+        Me.Label_Datensatz.Text = "Datensatz:"
         '
         'GroupBox_ErgebnisDB
         '
@@ -255,7 +267,6 @@ Partial Class Form1
     Private WithEvents Button_saveMDB As System.Windows.Forms.Button
     Private WithEvents Button_openMDB As System.Windows.Forms.Button
     Private WithEvents Button_Scatterplot As System.Windows.Forms.Button
-    Private WithEvents LinkLabel_WorkDir As System.Windows.Forms.LinkLabel
     Private WithEvents Label_Datensatz As System.Windows.Forms.Label
     Private WithEvents GroupBox_Anwendung As System.Windows.Forms.GroupBox
     Private WithEvents ComboBox_Anwendung As System.Windows.Forms.ComboBox
@@ -263,4 +274,6 @@ Partial Class Form1
     Private WithEvents ComboBox_Methode As System.Windows.Forms.ComboBox
     Private WithEvents Label_Methode As System.Windows.Forms.Label
     Private WithEvents Button_loadRefResult As System.Windows.Forms.Button
+    Friend WithEvents Button_BrowseDatensatz As System.Windows.Forms.Button
+    Friend WithEvents ComboBox_Datensatz As System.Windows.Forms.ComboBox
 End Class
