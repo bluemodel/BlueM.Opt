@@ -142,7 +142,7 @@ Public Class EVO_Settings
                     Me.Pop.OptPopStrategie = EVO_STRATEGIE.Plus_Strategie
                     Me.Pop.OptPopPenalty = EVO_POP_PENALTY.Mittelwert
 
-                    Me.is_paint_constraint = True
+                    Me.is_paint_constraint = False
 
             End Select
         End Sub
