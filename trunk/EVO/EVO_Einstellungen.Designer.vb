@@ -89,7 +89,6 @@ Partial Class EVO_Einstellungen
         Me.ComboOptPopEltern = New System.Windows.Forms.ComboBox
         Me.ComboOptPopStrategie = New System.Windows.Forms.ComboBox
         Me.ComboOptPopPenalty = New System.Windows.Forms.ComboBox
-        Me.checkpaintconstrained = New System.Windows.Forms.CheckBox
         Me.TabPage_CES = New System.Windows.Forms.TabPage
         Me.CheckBox_CES_UseSecPop_CES = New System.Windows.Forms.CheckBox
         Me.GroupBox_CES_SecPop = New System.Windows.Forms.GroupBox
@@ -571,7 +570,6 @@ Partial Class EVO_Einstellungen
         Me.TabPage_PES.Controls.Add(Me.GroupBox_SekPop)
         Me.TabPage_PES.Controls.Add(Me.CheckisPopul)
         Me.TabPage_PES.Controls.Add(Me.GroupBox_Populationen)
-        Me.TabPage_PES.Controls.Add(Me.checkpaintconstrained)
         Me.TabPage_PES.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TabPage_PES.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_PES.Margin = New System.Windows.Forms.Padding(0)
@@ -895,17 +893,6 @@ Partial Class EVO_Einstellungen
         Me.ComboOptPopPenalty.Name = "ComboOptPopPenalty"
         Me.ComboOptPopPenalty.Size = New System.Drawing.Size(108, 21)
         Me.ComboOptPopPenalty.TabIndex = 5
-        '
-        'checkpaintconstrained
-        '
-        Me.checkpaintconstrained.AutoSize = True
-        Me.checkpaintconstrained.Location = New System.Drawing.Point(4, 658)
-        Me.checkpaintconstrained.Name = "checkpaintconstrained"
-        Me.checkpaintconstrained.Size = New System.Drawing.Size(133, 17)
-        Me.checkpaintconstrained.TabIndex = 11
-        Me.checkpaintconstrained.Text = "Reduzierte Darstellung"
-        Me.ToolTip1.SetToolTip(Me.checkpaintconstrained, "Nur die Individuuen der aktuellen Generation werden gezeichnet")
-        Me.checkpaintconstrained.UseVisualStyleBackColor = True
         '
         'TabPage_CES
         '
@@ -1471,7 +1458,6 @@ Partial Class EVO_Einstellungen
     Public WithEvents Label_HJ_ES As System.Windows.Forms.Label
     Public WithEvents Label_HJ_TSgesamt As System.Windows.Forms.Label
     Public WithEvents Label_HJ_TSmittel As System.Windows.Forms.Label
-    Friend WithEvents checkpaintconstrained As System.Windows.Forms.CheckBox
     Friend WithEvents CheckisTournamentSelection As System.Windows.Forms.CheckBox
     Friend WithEvents ComboOptDnMutation As System.Windows.Forms.ComboBox
     Friend WithEvents Label_CES_OptModus As System.Windows.Forms.Label

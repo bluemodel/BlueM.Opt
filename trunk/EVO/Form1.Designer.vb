@@ -29,7 +29,9 @@ Partial Class Form1
         Me.components = New System.ComponentModel.Container
         Dim MenuStrip1 As System.Windows.Forms.MenuStrip
         Dim MenuItem_Tools As System.Windows.Forms.ToolStripMenuItem
+        Dim ToolStripSeparator1 As System.Windows.Forms.ToolStripSeparator
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
+        Me.MenuItem_DatensatzZurücksetzen = New System.Windows.Forms.ToolStripMenuItem
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.Button_Start = New System.Windows.Forms.Button
         Me.Button_openMDB = New System.Windows.Forms.Button
@@ -47,16 +49,41 @@ Partial Class Form1
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog
         Me.GroupBox_ErgebnisDB = New System.Windows.Forms.GroupBox
-        Me.MenuItem_DatensatzZurücksetzen = New System.Windows.Forms.ToolStripMenuItem
         Me.EVO_Einstellungen1 = New IHWB.EVO.EVO_Einstellungen
         Me.EVO_Opt_Verlauf1 = New IHWB.EVO.EVO_Opt_Verlauf
         Me.DForm = New IHWB.EVO.DiagrammForm
+        Me.MenuItem_Optionen = New System.Windows.Forms.ToolStripMenuItem
         MenuStrip1 = New System.Windows.Forms.MenuStrip
         MenuItem_Tools = New System.Windows.Forms.ToolStripMenuItem
+        ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator
+        MenuStrip1.SuspendLayout()
         Me.GroupBox_Anwendung.SuspendLayout()
         Me.GroupBox_ErgebnisDB.SuspendLayout()
-        MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
+        '
+        'MenuStrip1
+        '
+        MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {MenuItem_Tools})
+        MenuStrip1.Location = New System.Drawing.Point(0, 0)
+        MenuStrip1.Name = "MenuStrip1"
+        MenuStrip1.RightToLeft = System.Windows.Forms.RightToLeft.No
+        MenuStrip1.Size = New System.Drawing.Size(718, 24)
+        MenuStrip1.TabIndex = 15
+        MenuStrip1.Text = "MenuStrip1"
+        '
+        'MenuItem_Tools
+        '
+        MenuItem_Tools.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItem_DatensatzZurücksetzen, ToolStripSeparator1, Me.MenuItem_Optionen})
+        MenuItem_Tools.Name = "MenuItem_Tools"
+        MenuItem_Tools.Size = New System.Drawing.Size(44, 20)
+        MenuItem_Tools.Text = "Tools"
+        '
+        'MenuItem_DatensatzZurücksetzen
+        '
+        Me.MenuItem_DatensatzZurücksetzen.Enabled = False
+        Me.MenuItem_DatensatzZurücksetzen.Name = "MenuItem_DatensatzZurücksetzen"
+        Me.MenuItem_DatensatzZurücksetzen.Size = New System.Drawing.Size(200, 22)
+        Me.MenuItem_DatensatzZurücksetzen.Text = "Datensatz zurücksetzen"
         '
         'Button_Start
         '
@@ -219,30 +246,6 @@ Partial Class Form1
         Me.GroupBox_ErgebnisDB.TabStop = False
         Me.GroupBox_ErgebnisDB.Text = "Ergebnis"
         '
-        'MenuStrip1
-        '
-        MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {MenuItem_Tools})
-        MenuStrip1.Location = New System.Drawing.Point(0, 0)
-        MenuStrip1.Name = "MenuStrip1"
-        MenuStrip1.RightToLeft = System.Windows.Forms.RightToLeft.No
-        MenuStrip1.Size = New System.Drawing.Size(718, 24)
-        MenuStrip1.TabIndex = 15
-        MenuStrip1.Text = "MenuStrip1"
-        '
-        'MenuItem_Tools
-        '
-        MenuItem_Tools.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItem_DatensatzZurücksetzen})
-        MenuItem_Tools.Name = "MenuItem_Tools"
-        MenuItem_Tools.Size = New System.Drawing.Size(44, 20)
-        MenuItem_Tools.Text = "Tools"
-        '
-        'MenuItem_DatensatzZurücksetzen
-        '
-        Me.MenuItem_DatensatzZurücksetzen.Enabled = False
-        Me.MenuItem_DatensatzZurücksetzen.Name = "MenuItem_DatensatzZurücksetzen"
-        Me.MenuItem_DatensatzZurücksetzen.Size = New System.Drawing.Size(200, 22)
-        Me.MenuItem_DatensatzZurücksetzen.Text = "Datensatz zurücksetzen"
-        '
         'EVO_Einstellungen1
         '
         Me.EVO_Einstellungen1.Enabled = False
@@ -265,6 +268,17 @@ Partial Class Form1
         Me.DForm.Size = New System.Drawing.Size(473, 625)
         Me.DForm.TabIndex = 8
         '
+        'ToolStripSeparator1
+        '
+        ToolStripSeparator1.Name = "ToolStripSeparator1"
+        ToolStripSeparator1.Size = New System.Drawing.Size(197, 6)
+        '
+        'MenuItem_Optionen
+        '
+        Me.MenuItem_Optionen.Name = "MenuItem_Optionen"
+        Me.MenuItem_Optionen.Size = New System.Drawing.Size(200, 22)
+        Me.MenuItem_Optionen.Text = "Optionen..."
+        '
         'Form1
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
@@ -284,11 +298,11 @@ Partial Class Form1
         Me.Name = "Form1"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Evolutionsstrategie"
+        MenuStrip1.ResumeLayout(False)
+        MenuStrip1.PerformLayout()
         Me.GroupBox_Anwendung.ResumeLayout(False)
         Me.GroupBox_Anwendung.PerformLayout()
         Me.GroupBox_ErgebnisDB.ResumeLayout(False)
-        MenuStrip1.ResumeLayout(False)
-        MenuStrip1.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -312,4 +326,5 @@ Partial Class Form1
     Friend WithEvents Button_BrowseDatensatz As System.Windows.Forms.Button
     Friend WithEvents ComboBox_Datensatz As System.Windows.Forms.ComboBox
     Friend WithEvents MenuItem_DatensatzZurücksetzen As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents MenuItem_Optionen As System.Windows.Forms.ToolStripMenuItem
 End Class

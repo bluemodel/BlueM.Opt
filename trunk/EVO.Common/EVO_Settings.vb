@@ -66,8 +66,6 @@ Public Class EVO_Settings
             Public OptPopPenalty As EVO_POP_PENALTY     'Art der Beurteilung der Populationsgüte (Multiobjective)
         End Structure
 
-        Public is_paint_constraint As Boolean      'Nur die Individuuen der aktuellen Generation werden gezeichnet
-
         'Standardwerte setzen
         '********************
         Public Sub setStandard(ByVal modus As EVO_MODUS)
@@ -107,8 +105,6 @@ Public Class EVO_Settings
                     Me.Pop.OptPopStrategie = EVO_STRATEGIE.Plus_Strategie
                     Me.Pop.OptPopPenalty = EVO_POP_PENALTY.Mittelwert
 
-                    Me.is_paint_constraint = False
-
 
                 Case EVO_MODUS.Multi_Objective
 
@@ -141,8 +137,6 @@ Public Class EVO_Settings
                     Me.Pop.OptPopEltern = EVO_POP_ELTERN.Rekombination
                     Me.Pop.OptPopStrategie = EVO_STRATEGIE.Plus_Strategie
                     Me.Pop.OptPopPenalty = EVO_POP_PENALTY.Mittelwert
-
-                    Me.is_paint_constraint = False
 
             End Select
         End Sub
