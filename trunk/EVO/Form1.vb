@@ -56,7 +56,7 @@ Partial Class Form1
 
     '**** Multithreading ****
     Dim SIM_Eval_is_OK As Boolean
-    Dim BackgroundWorker1 as System.ComponentModel.BackgroundWorker 'Threads für Backgroundworker
+    Dim BackgroundWorker1 As System.ComponentModel.BackgroundWorker 'Threads für Backgroundworker
     Private PhysCPU As Integer                                      'Anzahl physikalischer Prozessoren
     Private LogCPU As Integer                                       'Anzahl logischer Prozessoren
 
@@ -99,7 +99,6 @@ Partial Class Form1
         'Liste der Methoden in ComboBox schreiben und Anfangseinstellung wählen
         ComboBox_Methode.Items.AddRange(New Object() {"", METH_RESET, METH_PES, METH_CES, METH_HYBRID, METH_SENSIPLOT, METH_HOOKJEEVES})
         ComboBox_Methode.SelectedIndex = 0
-        ComboBox_Methode.Enabled = False
 
         'Ende der Initialisierung
         IsInitializing = False
@@ -133,11 +132,7 @@ Partial Class Form1
             'Start Button deaktivieren
             Me.Button_Start.Enabled = False
 
-            'Datensatz deaktivieren
-            Me.Label_Datensatz.Enabled = False
-            Me.LinkLabel_WorkDir.Enabled = False
-
-            'Methode deaktivieren
+            'Methodenauswahl deaktivieren
             Me.Label_Methode.Enabled = False
             Me.ComboBox_Methode.Enabled = False
 
@@ -198,20 +193,7 @@ Partial Class Form1
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Testprobleme instanzieren
-                    If (IsNothing(Testprobleme1)) Then
-                        Testprobleme1 = New Testprobleme()
-                    End If
-
-                    'Testprobleme anzeigen
-                    Call Me.Testprobleme1.Show()
-
-                    '### DK: Methodenauswahl ist erforderlich 
-                    ComboBox_Methode.Items.Clear()
-                    ComboBox_Methode.Items.AddRange(New Object() {"", METH_PES, METH_Hybrid2008})
-
-                    'Methode aktivieren
-                    Me.Label_Methode.Enabled = True
-                    Me.ComboBox_Methode.Enabled = True
+                    Testprobleme1 = New Testprobleme()
 
 
                 Case ANW_TSP 'Anwendung Traveling Salesman Problem (TSP)
@@ -226,26 +208,168 @@ Partial Class Form1
 
             End Select
 
-            'Bei Simulationsanwendungen
-            If (Me.Anwendung <> ANW_TESTPROBLEME And Anwendung <> ANW_TSP) Then
-
-                'Datensatz aktivieren
-                Me.Label_Datensatz.Enabled = True
-                Me.LinkLabel_WorkDir.Enabled = True
-
-                'Datensatz anzeigen
-                Call Me.displayWorkDir()
-
-                'Methode aktivieren
-                Me.Label_Methode.Enabled = True
-                Me.ComboBox_Methode.Enabled = True
-            End If
+            'Datensatz UI aktivieren
+            Call Me.showDatensatzUI()
 
             'EVO_Verlauf zurücksetzen
             Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
 
             'Mauszeiger wieder normal
             Cursor = Cursors.Default
+
+        End If
+
+    End Sub
+
+    'Datensatz-UI anzeigen
+    '*********************
+    Private Sub showDatensatzUI()
+
+        Dim pfad As String
+
+        'UI aktivieren
+        Me.Label_Datensatz.Enabled = True
+        Me.ComboBox_Datensatz.Enabled = True
+
+        'Tooltip zurücksetzen
+        Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, "")
+
+        'Combo_Datensatz auffüllen
+        Call Me.populateCombo_Datensatz()
+
+        'Bei Simulationsanwendungen:
+        If (Me.Anwendung <> ANW_TESTPROBLEME) Then
+
+            'zuletzt benutzten Datensatz setzen
+            If (My.Settings.MRUSimDatensaetze.Count > 0) Then
+                pfad = My.Settings.MRUSimDatensaetze.Item(My.Settings.MRUSimDatensaetze.Count - 1)
+                Me.ComboBox_Datensatz.SelectedItem = pfad
+                Call Sim1.setDatensatz(pfad)
+            End If
+
+            'Browse-Button aktivieren
+            Me.Button_BrowseDatensatz.Enabled = True
+        End If
+
+    End Sub
+
+    'Combo_Datensatz auffüllen
+    '*************************
+    Private Sub populateCombo_Datensatz()
+
+        Dim i As Integer
+
+        'vorherige Einträge löschen
+        Me.ComboBox_Datensatz.Items.Clear()
+
+        Select Case Me.Anwendung
+
+            Case ANW_TESTPROBLEME
+
+                'Mit Tesproblemen füllen
+                Me.ComboBox_Datensatz.Items.AddRange(Testprobleme1.Testprobleme)
+
+            Case Else '(Sim-Anwendungen)
+
+                'Mit Benutzer-MRUSimDatensätze füllen
+                If (My.Settings.MRUSimDatensaetze.Count > 0) Then
+
+                    'Combobox rückwärts füllen
+                    For i = My.Settings.MRUSimDatensaetze.Count - 1 To 0 Step -1
+                        Me.ComboBox_Datensatz.Items.Add(My.Settings.MRUSimDatensaetze.Item(i))
+                    Next
+
+                End If
+
+        End Select
+
+    End Sub
+
+
+    'Arbeitsverzeichnis/Datensatz auswählen (nur Sim-Anwendungen)
+    '************************************************************
+    Private Sub selectSimDatensatz(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_BrowseDatensatz.Click
+
+        Dim DiagResult As DialogResult
+        Dim pfad As String
+
+        'Dialog vorbereiten
+        OpenFileDialog1.Filter = "ALL-Dateien (*.ALL)|*.ALL|INP-Dateien (*.INP)|*.INP"
+        OpenFileDialog1.Title = "Datensatz auswählen"
+
+        'Alten Datensatz dem Dialog zuweisen
+        OpenFileDialog1.InitialDirectory = Sim1.WorkDir
+        OpenFileDialog1.FileName = Sim1.WorkDir & Sim1.Datensatz & Sim1.Datensatzendung
+
+        'Dialog öffnen
+        DiagResult = OpenFileDialog1.ShowDialog()
+
+        'Neuen Datensatz speichern
+        If (DiagResult = Windows.Forms.DialogResult.OK) Then
+
+            pfad = OpenFileDialog1.FileName
+
+            'Datensatz setzen
+            Call Sim1.setDatensatz(pfad)
+
+            'Benutzereinstellungen aktualisieren
+            If (My.Settings.MRUSimDatensaetze.Contains(pfad)) Then
+                My.Settings.MRUSimDatensaetze.Remove(pfad)
+            End If
+            My.Settings.MRUSimDatensaetze.Add(pfad)
+
+            'Benutzereinstellungen speichern
+            Call My.Settings.Save()
+
+            'Datensatzanzeige aktualisieren
+            Call Me.populateCombo_Datensatz()
+            Me.ComboBox_Datensatz.SelectedItem = pfad
+
+            'Methodenauswahl wieder zurücksetzen 
+            '(Der Benutzer muss zuerst Ini neu ausführen!)
+            Me.ComboBox_Methode.SelectedItem = ""
+
+        End If
+
+    End Sub
+
+    'Datensatz wurde ausgewählt
+    '**************************
+    Private Sub INI_Datensatz(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Datensatz.SelectedIndexChanged
+
+        If (Me.IsInitializing = True) Then
+
+            Exit Sub
+
+        Else
+
+            'Tooltip zurücksetzen
+            '--------------------
+            Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, "")
+
+            'gewählten Datensatz an Anwendung übergeben
+            '------------------------------------------
+            Select Case Me.Anwendung
+
+                Case ANW_TESTPROBLEME
+
+                    'Tesproblem setzen
+                    Testprobleme1.setTestproblem(Me.ComboBox_Datensatz.SelectedItem)
+
+                    'Tooltip anzeigen
+                    Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, Testprobleme1.TestProblemDescription)
+
+                Case Else '(Alle Sim-Anwendungen)
+
+                    Call Sim1.setDatensatz(Me.ComboBox_Datensatz.SelectedItem)
+
+            End Select
+
+            'Methodenauswahl aktivieren und zurücksetzen
+            '-------------------------------------------
+            Me.Label_Methode.Enabled = True
+            Me.ComboBox_Methode.Enabled = True
+            Me.ComboBox_Methode.SelectedItem = ""
 
         End If
 
@@ -550,51 +674,6 @@ Partial Class Form1
 
     End Sub
 
-    'Arbeitsverzeichnis/Datensatz ändern
-    '***********************************
-    Private Sub changeDatensatz(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles LinkLabel_WorkDir.LinkClicked
-
-        Dim DiagResult As DialogResult
-
-        'Dialog vorbereiten
-        OpenFileDialog1.Filter = "ALL-Dateien (*.ALL)|*.ALL|INP-Dateien (*.INP)|*.INP"
-        OpenFileDialog1.Title = "Datensatz auswählen"
-
-        'Alten Datensatz dem Dialog zuweisen
-        OpenFileDialog1.InitialDirectory = Sim1.WorkDir
-        OpenFileDialog1.FileName = Sim1.WorkDir & Sim1.Datensatz & Sim1.Datensatzendung
-
-        'Dialog öffnen
-        DiagResult = OpenFileDialog1.ShowDialog()
-
-        'Neuen Datensatz speichern
-        If (DiagResult = Windows.Forms.DialogResult.OK) Then
-            Call Sim1.saveDatensatz(OpenFileDialog1.FileName)
-        End If
-
-        'Methodenauswahl wieder zurücksetzen (Der Benutzer muss zuerst Ini neu ausführen!)
-        Me.ComboBox_Methode.SelectedItem = ""
-
-    End Sub
-
-    'Arbeitsverzeichnis wurde geändert -> Anzeige aktualisieren
-    '**********************************************************
-    Private Sub displayWorkDir() Handles Sim1.WorkDirChange
-
-        Dim pfad As String
-        pfad = Sim1.WorkDir & Sim1.Datensatz & Sim1.Datensatzendung
-
-        'Datensatzanzeige aktualisieren
-        If (File.Exists(pfad)) Then
-            Me.LinkLabel_WorkDir.Text = pfad
-            Me.LinkLabel_WorkDir.Links(0).LinkData = Sim1.WorkDir
-        Else
-            Me.LinkLabel_WorkDir.Text = "bitte Datensatz auswählen!"
-            Me.LinkLabel_WorkDir.Links(0).LinkData = CurDir()
-        End If
-
-    End Sub
-
     'EVO_Einstellungen laden
     '***********************
     Friend Sub Load_EVO_Settings(ByVal sender As Object, ByVal e As System.EventArgs)
@@ -679,7 +758,7 @@ Partial Class Form1
             Call Me.EVO_Einstellungen1.saveSettings(dir & "EVO_Settings.xml")
 
             'BackgroundWorker für Multithreading einrichten
-            BackgroundWorker1  = new System.ComponentModel.BackgroundWorker
+            BackgroundWorker1 = New System.ComponentModel.BackgroundWorker
             AddHandler BackgroundWorker1.DoWork, AddressOf BackgroundWorker1_DoWork
             AddHandler BackgroundWorker1.RunWorkerCompleted, AddressOf BackgroundWorker1_RunWorkerCompleted
             'AddHandler BackgroundWorker1.ProgressChanged, AddressOf BackgroundWorker1_ProgressChanged
@@ -1023,7 +1102,7 @@ Partial Class Form1
 
                     While Me.BackgroundWorker1.IsBusy
                         System.Threading.Thread.Sleep(20)
-                        Application.DoEvents
+                        Application.DoEvents()
                     End While
                     '************************************************************************************
 
@@ -1035,7 +1114,7 @@ Partial Class Form1
 
                     'Lösung im TeeChart einzeichnen
                     '==============================
-                    If (SIM_Eval_is_OK) Then 
+                    If (SIM_Eval_is_OK) Then
                         Call Me.LösungZeichnen(CES1.Childs(i_ch), 0, 0, i_gen, i_ch, ColorManagement(ColorArray, CES1.Childs(i_ch)))
                     End If
 
@@ -1573,6 +1652,7 @@ Start_Evolutionsrunden:
                                 Case ANW_TESTPROBLEME
 
                                     Call Testprobleme1.Evaluierung_TestProbleme(ind, PES1.PES_iAkt.iAktPop, Me.Hauptdiagramm)
+                                    SIM_Eval_is_OK = True
 
                                 Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM
 
@@ -1587,7 +1667,7 @@ Start_Evolutionsrunden:
 
                                     While Me.BackgroundWorker1.IsBusy
                                         System.Threading.Thread.Sleep(20)
-                                        Application.DoEvents
+                                        Application.DoEvents()
                                     End While
                                     '************************************************************************************
 
@@ -1832,17 +1912,17 @@ Start_Evolutionsrunden:
         ReDim tmpZielindex(2)                       'Maximal 3 Achsen
         'Zunächst keine Achsenzuordnung (-1)
         For i = 0 To tmpZielindex.GetUpperBound(0)
-            tmpZielIndex(i) = -1                    
+            tmpZielindex(i) = -1
         Next
 
-        'Fallunterscheidung Methode
-        'XXXXXXXXXXXXXXXXXXXXXXXXXX
+        'Fallunterscheidung Anwendung/Methode
+        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
         Select Case Anwendung
 
             Case ANW_TESTPROBLEME 'Testprobleme
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-                Call Testprobleme1.DiagInitialise(Me.EVO_Einstellungen1.Settings, globalAnzPar, Me.Hauptdiagramm)
+                Call Testprobleme1.DiagInitialise(Me.EVO_Einstellungen1.Settings, Me.Hauptdiagramm)
 
             Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -2125,7 +2205,7 @@ Start_Evolutionsrunden:
 
     'Speichert die verwendeten Farben für die bisherigen Pfade und generiert neue, falls erforderlich
     '************************************************************************************************
-    Private Function ColorManagement(ByRef ColorAray(,) As Object, ByVal ind As Common.Individuum) as Color
+    Private Function ColorManagement(ByRef ColorAray(,) As Object, ByVal ind As Common.Individuum) As Color
         Dim i, j As Integer
         Dim count As Integer
         Dim Farbe As Color = Color.White
@@ -2792,7 +2872,7 @@ Start_Evolutionsrunden:
 
     End Sub
 
-        'BackgroundWorker1 RunWorkerCompleted
+    'BackgroundWorker1 RunWorkerCompleted
     '************************************
     Private Sub BackgroundWorker1_RunWorkerCompleted(ByVal sender As System.Object, _
                                                      ByVal e As System.ComponentModel.RunWorkerCompletedEventArgs)

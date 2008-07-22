@@ -142,11 +142,7 @@
     <Compile Include="Apps\SWMM\SWMM.vb" />
     <Compile Include="Apps\SWMM\Swmm_Iface.vb" />
     <Compile Include="Apps\S_CAN\Scan.vb" />
-    <Compile Include="Apps\Testprobleme\Testprobleme.Designer.vb">
-      <DependentUpon>Testprobleme.vb</DependentUpon>
-    </Compile>
     <Compile Include="Apps\Testprobleme\Testprobleme.vb">
-      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Apps\TSP.vb" />
     <Compile Include="AssemblyInfo.vb">
@@ -222,10 +218,6 @@
     <Compile Include="Settings.vb" />
     <EmbeddedResource Include="Apps\SensiPlot.resx">
       <DependentUpon>SensiPlot.vb</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Apps\Testprobleme\Testprobleme.resx">
-      <DependentUpon>Testprobleme.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Diagramm\DiagrammForm.resx">
