@@ -27,6 +27,8 @@ Partial Class Form1
 
     Private IsInitializing As Boolean
 
+    Private Options As OptionsDialog
+
     'Anwendung
     Private Anwendung As String
 
@@ -34,7 +36,7 @@ Partial Class Form1
     Public Shared Method As String
 
     '**** Deklarationen der Module *****
-    Private WithEvents Testprobleme1 As Testprobleme
+    Private Testprobleme1 As Testprobleme
     Friend WithEvents Sim1 As Sim
     Private SensiPlot1 As SensiPlot
     Private CES1 As EVO.Kern.CES
@@ -100,9 +102,18 @@ Partial Class Form1
         ComboBox_Methode.Items.AddRange(New Object() {"", METH_PES, METH_CES, METH_HYBRID, METH_SENSIPLOT, METH_HOOKJEEVES})
         ComboBox_Methode.SelectedIndex = 0
 
+        'OptionsDialog instanzieren
+        Me.Options = New OptionsDialog()
+
         'Ende der Initialisierung
         IsInitializing = False
 
+    End Sub
+
+    'Optionen Dialog anzeigen
+    '************************
+    Private Sub showOptionDialog(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem_Optionen.Click
+        Call Me.Options.ShowDialog()
     End Sub
 
 #Region "Initialisierung der Anwendungen"
@@ -1708,7 +1719,7 @@ Start_Evolutionsrunden:
                     If (EVO_Einstellungen1.Settings.PES.OptModus = Common.Constants.EVO_MODUS.Multi_Objective) Then
 
                         'SekPop abspeichern
-                        '---------------
+                        '------------------
                         If (Not IsNothing(Sim1)) Then
                             Call Sim1.OptResult.setSekPop(PES1.SekundärQb, PES1.PES_iAkt.iAktGen)
                         End If
@@ -1725,7 +1736,8 @@ Start_Evolutionsrunden:
                     End If
 
                     'ggf. alte Generation im Diagramm löschen
-                    If (EVO_Einstellungen1.Settings.PES.is_paint_constraint) Then
+                    If (Me.Options.showOnlyCurrentPop _
+                        And PES1.PES_iAkt.iAktGen < EVO_Einstellungen1.Settings.PES.n_Gen - 1) Then
                         Call Me.ClearLastGeneration(PES1.PES_iAkt.iAktPop)
                     End If
 

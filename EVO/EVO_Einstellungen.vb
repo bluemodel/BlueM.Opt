@@ -292,8 +292,6 @@ Public Class EVO_Einstellungen
                 .Pop.n_Popul = 1
                 .Pop.n_PopEltern = 1
             End If
-            'Reduzierte Darstellung
-            .is_paint_constraint = checkpaintconstrained.Checked
 
         End With
 
@@ -427,8 +425,6 @@ Public Class EVO_Einstellungen
             Me.TextAnzRunden.Value = .Pop.n_Runden
             Me.TextAnzPop.Value = .Pop.n_Popul
             Me.TextAnzPopEltern.Value = .Pop.n_PopEltern
-            'Reduzierte Darstellung
-            Me.checkpaintconstrained.Checked = .is_paint_constraint
 
         End With
 
