@@ -3,13 +3,17 @@ Imports System.IO
 Public Class Scan
     Inherits Sim
 
-    Public Overrides ReadOnly Property Datensatzendung() As String
-        Get
-            Return ".ALL"
-        End Get
-    End Property
-
     Private input As Wave.WEL
+
+    'Konstruktor
+    '***********
+    Public Sub New()
+
+        Call MyBase.New()
+
+        Me.mDatensatzendung = ".ALL"
+
+    End Sub
 
     Public Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
 

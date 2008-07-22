@@ -8,14 +8,14 @@ Imports System.ComponentModel
 '*******************************************************************************
 '**** ihwb Optimierung                                                      ****
 '****                                                                       ****
-'**** Christoph Huebner, Felix Froehlich, Dirk Muschalla                    ****
+'**** Christoph Huebner, Felix Froehlich, Dirk Muschalla, Dominik Kerber    ****
 '****                                                                       ****
 '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
 '**** TU Darmstadt                                                          ****
 '****                                                                       ****
 '**** Erstellt: Dezember 2003                                               ****
 '****                                                                       ****
-'**** Letzte Änderung: Juli 2007                                            ****
+'**** Letzte Änderung: Juli 2008                                            ****
 '*******************************************************************************
 '*******************************************************************************
 
@@ -26,6 +26,8 @@ Partial Class Form1
 
     Private IsInitializing As Boolean
 
+    Private Options As OptionsDialog
+
     'Anwendung
     Private Anwendung As String
 
@@ -33,11 +35,14 @@ Partial Class Form1
     Public Shared Method As String
 
     '**** Deklarationen der Module *****
-    Private WithEvents Testprobleme1 As Testprobleme
+    Private Testprobleme1 As Testprobleme
     Friend WithEvents Sim1 As Sim
     Private SensiPlot1 As SensiPlot
     Private CES1 As EVO.Kern.CES
     Private TSP1 As TSP
+
+    'New'
+    'Dim hybrid2008 As EVO.Hybrid2008.Main.cs
 
     '**** Globale Parameter Parameter Optimierung ****
     'TODO: diese Werte sollten eigentlich nur in CES bzw PES vorgehalten werden
@@ -91,13 +96,21 @@ Partial Class Form1
         ComboBox_Anwendung.SelectedIndex = 0
 
         'Liste der Methoden in ComboBox schreiben und Anfangseinstellung wählen
-        ComboBox_Methode.Items.AddRange(New Object() {"", METH_RESET, METH_PES, METH_CES, METH_HYBRID, METH_SENSIPLOT, METH_HOOKJEEVES})
+        ComboBox_Methode.Items.AddRange(New Object() {"", METH_PES, METH_CES, METH_HYBRID, METH_SENSIPLOT, METH_HOOKJEEVES})
         ComboBox_Methode.SelectedIndex = 0
-        ComboBox_Methode.Enabled = False
+
+        'OptionsDialog instanzieren
+        Me.Options = New OptionsDialog()
 
         'Ende der Initialisierung
         IsInitializing = False
 
+    End Sub
+
+    'Optionen Dialog anzeigen
+    '************************
+    Private Sub showOptionDialog(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem_Optionen.Click
+        Call Me.Options.ShowDialog()
     End Sub
 
 #Region "Initialisierung der Anwendungen"
@@ -127,11 +140,10 @@ Partial Class Form1
             'Start Button deaktivieren
             Me.Button_Start.Enabled = False
 
-            'Datensatz deaktivieren
-            Me.Label_Datensatz.Enabled = False
-            Me.LinkLabel_WorkDir.Enabled = False
+            'Datensatz-Reset deaktivieren
+            Me.MenuItem_DatensatzZurücksetzen.Enabled = False
 
-            'Methode deaktivieren
+            'Methodenauswahl deaktivieren
             Me.Label_Methode.Enabled = False
             Me.ComboBox_Methode.Enabled = False
 
@@ -192,23 +204,7 @@ Partial Class Form1
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Testprobleme instanzieren
-                    If (IsNothing(Testprobleme1)) Then
-                        Testprobleme1 = New Testprobleme()
-                    End If
-
-                    'Testprobleme anzeigen
-                    Call Me.Testprobleme1.Show()
-
-                    'EVO_Einstellungen aktivieren
-                    EVO_Einstellungen1.Enabled = True
-
-                    Call EVO_Einstellungen1.setStandard_PES(Testprobleme1.OptModus)
-
-                    'Globale Parameter werden gesetzt
-                    Call Testprobleme1.Parameter_Uebergabe(globalAnzPar, myPara)
-
-                    'Start-Button aktivieren (keine Methodenauswahl erforderlich)
-                    Button_Start.Enabled = True
+                    Testprobleme1 = New Testprobleme()
 
 
                 Case ANW_TSP 'Anwendung Traveling Salesman Problem (TSP)
@@ -223,26 +219,184 @@ Partial Class Form1
 
             End Select
 
-            'Bei Simulationsanwendungen
-            If (Me.Anwendung <> ANW_TESTPROBLEME And Anwendung <> ANW_TSP) Then
-
-                'Datensatz aktivieren
-                Me.Label_Datensatz.Enabled = True
-                Me.LinkLabel_WorkDir.Enabled = True
-
-                'Datensatz anzeigen
-                Call Me.displayWorkDir()
-
-                'Methode aktivieren
-                Me.Label_Methode.Enabled = True
-                Me.ComboBox_Methode.Enabled = True
-            End If
+            'Datensatz UI aktivieren
+            Call Me.Datensatz_initUI()
 
             'EVO_Verlauf zurücksetzen
             Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
 
             'Mauszeiger wieder normal
             Cursor = Cursors.Default
+
+        End If
+
+    End Sub
+
+    'Datensatz-UI anzeigen
+    '*********************
+    Private Sub Datensatz_initUI()
+
+        Dim pfad As String
+
+        'UI aktivieren
+        Me.Label_Datensatz.Enabled = True
+        Me.ComboBox_Datensatz.Enabled = True
+
+        'Tooltip zurücksetzen
+        Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, "")
+
+        'Combo_Datensatz auffüllen
+        Call Me.Datensatz_populateCombo()
+
+        'Bei Simulationsanwendungen:
+        If (Me.Anwendung <> ANW_TESTPROBLEME) Then
+
+            'zuletzt benutzten Datensatz setzen
+            If (My.Settings.MRUSimDatensaetze.Count > 0) Then
+                pfad = My.Settings.MRUSimDatensaetze.Item(My.Settings.MRUSimDatensaetze.Count - 1)
+                Me.ComboBox_Datensatz.SelectedItem = pfad
+                Call Sim1.setDatensatz(pfad)
+            End If
+
+            'Browse-Button aktivieren
+            Me.Button_BrowseDatensatz.Enabled = True
+        End If
+
+    End Sub
+
+    'Combo_Datensatz auffüllen
+    '*************************
+    Private Sub Datensatz_populateCombo()
+
+        Dim i As Integer
+
+        'vorherige Einträge löschen
+        Me.ComboBox_Datensatz.Items.Clear()
+
+        Select Case Me.Anwendung
+
+            Case ANW_TESTPROBLEME
+
+                'Mit Tesproblemen füllen
+                Me.ComboBox_Datensatz.Items.AddRange(Testprobleme1.Testprobleme)
+
+            Case Else '(Sim-Anwendungen)
+
+                'Mit Benutzer-MRUSimDatensätze füllen
+                If (My.Settings.MRUSimDatensaetze.Count > 0) Then
+
+                    'Combobox rückwärts füllen
+                    For i = My.Settings.MRUSimDatensaetze.Count - 1 To 0 Step -1
+                        Me.ComboBox_Datensatz.Items.Add(My.Settings.MRUSimDatensaetze.Item(i))
+                    Next
+
+                End If
+
+        End Select
+
+    End Sub
+
+
+    'Arbeitsverzeichnis/Datensatz auswählen (nur Sim-Anwendungen)
+    '************************************************************
+    Private Sub Datensatz_browse(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_BrowseDatensatz.Click
+
+        Dim DiagResult As DialogResult
+        Dim pfad As String
+
+        'Dialog vorbereiten
+        OpenFileDialog1.Filter = Sim1.Datensatzendung.Substring(1) & "-Dateien (*" & Sim1.Datensatzendung & ")|*" & Sim1.Datensatzendung
+        OpenFileDialog1.Title = "Datensatz auswählen"
+
+        'Alten Datensatz dem Dialog zuweisen
+        OpenFileDialog1.InitialDirectory = Sim1.WorkDir
+        OpenFileDialog1.FileName = Sim1.WorkDir & Sim1.Datensatz & Sim1.Datensatzendung
+
+        'Dialog öffnen
+        DiagResult = OpenFileDialog1.ShowDialog()
+
+        'Neuen Datensatz speichern
+        If (DiagResult = Windows.Forms.DialogResult.OK) Then
+
+            pfad = OpenFileDialog1.FileName
+
+            'Datensatz setzen
+            Call Sim1.setDatensatz(pfad)
+
+            'Benutzereinstellungen aktualisieren
+            If (My.Settings.MRUSimDatensaetze.Contains(pfad)) Then
+                My.Settings.MRUSimDatensaetze.Remove(pfad)
+            End If
+            My.Settings.MRUSimDatensaetze.Add(pfad)
+
+            'Benutzereinstellungen speichern
+            Call My.Settings.Save()
+
+            'Datensatzanzeige aktualisieren
+            Call Me.Datensatz_populateCombo()
+            Me.ComboBox_Datensatz.SelectedItem = pfad
+
+            'Methodenauswahl wieder zurücksetzen 
+            '(Der Benutzer muss zuerst Ini neu ausführen!)
+            Me.ComboBox_Methode.SelectedItem = ""
+
+        End If
+
+    End Sub
+
+    'Sim-Datensatz zurücksetzen
+    '**************************
+    Private Sub Datensatz_reset(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem_DatensatzZurücksetzen.Click
+
+        'Original ModellParameter schreiben
+        Call Sim1.Write_ModellParameter()
+
+        MsgBox("Die Startwerte der Optimierungsparameter wurden in die Eingabedateien geschrieben.", MsgBoxStyle.Information, "Info")
+
+    End Sub
+
+    'Datensatz wurde ausgewählt
+    '**************************
+    Private Sub INI_Datensatz(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Datensatz.SelectedIndexChanged
+
+        If (Me.IsInitializing = True) Then
+
+            Exit Sub
+
+        Else
+
+            'Zurücksetzen
+            '------------
+
+            'Tooltip
+            Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, "")
+
+            'Datensatz-Reset
+            Me.MenuItem_DatensatzZurücksetzen.Enabled = False
+
+            'gewählten Datensatz an Anwendung übergeben
+            '------------------------------------------
+            Select Case Me.Anwendung
+
+                Case ANW_TESTPROBLEME
+
+                    'Tesproblem setzen
+                    Testprobleme1.setTestproblem(Me.ComboBox_Datensatz.SelectedItem)
+
+                    'Tooltip anzeigen
+                    Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, Testprobleme1.TestProblemDescription)
+
+                Case Else '(Alle Sim-Anwendungen)
+
+                    Call Sim1.setDatensatz(Me.ComboBox_Datensatz.SelectedItem)
+
+            End Select
+
+            'Methodenauswahl aktivieren und zurücksetzen
+            '-------------------------------------------
+            Me.Label_Methode.Enabled = True
+            Me.ComboBox_Methode.Enabled = True
+            Me.ComboBox_Methode.SelectedItem = ""
 
         End If
 
@@ -291,20 +445,9 @@ Partial Class Form1
 
                     'Mauszeiger wieder normal
                     Cursor = Cursors.Default
+
+                    'Ende
                     Exit Sub
-
-
-                Case METH_RESET 'Methode Reset
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                    'Original ModellParameter schreiben
-                    Call Sim1.Write_ModellParameter()
-
-                    MsgBox("Die Startwerte der Optimierungsparameter wurden in die Eingabedateien geschrieben.", MsgBoxStyle.Information, "Info")
-
-                    'Ergebnis-Buttons
-                    Me.Button_openMDB.Enabled = True
-
 
                 Case METH_SENSIPLOT 'Methode SensiPlot
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -337,25 +480,51 @@ Partial Class Form1
                 Case METH_PES 'Methode PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'Ergebnis-Buttons
-                    Me.Button_openMDB.Enabled = True
-
-                    'PES für Sim vorbereiten
-                    Call Sim1.read_and_valid_INI_Files_PES()
-
-                    'EVO_Einstellungen einrichten
+                    'EVO_Einstellungen aktivieren
                     EVO_Einstellungen1.Enabled = True
-                    Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_PES
-                    If (Common.Manager.AnzPenalty = 1) Then
-                        'Single-Objective
-                        Call EVO_Einstellungen1.setStandard_PES(Common.Constants.EVO_MODUS.Single_Objective)
-                    ElseIf (Common.Manager.AnzPenalty > 1) Then
-                        'Multi-Objective
-                        Call EVO_Einstellungen1.setStandard_PES(Common.Constants.EVO_MODUS.Multi_Objective)
-                    End If
 
-                    'Parameterübergabe an PES
-                    Call Sim1.Parameter_Uebergabe(globalAnzPar, myPara)
+                    'Tabcontrols entfernen die man nicht braucht
+                    With EVO_Einstellungen1
+                        .TabControl1.TabPages.Remove(.TabPage_CES)
+                        .TabControl1.TabPages.Remove(.TabPage_HookeJeeves)
+                        .TabControl1.TabPages.Remove(.TabPage_Hybrid2008)
+                    End With
+
+                    'Fallunterscheidung Anwendung
+                    '============================
+                    If (Me.Anwendung = ANW_TESTPROBLEME) Then
+                        'Testprobleme
+                        '------------
+
+                        'EVO_Einstellungen einrichten
+                        Call EVO_Einstellungen1.setStandard_PES(Testprobleme1.OptModus)
+
+                        'Globale Parameter werden gesetzt
+                        Call Testprobleme1.Parameter_Uebergabe(globalAnzPar, myPara)
+
+                    Else
+                        'Alle SIM-Anwendungen
+                        '--------------------
+
+                        'Ergebnis-Buttons
+                        Me.Button_openMDB.Enabled = True
+
+                        'PES für Sim vorbereiten
+                        Call Sim1.read_and_valid_INI_Files_PES()
+
+                        'EVO_Einstellungen einrichten
+                        If (Common.Manager.AnzPenalty = 1) Then
+                            'Single-Objective
+                            Call EVO_Einstellungen1.setStandard_PES(Common.Constants.EVO_MODUS.Single_Objective)
+                        ElseIf (Common.Manager.AnzPenalty > 1) Then
+                            'Multi-Objective
+                            Call EVO_Einstellungen1.setStandard_PES(Common.Constants.EVO_MODUS.Multi_Objective)
+                        End If
+
+                        'Parameterübergabe an PES
+                        Call Sim1.Parameter_Uebergabe(globalAnzPar, myPara)
+
+                    End If
 
                     'EVO_Verlauf zurücksetzen
                     Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
@@ -364,9 +533,15 @@ Partial Class Form1
                 Case METH_HOOKJEEVES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'EVO_Einstellungen einrichten
-                    Me.EVO_Einstellungen1.Enabled = True
-                    Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_HookeJeeves
+                    'EVO_Einstellungen aktivieren
+                    EVO_Einstellungen1.Enabled = True
+
+                    'Tabcontrols entfernen die man nicht braucht
+                    With EVO_Einstellungen1
+                        .TabControl1.TabPages.Remove(.TabPage_PES)
+                        .TabControl1.TabPages.Remove(.TabPage_CES)
+                        .TabControl1.TabPages.Remove(.TabPage_Hybrid2008)
+                    End With
 
                     'TODO: eigenen read and valid methode für hookJeeves
                     Call Sim1.read_and_valid_INI_Files_PES()
@@ -385,24 +560,36 @@ Partial Class Form1
                 Case METH_CES, METH_HYBRID 'Methode CES und Methode CES_PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'Ergebnis-Buttons
-                    Me.Button_openMDB.Enabled = True
-
                     'Funktioniert nur bei BlueM!
                     If (Not Anwendung = ANW_BLUEM) Then
                         Throw New Exception("CES funktioniert bisher nur mit BlueM!")
                     End If
 
+                    'EVO_Einstellungen aktivieren
+                    EVO_Einstellungen1.Enabled = True
+
+                    'Tabcontrols entfernen die man nicht braucht
+                    With EVO_Einstellungen1
+                        .TabControl1.TabPages.Remove(.TabPage_HookeJeeves)
+                        .TabControl1.TabPages.Remove(.TabPage_Hybrid2008)
+                    End With
+
+                    'Ergebnis-Buttons
+                    Me.Button_openMDB.Enabled = True
+
                     'Fallunterscheidung CES oder Hybrid
                     Select Case Form1.Method
                         Case METH_CES
+
+                            'Tabcontrol PES auch entfernen
+                            With EVO_Einstellungen1
+                                .TabControl1.TabPages.Remove(.TabPage_PES)
+                            End With
+
                             'CES für Sim vorbereiten (Files lesen und Validieren)
                             Call Sim1.read_and_valid_INI_Files_CES()
 
                         Case METH_HYBRID
-
-                            'EVO_Einstellungen aktiviern
-                            EVO_Einstellungen1.Enabled = True
 
                             'CES für Sim vorbereiten (Files lesen und Validieren)
                             Call Sim1.read_and_valid_INI_Files_HYBRID()
@@ -415,13 +602,11 @@ Partial Class Form1
 
                             'Die Original Gerinneflaechen für SKos einlesen
                             'Call Sim1.skos.
+
                     End Select
 
                     'EVO_Einstellungen einrichten
-                    '****************************
-                    EVO_Einstellungen1.Enabled = True
-                    Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_CES
-
+                    '----------------------------
                     'Je nach Methode nur CES oder HYBRID
                     Call EVO_Einstellungen1.setStandard_CES()
 
@@ -439,59 +624,66 @@ Partial Class Form1
                         Call EVO_Einstellungen1.setTestModus(Sim1.CES_T_Modus, Sim1.TestPath, 1, 1, Sim1.n_Combinations)
                     End If
 
+
+                Case METH_Hybrid2008
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'EVO_Einstellungen aktivieren
+                    EVO_Einstellungen1.Enabled = True
+
+                    'Tabcontrols entfernen die man nicht braucht
+                    With EVO_Einstellungen1
+                        .TabControl1.TabPages.Remove(.TabPage_PES)
+                        .TabControl1.TabPages.Remove(.TabPage_CES)
+                        .TabControl1.TabPages.Remove(.TabPage_HookeJeeves)
+                    End With
+
+                    If (Me.Anwendung = ANW_TESTPROBLEME) Then
+                        'Testprobleme mit Hybrid2008 Verfahren berechnen
+                        MsgBox("Berechnung der Testprobleme mit Hybrid2008", MsgBoxStyle.Information, "Info")
+
+                    Else
+                        'Modelle mit Hybrid2008 berechnen
+                        MsgBox("Berechnung der Modelle mit Hybrid2008", MsgBoxStyle.Information, "Info")
+
+
+                    End If
+
+                    'Ergebnis-Buttons
+                    'Me.Button_openMDB.Enabled = True
+
+                    'PES für Sim vorbereiten
+                    'Call Sim1.read_and_valid_INI_Files_PES()
+
+                    'EVO_Einstellungen einrichten
+                    'Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_PES
+                    'If (Common.Manager.AnzPenalty = 1) Then
+                    'Single-Objective
+                    'Call EVO_Einstellungen1.setStandard_PES(Common.Constants.EVO_MODUS.Single_Objective)
+                    'ElseIf (Common.Manager.AnzPenalty > 1) Then
+                    'Multi-Objective
+                    'Call EVO_Einstellungen1.setStandard_PES(Common.Constants.EVO_MODUS.Multi_Objective)
+                    'End If
+
+                    'Parameterübergabe an PES
+                    'Call Sim1.Parameter_Uebergabe(globalAnzPar, myPara)
+
+                    'EVO_Verlauf zurücksetzen
+                    'Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
+
             End Select
 
-            'IniApp OK -> Start Button aktivieren
+            'IniMethod OK -> Start Button aktivieren
             Me.Button_Start.Enabled = True
 
             'Mauszeiger wieder normal
             Cursor = Cursors.Default
 
-        End If
+            If (Me.Anwendung <> ANW_TESTPROBLEME) Then
+                'Datensatz-Reset aktivieren
+                Me.MenuItem_DatensatzZurücksetzen.Enabled = True
+            End If
 
-    End Sub
-
-    'Arbeitsverzeichnis/Datensatz ändern
-    '***********************************
-    Private Sub changeDatensatz(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles LinkLabel_WorkDir.LinkClicked
-
-        Dim DiagResult As DialogResult
-
-        'Dialog vorbereiten
-        OpenFileDialog1.Filter = "ALL-Dateien (*.ALL)|*.ALL|INP-Dateien (*.INP)|*.INP"
-        OpenFileDialog1.Title = "Datensatz auswählen"
-
-        'Alten Datensatz dem Dialog zuweisen
-        OpenFileDialog1.InitialDirectory = Sim1.WorkDir
-        OpenFileDialog1.FileName = Sim1.WorkDir & Sim1.Datensatz & Sim1.Datensatzendung
-
-        'Dialog öffnen
-        DiagResult = OpenFileDialog1.ShowDialog()
-
-        'Neuen Datensatz speichern
-        If (DiagResult = Windows.Forms.DialogResult.OK) Then
-            Call Sim1.saveDatensatz(OpenFileDialog1.FileName)
-        End If
-
-        'Methodenauswahl wieder zurücksetzen (Der Benutzer muss zuerst Ini neu ausführen!)
-        Me.ComboBox_Methode.SelectedItem = ""
-
-    End Sub
-
-    'Arbeitsverzeichnis wurde geändert -> Anzeige aktualisieren
-    '**********************************************************
-    Private Sub displayWorkDir() Handles Sim1.WorkDirChange
-
-        Dim pfad As String
-        pfad = Sim1.WorkDir & Sim1.Datensatz & Sim1.Datensatzendung
-
-        'Datensatzanzeige aktualisieren
-        If (File.Exists(pfad)) Then
-            Me.LinkLabel_WorkDir.Text = pfad
-            Me.LinkLabel_WorkDir.Links(0).LinkData = Sim1.WorkDir
-        Else
-            Me.LinkLabel_WorkDir.Text = "bitte Datensatz auswählen!"
-            Me.LinkLabel_WorkDir.Links(0).LinkData = CurDir()
         End If
 
     End Sub
@@ -585,9 +777,6 @@ Partial Class Form1
                 Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM
 
                     Select Case Method
-                        Case METH_RESET
-                            Call Sim1.launchSim(0, 0)
-                            Call Sim1.WelDateiVerwursten()
                         Case METH_SENSIPLOT
                             Call STARTEN_SensiPlot()
                         Case METH_PES
@@ -944,7 +1133,7 @@ Partial Class Form1
 
                     'Lösung im TeeChart einzeichnen
                     '==============================
-                    If SIM_Eval_is_OK Then 
+                    If (SIM_Eval_is_OK) Then 
                         Call Me.LösungZeichnen(CES1.Childs(Child_Ready), 0, 0, i_gen, Child_Ready, ColorManagement(ColorArray, CES1.Childs(Child_Ready)))
                     End If
 
@@ -1401,9 +1590,9 @@ Partial Class Form1
         Dim Hypervolume As EVO.MO_Indicators.Indicators
         Hypervolume = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(EVO.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, Common.Manager.AnzPenalty)
 
-        'Datensätze für Multithreading kopieren
-        If n_Threads > 1 then
-            Call sim1.coppyDatensatz(n_Threads)
+        'Datensätze für Multithreading kopieren (nur Sim-Anwendungen)
+        If (Me.Anwendung <> ANW_TESTPROBLEME And n_Threads > 1) Then
+            Call Sim1.coppyDatensatz(n_Threads)
         End If
 
         'Diagramm vorbereiten und initialisieren
@@ -1487,6 +1676,7 @@ Start_Evolutionsrunden:
                         'OptParameter in Individuum kopieren
                         Call OptParameter.Clone_OptPara_Array(myPara, ind(i).PES_OptParas)
 
+                        'Testprobleme direkt auswerten
                         If Anwendung = ANW_TESTPROBLEME
                             
                             Call Testprobleme1.Evaluierung_TestProbleme(ind(i), PES1.PES_iAkt.iAktPop, Me.Hauptdiagramm)
@@ -1495,12 +1685,19 @@ Start_Evolutionsrunden:
                             Call PES1.EsBest(ind(i))
                         
                             Call EVO_Opt_Verlauf1.Nachfolger(PES1.PES_iAkt.iAktNachf + 1)
+
+                            'Lösung zeichnen
+                            If SIM_Eval_is_OK Then
+                                Call Me.LösungZeichnen(ind(i), PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, i, Color.Orange)
+                            End If
+
                             System.Windows.Forms.Application.DoEvents()
 
                         End If
 
                     Next
 
+                    'Simulationsanwendungen nachträglich auswerten
                     If Anwendung = ANW_BLUEM or Anwendung = ANW_SMUSI or Anwendung = ANW_SCAN or Anwendung = ANW_SWMM then
                         
                         Dim Thread_Free As integer = 0
@@ -1576,7 +1773,7 @@ Start_Evolutionsrunden:
                     If (EVO_Einstellungen1.Settings.PES.OptModus = Common.Constants.EVO_MODUS.Multi_Objective) Then
 
                         'SekPop abspeichern
-                        '---------------
+                        '------------------
                         If (Not IsNothing(Sim1)) Then
                             Call Sim1.OptResult.setSekPop(PES1.SekundärQb, PES1.PES_iAkt.iAktGen)
                         End If
@@ -1593,7 +1790,8 @@ Start_Evolutionsrunden:
                     End If
 
                     'ggf. alte Generation im Diagramm löschen
-                    If (EVO_Einstellungen1.Settings.PES.is_paint_constraint) Then
+                    If (Me.Options.showOnlyCurrentPop _
+                        And PES1.PES_iAkt.iAktGen < EVO_Einstellungen1.Settings.PES.n_Gen - 1) Then
                         Call Me.ClearLastGeneration(PES1.PES_iAkt.iAktPop)
                     End If
                     
@@ -1787,17 +1985,17 @@ Start_Evolutionsrunden:
         ReDim tmpZielindex(2)                       'Maximal 3 Achsen
         'Zunächst keine Achsenzuordnung (-1)
         For i = 0 To tmpZielindex.GetUpperBound(0)
-            tmpZielIndex(i) = -1                    
+            tmpZielindex(i) = -1
         Next
 
-        'Fallunterscheidung Methode
-        'XXXXXXXXXXXXXXXXXXXXXXXXXX
+        'Fallunterscheidung Anwendung/Methode
+        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
         Select Case Anwendung
 
             Case ANW_TESTPROBLEME 'Testprobleme
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-                Call Testprobleme1.DiagInitialise(Me.EVO_Einstellungen1.Settings, globalAnzPar, Me.Hauptdiagramm)
+                Call Testprobleme1.DiagInitialise(Me.EVO_Einstellungen1.Settings, Me.Hauptdiagramm)
 
             Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -1974,8 +2172,7 @@ Start_Evolutionsrunden:
         'Bei MultiObjective: 
         '-------------------
         If (Common.Manager.AnzPenalty > 1 _
-            And Form1.Method <> METH_SENSIPLOT _
-            And Form1.Method <> METH_RESET) Then
+            And Form1.Method <> METH_SENSIPLOT) Then
 
             'Indicator-Diagramm initialisieren
             '---------------------------------
@@ -2080,7 +2277,7 @@ Start_Evolutionsrunden:
 
     'Speichert die verwendeten Farben für die bisherigen Pfade und generiert neue, falls erforderlich
     '************************************************************************************************
-    Private Function ColorManagement(ByRef ColorAray(,) As Object, ByVal ind As Common.Individuum) as Color
+    Private Function ColorManagement(ByRef ColorAray(,) As Object, ByVal ind As Common.Individuum) As Color
         Dim i, j As Integer
         Dim count As Integer
         Dim Farbe As Color = Color.White

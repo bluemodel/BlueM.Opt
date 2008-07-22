@@ -89,7 +89,6 @@ Partial Class EVO_Einstellungen
         Me.ComboOptPopEltern = New System.Windows.Forms.ComboBox
         Me.ComboOptPopStrategie = New System.Windows.Forms.ComboBox
         Me.ComboOptPopPenalty = New System.Windows.Forms.ComboBox
-        Me.checkpaintconstrained = New System.Windows.Forms.CheckBox
         Me.TabPage_CES = New System.Windows.Forms.TabPage
         Me.CheckBox_CES_UseSecPop_CES = New System.Windows.Forms.CheckBox
         Me.GroupBox_CES_SecPop = New System.Windows.Forms.GroupBox
@@ -125,6 +124,7 @@ Partial Class EVO_Einstellungen
         Me.Numeric_HJ_DeltaFinish = New System.Windows.Forms.NumericUpDown
         Me.Numeric_HJ_DeltaStart = New System.Windows.Forms.NumericUpDown
         Me.CheckBox_HJ_DNVektor = New System.Windows.Forms.CheckBox
+        Me.TabPage_Hybrid2008 = New System.Windows.Forms.TabPage
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip
         Me.ÖffnenToolStripButton = New System.Windows.Forms.ToolStripButton
         Me.SpeichernToolStripButton = New System.Windows.Forms.ToolStripButton
@@ -540,6 +540,8 @@ Partial Class EVO_Einstellungen
         Me.TabControl1.Controls.Add(Me.TabPage_PES)
         Me.TabControl1.Controls.Add(Me.TabPage_CES)
         Me.TabControl1.Controls.Add(Me.TabPage_HookeJeeves)
+        Me.TabControl1.Controls.Add(Me.TabPage_Hybrid2008)
+        Me.TabControl1.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TabControl1.Location = New System.Drawing.Point(1, 41)
         Me.TabControl1.Margin = New System.Windows.Forms.Padding(0)
         Me.TabControl1.Name = "TabControl1"
@@ -568,7 +570,7 @@ Partial Class EVO_Einstellungen
         Me.TabPage_PES.Controls.Add(Me.GroupBox_SekPop)
         Me.TabPage_PES.Controls.Add(Me.CheckisPopul)
         Me.TabPage_PES.Controls.Add(Me.GroupBox_Populationen)
-        Me.TabPage_PES.Controls.Add(Me.checkpaintconstrained)
+        Me.TabPage_PES.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TabPage_PES.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_PES.Margin = New System.Windows.Forms.Padding(0)
         Me.TabPage_PES.Name = "TabPage_PES"
@@ -578,12 +580,12 @@ Partial Class EVO_Einstellungen
         '
         'Label_OptModusValue
         '
-        Me.Label_OptModusValue.AutoSize = True
         Me.Label_OptModusValue.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label_OptModusValue.Location = New System.Drawing.Point(77, 8)
+        Me.Label_OptModusValue.Location = New System.Drawing.Point(59, 9)
         Me.Label_OptModusValue.Name = "Label_OptModusValue"
-        Me.Label_OptModusValue.Size = New System.Drawing.Size(0, 13)
+        Me.Label_OptModusValue.Size = New System.Drawing.Size(140, 13)
         Me.Label_OptModusValue.TabIndex = 0
+        Me.Label_OptModusValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'ComboOptStrategie
         '
@@ -891,17 +893,6 @@ Partial Class EVO_Einstellungen
         Me.ComboOptPopPenalty.Size = New System.Drawing.Size(108, 21)
         Me.ComboOptPopPenalty.TabIndex = 5
         '
-        'checkpaintconstrained
-        '
-        Me.checkpaintconstrained.AutoSize = True
-        Me.checkpaintconstrained.Location = New System.Drawing.Point(4, 658)
-        Me.checkpaintconstrained.Name = "checkpaintconstrained"
-        Me.checkpaintconstrained.Size = New System.Drawing.Size(133, 17)
-        Me.checkpaintconstrained.TabIndex = 11
-        Me.checkpaintconstrained.Text = "Reduzierte Darstellung"
-        Me.ToolTip1.SetToolTip(Me.checkpaintconstrained, "Nur die Individuuen der aktuellen Generation werden gezeichnet")
-        Me.checkpaintconstrained.UseVisualStyleBackColor = True
-        '
         'TabPage_CES
         '
         Me.TabPage_CES.AutoScroll = True
@@ -914,6 +905,7 @@ Partial Class EVO_Einstellungen
         Me.TabPage_CES.Controls.Add(Me.Combo_CES_IniValues)
         Me.TabPage_CES.Controls.Add(Label_CES_IniValues)
         Me.TabPage_CES.Controls.Add(Me.Label_CES_OptModus)
+        Me.TabPage_CES.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TabPage_CES.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_CES.Margin = New System.Windows.Forms.Padding(0)
         Me.TabPage_CES.Name = "TabPage_CES"
@@ -1221,12 +1213,13 @@ Partial Class EVO_Einstellungen
         Me.TabPage_HookeJeeves.Controls.Add(Label1)
         Me.TabPage_HookeJeeves.Controls.Add(Me.Numeric_HJ_DeltaStart)
         Me.TabPage_HookeJeeves.Controls.Add(Me.CheckBox_HJ_DNVektor)
+        Me.TabPage_HookeJeeves.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TabPage_HookeJeeves.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_HookeJeeves.Name = "TabPage_HookeJeeves"
         Me.TabPage_HookeJeeves.Padding = New System.Windows.Forms.Padding(3)
         Me.TabPage_HookeJeeves.Size = New System.Drawing.Size(222, 630)
         Me.TabPage_HookeJeeves.TabIndex = 2
-        Me.TabPage_HookeJeeves.Text = "Hooke & Jeeves"
+        Me.TabPage_HookeJeeves.Text = "Hooke&Jeeves"
         '
         'Label_HJ_RS
         '
@@ -1318,6 +1311,17 @@ Partial Class EVO_Einstellungen
         Me.CheckBox_HJ_DNVektor.Size = New System.Drawing.Size(133, 17)
         Me.CheckBox_HJ_DNVektor.TabIndex = 2
         Me.CheckBox_HJ_DNVektor.Text = "mit Schrittweitenvektor"
+        '
+        'TabPage_Hybrid2008
+        '
+        Me.TabPage_Hybrid2008.BackColor = System.Drawing.SystemColors.Control
+        Me.TabPage_Hybrid2008.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.TabPage_Hybrid2008.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage_Hybrid2008.Name = "TabPage_Hybrid2008"
+        Me.TabPage_Hybrid2008.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage_Hybrid2008.Size = New System.Drawing.Size(222, 630)
+        Me.TabPage_Hybrid2008.TabIndex = 3
+        Me.TabPage_Hybrid2008.Text = "Hybrid2008"
         '
         'ToolStrip1
         '
@@ -1448,13 +1452,11 @@ Partial Class EVO_Einstellungen
     Private WithEvents Numeric_HJ_DeltaStart As System.Windows.Forms.NumericUpDown
     Private WithEvents CheckBox_HJ_DNVektor As System.Windows.Forms.CheckBox
     Public WithEvents TabPage_PES As System.Windows.Forms.TabPage
-    Public WithEvents TabControl1 As System.Windows.Forms.TabControl
     Public WithEvents Label_HJ_TSaktuelle As System.Windows.Forms.Label
     Public WithEvents Label_HJ_RS As System.Windows.Forms.Label
     Public WithEvents Label_HJ_ES As System.Windows.Forms.Label
     Public WithEvents Label_HJ_TSgesamt As System.Windows.Forms.Label
     Public WithEvents Label_HJ_TSmittel As System.Windows.Forms.Label
-    Friend WithEvents checkpaintconstrained As System.Windows.Forms.CheckBox
     Friend WithEvents CheckisTournamentSelection As System.Windows.Forms.CheckBox
     Friend WithEvents ComboOptDnMutation As System.Windows.Forms.ComboBox
     Friend WithEvents Label_CES_OptModus As System.Windows.Forms.Label
@@ -1487,4 +1489,6 @@ Partial Class EVO_Einstellungen
     Private WithEvents CheckBox_CES_RealOptimisation As System.Windows.Forms.CheckBox
     Private WithEvents LabelAnzEltern As System.Windows.Forms.Label
     Private WithEvents CheckBox_CES_StartPESPop As System.Windows.Forms.CheckBox
+    Friend WithEvents TabPage_Hybrid2008 As System.Windows.Forms.TabPage
+    Public WithEvents TabControl1 As System.Windows.Forms.TabControl
 End Class

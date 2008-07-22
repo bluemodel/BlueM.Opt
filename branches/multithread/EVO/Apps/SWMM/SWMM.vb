@@ -26,11 +26,6 @@ Public Class SWMM
 
     'Eigenschaften
     '#############
-    Public Overrides ReadOnly Property Datensatzendung() As String
-        Get
-            Return ".INP"
-        End Get
-    End Property
 
 #End Region 'Eigenschaften
 
@@ -42,6 +37,8 @@ Public Class SWMM
     Public Sub New()
 
         Call MyBase.New()
+
+        Me.mDatensatzendung = ".INP"
 
     End Sub
 
