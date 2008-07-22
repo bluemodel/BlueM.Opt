@@ -294,7 +294,7 @@ Partial Class Form1
         Dim pfad As String
 
         'Dialog vorbereiten
-        OpenFileDialog1.Filter = "ALL-Dateien (*.ALL)|*.ALL|INP-Dateien (*.INP)|*.INP"
+        OpenFileDialog1.Filter = Sim1.Datensatzendung.Substring(1) & "-Dateien (*" & Sim1.Datensatzendung & ")|*" & Sim1.Datensatzendung
         OpenFileDialog1.Title = "Datensatz auswählen"
 
         'Alten Datensatz dem Dialog zuweisen
