@@ -580,9 +580,8 @@ Partial Class EVO_Einstellungen
         '
         'Label_OptModusValue
         '
-        Me.Label_OptModusValue.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Label_OptModusValue.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label_OptModusValue.Location = New System.Drawing.Point(62, 9)
+        Me.Label_OptModusValue.Location = New System.Drawing.Point(59, 9)
         Me.Label_OptModusValue.Name = "Label_OptModusValue"
         Me.Label_OptModusValue.Size = New System.Drawing.Size(140, 13)
         Me.Label_OptModusValue.TabIndex = 0
