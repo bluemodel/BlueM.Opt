@@ -125,12 +125,12 @@ Partial Class EVO_Einstellungen
         Me.Numeric_HJ_DeltaFinish = New System.Windows.Forms.NumericUpDown
         Me.Numeric_HJ_DeltaStart = New System.Windows.Forms.NumericUpDown
         Me.CheckBox_HJ_DNVektor = New System.Windows.Forms.CheckBox
+        Me.TabPage_Hybrid2008 = New System.Windows.Forms.TabPage
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip
         Me.ÖffnenToolStripButton = New System.Windows.Forms.ToolStripButton
         Me.SpeichernToolStripButton = New System.Windows.Forms.ToolStripButton
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox
-        Me.TabPage_Hybrid2008 = New System.Windows.Forms.TabPage
         Label_CES_MemSize = New System.Windows.Forms.Label
         Label_CES_NMembers_SecPop_PES = New System.Windows.Forms.Label
         Label_CES_NExchange_secPop_PES = New System.Windows.Forms.Label
@@ -582,12 +582,13 @@ Partial Class EVO_Einstellungen
         '
         'Label_OptModusValue
         '
-        Me.Label_OptModusValue.AutoSize = True
+        Me.Label_OptModusValue.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Label_OptModusValue.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label_OptModusValue.Location = New System.Drawing.Point(77, 8)
+        Me.Label_OptModusValue.Location = New System.Drawing.Point(62, 9)
         Me.Label_OptModusValue.Name = "Label_OptModusValue"
-        Me.Label_OptModusValue.Size = New System.Drawing.Size(0, 13)
+        Me.Label_OptModusValue.Size = New System.Drawing.Size(140, 13)
         Me.Label_OptModusValue.TabIndex = 0
+        Me.Label_OptModusValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'ComboOptStrategie
         '
@@ -1325,6 +1326,17 @@ Partial Class EVO_Einstellungen
         Me.CheckBox_HJ_DNVektor.TabIndex = 2
         Me.CheckBox_HJ_DNVektor.Text = "mit Schrittweitenvektor"
         '
+        'TabPage_Hybrid2008
+        '
+        Me.TabPage_Hybrid2008.BackColor = System.Drawing.SystemColors.Control
+        Me.TabPage_Hybrid2008.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.TabPage_Hybrid2008.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage_Hybrid2008.Name = "TabPage_Hybrid2008"
+        Me.TabPage_Hybrid2008.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage_Hybrid2008.Size = New System.Drawing.Size(222, 630)
+        Me.TabPage_Hybrid2008.TabIndex = 3
+        Me.TabPage_Hybrid2008.Text = "Hybrid2008"
+        '
         'ToolStrip1
         '
         Me.ToolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
@@ -1365,17 +1377,6 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Einstellungen.TabIndex = 0
         Me.GroupBox_Einstellungen.TabStop = False
         Me.GroupBox_Einstellungen.Text = "Einstellungen:"
-        '
-        'TabPage_Hybrid2008
-        '
-        Me.TabPage_Hybrid2008.BackColor = System.Drawing.SystemColors.Control
-        Me.TabPage_Hybrid2008.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TabPage_Hybrid2008.Location = New System.Drawing.Point(4, 22)
-        Me.TabPage_Hybrid2008.Name = "TabPage_Hybrid2008"
-        Me.TabPage_Hybrid2008.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage_Hybrid2008.Size = New System.Drawing.Size(222, 630)
-        Me.TabPage_Hybrid2008.TabIndex = 3
-        Me.TabPage_Hybrid2008.Text = "Hybrid2008"
         '
         'EVO_Einstellungen
         '
