@@ -22,12 +22,6 @@ Public Class Smusi
     'Eigenschaften
     '#############
 
-    Public Overrides ReadOnly Property Datensatzendung() As String
-        Get
-            Return ".ALL"
-        End Get
-    End Property
-
     'SMUSI DLL
     '---------
     Private smusi_dll As SMUSI_EngineDotNetAccess
@@ -45,6 +39,8 @@ Public Class Smusi
     Public Sub New()
 
         Call MyBase.New()
+
+        Me.mDatensatzendung = ".ALL"
 
     End Sub
 

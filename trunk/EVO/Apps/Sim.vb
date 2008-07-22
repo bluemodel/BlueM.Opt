@@ -21,13 +21,15 @@ Public MustInherit Class Sim
     'Eigenschaften
     '#############
 
-    'Information
-    '-----------
-
     'Generelle Eigenschaften
     '-----------------------
     Public Datensatz As String                           'Name des zu simulierenden Datensatzes
-    Public MustOverride ReadOnly Property Datensatzendung() As String
+    Protected mDatensatzendung As String                 'Dateiendung des Datensatzes (inkl. Punkt)
+    Public ReadOnly Property Datensatzendung() As String
+        Get
+            Return Me.mDatensatzendung
+        End Get
+    End Property
     Public WorkDir As String                             'Arbeitsverzeichnis/Datensatz für BlueM
 
     Public SimStart As DateTime                          'Anfangsdatum der Simulation
