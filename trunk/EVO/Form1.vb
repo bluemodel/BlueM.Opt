@@ -97,7 +97,7 @@ Partial Class Form1
         ComboBox_Anwendung.SelectedIndex = 0
 
         'Liste der Methoden in ComboBox schreiben und Anfangseinstellung wählen
-        ComboBox_Methode.Items.AddRange(New Object() {"", METH_RESET, METH_PES, METH_CES, METH_HYBRID, METH_SENSIPLOT, METH_HOOKJEEVES})
+        ComboBox_Methode.Items.AddRange(New Object() {"", METH_PES, METH_CES, METH_HYBRID, METH_SENSIPLOT, METH_HOOKJEEVES})
         ComboBox_Methode.SelectedIndex = 0
 
         'Ende der Initialisierung
@@ -131,6 +131,9 @@ Partial Class Form1
 
             'Start Button deaktivieren
             Me.Button_Start.Enabled = False
+
+            'Datensatz-Reset deaktivieren
+            Me.MenuItem_DatensatzZurücksetzen.Enabled = False
 
             'Methodenauswahl deaktivieren
             Me.Label_Methode.Enabled = False
@@ -209,7 +212,7 @@ Partial Class Form1
             End Select
 
             'Datensatz UI aktivieren
-            Call Me.showDatensatzUI()
+            Call Me.Datensatz_initUI()
 
             'EVO_Verlauf zurücksetzen
             Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
@@ -223,7 +226,7 @@ Partial Class Form1
 
     'Datensatz-UI anzeigen
     '*********************
-    Private Sub showDatensatzUI()
+    Private Sub Datensatz_initUI()
 
         Dim pfad As String
 
@@ -235,7 +238,7 @@ Partial Class Form1
         Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, "")
 
         'Combo_Datensatz auffüllen
-        Call Me.populateCombo_Datensatz()
+        Call Me.Datensatz_populateCombo()
 
         'Bei Simulationsanwendungen:
         If (Me.Anwendung <> ANW_TESTPROBLEME) Then
@@ -255,7 +258,7 @@ Partial Class Form1
 
     'Combo_Datensatz auffüllen
     '*************************
-    Private Sub populateCombo_Datensatz()
+    Private Sub Datensatz_populateCombo()
 
         Dim i As Integer
 
@@ -288,7 +291,7 @@ Partial Class Form1
 
     'Arbeitsverzeichnis/Datensatz auswählen (nur Sim-Anwendungen)
     '************************************************************
-    Private Sub selectSimDatensatz(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_BrowseDatensatz.Click
+    Private Sub Datensatz_browse(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_BrowseDatensatz.Click
 
         Dim DiagResult As DialogResult
         Dim pfad As String
@@ -322,7 +325,7 @@ Partial Class Form1
             Call My.Settings.Save()
 
             'Datensatzanzeige aktualisieren
-            Call Me.populateCombo_Datensatz()
+            Call Me.Datensatz_populateCombo()
             Me.ComboBox_Datensatz.SelectedItem = pfad
 
             'Methodenauswahl wieder zurücksetzen 
@@ -330,6 +333,17 @@ Partial Class Form1
             Me.ComboBox_Methode.SelectedItem = ""
 
         End If
+
+    End Sub
+
+    'Sim-Datensatz zurücksetzen
+    '**************************
+    Private Sub Datensatz_reset(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem_DatensatzZurücksetzen.Click
+
+        'Original ModellParameter schreiben
+        Call Sim1.Write_ModellParameter()
+
+        MsgBox("Die Startwerte der Optimierungsparameter wurden in die Eingabedateien geschrieben.", MsgBoxStyle.Information, "Info")
 
     End Sub
 
@@ -343,9 +357,14 @@ Partial Class Form1
 
         Else
 
-            'Tooltip zurücksetzen
-            '--------------------
+            'Zurücksetzen
+            '------------
+
+            'Tooltip
             Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, "")
+
+            'Datensatz-Reset
+            Me.MenuItem_DatensatzZurücksetzen.Enabled = False
 
             'gewählten Datensatz an Anwendung übergeben
             '------------------------------------------
@@ -421,24 +440,6 @@ Partial Class Form1
 
                     'Ende
                     Exit Sub
-
-                Case METH_RESET 'Methode Reset
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                    'Original ModellParameter schreiben
-                    Call Sim1.Write_ModellParameter()
-
-                    MsgBox("Die Startwerte der Optimierungsparameter wurden in die Eingabedateien geschrieben.", MsgBoxStyle.Information, "Info")
-
-                    'Ergebnis-Buttons
-                    Me.Button_openMDB.Enabled = True
-
-                    'Mauszeiger wieder normal
-                    Cursor = Cursors.Default
-
-                    'Ende
-                    Exit Sub
-
 
                 Case METH_SENSIPLOT 'Methode SensiPlot
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -670,6 +671,11 @@ Partial Class Form1
             'Mauszeiger wieder normal
             Cursor = Cursors.Default
 
+            If (Me.Anwendung <> ANW_TESTPROBLEME) Then
+                'Datensatz-Reset aktivieren
+                Me.MenuItem_DatensatzZurücksetzen.Enabled = True
+            End If
+
         End If
 
     End Sub
@@ -768,8 +774,6 @@ Partial Class Form1
                 Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM
 
                     Select Case Method
-                        Case METH_RESET
-                            Call Sim1.launchSim()
                         Case METH_SENSIPLOT
                             Call STARTEN_SensiPlot()
                         Case METH_PES
@@ -2099,8 +2103,7 @@ Start_Evolutionsrunden:
         'Bei MultiObjective: 
         '-------------------
         If (Common.Manager.AnzPenalty > 1 _
-            And Form1.Method <> METH_SENSIPLOT _
-            And Form1.Method <> METH_RESET) Then
+            And Form1.Method <> METH_SENSIPLOT) Then
 
             'Indicator-Diagramm initialisieren
             '---------------------------------
