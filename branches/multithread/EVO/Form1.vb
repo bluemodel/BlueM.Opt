@@ -1119,9 +1119,8 @@ Partial Class Form1
 
                     Child_Run += 1
 
-                ElseIf Sim1.launchReady(Thread_Ready, Child_Ready)
+                ElseIf Sim1.launchReady(Thread_Ready, SIM_Eval_is_OK, Child_Ready)
 
-                    SIM_Eval_is_OK = True
                     Sim1.WorkDir = Sim1.getWorkDir(Thread_Ready)
                     If SIM_Eval_is_OK then Sim1.SIM_Ergebnis_auswerten(CES1.Childs(Child_Ready))
 
@@ -1644,6 +1643,7 @@ Start_Evolutionsrunden:
 
                     Call PES1.EsResetBWSpeicher()  'Nur bei Komma Strategie
                     ReDim ind(EVO_Einstellungen1.Settings.PES.n_Nachf - 1)
+                    Dim Child_False(-1) As Integer
                     Dim i As Integer
 
                     'Über alle Nachkommen
@@ -1651,10 +1651,6 @@ Start_Evolutionsrunden:
                     For i = 0 To EVO_Einstellungen1.Settings.PES.n_Nachf - 1
 
                         durchlauf += 1
-
-                        ''Do Schleife: Um Modellfehler bzw. Evaluierungsabbrüche abzufangen
-                        'Dim Eval_Count As Integer = 0
-                        'Do
 
                         'Neues Individuum instanzieren
                         ind(i) = New Common.Individuum("PES", durchlauf)
@@ -1687,9 +1683,7 @@ Start_Evolutionsrunden:
                             Call EVO_Opt_Verlauf1.Nachfolger(PES1.PES_iAkt.iAktNachf + 1)
 
                             'Lösung zeichnen
-                            If SIM_Eval_is_OK Then
-                                Call Me.LösungZeichnen(ind(i), PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, i, Color.Orange)
-                            End If
+                            Call Me.LösungZeichnen(ind(i), PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, i, Color.Orange)
 
                             System.Windows.Forms.Application.DoEvents()
 
@@ -1705,7 +1699,7 @@ Start_Evolutionsrunden:
                         Dim Child_Run As Integer = 0
                         Dim Child_Ready As Integer = 0
                         Dim Ready As Boolean = false
-                        System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.BelowNormal
+                        System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
 
                         Do
                             If Sim1.launchFree(Thread_Free) and Child_Run < EVO_Einstellungen1.Settings.PES.n_Nachf _
@@ -1721,17 +1715,13 @@ Start_Evolutionsrunden:
 
                                 Child_Run += 1
 
-                            ElseIf Sim1.launchReady(Thread_Ready, Child_Ready)
+                            ElseIf Sim1.launchReady(Thread_Ready, SIM_Eval_is_OK, Child_Ready) = True And SIM_Eval_is_OK
 
-                                SIM_Eval_is_OK = True
                                 Sim1.WorkDir = Sim1.getWorkDir(Thread_Ready)
-                                
-                                If SIM_Eval_is_OK then Sim1.SIM_Ergebnis_auswerten(ind(Child_Ready))
+                                Sim1.SIM_Ergebnis_auswerten(ind(Child_Ready))
                                 
                                 'Lösung zeichnen
-                                If SIM_Eval_is_OK Then
-                                    Call Me.LösungZeichnen(ind(Child_Ready), PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, Child_Ready, Color.Orange)
-                                End If
+                                Call Me.LösungZeichnen(ind(Child_Ready), PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, Child_Ready, Color.Orange)
 
                                 'SELEKTIONSPROZESS Schritt 1
                                 '###########################
@@ -1742,11 +1732,19 @@ Start_Evolutionsrunden:
                                 
                                 Call EVO_Opt_Verlauf1.Nachfolger(Child_Ready + 1)
                                 System.Windows.Forms.Application.DoEvents()
+
                                 If Child_Ready = EVO_Einstellungen1.Settings.PES.n_Nachf - 1 then Ready = true
-
                                 Child_Ready += 1
-                            Else
 
+                            ElseIf Sim1.launchReady(Thread_Ready, SIM_Eval_is_OK, Child_Ready) = False And SIM_Eval_is_OK = false
+
+                                ReDim Preserve Child_False(Child_False.GetLength(0))
+                                Child_False(Child_False.GetUpperBound(0)) = Child_Ready
+
+                                If Child_Ready = EVO_Einstellungen1.Settings.PES.n_Nachf - 1 then Ready = true
+                                Child_Ready += 1
+                                
+                            Else
                                 System.Threading.Thread.Sleep(400)
                                 Application.DoEvents
 
@@ -1756,12 +1754,45 @@ Start_Evolutionsrunden:
 
                     End If
 
-                        'Eval_Count += 1
-                        'If (Eval_Count >= 10) Then
-                        '    Throw New Exception("Es konnte kein gültiger Datensatz erzeugt werden!")
-                        'End If
+                    'Do Schleife: Um Modellfehler bzw. Evaluierungsabbrüche abzufangen
+                    If Child_False.GetLength(0) > -1 Then
+                        For i = 0 to Child_False.GetUpperBound(0)
+                            Dim Eval_Count As Integer = 0
+                            Do
+                                Call PES1.EsReproduktion()
+                                Call PES1.EsMutation()
 
-                        'Loop While SIM_Eval_is_OK = False
+                                myPara = PES1.EsGetParameter()
+                                Call OptParameter.Clone_OptPara_Array(myPara, ind(Child_False(i)).PES_OptParas)
+
+                                Sim1.WorkDir = Sim1.getWorkDir(0)
+                                Call Sim1.PREPARE_Evaluation_PES(ind(Child_False(i)).PES_OptParas)
+
+                                SIM_Eval_is_OK = Sim1.launchSim(0, Child_False(i))
+                                While Sim1.launchReady(0, SIM_Eval_is_OK, Child_False(i)) = False
+                                    System.Threading.Thread.Sleep(400)
+                                    System.Windows.Forms.Application.DoEvents()
+                                End While
+                                                                
+                                'Lösung auswerten und zeichnen
+                                If SIM_Eval_is_OK Then
+                                    Call Sim1.SIM_Ergebnis_auswerten(ind(Child_False(i)))
+                                    Call Me.LösungZeichnen(ind(Child_False(i)), PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, Child_False(i), Color.Orange)
+                                End If
+
+                                PES1.PES_iAkt.iAktNachf = Child_False(i)
+                                Call PES1.EsBest(ind(Child_False(i)))
+                                
+                                Call EVO_Opt_Verlauf1.Nachfolger(Child_False(i) + 1)
+                                System.Windows.Forms.Application.DoEvents()
+
+                                Eval_Count += 1
+                                If (Eval_Count >= 2) Then
+                                    Throw New Exception("Es konnte kein gültiger Datensatz erzeugt werden!")
+                                End If
+                            Loop While SIM_Eval_is_OK = False
+                        Next
+                    End If
 
                     'SELEKTIONSPROZESS Schritt 2 für NDSorting sonst Xe = Xb
                     '#######################################################

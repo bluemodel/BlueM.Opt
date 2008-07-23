@@ -1435,7 +1435,7 @@ Handler:
     '********************************
     Public MustOverride Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
     Public MustOverride Function launchFree(ByRef Thread_ID As Integer) As Boolean
-    Public MustOverride Function launchReady(ByRef Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
+    Public MustOverride Function launchReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
 
 
     'Simulationsergebnis verarbeiten
@@ -1877,6 +1877,7 @@ Handler:
         For i = 0 to n_Proz - 1
             Dim Source As String = WorkDir
             Dim Dest As String = System.Windows.Forms.Application.StartupPath() & "\Thread_" & i & "\"
+            Call purgeReadOnly(Dest)
 
             'Löschen um den Inhalt zu entsorgen
             If Directory.Exists(Dest) Then
@@ -1884,7 +1885,7 @@ Handler:
             End If
             
             My.Computer.FileSystem.CopyDirectory(Source, Dest, True)
-            purgeReadOnly(Dest)
+            Call purgeReadOnly(Dest)
             Directory.Delete(Dest & "\.svn", true)
 
         Next

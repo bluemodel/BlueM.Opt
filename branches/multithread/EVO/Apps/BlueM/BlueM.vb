@@ -371,12 +371,13 @@ Public Class BlueM
         Next
         
     End Function
-    Public Overrides Function launchReady(ByRef Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
+    Public Overrides Function launchReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
         launchReady = False
 
         For Each Thr_C As CThread In My_C_Thread
-            If Thr_C.Sim_Is_OK = True And Thr_C.get_Child_ID = Child_ID then
+            If Thr_C.launch_Ready = True And Thr_C.get_Child_ID = Child_ID then
                 launchReady = True
+                SimIsOK = Thr_C.Sim_Is_OK
                 Thread_ID = Thr_C.get_Thread_ID
                 MyThread(Thread_ID).Join
                 My_C_Thread(Thread_ID) = new CThread(Thread_ID, -1, "Folder", Datensatz, bluem_dll(Thread_ID))
@@ -599,8 +600,8 @@ Public Class BlueM
         Private WorkFolder As String
         Private DS_Name As String
         Private bluem_dll As BlueM_EngineDotNetAccess
-        Private is_Ini As Boolean
-        Private Is_OK As Boolean
+        Private SimIsOK As Boolean
+        Private launchReady As Boolean
 
         Public Sub New(ByVal _Thread_ID As Integer, ByVal _Child_ID As Integer, ByVal _WorkFolder As String, ByVal _DS_Name as String, ByRef _bluem_dll As BlueM_EngineDotNetAccess)
             Me.Thread_ID = _Thread_ID
@@ -611,16 +612,16 @@ Public Class BlueM
         End Sub
 
         Public Sub Thread()
-            
-            Me.is_Ini = False
+
+            Me.SimIsOK = false
+            Me.launchReady = false
 
             'Priority
-            System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
+            System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.BelowNormal
 
             Try
                 'Datensatz übergeben und initialisieren
                 Call bluem_dll.Initialize(Me.WorkFolder & Me.DS_Name)
-                Me.is_Ini = True
 
                 Dim SimEnde As DateTime = BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll.GetSimulationEndDate())
 
@@ -633,7 +634,7 @@ Public Class BlueM
                 Call bluem_dll.Finish()
 
                 'Simulation erfolgreich
-                Me.Is_OK = True
+                Me.SimIsOK = True
 
             Catch ex As Exception
 
@@ -644,7 +645,7 @@ Public Class BlueM
                 Call bluem_dll.Finish()
 
                 'Simulation nicht erfolgreich
-                Me.Is_OK = False
+                Me.SimIsOK = False
 
             Finally
 
@@ -653,22 +654,25 @@ Public Class BlueM
 
             End Try
 
+            'Me.SimIsOK = False
+            Me.launchReady = True
+
         End Sub
 
         Public Function Sim_Is_OK As Boolean
 
-            Sim_Is_OK = Me.Is_OK
+            Sim_Is_OK = Me.SimIsOK
+        End Function
+
+        Public Function launch_Ready As Boolean
+
+            launch_Ready = Me.launchReady
         End Function
 
         Public Sub set_is_OK()
 
-            Me.Is_OK = True
+            Me.SimIsOK = True
         End Sub
-
-        Public Function is_Initialized As Boolean
-
-            is_Initialized = Me.is_Ini
-        End Function
 
         Public Function get_Thread_ID As Integer
 

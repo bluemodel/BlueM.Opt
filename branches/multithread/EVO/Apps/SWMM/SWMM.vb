@@ -86,7 +86,7 @@ Public Class SWMM
     Public Overrides Function launchFree(ByRef Thread_ID As Integer) As Boolean
 
     End Function
-    Public Overrides Function launchReady(ByRef Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
+    Public Overrides Function launchReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
 
     End Function
 
