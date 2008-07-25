@@ -620,7 +620,7 @@ Public Class BlueM
         End Sub
 
         'Die Funktion startet die Simulation mit dem entsprechendem WorkingDir
-        '********************************************************************
+        '*********************************************************************
         Public Sub Thread()
 
             Me.SimIsOK = false

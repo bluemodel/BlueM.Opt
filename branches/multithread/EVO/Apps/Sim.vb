@@ -1877,10 +1877,10 @@ Handler:
         For i = 0 to n_Proz - 1
             Dim Source As String = WorkDir
             Dim Dest As String = System.Windows.Forms.Application.StartupPath() & "\Thread_" & i & "\"
-            Call purgeReadOnly(Dest)
 
             'Löschen um den Inhalt zu entsorgen
             If Directory.Exists(Dest) Then
+                Call purgeReadOnly(Dest)
                 Directory.Delete(Dest, True)
             End If
             
@@ -1896,7 +1896,7 @@ Handler:
     '*************************************
     Public Sub deleteDatensatz(byVal n_Proz As Integer)
         Dim i As Integer
-        For i = 1 to n_Proz - 1
+        For i = 1 to n_Proz
 
             If Directory.Exists(System.Windows.Forms.Application.StartupPath() & "\Thread_" & i) Then
                 Directory.Delete(System.Windows.Forms.Application.StartupPath() & "\Thread_" & i, True)

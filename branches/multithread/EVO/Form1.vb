@@ -742,23 +742,23 @@ Partial Class Form1
             'Optimierung pausieren
             '---------------------
             Me.ispause = True
-            Me.Button_Start.Text = ">"
-            Do While (Me.ispause)
-                System.Threading.Thread.Sleep(20)
-                Application.DoEvents()
-            Loop
+            'Me.Button_Start.Text = "Run"
+            'Do While (Me.ispause)
+            '    System.Threading.Thread.Sleep(20)
+            '    Application.DoEvents()
+            'Loop
 
         ElseIf (Me.isrun) Then
             'Optimierung weiterlaufen lassen
             '-------------------------------
             Me.ispause = False
-            Me.Button_Start.Text = "||"
+            Me.Button_Start.Text = "Pause"
 
         Else
             'Optimierung starten
             '-------------------
             Me.isrun = True
-            Me.Button_Start.Text = "||"
+            Me.Button_Start.Text = "Pause"
 
             'Ergebnis-Buttons
             If (Not IsNothing(Sim1)) Then
@@ -805,7 +805,7 @@ Partial Class Form1
             'Optimierung beendet
             '-------------------
             Me.isrun = False
-            Me.Button_Start.Text = ">"
+            Me.Button_Start.Text = "Run"
             Me.Button_Start.Enabled = False
 
         End If
@@ -1702,8 +1702,10 @@ Start_Evolutionsrunden:
                         System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
 
                         Do
+                            'Falls eine Simulation frei und nicht Pause
+                            '------------------------------------------
                             If Sim1.launchFree(Thread_Free) and Child_Run < EVO_Einstellungen1.Settings.PES.n_Nachf _
-                            and (Child_Ready + n_Threads > Child_Run) then
+                            and (Child_Ready + n_Threads > Child_Run) and Me.ispause = False then
 
                                 Sim1.WorkDir = Sim1.getWorkDir(Thread_Free)
                                                                 
@@ -1714,7 +1716,9 @@ Start_Evolutionsrunden:
                                 '******************************************************
 
                                 Child_Run += 1
-
+                            
+                            'Falls Simulation fertig und erfogreich
+                            '--------------------------------------
                             ElseIf Sim1.launchReady(Thread_Ready, SIM_Eval_is_OK, Child_Ready) = True And SIM_Eval_is_OK
 
                                 Sim1.WorkDir = Sim1.getWorkDir(Thread_Ready)
@@ -1736,6 +1740,8 @@ Start_Evolutionsrunden:
                                 If Child_Ready = EVO_Einstellungen1.Settings.PES.n_Nachf - 1 then Ready = true
                                 Child_Ready += 1
 
+                            'Falls Simulation fertig aber nicht erfolgreich
+                            '----------------------------------------------
                             ElseIf Sim1.launchReady(Thread_Ready, SIM_Eval_is_OK, Child_Ready) = False And SIM_Eval_is_OK = false
 
                                 ReDim Preserve Child_False(Child_False.GetLength(0))
@@ -1743,7 +1749,19 @@ Start_Evolutionsrunden:
 
                                 If Child_Ready = EVO_Einstellungen1.Settings.PES.n_Nachf - 1 then Ready = true
                                 Child_Ready += 1
+                            
+                            'Falls Pause und alle simulierten auch verarbeitet
+                            '-------------------------------------------------
+                            ElseIf Me.ispause = True And Child_Ready = Child_Run then
+
+                                Me.Button_Start.Text = "Run"
+                                Do While (Me.ispause)
+                                    System.Threading.Thread.Sleep(20)
+                                    Application.DoEvents()
+                                Loop
         
+                            'Falls total im Stress
+                            '---------------------
                             Else
                                 System.Threading.Thread.Sleep(400)
                                 Application.DoEvents
@@ -2453,12 +2471,14 @@ Start_Evolutionsrunden:
     '****************************************************
     Public Sub showWave(ByVal checkedSolutions As Collection)
 
-        Dim isOK As Boolean
+        Dim isOK As Boolean = false
         Dim isIHA As Boolean
 
         Dim zre As Wave.Zeitreihe
         Dim SimSeries As New Collection                 'zu zeichnende Simulationsreihen
         Dim RefSeries As New Collection                 'zu zeichnende Referenzreihen
+
+        Sim1.WorkDir = Sim1.getWorkDir(0)
 
         'Wait cursor
         Cursor = Cursors.WaitCursor
@@ -2520,8 +2540,12 @@ Start_Evolutionsrunden:
             'xxxxxxxxxxxxxxxxxxxx
 
             'Simulieren
-            isOK = Sim1.launchSim(0, 0)
-            If isOK then call Sim1.WelDateiVerwursten()
+            Call Sim1.launchSim(0, 0)
+            Do While Not isok
+                System.Threading.Thread.Sleep(100)
+                Sim1.launchReady(0, isok, 0)
+            Loop 
+            Call Sim1.WelDateiVerwursten()
 
             'Sonderfall IHA-Berechnung
             If (isIHA) Then
