@@ -341,8 +341,24 @@ Public Class BlueM
 
 #Region "Evaluierung"
 
+    'Gibt zurück ob ein beliebiger Thread beendet ist und ibt die ID diesen freien Threads zurück
+    '********************************************************************************************
+    Public Overrides Function launchFree(ByRef Thread_ID As Integer) As Boolean
+        launchFree = False
+
+        For Each Thr_C As CThread In My_C_Thread
+            If Thr_C.Sim_Is_OK = True and Thr_C.get_Child_ID = -1 then
+                launchFree = True
+                Thread_ID = Thr_C.get_Thread_ID
+                Exit For
+            End If
+        Next
+        
+    End Function
+
     'BlauesModell ausführen (simulieren)
-    '***********************************
+    'Startet einen neuen Thread und übergibt ihm die Child ID
+    '********************************************************
     Public Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
 
         launchSim = False
@@ -359,18 +375,9 @@ Public Class BlueM
 
     End function
 
-    Public Overrides Function launchFree(ByRef Thread_ID As Integer) As Boolean
-        launchFree = False
-
-        For Each Thr_C As CThread In My_C_Thread
-            If Thr_C.Sim_Is_OK = True and Thr_C.get_Child_ID = -1 then
-                launchFree = True
-                Thread_ID = Thr_C.get_Thread_ID
-                Exit For
-            End If
-        Next
-        
-    End Function
+    'Prüft ob des aktuelle Child mit der ID die oben übergeben wurde fertig ist
+    'Gibt die Thread ID zurück um zum auswerten in das Arbeitsverzeichnis zu wechseln
+    '********************************************************************************
     Public Overrides Function launchReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
         launchReady = False
 
@@ -386,7 +393,6 @@ Public Class BlueM
         Next
 
     End Function
-
 
     'Simulationsergebnis verarbeiten
     '-------------------------------
@@ -593,6 +599,8 @@ Public Class BlueM
 
 #Region "Threading"
 
+    'Klasse beinhaltet alle Infomationen für einen Simulationslauf im Thread
+    '***********************************************************************
     Public Class CThread
 
         Private Thread_ID As Integer
@@ -611,6 +619,8 @@ Public Class BlueM
             Me.bluem_dll = _bluem_dll
         End Sub
 
+        'Die Funktion startet die Simulation mit dem entsprechendem WorkingDir
+        '********************************************************************
         Public Sub Thread()
 
             Me.SimIsOK = false

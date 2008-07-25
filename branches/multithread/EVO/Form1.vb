@@ -1743,7 +1743,7 @@ Start_Evolutionsrunden:
 
                                 If Child_Ready = EVO_Einstellungen1.Settings.PES.n_Nachf - 1 then Ready = true
                                 Child_Ready += 1
-                                
+        
                             Else
                                 System.Threading.Thread.Sleep(400)
                                 Application.DoEvents
@@ -1787,7 +1787,7 @@ Start_Evolutionsrunden:
                                 System.Windows.Forms.Application.DoEvents()
 
                                 Eval_Count += 1
-                                If (Eval_Count >= 2) Then
+                                If (Eval_Count >= 10) Then
                                     Throw New Exception("Es konnte kein gültiger Datensatz erzeugt werden!")
                                 End If
                             Loop While SIM_Eval_is_OK = False
