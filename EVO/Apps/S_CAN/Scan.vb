@@ -15,7 +15,7 @@ Public Class Scan
 
     End Sub
 
-    Public Overrides Function launchSim() As Boolean
+    Public Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
 
         Dim i, j, k, AnzZeil As Integer
         Dim parameterdatei, Zeile, ZeilenArray(), stoffe(), tmp() As String
@@ -105,6 +105,19 @@ Public Class Scan
         Return True
 
     End Function
+
+    Public Overrides Function launchFree(ByRef Thread_ID As Integer) As Boolean
+
+    End Function
+    Public Overrides Function launchReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
+
+    End Function
+        
+    'Simulationsergebnis verarbeiten
+    '-------------------------------
+    Public Overrides Sub WelDateiVerwursten()
+
+    End Sub
 
     Public Overrides Function QWert(ByVal ziel As Common.Ziel) As Double
 

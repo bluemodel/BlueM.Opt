@@ -27,7 +27,7 @@ Public Class Individuum
     Public Path() As Integer               '03 Der Pfad
 
     Public Zielwerte() As Double           '04 Array aller Zielfunktionswerte (inkl. sekundär)
-    Public Constrain() As Double           '05 Werte der Randbedingungen
+    Public Constrain() As Double           '05 Werte der Randbedingungen (Wenn negativ dann ungültig)
     Public mutated As Boolean              '06 Gibt an ob der Wert bereits mutiert ist oder nicht
 
     'Für ND Sorting -------------------------------------------------
@@ -260,6 +260,7 @@ Public Class Individuum
 
         '14 Location des PES Parent
         Me.iLocation = 777
+
     End Sub
 
     'Konstruktor für ein Array von Individen
