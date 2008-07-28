@@ -42,7 +42,7 @@ Public Class CES
     Public NDSResult() As Individuum
 
     'Für Hybrid
-    Public PES_Memory() As Individuum
+    Public PES_Memory(-1) As Individuum
     Public PES_Parents_pChild() As Individuum
     Public PES_Parents_pLoc() As Individuum
     Private PES_Mem_SekundärQb(-1) As Individuum
@@ -632,12 +632,8 @@ Public Class CES
 
         Dim neu As Integer
 
-        If (Gen_No = 0 And Child_No = 0) Then
-            ReDim PES_Memory(0)
-        Else
-            ReDim Preserve PES_Memory(PES_Memory.GetLength(0))
-            neu = PES_Memory.GetUpperBound(0)
-        End If
+        ReDim Preserve PES_Memory(PES_Memory.GetLength(0))
+        neu = PES_Memory.GetUpperBound(0)
 
         PES_Memory(neu) = New Individuum("Memory", neu)
 

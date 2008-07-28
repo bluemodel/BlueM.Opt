@@ -43,7 +43,7 @@ Public Class SWMM
     End Sub
 
     
-    Public Overrides Function launchSim() As Boolean
+    Public Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
 
         'Aktuelles Verzeichnis bestimmen
         Dim currentDir As String = CurDir()
@@ -82,6 +82,19 @@ Public Class SWMM
         FiStr.Close()
 
     End Function
+
+    Public Overrides Function launchFree(ByRef Thread_ID As Integer) As Boolean
+
+    End Function
+    Public Overrides Function launchReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
+
+    End Function
+
+    'Simulationsergebnis verarbeiten
+    '-------------------------------
+    Public Overrides Sub WelDateiVerwursten()
+
+    End Sub
 
     Protected Overrides Sub Read_Kombinatorik()
 
@@ -153,200 +166,6 @@ Public Class SWMM
     'In der ersten Version wurden die Optimierungsparameter in einer eigenen Datei vorgehalten
     'Später wurde auf das bereits bestehende System mit drei Dateien umgestellt
 
-    'Protected Overrides Sub Read_OptZiele()
-    '    'Zeile automatische durch .net eingefügt, nehme ich erstmal raus
-    '    'MyBase.Read_OptZiele() 
-
-    '    Dim AnzZiele As Integer = 0
-    '    Dim i As Integer
-
-    '    'Gehe erstmal davon aus, dass Optimierungsparameter bei SWMM in einer Datei *.opt stehen
-    '    Dim Datei As String = WorkDir & Datensatz & "." & OptParameter_Ext
-    '    Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
-
-    '    Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-
-    '    Dim Zeile As String = ""
-
-    '    'Anzahl der Zielfunktionen feststellen
-    '    Do
-    '        Zeile = StrRead.ReadLine.ToString()
-    '        If Zeile = "[Optimierungsziele]" Then
-    '            Do
-    '                Zeile = StrRead.ReadLine.ToString()
-    '                AnzZiele = AnzZiele + 1
-    '            Loop Until Zeile = "[Optimierungsparameter]"
-    '            AnzZiele = AnzZiele - 4
-    '        End If
-    '    Loop Until StrRead.Peek() = -1
-
-    '    If (AnzZiele > 3) Then
-    '        MsgBox("Die Anzahl der Ziele beträgt mehr als 3!" & Chr(13) & Chr(10) _
-    '                & "Es werden nur die ersten drei Zielfunktionen im Hauptdiagramm angezeigt!", MsgBoxStyle.Information, "Info")
-    '    End If
-
-    '    ReDim List_OptZiele(AnzZiele - 1)
-
-    '    'Zurück zum Dateianfang und lesen
-    '    FiStr.Seek(0, SeekOrigin.Begin)
-
-    '    Do
-    '        Zeile = StrRead.ReadLine.ToString()
-    '        If Zeile = "[Optimierungsziele]" Then
-    '            'Erst nochmal zwei Zeilen vorschieben
-    '            Zeile = StrRead.ReadLine.ToString()
-    '            Zeile = StrRead.ReadLine.ToString()
-    '            For i = 0 To AnzZiele - 1
-    '                Zeile = StrRead.ReadLine.ToString()
-    '                List_OptZiele(i).Bezeichnung = Trim(Zeile.Substring(0, 19))
-    '                List_OptZiele(i).ZielTyp = Trim(Zeile.Substring(19, 11))
-    '                List_OptZiele(i).Datei = Trim(Zeile.Substring(30, 20))
-    '                List_OptZiele(i).SimGr = Trim(Zeile.Substring(50, 11))
-    '                List_OptZiele(i).ZielFkt = Trim(Zeile.Substring(61, 11))
-    '                List_OptZiele(i).WertTyp = Trim(Zeile.Substring(72, 11))
-    '                List_OptZiele(i).ZielWert = Trim(Zeile.Substring(83, 11))
-    '            Next
-    '            Exit Do
-    '        End If
-    '    Loop
-
-    '    StrRead.Close()
-    '    FiStr.Close()
-
-    'End Sub
-
-
-    'In der ersten Version wurden die Optimierungsparameter in einer eigenen Datei vorgehalten
-    'Später wurde auf das bereits bestehende System mit drei Dateien umgestellt
-
-    ''Optimierungsparameter einlesen
-    ''******************************
-    'Protected Overrides Sub Read_OptParameter()
-
-    '    Dim Datei As String = WorkDir & Datensatz & "." & OptParameter_Ext
-
-    '    Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
-    '    Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-
-    '    Dim Zeile As String
-    '    Dim AnzParam As Integer = 0
-
-    '    'Anzahl der Parameter feststellen
-    '    Do
-    '        Zeile = StrRead.ReadLine.ToString()
-    '        If Zeile = "[Optimierungsparameter]" Then
-    '            Do
-    '                Zeile = StrRead.ReadLine.ToString()
-    '                AnzParam = AnzParam + 1
-    '            Loop Until Zeile = "[Modellparameter]"
-    '            AnzParam = AnzParam - 4
-    '        End If
-    '    Loop Until StrRead.Peek() = -1
-
-
-    '    ReDim List_OptParameter(AnzParam - 1)
-    '    ReDim List_OptParameter_Save(AnzParam - 1)
-
-    '    'Zurück zum Dateianfang und lesen
-    '    FiStr.Seek(0, SeekOrigin.Begin)
-    '    Dim i As Integer = 0
-
-    '    Do
-    '        Zeile = StrRead.ReadLine.ToString()
-    '        If Zeile = "[Optimierungsparameter]" Then
-    '            'Erst nochmal zwei Zeilen vorschieben
-    '            Zeile = StrRead.ReadLine.ToString()
-    '            Zeile = StrRead.ReadLine.ToString()
-    '            For i = 0 To AnzParam - 1
-    '                Zeile = StrRead.ReadLine.ToString()
-    '                List_OptParameter(i).Bezeichnung = Trim(Zeile.Substring(0, 19))
-    '                List_OptParameter(i).Einheit = Trim(Zeile.Substring(19, 11))
-    '                List_OptParameter(i).Wert = Trim(Zeile.Substring(30, 12))
-    '                List_OptParameter(i).Min = Trim(Zeile.Substring(42, 11))
-    '                List_OptParameter(i).Max = Trim(Zeile.Substring(53, 5))
-    '            Next
-    '            Exit Do
-    '        End If
-    '    Loop
-
-    '    StrRead.Close()
-    '    FiStr.Close()
-
-    '    'OptParameter werden hier gesichert
-    '    For i = 0 To List_OptParameter.GetUpperBound(0)
-    '        Call copy_Struct_OptParameter(List_OptParameter(i), List_OptParameter_Save(i))
-    '    Next
-
-    'End Sub
-
-
-    'In der ersten Version wurden die Optimierungsparameter in einer eigenen Datei vorgehalten
-    'Später wurde auf das bereits bestehende System mit drei Dateien umgestellt
-
-    'Protected Overrides Sub Read_ModellParameter()
-
-    '    Dim Datei As String = WorkDir & Datensatz & "." & OptParameter_Ext
-
-    '    Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
-    '    Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-
-    '    Dim Zeile As String
-    '    Dim AnzParam As Integer = 0
-
-    '    'Anzahl der Parameter feststellen
-    '    Do
-    '        Zeile = StrRead.ReadLine.ToString()
-    '        If Zeile = "[Modellparameter]" Then
-    '            Do
-    '                Zeile = StrRead.ReadLine.ToString()
-    '                AnzParam = AnzParam + 1
-    '            Loop Until Zeile = "[Ende]"
-    '            AnzParam = AnzParam - 4
-    '        End If
-    '    Loop Until StrRead.Peek() = -1
-
-    '    ReDim List_ModellParameter(AnzParam - 1)
-    '    ReDim List_ModellParameter_Save(AnzParam - 1)
-
-    '    'Zurück zum Dateianfang und lesen
-    '    FiStr.Seek(0, SeekOrigin.Begin)
-
-    '    'Zurück zum Dateianfang und lesen
-    '    FiStr.Seek(0, SeekOrigin.Begin)
-    '    Dim i As Integer = 0
-
-    '    Do
-    '        Zeile = StrRead.ReadLine.ToString()
-    '        If Zeile = "[Modellparameter]" Then
-    '            'Erst nochmal zwei Zeilen vorschieben
-    '            Zeile = StrRead.ReadLine.ToString()
-    '            Zeile = StrRead.ReadLine.ToString()
-    '            For i = 0 To AnzParam - 1
-    '                Zeile = StrRead.ReadLine.ToString()
-    '                'Substring-Positionen müssen noch geprüft werden
-    '                List_ModellParameter(i).OptParameter = Trim(Zeile.Substring(0, 19))
-    '                List_ModellParameter(i).Bezeichnung = Trim(Zeile.Substring(19, 15))
-    '                List_ModellParameter(i).Einheit = Trim(Zeile.Substring(34, 10))
-    '                List_ModellParameter(i).Datei = Trim(Zeile.Substring(44, 10))
-    '                List_ModellParameter(i).Element = Trim(Zeile.Substring(44, 10))
-    '                List_ModellParameter(i).ZeileNr = Trim(Zeile.Substring(54, 10))
-    '                List_ModellParameter(i).SpVon = Trim(Zeile.Substring(64, 10))
-    '                List_ModellParameter(i).SpBis = Trim(Zeile.Substring(74, 9))
-    '                List_ModellParameter(i).Faktor = Trim(Zeile.Substring(83, 5))
-    '            Next
-    '            Exit Do
-    '        End If
-    '    Loop
-
-    '    StrRead.Close()
-    '    FiStr.Close()
-
-    '    'ModellParameter werden hier gesichert
-    '    For i = 0 To List_ModellParameter.GetUpperBound(0)
-    '        Call copy_Struct_ModellParameter(List_ModellParameter(i), List_ModellParameter_Save(i))
-    '    Next
-
-    'End Sub
 
     'Berechnung des Qualitätswerts (Zielwert)
     '****************************************

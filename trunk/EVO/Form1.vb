@@ -1,7 +1,6 @@
 Option Strict Off ' Off ist Default
 Option Explicit On
 Imports System.IO
-Imports System.Management
 Imports IHWB.EVO.Common
 Imports System.ComponentModel
 
@@ -58,9 +57,7 @@ Partial Class Form1
 
     '**** Multithreading ****
     Dim SIM_Eval_is_OK As Boolean
-    Dim BackgroundWorker1 As System.ComponentModel.BackgroundWorker 'Threads für Backgroundworker
-    Private PhysCPU As Integer                                      'Anzahl physikalischer Prozessoren
-    Private LogCPU As Integer                                       'Anzahl logischer Prozessoren
+    Private n_Threads As Integer                        'Anzahl der Threads
 
     'Dialoge
     Private WithEvents solutionDialog As SolutionDialog
@@ -89,7 +86,7 @@ Partial Class Form1
     Private Sub Form1_Load(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles MyBase.Load
 
         'Anzahl der Prozessoren wird ermittelt
-        Anzahl_Prozessoren(PhysCPU, LogCPU)
+        Anzahl_Prozessoren(n_Threads)
 
         'XP-look
         System.Windows.Forms.Application.EnableVisualStyles()
@@ -179,7 +176,7 @@ Partial Class Form1
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Objekt der Klasse BlueM initialisieren
-                    Sim1 = New BlueM()
+                    Sim1 = New BlueM(n_Threads)
 
 
                 Case ANW_SMUSI 'Anwendung Smusi
@@ -745,22 +742,23 @@ Partial Class Form1
             'Optimierung pausieren
             '---------------------
             Me.ispause = True
-            Me.Button_Start.Text = ">"
-            Do While (Me.ispause)
-                Application.DoEvents()
-            Loop
+            'Me.Button_Start.Text = "Run"
+            'Do While (Me.ispause)
+            '    System.Threading.Thread.Sleep(20)
+            '    Application.DoEvents()
+            'Loop
 
         ElseIf (Me.isrun) Then
             'Optimierung weiterlaufen lassen
             '-------------------------------
             Me.ispause = False
-            Me.Button_Start.Text = "||"
+            Me.Button_Start.Text = "Pause"
 
         Else
             'Optimierung starten
             '-------------------
             Me.isrun = True
-            Me.Button_Start.Text = "||"
+            Me.Button_Start.Text = "Pause"
 
             'Ergebnis-Buttons
             If (Not IsNothing(Sim1)) Then
@@ -773,12 +771,6 @@ Partial Class Form1
             Dim dir As String
             dir = My.Computer.FileSystem.SpecialDirectories.Temp & "\"
             Call Me.EVO_Einstellungen1.saveSettings(dir & "EVO_Settings.xml")
-
-            'BackgroundWorker für Multithreading einrichten
-            BackgroundWorker1 = New System.ComponentModel.BackgroundWorker
-            AddHandler BackgroundWorker1.DoWork, AddressOf BackgroundWorker1_DoWork
-            AddHandler BackgroundWorker1.RunWorkerCompleted, AddressOf BackgroundWorker1_RunWorkerCompleted
-            'AddHandler BackgroundWorker1.ProgressChanged, AddressOf BackgroundWorker1_ProgressChanged
 
             Select Case Anwendung
 
@@ -813,7 +805,7 @@ Partial Class Form1
             'Optimierung beendet
             '-------------------
             Me.isrun = False
-            Me.Button_Start.Text = ">"
+            Me.Button_Start.Text = "Run"
             Me.Button_Start.Enabled = False
 
         End If
@@ -931,7 +923,8 @@ Partial Class Form1
 
                 'Evaluieren
                 'TODO: Fehlerbehandlung bei Simulationsfehler
-                isOK = Sim1.SIM_Evaluierung(ind)
+                isOK = Sim1.launchSim(0, 0)
+                If isOK then Sim1.SIM_Ergebnis_auswerten(ind)
 
                 'BUG 253: Verletzte Constraints bei SensiPlot kenntlich machen?
 
@@ -1029,17 +1022,19 @@ Partial Class Form1
     Private Sub STARTEN_CES_or_HYBRID()
 
         'Hypervolumen instanzieren
-        '-------------------------
         Dim Hypervolume As EVO.MO_Indicators.Indicators
         Hypervolume = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(EVO.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, Common.Manager.AnzPenalty)
 
+        'Datensätze für Multithreading kopieren
+        If n_Threads > 1 then
+            Call sim1.coppyDatensatz(n_Threads)
+        End If
+
         'CES initialisieren
-        '******************
         CES1 = New EVO.Kern.CES()
         Call CES1.CESInitialise(EVO_Einstellungen1.Settings, Method, Sim1.CES_T_Modus, Common.Manager.AnzPenalty, Common.Manager.AnzConstraints, Sim1.List_Locations.GetLength(0), Sim1.VerzweigungsDatei.GetLength(0), Sim1.n_Combinations, Sim1.n_PathDimension)
 
         'EVO_Verlauf zurücksetzen
-        '************************
         Call Me.EVO_Opt_Verlauf1.Initialisieren(1, 1, EVO_Einstellungen1.Settings.CES.n_Generations, EVO_Einstellungen1.Settings.CES.n_Childs)
 
         Dim durchlauf_all As Integer = 0
@@ -1076,74 +1071,94 @@ Partial Class Form1
         End If
 
         'Startwerte werden der Verlaufsanzeige zugewiesen
-        Call Me.EVO_Opt_Verlauf1.Initialisieren(1, 1, EVO_Einstellungen1.Settings.CES.n_Generations, EVO_Einstellungen1.Settings.CES.n_Childs)
+        Call Me.EVO_Opt_Verlauf1.Initialisieren(0, 0, EVO_Einstellungen1.Settings.CES.n_Generations, EVO_Einstellungen1.Settings.CES.n_Childs)
 
         'xxxx Optimierung xxxxxx
         'Generationsschleife CES
         'xxxxxxxxxxxxxxxxxxxxxxx
-        For i_gen = 0 To CES1.Settings.CES.n_Generations - 1
+        Dim Time(CES1.Settings.CES.n_Generations - 1) As Timespan
+        Dim Stoppuhr As New Stopwatch()
+        
 
-            Call EVO_Opt_Verlauf1.Generation(i_gen + 1)
+        For i_gen = 0 To CES1.Settings.CES.n_Generations - 1
+            Stoppuhr.Reset
+            Stoppuhr.Start
 
             'Child Schleife
             'xxxxxxxxxxxxxx
-            For i_ch = 0 To CES1.Settings.CES.n_Childs - 1
-                durchlauf_all += 1
+            Dim Thread_Free As integer = 0
+            Dim Thread_Ready As Integer = 0
+            Dim Child_Run As Integer = 0
+            Dim Child_Ready As Integer = 0
+            Dim Ready As Boolean = false
+            System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.BelowNormal
 
-                'Do Schleife: Um Modellfehler bzw. Evaluierungsabbrüche abzufangen
-                Dim Eval_Count As Integer = 0
-                Do
-                    CES1.Childs(i_ch).ID = durchlauf_all
-                    Call EVO_Opt_Verlauf1.Nachfolger(i_ch + 1)
+            Do
+                If Sim1.launchFree(Thread_Free) and Child_Run < CES1.Settings.CES.n_Childs and (Child_Ready + n_Threads > Child_Run) then
+
+                    durchlauf_all += 1
+                    Sim1.WorkDir = Sim1.getWorkDir(Thread_Free)
+                    CES1.Childs(Child_Run).ID = durchlauf_all
 
                     '****************************************
                     'Aktueller Pfad wird an Sim zurückgegeben
                     'Bereitet das BlaueModell für die Kombinatorik vor
-                    Call Sim1.PREPARE_Evaluation_CES(CES1.Childs(i_ch).Path, CES1.Childs(i_ch).Get_All_Loc_Elem)
+                    Call Sim1.PREPARE_Evaluation_CES(CES1.Childs(Child_Run).Path, CES1.Childs(Child_Run).Get_All_Loc_Elem)
 
                     'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
                     '***************************************************************
                     If Method = METH_HYBRID And EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer Then
-                        If Sim1.Reduce_OptPara_and_ModPara(CES1.Childs(i_ch).Get_All_Loc_Elem) Then
-                            Call Sim1.PREPARE_Evaluation_PES(CES1.Childs(i_ch).Get_All_Loc_PES_Para)
+                        If Sim1.Reduce_OptPara_and_ModPara(CES1.Childs(Child_Run).Get_All_Loc_Elem) Then
+                            Call Sim1.PREPARE_Evaluation_PES(CES1.Childs(Child_Run).Get_All_Loc_PES_Para)
                         End If
                     End If
 
-                    'Simulation *************************************************************************
-                    SIM_Eval_is_OK = False
+                    ' Simulation ******************************************
+                    SIM_Eval_is_OK = Sim1.launchSim(Thread_Free, Child_Run)
+                    '******************************************************
 
-                    'Der BackgroundWorker startet die Simulation **********
-                    Call BackgroundWorker1.RunWorkerAsync(CES1.Childs(i_ch))
+                    Child_Run += 1
 
-                    While Me.BackgroundWorker1.IsBusy
-                        System.Threading.Thread.Sleep(20)
-                        Application.DoEvents()
-                    End While
-                    '************************************************************************************
+                ElseIf Sim1.launchReady(Thread_Ready, SIM_Eval_is_OK, Child_Ready)
+
+                    Sim1.WorkDir = Sim1.getWorkDir(Thread_Ready)
+                    If SIM_Eval_is_OK then Sim1.SIM_Ergebnis_auswerten(CES1.Childs(Child_Ready))
 
                     'HYBRID: Speichert die PES Erfahrung diesen Childs im PES Memory
                     '***************************************************************
                     If Method = METH_HYBRID And EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer Then
-                        Call CES1.Memory_Store(i_ch, i_gen)
+                        Call CES1.Memory_Store(Child_Ready, i_gen)
                     End If
 
                     'Lösung im TeeChart einzeichnen
                     '==============================
-                    If (SIM_Eval_is_OK) Then
-                        Call Me.LösungZeichnen(CES1.Childs(i_ch), 0, 0, i_gen, i_ch, ColorManagement(ColorArray, CES1.Childs(i_ch)))
+                    If (SIM_Eval_is_OK) Then 
+                        Call Me.LösungZeichnen(CES1.Childs(Child_Ready), 0, 0, i_gen, Child_Ready, ColorManagement(ColorArray, CES1.Childs(Child_Ready)))
                     End If
 
-                    Eval_Count += 1
-                    If (Eval_Count >= 10) Then
-                        Throw New Exception("Es konnte kein gültiger Datensatz erzeugt werden!")
-                    End If
+                    System.Windows.Forms.Application.DoEvents()
+                    Call EVO_Opt_Verlauf1.Nachfolger(Child_Ready + 1)
+                    If Child_Ready = CES1.Settings.CES.n_Childs - 1 then Ready = true
 
-                Loop While SIM_Eval_is_OK = False
+                    Child_Ready += 1
+                Else
 
-                System.Windows.Forms.Application.DoEvents()
-            Next
+                    System.Threading.Thread.Sleep(400)
+                    Application.DoEvents
+
+                End If
+
+            Loop While Ready = False
+            
+            Stoppuhr.Stop
+            Time(i_gen) = Stoppuhr.Elapsed
+
+            System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.BelowNormal
+
             '^ ENDE der Child Schleife
             'xxxxxxxxxxxxxxxxxxxxxxx
+
+            Call EVO_Opt_Verlauf1.Generation(i_gen + 1)
 
             'Die Listen müssen nach der letzten Evaluierung wieder zurückgesetzt werden
             'Sicher ob das benötigt wird?
@@ -1209,7 +1224,6 @@ Partial Class Form1
             If Method = METH_HYBRID And EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer Then
                 Call Mixed_Integer_PES(i_gen)
             End If
-
         Next
         'Ende der Generationsschleife CES
 
@@ -1219,6 +1233,10 @@ Partial Class Form1
         If Method = METH_HYBRID And EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Sequencial_1 Then
             Call Start_PES_after_CES()
         End If
+
+        'Datensätze für Multithreading löschen
+        '*************************************
+        Call sim1.deleteDatensatz(n_Threads)
 
     End Sub
 
@@ -1289,6 +1307,7 @@ Partial Class Form1
                             'Vorbereitung um das PES zu initieren
                             '************************************
                             globalAnzPar = CES1.Childs(i_ch).Loc(i_loc).PES_OptPara.GetLength(0)
+                            'XXX: folgende Zeile führt nur einen "shallow copy" aus! macht nichts?
                             myPara = CES1.Childs(i_ch).Loc(i_loc).PES_OptPara.Clone
 
                             'Schritte 1 - 3: PES wird initialisiert (Weiteres siehe dort ;-)
@@ -1414,7 +1433,8 @@ Partial Class Form1
             Call Sim1.PREPARE_Evaluation_PES(aktuellePara)
 
             'Evaluierung des Simulationsmodells (ToDo: Validätsprüfung fehlt)
-            SIM_Eval_is_OK = Sim1.SIM_Evaluierung(ind)
+            SIM_Eval_is_OK = Sim1.launchSim(0, 0)
+            If SIM_Eval_is_OK then Call Sim1.SIM_Ergebnis_auswerten(ind)
 
             'Lösung im TeeChart einzeichnen
             '------------------------------
@@ -1449,7 +1469,8 @@ Partial Class Form1
                 Call Sim1.PREPARE_Evaluation_PES(aktuellePara)
 
                 'Evaluierung des Simulationsmodells
-                SIM_Eval_is_OK = Sim1.SIM_Evaluierung(ind)
+                SIM_Eval_is_OK = Sim1.launchSim(0, 0)
+                If SIM_Eval_is_OK then Call Sim1.SIM_Ergebnis_auswerten(ind)
 
                 'Lösung im TeeChart einzeichnen
                 '------------------------------
@@ -1478,7 +1499,8 @@ Partial Class Form1
                     Call Sim1.PREPARE_Evaluation_PES(aktuellePara)
 
                     'Evaluierung des Simulationsmodells
-                    SIM_Eval_is_OK = Sim1.SIM_Evaluierung(ind)
+                    SIM_Eval_is_OK = Sim1.launchSim(0, 0)
+                    If SIM_Eval_is_OK then Call Sim1.SIM_Ergebnis_auswerten(ind)
 
                     'Lösung im TeeChart einzeichnen
                     '------------------------------
@@ -1560,23 +1582,17 @@ Partial Class Form1
     Private Sub STARTEN_PES()
 
         Dim durchlauf As Integer
-        Dim ind As Common.Individuum
+        Dim ind() As Common.Individuum
         Dim PES1 As EVO.Kern.PES
 
         'Hypervolumen instanzieren
-        '-------------------------
         Dim Hypervolume As EVO.MO_Indicators.Indicators
         Hypervolume = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(EVO.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, Common.Manager.AnzPenalty)
 
-        '--------------------------
-        'Dimensionierung der Variablen für Optionen Evostrategie
-        'Das Struct aus PES wird hier verwendet
-        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-        'TODO: If (ipop + igen + inachf + irunde) > 4 Then GoTo Start_Evolutionsrunden '????? Wie?
-        'Werte an Variablen übergeben auskommentiert Werte finden sich im PES werden hier aber nicht zugewiesen
-        'Kann der Kommentar nicht weg?
-        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        'Datensätze für Multithreading kopieren (nur Sim-Anwendungen)
+        If (Me.Anwendung <> ANW_TESTPROBLEME And n_Threads > 1) Then
+            Call Sim1.coppyDatensatz(n_Threads)
+        End If
 
         'Diagramm vorbereiten und initialisieren
         If (Not Form1.Method = METH_HYBRID And Not EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Sequencial_1) Then
@@ -1605,14 +1621,11 @@ Start_Evolutionsrunden:
         'xxxxxxxxxxxxxxxx
         For PES1.PES_iAkt.iAktRunde = 0 To EVO_Einstellungen1.Settings.PES.Pop.n_Runden - 1
 
-            Call EVO_Opt_Verlauf1.Runden(PES1.PES_iAkt.iAktRunde + 1)
             Call PES1.EsResetPopBWSpeicher() 'Nur bei Komma Strategie
 
             'Über alle Populationen
             'xxxxxxxxxxxxxxxxxxxxxx
             For PES1.PES_iAkt.iAktPop = 0 To EVO_Einstellungen1.Settings.PES.Pop.n_Popul - 1
-
-                Call EVO_Opt_Verlauf1.Population(PES1.PES_iAkt.iAktPop + 1)
 
                 'POPULATIONS REPRODUKTIONSPROZESS
                 '################################
@@ -1628,86 +1641,176 @@ Start_Evolutionsrunden:
                 'xxxxxxxxxxxxxxxxxxxxxx
                 For PES1.PES_iAkt.iAktGen = 0 To EVO_Einstellungen1.Settings.PES.n_Gen - 1
 
-                    Call EVO_Opt_Verlauf1.Generation(PES1.PES_iAkt.iAktGen + 1)
                     Call PES1.EsResetBWSpeicher()  'Nur bei Komma Strategie
+                    ReDim ind(EVO_Einstellungen1.Settings.PES.n_Nachf - 1)
+                    Dim Child_False(-1) As Integer
+                    Dim i As Integer
 
                     'Über alle Nachkommen
                     'xxxxxxxxxxxxxxxxxxxxxxxxx
-                    For PES1.PES_iAkt.iAktNachf = 0 To EVO_Einstellungen1.Settings.PES.n_Nachf - 1
+                    For i = 0 To EVO_Einstellungen1.Settings.PES.n_Nachf - 1
 
-                        Call EVO_Opt_Verlauf1.Nachfolger(PES1.PES_iAkt.iAktNachf + 1)
                         durchlauf += 1
 
-                        'Do Schleife: Um Modellfehler bzw. Evaluierungsabbrüche abzufangen
-                        Dim Eval_Count As Integer = 0
+                        'Neues Individuum instanzieren
+                        ind(i) = New Common.Individuum("PES", durchlauf)
+                        ind(i).ID = durchlauf
+
+                        'REPRODUKTIONSPROZESS
+                        '####################
+                        'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
+                        Call PES1.EsReproduktion()
+
+                        'MUTATIONSPROZESS
+                        '################
+                        'Mutieren der Ausgangswerte
+                        Call PES1.EsMutation()
+
+                        'Auslesen der Variierten Parameter
+                        myPara = PES1.EsGetParameter()
+
+                        'OptParameter in Individuum kopieren
+                        Call OptParameter.Clone_OptPara_Array(myPara, ind(i).PES_OptParas)
+
+                        'Testprobleme direkt auswerten
+                        If Anwendung = ANW_TESTPROBLEME
+                            
+                            Call Testprobleme1.Evaluierung_TestProbleme(ind(i), PES1.PES_iAkt.iAktPop, Me.Hauptdiagramm)
+
+                            PES1.PES_iAkt.iAktNachf = i
+                            Call PES1.EsBest(ind(i))
+                        
+                            Call EVO_Opt_Verlauf1.Nachfolger(PES1.PES_iAkt.iAktNachf + 1)
+
+                            'Lösung zeichnen
+                            Call Me.LösungZeichnen(ind(i), PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, i, Color.Orange)
+
+                            System.Windows.Forms.Application.DoEvents()
+
+                        End If
+
+                    Next
+
+                    'Simulationsanwendungen nachträglich auswerten
+                    If Anwendung = ANW_BLUEM or Anwendung = ANW_SMUSI or Anwendung = ANW_SCAN or Anwendung = ANW_SWMM then
+                        
+                        Dim Thread_Free As integer = 0
+                        Dim Thread_Ready As Integer = 0
+                        Dim Child_Run As Integer = 0
+                        Dim Child_Ready As Integer = 0
+                        Dim Ready As Boolean = false
+                        System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
+
                         Do
-                            'Neues Individuum instanzieren
-                            ind = New Common.Individuum("PES", durchlauf)
+                            'Falls eine Simulation frei und nicht Pause
+                            '------------------------------------------
+                            If Sim1.launchFree(Thread_Free) and Child_Run < EVO_Einstellungen1.Settings.PES.n_Nachf _
+                            and (Child_Ready + n_Threads > Child_Run) and Me.ispause = False then
 
-                            'REPRODUKTIONSPROZESS
-                            '####################
-                            'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
-                            Call PES1.EsReproduktion()
+                                Sim1.WorkDir = Sim1.getWorkDir(Thread_Free)
+                                                                
+                                Call Sim1.PREPARE_Evaluation_PES(ind(Child_Run).PES_OptParas)
 
-                            'MUTATIONSPROZESS
-                            '################
-                            'Mutieren der Ausgangswerte
-                            Call PES1.EsMutation()
+                                ' Simulation ******************************************
+                                SIM_Eval_is_OK = Sim1.launchSim(Thread_Free, Child_Run)
+                                '******************************************************
 
-                            'Auslesen der Variierten Parameter
-                            myPara = PES1.EsGetParameter()
+                                Child_Run += 1
+                            
+                            'Falls Simulation fertig und erfogreich
+                            '--------------------------------------
+                            ElseIf Sim1.launchReady(Thread_Ready, SIM_Eval_is_OK, Child_Ready) = True And SIM_Eval_is_OK
 
-                            'OptParameter in Individuum kopieren
-                            ind.PES_OptParas = myPara
+                                Sim1.WorkDir = Sim1.getWorkDir(Thread_Ready)
+                                Sim1.SIM_Ergebnis_auswerten(ind(Child_Ready))
+                                
+                                'Lösung zeichnen
+                                Call Me.LösungZeichnen(ind(Child_Ready), PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, Child_Ready, Color.Orange)
 
-                            'Ansteuerung der zu optimierenden Anwendung
-                            'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-                            Select Case Anwendung
+                                'SELEKTIONSPROZESS Schritt 1
+                                '###########################
+                                'Einordnen der Qualitätsfunktion im Bestwertspeicher bei SO
+                                'Falls MO Einordnen der Qualitätsfunktion in NDSorting
+                                PES1.PES_iAkt.iAktNachf = Child_Ready
+                                Call PES1.EsBest(ind(Child_Ready))
+                                
+                                Call EVO_Opt_Verlauf1.Nachfolger(Child_Ready + 1)
+                                System.Windows.Forms.Application.DoEvents()
 
-                                Case ANW_TESTPROBLEME
+                                If Child_Ready = EVO_Einstellungen1.Settings.PES.n_Nachf - 1 then Ready = true
+                                Child_Ready += 1
 
-                                    Call Testprobleme1.Evaluierung_TestProbleme(ind, PES1.PES_iAkt.iAktPop, Me.Hauptdiagramm)
-                                    SIM_Eval_is_OK = True
+                            'Falls Simulation fertig aber nicht erfolgreich
+                            '----------------------------------------------
+                            ElseIf Sim1.launchReady(Thread_Ready, SIM_Eval_is_OK, Child_Ready) = False And SIM_Eval_is_OK = false
 
-                                Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM
+                                ReDim Preserve Child_False(Child_False.GetLength(0))
+                                Child_False(Child_False.GetUpperBound(0)) = Child_Ready
 
-                                    'Vorbereiten des Modelldatensatzes
-                                    Call Sim1.PREPARE_Evaluation_PES(myPara)
+                                If Child_Ready = EVO_Einstellungen1.Settings.PES.n_Nachf - 1 then Ready = true
+                                Child_Ready += 1
+                            
+                            'Falls Pause und alle simulierten auch verarbeitet
+                            '-------------------------------------------------
+                            ElseIf Me.ispause = True And Child_Ready = Child_Run then
 
-                                    'Simulation *************************************************************************
-                                    SIM_Eval_is_OK = False
+                                Me.Button_Start.Text = "Run"
+                                Do While (Me.ispause)
+                                    System.Threading.Thread.Sleep(20)
+                                    Application.DoEvents()
+                                Loop
+        
+                            'Falls total im Stress
+                            '---------------------
+                            Else
+                                System.Threading.Thread.Sleep(400)
+                                Application.DoEvents
 
-                                    'Der BackgroundWorker startet die Simulation **********
-                                    Call BackgroundWorker1.RunWorkerAsync(ind)   '*********
-
-                                    While Me.BackgroundWorker1.IsBusy
-                                        System.Threading.Thread.Sleep(20)
-                                        Application.DoEvents()
-                                    End While
-                                    '************************************************************************************
-
-                                    'Lösung zeichnen
-                                    If (SIM_Eval_is_OK) Then
-                                        Call Me.LösungZeichnen(ind, PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, PES1.PES_iAkt.iAktNachf, Color.Orange)
-                                    End If
-                            End Select
-
-                            Eval_Count += 1
-                            If (Eval_Count >= 10) Then
-                                Throw New Exception("Es konnte kein gültiger Datensatz erzeugt werden!")
                             End If
 
-                        Loop While SIM_Eval_is_OK = False
+                        Loop While Ready = False
 
-                        'SELEKTIONSPROZESS Schritt 1
-                        '###########################
-                        'Einordnen der Qualitätsfunktion im Bestwertspeicher bei SO
-                        'Falls MO Einordnen der Qualitätsfunktion in NDSorting
-                        Call PES1.EsBest(ind)
+                    End If
 
-                        System.Windows.Forms.Application.DoEvents()
+                    'Do Schleife: Um Modellfehler bzw. Evaluierungsabbrüche abzufangen
+                    If Child_False.GetLength(0) > -1 Then
+                        For i = 0 to Child_False.GetUpperBound(0)
+                            Dim Eval_Count As Integer = 0
+                            Do
+                                Call PES1.EsReproduktion()
+                                Call PES1.EsMutation()
 
-                    Next 'Ende Schleife über alle Nachkommen
+                                myPara = PES1.EsGetParameter()
+                                Call OptParameter.Clone_OptPara_Array(myPara, ind(Child_False(i)).PES_OptParas)
+
+                                Sim1.WorkDir = Sim1.getWorkDir(0)
+                                Call Sim1.PREPARE_Evaluation_PES(ind(Child_False(i)).PES_OptParas)
+
+                                SIM_Eval_is_OK = Sim1.launchSim(0, Child_False(i))
+                                While Sim1.launchReady(0, SIM_Eval_is_OK, Child_False(i)) = False
+                                    System.Threading.Thread.Sleep(400)
+                                    System.Windows.Forms.Application.DoEvents()
+                                End While
+                                                                
+                                'Lösung auswerten und zeichnen
+                                If SIM_Eval_is_OK Then
+                                    Call Sim1.SIM_Ergebnis_auswerten(ind(Child_False(i)))
+                                    Call Me.LösungZeichnen(ind(Child_False(i)), PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, Child_False(i), Color.Orange)
+                                End If
+
+                                PES1.PES_iAkt.iAktNachf = Child_False(i)
+                                Call PES1.EsBest(ind(Child_False(i)))
+                                
+                                Call EVO_Opt_Verlauf1.Nachfolger(Child_False(i) + 1)
+                                System.Windows.Forms.Application.DoEvents()
+
+                                Eval_Count += 1
+                                If (Eval_Count >= 10) Then
+                                    Throw New Exception("Es konnte kein gültiger Datensatz erzeugt werden!")
+                                End If
+                            Loop While SIM_Eval_is_OK = False
+                        Next
+                    End If
 
                     'SELEKTIONSPROZESS Schritt 2 für NDSorting sonst Xe = Xb
                     '#######################################################
@@ -1740,7 +1843,8 @@ Start_Evolutionsrunden:
                         And PES1.PES_iAkt.iAktGen < EVO_Einstellungen1.Settings.PES.n_Gen - 1) Then
                         Call Me.ClearLastGeneration(PES1.PES_iAkt.iAktPop)
                     End If
-
+                    
+                    Call EVO_Opt_Verlauf1.Generation(PES1.PES_iAkt.iAktGen + 1)
                     System.Windows.Forms.Application.DoEvents()
 
                 Next 'Ende alle Generationen
@@ -1751,6 +1855,7 @@ Start_Evolutionsrunden:
                 '########################################
                 'Einordnen der Qualitätsfunktion im PopulationsBestwertspeicher
                 Call PES1.EsPopBest()
+                Call EVO_Opt_Verlauf1.Population(PES1.PES_iAkt.iAktPop + 1)
 
             Next 'Ende alle Populationen
             'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -1760,6 +1865,7 @@ Start_Evolutionsrunden:
             'Die neuen Populationseltern werden generiert
             Call PES1.EsPopEltern()
             System.Windows.Forms.Application.DoEvents()
+            Call EVO_Opt_Verlauf1.Runden(PES1.PES_iAkt.iAktRunde + 1)
 
         Next 'Ende alle Runden
         'xxxxxxxxxxxxxxxxxxxxx
@@ -2365,12 +2471,14 @@ Start_Evolutionsrunden:
     '****************************************************
     Public Sub showWave(ByVal checkedSolutions As Collection)
 
-        Dim isOK As Boolean
+        Dim isOK As Boolean = false
         Dim isIHA As Boolean
 
         Dim zre As Wave.Zeitreihe
         Dim SimSeries As New Collection                 'zu zeichnende Simulationsreihen
         Dim RefSeries As New Collection                 'zu zeichnende Referenzreihen
+
+        Sim1.WorkDir = Sim1.getWorkDir(0)
 
         'Wait cursor
         Cursor = Cursors.WaitCursor
@@ -2432,7 +2540,12 @@ Start_Evolutionsrunden:
             'xxxxxxxxxxxxxxxxxxxx
 
             'Simulieren
-            isOK = Sim1.launchSim()
+            Call Sim1.launchSim(0, 0)
+            Do While Not isok
+                System.Threading.Thread.Sleep(100)
+                Sim1.launchReady(0, isok, 0)
+            Loop 
+            Call Sim1.WelDateiVerwursten()
 
             'Sonderfall IHA-Berechnung
             If (isIHA) Then
@@ -2837,75 +2950,23 @@ Start_Evolutionsrunden:
 
     'Ermittelt beim Start die Anzahl der Physikalischen Prozessoren
     '**************************************************************
-    Public Sub Anzahl_Prozessoren(ByRef PhysCPU As Integer, ByRef LogCPU As Integer)
-        Dim mc As ManagementClass = New ManagementClass("Win32_Processor")
-        Dim moc As ManagementObjectCollection = mc.GetInstances()
-        Dim SocketDesignation As String = String.Empty
-        Dim PhysCPUarray As ArrayList = New ArrayList
+    Public Sub Anzahl_Prozessoren(ByRef n_Threads As Integer)
 
-        Dim mo As ManagementObject
-        For Each mo In moc
-            LogCPU += 1
-            SocketDesignation = mo.Properties("SocketDesignation").Value.ToString()
-            If Not PhysCPUarray.Contains(SocketDesignation) Then
-                PhysCPUarray.Add(SocketDesignation)
-            End If
-        Next
-        PhysCPU = PhysCPUarray.Count
+        Dim LogCPU As Integer = 0
+        LogCPU = Environment.ProcessorCount
 
-    End Sub
+        If LogCPU = 1 then
+            n_Threads = 2
+        Else If LogCPU = 2 then
+            n_Threads = 3
+        Else If LogCPU = 4 then
+            n_Threads = 6
+        End If
 
-#Region "BackgroundWorker"
-
-    'BackgroundWorker1 DoWork
-    '************************
-    Private Sub BackgroundWorker1_DoWork(ByVal sender As System.Object, ByVal e As System.ComponentModel.DoWorkEventArgs)
-
-        Dim SIM_Eval_is_OK As Boolean
-
-        'Retrieve the input arguments *********************************************************
-        Dim Input As Individuum = CType(e.Argument, Individuum)
-        '**************************************************************************************
-
-        'Priority
-        System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.BelowNormal
-
-        ''Settings für den Backgroundworker
-        'BackgroundWorker1.WorkerReportsProgress = True
-        'BackgroundWorker1.WorkerSupportsCancellation = True
-
-        'Job **************************************
-        SIM_Eval_is_OK = Sim1.SIM_Evaluierung(Input)
-
-        ''Progress ********************************
-        'Call BackgroundWorker1.ReportProgress(100)
-        ''*****************************************
-
-        'Return the complete string ******
-        e.Result = SIM_Eval_is_OK
-        '*********************************
+        'Hack
+        n_Threads = 3
 
     End Sub
-
-    'BackgroundWorker1 RunWorkerCompleted
-    '************************************
-    Private Sub BackgroundWorker1_RunWorkerCompleted(ByVal sender As System.Object, _
-                                                     ByVal e As System.ComponentModel.RunWorkerCompletedEventArgs)
-
-        SIM_Eval_is_OK = CType(e.Result, Boolean)
-
-    End Sub
-
-    ''BackgroundWorker1 ProgressChanged
-    ''*********************************
-    'Private Sub BackgroundWorker1_ProgressChanged(ByVal sender As System.Object, _
-    '                                              ByVal e As System.ComponentModel.ProgressChangedEventArgs)
-
-    '    SIM_Eval_is_OK = e.ProgressPercentage
-
-    'End Sub
-
-#End Region 'BackgroundWorker
 
 #End Region 'Methoden
 
