@@ -1094,7 +1094,10 @@ Partial Class Form1
             System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.BelowNormal
 
             Do
-                If Sim1.launchFree(Thread_Free) and Child_Run < CES1.Settings.CES.n_Childs and (Child_Ready + n_Threads > Child_Run) then
+                'Falls eine Simulation frei und nicht Pause
+                '------------------------------------------
+                If Sim1.launchFree(Thread_Free) and Child_Run < CES1.Settings.CES.n_Childs and _
+                (Child_Ready + n_Threads > Child_Run) and Me.ispause = False then
 
                     durchlauf_all += 1
                     Sim1.WorkDir = Sim1.getWorkDir(Thread_Free)
@@ -1118,7 +1121,9 @@ Partial Class Form1
                     '******************************************************
 
                     Child_Run += 1
-
+                
+                'Falls Simulation fertig und erfogreich
+                '--------------------------------------
                 ElseIf Sim1.launchReady(Thread_Ready, SIM_Eval_is_OK, Child_Ready)
 
                     Sim1.WorkDir = Sim1.getWorkDir(Thread_Ready)
@@ -1141,6 +1146,17 @@ Partial Class Form1
                     If Child_Ready = CES1.Settings.CES.n_Childs - 1 then Ready = true
 
                     Child_Ready += 1
+
+                'Falls Pause und alle simulierten auch verarbeitet
+                '-------------------------------------------------
+                ElseIf Me.ispause = True And Child_Ready = Child_Run then
+
+                    Me.Button_Start.Text = "Run"
+                    Do While (Me.ispause)
+                        System.Threading.Thread.Sleep(20)
+                        Application.DoEvents()
+                    Loop
+
                 Else
 
                     System.Threading.Thread.Sleep(400)
@@ -2962,9 +2978,6 @@ Start_Evolutionsrunden:
         Else If LogCPU = 4 then
             n_Threads = 6
         End If
-
-        'Hack
-        n_Threads = 3
 
     End Sub
 
