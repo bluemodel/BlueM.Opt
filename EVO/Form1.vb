@@ -2522,6 +2522,8 @@ Start_Evolutionsrunden:
         '======================================
         For Each ind As Common.Individuum In Sim1.OptResult.getSelectedSolutions()
 
+            isOK = false
+
             'Lösung per Checkbox ausgewählt?
             '-------------------------------
             If (Not checkedSolutions.Contains(ind.ID.ToString())) Then
@@ -2554,14 +2556,14 @@ Start_Evolutionsrunden:
 
             'Simulation ausführen
             'xxxxxxxxxxxxxxxxxxxx
-
             'Simulieren
             Call Sim1.launchSim(0, 0)
+            'Warten bis Thread fertig ist
             Do While Not isok
                 System.Threading.Thread.Sleep(100)
                 Sim1.launchReady(0, isok, 0)
-            Loop 
-            Call Sim1.WelDateiVerwursten()
+            Loop
+            call Sim1.WelDateiVerwursten()
 
             'Sonderfall IHA-Berechnung
             If (isIHA) Then
