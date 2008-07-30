@@ -3,6 +3,7 @@ Option Explicit On
 Imports System.IO
 Imports IHWB.EVO.Common
 Imports System.ComponentModel
+Imports System.Threading
 
 '*******************************************************************************
 '*******************************************************************************
@@ -58,6 +59,7 @@ Partial Class Form1
     '**** Multithreading ****
     Dim SIM_Eval_is_OK As Boolean
     Private n_Threads As Integer                        'Anzahl der Threads
+    Dim MI_Thread_OK as boolean = False
 
     'Dialoge
     Private WithEvents solutionDialog As SolutionDialog
@@ -1238,7 +1240,15 @@ Partial Class Form1
             'HYBRID: REPRODUKTION und MUTATION
             '*********************************
             If Method = METH_HYBRID And EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer Then
-                Call Mixed_Integer_PES(i_gen)
+                MI_Thread_OK = False
+                Dim MI_Thread As Thread
+                MI_Thread = new Thread(AddressOf Me.Mixed_Integer_PES)
+                MI_Thread.IsBackground = True
+                MI_Thread.Start(i_gen)
+                While MI_Thread_OK = False
+                    Thread.Sleep(100)
+                    Application.DoEvents
+                End While
             End If
         Next
         'Ende der Generationsschleife CES
@@ -1257,6 +1267,7 @@ Partial Class Form1
     End Sub
 
     'Mixed_Integer Teil ermittelt die PES Parameter für jedes neues Child und jede Location
+    'Achtung! wird auch als hread gestartet um weiter aufs Form zugreifen zu können
     '**************************************************************************************
     Private Sub Mixed_Integer_PES(ByVal i_gen As Integer)
 
@@ -1345,6 +1356,8 @@ Partial Class Form1
                 End If
             Next
         Next
+
+        MI_Thread_OK = True
     End Sub
 
     'Starten der PES mit der Front von CES
