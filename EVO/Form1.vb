@@ -1091,7 +1091,7 @@ Partial Class Form1
             Dim Child_Run As Integer = 0
             Dim Child_Ready As Integer = 0
             Dim Ready As Boolean = false
-            System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.BelowNormal
+            System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
 
             Do
                 'Falls eine Simulation frei und nicht Pause
@@ -2974,11 +2974,11 @@ Start_Evolutionsrunden:
         LogCPU = Environment.ProcessorCount
 
         If LogCPU = 1 then
-            n_Threads = 2
-        Else If LogCPU = 2 then
             n_Threads = 3
+        Else If LogCPU = 2 then
+            n_Threads = 4
         Else If LogCPU = 4 then
-            n_Threads = 6
+            n_Threads = 7
         End If
 
     End Sub
