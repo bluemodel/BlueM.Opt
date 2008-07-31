@@ -37,6 +37,10 @@ Public Class BlueM
     Friend IHASys As IHWB.IHA.IHAAnalysis
     Friend IHAProc As IHWB.EVO.IHAProcessor
 
+    'SKos
+    '----
+    Friend SKos1 As New SKos()
+
     '**** Multithreading ****
     Dim My_C_Thread() As CThread
     Dim MyThread() As Thread

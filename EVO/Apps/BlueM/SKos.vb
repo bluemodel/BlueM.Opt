@@ -19,7 +19,6 @@ Public Class SKos
     '*******************************************************************************
 
     Public Akt_Elemente() As String
-    Public Save_TRS(,) as String
 
     'Struktur welche Informationen der Transportstrecken entält
     '**********************************************************
@@ -118,7 +117,7 @@ Public Class SKos
 
     'Hilfsfunktion: Die "X" Einträge werden entfernt
     '***********************************************
-    Public Sub Remove_X(ByRef Array As String())
+    Private Sub Remove_X(ByRef Array As String())
         Dim x As Integer
         Dim i As Integer
         Dim TmpArray(Array.GetUpperBound(0)) As String
@@ -297,7 +296,7 @@ Public Class SKos
 
     'Volumen der Talsperren einlesen
     '*******************************
-    Public Sub Read_TAL(ByVal BlueM1 As BlueM, ByRef TAl_Array(,) As Object)
+    Private Sub Read_TAL(ByVal BlueM1 As BlueM, ByRef TAl_Array(,) As Object)
 
         'Dim TAL_Array(,) As Object = {}
         Dim Datei As String = BlueM1.WorkDir & BlueM1.Datensatz & ".TAL"
@@ -389,6 +388,15 @@ Public Class SKos
                 Next
             ElseIf Bauwerksliste(i, 0).Startswith("S") Then
 
+                'Kosten für den Aushub bei Vorland Abgrabungen
+                For j = 0 To TRS_act.GetUpperBound(0)
+                    If Bauwerksliste(i, 0) = TRS_act(j).Name Then
+                        'Kalkulation: 20€/m³
+                        Bauwerksliste(i, 1) = TRS_act(j).DeltaVolume * 20
+                        gefunden = True
+                    End If
+                Next
+
                 'Länge fürs Meandern wird nicht mehr berechnet
                 '*********************************************
                 'For j = 0 To TRS_act.GetUpperBound(0)
@@ -400,14 +408,6 @@ Public Class SKos
                 '    End If
                 'Next
 
-                'Kosten für den Aushub bei Vorland Abgrabungen
-                For j = 0 To TRS_act.GetUpperBound(0)
-                    If Bauwerksliste(i, 0) = TRS_act(j).Name Then
-                        'Kalkulation: 20€/m³
-                        Bauwerksliste(i, 1) = TRS_act(j).DeltaVolume * 20
-                        gefunden = True
-                    End If
-                Next
             End If
             If Not gefunden Then
                 Throw New Exception("Bauwerk wurde nicht in den Modellparametern gefunden")

@@ -77,8 +77,7 @@ Public MustInherit Class Sim
 
     'Kombinatorik
     '------------
-    Public SKos1 As New SKos()
-
+    
     Public Structure Struct_Massnahme
         Public Name As String
         Public Schaltung(,) As String
@@ -1005,7 +1004,7 @@ Public MustInherit Class Sim
         Akt.Path = Path
 
         'Die elemente werden an die Kostenkalkulation übergeben
-        SKos1.Akt_Elemente = Elements
+        CType(Me, IHWB.EVO.BlueM).SKos1.Akt_Elemente = Elements
 
         'Ermittelt das aktuelle_ON_OFF array
         Call Prepare_Verzweigung_ON_OFF()
