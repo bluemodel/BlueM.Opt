@@ -1271,6 +1271,8 @@ Partial Class Form1
     '**************************************************************************************
     Private Sub Mixed_Integer_PES(ByVal i_gen As Integer)
 
+        System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.BelowNormal
+
         Dim i_ch, i_loc As Integer
 
         'NDSorting für den PES Memory
