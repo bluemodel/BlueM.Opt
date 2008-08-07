@@ -154,6 +154,12 @@
     <Compile Include="Diagramm\DiagrammForm.vb">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="Diagramm\Hauptdiagramm.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Diagramm\Indicatordiagramm.vb">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Diagramm\MDBImportDialog.Designer.vb">
       <DependentUpon>MDBImportDialog.vb</DependentUpon>
     </Compile>
