@@ -66,14 +66,14 @@ Partial Class Form1
     Private WithEvents scatterplot1 As Scatterplot
 
     'Hauptdiagramm
-    Public ReadOnly Property Hauptdiagramm() As EVO.Diagramm
+    Public ReadOnly Property Hauptdiagramm() As EVO.Hauptdiagramm
         Get
             Return Me.DForm.Diag
         End Get
     End Property
 
     'Indicatordiagramm
-    Public ReadOnly Property Indicatordiagramm() As EVO.Diagramm
+    Public ReadOnly Property Indicatordiagramm() As EVO.Indicatordiagramm
         Get
             Return Me.DForm.DiagIndicator
         End Get
@@ -1137,18 +1137,18 @@ Partial Class Form1
                     'Lösung im TeeChart einzeichnen
                     '==============================
                     If (SIM_Eval_is_OK) Then 
-                        Call Me.LösungZeichnen(CES1.Childs(Child_Ready), 0, 0, i_gen, Child_Ready, ColorManagement(ColorArray, CES1.Childs(Child_Ready)))
+                        Call Me.Hauptdiagramm.ZeichneIndividuum(CES1.Childs(Child_Ready), 0, 0, i_gen, Child_Ready, ColorManagement(ColorArray, CES1.Childs(Child_Ready)))
                     End If
 
                     System.Windows.Forms.Application.DoEvents()
                     Call EVO_Opt_Verlauf1.Nachfolger(Child_Ready + 1)
-                    If Child_Ready = CES1.Settings.CES.n_Childs - 1 then Ready = true
+                    If Child_Ready = CES1.Settings.CES.n_Childs - 1 Then Ready = True
 
                     Child_Ready += 1
 
-                'Falls Pause und alle simulierten auch verarbeitet
-                '-------------------------------------------------
-                ElseIf Me.ispause = True And Child_Ready = Child_Run then
+                    'Falls Pause und alle simulierten auch verarbeitet
+                    '-------------------------------------------------
+                ElseIf Me.ispause = True And Child_Ready = Child_Run Then
 
                     Me.Button_Start.Text = "Run"
                     Do While (Me.ispause)
@@ -1159,13 +1159,13 @@ Partial Class Form1
                 Else
 
                     System.Threading.Thread.Sleep(400)
-                    Application.DoEvents
+                    Application.DoEvents()
 
                 End If
 
             Loop While Ready = False
-            
-            Stoppuhr.Stop
+
+            Stoppuhr.Stop()
             Time(i_gen) = Stoppuhr.Elapsed
 
             System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.BelowNormal
@@ -1205,12 +1205,13 @@ Partial Class Form1
                 End If
 
                 'SekPop zeichnen
-                Call PopulationZeichnen(CES1.SekundärQb)
+                Call Me.Hauptdiagramm.ZeichneSekPopulation(CES1.SekundärQb)
 
                 'Hypervolumen berechnen und zeichnen
                 '-----------------------------------
                 Call Hypervolume.update_dataset(Common.Individuum.Get_All_Penalty_of_Array(CES1.SekundärQb))
-                Call Me.HyperVolumenZeichnen(i_gen, Math.Abs(Hypervolume.calc_indicator()), Hypervolume.nadir)
+                Call Me.Hauptdiagramm.ZeichneNadirpunkt(Hypervolume.nadir)
+                Call Me.Indicatordiagramm.ZeichneHyperVolumen(i_gen, Math.Abs(Hypervolume.calc_indicator()))
             End If
             ' ^ ENDE Selectionsprozess
             'xxxxxxxxxxxxxxxxxxxxxxxxx
@@ -1239,12 +1240,12 @@ Partial Class Form1
             If Method = METH_HYBRID And EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer Then
                 MI_Thread_OK = False
                 Dim MI_Thread As Thread
-                MI_Thread = new Thread(AddressOf Me.Mixed_Integer_PES)
+                MI_Thread = New Thread(AddressOf Me.Mixed_Integer_PES)
                 MI_Thread.IsBackground = True
                 MI_Thread.Start(i_gen)
                 While MI_Thread_OK = False
                     Thread.Sleep(100)
-                    Application.DoEvents
+                    Application.DoEvents()
                 End While
             End If
         Next
@@ -1462,7 +1463,7 @@ Partial Class Form1
 
             'Evaluierung des Simulationsmodells (ToDo: Validätsprüfung fehlt)
             SIM_Eval_is_OK = Sim1.launchSim(0, 0)
-            If SIM_Eval_is_OK then Call Sim1.SIM_Ergebnis_auswerten(ind)
+            If SIM_Eval_is_OK Then Call Sim1.SIM_Ergebnis_auswerten(ind)
 
             'Lösung im TeeChart einzeichnen
             '------------------------------
@@ -1498,7 +1499,7 @@ Partial Class Form1
 
                 'Evaluierung des Simulationsmodells
                 SIM_Eval_is_OK = Sim1.launchSim(0, 0)
-                If SIM_Eval_is_OK then Call Sim1.SIM_Ergebnis_auswerten(ind)
+                If SIM_Eval_is_OK Then Call Sim1.SIM_Ergebnis_auswerten(ind)
 
                 'Lösung im TeeChart einzeichnen
                 '------------------------------
@@ -1528,7 +1529,7 @@ Partial Class Form1
 
                     'Evaluierung des Simulationsmodells
                     SIM_Eval_is_OK = Sim1.launchSim(0, 0)
-                    If SIM_Eval_is_OK then Call Sim1.SIM_Ergebnis_auswerten(ind)
+                    If SIM_Eval_is_OK Then Call Sim1.SIM_Ergebnis_auswerten(ind)
 
                     'Lösung im TeeChart einzeichnen
                     '------------------------------
@@ -1701,17 +1702,18 @@ Start_Evolutionsrunden:
                         Call OptParameter.Clone_OptPara_Array(myPara, ind(i).PES_OptParas)
 
                         'Testprobleme direkt auswerten
-                        If Anwendung = ANW_TESTPROBLEME
-                            
-                            Call Testprobleme1.Evaluierung_TestProbleme(ind(i), PES1.PES_iAkt.iAktPop, Me.Hauptdiagramm)
+                        If Anwendung = ANW_TESTPROBLEME Then
 
                             PES1.PES_iAkt.iAktNachf = i
-                            Call PES1.EsBest(ind(i))
-                        
-                            Call EVO_Opt_Verlauf1.Nachfolger(PES1.PES_iAkt.iAktNachf + 1)
 
-                            'Lösung zeichnen
-                            Call Me.LösungZeichnen(ind(i), PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, i, Color.Orange)
+                            'Lösung evaluieren und zeichnen
+                            Call Testprobleme1.Evaluierung_TestProbleme(ind(i), PES1.PES_iAkt.iAktPop, Me.Hauptdiagramm)
+
+                            'Einordnen
+                            Call PES1.EsBest(ind(i))
+
+                            'Verlauf aktualisieren
+                            Call EVO_Opt_Verlauf1.Nachfolger(PES1.PES_iAkt.iAktNachf + 1)
 
                             System.Windows.Forms.Application.DoEvents()
 
@@ -1720,23 +1722,23 @@ Start_Evolutionsrunden:
                     Next
 
                     'Simulationsanwendungen nachträglich auswerten
-                    If Anwendung = ANW_BLUEM or Anwendung = ANW_SMUSI or Anwendung = ANW_SCAN or Anwendung = ANW_SWMM then
-                        
-                        Dim Thread_Free As integer = 0
+                    If Anwendung = ANW_BLUEM Or Anwendung = ANW_SMUSI Or Anwendung = ANW_SCAN Or Anwendung = ANW_SWMM Then
+
+                        Dim Thread_Free As Integer = 0
                         Dim Thread_Ready As Integer = 0
                         Dim Child_Run As Integer = 0
                         Dim Child_Ready As Integer = 0
-                        Dim Ready As Boolean = false
+                        Dim Ready As Boolean = False
                         System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
 
                         Do
                             'Falls eine Simulation frei und nicht Pause
                             '------------------------------------------
-                            If Sim1.launchFree(Thread_Free) and Child_Run < EVO_Einstellungen1.Settings.PES.n_Nachf _
-                            and (Child_Ready + n_Threads > Child_Run) and Me.ispause = False then
+                            If Sim1.launchFree(Thread_Free) And Child_Run < EVO_Einstellungen1.Settings.PES.n_Nachf _
+                            And (Child_Ready + n_Threads > Child_Run) And Me.ispause = False Then
 
                                 Sim1.WorkDir = Sim1.getWorkDir(Thread_Free)
-                                                                
+
                                 Call Sim1.PREPARE_Evaluation_PES(ind(Child_Run).PES_OptParas)
 
                                 ' Simulation ******************************************
@@ -1744,16 +1746,16 @@ Start_Evolutionsrunden:
                                 '******************************************************
 
                                 Child_Run += 1
-                            
-                            'Falls Simulation fertig und erfogreich
-                            '--------------------------------------
-                            ElseIf Sim1.launchReady(Thread_Ready, SIM_Eval_is_OK, Child_Ready) = True And SIM_Eval_is_OK
+
+                                'Falls Simulation fertig und erfogreich
+                                '--------------------------------------
+                            ElseIf Sim1.launchReady(Thread_Ready, SIM_Eval_is_OK, Child_Ready) = True And SIM_Eval_is_OK Then
 
                                 Sim1.WorkDir = Sim1.getWorkDir(Thread_Ready)
                                 Sim1.SIM_Ergebnis_auswerten(ind(Child_Ready))
-                                
+
                                 'Lösung zeichnen
-                                Call Me.LösungZeichnen(ind(Child_Ready), PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, Child_Ready, Color.Orange)
+                                Call Me.Hauptdiagramm.ZeichneIndividuum(ind(Child_Ready), PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, Child_Ready, Color.Orange)
 
                                 'SELEKTIONSPROZESS Schritt 1
                                 '###########################
@@ -1761,38 +1763,38 @@ Start_Evolutionsrunden:
                                 'Falls MO Einordnen der Qualitätsfunktion in NDSorting
                                 PES1.PES_iAkt.iAktNachf = Child_Ready
                                 Call PES1.EsBest(ind(Child_Ready))
-                                
+
                                 Call EVO_Opt_Verlauf1.Nachfolger(Child_Ready + 1)
                                 System.Windows.Forms.Application.DoEvents()
 
-                                If Child_Ready = EVO_Einstellungen1.Settings.PES.n_Nachf - 1 then Ready = true
+                                If Child_Ready = EVO_Einstellungen1.Settings.PES.n_Nachf - 1 Then Ready = True
                                 Child_Ready += 1
 
-                            'Falls Simulation fertig aber nicht erfolgreich
-                            '----------------------------------------------
-                            ElseIf Sim1.launchReady(Thread_Ready, SIM_Eval_is_OK, Child_Ready) = False And SIM_Eval_is_OK = false
+                                'Falls Simulation fertig aber nicht erfolgreich
+                                '----------------------------------------------
+                            ElseIf Sim1.launchReady(Thread_Ready, SIM_Eval_is_OK, Child_Ready) = False And SIM_Eval_is_OK = False Then
 
                                 ReDim Preserve Child_False(Child_False.GetLength(0))
                                 Child_False(Child_False.GetUpperBound(0)) = Child_Ready
 
-                                If Child_Ready = EVO_Einstellungen1.Settings.PES.n_Nachf - 1 then Ready = true
+                                If Child_Ready = EVO_Einstellungen1.Settings.PES.n_Nachf - 1 Then Ready = True
                                 Child_Ready += 1
-                            
-                            'Falls Pause und alle simulierten auch verarbeitet
-                            '-------------------------------------------------
-                            ElseIf Me.ispause = True And Child_Ready = Child_Run then
+
+                                'Falls Pause und alle simulierten auch verarbeitet
+                                '-------------------------------------------------
+                            ElseIf Me.ispause = True And Child_Ready = Child_Run Then
 
                                 Me.Button_Start.Text = "Run"
                                 Do While (Me.ispause)
                                     System.Threading.Thread.Sleep(20)
                                     Application.DoEvents()
                                 Loop
-        
-                            'Falls total im Stress
-                            '---------------------
+
+                                'Falls total im Stress
+                                '---------------------
                             Else
                                 System.Threading.Thread.Sleep(400)
-                                Application.DoEvents
+                                Application.DoEvents()
 
                             End If
 
@@ -1802,7 +1804,7 @@ Start_Evolutionsrunden:
 
                     'Do Schleife: Um Modellfehler bzw. Evaluierungsabbrüche abzufangen
                     If Child_False.GetLength(0) > -1 Then
-                        For i = 0 to Child_False.GetUpperBound(0)
+                        For i = 0 To Child_False.GetUpperBound(0)
                             Dim Eval_Count As Integer = 0
                             Do
                                 Call PES1.EsReproduktion()
@@ -1819,16 +1821,16 @@ Start_Evolutionsrunden:
                                     System.Threading.Thread.Sleep(400)
                                     System.Windows.Forms.Application.DoEvents()
                                 End While
-                                                                
+
                                 'Lösung auswerten und zeichnen
                                 If SIM_Eval_is_OK Then
                                     Call Sim1.SIM_Ergebnis_auswerten(ind(Child_False(i)))
-                                    Call Me.LösungZeichnen(ind(Child_False(i)), PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, Child_False(i), Color.Orange)
+                                    Call Me.Hauptdiagramm.ZeichneIndividuum(ind(Child_False(i)), PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, Child_False(i), Color.Orange)
                                 End If
 
                                 PES1.PES_iAkt.iAktNachf = Child_False(i)
                                 Call PES1.EsBest(ind(Child_False(i)))
-                                
+
                                 Call EVO_Opt_Verlauf1.Nachfolger(Child_False(i) + 1)
                                 System.Windows.Forms.Application.DoEvents()
 
@@ -1857,21 +1859,22 @@ Start_Evolutionsrunden:
 
                         'SekPop zeichnen
                         '---------------
-                        Call PopulationZeichnen(PES1.SekundärQb)
+                        Call Me.Hauptdiagramm.ZeichneSekPopulation(PES1.SekundärQb)
 
                         'Hypervolumen berechnen und Zeichnen
                         '-----------------------------------
                         Call Hypervolume.update_dataset(Common.Individuum.Get_All_Penalty_of_Array(PES1.SekundärQb))
-                        Call Me.HyperVolumenZeichnen(PES1.PES_iAkt.iAktGen, Math.Abs(Hypervolume.calc_indicator()), Hypervolume.nadir)
+                        Call Me.Hauptdiagramm.ZeichneNadirpunkt(Hypervolume.nadir)
+                        Call Me.Indicatordiagramm.ZeichneHyperVolumen(PES1.PES_iAkt.iAktGen, Math.Abs(Hypervolume.calc_indicator()))
 
                     End If
 
                     'ggf. alte Generation im Diagramm löschen
                     If (Me.Options.showOnlyCurrentPop _
                         And PES1.PES_iAkt.iAktGen < EVO_Einstellungen1.Settings.PES.n_Gen - 1) Then
-                        Call Me.ClearLastGeneration(PES1.PES_iAkt.iAktPop)
+                        Call Me.Hauptdiagramm.LöscheLetzteGeneration(PES1.PES_iAkt.iAktPop)
                     End If
-                    
+
                     Call EVO_Opt_Verlauf1.Generation(PES1.PES_iAkt.iAktGen + 1)
                     System.Windows.Forms.Application.DoEvents()
 
@@ -1906,150 +1909,6 @@ Start_Evolutionsrunden:
 
     'Diagrammfunktionen
     '###################
-
-    'Zeichenfunktionen
-    'XXXXXXXXXXXXXXXXX
-
-    'Lösung im Hauptdiagramm eintragen
-    '**********************************
-    Private Sub LösungZeichnen(ByVal ind As Common.Individuum, ByVal runde As Integer, ByVal pop As Integer, ByVal gen As Integer, ByVal nachf As Integer, _
-                               ByVal Farbe As Color, Optional ByVal ColEach As Boolean = False)
-
-        Dim serie As Steema.TeeChart.Styles.Series
-
-        If (Common.Manager.AnzPenalty = 1) Then
-            'SingleObjective
-            'xxxxxxxxxxxxxxx
-            If (Not ind.Is_Feasible) Then
-                serie = Me.Hauptdiagramm.getSeriesPoint("Population " & (pop + 1).ToString() & " (ungültig)", "Gray", , , ColEach)
-            Else
-                serie = Me.Hauptdiagramm.getSeriesPoint("Population " & (pop + 1).ToString(), , , , ColEach)
-            End If
-            Call serie.Add(runde * EVO_Einstellungen1.Settings.PES.n_Gen * EVO_Einstellungen1.Settings.PES.n_Nachf + gen * EVO_Einstellungen1.Settings.PES.n_Nachf + nachf, ind.Penalties(0), ind.ID.ToString())
-
-        Else
-            'MultiObjective
-            'xxxxxxxxxxxxxx
-            If (Common.Manager.AnzPenalty = 2) Then
-                '2D-Diagramm
-                '------------------------------------------------------------------------
-                If (Not ind.Is_Feasible) Then
-                    serie = Me.Hauptdiagramm.getSeriesPoint("Population" & " (ungültig)", "Gray", , , ColEach)
-                Else
-                    serie = Me.Hauptdiagramm.getSeriesPoint("Population", "Orange", , , ColEach)
-                End If
-                Call serie.Add(ind.Penalties(0), ind.Penalties(1), ind.ID.ToString(), Farbe)
-
-            Else
-                '3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
-                '------------------------------------------------------------------------
-                Dim serie3D As Steema.TeeChart.Styles.Points3D
-                If (Not ind.Is_Feasible) Then
-                    serie3D = Me.Hauptdiagramm.getSeries3DPoint("Population" & " (ungültig)", "Gray", , , ColEach)
-                Else
-                    serie3D = Me.Hauptdiagramm.getSeries3DPoint("Population", "Orange", , , ColEach)
-                End If
-                Call serie3D.Add(ind.Penalties(0), ind.Penalties(1), ind.Penalties(2), ind.ID.ToString(), Farbe)
-            End If
-        End If
-    End Sub
-
-    'Population zeichnen
-    '*******************
-    Private Sub PopulationZeichnen(ByVal pop() As Common.Individuum)
-
-        Dim i As Short
-        Dim serie As Steema.TeeChart.Styles.Series
-        Dim serie3D As Steema.TeeChart.Styles.Points3D
-        Dim values(,) As Double
-
-        'Population in Array von Penalties transformieren
-        values = Common.Individuum.Get_All_Penalty_of_Array(pop)
-
-        If (Common.Manager.AnzPenalty = 2) Then
-            '2 Zielfunktionen
-            '----------------------------------------------------------------
-            serie = Me.Hauptdiagramm.getSeriesPoint("Sekundäre Population", "Green")
-            serie.Clear()
-            For i = 0 To values.GetUpperBound(0)
-                serie.Add(values(i, 0), values(i, 1))
-            Next i
-
-        ElseIf (Common.Manager.AnzPenalty >= 3) Then
-            '3 oder mehr Zielfunktionen (es werden die ersten drei angezeigt)
-            '----------------------------------------------------------------
-            serie3D = Me.Hauptdiagramm.getSeries3DPoint("Sekundäre Population", "Green")
-            serie3D.Clear()
-            For i = 0 To values.GetUpperBound(0)
-                serie3D.Add(values(i, 0), values(i, 1), values(i, 2))
-            Next i
-        End If
-
-    End Sub
-
-    'Ergebnisse der Hypervolumenberechnung anzeigen
-    '**********************************************
-    Private Sub HyperVolumenZeichnen(ByVal gen As Integer, ByVal indicator As Double, ByVal nadir() As Double)
-
-        'Indicator in Indikatordiagramm eintragen
-        Dim serie1 As Steema.TeeChart.Styles.Line
-        serie1 = Me.Indicatordiagramm.getSeriesLine("Hypervolume")
-        serie1.Add(gen, indicator, gen.ToString())
-
-        'Nadirpunkt in Hauptdiagramm anzeigen
-        If (Common.Manager.AnzPenalty = 2) Then
-            '2D
-            '--
-            Dim serie2 As Steema.TeeChart.Styles.Points
-            serie2 = Me.Hauptdiagramm.getSeriesPoint("Nadirpunkt", "Blue", Steema.TeeChart.Styles.PointerStyles.Diamond)
-            serie2.Clear()
-            serie2.Add(nadir(0), nadir(1), "Nadirpunkt")
-        Else
-            '3D
-            '--
-            Dim serie3 As Steema.TeeChart.Styles.Points3D
-            serie3 = Me.Hauptdiagramm.getSeries3DPoint("Nadirpunkt", "Blue", Steema.TeeChart.Styles.PointerStyles.Diamond)
-            serie3.Clear()
-            serie3.Add(nadir(0), nadir(1), nadir(2), "Nadirpunkt")
-        End If
-
-    End Sub
-
-    'Alte Generation im Hauptdiagramm löschen
-    '****************************************
-    Private Sub ClearLastGeneration(ByVal pop As Integer)
-
-        Dim serie As Steema.TeeChart.Styles.Series
-
-        If (Common.Manager.AnzPenalty = 1) Then
-            'SingleObjective
-            'xxxxxxxxxxxxxxx
-            serie = Me.Hauptdiagramm.getSeriesPoint("Population " & (pop + 1).ToString() & " (ungültig)", "Gray")
-            serie.Clear()
-            serie = Me.Hauptdiagramm.getSeriesPoint("Population " & (pop + 1).ToString())
-            serie.Clear()
-        Else
-            'MultiObjective
-            'xxxxxxxxxxxxxx
-            If (Common.Manager.AnzPenalty = 2) Then
-                '2D-Diagramm
-                '------------------------------------------------------------------------
-                serie = Me.Hauptdiagramm.getSeriesPoint("Population (ungültig)", "Gray")
-                serie.Clear()
-                serie = Me.Hauptdiagramm.getSeriesPoint("Population", "Orange")
-                serie.Clear()
-            Else
-                '3D-Diagramm
-                '-----------
-                Dim serie3D As Steema.TeeChart.Styles.Points3D
-                serie3D = Me.Hauptdiagramm.getSeries3DPoint("Population (ungültig)", "Gray")
-                serie3D.Clear()
-                serie3D = Me.Hauptdiagramm.getSeries3DPoint("Population", "Orange")
-                serie3D.Clear()
-            End If
-        End If
-
-    End Sub
 
     'Hauptdiagramm vorbereiten
     '*************************
@@ -2090,14 +1949,14 @@ Start_Evolutionsrunden:
                             'Achsen:
                             '-------
                             'X-Achse = QWert
-                            Achse.Name = Common.Manager.List_OptZiele(SensiPlot1.Selected_OptZiel).Bezeichnung
-                            Achse.Auto = True
-                            Achse.Max = 0
+                            Achse.Title = Common.Manager.List_OptZiele(SensiPlot1.Selected_OptZiel).Bezeichnung
+                            Achse.Automatic = True
+                            Achse.Maximum = 0
                             Achsen.Add(Achse)
                             'Y-Achse = OptParameter
-                            Achse.Name = Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Bezeichnung
-                            Achse.Auto = True
-                            Achse.Max = 0
+                            Achse.Title = Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Bezeichnung
+                            Achse.Automatic = True
+                            Achse.Maximum = 0
                             Achsen.Add(Achse)
 
                             'Achsenzuordnung
@@ -2118,19 +1977,19 @@ Start_Evolutionsrunden:
                             'Achsen:
                             '-------
                             'X-Achse = OptParameter1
-                            Achse.Name = Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Bezeichnung
-                            Achse.Auto = True
-                            Achse.Max = 0
+                            Achse.Title = Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Bezeichnung
+                            Achse.Automatic = True
+                            Achse.Maximum = 0
                             Achsen.Add(Achse)
                             'Y-Achse = QWert
-                            Achse.Name = Common.Manager.List_OptZiele(SensiPlot1.Selected_OptZiel).Bezeichnung
-                            Achse.Auto = True
-                            Achse.Max = 0
+                            Achse.Title = Common.Manager.List_OptZiele(SensiPlot1.Selected_OptZiel).Bezeichnung
+                            Achse.Automatic = True
+                            Achse.Maximum = 0
                             Achsen.Add(Achse)
                             'Z-Achse = OptParameter2
-                            Achse.Name = Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Bezeichnung
-                            Achse.Auto = True
-                            Achse.Max = 0
+                            Achse.Title = Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Bezeichnung
+                            Achse.Automatic = True
+                            Achse.Maximum = 0
                             Achsen.Add(Achse)
 
                             'Achsenzuordnung
@@ -2147,7 +2006,7 @@ Start_Evolutionsrunden:
                         End If
 
                         'Diagramm initialisieren
-                        Call Me.Hauptdiagramm.DiagInitialise(Anwendung, Achsen)
+                        Call Me.Hauptdiagramm.DiagInitialise(Anwendung, Achsen, Me.EVO_Einstellungen1.Settings)
 
 
                     Case Else 'PES, CES, CES + PES, HYBRID, HOOK & JEEVES
@@ -2162,23 +2021,23 @@ Start_Evolutionsrunden:
 
                             'X-Achse (Nr. der Simulation (Durchlauf))
                             '----------------------------------------
-                            Achse.Name = "Simulation"
-                            Achse.Auto = False
+                            Achse.Title = "Simulation"
+                            Achse.Automatic = False
                             If (Form1.Method = METH_PES) Then
                                 'Bei PES:
                                 If (EVO_Einstellungen1.Settings.PES.Pop.is_POPUL) Then
-                                    Achse.Max = EVO_Einstellungen1.Settings.PES.n_Gen * EVO_Einstellungen1.Settings.PES.n_Nachf * EVO_Einstellungen1.Settings.PES.Pop.n_Runden + 1
+                                    Achse.Maximum = EVO_Einstellungen1.Settings.PES.n_Gen * EVO_Einstellungen1.Settings.PES.n_Nachf * EVO_Einstellungen1.Settings.PES.Pop.n_Runden + 1
                                 Else
-                                    Achse.Max = EVO_Einstellungen1.Settings.PES.n_Gen * EVO_Einstellungen1.Settings.PES.n_Nachf + 1
+                                    Achse.Maximum = EVO_Einstellungen1.Settings.PES.n_Gen * EVO_Einstellungen1.Settings.PES.n_Nachf + 1
                                 End If
 
                             ElseIf (Form1.Method = METH_HOOKJEEVES) Then
                                 'Bei Hooke & Jeeves:
-                                Achse.Auto = True
+                                Achse.Automatic = True
 
                             Else
                                 'Bei CES etc.:
-                                Achse.Max = EVO_Einstellungen1.Settings.CES.n_Childs * EVO_Einstellungen1.Settings.CES.n_Generations
+                                Achse.Maximum = EVO_Einstellungen1.Settings.CES.n_Childs * EVO_Einstellungen1.Settings.CES.n_Generations
                             End If
 
                             Achsen.Add(Achse)
@@ -2187,9 +2046,9 @@ Start_Evolutionsrunden:
                             '-----------------------------------------
                             For i = 0 To Common.Manager.AnzZiele - 1
                                 If (Common.Manager.List_Ziele(i).isOpt) Then
-                                    Achse.Name = Common.Manager.List_Ziele(i).Bezeichnung
-                                    Achse.Auto = True
-                                    Achse.Max = 0
+                                    Achse.Title = Common.Manager.List_Ziele(i).Bezeichnung
+                                    Achse.Automatic = True
+                                    Achse.Maximum = 0
                                     Achsen.Add(Achse)
                                     Exit For 'Abbruch nach erstem OptZiel
                                 End If
@@ -2212,9 +2071,9 @@ Start_Evolutionsrunden:
                             j = 0
                             For i = 0 To Common.Manager.AnzZiele - 1
                                 If (Common.Manager.List_Ziele(i).isOpt) Then
-                                    Achse.Name = Common.Manager.List_Ziele(i).Bezeichnung
-                                    Achse.Auto = True
-                                    Achse.Max = 0
+                                    Achse.Title = Common.Manager.List_Ziele(i).Bezeichnung
+                                    Achse.Automatic = True
+                                    Achse.Maximum = 0
                                     Achsen.Add(Achse)
                                     tmpZielindex(j) = i
                                     j += 1
@@ -2237,17 +2096,17 @@ Start_Evolutionsrunden:
                         End If
 
                         'Diagramm initialisieren
-                        Call Me.Hauptdiagramm.DiagInitialise(Anwendung, Achsen)
+                        Call Me.Hauptdiagramm.DiagInitialise(Anwendung, Achsen, Me.EVO_Einstellungen1.Settings)
 
                         'IstWerte in Diagramm einzeichnen
-                        Call Me.drawIstWerte()
+                        Call Me.Hauptdiagramm.ZeichneIstWerte()
 
                 End Select
 
         End Select
 
-        'Bei MultiObjective: 
-        '-------------------
+        'Bei MultiObjective zusätzlich: 
+        '------------------------------
         If (Common.Manager.AnzPenalty > 1 _
             And Form1.Method <> METH_SENSIPLOT) Then
 
@@ -2259,57 +2118,6 @@ Start_Evolutionsrunden:
         End If
 
         Call Application.DoEvents()
-
-    End Sub
-
-    'IstWerte im Hauptdiagramm darstellen
-    '************************************
-    Private Sub drawIstWerte()
-
-        'Hinweis:
-        'Die Zuordnung von Achsen zu Zielfunktionen 
-        'muss im Diagramm bereits hinterlegt sein!
-        '-------------------------------------------
-
-        Dim colorline1 As Steema.TeeChart.Tools.ColorLine
-
-        'X-Achse:
-        If (Me.Hauptdiagramm.ZielIndexX <> -1) Then
-            If (Common.Manager.List_Ziele(Me.Hauptdiagramm.ZielIndexX).hasIstWert) Then
-                colorline1 = New Steema.TeeChart.Tools.ColorLine(Me.Hauptdiagramm.Chart)
-                colorline1.Pen.Color = Color.Red
-                colorline1.AllowDrag = False
-                colorline1.Draw3D = True
-                colorline1.Axis = Me.Hauptdiagramm.Axes.Bottom
-                colorline1.Value = Common.Manager.List_Ziele(Me.Hauptdiagramm.ZielIndexX).IstWert
-            End If
-        End If
-
-        'Y-Achse:
-        If (Me.Hauptdiagramm.ZielIndexY <> -1) Then
-            If (Common.Manager.List_Ziele(Me.Hauptdiagramm.ZielIndexY).hasIstWert) Then
-                colorline1 = New Steema.TeeChart.Tools.ColorLine(Me.Hauptdiagramm.Chart)
-                colorline1.Pen.Color = Color.Red
-                colorline1.AllowDrag = False
-                colorline1.Draw3D = True
-                colorline1.Axis = Me.Hauptdiagramm.Axes.Left
-                colorline1.Value = Common.Manager.List_Ziele(Me.Hauptdiagramm.ZielIndexY).IstWert
-            End If
-        End If
-
-        'Z-Achse:
-        If (Me.Hauptdiagramm.ZielIndexZ <> -1) Then
-            If (Common.Manager.List_Ziele(Me.Hauptdiagramm.ZielIndexZ).hasIstWert) Then
-                'BUG 317: ColorLine auf Depth-Axis geht nicht!
-                MsgBox("Der IstWert auf der Z-Achse (" & Common.Manager.List_Ziele(Me.Hauptdiagramm.ZielIndexZ).Bezeichnung & ") kann leider nicht angezeigt werden (Bug 317)", MsgBoxStyle.Information, "Info")
-                'colorline1 = New Steema.TeeChart.Tools.ColorLine(Me.Hauptdiagramm.Chart)
-                'colorline1.Pen.Color = Color.Red
-                'colorline1.AllowDrag = False
-                'colorline1.Draw3D = True
-                'colorline1.Axis = Me.Hauptdiagramm.Axes.Depth
-                'colorline1.Value = Common.Manager.List_Ziele(Me.Hauptdiagramm.ZielIndexZ).IstWert
-            End If
-        End If
 
     End Sub
 
@@ -2458,7 +2266,7 @@ Start_Evolutionsrunden:
             Call Me.solutionDialog.addSolution(ind)
 
             'Lösung im Hauptdiagramm anzeigen
-            Call Me.Hauptdiagramm.showSelectedSolution(ind)
+            Call Me.Hauptdiagramm.ZeichneAusgewählteLösung(ind)
 
             'Lösung im Scatterplot anzeigen
             If (Not IsNothing(Me.scatterplot1)) Then
@@ -2481,7 +2289,7 @@ Start_Evolutionsrunden:
 
         'Im Hauptdiagramm
         '----------------
-        Call Me.Hauptdiagramm.clearSelection()
+        Call Me.Hauptdiagramm.LöscheAusgewählteLösungen()
 
         'In der Scatterplot-Matrix
         '-------------------------
@@ -2499,7 +2307,7 @@ Start_Evolutionsrunden:
     '****************************************************
     Public Sub showWave(ByVal checkedSolutions As Collection)
 
-        Dim isOK As Boolean = false
+        Dim isOK As Boolean = False
         Dim isIHA As Boolean
 
         Dim zre As Wave.Zeitreihe
@@ -2534,7 +2342,7 @@ Start_Evolutionsrunden:
         '======================================
         For Each ind As Common.Individuum In Sim1.OptResult.getSelectedSolutions()
 
-            isOK = false
+            isOK = False
 
             'Lösung per Checkbox ausgewählt?
             '-------------------------------
@@ -2575,7 +2383,7 @@ Start_Evolutionsrunden:
                 System.Threading.Thread.Sleep(100)
                 Sim1.launchReady(0, isok, 0)
             Loop
-            call Sim1.WelDateiVerwursten()
+            Call Sim1.WelDateiVerwursten()
 
             'Sonderfall IHA-Berechnung
             If (isIHA) Then
@@ -2709,28 +2517,28 @@ Start_Evolutionsrunden:
                 '------
                 Dim Achsen As New Collection
                 Dim tmpAchse As EVO.Diagramm.Achse
-                tmpAchse.Auto = True
+                tmpAchse.Automatic = True
                 If (Me.Hauptdiagramm.ZielIndexZ = -1 And Me.Hauptdiagramm.ZielIndexY = -1) Then
                     'Single-objective
                     '----------------
                     'X-Achse
-                    tmpAchse.Name = "Simulation"
+                    tmpAchse.Title = "Simulation"
                     Achsen.Add(tmpAchse)
                     'Y-Achse
-                    tmpAchse.Name = Common.Manager.List_Ziele(Me.Hauptdiagramm.ZielIndexX).Bezeichnung
+                    tmpAchse.Title = Common.Manager.List_Ziele(Me.Hauptdiagramm.ZielIndexX).Bezeichnung
                     Achsen.Add(tmpAchse)
                 Else
                     'Multi-objective
                     '---------------
                     'X-Achse
-                    tmpAchse.Name = Common.Manager.List_Ziele(Me.Hauptdiagramm.ZielIndexX).Bezeichnung
+                    tmpAchse.Title = Common.Manager.List_Ziele(Me.Hauptdiagramm.ZielIndexX).Bezeichnung
                     Achsen.Add(tmpAchse)
                     'Y-Achse
-                    tmpAchse.Name = Common.Manager.List_Ziele(Me.Hauptdiagramm.ZielIndexY).Bezeichnung
+                    tmpAchse.Title = Common.Manager.List_Ziele(Me.Hauptdiagramm.ZielIndexY).Bezeichnung
                     Achsen.Add(tmpAchse)
                     If (Not Me.Hauptdiagramm.ZielIndexZ = -1) Then
                         'Z-Achse
-                        tmpAchse.Name = Common.Manager.List_Ziele(Me.Hauptdiagramm.ZielIndexZ).Bezeichnung
+                        tmpAchse.Title = Common.Manager.List_Ziele(Me.Hauptdiagramm.ZielIndexZ).Bezeichnung
                         Achsen.Add(tmpAchse)
                     End If
                 End If
@@ -2738,10 +2546,10 @@ Start_Evolutionsrunden:
                 'Diagramm initialisieren
                 '-----------------------
                 Me.Hauptdiagramm.Clear()
-                Me.Hauptdiagramm.DiagInitialise(Path.GetFileName(sourceFile), Achsen)
+                Me.Hauptdiagramm.DiagInitialise(Path.GetFileName(sourceFile), Achsen, Me.EVO_Einstellungen1.Settings)
 
                 'IstWerte in Diagramm einzeichnen
-                Call Me.drawIstWerte()
+                Call Me.Hauptdiagramm.ZeichneIstWerte()
 
                 Call My.Application.DoEvents()
 
@@ -2842,7 +2650,8 @@ Start_Evolutionsrunden:
                         nadir = Hypervolume.nadir
 
                         'Hypervolumen zeichnen
-                        Call Me.HyperVolumenZeichnen(sekpop.iGen, indicator, nadir)
+                        Call Me.Hauptdiagramm.ZeichneNadirpunkt(nadir)
+                        Call Me.Indicatordiagramm.ZeichneHyperVolumen(sekpop.iGen, indicator)
 
                         Call My.Application.DoEvents()
 

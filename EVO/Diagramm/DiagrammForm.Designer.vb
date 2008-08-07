@@ -27,10 +27,10 @@ Partial Class DiagrammForm
         Me.Button_TChart2Excel = New System.Windows.Forms.Button
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
-        Me.DiagIndicator = New IHWB.EVO.Diagramm
+        Me.DiagIndicator = New IHWB.EVO.Indicatordiagramm
         Me.Line_Hypervolume = New Steema.TeeChart.Styles.Line
         Me.MarksTip_Hypervolume = New Steema.TeeChart.Tools.MarksTip
-        Me.Diag = New IHWB.EVO.Diagramm
+        Me.Diag = New IHWB.EVO.Hauptdiagramm
         Me.GroupBox_TChartButtons.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -431,7 +431,7 @@ Partial Class DiagrammForm
         Me.ResumeLayout(False)
 
     End Sub
-    Friend WithEvents Diag As EVO.Diagramm
+    Friend WithEvents Diag As EVO.Hauptdiagramm
     Friend WithEvents GroupBox_TChartButtons As System.Windows.Forms.GroupBox
     Friend WithEvents Button_TChartEdit As System.Windows.Forms.Button
     Friend WithEvents Button_TChart2PNG As System.Windows.Forms.Button
@@ -439,7 +439,7 @@ Partial Class DiagrammForm
     Friend WithEvents Button_TChart2Excel As System.Windows.Forms.Button
     Friend WithEvents SaveFileDialog1 As System.Windows.Forms.SaveFileDialog
     Friend WithEvents ToolTip1 As System.Windows.Forms.ToolTip
-    Friend WithEvents DiagIndicator As EVO.Diagramm
+    Friend WithEvents DiagIndicator As EVO.Indicatordiagramm
     Friend WithEvents Line_Hypervolume As Steema.TeeChart.Styles.Line
     Friend WithEvents MarksTip_Hypervolume As Steema.TeeChart.Tools.MarksTip
 

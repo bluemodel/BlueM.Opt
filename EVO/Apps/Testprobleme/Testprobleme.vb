@@ -257,27 +257,27 @@ Public Class Testprobleme
 
     'Diagramm initialisieren
     '***********************
-    Public Sub DiagInitialise(ByVal PES_Settings As Common.EVO_Settings, ByRef Diag As EVO.Diagramm)
+    Public Sub DiagInitialise(ByRef rSettings As Common.EVO_Settings, ByRef Diag As EVO.Diagramm)
 
         Select Case Me.selectedTestproblem
 
             Case TP_SinusFunktion
-                Call Me.DiagInitialise_SinusFunktion(Diag)
+                Call Me.DiagInitialise_SinusFunktion(rSettings, Diag)
 
             Case TP_BealeProblem 'x1 = [-5;5], x2=[-2;2]
-                Call Me.DiagInitialise_BealeProblem(PES_Settings, Diag)
+                Call Me.DiagInitialise_BealeProblem(rSettings, Diag)
 
             Case TP_Schwefel24Problem 'xi = [-10,10]
-                Call Me.DiagInitialise_SchwefelProblem(PES_Settings, Diag)
+                Call Me.DiagInitialise_SchwefelProblem(rSettings, Diag)
 
             Case TP_Box
-                Call Me.DiagInitialise_3D_Box(PES_Settings, Diag)
+                Call Me.DiagInitialise_3D_Box(rSettings, Diag)
 
             Case TP_AbhängigeParameter
-                Call Me.DiagInitialise_AbhParameter(PES_Settings, Diag)
+                Call Me.DiagInitialise_AbhParameter(rSettings, Diag)
 
             Case Else
-                Call Me.DiagInitialise_MultiTestProb(PES_Settings, Diag)
+                Call Me.DiagInitialise_MultiTestProb(rSettings, Diag)
 
         End Select
 
@@ -285,53 +285,60 @@ Public Class Testprobleme
 
     'Diagramm für Sinus-Funktion initialisieren
     '*******************************************
-    Private Sub DiagInitialise_SinusFunktion(ByRef Diag As EVO.Diagramm)
+    Private Sub DiagInitialise_SinusFunktion(ByRef rSettings As Common.EVO_Settings, ByRef Diag As EVO.Hauptdiagramm)
 
-        Dim array_x() As Double = {}
-        Dim array_y() As Double = {}
+        Dim array_x() As Double
+        Dim array_y() As Double
         Dim i As Short
         Dim Unterteilung_X As Double
         Dim serie As Steema.TeeChart.Styles.Series
+        Dim achsen As Collection
+        Dim achse As Diagramm.Achse
 
-        'TeeChart Einrichten und Series generieren
-        With Diag
-            .Clear()
-            .Header.Text = "Sinus Funktion"
-            .Chart.Axes.Left.Title.Caption = "Y-Wert"
-            .Chart.Axes.Bottom.Title.Caption = "X-Wert"
-            .Aspect.View3D = False
-            .Legend.Visible = False
+        'Achsen vorbereiten
+        '------------------
+        achsen = New Collection()
 
-            'Axen Formatieren
-            .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Maximum = 2 * Math.PI
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Bottom.Increment = Math.PI
-            .Chart.Axes.Left.Automatic = False
-            .Chart.Axes.Left.Minimum = -1
-            .Chart.Axes.Left.Maximum = 1
-            .Chart.Axes.Left.Increment = 0.2
+        'X-Achse
+        achse.Title = "X-Wert"
+        achse.Automatic = False
+        achse.Minimum = 0
+        achse.Maximum = 2 * Math.PI
+        achse.Increment = Math.PI
+        achsen.Add(achse)
 
-            'Sinuslinie zeichnen
-            Unterteilung_X = 2 * Math.PI / (Me.mAnzParameter - 1)
+        'Y-Achse
+        achse.Title = "Y-Wert"
+        achse.Automatic = False
+        achse.Minimum = -1
+        achse.Maximum = 1
+        achse.Increment = 0.2
+        achsen.Add(achse)
 
-            ReDim array_x(Me.mAnzParameter - 1)
-            ReDim array_y(Me.mAnzParameter - 1)
+        'Diagramm initialisieren
+        '-----------------------
+        Call Diag.DiagInitialise("Sinus Funktion", achsen, rSettings)
 
-            For i = 0 To Me.mAnzParameter - 1
-                array_x(i) = Math.Round(i * Unterteilung_X, 2)
-                array_y(i) = Math.Sin(i * Unterteilung_X)
-            Next i
+        'Sinuslinie zeichnen
+        '-------------------
+        Unterteilung_X = 2 * Math.PI / (Me.mAnzParameter - 1)
 
-            serie = .getSeriesLine("Sinusfunktion", "Green")
-            serie.Add(array_x, array_y)
+        ReDim array_x(Me.mAnzParameter - 1)
+        ReDim array_y(Me.mAnzParameter - 1)
 
-        End With
+        For i = 0 To Me.mAnzParameter - 1
+            array_x(i) = Math.Round(i * Unterteilung_X, 2)
+            array_y(i) = Math.Sin(i * Unterteilung_X)
+        Next i
+
+        serie = Diag.getSeriesLine("Sinusfunktion", "Green")
+        Call serie.Add(array_x, array_y)
+
     End Sub
 
     'Diagramm für Beale-Problem initialisieren
     '*****************************************
-    Private Sub DiagInitialise_BealeProblem(ByVal PES_Settings As Common.EVO_Settings, ByRef Diag As EVO.Diagramm)
+    Private Sub DiagInitialise_BealeProblem(ByRef rSettings As Common.EVO_Settings, ByRef Diag As EVO.Hauptdiagramm)
 
         Dim array_x() As Double = {}
         Dim array_y() As Double = {}
@@ -339,51 +346,55 @@ Public Class Testprobleme
         Dim Anzahl_Kalkulationen As Integer
         Dim i As Short
         Dim serie As Steema.TeeChart.Styles.Series
+        Dim achsen As Collection
+        Dim achse As Diagramm.Achse
 
-        If (PES_Settings.PES.Pop.is_POPUL) Then
-            Anzahl_Kalkulationen = PES_Settings.PES.n_Gen * PES_Settings.PES.n_Nachf * PES_Settings.PES.Pop.n_Runden + 1
+        If (rSettings.PES.Pop.is_POPUL) Then
+            Anzahl_Kalkulationen = rSettings.PES.n_Gen * rSettings.PES.n_Nachf * rSettings.PES.Pop.n_Runden + 1
         Else
-            Anzahl_Kalkulationen = PES_Settings.PES.n_Gen * PES_Settings.PES.n_Nachf + 1
+            Anzahl_Kalkulationen = rSettings.PES.n_Gen * rSettings.PES.n_Nachf + 1
         End If
 
         'Ausgangswert berechnen
         Ausgangswert = (1.5 - 0.5 * (1 - 0.5)) ^ 2 + (2.25 - 0.5 * (1 - 0.5) ^ 2) ^ 2 + (2.625 - 0.5 * (1 - 0.5) ^ 3) ^ 2
 
-        'TeeChart Einrichten und Linien zeichnen
-        With Diag
-            .Clear()
-            .Header.Text = "Beale Problem"
-            .Chart.Axes.Left.Title.Caption = "Funktionswert"
-            .Chart.Axes.Bottom.Title.Caption = "Berechnungsschritt"
-            .Aspect.View3D = False
-            .Legend.Visible = False
+        'Achsen
+        '------
+        achsen = New Collection()
 
-            'Axen Formatieren
-            .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Maximum = Anzahl_Kalkulationen
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Left.Automatic = False
-            .Chart.Axes.Left.Maximum = Ausgangswert * 1.3
-            .Chart.Axes.Left.Minimum = 0
+        'X-Achse
+        achse.Title = "Berechnungsschritt"
+        achse.Automatic = False
+        achse.Minimum = 0
+        achse.Maximum = Anzahl_Kalkulationen
+        Call achsen.Add(achse)
 
-            'Linie für den Ausgangswert berechnen
-            ReDim array_y(Anzahl_Kalkulationen - 1)
-            ReDim array_x(Anzahl_Kalkulationen - 1)
-            For i = 0 To Anzahl_Kalkulationen - 1
-                array_y(i) = Ausgangswert
-                array_x(i) = i + 1
-            Next i
+        'Y-Achse
+        achse.Title = "Funktionswert"
+        achse.Automatic = False
+        achse.Minimum = 0
+        achse.Maximum = Ausgangswert * 1.3
+        Call achsen.Add(achse)
 
-            'Den Ausgangswert zeichnen
-            serie = .getSeriesLine("Ausgangswert", "Green")
-            serie.Add(array_x, array_y)
+        Call Diag.DiagInitialise("Beale Problem", achsen, rSettings)
 
-        End With
+        'Linie für den Ausgangswert berechnen
+        ReDim array_y(Anzahl_Kalkulationen - 1)
+        ReDim array_x(Anzahl_Kalkulationen - 1)
+        For i = 0 To Anzahl_Kalkulationen - 1
+            array_y(i) = Ausgangswert
+            array_x(i) = i + 1
+        Next i
+
+        'Den Ausgangswert zeichnen
+        serie = Diag.getSeriesLine("Ausgangswert", "Green")
+        serie.Add(array_x, array_y)
+
     End Sub
 
     'Diagramm für Schwefel-Problem initialisieren
     '********************************************
-    Private Sub DiagInitialise_SchwefelProblem(ByVal PES_Settings As Common.EVO_Settings, ByRef Diag As EVO.Diagramm)
+    Private Sub DiagInitialise_SchwefelProblem(ByRef rSettings As Common.EVO_Settings, ByRef Diag As EVO.Hauptdiagramm)
 
         Dim array_x() As Double = {}
         Dim array_y() As Double = {}
@@ -392,11 +403,13 @@ Public Class Testprobleme
         Dim i As Short
         Dim X() As Double
         Dim serie As Steema.TeeChart.Styles.Series
+        Dim achsen As Collection
+        Dim achse As Diagramm.Achse
 
-        If (PES_Settings.PES.Pop.is_POPUL) Then
-            Anzahl_Kalkulationen = PES_Settings.PES.n_Gen * PES_Settings.PES.n_Nachf * PES_Settings.PES.Pop.n_Runden + 1
+        If (rSettings.PES.Pop.is_POPUL) Then
+            Anzahl_Kalkulationen = rSettings.PES.n_Gen * rSettings.PES.n_Nachf * rSettings.PES.Pop.n_Runden + 1
         Else
-            Anzahl_Kalkulationen = PES_Settings.PES.n_Gen * PES_Settings.PES.n_Nachf + 1
+            Anzahl_Kalkulationen = rSettings.PES.n_Gen * rSettings.PES.n_Nachf + 1
         End If
 
         'Ausgangswert berechnen
@@ -409,6 +422,26 @@ Public Class Testprobleme
             Ausgangswert += ((X(1) - X(i) ^ 2) ^ 2 + (X(i) - 1) ^ 2)
         Next i
 
+        'Achsen
+        '------
+        achsen = New Collection()
+
+        'X-Achse
+        achse.Title = "Berechnungsschritt"
+        achse.Automatic = False
+        achse.Minimum = 0
+        achse.Maximum = Anzahl_Kalkulationen
+        Call achsen.Add(achse)
+
+        'Y-Achse
+        achse.Title = "Funktionswert"
+        achse.Automatic = False
+        achse.Minimum = 0
+        achse.Maximum = Ausgangswert * 1.3
+        Call achsen.Add(achse)
+
+        Call Diag.DiagInitialise("Schwefel 2.4 Problem", achsen, rSettings)
+
         'Linie für den Ausgangswert berechnen
         ReDim array_y(Anzahl_Kalkulationen - 1)
         ReDim array_x(Anzahl_Kalkulationen - 1)
@@ -417,55 +450,90 @@ Public Class Testprobleme
             array_x(i) = i + 1
         Next i
 
-        'TeeChart Einrichten und Series generieren
-        With Diag
-            .Clear()
-            .Header.Text = "Schwefel 2.4 Problem"
-            .Chart.Axes.Left.Title.Caption = "Funktionswert"
-            .Chart.Axes.Bottom.Title.Caption = "Berechnungsschritt"
-            .Aspect.View3D = False
-            .Legend.Visible = False
-
-            'Axen Formatieren
-            .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Maximum = Anzahl_Kalkulationen
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Left.Automatic = False
-            .Chart.Axes.Left.Maximum = Ausgangswert * 1.3
-            .Chart.Axes.Left.Minimum = 0
-            .Chart.Axes.Left.Logarithmic = False
-
-            'Ausgangswert zeichnen
-            serie = .getSeriesLine("Ausgangswert", "Red")
-            serie.Add(array_x, array_y)
-
-        End With
+        'Ausgangswert zeichnen
+        serie = Diag.getSeriesLine("Ausgangswert", "Red")
+        serie.Add(array_x, array_y)
 
     End Sub
 
     'Diagramm für MultiObjective-Probleme initialisieren
     '***************************************************
-    Private Sub DiagInitialise_MultiTestProb(ByVal PES_Settings As Common.EVO_Settings, ByRef Diag As EVO.Diagramm)
+    Private Sub DiagInitialise_MultiTestProb(ByRef rSettings As Common.EVO_Settings, ByRef Diag As EVO.Hauptdiagramm)
 
         Dim i, j As Short
+        Dim title As String
         Dim serie As Steema.TeeChart.Styles.Series
+        Dim achsen As Collection
+        Dim xachse, yachse As Diagramm.Achse
 
-        With Diag
-            .Clear()
-            .Aspect.View3D = False
-            .Legend.Visible = False
-            .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Maximum = 1
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Bottom.Increment = 0.1
-            .Chart.Axes.Bottom.Labels.Style = Steema.TeeChart.AxisLabelStyle.Value
-            .Chart.Axes.Left.Automatic = False
-            .Chart.Axes.Left.Maximum = 10
-            .Chart.Axes.Left.Minimum = 0
-            .Chart.Axes.Left.Increment = 2
-            .Chart.Axes.Left.Labels.Style = Steema.TeeChart.AxisLabelStyle.Value
-        End With
+        title = "Testproblem"
 
+        'Achsen
+        '------
+        achsen = New Collection()
+
+        'X-Achse
+        xachse.Title = "X"
+        xachse.Automatic = False
+        xachse.Minimum = 0
+        xachse.Maximum = 1
+        xachse.Increment = 0.1
+
+        'Y-Achse
+        yachse.Title = "Y"
+        yachse.Automatic = False
+        yachse.Minimum = 0
+        yachse.Maximum = 1
+        yachse.Increment = 0.1
+
+        'Problemspezifische Anpassungen
+        Select Case Me.selectedTestproblem
+
+            Case TP_Deb1
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                title = "Deb D1 - MO-konvex"
+                yachse.Automatic = True
+
+            Case TP_ZitzlerDebT1
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                title = "Zitzler/Deb/Theile T1"
+                yachse.Maximum = 7
+                yachse.Increment = 0.5
+
+            Case TP_ZitzlerDebT2
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                title = "Zitzler/Deb/Theile T2"
+                yachse.Maximum = 7
+
+            Case TP_ZitzlerDebT3
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                title = "Zitzler/Deb/Theile T3"
+                xachse.Increment = 0.2
+                yachse.Maximum = 7
+                yachse.Minimum = -1
+                yachse.Increment = 0.5
+
+            Case TP_ZitzlerDebT4
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                title = "Zitzler/Deb/Theile T4"
+                xachse.Automatic = True
+                yachse.Automatic = True
+
+            Case TP_CONSTR
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                title = TP_CONSTR
+                yachse.Maximum = 15
+
+        End Select
+
+        Call achsen.Add(xachse)
+        Call achsen.Add(yachse)
+
+        'Diagramm initialisieren
+        Call Diag.DiagInitialise(title, achsen, rSettings)
+
+        'Problemspezifische Serien zeichnen
+        '----------------------------------
         Select Case Me.selectedTestproblem
 
             Case TP_Deb1
@@ -474,7 +542,6 @@ Public Class Testprobleme
                 Dim Array1Y(100) As Double
                 Dim Array2X(100) As Double
                 Dim Array2Y(100) As Double
-                Diag.Header.Text = "Deb D1 - MO-konvex"
 
                 'Paretofront berechnen und zeichnen
                 For j = 0 To 100
@@ -497,9 +564,6 @@ Public Class Testprobleme
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 Dim ArrayX(1000) As Double
                 Dim ArrayY(1000) As Double
-                Diag.Header.Text = "Zitzler/Deb/Theile T1"
-                Diag.Chart.Axes.Left.Maximum = 7
-                Diag.Chart.Axes.Left.Increment = 0.5
 
                 'Paretofront berechnen und zeichnen
                 For j = 0 To 1000
@@ -514,8 +578,6 @@ Public Class Testprobleme
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 Dim ArrayX(100) As Double
                 Dim ArrayY(100) As Double
-                Diag.Header.Text = "Zitzler/Deb/Theile T2"
-                Diag.Chart.Axes.Left.Maximum = 7
 
                 'Paretofront berechnen und zeichnen
                 For j = 0 To 100
@@ -531,11 +593,6 @@ Public Class Testprobleme
                 'TODO: Titel der Serien (für Export)
                 Dim ArrayX(100) As Double
                 Dim ArrayY(100) As Double
-                Diag.Header.Text = "Zitzler/Deb/Theile T3"
-                Diag.Chart.Axes.Bottom.Increment = 0.2
-                Diag.Chart.Axes.Left.Maximum = 7
-                Diag.Chart.Axes.Left.Minimum = -1
-                Diag.Chart.Axes.Left.Increment = 0.5
 
                 'Paretofront berechnen und zeichnen
                 For j = 0 To 100
@@ -550,9 +607,6 @@ Public Class Testprobleme
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 Dim ArrayX(1000) As Double
                 Dim ArrayY(1000) As Double
-                Diag.Header.Text = "Zitzler/Deb/Theile T4"
-                Diag.Chart.Axes.Bottom.Automatic = True
-                Diag.Chart.Axes.Left.Automatic = True
 
                 'Lokale Optima berechnen und zeichnen
                 For i = 1 To 10
@@ -575,7 +629,6 @@ Public Class Testprobleme
                 Dim Array3Y(61) As Double
                 Dim Array4X(61) As Double
                 Dim Array4Y(61) As Double
-                Diag.Header.Text = TP_CONSTR
 
                 'Grenze 1 berechnen und zeichnen
                 For j = 0 To 100
@@ -619,218 +672,206 @@ Public Class Testprobleme
 
     'Diagramm für Box-Problem (3D) initialisieren
     '********************************************
-    Private Sub DiagInitialise_3D_Box(ByVal PES_Settings As Common.EVO_Settings, ByRef Diag As EVO.Diagramm)
+    Private Sub DiagInitialise_3D_Box(ByRef rSettings As Common.EVO_Settings, ByRef Diag As EVO.Hauptdiagramm)
 
         Dim i, j, n As Integer
         Dim ArrayX() As Double
         Dim ArrayY() As Double
         Dim ArrayZ() As Double
+        Dim achsen As Collection
+        Dim achse As Diagramm.Achse
 
-        With Diag
-            .Clear()
-            .Header.Text = TP_Box
-            .Legend.Visible = False
-            .Aspect.View3D = True
-            .Aspect.Chart3DPercent = 90
-            .Aspect.Elevation = 348
-            .Aspect.Orthogonal = False
-            .Aspect.Perspective = 62
-            .Aspect.Rotation = 329
-            .Aspect.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality
-            .Aspect.VertOffset = -20
-            .Aspect.Zoom = 66
-            .Tools.Add(New Steema.TeeChart.Tools.Rotate())
+        'Achsen
+        '------
+        achsen = New Collection()
 
-            'Achsen:
-            .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Visible = True
-            .Chart.Axes.Bottom.Title.Caption = "X"
-            .Chart.Axes.Bottom.Maximum = 1
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Bottom.Increment = 0.2
+        'X-Achse
+        achse.Title = "X"
+        achse.Automatic = False
+        achse.Minimum = 0
+        achse.Maximum = 1
+        achse.Increment = 0.2
+        Call achsen.Add(achse)
 
-            .Chart.Axes.Left.Automatic = False
-            .Chart.Axes.Left.Visible = True
-            .Chart.Axes.Left.Title.Caption = "Y"
-            .Chart.Axes.Left.Maximum = 1
-            .Chart.Axes.Left.Minimum = 0
-            .Chart.Axes.Left.Increment = 0.2
+        'Y-Achse
+        achse.Title = "Y"
+        achse.Automatic = False
+        achse.Minimum = 0
+        achse.Maximum = 1
+        achse.Increment = 0.2
+        Call achsen.Add(achse)
 
-            .Chart.Axes.Depth.Automatic = False
-            .Chart.Axes.Depth.Visible = True
-            .Chart.Axes.Depth.Title.Caption = "Z"
-            .Chart.Axes.Depth.Maximum = 1
-            .Chart.Axes.Depth.Minimum = 0
-            .Chart.Axes.Depth.Increment = 0.2
+        'Z-Achse
+        achse.Title = "Z"
+        achse.Automatic = False
+        achse.Minimum = 0
+        achse.Maximum = 1
+        achse.Increment = 0.2
+        Call achsen.Add(achse)
 
-            'Serien
-            '-----------
-            Dim surface As Steema.TeeChart.Styles.Surface
-            Dim series3D As Steema.TeeChart.Styles.Points3D
+        'Diagramm initialisieren
+        Call Diag.DiagInitialise(TP_Box, achsen, rSettings)
 
-            'Constraint 1
-            'x + y + z <= 0.8
-            Dim surfaceRes As Integer = 11
-            ReDim ArrayX(surfaceRes ^ 2 - 1)
-            ReDim ArrayY(surfaceRes ^ 2 - 1)
-            ReDim ArrayZ(surfaceRes ^ 2 - 1)
+        'Serien
+        '------
+        Dim surface As Steema.TeeChart.Styles.Surface
+        Dim series3D As Steema.TeeChart.Styles.Points3D
 
-            n = 0
-            For i = 0 To surfaceRes - 1
-                For j = 0 To (surfaceRes - 1)
-                    ArrayX(n) = i * (1.1 / surfaceRes)
-                    ArrayZ(n) = j * (1.1 / surfaceRes)
-                    ArrayY(n) = Math.Max(0.8 - ArrayX(n) - ArrayZ(n), 0)
-                    n += 1
-                Next
+        'Constraint 1
+        'x + y + z <= 0.8
+        Dim surfaceRes As Integer = 11
+        ReDim ArrayX(surfaceRes ^ 2 - 1)
+        ReDim ArrayY(surfaceRes ^ 2 - 1)
+        ReDim ArrayZ(surfaceRes ^ 2 - 1)
+
+        n = 0
+        For i = 0 To surfaceRes - 1
+            For j = 0 To (surfaceRes - 1)
+                ArrayX(n) = i * (1.1 / surfaceRes)
+                ArrayZ(n) = j * (1.1 / surfaceRes)
+                ArrayY(n) = Math.Max(0.8 - ArrayX(n) - ArrayZ(n), 0)
+                n += 1
             Next
+        Next
 
-            surface = New Steema.TeeChart.Styles.Surface(Diag.Chart)
-            surface.Title = "Constraint 1"
-            surface.IrregularGrid = True
-            surface.NumXValues = surfaceRes
-            surface.NumZValues = surfaceRes
-            surface.Add(ArrayX, ArrayY, ArrayZ)
-            surface.UseColorRange = False
-            surface.UsePalette = False
-            surface.Brush.Solid = True
-            surface.Brush.Color = Color.Green
-            surface.Brush.Transparency = 70
-            surface.Pen.Color = Color.Green
-            surface.SideBrush.Visible = True
-            surface.SideBrush.Color = Color.Red
-            surface.SideBrush.Transparency = 70
+        surface = New Steema.TeeChart.Styles.Surface(Diag.Chart)
+        surface.Title = "Constraint 1"
+        surface.IrregularGrid = True
+        surface.NumXValues = surfaceRes
+        surface.NumZValues = surfaceRes
+        surface.Add(ArrayX, ArrayY, ArrayZ)
+        surface.UseColorRange = False
+        surface.UsePalette = False
+        surface.Brush.Solid = True
+        surface.Brush.Color = Color.Green
+        surface.Brush.Transparency = 70
+        surface.Pen.Color = Color.Green
+        surface.SideBrush.Visible = True
+        surface.SideBrush.Color = Color.Red
+        surface.SideBrush.Transparency = 70
 
-            'Constraint 2
-            'x + y <= 0.5
-            ReDim ArrayX(65)
-            ReDim ArrayY(65)
-            ReDim ArrayZ(65)
+        'Constraint 2
+        'x + y <= 0.5
+        ReDim ArrayX(65)
+        ReDim ArrayY(65)
+        ReDim ArrayZ(65)
 
-            n = 0
-            For i = 0 To 10
-                For j = 0 To 5
-                    ArrayX(n) = j * 0.1
-                    ArrayZ(n) = i * 0.1
-                    ArrayY(n) = 0.5 - ArrayX(n)
-                    n += 1
-                Next
+        n = 0
+        For i = 0 To 10
+            For j = 0 To 5
+                ArrayX(n) = j * 0.1
+                ArrayZ(n) = i * 0.1
+                ArrayY(n) = 0.5 - ArrayX(n)
+                n += 1
             Next
+        Next
 
-            surface = New Steema.TeeChart.Styles.Surface(Diag.Chart)
-            surface.Title = "Constraint 2"
-            surface.IrregularGrid = True
-            surface.NumXValues = 10
-            surface.NumZValues = 10
-            surface.Add(ArrayX, ArrayY, ArrayZ)
-            surface.UseColorRange = False
-            surface.UsePalette = False
-            surface.Brush.Solid = True
-            surface.Brush.Color = Color.Blue
-            surface.Brush.Transparency = 70
-            surface.Pen.Color = Color.Blue
-            surface.SideBrush.Visible = True
-            surface.SideBrush.Color = Color.Red
-            surface.SideBrush.Transparency = 70
+        surface = New Steema.TeeChart.Styles.Surface(Diag.Chart)
+        surface.Title = "Constraint 2"
+        surface.IrregularGrid = True
+        surface.NumXValues = 10
+        surface.NumZValues = 10
+        surface.Add(ArrayX, ArrayY, ArrayZ)
+        surface.UseColorRange = False
+        surface.UsePalette = False
+        surface.Brush.Solid = True
+        surface.Brush.Color = Color.Blue
+        surface.Brush.Transparency = 70
+        surface.Pen.Color = Color.Blue
+        surface.SideBrush.Visible = True
+        surface.SideBrush.Color = Color.Red
+        surface.SideBrush.Transparency = 70
 
-            'Schnittgerade zwischen den Constraints
-            series3D = New Steema.TeeChart.Styles.Points3D(Diag.Chart)
-            series3D.Title = "Schnittgerade"
-            series3D.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Nothing
-            series3D.LinePen.Visible = True
-            series3D.LinePen.Width = 1
-            series3D.LinePen.Color = Color.Red
-            series3D.Add(0.5, 0, 0.3)
-            series3D.Add(0, 0.5, 0.3)
-
-        End With
-
+        'Schnittgerade zwischen den Constraints
+        series3D = New Steema.TeeChart.Styles.Points3D(Diag.Chart)
+        series3D.Title = "Schnittgerade"
+        series3D.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Nothing
+        series3D.LinePen.Visible = True
+        series3D.LinePen.Width = 1
+        series3D.LinePen.Color = Color.Red
+        series3D.Add(0.5, 0, 0.3)
+        series3D.Add(0, 0.5, 0.3)
 
     End Sub
 
 
     'Diagramm für Abhängige Parameter initialisieren
     '***********************************************
-    Private Sub DiagInitialise_AbhParameter(ByVal PES_Settings As Common.EVO_Settings, ByRef Diag As EVO.Diagramm)
+    Private Sub DiagInitialise_AbhParameter(ByRef rSettings As Common.EVO_Settings, ByRef Diag As EVO.Hauptdiagramm)
 
-        With Diag
-            .Clear()
-            .Header.Text = TP_AbhängigeParameter
-            .Legend.Visible = False
-            .Aspect.View3D = True
-            .Aspect.Chart3DPercent = 90
-            .Aspect.Elevation = 348
-            .Aspect.Orthogonal = False
-            .Aspect.Perspective = 62
-            .Aspect.Rotation = 360
-            .Aspect.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality
-            .Aspect.VertOffset = -20
-            .Aspect.Zoom = 66
-            .Tools.Add(New Steema.TeeChart.Tools.Rotate())
+        Dim i, j, n As Integer
+        Dim ArrayX() As Double
+        Dim ArrayY() As Double
+        Dim ArrayZ() As Double
+        Const surfaceRes As Integer = 11
+        Dim surface As Steema.TeeChart.Styles.Surface
+        Dim achsen As Collection
+        Dim achse As Diagramm.Achse
 
-            'Achsen:
-            .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Visible = True
-            .Chart.Axes.Bottom.Title.Caption = "X"
-            .Chart.Axes.Bottom.Maximum = 1
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Bottom.Increment = 0.2
+        'Achsen
+        '------
+        achsen = New Collection()
 
-            .Chart.Axes.Left.Automatic = False
-            .Chart.Axes.Left.Visible = True
-            .Chart.Axes.Left.Title.Caption = "Y"
-            .Chart.Axes.Left.Maximum = 1
-            .Chart.Axes.Left.Minimum = 0
-            .Chart.Axes.Left.Increment = 0.2
+        'X-Achse
+        achse.Title = "X"
+        achse.Automatic = False
+        achse.Minimum = 0
+        achse.Maximum = 1
+        achse.Increment = 0.2
+        Call achsen.Add(achse)
 
-            .Chart.Axes.Depth.Automatic = False
-            .Chart.Axes.Depth.Visible = True
-            .Chart.Axes.Depth.Title.Caption = "Zielfunktion"
-            .Chart.Axes.Depth.Maximum = 2
-            .Chart.Axes.Depth.Minimum = 0
-            .Chart.Axes.Depth.Increment = 0.5
+        'Y-Achse
+        achse.Title = "Y"
+        achse.Automatic = False
+        achse.Minimum = 0
+        achse.Maximum = 1
+        achse.Increment = 0.2
+        Call achsen.Add(achse)
 
-            'Serien
-            '-----------
-            Dim surface As Steema.TeeChart.Styles.Surface
+        'Z-Achse
+        achse.Title = "Zielfunktion"
+        achse.Automatic = False
+        achse.Minimum = 0
+        achse.Maximum = 2
+        achse.Increment = 0.5
+        Call achsen.Add(achse)
 
-            'x = y
-            Dim i, j, n As Integer
-            Dim ArrayX() As Double
-            Dim ArrayY() As Double
-            Dim ArrayZ() As Double
-            Dim surfaceRes As Integer = 11
-            ReDim ArrayX(surfaceRes ^ 2 - 1)
-            ReDim ArrayY(surfaceRes ^ 2 - 1)
-            ReDim ArrayZ(surfaceRes ^ 2 - 1)
+        'Diagramm initialisieren
+        Call Diag.DiagInitialise(TP_AbhängigeParameter, achsen, rSettings)
 
-            n = 0
-            For i = 0 To surfaceRes - 1
-                For j = 0 To (surfaceRes - 1)
-                    ArrayX(n) = i * (1.1 / surfaceRes)
-                    ArrayZ(n) = j * (2.1 / surfaceRes)
-                    ArrayY(n) = ArrayX(n)
-                    n += 1
-                Next
+        'Serien
+        '------
+
+        'Ebene x = y
+        ReDim ArrayX(surfaceRes ^ 2 - 1)
+        ReDim ArrayY(surfaceRes ^ 2 - 1)
+        ReDim ArrayZ(surfaceRes ^ 2 - 1)
+
+        n = 0
+        For i = 0 To surfaceRes - 1
+            For j = 0 To (surfaceRes - 1)
+                ArrayX(n) = i * (1.1 / surfaceRes)
+                ArrayZ(n) = j * (2.1 / surfaceRes)
+                ArrayY(n) = ArrayX(n)
+                n += 1
             Next
+        Next
 
-            surface = New Steema.TeeChart.Styles.Surface(Diag.Chart)
-            surface.Title = "X = Y"
-            surface.IrregularGrid = True
-            surface.NumXValues = surfaceRes
-            surface.NumZValues = surfaceRes
-            surface.Add(ArrayX, ArrayY, ArrayZ)
-            surface.UseColorRange = False
-            surface.UsePalette = False
-            surface.Brush.Solid = True
-            surface.Brush.Color = Color.Green
-            surface.Brush.Transparency = 70
-            surface.Pen.Color = Color.Green
-            surface.SideBrush.Visible = True
-            surface.SideBrush.Color = Color.Red
-            surface.SideBrush.Transparency = 70
-
-        End With
+        surface = New Steema.TeeChart.Styles.Surface(Diag.Chart)
+        surface.Title = "X = Y"
+        surface.IrregularGrid = True
+        surface.NumXValues = surfaceRes
+        surface.NumZValues = surfaceRes
+        surface.Add(ArrayX, ArrayY, ArrayZ)
+        surface.UseColorRange = False
+        surface.UsePalette = False
+        surface.Brush.Solid = True
+        surface.Brush.Color = Color.Green
+        surface.Brush.Transparency = 70
+        surface.Pen.Color = Color.Green
+        surface.SideBrush.Visible = True
+        surface.SideBrush.Color = Color.Red
+        surface.SideBrush.Transparency = 70
 
     End Sub
 
