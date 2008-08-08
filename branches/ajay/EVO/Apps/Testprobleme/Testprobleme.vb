@@ -265,14 +265,23 @@ Partial Public Class Testprobleme
                 mypara(1).Beziehung = Common.Constants.Beziehung.groesser
 
             Case "Flood Mitigation" 'Ajay
-                globalAnzPar = 30               'Parameters
+                globalAnzPar = 8                'Parameters
                 AnzZiele = 2                    'Objective
-                globalAnzRand = 0               'Constraints
+                globalAnzRand = 4               'Constraints
                 ReDim mypara(globalAnzPar - 1)
                 Randomize()
                 For i = 0 To globalAnzPar - 1
                     mypara(i) = New EVO.Common.OptParameter()
                     mypara(i).Xn = Rnd()
+
+                Next
+                For i = 0 To 3
+                    mypara(i).Min = 470424
+                    mypara(i).Max = 48407547
+                Next
+                For i = 4 To globalAnzPar - 1
+                    mypara(i).Min = 648000
+                    mypara(i).Max = 2592000
                 Next
 
         End Select
@@ -650,17 +659,13 @@ Partial Public Class Testprobleme
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 Dim ArrayX(1000) As Double
                 Dim ArrayY(1000) As Double
-                Diag.Header.Text = "Zitzler/Deb/Theile T1"
-                Diag.Chart.Axes.Left.Maximum = 7
-                Diag.Chart.Axes.Left.Increment = 0.5
+                Diag.Header.Text = "Flood mitigation ajay"
 
-                'Paretofront berechnen und zeichnen
-                For j = 0 To 1000
-                    ArrayX(j) = j / 1000
-                    ArrayY(j) = 1 - Math.Sqrt(ArrayX(j))
-                Next j
-                serie = Diag.getSeriesLine("Paretofront", "Green")
-                serie.Add(ArrayX, ArrayY)
+                Diag.Chart.Axes.Left.Maximum = -15000000
+                Diag.Chart.Axes.Left.Minimum = -55000000
+
+                Diag.Chart.Axes.Bottom.Maximum = 10000000
+                Diag.Chart.Axes.Bottom.Minimum = -15000000
 
         End Select
 
@@ -1138,25 +1143,63 @@ Partial Public Class Testprobleme
             Case "Flood Mitigation"
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-                'Qualitätswert berechnen
-                '-----------------------
-                f1 = ind.PES_OptParas(0).Xn
+                'Getting the new Parameters
+                ReDim X(7)
+                For i = 0 To X.GetUpperBound(0)
+                    X(i) = ind.PES_OptParas(i).RWert
+                Next
+
+                'Calculating the Objective Function
+                '----------------------------------
+                Dim Storage As Double
+                Storage = 650000
+                'float sconst=650000;
+
+                Dim p() As Double = {9449568.0, 9069713.044, 2441388.773, 1556876.392}
+                'double p[4] = { 9449568.000,9069713.044,2441388.773,1556876.392};
+                f1 = 0
                 f2 = 0
-                For i = 1 To globalAnzPar - 1
-                    f2 = f2 + ind.PES_OptParas(i).Xn
-                Next i
-                f2 = 1 + 9 / (globalAnzPar - 1) * f2
-                f2 = f2 * (1 - System.Math.Sqrt(f1 / f2))
+
+                'Objective Function 1 and 2
+                f1 = -((p(0) - X(4)) - (X(0) - X(1)))
+                f2 = -(0.09651 * (((8.0E-22 * Math.Pow(X(0), 3)) - (0.00000000000008 * Math.Pow(X(0), 2)) + (0.000003 * X(0)) + 6.2034) * X(4)))
+
+                f1 = f1 - ((p(1) - X(5)) - (X(1) - X(2)))
+                f2 = f2 - (0.09651 * (((8.0E-22 * Math.Pow(X(1), 3)) - (0.00000000000008 * Math.Pow(X(1), 2)) + (0.000003 * X(1)) + 6.2034) * X(5)))
+
+                f1 = f1 - ((p(2) - X(6)) - (X(2) - X(3)))
+                f2 = f2 - (0.09651 * (((8.0E-22 * Math.Pow(X(2), 3)) - (0.00000000000008 * Math.Pow(X(2), 2)) + (0.000003 * X(2)) + 6.2034) * X(6)))
+
+                f1 = f1 - ((p(3) - X(7)) - (X(3) - X(4)))
+                f2 = f2 - (0.09651 * (((8.0E-22 * Math.Pow(X(3), 3)) - (0.00000000000008 * Math.Pow(X(3), 2)) + (0.000003 * X(3)) + 6.2034) * X(7)))
+
+                'Constraints
+                '-----------
+                Dim contrain(3) As Double
+                contrain(0) = (X(0) - Storage - p(0) + X(4))
+                contrain(1) = (X(1) - X(0) - p(1) + X(5))
+                contrain(2) = (X(2) - X(1) - p(2) + X(6))
+                contrain(3) = (X(3) - X(2) - p(3) + X(7))
+
+                'Give Back the Penalties and Constraints
                 ind.Zielwerte(0) = f1
                 ind.Zielwerte(1) = f2
+                ind.Constrain(0) = contrain(0)
+                ind.Constrain(1) = contrain(1)
+                ind.Constrain(2) = contrain(2)
+                ind.Constrain(3) = contrain(3)
 
-                'Zeichnen
+                'Drawing
                 '--------
-                serie = Diag.getSeriesPoint("Population", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+
+                If ind.Is_Feasible Then
+                    serie = Diag.getSeriesPoint("Population", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                Else
+                    serie = Diag.getSeriesPoint("Population (ungültig)", "gray", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                End If
                 serie.Add(ind.Zielwerte(0), ind.Zielwerte(1))
 
         End Select
-
     End Sub
 
 #End Region 'Evaluierung
