@@ -126,7 +126,6 @@ Public Class EVO_Einstellungen
 
     End Sub
 
-    'UPGRADE_WARNING: Das Ereignis ComboOptEltern.SelectedIndexChanged kann ausgelöst werden, wenn das Formular initialisiert wird. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup2075"'
     Private Sub ComboOptEltern_SelectedIndexChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles ComboOptEltern.SelectedIndexChanged
 
         Select Case CType(ComboOptEltern.SelectedItem, EVO_ELTERN)
@@ -180,8 +179,6 @@ Public Class EVO_Einstellungen
 
     End Sub
 
-
-    'UPGRADE_WARNING: Das Ereignis CheckisPopul.CheckStateChanged kann ausgelöst werden, wenn das Formular initialisiert wird. Klicken Sie hier für weitere Informationen: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup2075"'
     Private Sub CheckisPopul_CheckStateChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles CheckisPopul.CheckStateChanged
 
         If (CheckisPopul.Checked) Then
@@ -292,8 +289,6 @@ Public Class EVO_Einstellungen
                 .Pop.n_Popul = 1
                 .Pop.n_PopEltern = 1
             End If
-            'Reduzierte Darstellung
-            .is_paint_constraint = checkpaintconstrained.Checked
 
         End With
 
@@ -427,8 +422,6 @@ Public Class EVO_Einstellungen
             Me.TextAnzRunden.Value = .Pop.n_Runden
             Me.TextAnzPop.Value = .Pop.n_Popul
             Me.TextAnzPopEltern.Value = .Pop.n_PopEltern
-            'Reduzierte Darstellung
-            Me.checkpaintconstrained.Checked = .is_paint_constraint
 
         End With
 

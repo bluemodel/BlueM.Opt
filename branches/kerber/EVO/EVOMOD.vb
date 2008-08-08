@@ -24,7 +24,6 @@ Module EVOMOD
     Public Const ANW_TSP As String = "Traveling Salesman"
 
     'Optimierungsmethoden
-    Public Const METH_RESET As String = "Reset"
     Public Const METH_PES As String = "PES"
     Public Const METH_CES As String = "CES"
     Public Const METH_HYBRID As String = "HYBRID"

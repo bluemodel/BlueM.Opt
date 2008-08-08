@@ -3,15 +3,19 @@ Imports System.IO
 Public Class Scan
     Inherits Sim
 
-    Public Overrides ReadOnly Property Datensatzendung() As String
-        Get
-            Return ".ALL"
-        End Get
-    End Property
-
     Private input As Wave.WEL
 
-    Public Overrides Function launchSim() As Boolean
+    'Konstruktor
+    '***********
+    Public Sub New()
+
+        Call MyBase.New()
+
+        Me.mDatensatzendung = ".ALL"
+
+    End Sub
+
+    Public Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
 
         Dim i, j, k, AnzZeil As Integer
         Dim parameterdatei, Zeile, ZeilenArray(), stoffe(), tmp() As String
@@ -101,6 +105,19 @@ Public Class Scan
         Return True
 
     End Function
+
+    Public Overrides Function launchFree(ByRef Thread_ID As Integer) As Boolean
+
+    End Function
+    Public Overrides Function launchReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
+
+    End Function
+        
+    'Simulationsergebnis verarbeiten
+    '-------------------------------
+    Public Overrides Sub WelDateiVerwursten()
+
+    End Sub
 
     Public Overrides Function QWert(ByVal ziel As Common.Ziel) As Double
 

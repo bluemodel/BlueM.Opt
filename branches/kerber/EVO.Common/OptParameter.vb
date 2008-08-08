@@ -88,6 +88,16 @@ Public Class OptParameter
 
     End Function
 
+    'Kopiert ein Array von OptParametern
+    '*********************************
+    Public Shared Sub Clone_OptPara_Array(ByVal Source() As OptParameter, ByRef Dest() As OptParameter)
+        Dim i As Integer
+
+        For i = 0 To Source.GetUpperBound(0)
+            Dest(i) = Source(i).Clone()
+        Next
+    End Sub
+
     'Konvertiert eine Liste von OptParametern in ein Array von Doubles (Xn)
     '**********************************************************************
     Public Shared Function MyParaDouble(ByVal OptParamer() As EVO.Common.OptParameter) As Double()

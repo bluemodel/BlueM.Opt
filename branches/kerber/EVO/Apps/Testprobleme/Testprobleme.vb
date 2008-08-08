@@ -1,273 +1,275 @@
 Imports IHWB.EVO.Common.Constants
 
-Partial Public Class Testprobleme
-    Inherits System.Windows.Forms.Form
+Public Class Testprobleme
 
     'Eigenschaften
     '#############
 
-    Private IsInitializing As Boolean
-    Public OptModus As EVO_MODUS
+    'Testprobleme:
+    Private Const TP_SinusFunktion As String = "Sinus-Funktion"
+    Private Const TP_BealeProblem As String = "Beale-Problem"
+    Private Const TP_Schwefel24Problem As String = "Schwefel 2.4-Problem"
+    Private Const TP_Deb1 As String = "Deb 1"
+    Private Const TP_ZitzlerDebT1 As String = "Zitzler/Deb T1"
+    Private Const TP_ZitzlerDebT2 As String = "Zitzler/Deb T2"
+    Private Const TP_ZitzlerDebT3 As String = "Zitzler/Deb T3"
+    Private Const TP_ZitzlerDebT4 As String = "Zitzler/Deb T4"
+    Private Const TP_CONSTR As String = "CONSTR"
+    Private Const TP_Box As String = "Box"
+    Private Const TP_AbhängigeParameter As String = "Abhängige Parameter"
+    Private Const TP_FloodMitigation As String = "Flood Mitigation"
+
+    Private mSelectedTestproblem As String
+    Private mTestProblemDescription As String
+
+    Private mAnzParameter As Integer
+    Private mAnzZiele As Integer
+    Private mAnzConstraints As Integer
+    Private mOptPara() As Common.OptParameter
 
     'Properties
     '##########
-    Public ReadOnly Property AnzParameter() As Integer
+
+    'Liste von Testproblemen
+    Public ReadOnly Property Testprobleme() As String()
         Get
-            Return Convert.ToInt32(Me.TextBox_Einstellung.Value)
+            Dim array() As String
+
+            ReDim array(11)
+
+            array(0) = TP_SinusFunktion
+            array(1) = TP_BealeProblem
+            array(2) = TP_Schwefel24Problem
+            array(3) = TP_Deb1
+            array(4) = TP_ZitzlerDebT1
+            array(5) = TP_ZitzlerDebT2
+            array(6) = TP_ZitzlerDebT3
+            array(7) = TP_ZitzlerDebT4
+            array(8) = TP_CONSTR
+            array(9) = TP_Box
+            array(10) = TP_AbhängigeParameter
+			array(11) = TP_FloodMitigation
+
+            Return array
+
         End Get
     End Property
 
-#Region "Form behavior"
+    'gewähltes Testproblem holen/setzen
+    '**********************************
+    Public ReadOnly Property selectedTestproblem() As String
+        Get
+            Return mSelectedTestproblem
+        End Get
+    End Property
 
-    'Form laden
-    '**********
-    Private Sub Testprobleme_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+    'Problembeschreibung
+    Public ReadOnly Property TestProblemDescription() As String
+        Get
+            Return Me.mTestProblemDescription
+        End Get
+    End Property
 
-        'Combobox füllen
-        Combo_Testproblem.Items.Add("Sinus-Funktion")
-        Combo_Testproblem.Items.Add("Beale-Problem")
-        Combo_Testproblem.Items.Add("Schwefel 2.4-Problem")
-        Combo_Testproblem.Items.Add("Deb 1")
-        Combo_Testproblem.Items.Add("Zitzler/Deb T1")
-        Combo_Testproblem.Items.Add("Zitzler/Deb T2")
-        Combo_Testproblem.Items.Add("Zitzler/Deb T3")
-        Combo_Testproblem.Items.Add("Zitzler/Deb T4")
-        Combo_Testproblem.Items.Add("CONSTR")
-        Combo_Testproblem.Items.Add("Box")
-        Combo_Testproblem.Items.Add("Abhängige Parameter")
+    'Anzahl Parameter
+    Public ReadOnly Property AnzParameter() As Integer
+        Get
+            Return Me.mAnzParameter
+        End Get
+    End Property
 
-        Combo_Testproblem.SelectedIndex = 0
+    'OptModus
+    Public ReadOnly Property OptModus() As EVO_MODUS
+        Get
+            If (Me.mAnzZiele > 1) Then
+                Return EVO_MODUS.Multi_Objective
+            Else
+                Return EVO_MODUS.Single_Objective
+            End If
+        End Get
+    End Property
 
-        'Ende der Initialisierung
-        IsInitializing = False
 
-        'Eventhandler einrichten
-        AddHandler Me.Combo_Testproblem.SelectedIndexChanged, AddressOf Form1.INI_App
+    'Tesproblem setzen
+    '*****************
+    Public Sub setTestproblem(ByVal name As String)
 
+        Dim i As Integer
+
+        Me.mSelectedTestproblem = name
+
+        Select Case Me.mSelectedTestproblem
+
+            Case TP_SinusFunktion
+                Me.mTestProblemDescription = "Parameter an Sinusfunktion anpassen"
+                Me.mAnzParameter = 50
+                Me.mAnzZiele = 1
+                Me.mAnzConstraints = 0
+                ReDim Me.mOptPara(Me.mAnzParameter - 1)
+                For i = 0 To Me.mAnzParameter - 1
+                    Me.mOptPara(i) = New EVO.Common.OptParameter()
+                    Me.mOptPara(i).Xn = 0
+                Next
+
+            Case TP_BealeProblem
+                Me.mTestProblemDescription = "Es wird das Minimum des Beale-Problems gesucht (x=(3, 0.5), F(x)=0)"
+                Me.mAnzParameter = 2
+                Me.mAnzZiele = 1
+                Me.mAnzConstraints = 0
+                ReDim Me.mOptPara(Me.mAnzParameter - 1)
+                For i = 0 To Me.mAnzParameter - 1
+                    Me.mOptPara(i) = New EVO.Common.OptParameter()
+                    Me.mOptPara(i).Xn = 0.5
+                Next
+
+            Case TP_Schwefel24Problem
+                Me.mTestProblemDescription = "Minimum der Problemstellung wird gesucht (xi=1, F(x)=0)"
+                Me.mAnzParameter = 5
+                Me.mAnzZiele = 1
+                Me.mAnzConstraints = 0
+                ReDim Me.mOptPara(Me.mAnzParameter - 1)
+                For i = 0 To Me.mAnzParameter - 1
+                    Me.mOptPara(i) = New EVO.Common.OptParameter()
+                    Me.mOptPara(i).Xn = 1
+                Next
+
+            Case TP_Deb1
+                Me.mTestProblemDescription = "Multikriterielles Testproblem (konvex)"
+                Me.mAnzParameter = 2
+                Me.mAnzZiele = 2
+                Me.mAnzConstraints = 0
+                ReDim Me.mOptPara(Me.mAnzParameter - 1)
+                Randomize()
+                For i = 0 To Me.mAnzParameter - 1
+                    Me.mOptPara(i) = New EVO.Common.OptParameter()
+                    Me.mOptPara(i).Xn = Rnd()
+                Next
+
+            Case TP_ZitzlerDebT1
+                Me.mTestProblemDescription = "Multikriterielles Testproblem (konvex)"
+                Me.mAnzParameter = 30
+                Me.mAnzZiele = 2
+                Me.mAnzConstraints = 0
+                ReDim Me.mOptPara(Me.mAnzParameter - 1)
+                Randomize()
+                For i = 0 To Me.mAnzParameter - 1
+                    Me.mOptPara(i) = New EVO.Common.OptParameter()
+                    Me.mOptPara(i).Xn = Rnd()
+                Next
+
+            Case TP_ZitzlerDebT2
+                Me.mTestProblemDescription = "Multikriterielles Testproblem (konkav)"
+                Me.mAnzParameter = 30
+                Me.mAnzZiele = 2
+                Me.mAnzConstraints = 0
+                ReDim Me.mOptPara(Me.mAnzParameter - 1)
+                Randomize()
+                For i = 0 To Me.mAnzParameter - 1
+                    Me.mOptPara(i) = New EVO.Common.OptParameter()
+                    Me.mOptPara(i).Xn = Rnd()
+                Next
+
+            Case TP_ZitzlerDebT3
+                Me.mTestProblemDescription = "Multikriterielles Testproblem (konvex, nicht stetig)"
+                Me.mAnzParameter = 15
+                Me.mAnzZiele = 2
+                Me.mAnzConstraints = 0
+                ReDim Me.mOptPara(Me.mAnzParameter - 1)
+                Randomize()
+                For i = 0 To Me.mAnzParameter - 1
+                    Me.mOptPara(i) = New EVO.Common.OptParameter()
+                    Me.mOptPara(i).Xn = Rnd()
+                Next
+
+            Case TP_ZitzlerDebT4
+                Me.mTestProblemDescription = "Multikriterielles Testproblem (konvex)"
+                Me.mAnzParameter = 10
+                Me.mAnzZiele = 2
+                Me.mAnzConstraints = 0
+                ReDim Me.mOptPara(Me.mAnzParameter - 1)
+                Randomize()
+                For i = 0 To Me.mAnzParameter - 1
+                    Me.mOptPara(i) = New EVO.Common.OptParameter()
+                    Me.mOptPara(i).Xn = Rnd()
+                Next
+
+            Case TP_CONSTR
+                Me.mTestProblemDescription = "Multikriterielles Testproblem (konvex) mit zwei Randbedingungen"
+                Me.mAnzParameter = 2
+                Me.mAnzZiele = 2
+                Me.mAnzConstraints = 2
+                ReDim Me.mOptPara(Me.mAnzParameter - 1)
+                Randomize()
+                For i = 0 To Me.mAnzParameter - 1
+                    Me.mOptPara(i) = New EVO.Common.OptParameter()
+                    Me.mOptPara(i).Xn = Rnd()
+                Next
+
+            Case TP_Box
+                Me.mTestProblemDescription = "Multikriterielles Testproblem (Kreis) mit zwei Randbedingungen"
+                Me.mAnzParameter = 3
+                Me.mAnzZiele = 3
+                Me.mAnzConstraints = 2
+                ReDim Me.mOptPara(Me.mAnzParameter - 1)
+                Randomize()
+                For i = 0 To Me.mAnzParameter - 1
+                    Me.mOptPara(i) = New EVO.Common.OptParameter()
+                    Me.mOptPara(i).Xn = Rnd()
+                Next
+
+            Case TP_AbhängigeParameter
+                Me.mTestProblemDescription = "Bedingung: Y > X"
+                Me.mAnzParameter = 2
+                Me.mAnzZiele = 1
+                Me.mAnzConstraints = 0
+                ReDim Me.mOptPara(Me.mAnzParameter - 1)
+                For i = 0 To Me.mAnzParameter - 1
+                    Me.mOptPara(i) = New EVO.Common.OptParameter()
+                    Me.mOptPara(i).Xn = 1
+                Next
+                'Beziehungen
+                Me.mOptPara(0).Beziehung = Common.Constants.Beziehung.keine
+                Me.mOptPara(1).Beziehung = Common.Constants.Beziehung.groesser
+
+            Case TP_FloodMitigation 'Ajay
+                Me.mTestProblemDescription = "Multicriteria Problem Flood Mitigation and Hydropower Generation"
+                Me.mAnzParameter = 8                'Parameters
+                Me.mAnzZiele = 2                    'Objective
+                Me.mAnzConstraints = 4               'Constraints
+                ReDim Me.mOptPara(Me.mAnzParameter - 1)
+                Randomize()
+                For i = 0 To Me.mAnzParameter - 1
+                    Me.mOptPara(i) = New EVO.Common.OptParameter()
+                    Me.mOptPara(i).Xn = Rnd()
+
+                Next
+                For i = 0 To 3
+                    Me.mOptPara(i).Min = 470424
+                    Me.mOptPara(i).Max = 48407547
+                Next
+                For i = 4 To Me.mAnzParameter - 1
+                    Me.mOptPara(i).Min = 648000
+                    Me.mOptPara(i).Max = 2592000
+                Next
+
+        End Select
     End Sub
-
-    'Auswahl eines neuen Testproblems
-    '********************************
-    Private Sub Combo_Testproblem_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles Combo_Testproblem.SelectedIndexChanged
-
-        If IsInitializing = True Then
-            Exit Sub
-        Else
-            'zusätzliche Einstellungen erstmal ausblenden
-            Me.Label_Einstellung.Visible = False
-            Me.TextBox_Einstellung.Visible = False
-
-            Select Case Combo_Testproblem.Text
-
-                Case "Sinus-Funktion"
-                    Me.Label_Beschreibungstext.Text = "Parameter an Sinusfunktion anpassen"
-                    Me.Label_Einstellung.Visible = True
-                    Me.Label_Einstellung.Text = "Anzahl Parameter:"
-                    Me.TextBox_Einstellung.Visible = True
-                    Me.TextBox_Einstellung.Text = "50"
-                    OptModus = EVO_MODUS.Single_Objective
-
-                Case "Beale-Problem"
-                    Me.Label_Beschreibungstext.Text = "Es wird das Minimum des Beale-Problems gesucht (x=(3, 0.5), F(x)=0)"
-                    OptModus = EVO_MODUS.Single_Objective
-
-                Case "Schwefel 2.4-Problem"
-                    Me.Label_Beschreibungstext.Text = "Minimum der Problemstellung wird gesucht (xi=1, F(x)=0)"
-                    Me.Label_Einstellung.Visible = True
-                    Me.Label_Einstellung.Text = "Anzahl Parameter:"
-                    Me.TextBox_Einstellung.Visible = True
-                    Me.TextBox_Einstellung.Text = "5"
-                    OptModus = EVO_MODUS.Single_Objective
-
-                Case "Deb 1"
-                    Me.Label_Beschreibungstext.Text = "Multikriterielles Testproblem (konvex)"
-                    OptModus = EVO_MODUS.Multi_Objective
-
-                Case "Zitzler/Deb T1"
-                    Me.Label_Beschreibungstext.Text = "Multikriterielles Testproblem (konvex)"
-                    OptModus = EVO_MODUS.Multi_Objective
-
-                Case "Zitzler/Deb T2"
-                    Me.Label_Beschreibungstext.Text = "Multikriterielles Testproblem (konkav)"
-                    OptModus = EVO_MODUS.Multi_Objective
-
-                Case "Zitzler/Deb T3"
-                    Me.Label_Beschreibungstext.Text = "Multikriterielles Testproblem (konvex, nicht stetig)"
-                    OptModus = EVO_MODUS.Multi_Objective
-
-                Case "Zitzler/Deb T4"
-                    Me.Label_Beschreibungstext.Text = "Multikriterielles Testproblem (konvex)"
-                    OptModus = EVO_MODUS.Multi_Objective
-
-                Case "CONSTR"
-                    Me.Label_Beschreibungstext.Text = "Multikriterielles Testproblem (konvex) mit zwei Randbedingungen"
-                    OptModus = EVO_MODUS.Multi_Objective
-
-                Case "Box"
-                    Me.Label_Beschreibungstext.Text = "Multikriterielles Testproblem (Kreis) mit zwei Randbedingungen"
-                    OptModus = EVO_MODUS.Multi_Objective
-
-                Case "Abhängige Parameter"
-                    Me.Label_Beschreibungstext.Text = "Bedingung: Y > X"
-                    OptModus = EVO_MODUS.Single_Objective
-
-            End Select
-
-        End If
-    End Sub
-
-    'Form schließen
-    '**************
-    Private Sub Testprobleme_FormClosing(ByVal sender As System.Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles MyBase.FormClosing
-
-        'verhindern, dass das Formular komplett gelöscht wird
-        e.Cancel = True
-
-        'Formular verstecken
-        Call Me.Hide()
-
-    End Sub
-
-
-#End Region 'Form behavior
 
     'Parameterübergabe
     '*****************
     Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef mypara() As EVO.Common.OptParameter)
 
-        Dim i, AnzZiele, AnzConstraints As Integer
+        Dim i As Integer
 
-        Select Case Me.Combo_Testproblem.Text
-
-            Case "Sinus-Funktion"
-                globalAnzPar = Me.AnzParameter
-                AnzZiele = 1
-                AnzConstraints = 0
-                ReDim mypara(globalAnzPar - 1)
-                For i = 0 To globalAnzPar - 1
-                    mypara(i) = New EVO.Common.OptParameter()
-                    mypara(i).Xn = 0
-                Next
-
-            Case "Beale-Problem" 'x1 = [-5;5], x2=[-2;2]
-                globalAnzPar = 2
-                AnzZiele = 1
-                AnzConstraints = 0
-                ReDim mypara(globalAnzPar - 1)
-                For i = 0 To globalAnzPar - 1
-                    mypara(i) = New EVO.Common.OptParameter()
-                    mypara(i).Xn = 0.5
-                Next
-
-            Case "Schwefel 2.4-Problem" 'xi = [-10,10]
-                globalAnzPar = Me.AnzParameter
-                AnzZiele = 1
-                AnzConstraints = 0
-                ReDim mypara(globalAnzPar - 1)
-                For i = 0 To globalAnzPar - 1
-                    mypara(i) = New EVO.Common.OptParameter()
-                    mypara(i).Xn = 1
-                Next
-
-            Case "Deb 1" 'x1 = [0.1;1], x2=[0;5]
-                globalAnzPar = 2
-                AnzZiele = 2
-                AnzConstraints = 0
-                ReDim mypara(globalAnzPar - 1)
-                Randomize()
-                For i = 0 To globalAnzPar - 1
-                    mypara(i) = New EVO.Common.OptParameter()
-                    mypara(i).Xn = Rnd()
-                Next
-
-            Case "Zitzler/Deb T1" 'xi = [0,1]
-                globalAnzPar = 30
-                AnzZiele = 2
-                AnzConstraints = 0
-                ReDim mypara(globalAnzPar - 1)
-                Randomize()
-                For i = 0 To globalAnzPar - 1
-                    mypara(i) = New EVO.Common.OptParameter()
-                    mypara(i).Xn = Rnd()
-                Next
-
-            Case "Zitzler/Deb T2" 'xi = [0,1]
-                globalAnzPar = 30
-                AnzZiele = 2
-                AnzConstraints = 0
-                ReDim mypara(globalAnzPar - 1)
-                Randomize()
-                For i = 0 To globalAnzPar - 1
-                    mypara(i) = New EVO.Common.OptParameter()
-                    mypara(i).Xn = Rnd()
-                Next
-
-            Case "Zitzler/Deb T3" 'xi = [0,1]
-                globalAnzPar = 15
-                AnzZiele = 2
-                AnzConstraints = 0
-                ReDim mypara(globalAnzPar - 1)
-                Randomize()
-                For i = 0 To globalAnzPar - 1
-                    mypara(i) = New EVO.Common.OptParameter()
-                    mypara(i).Xn = Rnd()
-                Next
-
-            Case "Zitzler/Deb T4" 'x1 = [0,1], xi=[-5,5]
-                globalAnzPar = 10
-                AnzZiele = 2
-                AnzConstraints = 0
-                ReDim mypara(globalAnzPar - 1)
-                Randomize()
-                For i = 0 To globalAnzPar - 1
-                    mypara(i) = New EVO.Common.OptParameter()
-                    mypara(i).Xn = Rnd()
-                Next
-
-            Case "CONSTR" 'x1 = [0.1;1], x2=[0;5]
-                globalAnzPar = 2
-                AnzZiele = 2
-                AnzConstraints = 2
-                ReDim mypara(globalAnzPar - 1)
-                Randomize()
-                For i = 0 To globalAnzPar - 1
-                    mypara(i) = New EVO.Common.OptParameter()
-                    mypara(i).Xn = Rnd()
-                Next
-
-            Case "Box"
-                globalAnzPar = 3
-                AnzZiele = 3
-                AnzConstraints = 2
-                ReDim mypara(globalAnzPar - 1)
-                Randomize()
-                For i = 0 To globalAnzPar - 1
-                    mypara(i) = New EVO.Common.OptParameter()
-                    mypara(i).Xn = Rnd()
-                Next
-
-            Case "Abhängige Parameter"
-                globalAnzPar = 2
-                AnzZiele = 1
-                AnzConstraints = 0
-                ReDim mypara(globalAnzPar - 1)
-                For i = 0 To globalAnzPar - 1
-                    mypara(i) = New EVO.Common.OptParameter()
-                    mypara(i).Xn = 1
-                Next
-                'Beziehungen
-                mypara(0).Beziehung = Common.Constants.Beziehung.keine
-                mypara(1).Beziehung = Common.Constants.Beziehung.groesser
-
-        End Select
+        globalAnzPar = Me.AnzParameter
+        mypara = Me.mOptPara
 
         'HACK: Ziele und Contraints dem Manager mitteilen (geht auch schöner!)
-        ReDim Common.Manager.List_Ziele(AnzZiele - 1)
+        ReDim Common.Manager.List_Ziele(Me.mAnzZiele - 1)
         For i = 0 To Common.Manager.AnzZiele - 1
             Common.Manager.List_Ziele(i) = New Common.Ziel()
             Common.Manager.List_Ziele(i).isOpt = True
         Next
-        ReDim Common.Manager.List_Constraints(AnzConstraints - 1)
+        ReDim Common.Manager.List_Constraints(Me.mAnzConstraints - 1)
         For i = 0 To Common.Manager.AnzConstraints - 1
             Common.Manager.List_Constraints(i) = New Common.Constraint()
         Next
@@ -278,27 +280,27 @@ Partial Public Class Testprobleme
 
     'Diagramm initialisieren
     '***********************
-    Public Sub DiagInitialise(ByVal PES_Settings As Common.EVO_Settings, ByVal globalAnzPar As Integer, ByRef Diag As EVO.Diagramm)
+    Public Sub DiagInitialise(ByRef rSettings As Common.EVO_Settings, ByRef Diag As EVO.Diagramm)
 
-        Select Case Me.Combo_Testproblem.Text
+        Select Case Me.selectedTestproblem
 
-            Case "Sinus-Funktion"
-                Call Me.DiagInitialise_SinusFunktion(globalAnzPar, Diag)
+            Case TP_SinusFunktion
+                Call Me.DiagInitialise_SinusFunktion(rSettings, Diag)
 
-            Case "Beale-Problem" 'x1 = [-5;5], x2=[-2;2]
-                Call Me.DiagInitialise_BealeProblem(PES_Settings, globalAnzPar, Diag)
+            Case TP_BealeProblem 'x1 = [-5;5], x2=[-2;2]
+                Call Me.DiagInitialise_BealeProblem(rSettings, Diag)
 
-            Case "Schwefel 2.4-Problem" 'xi = [-10,10]
-                Call Me.DiagInitialise_SchwefelProblem(PES_Settings, globalAnzPar, Diag)
+            Case TP_Schwefel24Problem 'xi = [-10,10]
+                Call Me.DiagInitialise_SchwefelProblem(rSettings, Diag)
 
-            Case "Box"
-                Call Me.DiagInitialise_3D_Box(PES_Settings, globalAnzPar, Diag)
+            Case TP_Box
+                Call Me.DiagInitialise_3D_Box(rSettings, Diag)
 
-            Case "Abhängige Parameter"
-                Call Me.DiagInitialise_AbhParameter(PES_Settings, globalAnzPar, Diag)
+            Case TP_AbhängigeParameter
+                Call Me.DiagInitialise_AbhParameter(rSettings, Diag)
 
             Case Else
-                Call Me.DiagInitialise_MultiTestProb(PES_Settings, Diag)
+                Call Me.DiagInitialise_MultiTestProb(rSettings, Diag)
 
         End Select
 
@@ -306,53 +308,60 @@ Partial Public Class Testprobleme
 
     'Diagramm für Sinus-Funktion initialisieren
     '*******************************************
-    Private Sub DiagInitialise_SinusFunktion(ByVal globalAnzPar As Short, ByRef Diag As EVO.Diagramm)
+    Private Sub DiagInitialise_SinusFunktion(ByRef rSettings As Common.EVO_Settings, ByRef Diag As EVO.Hauptdiagramm)
 
-        Dim array_x() As Double = {}
-        Dim array_y() As Double = {}
+        Dim array_x() As Double
+        Dim array_y() As Double
         Dim i As Short
         Dim Unterteilung_X As Double
         Dim serie As Steema.TeeChart.Styles.Series
+        Dim achsen As Collection
+        Dim achse As Diagramm.Achse
 
-        'TeeChart Einrichten und Series generieren
-        With Diag
-            .Clear()
-            .Header.Text = "Sinus Funktion"
-            .Chart.Axes.Left.Title.Caption = "Y-Wert"
-            .Chart.Axes.Bottom.Title.Caption = "X-Wert"
-            .Aspect.View3D = False
-            .Legend.Visible = False
+        'Achsen vorbereiten
+        '------------------
+        achsen = New Collection()
 
-            'Axen Formatieren
-            .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Maximum = 2 * Math.PI
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Bottom.Increment = Math.PI
-            .Chart.Axes.Left.Automatic = False
-            .Chart.Axes.Left.Minimum = -1
-            .Chart.Axes.Left.Maximum = 1
-            .Chart.Axes.Left.Increment = 0.2
+        'X-Achse
+        achse.Title = "X-Wert"
+        achse.Automatic = False
+        achse.Minimum = 0
+        achse.Maximum = 2 * Math.PI
+        achse.Increment = Math.PI
+        achsen.Add(achse)
 
-            'Sinuslinie zeichnen
-            Unterteilung_X = 2 * Math.PI / (globalAnzPar - 1)
+        'Y-Achse
+        achse.Title = "Y-Wert"
+        achse.Automatic = False
+        achse.Minimum = -1
+        achse.Maximum = 1
+        achse.Increment = 0.2
+        achsen.Add(achse)
 
-            ReDim array_x(globalAnzPar - 1)
-            ReDim array_y(globalAnzPar - 1)
+        'Diagramm initialisieren
+        '-----------------------
+        Call Diag.DiagInitialise("Sinus Funktion", achsen, rSettings)
 
-            For i = 0 To globalAnzPar - 1
-                array_x(i) = Math.Round(i * Unterteilung_X, 2)
-                array_y(i) = Math.Sin(i * Unterteilung_X)
-            Next i
+        'Sinuslinie zeichnen
+        '-------------------
+        Unterteilung_X = 2 * Math.PI / (Me.mAnzParameter - 1)
 
-            serie = .getSeriesLine("Sinusfunktion", "Green")
-            serie.Add(array_x, array_y)
+        ReDim array_x(Me.mAnzParameter - 1)
+        ReDim array_y(Me.mAnzParameter - 1)
 
-        End With
+        For i = 0 To Me.mAnzParameter - 1
+            array_x(i) = Math.Round(i * Unterteilung_X, 2)
+            array_y(i) = Math.Sin(i * Unterteilung_X)
+        Next i
+
+        serie = Diag.getSeriesLine("Sinusfunktion", "Green")
+        Call serie.Add(array_x, array_y)
+
     End Sub
 
     'Diagramm für Beale-Problem initialisieren
     '*****************************************
-    Private Sub DiagInitialise_BealeProblem(ByVal PES_Settings As Common.EVO_Settings, ByVal globalAnzPar As Short, ByRef Diag As EVO.Diagramm)
+    Private Sub DiagInitialise_BealeProblem(ByRef rSettings As Common.EVO_Settings, ByRef Diag As EVO.Hauptdiagramm)
 
         Dim array_x() As Double = {}
         Dim array_y() As Double = {}
@@ -360,75 +369,37 @@ Partial Public Class Testprobleme
         Dim Anzahl_Kalkulationen As Integer
         Dim i As Short
         Dim serie As Steema.TeeChart.Styles.Series
+        Dim achsen As Collection
+        Dim achse As Diagramm.Achse
 
-        If (PES_Settings.PES.Pop.is_POPUL) Then
-            Anzahl_Kalkulationen = PES_Settings.PES.n_Gen * PES_Settings.PES.n_Nachf * PES_Settings.PES.Pop.n_Runden + 1
+        If (rSettings.PES.Pop.is_POPUL) Then
+            Anzahl_Kalkulationen = rSettings.PES.n_Gen * rSettings.PES.n_Nachf * rSettings.PES.Pop.n_Runden + 1
         Else
-            Anzahl_Kalkulationen = PES_Settings.PES.n_Gen * PES_Settings.PES.n_Nachf + 1
+            Anzahl_Kalkulationen = rSettings.PES.n_Gen * rSettings.PES.n_Nachf + 1
         End If
 
         'Ausgangswert berechnen
         Ausgangswert = (1.5 - 0.5 * (1 - 0.5)) ^ 2 + (2.25 - 0.5 * (1 - 0.5) ^ 2) ^ 2 + (2.625 - 0.5 * (1 - 0.5) ^ 3) ^ 2
 
-        'TeeChart Einrichten und Linien zeichnen
-        With Diag
-            .Clear()
-            .Header.Text = "Beale Problem"
-            .Chart.Axes.Left.Title.Caption = "Funktionswert"
-            .Chart.Axes.Bottom.Title.Caption = "Berechnungsschritt"
-            .Aspect.View3D = False
-            .Legend.Visible = False
+        'Achsen
+        '------
+        achsen = New Collection()
 
-            'Axen Formatieren
-            .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Maximum = Anzahl_Kalkulationen
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Left.Automatic = False
-            .Chart.Axes.Left.Maximum = Ausgangswert * 1.3
-            .Chart.Axes.Left.Minimum = 0
+        'X-Achse
+        achse.Title = "Berechnungsschritt"
+        achse.Automatic = False
+        achse.Minimum = 0
+        achse.Maximum = Anzahl_Kalkulationen
+        Call achsen.Add(achse)
 
-            'Linie für den Ausgangswert berechnen
-            ReDim array_y(Anzahl_Kalkulationen - 1)
-            ReDim array_x(Anzahl_Kalkulationen - 1)
-            For i = 0 To Anzahl_Kalkulationen - 1
-                array_y(i) = Ausgangswert
-                array_x(i) = i + 1
-            Next i
+        'Y-Achse
+        achse.Title = "Funktionswert"
+        achse.Automatic = False
+        achse.Minimum = 0
+        achse.Maximum = Ausgangswert * 1.3
+        Call achsen.Add(achse)
 
-            'Den Ausgangswert zeichnen
-            serie = .getSeriesLine("Ausgangswert", "Green")
-            serie.Add(array_x, array_y)
-
-        End With
-    End Sub
-
-    'Diagramm für Schwefel-Problem initialisieren
-    '********************************************
-    Private Sub DiagInitialise_SchwefelProblem(ByVal PES_Settings As Common.EVO_Settings, ByVal globalAnzPar As Short, ByRef Diag As EVO.Diagramm)
-
-        Dim array_x() As Double = {}
-        Dim array_y() As Double = {}
-        Dim Ausgangswert As Double
-        Dim Anzahl_Kalkulationen As Integer
-        Dim i As Short
-        Dim X() As Double
-        Dim serie As Steema.TeeChart.Styles.Series
-
-        If (PES_Settings.PES.Pop.is_POPUL) Then
-            Anzahl_Kalkulationen = PES_Settings.PES.n_Gen * PES_Settings.PES.n_Nachf * PES_Settings.PES.Pop.n_Runden + 1
-        Else
-            Anzahl_Kalkulationen = PES_Settings.PES.n_Gen * PES_Settings.PES.n_Nachf + 1
-        End If
-
-        'Ausgangswert berechnen
-        ReDim X(globalAnzPar)
-        For i = 1 To globalAnzPar
-            X(i) = 10
-        Next i
-        Ausgangswert = 0
-        For i = 1 To globalAnzPar
-            Ausgangswert += ((X(1) - X(i) ^ 2) ^ 2 + (X(i) - 1) ^ 2)
-        Next i
+        Call Diag.DiagInitialise("Beale Problem", achsen, rSettings)
 
         'Linie für den Ausgangswert berechnen
         ReDim array_y(Anzahl_Kalkulationen - 1)
@@ -438,64 +409,172 @@ Partial Public Class Testprobleme
             array_x(i) = i + 1
         Next i
 
-        'TeeChart Einrichten und Series generieren
-        With Diag
-            .Clear()
-            .Header.Text = "Schwefel 2.4 Problem"
-            .Chart.Axes.Left.Title.Caption = "Funktionswert"
-            .Chart.Axes.Bottom.Title.Caption = "Berechnungsschritt"
-            .Aspect.View3D = False
-            .Legend.Visible = False
+        'Den Ausgangswert zeichnen
+        serie = Diag.getSeriesLine("Ausgangswert", "Green")
+        serie.Add(array_x, array_y)
 
-            'Axen Formatieren
-            .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Maximum = Anzahl_Kalkulationen
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Left.Automatic = False
-            .Chart.Axes.Left.Maximum = Ausgangswert * 1.3
-            .Chart.Axes.Left.Minimum = 0
-            .Chart.Axes.Left.Logarithmic = False
+    End Sub
 
-            'Ausgangswert zeichnen
-            serie = .getSeriesLine("Ausgangswert", "Red")
-            serie.Add(array_x, array_y)
+    'Diagramm für Schwefel-Problem initialisieren
+    '********************************************
+    Private Sub DiagInitialise_SchwefelProblem(ByRef rSettings As Common.EVO_Settings, ByRef Diag As EVO.Hauptdiagramm)
 
-        End With
+        Dim array_x() As Double = {}
+        Dim array_y() As Double = {}
+        Dim Ausgangswert As Double
+        Dim Anzahl_Kalkulationen As Integer
+        Dim i As Short
+        Dim X() As Double
+        Dim serie As Steema.TeeChart.Styles.Series
+        Dim achsen As Collection
+        Dim achse As Diagramm.Achse
+
+        If (rSettings.PES.Pop.is_POPUL) Then
+            Anzahl_Kalkulationen = rSettings.PES.n_Gen * rSettings.PES.n_Nachf * rSettings.PES.Pop.n_Runden + 1
+        Else
+            Anzahl_Kalkulationen = rSettings.PES.n_Gen * rSettings.PES.n_Nachf + 1
+        End If
+
+        'Ausgangswert berechnen
+        ReDim X(Me.mAnzParameter)
+        For i = 1 To Me.mAnzParameter
+            X(i) = 10
+        Next i
+        Ausgangswert = 0
+        For i = 1 To Me.mAnzParameter
+            Ausgangswert += ((X(1) - X(i) ^ 2) ^ 2 + (X(i) - 1) ^ 2)
+        Next i
+
+        'Achsen
+        '------
+        achsen = New Collection()
+
+        'X-Achse
+        achse.Title = "Berechnungsschritt"
+        achse.Automatic = False
+        achse.Minimum = 0
+        achse.Maximum = Anzahl_Kalkulationen
+        Call achsen.Add(achse)
+
+        'Y-Achse
+        achse.Title = "Funktionswert"
+        achse.Automatic = False
+        achse.Minimum = 0
+        achse.Maximum = Ausgangswert * 1.3
+        Call achsen.Add(achse)
+
+        Call Diag.DiagInitialise("Schwefel 2.4 Problem", achsen, rSettings)
+
+        'Linie für den Ausgangswert berechnen
+        ReDim array_y(Anzahl_Kalkulationen - 1)
+        ReDim array_x(Anzahl_Kalkulationen - 1)
+        For i = 0 To Anzahl_Kalkulationen - 1
+            array_y(i) = Ausgangswert
+            array_x(i) = i + 1
+        Next i
+
+        'Ausgangswert zeichnen
+        serie = Diag.getSeriesLine("Ausgangswert", "Red")
+        serie.Add(array_x, array_y)
 
     End Sub
 
     'Diagramm für MultiObjective-Probleme initialisieren
     '***************************************************
-    Private Sub DiagInitialise_MultiTestProb(ByVal PES_Settings As Common.EVO_Settings, ByRef Diag As EVO.Diagramm)
+    Private Sub DiagInitialise_MultiTestProb(ByRef rSettings As Common.EVO_Settings, ByRef Diag As EVO.Hauptdiagramm)
 
         Dim i, j As Short
+        Dim title As String
         Dim serie As Steema.TeeChart.Styles.Series
+        Dim achsen As Collection
+        Dim xachse, yachse As Diagramm.Achse
 
-        With Diag
-            .Clear()
-            .Aspect.View3D = False
-            .Legend.Visible = False
-            .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Maximum = 1
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Bottom.Increment = 0.1
-            .Chart.Axes.Bottom.Labels.Style = Steema.TeeChart.AxisLabelStyle.Value
-            .Chart.Axes.Left.Automatic = False
-            .Chart.Axes.Left.Maximum = 10
-            .Chart.Axes.Left.Minimum = 0
-            .Chart.Axes.Left.Increment = 2
-            .Chart.Axes.Left.Labels.Style = Steema.TeeChart.AxisLabelStyle.Value
-        End With
+        title = "Testproblem"
 
-        Select Case Me.Combo_Testproblem.Text
+        'Achsen
+        '------
+        achsen = New Collection()
 
-            Case "Deb 1"
+        'X-Achse
+        xachse.Title = "X"
+        xachse.Automatic = False
+        xachse.Minimum = 0
+        xachse.Maximum = 1
+        xachse.Increment = 0.1
+
+        'Y-Achse
+        yachse.Title = "Y"
+        yachse.Automatic = False
+        yachse.Minimum = 0
+        yachse.Maximum = 1
+        yachse.Increment = 0.1
+
+        'Problemspezifische Anpassungen
+        Select Case Me.selectedTestproblem
+
+            Case TP_Deb1
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                title = "Deb D1 - MO-konvex"
+                yachse.Automatic = True
+
+            Case TP_ZitzlerDebT1
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                title = "Zitzler/Deb/Theile T1"
+                yachse.Maximum = 7
+                yachse.Increment = 0.5
+
+            Case TP_ZitzlerDebT2
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                title = "Zitzler/Deb/Theile T2"
+                yachse.Maximum = 7
+
+            Case TP_ZitzlerDebT3
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                title = "Zitzler/Deb/Theile T3"
+                xachse.Increment = 0.2
+                yachse.Maximum = 7
+                yachse.Minimum = -1
+                yachse.Increment = 0.5
+
+            Case TP_ZitzlerDebT4
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                title = "Zitzler/Deb/Theile T4"
+                xachse.Automatic = True
+                yachse.Automatic = True
+
+            Case TP_CONSTR
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                title = TP_CONSTR
+                yachse.Maximum = 15
+
+            Case TP_FloodMitigation
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                title = "Flood mitigation ajay"
+
+                yachse.Maximum = -15000000
+                yachse.Minimum = -55000000
+
+                xachse.Maximum = 10000000
+                xachse.Minimum = -15000000
+
+        End Select
+
+        Call achsen.Add(xachse)
+        Call achsen.Add(yachse)
+
+        'Diagramm initialisieren
+        Call Diag.DiagInitialise(title, achsen, rSettings)
+
+        'Problemspezifische Serien zeichnen
+        '----------------------------------
+        Select Case Me.selectedTestproblem
+
+            Case TP_Deb1
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 Dim Array1X(100) As Double
                 Dim Array1Y(100) As Double
                 Dim Array2X(100) As Double
                 Dim Array2Y(100) As Double
-                Diag.Header.Text = "Deb D1 - MO-konvex"
 
                 'Paretofront berechnen und zeichnen
                 For j = 0 To 100
@@ -514,13 +593,10 @@ Partial Public Class Testprobleme
                 serie.Add(Array2X, Array2Y)
 
 
-            Case "Zitzler/Deb T1"
+            Case TP_ZitzlerDebT1
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 Dim ArrayX(1000) As Double
                 Dim ArrayY(1000) As Double
-                Diag.Header.Text = "Zitzler/Deb/Theile T1"
-                Diag.Chart.Axes.Left.Maximum = 7
-                Diag.Chart.Axes.Left.Increment = 0.5
 
                 'Paretofront berechnen und zeichnen
                 For j = 0 To 1000
@@ -531,12 +607,10 @@ Partial Public Class Testprobleme
                 serie.Add(ArrayX, ArrayY)
 
 
-            Case "Zitzler/Deb T2"
+            Case TP_ZitzlerDebT2
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 Dim ArrayX(100) As Double
                 Dim ArrayY(100) As Double
-                Diag.Header.Text = "Zitzler/Deb/Theile T2"
-                Diag.Chart.Axes.Left.Maximum = 7
 
                 'Paretofront berechnen und zeichnen
                 For j = 0 To 100
@@ -547,16 +621,11 @@ Partial Public Class Testprobleme
                 serie.Add(ArrayX, ArrayY)
 
 
-            Case "Zitzler/Deb T3"
+            Case TP_ZitzlerDebT3
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 'TODO: Titel der Serien (für Export)
                 Dim ArrayX(100) As Double
                 Dim ArrayY(100) As Double
-                Diag.Header.Text = "Zitzler/Deb/Theile T3"
-                Diag.Chart.Axes.Bottom.Increment = 0.2
-                Diag.Chart.Axes.Left.Maximum = 7
-                Diag.Chart.Axes.Left.Minimum = -1
-                Diag.Chart.Axes.Left.Increment = 0.5
 
                 'Paretofront berechnen und zeichnen
                 For j = 0 To 100
@@ -567,13 +636,10 @@ Partial Public Class Testprobleme
                 serie.Add(ArrayX, ArrayY)
 
 
-            Case "Zitzler/Deb T4"
+            Case TP_ZitzlerDebT4
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 Dim ArrayX(1000) As Double
                 Dim ArrayY(1000) As Double
-                Diag.Header.Text = "Zitzler/Deb/Theile T4"
-                Diag.Chart.Axes.Bottom.Automatic = True
-                Diag.Chart.Axes.Left.Automatic = True
 
                 'Lokale Optima berechnen und zeichnen
                 For i = 1 To 10
@@ -586,7 +652,7 @@ Partial Public Class Testprobleme
                 Next
 
 
-            Case "CONSTR"
+            Case TP_CONSTR
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 Dim Array1X(100) As Double
                 Dim Array1Y(100) As Double
@@ -596,7 +662,6 @@ Partial Public Class Testprobleme
                 Dim Array3Y(61) As Double
                 Dim Array4X(61) As Double
                 Dim Array4Y(61) As Double
-                Diag.Header.Text = "CONSTR"
 
                 'Grenze 1 berechnen und zeichnen
                 For j = 0 To 100
@@ -634,224 +699,216 @@ Partial Public Class Testprobleme
                 serie = Diag.getSeriesLine("Grenze 4", "Red")
                 serie.Add(Array4X, Array4Y)
 
+            Case TP_FloodMitigation
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                'keine Serien
+
         End Select
 
     End Sub
 
     'Diagramm für Box-Problem (3D) initialisieren
     '********************************************
-    Private Sub DiagInitialise_3D_Box(ByVal PES_Settings As Common.EVO_Settings, ByVal AnzPar As Integer, ByRef Diag As EVO.Diagramm)
+    Private Sub DiagInitialise_3D_Box(ByRef rSettings As Common.EVO_Settings, ByRef Diag As EVO.Hauptdiagramm)
 
         Dim i, j, n As Integer
         Dim ArrayX() As Double
         Dim ArrayY() As Double
         Dim ArrayZ() As Double
+        Dim achsen As Collection
+        Dim achse As Diagramm.Achse
 
-        With Diag
-            .Clear()
-            .Header.Text = "Box"
-            .Legend.Visible = False
-            .Aspect.View3D = True
-            .Aspect.Chart3DPercent = 90
-            .Aspect.Elevation = 348
-            .Aspect.Orthogonal = False
-            .Aspect.Perspective = 62
-            .Aspect.Rotation = 329
-            .Aspect.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality
-            .Aspect.VertOffset = -20
-            .Aspect.Zoom = 66
-            .Tools.Add(New Steema.TeeChart.Tools.Rotate())
+        'Achsen
+        '------
+        achsen = New Collection()
 
-            'Achsen:
-            .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Visible = True
-            .Chart.Axes.Bottom.Title.Caption = "X"
-            .Chart.Axes.Bottom.Maximum = 1
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Bottom.Increment = 0.2
+        'X-Achse
+        achse.Title = "X"
+        achse.Automatic = False
+        achse.Minimum = 0
+        achse.Maximum = 1
+        achse.Increment = 0.2
+        Call achsen.Add(achse)
 
-            .Chart.Axes.Left.Automatic = False
-            .Chart.Axes.Left.Visible = True
-            .Chart.Axes.Left.Title.Caption = "Y"
-            .Chart.Axes.Left.Maximum = 1
-            .Chart.Axes.Left.Minimum = 0
-            .Chart.Axes.Left.Increment = 0.2
+        'Y-Achse
+        achse.Title = "Y"
+        achse.Automatic = False
+        achse.Minimum = 0
+        achse.Maximum = 1
+        achse.Increment = 0.2
+        Call achsen.Add(achse)
 
-            .Chart.Axes.Depth.Automatic = False
-            .Chart.Axes.Depth.Visible = True
-            .Chart.Axes.Depth.Title.Caption = "Z"
-            .Chart.Axes.Depth.Maximum = 1
-            .Chart.Axes.Depth.Minimum = 0
-            .Chart.Axes.Depth.Increment = 0.2
+        'Z-Achse
+        achse.Title = "Z"
+        achse.Automatic = False
+        achse.Minimum = 0
+        achse.Maximum = 1
+        achse.Increment = 0.2
+        Call achsen.Add(achse)
 
-            'Serien
-            '-----------
-            Dim surface As Steema.TeeChart.Styles.Surface
-            Dim series3D As Steema.TeeChart.Styles.Points3D
+        'Diagramm initialisieren
+        Call Diag.DiagInitialise(TP_Box, achsen, rSettings)
 
-            'Constraint 1
-            'x + y + z <= 0.8
-            Dim surfaceRes As Integer = 11
-            ReDim ArrayX(surfaceRes ^ 2 - 1)
-            ReDim ArrayY(surfaceRes ^ 2 - 1)
-            ReDim ArrayZ(surfaceRes ^ 2 - 1)
+        'Serien
+        '------
+        Dim surface As Steema.TeeChart.Styles.Surface
+        Dim series3D As Steema.TeeChart.Styles.Points3D
 
-            n = 0
-            For i = 0 To surfaceRes - 1
-                For j = 0 To (surfaceRes - 1)
-                    ArrayX(n) = i * (1.1 / surfaceRes)
-                    ArrayZ(n) = j * (1.1 / surfaceRes)
-                    ArrayY(n) = Math.Max(0.8 - ArrayX(n) - ArrayZ(n), 0)
-                    n += 1
-                Next
+        'Constraint 1
+        'x + y + z <= 0.8
+        Dim surfaceRes As Integer = 11
+        ReDim ArrayX(surfaceRes ^ 2 - 1)
+        ReDim ArrayY(surfaceRes ^ 2 - 1)
+        ReDim ArrayZ(surfaceRes ^ 2 - 1)
+
+        n = 0
+        For i = 0 To surfaceRes - 1
+            For j = 0 To (surfaceRes - 1)
+                ArrayX(n) = i * (1.1 / surfaceRes)
+                ArrayZ(n) = j * (1.1 / surfaceRes)
+                ArrayY(n) = Math.Max(0.8 - ArrayX(n) - ArrayZ(n), 0)
+                n += 1
             Next
+        Next
 
-            surface = New Steema.TeeChart.Styles.Surface(Diag.Chart)
-            surface.Title = "Constraint 1"
-            surface.IrregularGrid = True
-            surface.NumXValues = surfaceRes
-            surface.NumZValues = surfaceRes
-            surface.Add(ArrayX, ArrayY, ArrayZ)
-            surface.UseColorRange = False
-            surface.UsePalette = False
-            surface.Brush.Solid = True
-            surface.Brush.Color = Color.Green
-            surface.Brush.Transparency = 70
-            surface.Pen.Color = Color.Green
-            surface.SideBrush.Visible = True
-            surface.SideBrush.Color = Color.Red
-            surface.SideBrush.Transparency = 70
+        surface = New Steema.TeeChart.Styles.Surface(Diag.Chart)
+        surface.Title = "Constraint 1"
+        surface.IrregularGrid = True
+        surface.NumXValues = surfaceRes
+        surface.NumZValues = surfaceRes
+        surface.Add(ArrayX, ArrayY, ArrayZ)
+        surface.UseColorRange = False
+        surface.UsePalette = False
+        surface.Brush.Solid = True
+        surface.Brush.Color = Color.Green
+        surface.Brush.Transparency = 70
+        surface.Pen.Color = Color.Green
+        surface.SideBrush.Visible = True
+        surface.SideBrush.Color = Color.Red
+        surface.SideBrush.Transparency = 70
 
-            'Constraint 2
-            'x + y <= 0.5
-            ReDim ArrayX(65)
-            ReDim ArrayY(65)
-            ReDim ArrayZ(65)
+        'Constraint 2
+        'x + y <= 0.5
+        ReDim ArrayX(65)
+        ReDim ArrayY(65)
+        ReDim ArrayZ(65)
 
-            n = 0
-            For i = 0 To 10
-                For j = 0 To 5
-                    ArrayX(n) = j * 0.1
-                    ArrayZ(n) = i * 0.1
-                    ArrayY(n) = 0.5 - ArrayX(n)
-                    n += 1
-                Next
+        n = 0
+        For i = 0 To 10
+            For j = 0 To 5
+                ArrayX(n) = j * 0.1
+                ArrayZ(n) = i * 0.1
+                ArrayY(n) = 0.5 - ArrayX(n)
+                n += 1
             Next
+        Next
 
-            surface = New Steema.TeeChart.Styles.Surface(Diag.Chart)
-            surface.Title = "Constraint 2"
-            surface.IrregularGrid = True
-            surface.NumXValues = 10
-            surface.NumZValues = 10
-            surface.Add(ArrayX, ArrayY, ArrayZ)
-            surface.UseColorRange = False
-            surface.UsePalette = False
-            surface.Brush.Solid = True
-            surface.Brush.Color = Color.Blue
-            surface.Brush.Transparency = 70
-            surface.Pen.Color = Color.Blue
-            surface.SideBrush.Visible = True
-            surface.SideBrush.Color = Color.Red
-            surface.SideBrush.Transparency = 70
+        surface = New Steema.TeeChart.Styles.Surface(Diag.Chart)
+        surface.Title = "Constraint 2"
+        surface.IrregularGrid = True
+        surface.NumXValues = 10
+        surface.NumZValues = 10
+        surface.Add(ArrayX, ArrayY, ArrayZ)
+        surface.UseColorRange = False
+        surface.UsePalette = False
+        surface.Brush.Solid = True
+        surface.Brush.Color = Color.Blue
+        surface.Brush.Transparency = 70
+        surface.Pen.Color = Color.Blue
+        surface.SideBrush.Visible = True
+        surface.SideBrush.Color = Color.Red
+        surface.SideBrush.Transparency = 70
 
-            'Schnittgerade zwischen den Constraints
-            series3D = New Steema.TeeChart.Styles.Points3D(Diag.Chart)
-            series3D.Title = "Schnittgerade"
-            series3D.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Nothing
-            series3D.LinePen.Visible = True
-            series3D.LinePen.Width = 1
-            series3D.LinePen.Color = Color.Red
-            series3D.Add(0.5, 0, 0.3)
-            series3D.Add(0, 0.5, 0.3)
-
-        End With
-
+        'Schnittgerade zwischen den Constraints
+        series3D = New Steema.TeeChart.Styles.Points3D(Diag.Chart)
+        series3D.Title = "Schnittgerade"
+        series3D.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Nothing
+        series3D.LinePen.Visible = True
+        series3D.LinePen.Width = 1
+        series3D.LinePen.Color = Color.Red
+        series3D.Add(0.5, 0, 0.3)
+        series3D.Add(0, 0.5, 0.3)
 
     End Sub
 
 
     'Diagramm für Abhängige Parameter initialisieren
     '***********************************************
-    Private Sub DiagInitialise_AbhParameter(ByVal PES_Settings As Common.EVO_Settings, ByVal AnzPar As Integer, ByRef Diag As EVO.Diagramm)
+    Private Sub DiagInitialise_AbhParameter(ByRef rSettings As Common.EVO_Settings, ByRef Diag As EVO.Hauptdiagramm)
 
-        With Diag
-            .Clear()
-            .Header.Text = "Abhängige Parameter"
-            .Legend.Visible = False
-            .Aspect.View3D = True
-            .Aspect.Chart3DPercent = 90
-            .Aspect.Elevation = 348
-            .Aspect.Orthogonal = False
-            .Aspect.Perspective = 62
-            .Aspect.Rotation = 360
-            .Aspect.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality
-            .Aspect.VertOffset = -20
-            .Aspect.Zoom = 66
-            .Tools.Add(New Steema.TeeChart.Tools.Rotate())
+        Dim i, j, n As Integer
+        Dim ArrayX() As Double
+        Dim ArrayY() As Double
+        Dim ArrayZ() As Double
+        Const surfaceRes As Integer = 11
+        Dim surface As Steema.TeeChart.Styles.Surface
+        Dim achsen As Collection
+        Dim achse As Diagramm.Achse
 
-            'Achsen:
-            .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Visible = True
-            .Chart.Axes.Bottom.Title.Caption = "X"
-            .Chart.Axes.Bottom.Maximum = 1
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Bottom.Increment = 0.2
+        'Achsen
+        '------
+        achsen = New Collection()
 
-            .Chart.Axes.Left.Automatic = False
-            .Chart.Axes.Left.Visible = True
-            .Chart.Axes.Left.Title.Caption = "Y"
-            .Chart.Axes.Left.Maximum = 1
-            .Chart.Axes.Left.Minimum = 0
-            .Chart.Axes.Left.Increment = 0.2
+        'X-Achse
+        achse.Title = "X"
+        achse.Automatic = False
+        achse.Minimum = 0
+        achse.Maximum = 1
+        achse.Increment = 0.2
+        Call achsen.Add(achse)
 
-            .Chart.Axes.Depth.Automatic = False
-            .Chart.Axes.Depth.Visible = True
-            .Chart.Axes.Depth.Title.Caption = "Zielfunktion"
-            .Chart.Axes.Depth.Maximum = 2
-            .Chart.Axes.Depth.Minimum = 0
-            .Chart.Axes.Depth.Increment = 0.5
+        'Y-Achse
+        achse.Title = "Y"
+        achse.Automatic = False
+        achse.Minimum = 0
+        achse.Maximum = 1
+        achse.Increment = 0.2
+        Call achsen.Add(achse)
 
-            'Serien
-            '-----------
-            Dim surface As Steema.TeeChart.Styles.Surface
+        'Z-Achse
+        achse.Title = "Zielfunktion"
+        achse.Automatic = False
+        achse.Minimum = 0
+        achse.Maximum = 2
+        achse.Increment = 0.5
+        Call achsen.Add(achse)
 
-            'x = y
-            Dim i, j, n As Integer
-            Dim ArrayX() As Double
-            Dim ArrayY() As Double
-            Dim ArrayZ() As Double
-            Dim surfaceRes As Integer = 11
-            ReDim ArrayX(surfaceRes ^ 2 - 1)
-            ReDim ArrayY(surfaceRes ^ 2 - 1)
-            ReDim ArrayZ(surfaceRes ^ 2 - 1)
+        'Diagramm initialisieren
+        Call Diag.DiagInitialise(TP_AbhängigeParameter, achsen, rSettings)
 
-            n = 0
-            For i = 0 To surfaceRes - 1
-                For j = 0 To (surfaceRes - 1)
-                    ArrayX(n) = i * (1.1 / surfaceRes)
-                    ArrayZ(n) = j * (2.1 / surfaceRes)
-                    ArrayY(n) = ArrayX(n)
-                    n += 1
-                Next
+        'Serien
+        '------
+
+        'Ebene x = y
+        ReDim ArrayX(surfaceRes ^ 2 - 1)
+        ReDim ArrayY(surfaceRes ^ 2 - 1)
+        ReDim ArrayZ(surfaceRes ^ 2 - 1)
+
+        n = 0
+        For i = 0 To surfaceRes - 1
+            For j = 0 To (surfaceRes - 1)
+                ArrayX(n) = i * (1.1 / surfaceRes)
+                ArrayZ(n) = j * (2.1 / surfaceRes)
+                ArrayY(n) = ArrayX(n)
+                n += 1
             Next
+        Next
 
-            surface = New Steema.TeeChart.Styles.Surface(Diag.Chart)
-            surface.Title = "X = Y"
-            surface.IrregularGrid = True
-            surface.NumXValues = surfaceRes
-            surface.NumZValues = surfaceRes
-            surface.Add(ArrayX, ArrayY, ArrayZ)
-            surface.UseColorRange = False
-            surface.UsePalette = False
-            surface.Brush.Solid = True
-            surface.Brush.Color = Color.Green
-            surface.Brush.Transparency = 70
-            surface.Pen.Color = Color.Green
-            surface.SideBrush.Visible = True
-            surface.SideBrush.Color = Color.Red
-            surface.SideBrush.Transparency = 70
-
-        End With
+        surface = New Steema.TeeChart.Styles.Surface(Diag.Chart)
+        surface.Title = "X = Y"
+        surface.IrregularGrid = True
+        surface.NumXValues = surfaceRes
+        surface.NumZValues = surfaceRes
+        surface.Add(ArrayX, ArrayY, ArrayZ)
+        surface.UseColorRange = False
+        surface.UsePalette = False
+        surface.Brush.Solid = True
+        surface.Brush.Color = Color.Green
+        surface.Brush.Transparency = 70
+        surface.Pen.Color = Color.Green
+        surface.SideBrush.Visible = True
+        surface.SideBrush.Color = Color.Red
+        surface.SideBrush.Transparency = 70
 
     End Sub
 
@@ -872,13 +929,13 @@ Partial Public Class Testprobleme
         Dim globalAnzPar As Short = ind.PES_OptParas.GetLength(0)
         Dim serie As Steema.TeeChart.Styles.Series
 
-        Select Case Me.Combo_Testproblem.Text
+        Select Case Me.selectedTestproblem
 
             '*************************************
             '* Single-Objective Problemstellungen *
             '*************************************
 
-            Case "Sinus-Funktion"
+            Case TP_SinusFunktion
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
                 'Fehlerquadrate zur Sinusfunktion |0-2pi|
@@ -906,7 +963,7 @@ Partial Public Class Testprobleme
                 serie.Add(array_x, array_y)
 
 
-            Case "Beale-Problem"
+            Case TP_BealeProblem
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
                 'Qualitätswert berechnen
@@ -921,7 +978,7 @@ Partial Public Class Testprobleme
                 serie = Diag.getSeriesPoint("Population " & ipop + 1)
                 serie.Add(ind.ID, ind.Zielwerte(0))
 
-            Case "Schwefel 2.4-Problem"
+            Case TP_Schwefel24Problem
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
                 'Qualitätswert berechnen
@@ -944,7 +1001,7 @@ Partial Public Class Testprobleme
                 '* Multi-Objective Problemstellungen *
                 '*************************************
 
-            Case "Deb 1" 'Deb 2000, D1 (Konvexe Pareto-Front)
+            Case TP_Deb1 'Deb 2000, D1 (Konvexe Pareto-Front)
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
                 'Qualitätswert berechnen
@@ -957,7 +1014,7 @@ Partial Public Class Testprobleme
                 serie = Diag.getSeriesPoint("Population", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                 serie.Add(ind.Zielwerte(0), ind.Zielwerte(1))
 
-            Case "Zitzler/Deb T1" 'Zitzler/Deb/Thiele 2000, T1 (Konvexe Pareto-Front)
+            Case TP_ZitzlerDebT1 'Zitzler/Deb/Thiele 2000, T1 (Konvexe Pareto-Front)
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
                 'Qualitätswert berechnen
@@ -977,7 +1034,7 @@ Partial Public Class Testprobleme
                 serie = Diag.getSeriesPoint("Population", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                 serie.Add(ind.Zielwerte(0), ind.Zielwerte(1))
 
-            Case "Zitzler/Deb T2" 'Zitzler/Deb/Thiele 2000, T2 (Non-Konvexe Pareto-Front)
+            Case TP_ZitzlerDebT2 'Zitzler/Deb/Thiele 2000, T2 (Non-Konvexe Pareto-Front)
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
                 'Qualitätswerte berechnen
@@ -997,7 +1054,7 @@ Partial Public Class Testprobleme
                 serie = Diag.getSeriesPoint("Population", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                 serie.Add(ind.Zielwerte(0), ind.Zielwerte(1))
 
-            Case "Zitzler/Deb T3" 'Zitzler/Deb/Thiele 2000, T3 (disconected Pareto-Front)
+            Case TP_ZitzlerDebT3 'Zitzler/Deb/Thiele 2000, T3 (disconected Pareto-Front)
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
                 'Qualitätswerte berechnen
@@ -1017,7 +1074,7 @@ Partial Public Class Testprobleme
                 serie = Diag.getSeriesPoint("Population", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                 serie.Add(ind.Zielwerte(0), ind.Zielwerte(1))
 
-            Case "Zitzler/Deb T4" 'Zitzler/Deb/Thiele 2000, T4 (local/global Pareto-Fronts)
+            Case TP_ZitzlerDebT4 'Zitzler/Deb/Thiele 2000, T4 (local/global Pareto-Fronts)
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
                 'Qualitätswerte berechnen
@@ -1038,7 +1095,7 @@ Partial Public Class Testprobleme
                 serie = Diag.getSeriesPoint("Population", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                 serie.Add(ind.Zielwerte(0), ind.Zielwerte(1))
 
-            Case "CONSTR"
+            Case TP_CONSTR
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
                 'Qualitätswerte berechnen
@@ -1068,7 +1125,7 @@ Partial Public Class Testprobleme
                 End If
                 serie.Add(ind.Zielwerte(0), ind.Zielwerte(1))
 
-            Case "Box"
+            Case TP_Box
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
                 'Qualitätswerte berechnen
@@ -1094,7 +1151,7 @@ Partial Public Class Testprobleme
                 End If
                 serie3D.Add(ind.Zielwerte(0), ind.Zielwerte(1), ind.Zielwerte(2))
 
-            Case "Abhängige Parameter"
+            Case TP_AbhängigeParameter
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
                 'Qualitätswerte berechnen
@@ -1107,8 +1164,66 @@ Partial Public Class Testprobleme
                 serie3D = Diag.getSeries3DPoint("Population " & ipop + 1)
                 serie3D.Add(ind.PES_OptParas(0).Xn, ind.PES_OptParas(1).Xn, ind.Zielwerte(0))
 
-        End Select
+            Case TP_FloodMitigation
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
+                'Getting the new Parameters
+                ReDim X(7)
+                For i = 0 To X.GetUpperBound(0)
+                    X(i) = ind.PES_OptParas(i).RWert
+                Next
+
+                'Calculating the Objective Function
+                '----------------------------------
+                Dim Storage As Double
+                Storage = 650000
+                'float sconst=650000;
+
+                Dim p() As Double = {9449568.0, 9069713.044, 2441388.773, 1556876.392}
+                'double p[4] = { 9449568.000,9069713.044,2441388.773,1556876.392};
+                f1 = 0
+                f2 = 0
+
+                'Objective Function 1 and 2
+                f1 = -((p(0) - X(4)) - (X(0) - X(1)))
+                f2 = -(0.09651 * (((8.0E-22 * Math.Pow(X(0), 3)) - (0.00000000000008 * Math.Pow(X(0), 2)) + (0.000003 * X(0)) + 6.2034) * X(4)))
+
+                f1 = f1 - ((p(1) - X(5)) - (X(1) - X(2)))
+                f2 = f2 - (0.09651 * (((8.0E-22 * Math.Pow(X(1), 3)) - (0.00000000000008 * Math.Pow(X(1), 2)) + (0.000003 * X(1)) + 6.2034) * X(5)))
+
+                f1 = f1 - ((p(2) - X(6)) - (X(2) - X(3)))
+                f2 = f2 - (0.09651 * (((8.0E-22 * Math.Pow(X(2), 3)) - (0.00000000000008 * Math.Pow(X(2), 2)) + (0.000003 * X(2)) + 6.2034) * X(6)))
+
+                f1 = f1 - ((p(3) - X(7)) - (X(3) - X(4)))
+                f2 = f2 - (0.09651 * (((8.0E-22 * Math.Pow(X(3), 3)) - (0.00000000000008 * Math.Pow(X(3), 2)) + (0.000003 * X(3)) + 6.2034) * X(7)))
+
+                'Constraints
+                '-----------
+                Dim contrain(3) As Double
+                contrain(0) = (X(0) - Storage - p(0) + X(4))
+                contrain(1) = (X(1) - X(0) - p(1) + X(5))
+                contrain(2) = (X(2) - X(1) - p(2) + X(6))
+                contrain(3) = (X(3) - X(2) - p(3) + X(7))
+
+                'Give Back the Penalties and Constraints
+                ind.Zielwerte(0) = f1
+                ind.Zielwerte(1) = f2
+                ind.Constrain(0) = contrain(0)
+                ind.Constrain(1) = contrain(1)
+                ind.Constrain(2) = contrain(2)
+                ind.Constrain(3) = contrain(3)
+
+                'Drawing
+                '--------
+
+                If ind.Is_Feasible Then
+                    serie = Diag.getSeriesPoint("Population", "Orange")
+                Else
+                    serie = Diag.getSeriesPoint("Population (ungültig)", "Gray")
+                End If
+                serie.Add(ind.Zielwerte(0), ind.Zielwerte(1))
+
+        End Select
     End Sub
 
 #End Region 'Evaluierung

@@ -22,12 +22,6 @@ Public Class Smusi
     'Eigenschaften
     '#############
 
-    Public Overrides ReadOnly Property Datensatzendung() As String
-        Get
-            Return ".ALL"
-        End Get
-    End Property
-
     'SMUSI DLL
     '---------
     Private smusi_dll As SMUSI_EngineDotNetAccess
@@ -45,6 +39,8 @@ Public Class Smusi
     Public Sub New()
 
         Call MyBase.New()
+
+        Me.mDatensatzendung = ".ALL"
 
     End Sub
 
@@ -93,7 +89,7 @@ Public Class Smusi
 
     'SMUSI ausführen (simulieren)
     '***********************************
-    Public Overrides Function launchSim() As Boolean
+    Public Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
 
         Dim simOK As Boolean
         Dim SimCurrent, SimStart, SimEnde As DateTime
@@ -206,43 +202,50 @@ Public Class Smusi
 
         End If
 
-
-        'Simulationsergebnis verarbeiten
-        '-------------------------------
-        If (simOK) Then
-
-            Dim datei, element As String
-            Dim ASCtmp As Wave.ASC
-            Dim elemente As New Collection()
-
-            'Einzulesende Dateien zusammenstellen
-            For Each ziel As Common.Ziel In Common.Manager.List_Ziele
-                element = ziel.SimGr.Substring(0, 4)
-                If (Not elemente.Contains(element)) Then
-                    elemente.Add(element, element)
-                End If
-            Next
-
-            'Altes SimErgebnis löschen
-            Me.SimErgebnis.Clear()
-
-            'Dateien einlesen
-            For Each elem As String In elemente
-                datei = elem & "_WEL.ASC"
-                ASCtmp = New Wave.ASC(Me.WorkDir & datei, True)
-                'Simulationsergebnis abspeichern
-                For Each zre As Wave.Zeitreihe In ASCtmp.Zeitreihen
-                    Me.SimErgebnis.Add(zre, elem & "_" & zre.ToString())
-                Next
-                ASCtmp = Nothing
-            Next
-
-            elemente = Nothing
-        End If
-
         Return simOK
 
     End Function
+
+    Public Overrides Function launchFree(ByRef Thread_ID As Integer) As Boolean
+
+    End Function
+    Public Overrides Function launchReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
+
+    End Function
+
+    'Simulationsergebnis verarbeiten
+    '-------------------------------
+    Public Overrides Sub WelDateiVerwursten()
+
+        Dim datei, element As String
+        Dim ASCtmp As Wave.ASC
+        Dim elemente As New Collection()
+
+        'Einzulesende Dateien zusammenstellen
+        For Each ziel As Common.Ziel In Common.Manager.List_Ziele
+            element = ziel.SimGr.Substring(0, 4)
+            If (Not elemente.Contains(element)) Then
+                elemente.Add(element, element)
+            End If
+        Next
+
+        'Altes SimErgebnis löschen
+        Me.SimErgebnis.Clear()
+
+        'Dateien einlesen
+        For Each elem As String In elemente
+            datei = elem & "_WEL.ASC"
+            ASCtmp = New Wave.ASC(Me.WorkDir & datei, True)
+            'Simulationsergebnis abspeichern
+            For Each zre As Wave.Zeitreihe In ASCtmp.Zeitreihen
+                Me.SimErgebnis.Add(zre, elem & "_" & zre.ToString())
+            Next
+            ASCtmp = Nothing
+        Next
+
+        elemente = Nothing
+
+    End Sub
 
     'Berechnung des Qualitätswerts (Zielwert)
     '****************************************

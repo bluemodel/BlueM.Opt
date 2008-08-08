@@ -21,15 +21,17 @@ Public MustInherit Class Sim
     'Eigenschaften
     '#############
 
-    'Information
-    '-----------
-
     'Generelle Eigenschaften
     '-----------------------
     Public Datensatz As String                           'Name des zu simulierenden Datensatzes
-    Public MustOverride ReadOnly Property Datensatzendung() As String
-    Public WorkDir As String                             'Arbeitsverzeichnis für das Blaue Modell
-    Public Event WorkDirChange()                         'Event für Änderung des Arbeitsverzeichnisses
+    Protected mDatensatzendung As String                 'Dateiendung des Datensatzes (inkl. Punkt)
+    Public ReadOnly Property Datensatzendung() As String
+        Get
+            Return Me.mDatensatzendung
+        End Get
+    End Property
+    Public WorkDir As String                             'Arbeitsverzeichnis/Datensatz für BlueM
+    Public WorkDirSave As String									'Arbeitsverzeichnis/Datensatz für BlueM
 
     Public SimStart As DateTime                          'Anfangsdatum der Simulation
     Public SimEnde As DateTime                           'Enddatum der Simulation
@@ -45,8 +47,8 @@ Public MustInherit Class Sim
     Public Const Constraints_Ext As String = "CON"       'Erweiterung der Datei mit den Constraints (*.CON)
     Public Const Combi_Ext As String = "CES"             'Erweiterung der Datei mit der Kombinatorik  (*.CES)
 
-	'OptParameter
-	'------------
+    'OptParameter
+    '------------
     Public List_OptParameter() As EVO.Common.OptParameter             'Liste der Optimierungsparameter
     Public List_OptParameter_Save() As EVO.Common.OptParameter        'Liste der Optimierungsparameter die nicht verändert wird
 
@@ -75,8 +77,7 @@ Public MustInherit Class Sim
 
     'Kombinatorik
     '------------
-    Public SKos1 As New SKos()
-
+    
     Public Structure Struct_Massnahme
         Public Name As String
         Public Schaltung(,) As String
@@ -92,9 +93,9 @@ Public MustInherit Class Sim
 
     Public List_Locations() As Struct_Lokation
 
-    Public VerzweigungsDatei(,) As String       			'Gibt die PathSize an für jede Pfadstelle
+    Public VerzweigungsDatei(,) As String                   'Gibt die PathSize an für jede Pfadstelle
     Public CES_T_Modus As Common.Constants.CES_T_MODUS      'Zeigt ob der TestModus aktiv ist
-    Public n_Combinations As Integer            			'Die Anzahl der Möglichen Kombinationen
+    Public n_Combinations As Integer                        'Die Anzahl der Möglichen Kombinationen
 
 
 #End Region 'Eigenschaften
@@ -119,42 +120,23 @@ Public MustInherit Class Sim
         ReDim Me.List_Locations(-1)
 
         'Simulationsergebnis instanzieren
-        Me.SimErgebnis = New Collection
-
-        'Benutzereinstellungen einlesen
-        '------------------------------
-        Call Me.ReadSettings()
-
-    End Sub
-
-    'Benutzereinstellungen einlesen 
-    '******************************
-    Public Sub ReadSettings()
-
-        'Datensatz
-        '---------
-        Dim pfad As String
-        pfad = My.Settings.Datensatz
-        Call Me.saveDatensatz(pfad)
+        Me.SimErgebnis = New Collection()
 
     End Sub
 
     'Pfad zum Datensatz verarbeiten und speichern
     '********************************************
-    Public Sub saveDatensatz(ByVal Pfad As String)
+    Public Sub setDatensatz(ByVal pfad As String)
 
-        If (File.Exists(Pfad)) Then
+        If (File.Exists(pfad)) Then
             'Datensatzname bestimmen
-            Me.Datensatz = Path.GetFileNameWithoutExtension(Pfad)
+            Me.Datensatz = Path.GetFileNameWithoutExtension(pfad)
             'Arbeitsverzeichnis bestimmen
-            Me.WorkDir = Path.GetDirectoryName(Pfad) & "\"
-            'Benutzereinstellungen speichern
-            My.Settings.Datensatz = Pfad
-            Call My.Settings.Save()
+            Me.WorkDir = Path.GetDirectoryName(pfad) & "\"
+				Me.WorkDirSave = Path.GetDirectoryName(Pfad) & "\"
+        Else
+            Throw New Exception("Der Datensatz '" & pfad & "' existiert nicht!")
         End If
-
-        'Event auslösen (wird von Form1.displayWorkDir() verarbeitet)
-        RaiseEvent WorkDirChange()
 
     End Sub
 
@@ -445,10 +427,10 @@ Public MustInherit Class Sim
                         .isOpt = False
                     End If
                     .Bezeichnung = WerteArray(2).Trim()
-                    If (WerteArray(3).Trim() = "+") Then 
-                    	.Richtung = Common.EVO_RICHTUNG.Maximierung
+                    If (WerteArray(3).Trim() = "+") Then
+                        .Richtung = Common.EVO_RICHTUNG.Maximierung
                     Else
-                    	.Richtung = Common.EVO_RICHTUNG.Minimierung
+                        .Richtung = Common.EVO_RICHTUNG.Minimierung
                     End If
                     .ZielTyp = WerteArray(4).Trim()
                     .Datei = WerteArray(5).Trim()
@@ -465,7 +447,7 @@ Public MustInherit Class Sim
                         .EvalEnde = Me.SimEnde
                     End If
                     .WertTyp = WerteArray(10).Trim()
-                    If (WerteArray(11).Trim() <> "") Then 
+                    If (WerteArray(11).Trim() <> "") Then
                         .RefWert = Convert.ToDouble(WerteArray(11).Trim(), Common.Provider.FortranProvider)
                     End If
                     .RefGr = WerteArray(12).Trim()
@@ -1022,7 +1004,7 @@ Public MustInherit Class Sim
         Akt.Path = Path
 
         'Die elemente werden an die Kostenkalkulation übergeben
-        SKos1.Akt_Elemente = Elements
+        CType(Me, IHWB.EVO.BlueM).SKos1.Akt_Elemente = Elements
 
         'Ermittelt das aktuelle_ON_OFF array
         Call Prepare_Verzweigung_ON_OFF()
@@ -1150,40 +1132,6 @@ Public MustInherit Class Sim
         For i = 0 To List_OptParameter_Save.GetUpperBound(0)
             List_OptParameter(i) = List_OptParameter_Save(i).Clone()
         Next
-
-    End Sub
-
-    'Schreibt die passenden OptParameter für jede Location ins Child
-    'ToDo alles ist da!
-    '***************************************************************
-    Dim n_tmp As Integer = 0
-
-    'Funktion wahrscheinlich überflüssig
-    Public Sub SaveParameter_to_Child(ByVal Loc As Integer, ByVal Measure As Integer, ByVal Parameter(,) As Object)
-
-        Dim i, j As Integer
-        Dim x As Integer = 0
-
-        'Die Parameterliste wird auf die einzelnen Locations verteilt
-        For i = 0 To List_OptParameter.GetUpperBound(0)
-            For j = 0 To List_Locations(Loc).List_Massnahmen(Measure).Bauwerke.GetUpperBound(0)
-                If Left(List_OptParameter(i).Bezeichnung, 4) = List_Locations(Loc).List_Massnahmen(Measure).Bauwerke(j) Then
-                    Parameter(0, x) = List_OptParameter(i).Bezeichnung
-                    Parameter(1, x) = List_OptParameter(i).Xn
-                    x += 1
-                    ReDim Preserve Parameter(1, x)
-                End If
-            Next
-        Next
-
-        ReDim Preserve Parameter(1, x - 1)
-
-        'Prüfung ob alle Parameter verteilt wurden
-        n_tmp += Parameter.GetLength(1)
-
-        If Loc = List_Locations.GetUpperBound(0) And Not List_OptParameter.GetLength(0) = n_tmp Then
-            Throw New Exception("Die Zahl der Parameter in der OptParliste entspricht nicht der Zahl der Parameter des Faksimile")
-        End If
 
     End Sub
 
@@ -1367,15 +1315,13 @@ Handler:
 
     'Evaluiert die Kinderchen mit Hilfe des Simulationsmodells
     '*********************************************************
-    Public Function SIM_Evaluierung(ByRef Indi As Common.Individuum) As Boolean
+    Public Sub SIM_Ergebnis_auswerten(ByRef Indi As Common.Individuum)
 
         Dim i As Short
 
-        SIM_Evaluierung = False
-
-        'Modell Starten
-        If Not launchSim() Then Exit Function
-
+        'Lesen der Relevanten Parameter aus der wel Datei
+        Call WelDateiVerwursten()
+        
         'Qualitätswerte berechnen
         For i = 0 To Common.Manager.AnzZiele - 1
             Indi.Zielwerte(i) = QWert(Common.Manager.List_Ziele(i))
@@ -1389,9 +1335,7 @@ Handler:
         'Lösung abspeichern
         Call Me.OptResult.addSolution(Indi)
 
-        SIM_Evaluierung = True
-
-    End Function
+    End Sub
 
     'VG_ Test Tagesganglinie mit Autokalibrierung
     'VG *****************************************
@@ -1454,7 +1398,14 @@ Handler:
 
     'SimModell ausführen (simulieren)
     '********************************
-    Public MustOverride Function launchSim() As Boolean
+    Public MustOverride Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
+    Public MustOverride Function launchFree(ByRef Thread_ID As Integer) As Boolean
+    Public MustOverride Function launchReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
+
+
+    'Simulationsergebnis verarbeiten
+    '-------------------------------
+    Public MustOverride Sub WelDateiVerwursten()
 
 #End Region 'Evaluierung
 
@@ -1879,6 +1830,90 @@ Handler:
     End Function
 
 #End Region 'SimErgebnisse lesen
+
+#Region "Multithreading"
+
+    'Datensätze für Multithreading kopieren
+    '**************************************
+    Public Sub coppyDatensatz(byVal n_Proz As Integer)
+
+        Dim i As Integer = 1
+
+        For i = 0 to n_Proz - 1
+            Dim Source As String = WorkDir
+            Dim Dest As String = System.Windows.Forms.Application.StartupPath() & "\Thread_" & i & "\"
+
+            'Löschen um den Inhalt zu entsorgen
+            If Directory.Exists(Dest) Then
+                Call purgeReadOnly(Dest)
+                Directory.Delete(Dest, True)
+            End If
+            
+            My.Computer.FileSystem.CopyDirectory(Source, Dest, True)
+            Call purgeReadOnly(Dest)
+            Directory.Delete(Dest & "\.svn", true)
+
+        Next
+
+    End Sub
+
+    'Datensätze für Multithreading löschen
+    '*************************************
+    Public Sub deleteDatensatz(byVal n_Proz As Integer)
+        Dim i As Integer
+        For i = 1 to n_Proz
+
+            If Directory.Exists(System.Windows.Forms.Application.StartupPath() & "\Thread_" & i) Then
+                Directory.Delete(System.Windows.Forms.Application.StartupPath() & "\Thread_" & i, True)
+            End If
+        Next
+    End Sub
+
+    'Gibt den aktuellen Datensatz zurück
+    '***********************************
+    Public Function getWorkDir(ByVal Thread_ID as Integer) As String
+
+        getWorkDir = ""
+        
+        getWorkDir = System.Windows.Forms.Application.StartupPath() & "\Thread_" & Thread_ID & "\"
+
+        Return getWorkDir
+        
+    End Function
+
+    'Ändert rekursiv die Attribute von Dateien und Unterverzeichnissen von Read-Only zu Normal
+    '*****************************************************************************************
+    Public Sub purgeReadOnly(ByVal path As String)
+
+        Dim mainDir As New DirectoryInfo(path)
+        Dim fInfo As IO.FileInfo() = mainDir.GetFiles("*.*")
+
+        'now loop through all the files and change the file attributes to normal
+        Dim file As IO.FileInfo
+
+        For Each file In fInfo
+            If (file.Attributes And FileAttributes.ReadOnly) Then
+                file.Attributes = FileAttributes.Normal
+            End If
+        Next
+
+        'do the same for the directories
+        Dim dInfo As DirectoryInfo() = mainDir.GetDirectories("*.*")
+        Dim dir As DirectoryInfo
+
+        For Each dir In dInfo
+            If (dir.Attributes And FileAttributes.ReadOnly) Then
+                dir.Attributes = FileAttributes.Normal
+            End If
+
+            'Call method recursively
+            Call purgeReadOnly(dir.FullName)
+        Next
+
+    End Sub
+
+
+#End Region  'Multithreading
 
 #End Region 'Methoden
 

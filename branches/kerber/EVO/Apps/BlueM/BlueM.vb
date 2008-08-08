@@ -1,5 +1,6 @@
 Imports System.IO
 Imports IHWB.BlueM.DllAdapter
+Imports System.Threading
 
 '*******************************************************************************
 '*******************************************************************************
@@ -22,21 +23,27 @@ Public Class BlueM
     'Eigenschaften
     '#############
 
-    Public Overrides ReadOnly Property Datensatzendung() As String
-        Get
-            Return ".ALL"
-        End Get
-    End Property
-
     'BlueM DLL
     '---------
-    Private bluem_dll As BlueM_EngineDotNetAccess
+    Private bluem_dll() As BlueM_EngineDotNetAccess
+
+    'Misc
+    '----
+    Private useKWL As Boolean       'gibt an, ob die KWL-Datei benutzt wird
 
     'IHA
     '---
-    Friend isIHA As Boolean = False
+    Friend isIHA As Boolean
     Friend IHASys As IHWB.IHA.IHAAnalysis
     Friend IHAProc As IHWB.EVO.IHAProcessor
+
+    'SKos
+    '----
+    Friend SKos1 As New SKos()
+
+    '**** Multithreading ****
+    Dim My_C_Thread() As CThread
+    Dim MyThread() As Thread
 
 #End Region 'Eigenschaften
 
@@ -47,20 +54,41 @@ Public Class BlueM
 
     'Konstruktor
     '***********
-    Public Sub New()
+    Public Sub New(byVal n_Proz As Integer)
 
         Call MyBase.New()
 
-        'BlueM DLL instanzieren
-        '----------------------
+        'Daten belegen
+        '-------------
+        Me.mDatensatzendung = ".ALL"
+
+        Me.useKWL = False
+        Me.isIHA = False
+
+        'BluM_DLL
         Dim dll_path As String
         dll_path = System.Windows.Forms.Application.StartupPath() & "\Apps\BlueM\BlueM.dll"
 
-        If (File.Exists(dll_path)) Then
-            bluem_dll = New BlueM_EngineDotNetAccess(dll_path)
-        Else
-            Throw New Exception("BlueM.dll nicht gefunden!")
-        End If
+        'BlueM DLL instanzieren je nach Anzahl der Prozessoren
+        '-----------------------------------------------------
+        ReDim bluem_dll(n_Proz - 1)
+        Dim i As Integer
+
+        For i = 0 to n_Proz - 1
+            If (File.Exists(dll_path)) Then
+                bluem_dll(i) = New BlueM_EngineDotNetAccess(dll_path)
+            Else
+                Throw New Exception("BlueM.dll nicht gefunden!")
+            End If
+        Next
+
+        'Anzahl der Threads
+        ReDim My_C_Thread(n_Proz - 1)
+        For i = 0 to n_Proz - 1
+            My_C_Thread(i) = new CThread(i, -1, "Folder", Datensatz, bluem_dll(i))
+            My_C_Thread(i).set_is_OK
+        Next
+        ReDim MyThread(n_Proz - 1)
 
     End Sub
 
@@ -138,8 +166,21 @@ Public Class BlueM
 
         Call MyBase.Read_ZIE()
 
-        'Weiterverarbeitung von ZielReihen:
-        '----------------------------------
+        'BlueM-spezifische Weiterverarbeitung von ZielReihen:
+        '====================================================
+        Dim ziel As Common.Ziel
+
+        'KWL: Feststellen, ob irgendeine Zielfunktion die KWL-Datei benutzt
+        '------------------------------------------------------------------
+        For Each ziel In Common.Manager.List_Ziele
+            If (ziel.Datei = "KWL") Then
+                Me.useKWL = True
+                Exit For
+            End If
+        Next
+
+        'IHA
+        '---
         Dim IHAZielReihe As Wave.Zeitreihe
         Dim IHAStart, IHAEnde As DateTime
 
@@ -148,7 +189,7 @@ Public Class BlueM
         'Gibt es eine IHA-Zielfunktion?
         'HACK: es wird immer nur das erste IHA-Ziel verwendet!
         '------------------------------
-        For Each ziel As Common.Ziel In Common.Manager.List_Ziele
+        For Each ziel In Common.Manager.List_Ziele
             If (ziel.ZielTyp = "IHA") Then
                 'IHA-Berechnung einschalten
                 Me.isIHA = True
@@ -163,7 +204,7 @@ Public Class BlueM
         '--------------------------
         If (Me.isIHA) Then
             'IHAAnalyse-Objekt instanzieren
-            Me.IHASys = New IHWB.IHA.IHAAnalysis(Me.WorkDir & "IHA\", IHAZielreihe, IHAStart, IHAEnde)
+            Me.IHASys = New IHWB.IHA.IHAAnalysis(Me.WorkDir & "IHA\", IHAZielReihe, IHAStart, IHAEnde)
 
             'IHAProcessor-Objekt instanzieren
             Me.IHAProc = New IHWB.EVO.IHAProcessor()
@@ -304,90 +345,104 @@ Public Class BlueM
 
 #Region "Evaluierung"
 
+    'Gibt zurück ob ein beliebiger Thread beendet ist und ibt die ID diesen freien Threads zurück
+    '********************************************************************************************
+    Public Overrides Function launchFree(ByRef Thread_ID As Integer) As Boolean
+        launchFree = False
+
+        For Each Thr_C As CThread In My_C_Thread
+            If Thr_C.Sim_Is_OK = True and Thr_C.get_Child_ID = -1 then
+                launchFree = True
+                Thread_ID = Thr_C.get_Thread_ID
+                Exit For
+            End If
+        Next
+        
+    End Function
+
     'BlauesModell ausführen (simulieren)
-    '***********************************
-    Public Overrides Function launchSim() As Boolean
+    'Startet einen neuen Thread und übergibt ihm die Child ID
+    '********************************************************
+    Public Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
 
-        Dim simOK As Boolean
+        launchSim = False
+        Dim Folder As String
+                       
+        Folder = getWorkDir(Thread_ID)
+        My_C_Thread(Thread_ID) = new CThread(Thread_ID, Child_ID, Folder, Datensatz, bluem_dll(Thread_ID))
+        MyThread(Thread_ID) = new Thread(AddressOf My_C_Thread(Thread_ID).Thread)
+        MyThread(Thread_ID).IsBackground = True
+        MyThread(Thread_ID).Start()
+        launchSim = True
 
-        Try
+        Return launchSim
 
-            Call bluem_dll.Initialize(Me.WorkDir & Me.Datensatz)
+    End function
 
-            Dim SimEnde As DateTime = BlueM_EngineDotNetAccess.DateTime(bluem_dll.GetSimulationEndDate())
+    'Prüft ob des aktuelle Child mit der ID die oben übergeben wurde fertig ist
+    'Gibt die Thread ID zurück um zum auswerten in das Arbeitsverzeichnis zu wechseln
+    '********************************************************************************
+    Public Overrides Function launchReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
+        launchReady = False
 
-            'Simulationszeitraum 
-            Do While (BlueM_EngineDotNetAccess.DateTime(bluem_dll.GetCurrentTime) <= SimEnde)
-                Call bluem_dll.PerformTimeStep()
-            Loop
+        For Each Thr_C As CThread In My_C_Thread
+            If Thr_C.launch_Ready = True And Thr_C.get_Child_ID = Child_ID then
+                launchReady = True
+                SimIsOK = Thr_C.Sim_Is_OK
+                Thread_ID = Thr_C.get_Thread_ID
+                MyThread(Thread_ID).Join
+                My_C_Thread(Thread_ID) = new CThread(Thread_ID, -1, "Folder", Datensatz, bluem_dll(Thread_ID))
+                My_C_Thread(Thread_ID).set_is_OK
+            End If
+        Next
 
-            'Simulation erfolgreich
-            simOK = True
+    End Function
 
-        Catch ex As Exception
+    'Simulationsergebnis verarbeiten
+    '-------------------------------
+    Public Overrides Sub WelDateiVerwursten()
+    
+        'Altes Simulationsergebnis löschen
+        Me.SimErgebnis.Clear()
 
-            'Simulationsfehler aufgetreten
-            MsgBox(ex.Message, MsgBoxStyle.Exclamation, "BlueM")
-            simOK = False
+        'WEL-Datei einlesen
+        '------------------
+        Dim WELtmp As Wave.WEL = New Wave.WEL(Me.WorkDir & Me.Datensatz & ".WEL", True)
 
-        Finally
+        'Reihen zu Simulationsergebnis hinzufügen
+        For Each zre As Wave.Zeitreihe In WELtmp.Zeitreihen
+            Me.SimErgebnis.Add(zre, zre.ToString())
+        Next
 
-            Call bluem_dll.Finish()
-            Call bluem_dll.Dispose()
+        'ggf. KWL-Datei einlesen
+        '-----------------------
+        If (Me.useKWL) Then
 
-        End Try
+            Dim KWLpath As String = Me.WorkDir & Me.Datensatz & ".KWL"
 
-        'Simulationsergebnis verarbeiten
-        '-------------------------------
-        If (simOK) Then
-
-            'Altes Simulationsergebnis löschen
-            Me.SimErgebnis.Clear()
-
-            'WEL-Datei einlesen
-            '------------------
-            Dim WELtmp As Wave.WEL = New Wave.WEL(Me.WorkDir & Me.Datensatz & ".WEL", True)
+            Dim KWLtmp As Wave.WEL = New Wave.WEL(KWLpath, True)
 
             'Reihen zu Simulationsergebnis hinzufügen
-            For Each zre As Wave.Zeitreihe In WELtmp.Zeitreihen
+            For Each zre As Wave.Zeitreihe In KWLtmp.Zeitreihen
                 Me.SimErgebnis.Add(zre, zre.ToString())
             Next
 
-            'ggf. KWL-Datei einlesen
-            '-----------------------
-            'TODO: Man könnte noch überprüfen, 
-            ' ob es überhaupt eine Zielfunktion gibt, 
-            ' die auf KWL-Ergebnisse zugreift
-            Dim KWLpath As String = Me.WorkDir & Me.Datensatz & ".KWL"
-            If (File.Exists(KWLpath)) Then
-
-                Dim KWLtmp As Wave.WEL = New Wave.WEL(KWLpath, True)
-
-                'Reihen zu Simulationsergebnis hinzufügen
-                For Each zre As Wave.Zeitreihe In KWLtmp.Zeitreihen
-                    Me.SimErgebnis.Add(zre, zre.ToString())
-                Next
-
-            End If
-
-            'Bei IHA-Berechnung jetzt IHA-Software ausführen
-            '-----------------------------------------------
-            If (Me.isIHA) Then
-                'IHA-Ziel raussuchen und Simulationsreihe übergeben
-                'HACK: es wird immer das erste IHA-Ziel verwendet!
-                For Each ziel As Common.Ziel In Common.Manager.List_Ziele
-                    If (ziel.ZielTyp = "IHA") Then
-                        Call Me.IHASys.calculate_IHA(Me.SimErgebnis(ziel.SimGr))
-                        Exit For
-                    End If
-                Next
-            End If
-
         End If
 
-        Return simOK
+        'Bei IHA-Berechnung jetzt IHA-Software ausführen
+        '-----------------------------------------------
+        If (Me.isIHA) Then
+            'IHA-Ziel raussuchen und Simulationsreihe übergeben
+            'HACK: es wird immer das erste IHA-Ziel verwendet!
+            For Each ziel As Common.Ziel In Common.Manager.List_Ziele
+                If (ziel.ZielTyp = "IHA") Then
+                    Call Me.IHASys.calculate_IHA(Me.SimErgebnis(ziel.SimGr))
+                    Exit For
+                End If
+            Next
+        End If
 
-    End Function
+    End Sub
 
 #End Region 'Evaluierung
 
@@ -545,6 +600,107 @@ Public Class BlueM
             End If
         Next
     End Function
+
+#Region "Threading"
+
+    'Klasse beinhaltet alle Infomationen für einen Simulationslauf im Thread
+    '***********************************************************************
+    Public Class CThread
+
+        Private Thread_ID As Integer
+        Private Child_ID As Integer
+        Private WorkFolder As String
+        Private DS_Name As String
+        Private bluem_dll As BlueM_EngineDotNetAccess
+        Private SimIsOK As Boolean
+        Private launchReady As Boolean
+
+        Public Sub New(ByVal _Thread_ID As Integer, ByVal _Child_ID As Integer, ByVal _WorkFolder As String, ByVal _DS_Name as String, ByRef _bluem_dll As BlueM_EngineDotNetAccess)
+            Me.Thread_ID = _Thread_ID
+            Me.Child_ID = _Child_ID
+            Me.WorkFolder = _WorkFolder
+            Me.DS_Name = _DS_Name
+            Me.bluem_dll = _bluem_dll
+        End Sub
+
+        'Die Funktion startet die Simulation mit dem entsprechendem WorkingDir
+        '*********************************************************************
+        Public Sub Thread()
+
+            Me.SimIsOK = false
+            Me.launchReady = false
+
+            'Priority
+            System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.BelowNormal
+
+            Try
+                'Datensatz übergeben und initialisieren
+                Call bluem_dll.Initialize(Me.WorkFolder & Me.DS_Name)
+
+                Dim SimEnde As DateTime = BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll.GetSimulationEndDate())
+
+                'Simulationszeitraum
+                Do While (BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll.GetCurrentTime) <= SimEnde)
+                    Call bluem_dll.PerformTimeStep()
+                Loop
+
+                'Simulation abschliessen
+                Call bluem_dll.Finish()
+
+                'Simulation erfolgreich
+                Me.SimIsOK = True
+
+            Catch ex As Exception
+
+                'Simulationsfehler aufgetreten
+                MsgBox(ex.Message, MsgBoxStyle.Exclamation, "BlueM")
+
+                'Simulation abschliessen
+                Call bluem_dll.Finish()
+
+                'Simulation nicht erfolgreich
+                Me.SimIsOK = False
+
+            Finally
+
+                'Ressourcen deallokieren
+                Call bluem_dll.Dispose()
+
+            End Try
+
+            'Me.SimIsOK = False
+            Me.launchReady = True
+
+        End Sub
+
+        Public Function Sim_Is_OK As Boolean
+
+            Sim_Is_OK = Me.SimIsOK
+        End Function
+
+        Public Function launch_Ready As Boolean
+
+            launch_Ready = Me.launchReady
+        End Function
+
+        Public Sub set_is_OK()
+
+            Me.SimIsOK = True
+        End Sub
+
+        Public Function get_Thread_ID As Integer
+
+            get_Thread_ID = Me.Thread_ID
+        End Function
+
+        Public Function get_Child_ID As Integer
+
+            get_Child_ID = Me.Child_ID
+        End Function
+
+    End Class
+
+#End Region 'Threading
 
 #End Region 'Methoden
 

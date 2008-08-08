@@ -89,7 +89,7 @@
     <Reference Include="System.Xml">
       <Name>System.XML</Name>
     </Reference>
-    <Reference Include="TeeChart, Version=3.5.3065.19161, Culture=neutral, PublicKeyToken=9c8126276c77bdb7, processorArchitecture=MSIL">
+    <Reference Include="TeeChart, Version=3.5.3105.20152, Culture=neutral, PublicKeyToken=9c8126276c77bdb7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <ProjectReference Include="..\..\EVO.MO_Indicators\MO_Indicators\EVO.MO_Indicators.csproj">
@@ -132,6 +132,12 @@
     <Import Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AboutDialog.Designer.vb">
+      <DependentUpon>AboutDialog.vb</DependentUpon>
+    </Compile>
+    <Compile Include="AboutDialog.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Apps\BlueM\BlueM.vb" />
     <Compile Include="Apps\BlueM\IHAProcessor.vb" />
     <Compile Include="Apps\BlueM\SKos.vb" />
@@ -146,21 +152,20 @@
     <Compile Include="Apps\SWMM\SWMM.vb" />
     <Compile Include="Apps\SWMM\Swmm_Iface.vb" />
     <Compile Include="Apps\S_CAN\Scan.vb" />
-    <Compile Include="Apps\Testprobleme\Testprobleme.Designer.vb">
-      <DependentUpon>Testprobleme.vb</DependentUpon>
-    </Compile>
     <Compile Include="Apps\Testprobleme\Testprobleme.vb">
-      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Apps\TSP.vb" />
-    <Compile Include="AssemblyInfo.vb">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Diagramm\DiagrammForm.Designer.vb">
       <DependentUpon>DiagrammForm.vb</DependentUpon>
     </Compile>
     <Compile Include="Diagramm\DiagrammForm.vb">
       <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Diagramm\Hauptdiagramm.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Diagramm\Indicatordiagramm.vb">
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Diagramm\MDBImportDialog.Designer.vb">
       <DependentUpon>MDBImportDialog.vb</DependentUpon>
@@ -203,6 +208,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Application.myapp</DependentUpon>
     </Compile>
+    <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Resources.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -222,14 +228,16 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="OptionsDialog.Designer.vb">
+      <DependentUpon>OptionsDialog.vb</DependentUpon>
+    </Compile>
+    <Compile Include="OptionsDialog.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="OptResult.vb" />
     <Compile Include="Settings.vb" />
     <EmbeddedResource Include="Apps\SensiPlot.resx">
       <DependentUpon>SensiPlot.vb</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Apps\Testprobleme\Testprobleme.resx">
-      <DependentUpon>Testprobleme.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Diagramm\DiagrammForm.resx">
@@ -272,6 +280,10 @@
       <SubType>Designer</SubType>
       <DependentUpon>Scatterplot.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="OptionsDialog.resx">
+      <DependentUpon>OptionsDialog.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\icon_excel.png" />
@@ -285,10 +297,14 @@
     </None>
     <None Include="Resources\icon_png.png" />
     <None Include="Resources\icon_edit.png" />
-    <Content Include="Apps\BlueM\BlueM.dll">
+    <EmbeddedResource Include="AboutDialog.resx">
+      <DependentUpon>AboutDialog.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Apps\BlueM\BlueM.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Apps\BlueM\IHWB.BlueM.DllAdapter.dll" />
+    </EmbeddedResource>
+    <None Include="Apps\BlueM\IHWB.BlueM.DllAdapter.dll" />
     <Content Include="Apps\SWMM\SWMM5.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
