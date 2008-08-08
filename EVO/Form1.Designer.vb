@@ -30,8 +30,13 @@ Partial Class Form1
         Dim MenuStrip1 As System.Windows.Forms.MenuStrip
         Dim MenuItem_Tools As System.Windows.Forms.ToolStripMenuItem
         Dim ToolStripSeparator1 As System.Windows.Forms.ToolStripSeparator
+        Dim ToolStripSeparator2 As System.Windows.Forms.ToolStripSeparator
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
         Me.MenuItem_DatensatzZurücksetzen = New System.Windows.Forms.ToolStripMenuItem
+        Me.MenuItem_Optionen = New System.Windows.Forms.ToolStripMenuItem
+        Me.MenuItem_Hilfe = New System.Windows.Forms.ToolStripMenuItem
+        Me.MenuItem_Wiki = New System.Windows.Forms.ToolStripMenuItem
+        Me.MenuItem_About = New System.Windows.Forms.ToolStripMenuItem
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.Button_Start = New System.Windows.Forms.Button
         Me.Button_openMDB = New System.Windows.Forms.Button
@@ -52,10 +57,10 @@ Partial Class Form1
         Me.EVO_Einstellungen1 = New IHWB.EVO.EVO_Einstellungen
         Me.EVO_Opt_Verlauf1 = New IHWB.EVO.EVO_Opt_Verlauf
         Me.DForm = New IHWB.EVO.DiagrammForm
-        Me.MenuItem_Optionen = New System.Windows.Forms.ToolStripMenuItem
         MenuStrip1 = New System.Windows.Forms.MenuStrip
         MenuItem_Tools = New System.Windows.Forms.ToolStripMenuItem
         ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator
+        ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator
         MenuStrip1.SuspendLayout()
         Me.GroupBox_Anwendung.SuspendLayout()
         Me.GroupBox_ErgebnisDB.SuspendLayout()
@@ -63,7 +68,7 @@ Partial Class Form1
         '
         'MenuStrip1
         '
-        MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {MenuItem_Tools})
+        MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {MenuItem_Tools, Me.MenuItem_Hilfe})
         MenuStrip1.Location = New System.Drawing.Point(0, 0)
         MenuStrip1.Name = "MenuStrip1"
         MenuStrip1.RightToLeft = System.Windows.Forms.RightToLeft.No
@@ -84,6 +89,41 @@ Partial Class Form1
         Me.MenuItem_DatensatzZurücksetzen.Name = "MenuItem_DatensatzZurücksetzen"
         Me.MenuItem_DatensatzZurücksetzen.Size = New System.Drawing.Size(200, 22)
         Me.MenuItem_DatensatzZurücksetzen.Text = "Datensatz zurücksetzen"
+        '
+        'ToolStripSeparator1
+        '
+        ToolStripSeparator1.Name = "ToolStripSeparator1"
+        ToolStripSeparator1.Size = New System.Drawing.Size(197, 6)
+        '
+        'MenuItem_Optionen
+        '
+        Me.MenuItem_Optionen.Name = "MenuItem_Optionen"
+        Me.MenuItem_Optionen.Size = New System.Drawing.Size(200, 22)
+        Me.MenuItem_Optionen.Text = "Optionen..."
+        '
+        'MenuItem_Hilfe
+        '
+        Me.MenuItem_Hilfe.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItem_Wiki, ToolStripSeparator2, Me.MenuItem_About})
+        Me.MenuItem_Hilfe.Name = "MenuItem_Hilfe"
+        Me.MenuItem_Hilfe.Size = New System.Drawing.Size(40, 20)
+        Me.MenuItem_Hilfe.Text = "Hilfe"
+        '
+        'MenuItem_Wiki
+        '
+        Me.MenuItem_Wiki.Name = "MenuItem_Wiki"
+        Me.MenuItem_Wiki.Size = New System.Drawing.Size(172, 22)
+        Me.MenuItem_Wiki.Text = "Wiki"
+        '
+        'ToolStripSeparator2
+        '
+        ToolStripSeparator2.Name = "ToolStripSeparator2"
+        ToolStripSeparator2.Size = New System.Drawing.Size(169, 6)
+        '
+        'MenuItem_About
+        '
+        Me.MenuItem_About.Name = "MenuItem_About"
+        Me.MenuItem_About.Size = New System.Drawing.Size(172, 22)
+        Me.MenuItem_About.Text = "About EVO.NET..."
         '
         'Button_Start
         '
@@ -268,20 +308,10 @@ Partial Class Form1
         Me.DForm.Size = New System.Drawing.Size(473, 625)
         Me.DForm.TabIndex = 8
         '
-        'ToolStripSeparator1
-        '
-        ToolStripSeparator1.Name = "ToolStripSeparator1"
-        ToolStripSeparator1.Size = New System.Drawing.Size(197, 6)
-        '
-        'MenuItem_Optionen
-        '
-        Me.MenuItem_Optionen.Name = "MenuItem_Optionen"
-        Me.MenuItem_Optionen.Size = New System.Drawing.Size(200, 22)
-        Me.MenuItem_Optionen.Text = "Optionen..."
-        '
         'Form1
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.AutoScroll = True
         Me.BackColor = System.Drawing.SystemColors.Control
         Me.ClientSize = New System.Drawing.Size(718, 792)
         Me.Controls.Add(MenuStrip1)
@@ -295,9 +325,10 @@ Partial Class Form1
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Location = New System.Drawing.Point(100, 100)
         Me.MainMenuStrip = MenuStrip1
+        Me.MaximizeBox = False
         Me.Name = "Form1"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "Evolutionsstrategie"
+        Me.Text = "EVO.NET"
         MenuStrip1.ResumeLayout(False)
         MenuStrip1.PerformLayout()
         Me.GroupBox_Anwendung.ResumeLayout(False)
@@ -327,4 +358,7 @@ Partial Class Form1
     Friend WithEvents ComboBox_Datensatz As System.Windows.Forms.ComboBox
     Friend WithEvents MenuItem_DatensatzZurücksetzen As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents MenuItem_Optionen As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents MenuItem_Hilfe As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents MenuItem_About As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents MenuItem_Wiki As System.Windows.Forms.ToolStripMenuItem
 End Class

@@ -83,6 +83,8 @@ Partial Class Form1
 
 #Region "Methoden"
 
+#Region "UI"
+
     'Initialisierung von Form1
     '*************************
     Private Sub Form1_Load(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles MyBase.Load
@@ -114,6 +116,21 @@ Partial Class Form1
     Private Sub showOptionDialog(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem_Optionen.Click
         Call Me.Options.ShowDialog()
     End Sub
+
+    'About Dialog anzeigen
+    '*********************
+    Private Sub MenuItem_About_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem_About.Click
+        Dim AboutDialog As New AboutDialog()
+        Call AboutDialog.ShowDialog()
+    End Sub
+
+    'EVO.NET Wiki aufrufen
+    '*********************
+    Private Sub MenuItem_Wiki_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem_Wiki.Click
+        Call Process.Start("http://130.83.196.154/BlueM/wiki/index.php/EVO.NET")
+    End Sub
+
+#End Region 'UI
 
 #Region "Initialisierung der Anwendungen"
 
@@ -923,7 +940,7 @@ Partial Class Form1
                 'Evaluieren
                 'TODO: Fehlerbehandlung bei Simulationsfehler
                 isOK = Sim1.launchSim(0, 0)
-                If isOK then Sim1.SIM_Ergebnis_auswerten(ind)
+                If isOK Then Sim1.SIM_Ergebnis_auswerten(ind)
 
                 'BUG 253: Verletzte Constraints bei SensiPlot kenntlich machen?
 
@@ -1025,8 +1042,8 @@ Partial Class Form1
         Hypervolume = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(EVO.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, Common.Manager.AnzPenalty)
 
         'Datensätze für Multithreading kopieren
-        If n_Threads > 1 then
-            Call sim1.coppyDatensatz(n_Threads)
+        If n_Threads > 1 Then
+            Call Sim1.coppyDatensatz(n_Threads)
         End If
 
         'CES initialisieren
@@ -1075,28 +1092,28 @@ Partial Class Form1
         'xxxx Optimierung xxxxxx
         'Generationsschleife CES
         'xxxxxxxxxxxxxxxxxxxxxxx
-        Dim Time(CES1.Settings.CES.n_Generations - 1) As Timespan
+        Dim Time(CES1.Settings.CES.n_Generations - 1) As TimeSpan
         Dim Stoppuhr As New Stopwatch()
-        
+
 
         For i_gen = 0 To CES1.Settings.CES.n_Generations - 1
-            Stoppuhr.Reset
-            Stoppuhr.Start
+            Stoppuhr.Reset()
+            Stoppuhr.Start()
 
             'Child Schleife
             'xxxxxxxxxxxxxx
-            Dim Thread_Free As integer = 0
+            Dim Thread_Free As Integer = 0
             Dim Thread_Ready As Integer = 0
             Dim Child_Run As Integer = 0
             Dim Child_Ready As Integer = 0
-            Dim Ready As Boolean = false
+            Dim Ready As Boolean = False
             System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
 
             Do
                 'Falls eine Simulation frei und nicht Pause
                 '------------------------------------------
-                If Sim1.launchFree(Thread_Free) and Child_Run < CES1.Settings.CES.n_Childs and _
-                (Child_Ready + n_Threads > Child_Run) and Me.ispause = False then
+                If Sim1.launchFree(Thread_Free) And Child_Run < CES1.Settings.CES.n_Childs And _
+                (Child_Ready + n_Threads > Child_Run) And Me.ispause = False Then
 
                     durchlauf_all += 1
                     Sim1.WorkDir = Sim1.getWorkDir(Thread_Free)
@@ -1120,13 +1137,13 @@ Partial Class Form1
                     '******************************************************
 
                     Child_Run += 1
-                
-                'Falls Simulation fertig und erfogreich
-                '--------------------------------------
-                ElseIf Sim1.launchReady(Thread_Ready, SIM_Eval_is_OK, Child_Ready)
+
+                    'Falls Simulation fertig und erfogreich
+                    '--------------------------------------
+                ElseIf Sim1.launchReady(Thread_Ready, SIM_Eval_is_OK, Child_Ready) Then
 
                     Sim1.WorkDir = Sim1.getWorkDir(Thread_Ready)
-                    If SIM_Eval_is_OK then Sim1.SIM_Ergebnis_auswerten(CES1.Childs(Child_Ready))
+                    If SIM_Eval_is_OK Then Sim1.SIM_Ergebnis_auswerten(CES1.Childs(Child_Ready))
 
                     'HYBRID: Speichert die PES Erfahrung diesen Childs im PES Memory
                     '***************************************************************
@@ -1136,7 +1153,7 @@ Partial Class Form1
 
                     'Lösung im TeeChart einzeichnen
                     '==============================
-                    If (SIM_Eval_is_OK) Then 
+                    If (SIM_Eval_is_OK) Then
                         Call Me.Hauptdiagramm.ZeichneIndividuum(CES1.Childs(Child_Ready), 0, 0, i_gen, Child_Ready, ColorManagement(ColorArray, CES1.Childs(Child_Ready)))
                     End If
 
@@ -1260,7 +1277,7 @@ Partial Class Form1
 
         'Datensätze für Multithreading löschen
         '*************************************
-        Call sim1.deleteDatensatz(n_Threads)
+        Call Sim1.deleteDatensatz(n_Threads)
 
     End Sub
 
@@ -2379,9 +2396,9 @@ Start_Evolutionsrunden:
             'Simulieren
             Call Sim1.launchSim(0, 0)
             'Warten bis Thread fertig ist
-            Do While Not isok
+            Do While Not isOK
                 System.Threading.Thread.Sleep(100)
-                Sim1.launchReady(0, isok, 0)
+                Sim1.launchReady(0, isOK, 0)
             Loop
             Call Sim1.WelDateiVerwursten()
 
@@ -2794,11 +2811,11 @@ Start_Evolutionsrunden:
         Dim LogCPU As Integer = 0
         LogCPU = Environment.ProcessorCount
 
-        If LogCPU = 1 then
+        If LogCPU = 1 Then
             n_Threads = 3
-        Else If LogCPU = 2 then
+        ElseIf LogCPU = 2 Then
             n_Threads = 4
-        Else If LogCPU = 4 then
+        ElseIf LogCPU = 4 Then
             n_Threads = 7
         End If
 
