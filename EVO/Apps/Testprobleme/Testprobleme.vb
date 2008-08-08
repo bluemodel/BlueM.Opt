@@ -17,6 +17,7 @@ Public Class Testprobleme
     Private Const TP_CONSTR As String = "CONSTR"
     Private Const TP_Box As String = "Box"
     Private Const TP_AbhängigeParameter As String = "Abhängige Parameter"
+    Private Const TP_FloodMitigation As String = "Flood Mitigation"
 
     Private mSelectedTestproblem As String
     Private mTestProblemDescription As String
@@ -34,7 +35,7 @@ Public Class Testprobleme
         Get
             Dim array() As String
 
-            ReDim array(10)
+            ReDim array(11)
 
             array(0) = TP_SinusFunktion
             array(1) = TP_BealeProblem
@@ -47,6 +48,7 @@ Public Class Testprobleme
             array(8) = TP_CONSTR
             array(9) = TP_Box
             array(10) = TP_AbhängigeParameter
+			array(11) = TP_FloodMitigation
 
             Return array
 
@@ -227,6 +229,27 @@ Public Class Testprobleme
                 'Beziehungen
                 Me.mOptPara(0).Beziehung = Common.Constants.Beziehung.keine
                 Me.mOptPara(1).Beziehung = Common.Constants.Beziehung.groesser
+
+            Case TP_FloodMitigation 'Ajay
+                Me.mTestProblemDescription = "Multicriteria Problem Flood Mitigation and Hydropower Generation"
+                Me.mAnzParameter = 8                'Parameters
+                Me.mAnzZiele = 2                    'Objective
+                Me.mAnzConstraints = 4               'Constraints
+                ReDim Me.mOptPara(Me.mAnzParameter - 1)
+                Randomize()
+                For i = 0 To Me.mAnzParameter - 1
+                    Me.mOptPara(i) = New EVO.Common.OptParameter()
+                    Me.mOptPara(i).Xn = Rnd()
+
+                Next
+                For i = 0 To 3
+                    Me.mOptPara(i).Min = 470424
+                    Me.mOptPara(i).Max = 48407547
+                Next
+                For i = 4 To Me.mAnzParameter - 1
+                    Me.mOptPara(i).Min = 648000
+                    Me.mOptPara(i).Max = 2592000
+                Next
 
         End Select
     End Sub
@@ -524,6 +547,16 @@ Public Class Testprobleme
                 title = TP_CONSTR
                 yachse.Maximum = 15
 
+            Case TP_FloodMitigation
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                title = "Flood mitigation ajay"
+
+                yachse.Maximum = -15000000
+                yachse.Minimum = -55000000
+
+                xachse.Maximum = 10000000
+                xachse.Minimum = -15000000
+
         End Select
 
         Call achsen.Add(xachse)
@@ -665,6 +698,10 @@ Public Class Testprobleme
                 Next j
                 serie = Diag.getSeriesLine("Grenze 4", "Red")
                 serie.Add(Array4X, Array4Y)
+
+            Case TP_FloodMitigation
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                'keine Serien
 
         End Select
 
@@ -1127,8 +1164,66 @@ Public Class Testprobleme
                 serie3D = Diag.getSeries3DPoint("Population " & ipop + 1)
                 serie3D.Add(ind.PES_OptParas(0).Xn, ind.PES_OptParas(1).Xn, ind.Zielwerte(0))
 
-        End Select
+            Case TP_FloodMitigation
+                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
+                'Getting the new Parameters
+                ReDim X(7)
+                For i = 0 To X.GetUpperBound(0)
+                    X(i) = ind.PES_OptParas(i).RWert
+                Next
+
+                'Calculating the Objective Function
+                '----------------------------------
+                Dim Storage As Double
+                Storage = 650000
+                'float sconst=650000;
+
+                Dim p() As Double = {9449568.0, 9069713.044, 2441388.773, 1556876.392}
+                'double p[4] = { 9449568.000,9069713.044,2441388.773,1556876.392};
+                f1 = 0
+                f2 = 0
+
+                'Objective Function 1 and 2
+                f1 = -((p(0) - X(4)) - (X(0) - X(1)))
+                f2 = -(0.09651 * (((8.0E-22 * Math.Pow(X(0), 3)) - (0.00000000000008 * Math.Pow(X(0), 2)) + (0.000003 * X(0)) + 6.2034) * X(4)))
+
+                f1 = f1 - ((p(1) - X(5)) - (X(1) - X(2)))
+                f2 = f2 - (0.09651 * (((8.0E-22 * Math.Pow(X(1), 3)) - (0.00000000000008 * Math.Pow(X(1), 2)) + (0.000003 * X(1)) + 6.2034) * X(5)))
+
+                f1 = f1 - ((p(2) - X(6)) - (X(2) - X(3)))
+                f2 = f2 - (0.09651 * (((8.0E-22 * Math.Pow(X(2), 3)) - (0.00000000000008 * Math.Pow(X(2), 2)) + (0.000003 * X(2)) + 6.2034) * X(6)))
+
+                f1 = f1 - ((p(3) - X(7)) - (X(3) - X(4)))
+                f2 = f2 - (0.09651 * (((8.0E-22 * Math.Pow(X(3), 3)) - (0.00000000000008 * Math.Pow(X(3), 2)) + (0.000003 * X(3)) + 6.2034) * X(7)))
+
+                'Constraints
+                '-----------
+                Dim contrain(3) As Double
+                contrain(0) = (X(0) - Storage - p(0) + X(4))
+                contrain(1) = (X(1) - X(0) - p(1) + X(5))
+                contrain(2) = (X(2) - X(1) - p(2) + X(6))
+                contrain(3) = (X(3) - X(2) - p(3) + X(7))
+
+                'Give Back the Penalties and Constraints
+                ind.Zielwerte(0) = f1
+                ind.Zielwerte(1) = f2
+                ind.Constrain(0) = contrain(0)
+                ind.Constrain(1) = contrain(1)
+                ind.Constrain(2) = contrain(2)
+                ind.Constrain(3) = contrain(3)
+
+                'Drawing
+                '--------
+
+                If ind.Is_Feasible Then
+                    serie = Diag.getSeriesPoint("Population", "Orange")
+                Else
+                    serie = Diag.getSeriesPoint("Population (ungültig)", "Gray")
+                End If
+                serie.Add(ind.Zielwerte(0), ind.Zielwerte(1))
+
+        End Select
     End Sub
 
 #End Region 'Evaluierung
