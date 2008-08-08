@@ -7,14 +7,11 @@ Imports System.Runtime.InteropServices
 ' Assemblyinformationen zu ändern
 
 
-' TODO: Werte der Assemblyattribute überprüfen
-
-
 <Assembly: AssemblyTitle("EVO.NET")> 
-<Assembly: AssemblyDescription("")>
-<Assembly: AssemblyCompany("IHWB")> 
-<Assembly: AssemblyProduct("")>
-<Assembly: AssemblyCopyright("IHWB, TU Darmstadt")> 
+<Assembly: AssemblyDescription("Multikriterielle Evolutionsstrategie")> 
+<Assembly: AssemblyCompany("IHWB - TU Darmstadt")> 
+<Assembly: AssemblyProduct("EVO.NET")> 
+<Assembly: AssemblyCopyright("Copyright © IHWB 2008")> 
 <Assembly: AssemblyTrademark("")>
 <Assembly: AssemblyCulture("")>
 
