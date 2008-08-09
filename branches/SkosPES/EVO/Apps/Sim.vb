@@ -91,7 +91,7 @@ Public MustInherit Class Sim
         Public List_Massnahmen() As Struct_Massnahme
     End Structure
 
-    Public List_Locations() As Struct_Lokation
+    Public Shared List_Locations() As Struct_Lokation
 
     Public VerzweigungsDatei(,) As String                   'Gibt die PathSize an für jede Pfadstelle
     Public CES_T_Modus As Common.Constants.CES_T_MODUS      'Zeigt ob der TestModus aktiv ist
@@ -159,6 +159,8 @@ Public MustInherit Class Sim
         Call Me.Read_OPT()
         'ModellParameter einlesen
         Call Me.Read_MOD()
+        'Kombinatorik Datei einlesen falls vorhanden
+        Call Me.Read_Kombinatorik()
         'Modell-/Optparameter validieren
         Call Me.Validate_OPT_fits_to_MOD()
         'Prüfen der Anfangswerte
@@ -985,6 +987,47 @@ Public MustInherit Class Sim
 
     End Sub
 
+    'Funktion zum erstellen der Elementliste
+    'Alle Elemente aus der CES datei werden hier in die Liste gesetzt
+    '****************************************************************
+    Public Shared Sub get_Elements(ByRef Elemenlist(,) As Object, ByVal Auswahl As String)
+
+        Dim Bauwerks_Array(-1) As String
+
+        'Kopiert die Bauwerke aus dem BlueM
+        Dim i, j, k As Integer
+        For i = 0 To List_Locations.GetUpperBound(0)
+            For j = 0 To List_Locations(i).List_Massnahmen.GetUpperBound(0)
+                For k = 0 To List_Locations(i).List_Massnahmen(j).Bauwerke.GetUpperBound(0)
+                    If List_Locations(i).List_Massnahmen(j).Bauwerke(k) <> "X" Then
+
+                        If Auswahl = "Alle" Then
+                            ReDim Preserve Bauwerks_Array(Bauwerks_Array.GetLength(0))
+                            Bauwerks_Array(Bauwerks_Array.GetUpperBound(0)) = List_Locations(i).List_Massnahmen(j).Bauwerke(k)
+
+                        ElseIf Auswahl = "Kosten" And List_Locations(i).List_Massnahmen(j).KostenTyp = 1 Then
+                            ReDim Preserve Bauwerks_Array(Bauwerks_Array.GetLength(0))
+                            Bauwerks_Array(Bauwerks_Array.GetUpperBound(0)) = List_Locations(i).List_Massnahmen(j).Bauwerke(k)
+
+                        ElseIf Auswahl = "Test" And List_Locations(i).List_Massnahmen(j).TestModus = 1 Then
+                            ReDim Preserve Bauwerks_Array(Bauwerks_Array.GetLength(0))
+                            Bauwerks_Array(Bauwerks_Array.GetUpperBound(0)) = List_Locations(i).List_Massnahmen(j).Bauwerke(k)
+
+                        ElseIf Auswahl <> "Alle" And Auswahl <> "Kosten" And Auswahl <> "Test"
+                            Throw New Exception("Diese Auswahl steht nicht zur Verfügung")
+                        End If
+                    End If
+                Next
+            Next
+        Next
+
+        'Die Werte des Arrays werden an die Liste übertragen
+        ReDim Elemenlist(Bauwerks_Array.GetUpperBound(0), 1)
+        For i = 0 To Bauwerks_Array.GetUpperBound(0)
+            Elemenlist(i, 0) = Bauwerks_Array(i)
+        Next
+
+    End Sub
 
     'Struct und Methoden welche aktuellen Informationen zur Verfügung stellen
     '#########################################################################
@@ -1321,7 +1364,7 @@ Handler:
 
         'Lesen der Relevanten Parameter aus der wel Datei
         Call WelDateiVerwursten()
-        
+
         'Qualitätswerte berechnen
         For i = 0 To Common.Manager.AnzZiele - 1
             Indi.Zielwerte(i) = QWert(Common.Manager.List_Ziele(i))
@@ -1835,11 +1878,11 @@ Handler:
 
     'Datensätze für Multithreading kopieren
     '**************************************
-    Public Sub coppyDatensatz(byVal n_Proz As Integer)
+    Public Sub coppyDatensatz(ByVal n_Proz As Integer)
 
         Dim i As Integer = 1
 
-        For i = 0 to n_Proz - 1
+        For i = 0 To n_Proz - 1
             Dim Source As String = WorkDir
             Dim Dest As String = System.Windows.Forms.Application.StartupPath() & "\Thread_" & i & "\"
 
@@ -1848,10 +1891,10 @@ Handler:
                 Call purgeReadOnly(Dest)
                 Directory.Delete(Dest, True)
             End If
-            
+
             My.Computer.FileSystem.CopyDirectory(Source, Dest, True)
             Call purgeReadOnly(Dest)
-            Directory.Delete(Dest & "\.svn", true)
+            Directory.Delete(Dest & "\.svn", True)
 
         Next
 
@@ -1859,9 +1902,9 @@ Handler:
 
     'Datensätze für Multithreading löschen
     '*************************************
-    Public Sub deleteDatensatz(byVal n_Proz As Integer)
+    Public Sub deleteDatensatz(ByVal n_Proz As Integer)
         Dim i As Integer
-        For i = 1 to n_Proz
+        For i = 1 To n_Proz
 
             If Directory.Exists(System.Windows.Forms.Application.StartupPath() & "\Thread_" & i) Then
                 Directory.Delete(System.Windows.Forms.Application.StartupPath() & "\Thread_" & i, True)
@@ -1871,14 +1914,14 @@ Handler:
 
     'Gibt den aktuellen Datensatz zurück
     '***********************************
-    Public Function getWorkDir(ByVal Thread_ID as Integer) As String
+    Public Function getWorkDir(ByVal Thread_ID As Integer) As String
 
         getWorkDir = ""
-        
+
         getWorkDir = System.Windows.Forms.Application.StartupPath() & "\Thread_" & Thread_ID & "\"
 
         Return getWorkDir
-        
+
     End Function
 
     'Ändert rekursiv die Attribute von Dateien und Unterverzeichnissen von Read-Only zu Normal

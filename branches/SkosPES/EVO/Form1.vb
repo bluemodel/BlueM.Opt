@@ -531,6 +531,12 @@ Partial Class Form1
                         'PES für Sim vorbereiten
                         Call Sim1.read_and_valid_INI_Files_PES()
 
+                        'Original ModellParameter schreiben
+                        Call Sim1.Write_ModellParameter()
+
+                        'Original Transportstrecken einlesen
+                        Call CType(Me.Sim1, IHWB.EVO.BlueM).SKos1.Read_TRS_Orig_Daten(Sim1.WorkDir, Sim1.Datensatz)
+
                         'EVO_Einstellungen einrichten
                         If (Common.Manager.AnzPenalty = 1) Then
                             'Single-Objective
@@ -617,7 +623,7 @@ Partial Class Form1
                             Call Sim1.Write_ModellParameter()
 
                             'Original Transportstrecken einlesen
-                            Call CType(Me.Sim1, IHWB.EVO.BlueM).SKos1.Read_TRS_Orig_Daten(Sim1)
+                            Call CType(Me.Sim1, IHWB.EVO.BlueM).SKos1.Read_TRS_Orig_Daten(Sim1.WorkDir, Sim1.Datensatz)
 
                     End Select
 

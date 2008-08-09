@@ -54,18 +54,23 @@ Public Class SKos
 
     'Funktion für die Kalkulation der Kosten
     '***************************************
-    Public Function Calculate_Costs(ByVal BlueM1 As BlueM) As Double
+    Public Function Calculate_Costs(ByVal WorkDir As String, ByVal Datensatz As String) As Double
         Dim costs As Double = 0
-        Dim Elementliste(0, 1) As Object
+
+        Dim Elementliste(-1, 1) As Object
         Dim TRS_Array(,) As Object = {}
         Dim TAL_Array(,) As Object = {}
 
-        'Bauwerksliste wird erstellt
-        Call create_Elementliste(BlueM1, Elementliste)
+        'Elementliste wird aus dem Sim besorgt
+        If Form1.Method = METH_CES Or Form1.Method = METH_HYBRID Then
+            Call IHWB.EVO.Sim.get_Elements(Elementliste, "Kosten")
+        ElseIf Form1.Method = METH_PES Then
+            Call IHWB.EVO.Sim.get_Elements(Elementliste, "Test")
+        End If
 
         'Ermitteln der massgeblichen Größen aus den Dateien
-        Call Read_TAL(BlueM1, TAL_Array)
-        Call Read_TRS_Daten(BlueM1, TRS_Akt)
+        Call Read_TAL(WorkDir, Datensatz, TAL_Array)
+        Call Read_TRS_Daten(WorkDir, Datensatz, TRS_Akt)
 
         'Berechnen der Volumen Differenzen aus der Original TRS und der Aktuellen TRS
         Call Calc_Volume(TRS_Orig, TRS_Akt)
@@ -74,46 +79,24 @@ Public Class SKos
         Call Acquire_Costs(TAL_Array, TRS_Akt, Elementliste)
 
         'Kosten aufsummieren
-        Dim i, j As Integer
-        For i = 0 To Akt_Elemente.GetUpperBound(0)
-            For j = 0 To Elementliste.GetUpperBound(0)
-                If Elementliste(j, 0) = Akt_Elemente(i) Then
-                    costs = costs + Elementliste(j, 1)
-                End If
-            Next
-        Next
-
-        Return costs
-    End Function
-    'Funktion zum erstellen der Elementliste
-    'Alle Elemente aus der CES datei werden hier in die Liste gesetzt
-    '****************************************************************
-    Private Sub create_Elementliste(ByVal BlueM1 As BlueM, ByRef Bauwerksliste(,) As Object)
-        Dim Bauwerks_Array() As String = {}
-
-        'Kopiert die Bauwerke aus dem BlueM
-        Dim i, j, k As Integer
-        Dim x As Integer = 0
-        For i = 0 To BlueM1.List_Locations.GetUpperBound(0)
-            For j = 0 To BlueM1.List_Locations(i).List_Massnahmen.GetUpperBound(0)
-                For k = 0 To BlueM1.List_Locations(i).List_Massnahmen(j).Bauwerke.GetUpperBound(0)
-                    If BlueM1.List_Locations(i).List_Massnahmen(j).KostenTyp = 1 Then
-                        System.Array.Resize(Bauwerks_Array, x + 1)
-                        Bauwerks_Array(x) = BlueM1.List_Locations(i).List_Massnahmen(j).Bauwerke(k)
-                        x += 1
+        If Form1.Method = METH_CES Or Form1.Method = METH_HYBRID Then
+            Dim i, j As Integer
+            For i = 0 To Akt_Elemente.GetUpperBound(0)
+                For j = 0 To Elementliste.GetUpperBound(0)
+                    If Elementliste(j, 0) = Akt_Elemente(i) Then
+                        costs = costs + Elementliste(j, 1)
                     End If
                 Next
             Next
-        Next
+        ElseIf Form1.Method = METH_PES Then
+            Dim j As Integer
+            For j = 0 To Elementliste.GetUpperBound(0)
+                costs = costs + Elementliste(j, 1)
+            Next
+        End If
 
-        Call Remove_X(Bauwerks_Array)
-
-        'Die Werte des Arrays werden an die Liste übertragen
-        ReDim Bauwerksliste(Bauwerks_Array.GetUpperBound(0), 1)
-        For i = 0 To Bauwerks_Array.GetUpperBound(0)
-            Bauwerksliste(i, 0) = Bauwerks_Array(i)
-        Next
-    End Sub
+        Return costs
+    End Function
 
     'Hilfsfunktion: Die "X" Einträge werden entfernt
     '***********************************************
@@ -134,9 +117,9 @@ Public Class SKos
 
     'Inforationen der Original Transportstrecken einlesen
     '****************************************************
-    Public Sub Read_TRS_Orig_Daten(ByVal BlueM1 As BlueM)
+    Public Sub Read_TRS_Orig_Daten(ByVal WorkDir As String, ByVal Datensatz As String)
 
-        Call Read_TRS_Daten(BlueM1, TRS_Orig)
+        Call Read_TRS_Daten(WorkDir, Datensatz, TRS_Orig)
 
     End Sub
 
@@ -144,12 +127,12 @@ Public Class SKos
     'Inforationen der Transportstrecken einlesen
     'Hier werden nur die Informationen einer Seite eingelesenund Symerie angenommen (könnte mann leicht erweitern)
     '*************************************************************************************************************
-    Public Shared Sub Read_TRS_Daten(ByVal BlueM1 As BlueM, ByRef TRS_Array() As TRS)
+    Public Shared Sub Read_TRS_Daten(ByVal WorkDir As String, ByVal Datensatz As String, ByRef TRS_Array() As TRS)
 
         ReDim TRS_Array(-1)
 
         'Dim TRS_Array(,) As Object = {}
-        Dim Datei As String = BlueM1.WorkDir & BlueM1.Datensatz & ".TRS"
+        Dim Datei As String = WorkDir & Datensatz & ".TRS"
 
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -296,10 +279,10 @@ Public Class SKos
 
     'Volumen der Talsperren einlesen
     '*******************************
-    Private Sub Read_TAL(ByVal BlueM1 As BlueM, ByRef TAl_Array(,) As Object)
+    Private Sub Read_TAL(ByVal WorkDir As String, ByVal Datensatz As String, ByRef TAl_Array(,) As Object)
 
         'Dim TAL_Array(,) As Object = {}
-        Dim Datei As String = BlueM1.WorkDir & BlueM1.Datensatz & ".TAL"
+        Dim Datei As String = WorkDir & Datensatz & ".TAL"
 
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))

@@ -230,6 +230,10 @@ Public Class BlueM
 
         Dim Datei As String = WorkDir & Datensatz & "." & Combi_Ext
 
+        If Form1.Method = METH_PES And Not File.Exists(Datei) Then
+            Exit Sub
+        End If
+
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
@@ -499,7 +503,7 @@ Public Class BlueM
                 QWert = MyBase.QWert_Reihe(ziel, SimReihe)
 
             Case "Kosten"
-                QWert = Me.SKos1.calculate_costs(Me)
+                QWert = Me.SKos1.calculate_costs(WorkDir, Datensatz)
 
             Case "IHA"
                 QWert = Me.IHAProc.QWert_IHA(ziel, Me.IHASys.RVAResult)
