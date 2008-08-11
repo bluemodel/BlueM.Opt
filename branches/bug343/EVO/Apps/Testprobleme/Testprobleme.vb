@@ -918,7 +918,7 @@ Public Class Testprobleme
 
     'Evaluierung und Zeichnen der Testprobleme
     '*****************************************
-    Public Sub Evaluierung_TestProbleme(ByRef ind As Common.Individuum, ByVal ipop As Short, ByRef Diag As EVO.Diagramm)
+    Public Sub Evaluierung_TestProbleme(ByRef ind As Common.Individuum_PES, ByVal ipop As Short, ByRef Diag As EVO.Diagramm)
 
         Dim i As Short
         Dim Unterteilung_X As Double

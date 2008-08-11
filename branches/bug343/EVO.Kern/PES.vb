@@ -95,12 +95,12 @@ Public Class PES
     Private Distanceb() As Double           'Array mit Crowding-Distance (Neighbourhood-Rekomb.)
     Private PenaltyDistance(,) As Double    'Array für normierte Raumabstände (Neighbourhood-Rekomb.)
     '---------------------
-    Public SekundärQb(-1) As Individuum     'Sekundäre Population wird mit -1 initialisiert dann länge 0
+    Public SekundärQb(-1) As Individuum_PES 'Sekundäre Population wird mit -1 initialisiert dann länge 0
 
     Const galpha As Double = 1.3            'Faktor alpha = 1.3 auf Generationsebene nach Rechenberg
     Const palpha As Double = 1.1            'Faktor alpha = 1.1 auf Populationsebene nach Rechenberg
 
-    Dim NDSorting() As Individuum
+    Dim NDSorting() As Individuum_PES
 
     Private Structure Struct_Sortierung
         Dim Index As Integer
@@ -249,7 +249,7 @@ Public Class PES
         'NDSorting wird nur benötigt, falls eine Paretofront approximiert wird
         If (Settings.PES.OptModus = EVO_MODUS.Multi_Objective) Then
             ReDim NDSorting(Settings.PES.n_Eltern + Settings.PES.n_Nachf - 1)
-            Call Individuum.New_Indi_Array("NDSorting", NDSorting)
+            Call Individuum_PES.New_Indi_Array("NDSorting", NDSorting)
             If (Settings.PES.OptEltern = EVO_ELTERN.Neighbourhood) Then
                 ReDim PenaltyDistance(Settings.PES.n_Eltern - 1, Settings.PES.n_Eltern - 1)
                 ReDim Distanceb(Settings.PES.n_Eltern - 1)
@@ -1361,8 +1361,8 @@ StartMutation:
             '********************* Alles in der Klasse Functions ****************************************
             'Zu Beginn den Bestwertspeicher in ein Individuum packen
             'Dimensionieren des Best_Indi
-            Dim Best_Indi(Best.Qb.GetUpperBound(0)) As Individuum
-            Call Individuum.New_Indi_Array("Bestwerte", Best_Indi)
+            Dim Best_Indi(Best.Qb.GetUpperBound(0)) As Individuum_PES
+            Call Individuum_PES.New_Indi_Array("Bestwerte", Best_Indi)
             'Kopieren in Best_Indi
             For i = 0 To Best.Qb.GetUpperBound(0)
                 Call Copy_Bestwert_to_Individuum(i, i, Best_Indi)
@@ -1413,7 +1413,7 @@ StartMutation:
 
     'Kopiert ein Individuum in den Bestwertspeicher
     '----------------------------------------------
-    Public Sub Copy_Individuum_to_Bestwert(ByVal i As Integer, ByVal Individ() As Individuum)
+    Public Sub Copy_Individuum_to_Bestwert(ByVal i As Integer, ByVal Individ() As Individuum_PES)
         Dim j, v As Integer
 
         For j = 0 To Anz.Penalty - 1
@@ -1438,7 +1438,7 @@ StartMutation:
 
     'Kopiert den Bestwertspeicher in ein Individuum
     '----------------------------------------------
-    Public Sub Copy_Bestwert_to_Individuum(ByVal i_indi As Integer, ByVal i_best As Integer, ByRef Individ As Individuum())
+    Public Sub Copy_Bestwert_to_Individuum(ByVal i_indi As Integer, ByVal i_best As Integer, ByRef Individ() As Individuum_PES)
 
         Dim i, j, v As Integer
 

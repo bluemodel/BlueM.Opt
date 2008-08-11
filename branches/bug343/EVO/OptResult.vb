@@ -114,8 +114,8 @@ Public Class OptResult
 
     End Sub
 
-    'Eine Lösung zum Optimierungsergebnis hinzufügen
-    '***********************************************
+    'Eine PES-Lösung zum Optimierungsergebnis hinzufügen
+    '***************************************************
     Public Sub addSolution(ByVal Ind As Common.Individuum)
 
         'Lösung zu OptResult hinzufügen
@@ -123,9 +123,26 @@ Public Class OptResult
         Me.Solutions(Me.Solutions.GetUpperBound(0)) = Ind.Clone()
 
         'In DB speichern
-        Call Me.db_insert(Ind)
+        If (TypeOf (Ind) Is Common.Individuum_PES) Then
+            Call Me.db_insert(CType(Ind, Common.Individuum_PES))
+        ElseIf (TypeOf (Ind) Is Common.Individuum_CES) Then
+            Call Me.db_insert(CType(Ind, Common.Individuum_CES))
+        End If
 
     End Sub
+
+    ''Eine CES-Lösung zum Optimierungsergebnis hinzufügen
+    ''***************************************************
+    'Public Sub addSolution(ByVal Ind As Common.Individuum_CES)
+
+    '    'Lösung zu OptResult hinzufügen
+    '    ReDim Preserve Me.Solutions(Me.Solutions.GetUpperBound(0) + 1)
+    '    Me.Solutions(Me.Solutions.GetUpperBound(0)) = Ind.Clone()
+
+    '    'In DB speichern
+    '    Call Me.db_insert(Ind)
+
+    'End Sub
 
     'Eine Lösung identifizieren
     '**************************
@@ -414,9 +431,63 @@ Public Class OptResult
         db.Close()
     End Sub
 
-    'Eine Lösung in die ErgebnisDB schreiben
-    '***************************************
-    Private Function db_insert(ByVal ind As Common.Individuum) As Boolean
+    'Eine PES-Lösung in die ErgebnisDB schreiben
+    '*******************************************
+    Private Function db_insert(ByVal ind As Common.Individuum_PES) As Boolean
+
+        Call db_connect()
+
+        Dim i As Integer
+
+        Dim command As OleDbCommand = New OleDbCommand("", db)
+
+        'Sim schreiben
+        '-------------
+        command.CommandText = "INSERT INTO Sim (ID, Name) VALUES (" & ind.ID & ", '" & Me.Datensatz & "')"
+        command.ExecuteNonQuery()
+
+        'QWerte schreiben 
+        '----------------
+        Dim fieldnames As String = ""
+        Dim fieldvalues As String = ""
+        For i = 0 To Common.Manager.AnzZiele - 1
+            fieldnames &= ", [" & Common.Manager.List_Ziele(i).Bezeichnung & "]"
+            fieldvalues &= ", " & ind.Zielwerte(i).ToString(Common.Provider.FortranProvider)
+        Next
+        command.CommandText = "INSERT INTO QWerte (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
+        command.ExecuteNonQuery()
+
+        'Constraints schreiben 
+        '---------------------
+        If (Common.Manager.AnzConstraints > 0) Then
+            fieldnames = ""
+            fieldvalues = ""
+            For i = 0 To Common.Manager.AnzConstraints - 1
+                fieldnames &= ", [" & Common.Manager.List_Constraints(i).Bezeichnung & "]"
+                fieldvalues &= ", " & ind.Constrain(i).ToString(Common.Provider.FortranProvider)
+            Next
+            command.CommandText = "INSERT INTO [Constraints] (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
+            command.ExecuteNonQuery()
+        End If
+
+        'OptParameter schreiben
+        '----------------------
+        fieldnames = ""
+        fieldvalues = ""
+        For i = 0 To Me.List_OptParameter.GetUpperBound(0)
+            fieldnames &= ", [" & Me.List_OptParameter(i).Bezeichnung & "]"
+            fieldvalues &= ", " & ind.PES_OptParas(i).RWert.ToString(Common.Provider.FortranProvider)
+        Next
+        command.CommandText = "INSERT INTO OptParameter (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
+        command.ExecuteNonQuery()
+
+        Call db_disconnect()
+
+    End Function
+
+    'Eine Hybrid-Lösung in die ErgebnisDB schreiben
+    '**********************************************
+    Private Function db_insert(ByVal ind As Common.Individuum_CES) As Boolean
 
         Call db_connect()
 
@@ -453,38 +524,16 @@ Public Class OptResult
             command.ExecuteNonQuery()
         End If
 
-        If (EVO.Form1.Method = METH_PES _
-            Or EVO.Form1.Method = METH_SENSIPLOT _
-            Or EVO.Form1.Method = METH_HOOKJEEVES) Then
-
-            'OptParameter schreiben
-            '----------------------
-            fieldnames = ""
-            fieldvalues = ""
-            For i = 0 To Me.List_OptParameter.GetUpperBound(0)
-                fieldnames &= ", [" & Me.List_OptParameter(i).Bezeichnung & "]"
-                fieldvalues &= ", " & ind.PES_OptParas(i).RWert.ToString(Common.Provider.FortranProvider)
-            Next
-            command.CommandText = "INSERT INTO OptParameter (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
-            command.ExecuteNonQuery()
-
-        End If
-
-        If (EVO.Form1.Method = METH_CES _
-            Or EVO.Form1.Method = METH_HYBRID) Then
-
-            'Pfad schreiben
-            '--------------
-            fieldnames = ""
-            fieldvalues = ""
-            For i = 0 To Me.List_Locations.GetUpperBound(0)
-                fieldnames &= ", [" & Me.List_Locations(i).Name & "]"
-                fieldvalues &= ", '" & ind.Measures(i) & "'"
-            Next
-            command.CommandText = "INSERT INTO Pfad (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
-            command.ExecuteNonQuery()
-
-        End If
+        'Pfad schreiben
+        '--------------
+        fieldnames = ""
+        fieldvalues = ""
+        For i = 0 To Me.List_Locations.GetUpperBound(0)
+            fieldnames &= ", [" & Me.List_Locations(i).Name & "]"
+            fieldvalues &= ", '" & ind.Measures(i) & "'"
+        Next
+        command.CommandText = "INSERT INTO Pfad (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
+        command.ExecuteNonQuery()
 
         If (EVO.Form1.Method = METH_HYBRID) Then
 
@@ -688,27 +737,29 @@ Public Class OptResult
 
                 If (Not QWerteOnly) Then
 
-                    ReDim .PES_OptParas(Me.List_OptParameter_Save.GetUpperBound(0))
+                    'BUG 343: 
 
-                    'OptParameter
-                    '------------
-                    For j = 0 To Me.List_OptParameter_Save.GetUpperBound(0)
-                        .PES_OptParas(j) = Me.List_OptParameter_Save(j).Clone()
-                        .PES_OptParas(j).RWert = ds.Tables(0).Rows(i).Item(Me.List_OptParameter_Save(j).Bezeichnung)
-                    Next
+                    'ReDim .PES_OptParas(Me.List_OptParameter_Save.GetUpperBound(0))
 
-                    'Constraints
-                    '-----------
-                    For j = 0 To Common.Manager.AnzConstraints - 1
-                        .Constrain(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Constraints(j).Bezeichnung)
-                    Next
+                    ''OptParameter
+                    ''------------
+                    'For j = 0 To Me.List_OptParameter_Save.GetUpperBound(0)
+                    '    .PES_OptParas(j) = Me.List_OptParameter_Save(j).Clone()
+                    '    .PES_OptParas(j).RWert = ds.Tables(0).Rows(i).Item(Me.List_OptParameter_Save(j).Bezeichnung)
+                    'Next
 
-                    'Pfad
-                    '----
-                    ReDim .Measures(Me.List_Locations.GetUpperBound(0))
-                    For j = 0 To Me.List_Locations.GetUpperBound(0)
-                        .Measures(j) = ds.Tables(0).Rows(i).Item(Me.List_Locations(j).Name)
-                    Next
+                    ''Constraints
+                    ''-----------
+                    'For j = 0 To Common.Manager.AnzConstraints - 1
+                    '    .Constrain(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Constraints(j).Bezeichnung)
+                    'Next
+
+                    ''Pfad
+                    ''----
+                    'ReDim .Measures(Me.List_Locations.GetUpperBound(0))
+                    'For j = 0 To Me.List_Locations.GetUpperBound(0)
+                    '    .Measures(j) = ds.Tables(0).Rows(i).Item(Me.List_Locations(j).Name)
+                    'Next
 
                 End If
 
