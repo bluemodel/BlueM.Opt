@@ -17,11 +17,11 @@
         End Get
     End Property
 
-    'Operator
+    'Operator (geht nicht!)
     '********
-    Public Shared Narrowing Operator CType(ByVal ind As Individuum) As Individuum_PES
+    'Public Shared Narrowing Operator CType(ByVal ind As Individuum) As Individuum_PES
 
-    End Operator
+    'End Operator
 
     'Initialisiert die PES-Individuumsklasse
     '***************************************
