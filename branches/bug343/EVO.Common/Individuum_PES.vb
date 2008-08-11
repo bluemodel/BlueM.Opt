@@ -51,9 +51,26 @@
     Public Overrides Function Clone() As Individuum
 
         Dim i, j As Integer
-        Dim Dest As Individuum_PES
 
-        Dest = MyBase.Clone()
+        Dim Dest As New Individuum_PES(Me.Type, Me.ID)
+
+        '04 Zielfunktionswerte
+        Call Array.Copy(Me.Zielwerte, Dest.Zielwerte, Me.Zielwerte.Length)
+
+        '05 Wert der Randbedingung(en)
+        ReDim Dest.Constrain(Me.Constrain.GetUpperBound(0))
+        If Not Me.Constrain.GetLength(0) = -1 Then
+            Array.Copy(Me.Constrain, Dest.Constrain, Me.Constrain.Length)
+        End If
+
+        '07 Kennzeichnung ob Dominiert
+        Dest.dominated = Me.dominated
+
+        '08 Nummer der Pareto Front
+        Dest.Front = Me.Front
+
+        '09 Für crowding distance
+        Dest.Distance = Me.Distance
 
         '06a Array für PES Parameter
         If Me.PES_OptParas.GetUpperBound(0) = -1 Then
@@ -70,12 +87,17 @@
 
     'Konstruktor für ein Array von Individen
     '***************************************
-    Public Shared Sub New_Indi_Array(ByVal _Type As String, ByRef Array() As Individuum_PES)
+    Public Shared Sub New_Indi_Array(ByVal _Type As String, ByRef Array() As Individuum)
         Dim i As Integer
 
         For i = 0 To Array.GetUpperBound(0)
             Array(i) = New Individuum_PES(_Type, i)
         Next
     End Sub
+
+    Public Overrides Function Create(Optional ByVal type As String = "tmp", Optional ByVal id As Integer = 0) As Individuum
+        Dim ind As New Individuum_PES(type, id)
+        Return ind
+    End Function
 
 End Class

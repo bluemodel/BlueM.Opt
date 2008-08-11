@@ -174,9 +174,26 @@
     Public Overrides Function Clone() As Individuum
 
         Dim i, j As Integer
-        Dim Dest As Individuum_CES
 
-        Dest = MyBase.Clone()
+        Dim Dest As New Individuum_CES(Me.Type, Me.ID)
+
+        '04 Zielfunktionswerte
+        Call Array.Copy(Me.Zielwerte, Dest.Zielwerte, Me.Zielwerte.Length)
+
+        '05 Wert der Randbedingung(en)
+        ReDim Dest.Constrain(Me.Constrain.GetUpperBound(0))
+        If Not Me.Constrain.GetLength(0) = -1 Then
+            Array.Copy(Me.Constrain, Dest.Constrain, Me.Constrain.Length)
+        End If
+
+        '07 Kennzeichnung ob Dominiert
+        Dest.dominated = Me.dominated
+
+        '08 Nummer der Pareto Front
+        Dest.Front = Me.Front
+
+        '09 Für crowding distance
+        Dest.Distance = Me.Distance
 
         '03 Der Pfad - zur Kontrolle wird falscher Pfad gesetzt
         ReDim Dest.Path(Me.Path.GetUpperBound(0))
@@ -242,6 +259,9 @@
         Next
     End Sub
 
-
+    Public Overrides Function Create(Optional ByVal type As String = "tmp", Optional ByVal id As Integer = 0) As Individuum
+        Dim ind As New Individuum_CES(type, id)
+        Return ind
+    End Function
 
 End Class

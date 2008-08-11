@@ -1504,7 +1504,7 @@ Partial Class Form1
                 Me.EVO_Einstellungen1.Label_HJ_TSaktuelle.Text = Tastschritte_aktuell.ToString
 
                 'Individuum instanzieren
-                ind = New Common.Individuum("HJ", durchlauf)
+                ind = New Common.Individuum_PES("HJ", durchlauf)
 
                 'HACK: OptParameter ins Individuum kopieren
                 For i = 0 To ind.PES_OptParas.Length - 1
@@ -1534,7 +1534,7 @@ Partial Class Form1
                     Me.EVO_Einstellungen1.Label_HJ_TSaktuelle.Text = Tastschritte_aktuell.ToString
 
                     'Individuum instanzieren
-                    ind = New Common.Individuum("HJ", durchlauf)
+                    ind = New Common.Individuum_PES("HJ", durchlauf)
 
                     'HACK: OptParameter ins Individuum kopieren
                     For i = 0 To ind.PES_OptParas.Length - 1

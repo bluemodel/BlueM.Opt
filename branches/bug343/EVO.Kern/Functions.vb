@@ -330,8 +330,10 @@ Public Class Functions
         Dim i As Integer
         Dim j As Integer
         Dim k As Integer
-        Dim swap As New Individuum("Swap", 0)
+        Dim swap As Individuum
         Dim fmin, fmax As Double
+
+        swap = _Individ(0).Create("swap", 0)
 
         For k = 0 To Manager.AnzPenalty - 1
             For i = StartIndex To EndIndex
@@ -374,10 +376,12 @@ Public Class Functions
         Dim i As Integer
         Dim j As Integer
         Dim k As Integer
-        Dim swap As New Individuum("Swap", 0)
+        Dim swap As Individuum
         Dim fmin, fmax As Double
         Dim StartIndex As Integer
         Dim EndIndex As Integer
+
+        swap = _Individ(0).Create("Swap", 0)
 
         StartIndex = 0
         EndIndex = _Individ.GetUpperBound(0)

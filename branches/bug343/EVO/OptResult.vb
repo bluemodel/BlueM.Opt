@@ -728,48 +728,48 @@ Public Class OptResult
 
         For i = 0 To numSolutions - 1
 
-            Me.Solutions(i) = New Common.Individuum("Solution", i)
+            'BUG 343: TODO!
 
-            With Me.Solutions(i)
-                'ID
-                '--
-                .ID = ds.Tables(0).Rows(i).Item("Sim.ID")
+            'Me.Solutions(i) = New Common.Individuum("Solution", i)
 
-                If (Not QWerteOnly) Then
+            'With Me.Solutions(i)
+            '    'ID
+            '    '--
+            '    .ID = ds.Tables(0).Rows(i).Item("Sim.ID")
 
-                    'BUG 343: 
+            '    If (Not QWerteOnly) Then
 
-                    'ReDim .PES_OptParas(Me.List_OptParameter_Save.GetUpperBound(0))
+            '        'ReDim .PES_OptParas(Me.List_OptParameter_Save.GetUpperBound(0))
 
-                    ''OptParameter
-                    ''------------
-                    'For j = 0 To Me.List_OptParameter_Save.GetUpperBound(0)
-                    '    .PES_OptParas(j) = Me.List_OptParameter_Save(j).Clone()
-                    '    .PES_OptParas(j).RWert = ds.Tables(0).Rows(i).Item(Me.List_OptParameter_Save(j).Bezeichnung)
-                    'Next
+            '        ''OptParameter
+            '        ''------------
+            '        'For j = 0 To Me.List_OptParameter_Save.GetUpperBound(0)
+            '        '    .PES_OptParas(j) = Me.List_OptParameter_Save(j).Clone()
+            '        '    .PES_OptParas(j).RWert = ds.Tables(0).Rows(i).Item(Me.List_OptParameter_Save(j).Bezeichnung)
+            '        'Next
 
-                    ''Constraints
-                    ''-----------
-                    'For j = 0 To Common.Manager.AnzConstraints - 1
-                    '    .Constrain(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Constraints(j).Bezeichnung)
-                    'Next
+            '        ''Constraints
+            '        ''-----------
+            '        'For j = 0 To Common.Manager.AnzConstraints - 1
+            '        '    .Constrain(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Constraints(j).Bezeichnung)
+            '        'Next
 
-                    ''Pfad
-                    ''----
-                    'ReDim .Measures(Me.List_Locations.GetUpperBound(0))
-                    'For j = 0 To Me.List_Locations.GetUpperBound(0)
-                    '    .Measures(j) = ds.Tables(0).Rows(i).Item(Me.List_Locations(j).Name)
-                    'Next
+            '        ''Pfad
+            '        ''----
+            '        'ReDim .Measures(Me.List_Locations.GetUpperBound(0))
+            '        'For j = 0 To Me.List_Locations.GetUpperBound(0)
+            '        '    .Measures(j) = ds.Tables(0).Rows(i).Item(Me.List_Locations(j).Name)
+            '        'Next
 
-                End If
+            '    End If
 
-                'QWerte
-                '------
-                For j = 0 To Common.Manager.AnzZiele - 1
-                    .Zielwerte(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Ziele(j).Bezeichnung)
-                Next
+            '    'QWerte
+            '    '------
+            '    For j = 0 To Common.Manager.AnzZiele - 1
+            '        .Zielwerte(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Ziele(j).Bezeichnung)
+            '    Next
 
-            End With
+            'End With
 
         Next
 

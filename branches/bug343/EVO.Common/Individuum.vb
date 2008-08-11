@@ -1,4 +1,4 @@
-Public Class Individuum
+Public MustInherit Class Individuum
 
     '*******************************************************************************
     '*******************************************************************************
@@ -109,31 +109,7 @@ Public Class Individuum
 
     'Kopiert ein Individuum
     '**********************
-    Public Overridable Function Clone() As Individuum
-
-        Dim Dest As New Individuum(Me.Type, Me.ID)
-
-        '04 Zielfunktionswerte
-        Call Array.Copy(Me.Zielwerte, Dest.Zielwerte, Me.Zielwerte.Length)
-
-        '05 Wert der Randbedingung(en)
-        ReDim Dest.Constrain(Me.Constrain.GetUpperBound(0))
-        If Not Me.Constrain.GetLength(0) = -1 Then
-            Array.Copy(Me.Constrain, Dest.Constrain, Me.Constrain.Length)
-        End If
-
-        '07 Kennzeichnung ob Dominiert
-        Dest.dominated = Me.dominated
-
-        '08 Nummer der Pareto Front
-        Dest.Front = Me.Front
-
-        '09 Für crowding distance
-        Dest.Distance = Me.Distance
-
-        Return Dest
-
-    End Function
+    Public MustOverride Function Clone() As Individuum
 
     'Kopiert ein Array von Individuuen
     '*********************************
@@ -160,7 +136,10 @@ Public Class Individuum
             Next j
         Next i
         Return Array
+
     End Function
+
+    Public MustOverride Function Create(Optional ByVal type As String = "tmp", Optional ByVal id As Integer = 0) As Individuum
 
 #End Region 'Methoden
 
