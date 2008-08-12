@@ -47,7 +47,7 @@ Public Class Functions
     '3. Der Bestwertspeicher wird entsprechend der Fronten oder der sekundären Population gefüllt
     '4: Sekundäre Population wird bestimmt und gespeichert
     '--------------------------------------------------------------------------------------------
-    Public Sub EsEltern_Pareto(ByRef NDSorting() As Individuum, ByRef SekundärQb() As Individuum, ByRef Best() As Individuum)
+    Public Sub EsEltern_Pareto(ByVal NDSorting() As Individuum, ByRef SekundärQb() As Individuum, ByRef Best() As Individuum)
 
         Dim i As Integer
         Dim NFrontMember_aktuell As Integer

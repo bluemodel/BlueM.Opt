@@ -36,16 +36,52 @@ Public Class CES
     '*************************
     Public Childs() As Individuum_CES
     Public Parents() As Individuum_CES
-    Public SekundärQb(-1) As Individuum_CES
+    Public Property IParents() As Individuum()
+        Get
+            Dim inds() As Individuum
+            ReDim inds(Me.Parents.GetUpperBound(0))
+            Call Array.Copy(Me.Parents, inds, Me.Parents.Length)
+            Return inds
+        End Get
+        Set(ByVal value As Individuum())
+            ReDim Me.Parents(value.GetUpperBound(0))
+            Call Array.Copy(value, Me.Parents, value.Length)
+        End Set
+    End Property
+    Public SekundärQb(-1) As Individuum
     Public NDSorting() As Individuum_CES
     'Checken ob es verwendet wird
     Public NDSResult() As Individuum_CES
 
     'Für Hybrid
     Public PES_Memory(-1) As Individuum_CES
+    Public Property IPES_Memory() As Individuum()
+        Get
+            Dim inds() As Individuum
+            ReDim inds(Me.PES_Memory.GetUpperBound(0))
+            Call Array.Copy(Me.PES_Memory, inds, Me.PES_Memory.Length)
+            Return inds
+        End Get
+        Set(ByVal value As Individuum())
+            ReDim Me.PES_Memory(value.GetUpperBound(0))
+            Call Array.Copy(value, Me.PES_Memory, value.Length)
+        End Set
+    End Property
     Public PES_Parents_pChild() As Individuum_CES
     Public PES_Parents_pLoc() As Individuum_CES
-    Private PES_Mem_SekundärQb(-1) As Individuum_CES
+    Public Property IPES_Parents_pLoc() As Individuum()
+        Get
+            Dim inds() As Individuum
+            ReDim inds(Me.PES_Parents_pLoc.GetUpperBound(0))
+            Call Array.Copy(Me.PES_Parents_pLoc, inds, Me.PES_Parents_pLoc.Length)
+            Return inds
+        End Get
+        Set(ByVal value As Individuum())
+            ReDim Me.PES_Parents_pLoc(value.GetUpperBound(0))
+            Call Array.Copy(value, Me.PES_Parents_pLoc, value.Length)
+        End Set
+    End Property
+    Private PES_Mem_SekundärQb(-1) As Individuum
 
 #End Region 'Eigenschaften
 
@@ -1057,7 +1093,7 @@ Public Class CES
         '4: Sekundäre Population wird bestimmt und gespeichert
         '--------------------------------
         Dim Func1 As New Kern.Functions(Settings.CES.n_Childs, Settings.CES.n_Parents, Settings.CES.is_SecPopRestriction, Settings.CES.n_MemberSecondPop, Settings.CES.n_Interact, Settings.CES.is_SecPop, iAktGen + 1)
-        Call Func1.EsEltern_Pareto(NDSorting, SekundärQb, Parents)
+        Call Func1.EsEltern_Pareto(NDSorting, SekundärQb, IParents)
         '********************************************************************************************
 
         'Schritt 5: ist für CES nicht notwenig, da die Parents ByRef zurückgegeben werden
@@ -1117,9 +1153,9 @@ Public Class CES
 
         '! Sekundär_QB wird hier nicht berücksichtigt da die PES Generationen !
         '! wegen der Reduzierung auf Locations entkoppelt                     !
-        Dim Fake_SekundärQb(-1) As Individuum_CES
+        Dim Fake_SekundärQb(-1) As Individuum
         Dim Func1 As New Kern.Functions(n_PES_Childs, Settings.PES.n_Eltern, Settings.PES.SekPop.is_Begrenzung, Settings.CES.n_PES_MemSecPop, Settings.CES.n_PES_Interact, False, iAktGen + 1)
-        Call Func1.EsEltern_Pareto(NDSorting, Fake_SekundärQb, PES_Parents_pLoc)
+        Call Func1.EsEltern_Pareto(NDSorting, Fake_SekundärQb, IPES_Parents_pLoc)
         '********************************************************************************************
 
     End Sub
@@ -1156,7 +1192,7 @@ Public Class CES
         '--------------------------------
         'Sekundär_QB wird hier berücksichtigt!
         Dim Func1 As New Kern.Functions(n_PES_Mem_Childs, Settings.CES.n_PES_MemSize, Settings.PES.SekPop.is_Begrenzung, Settings.PES.SekPop.n_MaxMembers, Settings.PES.SekPop.n_Interact, Settings.PES.SekPop.is_Interact, iAktGen + 1)
-        Call Func1.EsEltern_Pareto(NDSorting, PES_Mem_SekundärQb, PES_Memory)
+        Call Func1.EsEltern_Pareto(NDSorting, PES_Mem_SekundärQb, IPES_Memory)
         '********************************************************************************************
 
     End Sub
