@@ -2254,8 +2254,11 @@ Start_Evolutionsrunden:
                 Next
                 CountFarbe += 1
 
-                If CountFarbe > 15000 Then Farbe = Color.White
-                If CountFarbe > 15000 Then Throw New Exception("Die Anzahl der farben für die verschiedenen Pfade ist erschöpft")
+                If CountFarbe > 15000 Then
+                    Farbe = Color.White
+                    NeueFarbe = True
+                End If
+                'If CountFarbe > 15000 Then Throw New Exception("Die Anzahl der farben für die verschiedenen Pfade ist erschöpft")
             Loop Until NeueFarbe = True
             ColorArray(0, ColorArray.GetUpperBound(1)) = Farbe
             For i = 1 To ColorArray.GetUpperBound(0)
