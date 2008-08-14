@@ -122,11 +122,26 @@ Partial Public Class SolutionDialog
 
     End Sub
 
-    'Eine Lösung hinzufügen
-    '**********************
-    Public Sub addSolution(ByVal ind As Common.Individuum)
+    'Ein Individuum als Lösung hinzufügen
+    '************************************
+    Public Overloads Sub addSolution(ByVal ind As Common.Individuum)
 
-        'Bug 343: Methode sollte für verschiedene Individuen überladen werden!
+        'Fallunterscheidung je nach Individuumstyp
+        If (TypeOf (ind) Is Common.Individuum_PES) Then
+            Call Me.addSolution(CType(ind, Common.Individuum_PES))
+
+        ElseIf (TypeOf (ind) Is Common.Individuum_CES) Then
+            Call Me.addSolution(CType(ind, Common.Individuum_CES))
+
+        Else
+            MsgBox("SolutionDialog.addSolution():" & eol & "Für Individuum vom Typ '" & ind.GetType.ToString() & "' nicht implementiert!", MsgBoxStyle.Critical)
+        End If
+
+    End Sub
+
+    'Ein PES-Individuum als Lösung hinzufügen
+    '****************************************
+    Private Overloads Sub addSolution(ByVal ind As Common.Individuum_PES)
 
         Dim i As Integer
         Dim cellvalues() As Object
@@ -152,68 +167,100 @@ Partial Public Class SolutionDialog
             i += 1
         Next
 
-        'Bei CES und Hybrid
-        '------------------
-        If (TypeOf ind Is Common.Individuum_CES) Then
+        'OptParameter PES
+        For Each optpara As Common.OptParameter In CType(ind, Common.Individuum_PES).PES_OptParas
+            cellvalues(i) = optpara.RWert
+            i += 1
+        Next
 
-            'Measures
-            For Each measure As String In CType(ind, Common.Individuum_CES).Measures
-                cellvalues(i) = measure
-                i += 1
-            Next
+        'Zeile erstellen
+        row = New DataGridViewRow()
+        row.CreateCells(Me.DataGridView1, cellvalues)
+        row.HeaderCell.Value = ind.ID.ToString()
 
+        'Zeile hinzufügen
+        Me.DataGridView1.Rows.Add(row)
 
-        End If
+        'Spalten anpassen
+        Call Me.DataGridView1.AutoResizeColumns()
 
-        'Bei PES und Hybrid
-        '------------------
-        If (TypeOf ind Is Common.Individuum_PES Or _
-            TypeOf ind Is Common.Individuum_CES) Then
+    End Sub
+
+    'Ein CES-Individuum als Lösung hinzufügen
+    '****************************************
+    Private Overloads Sub addSolution(ByVal ind As Common.Individuum_CES)
+
+        Dim i As Integer
+        Dim cellvalues() As Object
+        Dim row As DataGridViewRow
+
+        'Daten zusammenstellen
+        '---------------------
+        ReDim cellvalues(Me.DataGridView1.ColumnCount - 1)
+
+        cellvalues(0) = True
+
+        i = 1
+
+        'Ziele
+        For Each qwert As Double In ind.Zielwerte
+            cellvalues(i) = qwert
+            i += 1
+        Next
+
+        'Constraints
+        For Each constraint As Double In ind.Constrain
+            cellvalues(i) = constraint
+            i += 1
+        Next
+
+        'Measures
+        For Each measure As String In ind.Measures
+            cellvalues(i) = measure
+            i += 1
+        Next
+
+        'Bei Hybrid
+        '----------
+        If (Form1.Method = METH_HYBRID) Then
 
             'OptParameter PES
-            For Each optpara As Common.OptParameter In CType(ind, Common.Individuum_PES).PES_OptParas
+            For Each optpara As Common.OptParameter In ind.PES_OptParas
                 cellvalues(i) = optpara.RWert
                 i += 1
             Next
 
         End If
 
-        'Bei CES und Hybrid
-        '--------------
-        If (TypeOf ind Is Common.Individuum_CES Or _
-            TypeOf ind Is Common.Individuum_CES) Then
+        'OptParameter CES
+        Dim found As Boolean
 
-            'OptParameter CES
-            Dim found As Boolean
-
-            Do While i < Me.DataGridView1.ColumnCount
-                found = False
-                For Each loc As Common.Individuum_CES.Location_Data In CType(ind, Common.Individuum_CES).Loc
-                    For Each optpara As Common.OptParameter In loc.PES_OptPara
-                        If optpara.Bezeichnung = Me.DataGridView1.Columns(i).HeaderText Then
-                            cellvalues(i) = optpara.RWert
-                            found = True
-                        End If
-                    Next
+        Do While i < Me.DataGridView1.ColumnCount
+            found = False
+            For Each loc As Common.Individuum_CES.Location_Data In CType(ind, Common.Individuum_CES).Loc
+                For Each optpara As Common.OptParameter In loc.PES_OptPara
+                    If optpara.Bezeichnung = Me.DataGridView1.Columns(i).HeaderText Then
+                        cellvalues(i) = optpara.RWert
+                        found = True
+                    End If
                 Next
-                If Not found Then
-                    cellvalues(i) = "---"
-                End If
-                i += 1
-            Loop
+            Next
+            If Not found Then
+                cellvalues(i) = "---"
+            End If
+            i += 1
+        Loop
 
-        End If
+        'Zeile erstellen
+        row = New DataGridViewRow()
+        row.CreateCells(Me.DataGridView1, cellvalues)
+        row.HeaderCell.Value = ind.ID.ToString()
 
-            'Zeile erstellen
-            row = New DataGridViewRow()
-            row.CreateCells(Me.DataGridView1, cellvalues)
-            row.HeaderCell.Value = ind.ID.ToString()
+        'Zeile hinzufügen
+        Me.DataGridView1.Rows.Add(row)
 
-            'Zeile hinzufügen
-            Me.DataGridView1.Rows.Add(row)
-
-            'Spalten anpassen
-            Call Me.DataGridView1.AutoResizeColumns()
+        'Spalten anpassen
+        Call Me.DataGridView1.AutoResizeColumns()
 
     End Sub
 
