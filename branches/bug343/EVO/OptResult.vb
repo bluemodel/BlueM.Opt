@@ -485,8 +485,8 @@ Public Class OptResult
 
     End Function
 
-    'Eine Hybrid-Lösung in die ErgebnisDB schreiben
-    '**********************************************
+    'Eine CES/Hybrid-Lösung in die ErgebnisDB schreiben
+    '**************************************************
     Private Function db_insert(ByVal ind As Common.Individuum_CES) As Boolean
 
         Call db_connect()
@@ -682,13 +682,38 @@ Public Class OptResult
     End Sub
 
     'Optimierungsergebnis aus einer DB lesen
-    '*****************************************************
+    '***************************************
     Public Sub db_load(ByVal sourceFile As String, Optional ByVal QWerteOnly As Boolean = False)
 
         '---------------------------------------------------------------------------
         'Hinweise:
         'Die EVO-Eingabedateien müssen eingelesen sein und mit der DB übereinstimmen
+        'Die aktuell ausgewählte Methode muss auch mit der DB übereinstimmen
         '---------------------------------------------------------------------------
+
+        'Neuen Dateipfad speichern
+        Me.db_path = sourceFile
+
+        Select Case Form1.Method
+            Case METH_PES, METH_HOOKJEEVES, METH_SENSIPLOT
+                Call db_getIndividuen_PES(QWerteOnly)
+
+            Case METH_CES, METH_HYBRID
+                Call db_getIndividuen_CES(QWerteOnly)
+
+            Case Else
+                MsgBox("OptResult.dbload() für Methode '" & Form1.Method & "' noch nicht implementiert!", MsgBoxStyle.Exclamation)
+                Exit Sub
+        End Select
+
+        'Sekundärpopulationen laden
+        Call Me.db_loadSekPops()
+
+    End Sub
+
+    'Alle Lösungen aus der DB als PES-Individuen einlesen
+    '****************************************************
+    Private Sub db_getIndividuen_PES(Optional ByVal QWerteOnly As Boolean = False)
 
         Dim i, j As Integer
         Dim numSolutions As Integer
@@ -696,18 +721,81 @@ Public Class OptResult
         Dim adapter As OleDbDataAdapter
         Dim ds As DataSet
 
-        'Neuen Dateipfad speichern
-        Me.db_path = sourceFile
+        'Connect
+        Call db_connect()
+
+        'Alle Lösungen aus DB lesen
+        '--------------------------
+        q = "SELECT Sim.ID, OptParameter.*, QWerte.*, Constraints.* FROM ((Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN OptParameter ON Sim.ID=OptParameter.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID ORDER BY Sim.ID"
+
+        adapter = New OleDbDataAdapter(q, db)
+
+        ds = New DataSet("EVO")
+        numSolutions = adapter.Fill(ds, "Result")
+
+        'Disconnect
+        Call db_disconnect()
+
+        'Alle Lösungen als Individuen übernehmen
+        '---------------------------------------
+        ReDim Me.Solutions(numSolutions - 1)
+
+        For i = 0 To numSolutions - 1
+
+            Me.Solutions(i) = New Common.Individuum_PES("Solution", i)
+
+            With CType(Me.Solutions(i), Common.Individuum_PES)
+                'ID
+                '--
+                .ID = ds.Tables(0).Rows(i).Item("Sim.ID")
+
+                If (Not QWerteOnly) Then
+
+                    ReDim .PES_OptParas(Me.List_OptParameter_Save.GetUpperBound(0))
+
+                    'OptParameter
+                    '------------
+                    For j = 0 To Me.List_OptParameter_Save.GetUpperBound(0)
+                        .PES_OptParas(j) = Me.List_OptParameter_Save(j).Clone()
+                        .PES_OptParas(j).RWert = ds.Tables(0).Rows(i).Item(Me.List_OptParameter_Save(j).Bezeichnung)
+                    Next
+
+                    'Constraints
+                    '-----------
+                    For j = 0 To Common.Manager.AnzConstraints - 1
+                        .Constrain(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Constraints(j).Bezeichnung)
+                    Next
+
+                End If
+
+                'QWerte
+                '------
+                For j = 0 To Common.Manager.AnzZiele - 1
+                    .Zielwerte(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Ziele(j).Bezeichnung)
+                Next
+
+            End With
+
+        Next
+
+    End Sub
+
+    'Alle Lösungen aus der DB als CES-Individuen einlesen
+    '****************************************************
+    Private Sub db_getIndividuen_CES(Optional ByVal QWerteOnly As Boolean = False)
+
+        Dim i, j As Integer
+        Dim numSolutions As Integer
+        Dim q As String = ""
+        Dim adapter As OleDbDataAdapter
+        Dim ds As DataSet
 
         'Connect
         Call db_connect()
 
-        'Read
-        '----
-        'Alle Lösungen
+        'Alle Lösungen aus DB lesen
+        '--------------------------
         Select Case Form1.Method
-            Case METH_PES, METH_SENSIPLOT, METH_HOOKJEEVES
-                q = "SELECT Sim.ID, OptParameter.*, QWerte.*, Constraints.* FROM ((Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN OptParameter ON Sim.ID=OptParameter.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID ORDER BY Sim.ID"
             Case METH_CES
                 q = "SELECT Sim.ID, Pfad.*, QWerte.*, Constraints.* FROM ((Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN Pfad ON Sim.ID=Pfad.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID"
             Case METH_HYBRID
@@ -722,62 +810,57 @@ Public Class OptResult
         'Disconnect
         Call db_disconnect()
 
-        'Alle Lösungen übernehmen
-        '========================
+        'Alle Lösungen als Individuen übernehmen
+        '---------------------------------------
         ReDim Me.Solutions(numSolutions - 1)
 
         For i = 0 To numSolutions - 1
 
-            'BUG 343: TODO!
+            Me.Solutions(i) = New Common.Individuum_CES("Solution", i)
 
-            'Me.Solutions(i) = New Common.Individuum("Solution", i)
+            With CType(Me.Solutions(i), Common.Individuum_CES)
+                'ID
+                '--
+                .ID = ds.Tables(0).Rows(i).Item("Sim.ID")
 
-            'With Me.Solutions(i)
-            '    'ID
-            '    '--
-            '    .ID = ds.Tables(0).Rows(i).Item("Sim.ID")
+                If (Not QWerteOnly) Then
 
-            '    If (Not QWerteOnly) Then
+                    'Bei CES sollte List_OptParameter_Save eine Länge von 0 haben, deswegen keine Fallunterscheidung notwendig
+                    ReDim .PES_OptParas(Me.List_OptParameter_Save.GetUpperBound(0))
 
-            '        'ReDim .PES_OptParas(Me.List_OptParameter_Save.GetUpperBound(0))
+                    'OptParameter
+                    '------------
+                    For j = 0 To Me.List_OptParameter_Save.GetUpperBound(0)
+                        .PES_OptParas(j) = Me.List_OptParameter_Save(j).Clone()
+                        .PES_OptParas(j).RWert = ds.Tables(0).Rows(i).Item(Me.List_OptParameter_Save(j).Bezeichnung)
+                    Next
 
-            '        ''OptParameter
-            '        ''------------
-            '        'For j = 0 To Me.List_OptParameter_Save.GetUpperBound(0)
-            '        '    .PES_OptParas(j) = Me.List_OptParameter_Save(j).Clone()
-            '        '    .PES_OptParas(j).RWert = ds.Tables(0).Rows(i).Item(Me.List_OptParameter_Save(j).Bezeichnung)
-            '        'Next
+                    'Constraints
+                    '-----------
+                    For j = 0 To Common.Manager.AnzConstraints - 1
+                        .Constrain(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Constraints(j).Bezeichnung)
+                    Next
 
-            '        ''Constraints
-            '        ''-----------
-            '        'For j = 0 To Common.Manager.AnzConstraints - 1
-            '        '    .Constrain(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Constraints(j).Bezeichnung)
-            '        'Next
+                    'Pfad
+                    '----
+                    ReDim .Measures(Me.List_Locations.GetUpperBound(0))
+                    For j = 0 To Me.List_Locations.GetUpperBound(0)
+                        .Measures(j) = ds.Tables(0).Rows(i).Item(Me.List_Locations(j).Name)
+                    Next
 
-            '        ''Pfad
-            '        ''----
-            '        'ReDim .Measures(Me.List_Locations.GetUpperBound(0))
-            '        'For j = 0 To Me.List_Locations.GetUpperBound(0)
-            '        '    .Measures(j) = ds.Tables(0).Rows(i).Item(Me.List_Locations(j).Name)
-            '        'Next
+                End If
 
-            '    End If
+                'QWerte
+                '------
+                For j = 0 To Common.Manager.AnzZiele - 1
+                    .Zielwerte(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Ziele(j).Bezeichnung)
+                Next
 
-            '    'QWerte
-            '    '------
-            '    For j = 0 To Common.Manager.AnzZiele - 1
-            '        .Zielwerte(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Ziele(j).Bezeichnung)
-            '    Next
-
-            'End With
+            End With
 
         Next
 
-        'Sekundärpopulationen laden
-        Call Me.db_loadSekPops()
-
     End Sub
-
 
     'Sekundärpopulationen aus DB laden
     '*********************************
