@@ -35,7 +35,7 @@ Partial Public Class Scatterplot
 
         'Optionen übernehmen
         Me.SekPopOnly = _sekpoponly
-        Me.ShowRef = _showref
+        Me.ShowRef = _showRef
 
         'Zielauswahl speichern
         Me.Zielauswahl = _zielauswahl
@@ -91,7 +91,7 @@ Partial Public Class Scatterplot
                 max(i) = Math.Max(Common.Manager.List_Ziele(Me.Zielauswahl(i)).IstWert, max(i))
             End If
             'Vergleichsergebnis
-            If (Me.ShowRef)
+            If (Me.ShowRef) Then
                 For Each ind As Common.Individuum In Me.OptResultRef.getSekPop()
                     min(i) = Math.Min(ind.Zielwerte(Me.Zielauswahl(i)), min(i))
                     max(i) = Math.Max(ind.Zielwerte(Me.Zielauswahl(i)), max(i))
