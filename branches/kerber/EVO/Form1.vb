@@ -839,7 +839,7 @@ Partial Class Form1
 
         Dim i, j, n, Anz_SensiPara, Anz_Sim As Integer
         Dim isOK As Boolean
-        Dim ind As Common.Individuum
+        Dim ind As Common.Individuum_PES
         Dim serie As Steema.TeeChart.Styles.Series
         Dim surface As New Steema.TeeChart.Styles.Surface
         Dim SimReihe As Wave.Zeitreihe
@@ -853,8 +853,8 @@ Partial Class Form1
         Me.globalAnzPar = Sim1.List_OptParameter.Length
         Anz_SensiPara = SensiPlot1.Selected_OptParameter.GetLength(0)
 
-        'Individuum wird initialisiert
-        Call Common.Individuum.Initialise(1, 0, Me.globalAnzPar)
+        'Individuumsklasse wird initialisiert
+        Call Common.Individuum_PES.Initialise(Me.globalAnzPar)
 
         'Anzahl Simulationen
         If (Anz_SensiPara = 1) Then
@@ -928,7 +928,7 @@ Partial Class Form1
                 Me.EVO_Opt_Verlauf1.Nachfolger(n)
 
                 'Individuum instanzieren
-                ind = New Common.Individuum("SensiPlot", n)
+                ind = New Common.Individuum_PES("SensiPlot", n)
 
                 'OptParameter ins Individuum kopieren
                 ind.PES_OptParas = Sim1.List_OptParameter
@@ -1236,7 +1236,7 @@ Partial Class Form1
             'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
             If Sim1.CES_T_Modus = Common.Constants.CES_T_MODUS.No_Test Then
                 'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
-                Call Common.Individuum.New_Indi_Array("Child", CES1.Childs)
+                CES1.Childs = Common.Individuum.New_Indi_Array(Individuum.Individuumsklassen.Individuum_CES, CES1.Childs.GetLength(0), "Child")
                 'Reproduktionsoperatoren, hier gehts dezent zur Sache
                 Call CES1.Reproduction_Control()
                 'Mutationsoperatoren
@@ -1281,7 +1281,7 @@ Partial Class Form1
     End Sub
 
     'Mixed_Integer Teil ermittelt die PES Parameter für jedes neues Child und jede Location
-    'Achtung! wird auch als hread gestartet um weiter aufs Form zugreifen zu können
+    'Achtung! wird auch als Thread gestartet um weiter aufs Form zugreifen zu können
     '**************************************************************************************
     Private Sub Mixed_Integer_PES(ByVal i_gen As Integer)
 
@@ -1420,7 +1420,7 @@ Partial Class Form1
         Dim j As Integer
         Dim k As Integer
         Dim b As Boolean
-        Dim ind As Common.Individuum
+        Dim ind As Common.Individuum_PES
         Dim QNBest() As Double = {}
         Dim QBest() As Double = {}
         Dim aktuellePara(Me.globalAnzPar - 1) As Double
@@ -1434,8 +1434,8 @@ Partial Class Form1
 
         Dim HookJeeves As EVO.Kern.HookeAndJeeves = New EVO.Kern.HookeAndJeeves(globalAnzPar, EVO_Einstellungen1.Settings.HookJeeves.DnStart, EVO_Einstellungen1.Settings.HookJeeves.DnFinish)
 
-        'Individuum wird initialisiert
-        Call Common.Individuum.Initialise(1, 0, Me.globalAnzPar)
+        'Individuumsklasse wird initialisiert
+        Call Common.Individuum_PES.Initialise(Me.globalAnzPar)
 
         ReDim QNBest(Common.Manager.AnzPenalty - 1)
         ReDim QBest(Common.Manager.AnzPenalty - 1)
@@ -1467,7 +1467,7 @@ Partial Class Form1
             'Bestimmen der Ausgangsgüte
             '==========================
             'Individuum instanzieren
-            ind = New Common.Individuum("HJ", durchlauf)
+            ind = New Common.Individuum_PES("HJ", durchlauf)
 
             'HACK: OptParameter ins Individuum kopieren
             For i = 0 To ind.PES_OptParas.Length - 1
@@ -1503,7 +1503,7 @@ Partial Class Form1
                 Me.EVO_Einstellungen1.Label_HJ_TSaktuelle.Text = Tastschritte_aktuell.ToString
 
                 'Individuum instanzieren
-                ind = New Common.Individuum("HJ", durchlauf)
+                ind = New Common.Individuum_PES("HJ", durchlauf)
 
                 'HACK: OptParameter ins Individuum kopieren
                 For i = 0 To ind.PES_OptParas.Length - 1
@@ -1533,7 +1533,7 @@ Partial Class Form1
                     Me.EVO_Einstellungen1.Label_HJ_TSaktuelle.Text = Tastschritte_aktuell.ToString
 
                     'Individuum instanzieren
-                    ind = New Common.Individuum("HJ", durchlauf)
+                    ind = New Common.Individuum_PES("HJ", durchlauf)
 
                     'HACK: OptParameter ins Individuum kopieren
                     For i = 0 To ind.PES_OptParas.Length - 1
@@ -1627,7 +1627,7 @@ Partial Class Form1
     Private Sub STARTEN_PES()
 
         Dim durchlauf As Integer
-        Dim ind() As Common.Individuum
+        Dim ind() As Common.Individuum_PES
         Dim PES1 As EVO.Kern.PES
 
         'Hypervolumen instanzieren
@@ -1644,8 +1644,8 @@ Partial Class Form1
             Call PrepareDiagramm()
         End If
 
-        'Individuum wird initialisiert
-        Call Common.Individuum.Initialise(1, 0, globalAnzPar)
+        'Individuumsklasse wird initialisiert
+        Call Common.Individuum_PES.Initialise(Me.globalAnzPar)
 
         'Schritte 0: Objekt der Klasse PES wird erzeugt
         '**********************************************
@@ -1698,8 +1698,7 @@ Start_Evolutionsrunden:
                         durchlauf += 1
 
                         'Neues Individuum instanzieren
-                        ind(i) = New Common.Individuum("PES", durchlauf)
-                        ind(i).ID = durchlauf
+                        ind(i) = New Common.Individuum_PES("PES", durchlauf)
 
                         'REPRODUKTIONSPROZESS
                         '####################
@@ -2178,45 +2177,90 @@ Start_Evolutionsrunden:
 
     'Speichert die verwendeten Farben für die bisherigen Pfade und generiert neue, falls erforderlich
     '************************************************************************************************
-    Private Function ColorManagement(ByRef ColorAray(,) As Object, ByVal ind As Common.Individuum) As Color
+    Private Function ColorManagement(ByRef ColorArray(,) As Object, ByVal ind As Common.Individuum_CES) As Color
         Dim i, j As Integer
         Dim count As Integer
         Dim Farbe As Color = Color.White
 
         'Falls der Pfad schon vorhanden ist wird diese Farbe verwendet
-        For i = 0 To ColorAray.GetUpperBound(1)
+        For i = 0 To ColorArray.GetUpperBound(1)
             count = 0
-            For j = 1 To ColorAray.GetUpperBound(0)
-                If ColorAray(j, i) = ind.Path(j - 1) Then
+            For j = 1 To ColorArray.GetUpperBound(0)
+                If ColorArray(j, i) = ind.Path(j - 1) Then
                     count += 1
                 End If
             Next
             If count = ind.Path.GetLength(0) Then
-                Farbe = ColorAray(0, i)
+                Farbe = ColorArray(0, i)
             End If
         Next
 
-        'Falls der Pfad nicht vorhanden ist wird eine neue generiert
+
+        'Für Farbverläufe __________________________________________________________________________________
+                
+        'If ColorAray.GetLength(1) = 0 then
+        '    ReDim Preserve ColorAray(ColorAray.GetUpperBound(0), ColorAray.GetLength(1))
+        '    Farbe = Color.FromArgb(255, 0, 255, 255)
+        'ElseIf Farbe = Color.White Then
+
+        '    Farbe = ColorAray(0, ColorAray.GetUpperBound(1))
+        '    ReDim Preserve ColorAray(ColorAray.GetUpperBound(0), ColorAray.GetLength(1))
+
+        '    Dim R As Integer = Farbe.R
+        '    Dim G As Integer = Farbe.G
+        '    Dim B As Integer = Farbe.B
+
+        '    G = G - 50
+        '    If G < 0 then
+        '        G = 255
+        '        B = B - 50
+        '        If B < 100
+        '            B = 255
+        '            R = R + 50
+        '            If R > 255
+        '                Throw New Exception("Die Anzahl der farben für die verschiedenen Pfade ist erschöpft")
+        '            End If
+        '        End If
+        '    End If
+
+        '    Farbe = color.FromArgb(255, R, G, B)
+        '    ColorAray(0, ColorAray.GetUpperBound(1)) = Farbe
+
+        '    For i = 1 To ColorAray.GetUpperBound(0)
+        '        ColorAray(i, ColorAray.GetUpperBound(1)) = ind.Path(i - 1)
+        '    Next
+
+        'End If
+
+
+        'Für zufällige Farben _________________________________________________________________________________
+
         If Farbe = Color.White Then
-            ReDim Preserve ColorAray(ColorAray.GetUpperBound(0), ColorAray.GetLength(1))
+            ReDim Preserve ColorArray(ColorArray.GetUpperBound(0), ColorArray.GetLength(1))
             Dim NeueFarbe As Boolean = True
             Dim CountFarbe As Integer = 0
             Do
                 Randomize()
-                Farbe = Drawing.Color.FromArgb(255, CInt(Int((25 * Rnd()) + 1)) * 10, _
-                                                    CInt(Int((25 * Rnd()) + 1)) * 10, _
-                                                    CInt(Int((25 * Rnd()) + 1)) * 10)
-                For i = 0 To ColorAray.GetUpperBound(1)
-                    If Farbe = ColorAray(0, i) Then
+                'Genriert Zahl zwischen
+                Farbe = Drawing.Color.FromArgb(255, CInt(Int((50 * Rnd()) + 1)) * 5, _
+                                                    CInt(Int((50 * Rnd()) + 1)) * 5, _
+                                                    CInt(Int((50 * Rnd()) + 1)) * 5)
+                For i = 0 To ColorArray.GetUpperBound(1)
+                    If Farbe = ColorArray(0, i) Then
                         NeueFarbe = False
                     End If
                 Next
                 CountFarbe += 1
-                If CountFarbe > 15000 Then Throw New Exception("Die Anzahl der farben für die verschiedenen Pfade ist erschöpft")
+
+                If CountFarbe > 15000 Then
+                    Farbe = Color.White
+                    NeueFarbe = True
+                End If
+                'If CountFarbe > 15000 Then Throw New Exception("Die Anzahl der farben für die verschiedenen Pfade ist erschöpft")
             Loop Until NeueFarbe = True
-            ColorAray(0, ColorAray.GetUpperBound(1)) = Farbe
-            For i = 1 To ColorAray.GetUpperBound(0)
-                ColorAray(i, ColorAray.GetUpperBound(1)) = ind.Path(i - 1)
+            ColorArray(0, ColorArray.GetUpperBound(1)) = Farbe
+            For i = 1 To ColorArray.GetUpperBound(0)
+                ColorArray(i, ColorArray.GetUpperBound(1)) = ind.Path(i - 1)
             Next
         End If
 
@@ -2374,18 +2418,18 @@ Start_Evolutionsrunden:
                 Case METH_PES
 
                     'Bereitet das BlueM für PES vor
-                    Call Sim1.PREPARE_Evaluation_PES(ind.Get_All_PES_Para)
+                    Call Sim1.PREPARE_Evaluation_PES(CType(ind, Individuum_PES).PES_OptParas)
 
                 Case METH_CES, METH_HYBRID
 
                     'Aktueller Pfad wird an Sim zurückgegeben
                     'Bereitet das BlaueModell für die Kombinatorik vor
-                    Call Sim1.PREPARE_Evaluation_CES(ind.Path, ind.Get_All_Loc_Elem)
+                    Call Sim1.PREPARE_Evaluation_CES(CType(ind, Individuum_CES).Path, CType(ind, Individuum_CES).Get_All_Loc_Elem)
 
                     'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
                     If Form1.Method = METH_HYBRID And EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer Then
-                        Call Sim1.Reduce_OptPara_and_ModPara(ind.Get_All_Loc_Elem)
-                        Call Sim1.PREPARE_Evaluation_PES(ind.Get_All_Loc_PES_Para)
+                        Call Sim1.Reduce_OptPara_and_ModPara(CType(ind, Individuum_CES).Get_All_Loc_Elem)
+                        Call Sim1.PREPARE_Evaluation_PES(CType(ind, Individuum_CES).Get_All_Loc_PES_Para)
                     End If
 
             End Select

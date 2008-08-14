@@ -185,20 +185,22 @@ Partial Public Class EVO_Opt_Verlauf
         'LabelaktNachf
         '
         Me.LabelaktNachf.ForeColor = System.Drawing.Color.Blue
-        Me.LabelaktNachf.Location = New System.Drawing.Point(285, 42)
+        Me.LabelaktNachf.Location = New System.Drawing.Point(278, 42)
         Me.LabelaktNachf.Name = "LabelaktNachf"
-        Me.LabelaktNachf.Size = New System.Drawing.Size(30, 13)
+        Me.LabelaktNachf.Size = New System.Drawing.Size(40, 13)
         Me.LabelaktNachf.TabIndex = 12
         Me.LabelaktNachf.Text = "0"
+        Me.LabelaktNachf.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
         'LabelaktGen
         '
         Me.LabelaktGen.ForeColor = System.Drawing.Color.Blue
-        Me.LabelaktGen.Location = New System.Drawing.Point(285, 24)
+        Me.LabelaktGen.Location = New System.Drawing.Point(278, 24)
         Me.LabelaktGen.Name = "LabelaktGen"
-        Me.LabelaktGen.Size = New System.Drawing.Size(30, 13)
+        Me.LabelaktGen.Size = New System.Drawing.Size(40, 13)
         Me.LabelaktGen.TabIndex = 11
         Me.LabelaktGen.Text = "0"
+        Me.LabelaktGen.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
         'LabelaktPop
         '
@@ -208,6 +210,7 @@ Partial Public Class EVO_Opt_Verlauf
         Me.LabelaktPop.Size = New System.Drawing.Size(23, 13)
         Me.LabelaktPop.TabIndex = 10
         Me.LabelaktPop.Text = "0"
+        Me.LabelaktPop.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
         'LabelaktRunde
         '
@@ -217,42 +220,47 @@ Partial Public Class EVO_Opt_Verlauf
         Me.LabelaktRunde.Size = New System.Drawing.Size(23, 13)
         Me.LabelaktRunde.TabIndex = 9
         Me.LabelaktRunde.Text = "0"
+        Me.LabelaktRunde.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
         'LabelAnzNachf
         '
         Me.LabelAnzNachf.ForeColor = System.Drawing.Color.Blue
-        Me.LabelAnzNachf.Location = New System.Drawing.Point(346, 42)
+        Me.LabelAnzNachf.Location = New System.Drawing.Point(335, 42)
         Me.LabelAnzNachf.Name = "LabelAnzNachf"
-        Me.LabelAnzNachf.Size = New System.Drawing.Size(30, 13)
+        Me.LabelAnzNachf.Size = New System.Drawing.Size(44, 15)
         Me.LabelAnzNachf.TabIndex = 8
         Me.LabelAnzNachf.Text = "0"
+        Me.LabelAnzNachf.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
         'LabelAnzGen
         '
         Me.LabelAnzGen.ForeColor = System.Drawing.Color.Blue
-        Me.LabelAnzGen.Location = New System.Drawing.Point(346, 24)
+        Me.LabelAnzGen.Location = New System.Drawing.Point(338, 24)
         Me.LabelAnzGen.Name = "LabelAnzGen"
-        Me.LabelAnzGen.Size = New System.Drawing.Size(30, 13)
+        Me.LabelAnzGen.Size = New System.Drawing.Size(41, 17)
         Me.LabelAnzGen.TabIndex = 7
         Me.LabelAnzGen.Text = "0"
+        Me.LabelAnzGen.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
         'LabelAnzPop
         '
         Me.LabelAnzPop.ForeColor = System.Drawing.Color.Blue
         Me.LabelAnzPop.Location = New System.Drawing.Point(108, 42)
         Me.LabelAnzPop.Name = "LabelAnzPop"
-        Me.LabelAnzPop.Size = New System.Drawing.Size(23, 13)
+        Me.LabelAnzPop.Size = New System.Drawing.Size(25, 15)
         Me.LabelAnzPop.TabIndex = 6
         Me.LabelAnzPop.Text = "0"
+        Me.LabelAnzPop.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
         'LabelAnzRunden
         '
         Me.LabelAnzRunden.ForeColor = System.Drawing.Color.Blue
         Me.LabelAnzRunden.Location = New System.Drawing.Point(108, 24)
         Me.LabelAnzRunden.Name = "LabelAnzRunden"
-        Me.LabelAnzRunden.Size = New System.Drawing.Size(23, 13)
+        Me.LabelAnzRunden.Size = New System.Drawing.Size(25, 17)
         Me.LabelAnzRunden.TabIndex = 5
         Me.LabelAnzRunden.Text = "0"
+        Me.LabelAnzRunden.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
         'EVO_Opt_Verlauf
         '
