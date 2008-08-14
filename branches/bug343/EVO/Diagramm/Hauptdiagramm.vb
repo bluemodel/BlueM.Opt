@@ -151,7 +151,7 @@
     '*******************
     Public Sub ZeichneSekPopulation(ByVal pop() As Common.Individuum)
 
-        Dim i As Short
+        Dim i As Integer
         Dim serie As Steema.TeeChart.Styles.Series
         Dim serie3D As Steema.TeeChart.Styles.Points3D
         Dim values(,) As Double
