@@ -114,35 +114,27 @@ Public Class OptResult
 
     End Sub
 
-    'Eine PES-Lösung zum Optimierungsergebnis hinzufügen
-    '***************************************************
+    'Eine Lösung zum Optimierungsergebnis hinzufügen
+    '***********************************************
     Public Sub addSolution(ByVal Ind As Common.Individuum)
 
         'Lösung zu OptResult hinzufügen
         ReDim Preserve Me.Solutions(Me.Solutions.GetUpperBound(0) + 1)
         Me.Solutions(Me.Solutions.GetUpperBound(0)) = Ind.Clone()
 
-        'In DB speichern
+        'In DB speichern:
+        'Fallunterscheidung je nach Individuumstyp
         If (TypeOf (Ind) Is Common.Individuum_PES) Then
             Call Me.db_insert(CType(Ind, Common.Individuum_PES))
+
         ElseIf (TypeOf (Ind) Is Common.Individuum_CES) Then
             Call Me.db_insert(CType(Ind, Common.Individuum_CES))
+
+        Else
+            MsgBox("OptResult.db_insert():" & eol & "Für Individuum vom Typ '" & Ind.GetType.ToString() & "' nicht implementiert!", MsgBoxStyle.Critical)
         End If
 
     End Sub
-
-    ''Eine CES-Lösung zum Optimierungsergebnis hinzufügen
-    ''***************************************************
-    'Public Sub addSolution(ByVal Ind As Common.Individuum_CES)
-
-    '    'Lösung zu OptResult hinzufügen
-    '    ReDim Preserve Me.Solutions(Me.Solutions.GetUpperBound(0) + 1)
-    '    Me.Solutions(Me.Solutions.GetUpperBound(0)) = Ind.Clone()
-
-    '    'In DB speichern
-    '    Call Me.db_insert(Ind)
-
-    'End Sub
 
     'Eine Lösung identifizieren
     '**************************
@@ -433,7 +425,7 @@ Public Class OptResult
 
     'Eine PES-Lösung in die ErgebnisDB schreiben
     '*******************************************
-    Private Function db_insert(ByVal ind As Common.Individuum_PES) As Boolean
+    Private Overloads Function db_insert(ByVal ind As Common.Individuum_PES) As Boolean
 
         Call db_connect()
 
@@ -487,7 +479,7 @@ Public Class OptResult
 
     'Eine CES/Hybrid-Lösung in die ErgebnisDB schreiben
     '**************************************************
-    Private Function db_insert(ByVal ind As Common.Individuum_CES) As Boolean
+    Private Overloads Function db_insert(ByVal ind As Common.Individuum_CES) As Boolean
 
         Call db_connect()
 
