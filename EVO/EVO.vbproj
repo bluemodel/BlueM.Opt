@@ -300,6 +300,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <None Include="Apps\BlueM\IHWB.BlueM.DllAdapter.dll" />
+    <None Include="Apps\SMUSI\IHWB.SMUSI.DllAdapter.dll" />
     <Content Include="Apps\SWMM\SWMM5.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
