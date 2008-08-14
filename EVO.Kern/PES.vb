@@ -1,5 +1,3 @@
-Option Strict Off
-
 Imports IHWB.EVO.Common
 
 Public Class PES
@@ -100,7 +98,19 @@ Public Class PES
     Const galpha As Double = 1.3            'Faktor alpha = 1.3 auf Generationsebene nach Rechenberg
     Const palpha As Double = 1.1            'Faktor alpha = 1.1 auf Populationsebene nach Rechenberg
 
-    Dim NDSorting() As Individuum
+    Dim NDSorting() As Individuum_PES
+    Private Property INDSorting() As Individuum()
+        Get
+            Dim inds() As Individuum
+            ReDim inds(Me.NDSorting.GetUpperBound(0))
+            Call Array.Copy(Me.NDSorting, inds, Me.NDSorting.Length)
+            Return inds
+        End Get
+        Set(ByVal value As Individuum())
+            ReDim Me.NDSorting(value.GetUpperBound(0))
+            Call Array.Copy(value, Me.NDSorting, value.Length)
+        End Set
+    End Property
 
     Private Structure Struct_Sortierung
         Dim Index As Integer
@@ -248,8 +258,7 @@ Public Class PES
 
         'NDSorting wird nur benötigt, falls eine Paretofront approximiert wird
         If (Settings.PES.OptModus = EVO_MODUS.Multi_Objective) Then
-            ReDim NDSorting(Settings.PES.n_Eltern + Settings.PES.n_Nachf - 1)
-            Call Individuum.New_Indi_Array("NDSorting", NDSorting)
+            NDSorting = Individuum.New_Indi_Array(Individuum.Individuumsklassen.Individuum_PES, Settings.PES.n_Eltern + Settings.PES.n_Nachf, "NDSorting")
             If (Settings.PES.OptEltern = EVO_ELTERN.Neighbourhood) Then
                 ReDim PenaltyDistance(Settings.PES.n_Eltern - 1, Settings.PES.n_Eltern - 1)
                 ReDim Distanceb(Settings.PES.n_Eltern - 1)
@@ -1355,14 +1364,13 @@ StartMutation:
             'Nur Eltern werden NDSorting hinzugefügt, Kinder sind schon oben drin
             '--------------------------------------------------------------------
             For i = Settings.PES.n_Nachf To Settings.PES.n_Nachf + Settings.PES.n_Eltern - 1
-                Call Copy_Bestwert_to_Individuum(i, i - Settings.PES.n_Nachf, NDSorting)
+                Call Copy_Bestwert_to_Individuum(i, i - Settings.PES.n_Nachf, INDSorting)
             Next i
 
             '********************* Alles in der Klasse Functions ****************************************
-            'Zu Beginn den Bestwertspeicher in ein Individuum packen
-            'Dimensionieren des Best_Indi
-            Dim Best_Indi(Best.Qb.GetUpperBound(0)) As Individuum
-            Call Individuum.New_Indi_Array("Bestwerte", Best_Indi)
+            'Zu Beginn den Bestwertspeicher in ein Array von Individuen packen
+            Dim Best_Indi() As Individuum
+            Best_Indi = Individuum.New_Indi_Array(Individuum.Individuumsklassen.Individuum_PES, Best.Qb.GetLength(0), "Bestwerte")
             'Kopieren in Best_Indi
             For i = 0 To Best.Qb.GetUpperBound(0)
                 Call Copy_Bestwert_to_Individuum(i, i, Best_Indi)
@@ -1427,8 +1435,10 @@ StartMutation:
         End If
 
         For v = 0 To Anz.Para - 1
-            Best.Db(v, i, PES_iAkt.iAktPop) = Individ(i).PES_OptParas(v).Dn
-            Best.Xb(v, i, PES_iAkt.iAktPop) = Individ(i).PES_OptParas(v).Xn
+            With CType(Individ(i), Individuum_PES)
+                Best.Db(v, i, PES_iAkt.iAktPop) = .PES_OptParas(v).Dn
+                Best.Xb(v, i, PES_iAkt.iAktPop) = .PES_OptParas(v).Xn
+            End With
         Next v
         If (Settings.PES.is_DiversityTournament) Then
             Best.Div(i, PES_iAkt.iAktPop) = Individ(i).Distance
@@ -1438,7 +1448,7 @@ StartMutation:
 
     'Kopiert den Bestwertspeicher in ein Individuum
     '----------------------------------------------
-    Public Sub Copy_Bestwert_to_Individuum(ByVal i_indi As Integer, ByVal i_best As Integer, ByRef Individ As Individuum())
+    Public Sub Copy_Bestwert_to_Individuum(ByVal i_indi As Integer, ByVal i_best As Integer, ByRef Individ() As Individuum)
 
         Dim i, j, v As Integer
 
@@ -1458,8 +1468,10 @@ StartMutation:
         End If
 
         For v = 0 To Anz.Para - 1
-            Individ(i_indi).PES_OptParas(v).Dn = Best.Db(v, i_best, PES_iAkt.iAktPop)
-            Individ(i_indi).PES_OptParas(v).Xn = Best.Xb(v, i_best, PES_iAkt.iAktPop)
+            With CType(Individ(i_indi), Individuum_PES)
+                .PES_OptParas(v).Dn = Best.Db(v, i_best, PES_iAkt.iAktPop)
+                .PES_OptParas(v).Xn = Best.Xb(v, i_best, PES_iAkt.iAktPop)
+            End With
         Next v
 
         Individ(i_indi).dominated = False

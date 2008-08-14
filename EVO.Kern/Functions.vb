@@ -47,7 +47,7 @@ Public Class Functions
     '3. Der Bestwertspeicher wird entsprechend der Fronten oder der sekundären Population gefüllt
     '4: Sekundäre Population wird bestimmt und gespeichert
     '--------------------------------------------------------------------------------------------
-    Public Sub EsEltern_Pareto(ByRef NDSorting() As Individuum, ByRef SekundärQb() As Individuum, ByRef Best() As Individuum)
+    Public Sub EsEltern_Pareto(ByVal NDSorting() As Individuum, ByRef SekundärQb() As Individuum, ByRef Best() As Individuum)
 
         Dim i As Integer
         Dim NFrontMember_aktuell As Integer
@@ -62,14 +62,11 @@ Public Class Functions
         rang = 1
         NFrontMember_gesamt = 0
 
-        'Initialisierung von Temp (NDSorting)
-        ReDim Temp(NNachf + NEltern - 1)
-
         'Initialisierung von NDSResult (NDSorting)
         ReDim NDSResult(NNachf + NEltern - 1)
 
         'NDSorting wird in Temp kopiert
-        Call Individuum.Clone_Indi_Array(NDSorting, Temp)
+        Temp = Individuum.Clone_Indi_Array(NDSorting)
 
         'Schleife läuft über die Zahl der Fronten die hier auch bestimmt werden
         Do
@@ -275,7 +272,8 @@ Public Class Functions
             End If
         Next i
 
-        Call Individuum.Clone_Indi_Array(Temp, NDSorting)
+        'Temp zurück in NDSorting kopieren
+        NDSorting = Individuum.Clone_Indi_Array(Temp)
 
         Return NFrontMember
 
@@ -330,8 +328,10 @@ Public Class Functions
         Dim i As Integer
         Dim j As Integer
         Dim k As Integer
-        Dim swap As New Individuum("Swap", 0)
+        Dim swap As Individuum
         Dim fmin, fmax As Double
+
+        swap = _Individ(0).Create("swap", 0)
 
         For k = 0 To Manager.AnzPenalty - 1
             For i = StartIndex To EndIndex
@@ -374,10 +374,12 @@ Public Class Functions
         Dim i As Integer
         Dim j As Integer
         Dim k As Integer
-        Dim swap As New Individuum("Swap", 0)
+        Dim swap As Individuum
         Dim fmin, fmax As Double
         Dim StartIndex As Integer
         Dim EndIndex As Integer
+
+        swap = _Individ(0).Create("Swap", 0)
 
         StartIndex = 0
         EndIndex = _Individ.GetUpperBound(0)
@@ -501,7 +503,8 @@ Public Class Functions
             End If
         Next i
 
-        Call Individuum.Clone_Indi_Array(Temp, SekundärQb)
+        'Temp nach SekundärQb zurückkopieren
+        SekundärQb = Individuum.Clone_Indi_Array(Temp)
 
         Return NFrontMember
 
