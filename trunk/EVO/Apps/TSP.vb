@@ -38,7 +38,7 @@ Public Class TSP
 
     '************************************* Struktur *****************************
     Public Structure Faksimile_Type
-        Dim No As Short
+        Dim No As Integer
         Dim Path() As Integer
         Dim Penalty As Double
         Dim Image(,) As Object
@@ -529,7 +529,7 @@ Public Class TSP
         Dim lowerb As Integer = 1
         Dim upperbo As Integer = n_Cities - 2
 
-        n_trans = Decimal.Round(n_Cities * TransRate / 100)
+        n_trans = Math.Round(n_Cities * TransRate / 100)
 
         For i = 0 To n_trans
             Point1 = CInt(Int((upperbo - lowerb + 1) * Rnd() + lowerb))

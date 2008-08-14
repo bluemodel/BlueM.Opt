@@ -1425,9 +1425,9 @@ Handler:
 
         Dim QWert As Double
         Dim i, j As Integer
-        Dim ZeitschritteBisStart As Long
-        Dim ZeitschritteEval As Long
-        Dim Versatz As Long
+        Dim ZeitschritteBisStart As Integer
+        Dim ZeitschritteEval As Integer
+        Dim Versatz As Integer
 
         'Bestimmen der Zeitschritte bis Start des Evaluierungszeitraums
         ZeitschritteBisStart = (ziel.EvalStart - ziel.RefReihe.XWerte(0)).TotalMinutes / Me.SimDT.TotalMinutes
@@ -1502,7 +1502,7 @@ Handler:
             Case "sUnter"
                 'Summe der Unterschreitungen
                 '---------------------------
-                Dim sUnter As Integer = 0
+                Dim sUnter As Double = 0
                 For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
                     If (SimReihe.YWerte(i + j) < ziel.RefReihe.YWerte(i)) Then
                         sUnter += ziel.RefReihe.YWerte(i) - SimReihe.YWerte(i + j)
@@ -1524,7 +1524,7 @@ Handler:
             Case "sÜber"
                 'Summe der Überschreitungen
                 '--------------------------
-                Dim sUeber As Integer = 0
+                Dim sUeber As Double = 0
                 For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
                     If (SimReihe.YWerte(i + j) > ziel.RefReihe.YWerte(i)) Then
                         sUeber += SimReihe.YWerte(i + j) - ziel.RefReihe.YWerte(i)

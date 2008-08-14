@@ -312,7 +312,7 @@ Public Class Testprobleme
 
         Dim array_x() As Double
         Dim array_y() As Double
-        Dim i As Short
+        Dim i As Integer
         Dim Unterteilung_X As Double
         Dim serie As Steema.TeeChart.Styles.Series
         Dim achsen As Collection
@@ -367,7 +367,7 @@ Public Class Testprobleme
         Dim array_y() As Double = {}
         Dim Ausgangswert As Double
         Dim Anzahl_Kalkulationen As Integer
-        Dim i As Short
+        Dim i As Integer
         Dim serie As Steema.TeeChart.Styles.Series
         Dim achsen As Collection
         Dim achse As Diagramm.Achse
@@ -423,7 +423,7 @@ Public Class Testprobleme
         Dim array_y() As Double = {}
         Dim Ausgangswert As Double
         Dim Anzahl_Kalkulationen As Integer
-        Dim i As Short
+        Dim i As Integer
         Dim X() As Double
         Dim serie As Steema.TeeChart.Styles.Series
         Dim achsen As Collection
@@ -918,15 +918,15 @@ Public Class Testprobleme
 
     'Evaluierung und Zeichnen der Testprobleme
     '*****************************************
-    Public Sub Evaluierung_TestProbleme(ByRef ind As Common.Individuum, ByVal ipop As Short, ByRef Diag As EVO.Diagramm)
+    Public Sub Evaluierung_TestProbleme(ByRef ind As Common.Individuum_PES, ByVal ipop As Short, ByRef Diag As EVO.Diagramm)
 
-        Dim i As Short
+        Dim i As Integer
         Dim Unterteilung_X As Double
         Dim x1, x2 As Double
         Dim X() As Double
         Dim f1, f2 As Double
         Dim g1, g2 As Double
-        Dim globalAnzPar As Short = ind.PES_OptParas.GetLength(0)
+        Dim globalAnzPar As Integer = ind.PES_OptParas.GetLength(0)
         Dim serie As Steema.TeeChart.Styles.Series
 
         Select Case Me.selectedTestproblem
