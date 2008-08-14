@@ -280,7 +280,7 @@ Public Class Testprobleme
 
     'Diagramm initialisieren
     '***********************
-    Public Sub DiagInitialise(ByRef rSettings As Common.EVO_Settings, ByRef Diag As EVO.Diagramm)
+    Public Sub DiagInitialise(ByRef rSettings As Common.EVO_Settings, ByRef Diag As EVO.Hauptdiagramm)
 
         Select Case Me.selectedTestproblem
 
