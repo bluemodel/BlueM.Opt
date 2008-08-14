@@ -18,7 +18,7 @@ Partial Public Class SolutionDialog
     '**********
     Private ReadOnly Property checkedSolutions As Collection
         Get
-            checkedSolutions = New Collection
+            checkedSolutions = New Collection()
             For Each row As DataGridViewRow In Me.DataGridView1.Rows
                 If (row.Cells(0).Value = "True") Then
                     checkedSolutions.Add(row.HeaderCell.Value, row.HeaderCell.Value)
@@ -126,6 +126,8 @@ Partial Public Class SolutionDialog
     '**********************
     Public Sub addSolution(ByVal ind As Common.Individuum)
 
+        'Bug 343: Methode sollte für verschiedene Individuen überladen werden!
+
         Dim i As Integer
         Dim cellvalues() As Object
         Dim row As DataGridViewRow
@@ -150,12 +152,9 @@ Partial Public Class SolutionDialog
             i += 1
         Next
 
-        'Bug 343: Methode für verschiedene Individuen überladen!
-
         'Bei CES und Hybrid
         '------------------
-        If (TypeOf ind Is Common.Individuum_CES Or _
-            TypeOf ind Is Common.Individuum_CES) Then
+        If (TypeOf ind Is Common.Individuum_CES) Then
 
             'Measures
             For Each measure As String In CType(ind, Common.Individuum_CES).Measures

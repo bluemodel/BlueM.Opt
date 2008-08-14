@@ -191,15 +191,13 @@ Public Class CES
 
         'Die Variablen für die Individuuen werden gesetzt
         '************************************************
-        Call Individuum_CES.Initialise(2, ModSett.n_Locations, 0)
+        Call Individuum_CES.Initialise(0, ModSett.n_Locations)
 
         'Parents werden dimensioniert
-        ReDim Parents(Settings.CES.n_Parents - 1)
-        Call Individuum_CES.New_Indi_Array("Parent", Parents)
+        Parents = Individuum.New_Indi_Array(Individuum.Individuumsklassen.Individuum_CES, Settings.CES.n_Parents, "Parent")
 
         'Childs werden dimensioniert
-        ReDim Childs(Settings.CES.n_Childs - 1)
-        Call Individuum_CES.New_Indi_Array("Child", Childs)
+        Childs = Individuum.New_Indi_Array(Individuum.Individuumsklassen.Individuum_CES, Settings.CES.n_Childs, "Child")
 
         'NDSorting wird dimensioniert
         ReDim NDSorting(Settings.CES.n_Childs + Settings.CES.n_Parents - 1)
@@ -790,8 +788,8 @@ Public Class CES
     '*******************************************************************************************************
     Private Sub Memory_Dubletten_loeschen(ByRef PES_Parents_pChild() As Individuum_CES)
 
-        Dim tmp(PES_Parents_pChild.GetUpperBound(0) - 1) As Individuum_CES
-        Call Individuum_CES.New_Indi_Array("tmp", tmp)
+        Dim tmp() As Individuum_CES
+        tmp = Individuum.New_Indi_Array(Individuum.Individuumsklassen.Individuum_CES, PES_Parents_pChild.GetLength(0), "tmp")
         Dim isDouble As Boolean
         Dim i, j, x As Integer
 
@@ -1062,8 +1060,8 @@ Public Class CES
     Public Sub NDSorting_CES_Control(ByVal iAktGen As Integer)
         Dim i As Short
 
-        Dim NDSorting(Settings.CES.n_Childs + Settings.CES.n_Parents - 1) As Individuum_CES
-        Call Individuum_CES.New_Indi_Array("NDSorting", NDSorting)
+        Dim NDSorting() As Individuum_CES
+        NDSorting = Individuum.New_Indi_Array(Individuum.Individuumsklassen.Individuum_CES, Settings.CES.n_Childs + Settings.CES.n_Parents, "NDSorting")
 
         '0. Eltern und Nachfolger werden gemeinsam betrachtet
         'Die Kinder werden NDSorting hinzugefügt
@@ -1126,8 +1124,8 @@ Public Class CES
 
         Dim i As Short
 
-        Dim NDSorting(PES_Parents_pLoc.GetUpperBound(0)) As Individuum_CES
-        Call Individuum_CES.New_Indi_Array("NDSorting", NDSorting)
+        Dim NDSorting() As Individuum_CES
+        NDSorting = Individuum.New_Indi_Array(Individuum.Individuumsklassen.Individuum_CES, PES_Parents_pLoc.GetLength(0), "NDSorting")
 
         '1. ALLE werden reinkopiert (anders als beim normalen Verfahren)
         '---------------------------------------------------------------
@@ -1166,8 +1164,8 @@ Public Class CES
 
         Dim i As Short
 
-        Dim NDSorting(PES_Memory.GetUpperBound(0)) As Individuum_CES
-        Call Individuum_CES.New_Indi_Array("NDSorting", NDSorting)
+        Dim NDSorting() As Individuum_CES
+        NDSorting = Individuum.New_Indi_Array(Individuum.Individuumsklassen.Individuum_CES, PES_Memory.GetLength(0), "NDSorting")
 
         '1. ALLE werden reinkopiert (anders als beim normalen Verfahren, aber wie bei per Location)
         '------------------------------------------------------------------------------------------

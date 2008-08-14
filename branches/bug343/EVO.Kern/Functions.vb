@@ -62,14 +62,11 @@ Public Class Functions
         rang = 1
         NFrontMember_gesamt = 0
 
-        'Initialisierung von Temp (NDSorting)
-        ReDim Temp(NNachf + NEltern - 1)
-
         'Initialisierung von NDSResult (NDSorting)
         ReDim NDSResult(NNachf + NEltern - 1)
 
         'NDSorting wird in Temp kopiert
-        Call Individuum.Clone_Indi_Array(NDSorting, Temp)
+        Temp = Individuum.Clone_Indi_Array(NDSorting)
 
         'Schleife läuft über die Zahl der Fronten die hier auch bestimmt werden
         Do
@@ -275,7 +272,8 @@ Public Class Functions
             End If
         Next i
 
-        Call Individuum.Clone_Indi_Array(Temp, NDSorting)
+        'Temp zurück in NDSorting kopieren
+        NDSorting = Individuum.Clone_Indi_Array(Temp)
 
         Return NFrontMember
 
@@ -505,7 +503,8 @@ Public Class Functions
             End If
         Next i
 
-        Call Individuum.Clone_Indi_Array(Temp, SekundärQb)
+        'Temp nach SekundärQb zurückkopieren
+        SekundärQb = Individuum.Clone_Indi_Array(Temp)
 
         Return NFrontMember
 

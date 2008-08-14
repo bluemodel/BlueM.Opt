@@ -854,8 +854,8 @@ Partial Class Form1
         Me.globalAnzPar = Sim1.List_OptParameter.Length
         Anz_SensiPara = SensiPlot1.Selected_OptParameter.GetLength(0)
 
-        'Individuum wird initialisiert
-        Call Common.Individuum_PES.Initialise(1, Me.globalAnzPar)
+        'Individuumsklasse wird initialisiert
+        Call Common.Individuum_PES.Initialise(Me.globalAnzPar)
 
         'Anzahl Simulationen
         If (Anz_SensiPara = 1) Then
@@ -1237,7 +1237,7 @@ Partial Class Form1
             'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
             If Sim1.CES_T_Modus = Common.Constants.CES_T_MODUS.No_Test Then
                 'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
-                Call Common.Individuum_CES.New_Indi_Array("Child", CES1.Childs)
+                CES1.Childs = Common.Individuum.New_Indi_Array(Individuum.Individuumsklassen.Individuum_CES, CES1.Childs.GetLength(0), "Child")
                 'Reproduktionsoperatoren, hier gehts dezent zur Sache
                 Call CES1.Reproduction_Control()
                 'Mutationsoperatoren
@@ -1435,8 +1435,8 @@ Partial Class Form1
 
         Dim HookJeeves As EVO.Kern.HookeAndJeeves = New EVO.Kern.HookeAndJeeves(globalAnzPar, EVO_Einstellungen1.Settings.HookJeeves.DnStart, EVO_Einstellungen1.Settings.HookJeeves.DnFinish)
 
-        'Individuum wird initialisiert
-        Call Common.Individuum_PES.Initialise(1, Me.globalAnzPar)
+        'Individuumsklasse wird initialisiert
+        Call Common.Individuum_PES.Initialise(Me.globalAnzPar)
 
         ReDim QNBest(Common.Manager.AnzPenalty - 1)
         ReDim QBest(Common.Manager.AnzPenalty - 1)
@@ -1645,8 +1645,8 @@ Partial Class Form1
             Call PrepareDiagramm()
         End If
 
-        'Individuum wird initialisiert
-        Call Common.Individuum_PES.Initialise(1, globalAnzPar)
+        'Individuumsklasse wird initialisiert
+        Call Common.Individuum_PES.Initialise(Me.globalAnzPar)
 
         'Schritte 0: Objekt der Klasse PES wird erzeugt
         '**********************************************
@@ -1700,7 +1700,6 @@ Start_Evolutionsrunden:
 
                         'Neues Individuum instanzieren
                         ind(i) = New Common.Individuum_PES("PES", durchlauf)
-                        ind(i).ID = durchlauf
 
                         'REPRODUKTIONSPROZESS
                         '####################
@@ -2375,7 +2374,7 @@ Start_Evolutionsrunden:
                 Case METH_PES
 
                     'Bereitet das BlueM für PES vor
-                    Call Sim1.PREPARE_Evaluation_PES(CType(ind, Individuum_PES).Get_All_PES_Para)
+                    Call Sim1.PREPARE_Evaluation_PES(CType(ind, Individuum_PES).PES_OptParas)
 
                 Case METH_CES, METH_HYBRID
 

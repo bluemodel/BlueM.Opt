@@ -2,6 +2,7 @@
     Inherits Individuum
 
     Private Shared n_Locations As Integer
+
     Public Path() As Integer               '03 Der Pfad
     Public mutated As Boolean              '06 Gibt an ob der Wert bereits mutiert ist oder nicht
 
@@ -110,90 +111,104 @@
         End Set
     End Property
 
-    'Initialisiert die CES_Individuum Klasse
-    '***************************************
-    Public Overloads Shared Sub Initialise(ByVal _Individ_Type As Integer, ByVal _n_Locations As Integer, ByVal _n_Para As Integer)
-        Individuum_CES.Individ_Type = _Individ_Type
-        Individuum_CES.n_Locations = _n_Locations
-        Individuum_CES.n_Para = _n_Para
+    ''' <summary>
+    ''' Initialisiert die CES-Individuumsklasse
+    ''' </summary>
+    ''' <param name="AnzahlParameter">Anzahl der Parameter, die jedes Individuum besitzen soll</param>
+    ''' <param name="AnzahlLocations">Anzahl der Locations, die jedes Individuum besitzen soll</param>
+    ''' <remarks></remarks>
+    Public Overloads Shared Sub Initialise(ByVal AnzahlParameter As Integer, ByVal AnzahlLocations As Integer)
+        Individuum_CES.n_Locations = AnzahlLocations
+        Individuum_CES.n_Para = AnzahlParameter
     End Sub
 
-    'Konstruktor für ein Individuum
-    '******************************
-    Public Sub New(ByVal _Type As String, ByVal _ID As Integer)
+    ''' <summary>
+    ''' Konstruktor
+    ''' </summary>
+    ''' <param name="type">Frei definierbarer String</param>
+    ''' <param name="id">Eindeutige Nummer</param>
+    Public Sub New(ByVal type As String, ByVal id As Integer)
 
-        Call MyBase.New(_Type, _ID)
+        'Basisindividuum instanzieren
+        Call MyBase.New(type, id)
 
+        'zusätzliche Individuum_CES-Eigenschaften:
+        '-----------------------------------------
         Dim i, j As Integer
 
-        '03 Der Pfad - zur Kontrolle wird falscher Pfad gesetzt
+        'Der Pfad - zur Kontrolle wird falscher Pfad gesetzt
         ReDim Me.Path(n_Locations - 1)
         For j = 0 To Me.Path.GetUpperBound(0)
             Me.Path(j) = 777
         Next
 
-        '06 Gibt an ob der Wert bereits mutiert ist oder nicht
+        'Gibt an ob der Wert bereits mutiert ist oder nicht
         Me.mutated = False
 
-        '06a Parameterarray für PES
+        'Parameterarray für PES
+        '(eigentlich nur bei METH_HYBRID gebraucht)
         ReDim Me.PES_OptParas(n_Para - 1)
         For i = 0 To Me.PES_OptParas.GetUpperBound(0)
             Me.PES_OptParas(i) = New OptParameter()
         Next
 
-        '09a Die Namen der Maßnahmen
+        'Die Namen der Maßnahmen
         ReDim Me.Measures(n_Locations - 1)
 
-        '11 + 10 Informationen pro Location
+        'Informationen pro Location
         ReDim Me.Loc(n_Locations - 1)
 
         For i = 0 To Me.Loc.GetUpperBound(0)
 
             ReDim Me.Loc(i).PES_OptPara(-1)
 
-            '11a Die Elemente die zur Location gehören
+            'Die Elemente die zur Location gehören
             ReDim Me.Loc(i).Loc_Elem(0)
             For j = 0 To Me.Loc(i).Loc_Elem.GetUpperBound(0)
                 Me.Loc(i).Loc_Elem(j) = "Leer"
             Next
         Next
 
-        '12 Die Generation (eher zur Information)
+        'Die Generation (eher zur Information)
         Me.Generation = 0
 
-        '13 MemoryRang des PES Elters
+        'MemoryRang des PES Elters
         Me.Memory_Strat = 777
 
-        '14 Location des PES Parent
+        'Location des PES Parent
         Me.iLocation = 777
 
     End Sub
 
-    'Kopiert ein Individuum
-    '**********************
+    ''' <summary>
+    ''' Kopiert ein Individuum
+    ''' </summary>
+    ''' <returns>Individuum</returns>
     Public Overrides Function Clone() As Individuum
 
         Dim i, j As Integer
 
-        Dim Dest As New Individuum_CES(Me.Type, Me.ID)
+        Dim Dest As New Individuum_CES(Me.mType, Me.ID)
 
-        '04 Zielfunktionswerte
+        'Zielfunktionswerte
         Call Array.Copy(Me.Zielwerte, Dest.Zielwerte, Me.Zielwerte.Length)
 
-        '05 Wert der Randbedingung(en)
-        ReDim Dest.Constrain(Me.Constrain.GetUpperBound(0))
-        If Not Me.Constrain.GetLength(0) = -1 Then
+        'Werte der Randbedingungen
+        If (Not Me.Constrain.GetLength(0) = -1) Then
             Array.Copy(Me.Constrain, Dest.Constrain, Me.Constrain.Length)
         End If
 
-        '07 Kennzeichnung ob Dominiert
-        Dest.dominated = Me.dominated
+        'Kennzeichnung ob Dominiert
+        Dest.Dominated = Me.Dominated
 
-        '08 Nummer der Pareto Front
+        'Nummer der Pareto Front
         Dest.Front = Me.Front
 
-        '09 Für crowding distance
+        'Für crowding distance
         Dest.Distance = Me.Distance
+
+        'CES-Spezifische Eigenschaften:
+        '------------------------------
 
         '03 Der Pfad - zur Kontrolle wird falscher Pfad gesetzt
         ReDim Dest.Path(Me.Path.GetUpperBound(0))
@@ -249,16 +264,10 @@
 
     End Function
 
-    'Konstruktor für ein Array von Individen
-    '***************************************
-    Public Shared Sub New_Indi_Array(ByVal _Type As String, ByRef Array() As Individuum_CES)
-        Dim i As Integer
-
-        For i = 0 To Array.GetUpperBound(0)
-            Array(i) = New Individuum_CES(_Type, i)
-        Next
-    End Sub
-
+    ''' <summary>
+    ''' Erzeugt ein neues (leeres) Individuum von der gleichen Klasse
+    ''' </summary>
+    ''' <returns>Das neue Individuum</returns>
     Public Overrides Function Create(Optional ByVal type As String = "tmp", Optional ByVal id As Integer = 0) As Individuum
         Dim ind As New Individuum_CES(type, id)
         Return ind

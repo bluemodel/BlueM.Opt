@@ -258,8 +258,7 @@ Public Class PES
 
         'NDSorting wird nur benötigt, falls eine Paretofront approximiert wird
         If (Settings.PES.OptModus = EVO_MODUS.Multi_Objective) Then
-            ReDim NDSorting(Settings.PES.n_Eltern + Settings.PES.n_Nachf - 1)
-            Call Individuum_PES.New_Indi_Array("NDSorting", INDSorting)
+            NDSorting = Individuum.New_Indi_Array(Individuum.Individuumsklassen.Individuum_PES, Settings.PES.n_Eltern + Settings.PES.n_Nachf, "NDSorting")
             If (Settings.PES.OptEltern = EVO_ELTERN.Neighbourhood) Then
                 ReDim PenaltyDistance(Settings.PES.n_Eltern - 1, Settings.PES.n_Eltern - 1)
                 ReDim Distanceb(Settings.PES.n_Eltern - 1)
@@ -1369,10 +1368,9 @@ StartMutation:
             Next i
 
             '********************* Alles in der Klasse Functions ****************************************
-            'Zu Beginn den Bestwertspeicher in ein Individuum packen
-            'Dimensionieren des Best_Indi
-            Dim Best_Indi(Best.Qb.GetUpperBound(0)) As Individuum
-            Call Individuum_PES.New_Indi_Array("Bestwerte", Best_Indi)
+            'Zu Beginn den Bestwertspeicher in ein Array von Individuen packen
+            Dim Best_Indi() As Individuum
+            Best_Indi = Individuum.New_Indi_Array(Individuum.Individuumsklassen.Individuum_PES, Best.Qb.GetLength(0), "Bestwerte")
             'Kopieren in Best_Indi
             For i = 0 To Best.Qb.GetUpperBound(0)
                 Call Copy_Bestwert_to_Individuum(i, i, Best_Indi)
