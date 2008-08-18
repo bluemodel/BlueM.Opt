@@ -43,7 +43,8 @@ Partial Class Form1
     Private TSP1 As TSP
 
     'New'
-    Dim hybrid2008 As EVO.HybridAlgo.HybridAlgo
+    Dim controller2008 As EVO.HybridAlgo.Controller
+    Dim networkmanager2008 As EVO.HybridAlgo.Networkmanager
 
     '**** Globale Parameter Parameter Optimierung ****
     'TODO: diese Werte sollten eigentlich nur in CES bzw PES vorgehalten werden
@@ -657,34 +658,23 @@ Partial Class Form1
                         'Testprobleme mit Hybrid2008 Verfahren berechnen
                         MsgBox("Berechnung der Testprobleme mit Hybrid2008", MsgBoxStyle.Information, "Info")
 
+                        'Falls Network-PC
+                        If (EVO_Einstellungen1.Combo_Hybrid_Role.SelectedItem = "Single PC") Then
+                            controller2008 = New EVO.HybridAlgo.Controller()
+                        ElseIf (EVO_Einstellungen1.Combo_Hybrid_Role.SelectedItem = "Network Client") Then
+                            networkmanager2008 = New EVO.HybridAlgo.Networkmanager("client")
+                            controller2008 = New EVO.HybridAlgo.Controller(networkmanager2008)
+                        Else
+                            networkmanager2008 = New EVO.HybridAlgo.Networkmanager("server")
+                            controller2008 = New EVO.HybridAlgo.Controller(networkmanager2008)
+                        End If
+
                     Else
                         'Modelle mit Hybrid2008 berechnen
                         MsgBox("Berechnung der Modelle mit Hybrid2008", MsgBoxStyle.Information, "Info")
 
 
                     End If
-
-                    'Ergebnis-Buttons
-                    'Me.Button_openMDB.Enabled = True
-
-                    'PES für Sim vorbereiten
-                    'Call Sim1.read_and_valid_INI_Files_PES()
-
-                    'EVO_Einstellungen einrichten
-                    'Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_PES
-                    'If (Common.Manager.AnzPenalty = 1) Then
-                    'Single-Objective
-                    'Call EVO_Einstellungen1.setStandard_PES(Common.Constants.EVO_MODUS.Single_Objective)
-                    'ElseIf (Common.Manager.AnzPenalty > 1) Then
-                    'Multi-Objective
-                    'Call EVO_Einstellungen1.setStandard_PES(Common.Constants.EVO_MODUS.Multi_Objective)
-                    'End If
-
-                    'Parameterübergabe an PES
-                    'Call Sim1.Parameter_Uebergabe(globalAnzPar, myPara)
-
-                    'EVO_Verlauf zurücksetzen
-                    'Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
 
             End Select
 

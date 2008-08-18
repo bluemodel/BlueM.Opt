@@ -331,6 +331,22 @@ Public Class EVO_Einstellungen
 
         End With
 
+        'Hybrid2008
+        '----------------
+        With Me.msettings.Hybrid2008
+
+            .Role = Me.Combo_Hybrid_Role.SelectedItem
+            .PopulationSize = Me.Numeric_Hybrid_PopulationSize.Value
+            .AlgorthmBreakpointRule = Me.Numeric_Hybrid_AlgorithmBreakpointRule.Value
+            .NumberEvolutions = Me.Numeric_Hybrid_NumberEvolutions.Value
+            .EvolutionPeriod = Me.Numeric_Hybrid_EvolutionPeriod.Value
+            .Draw = Me.CheckBox_Hybrid_Draw.Checked
+            .MySQL_Host = Me.TextBox_Hybrid_MySQL_Host.Text
+            .MySQL_User = Me.TextBox_Hybrid_MySQL_User.Text
+            .MySQL_Password = Me.TextBox_Hybrid_MySQL_Password.Text
+
+        End With
+
     End Sub
 
     'Setzt/Aktiviert/Deaktiviert die Einstellungen auf den PES Settings
@@ -466,6 +482,22 @@ Public Class EVO_Einstellungen
 
         End With
 
+        'Hybrid2008
+        '---------------
+        With Me.msettings.Hybrid2008
+
+            Me.Combo_Hybrid_Role.SelectedItem = .Role
+            Me.Numeric_Hybrid_PopulationSize.Value = .PopulationSize
+            Me.Numeric_Hybrid_AlgorithmBreakpointRule.Value = .AlgorthmBreakpointRule
+            Me.Numeric_Hybrid_NumberEvolutions.Value = .NumberEvolutions
+            Me.Numeric_Hybrid_EvolutionPeriod.Value = .EvolutionPeriod
+            Me.CheckBox_Hybrid_Draw.Checked = .Draw
+            Me.TextBox_Hybrid_MySQL_Host.Text = .MySQL_Host
+            Me.TextBox_Hybrid_MySQL_User.Text = .MySQL_User
+            Me.TextBox_Hybrid_MySQL_Password.Text = .MySQL_Password
+
+        End With
+
         Call Application.DoEvents()
 
     End Sub
@@ -520,6 +552,13 @@ Public Class EVO_Einstellungen
     '***********************************
     Public Sub setStandard_HJ()
         Call Me.msettings.HookJeeves.setStandard()
+        Call Me.writeForm()
+    End Sub
+
+    'Standardeinstellungen setzen für Hy2008
+    '***********************************
+    Public Sub setStandard_Hy2008()
+        Call Me.msettings.Hybrid2008.setStandard()
         Call Me.writeForm()
     End Sub
 
@@ -594,4 +633,24 @@ Public Class EVO_Einstellungen
 
 #End Region 'Schnittstelle
 
+    Private Sub Combo_Hybrid_Role_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Combo_Hybrid_Role.SelectedIndexChanged
+        If (Me.Combo_Hybrid_Role.SelectedItem = "Single PC") Then
+            Me.GroupBox_Hybrid_BasicOptions.Enabled = True
+            Me.GroupBox_Hybrid_NetworkServerOptions.Enabled = False
+            Me.GroupBox_Hybrid_PerformanceOptions.Enabled = True
+            Me.GroupBox_Hybrid_MySQLOptions.Enabled = False
+            Me.Numeric_Hybrid_PopulationSize.Enabled = True
+        ElseIf (Me.Combo_Hybrid_Role.SelectedItem = "Network Client") Then
+            Me.GroupBox_Hybrid_BasicOptions.Enabled = False
+            Me.GroupBox_Hybrid_NetworkServerOptions.Enabled = False
+            Me.GroupBox_Hybrid_PerformanceOptions.Enabled = True
+            Me.GroupBox_Hybrid_MySQLOptions.Enabled = True
+        ElseIf (Me.Combo_Hybrid_Role.SelectedItem = "Network Server") Then
+            Me.GroupBox_Hybrid_BasicOptions.Enabled = True
+            Me.GroupBox_Hybrid_NetworkServerOptions.Enabled = True
+            Me.GroupBox_Hybrid_PerformanceOptions.Enabled = True
+            Me.GroupBox_Hybrid_MySQLOptions.Enabled = True
+            Me.Numeric_Hybrid_PopulationSize.Enabled = False
+        End If
+    End Sub
 End Class
