@@ -342,6 +342,7 @@ Public Class EVO_Einstellungen
             .EvolutionPeriod = Me.Numeric_Hybrid_EvolutionPeriod.Value
             .Draw = Me.CheckBox_Hybrid_Draw.Checked
             .MySQL_Host = Me.TextBox_Hybrid_MySQL_Host.Text
+            .MySQL_Database = Me.TextBox_Hybrid_MySQL_DB.Text
             .MySQL_User = Me.TextBox_Hybrid_MySQL_User.Text
             .MySQL_Password = Me.TextBox_Hybrid_MySQL_Password.Text
 
@@ -493,6 +494,7 @@ Public Class EVO_Einstellungen
             Me.Numeric_Hybrid_EvolutionPeriod.Value = .EvolutionPeriod
             Me.CheckBox_Hybrid_Draw.Checked = .Draw
             Me.TextBox_Hybrid_MySQL_Host.Text = .MySQL_Host
+            Me.TextBox_Hybrid_MySQL_DB.Text = .MySQL_Database
             Me.TextBox_Hybrid_MySQL_User.Text = .MySQL_User
             Me.TextBox_Hybrid_MySQL_Password.Text = .MySQL_Password
 
@@ -633,13 +635,15 @@ Public Class EVO_Einstellungen
 
 #End Region 'Schnittstelle
 
+
+    'Hybrid2008: Voreinstellungen des Formulars aufgrund der Wahl der Rolle
     Private Sub Combo_Hybrid_Role_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Combo_Hybrid_Role.SelectedIndexChanged
         If (Me.Combo_Hybrid_Role.SelectedItem = "Single PC") Then
             Me.GroupBox_Hybrid_BasicOptions.Enabled = True
             Me.GroupBox_Hybrid_NetworkServerOptions.Enabled = False
             Me.GroupBox_Hybrid_PerformanceOptions.Enabled = True
             Me.GroupBox_Hybrid_MySQLOptions.Enabled = False
-            Me.Numeric_Hybrid_PopulationSize.Enabled = True
+            Me.Numeric_Hybrid_Numbergenerations.Enabled = True
         ElseIf (Me.Combo_Hybrid_Role.SelectedItem = "Network Client") Then
             Me.GroupBox_Hybrid_BasicOptions.Enabled = False
             Me.GroupBox_Hybrid_NetworkServerOptions.Enabled = False
@@ -650,7 +654,8 @@ Public Class EVO_Einstellungen
             Me.GroupBox_Hybrid_NetworkServerOptions.Enabled = True
             Me.GroupBox_Hybrid_PerformanceOptions.Enabled = True
             Me.GroupBox_Hybrid_MySQLOptions.Enabled = True
-            Me.Numeric_Hybrid_PopulationSize.Enabled = False
+            Me.Numeric_Hybrid_Numbergenerations.Enabled = False
         End If
     End Sub
+
 End Class

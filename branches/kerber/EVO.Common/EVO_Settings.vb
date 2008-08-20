@@ -269,6 +269,7 @@ Public Class EVO_Settings
 
         'Datenbank-Connection
         Public MySQL_Host As String
+        Public MySQL_Database As String
         Public MySQL_User As String
         Public MySQL_Password As String
 
@@ -287,7 +288,8 @@ Public Class EVO_Settings
             Me.Draw = True
 
             Me.MySQL_Host = "localhost"
-            Me.MySQL_User = "hybrid2008"
+            Me.MySQL_Database = "hybrid2008_db"
+            Me.MySQL_User = "hybrid2008_user"
             Me.MySQL_Password = ""
         End Sub
 

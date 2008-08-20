@@ -43,8 +43,7 @@ Partial Class Form1
     Private TSP1 As TSP
 
     'New'
-    Dim controller2008 As EVO.HybridAlgo.Controller
-    Dim networkmanager2008 As EVO.HybridAlgo.Networkmanager
+    Private controller2008 As EVO.HybridAlgo.Controller
 
     '**** Globale Parameter Parameter Optimierung ****
     'TODO: diese Werte sollten eigentlich nur in CES bzw PES vorgehalten werden
@@ -646,6 +645,7 @@ Partial Class Form1
 
                     'EVO_Einstellungen aktivieren
                     EVO_Einstellungen1.Enabled = True
+                    EVO_Einstellungen1.setStandard_Hy2008()
 
                     'Tabcontrols entfernen die man nicht braucht
                     With EVO_Einstellungen1
@@ -653,29 +653,6 @@ Partial Class Form1
                         .TabControl1.TabPages.Remove(.TabPage_CES)
                         .TabControl1.TabPages.Remove(.TabPage_HookeJeeves)
                     End With
-
-                    If (Me.Anwendung = ANW_TESTPROBLEME) Then
-                        'Testprobleme mit Hybrid2008 Verfahren berechnen
-                        MsgBox("Berechnung der Testprobleme mit Hybrid2008", MsgBoxStyle.Information, "Info")
-
-                        'Falls Network-PC
-                        If (EVO_Einstellungen1.Combo_Hybrid_Role.SelectedItem = "Single PC") Then
-                            controller2008 = New EVO.HybridAlgo.Controller()
-                        ElseIf (EVO_Einstellungen1.Combo_Hybrid_Role.SelectedItem = "Network Client") Then
-                            networkmanager2008 = New EVO.HybridAlgo.Networkmanager("client")
-                            controller2008 = New EVO.HybridAlgo.Controller(networkmanager2008)
-                        Else
-                            networkmanager2008 = New EVO.HybridAlgo.Networkmanager("server")
-                            controller2008 = New EVO.HybridAlgo.Controller(networkmanager2008)
-                        End If
-
-                    Else
-                        'Modelle mit Hybrid2008 berechnen
-                        MsgBox("Berechnung der Modelle mit Hybrid2008", MsgBoxStyle.Information, "Info")
-
-
-                    End If
-
             End Select
 
             'IniMethod OK -> Start Button aktivieren
@@ -792,10 +769,17 @@ Partial Class Form1
                             Call STARTEN_CES_or_HYBRID()
                         Case METH_HOOKJEEVES
                             Call STARTEN_HookJeeves()
+                        Case METH_Hybrid2008
+                            controller2008 = New EVO.HybridAlgo.Controller(EVO_Einstellungen1.Settings)
                     End Select
 
                 Case ANW_TESTPROBLEME
-                    Call STARTEN_PES()
+                    Select Case Method
+                        Case METH_PES
+                            Call STARTEN_PES()
+                        Case METH_Hybrid2008
+                            controller2008 = New EVO.HybridAlgo.Controller(EVO_Einstellungen1.Settings)
+                    End Select
 
                 Case ANW_TSP
                     Call STARTEN_TSP()

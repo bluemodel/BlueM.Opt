@@ -63,10 +63,11 @@ Partial Class EVO_Einstellungen
         Dim Label5 As System.Windows.Forms.Label
         Dim Label30 As System.Windows.Forms.Label
         Dim Label10 As System.Windows.Forms.Label
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(EVO_Einstellungen))
         Dim Label13 As System.Windows.Forms.Label
         Dim Label14 As System.Windows.Forms.Label
         Dim Label15 As System.Windows.Forms.Label
+        Dim Label16 As System.Windows.Forms.Label
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(EVO_Einstellungen))
         Me.TabControl1 = New System.Windows.Forms.TabControl
         Me.TabPage_PES = New System.Windows.Forms.TabPage
         Me.Label_OptModusValue = New System.Windows.Forms.Label
@@ -135,8 +136,14 @@ Partial Class EVO_Einstellungen
         Me.Numeric_HJ_DeltaStart = New System.Windows.Forms.NumericUpDown
         Me.CheckBox_HJ_DNVektor = New System.Windows.Forms.CheckBox
         Me.TabPage_Hybrid2008 = New System.Windows.Forms.TabPage
-        Me.GroupBox_Hybrid_NetworkServerOptions = New System.Windows.Forms.GroupBox
+        Me.GroupBox_Hybrid_MySQLOptions = New System.Windows.Forms.GroupBox
+        Me.TextBox_Hybrid_MySQL_DB = New System.Windows.Forms.TextBox
+        Me.TextBox_Hybrid_MySQL_Password = New System.Windows.Forms.TextBox
+        Me.TextBox_Hybrid_MySQL_User = New System.Windows.Forms.TextBox
+        Me.TextBox_Hybrid_MySQL_Host = New System.Windows.Forms.TextBox
         Me.GroupBox_Hybrid_PerformanceOptions = New System.Windows.Forms.GroupBox
+        Me.CheckBox_Hybrid_Draw = New System.Windows.Forms.CheckBox
+        Me.GroupBox_Hybrid_NetworkServerOptions = New System.Windows.Forms.GroupBox
         Me.Numeric_Hybrid_EvolutionPeriod = New System.Windows.Forms.NumericUpDown
         Me.Numeric_Hybrid_NumberEvolutions = New System.Windows.Forms.NumericUpDown
         Me.GroupBox_Hybrid_BasicOptions = New System.Windows.Forms.GroupBox
@@ -149,12 +156,6 @@ Partial Class EVO_Einstellungen
         Me.SpeichernToolStripButton = New System.Windows.Forms.ToolStripButton
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox
-        Me.CheckBox_Hybrid_Draw = New System.Windows.Forms.CheckBox
-        Me.GroupBox_Hybrid_MySQLOptions = New System.Windows.Forms.GroupBox
-        Me.TextBox_Hybrid_MySQL_Host = New System.Windows.Forms.TextBox
-        Me.TextBox_Hybrid_MySQL_User = New System.Windows.Forms.TextBox
-        Me.TextBox_Hybrid_MySQL_Password = New System.Windows.Forms.TextBox
-        Me.Button_Hybrid_MySQL_Connection = New System.Windows.Forms.Button
         Label_CES_MemSize = New System.Windows.Forms.Label
         Label_CES_NMembers_SecPop_PES = New System.Windows.Forms.Label
         Label_CES_NExchange_secPop_PES = New System.Windows.Forms.Label
@@ -202,6 +203,7 @@ Partial Class EVO_Einstellungen
         Label13 = New System.Windows.Forms.Label
         Label14 = New System.Windows.Forms.Label
         Label15 = New System.Windows.Forms.Label
+        Label16 = New System.Windows.Forms.Label
         Me.TabControl1.SuspendLayout()
         Me.TabPage_PES.SuspendLayout()
         CType(Me.TextDeltaStart, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -235,8 +237,9 @@ Partial Class EVO_Einstellungen
         CType(Me.Numeric_HJ_DeltaFinish, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Numeric_HJ_DeltaStart, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabPage_Hybrid2008.SuspendLayout()
-        Me.GroupBox_Hybrid_NetworkServerOptions.SuspendLayout()
+        Me.GroupBox_Hybrid_MySQLOptions.SuspendLayout()
         Me.GroupBox_Hybrid_PerformanceOptions.SuspendLayout()
+        Me.GroupBox_Hybrid_NetworkServerOptions.SuspendLayout()
         CType(Me.Numeric_Hybrid_EvolutionPeriod, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Numeric_Hybrid_NumberEvolutions, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox_Hybrid_BasicOptions.SuspendLayout()
@@ -245,7 +248,6 @@ Partial Class EVO_Einstellungen
         CType(Me.Numeric_Hybrid_Numbergenerations, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ToolStrip1.SuspendLayout()
         Me.GroupBox_Einstellungen.SuspendLayout()
-        Me.GroupBox_Hybrid_MySQLOptions.SuspendLayout()
         Me.SuspendLayout()
         '
         'Label_CES_MemSize
@@ -642,6 +644,42 @@ Partial Class EVO_Einstellungen
         Label10.Size = New System.Drawing.Size(78, 13)
         Label10.TabIndex = 51
         Label10.Text = "Populationsize:"
+        '
+        'Label13
+        '
+        Label13.AutoSize = True
+        Label13.Location = New System.Drawing.Point(4, 22)
+        Label13.Name = "Label13"
+        Label13.Size = New System.Drawing.Size(32, 13)
+        Label13.TabIndex = 51
+        Label13.Text = "Host:"
+        '
+        'Label14
+        '
+        Label14.AutoSize = True
+        Label14.Location = New System.Drawing.Point(4, 74)
+        Label14.Name = "Label14"
+        Label14.Size = New System.Drawing.Size(30, 13)
+        Label14.TabIndex = 35
+        Label14.Text = "user:"
+        '
+        'Label15
+        '
+        Label15.AutoSize = True
+        Label15.Location = New System.Drawing.Point(4, 100)
+        Label15.Name = "Label15"
+        Label15.Size = New System.Drawing.Size(55, 13)
+        Label15.TabIndex = 48
+        Label15.Text = "password:"
+        '
+        'Label16
+        '
+        Label16.AutoSize = True
+        Label16.Location = New System.Drawing.Point(4, 48)
+        Label16.Name = "Label16"
+        Label16.Size = New System.Drawing.Size(54, 13)
+        Label16.TabIndex = 55
+        Label16.Text = "DB-name:"
         '
         'TabControl1
         '
@@ -1437,6 +1475,74 @@ Partial Class EVO_Einstellungen
         Me.TabPage_Hybrid2008.TabIndex = 3
         Me.TabPage_Hybrid2008.Text = "Hybrid2008"
         '
+        'GroupBox_Hybrid_MySQLOptions
+        '
+        Me.GroupBox_Hybrid_MySQLOptions.Controls.Add(Me.TextBox_Hybrid_MySQL_DB)
+        Me.GroupBox_Hybrid_MySQLOptions.Controls.Add(Label16)
+        Me.GroupBox_Hybrid_MySQLOptions.Controls.Add(Me.TextBox_Hybrid_MySQL_Password)
+        Me.GroupBox_Hybrid_MySQLOptions.Controls.Add(Me.TextBox_Hybrid_MySQL_User)
+        Me.GroupBox_Hybrid_MySQLOptions.Controls.Add(Me.TextBox_Hybrid_MySQL_Host)
+        Me.GroupBox_Hybrid_MySQLOptions.Controls.Add(Label13)
+        Me.GroupBox_Hybrid_MySQLOptions.Controls.Add(Label14)
+        Me.GroupBox_Hybrid_MySQLOptions.Controls.Add(Label15)
+        Me.GroupBox_Hybrid_MySQLOptions.Enabled = False
+        Me.GroupBox_Hybrid_MySQLOptions.Location = New System.Drawing.Point(11, 278)
+        Me.GroupBox_Hybrid_MySQLOptions.Name = "GroupBox_Hybrid_MySQLOptions"
+        Me.GroupBox_Hybrid_MySQLOptions.Size = New System.Drawing.Size(200, 125)
+        Me.GroupBox_Hybrid_MySQLOptions.TabIndex = 52
+        Me.GroupBox_Hybrid_MySQLOptions.TabStop = False
+        Me.GroupBox_Hybrid_MySQLOptions.Text = "MySQL Options"
+        '
+        'TextBox_Hybrid_MySQL_DB
+        '
+        Me.TextBox_Hybrid_MySQL_DB.Location = New System.Drawing.Point(92, 45)
+        Me.TextBox_Hybrid_MySQL_DB.Name = "TextBox_Hybrid_MySQL_DB"
+        Me.TextBox_Hybrid_MySQL_DB.Size = New System.Drawing.Size(100, 20)
+        Me.TextBox_Hybrid_MySQL_DB.TabIndex = 56
+        '
+        'TextBox_Hybrid_MySQL_Password
+        '
+        Me.TextBox_Hybrid_MySQL_Password.Location = New System.Drawing.Point(92, 97)
+        Me.TextBox_Hybrid_MySQL_Password.Name = "TextBox_Hybrid_MySQL_Password"
+        Me.TextBox_Hybrid_MySQL_Password.Size = New System.Drawing.Size(100, 20)
+        Me.TextBox_Hybrid_MySQL_Password.TabIndex = 54
+        Me.TextBox_Hybrid_MySQL_Password.UseSystemPasswordChar = True
+        '
+        'TextBox_Hybrid_MySQL_User
+        '
+        Me.TextBox_Hybrid_MySQL_User.Location = New System.Drawing.Point(92, 71)
+        Me.TextBox_Hybrid_MySQL_User.Name = "TextBox_Hybrid_MySQL_User"
+        Me.TextBox_Hybrid_MySQL_User.Size = New System.Drawing.Size(100, 20)
+        Me.TextBox_Hybrid_MySQL_User.TabIndex = 53
+        '
+        'TextBox_Hybrid_MySQL_Host
+        '
+        Me.TextBox_Hybrid_MySQL_Host.Location = New System.Drawing.Point(92, 19)
+        Me.TextBox_Hybrid_MySQL_Host.Name = "TextBox_Hybrid_MySQL_Host"
+        Me.TextBox_Hybrid_MySQL_Host.Size = New System.Drawing.Size(100, 20)
+        Me.TextBox_Hybrid_MySQL_Host.TabIndex = 52
+        '
+        'GroupBox_Hybrid_PerformanceOptions
+        '
+        Me.GroupBox_Hybrid_PerformanceOptions.Controls.Add(Me.CheckBox_Hybrid_Draw)
+        Me.GroupBox_Hybrid_PerformanceOptions.Controls.Add(Label30)
+        Me.GroupBox_Hybrid_PerformanceOptions.Enabled = False
+        Me.GroupBox_Hybrid_PerformanceOptions.Location = New System.Drawing.Point(11, 227)
+        Me.GroupBox_Hybrid_PerformanceOptions.Name = "GroupBox_Hybrid_PerformanceOptions"
+        Me.GroupBox_Hybrid_PerformanceOptions.Size = New System.Drawing.Size(200, 45)
+        Me.GroupBox_Hybrid_PerformanceOptions.TabIndex = 51
+        Me.GroupBox_Hybrid_PerformanceOptions.TabStop = False
+        Me.GroupBox_Hybrid_PerformanceOptions.Text = "Performance Options"
+        '
+        'CheckBox_Hybrid_Draw
+        '
+        Me.CheckBox_Hybrid_Draw.Checked = True
+        Me.CheckBox_Hybrid_Draw.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.CheckBox_Hybrid_Draw.Location = New System.Drawing.Point(174, 20)
+        Me.CheckBox_Hybrid_Draw.Name = "CheckBox_Hybrid_Draw"
+        Me.CheckBox_Hybrid_Draw.Size = New System.Drawing.Size(18, 18)
+        Me.CheckBox_Hybrid_Draw.TabIndex = 50
+        '
         'GroupBox_Hybrid_NetworkServerOptions
         '
         Me.GroupBox_Hybrid_NetworkServerOptions.Controls.Add(Me.Numeric_Hybrid_EvolutionPeriod)
@@ -1450,18 +1556,6 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Hybrid_NetworkServerOptions.TabIndex = 50
         Me.GroupBox_Hybrid_NetworkServerOptions.TabStop = False
         Me.GroupBox_Hybrid_NetworkServerOptions.Text = "Network Server Options"
-        '
-        'GroupBox_Hybrid_PerformanceOptions
-        '
-        Me.GroupBox_Hybrid_PerformanceOptions.Controls.Add(Me.CheckBox_Hybrid_Draw)
-        Me.GroupBox_Hybrid_PerformanceOptions.Controls.Add(Label30)
-        Me.GroupBox_Hybrid_PerformanceOptions.Enabled = False
-        Me.GroupBox_Hybrid_PerformanceOptions.Location = New System.Drawing.Point(11, 227)
-        Me.GroupBox_Hybrid_PerformanceOptions.Name = "GroupBox_Hybrid_PerformanceOptions"
-        Me.GroupBox_Hybrid_PerformanceOptions.Size = New System.Drawing.Size(200, 45)
-        Me.GroupBox_Hybrid_PerformanceOptions.TabIndex = 51
-        Me.GroupBox_Hybrid_PerformanceOptions.TabStop = False
-        Me.GroupBox_Hybrid_PerformanceOptions.Text = "Performance Options"
         '
         'Numeric_Hybrid_EvolutionPeriod
         '
@@ -1585,90 +1679,6 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Einstellungen.TabStop = False
         Me.GroupBox_Einstellungen.Text = "Einstellungen:"
         '
-        'CheckBox_Hybrid_Draw
-        '
-        Me.CheckBox_Hybrid_Draw.Checked = True
-        Me.CheckBox_Hybrid_Draw.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBox_Hybrid_Draw.Location = New System.Drawing.Point(174, 20)
-        Me.CheckBox_Hybrid_Draw.Name = "CheckBox_Hybrid_Draw"
-        Me.CheckBox_Hybrid_Draw.Size = New System.Drawing.Size(18, 18)
-        Me.CheckBox_Hybrid_Draw.TabIndex = 50
-        '
-        'GroupBox_Hybrid_MySQLOptions
-        '
-        Me.GroupBox_Hybrid_MySQLOptions.Controls.Add(Me.Button_Hybrid_MySQL_Connection)
-        Me.GroupBox_Hybrid_MySQLOptions.Controls.Add(Me.TextBox_Hybrid_MySQL_Password)
-        Me.GroupBox_Hybrid_MySQLOptions.Controls.Add(Me.TextBox_Hybrid_MySQL_User)
-        Me.GroupBox_Hybrid_MySQLOptions.Controls.Add(Me.TextBox_Hybrid_MySQL_Host)
-        Me.GroupBox_Hybrid_MySQLOptions.Controls.Add(Label13)
-        Me.GroupBox_Hybrid_MySQLOptions.Controls.Add(Label14)
-        Me.GroupBox_Hybrid_MySQLOptions.Controls.Add(Label15)
-        Me.GroupBox_Hybrid_MySQLOptions.Enabled = False
-        Me.GroupBox_Hybrid_MySQLOptions.Location = New System.Drawing.Point(11, 278)
-        Me.GroupBox_Hybrid_MySQLOptions.Name = "GroupBox_Hybrid_MySQLOptions"
-        Me.GroupBox_Hybrid_MySQLOptions.Size = New System.Drawing.Size(200, 127)
-        Me.GroupBox_Hybrid_MySQLOptions.TabIndex = 52
-        Me.GroupBox_Hybrid_MySQLOptions.TabStop = False
-        Me.GroupBox_Hybrid_MySQLOptions.Text = "MySQL Options"
-        '
-        'Label13
-        '
-        Label13.AutoSize = True
-        Label13.Location = New System.Drawing.Point(4, 22)
-        Label13.Name = "Label13"
-        Label13.Size = New System.Drawing.Size(32, 13)
-        Label13.TabIndex = 51
-        Label13.Text = "Host:"
-        '
-        'Label14
-        '
-        Label14.AutoSize = True
-        Label14.Location = New System.Drawing.Point(4, 48)
-        Label14.Name = "Label14"
-        Label14.Size = New System.Drawing.Size(30, 13)
-        Label14.TabIndex = 35
-        Label14.Text = "user:"
-        '
-        'Label15
-        '
-        Label15.AutoSize = True
-        Label15.Location = New System.Drawing.Point(4, 74)
-        Label15.Name = "Label15"
-        Label15.Size = New System.Drawing.Size(55, 13)
-        Label15.TabIndex = 48
-        Label15.Text = "password:"
-        '
-        'TextBox_Hybrid_MySQL_Host
-        '
-        Me.TextBox_Hybrid_MySQL_Host.Location = New System.Drawing.Point(92, 19)
-        Me.TextBox_Hybrid_MySQL_Host.Name = "TextBox_Hybrid_MySQL_Host"
-        Me.TextBox_Hybrid_MySQL_Host.Size = New System.Drawing.Size(100, 20)
-        Me.TextBox_Hybrid_MySQL_Host.TabIndex = 52
-        '
-        'TextBox_Hybrid_MySQL_User
-        '
-        Me.TextBox_Hybrid_MySQL_User.Location = New System.Drawing.Point(92, 45)
-        Me.TextBox_Hybrid_MySQL_User.Name = "TextBox_Hybrid_MySQL_User"
-        Me.TextBox_Hybrid_MySQL_User.Size = New System.Drawing.Size(100, 20)
-        Me.TextBox_Hybrid_MySQL_User.TabIndex = 53
-        '
-        'TextBox_Hybrid_MySQL_Password
-        '
-        Me.TextBox_Hybrid_MySQL_Password.Location = New System.Drawing.Point(92, 71)
-        Me.TextBox_Hybrid_MySQL_Password.Name = "TextBox_Hybrid_MySQL_Password"
-        Me.TextBox_Hybrid_MySQL_Password.Size = New System.Drawing.Size(100, 20)
-        Me.TextBox_Hybrid_MySQL_Password.TabIndex = 54
-        Me.TextBox_Hybrid_MySQL_Password.UseSystemPasswordChar = True
-        '
-        'Button_Hybrid_MySQL_Connection
-        '
-        Me.Button_Hybrid_MySQL_Connection.Location = New System.Drawing.Point(6, 97)
-        Me.Button_Hybrid_MySQL_Connection.Name = "Button_Hybrid_MySQL_Connection"
-        Me.Button_Hybrid_MySQL_Connection.Size = New System.Drawing.Size(188, 23)
-        Me.Button_Hybrid_MySQL_Connection.TabIndex = 53
-        Me.Button_Hybrid_MySQL_Connection.Text = "Connection-Test"
-        Me.Button_Hybrid_MySQL_Connection.UseVisualStyleBackColor = True
-        '
         'EVO_Einstellungen
         '
         Me.Controls.Add(Me.GroupBox_Einstellungen)
@@ -1718,10 +1728,12 @@ Partial Class EVO_Einstellungen
         CType(Me.Numeric_HJ_DeltaStart, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabPage_Hybrid2008.ResumeLayout(False)
         Me.TabPage_Hybrid2008.PerformLayout()
-        Me.GroupBox_Hybrid_NetworkServerOptions.ResumeLayout(False)
-        Me.GroupBox_Hybrid_NetworkServerOptions.PerformLayout()
+        Me.GroupBox_Hybrid_MySQLOptions.ResumeLayout(False)
+        Me.GroupBox_Hybrid_MySQLOptions.PerformLayout()
         Me.GroupBox_Hybrid_PerformanceOptions.ResumeLayout(False)
         Me.GroupBox_Hybrid_PerformanceOptions.PerformLayout()
+        Me.GroupBox_Hybrid_NetworkServerOptions.ResumeLayout(False)
+        Me.GroupBox_Hybrid_NetworkServerOptions.PerformLayout()
         CType(Me.Numeric_Hybrid_EvolutionPeriod, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.Numeric_Hybrid_NumberEvolutions, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox_Hybrid_BasicOptions.ResumeLayout(False)
@@ -1733,8 +1745,6 @@ Partial Class EVO_Einstellungen
         Me.ToolStrip1.PerformLayout()
         Me.GroupBox_Einstellungen.ResumeLayout(False)
         Me.GroupBox_Einstellungen.PerformLayout()
-        Me.GroupBox_Hybrid_MySQLOptions.ResumeLayout(False)
-        Me.GroupBox_Hybrid_MySQLOptions.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -1822,8 +1832,8 @@ Partial Class EVO_Einstellungen
     Private WithEvents Numeric_Hybrid_PopulationSize As System.Windows.Forms.NumericUpDown
     Friend WithEvents GroupBox_Hybrid_MySQLOptions As System.Windows.Forms.GroupBox
     Private WithEvents CheckBox_Hybrid_Draw As System.Windows.Forms.CheckBox
-    Friend WithEvents Button_Hybrid_MySQL_Connection As System.Windows.Forms.Button
     Friend WithEvents TextBox_Hybrid_MySQL_Password As System.Windows.Forms.TextBox
     Friend WithEvents TextBox_Hybrid_MySQL_User As System.Windows.Forms.TextBox
     Friend WithEvents TextBox_Hybrid_MySQL_Host As System.Windows.Forms.TextBox
+    Friend WithEvents TextBox_Hybrid_MySQL_DB As System.Windows.Forms.TextBox
 End Class
