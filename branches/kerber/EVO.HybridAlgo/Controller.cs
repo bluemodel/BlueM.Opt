@@ -31,6 +31,8 @@ namespace IHWB.EVO.HybridAlgo
                 this.ok = networkmanager2008.check_connection();
             }
 
+            //Initialisieren des Individuum-Arrays
+
             //Ausführen des Hauptprogramms
             if (ok)
             {
