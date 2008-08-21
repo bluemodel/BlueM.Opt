@@ -32,17 +32,14 @@ Partial Class Form1
     'Anwendung
     Private Anwendung As String
 
-    'Optimierungsmethode
-    Public Shared Method As String
+    'Apps
+    Private Testprobleme1 As EVO.Apps.Testprobleme
+    Friend WithEvents Sim1 As EVO.Apps.Sim
+    Private SensiPlot1 As EVO.Apps.SensiPlot
+    Private TSP1 As EVO.Apps.TSP
 
-    '**** Deklarationen der Module *****
-    Private Testprobleme1 As Testprobleme
-    Friend WithEvents Sim1 As Sim
-    Private SensiPlot1 As SensiPlot
+    'Methoden
     Private CES1 As EVO.Kern.CES
-    Private TSP1 As TSP
-
-    'New'
     'Dim hybrid2008 As EVO.Hybrid2008.Main.cs
 
     '**** Globale Parameter Parameter Optimierung ****
@@ -63,21 +60,7 @@ Partial Class Form1
 
     'Dialoge
     Private WithEvents solutionDialog As SolutionDialog
-    Private WithEvents scatterplot1 As Scatterplot
-
-    'Hauptdiagramm
-    Public ReadOnly Property Hauptdiagramm() As EVO.Hauptdiagramm
-        Get
-            Return Me.DForm.Diag
-        End Get
-    End Property
-
-    'Indicatordiagramm
-    Public ReadOnly Property Indicatordiagramm() As EVO.Indicatordiagramm
-        Get
-            Return Me.DForm.DiagIndicator
-        End Get
-    End Property
+    Private WithEvents scatterplot1 As EVO.Diagramm.Scatterplot
 
 #End Region 'Eigenschaften
 
@@ -105,6 +88,9 @@ Partial Class Form1
 
         'OptionsDialog instanzieren
         Me.Options = New OptionsDialog()
+
+        'Handler für Klick auf Serien zuweisen
+        AddHandler Me.Hauptdiagramm.ClickSeries, AddressOf seriesClick
 
         'Ende der Initialisierung
         IsInitializing = False
@@ -195,41 +181,41 @@ Partial Class Form1
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Objekt der Klasse BlueM initialisieren
-                    Sim1 = New BlueM(n_Threads)
+                    Sim1 = New EVO.Apps.BlueM(n_Threads)
 
 
                 Case ANW_SMUSI 'Anwendung Smusi
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Objekt der Klasse Smusi initialisieren
-                    Sim1 = New Smusi()
+                    Sim1 = New EVO.Apps.Smusi()
 
 
                 Case ANW_SCAN 'Anwendung S:CAN
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Objekt der Klasse Scan initialisieren
-                    Sim1 = New Scan()
+                    Sim1 = New EVO.Apps.Scan()
 
 
                 Case ANW_SWMM   'Anwendung SWMM
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Objekt der Klasse SWMM initialisieren
-                    Sim1 = New SWMM()
+                    Sim1 = New EVO.Apps.SWMM()
 
 
                 Case ANW_TESTPROBLEME 'Anwendung Testprobleme
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Testprobleme instanzieren
-                    Testprobleme1 = New Testprobleme()
+                    Testprobleme1 = New EVO.Apps.Testprobleme()
 
 
                 Case ANW_TSP 'Anwendung Traveling Salesman Problem (TSP)
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    TSP1 = New TSP()
+                    TSP1 = New EVO.Apps.TSP()
 
                     Call TSP1.TSP_Initialize(Me.Hauptdiagramm)
 
@@ -455,9 +441,9 @@ Partial Class Form1
             Cursor = Cursors.WaitCursor
 
             'Methode setzen
-            Form1.Method = ComboBox_Methode.SelectedItem
+            EVO.Common.Manager.Method = ComboBox_Methode.SelectedItem
 
-            Select Case Form1.Method
+            Select Case EVO.Common.Manager.Method
 
                 Case "" 'Keine Methode ausgewählt
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -471,7 +457,7 @@ Partial Class Form1
                 Case METH_SENSIPLOT 'Methode SensiPlot
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    SensiPlot1 = New SensiPlot()
+                    SensiPlot1 = New EVO.Apps.SensiPlot()
 
                     'SensiPlot für Sim vorbereiten
                     Call Sim1.read_and_valid_INI_Files_PES()
@@ -597,7 +583,7 @@ Partial Class Form1
                     Me.Button_openMDB.Enabled = True
 
                     'Fallunterscheidung CES oder Hybrid
-                    Select Case Form1.Method
+                    Select Case EVO.Common.Manager.Method
                         Case METH_CES
 
                             'Tabcontrol PES auch entfernen
@@ -617,7 +603,7 @@ Partial Class Form1
                             Call Sim1.Write_ModellParameter()
 
                             'Original Transportstrecken einlesen
-                            Call CType(Me.Sim1, IHWB.EVO.BlueM).SKos1.Read_TRS_Orig_Daten(Sim1)
+                            Call CType(Me.Sim1, EVO.Apps.BlueM).SKos1.Read_TRS_Orig_Daten(Sim1)
 
                     End Select
 
@@ -1641,7 +1627,7 @@ Partial Class Form1
         End If
 
         'Diagramm vorbereiten und initialisieren
-        If (Not Form1.Method = METH_HYBRID And Not EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Sequencial_1) Then
+        If (Not EVO.Common.Manager.Method = METH_HYBRID And Not EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Sequencial_1) Then
             Call PrepareDiagramm()
         End If
 
@@ -1926,12 +1912,52 @@ Start_Evolutionsrunden:
     'Diagrammfunktionen
     '###################
 
+    'Chart nach Excel exportieren
+    '****************************
+    Private Sub TChart2Excel(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_TChart2Excel.Click
+        SaveFileDialog1.DefaultExt = Me.Hauptdiagramm.Export.Data.Excel.FileExtension
+        SaveFileDialog1.FileName = Me.Hauptdiagramm.Name + "." + SaveFileDialog1.DefaultExt
+        SaveFileDialog1.Filter = "Excel-Dateien (*.xls)|*.xls"
+        If (Me.SaveFileDialog1.ShowDialog() = System.Windows.Forms.DialogResult.OK) Then
+            Me.Hauptdiagramm.Export.Data.Excel.Series = Nothing 'export all series
+            Me.Hauptdiagramm.Export.Data.Excel.IncludeLabels = True
+            Me.Hauptdiagramm.Export.Data.Excel.IncludeIndex = True
+            Me.Hauptdiagramm.Export.Data.Excel.IncludeHeader = True
+            Me.Hauptdiagramm.Export.Data.Excel.IncludeSeriesTitle = True
+            Me.Hauptdiagramm.Export.Data.Excel.Save(Me.SaveFileDialog1.FileName)
+        End If
+    End Sub
+
+    'Chart als PNG exportieren
+    '*************************
+    Private Sub TChart2PNG(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_TChart2PNG.Click
+        SaveFileDialog1.DefaultExt = Me.Hauptdiagramm.Export.Image.PNG.FileExtension
+        SaveFileDialog1.FileName = Me.Hauptdiagramm.Name + "." + SaveFileDialog1.DefaultExt
+        SaveFileDialog1.Filter = "PNG-Dateien (*.png)|*.png"
+        If (Me.SaveFileDialog1.ShowDialog() = System.Windows.Forms.DialogResult.OK) Then
+            Me.Hauptdiagramm.Export.Image.PNG.GrayScale = False
+            Me.Hauptdiagramm.Export.Image.PNG.Save(Me.SaveFileDialog1.FileName)
+        End If
+    End Sub
+
+    'Chart in nativem TeeChart-Format abspeichern
+    '********************************************
+    Private Sub TChartSave(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_TChartSave.Click
+        SaveFileDialog1.DefaultExt = Me.Hauptdiagramm.Export.Template.FileExtension
+        SaveFileDialog1.FileName = Me.Hauptdiagramm.Name + "." + SaveFileDialog1.DefaultExt
+        SaveFileDialog1.Filter = "TeeChart-Dateien (*.ten)|*.ten"
+        If (Me.SaveFileDialog1.ShowDialog() = System.Windows.Forms.DialogResult.OK) Then
+            Me.Hauptdiagramm.Export.Template.IncludeData = True
+            Me.Hauptdiagramm.Export.Template.Save(Me.SaveFileDialog1.FileName)
+        End If
+    End Sub
+
     'Hauptdiagramm vorbereiten
     '*************************
     Private Sub PrepareDiagramm()
 
         Dim i, j, tmpZielindex() As Integer
-        Dim Achse As Diagramm.Achse
+        Dim Achse As EVO.Diagramm.Diagramm.Achse
         Dim Achsen As New Collection
 
         ReDim tmpZielindex(2)                       'Maximal 3 Achsen
@@ -2039,7 +2065,7 @@ Start_Evolutionsrunden:
                             '----------------------------------------
                             Achse.Title = "Simulation"
                             Achse.Automatic = False
-                            If (Form1.Method = METH_PES) Then
+                            If (EVO.Common.Manager.Method = METH_PES) Then
                                 'Bei PES:
                                 If (EVO_Einstellungen1.Settings.PES.Pop.is_POPUL) Then
                                     Achse.Maximum = EVO_Einstellungen1.Settings.PES.n_Gen * EVO_Einstellungen1.Settings.PES.n_Nachf * EVO_Einstellungen1.Settings.PES.Pop.n_Runden + 1
@@ -2047,7 +2073,7 @@ Start_Evolutionsrunden:
                                     Achse.Maximum = EVO_Einstellungen1.Settings.PES.n_Gen * EVO_Einstellungen1.Settings.PES.n_Nachf + 1
                                 End If
 
-                            ElseIf (Form1.Method = METH_HOOKJEEVES) Then
+                            ElseIf (EVO.Common.Manager.Method = METH_HOOKJEEVES) Then
                                 'Bei Hooke & Jeeves:
                                 Achse.Automatic = True
 
@@ -2124,11 +2150,11 @@ Start_Evolutionsrunden:
         'Bei MultiObjective zusätzlich: 
         '------------------------------
         If (Common.Manager.AnzPenalty > 1 _
-            And Form1.Method <> METH_SENSIPLOT) Then
+            And EVO.Common.Manager.Method <> METH_SENSIPLOT) Then
 
             'Indicator-Diagramm initialisieren
             '---------------------------------
-            Call Me.DForm.showIndicatorDiagramm()
+            Call Me.showIndicatorDiagramm()
             Call Me.Indicatordiagramm.getSeriesLine("Hypervolume").Clear()
 
         End If
@@ -2137,17 +2163,28 @@ Start_Evolutionsrunden:
 
     End Sub
 
+    'Indicatordiagramm anzeigen
+    '**************************
+    Private Sub showIndicatorDiagramm()
+
+        If (Me.Indicatordiagramm.Visible = False) Then
+            Me.Hauptdiagramm.Height -= 70
+            Me.Indicatordiagramm.Visible = True
+        End If
+
+    End Sub
+
     'Scatterplot-Matrix anzeigen
     '****************************
     Private Sub showScatterplot(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Scatterplot.Click
 
-        Dim Dialog As ScatterplotDialog
+        Dim Dialog As EVO.Diagramm.ScatterplotDialog
         Dim diagresult As DialogResult
         Dim sekpoponly, showRef As Boolean
         Dim zielauswahl() As Integer
 
         'Scatterplot-Dialog aufrufen
-        Dialog = New ScatterplotDialog()
+        Dialog = New EVO.Diagramm.ScatterplotDialog()
         If (IsNothing(Sim1.OptResultRef)) Then Dialog.GroupBox_Ref.Enabled = False
         diagresult = Dialog.ShowDialog()
 
@@ -2167,7 +2204,7 @@ Start_Evolutionsrunden:
         'Scatterplot-Matrix anzeigen
         Cursor = Cursors.WaitCursor
 
-        scatterplot1 = New Scatterplot(Sim1.OptResult, Sim1.OptResultRef, zielauswahl, sekpoponly, showRef)
+        scatterplot1 = New EVO.Diagramm.Scatterplot(Sim1.OptResult, Sim1.OptResultRef, zielauswahl, sekpoponly, showRef)
         Call scatterplot1.Show()
 
         Cursor = Cursors.Default
@@ -2386,15 +2423,15 @@ Start_Evolutionsrunden:
         'Sonderfall BlueM mit IHA-Berechnung 
         'ein 2. Wave für RVA-Diagramme instanzieren
         Dim Wave2 As Wave.Wave = Nothing
-        If (TypeOf Me.Sim1 Is IHWB.EVO.BlueM) Then
-            If (CType(Me.Sim1, IHWB.EVO.BlueM).isIHA) Then
+        If (TypeOf Me.Sim1 Is EVO.Apps.BlueM) Then
+            If (CType(Me.Sim1, EVO.Apps.BlueM).isIHA) Then
                 isIHA = True
                 Wave2 = New Wave.Wave()
                 Call Wave2.PrepareChart_RVA()
                 'IHA-Vergleichsmodus?
-                If (CType(Me.Sim1, IHWB.EVO.BlueM).IHAProc.isComparison) Then
+                If (CType(Me.Sim1, EVO.Apps.BlueM).IHAProc.isComparison) Then
                     'Referenz-RVAErgebnis in Wave2 laden
-                    Call Wave2.Display_RVA(CType(Me.Sim1, IHWB.EVO.BlueM).IHAProc.RVABase)
+                    Call Wave2.Display_RVA(CType(Me.Sim1, EVO.Apps.BlueM).IHAProc.RVABase)
                 End If
             End If
         End If
@@ -2414,7 +2451,7 @@ Start_Evolutionsrunden:
             'Simulation vorbereiten
             'xxxxxxxxxxxxxxxxxxxxxx
 
-            Select Case Form1.Method
+            Select Case EVO.Common.Manager.Method
 
                 Case METH_PES
 
@@ -2428,7 +2465,7 @@ Start_Evolutionsrunden:
                     Call Sim1.PREPARE_Evaluation_CES(CType(ind, Individuum_CES).Path, CType(ind, Individuum_CES).Get_All_Loc_Elem)
 
                     'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
-                    If Form1.Method = METH_HYBRID And EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer Then
+                    If (EVO.Common.Manager.Method = METH_HYBRID And EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer) Then
                         Call Sim1.Reduce_OptPara_and_ModPara(CType(ind, Individuum_CES).Get_All_Loc_Elem)
                         Call Sim1.PREPARE_Evaluation_PES(CType(ind, Individuum_CES).Get_All_Loc_PES_Para)
                     End If
@@ -2450,7 +2487,7 @@ Start_Evolutionsrunden:
             If (isIHA) Then
                 'RVA-Ergebnis in Wave2 laden
                 Dim RVAResult As Wave.RVA.Struct_RVAValues
-                RVAResult = CType(Me.Sim1, IHWB.EVO.BlueM).IHASys.RVAResult
+                RVAResult = CType(Me.Sim1, EVO.Apps.BlueM).IHASys.RVAResult
                 'Lösungsnummer an Titel anhängen
                 RVAResult.Title = "Lösung " & ind.ID.ToString()
                 Call Wave2.Display_RVA(RVAResult)
@@ -2552,7 +2589,7 @@ Start_Evolutionsrunden:
 
             'MDBImportDialog
             '---------------
-            Dim importDialog As New MDBImportDialog()
+            Dim importDialog As New EVO.OptResult.MDBImportDialog()
 
             diagresult = importDialog.ShowDialog()
 
@@ -2577,7 +2614,7 @@ Start_Evolutionsrunden:
                 'Achsen
                 '------
                 Dim Achsen As New Collection
-                Dim tmpAchse As EVO.Diagramm.Achse
+                Dim tmpAchse As EVO.Diagramm.Diagramm.Achse
                 tmpAchse.Automatic = True
                 If (Me.Hauptdiagramm.ZielIndexZ = -1 And Me.Hauptdiagramm.ZielIndexY = -1) Then
                     'Single-objective
@@ -2693,7 +2730,7 @@ Start_Evolutionsrunden:
                 If (importDialog.CheckBox_Hypervol.Checked) Then
 
                     'Indicator-Diagramm anzeigen
-                    Call Me.DForm.showIndicatorDiagramm()
+                    Call Me.showIndicatorDiagramm()
                     Call Me.Indicatordiagramm.getSeriesLine("Hypervolume").Clear()
 
                     'Hypervolumen instanzieren
@@ -2703,7 +2740,7 @@ Start_Evolutionsrunden:
                     Dim nadir() As Double
 
                     'Alle Generationen durchlaufen
-                    For Each sekpop As OptResult.Struct_SekPop In Sim1.OptResult.SekPops
+                    For Each sekpop As EVO.OptResult.OptResult.Struct_SekPop In Sim1.OptResult.SekPops
 
                         'Hypervolumen berechnen
                         Call Hypervolume.update_dataset(Sim1.OptResult.getSekPopValues(sekpop.iGen))
@@ -2758,7 +2795,7 @@ Start_Evolutionsrunden:
 
             'Daten einlesen
             '==============
-            Sim1.OptResultRef = New EVO.OptResult()
+            Sim1.OptResultRef = New EVO.OptResult.OptResult()
             Call Sim1.OptResultRef.db_load(sourceFile, True)
 
             'In Diagramm anzeigen

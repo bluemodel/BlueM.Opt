@@ -1,20 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{CAA1CE91-0973-4BE7-9BD8-16B5D40BC93C}</ProjectGuid>
+    <ProjectGuid>{4382061B-F0DF-4D7D-9A09-306C940D19A5}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>IHWB.EVO.Common</RootNamespace>
-    <AssemblyName>EVO.Common</AssemblyName>
+    <RootNamespace>IHWB.EVO.Diagramm</RootNamespace>
+    <AssemblyName>EVO.Diagramm</AssemblyName>
+    <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <OldToolsVersion>2.0</OldToolsVersion>
-    <UpgradeBackupLocation>
-    </UpgradeBackupLocation>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <OptionExplicit>On</OptionExplicit>
+    <OptionCompare>Binary</OptionCompare>
+    <OptionStrict>Off</OptionStrict>
+    <OptionInfer>On</OptionInfer>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,44 +23,43 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>EVO.Shared.xml</DocumentationFile>
+    <DocumentationFile>EVO.Diagramm.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>None</DebugType>
+    <DebugType>pdbonly</DebugType>
     <DefineDebug>false</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>EVO.Shared.xml</DocumentationFile>
+    <DocumentationFile>EVO.Diagramm.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="TeeChart, Version=3.5.3146.24806, Culture=neutral, PublicKeyToken=9c8126276c77bdb7, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
     <Import Include="System" />
     <Import Include="System.Collections" />
     <Import Include="System.Collections.Generic" />
-    <Import Include="System.Data" />
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Constants.vb" />
-    <Compile Include="Constraint.vb" />
-    <Compile Include="EVO_Settings.vb" />
-    <Compile Include="Individuum.vb">
+    <Compile Include="Diagramm.vb">
+      <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Individuum_CES.vb" />
-    <Compile Include="Individuum_PES.vb" />
-    <Compile Include="Locations.vb" />
-    <Compile Include="Manager.vb" />
-    <Compile Include="OptParameter.vb" />
-    <Compile Include="Provider.vb" />
+    <Compile Include="Hauptdiagramm.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Indicatordiagramm.vb">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -75,13 +75,32 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Ziel.vb" />
+    <Compile Include="Scatterplot.Designer.vb">
+      <DependentUpon>Scatterplot.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Scatterplot.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ScatterplotDialog.Designer.vb">
+      <DependentUpon>ScatterplotDialog.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ScatterplotDialog.vb">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Scatterplot.resx">
+      <DependentUpon>Scatterplot.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ScatterplotDialog.resx">
+      <DependentUpon>ScatterplotDialog.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
@@ -97,12 +116,19 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Wave\Wave.vbproj">
-      <Project>{BCD1BBE3-5AB2-4C3F-AC12-43EB977C6F6F}</Project>
-      <Name>Wave</Name>
+    <Content Include="Resources\TeeChart.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EVO.Common\EVO.Common.vbproj">
+      <Project>{CAA1CE91-0973-4BE7-9BD8-16B5D40BC93C}</Project>
+      <Name>EVO.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EVO.OptResult\EVO.OptResult.vbproj">
+      <Project>{A7B7B98D-94BE-47DB-954F-BBA2C1F53663}</Project>
+      <Name>EVO.OptResult</Name>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

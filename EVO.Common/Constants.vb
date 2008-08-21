@@ -14,6 +14,17 @@ Public Module Constants
     '*******************************************************************************
     '*******************************************************************************
 
+    'Verschiedenes
+    Public Const eol As String = Chr(13) & Chr(10)             'Zeilenumbruch
+
+    'Optimierungsmethoden
+    Public Const METH_PES As String = "PES"
+    Public Const METH_CES As String = "CES"
+    Public Const METH_HYBRID As String = "HYBRID"
+    Public Const METH_SENSIPLOT As String = "SensiPlot"
+    Public Const METH_HOOKJEEVES As String = "Hooke & Jeeves"
+    Public Const METH_Hybrid2008 As String = "Hybrid2008"
+
     'Option für Startvorgabe für Optimierung
     Public Enum EVO_STARTPARAMETER As Integer
         Zufall = 1
