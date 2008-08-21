@@ -8,11 +8,11 @@ Imports System.Runtime.InteropServices
 
 ' Die Werte der Assemblyattribute überprüfen
 
-<Assembly: AssemblyTitle("EVO.Shared")> 
+<Assembly: AssemblyTitle("EVO.Common")> 
 <Assembly: AssemblyDescription("")> 
-<Assembly: AssemblyCompany("IHWB")> 
-<Assembly: AssemblyProduct("")> 
-<Assembly: AssemblyCopyright("IHWB, TU Darmstadt")> 
+<Assembly: AssemblyCompany("IHWB - TU Darmstadt")> 
+<Assembly: AssemblyProduct("EVO.Common")> 
+<Assembly: AssemblyCopyright("Copyright © IHWB 2008")> 
 <Assembly: AssemblyTrademark("")> 
 
 <Assembly: ComVisible(False)>

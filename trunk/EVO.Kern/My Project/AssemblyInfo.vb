@@ -10,9 +10,9 @@ Imports System.Runtime.InteropServices
 
 <Assembly: AssemblyTitle("EVO.Kern")> 
 <Assembly: AssemblyDescription("")> 
-<Assembly: AssemblyCompany("IHWB")> 
-<Assembly: AssemblyProduct("")> 
-<Assembly: AssemblyCopyright("IHWB, TU Darmstadt")> 
+<Assembly: AssemblyCompany("IHWB - TU Darmstadt")> 
+<Assembly: AssemblyProduct("EVO.Kern")> 
+<Assembly: AssemblyCopyright("Copyright © IHWB 2008")> 
 <Assembly: AssemblyTrademark("")> 
 
 <Assembly: ComVisible(False)> 
