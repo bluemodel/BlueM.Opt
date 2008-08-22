@@ -1280,10 +1280,17 @@ Partial Class Form1
 
         Dim i_ch, i_loc As Integer
 
-        'NDSorting für den PES Memory
-        '****************************
+        'Selection oder NDSorting für den PES Memory
+        '*******************************************
         If CES1.PES_Memory.GetLength(0) > CES1.Settings.CES.n_PES_MemSize Then
-            Call CES1.NDSorting_Memory(i_gen)
+            If (Common.Manager.AnzPenalty = 1) Then
+                'Sortieren des PES_Memory anhande der Qualität
+                Call CES1.Sort_Individuum(CES1.PES_Memory)
+                'Kürzen des PES_Memory
+                ReDim Preserve CES1.PES_Memory(CES1.Settings.CES.n_PES_MemSize - 1)
+            Else
+                Call CES1.NDSorting_Memory(i_gen)
+            End If
         End If
 
         'pro Child
@@ -1304,10 +1311,17 @@ Partial Class Form1
                     '*******************************************************************************
                     Call CES1.Memory_Search_per_Location(i_loc)
 
-                    'Führt das NDSorting für diesen Satz durch
-                    '*****************************************
+                    'Führt das Sortieren oder NDSorting für diesen Satz durch
+                    '********************************************************
                     If CES1.PES_Parents_pLoc.GetLength(0) > CES1.Settings.PES.n_Eltern Then
-                        Call CES1.NDSorting_PES_Parents_per_Loc(i_gen)
+                        If (Common.Manager.AnzPenalty = 1) Then
+                            'Sortieren der Parents anhand der Qualität
+                            Call CES1.Sort_Individuum(CES1.PES_Parents_pLoc)
+                            'Kürzen der Parents
+                            ReDim Preserve CES1.PES_Parents_pLoc(CES1.Settings.PES.n_Eltern - 1)
+                        Else 
+                            Call CES1.NDSorting_PES_Parents_per_Loc(i_gen)
+                        End If
                     End If
 
                     Dim m As Integer
