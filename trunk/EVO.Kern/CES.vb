@@ -883,8 +883,11 @@ Public Class CES
                     End If
             End Select
         Next
-
-        PES_Parents_pChild = Tmp.Clone
+        
+        ReDim PES_Parents_pChild(Tmp.GetUpperBound(0))
+        For i = 0 to Tmp.GetUpperBound(0)
+            PES_Parents_pChild(i) = Tmp(i).Clone
+        Next
 
     End Sub
 
@@ -942,7 +945,7 @@ Public Class CES
     'Hilfsfunktion zum sortieren der Individuum
     '******************************************
     Public Sub Sort_Individuum(ByRef IndividuumList() As Individuum)
-        'Sortiert die Fiksimile anhand des Abstandes
+        'Sortiert die Individuen anhand des Penalty Wertes
         Dim i, j As Integer
         Dim swap As New Individuum_CES("swap", 0)
 
