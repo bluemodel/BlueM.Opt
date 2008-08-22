@@ -118,7 +118,7 @@
             Else
                 serie = Me.getSeriesPoint("Population " & (pop + 1).ToString(), , , , ColEach)
             End If
-            Call serie.Add(runde * Me.mEVO_Settings.PES.n_Gen * Me.mEVO_Settings.PES.n_Nachf + gen * Me.mEVO_Settings.PES.n_Nachf + nachf, ind.Penalties(0), ind.ID.ToString())
+            Call serie.Add(runde * Me.mEVO_Settings.PES.n_Gen * Me.mEVO_Settings.PES.n_Nachf + gen * Me.mEVO_Settings.PES.n_Nachf + nachf, ind.Penalties(0), ind.ID.ToString(), Farbe)
 
         Else
             'MultiObjective
