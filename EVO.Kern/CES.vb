@@ -336,14 +336,14 @@ Public Class CES
 
         'Strategie MINUS
         'xxxxxxxxxxxxxxx
-        If Settings.CES.OptStrategie = "minus" Then 'CHECK: sollte das nicht = EVO_STRATEGIE.Komma_Strategie sein?
+        If Settings.CES.OptStrategie = EVO_STRATEGIE.Komma_Strategie Then
             For i = 0 To Settings.CES.n_Parents - 1
                 Parents(i) = Childs(i).Clone()
             Next i
 
             'Strategie PLUS
             'xxxxxxxxxxxxxx
-        ElseIf Settings.CES.OptStrategie = "plus" Then 'CHECK: sollte das nicht = EVO_STRATEGIE.Plus_Strategie sein?
+        ElseIf Settings.CES.OptStrategie = EVO_STRATEGIE.Plus_Strategie Then
 
             For i = 0 To Settings.CES.n_Childs - 1
                 'Des schlechteste Elter wird bestimmt
