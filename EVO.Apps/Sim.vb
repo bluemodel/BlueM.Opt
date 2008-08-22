@@ -1835,7 +1835,7 @@ Handler:
             
             My.Computer.FileSystem.CopyDirectory(Source, Dest, True)
             Call purgeReadOnly(Dest)
-            Directory.Delete(Dest & "\.svn", true)
+            'Directory.Delete(Dest & "\.svn", true)
 
         Next
 
