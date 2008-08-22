@@ -43,6 +43,11 @@ Partial Class Form1
         Me.Button_Scatterplot = New System.Windows.Forms.Button
         Me.Button_saveMDB = New System.Windows.Forms.Button
         Me.Button_loadRefResult = New System.Windows.Forms.Button
+        Me.Button_TChartEdit = New System.Windows.Forms.Button
+        Me.Button_TChart2PNG = New System.Windows.Forms.Button
+        Me.Button_TChartSave = New System.Windows.Forms.Button
+        Me.Button_TChart2Excel = New System.Windows.Forms.Button
+        Me.Indicatordiagramm = New IHWB.EVO.Diagramm.Indicatordiagramm
         Me.GroupBox_Anwendung = New System.Windows.Forms.GroupBox
         Me.Button_BrowseDatensatz = New System.Windows.Forms.Button
         Me.ComboBox_Datensatz = New System.Windows.Forms.ComboBox
@@ -56,7 +61,8 @@ Partial Class Form1
         Me.GroupBox_ErgebnisDB = New System.Windows.Forms.GroupBox
         Me.EVO_Einstellungen1 = New IHWB.EVO.EVO_Einstellungen
         Me.EVO_Opt_Verlauf1 = New IHWB.EVO.EVO_Opt_Verlauf
-        Me.DForm = New IHWB.EVO.DiagrammForm
+        Me.GroupBox_TChartButtons = New System.Windows.Forms.GroupBox
+        Me.Hauptdiagramm = New IHWB.EVO.Diagramm.Hauptdiagramm
         MenuStrip1 = New System.Windows.Forms.MenuStrip
         MenuItem_Tools = New System.Windows.Forms.ToolStripMenuItem
         ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator
@@ -64,6 +70,7 @@ Partial Class Form1
         MenuStrip1.SuspendLayout()
         Me.GroupBox_Anwendung.SuspendLayout()
         Me.GroupBox_ErgebnisDB.SuspendLayout()
+        Me.GroupBox_TChartButtons.SuspendLayout()
         Me.SuspendLayout()
         '
         'MenuStrip1
@@ -185,6 +192,108 @@ Partial Class Form1
         Me.ToolTip1.SetToolTip(Me.Button_loadRefResult, "Vergleichsergebnis aus Ergebnisdatenbank laden")
         Me.Button_loadRefResult.UseVisualStyleBackColor = True
         '
+        'Button_TChartEdit
+        '
+        Me.Button_TChartEdit.Image = Global.IHWB.EVO.My.Resources.Resources.icon_edit
+        Me.Button_TChartEdit.Location = New System.Drawing.Point(6, 19)
+        Me.Button_TChartEdit.Name = "Button_TChartEdit"
+        Me.Button_TChartEdit.Size = New System.Drawing.Size(25, 25)
+        Me.Button_TChartEdit.TabIndex = 0
+        Me.ToolTip1.SetToolTip(Me.Button_TChartEdit, "Diagramm bearbeiten")
+        Me.Button_TChartEdit.UseVisualStyleBackColor = True
+        '
+        'Button_TChart2PNG
+        '
+        Me.Button_TChart2PNG.Image = Global.IHWB.EVO.My.Resources.Resources.icon_png
+        Me.Button_TChart2PNG.Location = New System.Drawing.Point(111, 19)
+        Me.Button_TChart2PNG.Name = "Button_TChart2PNG"
+        Me.Button_TChart2PNG.Size = New System.Drawing.Size(25, 25)
+        Me.Button_TChart2PNG.TabIndex = 3
+        Me.ToolTip1.SetToolTip(Me.Button_TChart2PNG, "als PNG exportieren")
+        Me.Button_TChart2PNG.UseVisualStyleBackColor = True
+        '
+        'Button_TChartSave
+        '
+        Me.Button_TChartSave.Image = Global.IHWB.EVO.My.Resources.Resources.icon_teechart
+        Me.Button_TChartSave.Location = New System.Drawing.Point(80, 19)
+        Me.Button_TChartSave.Name = "Button_TChartSave"
+        Me.Button_TChartSave.Size = New System.Drawing.Size(25, 25)
+        Me.Button_TChartSave.TabIndex = 2
+        Me.ToolTip1.SetToolTip(Me.Button_TChartSave, "als natives TeeChart-Format exportieren")
+        Me.Button_TChartSave.UseVisualStyleBackColor = True
+        '
+        'Button_TChart2Excel
+        '
+        Me.Button_TChart2Excel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
+        Me.Button_TChart2Excel.Image = Global.IHWB.EVO.My.Resources.Resources.icon_excel
+        Me.Button_TChart2Excel.Location = New System.Drawing.Point(49, 19)
+        Me.Button_TChart2Excel.Name = "Button_TChart2Excel"
+        Me.Button_TChart2Excel.Size = New System.Drawing.Size(25, 25)
+        Me.Button_TChart2Excel.TabIndex = 1
+        Me.ToolTip1.SetToolTip(Me.Button_TChart2Excel, "nach Excel exportieren")
+        Me.Button_TChart2Excel.UseVisualStyleBackColor = False
+        '
+        'Indicatordiagramm
+        '
+        '
+        '
+        '
+        Me.Indicatordiagramm.Aspect.View3D = False
+        Me.Indicatordiagramm.Aspect.ZOffset = 0
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Indicatordiagramm.Axes.Bottom.Labels.Font.Size = 6
+        Me.Indicatordiagramm.Axes.Bottom.Labels.Font.SizeFloat = 6.0!
+        Me.Indicatordiagramm.Axes.Bottom.Labels.Style = Steema.TeeChart.AxisLabelStyle.Value
+        Me.Indicatordiagramm.Axes.Bottom.MaximumOffset = 3
+        Me.Indicatordiagramm.Axes.Bottom.MinimumOffset = 3
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Indicatordiagramm.Axes.Left.Labels.Font.Size = 6
+        Me.Indicatordiagramm.Axes.Left.Labels.Font.SizeFloat = 6.0!
+        Me.Indicatordiagramm.Axes.Left.MaximumOffset = 3
+        Me.Indicatordiagramm.Axes.Left.MinimumOffset = 3
+        Me.Indicatordiagramm.Cursor = System.Windows.Forms.Cursors.Default
+        '
+        '
+        '
+        Me.Indicatordiagramm.Header.Visible = False
+        '
+        '
+        '
+        Me.Indicatordiagramm.Legend.Visible = False
+        Me.Indicatordiagramm.Location = New System.Drawing.Point(241, 582)
+        Me.Indicatordiagramm.Name = "Indicatordiagramm"
+        '
+        '
+        '
+        Me.Indicatordiagramm.Panel.MarginTop = 20
+        '
+        '
+        '
+        Me.Indicatordiagramm.Panning.Allow = Steema.TeeChart.ScrollModes.None
+        Me.Indicatordiagramm.Size = New System.Drawing.Size(473, 70)
+        Me.Indicatordiagramm.TabIndex = 7
+        Me.ToolTip1.SetToolTip(Me.Indicatordiagramm, "Hypervolumen")
+        Me.Indicatordiagramm.Visible = False
+        '
         'GroupBox_Anwendung
         '
         Me.GroupBox_Anwendung.BackColor = System.Drawing.SystemColors.Control
@@ -279,7 +388,7 @@ Partial Class Form1
         Me.GroupBox_ErgebnisDB.Controls.Add(Me.Button_openMDB)
         Me.GroupBox_ErgebnisDB.Controls.Add(Me.Button_loadRefResult)
         Me.GroupBox_ErgebnisDB.Controls.Add(Me.Button_Scatterplot)
-        Me.GroupBox_ErgebnisDB.Location = New System.Drawing.Point(431, 655)
+        Me.GroupBox_ErgebnisDB.Location = New System.Drawing.Point(426, 658)
         Me.GroupBox_ErgebnisDB.Name = "GroupBox_ErgebnisDB"
         Me.GroupBox_ErgebnisDB.Size = New System.Drawing.Size(131, 50)
         Me.GroupBox_ErgebnisDB.TabIndex = 14
@@ -301,12 +410,39 @@ Partial Class Form1
         Me.EVO_Opt_Verlauf1.Size = New System.Drawing.Size(467, 73)
         Me.EVO_Opt_Verlauf1.TabIndex = 6
         '
-        'DForm
+        'GroupBox_TChartButtons
         '
-        Me.DForm.Location = New System.Drawing.Point(241, 84)
-        Me.DForm.Name = "DForm"
-        Me.DForm.Size = New System.Drawing.Size(473, 625)
-        Me.DForm.TabIndex = 8
+        Me.GroupBox_TChartButtons.Controls.Add(Me.Button_TChartEdit)
+        Me.GroupBox_TChartButtons.Controls.Add(Me.Button_TChart2PNG)
+        Me.GroupBox_TChartButtons.Controls.Add(Me.Button_TChartSave)
+        Me.GroupBox_TChartButtons.Controls.Add(Me.Button_TChart2Excel)
+        Me.GroupBox_TChartButtons.Location = New System.Drawing.Point(241, 658)
+        Me.GroupBox_TChartButtons.Name = "GroupBox_TChartButtons"
+        Me.GroupBox_TChartButtons.Size = New System.Drawing.Size(143, 50)
+        Me.GroupBox_TChartButtons.TabIndex = 16
+        Me.GroupBox_TChartButtons.TabStop = False
+        Me.GroupBox_TChartButtons.Text = "Diagramm"
+        '
+        'Hauptdiagramm
+        '
+        '
+        '
+        '
+        Me.Hauptdiagramm.Aspect.View3D = False
+        Me.Hauptdiagramm.Aspect.ZOffset = 0
+        Me.Hauptdiagramm.Cursor = System.Windows.Forms.Cursors.Default
+        '
+        '
+        '
+        Me.Hauptdiagramm.Header.Lines = New String() {"EVO.NET"}
+        Me.Hauptdiagramm.Location = New System.Drawing.Point(241, 86)
+        Me.Hauptdiagramm.Name = "Hauptdiagramm"
+        Me.Hauptdiagramm.Size = New System.Drawing.Size(473, 566)
+        Me.Hauptdiagramm.TabIndex = 17
+        '
+        '
+        '
+        Me.Hauptdiagramm.Walls.View3D = False
         '
         'Form1
         '
@@ -314,13 +450,15 @@ Partial Class Form1
         Me.AutoScroll = True
         Me.BackColor = System.Drawing.SystemColors.Control
         Me.ClientSize = New System.Drawing.Size(718, 792)
+        Me.Controls.Add(Me.Indicatordiagramm)
+        Me.Controls.Add(Me.Hauptdiagramm)
+        Me.Controls.Add(Me.GroupBox_TChartButtons)
         Me.Controls.Add(MenuStrip1)
         Me.Controls.Add(Me.GroupBox_ErgebnisDB)
         Me.Controls.Add(Me.Button_Start)
         Me.Controls.Add(Me.EVO_Einstellungen1)
         Me.Controls.Add(Me.GroupBox_Anwendung)
         Me.Controls.Add(Me.EVO_Opt_Verlauf1)
-        Me.Controls.Add(Me.DForm)
         Me.Cursor = System.Windows.Forms.Cursors.Default
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Location = New System.Drawing.Point(100, 100)
@@ -334,12 +472,12 @@ Partial Class Form1
         Me.GroupBox_Anwendung.ResumeLayout(False)
         Me.GroupBox_Anwendung.PerformLayout()
         Me.GroupBox_ErgebnisDB.ResumeLayout(False)
+        Me.GroupBox_TChartButtons.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
     End Sub
 
-    Friend WithEvents DForm As EVO.DiagrammForm
     Friend WithEvents OpenFileDialog1 As System.Windows.Forms.OpenFileDialog
     Friend WithEvents SaveFileDialog1 As System.Windows.Forms.SaveFileDialog
     Private WithEvents EVO_Einstellungen1 As IHWB.EVO.EVO_Einstellungen
@@ -361,4 +499,11 @@ Partial Class Form1
     Friend WithEvents MenuItem_Hilfe As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents MenuItem_About As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents MenuItem_Wiki As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents GroupBox_TChartButtons As System.Windows.Forms.GroupBox
+    Friend WithEvents Button_TChartEdit As System.Windows.Forms.Button
+    Friend WithEvents Button_TChart2PNG As System.Windows.Forms.Button
+    Friend WithEvents Button_TChartSave As System.Windows.Forms.Button
+    Friend WithEvents Button_TChart2Excel As System.Windows.Forms.Button
+    Friend WithEvents Indicatordiagramm As IHWB.EVO.Diagramm.Indicatordiagramm
+    Friend WithEvents Hauptdiagramm As IHWB.EVO.Diagramm.Hauptdiagramm
 End Class

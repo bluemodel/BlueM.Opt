@@ -24,7 +24,7 @@ Public Class EVO_Einstellungen
     'Eigenschaften
     '#############
 
-    Private msettings As Common.EVO_Settings         'Sicherung sämtlicher Einstellungen
+    Private msettings As EVO.Common.EVO_Settings     'Sicherung sämtlicher Einstellungen
     Public isSaved As Boolean = False                'Flag der anzeigt, ob die Einstellungen bereits gesichert wurden
     Public isLoad As Boolean = False                 'Flag der anzeigt, ob die Settings aus einer XML Datei gelesen werden
     Private isInitializing As Boolean
@@ -49,7 +49,7 @@ Public Class EVO_Einstellungen
         Me.msettings = New Common.EVO_Settings()
         'Standard-Settings setzen
         Call Me.msettings.PES.setStandard(EVO_MODUS.Single_Objective)
-        Call Me.msettings.CES.setStandard(EVO.METH_CES)
+        Call Me.msettings.CES.setStandard(METH_CES)
         Call Me.msettings.HookJeeves.setStandard()
         'Comboboxen füllen
         Call Me.InitComboboxes()
@@ -112,12 +112,12 @@ Public Class EVO_Einstellungen
     '---
     Private Sub OptModus_Change_ActDeact_CES()
 
-        Select Case Evo.Form1.Method
+        Select Case EVO.Common.Manager.Method
 
-            Case evo.METH_CES
+            Case METH_CES
                 GroupBox_CES_Hybrid.Enabled = False
 
-            Case evo.METH_HYBRID
+            Case METH_HYBRID
                 GroupBox_CES_Hybrid.Enabled = True
 
                 Call Combo_CES_HybridType_SelectedIndexChanged(New Object(), System.EventArgs.Empty)
@@ -355,7 +355,7 @@ Public Class EVO_Einstellungen
     Private Sub Combo_CES_HybridType_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Combo_CES_HybridType.SelectedIndexChanged
 
 
-        If Form1.Method = Evo.METH_HYBRID And Not isLoad Then
+        If (EVO.Common.Manager.Method = METH_HYBRID And Not isLoad) Then
 
             Dim Item As HYBRID_TYPE
             Item = Me.Combo_CES_HybridType.SelectedItem
@@ -369,7 +369,7 @@ Public Class EVO_Einstellungen
                     Me.TextAnzGen.Enabled = False
 
                     'Eltern
-                    Me.TextAnzEltern.text = 5
+                    Me.TextAnzEltern.Text = 5
                     Me.TextAnzEltern.Enabled = True
                     Me.LabelAnzEltern.Text = "Maximal Zahl der Eltern:"
 
@@ -384,7 +384,7 @@ Public Class EVO_Einstellungen
                     Me.TextAnzGen.Enabled = True
 
                     'Eltern
-                    Me.TextAnzEltern.text = 5
+                    Me.TextAnzEltern.Text = 5
                     Me.TextAnzEltern.Enabled = True
                     Me.LabelAnzEltern.Text = "Anzahl der Eltern:"
 
@@ -546,7 +546,7 @@ Public Class EVO_Einstellungen
     'Standardeinstellungen setzen (CES)
     '**********************************
     Public Sub setStandard_CES()
-        Call Me.msettings.CES.setStandard(Evo.Form1.Method)
+        Call Me.msettings.CES.setStandard(EVO.Common.Manager.Method)
         Call Me.writeForm()
     End Sub
 
@@ -566,7 +566,7 @@ Public Class EVO_Einstellungen
 
     'PES_Settings Property
     '*********************
-    Public ReadOnly Property Settings() As Common.EVO_Settings
+    Public ReadOnly Property Settings() As EVO.Common.EVO_Settings
         Get
             'Wenn Einstellungen noch nicht gespeichert, zuerst aus Form einlesen
             If (Not Me.isSaved) Then

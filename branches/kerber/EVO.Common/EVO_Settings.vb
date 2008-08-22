@@ -187,7 +187,7 @@ Public Class EVO_Settings
                     Me.OptReprodOp = CES_REPRODOP.Selt_Rand_Uniform
                     Me.OptMutOperator = CES_MUTATION.RND_Switch
                     Me.pr_MutRate = 25
-        
+
                     Me.is_SecPop = True
                     Me.is_SecPopRestriction = True
                     Me.n_MemberSecondPop = 50
@@ -198,7 +198,7 @@ Public Class EVO_Settings
                     Me.ty_Hybrid = HYBRID_TYPE.Mixed_Integer
                     Me.Mem_Strategy = MEMORY_STRATEGY.C_This_Loc
                     Me.n_PES_MemSize = 500
-        
+
                     Me.is_PES_SecPop = False
                     Me.n_PES_MemSecPop = 50
                     Me.n_PES_Interact = 5
@@ -225,7 +225,7 @@ Public Class EVO_Settings
                     Me.ty_Hybrid = HYBRID_TYPE.Mixed_Integer
                     Me.Mem_Strategy = MEMORY_STRATEGY.C_This_Loc
                     Me.n_PES_MemSize = 500
-        
+
                     Me.is_PES_SecPop = False
                     Me.n_PES_MemSecPop = 50
                     Me.n_PES_Interact = 5

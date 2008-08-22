@@ -18,6 +18,8 @@ Public Module Manager
     'Eigenschaften
     '#############
 
+    Public Method As String                     'Optimierungsmethode
+
     Public List_Ziele() As Ziel                 'Liste der Zielfunktionen
     Public List_Constraints() As Constraint     'Liste der Constraints
 
