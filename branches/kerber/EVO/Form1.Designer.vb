@@ -47,7 +47,7 @@ Partial Class Form1
         Me.Button_TChart2PNG = New System.Windows.Forms.Button
         Me.Button_TChartSave = New System.Windows.Forms.Button
         Me.Button_TChart2Excel = New System.Windows.Forms.Button
-        Me.Indicatordiagramm = New IHWB.EVO.Diagramm.Indicatordiagramm
+        Me.Indicatordiagramm1 = New IHWB.EVO.Diagramm.Indicatordiagramm
         Me.GroupBox_Anwendung = New System.Windows.Forms.GroupBox
         Me.Button_BrowseDatensatz = New System.Windows.Forms.Button
         Me.ComboBox_Datensatz = New System.Windows.Forms.ComboBox
@@ -62,7 +62,7 @@ Partial Class Form1
         Me.EVO_Einstellungen1 = New IHWB.EVO.EVO_Einstellungen
         Me.EVO_Opt_Verlauf1 = New IHWB.EVO.EVO_Opt_Verlauf
         Me.GroupBox_TChartButtons = New System.Windows.Forms.GroupBox
-        Me.Hauptdiagramm = New IHWB.EVO.Diagramm.Hauptdiagramm
+        Me.Hauptdiagramm1 = New IHWB.EVO.Diagramm.Hauptdiagramm
         MenuStrip1 = New System.Windows.Forms.MenuStrip
         MenuItem_Tools = New System.Windows.Forms.ToolStripMenuItem
         ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator
@@ -238,8 +238,8 @@ Partial Class Form1
         '
         '
         '
-        Me.Indicatordiagramm.Aspect.View3D = False
-        Me.Indicatordiagramm.Aspect.ZOffset = 0
+        Me.Indicatordiagramm1.Aspect.View3D = False
+        Me.Indicatordiagramm1.Aspect.ZOffset = 0
         '
         '
         '
@@ -252,11 +252,11 @@ Partial Class Form1
         '
         '
         '
-        Me.Indicatordiagramm.Axes.Bottom.Labels.Font.Size = 6
-        Me.Indicatordiagramm.Axes.Bottom.Labels.Font.SizeFloat = 6.0!
-        Me.Indicatordiagramm.Axes.Bottom.Labels.Style = Steema.TeeChart.AxisLabelStyle.Value
-        Me.Indicatordiagramm.Axes.Bottom.MaximumOffset = 3
-        Me.Indicatordiagramm.Axes.Bottom.MinimumOffset = 3
+        Me.Indicatordiagramm1.Axes.Bottom.Labels.Font.Size = 6
+        Me.Indicatordiagramm1.Axes.Bottom.Labels.Font.SizeFloat = 6.0!
+        Me.Indicatordiagramm1.Axes.Bottom.Labels.Style = Steema.TeeChart.AxisLabelStyle.Value
+        Me.Indicatordiagramm1.Axes.Bottom.MaximumOffset = 3
+        Me.Indicatordiagramm1.Axes.Bottom.MinimumOffset = 3
         '
         '
         '
@@ -266,33 +266,33 @@ Partial Class Form1
         '
         '
         '
-        Me.Indicatordiagramm.Axes.Left.Labels.Font.Size = 6
-        Me.Indicatordiagramm.Axes.Left.Labels.Font.SizeFloat = 6.0!
-        Me.Indicatordiagramm.Axes.Left.MaximumOffset = 3
-        Me.Indicatordiagramm.Axes.Left.MinimumOffset = 3
-        Me.Indicatordiagramm.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Indicatordiagramm1.Axes.Left.Labels.Font.Size = 6
+        Me.Indicatordiagramm1.Axes.Left.Labels.Font.SizeFloat = 6.0!
+        Me.Indicatordiagramm1.Axes.Left.MaximumOffset = 3
+        Me.Indicatordiagramm1.Axes.Left.MinimumOffset = 3
+        Me.Indicatordiagramm1.Cursor = System.Windows.Forms.Cursors.Default
         '
         '
         '
-        Me.Indicatordiagramm.Header.Visible = False
+        Me.Indicatordiagramm1.Header.Visible = False
         '
         '
         '
-        Me.Indicatordiagramm.Legend.Visible = False
-        Me.Indicatordiagramm.Location = New System.Drawing.Point(241, 582)
-        Me.Indicatordiagramm.Name = "Indicatordiagramm"
+        Me.Indicatordiagramm1.Legend.Visible = False
+        Me.Indicatordiagramm1.Location = New System.Drawing.Point(241, 582)
+        Me.Indicatordiagramm1.Name = "Indicatordiagramm"
         '
         '
         '
-        Me.Indicatordiagramm.Panel.MarginTop = 20
+        Me.Indicatordiagramm1.Panel.MarginTop = 20
         '
         '
         '
-        Me.Indicatordiagramm.Panning.Allow = Steema.TeeChart.ScrollModes.None
-        Me.Indicatordiagramm.Size = New System.Drawing.Size(473, 70)
-        Me.Indicatordiagramm.TabIndex = 7
-        Me.ToolTip1.SetToolTip(Me.Indicatordiagramm, "Hypervolumen")
-        Me.Indicatordiagramm.Visible = False
+        Me.Indicatordiagramm1.Panning.Allow = Steema.TeeChart.ScrollModes.None
+        Me.Indicatordiagramm1.Size = New System.Drawing.Size(473, 70)
+        Me.Indicatordiagramm1.TabIndex = 7
+        Me.ToolTip1.SetToolTip(Me.Indicatordiagramm1, "Hypervolumen")
+        Me.Indicatordiagramm1.Visible = False
         '
         'GroupBox_Anwendung
         '
@@ -428,21 +428,21 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm.Aspect.View3D = False
-        Me.Hauptdiagramm.Aspect.ZOffset = 0
-        Me.Hauptdiagramm.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Hauptdiagramm1.Aspect.View3D = False
+        Me.Hauptdiagramm1.Aspect.ZOffset = 0
+        Me.Hauptdiagramm1.Cursor = System.Windows.Forms.Cursors.Default
         '
         '
         '
-        Me.Hauptdiagramm.Header.Lines = New String() {"EVO.NET"}
-        Me.Hauptdiagramm.Location = New System.Drawing.Point(241, 86)
-        Me.Hauptdiagramm.Name = "Hauptdiagramm"
-        Me.Hauptdiagramm.Size = New System.Drawing.Size(473, 566)
-        Me.Hauptdiagramm.TabIndex = 17
+        Me.Hauptdiagramm1.Header.Lines = New String() {"EVO.NET"}
+        Me.Hauptdiagramm1.Location = New System.Drawing.Point(241, 86)
+        Me.Hauptdiagramm1.Name = "Hauptdiagramm"
+        Me.Hauptdiagramm1.Size = New System.Drawing.Size(473, 566)
+        Me.Hauptdiagramm1.TabIndex = 17
         '
         '
         '
-        Me.Hauptdiagramm.Walls.View3D = False
+        Me.Hauptdiagramm1.Walls.View3D = False
         '
         'Form1
         '
@@ -450,8 +450,8 @@ Partial Class Form1
         Me.AutoScroll = True
         Me.BackColor = System.Drawing.SystemColors.Control
         Me.ClientSize = New System.Drawing.Size(718, 792)
-        Me.Controls.Add(Me.Indicatordiagramm)
-        Me.Controls.Add(Me.Hauptdiagramm)
+        Me.Controls.Add(Me.Indicatordiagramm1)
+        Me.Controls.Add(Me.Hauptdiagramm1)
         Me.Controls.Add(Me.GroupBox_TChartButtons)
         Me.Controls.Add(MenuStrip1)
         Me.Controls.Add(Me.GroupBox_ErgebnisDB)
@@ -504,6 +504,4 @@ Partial Class Form1
     Friend WithEvents Button_TChart2PNG As System.Windows.Forms.Button
     Friend WithEvents Button_TChartSave As System.Windows.Forms.Button
     Friend WithEvents Button_TChart2Excel As System.Windows.Forms.Button
-    Friend WithEvents Indicatordiagramm As IHWB.EVO.Diagramm.Indicatordiagramm
-    Friend WithEvents Hauptdiagramm As IHWB.EVO.Diagramm.Hauptdiagramm
 End Class
