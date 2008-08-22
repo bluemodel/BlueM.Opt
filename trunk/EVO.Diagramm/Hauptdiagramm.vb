@@ -118,8 +118,14 @@
             Else
                 serie = Me.getSeriesPoint("Population " & (pop + 1).ToString(), , , , ColEach)
             End If
-            Call serie.Add(runde * Me.mEVO_Settings.PES.n_Gen * Me.mEVO_Settings.PES.n_Nachf + gen * Me.mEVO_Settings.PES.n_Nachf + nachf, ind.Penalties(0), ind.ID.ToString(), Farbe)
-
+            Select Case EVO.Common.Manager.Method
+                Case EVO.Common.METH_PES
+                    Call serie.Add(runde * Me.mEVO_Settings.PES.n_Gen * Me.mEVO_Settings.PES.n_Nachf + gen * Me.mEVO_Settings.PES.n_Nachf + nachf, ind.Penalties(0), ind.ID.ToString(), Farbe)
+                Case EVO.Common.METH_HYBRID, EVO.Common.METH_CES
+                    Call serie.Add(runde * Me.mEVO_Settings.CES.n_Generations * Me.mEVO_Settings.CES.n_Childs + gen * Me.mEVO_Settings.CES.n_Childs + nachf, ind.Penalties(0), ind.ID.ToString(), Farbe)
+                Case Else
+                    Throw New Exception("Für diese Methode Single Objective zeichnen nicht definiert")
+            End Select
         Else
             'MultiObjective
             'xxxxxxxxxxxxxx
