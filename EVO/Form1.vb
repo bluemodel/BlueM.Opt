@@ -2095,7 +2095,6 @@ Start_Evolutionsrunden:
                                     Achse.Title = Common.Manager.List_Ziele(i).Bezeichnung
                                     Achse.Automatic = True
                                     Achse.Maximum = 0
-                                    Achsen.Add(Achse)
                                     Exit For 'Abbruch nach erstem OptZiel
                                 End If
                             Next
