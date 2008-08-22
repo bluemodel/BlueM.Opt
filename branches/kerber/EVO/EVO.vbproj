@@ -1,7 +1,7 @@
 ﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{FF1D5494-1205-4F3E-BD65-ADB8C6BD04D4}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -85,6 +85,7 @@
     </Reference>
     <Reference Include="TeeChart, Version=3.5.3146.24806, Culture=neutral, PublicKeyToken=9c8126276c77bdb7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\EVO.Diagramm\bin\Debug\TeeChart.dll</HintPath>
     </Reference>
     <ProjectReference Include="..\..\EVO.MO_Indicators\MO_Indicators\EVO.MO_Indicators.csproj">
       <Project>{A56DFA12-8680-4C7A-B6BB-406D4D3FE156}</Project>
@@ -113,7 +114,7 @@
     <ProjectReference Include="..\EVO.HybridAlgo\EVO.HybridAlgo.csproj">
       <Project>{85403900-E545-4122-B1A0-8C30AE0D0F3C}</Project>
       <Name>EVO.HybridAlgo</Name>
-	 </ProjectReference>
+    </ProjectReference>
     <ProjectReference Include="..\EVO.Diagramm\EVO.Diagramm.vbproj">
       <Project>{4382061B-F0DF-4D7D-9A09-306C940D19A5}</Project>
       <Name>EVO.Diagramm</Name>

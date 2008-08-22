@@ -62,6 +62,9 @@ Partial Class Form1
     Private WithEvents solutionDialog As SolutionDialog
     Private WithEvents scatterplot1 As EVO.Diagramm.Scatterplot
 
+    'TeeChart-Digramm
+    Private HauptDiagramm1 As EVO.Diagramm.Hauptdiagramm
+
 #End Region 'Eigenschaften
 
 #Region "Methoden"
@@ -734,6 +737,9 @@ Partial Class Form1
                 Me.Button_Scatterplot.Enabled = True
                 Me.Button_loadRefResult.Enabled = True
             End If
+
+            'TeeChart instanziieren
+
 
             'EVO_Einstellungen temporär speichern
             Dim dir As String
