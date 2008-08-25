@@ -1930,6 +1930,12 @@ Start_Evolutionsrunden:
     'Diagrammfunktionen
     '###################
 
+    'Hauptdiagramm bearbeiten
+    '************************
+    Private Sub Button_TChartEdit_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_TChartEdit.Click
+        Call Me.Hauptdiagramm1.TChartEdit(sender, e)
+    End Sub
+
     'Chart nach Excel exportieren
     '****************************
     Private Sub TChart2Excel(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_TChart2Excel.Click
