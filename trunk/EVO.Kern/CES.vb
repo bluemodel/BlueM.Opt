@@ -857,7 +857,7 @@ Public Class CES
     Private Sub Memory_Delete_too_weak(ByRef PES_Parents_pChild() As Individuum_CES)
 
         Dim i As Integer
-        Dim Tmp(-1) As Individuum
+        Dim Tmp(-1) As Individuum_CES
 
         For i = 0 To PES_Parents_pChild.GetUpperBound(0)
 
@@ -883,12 +883,10 @@ Public Class CES
                     End If
             End Select
         Next
-        
-        ReDim PES_Parents_pChild(Tmp.GetUpperBound(0))
-        For i = 0 to Tmp.GetUpperBound(0)
-            PES_Parents_pChild(i) = Tmp(i).Clone
-        Next
 
+        'Tmp zurück nach PES_Parents_pChild kopieren
+        PES_Parents_pChild = Individuum_CES.Clone_Indi_Array(Tmp)
+        
     End Sub
 
     'Durchsucht des PES_Perent_pChild - Der PES_Parantsatz für jede Location wird hier ermittelt
