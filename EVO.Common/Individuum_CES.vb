@@ -273,4 +273,28 @@
         Return ind
     End Function
 
+#Region "Shared"
+
+    ''' <summary>
+    ''' Kopiert ein Array von CES-Individuen
+    ''' </summary>
+    ''' <param name="Source">zu kopierendes Array von CES-Individuen</param>
+    ''' <returns>Array von CES-Individuen</returns>
+    Public Overloads Shared Function Clone_Indi_Array(ByVal Source() As Individuum_CES) As Individuum_CES()
+
+        Dim i As Integer
+        Dim ClonedArray() As Individuum_CES
+
+        ReDim ClonedArray(Source.GetUpperBound(0))
+
+        For i = 0 To Source.GetUpperBound(0)
+            ClonedArray(i) = Source(i).Clone()
+        Next
+
+        Return ClonedArray
+
+    End Function
+
+#End Region 'Shared
+
 End Class
