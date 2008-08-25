@@ -213,7 +213,6 @@
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
     <None Include="Resources\icon_png.png" />
-    <None Include="Resources\icon_edit.png" />
     <EmbeddedResource Include="AboutDialog.resx">
       <DependentUpon>AboutDialog.vb</DependentUpon>
       <SubType>Designer</SubType>
@@ -234,6 +233,7 @@
     <Content Include="RELEASE-NOTES.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\chart_curve_edit.png" />
     <None Include="Resources\database_connect.png" />
     <None Include="Resources\database_go.png" />
     <None Include="Resources\database_save.png" />

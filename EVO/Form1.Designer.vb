@@ -194,13 +194,12 @@ Partial Class Form1
         '
         'Button_TChartEdit
         '
-        Me.Button_TChartEdit.Image = Global.IHWB.EVO.My.Resources.Resources.icon_edit
+        Me.Button_TChartEdit.Image = Global.IHWB.EVO.My.Resources.Resources.chart_curve_edit
         Me.Button_TChartEdit.Location = New System.Drawing.Point(6, 19)
         Me.Button_TChartEdit.Name = "Button_TChartEdit"
         Me.Button_TChartEdit.Size = New System.Drawing.Size(25, 25)
         Me.Button_TChartEdit.TabIndex = 0
         Me.ToolTip1.SetToolTip(Me.Button_TChartEdit, "Diagramm bearbeiten")
-        Me.Button_TChartEdit.UseVisualStyleBackColor = True
         '
         'Button_TChart2PNG
         '
@@ -233,7 +232,7 @@ Partial Class Form1
         Me.ToolTip1.SetToolTip(Me.Button_TChart2Excel, "nach Excel exportieren")
         Me.Button_TChart2Excel.UseVisualStyleBackColor = False
         '
-        'Indicatordiagramm
+        'Indicatordiagramm1
         '
         '
         '
@@ -280,7 +279,7 @@ Partial Class Form1
         '
         Me.Indicatordiagramm1.Legend.Visible = False
         Me.Indicatordiagramm1.Location = New System.Drawing.Point(241, 582)
-        Me.Indicatordiagramm1.Name = "Indicatordiagramm"
+        Me.Indicatordiagramm1.Name = "Indicatordiagramm1"
         '
         '
         '
@@ -423,7 +422,7 @@ Partial Class Form1
         Me.GroupBox_TChartButtons.TabStop = False
         Me.GroupBox_TChartButtons.Text = "Diagramm"
         '
-        'Hauptdiagramm
+        'Hauptdiagramm1
         '
         '
         '
@@ -436,7 +435,7 @@ Partial Class Form1
         '
         Me.Hauptdiagramm1.Header.Lines = New String() {"EVO.NET"}
         Me.Hauptdiagramm1.Location = New System.Drawing.Point(241, 86)
-        Me.Hauptdiagramm1.Name = "Hauptdiagramm"
+        Me.Hauptdiagramm1.Name = "Hauptdiagramm1"
         Me.Hauptdiagramm1.Size = New System.Drawing.Size(473, 566)
         Me.Hauptdiagramm1.TabIndex = 17
         '
