@@ -60,7 +60,7 @@
         End Get
     End Property
 
-    'Gibt ein Array mit den DNs Parametern aller Locations zurück
+    'Gibt ein Array mit den DNs aller Locations zurück
     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     Public ReadOnly Property Get_All_Loc_PES_Dn() As Double()
         Get
@@ -75,6 +75,26 @@
                 Next
             Next
             Return Array
+        End Get
+
+    End Property
+
+    'Gibt das durchschnittliche DN zurück
+    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    Public ReadOnly Property Get_mean_PES_Dn As Double
+        Get
+            Dim n As Integer = 0
+            Dim sum As Double = 0
+            Dim i As Integer
+            Dim Dn_Mean As Double
+
+            n = me.Get_All_Loc_PES_Dn.GetLength(0)
+            For i = 0 to me.Get_All_Loc_PES_Dn.GetUpperBound(0)
+                sum = sum + Me.Get_All_Loc_PES_Dn(i)
+            Next
+            Dn_Mean = sum/n
+
+            Return Dn_Mean
         End Get
 
     End Property

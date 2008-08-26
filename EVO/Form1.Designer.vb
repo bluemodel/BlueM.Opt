@@ -64,8 +64,8 @@ Partial Class Form1
         Me.GroupBox_TChartButtons = New System.Windows.Forms.GroupBox
         Me.Hauptdiagramm1 = New IHWB.EVO.Diagramm.Hauptdiagramm
         Me.Info = New System.Windows.Forms.GroupBox
-        Me.Label_Dn = New System.Windows.Forms.Label
         Me.Label_Dn_Wert = New System.Windows.Forms.Label
+        Me.Label_Dn = New System.Windows.Forms.Label
         MenuStrip1 = New System.Windows.Forms.MenuStrip
         MenuItem_Tools = New System.Windows.Forms.ToolStripMenuItem
         ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator
@@ -458,6 +458,16 @@ Partial Class Form1
         Me.Info.TabStop = False
         Me.Info.Text = "Info"
         '
+        'Label_Dn_Wert
+        '
+        Me.Label_Dn_Wert.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.Label_Dn_Wert.AutoSize = True
+        Me.Label_Dn_Wert.ForeColor = System.Drawing.Color.Blue
+        Me.Label_Dn_Wert.Location = New System.Drawing.Point(3, 31)
+        Me.Label_Dn_Wert.Name = "Label_Dn_Wert"
+        Me.Label_Dn_Wert.Size = New System.Drawing.Size(0, 13)
+        Me.Label_Dn_Wert.TabIndex = 1
+        '
         'Label_Dn
         '
         Me.Label_Dn.AutoSize = True
@@ -466,17 +476,6 @@ Partial Class Form1
         Me.Label_Dn.Size = New System.Drawing.Size(24, 13)
         Me.Label_Dn.TabIndex = 0
         Me.Label_Dn.Text = "Dn:"
-        '
-        'Label_Dn_Wert
-        '
-        Me.Label_Dn_Wert.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.Label_Dn_Wert.AutoSize = True
-        Me.Label_Dn_Wert.ForeColor = System.Drawing.Color.Blue
-        Me.Label_Dn_Wert.Location = New System.Drawing.Point(3, 31)
-        Me.Label_Dn_Wert.Name = "Label_Dn_Wert"
-        Me.Label_Dn_Wert.Size = New System.Drawing.Size(47, 13)
-        Me.Label_Dn_Wert.TabIndex = 1
-        Me.Label_Dn_Wert.Text = "Dn Wert"
         '
         'Form1
         '
