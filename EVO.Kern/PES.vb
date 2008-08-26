@@ -31,14 +31,6 @@ Public Class PES
     '#########################################
 
     Private Settings As EVO_Settings
-
-    'Structure zum Speichern der Werte die aus den OptDateien generiert werden
-    Private Structure Struct_AktPara
-        Dim Dn() As Double                  'Schrittweitenvektor (Dimension varanz)
-        Dim Xn() As Double                  'aktuelle Variablenwerte (Dimension varanz)
-        Dim Bez() As Beziehung              'Beziehungen
-    End Structure
-
     Private AktPara() As OptParameter
 
     'Diese Struktur speichert den aktuellen Zustand
