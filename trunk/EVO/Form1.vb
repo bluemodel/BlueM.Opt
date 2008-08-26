@@ -1774,9 +1774,9 @@ Start_Evolutionsrunden:
                                 Sim1.WorkDir = Sim1.getWorkDir(Thread_Ready)
                                 Sim1.SIM_Ergebnis_auswerten(ind(Child_Ready))
 
-                                'Lösung zeichnen
+                                'Lösung zeichnen und Dn ausgeben
                                 Call Me.Hauptdiagramm1.ZeichneIndividuum(ind(Child_Ready), PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, Child_Ready, Color.Orange)
-
+                                Me.Label_Dn_Wert.Text = ind(Child_Ready).PES_OptParas(0).Dn.ToString.Substring(0, 8)
                                 'SELEKTIONSPROZESS Schritt 1
                                 '###########################
                                 'Einordnen der Qualitätsfunktion im Bestwertspeicher bei SO
