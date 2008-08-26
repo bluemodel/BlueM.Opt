@@ -110,7 +110,7 @@
             Farbe = System.Drawing.Color.Gray
         End If
 
-        If (Common.Manager.AnzPenalty = 1) Then
+        If (Common.Manager.NumPenalties = 1) Then
             'SingleObjective
             'xxxxxxxxxxxxxxx
             If (Not ind.Is_Feasible) Then
@@ -129,7 +129,7 @@
         Else
             'MultiObjective
             'xxxxxxxxxxxxxx
-            If (Common.Manager.AnzPenalty = 2) Then
+            If (Common.Manager.NumPenalties = 2) Then
                 '2D-Diagramm
                 '------------------------------------------------------------------------
                 If (Not ind.Is_Feasible) Then
@@ -165,7 +165,7 @@
         'Population in Array von Penalties transformieren
         values = Common.Individuum.Get_All_Penalty_of_Array(pop)
 
-        If (Common.Manager.AnzPenalty = 2) Then
+        If (Common.Manager.NumPenalties = 2) Then
             '2 Zielfunktionen
             '----------------------------------------------------------------
             serie = Me.getSeriesPoint("Sekundäre Population", "Green")
@@ -174,7 +174,7 @@
                 serie.Add(values(i, 0), values(i, 1))
             Next i
 
-        ElseIf (Common.Manager.AnzPenalty >= 3) Then
+        ElseIf (Common.Manager.NumPenalties >= 3) Then
             '3 oder mehr Zielfunktionen (es werden die ersten drei angezeigt)
             '----------------------------------------------------------------
             serie3D = Me.getSeries3DPoint("Sekundäre Population", "Green")
@@ -192,7 +192,7 @@
 
         Dim serie As Steema.TeeChart.Styles.Series
 
-        If (Common.Manager.AnzPenalty = 1) Then
+        If (Common.Manager.NumPenalties = 1) Then
             'SingleObjective
             'xxxxxxxxxxxxxxx
             serie = Me.getSeriesPoint("Population " & (pop + 1).ToString() & " (ungültig)", "Gray")
@@ -202,7 +202,7 @@
         Else
             'MultiObjective
             'xxxxxxxxxxxxxx
-            If (Common.Manager.AnzPenalty = 2) Then
+            If (Common.Manager.NumPenalties = 2) Then
                 '2D-Diagramm
                 '------------------------------------------------------------------------
                 serie = Me.getSeriesPoint("Population (ungültig)", "Gray")
@@ -235,33 +235,33 @@
 
         'X-Achse:
         If (Me.ZielIndexX <> -1) Then
-            If (Common.Manager.List_Ziele(Me.ZielIndexX).hasIstWert) Then
+            If (Common.Manager.List_Featurefunctions(Me.ZielIndexX).hasIstWert) Then
                 colorline1 = New Steema.TeeChart.Tools.ColorLine(Me.Chart)
                 colorline1.Pen.Color = System.Drawing.Color.Red
                 colorline1.AllowDrag = False
                 colorline1.Draw3D = True
                 colorline1.Axis = Me.Axes.Bottom
-                colorline1.Value = EVO.Common.Manager.List_Ziele(Me.ZielIndexX).IstWert
+                colorline1.Value = EVO.Common.Manager.List_Featurefunctions(Me.ZielIndexX).IstWert
             End If
         End If
 
         'Y-Achse:
         If (Me.ZielIndexY <> -1) Then
-            If (Common.Manager.List_Ziele(Me.ZielIndexY).hasIstWert) Then
+            If (Common.Manager.List_Featurefunctions(Me.ZielIndexY).hasIstWert) Then
                 colorline1 = New Steema.TeeChart.Tools.ColorLine(Me.Chart)
                 colorline1.Pen.Color = System.Drawing.Color.Red
                 colorline1.AllowDrag = False
                 colorline1.Draw3D = True
                 colorline1.Axis = Me.Axes.Left
-                colorline1.Value = Common.Manager.List_Ziele(Me.ZielIndexY).IstWert
+                colorline1.Value = Common.Manager.List_Featurefunctions(Me.ZielIndexY).IstWert
             End If
         End If
 
         'Z-Achse:
         If (Me.ZielIndexZ <> -1) Then
-            If (Common.Manager.List_Ziele(Me.ZielIndexZ).hasIstWert) Then
+            If (Common.Manager.List_Featurefunctions(Me.ZielIndexZ).hasIstWert) Then
                 'BUG 317: ColorLine auf Depth-Axis geht nicht!
-                MsgBox("Der IstWert auf der Z-Achse (" & Common.Manager.List_Ziele(Me.ZielIndexZ).Bezeichnung & ") kann leider nicht angezeigt werden (Bug 317)", MsgBoxStyle.Information, "Info")
+                MsgBox("Der IstWert auf der Z-Achse (" & Common.Manager.List_Featurefunctions(Me.ZielIndexZ).Bezeichnung & ") kann leider nicht angezeigt werden (Bug 317)", MsgBoxStyle.Information, "Info")
                 'colorline1 = New Steema.TeeChart.Tools.ColorLine(Me.Chart)
                 'colorline1.Pen.Color = System.Drawing.Color.Red
                 'colorline1.AllowDrag = False
@@ -277,7 +277,7 @@
     '**********************
     Public Sub ZeichneNadirpunkt(ByVal nadir() As Double)
 
-        If (Common.Manager.AnzPenalty = 2) Then
+        If (Common.Manager.NumPenalties = 2) Then
             '2D
             '--
             Dim serie2 As Steema.TeeChart.Styles.Points
@@ -322,10 +322,10 @@
             serie.Marks.ArrowLength = 10
             If (Me.ZielIndexX = -1) Then
                 'X-Achse ist Simulations-ID (Single-Objective)
-                serie.Add(ind.ID, ind.Zielwerte(Me.ZielIndexY), ind.ID.ToString())
+                serie.Add(ind.ID, ind.Features(Me.ZielIndexY), ind.ID.ToString())
             Else
                 'X- und Y-Achsen sind beides Zielwerte
-                serie.Add(ind.Zielwerte(Me.ZielIndexX), ind.Zielwerte(Me.ZielIndexY), ind.ID.ToString())
+                serie.Add(ind.Features(Me.ZielIndexX), ind.Features(Me.ZielIndexY), ind.ID.ToString())
             End If
 
         Else
@@ -333,7 +333,7 @@
             '-----------
             Dim serie3D As Steema.TeeChart.Styles.Points3D
             serie3D = Me.getSeries3DPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
-            serie3D.Add(ind.Zielwerte(Me.ZielIndexX), ind.Zielwerte(Me.ZielIndexY), ind.Zielwerte(Me.ZielIndexZ), ind.ID.ToString())
+            serie3D.Add(ind.Features(Me.ZielIndexX), ind.Features(Me.ZielIndexY), ind.Features(Me.ZielIndexZ), ind.ID.ToString())
             serie3D.Marks.Visible = True
             serie3D.Marks.Style = Steema.TeeChart.Styles.MarksStyles.Label
             serie3D.Marks.Transparency = 50

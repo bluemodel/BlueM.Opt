@@ -6,10 +6,10 @@ Public Class ScatterplotDialog
 
         'Listbox füllen
         Dim bezeichnung As String
-        For Each ziel As Common.Ziel In Common.Manager.List_Ziele
-            bezeichnung = ziel.Bezeichnung
-            'OptZiele mit Sternchen markieren
-            If (ziel.isOpt) Then bezeichnung &= " (*)"
+        For Each feature As Common.Featurefunction In Common.Manager.List_Featurefunctions
+            bezeichnung = feature.Bezeichnung
+            'Penalty-Functions mit Sternchen markieren
+            If (feature.isPenalty) Then bezeichnung &= " (*)"
             Me.CheckedListBox_Ziele.Items.Add(bezeichnung)
         Next
 
@@ -18,7 +18,7 @@ Public Class ScatterplotDialog
     Private Sub OK_Button_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_OK.Click
         'Mindestens 2 Ziele müssen ausgewählt sein
         If (Me.CheckedListBox_Ziele.CheckedIndices.Count < 2) Then
-            MsgBox("Bitte mindestens 2 Ziele auswählen!", MsgBoxStyle.Exclamation, "Fehler")
+            MsgBox("Bitte mindestens 2 Ziele auswählen!", MsgBoxStyle.Exclamation)
             Me.DialogResult = Windows.Forms.DialogResult.None
             Exit Sub
         End If

@@ -18,31 +18,31 @@ Public Module Manager
     'Eigenschaften
     '#############
 
-    Public Method As String                     'Optimierungsmethode
+    Public Method As String                             'Optimierungsmethode
 
-    Public List_Ziele() As Ziel                 'Liste der Zielfunktionen
-    Public List_Constraints() As Constraint     'Liste der Constraints
+    Public List_Featurefunctions() As Featurefunction           'Liste der Feature Functions
+    Public List_Constraintfunctions() As Constraintfunction     'Liste der Constraint Functions
 
     'Properties
     '##########
 
     'Gibt die Gesamtanzahl der Ziele zurück
     '**************************************
-    Public ReadOnly Property AnzZiele() As Integer
+    Public ReadOnly Property NumFeatures() As Integer
         Get
-            Return Manager.List_Ziele.Length
+            Return Manager.List_Featurefunctions.Length
         End Get
     End Property
 
-    'Gibt die Anzahl der OptimierungsZiele zurück
+    'Gibt die Anzahl der Penalty Functions zurück
     '********************************************
-    Public ReadOnly Property AnzPenalty() As Integer
+    Public ReadOnly Property NumPenalties() As Integer
         Get
             Dim n As Integer
 
             n = 0
-            For Each ziel As Ziel In Manager.List_Ziele
-                If (ziel.isOpt) Then n += 1
+            For Each feature As Featurefunction In Manager.List_Featurefunctions
+                If (feature.isPenalty) Then n += 1
             Next
 
             Return n
@@ -51,17 +51,17 @@ Public Module Manager
 
     'Gibt die OptimierungsZiele zurück
     '*********************************
-    Public ReadOnly Property List_OptZiele() As Ziel()
+    Public ReadOnly Property List_Penaltyfunctions() As Featurefunction()
         Get
             Dim i As Integer
-            Dim array() As Ziel
+            Dim array() As Featurefunction
 
-            ReDim array(Manager.AnzPenalty - 1)
+            ReDim array(Manager.NumPenalties - 1)
 
             i = 0
-            For Each ziel As Ziel In Manager.List_Ziele
-                If (ziel.isOpt) Then
-                    array(i) = ziel
+            For Each feature As Featurefunction In Manager.List_Featurefunctions
+                If (feature.isPenalty) Then
+                    array(i) = feature
                     i += 1
                 End If
             Next
@@ -72,9 +72,9 @@ Public Module Manager
 
     'Bibt die Anzahl Constraints zurück
     '**********************************
-    Public ReadOnly Property AnzConstraints() As Integer
+    Public ReadOnly Property NumConstraints() As Integer
         Get
-            Return Manager.List_Constraints.Length
+            Return Manager.List_Constraintfunctions.Length
         End Get
     End Property
 

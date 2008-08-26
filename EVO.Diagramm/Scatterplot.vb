@@ -75,26 +75,26 @@ Partial Public Class Scatterplot
             If (Me.SekPopOnly) Then
                 'Nur Sekundäre Population
                 For Each ind As Common.Individuum In Me.OptResult.getSekPop()
-                    min(i) = Math.Min(ind.Zielwerte(Me.Zielauswahl(i)), min(i))
-                    max(i) = Math.Max(ind.Zielwerte(Me.Zielauswahl(i)), max(i))
+                    min(i) = Math.Min(ind.Features(Me.Zielauswahl(i)), min(i))
+                    max(i) = Math.Max(ind.Features(Me.Zielauswahl(i)), max(i))
                 Next
             Else
                 'Alle Lösungen
                 For Each ind As Common.Individuum In Me.OptResult.Solutions
-                    min(i) = Math.Min(ind.Zielwerte(Me.Zielauswahl(i)), min(i))
-                    max(i) = Math.Max(ind.Zielwerte(Me.Zielauswahl(i)), max(i))
+                    min(i) = Math.Min(ind.Features(Me.Zielauswahl(i)), min(i))
+                    max(i) = Math.Max(ind.Features(Me.Zielauswahl(i)), max(i))
                 Next
             End If
             'IstWerte
-            If (Common.Manager.List_Ziele(Me.Zielauswahl(i)).hasIstWert) Then
-                min(i) = Math.Min(Common.Manager.List_Ziele(Me.Zielauswahl(i)).IstWert, min(i))
-                max(i) = Math.Max(Common.Manager.List_Ziele(Me.Zielauswahl(i)).IstWert, max(i))
+            If (Common.Manager.List_Featurefunctions(Me.Zielauswahl(i)).hasIstWert) Then
+                min(i) = Math.Min(Common.Manager.List_Featurefunctions(Me.Zielauswahl(i)).IstWert, min(i))
+                max(i) = Math.Max(Common.Manager.List_Featurefunctions(Me.Zielauswahl(i)).IstWert, max(i))
             End If
             'Vergleichsergebnis
             If (Me.ShowRef) Then
                 For Each ind As Common.Individuum In Me.OptResultRef.getSekPop()
-                    min(i) = Math.Min(ind.Zielwerte(Me.Zielauswahl(i)), min(i))
-                    max(i) = Math.Max(ind.Zielwerte(Me.Zielauswahl(i)), max(i))
+                    min(i) = Math.Min(ind.Features(Me.Zielauswahl(i)), min(i))
+                    max(i) = Math.Max(ind.Features(Me.Zielauswahl(i)), max(i))
                 Next
             End If
 
@@ -124,8 +124,8 @@ Partial Public Class Scatterplot
                     'Achsen
                     '------
                     'Titel
-                    xAchse = Common.Manager.List_Ziele(Me.Zielauswahl(i)).Bezeichnung
-                    yAchse = Common.Manager.List_Ziele(Me.Zielauswahl(j)).Bezeichnung
+                    xAchse = Common.Manager.List_Featurefunctions(Me.Zielauswahl(i)).Bezeichnung
+                    yAchse = Common.Manager.List_Featurefunctions(Me.Zielauswahl(j)).Bezeichnung
 
                     .Axes.Bottom.Title.Caption = xAchse
                     .Axes.Left.Title.Caption = yAchse
@@ -185,7 +185,7 @@ Partial Public Class Scatterplot
                         '------------------------
                         serie = .getSeriesPoint(xAchse & ", " & yAchse, "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         For Each ind As Common.Individuum In Me.OptResult.getSekPop()
-                            serie.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID.ToString())
+                            serie.Add(ind.Features(Me.Zielauswahl(i)), ind.Features(Me.Zielauswahl(j)), ind.ID.ToString())
                         Next
                     Else
                         'Alle Lösungen
@@ -196,17 +196,17 @@ Partial Public Class Scatterplot
                             'Constraintverletzung prüfen
                             If (ind.Is_Feasible) Then
                                 'gültige Lösung Zeichnen
-                                serie.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID.ToString())
+                                serie.Add(ind.Features(Me.Zielauswahl(i)), ind.Features(Me.Zielauswahl(j)), ind.ID.ToString())
                             Else
                                 'ungültige Lösung zeichnen
-                                serie_inv.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID.ToString())
+                                serie_inv.Add(ind.Features(Me.Zielauswahl(i)), ind.Features(Me.Zielauswahl(j)), ind.ID.ToString())
                             End If
                         Next
                     End If
 
                     'IstWerte eintragen
                     '==================
-                    If (Common.Manager.List_Ziele(Me.Zielauswahl(i)).hasIstWert) Then
+                    If (Common.Manager.List_Featurefunctions(Me.Zielauswahl(i)).hasIstWert) Then
                         'X-Achse:
                         '--------
                         colorline1 = New Steema.TeeChart.Tools.ColorLine(.Chart)
@@ -214,10 +214,10 @@ Partial Public Class Scatterplot
                         colorline1.Axis = .Axes.Bottom
                         colorline1.AllowDrag = False
                         colorline1.NoLimitDrag = True
-                        colorline1.Value = Common.Manager.List_Ziele(Me.Zielauswahl(i)).IstWert
+                        colorline1.Value = Common.Manager.List_Featurefunctions(Me.Zielauswahl(i)).IstWert
                     End If
 
-                    If (Common.Manager.List_Ziele(Me.Zielauswahl(j)).hasIstWert) Then
+                    If (Common.Manager.List_Featurefunctions(Me.Zielauswahl(j)).hasIstWert) Then
                         'Y-Achse:
                         '--------
                         colorline1 = New Steema.TeeChart.Tools.ColorLine(.Chart)
@@ -225,7 +225,7 @@ Partial Public Class Scatterplot
                         colorline1.Axis = .Axes.Left
                         colorline1.AllowDrag = False
                         colorline1.NoLimitDrag = True
-                        colorline1.Value = Common.Manager.List_Ziele(Me.Zielauswahl(j)).IstWert
+                        colorline1.Value = Common.Manager.List_Featurefunctions(Me.Zielauswahl(j)).IstWert
 
                     End If
 
@@ -234,7 +234,7 @@ Partial Public Class Scatterplot
                     If (Me.ShowRef) Then
                         serie = .getSeriesPoint(xAchse & ", " & yAchse & " (Vergleichsergebnis)", "Blue", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         For Each ind As Common.Individuum In Me.OptResultRef.getSekPop()
-                            serie.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID & " (Vergleichsergebnis)")
+                            serie.Add(ind.Features(Me.Zielauswahl(i)), ind.Features(Me.Zielauswahl(j)), ind.ID & " (Vergleichsergebnis)")
                         Next
                     End If
 
@@ -349,7 +349,7 @@ Partial Public Class Scatterplot
 
                     'Roten Punkt zeichnen
                     serie = .getSeriesPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
-                    serie.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID.ToString())
+                    serie.Add(ind.Features(Me.Zielauswahl(i)), ind.Features(Me.Zielauswahl(j)), ind.ID.ToString())
 
                     'Mark anzeigen
                     serie.Marks.Visible = True

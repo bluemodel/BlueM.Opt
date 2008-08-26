@@ -473,8 +473,8 @@ Partial Class Form1
                     For i = 0 To Sim1.List_OptParameter.GetUpperBound(0)
                         Call SensiPlot1.ListBox_OptParameter_add(Sim1.List_OptParameter(i))
                     Next
-                    For Each optziel As Common.Ziel In Common.Manager.List_OptZiele
-                        Call SensiPlot1.ListBox_OptZiele_add(optziel)
+                    For Each penaltyfunction As Common.Featurefunction In Common.Manager.List_Penaltyfunctions
+                        Call SensiPlot1.ListBox_OptZiele_add(penaltyfunction)
                     Next
                     'Dialog anzeigen
                     Dim SensiPlotDiagResult As Windows.Forms.DialogResult
@@ -522,10 +522,10 @@ Partial Class Form1
                         Call Sim1.read_and_valid_INI_Files_PES()
 
                         'EVO_Einstellungen einrichten
-                        If (Common.Manager.AnzPenalty = 1) Then
+                        If (Common.Manager.NumPenalties = 1) Then
                             'Single-Objective
                             Call EVO_Einstellungen1.setStandard_PES(Common.Constants.EVO_MODUS.Single_Objective)
-                        ElseIf (Common.Manager.AnzPenalty > 1) Then
+                        ElseIf (Common.Manager.NumPenalties > 1) Then
                             'Multi-Objective
                             Call EVO_Einstellungen1.setStandard_PES(Common.Constants.EVO_MODUS.Multi_Objective)
                         End If
@@ -556,9 +556,9 @@ Partial Class Form1
                     Call Sim1.read_and_valid_INI_Files_PES()
 
                     'Kontrolle: Nur SO möglich!
-                    If (Common.Manager.AnzPenalty = 1) Then
+                    If (Common.Manager.NumPenalties = 1) Then
                         Call EVO_Einstellungen1.setStandard_HJ()
-                    ElseIf (Common.Manager.AnzPenalty > 1) Then
+                    ElseIf (Common.Manager.NumPenalties > 1) Then
                         Throw New Exception("Methode von Hook und Jeeves erlaubt nur SO-Optimierung!")
                     End If
 
@@ -616,11 +616,11 @@ Partial Class Form1
                     'Je nach Methode nur CES oder HYBRID
                     Call EVO_Einstellungen1.setStandard_CES()
 
-                    'Je nach Anzahl der OptZiele von MO auf SO umschalten PES
-                    If (Common.Manager.AnzPenalty = 1) Then
+                    'Je nach Anzahl der Penalties von MO auf SO umschalten PES
+                    If (Common.Manager.NumPenalties = 1) Then
                         'Single-Objective
                         Call EVO_Einstellungen1.setStandard_PES(Common.Constants.EVO_MODUS.Single_Objective)
-                    ElseIf (Common.Manager.AnzPenalty > 1) Then
+                    ElseIf (Common.Manager.NumPenalties > 1) Then
                         'Multi-Objective
                         Call EVO_Einstellungen1.setStandard_PES(Common.Constants.EVO_MODUS.Multi_Objective)
                     End If
@@ -938,16 +938,16 @@ Partial Class Form1
                 If (Anz_SensiPara = 1) Then
                     '1 Parameter
                     serie = Me.Hauptdiagramm1.getSeriesPoint("SensiPlot", "Orange")
-                    serie.Add(ind.Penalties(SensiPlot1.Selected_OptZiel), Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).RWert, n.ToString())
+                    serie.Add(ind.Penalties(SensiPlot1.Selected_Penaltyfunction), Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).RWert, n.ToString())
                 Else
                     '2 Parameter
-                    surface.Add(Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).RWert, ind.Penalties(SensiPlot1.Selected_OptZiel), Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).RWert, n.ToString())
+                    surface.Add(Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).RWert, ind.Penalties(SensiPlot1.Selected_Penaltyfunction), Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).RWert, n.ToString())
                 End If
 
                 'Simulationsergebnis in Wave laden
                 If (SensiPlot1.show_Wave) Then
                     'SimReihe auslesen
-                    SimReihe = Sim1.SimErgebnis(Common.Manager.List_OptZiele(SensiPlot1.Selected_OptZiel).SimGr)
+                    SimReihe = Sim1.SimErgebnis(Common.Manager.List_Penaltyfunctions(SensiPlot1.Selected_Penaltyfunction).SimGr)
                     'Lösungs-ID an Titel anhängen
                     SimReihe.Title += " (Lösung " & n.ToString() & ")"
                     'SimReihe zu Collection hinzufügen
@@ -1029,16 +1029,16 @@ Partial Class Form1
 
         'Hypervolumen instanzieren
         Dim Hypervolume As EVO.MO_Indicators.Indicators
-        Hypervolume = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(EVO.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, Common.Manager.AnzPenalty)
+        Hypervolume = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(EVO.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, Common.Manager.NumPenalties)
 
         'Datensätze für Multithreading kopieren
         If n_Threads > 1 Then
-            Call Sim1.coppyDatensatz(n_Threads)
+            Call Sim1.copyDatensatz(n_Threads)
         End If
 
         'CES initialisieren
         CES1 = New EVO.Kern.CES()
-        Call CES1.CESInitialise(EVO_Einstellungen1.Settings, Method, Sim1.CES_T_Modus, Common.Manager.AnzPenalty, Common.Manager.AnzConstraints, Sim1.List_Locations.GetLength(0), Sim1.VerzweigungsDatei.GetLength(0), Sim1.n_Combinations, Sim1.n_PathDimension)
+        Call CES1.CESInitialise(EVO_Einstellungen1.Settings, Method, Sim1.CES_T_Modus, Common.Manager.NumPenalties, Common.Manager.NumConstraints, Sim1.List_Locations.GetLength(0), Sim1.VerzweigungsDatei.GetLength(0), Sim1.n_Combinations, Sim1.n_PathDimension)
 
         'EVO_Verlauf zurücksetzen
         Call Me.EVO_Opt_Verlauf1.Initialisieren(1, 1, EVO_Einstellungen1.Settings.CES.n_Generations, EVO_Einstellungen1.Settings.CES.n_Childs)
@@ -1189,7 +1189,7 @@ Partial Class Form1
             'MO oder SO SELEKTIONSPROZESS oder NDSorting SELEKTION
             'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
             'BUG 259: CES: Punkt-Labels der Sekundärpopulation fehlen noch!
-            If (Common.Manager.AnzPenalty = 1) Then
+            If (Common.Manager.NumPenalties = 1) Then
                 'Sortieren der Kinden anhand der Qualität
                 Call CES1.Sort_Individuum(CES1.Childs)
                 'Selectionsprozess je nach "plus" oder "minus" Strategie
@@ -1283,7 +1283,7 @@ Partial Class Form1
         'Selection oder NDSorting für den PES Memory
         '*******************************************
         If CES1.PES_Memory.GetLength(0) > CES1.Settings.CES.n_PES_MemSize Then
-            If (Common.Manager.AnzPenalty = 1) Then
+            If (Common.Manager.NumPenalties = 1) Then
                 'Sortieren des PES_Memory anhande der Qualität
                 Call CES1.Sort_Individuum(CES1.PES_Memory)
                 'Kürzen des PES_Memory
@@ -1314,12 +1314,12 @@ Partial Class Form1
                     'Führt das Sortieren oder NDSorting für diesen Satz durch
                     '********************************************************
                     If CES1.PES_Parents_pLoc.GetLength(0) > CES1.Settings.PES.n_Eltern Then
-                        If (Common.Manager.AnzPenalty = 1) Then
+                        If (Common.Manager.NumPenalties = 1) Then
                             'Sortieren der Parents anhand der Qualität
                             Call CES1.Sort_Individuum(CES1.PES_Parents_pLoc)
                             'Kürzen der Parents
                             ReDim Preserve CES1.PES_Parents_pLoc(CES1.Settings.PES.n_Eltern - 1)
-                        Else 
+                        Else
                             Call CES1.NDSorting_PES_Parents_per_Loc(i_gen)
                         End If
                     End If
@@ -1360,7 +1360,7 @@ Partial Class Form1
 
                             'Schritte 1 - 3: PES wird initialisiert (Weiteres siehe dort ;-)
                             '**************************************************************
-                            Call PES1.PesInitialise(EVO_Einstellungen1.Settings, globalAnzPar, Common.Manager.AnzPenalty, Common.Manager.AnzConstraints, myPara, Method)
+                            Call PES1.PesInitialise(EVO_Einstellungen1.Settings, globalAnzPar, Common.Manager.NumPenalties, Common.Manager.NumConstraints, myPara, Method)
 
                             'Die PopulationsEltern des PES werden gefüllt
                             For m = 0 To CES1.PES_Parents_pLoc.GetUpperBound(0)
@@ -1442,8 +1442,8 @@ Partial Class Form1
         'Individuumsklasse wird initialisiert
         Call Common.Individuum_PES.Initialise(Me.globalAnzPar)
 
-        ReDim QNBest(Common.Manager.AnzPenalty - 1)
-        ReDim QBest(Common.Manager.AnzPenalty - 1)
+        ReDim QNBest(Common.Manager.NumPenalties - 1)
+        ReDim QBest(Common.Manager.NumPenalties - 1)
 
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
@@ -1637,11 +1637,11 @@ Partial Class Form1
 
         'Hypervolumen instanzieren
         Dim Hypervolume As EVO.MO_Indicators.Indicators
-        Hypervolume = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(EVO.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, Common.Manager.AnzPenalty)
+        Hypervolume = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(EVO.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, Common.Manager.NumPenalties)
 
         'Datensätze für Multithreading kopieren (nur Sim-Anwendungen)
         If (Me.Anwendung <> ANW_TESTPROBLEME And n_Threads > 1) Then
-            Call Sim1.coppyDatensatz(n_Threads)
+            Call Sim1.copyDatensatz(n_Threads)
         End If
 
         'Diagramm vorbereiten und initialisieren
@@ -1658,7 +1658,7 @@ Partial Class Form1
 
         'Schritte 1 - 3: ES wird initialisiert (Weiteres siehe dort ;-)
         '**************************************************************
-        Call PES1.PesInitialise(EVO_Einstellungen1.Settings, globalAnzPar, Common.Manager.AnzPenalty, Common.Manager.AnzConstraints, myPara, Method)
+        Call PES1.PesInitialise(EVO_Einstellungen1.Settings, globalAnzPar, Common.Manager.NumPenalties, Common.Manager.NumConstraints, myPara, Method)
 
         'Startwerte werden der Verlaufsanzeige zugewiesen
         Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
@@ -2015,7 +2015,7 @@ Start_Evolutionsrunden:
                             'Achsen:
                             '-------
                             'X-Achse = QWert
-                            Achse.Title = Common.Manager.List_OptZiele(SensiPlot1.Selected_OptZiel).Bezeichnung
+                            Achse.Title = Common.Manager.List_Penaltyfunctions(SensiPlot1.Selected_Penaltyfunction).Bezeichnung
                             Achse.Automatic = True
                             Achse.Maximum = 0
                             Achsen.Add(Achse)
@@ -2027,8 +2027,8 @@ Start_Evolutionsrunden:
 
                             'Achsenzuordnung
                             'BUG 327!
-                            For i = 0 To Common.Manager.AnzZiele - 1
-                                If (Common.Manager.List_Ziele(i).Bezeichnung = Common.Manager.List_OptZiele(SensiPlot1.Selected_OptZiel).Bezeichnung) Then
+                            For i = 0 To Common.Manager.NumFeatures - 1
+                                If (Common.Manager.List_Featurefunctions(i).Bezeichnung = Common.Manager.List_Penaltyfunctions(SensiPlot1.Selected_Penaltyfunction).Bezeichnung) Then
                                     Me.Hauptdiagramm1.ZielIndexX = i
                                     Exit For 'Abbruch
                                 End If
@@ -2048,7 +2048,7 @@ Start_Evolutionsrunden:
                             Achse.Maximum = 0
                             Achsen.Add(Achse)
                             'Y-Achse = QWert
-                            Achse.Title = Common.Manager.List_OptZiele(SensiPlot1.Selected_OptZiel).Bezeichnung
+                            Achse.Title = Common.Manager.List_Penaltyfunctions(SensiPlot1.Selected_Penaltyfunction).Bezeichnung
                             Achse.Automatic = True
                             Achse.Maximum = 0
                             Achsen.Add(Achse)
@@ -2061,8 +2061,8 @@ Start_Evolutionsrunden:
                             'Achsenzuordnung
                             'BUG 327!
                             Me.Hauptdiagramm1.ZielIndexX = -1
-                            For i = 0 To Common.Manager.AnzZiele - 1
-                                If (Common.Manager.List_Ziele(i).Bezeichnung = Common.Manager.List_OptZiele(SensiPlot1.Selected_OptZiel).Bezeichnung) Then
+                            For i = 0 To Common.Manager.NumFeatures - 1
+                                If (Common.Manager.List_Featurefunctions(i).Bezeichnung = Common.Manager.List_Penaltyfunctions(SensiPlot1.Selected_Penaltyfunction).Bezeichnung) Then
                                     Me.Hauptdiagramm1.ZielIndexY = i
                                     Exit For 'Abbruch
                                 End If
@@ -2080,7 +2080,7 @@ Start_Evolutionsrunden:
 
                         'Achsen:
                         '-------
-                        If (Common.Manager.AnzPenalty = 1) Then
+                        If (Common.Manager.NumPenalties = 1) Then
 
                             'Single-Objective
                             '================
@@ -2110,9 +2110,9 @@ Start_Evolutionsrunden:
 
                             'Y-Achse: erste (und einzige) Zielfunktion
                             '-----------------------------------------
-                            For i = 0 To Common.Manager.AnzZiele - 1
-                                If (Common.Manager.List_Ziele(i).isOpt) Then
-                                    Achse.Title = Common.Manager.List_Ziele(i).Bezeichnung
+                            For i = 0 To Common.Manager.NumFeatures - 1
+                                If (Common.Manager.List_Featurefunctions(i).isPenalty) Then
+                                    Achse.Title = Common.Manager.List_Featurefunctions(i).Bezeichnung
                                     Achse.Automatic = True
                                     Achse.Maximum = 0
                                     Exit For 'Abbruch nach erstem OptZiel
@@ -2134,9 +2134,9 @@ Start_Evolutionsrunden:
 
                             'für jedes OptZiel eine Achse hinzufügen
                             j = 0
-                            For i = 0 To Common.Manager.AnzZiele - 1
-                                If (Common.Manager.List_Ziele(i).isOpt) Then
-                                    Achse.Title = Common.Manager.List_Ziele(i).Bezeichnung
+                            For i = 0 To Common.Manager.NumFeatures - 1
+                                If (Common.Manager.List_Featurefunctions(i).isPenalty) Then
+                                    Achse.Title = Common.Manager.List_Featurefunctions(i).Bezeichnung
                                     Achse.Automatic = True
                                     Achse.Maximum = 0
                                     Achsen.Add(Achse)
@@ -2153,9 +2153,9 @@ Start_Evolutionsrunden:
                             Me.Hauptdiagramm1.ZielIndexZ = tmpZielindex(2)
 
                             'Warnung bei mehr als 3 OptZielen
-                            If (Common.Manager.AnzPenalty > 3) Then
-                                MsgBox("Die Anzahl der Optimierungsziele beträgt mehr als 3!" & eol _
-                                        & "Es werden nur die ersten drei Zielfunktionen im Hauptdiagramm angezeigt!", MsgBoxStyle.Information, "Info")
+                            If (Common.Manager.NumPenalties > 3) Then
+                                MsgBox("Die Anzahl der Penalty-Funktionen beträgt mehr als 3!" & eol _
+                                        & "Es werden nur die ersten drei Penalty-Funktionen im Hauptdiagramm angezeigt!", MsgBoxStyle.Information)
                             End If
 
                         End If
@@ -2172,7 +2172,7 @@ Start_Evolutionsrunden:
 
         'Bei MultiObjective zusätzlich: 
         '------------------------------
-        If (Common.Manager.AnzPenalty > 1 _
+        If (Common.Manager.NumPenalties > 1 _
             And EVO.Common.Manager.Method <> METH_SENSIPLOT) Then
 
             'Indicator-Diagramm initialisieren
@@ -2504,7 +2504,7 @@ Start_Evolutionsrunden:
                 System.Threading.Thread.Sleep(100)
                 Sim1.launchReady(0, isOK, 0)
             Loop
-            Call Sim1.WelDateiVerwursten()
+            Call Sim1.ReadSimResult()
 
             'Sonderfall IHA-Berechnung
             If (isIHA) Then
@@ -2521,13 +2521,13 @@ Start_Evolutionsrunden:
 
             'zu zeichnenden Reihen aus Liste der Ziele raussuchen
             '----------------------------------------------------
-            For Each ziel As Common.Ziel In Common.Manager.List_Ziele
+            For Each feature As Common.Featurefunction In Common.Manager.List_Featurefunctions
 
-                With ziel
+                With feature
 
                     'Referenzreihe in Wave laden
                     '---------------------------
-                    If (.ZielTyp = "Reihe" Or .ZielTyp = "IHA") Then
+                    If (.Typ = "Reihe" Or .Typ = "IHA") Then
                         'Referenzreihen nur jeweils ein Mal zeichnen
                         If (Not RefSeries.Contains(.RefReiheDatei & .RefGr)) Then
                             RefSeries.Add(.RefGr, .RefReiheDatei & .RefGr)
@@ -2646,20 +2646,20 @@ Start_Evolutionsrunden:
                     tmpAchse.Title = "Simulation"
                     Achsen.Add(tmpAchse)
                     'Y-Achse
-                    tmpAchse.Title = Common.Manager.List_Ziele(Me.Hauptdiagramm1.ZielIndexX).Bezeichnung
+                    tmpAchse.Title = Common.Manager.List_Featurefunctions(Me.Hauptdiagramm1.ZielIndexX).Bezeichnung
                     Achsen.Add(tmpAchse)
                 Else
                     'Multi-objective
                     '---------------
                     'X-Achse
-                    tmpAchse.Title = Common.Manager.List_Ziele(Me.Hauptdiagramm1.ZielIndexX).Bezeichnung
+                    tmpAchse.Title = Common.Manager.List_Featurefunctions(Me.Hauptdiagramm1.ZielIndexX).Bezeichnung
                     Achsen.Add(tmpAchse)
                     'Y-Achse
-                    tmpAchse.Title = Common.Manager.List_Ziele(Me.Hauptdiagramm1.ZielIndexY).Bezeichnung
+                    tmpAchse.Title = Common.Manager.List_Featurefunctions(Me.Hauptdiagramm1.ZielIndexY).Bezeichnung
                     Achsen.Add(tmpAchse)
                     If (Not Me.Hauptdiagramm1.ZielIndexZ = -1) Then
                         'Z-Achse
-                        tmpAchse.Title = Common.Manager.List_Ziele(Me.Hauptdiagramm1.ZielIndexZ).Bezeichnung
+                        tmpAchse.Title = Common.Manager.List_Featurefunctions(Me.Hauptdiagramm1.ZielIndexZ).Bezeichnung
                         Achsen.Add(tmpAchse)
                     End If
                 End If
@@ -2695,7 +2695,7 @@ Start_Evolutionsrunden:
                                 serie = Me.Hauptdiagramm1.getSeriesPoint("Population (ungültig)", "Gray")
                             End If
                             'Zeichnen
-                            serie.Add(ind.ID, ind.Zielwerte(Me.Hauptdiagramm1.ZielIndexX), ind.ID.ToString())
+                            serie.Add(ind.ID, ind.Features(Me.Hauptdiagramm1.ZielIndexX), ind.ID.ToString())
                         ElseIf (Me.Hauptdiagramm1.ZielIndexZ = -1) Then
                             '2D
                             '--
@@ -2706,7 +2706,7 @@ Start_Evolutionsrunden:
                                 serie = Me.Hauptdiagramm1.getSeriesPoint("Population (ungültig)", "Gray")
                             End If
                             'Zeichnen
-                            serie.Add(ind.Zielwerte(Me.Hauptdiagramm1.ZielIndexX), ind.Zielwerte(Me.Hauptdiagramm1.ZielIndexY), ind.ID.ToString())
+                            serie.Add(ind.Features(Me.Hauptdiagramm1.ZielIndexX), ind.Features(Me.Hauptdiagramm1.ZielIndexY), ind.ID.ToString())
                         Else
                             '3D
                             '--
@@ -2717,7 +2717,7 @@ Start_Evolutionsrunden:
                                 serie3D = Me.Hauptdiagramm1.getSeries3DPoint("Population (ungültig)", "Gray")
                             End If
                             'Zeichnen
-                            serie3D.Add(ind.Zielwerte(Me.Hauptdiagramm1.ZielIndexX), ind.Zielwerte(Me.Hauptdiagramm1.ZielIndexY), ind.Zielwerte(Me.Hauptdiagramm1.ZielIndexZ), ind.ID.ToString())
+                            serie3D.Add(ind.Features(Me.Hauptdiagramm1.ZielIndexX), ind.Features(Me.Hauptdiagramm1.ZielIndexY), ind.Features(Me.Hauptdiagramm1.ZielIndexZ), ind.ID.ToString())
                         End If
 
                     Next
@@ -2735,12 +2735,12 @@ Start_Evolutionsrunden:
                             '2D
                             '--
                             serie = Me.Hauptdiagramm1.getSeriesPoint("Sekundäre Population", "Green")
-                            serie.Add(sekpopind.Zielwerte(Me.Hauptdiagramm1.ZielIndexX), sekpopind.Zielwerte(Me.Hauptdiagramm1.ZielIndexY), sekpopind.ID.ToString())
+                            serie.Add(sekpopind.Features(Me.Hauptdiagramm1.ZielIndexX), sekpopind.Features(Me.Hauptdiagramm1.ZielIndexY), sekpopind.ID.ToString())
                         Else
                             '3D
                             '--
                             serie3D = Me.Hauptdiagramm1.getSeries3DPoint("Sekundäre Population", "Green")
-                            serie3D.Add(sekpopind.Zielwerte(Me.Hauptdiagramm1.ZielIndexX), sekpopind.Zielwerte(Me.Hauptdiagramm1.ZielIndexY), sekpopind.Zielwerte(Me.Hauptdiagramm1.ZielIndexZ), sekpopind.ID.ToString())
+                            serie3D.Add(sekpopind.Features(Me.Hauptdiagramm1.ZielIndexX), sekpopind.Features(Me.Hauptdiagramm1.ZielIndexY), sekpopind.Features(Me.Hauptdiagramm1.ZielIndexZ), sekpopind.ID.ToString())
                         End If
                     Next
 
@@ -2758,7 +2758,7 @@ Start_Evolutionsrunden:
 
                     'Hypervolumen instanzieren
                     Dim Hypervolume As EVO.MO_Indicators.Indicators
-                    Hypervolume = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(EVO.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, Common.Manager.AnzPenalty)
+                    Hypervolume = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(EVO.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, Common.Manager.NumPenalties)
                     Dim indicator As Double
                     Dim nadir() As Double
 
@@ -2831,12 +2831,12 @@ Start_Evolutionsrunden:
                     '2D
                     '--
                     serie = Me.Hauptdiagramm1.getSeriesPoint("Vergleichsergebnis", "Blue")
-                    serie.Add(sekpopind.Zielwerte(Me.Hauptdiagramm1.ZielIndexX), sekpopind.Zielwerte(Me.Hauptdiagramm1.ZielIndexY), "Vergleichsergebnis " & sekpopind.ID)
+                    serie.Add(sekpopind.Features(Me.Hauptdiagramm1.ZielIndexX), sekpopind.Features(Me.Hauptdiagramm1.ZielIndexY), "Vergleichsergebnis " & sekpopind.ID)
                 Else
                     '3D
                     '--
                     serie3D = Me.Hauptdiagramm1.getSeries3DPoint("Vergleichsergebnis", "Blue")
-                    serie3D.Add(sekpopind.Zielwerte(Me.Hauptdiagramm1.ZielIndexX), sekpopind.Zielwerte(Me.Hauptdiagramm1.ZielIndexY), sekpopind.Zielwerte(Me.Hauptdiagramm1.ZielIndexZ), sekpopind.ID & " (Vergleichsergebnis)")
+                    serie3D.Add(sekpopind.Features(Me.Hauptdiagramm1.ZielIndexX), sekpopind.Features(Me.Hauptdiagramm1.ZielIndexY), sekpopind.Features(Me.Hauptdiagramm1.ZielIndexZ), sekpopind.ID & " (Vergleichsergebnis)")
                 End If
             Next
 
@@ -2850,9 +2850,9 @@ Start_Evolutionsrunden:
             Dim indicatorDiff, indicatorRef As Double
 
             'Vorbereitungen
-            ReDim nadir(Common.Manager.AnzPenalty - 1)
-            ReDim minmax(Common.Manager.AnzPenalty - 1)
-            For i = 0 To Common.Manager.AnzPenalty - 1
+            ReDim nadir(Common.Manager.NumPenalties - 1)
+            ReDim minmax(Common.Manager.NumPenalties - 1)
+            For i = 0 To Common.Manager.NumPenalties - 1
                 nadir(i) = 0
                 minmax(i) = False
             Next

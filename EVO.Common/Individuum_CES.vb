@@ -190,12 +190,12 @@
 
         Dim Dest As New Individuum_CES(Me.mType, Me.ID)
 
-        'Zielfunktionswerte
-        Call Array.Copy(Me.Zielwerte, Dest.Zielwerte, Me.Zielwerte.Length)
+        'Feature-Werte
+        Call Array.Copy(Me.Features, Dest.Features, Me.Features.Length)
 
-        'Werte der Randbedingungen
-        If (Not Me.Constrain.GetLength(0) = -1) Then
-            Array.Copy(Me.Constrain, Dest.Constrain, Me.Constrain.Length)
+        'Constraint-Werte
+        If (Not Me.Constraints.GetLength(0) = -1) Then
+            Array.Copy(Me.Constraints, Dest.Constraints, Me.Constraints.Length)
         End If
 
         'Kennzeichnung ob Dominiert

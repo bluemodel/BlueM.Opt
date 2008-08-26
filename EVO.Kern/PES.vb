@@ -1202,11 +1202,11 @@ StartMutation:
             'Multi-Objective Pareto
             '----------------------
             With NDSorting(PES_iAkt.iAktNachf)
-                For i = 0 To Manager.AnzZiele - 1
-                    .Zielwerte(i) = ind.Zielwerte(i)
+                For i = 0 To Manager.NumFeatures - 1
+                    .Features(i) = ind.Features(i)
                 Next i
                 For i = 0 To Anz.Constr - 1
-                    .Constrain(i) = ind.Constrain(i)
+                    .Constraints(i) = ind.Constraints(i)
                 Next i
                 .dominated = False
                 .Front = 0
@@ -1430,7 +1430,7 @@ StartMutation:
 
         If Anz.Constr > 0 Then
             For j = 0 To Anz.Constr - 1
-                Best.Rb(i, PES_iAkt.iAktPop, j) = Individ(i).Constrain(j)
+                Best.Rb(i, PES_iAkt.iAktPop, j) = Individ(i).Constraints(j)
             Next j
         End If
 
@@ -1453,17 +1453,17 @@ StartMutation:
         Dim i, j, v As Integer
 
         j = 0
-        For i = 0 To Manager.AnzZiele - 1
-            'HACK: Nur Zielwerte von OptZielen (d.h. Penalty) werden kopiert!
-            If (Manager.List_Ziele(i).isOpt) Then
-                Individ(i_indi).Zielwerte(i) = Best.Qb(i_best, PES_iAkt.iAktPop, j)
+        For i = 0 To Manager.NumFeatures - 1
+            'HACK: Nur Penalties werden kopiert!
+            If (Manager.List_Featurefunctions(i).isPenalty) Then
+                Individ(i_indi).Features(i) = Best.Qb(i_best, PES_iAkt.iAktPop, j)
                 j += 1
             End If
         Next i
 
         If Anz.Constr > 0 Then
             For j = 0 To Anz.Constr - 1
-                Individ(i_indi).Constrain(j) = Best.Rb(i_best, PES_iAkt.iAktPop, j)
+                Individ(i_indi).Constraints(j) = Best.Rb(i_best, PES_iAkt.iAktPop, j)
             Next j
         End If
 

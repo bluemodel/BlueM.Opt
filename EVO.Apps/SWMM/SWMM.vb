@@ -92,7 +92,7 @@ Public Class SWMM
 
     'Simulationsergebnis verarbeiten
     '-------------------------------
-    Public Overrides Sub WelDateiVerwursten()
+    Public Overrides Sub ReadSimResult()
 
     End Sub
 
@@ -169,19 +169,19 @@ Public Class SWMM
 
     'Berechnung des Qualitätswerts (Zielwert)
     '****************************************
-    Public Overrides Function QWert(ByVal ziel As Common.Ziel) As Double
+    Public Overrides Function CalculateFeature(ByVal feature As Common.Featurefunction) As Double
 
-        QWert = 0
+        CalculateFeature = 0
 
         Dim IsOK As Boolean
 
         'Fallunterscheidung Ergebnisdatei
         '--------------------------------
-        Select Case ziel.Datei
+        Select Case feature.Datei
 
             Case "RPT"
                 'SWMM-Ergebnisse aus RPT-Datei auslesen
-                QWert = QWert_RPT(ziel)
+                CalculateFeature = CalculateFeature_RPT(feature)
 
             Case Else
                 'es wurde eine nicht unterstützte Ergebnisdatei angegeben
@@ -194,11 +194,11 @@ Public Class SWMM
         End If
 
         'Zielrichtung berücksichtigen
-        QWert *= ziel.Richtung
+        CalculateFeature *= feature.Richtung
 
     End Function
 
-    Public Function QWert_RPT(ByVal OptZiel As Common.Ziel) As Double
+    Public Function CalculateFeature_RPT(ByVal feature As Common.Featurefunction) As Double
 
         Dim QWert As Double
         Dim FFreqEast As Double, FFreqGath As Double, FFreqWest As Double
