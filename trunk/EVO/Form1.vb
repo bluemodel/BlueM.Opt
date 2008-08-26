@@ -1141,12 +1141,11 @@ Partial Class Form1
                         Call CES1.Memory_Store(Child_Ready, i_gen)
                     End If
 
-                    'Lösung im TeeChart einzeichnen
-                    '==============================
-                    If (SIM_Eval_is_OK) Then
-                        Call Me.Hauptdiagramm1.ZeichneIndividuum(CES1.Childs(Child_Ready), 0, 0, i_gen, Child_Ready, ColorManagement(ColorArray, CES1.Childs(Child_Ready)))
-                    End If
-
+                    'Lösung im TeeChart einzeichnen und mittleres Dn ausgeben
+                    '========================================================
+                    Call Me.Hauptdiagramm1.ZeichneIndividuum(CES1.Childs(Child_Ready), 0, 0, i_gen, Child_Ready, ColorManagement(ColorArray, CES1.Childs(Child_Ready)))
+                    Me.Label_Dn_Wert.Text = Math.Round(CES1.Childs(Child_Ready).Get_mean_PES_Dn,6).ToString
+                    
                     System.Windows.Forms.Application.DoEvents()
                     Call EVO_Opt_Verlauf1.Nachfolger(Child_Ready + 1)
                     If Child_Ready = CES1.Settings.CES.n_Childs - 1 Then Ready = True
@@ -1776,7 +1775,8 @@ Start_Evolutionsrunden:
 
                                 'Lösung zeichnen und Dn ausgeben
                                 Call Me.Hauptdiagramm1.ZeichneIndividuum(ind(Child_Ready), PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, Child_Ready, Color.Orange)
-                                Me.Label_Dn_Wert.Text = ind(Child_Ready).PES_OptParas(0).Dn.ToString.Substring(0, 8)
+                                Me.Label_Dn_Wert.Text = Math.Round(ind(Child_Ready).PES_OptParas(0).Dn, 6).ToString
+                                
                                 'SELEKTIONSPROZESS Schritt 1
                                 '###########################
                                 'Einordnen der Qualitätsfunktion im Bestwertspeicher bei SO
