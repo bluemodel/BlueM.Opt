@@ -56,19 +56,19 @@ Partial Public Class SolutionDialog
 
         'Ziele
         '--------
-        For Each ziel As Common.Ziel In Common.Manager.List_Ziele
+        For Each feature As Common.Featurefunction In Common.Manager.List_Featurefunctions
             column = New DataGridViewTextBoxColumn()
-            If (ziel.isOpt) Then
+            If (feature.isPenalty) Then
                 cellstyle.BackColor = Color.LightGreen
-                column.HeaderText = ziel.Bezeichnung & " (*)"
+                column.HeaderText = feature.Bezeichnung & " (*)"
                 column.HeaderCell.ToolTipText = "OptZiel"
             Else
                 cellstyle.BackColor = Color.LightBlue
-                column.HeaderText = ziel.Bezeichnung
+                column.HeaderText = feature.Bezeichnung
                 column.HeaderCell.ToolTipText = "SekZiel"
             End If
             column.ReadOnly = True
-            column.Name = ziel.Bezeichnung
+            column.Name = feature.Bezeichnung
             column.DefaultCellStyle = cellstyle.Clone()
             Me.DataGridView1.Columns.Add(column)
         Next
@@ -77,7 +77,7 @@ Partial Public Class SolutionDialog
         '-----------
         cellstyle.BackColor = Color.LightCoral
 
-        For Each Constraint As Common.Constraint In Common.Manager.List_Constraints
+        For Each Constraint As Common.Constraintfunction In Common.Manager.List_Constraintfunctions
             column = New DataGridViewTextBoxColumn()
             column.ReadOnly = True
             column.HeaderText = Constraint.Bezeichnung
@@ -156,14 +156,14 @@ Partial Public Class SolutionDialog
         i = 1
 
         'Ziele
-        For Each qwert As Double In ind.Zielwerte
-            cellvalues(i) = qwert
+        For Each featurevalue As Double In ind.Features
+            cellvalues(i) = featurevalue
             i += 1
         Next
 
         'Constraints
-        For Each constraint As Double In ind.Constrain
-            cellvalues(i) = constraint
+        For Each constraintvalue As Double In ind.Constraints
+            cellvalues(i) = constraintvalue
             i += 1
         Next
 
@@ -203,14 +203,14 @@ Partial Public Class SolutionDialog
         i = 1
 
         'Ziele
-        For Each qwert As Double In ind.Zielwerte
-            cellvalues(i) = qwert
+        For Each featurevalue As Double In ind.Features
+            cellvalues(i) = featurevalue
             i += 1
         Next
 
         'Constraints
-        For Each constraint As Double In ind.Constrain
-            cellvalues(i) = constraint
+        For Each constraintvalue As Double In ind.Constraints
+            cellvalues(i) = constraintvalue
             i += 1
         Next
 

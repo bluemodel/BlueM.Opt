@@ -6,27 +6,27 @@ Public Class MDBImportDialog
 
         'Listboxen füllen
         Dim bezeichnung As String
-        For Each ziel As Common.Ziel In Common.Manager.List_Ziele
-            bezeichnung = ziel.Bezeichnung
-            'OptZiele mit Sternchen markieren
-            If (ziel.isOpt) Then bezeichnung &= " (*)"
+        For Each feature As Common.Featurefunction In Common.Manager.List_Featurefunctions
+            bezeichnung = feature.Bezeichnung
+            'Penalty-Funktionen mit Sternchen markieren
+            If (feature.isPenalty) Then bezeichnung &= " (*)"
             Me.ListBox_ZieleX.Items.Add(bezeichnung)
             Me.ListBox_ZieleY.Items.Add(bezeichnung)
             Me.ListBox_ZieleZ.Items.Add(bezeichnung)
         Next
 
         'Bei weniger als 3 Zielen Z-Achse ausblenden
-        If (Common.Manager.AnzZiele < 3) Then
+        If (Common.Manager.NumFeatures < 3) Then
             Me.ListBox_ZieleZ.Enabled = False
         End If
         'Bei weniger als 2 Zielen Y-Achse und SekPop-Optionen ausblenden
-        If (Common.Manager.AnzZiele < 2) Then
+        If (Common.Manager.NumFeatures < 2) Then
             Me.ListBox_ZieleY.Enabled = False
             Me.GroupBox_SekPop.Enabled = False
         End If
 
         'SekPop Combobox
-        If (Common.Manager.AnzPenalty < 2) Then
+        If (Common.Manager.NumPenalties < 2) Then
             Me.ComboBox_SekPop.SelectedIndex = 1
         Else
             Me.ComboBox_SekPop.SelectedIndex = 0

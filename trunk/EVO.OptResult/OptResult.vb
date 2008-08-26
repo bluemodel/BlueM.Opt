@@ -232,10 +232,10 @@ Public Class OptResult
 
         inds = Me.getSekPop(igen)
 
-        ReDim values(inds.GetUpperBound(0), Common.Manager.AnzPenalty - 1)
+        ReDim values(inds.GetUpperBound(0), Common.Manager.NumPenalties - 1)
 
         For i = 0 To inds.GetUpperBound(0)
-            For j = 0 To Common.Manager.AnzPenalty - 1
+            For j = 0 To Common.Manager.NumPenalties - 1
                 values(i, j) = inds(i).Penalties(j)
             Next
         Next
@@ -317,11 +317,11 @@ Public Class OptResult
         '----------------
         'Spalten festlegen:
         Dim fieldnames As String = ""
-        For i = 0 To Common.Manager.AnzZiele - 1
+        For i = 0 To Common.Manager.NumFeatures - 1
             If (i > 0) Then
                 fieldnames &= ", "
             End If
-            fieldnames &= "[" & Common.Manager.List_Ziele(i).Bezeichnung & "] DOUBLE"
+            fieldnames &= "[" & Common.Manager.List_Featurefunctions(i).Bezeichnung & "] DOUBLE"
         Next
         'Tabelle anpassen
         command.CommandText = "ALTER TABLE QWerte ADD COLUMN " & fieldnames
@@ -329,14 +329,14 @@ Public Class OptResult
 
         'Tabelle 'Constraints'
         '----------------
-        If (Common.Manager.AnzConstraints > 0) Then
+        If (Common.Manager.NumConstraints > 0) Then
             'Spalten festlegen:
             fieldnames = ""
-            For i = 0 To Common.Manager.AnzConstraints - 1
+            For i = 0 To Common.Manager.NumConstraints - 1
                 If (i > 0) Then
                     fieldnames &= ", "
                 End If
-                fieldnames &= "[" & Common.Manager.List_Constraints(i).Bezeichnung & "] DOUBLE"
+                fieldnames &= "[" & Common.Manager.List_Constraintfunctions(i).Bezeichnung & "] DOUBLE"
             Next
             'Tabelle anpassen
             command.CommandText = "ALTER TABLE [Constraints] ADD COLUMN " & fieldnames
@@ -442,21 +442,21 @@ Public Class OptResult
         '----------------
         Dim fieldnames As String = ""
         Dim fieldvalues As String = ""
-        For i = 0 To Common.Manager.AnzZiele - 1
-            fieldnames &= ", [" & Common.Manager.List_Ziele(i).Bezeichnung & "]"
-            fieldvalues &= ", " & ind.Zielwerte(i).ToString(Common.Provider.FortranProvider)
+        For i = 0 To Common.Manager.NumFeatures - 1
+            fieldnames &= ", [" & Common.Manager.List_Featurefunctions(i).Bezeichnung & "]"
+            fieldvalues &= ", " & ind.Features(i).ToString(Common.Provider.FortranProvider)
         Next
         command.CommandText = "INSERT INTO QWerte (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
         command.ExecuteNonQuery()
 
         'Constraints schreiben 
         '---------------------
-        If (Common.Manager.AnzConstraints > 0) Then
+        If (Common.Manager.NumConstraints > 0) Then
             fieldnames = ""
             fieldvalues = ""
-            For i = 0 To Common.Manager.AnzConstraints - 1
-                fieldnames &= ", [" & Common.Manager.List_Constraints(i).Bezeichnung & "]"
-                fieldvalues &= ", " & ind.Constrain(i).ToString(Common.Provider.FortranProvider)
+            For i = 0 To Common.Manager.NumConstraints - 1
+                fieldnames &= ", [" & Common.Manager.List_Constraintfunctions(i).Bezeichnung & "]"
+                fieldvalues &= ", " & ind.Constraints(i).ToString(Common.Provider.FortranProvider)
             Next
             command.CommandText = "INSERT INTO [Constraints] (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
             command.ExecuteNonQuery()
@@ -496,21 +496,21 @@ Public Class OptResult
         '----------------
         Dim fieldnames As String = ""
         Dim fieldvalues As String = ""
-        For i = 0 To Common.Manager.AnzZiele - 1
-            fieldnames &= ", [" & Common.Manager.List_Ziele(i).Bezeichnung & "]"
-            fieldvalues &= ", " & ind.Zielwerte(i).ToString(Common.Provider.FortranProvider)
+        For i = 0 To Common.Manager.NumFeatures - 1
+            fieldnames &= ", [" & Common.Manager.List_Featurefunctions(i).Bezeichnung & "]"
+            fieldvalues &= ", " & ind.Features(i).ToString(Common.Provider.FortranProvider)
         Next
         command.CommandText = "INSERT INTO QWerte (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
         command.ExecuteNonQuery()
 
         'Constraints schreiben 
         '---------------------
-        If (Common.Manager.AnzConstraints > 0) Then
+        If (Common.Manager.NumConstraints > 0) Then
             fieldnames = ""
             fieldvalues = ""
-            For i = 0 To Common.Manager.AnzConstraints - 1
-                fieldnames &= ", [" & Common.Manager.List_Constraints(i).Bezeichnung & "]"
-                fieldvalues &= ", " & ind.Constrain(i).ToString(Common.Provider.FortranProvider)
+            For i = 0 To Common.Manager.NumConstraints - 1
+                fieldnames &= ", [" & Common.Manager.List_Constraintfunctions(i).Bezeichnung & "]"
+                fieldvalues &= ", " & ind.Constraints(i).ToString(Common.Provider.FortranProvider)
             Next
             command.CommandText = "INSERT INTO [Constraints] (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
             command.ExecuteNonQuery()
@@ -579,8 +579,8 @@ Public Class OptResult
 
             'zugehörige Sim_ID bestimmen
             bedingung = ""
-            For j = 0 To Common.Manager.AnzPenalty - 1
-                bedingung &= " AND QWerte.[" & Common.Manager.List_OptZiele(j).Bezeichnung & "] = " & SekPop(i, j).ToString(Common.Provider.FortranProvider)
+            For j = 0 To Common.Manager.NumPenalties - 1
+                bedingung &= " AND QWerte.[" & Common.Manager.List_Penaltyfunctions(j).Bezeichnung & "] = " & SekPop(i, j).ToString(Common.Provider.FortranProvider)
             Next
             command.CommandText = "SELECT Sim.ID FROM Sim INNER JOIN QWerte ON Sim.ID = QWerte.Sim_ID WHERE (1=1" & bedingung & ")"
             Sim_ID = command.ExecuteScalar()
@@ -754,16 +754,16 @@ Public Class OptResult
 
                     'Constraints
                     '-----------
-                    For j = 0 To Common.Manager.AnzConstraints - 1
-                        .Constrain(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Constraints(j).Bezeichnung)
+                    For j = 0 To Common.Manager.NumConstraints - 1
+                        .Constraints(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Constraintfunctions(j).Bezeichnung)
                     Next
 
                 End If
 
                 'QWerte
                 '------
-                For j = 0 To Common.Manager.AnzZiele - 1
-                    .Zielwerte(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Ziele(j).Bezeichnung)
+                For j = 0 To Common.Manager.NumFeatures - 1
+                    .Features(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Featurefunctions(j).Bezeichnung)
                 Next
 
             End With
@@ -829,8 +829,8 @@ Public Class OptResult
 
                     'Constraints
                     '-----------
-                    For j = 0 To Common.Manager.AnzConstraints - 1
-                        .Constrain(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Constraints(j).Bezeichnung)
+                    For j = 0 To Common.Manager.NumConstraints - 1
+                        .Constraints(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Constraintfunctions(j).Bezeichnung)
                     Next
 
                     'Pfad
@@ -844,8 +844,8 @@ Public Class OptResult
 
                 'QWerte
                 '------
-                For j = 0 To Common.Manager.AnzZiele - 1
-                    .Zielwerte(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Ziele(j).Bezeichnung)
+                For j = 0 To Common.Manager.NumFeatures - 1
+                    .Features(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Featurefunctions(j).Bezeichnung)
                 Next
 
             End With

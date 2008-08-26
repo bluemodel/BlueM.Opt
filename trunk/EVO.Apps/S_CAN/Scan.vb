@@ -115,16 +115,16 @@ Public Class Scan
         
     'Simulationsergebnis verarbeiten
     '-------------------------------
-    Public Overrides Sub WelDateiVerwursten()
+    Public Overrides Sub ReadSimResult()
 
     End Sub
 
-    Public Overrides Function QWert(ByVal ziel As Common.Ziel) As Double
+    Public Overrides Function CalculateFeature(ByVal feature As Common.Featurefunction) As Double
 
-        QWert = QWert_Reihe(ziel, Me.SimErgebnis(ziel.SimGr))
+        CalculateFeature = CalculateFeature_Reihe(feature, Me.SimErgebnis(feature.SimGr))
 
         'Zielrichtung berücksichtigen
-        QWert *= ziel.Richtung
+        CalculateFeature *= feature.Richtung
 
     End Function
 

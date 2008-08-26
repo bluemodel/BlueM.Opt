@@ -54,9 +54,9 @@ Public Class IHAProcessor
 
     'QWert aus IHA-Ergebnissen berechnen
     '***********************************
-    Public Function QWert_IHA(ByVal OptZiel As Common.Ziel, ByVal RVAResult As Wave.RVA.Struct_RVAValues) As Double
+    Public Function CalculateFeature_IHA(ByVal OptZiel As Common.Featurefunction, ByVal RVAResult As Wave.RVA.Struct_RVAValues) As Double
 
-        Dim QWert As Double
+        Dim featurevalue As Double
         Dim i As Integer
         Dim RVAfx As Struct_RVAfx
 
@@ -71,45 +71,45 @@ Public Class IHAProcessor
                 '========================
                 Dim fx As Double
 
-                If (OptZiel.ZielFkt = "") Then
+                If (OptZiel.Funktion = "") Then
                     'fx(HA) Gesamtmittelwert
                     fx = RVAfx.All_Avg_fx
 
                 Else
                     'fx(HA) Mittelwert einer Parametergruppe
                     For i = 0 To RVAResult.NGroups - 1
-                        If (OptZiel.ZielFkt = RVAResult.IHAParamGroups(i).GName) Then
+                        If (OptZiel.Funktion = RVAResult.IHAParamGroups(i).GName) Then
                             fx = RVAfx.PGroup_Avg_fx(i)
                             Exit For
                         End If
                     Next
                 End If
 
-                QWert = 1 - fx
+                featurevalue = 1 - fx
 
             Case True
                 'RVA-Vergleich
                 '=============
                 Dim diff As Double
 
-                If (OptZiel.ZielFkt = "") Then
+                If (OptZiel.Funktion = "") Then
                     'fx(HA) Gesamtmittelwert
                     diff = RVAfx.All_Avg_fx - Me.RVAfxBase.All_Avg_fx
                 Else
                     'fx(HA) Mittelwert einer Parametergruppe
                     For i = 0 To RVAResult.NGroups - 1
-                        If (OptZiel.ZielFkt = RVAResult.IHAParamGroups(i).GName) Then
+                        If (OptZiel.Funktion = RVAResult.IHAParamGroups(i).GName) Then
                             diff = RVAfx.PGroup_Avg_fx(i) - Me.RVAfxBase.PGroup_Avg_fx(i)
                             Exit For
                         End If
                     Next
                 End If
 
-                QWert = (1 - diff) ^ 2
+                featurevalue = (1 - diff) ^ 2
 
         End Select
 
-        Return QWert
+        Return featurevalue
 
     End Function
 

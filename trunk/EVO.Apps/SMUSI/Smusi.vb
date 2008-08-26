@@ -212,15 +212,15 @@ Public Class Smusi
 
     'Simulationsergebnis verarbeiten
     '-------------------------------
-    Public Overrides Sub WelDateiVerwursten()
+    Public Overrides Sub ReadSimResult()
 
         Dim datei, element As String
         Dim ASCtmp As Wave.ASC
         Dim elemente As New Collection()
 
         'Einzulesende Dateien zusammenstellen
-        For Each ziel As Common.Ziel In Common.Manager.List_Ziele
-            element = ziel.SimGr.Substring(0, 4)
+        For Each feature As Common.Featurefunction In Common.Manager.List_Featurefunctions
+            element = feature.SimGr.Substring(0, 4)
             If (Not elemente.Contains(element)) Then
                 elemente.Add(element, element)
             End If
@@ -246,47 +246,47 @@ Public Class Smusi
 
     'Berechnung des Qualitätswerts (Zielwert)
     '****************************************
-    Public Overrides Function QWert(ByVal ziel As Common.Ziel) As Double
+    Public Overrides Function CalculateFeature(ByVal feature As Common.Featurefunction) As Double
 
-        QWert = 0
+        CalculateFeature = 0
 
         'Fallunterscheidung Ergebnisdatei
         '--------------------------------
-        Select Case ziel.Datei
+        Select Case feature.Datei
 
             Case "ASC"
                 'QWert aus ASC-Datei
-                QWert = QWert_ASC(ziel)
+                CalculateFeature = QWert_ASC(feature)
 
             Case Else
-                Throw New Exception("Der Wert '" & ziel.Datei & "' für die Datei wird bei Optimierungszielen für SMUSI nicht akzeptiert!")
+                Throw New Exception("Der Wert '" & feature.Datei & "' für die Datei wird bei Optimierungszielen für SMUSI nicht akzeptiert!")
 
         End Select
 
         'Zielrichtung berücksichtigen
-        QWert *= ziel.Richtung
+        CalculateFeature *= feature.Richtung
 
     End Function
 
     'Qualitätswert aus ASC-Datei
     '***************************
-    Private Function QWert_ASC(ByVal ziel As Common.Ziel) As Double
+    Private Function QWert_ASC(ByVal feature As Common.Featurefunction) As Double
 
         Dim QWert As Double
         Dim SimReihe As Wave.Zeitreihe
 
         'Simulationsergebnis auslesen
-        SimReihe = Me.SimErgebnis(ziel.SimGr)
+        SimReihe = Me.SimErgebnis(feature.SimGr)
 
         'Fallunterscheidung Zieltyp
         '--------------------------
-        Select Case ziel.ZielTyp
+        Select Case feature.Typ
 
             Case "Wert"
-                QWert = MyBase.QWert_Wert(ziel, SimReihe)
+                QWert = MyBase.CalculateFeature_Wert(feature, SimReihe)
 
             Case "Reihe"
-                QWert = MyBase.QWert_Reihe(ziel, SimReihe)
+                QWert = MyBase.CalculateFeature_Reihe(feature, SimReihe)
 
         End Select
 

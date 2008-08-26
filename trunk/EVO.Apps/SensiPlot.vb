@@ -16,7 +16,7 @@ Partial Public Class SensiPlot
     '*******************************************************************************
 
     Public Selected_OptParameter() As Integer
-    Public Selected_OptZiel As Integer
+    Public Selected_Penaltyfunction As Integer
     Public Selected_SensiType As String
     Public Anz_Steps As Integer
     Public show_Wave As Boolean
@@ -25,8 +25,8 @@ Partial Public Class SensiPlot
         ListBox_OptParameter.Items.Add(OptParameter)
     End Sub
 
-    Public Sub ListBox_OptZiele_add(ByVal ziel As Common.Ziel)
-        ListBox_OptZiele.Items.Add(ziel)
+    Public Sub ListBox_OptZiele_add(ByVal penaltyfunction As Common.Featurefunction)
+        ListBox_Penaltyfunctions.Items.Add(penaltyfunction)
     End Sub
 
     'Überprüfung und Anwendung der Einstellungen
@@ -36,7 +36,7 @@ Partial Public Class SensiPlot
         'OptParameter und OptZiel
         If (Me.ListBox_OptParameter.SelectedIndex = -1 _
                 Or Me.ListBox_OptParameter.SelectedIndices.Count > 2 _
-                Or Me.ListBox_OptZiele.SelectedIndex = -1) Then
+                Or Me.ListBox_Penaltyfunctions.SelectedIndex = -1) Then
             MsgBox("Bitte einen oder zwei OptParameter und ein OptZiel auswählen!", MsgBoxStyle.Exclamation, "Fehler")
             Me.DialogResult = Windows.Forms.DialogResult.None
             Exit Sub
@@ -53,7 +53,7 @@ Partial Public Class SensiPlot
             Me.Selected_OptParameter(i) = Me.ListBox_OptParameter.SelectedIndices(i)
         Next
         'OptZiel übergeben
-        Me.Selected_OptZiel = Me.ListBox_OptZiele.SelectedIndex
+        Me.Selected_Penaltyfunction = Me.ListBox_Penaltyfunctions.SelectedIndex
 
         'Modus
         If (Me.RadioButton_Gleichverteilt.Checked) Then
@@ -88,7 +88,7 @@ Partial Public Class SensiPlot
 
         'Überprüfung erfolgreich 
         Me.ListBox_OptParameter.Items.Clear()
-        Me.ListBox_OptZiele.Items.Clear()
+        Me.ListBox_Penaltyfunctions.Items.Clear()
 
     End Sub
 

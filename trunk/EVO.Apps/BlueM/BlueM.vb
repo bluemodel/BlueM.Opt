@@ -168,12 +168,12 @@ Public Class BlueM
 
         'BlueM-spezifische Weiterverarbeitung von ZielReihen:
         '====================================================
-        Dim ziel As Common.Ziel
+        Dim feature As Common.Featurefunction
 
         'KWL: Feststellen, ob irgendeine Zielfunktion die KWL-Datei benutzt
         '------------------------------------------------------------------
-        For Each ziel In Common.Manager.List_Ziele
-            If (ziel.Datei = "KWL") Then
+        For Each feature In Common.Manager.List_Featurefunctions
+            If (feature.Datei = "KWL") Then
                 Me.useKWL = True
                 Exit For
             End If
@@ -189,13 +189,13 @@ Public Class BlueM
         'Gibt es eine IHA-Zielfunktion?
         'HACK: es wird immer nur das erste IHA-Ziel verwendet!
         '------------------------------
-        For Each ziel In Common.Manager.List_Ziele
-            If (ziel.ZielTyp = "IHA") Then
+        For Each feature In Common.Manager.List_Featurefunctions
+            If (feature.Typ = "IHA") Then
                 'IHA-Berechnung einschalten
                 Me.isIHA = True
-                IHAZielReihe = ziel.RefReihe
-                IHAStart = ziel.EvalStart
-                IHAEnde = ziel.EvalEnde
+                IHAZielReihe = feature.RefReihe
+                IHAStart = feature.EvalStart
+                IHAEnde = feature.EvalEnde
                 Exit For
             End If
         Next
@@ -351,13 +351,13 @@ Public Class BlueM
         launchFree = False
 
         For Each Thr_C As CThread In My_C_Thread
-            If Thr_C.Sim_Is_OK = True and Thr_C.get_Child_ID = -1 then
+            If Thr_C.Sim_Is_OK = True And Thr_C.get_Child_ID = -1 Then
                 launchFree = True
                 Thread_ID = Thr_C.get_Thread_ID
                 Exit For
             End If
         Next
-        
+
     End Function
 
     'BlauesModell ausführen (simulieren)
@@ -367,17 +367,17 @@ Public Class BlueM
 
         launchSim = False
         Dim Folder As String
-                       
+
         Folder = getWorkDir(Thread_ID)
-        My_C_Thread(Thread_ID) = new CThread(Thread_ID, Child_ID, Folder, Datensatz, bluem_dll(Thread_ID))
-        MyThread(Thread_ID) = new Thread(AddressOf My_C_Thread(Thread_ID).Thread)
+        My_C_Thread(Thread_ID) = New CThread(Thread_ID, Child_ID, Folder, Datensatz, bluem_dll(Thread_ID))
+        MyThread(Thread_ID) = New Thread(AddressOf My_C_Thread(Thread_ID).Thread)
         MyThread(Thread_ID).IsBackground = True
         MyThread(Thread_ID).Start()
         launchSim = True
 
         Return launchSim
 
-    End function
+    End Function
 
     'Prüft ob des aktuelle Child mit der ID die oben übergeben wurde fertig ist
     'Gibt die Thread ID zurück um zum auswerten in das Arbeitsverzeichnis zu wechseln
@@ -386,13 +386,13 @@ Public Class BlueM
         launchReady = False
 
         For Each Thr_C As CThread In My_C_Thread
-            If Thr_C.launch_Ready = True And Thr_C.get_Child_ID = Child_ID then
+            If Thr_C.launch_Ready = True And Thr_C.get_Child_ID = Child_ID Then
                 launchReady = True
                 SimIsOK = Thr_C.Sim_Is_OK
                 Thread_ID = Thr_C.get_Thread_ID
-                MyThread(Thread_ID).Join
-                My_C_Thread(Thread_ID) = new CThread(Thread_ID, -1, "Folder", Datensatz, bluem_dll(Thread_ID))
-                My_C_Thread(Thread_ID).set_is_OK
+                MyThread(Thread_ID).Join()
+                My_C_Thread(Thread_ID) = New CThread(Thread_ID, -1, "Folder", Datensatz, bluem_dll(Thread_ID))
+                My_C_Thread(Thread_ID).set_is_OK()
             End If
         Next
 
@@ -400,8 +400,8 @@ Public Class BlueM
 
     'Simulationsergebnis verarbeiten
     '-------------------------------
-    Public Overrides Sub WelDateiVerwursten()
-    
+    Public Overrides Sub ReadSimResult()
+
         'Altes Simulationsergebnis löschen
         Me.SimErgebnis.Clear()
 
@@ -434,9 +434,9 @@ Public Class BlueM
         If (Me.isIHA) Then
             'IHA-Ziel raussuchen und Simulationsreihe übergeben
             'HACK: es wird immer das erste IHA-Ziel verwendet!
-            For Each ziel As Common.Ziel In Common.Manager.List_Ziele
-                If (ziel.ZielTyp = "IHA") Then
-                    Call Me.IHASys.calculate_IHA(Me.SimErgebnis(ziel.SimGr))
+            For Each feature As Common.Featurefunction In Common.Manager.List_Featurefunctions
+                If (feature.Typ = "IHA") Then
+                    Call Me.IHASys.calculate_IHA(Me.SimErgebnis(feature.SimGr))
                     Exit For
                 End If
             Next
@@ -450,63 +450,127 @@ Public Class BlueM
 
     'Berechnung des Qualitätswerts (Zielwert)
     '****************************************
-    Public Overrides Function QWert(ByVal ziel As Common.Ziel) As Double
+    Public Overrides Function CalculateFeature(ByVal feature As Common.Featurefunction) As Double
 
-        QWert = 0
+        CalculateFeature = 0
 
         'Fallunterscheidung Ergebnisdatei
         '--------------------------------
-        Select Case ziel.Datei
+        Select Case feature.Datei
 
             Case "WEL", "KWL"
                 'QWert aus WEL- oder KWL-Datei
-                QWert = QWert_WEL(ziel)
+                CalculateFeature = CalculateFeature_WEL(feature)
 
             Case "PRB"
                 'QWert aus PRB-Datei
                 'BUG 220: PRB geht nicht, weil keine Zeitreihe
                 Throw New Exception("PRB als OptZiel geht z.Zt. nicht (siehe Bug 138)")
-                'QWert = QWert_PRB(OptZiel)
+                'CalculateFeature = CalculateFeature_PRB(OptZiel)
 
             Case Else
-                Throw New Exception("Der Wert '" & ziel.Datei & "' für die Datei wird bei Optimierungszielen für BlueM nicht akzeptiert!")
+                Throw New Exception("Der Wert '" & feature.Datei & "' für die Datei wird bei Optimierungszielen für BlueM nicht akzeptiert!")
 
         End Select
 
         'Zielrichtung berücksichtigen
-        QWert *= ziel.Richtung
+        CalculateFeature *= feature.Richtung
 
     End Function
 
     'Qualitätswert aus WEL-Datei
     '***************************
-    Private Function QWert_WEL(ByVal ziel As Common.Ziel) As Double
+    Private Function CalculateFeature_WEL(ByVal feature As Common.Featurefunction) As Double
 
-        Dim QWert As Double
+        Dim featurevalue As Double
         Dim SimReihe As Wave.Zeitreihe
 
         'Simulationsergebnis auslesen
-        SimReihe = Me.SimErgebnis(ziel.SimGr)
+        SimReihe = Me.SimErgebnis(feature.SimGr)
 
         'Fallunterscheidung Zieltyp
         '--------------------------
-        Select Case ziel.ZielTyp
+        Select Case feature.Typ
 
             Case "Wert"
-                QWert = MyBase.QWert_Wert(ziel, SimReihe)
+                featurevalue = MyBase.CalculateFeature_Wert(feature, SimReihe)
 
             Case "Reihe"
-                QWert = MyBase.QWert_Reihe(ziel, SimReihe)
+                featurevalue = MyBase.CalculateFeature_Reihe(feature, SimReihe)
 
             Case "Kosten"
-                QWert = Me.SKos1.calculate_costs(Me)
+                featurevalue = Me.SKos1.calculate_costs(Me)
 
             Case "IHA"
-                QWert = Me.IHAProc.QWert_IHA(ziel, Me.IHASys.RVAResult)
+                featurevalue = Me.IHAProc.CalculateFeature_IHA(feature, Me.IHASys.RVAResult)
 
         End Select
 
-        Return QWert
+        Return featurevalue
+
+    End Function
+
+    'Qualitätswert aus PRB-Datei
+    '***************************
+    Private Function CalculateFeature_PRB(ByVal feature As Common.Featurefunction) As Double
+
+        'BUG 220: PRB geht nicht, weil keine Zeitreihe
+        'Dim i As Integer
+        'Dim IsOK As Boolean
+        'Dim QWert As Double
+        'Dim SimReihe As Object(,) = {}
+
+        ''Simulationsergebnis auslesen
+        'IsOK = Read_PRB(WorkDir & Datensatz & ".PRB", ziel.SimGr, SimReihe)
+
+        ''Diff
+        ''----
+        ''Überflüssige Stützstellen (P) entfernen
+        ''---------------------------------------
+        ''Anzahl Stützstellen bestimmen
+        'Dim stuetz As Integer = 0
+        'Dim P_vorher As Double = -99
+        'For i = 0 To SimReihe.GetUpperBound(0)
+        '    If (i = 0 Or Not SimReihe(i, 1) = P_vorher) Then
+        '        stuetz += 1
+        '        P_vorher = SimReihe(i, 1)
+        '    End If
+        'Next
+        ''Werte in neues Array schreiben
+        'Dim PRBtmp(stuetz, 1) As Object
+        'stuetz = 0
+        'For i = 0 To SimReihe.GetUpperBound(0)
+        '    If (i = 0 Or Not SimReihe(i, 1) = P_vorher) Then
+        '        PRBtmp(stuetz, 0) = SimReihe(i, 0)
+        '        PRBtmp(stuetz, 1) = SimReihe(i, 1)
+        '        P_vorher = SimReihe(i, 1)
+        '        stuetz += 1
+        '    End If
+        'Next
+        ''Reihe um eine Stützstelle erweitern
+        ''PRBtmp(stuetz, 0) = PRBtmp(stuetz - 1, 0)
+        ''PRBtmp(stuetz, 1) = PRBtmp(stuetz - 1, 1)
+
+        ''An Stützstellen der ZielReihe interpolieren
+        ''-------------------------------------------
+        'Dim PRBintp(ziel.ZielReihe.GetUpperBound(0), 1) As Object
+        'Dim j As Integer
+        'For i = 0 To ziel.ZielReihe.GetUpperBound(0)
+        '    'zugehörige Lamelle in SimReihe finden
+        '    j = 0
+        '    Do While (PRBtmp(j, 1) < ziel.ZielReihe(i, 1))
+        '        j += 1
+        '    Loop
+        '    'interpolieren
+        '    PRBintp(i, 0) = (PRBtmp(j + 1, 0) - PRBtmp(j, 0)) / (PRBtmp(j + 1, 1) - PRBtmp(j, 1)) * (ziel.ZielReihe(i, 1) - PRBtmp(j, 1)) + PRBtmp(j, 0)
+        '    PRBintp(i, 1) = ziel.ZielReihe(i, 1)
+        'Next
+
+        'For i = 0 To ziel.ZielReihe.GetUpperBound(0)
+        '    QWert += Math.Abs(ziel.ZielReihe(i, 0) - PRBintp(i, 0))
+        'Next
+
+        'Return QWert
 
     End Function
 
