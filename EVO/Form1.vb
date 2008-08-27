@@ -1044,7 +1044,6 @@ Partial Class Form1
         Call Me.EVO_Opt_Verlauf1.Initialisieren(1, 1, EVO_Einstellungen1.Settings.CES.n_Generations, EVO_Einstellungen1.Settings.CES.n_Childs)
 
         Dim durchlauf_all As Integer = 0
-        Dim serie As Steema.TeeChart.Styles.Series
         Dim ColorArray(CES1.ModSett.n_Locations, -1) As Object
 
         'Laufvariable für die Generationen
@@ -1357,8 +1356,7 @@ Partial Class Form1
                             'Vorbereitung um das PES zu initieren
                             '************************************
                             globalAnzPar = CES1.Childs(i_ch).Loc(i_loc).PES_OptPara.GetLength(0)
-                            'XXX: folgende Zeile führt nur einen "shallow copy" aus! macht nichts?
-                            myPara = CES1.Childs(i_ch).Loc(i_loc).PES_OptPara.Clone
+                            Call OptParameter.Clone_OptPara_Array(CES1.Childs(i_ch).Loc(i_loc).PES_OptPara, myPara)
 
                             'Schritte 1 - 3: PES wird initialisiert (Weiteres siehe dort ;-)
                             '**************************************************************
