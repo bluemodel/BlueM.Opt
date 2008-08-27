@@ -968,8 +968,8 @@ StartMutation:
             Next v
         End If
 
-        'Dn Vektor
-        '---------
+        'Dn Vektor und Schwefel
+        '----------------------
         If (Settings.PES.Schrittweite.is_DnVektor And Settings.PES.Schrittweite.OptDnMutation = EVO_DnMutation.Schwefel) Then
             taufix = Settings.PES.Schrittweite.DnC / Math.Sqrt(2 * Anz.Para)
             ZFix = Me.NormalDistributationRND(1.0, 0.0)
