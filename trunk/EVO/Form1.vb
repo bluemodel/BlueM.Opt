@@ -1144,8 +1144,11 @@ Partial Class Form1
                     'Lösung im TeeChart einzeichnen und mittleres Dn ausgeben
                     '========================================================
                     Call Me.Hauptdiagramm1.ZeichneIndividuum(CES1.Childs(Child_Ready), 0, 0, i_gen, Child_Ready, ColorManagement(ColorArray, CES1.Childs(Child_Ready)))
-                    Me.Label_Dn_Wert.Text = Math.Round(CES1.Childs(Child_Ready).Get_mean_PES_Dn,6).ToString
-                    
+                    Me.Label_Dn_Wert.Text = Math.Round(CES1.Childs(Child_Ready).Get_mean_PES_Dn, 6).ToString
+                    If Not CES1.Childs(Child_Ready).Get_mean_PES_Dn = -1 Then
+                        Me.Indicatordiagramm1.Zeichne_Dn(CES1.Childs(Child_Ready).ID, CES1.Childs(Child_Ready).Get_mean_PES_Dn)
+                    End If
+
                     System.Windows.Forms.Application.DoEvents()
                     Call EVO_Opt_Verlauf1.Nachfolger(Child_Ready + 1)
                     If Child_Ready = CES1.Settings.CES.n_Childs - 1 Then Ready = True
@@ -1194,11 +1197,11 @@ Partial Class Form1
                 'Selectionsprozess je nach "plus" oder "minus" Strategie
                 Call CES1.Selection_Process()
                 'Zeichnen der besten Eltern
-                For i_ch = 0 To EVO_Einstellungen1.Settings.CES.n_Parents - 1
-                    'durchlauf += 1
-                    serie = Me.Hauptdiagramm1.getSeriesPoint("Parent", "green")
-                    Call serie.Add(durchlauf_all, CES1.Parents(i_ch).Penalties(0))
-                Next
+                'For i_ch = 0 To EVO_Einstellungen1.Settings.CES.n_Parents - 1
+                '    'durchlauf += 1
+                '    serie = Me.Hauptdiagramm1.getSeriesPoint("Parent", "green")
+                '    Call serie.Add(durchlauf_all, CES1.Parents(i_ch).Penalties(0))
+                'Next
             Else
                 'NDSorting ******************
                 Call CES1.NDSorting_CES_Control(i_gen)
@@ -1374,6 +1377,9 @@ Partial Class Form1
 
                     End Select
                 End If
+
+                'Hier wird mean Dn auf alle Locations und PES OptParas übertragen
+                'CES1.Childs(i_ch).Set_mean_PES_Dn = CES1.Childs(i_ch).Get_mean_PES_Dn
             Next
         Next
 
@@ -1727,6 +1733,8 @@ Start_Evolutionsrunden:
 
                             'Lösung evaluieren und zeichnen
                             Call Testprobleme1.Evaluierung_TestProbleme(ind(i), PES1.PES_iAkt.iAktPop, Me.Hauptdiagramm1)
+                            Me.Label_Dn_Wert.Text = Math.Round(ind(i).PES_OptParas(0).Dn, 6).ToString
+                            Me.Indicatordiagramm1.Zeichne_Dn((PES1.PES_iAkt.iAktGen + 1) * EVO_Einstellungen1.Settings.PES.n_Nachf + i, ind(i).PES_OptParas(0).Dn)
 
                             'Einordnen
                             Call PES1.EsBest(ind(i))
@@ -1776,7 +1784,8 @@ Start_Evolutionsrunden:
                                 'Lösung zeichnen und Dn ausgeben
                                 Call Me.Hauptdiagramm1.ZeichneIndividuum(ind(Child_Ready), PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, Child_Ready, Color.Orange)
                                 Me.Label_Dn_Wert.Text = Math.Round(ind(Child_Ready).PES_OptParas(0).Dn, 6).ToString
-                                
+                                Me.Indicatordiagramm1.Zeichne_Dn((PES1.PES_iAkt.iAktGen + 1) * EVO_Einstellungen1.Settings.PES.n_Nachf + Child_Ready, ind(Child_Ready).PES_OptParas(0).Dn)
+
                                 'SELEKTIONSPROZESS Schritt 1
                                 '###########################
                                 'Einordnen der Qualitätsfunktion im Bestwertspeicher bei SO
@@ -2926,5 +2935,4 @@ Start_Evolutionsrunden:
     End Sub
 
 #End Region 'Methoden
-
 End Class

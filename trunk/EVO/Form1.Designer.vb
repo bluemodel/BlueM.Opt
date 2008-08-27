@@ -59,13 +59,13 @@ Partial Class Form1
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog
         Me.GroupBox_ErgebnisDB = New System.Windows.Forms.GroupBox
-        Me.EVO_Einstellungen1 = New IHWB.EVO.EVO_Einstellungen
-        Me.EVO_Opt_Verlauf1 = New IHWB.EVO.EVO_Opt_Verlauf
         Me.GroupBox_TChartButtons = New System.Windows.Forms.GroupBox
-        Me.Hauptdiagramm1 = New IHWB.EVO.Diagramm.Hauptdiagramm
         Me.Info = New System.Windows.Forms.GroupBox
         Me.Label_Dn_Wert = New System.Windows.Forms.Label
         Me.Label_Dn = New System.Windows.Forms.Label
+        Me.Hauptdiagramm1 = New IHWB.EVO.Diagramm.Hauptdiagramm
+        Me.EVO_Einstellungen1 = New IHWB.EVO.EVO_Einstellungen
+        Me.EVO_Opt_Verlauf1 = New IHWB.EVO.EVO_Opt_Verlauf
         MenuStrip1 = New System.Windows.Forms.MenuStrip
         MenuItem_Tools = New System.Windows.Forms.ToolStripMenuItem
         ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator
@@ -273,6 +273,14 @@ Partial Class Form1
         Me.Indicatordiagramm1.Axes.Left.Labels.Font.SizeFloat = 6.0!
         Me.Indicatordiagramm1.Axes.Left.MaximumOffset = 3
         Me.Indicatordiagramm1.Axes.Left.MinimumOffset = 3
+        '
+        '
+        '
+        Me.Indicatordiagramm1.Axes.Right.Visible = False
+        '
+        '
+        '
+        Me.Indicatordiagramm1.Axes.Top.Visible = False
         Me.Indicatordiagramm1.Cursor = System.Windows.Forms.Cursors.Default
         '
         '
@@ -287,7 +295,9 @@ Partial Class Form1
         '
         '
         '
-        Me.Indicatordiagramm1.Panel.MarginTop = 20
+        Me.Indicatordiagramm1.Panel.MarginBottom = 0
+        Me.Indicatordiagramm1.Panel.MarginRight = 9
+        Me.Indicatordiagramm1.Panel.MarginTop = 9
         '
         '
         '
@@ -398,21 +408,6 @@ Partial Class Form1
         Me.GroupBox_ErgebnisDB.TabStop = False
         Me.GroupBox_ErgebnisDB.Text = "Ergebnis"
         '
-        'EVO_Einstellungen1
-        '
-        Me.EVO_Einstellungen1.Enabled = False
-        Me.EVO_Einstellungen1.Location = New System.Drawing.Point(4, 85)
-        Me.EVO_Einstellungen1.Name = "EVO_Einstellungen1"
-        Me.EVO_Einstellungen1.Size = New System.Drawing.Size(230, 700)
-        Me.EVO_Einstellungen1.TabIndex = 2
-        '
-        'EVO_Opt_Verlauf1
-        '
-        Me.EVO_Opt_Verlauf1.Location = New System.Drawing.Point(241, 714)
-        Me.EVO_Opt_Verlauf1.Name = "EVO_Opt_Verlauf1"
-        Me.EVO_Opt_Verlauf1.Size = New System.Drawing.Size(467, 73)
-        Me.EVO_Opt_Verlauf1.TabIndex = 6
-        '
         'GroupBox_TChartButtons
         '
         Me.GroupBox_TChartButtons.Controls.Add(Me.Button_TChartEdit)
@@ -425,27 +420,6 @@ Partial Class Form1
         Me.GroupBox_TChartButtons.TabIndex = 16
         Me.GroupBox_TChartButtons.TabStop = False
         Me.GroupBox_TChartButtons.Text = "Diagramm"
-        '
-        'Hauptdiagramm1
-        '
-        '
-        '
-        '
-        Me.Hauptdiagramm1.Aspect.View3D = False
-        Me.Hauptdiagramm1.Aspect.ZOffset = 0
-        Me.Hauptdiagramm1.Cursor = System.Windows.Forms.Cursors.Default
-        '
-        '
-        '
-        Me.Hauptdiagramm1.Header.Lines = New String() {"EVO.NET"}
-        Me.Hauptdiagramm1.Location = New System.Drawing.Point(241, 86)
-        Me.Hauptdiagramm1.Name = "Hauptdiagramm1"
-        Me.Hauptdiagramm1.Size = New System.Drawing.Size(473, 566)
-        Me.Hauptdiagramm1.TabIndex = 17
-        '
-        '
-        '
-        Me.Hauptdiagramm1.Walls.View3D = False
         '
         'Info
         '
@@ -476,6 +450,42 @@ Partial Class Form1
         Me.Label_Dn.Size = New System.Drawing.Size(24, 13)
         Me.Label_Dn.TabIndex = 0
         Me.Label_Dn.Text = "Dn:"
+        '
+        'Hauptdiagramm1
+        '
+        '
+        '
+        '
+        Me.Hauptdiagramm1.Aspect.View3D = False
+        Me.Hauptdiagramm1.Aspect.ZOffset = 0
+        Me.Hauptdiagramm1.Cursor = System.Windows.Forms.Cursors.Default
+        '
+        '
+        '
+        Me.Hauptdiagramm1.Header.Lines = New String() {"EVO.NET"}
+        Me.Hauptdiagramm1.Location = New System.Drawing.Point(241, 86)
+        Me.Hauptdiagramm1.Name = "Hauptdiagramm1"
+        Me.Hauptdiagramm1.Size = New System.Drawing.Size(473, 566)
+        Me.Hauptdiagramm1.TabIndex = 17
+        '
+        '
+        '
+        Me.Hauptdiagramm1.Walls.View3D = False
+        '
+        'EVO_Einstellungen1
+        '
+        Me.EVO_Einstellungen1.Enabled = False
+        Me.EVO_Einstellungen1.Location = New System.Drawing.Point(4, 85)
+        Me.EVO_Einstellungen1.Name = "EVO_Einstellungen1"
+        Me.EVO_Einstellungen1.Size = New System.Drawing.Size(230, 700)
+        Me.EVO_Einstellungen1.TabIndex = 2
+        '
+        'EVO_Opt_Verlauf1
+        '
+        Me.EVO_Opt_Verlauf1.Location = New System.Drawing.Point(241, 714)
+        Me.EVO_Opt_Verlauf1.Name = "EVO_Opt_Verlauf1"
+        Me.EVO_Opt_Verlauf1.Size = New System.Drawing.Size(467, 73)
+        Me.EVO_Opt_Verlauf1.TabIndex = 6
         '
         'Form1
         '
