@@ -1758,6 +1758,7 @@ Handler:
     Public Sub copyDatensatz(ByVal n_Proz As Integer)
 
         Dim i As Integer = 1
+        'Dim j As Integer
 
         For i = 0 To n_Proz - 1
             Dim Source As String = WorkDir
@@ -1771,7 +1772,7 @@ Handler:
 
             My.Computer.FileSystem.CopyDirectory(Source, Dest, True)
             Call EVO.Common.FileHelper.purgeReadOnly(Dest)
-            'Call Directory.Delete(Dest & "\.svn", true)
+            Call Directory.Delete(Dest & "\.svn", true)
 
         Next
 

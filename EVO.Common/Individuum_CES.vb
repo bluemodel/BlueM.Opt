@@ -88,16 +88,36 @@
             Dim i As Integer
             Dim Dn_Mean As Double
 
-            n = me.Get_All_Loc_PES_Dn.GetLength(0)
-            For i = 0 to me.Get_All_Loc_PES_Dn.GetUpperBound(0)
+            n = Me.Get_All_Loc_PES_Dn.GetLength(0)
+            If n = 0 Then
+                Return -1
+            End If
+
+            For i = 0 To Me.Get_All_Loc_PES_Dn.GetUpperBound(0)
                 sum = sum + Me.Get_All_Loc_PES_Dn(i)
             Next
-            Dn_Mean = sum/n
+            Dn_Mean = sum / n
 
             Return Dn_Mean
         End Get
 
     End Property
+
+    'Setzt das durchnittliche Dn für alle OptParas
+    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    Public WriteOnly Property Set_mean_PES_Dn As Double
+        Set(ByVal Dn_Mean as Double) 
+            Dim i, j As Integer
+           
+            For i = 0 To Loc.GetUpperBound(0)
+                For j = 0 To Loc(i).PES_OptPara.GetUpperBound(0)
+                    Loc(i).PES_OptPara(j).Dn = Dn_Mean
+                Next
+            Next
+
+        End Set
+    End Property
+
 
     'Gibt ein Array mit den Elementen aller Locations zurück
     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -115,7 +135,6 @@
             Return Array
         End Get
     End Property
-
 
     'Schreibt alle Parameter aus der DB zurück ins Individuum
     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
