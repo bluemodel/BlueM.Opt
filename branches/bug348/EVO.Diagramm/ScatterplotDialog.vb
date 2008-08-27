@@ -2,11 +2,24 @@ Imports System.Windows.Forms
 
 Public Class ScatterplotDialog
 
+    Private mProblem As EVO.Common.Problem
+
+    Public Sub New(ByRef prob As EVO.Common.Problem)
+
+        ' This call is required by the Windows Form Designer.
+        InitializeComponent()
+        
+        ' Add any initialization after the InitializeComponent() call.
+        'Problem speichern
+        Me.mProblem = prob
+        
+    End Sub
+
     Private Sub ScatterplotDialog_Load( ByVal sender As System.Object,  ByVal e As System.EventArgs) Handles MyBase.Load
 
         'Listbox füllen
         Dim bezeichnung As String
-        For Each feature As Common.Featurefunction In Common.Manager.List_Featurefunctions
+        For Each feature As Common.Featurefunction In Me.mProblem.List_Featurefunctions
             bezeichnung = feature.Bezeichnung
             'Penalty-Functions mit Sternchen markieren
             If (feature.isPenalty) Then bezeichnung &= " (*)"

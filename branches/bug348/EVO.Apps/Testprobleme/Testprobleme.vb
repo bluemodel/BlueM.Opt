@@ -22,6 +22,8 @@ Public Class Testprobleme
     Private mSelectedTestproblem As String
     Private mTestProblemDescription As String
 
+    Private mProblem As EVO.Common.Problem
+
     Private mAnzParameter As Integer
     Private mAnzZiele As Integer
     Private mAnzConstraints As Integer
@@ -96,6 +98,9 @@ Public Class Testprobleme
         Dim i As Integer
 
         Me.mSelectedTestproblem = name
+
+        'Das Problem definieren
+        Me.mProblem = New EVO.Common.Problem(METH_PES, "", "")
 
         Select Case Me.mSelectedTestproblem
 
@@ -256,25 +261,30 @@ Public Class Testprobleme
 
     'Parameterübergabe
     '*****************
-    Public Sub Parameter_Uebergabe(ByRef globalAnzPar As Short, ByRef mypara() As EVO.Common.OptParameter)
+    Public Function getProblem() As EVO.Common.Problem
 
         Dim i As Integer
 
-        globalAnzPar = Me.AnzParameter
-        mypara = Me.mOptPara
-
-        'HACK: Ziele und Contraints dem Manager mitteilen (geht auch schöner!)
-        ReDim Common.Manager.List_Featurefunctions(Me.mAnzZiele - 1)
-        For i = 0 To Common.Manager.NumFeatures - 1
-            Common.Manager.List_Featurefunctions(i) = New Common.Featurefunction()
-            Common.Manager.List_Featurefunctions(i).isPenalty = True
+        'Das Problem mit Pseudo-Werten füllen
+        ReDim Me.mProblem.List_Featurefunctions(Me.mAnzZiele - 1)
+        For i = 0 To Me.mProblem.NumFeatures - 1
+            Me.mProblem.List_Featurefunctions(i) = New Common.Featurefunction()
+            Me.mProblem.List_Featurefunctions(i).isPenalty = True
         Next
-        ReDim Common.Manager.List_Constraintfunctions(Me.mAnzConstraints - 1)
-        For i = 0 To Common.Manager.NumConstraints - 1
-            Common.Manager.List_Constraintfunctions(i) = New Common.Constraintfunction()
+        ReDim Me.mProblem.List_Constraintfunctions(Me.mAnzConstraints - 1)
+        For i = 0 To Me.mProblem.NumConstraints - 1
+            Me.mProblem.List_Constraintfunctions(i) = New Common.Constraintfunction()
+        Next
+        ReDim Me.mProblem.List_OptParameter(Me.mAnzParameter -1)
+        ReDim Me.mProblem.List_OptParameter_Save(Me.mAnzParameter -1)
+        For i = 0 To Me.mProblem.NumParams - 1
+            Me.mProblem.List_OptParameter(i) = Me.mOptPara(i)
+            Me.mProblem.List_OptParameter_Save(i) = Me.mOptPara(i)
         Next
 
-    End Sub
+        Return Me.mProblem
+
+    End Function
 
 #Region "Diagrammfunktionen"
 
@@ -340,7 +350,7 @@ Public Class Testprobleme
 
         'Diagramm initialisieren
         '-----------------------
-        Call Diag.DiagInitialise("Sinus Funktion", achsen, rSettings)
+        Call Diag.DiagInitialise("Sinus Funktion", achsen, rSettings, Me.mProblem)
 
         'Sinuslinie zeichnen
         '-------------------
@@ -399,7 +409,7 @@ Public Class Testprobleme
         achse.Maximum = Ausgangswert * 1.3
         Call achsen.Add(achse)
 
-        Call Diag.DiagInitialise("Beale Problem", achsen, rSettings)
+        Call Diag.DiagInitialise("Beale Problem", achsen, rSettings, Me.mProblem)
 
         'Linie für den Ausgangswert berechnen
         ReDim array_y(Anzahl_Kalkulationen - 1)
@@ -463,7 +473,7 @@ Public Class Testprobleme
         achse.Maximum = Ausgangswert * 1.3
         Call achsen.Add(achse)
 
-        Call Diag.DiagInitialise("Schwefel 2.4 Problem", achsen, rSettings)
+        Call Diag.DiagInitialise("Schwefel 2.4 Problem", achsen, rSettings, Me.mProblem)
 
         'Linie für den Ausgangswert berechnen
         ReDim array_y(Anzahl_Kalkulationen - 1)
@@ -563,7 +573,7 @@ Public Class Testprobleme
         Call achsen.Add(yachse)
 
         'Diagramm initialisieren
-        Call Diag.DiagInitialise(title, achsen, rSettings)
+        Call Diag.DiagInitialise(title, achsen, rSettings, Me.mProblem)
 
         'Problemspezifische Serien zeichnen
         '----------------------------------
@@ -747,7 +757,7 @@ Public Class Testprobleme
         Call achsen.Add(achse)
 
         'Diagramm initialisieren
-        Call Diag.DiagInitialise(TP_Box, achsen, rSettings)
+        Call Diag.DiagInitialise(TP_Box, achsen, rSettings, Me.mProblem)
 
         'Serien
         '------
@@ -874,7 +884,7 @@ Public Class Testprobleme
         Call achsen.Add(achse)
 
         'Diagramm initialisieren
-        Call Diag.DiagInitialise(TP_AbhängigeParameter, achsen, rSettings)
+        Call Diag.DiagInitialise(TP_AbhängigeParameter, achsen, rSettings, Me.mProblem)
 
         'Serien
         '------

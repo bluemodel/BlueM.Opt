@@ -212,14 +212,14 @@ Public Class Smusi
 
     'Simulationsergebnis verarbeiten
     '-------------------------------
-    Public Overrides Sub ReadSimResult()
+    Public Overrides Sub SIM_Ergebnis_Lesen()
 
         Dim datei, element As String
         Dim ASCtmp As Wave.ASC
         Dim elemente As New Collection()
 
         'Einzulesende Dateien zusammenstellen
-        For Each feature As Common.Featurefunction In Common.Manager.List_Featurefunctions
+        For Each feature As Common.Featurefunction In Me.mProblem.List_Featurefunctions
             element = feature.SimGr.Substring(0, 4)
             If (Not elemente.Contains(element)) Then
                 elemente.Add(element, element)
@@ -299,12 +299,6 @@ Public Class Smusi
 
     'Kombinatorik
     '############
-
-    'Kombinatorik einlesen
-    '*********************
-    Protected Overrides Sub Read_Kombinatorik()
-
-    End Sub
 
     'Liest die Verzweigungen aus SMUSI in ein Array ein
     'Und Dimensioniert das Verzweigungsarray

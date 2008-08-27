@@ -25,6 +25,7 @@ Public Class EVO_Einstellungen
     '#############
 
     Private msettings As EVO.Common.EVO_Settings     'Sicherung sämtlicher Einstellungen
+    Private mProblem As EVO.Common.Problem           'Das Problem
     Public isSaved As Boolean = False                'Flag der anzeigt, ob die Einstellungen bereits gesichert wurden
     Public isLoad As Boolean = False                 'Flag der anzeigt, ob die Settings aus einer XML Datei gelesen werden
     Private isInitializing As Boolean
@@ -41,18 +42,20 @@ Public Class EVO_Einstellungen
         ' Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         Call Me.InitializeComponent()
 
-        Me.isInitializing = False
-
         ' Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
         'Settings instanzieren
         Me.msettings = New Common.EVO_Settings()
-        'Standard-Settings setzen
+
+        'Comboboxen füllen
+        Call Me.InitComboboxes()
+
+        Me.isInitializing = False
+
+       'Standard-Settings setzen
         Call Me.msettings.PES.setStandard(EVO_MODUS.Single_Objective)
         Call Me.msettings.CES.setStandard(METH_CES)
         Call Me.msettings.HookJeeves.setStandard()
-        'Comboboxen füllen
-        Call Me.InitComboboxes()
 
     End Sub
 
@@ -66,6 +69,12 @@ Public Class EVO_Einstellungen
 
     End Sub
 
+    Public Sub setProblem(ByRef prob As EVO.Common.Problem)
+
+        'Problem speichern
+        Me.mProblem = prob
+
+    End Sub
 
     'Optimierungsmodus wurde geändert
     '********************************
@@ -112,7 +121,7 @@ Public Class EVO_Einstellungen
     '---
     Private Sub OptModus_Change_ActDeact_CES()
 
-        Select Case EVO.Common.Manager.Method
+        Select Case Me.mProblem.Method
 
             Case METH_CES
                 GroupBox_CES_Hybrid.Enabled = False
@@ -157,8 +166,8 @@ Public Class EVO_Einstellungen
 
     End Sub
 
-    Private Sub CheckBox_CES_UseSecPop_CES_CheckedChanged( ByVal sender As System.Object,  ByVal e As System.EventArgs) Handles CheckBox_CES_UseSecPop_CES.CheckedChanged
-        
+    Private Sub CheckBox_CES_UseSecPop_CES_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckBox_CES_UseSecPop_CES.CheckedChanged
+
         If (Me.CheckBox_CES_UseSecPop_CES.Checked) Then
             Me.GroupBox_CES_SecPop.Enabled = True
         Else
@@ -167,7 +176,7 @@ Public Class EVO_Einstellungen
 
     End Sub
 
-    Private Sub CheckBox_CES_isMaxMemberSekPop_CheckedChanged( ByVal sender As System.Object,  ByVal e As System.EventArgs) Handles CheckBox_CES_isSecPopRestriction.CheckedChanged
+    Private Sub CheckBox_CES_isMaxMemberSekPop_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckBox_CES_isSecPopRestriction.CheckedChanged
 
         If (Me.CheckBox_CES_isSecPopRestriction.Checked) Then
             Me.Label_CES_NMembersSecPop.Enabled = True
@@ -191,7 +200,7 @@ Public Class EVO_Einstellungen
 
     Private Sub CheckBox_CES_RealOptimisation_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckBox_CES_RealOptimisation.CheckedChanged
 
-        If (CheckBox_CES_RealOptimisation.Checked)
+        If (CheckBox_CES_RealOptimisation.Checked) Then
             Me.GroupBox_CES_Hybrid.Enabled = True
         Else
             Me.GroupBox_CES_Hybrid.Enabled = False
@@ -337,8 +346,9 @@ Public Class EVO_Einstellungen
     '******************************************************************
     Private Sub Combo_CES_HybridType_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Combo_CES_HybridType.SelectedIndexChanged
 
+        If (Me.isInitializing) Then Exit Sub
 
-        If (EVO.Common.Manager.Method = METH_HYBRID And Not isLoad) Then
+        If (Me.mProblem.Method = METH_HYBRID And Not isLoad) Then
 
             Dim Item As HYBRID_TYPE
             Item = Me.Combo_CES_HybridType.SelectedItem
@@ -512,7 +522,7 @@ Public Class EVO_Einstellungen
     'Standardeinstellungen setzen (CES)
     '**********************************
     Public Sub setStandard_CES()
-        Call Me.msettings.CES.setStandard(EVO.Common.Manager.Method)
+        Call Me.msettings.CES.setStandard(Me.mProblem.Method)
         Call Me.writeForm()
     End Sub
 
@@ -570,7 +580,7 @@ Public Class EVO_Einstellungen
             Call Me.writeForm()
             isLoad = False
 
-        Catch e as Exception
+        Catch e As Exception
             MsgBox("Kann die angegebene XML-Datei nicht einlesen!" & eol & e.Message, MsgBoxStyle.Critical, "Fehler")
 
         Finally
@@ -582,12 +592,12 @@ Public Class EVO_Einstellungen
 
     'Fehlerbehandlung Serialisierung
     '*******************************
-    Private Sub serializerUnknownElement(sender As Object, e As XmlElementEventArgs)
+    Private Sub serializerUnknownElement(ByVal sender As Object, ByVal e As XmlElementEventArgs)
         MsgBox("Fehler beim Einlesen der Einstellungen:" & eol _
             & "Das Element '" & e.Element.Name & "' ist unbekannt!", MsgBoxStyle.Critical, "Fehler")
     End Sub
 
-    Private Sub serializerUnknownAttribute(sender As Object, e As XmlAttributeEventArgs)
+    Private Sub serializerUnknownAttribute(ByVal sender As Object, ByVal e As XmlAttributeEventArgs)
         MsgBox("Fehler beim Einlesen der Einstellungen:" & eol _
             & "Das Attribut '" & e.Attr.Name & "' ist unbekannt!", MsgBoxStyle.Critical, "Fehler")
     End Sub

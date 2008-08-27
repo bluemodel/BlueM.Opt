@@ -115,7 +115,7 @@ Public Class Scan
         
     'Simulationsergebnis verarbeiten
     '-------------------------------
-    Public Overrides Sub ReadSimResult()
+    Public Overrides Sub SIM_Ergebnis_Lesen()
 
     End Sub
 
@@ -127,10 +127,6 @@ Public Class Scan
         CalculateFeature *= feature.Richtung
 
     End Function
-
-    Protected Overrides Sub Read_Kombinatorik()
-        'nix
-    End Sub
 
     Protected Overrides Sub Read_SimParameter()
 

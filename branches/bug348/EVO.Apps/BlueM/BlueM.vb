@@ -39,7 +39,7 @@ Public Class BlueM
 
     'SKos
     '----
-    Public SKos1 As New SKos()
+    Public SKos1 As SKos
 
     '**** Multithreading ****
     Dim My_C_Thread() As CThread
@@ -65,7 +65,7 @@ Public Class BlueM
         Me.useKWL = False
         Me.isIHA = False
 
-        'BluM_DLL
+        'BlueM_DLL
         Dim dll_path As String
         dll_path = System.Windows.Forms.Application.StartupPath() & "\BlueM\BlueM.dll"
 
@@ -92,6 +92,70 @@ Public Class BlueM
 
     End Sub
 
+    Public Overrides Sub setProblem(ByRef prob As EVO.Common.Problem)
+
+        Call MyBase.setProblem(prob)
+
+        'SKos instanzieren
+        Me.SKos1 = New SKos(prob)
+
+        'BlueM-spezifische Weiterverarbeitung von ZielReihen:
+        '====================================================
+        Dim feature As Common.Featurefunction
+
+        'KWL: Feststellen, ob irgendeine Zielfunktion die KWL-Datei benutzt
+        '------------------------------------------------------------------
+        For Each feature In Me.mProblem.List_Featurefunctions
+            If (feature.Datei = "KWL") Then
+                Me.useKWL = True
+                Exit For
+            End If
+        Next
+
+        'IHA
+        '---
+        Dim IHAZielReihe As Wave.Zeitreihe
+        Dim IHAStart, IHAEnde As DateTime
+
+        IHAZielReihe = New Wave.Zeitreihe("new")
+
+        'Gibt es eine IHA-Zielfunktion?
+        'HACK: es wird immer nur das erste IHA-Ziel verwendet!
+        '------------------------------
+        For Each feature In Me.mProblem.List_Featurefunctions
+            If (feature.Typ = "IHA") Then
+                'IHA-Berechnung einschalten
+                Me.isIHA = True
+                IHAZielReihe = feature.RefReihe
+                IHAStart = feature.EvalStart
+                IHAEnde = feature.EvalEnde
+                Exit For
+            End If
+        Next
+
+        'IHA-Berechnung vorbereiten
+        '--------------------------
+        If (Me.isIHA) Then
+            'IHAAnalyse-Objekt instanzieren
+            Me.IHASys = New IHWB.IHA.IHAAnalysis(Me.WorkDir & "IHA\", IHAZielReihe, IHAStart, IHAEnde)
+
+            'IHAProcessor-Objekt instanzieren
+            Me.IHAProc = New IHAProcessor()
+
+            'IHA-Vergleichsmodus?
+            '--------------------
+            Dim reffile As String = Me.WorkDir & Me.Datensatz & ".rva"
+            If (File.Exists(reffile)) Then
+
+                Dim RVABase As New Wave.RVA(reffile)
+
+                'Vergleichsmodus aktivieren
+                Call Me.IHAProc.setComparisonMode(RVABase.RVAValues)
+            End If
+
+        End If
+
+    End Sub
 
 #Region "Eingabedateien lesen"
 
@@ -109,7 +173,7 @@ Public Class BlueM
         '----------------
         Dim Datei As String = Me.WorkDir & Me.Datensatz & ".ALL"
 
-        Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.Read)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
         'Alle Zeilen durchlaufen
@@ -157,137 +221,6 @@ Public Class BlueM
             Throw New Exception("Das CSV Format für die .WEL Datei ist nicht eingeschaltet. Bitte in .ALL unter '... CSV-Format' einschalten.")
         End If
 
-
-    End Sub
-
-    'Optimierungsziele einlesen
-    '**************************
-    Protected Overrides Sub Read_ZIE()
-
-        Call MyBase.Read_ZIE()
-
-        'BlueM-spezifische Weiterverarbeitung von ZielReihen:
-        '====================================================
-        Dim feature As Common.Featurefunction
-
-        'KWL: Feststellen, ob irgendeine Zielfunktion die KWL-Datei benutzt
-        '------------------------------------------------------------------
-        For Each feature In Common.Manager.List_Featurefunctions
-            If (feature.Datei = "KWL") Then
-                Me.useKWL = True
-                Exit For
-            End If
-        Next
-
-        'IHA
-        '---
-        Dim IHAZielReihe As Wave.Zeitreihe
-        Dim IHAStart, IHAEnde As DateTime
-
-        IHAZielReihe = New Wave.Zeitreihe("new")
-
-        'Gibt es eine IHA-Zielfunktion?
-        'HACK: es wird immer nur das erste IHA-Ziel verwendet!
-        '------------------------------
-        For Each feature In Common.Manager.List_Featurefunctions
-            If (feature.Typ = "IHA") Then
-                'IHA-Berechnung einschalten
-                Me.isIHA = True
-                IHAZielReihe = feature.RefReihe
-                IHAStart = feature.EvalStart
-                IHAEnde = feature.EvalEnde
-                Exit For
-            End If
-        Next
-
-        'IHA-Berechnung vorbereiten
-        '--------------------------
-        If (Me.isIHA) Then
-            'IHAAnalyse-Objekt instanzieren
-            Me.IHASys = New IHWB.IHA.IHAAnalysis(Me.WorkDir & "IHA\", IHAZielReihe, IHAStart, IHAEnde)
-
-            'IHAProcessor-Objekt instanzieren
-            Me.IHAProc = New IHAProcessor()
-
-            'IHA-Vergleichsmodus?
-            '--------------------
-            Dim reffile As String = Me.WorkDir & Me.Datensatz & ".rva"
-            If (File.Exists(reffile)) Then
-
-                Dim RVABase As New Wave.RVA(reffile)
-
-                'Vergleichsmodus aktivieren
-                Call Me.IHAProc.setComparisonMode(RVABase.RVAValues)
-            End If
-
-        End If
-
-    End Sub
-
-    'Kombinatorik einlesen
-    '*********************
-    Protected Overrides Sub Read_Kombinatorik()
-
-        Dim Datei As String = WorkDir & Datensatz & "." & Combi_Ext
-
-        Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
-        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-
-        Dim Zeile As String
-        Dim Anz As Integer = 0
-
-        'Anzahl der Parameter feststellen
-        Do
-            Zeile = StrRead.ReadLine.ToString()
-            If (Zeile.StartsWith("*") = False) Then
-                Anz += 1
-            End If
-        Loop Until StrRead.Peek() = -1
-
-        Dim i As Integer = -1
-        Dim j As Integer = 0
-        ReDim List_Locations(0)
-        ReDim List_Locations(0).List_Massnahmen(0)
-
-        'Zurück zum Dateianfang und lesen
-        FiStr.Seek(0, SeekOrigin.Begin)
-
-        Dim array() As String
-        Do
-            Zeile = StrRead.ReadLine.ToString()
-            If (Zeile.StartsWith("*") = False) Then
-                array = Zeile.Split("|")
-                'Werte zuweisen
-
-                If Not Is_Name_IN(array(1).Trim(), List_Locations) Then
-                    i += 1
-                    j = 0
-                    System.Array.Resize(List_Locations, i + 1)
-                    List_Locations(i).Name = array(1).Trim()
-                End If
-                System.Array.Resize(List_Locations(i).List_Massnahmen, j + 1)
-                ReDim List_Locations(i).List_Massnahmen(j).Schaltung(2, 1)
-                ReDim List_Locations(i).List_Massnahmen(j).Bauwerke(3)
-                List_Locations(i).List_Massnahmen(j).Name = array(2).Trim()
-                List_Locations(i).List_Massnahmen(j).Schaltung(0, 0) = array(3).Trim()
-                List_Locations(i).List_Massnahmen(j).Schaltung(0, 1) = array(4).Trim()
-                List_Locations(i).List_Massnahmen(j).Schaltung(1, 0) = array(5).Trim()
-                List_Locations(i).List_Massnahmen(j).Schaltung(1, 1) = array(6).Trim()
-                List_Locations(i).List_Massnahmen(j).Schaltung(2, 0) = array(7).Trim()
-                List_Locations(i).List_Massnahmen(j).Schaltung(2, 1) = array(8).Trim()
-                List_Locations(i).List_Massnahmen(j).KostenTyp = array(9).Trim()
-                List_Locations(i).List_Massnahmen(j).Bauwerke(0) = array(10).Trim()
-                List_Locations(i).List_Massnahmen(j).Bauwerke(1) = array(11).Trim()
-                List_Locations(i).List_Massnahmen(j).Bauwerke(2) = array(12).Trim()
-                List_Locations(i).List_Massnahmen(j).Bauwerke(3) = array(13).Trim()
-                List_Locations(i).List_Massnahmen(j).TestModus = Convert.ToInt16(array(14).Trim())
-                j += 1
-            End If
-
-        Loop Until StrRead.Peek() = -1
-
-        StrRead.Close()
-        FiStr.Close()
 
     End Sub
 
@@ -400,7 +333,7 @@ Public Class BlueM
 
     'Simulationsergebnis verarbeiten
     '-------------------------------
-    Public Overrides Sub ReadSimResult()
+    Public Overrides Sub SIM_Ergebnis_Lesen()
 
         'Altes Simulationsergebnis löschen
         Me.SimErgebnis.Clear()
@@ -434,7 +367,7 @@ Public Class BlueM
         If (Me.isIHA) Then
             'IHA-Ziel raussuchen und Simulationsreihe übergeben
             'HACK: es wird immer das erste IHA-Ziel verwendet!
-            For Each feature As Common.Featurefunction In Common.Manager.List_Featurefunctions
+            For Each feature As Common.Featurefunction In Me.mProblem.List_Featurefunctions
                 If (feature.Typ = "IHA") Then
                     Call Me.IHASys.calculate_IHA(Me.SimErgebnis(feature.SimGr))
                     Exit For
@@ -499,7 +432,7 @@ Public Class BlueM
                 featurevalue = MyBase.CalculateFeature_Reihe(feature, SimReihe)
 
             Case "Kosten"
-                featurevalue = Me.SKos1.calculate_costs(Me)
+                featurevalue = Me.SKos1.calculate_costs()
 
             Case "IHA"
                 featurevalue = Me.IHAProc.CalculateFeature_IHA(feature, Me.IHASys.RVAResult)
@@ -581,6 +514,73 @@ Public Class BlueM
     'Kombinatorik
     '############
 
+    'Mehrere Prüfungen ob die .VER Datei des BlueM und der .CES Datei auch zusammenpassen
+    '************************************************************************************
+    Public Sub Validate_CES_fits_to_VER()
+
+        Dim i As Integer = 0
+        Dim j As Integer = 0
+        Dim x As Integer = 0
+        Dim y As Integer = 0
+
+        Dim FoundA(VerzweigungsDatei.GetUpperBound(0)) As Boolean
+
+        'Prüft ob jede Verzweigung einmal in der LocationList vorkommt
+        For i = 0 To VerzweigungsDatei.GetUpperBound(0)
+            For j = 0 To Me.mProblem.List_Locations.GetUpperBound(0)
+                For x = 0 To Me.mProblem.List_Locations(j).List_Massnahmen.GetUpperBound(0)
+                    For y = 0 To Me.mProblem.List_Locations(j).List_Massnahmen(x).Schaltung.GetUpperBound(0)
+                        If VerzweigungsDatei(i, 0) = Me.mProblem.List_Locations(j).List_Massnahmen(x).Schaltung(y, 0) And VerzweigungsDatei(i, 1) = "2" Then
+                            FoundA(i) = True
+                        End If
+                    Next
+                Next
+            Next
+        Next
+
+        'Prüft ob die nicht vorkommenden Verzweigungen Verzweigungen anderer Art sind
+        For i = 0 To VerzweigungsDatei.GetUpperBound(0)
+            If Not VerzweigungsDatei(i, 1) = "2" And FoundA(i) = False Then
+                FoundA(i) = True
+            End If
+        Next
+
+        Dim FoundB As Boolean = True
+        Dim TmpBool As Boolean = False
+
+        'Prüft ob alle in der LocationList Vorkommenden Verzweigungen auch in der Verzweigungsdatei sind
+        For j = 0 To Me.mProblem.List_Locations.GetUpperBound(0)
+            For x = 0 To Me.mProblem.List_Locations(j).List_Massnahmen.GetUpperBound(0)
+                For y = 0 To Me.mProblem.List_Locations(j).List_Massnahmen(x).Schaltung.GetUpperBound(0)
+                    If Not Me.mProblem.List_Locations(j).List_Massnahmen(x).Schaltung(y, 0) = "X" Then
+                        TmpBool = False
+                        For i = 0 To VerzweigungsDatei.GetUpperBound(0)
+                            If VerzweigungsDatei(i, 0) = Me.mProblem.List_Locations(j).List_Massnahmen(x).Schaltung(y, 0) And VerzweigungsDatei(i, 1) = "2" Then
+                                TmpBool = True
+                            End If
+                        Next
+                        If Not TmpBool Then
+                            FoundB = False
+                        End If
+                    End If
+
+                Next
+            Next
+        Next
+
+        'Übergabe
+        If FoundB = False Then
+            Throw New Exception(".VER und .CES Dateien passen nicht zusammen! Eine Verzweigung in der VER Datei kommt in der CES Datei nicht vor und ist nicht nicht vom Typ Prozentsatz (Kennung 2)")
+        Else
+            For i = 0 To FoundA.GetUpperBound(0)
+                If FoundA(i) = False Then
+                    Throw New Exception(".VER und .CES Dateien passen nicht zusammen! Eine in der CES Datei angegebene Verzeigung kommt in der VEr Datei nicht vor.")
+                End If
+            Next
+        End If
+
+    End Sub
+
     'Schreibt die neuen Verzweigungen
     '********************************
     Protected Overrides Sub Write_Verzweigungen()
@@ -648,22 +648,6 @@ Public Class BlueM
     End Sub
 
 #End Region 'Kombinatorik
-
-    'Hilfs Funktionen
-    'XXXXXXXXXXXXXXXX
-
-    'Hilfsfunktion um zu Prüfen ob der Name bereits vorhanden ist oder nicht
-    '***********************************************************************
-    Public Shared Function Is_Name_IN(ByVal Name As String, ByVal Array() As EVO.Common.Struct_Lokation) As Boolean
-        Is_Name_IN = False
-        Dim i As Integer
-        For i = 0 To Array.GetUpperBound(0)
-            If Name = Array(i).Name Then
-                Is_Name_IN = True
-                Exit Function
-            End If
-        Next
-    End Function
 
 #Region "Threading"
 

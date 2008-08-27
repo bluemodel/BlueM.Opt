@@ -52,7 +52,7 @@
             For i = 0 To Loc.GetUpperBound(0)
                 For j = 0 To Loc(i).PES_OptPara.GetUpperBound(0)
                     ReDim Preserve array(x)
-                    array(x) = Loc(i).PES_OptPara(j).Xn
+                    array(x) = Loc(i).PES_OptPara(j).RWert
                     x += 1
                 Next
             Next
@@ -132,17 +132,6 @@
     End Property
 
     ''' <summary>
-    ''' Initialisiert die CES-Individuumsklasse
-    ''' </summary>
-    ''' <param name="AnzahlParameter">Anzahl der Parameter, die jedes Individuum besitzen soll</param>
-    ''' <param name="AnzahlLocations">Anzahl der Locations, die jedes Individuum besitzen soll</param>
-    ''' <remarks></remarks>
-    Public Overloads Shared Sub Initialise(ByVal AnzahlParameter As Integer, ByVal AnzahlLocations As Integer)
-        Individuum_CES.n_Locations = AnzahlLocations
-        Individuum_CES.n_Para = AnzahlParameter
-    End Sub
-
-    ''' <summary>
     ''' Konstruktor
     ''' </summary>
     ''' <param name="type">Frei definierbarer String</param>
@@ -167,7 +156,7 @@
 
         'Parameterarray für PES
         '(eigentlich nur bei METH_HYBRID gebraucht)
-        ReDim Me.PES_OptParas(n_Para - 1)
+        ReDim Me.PES_OptParas(Individuum.mProblem.NumParams - 1)
         For i = 0 To Me.PES_OptParas.GetUpperBound(0)
             Me.PES_OptParas(i) = New OptParameter()
         Next

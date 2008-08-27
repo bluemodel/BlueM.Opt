@@ -92,11 +92,7 @@ Public Class SWMM
 
     'Simulationsergebnis verarbeiten
     '-------------------------------
-    Public Overrides Sub ReadSimResult()
-
-    End Sub
-
-    Protected Overrides Sub Read_Kombinatorik()
+    Public Overrides Sub SIM_Ergebnis_Lesen()
 
     End Sub
 
