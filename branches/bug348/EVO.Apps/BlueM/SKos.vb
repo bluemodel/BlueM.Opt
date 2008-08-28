@@ -27,7 +27,7 @@ Public Class SKos
     '**********************************************************
     Public Structure TRS
 
-        Dim Name as String
+        Dim Name As String
         Dim Laenge As Double
         Dim DeltaVolume As Double
         Dim Costs As Double
@@ -64,7 +64,7 @@ Public Class SKos
 
     'Funktion für die Kalkulation der Kosten
     '***************************************
-    Public Function Calculate_Costs() As Double
+    Public Function Calculate_Costs(ByRef WorkDir As String) As Double
         Dim costs As Double = 0
         Dim Elementliste(0, 1) As Object
         Dim TRS_Array(,) As Object = {}
@@ -74,8 +74,8 @@ Public Class SKos
         Call create_Elementliste(Elementliste)
 
         'Ermitteln der massgeblichen Größen aus den Dateien
-        Call Read_TAL(TAL_Array)
-        Call Read_TRS_Daten(TRS_Akt)
+        Call Read_TAL(TAL_Array, WorkDir)
+        Call Read_TRS_Daten(TRS_Akt, WorkDir)
 
         'Berechnen der Volumen Differenzen aus der Original TRS und der Aktuellen TRS
         Call Calc_Volume(TRS_Orig, TRS_Akt)
@@ -100,8 +100,8 @@ Public Class SKos
     'Alle Elemente aus der CES datei werden hier in die Liste gesetzt
     '****************************************************************
     Private Sub create_Elementliste(ByRef Bauwerksliste(,) As Object)
-        
-Dim Bauwerks_Array() As String = {}
+
+        Dim Bauwerks_Array() As String = {}
 
         'Kopiert die Bauwerke aus dem BlueM
         Dim i, j, k As Integer
@@ -146,9 +146,9 @@ Dim Bauwerks_Array() As String = {}
 
     'Inforationen der Original Transportstrecken einlesen
     '****************************************************
-    Public Sub Read_TRS_Orig_Daten()
+    Public Sub Read_TRS_Orig_Daten(ByRef WorkDir As String)
 
-        Call Read_TRS_Daten(TRS_Orig)
+        Call Read_TRS_Daten(TRS_Orig, WorkDir)
 
     End Sub
 
@@ -156,12 +156,12 @@ Dim Bauwerks_Array() As String = {}
     'Inforationen der Transportstrecken einlesen
     'Hier werden nur die Informationen einer Seite eingelesenund Symerie angenommen (könnte mann leicht erweitern)
     '*************************************************************************************************************
-    Public Sub Read_TRS_Daten(ByRef TRS_Array() As TRS)
+    Public Sub Read_TRS_Daten(ByRef TRS_Array() As TRS, ByRef WorkDir As String)
 
         ReDim TRS_Array(-1)
 
         'Dim TRS_Array(,) As Object = {}
-        Dim Datei As String = Me.mProblem.WorkDir & Me.mProblem.Datensatz & ".TRS"
+        Dim Datei As String = WorkDir & Me.mProblem.Datensatz & ".TRS"
 
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -308,10 +308,10 @@ Dim Bauwerks_Array() As String = {}
 
     'Volumen der Talsperren einlesen
     '*******************************
-    Private Sub Read_TAL(ByRef TAl_Array(,) As Object)
+    Private Sub Read_TAL(ByRef TAl_Array(,) As Object, ByRef WorkDir As String)
 
         'Dim TAL_Array(,) As Object = {}
-        Dim Datei As String = Me.mProblem.WorkDir & Me.mProblem.Datensatz & ".TAL"
+        Dim Datei As String = WorkDir & Me.mProblem.Datensatz & ".TAL"
 
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))

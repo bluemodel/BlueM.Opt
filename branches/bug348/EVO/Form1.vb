@@ -600,7 +600,7 @@ Partial Class Form1
                             Call Sim1.Write_ModellParameter()
 
                             'Original Transportstrecken einlesen
-                            Call CType(Me.Sim1, EVO.Apps.BlueM).SKos1.Read_TRS_Orig_Daten()
+                            Call CType(Me.Sim1, EVO.Apps.BlueM).SKos1.Read_TRS_Orig_Daten(Sim1.WorkDir)
 
                     End Select
 

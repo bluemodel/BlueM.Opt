@@ -49,7 +49,7 @@ Public Class Problem
     'Eigenschaften
     '#############
 
-    Private mWorkDir As String
+    Private WorkDir As String
     Private mDatensatz As String
 
     Private mMethod As String                                    'Optimierungsmethode
@@ -66,12 +66,6 @@ Public Class Problem
 
     'Properties
     '##########
-
-    Public ReadOnly Property WorkDir() As String
-        Get
-            Return Me.mWorkDir
-        End Get
-    End Property
 
     Public ReadOnly Property Datensatz() As String
         Get
@@ -177,7 +171,7 @@ Public Class Problem
         Me.mMethod = method
 
         'Pfad und Datensatz speichern
-        Me.mWorkDir = workdir
+        Me.WorkDir = workdir
         Me.mDatensatz = datensatz
 
         'Datenstrukturen initialisieren

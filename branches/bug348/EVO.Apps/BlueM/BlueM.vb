@@ -432,7 +432,7 @@ Public Class BlueM
                 featurevalue = MyBase.CalculateFeature_Reihe(feature, SimReihe)
 
             Case "Kosten"
-                featurevalue = Me.SKos1.calculate_costs()
+                featurevalue = Me.SKos1.Calculate_Costs(Me.WorkDir)
 
             Case "IHA"
                 featurevalue = Me.IHAProc.CalculateFeature_IHA(feature, Me.IHASys.RVAResult)

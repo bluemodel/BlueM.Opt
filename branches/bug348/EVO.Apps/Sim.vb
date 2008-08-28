@@ -30,8 +30,9 @@ Public MustInherit Class Sim
             Return Me.mDatensatzendung
         End Get
     End Property
-    Public WorkDir As String                             'Arbeitsverzeichnis/Datensatz für BlueM
-    Public WorkDirSave As String									'Arbeitsverzeichnis/Datensatz für BlueM
+    Public WorkDir As String                            'Arbeitsverzeichnis/Datensatz für BlueM
+
+    Public WorkDirSave As String                         'Arbeitsverzeichnis/Datensatz für BlueM
 
     Public SimStart As DateTime                          'Anfangsdatum der Simulation
     Public SimEnde As DateTime                           'Enddatum der Simulation
@@ -88,7 +89,7 @@ Public MustInherit Class Sim
             Me.Datensatz = Path.GetFileNameWithoutExtension(pfad)
             'Arbeitsverzeichnis bestimmen
             Me.WorkDir = Path.GetDirectoryName(pfad) & "\"
-			Me.WorkDirSave = Path.GetDirectoryName(Pfad) & "\"
+            Me.WorkDirSave = Path.GetDirectoryName(pfad) & "\"
         Else
             Throw New Exception("Der Datensatz '" & pfad & "' existiert nicht!")
         End If
@@ -123,8 +124,8 @@ Public MustInherit Class Sim
         End Select
 
         'Aktuelle Parameterlisten dimensionieren
-        Redim Me.Akt.OptPara(Me.mProblem.NumParams - 1)
-        Redim Me.Akt.ModPara(Me.mProblem.List_ModellParameter.GetUpperBound(0))
+        ReDim Me.Akt.OptPara(Me.mProblem.NumParams - 1)
+        ReDim Me.Akt.ModPara(Me.mProblem.List_ModellParameter.GetUpperBound(0))
 
         'Startwerte der OptParameter setzen
         For i = 0 To Me.mProblem.NumParams - 1
@@ -247,8 +248,8 @@ Public MustInherit Class Sim
         Akt.Path = Path
 
         'Aktuelle Parameterlisten neu dimensionieren
-        Redim Me.Akt.OptPara(Me.mProblem.NumParams - 1)
-        Redim Me.Akt.ModPara(Me.mProblem.List_ModellParameter.GetUpperBound(0))
+        ReDim Me.Akt.OptPara(Me.mProblem.NumParams - 1)
+        ReDim Me.Akt.ModPara(Me.mProblem.List_ModellParameter.GetUpperBound(0))
 
         'Die elemente werden an die Kostenkalkulation übergeben
         CType(Me, BlueM).SKos1.Akt_Elemente = Elements
@@ -300,14 +301,14 @@ Public MustInherit Class Sim
         Dim i As Integer
 
         'Aktuelle Parameterlisten neu dimensionieren (wegen HYBRID)
-        Redim Me.Akt.OptPara(Me.mProblem.NumParams - 1)
-        Redim Me.Akt.ModPara(Me.mProblem.List_ModellParameter.GetUpperBound(0))
+        ReDim Me.Akt.OptPara(Me.mProblem.NumParams - 1)
+        ReDim Me.Akt.ModPara(Me.mProblem.List_ModellParameter.GetUpperBound(0))
 
         'Aktuelle Parameter speichern
         For i = 0 To Me.mProblem.NumParams - 1
             Me.Akt.OptPara(i) = OptParams(i).RWert
         Next
-        
+
         'Parameter in Eingabedateien schreiben
         Call Write_ModellParameter()
 
@@ -319,10 +320,10 @@ Public MustInherit Class Sim
     Public Sub PREPARE_Evaluation_PES(ByVal RWerte() As Double)
 
         'Aktuelle Parameterlisten neu dimensionieren (wegen HYBRID)
-        Redim Me.Akt.OptPara(Me.mProblem.NumParams - 1)
-        Redim Me.Akt.ModPara(Me.mProblem.List_ModellParameter.GetUpperBound(0))
+        ReDim Me.Akt.OptPara(Me.mProblem.NumParams - 1)
+        ReDim Me.Akt.ModPara(Me.mProblem.List_ModellParameter.GetUpperBound(0))
 
-       'Aktuelle Parameter speichern
+        'Aktuelle Parameter speichern
         Me.Akt.OptPara = RWerte
 
         'Mutierte Parameter in Eingabedateien schreiben
@@ -375,7 +376,7 @@ Public MustInherit Class Sim
 
     End Sub
 
-     'Die ModellParameter in die Eingabedateien des SimModells schreiben
+    'Die ModellParameter in die Eingabedateien des SimModells schreiben
     '******************************************************************
     Public Sub Write_ModellParameter()
 
@@ -486,7 +487,7 @@ Handler:
 
     End Sub
 
-   'SimModell ausführen (simulieren)
+    'SimModell ausführen (simulieren)
     '********************************
     Public MustOverride Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
     Public MustOverride Function launchFree(ByRef Thread_ID As Integer) As Boolean
