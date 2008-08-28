@@ -226,18 +226,6 @@ Partial Public Class SolutionDialog
             i += 1
         Next
 
-        'Bei Hybrid
-        '----------
-        If (Me.mProblem.Method = EVO.Common.METH_HYBRID) Then
-
-            'OptParameter PES
-            For Each optpara As Common.OptParameter In ind.PES_OptParas
-                cellvalues(i) = optpara.RWert
-                i += 1
-            Next
-
-        End If
-
         'OptParameter CES
         Dim found As Boolean
 
@@ -249,9 +237,11 @@ Partial Public Class SolutionDialog
                         cellvalues(i) = optpara.RWert
                         found = True
                     End If
+                    If (found) Then Exit For
                 Next
+                If (found) Then Exit For
             Next
-            If Not found Then
+            If (Not found) Then
                 cellvalues(i) = "---"
             End If
             i += 1

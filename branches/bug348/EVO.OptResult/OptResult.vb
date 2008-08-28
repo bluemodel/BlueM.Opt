@@ -813,16 +813,6 @@ Public Class OptResult
 
                 If (Not QWerteOnly) Then
 
-                    'Bei CES sollte List_OptParameter_Save eine Länge von 0 haben, deswegen keine Fallunterscheidung notwendig
-                    ReDim .PES_OptParas(Me.mProblem.List_OptParameter_Save.GetUpperBound(0))
-
-                    'OptParameter
-                    '------------
-                    For j = 0 To Me.mProblem.List_OptParameter_Save.GetUpperBound(0)
-                        .PES_OptParas(j) = Me.mProblem.List_OptParameter_Save(j).Clone()
-                        .PES_OptParas(j).RWert = ds.Tables(0).Rows(i).Item(Me.mProblem.List_OptParameter_Save(j).Bezeichnung)
-                    Next
-
                     'Constraints
                     '-----------
                     For j = 0 To Me.mProblem.NumConstraints - 1
@@ -835,6 +825,10 @@ Public Class OptResult
                     For j = 0 To Me.mProblem.List_Locations.GetUpperBound(0)
                         .Measures(j) = ds.Tables(0).Rows(i).Item(Me.mProblem.List_Locations(j).Name)
                     Next
+
+                    'OptParameter
+                    '------------
+                    'BUG 343: TODO: OptParameter von Datenbank in Individuum_CES einlesen
 
                 End If
 

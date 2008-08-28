@@ -8,8 +8,6 @@
     Public Measures() As String            '09a Die Namen der Maßnahmen
     Public Loc() As Location_Data          '10 + 11a Information pro Location
 
-    Public PES_OptParas() As OptParameter  '06a Parameterarray für PES
-
     'Für PES Memory -------------------------------------------------
     Public Generation As Integer           '12 Die Generation (eher zur Information)
 
@@ -25,20 +23,6 @@
         Dim PES_OptPara() As OptParameter   'Array für das Speicherrn der PES Parameter
 
     End Structure
-
-    'Gibt ein Array mit den PES Parametern zurück
-    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    Public ReadOnly Property Get_All_PES_Para() As Double()
-        Get
-            Dim i As Integer
-            Dim Array(-1) As Double
-            For i = 0 To PES_OptParas.GetUpperBound(0)
-                ReDim Preserve Array(Array.GetLength(0))
-                Array(Array.GetUpperBound(0)) = PES_OptParas(i).Xn
-            Next
-            Return Array
-        End Get
-    End Property
 
     'Gibt ein Array mit den PES Parametern (RWerte) aller Locations zurück
     'Die Reihenfolge stimmt mit Problem.List_OptParameter überein
@@ -177,13 +161,6 @@
         'Gibt an ob der Wert bereits mutiert ist oder nicht
         Me.mutated = False
 
-        'Parameterarray für PES
-        '(eigentlich nur bei METH_HYBRID gebraucht)
-        ReDim Me.PES_OptParas(Individuum.mProblem.NumParams - 1)
-        For i = 0 To Me.PES_OptParas.GetUpperBound(0)
-            Me.PES_OptParas(i) = New OptParameter()
-        Next
-
         'Die Namen der Maßnahmen
         ReDim Me.Measures(Individuum.mProblem.NumLocations - 1)
 
@@ -245,16 +222,6 @@
         '03 Der Pfad - zur Kontrolle wird falscher Pfad gesetzt
         ReDim Dest.Path(Me.Path.GetUpperBound(0))
         Array.Copy(Me.Path, Dest.Path, Me.Path.Length)
-
-        '06a Array für PES Parameter
-        If Me.PES_OptParas.GetUpperBound(0) = -1 Then
-            ReDim Dest.PES_OptParas(-1)
-        Else
-            ReDim Dest.PES_OptParas(Me.PES_OptParas.GetUpperBound(0))
-            For i = 0 To Me.PES_OptParas.GetUpperBound(0)
-                Dest.PES_OptParas(i) = Me.PES_OptParas(i).Clone
-            Next
-        End If
 
         '06 Gibt an ob der Wert bereits mutiert ist oder nicht
         Dest.mutated = Me.mutated
