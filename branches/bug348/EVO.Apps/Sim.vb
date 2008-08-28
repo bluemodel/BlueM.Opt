@@ -103,10 +103,6 @@ Public MustInherit Class Sim
         'Problem speichern
         Me.mProblem = prob
 
-        'Aktuell dimensionieren
-        Redim Me.Akt.OptPara(Me.mProblem.NumParams - 1)
-        Redim Me.Akt.ModPara(Me.mProblem.List_ModellParameter_Save.GetUpperBound(0))
-
         'Je nach Problem weitere Vorbereitungen treffen
         Select Case Me.mProblem.Method
 
@@ -125,6 +121,15 @@ Public MustInherit Class Sim
                 End If
 
         End Select
+
+        'Aktuelle Parameterlisten dimensionieren
+        Redim Me.Akt.OptPara(Me.mProblem.NumParams - 1)
+        Redim Me.Akt.ModPara(Me.mProblem.List_ModellParameter.GetUpperBound(0))
+
+        'Startwerte der OptParameter setzen
+        For i = 0 To Me.mProblem.NumParams - 1
+            Me.Akt.OptPara(i) = Me.mProblem.List_OptParameter(i).StartWert
+        Next
 
         'Ergebnisspeicher initialisieren
         Me.OptResult = New EVO.OptResult.OptResult(Me.Datensatz, Me.mProblem)
@@ -241,6 +246,10 @@ Public MustInherit Class Sim
         'Setzt den Aktuellen Pfad
         Akt.Path = Path
 
+        'Aktuelle Parameterlisten neu dimensionieren
+        Redim Me.Akt.OptPara(Me.mProblem.NumParams - 1)
+        Redim Me.Akt.ModPara(Me.mProblem.List_ModellParameter.GetUpperBound(0))
+
         'Die elemente werden an die Kostenkalkulation übergeben
         CType(Me, BlueM).SKos1.Akt_Elemente = Elements
 
@@ -290,6 +299,10 @@ Public MustInherit Class Sim
 
         Dim i As Integer
 
+        'Aktuelle Parameterlisten neu dimensionieren (wegen HYBRID)
+        Redim Me.Akt.OptPara(Me.mProblem.NumParams - 1)
+        Redim Me.Akt.ModPara(Me.mProblem.List_ModellParameter.GetUpperBound(0))
+
         'Aktuelle Parameter speichern
         For i = 0 To Me.mProblem.NumParams - 1
             Me.Akt.OptPara(i) = OptParams(i).RWert
@@ -305,7 +318,11 @@ Public MustInherit Class Sim
     '***********************************************************************
     Public Sub PREPARE_Evaluation_PES(ByVal RWerte() As Double)
 
-        'Aktuelle Parameter speichern
+        'Aktuelle Parameterlisten neu dimensionieren (wegen HYBRID)
+        Redim Me.Akt.OptPara(Me.mProblem.NumParams - 1)
+        Redim Me.Akt.ModPara(Me.mProblem.List_ModellParameter.GetUpperBound(0))
+
+       'Aktuelle Parameter speichern
         Me.Akt.OptPara = RWerte
 
         'Mutierte Parameter in Eingabedateien schreiben
@@ -351,6 +368,7 @@ Public MustInherit Class Sim
             For j = 0 To Me.mProblem.List_OptParameter.GetUpperBound(0)
                 If (Me.mProblem.List_ModellParameter(i).OptParameter = Me.mProblem.List_OptParameter(j).Bezeichnung) Then
                     Me.Akt.ModPara(i) = Me.Akt.OptPara(j) * Me.mProblem.List_ModellParameter(i).Faktor
+                    Exit For
                 End If
             Next
         Next

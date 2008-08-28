@@ -87,7 +87,7 @@ Public Class Problem
 
     Public ReadOnly Property NumParams() As Integer
         Get
-            Return Me.List_OptParameter_Save.Length
+            Return Me.List_OptParameter.Length
         End Get
     End Property
 
@@ -179,6 +179,15 @@ Public Class Problem
         'Pfad und Datensatz speichern
         Me.mWorkDir = workdir
         Me.mDatensatz = datensatz
+
+        'Datenstrukturen initialisieren
+        ReDim Me.List_Featurefunctions(-1)
+        ReDim Me.List_Constraintfunctions(-1)
+        ReDim Me.List_OptParameter(-1)
+        ReDim Me.List_OptParameter_Save(-1)
+        ReDim Me.List_ModellParameter(-1)
+        ReDim Me.List_ModellParameter_Save(-1)
+        ReDim Me.List_Locations(-1)
 
     End Sub
 
@@ -809,7 +818,7 @@ Public Class Problem
                     If List_OptParameter(i).Bezeichnung = List_ModellParameter(j).OptParameter Then
                         TMP_OptPara(count) = List_OptParameter(i).Clone()
                         count += 1
-                        j = List_ModellParameter.GetUpperBound(0)
+                        Exit For
                     End If
                 Next
             Next

@@ -1,8 +1,6 @@
 ﻿Public Class Individuum_CES
     Inherits Individuum
 
-    Private Shared n_Locations As Integer
-
     Public Path() As Integer               '03 Der Pfad
     Public mutated As Boolean              '06 Gibt an ob der Wert bereits mutiert ist oder nicht
 
@@ -42,39 +40,64 @@
         End Get
     End Property
 
-    'Gibt ein Array mit den PES Parametern aller Locations zurück
-    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    'Gibt ein Array mit den PES Parametern (RWerte) aller Locations zurück
+    'Die Reihenfolge stimmt mit Problem.List_OptParameter überein
+    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     Public ReadOnly Property Get_All_Loc_PES_Para() As Double()
         Get
-            Dim i, j, x As Integer
-            Dim array(-1) As Double
-            x = 0
-            For i = 0 To Loc.GetUpperBound(0)
-                For j = 0 To Loc(i).PES_OptPara.GetUpperBound(0)
-                    ReDim Preserve array(x)
-                    array(x) = Loc(i).PES_OptPara(j).RWert
-                    x += 1
-                Next
-            Next
-            Return Array
+            Dim i, j, k As Integer
+            Dim found As Boolean
+            Dim RWerte() As Double
+
+            ReDim RWerte(Individuum.mProblem.NumParams - 1)
+
+            'Alle OptParameter durchlaufen
+            For i = 0 To Individuum.mProblem.NumParams - 1
+
+                found = False
+
+                'Zugehörige Location finden
+                For j = 0 To Individuum.mProblem.NumLocations - 1
+
+                    'Zugehörigen OptParameter finden
+                    For k = 0 To Me.Loc(j).PES_OptPara.GetUpperBound(0)
+                        
+                        If (Me.Loc(j).PES_OptPara(k).Bezeichnung = Individuum.mProblem.List_OptParameter(i).Bezeichnung)
+                            RWerte(i) = Loc(j).PES_OptPara(k).RWert
+                            found = True
+                        End If
+
+                        If (found) Then Exit For
+
+                    Next k
+
+                    If (found) Then Exit For
+
+                Next j
+
+            Next i
+
+            Return RWerte
+
         End Get
     End Property
 
     'Gibt ein Array mit den DNs aller Locations zurück
-    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    'VORSICHT: Reihenfolge stimmt _nicht_ mit Problem.ListOptParameter überein!
+    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     Public ReadOnly Property Get_All_Loc_PES_Dn() As Double()
         Get
             Dim i, j, x As Integer
-            Dim Array(-1) As Double
+            Dim tmparray(-1) As Double
             x = 0
             For i = 0 To Loc.GetUpperBound(0)
                 For j = 0 To Loc(i).PES_OptPara.GetUpperBound(0)
-                    ReDim Preserve Array(x)
-                    Array(x) = Loc(i).PES_OptPara(j).Dn
+                    ReDim Preserve tmparray(x)
+                    tmparray(x) = Loc(i).PES_OptPara(j).Dn
                     x += 1
                 Next
             Next
-            Return Array
+            Return tmparray
         End Get
 
     End Property
@@ -146,7 +169,7 @@
         Dim i, j As Integer
 
         'Der Pfad - zur Kontrolle wird falscher Pfad gesetzt
-        ReDim Me.Path(n_Locations - 1)
+        ReDim Me.Path(Individuum.mProblem.NumLocations - 1)
         For j = 0 To Me.Path.GetUpperBound(0)
             Me.Path(j) = 777
         Next
@@ -162,10 +185,10 @@
         Next
 
         'Die Namen der Maßnahmen
-        ReDim Me.Measures(n_Locations - 1)
+        ReDim Me.Measures(Individuum.mProblem.NumLocations - 1)
 
         'Informationen pro Location
-        ReDim Me.Loc(n_Locations - 1)
+        ReDim Me.Loc(Individuum.mProblem.NumLocations - 1)
 
         For i = 0 To Me.Loc.GetUpperBound(0)
 
