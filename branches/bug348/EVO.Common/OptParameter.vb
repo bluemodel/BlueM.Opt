@@ -100,16 +100,18 @@ Public Class OptParameter
 
     'Konvertiert eine Liste von OptParametern in ein Array von Doubles (Xn)
     '**********************************************************************
-    Public Shared Function MyParaDouble(ByVal OptParamer() As EVO.Common.OptParameter) As Double()
+    Public Shared Function Get_OptParas_Xn(ByVal OptParameter() As EVO.Common.OptParameter) As Double()
+        
         Dim i As Integer
-        Dim Array(-1) As Double
-        ReDim MyParaDouble(-1)
+        Dim Xn() As Double
 
-        For i = 0 To OptParamer.GetUpperBound(0)
-            ReDim Preserve Array(Array.GetUpperBound(0) + 1)
-            Array(i) = OptParamer(i).Xn
+        ReDim Xn(OptParameter.GetUpperBound(0))
+
+        For i = 0 To OptParameter.GetUpperBound(0)
+            Xn(i) = OptParameter(i).Xn
         Next
-        MyParaDouble = Array.Clone()
+
+        Return Xn
 
     End Function
 
