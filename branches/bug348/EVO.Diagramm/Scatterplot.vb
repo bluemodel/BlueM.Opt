@@ -332,8 +332,9 @@ Partial Public Class Scatterplot
                 RaiseEvent pointSelected(ind)
 
             End If
-        Catch
-            MsgBox("Lösung nicht auswählbar!", MsgBoxStyle.Information, "Info")
+
+        Catch ex As Exception
+            MsgBox(ex.Message, MsgBoxStyle.Exclamation)
         End Try
 
     End Sub
