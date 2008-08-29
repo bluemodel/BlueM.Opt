@@ -818,13 +818,13 @@ Public Class OptResult
                 If (Not QWerteOnly) Then
 
                     'Bei CES sollte List_OptParameter_Save eine Länge von 0 haben, deswegen keine Fallunterscheidung notwendig
-                    ReDim .PES_OptParas(Me.List_OptParameter_Save.GetUpperBound(0))
+                    ReDim .PES_OptParas_fuer_DB(Me.List_OptParameter_Save.GetUpperBound(0))
 
                     'OptParameter
                     '------------
                     For j = 0 To Me.List_OptParameter_Save.GetUpperBound(0)
-                        .PES_OptParas(j) = Me.List_OptParameter_Save(j).Clone()
-                        .PES_OptParas(j).RWert = ds.Tables(0).Rows(i).Item(Me.List_OptParameter_Save(j).Bezeichnung)
+                        .PES_OptParas_fuer_DB(j) = Me.List_OptParameter_Save(j).Clone()
+                        .PES_OptParas_fuer_DB(j).RWert = ds.Tables(0).Rows(i).Item(Me.List_OptParameter_Save(j).Bezeichnung)
                     Next
 
                     'Constraints

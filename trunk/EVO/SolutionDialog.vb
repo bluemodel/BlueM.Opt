@@ -225,7 +225,7 @@ Partial Public Class SolutionDialog
         If (EVO.Common.Manager.Method = EVO.Common.METH_HYBRID) Then
 
             'OptParameter PES
-            For Each optpara As Common.OptParameter In ind.PES_OptParas
+            For Each optpara As Common.OptParameter In ind.PES_OptParas_fuer_DB
                 cellvalues(i) = optpara.RWert
                 i += 1
             Next
