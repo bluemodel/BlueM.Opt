@@ -72,27 +72,8 @@ Public Class Testprobleme
         End Get
     End Property
 
-    'Anzahl Parameter
-    Public ReadOnly Property AnzParameter() As Integer
-        Get
-            Return Me.mAnzParameter
-        End Get
-    End Property
-
-    'OptModus
-    Public ReadOnly Property OptModus() As EVO_MODUS
-        Get
-            If (Me.mAnzZiele > 1) Then
-                Return EVO_MODUS.Multi_Objective
-            Else
-                Return EVO_MODUS.Single_Objective
-            End If
-        End Get
-    End Property
-
-
-    'Tesproblem setzen
-    '*****************
+    'Testproblem setzen
+    '******************
     Public Sub setTestproblem(ByVal name As String)
 
         Dim i As Integer

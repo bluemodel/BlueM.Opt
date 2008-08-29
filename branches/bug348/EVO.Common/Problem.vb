@@ -93,6 +93,23 @@ Public Class Problem
         End Get
     End Property
 
+    ''' <summary>
+    ''' Optimierungsmodus
+    ''' </summary>
+    ''' <returns>Single-Objective oder Multi-Objective</returns>
+    Public ReadOnly Property Modus() As EVO.Common.Constants.EVO_MODUS
+        Get
+            Select Case Me.NumPenalties
+                Case 1
+                    Return EVO_MODUS.Single_Objective
+                Case Is > 1
+                    Return EVO_MODUS.Multi_Objective
+                Case Else
+                    Throw New Exception("Es sind keine Penalty-Functions definiert!")
+            End Select
+        End Get
+    End Property
+
     'Gibt die Anzahl der Penalty Functions zurück
     '********************************************
     Public ReadOnly Property NumPenalties() As Integer
@@ -765,7 +782,7 @@ Public Class Problem
     '!Wird jetzt aus den Elementen des Child generiert!
     '***************************************************************************
     Public Function Reduce_OptPara_and_ModPara(ByRef Elements() As String) As Boolean
-        
+
         Reduce_OptPara_and_ModPara = True 'Wird wirklich abgefragt!
         Dim i As Integer
 

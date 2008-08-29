@@ -69,10 +69,86 @@ Public Class EVO_Einstellungen
 
     End Sub
 
-    Public Sub setProblem(ByRef prob As EVO.Common.Problem)
+    Public Sub Initialise(ByRef prob As EVO.Common.Problem)
 
         'Problem speichern
         Me.mProblem = prob
+
+        'EVO_Einstellungen zurücksetzen
+        Me.isSaved = False
+
+        'Zunächst alle TabPages entfernen, 
+        'dann je nach Bedarf wieder hinzufügen
+        Call Me.TabControl1.TabPages.Clear()
+
+        'Anzeige je nach Methode anpassen
+        Select Case Me.mProblem.Method
+
+            Case METH_SENSIPLOT
+
+                Me.Enabled = False
+
+            Case METH_PES
+
+                'EVO_Einstellungen aktivieren
+                Me.Enabled = True
+
+                'Tabpage anzeigen
+                Me.TabControl1.TabPages.Add(Me.TabPage_PES)
+
+                'Standardeinstellungen setzen
+                Call Me.setStandard_PES(Me.mProblem.Modus)
+
+            Case METH_HOOKJEEVES
+
+                'EVO_Einstellungen aktivieren
+                Me.Enabled = True
+
+                'Tabpage anzeigen
+                Me.TabControl1.TabPages.Add(Me.TabPage_HookeJeeves)
+
+                'Standardeinstellungen setzen
+                Call Me.setStandard_HJ()
+
+            Case METH_CES
+
+                'EVO_Einstellungen aktivieren
+                Me.Enabled = True
+
+                'Tabpage anzeigen
+                Me.TabControl1.TabPages.Add(Me.TabPage_CES)
+
+                'Standardeinstellungen setzen
+                Call Me.setStandard_CES()
+
+            Case METH_HYBRID
+
+                'EVO_Einstellungen aktivieren
+                Me.Enabled = True
+
+                'Tabpage anzeigen
+                Me.TabControl1.TabPages.Add(Me.TabPage_PES)
+                Me.TabControl1.TabPages.Add(Me.TabPage_CES)
+
+                'Standardeinstellungen setzen
+                Call Me.setStandard_CES()
+                Call Me.setStandard_PES(Me.mProblem.Modus)
+
+            Case METH_Hybrid2008
+
+                'EVO_Einstellungen aktivieren
+                Me.Enabled = True
+
+                'Tabpage anzeigen
+                Me.TabControl1.TabPages.Add(Me.TabPage_Hybrid2008)
+
+                'TODO: Standardwerte für METH_Hybrid2008 setzen
+
+            Case Else
+
+                Me.Enabled = False
+
+        End Select
 
     End Sub
 
