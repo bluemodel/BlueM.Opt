@@ -2316,15 +2316,19 @@ Start_Evolutionsrunden:
 
         Dim isOK As Boolean = False
         Dim isIHA As Boolean
+        Dim WorkDir_Prev As String
 
         Dim zre As Wave.Zeitreihe
         Dim SimSeries As New Collection                 'zu zeichnende Simulationsreihen
         Dim RefSeries As New Collection                 'zu zeichnende Referenzreihen
 
-        Sim1.WorkDir_Current = Sim1.getWorkDir(0)
-
         'Wait cursor
         Cursor = Cursors.WaitCursor
+
+        'Simulationen in Originalverzeichnis ausführen (ohne Threads),
+        'WorDir_Current aber merken, und am Ende wieder setzen!
+        WorkDir_Prev = Sim1.WorkDir_Current
+        Sim1.WorkDir_Current = Sim1.WorkDir_Original
 
         'Wave instanzieren
         Dim Wave1 As New Wave.Wave()
@@ -2383,13 +2387,9 @@ Start_Evolutionsrunden:
 
             'Simulation ausführen
             'xxxxxxxxxxxxxxxxxxxx
-            'Simulieren
-            Call Sim1.launchSim(0, 0)
-            'Warten bis Thread fertig ist
-            Do While Not isOK
-                System.Threading.Thread.Sleep(100)
-                Sim1.launchReady(0, isOK, 0)
-            Loop
+            isOK = Sim1.launchSim()
+            'TODO: Simulationsfehler abfangen!
+
             Call Sim1.SIM_Ergebnis_Lesen()
 
             'Sonderfall IHA-Berechnung
@@ -2446,6 +2446,9 @@ Start_Evolutionsrunden:
 
         'Cursor
         Cursor = Cursors.Default
+
+        'Simulationsverzeichnis zurücksetzen
+        Sim1.WorkDir_Current = WorkDir_Prev
 
     End Sub
 
