@@ -725,8 +725,11 @@ Partial Class Form1
         Dim SimReihen As Collection
         Dim Wave1 As Wave.Wave
 
+        'Simulationen in Originalverzeichnis ausführen (keine Threads)
+        Sim1.WorkDir_Current = Sim1.WorkDir_Original
+
         'Instanzieren
-        SimReihen = New Collection
+        SimReihen = New Collection()
 
         'Parameter
         Anz_SensiPara = SensiPlot1.Selected_OptParameter.GetLength(0)
@@ -815,9 +818,11 @@ Partial Class Form1
                 Call Sim1.PREPARE_Evaluation_PES(ind.PES_OptParas)
 
                 'Evaluieren
+                isOK = Sim1.launchSim()
                 'TODO: Fehlerbehandlung bei Simulationsfehler
-                isOK = Sim1.launchSim(0, 0)
-                If isOK Then Sim1.SIM_Ergebnis_auswerten(ind)
+
+                Call Sim1.SIM_Ergebnis_Lesen()
+                Call Sim1.SIM_Ergebnis_auswerten(ind)
 
                 'BUG 253: Verletzte Constraints bei SensiPlot kenntlich machen?
 

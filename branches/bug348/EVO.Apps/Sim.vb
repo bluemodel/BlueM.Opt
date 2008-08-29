@@ -488,7 +488,9 @@ Handler:
 
     'SimModell ausführen (simulieren)
     '********************************
-    Public MustOverride Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
+    Public MustOverride Overloads Function launchSim() As Boolean
+    'mit Threads:
+    Public MustOverride Overloads Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
     Public MustOverride Function launchFree(ByRef Thread_ID As Integer) As Boolean
     Public MustOverride Function launchReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
 

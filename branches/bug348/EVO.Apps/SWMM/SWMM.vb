@@ -43,7 +43,7 @@ Public Class SWMM
     End Sub
 
     
-    Public Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
+    Public Overrides Function launchSim() As Boolean
 
         'Aktuelles Verzeichnis bestimmen
         Dim currentDir As String = CurDir()
@@ -80,6 +80,12 @@ Public Class SWMM
 
         StrRead.Close()
         FiStr.Close()
+
+    End Function
+
+    Public Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
+
+        Call Me.launchSim()
 
     End Function
 
@@ -149,7 +155,7 @@ Public Class SWMM
 
     End Sub
 
-    
+
 
     Protected Overrides Sub Read_Verzweigungen()
 

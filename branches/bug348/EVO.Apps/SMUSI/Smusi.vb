@@ -88,8 +88,8 @@ Public Class Smusi
     End Sub
 
     'SMUSI ausführen (simulieren)
-    '***********************************
-    Public Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
+    '****************************
+    Public Overrides Function launchSim() As Boolean
 
         Dim simOK As Boolean
         Dim SimCurrent, SimStart, SimEnde As DateTime
@@ -101,18 +101,18 @@ Public Class Smusi
             Dim exe_path As String
             Dim String1 As String
             Dim String3 As String
-            dim String4 as string
+            Dim String4 As String
 
             exe_path = System.Windows.Forms.Application.StartupPath() & "\SMUSI.WIN.exe"
             String1 = exe_path
             String3 = Me.WorkDir_Current & Me.Datensatz & ".all"
-            String4 = """
+            String4 = """"
 
             Dim ExterneAnwendung As New System.Diagnostics.Process()
 
-            externeanwendung.StartInfo.FileName = string1
+            ExterneAnwendung.StartInfo.FileName = String1
             ExterneAnwendung.StartInfo.Arguments = String4 & String3 & String4
-            externeanwendung.StartInfo.CreateNoWindow = True
+            ExterneAnwendung.StartInfo.CreateNoWindow = True
             ExterneAnwendung.Start()
 
             Do While (Not ExterneAnwendung.HasExited)
@@ -203,9 +203,16 @@ Public Class Smusi
 
     End Function
 
+    Public Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
+
+        Call Me.launchSim()
+
+    End Function
+
     Public Overrides Function launchFree(ByRef Thread_ID As Integer) As Boolean
 
     End Function
+
     Public Overrides Function launchReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
 
     End Function
