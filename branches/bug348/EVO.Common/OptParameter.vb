@@ -90,13 +90,20 @@ Public Class OptParameter
 
     'Kopiert ein Array von OptParametern
     '*********************************
-    Public Shared Sub Clone_OptPara_Array(ByVal Source() As OptParameter, ByRef Dest() As OptParameter)
+    Public Shared Function Clone_Array(ByVal sourcearray() As OptParameter) As OptParameter()
+        
         Dim i As Integer
+        Dim clonearray() As OptParameter
 
-        For i = 0 To Source.GetUpperBound(0)
-            Dest(i) = Source(i).Clone()
+        ReDim clonearray(sourcearray.GetUpperBound(0))
+
+        For i = 0 To sourcearray.GetUpperBound(0)
+            clonearray(i) = sourcearray(i).Clone()
         Next
-    End Sub
+
+        Return clonearray
+
+    End Function
 
     'Konvertiert eine Liste von OptParametern in ein Array von Doubles (Xn)
     '**********************************************************************

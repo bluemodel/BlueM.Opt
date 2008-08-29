@@ -1354,7 +1354,7 @@ Partial Class Form1
                             Call PES1.EsReproMut(EVO_Einstellungen1.Settings.CES.is_PopMutStart)
 
                             'Auslesen der Variierten Parameter
-                            CES1.Childs(i_ch).Loc(i_loc).PES_OptPara = PES1.EsGetParameter()
+                            CES1.Childs(i_ch).Loc(i_loc).PES_OptPara = EVO.Common.OptParameter.Clone_Array(PES1.EsGetParameter())
 
                     End Select
                 End If
@@ -1698,7 +1698,7 @@ Start_Evolutionsrunden:
                         Call PES1.EsMutation()
 
                         'Auslesen der Variierten Parameter und in Individuum kopieren
-                        Call OptParameter.Clone_OptPara_Array(PES1.EsGetParameter(), ind(i).PES_OptParas)
+                        ind(i).PES_OptParas = EVO.Common.OptParameter.Clone_Array(PES1.EsGetParameter())
 
                         'Testprobleme direkt auswerten
                         If Anwendung = ANW_TESTPROBLEME Then
@@ -1810,7 +1810,8 @@ Start_Evolutionsrunden:
                                 Call PES1.EsReproduktion()
                                 Call PES1.EsMutation()
 
-                                Call OptParameter.Clone_OptPara_Array(PES1.EsGetParameter(), ind(Child_False(i)).PES_OptParas)
+                                'Parameter aus PES ins Individuum kopieren
+                                ind(Child_False(i)).PES_OptParas = EVO.Common.OptParameter.Clone_Array(PES1.EsGetParameter())
 
                                 Sim1.WorkDir = Sim1.getWorkDir(0)
                                 Call Sim1.PREPARE_Evaluation_PES(ind(Child_False(i)).PES_OptParas)
