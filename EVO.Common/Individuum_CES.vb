@@ -10,7 +10,8 @@
     Public Measures() As String            '09a Die Namen der Maßnahmen
     Public Loc() As Location_Data          '10 + 11a Information pro Location
 
-    Public PES_OptParas() As OptParameter  '06a Parameterarray für PES
+    'Nur fuer die Datenbank ollte sonst nicht verwendet werden!
+    Public PES_OptParas_fuer_DB() As OptParameter  '06a Parameterarray für PES
 
     'Für PES Memory -------------------------------------------------
     Public Generation As Integer           '12 Die Generation (eher zur Information)
@@ -28,18 +29,34 @@
 
     End Structure
 
-    'Gibt ein Array mit den PES Parametern zurück
-    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    Public ReadOnly Property Get_All_PES_Para() As Double()
+    'Gibt ein Array mit den PES_Opt_Parametern aller Locations zurück
+    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    Public Property Get_a_Set_All_Loc_PES_Opt_Para() As OptParameter()
         Get
-            Dim i As Integer
-            Dim Array(-1) As Double
-            For i = 0 To PES_OptParas.GetUpperBound(0)
-                ReDim Preserve Array(Array.GetLength(0))
-                Array(Array.GetUpperBound(0)) = PES_OptParas(i).Xn
+            Dim i, j, x As Integer
+            Dim array(-1) As OptParameter
+            x = 0
+            For i = 0 To Loc.GetUpperBound(0)
+                For j = 0 To Loc(i).PES_OptPara.GetUpperBound(0)
+                    ReDim Preserve array(x)
+                    array(x) = Loc(i).PES_OptPara(j).Clone
+                    x += 1
+                Next
             Next
-            Return Array
+            Return array
         End Get
+
+        Set(ByVal Array() As OptParameter)
+            Dim i, j, x As Integer
+
+            x = 0
+            For i = 0 To Loc.GetUpperBound(0)
+                For j = 0 To Loc(i).PES_OptPara.GetUpperBound(0)
+                    Loc(i).PES_OptPara(j) = Array(x).Clone
+                    x += 1
+                Next
+            Next
+        End Set
     End Property
 
     'Gibt ein Array mit den PES Parametern aller Locations zurück
@@ -81,7 +98,7 @@
 
     'Gibt das durchschnittliche DN zurück
     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    Public ReadOnly Property Get_mean_PES_Dn As Double
+    Public ReadOnly Property Get_mean_PES_Dn() As Double
         Get
             Dim n As Integer = 0
             Dim sum As Double = 0
@@ -105,10 +122,10 @@
 
     'Setzt das durchnittliche Dn für alle OptParas
     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    Public WriteOnly Property Set_mean_PES_Dn As Double
-        Set(ByVal Dn_Mean as Double) 
+    Public WriteOnly Property Set_mean_PES_Dn() As Double
+        Set(ByVal Dn_Mean As Double)
             Dim i, j As Integer
-           
+
             For i = 0 To Loc.GetUpperBound(0)
                 For j = 0 To Loc(i).PES_OptPara.GetUpperBound(0)
                     Loc(i).PES_OptPara(j).Dn = Dn_Mean
@@ -186,9 +203,9 @@
 
         'Parameterarray für PES
         '(eigentlich nur bei METH_HYBRID gebraucht)
-        ReDim Me.PES_OptParas(n_Para - 1)
-        For i = 0 To Me.PES_OptParas.GetUpperBound(0)
-            Me.PES_OptParas(i) = New OptParameter()
+        ReDim Me.PES_OptParas_fuer_DB(n_Para - 1)
+        For i = 0 To Me.PES_OptParas_fuer_DB.GetUpperBound(0)
+            Me.PES_OptParas_fuer_DB(i) = New OptParameter()
         Next
 
         'Die Namen der Maßnahmen
@@ -254,12 +271,12 @@
         Array.Copy(Me.Path, Dest.Path, Me.Path.Length)
 
         '06a Array für PES Parameter
-        If Me.PES_OptParas.GetUpperBound(0) = -1 Then
-            ReDim Dest.PES_OptParas(-1)
+        If Me.PES_OptParas_fuer_DB.GetUpperBound(0) = -1 Then
+            ReDim Dest.PES_OptParas_fuer_DB(-1)
         Else
-            ReDim Dest.PES_OptParas(Me.PES_OptParas.GetUpperBound(0))
-            For i = 0 To Me.PES_OptParas.GetUpperBound(0)
-                Dest.PES_OptParas(i) = Me.PES_OptParas(i).Clone
+            ReDim Dest.PES_OptParas_fuer_DB(Me.PES_OptParas_fuer_DB.GetUpperBound(0))
+            For i = 0 To Me.PES_OptParas_fuer_DB.GetUpperBound(0)
+                Dest.PES_OptParas_fuer_DB(i) = Me.PES_OptParas_fuer_DB(i).Clone
             Next
         End If
 
