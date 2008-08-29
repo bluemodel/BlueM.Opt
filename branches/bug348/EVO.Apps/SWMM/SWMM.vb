@@ -49,12 +49,12 @@ Public Class SWMM
         Dim currentDir As String = CurDir()
         Dim InpDatei As String, RptDatei As String, DatDatei As String
         'zum Arbeitsverzeichnis wechseln
-        ChDrive(Me.WorkDir)
-        ChDir(Me.WorkDir)
+        ChDrive(Me.WorkDir_Current)
+        ChDir(Me.WorkDir_Current)
         'dll aufrufen
-        InpDatei = Me.WorkDir & Me.Datensatz & ".inp"
-        RptDatei = Me.WorkDir & Me.Datensatz & ".rpt"
-        DatDatei = Me.WorkDir & Me.Datensatz & ".dat"
+        InpDatei = Me.WorkDir_Current & Me.Datensatz & ".inp"
+        RptDatei = Me.WorkDir_Current & Me.Datensatz & ".rpt"
+        DatDatei = Me.WorkDir_Current & Me.Datensatz & ".dat"
         RunSwmmDll(InpDatei, RptDatei, DatDatei)
         'zurück ins Ausgangsverzeichnis wechseln
         ChDrive(currentDir)
@@ -105,7 +105,7 @@ Public Class SWMM
 
         'INP-Datei öffnen
         '----------------
-        Dim Datei As String = Me.WorkDir & Me.Datensatz & ".INP"
+        Dim Datei As String = Me.WorkDir_Current & Me.Datensatz & ".INP"
 
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -202,7 +202,7 @@ Public Class SWMM
         Dim DateiPfad As String
         Dim Zeile As String
 
-        DateiPfad = WorkDir & Datensatz & ".RPT"
+        DateiPfad = WorkDir_Current & Datensatz & ".RPT"
 
         'RPT-Datei öffnen
         Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.Read)

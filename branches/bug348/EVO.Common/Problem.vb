@@ -49,7 +49,7 @@ Public Class Problem
     'Eigenschaften
     '#############
 
-    Private WorkDir As String
+    Private mWorkDir As String
     Private mDatensatz As String
 
     Private mMethod As String                                    'Optimierungsmethode
@@ -171,7 +171,7 @@ Public Class Problem
         Me.mMethod = method
 
         'Pfad und Datensatz speichern
-        Me.WorkDir = workdir
+        Me.mWorkDir = workdir
         Me.mDatensatz = datensatz
 
         'Datenstrukturen initialisieren
@@ -234,7 +234,7 @@ Public Class Problem
         '*| Bezeichnung  | Einh. | Anfangsw. |  Min   |  Max   | Beziehung |
         '*|-<---------->-|-<--->-|-<------->-|-<---->-|-<---->-|-<------->-|
 
-        Dim Datei As String = Me.WorkDir & Me.Datensatz & "." & OptParameter_Ext
+        Dim Datei As String = Me.mWorkDir & Me.Datensatz & "." & OptParameter_Ext
 
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -300,7 +300,7 @@ Public Class Problem
         '*| OptParameter | Bezeichnung  | Einh. | Datei | Elem  | Zeile | von | bis | Faktor |
         '*|-<---------->-|-<---------->-|-<--->-|-<--->-|-<--->-|-<--->-|-<->-|-<->-|-<---->-|
 
-        Dim Datei As String = Me.WorkDir & Me.Datensatz & "." & ModParameter_Ext
+        Dim Datei As String = Me.mWorkDir & Me.Datensatz & "." & ModParameter_Ext
 
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -359,7 +359,7 @@ Public Class Problem
     '**************************
     Private Sub Read_ZIE(ByVal SimStart As DateTime, ByVal SimEnde As DateTime)
 
-        Dim ZIE_Datei As String = Me.WorkDir & Me.Datensatz & "." & OptZiele_Ext
+        Dim ZIE_Datei As String = Me.mWorkDir & Me.Datensatz & "." & OptZiele_Ext
 
         'Format:
         '*|-----|-------------|---|---------|-------|----------|---------|--------------|-------------------|--------------------|---------|
@@ -454,13 +454,13 @@ Public Class Problem
                     ext = System.IO.Path.GetExtension(.RefReiheDatei)
                     Select Case (ext.ToUpper)
                         Case ".WEL"
-                            Dim WEL As New Wave.WEL(Me.WorkDir & .RefReiheDatei)
+                            Dim WEL As New Wave.WEL(Me.mWorkDir & .RefReiheDatei)
                             .RefReihe = WEL.getReihe(.RefGr)
                         Case ".ASC"
-                            Dim ASC As New Wave.ASC(Me.WorkDir & .RefReiheDatei)
+                            Dim ASC As New Wave.ASC(Me.mWorkDir & .RefReiheDatei)
                             .RefReihe = ASC.getReihe(.RefGr)
                         Case ".ZRE"
-                            Dim ZRE As New Wave.ZRE(Me.WorkDir & .RefReiheDatei)
+                            Dim ZRE As New Wave.ZRE(Me.mWorkDir & .RefReiheDatei)
                             .RefReihe = ZRE.Zeitreihen(0)
                             'Case ".PRB"
                             'BUG 183: geht nicht mehr, weil PRB-Dateien keine Zeitreihen sind!
@@ -511,7 +511,7 @@ Public Class Problem
         Dim WerteArray() As String
         Const AnzSpalten As Integer = 9
 
-        Dim Datei As String = Me.WorkDir & Me.Datensatz & "." & Constraints_Ext
+        Dim Datei As String = Me.mWorkDir & Me.Datensatz & "." & Constraints_Ext
 
         If (File.Exists(Datei)) Then
 
@@ -574,10 +574,10 @@ Public Class Problem
                         ext = System.IO.Path.GetExtension(.GrenzReiheDatei)
                         Select Case (ext.ToUpper)
                             Case ".WEL"
-                                Dim WEL As New Wave.WEL(Me.WorkDir & .GrenzReiheDatei)
+                                Dim WEL As New Wave.WEL(Me.mWorkDir & .GrenzReiheDatei)
                                 .GrenzReihe = WEL.getReihe(.GrenzGr)
                             Case ".ZRE"
-                                Dim ZRE As New Wave.ZRE(Me.WorkDir & .GrenzReiheDatei)
+                                Dim ZRE As New Wave.ZRE(Me.mWorkDir & .GrenzReiheDatei)
                                 .GrenzReihe = ZRE.Zeitreihen(0)
                             Case Else
                                 Throw New Exception("Das Format der Grenzwertreihe '" & .GrenzReiheDatei & "' wurde nicht erkannt!")
@@ -614,7 +614,7 @@ Public Class Problem
     '*********************
     Private Sub Read_CES()
 
-        Dim Datei As String = Me.WorkDir & Me.Datensatz & "." & EVO.Common.Problem.Combi_Ext
+        Dim Datei As String = Me.mWorkDir & Me.Datensatz & "." & EVO.Common.Problem.Combi_Ext
 
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))

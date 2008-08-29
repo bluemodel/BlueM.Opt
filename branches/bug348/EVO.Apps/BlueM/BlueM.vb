@@ -137,14 +137,14 @@ Public Class BlueM
         '--------------------------
         If (Me.isIHA) Then
             'IHAAnalyse-Objekt instanzieren
-            Me.IHASys = New IHWB.IHA.IHAAnalysis(Me.WorkDir & "IHA\", IHAZielReihe, IHAStart, IHAEnde)
+            Me.IHASys = New IHWB.IHA.IHAAnalysis(Me.WorkDir_Original & "IHA\", IHAZielReihe, IHAStart, IHAEnde)
 
             'IHAProcessor-Objekt instanzieren
             Me.IHAProc = New IHAProcessor()
 
             'IHA-Vergleichsmodus?
             '--------------------
-            Dim reffile As String = Me.WorkDir & Me.Datensatz & ".rva"
+            Dim reffile As String = Me.WorkDir_Original & Me.Datensatz & ".rva"
             If (File.Exists(reffile)) Then
 
                 Dim RVABase As New Wave.RVA(reffile)
@@ -171,7 +171,7 @@ Public Class BlueM
 
         'ALL-Datei öffnen
         '----------------
-        Dim Datei As String = Me.WorkDir & Me.Datensatz & ".ALL"
+        Dim Datei As String = Me.WorkDir_Original & Me.Datensatz & ".ALL"
 
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.Read)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -231,7 +231,7 @@ Public Class BlueM
 
         Dim i As Integer
 
-        Dim FiStr As FileStream = New FileStream(WorkDir & Datensatz & ".ver", FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim FiStr As FileStream = New FileStream(WorkDir_Current & Datensatz & ".ver", FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
         'Anzahl der Parameter feststellen
@@ -340,7 +340,7 @@ Public Class BlueM
 
         'WEL-Datei einlesen
         '------------------
-        Dim WELtmp As Wave.WEL = New Wave.WEL(Me.WorkDir & Me.Datensatz & ".WEL", True)
+        Dim WELtmp As Wave.WEL = New Wave.WEL(Me.WorkDir_Current & Me.Datensatz & ".WEL", True)
 
         'Reihen zu Simulationsergebnis hinzufügen
         For Each zre As Wave.Zeitreihe In WELtmp.Zeitreihen
@@ -351,7 +351,7 @@ Public Class BlueM
         '-----------------------
         If (Me.useKWL) Then
 
-            Dim KWLpath As String = Me.WorkDir & Me.Datensatz & ".KWL"
+            Dim KWLpath As String = Me.WorkDir_Current & Me.Datensatz & ".KWL"
 
             Dim KWLtmp As Wave.WEL = New Wave.WEL(KWLpath, True)
 
@@ -432,7 +432,7 @@ Public Class BlueM
                 featurevalue = MyBase.CalculateFeature_Reihe(feature, SimReihe)
 
             Case "Kosten"
-                featurevalue = Me.SKos1.Calculate_Costs(Me.WorkDir)
+                featurevalue = Me.SKos1.Calculate_Costs(Me.WorkDir_Current)
 
             Case "IHA"
                 featurevalue = Me.IHAProc.CalculateFeature_IHA(feature, Me.IHASys.RVAResult)
@@ -594,7 +594,7 @@ Public Class BlueM
         Dim DateiPfad As String
         Dim SplitZeile() As String
 
-        DateiPfad = WorkDir & Datensatz & ".ver"
+        DateiPfad = WorkDir_Current & Datensatz & ".ver"
         'Datei öffnen
         Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.Read)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))

@@ -26,7 +26,7 @@ Public Class Scan
 
 
         'Parameter einlesen
-        parameterdatei = Me.WorkDir & Me.Datensatz & ".PAR"
+        parameterdatei = Me.WorkDir_Current & Me.Datensatz & ".PAR"
 
         FiStr = New FileStream(parameterdatei, FileMode.Open, IO.FileAccess.Read)
         StrRead = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -132,7 +132,7 @@ Public Class Scan
 
         Dim inputdatei As String
 
-        inputdatei = Me.WorkDir & Me.Datensatz & "_input.WEL"
+        inputdatei = Me.WorkDir_Current & Me.Datensatz & "_input.WEL"
         Me.input = New Wave.WEL(inputdatei, True)
 
         Me.SimStart = Me.input.Zeitreihen(0).XWerte(0)

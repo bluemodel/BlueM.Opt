@@ -30,9 +30,8 @@ Public MustInherit Class Sim
             Return Me.mDatensatzendung
         End Get
     End Property
-    Public WorkDir As String                            'Arbeitsverzeichnis/Datensatz für BlueM
-
-    Public WorkDirSave As String                         'Arbeitsverzeichnis/Datensatz für BlueM
+    Public WorkDir_Current As String                     'aktuelles Arbeits-/Datensatzverzeichnis
+    Public WorkDir_Original As String                    'Original-Arbeits-/Datensatzverzeichnis
 
     Public SimStart As DateTime                          'Anfangsdatum der Simulation
     Public SimEnde As DateTime                           'Enddatum der Simulation
@@ -88,8 +87,8 @@ Public MustInherit Class Sim
             'Datensatzname bestimmen
             Me.Datensatz = Path.GetFileNameWithoutExtension(pfad)
             'Arbeitsverzeichnis bestimmen
-            Me.WorkDir = Path.GetDirectoryName(pfad) & "\"
-            Me.WorkDirSave = Path.GetDirectoryName(pfad) & "\"
+            Me.WorkDir_Current = Path.GetDirectoryName(pfad) & "\"
+            Me.WorkDir_Original = Path.GetDirectoryName(pfad) & "\"
         Else
             Throw New Exception("Der Datensatz '" & pfad & "' existiert nicht!")
         End If
@@ -398,7 +397,7 @@ Public MustInherit Class Sim
         For i = 0 To Me.mProblem.List_ModellParameter.GetUpperBound(0)
             WriteCheck = True
 
-            DateiPfad = WorkDir & Datensatz & "." & Me.mProblem.List_ModellParameter(i).Datei
+            DateiPfad = Me.WorkDir_Current & Me.Datensatz & "." & Me.mProblem.List_ModellParameter(i).Datei
             'Datei öffnen
             Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
             Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -867,7 +866,7 @@ Handler:
         Dim i As Integer = 1
 
         For i = 0 To n_Proz - 1
-            Dim Source As String = WorkDir
+            Dim Source As String = Me.WorkDir_Original
             Dim Dest As String = System.Windows.Forms.Application.StartupPath() & "\Thread_" & i & "\"
 
             'Löschen um den Inhalt zu entsorgen

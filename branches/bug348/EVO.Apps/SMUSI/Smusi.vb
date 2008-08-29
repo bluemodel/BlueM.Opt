@@ -53,7 +53,7 @@ Public Class Smusi
 
         'ALL-Datei öffnen
         '----------------
-        Dim Datei As String = Me.WorkDir & Me.Datensatz & ".ALL"
+        Dim Datei As String = Me.WorkDir_Original & Me.Datensatz & ".ALL"
 
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -105,7 +105,7 @@ Public Class Smusi
 
             exe_path = System.Windows.Forms.Application.StartupPath() & "\SMUSI.WIN.exe"
             String1 = exe_path
-            String3 = Me.WorkDir & Me.Datensatz & ".all"
+            String3 = Me.WorkDir_Current & Me.Datensatz & ".all"
             String4 = """
 
             Dim ExterneAnwendung As New System.Diagnostics.Process()
@@ -125,7 +125,7 @@ Public Class Smusi
             ExterneAnwendung = Nothing
 
 
-            If (File.Exists(Me.WorkDir & Me.Datensatz & ".sum")) Then
+            If (File.Exists(Me.WorkDir_Current & Me.Datensatz & ".sum")) Then
                 simOK = True
             Else
                 simOK = False
@@ -151,7 +151,7 @@ Public Class Smusi
 
             Try
 
-                Call smusi_dll.Initialize(Me.WorkDir & Me.Datensatz)
+                Call smusi_dll.Initialize(Me.WorkDir_Current & Me.Datensatz)
 
                 'Dim SimEnde As DateTime = SMUSI_EngineDotNetAccess.DateTime(smusi_dll.GetSimulationEndDate())
 
@@ -232,7 +232,7 @@ Public Class Smusi
         'Dateien einlesen
         For Each elem As String In elemente
             datei = elem & "_WEL.ASC"
-            ASCtmp = New Wave.ASC(Me.WorkDir & datei, True)
+            ASCtmp = New Wave.ASC(Me.WorkDir_Current & datei, True)
             'Simulationsergebnis abspeichern
             For Each zre As Wave.Zeitreihe In ASCtmp.Zeitreihen
                 Me.SimErgebnis.Add(zre, elem & "_" & zre.ToString())
