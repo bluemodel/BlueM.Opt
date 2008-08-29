@@ -312,11 +312,6 @@ Public Class PES
 
         Dim i As Integer
 
-        'Check
-        If (Me.mProblem.List_OptParameter.Length <> Me.mProblem.NumParams) Then
-            Throw New Exception("Falsche Anzahl Parameter übergeben!")
-        End If
-
         'Dynamisches Array wird mit Werten belegt
         For i = 0 To Me.mProblem.NumParams - 1
             If (Me.mProblem.List_OptParameter(i).Xn < 0 Or Me.mProblem.List_OptParameter(i).Xn > 1) Then
@@ -333,7 +328,7 @@ Public Class PES
         Randomize()
 
         'Die Startparameter für die Eltern werden gesetzt
-        Select Case mSettings.PES.OptStartparameter
+        Select Case Me.mSettings.PES.OptStartparameter
 
             Case EVO_STARTPARAMETER.Zufall 'Zufällige Startwerte
                 For v = 0 To Me.mProblem.NumParams - 1
@@ -368,6 +363,11 @@ Public Class PES
     Public Sub EsStartvalues(ByVal is_Pop As Boolean, ByVal Parameter() As OptParameter, ByVal IndexElter As Integer)
 
         Dim v As Integer
+
+        'Check
+        If (Parameter.Length <> Me.mProblem.List_OptParameter.Length) Then
+            Throw New Exception("Falsche Anzahl Parameter übergeben!")
+        End If
 
         For v = 0 To Me.mProblem.NumParams - 1
             If is_Pop = True Then
