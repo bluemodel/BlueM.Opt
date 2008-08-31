@@ -8,6 +8,7 @@ Website: http://130.83.196.154/BlueM/wiki/index.php/EVO.NET
 Version 1.2
 -----------
 * Umstrukturierung mit neuen Projekten EVO.Apps, EVO.Diagramm und EVO.OptResult
+* Anzeige des Verlaufs der Schrittweite Dn im Indikatordiagramm
 
 Version 1.1.1
 -------------
