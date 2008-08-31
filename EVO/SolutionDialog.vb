@@ -226,12 +226,6 @@ Partial Public Class SolutionDialog
             i += 1
         Next
 
-            For Each optpara As Common.OptParameter In ind.PES_OptParas_fuer_DB
-                cellvalues(i) = optpara.RWert
-                i += 1
-            Next
-
-
         'OptParameter CES
         Dim found As Boolean
 
