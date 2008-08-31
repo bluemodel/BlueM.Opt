@@ -14,6 +14,9 @@ Partial Public Class Scatterplot
     '*******************************************************************************
     '*******************************************************************************
 
+    'Das Problem
+    Private mProblem As EVO.Common.Problem
+
     Private Diags(,) As EVO.Diagramm.Diagramm
     Private OptResult, OptResultRef As EVO.OptResult.OptResult
     Private Zielauswahl() As Integer
@@ -22,12 +25,14 @@ Partial Public Class Scatterplot
 
     'Konstruktor
     '***********
-    Public Sub New(ByVal optres As EVO.OptResult.OptResult, ByVal optresref As EVO.OptResult.OptResult, ByVal _zielauswahl() As Integer, ByVal _sekpoponly As Boolean, ByVal _showRef As Boolean)
+    Public Sub New(ByRef prob As EVO.Common.Problem, ByVal optres As EVO.OptResult.OptResult, ByVal optresref As EVO.OptResult.OptResult, ByVal _zielauswahl() As Integer, ByVal _sekpoponly As Boolean, ByVal _showRef As Boolean)
 
         ' Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent()
 
         ' Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+        'Problem speichern
+        Me.mProblem = prob
 
         'Optimierungsergebnis übergeben
         Me.OptResult = optres
@@ -86,9 +91,9 @@ Partial Public Class Scatterplot
                 Next
             End If
             'IstWerte
-            If (Common.Manager.List_Featurefunctions(Me.Zielauswahl(i)).hasIstWert) Then
-                min(i) = Math.Min(Common.Manager.List_Featurefunctions(Me.Zielauswahl(i)).IstWert, min(i))
-                max(i) = Math.Max(Common.Manager.List_Featurefunctions(Me.Zielauswahl(i)).IstWert, max(i))
+            If (Me.mProblem.List_Featurefunctions(Me.Zielauswahl(i)).hasIstWert) Then
+                min(i) = Math.Min(Me.mProblem.List_Featurefunctions(Me.Zielauswahl(i)).IstWert, min(i))
+                max(i) = Math.Max(Me.mProblem.List_Featurefunctions(Me.Zielauswahl(i)).IstWert, max(i))
             End If
             'Vergleichsergebnis
             If (Me.ShowRef) Then
@@ -124,8 +129,8 @@ Partial Public Class Scatterplot
                     'Achsen
                     '------
                     'Titel
-                    xAchse = Common.Manager.List_Featurefunctions(Me.Zielauswahl(i)).Bezeichnung
-                    yAchse = Common.Manager.List_Featurefunctions(Me.Zielauswahl(j)).Bezeichnung
+                    xAchse = Me.mProblem.List_Featurefunctions(Me.Zielauswahl(i)).Bezeichnung
+                    yAchse = Me.mProblem.List_Featurefunctions(Me.Zielauswahl(j)).Bezeichnung
 
                     .Axes.Bottom.Title.Caption = xAchse
                     .Axes.Left.Title.Caption = yAchse
@@ -206,7 +211,7 @@ Partial Public Class Scatterplot
 
                     'IstWerte eintragen
                     '==================
-                    If (Common.Manager.List_Featurefunctions(Me.Zielauswahl(i)).hasIstWert) Then
+                    If (Me.mProblem.List_Featurefunctions(Me.Zielauswahl(i)).hasIstWert) Then
                         'X-Achse:
                         '--------
                         colorline1 = New Steema.TeeChart.Tools.ColorLine(.Chart)
@@ -214,10 +219,10 @@ Partial Public Class Scatterplot
                         colorline1.Axis = .Axes.Bottom
                         colorline1.AllowDrag = False
                         colorline1.NoLimitDrag = True
-                        colorline1.Value = Common.Manager.List_Featurefunctions(Me.Zielauswahl(i)).IstWert
+                        colorline1.Value = Me.mProblem.List_Featurefunctions(Me.Zielauswahl(i)).IstWert
                     End If
 
-                    If (Common.Manager.List_Featurefunctions(Me.Zielauswahl(j)).hasIstWert) Then
+                    If (Me.mProblem.List_Featurefunctions(Me.Zielauswahl(j)).hasIstWert) Then
                         'Y-Achse:
                         '--------
                         colorline1 = New Steema.TeeChart.Tools.ColorLine(.Chart)
@@ -225,7 +230,7 @@ Partial Public Class Scatterplot
                         colorline1.Axis = .Axes.Left
                         colorline1.AllowDrag = False
                         colorline1.NoLimitDrag = True
-                        colorline1.Value = Common.Manager.List_Featurefunctions(Me.Zielauswahl(j)).IstWert
+                        colorline1.Value = Me.mProblem.List_Featurefunctions(Me.Zielauswahl(j)).IstWert
 
                     End If
 
@@ -327,8 +332,9 @@ Partial Public Class Scatterplot
                 RaiseEvent pointSelected(ind)
 
             End If
-        Catch
-            MsgBox("Lösung nicht auswählbar!", MsgBoxStyle.Information, "Info")
+
+        Catch ex As Exception
+            MsgBox(ex.Message, MsgBoxStyle.Exclamation)
         End Try
 
     End Sub

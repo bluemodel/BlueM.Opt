@@ -53,7 +53,7 @@ Public Class Smusi
 
         'ALL-Datei öffnen
         '----------------
-        Dim Datei As String = Me.WorkDir & Me.Datensatz & ".ALL"
+        Dim Datei As String = Me.WorkDir_Original & Me.Datensatz & ".ALL"
 
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -88,8 +88,8 @@ Public Class Smusi
     End Sub
 
     'SMUSI ausführen (simulieren)
-    '***********************************
-    Public Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
+    '****************************
+    Public Overrides Function launchSim() As Boolean
 
         Dim simOK As Boolean
         Dim SimCurrent, SimStart, SimEnde As DateTime
@@ -101,18 +101,18 @@ Public Class Smusi
             Dim exe_path As String
             Dim String1 As String
             Dim String3 As String
-            dim String4 as string
+            Dim String4 As String
 
             exe_path = System.Windows.Forms.Application.StartupPath() & "\SMUSI.WIN.exe"
             String1 = exe_path
-            String3 = Me.WorkDir & Me.Datensatz & ".all"
-            String4 = """
+            String3 = Me.WorkDir_Current & Me.Datensatz & ".all"
+            String4 = """"
 
             Dim ExterneAnwendung As New System.Diagnostics.Process()
 
-            externeanwendung.StartInfo.FileName = string1
+            ExterneAnwendung.StartInfo.FileName = String1
             ExterneAnwendung.StartInfo.Arguments = String4 & String3 & String4
-            externeanwendung.StartInfo.CreateNoWindow = True
+            ExterneAnwendung.StartInfo.CreateNoWindow = True
             ExterneAnwendung.Start()
 
             Do While (Not ExterneAnwendung.HasExited)
@@ -125,7 +125,7 @@ Public Class Smusi
             ExterneAnwendung = Nothing
 
 
-            If (File.Exists(Me.WorkDir & Me.Datensatz & ".sum")) Then
+            If (File.Exists(Me.WorkDir_Current & Me.Datensatz & ".sum")) Then
                 simOK = True
             Else
                 simOK = False
@@ -151,7 +151,7 @@ Public Class Smusi
 
             Try
 
-                Call smusi_dll.Initialize(Me.WorkDir & Me.Datensatz)
+                Call smusi_dll.Initialize(Me.WorkDir_Current & Me.Datensatz)
 
                 'Dim SimEnde As DateTime = SMUSI_EngineDotNetAccess.DateTime(smusi_dll.GetSimulationEndDate())
 
@@ -203,23 +203,30 @@ Public Class Smusi
 
     End Function
 
+    Public Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
+
+        Call Me.launchSim()
+
+    End Function
+
     Public Overrides Function launchFree(ByRef Thread_ID As Integer) As Boolean
 
     End Function
+
     Public Overrides Function launchReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
 
     End Function
 
     'Simulationsergebnis verarbeiten
     '-------------------------------
-    Public Overrides Sub ReadSimResult()
+    Public Overrides Sub SIM_Ergebnis_Lesen()
 
         Dim datei, element As String
         Dim ASCtmp As Wave.ASC
         Dim elemente As New Collection()
 
         'Einzulesende Dateien zusammenstellen
-        For Each feature As Common.Featurefunction In Common.Manager.List_Featurefunctions
+        For Each feature As Common.Featurefunction In Me.mProblem.List_Featurefunctions
             element = feature.SimGr.Substring(0, 4)
             If (Not elemente.Contains(element)) Then
                 elemente.Add(element, element)
@@ -232,7 +239,7 @@ Public Class Smusi
         'Dateien einlesen
         For Each elem As String In elemente
             datei = elem & "_WEL.ASC"
-            ASCtmp = New Wave.ASC(Me.WorkDir & datei, True)
+            ASCtmp = New Wave.ASC(Me.WorkDir_Current & datei, True)
             'Simulationsergebnis abspeichern
             For Each zre As Wave.Zeitreihe In ASCtmp.Zeitreihen
                 Me.SimErgebnis.Add(zre, elem & "_" & zre.ToString())
@@ -299,12 +306,6 @@ Public Class Smusi
 
     'Kombinatorik
     '############
-
-    'Kombinatorik einlesen
-    '*********************
-    Protected Overrides Sub Read_Kombinatorik()
-
-    End Sub
 
     'Liest die Verzweigungen aus SMUSI in ein Array ein
     'Und Dimensioniert das Verzweigungsarray

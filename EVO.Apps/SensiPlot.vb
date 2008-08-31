@@ -15,17 +15,42 @@ Partial Public Class SensiPlot
     '*******************************************************************************
     '*******************************************************************************
 
+    'Das Problem
+    Private mProblem As EVO.Common.Problem
+
     Public Selected_OptParameter() As Integer
     Public Selected_Penaltyfunction As Integer
     Public Selected_SensiType As String
     Public Anz_Steps As Integer
     Public show_Wave As Boolean
 
-    Public Sub ListBox_OptParameter_add(ByVal OptParameter As EVO.Common.OptParameter)
+    Public Sub New(ByRef prob As EVO.Common.Problem)
+
+        Call InitializeComponent()
+        
+        'Problem speichern
+        Me.mProblem = prob
+
+    End Sub
+
+    Private Sub SensiPlot_Load( ByVal sender As System.Object,  ByVal e As System.EventArgs) Handles MyBase.Load
+
+        'List_Boxen füllen
+        Dim i As Integer
+        For i = 0 To Me.mProblem.List_OptParameter.GetUpperBound(0)
+            Call Me.ListBox_OptParameter_add(Me.mProblem.List_OptParameter(i))
+        Next
+        For Each penaltyfunction As Common.Featurefunction In Me.mProblem.List_Penaltyfunctions
+            Call Me.ListBox_OptZiele_add(penaltyfunction)
+        Next
+
+   End Sub
+
+    Private Sub ListBox_OptParameter_add(ByVal OptParameter As EVO.Common.OptParameter)
         ListBox_OptParameter.Items.Add(OptParameter)
     End Sub
 
-    Public Sub ListBox_OptZiele_add(ByVal penaltyfunction As Common.Featurefunction)
+    Private Sub ListBox_OptZiele_add(ByVal penaltyfunction As Common.Featurefunction)
         ListBox_Penaltyfunctions.Items.Add(penaltyfunction)
     End Sub
 

@@ -24,7 +24,7 @@ Public MustInherit Class Individuum
 
     'Shared Variablen der Klasse
     '***************************
-    Protected Shared n_Para As Integer      'Anzahl Parameter
+    Protected Shared mProblem As Problem    'Das Problem
 
     'Eigenschaften
     '*************
@@ -76,12 +76,12 @@ Public MustInherit Class Individuum
             Dim i, j As Integer
             Dim Array() As Double
 
-            ReDim Array(Common.Manager.NumPenalties - 1)
+            ReDim Array(Individuum.mProblem.NumPenalties - 1)
 
             j = 0
-            For i = 0 To Common.Manager.NumFeatures - 1
+            For i = 0 To Individuum.mProblem.NumFeatures - 1
                 'Nur die Feature-Werte von Penalty-Funktionen zurückgeben!
-                If (Common.Manager.List_Featurefunctions(i).isPenalty) Then
+                If (Individuum.mProblem.List_Featurefunctions(i).isPenalty) Then
                     Array(j) = Me.Features(i)
                     j += 1
                 End If
@@ -162,8 +162,11 @@ Public MustInherit Class Individuum
     ''' <summary>
     ''' Initialisiert die Basis-Individuumsklasse
     ''' </summary>
-    ''' <remarks>Diese Methode bewirkt nichts</remarks>
-    Public Shared Sub Initialise()
+    ''' <param name="prob">Das Problem</param>
+    Public Shared Sub Initialise(ByRef prob As Problem)
+
+        'Problem speichern
+        Individuum.mProblem = prob
 
     End Sub
 
@@ -176,6 +179,11 @@ Public MustInherit Class Individuum
 
         Dim i As Integer
 
+        'Check Initialisierung
+        If (IsNothing(Individuum.mProblem)) Then
+            Throw New Exception("Die Individuumsklasse wurde noch nicht mit einem Problem initialisiert!")
+        End If
+
         'Typ des Individuum
         Me.mType = type
 
@@ -183,14 +191,14 @@ Public MustInherit Class Individuum
         Me.mID = id
 
         'Feature-Werte
-        ReDim Me.Features(Common.Manager.NumFeatures - 1)
-        For i = 0 To Common.Manager.NumFeatures - 1
+        ReDim Me.Features(Individuum.mProblem.NumFeatures - 1)
+        For i = 0 To Individuum.mProblem.NumFeatures - 1
             Me.Features(i) = Double.MaxValue           'mit maximalem Double-Wert initialisieren
         Next
 
         'Contraint-Werte
-        ReDim Me.Constraints(Common.Manager.NumConstraints - 1)
-        For i = 0 To Common.Manager.NumConstraints - 1
+        ReDim Me.Constraints(Individuum.mProblem.NumConstraints - 1)
+        For i = 0 To Individuum.mProblem.NumConstraints - 1
             Me.Constraints(i) = Double.MinValue        'mit minimalem Double-Wert initialisieren
         Next
 
@@ -275,10 +283,10 @@ Public MustInherit Class Individuum
         Dim j, i As Integer
         Dim Array(,) As Double
 
-        ReDim Array(Indi_Array.GetUpperBound(0), Manager.NumPenalties - 1)
+        ReDim Array(Indi_Array.GetUpperBound(0), Individuum.mProblem.NumPenalties - 1)
 
         For i = 0 To Indi_Array.GetUpperBound(0)
-            For j = 0 To Manager.NumPenalties - 1
+            For j = 0 To Individuum.mProblem.NumPenalties - 1
                 Array(i, j) = Indi_Array(i).Penalties(j)
             Next j
         Next i

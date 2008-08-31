@@ -15,7 +15,7 @@ Public Class Scan
 
     End Sub
 
-    Public Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
+    Public Overrides Function launchSim() As Boolean
 
         Dim i, j, k, AnzZeil As Integer
         Dim parameterdatei, Zeile, ZeilenArray(), stoffe(), tmp() As String
@@ -26,7 +26,7 @@ Public Class Scan
 
 
         'Parameter einlesen
-        parameterdatei = Me.WorkDir & Me.Datensatz & ".PAR"
+        parameterdatei = Me.WorkDir_Current & Me.Datensatz & ".PAR"
 
         FiStr = New FileStream(parameterdatei, FileMode.Open, IO.FileAccess.Read)
         StrRead = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -106,16 +106,23 @@ Public Class Scan
 
     End Function
 
+    Public Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
+
+        Call Me.launchSim()
+
+    End Function
+
     Public Overrides Function launchFree(ByRef Thread_ID As Integer) As Boolean
 
     End Function
+
     Public Overrides Function launchReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
 
     End Function
-        
+
     'Simulationsergebnis verarbeiten
     '-------------------------------
-    Public Overrides Sub ReadSimResult()
+    Public Overrides Sub SIM_Ergebnis_Lesen()
 
     End Sub
 
@@ -128,15 +135,11 @@ Public Class Scan
 
     End Function
 
-    Protected Overrides Sub Read_Kombinatorik()
-        'nix
-    End Sub
-
     Protected Overrides Sub Read_SimParameter()
 
         Dim inputdatei As String
 
-        inputdatei = Me.WorkDir & Me.Datensatz & "_input.WEL"
+        inputdatei = Me.WorkDir_Current & Me.Datensatz & "_input.WEL"
         Me.input = New Wave.WEL(inputdatei, True)
 
         Me.SimStart = Me.input.Zeitreihen(0).XWerte(0)
