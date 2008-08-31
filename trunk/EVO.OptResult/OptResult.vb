@@ -44,15 +44,7 @@ Public Class OptResult
 
     'Konstruktor
     '***********
-    Public Sub New()
-
-        ReDim Me.Solutions(-1)
-        ReDim Me.selSolutionIDs(-1)
-        ReDim Me.SekPops(-1)
-
-    End Sub
-
-    Public Sub New(ByVal Datensatzname As String, ByRef prob As EVO.Common.Problem)
+    Public Sub New(ByVal Datensatzname As String, ByRef prob As EVO.Common.Problem, Optional ByVal createNewMdb As Boolean = True)
 
         'Datensatzname speichern
         Me.Datensatz = Datensatzname
@@ -64,8 +56,10 @@ Public Class OptResult
         ReDim Me.selSolutionIDs(-1)
         ReDim Me.SekPops(-1)
 
-        'DB initialiseren
-        Call Me.db_init()
+        If (createNewMdb) Then
+            'DB initialiseren
+            Call Me.db_init()
+        End If
 
     End Sub
 

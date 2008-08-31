@@ -2715,7 +2715,7 @@ Start_Evolutionsrunden:
 
             'Daten einlesen
             '==============
-            Sim1.OptResultRef = New EVO.OptResult.OptResult()
+            Sim1.OptResultRef = New EVO.OptResult.OptResult(Me.Sim1.Datensatz, Me.mProblem, False)
             Call Sim1.OptResultRef.db_load(sourceFile, True)
 
             'In Diagramm anzeigen
