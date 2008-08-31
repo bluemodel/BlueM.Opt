@@ -815,11 +815,7 @@ Public Class OptResult
 
                     'OptParameter
                     '------------
-                    ReDim .PES_OptParas_fuer_DB(Me.mProblem.List_OptParameter_Save.GetUpperBound(0))
-                    For j = 0 To Me.mProblem.List_OptParameter_Save.GetUpperBound(0)
-                        .PES_OptParas_fuer_DB(j) = Me.mProblem.List_OptParameter_Save(j).Clone()
-                        .PES_OptParas_fuer_DB(j).RWert = ds.Tables(0).Rows(i).Item(Me.mProblem.List_OptParameter_Save(j).Bezeichnung)
-                    Next
+                    'TODO: OptParameter aus DB in Individuum_CES einlesen
 
                     'Constraints
                     '-----------

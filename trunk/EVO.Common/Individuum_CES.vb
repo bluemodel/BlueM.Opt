@@ -8,9 +8,6 @@
     Public Measures() As String            '09a Die Namen der Maßnahmen
     Public Loc() As Location_Data          '10 + 11a Information pro Location
 
-    'Nur fuer die Datenbank ollte sonst nicht verwendet werden!
-    Public PES_OptParas_fuer_DB() As OptParameter  '06a Parameterarray für PES
-
     'Für PES Memory -------------------------------------------------
     Public Generation As Integer           '12 Die Generation (eher zur Information)
 
@@ -57,8 +54,6 @@
         End Set
     End Property
 
-    'Gibt ein Array mit den PES Parametern aller Locations zurück
-    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     'Gibt ein Array mit den PES Parametern (RWerte) aller Locations zurück
     'Die Reihenfolge stimmt mit Problem.List_OptParameter überein
     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -215,13 +210,6 @@
         'Gibt an ob der Wert bereits mutiert ist oder nicht
         Me.mutated = False
 
-        'Parameterarray für PES
-        '(eigentlich nur bei METH_HYBRID gebraucht)
-        ReDim Me.PES_OptParas_fuer_DB(Individuum.mProblem.NumParams - 1)
-        For i = 0 To Me.PES_OptParas_fuer_DB.GetUpperBound(0)
-            Me.PES_OptParas_fuer_DB(i) = New OptParameter()
-        Next
-
         'Die Namen der Maßnahmen
         ReDim Me.Measures(Individuum.mProblem.NumLocations - 1)
 
@@ -283,16 +271,6 @@
         '03 Der Pfad - zur Kontrolle wird falscher Pfad gesetzt
         ReDim Dest.Path(Me.Path.GetUpperBound(0))
         Array.Copy(Me.Path, Dest.Path, Me.Path.Length)
-
-        '06a Array für PES Parameter
-        If Me.PES_OptParas_fuer_DB.GetUpperBound(0) = -1 Then
-            ReDim Dest.PES_OptParas_fuer_DB(-1)
-        Else
-            ReDim Dest.PES_OptParas_fuer_DB(Me.PES_OptParas_fuer_DB.GetUpperBound(0))
-            For i = 0 To Me.PES_OptParas_fuer_DB.GetUpperBound(0)
-                Dest.PES_OptParas_fuer_DB(i) = Me.PES_OptParas_fuer_DB(i).Clone
-            Next
-        End If
 
         '06 Gibt an ob der Wert bereits mutiert ist oder nicht
         Dest.mutated = Me.mutated
