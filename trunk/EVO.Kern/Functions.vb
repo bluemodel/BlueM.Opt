@@ -19,6 +19,7 @@ Public Class Functions
 
     'Die Statische Variablen werden im Konstruktor übergeben
     '*******************************************************
+    Dim mProblem As EVO.Common.Problem
     Dim NNachf As Integer
     Dim NEltern As Integer
     Dim isSekPopBegrenzung As Boolean
@@ -30,8 +31,9 @@ Public Class Functions
 
     'Die Statische Variablen werden im Konstruktor übergeben
     '*******************************************************
-    Public Sub New(ByVal _NNachf As Integer, ByVal _NEltern As Integer, ByVal _isSekPopBegrenzung As Boolean, ByVal _NMaxMemberSekPop As Integer, ByVal _NInteract As Integer, ByVal _isInteract As Boolean, ByVal _iAktGen As Integer)
+    Public Sub New(ByRef prob As EVO.Common.Problem, ByVal _NNachf As Integer, ByVal _NEltern As Integer, ByVal _isSekPopBegrenzung As Boolean, ByVal _NMaxMemberSekPop As Integer, ByVal _NInteract As Integer, ByVal _isInteract As Boolean, ByVal _iAktGen As Integer)
 
+        mProblem = prob
         NNachf = _NNachf
         NEltern = _NEltern
         isSekPopBegrenzung = _isSekPopBegrenzung
@@ -152,7 +154,7 @@ Public Class Functions
         Dim isDominated As Boolean
         Dim Summe_Constrain(1) As Double
 
-        If (Common.Manager.NumConstraints > 0) Then
+        If (Me.mProblem.NumConstraints > 0) Then
             'Mit Constraints
             '===============
             For i = 0 To NDSorting.GetUpperBound(0)
@@ -173,7 +175,7 @@ Public Class Functions
                         Summe_Constrain(0) = 0
                         Summe_Constrain(1) = 0
 
-                        For k = 0 To Common.Manager.NumConstraints - 1
+                        For k = 0 To Me.mProblem.NumConstraints - 1
                             If (NDSorting(i).Constraints(k) < 0) Then
                                 Summe_Constrain(0) += NDSorting(i).Constraints(k)
                             End If
@@ -192,11 +194,11 @@ Public Class Functions
                         '------------
                         isDominated = False
 
-                        For k = 0 To Manager.NumPenalties - 1
+                        For k = 0 To Me.mProblem.NumPenalties - 1
                             isDominated = isDominated Or (NDSorting(i).Penalties(k) < NDSorting(j).Penalties(k))
                         Next k
 
-                        For k = 0 To Manager.NumPenalties - 1
+                        For k = 0 To Me.mProblem.NumPenalties - 1
                             isDominated = isDominated And (NDSorting(i).Penalties(k) <= NDSorting(j).Penalties(k))
                         Next k
 
@@ -216,11 +218,11 @@ Public Class Functions
 
                     isDominated = False
 
-                    For k = 0 To Manager.NumPenalties - 1
+                    For k = 0 To Me.mProblem.NumPenalties - 1
                         isDominated = isDominated Or (NDSorting(i).Penalties(k) < NDSorting(j).Penalties(k))
                     Next k
 
-                    For k = 0 To Manager.NumPenalties - 1
+                    For k = 0 To Me.mProblem.NumPenalties - 1
                         isDominated = isDominated And (NDSorting(i).Penalties(k) <= NDSorting(j).Penalties(k))
                     Next k
 
@@ -333,7 +335,7 @@ Public Class Functions
 
         swap = _Individ(0).Create("swap", 0)
 
-        For k = 0 To Manager.NumPenalties - 1
+        For k = 0 To Me.mProblem.NumPenalties - 1
             For i = StartIndex To EndIndex
                 For j = StartIndex To EndIndex
                     If (_Individ(i).Penalties(k) < _Individ(j).Penalties(k)) Then
@@ -387,7 +389,7 @@ Public Class Functions
             _Individ(i).Distance = 0.0
         Next i
 
-        For k = 0 To Manager.NumPenalties - 1
+        For k = 0 To Me.mProblem.NumPenalties - 1
             For i = StartIndex To EndIndex
                 For j = StartIndex To EndIndex
                     If (_Individ(i).Penalties(k) < _Individ(j).Penalties(k)) Then
@@ -458,7 +460,7 @@ Public Class Functions
         For i = 0 To SekundärQb.GetUpperBound(0) - 1
             For j = i + 1 To SekundärQb.GetUpperBound(0)
                 Logical = True
-                For k = 0 To Manager.NumPenalties - 1
+                For k = 0 To Me.mProblem.NumPenalties - 1
                     Logical = Logical And (SekundärQb(i).Penalties(k) = SekundärQb(j).Penalties(k))
                 Next k
                 If (Logical) Then

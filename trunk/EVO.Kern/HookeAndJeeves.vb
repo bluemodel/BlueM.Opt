@@ -76,19 +76,19 @@ Public Class HookeAndJeeves
         ReDim dblExtrapolationsschritt(Anzahlparameter - 1)
     End Sub
 
-    Public Sub Initialize(ByVal Parameter() As Double)
+    Public Sub Initialize(ByVal OptParameter() As EVO.Common.OptParameter)
         Dim i As Integer
 
         'Prüfung
-        If Parameter.GetUpperBound(0) <> intAnzahlParameter - 1 Then
+        If OptParameter.GetUpperBound(0) <> intAnzahlParameter - 1 Then
             Throw New Exception("Die Anzahl der übergebenen Parameter ist nicht gleich der definierten Anzahl!")
         End If
         'Dynamisches Array wird mit Werten belegt (Vektor der zu optimierenden Parameter)
         For i = 0 To intAnzahlParameter - 1
-            If Parameter(i) < 0 Or Parameter(i) > 1 Then
+            If (OptParameter(i).Xn < 0 Or OptParameter(i).Xn > 1) Then
                 Throw New Exception("Der Startparameter " & i & " liegt nicht zwischen 0 und 1. Sie müssen hier skaliert vorliegen")
             End If
-            dblStartparameter(i) = Parameter(i)
+            dblStartparameter(i) = OptParameter(i).Xn
         Next
         dblStartparameter.CopyTo(dblLetzteParameter, 0)
         dblStartparameter.CopyTo(dblLetzteParameterBackup, 0)
