@@ -19,15 +19,13 @@ Public Class OptResult
     'Allgemeine Einstellungen
     Private Datensatz As String
 
+    'Das Problem
+    Private mProblem As EVO.Common.Problem
+
     'Ergebnisdatenbank
     Public Ergebnisdb As Boolean = True              'Gibt an, ob die Ergebnisdatenbank geschrieben werden soll
     Private db_path As String                        'Pfad zur Ergebnisdatenbank
     Private db As OleDb.OleDbConnection
-
-    'Optimierungsbedingungen
-    Public List_OptParameter() As EVO.Common.OptParameter
-    Public List_OptParameter_Save() As EVO.Common.OptParameter
-    Public List_Locations() As EVO.Common.Struct_Lokation
 
     'Array von Lösungen
     Public Solutions() As Common.Individuum
@@ -46,30 +44,22 @@ Public Class OptResult
 
     'Konstruktor
     '***********
-    Public Sub New()
-
-        ReDim Me.Solutions(-1)
-        ReDim Me.selSolutionIDs(-1)
-        ReDim Me.SekPops(-1)
-
-    End Sub
-
-    Public Sub New(ByVal Datensatzname As String, ByVal oList_OptParameter() As EVO.Common.OptParameter, ByVal oList_OptParameter_Save() As EVO.Common.OptParameter, ByVal oList_Locations() As EVO.Common.Struct_Lokation)
+    Public Sub New(ByVal Datensatzname As String, ByRef prob As EVO.Common.Problem, Optional ByVal createNewMdb As Boolean = True)
 
         'Datensatzname speichern
         Me.Datensatz = Datensatzname
 
-        'Optimierungsbedingungen kopieren
-        Me.List_OptParameter = oList_OptParameter
-        Me.List_OptParameter_Save = oList_OptParameter_Save
-        Me.List_Locations = oList_Locations
+        'Problem speichern
+        Me.mProblem = prob
 
         ReDim Me.Solutions(-1)
         ReDim Me.selSolutionIDs(-1)
         ReDim Me.SekPops(-1)
 
-        'DB initialiseren
-        Call Me.db_init()
+        If (createNewMdb) Then
+            'DB initialiseren
+            Call Me.db_init()
+        End If
 
     End Sub
 
@@ -232,10 +222,10 @@ Public Class OptResult
 
         inds = Me.getSekPop(igen)
 
-        ReDim values(inds.GetUpperBound(0), Common.Manager.AnzPenalty - 1)
+        ReDim values(inds.GetUpperBound(0), Me.mProblem.NumPenalties - 1)
 
         For i = 0 To inds.GetUpperBound(0)
-            For j = 0 To Common.Manager.AnzPenalty - 1
+            For j = 0 To Me.mProblem.NumPenalties - 1
                 values(i, j) = inds(i).Penalties(j)
             Next
         Next
@@ -290,7 +280,7 @@ Public Class OptResult
         'Allgemeine Anpassungen
         Call Me.db_prepare()
         'Methodenspezifische Anpassungen
-        Select Case EVO.Common.Manager.Method
+        Select Case Me.mProblem.Method
             Case EVO.Common.METH_PES, EVO.Common.METH_SENSIPLOT, EVO.Common.METH_HOOKJEEVES
                 Call Me.db_prepare_PES()
             Case EVO.Common.METH_CES
@@ -317,11 +307,11 @@ Public Class OptResult
         '----------------
         'Spalten festlegen:
         Dim fieldnames As String = ""
-        For i = 0 To Common.Manager.AnzZiele - 1
+        For i = 0 To Me.mProblem.NumFeatures - 1
             If (i > 0) Then
                 fieldnames &= ", "
             End If
-            fieldnames &= "[" & Common.Manager.List_Ziele(i).Bezeichnung & "] DOUBLE"
+            fieldnames &= "[" & Me.mProblem.List_Featurefunctions(i).Bezeichnung & "] DOUBLE"
         Next
         'Tabelle anpassen
         command.CommandText = "ALTER TABLE QWerte ADD COLUMN " & fieldnames
@@ -329,14 +319,14 @@ Public Class OptResult
 
         'Tabelle 'Constraints'
         '----------------
-        If (Common.Manager.AnzConstraints > 0) Then
+        If (Me.mProblem.NumConstraints > 0) Then
             'Spalten festlegen:
             fieldnames = ""
-            For i = 0 To Common.Manager.AnzConstraints - 1
+            For i = 0 To Me.mProblem.NumConstraints - 1
                 If (i > 0) Then
                     fieldnames &= ", "
                 End If
-                fieldnames &= "[" & Common.Manager.List_Constraints(i).Bezeichnung & "] DOUBLE"
+                fieldnames &= "[" & Me.mProblem.List_Constraintfunctions(i).Bezeichnung & "] DOUBLE"
             Next
             'Tabelle anpassen
             command.CommandText = "ALTER TABLE [Constraints] ADD COLUMN " & fieldnames
@@ -360,11 +350,11 @@ Public Class OptResult
         Dim fieldnames As String = ""
         Dim i As Integer
 
-        For i = 0 To List_OptParameter_Save.GetUpperBound(0)
+        For i = 0 To Me.mProblem.List_OptParameter.GetUpperBound(0)
             If (i > 0) Then
                 fieldnames &= ", "
             End If
-            fieldnames &= "[" & List_OptParameter_Save(i).Bezeichnung & "] DOUBLE"
+            fieldnames &= "[" & Me.mProblem.List_OptParameter(i).Bezeichnung & "] DOUBLE"
         Next
         'Tabelle anpassen
         command.CommandText = "ALTER TABLE OptParameter ADD COLUMN " & fieldnames
@@ -387,11 +377,11 @@ Public Class OptResult
         Dim fieldnames As String = ""
         Dim i As Integer
 
-        For i = 0 To Me.List_Locations.GetUpperBound(0)
+        For i = 0 To Me.mProblem.List_Locations.GetUpperBound(0)
             If (i > 0) Then
                 fieldnames &= ", "
             End If
-            fieldnames &= "[" & Me.List_Locations(i).Name & "] TEXT"
+            fieldnames &= "[" & Me.mProblem.List_Locations(i).Name & "] TEXT"
         Next
         'Tabelle anpassen
         command.CommandText = "ALTER TABLE Pfad ADD COLUMN " & fieldnames
@@ -442,21 +432,21 @@ Public Class OptResult
         '----------------
         Dim fieldnames As String = ""
         Dim fieldvalues As String = ""
-        For i = 0 To Common.Manager.AnzZiele - 1
-            fieldnames &= ", [" & Common.Manager.List_Ziele(i).Bezeichnung & "]"
-            fieldvalues &= ", " & ind.Zielwerte(i).ToString(Common.Provider.FortranProvider)
+        For i = 0 To Me.mProblem.NumFeatures - 1
+            fieldnames &= ", [" & Me.mProblem.List_Featurefunctions(i).Bezeichnung & "]"
+            fieldvalues &= ", " & ind.Features(i).ToString(Common.Provider.FortranProvider)
         Next
         command.CommandText = "INSERT INTO QWerte (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
         command.ExecuteNonQuery()
 
         'Constraints schreiben 
         '---------------------
-        If (Common.Manager.AnzConstraints > 0) Then
+        If (Me.mProblem.NumConstraints > 0) Then
             fieldnames = ""
             fieldvalues = ""
-            For i = 0 To Common.Manager.AnzConstraints - 1
-                fieldnames &= ", [" & Common.Manager.List_Constraints(i).Bezeichnung & "]"
-                fieldvalues &= ", " & ind.Constrain(i).ToString(Common.Provider.FortranProvider)
+            For i = 0 To Me.mProblem.NumConstraints - 1
+                fieldnames &= ", [" & Me.mProblem.List_Constraintfunctions(i).Bezeichnung & "]"
+                fieldvalues &= ", " & ind.Constraints(i).ToString(Common.Provider.FortranProvider)
             Next
             command.CommandText = "INSERT INTO [Constraints] (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
             command.ExecuteNonQuery()
@@ -466,8 +456,8 @@ Public Class OptResult
         '----------------------
         fieldnames = ""
         fieldvalues = ""
-        For i = 0 To Me.List_OptParameter.GetUpperBound(0)
-            fieldnames &= ", [" & Me.List_OptParameter(i).Bezeichnung & "]"
+        For i = 0 To Me.mProblem.List_OptParameter.GetUpperBound(0)
+            fieldnames &= ", [" & Me.mProblem.List_OptParameter(i).Bezeichnung & "]"
             fieldvalues &= ", " & ind.PES_OptParas(i).RWert.ToString(Common.Provider.FortranProvider)
         Next
         command.CommandText = "INSERT INTO OptParameter (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
@@ -496,21 +486,21 @@ Public Class OptResult
         '----------------
         Dim fieldnames As String = ""
         Dim fieldvalues As String = ""
-        For i = 0 To Common.Manager.AnzZiele - 1
-            fieldnames &= ", [" & Common.Manager.List_Ziele(i).Bezeichnung & "]"
-            fieldvalues &= ", " & ind.Zielwerte(i).ToString(Common.Provider.FortranProvider)
+        For i = 0 To Me.mProblem.NumFeatures - 1
+            fieldnames &= ", [" & Me.mProblem.List_Featurefunctions(i).Bezeichnung & "]"
+            fieldvalues &= ", " & ind.Features(i).ToString(Common.Provider.FortranProvider)
         Next
         command.CommandText = "INSERT INTO QWerte (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
         command.ExecuteNonQuery()
 
         'Constraints schreiben 
         '---------------------
-        If (Common.Manager.AnzConstraints > 0) Then
+        If (Me.mProblem.NumConstraints > 0) Then
             fieldnames = ""
             fieldvalues = ""
-            For i = 0 To Common.Manager.AnzConstraints - 1
-                fieldnames &= ", [" & Common.Manager.List_Constraints(i).Bezeichnung & "]"
-                fieldvalues &= ", " & ind.Constrain(i).ToString(Common.Provider.FortranProvider)
+            For i = 0 To Me.mProblem.NumConstraints - 1
+                fieldnames &= ", [" & Me.mProblem.List_Constraintfunctions(i).Bezeichnung & "]"
+                fieldvalues &= ", " & ind.Constraints(i).ToString(Common.Provider.FortranProvider)
             Next
             command.CommandText = "INSERT INTO [Constraints] (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
             command.ExecuteNonQuery()
@@ -520,14 +510,14 @@ Public Class OptResult
         '--------------
         fieldnames = ""
         fieldvalues = ""
-        For i = 0 To Me.List_Locations.GetUpperBound(0)
-            fieldnames &= ", [" & Me.List_Locations(i).Name & "]"
+        For i = 0 To Me.mProblem.List_Locations.GetUpperBound(0)
+            fieldnames &= ", [" & Me.mProblem.List_Locations(i).Name & "]"
             fieldvalues &= ", '" & ind.Measures(i) & "'"
         Next
         command.CommandText = "INSERT INTO Pfad (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
         command.ExecuteNonQuery()
 
-        If (EVO.Common.Manager.Method = EVO.Common.METH_HYBRID) Then
+        If (Me.mProblem.Method = EVO.Common.METH_HYBRID) Then
 
             Dim found As Boolean
 
@@ -535,12 +525,12 @@ Public Class OptResult
             '----------------------
             fieldnames = ""
             fieldvalues = ""
-            For i = 0 To Me.List_OptParameter_Save.GetUpperBound(0)
+            For i = 0 To Me.mProblem.List_OptParameter_Save.GetUpperBound(0)
                 found = False
-                fieldnames &= ", [" & Me.List_OptParameter_Save(i).Bezeichnung & "]"
+                fieldnames &= ", [" & Me.mProblem.List_OptParameter_Save(i).Bezeichnung & "]"
                 For x = 0 To ind.Loc.GetUpperBound(0)
                     For y = 0 To ind.Loc(x).PES_OptPara.GetUpperBound(0)
-                        If ind.Loc(x).PES_OptPara(y).Bezeichnung = Me.List_OptParameter_Save(i).Bezeichnung Then
+                        If ind.Loc(x).PES_OptPara(y).Bezeichnung = Me.mProblem.List_OptParameter_Save(i).Bezeichnung Then
                             fieldvalues &= ", " & ind.Loc(x).PES_OptPara(y).RWert.ToString(Common.Provider.FortranProvider)
                             found = True
                         End If
@@ -579,8 +569,8 @@ Public Class OptResult
 
             'zugehörige Sim_ID bestimmen
             bedingung = ""
-            For j = 0 To Common.Manager.AnzPenalty - 1
-                bedingung &= " AND QWerte.[" & Common.Manager.List_OptZiele(j).Bezeichnung & "] = " & SekPop(i, j).ToString(Common.Provider.FortranProvider)
+            For j = 0 To Me.mProblem.NumPenalties - 1
+                bedingung &= " AND QWerte.[" & Me.mProblem.List_Penaltyfunctions(j).Bezeichnung & "] = " & SekPop(i, j).ToString(Common.Provider.FortranProvider)
             Next
             command.CommandText = "SELECT Sim.ID FROM Sim INNER JOIN QWerte ON Sim.ID = QWerte.Sim_ID WHERE (1=1" & bedingung & ")"
             Sim_ID = command.ExecuteScalar()
@@ -686,7 +676,7 @@ Public Class OptResult
         'Neuen Dateipfad speichern
         Me.db_path = sourceFile
 
-        Select Case EVO.Common.Manager.Method
+        Select Case Me.mProblem.Method
             Case EVO.Common.METH_PES, EVO.Common.METH_HOOKJEEVES, EVO.Common.METH_SENSIPLOT
                 Call db_getIndividuen_PES(QWerteOnly)
 
@@ -694,7 +684,7 @@ Public Class OptResult
                 Call db_getIndividuen_CES(QWerteOnly)
 
             Case Else
-                MsgBox("OptResult.dbload() für Methode '" & EVO.Common.Manager.Method & "' noch nicht implementiert!", MsgBoxStyle.Exclamation)
+                MsgBox("OptResult.dbload() für Methode '" & Me.mProblem.Method & "' noch nicht implementiert!", MsgBoxStyle.Exclamation)
                 Exit Sub
         End Select
 
@@ -743,27 +733,27 @@ Public Class OptResult
 
                 If (Not QWerteOnly) Then
 
-                    ReDim .PES_OptParas(Me.List_OptParameter_Save.GetUpperBound(0))
+                    ReDim .PES_OptParas(Me.mProblem.List_OptParameter_Save.GetUpperBound(0))
 
                     'OptParameter
                     '------------
-                    For j = 0 To Me.List_OptParameter_Save.GetUpperBound(0)
-                        .PES_OptParas(j) = Me.List_OptParameter_Save(j).Clone()
-                        .PES_OptParas(j).RWert = ds.Tables(0).Rows(i).Item(Me.List_OptParameter_Save(j).Bezeichnung)
+                    For j = 0 To Me.mProblem.List_OptParameter_Save.GetUpperBound(0)
+                        .PES_OptParas(j) = Me.mProblem.List_OptParameter_Save(j).Clone()
+                        .PES_OptParas(j).RWert = ds.Tables(0).Rows(i).Item(Me.mProblem.List_OptParameter_Save(j).Bezeichnung)
                     Next
 
                     'Constraints
                     '-----------
-                    For j = 0 To Common.Manager.AnzConstraints - 1
-                        .Constrain(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Constraints(j).Bezeichnung)
+                    For j = 0 To Me.mProblem.NumConstraints - 1
+                        .Constraints(j) = ds.Tables(0).Rows(i).Item(Me.mProblem.List_Constraintfunctions(j).Bezeichnung)
                     Next
 
                 End If
 
                 'QWerte
                 '------
-                For j = 0 To Common.Manager.AnzZiele - 1
-                    .Zielwerte(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Ziele(j).Bezeichnung)
+                For j = 0 To Me.mProblem.NumFeatures - 1
+                    .Features(j) = ds.Tables(0).Rows(i).Item(Me.mProblem.List_Featurefunctions(j).Bezeichnung)
                 Next
 
             End With
@@ -787,7 +777,7 @@ Public Class OptResult
 
         'Alle Lösungen aus DB lesen
         '--------------------------
-        Select Case EVO.Common.Manager.Method
+        Select Case Me.mProblem.Method
             Case EVO.Common.METH_CES
                 q = "SELECT Sim.ID, Pfad.*, QWerte.*, Constraints.* FROM ((Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN Pfad ON Sim.ID=Pfad.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID"
             Case EVO.Common.METH_HYBRID
@@ -817,35 +807,29 @@ Public Class OptResult
 
                 If (Not QWerteOnly) Then
 
-                    'Bei CES sollte List_OptParameter_Save eine Länge von 0 haben, deswegen keine Fallunterscheidung notwendig
-                    ReDim .PES_OptParas(Me.List_OptParameter_Save.GetUpperBound(0))
-
                     'OptParameter
                     '------------
-                    For j = 0 To Me.List_OptParameter_Save.GetUpperBound(0)
-                        .PES_OptParas(j) = Me.List_OptParameter_Save(j).Clone()
-                        .PES_OptParas(j).RWert = ds.Tables(0).Rows(i).Item(Me.List_OptParameter_Save(j).Bezeichnung)
-                    Next
+                    'TODO: OptParameter aus DB in Individuum_CES einlesen
 
                     'Constraints
                     '-----------
-                    For j = 0 To Common.Manager.AnzConstraints - 1
-                        .Constrain(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Constraints(j).Bezeichnung)
+                    For j = 0 To Me.mProblem.NumConstraints - 1
+                        .Constraints(j) = ds.Tables(0).Rows(i).Item(Me.mProblem.List_Constraintfunctions(j).Bezeichnung)
                     Next
 
                     'Pfad
                     '----
-                    ReDim .Measures(Me.List_Locations.GetUpperBound(0))
-                    For j = 0 To Me.List_Locations.GetUpperBound(0)
-                        .Measures(j) = ds.Tables(0).Rows(i).Item(Me.List_Locations(j).Name)
+                    ReDim .Measures(Me.mProblem.List_Locations.GetUpperBound(0))
+                    For j = 0 To Me.mProblem.List_Locations.GetUpperBound(0)
+                        .Measures(j) = ds.Tables(0).Rows(i).Item(Me.mProblem.List_Locations(j).Name)
                     Next
 
                 End If
 
                 'QWerte
                 '------
-                For j = 0 To Common.Manager.AnzZiele - 1
-                    .Zielwerte(j) = ds.Tables(0).Rows(i).Item(Common.Manager.List_Ziele(j).Bezeichnung)
+                For j = 0 To Me.mProblem.NumFeatures - 1
+                    .Features(j) = ds.Tables(0).Rows(i).Item(Me.mProblem.List_Featurefunctions(j).Bezeichnung)
                 Next
 
             End With

@@ -1679,12 +1679,12 @@ Partial Class EVO_Einstellungen
     Friend WithEvents ÖffnenToolStripButton As System.Windows.Forms.ToolStripButton
     Friend WithEvents SpeichernToolStripButton As System.Windows.Forms.ToolStripButton
     Private WithEvents ToolStrip1 As System.Windows.Forms.ToolStrip
-    Friend WithEvents GroupBox_Einstellungen As System.Windows.Forms.GroupBox
-    Friend WithEvents TabPage_HookeJeeves As System.Windows.Forms.TabPage
+    Private WithEvents GroupBox_Einstellungen As System.Windows.Forms.GroupBox
+    Private WithEvents TabPage_HookeJeeves As System.Windows.Forms.TabPage
     Private WithEvents Numeric_HJ_DeltaFinish As System.Windows.Forms.NumericUpDown
     Private WithEvents Numeric_HJ_DeltaStart As System.Windows.Forms.NumericUpDown
     Private WithEvents CheckBox_HJ_DNVektor As System.Windows.Forms.CheckBox
-    Public WithEvents TabPage_PES As System.Windows.Forms.TabPage
+    Private WithEvents TabPage_PES As System.Windows.Forms.TabPage
     Public WithEvents Label_HJ_TSaktuelle As System.Windows.Forms.Label
     Public WithEvents Label_HJ_RS As System.Windows.Forms.Label
     Public WithEvents Label_HJ_ES As System.Windows.Forms.Label
@@ -1711,7 +1711,7 @@ Partial Class EVO_Einstellungen
     Private WithEvents Numeric_CES_NExchange_SecPop_PES As System.Windows.Forms.NumericUpDown
     Friend WithEvents CheckBox_CES_UseSecPop_PES As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBox_CES_UseSecPop_CES As System.Windows.Forms.CheckBox
-    Public WithEvents TabPage_CES As System.Windows.Forms.TabPage
+    Private WithEvents TabPage_CES As System.Windows.Forms.TabPage
     Friend WithEvents Combo_CES_MemStrategy As System.Windows.Forms.ComboBox
     Private WithEvents Numeric_CES_n_MemSize As System.Windows.Forms.NumericUpDown
     Private WithEvents GroupBox_SekPop As System.Windows.Forms.GroupBox
@@ -1722,7 +1722,6 @@ Partial Class EVO_Einstellungen
     Private WithEvents CheckBox_CES_RealOptimisation As System.Windows.Forms.CheckBox
     Private WithEvents LabelAnzEltern As System.Windows.Forms.Label
     Private WithEvents CheckBox_CES_StartPESPop As System.Windows.Forms.CheckBox
-    Friend WithEvents TabPage_MetaEvo As System.Windows.Forms.TabPage
     Public WithEvents TabControl1 As System.Windows.Forms.TabControl
     Friend WithEvents Combo_Hybrid_Role As System.Windows.Forms.ComboBox
     Private WithEvents Numeric_Hybrid_Numbergenerations As System.Windows.Forms.NumericUpDown
@@ -1735,4 +1734,5 @@ Partial Class EVO_Einstellungen
     Friend WithEvents TextBox_Hybrid_MySQL_User As System.Windows.Forms.TextBox
     Friend WithEvents TextBox_Hybrid_MySQL_Host As System.Windows.Forms.TextBox
     Friend WithEvents TextBox_Hybrid_MySQL_DB As System.Windows.Forms.TextBox
+    Private WithEvents TabPage_MetaEvo As System.Windows.Forms.TabPage
 End Class

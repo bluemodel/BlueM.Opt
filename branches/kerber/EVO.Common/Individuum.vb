@@ -24,15 +24,15 @@ Public MustInherit Class Individuum
 
     'Shared Variablen der Klasse
     '***************************
-    Protected Shared n_Para As Integer      'Anzahl Parameter
+    Protected Shared mProblem As Problem    'Das Problem
 
     'Eigenschaften
     '*************
     Protected mType As String               'Typ des Individuums
     Protected mID As Integer                'ID des Individuums
 
-    Protected mZielwerte() As Double        'Array aller Zielfunktionswerte (inkl. sekundär)
-    Protected mConstrain() As Double        'Werte der Randbedingungen (Wenn negativ dann ungültig)
+    Protected mFeatures() As Double         'Array aller Featurefunktionswerte (inkl. Penalties)
+    Protected mConstraints() As Double      'Werte der Randbedingungen (Wenn negativ dann ungültig)
 
     'Für ND Sorting -------------------------------------------------
     Protected mDominated As Boolean         'Kennzeichnung ob Dominiert
@@ -56,34 +56,33 @@ Public MustInherit Class Individuum
     End Property
 
     ''' <summary>
-    ''' Werte der Zielfunktionen
+    ''' Werte der Feature Funktionen
     ''' </summary>
-    ''' <remarks>Zielfunktionen beinhalten die Penaltyfunktionen und die Eigenschaftsfunktionen</remarks>
-    Public Property Zielwerte() As Double()
+    ''' <remarks>Featurefunktionen beinhalten auch die Penaltyfunktionen</remarks>
+    Public Property Features() As Double()
         Get
-            Return Me.mZielwerte
+            Return Me.mFeatures
         End Get
         Set(ByVal value As Double())
-            Me.mZielwerte = value
+            Me.mFeatures = value
         End Set
     End Property
 
     ''' <summary>
     ''' Werte der Penalty-Funktionen
     ''' </summary>
-    ''' <remarks>Zielfunktionswerte nur von OptZielen</remarks>
     Public ReadOnly Property Penalties() As Double()
         Get
             Dim i, j As Integer
             Dim Array() As Double
 
-            ReDim Array(Common.Manager.AnzPenalty - 1)
+            ReDim Array(Individuum.mProblem.NumPenalties - 1)
 
             j = 0
-            For i = 0 To Common.Manager.AnzZiele - 1
-                'Nur die Zielfunktionswerte von OptZielen zurückgeben!
-                If (Common.Manager.List_Ziele(i).isOpt) Then
-                    Array(j) = Me.Zielwerte(i)
+            For i = 0 To Individuum.mProblem.NumFeatures - 1
+                'Nur die Feature-Werte von Penalty-Funktionen zurückgeben!
+                If (Individuum.mProblem.List_Featurefunctions(i).isPenalty) Then
+                    Array(j) = Me.Features(i)
                     j += 1
                 End If
             Next
@@ -95,12 +94,12 @@ Public MustInherit Class Individuum
     ''' Werte der Constraintfunktionen
     ''' </summary>
     ''' <remarks>Negativer Constraintwert bedeutet Randbedingung ist verletzt</remarks>
-    Public Property Constrain() As Double()
+    Public Property Constraints() As Double()
         Get
-            Return Me.mConstrain
+            Return Me.mConstraints
         End Get
         Set(ByVal value As Double())
-            Me.mConstrain = value
+            Me.mConstraints = value
         End Set
     End Property
 
@@ -146,8 +145,8 @@ Public MustInherit Class Individuum
     ''' <remarks>wenn einer der Werte der Constraint-Funktionen negativ ist, ist das Individuum ungültig (Is_Feasible = False)</remarks>
     Public ReadOnly Property Is_Feasible() As Boolean
         Get
-            For i As Integer = 0 To Me.Constrain.GetUpperBound(0)
-                If (Me.Constrain(i) < 0) Then Return False
+            For i As Integer = 0 To Me.Constraints.GetUpperBound(0)
+                If (Me.Constraints(i) < 0) Then Return False
             Next
             Return True
         End Get
@@ -163,8 +162,11 @@ Public MustInherit Class Individuum
     ''' <summary>
     ''' Initialisiert die Basis-Individuumsklasse
     ''' </summary>
-    ''' <remarks>Diese Methode bewirkt nichts</remarks>
-    Public Shared Sub Initialise()
+    ''' <param name="prob">Das Problem</param>
+    Public Shared Sub Initialise(ByRef prob As Problem)
+
+        'Problem speichern
+        Individuum.mProblem = prob
 
     End Sub
 
@@ -177,22 +179,27 @@ Public MustInherit Class Individuum
 
         Dim i As Integer
 
+        'Check Initialisierung
+        If (IsNothing(Individuum.mProblem)) Then
+            Throw New Exception("Die Individuumsklasse wurde noch nicht mit einem Problem initialisiert!")
+        End If
+
         'Typ des Individuum
         Me.mType = type
 
         'Nummer des Individuum
         Me.mID = id
 
-        'Zielfunktionswerte
-        ReDim Me.Zielwerte(Common.Manager.AnzZiele - 1)
-        For i = 0 To Common.Manager.AnzZiele - 1
-            Me.Zielwerte(i) = Double.MaxValue           'mit maximalem Double-Wert initialisieren
+        'Feature-Werte
+        ReDim Me.Features(Individuum.mProblem.NumFeatures - 1)
+        For i = 0 To Individuum.mProblem.NumFeatures - 1
+            Me.Features(i) = Double.MaxValue           'mit maximalem Double-Wert initialisieren
         Next
 
-        'Wert der Randbedingung(en)
-        ReDim Me.Constrain(Common.Manager.AnzConstraints - 1)
-        For i = 0 To Common.Manager.AnzConstraints - 1
-            Me.Constrain(i) = Double.MinValue           'mit minimalem Double-Wert initialisieren
+        'Contraint-Werte
+        ReDim Me.Constraints(Individuum.mProblem.NumConstraints - 1)
+        For i = 0 To Individuum.mProblem.NumConstraints - 1
+            Me.Constraints(i) = Double.MinValue        'mit minimalem Double-Wert initialisieren
         Next
 
         'Kennzeichnung ob Dominiert
@@ -276,10 +283,10 @@ Public MustInherit Class Individuum
         Dim j, i As Integer
         Dim Array(,) As Double
 
-        ReDim Array(Indi_Array.GetUpperBound(0), Manager.AnzPenalty - 1)
+        ReDim Array(Indi_Array.GetUpperBound(0), Individuum.mProblem.NumPenalties - 1)
 
         For i = 0 To Indi_Array.GetUpperBound(0)
-            For j = 0 To Manager.AnzPenalty - 1
+            For j = 0 To Individuum.mProblem.NumPenalties - 1
                 Array(i, j) = Indi_Array(i).Penalties(j)
             Next j
         Next i

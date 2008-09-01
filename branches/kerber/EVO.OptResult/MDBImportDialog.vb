@@ -1,32 +1,44 @@
 Public Class MDBImportDialog
 
+    Private mProblem As EVO.Common.Problem
+
+    Public Sub New(ByRef prob As EVO.Common.Problem)
+
+        ' This call is required by the Windows Form Designer.
+        InitializeComponent()
+
+        ' Add any initialization after the InitializeComponent() call.
+        Me.mProblem = prob
+
+    End Sub
+
     'Form load
     '*********
     Private Sub MDBImportDialog_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
         'Listboxen füllen
         Dim bezeichnung As String
-        For Each ziel As Common.Ziel In Common.Manager.List_Ziele
-            bezeichnung = ziel.Bezeichnung
-            'OptZiele mit Sternchen markieren
-            If (ziel.isOpt) Then bezeichnung &= " (*)"
+        For Each feature As Common.Featurefunction In Me.mProblem.List_Featurefunctions
+            bezeichnung = feature.Bezeichnung
+            'Penalty-Funktionen mit Sternchen markieren
+            If (feature.isPenalty) Then bezeichnung &= " (*)"
             Me.ListBox_ZieleX.Items.Add(bezeichnung)
             Me.ListBox_ZieleY.Items.Add(bezeichnung)
             Me.ListBox_ZieleZ.Items.Add(bezeichnung)
         Next
 
         'Bei weniger als 3 Zielen Z-Achse ausblenden
-        If (Common.Manager.AnzZiele < 3) Then
+        If (Me.mProblem.NumFeatures < 3) Then
             Me.ListBox_ZieleZ.Enabled = False
         End If
         'Bei weniger als 2 Zielen Y-Achse und SekPop-Optionen ausblenden
-        If (Common.Manager.AnzZiele < 2) Then
+        If (Me.mProblem.NumFeatures < 2) Then
             Me.ListBox_ZieleY.Enabled = False
             Me.GroupBox_SekPop.Enabled = False
         End If
 
         'SekPop Combobox
-        If (Common.Manager.AnzPenalty < 2) Then
+        If (Me.mProblem.NumPenalties < 2) Then
             Me.ComboBox_SekPop.SelectedIndex = 1
         Else
             Me.ComboBox_SekPop.SelectedIndex = 0

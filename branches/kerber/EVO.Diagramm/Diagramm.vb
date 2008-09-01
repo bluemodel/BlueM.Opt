@@ -42,7 +42,7 @@ Public Class Diagramm
 
     'Diagramm bearbeiten
     '*******************
-    Private Sub TChartEdit(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Me.DoubleClick
+    Public Sub TChartEdit(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Me.DoubleClick
         Try
             Me.ShowEditor()
         Catch ex As Exception

@@ -19,15 +19,6 @@
     End Property
 
     ''' <summary>
-    ''' Initialisiert die PES-Individuumsklasse
-    ''' </summary>
-    ''' <param name="AnzahlParameter">Anzahl der Parameter, die jedes Individuum besitzen soll</param>
-    ''' <remarks></remarks>
-    Public Overloads Shared Sub Initialise(ByVal AnzahlParameter As Integer)
-        Individuum_PES.n_Para = AnzahlParameter
-    End Sub
-
-    ''' <summary>
     ''' Konstruktor
     ''' </summary>
     ''' <param name="type">Frei definierbarer String</param>
@@ -42,7 +33,7 @@
         Dim i As Integer
 
         'Parameterarray für PES
-        ReDim Me.PES_OptParas(n_Para - 1)
+        ReDim Me.PES_OptParas(Individuum.mProblem.NumParams - 1)
         For i = 0 To Me.PES_OptParas.GetUpperBound(0)
             Me.PES_OptParas(i) = New OptParameter()
         Next
@@ -59,12 +50,12 @@
 
         Clone = New Individuum_PES(Me.mType, Me.mID)
 
-        'Zielfunktionswerte
-        Call Array.Copy(Me.Zielwerte, Clone.Zielwerte, Me.Zielwerte.Length)
+        'Feature-Werte
+        Call Array.Copy(Me.Features, Clone.Features, Me.Features.Length)
 
-        'Werte der Randbedingungen
-        If (Not Me.Constrain.GetLength(0) = -1) Then
-            Array.Copy(Me.Constrain, Clone.Constrain, Me.Constrain.Length)
+        'Constraint-Werte
+        If (Not Me.Constraints.GetLength(0) = -1) Then
+            Array.Copy(Me.Constraints, Clone.Constraints, Me.Constraints.Length)
         End If
 
         'Kennzeichnung ob Dominiert

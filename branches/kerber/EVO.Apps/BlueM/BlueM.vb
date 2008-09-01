@@ -39,7 +39,7 @@ Public Class BlueM
 
     'SKos
     '----
-    Public SKos1 As New SKos()
+    Public SKos1 As SKos
 
     '**** Multithreading ****
     Dim My_C_Thread() As CThread
@@ -65,7 +65,7 @@ Public Class BlueM
         Me.useKWL = False
         Me.isIHA = False
 
-        'BluM_DLL
+        'BlueM_DLL
         Dim dll_path As String
         dll_path = System.Windows.Forms.Application.StartupPath() & "\BlueM\BlueM.dll"
 
@@ -92,6 +92,70 @@ Public Class BlueM
 
     End Sub
 
+    Public Overrides Sub setProblem(ByRef prob As EVO.Common.Problem)
+
+        Call MyBase.setProblem(prob)
+
+        'SKos instanzieren
+        Me.SKos1 = New SKos(prob)
+
+        'BlueM-spezifische Weiterverarbeitung von ZielReihen:
+        '====================================================
+        Dim feature As Common.Featurefunction
+
+        'KWL: Feststellen, ob irgendeine Zielfunktion die KWL-Datei benutzt
+        '------------------------------------------------------------------
+        For Each feature In Me.mProblem.List_Featurefunctions
+            If (feature.Datei = "KWL") Then
+                Me.useKWL = True
+                Exit For
+            End If
+        Next
+
+        'IHA
+        '---
+        Dim IHAZielReihe As Wave.Zeitreihe
+        Dim IHAStart, IHAEnde As DateTime
+
+        IHAZielReihe = New Wave.Zeitreihe("new")
+
+        'Gibt es eine IHA-Zielfunktion?
+        'HACK: es wird immer nur das erste IHA-Ziel verwendet!
+        '------------------------------
+        For Each feature In Me.mProblem.List_Featurefunctions
+            If (feature.Typ = "IHA") Then
+                'IHA-Berechnung einschalten
+                Me.isIHA = True
+                IHAZielReihe = feature.RefReihe
+                IHAStart = feature.EvalStart
+                IHAEnde = feature.EvalEnde
+                Exit For
+            End If
+        Next
+
+        'IHA-Berechnung vorbereiten
+        '--------------------------
+        If (Me.isIHA) Then
+            'IHAAnalyse-Objekt instanzieren
+            Me.IHASys = New IHWB.IHA.IHAAnalysis(Me.WorkDir_Original & "IHA\", IHAZielReihe, IHAStart, IHAEnde)
+
+            'IHAProcessor-Objekt instanzieren
+            Me.IHAProc = New IHAProcessor()
+
+            'IHA-Vergleichsmodus?
+            '--------------------
+            Dim reffile As String = Me.WorkDir_Original & Me.Datensatz & ".rva"
+            If (File.Exists(reffile)) Then
+
+                Dim RVABase As New Wave.RVA(reffile)
+
+                'Vergleichsmodus aktivieren
+                Call Me.IHAProc.setComparisonMode(RVABase.RVAValues)
+            End If
+
+        End If
+
+    End Sub
 
 #Region "Eingabedateien lesen"
 
@@ -107,9 +171,9 @@ Public Class BlueM
 
         'ALL-Datei öffnen
         '----------------
-        Dim Datei As String = Me.WorkDir & Me.Datensatz & ".ALL"
+        Dim Datei As String = Me.WorkDir_Original & Me.Datensatz & ".ALL"
 
-        Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.Read)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
         'Alle Zeilen durchlaufen
@@ -160,137 +224,6 @@ Public Class BlueM
 
     End Sub
 
-    'Optimierungsziele einlesen
-    '**************************
-    Protected Overrides Sub Read_ZIE()
-
-        Call MyBase.Read_ZIE()
-
-        'BlueM-spezifische Weiterverarbeitung von ZielReihen:
-        '====================================================
-        Dim ziel As Common.Ziel
-
-        'KWL: Feststellen, ob irgendeine Zielfunktion die KWL-Datei benutzt
-        '------------------------------------------------------------------
-        For Each ziel In Common.Manager.List_Ziele
-            If (ziel.Datei = "KWL") Then
-                Me.useKWL = True
-                Exit For
-            End If
-        Next
-
-        'IHA
-        '---
-        Dim IHAZielReihe As Wave.Zeitreihe
-        Dim IHAStart, IHAEnde As DateTime
-
-        IHAZielReihe = New Wave.Zeitreihe("new")
-
-        'Gibt es eine IHA-Zielfunktion?
-        'HACK: es wird immer nur das erste IHA-Ziel verwendet!
-        '------------------------------
-        For Each ziel In Common.Manager.List_Ziele
-            If (ziel.ZielTyp = "IHA") Then
-                'IHA-Berechnung einschalten
-                Me.isIHA = True
-                IHAZielReihe = ziel.RefReihe
-                IHAStart = ziel.EvalStart
-                IHAEnde = ziel.EvalEnde
-                Exit For
-            End If
-        Next
-
-        'IHA-Berechnung vorbereiten
-        '--------------------------
-        If (Me.isIHA) Then
-            'IHAAnalyse-Objekt instanzieren
-            Me.IHASys = New IHWB.IHA.IHAAnalysis(Me.WorkDir & "IHA\", IHAZielReihe, IHAStart, IHAEnde)
-
-            'IHAProcessor-Objekt instanzieren
-            Me.IHAProc = New IHAProcessor()
-
-            'IHA-Vergleichsmodus?
-            '--------------------
-            Dim reffile As String = Me.WorkDir & Me.Datensatz & ".rva"
-            If (File.Exists(reffile)) Then
-
-                Dim RVABase As New Wave.RVA(reffile)
-
-                'Vergleichsmodus aktivieren
-                Call Me.IHAProc.setComparisonMode(RVABase.RVAValues)
-            End If
-
-        End If
-
-    End Sub
-
-    'Kombinatorik einlesen
-    '*********************
-    Protected Overrides Sub Read_Kombinatorik()
-
-        Dim Datei As String = WorkDir & Datensatz & "." & Combi_Ext
-
-        Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
-        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-
-        Dim Zeile As String
-        Dim Anz As Integer = 0
-
-        'Anzahl der Parameter feststellen
-        Do
-            Zeile = StrRead.ReadLine.ToString()
-            If (Zeile.StartsWith("*") = False) Then
-                Anz += 1
-            End If
-        Loop Until StrRead.Peek() = -1
-
-        Dim i As Integer = -1
-        Dim j As Integer = 0
-        ReDim List_Locations(0)
-        ReDim List_Locations(0).List_Massnahmen(0)
-
-        'Zurück zum Dateianfang und lesen
-        FiStr.Seek(0, SeekOrigin.Begin)
-
-        Dim array() As String
-        Do
-            Zeile = StrRead.ReadLine.ToString()
-            If (Zeile.StartsWith("*") = False) Then
-                array = Zeile.Split("|")
-                'Werte zuweisen
-
-                If Not Is_Name_IN(array(1).Trim(), List_Locations) Then
-                    i += 1
-                    j = 0
-                    System.Array.Resize(List_Locations, i + 1)
-                    List_Locations(i).Name = array(1).Trim()
-                End If
-                System.Array.Resize(List_Locations(i).List_Massnahmen, j + 1)
-                ReDim List_Locations(i).List_Massnahmen(j).Schaltung(2, 1)
-                ReDim List_Locations(i).List_Massnahmen(j).Bauwerke(3)
-                List_Locations(i).List_Massnahmen(j).Name = array(2).Trim()
-                List_Locations(i).List_Massnahmen(j).Schaltung(0, 0) = array(3).Trim()
-                List_Locations(i).List_Massnahmen(j).Schaltung(0, 1) = array(4).Trim()
-                List_Locations(i).List_Massnahmen(j).Schaltung(1, 0) = array(5).Trim()
-                List_Locations(i).List_Massnahmen(j).Schaltung(1, 1) = array(6).Trim()
-                List_Locations(i).List_Massnahmen(j).Schaltung(2, 0) = array(7).Trim()
-                List_Locations(i).List_Massnahmen(j).Schaltung(2, 1) = array(8).Trim()
-                List_Locations(i).List_Massnahmen(j).KostenTyp = array(9).Trim()
-                List_Locations(i).List_Massnahmen(j).Bauwerke(0) = array(10).Trim()
-                List_Locations(i).List_Massnahmen(j).Bauwerke(1) = array(11).Trim()
-                List_Locations(i).List_Massnahmen(j).Bauwerke(2) = array(12).Trim()
-                List_Locations(i).List_Massnahmen(j).Bauwerke(3) = array(13).Trim()
-                List_Locations(i).List_Massnahmen(j).TestModus = Convert.ToInt16(array(14).Trim())
-                j += 1
-            End If
-
-        Loop Until StrRead.Peek() = -1
-
-        StrRead.Close()
-        FiStr.Close()
-
-    End Sub
-
     'Liest die Verzweigungen aus BlueM in ein Array ein
     'Und Dimensioniert das Verzweigungsarray
     '*******************************************************
@@ -298,7 +231,7 @@ Public Class BlueM
 
         Dim i As Integer
 
-        Dim FiStr As FileStream = New FileStream(WorkDir & Datensatz & ".ver", FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim FiStr As FileStream = New FileStream(WorkDir_Current & Datensatz & ".ver", FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
         'Anzahl der Parameter feststellen
@@ -351,13 +284,13 @@ Public Class BlueM
         launchFree = False
 
         For Each Thr_C As CThread In My_C_Thread
-            If Thr_C.Sim_Is_OK = True and Thr_C.get_Child_ID = -1 then
+            If Thr_C.Sim_Is_OK = True And Thr_C.get_Child_ID = -1 Then
                 launchFree = True
                 Thread_ID = Thr_C.get_Thread_ID
                 Exit For
             End If
         Next
-        
+
     End Function
 
     'BlauesModell ausführen (simulieren)
@@ -367,17 +300,61 @@ Public Class BlueM
 
         launchSim = False
         Dim Folder As String
-                       
+
         Folder = getWorkDir(Thread_ID)
-        My_C_Thread(Thread_ID) = new CThread(Thread_ID, Child_ID, Folder, Datensatz, bluem_dll(Thread_ID))
-        MyThread(Thread_ID) = new Thread(AddressOf My_C_Thread(Thread_ID).Thread)
+        My_C_Thread(Thread_ID) = New CThread(Thread_ID, Child_ID, Folder, Datensatz, bluem_dll(Thread_ID))
+        MyThread(Thread_ID) = New Thread(AddressOf My_C_Thread(Thread_ID).Thread)
         MyThread(Thread_ID).IsBackground = True
         MyThread(Thread_ID).Start()
         launchSim = True
 
         Return launchSim
 
-    End function
+    End Function
+
+    'BlueM ohne Thread ausführen
+    '***************************
+    Public Overrides Function launchSim() As Boolean
+
+        Dim simOK As Boolean
+
+        Try
+
+            'Datensatz übergeben und initialisieren
+            Call bluem_dll(0).Initialize(Me.WorkDir_Current & Me.Datensatz)
+
+            Dim SimEnde As DateTime = BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll(0).GetSimulationEndDate())
+
+            'Simulationszeitraum 
+            Do While (BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll(0).GetCurrentTime) <= SimEnde)
+                Call bluem_dll(0).PerformTimeStep()
+            Loop
+
+            'Simulation abschliessen
+            Call bluem_dll(0).Finish()
+
+            'Simulation erfolgreich
+            simOK = True
+
+        Catch ex As Exception
+
+            'Simulationsfehler aufgetreten
+            MsgBox(ex.Message, MsgBoxStyle.Exclamation, "BlueM")
+
+            'Simulation abschliessen
+            Call bluem_dll(0).Finish()
+
+            'Simulation nicht erfolgreich
+            simOK = False
+
+        Finally
+
+            'Ressourcen deallokieren
+            Call bluem_dll(0).Dispose()
+
+        End Try
+
+    End Function
 
     'Prüft ob des aktuelle Child mit der ID die oben übergeben wurde fertig ist
     'Gibt die Thread ID zurück um zum auswerten in das Arbeitsverzeichnis zu wechseln
@@ -386,13 +363,13 @@ Public Class BlueM
         launchReady = False
 
         For Each Thr_C As CThread In My_C_Thread
-            If Thr_C.launch_Ready = True And Thr_C.get_Child_ID = Child_ID then
+            If Thr_C.launch_Ready = True And Thr_C.get_Child_ID = Child_ID Then
                 launchReady = True
                 SimIsOK = Thr_C.Sim_Is_OK
                 Thread_ID = Thr_C.get_Thread_ID
-                MyThread(Thread_ID).Join
-                My_C_Thread(Thread_ID) = new CThread(Thread_ID, -1, "Folder", Datensatz, bluem_dll(Thread_ID))
-                My_C_Thread(Thread_ID).set_is_OK
+                MyThread(Thread_ID).Join()
+                My_C_Thread(Thread_ID) = New CThread(Thread_ID, -1, "Folder", Datensatz, bluem_dll(Thread_ID))
+                My_C_Thread(Thread_ID).set_is_OK()
             End If
         Next
 
@@ -400,14 +377,14 @@ Public Class BlueM
 
     'Simulationsergebnis verarbeiten
     '-------------------------------
-    Public Overrides Sub WelDateiVerwursten()
-    
+    Public Overrides Sub SIM_Ergebnis_Lesen()
+
         'Altes Simulationsergebnis löschen
         Me.SimErgebnis.Clear()
 
         'WEL-Datei einlesen
         '------------------
-        Dim WELtmp As Wave.WEL = New Wave.WEL(Me.WorkDir & Me.Datensatz & ".WEL", True)
+        Dim WELtmp As Wave.WEL = New Wave.WEL(Me.WorkDir_Current & Me.Datensatz & ".WEL", True)
 
         'Reihen zu Simulationsergebnis hinzufügen
         For Each zre As Wave.Zeitreihe In WELtmp.Zeitreihen
@@ -418,7 +395,7 @@ Public Class BlueM
         '-----------------------
         If (Me.useKWL) Then
 
-            Dim KWLpath As String = Me.WorkDir & Me.Datensatz & ".KWL"
+            Dim KWLpath As String = Me.WorkDir_Current & Me.Datensatz & ".KWL"
 
             Dim KWLtmp As Wave.WEL = New Wave.WEL(KWLpath, True)
 
@@ -434,9 +411,9 @@ Public Class BlueM
         If (Me.isIHA) Then
             'IHA-Ziel raussuchen und Simulationsreihe übergeben
             'HACK: es wird immer das erste IHA-Ziel verwendet!
-            For Each ziel As Common.Ziel In Common.Manager.List_Ziele
-                If (ziel.ZielTyp = "IHA") Then
-                    Call Me.IHASys.calculate_IHA(Me.SimErgebnis(ziel.SimGr))
+            For Each feature As Common.Featurefunction In Me.mProblem.List_Featurefunctions
+                If (feature.Typ = "IHA") Then
+                    Call Me.IHASys.calculate_IHA(Me.SimErgebnis(feature.SimGr))
                     Exit For
                 End If
             Next
@@ -450,63 +427,127 @@ Public Class BlueM
 
     'Berechnung des Qualitätswerts (Zielwert)
     '****************************************
-    Public Overrides Function QWert(ByVal ziel As Common.Ziel) As Double
+    Public Overrides Function CalculateFeature(ByVal feature As Common.Featurefunction) As Double
 
-        QWert = 0
+        CalculateFeature = 0
 
         'Fallunterscheidung Ergebnisdatei
         '--------------------------------
-        Select Case ziel.Datei
+        Select Case feature.Datei
 
             Case "WEL", "KWL"
                 'QWert aus WEL- oder KWL-Datei
-                QWert = QWert_WEL(ziel)
+                CalculateFeature = CalculateFeature_WEL(feature)
 
             Case "PRB"
                 'QWert aus PRB-Datei
                 'BUG 220: PRB geht nicht, weil keine Zeitreihe
                 Throw New Exception("PRB als OptZiel geht z.Zt. nicht (siehe Bug 138)")
-                'QWert = QWert_PRB(OptZiel)
+                'CalculateFeature = CalculateFeature_PRB(OptZiel)
 
             Case Else
-                Throw New Exception("Der Wert '" & ziel.Datei & "' für die Datei wird bei Optimierungszielen für BlueM nicht akzeptiert!")
+                Throw New Exception("Der Wert '" & feature.Datei & "' für die Datei wird bei Optimierungszielen für BlueM nicht akzeptiert!")
 
         End Select
 
         'Zielrichtung berücksichtigen
-        QWert *= ziel.Richtung
+        CalculateFeature *= feature.Richtung
 
     End Function
 
     'Qualitätswert aus WEL-Datei
     '***************************
-    Private Function QWert_WEL(ByVal ziel As Common.Ziel) As Double
+    Private Function CalculateFeature_WEL(ByVal feature As Common.Featurefunction) As Double
 
-        Dim QWert As Double
+        Dim featurevalue As Double
         Dim SimReihe As Wave.Zeitreihe
 
         'Simulationsergebnis auslesen
-        SimReihe = Me.SimErgebnis(ziel.SimGr)
+        SimReihe = Me.SimErgebnis(feature.SimGr)
 
         'Fallunterscheidung Zieltyp
         '--------------------------
-        Select Case ziel.ZielTyp
+        Select Case feature.Typ
 
             Case "Wert"
-                QWert = MyBase.QWert_Wert(ziel, SimReihe)
+                featurevalue = MyBase.CalculateFeature_Wert(feature, SimReihe)
 
             Case "Reihe"
-                QWert = MyBase.QWert_Reihe(ziel, SimReihe)
+                featurevalue = MyBase.CalculateFeature_Reihe(feature, SimReihe)
 
             Case "Kosten"
-                QWert = Me.SKos1.calculate_costs(Me)
+                featurevalue = Me.SKos1.Calculate_Costs(Me.WorkDir_Current)
 
             Case "IHA"
-                QWert = Me.IHAProc.QWert_IHA(ziel, Me.IHASys.RVAResult)
+                featurevalue = Me.IHAProc.CalculateFeature_IHA(feature, Me.IHASys.RVAResult)
 
         End Select
 
-        Return QWert
+        Return featurevalue
+
+    End Function
+
+    'Qualitätswert aus PRB-Datei
+    '***************************
+    Private Function CalculateFeature_PRB(ByVal feature As Common.Featurefunction) As Double
+
+        'BUG 220: PRB geht nicht, weil keine Zeitreihe
+        'Dim i As Integer
+        'Dim IsOK As Boolean
+        'Dim QWert As Double
+        'Dim SimReihe As Object(,) = {}
+
+        ''Simulationsergebnis auslesen
+        'IsOK = Read_PRB(WorkDir & Datensatz & ".PRB", ziel.SimGr, SimReihe)
+
+        ''Diff
+        ''----
+        ''Überflüssige Stützstellen (P) entfernen
+        ''---------------------------------------
+        ''Anzahl Stützstellen bestimmen
+        'Dim stuetz As Integer = 0
+        'Dim P_vorher As Double = -99
+        'For i = 0 To SimReihe.GetUpperBound(0)
+        '    If (i = 0 Or Not SimReihe(i, 1) = P_vorher) Then
+        '        stuetz += 1
+        '        P_vorher = SimReihe(i, 1)
+        '    End If
+        'Next
+        ''Werte in neues Array schreiben
+        'Dim PRBtmp(stuetz, 1) As Object
+        'stuetz = 0
+        'For i = 0 To SimReihe.GetUpperBound(0)
+        '    If (i = 0 Or Not SimReihe(i, 1) = P_vorher) Then
+        '        PRBtmp(stuetz, 0) = SimReihe(i, 0)
+        '        PRBtmp(stuetz, 1) = SimReihe(i, 1)
+        '        P_vorher = SimReihe(i, 1)
+        '        stuetz += 1
+        '    End If
+        'Next
+        ''Reihe um eine Stützstelle erweitern
+        ''PRBtmp(stuetz, 0) = PRBtmp(stuetz - 1, 0)
+        ''PRBtmp(stuetz, 1) = PRBtmp(stuetz - 1, 1)
+
+        ''An Stützstellen der ZielReihe interpolieren
+        ''-------------------------------------------
+        'Dim PRBintp(ziel.ZielReihe.GetUpperBound(0), 1) As Object
+        'Dim j As Integer
+        'For i = 0 To ziel.ZielReihe.GetUpperBound(0)
+        '    'zugehörige Lamelle in SimReihe finden
+        '    j = 0
+        '    Do While (PRBtmp(j, 1) < ziel.ZielReihe(i, 1))
+        '        j += 1
+        '    Loop
+        '    'interpolieren
+        '    PRBintp(i, 0) = (PRBtmp(j + 1, 0) - PRBtmp(j, 0)) / (PRBtmp(j + 1, 1) - PRBtmp(j, 1)) * (ziel.ZielReihe(i, 1) - PRBtmp(j, 1)) + PRBtmp(j, 0)
+        '    PRBintp(i, 1) = ziel.ZielReihe(i, 1)
+        'Next
+
+        'For i = 0 To ziel.ZielReihe.GetUpperBound(0)
+        '    QWert += Math.Abs(ziel.ZielReihe(i, 0) - PRBintp(i, 0))
+        'Next
+
+        'Return QWert
 
     End Function
 
@@ -516,6 +557,73 @@ Public Class BlueM
 
     'Kombinatorik
     '############
+
+    'Mehrere Prüfungen ob die .VER Datei des BlueM und der .CES Datei auch zusammenpassen
+    '************************************************************************************
+    Public Sub Validate_CES_fits_to_VER()
+
+        Dim i As Integer = 0
+        Dim j As Integer = 0
+        Dim x As Integer = 0
+        Dim y As Integer = 0
+
+        Dim FoundA(VerzweigungsDatei.GetUpperBound(0)) As Boolean
+
+        'Prüft ob jede Verzweigung einmal in der LocationList vorkommt
+        For i = 0 To VerzweigungsDatei.GetUpperBound(0)
+            For j = 0 To Me.mProblem.List_Locations.GetUpperBound(0)
+                For x = 0 To Me.mProblem.List_Locations(j).List_Massnahmen.GetUpperBound(0)
+                    For y = 0 To Me.mProblem.List_Locations(j).List_Massnahmen(x).Schaltung.GetUpperBound(0)
+                        If VerzweigungsDatei(i, 0) = Me.mProblem.List_Locations(j).List_Massnahmen(x).Schaltung(y, 0) And VerzweigungsDatei(i, 1) = "2" Then
+                            FoundA(i) = True
+                        End If
+                    Next
+                Next
+            Next
+        Next
+
+        'Prüft ob die nicht vorkommenden Verzweigungen Verzweigungen anderer Art sind
+        For i = 0 To VerzweigungsDatei.GetUpperBound(0)
+            If Not VerzweigungsDatei(i, 1) = "2" And FoundA(i) = False Then
+                FoundA(i) = True
+            End If
+        Next
+
+        Dim FoundB As Boolean = True
+        Dim TmpBool As Boolean = False
+
+        'Prüft ob alle in der LocationList Vorkommenden Verzweigungen auch in der Verzweigungsdatei sind
+        For j = 0 To Me.mProblem.List_Locations.GetUpperBound(0)
+            For x = 0 To Me.mProblem.List_Locations(j).List_Massnahmen.GetUpperBound(0)
+                For y = 0 To Me.mProblem.List_Locations(j).List_Massnahmen(x).Schaltung.GetUpperBound(0)
+                    If Not Me.mProblem.List_Locations(j).List_Massnahmen(x).Schaltung(y, 0) = "X" Then
+                        TmpBool = False
+                        For i = 0 To VerzweigungsDatei.GetUpperBound(0)
+                            If VerzweigungsDatei(i, 0) = Me.mProblem.List_Locations(j).List_Massnahmen(x).Schaltung(y, 0) And VerzweigungsDatei(i, 1) = "2" Then
+                                TmpBool = True
+                            End If
+                        Next
+                        If Not TmpBool Then
+                            FoundB = False
+                        End If
+                    End If
+
+                Next
+            Next
+        Next
+
+        'Übergabe
+        If FoundB = False Then
+            Throw New Exception(".VER und .CES Dateien passen nicht zusammen! Eine Verzweigung in der VER Datei kommt in der CES Datei nicht vor und ist nicht nicht vom Typ Prozentsatz (Kennung 2)")
+        Else
+            For i = 0 To FoundA.GetUpperBound(0)
+                If FoundA(i) = False Then
+                    Throw New Exception(".VER und .CES Dateien passen nicht zusammen! Eine in der CES Datei angegebene Verzeigung kommt in der VEr Datei nicht vor.")
+                End If
+            Next
+        End If
+
+    End Sub
 
     'Schreibt die neuen Verzweigungen
     '********************************
@@ -530,7 +638,7 @@ Public Class BlueM
         Dim DateiPfad As String
         Dim SplitZeile() As String
 
-        DateiPfad = WorkDir & Datensatz & ".ver"
+        DateiPfad = WorkDir_Current & Datensatz & ".ver"
         'Datei öffnen
         Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.Read)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -585,22 +693,6 @@ Public Class BlueM
 
 #End Region 'Kombinatorik
 
-    'Hilfs Funktionen
-    'XXXXXXXXXXXXXXXX
-
-    'Hilfsfunktion um zu Prüfen ob der Name bereits vorhanden ist oder nicht
-    '***********************************************************************
-    Public Shared Function Is_Name_IN(ByVal Name As String, ByVal Array() As EVO.Common.Struct_Lokation) As Boolean
-        Is_Name_IN = False
-        Dim i As Integer
-        For i = 0 To Array.GetUpperBound(0)
-            If Name = Array(i).Name Then
-                Is_Name_IN = True
-                Exit Function
-            End If
-        Next
-    End Function
-
 #Region "Threading"
 
     'Klasse beinhaltet alle Infomationen für einen Simulationslauf im Thread
@@ -615,7 +707,7 @@ Public Class BlueM
         Private SimIsOK As Boolean
         Private launchReady As Boolean
 
-        Public Sub New(ByVal _Thread_ID As Integer, ByVal _Child_ID As Integer, ByVal _WorkFolder As String, ByVal _DS_Name as String, ByRef _bluem_dll As BlueM_EngineDotNetAccess)
+        Public Sub New(ByVal _Thread_ID As Integer, ByVal _Child_ID As Integer, ByVal _WorkFolder As String, ByVal _DS_Name As String, ByRef _bluem_dll As BlueM_EngineDotNetAccess)
             Me.Thread_ID = _Thread_ID
             Me.Child_ID = _Child_ID
             Me.WorkFolder = _WorkFolder
@@ -627,8 +719,8 @@ Public Class BlueM
         '*********************************************************************
         Public Sub Thread()
 
-            Me.SimIsOK = false
-            Me.launchReady = false
+            Me.SimIsOK = False
+            Me.launchReady = False
 
             'Priority
             System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.BelowNormal
@@ -673,12 +765,12 @@ Public Class BlueM
 
         End Sub
 
-        Public Function Sim_Is_OK As Boolean
+        Public Function Sim_Is_OK() As Boolean
 
             Sim_Is_OK = Me.SimIsOK
         End Function
 
-        Public Function launch_Ready As Boolean
+        Public Function launch_Ready() As Boolean
 
             launch_Ready = Me.launchReady
         End Function
@@ -688,12 +780,12 @@ Public Class BlueM
             Me.SimIsOK = True
         End Sub
 
-        Public Function get_Thread_ID As Integer
+        Public Function get_Thread_ID() As Integer
 
             get_Thread_ID = Me.Thread_ID
         End Function
 
-        Public Function get_Child_ID As Integer
+        Public Function get_Child_ID() As Integer
 
             get_Child_ID = Me.Child_ID
         End Function

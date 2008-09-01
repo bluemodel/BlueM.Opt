@@ -59,10 +59,13 @@ Partial Class Form1
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog
         Me.GroupBox_ErgebnisDB = New System.Windows.Forms.GroupBox
+        Me.GroupBox_TChartButtons = New System.Windows.Forms.GroupBox
+        Me.Info = New System.Windows.Forms.GroupBox
+        Me.Label_Dn_Wert = New System.Windows.Forms.Label
+        Me.Label_Dn = New System.Windows.Forms.Label
+        Me.Hauptdiagramm1 = New IHWB.EVO.Diagramm.Hauptdiagramm
         Me.EVO_Einstellungen1 = New IHWB.EVO.EVO_Einstellungen
         Me.EVO_Opt_Verlauf1 = New IHWB.EVO.EVO_Opt_Verlauf
-        Me.GroupBox_TChartButtons = New System.Windows.Forms.GroupBox
-        Me.Hauptdiagramm1 = New IHWB.EVO.Diagramm.Hauptdiagramm
         MenuStrip1 = New System.Windows.Forms.MenuStrip
         MenuItem_Tools = New System.Windows.Forms.ToolStripMenuItem
         ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator
@@ -71,6 +74,7 @@ Partial Class Form1
         Me.GroupBox_Anwendung.SuspendLayout()
         Me.GroupBox_ErgebnisDB.SuspendLayout()
         Me.GroupBox_TChartButtons.SuspendLayout()
+        Me.Info.SuspendLayout()
         Me.SuspendLayout()
         '
         'MenuStrip1
@@ -152,7 +156,7 @@ Partial Class Form1
         '
         Me.Button_openMDB.Enabled = False
         Me.Button_openMDB.Image = Global.IHWB.EVO.My.Resources.Resources.database_connect
-        Me.Button_openMDB.Location = New System.Drawing.Point(37, 16)
+        Me.Button_openMDB.Location = New System.Drawing.Point(37, 19)
         Me.Button_openMDB.Name = "Button_openMDB"
         Me.Button_openMDB.Size = New System.Drawing.Size(25, 25)
         Me.Button_openMDB.TabIndex = 13
@@ -163,7 +167,7 @@ Partial Class Form1
         '
         Me.Button_Scatterplot.Enabled = False
         Me.Button_Scatterplot.Image = Global.IHWB.EVO.My.Resources.Resources.scatterplot
-        Me.Button_Scatterplot.Location = New System.Drawing.Point(99, 16)
+        Me.Button_Scatterplot.Location = New System.Drawing.Point(99, 19)
         Me.Button_Scatterplot.Name = "Button_Scatterplot"
         Me.Button_Scatterplot.Size = New System.Drawing.Size(25, 25)
         Me.Button_Scatterplot.TabIndex = 9
@@ -174,7 +178,7 @@ Partial Class Form1
         '
         Me.Button_saveMDB.Enabled = False
         Me.Button_saveMDB.Image = Global.IHWB.EVO.My.Resources.Resources.database_save
-        Me.Button_saveMDB.Location = New System.Drawing.Point(6, 16)
+        Me.Button_saveMDB.Location = New System.Drawing.Point(6, 19)
         Me.Button_saveMDB.Name = "Button_saveMDB"
         Me.Button_saveMDB.Size = New System.Drawing.Size(25, 25)
         Me.Button_saveMDB.TabIndex = 14
@@ -185,7 +189,7 @@ Partial Class Form1
         '
         Me.Button_loadRefResult.Enabled = False
         Me.Button_loadRefResult.Image = Global.IHWB.EVO.My.Resources.Resources.database_go
-        Me.Button_loadRefResult.Location = New System.Drawing.Point(68, 16)
+        Me.Button_loadRefResult.Location = New System.Drawing.Point(68, 19)
         Me.Button_loadRefResult.Name = "Button_loadRefResult"
         Me.Button_loadRefResult.Size = New System.Drawing.Size(25, 25)
         Me.Button_loadRefResult.TabIndex = 9
@@ -194,13 +198,12 @@ Partial Class Form1
         '
         'Button_TChartEdit
         '
-        Me.Button_TChartEdit.Image = Global.IHWB.EVO.My.Resources.Resources.icon_edit
+        Me.Button_TChartEdit.Image = Global.IHWB.EVO.My.Resources.Resources.chart_curve_edit
         Me.Button_TChartEdit.Location = New System.Drawing.Point(6, 19)
         Me.Button_TChartEdit.Name = "Button_TChartEdit"
         Me.Button_TChartEdit.Size = New System.Drawing.Size(25, 25)
         Me.Button_TChartEdit.TabIndex = 0
         Me.ToolTip1.SetToolTip(Me.Button_TChartEdit, "Diagramm bearbeiten")
-        Me.Button_TChartEdit.UseVisualStyleBackColor = True
         '
         'Button_TChart2PNG
         '
@@ -233,7 +236,7 @@ Partial Class Form1
         Me.ToolTip1.SetToolTip(Me.Button_TChart2Excel, "nach Excel exportieren")
         Me.Button_TChart2Excel.UseVisualStyleBackColor = False
         '
-        'Indicatordiagramm
+        'Indicatordiagramm1
         '
         '
         '
@@ -270,6 +273,14 @@ Partial Class Form1
         Me.Indicatordiagramm1.Axes.Left.Labels.Font.SizeFloat = 6.0!
         Me.Indicatordiagramm1.Axes.Left.MaximumOffset = 3
         Me.Indicatordiagramm1.Axes.Left.MinimumOffset = 3
+        '
+        '
+        '
+        Me.Indicatordiagramm1.Axes.Right.Visible = False
+        '
+        '
+        '
+        Me.Indicatordiagramm1.Axes.Top.Visible = False
         Me.Indicatordiagramm1.Cursor = System.Windows.Forms.Cursors.Default
         '
         '
@@ -280,11 +291,13 @@ Partial Class Form1
         '
         Me.Indicatordiagramm1.Legend.Visible = False
         Me.Indicatordiagramm1.Location = New System.Drawing.Point(241, 582)
-        Me.Indicatordiagramm1.Name = "Indicatordiagramm"
+        Me.Indicatordiagramm1.Name = "Indicatordiagramm1"
         '
         '
         '
-        Me.Indicatordiagramm1.Panel.MarginTop = 20
+        Me.Indicatordiagramm1.Panel.MarginBottom = 0
+        Me.Indicatordiagramm1.Panel.MarginRight = 9
+        Me.Indicatordiagramm1.Panel.MarginTop = 9
         '
         '
         '
@@ -388,12 +401,76 @@ Partial Class Form1
         Me.GroupBox_ErgebnisDB.Controls.Add(Me.Button_openMDB)
         Me.GroupBox_ErgebnisDB.Controls.Add(Me.Button_loadRefResult)
         Me.GroupBox_ErgebnisDB.Controls.Add(Me.Button_Scatterplot)
-        Me.GroupBox_ErgebnisDB.Location = New System.Drawing.Point(426, 658)
+        Me.GroupBox_ErgebnisDB.Location = New System.Drawing.Point(390, 658)
         Me.GroupBox_ErgebnisDB.Name = "GroupBox_ErgebnisDB"
         Me.GroupBox_ErgebnisDB.Size = New System.Drawing.Size(131, 50)
         Me.GroupBox_ErgebnisDB.TabIndex = 14
         Me.GroupBox_ErgebnisDB.TabStop = False
         Me.GroupBox_ErgebnisDB.Text = "Ergebnis"
+        '
+        'GroupBox_TChartButtons
+        '
+        Me.GroupBox_TChartButtons.Controls.Add(Me.Button_TChartEdit)
+        Me.GroupBox_TChartButtons.Controls.Add(Me.Button_TChart2PNG)
+        Me.GroupBox_TChartButtons.Controls.Add(Me.Button_TChartSave)
+        Me.GroupBox_TChartButtons.Controls.Add(Me.Button_TChart2Excel)
+        Me.GroupBox_TChartButtons.Location = New System.Drawing.Point(241, 658)
+        Me.GroupBox_TChartButtons.Name = "GroupBox_TChartButtons"
+        Me.GroupBox_TChartButtons.Size = New System.Drawing.Size(143, 50)
+        Me.GroupBox_TChartButtons.TabIndex = 16
+        Me.GroupBox_TChartButtons.TabStop = False
+        Me.GroupBox_TChartButtons.Text = "Diagramm"
+        '
+        'Info
+        '
+        Me.Info.Controls.Add(Me.Label_Dn_Wert)
+        Me.Info.Controls.Add(Me.Label_Dn)
+        Me.Info.Location = New System.Drawing.Point(527, 658)
+        Me.Info.Name = "Info"
+        Me.Info.Size = New System.Drawing.Size(59, 50)
+        Me.Info.TabIndex = 18
+        Me.Info.TabStop = False
+        Me.Info.Text = "Info"
+        '
+        'Label_Dn_Wert
+        '
+        Me.Label_Dn_Wert.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.Label_Dn_Wert.AutoSize = True
+        Me.Label_Dn_Wert.ForeColor = System.Drawing.Color.Blue
+        Me.Label_Dn_Wert.Location = New System.Drawing.Point(3, 31)
+        Me.Label_Dn_Wert.Name = "Label_Dn_Wert"
+        Me.Label_Dn_Wert.Size = New System.Drawing.Size(0, 13)
+        Me.Label_Dn_Wert.TabIndex = 1
+        '
+        'Label_Dn
+        '
+        Me.Label_Dn.AutoSize = True
+        Me.Label_Dn.Location = New System.Drawing.Point(3, 13)
+        Me.Label_Dn.Name = "Label_Dn"
+        Me.Label_Dn.Size = New System.Drawing.Size(24, 13)
+        Me.Label_Dn.TabIndex = 0
+        Me.Label_Dn.Text = "Dn:"
+        '
+        'Hauptdiagramm1
+        '
+        '
+        '
+        '
+        Me.Hauptdiagramm1.Aspect.View3D = False
+        Me.Hauptdiagramm1.Aspect.ZOffset = 0
+        Me.Hauptdiagramm1.Cursor = System.Windows.Forms.Cursors.Default
+        '
+        '
+        '
+        Me.Hauptdiagramm1.Header.Lines = New String() {"EVO.NET"}
+        Me.Hauptdiagramm1.Location = New System.Drawing.Point(241, 86)
+        Me.Hauptdiagramm1.Name = "Hauptdiagramm1"
+        Me.Hauptdiagramm1.Size = New System.Drawing.Size(473, 566)
+        Me.Hauptdiagramm1.TabIndex = 17
+        '
+        '
+        '
+        Me.Hauptdiagramm1.Walls.View3D = False
         '
         'EVO_Einstellungen1
         '
@@ -410,46 +487,13 @@ Partial Class Form1
         Me.EVO_Opt_Verlauf1.Size = New System.Drawing.Size(467, 73)
         Me.EVO_Opt_Verlauf1.TabIndex = 6
         '
-        'GroupBox_TChartButtons
-        '
-        Me.GroupBox_TChartButtons.Controls.Add(Me.Button_TChartEdit)
-        Me.GroupBox_TChartButtons.Controls.Add(Me.Button_TChart2PNG)
-        Me.GroupBox_TChartButtons.Controls.Add(Me.Button_TChartSave)
-        Me.GroupBox_TChartButtons.Controls.Add(Me.Button_TChart2Excel)
-        Me.GroupBox_TChartButtons.Location = New System.Drawing.Point(241, 658)
-        Me.GroupBox_TChartButtons.Name = "GroupBox_TChartButtons"
-        Me.GroupBox_TChartButtons.Size = New System.Drawing.Size(143, 50)
-        Me.GroupBox_TChartButtons.TabIndex = 16
-        Me.GroupBox_TChartButtons.TabStop = False
-        Me.GroupBox_TChartButtons.Text = "Diagramm"
-        '
-        'Hauptdiagramm
-        '
-        '
-        '
-        '
-        Me.Hauptdiagramm1.Aspect.View3D = False
-        Me.Hauptdiagramm1.Aspect.ZOffset = 0
-        Me.Hauptdiagramm1.Cursor = System.Windows.Forms.Cursors.Default
-        '
-        '
-        '
-        Me.Hauptdiagramm1.Header.Lines = New String() {"EVO.NET"}
-        Me.Hauptdiagramm1.Location = New System.Drawing.Point(241, 86)
-        Me.Hauptdiagramm1.Name = "Hauptdiagramm"
-        Me.Hauptdiagramm1.Size = New System.Drawing.Size(473, 566)
-        Me.Hauptdiagramm1.TabIndex = 17
-        '
-        '
-        '
-        Me.Hauptdiagramm1.Walls.View3D = False
-        '
         'Form1
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.AutoScroll = True
         Me.BackColor = System.Drawing.SystemColors.Control
         Me.ClientSize = New System.Drawing.Size(718, 792)
+        Me.Controls.Add(Me.Info)
         Me.Controls.Add(Me.Indicatordiagramm1)
         Me.Controls.Add(Me.Hauptdiagramm1)
         Me.Controls.Add(Me.GroupBox_TChartButtons)
@@ -473,6 +517,8 @@ Partial Class Form1
         Me.GroupBox_Anwendung.PerformLayout()
         Me.GroupBox_ErgebnisDB.ResumeLayout(False)
         Me.GroupBox_TChartButtons.ResumeLayout(False)
+        Me.Info.ResumeLayout(False)
+        Me.Info.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -504,4 +550,7 @@ Partial Class Form1
     Friend WithEvents Button_TChart2PNG As System.Windows.Forms.Button
     Friend WithEvents Button_TChartSave As System.Windows.Forms.Button
     Friend WithEvents Button_TChart2Excel As System.Windows.Forms.Button
+    Friend WithEvents Info As System.Windows.Forms.GroupBox
+    Friend WithEvents Label_Dn As System.Windows.Forms.Label
+    Friend WithEvents Label_Dn_Wert As System.Windows.Forms.Label
 End Class

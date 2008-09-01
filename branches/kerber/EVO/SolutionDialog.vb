@@ -14,6 +14,9 @@ Partial Public Class SolutionDialog
     '*******************************************************************************
     '*******************************************************************************
 
+    'Das Problem
+    Private mProblem As EVO.Common.Problem
+
     'Properties
     '**********
     Private ReadOnly Property checkedSolutions As Collection
@@ -36,12 +39,15 @@ Partial Public Class SolutionDialog
 
     'Konstruktor
     '***********
-    Public Sub New(ByVal lOptPara() As EVO.Common.OptParameter, ByVal lLoc() As EVO.Common.Locations.Struct_Lokation)
+    Public Sub New(ByRef prob As EVO.Common.Problem)
 
         ' Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent()
 
         ' Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+
+        'Problem speichern
+        Me.mProblem = prob
 
         'Spalten einrichten
         '==================
@@ -56,19 +62,19 @@ Partial Public Class SolutionDialog
 
         'Ziele
         '--------
-        For Each ziel As Common.Ziel In Common.Manager.List_Ziele
+        For Each feature As Common.Featurefunction In Me.mProblem.List_Featurefunctions
             column = New DataGridViewTextBoxColumn()
-            If (ziel.isOpt) Then
+            If (feature.isPenalty) Then
                 cellstyle.BackColor = Color.LightGreen
-                column.HeaderText = ziel.Bezeichnung & " (*)"
+                column.HeaderText = feature.Bezeichnung & " (*)"
                 column.HeaderCell.ToolTipText = "OptZiel"
             Else
                 cellstyle.BackColor = Color.LightBlue
-                column.HeaderText = ziel.Bezeichnung
+                column.HeaderText = feature.Bezeichnung
                 column.HeaderCell.ToolTipText = "SekZiel"
             End If
             column.ReadOnly = True
-            column.Name = ziel.Bezeichnung
+            column.Name = feature.Bezeichnung
             column.DefaultCellStyle = cellstyle.Clone()
             Me.DataGridView1.Columns.Add(column)
         Next
@@ -77,7 +83,7 @@ Partial Public Class SolutionDialog
         '-----------
         cellstyle.BackColor = Color.LightCoral
 
-        For Each Constraint As Common.Constraint In Common.Manager.List_Constraints
+        For Each Constraint As Common.Constraintfunction In Me.mProblem.List_Constraintfunctions
             column = New DataGridViewTextBoxColumn()
             column.ReadOnly = True
             column.HeaderText = Constraint.Bezeichnung
@@ -91,7 +97,7 @@ Partial Public Class SolutionDialog
         '---------
         cellstyle.BackColor = Color.AliceBlue
 
-        For Each Location As EVO.Common.Locations.Struct_Lokation In lLoc
+        For Each Location As EVO.Common.Locations.Struct_Lokation In Me.mProblem.List_Locations
             column = New DataGridViewTextBoxColumn()
             column.ReadOnly = True
             column.HeaderText = Location.Name
@@ -105,7 +111,7 @@ Partial Public Class SolutionDialog
         '------------
         cellstyle.BackColor = Color.LightGray
 
-        For Each OptPara As EVO.Common.OptParameter In lOptPara
+        For Each OptPara As EVO.Common.OptParameter In Me.mProblem.List_OptParameter_Save
             column = New DataGridViewTextBoxColumn()
             column.ReadOnly = True
             column.HeaderText = OptPara.Bezeichnung
@@ -156,14 +162,14 @@ Partial Public Class SolutionDialog
         i = 1
 
         'Ziele
-        For Each qwert As Double In ind.Zielwerte
-            cellvalues(i) = qwert
+        For Each featurevalue As Double In ind.Features
+            cellvalues(i) = featurevalue
             i += 1
         Next
 
         'Constraints
-        For Each constraint As Double In ind.Constrain
-            cellvalues(i) = constraint
+        For Each constraintvalue As Double In ind.Constraints
+            cellvalues(i) = constraintvalue
             i += 1
         Next
 
@@ -203,14 +209,14 @@ Partial Public Class SolutionDialog
         i = 1
 
         'Ziele
-        For Each qwert As Double In ind.Zielwerte
-            cellvalues(i) = qwert
+        For Each featurevalue As Double In ind.Features
+            cellvalues(i) = featurevalue
             i += 1
         Next
 
         'Constraints
-        For Each constraint As Double In ind.Constrain
-            cellvalues(i) = constraint
+        For Each constraintvalue As Double In ind.Constraints
+            cellvalues(i) = constraintvalue
             i += 1
         Next
 
@@ -219,18 +225,6 @@ Partial Public Class SolutionDialog
             cellvalues(i) = measure
             i += 1
         Next
-
-        'Bei Hybrid
-        '----------
-        If (EVO.Common.Manager.Method = EVO.Common.METH_HYBRID) Then
-
-            'OptParameter PES
-            For Each optpara As Common.OptParameter In ind.PES_OptParas
-                cellvalues(i) = optpara.RWert
-                i += 1
-            Next
-
-        End If
 
         'OptParameter CES
         Dim found As Boolean
@@ -243,9 +237,11 @@ Partial Public Class SolutionDialog
                         cellvalues(i) = optpara.RWert
                         found = True
                     End If
+                    If (found) Then Exit For
                 Next
+                If (found) Then Exit For
             Next
-            If Not found Then
+            If (Not found) Then
                 cellvalues(i) = "---"
             End If
             i += 1

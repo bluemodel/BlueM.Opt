@@ -25,7 +25,7 @@ Partial Class SensiPlot
         Me.Cancel_Button = New System.Windows.Forms.Button
         Me.ListBox_OptParameter = New System.Windows.Forms.ListBox
         Me.Label_OptParameter = New System.Windows.Forms.Label
-        Me.ListBox_OptZiele = New System.Windows.Forms.ListBox
+        Me.ListBox_Penaltyfunctions = New System.Windows.Forms.ListBox
         Me.Label_OptZiele = New System.Windows.Forms.Label
         Me.TextBox_AnzSim = New System.Windows.Forms.MaskedTextBox
         Me.Label_AnzStep = New System.Windows.Forms.Label
@@ -91,22 +91,22 @@ Partial Class SensiPlot
         Me.Label_OptParameter.TabIndex = 2
         Me.Label_OptParameter.Text = "OptParameter:"
         '
-        'ListBox_OptZiele
+        'ListBox_Penaltyfunctions
         '
-        Me.ListBox_OptZiele.FormattingEnabled = True
-        Me.ListBox_OptZiele.Location = New System.Drawing.Point(148, 32)
-        Me.ListBox_OptZiele.Name = "ListBox_OptZiele"
-        Me.ListBox_OptZiele.Size = New System.Drawing.Size(130, 212)
-        Me.ListBox_OptZiele.TabIndex = 3
+        Me.ListBox_Penaltyfunctions.FormattingEnabled = True
+        Me.ListBox_Penaltyfunctions.Location = New System.Drawing.Point(148, 32)
+        Me.ListBox_Penaltyfunctions.Name = "ListBox_Penaltyfunctions"
+        Me.ListBox_Penaltyfunctions.Size = New System.Drawing.Size(130, 212)
+        Me.ListBox_Penaltyfunctions.TabIndex = 3
         '
         'Label_OptZiele
         '
         Me.Label_OptZiele.AutoSize = True
         Me.Label_OptZiele.Location = New System.Drawing.Point(145, 13)
         Me.Label_OptZiele.Name = "Label_OptZiele"
-        Me.Label_OptZiele.Size = New System.Drawing.Size(50, 13)
+        Me.Label_OptZiele.Size = New System.Drawing.Size(95, 13)
         Me.Label_OptZiele.TabIndex = 4
-        Me.Label_OptZiele.Text = "OptZiele:"
+        Me.Label_OptZiele.Text = "Penaltyfunktionen:"
         '
         'TextBox_AnzSim
         '
@@ -187,7 +187,7 @@ Partial Class SensiPlot
         Me.Controls.Add(Me.Label_AnzStep)
         Me.Controls.Add(Me.TextBox_AnzSim)
         Me.Controls.Add(Me.Label_OptZiele)
-        Me.Controls.Add(Me.ListBox_OptZiele)
+        Me.Controls.Add(Me.ListBox_Penaltyfunctions)
         Me.Controls.Add(Me.Label_OptParameter)
         Me.Controls.Add(Me.ListBox_OptParameter)
         Me.Controls.Add(Me.TableLayoutPanel1)
@@ -210,7 +210,7 @@ Partial Class SensiPlot
     Friend WithEvents Cancel_Button As System.Windows.Forms.Button
     Friend WithEvents ListBox_OptParameter As System.Windows.Forms.ListBox
     Friend WithEvents Label_OptParameter As System.Windows.Forms.Label
-    Friend WithEvents ListBox_OptZiele As System.Windows.Forms.ListBox
+    Friend WithEvents ListBox_Penaltyfunctions As System.Windows.Forms.ListBox
     Friend WithEvents Label_OptZiele As System.Windows.Forms.Label
     Friend WithEvents TextBox_AnzSim As System.Windows.Forms.MaskedTextBox
     Friend WithEvents Label_AnzStep As System.Windows.Forms.Label

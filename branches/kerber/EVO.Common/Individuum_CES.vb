@@ -1,16 +1,12 @@
 ﻿Public Class Individuum_CES
     Inherits Individuum
 
-    Private Shared n_Locations As Integer
-
     Public Path() As Integer               '03 Der Pfad
     Public mutated As Boolean              '06 Gibt an ob der Wert bereits mutiert ist oder nicht
 
     'Information pro Location ---------------------------------------
     Public Measures() As String            '09a Die Namen der Maßnahmen
     Public Loc() As Location_Data          '10 + 11a Information pro Location
-
-    Public PES_OptParas() As OptParameter  '06a Parameterarray für PES
 
     'Für PES Memory -------------------------------------------------
     Public Generation As Integer           '12 Die Generation (eher zur Information)
@@ -28,56 +24,137 @@
 
     End Structure
 
-    'Gibt ein Array mit den PES Parametern zurück
-    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    Public ReadOnly Property Get_All_PES_Para() As Double()
-        Get
-            Dim i As Integer
-            Dim Array(-1) As Double
-            For i = 0 To PES_OptParas.GetUpperBound(0)
-                ReDim Preserve Array(Array.GetLength(0))
-                Array(Array.GetUpperBound(0)) = PES_OptParas(i).Xn
-            Next
-            Return Array
-        End Get
-    End Property
-
-    'Gibt ein Array mit den PES Parametern aller Locations zurück
+    'Gibt ein Array mit den PES_Opt_Parametern aller Locations zurück
     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    Public ReadOnly Property Get_All_Loc_PES_Para() As Double()
+    Public Property Get_a_Set_All_Loc_PES_Opt_Para() As OptParameter()
         Get
             Dim i, j, x As Integer
-            Dim array(-1) As Double
+            Dim array(-1) As OptParameter
             x = 0
             For i = 0 To Loc.GetUpperBound(0)
                 For j = 0 To Loc(i).PES_OptPara.GetUpperBound(0)
                     ReDim Preserve array(x)
-                    array(x) = Loc(i).PES_OptPara(j).Xn
+                    array(x) = Loc(i).PES_OptPara(j).Clone
                     x += 1
                 Next
             Next
-            Return Array
+            Return array
         End Get
-    End Property
 
-    'Gibt ein Array mit den DNs Parametern aller Locations zurück
-    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    Public ReadOnly Property Get_All_Loc_PES_Dn() As Double()
-        Get
+        Set(ByVal Array() As OptParameter)
             Dim i, j, x As Integer
-            Dim Array(-1) As Double
+
             x = 0
             For i = 0 To Loc.GetUpperBound(0)
                 For j = 0 To Loc(i).PES_OptPara.GetUpperBound(0)
-                    ReDim Preserve Array(x)
-                    Array(x) = Loc(i).PES_OptPara(j).Dn
+                    Loc(i).PES_OptPara(j) = Array(x).Clone
                     x += 1
                 Next
             Next
-            Return Array
+        End Set
+    End Property
+
+    'Gibt ein Array mit den PES Parametern (RWerte) aller Locations zurück
+    'Die Reihenfolge stimmt mit Problem.List_OptParameter überein
+    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    Public ReadOnly Property Get_All_Loc_PES_Para() As Double()
+        Get
+            Dim i, j, k As Integer
+            Dim found As Boolean
+            Dim RWerte() As Double
+
+            ReDim RWerte(Individuum.mProblem.NumParams - 1)
+
+            'Alle OptParameter durchlaufen
+            For i = 0 To Individuum.mProblem.NumParams - 1
+
+                found = False
+
+                'Zugehörige Location finden
+                For j = 0 To Individuum.mProblem.NumLocations - 1
+
+                    'Zugehörigen OptParameter finden
+                    For k = 0 To Me.Loc(j).PES_OptPara.GetUpperBound(0)
+                        
+                        If (Me.Loc(j).PES_OptPara(k).Bezeichnung = Individuum.mProblem.List_OptParameter(i).Bezeichnung)
+                            RWerte(i) = Loc(j).PES_OptPara(k).RWert
+                            found = True
+                        End If
+
+                        If (found) Then Exit For
+
+                    Next k
+
+                    If (found) Then Exit For
+
+                Next j
+
+            Next i
+
+            Return RWerte
+
+        End Get
+    End Property
+
+    'Gibt ein Array mit den DNs aller Locations zurück
+    'VORSICHT: Reihenfolge stimmt _nicht_ mit Problem.ListOptParameter überein!
+    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    Public ReadOnly Property Get_All_Loc_PES_Dn() As Double()
+        Get
+            Dim i, j, x As Integer
+            Dim tmparray(-1) As Double
+            x = 0
+            For i = 0 To Loc.GetUpperBound(0)
+                For j = 0 To Loc(i).PES_OptPara.GetUpperBound(0)
+                    ReDim Preserve tmparray(x)
+                    tmparray(x) = Loc(i).PES_OptPara(j).Dn
+                    x += 1
+                Next
+            Next
+            Return tmparray
         End Get
 
     End Property
+
+    'Gibt das durchschnittliche DN zurück
+    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    Public ReadOnly Property Get_mean_PES_Dn() As Double
+        Get
+            Dim n As Integer = 0
+            Dim sum As Double = 0
+            Dim i As Integer
+            Dim Dn_Mean As Double
+
+            n = Me.Get_All_Loc_PES_Dn.GetLength(0)
+            If n = 0 Then
+                Return -1
+            End If
+
+            For i = 0 To Me.Get_All_Loc_PES_Dn.GetUpperBound(0)
+                sum = sum + Me.Get_All_Loc_PES_Dn(i)
+            Next
+            Dn_Mean = sum / n
+
+            Return Dn_Mean
+        End Get
+
+    End Property
+
+    'Setzt das durchnittliche Dn für alle OptParas
+    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    Public WriteOnly Property Set_mean_PES_Dn() As Double
+        Set(ByVal Dn_Mean As Double)
+            Dim i, j As Integer
+
+            For i = 0 To Loc.GetUpperBound(0)
+                For j = 0 To Loc(i).PES_OptPara.GetUpperBound(0)
+                    Loc(i).PES_OptPara(j).Dn = Dn_Mean
+                Next
+            Next
+
+        End Set
+    End Property
+
 
     'Gibt ein Array mit den Elementen aller Locations zurück
     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -96,7 +173,6 @@
         End Get
     End Property
 
-
     'Schreibt alle Parameter aus der DB zurück ins Individuum
     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     Public WriteOnly Property SetAll_Para() As Double()
@@ -110,17 +186,6 @@
             Next
         End Set
     End Property
-
-    ''' <summary>
-    ''' Initialisiert die CES-Individuumsklasse
-    ''' </summary>
-    ''' <param name="AnzahlParameter">Anzahl der Parameter, die jedes Individuum besitzen soll</param>
-    ''' <param name="AnzahlLocations">Anzahl der Locations, die jedes Individuum besitzen soll</param>
-    ''' <remarks></remarks>
-    Public Overloads Shared Sub Initialise(ByVal AnzahlParameter As Integer, ByVal AnzahlLocations As Integer)
-        Individuum_CES.n_Locations = AnzahlLocations
-        Individuum_CES.n_Para = AnzahlParameter
-    End Sub
 
     ''' <summary>
     ''' Konstruktor
@@ -137,7 +202,7 @@
         Dim i, j As Integer
 
         'Der Pfad - zur Kontrolle wird falscher Pfad gesetzt
-        ReDim Me.Path(n_Locations - 1)
+        ReDim Me.Path(Individuum.mProblem.NumLocations - 1)
         For j = 0 To Me.Path.GetUpperBound(0)
             Me.Path(j) = 777
         Next
@@ -145,18 +210,11 @@
         'Gibt an ob der Wert bereits mutiert ist oder nicht
         Me.mutated = False
 
-        'Parameterarray für PES
-        '(eigentlich nur bei METH_HYBRID gebraucht)
-        ReDim Me.PES_OptParas(n_Para - 1)
-        For i = 0 To Me.PES_OptParas.GetUpperBound(0)
-            Me.PES_OptParas(i) = New OptParameter()
-        Next
-
         'Die Namen der Maßnahmen
-        ReDim Me.Measures(n_Locations - 1)
+        ReDim Me.Measures(Individuum.mProblem.NumLocations - 1)
 
         'Informationen pro Location
-        ReDim Me.Loc(n_Locations - 1)
+        ReDim Me.Loc(Individuum.mProblem.NumLocations - 1)
 
         For i = 0 To Me.Loc.GetUpperBound(0)
 
@@ -190,12 +248,12 @@
 
         Dim Dest As New Individuum_CES(Me.mType, Me.ID)
 
-        'Zielfunktionswerte
-        Call Array.Copy(Me.Zielwerte, Dest.Zielwerte, Me.Zielwerte.Length)
+        'Feature-Werte
+        Call Array.Copy(Me.Features, Dest.Features, Me.Features.Length)
 
-        'Werte der Randbedingungen
-        If (Not Me.Constrain.GetLength(0) = -1) Then
-            Array.Copy(Me.Constrain, Dest.Constrain, Me.Constrain.Length)
+        'Constraint-Werte
+        If (Not Me.Constraints.GetLength(0) = -1) Then
+            Array.Copy(Me.Constraints, Dest.Constraints, Me.Constraints.Length)
         End If
 
         'Kennzeichnung ob Dominiert
@@ -213,16 +271,6 @@
         '03 Der Pfad - zur Kontrolle wird falscher Pfad gesetzt
         ReDim Dest.Path(Me.Path.GetUpperBound(0))
         Array.Copy(Me.Path, Dest.Path, Me.Path.Length)
-
-        '06a Array für PES Parameter
-        If Me.PES_OptParas.GetUpperBound(0) = -1 Then
-            ReDim Dest.PES_OptParas(-1)
-        Else
-            ReDim Dest.PES_OptParas(Me.PES_OptParas.GetUpperBound(0))
-            For i = 0 To Me.PES_OptParas.GetUpperBound(0)
-                Dest.PES_OptParas(i) = Me.PES_OptParas(i).Clone
-            Next
-        End If
 
         '06 Gibt an ob der Wert bereits mutiert ist oder nicht
         Dest.mutated = Me.mutated
@@ -272,5 +320,29 @@
         Dim ind As New Individuum_CES(type, id)
         Return ind
     End Function
+
+#Region "Shared"
+
+    ''' <summary>
+    ''' Kopiert ein Array von CES-Individuen
+    ''' </summary>
+    ''' <param name="Source">zu kopierendes Array von CES-Individuen</param>
+    ''' <returns>Array von CES-Individuen</returns>
+    Public Overloads Shared Function Clone_Indi_Array(ByVal Source() As Individuum_CES) As Individuum_CES()
+
+        Dim i As Integer
+        Dim ClonedArray() As Individuum_CES
+
+        ReDim ClonedArray(Source.GetUpperBound(0))
+
+        For i = 0 To Source.GetUpperBound(0)
+            ClonedArray(i) = Source(i).Clone()
+        Next
+
+        Return ClonedArray
+
+    End Function
+
+#End Region 'Shared
 
 End Class
