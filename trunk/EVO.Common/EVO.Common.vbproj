@@ -58,6 +58,7 @@
     <Compile Include="Individuum_CES.vb" />
     <Compile Include="Individuum_PES.vb" />
     <Compile Include="Locations.vb" />
+    <Compile Include="Modellparameter.vb" />
     <Compile Include="Problem.vb" />
     <Compile Include="OptParameter.vb" />
     <Compile Include="Provider.vb" />
