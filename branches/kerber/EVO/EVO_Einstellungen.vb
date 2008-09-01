@@ -331,15 +331,12 @@ Public Class EVO_Einstellungen
 
         End With
 
-        'Hybrid2008
+        'MetaEvo
         '----------------
-        With Me.msettings.Hybrid2008
+        With Me.msettings.MetaEvo
 
             .Role = Me.Combo_Hybrid_Role.SelectedItem
             .PopulationSize = Me.Numeric_Hybrid_PopulationSize.Value
-            .AlgorthmBreakpointRule = Me.Numeric_Hybrid_AlgorithmBreakpointRule.Value
-            .NumberEvolutions = Me.Numeric_Hybrid_NumberEvolutions.Value
-            .EvolutionPeriod = Me.Numeric_Hybrid_EvolutionPeriod.Value
             .Draw = Me.CheckBox_Hybrid_Draw.Checked
             .MySQL_Host = Me.TextBox_Hybrid_MySQL_Host.Text
             .MySQL_Database = Me.TextBox_Hybrid_MySQL_DB.Text
@@ -483,15 +480,12 @@ Public Class EVO_Einstellungen
 
         End With
 
-        'Hybrid2008
+        'MetaEvo
         '---------------
-        With Me.msettings.Hybrid2008
+        With Me.msettings.MetaEvo
 
             Me.Combo_Hybrid_Role.SelectedItem = .Role
             Me.Numeric_Hybrid_PopulationSize.Value = .PopulationSize
-            Me.Numeric_Hybrid_AlgorithmBreakpointRule.Value = .AlgorthmBreakpointRule
-            Me.Numeric_Hybrid_NumberEvolutions.Value = .NumberEvolutions
-            Me.Numeric_Hybrid_EvolutionPeriod.Value = .EvolutionPeriod
             Me.CheckBox_Hybrid_Draw.Checked = .Draw
             Me.TextBox_Hybrid_MySQL_Host.Text = .MySQL_Host
             Me.TextBox_Hybrid_MySQL_DB.Text = .MySQL_Database
@@ -511,15 +505,15 @@ Public Class EVO_Einstellungen
         Dim i As Integer
         Dim PathStr As String
 
-        If nChilds = 1 Then
+        If NChilds = 1 Then
             PathStr = "   Path: "
             For i = 0 To Path.GetUpperBound(0)
                 PathStr = PathStr & Path(i) & " "
             Next
-            PathStr = PathStr.Trimend
+            PathStr = PathStr.TrimEnd
         Else
             PathStr = "   n_combi: "
-            PathStr = PathStr & nChilds
+            PathStr = PathStr & NChilds
         End If
 
         Me.Label_CES_OptModus.Text = "Modus: " & Modus.ToString & PathStr
@@ -527,7 +521,7 @@ Public Class EVO_Einstellungen
         Me.Numeric_CES_n_Parents.Minimum = 1
         Me.Numeric_CES_n_Parents.Value = nParents
         Me.Numeric_CES_n_childs.Minimum = 1
-        Me.Numeric_CES_n_childs.Value = nChilds
+        Me.Numeric_CES_n_childs.Value = NChilds
 
     End Sub
 
@@ -560,7 +554,7 @@ Public Class EVO_Einstellungen
     'Standardeinstellungen setzen für Hy2008
     '***********************************
     Public Sub setStandard_Hy2008()
-        Call Me.msettings.Hybrid2008.setStandard()
+        Call Me.msettings.MetaEvo.setStandard()
         Call Me.writeForm()
     End Sub
 
@@ -611,7 +605,7 @@ Public Class EVO_Einstellungen
             Call Me.writeForm()
             isLoad = False
 
-        Catch e as Exception
+        Catch e As Exception
             MsgBox("Kann die angegebene XML-Datei nicht einlesen!" & eol & e.Message, MsgBoxStyle.Critical, "Fehler")
 
         Finally
@@ -623,12 +617,12 @@ Public Class EVO_Einstellungen
 
     'Fehlerbehandlung Serialisierung
     '*******************************
-    Private Sub serializerUnknownElement(sender As Object, e As XmlElementEventArgs)
+    Private Sub serializerUnknownElement(ByVal sender As Object, ByVal e As XmlElementEventArgs)
         MsgBox("Fehler beim Einlesen der Einstellungen:" & eol _
             & "Das Element '" & e.Element.Name & "' ist unbekannt!", MsgBoxStyle.Critical, "Fehler")
     End Sub
 
-    Private Sub serializerUnknownAttribute(sender As Object, e As XmlAttributeEventArgs)
+    Private Sub serializerUnknownAttribute(ByVal sender As Object, ByVal e As XmlAttributeEventArgs)
         MsgBox("Fehler beim Einlesen der Einstellungen:" & eol _
             & "Das Attribut '" & e.Attr.Name & "' ist unbekannt!", MsgBoxStyle.Critical, "Fehler")
     End Sub
@@ -636,25 +630,20 @@ Public Class EVO_Einstellungen
 #End Region 'Schnittstelle
 
 
-    'Hybrid2008: Voreinstellungen des Formulars aufgrund der Wahl der Rolle
+    'MetaEvo: Voreinstellungen des Formulars aufgrund der Wahl der Rolle
     Private Sub Combo_Hybrid_Role_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Combo_Hybrid_Role.SelectedIndexChanged
         If (Me.Combo_Hybrid_Role.SelectedItem = "Single PC") Then
             Me.GroupBox_Hybrid_BasicOptions.Enabled = True
-            Me.GroupBox_Hybrid_NetworkServerOptions.Enabled = False
             Me.GroupBox_Hybrid_PerformanceOptions.Enabled = True
             Me.GroupBox_Hybrid_MySQLOptions.Enabled = False
-            Me.Numeric_Hybrid_Numbergenerations.Enabled = True
         ElseIf (Me.Combo_Hybrid_Role.SelectedItem = "Network Client") Then
             Me.GroupBox_Hybrid_BasicOptions.Enabled = False
-            Me.GroupBox_Hybrid_NetworkServerOptions.Enabled = False
             Me.GroupBox_Hybrid_PerformanceOptions.Enabled = True
             Me.GroupBox_Hybrid_MySQLOptions.Enabled = True
         ElseIf (Me.Combo_Hybrid_Role.SelectedItem = "Network Server") Then
             Me.GroupBox_Hybrid_BasicOptions.Enabled = True
-            Me.GroupBox_Hybrid_NetworkServerOptions.Enabled = True
             Me.GroupBox_Hybrid_PerformanceOptions.Enabled = True
             Me.GroupBox_Hybrid_MySQLOptions.Enabled = True
-            Me.Numeric_Hybrid_Numbergenerations.Enabled = False
         End If
     End Sub
 

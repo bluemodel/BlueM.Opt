@@ -19,7 +19,7 @@ namespace IHWB.EVO.HybridAlgo
         public Networkmanager(EVO.Common.EVO_Settings settings_input)
         {   
             this.settings = settings_input;
-            mycon = new MySqlConnection("datasource=" + settings.Hybrid2008.MySQL_Host + ";username=" + settings.Hybrid2008.MySQL_User + ";password=" + settings.Hybrid2008.MySQL_Password + ";database=information_schema");
+            mycon = new MySqlConnection("datasource=" + settings.MetaEvo.MySQL_Host + ";username=" + settings.MetaEvo.MySQL_User + ";password=" + settings.MetaEvo.MySQL_Password + ";database=information_schema");
             myCommand = new MySqlCommand();
             myCommand.Connection = mycon;
         }
@@ -45,13 +45,13 @@ namespace IHWB.EVO.HybridAlgo
         public void database_init()   //ToDO: Fertiges Individuum oder Problem übergeben
         {    
             //Datenbank
-            myCommand.CommandText = "CREATE DATABASE IF NOT EXISTS " + settings.Hybrid2008.MySQL_Database;
+            myCommand.CommandText = "CREATE DATABASE IF NOT EXISTS " + settings.MetaEvo.MySQL_Database;
             myCommand.Connection.Open();
             myCommand.ExecuteNonQuery();
             myCommand.Connection.Close();
 
             //Wechseln in neue Datenbank
-            myCommand.Connection.ConnectionString = "datasource=" + settings.Hybrid2008.MySQL_Host + ";username=" + settings.Hybrid2008.MySQL_User + ";password=" + settings.Hybrid2008.MySQL_Password + ";database=" + settings.Hybrid2008.MySQL_Database;
+            myCommand.Connection.ConnectionString = "datasource=" + settings.MetaEvo.MySQL_Host + ";username=" + settings.MetaEvo.MySQL_User + ";password=" + settings.MetaEvo.MySQL_Password + ";database=" + settings.MetaEvo.MySQL_Database;
 
             //benötigte Tabellen (->Problem/Individuum) erzeugen
             myCommand.CommandText = "CREATE TABLE IF NOT EXISTS test (col1 INT, col2 CHAR(5))";
@@ -63,7 +63,7 @@ namespace IHWB.EVO.HybridAlgo
         //Datenbank löschen
         public void database_delete()
         {
-            myCommand.CommandText = "DROP DATABASE IF EXISTS " + settings.Hybrid2008.MySQL_Database;
+            myCommand.CommandText = "DROP DATABASE IF EXISTS " + settings.MetaEvo.MySQL_Database;
             myCommand.Connection.Open();
             myCommand.ExecuteNonQuery();
             myCommand.Connection.Close();

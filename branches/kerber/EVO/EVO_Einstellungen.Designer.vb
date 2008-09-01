@@ -57,9 +57,6 @@ Partial Class EVO_Einstellungen
         Dim Label3 As System.Windows.Forms.Label
         Dim Label1 As System.Windows.Forms.Label
         Dim Label11 As System.Windows.Forms.Label
-        Dim Label12 As System.Windows.Forms.Label
-        Dim Label22 As System.Windows.Forms.Label
-        Dim Label23 As System.Windows.Forms.Label
         Dim Label5 As System.Windows.Forms.Label
         Dim Label30 As System.Windows.Forms.Label
         Dim Label10 As System.Windows.Forms.Label
@@ -135,7 +132,7 @@ Partial Class EVO_Einstellungen
         Me.Numeric_HJ_DeltaFinish = New System.Windows.Forms.NumericUpDown
         Me.Numeric_HJ_DeltaStart = New System.Windows.Forms.NumericUpDown
         Me.CheckBox_HJ_DNVektor = New System.Windows.Forms.CheckBox
-        Me.TabPage_Hybrid2008 = New System.Windows.Forms.TabPage
+        Me.TabPage_MetaEvo = New System.Windows.Forms.TabPage
         Me.GroupBox_Hybrid_MySQLOptions = New System.Windows.Forms.GroupBox
         Me.TextBox_Hybrid_MySQL_DB = New System.Windows.Forms.TextBox
         Me.TextBox_Hybrid_MySQL_Password = New System.Windows.Forms.TextBox
@@ -143,12 +140,8 @@ Partial Class EVO_Einstellungen
         Me.TextBox_Hybrid_MySQL_Host = New System.Windows.Forms.TextBox
         Me.GroupBox_Hybrid_PerformanceOptions = New System.Windows.Forms.GroupBox
         Me.CheckBox_Hybrid_Draw = New System.Windows.Forms.CheckBox
-        Me.GroupBox_Hybrid_NetworkServerOptions = New System.Windows.Forms.GroupBox
-        Me.Numeric_Hybrid_EvolutionPeriod = New System.Windows.Forms.NumericUpDown
-        Me.Numeric_Hybrid_NumberEvolutions = New System.Windows.Forms.NumericUpDown
         Me.GroupBox_Hybrid_BasicOptions = New System.Windows.Forms.GroupBox
         Me.Numeric_Hybrid_PopulationSize = New System.Windows.Forms.NumericUpDown
-        Me.Numeric_Hybrid_AlgorithmBreakpointRule = New System.Windows.Forms.NumericUpDown
         Me.Numeric_Hybrid_Numbergenerations = New System.Windows.Forms.NumericUpDown
         Me.Combo_Hybrid_Role = New System.Windows.Forms.ComboBox
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip
@@ -194,9 +187,6 @@ Partial Class EVO_Einstellungen
         Label3 = New System.Windows.Forms.Label
         Label1 = New System.Windows.Forms.Label
         Label11 = New System.Windows.Forms.Label
-        Label12 = New System.Windows.Forms.Label
-        Label22 = New System.Windows.Forms.Label
-        Label23 = New System.Windows.Forms.Label
         Label5 = New System.Windows.Forms.Label
         Label30 = New System.Windows.Forms.Label
         Label10 = New System.Windows.Forms.Label
@@ -236,15 +226,11 @@ Partial Class EVO_Einstellungen
         Me.TabPage_HookeJeeves.SuspendLayout()
         CType(Me.Numeric_HJ_DeltaFinish, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Numeric_HJ_DeltaStart, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.TabPage_Hybrid2008.SuspendLayout()
+        Me.TabPage_MetaEvo.SuspendLayout()
         Me.GroupBox_Hybrid_MySQLOptions.SuspendLayout()
         Me.GroupBox_Hybrid_PerformanceOptions.SuspendLayout()
-        Me.GroupBox_Hybrid_NetworkServerOptions.SuspendLayout()
-        CType(Me.Numeric_Hybrid_EvolutionPeriod, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.Numeric_Hybrid_NumberEvolutions, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox_Hybrid_BasicOptions.SuspendLayout()
         CType(Me.Numeric_Hybrid_PopulationSize, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.Numeric_Hybrid_AlgorithmBreakpointRule, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Numeric_Hybrid_Numbergenerations, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ToolStrip1.SuspendLayout()
         Me.GroupBox_Einstellungen.SuspendLayout()
@@ -591,33 +577,6 @@ Partial Class EVO_Einstellungen
         Label11.TabIndex = 35
         Label11.Text = "Number of generations:"
         '
-        'Label12
-        '
-        Label12.AutoSize = True
-        Label12.Location = New System.Drawing.Point(4, 74)
-        Label12.Name = "Label12"
-        Label12.Size = New System.Drawing.Size(81, 13)
-        Label12.TabIndex = 48
-        Label12.Text = "Breakpoint-rule:"
-        '
-        'Label22
-        '
-        Label22.AutoSize = True
-        Label22.Location = New System.Drawing.Point(4, 48)
-        Label22.Name = "Label22"
-        Label22.Size = New System.Drawing.Size(86, 13)
-        Label22.TabIndex = 1
-        Label22.Text = "Evolution-period:"
-        '
-        'Label23
-        '
-        Label23.AutoSize = True
-        Label23.Location = New System.Drawing.Point(4, 22)
-        Label23.Name = "Label23"
-        Label23.Size = New System.Drawing.Size(111, 13)
-        Label23.TabIndex = 0
-        Label23.Text = "Number of Evolutions:"
-        '
         'Label5
         '
         Label5.AutoSize = True
@@ -686,7 +645,7 @@ Partial Class EVO_Einstellungen
         Me.TabControl1.Controls.Add(Me.TabPage_PES)
         Me.TabControl1.Controls.Add(Me.TabPage_CES)
         Me.TabControl1.Controls.Add(Me.TabPage_HookeJeeves)
-        Me.TabControl1.Controls.Add(Me.TabPage_Hybrid2008)
+        Me.TabControl1.Controls.Add(Me.TabPage_MetaEvo)
         Me.TabControl1.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TabControl1.Location = New System.Drawing.Point(1, 41)
         Me.TabControl1.Margin = New System.Windows.Forms.Padding(0)
@@ -1458,22 +1417,21 @@ Partial Class EVO_Einstellungen
         Me.CheckBox_HJ_DNVektor.TabIndex = 2
         Me.CheckBox_HJ_DNVektor.Text = "mit Schrittweitenvektor"
         '
-        'TabPage_Hybrid2008
+        'TabPage_MetaEvo
         '
-        Me.TabPage_Hybrid2008.BackColor = System.Drawing.SystemColors.Control
-        Me.TabPage_Hybrid2008.Controls.Add(Me.GroupBox_Hybrid_MySQLOptions)
-        Me.TabPage_Hybrid2008.Controls.Add(Me.GroupBox_Hybrid_PerformanceOptions)
-        Me.TabPage_Hybrid2008.Controls.Add(Label5)
-        Me.TabPage_Hybrid2008.Controls.Add(Me.GroupBox_Hybrid_NetworkServerOptions)
-        Me.TabPage_Hybrid2008.Controls.Add(Me.GroupBox_Hybrid_BasicOptions)
-        Me.TabPage_Hybrid2008.Controls.Add(Me.Combo_Hybrid_Role)
-        Me.TabPage_Hybrid2008.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TabPage_Hybrid2008.Location = New System.Drawing.Point(4, 22)
-        Me.TabPage_Hybrid2008.Name = "TabPage_Hybrid2008"
-        Me.TabPage_Hybrid2008.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage_Hybrid2008.Size = New System.Drawing.Size(222, 630)
-        Me.TabPage_Hybrid2008.TabIndex = 3
-        Me.TabPage_Hybrid2008.Text = "Hybrid2008"
+        Me.TabPage_MetaEvo.BackColor = System.Drawing.SystemColors.Control
+        Me.TabPage_MetaEvo.Controls.Add(Me.GroupBox_Hybrid_MySQLOptions)
+        Me.TabPage_MetaEvo.Controls.Add(Me.GroupBox_Hybrid_PerformanceOptions)
+        Me.TabPage_MetaEvo.Controls.Add(Label5)
+        Me.TabPage_MetaEvo.Controls.Add(Me.GroupBox_Hybrid_BasicOptions)
+        Me.TabPage_MetaEvo.Controls.Add(Me.Combo_Hybrid_Role)
+        Me.TabPage_MetaEvo.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.TabPage_MetaEvo.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage_MetaEvo.Name = "TabPage_MetaEvo"
+        Me.TabPage_MetaEvo.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage_MetaEvo.Size = New System.Drawing.Size(222, 630)
+        Me.TabPage_MetaEvo.TabIndex = 3
+        Me.TabPage_MetaEvo.Text = "MetaEvo"
         '
         'GroupBox_Hybrid_MySQLOptions
         '
@@ -1486,7 +1444,7 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Hybrid_MySQLOptions.Controls.Add(Label14)
         Me.GroupBox_Hybrid_MySQLOptions.Controls.Add(Label15)
         Me.GroupBox_Hybrid_MySQLOptions.Enabled = False
-        Me.GroupBox_Hybrid_MySQLOptions.Location = New System.Drawing.Point(11, 278)
+        Me.GroupBox_Hybrid_MySQLOptions.Location = New System.Drawing.Point(11, 172)
         Me.GroupBox_Hybrid_MySQLOptions.Name = "GroupBox_Hybrid_MySQLOptions"
         Me.GroupBox_Hybrid_MySQLOptions.Size = New System.Drawing.Size(200, 125)
         Me.GroupBox_Hybrid_MySQLOptions.TabIndex = 52
@@ -1527,7 +1485,7 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Hybrid_PerformanceOptions.Controls.Add(Me.CheckBox_Hybrid_Draw)
         Me.GroupBox_Hybrid_PerformanceOptions.Controls.Add(Label30)
         Me.GroupBox_Hybrid_PerformanceOptions.Enabled = False
-        Me.GroupBox_Hybrid_PerformanceOptions.Location = New System.Drawing.Point(11, 227)
+        Me.GroupBox_Hybrid_PerformanceOptions.Location = New System.Drawing.Point(11, 121)
         Me.GroupBox_Hybrid_PerformanceOptions.Name = "GroupBox_Hybrid_PerformanceOptions"
         Me.GroupBox_Hybrid_PerformanceOptions.Size = New System.Drawing.Size(200, 45)
         Me.GroupBox_Hybrid_PerformanceOptions.TabIndex = 51
@@ -1543,54 +1501,16 @@ Partial Class EVO_Einstellungen
         Me.CheckBox_Hybrid_Draw.Size = New System.Drawing.Size(18, 18)
         Me.CheckBox_Hybrid_Draw.TabIndex = 50
         '
-        'GroupBox_Hybrid_NetworkServerOptions
-        '
-        Me.GroupBox_Hybrid_NetworkServerOptions.Controls.Add(Me.Numeric_Hybrid_EvolutionPeriod)
-        Me.GroupBox_Hybrid_NetworkServerOptions.Controls.Add(Me.Numeric_Hybrid_NumberEvolutions)
-        Me.GroupBox_Hybrid_NetworkServerOptions.Controls.Add(Label22)
-        Me.GroupBox_Hybrid_NetworkServerOptions.Controls.Add(Label23)
-        Me.GroupBox_Hybrid_NetworkServerOptions.Enabled = False
-        Me.GroupBox_Hybrid_NetworkServerOptions.Location = New System.Drawing.Point(11, 148)
-        Me.GroupBox_Hybrid_NetworkServerOptions.Name = "GroupBox_Hybrid_NetworkServerOptions"
-        Me.GroupBox_Hybrid_NetworkServerOptions.Size = New System.Drawing.Size(200, 73)
-        Me.GroupBox_Hybrid_NetworkServerOptions.TabIndex = 50
-        Me.GroupBox_Hybrid_NetworkServerOptions.TabStop = False
-        Me.GroupBox_Hybrid_NetworkServerOptions.Text = "Network Server Options"
-        '
-        'Numeric_Hybrid_EvolutionPeriod
-        '
-        Me.Numeric_Hybrid_EvolutionPeriod.DecimalPlaces = 1
-        Me.Numeric_Hybrid_EvolutionPeriod.Increment = New Decimal(New Integer() {1, 0, 0, 65536})
-        Me.Numeric_Hybrid_EvolutionPeriod.Location = New System.Drawing.Point(139, 45)
-        Me.Numeric_Hybrid_EvolutionPeriod.Name = "Numeric_Hybrid_EvolutionPeriod"
-        Me.Numeric_Hybrid_EvolutionPeriod.Size = New System.Drawing.Size(53, 20)
-        Me.Numeric_Hybrid_EvolutionPeriod.TabIndex = 4
-        Me.Numeric_Hybrid_EvolutionPeriod.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.Numeric_Hybrid_EvolutionPeriod.Value = New Decimal(New Integer() {12, 0, 0, 65536})
-        '
-        'Numeric_Hybrid_NumberEvolutions
-        '
-        Me.Numeric_Hybrid_NumberEvolutions.Location = New System.Drawing.Point(139, 19)
-        Me.Numeric_Hybrid_NumberEvolutions.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
-        Me.Numeric_Hybrid_NumberEvolutions.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
-        Me.Numeric_Hybrid_NumberEvolutions.Name = "Numeric_Hybrid_NumberEvolutions"
-        Me.Numeric_Hybrid_NumberEvolutions.Size = New System.Drawing.Size(53, 20)
-        Me.Numeric_Hybrid_NumberEvolutions.TabIndex = 3
-        Me.Numeric_Hybrid_NumberEvolutions.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.Numeric_Hybrid_NumberEvolutions.Value = New Decimal(New Integer() {500, 0, 0, 0})
-        '
         'GroupBox_Hybrid_BasicOptions
         '
         Me.GroupBox_Hybrid_BasicOptions.Controls.Add(Label10)
         Me.GroupBox_Hybrid_BasicOptions.Controls.Add(Me.Numeric_Hybrid_PopulationSize)
-        Me.GroupBox_Hybrid_BasicOptions.Controls.Add(Me.Numeric_Hybrid_AlgorithmBreakpointRule)
         Me.GroupBox_Hybrid_BasicOptions.Controls.Add(Label11)
-        Me.GroupBox_Hybrid_BasicOptions.Controls.Add(Label12)
         Me.GroupBox_Hybrid_BasicOptions.Controls.Add(Me.Numeric_Hybrid_Numbergenerations)
         Me.GroupBox_Hybrid_BasicOptions.Enabled = False
         Me.GroupBox_Hybrid_BasicOptions.Location = New System.Drawing.Point(11, 43)
         Me.GroupBox_Hybrid_BasicOptions.Name = "GroupBox_Hybrid_BasicOptions"
-        Me.GroupBox_Hybrid_BasicOptions.Size = New System.Drawing.Size(200, 99)
+        Me.GroupBox_Hybrid_BasicOptions.Size = New System.Drawing.Size(200, 72)
         Me.GroupBox_Hybrid_BasicOptions.TabIndex = 36
         Me.GroupBox_Hybrid_BasicOptions.TabStop = False
         Me.GroupBox_Hybrid_BasicOptions.Text = "Basic Options"
@@ -1605,18 +1525,6 @@ Partial Class EVO_Einstellungen
         Me.Numeric_Hybrid_PopulationSize.TabIndex = 50
         Me.Numeric_Hybrid_PopulationSize.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         Me.Numeric_Hybrid_PopulationSize.Value = New Decimal(New Integer() {1, 0, 0, 0})
-        '
-        'Numeric_Hybrid_AlgorithmBreakpointRule
-        '
-        Me.Numeric_Hybrid_AlgorithmBreakpointRule.DecimalPlaces = 2
-        Me.Numeric_Hybrid_AlgorithmBreakpointRule.Increment = New Decimal(New Integer() {1, 0, 0, 131072})
-        Me.Numeric_Hybrid_AlgorithmBreakpointRule.Location = New System.Drawing.Point(139, 71)
-        Me.Numeric_Hybrid_AlgorithmBreakpointRule.Maximum = New Decimal(New Integer() {1, 0, 0, 0})
-        Me.Numeric_Hybrid_AlgorithmBreakpointRule.Name = "Numeric_Hybrid_AlgorithmBreakpointRule"
-        Me.Numeric_Hybrid_AlgorithmBreakpointRule.Size = New System.Drawing.Size(53, 20)
-        Me.Numeric_Hybrid_AlgorithmBreakpointRule.TabIndex = 49
-        Me.Numeric_Hybrid_AlgorithmBreakpointRule.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.Numeric_Hybrid_AlgorithmBreakpointRule.Value = New Decimal(New Integer() {12, 0, 0, 131072})
         '
         'Numeric_Hybrid_Numbergenerations
         '
@@ -1726,20 +1634,15 @@ Partial Class EVO_Einstellungen
         Me.TabPage_HookeJeeves.PerformLayout()
         CType(Me.Numeric_HJ_DeltaFinish, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.Numeric_HJ_DeltaStart, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.TabPage_Hybrid2008.ResumeLayout(False)
-        Me.TabPage_Hybrid2008.PerformLayout()
+        Me.TabPage_MetaEvo.ResumeLayout(False)
+        Me.TabPage_MetaEvo.PerformLayout()
         Me.GroupBox_Hybrid_MySQLOptions.ResumeLayout(False)
         Me.GroupBox_Hybrid_MySQLOptions.PerformLayout()
         Me.GroupBox_Hybrid_PerformanceOptions.ResumeLayout(False)
         Me.GroupBox_Hybrid_PerformanceOptions.PerformLayout()
-        Me.GroupBox_Hybrid_NetworkServerOptions.ResumeLayout(False)
-        Me.GroupBox_Hybrid_NetworkServerOptions.PerformLayout()
-        CType(Me.Numeric_Hybrid_EvolutionPeriod, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.Numeric_Hybrid_NumberEvolutions, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox_Hybrid_BasicOptions.ResumeLayout(False)
         Me.GroupBox_Hybrid_BasicOptions.PerformLayout()
         CType(Me.Numeric_Hybrid_PopulationSize, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.Numeric_Hybrid_AlgorithmBreakpointRule, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.Numeric_Hybrid_Numbergenerations, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ToolStrip1.ResumeLayout(False)
         Me.ToolStrip1.PerformLayout()
@@ -1819,15 +1722,11 @@ Partial Class EVO_Einstellungen
     Private WithEvents CheckBox_CES_RealOptimisation As System.Windows.Forms.CheckBox
     Private WithEvents LabelAnzEltern As System.Windows.Forms.Label
     Private WithEvents CheckBox_CES_StartPESPop As System.Windows.Forms.CheckBox
-    Friend WithEvents TabPage_Hybrid2008 As System.Windows.Forms.TabPage
+    Friend WithEvents TabPage_MetaEvo As System.Windows.Forms.TabPage
     Public WithEvents TabControl1 As System.Windows.Forms.TabControl
     Friend WithEvents Combo_Hybrid_Role As System.Windows.Forms.ComboBox
     Private WithEvents Numeric_Hybrid_Numbergenerations As System.Windows.Forms.NumericUpDown
     Friend WithEvents GroupBox_Hybrid_BasicOptions As System.Windows.Forms.GroupBox
-    Private WithEvents Numeric_Hybrid_AlgorithmBreakpointRule As System.Windows.Forms.NumericUpDown
-    Friend WithEvents GroupBox_Hybrid_NetworkServerOptions As System.Windows.Forms.GroupBox
-    Friend WithEvents Numeric_Hybrid_EvolutionPeriod As System.Windows.Forms.NumericUpDown
-    Friend WithEvents Numeric_Hybrid_NumberEvolutions As System.Windows.Forms.NumericUpDown
     Friend WithEvents GroupBox_Hybrid_PerformanceOptions As System.Windows.Forms.GroupBox
     Private WithEvents Numeric_Hybrid_PopulationSize As System.Windows.Forms.NumericUpDown
     Friend WithEvents GroupBox_Hybrid_MySQLOptions As System.Windows.Forms.GroupBox

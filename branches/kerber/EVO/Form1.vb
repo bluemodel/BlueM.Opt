@@ -40,7 +40,7 @@ Partial Class Form1
 
     'Methoden
     Private CES1 As EVO.Kern.CES
-    Private controller2008 As EVO.HybridAlgo.Controller
+    Private MetaEvoController As EVO.HybridAlgo.Controller
 
     '**** Globale Parameter Parameter Optimierung ****
     'TODO: diese Werte sollten eigentlich nur in CES bzw PES vorgehalten werden
@@ -87,7 +87,7 @@ Partial Class Form1
         ComboBox_Anwendung.SelectedIndex = 0
 
         'Liste der Methoden in ComboBox schreiben und Anfangseinstellung wählen
-        ComboBox_Methode.Items.AddRange(New Object() {"", METH_PES, METH_CES, METH_HYBRID, METH_Hybrid2008, METH_SENSIPLOT, METH_HOOKJEEVES})
+        ComboBox_Methode.Items.AddRange(New Object() {"", METH_PES, METH_CES, METH_HYBRID, METH_MetaEvo, METH_SENSIPLOT, METH_HOOKJEEVES})
         ComboBox_Methode.SelectedIndex = 0
 
         'OptionsDialog instanzieren
@@ -495,7 +495,7 @@ Partial Class Form1
                     With EVO_Einstellungen1
                         .TabControl1.TabPages.Remove(.TabPage_CES)
                         .TabControl1.TabPages.Remove(.TabPage_HookeJeeves)
-                        .TabControl1.TabPages.Remove(.TabPage_Hybrid2008)
+                        .TabControl1.TabPages.Remove(.TabPage_MetaEvo)
                     End With
 
                     'Fallunterscheidung Anwendung
@@ -548,7 +548,7 @@ Partial Class Form1
                     With EVO_Einstellungen1
                         .TabControl1.TabPages.Remove(.TabPage_PES)
                         .TabControl1.TabPages.Remove(.TabPage_CES)
-                        .TabControl1.TabPages.Remove(.TabPage_Hybrid2008)
+                        .TabControl1.TabPages.Remove(.TabPage_MetaEvo)
                     End With
 
                     'TODO: eigenen read and valid methode für hookJeeves
@@ -579,7 +579,7 @@ Partial Class Form1
                     'Tabcontrols entfernen die man nicht braucht
                     With EVO_Einstellungen1
                         .TabControl1.TabPages.Remove(.TabPage_HookeJeeves)
-                        .TabControl1.TabPages.Remove(.TabPage_Hybrid2008)
+                        .TabControl1.TabPages.Remove(.TabPage_MetaEvo)
                     End With
 
                     'Ergebnis-Buttons
@@ -630,7 +630,7 @@ Partial Class Form1
                     End If
 
 
-                Case METH_Hybrid2008
+                Case METH_MetaEvo
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'EVO_Einstellungen aktivieren
@@ -762,16 +762,16 @@ Partial Class Form1
                             Call STARTEN_CES_or_HYBRID()
                         Case METH_HOOKJEEVES
                             Call STARTEN_HookJeeves()
-                        Case METH_Hybrid2008
-                            controller2008 = New EVO.HybridAlgo.Controller(EVO_Einstellungen1.Settings)
+                        Case METH_MetaEvo
+                            MetaEvoController = New EVO.HybridAlgo.Controller(EVO_Einstellungen1.Settings, Me.Hauptdiagramm1)
                     End Select
 
                 Case ANW_TESTPROBLEME
                     Select Case Method
                         Case METH_PES
                             Call STARTEN_PES()
-                        Case METH_Hybrid2008
-                            controller2008 = New EVO.HybridAlgo.Controller(EVO_Einstellungen1.Settings)
+                        Case METH_MetaEvo
+                            MetaEvoController = New EVO.HybridAlgo.Controller(EVO_Einstellungen1.Settings, Me.Hauptdiagramm1)
                     End Select
 
                 Case ANW_TSP

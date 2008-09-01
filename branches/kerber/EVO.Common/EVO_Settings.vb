@@ -251,19 +251,14 @@ Public Class EVO_Settings
 
     End Structure
 
-    Public Structure Hybrid2008_Settings
+    Public Structure MetaEvo_Settings
 
         Public Role As String                         'Was stellt dieser PC da: Single PC, Network Server, Network Client
 
         'Einstellungen für einen PC der das Problem berechnet
         Public PopulationSize As Integer            'Populationsgrösse
-        Public NumberGenerations As Integer         'Soll ein Schrittweitenvektor benutzt werden
-        Public AlgorthmBreakpointRule As Double     'Wenn 3 Generationen nacheinander weniger als x*Populationsgrösse neue Individuen überleben
-
-        'Einstellungen für ein Netzwerk das das Problem berechnet
-        Public NumberEvolutions As Integer          'Wie viele Evolutionsschritte (=Zusammenfassung von Metagenerationen) es geben soll
-        Public EvolutionPeriod As Double              'Wartezeit bis zur neuen Metageneration als:  x * Dauer(Evaluation aller Individuen der Clients)
-
+        Public NumberGenerations As Integer         'Anzahl der Generationen die berechnet werden
+        
         'Performanceeinstellungen
         Public Draw As Boolean                      'Ob die Berechnung grafisch dargestellt wird
 
@@ -280,16 +275,12 @@ Public Class EVO_Settings
 
             Me.PopulationSize = 20
             Me.NumberGenerations = 100
-            Me.AlgorthmBreakpointRule = 0.1
-
-            Me.NumberEvolutions = 20
-            Me.EvolutionPeriod = 1.2
 
             Me.Draw = True
 
             Me.MySQL_Host = "localhost"
-            Me.MySQL_Database = "hybrid2008_db"
-            Me.MySQL_User = "hybrid2008_user"
+            Me.MySQL_Database = "MetaEvo_db"
+            Me.MySQL_User = "MetaEvo_user"
             Me.MySQL_Password = ""
         End Sub
 
@@ -298,5 +289,5 @@ Public Class EVO_Settings
     Public PES As PES_Settings
     Public CES As CES_Settings
     Public HookJeeves As HookJeeves_Settings
-    Public Hybrid2008 As Hybrid2008_Settings
+    Public MetaEvo As MetaEvo_Settings
 End Class

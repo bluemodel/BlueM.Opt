@@ -9,22 +9,23 @@ namespace IHWB.EVO.HybridAlgo
     {
         //### Variablen ###
         EVO.Common.EVO_Settings settings;
-
+        EVO.Diagramm.Hauptdiagramm hauptdiagramm1;
         Networkmanager networkmanager2008;
 
         string role;
         bool ok;
 
         //### Konstruktor ###
-        public Controller(EVO.Common.EVO_Settings settings_input)  //Problem und Zeichner sollte noch übergeben werden
+        public Controller(EVO.Common.EVO_Settings settings_input, EVO.Diagramm.Hauptdiagramm hauptdiagramm_input)  //Problem und Zeichner sollte noch übergeben werden
         {
             //Daten einlesen
             this.ok = true;
+            this.hauptdiagramm1 = hauptdiagramm_input;
             this.settings = settings_input;
-            this.role = this.settings.Hybrid2008.Role; 
+            this.role = this.settings.MetaEvo.Role; 
 
             //Falls Berechnung im Netzwerk: Networkmanager instanziieren und Verbindung zur Datenbank checken
-            if (settings.Hybrid2008.Role != "Single PC")
+            if (settings.MetaEvo.Role != "Single PC")
             {
                 this.ok = false;
                 networkmanager2008 = new Networkmanager(this.settings);

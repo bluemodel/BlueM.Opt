@@ -23,7 +23,7 @@ Public Module Constants
     Public Const METH_HYBRID As String = "HYBRID"
     Public Const METH_SENSIPLOT As String = "SensiPlot"
     Public Const METH_HOOKJEEVES As String = "Hooke & Jeeves"
-    Public Const METH_Hybrid2008 As String = "Hybrid2008"
+    Public Const METH_MetaEvo As String = "MetaEvo"
 
     'Option für Startvorgabe für Optimierung
     Public Enum EVO_STARTPARAMETER As Integer
