@@ -65,7 +65,7 @@ Partial Class Form1
 
     'Diagramme
     Private WithEvents Hauptdiagramm1 As IHWB.EVO.Diagramm.Hauptdiagramm
-    Private WithEvents Monitor1 As Monitor
+    Private WithEvents Monitor1 As EVO.Diagramm.Monitor
 
 #End Region 'Eigenschaften
 
@@ -95,7 +95,7 @@ Partial Class Form1
         Me.Options = New OptionsDialog()
 
         'Monitor instanzieren
-        Me.Monitor1 = New Monitor()
+        Me.Monitor1 = New EVO.Diagramm.Monitor()
 
         'Handler für Klick auf Serien zuweisen
         AddHandler Me.Hauptdiagramm1.ClickSeries, AddressOf seriesClick
@@ -2782,14 +2782,6 @@ Start_Evolutionsrunden:
             'Instanzierung
             HypervolumeRef = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, minmax, nadir, sekpopvaluesRef)
             indicatorRef = -HypervolumeRef.calc_indicator()
-
-            'Anzeige im Monitor als ColorLine
-            Dim colorline1 As New Steema.TeeChart.Tools.ColorLine(Me.Monitor1.Monitordiagramm.Chart)
-            colorline1.Pen.Color = Color.Blue
-            colorline1.Pen.Width = 2
-            colorline1.AllowDrag = False
-            colorline1.Axis = Me.Monitor1.Monitordiagramm.Axes.Left
-            colorline1.Value = indicatorRef
 
             'Cursor Default
             Cursor = Cursors.Default
