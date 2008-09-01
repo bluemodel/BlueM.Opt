@@ -6,7 +6,10 @@
     Private Line_Hypervolume As Steema.TeeChart.Styles.Line
     Private Line_Dn As Steema.TeeChart.Styles.Line
 
-    Public Event MonitorClosed
+    Private axis_horiz_gen As Steema.TeeChart.Axis
+    Private axis_vert_hyperv As Steema.TeeChart.Axis
+
+    Public Event MonitorClosed()
 
     'Konstruktor
     '***********
@@ -23,7 +26,6 @@
         Me.Monitordiagramm.Axes.Left.Title.Caption = "Schrittweite"
 
         'Generationsachse (oben)
-        Dim axis_horiz_gen As Steema.TeeChart.Axis
         axis_horiz_gen = Steema.TeeChart.Axes.CreateNewAxis(Me.Monitordiagramm.Chart)
         axis_horiz_gen.Title.Caption = "Generation"
         axis_horiz_gen.Horizontal = True
@@ -33,7 +35,6 @@
         axis_horiz_gen.Grid.Visible = False
 
         'Hypervolumenachse (rechts)
-        Dim axis_vert_hyperv As Steema.TeeChart.Axis
         axis_vert_hyperv = Steema.TeeChart.Axes.CreateNewAxis(Me.Monitordiagramm.Chart)
         axis_vert_hyperv.Title.Caption = "Hypervolumen"
         axis_vert_hyperv.Title.Angle = 90
@@ -111,14 +112,14 @@
 
     End Sub
 
-    'Anzeige im Monitor als ColorLine
+    'Anzeige eines Referenz-Hypervolumens als ColorLine
     Public Sub ZeichneReferenzHypervolumen(ByVal indicatorRef As Double)
 
         Dim colorline1 As New Steema.TeeChart.Tools.ColorLine(Me.Monitordiagramm.Chart)
-        colorline1.Pen.Color = System.Drawing.Color.Blue
+        colorline1.Pen.Color = System.Drawing.Color.Red
         colorline1.Pen.Width = 2
         colorline1.AllowDrag = False
-        colorline1.Axis = Me.Monitordiagramm.Axes.Left
+        colorline1.Axis = Me.axis_vert_hyperv
         colorline1.Value = indicatorRef
 
     End Sub

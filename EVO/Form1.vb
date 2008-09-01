@@ -2783,6 +2783,9 @@ Start_Evolutionsrunden:
             HypervolumeRef = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, minmax, nadir, sekpopvaluesRef)
             indicatorRef = -HypervolumeRef.calc_indicator()
 
+            'Im Monitor anzeigen
+            Call Me.Monitor1.ZeichneReferenzHypervolumen(indicatorRef)
+
             'Cursor Default
             Cursor = Cursors.Default
 
