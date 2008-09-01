@@ -57,6 +57,12 @@
     <Compile Include="Hauptdiagramm.vb">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Monitor.Designer.vb">
+      <DependentUpon>Monitor.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Monitor.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -86,6 +92,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Monitor.resx">
+      <DependentUpon>Monitor.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="My Project\licenses.licx" />
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
