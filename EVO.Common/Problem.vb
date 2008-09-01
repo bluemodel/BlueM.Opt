@@ -1,50 +1,43 @@
+'*******************************************************************************
+'*******************************************************************************
+'**** Klasse Problem                                                        ****
+'****                                                                       ****
+'**** Autoren: Christoph Hübner, Felix Fröhlich                             ****
+'****                                                                       ****
+'**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
+'**** TU Darmstadt                                                          ****
+'*******************************************************************************
+'*******************************************************************************
+
 Imports System.IO
 
+''' <summary>
+''' Definiert das zu lösende Optimierungsproblem
+''' </summary>
 Public Class Problem
-
-    '*******************************************************************************
-    '*******************************************************************************
-    '**** Klasse Problem                                                        ****
-    '****                                                                       ****
-    '**** Autoren: Christoph Hübner, Felix Fröhlich                             ****
-    '****                                                                       ****
-    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
-    '**** TU Darmstadt                                                          ****
-    '*******************************************************************************
-    '*******************************************************************************
-
-    'Struct ModellParameter
-    '----------------------
-    Public Structure Struct_ModellParameter
-        Public OptParameter As String               'Optimierungsparameter, aus dem dieser Modellparameter errechnet wird
-        Public Bezeichnung As String                'Bezeichnung
-        Public Einheit As String                    'Einheit
-        Public Datei As String                      'Dateiendung der BM-Eingabedatei
-        Public Element As String                    'Optional: Das Element auf das sich der Modellparameter bezieht
-        Public ZeileNr As Short                     'Zeile
-        Public SpVon As Short                       'Anfangsspalte
-        Public SpBis As Short                       'Endspalte
-        Public Faktor As Double                     'Faktor fuer das Umrechnen zwischen OptParameter und ModellParameter
-        Public Function Clone() As Struct_ModellParameter
-            Clone.OptParameter = Me.OptParameter
-            Clone.Bezeichnung = Me.Bezeichnung
-            Clone.Einheit = Me.Einheit
-            Clone.Datei = Me.Datei
-            Clone.Element = Me.Element
-            Clone.ZeileNr = Me.ZeileNr
-            Clone.SpVon = Me.SpVon
-            Clone.SpBis = Me.SpBis
-            Clone.Faktor = Me.Faktor
-        End Function
-    End Structure
 
     'Konstanten
     '##########
-    Public Const OptParameter_Ext As String = "OPT"      'Erweiterung der Datei mit den Optimierungsparametern (*.OPT)
-    Public Const ModParameter_Ext As String = "MOD"      'Erweiterung der Datei mit den Modellparametern (*.MOD)
-    Public Const OptZiele_Ext As String = "ZIE"          'Erweiterung der Datei mit den Zielfunktionen (*.ZIE)
-    Public Const Constraints_Ext As String = "CON"       'Erweiterung der Datei mit den Constraints (*.CON)
-    Public Const Combi_Ext As String = "CES"             'Erweiterung der Datei mit der Kombinatorik  (*.CES)
+    ''' <summary>
+    ''' Erweiterung der Datei mit den Optimierungsparametern (*.OPT)
+    ''' </summary>
+    Public Const FILEEXT_OPT As String = "OPT"
+    ''' <summary>
+    ''' Erweiterung der Datei mit den Modellparametern (*.MOD)
+    ''' </summary>
+    Public Const FILEEXT_MOD As String = "MOD"
+    ''' <summary>
+    ''' Erweiterung der Datei mit den Zielfunktionen (*.ZIE)
+    ''' </summary>
+    Public Const FILEEXT_ZIE As String = "ZIE"
+    ''' <summary>
+    ''' Erweiterung der Datei mit den Constraints (*.CON)
+    ''' </summary>
+    Public Const FILEEXT_CON As String = "CON"
+    ''' <summary>
+    ''' Erweiterung der Datei mit der Kombinatorik  (*.CES)
+    ''' </summary>
+    Public Const FILEEXT_CES As String = "CES"
 
     'Eigenschaften
     '#############
@@ -52,41 +45,79 @@ Public Class Problem
     Private mWorkDir As String
     Private mDatensatz As String
 
-    Private mMethod As String                                    'Optimierungsmethode
+    Private mMethod As String
 
-    Public List_ModellParameter() As Struct_ModellParameter      'Liste der Modellparameter
-    Public List_ModellParameter_Save() As Struct_ModellParameter 'Liste der Modellparameter die nicht verändert wird
+    ''' <summary>
+    ''' Aktuelle Liste der Modellparameter
+    ''' </summary>
+    Public List_ModellParameter() As Struct_ModellParameter
+    ''' <summary>
+    ''' Original-Liste der Modellparameter, die nicht verändert wird
+    ''' </summary>
+    Public List_ModellParameter_Save() As Struct_ModellParameter
+    ''' <summary>
+    ''' Aktuelle Liste der OptParameter
+    ''' </summary>
     Public List_OptParameter() As OptParameter
+    ''' <summary>
+    ''' Original-Liste der OptParameter, die nicht verändert wird
+    ''' </summary>
     Public List_OptParameter_Save() As OptParameter
-    Public List_Featurefunctions() As Featurefunction           'Liste der Feature Functions
-    Public List_Constraintfunctions() As Constraintfunction     'Liste der Constraint Functions
+    ''' <summary>
+    ''' Liste der Feature Functions
+    ''' </summary>
+    ''' <remarks>Enthält sowohl Feature Functions als auch Penalty Functions</remarks>
+    Public List_Featurefunctions() As Featurefunction
+    ''' <summary>
+    ''' Liste der Constraint Functions
+    ''' </summary>
+    Public List_Constraintfunctions() As Constraintfunction
+    ''' <summary>
+    ''' Liste der Locations
+    ''' </summary>
+    ''' <remarks>nur bei Kombinatorik verwendet</remarks>
     Public List_Locations() As Struct_Lokation
-
-    Public CES_T_Modus As Constants.CES_T_MODUS                 'Zeigt ob der TestModus aktiv ist
+    ''' <summary>
+    ''' Zeigt ob der CES-TestModus aktiv ist
+    ''' </summary>
+    ''' <remarks>nur bei Kombinatorik verwendet</remarks>
+    Public CES_T_Modus As Constants.CES_T_MODUS
 
     'Properties
     '##########
 
+    ''' <summary>
+    ''' Name des zu optimierenden Datensatzes
+    ''' </summary>
+    ''' <remarks>nur bei Sim-Anwendungen relevant</remarks>
     Public ReadOnly Property Datensatz() As String
         Get
             Return Me.mDatensatz
         End Get
     End Property
 
+    ''' <summary>
+    ''' Name der verwendeten Optimieurungsmethode
+    ''' </summary>
     Public ReadOnly Property Method() As String
         Get
             Return Me.mMethod
         End Get
     End Property
 
+    ''' <summary>
+    ''' Anzahl Optparameter
+    ''' </summary>
     Public ReadOnly Property NumParams() As Integer
         Get
             Return Me.List_OptParameter.Length
         End Get
     End Property
 
-    'Gibt die Gesamtanzahl der Ziele zurück
-    '**************************************
+    ''' <summary>
+    ''' Anzahl Feature Functions
+    ''' </summary>
+    ''' <remarks>Inklusive Penalty Functions!</remarks>
     Public ReadOnly Property NumFeatures() As Integer
         Get
             Return Me.List_Featurefunctions.Length
@@ -110,8 +141,9 @@ Public Class Problem
         End Get
     End Property
 
-    'Gibt die Anzahl der Penalty Functions zurück
-    '********************************************
+    ''' <summary>
+    ''' Anzahl Penalty Functions
+    ''' </summary>
     Public ReadOnly Property NumPenalties() As Integer
         Get
             Dim n As Integer
@@ -125,8 +157,10 @@ Public Class Problem
         End Get
     End Property
 
-    'Gibt die OptimierungsZiele zurück
-    '*********************************
+    ''' <summary>
+    ''' Liste der Penalty Functions
+    ''' </summary>
+    ''' <remarks>ReadOnly! Zum Setzen von Werten die List_Featurefunctions verwenden!</remarks>
     Public ReadOnly Property List_Penaltyfunctions() As Featurefunction()
         Get
             Dim i As Integer
@@ -146,16 +180,19 @@ Public Class Problem
         End Get
     End Property
 
-    'Gibt die Anzahl Constraints zurück
-    '**********************************
+    ''' <summary>
+    ''' Anzahl Constraint Functions
+    ''' </summary>
     Public ReadOnly Property NumConstraints() As Integer
         Get
             Return Me.List_Constraintfunctions.Length
         End Get
     End Property
 
-    'Gibt die Pfad Dimensionen zurück
-    '********************************
+    ''' <summary>
+    ''' Pfad Dimension
+    ''' </summary>
+    ''' <remarks>nur bei Kombinatorik verwendet</remarks>
     Public ReadOnly Property n_PathDimension() As Integer()
         Get
             Dim i As Integer
@@ -203,10 +240,11 @@ Public Class Problem
     End Sub
 
     ''' <summary>
-    ''' EVO-Eingabedateien einlesen
+    ''' Alle EVO-Eingabedateien einlesen
     ''' </summary>
     ''' <param name="simstart">Startzeitpunkt der Simulation</param>
     ''' <param name="simende">Endzeitpunkt der Simulation</param>
+    ''' <remarks>Liest je nach eingestellter Methode die jeweils erforderlichen Dateien ein</remarks>
     Public Sub Read_InputFiles(ByVal simstart As DateTime, ByVal simende As DateTime)
 
         'EVO-Eingabedateien einlesen
@@ -242,8 +280,10 @@ Public Class Problem
 
     End Sub
 
-    'Optimierungsparameter einlesen
-    '******************************
+    ''' <summary>
+    ''' Optimierungsparameter (*.OPT-Datei) einlesen
+    ''' </summary>
+    ''' <remarks>http://130.83.196.154/BlueM/wiki/index.php/OPT-Datei</remarks>
     Private Sub Read_OPT()
 
         'Format:
@@ -251,7 +291,7 @@ Public Class Problem
         '*| Bezeichnung  | Einh. | Anfangsw. |  Min   |  Max   | Beziehung |
         '*|-<---------->-|-<--->-|-<------->-|-<---->-|-<---->-|-<------->-|
 
-        Dim Datei As String = Me.mWorkDir & Me.Datensatz & "." & OptParameter_Ext
+        Dim Datei As String = Me.mWorkDir & Me.Datensatz & "." & FILEEXT_OPT
 
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -308,8 +348,10 @@ Public Class Problem
 
     End Sub
 
-    'Modellparameter einlesen
-    '************************
+    ''' <summary>
+    ''' Modellparameter (*.MOD-Datei) einlesen
+    ''' </summary>
+    ''' <remarks>http://130.83.196.154/BlueM/wiki/index.php/MOD-Datei</remarks>
     Private Sub Read_MOD()
 
         'Format:
@@ -317,7 +359,7 @@ Public Class Problem
         '*| OptParameter | Bezeichnung  | Einh. | Datei | Elem  | Zeile | von | bis | Faktor |
         '*|-<---------->-|-<---------->-|-<--->-|-<--->-|-<--->-|-<--->-|-<->-|-<->-|-<---->-|
 
-        Dim Datei As String = Me.mWorkDir & Me.Datensatz & "." & ModParameter_Ext
+        Dim Datei As String = Me.mWorkDir & Me.Datensatz & "." & FILEEXT_MOD
 
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -372,11 +414,15 @@ Public Class Problem
 
     End Sub
 
-    'Optimierungsziele einlesen
-    '**************************
+    ''' <summary>
+    ''' Optimierungsziele / Feature Functions (*.ZIE) einlesen
+    ''' </summary>
+    ''' <param name="SimStart">Startzeitpunkt der Simulation</param>
+    ''' <param name="SimEnde">Endzeitpunkt der Simulation</param>
+    ''' <remarks>http://130.83.196.154/BlueM/wiki/index.php/ZIE-Datei</remarks>
     Private Sub Read_ZIE(ByVal SimStart As DateTime, ByVal SimEnde As DateTime)
 
-        Dim ZIE_Datei As String = Me.mWorkDir & Me.Datensatz & "." & OptZiele_Ext
+        Dim ZIE_Datei As String = Me.mWorkDir & Me.Datensatz & "." & FILEEXT_ZIE
 
         'Format:
         '*|-----|-------------|---|---------|-------|----------|---------|--------------|-------------------|--------------------|---------|
@@ -512,8 +558,12 @@ Public Class Problem
 
     End Sub
 
-    'Constraints einlesen
-    '********************
+    ''' <summary>
+    ''' Constraint Functions (*.CON) einlesen
+    ''' </summary>
+    ''' <param name="SimStart">Startzeitpunkt der Simulation</param>
+    ''' <param name="SimEnde">Endzeitpunkt der Simulation</param>
+    ''' <remarks>http://130.83.196.154/BlueM/wiki/index.php/CON-Datei</remarks>
     Private Sub Read_CON(ByVal SimStart As DateTime, ByVal SimEnde As DateTime)
 
         'Format:
@@ -528,7 +578,7 @@ Public Class Problem
         Dim WerteArray() As String
         Const AnzSpalten As Integer = 9
 
-        Dim Datei As String = Me.mWorkDir & Me.Datensatz & "." & Constraints_Ext
+        Dim Datei As String = Me.mWorkDir & Me.Datensatz & "." & FILEEXT_CON
 
         If (File.Exists(Datei)) Then
 
@@ -627,11 +677,13 @@ Public Class Problem
 
     End Sub
 
-    'Kombinatorik einlesen
-    '*********************
+    ''' <summary>
+    ''' Kombinatorik (*.CES) einlesen
+    ''' </summary>
+    ''' <remarks>Nur bei Kombinatorik verwendet. http://130.83.196.154/BlueM/wiki/index.php/CES-Datei</remarks>
     Private Sub Read_CES()
 
-        Dim Datei As String = Me.mWorkDir & Me.Datensatz & "." & EVO.Common.Problem.Combi_Ext
+        Dim Datei As String = Me.mWorkDir & Me.Datensatz & "." & EVO.Common.Problem.FILEEXT_CES
 
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -696,9 +748,11 @@ Public Class Problem
 
     End Sub
 
-    'Prüft ob .OPT und .MOD Dateien zusammenpassen
-    '*********************************************
+    ''' <summary>
+    ''' Prüft ob Optparameter und Modellparameter zusammenpassen
+    ''' </summary>
     Private Sub Validate_OPT_fits_to_MOD()
+
         Dim i, j As Integer
         Dim isValid_A As Boolean = True
         Dim isValid_B As Boolean = True
@@ -740,8 +794,9 @@ Public Class Problem
 
     End Sub
 
-    'Prüft ob der Startwert der OptPara in der .OPT innerhalb der Min und Max Grenzen liegt
-    '**************************************************************************************
+    ''' <summary>
+    ''' Prüft ob die Startwerte der OptParameter innerhalb der Min und Max Grenzen liegen
+    ''' </summary>
     Private Sub Validate_Startvalues()
         Dim i As Integer
 
@@ -752,8 +807,10 @@ Public Class Problem
         Next
     End Sub
 
-    'Validierungsfunktion der Kombinatorik Prüft ob Verbraucher an zwei Standorten Dopp vorhanden sind
-    '*************************************************************************************************
+    ''' <summary>
+    ''' Validierungsfunktion der Kombinatorik Prüft ob Verbraucher an zwei Standorten doppelt vorhanden sind
+    ''' </summary>
+    ''' <remarks>Nur bei Kombinatorik verwendet</remarks>
     Public Sub Validate_Combinatoric()
 
         Dim i, j, x, y, m, n As Integer
@@ -778,9 +835,13 @@ Public Class Problem
 
     End Sub
 
-    'Reduziert die OptParameter und die ModellParameter auf die aktiven Elemente
-    '!Wird jetzt aus den Elementen des Child generiert!
-    '***************************************************************************
+    ''' <summary>
+    ''' Reduziert die OptParameter und die ModellParameter auf die aktiven Elemente. 
+    ''' !Wird jetzt aus den Elementen des Child generiert!
+    ''' </summary>
+    ''' <param name="Elements">???</param>
+    ''' <returns>???</returns>
+    ''' <remarks>Nur bei Kombinatorik verwendet</remarks>
     Public Function Reduce_OptPara_and_ModPara(ByRef Elements() As String) As Boolean
 
         Reduce_OptPara_and_ModPara = True 'Wird wirklich abgefragt!
@@ -850,8 +911,9 @@ Public Class Problem
 
     End Function
 
-    'Setzt die Listen nach der Evaluierung wieder zurück auf alles was in den Eingabedateien steht
-    '*********************************************************************************************
+    ''' <summary>
+    ''' Setzt die Listen der OptParameter und Modellparameter wieder zurück auf alles was in den Eingabedateien steht
+    ''' </summary>
     Public Sub Reset_OptPara_and_ModPara()
         Dim i As Integer
 
@@ -868,8 +930,10 @@ Public Class Problem
 
     End Sub
 
-    'Berechnet die Anzahl maximal möglicher Kombinationen
-    '****************************************************
+    ''' <summary>
+    ''' Anzahl maximal möglicher Kombinationen
+    ''' </summary>
+    ''' <remarks>Nur bei Kombinatorik verwendet</remarks>
     Public ReadOnly Property NumCombinations() As Integer
         Get
             If (Me.CES_T_Modus = EVO.Common.Constants.CES_T_MODUS.One_Combi) Then
@@ -884,30 +948,43 @@ Public Class Problem
         End Get
     End Property
 
+    ''' <summary>
+    ''' Anzahl Locations
+    ''' </summary>
+    ''' <remarks>Nur bei Kombinatorik verwendet</remarks>
     Public ReadOnly Property NumLocations() As Integer
         Get
             Return Me.List_Locations.Length
         End Get
     End Property
 
-    'Hilfsfunktion um zu Prüfen ob der Name bereits vorhanden ist oder nicht
-    '***********************************************************************
-    Public Shared Function Is_Name_IN(ByVal Name As String, ByVal Array() As EVO.Common.Struct_Lokation) As Boolean
+    ''' <summary>
+    ''' Hilfsfunktion um zu Prüfen ob der Name bereits vorhanden ist oder nicht
+    ''' </summary>
+    ''' <param name="name">???</param>
+    ''' <param name="array_modellparameter">???</param>
+    ''' <returns>???</returns>
+    ''' <remarks>Nur bei Kombinatorik verwendet</remarks>
+    Public Shared Function Is_Name_IN(ByVal name As String, ByVal array_modellparameter() As EVO.Common.Struct_Lokation) As Boolean
         Is_Name_IN = False
         Dim i As Integer
-        For i = 0 To Array.GetUpperBound(0)
-            If Name = Array(i).Name Then
+        For i = 0 To array_modellparameter.GetUpperBound(0)
+            If name = array_modellparameter(i).Name Then
                 Is_Name_IN = True
                 Exit Function
             End If
         Next
     End Function
 
-    'VG_ Test Tagesganglinie mit Autokalibrierung
-    'VG *****************************************
-    'VG Beta-Version - erlaubt Kalirbierung der Tagesganlinie
-    'VG dafür muss für den jeweiligen Tagesgangwert in der .mod Datei in der Spalte "Elem" "TGG_QH" eingetragen werden
-    'VG Vorschlag: Aktivierung der kalibrierung des Tagesganlinie über einen Schalter, damit diese Funktion nicht bei jeder optimierung aufgerufen wird
+    ''' <summary>
+    ''' Test Tagesganglinie mit Autokalibrierung
+    ''' </summary>
+    ''' <remarks>
+    ''' Beta-Version - erlaubt Kalirbierung der Tagesganlinie
+    ''' dafür muss für den jeweiligen Tagesgangwert in der .mod Datei in der Spalte "Elem" "TGG_QH" eingetragen werden
+    ''' Vorschlag: Aktivierung der kalibrierung des Tagesganlinie über einen Schalter, damit diese Funktion nicht bei jeder optimierung aufgerufen wird
+    ''' Kontakt: Valentin Gamerith
+    ''' </remarks>
     Private Sub VG_Kalibrierung_Tagesganglinie()
 
         Dim i, j As Integer
@@ -943,12 +1020,11 @@ Public Class Problem
         End If
     End Sub
 
-    'Kombinatorik
-    '############
-
-    'Überprüft ob und welcher TestModus aktiv ist
-    'Beschreibung:
-    '********************************************
+    ''' <summary>
+    ''' Überprüft ob und welcher CES-TestModus aktiv ist
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks>Nur bei Kombinatorik verwendet</remarks>
     Public Function Set_TestModus() As Common.Constants.CES_T_MODUS
 
         Dim i, j As Integer
