@@ -37,6 +37,8 @@ Partial Class Form1
         Me.MenuItem_Hilfe = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuItem_Wiki = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuItem_About = New System.Windows.Forms.ToolStripMenuItem
+        Me.AnsichtToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.MenuItem_MonitorAnzeigen = New System.Windows.Forms.ToolStripMenuItem
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.Button_Start = New System.Windows.Forms.Button
         Me.Button_openMDB = New System.Windows.Forms.Button
@@ -47,7 +49,6 @@ Partial Class Form1
         Me.Button_TChart2PNG = New System.Windows.Forms.Button
         Me.Button_TChartSave = New System.Windows.Forms.Button
         Me.Button_TChart2Excel = New System.Windows.Forms.Button
-        Me.Indicatordiagramm1 = New IHWB.EVO.Diagramm.Indicatordiagramm
         Me.GroupBox_Anwendung = New System.Windows.Forms.GroupBox
         Me.Button_BrowseDatensatz = New System.Windows.Forms.Button
         Me.ComboBox_Datensatz = New System.Windows.Forms.ComboBox
@@ -79,7 +80,7 @@ Partial Class Form1
         '
         'MenuStrip1
         '
-        MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {MenuItem_Tools, Me.MenuItem_Hilfe})
+        MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {MenuItem_Tools, Me.AnsichtToolStripMenuItem, Me.MenuItem_Hilfe})
         MenuStrip1.Location = New System.Drawing.Point(0, 0)
         MenuStrip1.Name = "MenuStrip1"
         MenuStrip1.RightToLeft = System.Windows.Forms.RightToLeft.No
@@ -135,6 +136,22 @@ Partial Class Form1
         Me.MenuItem_About.Name = "MenuItem_About"
         Me.MenuItem_About.Size = New System.Drawing.Size(172, 22)
         Me.MenuItem_About.Text = "About EVO.NET..."
+        '
+        'AnsichtToolStripMenuItem
+        '
+        Me.AnsichtToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItem_MonitorAnzeigen})
+        Me.AnsichtToolStripMenuItem.Name = "AnsichtToolStripMenuItem"
+        Me.AnsichtToolStripMenuItem.Size = New System.Drawing.Size(54, 20)
+        Me.AnsichtToolStripMenuItem.Text = "Ansicht"
+        '
+        'MenuItem_MonitorAnzeigen
+        '
+        Me.MenuItem_MonitorAnzeigen.Checked = True
+        Me.MenuItem_MonitorAnzeigen.CheckOnClick = True
+        Me.MenuItem_MonitorAnzeigen.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.MenuItem_MonitorAnzeigen.Name = "MenuItem_MonitorAnzeigen"
+        Me.MenuItem_MonitorAnzeigen.Size = New System.Drawing.Size(167, 22)
+        Me.MenuItem_MonitorAnzeigen.Text = "Monitor anzeigen"
         '
         'Button_Start
         '
@@ -235,77 +252,6 @@ Partial Class Form1
         Me.Button_TChart2Excel.TabIndex = 1
         Me.ToolTip1.SetToolTip(Me.Button_TChart2Excel, "nach Excel exportieren")
         Me.Button_TChart2Excel.UseVisualStyleBackColor = False
-        '
-        'Indicatordiagramm1
-        '
-        '
-        '
-        '
-        Me.Indicatordiagramm1.Aspect.View3D = False
-        Me.Indicatordiagramm1.Aspect.ZOffset = 0
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        Me.Indicatordiagramm1.Axes.Bottom.Labels.Font.Size = 6
-        Me.Indicatordiagramm1.Axes.Bottom.Labels.Font.SizeFloat = 6.0!
-        Me.Indicatordiagramm1.Axes.Bottom.Labels.Style = Steema.TeeChart.AxisLabelStyle.Value
-        Me.Indicatordiagramm1.Axes.Bottom.MaximumOffset = 3
-        Me.Indicatordiagramm1.Axes.Bottom.MinimumOffset = 3
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        Me.Indicatordiagramm1.Axes.Left.Labels.Font.Size = 6
-        Me.Indicatordiagramm1.Axes.Left.Labels.Font.SizeFloat = 6.0!
-        Me.Indicatordiagramm1.Axes.Left.MaximumOffset = 3
-        Me.Indicatordiagramm1.Axes.Left.MinimumOffset = 3
-        '
-        '
-        '
-        Me.Indicatordiagramm1.Axes.Right.Visible = False
-        '
-        '
-        '
-        Me.Indicatordiagramm1.Axes.Top.Visible = False
-        Me.Indicatordiagramm1.Cursor = System.Windows.Forms.Cursors.Default
-        '
-        '
-        '
-        Me.Indicatordiagramm1.Header.Visible = False
-        '
-        '
-        '
-        Me.Indicatordiagramm1.Legend.Visible = False
-        Me.Indicatordiagramm1.Location = New System.Drawing.Point(241, 582)
-        Me.Indicatordiagramm1.Name = "Indicatordiagramm1"
-        '
-        '
-        '
-        Me.Indicatordiagramm1.Panel.MarginBottom = 0
-        Me.Indicatordiagramm1.Panel.MarginRight = 9
-        Me.Indicatordiagramm1.Panel.MarginTop = 9
-        '
-        '
-        '
-        Me.Indicatordiagramm1.Panning.Allow = Steema.TeeChart.ScrollModes.None
-        Me.Indicatordiagramm1.Size = New System.Drawing.Size(473, 70)
-        Me.Indicatordiagramm1.TabIndex = 7
-        Me.ToolTip1.SetToolTip(Me.Indicatordiagramm1, "Hypervolumen")
-        Me.Indicatordiagramm1.Visible = False
         '
         'GroupBox_Anwendung
         '
@@ -494,7 +440,6 @@ Partial Class Form1
         Me.BackColor = System.Drawing.SystemColors.Control
         Me.ClientSize = New System.Drawing.Size(718, 792)
         Me.Controls.Add(Me.Info)
-        Me.Controls.Add(Me.Indicatordiagramm1)
         Me.Controls.Add(Me.Hauptdiagramm1)
         Me.Controls.Add(Me.GroupBox_TChartButtons)
         Me.Controls.Add(MenuStrip1)
@@ -553,4 +498,6 @@ Partial Class Form1
     Friend WithEvents Info As System.Windows.Forms.GroupBox
     Friend WithEvents Label_Dn As System.Windows.Forms.Label
     Friend WithEvents Label_Dn_Wert As System.Windows.Forms.Label
+    Friend WithEvents AnsichtToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Private WithEvents MenuItem_MonitorAnzeigen As System.Windows.Forms.ToolStripMenuItem
 End Class
