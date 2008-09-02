@@ -1200,8 +1200,8 @@ StartMutation:
                 .Dominated = False
                 .Front = 0
                 For v = 0 To Me.mProblem.NumParams - 1
-                    .PES_OptParas(v).Dn = AktPara(v).Dn 'TODO: Hier die OptPara des übergebenen Individuums nehmen? 
-                    .PES_OptParas(v).Xn = AktPara(v).Xn
+                    .OptParameter(v).Dn = AktPara(v).Dn 'TODO: Hier die OptPara des übergebenen Individuums nehmen? 
+                    .OptParameter(v).Xn = AktPara(v).Xn
                 Next v
                 .Distance = 0
             End With
@@ -1425,8 +1425,8 @@ StartMutation:
 
         For v = 0 To Me.mProblem.NumParams - 1
             With CType(Individ(i), Individuum_PES)
-                Best.Db(v, i, PES_iAkt.iAktPop) = .PES_OptParas(v).Dn
-                Best.Xb(v, i, PES_iAkt.iAktPop) = .PES_OptParas(v).Xn
+                Best.Db(v, i, PES_iAkt.iAktPop) = .OptParameter(v).Dn
+                Best.Xb(v, i, PES_iAkt.iAktPop) = .OptParameter(v).Xn
             End With
         Next v
         If (Me.mSettings.PES.is_DiversityTournament) Then
@@ -1458,8 +1458,8 @@ StartMutation:
 
         For v = 0 To Me.mProblem.NumParams - 1
             With CType(Individ(i_indi), Individuum_PES)
-                .PES_OptParas(v).Dn = Best.Db(v, i_best, PES_iAkt.iAktPop)
-                .PES_OptParas(v).Xn = Best.Xb(v, i_best, PES_iAkt.iAktPop)
+                .OptParameter(v).Dn = Best.Db(v, i_best, PES_iAkt.iAktPop)
+                .OptParameter(v).Xn = Best.Xb(v, i_best, PES_iAkt.iAktPop)
             End With
         Next v
 

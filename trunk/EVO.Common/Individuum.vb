@@ -56,6 +56,84 @@ Public MustInherit Class Individuum
     End Property
 
     ''' <summary>
+    ''' Die OptParameter als Objekte
+    ''' </summary>
+    Public MustOverride Property OptParameter() As EVO.Common.OptParameter()
+
+    ''' <summary>
+    ''' Die OptParameter als skalierte Werte
+    ''' </summary>
+    Public Property OptParameter_Xn() As Double()
+        Get
+            Dim i As Integer
+            Dim Xn() As Double
+
+            ReDim Xn(Individuum.mProblem.NumParams - 1)
+
+            For i = 0 To Individuum.mProblem.NumParams - 1
+                Xn(i) = Me.OptParameter(i).Xn
+            Next
+
+            Return Xn
+
+        End Get
+        Set(ByVal values As Double())
+
+            'Prüfung: Anzahl Parameter
+            If (values.Length <> Individuum.mProblem.NumParams) Then
+                Throw New Exception("Falsche Anzahl Parameter übergeben!")
+            End If
+
+            'Prüfung: zwischen 0 und 1
+            For Each param As Double In values
+                If (param < 0 Or param > 1) Then
+                    Throw New Exception("Skalierter Parameterwert muss zwischen 0 und 1 liegen!")
+                End If
+            Next
+
+            Dim i As Integer
+
+            For i = 0 To Individuum.mProblem.NumParams - 1
+                Me.OptParameter(i).Xn = values(i)
+            Next
+
+        End Set
+    End Property
+
+    ''' <summary>
+    ''' Die OptParameter als reale Werte
+    ''' </summary>
+    Public Property OptParameter_RWerte() As Double()
+        Get
+            Dim i As Integer
+            Dim RWerte() As Double
+
+            ReDim RWerte(Individuum.mProblem.NumParams - 1)
+
+            For i = 0 To Individuum.mProblem.NumParams - 1
+                RWerte(i) = Me.OptParameter(i).RWert
+            Next
+
+            Return RWerte
+
+        End Get
+        Set(ByVal values As Double())
+
+            'Prüfung: Anzahl Parameter
+            If (values.Length <> Individuum.mProblem.NumParams) Then
+                Throw New Exception("Falsche Anzahl Parameter übergeben!")
+            End If
+
+            Dim i As Integer
+
+            For i = 0 To Individuum.mProblem.NumParams - 1
+                Me.OptParameter(i).RWert = values(i)
+            Next
+
+        End Set
+    End Property
+
+    ''' <summary>
     ''' Werte der Feature Funktionen
     ''' </summary>
     ''' <remarks>Featurefunktionen beinhalten auch die Penaltyfunktionen</remarks>

@@ -85,7 +85,7 @@ Public Class SWMM
 
     Public Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
 
-        Call Me.launchSim()
+        Return Me.launchSim()
 
     End Function
 
@@ -98,7 +98,7 @@ Public Class SWMM
 
     'Simulationsergebnis verarbeiten
     '-------------------------------
-    Public Overrides Sub SIM_Ergebnis_Lesen()
+    Protected Overrides Sub SIM_Ergebnis_Lesen()
 
     End Sub
 
