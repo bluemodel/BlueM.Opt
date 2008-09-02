@@ -700,7 +700,7 @@ Partial Class Form1
                         Case METH_HOOKJEEVES
                             Call STARTEN_HookJeeves()
                         Case METH_MetaEvo
-                            MetaEvoController = New EVO.HybridAlgo.Controller(EVO_Einstellungen1.Settings, Me.Hauptdiagramm1)
+                            MetaEvoController = New EVO.HybridAlgo.Controller(Me.mProblem, EVO_Einstellungen1.Settings, Me.Hauptdiagramm1)
                     End Select
 
                 Case ANW_TESTPROBLEME
@@ -708,7 +708,7 @@ Partial Class Form1
                         Case METH_PES
                             Call STARTEN_PES()
                         Case METH_MetaEvo
-                            MetaEvoController = New EVO.HybridAlgo.Controller(EVO_Einstellungen1.Settings, Me.Hauptdiagramm1)
+                            MetaEvoController = New EVO.HybridAlgo.Controller(Me.mProblem, EVO_Einstellungen1.Settings, Me.Hauptdiagramm1)
                     End Select
 
                 Case ANW_TSP
