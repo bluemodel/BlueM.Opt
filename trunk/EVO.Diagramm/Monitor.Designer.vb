@@ -74,12 +74,6 @@ Partial Class Monitor
         '
         '
         '
-        Me.Monitordiagramm.Panel.MarginBottom = 3
-        Me.Monitordiagramm.Panel.MarginRight = 15
-        Me.Monitordiagramm.Panel.MarginTop = 9
-        '
-        '
-        '
         Me.Monitordiagramm.Panning.Allow = Steema.TeeChart.ScrollModes.None
         Me.Monitordiagramm.Size = New System.Drawing.Size(492, 466)
         Me.Monitordiagramm.TabIndex = 8

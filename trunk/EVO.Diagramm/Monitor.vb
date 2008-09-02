@@ -6,9 +6,6 @@
     Private Line_Hypervolume As Steema.TeeChart.Styles.Line
     Private Line_Dn As Steema.TeeChart.Styles.Line
 
-    Private axis_horiz_gen As Steema.TeeChart.Axis
-    Private axis_vert_hyperv As Steema.TeeChart.Axis
-
     Public Event MonitorClosed()
 
     'Konstruktor
@@ -26,22 +23,18 @@
         Me.Monitordiagramm.Axes.Left.Title.Caption = "Schrittweite"
 
         'Generationsachse (oben)
-        axis_horiz_gen = Steema.TeeChart.Axes.CreateNewAxis(Me.Monitordiagramm.Chart)
-        axis_horiz_gen.Title.Caption = "Generation"
-        axis_horiz_gen.Horizontal = True
-        axis_horiz_gen.Visible = True
-        axis_horiz_gen.OtherSide = True
-        axis_horiz_gen.Automatic = True
-        axis_horiz_gen.Grid.Visible = False
+        Me.Monitordiagramm.Axes.Top.Visible = True
+        Me.Monitordiagramm.Axes.Top.Title.Caption = "Generation"
+        Me.Monitordiagramm.Axes.Top.Horizontal = True
+        Me.Monitordiagramm.Axes.Top.Automatic = True
+        Me.Monitordiagramm.Axes.Top.Grid.Visible = False
 
         'Hypervolumenachse (rechts)
-        axis_vert_hyperv = Steema.TeeChart.Axes.CreateNewAxis(Me.Monitordiagramm.Chart)
-        axis_vert_hyperv.Title.Caption = "Hypervolumen"
-        axis_vert_hyperv.Title.Angle = 90
-        axis_vert_hyperv.Visible = True
-        axis_vert_hyperv.OtherSide = True
-        axis_vert_hyperv.Automatic = True
-        axis_vert_hyperv.Grid.Visible = False
+        Me.Monitordiagramm.Axes.Right.Visible = True
+        Me.Monitordiagramm.Axes.Right.Title.Caption = "Hypervolumen"
+        Me.Monitordiagramm.Axes.Right.Title.Angle = 90
+        Me.Monitordiagramm.Axes.Right.Automatic = True
+        Me.Monitordiagramm.Axes.Right.Grid.Visible = False
 
         'Linien/Serien
         '-------------
@@ -59,8 +52,8 @@
         'Hypervolume-Linie initialisieren
         Me.Line_Hypervolume = New Steema.TeeChart.Styles.Line(Me.Monitordiagramm.Chart)
         Me.Line_Hypervolume.Title = "Hypervolumen"
-        Me.Line_Hypervolume.CustomHorizAxis = axis_horiz_gen
-        Me.Line_Hypervolume.CustomVertAxis = axis_vert_hyperv
+        Me.Line_Hypervolume.CustomHorizAxis = Me.Monitordiagramm.Axes.Top
+        Me.Line_Hypervolume.CustomVertAxis = Me.Monitordiagramm.Axes.Right
         Me.Line_Hypervolume.Color = System.Drawing.Color.Red
         Me.Line_Hypervolume.Pointer.Visible = True
         Me.Line_Hypervolume.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
@@ -119,12 +112,10 @@
         colorline1.Pen.Color = System.Drawing.Color.Red
         colorline1.Pen.Width = 2
         colorline1.AllowDrag = False
-        colorline1.Axis = Me.axis_vert_hyperv
+        colorline1.Axis = Me.Monitordiagramm.Axes.Right
         colorline1.Value = indicatorRef
 
     End Sub
-
-
 
     'Dn's anzeigen
     '*************
