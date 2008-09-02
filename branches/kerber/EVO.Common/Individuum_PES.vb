@@ -4,12 +4,9 @@
     Private mOptParas() As OptParameter  '06a Parameterarray für PES
 
     ''' <summary>
-    ''' Die Optimierungsparameter des Individuums
+    ''' Die OptParameter als Objekte
     ''' </summary>
-    ''' <value></value>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
-    Public Property PES_OptParas() As OptParameter()
+    Public Overrides Property OptParameter() As EVO.Common.OptParameter()
         Get
             Return Me.mOptParas
         End Get
@@ -33,9 +30,9 @@
         Dim i As Integer
 
         'Parameterarray für PES
-        ReDim Me.PES_OptParas(Individuum.mProblem.NumParams - 1)
-        For i = 0 To Me.PES_OptParas.GetUpperBound(0)
-            Me.PES_OptParas(i) = New OptParameter()
+        ReDim Me.mOptParas(Individuum.mProblem.NumParams - 1)
+        For i = 0 To Me.mOptParas.GetUpperBound(0)
+            Me.mOptParas(i) = New OptParameter()
         Next
 
     End Sub
@@ -68,8 +65,8 @@
         Clone.Distance = Me.Distance
 
         'Array für PES Parameter
-        For i = 0 To Me.PES_OptParas.GetUpperBound(0)
-            CType(Clone, Individuum_PES).PES_OptParas(i) = Me.PES_OptParas(i).Clone
+        For i = 0 To Me.OptParameter.GetUpperBound(0)
+            CType(Clone, Individuum_PES).mOptParas(i) = Me.mOptParas(i).Clone
         Next
 
         Return Clone

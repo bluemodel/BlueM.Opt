@@ -458,7 +458,7 @@ Public Class OptResult
         fieldvalues = ""
         For i = 0 To Me.mProblem.List_OptParameter.GetUpperBound(0)
             fieldnames &= ", [" & Me.mProblem.List_OptParameter(i).Bezeichnung & "]"
-            fieldvalues &= ", " & ind.PES_OptParas(i).RWert.ToString(Common.Provider.FortranProvider)
+            fieldvalues &= ", " & ind.OptParameter(i).RWert.ToString(Common.Provider.FortranProvider)
         Next
         command.CommandText = "INSERT INTO OptParameter (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
         command.ExecuteNonQuery()
@@ -733,13 +733,11 @@ Public Class OptResult
 
                 If (Not QWerteOnly) Then
 
-                    ReDim .PES_OptParas(Me.mProblem.List_OptParameter_Save.GetUpperBound(0))
-
                     'OptParameter
                     '------------
-                    For j = 0 To Me.mProblem.List_OptParameter_Save.GetUpperBound(0)
-                        .PES_OptParas(j) = Me.mProblem.List_OptParameter_Save(j).Clone()
-                        .PES_OptParas(j).RWert = ds.Tables(0).Rows(i).Item(Me.mProblem.List_OptParameter_Save(j).Bezeichnung)
+                    For j = 0 To Me.mProblem.NumParams - 1
+                        .OptParameter(j) = Me.mProblem.List_OptParameter_Save(j).Clone()
+                        .OptParameter(j).RWert = ds.Tables(0).Rows(i).Item(Me.mProblem.List_OptParameter_Save(j).Bezeichnung)
                     Next
 
                     'Constraints

@@ -43,6 +43,9 @@ Public MustInherit Class Sim
     '-----------
     Protected mProblem As EVO.Common.Problem
 
+    'Die Einstellungen
+    Protected mSettings As EVO.Common.EVO_Settings
+
     Protected Structure Aktuell
         Public OptPara() As Double
         Public ModPara() As Double
@@ -133,6 +136,15 @@ Public MustInherit Class Sim
 
         'Ergebnisspeicher initialisieren
         Me.OptResult = New EVO.OptResult.OptResult(Me.Datensatz, Me.mProblem)
+
+    End Sub
+
+    'Einstellungen setzen
+    '********************
+    Public Sub setSettings(ByRef settings As EVO.Common.EVO_Settings)
+
+        'Settings speichern
+        Me.mSettings = settings
 
     End Sub
 
@@ -293,6 +305,77 @@ Public MustInherit Class Sim
 
 #Region "Evaluierung"
 
+    ''' <summary>
+    ''' Evaluiert ein Individuum
+    ''' </summary>
+    ''' <param name="ind">das zu evaluierende Individuum</param>
+    ''' <returns>True wenn erfolgreich, False wenn fehlgeschlagen</returns>
+    Public Overloads Function Evaluate(ByRef ind As EVO.Common.Individuum) As Boolean
+
+        Dim isOK As Boolean
+
+        isOK = False
+
+        'Simulation vorbereiten
+        '----------------------
+        Select Case Me.mProblem.Method
+
+            Case EVO.Common.METH_PES, EVO.Common.METH_SENSIPLOT, EVO.Common.METH_HOOKJEEVES
+
+                'Bereitet das Sim für PES vor
+                Call Me.PREPARE_Evaluation_PES(ind.OptParameter)
+
+            Case EVO.Common.METH_CES, EVO.Common.METH_HYBRID
+
+                'Bereitet das Sim für die Kombinatorik vor
+                Call Me.PREPARE_Evaluation_CES(CType(ind, EVO.Common.Individuum_CES).Path, CType(ind, EVO.Common.Individuum_CES).Get_All_Loc_Elem)
+
+                'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
+                If (Me.mProblem.Method = EVO.Common.METH_HYBRID And Me.mSettings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer) Then
+                    Call Me.mProblem.Reduce_OptPara_and_ModPara(CType(ind, EVO.Common.Individuum_CES).Get_All_Loc_Elem)
+                    Call Me.PREPARE_Evaluation_PES(ind.OptParameter)
+                End If
+
+            Case Else
+
+                Throw New Exception("Funktion Sim.Evaluate() für Methode '" & Me.mProblem.Method & "' noch nicht implementiert!")
+
+        End Select
+
+        'Simulation ausführen
+        '--------------------
+        isOK = Me.launchSim()
+
+        If (Not isOK) Then Return False
+
+        'Simulationsergebnis einlesen und verarbeiten
+        '--------------------------------------------
+        Call Me.SIM_Ergebnis_auswerten(ind)
+
+        Return isOK
+
+    End Function
+
+    ''' <summary>
+    ''' Evaluiert ein Array von Individuen
+    ''' </summary>
+    ''' <param name="inds">Ein Array von zu evaluierenden Individuen</param>
+    ''' <returns>True/False für jedes Individuum</returns>
+    Public Overloads Function Evaluate(ByRef inds() As EVO.Common.Individuum) As Boolean()
+
+        Dim i As Integer
+        Dim isOK() As Boolean
+
+        ReDim isOK(inds.GetUpperBound(0))
+
+        For i = 0 To inds.GetUpperBound(0)
+            isOK(i) = Me.Evaluate(inds(i))
+        Next
+
+        Return isOK
+
+    End Function
+
     'Evaluierung des SimModells für ParameterOptimierung - Steuerungseinheit
     '***********************************************************************
     Public Sub PREPARE_Evaluation_PES(ByVal OptParams() As EVO.Common.OptParameter)
@@ -309,23 +392,6 @@ Public MustInherit Class Sim
         Next
 
         'Parameter in Eingabedateien schreiben
-        Call Write_ModellParameter()
-
-    End Sub
-
-    'Evaluierung des SimModells für ParameterOptimierung - Steuerungseinheit
-    'HACK: Überladene Methode für altes Parameterarray (BUG 257)
-    '***********************************************************************
-    Public Sub PREPARE_Evaluation_PES(ByVal RWerte() As Double)
-
-        'Aktuelle Parameterlisten neu dimensionieren (wegen HYBRID)
-        ReDim Me.Akt.OptPara(Me.mProblem.NumParams - 1)
-        ReDim Me.Akt.ModPara(Me.mProblem.List_ModellParameter.GetUpperBound(0))
-
-        'Aktuelle Parameter speichern
-        Me.Akt.OptPara = RWerte
-
-        'Mutierte Parameter in Eingabedateien schreiben
         Call Write_ModellParameter()
 
     End Sub
@@ -356,7 +422,7 @@ Public MustInherit Class Sim
 
     'ModellParameter aus OptParametern errechnen
     '*******************************************
-    Public Sub OptParameter_to_ModellParameter()
+    Private Sub OptParameter_to_ModellParameter()
         Dim i As Integer
         Dim j As Integer
 
@@ -497,7 +563,7 @@ Handler:
 
     'Simulationsergebnis einlesen
     '----------------------------
-    Public MustOverride Sub SIM_Ergebnis_Lesen()
+    Protected MustOverride Sub SIM_Ergebnis_Lesen()
 
 #End Region 'Evaluierung
 
@@ -880,7 +946,7 @@ Handler:
 
             My.Computer.FileSystem.CopyDirectory(Source, Dest, True)
             Call EVO.Common.FileHelper.purgeReadOnly(Dest)
-            Call Directory.Delete(Dest & "\.svn", true)
+            Call Directory.Delete(Dest & "\.svn", True)
 
         Next
 

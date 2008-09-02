@@ -917,7 +917,7 @@ Public Class Testprobleme
         Dim X() As Double
         Dim f1, f2 As Double
         Dim g1, g2 As Double
-        Dim globalAnzPar As Integer = ind.PES_OptParas.GetLength(0)
+        Dim globalAnzPar As Integer = ind.OptParameter.GetLength(0)
         Dim serie As Steema.TeeChart.Styles.Series
 
         Select Case Me.selectedTestproblem
@@ -935,7 +935,7 @@ Public Class Testprobleme
 
                 ind.Features(0) = 0
                 For i = 0 To globalAnzPar - 1
-                    ind.Features(0) += (Math.Sin(i * Unterteilung_X) - (-1 + (ind.PES_OptParas(i).Xn * 2))) ^ 2
+                    ind.Features(0) += (Math.Sin(i * Unterteilung_X) - (-1 + (ind.OptParameter(i).Xn * 2))) ^ 2
                 Next i
 
                 'Zeichnen
@@ -947,7 +947,7 @@ Public Class Testprobleme
                 ReDim array_y(globalAnzPar - 1)
                 For i = 0 To globalAnzPar - 1
                     array_x(i) = Math.Round(i * Unterteilung_X, 2)
-                    array_y(i) = (-1 + ind.PES_OptParas(i).Xn * 2)
+                    array_y(i) = (-1 + ind.OptParameter(i).Xn * 2)
                 Next i
 
                 serie = Diag.getSeriesPoint("Population " & ipop + 1)
@@ -959,8 +959,8 @@ Public Class Testprobleme
 
                 'Qualitätswert berechnen
                 '-----------------------
-                x1 = -5 + (ind.PES_OptParas(0).Xn * 10)
-                x2 = -2 + (ind.PES_OptParas(1).Xn * 4)
+                x1 = -5 + (ind.OptParameter(0).Xn * 10)
+                x2 = -2 + (ind.OptParameter(1).Xn * 4)
 
                 ind.Features(0) = (1.5 - x1 * (1 - x2)) ^ 2 + (2.25 - x1 * (1 - x2) ^ 2) ^ 2 + (2.625 - x1 * (1 - x2) ^ 3) ^ 2
 
@@ -976,7 +976,7 @@ Public Class Testprobleme
                 '-----------------------
                 ReDim X(globalAnzPar - 1)
                 For i = 0 To globalAnzPar - 1
-                    X(i) = -10 + ind.PES_OptParas(i).Xn * 20
+                    X(i) = -10 + ind.OptParameter(i).Xn * 20
                 Next i
                 ind.Features(0) = 0
                 For i = 0 To globalAnzPar - 1
@@ -997,8 +997,8 @@ Public Class Testprobleme
 
                 'Qualitätswert berechnen
                 '-----------------------
-                ind.Features(0) = ind.PES_OptParas(0).Xn * (9 / 10) + 0.1
-                ind.Features(1) = (1 + 5 * ind.PES_OptParas(1).Xn) / (ind.PES_OptParas(0).Xn * (9 / 10) + 0.1)
+                ind.Features(0) = ind.OptParameter(0).Xn * (9 / 10) + 0.1
+                ind.Features(1) = (1 + 5 * ind.OptParameter(1).Xn) / (ind.OptParameter(0).Xn * (9 / 10) + 0.1)
 
                 'Zeichnen
                 '--------
@@ -1010,10 +1010,10 @@ Public Class Testprobleme
 
                 'Qualitätswert berechnen
                 '-----------------------
-                f1 = ind.PES_OptParas(0).Xn
+                f1 = ind.OptParameter(0).Xn
                 f2 = 0
                 For i = 1 To globalAnzPar - 1
-                    f2 = f2 + ind.PES_OptParas(i).Xn
+                    f2 = f2 + ind.OptParameter(i).Xn
                 Next i
                 f2 = 1 + 9 / (globalAnzPar - 1) * f2
                 f2 = f2 * (1 - System.Math.Sqrt(f1 / f2))
@@ -1030,10 +1030,10 @@ Public Class Testprobleme
 
                 'Qualitätswerte berechnen
                 '------------------------
-                f1 = ind.PES_OptParas(0).Xn
+                f1 = ind.OptParameter(0).Xn
                 f2 = 0
                 For i = 1 To globalAnzPar - 1
-                    f2 = f2 + ind.PES_OptParas(i).Xn
+                    f2 = f2 + ind.OptParameter(i).Xn
                 Next i
                 f2 = 1 + 9 / (globalAnzPar - 1) * f2
                 f2 = f2 * (1 - (f1 / f2) * (f1 / f2))
@@ -1050,10 +1050,10 @@ Public Class Testprobleme
 
                 'Qualitätswerte berechnen
                 '------------------------
-                f1 = ind.PES_OptParas(0).Xn
+                f1 = ind.OptParameter(0).Xn
                 f2 = 0
                 For i = 1 To globalAnzPar - 1
-                    f2 = f2 + ind.PES_OptParas(i).Xn
+                    f2 = f2 + ind.OptParameter(i).Xn
                 Next i
                 f2 = 1 + 9 / (globalAnzPar - 1) * f2
                 f2 = f2 * (1 - Math.Sqrt(f1 / f2) - (f1 / f2) * Math.Sin(10 * Math.PI * f1))
@@ -1070,10 +1070,10 @@ Public Class Testprobleme
 
                 'Qualitätswerte berechnen
                 '------------------------
-                f1 = ind.PES_OptParas(0).Xn
+                f1 = ind.OptParameter(0).Xn
                 f2 = 0
                 For i = 1 To globalAnzPar - 1
-                    x2 = -5 + (ind.PES_OptParas(i).Xn * 10)
+                    x2 = -5 + (ind.OptParameter(i).Xn * 10)
                     f2 = f2 + (x2 * x2 - 10 * Math.Cos(4 * Math.PI * x2))
                 Next i
                 f2 = 1 + 10 * (globalAnzPar - 1) + f2
@@ -1091,16 +1091,16 @@ Public Class Testprobleme
 
                 'Qualitätswerte berechnen
                 '------------------------
-                f1 = ind.PES_OptParas(0).Xn * (9 / 10) + 0.1
-                f2 = (1 + 5 * ind.PES_OptParas(1).Xn) / (ind.PES_OptParas(0).Xn * (9 / 10) + 0.1)
+                f1 = ind.OptParameter(0).Xn * (9 / 10) + 0.1
+                f2 = (1 + 5 * ind.OptParameter(1).Xn) / (ind.OptParameter(0).Xn * (9 / 10) + 0.1)
 
                 ind.Features(0) = f1
                 ind.Features(1) = f2
 
                 'Constraints berechnen
                 '---------------------
-                g1 = (5 * ind.PES_OptParas(1).Xn) + 9 * (ind.PES_OptParas(0).Xn * (9 / 10) + 0.1) - 6
-                g2 = (-1) * (5 * ind.PES_OptParas(1).Xn) + 9 * (ind.PES_OptParas(0).Xn * (9 / 10) + 0.1) - 1
+                g1 = (5 * ind.OptParameter(1).Xn) + 9 * (ind.OptParameter(0).Xn * (9 / 10) + 0.1) - 6
+                g2 = (-1) * (5 * ind.OptParameter(1).Xn) + 9 * (ind.OptParameter(0).Xn * (9 / 10) + 0.1) - 1
 
                 ind.Constraints(0) = g1
                 ind.Constraints(1) = g2
@@ -1121,14 +1121,14 @@ Public Class Testprobleme
 
                 'Qualitätswerte berechnen
                 '------------------------
-                ind.Features(0) = ind.PES_OptParas(0).Xn
-                ind.Features(1) = ind.PES_OptParas(1).Xn
-                ind.Features(2) = ind.PES_OptParas(2).Xn
+                ind.Features(0) = ind.OptParameter(0).Xn
+                ind.Features(1) = ind.OptParameter(1).Xn
+                ind.Features(2) = ind.OptParameter(2).Xn
 
                 'Constraints berechnen
                 '---------------------
-                ind.Constraints(0) = ind.PES_OptParas(0).Xn + ind.PES_OptParas(1).Xn - 0.5
-                ind.Constraints(1) = ind.PES_OptParas(0).Xn + ind.PES_OptParas(1).Xn + ind.PES_OptParas(2).Xn - 0.8
+                ind.Constraints(0) = ind.OptParameter(0).Xn + ind.OptParameter(1).Xn - 0.5
+                ind.Constraints(1) = ind.OptParameter(0).Xn + ind.OptParameter(1).Xn + ind.OptParameter(2).Xn - 0.8
 
                 'Zeichnen
                 '--------
@@ -1147,13 +1147,13 @@ Public Class Testprobleme
 
                 'Qualitätswerte berechnen
                 '------------------------
-                ind.Features(0) = ind.PES_OptParas(0).Xn ^ 2 + ind.PES_OptParas(1).Xn ^ 2
+                ind.Features(0) = ind.OptParameter(0).Xn ^ 2 + ind.OptParameter(1).Xn ^ 2
 
                 'Zeichnen
                 '--------
                 Dim serie3D As Steema.TeeChart.Styles.Points3D
                 serie3D = Diag.getSeries3DPoint("Population " & ipop + 1)
-                serie3D.Add(ind.PES_OptParas(0).Xn, ind.PES_OptParas(1).Xn, ind.Features(0))
+                serie3D.Add(ind.OptParameter(0).Xn, ind.OptParameter(1).Xn, ind.Features(0))
 
             Case TP_FloodMitigation
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -1161,7 +1161,7 @@ Public Class Testprobleme
                 'Getting the new Parameters
                 ReDim X(7)
                 For i = 0 To X.GetUpperBound(0)
-                    X(i) = ind.PES_OptParas(i).RWert
+                    X(i) = ind.OptParameter(i).RWert
                 Next
 
                 'Calculating the Objective Function

@@ -1,10 +1,3 @@
-Option Strict Off ' Off ist Default
-Option Explicit On
-Imports System.IO
-Imports IHWB.EVO.Common
-Imports System.ComponentModel
-Imports System.Threading
-
 '*******************************************************************************
 '*******************************************************************************
 '**** ihwb Optimierung                                                      ****
@@ -19,6 +12,13 @@ Imports System.Threading
 '**** Letzte Änderung: Juli 2008                                            ****
 '*******************************************************************************
 '*******************************************************************************
+
+Option Strict Off ' Off ist Default
+Option Explicit On
+Imports System.IO
+Imports IHWB.EVO.Common
+Imports System.ComponentModel
+Imports System.Threading
 
 Partial Class Form1
     Inherits System.Windows.Forms.Form
@@ -57,15 +57,15 @@ Partial Class Form1
     '**** Multithreading ****
     Dim SIM_Eval_is_OK As Boolean
     Private n_Threads As Integer                        'Anzahl der Threads
-    Dim MI_Thread_OK as boolean = False
+    Dim MI_Thread_OK As Boolean = False
 
     'Dialoge
     Private WithEvents solutionDialog As SolutionDialog
     Private WithEvents scatterplot1 As EVO.Diagramm.Scatterplot
 
     'Diagramme
-    Private WithEvents Indicatordiagramm1 As IHWB.EVO.Diagramm.Indicatordiagramm
     Private WithEvents Hauptdiagramm1 As IHWB.EVO.Diagramm.Hauptdiagramm
+    Private WithEvents Monitor1 As EVO.Diagramm.Monitor
 
 #End Region 'Eigenschaften
 
@@ -94,6 +94,9 @@ Partial Class Form1
         'OptionsDialog instanzieren
         Me.Options = New OptionsDialog()
 
+        'Monitor instanzieren
+        Me.Monitor1 = New EVO.Diagramm.Monitor()
+
         'Handler für Klick auf Serien zuweisen
         AddHandler Me.Hauptdiagramm1.ClickSeries, AddressOf seriesClick
 
@@ -106,6 +109,23 @@ Partial Class Form1
     '************************
     Private Sub showOptionDialog(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem_Optionen.Click
         Call Me.Options.ShowDialog()
+    End Sub
+
+    'Monitor anzeigen
+    '****************
+    Private Sub MenuItem_MonitorAnzeigen_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem_MonitorAnzeigen.Click
+
+        If (Me.MenuItem_MonitorAnzeigen.Checked) Then
+            Me.Monitor1.Show()
+        Else
+            Me.Monitor1.Hide()
+        End If
+
+    End Sub
+
+    'Wenn Monitor geschlossen wird, Menüeintrag aktualisieren
+    Private Sub MonitorClosed() Handles Monitor1.MonitorClosed
+        Me.MenuItem_MonitorAnzeigen.Checked = False
     End Sub
 
     'About Dialog anzeigen
@@ -431,7 +451,7 @@ Partial Class Form1
             'Problemdefinition
             '=================
             If (Me.Anwendung <> ANW_TESTPROBLEME And Me.Anwendung <> ANW_TSP) Then
-                
+
                 'Bei allen Sim-Anwendungen
                 '-------------------------
 
@@ -440,10 +460,13 @@ Partial Class Form1
 
                 'EVO-Eingabedateien einlesen
                 Call Me.mProblem.Read_InputFiles(Me.Sim1.SimStart, Me.Sim1.SimEnde)
-                
+
                 'Problem an Sim-Objekt übergeben
                 Call Me.Sim1.setProblem(Me.mProblem)
-            
+
+                'Settings auch übergeben
+                Call Me.Sim1.setSettings(Me.EVO_Einstellungen1.Settings)
+
             ElseIf (Me.Anwendung = ANW_TESTPROBLEME) Then
 
                 'Bei Testproblemen definieren diese das Problem selbst
@@ -483,10 +506,13 @@ Partial Class Form1
                 Case METH_SENSIPLOT 'Methode SensiPlot
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
+                    'SensiPlot instanzieren
                     SensiPlot1 = New EVO.Apps.SensiPlot(Me.mProblem)
 
+                    'Monitor deaktivieren
+                    Me.MenuItem_MonitorAnzeigen.Checked = False
+
                     'SensiPlot Dialog anzeigen:
-                    '--------------------------
                     Dim SensiPlotDiagResult As Windows.Forms.DialogResult
                     SensiPlotDiagResult = SensiPlot1.ShowDialog()
                     If (Not SensiPlotDiagResult = Windows.Forms.DialogResult.OK) Then
@@ -637,6 +663,11 @@ Partial Class Form1
             '-------------------
             Me.isrun = True
             Me.Button_Start.Text = "Pause"
+
+            'Monitor anzeigen
+            If (Me.MenuItem_MonitorAnzeigen.Checked) Then
+                Call Me.Monitor1.Show()
+            End If
 
             'Ergebnis-Buttons
             If (Not IsNothing(Sim1)) Then
@@ -806,17 +837,11 @@ Partial Class Form1
                 ind = New Common.Individuum_PES("SensiPlot", n)
 
                 'OptParameter ins Individuum kopieren
-                ind.PES_OptParas = Me.mProblem.List_OptParameter
+                ind.OptParameter = Me.mProblem.List_OptParameter
 
-                'Parameter an Sim übergeben
-                Call Sim1.PREPARE_Evaluation_PES(ind.PES_OptParas)
-
-                'Evaluieren
-                isOK = Sim1.launchSim()
+                'Individuum in Sim evaluieren
+                isOK = Sim1.Evaluate(ind)
                 'TODO: Fehlerbehandlung bei Simulationsfehler
-
-                Call Sim1.SIM_Ergebnis_Lesen()
-                Call Sim1.SIM_Ergebnis_auswerten(ind)
 
                 'BUG 253: Verletzte Constraints bei SensiPlot kenntlich machen?
 
@@ -824,10 +849,10 @@ Partial Class Form1
                 If (Anz_SensiPara = 1) Then
                     '1 Parameter
                     serie = Me.Hauptdiagramm1.getSeriesPoint("SensiPlot", "Orange")
-                    serie.Add(ind.Penalties(SensiPlot1.Selected_Penaltyfunction), ind.PES_OptParas(SensiPlot1.Selected_OptParameter(0)).RWert, n.ToString())
+                    serie.Add(ind.Penalties(SensiPlot1.Selected_Penaltyfunction), ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(0)), n.ToString())
                 Else
                     '2 Parameter
-                    surface.Add(ind.PES_OptParas(SensiPlot1.Selected_OptParameter(0)).RWert, ind.Penalties(SensiPlot1.Selected_Penaltyfunction), ind.PES_OptParas(SensiPlot1.Selected_OptParameter(1)).RWert, n.ToString())
+                    surface.Add(ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(0)), ind.Penalties(SensiPlot1.Selected_Penaltyfunction), ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(1)), n.ToString())
                 End If
 
                 'Simulationsergebnis in Wave laden
@@ -1003,7 +1028,7 @@ Partial Class Form1
                     '***************************************************************
                     If (Me.mProblem.Method = METH_HYBRID And EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer) Then
                         If (Me.mProblem.Reduce_OptPara_and_ModPara(CES1.Childs(Child_Run).Get_All_Loc_Elem)) Then
-                            Call Sim1.PREPARE_Evaluation_PES(CES1.Childs(Child_Run).Get_All_Loc_PES_Para)
+                            Call Sim1.PREPARE_Evaluation_PES(CES1.Childs(Child_Run).OptParameter)
                         End If
                     End If
 
@@ -1031,7 +1056,7 @@ Partial Class Form1
                     Call Me.Hauptdiagramm1.ZeichneIndividuum(CES1.Childs(Child_Ready), 0, 0, i_gen, Child_Ready, ColorManagement(ColorArray, CES1.Childs(Child_Ready)))
                     Me.Label_Dn_Wert.Text = Math.Round(CES1.Childs(Child_Ready).Get_mean_PES_Dn, 6).ToString
                     If Not CES1.Childs(Child_Ready).Get_mean_PES_Dn = -1 Then
-                        Me.Indicatordiagramm1.Zeichne_Dn(CES1.Childs(Child_Ready).ID, CES1.Childs(Child_Ready).Get_mean_PES_Dn)
+                        Me.Monitor1.Zeichne_Dn(CES1.Childs(Child_Ready).ID, CES1.Childs(Child_Ready).Get_mean_PES_Dn)
                     End If
 
                     System.Windows.Forms.Application.DoEvents()
@@ -1105,7 +1130,7 @@ Partial Class Form1
                 '-----------------------------------
                 Call Hypervolume.update_dataset(Common.Individuum.Get_All_Penalty_of_Array(CES1.SekundärQb))
                 Call Me.Hauptdiagramm1.ZeichneNadirpunkt(Hypervolume.nadir)
-                Call Me.Indicatordiagramm1.ZeichneHyperVolumen(i_gen, Math.Abs(Hypervolume.calc_indicator()))
+                Call Me.Monitor1.ZeichneHyperVolumen(i_gen, Math.Abs(Hypervolume.calc_indicator()))
             End If
             ' ^ ENDE Selectionsprozess
             'xxxxxxxxxxxxxxxxxxxxxxxxx
@@ -1362,12 +1387,12 @@ Partial Class Form1
             ind = New Common.Individuum_PES("HJ", durchlauf)
 
             'HACK: OptParameter ins Individuum kopieren
-            For i = 0 To ind.PES_OptParas.Length - 1
-                ind.PES_OptParas(i).Xn = aktuellePara(i)
+            For i = 0 To ind.OptParameter.Length - 1
+                ind.OptParameter(i).Xn = aktuellePara(i)
             Next
 
             'Vorbereiten des Modelldatensatzes
-            Call Sim1.PREPARE_Evaluation_PES(ind.PES_OptParas)
+            Call Sim1.PREPARE_Evaluation_PES(ind.OptParameter)
 
             'Evaluierung des Simulationsmodells (ToDo: Validätsprüfung fehlt)
             SIM_Eval_is_OK = Sim1.launchSim(0, 0)
@@ -1398,12 +1423,12 @@ Partial Class Form1
                 ind = New Common.Individuum_PES("HJ", durchlauf)
 
                 'HACK: OptParameter ins Individuum kopieren
-                For i = 0 To ind.PES_OptParas.Length - 1
-                    ind.PES_OptParas(i).Xn = aktuellePara(i)
+                For i = 0 To ind.OptParameter.Length - 1
+                    ind.OptParameter(i).Xn = aktuellePara(i)
                 Next
 
                 'Vorbereiten des Modelldatensatzes
-                Call Sim1.PREPARE_Evaluation_PES(ind.PES_OptParas)
+                Call Sim1.PREPARE_Evaluation_PES(ind.OptParameter)
 
                 'Evaluierung des Simulationsmodells
                 SIM_Eval_is_OK = Sim1.launchSim(0, 0)
@@ -1428,12 +1453,12 @@ Partial Class Form1
                     ind = New Common.Individuum_PES("HJ", durchlauf)
 
                     'HACK: OptParameter ins Individuum kopieren
-                    For i = 0 To ind.PES_OptParas.Length - 1
-                        ind.PES_OptParas(i).Xn = aktuellePara(i)
+                    For i = 0 To ind.OptParameter.Length - 1
+                        ind.OptParameter(i).Xn = aktuellePara(i)
                     Next
 
                     'Vorbereiten des Modelldatensatzes
-                    Call Sim1.PREPARE_Evaluation_PES(ind.PES_OptParas)
+                    Call Sim1.PREPARE_Evaluation_PES(ind.OptParameter)
 
                     'Evaluierung des Simulationsmodells
                     SIM_Eval_is_OK = Sim1.launchSim(0, 0)
@@ -1603,7 +1628,7 @@ Start_Evolutionsrunden:
                         Call PES1.EsMutation()
 
                         'Auslesen der Variierten Parameter und in Individuum kopieren
-                        ind(i).PES_OptParas = EVO.Common.OptParameter.Clone_Array(PES1.EsGetParameter())
+                        ind(i).OptParameter = EVO.Common.OptParameter.Clone_Array(PES1.EsGetParameter())
 
                         'Testprobleme direkt auswerten
                         If Anwendung = ANW_TESTPROBLEME Then
@@ -1612,8 +1637,8 @@ Start_Evolutionsrunden:
 
                             'Lösung evaluieren und zeichnen
                             Call Testprobleme1.Evaluierung_TestProbleme(ind(i), PES1.PES_iAkt.iAktPop, Me.Hauptdiagramm1)
-                            Me.Label_Dn_Wert.Text = Math.Round(ind(i).PES_OptParas(0).Dn, 6).ToString
-                            Me.Indicatordiagramm1.Zeichne_Dn((PES1.PES_iAkt.iAktGen + 1) * EVO_Einstellungen1.Settings.PES.n_Nachf + i, ind(i).PES_OptParas(0).Dn)
+                            Me.Label_Dn_Wert.Text = Math.Round(ind(i).OptParameter(0).Dn, 6).ToString
+                            Me.Monitor1.Zeichne_Dn((PES1.PES_iAkt.iAktGen + 1) * EVO_Einstellungen1.Settings.PES.n_Nachf + i, ind(i).OptParameter(0).Dn)
 
                             'Einordnen
                             Call PES1.EsBest(ind(i))
@@ -1645,7 +1670,7 @@ Start_Evolutionsrunden:
 
                                 Sim1.WorkDir_Current = Sim1.getWorkDir(Thread_Free)
 
-                                Call Sim1.PREPARE_Evaluation_PES(ind(Child_Run).PES_OptParas)
+                                Call Sim1.PREPARE_Evaluation_PES(ind(Child_Run).OptParameter)
 
                                 ' Simulation ******************************************
                                 SIM_Eval_is_OK = Sim1.launchSim(Thread_Free, Child_Run)
@@ -1662,8 +1687,8 @@ Start_Evolutionsrunden:
 
                                 'Lösung zeichnen und Dn ausgeben
                                 Call Me.Hauptdiagramm1.ZeichneIndividuum(ind(Child_Ready), PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, Child_Ready, Color.Orange)
-                                Me.Label_Dn_Wert.Text = Math.Round(ind(Child_Ready).PES_OptParas(0).Dn, 6).ToString
-                                Me.Indicatordiagramm1.Zeichne_Dn((PES1.PES_iAkt.iAktGen + 1) * EVO_Einstellungen1.Settings.PES.n_Nachf + Child_Ready, ind(Child_Ready).PES_OptParas(0).Dn)
+                                Me.Label_Dn_Wert.Text = Math.Round(ind(Child_Ready).OptParameter(0).Dn, 6).ToString
+                                Me.Monitor1.Zeichne_Dn((PES1.PES_iAkt.iAktGen + 1) * EVO_Einstellungen1.Settings.PES.n_Nachf + Child_Ready, ind(Child_Ready).OptParameter(0).Dn)
 
                                 'SELEKTIONSPROZESS Schritt 1
                                 '###########################
@@ -1719,10 +1744,10 @@ Start_Evolutionsrunden:
                                 Call PES1.EsMutation()
 
                                 'Parameter aus PES ins Individuum kopieren
-                                ind(Child_False(i)).PES_OptParas = EVO.Common.OptParameter.Clone_Array(PES1.EsGetParameter())
+                                ind(Child_False(i)).OptParameter = EVO.Common.OptParameter.Clone_Array(PES1.EsGetParameter())
 
                                 Sim1.WorkDir_Current = Sim1.getWorkDir(0)
-                                Call Sim1.PREPARE_Evaluation_PES(ind(Child_False(i)).PES_OptParas)
+                                Call Sim1.PREPARE_Evaluation_PES(ind(Child_False(i)).OptParameter)
 
                                 SIM_Eval_is_OK = Sim1.launchSim(0, Child_False(i))
                                 While Sim1.launchReady(0, SIM_Eval_is_OK, Child_False(i)) = False
@@ -1773,7 +1798,7 @@ Start_Evolutionsrunden:
                         '-----------------------------------
                         Call Hypervolume.update_dataset(Common.Individuum.Get_All_Penalty_of_Array(PES1.SekundärQb))
                         Call Me.Hauptdiagramm1.ZeichneNadirpunkt(Hypervolume.nadir)
-                        Call Me.Indicatordiagramm1.ZeichneHyperVolumen(PES1.PES_iAkt.iAktGen, Math.Abs(Hypervolume.calc_indicator()))
+                        Call Me.Monitor1.ZeichneHyperVolumen(PES1.PES_iAkt.iAktGen, Math.Abs(Hypervolume.calc_indicator()))
 
                     End If
 
@@ -2058,30 +2083,7 @@ Start_Evolutionsrunden:
 
         End Select
 
-        'Bei MultiObjective zusätzlich: 
-        '------------------------------
-        If (Me.mProblem.NumPenalties > 1 _
-            And Me.mProblem.Method <> METH_SENSIPLOT) Then
-
-            'Indicator-Diagramm initialisieren
-            '---------------------------------
-            Call Me.showIndicatorDiagramm()
-            Call Me.Indicatordiagramm1.getSeriesLine("Hypervolume").Clear()
-
-        End If
-
         Call Application.DoEvents()
-
-    End Sub
-
-    'Indicatordiagramm anzeigen
-    '**************************
-    Private Sub showIndicatorDiagramm()
-
-        If (Me.Indicatordiagramm1.Visible = False) Then
-            Me.Hauptdiagramm1.Height -= 70
-            Me.Indicatordiagramm1.Visible = True
-        End If
 
     End Sub
 
@@ -2316,7 +2318,7 @@ Start_Evolutionsrunden:
     '****************************************************
     Public Sub showWave(ByVal checkedSolutions As Collection)
 
-        Dim isOK As Boolean = False
+        Dim isOK As Boolean
         Dim isIHA As Boolean
         Dim WorkDir_Prev As String
 
@@ -2355,44 +2357,16 @@ Start_Evolutionsrunden:
         '======================================
         For Each ind As Common.Individuum In Sim1.OptResult.getSelectedSolutions()
 
-            isOK = False
-
             'Lösung per Checkbox ausgewählt?
             '-------------------------------
             If (Not checkedSolutions.Contains(ind.ID.ToString())) Then
                 Continue For
             End If
 
-            'Simulation vorbereiten
-            'xxxxxxxxxxxxxxxxxxxxxx
+            'Individuum in Sim evaluieren
+            isOK = Sim1.Evaluate(ind)
 
-            Select Case Me.mProblem.Method
-
-                Case METH_PES
-
-                    'Bereitet das BlueM für PES vor
-                    Call Sim1.PREPARE_Evaluation_PES(CType(ind, Individuum_PES).PES_OptParas)
-
-                Case METH_CES, METH_HYBRID
-
-                    'Aktueller Pfad wird an Sim zurückgegeben
-                    'Bereitet das BlaueModell für die Kombinatorik vor
-                    Call Sim1.PREPARE_Evaluation_CES(CType(ind, Individuum_CES).Path, CType(ind, Individuum_CES).Get_All_Loc_Elem)
-
-                    'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
-                    If (Me.mProblem.Method = METH_HYBRID And Me.EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer) Then
-                        Call Me.mProblem.Reduce_OptPara_and_ModPara(CType(ind, Individuum_CES).Get_All_Loc_Elem)
-                        Call Sim1.PREPARE_Evaluation_PES(CType(ind, Individuum_CES).Get_All_Loc_PES_Para)
-                    End If
-
-            End Select
-
-            'Simulation ausführen
-            'xxxxxxxxxxxxxxxxxxxx
-            isOK = Sim1.launchSim()
             'TODO: Simulationsfehler abfangen!
-
-            Call Sim1.SIM_Ergebnis_Lesen()
 
             'Sonderfall IHA-Berechnung
             If (isIHA) Then
@@ -2643,10 +2617,6 @@ Start_Evolutionsrunden:
                 '============
                 If (importDialog.CheckBox_Hypervol.Checked) Then
 
-                    'Indicator-Diagramm anzeigen
-                    Call Me.showIndicatorDiagramm()
-                    Call Me.Indicatordiagramm1.getSeriesLine("Hypervolume").Clear()
-
                     'Hypervolumen instanzieren
                     Dim Hypervolume As EVO.MO_Indicators.Indicators
                     Hypervolume = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(EVO.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, Me.mProblem.NumPenalties)
@@ -2663,7 +2633,7 @@ Start_Evolutionsrunden:
 
                         'Hypervolumen zeichnen
                         Call Me.Hauptdiagramm1.ZeichneNadirpunkt(nadir)
-                        Call Me.Indicatordiagramm1.ZeichneHyperVolumen(sekpop.iGen, indicator)
+                        Call Me.Monitor1.ZeichneHyperVolumen(sekpop.iGen, indicator)
 
                         Call My.Application.DoEvents()
 
@@ -2775,20 +2745,12 @@ Start_Evolutionsrunden:
 
             'Referenz-Hypervolumen
             '---------------------
-            If (Me.Indicatordiagramm1.Visible) Then
+            'Instanzierung
+            HypervolumeRef = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, minmax, nadir, sekpopvaluesRef)
+            indicatorRef = -HypervolumeRef.calc_indicator()
 
-                'Instanzierung
-                HypervolumeRef = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, minmax, nadir, sekpopvaluesRef)
-                indicatorRef = -HypervolumeRef.calc_indicator()
-
-                'Anzeige in IndicatorDiagramm
-                Dim colorline1 As New Steema.TeeChart.Tools.ColorLine(Me.Indicatordiagramm1.Chart)
-                colorline1.Pen.Color = Color.Blue
-                colorline1.Pen.Width = 2
-                colorline1.AllowDrag = False
-                colorline1.Axis = Me.Indicatordiagramm1.Axes.Left
-                colorline1.Value = indicatorRef
-            End If
+            'Im Monitor anzeigen
+            Call Me.Monitor1.ZeichneReferenzHypervolumen(indicatorRef)
 
             'Cursor Default
             Cursor = Cursors.Default
@@ -2817,4 +2779,5 @@ Start_Evolutionsrunden:
     End Sub
 
 #End Region 'Methoden
+
 End Class
