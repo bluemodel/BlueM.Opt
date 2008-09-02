@@ -173,9 +173,9 @@ Partial Public Class SolutionDialog
             i += 1
         Next
 
-        'OptParameter PES
-        For Each optpara As Common.OptParameter In CType(ind, Common.Individuum_PES).PES_OptParas
-            cellvalues(i) = optpara.RWert
+        'OptParameter
+        For Each optpara As Double In ind.OptParameter_RWerte
+            cellvalues(i) = optpara
             i += 1
         Next
 

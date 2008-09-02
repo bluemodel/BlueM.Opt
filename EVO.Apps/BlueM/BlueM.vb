@@ -354,6 +354,8 @@ Public Class BlueM
 
         End Try
 
+        Return simOK
+
     End Function
 
     'Prüft ob des aktuelle Child mit der ID die oben übergeben wurde fertig ist
@@ -377,7 +379,7 @@ Public Class BlueM
 
     'Simulationsergebnis verarbeiten
     '-------------------------------
-    Public Overrides Sub SIM_Ergebnis_Lesen()
+    Protected Overrides Sub SIM_Ergebnis_Lesen()
 
         'Altes Simulationsergebnis löschen
         Me.SimErgebnis.Clear()
