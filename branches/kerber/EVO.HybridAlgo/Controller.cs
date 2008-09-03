@@ -30,7 +30,7 @@ namespace IHWB.EVO.HybridAlgo
             //Initialisieren des Individuum-Arrays
             individuumnumber = 0;
             generation = new EVO.Common.Individuum_MetaEvo[this.settings.MetaEvo.PopulationSize];
-                //Setzen des Problems
+                //Setzen des Problems zum Design des Individuums
             EVO.Common.Individuum_MetaEvo.Initialise(ref prob_input);
                 //Füllen des Arrays
             for (int j = 0; j < this.settings.MetaEvo.PopulationSize; j++) 
@@ -78,10 +78,12 @@ namespace IHWB.EVO.HybridAlgo
                     int min = (int)this.prob.List_OptParameter[j].Min;
                     random[j] = randomizer.Next(min, max);
                 }
-                generation[k].set_genes(random);
+                generation[k].set_optparas(random);
             }
             return true;
         }
+
+        //### Methoden ### Hauptprogramm
 
         // Single PC
         private void start_single_pc()
@@ -151,7 +153,7 @@ namespace IHWB.EVO.HybridAlgo
             --
 
             ++ Client Status "calculating"
-	            Falls Individuen-Status "Raw" und Rechner-IP die eigene existiert 
+	            Falls Individuen-Status "Raw" und Rechner-IpName die eigene existiert 
 		            Markiert Individuum als Status "calculate", timestamp
 		            Client simuliert
 		            Client editiert Individuum mit Ergebnissen und Status "ready" oder "false", timestamp
@@ -162,7 +164,7 @@ namespace IHWB.EVO.HybridAlgo
             --
 
             ++ Client Status "standby"
-	            Falls Individuum mit für ihn markierter IP existiert
+	            Falls Individuum mit für ihn markierter IpName existiert
 		            Client Status "claculating"
 		            x = 0
 	            else (Falls alle Individuen	Status:ready sind) {
@@ -175,5 +177,7 @@ namespace IHWB.EVO.HybridAlgo
             Nochmal aufrufen
              */
         }
+
+        //### Methoden ### Subroutinen
     }
 }
