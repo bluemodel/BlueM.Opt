@@ -35,7 +35,7 @@ namespace IHWB.EVO.HybridAlgo
                 //Füllen des Arrays
             for (int j = 0; j < this.settings.MetaEvo.PopulationSize; j++) 
             {
-                generation[j] = new IHWB.EVO.Common.Individuum_MetaEvo("MetaEvo", individuumnumber);
+                generation[j] = new IHWB.EVO.Common.Individuum_MetaEvo("MetaEvo", individuumnumber, prob_input.List_OptParameter.Length);
                 individuumnumber++;
             }
                 //Zufällige Parents setzen
@@ -59,6 +59,8 @@ namespace IHWB.EVO.HybridAlgo
             }  
         }
 
+
+
         //### Methoden ###
 
         // Zufällige Eltern setzen
@@ -68,7 +70,7 @@ namespace IHWB.EVO.HybridAlgo
             Random randomizer = new Random();
 
             //Für jedes Individuum durchgehen
-            for (int k = 0; k < this.prob.NumParams; k++)
+            for (int k = 0; k < this.settings.MetaEvo.PopulationSize; k++)
             {
                 random = new double[this.prob.NumParams];
                 //Für jeden Parameter durchgehen
@@ -83,18 +85,21 @@ namespace IHWB.EVO.HybridAlgo
             return true;
         }
 
+
+
         //### Methoden ### Hauptprogramm
 
         // Single PC
         private void start_single_pc()
         {
-            MessageBox.Show("Testmethode wird ausgeführt");
+            MessageBox.Show("Single PC wird ausgeführt");
         }
 
         // Network Server
         private void start_network_server()
         {
-            MessageBox.Show("Testmethode wird ausgeführt");
+            MessageBox.Show("Network Server wird ausgeführt");
+            networkmanager.Individuums_WriteToDB(generation);
             /*
             ++ Server-Status "generate Individuums"
 	            Server liest Individuen von DB
@@ -142,7 +147,7 @@ namespace IHWB.EVO.HybridAlgo
         // Network Client
         private void start_network_client()
         {
-            MessageBox.Show("Testmethode wird ausgeführt");
+            MessageBox.Show("Network Client wird ausgeführt");
             /*
             ++ Client Status "ready"
 	            Server-Status lesen -> Abbruch-Kriterium für Clients möglich
@@ -177,6 +182,8 @@ namespace IHWB.EVO.HybridAlgo
             Nochmal aufrufen
              */
         }
+
+
 
         //### Methoden ### Subroutinen
     }

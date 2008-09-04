@@ -5,20 +5,22 @@
     Private optparas() As Double   'Gene/Optimierungsparameter des Individuums
     Private Generator As String  'von welchem Algorithmus das Individuum gemacht wurde
     Private Client As String  'Welcher Rechner dieses Individuum berechnen soll [ip oder Rechnername]
+    Private numberOptparas As Integer 'Anzahl der Optoaras des Problems
 
     '### Initialisierung
-    Public Sub New(ByVal type As String, ByVal id As Integer)
+    Public Sub New(ByVal type As String, ByVal id As Integer, ByVal numberOptparas_input As Integer)
 
         'Basisindividuum instanzieren
         Call MyBase.New(type, id)
 
-
+        numberOptparas = numberOptparas_input
+        ReDim optparas(numberOptparas - 1)
 
     End Sub
     '### Überschriebene Methoden
 
     Public Overrides Function Clone() As Individuum
-        Dim Dest As New Individuum_MetaEvo(Me.mType, Me.ID)
+        Dim Dest As New Individuum_MetaEvo(Me.mType, Me.ID, Me.numberOptparas)
         Return Dest
     End Function
 
@@ -29,6 +31,7 @@
 
     Public Overrides Property OptParameter() As OptParameter()
         Get
+
         End Get
         Set(ByVal value As OptParameter())
 
@@ -40,7 +43,7 @@
     Public Function set_optparas(ByVal optparas_input As Double())
         Dim i As Integer
 
-        For i = 0 To Optparas.Length - 1
+        For i = 0 To optparas_input.Length - 1
             Me.optparas(i) = optparas_input(i)
         Next
 

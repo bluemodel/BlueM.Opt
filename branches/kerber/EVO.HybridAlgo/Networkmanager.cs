@@ -179,12 +179,12 @@ namespace IHWB.EVO.HybridAlgo
             //Datensätze
             for (int j = 0; j < generation_input.Length; j++)
             {
-                tmptxt = tmptxt + "(" + generation_input[j].ID + ", 'raw',";
-                for (int k = 1; k <= number_optparas; k++)
+                tmptxt = tmptxt + "('" + generation_input[j].ID + "','raw',";
+                for (int k = 0; k < number_optparas; k++)
                 {
-                    tmptxt = tmptxt + generation_input[j].get_optparas()[k] + ",";
+                    tmptxt = tmptxt + "'" + generation_input[j].get_optparas()[k] + "',";
                 }
-                tmptxt = tmptxt + ", " + generation_input[j].get_Client() + "),";
+                tmptxt = tmptxt + "'" + generation_input[j].get_Client() + "'),";
             }
             tmptxt = tmptxt.TrimEnd(',') + ";";
 
@@ -203,7 +203,7 @@ namespace IHWB.EVO.HybridAlgo
 
             //Aus der DB lesen und in Individuum speichern
             int ExportPosition = 0;
-            EVO.Common.Individuum_MetaEvo individuumnew = new IHWB.EVO.Common.Individuum_MetaEvo("MetaEvo", 1);
+            EVO.Common.Individuum_MetaEvo individuumnew = new IHWB.EVO.Common.Individuum_MetaEvo("MetaEvo", 1, number_optparas);
 
             double[] constraints = new double[number_constraints];
             double[] features = new double[number_features];
@@ -250,13 +250,13 @@ namespace IHWB.EVO.HybridAlgo
             
             for (int k = 1; k <= number_constraints; k++)
             {
-                tmptxt = tmptxt + "const" + k + " = " + individuum_input.Constraints[k] + ", ";
+                tmptxt = tmptxt + "'const" + k + "' = '" + individuum_input.Constraints[k] + "', ";
             }
             for (int k = 1; k <= number_features; k++)
             {
-                tmptxt = tmptxt + "feat" + k + " = " + individuum_input.Features[k] + ", ";
+                tmptxt = tmptxt + "'feat" + k + "' = '" + individuum_input.Features[k] + "', ";
             }
-            tmptxt = tmptxt + "ipName = " + individuum_input.get_Client() + " ";
+            tmptxt = tmptxt + "'ipName' = '" + individuum_input.get_Client() + "' ";
             tmptxt = tmptxt + "WHERE `id` = " + individuum_input.ID + "LIMIT 1 ;"; ;
 
             myCommand.CommandText = tmptxt;
@@ -331,7 +331,7 @@ namespace IHWB.EVO.HybridAlgo
 
         //### Methoden ### Working Process -> Scheduling
 
-        //Scheduling
+        //Scheduling //Rückgabe Wartezeit bis erster Client fertig ist
         private int scheduling(ref EVO.Common.Individuum_MetaEvo[] generation_input, string modus_input)
         {
             int current_ind = 0;
