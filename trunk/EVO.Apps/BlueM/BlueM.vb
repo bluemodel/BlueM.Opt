@@ -42,10 +42,32 @@ Public Class BlueM
     Public SKos1 As SKos
 
     '**** Multithreading ****
-    Dim My_C_Thread() As CThread
-    Dim MyThread() As Thread
+    Dim MyBlueMThreads() As BlueMThread
+    Dim MyThreads() As Thread
 
 #End Region 'Eigenschaften
+
+#Region "Properties"
+
+    ''' <summary>
+    ''' Alle Dateiendungen (ohne Punkt), die in einem Datensatz vorkommen können
+    ''' </summary>
+    ''' <remarks>Der erste Wert des Arrays wird als Filter für OpenFile-Dialoge verwendet</remarks>
+    Public Overrides ReadOnly Property DatensatzDateiendungen() As Collections.Specialized.StringCollection
+        Get
+            Dim exts As Collections.Specialized.StringCollection = New Collections.Specialized.StringCollection()
+
+            exts.AddRange(New String() {"ALL", "SYS", "FKT", "KTR", "EXT", "JGG", "WGG", _
+                                        "TGG", "TAL", "HYA", "TRS", "EZG", "EIN", "URB", _
+                                        "VER", "RUE", "BEK", "BOA", "BOD", "LNZ", "EFL", _
+                                        "DIF", "ZRE", "BIN"})
+
+            Return exts
+
+        End Get
+    End Property
+
+#End Region 'Properties
 
 #Region "Methoden"
 
@@ -54,14 +76,12 @@ Public Class BlueM
 
     'Konstruktor
     '***********
-    Public Sub New(byVal n_Proz As Integer)
+    Public Sub New(ByVal n_Proz As Integer)
 
         Call MyBase.New()
 
         'Daten belegen
         '-------------
-        Me.mDatensatzendung = ".ALL"
-
         Me.useKWL = False
         Me.isIHA = False
 
@@ -74,7 +94,7 @@ Public Class BlueM
         ReDim bluem_dll(n_Proz - 1)
         Dim i As Integer
 
-        For i = 0 to n_Proz - 1
+        For i = 0 To n_Proz - 1
             If (File.Exists(dll_path)) Then
                 bluem_dll(i) = New BlueM_EngineDotNetAccess(dll_path)
             Else
@@ -83,12 +103,12 @@ Public Class BlueM
         Next
 
         'Anzahl der Threads
-        ReDim My_C_Thread(n_Proz - 1)
-        For i = 0 to n_Proz - 1
-            My_C_Thread(i) = new CThread(i, -1, "Folder", Datensatz, bluem_dll(i))
-            My_C_Thread(i).set_is_OK
+        ReDim MyBlueMThreads(n_Proz - 1)
+        For i = 0 To n_Proz - 1
+            MyBlueMThreads(i) = New BlueMThread(i, -1, "Folder", Datensatz, bluem_dll(i))
+            MyBlueMThreads(i).set_is_OK()
         Next
-        ReDim MyThread(n_Proz - 1)
+        ReDim MyThreads(n_Proz - 1)
 
     End Sub
 
@@ -283,7 +303,7 @@ Public Class BlueM
     Public Overrides Function launchFree(ByRef Thread_ID As Integer) As Boolean
         launchFree = False
 
-        For Each Thr_C As CThread In My_C_Thread
+        For Each Thr_C As BlueMThread In MyBlueMThreads
             If Thr_C.Sim_Is_OK = True And Thr_C.get_Child_ID = -1 Then
                 launchFree = True
                 Thread_ID = Thr_C.get_Thread_ID
@@ -301,11 +321,11 @@ Public Class BlueM
         launchSim = False
         Dim Folder As String
 
-        Folder = getWorkDir(Thread_ID)
-        My_C_Thread(Thread_ID) = New CThread(Thread_ID, Child_ID, Folder, Datensatz, bluem_dll(Thread_ID))
-        MyThread(Thread_ID) = New Thread(AddressOf My_C_Thread(Thread_ID).Thread)
-        MyThread(Thread_ID).IsBackground = True
-        MyThread(Thread_ID).Start()
+        Folder = getThreadWorkDir(Thread_ID)
+        MyBlueMThreads(Thread_ID) = New BlueMThread(Thread_ID, Child_ID, Folder, Datensatz, bluem_dll(Thread_ID))
+        MyThreads(Thread_ID) = New Thread(AddressOf MyBlueMThreads(Thread_ID).launchSim)
+        MyThreads(Thread_ID).IsBackground = True
+        MyThreads(Thread_ID).Start()
         launchSim = True
 
         Return launchSim
@@ -364,14 +384,14 @@ Public Class BlueM
     Public Overrides Function launchReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
         launchReady = False
 
-        For Each Thr_C As CThread In My_C_Thread
+        For Each Thr_C As BlueMThread In MyBlueMThreads
             If Thr_C.launch_Ready = True And Thr_C.get_Child_ID = Child_ID Then
                 launchReady = True
                 SimIsOK = Thr_C.Sim_Is_OK
                 Thread_ID = Thr_C.get_Thread_ID
-                MyThread(Thread_ID).Join()
-                My_C_Thread(Thread_ID) = New CThread(Thread_ID, -1, "Folder", Datensatz, bluem_dll(Thread_ID))
-                My_C_Thread(Thread_ID).set_is_OK()
+                MyThreads(Thread_ID).Join()
+                MyBlueMThreads(Thread_ID) = New BlueMThread(Thread_ID, -1, "Folder", Datensatz, bluem_dll(Thread_ID))
+                MyBlueMThreads(Thread_ID).set_is_OK()
             End If
         Next
 
@@ -448,7 +468,7 @@ Public Class BlueM
                 'CalculateFeature = CalculateFeature_PRB(OptZiel)
 
             Case Else
-                Throw New Exception("Der Wert '" & feature.Datei & "' für die Datei wird bei Optimierungszielen für BlueM nicht akzeptiert!")
+                Throw New Exception("Der Wert '" & feature.Datei & "' für die Datei wird bei Optimierungszielen für BlueM nicht unterstützt!")
 
         End Select
 
@@ -694,107 +714,6 @@ Public Class BlueM
     End Sub
 
 #End Region 'Kombinatorik
-
-#Region "Threading"
-
-    'Klasse beinhaltet alle Infomationen für einen Simulationslauf im Thread
-    '***********************************************************************
-    Public Class CThread
-
-        Private Thread_ID As Integer
-        Private Child_ID As Integer
-        Private WorkFolder As String
-        Private DS_Name As String
-        Private bluem_dll As BlueM_EngineDotNetAccess
-        Private SimIsOK As Boolean
-        Private launchReady As Boolean
-
-        Public Sub New(ByVal _Thread_ID As Integer, ByVal _Child_ID As Integer, ByVal _WorkFolder As String, ByVal _DS_Name As String, ByRef _bluem_dll As BlueM_EngineDotNetAccess)
-            Me.Thread_ID = _Thread_ID
-            Me.Child_ID = _Child_ID
-            Me.WorkFolder = _WorkFolder
-            Me.DS_Name = _DS_Name
-            Me.bluem_dll = _bluem_dll
-        End Sub
-
-        'Die Funktion startet die Simulation mit dem entsprechendem WorkingDir
-        '*********************************************************************
-        Public Sub Thread()
-
-            Me.SimIsOK = False
-            Me.launchReady = False
-
-            'Priority
-            System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.BelowNormal
-
-            Try
-                'Datensatz übergeben und initialisieren
-                Call bluem_dll.Initialize(Me.WorkFolder & Me.DS_Name)
-
-                Dim SimEnde As DateTime = BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll.GetSimulationEndDate())
-
-                'Simulationszeitraum
-                Do While (BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll.GetCurrentTime) <= SimEnde)
-                    Call bluem_dll.PerformTimeStep()
-                Loop
-
-                'Simulation abschliessen
-                Call bluem_dll.Finish()
-
-                'Simulation erfolgreich
-                Me.SimIsOK = True
-
-            Catch ex As Exception
-
-                'Simulationsfehler aufgetreten
-                MsgBox(ex.Message, MsgBoxStyle.Exclamation, "BlueM")
-
-                'Simulation abschliessen
-                Call bluem_dll.Finish()
-
-                'Simulation nicht erfolgreich
-                Me.SimIsOK = False
-
-            Finally
-
-                'Ressourcen deallokieren
-                Call bluem_dll.Dispose()
-
-            End Try
-
-            'Me.SimIsOK = False
-            Me.launchReady = True
-
-        End Sub
-
-        Public Function Sim_Is_OK() As Boolean
-
-            Sim_Is_OK = Me.SimIsOK
-        End Function
-
-        Public Function launch_Ready() As Boolean
-
-            launch_Ready = Me.launchReady
-        End Function
-
-        Public Sub set_is_OK()
-
-            Me.SimIsOK = True
-        End Sub
-
-        Public Function get_Thread_ID() As Integer
-
-            get_Thread_ID = Me.Thread_ID
-        End Function
-
-        Public Function get_Child_ID() As Integer
-
-            get_Child_ID = Me.Child_ID
-        End Function
-
-    End Class
-
-#End Region 'Threading
 
 #End Region 'Methoden
 

@@ -23,13 +23,16 @@ Public MustInherit Class Sim
 
     'Generelle Eigenschaften
     '-----------------------
+    ''' <summary>
+    ''' Eine StringCollection mit allen Dateiendungen (ohne Punkt), die in einem Datensatz vorkommen können
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks>Der erste Wert des Arrays wird als Filter für OpenFile-Dialoge verwendet</remarks>
+    Public MustOverride ReadOnly Property DatensatzDateiendungen() As Collections.Specialized.StringCollection
+
     Public Datensatz As String                           'Name des zu simulierenden Datensatzes
-    Protected mDatensatzendung As String                 'Dateiendung des Datensatzes (inkl. Punkt)
-    Public ReadOnly Property Datensatzendung() As String
-        Get
-            Return Me.mDatensatzendung
-        End Get
-    End Property
+
     Public WorkDir_Current As String                     'aktuelles Arbeits-/Datensatzverzeichnis
     Public WorkDir_Original As String                    'Original-Arbeits-/Datensatzverzeichnis
 
@@ -929,50 +932,124 @@ Handler:
 
     'Datensätze für Multithreading kopieren
     '**************************************
-    Public Sub copyDatensatz(ByVal n_Proz As Integer)
+    Public Sub createThreadWorkDirs(ByVal n_Threads As Integer)
 
         Dim i As Integer = 1
-        'Dim j As Integer
+        Dim Source, Dest, relPaths() As String
+        Dim binPath As String = System.Windows.Forms.Application.StartupPath()
 
-        For i = 0 To n_Proz - 1
-            Dim Source As String = Me.WorkDir_Original
-            Dim Dest As String = System.Windows.Forms.Application.StartupPath() & "\Thread_" & i & "\"
+        Source = Me.WorkDir_Original
+        Dest = binPath & "\Thread_0\"
 
-            'Löschen um den Inhalt zu entsorgen
-            If Directory.Exists(Dest) Then
-                Call EVO.Common.FileHelper.purgeReadOnly(Dest)
-                Directory.Delete(Dest, True)
-            End If
+        'Alte Thread-Ordner löschen
+        Call Me.deleteThreadWorkDirs()
 
+        'zu kopierende Dateien bestimmen
+        relPaths = Me.getDatensatzFiles(Source)
+
+        'Dateien in Ordner Thread_0 kopieren
+        For Each relPath As String In relPaths
+            My.Computer.FileSystem.CopyFile(Source & relPath, Dest & relPath, True)
+        Next
+
+        'Für die weiteren Threads den Ordner Thread_0 kopieren
+        Source = binPath & "\Thread_0\"
+
+        For i = 1 To n_Threads - 1
+
+            Dest = binPath & "\Thread_" & i.ToString() & "\"
             My.Computer.FileSystem.CopyDirectory(Source, Dest, True)
-            Call EVO.Common.FileHelper.purgeReadOnly(Dest)
-            Call Directory.Delete(Dest & "\.svn", True)
 
         Next
 
     End Sub
 
-    'Datensätze für Multithreading löschen
-    '*************************************
-    Public Sub deleteDatensatz(ByVal n_Proz As Integer)
-        Dim i As Integer
-        For i = 1 To n_Proz
+    ''' <summary>
+    ''' Gibt die relativen Pfade aller Datensatz-Dateien zurück
+    ''' </summary>
+    ''' <param name="rootdirectory">Das zu durchsuchende Verzeichnis</param>
+    ''' <returns></returns>
+    Protected Function getDatensatzFiles(ByVal rootdirectory As String) As String()
 
-            If Directory.Exists(System.Windows.Forms.Application.StartupPath() & "\Thread_" & i) Then
-                Directory.Delete(System.Windows.Forms.Application.StartupPath() & "\Thread_" & i, True)
+        Dim Files() As IO.FileInfo
+        Dim DirInfo, Dirs() As IO.DirectoryInfo
+        Dim paths(), subpaths(), ext As String
+
+        If (rootdirectory.LastIndexOf("\") <> rootdirectory.Length - 1) Then
+            rootdirectory &= "\"
+        End If
+
+        ReDim paths(-1)
+
+        DirInfo = New IO.DirectoryInfo(rootdirectory)
+
+        'zu kopierende Dateien anhand der Dateiendung bestimmen
+        Files = DirInfo.GetFiles("*.*")
+        For Each File As IO.FileInfo In Files
+            'Dateiendung bestimmen
+            If (File.Extension.Length > 0) Then
+                ext = File.Extension.Substring(1).ToUpper()
+                'Prüfen, ob es sich ume eine zu kopierende Datei handelt
+                If (Me.DatensatzDateiendungen.Contains(ext)) Then
+                    'Relativen Pfad der Datei zu Array hinzufügen
+                    ReDim Preserve paths(paths.Length)
+                    paths(paths.Length - 1) = File.Name
+                End If
             End If
         Next
+
+        'Unterverzeichnisse rekursiv durchsuchen
+        Dirs = DirInfo.GetDirectories("*.*")
+        For Each dir As IO.DirectoryInfo In Dirs
+            '.svn-Verzeichnisse überspringen
+            If (dir.Name <> ".svn") Then
+                'Pfade aus Unterverzeichnis holen
+                subpaths = Me.getDatensatzFiles(dir.FullName)
+                'Pfade zu Array hinzufügen
+                For Each subpath As String In subpaths
+                    subpath = dir.Name & "\" & subpath
+                    ReDim Preserve paths(paths.Length)
+                    paths(paths.Length - 1) = subpath
+                Next
+            End If
+        Next
+
+        Return paths
+
+    End Function
+
+    ''' <summary>
+    ''' Datensätze für Multithreading löschen
+    ''' </summary>
+    ''' <remarks>löscht die Ordner Thread_0 bis Thread_9 im bin-Verzeichnis</remarks>
+    Public Sub deleteThreadWorkDirs()
+
+        Dim i As Integer
+        Dim dir As String
+
+        For i = 0 To 9
+
+            dir = System.Windows.Forms.Application.StartupPath() & "\Thread_" & i.ToString() & "\"
+
+            If Directory.Exists(dir) Then
+                Call EVO.Common.FileHelper.purgeReadOnly(dir)
+                Directory.Delete(dir, True)
+            End If
+        Next
+
     End Sub
 
-    'Gibt den aktuellen Datensatz zurück
-    '***********************************
-    Public Function getWorkDir(ByVal Thread_ID As Integer) As String
+    ''' <summary>
+    ''' Gibt den Datensatz Ordner eines Threads zurück
+    ''' </summary>
+    ''' <param name="Thread_ID"></param>
+    Public Function getThreadWorkDir(ByVal Thread_ID As Integer) As String
 
-        getWorkDir = ""
+        Dim dir As String
 
-        getWorkDir = System.Windows.Forms.Application.StartupPath() & "\Thread_" & Thread_ID & "\"
+        dir = System.Windows.Forms.Application.StartupPath() & "\Thread_" & Thread_ID.ToString() & "\"
 
-        Return getWorkDir
+        Return dir
 
     End Function
 

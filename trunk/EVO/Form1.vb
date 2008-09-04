@@ -335,12 +335,12 @@ Partial Class Form1
         Dim pfad As String
 
         'Dialog vorbereiten
-        OpenFileDialog1.Filter = Sim1.Datensatzendung.Substring(1) & "-Dateien (*" & Sim1.Datensatzendung & ")|*" & Sim1.Datensatzendung
+        OpenFileDialog1.Filter = Sim1.DatensatzDateiendungen(0) & "-Dateien (*." & Sim1.DatensatzDateiendungen(0) & ")|*." & Sim1.DatensatzDateiendungen(0)
         OpenFileDialog1.Title = "Datensatz auswählen"
 
         'Alten Datensatz dem Dialog zuweisen
         OpenFileDialog1.InitialDirectory = Sim1.WorkDir_Original
-        OpenFileDialog1.FileName = Sim1.WorkDir_Original & Sim1.Datensatz & Sim1.Datensatzendung
+        OpenFileDialog1.FileName = Sim1.WorkDir_Original & Sim1.Datensatz & "." & Sim1.DatensatzDateiendungen(0)
 
         'Dialog öffnen
         DiagResult = OpenFileDialog1.ShowDialog()
@@ -950,7 +950,7 @@ Partial Class Form1
 
         'Datensätze für Multithreading kopieren
         If n_Threads > 1 Then
-            Call Sim1.copyDatensatz(n_Threads)
+            Call Sim1.createThreadWorkDirs(n_Threads)
         End If
 
         'CES initialisieren
@@ -1022,7 +1022,7 @@ Partial Class Form1
                 (Child_Ready + n_Threads > Child_Run) And Me.ispause = False Then
 
                     durchlauf_all += 1
-                    Sim1.WorkDir_Current = Sim1.getWorkDir(Thread_Free)
+                    Sim1.WorkDir_Current = Sim1.getThreadWorkDir(Thread_Free)
                     CES1.Childs(Child_Run).ID = durchlauf_all
 
                     '****************************************
@@ -1048,7 +1048,7 @@ Partial Class Form1
                     '--------------------------------------
                 ElseIf Sim1.launchReady(Thread_Ready, SIM_Eval_is_OK, Child_Ready) Then
 
-                    Sim1.WorkDir_Current = Sim1.getWorkDir(Thread_Ready)
+                    Sim1.WorkDir_Current = Sim1.getThreadWorkDir(Thread_Ready)
                     If SIM_Eval_is_OK Then Sim1.SIM_Ergebnis_auswerten(CES1.Childs(Child_Ready))
 
                     'HYBRID: Speichert die PES Erfahrung diesen Childs im PES Memory
@@ -1185,7 +1185,7 @@ Partial Class Form1
 
         'Datensätze für Multithreading löschen
         '*************************************
-        Call Sim1.deleteDatensatz(n_Threads)
+        Call Sim1.deleteThreadWorkDirs()
 
     End Sub
 
@@ -1559,7 +1559,7 @@ Partial Class Form1
 
         'Datensätze für Multithreading kopieren (nur Sim-Anwendungen)
         If (Me.Anwendung <> ANW_TESTPROBLEME And n_Threads > 1) Then
-            Call Sim1.copyDatensatz(n_Threads)
+            Call Sim1.createThreadWorkDirs(n_Threads)
         End If
 
         'Diagramm vorbereiten und initialisieren
@@ -1674,7 +1674,7 @@ Start_Evolutionsrunden:
                             If Sim1.launchFree(Thread_Free) And Child_Run < EVO_Einstellungen1.Settings.PES.n_Nachf _
                             And (Child_Ready + n_Threads > Child_Run) And Me.ispause = False Then
 
-                                Sim1.WorkDir_Current = Sim1.getWorkDir(Thread_Free)
+                                Sim1.WorkDir_Current = Sim1.getThreadWorkDir(Thread_Free)
 
                                 Call Sim1.PREPARE_Evaluation_PES(ind(Child_Run).OptParameter)
 
@@ -1688,7 +1688,7 @@ Start_Evolutionsrunden:
                                 '--------------------------------------
                             ElseIf Sim1.launchReady(Thread_Ready, SIM_Eval_is_OK, Child_Ready) = True And SIM_Eval_is_OK Then
 
-                                Sim1.WorkDir_Current = Sim1.getWorkDir(Thread_Ready)
+                                Sim1.WorkDir_Current = Sim1.getThreadWorkDir(Thread_Ready)
                                 Sim1.SIM_Ergebnis_auswerten(ind(Child_Ready))
 
                                 'Lösung zeichnen und Dn ausgeben
@@ -1752,7 +1752,7 @@ Start_Evolutionsrunden:
                                 'Parameter aus PES ins Individuum kopieren
                                 ind(Child_False(i)).OptParameter = EVO.Common.OptParameter.Clone_Array(PES1.EsGetParameter())
 
-                                Sim1.WorkDir_Current = Sim1.getWorkDir(0)
+                                Sim1.WorkDir_Current = Sim1.getThreadWorkDir(0)
                                 Call Sim1.PREPARE_Evaluation_PES(ind(Child_False(i)).OptParameter)
 
                                 SIM_Eval_is_OK = Sim1.launchSim(0, Child_False(i))
