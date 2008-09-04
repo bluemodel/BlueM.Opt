@@ -5,13 +5,29 @@ Public Class Scan
 
     Private input As Wave.WEL
 
+    ''' <summary>
+    ''' Alle Dateiendungen (ohne Punkt), die in einem Datensatz vorkommen können
+    ''' </summary>
+    ''' <remarks>Der erste Wert des Arrays wird als Filter für OpenFile-Dialoge verwendet</remarks>
+    Public Overrides ReadOnly Property DatensatzDateiendungen() As Collections.Specialized.StringCollection
+        Get
+            Dim exts As Collections.Specialized.StringCollection = New Collections.Specialized.StringCollection()
+
+            exts.AddRange(New String() {"ALL", "WEL"})
+
+            'TODO: Dateiendungen für SCAN-Datensatz
+
+            Return exts
+
+        End Get
+    End Property
+
+
     'Konstruktor
     '***********
     Public Sub New()
 
         Call MyBase.New()
-
-        Me.mDatensatzendung = ".ALL"
 
     End Sub
 

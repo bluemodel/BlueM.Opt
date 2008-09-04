@@ -22,12 +22,26 @@ Imports System.IO
 Public Class SWMM
     Inherits Sim
 
-#Region "Eigenschaften"
+#Region "Properties"
 
-    'Eigenschaften
-    '#############
+    ''' <summary>
+    ''' Alle Dateiendungen (ohne Punkt), die in einem Datensatz vorkommen können
+    ''' </summary>
+    ''' <remarks>Der erste Wert des Arrays wird als Filter für OpenFile-Dialoge verwendet</remarks>
+    Public Overrides ReadOnly Property DatensatzDateiendungen() As Collections.Specialized.StringCollection
+        Get
+            Dim exts As Collections.Specialized.StringCollection = New Collections.Specialized.StringCollection()
 
-#End Region 'Eigenschaften
+            exts.AddRange(New String() {"INP"})
+
+            'TODO: Dateiendungen für SWMM-Datensatz
+
+            Return exts
+
+        End Get
+    End Property
+
+#End Region 'Properties
 
 
 #Region "Methoden"
@@ -37,8 +51,6 @@ Public Class SWMM
     Public Sub New()
 
         Call MyBase.New()
-
-        Me.mDatensatzendung = ".INP"
 
     End Sub
 

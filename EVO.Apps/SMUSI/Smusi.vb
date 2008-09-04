@@ -1,5 +1,5 @@
 Imports System.IO
-imports ihwb.SMUSI.DllAdapter
+Imports IHWB.SMUSI.DllAdapter
 
 '*******************************************************************************
 '*******************************************************************************
@@ -26,8 +26,29 @@ Public Class Smusi
     '---------
     Private smusi_dll As SMUSI_EngineDotNetAccess
 
-
 #End Region 'Eigenschaften
+
+#Region "Properties"
+
+    ''' <summary>
+    ''' Alle Dateiendungen (ohne Punkt), die in einem Datensatz vorkommen können
+    ''' </summary>
+    ''' <remarks>Der erste Wert des Arrays wird als Filter für OpenFile-Dialoge verwendet</remarks>
+    Public Overrides ReadOnly Property DatensatzDateiendungen() As Collections.Specialized.StringCollection
+        Get
+            Dim exts As Collections.Specialized.StringCollection = New Collections.Specialized.StringCollection()
+
+            exts.AddRange(New String() {"ALL"})
+
+            'TODO: Dateiendungen für SMUSI-Datensatz
+
+            Return exts
+
+        End Get
+    End Property
+
+
+#End Region 'Properties
 
 #Region "Methoden"
 
@@ -39,8 +60,6 @@ Public Class Smusi
     Public Sub New()
 
         Call MyBase.New()
-
-        Me.mDatensatzendung = ".ALL"
 
     End Sub
 
