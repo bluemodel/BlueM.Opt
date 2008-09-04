@@ -4,7 +4,7 @@
 
     Private optparas() As Double   'Gene/Optimierungsparameter des Individuums
     Private Generator As String  'von welchem Algorithmus das Individuum gemacht wurde
-    Private IPWorker As String  'Welcher Rechner diesen Client berechnen soll
+    Private Client As String  'Welcher Rechner dieses Individuum berechnen soll [ip oder Rechnername]
 
     '### Initialisierung
     Public Sub New(ByVal type As String, ByVal id As Integer)
@@ -64,14 +64,14 @@
     End Function
 
     'IPWorker setzen
-    Public Function set_IPWorker(ByVal IPWorker_input As String)
-        Me.IPWorker = IPWorker_input
+    Public Function set_Client(ByVal Client_input As String)
+        Me.Client = Client_input
         Return True
     End Function
 
     'IPWorker auslesen
-    Public Function get_IPWorker() As String
-        Return Me.IPWorker
+    Public Function get_Client() As String
+        Return Me.Client
     End Function
 
 End Class

@@ -12,45 +12,42 @@ namespace IHWB.EVO.HybridAlgo
         //### Variablen ###
         MySqlConnection mycon;
         MySqlCommand myCommand;
-        MySqlDataReader myReader;
-
-        EVO.Common.Individuum_MetaEvo individuum;
-        EVO.Common.EVO_Settings settings;
+        MySqlDataReader myReader;       
 
         int number_optparas;
         int number_constraints;  //Anzahl constraints
         int number_features;    //Anzahl Featurefunktionswerte (inkl. Penalties)
 
+        int[,] calctimes;   //Scheduling-Tabelle
+
         //### Konstruktor ###
         public Networkmanager(ref EVO.Common.Individuum_MetaEvo individuum_input, ref EVO.Common.EVO_Settings settings_input)
         {
-            this.individuum = individuum_input;
-            number_optparas = individuum.get_optparas().Length;
-            number_constraints = individuum.Constraints.Length; 
-            number_features = individuum.Features.Length;  
+            number_optparas = individuum_input.get_optparas().Length;
+            number_constraints = individuum_input.Constraints.Length;
+            number_features = individuum_input.Features.Length;
 
-            this.settings = settings_input;
             myCommand = new MySqlCommand();
 
             //Server
-            if (this.settings.MetaEvo.Role == "Network Server")
+            if (settings_input.MetaEvo.Role == "Network Server")
             {
-                mycon = new MySqlConnection("datasource=" + settings.MetaEvo.MySQL_Host + ";username=" + settings.MetaEvo.MySQL_User + ";password=" + settings.MetaEvo.MySQL_Password + ";database=information_schema");
+                mycon = new MySqlConnection("datasource=" + settings_input.MetaEvo.MySQL_Host + ";username=" + settings_input.MetaEvo.MySQL_User + ";password=" + settings_input.MetaEvo.MySQL_Password + ";database=information_schema");
                 myCommand.Connection = mycon;
 
-                if (this.check_connection())
+                if (this.DB_check_connection())
                 {
-                    database_init();  //Inklusive Server-Entry
+                    DB_init(ref settings_input);  //Inklusive Server-Entry
                 }
             }
             // Client
             else
             {
-                mycon = new MySqlConnection("datasource=" + settings.MetaEvo.MySQL_Host + ";username=" + settings.MetaEvo.MySQL_User + ";password=" + settings.MetaEvo.MySQL_Password + ";database=" + settings.MetaEvo.MySQL_Database);
+                mycon = new MySqlConnection("datasource=" + settings_input.MetaEvo.MySQL_Host + ";username=" + settings_input.MetaEvo.MySQL_User + ";password=" + settings_input.MetaEvo.MySQL_Password + ";database=" + settings_input.MetaEvo.MySQL_Database);
                 myCommand.Connection = mycon;
-                if (this.check_connection())
+                if (this.DB_check_connection())
                 {
-                    client_entry();
+                    DB_client_entry();
                 }
             }
         }
@@ -60,7 +57,7 @@ namespace IHWB.EVO.HybridAlgo
         //### Methoden ### Initialisierung
 
         //Verbindung zur DB prüfen bzw. Fehler ausgeben
-        private bool check_connection()
+        private bool DB_check_connection()
         {
             try
             {
@@ -76,16 +73,16 @@ namespace IHWB.EVO.HybridAlgo
         }
 
         //Datenbank erzeugen
-        private void database_init()   
+        private void DB_init(ref EVO.Common.EVO_Settings settings_input)   
         {
             //Datenbank
-            myCommand.CommandText = "CREATE DATABASE IF NOT EXISTS " + settings.MetaEvo.MySQL_Database;
+            myCommand.CommandText = "CREATE DATABASE IF NOT EXISTS " + settings_input.MetaEvo.MySQL_Database;
             myCommand.Connection.Open();
             myCommand.ExecuteNonQuery();
             myCommand.Connection.Close();
 
             //Wechseln in neue Datenbank
-            myCommand.Connection.ConnectionString = "datasource=" + settings.MetaEvo.MySQL_Host + ";username=" + settings.MetaEvo.MySQL_User + ";password=" + settings.MetaEvo.MySQL_Password + ";database=" + settings.MetaEvo.MySQL_Database;
+            myCommand.Connection.ConnectionString = "datasource=" + settings_input.MetaEvo.MySQL_Host + ";username=" + settings_input.MetaEvo.MySQL_User + ";password=" + settings_input.MetaEvo.MySQL_Password + ";database=" + settings_input.MetaEvo.MySQL_Database;
 
             //benötigte Tabellen: "metaevo_network" 
             myCommand.CommandText = "DROP TABLE IF EXISTS `metaevo_network`;";
@@ -132,7 +129,7 @@ namespace IHWB.EVO.HybridAlgo
         }
 
         //sich als Client in DB eintragen
-        private void client_entry() {
+        private void DB_client_entry() {
             //Eintrag für Client
             myCommand.CommandText = "INSERT INTO `metaevo_network` (`ipName`, `type`, `status`, `timestamp`, `speed-index`, `lowest speed`) VALUES ('" + Dns.GetHostName() + "', 'client', 'ready', '', '0', '0');";
             myCommand.Connection.Open();
@@ -140,19 +137,19 @@ namespace IHWB.EVO.HybridAlgo
             myCommand.Connection.Close();
         }
 
-        //Datenbank löschen
-        public void database_delete()
+        //Individuum-Datenbank säubern
+        private void DB_ClearIndividuumsTable()
         {
-            myCommand.CommandText = "DROP DATABASE IF EXISTS " + settings.MetaEvo.MySQL_Database;
+            myCommand.CommandText = "TRUNCATE TABLE `metaevo_individuums`";
             myCommand.Connection.Open();
             myCommand.ExecuteNonQuery();
             myCommand.Connection.Close();
         }
 
-        //Individuum-Datenbank säubern
-        public void ClearIndividuumsTable()
+        //Datenbank löschen
+        private void DB_delete(ref EVO.Common.EVO_Settings settings_input)
         {
-            myCommand.CommandText = "TRUNCATE TABLE `metaevo_individuums`";
+            myCommand.CommandText = "DROP DATABASE IF EXISTS " + settings_input.MetaEvo.MySQL_Database;
             myCommand.Connection.Open();
             myCommand.ExecuteNonQuery();
             myCommand.Connection.Close();
@@ -163,10 +160,10 @@ namespace IHWB.EVO.HybridAlgo
         //### Methoden ### Working Process -> Individuums 
 
         //Individuen in die Datenbank einfügen (ID, optparas, ipName)
-        public void IndividuumsWriteToDB(EVO.Common.Individuum_MetaEvo[] generation_input)
+        public void Individuums_WriteToDB(EVO.Common.Individuum_MetaEvo[] generation_input)
         {
-            //Scheduling-Tabelle bearbeiten
-
+            //Alte Individuen aus DB löschen
+            this.DB_ClearIndividuumsTable();
 
             //Schreiben der Individuen-Daten in die DB (alle gleichzeitig)
             string tmptxt = "INSERT INTO `metaevo_individuums` (`id` ,`status` ,";
@@ -187,7 +184,7 @@ namespace IHWB.EVO.HybridAlgo
                 {
                     tmptxt = tmptxt + generation_input[j].get_optparas()[k] + ",";
                 }
-                tmptxt = tmptxt + ", " + generation_input[j].get_IPWorker() + "),";
+                tmptxt = tmptxt + ", " + generation_input[j].get_Client() + "),";
             }
             tmptxt = tmptxt.TrimEnd(',') + ";";
 
@@ -198,7 +195,7 @@ namespace IHWB.EVO.HybridAlgo
         }
         
         //nächstes eigenes Individuum aus der DB lesen (constraints, features, ipName)
-        public EVO.Common.Individuum_MetaEvo IndividuumReadFromDB()
+        public EVO.Common.Individuum_MetaEvo Individuum_ReadFromDB()
         {
             myCommand = new MySqlCommand("Select * from metaevo_individuums WHERE ipName = " + Dns.GetHostName() + " LIMIT 1", mycon);
             mycon.Open();
@@ -213,7 +210,7 @@ namespace IHWB.EVO.HybridAlgo
 
             while (myReader.Read())
             {
-                individuum.ID = myReader.GetInt32(ExportPosition);
+                individuumnew.ID = myReader.GetInt32(ExportPosition);
                 ExportPosition += (this.number_optparas + 2); //Optparameter überspringen
 
                 for (int k = 1; k <= number_constraints; k++)
@@ -227,26 +224,26 @@ namespace IHWB.EVO.HybridAlgo
                     ExportPosition++;
                 }
             }
-            individuum.Constraints = constraints;
-            individuum.Features = features;
+            individuumnew.Constraints = constraints;
+            individuumnew.Features = features;
 
             myReader.Close();
             mycon.Close();
 
             //Individuum in der DB als "calculate" markieren
-            myCommand.CommandText = "UPDATE `metaevo_individuums`  SET `status` = 'calculate' WHERE `id` = " + individuum.ID + " LIMIT 1 ;";
+            myCommand.CommandText = "UPDATE `metaevo_individuums`  SET `status` = 'calculate' WHERE `id` = " + individuumnew.ID + " LIMIT 1 ;";
             myCommand.Connection.Open();
             myCommand.ExecuteNonQuery();
             myCommand.Connection.Close();
 
             //Client in der DB als "claculating" markieren
-            this.StatusSetInDB(Dns.GetHostName(), "calculating");
+            this.Status_SetInDB(Dns.GetHostName(), "calculating");
 
-            return individuum;
+            return individuumnew;
         }
 
-        //Bekanntes Individuum updaten (constraints, features, ipName)
-        public void IndividuumUpdateInDB(EVO.Common.Individuum_MetaEvo individuum_input)
+        //Bekanntes Individuum in DB updaten (constraints, features, ipName)
+        public void Individuum_UpdateInDB(ref EVO.Common.Individuum_MetaEvo individuum_input)
         {
             //Individuum in DB updaten (Daten und Status auf "ready")
             string tmptxt = "UPDATE `metaevo_individuums` SET ";
@@ -259,8 +256,8 @@ namespace IHWB.EVO.HybridAlgo
             {
                 tmptxt = tmptxt + "feat" + k + " = " + individuum_input.Features[k] + ", ";
             }
-            tmptxt = tmptxt + "ipName = " + individuum_input.get_IPWorker() + " ";
-            tmptxt = tmptxt + "WHERE `id` = " + individuum.ID + "LIMIT 1 ;"; ;
+            tmptxt = tmptxt + "ipName = " + individuum_input.get_Client() + " ";
+            tmptxt = tmptxt + "WHERE `id` = " + individuum_input.ID + "LIMIT 1 ;"; ;
 
             myCommand.CommandText = tmptxt;
             myCommand.Connection.Open();
@@ -268,7 +265,7 @@ namespace IHWB.EVO.HybridAlgo
             myCommand.Connection.Close();
 
             //Client in DB als "standby" markieren
-            this.StatusSetInDB(Dns.GetHostName(), "standby");
+            this.Status_SetInDB(Dns.GetHostName(), "standby");
         }
       
 
@@ -276,7 +273,7 @@ namespace IHWB.EVO.HybridAlgo
         //### Methoden ### Working Process -> Client/Server Status 
          
         //Status eines Clients/Servers setzen
-        public void StatusSetInDB(string ipName, string status)
+        public void Status_SetInDB(string ipName, string status)
         {
             myCommand.CommandText = "UPDATE `metaevo_network` SET `status` = '" + status + "' WHERE `ipName` = " + ipName + " LIMIT 1;";
             myCommand.Connection.Open();
@@ -284,8 +281,8 @@ namespace IHWB.EVO.HybridAlgo
             myCommand.Connection.Close();
         }
         
-        //Status von Clients lesen // Rückgabe stringarray[ipName][status,timestamp,speed-index,lowest speed]
-        public string[,] StatusReadClients()
+        //Status von Clients lesen // Rückgabe stringarray[#clients][ipName,status,timestamp,speed-index,lowest speed]
+        public string[,] Status_ReadClients()
         {
             myCommand = new MySqlCommand("Select * from metaevo_network WHERE type = client", mycon);
             mycon.Open();
@@ -310,8 +307,8 @@ namespace IHWB.EVO.HybridAlgo
             return back;
         }
 
-        //Status von Server lesen // Rückgabe stringarray[status, timestamp]
-        public string[] StatusReadServer()
+        //Status von Server lesen // Rückgabe stringarray[1][status, timestamp]
+        public string[] Status_ReadServer()
         {
             myCommand = new MySqlCommand("Select status, timestamp from metaevo_network WHERE type = server LIMIT 1", mycon);
             mycon.Open();
@@ -334,7 +331,79 @@ namespace IHWB.EVO.HybridAlgo
 
         //### Methoden ### Working Process -> Scheduling
 
+        //Scheduling
+        private int scheduling(ref EVO.Common.Individuum_MetaEvo[] generation_input, string modus_input)
+        {
+            int current_ind = 0;
+            
+            //Statustabelle der Clients aus DB
+            string[,] status_clients = this.Status_ReadClients();
 
-        //
+            //Falls Modus = "new" 
+            if (modus_input == "new")
+            {
+                //Tabelle anlegen [#clients][momentane Summe der Berechnungszeiten, speed-index (-1 = defekt)]
+                calctimes = new int[status_clients.Length, 2];
+                for (int j = 0; j < status_clients.Length; j++)
+                {
+                    if (status_clients[j, 1] == "error") calctimes[j, 1] = -1;
+                    else calctimes[j, 1] = Convert.ToInt32(status_clients[j, 3]);
+                }
+            }
+
+            //Falls Modus = "continue"
+            else
+            {
+                //Vergleich ob neue Clients in DB, ggf SchedTabelle vergrössern (defekte Clients bleiben in der Tabelle !!)
+                if (status_clients.Length != calctimes.Length)
+                {
+                    int[,] tmp = calctimes;
+                    calctimes = new int[status_clients.Length, 2];
+                    for (int k = 0; k < tmp.Length; k++)
+                    {
+                        calctimes[k, 0] = tmp[k, 0];
+                        calctimes[k, 1] = tmp[k, 1];
+                    }
+                }
+            }
+            
+
+            //Scheduling berechnen
+            //  Für jedes Individuum
+            for (int k = 0; k < generation_input.Length; k++)
+            {
+                current_ind = 0;
+                //  Alle Clients durchgehen
+                for (int j = 1; j < status_clients.Length; j++)
+                {
+                    if (calctimes[j, 1] > -1) //falls Individuum funktioniert
+                    {
+                        if ((calctimes[j, 0] + calctimes[j, 1]) < (calctimes[current_ind, 0] + calctimes[current_ind, 1]))
+                        {
+                            current_ind = j;
+                        }
+                    }
+                }
+                //In der Hilfstabelle Zeiten addieren
+                calctimes[current_ind, 0] += calctimes[current_ind, 1];
+                //Dem Individuum den Client(=IPWorker) zuweisen
+                generation_input[k].set_Client(status_clients[current_ind,0]);
+            }
+
+            //Rückgabewert = Dauer bis erster Client fertig
+            current_ind = 0;
+
+            for (int j = 1; j < calctimes.Length; j++)
+            {
+                if (calctimes[j, 1] > 0) //falls Individuum funktioniert
+                {
+                    if (calctimes[j, 0] < calctimes[current_ind, 0])
+                    {
+                        current_ind = j;
+                    }
+                }
+            }
+            return calctimes[current_ind,0];
+        }
     }
 }
