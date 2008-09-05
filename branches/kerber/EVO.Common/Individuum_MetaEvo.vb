@@ -43,9 +43,10 @@
     Public Function set_optparas(ByVal optparas_input As Double())
         Dim i As Integer
 
-        For i = 0 To optparas_input.Length - 1
-            Me.optparas(i) = optparas_input(i)
-        Next
+        Me.optparas = optparas_input
+        'For i = 0 To optparas_input.Length - 1
+        'Me.optparas(i) = optparas_input(i)
+        'Next
 
         Return True
     End Function

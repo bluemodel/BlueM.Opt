@@ -13,6 +13,8 @@ namespace IHWB.EVO.HybridAlgo
         EVO.Diagramm.Hauptdiagramm hauptdiagramm1;
 
         Networkmanager networkmanager;
+        EVO.Common.Individuum_MetaEvo individuumForClient;
+
         string role;
         EVO.Common.Individuum_MetaEvo[] generation;
         int individuumnumber;
@@ -25,35 +27,53 @@ namespace IHWB.EVO.HybridAlgo
             this.settings = settings_input;
             this.hauptdiagramm1 = hauptdiagramm_input;
 
-            this.role = this.settings.MetaEvo.Role; 
+            this.role = this.settings.MetaEvo.Role;
 
-            //Initialisieren des Individuum-Arrays
-            individuumnumber = 0;
-            generation = new EVO.Common.Individuum_MetaEvo[this.settings.MetaEvo.PopulationSize];
-                //Setzen des Problems zum Design des Individuums
+            //Setzen des Problems zum Design des Individuums
             EVO.Common.Individuum_MetaEvo.Initialise(ref prob_input);
-                //Füllen des Arrays
-            for (int j = 0; j < this.settings.MetaEvo.PopulationSize; j++) 
-            {
-                generation[j] = new IHWB.EVO.Common.Individuum_MetaEvo("MetaEvo", individuumnumber, prob_input.List_OptParameter.Length);
-                individuumnumber++;
-            }
-                //Zufällige Parents setzen
-            set_random_adults();
+            individuumnumber = 0;
 
-
-            //Ausführen des Hauptprogramms (Single PC, Network Server, Network Client)
             switch (this.role)
             {
                 case "Single PC":
+                    //### Vorbereitung ###
+                    //Initialisieren des Individuum-Arrays
+                    generation = new EVO.Common.Individuum_MetaEvo[this.settings.MetaEvo.PopulationSize];
+                    for (int j = 0; j < this.settings.MetaEvo.PopulationSize; j++)
+                    {
+                        generation[j] = new EVO.Common.Individuum_MetaEvo("MetaEvo", individuumnumber, prob_input.List_OptParameter.Length);
+                        individuumnumber++;
+                    }
+                    //Zufällige Parents setzen
+                    set_random_adults();
+
+                    //### Hauptprogramm ###
                     start_single_pc();
                     break;
+
                 case "Network Server":
+                    //### Vorbereitung ###
+                    //Initialisieren des Individuum-Arrays
+                    generation = new EVO.Common.Individuum_MetaEvo[this.settings.MetaEvo.PopulationSize];
+                    for (int j = 0; j < this.settings.MetaEvo.PopulationSize; j++)
+                    {
+                        generation[j] = new IHWB.EVO.Common.Individuum_MetaEvo("MetaEvo", individuumnumber, prob_input.List_OptParameter.Length);
+                        individuumnumber++;
+                    }
+                    //Zufällige Parents setzen
+                    set_random_adults();
+
+                    //### Hauptprogramm ###
                     networkmanager = new Networkmanager(ref this.generation[0], ref this.settings); 
                     start_network_server();
                     break;
+
                 case "Network Client":
-                    networkmanager = new Networkmanager(ref this.generation[0], ref this.settings); 
+                    //### Vorbereitung ###
+                    individuumForClient = new EVO.Common.Individuum_MetaEvo("MetaEvo", individuumnumber, prob_input.List_OptParameter.Length);
+
+                    //### Hauptprogramm ###
+                    networkmanager = new Networkmanager(ref this.individuumForClient, ref this.settings); 
                     start_network_client();
                     break;
             }  
@@ -98,8 +118,10 @@ namespace IHWB.EVO.HybridAlgo
         // Network Server
         private void start_network_server()
         {
-            MessageBox.Show("Network Server wird ausgeführt");
-            networkmanager.Individuums_WriteToDB(generation);
+            MessageBox.Show("Network Server: ");
+            networkmanager.Individuums_WriteToDB(ref generation);
+            networkmanager.Status_SetInDB("Gigamachine", "teststatus");
+            MessageBox.Show("Network Server: "+ networkmanager.Status_ReadServer()[1]+ " "+ networkmanager.Status_ReadServer()[0]);
             /*
             ++ Server-Status "generate Individuums"
 	            Server liest Individuen von DB
@@ -148,6 +170,8 @@ namespace IHWB.EVO.HybridAlgo
         private void start_network_client()
         {
             MessageBox.Show("Network Client wird ausgeführt");
+            networkmanager.Individuum_ReadFromDB_Client(ref individuumForClient);
+            MessageBox.Show("Individuum: " + individuumForClient.get_optparas()[3]);
             /*
             ++ Client Status "ready"
 	            Server-Status lesen -> Abbruch-Kriterium für Clients möglich
