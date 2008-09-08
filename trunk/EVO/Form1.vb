@@ -981,6 +981,10 @@ Partial Class Form1
         'Hier werden dem Child die passenden Massnahmen und deren Elemente pro Location zugewiesen
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         For i_ch = 0 To CES1.mSettings.CES.n_Childs - 1
+            'Das Dn wird gesetzt
+            If EVO_Einstellungen1.Settings.PES.Schrittweite.is_DnVektor = False Then
+                CES1.Childs(i_ch).CES_Dn = EVO_Einstellungen1.Settings.PES.Schrittweite.DnStart
+            End If
             For i_loc = 0 To CES1.ModSett.n_Locations - 1
                 Call Sim1.Identify_Measures_Elements_Parameters(i_loc, CES1.Childs(i_ch).Path(i_loc), CES1.Childs(i_ch).Measures(i_loc), CES1.Childs(i_ch).Loc(i_loc).Loc_Elem, CES1.Childs(i_ch).Loc(i_loc).PES_OptPara)
             Next
@@ -1215,6 +1219,14 @@ Partial Class Form1
         'xxxxxxxxx
         For i_ch = 0 To CES1.Childs.GetUpperBound(0)
 
+            'Das Dn des Child mutieren
+            If EVO_Einstellungen1.Settings.PES.Schrittweite.is_DnVektor = False Then
+                Dim PESX As EVO.Kern.PES
+                PESX = New EVO.Kern.PES
+                Call PESX.PesInitialise(EVO_Einstellungen1.Settings, Me.mProblem)
+                CES1.Childs(i_ch).CES_Dn = PESX.CES_Dn_Mutation(CES1.Childs(i_ch).CES_Dn)
+            End If
+
             'Ermittelt fuer jedes Child den PES Parent Satz (PES_Parents ist das Ergebnis)
             Call CES1.Memory_Search_per_Child(CES1.Childs(i_ch))
 
@@ -1284,7 +1296,7 @@ Partial Class Form1
                             Next
 
                             'Startet die Prozesse evolutionstheoretischen Prozesse nacheinander
-                            Call PES1.EsReproMut(EVO_Einstellungen1.Settings.CES.is_PopMutStart)
+                            Call PES1.EsReproMut(CES1.Childs(i_ch).CES_Dn, EVO_Einstellungen1.Settings.CES.is_PopMutStart)
 
                             'Auslesen der Variierten Parameter
                             CES1.Childs(i_ch).Loc(i_loc).PES_OptPara = EVO.Common.OptParameter.Clone_Array(PES1.EsGetParameter())

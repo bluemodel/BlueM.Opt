@@ -1,6 +1,8 @@
 ﻿Public Class Individuum_CES
     Inherits Individuum
 
+    Public CES_Dn As Double                '02 Dn fuer CES um den Schrittweitenvektor zu verhindern
+
     Public Path() As Integer               '03 Der Pfad
     Public mutated As Boolean              '06 Gibt an ob der Wert bereits mutiert ist oder nicht
 
@@ -185,6 +187,9 @@
         '-----------------------------------------
         Dim i, j As Integer
 
+        'Das Dn auf minus zur Kontrolle
+        CES_Dn = -1
+
         'Der Pfad - zur Kontrolle wird falscher Pfad gesetzt
         ReDim Me.Path(Individuum.mProblem.NumLocations - 1)
         For j = 0 To Me.Path.GetUpperBound(0)
@@ -231,6 +236,9 @@
         Dim i, j As Integer
 
         Dim Dest As New Individuum_CES(Me.mType, Me.ID)
+
+        'Dn Wert
+        Dest.CES_Dn = Me.CES_Dn
 
         'Feature-Werte
         Call Array.Copy(Me.Features, Dest.Features, Me.Features.Length)
