@@ -2369,8 +2369,8 @@ Start_Evolutionsrunden:
                 Continue For
             End If
 
-            'Individuum in Sim evaluieren
-            isOK = Sim1.Evaluate(ind)
+            'Individuum in Sim evaluieren (ohne in DB zu speichern)
+            isOK = Sim1.Evaluate(ind, False)
 
             'TODO: Simulationsfehler abfangen!
 

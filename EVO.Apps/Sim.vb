@@ -312,8 +312,9 @@ Public MustInherit Class Sim
     ''' Evaluiert ein Individuum
     ''' </summary>
     ''' <param name="ind">das zu evaluierende Individuum</param>
+    ''' <param name="storeInDB">Ob Individuum in OptResult-DB gespeichert werden soll</param>
     ''' <returns>True wenn erfolgreich, False wenn fehlgeschlagen</returns>
-    Public Overloads Function Evaluate(ByRef ind As EVO.Common.Individuum) As Boolean
+    Public Overloads Function Evaluate(ByRef ind As EVO.Common.Individuum, Optional ByVal storeInDB As Boolean = True) As Boolean
 
         Dim isOK As Boolean
 
