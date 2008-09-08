@@ -309,10 +309,10 @@ Public MustInherit Class Sim
 #Region "Evaluierung"
 
     ''' <summary>
-    ''' Evaluiert ein Individuum
+    ''' Evaluiert ein Individuum. Durchläuft alle Schritte vom Schreiben der Modellparameter bis zum Berechnen der Features.
     ''' </summary>
     ''' <param name="ind">das zu evaluierende Individuum</param>
-    ''' <param name="storeInDB">Ob Individuum in OptResult-DB gespeichert werden soll</param>
+    ''' <param name="storeInDB">Ob das Individuum in OptResult-DB gespeichert werden soll</param>
     ''' <returns>True wenn erfolgreich, False wenn fehlgeschlagen</returns>
     Public Overloads Function Evaluate(ByRef ind As EVO.Common.Individuum, Optional ByVal storeInDB As Boolean = True) As Boolean
 
@@ -354,18 +354,19 @@ Public MustInherit Class Sim
 
         'Simulationsergebnis einlesen und verarbeiten
         '--------------------------------------------
-        Call Me.SIM_Ergebnis_auswerten(ind)
+        Call Me.SIM_Ergebnis_auswerten(ind, storeInDB)
 
         Return isOK
 
     End Function
 
     ''' <summary>
-    ''' Evaluiert ein Array von Individuen
+    ''' Evaluiert ein Array von Individuen. Durchläuft alle Schritte vom Schreiben der Modellparameter bis zum Berechnen der Features.
     ''' </summary>
     ''' <param name="inds">Ein Array von zu evaluierenden Individuen</param>
+    ''' <param name="storeInDB">Ob das Individuum in OptResult-DB gespeichert werden soll</param>
     ''' <returns>True/False für jedes Individuum</returns>
-    Public Overloads Function Evaluate(ByRef inds() As EVO.Common.Individuum) As Boolean()
+    Public Overloads Function Evaluate(ByRef inds() As EVO.Common.Individuum, Optional ByVal storeInDB As Boolean = True) As Boolean()
 
         Dim i As Integer
         Dim isOK() As Boolean
@@ -373,7 +374,7 @@ Public MustInherit Class Sim
         ReDim isOK(inds.GetUpperBound(0))
 
         For i = 0 To inds.GetUpperBound(0)
-            isOK(i) = Me.Evaluate(inds(i))
+            isOK(i) = Me.Evaluate(inds(i), storeInDB)
         Next
 
         Return isOK
@@ -400,9 +401,13 @@ Public MustInherit Class Sim
 
     End Sub
 
-    'Evaluiert die Kinderchen mit Hilfe des Simulationsmodells
-    '*********************************************************
-    Public Sub SIM_Ergebnis_auswerten(ByRef Indi As Common.Individuum)
+    ''' <summary>
+    ''' Evaluiert ein Individuum mit Hilfe des Simulationsmodells. Es werden alle im Problem definierten Feature- und Constraint-Werte berechnet und im Individuum gespeichert.
+    ''' </summary>
+    ''' <param name="ind">das zu evaluierende Individuum</param>
+    ''' <param name="storeInDB">Ob das Individuum in OptResult-DB gespeichert werden soll</param>
+    ''' <remarks>Die Simulation muss bereits erfolgt sein</remarks>
+    Public Sub SIM_Ergebnis_auswerten(ByRef ind As Common.Individuum, Optional ByVal storeInDB As Boolean = True)
 
         Dim i As Short
 
@@ -411,16 +416,18 @@ Public MustInherit Class Sim
 
         'Qualitätswerte berechnen
         For i = 0 To Me.mProblem.NumFeatures - 1
-            Indi.Features(i) = CalculateFeature(Me.mProblem.List_Featurefunctions(i))
+            ind.Features(i) = CalculateFeature(Me.mProblem.List_Featurefunctions(i))
         Next
 
         'Constraints berechnen
         For i = 0 To Me.mProblem.NumConstraints - 1
-            Indi.Constraints(i) = CalculateConstraint(Me.mProblem.List_Constraintfunctions(i))
+            ind.Constraints(i) = CalculateConstraint(Me.mProblem.List_Constraintfunctions(i))
         Next
 
-        'Lösung abspeichern
-        Call Me.OptResult.addSolution(Indi)
+        If (storeInDB) Then
+            'Lösung im OptResult abspeichern (und zu DB hinzufügen)
+            Call Me.OptResult.addSolution(ind)
+        End If
 
     End Sub
 
