@@ -120,8 +120,8 @@ namespace IHWB.EVO.HybridAlgo
         {
             MessageBox.Show("Network Server: ");
             networkmanager.Individuums_WriteToDB(ref generation);
-            networkmanager.Status_SetInDB("Gigamachine", "teststatus");
-            MessageBox.Show("Network Server: "+ networkmanager.Status_ReadServer()[1]+ " "+ networkmanager.Status_ReadServer()[0]);
+            //networkmanager.Network_UpdateInDB("Gigamachine", "status", 0,0);
+            MessageBox.Show("Network Server: "+ networkmanager.Network_ReadServer()[1]+ " "+ networkmanager.Network_ReadServer()[0]);
             /*
             ++ Server-Status "generate Individuums"
 	            Server liest Individuen von DB
@@ -185,20 +185,11 @@ namespace IHWB.EVO.HybridAlgo
 	            Falls Individuen-Status "Raw" und Rechner-IpName die eigene existiert 
 		            Markiert Individuum als Status "calculate", timestamp
 		            Client simuliert
-		            Client editiert Individuum mit Ergebnissen und Status "ready" oder "false", timestamp
-		            [ende]Client schreibt in Rechner-Tabelle: Speed-Index [Durchschnitt der Berechnungen], 
+		            Client editiert Individuum mit Ergebnissen und Status "ready" oder "false",
+		            [ende]Client schreibt in Rechner-Tabelle: Speed-av, Speed-low,  
 	            Sonst
 		            x = 20
-		            Client Status "standby"
-            --
-
-            ++ Client Status "standby"
-	            Falls Individuum mit für ihn markierter IpName existiert
-		            Client Status "claculating"
-		            x = 0
-	            else (Falls alle Individuen	Status:ready sind) {
 		            Client Status "ready"
-	            }
             --
 
             delay x

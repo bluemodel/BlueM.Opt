@@ -2,10 +2,11 @@
     Inherits Individuum
 
 
-    Private optparas() As Double   'Gene/Optimierungsparameter des Individuums
-    Private Generator As String  'von welchem Algorithmus das Individuum gemacht wurde
-    Private Client As String  'Welcher Rechner dieses Individuum berechnen soll [ip oder Rechnername]
-    Private numberOptparas As Integer 'Anzahl der Optoaras des Problems
+    Private optparas() As Double            'Gene/Optimierungsparameter des Individuums
+    Private generator As String             'von welchem Algorithmus das Individuum gemacht wurde
+    Private Client As String                'Welcher Rechner dieses Individuum berechnen soll [ip oder Rechnername]
+    Private numberOptparas As Integer       'Anzahl der Optoaras des Problems
+    Private status As String                '{raw, calculate, ready, false}
 
     '### Initialisierung
     Public Sub New(ByVal type As String, ByVal id As Integer, ByVal numberOptparas_input As Integer)
@@ -41,13 +42,7 @@
     '### Neue Methoden
     'Gene setzen
     Public Function set_optparas(ByVal optparas_input As Double())
-        Dim i As Integer
-
         Me.optparas = optparas_input
-        'For i = 0 To optparas_input.Length - 1
-        'Me.optparas(i) = optparas_input(i)
-        'Next
-
         Return True
     End Function
 
@@ -58,24 +53,35 @@
 
     'Generator setzen
     Public Function set_generator(ByVal generator_input As String)
-        Me.Generator = generator_input
+        Me.generator = generator_input
         Return True
     End Function
 
     'Generator auslesen
     Public Function get_generator() As String
-        Return Me.Generator
+        Return Me.generator
     End Function
 
     'IPWorker setzen
-    Public Function set_Client(ByVal Client_input As String)
+    Public Function set_Client(ByVal client_input As String)
         Me.Client = Client_input
         Return True
     End Function
 
     'IPWorker auslesen
-    Public Function get_Client() As String
+    Public Function get_client() As String
         Return Me.Client
+    End Function
+
+    'Status setzen
+    Public Function set_status(ByVal status_input As String)
+        Me.status = status_input
+        Return True
+    End Function
+
+    'Status auslesen
+    Public Function get_status() As String
+        Return Me.status
     End Function
 
 End Class

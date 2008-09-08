@@ -4,6 +4,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Net;
 using MySql.Data.MySqlClient;
+using System.Threading;
 
 namespace IHWB.EVO.HybridAlgo
 {
@@ -12,14 +13,15 @@ namespace IHWB.EVO.HybridAlgo
         //### Variablen ###
         MySqlConnection mycon;
         MySqlCommand myCommand;
-        MySqlDataReader myReader;       
+        MySqlDataReader myReader;
 
-        int number_optparas;
+        Network network1;
+
+        int number_optparas;     //Anzahl Optimierungsparameter
         int number_constraints;  //Anzahl constraints
         int number_features;    //Anzahl Featurefunktionswerte (inkl. Penalties)
-        int number_clients;
-
-        int[,] calctimes;   //Scheduling-Tabelle
+        int populationsize;     //Anzahl Individuen in einer Population
+        DateTime startingtime;       //Start des Berechnungszyklusses
 
         //### Konstruktor ###
         public Networkmanager(ref EVO.Common.Individuum_MetaEvo individuum_input, ref EVO.Common.EVO_Settings settings_input)
@@ -27,7 +29,7 @@ namespace IHWB.EVO.HybridAlgo
             number_optparas = individuum_input.get_optparas().Length;
             number_constraints = individuum_input.Constraints.Length;
             number_features = individuum_input.Features.Length;
-            number_clients = 1;
+            populationsize = settings_input.MetaEvo.PopulationSize;
 
             myCommand = new MySqlCommand();
 
@@ -40,6 +42,7 @@ namespace IHWB.EVO.HybridAlgo
                 if (this.DB_check_connection())
                 {
                     DB_init(ref settings_input);  //Inklusive Server-Entry
+                    network1 = new Network(ref mycon); //Verwaltung der Netzwerkstruktur
                 }
             }
             // Client
@@ -92,13 +95,13 @@ namespace IHWB.EVO.HybridAlgo
             myCommand.ExecuteNonQuery();
             myCommand.Connection.Close();
 
-            myCommand.CommandText = "CREATE TABLE IF NOT EXISTS `metaevo_network` (`ipName` varchar(15) NOT NULL,`type` varchar(20) NOT NULL,`status` varchar(20) NOT NULL,`timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,`speed-index` varchar(20) NOT NULL,`lowest speed` varchar(20) NOT NULL,PRIMARY KEY  (`ipName`)) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+            myCommand.CommandText = "CREATE TABLE IF NOT EXISTS `metaevo_network` (`ipName` varchar(15) NOT NULL,`type` varchar(20) NOT NULL,`status` varchar(20) NOT NULL,`timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,`speed-av` double NOT NULL,`speed-low` double NOT NULL, `individuums` int NOT NULL ,PRIMARY KEY  (`ipName`)) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
             myCommand.Connection.Open();
             myCommand.ExecuteNonQuery();
             myCommand.Connection.Close();
 
             //Eintrag für Server
-            myCommand.CommandText = "INSERT INTO `metaevo_network` (`ipName`, `type`, `status`, `timestamp`, `speed-index`, `lowest speed`) VALUES ('" + Dns.GetHostName() + "', 'server', 'generate Individuums', '', '0', '0');";
+            myCommand.CommandText = "INSERT INTO `metaevo_network` (`ipName`, `type`, `status`, `timestamp`, `speed-av`, `speed-low`) VALUES ('" + Dns.GetHostName() + "', 'server', 'generate Individuums', '', '0', '0');";
             myCommand.Connection.Open();
             myCommand.ExecuteNonQuery();
             myCommand.Connection.Close();
@@ -133,7 +136,7 @@ namespace IHWB.EVO.HybridAlgo
         //(ok)sich als Client in DB eintragen
         private void DB_client_entry() {
             //Eintrag für Client
-            myCommand.CommandText = "INSERT INTO `metaevo_network` (`ipName`, `type`, `status`, `timestamp`, `speed-index`, `lowest speed`) VALUES ('" + Dns.GetHostName() + "', 'client', 'ready', '', '0', '0');";
+            myCommand.CommandText = "INSERT INTO `metaevo_network` (`ipName`, `type`, `status`, `timestamp`, `speed-av`, `speed-low`, `individuums`) VALUES ('" + Dns.GetHostName() + "', 'client', 'ready', '', '1000', '1000', '0');";
             myCommand.Connection.Open();
             try
             {
@@ -141,6 +144,8 @@ namespace IHWB.EVO.HybridAlgo
             }
             catch (MySqlException ex)
             {
+                myCommand.CommandText = "UPDATE `metaevo_network` SET status = 'ready' WHERE ipName = '" + Dns.GetHostName() + "');";
+                myCommand.ExecuteNonQuery();
                 MessageBox.Show("Client existiert bereits in der Datenbank", "MySQL Database");
             }
             myCommand.Connection.Close();
@@ -168,7 +173,7 @@ namespace IHWB.EVO.HybridAlgo
 
         //### Methoden ### Working Process -> Individuums 
 
-        //(ok)Individuen in die Datenbank einfügen (ID, status, optparas, ipName)
+        //(ok)Neue Individuen in die Datenbank einfügen (ID, status, optparas, ipName)
         public void Individuums_WriteToDB(ref EVO.Common.Individuum_MetaEvo[] generation_input)
         {
             //Alte Individuen aus DB löschen
@@ -193,7 +198,7 @@ namespace IHWB.EVO.HybridAlgo
                 {
                     tmptxt = tmptxt + "'" + generation_input[j].get_optparas()[k] + "',";
                 }
-                tmptxt = tmptxt + "'" + generation_input[j].get_Client() + "'),";
+                tmptxt = tmptxt + "'" + generation_input[j].get_client() + "'),";
             }
             tmptxt = tmptxt.TrimEnd(',') + ";";
 
@@ -206,7 +211,7 @@ namespace IHWB.EVO.HybridAlgo
         //(ok)nächstes eigenes Individuum aus der DB lesen (ID, optparas)
         public void Individuum_ReadFromDB_Client(ref EVO.Common.Individuum_MetaEvo individuum_input)
         {
-            myCommand = new MySqlCommand("Select * from metaevo_individuums WHERE ipName = '" + Dns.GetHostName() + "' AND status = 'raw' LIMIT 1", mycon);
+            myCommand = new MySqlCommand("Select * from metaevo_individuums WHERE ipName = '" + Dns.GetHostName() + "' AND (status = 'raw' OR status = 'calculate') LIMIT 1", mycon);
             mycon.Open();
             myReader = myCommand.ExecuteReader();
 
@@ -231,15 +236,30 @@ namespace IHWB.EVO.HybridAlgo
             myReader.Close();
             mycon.Close();
         }
-        
-        //(ok)alle fertigen Individuen aus der DB updaten (ID, constraints, features, ipName)
-        public void Individuums_UpdateFromDB(ref EVO.Common.Individuum_MetaEvo[] generation_input)
+
+        //prüfen wie viele Individuen fertig berechnet sind
+        public int Individuums_CountReadyInDB()
         {
-            myCommand = new MySqlCommand("Select * from metaevo_individuums WHERE status = 'ready' ", mycon);
+            myCommand = new MySqlCommand("Select status from metaevo_individuums WHERE status = 'true' OR status = 'false'", mycon);
             mycon.Open();
             myReader = myCommand.ExecuteReader();
 
-            int exportPosition = 0;
+            int count = 0;
+            while (myReader.Read())
+            {
+                count++;
+            }
+            return count;
+        }
+        
+        //alle Individuen aus der DB in der Generation updaten (ID, status, constraints, features, ipName)
+        public void Individuums_UpdateFromDB(ref EVO.Common.Individuum_MetaEvo[] generation_input)
+        {
+            myCommand = new MySqlCommand("Select * from metaevo_individuums", mycon);
+            mycon.Open();
+            myReader = myCommand.ExecuteReader();
+
+            int exportPosition;
             int individuumcounter = 0;
 
             double[] constraints = new double[number_constraints];
@@ -248,28 +268,37 @@ namespace IHWB.EVO.HybridAlgo
             //Aus der DB lesen und in Individuum speichern
             while (myReader.Read())
             {
-                //Passendes Individuum zum DB-Export in der Individuentabelle finden
+                //Passendes Individuum zum DB-Export in der Individuentabelle finden (id-Vergleich)
                 for (int k = 0; k < generation_input.Length; k++)
                 {
-                    if (generation_input[k].ID == myReader.GetInt32(exportPosition))
+                    if (generation_input[k].ID == myReader.GetInt32(0))
                     {
-                        exportPosition = k;
+                        individuumcounter = k;
                     }
                 }
 
-                generation_input[individuumcounter].ID = myReader.GetInt32(exportPosition);
-                exportPosition += (this.number_optparas + 2); //Optparameter überspringen
+                //Status setzen
+                exportPosition = 1;
+                generation_input[individuumcounter].set_status(myReader.GetString(exportPosition));
 
+                //Optparameter überspringen
+                exportPosition += (this.number_optparas + 1); 
+
+                //Constraints setzen
                 for (int k = 0; k < number_constraints; k++)
                 {
                     generation_input[individuumcounter].Constraints[k] = myReader.GetDouble(exportPosition);
                     exportPosition++;
                 }
+
+                //Features setzen
                 for (int k = 0; k < number_features; k++)
                 {
                     generation_input[individuumcounter].Features[k] = myReader.GetDouble(exportPosition);
                     exportPosition++;
                 }
+
+                //Client setzen
                 generation_input[individuumcounter].set_Client(myReader.GetString(exportPosition));
             }
 
@@ -277,7 +306,7 @@ namespace IHWB.EVO.HybridAlgo
             mycon.Close();
         }
 
-        //(ok)bekanntes Individuum in DB updaten (abhängig vom Eingabeparameter) //Options: status opt feat const ipName
+        //(ok)bekanntes Individuum in DB updaten (abhängig vom Eingabeparameter) //Options: status, opt, feat, const, ipName
         public void Individuum_UpdateInDB(ref EVO.Common.Individuum_MetaEvo individuum_input, string fields2update, string status_input)
         {
             //Individuum in DB updaten 
@@ -315,7 +344,7 @@ namespace IHWB.EVO.HybridAlgo
             }
             if (fields2update.Contains("ipName"))
             {
-                tmptxt = tmptxt + "ipName = '" + individuum_input.get_Client() + "' ";
+                tmptxt = tmptxt + "ipName = '" + individuum_input.get_client() + "' ";
             }
             tmptxt = tmptxt + "WHERE id = '" + individuum_input.ID + "' LIMIT 1;"; ;
 
@@ -326,62 +355,40 @@ namespace IHWB.EVO.HybridAlgo
         }
 
 
-        //### Methoden ### Working Process -> Client/Server Status 
+ 
+        //### Methoden ### Working Process -> Network Functions for Clients
          
-        //(ok)Status eines Clients/Servers setzen
-        public void Status_SetInDB(string ipName, string status)
+        //Eigene Eigenschaften eines Clients/Servers updaten 
+        public void Network_UpdateInDB(string status_input, int speed_av_input, int speed_low_input)
         {
-            myCommand.CommandText = "UPDATE `metaevo_network` SET status = '" + status + "' WHERE ipName = '" + ipName + "' LIMIT 1;";
+            //Client in DB updaten 
+            string tmptxt = "UPDATE `metaevo_network` SET ";
+            string status = status_input;
+
+            //status
+            if (status_input != "")
+            {
+                tmptxt = tmptxt + "status = '" + status_input + "' ";
+            }
+            //speed
+            if (speed_av_input != 0)
+            {
+                tmptxt = tmptxt + "speed-av = " + speed_av_input + " ";
+            }
+            //lowest speed
+            if (speed_low_input != 0)
+            {
+                tmptxt = tmptxt + "speed-low = " + speed_low_input + " ";
+            }
+            tmptxt = tmptxt + "WHERE ipName = '" + Dns.GetHostName() + "' LIMIT 1;";
+            myCommand.CommandText = tmptxt;
             myCommand.Connection.Open();
             myCommand.ExecuteNonQuery();
             myCommand.Connection.Close();
         }
-        
-        //(ok)Status von Clients lesen // Rückgabe stringarray[#clients][ipName,status,timestamp,speed-index,lowest speed]
-        public string[,] Status_ReadClients()
-        {
-            myCommand = new MySqlCommand("Select * from metaevo_network WHERE type = 'client'", mycon);
-            mycon.Open();
-            myReader = myCommand.ExecuteReader();
-
-            string[,] back = new string[this.number_clients, 5];
-            int k = 0;
-            bool readagain = false;
-
-            while (myReader.Read())
-            {
-                //Mehr Clients vorhanden als beim letzten Auslesen 
-                //-> Tabelle auf neue Anzahl erweitern und neu starten
-                if (k >= number_clients)
-                {
-                    number_clients++;
-                    readagain = true;
-                }
-                else
-                {
-                    back[k, 0] = myReader.GetString(0);
-                    back[k, 1] = myReader.GetString(2);
-                    back[k, 2] = myReader.GetString(3);
-                    back[k, 3] = myReader.GetString(4);
-                    back[k, 4] = myReader.GetString(5);
-                }
-                k++;
-            }
-            myReader.Close();
-            mycon.Close();
-
-            if (readagain)
-            {
-                return this.Status_ReadClients();
-            }
-            else
-            {
-                return back;
-            }
-        }
 
         //(ok)Status von Server lesen // Rückgabe stringarray[1][status, timestamp]
-        public string[] Status_ReadServer()
+        public string[] Network_ReadServer()
         {
             myCommand = new MySqlCommand("Select status, timestamp from metaevo_network WHERE type = 'server' LIMIT 1", mycon);
             mycon.Open();
@@ -404,79 +411,159 @@ namespace IHWB.EVO.HybridAlgo
 
         //### Methoden ### Working Process -> Scheduling
 
-        //Scheduling //Rückgabe Wartezeit bis erster Client fertig ist  //Eingabe "new" oder "continue"
-        private int scheduling(ref EVO.Common.Individuum_MetaEvo[] generation_input, string modus_input)
+        //Scheduling //Rückgabe Wartezeit bis erster Client fertig ist in ms //Eingabe "new" oder "continue"
+        private TimeSpan scheduling(ref EVO.Common.Individuum_MetaEvo[] generation_input, string modus_input)
         {
             int current_ind = 0;
+            TimeSpan waitfor = new TimeSpan();
+            int current_client;
+            bool scheduling_error = false;
+
+            //Statustabelle der Clients aktualisieren
+            network1.update_From_DB();
+
             
-            //Statustabelle der Clients aus DB
-            string[,] status_clients = this.Status_ReadClients();
 
             //Falls Modus = "new" 
             if (modus_input == "new")
             {
-                //Tabelle anlegen [#clients][momentane Summe der Berechnungszeiten, speed-index (-1 = defekt)]
-                calctimes = new int[status_clients.Length, 2];
-                for (int j = 0; j < status_clients.Length; j++)
-                {
-                    if (status_clients[j, 1] == "error") calctimes[j, 1] = -1;
-                    else calctimes[j, 1] = Convert.ToInt32(status_clients[j, 3]);
-                }
+                network1.erase_current_calc_times();
             }
+
+
 
             //Falls Modus = "continue"
             else
             {
-                //Vergleich ob neue Clients in DB, ggf SchedTabelle vergrössern (defekte Clients bleiben in der Tabelle !!)
-                if (status_clients.Length != calctimes.Length)
+               //Falls kein Client fertig ist, sofort weitere Wartezeit zurückgeben
+                current_client = 0;
+                for (int k = 0; k < network1.number_clients; k++)
                 {
-                    int[,] tmp = calctimes;
-                    calctimes = new int[status_clients.Length, 2];
-                    for (int k = 0; k < tmp.Length; k++)
+                    if (network1.Clients[k].status == "ready")
                     {
-                        calctimes[k, 0] = tmp[k, 0];
-                        calctimes[k, 1] = tmp[k, 1];
+                        if (network1.Clients[k].current_calc_time < network1.Clients[current_client].current_calc_time)
+                        {
+                            current_client = k;
+                        }
+                    }
+                }
+                waitfor = this.startingtime.AddMilliseconds(network1.Clients[current_client].current_calc_time).Subtract(DateTime.Now);
+                if (waitfor.TotalMilliseconds > 0) return waitfor;
+
+
+                //Mindestens ein Client ist fertig:
+                //DB auf Geschwindigkeitsänderung/Ausfall von Clients untersuchen
+                current_client = 0;
+
+                //Individuums-Informationen aus der DB updaten
+                this.Individuums_UpdateFromDB(ref generation_input);
+
+                for (int k = 0; k < network1.number_clients; k++)
+                {
+                    if (network1.Clients[k].status == "ready")
+                    {
+                        //Suche "raw" Individuum was von einem langsameren Client berechnet werden soll 
+                        //  -> fehler im scheduling
+                        scheduling_error = true;
+                    }
+                }
+
+                if (scheduling_error)
+                {
+                    //Findet neu ausgefallene Clients
+                    for (int k = 0; k < network1.number_clients; k++)
+                    {
+                        if (network1.Clients[k].status == "calculating")
+                        {
+                            //Falls ausgefallen die zugehörigen Individuen demarkieren und Client als defekt markieren
+                            if (network1.Clients[k].timestamp.AddMilliseconds(network1.Clients[k].speed_low) < DateTime.Now)
+                            {
+                                network1.Clients[k].setstatus_AlsoInDB("error");
+                            }
+                            //Alle "raw"-Individuen demarkieren
+                            else
+                            {
+
+                            }
+                        }
                     }
                 }
             }
-            
 
-            //Scheduling berechnen
-            //  Für jedes Individuum
-            for (int k = 0; k < generation_input.Length; k++)
+            if (scheduling_error || modus_input == "new")
             {
-                current_ind = 0;
-                //  Alle Clients durchgehen
-                for (int j = 1; j < status_clients.Length; j++)
+
+                //Scheduling berechnen
+                //  Für jedes Individuum
+                for (int k = 0; k < generation_input.Length; k++)
                 {
-                    if (calctimes[j, 1] > -1) //falls Individuum funktioniert
+                    //Falls das Individuum noch zu berechnen ist
+                    if (generation_input[k].get_status() == "raw")
                     {
-                        if ((calctimes[j, 0] + calctimes[j, 1]) < (calctimes[current_ind, 0] + calctimes[current_ind, 1]))
+                        current_ind = 0;
+                        //  Alle Clients durchgehen
+                        for (int j = 1; j < network1.number_clients; j++)
+                        {
+                            if (network1.Clients[j].status != "error") //falls Individuum funktioniert
+                            {
+                                if ((network1.Clients[j].current_calc_time + network1.Clients[j].speed_av) < (network1.Clients[current_ind].current_calc_time + network1.Clients[current_ind].speed_av))
+                                {
+                                    current_ind = j;
+                                }
+                            }
+                        }
+                        //In der current_calc_time-Eigenschaft Zeiten addieren, Individuum addieren
+                        network1.Clients[current_ind].current_calc_time += network1.Clients[current_ind].speed_av;
+                        network1.Clients[current_ind].numberindividuums++;
+                        //Dem Individuum den Client(=IPWorker) zuweisen
+                        generation_input[k].set_Client(network1.Clients[current_ind].ipName);
+                        //Diese Information auch in die DB schreiben
+                        this.Individuum_UpdateInDB(ref generation_input[k], "ipName", "");
+                    }
+                }
+
+                //Rückgabewert = Dauer bis erster Client fertig
+                current_client = 0;
+
+                for (int j = 1; j < network1.number_clients; j++)
+                {
+                    if (network1.Clients[j].status != "error") //falls Client funktioniert
+                    {
+                        if (network1.Clients[j].current_calc_time < network1.Clients[current_client].current_calc_time)
                         {
                             current_ind = j;
                         }
                     }
                 }
-                //In der Hilfstabelle Zeiten addieren
-                calctimes[current_ind, 0] += calctimes[current_ind, 1];
-                //Dem Individuum den Client(=IPWorker) zuweisen
-                generation_input[k].set_Client(status_clients[current_ind,0]);
+                waitfor = this.startingtime.AddMilliseconds(network1.Clients[current_client].current_calc_time).Subtract(DateTime.Now);
+                return waitfor;
             }
-
-            //Rückgabewert = Dauer bis erster Client fertig
-            current_ind = 0;
-
-            for (int j = 1; j < calctimes.Length; j++)
-            {
-                if (calctimes[j, 1] > 0) //falls Individuum funktioniert
-                {
-                    if (calctimes[j, 0] < calctimes[current_ind, 0])
-                    {
-                        current_ind = j;
-                    }
-                }
-            }
-            return calctimes[current_ind,0];
         }
+        return //ansonsten wartezeit bis langsamster client fertig ist
+
+
+        //### Hauptprogramm ###
+        public bool perform_step(ref EVO.Common.Individuum_MetaEvo[] generation_input)
+        {
+            TimeSpan waitfor;
+            startingtime = DateTime.Now;
+
+            //Scheduling initialisieren und ersten Schritt rechnen
+            waitfor = this.scheduling(ref generation_input, "new");
+            //Warten
+            System.Threading.Thread.Sleep(waitfor);
+
+            //Prüfen ob alle Individuen fertig berechnet sind
+            while (this.Individuums_CountReadyInDB() < this.populationsize)
+            {
+                //Scheduling anstossen
+                waitfor = this.scheduling(ref generation_input, "continue");
+
+                //Warten
+                System.Threading.Thread.Sleep(waitfor);
+            }
+            return true;
+        }
+
     }
 }
