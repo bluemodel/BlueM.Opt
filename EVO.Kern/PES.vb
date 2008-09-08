@@ -418,7 +418,7 @@ Public Class PES
 
     'Function um PopReproduktion, PopMutation, Reproduktion und Mutio n direkt ablaufen zu lassen
     '********************************************************************************************
-    Public Sub EsReproMut(ByVal is_Pop As Boolean)
+    Public Sub EsReproMut(ByVal CES_Dn As Double, ByVal is_Pop As Boolean)
 
         If is_Pop = True Then
 
@@ -441,8 +441,12 @@ Public Class PES
 
         'MUTATIONSPROZESS
         '################
-        'Mutieren der Ausgangswerte
-        Call EsMutation()
+        'Mutieren der Ausgangswerte mit und ohne Vektor
+        If mSettings.PES.Schrittweite.is_DnVektor = False Then
+            Call CES_Xn_Mutation(CES_Dn)
+        ElseIf mSettings.PES.Schrittweite.is_DnVektor = True Then
+            Call EsMutation()
+        End If
 
     End Sub
 
@@ -1029,6 +1033,86 @@ StartMutation:
         Next v
 
     End Sub
+
+    'CES_Dn_Mutation mutiert das Dn für ein CES
+    '******************************************
+    Public Function CES_Dn_Mutation(ByVal Dn_CES As Double) As Double
+
+        Dim Z As Double
+
+        Dim DnTemp As Double             'Temporäre Schrittweiten für Nachkomme
+        Dim expo As Integer                  'Exponent für Schrittweite (+/-1)
+        Dim tau As Double
+
+        If (mSettings.PES.Schrittweite.OptDnMutation = EVO_DnMutation.Rechenberg) Then
+            '+/-1
+            expo = (2 * Int(Rnd() + 0.5) - 1)
+            'Schrittweite wird mutiert
+            DnTemp = Dn_CES * galpha ^ expo
+        ElseIf (mSettings.PES.Schrittweite.OptDnMutation = EVO_DnMutation.Schwefel) Then
+            tau = mSettings.PES.Schrittweite.DnC / Math.Sqrt(Me.mProblem.NumParams)
+            'Normalverteilte Zufallszahl (SD = 1, mean = 0)
+            Z = Me.NormalDistributationRND(1.0, 0.0)
+            'Neue Schrittweite
+            DnTemp = Dn_CES * Math.Exp(tau * Z)
+            'Mindestschrittweite muss eingehalten werden
+            If DnTemp < mSettings.PES.Schrittweite.DnEpsilon Then DnTemp = mSettings.PES.Schrittweite.DnEpsilon
+        End If
+
+        Return DnTemp
+
+    End Function
+
+    'Verwedet das Mutiert Dn des CES und mutiert die Parameter
+    '*********************************************************
+    Public Sub CES_Xn_Mutation(ByVal Dn_CES As Double)
+
+        Dim v, i As Integer
+        Dim Z As Double
+
+        Dim XnTemp() As Double             'Temporäre Parameterwerte für Nachkomme
+
+        ReDim XnTemp(Me.mProblem.NumParams - 1)
+
+        'Mutation
+        '--------
+        For v = 0 To Me.mProblem.NumParams - 1
+            i = 0
+            Do
+                i += 1
+                'Abbruchkriterium
+                '----------------
+                If (i >= 1000) Then
+                    Throw New Exception("Es konnte kein gültiger Parametersatz generiert werden")
+                End If
+
+                'Normalverteilte Zufallszahl mit Standardabweichung 1/sqr(varanz)
+
+                'Z = System.Math.Sqrt(-2 * System.Math.Log(1 - Rnd()) / Anz.Para) * System.Math.Sin(6.2832 * Rnd())
+                If (mSettings.PES.Schrittweite.OptDnMutation = EVO_DnMutation.Rechenberg) Then
+                    'Normalverteilte Zufallszahl mit Standardabweichung 1/sqr(var.anz), , Mittelwert 0
+                    Z = Me.NormalDistributationRND(1 / Math.Sqrt(Me.mProblem.NumParams), 0.0)
+                ElseIf (mSettings.PES.Schrittweite.OptDnMutation = EVO_DnMutation.Schwefel) Then
+                    'Normalverteilte Zufallszahl mit Standardabweichung 1, Mittelwert 0
+                    Z = Me.NormalDistributationRND(1.0, 0.0)
+                End If
+                'Mutation wird durchgeführt
+                XnTemp(v) = AktPara(v).Xn + Dn_CES * Z
+
+                'Restriktion für die mutierten Werte
+            Loop While (XnTemp(v) <= 0 Or XnTemp(v) > 1 Or Not checkBeziehung(v, XnTemp))
+
+        Next v
+
+        'Mutierte Werte übernehmen
+        '-------------------------
+        For v = 0 To Me.mProblem.NumParams - 1
+            AktPara(v).Dn = Dn_CES
+            AktPara(v).Xn = XnTemp(v)
+        Next v
+
+    End Sub
+
 
     Public Function NormalDistributationRND(ByVal sd As Double, ByVal mean As Double) As Double
         Dim fac As Double

@@ -380,7 +380,8 @@ Public Class CES
     Public Sub Reproduction_Control()
         Dim i As Integer
         Dim x, y As Integer
-        Dim Einzelkind(ModSett.n_Locations - 1) As Integer
+        Dim Einzelkind_Path(ModSett.n_Locations - 1) As Integer
+        Dim Einzelkind_Dn_CES As Double
 
         Select Case mSettings.CES.OptReprodOp
             'UPGRADE: Eltern werden nicht zufällig gewählt sondern immer in Top Down Reihenfolge
@@ -389,13 +390,15 @@ Public Class CES
                 y = 1
                 For i = 0 To mSettings.CES.n_Childs - 2 Step 2
                     Call ReprodOp_Select_Random_Uniform(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
+                    Call ReprodOp_Dn_Mitteln(Parents(x).CES_Dn, Parents(y).CES_Dn, Childs(i).CES_Dn, Childs(i + 1).CES_Dn)
                     x += 1
                     y += 1
                     If x = mSettings.CES.n_Parents - 1 Then x = 0
                     If y = mSettings.CES.n_Parents - 1 Then y = 0
                 Next i
                 If Even_Number(mSettings.CES.n_Childs) = False Then
-                    Call ReprodOp_Select_Random_Uniform(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind)
+                    Call ReprodOp_Select_Random_Uniform(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind_Path)
+                    Call ReprodOp_Dn_Mitteln(Parents(x).CES_Dn, Parents(y).CES_Dn, Childs(mSettings.CES.n_Childs - 1).CES_Dn, Einzelkind_Dn_CES)
                 End If
 
             Case CES_REPRODOP.Order_Crossover
@@ -404,13 +407,15 @@ Public Class CES
                 y = 1
                 For i = 0 To mSettings.CES.n_Childs - 2 Step 2
                     Call ReprodOp_Order_Crossover(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
+                    Call ReprodOp_Dn_Mitteln(Parents(x).CES_Dn, Parents(y).CES_Dn, Childs(i).CES_Dn, Childs(i + 1).CES_Dn)
                     x += 1
                     y += 1
                     If x = mSettings.CES.n_Parents - 1 Then x = 0
                     If y = mSettings.CES.n_Parents - 1 Then y = 0
                 Next i
                 If Even_Number(mSettings.CES.n_Childs) = False Then
-                    Call ReprodOp_Order_Crossover(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind)
+                    Call ReprodOp_Order_Crossover(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind_Path)
+                    Call ReprodOp_Dn_Mitteln(Parents(x).CES_Dn, Parents(y).CES_Dn, Childs(mSettings.CES.n_Childs - 1).CES_Dn, Einzelkind_Dn_CES)
                 End If
 
             Case CES_REPRODOP.Part_Mapped_Cross
@@ -418,13 +423,15 @@ Public Class CES
                 y = 1
                 For i = 0 To mSettings.CES.n_Childs - 2 Step 2
                     Call ReprodOp_Part_Mapped_Crossover(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
+                    Call ReprodOp_Dn_Mitteln(Parents(x).CES_Dn, Parents(y).CES_Dn, Childs(i).CES_Dn, Childs(i + 1).CES_Dn)
                     x += 1
                     y += 1
                     If x = mSettings.CES.n_Parents - 1 Then x = 0
                     If y = mSettings.CES.n_Parents - 1 Then y = 0
                 Next i
                 If Even_Number(mSettings.CES.n_Childs) = False Then
-                    Call ReprodOp_Part_Mapped_Crossover(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind)
+                    Call ReprodOp_Part_Mapped_Crossover(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind_Path)
+                    Call ReprodOp_Dn_Mitteln(Parents(x).CES_Dn, Parents(y).CES_Dn, Childs(mSettings.CES.n_Childs - 1).CES_Dn, Einzelkind_Dn_CES)
                 End If
 
         End Select
@@ -587,6 +594,17 @@ Public Class CES
                 ChildPath_B(i) = mapper
             End If
         Next
+    End Sub
+
+    'Das Dn des CES muss auch ermittelt werden
+    'Dn Mitteln wird hier gemacht
+    Public Sub ReprodOp_Dn_Mitteln(ByVal ParDn_A As Double, ByVal ParDn_B As Double, ByRef ChildDn_A As Double, ByRef ChildDn_B As Double)
+        Dim Dn_neu As Double
+
+        Dn_neu = (ParDn_A + ParDn_B) / 2
+
+        ChildDn_A = Dn_neu
+        ChildDn_B = Dn_neu
     End Sub
 
 
@@ -1076,7 +1094,7 @@ Public Class CES
 
         For i = 0 To mSettings.CES.n_Childs - 1
             NDSorting(i) = Childs(i).Clone()
-            NDSorting(i).dominated = False
+            NDSorting(i).Dominated = False
             NDSorting(i).Front = 0
             NDSorting(i).Distance = 0
         Next i
@@ -1087,7 +1105,7 @@ Public Class CES
 
         For i = mSettings.CES.n_Childs To mSettings.CES.n_Childs + mSettings.CES.n_Parents - 1
             NDSorting(i) = Parents(i - mSettings.CES.n_Childs).Clone()
-            NDSorting(i).dominated = False
+            NDSorting(i).Dominated = False
             NDSorting(i).Front = 0
             NDSorting(i).Distance = 0
         Next i
@@ -1138,7 +1156,7 @@ Public Class CES
         '---------------------------------------------------------------
         For i = 0 To PES_Parents_pLoc.GetUpperBound(0)
             NDSorting(i) = PES_Parents_pLoc(i).Clone()
-            NDSorting(i).dominated = False
+            NDSorting(i).Dominated = False
             NDSorting(i).Front = 0
             NDSorting(i).Distance = 0
         Next i
@@ -1178,7 +1196,7 @@ Public Class CES
         '------------------------------------------------------------------------------------------
         For i = 0 To PES_Memory.GetUpperBound(0)
             NDSorting(i) = PES_Memory(i).Clone()
-            NDSorting(i).dominated = False
+            NDSorting(i).Dominated = False
             NDSorting(i).Front = 0
             NDSorting(i).Distance = 0
         Next i
