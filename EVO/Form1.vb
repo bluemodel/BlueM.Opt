@@ -445,45 +445,16 @@ Partial Class Form1
             'Mauszeiger busy
             Cursor = Cursors.WaitCursor
 
-            'Diagramm zurücksetzen
-            Me.Hauptdiagramm1.Reset()
-
-
-            'Problemdefinition
-            '=================
-            If (Me.Anwendung <> ANW_TESTPROBLEME And Me.Anwendung <> ANW_TSP) Then
-
-                'Bei allen Sim-Anwendungen
-                '-------------------------
-
-                'Neues Problem instanzieren und Methode setzen
-                Me.mProblem = New EVO.Common.Problem(ComboBox_Methode.SelectedItem, Sim1.WorkDir_Original, Sim1.Datensatz)
-
-                'EVO-Eingabedateien einlesen
-                Call Me.mProblem.Read_InputFiles(Me.Sim1.SimStart, Me.Sim1.SimEnde)
-
-                'Problem an Sim-Objekt übergeben
-                Call Me.Sim1.setProblem(Me.mProblem)
-
-                'Settings auch übergeben
-                Call Me.Sim1.setSettings(Me.EVO_Einstellungen1.Settings)
-
-            ElseIf (Me.Anwendung = ANW_TESTPROBLEME) Then
-
-                'Bei Testproblemen definieren diese das Problem selbst
-                '-----------------------------------------------------
-                Me.mProblem = Testprobleme1.getProblem()
-
-            End If
-
-            'Problem an EVO_Einstellungen übergeben
-            '--------------------------------------
-            Call Me.EVO_Einstellungen1.Initialise(Me.mProblem)
-
+            'Problem initialisieren
+            '======================
+            Call Me.INI_Problem(Me.ComboBox_Methode.SelectedItem)
 
             'Methodenspezifische Vorbereitungen
             '(zunächst alles deaktivieren, danach je nach Methode aktivieren)
             '================================================================
+
+            'Diagramm zurücksetzen
+            Me.Hauptdiagramm1.Reset()
 
             'Start Button deaktivieren
             Me.Button_Start.Enabled = False
@@ -526,6 +497,9 @@ Partial Class Form1
                 Case METH_PES 'Methode PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
+                    'Ergebnis-Buttons
+                    Me.Button_openMDB.Enabled = True
+
                     'EVO_Opt_Verlauf initialisieren
                     Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
 
@@ -537,6 +511,9 @@ Partial Class Form1
                     If (Me.mProblem.Modus = EVO_MODUS.Multi_Objective) Then
                         Throw New Exception("Methode von Hook und Jeeves erlaubt nur Single-Objective Optimierung!")
                     End If
+
+                    'Ergebnis-Buttons
+                    Me.Button_openMDB.Enabled = True
 
                     'TODO: EVO_Opt_Verlauf initialisieren
 
@@ -605,6 +582,49 @@ Partial Class Form1
             Cursor = Cursors.Default
 
         End If
+
+    End Sub
+
+    ''' <summary>
+    ''' Problem initialisieren und überall bekannt machen
+    ''' </summary>
+    ''' <param name="Method">gewählte Methode</param>
+    Private Sub INI_Problem(ByVal Method As String)
+
+        'Problemdefinition
+        '=================
+        If (Me.Anwendung <> ANW_TESTPROBLEME And Me.Anwendung <> ANW_TSP) Then
+
+            'Bei allen Sim-Anwendungen
+            '-------------------------
+
+            'Neues Problem instanzieren und Methode setzen
+            Me.mProblem = New EVO.Common.Problem(Method, Me.Sim1.WorkDir_Original, Me.Sim1.Datensatz)
+
+            'EVO-Eingabedateien einlesen
+            Call Me.mProblem.Read_InputFiles(Me.Sim1.SimStart, Me.Sim1.SimEnde)
+
+            'Problem an Sim-Objekt übergeben
+            Call Me.Sim1.setProblem(Me.mProblem)
+
+            'Settings auch übergeben
+            Call Me.Sim1.setSettings(Me.EVO_Einstellungen1.Settings)
+
+        ElseIf (Me.Anwendung = ANW_TESTPROBLEME) Then
+
+            'Bei Testproblemen definieren diese das Problem selbst
+            '-----------------------------------------------------
+            Me.mProblem = Testprobleme1.getProblem()
+
+        End If
+
+        'Problem an EVO_Einstellungen übergeben
+        '--------------------------------------
+        Call Me.EVO_Einstellungen1.Initialise(Me.mProblem)
+
+        'Individuumsklasse mit Problem initialisieren
+        '--------------------------------------------
+        Call EVO.Common.Individuum.Initialise(Me.mProblem)
 
     End Sub
 
@@ -764,9 +784,6 @@ Partial Class Form1
 
         'Parameter
         Anz_SensiPara = SensiPlot1.Selected_OptParameter.GetLength(0)
-
-        'Individuumsklasse wird initialisiert
-        Call Common.Individuum.Initialise(Me.mProblem)
 
         'Anzahl Simulationen
         If (Anz_SensiPara = 1) Then
@@ -1367,9 +1384,6 @@ Partial Class Form1
 
         Dim HookJeeves As EVO.Kern.HookeAndJeeves = New EVO.Kern.HookeAndJeeves(Me.mProblem.NumParams, EVO_Einstellungen1.Settings.HookJeeves.DnStart, EVO_Einstellungen1.Settings.HookJeeves.DnFinish)
 
-        'Individuumsklasse wird initialisiert
-        Call Common.Individuum.Initialise(Me.mProblem)
-
         ReDim QNBest(Me.mProblem.NumPenalties - 1)
         ReDim QBest(Me.mProblem.NumPenalties - 1)
 
@@ -1578,9 +1592,6 @@ Partial Class Form1
         If (Not Me.mProblem.Method = METH_HYBRID And Not Me.EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Sequencial_1) Then
             Call PrepareDiagramm()
         End If
-
-        'Individuumsklasse wird initialisiert
-        Call Common.Individuum.Initialise(Me.mProblem)
 
         'Schritte 0: Objekt der Klasse PES wird erzeugt
         '**********************************************
