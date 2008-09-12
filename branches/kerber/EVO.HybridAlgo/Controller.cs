@@ -15,10 +15,11 @@ namespace IHWB.EVO.HybridAlgo
 
         Networkmanager networkmanager;
         EVO.Common.Individuum_MetaEvo individuumForClient;
-
-        string role;
         EVO.Common.Individuum_MetaEvo[] generation;
+        Algomanager algomanager;
+
         int individuumnumber;
+        string role;
 
         //### Konstruktor ###  
         public Controller(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input, ref EVO.Apps.Sim sim_input)  
@@ -48,6 +49,9 @@ namespace IHWB.EVO.HybridAlgo
                     //Zufällige Parents setzen
                     set_random_adults();
 
+                    //Algomanager starten
+                    algomanager = new Algomanager(ref prob);
+
                     //### Hauptprogramm ###
                     start_single_pc(ref sim_input);
                     break;
@@ -61,8 +65,9 @@ namespace IHWB.EVO.HybridAlgo
                         generation[j] = new IHWB.EVO.Common.Individuum_MetaEvo("MetaEvo", individuumnumber, prob_input.List_OptParameter.Length);
                         individuumnumber++;
                     }
-                    //Zufällige Parents setzen
-                    set_random_adults();
+
+                    //Algomanager starten
+                    algomanager = new Algomanager(ref prob);
 
                     //### Hauptprogramm ###
                     networkmanager = new Networkmanager(ref this.generation[0], ref this.settings);
@@ -120,50 +125,59 @@ namespace IHWB.EVO.HybridAlgo
         // Network Server
         private void start_network_server(ref EVO.Apps.Sim sim_input)
         {
-            networkmanager.Individuums_WriteToDB(ref generation);
-            MessageBox.Show("Network Server started successfully");
-            /*
-            ++ Server-Status "generate Individuums"
-	            Server liest Individuen von DB
-	            Server erzeugt Individuen
-	            Server führt Scheduling durch falls Hash(Speed-Indizes auf 10sek gerundet) anders{
-		            wh++
-			            Finde Client (Aktuelle Rechenzeit + speed-index) am kleinsten ist.
-			            in SchedTab Client: Individuums += 1 
-		            --
-	            }
-	            Server speichert neue Individuen in Tabelle mit Anleitung von SchedTab
-	            Server-Status "error watching"
-	            x = 10
-            --
+            Client meServer = networkmanager.Network_Init_Client_Object(Dns.GetHostName());
+            meServer.status = "init Genpool";
 
-            ++ Server-Status "error watching"
-	            Falls mindestens ein Client Status: ready besitzt {
-		            Rechner-tabelle laden 
-		            x = 2
-		            Prüfe auf Funktionalität der Clients ("error" = Now - Last Timestamp > 105% lowest speed) {
-			            unfertige Individuen des clients demarkieren
-			            in SchedTab -= setzen
-			            new scheduling = true
-		            }
-		            Prüfe ungenaues Sched(Individuen unfertiger Clients * Speed-Index) + (Now - Timestamp) > kleinster speed-index {
-			            "raw" Individuen des clients demarkieren
-			            in SchedTab -= (summe-der-raw-individuen) setzen
-			            new scheduling = true
-		            }
-		            Falls (new scheduling) {
-			            Scheduling fortsetzen
-		            }
-		            Falls alle Individuen Status: ready sind {
-			            Server-Status "generate Individuals"
-		            }
-	            }
-            --
+            for (int k = 0; k < settings.MetaEvo.NumberGenerations; k++)
+            {
+                //Einmaliges Initialisieren des Genpools
+                if (meServer.status == "init Genpool")
+                {
+                    //Zufällige Parents setzen und in DB schreiben
+                    set_random_adults();
+                    networkmanager.Individuums_WriteToDB(ref generation);
 
-            delay x
+                    if (networkmanager.perform_step(ref this.generation))
+                    {
+                        meServer.set_AlsoInDB("generate Individuums", -1, -1, -1);
+                        algomanager.set_genpool(generation);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Fehler beim Initialisieren des Genpools");
+                    }
+                }
 
-            Nochmal aufrufen
-             */
+                //Individuen erzeugen
+                if (meServer.status == "generate Individuums")
+                {
+                    //Fertig berechnete Individuen (alle) aus der DB in generation updaten
+                    networkmanager.Individuums_UpdateFromDB(ref this.generation);
+
+                    //Evolutionsschritte
+                    algomanager.build_new_generation(ref this.generation);
+
+                    //Neue Individuen in die DB schreiben
+                    networkmanager.Individuums_WriteToDB(ref this.generation);
+
+                    //Neuen Serverstatus setzen
+                    meServer.set_AlsoInDB("error watching", -1, -1, -1);
+                }
+
+                //Individuen berechnen lassen
+                if (meServer.status == "error watching")
+                {
+                    if (networkmanager.perform_step(ref this.generation))
+                    {
+                        meServer.set_AlsoInDB("generate Individuums", -1, -1, -1);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Fehler beim Ausführen der Kalkulation im Netzwerk");
+                    }
+                }
+            }
+            meServer.set_AlsoInDB("finished", -1, -1, -1);
         }
 
         // Network Client
@@ -192,7 +206,7 @@ namespace IHWB.EVO.HybridAlgo
                     //Individuum in DB als "calculate" markieren
                     networkmanager.Individuum_UpdateInDB(ref individuumForClient, "status", "calculate");
                     //Simulieren
-                    sim_input.Evaluate(ref individuumForClient);
+                    //sim_input.Evaluate(ref individuumForClient);
                     //Individuum in DB Updaten
                     networkmanager.Individuum_UpdateInDB(ref individuumForClient, "status feat const", "true");
                 }
@@ -207,7 +221,6 @@ namespace IHWB.EVO.HybridAlgo
                     }
                     System.Threading.Thread.Sleep(5000);
                 }
-                
                 serverstatus = networkmanager.Network_ReadServer();
             }
         }

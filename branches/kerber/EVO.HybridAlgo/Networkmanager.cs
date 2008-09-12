@@ -253,7 +253,7 @@ namespace IHWB.EVO.HybridAlgo
         }
         
         //(ok)alle Individuen aus der DB in der Generation updaten (ID, status, constraints, features, ipName)
-        private void Individuums_UpdateFromDB(ref EVO.Common.Individuum_MetaEvo[] generation_input)
+        public void Individuums_UpdateFromDB(ref EVO.Common.Individuum_MetaEvo[] generation_input)
         {
             myCommand = new MySqlCommand("Select * from metaevo_individuums", mycon);
             mycon.Open();
@@ -406,7 +406,7 @@ namespace IHWB.EVO.HybridAlgo
             return back;
         }
 
-        //ok Client-Individuum initialisieren
+        //(ok)Client-Individuum initialisieren
         public Client Network_Init_Client_Object(string ipName_input)
         {
             Client back = new Client(ref mycon, ipName_input, "ready", DateTime.Now, 0, 0, 0);
@@ -572,7 +572,7 @@ namespace IHWB.EVO.HybridAlgo
         }
 
 
-        //### Hauptprogramm ###
+        //### Hauptprogramm ### Berechnet eine Generation im Netzwerk
         public bool perform_step(ref EVO.Common.Individuum_MetaEvo[] generation_input)
         {
             TimeSpan waitfor;
