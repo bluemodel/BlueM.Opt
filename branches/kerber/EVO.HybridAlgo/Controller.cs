@@ -155,7 +155,7 @@ namespace IHWB.EVO.HybridAlgo
                     networkmanager.Individuums_UpdateFromDB(ref this.generation);
 
                     //Evolutionsschritte
-                    algomanager.build_new_generation(ref this.generation);
+                    algomanager.eval_and_build(ref this.generation);
 
                     //Neue Individuen in die DB schreiben
                     networkmanager.Individuums_WriteToDB(ref this.generation);
