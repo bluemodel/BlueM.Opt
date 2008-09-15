@@ -206,7 +206,7 @@ namespace IHWB.EVO.HybridAlgo
                     //Individuum in DB als "calculate" markieren
                     networkmanager.Individuum_UpdateInDB(ref individuumForClient, "status", "calculate");
                     //Simulieren
-                    sim_input.Evaluate(ref individuumForClient);
+                    //sim_input.Evaluate(ref individuumForClient);
                     //Individuum in DB Updaten
                     networkmanager.Individuum_UpdateInDB(ref individuumForClient, "status feat const", "true");
                 }
