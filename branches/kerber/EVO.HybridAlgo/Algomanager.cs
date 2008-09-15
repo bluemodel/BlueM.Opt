@@ -50,8 +50,15 @@ namespace IHWB.EVO.HybridAlgo
             //1.Selektion: 
             //1.1.Dominanzanalyse
             //1.1.2.Sortieren nach einem zufällig gewählten Kriterium
+            Random rand = new Random();
+            int kriterium = rand.Next(0, new_generation_input[0].get_optparas().Length);
+
             //1.1.3.Dominanzkriterium anwenden innerhalb der neuen Individuen
-            //1.1.4.Dominanzkriterium anwenden zwischen den neuen und den alten Individuen
+            quicksort(ref new_generation_input, kriterium, 0, new_generation_input[0].get_optparas().Length-1);  
+
+            //1.1.4.Dominanzkriterium anwenden innerhalb der alten Individuen
+            
+            //1.1.5.Dominanzkriterium anwenden zwischen den neuen und den alten Individuen
 
             //1.2.Clustering bis auf Generationsgrösse
 
@@ -72,11 +79,20 @@ namespace IHWB.EVO.HybridAlgo
             }
         }
 
-        private void quicksort(ref EVO.Common.Individuum_MetaEvo[] individuen_input)
+        private void quicksort(ref EVO.Common.Individuum_MetaEvo[] input, int kriterium, int low_input, int high_input)
         {
-            Random rand = new Random();
-            int kriterium;
-            kriterium = rand.Next(0,individuen_input[0].get_optparas().Length);
+            int low = low_input;
+            int high = high_input;
+            double medianvalue = input[(low_input + high_input) / 2].get_optparas()[kriterium];
+            while (low_input <= high_input)
+            {
+                while (input[low].get_optparas()[kriterium] < medianvalue) low++;
+                while (input[high].get_optparas()[kriterium] > medianvalue) high++;
+                if (low <= high)
+                {
+
+                }
+            }
         }
     }
 }
