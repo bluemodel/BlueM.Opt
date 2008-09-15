@@ -8,8 +8,8 @@
     <ProjectGuid>{85403900-E545-4122-B1A0-8C30AE0D0F3C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>IHWB.EVO.HybridAlgo</RootNamespace>
-    <AssemblyName>EVO.HybridAlgo</AssemblyName>
+    <RootNamespace>IHWB.EVO.MetaEvo</RootNamespace>
+    <AssemblyName>EVO.MetaEvo</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

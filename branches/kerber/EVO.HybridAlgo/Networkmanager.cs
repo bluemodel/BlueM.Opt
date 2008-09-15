@@ -6,7 +6,7 @@ using System.Net;
 using MySql.Data.MySqlClient;
 using System.Threading;
 
-namespace IHWB.EVO.HybridAlgo
+namespace IHWB.EVO.MetaEvo
 {
     public class Networkmanager
     {

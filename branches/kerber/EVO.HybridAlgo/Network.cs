@@ -4,7 +4,7 @@ using System.Text;
 using System.Net;
 using MySql.Data.MySqlClient;
 
-namespace IHWB.EVO.HybridAlgo
+namespace IHWB.EVO.MetaEvo
 {
     
     //Struktur eines Clients
