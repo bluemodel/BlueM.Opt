@@ -91,10 +91,6 @@
       <Project>{A56DFA12-8680-4C7A-B6BB-406D4D3FE156}</Project>
       <Name>EVO.MO_Indicators</Name>
     </ProjectReference>
-    <ProjectReference Include="..\EVO.HybridAlgo\EVO.HybridAlgo.csproj">
-      <Project>{85403900-E545-4122-B1A0-8C30AE0D0F3C}</Project>
-      <Name>EVO.HybridAlgo</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\IHA.Win\IHA.Win.vbproj">
       <Project>{7A7828C7-812B-45C0-AC5A-AE2DB74B7CD8}</Project>
       <Name>IHA.Win</Name>
@@ -122,6 +118,10 @@
     <ProjectReference Include="..\EVO.Kern\EVO.Kern.vbproj">
       <Project>{58356A07-425E-4C91-ACB8-17B9286C9417}</Project>
       <Name>EVO.Kern</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EVO.MetaEvo\EVO.MetaEvo.csproj">
+      <Project>{85403900-E545-4122-B1A0-8C30AE0D0F3C}</Project>
+      <Name>EVO.MetaEvo</Name>
     </ProjectReference>
     <ProjectReference Include="..\EVO.OptResult\EVO.OptResult.vbproj">
       <Project>{A7B7B98D-94BE-47DB-954F-BBA2C1F53663}</Project>
