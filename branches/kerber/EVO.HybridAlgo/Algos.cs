@@ -14,7 +14,7 @@ namespace IHWB.EVO.MetaEvo
            
         }
 
-        public void build_individuals(Algofeedback feedback_input, ref EVO.Common.Individuum_MetaEvo[] new_generation_input, int startindex_input)
+        public void build_individuals(ref EVO.Common.Individuum_MetaEvo[] genpool_input, ref EVO.Common.Individuum_MetaEvo[] new_generation_input, Algofeedback feedback_input, int startindex_input)
         {
             //Beschreibbare Individuen für einen Algo: generation[startindex] bis generation[startindex+numberindividuums]
             int startindex = startindex_input;

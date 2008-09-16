@@ -15,6 +15,7 @@ namespace IHWB.EVO.MetaEvo
 
         Networkmanager networkmanager;
         EVO.Common.Individuum_MetaEvo individuumForClient;
+        EVO.Common.Individuum individuumForClient_Base;
         EVO.Common.Individuum_MetaEvo[] generation;
         Algomanager algomanager;
 
