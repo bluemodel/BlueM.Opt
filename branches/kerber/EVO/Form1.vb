@@ -43,7 +43,7 @@ Partial Class Form1
 
     'Methoden
     Private CES1 As EVO.Kern.CES
-    Private MetaEvoController As EVO.HybridAlgo.Controller
+    Private MetaEvoController As EVO.MetaEvo.Controller
 
     '**** Globale Parameter Parameter Optimierung ****
     'TODO: diese Werte sollten eigentlich nur in CES bzw PES vorgehalten werden
@@ -700,7 +700,7 @@ Partial Class Form1
                         Case METH_HOOKJEEVES
                             Call STARTEN_HookJeeves()
                         Case METH_MetaEvo
-                            MetaEvoController = New EVO.HybridAlgo.Controller(Me.mProblem, EVO_Einstellungen1.Settings, Me.Hauptdiagramm1, Me.Sim1)
+                            MetaEvoController = New EVO.MetaEvo.Controller(Me.mProblem, EVO_Einstellungen1.Settings, Me.Hauptdiagramm1, Me.Sim1)
                     End Select
 
                 Case ANW_TESTPROBLEME
@@ -708,7 +708,7 @@ Partial Class Form1
                         Case METH_PES
                             Call STARTEN_PES()
                         Case METH_MetaEvo
-                            MetaEvoController = New EVO.HybridAlgo.Controller(Me.mProblem, EVO_Einstellungen1.Settings, Me.Hauptdiagramm1, Me.Sim1)
+                            MetaEvoController = New EVO.MetaEvo.Controller(Me.mProblem, EVO_Einstellungen1.Settings, Me.Hauptdiagramm1, Me.Sim1)
                     End Select
 
                 Case ANW_TSP

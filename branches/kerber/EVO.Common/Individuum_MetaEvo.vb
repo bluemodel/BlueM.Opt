@@ -1,12 +1,11 @@
 ﻿Public Class Individuum_MetaEvo
     Inherits Individuum
 
-
-    Private optparas() As Double            'Gene/Optimierungsparameter des Individuums
     Private generator As String             'von welchem Algorithmus das Individuum gemacht wurde
     Private Client As String                'Welcher Rechner dieses Individuum berechnen soll [ip oder Rechnername]
     Private numberOptparas As Integer       'Anzahl der Optoaras des Problems
     Private status As String                '{raw, calculate, ready, false}
+    Private basisIndividuum As Individuum
 
     '### Initialisierung
     Public Sub New(ByVal type As String, ByVal id As Integer, ByVal numberOptparas_input As Integer)
@@ -15,7 +14,6 @@
         Call MyBase.New(type, id)
 
         numberOptparas = numberOptparas_input
-        ReDim optparas(numberOptparas - 1)
 
     End Sub
     '### Überschriebene Methoden
@@ -35,20 +33,20 @@
 
         End Get
         Set(ByVal value As OptParameter())
-
+           
         End Set
     End Property
 
     '### Neue Methoden
     'Gene setzen
     Public Function set_optparas(ByVal optparas_input As Double())
-        Me.optparas = optparas_input
+        Me.OptParameter_RWerte = optparas_input
         Return True
     End Function
 
     'Gene zurückgeben
     Public Function get_optparas() As Double()
-        Return Me.optparas
+        Return Me.OptParameter_RWerte
     End Function
 
     'Generator setzen
@@ -64,7 +62,7 @@
 
     'IPWorker setzen
     Public Function set_Client(ByVal client_input As String)
-        Me.Client = Client_input
+        Me.Client = client_input
         Return True
     End Function
 

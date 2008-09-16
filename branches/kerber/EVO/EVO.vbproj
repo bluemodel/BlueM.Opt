@@ -107,7 +107,7 @@
       <Project>{CAA1CE91-0973-4BE7-9BD8-16B5D40BC93C}</Project>
       <Name>EVO.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\EVO.HybridAlgo\EVO.HybridAlgo.csproj">
+    <ProjectReference Include="..\EVO.MetaEvo\EVO.MetaEvo.csproj">
       <Project>{85403900-E545-4122-B1A0-8C30AE0D0F3C}</Project>
       <Name>EVO.HybridAlgo</Name>
     </ProjectReference>
