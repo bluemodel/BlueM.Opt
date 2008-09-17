@@ -357,35 +357,7 @@ namespace IHWB.EVO.MetaEvo
 
  
         //### Methoden ### Working Process -> Network Functions for Clients
-        /*
-        //(ok)Eigene Eigenschaften eines Clients/Servers in der DB updaten 
-        public void Network_UpdateInDB(string status_input, double speed_av_input, double speed_low_input)
-        {
-            //Client in DB updaten 
-            string tmptxt = "UPDATE `metaevo_network` SET ";
-
-            //status
-            if (status_input != "")
-            {
-                tmptxt = tmptxt + "status = '" + status_input + "', ";
-            }
-            //speed
-            if (speed_av_input != 0)
-            {
-                tmptxt = tmptxt + "speed_av = '" + speed_av_input + "', ";
-            }
-            //lowest speed
-            if (speed_low_input != 0)
-            {
-                tmptxt = tmptxt + "speed_low = '" + speed_low_input + "' ";
-            }
-            tmptxt = tmptxt.TrimEnd(',', ' ') + " WHERE ipName = '" + Dns.GetHostName() + "' LIMIT 1;";
-            myCommand.CommandText = tmptxt;
-            myCommand.Connection.Open();
-            myCommand.ExecuteNonQuery();
-            myCommand.Connection.Close();
-        }
-        */
+        
         //(ok)Status von Server lesen // Rückgabe stringarray[1][status, timestamp]
         public string[] Network_ReadServer()
         {
@@ -412,6 +384,7 @@ namespace IHWB.EVO.MetaEvo
             Client back = new Client(ref mycon, ipName_input, "ready", DateTime.Now, 0, 0, 0);
             return back;
         }
+
 
 
         //### Methoden ### Working Process -> Scheduling
@@ -572,7 +545,9 @@ namespace IHWB.EVO.MetaEvo
         }
 
 
+
         //### Hauptprogramm ### Berechnet eine Generation im Netzwerk
+
         public bool perform_step(ref EVO.Common.Individuum_MetaEvo[] generation_input)
         {
             TimeSpan waitfor;

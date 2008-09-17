@@ -19,11 +19,20 @@ namespace IHWB.EVO.MetaEvo
             //Beschreibbare Individuen für einen Algo: generation[startindex] bis generation[startindex+numberindividuums]
             int startindex = startindex_input;
             int numberindividuums = feedback_input.number_individuals_for_nextGen;
+            Random rand = new Random();
+
+            new_generation_input.Initialize();
 
             switch (feedback_input.name)
             {
                 case "testalgo_0":
 
+                    for (int i = 0; i < numberindividuums; i++)
+                    {
+                        //Zufälligen parent wählen und kopieren
+                        new_generation_input[startindex + i] = genpool_input[rand.Next(0, genpool_input.Length)].Clone_MetaEvo();
+
+                    }
                     break;
                 case "testalgo_1":
 

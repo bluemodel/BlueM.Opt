@@ -47,8 +47,6 @@ namespace IHWB.EVO.MetaEvo
                         generation[j] = new EVO.Common.Individuum_MetaEvo("MetaEvo", individuumnumber, prob_input.List_OptParameter.Length);
                         individuumnumber++;
                     }
-                    //Zufällige Parents setzen
-                    set_random_adults();
 
                     //Algomanager starten
                     algomanager = new Algomanager(ref prob);
@@ -91,7 +89,7 @@ namespace IHWB.EVO.MetaEvo
         //### Methoden ###
 
         // Zufällige Eltern setzen
-        private bool set_random_adults()
+        private bool set_random_parents()
         {
             double[] random;
             Random randomizer = new Random();
@@ -119,8 +117,33 @@ namespace IHWB.EVO.MetaEvo
         // Single PC
         private void start_single_pc(ref EVO.Apps.Sim sim_input)
         {
-            MessageBox.Show("Single PC wird ausgeführt");
+            Client mePC = networkmanager.Network_Init_Client_Object(Dns.GetHostName());
+            mePC.status = "init";
+            int generationcounter = 0;
 
+            while (generationcounter < settings.MetaEvo.NumberGenerations)
+            {
+                if (mePC.status == "init")
+                {
+                    //Zufällige Parents setzen
+                    set_random_parents();
+
+                    //Genpool setzen
+                    algomanager.set_genpool(generation);
+
+                    mePC.status = "perform";
+                }
+
+                else if (mePC.status == "perform")
+                {
+                    //Zeichnen
+
+                    //Neue Generation
+                    algomanager.eval_and_build(ref generation);
+
+                    generationcounter++;
+                }
+            }
         }
 
         // Network Server
@@ -128,14 +151,15 @@ namespace IHWB.EVO.MetaEvo
         {
             Client meServer = networkmanager.Network_Init_Client_Object(Dns.GetHostName());
             meServer.status = "init Genpool";
+            int generationcounter = 0;
 
-            for (int k = 0; k < settings.MetaEvo.NumberGenerations; k++)
+            while (generationcounter < settings.MetaEvo.NumberGenerations)
             {
                 //Einmaliges Initialisieren des Genpools
                 if (meServer.status == "init Genpool")
                 {
                     //Zufällige Parents setzen und in DB schreiben
-                    set_random_adults();
+                    set_random_parents();
                     networkmanager.Individuums_WriteToDB(ref generation);
 
                     if (networkmanager.perform_step(ref this.generation))
@@ -150,10 +174,12 @@ namespace IHWB.EVO.MetaEvo
                 }
 
                 //Individuen erzeugen
-                if (meServer.status == "generate Individuums")
+                else if (meServer.status == "generate Individuums")
                 {
                     //Fertig berechnete Individuen (alle) aus der DB in generation updaten
                     networkmanager.Individuums_UpdateFromDB(ref this.generation);
+
+                    //Zeichnen
 
                     //Evolutionsschritte
                     algomanager.eval_and_build(ref this.generation);
@@ -163,10 +189,12 @@ namespace IHWB.EVO.MetaEvo
 
                     //Neuen Serverstatus setzen
                     meServer.set_AlsoInDB("error watching", -1, -1, -1);
+
+                    generationcounter++;
                 }
 
                 //Individuen berechnen lassen
-                if (meServer.status == "error watching")
+                else if (meServer.status == "error watching")
                 {
                     if (networkmanager.perform_step(ref this.generation))
                     {
