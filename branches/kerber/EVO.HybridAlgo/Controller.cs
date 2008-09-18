@@ -15,7 +15,6 @@ namespace IHWB.EVO.MetaEvo
 
         Networkmanager networkmanager;
         EVO.Common.Individuum_MetaEvo individuumForClient;
-        EVO.Common.Individuum individuumForClient_Base;
         EVO.Common.Individuum_MetaEvo[] generation;
         Algomanager algomanager;
 
@@ -49,7 +48,7 @@ namespace IHWB.EVO.MetaEvo
                     }
 
                     //Algomanager starten
-                    algomanager = new Algomanager(ref prob);
+                    algomanager = new Algomanager(ref prob, individuumnumber);
 
                     //### Hauptprogramm ###
                     start_single_pc(ref sim_input);
@@ -66,7 +65,7 @@ namespace IHWB.EVO.MetaEvo
                     }
 
                     //Algomanager starten
-                    algomanager = new Algomanager(ref prob);
+                    algomanager = new Algomanager(ref prob, individuumnumber);
 
                     //### Hauptprogramm ###
                     networkmanager = new Networkmanager(ref this.generation[0], ref this.settings);
@@ -117,7 +116,7 @@ namespace IHWB.EVO.MetaEvo
         // Single PC
         private void start_single_pc(ref EVO.Apps.Sim sim_input)
         {
-            Client mePC = networkmanager.Network_Init_Client_Object(Dns.GetHostName());
+            Client mePC = new Client(); 
             mePC.status = "init";
             int generationcounter = 0;
 
@@ -144,12 +143,14 @@ namespace IHWB.EVO.MetaEvo
                     generationcounter++;
                 }
             }
+            MessageBox.Show("Single PC","Problem fertig berechnet");
         }
 
         // Network Server
         private void start_network_server(ref EVO.Apps.Sim sim_input)
         {
-            Client meServer = networkmanager.Network_Init_Client_Object(Dns.GetHostName());
+            Client meServer = new Client(); 
+            meServer = networkmanager.Network_Init_Client_Object(Dns.GetHostName());
             meServer.status = "init Genpool";
             int generationcounter = 0;
 
@@ -207,15 +208,17 @@ namespace IHWB.EVO.MetaEvo
                 }
             }
             meServer.set_AlsoInDB("finished", -1, -1, -1);
+            MessageBox.Show("Network Server", "Problem fertig berechnet");
         }
 
         // Network Client
         private void start_network_client(ref EVO.Apps.Sim sim_input)
         {
-            MessageBox.Show("Network Client wird ausgeführt");
 
+            Client meClient = new Client();
+            meClient = networkmanager.Network_Init_Client_Object(Dns.GetHostName());
             string[] serverstatus = networkmanager.Network_ReadServer();
-            Client meClient = networkmanager.Network_Init_Client_Object(Dns.GetHostName());
+            
 
             //Solange der Server noch nicht fertig ist
             while (serverstatus[0] != "finished") {
@@ -252,6 +255,7 @@ namespace IHWB.EVO.MetaEvo
                 }
                 serverstatus = networkmanager.Network_ReadServer();
             }
+            MessageBox.Show("Network Client", "Problem fertig berechnet");
         }
 
 

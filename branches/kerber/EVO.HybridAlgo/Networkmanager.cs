@@ -381,7 +381,7 @@ namespace IHWB.EVO.MetaEvo
         //(ok)Client-Individuum initialisieren
         public Client Network_Init_Client_Object(string ipName_input)
         {
-            Client back = new Client(ref mycon, ipName_input, "ready", DateTime.Now, 0, 0, 0);
+            Client back = new Client(ref mycon, ipName_input, "ready", DateTime.Now, 1000, 1000, 0);
             return back;
         }
 

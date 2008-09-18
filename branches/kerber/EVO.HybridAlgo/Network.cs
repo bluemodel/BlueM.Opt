@@ -23,6 +23,11 @@ namespace IHWB.EVO.MetaEvo
         MySqlCommand myCommand;
         MySqlDataReader myReader;
 
+        public Client()
+        {
+            
+        }
+
         public Client(ref MySqlConnection mycon_input, string ipName_input, string status_input, DateTime timestamp_input, double speed_av_input, double speed_low_input, int numberindividuums_input)
         {
             ipName = ipName_input;

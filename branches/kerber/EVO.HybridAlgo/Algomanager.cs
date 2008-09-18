@@ -13,6 +13,7 @@ namespace IHWB.EVO.MetaEvo
         public double initiative;
 
         //Eigenschaften für den Algo: Hier können Feedbackinfos abgelegt werden
+        int[] feedback_int;
         string[] feedback_string;
         double[] feedback_double;
 
@@ -31,24 +32,23 @@ namespace IHWB.EVO.MetaEvo
         EVO.Common.Individuum_MetaEvo[] genpool;
         Algos algos;
         int startindex;
-        int minimumdistance;
+        int individuumnumber;
 
-        public Algomanager(ref EVO.Common.Problem prob_input)
+        public Algomanager(ref EVO.Common.Problem prob_input, int individuumnumber_input)
         {
+            individuumnumber = individuumnumber_input;
             //Algoarray initialisieren in der Grösse der Anzahl der Algorithmen
             algos = new Algos();
 
             algofeedbackarray = new Algofeedback[2];
 
-            algofeedbackarray[0] = new Algofeedback("testalgo_0");
-            algofeedbackarray[1] = new Algofeedback("testalgo_1");
+            algofeedbackarray[0] = new Algofeedback("Zufällige Einfache Mutation");
+            algofeedbackarray[1] = new Algofeedback("Zufällige Rekombination");
         }
 
         public void set_genpool(EVO.Common.Individuum_MetaEvo[] genpool_input) 
         {
             this.genpool = genpool_input;
-
-            //minimumdistance initialisieren -> maximum der Distanz zwischen zwei Nachbarn
         }
 
         public void eval_and_build(ref EVO.Common.Individuum_MetaEvo[] new_generation_input)
@@ -74,7 +74,7 @@ namespace IHWB.EVO.MetaEvo
 
             //2.Feedback erstellen
             //2.1.Initiative berechnen
-            //2.2.Individuen für nächste Generation berechnen
+            //2.2.Anzahl Individuen pro Algo für nächste Generation berechnen
 
             //3.Rückgabe für Zeichnen generieren (aus neuem Genpool)
 
@@ -82,7 +82,7 @@ namespace IHWB.EVO.MetaEvo
             startindex = 0;
             for (int k = 0; k < algofeedbackarray.Length; k++)
             {
-                algos.build_individuals(ref genpool, ref new_generation_input, algofeedbackarray[k], startindex);
+                algos.build_individuals(ref genpool, ref new_generation_input, algofeedbackarray[k], startindex, ref individuumnumber);
                 startindex += algofeedbackarray[k].number_individuals_for_nextGen;
             }
         }
@@ -95,15 +95,17 @@ namespace IHWB.EVO.MetaEvo
             EVO.Common.Individuum_MetaEvo individuum_tmp;
             while (low_input <= high_input)
             {
+                //Nächste Abweichung von der erstrebten Sortierung suchen
                 while (input[low].get_optparas()[kriterium] < medianvalue) low++;
-                while (input[high].get_optparas()[kriterium] > medianvalue) high++;
+                while (input[high].get_optparas()[kriterium] > medianvalue) high--;
+                //Tauschen falls indizes "high" und "low" entsprechend stehen
                 if (low <= high)
                 {
                     individuum_tmp = input[low];
                     input[low] = input[high];
                     input[high] = individuum_tmp;
                     low++;
-                    high++;
+                    high--;
                 }
             }
             if (low_input < low) quicksort(ref input, kriterium, low_input, low);
