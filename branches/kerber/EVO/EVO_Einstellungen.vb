@@ -573,6 +573,7 @@ Public Class EVO_Einstellungen
 
             Me.Combo_Hybrid_Role.SelectedItem = .Role
             Me.Numeric_Hybrid_PopulationSize.Value = .PopulationSize
+            Me.Numeric_Hybrid_Numbergenerations.Value = .NumberGenerations
             Me.CheckBox_Hybrid_Draw.Checked = .Draw
             Me.TextBox_Hybrid_MySQL_Host.Text = .MySQL_Host
             Me.TextBox_Hybrid_MySQL_DB.Text = .MySQL_Database
