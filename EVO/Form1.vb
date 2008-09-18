@@ -706,6 +706,7 @@ Partial Class Form1
             End If
 
             'Ergebnis-Buttons
+            Me.Button_openMDB.Enabled = False
             If (Not IsNothing(Sim1)) Then
                 Me.Button_saveMDB.Enabled = True
                 Me.Button_Scatterplot.Enabled = True
