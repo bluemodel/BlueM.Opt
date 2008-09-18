@@ -274,7 +274,7 @@ Public Class EVO_Settings
             Me.Role = "Single PC"
 
             Me.PopulationSize = 20
-            Me.NumberGenerations = 100
+            Me.NumberGenerations = 10
 
             Me.Draw = True
 

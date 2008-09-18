@@ -3,17 +3,28 @@
 
     Private generator As String             'von welchem Algorithmus das Individuum gemacht wurde
     Private Client As String                'Welcher Rechner dieses Individuum berechnen soll [ip oder Rechnername]
-    Private numberOptparas As Integer       'Anzahl der Optoaras des Problems
+    Private numberOptparas As Integer       'Anzahl der Optparas des Problems
     Private status As String                '{raw, calculate, ready, false}
-    Private basisIndividuum As Individuum
+    Private mOptparameter() As OptParameter
 
     '### Initialisierung
     Public Sub New(ByVal type As String, ByVal id As Integer, ByVal numberOptparas_input As Integer)
 
+
         'Basisindividuum instanzieren
         Call MyBase.New(type, id)
 
+        Dim i As Integer
+        ReDim Me.mOptparameter(numberOptparas_input)
         numberOptparas = numberOptparas_input
+
+        'Initialisieren der Optparameter
+        For i = 0 To numberOptparas - 1
+            Me.mOptparameter(i) = New OptParameter()
+            Me.mOptParameter(i).Min = Individuum.mProblem.List_OptParameter(i).Min
+            Me.mOptParameter(i).Max = Individuum.mProblem.List_OptParameter(i).Max
+            Me.mOptParameter(i).Bezeichnung = Individuum.mProblem.List_OptParameter(i).Bezeichnung
+        Next
 
     End Sub
     '### Überschriebene Methoden
@@ -35,7 +46,7 @@
 
     Public Overrides Property OptParameter() As OptParameter()
         Get
-
+            Return Me.mOptparameter
         End Get
         Set(ByVal value As OptParameter())
            
