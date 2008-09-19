@@ -34,7 +34,7 @@ namespace IHWB.EVO.MetaEvo
         int startindex;
         int individuumnumber;
 
-        public Algomanager(ref EVO.Common.Problem prob_input, int individuumnumber_input)
+        public Algomanager(ref EVO.Common.Problem prob_input, int individuumnumber_input) //Zeichenobjekt übergeben
         {
             individuumnumber = individuumnumber_input;
             //Algoarray initialisieren in der Grösse der Anzahl der Algorithmen
@@ -60,7 +60,7 @@ namespace IHWB.EVO.MetaEvo
             int kriterium = rand.Next(0, new_generation_input[0].get_optparas().Length);
 
             //1.1.3.Sortieren und Dominanzkriterium anwenden innerhalb der neuen Individuen
-            quicksort(ref new_generation_input, kriterium, 0, new_generation_input[0].get_optparas().Length-1);
+            quicksort(ref new_generation_input, kriterium, 0, new_generation_input.Length-1);
             check_domination(ref new_generation_input, ref new_generation_input);
             
             //1.1.4.Dominanzkriterium anwenden zwischen den neuen und den alten Individuen
@@ -70,7 +70,7 @@ namespace IHWB.EVO.MetaEvo
             clustering(ref genpool, ref new_generation_input);
 
             //1.2.1.Sortieren des genpools
-            quicksort(ref genpool, kriterium, 0, new_generation_input[0].get_optparas().Length - 1);
+            quicksort(ref genpool, kriterium, 0, new_generation_input.Length - 1);
 
             //2.Feedback erstellen
             //2.1.Initiative berechnen
@@ -93,13 +93,13 @@ namespace IHWB.EVO.MetaEvo
             int high = high_input;
             double medianvalue = input[(low_input + high_input) / 2].get_optparas()[kriterium];
             EVO.Common.Individuum_MetaEvo individuum_tmp;
-            while (low_input <= high_input)
+            while (low < high)
             {
                 //Nächste Abweichung von der erstrebten Sortierung suchen
-                while (input[low].get_optparas()[kriterium] < medianvalue) low++;
-                while (input[high].get_optparas()[kriterium] > medianvalue) high--;
+                while ((input[low].get_optparas()[kriterium] <= medianvalue) && (low < high)) low++;
+                while ((input[high].get_optparas()[kriterium] >= medianvalue) && (low < high)) high--;
                 //Tauschen falls indizes "high" und "low" entsprechend stehen
-                if (low <= high)
+                if (low < high)
                 {
                     individuum_tmp = input[low];
                     input[low] = input[high];
@@ -108,6 +108,8 @@ namespace IHWB.EVO.MetaEvo
                     high--;
                 }
             }
+            low--;
+            high++;
             if (low_input < low) quicksort(ref input, kriterium, low_input, low);
             if (high < high_input) quicksort(ref input, kriterium, high, high_input);
         }
@@ -131,9 +133,9 @@ namespace IHWB.EVO.MetaEvo
                             if (input[k].get_status() == "true")
                             {
                                 //Jede Eigenschaft vergleichen
-                                for (int j = 0; j < input[0].Features.Length; j++)
+                                for (int j = 0; j < input[0].Penalties.Length; j++)
                                 {
-                                    if (input[i].Features[j] > input[k].Features[j]) { dominated = false; break; }
+                                    if (input[i].Penalties[j] > input[k].Penalties[j]) { dominated = false; break; }
                                 }
                                 if (dominated) { input[i].set_status("false"); dominated = true; break; }
                             }
@@ -155,9 +157,10 @@ namespace IHWB.EVO.MetaEvo
                             if (input2[k].get_status() == "true")
                             {
                                 //Jede Eigenschaft vergleichen
-                                for (int j = 0; j < input[0].Features.Length; j++)
+                                for (int j = 0; j < input[0].Penalties.Length; j++)
                                 {
-                                    if (input[i].Features[j] > input2[k].Features[j]) {
+                                    if (input[i].Penalties[j] > input2[k].Penalties[j])
+                                    {
                                         if (status == 0) status = 1;
                                         else if (status == -1)
                                         {
@@ -165,7 +168,8 @@ namespace IHWB.EVO.MetaEvo
                                             break;
                                         }
                                     }
-                                    if (input[i].Features[j] < input2[k].Features[j]) { 
+                                    if (input[i].Penalties[j] < input2[k].Penalties[j])
+                                    { 
                                         if (status == 0) status = -1;
                                         else if (status == 1)
                                         {

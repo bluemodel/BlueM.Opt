@@ -135,7 +135,11 @@ namespace IHWB.EVO.MetaEvo
 
                 else if (mePC.status == "perform")
                 {
-                    //Zeichnen
+                    for (int i = 0; i < generation.Length; i++)
+                    {
+                        //Simulieren (geht noch nicht)
+                        //sim_input.Evaluate(ref generation[i]);
+                    }
 
                     //Neue Generation
                     algomanager.eval_and_build(ref generation);
