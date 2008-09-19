@@ -49,7 +49,7 @@
             Return Me.mOptparameter
         End Get
         Set(ByVal value As OptParameter())
-           
+            Me.mOptparameter = value
         End Set
     End Property
 
