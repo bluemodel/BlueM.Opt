@@ -1,7 +1,7 @@
 ﻿Public Class Individuum_MetaEvo
     Inherits Individuum
 
-    Private generator As String             'von welchem Algorithmus das Individuum gemacht wurde
+    Private generator_id As Integer         'von welchem Algorithmus das Individuum gemacht wurde
     Private Client As String                'Welcher Rechner dieses Individuum berechnen soll [ip oder Rechnername]
     Private numberOptparas As Integer       'Anzahl der Optparas des Problems
     Private status As String                '{raw, calculate, ready, false}
@@ -66,14 +66,14 @@
     End Function
 
     'Generator setzen
-    Public Function set_generator(ByVal generator_input As String)
-        Me.generator = generator_input
+    Public Function set_generator(ByVal generator_input As Integer)
+        Me.generator_id = generator_input
         Return True
     End Function
 
     'Generator auslesen
-    Public Function get_generator() As String
-        Return Me.generator
+    Public Function get_generator() As Integer
+        Return Me.generator_id
     End Function
 
     'IPWorker setzen

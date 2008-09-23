@@ -261,6 +261,7 @@ Public Class EVO_Settings
         
         'Performanceeinstellungen
         Public Draw As Boolean                      'Ob die Berechnung grafisch dargestellt wird
+        Public Log As Boolean                       'Ob die Logdaten angezeigt werden sollen
 
         'Datenbank-Connection
         Public MySQL_Host As String
@@ -277,6 +278,7 @@ Public Class EVO_Settings
             Me.NumberGenerations = 10
 
             Me.Draw = True
+            Me.Log = True
 
             Me.MySQL_Host = "localhost"
             Me.MySQL_Database = "MetaEvo_db"
