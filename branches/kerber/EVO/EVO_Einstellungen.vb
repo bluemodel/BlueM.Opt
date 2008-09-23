@@ -422,8 +422,10 @@ Public Class EVO_Einstellungen
         With Me.msettings.MetaEvo
 
             .Role = Me.Combo_Hybrid_Role.SelectedItem
+            .NumberGenerations = Me.Numeric_Hybrid_Numbergenerations.Value
             .PopulationSize = Me.Numeric_Hybrid_PopulationSize.Value
             .Draw = Me.CheckBox_Hybrid_Draw.Checked
+            .Log = Me.CheckBox_Hybrid_Log.Checked
             .MySQL_Host = Me.TextBox_Hybrid_MySQL_Host.Text
             .MySQL_Database = Me.TextBox_Hybrid_MySQL_DB.Text
             .MySQL_User = Me.TextBox_Hybrid_MySQL_User.Text
@@ -575,6 +577,7 @@ Public Class EVO_Einstellungen
             Me.Numeric_Hybrid_PopulationSize.Value = .PopulationSize
             Me.Numeric_Hybrid_Numbergenerations.Value = .NumberGenerations
             Me.CheckBox_Hybrid_Draw.Checked = .Draw
+            Me.CheckBox_Hybrid_Log.Checked = .Log
             Me.TextBox_Hybrid_MySQL_Host.Text = .MySQL_Host
             Me.TextBox_Hybrid_MySQL_DB.Text = .MySQL_Database
             Me.TextBox_Hybrid_MySQL_User.Text = .MySQL_User
@@ -726,7 +729,7 @@ Public Class EVO_Einstellungen
             Me.GroupBox_Hybrid_MySQLOptions.Enabled = False
         ElseIf (Me.Combo_Hybrid_Role.SelectedItem = "Network Client") Then
             Me.GroupBox_Hybrid_BasicOptions.Enabled = False
-            Me.GroupBox_Hybrid_PerformanceOptions.Enabled = True
+            Me.GroupBox_Hybrid_PerformanceOptions.Enabled = False
             Me.GroupBox_Hybrid_MySQLOptions.Enabled = True
         ElseIf (Me.Combo_Hybrid_Role.SelectedItem = "Network Server") Then
             Me.GroupBox_Hybrid_BasicOptions.Enabled = True

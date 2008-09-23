@@ -65,6 +65,7 @@ Partial Class EVO_Einstellungen
         Dim Label15 As System.Windows.Forms.Label
         Dim Label16 As System.Windows.Forms.Label
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(EVO_Einstellungen))
+        Dim Label12 As System.Windows.Forms.Label
         Me.TabControl1 = New System.Windows.Forms.TabControl
         Me.TabPage_PES = New System.Windows.Forms.TabPage
         Me.Label_OptModusValue = New System.Windows.Forms.Label
@@ -149,6 +150,7 @@ Partial Class EVO_Einstellungen
         Me.SpeichernToolStripButton = New System.Windows.Forms.ToolStripButton
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox
+        Me.CheckBox_Hybrid_Log = New System.Windows.Forms.CheckBox
         Label_CES_MemSize = New System.Windows.Forms.Label
         Label_CES_NMembers_SecPop_PES = New System.Windows.Forms.Label
         Label_CES_NExchange_secPop_PES = New System.Windows.Forms.Label
@@ -194,6 +196,7 @@ Partial Class EVO_Einstellungen
         Label14 = New System.Windows.Forms.Label
         Label15 = New System.Windows.Forms.Label
         Label16 = New System.Windows.Forms.Label
+        Label12 = New System.Windows.Forms.Label
         Me.TabControl1.SuspendLayout()
         Me.TabPage_PES.SuspendLayout()
         CType(Me.TextDeltaStart, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -1444,7 +1447,7 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Hybrid_MySQLOptions.Controls.Add(Label14)
         Me.GroupBox_Hybrid_MySQLOptions.Controls.Add(Label15)
         Me.GroupBox_Hybrid_MySQLOptions.Enabled = False
-        Me.GroupBox_Hybrid_MySQLOptions.Location = New System.Drawing.Point(11, 172)
+        Me.GroupBox_Hybrid_MySQLOptions.Location = New System.Drawing.Point(11, 200)
         Me.GroupBox_Hybrid_MySQLOptions.Name = "GroupBox_Hybrid_MySQLOptions"
         Me.GroupBox_Hybrid_MySQLOptions.Size = New System.Drawing.Size(200, 125)
         Me.GroupBox_Hybrid_MySQLOptions.TabIndex = 52
@@ -1482,12 +1485,14 @@ Partial Class EVO_Einstellungen
         '
         'GroupBox_Hybrid_PerformanceOptions
         '
+        Me.GroupBox_Hybrid_PerformanceOptions.Controls.Add(Me.CheckBox_Hybrid_Log)
+        Me.GroupBox_Hybrid_PerformanceOptions.Controls.Add(Label12)
         Me.GroupBox_Hybrid_PerformanceOptions.Controls.Add(Me.CheckBox_Hybrid_Draw)
         Me.GroupBox_Hybrid_PerformanceOptions.Controls.Add(Label30)
         Me.GroupBox_Hybrid_PerformanceOptions.Enabled = False
         Me.GroupBox_Hybrid_PerformanceOptions.Location = New System.Drawing.Point(11, 121)
         Me.GroupBox_Hybrid_PerformanceOptions.Name = "GroupBox_Hybrid_PerformanceOptions"
-        Me.GroupBox_Hybrid_PerformanceOptions.Size = New System.Drawing.Size(200, 45)
+        Me.GroupBox_Hybrid_PerformanceOptions.Size = New System.Drawing.Size(200, 73)
         Me.GroupBox_Hybrid_PerformanceOptions.TabIndex = 51
         Me.GroupBox_Hybrid_PerformanceOptions.TabStop = False
         Me.GroupBox_Hybrid_PerformanceOptions.Text = "Performance Options"
@@ -1496,7 +1501,7 @@ Partial Class EVO_Einstellungen
         '
         Me.CheckBox_Hybrid_Draw.Checked = True
         Me.CheckBox_Hybrid_Draw.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBox_Hybrid_Draw.Location = New System.Drawing.Point(174, 20)
+        Me.CheckBox_Hybrid_Draw.Location = New System.Drawing.Point(174, 19)
         Me.CheckBox_Hybrid_Draw.Name = "CheckBox_Hybrid_Draw"
         Me.CheckBox_Hybrid_Draw.Size = New System.Drawing.Size(18, 18)
         Me.CheckBox_Hybrid_Draw.TabIndex = 50
@@ -1586,6 +1591,24 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Einstellungen.TabIndex = 0
         Me.GroupBox_Einstellungen.TabStop = False
         Me.GroupBox_Einstellungen.Text = "Einstellungen:"
+        '
+        'CheckBox_Hybrid_Log
+        '
+        Me.CheckBox_Hybrid_Log.Checked = True
+        Me.CheckBox_Hybrid_Log.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.CheckBox_Hybrid_Log.Location = New System.Drawing.Point(174, 45)
+        Me.CheckBox_Hybrid_Log.Name = "CheckBox_Hybrid_Log"
+        Me.CheckBox_Hybrid_Log.Size = New System.Drawing.Size(18, 18)
+        Me.CheckBox_Hybrid_Log.TabIndex = 52
+        '
+        'Label12
+        '
+        Label12.AutoSize = True
+        Label12.Location = New System.Drawing.Point(4, 48)
+        Label12.Name = "Label12"
+        Label12.Size = New System.Drawing.Size(83, 13)
+        Label12.TabIndex = 51
+        Label12.Text = "Application Log:"
         '
         'EVO_Einstellungen
         '
@@ -1735,4 +1758,5 @@ Partial Class EVO_Einstellungen
     Friend WithEvents TextBox_Hybrid_MySQL_Host As System.Windows.Forms.TextBox
     Friend WithEvents TextBox_Hybrid_MySQL_DB As System.Windows.Forms.TextBox
     Private WithEvents TabPage_MetaEvo As System.Windows.Forms.TabPage
+    Private WithEvents CheckBox_Hybrid_Log As System.Windows.Forms.CheckBox
 End Class
