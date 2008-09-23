@@ -381,11 +381,13 @@ Public MustInherit Class Sim
     ''' </summary>
     ''' <param name="ind">MetaEvo Individuum</param>
     ''' <returns>True wenn erfolgreich, False wenn fehlgeschlagen</returns>
-    Public Overloads Function Evaluate(ByRef ind As EVO.Common.Individuum_MetaEvo)
+    Public Overloads Function Evaluate_MetaEvo(ByRef ind As EVO.Common.Individuum_MetaEvo)
         If (Me.Evaluate(ind)) Then
             ind.set_status("true")
+            Return True
         Else
             ind.set_status("false")
+            Return False
         End If
     End Function
 
