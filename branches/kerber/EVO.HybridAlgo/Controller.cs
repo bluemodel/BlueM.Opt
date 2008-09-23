@@ -17,6 +17,7 @@ namespace IHWB.EVO.MetaEvo
         EVO.Common.Individuum_MetaEvo individuumForClient;
         EVO.Common.Individuum_MetaEvo[] generation;
         Algomanager algomanager;
+        EVO.Diagramm.ApplicationLog applog;
 
         int individuumnumber;
         string role;
@@ -24,6 +25,9 @@ namespace IHWB.EVO.MetaEvo
         //### Konstruktor ###  
         public Controller(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input, ref EVO.Apps.Sim sim_input)  
         {
+            applog = new IHWB.EVO.Diagramm.ApplicationLog();
+            if (settings_input.MetaEvo.Log) applog.log = true;
+
             //Daten einlesen
             this.prob = prob_input;
             this.settings = settings_input;
@@ -38,6 +42,7 @@ namespace IHWB.EVO.MetaEvo
             switch (this.role)
             {
                 case "Single PC":
+                    if (applog.log) applog.appendText("Controller: MetaEvo started in 'Single PC'-Mode");
                     //### Vorbereitung ###
                     //Initialisieren des Individuum-Arrays
                     generation = new EVO.Common.Individuum_MetaEvo[this.settings.MetaEvo.PopulationSize];
@@ -48,13 +53,14 @@ namespace IHWB.EVO.MetaEvo
                     }
 
                     //Algomanager starten
-                    algomanager = new Algomanager(ref prob, individuumnumber);
+                    algomanager = new Algomanager(ref prob, individuumnumber, ref applog);
 
                     //### Hauptprogramm ###
                     start_single_pc(ref sim_input);
                     break;
 
                 case "Network Server":
+                    if (applog.log) applog.appendText("Controller: MetaEvo started in 'Network Server'-Mode");
                     //### Vorbereitung ###
                     //Initialisieren des Individuum-Arrays
                     generation = new EVO.Common.Individuum_MetaEvo[this.settings.MetaEvo.PopulationSize];
@@ -65,19 +71,20 @@ namespace IHWB.EVO.MetaEvo
                     }
 
                     //Algomanager starten
-                    algomanager = new Algomanager(ref prob, individuumnumber);
+                    algomanager = new Algomanager(ref prob, individuumnumber, ref applog);
 
                     //### Hauptprogramm ###
-                    networkmanager = new Networkmanager(ref this.generation[0], ref this.settings);
+                    networkmanager = new Networkmanager(ref this.generation[0], ref this.settings, ref applog);
                     start_network_server(ref sim_input);
                     break;
 
                 case "Network Client":
+                    if (applog.log) applog.appendText("Controller: MetaEvo started in 'Network Client'-Mode");
                     //### Vorbereitung ###
                     individuumForClient = new EVO.Common.Individuum_MetaEvo("MetaEvo", individuumnumber, prob_input.List_OptParameter.Length);
 
                     //### Hauptprogramm ###
-                    networkmanager = new Networkmanager(ref this.individuumForClient, ref this.settings);
+                    networkmanager = new Networkmanager(ref this.individuumForClient, ref this.settings, ref applog);
                     start_network_client(ref sim_input);
                     break;
             }  
@@ -88,10 +95,11 @@ namespace IHWB.EVO.MetaEvo
         //### Methoden ###
 
         // Zufällige Eltern setzen
-        private bool set_random_parents()
+        private bool set_random_parents(ref EVO.Common.Individuum_MetaEvo[] generation_input)
         {
             double[] random;
             Random randomizer = new Random();
+            if (applog.log) applog.appendText("Controller: Construct random Parents");
 
             //Für jedes Individuum durchgehen
             for (int k = 0; k < this.settings.MetaEvo.PopulationSize; k++)
@@ -104,7 +112,8 @@ namespace IHWB.EVO.MetaEvo
                     int min = (int)this.prob.List_OptParameter[j].Min;
                     random[j] = randomizer.Next(min, max);
                 }
-                generation[k].set_optparas(random);
+                generation_input[k].set_optparas(random);
+                generation_input[k].set_status("raw");
             }
             return true;
         }
@@ -118,14 +127,14 @@ namespace IHWB.EVO.MetaEvo
         {
             Client mePC = new Client(); 
             mePC.status = "init";
-            int generationcounter = 0;
+            int generationcounter = 1;
 
             while (generationcounter < settings.MetaEvo.NumberGenerations)
             {
                 if (mePC.status == "init")
                 {
                     //Zufällige Parents setzen
-                    set_random_parents();
+                    set_random_parents(ref generation);
 
                     //Genpool setzen
                     algomanager.set_genpool(generation);
@@ -135,11 +144,15 @@ namespace IHWB.EVO.MetaEvo
 
                 else if (mePC.status == "perform")
                 {
+                    if (applog.log) applog.appendText("Controller: ### Starting new Generation ###");
+                    if (applog.log) applog.appendText("Controller: Gen" + generationcounter + ": Simulate Individuals");
                     for (int i = 0; i < generation.Length; i++)
                     {
-                        //Simulieren (geht noch nicht)
-                        //sim_input.Evaluate(ref generation[i]);
+                        //Simulieren 
+                        //sim_input.Evaluate_MetaEvo(ref generation[i]); 
                     }
+                    //Zeichnen
+                    algomanager.draw(ref generation, ref hauptdiagramm1);
 
                     //Neue Generation
                     algomanager.eval_and_build(ref generation);
@@ -147,7 +160,7 @@ namespace IHWB.EVO.MetaEvo
                     generationcounter++;
                 }
             }
-            MessageBox.Show("Single PC","Problem fertig berechnet");
+            if (applog.log) applog.appendText("Controller: Calculation Finished");
         }
 
         // Network Server
@@ -164,10 +177,10 @@ namespace IHWB.EVO.MetaEvo
                 if (meServer.status == "init Genpool")
                 {
                     //Zufällige Parents setzen und in DB schreiben
-                    set_random_parents();
+                    set_random_parents(ref generation);
                     networkmanager.Individuums_WriteToDB(ref generation);
 
-                    if (networkmanager.perform_step(ref this.generation))
+                    if (networkmanager.perform_step(ref generation))
                     {
                         meServer.set_AlsoInDB("generate Individuums", -1, -1, -1);
                         algomanager.set_genpool(generation);
@@ -182,15 +195,16 @@ namespace IHWB.EVO.MetaEvo
                 else if (meServer.status == "generate Individuums")
                 {
                     //Fertig berechnete Individuen (alle) aus der DB in generation updaten
-                    networkmanager.Individuums_UpdateFromDB(ref this.generation);
+                    networkmanager.Individuums_UpdateFromDB(ref generation);
 
                     //Zeichnen
+                    algomanager.draw(ref generation, ref hauptdiagramm1);
 
                     //Evolutionsschritte
                     algomanager.eval_and_build(ref this.generation);
 
                     //Neue Individuen in die DB schreiben
-                    networkmanager.Individuums_WriteToDB(ref this.generation);
+                    networkmanager.Individuums_WriteToDB(ref generation);
 
                     //Neuen Serverstatus setzen
                     meServer.set_AlsoInDB("error watching", -1, -1, -1);
@@ -201,7 +215,7 @@ namespace IHWB.EVO.MetaEvo
                 //Individuen berechnen lassen
                 else if (meServer.status == "error watching")
                 {
-                    if (networkmanager.perform_step(ref this.generation))
+                    if (networkmanager.perform_step(ref generation))
                     {
                         meServer.set_AlsoInDB("generate Individuums", -1, -1, -1);
                     }
@@ -212,7 +226,7 @@ namespace IHWB.EVO.MetaEvo
                 }
             }
             meServer.set_AlsoInDB("finished", -1, -1, -1);
-            MessageBox.Show("Network Server", "Problem fertig berechnet");
+            if (applog.log) applog.appendText("Controller: Calculation Finished");
         }
 
         // Network Client
@@ -242,7 +256,7 @@ namespace IHWB.EVO.MetaEvo
                     //Individuum in DB als "calculate" markieren
                     networkmanager.Individuum_UpdateInDB(ref individuumForClient, "status", "calculate");
                     //Simulieren
-                    sim_input.Evaluate(ref individuumForClient);
+                    sim_input.Evaluate_MetaEvo(ref individuumForClient);
                     //Individuum in DB Updaten
                     networkmanager.Individuum_UpdateInDB(ref individuumForClient, "status feat const", "true");
                 }
@@ -259,7 +273,7 @@ namespace IHWB.EVO.MetaEvo
                 }
                 serverstatus = networkmanager.Network_ReadServer();
             }
-            MessageBox.Show("Network Client", "Problem fertig berechnet");
+            if (applog.log) applog.appendText("Controller: Calculation Finished");
         }
 
 

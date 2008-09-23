@@ -14,6 +14,7 @@ namespace IHWB.EVO.MetaEvo
         MySqlConnection mycon;
         MySqlCommand myCommand;
         MySqlDataReader myReader;
+        EVO.Diagramm.ApplicationLog applog;
 
         Network network1;
 
@@ -24,18 +25,20 @@ namespace IHWB.EVO.MetaEvo
         DateTime startingtime;       //Start des Berechnungszyklusses
 
         //### Konstruktor ###
-        public Networkmanager(ref EVO.Common.Individuum_MetaEvo individuum_input, ref EVO.Common.EVO_Settings settings_input)
+        public Networkmanager(ref EVO.Common.Individuum_MetaEvo individuum_input, ref EVO.Common.EVO_Settings settings_input, ref EVO.Diagramm.ApplicationLog applog_input)
         {
             number_optparas = individuum_input.get_optparas().Length;
             number_constraints = individuum_input.Constraints.Length;
             number_features = individuum_input.Features.Length;
             populationsize = settings_input.MetaEvo.PopulationSize;
+            applog = applog_input;
 
             myCommand = new MySqlCommand();
 
             //Server
             if (settings_input.MetaEvo.Role == "Network Server")
             {
+                if (applog.log) applog.appendText("Network Manager: Started in 'Network Server' Mode");
                 mycon = new MySqlConnection("datasource=" + settings_input.MetaEvo.MySQL_Host + ";username=" + settings_input.MetaEvo.MySQL_User + ";password=" + settings_input.MetaEvo.MySQL_Password + ";database=information_schema");
                 myCommand.Connection = mycon;
 
@@ -48,6 +51,7 @@ namespace IHWB.EVO.MetaEvo
             // Client
             else
             {
+                if (applog.log) applog.appendText("Network Manager: Started in 'Network Client' Mode");
                 mycon = new MySqlConnection("datasource=" + settings_input.MetaEvo.MySQL_Host + ";username=" + settings_input.MetaEvo.MySQL_User + ";password=" + settings_input.MetaEvo.MySQL_Password + ";database=" + settings_input.MetaEvo.MySQL_Database);
                 myCommand.Connection = mycon;
                 if (this.DB_check_connection())
@@ -68,9 +72,11 @@ namespace IHWB.EVO.MetaEvo
             {
                 mycon.Open();
                 mycon.Close();
+                if (applog.log) applog.appendText("Network Manager: DB-Connection Successfilly");
             }
             catch (MySqlException ex)
             {
+                if (applog.log) applog.appendText("Network Manager: DB-Connection Failed");
                 MessageBox.Show(ex.Message,"MySQL Database");
                 return false;
             }
@@ -131,6 +137,7 @@ namespace IHWB.EVO.MetaEvo
             myCommand.Connection.Open();
             myCommand.ExecuteNonQuery();
             myCommand.Connection.Close();
+            if (applog.log) applog.appendText("Network Manager: DB-Construction Successfilly");
         }
 
         //(ok)sich als Client in DB eintragen

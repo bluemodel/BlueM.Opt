@@ -5,26 +5,68 @@ using System.Windows.Forms;
 
 namespace IHWB.EVO.MetaEvo
 {
+    class Algofeedback
+    {
+        //Administrative Eigenschaften
+        public string name;
+        public int number_individuals_for_nextGen;
+        public int number_individuals_survived;
+        public double initiative;
+
+        //Eigenschaften für den Algo: Hier können Feedbackinfos abgelegt werden
+        int[] feedback_int;
+        string[] feedback_string;
+        double[] feedback_double;
+
+        public Algofeedback(string name_input)
+        {
+            this.name = name_input;
+            this.initiative = 10;
+            this.number_individuals_for_nextGen = 1;
+        }
+    }
+
     class Algos
     {
-        
+        public Algofeedback[] algofeedbackarray;
+        int individuumnumber;
 
-        public Algos()
+        public Algos(int individuumnumer_input)
         {
-           
+            individuumnumber = individuumnumer_input;
+
+            algofeedbackarray = new Algofeedback[2];
+            algofeedbackarray[0] = new Algofeedback("Zufällige Einfache Mutation");
+            algofeedbackarray[1] = new Algofeedback("Zufällige Rekombination");
         }
 
-        public void build_individuals(ref EVO.Common.Individuum_MetaEvo[] genpool_input, ref EVO.Common.Individuum_MetaEvo[] new_generation_input, Algofeedback feedback_input, int startindex_input, ref int individuumnumer_input)
+        public void newGeneration(ref EVO.Common.Individuum_MetaEvo[] genpool_input, ref EVO.Common.Individuum_MetaEvo[] new_generation_input)
+        {
+            int startindex;
+
+            startindex = 0;
+            for (int algo_id = 0; algo_id < algofeedbackarray.Length; algo_id++)
+            {
+                this.build_individuals(ref genpool_input, ref new_generation_input, algo_id, startindex);
+                startindex += algofeedbackarray[algo_id].number_individuals_for_nextGen;
+            }
+        }
+
+        public void build_individuals(ref EVO.Common.Individuum_MetaEvo[] genpool_input, ref EVO.Common.Individuum_MetaEvo[] new_generation_input, int algo_id, int startindex_input)
         {
             //Beschreibbare Individuen für einen Algo: generation[startindex] bis generation[startindex+numberindividuums]
             int startindex = startindex_input;
-            int numberindividuums = feedback_input.number_individuals_for_nextGen;
+            int numberindividuums = this.algofeedbackarray[algo_id].number_individuals_for_nextGen;
             int numberoptparas = genpool_input[0].get_optparas().Length;
             Random rand = new Random();
 
+            //Vorbereiten der Output-Generation
             new_generation_input.Initialize();
 
-            switch (feedback_input.name)
+            //Sicherung gegen Rundungsfehler bei der Platzvergabe für die Algos
+            if (startindex + numberindividuums >= genpool_input.Length) numberindividuums = genpool_input.Length - startindex;
+
+            switch (algofeedbackarray[algo_id].name)
             {
                 case "Zufällige Einfache Mutation":
                     double[] mutated_optparas = new double[numberoptparas];
@@ -38,8 +80,9 @@ namespace IHWB.EVO.MetaEvo
                         //Zurückspeichern
                         new_generation_input[startindex + i].set_optparas(mutated_optparas);
                         new_generation_input[startindex + i].set_status("raw");
-                        new_generation_input[startindex + i].ID = individuumnumer_input;
-                        individuumnumer_input++;
+                        new_generation_input[startindex + i].set_generator(algo_id);
+                        new_generation_input[startindex + i].ID = individuumnumber;
+                        individuumnumber++;
                     }
                     break;
                 case "Zufällige Rekombination":
@@ -59,12 +102,13 @@ namespace IHWB.EVO.MetaEvo
                         //Zurückspeichern
                         new_generation_input[startindex + i].set_optparas(recombinated_optparas2);
                         new_generation_input[startindex + i].set_status("raw");
-                        new_generation_input[startindex + i].ID = individuumnumer_input;
-                        individuumnumer_input++;
+                        new_generation_input[startindex + i].set_generator(algo_id);
+                        new_generation_input[startindex + i].ID = individuumnumber;
+                        individuumnumber++;
                     }
                     break;
                 default:
-                    MessageBox.Show("Algomanager", "Algorithmus " + feedback_input.name + " ist nicht bekannt!");
+                    MessageBox.Show("Algomanager", "Algorithmus " + algofeedbackarray[algo_id].name + " ist nicht bekannt!");
                     break;
             }
         }
