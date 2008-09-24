@@ -149,7 +149,7 @@ namespace IHWB.EVO.MetaEvo
                     for (int i = 0; i < generation.Length; i++)
                     {
                         //Simulieren 
-                        //sim_input.Evaluate_MetaEvo(ref generation[i]); 
+                        sim_input.Evaluate_MetaEvo(ref generation[i]); 
                     }
                     //Zeichnen
                     algomanager.draw(ref generation, ref hauptdiagramm1);
