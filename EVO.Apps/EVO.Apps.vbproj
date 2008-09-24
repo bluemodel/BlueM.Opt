@@ -37,7 +37,7 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="IHWB.BlueM.DllAdapter, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL" />
+    <Reference Include="IHWB.BlueM.DllAdapter, Version=0.0.1.1, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="IHWB.SMUSI.DllAdapter, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
