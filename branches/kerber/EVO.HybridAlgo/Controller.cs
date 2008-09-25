@@ -37,7 +37,7 @@ namespace IHWB.EVO.MetaEvo
 
             //Setzen des Problems zum Design des Individuums
             EVO.Common.Individuum_MetaEvo.Initialise(ref prob_input);
-            individuumnumber = 0;
+            individuumnumber = 1;
 
             switch (this.role)
             {
@@ -99,7 +99,7 @@ namespace IHWB.EVO.MetaEvo
         {
             double[] random;
             Random randomizer = new Random();
-            if (applog.log) applog.appendText("Controller: Construct random Parents");
+            if (applog.log) applog.appendText("Controller: Construct random Genpool");
 
             //Für jedes Individuum durchgehen
             for (int k = 0; k < this.settings.MetaEvo.PopulationSize; k++)
@@ -137,14 +137,15 @@ namespace IHWB.EVO.MetaEvo
                     set_random_parents(ref generation);
 
                     //Genpool simulieren und setzen
-                    if (applog.log) applog.appendText("Controller: Genpool: Simulate Individuals...");
+                    if (applog.log) applog.appendText("Controller: Genpool: Simulating Individuums...");
                     for (int i = 0; i < generation.Length; i++)
                     {
                         //Simulieren 
                         sim_input.Evaluate_MetaEvo(ref generation[i]);
-                        if (applog.log) applog.appendText("Controller: Individuum " + i + " (" + ((double)(i + 1) / (double)generation.Length) * 100 + "%)");
+                        if (applog.log) applog.appendText("Controller: Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length),2) * 100 + "%)");   
                     }
-                    algomanager.set_genpool(generation);
+                    algomanager.set_genpool(ref generation);
+
 
                     mePC.status = "perform";
                 }
@@ -152,19 +153,25 @@ namespace IHWB.EVO.MetaEvo
                 else if (mePC.status == "perform")
                 {
                     //Neue Generation
-                    if (applog.log) applog.appendText("Controller: ### Building new Generation ###");
-                    algomanager.eval_and_build(ref generation);
+                    if (applog.log) applog.appendText("Controller: ### Building new Individuums for Generation " + generationcounter + " ###");
+                    algomanager.new_individuals_build(ref generation);
                     
                     //Neue Generation Simulieren
-                    if (applog.log) applog.appendText("Controller: Gen" + generationcounter + ": Simulate Individuals...");
+                    if (applog.log) applog.appendText("Controller: Individuums for Generation " + generationcounter + ": Simulating Individuums...");
                     for (int i = 0; i < generation.Length; i++)
                     {
                         //Simulieren 
                         sim_input.Evaluate_MetaEvo(ref generation[i]);
-                        if (applog.log) applog.appendText("Controller: Individuum " + i + " (" + ((double)(i + 1) / (double)generation.Length) * 100 + "%)");
+                        if (applog.log) applog.appendText("Controller: Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length),2) * 100 + "%)");
                     }
-                    //Zeichnen
-                    algomanager.draw(ref generation, ref hauptdiagramm1);
+                    //neue Individuen Zeichnen
+                    algomanager.draw_individuals(ref generation, ref hauptdiagramm1);
+
+                    //Neue Generation auswerten und neuen Genpool erstellen 
+                    algomanager.new_individuals_merge_with_genpool(ref generation);
+
+                    //Genpool Zeichnen
+                    algomanager.draw_genpool(ref hauptdiagramm1);
 
                     generationcounter++;
                 }
@@ -191,8 +198,8 @@ namespace IHWB.EVO.MetaEvo
 
                     if (networkmanager.perform_step(ref generation))
                     {
-                        meServer.set_AlsoInDB("generate Individuums", -1, -1, -1);
-                        algomanager.set_genpool(generation);
+                        meServer.set_AlsoInDB("error watching", -1, -1, -1);
+                        algomanager.set_genpool(ref generation);
                     }
                     else
                     {
@@ -206,11 +213,17 @@ namespace IHWB.EVO.MetaEvo
                     //Fertig berechnete Individuen (alle) aus der DB in generation updaten
                     networkmanager.Individuums_UpdateFromDB(ref generation);
 
-                    //Zeichnen
-                    algomanager.draw(ref generation, ref hauptdiagramm1);
+                    //Neue Individuen Zeichnen
+                    algomanager.draw_individuals(ref generation, ref hauptdiagramm1);
+
+                    //Mit Genpool verrechnen
+                    algomanager.new_individuals_merge_with_genpool(ref generation);
+
+                    //Genpool Zeichnen
+                    algomanager.draw_genpool(ref hauptdiagramm1);
 
                     //Evolutionsschritte
-                    algomanager.eval_and_build(ref this.generation);
+                    algomanager.new_individuals_build(ref generation);
 
                     //Neue Individuen in die DB schreiben
                     networkmanager.Individuums_WriteToDB(ref generation);
