@@ -14,16 +14,14 @@ Partial Public Class ApplicationLog
         Me.TextBox1.Clear()
         Me.Show()
         Me.log = False
-
         Me.starttime = DateTime.Now
 
     End Sub
 
     Public Sub appendText(ByVal text As String)
-
         Me.TextBox1.AppendText(String.Format("{0:####.####}", (DateTime.Now - starttime).TotalMilliseconds) + ": " + text + vbCrLf)
+        'Me.Show()
+        Me.Refresh()
     End Sub
-
-
 
 End Class

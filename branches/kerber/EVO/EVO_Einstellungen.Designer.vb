@@ -64,8 +64,8 @@ Partial Class EVO_Einstellungen
         Dim Label14 As System.Windows.Forms.Label
         Dim Label15 As System.Windows.Forms.Label
         Dim Label16 As System.Windows.Forms.Label
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(EVO_Einstellungen))
         Dim Label12 As System.Windows.Forms.Label
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(EVO_Einstellungen))
         Me.TabControl1 = New System.Windows.Forms.TabControl
         Me.TabPage_PES = New System.Windows.Forms.TabPage
         Me.Label_OptModusValue = New System.Windows.Forms.Label
@@ -134,23 +134,23 @@ Partial Class EVO_Einstellungen
         Me.Numeric_HJ_DeltaStart = New System.Windows.Forms.NumericUpDown
         Me.CheckBox_HJ_DNVektor = New System.Windows.Forms.CheckBox
         Me.TabPage_MetaEvo = New System.Windows.Forms.TabPage
-        Me.GroupBox_Hybrid_MySQLOptions = New System.Windows.Forms.GroupBox
-        Me.TextBox_Hybrid_MySQL_DB = New System.Windows.Forms.TextBox
-        Me.TextBox_Hybrid_MySQL_Password = New System.Windows.Forms.TextBox
-        Me.TextBox_Hybrid_MySQL_User = New System.Windows.Forms.TextBox
-        Me.TextBox_Hybrid_MySQL_Host = New System.Windows.Forms.TextBox
-        Me.GroupBox_Hybrid_PerformanceOptions = New System.Windows.Forms.GroupBox
-        Me.CheckBox_Hybrid_Draw = New System.Windows.Forms.CheckBox
-        Me.GroupBox_Hybrid_BasicOptions = New System.Windows.Forms.GroupBox
-        Me.Numeric_Hybrid_PopulationSize = New System.Windows.Forms.NumericUpDown
-        Me.Numeric_Hybrid_Numbergenerations = New System.Windows.Forms.NumericUpDown
-        Me.Combo_Hybrid_Role = New System.Windows.Forms.ComboBox
+        Me.GroupBox_MetaEvo_MySQLOptions = New System.Windows.Forms.GroupBox
+        Me.TextBox_MetaEvo_MySQL_DB = New System.Windows.Forms.TextBox
+        Me.TextBox_MetaEvo_MySQL_Password = New System.Windows.Forms.TextBox
+        Me.TextBox_MetaEvo_MySQL_User = New System.Windows.Forms.TextBox
+        Me.TextBox_MetaEvo_MySQL_Host = New System.Windows.Forms.TextBox
+        Me.GroupBox_MetaEvo_PerformanceOptions = New System.Windows.Forms.GroupBox
+        Me.CheckBox_MetaEvo_Log = New System.Windows.Forms.CheckBox
+        Me.CheckBox_MetaEvo_Draw = New System.Windows.Forms.CheckBox
+        Me.GroupBox_MetaEvo_BasicOptions = New System.Windows.Forms.GroupBox
+        Me.Numeric_MetaEvo_PopulationSize = New System.Windows.Forms.NumericUpDown
+        Me.Numeric_MetaEvo_Numbergenerations = New System.Windows.Forms.NumericUpDown
+        Me.Combo_MetaEvo_Role = New System.Windows.Forms.ComboBox
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip
         Me.ÖffnenToolStripButton = New System.Windows.Forms.ToolStripButton
         Me.SpeichernToolStripButton = New System.Windows.Forms.ToolStripButton
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox
-        Me.CheckBox_Hybrid_Log = New System.Windows.Forms.CheckBox
         Label_CES_MemSize = New System.Windows.Forms.Label
         Label_CES_NMembers_SecPop_PES = New System.Windows.Forms.Label
         Label_CES_NExchange_secPop_PES = New System.Windows.Forms.Label
@@ -230,11 +230,11 @@ Partial Class EVO_Einstellungen
         CType(Me.Numeric_HJ_DeltaFinish, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Numeric_HJ_DeltaStart, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabPage_MetaEvo.SuspendLayout()
-        Me.GroupBox_Hybrid_MySQLOptions.SuspendLayout()
-        Me.GroupBox_Hybrid_PerformanceOptions.SuspendLayout()
-        Me.GroupBox_Hybrid_BasicOptions.SuspendLayout()
-        CType(Me.Numeric_Hybrid_PopulationSize, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.Numeric_Hybrid_Numbergenerations, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.GroupBox_MetaEvo_MySQLOptions.SuspendLayout()
+        Me.GroupBox_MetaEvo_PerformanceOptions.SuspendLayout()
+        Me.GroupBox_MetaEvo_BasicOptions.SuspendLayout()
+        CType(Me.Numeric_MetaEvo_PopulationSize, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.Numeric_MetaEvo_Numbergenerations, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ToolStrip1.SuspendLayout()
         Me.GroupBox_Einstellungen.SuspendLayout()
         Me.SuspendLayout()
@@ -642,6 +642,15 @@ Partial Class EVO_Einstellungen
         Label16.Size = New System.Drawing.Size(54, 13)
         Label16.TabIndex = 55
         Label16.Text = "DB-name:"
+        '
+        'Label12
+        '
+        Label12.AutoSize = True
+        Label12.Location = New System.Drawing.Point(4, 48)
+        Label12.Name = "Label12"
+        Label12.Size = New System.Drawing.Size(83, 13)
+        Label12.TabIndex = 51
+        Label12.Text = "Application Log:"
         '
         'TabControl1
         '
@@ -1423,11 +1432,11 @@ Partial Class EVO_Einstellungen
         'TabPage_MetaEvo
         '
         Me.TabPage_MetaEvo.BackColor = System.Drawing.SystemColors.Control
-        Me.TabPage_MetaEvo.Controls.Add(Me.GroupBox_Hybrid_MySQLOptions)
-        Me.TabPage_MetaEvo.Controls.Add(Me.GroupBox_Hybrid_PerformanceOptions)
+        Me.TabPage_MetaEvo.Controls.Add(Me.GroupBox_MetaEvo_MySQLOptions)
+        Me.TabPage_MetaEvo.Controls.Add(Me.GroupBox_MetaEvo_PerformanceOptions)
         Me.TabPage_MetaEvo.Controls.Add(Label5)
-        Me.TabPage_MetaEvo.Controls.Add(Me.GroupBox_Hybrid_BasicOptions)
-        Me.TabPage_MetaEvo.Controls.Add(Me.Combo_Hybrid_Role)
+        Me.TabPage_MetaEvo.Controls.Add(Me.GroupBox_MetaEvo_BasicOptions)
+        Me.TabPage_MetaEvo.Controls.Add(Me.Combo_MetaEvo_Role)
         Me.TabPage_MetaEvo.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TabPage_MetaEvo.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_MetaEvo.Name = "TabPage_MetaEvo"
@@ -1436,120 +1445,129 @@ Partial Class EVO_Einstellungen
         Me.TabPage_MetaEvo.TabIndex = 3
         Me.TabPage_MetaEvo.Text = "MetaEvo"
         '
-        'GroupBox_Hybrid_MySQLOptions
+        'GroupBox_MetaEvo_MySQLOptions
         '
-        Me.GroupBox_Hybrid_MySQLOptions.Controls.Add(Me.TextBox_Hybrid_MySQL_DB)
-        Me.GroupBox_Hybrid_MySQLOptions.Controls.Add(Label16)
-        Me.GroupBox_Hybrid_MySQLOptions.Controls.Add(Me.TextBox_Hybrid_MySQL_Password)
-        Me.GroupBox_Hybrid_MySQLOptions.Controls.Add(Me.TextBox_Hybrid_MySQL_User)
-        Me.GroupBox_Hybrid_MySQLOptions.Controls.Add(Me.TextBox_Hybrid_MySQL_Host)
-        Me.GroupBox_Hybrid_MySQLOptions.Controls.Add(Label13)
-        Me.GroupBox_Hybrid_MySQLOptions.Controls.Add(Label14)
-        Me.GroupBox_Hybrid_MySQLOptions.Controls.Add(Label15)
-        Me.GroupBox_Hybrid_MySQLOptions.Enabled = False
-        Me.GroupBox_Hybrid_MySQLOptions.Location = New System.Drawing.Point(11, 200)
-        Me.GroupBox_Hybrid_MySQLOptions.Name = "GroupBox_Hybrid_MySQLOptions"
-        Me.GroupBox_Hybrid_MySQLOptions.Size = New System.Drawing.Size(200, 125)
-        Me.GroupBox_Hybrid_MySQLOptions.TabIndex = 52
-        Me.GroupBox_Hybrid_MySQLOptions.TabStop = False
-        Me.GroupBox_Hybrid_MySQLOptions.Text = "MySQL Options"
+        Me.GroupBox_MetaEvo_MySQLOptions.Controls.Add(Me.TextBox_MetaEvo_MySQL_DB)
+        Me.GroupBox_MetaEvo_MySQLOptions.Controls.Add(Label16)
+        Me.GroupBox_MetaEvo_MySQLOptions.Controls.Add(Me.TextBox_MetaEvo_MySQL_Password)
+        Me.GroupBox_MetaEvo_MySQLOptions.Controls.Add(Me.TextBox_MetaEvo_MySQL_User)
+        Me.GroupBox_MetaEvo_MySQLOptions.Controls.Add(Me.TextBox_MetaEvo_MySQL_Host)
+        Me.GroupBox_MetaEvo_MySQLOptions.Controls.Add(Label13)
+        Me.GroupBox_MetaEvo_MySQLOptions.Controls.Add(Label14)
+        Me.GroupBox_MetaEvo_MySQLOptions.Controls.Add(Label15)
+        Me.GroupBox_MetaEvo_MySQLOptions.Enabled = False
+        Me.GroupBox_MetaEvo_MySQLOptions.Location = New System.Drawing.Point(11, 200)
+        Me.GroupBox_MetaEvo_MySQLOptions.Name = "GroupBox_MetaEvo_MySQLOptions"
+        Me.GroupBox_MetaEvo_MySQLOptions.Size = New System.Drawing.Size(200, 125)
+        Me.GroupBox_MetaEvo_MySQLOptions.TabIndex = 52
+        Me.GroupBox_MetaEvo_MySQLOptions.TabStop = False
+        Me.GroupBox_MetaEvo_MySQLOptions.Text = "MySQL Options"
         '
-        'TextBox_Hybrid_MySQL_DB
+        'TextBox_MetaEvo_MySQL_DB
         '
-        Me.TextBox_Hybrid_MySQL_DB.Location = New System.Drawing.Point(92, 45)
-        Me.TextBox_Hybrid_MySQL_DB.Name = "TextBox_Hybrid_MySQL_DB"
-        Me.TextBox_Hybrid_MySQL_DB.Size = New System.Drawing.Size(100, 20)
-        Me.TextBox_Hybrid_MySQL_DB.TabIndex = 56
+        Me.TextBox_MetaEvo_MySQL_DB.Location = New System.Drawing.Point(92, 45)
+        Me.TextBox_MetaEvo_MySQL_DB.Name = "TextBox_MetaEvo_MySQL_DB"
+        Me.TextBox_MetaEvo_MySQL_DB.Size = New System.Drawing.Size(100, 20)
+        Me.TextBox_MetaEvo_MySQL_DB.TabIndex = 56
         '
-        'TextBox_Hybrid_MySQL_Password
+        'TextBox_MetaEvo_MySQL_Password
         '
-        Me.TextBox_Hybrid_MySQL_Password.Location = New System.Drawing.Point(92, 97)
-        Me.TextBox_Hybrid_MySQL_Password.Name = "TextBox_Hybrid_MySQL_Password"
-        Me.TextBox_Hybrid_MySQL_Password.Size = New System.Drawing.Size(100, 20)
-        Me.TextBox_Hybrid_MySQL_Password.TabIndex = 54
-        Me.TextBox_Hybrid_MySQL_Password.UseSystemPasswordChar = True
+        Me.TextBox_MetaEvo_MySQL_Password.Location = New System.Drawing.Point(92, 97)
+        Me.TextBox_MetaEvo_MySQL_Password.Name = "TextBox_MetaEvo_MySQL_Password"
+        Me.TextBox_MetaEvo_MySQL_Password.Size = New System.Drawing.Size(100, 20)
+        Me.TextBox_MetaEvo_MySQL_Password.TabIndex = 54
+        Me.TextBox_MetaEvo_MySQL_Password.UseSystemPasswordChar = True
         '
-        'TextBox_Hybrid_MySQL_User
+        'TextBox_MetaEvo_MySQL_User
         '
-        Me.TextBox_Hybrid_MySQL_User.Location = New System.Drawing.Point(92, 71)
-        Me.TextBox_Hybrid_MySQL_User.Name = "TextBox_Hybrid_MySQL_User"
-        Me.TextBox_Hybrid_MySQL_User.Size = New System.Drawing.Size(100, 20)
-        Me.TextBox_Hybrid_MySQL_User.TabIndex = 53
+        Me.TextBox_MetaEvo_MySQL_User.Location = New System.Drawing.Point(92, 71)
+        Me.TextBox_MetaEvo_MySQL_User.Name = "TextBox_MetaEvo_MySQL_User"
+        Me.TextBox_MetaEvo_MySQL_User.Size = New System.Drawing.Size(100, 20)
+        Me.TextBox_MetaEvo_MySQL_User.TabIndex = 53
         '
-        'TextBox_Hybrid_MySQL_Host
+        'TextBox_MetaEvo_MySQL_Host
         '
-        Me.TextBox_Hybrid_MySQL_Host.Location = New System.Drawing.Point(92, 19)
-        Me.TextBox_Hybrid_MySQL_Host.Name = "TextBox_Hybrid_MySQL_Host"
-        Me.TextBox_Hybrid_MySQL_Host.Size = New System.Drawing.Size(100, 20)
-        Me.TextBox_Hybrid_MySQL_Host.TabIndex = 52
+        Me.TextBox_MetaEvo_MySQL_Host.Location = New System.Drawing.Point(92, 19)
+        Me.TextBox_MetaEvo_MySQL_Host.Name = "TextBox_MetaEvo_MySQL_Host"
+        Me.TextBox_MetaEvo_MySQL_Host.Size = New System.Drawing.Size(100, 20)
+        Me.TextBox_MetaEvo_MySQL_Host.TabIndex = 52
         '
-        'GroupBox_Hybrid_PerformanceOptions
+        'GroupBox_MetaEvo_PerformanceOptions
         '
-        Me.GroupBox_Hybrid_PerformanceOptions.Controls.Add(Me.CheckBox_Hybrid_Log)
-        Me.GroupBox_Hybrid_PerformanceOptions.Controls.Add(Label12)
-        Me.GroupBox_Hybrid_PerformanceOptions.Controls.Add(Me.CheckBox_Hybrid_Draw)
-        Me.GroupBox_Hybrid_PerformanceOptions.Controls.Add(Label30)
-        Me.GroupBox_Hybrid_PerformanceOptions.Enabled = False
-        Me.GroupBox_Hybrid_PerformanceOptions.Location = New System.Drawing.Point(11, 121)
-        Me.GroupBox_Hybrid_PerformanceOptions.Name = "GroupBox_Hybrid_PerformanceOptions"
-        Me.GroupBox_Hybrid_PerformanceOptions.Size = New System.Drawing.Size(200, 73)
-        Me.GroupBox_Hybrid_PerformanceOptions.TabIndex = 51
-        Me.GroupBox_Hybrid_PerformanceOptions.TabStop = False
-        Me.GroupBox_Hybrid_PerformanceOptions.Text = "Performance Options"
+        Me.GroupBox_MetaEvo_PerformanceOptions.Controls.Add(Me.CheckBox_MetaEvo_Log)
+        Me.GroupBox_MetaEvo_PerformanceOptions.Controls.Add(Label12)
+        Me.GroupBox_MetaEvo_PerformanceOptions.Controls.Add(Me.CheckBox_MetaEvo_Draw)
+        Me.GroupBox_MetaEvo_PerformanceOptions.Controls.Add(Label30)
+        Me.GroupBox_MetaEvo_PerformanceOptions.Enabled = False
+        Me.GroupBox_MetaEvo_PerformanceOptions.Location = New System.Drawing.Point(11, 121)
+        Me.GroupBox_MetaEvo_PerformanceOptions.Name = "GroupBox_MetaEvo_PerformanceOptions"
+        Me.GroupBox_MetaEvo_PerformanceOptions.Size = New System.Drawing.Size(200, 73)
+        Me.GroupBox_MetaEvo_PerformanceOptions.TabIndex = 51
+        Me.GroupBox_MetaEvo_PerformanceOptions.TabStop = False
+        Me.GroupBox_MetaEvo_PerformanceOptions.Text = "Performance Options"
         '
-        'CheckBox_Hybrid_Draw
+        'CheckBox_MetaEvo_Log
         '
-        Me.CheckBox_Hybrid_Draw.Checked = True
-        Me.CheckBox_Hybrid_Draw.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBox_Hybrid_Draw.Location = New System.Drawing.Point(174, 19)
-        Me.CheckBox_Hybrid_Draw.Name = "CheckBox_Hybrid_Draw"
-        Me.CheckBox_Hybrid_Draw.Size = New System.Drawing.Size(18, 18)
-        Me.CheckBox_Hybrid_Draw.TabIndex = 50
+        Me.CheckBox_MetaEvo_Log.Checked = True
+        Me.CheckBox_MetaEvo_Log.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.CheckBox_MetaEvo_Log.Location = New System.Drawing.Point(174, 45)
+        Me.CheckBox_MetaEvo_Log.Name = "CheckBox_MetaEvo_Log"
+        Me.CheckBox_MetaEvo_Log.Size = New System.Drawing.Size(18, 18)
+        Me.CheckBox_MetaEvo_Log.TabIndex = 52
         '
-        'GroupBox_Hybrid_BasicOptions
+        'CheckBox_MetaEvo_Draw
         '
-        Me.GroupBox_Hybrid_BasicOptions.Controls.Add(Label10)
-        Me.GroupBox_Hybrid_BasicOptions.Controls.Add(Me.Numeric_Hybrid_PopulationSize)
-        Me.GroupBox_Hybrid_BasicOptions.Controls.Add(Label11)
-        Me.GroupBox_Hybrid_BasicOptions.Controls.Add(Me.Numeric_Hybrid_Numbergenerations)
-        Me.GroupBox_Hybrid_BasicOptions.Enabled = False
-        Me.GroupBox_Hybrid_BasicOptions.Location = New System.Drawing.Point(11, 43)
-        Me.GroupBox_Hybrid_BasicOptions.Name = "GroupBox_Hybrid_BasicOptions"
-        Me.GroupBox_Hybrid_BasicOptions.Size = New System.Drawing.Size(200, 72)
-        Me.GroupBox_Hybrid_BasicOptions.TabIndex = 36
-        Me.GroupBox_Hybrid_BasicOptions.TabStop = False
-        Me.GroupBox_Hybrid_BasicOptions.Text = "Basic Options"
+        Me.CheckBox_MetaEvo_Draw.Checked = True
+        Me.CheckBox_MetaEvo_Draw.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.CheckBox_MetaEvo_Draw.Location = New System.Drawing.Point(174, 19)
+        Me.CheckBox_MetaEvo_Draw.Name = "CheckBox_MetaEvo_Draw"
+        Me.CheckBox_MetaEvo_Draw.Size = New System.Drawing.Size(18, 18)
+        Me.CheckBox_MetaEvo_Draw.TabIndex = 50
         '
-        'Numeric_Hybrid_PopulationSize
+        'GroupBox_MetaEvo_BasicOptions
         '
-        Me.Numeric_Hybrid_PopulationSize.Location = New System.Drawing.Point(139, 19)
-        Me.Numeric_Hybrid_PopulationSize.Maximum = New Decimal(New Integer() {5000, 0, 0, 0})
-        Me.Numeric_Hybrid_PopulationSize.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
-        Me.Numeric_Hybrid_PopulationSize.Name = "Numeric_Hybrid_PopulationSize"
-        Me.Numeric_Hybrid_PopulationSize.Size = New System.Drawing.Size(53, 20)
-        Me.Numeric_Hybrid_PopulationSize.TabIndex = 50
-        Me.Numeric_Hybrid_PopulationSize.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.Numeric_Hybrid_PopulationSize.Value = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.GroupBox_MetaEvo_BasicOptions.Controls.Add(Label10)
+        Me.GroupBox_MetaEvo_BasicOptions.Controls.Add(Me.Numeric_MetaEvo_PopulationSize)
+        Me.GroupBox_MetaEvo_BasicOptions.Controls.Add(Label11)
+        Me.GroupBox_MetaEvo_BasicOptions.Controls.Add(Me.Numeric_MetaEvo_Numbergenerations)
+        Me.GroupBox_MetaEvo_BasicOptions.Enabled = False
+        Me.GroupBox_MetaEvo_BasicOptions.Location = New System.Drawing.Point(11, 43)
+        Me.GroupBox_MetaEvo_BasicOptions.Name = "GroupBox_MetaEvo_BasicOptions"
+        Me.GroupBox_MetaEvo_BasicOptions.Size = New System.Drawing.Size(200, 72)
+        Me.GroupBox_MetaEvo_BasicOptions.TabIndex = 36
+        Me.GroupBox_MetaEvo_BasicOptions.TabStop = False
+        Me.GroupBox_MetaEvo_BasicOptions.Text = "Basic Options"
         '
-        'Numeric_Hybrid_Numbergenerations
+        'Numeric_MetaEvo_PopulationSize
         '
-        Me.Numeric_Hybrid_Numbergenerations.Location = New System.Drawing.Point(139, 45)
-        Me.Numeric_Hybrid_Numbergenerations.Maximum = New Decimal(New Integer() {5000, 0, 0, 0})
-        Me.Numeric_Hybrid_Numbergenerations.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
-        Me.Numeric_Hybrid_Numbergenerations.Name = "Numeric_Hybrid_Numbergenerations"
-        Me.Numeric_Hybrid_Numbergenerations.Size = New System.Drawing.Size(53, 20)
-        Me.Numeric_Hybrid_Numbergenerations.TabIndex = 34
-        Me.Numeric_Hybrid_Numbergenerations.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.Numeric_Hybrid_Numbergenerations.Value = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.Numeric_MetaEvo_PopulationSize.Location = New System.Drawing.Point(139, 19)
+        Me.Numeric_MetaEvo_PopulationSize.Maximum = New Decimal(New Integer() {5000, 0, 0, 0})
+        Me.Numeric_MetaEvo_PopulationSize.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.Numeric_MetaEvo_PopulationSize.Name = "Numeric_MetaEvo_PopulationSize"
+        Me.Numeric_MetaEvo_PopulationSize.Size = New System.Drawing.Size(53, 20)
+        Me.Numeric_MetaEvo_PopulationSize.TabIndex = 50
+        Me.Numeric_MetaEvo_PopulationSize.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_MetaEvo_PopulationSize.Value = New Decimal(New Integer() {1, 0, 0, 0})
         '
-        'Combo_Hybrid_Role
+        'Numeric_MetaEvo_Numbergenerations
         '
-        Me.Combo_Hybrid_Role.FormattingEnabled = True
-        Me.Combo_Hybrid_Role.Items.AddRange(New Object() {"Single PC", "Network Server", "Network Client"})
-        Me.Combo_Hybrid_Role.Location = New System.Drawing.Point(80, 16)
-        Me.Combo_Hybrid_Role.Name = "Combo_Hybrid_Role"
-        Me.Combo_Hybrid_Role.Size = New System.Drawing.Size(123, 21)
-        Me.Combo_Hybrid_Role.TabIndex = 0
+        Me.Numeric_MetaEvo_Numbergenerations.Location = New System.Drawing.Point(139, 45)
+        Me.Numeric_MetaEvo_Numbergenerations.Maximum = New Decimal(New Integer() {5000, 0, 0, 0})
+        Me.Numeric_MetaEvo_Numbergenerations.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.Numeric_MetaEvo_Numbergenerations.Name = "Numeric_MetaEvo_Numbergenerations"
+        Me.Numeric_MetaEvo_Numbergenerations.Size = New System.Drawing.Size(53, 20)
+        Me.Numeric_MetaEvo_Numbergenerations.TabIndex = 34
+        Me.Numeric_MetaEvo_Numbergenerations.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_MetaEvo_Numbergenerations.Value = New Decimal(New Integer() {1, 0, 0, 0})
+        '
+        'Combo_MetaEvo_Role
+        '
+        Me.Combo_MetaEvo_Role.FormattingEnabled = True
+        Me.Combo_MetaEvo_Role.Items.AddRange(New Object() {"Single PC", "Network Server", "Network Client"})
+        Me.Combo_MetaEvo_Role.Location = New System.Drawing.Point(80, 16)
+        Me.Combo_MetaEvo_Role.Name = "Combo_MetaEvo_Role"
+        Me.Combo_MetaEvo_Role.Size = New System.Drawing.Size(123, 21)
+        Me.Combo_MetaEvo_Role.TabIndex = 0
         '
         'ToolStrip1
         '
@@ -1591,24 +1609,6 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Einstellungen.TabIndex = 0
         Me.GroupBox_Einstellungen.TabStop = False
         Me.GroupBox_Einstellungen.Text = "Einstellungen:"
-        '
-        'CheckBox_Hybrid_Log
-        '
-        Me.CheckBox_Hybrid_Log.Checked = True
-        Me.CheckBox_Hybrid_Log.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBox_Hybrid_Log.Location = New System.Drawing.Point(174, 45)
-        Me.CheckBox_Hybrid_Log.Name = "CheckBox_Hybrid_Log"
-        Me.CheckBox_Hybrid_Log.Size = New System.Drawing.Size(18, 18)
-        Me.CheckBox_Hybrid_Log.TabIndex = 52
-        '
-        'Label12
-        '
-        Label12.AutoSize = True
-        Label12.Location = New System.Drawing.Point(4, 48)
-        Label12.Name = "Label12"
-        Label12.Size = New System.Drawing.Size(83, 13)
-        Label12.TabIndex = 51
-        Label12.Text = "Application Log:"
         '
         'EVO_Einstellungen
         '
@@ -1659,14 +1659,14 @@ Partial Class EVO_Einstellungen
         CType(Me.Numeric_HJ_DeltaStart, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabPage_MetaEvo.ResumeLayout(False)
         Me.TabPage_MetaEvo.PerformLayout()
-        Me.GroupBox_Hybrid_MySQLOptions.ResumeLayout(False)
-        Me.GroupBox_Hybrid_MySQLOptions.PerformLayout()
-        Me.GroupBox_Hybrid_PerformanceOptions.ResumeLayout(False)
-        Me.GroupBox_Hybrid_PerformanceOptions.PerformLayout()
-        Me.GroupBox_Hybrid_BasicOptions.ResumeLayout(False)
-        Me.GroupBox_Hybrid_BasicOptions.PerformLayout()
-        CType(Me.Numeric_Hybrid_PopulationSize, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.Numeric_Hybrid_Numbergenerations, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.GroupBox_MetaEvo_MySQLOptions.ResumeLayout(False)
+        Me.GroupBox_MetaEvo_MySQLOptions.PerformLayout()
+        Me.GroupBox_MetaEvo_PerformanceOptions.ResumeLayout(False)
+        Me.GroupBox_MetaEvo_PerformanceOptions.PerformLayout()
+        Me.GroupBox_MetaEvo_BasicOptions.ResumeLayout(False)
+        Me.GroupBox_MetaEvo_BasicOptions.PerformLayout()
+        CType(Me.Numeric_MetaEvo_PopulationSize, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.Numeric_MetaEvo_Numbergenerations, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ToolStrip1.ResumeLayout(False)
         Me.ToolStrip1.PerformLayout()
         Me.GroupBox_Einstellungen.ResumeLayout(False)
@@ -1746,17 +1746,17 @@ Partial Class EVO_Einstellungen
     Private WithEvents LabelAnzEltern As System.Windows.Forms.Label
     Private WithEvents CheckBox_CES_StartPESPop As System.Windows.Forms.CheckBox
     Public WithEvents TabControl1 As System.Windows.Forms.TabControl
-    Friend WithEvents Combo_Hybrid_Role As System.Windows.Forms.ComboBox
-    Private WithEvents Numeric_Hybrid_Numbergenerations As System.Windows.Forms.NumericUpDown
-    Friend WithEvents GroupBox_Hybrid_BasicOptions As System.Windows.Forms.GroupBox
-    Friend WithEvents GroupBox_Hybrid_PerformanceOptions As System.Windows.Forms.GroupBox
-    Private WithEvents Numeric_Hybrid_PopulationSize As System.Windows.Forms.NumericUpDown
-    Friend WithEvents GroupBox_Hybrid_MySQLOptions As System.Windows.Forms.GroupBox
-    Private WithEvents CheckBox_Hybrid_Draw As System.Windows.Forms.CheckBox
-    Friend WithEvents TextBox_Hybrid_MySQL_Password As System.Windows.Forms.TextBox
-    Friend WithEvents TextBox_Hybrid_MySQL_User As System.Windows.Forms.TextBox
-    Friend WithEvents TextBox_Hybrid_MySQL_Host As System.Windows.Forms.TextBox
-    Friend WithEvents TextBox_Hybrid_MySQL_DB As System.Windows.Forms.TextBox
+    Friend WithEvents Combo_MetaEvo_Role As System.Windows.Forms.ComboBox
+    Private WithEvents Numeric_MetaEvo_Numbergenerations As System.Windows.Forms.NumericUpDown
+    Friend WithEvents GroupBox_MetaEvo_BasicOptions As System.Windows.Forms.GroupBox
+    Friend WithEvents GroupBox_MetaEvo_PerformanceOptions As System.Windows.Forms.GroupBox
+    Private WithEvents Numeric_MetaEvo_PopulationSize As System.Windows.Forms.NumericUpDown
+    Friend WithEvents GroupBox_MetaEvo_MySQLOptions As System.Windows.Forms.GroupBox
+    Private WithEvents CheckBox_MetaEvo_Draw As System.Windows.Forms.CheckBox
+    Friend WithEvents TextBox_MetaEvo_MySQL_Password As System.Windows.Forms.TextBox
+    Friend WithEvents TextBox_MetaEvo_MySQL_User As System.Windows.Forms.TextBox
+    Friend WithEvents TextBox_MetaEvo_MySQL_Host As System.Windows.Forms.TextBox
+    Friend WithEvents TextBox_MetaEvo_MySQL_DB As System.Windows.Forms.TextBox
     Private WithEvents TabPage_MetaEvo As System.Windows.Forms.TabPage
-    Private WithEvents CheckBox_Hybrid_Log As System.Windows.Forms.CheckBox
+    Private WithEvents CheckBox_MetaEvo_Log As System.Windows.Forms.CheckBox
 End Class

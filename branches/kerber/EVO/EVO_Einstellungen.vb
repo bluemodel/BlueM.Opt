@@ -421,15 +421,15 @@ Public Class EVO_Einstellungen
         '----------------
         With Me.msettings.MetaEvo
 
-            .Role = Me.Combo_Hybrid_Role.SelectedItem
-            .NumberGenerations = Me.Numeric_Hybrid_Numbergenerations.Value
-            .PopulationSize = Me.Numeric_Hybrid_PopulationSize.Value
-            .Draw = Me.CheckBox_Hybrid_Draw.Checked
-            .Log = Me.CheckBox_Hybrid_Log.Checked
-            .MySQL_Host = Me.TextBox_Hybrid_MySQL_Host.Text
-            .MySQL_Database = Me.TextBox_Hybrid_MySQL_DB.Text
-            .MySQL_User = Me.TextBox_Hybrid_MySQL_User.Text
-            .MySQL_Password = Me.TextBox_Hybrid_MySQL_Password.Text
+            .Role = Me.Combo_MetaEvo_Role.SelectedItem
+            .NumberGenerations = Me.Numeric_MetaEvo_Numbergenerations.Value
+            .PopulationSize = Me.Numeric_MetaEvo_PopulationSize.Value
+            .Draw = Me.CheckBox_MetaEvo_Draw.Checked
+            .Log = Me.CheckBox_MetaEvo_Log.Checked
+            .MySQL_Host = Me.TextBox_MetaEvo_MySQL_Host.Text
+            .MySQL_Database = Me.TextBox_MetaEvo_MySQL_DB.Text
+            .MySQL_User = Me.TextBox_MetaEvo_MySQL_User.Text
+            .MySQL_Password = Me.TextBox_MetaEvo_MySQL_Password.Text
 
         End With
 
@@ -573,15 +573,15 @@ Public Class EVO_Einstellungen
         '---------------
         With Me.msettings.MetaEvo
 
-            Me.Combo_Hybrid_Role.SelectedItem = .Role
-            Me.Numeric_Hybrid_PopulationSize.Value = .PopulationSize
-            Me.Numeric_Hybrid_Numbergenerations.Value = .NumberGenerations
-            Me.CheckBox_Hybrid_Draw.Checked = .Draw
-            Me.CheckBox_Hybrid_Log.Checked = .Log
-            Me.TextBox_Hybrid_MySQL_Host.Text = .MySQL_Host
-            Me.TextBox_Hybrid_MySQL_DB.Text = .MySQL_Database
-            Me.TextBox_Hybrid_MySQL_User.Text = .MySQL_User
-            Me.TextBox_Hybrid_MySQL_Password.Text = .MySQL_Password
+            Me.Combo_MetaEvo_Role.SelectedItem = .Role
+            Me.Numeric_MetaEvo_PopulationSize.Value = .PopulationSize
+            Me.Numeric_MetaEvo_Numbergenerations.Value = .NumberGenerations
+            Me.CheckBox_MetaEvo_Draw.Checked = .Draw
+            Me.CheckBox_MetaEvo_Log.Checked = .Log
+            Me.TextBox_MetaEvo_MySQL_Host.Text = .MySQL_Host
+            Me.TextBox_MetaEvo_MySQL_DB.Text = .MySQL_Database
+            Me.TextBox_MetaEvo_MySQL_User.Text = .MySQL_User
+            Me.TextBox_MetaEvo_MySQL_Password.Text = .MySQL_Password
 
         End With
 
@@ -722,19 +722,19 @@ Public Class EVO_Einstellungen
 
 
     'MetaEvo: Voreinstellungen des Formulars aufgrund der Wahl der Rolle
-    Private Sub Combo_Hybrid_Role_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Combo_Hybrid_Role.SelectedIndexChanged
-        If (Me.Combo_Hybrid_Role.SelectedItem = "Single PC") Then
-            Me.GroupBox_Hybrid_BasicOptions.Enabled = True
-            Me.GroupBox_Hybrid_PerformanceOptions.Enabled = True
-            Me.GroupBox_Hybrid_MySQLOptions.Enabled = False
-        ElseIf (Me.Combo_Hybrid_Role.SelectedItem = "Network Client") Then
-            Me.GroupBox_Hybrid_BasicOptions.Enabled = False
-            Me.GroupBox_Hybrid_PerformanceOptions.Enabled = False
-            Me.GroupBox_Hybrid_MySQLOptions.Enabled = True
-        ElseIf (Me.Combo_Hybrid_Role.SelectedItem = "Network Server") Then
-            Me.GroupBox_Hybrid_BasicOptions.Enabled = True
-            Me.GroupBox_Hybrid_PerformanceOptions.Enabled = True
-            Me.GroupBox_Hybrid_MySQLOptions.Enabled = True
+    Private Sub Combo_Hybrid_Role_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Combo_MetaEvo_Role.SelectedIndexChanged
+        If (Me.Combo_MetaEvo_Role.SelectedItem = "Single PC") Then
+            Me.GroupBox_MetaEvo_BasicOptions.Enabled = True
+            Me.GroupBox_MetaEvo_PerformanceOptions.Enabled = True
+            Me.GroupBox_MetaEvo_MySQLOptions.Enabled = False
+        ElseIf (Me.Combo_MetaEvo_Role.SelectedItem = "Network Client") Then
+            Me.GroupBox_MetaEvo_BasicOptions.Enabled = False
+            Me.GroupBox_MetaEvo_PerformanceOptions.Enabled = False
+            Me.GroupBox_MetaEvo_MySQLOptions.Enabled = True
+        ElseIf (Me.Combo_MetaEvo_Role.SelectedItem = "Network Server") Then
+            Me.GroupBox_MetaEvo_BasicOptions.Enabled = True
+            Me.GroupBox_MetaEvo_PerformanceOptions.Enabled = True
+            Me.GroupBox_MetaEvo_MySQLOptions.Enabled = True
         End If
     End Sub
 

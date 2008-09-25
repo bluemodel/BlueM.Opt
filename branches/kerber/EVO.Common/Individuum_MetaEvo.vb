@@ -36,6 +36,18 @@
 
     Public Function Clone_MetaEvo() As Individuum_MetaEvo
         Dim Dest As New Individuum_MetaEvo(Me.mType, Me.ID, Me.numberOptparas)
+        Dim i As Integer
+
+        Dest.status = Me.status
+        Dest.generator_id = Me.generator_id
+        For i = 0 To numberOptparas - 1
+            Dest.mOptparameter = Me.mOptparameter
+        Next
+
+        For i = 0 To mFeatures.Length - 1
+            Dest.mFeatures = Me.mFeatures
+        Next
+
         Return Dest
     End Function
 
@@ -97,5 +109,4 @@
     Public Function get_status() As String
         Return Me.status
     End Function
-
 End Class
