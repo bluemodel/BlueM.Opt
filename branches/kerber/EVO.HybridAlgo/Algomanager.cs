@@ -21,8 +21,11 @@ namespace IHWB.EVO.MetaEvo
 
         public void set_genpool(EVO.Common.Individuum_MetaEvo[] genpool_input) 
         {
-            this.genpool = genpool_input;
-            if (applog.log) applog.appendText("Algo Manager: Starting with Genpool: \r\n" + this.generationinfo(ref genpool_input));
+            this.genpool = new EVO.Common.Individuum_MetaEvo[genpool_input.Length];
+            for (int i = 0; i < genpool_input.Length; i++)
+            {
+                this.genpool[i] = genpool_input[i].Clone_MetaEvo();
+            }
         }
 
         //new_generation mit Genpool verarbeiten und neue Individuen in new_generation erzeugen
@@ -38,6 +41,7 @@ namespace IHWB.EVO.MetaEvo
             //1.1.3.Sortieren und Dominanzkriterium anwenden innerhalb der Penalties der neuen Individuen
             if (applog.log) applog.appendText("Algo Manager: Starting quicksort using criterion "+kriterium);
             quicksort(ref new_generation_input, kriterium, 0, new_generation_input.Length-1);
+            if (applog.log) applog.appendText("Algo Manager: Starting domination-check");
             check_domination(ref new_generation_input, ref new_generation_input);
             
             //1.1.4.Dominanzkriterium auf Penalties zwischen den neuen und den alten Individuen anwenden
@@ -94,7 +98,6 @@ namespace IHWB.EVO.MetaEvo
         //Prüfen ob ein ein Individuum von einem anderen Individuum dominiert wird
         private void check_domination(ref EVO.Common.Individuum_MetaEvo[] input, ref EVO.Common.Individuum_MetaEvo[] input2)
         {
-            if (applog.log) applog.appendText("Algo Manager: Starting domination-check");
             int dominated = 0;
             int status = 0;
 
@@ -189,7 +192,7 @@ namespace IHWB.EVO.MetaEvo
             int maxindividuums = genpool.Length;
             double distance;
 
-            for (int i = 0; i < maxindividuums; i++)
+            for (int i = 0; i < genpool.Length; i++)
             {
                 if (input[i].get_status() == "true") maxindividuums--;
                 if (input2[i].get_status() == "true") maxindividuums--;
@@ -253,7 +256,7 @@ namespace IHWB.EVO.MetaEvo
 
             for (int i = 0; i < 2 * input.Length; i++)
             {
-                if (i > input.Length - 1)
+                if (i >= input.Length)
                 {
                     if (input2[i - input.Length].get_status() == "true")
                     {
@@ -297,14 +300,10 @@ namespace IHWB.EVO.MetaEvo
                 {
                     back = back + "[" + j + "]: " + String.Format("{0:####}", optparas[j]) + " ";
                 }
-                //Wann penalties angezeigt werden (Sollte eigentlich auf !=Maxwert prüfen)
-                if (generation[i].Penalties[0] < 1000000)
+                back = back + "\r\nPenalties";
+                for (int j = 0; j < generation[i].Penalties.Length; j++)
                 {
-                    back = back + "\r\nPenalties";
-                    for (int j = 0; j < generation[i].Penalties.Length; j++)
-                    {
-                        back = back + "[" + j + "]: " + String.Format("{0:####}", generation[i].Penalties[j]) + " ";
-                    }
+                    back = back + "[" + j + "]: " + String.Format("{0:####}", generation[i].Penalties[j]) + " ";
                 }
                 back = back + "\r\n";
             }
@@ -349,9 +348,9 @@ namespace IHWB.EVO.MetaEvo
                 algos.algofeedbackarray[i].number_individuals_for_nextGen = (int)(((double)algos.algofeedbackarray[i].initiative / (double)initiativensumme) * (double)new_generation_input.Length);
                 log = log + "[" + algos.algofeedbackarray[i].name + "]: Survived: " + algos.algofeedbackarray[i].number_individuals_survived + "/" + algos.algofeedbackarray[i].number_individuals_for_nextGen + " Initiative: " + algos.algofeedbackarray[i].initiative + " -> " + algos.algofeedbackarray[i].number_individuals_for_nextGen + " Individuen\r\n";
             }
-            if (applog.log) applog.appendText("Algo Manager: nemGen_composition: Individuenverteilung für die neue Generation:\r\n" + log);
+            if (applog.log) applog.appendText("Algo Manager: nemGen_composition: Individuenverteilung für die neue Generation berechnen:\r\n" + log);
         }
-        //Zeichnen des Genpools
+        //Zeichnen der neuen Individuen und des Genpools
         public void draw(ref EVO.Common.Individuum_MetaEvo[] genpool, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input)
         {
             //hauptdiagramm_input.

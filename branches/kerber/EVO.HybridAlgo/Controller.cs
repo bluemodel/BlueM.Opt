@@ -23,7 +23,7 @@ namespace IHWB.EVO.MetaEvo
         string role;
 
         //### Konstruktor ###  
-        public Controller(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input, ref EVO.Apps.Sim sim_input)
+        public Controller(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input, ref EVO.Apps.Sim sim_input)  
         {
             applog = new IHWB.EVO.Diagramm.ApplicationLog();
             if (settings_input.MetaEvo.Log) applog.log = true;
@@ -87,8 +87,37 @@ namespace IHWB.EVO.MetaEvo
                     networkmanager = new Networkmanager(ref this.individuumForClient, ref this.settings, ref applog);
                     start_network_client(ref sim_input);
                     break;
-            }
+            }  
         }
+
+
+
+        //### Methoden ###
+
+        // Zufällige Eltern setzen
+        private bool set_random_parents(ref EVO.Common.Individuum_MetaEvo[] generation_input)
+        {
+            double[] random;
+            Random randomizer = new Random();
+            if (applog.log) applog.appendText("Controller: Construct random Parents");
+
+            //Für jedes Individuum durchgehen
+            for (int k = 0; k < this.settings.MetaEvo.PopulationSize; k++)
+            {
+                random = new double[this.prob.NumParams];
+                //Für jeden Parameter durchgehen
+                for (int j = 0; j < this.prob.NumParams; j++)
+                {
+                    double max = this.prob.List_OptParameter[j].Max;
+                    double min = this.prob.List_OptParameter[j].Min;
+                    random[j] = min + (max - min)*((double)randomizer.Next(0, 1000)/1000);
+                }
+                generation_input[k].set_optparas(random);
+                generation_input[k].set_status("raw");
+            }
+            return true;
+        }
+
 
 
         //### Methoden ### Hauptprogramm
@@ -104,7 +133,17 @@ namespace IHWB.EVO.MetaEvo
             {
                 if (mePC.status == "init")
                 {
-                    //Genpool setzen
+                    //Zufällige Parents setzen
+                    set_random_parents(ref generation);
+
+                    //Genpool simulieren und setzen
+                    if (applog.log) applog.appendText("Controller: Genpool: Simulate Individuals...");
+                    for (int i = 0; i < generation.Length; i++)
+                    {
+                        //Simulieren 
+                        sim_input.Evaluate_MetaEvo(ref generation[i]);
+                        if (applog.log) applog.appendText("Controller: Individuum " + i + " (" + ((double)(i + 1) / (double)generation.Length) * 100 + "%)");
+                    }
                     algomanager.set_genpool(generation);
 
                     mePC.status = "perform";
@@ -112,22 +151,20 @@ namespace IHWB.EVO.MetaEvo
 
                 else if (mePC.status == "perform")
                 {
-                    if (applog.log) applog.appendText("Controller: ### Starting new Generation ###");
-                    if (applog.log) applog.appendText("Controller: Gen" + generationcounter + ": Simulate Individuals");
-
-                    //Simulieren 
-                    if (applog.log) applog.appendText("Controller: Simulating...");
+                    //Neue Generation
+                    if (applog.log) applog.appendText("Controller: ### Building new Generation ###");
+                    algomanager.eval_and_build(ref generation);
+                    
+                    //Neue Generation Simulieren
+                    if (applog.log) applog.appendText("Controller: Gen" + generationcounter + ": Simulate Individuals...");
                     for (int i = 0; i < generation.Length; i++)
                     {
+                        //Simulieren 
                         sim_input.Evaluate_MetaEvo(ref generation[i]);
+                        if (applog.log) applog.appendText("Controller: Individuum " + i + " (" + ((double)(i + 1) / (double)generation.Length) * 100 + "%)");
                     }
-                    if (applog.log) applog.appendText("Controller: Simulation finished");
-
                     //Zeichnen
                     algomanager.draw(ref generation, ref hauptdiagramm1);
-
-                    //Neue Generation
-                    algomanager.eval_and_build(ref generation);
 
                     generationcounter++;
                 }
@@ -149,6 +186,7 @@ namespace IHWB.EVO.MetaEvo
                 if (meServer.status == "init Genpool")
                 {
                     //Zufällige Parents setzen und in DB schreiben
+                    set_random_parents(ref generation);
                     networkmanager.Individuums_WriteToDB(ref generation);
 
                     if (networkmanager.perform_step(ref generation))
@@ -246,9 +284,5 @@ namespace IHWB.EVO.MetaEvo
             }
             if (applog.log) applog.appendText("Controller: Calculation Finished");
         }
-
-
-
-        //### Methoden ### Subroutinen
     }
 }
