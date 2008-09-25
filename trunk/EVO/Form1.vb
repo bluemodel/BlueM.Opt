@@ -771,7 +771,8 @@ Partial Class Form1
         Dim i, j, n, Anz_SensiPara, Anz_Sim As Integer
         Dim isOK As Boolean
         Dim ind As Common.Individuum_PES
-        Dim serie As Steema.TeeChart.Styles.Series
+        Dim serie As Steema.TeeChart.Styles.Points
+        Dim serie3D As New Steema.TeeChart.Styles.Points3D
         Dim surface As New Steema.TeeChart.Styles.Surface
         Dim SimReihe As Wave.Zeitreihe
         Dim SimReihen As Collection
@@ -804,18 +805,21 @@ Partial Class Form1
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
 
-        'Oberflächendiagramm
+        'Bei 2 OptParametern 3D-Diagramm vorbereiten
         If (Anz_SensiPara > 1) Then
+            'Oberfläche
             surface = New Steema.TeeChart.Styles.Surface(Me.Hauptdiagramm1.Chart)
             surface.IrregularGrid = True
             surface.NumXValues = SensiPlot1.Anz_Steps
             surface.NumZValues = SensiPlot1.Anz_Steps
+            '3D-Punkte
+            serie3D = Me.Hauptdiagramm1.getSeries3DPoint("Sensiplot", "Orange")
             'Diagramm drehen (rechter Mausbutton)
             Dim rotate1 As New Steema.TeeChart.Tools.Rotate
             rotate1.Button = Windows.Forms.MouseButtons.Right
             Me.Hauptdiagramm1.Tools.Add(rotate1)
             'MarksTips
-            Me.Hauptdiagramm1.add_MarksTips(surface)
+            Me.Hauptdiagramm1.add_MarksTips(serie3D, Steema.TeeChart.Styles.MarksStyles.Label)
             surface.Title = "SensiPlot"
             surface.Cursor = Cursors.Hand
         End If
@@ -857,36 +861,70 @@ Partial Class Form1
                 'Verlaufsanzeige aktualisieren
                 Me.EVO_Opt_Verlauf1.Nachfolger(n)
 
-                'Individuum instanzieren
-                ind = New Common.Individuum_PES("SensiPlot", n)
+                'Einhaltung von OptParameter-Beziehung überprüfen
+                isOK = True
+                If (Anz_SensiPara > 1) Then
+                    'Es muss nur der zweite Parameter auf eine Beziehung geprüft werden
+                    If (Me.mProblem.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Beziehung <> Beziehung.keine) Then
+                        'Beziehung bezieht sich immer auf den in der Liste vorherigen Parameter
+                        If (SensiPlot1.Selected_OptParameter(0) = SensiPlot1.Selected_OptParameter(1) - 1) Then
 
-                'OptParameter ins Individuum kopieren
-                ind.OptParameter = Me.mProblem.List_OptParameter
+                            isOK = False
 
-                'Individuum in Sim evaluieren
-                isOK = Sim1.Evaluate(ind)
-                'TODO: Fehlerbehandlung bei Simulationsfehler
+                            Dim ref As Double = Me.mProblem.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).RWert
+                            Dim wert As Double = Me.mProblem.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).RWert
 
-                'BUG 253: Verletzte Constraints bei SensiPlot kenntlich machen?
+                            Select Case Me.mProblem.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Beziehung
+                                Case Beziehung.kleiner
+                                    If (wert < ref) Then isOK = True
+                                Case Beziehung.kleinergleich
+                                    If (wert <= ref) Then isOK = True
+                                Case Beziehung.groesser
+                                    If (wert > ref) Then isOK = True
+                                Case Beziehung.groessergleich
+                                    If (wert >= ref) Then isOK = True
+                            End Select
 
-                'Diagramm aktualisieren
-                If (Anz_SensiPara = 1) Then
-                    '1 Parameter
-                    serie = Me.Hauptdiagramm1.getSeriesPoint("SensiPlot", "Orange")
-                    serie.Add(ind.Penalties(SensiPlot1.Selected_Penaltyfunction), ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(0)), n.ToString())
-                Else
-                    '2 Parameter
-                    surface.Add(ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(0)), ind.Penalties(SensiPlot1.Selected_Penaltyfunction), ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(1)), n.ToString())
+                        End If
+                    End If
                 End If
 
-                'Simulationsergebnis in Wave laden
-                If (SensiPlot1.show_Wave) Then
-                    'SimReihe auslesen
-                    SimReihe = Sim1.SimErgebnis(Me.mProblem.List_Penaltyfunctions(SensiPlot1.Selected_Penaltyfunction).SimGr)
-                    'Lösungs-ID an Titel anhängen
-                    SimReihe.Title += " (Lösung " & n.ToString() & ")"
-                    'SimReihe zu Collection hinzufügen
-                    SimReihen.Add(SimReihe)
+                'Evaluierung nur bei isOK
+                If (isOK) Then
+
+                    'Individuum instanzieren
+                    ind = New Common.Individuum_PES("SensiPlot", n)
+
+                    'OptParameter ins Individuum kopieren
+                    ind.OptParameter = Me.mProblem.List_OptParameter
+
+                    'Individuum in Sim evaluieren
+                    isOK = Sim1.Evaluate(ind)
+                    'TODO: Fehlerbehandlung bei Simulationsfehler
+
+                    'BUG 253: Verletzte Constraints bei SensiPlot kenntlich machen?
+
+                    'Diagramm aktualisieren
+                    If (Anz_SensiPara = 1) Then
+                        '1 Parameter
+                        serie = Me.Hauptdiagramm1.getSeriesPoint("SensiPlot", "Orange")
+                        serie.Add(ind.Penalties(SensiPlot1.Selected_Penaltyfunction), ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(0)), n.ToString())
+                    Else
+                        '2 Parameter
+                        surface.Add(ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(0)), ind.Penalties(SensiPlot1.Selected_Penaltyfunction), ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(1)), n.ToString())
+                        serie3D.Add(ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(0)), ind.Penalties(SensiPlot1.Selected_Penaltyfunction), ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(1)), n.ToString())
+                    End If
+
+                    'Simulationsergebnis in Wave laden
+                    If (SensiPlot1.show_Wave) Then
+                        'SimReihe auslesen
+                        SimReihe = Sim1.SimErgebnis(Me.mProblem.List_Penaltyfunctions(SensiPlot1.Selected_Penaltyfunction).SimGr)
+                        'Lösungs-ID an Titel anhängen
+                        SimReihe.Title += " (Lösung " & n.ToString() & ")"
+                        'SimReihe zu Collection hinzufügen
+                        SimReihen.Add(SimReihe)
+                    End If
+
                 End If
 
                 System.Windows.Forms.Application.DoEvents()
