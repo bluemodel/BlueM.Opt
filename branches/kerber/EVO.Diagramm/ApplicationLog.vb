@@ -19,9 +19,9 @@ Partial Public Class ApplicationLog
     End Sub
 
     Public Sub appendText(ByVal text As String)
-        Me.TextBox1.AppendText(String.Format("{0:####.####}", (DateTime.Now - starttime).TotalMilliseconds) + ": " + text + vbCrLf)
-        'Me.Show()
+        Me.TextBox1.AppendText(String.Format("{0:####.##}", (DateTime.Now - starttime).TotalSeconds) + ": " + text + vbCrLf)
         Me.Refresh()
+        Me.Update()
     End Sub
 
 End Class
