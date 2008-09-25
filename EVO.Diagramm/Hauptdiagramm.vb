@@ -177,7 +177,7 @@
             serie = Me.getSeriesPoint("Sekundäre Population", "Green")
             serie.Clear()
             For i = 0 To values.GetUpperBound(0)
-                serie.Add(values(i, 0), values(i, 1))
+                serie.Add(values(i, 0), values(i, 1), pop(i).ID.ToString())
             Next i
 
         ElseIf (Me.mProblem.NumPenalties >= 3) Then
@@ -186,7 +186,7 @@
             serie3D = Me.getSeries3DPoint("Sekundäre Population", "Green")
             serie3D.Clear()
             For i = 0 To values.GetUpperBound(0)
-                serie3D.Add(values(i, 0), values(i, 1), values(i, 2))
+                serie3D.Add(values(i, 0), values(i, 1), values(i, 2), pop(i).ID.ToString())
             Next i
         End If
 
