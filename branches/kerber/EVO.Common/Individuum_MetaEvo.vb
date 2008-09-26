@@ -5,6 +5,8 @@
     Private Client As String                'Welcher Rechner dieses Individuum berechnen soll [ip oder Rechnername]
     Private numberOptparas As Integer       'Anzahl der Optparas des Problems
     Private status As String                '{raw, calculate, ready, false}
+    Private statusreason As String          '{false: dominated, crowding}
+    Private statusopponent As Integer        'Individuen-ID durch den dieses Individuum gelöscht wurde
     Private mOptparameter() As OptParameter
 
     '### Initialisierung
@@ -88,25 +90,41 @@
         Return Me.generator_id
     End Function
 
-    'IPWorker setzen
+    'Client setzen
     Public Function set_Client(ByVal client_input As String)
         Me.Client = client_input
         Return True
     End Function
 
-    'IPWorker auslesen
+    'Client auslesen
     Public Function get_client() As String
         Return Me.Client
     End Function
 
     'Status setzen
     Public Function set_status(ByVal status_input As String)
-        Me.status = status_input
-        Return True
+        If (status_input.Contains("false")) Then
+            'Dim stringarray As String(3)
+            Me.status = "false"
+            Me.statusreason = status_input.Split("#")(1)
+            Me.statusopponent = CInt(status_input.Split("#")(2))
+            Return True
+        Else
+            Me.status = status_input
+            Return True
+        End If
     End Function
 
     'Status auslesen
     Public Function get_status() As String
         Return Me.status
+    End Function
+
+    Public Function get_status_reason() As String
+        Return Me.statusreason
+    End Function
+
+    Public Function get_status_opponent() As Integer
+        Return Me.statusopponent
     End Function
 End Class

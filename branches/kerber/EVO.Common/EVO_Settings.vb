@@ -274,7 +274,7 @@ Public Class EVO_Settings
         Public Sub setStandard()
             Me.Role = "Single PC"
 
-            Me.PopulationSize = 20
+            Me.PopulationSize = 5
             Me.NumberGenerations = 10
 
             Me.Draw = True
@@ -282,7 +282,7 @@ Public Class EVO_Settings
 
             Me.MySQL_Host = "localhost"
             Me.MySQL_Database = "MetaEvo_db"
-            Me.MySQL_User = "MetaEvo_user"
+            Me.MySQL_User = "remote_user"
             Me.MySQL_Password = ""
         End Sub
 
