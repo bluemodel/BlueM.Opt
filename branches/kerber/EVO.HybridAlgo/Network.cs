@@ -35,11 +35,11 @@ namespace IHWB.EVO.MetaEvo
             timestamp = timestamp_input;
             speed_av = speed_av_input;
             speed_low = speed_low_input;
-            current_calc_time = speed_av_input * numberindividuums_input;  //In millisekunden
+            current_calc_time = speed_av_input * numberindividuums_input;  //In Millisekunden
             numberindividuums = numberindividuums_input;
 
-            mycon = mycon_input;
-            myCommand.Connection = mycon;
+            myCommand = new MySqlCommand();
+            myCommand.Connection = mycon_input;
         }
 
         //In der Datenbank updaten
@@ -82,13 +82,14 @@ namespace IHWB.EVO.MetaEvo
         //Von der Datenbank updaten
         public void get_NumberIndividuumsFromDB()
         {
-            myCommand = new MySqlCommand("Select * from metaevo_network WHERE ipName = '" + this.ipName + "'", mycon);
-            mycon.Open();
+            myCommand.CommandText ="Select * from metaevo_network WHERE ipName = '" + this.ipName + "'";
+            myCommand.Connection.Open();
             myReader = myCommand.ExecuteReader();
             while (myReader.Read())
             {
                 this.numberindividuums = myReader.GetInt32(6);
             }
+            myCommand.Connection.Close();
         }
     }
 
@@ -117,39 +118,36 @@ namespace IHWB.EVO.MetaEvo
         //Aktuelle Daten aus der DB holen
         public void update_From_DB()
         {
-            //Array mit Clients
-            Clients = new Client[number_clients]; 
-
-            //Daten auslesen
+            //Clients zählen
             myCommand = new MySqlCommand("Select * from metaevo_network WHERE type = 'client'", mycon);
             mycon.Open();
             myReader = myCommand.ExecuteReader();
 
-            int k = 0;
-            bool readagain = false;
+            this.number_clients = 0;
 
             while (myReader.Read())
             {
-                //Mehr Clients vorhanden als beim letzten Auslesen 
-                //-> Tabelle auf neue Anzahl erweitern und neu starten
-                if (k >= number_clients)
-                {
-                    number_clients++;
-                    readagain = true;
-                }
-                else
-                {
-                    Clients[k] = new Client(ref mycon, myReader.GetString(0), myReader.GetString(2), myReader.GetDateTime(3), myReader.GetDouble(4), myReader.GetDouble(5), myReader.GetInt32(6));
-                }
-                k++;
+                number_clients++;
+            }
+            mycon.Close();
+
+            //Array mit Clients erzeugen
+            Clients = new Client[number_clients]; 
+
+            //Clients einlesen
+            myCommand = new MySqlCommand("Select * from metaevo_network WHERE type = 'client'", mycon);
+            mycon.Open();
+            myReader = myCommand.ExecuteReader();
+
+            number_clients = 0;
+
+            while (myReader.Read())
+            {
+                Clients[number_clients] = new Client(ref mycon, myReader.GetString(0), myReader.GetString(2), myReader.GetDateTime(3), myReader.GetDouble(4), myReader.GetDouble(5), myReader.GetInt32(6));
+                number_clients++;
             }
             myReader.Close();
             mycon.Close();
-
-            if (readagain)
-            {
-                this.update_From_DB();
-            }
         }
 
         //Aktuelle Berechnungszeiten löschen (neues Scheduling)

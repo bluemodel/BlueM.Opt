@@ -9,10 +9,11 @@ namespace IHWB.EVO.MetaEvo
     class Algomanager
     {
         EVO.Common.Individuum_MetaEvo[] genpool;
+        EVO.Common.Individuum_MetaEvo[] wastepool;
         EVO.Diagramm.ApplicationLog applog;
         Algos algos;
 
-        public Algomanager(ref EVO.Common.Problem prob_input, int individuumnumber_input, ref EVO.Diagramm.ApplicationLog applog_input) //Zeichenobjekt übergeben
+        public Algomanager(ref EVO.Common.Problem prob_input, int individuumnumber_input, ref EVO.Diagramm.ApplicationLog applog_input) 
         {
             applog = applog_input;
             //Algoobjekt initialisieren (enthält die algorithmus-Methoden und das Feedback zu jedem Algo)
@@ -21,6 +22,7 @@ namespace IHWB.EVO.MetaEvo
 
         public void set_genpool(ref EVO.Common.Individuum_MetaEvo[] genpool_input) 
         {
+            this.wastepool = new EVO.Common.Individuum_MetaEvo[genpool_input.Length];
             this.genpool = new EVO.Common.Individuum_MetaEvo[genpool_input.Length];
             for (int i = 0; i < genpool_input.Length; i++)
             {
@@ -54,16 +56,18 @@ namespace IHWB.EVO.MetaEvo
             //2.Feedback erstellen
             newGen_composition(ref new_generation_input);
 
-            //3.Genpool und neue Individuen zu neuem Genpool zusammenfassen 
+            //3.Genpool und neue Individuen zu neuem Genpool zusammenfassen, restliche Individuen in Wastepool verschieben 
             zip(ref genpool, ref new_generation_input);
-            if (applog.log) applog.appendText("Algo Manager: Result: New Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n");
+            this.wastepool = new_generation_input;
+            quicksort(ref wastepool, kriterium, 0, new_generation_input.Length - 1);
             quicksort(ref genpool, kriterium, 0, new_generation_input.Length - 1);
+            if (applog.log) applog.appendText("Algo Manager: Result: New Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n");
         }
 
         public void new_individuals_build(ref EVO.Common.Individuum_MetaEvo[] new_generation_input)
         {
             //4.Generierung neuer Individuen (wieder in new_generation_input)
-            algos.newGeneration(ref genpool, ref new_generation_input);
+            algos.newGeneration(ref genpool, ref new_generation_input, ref wastepool);
         }
 
         //Sortieren nach einem gegebenen Penaltie(ok)
@@ -114,7 +118,7 @@ namespace IHWB.EVO.MetaEvo
                     if (input[i].get_status() == "true")
                     {
                         //mit
-                        for (int k = i + 1; k < input.Length; k++)
+                        for (int k = input.Length-1; k > i; k--)
                         {
                             if (input[k].get_status() == "true")
                             {
@@ -124,8 +128,8 @@ namespace IHWB.EVO.MetaEvo
                                     dominator = k;
                                     if (input[i].Penalties[j] > input[k].Penalties[j]) { dominator = -1; break; }
                                 }
-                                if (dominator > -1) { 
-                                    input[i].set_status("false");
+                                if (dominator > -1) {
+                                    input[i].set_status("false#dominated#" + input[dominator].ID);
                                     if (applog.log) applog.appendText("Algo Manager: Domination: Individuum " + input[i].ID + " is dominated by Individuum " + input[dominator].ID);
                                     break; 
                                 }
@@ -143,7 +147,7 @@ namespace IHWB.EVO.MetaEvo
                     if (input[i].get_status() == "true")
                     {
                         //mit
-                        for (int k = 0; k < input2.Length; k++)
+                        for (int k = input2.Length - 1; k >= 0; k--)
                         {
                             if ((input2[k].get_status() == "true") && (input[i].ID != input2[k].ID))
                             {
@@ -171,15 +175,15 @@ namespace IHWB.EVO.MetaEvo
                                     }
                                 }
                                 if (status == 1) { 
-                                    status = 0; 
-                                    input2[k].set_status("false");
-                                    if (applog.log) applog.appendText("Algo Manager: Domination2: Individuum " + input2[k].ID + " is dominated by Individuum " + input[i].ID);
+                                    status = 0;
+                                    input2[k].set_status("false#dominated#" + input[i].ID);
+                                    if (applog.log) applog.appendText("Algo Manager: Domination: Individuum " + input2[k].ID + " is dominated by Individuum " + input[i].ID);
                                     break; 
                                 }
                                 if (status == -1) { 
-                                    status = 0; 
-                                    input[i].set_status("false");
-                                    if (applog.log) applog.appendText("Algo Manager: Domination2: Individuum " + input[i].ID + " is dominated by Individuum " + input2[k].ID);
+                                    status = 0;
+                                    input[i].set_status("false#dominated#" + input2[k].ID);
+                                    if (applog.log) applog.appendText("Algo Manager: Domination: Individuum " + input[i].ID + " is dominated by Individuum " + input2[k].ID);
                                     break;
                                 }
                             }
@@ -257,7 +261,7 @@ namespace IHWB.EVO.MetaEvo
                 //Zu nahe Individuen killen
                 for (int i = 0; i < individuums2kill.Length/2; i++)
                 {
-                    work[(int)individuums2kill[i, 0]].set_status("false");
+                    work[(int)individuums2kill[i, 0]].set_status("false#crowding#0");
                     if (applog.log) applog.appendText("Algo Manager: Clustering: Individuum " + work[(int)individuums2kill[i, 0]].ID + " is not needed anymore");
                 }
                 //Zur überprüfung ob genug Individuen reduziert wurden
@@ -268,6 +272,7 @@ namespace IHWB.EVO.MetaEvo
         private void zip(ref EVO.Common.Individuum_MetaEvo[] input, ref EVO.Common.Individuum_MetaEvo[] input2)
         {
             int pointer = 0;
+            EVO.Common.Individuum_MetaEvo tmp;
 
             for (int i = 0; i < 2 * input.Length; i++)
             {
@@ -275,7 +280,9 @@ namespace IHWB.EVO.MetaEvo
                 {
                     if (input2[i - input.Length].get_status() == "true")
                     {
-                        genpool[pointer] = input2[i - input.Length].Clone_MetaEvo();
+                        tmp = input2[i - input.Length];
+                        input2[i - input.Length] = input[pointer];
+                        input[pointer] = tmp;
                         pointer++;
                     }
                 }
@@ -283,7 +290,9 @@ namespace IHWB.EVO.MetaEvo
                 {
                     if (input[i].get_status() == "true")
                     {
-                        genpool[pointer] = input[i].Clone_MetaEvo();
+                        tmp = input[i];
+                        input[i] = input[pointer];
+                        input[pointer] = tmp;
                         pointer++;
                     }
                 }

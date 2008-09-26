@@ -192,14 +192,16 @@ namespace IHWB.EVO.MetaEvo
                 //Einmaliges Initialisieren des Genpools
                 if (meServer.status == "init Genpool")
                 {
+                    if (applog.log) applog.appendText("Controller: State: Init");
                     //Zufällige Parents setzen und in DB schreiben
                     set_random_parents(ref generation);
-                    networkmanager.Individuums_WriteToDB(ref generation);
 
-                    if (networkmanager.perform_step(ref generation))
+                    //Von den Clients ausrechnen lassen
+                    if (applog.log) applog.appendText("Controller: Calculate Individuums by Clients");
+                    if (networkmanager.calculate_by_clients(ref generation))
                     {
-                        meServer.set_AlsoInDB("error watching", -1, -1, -1);
                         algomanager.set_genpool(ref generation);
+                        meServer.set_AlsoInDB("generate Individuums", -1, -1, -1);
                     }
                     else
                     {
@@ -237,7 +239,8 @@ namespace IHWB.EVO.MetaEvo
                 //Individuen berechnen lassen
                 else if (meServer.status == "error watching")
                 {
-                    if (networkmanager.perform_step(ref generation))
+                    //Von den Clients ausrechnen lassen
+                    if (networkmanager.calculate_by_clients(ref generation))
                     {
                         meServer.set_AlsoInDB("generate Individuums", -1, -1, -1);
                     }

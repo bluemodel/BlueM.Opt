@@ -409,6 +409,14 @@ namespace IHWB.EVO.MetaEvo
             //Statustabelle der Clients aktualisieren
             network1.update_From_DB();
 
+            //Falls kein Aktiver Client vorhanden ist, 3 Sekunden warten und dann nochmal aufrufen
+            if (network1.number_clients == 0)
+            {
+                if (applog.log) applog.appendText("Scheduling: No Client found registered in DB - wait...");
+                System.Threading.Thread.Sleep(this.startingtime.AddSeconds(3) - this.startingtime);
+                scheduling(ref generation_input, modus_input);
+            }
+
             //Falls Modus = "new" 
             if (modus_input == "new")
             {
@@ -555,24 +563,29 @@ namespace IHWB.EVO.MetaEvo
 
         //### Hauptprogramm ### Berechnet eine Generation im Netzwerk
 
-        public bool perform_step(ref EVO.Common.Individuum_MetaEvo[] generation_input)
+        public bool calculate_by_clients(ref EVO.Common.Individuum_MetaEvo[] generation_input)
         {
             TimeSpan waitfor;
             startingtime = DateTime.Now;
 
             //Scheduling initialisieren und ersten Schritt rechnen
+            if (applog.log) applog.appendText("Networkmanager: Scheduling");
             waitfor = this.scheduling(ref generation_input, "new");
 
             //In die Datenbank schreiben
+            if (applog.log) applog.appendText("Networkmanager: Write Individuums to DB");
             this.DB_ClearIndividuumsTable();
             this.Individuums_WriteToDB(ref generation_input);
 
-            //Warten bis erste ergebnisse vorliegen müssten
+            //Warten bis erste Ergebnisse vorliegen müssten
+            if (applog.log) applog.appendText("Networkmanager: Waiting for first Results...");
             System.Threading.Thread.Sleep(waitfor);
 
             //Prüfen ob alle Individuen fertig berechnet sind
             while (this.Individuums_CountReadyInDB() < this.populationsize)
             {
+                if (applog.log) applog.appendText("Networkmanager: " + Math.Round((double)this.Individuums_CountReadyInDB() / (double)populationsize,2)*100 + "%");
+               
                 //Scheduling-korrektur anstossen (inklusive-DB Update)
                 waitfor = this.scheduling(ref generation_input, "continue");
 

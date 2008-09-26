@@ -42,7 +42,7 @@ namespace IHWB.EVO.MetaEvo
             algofeedbackarray[1] = new Algofeedback("Zufällige Rekombination", individuumnumber / algofeedbackarray.Length);
         }
 
-        public void newGeneration(ref EVO.Common.Individuum_MetaEvo[] genpool_input, ref EVO.Common.Individuum_MetaEvo[] new_generation_input)
+        public void newGeneration(ref EVO.Common.Individuum_MetaEvo[] genpool_input, ref EVO.Common.Individuum_MetaEvo[] new_generation_input, ref EVO.Common.Individuum_MetaEvo[] wastepool_input)
         {
             int startindex;
 
@@ -95,7 +95,7 @@ namespace IHWB.EVO.MetaEvo
                         new_generation_input[startindex + i].set_status("raw");
                         new_generation_input[startindex + i].set_generator(algo_id);
                         new_generation_input[startindex + i].ID = individuumnumber;
-                        if (applog.log) applog.appendText("Algos: Buliding Individuum " + individuumnumber + " with " + algofeedbackarray[algo_id].name);
+                        if (applog.log) applog.appendText("Algos: Buliding Individuum " + individuumnumber + " with '" + algofeedbackarray[algo_id].name + "'");
                         individuumnumber++;
                     }
                     break;
@@ -118,7 +118,7 @@ namespace IHWB.EVO.MetaEvo
                         new_generation_input[startindex + i].set_status("raw");
                         new_generation_input[startindex + i].set_generator(algo_id);
                         new_generation_input[startindex + i].ID = individuumnumber;
-                        if (applog.log) applog.appendText("Algos: Buliding Individuum " + individuumnumber + " with " + algofeedbackarray[algo_id].name);
+                        if (applog.log) applog.appendText("Algos: Buliding Individuum " + individuumnumber + " with '" + algofeedbackarray[algo_id].name + "'");
                         individuumnumber++;
                     }
                     break;
