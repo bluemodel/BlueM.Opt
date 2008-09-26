@@ -726,14 +726,17 @@ Public Class EVO_Einstellungen
         If (Me.Combo_MetaEvo_Role.SelectedItem = "Single PC") Then
             Me.GroupBox_MetaEvo_BasicOptions.Enabled = True
             Me.GroupBox_MetaEvo_PerformanceOptions.Enabled = True
+            Me.CheckBox_MetaEvo_Draw.Enabled = True
             Me.GroupBox_MetaEvo_MySQLOptions.Enabled = False
         ElseIf (Me.Combo_MetaEvo_Role.SelectedItem = "Network Client") Then
             Me.GroupBox_MetaEvo_BasicOptions.Enabled = False
-            Me.GroupBox_MetaEvo_PerformanceOptions.Enabled = False
+            Me.GroupBox_MetaEvo_PerformanceOptions.Enabled = True
+            Me.CheckBox_MetaEvo_Draw.Enabled = False
             Me.GroupBox_MetaEvo_MySQLOptions.Enabled = True
         ElseIf (Me.Combo_MetaEvo_Role.SelectedItem = "Network Server") Then
             Me.GroupBox_MetaEvo_BasicOptions.Enabled = True
             Me.GroupBox_MetaEvo_PerformanceOptions.Enabled = True
+            Me.CheckBox_MetaEvo_Draw.Enabled = True
             Me.GroupBox_MetaEvo_MySQLOptions.Enabled = True
         End If
     End Sub

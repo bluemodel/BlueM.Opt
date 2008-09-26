@@ -19,6 +19,7 @@
         Dim i As Integer
         ReDim Me.mOptparameter(numberOptparas_input)
         numberOptparas = numberOptparas_input
+        Me.status = "false"
 
         'Initialisieren der Optparameter
         For i = 0 To numberOptparas - 1

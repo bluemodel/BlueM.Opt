@@ -20,8 +20,7 @@ Partial Public Class ApplicationLog
 
     Public Sub appendText(ByVal text As String)
         Me.TextBox1.AppendText(String.Format("{0:####.##}", (DateTime.Now - starttime).TotalSeconds) + ": " + text + vbCrLf)
-        Me.Refresh()
-        Me.Update()
+        System.Windows.Forms.Application.DoEvents()
     End Sub
 
 End Class
