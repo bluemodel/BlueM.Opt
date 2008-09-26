@@ -81,7 +81,7 @@ namespace IHWB.EVO.MetaEvo
                 case "Network Client":
                     if (applog.log) applog.appendText("Controller: MetaEvo started in 'Network Client'-Mode");
                     //### Vorbereitung ###
-                    individuumForClient = new EVO.Common.Individuum_MetaEvo("MetaEvo", individuumnumber, prob_input.List_OptParameter.Length);
+                    individuumForClient = new EVO.Common.Individuum_MetaEvo("MetaEvo", 0, prob_input.List_OptParameter.Length);
 
                     //### Hauptprogramm ###
                     networkmanager = new Networkmanager(ref this.individuumForClient, ref this.settings, ref applog);
@@ -142,7 +142,7 @@ namespace IHWB.EVO.MetaEvo
                     {
                         //Simulieren 
                         sim_input.Evaluate_MetaEvo(ref generation[i]);
-                        if (applog.log) applog.appendText("Controller: Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length),2) * 100 + "%)");   
+                        if (applog.log) applog.appendText("Controller: Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length),2) * 100 + "%)");
                     }
                     algomanager.set_genpool(ref generation);
 
@@ -269,18 +269,21 @@ namespace IHWB.EVO.MetaEvo
                 networkmanager.Individuum_ReadFromDB_Client(ref individuumForClient);
 
                 //Falls Individuum existiert, berechnen
-                if (individuumForClient.ID != 0)
+                if (individuumForClient.get_status() == "raw")
                 {
+                    
                     if (meClient.status != "calculating")
                     {
                         //Status zuweisen
                         meClient.set_AlsoInDB("calculating", -1, -1, -1);
                         //Anzahl der zu berechnenden Individuen aus der DB lesen
                         meClient.get_NumberIndividuumsFromDB();
+                        if (applog.log) applog.appendText("Controller: " + meClient.numberindividuums + " Individuums found in DB (for this Client)");
                     }
                     //Individuum in DB als "calculate" markieren
                     networkmanager.Individuum_UpdateInDB(ref individuumForClient, "status", "calculate");
                     //Simulieren
+                    if (applog.log) applog.appendText("Controller: Individuum " + individuumForClient.ID + " simulating...");
                     sim_input.Evaluate_MetaEvo(ref individuumForClient);
                     //Individuum in DB Updaten
                     networkmanager.Individuum_UpdateInDB(ref individuumForClient, "status feat const", "true");
@@ -294,7 +297,8 @@ namespace IHWB.EVO.MetaEvo
                         //Status zuweisen
                         meClient.set_AlsoInDB("ready", -1, -1, -1);
                     }
-                    System.Threading.Thread.Sleep(5000);
+                    if (applog.log) applog.appendText("Controller: No Individuum found in DB (for this Client) - waiting...");
+                    System.Threading.Thread.Sleep(3000);
                 }
                 serverstatus = networkmanager.Network_ReadServer();
             }

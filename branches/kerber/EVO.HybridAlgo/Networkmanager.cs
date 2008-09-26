@@ -72,7 +72,7 @@ namespace IHWB.EVO.MetaEvo
             {
                 mycon.Open();
                 mycon.Close();
-                if (applog.log) applog.appendText("Network Manager: DB-Connection Successfilly");
+                if (applog.log) applog.appendText("Network Manager: DB-Connection Successfully");
             }
             catch (MySqlException ex)
             {
@@ -237,6 +237,7 @@ namespace IHWB.EVO.MetaEvo
                     optparas[k] = myReader.GetDouble(ExportPosition);
                     ExportPosition++;
                 }
+                individuum_input.set_status("raw");
             }
             individuum_input.set_optparas(optparas);
 
@@ -247,8 +248,8 @@ namespace IHWB.EVO.MetaEvo
         //(ok)prüfen wie viele Individuen fertig berechnet sind
         public int Individuums_CountReadyInDB()
         {
-            myCommand = new MySqlCommand("Select status from metaevo_individuums WHERE status = 'true' OR status = 'false'", mycon);
-            mycon.Open();
+            myCommand.CommandText = "Select status from metaevo_individuums WHERE status = 'true' OR status = 'false'";
+            myCommand.Connection.Open();
             myReader = myCommand.ExecuteReader();
 
             int count = 0;
@@ -256,6 +257,7 @@ namespace IHWB.EVO.MetaEvo
             {
                 count++;
             }
+            myCommand.Connection.Close();
             return count;
         }
         
@@ -413,7 +415,7 @@ namespace IHWB.EVO.MetaEvo
             if (network1.number_clients == 0)
             {
                 if (applog.log) applog.appendText("Scheduling: No Client found registered in DB - wait...");
-                System.Threading.Thread.Sleep(this.startingtime.AddSeconds(3) - this.startingtime);
+                System.Threading.Thread.Sleep(3000);
                 scheduling(ref generation_input, modus_input);
             }
 
@@ -536,6 +538,7 @@ namespace IHWB.EVO.MetaEvo
 
             for (int j = 1; j < network1.number_clients; j++)
             {
+                if (applog.log) applog.appendText("Scheduling: Client " + network1.Clients[j].ipName + " (" + network1.Clients[j].status + "): Calculating " + network1.Clients[j].numberindividuums + " Individuums");
                 if (network1.Clients[j].status != "error") //falls Client funktioniert
                 {
                     //Falls Modus = new oder ein scheduling_error auftrat, Wartezeit bis erster Client fertig
@@ -555,7 +558,7 @@ namespace IHWB.EVO.MetaEvo
                     }
                 }
             }
-            waitfor = this.startingtime.AddMilliseconds(network1.Clients[current_client].current_calc_time).Subtract(DateTime.Now);
+            waitfor = DateTime.Now.Subtract(this.startingtime.AddMilliseconds(network1.Clients[current_client].current_calc_time));
             return waitfor;
         }
 
