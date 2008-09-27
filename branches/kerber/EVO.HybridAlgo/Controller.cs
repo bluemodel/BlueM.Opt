@@ -192,16 +192,15 @@ namespace IHWB.EVO.MetaEvo
                 //Einmaliges Initialisieren des Genpools
                 if (meServer.status == "init Genpool")
                 {
-                    if (applog.log) applog.appendText("Controller: State: Init");
                     //Zufällige Parents setzen und in DB schreiben
                     set_random_parents(ref generation);
 
                     //Von den Clients ausrechnen lassen
-                    if (applog.log) applog.appendText("Controller: Calculate Individuums by Clients");
+                    if (applog.log) applog.appendText("Controller: Calculate Genpool by Clients");
                     if (networkmanager.calculate_by_clients(ref generation))
                     {
                         algomanager.set_genpool(ref generation);
-                        meServer.set_AlsoInDB("generate Individuums", -1, -1, -1);
+                        meServer.set_AlsoInDB("generate Individuums", -1, -1);
                     }
                     else
                     {
@@ -212,9 +211,6 @@ namespace IHWB.EVO.MetaEvo
                 //Individuen erzeugen
                 else if (meServer.status == "generate Individuums")
                 {
-                    //Fertig berechnete Individuen (alle) aus der DB in generation updaten
-                    networkmanager.Individuums_UpdateFromDB(ref generation);
-
                     //Neue Individuen Zeichnen
                     algomanager.draw_individuals(ref generation, ref hauptdiagramm1);
 
@@ -227,22 +223,18 @@ namespace IHWB.EVO.MetaEvo
                     //Evolutionsschritte
                     algomanager.new_individuals_build(ref generation);
 
-                    //Neue Individuen in die DB schreiben
-                    networkmanager.Individuums_WriteToDB(ref generation);
-
                     //Neuen Serverstatus setzen
-                    meServer.set_AlsoInDB("error watching", -1, -1, -1);
-
-                    generationcounter++;
+                    meServer.set_AlsoInDB("waiting for client-calculation", -1, -1);
                 }
 
                 //Individuen berechnen lassen
-                else if (meServer.status == "error watching")
+                else if (meServer.status == "waiting for client-calculation")
                 {
                     //Von den Clients ausrechnen lassen
                     if (networkmanager.calculate_by_clients(ref generation))
                     {
-                        meServer.set_AlsoInDB("generate Individuums", -1, -1, -1);
+                        generationcounter++;
+                        meServer.set_AlsoInDB("generate Individuums", -1, -1);
                     }
                     else
                     {
@@ -250,19 +242,20 @@ namespace IHWB.EVO.MetaEvo
                     }
                 }
             }
-            meServer.set_AlsoInDB("finished", -1, -1, -1);
+            meServer.set_AlsoInDB("finished", -1, -1);
             if (applog.log) applog.appendText("Controller: Calculation Finished");
         }
 
         // Network Client
         private void start_network_client(ref EVO.Apps.Sim sim_input)
         {
-
             Client meClient = new Client();
+            meClient.numberindividuums = 0;
             meClient = networkmanager.Network_Init_Client_Object(Dns.GetHostName());
             string[] serverstatus = networkmanager.Network_ReadServer();
+            DateTime Berechnungsstart;
+            double Berechnungsdauer;
             
-
             //Solange der Server noch nicht fertig ist
             while (serverstatus[0] != "finished") {
 
@@ -271,35 +264,40 @@ namespace IHWB.EVO.MetaEvo
                 //Falls Individuum existiert, berechnen
                 if (individuumForClient.get_status() == "raw")
                 {
-                    
-                    if (meClient.status != "calculating")
-                    {
-                        //Status zuweisen
-                        meClient.set_AlsoInDB("calculating", -1, -1, -1);
-                        //Anzahl der zu berechnenden Individuen aus der DB lesen
-                        meClient.get_NumberIndividuumsFromDB();
-                        if (applog.log) applog.appendText("Controller: " + meClient.numberindividuums + " Individuums found in DB (for this Client)");
-                    }
+                    //Status zuweisen
+                    meClient.set_AlsoInDB("calculating", -1, -1);
+                    meClient.numberindividuums++;
+
                     //Individuum in DB als "calculate" markieren
                     networkmanager.Individuum_UpdateInDB(ref individuumForClient, "status", "calculate");
+
                     //Simulieren
+                    Berechnungsstart = DateTime.Now;
                     if (applog.log) applog.appendText("Controller: Individuum " + individuumForClient.ID + " simulating...");
                     sim_input.Evaluate_MetaEvo(ref individuumForClient);
+
+                    //Neuen Speed-Daten berechnen
+                    Berechnungsdauer = DateTime.Now.Subtract(Berechnungsstart).Milliseconds;
+                    meClient.speed_av += (meClient.speed_av - Berechnungsdauer) / meClient.numberindividuums;
+                    if (Berechnungsdauer > meClient.speed_low) meClient.speed_low = Berechnungsdauer;
+                    if (applog.log) applog.appendText("Controller: Average Speed is set to " + meClient.speed_av + " Milliseconds, Lowest Speed is set to "+meClient.speed_low+" Milliseconds");
+
                     //Individuum in DB Updaten
-                    networkmanager.Individuum_UpdateInDB(ref individuumForClient, "status feat const", "true");
+                    networkmanager.Individuum_UpdateInDB(ref individuumForClient, "status feat const", individuumForClient.get_status());
+
+                    //Client ind DB Updaten
+                    meClient.set_AlsoInDB("", meClient.speed_av, meClient.speed_low);
                 }
 
                 // Wenn kein Individuum mehr da ist, warten
                 else
                 {
-                    if (meClient.status != "ready")
-                    {
-                        //Status zuweisen
-                        meClient.set_AlsoInDB("ready", -1, -1, -1);
-                    }
+                    meClient.set_AlsoInDB("ready", -1, -1);
                     if (applog.log) applog.appendText("Controller: No Individuum found in DB (for this Client) - waiting...");
                     System.Threading.Thread.Sleep(3000);
                 }
+
+                //Serverstatus neu lesen
                 serverstatus = networkmanager.Network_ReadServer();
             }
             if (applog.log) applog.appendText("Controller: Calculation Finished");
