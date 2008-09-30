@@ -1860,7 +1860,12 @@ Start_Evolutionsrunden:
 
                         'SekPop zeichnen
                         '---------------
-                        Call Me.Hauptdiagramm1.ZeichneSekPopulation(PES1.SekundärQb)
+                        If (Not IsNothing(Sim1)) Then
+                            'BUG 257: Umweg über Sim1.OptResult gehen, weil es im PES keine Individuum-IDs gibt
+                            Call Me.Hauptdiagramm1.ZeichneSekPopulation(Sim1.OptResult.getSekPop())
+                        Else
+                            Call Me.Hauptdiagramm1.ZeichneSekPopulation(PES1.SekundärQb)
+                        End If
 
                         'Hypervolumen berechnen und Zeichnen
                         '-----------------------------------
