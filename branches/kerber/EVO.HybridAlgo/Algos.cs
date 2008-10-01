@@ -134,13 +134,23 @@ namespace IHWB.EVO.MetaEvo
                             for (int k = 0; k < genpool_input[0].get_optparas().Length; k++)
                             {
                                 diversity_optparas[k] = genpool_input[0].get_optparas()[k] + (genpool_input[0].get_optparas()[k] - genpool_input[(int)i/2].get_optparas()[k]);
+                                //Auf Max prüfen, ggf. Multiplikator für den Optpara anpassen anpassen
+                                if (genpool_input[1].OptParameter[k].Max < diversity_optparas[k])
+                                {
+
+                                }
                             }
                         }
                         else
                         {
                             for (int k = 0; k < genpool_input[0].get_optparas().Length; k++)
                             {
-                                diversity_optparas[k] = genpool_input[genpool_input.Length].get_optparas()[k] + (genpool_input[genpool_input.Length].get_optparas()[k] - genpool_input[genpool_input.Length - 1 - (int)i / 2].get_optparas()[k]);
+                                diversity_optparas[k] = genpool_input[genpool_input.Length].get_optparas()[k] + (genpool_input[genpool_input.Length - 1].get_optparas()[k] - genpool_input[genpool_input.Length - 1 - (int)i / 2].get_optparas()[k]);
+                                //Auf Min prüfen, ggf. Multiplikator für den Optpara anpassen anpassen
+                                if (genpool_input[1].OptParameter[k].Min > diversity_optparas[k])
+                                {
+
+                                }
                             }
                         }
                         //Zurückspeichern
