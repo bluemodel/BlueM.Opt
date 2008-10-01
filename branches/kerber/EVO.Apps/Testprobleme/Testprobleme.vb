@@ -81,7 +81,7 @@ Public Class Testprobleme
         Me.mSelectedTestproblem = name
 
         'Das Problem definieren
-        Me.mProblem = New EVO.Common.Problem(METH_PES, "", "")
+        Me.mProblem = New EVO.Common.Problem()
 
         Select Case Me.mSelectedTestproblem
 

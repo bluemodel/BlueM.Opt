@@ -87,22 +87,41 @@ Public Class Problem
     '##########
 
     ''' <summary>
-    ''' Name des zu optimierenden Datensatzes
+    ''' Arbeitsverzeichnis
     ''' </summary>
     ''' <remarks>nur bei Sim-Anwendungen relevant</remarks>
-    Public ReadOnly Property Datensatz() As String
+    Public Property WorkDir() As String
         Get
-            Return Me.mDatensatz
+            Return Me.mWorkDir
         End Get
+        Set(ByVal value As String)
+            Me.mWorkDir = value
+        End Set
     End Property
 
     ''' <summary>
-    ''' Name der verwendeten Optimieurungsmethode
+    ''' Name des zu optimierenden Datensatzes
     ''' </summary>
-    Public ReadOnly Property Method() As String
+    ''' <remarks>nur bei Sim-Anwendungen relevant</remarks>
+    Public Property Datensatz() As String
+        Get
+            Return Me.mDatensatz
+        End Get
+        Set(ByVal value As String)
+            Me.mDatensatz = value
+        End Set
+    End Property
+
+    ''' <summary>
+    ''' Name der zu verwendenden Optimierungsmethode
+    ''' </summary>
+    Public Property Method() As String
         Get
             Return Me.mMethod
         End Get
+        Set(ByVal value As String)
+            Me.mMethod = value
+        End Set
     End Property
 
     ''' <summary>
@@ -216,17 +235,7 @@ Public Class Problem
     ''' <summary>
     ''' Konstruktor
     ''' </summary>
-    ''' <param name="method">Zu verwendende Methode</param>
-    ''' <param name="workdir">Pfad zum Datensatz-Verzeichnis</param>
-    ''' <param name="datensatz">Name des Datensatzes</param>
-    Public Sub New(ByVal method As String, ByVal workdir As String, ByVal datensatz As String)
-
-        'Methode setzen
-        Me.mMethod = method
-
-        'Pfad und Datensatz speichern
-        Me.mWorkDir = workdir
-        Me.mDatensatz = datensatz
+    Public Sub New()
 
         'Datenstrukturen initialisieren
         ReDim Me.List_Featurefunctions(-1)

@@ -455,8 +455,12 @@ Partial Class Form1
                 'Bei allen Sim-Anwendungen
                 '-------------------------
 
-                'Neues Problem instanzieren und Methode setzen
-                Me.mProblem = New EVO.Common.Problem(ComboBox_Methode.SelectedItem, Sim1.WorkDir_Original, Sim1.Datensatz)
+                'Neues Problem instanzieren
+                Me.mProblem = New EVO.Common.Problem()
+
+                'WorkDir und Datensatz übergeben
+                Me.mProblem.WorkDir = Sim1.WorkDir_Original
+                Me.mProblem.Datensatz = Sim1.Datensatz
 
                 'EVO-Eingabedateien einlesen
                 Call Me.mProblem.Read_InputFiles(Me.Sim1.SimStart, Me.Sim1.SimEnde)
@@ -474,6 +478,10 @@ Partial Class Form1
                 Me.mProblem = Testprobleme1.getProblem()
 
             End If
+
+            'Methode an Problem übergeben
+            '----------------------------
+            Me.mProblem.Method = ComboBox_Methode.SelectedItem.ToString()
 
             'Problem an EVO_Einstellungen übergeben
             '--------------------------------------
