@@ -708,7 +708,7 @@ Partial Class Form1
                         Case METH_PES
                             Call STARTEN_PES()
                         Case METH_MetaEvo
-                            MetaEvoController = New EVO.MetaEvo.Controller(Me.mProblem, EVO_Einstellungen1.Settings, Me.Hauptdiagramm1, Me.Sim1)
+                            MetaEvoController = New EVO.MetaEvo.Controller(Me.mProblem, EVO_Einstellungen1.Settings, Me.Hauptdiagramm1, Me.Testprobleme1)
                     End Select
 
                 Case ANW_TSP

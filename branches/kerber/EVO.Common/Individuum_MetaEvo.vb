@@ -80,6 +80,11 @@
         Return Me.OptParameter_RWerte
     End Function
 
+    'Optparameter nach Definition zurückgaben
+    Public Function get_mOptparas() As OptParameter()
+        Return Me.mOptparameter
+    End Function
+
     'Generator setzen
     Public Function set_generator(ByVal generator_input As Integer)
         Me.generator_id = generator_input

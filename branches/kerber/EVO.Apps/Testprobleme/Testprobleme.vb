@@ -909,6 +909,16 @@ Public Class Testprobleme
 
     'Evaluierung und Zeichnen der Testprobleme
     '*****************************************
+    Public Sub Evaluierung_TestProbleme_MetaEvo(ByRef ind_input As Common.Individuum_MetaEvo, ByVal ipop As Short, ByRef Diag As EVO.Diagramm.Hauptdiagramm)
+        'Umbauen
+        Dim ind As Common.Individuum_PES
+        ind = New Common.Individuum_PES("MetaEvo", ind_input.ID)
+        ind.OptParameter = ind_input.get_mOptparas
+        ind.Features = ind_input.Features
+
+        Evaluierung_TestProbleme(ind, ipop, Diag)
+    End Sub
+
     Public Sub Evaluierung_TestProbleme(ByRef ind As Common.Individuum_PES, ByVal ipop As Short, ByRef Diag As EVO.Diagramm.Hauptdiagramm)
 
         Dim i As Integer
