@@ -76,13 +76,21 @@ Public Class Testprobleme
     '******************
     Public Sub setTestproblem(ByVal name As String)
 
-        Dim i As Integer
-
         Me.mSelectedTestproblem = name
 
-        'Das Problem definieren
-        Me.mProblem = New EVO.Common.Problem()
+    End Sub
 
+
+    'Parameterübergabe
+    '*****************
+    Public Sub getProblem(ByRef prob As EVO.Common.Problem)
+
+        Dim i As Integer
+
+        'Das Problem setzen
+        Me.mProblem = prob
+
+        'Je nach Datensatz/Testproblem initialisierungen durchführen
         Select Case Me.mSelectedTestproblem
 
             Case TP_SinusFunktion
@@ -238,13 +246,6 @@ Public Class Testprobleme
                 Next
 
         End Select
-    End Sub
-
-    'Parameterübergabe
-    '*****************
-    Public Function getProblem() As EVO.Common.Problem
-
-        Dim i As Integer
 
         'Das Problem mit Pseudo-Werten füllen
         ReDim Me.mProblem.List_Featurefunctions(Me.mAnzZiele - 1)
@@ -256,16 +257,14 @@ Public Class Testprobleme
         For i = 0 To Me.mProblem.NumConstraints - 1
             Me.mProblem.List_Constraintfunctions(i) = New Common.Constraintfunction()
         Next
-        ReDim Me.mProblem.List_OptParameter(Me.mAnzParameter -1)
-        ReDim Me.mProblem.List_OptParameter_Save(Me.mAnzParameter -1)
+        ReDim Me.mProblem.List_OptParameter(Me.mAnzParameter - 1)
+        ReDim Me.mProblem.List_OptParameter_Save(Me.mAnzParameter - 1)
         For i = 0 To Me.mProblem.NumParams - 1
             Me.mProblem.List_OptParameter(i) = Me.mOptPara(i)
             Me.mProblem.List_OptParameter_Save(i) = Me.mOptPara(i)
         Next
 
-        Return Me.mProblem
-
-    End Function
+    End Sub
 
 #Region "Diagrammfunktionen"
 
@@ -919,7 +918,7 @@ Public Class Testprobleme
         Evaluierung_TestProbleme(ind, ipop, Diag)
     End Sub
 
-    Public Sub Evaluierung_TestProbleme(ByRef ind As Common.Individuum_PES, ByVal ipop As Short, ByRef Diag As EVO.Diagramm.Hauptdiagramm)
+    Public Sub Evaluierung_TestProbleme(ByRef ind As Common.Individuum, ByVal ipop As Short, ByRef Diag As EVO.Diagramm.Hauptdiagramm)
 
         Dim i As Integer
         Dim Unterteilung_X As Double
@@ -927,7 +926,7 @@ Public Class Testprobleme
         Dim X() As Double
         Dim f1, f2 As Double
         Dim g1, g2 As Double
-        Dim globalAnzPar As Integer = ind.OptParameter.GetLength(0)
+        Dim globalAnzPar As Integer = Me.mProblem.NumParams
         Dim serie As Steema.TeeChart.Styles.Series
 
         Select Case Me.selectedTestproblem

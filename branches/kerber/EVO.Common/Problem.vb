@@ -113,15 +113,12 @@ Public Class Problem
     End Property
 
     ''' <summary>
-    ''' Name der zu verwendenden Optimierungsmethode
+    ''' Name der verwendeten Optimierungsmethode
     ''' </summary>
-    Public Property Method() As String
+    Public ReadOnly Property Method() As String
         Get
             Return Me.mMethod
         End Get
-        Set(ByVal value As String)
-            Me.mMethod = value
-        End Set
     End Property
 
     ''' <summary>
@@ -235,7 +232,11 @@ Public Class Problem
     ''' <summary>
     ''' Konstruktor
     ''' </summary>
-    Public Sub New()
+    ''' <param name="Method">zu verwendende Methode</param>
+    Public Sub New(ByVal Method As String)
+
+        'Methode setzen
+        Me.mMethod = Method
 
         'Datenstrukturen initialisieren
         ReDim Me.List_Featurefunctions(-1)

@@ -447,16 +447,16 @@ Partial Class Form1
             'Diagramm zurücksetzen
             Me.Hauptdiagramm1.Reset()
 
-
             'Problemdefinition
             '=================
+
+            'Neues Problem mit ausgewählter Methode instanzieren
+            Me.mProblem = New EVO.Common.Problem(ComboBox_Methode.SelectedItem.ToString())
+
             If (Me.Anwendung <> ANW_TESTPROBLEME And Me.Anwendung <> ANW_TSP) Then
 
                 'Bei allen Sim-Anwendungen
                 '-------------------------
-
-                'Neues Problem instanzieren
-                Me.mProblem = New EVO.Common.Problem()
 
                 'WorkDir und Datensatz übergeben
                 Me.mProblem.WorkDir = Sim1.WorkDir_Original
@@ -475,13 +475,9 @@ Partial Class Form1
 
                 'Bei Testproblemen definieren diese das Problem selbst
                 '-----------------------------------------------------
-                Me.mProblem = Testprobleme1.getProblem()
+                Call Testprobleme1.getProblem(Me.mProblem)
 
             End If
-
-            'Methode an Problem übergeben
-            '----------------------------
-            Me.mProblem.Method = ComboBox_Methode.SelectedItem.ToString()
 
             'Problem an EVO_Einstellungen übergeben
             '--------------------------------------
