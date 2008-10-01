@@ -143,18 +143,18 @@ namespace IHWB.EVO.MetaEvo
         //(ok)sich als Client in DB eintragen
         public void DB_client_entry() {
             //Eintrag für Client
-            myCommand.CommandText = "INSERT INTO `metaevo_network` (`ipName`, `type`, `status`, `timestamp`, `speed_av`, `speed_low`) VALUES ('" + Dns.GetHostName() + "', 'client', 'ready', '', '1000', '1000');";
             myCommand.Connection.Open();
             try
             {
+                myCommand.CommandText = "INSERT INTO `metaevo_network` (`ipName`, `type`, `status`, `timestamp`, `speed_av`, `speed_low`) VALUES ('" + Dns.GetHostName() + "', 'client', 'ready', '', '1000', '1000');";
                 myCommand.ExecuteNonQuery();
             }
-            catch 
+            catch
             {
-                myCommand.CommandText = "UPDATE `metaevo_network` SET status = 'ready' WHERE ipName = '" + Dns.GetHostName() + "';";
-                myCommand.ExecuteNonQuery();
-                MessageBox.Show("Client existiert bereits in der Datenbank", "MySQL Database");
             }
+            //Um Timestamp richtig zu generieren:
+            myCommand.CommandText = "UPDATE `metaevo_network` SET `status`= 'ready' WHERE ipName = '" + Dns.GetHostName() + "';";
+            myCommand.ExecuteNonQuery();
             myCommand.Connection.Close();
         }
 
@@ -187,12 +187,12 @@ namespace IHWB.EVO.MetaEvo
             this.DB_ClearIndividuumsTable();
 
             //Schreiben der Individuen-Daten in die DB (alle gleichzeitig)
-            string tmptxt = "INSERT INTO `metaevo_individuums` (`id` ,`status` ,";
+            string tmptxt = "INSERT INTO `metaevo_individuums` (`id` :`status` :";
 
             //Datenmaske
             for (int k = 1; k <= number_optparas; k++)
             {
-                tmptxt = tmptxt + "`opt" + k + "`,";
+                tmptxt = tmptxt + "`opt" + k + "`:";
             }
 
             tmptxt = tmptxt + "`ipName`) VALUES ";
@@ -200,14 +200,14 @@ namespace IHWB.EVO.MetaEvo
             //Datensätze
             for (int j = 0; j < generation_input.Length; j++)
             {
-                tmptxt = tmptxt + "('" + generation_input[j].ID + "','raw',";
+                tmptxt = tmptxt + "('" + generation_input[j].ID + "':'raw':";
                 for (int k = 0; k < number_optparas; k++)
                 {
-                    tmptxt = tmptxt + "'" + generation_input[j].get_optparas()[k] + "',";
+                    tmptxt = tmptxt + "'" + generation_input[j].get_optparas()[k] + "':";
                 }
-                tmptxt = tmptxt + "'" + generation_input[j].get_client() + "'),";
+                tmptxt = tmptxt + "'" + generation_input[j].get_client() + "'):";
             }
-            tmptxt = tmptxt.TrimEnd(',') + ";";
+            tmptxt = tmptxt.TrimEnd(':').Replace(",",".").Replace(":", ",") + ";";
 
             myCommand.CommandText = tmptxt;
             myCommand.Connection.Open();
@@ -325,14 +325,14 @@ namespace IHWB.EVO.MetaEvo
             //status
             if (fields2update.Contains("status"))
             {
-                tmptxt = tmptxt + "status = '" + status_input + "' ";
+                tmptxt = tmptxt + "status = '" + status_input + "': ";
             }
             //opt
             if (fields2update.Contains("opt")) 
             {
                 for (int k = 0; k < number_constraints; k++)
                 {
-                    tmptxt = tmptxt + "opt" + (k + 1) + " = '" + individuum_input.get_optparas()[k] + "', ";
+                    tmptxt = tmptxt + "opt" + (k + 1) + " = '" + individuum_input.get_optparas()[k] + "': ";
                 }
             }
             //feat
@@ -340,27 +340,34 @@ namespace IHWB.EVO.MetaEvo
             {
                 for (int k = 0; k < number_features; k++)
                 {
-                    tmptxt = tmptxt + "feat" + (k + 1) + " = '" + individuum_input.Features[k] + "', ";
+                    tmptxt = tmptxt + "feat" + (k + 1) + " = '" + individuum_input.Features[k] + "': ";
                 }
             }
             //const
             if (fields2update.Contains("const")) 
             {
-                for (int k = 0; k < number_features; k++)
+                for (int k = 0; k < number_constraints; k++)
                 {
-                    tmptxt = tmptxt + "const" + (k + 1) + " = '" + individuum_input.Constraints[k] + "', ";
+                    tmptxt = tmptxt + "const" + (k + 1) + " = '" + individuum_input.Constraints[k] + "': ";
                 }
             }
             if (fields2update.Contains("ipName"))
             {
                 tmptxt = tmptxt + "ipName = '" + individuum_input.get_client() + "' ";
             }
-            tmptxt = tmptxt.TrimEnd(',', ' ') + " WHERE id = '" + individuum_input.ID + "' LIMIT 1;"; ;
+            tmptxt = tmptxt.TrimEnd(':', ' ').Replace(",", ".").Replace(":", ",") + " WHERE id = '" + individuum_input.ID + "' LIMIT 1;"; ;
 
             myCommand.CommandText = tmptxt;
-            myCommand.Connection.Open();
-            myCommand.ExecuteNonQuery();
-            myCommand.Connection.Close();
+            try
+            {
+                myCommand.Connection.Open();
+                myCommand.ExecuteNonQuery();
+                myCommand.Connection.Close();
+            }
+            catch
+            {
+                //Eigene DB löschen um kollisionen zu vermeiden?
+            }
         }
 
 
@@ -413,39 +420,43 @@ namespace IHWB.EVO.MetaEvo
                 System.Threading.Thread.Sleep(3000);
                 scheduling_new(ref generation_input);
             }
+            else
+            {
+                if (applog.log) applog.appendText("Networkmanager: New Scheduling");
 
-            //Individusn-Zuweisungen zurücksetzen 
-            network1.erase_current_calc_times();
+                //Individuen-Zuweisungen zurücksetzen 
+                network1.erase_current_calc_times();
 
-          
-            //Scheduling berechnen
-            //Für jedes Individuum
-            for (int k = 0; k < generation_input.Length; k++)
-            {  
-                current_client = 0;
-                //Alle Clients durchgehen
-                for (int j = 1; j < network1.number_clients; j++)
+
+                //Scheduling berechnen
+                //Für jedes Individuum
+                for (int k = 0; k < generation_input.Length; k++)
                 {
-                    //falls Client funktioniert
-                    if (network1.Clients[j].status != "error") 
+                    current_client = 0;
+                    //Alle Clients durchgehen
+                    for (int j = 1; j < network1.number_clients; j++)
                     {
-                        //Falls Client schneller 
-                        if ((network1.Clients[j].speed_av * network1.Clients[j].numberindividuums + network1.Clients[j].speed_av) < (network1.Clients[current_client].speed_av * network1.Clients[current_client].numberindividuums + network1.Clients[current_client].speed_av))
+                        //falls Client funktioniert
+                        if (network1.Clients[j].status != "error")
                         {
-                            current_client = j;
+                            //Falls Client schneller 
+                            if ((network1.Clients[j].speed_av * network1.Clients[j].numberindividuums + network1.Clients[j].speed_av) < (network1.Clients[current_client].speed_av * network1.Clients[current_client].numberindividuums + network1.Clients[current_client].speed_av))
+                            {
+                                current_client = j;
+                            }
                         }
                     }
+                    //In der current_calc_time-Eigenschaft Zeiten addieren, Individuum addieren
+                    network1.Clients[current_client].numberindividuums++;
+                    //Dem Individuum den Client(=IPWorker) zuweisen
+                    generation_input[k].set_Client(network1.Clients[current_client].ipName);
                 }
-                //In der current_calc_time-Eigenschaft Zeiten addieren, Individuum addieren
-                network1.Clients[current_client].numberindividuums++;
-                //Dem Individuum den Client(=IPWorker) zuweisen
-                generation_input[k].set_Client(network1.Clients[current_client].ipName);
-            }  
 
-            //Ausgabe der Zuteilung
-            for (int i = 0; i < network1.Clients.Length; i++)
-            {
-                if (applog.log) applog.appendText("Networkmanager: Scheduling: Client '"+network1.Clients[i].ipName+"' "+network1.Clients[i].numberindividuums+" Individuums");
+                //Ausgabe der Zuteilung
+                for (int i = 0; i < network1.Clients.Length; i++)
+                {
+                    if (applog.log) applog.appendText("Networkmanager: New Scheduling: Client '" + network1.Clients[i].ipName + "' " + network1.Clients[i].numberindividuums + " Individuums");
+                }
             }
         }
 
@@ -461,14 +472,15 @@ namespace IHWB.EVO.MetaEvo
             //Falls kein Aktiver Client vorhanden ist, 3 Sekunden warten und dann scheduling_new aufrufen
             if (network1.number_clients == 0)
             {
-                if (applog.log) applog.appendText("Scheduling: No Client found registered in DB - wait...");
+                if (applog.log) applog.appendText("Scheduling: No Client found registered in DB - waiting...");
                 System.Threading.Thread.Sleep(3000);
                 scheduling_new(ref generation_input);
             }
 
-            //An den Daten der Clients hat sich etwas geändert (Status=ready oder Speed-av hat sich geändert)
-            if (scheduling_error)
+            //An den Daten der Clients hat sich etwas geändert (Status=ready oder Speed-av hat sich um mehr als 5% geändert)
+            else if (scheduling_error)   
             {
+                if (applog.log) applog.appendText("Networkmanager: Adapted Scheduling");
 
                 //DB auf Geschwindigkeitsänderung/Ausfall von Clients untersuchen und entsprechende Individuen demarkieren
                 current_client = 0;
@@ -489,7 +501,7 @@ namespace IHWB.EVO.MetaEvo
                             //Evtl vorhandene Individuen des Clients demarkieren
                             for (int j = 0; j < generation_input.Length; j++)
                             {
-                                if (generation_input[j].get_client() == network1.Clients[k].ipName)
+                                if ((generation_input[j].get_client() == network1.Clients[k].ipName) && (generation_input[j].get_status() != "true") && (generation_input[j].get_status() != "false"))
                                 {
                                     generation_input[j].set_status("raw");
                                     generation_input[j].set_Client("");
@@ -500,21 +512,36 @@ namespace IHWB.EVO.MetaEvo
                 }
 
                 //Individuenzahlen der Clients neu berechnen und nur benötigte Änderungen in DB umsetzen
-                //  Temporäres CurrentCalctime-Array aufbauen
+                //  Temporäres CurrentCalctime-Array aufbauen     Client: [aktuelle vergangene Rechenzeit beim aktuellen Individuum][bereits berechnete Individuen]
                 double[,] current_status = new double[network1.Clients.Length, 2]; //{Calctime, Individuums Calculated}
-                //      Anzahl der Berechneten Individuen
+                
+                //      Anzahl der Berechneten Individuen pro Client
                 for (int i = 0; i < generation_input.Length; i++)
                 {
                     if (generation_input[i].get_status() != "raw")
                     {
-                        current_status[i, 1]++;
+                        for (int j = 1; j < network1.number_clients; j++)
+                        {
+                            //falls Client funktioniert
+                            if (network1.Clients[j].status != "error")
+                            {
+                                //Falls Individuum diesem Client zugeordnet ist
+                                if (generation_input[i].get_client() == network1.Clients[j].ipName)
+                                {
+                                    current_status[j, 1]++; 
+                                }
+                            }
+                        }
                     }
                 }
-                //      Berechnungszeit des gerade berechneten Individuums
+                
+                //      Berechnungszeit des gerade berechneten Individuums pro Client
                 for (int i = 0; i < network1.Clients.Length; i++)
                 {
-                    current_status[i, 0] = (DateTime.Now.Subtract(network1.Clients[i].timestamp)).Milliseconds;
+                    current_status[i, 0] = (DateTime.Now.Subtract(network1.Clients[i].timestamp)).TotalMilliseconds;
                 }
+                
+                //      Individuenverteilung jetzt neu berechnen
                 for (int i = 0; i < generation_input.Length; i++)
                 {
                     if (generation_input[i].get_status() == "raw")
@@ -526,7 +553,7 @@ namespace IHWB.EVO.MetaEvo
                             //falls Client funktioniert
                             if (network1.Clients[j].status != "error")
                             {
-                                //Falls Client schneller 
+                                //Falls schnellster Client 
                                 if (current_status[j, 0] + network1.Clients[j].speed_av < (current_status[current_client, 0] + network1.Clients[current_client].speed_av))
                                 {
                                     current_client = j;
@@ -539,43 +566,41 @@ namespace IHWB.EVO.MetaEvo
                     }
                 }
 
-                //Individuen von Clients mit jetzt geringerem Speed demarkieren
+                //Individuen von Clients mit inzwischen geringerem Speed in DB demarkieren
                 for (int i = 0; i < network1.Clients.Length; i++)
                 {
+                    int j = 0;
                     while (current_status[i, 1] < network1.Clients[i].numberindividuums)
                     {
-                        for (int j = 0; j < generation_input.Length; j++)
+                        if ((generation_input[j].get_status() == "raw") && (generation_input[j].get_client() == network1.Clients[i].ipName))
                         {
-                            if ((generation_input[j].get_status() != "raw") && (generation_input[j].get_client() == network1.Clients[i].ipName))
-                            {
-                                generation_input[j].set_Client("");
-                            }
+                            generation_input[j].set_Client("");
+                            network1.Clients[i].numberindividuums--;
                         }
-                        network1.Clients[i].numberindividuums--;
+                        j++;
                     }
                 }
 
-                //Freie Individuen in DB updaten
+                //Freie Individuen suchen und nach den berechneten Änderungen in DB updaten
                 for (int i = 0; i < network1.Clients.Length; i++)
                 {
+                    int j = 0;
                     while (current_status[i, 1] > network1.Clients[i].numberindividuums)
                     {
-                        for (int j = 0; j < generation_input.Length; j++)
+                        if (generation_input[j].get_client() == "")
                         {
-                            if ((generation_input[j].get_status() != "raw") && (generation_input[j].get_client() == ""))
-                            {
-                                generation_input[j].set_Client(network1.Clients[i].ipName);
-                                this.Individuum_UpdateInDB(ref generation_input[j], "status ipName", "raw");
-                            }
+                            generation_input[j].set_Client(network1.Clients[i].ipName);
+                            this.Individuum_UpdateInDB(ref generation_input[j], "ipName status", "raw");
+                            network1.Clients[i].numberindividuums++;
                         }
-                        network1.Clients[i].numberindividuums++;
+                        j++;
                     }
                 }
 
                 //Ausgabe der neuen Zuteilung
                 for (int i = 0; i < network1.Clients.Length; i++)
                 {
-                    if (applog.log) applog.appendText("Networkmanager: New Scheduling: Client '" + network1.Clients[i].ipName + "' " + network1.Clients[i].numberindividuums + " Individuums");
+                    if (applog.log) applog.appendText("Networkmanager: Adapted Scheduling: Client '" + network1.Clients[i].ipName + "' " + network1.Clients[i].numberindividuums + " Individuums");
                 }
             }
         }
@@ -589,7 +614,6 @@ namespace IHWB.EVO.MetaEvo
             int individuums_ready = 0;
 
             //Scheduling initialisieren und ersten Schritt rechnen
-            if (applog.log) applog.appendText("Networkmanager: Scheduling");
             this.scheduling_new(ref generation_input);
 
             //In die Datenbank schreiben

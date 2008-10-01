@@ -13,7 +13,7 @@ namespace IHWB.EVO.MetaEvo
     {
         public readonly string ipName;
         public string status;               //{Client Status: {claculating, error, ready} Server Status: {init Genpool, generate Individuums, waiting for client-calculation, finished}
-        public DateTime timestamp; //Zeit seit dem letzten Update der Db durch diesen Client
+        public DateTime timestamp;          //Zeit seit dem letzten Update der Db durch diesen Client
         public double speed_av;             //in Millisekunden durchschnittliche Simulationszeit
         public double speed_low;            //in Millisekunden langsamste Simulationszeit
         public int numberindividuums;       //Wie viele Individuen der Client berechnen soll
@@ -55,7 +55,7 @@ namespace IHWB.EVO.MetaEvo
             //speed_av
             if (speed_av_input != -1)
             {
-                tmptxt = tmptxt + "speed_av = '" + speed_av_input + "' ";
+                tmptxt = tmptxt + "speed_av = '" + speed_av_input + "', ";
                 this.speed_av = speed_av_input;
             }
             //speed_low
@@ -64,12 +64,6 @@ namespace IHWB.EVO.MetaEvo
                 tmptxt = tmptxt + "speed_low = '" + speed_low_input + "' ";
                 this.speed_low = speed_low_input;
             }
-            //individuen
-            /*if (numberindividuums_input != -1)
-            {
-                tmptxt = tmptxt + "individuums = '" + numberindividuums_input + "' ";
-                this.numberindividuums = numberindividuums_input;
-            }*/
             tmptxt = tmptxt.TrimEnd(',', ' ') + " WHERE ipName = '" + this.ipName + "' LIMIT 1;";
             myCommand.CommandText = tmptxt;
             myCommand.Connection.Open();
@@ -100,6 +94,7 @@ namespace IHWB.EVO.MetaEvo
         MySqlDataReader myReader;
 
         public int number_clients;     //Anzahl Clients
+        private int number_clients_old;
 
         public Client[] Clients;
 
@@ -109,6 +104,7 @@ namespace IHWB.EVO.MetaEvo
             mycon = mycon_input;
             myCommand = new MySqlCommand();
             myCommand.Connection = mycon;
+            Clients = new Client[0];
 
             number_clients = 0;
         }
@@ -116,7 +112,7 @@ namespace IHWB.EVO.MetaEvo
         //Aktuelle Daten aus der DB holen
         public bool update_From_DB()
         {
-            Client[] tmp = this.Clients;
+            
             bool back = false; //Ob Scheduling neu berechnet werden muss
 
             //Clients zählen
@@ -124,51 +120,78 @@ namespace IHWB.EVO.MetaEvo
             mycon.Open();
             myReader = myCommand.ExecuteReader();
 
-            this.number_clients = 0;
-
-            while (myReader.Read())
-            {
-                number_clients++;
-            }
-            mycon.Close();
-
-            //Array mit Clients ggf. erweitern
-            if (number_clients > Clients.Length)
-            {
-                Clients = new Client[number_clients];
-            }
-
-            //Clients einlesen
-            myCommand.CommandText = "Select * from metaevo_network WHERE type = 'client'";
-            myCommand.Connection.Open();
-            myReader = myCommand.ExecuteReader();
-
             number_clients = 0;
+            number_clients_old = Clients.Length;
 
             while (myReader.Read())
             {
-                //Updaten
-                if (number_clients < Clients.Length) 
-                {
-                    Clients[number_clients] = tmp[number_clients];
-                    if ((Clients[number_clients].status != myReader.GetString(2)) || (Clients[number_clients].speed_av != myReader.GetDouble(4)) ) back = true;
-                    Clients[number_clients].status = myReader.GetString(2);
-                    Clients[number_clients].timestamp = myReader.GetDateTime(3);
-                    Clients[number_clients].speed_av = myReader.GetDouble(4);
-                    Clients[number_clients].speed_low = myReader.GetDouble(5);
-                }
-
-                //oder neu anlegen
-                else 
-                {
-                    Clients[number_clients] = new Client(ref mycon, myReader.GetString(0), myReader.GetString(2), myReader.GetDateTime(3), myReader.GetDouble(4), myReader.GetDouble(5), 0);
-                    back = true;
-                }
-
                 number_clients++;
             }
-            myReader.Close();
             mycon.Close();
+
+            if (number_clients > 0)
+            {
+                //Altes Client-Array zwischenspeichern
+                Client[] tmp = this.Clients;
+
+                //Array mit Clients ggf. erweitern
+                if (number_clients > Clients.Length)
+                {
+                    Clients = new Client[number_clients];
+                }
+                
+                DateTime tmp2;
+               
+                //Clients einlesen
+                myCommand.CommandText = "Select * from metaevo_network WHERE type = 'client'";
+                myCommand.Connection.Open();
+                myReader = myCommand.ExecuteReader();
+
+                number_clients = 0;
+
+                while (myReader.Read())
+                {
+                    //Updaten
+                    if (number_clients < number_clients_old)
+                    {
+                        //Kopieren der bisherigen Daten des Servers
+                        Clients[number_clients] = tmp[number_clients];
+
+                        //Überprüfungen ob neues Scheduling erforderlich ist
+                        if (!(back))
+                        {
+                            //Falls sich der Status eines Clients in der DB unterscheidet vom gespeicherten Status
+                            if (Clients[number_clients].status != myReader.GetString(2)) back = true;
+                        }
+                        if (!(back))
+                        {
+                            //5% Geschwindigkeits-Toleranz des Clients bis neues Scheduling berechnet werden muss
+                            if (Math.Abs(Clients[number_clients].speed_av - myReader.GetDouble(4)) > Clients[number_clients].speed_av * 0.05) back = true;
+                        }
+                        if (!(back))
+                        {
+                            //120% Berechnungszeit-Toleranz bis neues Scheduling den alive-Status der Individuen prüfen muss (hängt sehr vom Server ab)
+                            if (Clients[number_clients].timestamp.Subtract(DateTime.Now).TotalMilliseconds > 1.2 * Clients[number_clients].speed_av) back = true;
+                        }
+                        Clients[number_clients].status = myReader.GetString(2);
+                        Clients[number_clients].timestamp = new DateTime(myReader.GetMySqlDateTime(3).Year, myReader.GetMySqlDateTime(3).Month, myReader.GetMySqlDateTime(3).Day, myReader.GetMySqlDateTime(3).Hour, myReader.GetMySqlDateTime(3).Minute, myReader.GetMySqlDateTime(3).Second);
+                        Clients[number_clients].speed_av = myReader.GetDouble(4);
+                        Clients[number_clients].speed_low = myReader.GetDouble(5);   
+                    }
+
+                    //oder neu anlegen
+                    else
+                    {
+                        tmp2 = new DateTime(myReader.GetMySqlDateTime(3).Year, myReader.GetMySqlDateTime(3).Month, myReader.GetMySqlDateTime(3).Day, myReader.GetMySqlDateTime(3).Hour, myReader.GetMySqlDateTime(3).Minute, myReader.GetMySqlDateTime(3).Second);
+                        Clients[number_clients] = new Client(ref mycon, myReader.GetString(0), myReader.GetString(2), tmp2, myReader.GetDouble(4), myReader.GetDouble(5), 0);
+                        back = true;
+                    }
+
+                    number_clients++;
+                }
+                myReader.Close();
+                mycon.Close();
+            }
             return back;
         }
 

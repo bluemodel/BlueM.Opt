@@ -37,9 +37,10 @@ namespace IHWB.EVO.MetaEvo
             individuumnumber = individuumnumber_input;
             applog = applog_input;
 
-            algofeedbackarray = new Algofeedback[2];
-            algofeedbackarray[0] = new Algofeedback("Zufällige Einfache Mutation", individuumnumber/algofeedbackarray.Length);
+            algofeedbackarray = new Algofeedback[3];
+            algofeedbackarray[0] = new Algofeedback("Zufällige Einfache Mutation", individuumnumber / algofeedbackarray.Length);
             algofeedbackarray[1] = new Algofeedback("Zufällige Rekombination", individuumnumber / algofeedbackarray.Length);
+            algofeedbackarray[2] = new Algofeedback("Diversität aus Sortierung", individuumnumber / algofeedbackarray.Length);
         }
 
         public void newGeneration(ref EVO.Common.Individuum_MetaEvo[] genpool_input, ref EVO.Common.Individuum_MetaEvo[] new_generation_input, ref EVO.Common.Individuum_MetaEvo[] wastepool_input)
@@ -95,10 +96,11 @@ namespace IHWB.EVO.MetaEvo
                         new_generation_input[startindex + i].set_status("raw");
                         new_generation_input[startindex + i].set_generator(algo_id);
                         new_generation_input[startindex + i].ID = individuumnumber;
-                        if (applog.log) applog.appendText("Algos: Buliding Individuum " + individuumnumber + " with '" + algofeedbackarray[algo_id].name + "'");
                         individuumnumber++;
                     }
+                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with '" + algofeedbackarray[algo_id].name + "'");
                     break;
+
                 case "Zufällige Rekombination":
                     double[] recombinated_optparas = new double[numberoptparas];
                     double[] recombinated_optparas2 = new double[numberoptparas];
@@ -118,10 +120,39 @@ namespace IHWB.EVO.MetaEvo
                         new_generation_input[startindex + i].set_status("raw");
                         new_generation_input[startindex + i].set_generator(algo_id);
                         new_generation_input[startindex + i].ID = individuumnumber;
-                        if (applog.log) applog.appendText("Algos: Buliding Individuum " + individuumnumber + " with '" + algofeedbackarray[algo_id].name + "'");
                         individuumnumber++;
                     }
+                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with '" + algofeedbackarray[algo_id].name + "'");
                     break;
+
+                case "Diversität aus Sortierung":
+                    double[] diversity_optparas = new double[numberoptparas];
+                    for (int i = 0; i < numberindividuums; i++)
+                    {
+                        if (i % 2 == 0)
+                        {
+                            for (int k = 0; k < genpool_input[0].get_optparas().Length; k++)
+                            {
+                                diversity_optparas[k] = genpool_input[0].get_optparas()[k] + (genpool_input[0].get_optparas()[k] - genpool_input[(int)i/2].get_optparas()[k]);
+                            }
+                        }
+                        else
+                        {
+                            for (int k = 0; k < genpool_input[0].get_optparas().Length; k++)
+                            {
+                                diversity_optparas[k] = genpool_input[genpool_input.Length].get_optparas()[k] + (genpool_input[genpool_input.Length].get_optparas()[k] - genpool_input[genpool_input.Length - 1 - (int)i / 2].get_optparas()[k]);
+                            }
+                        }
+                        //Zurückspeichern
+                        new_generation_input[startindex + i].set_optparas(diversity_optparas);
+                        new_generation_input[startindex + i].set_status("raw");
+                        new_generation_input[startindex + i].set_generator(algo_id);
+                        new_generation_input[startindex + i].ID = individuumnumber;
+                        individuumnumber++;
+                    }
+                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with '" + algofeedbackarray[algo_id].name + "'");
+                    break;
+
                 default:
                     MessageBox.Show("Algomanager", "Algorithmus " + algofeedbackarray[algo_id].name + " ist nicht bekannt!");
                     break;

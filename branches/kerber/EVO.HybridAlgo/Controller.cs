@@ -269,21 +269,21 @@ namespace IHWB.EVO.MetaEvo
                     meClient.numberindividuums++;
 
                     //Individuum in DB als "calculate" markieren
+                    Berechnungsstart = DateTime.Now;
                     networkmanager.Individuum_UpdateInDB(ref individuumForClient, "status", "calculate");
 
                     //Simulieren
-                    Berechnungsstart = DateTime.Now;
                     if (applog.log) applog.appendText("Controller: Individuum " + individuumForClient.ID + " simulating...");
                     sim_input.Evaluate_MetaEvo(ref individuumForClient);
 
-                    //Neuen Speed-Daten berechnen
-                    Berechnungsdauer = DateTime.Now.Subtract(Berechnungsstart).Milliseconds;
-                    meClient.speed_av += (meClient.speed_av - Berechnungsdauer) / meClient.numberindividuums;
-                    if (Berechnungsdauer > meClient.speed_low) meClient.speed_low = Berechnungsdauer;
-                    if (applog.log) applog.appendText("Controller: Average Speed is set to " + meClient.speed_av + " Milliseconds, Lowest Speed is set to "+meClient.speed_low+" Milliseconds");
-
                     //Individuum in DB Updaten
                     networkmanager.Individuum_UpdateInDB(ref individuumForClient, "status feat const", individuumForClient.get_status());
+                    
+                    //Neuen Speed-Daten berechnen
+                    Berechnungsdauer = Math.Round((DateTime.Now.Subtract(Berechnungsstart)).TotalMilliseconds, 0);
+                    meClient.speed_av += Math.Round((Berechnungsdauer - meClient.speed_av) / meClient.numberindividuums, 0);
+                    if (Berechnungsdauer > meClient.speed_low) meClient.speed_low = Berechnungsdauer;
+                    if (applog.log) applog.appendText("Controller: Average Speed is set to " + meClient.speed_av + " Milliseconds, Lowest Speed is set to " + meClient.speed_low + " Milliseconds");
 
                     //Client ind DB Updaten
                     meClient.set_AlsoInDB("", meClient.speed_av, meClient.speed_low);
@@ -292,9 +292,10 @@ namespace IHWB.EVO.MetaEvo
                 // Wenn kein Individuum mehr da ist, warten
                 else
                 {
-                    meClient.set_AlsoInDB("ready", -1, -1);
                     if (applog.log) applog.appendText("Controller: No Individuum found in DB (for this Client) - waiting...");
                     System.Threading.Thread.Sleep(3000);
+                    //Prüfen ob Client-Entry noch besteht bzw. neu eintragen
+                    networkmanager.DB_client_entry();
                 }
 
                 //Serverstatus neu lesen
