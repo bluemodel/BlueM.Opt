@@ -143,7 +143,7 @@ Public Class EVO_Einstellungen
                 Me.TabControl1.TabPages.Add(Me.TabPage_MetaEvo)
 
                 'Standardeinstellungen setzen
-                Call Me.setStandard_Hy2008()
+                Call Me.setStandard_MetaEvo()
 
             Case Else
 
@@ -644,7 +644,7 @@ Public Class EVO_Einstellungen
 
     'Standardeinstellungen setzen für Hy2008
     '***********************************
-    Public Sub setStandard_Hy2008()
+    Public Sub setStandard_MetaEvo()
         Call Me.msettings.MetaEvo.setStandard()
         Call Me.writeForm()
     End Sub
