@@ -103,7 +103,7 @@ namespace IHWB.EVO.MetaEvo
             if (low_input < low) quicksort(ref input, kriterium, low_input, low);
             if (high < high_input) quicksort(ref input, kriterium, high, high_input);
         }
-        //Prüfen ob ein ein Individuum von einem anderen Individuum dominiert wird
+        //Prüfen ob ein ein Individuum von einem anderen Individuum dominiert wird (kleiner ist dominant)
         private void check_domination(ref EVO.Common.Individuum_MetaEvo[] input, ref EVO.Common.Individuum_MetaEvo[] input2)
         {
             int dominator = -1;
@@ -123,14 +123,14 @@ namespace IHWB.EVO.MetaEvo
                             if (input[k].get_status() == "true")
                             {
                                 //Jede Eigenschaft vergleichen
+                                dominator = i;
                                 for (int j = 0; j < input[0].Penalties.Length; j++)
                                 {
-                                    dominator = k;
                                     if (input[i].Penalties[j] > input[k].Penalties[j]) { dominator = -1; break; }
                                 }
                                 if (dominator > -1) {
-                                    input[i].set_status("false#dominated#" + input[dominator].ID);
-                                    if (applog.log) applog.appendText("Algo Manager: Domination: Individuum " + input[i].ID + " is dominated by Individuum " + input[dominator].ID);
+                                    input[k].set_status("false#dominated#" + input[dominator].ID);
+                                    if (applog.log) applog.appendText("Algo Manager: Domination: Individuum " + input[k].ID + " is dominated by Individuum " + input[dominator].ID);
                                     break; 
                                 }
                             }
@@ -176,14 +176,14 @@ namespace IHWB.EVO.MetaEvo
                                 }
                                 if (status == 1) { 
                                     status = 0;
-                                    input2[k].set_status("false#dominated#" + input[i].ID);
-                                    if (applog.log) applog.appendText("Algo Manager: Domination: Individuum " + input2[k].ID + " is dominated by Individuum " + input[i].ID);
+                                    input2[i].set_status("false#dominated#" + input[k].ID);
+                                    if (applog.log) applog.appendText("Algo Manager: Domination: Individuum " + input2[i].ID + " is dominated by Individuum " + input[k].ID);
                                     break; 
                                 }
                                 if (status == -1) { 
                                     status = 0;
-                                    input[i].set_status("false#dominated#" + input2[k].ID);
-                                    if (applog.log) applog.appendText("Algo Manager: Domination: Individuum " + input[i].ID + " is dominated by Individuum " + input2[k].ID);
+                                    input[k].set_status("false#dominated#" + input2[i].ID);
+                                    if (applog.log) applog.appendText("Algo Manager: Domination: Individuum " + input[k].ID + " is dominated by Individuum " + input2[i].ID);
                                     break;
                                 }
                             }

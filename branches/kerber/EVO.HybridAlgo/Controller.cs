@@ -9,6 +9,10 @@ namespace IHWB.EVO.MetaEvo
     public class Controller
     {
         //### Variablen ###
+        string modell = "";
+        EVO.Apps.Sim sim;
+        EVO.Apps.Testprobleme testprobleme;
+
         EVO.Common.Problem prob; 
         EVO.Common.EVO_Settings settings;
         EVO.Diagramm.Hauptdiagramm hauptdiagramm1;
@@ -23,7 +27,21 @@ namespace IHWB.EVO.MetaEvo
         string role;
 
         //### Konstruktor ###  
-        public Controller(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input, ref EVO.Apps.Sim sim_input)  
+        public Controller(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input, ref EVO.Apps.Testprobleme testprobleme_input)
+        {
+            this.modell = "testprobleme";
+            this.testprobleme = testprobleme_input;
+            init(ref prob_input, ref settings_input, ref hauptdiagramm_input);
+        }
+        public Controller(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input, ref EVO.Apps.Sim sim_input)
+        {
+            this.modell = "sim";
+            this.sim = sim_input;
+            init(ref prob_input, ref settings_input, ref hauptdiagramm_input);
+        }
+
+        //### Konstruktor ###
+        public void init(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input)  
         {
             applog = new IHWB.EVO.Diagramm.ApplicationLog();
             if (settings_input.MetaEvo.Log) applog.log = true;
@@ -56,7 +74,7 @@ namespace IHWB.EVO.MetaEvo
                     algomanager = new Algomanager(ref prob, individuumnumber, ref applog);
 
                     //### Hauptprogramm ###
-                    start_single_pc(ref sim_input);
+                    start_single_pc();
                     break;
 
                 case "Network Server":
@@ -75,7 +93,7 @@ namespace IHWB.EVO.MetaEvo
 
                     //### Hauptprogramm ###
                     networkmanager = new Networkmanager(ref this.generation[0], ref this.settings, ref applog);
-                    start_network_server(ref sim_input);
+                    start_network_server();
                     break;
 
                 case "Network Client":
@@ -85,7 +103,7 @@ namespace IHWB.EVO.MetaEvo
 
                     //### Hauptprogramm ###
                     networkmanager = new Networkmanager(ref this.individuumForClient, ref this.settings, ref applog);
-                    start_network_client(ref sim_input);
+                    start_network_client();
                     break;
             }  
         }
@@ -123,7 +141,7 @@ namespace IHWB.EVO.MetaEvo
         //### Methoden ### Hauptprogramm
 
         // Single PC
-        private void start_single_pc(ref EVO.Apps.Sim sim_input)
+        private void start_single_pc()
         {
             Client mePC = new Client(); 
             mePC.status = "init";
@@ -141,7 +159,8 @@ namespace IHWB.EVO.MetaEvo
                     for (int i = 0; i < generation.Length; i++)
                     {
                         //Simulieren 
-                        sim_input.Evaluate_MetaEvo(ref generation[i]);
+                        if (modell == "testprobleme")testprobleme.Evaluierung_TestProbleme_MetaEvo(ref generation[i],0,ref hauptdiagramm1);
+                        if (modell == "sim") sim.Evaluate_MetaEvo(ref generation[i]);
                         if (applog.log) applog.appendText("Controller: Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length),2) * 100 + "%)");
                     }
                     algomanager.set_genpool(ref generation);
@@ -161,7 +180,8 @@ namespace IHWB.EVO.MetaEvo
                     for (int i = 0; i < generation.Length; i++)
                     {
                         //Simulieren 
-                        sim_input.Evaluate_MetaEvo(ref generation[i]);
+                        if (modell == "testprobleme") testprobleme.Evaluierung_TestProbleme_MetaEvo(ref generation[i], (short)generationcounter, ref hauptdiagramm1);
+                            if (modell == "sim") sim.Evaluate_MetaEvo(ref generation[i]);
                         if (applog.log) applog.appendText("Controller: Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length),2) * 100 + "%)");
                     }
                     //neue Individuen Zeichnen
@@ -180,7 +200,7 @@ namespace IHWB.EVO.MetaEvo
         }
 
         // Network Server
-        private void start_network_server(ref EVO.Apps.Sim sim_input)
+        private void start_network_server()
         {
             Client meServer = new Client(); 
             meServer = networkmanager.Network_Init_Client_Object(Dns.GetHostName());
@@ -247,7 +267,7 @@ namespace IHWB.EVO.MetaEvo
         }
 
         // Network Client
-        private void start_network_client(ref EVO.Apps.Sim sim_input)
+        private void start_network_client()
         {
             Client meClient = new Client();
             meClient.numberindividuums = 0;
@@ -274,7 +294,8 @@ namespace IHWB.EVO.MetaEvo
 
                     //Simulieren
                     if (applog.log) applog.appendText("Controller: Individuum " + individuumForClient.ID + " simulating...");
-                    sim_input.Evaluate_MetaEvo(ref individuumForClient);
+                    if (modell == "testprobleme") testprobleme.Evaluierung_TestProbleme_MetaEvo(ref individuumForClient, 0, ref hauptdiagramm1);
+                    if (modell == "sim") sim.Evaluate_MetaEvo(ref individuumForClient);
 
                     //Individuum in DB Updaten
                     networkmanager.Individuum_UpdateInDB(ref individuumForClient, "status feat const", individuumForClient.get_status());
