@@ -42,9 +42,8 @@ namespace IHWB.EVO.MetaEvo
             int kriterium = rand.Next(0, new_generation_input[0].Penalties.Length);
 
             //1.1.3.Sortieren und Dominanzkriterium anwenden innerhalb der Penalties der neuen Individuen
-            if (applog.log) applog.appendText("Algo Manager: Starting quicksort using criterion "+kriterium);
+            //if (applog.log) applog.appendText("Algo Manager: Starting quicksort using criterion "+kriterium);
             quicksort(ref new_generation_input, kriterium, 0, new_generation_input.Length-1);
-            if (applog.log) applog.appendText("Algo Manager: Starting domination-check");
             check_domination(ref new_generation_input, ref new_generation_input);
             
             //1.1.4.Dominanzkriterium auf Penalties zwischen den neuen und den alten Individuen anwenden
@@ -123,14 +122,15 @@ namespace IHWB.EVO.MetaEvo
                             if (input[k].get_status() == "true")
                             {
                                 //Jede Eigenschaft vergleichen
-                                dominator = i;
                                 for (int j = 0; j < input[0].Penalties.Length; j++)
                                 {
-                                    if (input[i].Penalties[j] > input[k].Penalties[j]) { dominator = -1; break; }
+                                    if (input[i].Penalties[0] < input[k].Penalties[0]) dominator = i;
+                                    else if (input[i].Penalties[j] > input[k].Penalties[j]) { dominator = -1; break; }
                                 }
                                 if (dominator > -1) {
                                     input[k].set_status("false#dominated#" + input[dominator].ID);
                                     if (applog.log) applog.appendText("Algo Manager: Domination: Individuum " + input[k].ID + " is dominated by Individuum " + input[dominator].ID);
+                                    dominator = -1;
                                     break; 
                                 }
                             }
@@ -149,7 +149,7 @@ namespace IHWB.EVO.MetaEvo
                         //mit
                         for (int k = input2.Length - 1; k >= 0; k--)
                         {
-                            if ((input2[k].get_status() == "true") && (input[i].ID != input2[k].ID))
+                            if ((input[i].get_status() == "true") && (input2[k].get_status() == "true") && (input[i].ID != input2[k].ID))
                             {
                                 //Jede Eigenschaft vergleichen
                                 for (int j = 0; j < input[0].Penalties.Length; j++)
@@ -177,13 +177,12 @@ namespace IHWB.EVO.MetaEvo
                                 if (status == 1) { 
                                     status = 0;
                                     input2[i].set_status("false#dominated#" + input[k].ID);
-                                    if (applog.log) applog.appendText("Algo Manager: Domination: Individuum " + input2[i].ID + " is dominated by Individuum " + input[k].ID);
-                                    break; 
+                                    if (applog.log) applog.appendText("Algo Manager: Domination2a: Individuum " + input2[i].ID + " is dominated by Individuum " + input[k].ID);
                                 }
                                 if (status == -1) { 
                                     status = 0;
                                     input[k].set_status("false#dominated#" + input2[i].ID);
-                                    if (applog.log) applog.appendText("Algo Manager: Domination: Individuum " + input[k].ID + " is dominated by Individuum " + input2[i].ID);
+                                    if (applog.log) applog.appendText("Algo Manager: Domination2b: Individuum " + input[k].ID + " is dominated by Individuum " + input2[i].ID);
                                     break;
                                 }
                             }
@@ -262,7 +261,7 @@ namespace IHWB.EVO.MetaEvo
                 for (int i = 0; i < individuums2kill.Length/2; i++)
                 {
                     work[(int)individuums2kill[i, 0]].set_status("false#crowding#0");
-                    if (applog.log) applog.appendText("Algo Manager: Clustering: Individuum " + work[(int)individuums2kill[i, 0]].ID + " is not needed anymore");
+                    if (applog.log) applog.appendText("Algo Manager: Clustering: Individuum " + work[(int)individuums2kill[i, 0]].ID + " is not used anymore");
                 }
                 //Zur überprüfung ob genug Individuen reduziert wurden
                 clustering_kill(ref input, ref input2);
@@ -321,12 +320,23 @@ namespace IHWB.EVO.MetaEvo
                 optparas = generation[i].get_optparas();
                 for (int j = 0; j < optparas.Length; j++)
                 {
-                    back = back + "[" + j + "]: " + String.Format("{0:####}", optparas[j]) + " ";
+                    back = back + "[" + j + "]: " + String.Format("{0:N3}",optparas[j]) + " ";
                 }
-                back = back + "\r\nPenalties";
-                for (int j = 0; j < generation[i].Penalties.Length; j++)
+                if (generation[0].Constraints.Length > 0)
                 {
-                    back = back + "[" + j + "]: " + String.Format("{0:####}", generation[i].Penalties[j]) + " ";
+                    back = back + "\r\nConst";
+                    for (int j = 0; j < generation[i].Constraints.Length; j++)
+                    {
+                        back = back + "[" + j + "]: " + String.Format("{0:N3}", generation[i].Constraints[j]) + " ";
+                    }
+                }
+                if (generation[0].Features.Length > 0)
+                {
+                    back = back + "\r\nFeat";
+                    for (int j = 0; j < generation[i].Features.Length; j++)
+                    {
+                        back = back + "[" + j + "]: " + String.Format("{0:N3}", generation[i].Features[j]) + " ";
+                    }
                 }
                 back = back + "\r\n";
             }
@@ -368,15 +378,15 @@ namespace IHWB.EVO.MetaEvo
                 }
                 initiativensumme += algos.algofeedbackarray[i].initiative;
             }
-            if (applog.log) applog.appendText("Algo Manager: nemGen_composition: Initiativensumme: " + initiativensumme);
+            if (applog.log) applog.appendText("Algo Manager: nemGen_composition: Initiativ-sum: " + initiativensumme);
 
             //4. number_individuals_for_nextGen neu setzen
             for (int i = 0; i < algos.algofeedbackarray.Length; i++)
             {
                 algos.algofeedbackarray[i].number_individuals_for_nextGen = (int)(((double)algos.algofeedbackarray[i].initiative / (double)initiativensumme) * (double)new_generation_input.Length);
-                log = log + "[" + algos.algofeedbackarray[i].name + "]: Survived: " + algos.algofeedbackarray[i].number_individuals_survived + "/" + algos.algofeedbackarray[i].number_individuals_for_nextGen + " Initiative: " + algos.algofeedbackarray[i].initiative + " -> " + algos.algofeedbackarray[i].number_individuals_for_nextGen + " Individuen\r\n";
+                log = log + "[" + algos.algofeedbackarray[i].name + "]: Survived: " + algos.algofeedbackarray[i].number_individuals_survived + "/" + algos.algofeedbackarray[i].number_individuals_for_nextGen + " Initiative: " + algos.algofeedbackarray[i].initiative + " -> " + algos.algofeedbackarray[i].number_individuals_for_nextGen + " Individuen für nächste Generation\r\n";
             }
-            if (applog.log) applog.appendText("Algo Manager: nemGen_composition: Individuenverteilung für die neue Generation berechnen:\r\n" + log);
+            if (applog.log) applog.appendText("Algo Manager: nemGen_composition: Individuuum-Composition for next Generation:\r\n" + log);
         }
         //Zeichnen der neuen Individuen
         public void draw_individuals(ref EVO.Common.Individuum_MetaEvo[] genpool, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input)
@@ -389,6 +399,4 @@ namespace IHWB.EVO.MetaEvo
             //hauptdiagramm_input.
         }
     }
-
-
 }

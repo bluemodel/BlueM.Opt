@@ -137,6 +137,32 @@ namespace IHWB.EVO.MetaEvo
             myCommand.Connection.Open();
             myCommand.ExecuteNonQuery();
             myCommand.Connection.Close();
+
+            //benötigte Tabellen: "metaevo_final_individuums" 
+            myCommand.CommandText = "DROP TABLE IF EXISTS `metaevo_final_individuums`;";
+            myCommand.Connection.Open();
+            myCommand.ExecuteNonQuery();
+            myCommand.Connection.Close();
+
+            tmptxt = "CREATE TABLE IF NOT EXISTS `metaevo_final_individuums` (`id` int(11) NOT NULL,";
+            for (int k = 1; k <= number_optparas; k++)
+            {
+                tmptxt = tmptxt + "`opt" + k + "` double NOT NULL,";
+            }
+            for (int k = 1; k <= number_constraints; k++)
+            {
+                tmptxt = tmptxt + "`const" + k + "` double NOT NULL default '0',";
+            }
+            for (int k = 1; k <= number_features; k++)
+            {
+                tmptxt = tmptxt + "`feat" + k + "` double NOT NULL default '0',";
+            }
+            tmptxt = tmptxt + " PRIMARY KEY  (`id`)) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+
+            myCommand.CommandText = tmptxt;
+            myCommand.Connection.Open();
+            myCommand.ExecuteNonQuery();
+            myCommand.Connection.Close();
             if (applog.log) applog.appendText("Network Manager: DB-Construction Successfilly");
         }
 
@@ -208,6 +234,57 @@ namespace IHWB.EVO.MetaEvo
                 tmptxt = tmptxt + "'" + generation_input[j].get_client() + "'):";
             }
             tmptxt = tmptxt.TrimEnd(':').Replace(",",".").Replace(":", ",") + ";";
+
+            myCommand.CommandText = tmptxt;
+            myCommand.Connection.Open();
+            myCommand.ExecuteNonQuery();
+            myCommand.Connection.Close();
+        }
+
+        //(ok)Neue Individuen in die Speicher-DB einfügen (ID, status, optparas, features, constraints)
+        public void Individuums_StoreFinalInDB(ref EVO.Common.Individuum_MetaEvo[] generation_input)
+        {
+            //Alte Individuen aus DB löschen
+            this.DB_ClearIndividuumsTable();
+
+            //Schreiben der Individuen-Daten in die DB (alle gleichzeitig)
+            string tmptxt = "INSERT INTO `metaevo_individuums` (`id` :";
+
+            //Datenmaske
+            for (int k = 1; k <= number_optparas; k++)
+            {
+                tmptxt = tmptxt + "`opt" + k + "`:";
+            }
+            for (int k = 1; k <= number_features; k++)
+            {
+                tmptxt = tmptxt + "`feat" + k + "`:";
+            }
+            for (int k = 1; k <= number_constraints; k++)
+            {
+                tmptxt = tmptxt + "`const" + k + "`:";
+            }
+
+            tmptxt = tmptxt + ") VALUES ";
+
+            //Datensätze
+            for (int j = 0; j < generation_input.Length; j++)
+            {
+                tmptxt = tmptxt + "('" + generation_input[j].ID + "':";
+                for (int k = 0; k < number_optparas; k++)
+                {
+                    tmptxt = tmptxt + "'" + generation_input[j].get_optparas()[k] + "':";
+                }
+                for (int k = 0; k < number_features; k++)
+                {
+                    tmptxt = tmptxt + "'" + generation_input[j].Features[k] + "':";
+                }
+                for (int k = 0; k < number_constraints; k++)
+                {
+                    tmptxt = tmptxt + "'" + generation_input[j].Constraints[k] + "':";
+                }
+                tmptxt = tmptxt + "'" + generation_input[j].get_client() + "'):";
+            }
+            tmptxt = tmptxt.TrimEnd(':').Replace(",", ".").Replace(":", ",") + ";";
 
             myCommand.CommandText = tmptxt;
             myCommand.Connection.Open();
@@ -642,6 +719,9 @@ namespace IHWB.EVO.MetaEvo
 
             //Fertige Individuen wieder auslesen
             this.Individuums_UpdateFromDB(ref generation_input);
+
+            //In speicher-DB schreiben
+            this.Individuums_StoreFinalInDB(ref generation_input);
 
             return true;
         }

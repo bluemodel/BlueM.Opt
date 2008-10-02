@@ -79,15 +79,14 @@ namespace IHWB.EVO.MetaEvo
 
             switch (algofeedbackarray[algo_id].name)
             {
-                case "Zufällige Einfache Mutation":
+                case "Zufällige Einfache Mutation": //Mutiert an einer zufälligen Stelle innerhalb der Grenzen von Min und Max
                     double[] mutated_optparas = new double[numberoptparas];
                     int selecteditem;
 
                     for (int i = 0; i < numberindividuums; i++)
                     {
-                        //Zufälligen parent wählen und kopieren
-                        new_generation_input[startindex + i] = genpool_input[rand.Next(0, genpool_input.Length)].Clone_MetaEvo();
-                        mutated_optparas = new_generation_input[startindex + i].get_optparas();
+                        //Zufälligen parent wählen und optparas kopieren
+                        mutated_optparas = new_generation_input[rand.Next(0, genpool_input.Length - 1)].get_optparas();
                         //Zufälligen Wert mutieren
                         selecteditem = rand.Next(0, numberoptparas - 1);
                         mutated_optparas[selecteditem] = genpool_input[1].OptParameter[selecteditem].Min + (genpool_input[1].OptParameter[selecteditem].Max - genpool_input[1].OptParameter[selecteditem].Min) * ((double)rand.Next(0, 1000) / (double)1000);
@@ -98,7 +97,7 @@ namespace IHWB.EVO.MetaEvo
                         new_generation_input[startindex + i].ID = individuumnumber;
                         individuumnumber++;
                     }
-                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with '" + algofeedbackarray[algo_id].name + "'");
+                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with '" + algofeedbackarray[algo_id].name + "'...done");
                     break;
 
                 case "Zufällige Rekombination":
@@ -107,37 +106,45 @@ namespace IHWB.EVO.MetaEvo
                     for (int i = 0; i < numberindividuums; i++)
                     {
                         //Zufälligen parent wählen und kopieren
-                        new_generation_input[startindex + i] = genpool_input[rand.Next(0, genpool_input.Length)].Clone_MetaEvo();
-                        recombinated_optparas = new_generation_input[startindex + i].get_optparas();
-                        recombinated_optparas2 = genpool_input[rand.Next(0, genpool_input.Length)].get_optparas();
+                        recombinated_optparas = genpool_input[rand.Next(0, genpool_input.Length - 1)].get_optparas();
+                        recombinated_optparas2 = genpool_input[rand.Next(0, genpool_input.Length - 1)].get_optparas();
                         //Zufällige Rekombination
                         for (int j = 0; j < numberoptparas; j++)
                         {
-                            if (rand.Next(-10, 10) > 0) recombinated_optparas2[j] = recombinated_optparas[j];
+                            if (rand.Next(-10, 10) > 0) recombinated_optparas[j] = recombinated_optparas2[j];
                         }
                         //Zurückspeichern
-                        new_generation_input[startindex + i].set_optparas(recombinated_optparas2);
+                        new_generation_input[startindex + i].set_optparas(recombinated_optparas);
                         new_generation_input[startindex + i].set_status("raw");
                         new_generation_input[startindex + i].set_generator(algo_id);
                         new_generation_input[startindex + i].ID = individuumnumber;
                         individuumnumber++;
                     }
-                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with '" + algofeedbackarray[algo_id].name + "'");
+                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with '" + algofeedbackarray[algo_id].name + "'...done");
                     break;
 
                 case "Diversität aus Sortierung":
-                    double[] diversity_optparas = new double[numberoptparas];
+                    double[] diversity_optparas = new double[numberoptparas]; 
+                    double[] mult1 = new double[numberoptparas];
+                    double[] mult2 = new double[numberoptparas];
+                    for (int i = 0; i < numberoptparas; i++)
+                    {
+                        mult1[i] = 1;
+                        mult2[i] = 1;
+                    }
+
                     for (int i = 0; i < numberindividuums; i++)
                     {
                         if (i % 2 == 0)
                         {
                             for (int k = 0; k < genpool_input[0].get_optparas().Length; k++)
                             {
-                                diversity_optparas[k] = genpool_input[0].get_optparas()[k] + (genpool_input[0].get_optparas()[k] - genpool_input[(int)i/2].get_optparas()[k]);
+                                diversity_optparas[k] = genpool_input[0].get_optparas()[k] + mult1[k]*(genpool_input[0].get_optparas()[k] - genpool_input[((int)i/2)+1].get_optparas()[k]);
                                 //Auf Max prüfen, ggf. Multiplikator für den Optpara anpassen anpassen
-                                if (genpool_input[1].OptParameter[k].Max < diversity_optparas[k])
+                                if ((genpool_input[0].OptParameter[k].Max < diversity_optparas[k]) || (genpool_input[0].OptParameter[k].Min > diversity_optparas[k]))
                                 {
-
+                                    mult1[k] *= 0.5;
+                                    k--;
                                 }
                             }
                         }
@@ -145,11 +152,12 @@ namespace IHWB.EVO.MetaEvo
                         {
                             for (int k = 0; k < genpool_input[0].get_optparas().Length; k++)
                             {
-                                diversity_optparas[k] = genpool_input[genpool_input.Length].get_optparas()[k] + (genpool_input[genpool_input.Length - 1].get_optparas()[k] - genpool_input[genpool_input.Length - 1 - (int)i / 2].get_optparas()[k]);
+                                diversity_optparas[k] = genpool_input[genpool_input.Length - 1].get_optparas()[k] + mult2[k] * (genpool_input[genpool_input.Length - 1].get_optparas()[k] - genpool_input[genpool_input.Length - 2 - (int)i / 2].get_optparas()[k]);
                                 //Auf Min prüfen, ggf. Multiplikator für den Optpara anpassen anpassen
-                                if (genpool_input[1].OptParameter[k].Min > diversity_optparas[k])
+                                if ((genpool_input[0].OptParameter[k].Min > diversity_optparas[k]) || (genpool_input[0].OptParameter[k].Max < diversity_optparas[k]))
                                 {
-
+                                    mult2[k] *= 0.5;
+                                    k--;
                                 }
                             }
                         }
@@ -160,7 +168,7 @@ namespace IHWB.EVO.MetaEvo
                         new_generation_input[startindex + i].ID = individuumnumber;
                         individuumnumber++;
                     }
-                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with '" + algofeedbackarray[algo_id].name + "'");
+                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with '" + algofeedbackarray[algo_id].name + "'...done");
                     break;
 
                 default:

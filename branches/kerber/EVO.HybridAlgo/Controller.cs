@@ -45,6 +45,7 @@ namespace IHWB.EVO.MetaEvo
         {
             applog = new IHWB.EVO.Diagramm.ApplicationLog();
             if (settings_input.MetaEvo.Log) applog.log = true;
+            else applog.Hide();
 
             //Daten einlesen
             this.prob = prob_input;
@@ -56,6 +57,7 @@ namespace IHWB.EVO.MetaEvo
             //Setzen des Problems zum Design des Individuums
             EVO.Common.Individuum_MetaEvo.Initialise(ref prob_input);
             individuumnumber = 1;
+            if (applog.log) applog.appendText("Controller: Task: " + prob.WorkDir);
 
             switch (this.role)
             {
@@ -100,6 +102,8 @@ namespace IHWB.EVO.MetaEvo
                     if (applog.log) applog.appendText("Controller: MetaEvo started in 'Network Client'-Mode");
                     //### Vorbereitung ###
                     individuumForClient = new EVO.Common.Individuum_MetaEvo("MetaEvo", 0, prob_input.List_OptParameter.Length);
+                    //Microsoft SQL-DB des Clients ausschalten
+                    if (modell == "sim") { sim.StoreIndividuals = false; }
 
                     //### Hauptprogramm ###
                     networkmanager = new Networkmanager(ref this.individuumForClient, ref this.settings, ref applog);
@@ -147,7 +151,7 @@ namespace IHWB.EVO.MetaEvo
             mePC.status = "init";
             int generationcounter = 1;
 
-            while (generationcounter < settings.MetaEvo.NumberGenerations)
+            while (generationcounter <= settings.MetaEvo.NumberGenerations)
             {
                 if (mePC.status == "init")
                 {
@@ -197,6 +201,7 @@ namespace IHWB.EVO.MetaEvo
                 }
             }
             if (applog.log) applog.appendText("Controller: Calculation Finished");
+            if (applog.log) applog.savelog();
         }
 
         // Network Server
@@ -207,7 +212,7 @@ namespace IHWB.EVO.MetaEvo
             meServer.status = "init Genpool";
             int generationcounter = 0;
 
-            while (generationcounter < settings.MetaEvo.NumberGenerations)
+            while (generationcounter <= settings.MetaEvo.NumberGenerations)
             {
                 //Einmaliges Initialisieren des Genpools
                 if (meServer.status == "init Genpool")
