@@ -129,6 +129,8 @@
                     Call serie.Add(runde * Me.mSettings.PES.n_Gen * Me.mSettings.PES.n_Nachf + gen * Me.mSettings.PES.n_Nachf + nachf, ind.Penalties(0), ind.ID.ToString(), Farbe)
                 Case EVO.Common.METH_HYBRID, EVO.Common.METH_CES
                     Call serie.Add(runde * Me.mSettings.CES.n_Generations * Me.mSettings.CES.n_Childs + gen * Me.mSettings.CES.n_Childs + nachf, ind.Penalties(0), ind.ID.ToString(), Farbe)
+                Case EVO.Common.METH_MetaEvo
+                    Call serie.Add(runde * Me.mSettings.MetaEvo.NumberGenerations * Me.mSettings.MetaEvo.PopulationSize + gen * Me.mSettings.MetaEvo.PopulationSize + nachf, ind.Penalties(0), ind.ID.ToString(), Farbe)
                 Case Else
                     Throw New Exception("Für diese Methode Single Objective zeichnen nicht definiert")
             End Select
