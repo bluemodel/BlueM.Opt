@@ -1,4 +1,5 @@
-﻿
+﻿Imports System.IO
+
 Partial Public Class ApplicationLog
     Inherits System.Windows.Forms.Form
 
@@ -19,8 +20,16 @@ Partial Public Class ApplicationLog
     End Sub
 
     Public Sub appendText(ByVal text As String)
-        Me.TextBox1.AppendText(String.Format("{0:####.##}", (DateTime.Now - starttime).TotalSeconds) + ": " + text + vbCrLf)
+        Me.TextBox1.AppendText(Format((DateTime.Now - starttime).TotalSeconds, "###,###,##0.00") + ": " + text + vbCrLf)
         System.Windows.Forms.Application.DoEvents()
+    End Sub
+
+    Public Sub savelog()
+        Dim sw As StreamWriter = File.CreateText("c:\MetaEvo_Logfile.txt")
+
+        sw.Write(Me.TextBox1.Text)
+        sw.Flush()
+        sw.Close()
     End Sub
 
 End Class
