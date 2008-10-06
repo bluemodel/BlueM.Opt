@@ -158,17 +158,19 @@ namespace IHWB.EVO.MetaEvo
                     //Zufällige Parents setzen
                     set_random_parents(ref generation);
 
-                    //Genpool simulieren und setzen
+                    //Genpool simulieren
                     if (applog.log) applog.appendText("Controller: Genpool: Simulating Individuums...");
                     for (int i = 0; i < generation.Length; i++)
                     {
                         //Simulieren 
-                        if (modell == "testprobleme")testprobleme.Evaluierung_TestProbleme_MetaEvo(ref generation[i],0,ref hauptdiagramm1);
+                        if (modell == "testprobleme")testprobleme.Evaluierung_TestProbleme_MetaEvo(ref generation[i],1,ref hauptdiagramm1);
                         if (modell == "sim") sim.Evaluate_MetaEvo(ref generation[i]);
                         if (applog.log) applog.appendText("Controller: Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length),2) * 100 + "%)");
                     }
-                    algomanager.set_genpool(ref generation);
 
+                    //Genpool speichern und zeichnen
+                    algomanager.set_genpool(ref generation);
+                    algomanager.draw_genpool(ref hauptdiagramm1);
 
                     mePC.status = "perform";
                 }
@@ -183,18 +185,20 @@ namespace IHWB.EVO.MetaEvo
                     if (applog.log) applog.appendText("Controller: Individuums for Generation " + generationcounter + ": Simulating Individuums...");
                     for (int i = 0; i < generation.Length; i++)
                     {
-                        //Simulieren 
-                        if (modell == "testprobleme") testprobleme.Evaluierung_TestProbleme_MetaEvo(ref generation[i], (short)generationcounter, ref hauptdiagramm1);
-                            if (modell == "sim") sim.Evaluate_MetaEvo(ref generation[i]);
+                        //Simulieren und zeichnen
+                        if (modell == "testprobleme") testprobleme.Evaluierung_TestProbleme_MetaEvo(ref generation[i], 1, ref hauptdiagramm1);
+                        if (modell == "sim")
+                        {
+                            sim.Evaluate_MetaEvo(ref generation[i]);
+                            algomanager.draw_individuum(ref generation[i], ref hauptdiagramm1, generation[i].ID % generation.Length);
+                        }
                         if (applog.log) applog.appendText("Controller: Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length),2) * 100 + "%)");
                     }
-                    //neue Individuen Zeichnen
-                    algomanager.draw_individuals(ref generation, ref hauptdiagramm1);
 
                     //Neue Generation auswerten und neuen Genpool erstellen 
                     algomanager.new_individuals_merge_with_genpool(ref generation);
 
-                    //Genpool Zeichnen
+                    //Genpool zeichnen
                     algomanager.draw_genpool(ref hauptdiagramm1);
 
                     generationcounter++;
@@ -237,7 +241,7 @@ namespace IHWB.EVO.MetaEvo
                 else if (meServer.status == "generate Individuums")
                 {
                     //Neue Individuen Zeichnen
-                    algomanager.draw_individuals(ref generation, ref hauptdiagramm1);
+                    //algomanager.draw_individuals(ref generation, ref hauptdiagramm1);
 
                     //Mit Genpool verrechnen
                     algomanager.new_individuals_merge_with_genpool(ref generation);
@@ -299,7 +303,7 @@ namespace IHWB.EVO.MetaEvo
 
                     //Simulieren
                     if (applog.log) applog.appendText("Controller: Individuum " + individuumForClient.ID + " simulating...");
-                    if (modell == "testprobleme") testprobleme.Evaluierung_TestProbleme_MetaEvo(ref individuumForClient, 0, ref hauptdiagramm1);
+                    if (modell == "testprobleme") testprobleme.Evaluierung_TestProbleme_MetaEvo(ref individuumForClient, 1, ref hauptdiagramm1);
                     if (modell == "sim") sim.Evaluate_MetaEvo(ref individuumForClient);
 
                     //Individuum in DB Updaten

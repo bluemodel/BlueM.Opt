@@ -4,6 +4,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Collections;
 
+
 namespace IHWB.EVO.MetaEvo
 {
     class Algomanager
@@ -42,16 +43,15 @@ namespace IHWB.EVO.MetaEvo
             int kriterium = rand.Next(0, new_generation_input[0].Penalties.Length);
 
             //1.1.3.Sortieren und Dominanzkriterium anwenden innerhalb der Penalties der neuen Individuen
-            //if (applog.log) applog.appendText("Algo Manager: Starting quicksort using criterion "+kriterium);
             quicksort(ref new_generation_input, kriterium, 0, new_generation_input.Length-1);
             check_domination(ref new_generation_input, ref new_generation_input);
             
             //1.1.4.Dominanzkriterium auf Penalties zwischen den neuen und den alten Individuen anwenden
             check_domination(ref new_generation_input, ref genpool);
-
+            
             //1.2.Clustering bis auf maximale Generationsgrösse, Speichern in Genpool
             clustering_kill(ref genpool, ref new_generation_input);
-
+            
             //2.Feedback erstellen
             newGen_composition(ref new_generation_input);
 
@@ -119,7 +119,7 @@ namespace IHWB.EVO.MetaEvo
                         //mit
                         for (int k = input.Length-1; k > i; k--)
                         {
-                            if (input[k].get_status() == "true")
+                            if ((input[k].get_status() == "true") && (input[i].get_status() == "true"))
                             {
                                 //Jede Eigenschaft vergleichen
                                 for (int j = 0; j < input[0].Penalties.Length; j++)
@@ -129,7 +129,7 @@ namespace IHWB.EVO.MetaEvo
                                 }
                                 if (dominator > -1) {
                                     input[k].set_status("false#dominated#" + input[dominator].ID);
-                                    if (applog.log) applog.appendText("Algo Manager: Domination: Individuum " + input[k].ID + " is dominated by Individuum " + input[dominator].ID);
+                                    if (applog.log) applog.appendText("Algo Manager: Domination: Individuum " + input[k].ID + " is dominated (by Individuum " + input[dominator].ID + ")");
                                     dominator = -1;
                                     break; 
                                 }
@@ -174,15 +174,15 @@ namespace IHWB.EVO.MetaEvo
                                         }
                                     }
                                 }
-                                if (status == 1) { 
-                                    status = 0;
-                                    input2[i].set_status("false#dominated#" + input[k].ID);
-                                    if (applog.log) applog.appendText("Algo Manager: Domination2a: Individuum " + input2[i].ID + " is dominated by Individuum " + input[k].ID);
-                                }
                                 if (status == -1) { 
                                     status = 0;
-                                    input[k].set_status("false#dominated#" + input2[i].ID);
-                                    if (applog.log) applog.appendText("Algo Manager: Domination2b: Individuum " + input[k].ID + " is dominated by Individuum " + input2[i].ID);
+                                    input2[k].set_status("false#dominated#" + input[i].ID);
+                                    if (applog.log) applog.appendText("Algo Manager: Domination2a: Individuum " + input2[k].ID + " is dominated (by Individuum " + input[i].ID + ")");
+                                }
+                                if (status == 1) { 
+                                    status = 0;
+                                    input[i].set_status("false#dominated#" + input2[k].ID);
+                                    if (applog.log) applog.appendText("Algo Manager: Domination2b: Individuum " + input[i].ID + " is dominated (by Individuum " + input2[k].ID + ")");
                                     break;
                                 }
                             }
@@ -330,12 +330,12 @@ namespace IHWB.EVO.MetaEvo
                         back = back + "[" + j + "]: " + String.Format("{0:N3}", generation[i].Constraints[j]) + " ";
                     }
                 }
-                if (generation[0].Features.Length > 0)
+                if (generation[0].Penalties.Length > 0)
                 {
-                    back = back + "\r\nFeat";
-                    for (int j = 0; j < generation[i].Features.Length; j++)
+                    back = back + "\r\nPenaltie";
+                    for (int j = 0; j < generation[i].Penalties.Length; j++)
                     {
-                        back = back + "[" + j + "]: " + String.Format("{0:N3}", generation[i].Features[j]) + " ";
+                        back = back + "[" + j + "]: " + String.Format("{0:N3}", generation[i].Penalties[j]) + " ";
                     }
                 }
                 back = back + "\r\n";
@@ -383,20 +383,22 @@ namespace IHWB.EVO.MetaEvo
             //4. number_individuals_for_nextGen neu setzen
             for (int i = 0; i < algos.algofeedbackarray.Length; i++)
             {
+                log = log + "[" + algos.algofeedbackarray[i].name + "]: Survived: " + algos.algofeedbackarray[i].number_individuals_survived + "/" + algos.algofeedbackarray[i].number_individuals_for_nextGen + " Initiative: " + algos.algofeedbackarray[i].initiative + " -> ";
                 algos.algofeedbackarray[i].number_individuals_for_nextGen = (int)(((double)algos.algofeedbackarray[i].initiative / (double)initiativensumme) * (double)new_generation_input.Length);
-                log = log + "[" + algos.algofeedbackarray[i].name + "]: Survived: " + algos.algofeedbackarray[i].number_individuals_survived + "/" + algos.algofeedbackarray[i].number_individuals_for_nextGen + " Initiative: " + algos.algofeedbackarray[i].initiative + " -> " + algos.algofeedbackarray[i].number_individuals_for_nextGen + " Individuen für nächste Generation\r\n";
+                log = log + algos.algofeedbackarray[i].number_individuals_for_nextGen + " Individuums for next generation\r\n";
             }
             if (applog.log) applog.appendText("Algo Manager: nemGen_composition: Individuuum-Composition for next Generation:\r\n" + log);
         }
         //Zeichnen der neuen Individuen
-        public void draw_individuals(ref EVO.Common.Individuum_MetaEvo[] genpool, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input)
+        public void draw_individuum(ref EVO.Common.Individuum_MetaEvo individuum, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input, int laufnummerModGeneration)
         {
-            //hauptdiagramm_input.
+            //System.Drawing.Color c = System.Drawing.ColorTranslator.FromHtml("#F5F7F8");
+            //hauptdiagramm_input.ZeichneIndividuum(individuum,1,1,1,laufnummerModGeneration,,true);
         }
         //Zeichnen des Genpools
         public void draw_genpool(ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input)
         {
-            //hauptdiagramm_input.
+            hauptdiagramm_input.ZeichneSekPopulation(genpool);
         }
     }
 }
