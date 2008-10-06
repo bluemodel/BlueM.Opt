@@ -25,7 +25,7 @@ Partial Public Class ApplicationLog
     End Sub
 
     Public Sub savelog()
-        Dim sw As StreamWriter = File.CreateText("c:\MetaEvo_Logfile.txt")
+        Dim sw As StreamWriter = File.CreateText("D:\Diplomarbeit\MetaEvo_Logfile.txt")
 
         sw.Write(Me.TextBox1.Text)
         sw.Flush()

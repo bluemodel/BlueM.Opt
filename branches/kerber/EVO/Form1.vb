@@ -704,6 +704,7 @@ Partial Class Form1
                         Case METH_HOOKJEEVES
                             Call STARTEN_HookJeeves()
                         Case METH_MetaEvo
+                            Me.PrepareDiagramm()
                             MetaEvoController = New EVO.MetaEvo.Controller(Me.mProblem, EVO_Einstellungen1.Settings, Me.Hauptdiagramm1, Me.Sim1)
                     End Select
 
@@ -712,6 +713,7 @@ Partial Class Form1
                         Case METH_PES
                             Call STARTEN_PES()
                         Case METH_MetaEvo
+                            Me.PrepareDiagramm()
                             MetaEvoController = New EVO.MetaEvo.Controller(Me.mProblem, EVO_Einstellungen1.Settings, Me.Hauptdiagramm1, Me.Testprobleme1)
                     End Select
 

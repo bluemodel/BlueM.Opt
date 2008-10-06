@@ -29,6 +29,16 @@
             Me.mOptParameter(i).Bezeichnung = Individuum.mProblem.List_OptParameter(i).Bezeichnung
         Next
 
+        'Constraints mit Teilmenge Penalties auf 0 setzen
+        For i = 0 To MyBase.Constraints.Length - 1
+            Me.Constraints(i) = 0
+        Next
+
+        'Features auf 0 setzen
+        For i = 0 To MyBase.Features.Length - 1
+            Me.Features(i) = 0
+        Next
+
     End Sub
     '### Überschriebene Methoden
 
