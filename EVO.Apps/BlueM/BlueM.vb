@@ -691,7 +691,7 @@ Public Class BlueM
                         SplitZeile = Zeilenarray(j).Split("|")
                         If Akt.VER_ONOFF(i, 0) = SplitZeile(1).Trim Then
                             StrLeft = Microsoft.VisualBasic.Left(Zeilenarray(j), 31)
-                            StrRight = Microsoft.VisualBasic.Right(Zeilenarray(j), 49)
+                            StrRight = Microsoft.VisualBasic.Right(Zeilenarray(j), 41)
                             If Akt.VER_ONOFF(i, 1) = "1" Then
                                 Zeilenarray(j) = StrLeft & "      100     " & StrRight
                             ElseIf (Akt.VER_ONOFF(i, 1) = "0") Then
