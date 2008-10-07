@@ -1119,7 +1119,7 @@ Partial Class Form1
 
                     'Lösung im TeeChart einzeichnen und mittleres Dn ausgeben
                     '========================================================
-                    Call Me.Hauptdiagramm1.ZeichneIndividuum(CES1.Childs(Child_Ready), 0, 0, i_gen, Child_Ready, ColorManagement(ColorArray, CES1.Childs(Child_Ready)))
+                    Call Me.Hauptdiagramm1.ZeichneIndividuum(CES1.Childs(Child_Ready), 0, 0, i_gen, Child_Ready + 1, ColorManagement(ColorArray, CES1.Childs(Child_Ready)))
                     Me.Label_Dn_Wert.Text = Math.Round(CES1.Childs(Child_Ready).Get_mean_PES_Dn, 6).ToString
                     If Not CES1.Childs(Child_Ready).Get_mean_PES_Dn = -1 Then
                         Me.Monitor1.Zeichne_Dn(CES1.Childs(Child_Ready).ID, CES1.Childs(Child_Ready).Get_mean_PES_Dn)
@@ -1870,7 +1870,7 @@ Start_Evolutionsrunden:
                         'Hypervolumen berechnen und Zeichnen
                         '-----------------------------------
                         Call Hypervolume.update_dataset(Common.Individuum.Get_All_Penalty_of_Array(PES1.SekundärQb))
-                        Call Me.Hauptdiagramm1.ZeichneNadirpunkt(Hypervolume.nadir)
+                        'Call Me.Hauptdiagramm1.ZeichneNadirpunkt(Hypervolume.nadir)
                         Call Me.Monitor1.ZeichneHyperVolumen(PES1.PES_iAkt.iAktGen, Math.Abs(Hypervolume.calc_indicator()))
 
                     End If
