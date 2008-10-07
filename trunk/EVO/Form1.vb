@@ -236,6 +236,12 @@ Partial Class Form1
                     'Testprobleme instanzieren
                     Testprobleme1 = New EVO.Apps.Testprobleme()
 
+                    'HACK: bei Testproblemen als Methodenauswahl nur PES zulassen!
+                    Me.IsInitializing = True
+                    Call Me.ComboBox_Methode.Items.Clear()
+                    Call Me.ComboBox_Methode.Items.AddRange(New String() {"", METH_PES})
+                    Me.IsInitializing = False
+
 
                 Case ANW_TSP 'Anwendung Traveling Salesman Problem (TSP)
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -436,7 +442,7 @@ Partial Class Form1
     '************************
     Private Sub INI_Method(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Methode.SelectedIndexChanged
 
-        If (Me.IsInitializing = True) Then
+        If (Me.IsInitializing = True Or Me.ComboBox_Methode.SelectedItem = "") Then
 
             Exit Sub
 
@@ -465,15 +471,6 @@ Partial Class Form1
             Me.Button_Scatterplot.Enabled = False
 
             Select Case Me.mProblem.Method
-
-                Case "" 'Keine Methode ausgewählt
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                    'Mauszeiger wieder normal
-                    Cursor = Cursors.Default
-
-                    'Ende
-                    Exit Sub
 
                 Case METH_SENSIPLOT 'Methode SensiPlot
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
