@@ -924,6 +924,15 @@ Partial Class Form1
 
                 End If
 
+                'Pause?
+                If (Me.ispause) Then
+                    Me.Button_Start.Text = "Run"
+                    Do While (Me.ispause)
+                        System.Threading.Thread.Sleep(20)
+                        Application.DoEvents()
+                    Loop
+                End If
+
                 System.Windows.Forms.Application.DoEvents()
 
             Next
@@ -1696,7 +1705,7 @@ Start_Evolutionsrunden:
                         ind(i).OptParameter = EVO.Common.OptParameter.Clone_Array(PES1.EsGetParameter())
 
                         'Testprobleme direkt auswerten
-                        If Anwendung = ANW_TESTPROBLEME Then
+                        If (Anwendung = ANW_TESTPROBLEME) Then
 
                             PES1.PES_iAkt.iAktNachf = i
 
@@ -1710,6 +1719,15 @@ Start_Evolutionsrunden:
 
                             'Verlauf aktualisieren
                             Call EVO_Opt_Verlauf1.Nachfolger(PES1.PES_iAkt.iAktNachf + 1)
+
+                            'Pause?
+                            If (Me.ispause) Then
+                                Me.Button_Start.Text = "Run"
+                                Do While (Me.ispause)
+                                    System.Threading.Thread.Sleep(20)
+                                    Application.DoEvents()
+                                Loop
+                            End If
 
                             System.Windows.Forms.Application.DoEvents()
 
