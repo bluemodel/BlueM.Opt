@@ -109,6 +109,9 @@ Public MustInherit Class Sim
         'Problem speichern
         Me.mProblem = prob
 
+        'Original-WorkDir benutzen (bei Neustart wichtig)
+        Me.WorkDir_Current = Me.WorkDir_Original
+
         'Je nach Problem weitere Vorbereitungen treffen
         Select Case Me.mProblem.Method
 
