@@ -51,14 +51,20 @@
         Dim Dest As New Individuum_MetaEvo(Me.mType, Me.ID, Me.numberOptparas)
         Dim i As Integer
 
+        Dest.Client = Me.Client
         Dest.status = Me.status
-        Dest.generator_id = Me.generator_id
+        Dest.statusreason = Me.statusreason
+        Dest.statusopponent = Me.statusopponent
         For i = 0 To numberOptparas - 1
             Dest.mOptparameter = Me.mOptparameter
         Next
 
         For i = 0 To mFeatures.Length - 1
             Dest.mFeatures = Me.mFeatures
+        Next
+
+        For i = 0 To mConstraints.Length - 1
+            Dest.mConstraints = Me.mConstraints
         Next
 
         Return Dest
