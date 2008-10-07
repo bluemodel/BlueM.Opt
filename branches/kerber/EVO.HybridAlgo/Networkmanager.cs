@@ -686,9 +686,10 @@ namespace IHWB.EVO.MetaEvo
 
         //### Hauptprogramm ### Berechnet eine Generation im Netzwerk
 
-        public bool calculate_by_clients(ref EVO.Common.Individuum_MetaEvo[] generation_input)
+        public bool calculate_by_clients(ref EVO.Common.Individuum_MetaEvo[] generation_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input)
         {
             int individuums_ready = 0;
+            int individuums_ready_now = 0;
 
             //Scheduling initialisieren und ersten Schritt rechnen
             this.scheduling_new(ref generation_input);
@@ -702,12 +703,23 @@ namespace IHWB.EVO.MetaEvo
             if (applog.log) applog.appendText("Networkmanager: Waiting for first Results...");
 
             //Prüfen ob alle Individuen fertig berechnet sind
-            while (this.Individuums_CountReadyInDB() < this.populationsize)
+            while (individuums_ready_now < this.populationsize)
             {
-                if (individuums_ready < this.Individuums_CountReadyInDB()) 
+                if (individuums_ready < individuums_ready_now) 
                 {
-                    individuums_ready = this.Individuums_CountReadyInDB();
-                    if (applog.log) applog.appendText("Networkmanager: " + Math.Round((double)this.Individuums_CountReadyInDB() / (double)populationsize,2)*100 + "%");
+                    //Fertige Individuen wieder auslesen
+                    this.Individuums_UpdateFromDB(ref generation_input);
+
+                    //Neue fertige Individuen zeichnen
+                    for (int i = individuums_ready; i < individuums_ready_now; i++)
+                    {
+                        hauptdiagramm_input.ZeichneIndividuum(generation_input[i], 1, 1, 1, generation_input[i].ID % generation_input.Length, System.Drawing.Color.Yellow, true);
+                        System.Windows.Forms.Application.DoEvents();
+                    }
+
+                    if (applog.log) applog.appendText("Networkmanager: " + Math.Round((double)individuums_ready_now / (double)populationsize, 2) * 100 + "%");
+
+                    individuums_ready = individuums_ready_now;
                 }
                
                 //Scheduling-korrektur anstossen (inklusive-DB Update)
@@ -715,10 +727,9 @@ namespace IHWB.EVO.MetaEvo
 
                 //Warten
                 System.Threading.Thread.Sleep(1000);
-            }
 
-            //Fertige Individuen wieder auslesen
-            this.Individuums_UpdateFromDB(ref generation_input);
+                individuums_ready_now = this.Individuums_CountReadyInDB();
+            }
 
             //In speicher-DB schreiben
             this.Individuums_StoreFinalInDB(ref generation_input);

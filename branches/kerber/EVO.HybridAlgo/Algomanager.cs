@@ -13,9 +13,11 @@ namespace IHWB.EVO.MetaEvo
         EVO.Common.Individuum_MetaEvo[] wastepool;
         EVO.Diagramm.ApplicationLog applog;
         Algos algos;
+        EVO.Diagramm.Hauptdiagramm hauptdiagramm;
 
-        public Algomanager(ref EVO.Common.Problem prob_input, int individuumnumber_input, ref EVO.Diagramm.ApplicationLog applog_input) 
+        public Algomanager(ref EVO.Common.Problem prob_input, int individuumnumber_input, ref EVO.Diagramm.ApplicationLog applog_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input) 
         {
+            hauptdiagramm = hauptdiagramm_input;
             applog = applog_input;
             //Algoobjekt initialisieren (enthält die algorithmus-Methoden und das Feedback zu jedem Algo)
             algos = new Algos(individuumnumber_input, ref applog);
@@ -30,6 +32,10 @@ namespace IHWB.EVO.MetaEvo
                 this.genpool[i] = genpool_input[i].Clone_MetaEvo();
             }
             if (applog.log) applog.appendText("Algo Manager: Genpool: \r\n" + this.generationinfo(ref this.genpool));
+
+            //Genpool zeichnen
+            hauptdiagramm.ZeichneSekPopulation(genpool);
+            System.Windows.Forms.Application.DoEvents();
         }
 
         //new_generation mit Genpool verarbeiten und neue Individuen in new_generation erzeugen
@@ -57,10 +63,14 @@ namespace IHWB.EVO.MetaEvo
 
             //3.Genpool und neue Individuen zu neuem Genpool zusammenfassen, restliche Individuen in Wastepool verschieben 
             zip(ref genpool, ref new_generation_input);
-            this.wastepool = new_generation_input;
+            wastepool = new_generation_input;
             quicksort(ref wastepool, kriterium, 0, new_generation_input.Length - 1);
             quicksort(ref genpool, kriterium, 0, new_generation_input.Length - 1);
             if (applog.log) applog.appendText("Algo Manager: Result: New Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n");
+            //Genpool zeichnen
+            hauptdiagramm.LöscheLetzteGeneration(1);
+            hauptdiagramm.ZeichneSekPopulation(genpool);
+            System.Windows.Forms.Application.DoEvents();
         }
 
         public void new_individuals_build(ref EVO.Common.Individuum_MetaEvo[] new_generation_input)
@@ -177,12 +187,12 @@ namespace IHWB.EVO.MetaEvo
                                 if (status == -1) { 
                                     status = 0;
                                     input2[k].set_status("false#dominated#" + input[i].ID);
-                                    if (applog.log) applog.appendText("Algo Manager: Domination2a: Individuum " + input2[k].ID + " is dominated (by Individuum " + input[i].ID + ")");
+                                    if (applog.log) applog.appendText("Algo Manager: Domination: Individuum " + input2[k].ID + " is dominated (by Individuum " + input[i].ID + ")");
                                 }
                                 if (status == 1) { 
                                     status = 0;
                                     input[i].set_status("false#dominated#" + input2[k].ID);
-                                    if (applog.log) applog.appendText("Algo Manager: Domination2b: Individuum " + input[i].ID + " is dominated (by Individuum " + input2[k].ID + ")");
+                                    if (applog.log) applog.appendText("Algo Manager: Domination: Individuum " + input[i].ID + " is dominated (by Individuum " + input2[k].ID + ")");
                                     break;
                                 }
                             }
@@ -296,6 +306,19 @@ namespace IHWB.EVO.MetaEvo
                     }
                 }
             }
+            //Nicht genug true-Individuen überlebten -> input von "false"-Individuen bereinigen ("true"-Individuen vervielfältigen)
+            if (pointer < input.Length - 1)
+            {
+                pointer = 0;
+                for (int i = 0; i < input.Length; i++)
+                {
+                    if (input[i].get_status() == "false")
+                    {
+                        input[i] = input[pointer].Clone_MetaEvo();
+                        pointer++;
+                    }
+                }
+            }
         }
         //Einfache Distanzsumme zwischen zwei Arrays
         private double easydistance(double[] input1, double[] input2)
@@ -384,21 +407,10 @@ namespace IHWB.EVO.MetaEvo
             for (int i = 0; i < algos.algofeedbackarray.Length; i++)
             {
                 log = log + "[" + algos.algofeedbackarray[i].name + "]: Survived: " + algos.algofeedbackarray[i].number_individuals_survived + "/" + algos.algofeedbackarray[i].number_individuals_for_nextGen + " Initiative: " + algos.algofeedbackarray[i].initiative + " -> ";
-                algos.algofeedbackarray[i].number_individuals_for_nextGen = (int)(((double)algos.algofeedbackarray[i].initiative / (double)initiativensumme) * (double)new_generation_input.Length);
+                algos.algofeedbackarray[i].number_individuals_for_nextGen = (int)Math.Round(((double)algos.algofeedbackarray[i].initiative / (double)initiativensumme) * (double)new_generation_input.Length);
                 log = log + algos.algofeedbackarray[i].number_individuals_for_nextGen + " Individuums for next generation\r\n";
             }
             if (applog.log) applog.appendText("Algo Manager: nemGen_composition: Individuuum-Composition for next Generation:\r\n" + log);
-        }
-        //Zeichnen der neuen Individuen
-        public void draw_individuum(ref EVO.Common.Individuum_MetaEvo individuum, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input, int laufnummerModGeneration)
-        {
-            //System.Drawing.Color c = System.Drawing.ColorTranslator.FromHtml("#F5F7F8");
-            //hauptdiagramm_input.ZeichneIndividuum(individuum,1,1,1,laufnummerModGeneration,,true);
-        }
-        //Zeichnen des Genpools
-        public void draw_genpool(ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input)
-        {
-            hauptdiagramm_input.ZeichneSekPopulation(genpool);
         }
     }
 }
