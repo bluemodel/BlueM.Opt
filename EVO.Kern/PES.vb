@@ -1239,7 +1239,7 @@ StartMutation:
 
     'ES_BEST - Einordnen der Qualitätsfunktion im Bestwertspeicher
     '*************************************************************
-    Public Sub EsBest(ByVal ind As Individuum)
+    Public Sub EsBest(ByVal Ind As Individuum)
 
         Dim m, i, j, v As Integer
         Dim h As Double
@@ -1265,9 +1265,9 @@ StartMutation:
                 Best.Qb(j, PES_iAkt.iAktPop, 0) = ind.Penalties(0)
                 For v = 0 To Me.mProblem.NumParams - 1
                     'Die Schrittweite wird ebenfalls übernommen
-                    Best.Db(v, j, PES_iAkt.iAktPop) = AktPara(v).Dn
+                    Best.Db(v, j, PES_iAkt.iAktPop) = Ind.OptParameter(v).Dn
                     'Die eigentlichen Parameterwerte werden übernommen
-                    Best.Xb(v, j, PES_iAkt.iAktPop) = AktPara(v).Xn 'TODO: Hier die OptPara des übergebenen Individuums nehmen? 
+                    Best.Xb(v, j, PES_iAkt.iAktPop) = Ind.OptParameter(v).Xn
                 Next v
             End If
 
@@ -1284,8 +1284,8 @@ StartMutation:
                 .Dominated = False
                 .Front = 0
                 For v = 0 To Me.mProblem.NumParams - 1
-                    .OptParameter(v).Dn = AktPara(v).Dn 'TODO: Hier die OptPara des übergebenen Individuums nehmen? 
-                    .OptParameter(v).Xn = AktPara(v).Xn
+                    .OptParameter(v).Dn = Ind.OptParameter(v).Dn
+                    .OptParameter(v).Xn = Ind.OptParameter(v).Xn
                 Next v
                 .Distance = 0
             End With
