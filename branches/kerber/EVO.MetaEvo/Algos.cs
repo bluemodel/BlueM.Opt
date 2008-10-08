@@ -42,7 +42,7 @@ namespace IHWB.EVO.MetaEvo
             algofeedbackarray[1] = new Algofeedback("Zufällige Rekombination", individuumnumber / algofeedbackarray.Length);
             algofeedbackarray[2] = new Algofeedback("Diversität aus Sortierung", individuumnumber / algofeedbackarray.Length);
             algofeedbackarray[3] = new Algofeedback("Totaler Zufall", individuumnumber / algofeedbackarray.Length);
-            algofeedbackarray[4] = new Algofeedback("Hook and Jeeves", individuumnumber / algofeedbackarray.Length);
+            algofeedbackarray[4] = new Algofeedback("Dominanzvektor", individuumnumber / algofeedbackarray.Length);
         }
 
         public void newGeneration(ref EVO.Common.Individuum_MetaEvo[] genpool_input, ref EVO.Common.Individuum_MetaEvo[] new_generation_input, ref EVO.Common.Individuum_MetaEvo[] wastepool_input)
@@ -198,7 +198,7 @@ namespace IHWB.EVO.MetaEvo
                     }
                     break;
 
-                case "Hook and Jeeves": //Differenzvektor eines dominierten und eines dominanten Individuums auf ein dominantes Individuum addieren
+                case "Dominanzvektor": //Differenzvektor eines dominierten und eines dominanten Individuums auf ein dominantes Individuum addieren
                     if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with '" + algofeedbackarray[algo_id].name + "'...done");
 
                     double[] HaJ;
@@ -214,10 +214,10 @@ namespace IHWB.EVO.MetaEvo
                         //Den Wastepool durchgehen
                         for (int j = pointer; j < wastepool_input.Length; j++)
                         {
-                            //In der ersten Runde hat Wastepool noch keinen Inhalt 
+                            //In der ersten Runde hat Wastepool noch keinen Inhalt; also Standard-Initialisierung 
+                            HaJ = genpool_input[j].get_optparas();
                             if (wastepool_input[j] == null)
                             {
-                                HaJ = genpool_input[j].get_optparas();
                                 break;
                             }
                             else if(wastepool_input[j].get_status_reason() == "dominated")
