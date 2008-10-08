@@ -1885,7 +1885,7 @@ Start_Evolutionsrunden:
                         'Hypervolumen berechnen und Zeichnen
                         '-----------------------------------
                         Call Hypervolume.update_dataset(Common.Individuum.Get_All_Penalty_of_Array(PES1.SekundärQb))
-                        'Call Me.Hauptdiagramm1.ZeichneNadirpunkt(Hypervolume.nadir)
+                        Call Me.Hauptdiagramm1.ZeichneNadirpunkt(Hypervolume.nadir)
                         Call Me.Monitor1.ZeichneHyperVolumen(PES1.PES_iAkt.iAktGen, Math.Abs(Hypervolume.calc_indicator()))
 
                     End If
