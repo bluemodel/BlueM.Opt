@@ -1274,21 +1274,10 @@ StartMutation:
         Else
             'Multi-Objective Pareto
             '----------------------
-            With NDSorting(PES_iAkt.iAktNachf)
-                For i = 0 To Me.mProblem.NumFeatures - 1
-                    .Features(i) = ind.Features(i)
-                Next i
-                For i = 0 To Me.mProblem.NumConstraints - 1
-                    .Constraints(i) = ind.Constraints(i)
-                Next i
-                .Dominated = False
-                .Front = 0
-                For v = 0 To Me.mProblem.NumParams - 1
-                    .OptParameter(v).Dn = Ind.OptParameter(v).Dn
-                    .OptParameter(v).Xn = Ind.OptParameter(v).Xn
-                Next v
-                .Distance = 0
-            End With
+            NDSorting(PES_iAkt.iAktNachf) = Ind             'Quasi ByReferenz!?
+            NDSorting(PES_iAkt.iAktNachf).Distance = 0
+            NDSorting(PES_iAkt.iAktNachf).Dominated = False
+            NDSorting(PES_iAkt.iAktNachf).Front = 0
         End If
 
     End Sub

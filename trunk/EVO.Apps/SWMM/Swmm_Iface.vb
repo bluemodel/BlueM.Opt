@@ -83,7 +83,7 @@ Module swmm5_iface
         '  Purpose: runs the command line version of SWMM 5.
         '------------------------------------------------------------------------------
         Dim pi As PROCESS_INFORMATION
-        Dim si As STARTUPINFO
+        Dim si As New STARTUPINFO
         Dim exitCode As Integer
 
         ' --- Initialize data structures
