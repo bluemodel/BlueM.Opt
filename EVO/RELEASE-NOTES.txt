@@ -1,9 +1,14 @@
 ﻿===============================================================
 EVO.NET Release Notes
 ===============================================================
+Autoren: Christoph Hübner, Felix Fröhlich
 (c) IHWB TU-Darmstadt
 Website: http://130.83.196.154/BlueM/wiki/index.php/EVO.NET
 ===============================================================
+
+Version 1.2.2
+-------------
+* Fehler im PES Kern bedingt durch die freie Evaluierungsreihenfolge des Multithreadings behoben
 
 Version 1.2.1
 -------------
