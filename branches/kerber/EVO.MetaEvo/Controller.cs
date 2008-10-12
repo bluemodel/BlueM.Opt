@@ -73,7 +73,7 @@ namespace IHWB.EVO.MetaEvo
                     }
 
                     //Algomanager starten
-                    algomanager = new Algomanager(ref prob, individuumnumber, ref applog, ref hauptdiagramm1);
+                    algomanager = new Algomanager(ref prob, ref generation, individuumnumber, ref applog, ref hauptdiagramm1);
 
                     //### Hauptprogramm ###
                     start_single_pc();
@@ -91,7 +91,7 @@ namespace IHWB.EVO.MetaEvo
                     }
 
                     //Algomanager starten
-                    algomanager = new Algomanager(ref prob, individuumnumber, ref applog, ref hauptdiagramm1);
+                    algomanager = new Algomanager(ref prob, ref generation, individuumnumber, ref applog, ref hauptdiagramm1);
 
                     //### Hauptprogramm ###
                     networkmanager = new Networkmanager(ref this.generation[0], ref this.settings, ref applog);

@@ -15,12 +15,12 @@ namespace IHWB.EVO.MetaEvo
         Algos algos;
         EVO.Diagramm.Hauptdiagramm hauptdiagramm;
 
-        public Algomanager(ref EVO.Common.Problem prob_input, int individuumnumber_input, ref EVO.Diagramm.ApplicationLog applog_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input) 
+        public Algomanager(ref EVO.Common.Problem prob_input, ref EVO.Common.Individuum_MetaEvo[] genpool_muster, int individuumnumber_input, ref EVO.Diagramm.ApplicationLog applog_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input) 
         {
             hauptdiagramm = hauptdiagramm_input;
             applog = applog_input;
             //Algoobjekt initialisieren (enthält die algorithmus-Methoden und das Feedback zu jedem Algo)
-            algos = new Algos(individuumnumber_input, ref applog);
+            algos = new Algos(ref genpool_muster, individuumnumber_input, ref applog);
         }
 
         public void set_genpool(ref EVO.Common.Individuum_MetaEvo[] genpool_input) 

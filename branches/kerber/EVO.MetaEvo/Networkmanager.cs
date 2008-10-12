@@ -244,11 +244,9 @@ namespace IHWB.EVO.MetaEvo
         //(ok)Neue Individuen in die Speicher-DB einfügen (ID, status, optparas, features, constraints)
         public void Individuums_StoreFinalInDB(ref EVO.Common.Individuum_MetaEvo[] generation_input)
         {
-            //Alte Individuen aus DB löschen
-            this.DB_ClearIndividuumsTable();
 
             //Schreiben der Individuen-Daten in die DB (alle gleichzeitig)
-            string tmptxt = "INSERT INTO `metaevo_individuums` (`id` :";
+            string tmptxt = "INSERT INTO `metaevo_final_individuums` (`id` :";
 
             //Datenmaske
             for (int k = 1; k <= number_optparas; k++)

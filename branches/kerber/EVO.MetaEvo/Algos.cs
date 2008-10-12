@@ -13,11 +13,6 @@ namespace IHWB.EVO.MetaEvo
         public int number_individuals_survived;
         public double initiative;
 
-        //Eigenschaften für den Algo: Hier können Feedbackinfos abgelegt werden
-        int[] feedback_int;
-        string[] feedback_string;
-        double[] feedback_double;
-
         public Algofeedback(string name_input, int number_individuals_for_nextGen_input)
         {
             this.name = name_input;
@@ -29,20 +24,21 @@ namespace IHWB.EVO.MetaEvo
     class Algos
     {
         public Algofeedback[] algofeedbackarray;
-        int individuumnumber;
+        int individuum_id;
         EVO.Diagramm.ApplicationLog applog;
 
-        public Algos(int individuumnumber_input, ref EVO.Diagramm.ApplicationLog applog_input)
+        public Algos(ref EVO.Common.Individuum_MetaEvo[] genpool_muster, int individuum_id_input, ref EVO.Diagramm.ApplicationLog applog_input)
         {
-            individuumnumber = individuumnumber_input;
+            individuum_id = individuum_id_input;
             applog = applog_input;
 
-            algofeedbackarray = new Algofeedback[5];
-            algofeedbackarray[0] = new Algofeedback("Zufällige Einfache Mutation", individuumnumber / algofeedbackarray.Length);
-            algofeedbackarray[1] = new Algofeedback("Zufällige Rekombination", individuumnumber / algofeedbackarray.Length);
-            algofeedbackarray[2] = new Algofeedback("Diversität aus Sortierung", individuumnumber / algofeedbackarray.Length);
-            algofeedbackarray[3] = new Algofeedback("Totaler Zufall", individuumnumber / algofeedbackarray.Length);
-            algofeedbackarray[4] = new Algofeedback("Dominanzvektor", individuumnumber / algofeedbackarray.Length);
+            algofeedbackarray = new Algofeedback[6];
+            algofeedbackarray[0] = new Algofeedback("Zufällige Einfache Mutation", individuum_id / algofeedbackarray.Length);
+            algofeedbackarray[1] = new Algofeedback("Zufällige Rekombination", individuum_id / algofeedbackarray.Length);
+            algofeedbackarray[2] = new Algofeedback("Diversität aus Sortierung", individuum_id / algofeedbackarray.Length);
+            algofeedbackarray[3] = new Algofeedback("Totaler Zufall", individuum_id / algofeedbackarray.Length);
+            algofeedbackarray[4] = new Algofeedback("Dominanzvektor", individuum_id / algofeedbackarray.Length);
+            algofeedbackarray[5] = new Algofeedback("Hook and Jeeves", individuum_id / algofeedbackarray.Length);
         }
 
         public void newGeneration(ref EVO.Common.Individuum_MetaEvo[] genpool_input, ref EVO.Common.Individuum_MetaEvo[] new_generation_input, ref EVO.Common.Individuum_MetaEvo[] wastepool_input)
@@ -81,7 +77,8 @@ namespace IHWB.EVO.MetaEvo
 
             switch (algofeedbackarray[algo_id].name)
             {
-                case "Zufällige Einfache Mutation": //Mutiert an einer zufälligen Stelle innerhalb der Grenzen von Min und Max
+                #region Zufällige Einfache Mutation: Mutiert an einer zufälligen Stelle innerhalb der Grenzen von Min und Max
+                case "Zufällige Einfache Mutation": 
                     if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with '" + algofeedbackarray[algo_id].name + "'...done");
                     
                     double[] mutated_optparas = new double[numberoptparas];
@@ -95,15 +92,17 @@ namespace IHWB.EVO.MetaEvo
                         selecteditem = rand.Next(0, numberoptparas - 1);
                         mutated_optparas[selecteditem] = genpool_input[1].OptParameter[selecteditem].Min + (genpool_input[1].OptParameter[selecteditem].Max - genpool_input[1].OptParameter[selecteditem].Min) * ((double)rand.Next(0, 1000) / (double)1000);
                         //Zurückspeichern
-                        new_generation_input[startindex + i] = new IHWB.EVO.Common.Individuum_MetaEvo("MetaEvo", individuumnumber, numberoptparas);
+                        new_generation_input[startindex + i] = new IHWB.EVO.Common.Individuum_MetaEvo("MetaEvo", individuum_id, numberoptparas);
                         new_generation_input[startindex + i].set_optparas(mutated_optparas);
                         new_generation_input[startindex + i].set_status("raw");
                         new_generation_input[startindex + i].set_generator(algo_id);
-                        individuumnumber++; 
+                        individuum_id++; 
                     }
                     break;
+                #endregion
 
-                case "Zufällige Rekombination": //Die Werte zweier zufälliger Eltern werden zufällig rekombiniert
+                #region Zufällige Rekombination: Die Werte zweier zufälliger Eltern werden zufällig rekombiniert
+                case "Zufällige Rekombination": 
                     if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with '" + algofeedbackarray[algo_id].name + "'...done");
                     
                     double[] recombinated_optparas = new double[numberoptparas];
@@ -119,15 +118,17 @@ namespace IHWB.EVO.MetaEvo
                             if (rand.Next(-10, 10) > 0) recombinated_optparas[j] = recombinated_optparas2[j];
                         }
                         //Zurückspeichern
-                        new_generation_input[startindex + i] = new IHWB.EVO.Common.Individuum_MetaEvo("MetaEvo", individuumnumber, numberoptparas);
+                        new_generation_input[startindex + i] = new IHWB.EVO.Common.Individuum_MetaEvo("MetaEvo", individuum_id, numberoptparas);
                         new_generation_input[startindex + i].set_optparas(recombinated_optparas);
                         new_generation_input[startindex + i].set_status("raw");
                         new_generation_input[startindex + i].set_generator(algo_id);
-                        individuumnumber++;
+                        individuum_id++;
                     }
                     break;
+                #endregion
 
-                case "Diversität aus Sortierung": //Differenzvektorbestimmung und Addierung am Rande der nach zufälligem Kriterium sortierten Generation
+                #region Diversität aus Sortierung: Differenzvektorbestimmung und Addierung am Rande der nach zufälligem Kriterium sortierten Generation
+                case "Diversität aus Sortierung": 
                     if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with '" + algofeedbackarray[algo_id].name + "'...done");
                     
                     double[] diversity_optparas = new double[numberoptparas];
@@ -164,19 +165,20 @@ namespace IHWB.EVO.MetaEvo
                             }
                         }
                         //Zurückspeichern
-                        new_generation_input[startindex + i] = new IHWB.EVO.Common.Individuum_MetaEvo("MetaEvo", individuumnumber, numberoptparas);
+                        new_generation_input[startindex + i] = new IHWB.EVO.Common.Individuum_MetaEvo("MetaEvo", individuum_id, numberoptparas);
                         new_generation_input[startindex + i].set_optparas(diversity_optparas);
                         new_generation_input[startindex + i].set_status("raw");
                         new_generation_input[startindex + i].set_generator(algo_id);
-                        individuumnumber++;
+                        individuum_id++;
                     }
                     break;
+                #endregion
 
-                case "Totaler Zufall": //Alle Optparameter entstehen durch zufällige Wahl
+                #region Totaler Zufall: Alle Optparameter entstehen durch zufällige Wahl
+                case "Totaler Zufall": 
                     if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with '" + algofeedbackarray[algo_id].name + "'...done"); 
                     
                     double[] random;
-                    Random randomizer = new Random();
 
                     //Für jedes Individuum durchgehen
                     for (int k = 0; k < numberindividuums; k++)
@@ -187,35 +189,36 @@ namespace IHWB.EVO.MetaEvo
                         {
                             double max = genpool_input[0].OptParameter[j].Max;
                             double min = genpool_input[0].OptParameter[j].Min;
-                            random[j] = min + (max - min) * ((double)randomizer.Next(0, 1000) / 1000);
+                            random[j] = min + (max - min) * ((double)rand.Next(0, 1000) / 1000);
                         }
                         //Zurückspeichern
-                        new_generation_input[startindex + k] = new IHWB.EVO.Common.Individuum_MetaEvo("MetaEvo", individuumnumber, numberoptparas);
+                        new_generation_input[startindex + k] = new IHWB.EVO.Common.Individuum_MetaEvo("MetaEvo", individuum_id, numberoptparas);
                         new_generation_input[startindex + k].set_optparas(random);
                         new_generation_input[startindex + k].set_status("raw");
                         new_generation_input[startindex + k].set_generator(algo_id);
-                        individuumnumber++;
+                        individuum_id++;
                     }
                     break;
+                #endregion
 
-                case "Dominanzvektor": //Differenzvektor eines dominierten und eines dominanten Individuums auf ein dominantes Individuum addieren
+                #region Dominanzvektor: Differenzvektor eines dominierten und eines dominanten Individuums auf ein dominantes Individuum addieren
+                case "Dominanzvektor": 
                     if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with '" + algofeedbackarray[algo_id].name + "'...done");
 
-                    double[] HaJ;
-                    Random randomizer2 = new Random();
+                    double[] dominanz;
                     int dominator = -1;
                     double multiplikator = 1;
-                    int pointer = 0;  //Um kein Individuum doppelt zu berechnen
+                    int pointer_parent = 0;  //Um kein Individuum doppelt zu berechnen
 
                     //Für jedes Individuum durchgehen
                     for (int k = 0; k < numberindividuums; k++)
                     {
-                        HaJ = new double[numberoptparas];
+                        dominanz = new double[numberoptparas];
                         //Den Wastepool durchgehen
-                        for (int j = pointer; j < wastepool_input.Length; j++)
+                        for (int j = pointer_parent; j < wastepool_input.Length; j++)
                         {
                             //In der ersten Runde hat Wastepool noch keinen Inhalt; also Standard-Initialisierung 
-                            HaJ = genpool_input[j].get_optparas();
+                            dominanz = genpool_input[j].get_optparas();
                             if (wastepool_input[j] == null)
                             {
                                 break;
@@ -231,9 +234,9 @@ namespace IHWB.EVO.MetaEvo
                                         //Den neuen Optparas-Vektor bestimmen
                                         for (int h = 0; h < numberoptparas; h++)
                                         {
-                                            HaJ[h] = genpool_input[i].get_optparas()[h] + (multiplikator * (genpool_input[i].get_optparas()[h] - wastepool_input[j].get_optparas()[h]));
+                                            dominanz[h] = genpool_input[i].get_optparas()[h] + (multiplikator * (genpool_input[i].get_optparas()[h] - wastepool_input[j].get_optparas()[h]));
                                             //Falls die Grenzen überschritten sind
-                                            if ((HaJ[h] > genpool_input[0].OptParameter[h].Max) || (HaJ[h] < genpool_input[0].OptParameter[h].Min))
+                                            if ((dominanz[h] > genpool_input[0].OptParameter[h].Max) || (dominanz[h] < genpool_input[0].OptParameter[h].Min))
                                             {
                                                 multiplikator *= 0.5;
                                                 h--;
@@ -246,23 +249,227 @@ namespace IHWB.EVO.MetaEvo
                                         break;
                                     }
                                 }
-                                pointer++;
+                                pointer_parent++;
                                 //Neue HaJ-Optparas wurden generiert und können gespeichert werden
-                                if (HaJ != genpool_input[j].get_optparas()) break;
+                                if (dominanz != genpool_input[j].get_optparas()) break;
                             }
                         }
                         //Zurückspeichern
-                        new_generation_input[startindex + k] = new IHWB.EVO.Common.Individuum_MetaEvo("MetaEvo", individuumnumber, numberoptparas);
-                        new_generation_input[startindex + k].set_optparas(HaJ);
+                        new_generation_input[startindex + k] = new IHWB.EVO.Common.Individuum_MetaEvo("MetaEvo", individuum_id, numberoptparas);
+                        new_generation_input[startindex + k].set_optparas(dominanz);
                         new_generation_input[startindex + k].set_status("raw");
                         new_generation_input[startindex + k].set_generator(algo_id);
-                        individuumnumber++;
+                        individuum_id++;
                     }
                     break;
+                #endregion
 
+                #region Hook and Jeeves: Optparameter werden nacheinander variiert und zwei neue Individuen erzeugt
+                case "Hook and Jeeves": 
+                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with '" + algofeedbackarray[algo_id].name + "'...done");
+                    //Statusparameter im Feedbackarray:
+                    //Doublearray: Pro Individuum: [Optparameter][Schrittweite, Schrittweitenteilungen in Parent und Child, Anzahl Kinder in parent]
+
+                    double[] haj = new double[numberoptparas];
+                    double[] haj2 = new double[numberoptparas];
+                    bool construct_new = true;
+                    pointer_parent = 0;
+                    int pointer2 = 0;
+                    int pointer_optpara = 0;
+
+                    //Falls Individuen erzeugt werden sollen
+                    if (numberindividuums > 0)
+                    {
+                        //Genpool durchsuchen
+                        while ((numberindividuums > 0) && (pointer_parent < genpool_input.Length))
+                        {
+                            //Suchen ob ein Individuum aus einem Hook and Jeeves Prozess überlebt hat
+                            if (genpool_input[pointer_parent].get_generator() == 5)
+                            {
+                                //Suchen ob von diesem Parent nur eine einzige Individuum-Variante erzeugt wurde  
+                                for (int i = 0; i < numberoptparas; i++) 
+                                {
+                                    if (genpool_input[pointer_parent].feedbackdata[i,2] == 1) 
+                                    {
+                                        //im parent vermerken
+                                        genpool_input[pointer_parent].feedbackdata[i, 2] = 2;
+
+                                        haj = genpool_input[pointer_parent].get_optparas();
+                                        haj[i] += genpool_input[pointer_parent].feedbackdata[i, 0];
+                                        if (haj[i] > genpool_input[pointer_parent].OptParameter[i].Max) haj[i] = genpool_input[pointer_parent].OptParameter[i].Max;
+
+                                        //Zurückspeichern
+                                        new_generation_input[startindex + numberindividuums] = genpool_input[pointer_parent].Clone_MetaEvo();
+                                        new_generation_input[startindex + numberindividuums].ID = individuum_id;
+                                        new_generation_input[startindex + numberindividuums].set_optparas(haj);
+                                        new_generation_input[startindex + numberindividuums].set_status("raw");
+                                        new_generation_input[startindex + numberindividuums].set_generator(algo_id);
+                                        //Feedbackdaten setzen
+                                        new_generation_input[startindex + numberindividuums].feedbackdata[i, 0] = genpool_input[pointer_parent].feedbackdata[i, 0]/2;
+                                        new_generation_input[startindex + numberindividuums].feedbackdata[i, 1] = genpool_input[pointer_parent].feedbackdata[i, 1] + 1;
+                                        new_generation_input[startindex + numberindividuums].feedbackdata[i, 2] = 0;
+
+                                        individuum_id++;
+                                        numberindividuums--;
+                                        construct_new = false;
+                                        break;
+                                    }
+                                }
+
+                                //Sonst neue Individuen mit neuen Feedbackdaten erstellen
+                                if (construct_new) 
+                                {
+                                    //Schrittweitenteilung durchgehen (wie oft ein Optparameter schon als Individuums-Basis verändert wurde) niedrigsten mit pointer2 ausstatten
+                                    for (int i = 1; i < numberoptparas; i++)
+                                    {
+                                        if (genpool_input[pointer_parent].feedbackdata[i, 1] < genpool_input[pointer_parent].feedbackdata[pointer2, 1]) pointer2 = i;
+                                    }
+				                    //Zufälligen der am wenigsten benutzten Optparameter auswählen
+                                    while (genpool_input[pointer_parent].feedbackdata[pointer_optpara, 1] > genpool_input[pointer_parent].feedbackdata[pointer2, 1]) {
+                                        pointer_optpara = rand.Next(0, numberoptparas - 1); //pointer_optpara zeigt auf random Optpara
+                                    }
+                    				
+				                    //Individuum erstellen
+                                    genpool_input[pointer_parent].feedbackdata[pointer_optpara, 2] = 1;
+
+                                    haj = genpool_input[pointer_parent].get_optparas();
+                                    haj[pointer_optpara] -= genpool_input[pointer_parent].feedbackdata[pointer_optpara, 0];
+                                    if (haj[pointer_optpara] < genpool_input[pointer_parent].OptParameter[pointer_optpara].Min) haj[pointer_optpara] = genpool_input[pointer_parent].OptParameter[pointer_optpara].Min;
+
+                                    //Zurückspeichern
+                                    new_generation_input[startindex + numberindividuums] = genpool_input[pointer_parent].Clone_MetaEvo();
+                                    new_generation_input[startindex + numberindividuums].ID = individuum_id;
+                                    new_generation_input[startindex + numberindividuums].set_optparas(haj);
+                                    new_generation_input[startindex + numberindividuums].set_status("raw");
+                                    new_generation_input[startindex + numberindividuums].set_generator(algo_id);
+                                    //Feedbackdaten setzen
+                                    new_generation_input[startindex + numberindividuums].feedbackdata[pointer_optpara, 0] = genpool_input[pointer_parent].feedbackdata[pointer_optpara, 0] / 2;
+                                    new_generation_input[startindex + numberindividuums].feedbackdata[pointer_optpara, 1] = genpool_input[pointer_parent].feedbackdata[pointer_optpara, 1] + 1;
+                                    new_generation_input[startindex + numberindividuums].feedbackdata[pointer_optpara, 2] = 0;
+
+                                    individuum_id++;
+                                    numberindividuums--;
+
+                                    //Falls erlaubt, zweites Individuen erstellen 
+                                    if (numberindividuums > 0)
+                                    {
+                                        genpool_input[pointer_parent].feedbackdata[pointer_optpara, 2] = 2;
+                                        haj2 = genpool_input[pointer_parent].get_optparas();
+                                        haj2[pointer_optpara] += genpool_input[pointer_parent].feedbackdata[pointer_optpara, 0];
+                                        if (haj2[pointer_optpara] > genpool_input[pointer_parent].OptParameter[pointer_optpara].Max) haj[pointer_optpara] = genpool_input[pointer_parent].OptParameter[pointer_optpara].Max;
+
+                                        //Zurückspeichern
+                                        new_generation_input[startindex + numberindividuums] = genpool_input[pointer_parent].Clone_MetaEvo();
+                                        new_generation_input[startindex + numberindividuums].ID = individuum_id;
+                                        new_generation_input[startindex + numberindividuums].set_optparas(haj);
+                                        new_generation_input[startindex + numberindividuums].set_status("raw");
+                                        new_generation_input[startindex + numberindividuums].set_generator(algo_id);
+                                        //Feedbackdaten setzen
+                                        new_generation_input[startindex + numberindividuums].feedbackdata[pointer_optpara, 0] = genpool_input[pointer_parent].feedbackdata[pointer_optpara, 0] / 2;
+                                        new_generation_input[startindex + numberindividuums].feedbackdata[pointer_optpara, 1] = genpool_input[pointer_parent].feedbackdata[pointer_optpara, 1] + 1;
+                                        new_generation_input[startindex + numberindividuums].feedbackdata[pointer_optpara, 2] = 0;
+
+                                        individuum_id++;
+                                        numberindividuums--;
+                                    }   
+                                }
+                                construct_new = true;
+                            }
+                            pointer_parent++;
+                        }
+
+                        //Falls noch Individuen erzeugt werden dürfen (neuen Hook and Jeeves Prozess starten)
+                        while (numberindividuums > 0)
+                        {
+                            //Zufälliges Individuum als Startpunkt wählen
+                            pointer_parent = rand.Next(0, genpool_input.Length - 1);
+                            while (genpool_input[pointer_parent].get_generator() == 5)
+                            {
+                                pointer_parent = rand.Next(0, genpool_input.Length - 1);
+                            }
+                            haj = genpool_input[pointer_parent].get_optparas();
+
+                            //Parent-Individuum modifizieren
+                            genpool_input[pointer_parent].feedbackdata = new double[numberoptparas, 3];
+                            genpool_input[pointer_parent].feedbackdata[pointer_optpara, 1] = 0;
+                            genpool_input[pointer_parent].feedbackdata[pointer_optpara, 2] = 0;
+
+                            //Parameter bestimmen
+                            //Schrittweiten berechnen und speichern (extremste Optparameter des Genpools suchen)
+                            //haj als Zwischenspeicher nutzen
+                            /*for (int i = 0; i < numberoptparas; i++)
+                            {
+                                haj[i] = genpool_input[0].get_optparas()[i];
+                                haj2[i] = genpool_input[0].get_optparas()[i];
+                            }*/
+                            haj = genpool_input[0].get_optparas();
+                            haj2 = genpool_input[0].get_optparas();
+                            for (int i = 1; i < genpool_input.Length; i++)
+                            {
+                                for (int j = 0; j < numberoptparas; j++)
+                                {
+                                    if (genpool_input[i].get_optparas()[j] < haj[j]) haj[j] = genpool_input[i].get_optparas()[j];
+                                    if (genpool_input[i].get_optparas()[j] > haj2[j]) haj2[j] = genpool_input[i].get_optparas()[j];
+                                }
+                            }
+                            for (int i = 0; i < numberoptparas; i++)
+                            {
+                                genpool_input[pointer_parent].feedbackdata[i, 0] = (haj2[i] - haj[i]) / 2;
+                            }
+
+                            //Optparameter zufällig wählen
+                            pointer_optpara = rand.Next(0, numberoptparas - 1);
+
+                            //Optparas erstellen
+                            haj = genpool_input[pointer_parent].get_optparas();
+                            haj[pointer_optpara] -= genpool_input[pointer_parent].feedbackdata[pointer_optpara, 0];
+                            if (haj[pointer_optpara] < genpool_input[pointer_parent].OptParameter[pointer_optpara].Min) haj[pointer_optpara] = genpool_input[pointer_parent].OptParameter[pointer_optpara].Min;
+                            
+                            //Individuum erstellen
+                            genpool_input[pointer_parent].feedbackdata[pointer_optpara, 2] = 1;
+                            //Zurückspeichern
+                            new_generation_input[startindex + numberindividuums] = new IHWB.EVO.Common.Individuum_MetaEvo("MetaEvo", individuum_id, numberoptparas);
+                            new_generation_input[startindex + numberindividuums].set_status("raw");
+                            new_generation_input[startindex + numberindividuums].set_optparas(haj);
+                            new_generation_input[startindex + numberindividuums].set_generator(algo_id);
+                            new_generation_input[startindex + numberindividuums].feedbackdata = new double[numberoptparas, 3];
+                            new_generation_input[startindex + numberindividuums].feedbackdata[pointer_optpara, 0] = genpool_input[pointer_parent].feedbackdata[pointer_optpara, 0] / 2;
+                            new_generation_input[startindex + numberindividuums].feedbackdata[pointer_optpara, 1] = genpool_input[pointer_parent].feedbackdata[pointer_optpara, 1] + 1;
+                            new_generation_input[startindex + numberindividuums].feedbackdata[pointer_optpara, 2] = 0;
+
+                            individuum_id++;
+                            numberindividuums--;
+
+                            //Falls erlaubt, zweites Individuen erstellen 
+                            if (numberindividuums > 0) 
+                            {
+                                haj2 = genpool_input[pointer_parent].get_optparas();
+                                haj2[pointer_optpara] += genpool_input[pointer_parent].feedbackdata[pointer_optpara, 0];
+                                if (haj[pointer_optpara] > genpool_input[pointer_parent].OptParameter[pointer_optpara].Max) haj2[pointer_optpara] = genpool_input[pointer_parent].OptParameter[pointer_optpara].Max;
+                                genpool_input[pointer_parent].feedbackdata[pointer_optpara, 2] = 2;
+                                //Zurückspeichern
+                                new_generation_input[startindex + numberindividuums] = new IHWB.EVO.Common.Individuum_MetaEvo("MetaEvo", individuum_id, numberoptparas);
+                                new_generation_input[startindex + numberindividuums].set_status("raw");
+                                new_generation_input[startindex + numberindividuums].set_optparas(haj2);
+                                new_generation_input[startindex + numberindividuums].set_generator(algo_id);
+                                new_generation_input[startindex + numberindividuums].feedbackdata = new double[numberoptparas,3];
+                                new_generation_input[startindex + numberindividuums].feedbackdata[pointer_optpara, 0] = genpool_input[pointer_parent].feedbackdata[pointer_optpara, 0] / 2;
+                                new_generation_input[startindex + numberindividuums].feedbackdata[pointer_optpara, 1] = genpool_input[pointer_parent].feedbackdata[pointer_optpara, 1] + 1;
+                                new_generation_input[startindex + numberindividuums].feedbackdata[pointer_optpara, 2] = 0;
+
+                                individuum_id++;
+                                numberindividuums--;
+                            }
+                        }
+                    }
+                    break;
+                #endregion
+
+                #region default: Error Message anzeigen
                 default:
                     MessageBox.Show("Algomanager", "Algorithmus " + algofeedbackarray[algo_id].name + " ist nicht bekannt!");
                     break;
+                #endregion
             }
         }
     }

@@ -8,6 +8,7 @@
     Private statusreason As String          '{false: dominated, crowding}
     Private statusopponent As Integer        'Individuen-ID durch den dieses Individuum gelöscht wurde
     Private mOptparameter() As OptParameter
+    Public feedbackdata(,) As Double        'Spezifischer Feedback für einen Algorithmus
 
     '### Initialisierung
     Public Sub New(ByVal type As String, ByVal id As Integer, ByVal numberOptparas_input As Integer)
@@ -66,6 +67,8 @@
         For i = 0 To mConstraints.Length - 1
             Dest.mConstraints = Me.mConstraints
         Next
+
+        Dest.feedbackdata = Me.feedbackdata
 
         Return Dest
     End Function
