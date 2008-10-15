@@ -12,7 +12,7 @@ namespace IHWB.EVO.MetaEvo
         EVO.Common.Individuum_MetaEvo[] genpool;
         EVO.Common.Individuum_MetaEvo[] wastepool;
         EVO.Diagramm.ApplicationLog applog;
-        Algos algos;
+        public Algos algos;
         EVO.Diagramm.Hauptdiagramm hauptdiagramm;
 
         public Algomanager(ref EVO.Common.Problem prob_input, ref EVO.Common.Individuum_MetaEvo[] genpool_muster, int individuumnumber_input, ref EVO.Diagramm.ApplicationLog applog_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input) 
@@ -206,23 +206,22 @@ namespace IHWB.EVO.MetaEvo
         //Individuen die einen zu geringen Abstand der Penalties besitzen, löschen
         private void clustering_kill(ref EVO.Common.Individuum_MetaEvo[] input, ref EVO.Common.Individuum_MetaEvo[] input2)
         {
-            int maxindividuums = genpool.Length;
+            int killindividuums = -genpool.Length;
             double distance;
 
             for (int i = 0; i < genpool.Length; i++)
             {
-                if (input[i].get_status() == "true") maxindividuums--;
-                if (input2[i].get_status() == "true") maxindividuums--;
+                if (input[i].get_status() == "true") killindividuums++;
+                if (input2[i].get_status() == "true") killindividuums++;
             }
             // zu viele Individuen vorhanden  (Wenn die Individuenanzahl der definierten Generationsgrösse entspricht, abbrechen)
-            if (maxindividuums < 0)
+            if (killindividuums > 0)
             {
-                maxindividuums *= -1;
-                double[,] individuums2kill = new double[maxindividuums, 2];
+                double[] distances = new double[input.Length + killindividuums];
                 int pointer = 0;
 
-                //Arbeits-Array erstellen
-                EVO.Common.Individuum_MetaEvo[] work = new IHWB.EVO.Common.Individuum_MetaEvo[input.Length + maxindividuums];
+                //Arbeits-Array erstellen (genau so gross dass alle "true"-Individuen Platz finden)
+                EVO.Common.Individuum_MetaEvo[] work = new IHWB.EVO.Common.Individuum_MetaEvo[input.Length + killindividuums];
                 for (int i = 0; i < input.Length; i++)
                 {
                     if (input[i].get_status() == "true")
@@ -237,90 +236,82 @@ namespace IHWB.EVO.MetaEvo
                     }
                 }
 
-                //Geringste Abstände finden
+                //Abstände finden (Achtung: letztes Individuum in der Liste wird nie gelöscht!)
                 for (int i = 0; i < work.Length - 1; i++)
                 {
                     //mit
                     for (int k = i + 1; k < work.Length; k++)
                     {
                         distance = easydistance(work[i].Penalties, work[k].Penalties);
-                        //Falls nur ein idnividuum entfernt werden muss
-                        if ((individuums2kill.Length == 2) && (distance < individuums2kill[0, 1]))
-                        {
-                            individuums2kill[0, 0] = i;
-                            individuums2kill[0, 1] = distance;
-                        }
-                        //Für mehrere Individuen
-                        else
-                        {
-                            for (int j = individuums2kill.Length/2 - 1; j > 0; j--)
-                            {
-                                if (distance < individuums2kill[j, 1])
-                                {
-                                    individuums2kill[j, 0] = individuums2kill[j - 1, 0];
-                                    individuums2kill[j, 1] = individuums2kill[j - 1, 1];
-                                    individuums2kill[j - 1, 0] = i;
-                                    individuums2kill[j - 1, 1] = distance;
-                                }
-                                else break;
-                            }
-                        }
+                        if ((distances[i] > distance) || (distances[i] == 0)) distances[i] = distance;
                     }
                 }
-                //Zu nahe Individuen killen
-                for (int i = 0; i < individuums2kill.Length/2; i++)
+
+                //Individuen mit den geringsten Abständen entfernen
+                while (killindividuums > 0)
                 {
-                    work[(int)individuums2kill[i, 0]].set_status("false#crowding#0");
-                    if (applog.log) applog.appendText("Algo Manager: Clustering: Individuum " + work[(int)individuums2kill[i, 0]].ID + " is not used anymore");
+                    int pointer_lowest_distance = 0;
+                    for (int i = 1; i < distances.Length; i++)
+                    {
+                        if (distances[i] != 0)
+                        {
+                            if (distances[pointer_lowest_distance] == 0) distance = distances[i];
+                            else if (distances[i] < distances[pointer_lowest_distance]) pointer_lowest_distance = i;
+                        }   
+                    }
+                    distances[pointer_lowest_distance] = 0;
+                    if (applog.log) applog.appendText("Algo Manager: Clustering: Individuum " + work[pointer_lowest_distance].ID + " is not used anymore");
+                    work[pointer_lowest_distance].set_status("false#crowding#0");
+
+                    killindividuums--;
                 }
-                //Zur überprüfung ob genug Individuen reduziert wurden
-                clustering_kill(ref input, ref input2);
             }  
         }
         //Kopieren der Verbleibenden Individuen auf die Generation input
         private void zip(ref EVO.Common.Individuum_MetaEvo[] input, ref EVO.Common.Individuum_MetaEvo[] input2)
         {
-            int pointer = 0;
+            int pointer_true = 0;
+            int pointer_false = 0;
             EVO.Common.Individuum_MetaEvo tmp;
 
-            for (int i = 0; i < 2 * input.Length; i++)
+            //input: True-Individuen ; input2: False-Individuen
+            while (pointer_true < input.Length)
             {
-                if (i >= input.Length)
+                if (input[pointer_true].get_status() == "false") 
                 {
-                    if (input2[i - input.Length].get_status() == "true")
+                    while (pointer_false < input2.Length)
                     {
-                        tmp = input2[i - input.Length];
-                        input2[i - input.Length] = input[pointer];
-                        input[pointer] = tmp;
-                        pointer++;
+                        if (input2[pointer_false].get_status() == "true")
+                        {
+                            tmp = input[pointer_true];
+                            input[pointer_true] = input2[pointer_false];
+                            input[pointer_false] = tmp;
+                            pointer_true++;
+                            pointer_false++;
+                            break;
+                        }
+                        pointer_false++;
                     }
+                    if (pointer_false == input2.Length) break;
                 }
-                else
-                {
-                    if (input[i].get_status() == "true")
-                    {
-                        tmp = input[i];
-                        input[i] = input[pointer];
-                        input[pointer] = tmp;
-                        pointer++;
-                    }
-                }
+                pointer_true++;
             }
+            
             //Nicht genug true-Individuen überlebten -> input von "false"-Individuen bereinigen ("true"-Individuen vervielfältigen)
-            if (pointer < input.Length - 1)
+            if (pointer_true < input.Length)
             {
-                pointer = 0;
+                pointer_true = 0;
                 for (int i = 0; i < input.Length; i++)
                 {
                     if (input[i].get_status() == "false")
                     {
-                        input[i] = input[pointer].Clone_MetaEvo();
-                        pointer++;
+                        input[i] = input[pointer_true].Clone_MetaEvo();
+                        pointer_true++;
                     }
                 }
             }
         }
-        //Einfache Distanzsumme zwischen zwei Arrays
+        //Einfache Distanzsumme zwischen zwei Arrays; falls Abstand = 0, return -1
         private double easydistance(double[] input1, double[] input2)
         {
             double back = 0;
@@ -329,6 +320,7 @@ namespace IHWB.EVO.MetaEvo
             {
                 back += (input1[i] - input2[i]) * (input1[i] - input2[i]);
             }
+            if (back == 0) return -1;
             return System.Math.Sqrt(back);
         }
         //String mit Auszug der generation

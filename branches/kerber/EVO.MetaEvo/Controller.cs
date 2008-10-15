@@ -193,7 +193,7 @@ namespace IHWB.EVO.MetaEvo
                                 tmp = tmp + generation[i].get_optparas()[j] + " / ";
                             }
                             tmp = tmp.TrimEnd(' ','/') + ")";
-                            applog.appendText("Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   Optparas: " + tmp);
+                            applog.appendText("Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   "+algomanager.algos.algofeedbackarray[generation[i].get_generator()].name +": Optparas: " + tmp);
                         }
 
                         //Simulieren und zeichnen
