@@ -38,9 +38,12 @@ Public Class Smusi
         Get
             Dim exts As Collections.Specialized.StringCollection = New Collections.Specialized.StringCollection()
 
-            exts.AddRange(New String() {"ALL"})
+            exts.AddRange(New String() {"ALL", "AUS", "BEK", "BKL", "BOF", "BWN", "DRO", _
+                                        "EIN", "FKA", "JGG", "KLA", "RKL", "RUE", "SAM", _
+                                        "SMZ", "SOP", "SYS", "TGG", "VER", "WIN", "WMB", _
+                                        "XYZ"})
 
-            'TODO: Dateiendungen für SMUSI-Datensatz
+            'TODO: Dateiendungen für SMUSI-Datensatz auf Komplettheit prüfen
 
             Return exts
 
@@ -114,7 +117,7 @@ Public Class Smusi
         Dim SimCurrent, SimStart, SimEnde As DateTime
         Dim EXE_DLL As Boolean 'true = EXE, false = DLL
 
-        EXE_DLL = True
+        EXE_DLL = False
 
         If EXE_DLL Then
             Dim exe_path As String
@@ -154,7 +157,7 @@ Public Class Smusi
             'SMUSI DLL instanzieren
             '----------------------
             Dim dll_path As String
-            dll_path = System.Windows.Forms.Application.StartupPath() & "\SMUSI.dll"
+            dll_path = System.Windows.Forms.Application.StartupPath() & "\SMUSI\SMUSI.dll"
 
             smusi_dll = Nothing
 
@@ -222,18 +225,18 @@ Public Class Smusi
 
     End Function
 
+	'TODO: SMUSI Thread-Funktionen
+	'#############################
     Public Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
-
         Return Me.launchSim()
-
     End Function
 
     Public Overrides Function launchFree(ByRef Thread_ID As Integer) As Boolean
-
+        Return True
     End Function
 
     Public Overrides Function launchReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
-
+        Return True
     End Function
 
     'Simulationsergebnis verarbeiten
