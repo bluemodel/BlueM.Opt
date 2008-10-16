@@ -126,6 +126,9 @@
     <None Include="SMUSI\IHWB.SMUSI.DllAdapter.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="SMUSI\smusi.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="SWMM\SWMM5.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
