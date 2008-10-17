@@ -596,35 +596,14 @@ Handler:
     Protected Function CalculateFeature_Reihe(ByVal feature As Common.Featurefunction, ByVal SimReihe As Wave.Zeitreihe) As Double
 
         Dim QWert As Double
-        Dim i, j As Integer
-        Dim ZeitschritteBisStart As Integer
-        Dim ZeitschritteEval As Integer
-        Dim Versatz As Integer
+        Dim i As Integer
 
-        'Bestimmen der Zeitschritte bis Start des Evaluierungszeitraums
-        ZeitschritteBisStart = (feature.EvalStart - feature.RefReihe.XWerte(0)).TotalMinutes / Me.SimDT.TotalMinutes
-        'Bestimmen der Zeitschritte des Evaluierungszeitraums
-        ZeitschritteEval = (feature.EvalEnde - feature.EvalStart).TotalMinutes / Me.SimDT.TotalMinutes
+        'Simulationszeitreihe auf Evaluierungszeitraum zuschneiden
+        Call SimReihe.Cut(feature.EvalStart, feature.EvalEnde)
 
-        'Überprüfen ob simulierte Zeitreihe evtl. anderen Startzeitpunkt 
-        'als Simulations Startzeitpunkt hat (kann bei SMUSI vorkommen!)
-        '
-        'Falls ein Versatz der beiden Zeitreihen vorliegt wird j
-        'zum entsprechenden Verschieben der Laufvariable i benutzt
-        '---------------------------------------------------------------
-        'Fallunterscheidung je nach Zeitschrittweite
-        If (Me.SimDT.TotalMinutes >= 1440) Then
-            'Bei dt >= 1d ist Versatz unerheblich
-            j = 0
-        Else
-            Versatz = (SimReihe.XWerte(0) - feature.RefReihe.XWerte(0)).TotalMinutes / Me.SimDT.TotalMinutes
-            If Versatz < 0 Then
-                j = -1 * Versatz
-            ElseIf Versatz = 0 Then
-                j = 0
-            Else
-                j = Versatz
-            End If
+        'BUG 218: Kontrolle
+        If (feature.RefReihe.Length <> SimReihe.Length) Then
+            Throw New Exception("Ziel '" & feature.Bezeichnung & "': Simulations- und Referenzzeitreihe sind nicht kompatibel! (Länge/Zeitschritt?) Siehe Bug 218")
         End If
 
         'Fallunterscheidung Zielfunktion
@@ -634,15 +613,17 @@ Handler:
             Case "AbQuad"
                 'Summe der Fehlerquadrate
                 '------------------------
-                For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    QWert += (feature.RefReihe.YWerte(i) - SimReihe.YWerte(i + j)) * (feature.RefReihe.YWerte(i) - SimReihe.YWerte(i + j))
+                QWert = 0
+                For i = 0 To SimReihe.Length - 1
+                    QWert += (feature.RefReihe.YWerte(i) - SimReihe.YWerte(i)) * (feature.RefReihe.YWerte(i) - SimReihe.YWerte(i))
                 Next
 
             Case "Diff"
                 'Summe der Fehler
                 '----------------
-                For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    QWert += Math.Abs(feature.RefReihe.YWerte(i) - SimReihe.YWerte(i + j))
+                QWert = 0
+                For i = 0 To SimReihe.Length - 1
+                    QWert += Math.Abs(feature.RefReihe.YWerte(i) - SimReihe.YWerte(i))
                 Next
 
             Case "Volf"
@@ -650,11 +631,11 @@ Handler:
                 '-------------
                 Dim VolSim As Double = 0
                 Dim VolZiel As Double = 0
-                For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    VolSim += SimReihe.YWerte(i + j)
+                For i = 0 To SimReihe.Length - 1
+                    VolSim += SimReihe.YWerte(i)
                     VolZiel += feature.RefReihe.YWerte(i)
                 Next
-                'Umrechnen in echtes Volumen
+                'HACK: Umrechnen in echtes Volumen (Annahme: Einheit = m3/s)
                 VolSim *= Me.SimDT.TotalSeconds
                 VolZiel *= Me.SimDT.TotalSeconds
                 'Differenz bilden
@@ -664,20 +645,20 @@ Handler:
                 'Relative Anzahl der Zeitschritte mit Unterschreitungen (in Prozent)
                 '-------------------------------------------------------------------
                 Dim nUnter As Integer = 0
-                For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    If (SimReihe.YWerte(i + j) < feature.RefReihe.YWerte(i)) Then
+                For i = 0 To SimReihe.Length - 1
+                    If (SimReihe.YWerte(i) < feature.RefReihe.YWerte(i)) Then
                         nUnter += 1
                     End If
                 Next
-                QWert = nUnter / ZeitschritteEval * 100
+                QWert = nUnter / SimReihe.Length * 100
 
             Case "sUnter"
                 'Summe der Unterschreitungen
                 '---------------------------
                 Dim sUnter As Double = 0
-                For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    If (SimReihe.YWerte(i + j) < feature.RefReihe.YWerte(i)) Then
-                        sUnter += feature.RefReihe.YWerte(i) - SimReihe.YWerte(i + j)
+                For i = 0 To SimReihe.Length - 1
+                    If (SimReihe.YWerte(i) < feature.RefReihe.YWerte(i)) Then
+                        sUnter += feature.RefReihe.YWerte(i) - SimReihe.YWerte(i)
                     End If
                 Next
                 QWert = sUnter
@@ -686,20 +667,20 @@ Handler:
                 'Relative Anzahl der Zeitschritte mit Überschreitungen (in Prozent)
                 '------------------------------------------------------------------
                 Dim nUeber As Integer = 0
-                For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    If (SimReihe.YWerte(i + j) > feature.RefReihe.YWerte(i)) Then
+                For i = 0 To SimReihe.Length - 1
+                    If (SimReihe.YWerte(i) > feature.RefReihe.YWerte(i)) Then
                         nUeber += 1
                     End If
                 Next
-                QWert = nUeber / ZeitschritteEval * 100
+                QWert = nUeber / SimReihe.Length * 100
 
             Case "sÜber"
                 'Summe der Überschreitungen
                 '--------------------------
                 Dim sUeber As Double = 0
-                For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    If (SimReihe.YWerte(i + j) > feature.RefReihe.YWerte(i)) Then
-                        sUeber += SimReihe.YWerte(i + j) - feature.RefReihe.YWerte(i)
+                For i = 0 To SimReihe.Length - 1
+                    If (SimReihe.YWerte(i) > feature.RefReihe.YWerte(i)) Then
+                        sUeber += SimReihe.YWerte(i) - feature.RefReihe.YWerte(i)
                     End If
                 Next
                 QWert = sUeber
@@ -709,12 +690,12 @@ Handler:
                 '--------------
                 'Mittelwert bilden
                 Dim Qobs_quer, zaehler, nenner As Double
-                For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
+                For i = 0 To SimReihe.Length - 1
                     Qobs_quer += feature.RefReihe.YWerte(i)
                 Next
-                Qobs_quer = Qobs_quer / (ZeitschritteEval)
-                For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    zaehler += (feature.RefReihe.YWerte(i) - SimReihe.YWerte(i + j)) * (feature.RefReihe.YWerte(i) - SimReihe.YWerte(i + j))
+                Qobs_quer = Qobs_quer / (SimReihe.Length)
+                For i = 0 To SimReihe.Length - 1
+                    zaehler += (feature.RefReihe.YWerte(i) - SimReihe.YWerte(i)) * (feature.RefReihe.YWerte(i) - SimReihe.YWerte(i))
                     nenner += (feature.RefReihe.YWerte(i) - Qobs_quer) * (feature.RefReihe.YWerte(i) - Qobs_quer)
                 Next
                 'abgeänderte Nash-Sutcliffe Formel: 0 als Zielwert (1- weggelassen)
