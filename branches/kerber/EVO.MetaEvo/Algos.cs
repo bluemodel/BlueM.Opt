@@ -42,7 +42,7 @@ namespace IHWB.EVO.MetaEvo
 
             for (int i = 0; i < tmp.Length; i++)
             {
-                algofeedbackarray[i] = new Algofeedback(tmp[i], individuum_id / algofeedbackarray.Length);
+                algofeedbackarray[i] = new Algofeedback(tmp[i].Trim(), individuum_id / algofeedbackarray.Length);
             }
         }
 
@@ -593,7 +593,7 @@ namespace IHWB.EVO.MetaEvo
 
                 #region default: Error Message anzeigen
                 default:
-                    MessageBox.Show("Algomanager", "Algorithmus " + algofeedbackarray[algo_id].name + " ist nicht bekannt!");
+                    MessageBox.Show("Algorithmus '" + algofeedbackarray[algo_id].name + "' ist nicht bekannt!","Algomanager");
                     break;
                 #endregion
             }

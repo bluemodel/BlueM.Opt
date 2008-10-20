@@ -171,11 +171,12 @@ namespace IHWB.EVO.MetaEvo
 
                     //Genpool speichern und zeichnen
                     algomanager.set_genpool(ref generation);
+                    generation = new EVO.Common.Individuum_MetaEvo[3*this.settings.MetaEvo.PopulationSize];
 
-                    mePC.status = "perform";
+                    mePC.status = "perform_global_or_hybrid";
                 }
 
-                else if (mePC.status == "perform")
+                else if (mePC.status == "perform_global_or_hybrid")
                 {
                     //Neue Generation bauen
                     if (applog.log) applog.appendText("Controller: ### Building new Individuums for Generation " + generationcounter + " ###");
@@ -201,7 +202,7 @@ namespace IHWB.EVO.MetaEvo
                         if (modell == "sim")
                         {
                             sim.Evaluate_MetaEvo(ref generation[i]);
-                            hauptdiagramm1.ZeichneIndividuum(generation[i], 1, 1, 1, generation[i].ID % generation.Length, System.Drawing.Color.Orange, false);
+                            hauptdiagramm1.ZeichneIndividuum(generation[i], 1, 1, 1, generation[i].ID % generation.Length, System.Drawing.Color.Yellow, true);
                             System.Windows.Forms.Application.DoEvents();
                         }  
                     }
@@ -209,7 +210,8 @@ namespace IHWB.EVO.MetaEvo
                     //Neue Individuen mit Genpool verrechnen und Genpool zeichnen
                     algomanager.new_individuals_merge_with_genpool(ref generation);
 
-                    generationcounter++;
+                    if (algomanager.calculationmode == "local") mePC.status = "perform_local";
+                    else generationcounter++;
                 }
             }
             if (applog.log) applog.appendText("Controller: Calculation Finished");
@@ -238,6 +240,7 @@ namespace IHWB.EVO.MetaEvo
                     {
                         algomanager.set_genpool(ref generation);
                         meServer.set_AlsoInDB("generate Individuums", -1, -1);
+                        generation = new EVO.Common.Individuum_MetaEvo[3 * this.settings.MetaEvo.PopulationSize];
                     }
                     else
                     {
@@ -264,7 +267,8 @@ namespace IHWB.EVO.MetaEvo
                     //Von den Clients ausrechnen lassen
                     if (networkmanager.calculate_by_clients(ref generation, ref hauptdiagramm1))
                     {
-                        generationcounter++;
+                        if (algomanager.calculationmode == "local") meServer.status = "perform_local";
+                        else generationcounter++;
                         meServer.set_AlsoInDB("generate Individuums", -1, -1);
                     }
                     else

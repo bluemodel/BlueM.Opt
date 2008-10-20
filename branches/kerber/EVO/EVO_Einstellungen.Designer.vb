@@ -66,6 +66,7 @@ Partial Class EVO_Einstellungen
         Dim Label16 As System.Windows.Forms.Label
         Dim Label12 As System.Windows.Forms.Label
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(EVO_Einstellungen))
+        Dim Label17 As System.Windows.Forms.Label
         Me.TabControl1 = New System.Windows.Forms.TabControl
         Me.TabPage_PES = New System.Windows.Forms.TabPage
         Me.Label_OptModusValue = New System.Windows.Forms.Label
@@ -197,6 +198,7 @@ Partial Class EVO_Einstellungen
         Label15 = New System.Windows.Forms.Label
         Label16 = New System.Windows.Forms.Label
         Label12 = New System.Windows.Forms.Label
+        Label17 = New System.Windows.Forms.Label
         Me.TabControl1.SuspendLayout()
         Me.TabPage_PES.SuspendLayout()
         CType(Me.TextDeltaStart, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -574,7 +576,7 @@ Partial Class EVO_Einstellungen
         'Label11
         '
         Label11.AutoSize = True
-        Label11.Location = New System.Drawing.Point(4, 48)
+        Label11.Location = New System.Drawing.Point(4, 57)
         Label11.Name = "Label11"
         Label11.Size = New System.Drawing.Size(117, 13)
         Label11.TabIndex = 35
@@ -603,9 +605,10 @@ Partial Class EVO_Einstellungen
         Label10.AutoSize = True
         Label10.Location = New System.Drawing.Point(4, 22)
         Label10.Name = "Label10"
-        Label10.Size = New System.Drawing.Size(78, 13)
+        Label10.Size = New System.Drawing.Size(97, 13)
         Label10.TabIndex = 51
-        Label10.Text = "Populationsize:"
+        Label10.Text = "Number of parents:"
+        AddHandler Label10.Click, AddressOf Me.Label10_Click
         '
         'Label13
         '
@@ -1456,7 +1459,7 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_MetaEvo_MySQLOptions.Controls.Add(Label14)
         Me.GroupBox_MetaEvo_MySQLOptions.Controls.Add(Label15)
         Me.GroupBox_MetaEvo_MySQLOptions.Enabled = False
-        Me.GroupBox_MetaEvo_MySQLOptions.Location = New System.Drawing.Point(11, 200)
+        Me.GroupBox_MetaEvo_MySQLOptions.Location = New System.Drawing.Point(11, 210)
         Me.GroupBox_MetaEvo_MySQLOptions.Name = "GroupBox_MetaEvo_MySQLOptions"
         Me.GroupBox_MetaEvo_MySQLOptions.Size = New System.Drawing.Size(200, 125)
         Me.GroupBox_MetaEvo_MySQLOptions.TabIndex = 52
@@ -1499,7 +1502,7 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_MetaEvo_PerformanceOptions.Controls.Add(Me.CheckBox_MetaEvo_Draw)
         Me.GroupBox_MetaEvo_PerformanceOptions.Controls.Add(Label30)
         Me.GroupBox_MetaEvo_PerformanceOptions.Enabled = False
-        Me.GroupBox_MetaEvo_PerformanceOptions.Location = New System.Drawing.Point(11, 121)
+        Me.GroupBox_MetaEvo_PerformanceOptions.Location = New System.Drawing.Point(11, 131)
         Me.GroupBox_MetaEvo_PerformanceOptions.Name = "GroupBox_MetaEvo_PerformanceOptions"
         Me.GroupBox_MetaEvo_PerformanceOptions.Size = New System.Drawing.Size(200, 73)
         Me.GroupBox_MetaEvo_PerformanceOptions.TabIndex = 51
@@ -1526,6 +1529,7 @@ Partial Class EVO_Einstellungen
         '
         'GroupBox_MetaEvo_BasicOptions
         '
+        Me.GroupBox_MetaEvo_BasicOptions.Controls.Add(Label17)
         Me.GroupBox_MetaEvo_BasicOptions.Controls.Add(Label10)
         Me.GroupBox_MetaEvo_BasicOptions.Controls.Add(Me.Numeric_MetaEvo_PopulationSize)
         Me.GroupBox_MetaEvo_BasicOptions.Controls.Add(Label11)
@@ -1533,7 +1537,7 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_MetaEvo_BasicOptions.Enabled = False
         Me.GroupBox_MetaEvo_BasicOptions.Location = New System.Drawing.Point(11, 43)
         Me.GroupBox_MetaEvo_BasicOptions.Name = "GroupBox_MetaEvo_BasicOptions"
-        Me.GroupBox_MetaEvo_BasicOptions.Size = New System.Drawing.Size(200, 72)
+        Me.GroupBox_MetaEvo_BasicOptions.Size = New System.Drawing.Size(200, 82)
         Me.GroupBox_MetaEvo_BasicOptions.TabIndex = 36
         Me.GroupBox_MetaEvo_BasicOptions.TabStop = False
         Me.GroupBox_MetaEvo_BasicOptions.Text = "Basic Options"
@@ -1551,7 +1555,7 @@ Partial Class EVO_Einstellungen
         '
         'Numeric_MetaEvo_Numbergenerations
         '
-        Me.Numeric_MetaEvo_Numbergenerations.Location = New System.Drawing.Point(139, 45)
+        Me.Numeric_MetaEvo_Numbergenerations.Location = New System.Drawing.Point(139, 54)
         Me.Numeric_MetaEvo_Numbergenerations.Maximum = New Decimal(New Integer() {5000, 0, 0, 0})
         Me.Numeric_MetaEvo_Numbergenerations.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.Numeric_MetaEvo_Numbergenerations.Name = "Numeric_MetaEvo_Numbergenerations"
@@ -1609,6 +1613,15 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Einstellungen.TabIndex = 0
         Me.GroupBox_Einstellungen.TabStop = False
         Me.GroupBox_Einstellungen.Text = "Einstellungen:"
+        '
+        'Label17
+        '
+        Label17.AutoSize = True
+        Label17.Location = New System.Drawing.Point(4, 35)
+        Label17.Name = "Label17"
+        Label17.Size = New System.Drawing.Size(83, 13)
+        Label17.TabIndex = 52
+        Label17.Text = "(1:3 Nachfolger)"
         '
         'EVO_Einstellungen
         '

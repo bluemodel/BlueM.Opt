@@ -15,7 +15,7 @@ namespace IHWB.EVO.MetaEvo
         public Algos algos;
         EVO.Diagramm.Hauptdiagramm hauptdiagramm;
 
-        string calculationmode = "global";  //{"global", "local", "hybrid"}
+        public string calculationmode = "global";  //{"global", "local", "hybrid"}
         int noAdvantage = 0; 
 
         public Algomanager(ref EVO.Common.Problem prob_input, ref EVO.Common.Individuum_MetaEvo[] genpool_muster, int individuumnumber_input, ref EVO.Diagramm.ApplicationLog applog_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input) 
@@ -143,7 +143,7 @@ namespace IHWB.EVO.MetaEvo
                                 //Jede Eigenschaft vergleichen
                                 for (int j = 0; j < input[0].Penalties.Length; j++)
                                 {
-                                    if (input[i].Penalties[0] < input[k].Penalties[0]) dominator = i;
+                                    if (input[i].Penalties[j] < input[k].Penalties[j]) dominator = i;
                                     else if (input[i].Penalties[j] > input[k].Penalties[j]) { dominator = -1; break; }
                                 }
                                 if (dominator > -1) {
@@ -213,29 +213,34 @@ namespace IHWB.EVO.MetaEvo
            
         }
         //Individuen die einen zu geringen Abstand der Penalties besitzen, löschen
-        private void clustering_kill(ref EVO.Common.Individuum_MetaEvo[] input, ref EVO.Common.Individuum_MetaEvo[] input2)
+        private void clustering_kill(ref EVO.Common.Individuum_MetaEvo[] genpool_input, ref EVO.Common.Individuum_MetaEvo[] input2)
         {
-            int killindividuums = -genpool.Length;
+            int killindividuums = -genpool_input.Length;
             double distance;
 
-            for (int i = 0; i < genpool.Length; i++)
+            //Anzahl lebender Individuen bestimmen
+            for (int i = 0; i < genpool_input.Length; i++)
             {
-                if (input[i].get_status() == "true") killindividuums++;
+                if (genpool_input[i].get_status() == "true") killindividuums++;
+            }
+            for (int i = 0; i < input2.Length; i++)
+            {
                 if (input2[i].get_status() == "true") killindividuums++;
             }
+
             // zu viele Individuen vorhanden  (Wenn die Individuenanzahl der definierten Generationsgrösse entspricht, abbrechen)
             if (killindividuums > 0)
             {
-                double[] distances = new double[input.Length + killindividuums];
+                double[] distances = new double[genpool_input.Length + killindividuums];
                 int pointer = 0;
 
                 //Arbeits-Array erstellen (genau so gross dass alle "true"-Individuen Platz finden)
-                EVO.Common.Individuum_MetaEvo[] work = new IHWB.EVO.Common.Individuum_MetaEvo[input.Length + killindividuums];
-                for (int i = 0; i < input.Length; i++)
+                EVO.Common.Individuum_MetaEvo[] work = new IHWB.EVO.Common.Individuum_MetaEvo[genpool_input.Length + killindividuums];
+                for (int i = 0; i < genpool_input.Length; i++)
                 {
-                    if (input[i].get_status() == "true")
+                    if (genpool_input[i].get_status() == "true")
                     {
-                        work[pointer] = input[i];
+                        work[pointer] = genpool_input[i];
                         pointer++;
                     }
                     if (input2[i].get_status() == "true")
@@ -294,7 +299,7 @@ namespace IHWB.EVO.MetaEvo
                         {
                             tmp = input[pointer_true];
                             input[pointer_true] = input2[pointer_false];
-                            input[pointer_false] = tmp;
+                            input2[pointer_false] = tmp;
                             pointer_true++;
                             pointer_false++;
                             break;
@@ -307,6 +312,7 @@ namespace IHWB.EVO.MetaEvo
             }
             
             //Nicht genug true-Individuen überlebten -> input von "false"-Individuen bereinigen ("true"-Individuen vervielfältigen)
+            //ToDo: Tote Individuen mit hoher Diversität überleben
             if (pointer_true < input.Length)
             {
                 pointer_true = 0;
