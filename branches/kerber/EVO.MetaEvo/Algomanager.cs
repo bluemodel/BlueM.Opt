@@ -15,12 +15,16 @@ namespace IHWB.EVO.MetaEvo
         public Algos algos;
         EVO.Diagramm.Hauptdiagramm hauptdiagramm;
 
+        string calculationmode = "global";  //{"global", "local", "hybrid"}
+        int noAdvantage = 0; 
+
         public Algomanager(ref EVO.Common.Problem prob_input, ref EVO.Common.Individuum_MetaEvo[] genpool_muster, int individuumnumber_input, ref EVO.Diagramm.ApplicationLog applog_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input) 
         {
             hauptdiagramm = hauptdiagramm_input;
             applog = applog_input;
             //Algoobjekt initialisieren (enthält die algorithmus-Methoden und das Feedback zu jedem Algo)
             algos = new Algos(ref genpool_muster, individuumnumber_input, ref applog);
+            algos.set_algos("Zufällige Einfache Mutation, Feedback Mutation, Zufällige Rekombination, Diversität aus Sortierung, Totaler Zufall, Dominanzvektor");
         }
 
         public void set_genpool(ref EVO.Common.Individuum_MetaEvo[] genpool_input) 
@@ -41,36 +45,41 @@ namespace IHWB.EVO.MetaEvo
         //new_generation mit Genpool verarbeiten und neue Individuen in new_generation erzeugen
         public void new_individuals_merge_with_genpool(ref EVO.Common.Individuum_MetaEvo[] new_generation_input)
         {
-            if (applog.log) applog.appendText("Algo Manager: Input: Generated and Simulated Individuums: \r\n" + this.generationinfo(ref new_generation_input));
-            //1.Selektion: 
-            //1.1.Dominanzanalyse
-            //1.1.2.Sortieren nach einem zufällig gewählten Kriterium
-            Random rand = new Random();
-            int kriterium = rand.Next(0, new_generation_input[0].Penalties.Length);
+            if ((calculationmode == "global") || (calculationmode == "hybrid"))
+            {
+                if (applog.log) applog.appendText("Algo Manager: Input: Generated and Simulated Individuums: \r\n" + this.generationinfo(ref new_generation_input));
+                //1.Selektion: 
+                //1.1.Dominanzanalyse
+                //1.1.2.Sortieren nach einem zufällig gewählten Kriterium
+                Random rand = new Random();
+                int kriterium = rand.Next(0, new_generation_input[0].Penalties.Length);
 
-            //1.1.3.Sortieren und Dominanzkriterium anwenden innerhalb der Penalties der neuen Individuen
-            quicksort(ref new_generation_input, kriterium, 0, new_generation_input.Length-1);
-            check_domination(ref new_generation_input, ref new_generation_input);
-            
-            //1.1.4.Dominanzkriterium auf Penalties zwischen den neuen und den alten Individuen anwenden
-            check_domination(ref new_generation_input, ref genpool);
-            
-            //1.2.Clustering bis auf maximale Generationsgrösse, Speichern in Genpool
-            clustering_kill(ref genpool, ref new_generation_input);
-            
-            //2.Feedback erstellen
-            newGen_composition(ref new_generation_input);
+                //1.1.3.Sortieren und Dominanzkriterium anwenden innerhalb der Penalties der neuen Individuen
+                quicksort(ref new_generation_input, kriterium, 0, new_generation_input.Length - 1);
+                check_domination(ref new_generation_input, ref new_generation_input);
 
-            //3.Genpool und neue Individuen zu neuem Genpool zusammenfassen, restliche Individuen in Wastepool verschieben 
-            zip(ref genpool, ref new_generation_input);
-            wastepool = new_generation_input;
-            quicksort(ref wastepool, kriterium, 0, new_generation_input.Length - 1);
-            quicksort(ref genpool, kriterium, 0, new_generation_input.Length - 1);
-            if (applog.log) applog.appendText("Algo Manager: Result: New Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n");
-            //Genpool zeichnen
-            hauptdiagramm.LöscheLetzteGeneration(1);
-            hauptdiagramm.ZeichneSekPopulation(genpool);
-            System.Windows.Forms.Application.DoEvents();
+                //1.1.4.Dominanzkriterium auf Penalties zwischen den neuen und den alten Individuen anwenden
+                check_domination(ref new_generation_input, ref genpool);
+
+                //1.2.Clustering bis auf maximale Generationsgrösse, Speichern in Genpool
+                clustering_kill(ref genpool, ref new_generation_input);
+
+                //2.Feedback erstellen
+                newGen_composition(ref new_generation_input);
+
+                //3.Genpool und neue Individuen zu neuem Genpool zusammenfassen, restliche Individuen in Wastepool verschieben 
+                zip(ref genpool, ref new_generation_input);
+                wastepool = new_generation_input;
+                quicksort(ref wastepool, kriterium, 0, new_generation_input.Length - 1);
+                quicksort(ref genpool, kriterium, 0, new_generation_input.Length - 1);
+                if (applog.log) applog.appendText("Algo Manager: Result: New Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n");
+                //Genpool zeichnen
+                hauptdiagramm.LöscheLetzteGeneration(1);
+                hauptdiagramm.ZeichneSekPopulation(genpool);
+                System.Windows.Forms.Application.DoEvents();
+
+                if ((noAdvantage == 3) && (calculationmode == "global")) set_calculationmode("local");
+            }
         }
 
         public void new_individuals_build(ref EVO.Common.Individuum_MetaEvo[] new_generation_input)
@@ -358,7 +367,7 @@ namespace IHWB.EVO.MetaEvo
 
             return back + "----------";
         }
-        //Feedback erstellen
+        //Feedback erstellen und ggf. zwischen globaler und lokaler optimierung umschalten
         private void newGen_composition(ref EVO.Common.Individuum_MetaEvo[] new_generation_input)
         {
             double initiativensumme = 0;
@@ -377,8 +386,14 @@ namespace IHWB.EVO.MetaEvo
                 if (new_generation_input[i].get_status() == "true")
                 {
                     algos.algofeedbackarray[new_generation_input[i].get_generator()].number_individuals_survived++;
+                    survivingrate++;
                 }
             }
+
+            //2b. Falls survivingrate = 0, noAdvantage hochzählen
+            if (survivingrate == 0) noAdvantage++;
+            else noAdvantage = 0;
+            survivingrate = 0;
 
             //3. Initiative berechnen 
             for (int i = 0; i < algos.algofeedbackarray.Length; i++)
@@ -403,6 +418,15 @@ namespace IHWB.EVO.MetaEvo
                 log = log + algos.algofeedbackarray[i].number_individuals_for_nextGen + " Individuums for next generation\r\n";
             }
             if (applog.log) applog.appendText("Algo Manager: nemGen_composition: Individuuum-Composition for next Generation:\r\n" + log);
+        }
+        //Umschalten auf Lokale Algorithmen
+        private void set_calculationmode(string calculationmode_input)
+        {
+            if (applog.log) applog.appendText("Algo Manager: No Advantages last 3 Generations - switching to local Algorithms");
+            calculationmode = calculationmode_input;
+
+            //Neue Algorithmuskomposition
+            algos.set_algos("Hook and Jeeves V2");
         }
     }
 }
