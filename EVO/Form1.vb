@@ -43,7 +43,6 @@ Partial Class Form1
 
     'Methoden
     Private CES1 As EVO.Kern.CES
-    'Dim hybrid2008 As EVO.Hybrid2008.Main.cs
 
     '**** Globale Parameter Parameter Optimierung ****
     'TODO: diese Werte sollten eigentlich nur in CES bzw PES vorgehalten werden
@@ -588,6 +587,9 @@ Partial Class Form1
     ''' <param name="Method">gewählte Methode</param>
     Private Sub INI_Problem(ByVal Method As String)
 
+        'Neues Problem mit ausgewählter Methode instanzieren
+        Me.mProblem = New EVO.Common.Problem(Method)
+
         'Problemdefinition
         '=================
         If (Me.Anwendung <> ANW_TESTPROBLEME And Me.Anwendung <> ANW_TSP) Then
@@ -595,8 +597,9 @@ Partial Class Form1
             'Bei allen Sim-Anwendungen
             '-------------------------
 
-            'Neues Problem instanzieren und Methode setzen
-            Me.mProblem = New EVO.Common.Problem(Method, Me.Sim1.WorkDir_Original, Me.Sim1.Datensatz)
+            'WorkDir und Datensatz übergeben
+            Me.mProblem.WorkDir = Sim1.WorkDir_Original
+            Me.mProblem.Datensatz = Sim1.Datensatz
 
             'EVO-Eingabedateien einlesen
             Call Me.mProblem.Read_InputFiles(Me.Sim1.SimStart, Me.Sim1.SimEnde)
@@ -611,7 +614,7 @@ Partial Class Form1
 
             'Bei Testproblemen definieren diese das Problem selbst
             '-----------------------------------------------------
-            Me.mProblem = Testprobleme1.getProblem()
+            Call Testprobleme1.getProblem(Me.mProblem)
 
         End If
 
