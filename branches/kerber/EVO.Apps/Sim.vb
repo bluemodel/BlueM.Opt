@@ -23,13 +23,16 @@ Public MustInherit Class Sim
 
     'Generelle Eigenschaften
     '-----------------------
+    ''' <summary>
+    ''' Eine StringCollection mit allen Dateiendungen (ohne Punkt), die in einem Datensatz vorkommen können
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks>Der erste Wert des Arrays wird als Filter für OpenFile-Dialoge verwendet</remarks>
+    Public MustOverride ReadOnly Property DatensatzDateiendungen() As Collections.Specialized.StringCollection
+
     Public Datensatz As String                           'Name des zu simulierenden Datensatzes
-    Protected mDatensatzendung As String                 'Dateiendung des Datensatzes (inkl. Punkt)
-    Public ReadOnly Property Datensatzendung() As String
-        Get
-            Return Me.mDatensatzendung
-        End Get
-    End Property
+
     Public WorkDir_Current As String                     'aktuelles Arbeits-/Datensatzverzeichnis
     Public WorkDir_Original As String                    'Original-Arbeits-/Datensatzverzeichnis
 
@@ -133,6 +136,9 @@ Public MustInherit Class Sim
 
         'Problem speichern
         Me.mProblem = prob
+
+        'Original-WorkDir benutzen (bei Neustart wichtig)
+        Me.WorkDir_Current = Me.WorkDir_Original
 
         'Je nach Problem weitere Vorbereitungen treffen
         Select Case Me.mProblem.Method
@@ -338,11 +344,12 @@ Public MustInherit Class Sim
 #Region "Evaluierung"
 
     ''' <summary>
-    ''' Evaluiert ein Individuum
+    ''' Evaluiert ein Individuum. Durchläuft alle Schritte vom Schreiben der Modellparameter bis zum Berechnen der Features.
     ''' </summary>
     ''' <param name="ind">das zu evaluierende Individuum</param>
+    ''' <param name="storeInDB">Ob das Individuum in OptResult-DB gespeichert werden soll</param>
     ''' <returns>True wenn erfolgreich, False wenn fehlgeschlagen</returns>
-    Public Overloads Function Evaluate(ByRef ind As EVO.Common.Individuum) As Boolean
+    Public Overloads Function Evaluate(ByRef ind As EVO.Common.Individuum, Optional ByVal storeInDB As Boolean = True) As Boolean
 
         Dim isOK As Boolean
 
@@ -382,18 +389,19 @@ Public MustInherit Class Sim
 
         'Simulationsergebnis einlesen und verarbeiten
         '--------------------------------------------
-        Call Me.SIM_Ergebnis_auswerten(ind)
+        Call Me.SIM_Ergebnis_auswerten(ind, storeInDB)
 
         Return isOK
 
     End Function
 
     ''' <summary>
-    ''' Evaluiert ein Array von Individuen
+    ''' Evaluiert ein Array von Individuen. Durchläuft alle Schritte vom Schreiben der Modellparameter bis zum Berechnen der Features.
     ''' </summary>
     ''' <param name="inds">Ein Array von zu evaluierenden Individuen</param>
+    ''' <param name="storeInDB">Ob das Individuum in OptResult-DB gespeichert werden soll</param>
     ''' <returns>True/False für jedes Individuum</returns>
-    Public Overloads Function Evaluate(ByRef inds() As EVO.Common.Individuum) As Boolean()
+    Public Overloads Function Evaluate(ByRef inds() As EVO.Common.Individuum, Optional ByVal storeInDB As Boolean = True) As Boolean()
 
         Dim i As Integer
         Dim isOK() As Boolean
@@ -401,7 +409,7 @@ Public MustInherit Class Sim
         ReDim isOK(inds.GetUpperBound(0))
 
         For i = 0 To inds.GetUpperBound(0)
-            isOK(i) = Me.Evaluate(inds(i))
+            isOK(i) = Me.Evaluate(inds(i), storeInDB)
         Next
 
         Return isOK
@@ -443,9 +451,13 @@ Public MustInherit Class Sim
 
     End Sub
 
-    'Evaluiert die Kinderchen mit Hilfe des Simulationsmodells
-    '*********************************************************
-    Public Sub SIM_Ergebnis_auswerten(ByRef Indi As Common.Individuum)
+    ''' <summary>
+    ''' Evaluiert ein Individuum mit Hilfe des Simulationsmodells. Es werden alle im Problem definierten Feature- und Constraint-Werte berechnet und im Individuum gespeichert.
+    ''' </summary>
+    ''' <param name="ind">das zu evaluierende Individuum</param>
+    ''' <param name="storeInDB">Ob das Individuum in OptResult-DB gespeichert werden soll</param>
+    ''' <remarks>Die Simulation muss bereits erfolgt sein</remarks>
+    Public Sub SIM_Ergebnis_auswerten(ByRef ind As Common.Individuum, Optional ByVal storeInDB As Boolean = True)
 
         Dim i As Short
 
@@ -454,17 +466,17 @@ Public MustInherit Class Sim
 
         'Qualitätswerte berechnen
         For i = 0 To Me.mProblem.NumFeatures - 1
-            Indi.Features(i) = CalculateFeature(Me.mProblem.List_Featurefunctions(i))
+            ind.Features(i) = CalculateFeature(Me.mProblem.List_Featurefunctions(i))
         Next
 
         'Constraints berechnen
         For i = 0 To Me.mProblem.NumConstraints - 1
-            Indi.Constraints(i) = CalculateConstraint(Me.mProblem.List_Constraintfunctions(i))
+            ind.Constraints(i) = CalculateConstraint(Me.mProblem.List_Constraintfunctions(i))
         Next
 
-        'Lösung abspeichern
-        If (Me.StoreIndividuals) Then
-            Call Me.OptResult.addSolution(Indi)
+        'Lösung im OptResult abspeichern (und zu DB hinzufügen)
+        If (Me.StoreIndividuals And storeInDB) Then
+            Call Me.OptResult.addSolution(ind)
         End If
 
     End Sub
@@ -631,35 +643,14 @@ Handler:
     Protected Function CalculateFeature_Reihe(ByVal feature As Common.Featurefunction, ByVal SimReihe As Wave.Zeitreihe) As Double
 
         Dim QWert As Double
-        Dim i, j As Integer
-        Dim ZeitschritteBisStart As Integer
-        Dim ZeitschritteEval As Integer
-        Dim Versatz As Integer
+        Dim i As Integer
 
-        'Bestimmen der Zeitschritte bis Start des Evaluierungszeitraums
-        ZeitschritteBisStart = (feature.EvalStart - feature.RefReihe.XWerte(0)).TotalMinutes / Me.SimDT.TotalMinutes
-        'Bestimmen der Zeitschritte des Evaluierungszeitraums
-        ZeitschritteEval = (feature.EvalEnde - feature.EvalStart).TotalMinutes / Me.SimDT.TotalMinutes
+        'Simulationszeitreihe auf Evaluierungszeitraum zuschneiden
+        Call SimReihe.Cut(feature.EvalStart, feature.EvalEnde)
 
-        'Überprüfen ob simulierte Zeitreihe evtl. anderen Startzeitpunkt 
-        'als Simulations Startzeitpunkt hat (kann bei SMUSI vorkommen!)
-        '
-        'Falls ein Versatz der beiden Zeitreihen vorliegt wird j
-        'zum entsprechenden Verschieben der Laufvariable i benutzt
-        '---------------------------------------------------------------
-        'Fallunterscheidung je nach Zeitschrittweite
-        If (Me.SimDT.TotalMinutes >= 1440) Then
-            'Bei dt >= 1d ist Versatz unerheblich
-            j = 0
-        Else
-            Versatz = (SimReihe.XWerte(0) - feature.RefReihe.XWerte(0)).TotalMinutes / Me.SimDT.TotalMinutes
-            If Versatz < 0 Then
-                j = -1 * Versatz
-            ElseIf Versatz = 0 Then
-                j = 0
-            Else
-                j = Versatz
-            End If
+        'BUG 218: Kontrolle
+        If (feature.RefReihe.Length <> SimReihe.Length) Then
+            Throw New Exception("Ziel '" & feature.Bezeichnung & "': Simulations- und Referenzzeitreihe sind nicht kompatibel! (Länge/Zeitschritt?) Siehe Bug 218")
         End If
 
         'Fallunterscheidung Zielfunktion
@@ -669,15 +660,17 @@ Handler:
             Case "AbQuad"
                 'Summe der Fehlerquadrate
                 '------------------------
-                For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    QWert += (feature.RefReihe.YWerte(i) - SimReihe.YWerte(i + j)) * (feature.RefReihe.YWerte(i) - SimReihe.YWerte(i + j))
+                QWert = 0
+                For i = 0 To SimReihe.Length - 1
+                    QWert += (feature.RefReihe.YWerte(i) - SimReihe.YWerte(i)) * (feature.RefReihe.YWerte(i) - SimReihe.YWerte(i))
                 Next
 
             Case "Diff"
                 'Summe der Fehler
                 '----------------
-                For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    QWert += Math.Abs(feature.RefReihe.YWerte(i) - SimReihe.YWerte(i + j))
+                QWert = 0
+                For i = 0 To SimReihe.Length - 1
+                    QWert += Math.Abs(feature.RefReihe.YWerte(i) - SimReihe.YWerte(i))
                 Next
 
             Case "Volf"
@@ -685,11 +678,11 @@ Handler:
                 '-------------
                 Dim VolSim As Double = 0
                 Dim VolZiel As Double = 0
-                For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    VolSim += SimReihe.YWerte(i + j)
+                For i = 0 To SimReihe.Length - 1
+                    VolSim += SimReihe.YWerte(i)
                     VolZiel += feature.RefReihe.YWerte(i)
                 Next
-                'Umrechnen in echtes Volumen
+                'HACK: Umrechnen in echtes Volumen (Annahme: Einheit = m3/s)
                 VolSim *= Me.SimDT.TotalSeconds
                 VolZiel *= Me.SimDT.TotalSeconds
                 'Differenz bilden
@@ -699,20 +692,20 @@ Handler:
                 'Relative Anzahl der Zeitschritte mit Unterschreitungen (in Prozent)
                 '-------------------------------------------------------------------
                 Dim nUnter As Integer = 0
-                For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    If (SimReihe.YWerte(i + j) < feature.RefReihe.YWerte(i)) Then
+                For i = 0 To SimReihe.Length - 1
+                    If (SimReihe.YWerte(i) < feature.RefReihe.YWerte(i)) Then
                         nUnter += 1
                     End If
                 Next
-                QWert = nUnter / ZeitschritteEval * 100
+                QWert = nUnter / SimReihe.Length * 100
 
             Case "sUnter"
                 'Summe der Unterschreitungen
                 '---------------------------
                 Dim sUnter As Double = 0
-                For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    If (SimReihe.YWerte(i + j) < feature.RefReihe.YWerte(i)) Then
-                        sUnter += feature.RefReihe.YWerte(i) - SimReihe.YWerte(i + j)
+                For i = 0 To SimReihe.Length - 1
+                    If (SimReihe.YWerte(i) < feature.RefReihe.YWerte(i)) Then
+                        sUnter += feature.RefReihe.YWerte(i) - SimReihe.YWerte(i)
                     End If
                 Next
                 QWert = sUnter
@@ -721,20 +714,20 @@ Handler:
                 'Relative Anzahl der Zeitschritte mit Überschreitungen (in Prozent)
                 '------------------------------------------------------------------
                 Dim nUeber As Integer = 0
-                For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    If (SimReihe.YWerte(i + j) > feature.RefReihe.YWerte(i)) Then
+                For i = 0 To SimReihe.Length - 1
+                    If (SimReihe.YWerte(i) > feature.RefReihe.YWerte(i)) Then
                         nUeber += 1
                     End If
                 Next
-                QWert = nUeber / ZeitschritteEval * 100
+                QWert = nUeber / SimReihe.Length * 100
 
             Case "sÜber"
                 'Summe der Überschreitungen
                 '--------------------------
                 Dim sUeber As Double = 0
-                For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    If (SimReihe.YWerte(i + j) > feature.RefReihe.YWerte(i)) Then
-                        sUeber += SimReihe.YWerte(i + j) - feature.RefReihe.YWerte(i)
+                For i = 0 To SimReihe.Length - 1
+                    If (SimReihe.YWerte(i) > feature.RefReihe.YWerte(i)) Then
+                        sUeber += SimReihe.YWerte(i) - feature.RefReihe.YWerte(i)
                     End If
                 Next
                 QWert = sUeber
@@ -744,12 +737,12 @@ Handler:
                 '--------------
                 'Mittelwert bilden
                 Dim Qobs_quer, zaehler, nenner As Double
-                For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
+                For i = 0 To SimReihe.Length - 1
                     Qobs_quer += feature.RefReihe.YWerte(i)
                 Next
-                Qobs_quer = Qobs_quer / (ZeitschritteEval)
-                For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
-                    zaehler += (feature.RefReihe.YWerte(i) - SimReihe.YWerte(i + j)) * (feature.RefReihe.YWerte(i) - SimReihe.YWerte(i + j))
+                Qobs_quer = Qobs_quer / (SimReihe.Length)
+                For i = 0 To SimReihe.Length - 1
+                    zaehler += (feature.RefReihe.YWerte(i) - SimReihe.YWerte(i)) * (feature.RefReihe.YWerte(i) - SimReihe.YWerte(i))
                     nenner += (feature.RefReihe.YWerte(i) - Qobs_quer) * (feature.RefReihe.YWerte(i) - Qobs_quer)
                 Next
                 'abgeänderte Nash-Sutcliffe Formel: 0 als Zielwert (1- weggelassen)
@@ -978,50 +971,124 @@ Handler:
 
     'Datensätze für Multithreading kopieren
     '**************************************
-    Public Sub copyDatensatz(ByVal n_Proz As Integer)
+    Public Sub createThreadWorkDirs(ByVal n_Threads As Integer)
 
         Dim i As Integer = 1
-        'Dim j As Integer
+        Dim Source, Dest, relPaths() As String
+        Dim binPath As String = System.Windows.Forms.Application.StartupPath()
 
-        For i = 0 To n_Proz - 1
-            Dim Source As String = Me.WorkDir_Original
-            Dim Dest As String = System.Windows.Forms.Application.StartupPath() & "\Thread_" & i & "\"
+        Source = Me.WorkDir_Original
+        Dest = binPath & "\Thread_0\"
 
-            'Löschen um den Inhalt zu entsorgen
-            If Directory.Exists(Dest) Then
-                Call EVO.Common.FileHelper.purgeReadOnly(Dest)
-                Directory.Delete(Dest, True)
-            End If
+        'Alte Thread-Ordner löschen
+        Call Me.deleteThreadWorkDirs()
 
+        'zu kopierende Dateien bestimmen
+        relPaths = Me.getDatensatzFiles(Source)
+
+        'Dateien in Ordner Thread_0 kopieren
+        For Each relPath As String In relPaths
+            My.Computer.FileSystem.CopyFile(Source & relPath, Dest & relPath, True)
+        Next
+
+        'Für die weiteren Threads den Ordner Thread_0 kopieren
+        Source = binPath & "\Thread_0\"
+
+        For i = 1 To n_Threads - 1
+
+            Dest = binPath & "\Thread_" & i.ToString() & "\"
             My.Computer.FileSystem.CopyDirectory(Source, Dest, True)
-            Call EVO.Common.FileHelper.purgeReadOnly(Dest)
-            Call Directory.Delete(Dest & "\.svn", True)
 
         Next
 
     End Sub
 
-    'Datensätze für Multithreading löschen
-    '*************************************
-    Public Sub deleteDatensatz(ByVal n_Proz As Integer)
-        Dim i As Integer
-        For i = 1 To n_Proz
+    ''' <summary>
+    ''' Gibt die relativen Pfade aller Datensatz-Dateien zurück
+    ''' </summary>
+    ''' <param name="rootdirectory">Das zu durchsuchende Verzeichnis</param>
+    ''' <returns></returns>
+    Protected Function getDatensatzFiles(ByVal rootdirectory As String) As String()
 
-            If Directory.Exists(System.Windows.Forms.Application.StartupPath() & "\Thread_" & i) Then
-                Directory.Delete(System.Windows.Forms.Application.StartupPath() & "\Thread_" & i, True)
+        Dim Files() As IO.FileInfo
+        Dim DirInfo, Dirs() As IO.DirectoryInfo
+        Dim paths(), subpaths(), ext As String
+
+        If (rootdirectory.LastIndexOf("\") <> rootdirectory.Length - 1) Then
+            rootdirectory &= "\"
+        End If
+
+        ReDim paths(-1)
+
+        DirInfo = New IO.DirectoryInfo(rootdirectory)
+
+        'zu kopierende Dateien anhand der Dateiendung bestimmen
+        Files = DirInfo.GetFiles("*.*")
+        For Each File As IO.FileInfo In Files
+            'Dateiendung bestimmen
+            If (File.Extension.Length > 0) Then
+                ext = File.Extension.Substring(1).ToUpper()
+                'Prüfen, ob es sich ume eine zu kopierende Datei handelt
+                If (Me.DatensatzDateiendungen.Contains(ext)) Then
+                    'Relativen Pfad der Datei zu Array hinzufügen
+                    ReDim Preserve paths(paths.Length)
+                    paths(paths.Length - 1) = File.Name
+                End If
             End If
         Next
+
+        'Unterverzeichnisse rekursiv durchsuchen
+        Dirs = DirInfo.GetDirectories("*.*")
+        For Each dir As IO.DirectoryInfo In Dirs
+            '.svn-Verzeichnisse überspringen
+            If (dir.Name <> ".svn") Then
+                'Pfade aus Unterverzeichnis holen
+                subpaths = Me.getDatensatzFiles(dir.FullName)
+                'Pfade zu Array hinzufügen
+                For Each subpath As String In subpaths
+                    subpath = dir.Name & "\" & subpath
+                    ReDim Preserve paths(paths.Length)
+                    paths(paths.Length - 1) = subpath
+                Next
+            End If
+        Next
+
+        Return paths
+
+    End Function
+
+    ''' <summary>
+    ''' Datensätze für Multithreading löschen
+    ''' </summary>
+    ''' <remarks>löscht die Ordner Thread_0 bis Thread_9 im bin-Verzeichnis</remarks>
+    Public Sub deleteThreadWorkDirs()
+
+        Dim i As Integer
+        Dim dir As String
+
+        For i = 0 To 9
+
+            dir = System.Windows.Forms.Application.StartupPath() & "\Thread_" & i.ToString() & "\"
+
+            If Directory.Exists(dir) Then
+                Call EVO.Common.FileHelper.purgeReadOnly(dir)
+                Directory.Delete(dir, True)
+            End If
+        Next
+
     End Sub
 
-    'Gibt den aktuellen Datensatz zurück
-    '***********************************
-    Public Function getWorkDir(ByVal Thread_ID As Integer) As String
+    ''' <summary>
+    ''' Gibt den Datensatz Ordner eines Threads zurück
+    ''' </summary>
+    ''' <param name="Thread_ID"></param>
+    Public Function getThreadWorkDir(ByVal Thread_ID As Integer) As String
 
-        getWorkDir = ""
+        Dim dir As String
 
-        getWorkDir = System.Windows.Forms.Application.StartupPath() & "\Thread_" & Thread_ID & "\"
+        dir = System.Windows.Forms.Application.StartupPath() & "\Thread_" & Thread_ID.ToString() & "\"
 
-        Return getWorkDir
+        Return dir
 
     End Function
 

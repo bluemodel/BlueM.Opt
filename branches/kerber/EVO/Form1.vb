@@ -236,6 +236,12 @@ Partial Class Form1
                     'Testprobleme instanzieren
                     Testprobleme1 = New EVO.Apps.Testprobleme()
 
+                    'HACK: bei Testproblemen als Methodenauswahl nur PES und MetaEVO zulassen!
+                    Me.IsInitializing = True
+                    Call Me.ComboBox_Methode.Items.Clear()
+                    Call Me.ComboBox_Methode.Items.AddRange(New String() {"", METH_PES, METH_MetaEvo})
+                    Me.IsInitializing = False
+
 
                 Case ANW_TSP 'Anwendung Traveling Salesman Problem (TSP)
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -334,12 +340,12 @@ Partial Class Form1
         Dim pfad As String
 
         'Dialog vorbereiten
-        OpenFileDialog1.Filter = Sim1.Datensatzendung.Substring(1) & "-Dateien (*" & Sim1.Datensatzendung & ")|*" & Sim1.Datensatzendung
+        OpenFileDialog1.Filter = Sim1.DatensatzDateiendungen(0) & "-Dateien (*." & Sim1.DatensatzDateiendungen(0) & ")|*." & Sim1.DatensatzDateiendungen(0)
         OpenFileDialog1.Title = "Datensatz auswählen"
 
         'Alten Datensatz dem Dialog zuweisen
         OpenFileDialog1.InitialDirectory = Sim1.WorkDir_Original
-        OpenFileDialog1.FileName = Sim1.WorkDir_Original & Sim1.Datensatz & Sim1.Datensatzendung
+        OpenFileDialog1.FileName = Sim1.WorkDir_Original & Sim1.Datensatz & "." & Sim1.DatensatzDateiendungen(0)
 
         'Dialog öffnen
         DiagResult = OpenFileDialog1.ShowDialog()
@@ -435,7 +441,7 @@ Partial Class Form1
     '************************
     Private Sub INI_Method(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Methode.SelectedIndexChanged
 
-        If (Me.IsInitializing = True) Then
+        If (Me.IsInitializing = True Or Me.ComboBox_Methode.SelectedItem = "") Then
 
             Exit Sub
 
@@ -444,49 +450,16 @@ Partial Class Form1
             'Mauszeiger busy
             Cursor = Cursors.WaitCursor
 
-            'Diagramm zurücksetzen
-            Me.Hauptdiagramm1.Reset()
-
-            'Problemdefinition
-            '=================
-
-            'Neues Problem mit ausgewählter Methode instanzieren
-            Me.mProblem = New EVO.Common.Problem(ComboBox_Methode.SelectedItem.ToString())
-
-            If (Me.Anwendung <> ANW_TESTPROBLEME And Me.Anwendung <> ANW_TSP) Then
-
-                'Bei allen Sim-Anwendungen
-                '-------------------------
-
-                'WorkDir und Datensatz übergeben
-                Me.mProblem.WorkDir = Sim1.WorkDir_Original
-                Me.mProblem.Datensatz = Sim1.Datensatz
-
-                'EVO-Eingabedateien einlesen
-                Call Me.mProblem.Read_InputFiles(Me.Sim1.SimStart, Me.Sim1.SimEnde)
-
-                'Problem an Sim-Objekt übergeben
-                Call Me.Sim1.setProblem(Me.mProblem)
-
-                'Settings auch übergeben
-                Call Me.Sim1.setSettings(Me.EVO_Einstellungen1.Settings)
-
-            ElseIf (Me.Anwendung = ANW_TESTPROBLEME) Then
-
-                'Bei Testproblemen definieren diese das Problem selbst
-                '-----------------------------------------------------
-                Call Testprobleme1.getProblem(Me.mProblem)
-
-            End If
-
-            'Problem an EVO_Einstellungen übergeben
-            '--------------------------------------
-            Call Me.EVO_Einstellungen1.Initialise(Me.mProblem)
-
+            'Problem initialisieren
+            '======================
+            Call Me.INI_Problem(Me.ComboBox_Methode.SelectedItem)
 
             'Methodenspezifische Vorbereitungen
             '(zunächst alles deaktivieren, danach je nach Methode aktivieren)
             '================================================================
+
+            'Diagramm zurücksetzen
+            Me.Hauptdiagramm1.Reset()
 
             'Start Button deaktivieren
             Me.Button_Start.Enabled = False
@@ -497,15 +470,6 @@ Partial Class Form1
             Me.Button_Scatterplot.Enabled = False
 
             Select Case Me.mProblem.Method
-
-                Case "" 'Keine Methode ausgewählt
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                    'Mauszeiger wieder normal
-                    Cursor = Cursors.Default
-
-                    'Ende
-                    Exit Sub
 
                 Case METH_SENSIPLOT 'Methode SensiPlot
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -529,6 +493,9 @@ Partial Class Form1
                 Case METH_PES 'Methode PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
+                    'Ergebnis-Buttons
+                    Me.Button_openMDB.Enabled = True
+
                     'EVO_Opt_Verlauf initialisieren
                     Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
 
@@ -540,6 +507,9 @@ Partial Class Form1
                     If (Me.mProblem.Modus = EVO_MODUS.Multi_Objective) Then
                         Throw New Exception("Methode von Hook und Jeeves erlaubt nur Single-Objective Optimierung!")
                     End If
+
+                    'Ergebnis-Buttons
+                    Me.Button_openMDB.Enabled = True
 
                     'TODO: EVO_Opt_Verlauf initialisieren
 
@@ -594,6 +564,53 @@ Partial Class Form1
             Cursor = Cursors.Default
 
         End If
+
+    End Sub
+
+    ''' <summary>
+    ''' Problem initialisieren und überall bekannt machen
+    ''' </summary>
+    ''' <param name="Method">gewählte Methode</param>
+    Private Sub INI_Problem(ByVal Method As String)
+
+        'Neues Problem mit ausgewählter Methode instanzieren
+        Me.mProblem = New EVO.Common.Problem(Method)
+
+        'Problemdefinition
+        '=================
+        If (Me.Anwendung <> ANW_TESTPROBLEME And Me.Anwendung <> ANW_TSP) Then
+
+            'Bei allen Sim-Anwendungen
+            '-------------------------
+
+            'WorkDir und Datensatz übergeben
+            Me.mProblem.WorkDir = Sim1.WorkDir_Original
+            Me.mProblem.Datensatz = Sim1.Datensatz
+
+            'EVO-Eingabedateien einlesen
+            Call Me.mProblem.Read_InputFiles(Me.Sim1.SimStart, Me.Sim1.SimEnde)
+
+            'Problem an Sim-Objekt übergeben
+            Call Me.Sim1.setProblem(Me.mProblem)
+
+            'Settings auch übergeben
+            Call Me.Sim1.setSettings(Me.EVO_Einstellungen1.Settings)
+
+        ElseIf (Me.Anwendung = ANW_TESTPROBLEME) Then
+
+            'Bei Testproblemen definieren diese das Problem selbst
+            '-----------------------------------------------------
+            Call Testprobleme1.getProblem(Me.mProblem)
+
+        End If
+
+        'Problem an EVO_Einstellungen übergeben
+        '--------------------------------------
+        Call Me.EVO_Einstellungen1.Initialise(Me.mProblem)
+
+        'Individuumsklasse mit Problem initialisieren
+        '--------------------------------------------
+        Call EVO.Common.Individuum.Initialise(Me.mProblem)
 
     End Sub
 
@@ -675,6 +692,7 @@ Partial Class Form1
             End If
 
             'Ergebnis-Buttons
+            Me.Button_openMDB.Enabled = False
             If (Not IsNothing(Sim1)) Then
                 Me.Button_saveMDB.Enabled = True
                 Me.Button_Scatterplot.Enabled = True
@@ -751,7 +769,8 @@ Partial Class Form1
         Dim i, j, n, Anz_SensiPara, Anz_Sim As Integer
         Dim isOK As Boolean
         Dim ind As Common.Individuum_PES
-        Dim serie As Steema.TeeChart.Styles.Series
+        Dim serie As Steema.TeeChart.Styles.Points
+        Dim serie3D As New Steema.TeeChart.Styles.Points3D
         Dim surface As New Steema.TeeChart.Styles.Surface
         Dim SimReihe As Wave.Zeitreihe
         Dim SimReihen As Collection
@@ -765,9 +784,6 @@ Partial Class Form1
 
         'Parameter
         Anz_SensiPara = SensiPlot1.Selected_OptParameter.GetLength(0)
-
-        'Individuumsklasse wird initialisiert
-        Call Common.Individuum.Initialise(Me.mProblem)
 
         'Anzahl Simulationen
         If (Anz_SensiPara = 1) Then
@@ -787,18 +803,21 @@ Partial Class Form1
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
 
-        'Oberflächendiagramm
+        'Bei 2 OptParametern 3D-Diagramm vorbereiten
         If (Anz_SensiPara > 1) Then
+            'Oberfläche
             surface = New Steema.TeeChart.Styles.Surface(Me.Hauptdiagramm1.Chart)
             surface.IrregularGrid = True
             surface.NumXValues = SensiPlot1.Anz_Steps
             surface.NumZValues = SensiPlot1.Anz_Steps
+            '3D-Punkte
+            serie3D = Me.Hauptdiagramm1.getSeries3DPoint("Sensiplot", "Orange")
             'Diagramm drehen (rechter Mausbutton)
             Dim rotate1 As New Steema.TeeChart.Tools.Rotate
             rotate1.Button = Windows.Forms.MouseButtons.Right
             Me.Hauptdiagramm1.Tools.Add(rotate1)
             'MarksTips
-            Me.Hauptdiagramm1.add_MarksTips(surface)
+            Me.Hauptdiagramm1.add_MarksTips(serie3D, Steema.TeeChart.Styles.MarksStyles.Label)
             surface.Title = "SensiPlot"
             surface.Cursor = Cursors.Hand
         End If
@@ -840,36 +859,79 @@ Partial Class Form1
                 'Verlaufsanzeige aktualisieren
                 Me.EVO_Opt_Verlauf1.Nachfolger(n)
 
-                'Individuum instanzieren
-                ind = New Common.Individuum_PES("SensiPlot", n)
+                'Einhaltung von OptParameter-Beziehung überprüfen
+                isOK = True
+                If (Anz_SensiPara > 1) Then
+                    'Es muss nur der zweite Parameter auf eine Beziehung geprüft werden
+                    If (Me.mProblem.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Beziehung <> Beziehung.keine) Then
+                        'Beziehung bezieht sich immer auf den in der Liste vorherigen Parameter
+                        If (SensiPlot1.Selected_OptParameter(0) = SensiPlot1.Selected_OptParameter(1) - 1) Then
 
-                'OptParameter ins Individuum kopieren
-                ind.OptParameter = Me.mProblem.List_OptParameter
+                            isOK = False
 
-                'Individuum in Sim evaluieren
-                isOK = Sim1.Evaluate(ind)
-                'TODO: Fehlerbehandlung bei Simulationsfehler
+                            Dim ref As Double = Me.mProblem.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).RWert
+                            Dim wert As Double = Me.mProblem.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).RWert
 
-                'BUG 253: Verletzte Constraints bei SensiPlot kenntlich machen?
+                            Select Case Me.mProblem.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Beziehung
+                                Case Beziehung.kleiner
+                                    If (wert < ref) Then isOK = True
+                                Case Beziehung.kleinergleich
+                                    If (wert <= ref) Then isOK = True
+                                Case Beziehung.groesser
+                                    If (wert > ref) Then isOK = True
+                                Case Beziehung.groessergleich
+                                    If (wert >= ref) Then isOK = True
+                            End Select
 
-                'Diagramm aktualisieren
-                If (Anz_SensiPara = 1) Then
-                    '1 Parameter
-                    serie = Me.Hauptdiagramm1.getSeriesPoint("SensiPlot", "Orange")
-                    serie.Add(ind.Penalties(SensiPlot1.Selected_Penaltyfunction), ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(0)), n.ToString())
-                Else
-                    '2 Parameter
-                    surface.Add(ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(0)), ind.Penalties(SensiPlot1.Selected_Penaltyfunction), ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(1)), n.ToString())
+                        End If
+                    End If
                 End If
 
-                'Simulationsergebnis in Wave laden
-                If (SensiPlot1.show_Wave) Then
-                    'SimReihe auslesen
-                    SimReihe = Sim1.SimErgebnis(Me.mProblem.List_Penaltyfunctions(SensiPlot1.Selected_Penaltyfunction).SimGr)
-                    'Lösungs-ID an Titel anhängen
-                    SimReihe.Title += " (Lösung " & n.ToString() & ")"
-                    'SimReihe zu Collection hinzufügen
-                    SimReihen.Add(SimReihe)
+                'Evaluierung nur bei isOK
+                If (isOK) Then
+
+                    'Individuum instanzieren
+                    ind = New Common.Individuum_PES("SensiPlot", n)
+
+                    'OptParameter ins Individuum kopieren
+                    ind.OptParameter = Me.mProblem.List_OptParameter
+
+                    'Individuum in Sim evaluieren
+                    isOK = Sim1.Evaluate(ind)
+                    'TODO: Fehlerbehandlung bei Simulationsfehler
+
+                    'BUG 253: Verletzte Constraints bei SensiPlot kenntlich machen?
+
+                    'Diagramm aktualisieren
+                    If (Anz_SensiPara = 1) Then
+                        '1 Parameter
+                        serie = Me.Hauptdiagramm1.getSeriesPoint("SensiPlot", "Orange")
+                        serie.Add(ind.Penalties(SensiPlot1.Selected_Penaltyfunction), ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(0)), n.ToString())
+                    Else
+                        '2 Parameter
+                        surface.Add(ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(0)), ind.Penalties(SensiPlot1.Selected_Penaltyfunction), ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(1)), n.ToString())
+                        serie3D.Add(ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(0)), ind.Penalties(SensiPlot1.Selected_Penaltyfunction), ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(1)), n.ToString())
+                    End If
+
+                    'Simulationsergebnis in Wave laden
+                    If (SensiPlot1.show_Wave) Then
+                        'SimReihe auslesen
+                        SimReihe = Sim1.SimErgebnis(Me.mProblem.List_Penaltyfunctions(SensiPlot1.Selected_Penaltyfunction).SimGr)
+                        'Lösungs-ID an Titel anhängen
+                        SimReihe.Title += " (Lösung " & n.ToString() & ")"
+                        'SimReihe zu Collection hinzufügen
+                        SimReihen.Add(SimReihe)
+                    End If
+
+                End If
+
+                'Pause?
+                If (Me.ispause) Then
+                    Me.Button_Start.Text = "Run"
+                    Do While (Me.ispause)
+                        System.Threading.Thread.Sleep(20)
+                        Application.DoEvents()
+                    Loop
                 End If
 
                 System.Windows.Forms.Application.DoEvents()
@@ -951,7 +1013,7 @@ Partial Class Form1
 
         'Datensätze für Multithreading kopieren
         If n_Threads > 1 Then
-            Call Sim1.copyDatensatz(n_Threads)
+            Call Sim1.createThreadWorkDirs(n_Threads)
         End If
 
         'CES initialisieren
@@ -982,6 +1044,10 @@ Partial Class Form1
         'Hier werden dem Child die passenden Massnahmen und deren Elemente pro Location zugewiesen
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         For i_ch = 0 To CES1.mSettings.CES.n_Childs - 1
+            'Das Dn wird gesetzt
+            If EVO_Einstellungen1.Settings.PES.Schrittweite.is_DnVektor = False Then
+                CES1.Childs(i_ch).CES_Dn = EVO_Einstellungen1.Settings.PES.Schrittweite.DnStart
+            End If
             For i_loc = 0 To CES1.ModSett.n_Locations - 1
                 Call Sim1.Identify_Measures_Elements_Parameters(i_loc, CES1.Childs(i_ch).Path(i_loc), CES1.Childs(i_ch).Measures(i_loc), CES1.Childs(i_ch).Loc(i_loc).Loc_Elem, CES1.Childs(i_ch).Loc(i_loc).PES_OptPara)
             Next
@@ -1023,7 +1089,7 @@ Partial Class Form1
                 (Child_Ready + n_Threads > Child_Run) And Me.ispause = False Then
 
                     durchlauf_all += 1
-                    Sim1.WorkDir_Current = Sim1.getWorkDir(Thread_Free)
+                    Sim1.WorkDir_Current = Sim1.getThreadWorkDir(Thread_Free)
                     CES1.Childs(Child_Run).ID = durchlauf_all
 
                     '****************************************
@@ -1049,7 +1115,7 @@ Partial Class Form1
                     '--------------------------------------
                 ElseIf Sim1.launchReady(Thread_Ready, SIM_Eval_is_OK, Child_Ready) Then
 
-                    Sim1.WorkDir_Current = Sim1.getWorkDir(Thread_Ready)
+                    Sim1.WorkDir_Current = Sim1.getThreadWorkDir(Thread_Ready)
                     If SIM_Eval_is_OK Then Sim1.SIM_Ergebnis_auswerten(CES1.Childs(Child_Ready))
 
                     'HYBRID: Speichert die PES Erfahrung diesen Childs im PES Memory
@@ -1060,7 +1126,7 @@ Partial Class Form1
 
                     'Lösung im TeeChart einzeichnen und mittleres Dn ausgeben
                     '========================================================
-                    Call Me.Hauptdiagramm1.ZeichneIndividuum(CES1.Childs(Child_Ready), 0, 0, i_gen, Child_Ready, ColorManagement(ColorArray, CES1.Childs(Child_Ready)))
+                    Call Me.Hauptdiagramm1.ZeichneIndividuum(CES1.Childs(Child_Ready), 0, 0, i_gen, Child_Ready + 1, ColorManagement(ColorArray, CES1.Childs(Child_Ready)))
                     Me.Label_Dn_Wert.Text = Math.Round(CES1.Childs(Child_Ready).Get_mean_PES_Dn, 6).ToString
                     If Not CES1.Childs(Child_Ready).Get_mean_PES_Dn = -1 Then
                         Me.Monitor1.Zeichne_Dn(CES1.Childs(Child_Ready).ID, CES1.Childs(Child_Ready).Get_mean_PES_Dn)
@@ -1186,7 +1252,7 @@ Partial Class Form1
 
         'Datensätze für Multithreading löschen
         '*************************************
-        Call Sim1.deleteDatensatz(n_Threads)
+        Call Sim1.deleteThreadWorkDirs()
 
     End Sub
 
@@ -1215,6 +1281,14 @@ Partial Class Form1
         'pro Child
         'xxxxxxxxx
         For i_ch = 0 To CES1.Childs.GetUpperBound(0)
+
+            'Das Dn des Child mutieren
+            If EVO_Einstellungen1.Settings.PES.Schrittweite.is_DnVektor = False Then
+                Dim PESX As EVO.Kern.PES
+                PESX = New EVO.Kern.PES
+                Call PESX.PesInitialise(EVO_Einstellungen1.Settings, Me.mProblem)
+                CES1.Childs(i_ch).CES_Dn = PESX.CES_Dn_Mutation(CES1.Childs(i_ch).CES_Dn)
+            End If
 
             'Ermittelt fuer jedes Child den PES Parent Satz (PES_Parents ist das Ergebnis)
             Call CES1.Memory_Search_per_Child(CES1.Childs(i_ch))
@@ -1285,7 +1359,7 @@ Partial Class Form1
                             Next
 
                             'Startet die Prozesse evolutionstheoretischen Prozesse nacheinander
-                            Call PES1.EsReproMut(EVO_Einstellungen1.Settings.CES.is_PopMutStart)
+                            Call PES1.EsReproMut(CES1.Childs(i_ch).CES_Dn, EVO_Einstellungen1.Settings.CES.is_PopMutStart)
 
                             'Auslesen der Variierten Parameter
                             CES1.Childs(i_ch).Loc(i_loc).PES_OptPara = EVO.Common.OptParameter.Clone_Array(PES1.EsGetParameter())
@@ -1355,9 +1429,6 @@ Partial Class Form1
         Dim Rueckschritte As Long
 
         Dim HookJeeves As EVO.Kern.HookeAndJeeves = New EVO.Kern.HookeAndJeeves(Me.mProblem.NumParams, EVO_Einstellungen1.Settings.HookJeeves.DnStart, EVO_Einstellungen1.Settings.HookJeeves.DnFinish)
-
-        'Individuumsklasse wird initialisiert
-        Call Common.Individuum.Initialise(Me.mProblem)
 
         ReDim QNBest(Me.mProblem.NumPenalties - 1)
         ReDim QBest(Me.mProblem.NumPenalties - 1)
@@ -1560,16 +1631,13 @@ Partial Class Form1
 
         'Datensätze für Multithreading kopieren (nur Sim-Anwendungen)
         If (Me.Anwendung <> ANW_TESTPROBLEME And n_Threads > 1) Then
-            Call Sim1.copyDatensatz(n_Threads)
+            Call Sim1.createThreadWorkDirs(n_Threads)
         End If
 
         'Diagramm vorbereiten und initialisieren
         If (Not Me.mProblem.Method = METH_HYBRID And Not Me.EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Sequencial_1) Then
             Call PrepareDiagramm()
         End If
-
-        'Individuumsklasse wird initialisiert
-        Call Common.Individuum.Initialise(Me.mProblem)
 
         'Schritte 0: Objekt der Klasse PES wird erzeugt
         '**********************************************
@@ -1638,7 +1706,7 @@ Start_Evolutionsrunden:
                         ind(i).OptParameter = EVO.Common.OptParameter.Clone_Array(PES1.EsGetParameter())
 
                         'Testprobleme direkt auswerten
-                        If Anwendung = ANW_TESTPROBLEME Then
+                        If (Anwendung = ANW_TESTPROBLEME) Then
 
                             PES1.PES_iAkt.iAktNachf = i
 
@@ -1652,6 +1720,15 @@ Start_Evolutionsrunden:
 
                             'Verlauf aktualisieren
                             Call EVO_Opt_Verlauf1.Nachfolger(PES1.PES_iAkt.iAktNachf + 1)
+
+                            'Pause?
+                            If (Me.ispause) Then
+                                Me.Button_Start.Text = "Run"
+                                Do While (Me.ispause)
+                                    System.Threading.Thread.Sleep(20)
+                                    Application.DoEvents()
+                                Loop
+                            End If
 
                             System.Windows.Forms.Application.DoEvents()
 
@@ -1675,7 +1752,7 @@ Start_Evolutionsrunden:
                             If Sim1.launchFree(Thread_Free) And Child_Run < EVO_Einstellungen1.Settings.PES.n_Nachf _
                             And (Child_Ready + n_Threads > Child_Run) And Me.ispause = False Then
 
-                                Sim1.WorkDir_Current = Sim1.getWorkDir(Thread_Free)
+                                Sim1.WorkDir_Current = Sim1.getThreadWorkDir(Thread_Free)
 
                                 Call Sim1.PREPARE_Evaluation_PES(ind(Child_Run).OptParameter)
 
@@ -1689,7 +1766,7 @@ Start_Evolutionsrunden:
                                 '--------------------------------------
                             ElseIf Sim1.launchReady(Thread_Ready, SIM_Eval_is_OK, Child_Ready) = True And SIM_Eval_is_OK Then
 
-                                Sim1.WorkDir_Current = Sim1.getWorkDir(Thread_Ready)
+                                Sim1.WorkDir_Current = Sim1.getThreadWorkDir(Thread_Ready)
                                 Sim1.SIM_Ergebnis_auswerten(ind(Child_Ready))
 
                                 'Lösung zeichnen und Dn ausgeben
@@ -1753,7 +1830,7 @@ Start_Evolutionsrunden:
                                 'Parameter aus PES ins Individuum kopieren
                                 ind(Child_False(i)).OptParameter = EVO.Common.OptParameter.Clone_Array(PES1.EsGetParameter())
 
-                                Sim1.WorkDir_Current = Sim1.getWorkDir(0)
+                                Sim1.WorkDir_Current = Sim1.getThreadWorkDir(0)
                                 Call Sim1.PREPARE_Evaluation_PES(ind(Child_False(i)).OptParameter)
 
                                 SIM_Eval_is_OK = Sim1.launchSim(0, Child_False(i))
@@ -1799,7 +1876,12 @@ Start_Evolutionsrunden:
 
                         'SekPop zeichnen
                         '---------------
-                        Call Me.Hauptdiagramm1.ZeichneSekPopulation(PES1.SekundärQb)
+                        If (Not IsNothing(Sim1)) Then
+                            'BUG 257: Umweg über Sim1.OptResult gehen, weil es im PES keine Individuum-IDs gibt
+                            Call Me.Hauptdiagramm1.ZeichneSekPopulation(Sim1.OptResult.getSekPop())
+                        Else
+                            Call Me.Hauptdiagramm1.ZeichneSekPopulation(PES1.SekundärQb)
+                        End If
 
                         'Hypervolumen berechnen und Zeichnen
                         '-----------------------------------
@@ -2370,8 +2452,8 @@ Start_Evolutionsrunden:
                 Continue For
             End If
 
-            'Individuum in Sim evaluieren
-            isOK = Sim1.Evaluate(ind)
+            'Individuum in Sim evaluieren (ohne in DB zu speichern, da es ja bereits drin ist)
+            isOK = Sim1.Evaluate(ind, False)
 
             'TODO: Simulationsfehler abfangen!
 

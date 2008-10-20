@@ -26,6 +26,6 @@ Imports System.Runtime.InteropServices
 ' mit '*' verwenden. Siehe unten
 
 
-<Assembly: AssemblyVersion("1.2.1.*")> 
+<Assembly: AssemblyVersion("1.2.2.*")> 
 
 

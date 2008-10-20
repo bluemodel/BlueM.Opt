@@ -30,15 +30,15 @@ Partial Class Form1
         Dim MenuStrip1 As System.Windows.Forms.MenuStrip
         Dim MenuItem_Tools As System.Windows.Forms.ToolStripMenuItem
         Dim ToolStripSeparator1 As System.Windows.Forms.ToolStripSeparator
+        Dim MenuItem_Ansicht As System.Windows.Forms.ToolStripMenuItem
+        Dim MenuItem_Hilfe As System.Windows.Forms.ToolStripMenuItem
         Dim ToolStripSeparator2 As System.Windows.Forms.ToolStripSeparator
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
         Me.MenuItem_DatensatzZurücksetzen = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuItem_Optionen = New System.Windows.Forms.ToolStripMenuItem
-        Me.MenuItem_Hilfe = New System.Windows.Forms.ToolStripMenuItem
+        Me.MenuItem_MonitorAnzeigen = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuItem_Wiki = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuItem_About = New System.Windows.Forms.ToolStripMenuItem
-        Me.AnsichtToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.MenuItem_MonitorAnzeigen = New System.Windows.Forms.ToolStripMenuItem
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.Button_Start = New System.Windows.Forms.Button
         Me.Button_openMDB = New System.Windows.Forms.Button
@@ -70,6 +70,8 @@ Partial Class Form1
         MenuStrip1 = New System.Windows.Forms.MenuStrip
         MenuItem_Tools = New System.Windows.Forms.ToolStripMenuItem
         ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator
+        MenuItem_Ansicht = New System.Windows.Forms.ToolStripMenuItem
+        MenuItem_Hilfe = New System.Windows.Forms.ToolStripMenuItem
         ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator
         MenuStrip1.SuspendLayout()
         Me.GroupBox_Anwendung.SuspendLayout()
@@ -80,7 +82,7 @@ Partial Class Form1
         '
         'MenuStrip1
         '
-        MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {MenuItem_Tools, Me.AnsichtToolStripMenuItem, Me.MenuItem_Hilfe})
+        MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {MenuItem_Tools, MenuItem_Ansicht, MenuItem_Hilfe})
         MenuStrip1.Location = New System.Drawing.Point(0, 0)
         MenuStrip1.Name = "MenuStrip1"
         MenuStrip1.RightToLeft = System.Windows.Forms.RightToLeft.No
@@ -113,12 +115,28 @@ Partial Class Form1
         Me.MenuItem_Optionen.Size = New System.Drawing.Size(200, 22)
         Me.MenuItem_Optionen.Text = "Optionen..."
         '
+        'MenuItem_Ansicht
+        '
+        MenuItem_Ansicht.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItem_MonitorAnzeigen})
+        MenuItem_Ansicht.Name = "MenuItem_Ansicht"
+        MenuItem_Ansicht.Size = New System.Drawing.Size(54, 20)
+        MenuItem_Ansicht.Text = "Ansicht"
+        '
+        'MenuItem_MonitorAnzeigen
+        '
+        Me.MenuItem_MonitorAnzeigen.Checked = True
+        Me.MenuItem_MonitorAnzeigen.CheckOnClick = True
+        Me.MenuItem_MonitorAnzeigen.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.MenuItem_MonitorAnzeigen.Name = "MenuItem_MonitorAnzeigen"
+        Me.MenuItem_MonitorAnzeigen.Size = New System.Drawing.Size(167, 22)
+        Me.MenuItem_MonitorAnzeigen.Text = "Monitor anzeigen"
+        '
         'MenuItem_Hilfe
         '
-        Me.MenuItem_Hilfe.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItem_Wiki, ToolStripSeparator2, Me.MenuItem_About})
-        Me.MenuItem_Hilfe.Name = "MenuItem_Hilfe"
-        Me.MenuItem_Hilfe.Size = New System.Drawing.Size(40, 20)
-        Me.MenuItem_Hilfe.Text = "Hilfe"
+        MenuItem_Hilfe.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItem_Wiki, ToolStripSeparator2, Me.MenuItem_About})
+        MenuItem_Hilfe.Name = "MenuItem_Hilfe"
+        MenuItem_Hilfe.Size = New System.Drawing.Size(40, 20)
+        MenuItem_Hilfe.Text = "Hilfe"
         '
         'MenuItem_Wiki
         '
@@ -136,22 +154,6 @@ Partial Class Form1
         Me.MenuItem_About.Name = "MenuItem_About"
         Me.MenuItem_About.Size = New System.Drawing.Size(172, 22)
         Me.MenuItem_About.Text = "About EVO.NET..."
-        '
-        'AnsichtToolStripMenuItem
-        '
-        Me.AnsichtToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItem_MonitorAnzeigen})
-        Me.AnsichtToolStripMenuItem.Name = "AnsichtToolStripMenuItem"
-        Me.AnsichtToolStripMenuItem.Size = New System.Drawing.Size(54, 20)
-        Me.AnsichtToolStripMenuItem.Text = "Ansicht"
-        '
-        'MenuItem_MonitorAnzeigen
-        '
-        Me.MenuItem_MonitorAnzeigen.Checked = True
-        Me.MenuItem_MonitorAnzeigen.CheckOnClick = True
-        Me.MenuItem_MonitorAnzeigen.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.MenuItem_MonitorAnzeigen.Name = "MenuItem_MonitorAnzeigen"
-        Me.MenuItem_MonitorAnzeigen.Size = New System.Drawing.Size(167, 22)
-        Me.MenuItem_MonitorAnzeigen.Text = "Monitor anzeigen"
         '
         'Button_Start
         '
@@ -408,7 +410,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Header.Lines = New String() {"EVO.NET"}
+        Me.Hauptdiagramm1.Header.Lines = New String() {"BlueM.Opt"}
         Me.Hauptdiagramm1.Location = New System.Drawing.Point(241, 86)
         Me.Hauptdiagramm1.Name = "Hauptdiagramm1"
         Me.Hauptdiagramm1.Size = New System.Drawing.Size(473, 566)
@@ -455,7 +457,7 @@ Partial Class Form1
         Me.MaximizeBox = False
         Me.Name = "Form1"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "EVO.NET"
+        Me.Text = "BlueM.Opt"
         MenuStrip1.ResumeLayout(False)
         MenuStrip1.PerformLayout()
         Me.GroupBox_Anwendung.ResumeLayout(False)
@@ -485,11 +487,6 @@ Partial Class Form1
     Private WithEvents Button_loadRefResult As System.Windows.Forms.Button
     Friend WithEvents Button_BrowseDatensatz As System.Windows.Forms.Button
     Friend WithEvents ComboBox_Datensatz As System.Windows.Forms.ComboBox
-    Friend WithEvents MenuItem_DatensatzZurücksetzen As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents MenuItem_Optionen As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents MenuItem_Hilfe As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents MenuItem_About As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents MenuItem_Wiki As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents GroupBox_TChartButtons As System.Windows.Forms.GroupBox
     Friend WithEvents Button_TChartEdit As System.Windows.Forms.Button
     Friend WithEvents Button_TChart2PNG As System.Windows.Forms.Button
@@ -498,6 +495,9 @@ Partial Class Form1
     Friend WithEvents Info As System.Windows.Forms.GroupBox
     Friend WithEvents Label_Dn As System.Windows.Forms.Label
     Friend WithEvents Label_Dn_Wert As System.Windows.Forms.Label
-    Friend WithEvents AnsichtToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Private WithEvents MenuItem_MonitorAnzeigen As System.Windows.Forms.ToolStripMenuItem
+    Private WithEvents MenuItem_DatensatzZurücksetzen As System.Windows.Forms.ToolStripMenuItem
+    Private WithEvents MenuItem_Optionen As System.Windows.Forms.ToolStripMenuItem
+    Private WithEvents MenuItem_About As System.Windows.Forms.ToolStripMenuItem
+    Private WithEvents MenuItem_Wiki As System.Windows.Forms.ToolStripMenuItem
 End Class
