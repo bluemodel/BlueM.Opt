@@ -201,7 +201,7 @@ namespace IHWB.EVO.MetaEvo
                         if (modell == "sim")
                         {
                             sim.Evaluate_MetaEvo(ref generation[i]);
-                            hauptdiagramm1.ZeichneIndividuum(generation[i], 1, 1, 1, generation[i].ID % generation.Length, System.Drawing.Color.Yellow, true);
+                            hauptdiagramm1.ZeichneIndividuum(generation[i], 1, 1, 1, generation[i].ID % generation.Length, System.Drawing.Color.Orange, false);
                             System.Windows.Forms.Application.DoEvents();
                         }  
                     }
