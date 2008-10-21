@@ -1241,7 +1241,7 @@ StartMutation:
     '*************************************************************
     Public Sub EsBest(ByVal Ind As Individuum)
 
-        Dim m, i, j, v As Integer
+        Dim m, j, v As Integer
         Dim h As Double
 
         If (mSettings.PES.OptModus = EVO_MODUS.Single_Objective) Then
