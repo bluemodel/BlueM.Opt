@@ -57,12 +57,12 @@ namespace IHWB.EVO.MetaEvo
             //Setzen des Problems zum Design des Individuums
             EVO.Common.Individuum_MetaEvo.Initialise(ref prob_input);
             individuumnumber = 1;
-            if (applog.log) applog.appendText("Controller: Task: " + prob.WorkDir);
+            applog.appendText("Controller: Task: " + prob.WorkDir);
 
             switch (this.role)
             {
                 case "Single PC":
-                    if (applog.log) applog.appendText("Controller: MetaEvo started in 'Single PC'-Mode");
+                     applog.appendText("Controller: MetaEvo started in 'Single PC'-Mode");
                     //### Vorbereitung ###
                     //Initialisieren des Individuum-Arrays
                     generation = new EVO.Common.Individuum_MetaEvo[this.settings.MetaEvo.PopulationSize];
@@ -80,7 +80,7 @@ namespace IHWB.EVO.MetaEvo
                     break;
 
                 case "Network Server":
-                    if (applog.log) applog.appendText("Controller: MetaEvo started in 'Network Server'-Mode");
+                     applog.appendText("Controller: MetaEvo started in 'Network Server'-Mode");
                     //### Vorbereitung ###
                     //Initialisieren des Individuum-Arrays
                     generation = new EVO.Common.Individuum_MetaEvo[this.settings.MetaEvo.PopulationSize];
@@ -99,7 +99,7 @@ namespace IHWB.EVO.MetaEvo
                     break;
 
                 case "Network Client":
-                    if (applog.log) applog.appendText("Controller: MetaEvo started in 'Network Client'-Mode");
+                     applog.appendText("Controller: MetaEvo started in 'Network Client'-Mode");
                     //### Vorbereitung ###
                     individuumForClient = new EVO.Common.Individuum_MetaEvo("MetaEvo", 0, prob_input.List_OptParameter.Length);
                     //Microsoft SQL-DB des Clients ausschalten
@@ -121,7 +121,7 @@ namespace IHWB.EVO.MetaEvo
         {
             double[] random;
             Random randomizer = new Random();
-            if (applog.log) applog.appendText("Controller: Construct random Genpool");
+            applog.appendText("Controller: Construct random Genpool");
 
             //Für jedes Individuum durchgehen
             for (int k = 0; k < this.settings.MetaEvo.PopulationSize; k++)
@@ -160,7 +160,7 @@ namespace IHWB.EVO.MetaEvo
                     set_random_parents(ref generation);
 
                     //Genpool simulieren
-                    if (applog.log) applog.appendText("Controller: Genpool: Simulating Individuums...");
+                     applog.appendText("Controller: Genpool: Simulating Individuums...");
                     for (int i = 0; i < generation.Length; i++)
                     {
                         //Simulieren 
@@ -170,7 +170,7 @@ namespace IHWB.EVO.MetaEvo
                             generation[i].set_status("true");
                         }
                         if ((modell == "sim") && (generation[i].get_toSimulate())) sim.Evaluate_MetaEvo(ref generation[i]);
-                        if (applog.log) applog.appendText("Controller: Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length),2) * 100 + "%)");
+                        applog.appendText("Controller: Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length),2) * 100 + "%)");
                     }
 
                     //Genpool speichern und zeichnen
@@ -183,14 +183,14 @@ namespace IHWB.EVO.MetaEvo
                 else if (mePC.status == "perform_global_or_hybrid")
                 {
                     //Neue Generation bauen
-                    if (applog.log) applog.appendText("Controller: ### Building new Individuums for Generation " + generationcounter + " ###");
+                    applog.appendText("Controller: ### Building new Individuums for Generation " + generationcounter + " ###");
                     algomanager.new_individuals_build(ref generation);
                     
                     //Neue Generation Simulieren
-                    if (applog.log) applog.appendText("Controller: Individuums for Generation " + generationcounter + ": Simulating Individuums...");
+                    applog.appendText("Controller: Individuums for Generation " + generationcounter + ": Simulating Individuums...");
                     for (int i = 0; i < generation.Length; i++)
                     {
-                        if (applog.log)
+                        
                         {
                             tmp = "(";
                             for (int j = 0; j < generation[0].get_optparas().Length; j++)
@@ -222,8 +222,8 @@ namespace IHWB.EVO.MetaEvo
                     else generationcounter++;
                 }
             }
-            if (applog.log) applog.appendText("Controller: Calculation Finished");
-            if (applog.log) applog.savelog();
+            applog.appendText("Controller: Calculation Finished");
+            applog.savelog();
         }
 
         // Network Server
@@ -243,7 +243,7 @@ namespace IHWB.EVO.MetaEvo
                     set_random_parents(ref generation);
 
                     //Von den Clients ausrechnen lassen
-                    if (applog.log) applog.appendText("Controller: Calculate Genpool by Clients");
+                    applog.appendText("Controller: Calculate Genpool by Clients");
                     if (networkmanager.calculate_by_clients(ref generation, ref hauptdiagramm1))
                     {
                         algomanager.set_genpool(ref generation);
@@ -286,7 +286,7 @@ namespace IHWB.EVO.MetaEvo
                 }
             }
             meServer.set_AlsoInDB("finished", -1, -1);
-            if (applog.log) applog.appendText("Controller: Calculation Finished");
+            applog.appendText("Controller: Calculation Finished");
         }
 
         // Network Client
@@ -316,7 +316,7 @@ namespace IHWB.EVO.MetaEvo
                     networkmanager.Individuum_UpdateInDB(ref individuumForClient, "status", "calculate");
 
                     //Simulieren
-                    if (applog.log) applog.appendText("Controller: Individuum " + individuumForClient.ID + " simulating...");
+                    applog.appendText("Controller: Individuum " + individuumForClient.ID + " simulating...");
                     if (modell == "testprobleme") testprobleme.Evaluierung_TestProbleme_MetaEvo(ref individuumForClient, 1, ref hauptdiagramm1);
                     if (modell == "sim") sim.Evaluate_MetaEvo(ref individuumForClient);
 
@@ -327,7 +327,7 @@ namespace IHWB.EVO.MetaEvo
                     Berechnungsdauer = Math.Round((DateTime.Now.Subtract(Berechnungsstart)).TotalMilliseconds, 0);
                     meClient.speed_av += Math.Round((Berechnungsdauer - meClient.speed_av) / meClient.numberindividuums, 0);
                     if (Berechnungsdauer > meClient.speed_low) meClient.speed_low = Berechnungsdauer;
-                    if (applog.log) applog.appendText("Controller: Average Speed is set to " + meClient.speed_av + " Milliseconds, Lowest Speed is set to " + meClient.speed_low + " Milliseconds");
+                    applog.appendText("Controller: Average Speed is set to " + meClient.speed_av + " Milliseconds, Lowest Speed is set to " + meClient.speed_low + " Milliseconds");
 
                     //Client ind DB Updaten
                     meClient.set_AlsoInDB("", meClient.speed_av, meClient.speed_low);
@@ -336,7 +336,7 @@ namespace IHWB.EVO.MetaEvo
                 // Wenn kein Individuum mehr da ist, warten
                 else
                 {
-                    if (applog.log) applog.appendText("Controller: No Individuum found in DB (for this Client) - waiting...");
+                    applog.appendText("Controller: No Individuum found in DB (for this Client) - waiting...");
                     System.Threading.Thread.Sleep(3000);
                     //Prüfen ob Client-Entry noch besteht bzw. neu eintragen
                     networkmanager.DB_client_entry();
@@ -345,7 +345,7 @@ namespace IHWB.EVO.MetaEvo
                 //Serverstatus neu lesen
                 serverstatus = networkmanager.Network_ReadServer();
             }
-            if (applog.log) applog.appendText("Controller: Calculation Finished");
+            applog.appendText("Controller: Calculation Finished");
         }
     }
 }

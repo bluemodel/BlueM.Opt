@@ -89,7 +89,7 @@ namespace IHWB.EVO.MetaEvo
                 //Globale Algorithmen
                 #region Zufällige Einfache Mutation: Mutiert an einer zufälligen Stelle innerhalb der Grenzen von Min und Max
                 case "Zufällige Einfache Mutation":
-                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
+                     applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
 
                     double[] mutated_optparas = new double[numberoptparas];
                     int selecteditem;
@@ -116,7 +116,7 @@ namespace IHWB.EVO.MetaEvo
                     //Feedbackdata: Pro Individuum: [[Mutationsparameter]] 
                     //Ein Mutationsparameter kann pro runde maximal um 10% verändert werden
 
-                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with "+algo_id+":'" + algofeedbackarray[algo_id].name + "'...done");
+                     applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with "+algo_id+":'" + algofeedbackarray[algo_id].name + "'...done");
 
                     double[] fmutated_optparas = new double[numberoptparas];
                     int pointer_parent2 = 0;
@@ -224,7 +224,7 @@ namespace IHWB.EVO.MetaEvo
 
                 #region Zufällige Rekombination: Die Werte zweier zufälliger Eltern werden zufällig rekombiniert
                 case "Zufällige Rekombination":
-                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done"); 
+                     applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done"); 
                     
                     int selectedind;
                     int selectedind2;
@@ -260,7 +260,7 @@ namespace IHWB.EVO.MetaEvo
 
                 #region Diversität aus Sortierung: Differenzvektorbestimmung und Addierung am Rande der nach zufälligem Kriterium sortierten Generation
                 case "Diversität aus Sortierung":
-                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
+                    applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
 
                     double[] diversity_optparas = new double[numberoptparas];
                     double mult1 = 1;
@@ -309,7 +309,7 @@ namespace IHWB.EVO.MetaEvo
 
                 #region Totaler Zufall: Alle Optparameter entstehen durch zufällige Wahl
                 case "Totaler Zufall":
-                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
+                     applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
 
                     double[] random;
 
@@ -336,7 +336,7 @@ namespace IHWB.EVO.MetaEvo
 
                 #region Dominanzvektor: Differenzvektor eines dominierten und eines dominanten Individuums auf ein dominantes Individuum addieren
                 case "Dominanzvektor":
-                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
+                     applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
 
                     double[] dominanz;
                     int dominator = -1;
@@ -399,7 +399,7 @@ namespace IHWB.EVO.MetaEvo
 
                 #region Hook and Jeeves V1: Optparameter werden nacheinander variiert und zwei neue Individuen erzeugt
                 case "Hook and Jeeves V1":
-                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
+                     applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
                     //Statusparameter im Feedbackarray:
                     //Doublearray: Pro Individuum: [Optparameter][Schrittweite, Schrittweitenteilungen in Parent und Child, Anzahl Kinder in parent]
 
@@ -599,7 +599,7 @@ namespace IHWB.EVO.MetaEvo
                 //Lokale Algorithmen
                 #region Hook and Jeeves V2: Optparameter werden nacheinander variiert und zwei neue Individuen erzeugt
                 case "Hook and Jeeves V2":
-                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
+                     applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
                     
                     for (int i = 0; i < numberindividuums; i++)
                     {

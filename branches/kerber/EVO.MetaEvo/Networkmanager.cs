@@ -22,7 +22,6 @@ namespace IHWB.EVO.MetaEvo
         int number_constraints;  //Anzahl constraints
         int number_features;    //Anzahl Featurefunktionswerte (inkl. Penalties)
         int populationsize;     //Anzahl Individuen in einer Population
-        DateTime startingtime;       //Start des Berechnungszyklusses
 
         //### Konstruktor ###
         public Networkmanager(ref EVO.Common.Individuum_MetaEvo individuum_input, ref EVO.Common.EVO_Settings settings_input, ref EVO.Diagramm.ApplicationLog applog_input)
@@ -38,7 +37,7 @@ namespace IHWB.EVO.MetaEvo
             //Server
             if (settings_input.MetaEvo.Role == "Network Server")
             {
-                if (applog.log) applog.appendText("Network Manager: Started in 'Network Server' Mode");
+                applog.appendText("Network Manager: Started in 'Network Server' Mode");
                 mycon = new MySqlConnection("datasource=" + settings_input.MetaEvo.MySQL_Host + ";username=" + settings_input.MetaEvo.MySQL_User + ";password=" + settings_input.MetaEvo.MySQL_Password + ";database=information_schema");
                 myCommand.Connection = mycon;
 
@@ -51,7 +50,7 @@ namespace IHWB.EVO.MetaEvo
             // Client
             else
             {
-                if (applog.log) applog.appendText("Network Manager: Started in 'Network Client' Mode");
+                applog.appendText("Network Manager: Started in 'Network Client' Mode");
                 mycon = new MySqlConnection("datasource=" + settings_input.MetaEvo.MySQL_Host + ";username=" + settings_input.MetaEvo.MySQL_User + ";password=" + settings_input.MetaEvo.MySQL_Password + ";database=" + settings_input.MetaEvo.MySQL_Database);
                 myCommand.Connection = mycon;
                 if (this.DB_check_connection())
@@ -72,11 +71,11 @@ namespace IHWB.EVO.MetaEvo
             {
                 mycon.Open();
                 mycon.Close();
-                if (applog.log) applog.appendText("Network Manager: DB-Connection Successfully");
+                 applog.appendText("Network Manager: DB-Connection Successfully");
             }
             catch (MySqlException ex)
             {
-                if (applog.log) applog.appendText("Network Manager: DB-Connection Failed");
+                 applog.appendText("Network Manager: DB-Connection Failed");
                 MessageBox.Show(ex.Message,"MySQL Database");
                 return false;
             }
@@ -163,7 +162,7 @@ namespace IHWB.EVO.MetaEvo
             myCommand.Connection.Open();
             myCommand.ExecuteNonQuery();
             myCommand.Connection.Close();
-            if (applog.log) applog.appendText("Network Manager: DB-Construction Successfilly");
+             applog.appendText("Network Manager: DB-Construction Successfilly");
         }
 
         //(ok)sich als Client in DB eintragen
@@ -494,13 +493,13 @@ namespace IHWB.EVO.MetaEvo
             //Falls kein Aktiver Client vorhanden ist, 3 Sekunden warten und dann nochmal aufrufen
             if (network1.number_clients == 0)
             {
-                if (applog.log) applog.appendText("Scheduling: No Client found registered in DB - wait...");
+                 applog.appendText("Scheduling: No Client found registered in DB - wait...");
                 System.Threading.Thread.Sleep(3000);
                 scheduling_new(ref generation_input);
             }
             else
             {
-                if (applog.log) applog.appendText("Networkmanager: New Scheduling");
+                 applog.appendText("Networkmanager: New Scheduling");
 
                 //Individuen-Zuweisungen zurücksetzen 
                 network1.erase_current_calc_times();
@@ -533,7 +532,7 @@ namespace IHWB.EVO.MetaEvo
                 //Ausgabe der Zuteilung
                 for (int i = 0; i < network1.Clients.Length; i++)
                 {
-                    if (applog.log) applog.appendText("Networkmanager: New Scheduling: Client '" + network1.Clients[i].ipName + "' " + network1.Clients[i].numberindividuums + " Individuums");
+                     applog.appendText("Networkmanager: New Scheduling: Client '" + network1.Clients[i].ipName + "' " + network1.Clients[i].numberindividuums + " Individuums");
                 }
             }
         }
@@ -550,7 +549,7 @@ namespace IHWB.EVO.MetaEvo
             //Falls kein Aktiver Client vorhanden ist, 3 Sekunden warten und dann scheduling_new aufrufen
             if (network1.number_clients == 0)
             {
-                if (applog.log) applog.appendText("Scheduling: No Client found registered in DB - waiting...");
+                 applog.appendText("Scheduling: No Client found registered in DB - waiting...");
                 System.Threading.Thread.Sleep(3000);
                 scheduling_new(ref generation_input);
             }
@@ -558,7 +557,7 @@ namespace IHWB.EVO.MetaEvo
             //An den Daten der Clients hat sich etwas geändert (Status=ready oder Speed-av hat sich um mehr als 5% geändert)
             else if (scheduling_error)   
             {
-                if (applog.log) applog.appendText("Networkmanager: Adapted Scheduling");
+                 applog.appendText("Networkmanager: Adapted Scheduling");
 
                 //DB auf Geschwindigkeitsänderung/Ausfall von Clients untersuchen und entsprechende Individuen demarkieren
                 current_client = 0;
@@ -678,7 +677,7 @@ namespace IHWB.EVO.MetaEvo
                 //Ausgabe der neuen Zuteilung
                 for (int i = 0; i < network1.Clients.Length; i++)
                 {
-                    if (applog.log) applog.appendText("Networkmanager: Adapted Scheduling: Client '" + network1.Clients[i].ipName + "' " + network1.Clients[i].numberindividuums + " Individuums");
+                     applog.appendText("Networkmanager: Adapted Scheduling: Client '" + network1.Clients[i].ipName + "' " + network1.Clients[i].numberindividuums + " Individuums");
                 }
             }
         }
@@ -696,12 +695,12 @@ namespace IHWB.EVO.MetaEvo
             this.scheduling_new(ref generation_input);
 
             //In die Datenbank schreiben
-            if (applog.log) applog.appendText("Networkmanager: Write Individuums to DB");
+            applog.appendText("Networkmanager: Write Individuums to DB");
             this.DB_ClearIndividuumsTable();
             this.Individuums_WriteToDB(ref generation_input);
 
             //Warten bis erste Ergebnisse vorliegen müssten
-            if (applog.log) applog.appendText("Networkmanager: Waiting for first Results...");
+            applog.appendText("Networkmanager: Waiting for first Results...");
 
             //Prüfen ob alle Individuen fertig berechnet sind
             while (individuums_ready_now < this.populationsize)
@@ -718,7 +717,7 @@ namespace IHWB.EVO.MetaEvo
                         System.Windows.Forms.Application.DoEvents();
                     }
 
-                    if (applog.log) applog.appendText("Networkmanager: " + Math.Round((double)individuums_ready_now / (double)populationsize, 2) * 100 + "%");
+                    applog.appendText("Networkmanager: " + Math.Round((double)individuums_ready_now / (double)populationsize, 2) * 100 + "%");
 
                     individuums_ready = individuums_ready_now;
                 }
