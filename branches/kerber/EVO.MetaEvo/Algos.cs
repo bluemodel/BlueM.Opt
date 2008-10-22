@@ -25,12 +25,14 @@ namespace IHWB.EVO.MetaEvo
     {
         public Algofeedback[] algofeedbackarray;
         int individuum_id;
+        int ChildsPerParent;
         EVO.Diagramm.ApplicationLog applog;
 
-        public Algos(ref EVO.Common.Individuum_MetaEvo[] genpool_muster, int individuum_id_input, ref EVO.Diagramm.ApplicationLog applog_input)
+        public Algos(ref EVO.Common.EVO_Settings settings_input, int individuum_id_input, ref EVO.Diagramm.ApplicationLog applog_input)
         {
             individuum_id = individuum_id_input;
             applog = applog_input;
+            ChildsPerParent = settings_input.MetaEvo.ChildsPerParent;
         }
 
         //Legt fest welche Algorithmen genutzt werden sollen
@@ -42,7 +44,7 @@ namespace IHWB.EVO.MetaEvo
 
             for (int i = 0; i < tmp.Length; i++)
             {
-                algofeedbackarray[i] = new Algofeedback(tmp[i].Trim(), individuum_id / algofeedbackarray.Length);
+                algofeedbackarray[i] = new Algofeedback(tmp[i].Trim(), (individuum_id * ChildsPerParent) / algofeedbackarray.Length);
             }
         }
 
@@ -70,15 +72,15 @@ namespace IHWB.EVO.MetaEvo
             Random rand = new Random();
 
             //Sicherung gegen Rundungsfehler bei der Platzvergabe für die Algos
-            if (startindex + numberindividuums >= genpool_input.Length)
+            if (startindex + numberindividuums >= new_generation_input.Length)
             {
-                numberindividuums = genpool_input.Length - startindex;
+                numberindividuums = new_generation_input.Length - startindex;
                 algofeedbackarray[algo_id].number_individuals_for_nextGen = numberindividuums;
             }
             //Letzter Algo bekommt automatisch restliche Plätze
             if (algo_id == algofeedbackarray.Length - 1)
             {
-                numberindividuums = genpool_input.Length - startindex;
+                numberindividuums = new_generation_input.Length - startindex;
                 algofeedbackarray[algo_id].number_individuals_for_nextGen = numberindividuums;
             }
 
@@ -86,16 +88,16 @@ namespace IHWB.EVO.MetaEvo
             {
                 //Globale Algorithmen
                 #region Zufällige Einfache Mutation: Mutiert an einer zufälligen Stelle innerhalb der Grenzen von Min und Max
-                case "Zufällige Einfache Mutation": 
-                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with '" + algofeedbackarray[algo_id].name + "'...done");
-                    
+                case "Zufällige Einfache Mutation":
+                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
+
                     double[] mutated_optparas = new double[numberoptparas];
                     int selecteditem;
 
                     for (int i = 0; i < numberindividuums; i++)
                     {
                         //Zufälligen parent wählen und optparas kopieren
-                        mutated_optparas = new_generation_input[rand.Next(0, genpool_input.Length - 1)].get_optparas();
+                        mutated_optparas = genpool_input[rand.Next(0, genpool_input.Length - 1)].get_optparas();
                         //Zufälligen Wert mutieren
                         selecteditem = rand.Next(0, numberoptparas - 1);
                         mutated_optparas[selecteditem] = genpool_input[1].OptParameter[selecteditem].Min + (genpool_input[1].OptParameter[selecteditem].Max - genpool_input[1].OptParameter[selecteditem].Min) * ((double)rand.Next(0, 1000) / (double)1000);
@@ -114,7 +116,7 @@ namespace IHWB.EVO.MetaEvo
                     //Feedbackdata: Pro Individuum: [[Mutationsparameter]] 
                     //Ein Mutationsparameter kann pro runde maximal um 10% verändert werden
 
-                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with '" + algofeedbackarray[algo_id].name + "'...done");
+                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with "+algo_id+":'" + algofeedbackarray[algo_id].name + "'...done");
 
                     double[] fmutated_optparas = new double[numberoptparas];
                     int pointer_parent2 = 0;
@@ -218,17 +220,27 @@ namespace IHWB.EVO.MetaEvo
                     break;
                 #endregion
 
+                //Mutation nach Rechenberg (S.62 Muschalla)
+
                 #region Zufällige Rekombination: Die Werte zweier zufälliger Eltern werden zufällig rekombiniert
-                case "Zufällige Rekombination": 
-                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with '" + algofeedbackarray[algo_id].name + "'...done");
+                case "Zufällige Rekombination":
+                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done"); 
                     
+                    int selectedind;
+                    int selectedind2;
                     double[] recombinated_optparas = new double[numberoptparas];
                     double[] recombinated_optparas2 = new double[numberoptparas];
                     for (int i = 0; i < numberindividuums; i++)
                     {
                         //Zufälligen parent wählen und kopieren
-                        recombinated_optparas = genpool_input[rand.Next(0, genpool_input.Length - 1)].get_optparas();
-                        recombinated_optparas2 = genpool_input[rand.Next(0, genpool_input.Length - 1)].get_optparas();
+                        selectedind = rand.Next(0, genpool_input.Length - 1);
+                        selectedind2 = rand.Next(0, genpool_input.Length - 1);
+                        while (selectedind == selectedind2)
+                        {
+                            selectedind2 = rand.Next(0, genpool_input.Length - 1);
+                        }
+                        recombinated_optparas = genpool_input[selectedind].get_optparas();
+                        recombinated_optparas2 = genpool_input[selectedind2].get_optparas();
                         //Zufällige Rekombination
                         for (int j = 0; j < numberoptparas; j++)
                         {
@@ -244,10 +256,12 @@ namespace IHWB.EVO.MetaEvo
                     break;
                 #endregion
 
+                //ToDo: Intermediäre Rekombination (S.60, S.75 Muschalla)
+
                 #region Diversität aus Sortierung: Differenzvektorbestimmung und Addierung am Rande der nach zufälligem Kriterium sortierten Generation
-                case "Diversität aus Sortierung": 
-                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with '" + algofeedbackarray[algo_id].name + "'...done");
-                    
+                case "Diversität aus Sortierung":
+                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
+
                     double[] diversity_optparas = new double[numberoptparas];
                     double mult1 = 1;
 
@@ -292,9 +306,9 @@ namespace IHWB.EVO.MetaEvo
                 #endregion
 
                 #region Totaler Zufall: Alle Optparameter entstehen durch zufällige Wahl
-                case "Totaler Zufall": 
-                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with '" + algofeedbackarray[algo_id].name + "'...done"); 
-                    
+                case "Totaler Zufall":
+                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
+
                     double[] random;
 
                     //Für jedes Individuum durchgehen
@@ -319,8 +333,8 @@ namespace IHWB.EVO.MetaEvo
                 #endregion
 
                 #region Dominanzvektor: Differenzvektor eines dominierten und eines dominanten Individuums auf ein dominantes Individuum addieren
-                case "Dominanzvektor": 
-                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with '" + algofeedbackarray[algo_id].name + "'...done");
+                case "Dominanzvektor":
+                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
 
                     double[] dominanz;
                     int dominator = -1;
@@ -335,7 +349,7 @@ namespace IHWB.EVO.MetaEvo
                         for (int j = pointer_parent; j < wastepool_input.Length; j++)
                         {
                             //In der ersten Runde hat Wastepool noch keinen Inhalt; also Standard-Initialisierung 
-                            dominanz = genpool_input[j].get_optparas();
+                            dominanz = genpool_input[j%genpool_input.Length].get_optparas();
                             if (wastepool_input[j] == null)
                             {
                                 break;
@@ -368,7 +382,7 @@ namespace IHWB.EVO.MetaEvo
                                 }
                                 pointer_parent++;
                                 //Neue HaJ-Optparas wurden generiert und können gespeichert werden
-                                if (dominanz != genpool_input[j].get_optparas()) break;
+                                if (dominanz != genpool_input[j%genpool_input.Length].get_optparas()) break;
                             }
                         }
                         //Zurückspeichern
@@ -382,8 +396,8 @@ namespace IHWB.EVO.MetaEvo
                 #endregion
 
                 #region Hook and Jeeves V1: Optparameter werden nacheinander variiert und zwei neue Individuen erzeugt
-                case "Hook and Jeeves V1": 
-                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with '" + algofeedbackarray[algo_id].name + "'...done");
+                case "Hook and Jeeves V1":
+                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
                     //Statusparameter im Feedbackarray:
                     //Doublearray: Pro Individuum: [Optparameter][Schrittweite, Schrittweitenteilungen in Parent und Child, Anzahl Kinder in parent]
 
@@ -578,9 +592,13 @@ namespace IHWB.EVO.MetaEvo
                     break;
                 #endregion
 
+                
+
                 //Lokale Algorithmen
                 #region Hook and Jeeves V2: Optparameter werden nacheinander variiert und zwei neue Individuen erzeugt
                 case "Hook and Jeeves V2":
+                    if (applog.log) applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
+                    
                     for (int i = 0; i < numberindividuums; i++)
                     {
                         if (genpool_input[i].get_generator() == algo_id)

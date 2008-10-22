@@ -73,7 +73,7 @@ namespace IHWB.EVO.MetaEvo
                     }
 
                     //Algomanager starten
-                    algomanager = new Algomanager(ref prob, ref generation, individuumnumber, ref applog, ref hauptdiagramm1);
+                    algomanager = new Algomanager(ref prob, ref settings, individuumnumber, ref applog, ref hauptdiagramm1);
 
                     //### Hauptprogramm ###
                     start_single_pc();
@@ -91,7 +91,7 @@ namespace IHWB.EVO.MetaEvo
                     }
 
                     //Algomanager starten
-                    algomanager = new Algomanager(ref prob, ref generation, individuumnumber, ref applog, ref hauptdiagramm1);
+                    algomanager = new Algomanager(ref prob, ref settings, individuumnumber, ref applog, ref hauptdiagramm1);
 
                     //### Hauptprogramm ###
                     networkmanager = new Networkmanager(ref this.generation[0], ref this.settings, ref applog);
@@ -164,14 +164,18 @@ namespace IHWB.EVO.MetaEvo
                     for (int i = 0; i < generation.Length; i++)
                     {
                         //Simulieren 
-                        if (modell == "testprobleme")testprobleme.Evaluierung_TestProbleme_MetaEvo(ref generation[i],1,ref hauptdiagramm1);
-                        if (modell == "sim") sim.Evaluate_MetaEvo(ref generation[i]);
+                        if (modell == "testprobleme")
+                        {
+                            testprobleme.Evaluierung_TestProbleme_MetaEvo(ref generation[i], 1, ref hauptdiagramm1);
+                            generation[i].set_status("true");
+                        }
+                        if ((modell == "sim") && (generation[i].get_toSimulate())) sim.Evaluate_MetaEvo(ref generation[i]);
                         if (applog.log) applog.appendText("Controller: Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length),2) * 100 + "%)");
                     }
 
                     //Genpool speichern und zeichnen
                     algomanager.set_genpool(ref generation);
-                    generation = new EVO.Common.Individuum_MetaEvo[3*this.settings.MetaEvo.PopulationSize];
+                    generation = new EVO.Common.Individuum_MetaEvo[this.settings.MetaEvo.ChildsPerParent*this.settings.MetaEvo.PopulationSize];
 
                     mePC.status = "perform_global_or_hybrid";
                 }
@@ -198,7 +202,11 @@ namespace IHWB.EVO.MetaEvo
                         }
 
                         //Simulieren und zeichnen
-                        if (modell == "testprobleme") testprobleme.Evaluierung_TestProbleme_MetaEvo(ref generation[i], 1, ref hauptdiagramm1);
+                        if (modell == "testprobleme")
+                        {
+                            testprobleme.Evaluierung_TestProbleme_MetaEvo(ref generation[i], 1, ref hauptdiagramm1);
+                            generation[i].set_status("true");
+                        }
                         if (modell == "sim")
                         {
                             sim.Evaluate_MetaEvo(ref generation[i]);
@@ -240,7 +248,7 @@ namespace IHWB.EVO.MetaEvo
                     {
                         algomanager.set_genpool(ref generation);
                         meServer.set_AlsoInDB("generate Individuums", -1, -1);
-                        generation = new EVO.Common.Individuum_MetaEvo[3 * this.settings.MetaEvo.PopulationSize];
+                        generation = new EVO.Common.Individuum_MetaEvo[this.settings.MetaEvo.ChildsPerParent * this.settings.MetaEvo.PopulationSize];
                     }
                     else
                     {

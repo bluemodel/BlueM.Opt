@@ -9,6 +9,7 @@
     Private statusopponent As Integer        'Individuen-ID durch den dieses Individuum gelöscht wurde
     Private mOptparameter() As OptParameter
     Public feedbackdata(,) As Double        'Spezifischer Feedback für einen Algorithmus
+    Private toSimulate As Boolean           'Ob dieses Individuum simuliert werden soll
 
     '### Initialisierung
     Public Sub New(ByVal type As String, ByVal id As Integer, ByVal numberOptparas_input As Integer)
@@ -21,6 +22,7 @@
         ReDim Me.mOptparameter(numberOptparas_input)
         numberOptparas = numberOptparas_input
         Me.status = "false"
+        Me.toSimulate = False
 
         'Initialisieren der Optparameter
         For i = 0 To numberOptparas - 1
@@ -69,6 +71,7 @@
         Next
 
         Dest.feedbackdata = Me.feedbackdata
+        Dest.toSimulate = False
 
         Return Dest
     End Function
@@ -84,6 +87,7 @@
         End Get
         Set(ByVal value As OptParameter())
             Me.mOptparameter = value
+            Me.toSimulate = True
         End Set
     End Property
 
@@ -91,6 +95,7 @@
     'Gene setzen
     Public Function set_optparas(ByVal optparas_input As Double())
         Me.OptParameter_RWerte = optparas_input
+        Me.toSimulate = True
         Return True
     End Function
 
@@ -151,5 +156,15 @@
 
     Public Function get_status_opponent() As Integer
         Return Me.statusopponent
+    End Function
+
+    'Simulieren?
+    Public Function set_toSimulate(ByVal toSimulate_input As Boolean)
+        Me.toSimulate = toSimulate_input
+        Return True
+    End Function
+
+    Public Function get_toSimulate() As Boolean
+        Return Me.toSimulate
     End Function
 End Class

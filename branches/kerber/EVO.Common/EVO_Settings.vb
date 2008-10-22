@@ -269,6 +269,9 @@ Public Class EVO_Settings
         Public MySQL_User As String
         Public MySQL_Password As String
 
+        'Versteckte Optionen
+        Public ChildsPerParent As Integer
+
         'Standardwerte setzen
         '********************
         Public Sub setStandard()
@@ -284,6 +287,8 @@ Public Class EVO_Settings
             Me.MySQL_Database = "MetaEvo_db"
             Me.MySQL_User = "remote_user"
             Me.MySQL_Password = ""
+
+            Me.ChildsPerParent = 3
         End Sub
 
     End Structure

@@ -226,12 +226,15 @@ namespace IHWB.EVO.MetaEvo
             //Datensätze
             for (int j = 0; j < generation_input.Length; j++)
             {
-                tmptxt = tmptxt + "('" + generation_input[j].ID + "':'raw':";
-                for (int k = 0; k < number_optparas; k++)
+                if (generation_input[j].get_toSimulate())
                 {
-                    tmptxt = tmptxt + "'" + generation_input[j].get_optparas()[k] + "':";
+                    tmptxt = tmptxt + "('" + generation_input[j].ID + "':'raw':";
+                    for (int k = 0; k < number_optparas; k++)
+                    {
+                        tmptxt = tmptxt + "'" + generation_input[j].get_optparas()[k] + "':";
+                    }
+                    tmptxt = tmptxt + "'" + generation_input[j].get_client() + "'):";
                 }
-                tmptxt = tmptxt + "'" + generation_input[j].get_client() + "'):";
             }
             tmptxt = tmptxt.TrimEnd(':').Replace(",",".").Replace(":", ",") + ";";
 
