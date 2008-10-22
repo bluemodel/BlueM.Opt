@@ -485,7 +485,7 @@ Public Class BlueM
         Dim SimReihe As Wave.Zeitreihe
 
         'Simulationsergebnis auslesen
-        SimReihe = Me.SimErgebnis(feature.SimGr)
+        SimReihe = Me.SimErgebnis(feature.SimGr).Clone()
 
         'Fallunterscheidung Zieltyp
         '--------------------------
