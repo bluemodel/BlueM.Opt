@@ -7,16 +7,12 @@ Partial Public Class ApplicationLog
     Public log As Boolean
 
     Public Sub New()
-
-        ' This call is required by the Windows Form Designer.
         Call InitializeComponent()
-
-        ' Add any initialization after the InitializeComponent() call.
         Me.TextBox1.Clear()
         Me.Show()
-        Me.log = False
-        Me.starttime = DateTime.Now
 
+        Me.log = False                      'Ob Algo-Nachrichten ausgegeben werden
+        Me.starttime = DateTime.Now
     End Sub
 
     Public Sub appendText(ByVal text As String)
@@ -46,4 +42,15 @@ Partial Public Class ApplicationLog
         
     End Sub
 
+    Private Sub ApplicationLog_FormClosing(ByVal sender As System.Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles MyBase.FormClosing
+
+        'verhindern, dass das Form komplett gelöscht wird
+        e.Cancel = True
+
+        'Dialog verstecken
+        Call Me.Hide()
+
+        Me.log = False
+
+    End Sub
 End Class

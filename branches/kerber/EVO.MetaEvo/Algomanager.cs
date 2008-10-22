@@ -68,7 +68,7 @@ namespace IHWB.EVO.MetaEvo
                 newGen_composition(ref new_generation_input);
 
                 //3.Genpool und neue Individuen zu neuem Genpool zusammenfassen, restliche Individuen in Wastepool verschieben 
-                Zip(ref genpool, ref new_generation_input);
+                zip(ref genpool, ref new_generation_input);
                 wastepool = new_generation_input;
                 quicksort(ref wastepool, kriterium, 0, new_generation_input.Length - 1);
                 quicksort(ref genpool, kriterium, 0, genpool.Length - 1);
@@ -216,9 +216,6 @@ namespace IHWB.EVO.MetaEvo
         private void clustering_kill(ref EVO.Common.Individuum_MetaEvo[] genpool_input, ref EVO.Common.Individuum_MetaEvo[] input2)
         {
             int killindividuums = -genpool_input.Length;
-            double distance;
-            string tmp = "";
-            string tmp2 = "";
 
             //Anzahl lebender Individuen bestimmen
             for (int i = 0; i < genpool_input.Length; i++)
@@ -233,7 +230,7 @@ namespace IHWB.EVO.MetaEvo
             // zu viele Individuen vorhanden  (Wenn die Individuenanzahl der definierten Generationsgrösse entspricht, abbrechen)
             if (killindividuums > 0)
             {
-                double[] distances = new double[genpool_input.Length + killindividuums];
+                double[] densities = new double[genpool_input.Length + killindividuums];
                 int pointer = 0;
 
                 //Arbeits-Array erstellen (genau so gross dass alle "true"-Individuen Platz finden)
@@ -255,119 +252,27 @@ namespace IHWB.EVO.MetaEvo
                     }
                 }
 
-                //Abstände finden (Achtung: letztes Individuum in der Liste wird nie gelöscht!)
-                for (int i = 0; i < work.Length - 1; i++)
-                {
-                    for (int k = i + 1; k < work.Length; k++)
-                    {
-                        distance = easydistance(work[i].Penalties, work[k].Penalties);
-                        if ((distances[i] > distance) || (distances[i] == 0))
-                        {
-                            distances[i] = distance;
-                            tmp2 = work[k].ID.ToString();
-                        }
-                    }
-                    tmp = tmp + "[" + work[i].ID + " -> " + tmp2 + "]: " + distances[i] + " / ";
-                }
-                if (applog.log) applog.appendText("Algo Manager: Clustering: Abstände " + tmp);
-
-                //Individuen mit den geringsten Abständen entfernen
+                //Individuen mit höchsten Dichten entfernen
                 while (killindividuums > 0)
                 {
-                    int pointer_lowest_distance = 0;
-                    for (int i = 1; i < distances.Length; i++)
+                    //Dichten bestimmen lassen
+                    densities = calcualte_densities(ref work);  
+
+                    pointer = 0;
+                    for (int i = 1; i < densities.Length; i++)
                     {
-                        if (distances[pointer_lowest_distance] == 0) pointer_lowest_distance++;
-                        if (distances[i] != 0)
-                        { 
-                            if (distances[i] < distances[pointer_lowest_distance]) pointer_lowest_distance = i;
-                        }   
+                        if (densities[i] > densities[pointer]) pointer = i;  
                     }
-                    distances[pointer_lowest_distance] = 0;
-                    if (applog.log) applog.appendText("Algo Manager: Clustering: Individuum " + work[pointer_lowest_distance].ID + " is not used anymore");
-                    work[pointer_lowest_distance].set_status("false#crowding#0");
+                    densities[pointer] = 0;
+                    if (applog.log) applog.appendText("Algo Manager: Clustering: Individuum " + work[pointer].ID + " is not used anymore");
+                    work[pointer].set_status("false#crowding#0");
 
                     killindividuums--;
                 }
             }  
         }
-        //Diversität/Dichtemass der false-Individuen bestimmen (nur wenn nötig)
-        private void diversity(int numberawake_input, ref EVO.Common.Individuum_MetaEvo[] genpool_input, ref EVO.Common.Individuum_MetaEvo[] input2)
-        {
-            //Individuen überleben deren Abstand zum nächster lebenden Nachbar gering ist
-            //aber dessen Abstand zu seinem nächsten lebenden Nachbar hoch ist -> ToDo: Statt Abstand, Dichte
-            double[,] distances; //Individuum[distance,pointer auf nächstes Alive-Individuum, Ranking]
-            int pointer = 0;
-            double distance = -1;
-
-            //Arbeits-Array erstellen 
-            EVO.Common.Individuum_MetaEvo[] work = new IHWB.EVO.Common.Individuum_MetaEvo[genpool_input.Length + input2.Length];
-            for (int i = 0; i < genpool_input.Length; i++)
-            {
-                work[pointer] = genpool_input[i];
-                pointer++;
-            }
-            for (int i = 0; i < input2.Length; i++)
-            {
-                work[pointer] = input2[i];
-                pointer++;
-            }
-
-            //Näheste true-Individuen für jedes Individuum finden
-            distances = new double[work.Length, 3]; //Für alle False-Individuen
-            for (int i = 0; i < work.Length; i++)
-            {   
-                for (int j = 0; j < genpool_input.Length; j++)
-                {
-                    if (genpool_input[j].get_status() == "true")
-                    {
-                        distance = easydistance(work[i].get_optparas(), genpool_input[j].get_optparas());
-                        //Initialisierung oder Vergleich
-                        if ((distances[i, 0] == 0) || (distances[i, 0] > pointer))
-                        {
-                            distances[i, 0] = easydistance(work[i].get_optparas(), genpool_input[j].get_optparas());
-                            distances[i, 1] = j; //Pointer auf das zugehörige näheste true-Individuum
-                        }
-                    }
-                }
-            }
-
-            //Ranking bestimmen
-            for (int i = 0; i < work.Length; i++)
-            {
-                if (work[i].get_status() == "false")
-                {
-                    //Individuum-Kopie werden nicht berücksichtigt 
-                    if (distances[i, 0] == 0) distances[i, 2] = -1;
-                    else
-                    {
-                        distances[i, 2] = distances[i, 1] / distances[i, 0];
-                    }
-                }
-                else distances[i, 2] = 0;
-            }
-
-            //Individuen "wiederbeleben"
-            pointer = numberawake_input; //Anzahl der wieder zu belebenden Individuen
-            while (pointer > 0)
-            {
-                int pointer_highest_ranking = 0;
-                for (int i = 1; i < work.Length; i++)
-                {
-                    if (distances[i,2] > 0)
-                    {
-                        if (distances[i, 2] < distances[pointer_highest_ranking, 2]) pointer_highest_ranking = i;
-                    }
-                }
-                distances[pointer_highest_ranking, 2] = 0;
-                if (applog.log) applog.appendText("Algo Manager: Diversity: Individuum " + work[pointer_highest_ranking].ID + " is used again");
-                work[pointer_highest_ranking].set_status("true");
-
-                pointer--;
-            }
-        }
         //Kopieren der Verbleibenden Individuen auf die Generation input
-        private void Zip(ref EVO.Common.Individuum_MetaEvo[] genpool_input, ref EVO.Common.Individuum_MetaEvo[] input2)
+        private void zip(ref EVO.Common.Individuum_MetaEvo[] genpool_input, ref EVO.Common.Individuum_MetaEvo[] input2)
         {
             int pointer_true = 0;
             int pointer_false = 0;
@@ -398,22 +303,10 @@ namespace IHWB.EVO.MetaEvo
 
             //Nicht genug true-Individuen überlebten !!!
             if (pointer_true < genpool_input.Length) {
+                revive(genpool_input.Length - pointer_true, ref genpool_input, ref input2);
                 //Noch einmal die Sortierung anwenden
-                diversity(genpool_input.Length - pointer_true, ref genpool_input, ref input2);
-                Zip(ref genpool_input, ref input2);
+                zip(ref genpool_input, ref input2);
             }
-        }
-        //Einfache Distanzsumme zwischen zwei Arrays; falls Abstand = 0, return -1
-        private double easydistance(double[] input1, double[] input2)
-        {
-            double back = 0;
-
-            for (int i = 0; i < input1.Length; i++)
-            {
-                back += (input1[i] - input2[i]) * (input1[i] - input2[i]);
-            }
-            if (back == 0) return -1;
-            return System.Math.Sqrt(back);
         }
         //String mit Auszug der generation
         private string generationinfo(ref EVO.Common.Individuum_MetaEvo[] generation)
@@ -510,6 +403,124 @@ namespace IHWB.EVO.MetaEvo
 
             //Neue Algorithmuskomposition
             algos.set_algos("Hook and Jeeves V2");
+        }
+
+        //Individuen wiederbeleben 
+        private void revive(int numberawake_input, ref EVO.Common.Individuum_MetaEvo[] genpool_input, ref EVO.Common.Individuum_MetaEvo[] input2)
+        {
+            //Individuen überleben deren Abstand zum nächster lebenden Nachbar gering ist
+            //aber dessen Abstand zu seinem nächsten lebenden Nachbar hoch ist
+            double[,] distances; //Individuum[distance zu nähstem true-Individuum, pointer auf nächstes true-Individuum, Ranking]
+            double[] densities;
+            int pointer = 0;
+            double distance = -1;
+
+            //Arbeits-Array erstellen 
+            EVO.Common.Individuum_MetaEvo[] work = new IHWB.EVO.Common.Individuum_MetaEvo[genpool_input.Length + input2.Length];
+            for (int i = 0; i < genpool_input.Length; i++)
+            {
+                work[pointer] = genpool_input[i];
+                pointer++;
+            }
+            for (int i = 0; i < input2.Length; i++)
+            {
+                work[pointer] = input2[i];
+                pointer++;
+            }
+
+            //Näheste true-Individuen für alle false-Individuum finden
+            distances = new double[work.Length, 3]; //Für alle false-Individuen
+            for (int i = 0; i < work.Length; i++)
+            {
+                if (genpool_input[i].get_status() == "false")
+                {
+                    for (int j = 0; j < genpool_input.Length; j++)
+                    {
+                        //Nur im genpool kommen true-Individuen vor
+                        if ((genpool_input[j].get_status() == "true") && (genpool_input[j].ID != work[i].ID))
+                        {
+                            distance = calcualte_distance(work[i].Penalties, genpool_input[j].Penalties);
+                            //Initialisierung oder Vergleich
+                            if ((distances[i, 0] > distance) || (distances[i, 0] == 0))
+                            {
+                                distances[i, 0] = distance;
+                                distances[i, 1] = j; //Pointer auf das zugehörige näheste true-Individuum
+                                if (distance == -1) break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            //Dichtewerte der true-Individuen berechnen lassen
+            densities = calcualte_densities(ref work);  
+
+            //Ranking bestimmen für alle False-Individuen
+            for (int i = 0; i < work.Length; i++)
+            {
+                if (work[i].get_status() == "false")
+                {
+                    //Individuum-Kopie werden nicht berücksichtigt 
+                    if (distances[i, 0] != -1)
+                    {
+                        //Abstand des false-Individuums zum nächsten true-Individuum soll minimal sein
+                        //Abstand des true-Individuums zu seinem nächsten true-Individuum soll maximal sein
+                        distances[i, 2] = densities[(int)distances[i, 1]] / distances[i, 0];
+                    }
+                }
+                else distances[i, 2] = 0;
+            }
+
+            //Individuen "wiederbeleben"
+            while (numberawake_input > 0)
+            {
+                int pointer_highest_ranking = 0;
+                for (int i = 1; i < work.Length; i++)
+                {
+                    if (distances[i, 2] > distances[pointer_highest_ranking, 2]) pointer_highest_ranking = i;
+                }
+                distances[pointer_highest_ranking, 2] = 0;
+                if (applog.log) applog.appendText("Algo Manager: Diversity: Individuum " + work[pointer_highest_ranking].ID + " is used again");
+                work[pointer_highest_ranking].set_status("true");
+
+                numberawake_input--;
+            }
+        }
+        //Einfache Distanzsumme zwischen zwei Arrays; falls Abstand = 0, return -1
+        private double calcualte_distance(double[] input1, double[] input2)
+        {
+            double back = 0;
+
+            for (int i = 0; i < input1.Length; i++)
+            {
+                back += (input1[i] - input2[i]) * (input1[i] - input2[i]);
+            }
+            if (back == 0) return -1;
+            return System.Math.Sqrt(back);
+        }
+        //Dichte des Raumes in dem sich das Individuum befindet
+        private double[] calcualte_densities(ref EVO.Common.Individuum_MetaEvo[] work_input)
+        {
+            double[] densitys = new double[work_input.Length];
+            double tmp;
+
+            
+            for (int i = 0; i < work_input.Length; i++)
+            {
+                if (work_input[i].get_status() == "true")
+                {
+                    for (int j = 0; j < work_input.Length; j++)
+                    {
+                        if (work_input[j].get_status() == "true")
+                        {
+                            tmp = calcualte_distance(work_input[i].Penalties, work_input[j].Penalties);
+                            if (tmp == -1) densitys[i]++;
+                            else densitys[i] += (1 / ((tmp - 1) * (tmp - 1)));
+                        }
+                    }
+                }
+            }
+            return densitys;
         }
     }
 }

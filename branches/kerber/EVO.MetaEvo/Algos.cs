@@ -267,11 +267,12 @@ namespace IHWB.EVO.MetaEvo
 
                     for (int i = 0; i < numberindividuums; i++)
                     {
+                        //Am Rand mit geringen Optpara-Werten erzeugen
                         if (i % 2 == 0)
                         {
                             for (int k = 0; k < genpool_input[0].get_optparas().Length; k++)
                             {
-                                diversity_optparas[k] = genpool_input[0].get_optparas()[k] + mult1*(genpool_input[0].get_optparas()[k] - genpool_input[((int)i/2)+1].get_optparas()[k]);
+                                diversity_optparas[k] = genpool_input[0].get_optparas()[k] + mult1*(genpool_input[0].get_optparas()[k] - genpool_input[(((int)i/2)+1)%genpool_input.Length].get_optparas()[k]);
                                 //Auf Max prüfen, ggf. Multiplikator für den Optpara anpassen anpassen
                                 if ((genpool_input[0].OptParameter[k].Max < diversity_optparas[k]) || (genpool_input[0].OptParameter[k].Min > diversity_optparas[k]))
                                 {
@@ -281,11 +282,12 @@ namespace IHWB.EVO.MetaEvo
                                 else mult1 = 1;
                             }
                         }
+                        // Am Rand mit hohen Optpara-Werten erzeugen
                         else
                         {
                             for (int k = 0; k < genpool_input[0].get_optparas().Length; k++)
                             {
-                                diversity_optparas[k] = genpool_input[genpool_input.Length - 1].get_optparas()[k] + mult1 * (genpool_input[genpool_input.Length - 1].get_optparas()[k] - genpool_input[genpool_input.Length - 2 - (int)i / 2].get_optparas()[k]);
+                                diversity_optparas[k] = genpool_input[genpool_input.Length - 1].get_optparas()[k] + mult1 * (genpool_input[genpool_input.Length - 1].get_optparas()[k] - genpool_input[(genpool_input.Length - 2 - (int)i / 2)%genpool_input.Length].get_optparas()[k]);
                                 //Auf Min prüfen, ggf. Multiplikator für den Optpara anpassen anpassen
                                 if ((genpool_input[0].OptParameter[k].Min > diversity_optparas[k]) || (genpool_input[0].OptParameter[k].Max < diversity_optparas[k]))
                                 {
