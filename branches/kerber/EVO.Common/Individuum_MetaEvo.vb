@@ -141,6 +141,8 @@
             Return True
         Else
             Me.status = status_input
+            Me.statusreason = ""
+            Me.statusopponent = -1
             Return True
         End If
     End Function

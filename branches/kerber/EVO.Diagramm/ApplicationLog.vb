@@ -23,25 +23,26 @@ Partial Public Class ApplicationLog
     End Sub
 
     Public Sub savelog()
-        Dim sw As StreamWriter
-        Dim SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog()
-        Dim jetzt = DateTime.Now
+        If Me.log Then
+            Dim sw As StreamWriter
+            Dim SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog()
+            Dim jetzt = DateTime.Now
 
-        'Dialog einrichten
-        SaveFileDialog1.Filter = "Text-Dateien (*.txt)|*.txt"
-        SaveFileDialog1.FileName = "ApplicationLog_" + jetzt.Year.ToString + jetzt.Month.ToString + jetzt.Day.ToString + "_" + jetzt.Hour.ToString + jetzt.Minute.ToString + ".txt"
-        SaveFileDialog1.DefaultExt = "txt"
-        SaveFileDialog1.Title = "Einstellungsdatei speichern"
-        SaveFileDialog1.InitialDirectory = CurDir()
+            'Dialog einrichten
+            SaveFileDialog1.Filter = "Text-Dateien (*.txt)|*.txt"
+            SaveFileDialog1.FileName = "ApplicationLog_" + jetzt.Year.ToString + jetzt.Month.ToString + jetzt.Day.ToString + "_" + jetzt.Hour.ToString + jetzt.Minute.ToString + ".txt"
+            SaveFileDialog1.DefaultExt = "txt"
+            SaveFileDialog1.Title = "Einstellungsdatei speichern"
+            SaveFileDialog1.InitialDirectory = CurDir()
 
-        'Dialog anzeigen
-        If (SaveFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK) Then
-            sw = File.CreateText(SaveFileDialog1.FileName)
-            sw.Write(Me.TextBox1.Text)
-            sw.Flush()
-            sw.Close()
+            'Dialog anzeigen
+            If (SaveFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK) Then
+                sw = File.CreateText(SaveFileDialog1.FileName)
+                sw.Write(Me.TextBox1.Text)
+                sw.Flush()
+                sw.Close()
+            End If
         End If
-        
     End Sub
 
     Private Sub ApplicationLog_FormClosing(ByVal sender As System.Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles MyBase.FormClosing

@@ -57,7 +57,7 @@ namespace IHWB.EVO.MetaEvo
             //Setzen des Problems zum Design des Individuums
             EVO.Common.Individuum_MetaEvo.Initialise(ref prob_input);
             individuumnumber = 1;
-            applog.appendText("Controller: Task: " + prob.WorkDir);
+            applog.appendText("Controller: Task: " + prob.Datensatz);
 
             switch (this.role)
             {

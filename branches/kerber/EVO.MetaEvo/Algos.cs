@@ -39,13 +39,16 @@ namespace IHWB.EVO.MetaEvo
         public void set_algos(string algos2use_input) 
         {
             string[] tmp;
+
             tmp = algos2use_input.Split(',', ';');
             algofeedbackarray = new Algofeedback[tmp.Length];
 
             for (int i = 0; i < tmp.Length; i++)
             {
                 algofeedbackarray[i] = new Algofeedback(tmp[i].Trim(), (individuum_id * ChildsPerParent) / algofeedbackarray.Length);
+                
             }
+            applog.appendText("Algos: Using Algos " + algos2use_input);
         }
 
         //Neue Generation erzeugen
@@ -89,7 +92,7 @@ namespace IHWB.EVO.MetaEvo
                 //Globale Algorithmen
                 #region Zufällige Einfache Mutation: Mutiert an einer zufälligen Stelle innerhalb der Grenzen von Min und Max
                 case "Zufällige Einfache Mutation":
-                     applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
+                    applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
 
                     double[] mutated_optparas = new double[numberoptparas];
                     int selecteditem;
@@ -220,7 +223,34 @@ namespace IHWB.EVO.MetaEvo
                     break;
                 #endregion
 
-                //Mutation nach Rechenberg (S.62 Muschalla)
+                #region Ungleichverteilte Mutation: Mutiert an einer zufälligen Stelle (grössere Mutationen sind unwahrscheinlicher)
+                case "Ungleichverteilte Mutation":
+                    applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
+
+                    double[] mutated_optparas2 = new double[numberoptparas];
+                    int selecteditem2;
+                    double random = 0;
+
+                    for (int i = 0; i < numberindividuums; i++)
+                    {
+                        //Zufälligen parent wählen und optparas kopieren
+                        mutated_optparas2 = genpool_input[rand.Next(0, genpool_input.Length - 1)].get_optparas();
+                        //Zufälligen Wert mutieren
+                        selecteditem2 = rand.Next(0, numberoptparas - 1);
+                        random = ((rand.Next(-1000,1000))/1000)*1.15;
+                        mutated_optparas2[selecteditem2] *= (random * random * random + 1); //x³ + 1: x < |1,15| -> Etwa: 0,5 < f(x) < 1,5 
+                        //Grenzen prüfen
+                        if (mutated_optparas2[selecteditem2] > genpool_input[1].OptParameter[selecteditem2].Max) mutated_optparas2[selecteditem2] = genpool_input[1].OptParameter[selecteditem2].Max;
+                        if (mutated_optparas2[selecteditem2] < genpool_input[1].OptParameter[selecteditem2].Min) mutated_optparas2[selecteditem2] = genpool_input[1].OptParameter[selecteditem2].Min;
+                        //Zurückspeichern
+                        new_generation_input[startindex + i] = new IHWB.EVO.Common.Individuum_MetaEvo("MetaEvo", individuum_id, numberoptparas);
+                        new_generation_input[startindex + i].set_optparas(mutated_optparas2);
+                        new_generation_input[startindex + i].set_status("raw");
+                        new_generation_input[startindex + i].set_generator(algo_id);
+                        individuum_id++;
+                    }
+                    break;
+                #endregion
 
                 #region Zufällige Rekombination: Die Werte zweier zufälliger Eltern werden zufällig rekombiniert
                 case "Zufällige Rekombination":
@@ -311,22 +341,22 @@ namespace IHWB.EVO.MetaEvo
                 case "Totaler Zufall":
                      applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
 
-                    double[] random;
+                    double[] random_array;
 
                     //Für jedes Individuum durchgehen
                     for (int k = 0; k < numberindividuums; k++)
                     {
-                        random = new double[numberoptparas];
+                        random_array = new double[numberoptparas];
                         //Für jeden Parameter durchgehen
                         for (int j = 0; j < numberoptparas; j++)
                         {
                             double max = genpool_input[0].OptParameter[j].Max;
                             double min = genpool_input[0].OptParameter[j].Min;
-                            random[j] = min + (max - min) * ((double)rand.Next(0, 1000) / 1000);
+                            random_array[j] = min + (max - min) * ((double)rand.Next(0, 1000) / 1000);
                         }
                         //Zurückspeichern
                         new_generation_input[startindex + k] = new IHWB.EVO.Common.Individuum_MetaEvo("MetaEvo", individuum_id, numberoptparas);
-                        new_generation_input[startindex + k].set_optparas(random);
+                        new_generation_input[startindex + k].set_optparas(random_array);
                         new_generation_input[startindex + k].set_status("raw");
                         new_generation_input[startindex + k].set_generator(algo_id);
                         individuum_id++;
@@ -338,55 +368,60 @@ namespace IHWB.EVO.MetaEvo
                 case "Dominanzvektor":
                      applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
 
-                    double[] dominanz;
+                    double[] dominanz = new double[numberoptparas];
                     int dominator = -1;
                     double multiplikator = 1;
                     int pointer_parent = 0;  //Um kein Individuum doppelt zu berechnen
+                    bool generate_new = false;
 
                     //Für jedes Individuum durchgehen
                     for (int k = 0; k < numberindividuums; k++)
                     {
-                        dominanz = new double[numberoptparas];
-                        //Den Wastepool durchgehen
-                        for (int j = pointer_parent; j < wastepool_input.Length; j++)
+                        //In der ersten Runde hat Wastepool noch keinen Inhalt; Kopien erzeugen 
+                        if (wastepool_input[0] == null)
                         {
-                            //In der ersten Runde hat Wastepool noch keinen Inhalt; also Standard-Initialisierung 
-                            dominanz = genpool_input[j%genpool_input.Length].get_optparas();
-                            if (wastepool_input[j] == null)
+                            dominanz = genpool_input[k % genpool_input.Length].get_optparas();
+                        }
+                        else
+                        {
+                            generate_new = true;
+                            //Den Wastepool durchgehen
+                            for (int j = pointer_parent; j < wastepool_input.Length; j++)
                             {
-                                break;
-                            }
-                            else if(wastepool_input[j].get_status_reason() == "dominated")
-                            {
-                                dominator = wastepool_input[j].get_status_opponent();
-                                for (int i = 0; i < genpool_input.Length; i++)
+                                if (wastepool_input[j].get_status_reason() == "dominated")
                                 {
-                                    //Den Dominator im Genpool suchen der das Individuum im Wastepool dominierte
-                                    if (genpool_input[i].ID == dominator)
+                                    dominator = wastepool_input[j].get_status_opponent();
+                                    for (int i = 0; i < genpool_input.Length; i++)
                                     {
-                                        //Den neuen Optparas-Vektor bestimmen
-                                        for (int h = 0; h < numberoptparas; h++)
+                                        //Den Dominator im Genpool suchen der das Individuum im Wastepool dominierte
+                                        if (genpool_input[i].ID == dominator)
                                         {
-                                            dominanz[h] = genpool_input[i].get_optparas()[h] + (multiplikator * (genpool_input[i].get_optparas()[h] - wastepool_input[j].get_optparas()[h]));
-                                            //Falls die Grenzen überschritten sind
-                                            if ((dominanz[h] > genpool_input[0].OptParameter[h].Max) || (dominanz[h] < genpool_input[0].OptParameter[h].Min))
+                                            //Den neuen Optparas-Vektor bestimmen
+                                            for (int h = 0; h < numberoptparas; h++)
                                             {
-                                                multiplikator *= 0.5;
-                                                h--;
+                                                dominanz[h] = genpool_input[i].get_optparas()[h] + (multiplikator * (genpool_input[i].get_optparas()[h] - wastepool_input[j].get_optparas()[h]));
+                                                //Falls die Grenzen überschritten sind
+                                                if ((dominanz[h] > genpool_input[0].OptParameter[h].Max) || (dominanz[h] < genpool_input[0].OptParameter[h].Min))
+                                                {
+                                                    multiplikator *= 0.5;
+                                                    h--;
+                                                }
+                                                else
+                                                {
+                                                    multiplikator = 1;
+                                                }
                                             }
-                                            else
-                                            {
-                                                multiplikator = 1;
-                                            }
+                                            generate_new = false;
+                                            break;
                                         }
-                                        break;
                                     }
+                                    pointer_parent++;
+                                    //Neue dominanz-Optparas wurden generiert und können gespeichert werden
+                                    if (generate_new == false) break;
                                 }
-                                pointer_parent++;
-                                //Neue HaJ-Optparas wurden generiert und können gespeichert werden
-                                if (dominanz != genpool_input[j%genpool_input.Length].get_optparas()) break;
                             }
                         }
+                        
                         //Zurückspeichern
                         new_generation_input[startindex + k] = new IHWB.EVO.Common.Individuum_MetaEvo("MetaEvo", individuum_id, numberoptparas);
                         new_generation_input[startindex + k].set_optparas(dominanz);
