@@ -362,11 +362,16 @@ Public Class Testprobleme
         Dim achsen As Collection
         Dim achse As EVO.Diagramm.Diagramm.Achse
 
-        If (rSettings.PES.Pop.is_POPUL) Then
-            Anzahl_Kalkulationen = rSettings.PES.n_Gen * rSettings.PES.n_Nachf * rSettings.PES.Pop.n_Runden + 1
-        Else
-            Anzahl_Kalkulationen = rSettings.PES.n_Gen * rSettings.PES.n_Nachf + 1
-        End If
+        Select Case Me.mProblem.Method
+            Case METH_PES
+                If (rSettings.PES.Pop.is_POPUL) Then
+                    Anzahl_Kalkulationen = rSettings.PES.n_Gen * rSettings.PES.n_Nachf * rSettings.PES.Pop.n_Runden + 1
+                Else
+                    Anzahl_Kalkulationen = rSettings.PES.n_Gen * rSettings.PES.n_Nachf + 1
+                End If
+            Case METH_MetaEvo
+                Anzahl_Kalkulationen = rSettings.MetaEvo.NumberGenerations * rSettings.MetaEvo.ChildsPerParent * rSettings.MetaEvo.PopulationSize
+        End Select
 
         'Ausgangswert berechnen
         Ausgangswert = (1.5 - 0.5 * (1 - 0.5)) ^ 2 + (2.25 - 0.5 * (1 - 0.5) ^ 2) ^ 2 + (2.625 - 0.5 * (1 - 0.5) ^ 3) ^ 2
@@ -419,11 +424,16 @@ Public Class Testprobleme
         Dim achsen As Collection
         Dim achse As EVO.Diagramm.Diagramm.Achse
 
-        If (rSettings.PES.Pop.is_POPUL) Then
-            Anzahl_Kalkulationen = rSettings.PES.n_Gen * rSettings.PES.n_Nachf * rSettings.PES.Pop.n_Runden + 1
-        Else
-            Anzahl_Kalkulationen = rSettings.PES.n_Gen * rSettings.PES.n_Nachf + 1
-        End If
+        Select Case Me.mProblem.Method
+            Case METH_PES
+                If (rSettings.PES.Pop.is_POPUL) Then
+                    Anzahl_Kalkulationen = rSettings.PES.n_Gen * rSettings.PES.n_Nachf * rSettings.PES.Pop.n_Runden + 1
+                Else
+                    Anzahl_Kalkulationen = rSettings.PES.n_Gen * rSettings.PES.n_Nachf + 1
+                End If
+            Case METH_MetaEvo
+                Anzahl_Kalkulationen = rSettings.MetaEvo.NumberGenerations * rSettings.MetaEvo.ChildsPerParent * rSettings.MetaEvo.PopulationSize
+        End Select
 
         'Ausgangswert berechnen
         ReDim X(Me.mAnzParameter)

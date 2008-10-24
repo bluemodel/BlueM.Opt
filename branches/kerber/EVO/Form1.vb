@@ -2099,6 +2099,10 @@ Start_Evolutionsrunden:
                                     Achse.Maximum = EVO_Einstellungen1.Settings.PES.n_Gen * EVO_Einstellungen1.Settings.PES.n_Nachf + 1
                                 End If
 
+                            ElseIf (Me.mProblem.Method = METH_MetaEvo) Then
+                                'Bei MetaEvo:
+                                Achse.Maximum = EVO_Einstellungen1.Settings.MetaEvo.NumberGenerations * EVO_Einstellungen1.Settings.MetaEvo.ChildsPerParent * EVO_Einstellungen1.Settings.MetaEvo.PopulationSize
+
                             ElseIf (Me.mProblem.Method = METH_HOOKJEEVES) Then
                                 'Bei Hooke & Jeeves:
                                 Achse.Automatic = True
