@@ -137,7 +137,11 @@
             'Dim stringarray As String(3)
             Me.status = "false"
             Me.statusreason = status_input.Split("#")(1)
-            Me.statusopponent = CInt(status_input.Split("#")(2))
+            Try
+                Me.statusopponent = CInt(status_input.Split("#")(2))
+            Catch ex As Exception
+
+            End Try
             Return True
         Else
             Me.status = status_input

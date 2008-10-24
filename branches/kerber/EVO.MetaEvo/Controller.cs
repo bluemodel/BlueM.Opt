@@ -167,6 +167,7 @@ namespace IHWB.EVO.MetaEvo
                         {
                             testprobleme.Evaluierung_TestProbleme_MetaEvo(ref generation[i],0,ref hauptdiagramm1);
                             if (generation[i].Is_Feasible) generation[i].set_status("true");
+                            else generation[i].set_status("false#constraints#");
                         }
                         if ((this.settings.MetaEvo.Application == "sim") && (generation[i].get_toSimulate())) sim.Evaluate_MetaEvo(ref generation[i]);
                         applog.appendText("Controller: Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length),2) * 100 + "%)");
@@ -189,22 +190,20 @@ namespace IHWB.EVO.MetaEvo
                     applog.appendText("Controller: Individuums for Generation " + generationcounter + ": Simulating Individuums...");
                     for (int i = 0; i < generation.Length; i++)
                     {
-                        
+                        tmp = "(";
+                        for (int j = 0; j < generation[0].get_optparas().Length; j++)
                         {
-                            tmp = "(";
-                            for (int j = 0; j < generation[0].get_optparas().Length; j++)
-                            {
-                                tmp = tmp + generation[i].get_optparas()[j] + " / ";
-                            }
-                            tmp = tmp.TrimEnd(' ','/') + ")";
-                            applog.appendText("Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   " + algomanager.algos.algofeedbackarray[generation[i].get_generator()].name); // +": Optparas: " + tmp
+                            tmp = tmp + generation[i].get_optparas()[j] + " / ";
                         }
+                        tmp = tmp.TrimEnd(' ','/') + ")";
+                        applog.appendText("Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   " + algomanager.algos.algofeedbackarray[generation[i].get_generator()].name); // +": Optparas: " + tmp
 
                         //Simulieren und zeichnen
                         if (this.settings.MetaEvo.Application == "testprobleme")
                         {
                             testprobleme.Evaluierung_TestProbleme_MetaEvo(ref generation[i], 1, ref hauptdiagramm1);
-                            generation[i].set_status("true");
+                            if (generation[i].Is_Feasible) generation[i].set_status("true");
+                            else generation[i].set_status("false#constraints#");
                         }
                         if (this.settings.MetaEvo.Application == "sim")
                         {
@@ -320,6 +319,7 @@ namespace IHWB.EVO.MetaEvo
                     {
                         testprobleme.Evaluierung_TestProbleme_MetaEvo(ref individuumForClient, 1, ref hauptdiagramm1);
                         if (individuumForClient.Is_Feasible) individuumForClient.set_status("true");
+                        else individuumForClient.set_status("false#constraints#");
                     }
                     if (this.settings.MetaEvo.Application == "sim") sim.Evaluate_MetaEvo(ref individuumForClient);
 
