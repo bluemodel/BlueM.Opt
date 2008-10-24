@@ -31,14 +31,14 @@ Partial Class ApplicationLog
         Me.TextBox1.Multiline = True
         Me.TextBox1.Name = "TextBox1"
         Me.TextBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.TextBox1.Size = New System.Drawing.Size(1046, 709)
+        Me.TextBox1.Size = New System.Drawing.Size(1046, 941)
         Me.TextBox1.TabIndex = 0
         '
         'ApplicationLog
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1071, 734)
+        Me.ClientSize = New System.Drawing.Size(992, 966)
         Me.Controls.Add(Me.TextBox1)
         Me.Name = "ApplicationLog"
         Me.Text = "ApplicationLog"

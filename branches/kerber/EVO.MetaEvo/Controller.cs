@@ -9,7 +9,6 @@ namespace IHWB.EVO.MetaEvo
     public class Controller
     {
         //### Variablen ###
-        string modell = "";
         EVO.Apps.Sim sim;
         EVO.Apps.Testprobleme testprobleme;
 
@@ -29,13 +28,13 @@ namespace IHWB.EVO.MetaEvo
         //### Konstruktor ###  
         public Controller(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input, ref EVO.Apps.Testprobleme testprobleme_input)
         {
-            this.modell = "testprobleme";
+            settings_input.MetaEvo.Application = "testprobleme";
             this.testprobleme = testprobleme_input;
             init(ref prob_input, ref settings_input, ref hauptdiagramm_input);
         }
         public Controller(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input, ref EVO.Apps.Sim sim_input)
         {
-            this.modell = "sim";
+            settings_input.MetaEvo.Application = "sim";
             this.sim = sim_input;
             init(ref prob_input, ref settings_input, ref hauptdiagramm_input);
         }
@@ -103,7 +102,7 @@ namespace IHWB.EVO.MetaEvo
                     //### Vorbereitung ###
                     individuumForClient = new EVO.Common.Individuum_MetaEvo("MetaEvo", 0, prob_input.List_OptParameter.Length);
                     //Microsoft SQL-DB des Clients ausschalten
-                    if (modell == "sim") { sim.StoreIndividuals = false; }
+                    if (this.settings.MetaEvo.Application == "sim") { sim.StoreIndividuals = false; }
 
                     //### Hauptprogramm ###
                     networkmanager = new Networkmanager(ref this.individuumForClient, ref this.settings, ref applog);
@@ -164,12 +163,12 @@ namespace IHWB.EVO.MetaEvo
                     for (int i = 0; i < generation.Length; i++)
                     {
                         //Simulieren 
-                        if (modell == "testprobleme")
+                        if (this.settings.MetaEvo.Application == "testprobleme")
                         {
                             testprobleme.Evaluierung_TestProbleme_MetaEvo(ref generation[i], 1, ref hauptdiagramm1);
                             generation[i].set_status("true");
                         }
-                        if ((modell == "sim") && (generation[i].get_toSimulate())) sim.Evaluate_MetaEvo(ref generation[i]);
+                        if ((this.settings.MetaEvo.Application == "sim") && (generation[i].get_toSimulate())) sim.Evaluate_MetaEvo(ref generation[i]);
                         applog.appendText("Controller: Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length),2) * 100 + "%)");
                     }
 
@@ -198,16 +197,16 @@ namespace IHWB.EVO.MetaEvo
                                 tmp = tmp + generation[i].get_optparas()[j] + " / ";
                             }
                             tmp = tmp.TrimEnd(' ','/') + ")";
-                            applog.appendText("Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   "+algomanager.algos.algofeedbackarray[generation[i].get_generator()].name +": Optparas: " + tmp);
+                            applog.appendText("Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   " + algomanager.algos.algofeedbackarray[generation[i].get_generator()].name); // +": Optparas: " + tmp
                         }
 
                         //Simulieren und zeichnen
-                        if (modell == "testprobleme")
+                        if (this.settings.MetaEvo.Application == "testprobleme")
                         {
                             testprobleme.Evaluierung_TestProbleme_MetaEvo(ref generation[i], 1, ref hauptdiagramm1);
                             generation[i].set_status("true");
                         }
-                        if (modell == "sim")
+                        if (this.settings.MetaEvo.Application == "sim")
                         {
                             sim.Evaluate_MetaEvo(ref generation[i]);
                             hauptdiagramm1.ZeichneIndividuum(generation[i], 1, 1, 1, generation[i].ID % generation.Length, System.Drawing.Color.Yellow, true);
@@ -317,8 +316,12 @@ namespace IHWB.EVO.MetaEvo
 
                     //Simulieren
                     applog.appendText("Controller: Individuum " + individuumForClient.ID + " simulating...");
-                    if (modell == "testprobleme") testprobleme.Evaluierung_TestProbleme_MetaEvo(ref individuumForClient, 1, ref hauptdiagramm1);
-                    if (modell == "sim") sim.Evaluate_MetaEvo(ref individuumForClient);
+                    if (this.settings.MetaEvo.Application == "testprobleme")
+                    {
+                        testprobleme.Evaluierung_TestProbleme_MetaEvo(ref individuumForClient, 1, ref hauptdiagramm1);
+                        individuumForClient.set_status("true");
+                    }
+                    if (this.settings.MetaEvo.Application == "sim") sim.Evaluate_MetaEvo(ref individuumForClient);
 
                     //Individuum in DB Updaten
                     networkmanager.Individuum_UpdateInDB(ref individuumForClient, "status feat const", individuumForClient.get_status());

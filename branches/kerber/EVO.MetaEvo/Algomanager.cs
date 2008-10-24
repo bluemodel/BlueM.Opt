@@ -14,12 +14,14 @@ namespace IHWB.EVO.MetaEvo
         EVO.Diagramm.ApplicationLog applog;
         public Algos algos;
         EVO.Diagramm.Hauptdiagramm hauptdiagramm;
+        string modell;
 
         public string calculationmode = "global";  //{"global", "local", "hybrid"}
         int noAdvantage = 0;
 
         public Algomanager(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, int individuumnumber_input, ref EVO.Diagramm.ApplicationLog applog_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input) 
         {
+            modell = settings_input.MetaEvo.Application;
             hauptdiagramm = hauptdiagramm_input;
             applog = applog_input;
             //Algoobjekt initialisieren (enthält die algorithmus-Methoden und das Feedback zu jedem Algo)
@@ -54,12 +56,13 @@ namespace IHWB.EVO.MetaEvo
                 //1.Selektion: 
                 //1.1.Sortieren nach einem zufällig gewählten Kriterium
                 int kriterium = rand.Next(0, new_generation_input[0].Penalties.Length);
-                //1.2.Sortieren und Dominanzkriterium anwenden innerhalb der Penalties der neuen Individuen
+                //1.2.Dominanzkriterium auf Penalties zwischen den neuen und den alten Individuen anwenden
+                check_domination(ref genpool, ref new_generation_input);
+                //1.3.Sortieren und Dominanzkriterium anwenden innerhalb der Penalties der neuen Individuen
                 quicksort(ref new_generation_input, kriterium, 0, new_generation_input.Length - 1);
-                //1.3.Dominanzkriterium auf Penalties innerhalb der neuen Individuen
+                //1.4.Dominanzkriterium auf Penalties innerhalb der neuen Individuen
                 check_domination(ref new_generation_input, ref new_generation_input);
-                //1.4.Dominanzkriterium auf Penalties zwischen den neuen und den alten Individuen anwenden
-                check_domination(ref new_generation_input, ref genpool);
+                
 
                 //2.Mengenanpassung des Genpools:
                 //2.1 Anzahl der überlebenden Individuen
@@ -83,7 +86,7 @@ namespace IHWB.EVO.MetaEvo
                 applog.appendText("Algo Manager: Result: New Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n");
                 
                 //5.Genpool zeichnen:
-                hauptdiagramm.LöscheLetzteGeneration(1);
+                if (modell == "sim") hauptdiagramm.LöscheLetzteGeneration(1);
                 hauptdiagramm.ZeichneSekPopulation(genpool);
                 System.Windows.Forms.Application.DoEvents();
 
@@ -135,35 +138,37 @@ namespace IHWB.EVO.MetaEvo
             if (high < high_input) quicksort(ref input, kriterium, high, high_input);
         }
         //Prüfen ob ein ein Individuum von einem anderen Individuum dominiert wird (kleiner ist dominant)
-        private void check_domination(ref EVO.Common.Individuum_MetaEvo[] input, ref EVO.Common.Individuum_MetaEvo[] input2)
+        private void check_domination(ref EVO.Common.Individuum_MetaEvo[] genpool_input, ref EVO.Common.Individuum_MetaEvo[] input2)
         {
             int dominator = -1;
             int status = 0;
+            int pointer_genpool = 0;
+            int pointer_newgen = 0;
 
             //Falls input1 = input2, nur innerhalb der ersten Generation prüfen
-            if (input == input2)
+            if (genpool_input == input2)
             {
                 //Individuen vergleichen
-                for (int i = 0; i < input.Length; i++)
+                for (int i = 0; i < genpool_input.Length; i++)
                 {
-                    if (input[i].get_status() == "true")
+                    if (genpool_input[i].get_status() == "true")
                     {
                         //mit
-                        for (int k = input.Length-1; k > i; k--)
+                        for (int k = genpool_input.Length - 1; k > i; k--)
                         {
-                            if ((input[k].get_status() == "true") && (input[i].get_status() == "true"))
+                            if (genpool_input[k].get_status() == "true")
                             {
                                 //Jede Eigenschaft vergleichen
-                                for (int j = 0; j < input[0].Penalties.Length; j++)
+                                for (int j = 0; j < genpool_input[0].Penalties.Length; j++)
                                 {
-                                    if (input[i].Penalties[j] < input[k].Penalties[j]) dominator = i;
-                                    else if (input[i].Penalties[j] > input[k].Penalties[j]) { dominator = -1; break; }
+                                    if (genpool_input[i].Penalties[j] <= genpool_input[k].Penalties[j]) dominator = i;
+                                    else if (genpool_input[i].Penalties[j] > genpool_input[k].Penalties[j]) { dominator = -1; break; }
                                 }
-                                if (dominator > -1) {
-                                    input[k].set_status("false#dominated#" + input[dominator].ID);
-                                     applog.appendText("Algo Manager: Domination: Individuum " + input[k].ID + " is dominated (by Individuum " + input[dominator].ID + ")");
+                                if (dominator > -1)
+                                {
+                                    genpool_input[k].set_status("false#dominated#" + genpool_input[dominator].ID);
+                                    applog.appendText("Algo Manager: Domination: Individuum " + genpool_input[k].ID + " is dominated (by Individuum " + genpool_input[dominator].ID + ")");
                                     dominator = -1;
-                                    break; 
                                 }
                             }
                         }
@@ -173,53 +178,65 @@ namespace IHWB.EVO.MetaEvo
             //Sonst Generationen untereinander prüfen (aber nicht innerhalb von sich selbst)
             else
             {
-                //Individuen vergleichen
-                for (int i = 0; i < input.Length; i++)
+                while (pointer_genpool < genpool_input.Length)
                 {
-                    if (input[i].get_status() == "true")
+                    if (genpool_input[pointer_genpool].get_status() == "true")
                     {
-                        //mit
-                        for (int k = input2.Length - 1; k >= 0; k--)
+                        pointer_newgen = 0;
+                        while (pointer_newgen < input2.Length)
                         {
-                            if ((input[i].get_status() == "true") && (input2[k].get_status() == "true"))
+                            if ((input2[pointer_newgen].get_status() == "true") && (genpool_input[pointer_genpool].get_status() == "true"))
                             {
                                 //Jede Eigenschaft vergleichen
-                                for (int j = 0; j < input[0].Penalties.Length; j++)
+                                for (int j = 0; j < genpool_input[0].Penalties.Length; j++)
                                 {
                                     //falls gleich, nichts tun
-                                    if (input[i].Penalties[j] > input2[k].Penalties[j])
+                                    if (genpool_input[pointer_genpool].Penalties[j] > input2[pointer_newgen].Penalties[j])
                                     {
-                                        if (status == 0) status = 1;
-                                        else if (status == -1)
+                                        if (status == -1)
                                         {
-                                            status = 0;
+                                            status = 10;
                                             break;
                                         }
+                                        status = 1;
                                     }
-                                    if (input[i].Penalties[j] < input2[k].Penalties[j])
-                                    { 
-                                        if (status == 0) status = -1;
-                                        else if (status == 1)
+                                    if (genpool_input[pointer_genpool].Penalties[j] < input2[pointer_newgen].Penalties[j])
+                                    {
+                                        if (status == 1)
                                         {
-                                            status = 0;
+                                            status = 10;
                                             break;
                                         }
+                                        status = -1;
                                     }
                                 }
-                                if (status == -1) { 
-                                    status = 0;
-                                    input2[k].set_status("false#dominated#" + input[i].ID);
-                                     applog.appendText("Algo Manager: Domination: Individuum " + input2[k].ID + " is dominated (by Individuum " + input[i].ID + ")");
+                                switch (status)
+                                {
+                                    case -1:
+                                        input2[pointer_newgen].set_status("false#dominated#" + genpool_input[pointer_genpool].ID);
+                                        applog.appendText("Algo Manager: Domination: Individuum " + input2[pointer_newgen].ID + " is dominated (by Individuum " + genpool_input[pointer_genpool].ID + ")");
+                                        break;
+
+                                    case 1:
+                                        genpool_input[pointer_genpool].set_status("false#dominated#" + input2[pointer_newgen].ID);
+                                        applog.appendText("Algo Manager: Domination: Individuum " + genpool_input[pointer_genpool].ID + " is dominated (by Individuum " + input2[pointer_newgen].ID + ")");
+                                        break;
+
+                                    case 0:
+                                        genpool_input[pointer_genpool].set_status("false#equal#" + input2[pointer_newgen].ID);
+                                        applog.appendText("Algo Manager: Domination: Individuum " + genpool_input[pointer_genpool].ID + " equals Individuum " + input2[pointer_newgen].ID);
+                                        break;
+
+                                    case 10:
+                                        break;
                                 }
-                                if (status == 1) { 
-                                    status = 0;
-                                    input[i].set_status("false#dominated#" + input2[k].ID);
-                                     applog.appendText("Algo Manager: Domination: Individuum " + input[i].ID + " is dominated (by Individuum " + input2[k].ID + ")");
-                                    break;
-                                }
+                                status = 0;
                             }
-                        }
+                            if (genpool_input[pointer_genpool].get_status() == "false") break;
+                            pointer_newgen++;
+                        }        
                     }
+                    pointer_genpool++;
                 }
             }    
         }
@@ -230,7 +247,7 @@ namespace IHWB.EVO.MetaEvo
             double[] densities = new double[genpool_input.Length + killindividuums];
             int pointer = 0;
 
-            applog.appendText("Algo Manager: Number of new Individuums has a difference to Genpool: " + killindividuums_input + " -> Crowding Selection");
+            applog.appendText("Algo Manager: Number of new Individuums has a difference to Genpool-size: " + killindividuums_input + " -> Crowding Selection");
 
             //Arbeits-Array erstellen (genau so gross dass alle "true"-Individuen Platz finden)
             EVO.Common.Individuum_MetaEvo[] work = new IHWB.EVO.Common.Individuum_MetaEvo[genpool_input.Length + killindividuums];
@@ -254,16 +271,23 @@ namespace IHWB.EVO.MetaEvo
             //Individuen mit höchsten Dichten entfernen
             while (killindividuums > 0)
             {
+                //string tmp;
+                //applog.appendText("Work-Array: " + this.generationinfo(ref work));
+                
                 //Dichten bestimmen lassen
-                densities = calcualte_densities(ref work);  
+                densities = calcualte_densities(ref work);
 
                 pointer = 0;
+                //tmp = " [" + 0 + "]:" + densities[0] + " ";
                 for (int i = 1; i < densities.Length; i++)
                 {
-                    if (densities[i] > densities[pointer]) pointer = i;  
+                    if (densities[i] > densities[pointer]) pointer = i;
+                    //tmp = tmp + " ["+i+"]:" + densities[i]+ " ";
                 }
+                //applog.appendText("Algo Manager: Crowding: Densities: " + tmp);
+
                 densities[pointer] = 0;
-                 applog.appendText("Algo Manager: Crowding: Individuum " + work[pointer].ID + " is not used anymore");
+                applog.appendText("Algo Manager: Crowding: Individuum " + work[pointer].ID + " is not used anymore");
                 work[pointer].set_status("false#crowding#0");
 
                 killindividuums--;
@@ -279,7 +303,7 @@ namespace IHWB.EVO.MetaEvo
             int pointer = 0;
             double distance = -1;
 
-            applog.appendText("Algo Manager: Number of new Individuums has a difference to Genpool: " + numberawake_input + " -> Revive");
+            applog.appendText("Algo Manager: Number of new Individuums has a difference to Genpool-size: " + numberawake_input + " -> Revive");
 
             //Arbeits-Array erstellen 
             EVO.Common.Individuum_MetaEvo[] work = new IHWB.EVO.Common.Individuum_MetaEvo[genpool_input.Length + input2.Length];
@@ -390,12 +414,13 @@ namespace IHWB.EVO.MetaEvo
 
             for (int i = 0; i < generation.Length; i++)
             {
-                back = back + "[ID]: " + generation[i].ID + " [Generator]: " + generation[i].get_generator() + " [Status]: " + generation[i].get_status() + " [Client]: " + generation[i].get_client() + "\r\nOptparas: ";
-                optparas = generation[i].get_optparas();
+                back = back + "[ID]: " + generation[i].ID + " [Generator]: " + generation[i].get_generator() + " [Status]: " + generation[i].get_status() + " [Client]: " + generation[i].get_client();
+                /*optparas = generation[i].get_optparas();
+                back = back + "\r\nOptparas: ";
                 for (int j = 0; j < optparas.Length; j++)
                 {
                     back = back + "[" + j + "]: " + String.Format("{0:N3}",optparas[j]) + " ";
-                }
+                }*/
                 if (generation[0].Constraints.Length > 0)
                 {
                     back = back + "\r\nConst";
@@ -520,11 +545,11 @@ namespace IHWB.EVO.MetaEvo
                 {
                     for (int j = 0; j < work_input.Length; j++)
                     {
-                        if (work_input[j].get_status() == "true")
+                        if ((work_input[j].get_status() == "true") && (i != j))
                         {
                             tmp = calcualte_distance(work_input[i].Penalties, work_input[j].Penalties);
                             if (tmp == -1) densitys[i]++;
-                            else densitys[i] += (1 / ((tmp - 1) * (tmp - 1)));
+                            else densitys[i] += (1 / ((tmp + 1) * (tmp + 1)) );
                         }
                     }
                 }

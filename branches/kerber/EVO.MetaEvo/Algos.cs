@@ -378,11 +378,8 @@ namespace IHWB.EVO.MetaEvo
                     for (int k = 0; k < numberindividuums; k++)
                     {
                         //In der ersten Runde hat Wastepool noch keinen Inhalt; Kopien erzeugen 
-                        if (wastepool_input[0] == null)
-                        {
-                            dominanz = genpool_input[k % genpool_input.Length].get_optparas();
-                        }
-                        else
+                        dominanz = genpool_input[k % genpool_input.Length].get_optparas();
+                        if (wastepool_input[0] != null)
                         {
                             generate_new = true;
                             //Den Wastepool durchgehen
