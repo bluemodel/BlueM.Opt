@@ -56,6 +56,7 @@ Public Class EVO_Einstellungen
         Call Me.msettings.PES.setStandard(EVO_MODUS.Single_Objective)
         Call Me.msettings.CES.setStandard(METH_CES)
         Call Me.msettings.HookJeeves.setStandard()
+        Call Me.msettings.MetaEvo.setStandard()
 
     End Sub
 
