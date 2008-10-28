@@ -62,6 +62,7 @@
     <Compile Include="Modellparameter.vb" />
     <Compile Include="Problem.vb" />
     <Compile Include="OptParameter.vb" />
+    <Compile Include="Progress.vb" />
     <Compile Include="Provider.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

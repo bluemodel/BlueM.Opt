@@ -35,6 +35,9 @@ Partial Class Form1
     'Problem
     Private mProblem As EVO.Common.Problem
 
+    'Progress
+    Private mProgress As EVO.Common.Progress
+
     'Apps
     Private Testprobleme1 As EVO.Apps.Testprobleme
     Friend WithEvents Sim1 As EVO.Apps.Sim
@@ -96,6 +99,10 @@ Partial Class Form1
 
         'Monitor instanzieren
         Me.Monitor1 = New EVO.Diagramm.Monitor()
+
+        'Progress instanzieren und an EVO_Opt_Verlauf übergeben
+        Me.mProgress = New EVO.Common.Progress()
+        Me.EVO_Opt_Verlauf1.Initialisieren(Me.mProgress)
 
         'Handler für Klick auf Serien zuweisen
         AddHandler Me.Hauptdiagramm1.ClickSeries, AddressOf seriesClick
@@ -258,8 +265,8 @@ Partial Class Form1
             'Datensatz UI aktivieren
             Call Me.Datensatz_initUI()
 
-            'EVO_Verlauf zurücksetzen
-            Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
+            'Progress zurücksetzen
+            Call Me.mProgress.Initialize()
 
             'Mauszeiger wieder normal
             Cursor = Cursors.Default
@@ -433,6 +440,9 @@ Partial Class Form1
             Me.ComboBox_Methode.Enabled = True
             Me.ComboBox_Methode.SelectedItem = ""
 
+            'Progress zurücksetzen
+            Call Me.mProgress.Initialize()
+
         End If
 
     End Sub
@@ -489,6 +499,8 @@ Partial Class Form1
                         Exit Sub
                     End If
 
+                    'TODO: Progress initialisieren
+
 
                 Case METH_PES 'Methode PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -496,8 +508,7 @@ Partial Class Form1
                     'Ergebnis-Buttons
                     Me.Button_openMDB.Enabled = True
 
-                    'EVO_Opt_Verlauf initialisieren
-                    Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
+                    'TODO: Progress mit Standardwerten initialisieren
 
 
                 Case METH_HOOKJEEVES
@@ -511,7 +522,7 @@ Partial Class Form1
                     'Ergebnis-Buttons
                     Me.Button_openMDB.Enabled = True
 
-                    'TODO: EVO_Opt_Verlauf initialisieren
+                    'TODO: Progress mit Standardwerten initialisieren
 
 
                 Case METH_CES, METH_HYBRID 'Methode CES und HYBRID
@@ -542,11 +553,13 @@ Partial Class Form1
                         Call EVO_Einstellungen1.setTestModus(Me.mProblem.CES_T_Modus, Sim1.TestPath, 1, 1, Me.mProblem.NumCombinations)
                     End If
 
-                    'TODO: EVO_Opt_Verlauf initialisieren
+                    'TODO: Progress mit Standardwerten initialisieren
 
                 Case METH_MetaEvo
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-                    Call Me.EVO_Opt_Verlauf1.Initialisieren(1, 1, EVO_Einstellungen1.Settings.MetaEvo.NumberGenerations, EVO_Einstellungen1.Settings.MetaEvo.PopulationSize)
+
+                    'Progress mit Standardwerten initialisieren
+                    Call Me.mProgress.Initialize(1, 1, EVO_Einstellungen1.Settings.MetaEvo.NumberGenerations, EVO_Einstellungen1.Settings.MetaEvo.PopulationSize)
 
 
 
@@ -794,11 +807,8 @@ Partial Class Form1
             Anz_Sim = SensiPlot1.Anz_Steps ^ 2
         End If
 
-        'Startwerte werden der Verlaufsanzeige zugewiesen
-        Call Me.EVO_Opt_Verlauf1.Initialisieren(1, 1, 1, Anz_Sim)
-        Call Me.EVO_Opt_Verlauf1.Runden(1)
-        Call Me.EVO_Opt_Verlauf1.Population(1)
-        Call Me.EVO_Opt_Verlauf1.Generation(1)
+        'Progress initialisieren
+        Call Me.mProgress.Initialize(0, 0, 0, Anz_Sim)
 
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
@@ -857,7 +867,7 @@ Partial Class Form1
                 n += 1
 
                 'Verlaufsanzeige aktualisieren
-                Me.EVO_Opt_Verlauf1.Nachfolger(n)
+                Me.mProgress.iNachf = n
 
                 'Einhaltung von OptParameter-Beziehung überprüfen
                 isOK = True
@@ -1020,8 +1030,8 @@ Partial Class Form1
         CES1 = New EVO.Kern.CES()
         Call CES1.CESInitialise(Me.EVO_Einstellungen1.Settings, Me.mProblem, Sim1.VerzweigungsDatei.GetLength(0))
 
-        'EVO_Verlauf zurücksetzen
-        Call Me.EVO_Opt_Verlauf1.Initialisieren(1, 1, EVO_Einstellungen1.Settings.CES.n_Generations, EVO_Einstellungen1.Settings.CES.n_Childs)
+        'Progress initialisieren
+        Call Me.mProgress.Initialize(1, 1, EVO_Einstellungen1.Settings.CES.n_Generations, EVO_Einstellungen1.Settings.CES.n_Childs)
 
         Dim durchlauf_all As Integer = 0
         Dim ColorArray(CES1.ModSett.n_Locations, -1) As Object
@@ -1060,7 +1070,7 @@ Partial Class Form1
         End If
 
         'Startwerte werden der Verlaufsanzeige zugewiesen
-        Call Me.EVO_Opt_Verlauf1.Initialisieren(0, 0, EVO_Einstellungen1.Settings.CES.n_Generations, EVO_Einstellungen1.Settings.CES.n_Childs)
+        Call Me.mProgress.Initialize(1, 1, EVO_Einstellungen1.Settings.CES.n_Generations, EVO_Einstellungen1.Settings.CES.n_Childs)
 
         'xxxx Optimierung xxxxxx
         'Generationsschleife CES
@@ -1133,10 +1143,15 @@ Partial Class Form1
                     End If
 
                     System.Windows.Forms.Application.DoEvents()
-                    Call EVO_Opt_Verlauf1.Nachfolger(Child_Ready + 1)
-                    If Child_Ready = CES1.mSettings.CES.n_Childs - 1 Then Ready = True
+                    If (Child_Ready = CES1.mSettings.CES.n_Childs - 1) Then 
+						Ready = True
+					End If
 
                     Child_Ready += 1
+
+                    'Verlauf aktualisieren
+                    Me.mProgress.iNachf = Child_Ready
+
 
                     'Falls Pause und alle simulierten auch verarbeitet
                     '-------------------------------------------------
@@ -1165,7 +1180,8 @@ Partial Class Form1
             '^ ENDE der Child Schleife
             'xxxxxxxxxxxxxxxxxxxxxxx
 
-            Call EVO_Opt_Verlauf1.Generation(i_gen + 1)
+            'Generation hochzählen
+            Me.mProgress.iGen = i_gen + 1
 
             'Die Listen müssen nach der letzten Evaluierung wieder zurückgesetzt werden
             'Sicher ob das benötigt wird?
@@ -1648,7 +1664,7 @@ Partial Class Form1
         Call PES1.PesInitialise(EVO_Einstellungen1.Settings, Me.mProblem)
 
         'Startwerte werden der Verlaufsanzeige zugewiesen
-        Call Me.EVO_Opt_Verlauf1.Initialisieren(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
+        Call Me.mProgress.Initialize(EVO_Einstellungen1.Settings.PES.Pop.n_Runden, EVO_Einstellungen1.Settings.PES.Pop.n_Popul, EVO_Einstellungen1.Settings.PES.n_Gen, EVO_Einstellungen1.Settings.PES.n_Nachf)
 
         durchlauf = 0
 
@@ -1719,7 +1735,7 @@ Start_Evolutionsrunden:
                             Call PES1.EsBest(ind(i))
 
                             'Verlauf aktualisieren
-                            Call EVO_Opt_Verlauf1.Nachfolger(PES1.PES_iAkt.iAktNachf + 1)
+                            Me.mProgress.iNachf = PES1.PES_iAkt.iAktNachf + 1
 
                             'Pause?
                             If (Me.ispause) Then
@@ -1747,10 +1763,10 @@ Start_Evolutionsrunden:
                         System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
 
                         Do
-                            'Falls eine Simulation frei und nicht Pause
-                            '------------------------------------------
                             If Sim1.launchFree(Thread_Free) And Child_Run < EVO_Einstellungen1.Settings.PES.n_Nachf _
                             And (Child_Ready + n_Threads > Child_Run) And Me.ispause = False Then
+                                'Falls eine Simulation frei und nicht Pause
+                                '------------------------------------------
 
                                 Sim1.WorkDir_Current = Sim1.getThreadWorkDir(Thread_Free)
 
@@ -1762,9 +1778,9 @@ Start_Evolutionsrunden:
 
                                 Child_Run += 1
 
-                                'Falls Simulation fertig und erfogreich
-                                '--------------------------------------
                             ElseIf Sim1.launchReady(Thread_Ready, SIM_Eval_is_OK, Child_Ready) = True And SIM_Eval_is_OK Then
+                                'Falls Simulation fertig und erfolgreich
+                                '---------------------------------------
 
                                 Sim1.WorkDir_Current = Sim1.getThreadWorkDir(Thread_Ready)
                                 Sim1.SIM_Ergebnis_auswerten(ind(Child_Ready))
@@ -1781,15 +1797,20 @@ Start_Evolutionsrunden:
                                 PES1.PES_iAkt.iAktNachf = Child_Ready
                                 Call PES1.EsBest(ind(Child_Ready))
 
-                                Call EVO_Opt_Verlauf1.Nachfolger(Child_Ready + 1)
-                                System.Windows.Forms.Application.DoEvents()
+                                If (Child_Ready = EVO_Einstellungen1.Settings.PES.n_Nachf - 1) Then
+                                    Ready = True
+                                End If
 
-                                If Child_Ready = EVO_Einstellungen1.Settings.PES.n_Nachf - 1 Then Ready = True
                                 Child_Ready += 1
 
+                                'Verlauf aktualisieren
+                                Me.mProgress.iNachf = Child_Ready
+
+                                System.Windows.Forms.Application.DoEvents()
+
+                            ElseIf Sim1.launchReady(Thread_Ready, SIM_Eval_is_OK, Child_Ready) = False And SIM_Eval_is_OK = False Then
                                 'Falls Simulation fertig aber nicht erfolgreich
                                 '----------------------------------------------
-                            ElseIf Sim1.launchReady(Thread_Ready, SIM_Eval_is_OK, Child_Ready) = False And SIM_Eval_is_OK = False Then
 
                                 ReDim Preserve Child_False(Child_False.GetLength(0))
                                 Child_False(Child_False.GetUpperBound(0)) = Child_Ready
@@ -1797,9 +1818,9 @@ Start_Evolutionsrunden:
                                 If Child_Ready = EVO_Einstellungen1.Settings.PES.n_Nachf - 1 Then Ready = True
                                 Child_Ready += 1
 
+                            ElseIf Me.ispause = True And Child_Ready = Child_Run Then
                                 'Falls Pause und alle simulierten auch verarbeitet
                                 '-------------------------------------------------
-                            ElseIf Me.ispause = True And Child_Ready = Child_Run Then
 
                                 Me.Button_Start.Text = "Run"
                                 Do While (Me.ispause)
@@ -1807,9 +1828,9 @@ Start_Evolutionsrunden:
                                     Application.DoEvents()
                                 Loop
 
+                            Else
                                 'Falls total im Stress
                                 '---------------------
-                            Else
                                 System.Threading.Thread.Sleep(400)
                                 Application.DoEvents()
 
@@ -1848,7 +1869,9 @@ Start_Evolutionsrunden:
                                 PES1.PES_iAkt.iAktNachf = Child_False(i)
                                 Call PES1.EsBest(ind(Child_False(i)))
 
-                                Call EVO_Opt_Verlauf1.Nachfolger(Child_False(i) + 1)
+                                'Verlauf aktualisieren
+                                Me.mProgress.iNachf = Child_False(i) + 1
+
                                 System.Windows.Forms.Application.DoEvents()
 
                                 Eval_Count += 1
@@ -1897,7 +1920,9 @@ Start_Evolutionsrunden:
                         Call Me.Hauptdiagramm1.LöscheLetzteGeneration(PES1.PES_iAkt.iAktPop)
                     End If
 
-                    Call EVO_Opt_Verlauf1.Generation(PES1.PES_iAkt.iAktGen + 1)
+                    'Verlauf aktualisieren
+                    Me.mProgress.iGen = PES1.PES_iAkt.iAktGen + 1
+
                     System.Windows.Forms.Application.DoEvents()
 
                 Next 'Ende alle Generationen
@@ -1908,7 +1933,9 @@ Start_Evolutionsrunden:
                 '########################################
                 'Einordnen der Qualitätsfunktion im PopulationsBestwertspeicher
                 Call PES1.EsPopBest()
-                Call EVO_Opt_Verlauf1.Population(PES1.PES_iAkt.iAktPop + 1)
+
+                'Verlauf aktualisieren
+                Me.mProgress.iPopul = PES1.PES_iAkt.iAktPop + 1
 
             Next 'Ende alle Populationen
             'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -1917,8 +1944,9 @@ Start_Evolutionsrunden:
             '########################################
             'Die neuen Populationseltern werden generiert
             Call PES1.EsPopEltern()
-            System.Windows.Forms.Application.DoEvents()
-            Call EVO_Opt_Verlauf1.Runden(PES1.PES_iAkt.iAktRunde + 1)
+
+            'Verlauf aktualisieren
+            Me.mProgress.iRunde = PES1.PES_iAkt.iAktRunde + 1
 
         Next 'Ende alle Runden
         'xxxxxxxxxxxxxxxxxxxxx
