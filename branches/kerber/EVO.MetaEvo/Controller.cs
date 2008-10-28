@@ -14,33 +14,35 @@ namespace IHWB.EVO.MetaEvo
 
         EVO.Common.Problem prob; 
         EVO.Common.EVO_Settings settings;
-        EVO.Diagramm.Hauptdiagramm hauptdiagramm1;
-
-        Networkmanager networkmanager;
         EVO.Common.Individuum_MetaEvo individuumForClient;
         EVO.Common.Individuum_MetaEvo[] generation;
-        Algomanager algomanager;
+        EVO.Common.Progress progress1;
+
+        EVO.Diagramm.Hauptdiagramm hauptdiagramm1;
         EVO.Diagramm.ApplicationLog applog;
+
+        Networkmanager networkmanager;
+        Algomanager algomanager;
 
         int individuumnumber;
         string role;
 
         //### Konstruktor ###  
-        public Controller(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input, ref EVO.Apps.Testprobleme testprobleme_input)
+        public Controller(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input, ref EVO.Common.Progress progress1, ref EVO.Apps.Testprobleme testprobleme_input)
         {
             settings_input.MetaEvo.Application = "testprobleme";
             this.testprobleme = testprobleme_input;
-            init(ref prob_input, ref settings_input, ref hauptdiagramm_input);
+            init(ref prob_input, ref settings_input, ref hauptdiagramm_input, ref progress1);
         }
-        public Controller(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input, ref EVO.Apps.Sim sim_input)
+        public Controller(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input, ref EVO.Common.Progress progress1, ref EVO.Apps.Sim sim_input)
         {
             settings_input.MetaEvo.Application = "sim";
             this.sim = sim_input;
-            init(ref prob_input, ref settings_input, ref hauptdiagramm_input);
+            init(ref prob_input, ref settings_input, ref hauptdiagramm_input, ref progress1);
         }
 
         //### Konstruktor ###
-        public void init(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input)  
+        public void init(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input, ref EVO.Common.Progress progress1_input)  
         {
             applog = new IHWB.EVO.Diagramm.ApplicationLog();
             if (settings_input.MetaEvo.Log) applog.log = true;
@@ -49,6 +51,7 @@ namespace IHWB.EVO.MetaEvo
             //Daten einlesen
             this.prob = prob_input;
             this.settings = settings_input;
+            this.progress1 = progress1_input;
             this.hauptdiagramm1 = hauptdiagramm_input;
 
             this.role = this.settings.MetaEvo.Role;
@@ -57,6 +60,9 @@ namespace IHWB.EVO.MetaEvo
             EVO.Common.Individuum_MetaEvo.Initialise(ref prob_input);
             individuumnumber = 1;
             applog.appendText("Controller: Task: " + prob.Datensatz);
+
+            //Progress Initialisieren
+            progress1.Initialize(1, 1, (short)settings.MetaEvo.NumberGenerations, (short)(settings.MetaEvo.ChildsPerParent * settings.MetaEvo.PopulationSize));
 
             switch (this.role)
             {
@@ -159,7 +165,7 @@ namespace IHWB.EVO.MetaEvo
                     set_random_parents(ref generation);
 
                     //Genpool simulieren
-                     applog.appendText("Controller: Genpool: Simulating Individuums...");
+                    applog.appendText("Controller: Genpool: Simulating Individuums...");
                     for (int i = 0; i < generation.Length; i++)
                     {
                         //Simulieren 
@@ -188,6 +194,7 @@ namespace IHWB.EVO.MetaEvo
                     
                     //Neue Generation Simulieren
                     applog.appendText("Controller: Individuums for Generation " + generationcounter + ": Simulating Individuums...");
+                    progress1.iNachf = 0;
                     for (int i = 0; i < generation.Length; i++)
                     {
                         tmp = "(";
@@ -210,7 +217,8 @@ namespace IHWB.EVO.MetaEvo
                             sim.Evaluate_MetaEvo(ref generation[i]);
                             hauptdiagramm1.ZeichneIndividuum(generation[i], 1, 1, 1, generation[i].ID % generation.Length, System.Drawing.Color.Yellow, true);
                             System.Windows.Forms.Application.DoEvents();
-                        }  
+                        }
+                        progress1.NextNachf();
                     }
 
                     //Neue Individuen mit Genpool verrechnen und Genpool zeichnen
@@ -218,6 +226,7 @@ namespace IHWB.EVO.MetaEvo
 
                     if (algomanager.calculationmode == "local") mePC.status = "perform_local";
                     else generationcounter++;
+                    progress1.NextGen();
                 }
             }
             applog.appendText("Controller: Calculation Finished");

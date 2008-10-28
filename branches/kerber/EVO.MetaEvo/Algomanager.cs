@@ -26,7 +26,7 @@ namespace IHWB.EVO.MetaEvo
             applog = applog_input;
             //Algoobjekt initialisieren (enthält die algorithmus-Methoden und das Feedback zu jedem Algo)
             algos = new Algos(ref settings_input, individuumnumber_input, ref applog);
-            algos.set_algos("Zufällige Einfache Mutation, Feedback Mutation, Ungleichverteilte Mutation, Zufällige Rekombination, Diversität aus Sortierung, Totaler Zufall, Dominanzvektor");
+            algos.set_algos("Zufällige Einfache Mutation, Feedback Mutation, Ungleichverteilte Mutation, Zufällige Rekombination, Intermediäre Rekombination, Diversität aus Sortierung, Totaler Zufall, Dominanzvektor");
         }
 
         public void set_genpool(ref EVO.Common.Individuum_MetaEvo[] genpool_input) 
@@ -62,7 +62,6 @@ namespace IHWB.EVO.MetaEvo
                 quicksort(ref new_generation_input, kriterium, 0, new_generation_input.Length - 1);
                 //1.4.Dominanzkriterium auf Penalties innerhalb der neuen Individuen
                 check_domination(ref new_generation_input, ref new_generation_input);
-                
 
                 //2.Mengenanpassung des Genpools:
                 //2.1 Anzahl der überlebenden Individuen
@@ -81,7 +80,7 @@ namespace IHWB.EVO.MetaEvo
                 //4.2.false-Individuen in Wastepool verschieben 
                 wastepool = new_generation_input;
                 //4.3.Sortieren
-                quicksort(ref wastepool, kriterium, 0, wastepool.Length - 1);
+                //quicksort(ref wastepool, kriterium, 0, wastepool.Length - 1); //Nötig??
                 quicksort(ref genpool, kriterium, 0, genpool.Length - 1);
                 applog.appendText("Algo Manager: Result: New Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n");
                 
@@ -90,17 +89,21 @@ namespace IHWB.EVO.MetaEvo
                 hauptdiagramm.ZeichneSekPopulation(genpool);
                 System.Windows.Forms.Application.DoEvents();
 
-                if ((noAdvantage == 5) && (calculationmode == "global")) set_calculationmode(noAdvantage, "local");
+                if ((noAdvantage == 5) && (calculationmode == "global"))
+                {
+                    set_calculationmode_local(noAdvantage, ref genpool);
+                    MessageBox.Show("Switching to Local Optimization after " + (new_generation_input[new_generation_input.Length - 1].ID) / new_generation_input.Length + " Generations", "Algomanager");
+                }
             }
             if (calculationmode == "local")
             {
-                MessageBox.Show("Switching to Local Optimization after " + (new_generation_input[new_generation_input.Length - 1].ID) / new_generation_input.Length + " Generations", "Algomanager");
+                
             }
         }
 
         public void new_individuals_build(ref EVO.Common.Individuum_MetaEvo[] new_generation_input)
         {
-            //4.Generierung neuer Individuen (wieder in new_generation_input)
+            //Generierung neuer Individuen (wieder in new_generation_input)
             algos.newGeneration(ref genpool, ref new_generation_input, ref wastepool);
         }
 
@@ -496,13 +499,18 @@ namespace IHWB.EVO.MetaEvo
         }
 
         //Umschalten auf Lokale Algorithmen
-        private void set_calculationmode(int noAdvantage, string calculationmode_input)
+        private void set_calculationmode_local(int noAdvantage, ref EVO.Common.Individuum_MetaEvo[] genpool_input)
         {
             applog.appendText("Algo Manager: No Advantages last " + noAdvantage + " Generations - switching to local Algorithms");
-            calculationmode = calculationmode_input;
+            calculationmode = "local";
+
+            for (int i = 0; i < genpool_input.Length; i++)
+            {
+                genpool_input[i].set_generator(-1);
+            }
 
             //Neue Algorithmuskomposition
-            algos.set_algos("Hook and Jeeves V2");
+            algos.set_algos("Hook and Jeeves");
         }
         //Mengendifferenz zwischen Genpoolgrösse und überlebenden Individuen
         private int calculate_difference2genpool(ref EVO.Common.Individuum_MetaEvo[] genpool_input, ref EVO.Common.Individuum_MetaEvo[] input2)
