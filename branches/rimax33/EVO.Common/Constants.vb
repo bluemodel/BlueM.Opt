@@ -13,6 +13,14 @@ Public Module Constants
     '**** TU Darmstadt                                                          ****
     '*******************************************************************************
     '*******************************************************************************
+    Public hN As Double
+    Public tVor As Double
+    Public polder As Boolean
+    Public weirHeight As Double
+    Public globalDatensatz As String
+    Public globalWorkDir As String
+    Public ReferenceSolution As String
+
 
     'Option für Startvorgabe für Optimierung
     Public Enum EVO_STARTPARAMETER As Integer

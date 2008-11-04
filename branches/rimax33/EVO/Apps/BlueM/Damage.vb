@@ -4,12 +4,13 @@ Public Class Damage
 
     Public Function QWert_Damage(ByVal Pfad As String) As Double
 
-        Dim Damage As Double
+        Dim Damage, DamageWW, DamageRW, DamageVW, Damage2 As Double
+
         Try
             Dim FiStr As FileStream = New FileStream(Pfad, FileMode.Open, FileAccess.ReadWrite)
             Dim StrRe As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
             Dim Text As String
-            Dim zeile, k_s26, k_s29, k_s31 As Integer
+            Dim zeile, k_s26, k_s29, k_s31, j As Integer
             Dim k_s206, k_s205, k_s255, k_s204, k_s209, k_s200 As Integer
             Dim k_s111, k_s115, k_s116, k_s118 As Integer
             Dim Qmax26, Qmax29, Qmax31 As Double
@@ -19,6 +20,8 @@ Public Class Damage
             Dim D204, D206, D205, D209, D200 As Double
             Dim D111, D115, D116, D118 As Double
             Dim y1, y2, x1, dx As Double
+            Dim PU_hN, tQmax209 As Double
+
 
 
             ' Dim x() As Double = {20.0, 40.0, 60.0, 80.0, 100.0, 120.0, 140.0, 160.0, 180.0, 200.0, 220.0, 240.0}
@@ -107,7 +110,11 @@ Public Class Damage
                     If (CDbl(strarray(k_s205)) > Qmax205) Then Qmax205 = CDbl(strarray(k_s205))
                     'If (CDbl(strarray(k_s255)) > Qmax255) Then Qmax255 = CDbl(strarray(k_s255))
                     If (CDbl(strarray(k_s206)) > Qmax206) Then Qmax206 = CDbl(strarray(k_s206))
-                    If (CDbl(strarray(k_s209)) > Qmax209) Then Qmax209 = CDbl(strarray(k_s209))
+                    If (CDbl(strarray(k_s209)) > Qmax209) Then
+                        Qmax209 = CDbl(strarray(k_s209))
+                        tQmax209 = zeile
+                    End If
+
                     If (CDbl(strarray(k_s111)) > Qmax111) Then Qmax111 = CDbl(strarray(k_s111))
                     If (CDbl(strarray(k_s115)) > Qmax115) Then Qmax115 = CDbl(strarray(k_s115))
                     If (CDbl(strarray(k_s116)) > Qmax116) Then Qmax116 = CDbl(strarray(k_s116))
@@ -623,10 +630,42 @@ Public Class Damage
             '                Qmax115.ToString + Chr(9) + Qmax116.ToString + Chr(9) + Qmax118.ToString)
 
 
-            Damage = D29 + D31 + D26 + D200 + D204 + D205 + D206 + D209 + D111 + D115 + D116 + D118
-            'damage_ww = D111 + D115 + D116 + D118
-            'damage_rw = D29 + D31 + D26
-            ' damage_vw = D200 + D204 + D205 + D206 + D209
+            Damage2 = D29 ^ 2.0 + D31 ^ 2.0 + D26 ^ 2.0 + D200 ^ 2.0 + D204 ^ 2.0 + D205 ^ 2.0 + D206 ^ 2.0 + D209 ^ 2.0 + D111 ^ 2.0 + D115 ^ 2.0 + D116 ^ 2.0 + D118 ^ 2.0
+
+            DamageWW = D111 + D115 + D116 + D118
+            DamageRW = D29 + D31 + D26
+            DamageVW = D200 + D204 + D205 + D206 + D209
+
+            Damage = DamageWW + DamageRW + DamageVW
+
+            '**************************************
+            '* Berechne Scheitelstatistik         *
+            '**************************************
+
+            'PU_HainsSum = 1 - Math.Exp(-1 * (1 + 0.5984 * (Qmax206 - 11.2394) / 7.0892) ^ (1 / -0.5984))
+
+            PU_hN = 1 - Math.Exp(-1 * (1 + 0.4079 * (Common.Constants.hN - 50.008) / 16.4215) ^ (1 / -0.4079))
+
+            If Form1.Method <> "MCS" Then
+                For j = 0 To Common.Manager.AnzPenalty - 1
+                    If Common.Manager.List_OptZiele(j).ZielTyp = "Schaden" Then
+                        Select Case Common.Manager.List_OptZiele(j).ZielFkt
+                            Case "einfach"
+                                Damage = Damage
+                            Case "Quad"
+                                Damage = Damage2
+                            Case "QuadPU"
+                                Damage = (Damage * PU_hN) ^ 2
+                        End Select
+                    End If
+                Next
+            End If
+
+            If (zeile - tQmax209 < 6) Then
+                Console.WriteLine("WARNUNG! Simulationsraum zu kurz!: " + (zeile - tQmax209).ToString + Chr(9))
+            End If
+            
+
 
             '*** check Schadensfunktion: Q - D - Beziehung
             'Console.WriteLine(nrun.ToString + Chr(9) + D29.ToString + Chr(9) + Qmax29.ToString + Chr(9) + D31.ToString + Chr(9) + Qmax31.ToString + Chr(9) + D26.ToString + Chr(9) + Qmax26.ToString + Chr(9) + D200.ToString + Chr(9) + Qmax200.ToString + Chr(9) + D204.ToString + Chr(9) + Qmax204.ToString + Chr(9) + D205.ToString + Chr(9) + Qmax205.ToString + Chr(9) + D206.ToString + Chr(9) + Qmax206.ToString + Chr(9) + D209.ToString + Chr(9) + Qmax209.ToString + Chr(9) + D111.ToString + Chr(9) + Qmax111.ToString + Chr(9) + D115.ToString + Chr(9) + Qmax115.ToString + Chr(9) + D116.ToString + Chr(9) + Qmax116.ToString + Chr(9) + D118.ToString + Chr(9) + Qmax118.ToString)

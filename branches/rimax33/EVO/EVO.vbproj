@@ -130,7 +130,9 @@
     <Compile Include="Apps\BlueM\BlueM.vb" />
     <Compile Include="Apps\BlueM\Damage.vb" />
     <Compile Include="Apps\BlueM\IHAProcessor.vb" />
+    <Compile Include="Apps\BlueM\MouseMove.vb" />
     <Compile Include="Apps\BlueM\SKos.vb" />
+    <Compile Include="Apps\BlueM\HECRAS.vb" />
     <Compile Include="Apps\SensiPlot.Designer.vb">
       <DependentUpon>SensiPlot.vb</DependentUpon>
     </Compile>
@@ -258,6 +260,7 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Diagramm\licenses.licx" />
+    <EmbeddedResource Include="My Project\licenses.licx" />
     <EmbeddedResource Include="My Project\Resources.resx">
       <SubType>Designer</SubType>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
@@ -275,6 +278,7 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="ClassDiagram1.cd" />
+    <None Include="ClassDiagram2.cd" />
     <None Include="My Project\Settings.settings">
       <CustomToolNamespace>My</CustomToolNamespace>
       <Generator>SettingsSingleFileGenerator</Generator>
