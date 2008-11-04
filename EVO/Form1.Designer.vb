@@ -37,6 +37,7 @@ Partial Class Form1
         Me.Button_MCS = New System.Windows.Forms.Button
         Me.Button_genP = New System.Windows.Forms.Button
         Me.Button_loadRefResult = New System.Windows.Forms.Button
+        Me.Button_MouseMove = New System.Windows.Forms.Button
         Me.GroupBox_Anwendung = New System.Windows.Forms.GroupBox
         Me.Label_Anwendung = New System.Windows.Forms.Label
         Me.ComboBox_Anwendung = New System.Windows.Forms.ComboBox
@@ -55,10 +56,24 @@ Partial Class Form1
         Me.Numeric_MCS_von = New System.Windows.Forms.NumericUpDown
         Me.Label_Anzahl_MCS = New System.Windows.Forms.Label
         Me.Label1 = New System.Windows.Forms.Label
+        Me.Label_AbbruchDauer = New System.Windows.Forms.Label
+        Me.NumericUpDown_nMin = New System.Windows.Forms.NumericUpDown
+        Me.Label2 = New System.Windows.Forms.Label
+        Me.Label3 = New System.Windows.Forms.Label
+        Me.Label_Einst = New System.Windows.Forms.Label
+        Me.Label_Vorentl = New System.Windows.Forms.Label
+        Me.NumericUpDown_Vorentl = New System.Windows.Forms.NumericUpDown
+        Me.NumericUpDownXMouse = New System.Windows.Forms.NumericUpDown
+        Me.NumericUpDownyMouse = New System.Windows.Forms.NumericUpDown
+        Me.CheckBoxPolder = New System.Windows.Forms.CheckBox
         Me.GroupBox_Anwendung.SuspendLayout()
         Me.GroupBox_ErgebnisDB.SuspendLayout()
         CType(Me.Numeric_MCS_bis, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Numeric_MCS_von, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.NumericUpDown_nMin, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.NumericUpDown_Vorentl, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.NumericUpDownXMouse, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.NumericUpDownyMouse, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'Button_Start
@@ -162,6 +177,21 @@ Partial Class Form1
         Me.Button_loadRefResult.TabIndex = 9
         Me.ToolTip1.SetToolTip(Me.Button_loadRefResult, "Vergleichsergebnis aus Ergebnisdatenbank laden")
         Me.Button_loadRefResult.UseVisualStyleBackColor = True
+        '
+        'Button_MouseMove
+        '
+        Me.Button_MouseMove.BackColor = System.Drawing.SystemColors.Control
+        Me.Button_MouseMove.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Button_MouseMove.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Button_MouseMove.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.Button_MouseMove.Location = New System.Drawing.Point(722, 330)
+        Me.Button_MouseMove.Name = "Button_MouseMove"
+        Me.Button_MouseMove.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.Button_MouseMove.Size = New System.Drawing.Size(82, 23)
+        Me.Button_MouseMove.TabIndex = 30
+        Me.Button_MouseMove.Text = "MoveMouse"
+        Me.ToolTip1.SetToolTip(Me.Button_MouseMove, "Optimierung starten")
+        Me.Button_MouseMove.UseVisualStyleBackColor = True
         '
         'GroupBox_Anwendung
         '
@@ -323,11 +353,123 @@ Partial Class Form1
         Me.Label1.TabIndex = 21
         Me.Label1.Text = "bis:"
         '
+        'Label_AbbruchDauer
+        '
+        Me.Label_AbbruchDauer.AutoSize = True
+        Me.Label_AbbruchDauer.Location = New System.Drawing.Point(714, 462)
+        Me.Label_AbbruchDauer.Name = "Label_AbbruchDauer"
+        Me.Label_AbbruchDauer.Size = New System.Drawing.Size(33, 13)
+        Me.Label_AbbruchDauer.TabIndex = 23
+        Me.Label_AbbruchDauer.Text = "nMin:"
+        '
+        'NumericUpDown_nMin
+        '
+        Me.NumericUpDown_nMin.Location = New System.Drawing.Point(748, 460)
+        Me.NumericUpDown_nMin.Maximum = New Decimal(New Integer() {100000, 0, 0, 0})
+        Me.NumericUpDown_nMin.Name = "NumericUpDown_nMin"
+        Me.NumericUpDown_nMin.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.NumericUpDown_nMin.Size = New System.Drawing.Size(56, 20)
+        Me.NumericUpDown_nMin.TabIndex = 24
+        Me.NumericUpDown_nMin.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.NumericUpDown_nMin.Value = New Decimal(New Integer() {100, 0, 0, 0})
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(708, 511)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(92, 13)
+        Me.Label2.TabIndex = 25
+        Me.Label2.Text = "MCS-SCHLEIFEN"
+        '
+        'Label3
+        '
+        Me.Label3.AutoSize = True
+        Me.Label3.Location = New System.Drawing.Point(708, 444)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(109, 13)
+        Me.Label3.TabIndex = 26
+        Me.Label3.Text = "ABBRUCHKRITERIA"
+        '
+        'Label_Einst
+        '
+        Me.Label_Einst.AutoSize = True
+        Me.Label_Einst.Location = New System.Drawing.Point(708, 381)
+        Me.Label_Einst.Name = "Label_Einst"
+        Me.Label_Einst.Size = New System.Drawing.Size(97, 13)
+        Me.Label_Einst.TabIndex = 27
+        Me.Label_Einst.Text = "EINSTELLUNGEN"
+        '
+        'Label_Vorentl
+        '
+        Me.Label_Vorentl.AutoSize = True
+        Me.Label_Vorentl.Location = New System.Drawing.Point(714, 403)
+        Me.Label_Vorentl.Name = "Label_Vorentl"
+        Me.Label_Vorentl.Size = New System.Drawing.Size(28, 13)
+        Me.Label_Vorentl.TabIndex = 28
+        Me.Label_Vorentl.Text = "tvor:"
+        '
+        'NumericUpDown_Vorentl
+        '
+        Me.NumericUpDown_Vorentl.Location = New System.Drawing.Point(745, 401)
+        Me.NumericUpDown_Vorentl.Maximum = New Decimal(New Integer() {100000, 0, 0, 0})
+        Me.NumericUpDown_Vorentl.Name = "NumericUpDown_Vorentl"
+        Me.NumericUpDown_Vorentl.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.NumericUpDown_Vorentl.Size = New System.Drawing.Size(56, 20)
+        Me.NumericUpDown_Vorentl.TabIndex = 29
+        Me.NumericUpDown_Vorentl.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.NumericUpDown_Vorentl.Value = New Decimal(New Integer() {24, 0, 0, 0})
+        '
+        'NumericUpDownXMouse
+        '
+        Me.NumericUpDownXMouse.Location = New System.Drawing.Point(722, 304)
+        Me.NumericUpDownXMouse.Maximum = New Decimal(New Integer() {100000, 0, 0, 0})
+        Me.NumericUpDownXMouse.Minimum = New Decimal(New Integer() {10000, 0, 0, -2147483648})
+        Me.NumericUpDownXMouse.Name = "NumericUpDownXMouse"
+        Me.NumericUpDownXMouse.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.NumericUpDownXMouse.Size = New System.Drawing.Size(46, 20)
+        Me.NumericUpDownXMouse.TabIndex = 31
+        Me.NumericUpDownXMouse.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.NumericUpDownXMouse.Value = New Decimal(New Integer() {250, 0, 0, 0})
+        '
+        'NumericUpDownyMouse
+        '
+        Me.NumericUpDownyMouse.Location = New System.Drawing.Point(771, 304)
+        Me.NumericUpDownyMouse.Maximum = New Decimal(New Integer() {100000, 0, 0, 0})
+        Me.NumericUpDownyMouse.Minimum = New Decimal(New Integer() {10000, 0, 0, -2147483648})
+        Me.NumericUpDownyMouse.Name = "NumericUpDownyMouse"
+        Me.NumericUpDownyMouse.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.NumericUpDownyMouse.Size = New System.Drawing.Size(46, 20)
+        Me.NumericUpDownyMouse.TabIndex = 32
+        Me.NumericUpDownyMouse.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.NumericUpDownyMouse.Value = New Decimal(New Integer() {50, 0, 0, 0})
+        '
+        'CheckBoxPolder
+        '
+        Me.CheckBoxPolder.AutoSize = True
+        Me.CheckBoxPolder.Location = New System.Drawing.Point(722, 264)
+        Me.CheckBoxPolder.Name = "CheckBoxPolder"
+        Me.CheckBoxPolder.Size = New System.Drawing.Size(56, 17)
+        Me.CheckBoxPolder.TabIndex = 33
+        Me.CheckBoxPolder.Text = "Polder"
+        Me.CheckBoxPolder.UseVisualStyleBackColor = True
+        '
         'Form1
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.BackColor = System.Drawing.SystemColors.Control
         Me.ClientSize = New System.Drawing.Size(819, 753)
+        Me.Controls.Add(Me.CheckBoxPolder)
+        Me.Controls.Add(Me.NumericUpDownyMouse)
+        Me.Controls.Add(Me.NumericUpDownXMouse)
+        Me.Controls.Add(Me.Button_MouseMove)
+        Me.Controls.Add(Me.NumericUpDown_Vorentl)
+        Me.Controls.Add(Me.Label_Vorentl)
+        Me.Controls.Add(Me.Label_Einst)
+        Me.Controls.Add(Me.Label3)
+        Me.Controls.Add(Me.Label2)
+        Me.Controls.Add(Me.NumericUpDown_nMin)
+        Me.Controls.Add(Me.Label_AbbruchDauer)
         Me.Controls.Add(Me.Button_genP)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.Label_Anzahl_MCS)
@@ -353,6 +495,10 @@ Partial Class Form1
         Me.GroupBox_ErgebnisDB.ResumeLayout(False)
         CType(Me.Numeric_MCS_bis, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.Numeric_MCS_von, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.NumericUpDown_nMin, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.NumericUpDown_Vorentl, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.NumericUpDownXMouse, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.NumericUpDownyMouse, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -382,4 +528,15 @@ Partial Class Form1
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Public WithEvents Button_genP As System.Windows.Forms.Button
     Private WithEvents Button_loadRefResult As System.Windows.Forms.Button
+    Friend WithEvents Label_AbbruchDauer As System.Windows.Forms.Label
+    Friend WithEvents NumericUpDown_nMin As System.Windows.Forms.NumericUpDown
+    Friend WithEvents Label2 As System.Windows.Forms.Label
+    Friend WithEvents Label3 As System.Windows.Forms.Label
+    Friend WithEvents Label_Einst As System.Windows.Forms.Label
+    Friend WithEvents Label_Vorentl As System.Windows.Forms.Label
+    Friend WithEvents NumericUpDown_Vorentl As System.Windows.Forms.NumericUpDown
+    Public WithEvents Button_MouseMove As System.Windows.Forms.Button
+    Friend WithEvents NumericUpDownXMouse As System.Windows.Forms.NumericUpDown
+    Friend WithEvents NumericUpDownyMouse As System.Windows.Forms.NumericUpDown
+    Friend WithEvents CheckBoxPolder As System.Windows.Forms.CheckBox
 End Class

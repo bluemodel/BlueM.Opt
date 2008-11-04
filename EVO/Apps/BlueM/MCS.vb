@@ -5,7 +5,7 @@ Public Class MCS
 
     Dim Pstd(10000) As Double 'Basisniederschlagsvektor
     Dim Dauer, Lauf As Integer
-    Dim P_Menge, P_Area, P_area_ohTS As Double
+    Dim P_Menge, P_Area, P_area_ohTS, P_Malter, P_AltSch As Double
     Dim StFac(10000), Schaden As Double
     Dim rand(2000), Teibereiche As Double
     Dim Parray(2000) As Double
@@ -36,17 +36,21 @@ Public Class MCS
 
     Dim nTeilbereiche As Integer = 4
     Dim nStationen As Integer = 15
-   
+    Dim spatialFactor As Boolean = False
+
     Public Vorlaufzeit As Integer  '!Auch in Sim.vb/ Write_ModellParameter() festlegen!!
 
-    Dim Pmin As Double = 100
+    Dim Pmin As Double = 50
     Dim Pmax As Double = 500
     Dim PMGN1 As Double = 200
     Dim PMGN12 As Double = 325
     Dim PMGN24 As Double = 400
     Dim PMGN72 As Double = 500
 
-    Dim DistMax As Double = 40.0 '--> variable FORM excel auswertung
+    Dim PfadZRE As String = "D:/BMdiss/ZRE-MCS/"
+
+
+    Dim DistMax As Double = 40.0 '--> Variabel from excel auswertung
 
     Dim StDist(,) As Double = {{0.0, 2.22, 11.15, 28.93, 25.89, 24.06, 7.17, 15.64, 15.71, 14.53, 18.96, 17.92, 4.51, 20.95, 9.22} _
                             , {2.22, 0.0, 13.37, 31.16, 28.0, 26.13, 8.44, 17.85, 17.5, 16.75, 21.18, 20.14, 6.71, 22.76, 7.44} _
@@ -75,11 +79,22 @@ Public Class MCS
 
         Vorlaufzeit = nt
         Lauf = iLauf
+        Dim i As Integer
 
         Call getPath() 'ermittle Arbeitsverzeichnis
         Call readDate() 'Simulationszeitraum ermitteln
 
         read_Nied(iLauf)
+
+        P_Malter = 0.0
+        P_AltSch = 0.0
+
+        'Console.Out.WriteLine(StFac(i))
+        If spatialFactor = False Then
+            For i = 1 To 15
+                StFac(i) = 1.0
+            Next i
+        End If
 
         writeZRE("AltenbergKipsdorf.zre", StFac(1))
         writeZRE("AltenbergSchellerau.zre", StFac(2))
@@ -97,17 +112,20 @@ Public Class MCS
         writeZRE("TharandtGrillenburg.zre", StFac(14))
         writeZRE("ZinnwaldGeorgenfeld.zre", StFac(15))
 
-        modify_TS_V0("/../ZRE/S0.txt", "Lehnmuehle", iLauf)
-        modify_TS_V0("/../ZRE/S0.txt", "Klingenberg", iLauf)
-        modify_TS_V0("/../ZRE/S0.txt", "Malter", iLauf)
+        modify_TS_V0(PfadZRE + "S0.txt", "Lehnmuehle", iLauf)
+        modify_TS_V0(PfadZRE + "S0.txt", "Klingenberg", iLauf)
+        modify_TS_V0(PfadZRE + "S0.txt", "Malter", iLauf)
+
+        modifyVorregen(WorkDir, Datensatz)
 
         If Not evo Then
-            'runBluem()
-            'readWel(Me.WorkDir, Me.Datensatz)
-            'Me.Damage1 = New Damage()
-            'Schaden = Me.Damage1.QWert_Damage(WorkDir & Datensatz & ".wel")
+            runBluem()
+            readWel(Me.WorkDir, Me.Datensatz)
+            Me.Damage1 = New Damage()
+            Schaden = Me.Damage1.QWert_Damage(WorkDir & Datensatz & ".wel")
             output(iLauf)
         End If
+        'Console.Out.WriteLine(Schaden)
 
     End Sub
 
@@ -117,6 +135,7 @@ Public Class MCS
 
         Dim i As Integer = 0
         Dim k As Integer
+        Dim l As Integer = 0
 
         Dim GradMax As Double
         Dim StNr, Grad As Double
@@ -127,18 +146,23 @@ Public Class MCS
         Dim out As String = ""
 
         For Lauf = iStart To iEnde
-
-            Dauer = Zufallsdauer()
+            l += 1
 
             Dim P_Matrix() As Double = {Pmin, Pmax, PMGN1, PMGN12, PMGN24, PMGN72}
 
+            If l = 1 Then Dauer = Zufallsdauer()
+
 100:        P_Menge = NiedGen(P_Matrix(0), P_Matrix(1), Lauf)
 
+            Dauer = Zufallsdauer()
 
-           
+            'Console.Out.WriteLine(CheckPSum(1))
             If CheckPSum(1) > P_Matrix(2) Then GoTo 100
+            'Console.Out.WriteLine(CheckPSum(12))
             If CheckPSum(12) > P_Matrix(3) Then GoTo 100
+            'Console.Out.WriteLine(CheckPSum(24))
             If CheckPSum(24) > P_Matrix(4) Then GoTo 100
+            'Console.Out.WriteLine(CheckPSum(72))
             If CheckPSum(72) > P_Matrix(5) Then GoTo 100
 
             '*****************************************
@@ -156,17 +180,20 @@ Public Class MCS
             Randomize()
             StNr = CDbl(Int(Rnd() * (nStationen - 1)))
 
-            For i = 1 To nStationen
 
-                StFac(i) = (P_Menge - Grad * StDist(i - 1, StNr)) / P_Menge
-                'Console.Out.WriteLine(StFac(i))
+            For i = 1 To nStationen
+                If spatialFactor Then
+                    StFac(i) = (P_Menge - Grad * StDist(i - 1, StNr)) / P_Menge
+                Else
+                    StFac(i) = 1.0
+                End If
             Next
 
             '*****************************************
             'Schreiben der allgemeinen P-Dateien
             '*****************************************
 
-            Dim StrWri As StreamWriter = New StreamWriter(WorkDir + "ZRE/Nied_" + Lauf.ToString + ".txt", False, System.Text.Encoding.GetEncoding("iso8859-1"))
+            Dim StrWri As StreamWriter = New StreamWriter(PfadZRE + "Nied_" + Lauf.ToString + ".txt", False, System.Text.Encoding.GetEncoding("iso8859-1"))
 
             out = ""
             'Faktoren für räumliche Verteilung zuerst
@@ -234,7 +261,7 @@ Public Class MCS
     Public Function NiedGen(ByVal Pmin As Integer, ByVal Pmax As Integer, ByVal num As Integer) As Double
 
         Dim SumP1(1000), SumP2(1000), ZF1(1000), ZF2(1000), Sum1, Sum2, zahl As Double
-        Dim n, m, k, L_Tb, n_Tb, P_Sum, ctrsum As Integer
+        Dim n, m, k, L_Tb, n_Tb, P_Sum, ctrsum, i As Integer
         Dim out As String
         Dim Pmax1h, Pmax12h As Double
         Dim PP As Double
@@ -245,6 +272,22 @@ Public Class MCS
 
         Randomize()
         P_Sum = Pmin + Int(Rnd() * (Pmax - Pmin))
+
+        'Lese extern generierten hN ein:
+        '-------------------------------------------
+        Dim FiStr As FileStream = New FileStream(PfadZRE + "GEVhN.txt", FileMode.Open, FileAccess.ReadWrite)
+        Dim StrRe As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+        For i = 0 To num - 1
+            P_Sum = CDbl(StrRe.ReadLine.ToString.Trim)
+        Next i
+
+        Console.Out.WriteLine(num.ToString + " " + P_Sum.ToString)
+
+        StrRe.Close()
+        FiStr.Close()
+
+        '------------------------------------------
 
         n_Tb = nTeilbereiche
         L_Tb = Dauer / n_Tb                    'default 48/4=12
@@ -309,7 +352,7 @@ Public Class MCS
         'Schreiben der P-Dateien
         '*****************************************
 
-        Dim Datei As String = WorkDir + "ZRE/Nied_" + num.ToString + ".txt"
+        Dim Datei As String = PfadZRE + "Nied_" + num.ToString + ".txt"
 
         Dim StrWri As StreamWriter = New StreamWriter(Datei, False, System.Text.Encoding.GetEncoding("iso8859-1"))
         out = ""
@@ -353,7 +396,7 @@ Public Class MCS
     Public Sub read_Nied(ByVal number As Integer)
         Dim Text As String
 
-        Dim FiStr As FileStream = New FileStream(WorkDir + "/../ZRE/Nied_" + number.ToString + ".txt", FileMode.Open, FileAccess.ReadWrite)
+        Dim FiStr As FileStream = New FileStream(PfadZRE + "Nied_" + number.ToString + ".txt", FileMode.Open, FileAccess.ReadWrite)
         Dim StrRe As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
         Dim n, k As Integer
 
@@ -396,6 +439,8 @@ Public Class MCS
         For k = 1 To nStationen
             P_Area += P_Menge * StFac(k) * PolyFac(k - 1)
         Next k
+
+        Common.Constants.hN = P_Area
 
         '* oberhalb der TS
         '**************************************
@@ -456,11 +501,16 @@ Public Class MCS
             Else
                 Text += date2.ToString("yyyyMMdd HH:mm") + " " + "0.0" + vbCrLf
             End If
-
+            If zreName = "AltenbergSchellerau.zre" Then
+                P_AltSch += Pstd(i) * Faktor
+            End If
+            If zreName = "MalterTS.zre" Then
+                P_Malter += Pstd(i) * Faktor
+            End If
             date2 = date2.Add(Me.SimDT)
         End While
 
-        Dim StrWri As StreamWriter = New StreamWriter(WorkDir + "/../ZRE/" + zreName)
+        Dim StrWri As StreamWriter = New StreamWriter(PfadZRE + zreName)
         StrWri.Write(Text)
         StrWri.Close()
 
@@ -564,7 +614,7 @@ Public Class MCS
         'lese V0-Zufallszahlen:
 
         Try
-            Dim FiStr As FileStream = New FileStream(WorkDir + PfadSO, FileMode.Open, FileAccess.ReadWrite)
+            Dim FiStr As FileStream = New FileStream(PfadZRE + "S0.txt", FileMode.Open, FileAccess.ReadWrite)
             Dim StrRe As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
             Dim i As Integer
 
@@ -691,7 +741,9 @@ Public Class MCS
                                     + "P_Dauer" + Chr(9) _
                                     + "hN_max" + Chr(9) _
                                     + "hN_area" + Chr(9) _
-                                    + "hN_area_ohTS" + Chr(9)
+                                    + "hN_area_ohTS" + Chr(9) _
+                                    + "hN_AltSch" + Chr(9) _
+                                    + "hN_Malter" + Chr(9)
 
 
             Console.Out.WriteLine(header)
@@ -732,7 +784,9 @@ Public Class MCS
                                                     + P_Dauer.ToString + Chr(9) _
                                                     + P_Menge.ToString + Chr(9) _
                                                     + P_Area.ToString + Chr(9) _
-                                                    + P_area_ohTS.ToString
+                                                    + P_area_ohTS.ToString + Chr(9) _
+                                                    + P_AltSch.ToString + Chr(9) _
+                                                    + P_Malter.ToString + Chr(9)
 
 
             Console.Out.WriteLine(outpu)
@@ -767,6 +821,7 @@ Public Class MCS
         StrWri.Write(Text)
         StrWri.Close()
     End Sub
+    
 
     Public Sub readWel(ByVal Pfad1 As String, ByVal AnwName1 As String)
         Dim FiStr As FileStream = New FileStream(Pfad1 + AnwName1 + ".wel", FileMode.Open, FileAccess.ReadWrite)
@@ -969,8 +1024,6 @@ Public Class MCS
 
     End Sub
 
-
-
     Public Sub runBluem()
         'BlueM DLL instanzieren
         '----------------------
@@ -1009,5 +1062,111 @@ Public Class MCS
         End Try
 
     End Sub
+
+    Public Sub modifyVorregen(ByVal Pfad1 As String, ByVal AnwName1 As String)
+        Dim Text, Text1, TextNew, TextVR, out, TextCN As String
+
+        Try
+            Dim FiStr As FileStream = New FileStream(Pfad1 + AnwName1 + ".EZG", FileMode.Open, FileAccess.ReadWrite)
+            Dim StrRe As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+            Dim i, j As Integer
+            Dim VG As Double
+
+            Text = ""
+            out = ""
+            VG = 0.0
+            i = 0
+           
+            Do
+                Text = StrRe.ReadLine.ToString
+                i += 1
+                Text1 = ""
+                If i > 9 And i < 75 Then
+                    '
+                    ' Lese Datei
+                    '
+                    TextVR = readVorregen()
+
+                    If TextVR.Length = 1 Then
+                        TextVR = "   " + TextVR
+                    ElseIf TextVR.Length = 2 Then
+                        TextVR = "  " + TextVR
+                    ElseIf TextVR.Length = 3 Then
+                        TextVR = " " + TextVR
+                    End If
+
+                    Dim strarray() As String = Text.Split("|"c)
+                    strarray(1) = " |" + strarray(1)
+
+                    For j = 1 To 8
+                        Text1 = Text1 + strarray(j) + "|"
+                    Next
+
+                    TextCN = strarray(9).ToString.Substring(0, 5)
+
+                    Text1 = Text1 + TextCN + " " + TextVR + "|"
+
+                    For j = 10 To 12
+                        Text1 = Text1 + strarray(j) + "|"
+                    Next
+
+                    Text = Text1
+
+                End If
+
+                    TextNew = TextNew + Text + Environment.NewLine
+
+                    'Console.Out.WriteLine(TextNew)
+                    'Console.Out.WriteLine(Text)
+
+
+            Loop Until StrRe.Peek() = -1
+
+            StrRe.Close()
+            FiStr.Close()
+
+            Dim StrWri As StreamWriter = New StreamWriter(Pfad1 + AnwName1 + ".EZG", False, System.Text.Encoding.GetEncoding("iso8859-1"))
+            StrWri.Write(TextNew)
+            StrWri.Close()
+
+        Catch except As Exception
+            MsgBox(except.Message, "Fehler in modifyCN", MsgBoxStyle.Exclamation)
+        End Try
+
+
+
+    End Sub
+
+
+    Public Function readVorregen() As String
+        Dim Vorregen, i As Integer
+        Dim Text As String
+
+
+        Try
+            Dim FiStr As FileStream = New FileStream(PfadZRE + "Vorregen.txt", FileMode.Open, FileAccess.ReadWrite)
+            Dim StrRe As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+
+            Text = StrRe.ReadLine.ToString
+
+            For i = 1 To Lauf
+                Text = StrRe.ReadLine.ToString
+
+                Dim strarray() As String = Text.Split(";"c)
+
+                Vorregen = Trim(strarray(1))
+
+            Next i
+
+            StrRe.Close()
+            FiStr.Close()
+
+
+        Catch except As Exception
+            MsgBox(except.Message, "Fehler in modify_TS_V0", MsgBoxStyle.Exclamation)
+        End Try
+
+        Return Vorregen
+    End Function
 
 End Class

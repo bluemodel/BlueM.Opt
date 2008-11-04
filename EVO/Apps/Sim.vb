@@ -290,7 +290,7 @@ Public MustInherit Class Sim
         Dim AnzParam As Integer = 0
         Dim AnzParam0 As Integer = 0
         Dim i As Integer = 0
-        Dim k As Integer = 0
+        Dim k As Integer = 1
         Dim tmp As Integer
 
         Do
@@ -316,25 +316,29 @@ Public MustInherit Class Sim
                     AnzParam0 = AnzParam
                     '-------------------
                 Else
-                    ReDim Preserve List_OptParameter(i)
+                    ReDim Preserve List_OptParameter(k - 1)
+                    'Console.Out.WriteLine(k - 1)
                     'OptParameter instanzieren
-                    List_OptParameter(i) = New Common.OptParameter()
+                    List_OptParameter(k - 1) = New Common.OptParameter()
                     'Werte zuweisen
-                    List_OptParameter(i).Bezeichnung = array(1).Trim()
-                    List_OptParameter(i).Einheit = array(2).Trim()
-                    List_OptParameter(i).StartWert = Convert.ToDouble(array(3).Trim(), Common.Provider.FortranProvider)
-                    List_OptParameter(i).Min = Convert.ToDouble(array(4).Trim(), Common.Provider.FortranProvider)
-                    List_OptParameter(i).Max = Convert.ToDouble(array(5).Trim(), Common.Provider.FortranProvider)
+                    List_OptParameter(k - 1).Bezeichnung = array(1).Trim()
+                    List_OptParameter(k - 1).Einheit = array(2).Trim()
+                    List_OptParameter(k - 1).StartWert = Convert.ToDouble(array(3).Trim(), Common.Provider.FortranProvider)
+                    List_OptParameter(k - 1).Min = Convert.ToDouble(array(4).Trim(), Common.Provider.FortranProvider)
+                    List_OptParameter(k - 1).Max = Convert.ToDouble(array(5).Trim(), Common.Provider.FortranProvider)
                     'liegt eine Beziehung vor?
-                    If (i > 0 And Not array(6).Trim() = "") Then
-                        Me.List_OptParameter(i).Beziehung = Common.Constants.getBeziehung(array(6).Trim())
+                    If (k > 0 And Not array(6).Trim() = "") Then
+                        Me.List_OptParameter(k - 1).Beziehung = Common.Constants.getBeziehung(array(6).Trim())
                     End If
                     'Eingelesenen Startwert setzen
-                    List_OptParameter(i).RWert = List_OptParameter(i).StartWert
-                    i += 1
+                    List_OptParameter(k - 1).RWert = List_OptParameter(k - 1).StartWert
+
                 End If
+                k += 1
             End If
         Loop Until StrRead.Peek() = -1
+
+        'Console.Out.WriteLine("nOptParameter=" + AnzParam.ToString)
 
         StrRead.Close()
         FiStr.Close()
@@ -366,7 +370,7 @@ Public MustInherit Class Sim
 
         Dim array() As String
         Dim i As Integer = 0
-        Dim k As Integer = 0
+        Dim k As Integer = 1
         Dim tmp As Integer = 0
 
         Do
@@ -380,29 +384,32 @@ Public MustInherit Class Sim
                     AnzParam = AnzParam + tmp + tmp - 1 'ermitteln der Parameteranzahl nAbschn + nAbschn - 1
                     If AnzParam > 0 Then ReDim Preserve List_ModellParameter(AnzParam - 1)
                     For k = AnzParam0 To AnzParam - 1
+
                         List_ModellParameter(k).OptParameter = "Zeitreihe" + k.ToString
                         List_ModellParameter(k).Element = i + 1
                         List_ModellParameter(k).Faktor = Convert.ToDouble(array(9).Trim(), Common.Provider.FortranProvider)
                         List_ModellParameter(k).Bezeichnung = array(2).Trim()
                         List_ModellParameter(i).ZeileNr = Convert.ToInt16(array(3).Trim(), Common.Provider.FortranProvider)
                         List_ModellParameter(i).SpVon = Convert.ToInt16(array(7).Trim())
+                        'Console.Out.WriteLine(List_ModellParameter(k).Element)
                     Next
                     AnzParam0 = AnzParam
                     List_ModellParameter(i).Datei = array(4).Trim()
                     '------------------
                 Else
-                    ReDim Preserve List_ModellParameter(i)
+                    ReDim Preserve List_ModellParameter(k - 1)
                     'Werte zuweisen
-	                List_ModellParameter(i).OptParameter = array(1).Trim()
-	                List_ModellParameter(i).Bezeichnung = array(2).Trim()
-	                List_ModellParameter(i).Einheit = array(3).Trim()
-	                List_ModellParameter(i).Datei = array(4).Trim()
-	                List_ModellParameter(i).Element = array(5).Trim()
-	                List_ModellParameter(i).ZeileNr = Convert.ToInt16(array(6).Trim())
-	                List_ModellParameter(i).SpVon = Convert.ToInt16(array(7).Trim())
-	                List_ModellParameter(i).SpBis = Convert.ToInt16(array(8).Trim())
-	                List_ModellParameter(i).Faktor = Convert.ToDouble(array(9).Trim(), Common.Provider.FortranProvider)
+                    List_ModellParameter(k - 1).OptParameter = array(1).Trim()
+                    List_ModellParameter(k - 1).Bezeichnung = array(2).Trim()
+                    List_ModellParameter(k - 1).Einheit = array(3).Trim()
+                    List_ModellParameter(k - 1).Datei = array(4).Trim()
+                    List_ModellParameter(k - 1).Element = array(5).Trim()
+                    List_ModellParameter(k - 1).ZeileNr = Convert.ToInt16(array(6).Trim())
+                    List_ModellParameter(k - 1).SpVon = Convert.ToInt16(array(7).Trim())
+                    List_ModellParameter(k - 1).SpBis = Convert.ToInt16(array(8).Trim())
+                    List_ModellParameter(k - 1).Faktor = Convert.ToDouble(array(9).Trim(), Common.Provider.FortranProvider)
                 End If
+                k += 1
                 i += 1
             End If
         Loop Until StrRead.Peek() = -1
@@ -1296,20 +1303,22 @@ Public MustInherit Class Sim
         Dim actDate, date2 As DateTime
         Dim Q1, Q2, dQ, dt, tmin, tmax As Double
 
-        Dim Vorlaufzeit As Integer = 0
+        Dim Vorlaufzeit As Integer = 0.0
+
+
+        AnzParam = List_ModellParameter.Length
+
+        'ermittle Anzahl der Zeitreihen
+        For n = 0 To AnzParam - 1
+            If List_ModellParameter(n).OptParameter.Contains("Zeitreihe") Then
+                If List_ModellParameter(n).Element > nZRE Then nZRE = List_ModellParameter(n).Element
+            End If
+        Next
+
 
         'Sonderfall Zeitreihe
         'xxxxxxxxxxxxxxxxxxxx
-        If List_OptParameter(0).Bezeichnung.Contains("Zeitreihe") Then
-
-            AnzParam = List_ModellParameter.Length
-
-            'ermittle Anzahl der Zeitreihen
-            For n = 0 To AnzParam - 1
-                If List_ModellParameter(n).OptParameter.Contains("Zeitreihe") Then
-                    If List_ModellParameter(n).Element > nZRE Then nZRE = List_ModellParameter(n).Element
-                End If
-            Next
+        If nZRE > 0 Then
 
             'Bestimmen der Simulationschritte
             actDate = Me.SimStart
@@ -1343,14 +1352,15 @@ Public MustInherit Class Sim
                     Zeitpunkt(j) = Math.Round(Zeitpunkt(j), 0)
                     'Console.Out.WriteLine(Zeitpunkt(j))
                 Next j
-            
+
                 '2.Q eintragen
                 If List_ModellParameter(n).SpVon = 0 Then
                     For k = 0 To jend
                         param += 1
                         For j = Zeitpunkt(k) + Vorlaufzeit To Zeitpunkt(k + 1) + Vorlaufzeit
-                            Qab(j) = List_OptParameter(param - 1).Xn * List_OptParameter(n).Max
-                            'Console.Out.WriteLine(Qab(j))
+                            Qab(j) = List_OptParameter(param - 1).Xn * List_OptParameter(param - 1).Max
+
+                            'Console.Out.WriteLine(List_OptParameter(param - 1).Max)
                         Next j
                     Next k
 
@@ -1377,106 +1387,110 @@ Public MustInherit Class Sim
                 Call writeZRE(Qab, PfadZRE)
 
             Next
-        Else
-        
-            'Normale OptParameter
-            'xxxxxxxxxxxxxxxxxxxx
-
-            'ModellParameter aus OptParametern kalkulieren()
-            Call OptParameter_to_ModellParameter()
-
-            'Alle ModellParameter durchlaufen
-            For i = 0 To List_ModellParameter.GetUpperBound(0)
-                WriteCheck = True
-
-                DateiPfad = WorkDir & Datensatz & "." & List_ModellParameter(i).Datei
-                'Datei öffnen
-                Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
-                Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-                Dim StrReadSync As TextReader = TextReader.Synchronized(StrRead)
-
-                'Anzahl der Zeilen feststellen
-                AnzZeil = 0
-                On Error GoTo Handler
-                Do
-                    Zeile = StrRead.ReadLine.ToString
-                    AnzZeil += 1
-                Loop Until StrRead.Peek() = -1
-Handler:
-                If AnzZeil = 0 Then
-                    Throw New Exception("Fehler beim lesen der Transportstreckendatei (.TRS). Sie könnte leer sein.")
-                End If
-
-                ReDim Zeilenarray(AnzZeil - 1)
-
-                'Datei komplett einlesen
-                FiStr.Seek(0, SeekOrigin.Begin)
-                For j = 0 To AnzZeil - 1
-                    Zeilenarray(j) = StrRead.ReadLine.ToString
-                Next
-
-                StrReadSync.Close()
-                StrRead.Close()
-                FiStr.Close()
-
-                'Anzahl verfügbarer Zeichen
-                AnzZeichen = List_ModellParameter(i).SpBis - List_ModellParameter(i).SpVon + 1
-
-                'Zeile einlesen und splitten
-                Zeile = Zeilenarray(List_ModellParameter(i).ZeileNr - 1)
-                StrLeft = Zeile.Substring(0, List_ModellParameter(i).SpVon - 1)
-                If (Zeile.Length > List_ModellParameter(i).SpBis) Then
-                    StrRight = Zeile.Substring(List_ModellParameter(i).SpBis)
-                Else
-                    StrRight = ""
-                End If
-
-                'Wert auf verfügbare Stellen kürzen
-                '----------------------------------
-                'bestimmen des ganzzahligen Anteils, \-Operator ginge zwar theoretisch, ist aber für Zahlen < 1 nicht robust (warum auch immer)
-                WertStr = Convert.ToString(List_ModellParameter(i).Wert - List_ModellParameter(i).Wert Mod 1.0, Common.Provider.FortranProvider)
-
-                If (WertStr.Length > AnzZeichen) Then
-                    'Wert zu lang
-                    Throw New Exception("Der Wert des Modellparameters '" & List_ModellParameter(i).Bezeichnung & "' (" & WertStr & ") ist länger als die zur Verfügung stehende Anzahl von Zeichen!")
-
-                ElseIf (WertStr.Length < AnzZeichen - 1) Then
-                    'Runden auf verfügbare Stellen: Anzahl der Stellen - Anzahl der Vorkommastellen - Komma
-                    WertStr = Convert.ToString(Math.Round(List_ModellParameter(i).Wert, AnzZeichen - WertStr.Length - 1), Common.Provider.FortranProvider)
-
-                Else
-                    'Ganzzahligen Wert benutzen
-                End If
-
-                'Falls erforderlich, Wert mit Leerzeichen füllen
-                If (WertStr.Length < AnzZeichen) Then
-                    For j = 1 To AnzZeichen - WertStr.Length
-                        WertStr = " " & WertStr
-                    Next
-                End If
-
-                'Zeile wieder zusammensetzen
-                Zeile = StrLeft & WertStr & StrRight
-
-                Zeilenarray(List_ModellParameter(i).ZeileNr - 1) = Zeile
-
-                'Alle Zeilen wieder in Datei schreiben
-                Dim StrWrite As StreamWriter = New StreamWriter(DateiPfad, False, System.Text.Encoding.GetEncoding("iso8859-1"))
-                Dim StrWriteSync As TextWriter = TextWriter.Synchronized(StrWrite)
-
-                For j = 0 To AnzZeil - 1
-                    StrWrite.WriteLine(Zeilenarray(j))
-                Next
-
-                StrWriteSync.Close()
-                StrWrite.Close()
-            Next
-
-            If Not WriteCheck Then
-                Throw New Exception("Es wurde kein Parameter geschrieben.")
-            End If
         End If
 
+        'Normale OptParameter
+        'xxxxxxxxxxxxxxxxxxxx
+
+        'ModellParameter aus OptParametern kalkulieren()
+        Call OptParameter_to_ModellParameter()
+     
+        'Alle ModellParameter durchlaufen
+        For i = param To List_ModellParameter.GetUpperBound(0)
+            WriteCheck = True
+
+            DateiPfad = WorkDir & Datensatz & "." & List_ModellParameter(i).Datei
+            'Datei öffnen
+            Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
+            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+            Dim StrReadSync As TextReader = TextReader.Synchronized(StrRead)
+
+            'Anzahl der Zeilen feststellen
+            AnzZeil = 0
+            On Error GoTo Handler
+            Do
+                Zeile = StrRead.ReadLine.ToString
+                AnzZeil += 1
+            Loop Until StrRead.Peek() = -1
+Handler:
+            If AnzZeil = 0 Then
+                Throw New Exception("Fehler beim lesen der Transportstreckendatei (.TRS). Sie könnte leer sein.")
+            End If
+
+            ReDim Zeilenarray(AnzZeil - 1)
+
+            'Datei komplett einlesen
+            FiStr.Seek(0, SeekOrigin.Begin)
+            For j = 0 To AnzZeil - 1
+                Zeilenarray(j) = StrRead.ReadLine.ToString
+            Next
+
+            StrReadSync.Close()
+            StrRead.Close()
+            FiStr.Close()
+
+            'Anzahl verfügbarer Zeichen
+            AnzZeichen = List_ModellParameter(i).SpBis - List_ModellParameter(i).SpVon + 1
+
+            'Zeile einlesen und splitten
+            Zeile = Zeilenarray(List_ModellParameter(i).ZeileNr - 1)
+            StrLeft = Zeile.Substring(0, List_ModellParameter(i).SpVon - 1)
+            If (Zeile.Length > List_ModellParameter(i).SpBis) Then
+                StrRight = Zeile.Substring(List_ModellParameter(i).SpBis)
+            Else
+                StrRight = ""
+            End If
+
+            'Wert auf verfügbare Stellen kürzen
+            '----------------------------------
+            'bestimmen des ganzzahligen Anteils, \-Operator ginge zwar theoretisch, ist aber für Zahlen < 1 nicht robust (warum auch immer)
+            WertStr = Convert.ToString(List_ModellParameter(i).Wert - List_ModellParameter(i).Wert Mod 1.0, Common.Provider.FortranProvider)
+
+            If (WertStr.Length > AnzZeichen) Then
+                'Wert zu lang
+                Throw New Exception("Der Wert des Modellparameters '" & List_ModellParameter(i).Bezeichnung & "' (" & WertStr & ") ist länger als die zur Verfügung stehende Anzahl von Zeichen!")
+
+            ElseIf (WertStr.Length < AnzZeichen - 1) Then
+                'Runden auf verfügbare Stellen: Anzahl der Stellen - Anzahl der Vorkommastellen - Komma
+                WertStr = Convert.ToString(Math.Round(List_ModellParameter(i).Wert, AnzZeichen - WertStr.Length - 1), Common.Provider.FortranProvider)
+
+            Else
+                'Ganzzahligen Wert benutzen
+            End If
+
+            'Falls erforderlich, Wert mit Leerzeichen füllen
+            If (WertStr.Length < AnzZeichen) Then
+                For j = 1 To AnzZeichen - WertStr.Length
+                    WertStr = " " & WertStr
+                Next
+            End If
+
+            'Zeile wieder zusammensetzen
+            Zeile = StrLeft & WertStr & StrRight
+            '
+            'Nutereingabe
+            '
+            Common.weirHeight = Math.Round(List_ModellParameter(i).Wert, 2)
+            '
+            Zeilenarray(List_ModellParameter(i).ZeileNr - 1) = Zeile
+            'Console.Out.WriteLine(Common.weirHeight)
+
+            'Alle Zeilen wieder in Datei schreiben
+            Dim StrWrite As StreamWriter = New StreamWriter(DateiPfad, False, System.Text.Encoding.GetEncoding("iso8859-1"))
+            Dim StrWriteSync As TextWriter = TextWriter.Synchronized(StrWrite)
+
+            For j = 0 To AnzZeil - 1
+                StrWrite.WriteLine(Zeilenarray(j))
+            Next
+
+            StrWriteSync.Close()
+            StrWrite.Close()
+        Next
+
+        ' If Not WriteCheck Then
+        ' !Throw(New Exception("Es wurde kein Parameter geschrieben."))
+        ' End If
+    
     End Sub
 
     'Evaluiert die Kinderchen mit Hilfe des Simulationsmodells
@@ -1488,6 +1502,7 @@ Handler:
         SIM_Evaluierung = False
 
         'Modell Starten
+
         If Not launchSim() Then Exit Function
 
         'Qualitätswerte berechnen
@@ -1501,11 +1516,14 @@ Handler:
         Next
 
         'Lösung abspeichern
-        Call Me.OptResult.addSolution(Indi)
-
+        If Form1.Method <> "PESMCS" And Not Common.polder Then
+            Call Me.OptResult.addSolution(Indi)
+        End If
         SIM_Evaluierung = True
 
     End Function
+
+
 
     'VG_ Test Tagesganglinie mit Autokalibrierung
     'VG *****************************************
@@ -1680,6 +1698,12 @@ Handler:
                 For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
                     QWert += (ziel.RefReihe.YWerte(i) - SimReihe.YWerte(i + j)) * (ziel.RefReihe.YWerte(i) - SimReihe.YWerte(i + j))
                 Next
+            Case "Max2"
+                'Summe der Reziproken Fehlerquadrate
+                '------------------------
+                For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
+                    QWert = (1.0 / (ziel.RefReihe.YWerte(i) - SimReihe.YWerte(i + j))) ^ 2.0
+                Next
 
             Case "Diff"
                 'Summe der Fehler
@@ -1702,6 +1726,21 @@ Handler:
                 VolZiel *= Me.SimDT.TotalSeconds
                 'Differenz bilden
                 QWert = Math.Abs(VolZiel - VolSim)
+
+            Case "Volf2"
+                'Volumenfehler
+                '-------------
+                Dim VolSim As Double = 0
+                Dim VolZiel As Double = 0
+                For i = ZeitschritteBisStart To ZeitschritteBisStart + ZeitschritteEval
+                    VolSim += SimReihe.YWerte(i + j)
+                    VolZiel += ziel.RefReihe.YWerte(i)
+                Next
+                'Umrechnen in echtes Volumen
+                VolSim *= Me.SimDT.TotalSeconds
+                VolZiel *= Me.SimDT.TotalSeconds
+                'Differenz bilden
+                QWert = Math.Abs(VolZiel - VolSim) ^ 2
 
             Case "nUnter"
                 'Relative Anzahl der Zeitschritte mit Unterschreitungen (in Prozent)
@@ -1800,6 +1839,19 @@ Handler:
                 'Summe der Fehler
                 '----------------
                 QWert = Math.Abs(ziel.RefWert - SimWert)
+
+            Case "fDiff"
+                'Freibord
+                QWert = Math.Abs(ziel.RefWert - SimWert)
+                Console.Out.WriteLine(ziel.RefWert)
+                Console.Out.WriteLine(SimWert)
+            Case "Max2"
+                '1/Summe der Fehlerquadrate
+                '------------------------
+                QWert = 1.0 / ((ziel.RefWert - SimWert) ^ 2.0)
+              
+
+
 
             Case "nUnter"
                 'Relative Anzahl der Zeitschritte mit Unterschreitungen (in Prozent)

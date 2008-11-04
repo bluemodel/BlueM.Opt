@@ -283,7 +283,7 @@ Public Class OptResult
         Call Me.db_prepare()
         'Methodenspezifische Anpassungen
         Select Case EVO.Form1.Method
-            Case METH_PES, METH_SENSIPLOT, METH_HOOKJEEVES, METH_PESMCS
+            Case METH_PES, METH_SENSIPLOT, METH_HOOKJEEVES, METH_MCSPES, METH_PESMCS
                 Call Me.db_prepare_PES()
             Case METH_CES
                 Call Me.db_prepare_CES()
@@ -316,6 +316,11 @@ Public Class OptResult
             End If
             fieldnames &= "[" & Common.Manager.List_Ziele(i).Bezeichnung & "] DOUBLE"
         Next
+
+        'Tabelle erweitert, um weitere Werte zu speichern
+        'For i = 0 To Common.Manager.AnzPenalty - 1
+        'fieldnames &= ", [" & Common.Manager.List_Ziele(i).Bezeichnung & "_sim] DOUBLE"
+        ' Next
 
         'Tabelle anpassen
         command.CommandText = "ALTER TABLE QWerte ADD COLUMN " & fieldnames
@@ -360,6 +365,12 @@ Public Class OptResult
             End If
             fieldnames &= "[" & List_OptParameter_Save(i).Bezeichnung & "] DOUBLE"
         Next
+
+        'Tabelle erweitert, um weitere Werte zu speichern
+        ' For i = 0 To Common.Manager.AnzPenalty - 1
+        'fieldnames &= ", [" & List_OptParameter_Save(i).Bezeichnung & "_sim] DOUBLE"
+        ' Next
+
         'Tabelle anpassen
         command.CommandText = "ALTER TABLE OptParameter ADD COLUMN " & fieldnames
         command.ExecuteNonQuery()
@@ -459,7 +470,8 @@ Public Class OptResult
         If (EVO.Form1.Method = METH_PES _
             Or EVO.Form1.Method = METH_SENSIPLOT _
             Or EVO.Form1.Method = METH_HOOKJEEVES _
-    Or EVO.Form1.Method = METH_PESMCS) Then
+            Or EVO.Form1.Method = METH_PESMCS _
+    Or EVO.Form1.Method = METH_MCSPES) Then
 
             'OptParameter schreiben
             '----------------------
@@ -545,6 +557,14 @@ Public Class OptResult
             For j = 0 To Common.Manager.AnzPenalty - 1
                 bedingung &= " AND QWerte.[" & Common.Manager.List_OptZiele(j).Bezeichnung & "] = " & SekPop(i, j).ToString(Common.Provider.FortranProvider)
             Next
+
+            'Tabelle erweitert, um weitere Werte zu speichern
+            'For j = 0 To Common.Manager.AnzPenalty - 1
+            'bedingung &= " AND QWerte.[" & Common.Manager.List_OptZiele(j).Bezeichnung & "_sim] = " & Common.Manager.List_OptZiele(j).SimWert.ToString(Common.Provider.FortranProvider)
+            'Next
+
+
+            'Console.Out.WriteLine(bedingung)
             command.CommandText = "SELECT Sim.ID FROM Sim INNER JOIN QWerte ON Sim.ID = QWerte.Sim_ID WHERE (1=1" & bedingung & ")"
             Sim_ID = command.ExecuteScalar()
 
@@ -661,7 +681,7 @@ Public Class OptResult
         '----
         'Alle Lösungen
         Select Case Form1.Method
-            Case METH_PES, METH_SENSIPLOT, METH_HOOKJEEVES
+            Case METH_PES, METH_SENSIPLOT, METH_HOOKJEEVES, METH_MCSPES, METH_PESMCS
                 q = "SELECT Sim.ID, OptParameter.*, QWerte.*, Constraints.* FROM ((Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN OptParameter ON Sim.ID=OptParameter.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID ORDER BY Sim.ID"
             Case METH_CES
                 q = "SELECT Sim.ID, Pfad.*, QWerte.*, Constraints.* FROM ((Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN Pfad ON Sim.ID=Pfad.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID"

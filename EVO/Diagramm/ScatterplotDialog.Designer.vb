@@ -27,6 +27,7 @@ Partial Class ScatterplotDialog
         Me.Button_Cancel = New System.Windows.Forms.Button
         Me.GroupBox_Zielauswahl = New System.Windows.Forms.GroupBox
         Me.LinkLabel_CheckAll = New System.Windows.Forms.LinkLabel
+        Me.LinkLabel_CheckAll = New System.Windows.Forms.LinkLabel
         Me.CheckedListBox_Ziele = New System.Windows.Forms.CheckedListBox
         Me.CheckBox_SekPopOnly = New System.Windows.Forms.CheckBox
         Me.GroupBox_SekPop = New System.Windows.Forms.GroupBox
@@ -35,6 +36,9 @@ Partial Class ScatterplotDialog
         Me.GroupBox_Zielauswahl.SuspendLayout()
         Me.GroupBox_SekPop.SuspendLayout()
         Me.GroupBox_Ref.SuspendLayout()
+        'Me.GroupBox2 = New System.Windows.Forms.GroupBox
+        'Me.GroupBox1.SuspendLayout()
+        'Me.GroupBox2.SuspendLayout()
         Me.SuspendLayout()
         '
         'Button_OK
@@ -165,5 +169,10 @@ Partial Class ScatterplotDialog
     Friend WithEvents LinkLabel_CheckAll As System.Windows.Forms.LinkLabel
     Friend WithEvents GroupBox_Ref As System.Windows.Forms.GroupBox
     Friend WithEvents CheckBox_showRef As System.Windows.Forms.CheckBox
+    'Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
+    ' Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
+
+
+   
 
 End Class

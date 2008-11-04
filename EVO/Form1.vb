@@ -2,6 +2,7 @@ Option Strict Off ' Off ist Default
 Option Explicit On
 Imports System.IO
 Imports System.Management
+Imports System.Threading
 
 '*******************************************************************************
 '*******************************************************************************
@@ -48,7 +49,8 @@ Partial Class Form1
     Dim array_y() As Double
     Dim myPara() As EVO.Common.OptParameter
 
-    Dim QWertMin As Double
+    Dim QWertMin, QWert() As Double
+    Dim QWertMinDauer As Integer
 
     '**** Verschiedenes ****
     Dim isrun As Boolean = False                        'Optimierung läuft
@@ -57,6 +59,12 @@ Partial Class Form1
     'Dialoge
     Private WithEvents solutionDialog As SolutionDialog
     Private WithEvents scatterplot1 As Scatterplot
+
+    Public Kalib1995, Kalib1999, Kalib1996, Kalib2000, Kalib2002, Kalib1983 As Boolean
+    Public Pfad1996, Pfad2002, Pfad2000, Pfad1995, Pfad1983, Pfad1999 As String
+    Public AnwName1996, AnwName2002, AnwName2000, AnwName1995, AnwName1983, AnwName1999 As String
+    Public DauerKalib1996, DauerKalib2002, DauerKalib1995, DauerKalib1999, DauerKalib2000, DauerKalib1983 As Integer
+
 
     'Hauptdiagramm
     Public ReadOnly Property Hauptdiagramm() As EVO.Diagramm
@@ -91,7 +99,7 @@ Partial Class Form1
         ComboBox_Anwendung.SelectedIndex = 0
 
         'Liste der Methoden in ComboBox schreiben und Anfangseinstellung wählen
-        ComboBox_Methode.Items.AddRange(New Object() {"", METH_RESET, METH_PES, METH_CES, METH_HYBRID, METH_SENSIPLOT, METH_HOOKJEEVES, METH_MCS, METH_PESMCS})
+        ComboBox_Methode.Items.AddRange(New Object() {"", METH_RESET, METH_PES, METH_CES, METH_HYBRID, METH_SENSIPLOT, METH_HOOKJEEVES, METH_MCS, METH_MCSPES, METH_PESMCS})
         ComboBox_Methode.SelectedIndex = 0
         ComboBox_Methode.Enabled = False
 
@@ -123,7 +131,7 @@ Partial Class Form1
 
             'Sim1 zerstören
             Me.Sim1 = Nothing
-            
+
             'Start Button deaktivieren
             Me.Button_Start.Enabled = False
 
@@ -334,7 +342,7 @@ Partial Class Form1
                     End If
 
 
-                Case METH_PES 'Methode PES
+                Case METH_PES, METH_PESMCS 'Methode PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Ergebnis-Buttons
@@ -368,7 +376,7 @@ Partial Class Form1
                     Me.Button_MCS.Enabled = True
 
 
-                Case METH_PESMCS 'Methode MCS
+                Case METH_MCSPES 'Methode MCS
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Ergebnis-Buttons
@@ -510,6 +518,9 @@ Partial Class Form1
         Dim pfad As String
         pfad = Sim1.WorkDir & Sim1.Datensatz & Sim1.Datensatzendung
 
+        Common.globalWorkDir = Sim1.WorkDir
+        Common.globalDatensatz = Sim1.Datensatz
+
         'Datensatzanzeige aktualisieren
         If (File.Exists(pfad)) Then
             Me.LinkLabel_WorkDir.Text = pfad
@@ -617,8 +628,10 @@ Partial Class Form1
                             Call STARTEN_SensiPlot()
                         Case METH_PES
                             Call STARTEN_PES()
-                        Case METH_PESMCS
+                        Case METH_MCSPES
                             Call MonteCarloSimulation()
+                        Case METH_PESMCS
+                            Call STARTEN_PES()
                         Case METH_CES
                             Call STARTEN_CES_or_HYBRID()
                         Case METH_HYBRID
@@ -1386,6 +1399,10 @@ Partial Class Form1
         Dim ind As Common.Individuum
         Dim PES1 As EVO.Kern.PES
 
+        'für MCS
+        Dim i, k, nStart, nEnde, Vorlaufzeit As New Integer
+        Dim mcs As New MCS
+
         'Hypervolumen instanzieren
         '-------------------------
         Dim Hypervolume As EVO.MO_Indicators.Indicators
@@ -1394,6 +1411,12 @@ Partial Class Form1
         '--------------------------
         Dim StartDate As Date
         Dim actDate As Date
+
+        ReDim QWert(Common.Manager.AnzZiele)
+        For i = 0 To Common.Manager.AnzZiele - 1
+            QWert(i) = 0.0
+        Next
+
         '--------------------------
         'Dimensionierung der Variablen für Optionen Evostrategie
         'Das Struct aus PES wird hier verwendet
@@ -1433,6 +1456,10 @@ Start_Evolutionsrunden:
         'xxxxxxxxxxxxxxxx
         For PES1.PES_iAkt.iAktRunde = 0 To EVO_Einstellungen1.Settings.PES.Pop.n_Runden - 1
 
+            'Initialisierung Minimumspeicher
+            QWertMin = 9999999999999
+            QWertMinDauer = 0
+
             Call EVO_Opt_Verlauf1.Runden(PES1.PES_iAkt.iAktRunde + 1)
             Call PES1.EsResetPopBWSpeicher() 'Nur bei Komma Strategie
 
@@ -1456,9 +1483,10 @@ Start_Evolutionsrunden:
                 'xxxxxxxxxxxxxxxxxxxxxx
                 For PES1.PES_iAkt.iAktGen = 0 To EVO_Einstellungen1.Settings.PES.n_Gen - 1
 
-                    ' If (PES1.PES_iAkt.iAktGen Mod 3 = 0) Then
-                    'Sim1.OptResult.db_save(Sim1.WorkDir + "resGen_" + PES1.PES_iAkt.iAktGen.ToString + ".mdb")
-                    '  End If
+                   
+
+
+                    '**************************************************************
 
                     Call EVO_Opt_Verlauf1.Generation(PES1.PES_iAkt.iAktGen + 1)
                     Call PES1.EsResetBWSpeicher()  'Nur bei Komma Strategie
@@ -1471,8 +1499,11 @@ Start_Evolutionsrunden:
                         Me.LabelZeit.Text = (actDate - StartDate).ToString.Substring(0, 8)
 
                         Call EVO_Opt_Verlauf1.Nachfolger(PES1.PES_iAkt.iAktNachf + 1)
-                        'QWertMin = 9999999999999
                         durchlauf += 1
+
+                        If (durchlauf Mod 100 = 0) Then
+                            Sim1.OptResult.db_save(Sim1.WorkDir + "backup_" + durchlauf.ToString + ".mdb")
+                        End If
 
                         'Do Schleife: Um Modellfehler bzw. Evaluierungsabbrüche abzufangen
                         Dim Eval_Count As Integer = 0
@@ -1507,16 +1538,81 @@ Start_Evolutionsrunden:
 
                                 Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM
 
-                                    'Vorbereiten des Modelldatensatzes
-                                    Call Sim1.PREPARE_Evaluation_PES(myPara)
+                                    'für jeden MCS Lauf PES
+                                    '**************************************************************
+                                    If (Method = METH_MCSPES) Then
+                                        'Vorbereiten des Modelldatensatzes
+                                        Call Sim1.PREPARE_Evaluation_PES(myPara)
 
-                                    'Evaluierung des Simulationsmodells
-                                    SIM_Eval_is_OK = Sim1.SIM_Evaluierung(ind)
+                                        'Evaluierung des Simulationsmodells
+                                        SIM_Eval_is_OK = Sim1.SIM_Evaluierung(ind)
+                                        If (durchlauf = 2) Then
+                                            Call replaceZreBin(Sim1.WorkDir & Sim1.Datensatz & ".EXT")
+                                        End If
 
-                                    ' If (Common.Manager.AnzPenalty = 1) Then
-                                    'If ind.Penalties(0) < QWertMin Then QWertMin = ind.Penalties(0)
-                                    'End If
+                                        If ind.Penalties(0) < QWertMin Then
+                                            QWertMin = ind.Penalties(0)
+                                            QWertMinDauer = 0
+                                        End If
+                                        QWertMinDauer += 1
+                                        If QWertMinDauer >= Me.NumericUpDown_nMin.Value Then Exit Sub
+                                        If QWertMin < 10000.0 Then Exit Sub
+                                        Console.Out.WriteLine(QWertMin.ToString + " " + QWertMinDauer.ToString)
 
+                                        'zuerst alle MCS dann PES usw.
+                                        '**************************************************************
+                                    ElseIf Method = METH_PESMCS Then
+
+                                        Call Sim1.PREPARE_Evaluation_PES(myPara)
+
+                                        nStart = Me.Numeric_MCS_von.Value
+                                        nEnde = Me.Numeric_MCS_bis.Value
+                                        Common.Constants.tVor = Me.NumericUpDown_Vorentl.Value
+
+                                        For k = 0 To Common.Manager.AnzZiele - 1
+                                            QWert(k) = 0.0
+                                        Next
+
+                                        For i = nStart To nEnde Step 2
+
+                                            'Variieren der Niederschläge
+                                            mcs.MonteCarlo(i, Common.Constants.tVor, True) 'letzter Wert Evo true/false
+                                            'Evaluierung des Simulationsmodells
+
+                                            SIM_Eval_is_OK = Sim1.SIM_Evaluierung(ind)
+
+                                            For k = 0 To Common.Manager.AnzZiele - 1
+                                                QWert(k) += ind.Zielwerte(k)
+                                                'Console.Out.WriteLine(i.ToString + " " + ind.Zielwerte(k).ToString + " " + QWert(k).ToString)
+                                            Next
+
+                                        Next i
+
+                                        'Qualitätswerte berechnen
+                                        For i = 0 To Common.Manager.AnzZiele - 1
+                                            ind.Zielwerte(i) = QWert(i)
+                                            Console.Out.WriteLine(ind.Zielwerte(i).ToString)
+                                        Next
+
+                                        Call Sim1.OptResult.addSolution(ind)
+                                        'Console.Out.WriteLine(ind.Zielwerte(0).ToString)
+                                        'zuerst alle MCS dann PES usw.
+                                        '**************************************************************
+
+                                    Else
+                                        'Vorbereiten des Modelldatensatzes
+                                        Call Sim1.PREPARE_Evaluation_PES(myPara)
+
+                                        'Evaluierung des Simulationsmodells
+                                        SIM_Eval_is_OK = Sim1.SIM_Evaluierung(ind)
+                                        Common.polder = Me.CheckBoxPolder.Checked
+                                        If Common.polder Then
+                                            Dim hec As New HECRAS
+                                            hec.main()
+                                            SIM_Eval_is_OK = Sim1.SIM_Evaluierung(ind)
+                                        End If
+
+                                    End If
                                     'Lösung zeichnen
                                     If (SIM_Eval_is_OK) Then
                                         Call Me.LösungZeichnen(ind, PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, PES1.PES_iAkt.iAktNachf)
@@ -1526,9 +1622,6 @@ Start_Evolutionsrunden:
                             Eval_Count += 1
                             If (Eval_Count >= 10) Then
                                 Throw New Exception("Es konnte kein gültiger Datensatz erzeugt werden!")
-                                ' If Me.Method = METH_PESMCS Then
-                                'Exit Sub
-                                ' End If
                             End If
 
                         Loop While SIM_Eval_is_OK = False
@@ -1841,7 +1934,7 @@ Start_Evolutionsrunden:
                             '----------------------------------------
                             Achse.Name = "Simulation"
                             Achse.Auto = False
-                            If (Form1.Method = METH_PES Or Form1.Method = METH_PESMCS) Then
+                            If (Form1.Method = METH_PES Or Form1.Method = METH_MCSPES Or Form1.Method = METH_PESMCS) Then
                                 'Bei PES:
                                 If (EVO_Einstellungen1.Settings.PES.Pop.is_POPUL) Then
                                     Achse.Max = EVO_Einstellungen1.Settings.PES.n_Gen * EVO_Einstellungen1.Settings.PES.n_Nachf * EVO_Einstellungen1.Settings.PES.Pop.n_Runden + 1
@@ -2618,18 +2711,20 @@ Start_Evolutionsrunden:
 
     End Sub
 
+    'run MCSPES
+    '**************************************************************
     Public Sub MonteCarloSimulation()
-        Dim i, nLauf, nStart, Vorlaufzeit As New Integer
+        Dim i, nStart, nEnde, Vorlaufzeit As New Integer
         Dim mcs As New MCS
 
 
-        nLauf = Me.EVO_Einstellungen1.Numeric_EndeBeiLauf.Value
-        nStart = Me.EVO_Einstellungen1.Numeric_StarteBeiLauf.Value
-        Vorlaufzeit = 48
+        nStart = Me.Numeric_MCS_von.Value
+        nEnde = Me.Numeric_MCS_bis.Value
+        Common.Constants.tVor = Me.NumericUpDown_Vorentl.Value
 
-        For i = nStart To nLauf
+        For i = nStart To nEnde
 
-            mcs.MonteCarlo(i, Vorlaufzeit, True) 'letzter Wert Evo true/false
+            mcs.MonteCarlo(i, Common.Constants.tVor, True) 'letzter Wert Evo true/false
 
             Call STARTEN_PES()
 
@@ -2649,61 +2744,44 @@ Start_Evolutionsrunden:
         Next i
     End Sub
 
+
+
 #End Region 'Methoden
 
 
     Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_MCS.Click
-        Dim i, nStart, nEnde, Vorlaufzeit As New Integer
+        Dim i, nStart, nEnde As New Integer
         Dim mcs As New MCS
 
 
         nStart = Me.Numeric_MCS_von.Value
         nEnde = Me.Numeric_MCS_bis.Value
-        Vorlaufzeit = 48.0
-
+        Common.Constants.tVor = Me.NumericUpDown_Vorentl.Value
+       
         'My.Settings.Datensatz = "D:\BM\503-neu-SO-10000-PohTS\Ia-Ist\Ia.ALL"
 
         For i = nStart To nEnde
-            mcs.MonteCarlo(i, Vorlaufzeit, False) 'letzter Wert Evo true/false
+            mcs.MonteCarlo(i, Common.Constants.tVor, False) 'letzter Wert Evo true/false
         Next i
 
         If False Then
-            My.Settings.Datensatz = "D:\BM\503-neu-SO-10000-PohTS\Ib-Ist-alleauf\Ib.ALL"
+            'My.Settings.Datensatz = "D:\BM\505-10000n-HWEakt\Ic-Ist-allezu\Ic.ALL"
+
+            'For i = nStart To nEnde
+            'mcs.MonteCarlo(i, Vorlaufzeit, False) 'letzter Wert Evo true/false
+            'Next i
+
+            My.Settings.Datensatz = "D:\BM\506-hNGEV-Fac1\IIIe-24h-Kli\IIIe.ALL"
 
             For i = nStart To nEnde
-                mcs.MonteCarlo(i, Vorlaufzeit, False) 'letzter Wert Evo true/false
+                mcs.MonteCarlo(i, Common.Constants.tVor, False) 'letzter Wert Evo true/false
             Next i
 
-            My.Settings.Datensatz = "D:\BM\503-neu-SO-10000-PohTS\Ic-Ist-allezu\Ic.ALL"
+            My.Settings.Datensatz = "D:\BM\506-hNGEV-Fac1\IIIf-24h-LehKli\IIIf.ALL"
 
             For i = nStart To nEnde
-                mcs.MonteCarlo(i, Vorlaufzeit, False) 'letzter Wert Evo true/false
+                mcs.MonteCarlo(i, Common.Constants.tVor, False) 'letzter Wert Evo true/false
             Next i
-
-            My.Settings.Datensatz = "D:\BM\503-neu-SO-10000-PohTS\Id-Ist-alauf-KlizuwennMalHWE\Id.ALL"
-
-            For i = nStart To nEnde
-                mcs.MonteCarlo(i, Vorlaufzeit, False) 'letzter Wert Evo true/false
-            Next i
-
-            My.Settings.Datensatz = "D:\BM\503-neu-SO-10000-PohTS\Ie-Ist-alauf-MalzuwennKliHWE\Ie.ALL"
-
-            For i = nStart To nEnde
-                mcs.MonteCarlo(i, Vorlaufzeit, False) 'letzter Wert Evo true/false
-            Next i
-
-            My.Settings.Datensatz = "D:\BM\503-neu-SO-10000-PohTS\If-Ist-alauf-MalodKlizuwennHWE\If.ALL"
-
-            For i = nStart To nEnde
-                mcs.MonteCarlo(i, Vorlaufzeit, False) 'letzter Wert Evo true/false
-            Next i
-
-            My.Settings.Datensatz = "D:\BM\503-neu-SO-10000-PohTS\IIa-dyn-alauf\IIa.ALL"
-
-            For i = nStart To nEnde
-                mcs.MonteCarlo(i, Vorlaufzeit, False) 'letzter Wert Evo true/false
-            Next i
-
         End If
 
     End Sub
@@ -2712,4 +2790,45 @@ Start_Evolutionsrunden:
         Dim gen As New MCS
         gen.erstelle_Niederschlag(Me.Numeric_MCS_von.Value, Me.Numeric_MCS_bis.Value)
     End Sub
+
+
+    Private Sub Button_Start_ClientSizeChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles Button_Start.ClientSizeChanged
+
+    End Sub
+
+    Private Sub Button1_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_MouseMove.Click
+        
+        Cursor.Position = New Point(Me.NumericUpDownXMouse.Value, Me.NumericUpDownyMouse.Value)
+        
+    End Sub
+
+    Private Declare Sub Sleep Lib "kernel32" (ByVal lngMilliseconds As Int32)
+
+    'ersetzt Erweiterung zre mit bin
+    '********************************************
+    Sub replaceZreBin(ByVal Pfad As String)
+        Dim FiStr As FileStream = New FileStream(Pfad, FileMode.Open, FileAccess.ReadWrite)
+        Dim StrRe As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Dim Text, Text1 As String
+
+        Text = ""
+        Text1 = ""
+
+        Do
+            Text1 = StrRe.ReadLine.ToString
+            If Text1.Contains("mm/h") Then
+                Text1 = Text1.Replace(".zre", ".bin")
+                'Console.Out.WriteLine(Text1)
+            End If
+            Text = Text + Text1 + vbCrLf
+
+        Loop Until StrRe.Peek() = -1
+        StrRe.Close()
+        FiStr.Close()
+
+        Dim StrWri As StreamWriter = New StreamWriter(Pfad, False, System.Text.Encoding.GetEncoding("iso8859-1"))
+        StrWri.Write(Text)
+        StrWri.Close()
+    End Sub
+
 End Class
