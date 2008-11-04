@@ -562,7 +562,7 @@ namespace IHWB.EVO.MetaEvo
                                             new_generation_input[i * 3].ID = individuum_id;
                                             individuum_id++;
                                             //Schrittweiten definieren
-                                            genpool_input[i].feedbackdata = new double[3, Math.Max(genpool_input[0].Penalties.Length, numberoptparas)];
+                                            genpool_input[i].feedbackdata = new double[3, Math.Max(genpool_input[0].Penalties.Length, Math.Max(numberoptparas, 3))];
                                             for (int j = 0; j < numberoptparas; j++)
                                             {
                                                 //Gewichtung berechnen
