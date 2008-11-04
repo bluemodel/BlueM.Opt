@@ -1729,7 +1729,7 @@ Start_Evolutionsrunden:
                             'Lösung evaluieren und zeichnen
                             Call Testprobleme1.Evaluierung_TestProbleme(ind(i), PES1.PES_iAkt.iAktPop, Me.Hauptdiagramm1)
                             Me.Label_Dn_Wert.Text = Math.Round(ind(i).OptParameter(0).Dn, 6).ToString
-                            Me.Monitor1.Zeichne_Dn((PES1.PES_iAkt.iAktGen + 1) * EVO_Einstellungen1.Settings.PES.n_Nachf + i, ind(i).OptParameter(0).Dn)
+                            Me.Monitor1.Zeichne_Dn(PES1.PES_iAkt.iAktGen * EVO_Einstellungen1.Settings.PES.n_Nachf + i + 1, ind(i).OptParameter(0).Dn)
 
                             'Einordnen
                             Call PES1.EsBest(ind(i))
@@ -1788,7 +1788,7 @@ Start_Evolutionsrunden:
                                 'Lösung zeichnen und Dn ausgeben
                                 Call Me.Hauptdiagramm1.ZeichneIndividuum(ind(Child_Ready), PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, Child_Ready, Color.Orange)
                                 Me.Label_Dn_Wert.Text = Math.Round(ind(Child_Ready).OptParameter(0).Dn, 6).ToString
-                                Me.Monitor1.Zeichne_Dn((PES1.PES_iAkt.iAktGen + 1) * EVO_Einstellungen1.Settings.PES.n_Nachf + Child_Ready, ind(Child_Ready).OptParameter(0).Dn)
+                                Me.Monitor1.Zeichne_Dn(PES1.PES_iAkt.iAktGen * EVO_Einstellungen1.Settings.PES.n_Nachf + Child_Ready + 1, ind(Child_Ready).OptParameter(0).Dn)
 
                                 'SELEKTIONSPROZESS Schritt 1
                                 '###########################
