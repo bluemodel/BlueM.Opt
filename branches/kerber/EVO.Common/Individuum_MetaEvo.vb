@@ -22,7 +22,7 @@
         ReDim Me.mOptparameter(numberOptparas_input)
         numberOptparas = numberOptparas_input
         Me.status = "false"
-        Me.toSimulate = False
+        Me.toSimulate = True
 
         'Initialisieren der Optparameter
         For i = 0 To numberOptparas - 1

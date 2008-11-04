@@ -26,6 +26,7 @@ namespace IHWB.EVO.MetaEvo
         public Algofeedback[] algofeedbackarray;
         int individuum_id;
         int ChildsPerParent;
+        int populationsize;
         EVO.Diagramm.ApplicationLog applog;
 
         public Algos(ref EVO.Common.EVO_Settings settings_input, int individuum_id_input, ref EVO.Diagramm.ApplicationLog applog_input)
@@ -33,6 +34,7 @@ namespace IHWB.EVO.MetaEvo
             individuum_id = individuum_id_input;
             applog = applog_input;
             ChildsPerParent = settings_input.MetaEvo.ChildsPerParent;
+            populationsize = settings_input.MetaEvo.PopulationSize;
         }
 
         //Legt fest welche Algorithmen genutzt werden sollen
@@ -45,10 +47,10 @@ namespace IHWB.EVO.MetaEvo
 
             for (int i = 0; i < tmp.Length; i++)
             {
-                algofeedbackarray[i] = new Algofeedback(tmp[i].Trim(), (individuum_id * ChildsPerParent) / algofeedbackarray.Length);
+                algofeedbackarray[i] = new Algofeedback(tmp[i].Trim(), (populationsize * ChildsPerParent) / algofeedbackarray.Length);
                 
             }
-            applog.appendText("Algos: Using Algos " + algos2use_input);
+            applog.appendText("Algos: Using Algos: " + algos2use_input);
         }
 
         //Neue Generation erzeugen
@@ -71,6 +73,7 @@ namespace IHWB.EVO.MetaEvo
             int startindex = startindex_input;
             int numberindividuums = this.algofeedbackarray[algo_id].number_individuals_for_nextGen;
             int numberoptparas = genpool_input[0].get_optparas().Length;
+            int numberpenalties = genpool_input[0].Penalties.Length;
             int new_individuums_counter = 0;
             Random rand = new Random();
 
@@ -483,11 +486,12 @@ namespace IHWB.EVO.MetaEvo
                 
 
                 //Lokale Algorithmen
-                #region Hook and Jeeves V2: Optparameter werden nacheinander variiert und zwei neue Individuen erzeugt
+                #region Hook and Jeeves: Optparameter werden nacheinander variiert und zwei neue Individuen erzeugt
                 case "Hook and Jeeves":  //VGL: Syrjakow S.95f
                     {
+                        numberindividuums = (int)((double)numberindividuums * ((double)genpool_input.Length / (double)new_generation_input.Length));
                         applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
-                        //Pro Basis-Individuum: [Gewichtungsparameter für die Zielfunktionen][Tast-Schrittweiten][Zustand,zu variierender optparameter,schon gelaufen]
+                        //Feedbackdate Pro Basis-Individuum: 0:[Gewichtungsparameter für die Zielfunktionen]1:[Tast-Schrittweiten]2:[0:Zustand,1:zu variierender optparameter,2:schon gelaufen]
                         //Gewichtungsparameter für die Zielfunktionen [penalties]
                         //Tast-Schrittweiten [optparameter]
                         //Zustand [1]
@@ -495,11 +499,40 @@ namespace IHWB.EVO.MetaEvo
                         //Schon gelaufen [1]
 
                         bool run;
+                        bool firstrun = true;
                         int nextstate = 0;
                         int countready = 0;
-                        
+                        double[,] weightsinfo = new double[2,numberpenalties];  //0:[min]1:[max] eines jeden optparameters
+                        double[] Penalties_tmp;
+
+                        if (firstrun)
+                        {
+                            //Vorbereitung für Wichtungsberechnung der einzelnen Funktionen 
+                            applog.appendText("Algos: Hook and Jeeves: Starting precalculation of weights");
+                            for (int i = 0; i < numberpenalties; i++) //Min,Max vorbelegen
+                            {
+                                weightsinfo[0, i] = genpool_input[0].Penalties[i];
+                                weightsinfo[1, i] = weightsinfo[0, i];
+                            }
+                            for (int i = 1; i < genpool_input.Length; i++)  //Restlichen genpool durchforsten
+                            {
+                                Penalties_tmp = genpool_input[i].Penalties;
+                                for (int j = 0; j < numberpenalties; j++) //Min,Max eines jeden Penalties suchen
+                                {
+                                    if (weightsinfo[0, j] > Penalties_tmp[j]) weightsinfo[0, j] = Penalties_tmp[j]; //Min
+                                    if (weightsinfo[1, j] < Penalties_tmp[j]) weightsinfo[1, j] = Penalties_tmp[j]; //Max
+                                }
+                            }
+                            firstrun = false;
+                        }
+
+                        applog.appendText("Algos: Hook and Jeeves: Starting Calculation of " + numberindividuums + " Processes");
                         for (int i = 0; i < numberindividuums; i++)
-                        {   
+                        {
+                            //Standardmässig nicht simulieren
+                            new_generation_input[i * 3].set_toSimulate(false);
+                            new_generation_input[i * 3 + 1].set_toSimulate(false);
+                            new_generation_input[i * 3 + 2].set_toSimulate(false);
                             //Zustand auslesen
                             //-1: Schrittweiten definieren
                             //0: Tast0
@@ -513,136 +546,193 @@ namespace IHWB.EVO.MetaEvo
                             //30: Extrapolation zurück
                             //40: Schrittweite halbieren oder Goal
                             //50: Goal
-                            if (genpool_input[i].get_generator() == algo_id) nextstate = (int)genpool_input[i].feedbackdata[0, 2];
+                            if (genpool_input[i].get_generator() == algo_id) nextstate = (int)genpool_input[i].feedbackdata[2, 0];
                             else nextstate = -1;
                             
                             run = true;
 
                             while(run)
                             {
+                                applog.appendText("Algos: Hook and Jeeves: BaseIndividuum "+ genpool_input[i].ID + ": state: " + nextstate);
                                 switch (nextstate)
                                 {
-                                    case (-1): //-1: Schrittweiten definieren, Wichtungsfaktoren bestimmen
+                                    case (-1): //-1: Schrittweiten definieren
                                         {
                                             new_generation_input[i * 3] = genpool_input[i].Clone_MetaEvo();
                                             new_generation_input[i * 3].ID = individuum_id;
                                             individuum_id++;
                                             //Schrittweiten definieren
-                                            genpool_input[i].feedbackdata = new double[Math.Max(genpool_input[0].Penalties.Length, numberoptparas), 3];
-                                            for (int j = 0; j < genpool_input[0].OptParameter.Length; j++)
+                                            genpool_input[i].feedbackdata = new double[3, Math.Max(genpool_input[0].Penalties.Length, numberoptparas)];
+                                            for (int j = 0; j < numberoptparas; j++)
                                             {
-                                                genpool_input[i].feedbackdata[j,1] = (genpool_input[i].OptParameter[j].Max - genpool_input[i].OptParameter[j].Min)/2;
+                                                //Gewichtung berechnen
+                                                genpool_input[i].feedbackdata[0, j] = 0;
+                                                if (j < numberpenalties)
+                                                {
+                                                    for (int k = 0; k < numberpenalties; k++)
+                                                    {
+                                                        genpool_input[i].feedbackdata[0, j] += (weightsinfo[1, k] - genpool_input[i].Penalties[k]) / (weightsinfo[1, k] - weightsinfo[0, k]);
+                                                    }
+                                                    if (genpool_input[i].feedbackdata[0, j] == 0) genpool_input[i].feedbackdata[0, j] = 0.5;
+                                                    else genpool_input[i].feedbackdata[0, j] = ((weightsinfo[1, j] - genpool_input[i].Penalties[j]) / (weightsinfo[1, j] - weightsinfo[0, j])) / genpool_input[i].feedbackdata[0, j];
+                                                    applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Wichtung Penalty[" + j + "]: " + genpool_input[i].feedbackdata[0, j]);
+                                                }
+                                                //Initiale Tastschrittweite
+                                                genpool_input[i].feedbackdata[1, j] = (genpool_input[i].OptParameter[j].Max - genpool_input[i].OptParameter[j].Min) / (double)(numberindividuums * 2);
                                             }
-                                            genpool_input[i].feedbackdata[0, 2] = 0;//Zustand [1]
-                                            genpool_input[i].feedbackdata[1, 2] = 0;//zu variierender optparameter [1]
+                                            genpool_input[i].feedbackdata[2, 0] = 0;//Zustand [1]
+                                            genpool_input[i].feedbackdata[2, 1] = 0;//zu variierender optparameter [1]
                                             genpool_input[i].feedbackdata[2, 2] = 0;//Schon gelaufen [1]
-                                            //Wichtungsfaktoren bestimmen
+                                            genpool_input[i].set_generator(algo_id);
                                             nextstate = 0;
                                             break;
                                         }
                                     case (0): //0: Tast0
                                         {
                                             double[] mutated_optparas = new_generation_input[i * 3].get_optparas();
-                                            mutated_optparas[(int)genpool_input[i].feedbackdata[1, 2]] -= genpool_input[i].feedbackdata[(int)genpool_input[i].feedbackdata[1, 2], 1];
-
+                                            mutated_optparas[(int)genpool_input[i].feedbackdata[2, 1]] -= genpool_input[i].feedbackdata[1, (int)genpool_input[i].feedbackdata[2, 1]];
+                                            //Grenzen einhalten
+                                            if (mutated_optparas[(int)genpool_input[i].feedbackdata[2, 1]] < genpool_input[0].OptParameter[(int)genpool_input[i].feedbackdata[2, 1]].Min) mutated_optparas[(int)genpool_input[i].feedbackdata[2, 1]] = genpool_input[0].OptParameter[(int)genpool_input[i].feedbackdata[2, 1]].Min;
+                                            if (mutated_optparas[(int)genpool_input[i].feedbackdata[2, 1]] > genpool_input[0].OptParameter[(int)genpool_input[i].feedbackdata[2, 1]].Max) mutated_optparas[(int)genpool_input[i].feedbackdata[2, 1]] = genpool_input[0].OptParameter[(int)genpool_input[i].feedbackdata[2, 1]].Max;
+                                            
                                             new_generation_input[i * 3 + 1] = new IHWB.EVO.Common.Individuum_MetaEvo("MetaEvo", individuum_id, numberoptparas);
                                             new_generation_input[i * 3 + 1].set_optparas(mutated_optparas);
                                             new_generation_input[i * 3 + 1].set_status("raw");
                                             new_generation_input[i * 3 + 1].set_generator(algo_id);
                                             individuum_id++;
+                                            applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": BestIndividuum " + new_generation_input[i * 3].ID + " -> " + new_generation_input[i * 3 + 1].ID + " Mutate optparas[" + (int)genpool_input[i].feedbackdata[2, 1] + "] from " + new_generation_input[i * 3].get_optparas()[(int)genpool_input[i].feedbackdata[2, 1]] + " to " + mutated_optparas[(int)genpool_input[i].feedbackdata[2, 1]] + " (- Stepsize: " + genpool_input[i].feedbackdata[1, (int)genpool_input[i].feedbackdata[2, 1]] + ")");
                                             run = false;
                                             nextstate = 1;
                                             break;
                                         }
-                                    case (1): //1: Tast1: Vergleich -Opt
+                                    case (1): //1: Tast1: Vergleich -Opt 
                                         {
-                                            double[] new_optparas = new_generation_input[i * 3].get_optparas();
-                                            double[] new2_optparas = new_generation_input[i * 3 + 1].get_optparas();
-                                            double fit_new = 0;
-                                            double fit_new2 = 0;
-                                            for (int j = 0; j < numberoptparas; j++)
+                                            double[] new_penalties = new_generation_input[i * 3].Penalties;
+                                            double[] new2_penalties = new_generation_input[i * 3 + 1].Penalties;
+                                            double weighted_penaltie_new = 0;  //(tatsächlich Fehlergrösse)
+                                            double weighted_penaltie_new2 = 0; //(tatsächlich Fehlergrösse)
+                                            
+                                            for (int j = 0; j < numberpenalties; j++)
                                             {
-                                                fit_new += new_optparas[j] * genpool_input[i].feedbackdata[j, 0];
-                                                fit_new2 += new2_optparas[j] * genpool_input[i].feedbackdata[j, 0];
+                                                weighted_penaltie_new += new_penalties[j] * genpool_input[i].feedbackdata[0, j];
+                                                weighted_penaltie_new2 += new2_penalties[j] * genpool_input[i].feedbackdata[0, j];
                                             }
-                                            if (fit_new2 > fit_new) nextstate = 4;
+                                            applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": WightedPenalties: BestIndividuum " + new_generation_input[i * 3].ID + " = " + weighted_penaltie_new + " / NewIndividuum " + new_generation_input[i * 3 + 1].ID + " = " + weighted_penaltie_new2);
+                                            if (weighted_penaltie_new2 < weighted_penaltie_new) nextstate = 4;
                                             else nextstate = 2;
                                             break;
                                         }
                                     case (2): //2: Tast2
                                         {
                                             double[] mutated_optparas = new_generation_input[i * 3].get_optparas();
-                                            mutated_optparas[(int)genpool_input[i].feedbackdata[1, 2]] += genpool_input[i].feedbackdata[(int)genpool_input[i].feedbackdata[1, 2], 1];
-
+                                            mutated_optparas[(int)genpool_input[i].feedbackdata[2, 1]] += genpool_input[i].feedbackdata[1, (int)genpool_input[i].feedbackdata[2, 1]];
+                                            //Grenzen einhalten
+                                            if (mutated_optparas[(int)genpool_input[i].feedbackdata[2, 1]] < genpool_input[0].OptParameter[(int)genpool_input[i].feedbackdata[2, 1]].Min) mutated_optparas[(int)genpool_input[i].feedbackdata[2, 1]] = genpool_input[0].OptParameter[(int)genpool_input[i].feedbackdata[2, 1]].Min;
+                                            if (mutated_optparas[(int)genpool_input[i].feedbackdata[2, 1]] > genpool_input[0].OptParameter[(int)genpool_input[i].feedbackdata[2, 1]].Max) mutated_optparas[(int)genpool_input[i].feedbackdata[2, 1]] = genpool_input[0].OptParameter[(int)genpool_input[i].feedbackdata[2, 1]].Max;
+                                            
                                             new_generation_input[i * 3 + 1] = new IHWB.EVO.Common.Individuum_MetaEvo("MetaEvo", individuum_id, numberoptparas);
                                             new_generation_input[i * 3 + 1].set_optparas(mutated_optparas);
                                             new_generation_input[i * 3 + 1].set_status("raw");
                                             new_generation_input[i * 3 + 1].set_generator(algo_id);
                                             individuum_id++;
+                                            applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": BestIndividuum " + new_generation_input[i * 3].ID + " Mutate optparas[" + (int)genpool_input[i].feedbackdata[2, 1] + "] from " + new_generation_input[i * 3].get_optparas()[(int)genpool_input[i].feedbackdata[2, 1]] + " to " + mutated_optparas[(int)genpool_input[i].feedbackdata[2, 1]] + " (+ Stepsize: " + genpool_input[i].feedbackdata[1, (int)genpool_input[i].feedbackdata[2, 1]] + ")");
                                             run = false;
+                                            genpool_input[i].feedbackdata[1,(int)genpool_input[i].feedbackdata[2, 1]] *= -1; //Schrittweite negieren
                                             nextstate = 3;
                                             break;
                                         }
                                     case (3): //3: Tast3: Vergleich +Opt
                                         {
-                                            double[] new_optparas = new_generation_input[i * 3].get_optparas();
-                                            double[] new2_optparas = new_generation_input[i * 3 + 1].get_optparas();
-                                            double fit_new = 0;
-                                            double fit_new2 = 0;
-                                            for (int j = 0; j < numberoptparas; j++)
+                                            double[] new_penalties = new_generation_input[i * 3].Penalties;
+                                            double[] new2_penalties = new_generation_input[i * 3 + 1].Penalties;
+                                            double weighted_penaltie_new = 0;  //(tatsächlich Fehlergrösse)
+                                            double weighted_penaltie_new2 = 0; //(tatsächlich Fehlergrösse)
+
+                                            for (int j = 0; j < numberpenalties; j++)
                                             {
-                                                fit_new += new_optparas[j] * genpool_input[i].feedbackdata[j, 0];
-                                                fit_new2 += new2_optparas[j] * genpool_input[i].feedbackdata[j, 0];
+                                                weighted_penaltie_new += new_penalties[j] * genpool_input[i].feedbackdata[0, j];
+                                                weighted_penaltie_new2 += new2_penalties[j] * genpool_input[i].feedbackdata[0, j];
                                             }
-                                            if (fit_new2 > fit_new) nextstate = 4;
+                                            applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": WightedPenalties: BestIndividuum " + new_generation_input[i * 3].ID + " = " + weighted_penaltie_new + " / NewIndividuum " + new_generation_input[i * 3 + 1].ID + " = " + weighted_penaltie_new2);
+                                            if (weighted_penaltie_new2 < weighted_penaltie_new) nextstate = 4;
                                             else nextstate = 5;
                                             break;
                                         }
                                     case (4): //4: Tast4
-                                        {
+                                        { 
                                             new_generation_input[i * 3] = new_generation_input[i * 3 + 1].Clone_MetaEvo();
                                             new_generation_input[i * 3].set_toSimulate(false);
+                                            applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Neues BestIndividuum: " + new_generation_input[i * 3].ID);
                                             nextstate = 5;
                                             break;
                                         }
                                     case (5): //5: Tast5
                                         {
-                                            if (genpool_input[i].feedbackdata[1, 2] < numberoptparas - 1)
+                                            if (genpool_input[i].feedbackdata[2, 1] < numberoptparas - 1)
                                             {
-                                                genpool_input[i].feedbackdata[1, 2]++;
+                                                genpool_input[i].feedbackdata[2, 1]++;
                                                 nextstate = 0;
                                             }
-                                            else nextstate = 10;
+                                            else
+                                            {
+                                                genpool_input[i].feedbackdata[2, 1] = 0;//zu variierender optparameter [1]
+                                                nextstate = 10;
+                                            }
+                                            applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Optparameter " + (genpool_input[i].feedbackdata[2, 1]) + " von " + numberoptparas + " mit der vorgegebenen Schrittweite getestet");  
                                             break;
                                         }
                                     case (10): //10: Vergleich der Funktionswerte
                                         {
-                                            double[] gen_optparas = genpool_input[i].get_optparas();
-                                            double[] new_optparas = new_generation_input[i * 3].get_optparas();
-                                            double fit_gen = 0;
-                                            double fit_new = 0;
-                                            for (int j = 0; j < numberoptparas; j++)
+                                            double[] gen_penalties = genpool_input[i].Penalties;
+                                            double[] new_penalties = new_generation_input[i * 3].Penalties;
+                                            double weighted_penaltie_gen = 0;  //(tatsächlich Fehlergrösse)
+                                            double weighted_penaltie_new = 0; //(tatsächlich Fehlergrösse)
+
+                                            for (int j = 0; j < numberpenalties; j++)
                                             {
-                                                fit_gen += gen_optparas[j] * genpool_input[i].feedbackdata[j, 0];
-                                                fit_new += new_optparas[j] * genpool_input[i].feedbackdata[j, 0];
+                                                weighted_penaltie_gen += gen_penalties[j] * genpool_input[i].feedbackdata[0, j];
+                                                weighted_penaltie_new += new_penalties[j] * genpool_input[i].feedbackdata[0, j];
                                             }
-                                            if (fit_new > fit_gen) nextstate = 20;
-                                            else nextstate = 30;
+                                            if (weighted_penaltie_new < weighted_penaltie_gen)
+                                            {
+                                                applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Neues BestIndividuum " + new_generation_input[i * 3].ID + " Penaltie: " + weighted_penaltie_new + " ist besser als Basisindividuum " + genpool_input[i].ID + " Penaltie: " + weighted_penaltie_gen);
+                                                nextstate = 20;
+                                            }
+                                            else
+                                            {
+                                                applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Neues BestIndividuum " + new_generation_input[i * 3].ID + " Penaltie: " + weighted_penaltie_new + " ist NICHT besser als Basisindividuum " + genpool_input[i].ID + " Penaltie: " + weighted_penaltie_gen);
+                                                nextstate = 30;
+                                            }
                                             break;
                                         }
                                     case (20): //20: Extrapolation
                                         {
                                             double[] extrapolation = new double[numberoptparas];
+                                            double[,] feedbackdata_tmp;
+                                            string tmp = "(/";
 
                                             for (int j = 0; j < numberoptparas; j++)
                                             {
+                                                //Extrapolationsvektor zusammenstellen
                                                 extrapolation[j] = (2*new_generation_input[i * 3].get_optparas()[j]) - genpool_input[i].get_optparas()[j];
+                                                //Grenzen einhalten
+                                                if (extrapolation[j] < genpool_input[0].OptParameter[j].Min) extrapolation[j] = genpool_input[0].OptParameter[j].Min;
+                                                if (extrapolation[j] > genpool_input[0].OptParameter[j].Max) extrapolation[j] = genpool_input[0].OptParameter[j].Max;
+                                                tmp = tmp + " " + extrapolation[j] + "/";
                                             }
+                                            applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Neues BestIndividuum "+individuum_id+" mit Extrapolationsschritt auf " + tmp + ")");
+                                            //Kopieren des Individuums in den Genpool
+                                            feedbackdata_tmp = genpool_input[i].feedbackdata;
                                             genpool_input[i] = new_generation_input[i * 3].Clone_MetaEvo();
-                                            new_generation_input[i * 3].set_optparas(extrapolation);
-
-                                            genpool_input[i].feedbackdata[1, 2] = 0;//zu variierender optparameter [1]
+                                            genpool_input[i].feedbackdata = feedbackdata_tmp;
                                             genpool_input[i].feedbackdata[2, 2] = 1;//Schon gelaufen [1]
+                                            
+                                            //Extrapolation auf Satelliten-Individuum anwenden
+                                            new_generation_input[i * 3] = new IHWB.EVO.Common.Individuum_MetaEvo("MetaEvo", individuum_id, numberoptparas);
+                                            new_generation_input[i * 3].set_optparas(extrapolation);
+                                            new_generation_input[i * 3].set_status("raw");
+                                            new_generation_input[i * 3].set_generator(algo_id);
+                                            individuum_id++;
                                             nextstate = 0;
                                             break;
                                         }
@@ -650,6 +740,7 @@ namespace IHWB.EVO.MetaEvo
                                         {
                                             if (genpool_input[i].feedbackdata[2, 2] == 1)
                                             {
+                                                applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Extrapolation zurückgehen");
                                                 new_generation_input[i * 3] = genpool_input[i].Clone_MetaEvo();
                                                 new_generation_input[i * 3].ID = individuum_id;
                                                 individuum_id++;
@@ -661,12 +752,13 @@ namespace IHWB.EVO.MetaEvo
                                         }
                                     case (40): //40: Schrittweite halbieren oder Goal
                                         {
-                                            int finished = 0;
+                                            int finished = 0; //Wieviele Penalties fein genug bestimmt wurden
 
                                             for (int j = 0; j < numberoptparas; j++)
                                             {
-                                                if (true) finished++; //ToDo: stepsize < Epsilon  
-                                                genpool_input[i].feedbackdata[j, 1] *= 0.5;
+                                                if (Math.Abs(genpool_input[i].feedbackdata[1, j]) < Math.Abs(genpool_input[0].OptParameter[j].Max - genpool_input[0].OptParameter[j].Min) / 100) finished++;  
+                                                genpool_input[i].feedbackdata[1, j] *= 0.5;
+                                                applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Schrittweite[" + j + "] von " + genpool_input[i].feedbackdata[1, j] * 2 + " auf " + genpool_input[i].feedbackdata[1, j]);
                                             }
                                             if (finished == numberoptparas) nextstate = 50;
                                             else nextstate = 0;
@@ -675,15 +767,18 @@ namespace IHWB.EVO.MetaEvo
                                     case (50): //50: Goal
                                         {
                                             countready++;
+                                            run = false;
                                             break;
                                         }
                                 }
                             }
+                            genpool_input[i].feedbackdata[2, 0] = nextstate;
                         }
                         //Alle Hook and Jeeves Prozesse fertig
                         if (countready == numberindividuums)
                         {
-                            
+                            algofeedbackarray[algo_id].number_individuals_for_nextGen = 0;
+                            run = false;
                         }
                         break;
                     }

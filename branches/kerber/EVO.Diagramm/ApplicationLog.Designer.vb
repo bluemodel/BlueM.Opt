@@ -38,7 +38,7 @@ Partial Class ApplicationLog
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(992, 966)
+        Me.ClientSize = New System.Drawing.Size(1068, 966)
         Me.Controls.Add(Me.TextBox1)
         Me.Name = "ApplicationLog"
         Me.Text = "ApplicationLog"

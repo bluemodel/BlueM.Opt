@@ -49,10 +49,10 @@ namespace IHWB.EVO.MetaEvo
         {
             Random rand = new Random();
             int difference2genpool = 0;
+            applog.appendText("Algo Manager: Input: Generated and Simulated Individuums: \r\n" + this.generationinfo(ref new_generation_input));
+                
             if ((calculationmode == "global") || (calculationmode == "hybrid"))
             {
-                applog.appendText("Algo Manager: Input: Generated and Simulated Individuums: \r\n" + this.generationinfo(ref new_generation_input));
-                
                 //1.Selektion: 
                 //1.1.Sortieren nach einem zufällig gewählten Kriterium
                 int kriterium = rand.Next(0, new_generation_input[0].Penalties.Length);
@@ -82,23 +82,30 @@ namespace IHWB.EVO.MetaEvo
                 //4.3.Sortieren
                 //quicksort(ref wastepool, kriterium, 0, wastepool.Length - 1); //Nötig??
                 quicksort(ref genpool, kriterium, 0, genpool.Length - 1);
-                applog.appendText("Algo Manager: Result: New Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n");
+                applog.appendText("Algo Manager: Result: New Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n"); 
                 
                 //5.Genpool zeichnen:
                 if (modell == "sim") hauptdiagramm.LöscheLetzteGeneration(1);
                 hauptdiagramm.ZeichneSekPopulation(genpool);
                 System.Windows.Forms.Application.DoEvents();
 
-                if ((noAdvantage == 5) && (calculationmode == "global"))
+                if ((noAdvantage == 0) && (calculationmode == "global"))
                 {
-                    set_calculationmode_local(noAdvantage, ref genpool);
-                    MessageBox.Show("Switching to Local Optimization after " + (new_generation_input[new_generation_input.Length - 1].ID) / new_generation_input.Length + " Generations", "Algomanager");
+                    set_calculationmode_local(noAdvantage, ref genpool, ref new_generation_input);
+                    //MessageBox.Show("Switching to Local Optimization after " + (new_generation_input[new_generation_input.Length - 1].ID) / new_generation_input.Length + " Generations", "Algomanager");
                 }
             }
-            if (calculationmode == "local")
+            else if (calculationmode == "local")
             {
-                
+                applog.appendText("Algo Manager: Result: New Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n"); 
+
+                //5.Genpool zeichnen:
+                if (modell == "sim") hauptdiagramm.LöscheLetzteGeneration(1);
+                hauptdiagramm.ZeichneSekPopulation(genpool);
+                System.Windows.Forms.Application.DoEvents();
             }
+
+              
         }
 
         public void new_individuals_build(ref EVO.Common.Individuum_MetaEvo[] new_generation_input)
@@ -372,9 +379,8 @@ namespace IHWB.EVO.MetaEvo
                 {
                     if (distances[i, 2] > distances[pointer_highest_ranking, 2]) pointer_highest_ranking = i;
                 }
-                distances[pointer_highest_ranking, 2] = 0;
+                distances[pointer_highest_ranking, 2] = -1;
                 applog.appendText("Algo Manager: Diversity: Individuum " + work[pointer_highest_ranking].ID + " is used again");
-                work[pointer_highest_ranking].set_status("true");
                 work[pointer_highest_ranking].set_status("true");
 
                 numberawake_input++;
@@ -418,12 +424,12 @@ namespace IHWB.EVO.MetaEvo
             for (int i = 0; i < generation.Length; i++)
             {
                 back = back + "[ID]: " + generation[i].ID + " [Generator]: " + generation[i].get_generator() + " [Status]: " + generation[i].get_status() + " [Client]: " + generation[i].get_client();
-                /*optparas = generation[i].get_optparas();
+                optparas = generation[i].get_optparas();
                 back = back + "\r\nOptparas: ";
                 for (int j = 0; j < optparas.Length; j++)
                 {
                     back = back + "[" + j + "]: " + String.Format("{0:N3}",optparas[j]) + " ";
-                }*/
+                }
                 if (generation[0].Constraints.Length > 0)
                 {
                     back = back + "\r\nConst";
@@ -499,7 +505,7 @@ namespace IHWB.EVO.MetaEvo
         }
 
         //Umschalten auf Lokale Algorithmen
-        private void set_calculationmode_local(int noAdvantage, ref EVO.Common.Individuum_MetaEvo[] genpool_input)
+        private void set_calculationmode_local(int noAdvantage, ref EVO.Common.Individuum_MetaEvo[] genpool_input, ref EVO.Common.Individuum_MetaEvo[] new_generation_input)
         {
             applog.appendText("Algo Manager: No Advantages last " + noAdvantage + " Generations - switching to local Algorithms");
             calculationmode = "local";
@@ -507,6 +513,10 @@ namespace IHWB.EVO.MetaEvo
             for (int i = 0; i < genpool_input.Length; i++)
             {
                 genpool_input[i].set_generator(-1);
+            }
+            for (int i = 0; i < new_generation_input.Length; i++)
+            {
+                new_generation_input[i].set_generator(-1);
             }
 
             //Neue Algorithmuskomposition

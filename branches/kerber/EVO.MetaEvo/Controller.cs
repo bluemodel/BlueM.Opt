@@ -159,6 +159,7 @@ namespace IHWB.EVO.MetaEvo
 
             while (generationcounter <= settings.MetaEvo.NumberGenerations)
             {
+                #region Zustand: init
                 if (mePC.status == "init")
                 {
                     //Zufällige Parents setzen
@@ -185,7 +186,9 @@ namespace IHWB.EVO.MetaEvo
 
                     mePC.status = "perform_global_or_hybrid";
                 }
-
+                #endregion
+                
+                #region Zustand: perform_global_or_hybrid
                 else if (mePC.status == "perform_global_or_hybrid")
                 {
                     //Neue Generation bauen
@@ -203,21 +206,26 @@ namespace IHWB.EVO.MetaEvo
                             tmp = tmp + generation[i].get_optparas()[j] + " / ";
                         }
                         tmp = tmp.TrimEnd(' ','/') + ")";
-                        applog.appendText("Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   " + algomanager.algos.algofeedbackarray[generation[i].get_generator()].name); // +": Optparas: " + tmp
+                        
 
                         //Simulieren und zeichnen
-                        if (this.settings.MetaEvo.Application == "testprobleme")
-                        {
-                            testprobleme.Evaluierung_TestProbleme_MetaEvo(ref generation[i], 1, ref hauptdiagramm1);
-                            if (generation[i].Is_Feasible) generation[i].set_status("true");
-                            else generation[i].set_status("false#constraints#");
+                        if (generation[i].get_toSimulate()){
+                            if (this.settings.MetaEvo.Application == "testprobleme") 
+                            {
+                                applog.appendText("Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   " + algomanager.algos.algofeedbackarray[generation[i].get_generator()].name); // +": Optparas: " + tmp
+                                testprobleme.Evaluierung_TestProbleme_MetaEvo(ref generation[i], 1, ref hauptdiagramm1);
+                                if (generation[i].Is_Feasible) generation[i].set_status("true");
+                                else generation[i].set_status("false#constraints#");
+                            }
+                            if (this.settings.MetaEvo.Application == "sim")
+                            {
+                                applog.appendText("Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   " + algomanager.algos.algofeedbackarray[generation[i].get_generator()].name); // +": Optparas: " + tmp
+                                sim.Evaluate_MetaEvo(ref generation[i]);
+                                hauptdiagramm1.ZeichneIndividuum(generation[i], 1, 1, 1, generation[i].ID % generation.Length, System.Drawing.Color.Yellow, true);
+                                System.Windows.Forms.Application.DoEvents();
+                            }
                         }
-                        if (this.settings.MetaEvo.Application == "sim")
-                        {
-                            sim.Evaluate_MetaEvo(ref generation[i]);
-                            hauptdiagramm1.ZeichneIndividuum(generation[i], 1, 1, 1, generation[i].ID % generation.Length, System.Drawing.Color.Yellow, true);
-                            System.Windows.Forms.Application.DoEvents();
-                        }
+                        else applog.appendText("Controller: NOT Simulating Individuum " + generation[i].ID);
                         progress1.NextNachf();
                     }
 
@@ -225,9 +233,57 @@ namespace IHWB.EVO.MetaEvo
                     algomanager.new_individuals_merge_with_genpool(ref generation);
 
                     if (algomanager.calculationmode == "local") mePC.status = "perform_local";
-                    else generationcounter++;
+                    generationcounter++;
                     progress1.NextGen();
                 }
+                #endregion
+
+                #region Zustand: perform_local
+                else if (mePC.status == "perform_local")
+                {
+                    //Neue Generation bauen
+                    applog.appendText("Controller: ### Building new Individuums for Generation " + generationcounter + " ###");
+                    algomanager.new_individuals_build(ref generation);
+
+                    //Neue Generation Simulieren
+                    applog.appendText("Controller: Individuums for Generation " + generationcounter + ": Simulating Individuums...");
+                    for (int i = 0; i < generation.Length; i++)
+                    {
+                        tmp = "(";
+                        for (int j = 0; j < generation[0].get_optparas().Length; j++)
+                        {
+                            tmp = tmp + generation[i].get_optparas()[j] + " / ";
+                        }
+                        tmp = tmp.TrimEnd(' ', '/') + ")";
+
+
+                        //Simulieren und zeichnen
+                        if (generation[i].get_toSimulate())
+                        {
+                            if (this.settings.MetaEvo.Application == "testprobleme")
+                            {
+                                applog.appendText("Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   " + algomanager.algos.algofeedbackarray[generation[i].get_generator()].name); // +": Optparas: " + tmp
+                                testprobleme.Evaluierung_TestProbleme_MetaEvo(ref generation[i], 1, ref hauptdiagramm1);
+                                if (generation[i].Is_Feasible) generation[i].set_status("true");
+                                else generation[i].set_status("false#constraints#");
+                            }
+                            if (this.settings.MetaEvo.Application == "sim")
+                            {
+                                applog.appendText("Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   " + algomanager.algos.algofeedbackarray[generation[i].get_generator()].name); // +": Optparas: " + tmp
+                                sim.Evaluate_MetaEvo(ref generation[i]);
+                                hauptdiagramm1.ZeichneIndividuum(generation[i], 1, 1, 1, generation[i].ID % generation.Length, System.Drawing.Color.Yellow, true);
+                                System.Windows.Forms.Application.DoEvents();
+                            }
+                        }
+                        else applog.appendText("Controller: NOT Simulating Individuum " + generation[i].ID);
+                    }
+
+                    //Neue Individuen mit Genpool verrechnen und Genpool zeichnen
+                    algomanager.new_individuals_merge_with_genpool(ref generation);
+
+                    if (algomanager.algos.algofeedbackarray[0].number_individuals_for_nextGen == 0) generationcounter = settings.MetaEvo.NumberGenerations + 1;
+                }
+                #endregion
             }
             applog.appendText("Controller: Calculation Finished");
             applog.savelog();
