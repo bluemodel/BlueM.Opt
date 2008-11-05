@@ -422,7 +422,7 @@ Partial Class Form1
 
                 Case ANW_TESTPROBLEME
 
-                    'Tesproblem setzen
+                    'Testproblem setzen
                     Testprobleme1.setTestproblem(Me.ComboBox_Datensatz.SelectedItem)
 
                     'Tooltip anzeigen
@@ -430,7 +430,11 @@ Partial Class Form1
 
                 Case Else '(Alle Sim-Anwendungen)
 
+                    'Datensatz setzen
                     Call Sim1.setDatensatz(Me.ComboBox_Datensatz.SelectedItem)
+
+                    'Tooltip anzeigen
+                    Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, Me.ComboBox_Datensatz.SelectedItem)
 
             End Select
 
