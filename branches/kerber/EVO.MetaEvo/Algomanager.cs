@@ -15,6 +15,7 @@ namespace IHWB.EVO.MetaEvo
         public Algos algos;
         EVO.Diagramm.Hauptdiagramm hauptdiagramm;
         string modell;
+        EVO.MO_Indicators.Solutionvolume solutionvolume;
 
         public string calculationmode = "global";  //{"global", "local", "hybrid"}
         int noAdvantage = 0;
@@ -27,6 +28,8 @@ namespace IHWB.EVO.MetaEvo
             //Algoobjekt initialisieren (enthält die algorithmus-Methoden und das Feedback zu jedem Algo)
             algos = new Algos(ref settings_input, individuumnumber_input, ref applog);
             algos.set_algos("Zufällige Einfache Mutation, Feedback Mutation, Ungleichverteilte Mutation, Zufällige Rekombination, Intermediäre Rekombination, Diversität aus Sortierung, Totaler Zufall, Dominanzvektor");
+
+            solutionvolume = new EVO.MO_Indicators.Solutionvolume(5, 0.05, ref applog);
         }
 
         public void set_genpool(ref EVO.Common.Individuum_MetaEvo[] genpool_input) 
@@ -89,7 +92,8 @@ namespace IHWB.EVO.MetaEvo
                 hauptdiagramm.ZeichneSekPopulation(genpool);
                 System.Windows.Forms.Application.DoEvents();
 
-                if ((noAdvantage == 0) && (calculationmode == "global"))
+                //6.Solutionvolume berechnen
+                if ((solutionvolume.calculate_and_decide(ref genpool)) && (calculationmode == "global"))
                 {
                     set_calculationmode_local(noAdvantage, ref genpool, ref new_generation_input);
                     //MessageBox.Show("Switching to Local Optimization after " + (new_generation_input[new_generation_input.Length - 1].ID) / new_generation_input.Length + " Generations", "Algomanager");
