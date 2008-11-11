@@ -225,7 +225,7 @@ namespace IHWB.EVO.MetaEvo
                                 System.Windows.Forms.Application.DoEvents();
                             }
                         }
-                        else applog.appendText("Controller: NOT Simulating Individuum " + generation[i].ID);
+                        //else applog.appendText("Controller: NOT Simulating Individuum " + generation[i].ID);
                         progress1.NextNachf();
                     }
 
@@ -275,7 +275,7 @@ namespace IHWB.EVO.MetaEvo
                                 System.Windows.Forms.Application.DoEvents();
                             }
                         }
-                        else applog.appendText("Controller: NOT Simulating Individuum " + generation[i].ID);
+                        //else applog.appendText("Controller: NOT Simulating Individuum " + generation[i].ID);
                     }
 
                     //Neue Individuen mit Genpool verrechnen und Genpool zeichnen

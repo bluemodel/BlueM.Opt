@@ -578,7 +578,7 @@ namespace IHWB.EVO.MetaEvo
                                                     applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Wichtung Penalty[" + j + "]: " + genpool_input[i].feedbackdata[0, j]);
                                                 }
                                                 //Initiale Tastschrittweite
-                                                genpool_input[i].feedbackdata[1, j] = (genpool_input[i].OptParameter[j].Max - genpool_input[i].OptParameter[j].Min) / (double)(numberindividuums * 2);
+                                                genpool_input[i].feedbackdata[1, j] = (genpool_input[i].OptParameter[j].Max - genpool_input[i].OptParameter[j].Min) / (double)numberindividuums;
                                             }
                                             genpool_input[i].feedbackdata[2, 0] = 0;//Zustand [1]
                                             genpool_input[i].feedbackdata[2, 1] = 0;//zu variierender optparameter [1]
@@ -607,19 +607,22 @@ namespace IHWB.EVO.MetaEvo
                                         }
                                     case (1): //1: Tast1: Vergleich -Opt 
                                         {
-                                            double[] new_penalties = new_generation_input[i * 3].Penalties;
-                                            double[] new2_penalties = new_generation_input[i * 3 + 1].Penalties;
-                                            double weighted_penaltie_new = 0;  //(tatsächlich Fehlergrösse)
-                                            double weighted_penaltie_new2 = 0; //(tatsächlich Fehlergrösse)
-                                            
-                                            for (int j = 0; j < numberpenalties; j++)
+                                            if (new_generation_input[i * 3 + 1].get_status() == "true")
                                             {
-                                                weighted_penaltie_new += new_penalties[j] * genpool_input[i].feedbackdata[0, j];
-                                                weighted_penaltie_new2 += new2_penalties[j] * genpool_input[i].feedbackdata[0, j];
+                                                double[] new_penalties = new_generation_input[i * 3].Penalties;
+                                                double[] new2_penalties = new_generation_input[i * 3 + 1].Penalties;
+                                                double weighted_penaltie_new = 0;  //(tatsächlich Fehlergrösse)
+                                                double weighted_penaltie_new2 = 0; //(tatsächlich Fehlergrösse)
+
+                                                for (int j = 0; j < numberpenalties; j++)
+                                                {
+                                                    weighted_penaltie_new += new_penalties[j] * genpool_input[i].feedbackdata[0, j];
+                                                    weighted_penaltie_new2 += new2_penalties[j] * genpool_input[i].feedbackdata[0, j];
+                                                }
+                                                applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": WightedPenalties: BestIndividuum " + new_generation_input[i * 3].ID + " = " + weighted_penaltie_new + " / NewIndividuum " + new_generation_input[i * 3 + 1].ID + " = " + weighted_penaltie_new2);
+                                                if (weighted_penaltie_new2 < weighted_penaltie_new) { nextstate = 4; break; }
                                             }
-                                            applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": WightedPenalties: BestIndividuum " + new_generation_input[i * 3].ID + " = " + weighted_penaltie_new + " / NewIndividuum " + new_generation_input[i * 3 + 1].ID + " = " + weighted_penaltie_new2);
-                                            if (weighted_penaltie_new2 < weighted_penaltie_new) nextstate = 4;
-                                            else nextstate = 2;
+                                            nextstate = 2;
                                             break;
                                         }
                                     case (2): //2: Tast2
@@ -643,19 +646,22 @@ namespace IHWB.EVO.MetaEvo
                                         }
                                     case (3): //3: Tast3: Vergleich +Opt
                                         {
-                                            double[] new_penalties = new_generation_input[i * 3].Penalties;
-                                            double[] new2_penalties = new_generation_input[i * 3 + 1].Penalties;
-                                            double weighted_penaltie_new = 0;  //(tatsächlich Fehlergrösse)
-                                            double weighted_penaltie_new2 = 0; //(tatsächlich Fehlergrösse)
-
-                                            for (int j = 0; j < numberpenalties; j++)
+                                            if (new_generation_input[i * 3 + 1].get_status() == "true")
                                             {
-                                                weighted_penaltie_new += new_penalties[j] * genpool_input[i].feedbackdata[0, j];
-                                                weighted_penaltie_new2 += new2_penalties[j] * genpool_input[i].feedbackdata[0, j];
+                                                double[] new_penalties = new_generation_input[i * 3].Penalties;
+                                                double[] new2_penalties = new_generation_input[i * 3 + 1].Penalties;
+                                                double weighted_penaltie_new = 0;  //(tatsächlich Fehlergrösse)
+                                                double weighted_penaltie_new2 = 0; //(tatsächlich Fehlergrösse)
+
+                                                for (int j = 0; j < numberpenalties; j++)
+                                                {
+                                                    weighted_penaltie_new += new_penalties[j] * genpool_input[i].feedbackdata[0, j];
+                                                    weighted_penaltie_new2 += new2_penalties[j] * genpool_input[i].feedbackdata[0, j];
+                                                }
+                                                applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": WightedPenalties: BestIndividuum " + new_generation_input[i * 3].ID + " = " + weighted_penaltie_new + " / NewIndividuum " + new_generation_input[i * 3 + 1].ID + " = " + weighted_penaltie_new2);
+                                                if (weighted_penaltie_new2 < weighted_penaltie_new) { nextstate = 4; break; }
                                             }
-                                            applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": WightedPenalties: BestIndividuum " + new_generation_input[i * 3].ID + " = " + weighted_penaltie_new + " / NewIndividuum " + new_generation_input[i * 3 + 1].ID + " = " + weighted_penaltie_new2);
-                                            if (weighted_penaltie_new2 < weighted_penaltie_new) nextstate = 4;
-                                            else nextstate = 5;
+                                            nextstate = 5;
                                             break;
                                         }
                                     case (4): //4: Tast4
@@ -672,13 +678,14 @@ namespace IHWB.EVO.MetaEvo
                                             {
                                                 genpool_input[i].feedbackdata[2, 1]++;
                                                 nextstate = 0;
+                                                applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Optparameter " + (genpool_input[i].feedbackdata[2, 1]) + " von " + numberoptparas + " mit der vorgegebenen Schrittweite getestet");  
                                             }
                                             else
                                             {
+                                                applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Optparameter " + numberoptparas + " von " + numberoptparas + " mit der vorgegebenen Schrittweite getestet");  
                                                 genpool_input[i].feedbackdata[2, 1] = 0;//zu variierender optparameter [1]
                                                 nextstate = 10;
                                             }
-                                            applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Optparameter " + (genpool_input[i].feedbackdata[2, 1]) + " von " + numberoptparas + " mit der vorgegebenen Schrittweite getestet");  
                                             break;
                                         }
                                     case (10): //10: Vergleich der Funktionswerte
@@ -756,7 +763,7 @@ namespace IHWB.EVO.MetaEvo
 
                                             for (int j = 0; j < numberoptparas; j++)
                                             {
-                                                if (Math.Abs(genpool_input[i].feedbackdata[1, j]) < Math.Abs(genpool_input[0].OptParameter[j].Max - genpool_input[0].OptParameter[j].Min) / 100) finished++;  
+                                                if (Math.Abs(genpool_input[i].feedbackdata[1, j]) < Math.Abs(genpool_input[0].OptParameter[j].Max - genpool_input[0].OptParameter[j].Min) / 50) finished++;  
                                                 genpool_input[i].feedbackdata[1, j] *= 0.5;
                                                 applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Schrittweite[" + j + "] von " + genpool_input[i].feedbackdata[1, j] * 2 + " auf " + genpool_input[i].feedbackdata[1, j]);
                                             }

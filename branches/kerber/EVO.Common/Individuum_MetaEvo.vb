@@ -4,7 +4,7 @@
     Private generator_id As Integer         'von welchem Algorithmus das Individuum gemacht wurde
     Private Client As String                'Welcher Rechner dieses Individuum berechnen soll [ip oder Rechnername]
     Private numberOptparas As Integer       'Anzahl der Optparas des Problems
-    Private status As String                '{raw, calculate, ready, false}
+    Private status As String                '{raw, calculate, true, false}
     Private statusreason As String          '{false: dominated, crowding}
     Private statusopponent As Integer        'Individuen-ID durch den dieses Individuum gelöscht wurde
     Private mOptparameter() As OptParameter

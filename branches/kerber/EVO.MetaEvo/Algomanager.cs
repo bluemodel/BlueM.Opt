@@ -29,7 +29,7 @@ namespace IHWB.EVO.MetaEvo
             algos = new Algos(ref settings_input, individuumnumber_input, ref applog);
             algos.set_algos("Zufällige Einfache Mutation, Feedback Mutation, Ungleichverteilte Mutation, Zufällige Rekombination, Intermediäre Rekombination, Diversität aus Sortierung, Totaler Zufall, Dominanzvektor");
 
-            solutionvolume = new EVO.MO_Indicators.Solutionvolume(5, 0.05, ref applog);
+            solutionvolume = new EVO.MO_Indicators.Solutionvolume(5, 0.01, ref applog);
         }
 
         public void set_genpool(ref EVO.Common.Individuum_MetaEvo[] genpool_input) 
