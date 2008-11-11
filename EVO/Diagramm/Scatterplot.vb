@@ -718,7 +718,7 @@ Partial Public Class Scatterplot
 
                         For Each ind As Common.Individuum In Me.OptResult.getSekPop()
 
-                            serie.Add(ind.Zielwerte(Math.Abs(Me.Zielauswahl(i))), ind.Zielwerte(Math.Abs(Me.Zielauswahl(j))), ind.ID)
+                            serie.Add(ind.Zielwerte(Math.Abs(Me.Zielauswahl(i))), ind.Zielwerte(Math.Abs(Me.Zielauswahl(j))), ind.ID.ToString())
 
                             'finde Min und Max zur Darstellung für Linien
                             If (exiSca Or exiScaQuo) Then
@@ -770,7 +770,7 @@ Partial Public Class Scatterplot
                                 If n = ind.Zielwerte.Length Then
                                     'Console.Out.WriteLine(ind.Zielwerte(Me.Zielauswahl(i)).ToString + " " + ind.Zielwerte(Me.Zielauswahl(j)).ToString)
 
-                                    serieValid.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID)
+                                    serieValid.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID.ToString())
                                 End If
                             Next
 
@@ -850,10 +850,10 @@ Partial Public Class Scatterplot
                             'Constraintverletzung prüfen
                             If (ind.Is_Feasible) Then
                                 'gültige Lösung Zeichnen
-                                serie.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID)
+                                serie.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID.ToString())
                             Else
                                 'ungültige Lösung zeichnen
-                                serie_inv.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID)
+                                serie_inv.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID.ToString())
                             End If
                         Next
                     End If
@@ -903,8 +903,12 @@ Partial Public Class Scatterplot
 
                     If (i >= j) Then
                         'Diagramme ausblenden
-                        .Walls.Back.Transparent = False     'Grau anzeigen
-                        .Tools.Clear(True)                  'Um MarksTips zu entfernen
+                        'Hintergrund grau anzeigen
+                        .Walls.Back.Transparent = False
+                        .Walls.Back.Gradient.Visible = False
+                        'MarksTips entfernen
+                        .Tools.Clear(True)
+                        'Serien unsichtbar machen
                         For Each s As Steema.TeeChart.Styles.Series In .Series
                             s.Cursor = Cursors.Default      'Kein Hand-Cursor
                             s.Color = Color.Empty           'Punkte unsichtbar
@@ -1045,7 +1049,7 @@ Partial Public Class Scatterplot
                     If (i < j) Then
                         'Roten Punkt zeichnen
                         serie = .getSeriesPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
-                        serie.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID)
+                        serie.Add(ind.Zielwerte(Me.Zielauswahl(i)), ind.Zielwerte(Me.Zielauswahl(j)), ind.ID.ToString())
 
                         'Mark anzeigen
                         serie.Marks.Visible = True
