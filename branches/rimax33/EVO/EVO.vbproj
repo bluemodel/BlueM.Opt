@@ -73,6 +73,10 @@
       <HintPath>..\EVO.Kern\EVO.Kern.dll</HintPath>
     </Reference>
     <Reference Include="IHWB.BlueM.DllAdapter, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL" />
+    <Reference Include="IHWB.SMUSI.DllAdapter, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Apps\SMUSI\IHWB.SMUSI.DllAdapter.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualBasic.Compatibility">
       <Name>Microsoft.VisualBasic.Compatibility</Name>
     </Reference>
@@ -289,6 +293,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Apps\BlueM\IHWB.BlueM.DllAdapter.dll" />
+    <None Include="Apps\SMUSI\IHWB.SMUSI.DllAdapter.dll" />
     <Content Include="Apps\SWMM\SWMM5.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
