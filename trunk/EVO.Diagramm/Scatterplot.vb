@@ -1,18 +1,25 @@
+'*******************************************************************************
+'*******************************************************************************
+'**** Klasse Scatterplot                                                    ****
+'****                                                                       ****
+'**** Stellt ein Optimierungsergebnis als Scatterplot-Matrix dar            ****
+'****                                                                       ****
+'**** Autor: Felix Froehlich                                                ****
+'****                                                                       ****
+'**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
+'**** TU Darmstadt                                                          ****
+'*******************************************************************************
+'*******************************************************************************
+
+Imports System.Windows.Forms
+
+''' <summary>
+''' Zeigt den Lösungs- oder Entscheidungsraum in Form einer Scatterplot-Matrix an
+''' </summary>
 Partial Public Class Scatterplot
     Inherits System.Windows.Forms.Form
 
-    '*******************************************************************************
-    '*******************************************************************************
-    '**** Klasse Scatterplot                                                    ****
-    '****                                                                       ****
-    '**** Stellt ein Optimierungsergebnis als Scatterplot-Matrix dar            ****
-    '****                                                                       ****
-    '**** Autor: Felix Froehlich                                                ****
-    '****                                                                       ****
-    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
-    '**** TU Darmstadt                                                          ****
-    '*******************************************************************************
-    '*******************************************************************************
+#Region "Eigenschaften"
 
     'Das Problem
     Private mProblem As EVO.Common.Problem
@@ -20,14 +27,35 @@ Partial Public Class Scatterplot
     Private Diags(,) As EVO.Diagramm.Diagramm
     Private dimension As Integer
     Private OptResult, OptResultRef As EVO.OptResult.OptResult
-    Private Zielauswahl() As Integer
-    Private SekPopOnly, ShowRef As Boolean
-    Private isSolutionSpace As Boolean
+    Private Auswahl() As Integer
+    Private ShowSekPopOnly, ShowRefResult As Boolean
+    Private ShownSpace As EVO.Common.SPACE
+
+#End Region 'Eigenschaften
+
+#Region "Events"
+
+    ''' <summary>
+    ''' Event wird ausgelöst, wenn in der Scatterplot-Matrix eine Lösung ausgewählt wird
+    ''' </summary>
+    ''' <param name="ind">Das ausgewählte Individuum</param>
+    ''' <remarks>wird von Form1.selectSolution() verarbeitet</remarks>
     Public Event pointSelected(ByVal ind As Common.Individuum)
 
-    'Konstruktor
-    '***********
-    Public Sub New(ByRef prob As EVO.Common.Problem, ByVal optres As EVO.OptResult.OptResult)
+#End Region 'Events
+
+#Region "Methoden"
+
+    ''' <summary>
+    ''' Konstruktor
+    ''' </summary>
+    ''' <param name="prob">Das Optimierungsproblem</param>
+    ''' <param name="optres">Das Optimierungsergebnis</param>
+    ''' <param name="optresref">Ein Referenz-Optimierungsergebnis (darf Nothing sein)</param>
+    Public Sub New(ByRef prob As EVO.Common.Problem, ByVal optres As EVO.OptResult.OptResult, ByVal optresref As EVO.OptResult.OptResult)
+
+        Dim Dialog As ScatterplotDialog
+        Dim diagresult As DialogResult
 
         ' Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent()
@@ -39,82 +67,51 @@ Partial Public Class Scatterplot
 
         'Optimierungsergebnis übergeben
         Me.OptResult = optres
-
-    End Sub
-
-    ''' <summary>
-    ''' Zeigt den Lösungsraum an
-    ''' </summary>
-    ''' <param name="optresref">Ein Referenz-Optimierungsergebnis</param>
-    ''' <param name="_zielauswahl">Ein Array mit den Indizes der anzuzeigenden Feature-Functions</param>
-    ''' <param name="_sekpoponly">Wenn True, wird nur die Sekundärpopulation angezeigt</param>
-    ''' <param name="_showRef">Wenn True, wird das Referenz-Optimierungsergebnis ebenfalls geplottet</param>
-    ''' <remarks></remarks>
-    Public Sub ShowSolutionSpace(ByVal optresref As EVO.OptResult.OptResult, ByVal _zielauswahl() As Integer, ByVal _sekpoponly As Boolean, ByVal _showRef As Boolean)
-
-        Me.isSolutionSpace = True
-        Me.Text &= " - Solution Space"
-
-        'Referenz-OptErgebnis übernehmen
         Me.OptResultRef = optresref
 
-        'Optionen übernehmen
-        Me.SekPopOnly = _sekpoponly
-        Me.ShowRef = _showRef
+        'Scatterplot-Dialog aufrufen
+        Dialog = New EVO.Diagramm.ScatterplotDialog(Me.mProblem, Not IsNothing(Me.OptResultRef))
+        diagresult = Dialog.ShowDialog()
 
-        'Zielauswahl speichern
-        Me.Zielauswahl = _zielauswahl
+        If (diagresult = DialogResult.OK) Then
+            'Einstellungen übernehmen
+            Me.ShownSpace = Dialog.selectedSpace
+            Me.Auswahl = Dialog.selectedVariables
+            Me.ShowSekPopOnly = Dialog.ShowSekPopOnly
+            Me.ShowRefResult = Dialog.ShowRefResult
+
+            'Anzeigen
+            Call Me.Display()
+        Else
+            'Abbruch
+            Me.Dispose()
+        End If
+
+    End Sub
+
+    'Scatterplot-Matrix anzeigen
+    '***************************
+    Private Sub Display()
 
         'Diagramme zeichnen
-        Call Me.draw_solutionspace()
+        Select Case Me.ShownSpace
+
+            Case Common.SPACE.SolutionSpace
+                Me.Text &= " - Solution Space"
+                Call Me.draw_solutionspace()
+
+            Case Common.SPACE.DecisionSpace
+                Me.Text &= " - Decision Space"
+                Call Me.draw_decisionspace()
+
+        End Select
 
         'Bereits ausgewählte Lösungen anzeigen
         For Each ind As Common.Individuum In Me.OptResult.getSelectedSolutions
             Call Me.showSelectedSolution(ind)
         Next
 
-    End Sub
-
-    ''' <summary>
-    ''' Zeigt den Parameter-/ Entscheidungsraum an
-    ''' </summary>
-    ''' <remarks>Es wird nur die Sekundäre Poulation angezeigt</remarks>
-    Public Sub ShowParameterSpace()
-
-        Me.isSolutionSpace = False
-        Me.Text &= " - Decision Space"
-
-        'Diagramme zeichnen
-        Call Me.draw_parameterspace()
-
-        'Bereits ausgewählte Lösungen anzeigen
-        For Each ind As Common.Individuum In Me.OptResult.getSelectedSolutions
-            Call Me.showSelectedSolution(ind)
-        Next
-
-    End Sub
-
-    'Matrix dimensionieren
-    '*********************
-    Private Sub dimensionieren(ByVal _dimension As Integer)
-
-        Me.dimension = _dimension
-
-        ReDim Me.Diags(Me.dimension - 1, Me.dimension - 1)
-
-        Dim i As Integer
-
-        Me.matrix.Name = "Matrix"
-
-        Me.matrix.ColumnCount = Me.dimension
-        For i = 1 To Me.dimension
-            Me.matrix.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100 / Me.dimension))
-        Next
-
-        Me.matrix.RowCount = Me.dimension
-        For i = 1 To Me.dimension
-            Me.matrix.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100 / Me.dimension))
-        Next
+        Call Me.Show()
 
     End Sub
 
@@ -130,7 +127,7 @@ Partial Public Class Scatterplot
         Dim colorline1 As Steema.TeeChart.Tools.ColorLine
 
         'Matrix dimensionieren
-        Call Me.dimensionieren(Me.Zielauswahl.Length)
+        Call Me.dimensionieren(Me.Auswahl.Length)
 
         'Min und Max für Achsen bestimmen
         '--------------------------------
@@ -139,29 +136,29 @@ Partial Public Class Scatterplot
         For i = 0 To Me.dimension - 1
             min(i) = Double.MaxValue
             max(i) = Double.MinValue
-            If (Me.SekPopOnly) Then
+            If (Me.ShowSekPopOnly) Then
                 'Nur Sekundäre Population
                 For Each ind As Common.Individuum In Me.OptResult.getSekPop()
-                    min(i) = Math.Min(ind.Features(Me.Zielauswahl(i)), min(i))
-                    max(i) = Math.Max(ind.Features(Me.Zielauswahl(i)), max(i))
+                    min(i) = Math.Min(ind.Features(Me.Auswahl(i)), min(i))
+                    max(i) = Math.Max(ind.Features(Me.Auswahl(i)), max(i))
                 Next
             Else
                 'Alle Lösungen
                 For Each ind As Common.Individuum In Me.OptResult.Solutions
-                    min(i) = Math.Min(ind.Features(Me.Zielauswahl(i)), min(i))
-                    max(i) = Math.Max(ind.Features(Me.Zielauswahl(i)), max(i))
+                    min(i) = Math.Min(ind.Features(Me.Auswahl(i)), min(i))
+                    max(i) = Math.Max(ind.Features(Me.Auswahl(i)), max(i))
                 Next
             End If
             'IstWerte
-            If (Me.mProblem.List_Featurefunctions(Me.Zielauswahl(i)).hasIstWert) Then
-                min(i) = Math.Min(Me.mProblem.List_Featurefunctions(Me.Zielauswahl(i)).IstWert, min(i))
-                max(i) = Math.Max(Me.mProblem.List_Featurefunctions(Me.Zielauswahl(i)).IstWert, max(i))
+            If (Me.mProblem.List_Featurefunctions(Me.Auswahl(i)).hasIstWert) Then
+                min(i) = Math.Min(Me.mProblem.List_Featurefunctions(Me.Auswahl(i)).IstWert, min(i))
+                max(i) = Math.Max(Me.mProblem.List_Featurefunctions(Me.Auswahl(i)).IstWert, max(i))
             End If
             'Vergleichsergebnis
-            If (Me.ShowRef) Then
+            If (Me.ShowRefResult) Then
                 For Each ind As Common.Individuum In Me.OptResultRef.getSekPop()
-                    min(i) = Math.Min(ind.Features(Me.Zielauswahl(i)), min(i))
-                    max(i) = Math.Max(ind.Features(Me.Zielauswahl(i)), max(i))
+                    min(i) = Math.Min(ind.Features(Me.Auswahl(i)), min(i))
+                    max(i) = Math.Max(ind.Features(Me.Auswahl(i)), max(i))
                 Next
             End If
 
@@ -191,8 +188,8 @@ Partial Public Class Scatterplot
                     'Achsen
                     '------
                     'Titel
-                    xAchse = Me.mProblem.List_Featurefunctions(Me.Zielauswahl(i)).Bezeichnung
-                    yAchse = Me.mProblem.List_Featurefunctions(Me.Zielauswahl(j)).Bezeichnung
+                    xAchse = Me.mProblem.List_Featurefunctions(Me.Auswahl(i)).Bezeichnung
+                    yAchse = Me.mProblem.List_Featurefunctions(Me.Auswahl(j)).Bezeichnung
 
                     .Axes.Bottom.Title.Caption = xAchse
                     .Axes.Left.Title.Caption = yAchse
@@ -247,12 +244,12 @@ Partial Public Class Scatterplot
 
                     'Punkte eintragen
                     '================
-                    If (Me.SekPopOnly) Then
+                    If (Me.ShowSekPopOnly) Then
                         'Nur Sekundäre Population
                         '------------------------
                         serie = .getSeriesPoint(xAchse & ", " & yAchse, "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         For Each ind As Common.Individuum In Me.OptResult.getSekPop()
-                            serie.Add(ind.Features(Me.Zielauswahl(i)), ind.Features(Me.Zielauswahl(j)), ind.ID.ToString())
+                            serie.Add(ind.Features(Me.Auswahl(i)), ind.Features(Me.Auswahl(j)), ind.ID.ToString())
                         Next
                     Else
                         'Alle Lösungen
@@ -263,17 +260,17 @@ Partial Public Class Scatterplot
                             'Constraintverletzung prüfen
                             If (ind.Is_Feasible) Then
                                 'gültige Lösung Zeichnen
-                                serie.Add(ind.Features(Me.Zielauswahl(i)), ind.Features(Me.Zielauswahl(j)), ind.ID.ToString())
+                                serie.Add(ind.Features(Me.Auswahl(i)), ind.Features(Me.Auswahl(j)), ind.ID.ToString())
                             Else
                                 'ungültige Lösung zeichnen
-                                serie_inv.Add(ind.Features(Me.Zielauswahl(i)), ind.Features(Me.Zielauswahl(j)), ind.ID.ToString())
+                                serie_inv.Add(ind.Features(Me.Auswahl(i)), ind.Features(Me.Auswahl(j)), ind.ID.ToString())
                             End If
                         Next
                     End If
 
                     'IstWerte eintragen
                     '==================
-                    If (Me.mProblem.List_Featurefunctions(Me.Zielauswahl(i)).hasIstWert) Then
+                    If (Me.mProblem.List_Featurefunctions(Me.Auswahl(i)).hasIstWert) Then
                         'X-Achse:
                         '--------
                         colorline1 = New Steema.TeeChart.Tools.ColorLine(.Chart)
@@ -281,10 +278,10 @@ Partial Public Class Scatterplot
                         colorline1.Axis = .Axes.Bottom
                         colorline1.AllowDrag = False
                         colorline1.NoLimitDrag = True
-                        colorline1.Value = Me.mProblem.List_Featurefunctions(Me.Zielauswahl(i)).IstWert
+                        colorline1.Value = Me.mProblem.List_Featurefunctions(Me.Auswahl(i)).IstWert
                     End If
 
-                    If (Me.mProblem.List_Featurefunctions(Me.Zielauswahl(j)).hasIstWert) Then
+                    If (Me.mProblem.List_Featurefunctions(Me.Auswahl(j)).hasIstWert) Then
                         'Y-Achse:
                         '--------
                         colorline1 = New Steema.TeeChart.Tools.ColorLine(.Chart)
@@ -292,16 +289,16 @@ Partial Public Class Scatterplot
                         colorline1.Axis = .Axes.Left
                         colorline1.AllowDrag = False
                         colorline1.NoLimitDrag = True
-                        colorline1.Value = Me.mProblem.List_Featurefunctions(Me.Zielauswahl(j)).IstWert
+                        colorline1.Value = Me.mProblem.List_Featurefunctions(Me.Auswahl(j)).IstWert
 
                     End If
 
                     'Vergleichsergebnis anzeigen
                     '===========================
-                    If (Me.ShowRef) Then
+                    If (Me.ShowRefResult) Then
                         serie = .getSeriesPoint(xAchse & ", " & yAchse & " (Vergleichsergebnis)", "Blue", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         For Each ind As Common.Individuum In Me.OptResultRef.getSekPop()
-                            serie.Add(ind.Features(Me.Zielauswahl(i)), ind.Features(Me.Zielauswahl(j)), ind.ID & " (Vergleichsergebnis)")
+                            serie.Add(ind.Features(Me.Auswahl(i)), ind.Features(Me.Auswahl(j)), ind.ID & " (Vergleichsergebnis)")
                         Next
                     End If
 
@@ -332,7 +329,7 @@ Partial Public Class Scatterplot
 
     'Entscheidungsraum zeichnen
     '**************************
-    Private Sub draw_parameterspace()
+    Private Sub draw_decisionspace()
 
         Dim i, j As Integer
         Dim xAchse, yAchse As String
@@ -463,7 +460,31 @@ Partial Public Class Scatterplot
 
     End Sub
 
-   'Ruft bei Doppelklick auf Diagramm den TeeChart Editor auf
+    'Matrix dimensionieren
+    '*********************
+    Private Sub dimensionieren(ByVal _dimension As Integer)
+
+        Me.dimension = _dimension
+
+        ReDim Me.Diags(Me.dimension - 1, Me.dimension - 1)
+
+        Dim i As Integer
+
+        Me.matrix.Name = "Matrix"
+
+        Me.matrix.ColumnCount = Me.dimension
+        For i = 1 To Me.dimension
+            Me.matrix.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100 / Me.dimension))
+        Next
+
+        Me.matrix.RowCount = Me.dimension
+        For i = 1 To Me.dimension
+            Me.matrix.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100 / Me.dimension))
+        Next
+
+    End Sub
+
+    'Ruft bei Doppelklick auf Diagramm den TeeChart Editor auf
     '*********************************************************
     Private Sub ShowEditor(ByVal sender As Object, ByVal e As System.EventArgs)
 
@@ -507,14 +528,16 @@ Partial Public Class Scatterplot
             End If
 
         Catch ex As Exception
-            MsgBox(ex.Message, MsgBoxStyle.Exclamation)
+            MsgBox("Lösung nicht auswählbar!", MsgBoxStyle.Information)
         End Try
 
     End Sub
 
-    'Eine ausgewählte Lösung in den Diagrammen anzeigen
-    'wird von Form1.selectSolution() aufgerufen
-    '**************************************************
+    ''' <summary>
+    ''' Eine ausgewählte Lösung in den Diagrammen anzeigen
+    ''' </summary>
+    ''' <param name="ind">das ausgewählte Individuum</param>
+    ''' <remarks>wird von Form1.selectSolution() aufgerufen</remarks>
     Public Sub showSelectedSolution(ByVal ind As Common.Individuum)
 
         Dim serie As Steema.TeeChart.Styles.Series
@@ -530,11 +553,12 @@ Partial Public Class Scatterplot
                     'Roten Punkt zeichnen
                     serie = .getSeriesPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
 
-                    If (Me.isSolutionSpace) Then
-                        serie.Add(ind.Features(Me.Zielauswahl(i)), ind.Features(Me.Zielauswahl(j)), ind.ID.ToString())
-                    Else
-                        serie.Add(ind.OptParameter_RWerte(i), ind.OptParameter_RWerte(j), ind.ID.ToString())
-                    End If
+                    Select Case Me.ShownSpace
+                        Case Common.SPACE.SolutionSpace
+                            serie.Add(ind.Features(Me.Auswahl(i)), ind.Features(Me.Auswahl(j)), ind.ID.ToString())
+                        Case Common.SPACE.DecisionSpace
+                            serie.Add(ind.OptParameter_RWerte(i), ind.OptParameter_RWerte(j), ind.ID.ToString())
+                    End Select
 
                     'Mark anzeigen
                     serie.Marks.Visible = True
@@ -546,10 +570,12 @@ Partial Public Class Scatterplot
                 End With
             Next j
         Next i
+
     End Sub
 
-    'Serie der ausgewählten Lösungen löschen
-    '***************************************
+    ''' <summary>
+    ''' Serie der ausgewählten Lösungen löschen
+    ''' </summary>
     Public Sub clearSelection()
 
         Dim i, j As Integer
@@ -570,5 +596,7 @@ Partial Public Class Scatterplot
     End Sub
 
 #End Region 'Lösungsauswahl
+
+#End Region 'Methoden
 
 End Class
