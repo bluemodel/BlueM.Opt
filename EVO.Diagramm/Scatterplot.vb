@@ -80,6 +80,8 @@ Partial Public Class Scatterplot
             Me.ShowSekPopOnly = Dialog.ShowSekPopOnly
             Me.ShowRefResult = Dialog.ShowRefResult
 
+            Application.DoEvents()
+
             'Anzeigen
             Call Me.Display()
         Else
@@ -92,6 +94,9 @@ Partial Public Class Scatterplot
     'Scatterplot-Matrix anzeigen
     '***************************
     Private Sub Display()
+
+        'Matrix dimensionieren
+        Call Me.dimensionieren(Me.Auswahl.Length)
 
         'Diagramme zeichnen
         Select Case Me.ShownSpace
@@ -112,6 +117,7 @@ Partial Public Class Scatterplot
         Next
 
         Call Me.Show()
+        Call Me.BringToFront()
 
     End Sub
 
@@ -125,9 +131,6 @@ Partial Public Class Scatterplot
         Dim max() As Double
         Dim serie, serie_inv As Steema.TeeChart.Styles.Series
         Dim colorline1 As Steema.TeeChart.Tools.ColorLine
-
-        'Matrix dimensionieren
-        Call Me.dimensionieren(Me.Auswahl.Length)
 
         'Min und Max für Achsen bestimmen
         '--------------------------------
@@ -335,18 +338,15 @@ Partial Public Class Scatterplot
         Dim xAchse, yAchse As String
         Dim min() As Double
         Dim max() As Double
-        Dim serie As Steema.TeeChart.Styles.Series
-
-        'Matrix dimensionieren
-        Call Me.dimensionieren(Me.mProblem.NumParams)
+        Dim serie, serie_inv As Steema.TeeChart.Styles.Series
 
         'Min und Max für Achsen bestimmen
         '--------------------------------
         ReDim min(Me.dimension - 1)
         ReDim max(Me.dimension - 1)
         For i = 0 To Me.dimension - 1
-            min(i) = Me.mProblem.List_OptParameter(i).Min
-            max(i) = Me.mProblem.List_OptParameter(i).Max
+            min(i) = Me.mProblem.List_OptParameter(Me.Auswahl(i)).Min
+            max(i) = Me.mProblem.List_OptParameter(Me.Auswahl(i)).Max
         Next
 
         'Schleife über Spalten
@@ -373,8 +373,8 @@ Partial Public Class Scatterplot
                     'Achsen
                     '------
                     'Titel
-                    xAchse = Me.mProblem.List_OptParameter(i).Bezeichnung
-                    yAchse = Me.mProblem.List_OptParameter(j).Bezeichnung
+                    xAchse = Me.mProblem.List_OptParameter(Me.Auswahl(i)).Bezeichnung
+                    yAchse = Me.mProblem.List_OptParameter(Me.Auswahl(j)).Bezeichnung
 
                     .Axes.Bottom.Title.Caption = xAchse
                     .Axes.Left.Title.Caption = yAchse
@@ -429,12 +429,38 @@ Partial Public Class Scatterplot
 
                     'Punkte eintragen
                     '================
-                    'Nur Sekundäre Population
-                    '------------------------
-                    serie = .getSeriesPoint(xAchse & ", " & yAchse, "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                    For Each ind As Common.Individuum In Me.OptResult.getSekPop()
-                        serie.Add(ind.OptParameter_RWerte(i), ind.OptParameter_RWerte(j), ind.ID.ToString())
-                    Next
+                    If (Me.ShowSekPopOnly) Then
+                        'Nur Sekundäre Population
+                        '------------------------
+                        serie = .getSeriesPoint(xAchse & ", " & yAchse, "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        For Each ind As Common.Individuum In Me.OptResult.getSekPop()
+                            serie.Add(ind.OptParameter_RWerte(Me.Auswahl(i)), ind.OptParameter_RWerte(Me.Auswahl(j)), ind.ID.ToString())
+                        Next
+                    Else
+                        'Alle Lösungen
+                        '-------------
+                        serie = .getSeriesPoint(xAchse & ", " & yAchse, "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        serie_inv = .getSeriesPoint(xAchse & ", " & yAchse & " (ungültig)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        For Each ind As Common.Individuum In Me.OptResult.Solutions
+                            'Constraintverletzung prüfen
+                            If (ind.Is_Feasible) Then
+                                'gültige Lösung Zeichnen
+                                serie.Add(ind.OptParameter_RWerte(Me.Auswahl(i)), ind.OptParameter_RWerte(Me.Auswahl(j)), ind.ID.ToString())
+                            Else
+                                'ungültige Lösung zeichnen
+                                serie_inv.Add(ind.OptParameter_RWerte(Me.Auswahl(i)), ind.OptParameter_RWerte(Me.Auswahl(j)), ind.ID.ToString())
+                            End If
+                        Next
+                    End If
+
+                    'Vergleichsergebnis anzeigen
+                    '===========================
+                    If (Me.ShowRefResult) Then
+                        serie = .getSeriesPoint(xAchse & ", " & yAchse & " (Vergleichsergebnis)", "Blue", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        For Each ind As Common.Individuum In Me.OptResultRef.getSekPop()
+                            serie.Add(ind.OptParameter_RWerte(Me.Auswahl(i)), ind.OptParameter_RWerte(Me.Auswahl(j)), ind.ID & " (Vergleichsergebnis)")
+                        Next
+                    End If
 
                     'Diagramme auf der Diagonalen ausblenden
                     '=======================================
