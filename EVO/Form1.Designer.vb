@@ -42,7 +42,7 @@ Partial Class Form1
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.Button_Start = New System.Windows.Forms.Button
         Me.Button_openMDB = New System.Windows.Forms.Button
-        Me.Button_ScatterplotSolutionSpace = New System.Windows.Forms.Button
+        Me.Button_Scatterplot = New System.Windows.Forms.Button
         Me.Button_saveMDB = New System.Windows.Forms.Button
         Me.Button_loadRefResult = New System.Windows.Forms.Button
         Me.Button_TChartEdit = New System.Windows.Forms.Button
@@ -60,7 +60,6 @@ Partial Class Form1
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog
         Me.GroupBox_ErgebnisDB = New System.Windows.Forms.GroupBox
-        Me.Button_ScatterplotParamSpace = New System.Windows.Forms.Button
         Me.GroupBox_TChartButtons = New System.Windows.Forms.GroupBox
         Me.Info = New System.Windows.Forms.GroupBox
         Me.Label_Dn_Wert = New System.Windows.Forms.Label
@@ -163,10 +162,10 @@ Partial Class Form1
         Me.Button_Start.Enabled = False
         Me.Button_Start.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Button_Start.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.Button_Start.Location = New System.Drawing.Point(624, 662)
+        Me.Button_Start.Location = New System.Drawing.Point(594, 662)
         Me.Button_Start.Name = "Button_Start"
         Me.Button_Start.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.Button_Start.Size = New System.Drawing.Size(90, 46)
+        Me.Button_Start.Size = New System.Drawing.Size(120, 46)
         Me.Button_Start.TabIndex = 3
         Me.Button_Start.Text = "Run"
         Me.ToolTip1.SetToolTip(Me.Button_Start, "Optimierung starten")
@@ -183,16 +182,16 @@ Partial Class Form1
         Me.ToolTip1.SetToolTip(Me.Button_openMDB, "Optimierungsergebnis aus Datenbank laden")
         Me.Button_openMDB.UseVisualStyleBackColor = True
         '
-        'Button_ScatterplotSolutionSpace
+        'Button_Scatterplot
         '
-        Me.Button_ScatterplotSolutionSpace.Enabled = False
-        Me.Button_ScatterplotSolutionSpace.Image = Global.IHWB.EVO.My.Resources.Resources.scatterplot
-        Me.Button_ScatterplotSolutionSpace.Location = New System.Drawing.Point(99, 19)
-        Me.Button_ScatterplotSolutionSpace.Name = "Button_ScatterplotSolutionSpace"
-        Me.Button_ScatterplotSolutionSpace.Size = New System.Drawing.Size(25, 25)
-        Me.Button_ScatterplotSolutionSpace.TabIndex = 9
-        Me.ToolTip1.SetToolTip(Me.Button_ScatterplotSolutionSpace, "Scatterplot-Matrix des Lösungsraums anzeigen")
-        Me.Button_ScatterplotSolutionSpace.UseVisualStyleBackColor = True
+        Me.Button_Scatterplot.Enabled = False
+        Me.Button_Scatterplot.Image = Global.IHWB.EVO.My.Resources.Resources.scatterplot
+        Me.Button_Scatterplot.Location = New System.Drawing.Point(99, 19)
+        Me.Button_Scatterplot.Name = "Button_Scatterplot"
+        Me.Button_Scatterplot.Size = New System.Drawing.Size(25, 25)
+        Me.Button_Scatterplot.TabIndex = 9
+        Me.ToolTip1.SetToolTip(Me.Button_Scatterplot, "Scatterplot-Matrix anzeigen")
+        Me.Button_Scatterplot.UseVisualStyleBackColor = True
         '
         'Button_saveMDB
         '
@@ -346,27 +345,16 @@ Partial Class Form1
         '
         'GroupBox_ErgebnisDB
         '
-        Me.GroupBox_ErgebnisDB.Controls.Add(Me.Button_ScatterplotParamSpace)
         Me.GroupBox_ErgebnisDB.Controls.Add(Me.Button_saveMDB)
         Me.GroupBox_ErgebnisDB.Controls.Add(Me.Button_openMDB)
         Me.GroupBox_ErgebnisDB.Controls.Add(Me.Button_loadRefResult)
-        Me.GroupBox_ErgebnisDB.Controls.Add(Me.Button_ScatterplotSolutionSpace)
+        Me.GroupBox_ErgebnisDB.Controls.Add(Me.Button_Scatterplot)
         Me.GroupBox_ErgebnisDB.Location = New System.Drawing.Point(390, 658)
         Me.GroupBox_ErgebnisDB.Name = "GroupBox_ErgebnisDB"
-        Me.GroupBox_ErgebnisDB.Size = New System.Drawing.Size(163, 50)
+        Me.GroupBox_ErgebnisDB.Size = New System.Drawing.Size(133, 50)
         Me.GroupBox_ErgebnisDB.TabIndex = 14
         Me.GroupBox_ErgebnisDB.TabStop = False
         Me.GroupBox_ErgebnisDB.Text = "Ergebnis"
-        '
-        'Button_ScatterplotParamSpace
-        '
-        Me.Button_ScatterplotParamSpace.Enabled = False
-        Me.Button_ScatterplotParamSpace.Location = New System.Drawing.Point(129, 19)
-        Me.Button_ScatterplotParamSpace.Name = "Button_ScatterplotParamSpace"
-        Me.Button_ScatterplotParamSpace.Size = New System.Drawing.Size(25, 25)
-        Me.Button_ScatterplotParamSpace.TabIndex = 10
-        Me.ToolTip1.SetToolTip(Me.Button_ScatterplotParamSpace, "Scatterplot-Matrix des Parameterraums anzeigen")
-        Me.Button_ScatterplotParamSpace.UseVisualStyleBackColor = True
         '
         'GroupBox_TChartButtons
         '
@@ -385,7 +373,7 @@ Partial Class Form1
         '
         Me.Info.Controls.Add(Me.Label_Dn_Wert)
         Me.Info.Controls.Add(Me.Label_Dn)
-        Me.Info.Location = New System.Drawing.Point(559, 658)
+        Me.Info.Location = New System.Drawing.Point(529, 658)
         Me.Info.Name = "Info"
         Me.Info.Size = New System.Drawing.Size(59, 50)
         Me.Info.TabIndex = 18
@@ -489,7 +477,7 @@ Partial Class Form1
     Private WithEvents GroupBox_ErgebnisDB As System.Windows.Forms.GroupBox
     Private WithEvents Button_saveMDB As System.Windows.Forms.Button
     Private WithEvents Button_openMDB As System.Windows.Forms.Button
-    Private WithEvents Button_ScatterplotSolutionSpace As System.Windows.Forms.Button
+    Private WithEvents Button_Scatterplot As System.Windows.Forms.Button
     Private WithEvents Label_Datensatz As System.Windows.Forms.Label
     Private WithEvents GroupBox_Anwendung As System.Windows.Forms.GroupBox
     Private WithEvents ComboBox_Anwendung As System.Windows.Forms.ComboBox
@@ -512,5 +500,4 @@ Partial Class Form1
     Private WithEvents MenuItem_Optionen As System.Windows.Forms.ToolStripMenuItem
     Private WithEvents MenuItem_About As System.Windows.Forms.ToolStripMenuItem
     Private WithEvents MenuItem_Wiki As System.Windows.Forms.ToolStripMenuItem
-    Private WithEvents Button_ScatterplotParamSpace As System.Windows.Forms.Button
 End Class

@@ -186,8 +186,7 @@ Partial Class Form1
             'Ergebnis-Buttons
             Me.Button_saveMDB.Enabled = False
             Me.Button_openMDB.Enabled = False
-            Me.Button_ScatterplotSolutionSpace.Enabled = False
-            Me.Button_ScatterplotParamSpace.Enabled = False
+            Me.Button_Scatterplot.Enabled = False
             Me.Button_loadRefResult.Enabled = False
 
             'EVO_Settings zurücksetzen
@@ -482,8 +481,7 @@ Partial Class Form1
             'Ergebnis-Buttons deaktivieren
             Me.Button_saveMDB.Enabled = False
             Me.Button_openMDB.Enabled = False
-            Me.Button_ScatterplotSolutionSpace.Enabled = False
-            Me.Button_ScatterplotParamSpace.Enabled = False
+            Me.Button_Scatterplot.Enabled = False
 
             Select Case Me.mProblem.Method
 
@@ -726,8 +724,7 @@ Partial Class Form1
             Me.Button_openMDB.Enabled = False
             If (Not IsNothing(Sim1)) Then
                 Me.Button_saveMDB.Enabled = True
-                Me.Button_ScatterplotSolutionSpace.Enabled = True
-                Me.Button_ScatterplotParamSpace.Enabled = True
+                Me.Button_Scatterplot.Enabled = True
                 Me.Button_loadRefResult.Enabled = True
             End If
 
@@ -2212,61 +2209,18 @@ Start_Evolutionsrunden:
     End Sub
 
     ''' <summary>
-    ''' Scatterplot-Matrix des Lösungsraums anzeigen
+    ''' Scatterplot-Matrix anzeigen
     ''' </summary>
-    Private Sub showScatterplotSolutionSpace(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_ScatterplotSolutionSpace.Click
+    Private Sub showScatterplot(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Scatterplot.Click
 
-        Dim Dialog As EVO.Diagramm.ScatterplotDialog
-        Dim diagresult As DialogResult
-        Dim sekpoponly, showRef As Boolean
-        Dim zielauswahl() As Integer
-
-        'Scatterplot-Dialog aufrufen
-        Dialog = New EVO.Diagramm.ScatterplotDialog(Me.mProblem)
-        If (IsNothing(Sim1.OptResultRef)) Then Dialog.GroupBox_Ref.Enabled = False
-        diagresult = Dialog.ShowDialog()
-
-        If (Not diagresult = Windows.Forms.DialogResult.OK) Then
-            Exit Sub
+        'gucken, welches Scatterplot noch frei ist
+        If (IsNothing(Me.scatterplot1) OrElse Not Me.scatterplot1.Visible) Then
+            Me.scatterplot1 = New EVO.Diagramm.Scatterplot(Me.mProblem, Sim1.OptResult, Sim1.OptResultRef)
+        ElseIf (IsNothing(Me.scatterplot2) OrElse Not Me.scatterplot2.Visible) Then
+            Me.scatterplot2 = New EVO.Diagramm.Scatterplot(Me.mProblem, Sim1.OptResult, Sim1.OptResultRef)
+        Else
+            MsgBox("Es werden bereits 2 Scatterplot-Matrizen angezeigt" & eol & "Bitte zuerst eine schließen!", MsgBoxStyle.Information)
         End If
-
-        'Einstellungen übernehmen
-        sekpoponly = Dialog.CheckBox_SekPopOnly.Checked
-        showRef = Dialog.CheckBox_showRef.Checked
-        ReDim zielauswahl(-1)
-        For Each indexChecked As Integer In Dialog.CheckedListBox_Ziele.CheckedIndices
-            ReDim Preserve zielauswahl(zielauswahl.GetUpperBound(0) + 1)
-            zielauswahl(zielauswahl.GetUpperBound(0)) = indexChecked
-        Next
-
-        'Scatterplot-Matrix anzeigen
-        Cursor = Cursors.WaitCursor
-
-        scatterplot1 = New EVO.Diagramm.Scatterplot(Me.mProblem, Sim1.OptResult)
-        Call scatterplot1.ShowSolutionSpace(Sim1.OptResultRef, zielauswahl, sekpoponly, showRef)
-        Call scatterplot1.Show()
-
-        Cursor = Cursors.Default
-
-        Call scatterplot1.BringToFront()
-
-    End Sub
-
-    ''' <summary>
-    ''' Scatterplot-Matrix des Parameter- / Entscheidungsraums anzeigen
-    ''' </summary>
-    Private Sub showScatterplotParamSpace(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_ScatterplotParamSpace.Click
-
-        'Scatterplot-Matrix anzeigen
-        Cursor = Cursors.WaitCursor
-
-        scatterplot2 = New EVO.Diagramm.Scatterplot(Me.mProblem, Sim1.OptResult)
-        Call scatterplot2.ShowParameterSpace()
-        Call scatterplot2.Show()
-
-        Cursor = Cursors.Default
-
-        Call scatterplot2.BringToFront()
 
     End Sub
 
@@ -2391,7 +2345,7 @@ Start_Evolutionsrunden:
                 'Lösung auswählen
                 Call Me.selectSolution(ind)
             Catch
-                MsgBox("Lösung nicht auswählbar!", MsgBoxStyle.Information, "Info")
+                MsgBox("Lösung nicht auswählbar!", MsgBoxStyle.Information)
             End Try
 
         End If
@@ -2791,8 +2745,7 @@ Start_Evolutionsrunden:
                 End If
 
                 'Ergebnis-Buttons
-                Me.Button_ScatterplotSolutionSpace.Enabled = True
-                Me.Button_ScatterplotParamSpace.Enabled = True
+                Me.Button_Scatterplot.Enabled = True
                 Me.Button_loadRefResult.Enabled = True
 
                 'Start-Button deaktivieren
