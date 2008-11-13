@@ -2213,14 +2213,19 @@ Start_Evolutionsrunden:
     ''' </summary>
     Private Sub showScatterplot(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Scatterplot.Click
 
+        Cursor = Cursors.WaitCursor
+
         'gucken, welches Scatterplot noch frei ist
         If (IsNothing(Me.scatterplot1) OrElse Not Me.scatterplot1.Visible) Then
             Me.scatterplot1 = New EVO.Diagramm.Scatterplot(Me.mProblem, Sim1.OptResult, Sim1.OptResultRef)
         ElseIf (IsNothing(Me.scatterplot2) OrElse Not Me.scatterplot2.Visible) Then
             Me.scatterplot2 = New EVO.Diagramm.Scatterplot(Me.mProblem, Sim1.OptResult, Sim1.OptResultRef)
         Else
+            Cursor = Cursors.Default
             MsgBox("Es werden bereits 2 Scatterplot-Matrizen angezeigt" & eol & "Bitte zuerst eine schließen!", MsgBoxStyle.Information)
         End If
+
+        Cursor = Cursors.Default
 
     End Sub
 
@@ -2567,6 +2572,7 @@ Start_Evolutionsrunden:
 
         Dim diagresult As DialogResult
         Dim sourceFile As String
+        Dim isOK As Boolean
 
         'Datei-öffnen Dialog anzeigen
         Me.OpenFileDialog1.Filter = "Access-Datenbanken (*.mdb)|*.mdb"
@@ -2592,164 +2598,169 @@ Start_Evolutionsrunden:
 
                 'Daten einlesen
                 '==============
-                Call Sim1.OptResult.db_load(sourceFile)
+                isOK = Sim1.OptResult.db_load(sourceFile)
 
-                'Hauptdiagramm
-                '=============
+                If (isOK) Then
 
-                'Achsenzuordnung
-                '---------------
-                Me.Hauptdiagramm1.ZielIndexX = importDialog.ListBox_ZieleX.SelectedIndex
-                Me.Hauptdiagramm1.ZielIndexY = importDialog.ListBox_ZieleY.SelectedIndex
-                Me.Hauptdiagramm1.ZielIndexZ = importDialog.ListBox_ZieleZ.SelectedIndex
+                    'Hauptdiagramm
+                    '=============
 
-                'Achsen
-                '------
-                Dim Achsen As New Collection
-                Dim tmpAchse As EVO.Diagramm.Diagramm.Achse
-                tmpAchse.Automatic = True
-                If (Me.Hauptdiagramm1.ZielIndexZ = -1 And Me.Hauptdiagramm1.ZielIndexY = -1) Then
-                    'Single-objective
-                    '----------------
-                    'X-Achse
-                    tmpAchse.Title = "Simulation"
-                    Achsen.Add(tmpAchse)
-                    'Y-Achse
-                    tmpAchse.Title = Me.mProblem.List_Featurefunctions(Me.Hauptdiagramm1.ZielIndexX).Bezeichnung
-                    Achsen.Add(tmpAchse)
-                Else
-                    'Multi-objective
+                    'Achsenzuordnung
                     '---------------
-                    'X-Achse
-                    tmpAchse.Title = Me.mProblem.List_Featurefunctions(Me.Hauptdiagramm1.ZielIndexX).Bezeichnung
-                    Achsen.Add(tmpAchse)
-                    'Y-Achse
-                    tmpAchse.Title = Me.mProblem.List_Featurefunctions(Me.Hauptdiagramm1.ZielIndexY).Bezeichnung
-                    Achsen.Add(tmpAchse)
-                    If (Not Me.Hauptdiagramm1.ZielIndexZ = -1) Then
-                        'Z-Achse
-                        tmpAchse.Title = Me.mProblem.List_Featurefunctions(Me.Hauptdiagramm1.ZielIndexZ).Bezeichnung
+                    Me.Hauptdiagramm1.ZielIndexX = importDialog.ListBox_ZieleX.SelectedIndex
+                    Me.Hauptdiagramm1.ZielIndexY = importDialog.ListBox_ZieleY.SelectedIndex
+                    Me.Hauptdiagramm1.ZielIndexZ = importDialog.ListBox_ZieleZ.SelectedIndex
+
+                    'Achsen
+                    '------
+                    Dim Achsen As New Collection
+                    Dim tmpAchse As EVO.Diagramm.Diagramm.Achse
+                    tmpAchse.Automatic = True
+                    If (Me.Hauptdiagramm1.ZielIndexZ = -1 And Me.Hauptdiagramm1.ZielIndexY = -1) Then
+                        'Single-objective
+                        '----------------
+                        'X-Achse
+                        tmpAchse.Title = "Simulation"
                         Achsen.Add(tmpAchse)
+                        'Y-Achse
+                        tmpAchse.Title = Me.mProblem.List_Featurefunctions(Me.Hauptdiagramm1.ZielIndexX).Bezeichnung
+                        Achsen.Add(tmpAchse)
+                    Else
+                        'Multi-objective
+                        '---------------
+                        'X-Achse
+                        tmpAchse.Title = Me.mProblem.List_Featurefunctions(Me.Hauptdiagramm1.ZielIndexX).Bezeichnung
+                        Achsen.Add(tmpAchse)
+                        'Y-Achse
+                        tmpAchse.Title = Me.mProblem.List_Featurefunctions(Me.Hauptdiagramm1.ZielIndexY).Bezeichnung
+                        Achsen.Add(tmpAchse)
+                        If (Not Me.Hauptdiagramm1.ZielIndexZ = -1) Then
+                            'Z-Achse
+                            tmpAchse.Title = Me.mProblem.List_Featurefunctions(Me.Hauptdiagramm1.ZielIndexZ).Bezeichnung
+                            Achsen.Add(tmpAchse)
+                        End If
                     End If
-                End If
 
-                'Diagramm initialisieren
-                '-----------------------
-                Me.Hauptdiagramm1.Clear()
-                Me.Hauptdiagramm1.DiagInitialise(Path.GetFileName(sourceFile), Achsen, Me.EVO_Einstellungen1.Settings, Me.mProblem)
+                    'Diagramm initialisieren
+                    '-----------------------
+                    Me.Hauptdiagramm1.Clear()
+                    Me.Hauptdiagramm1.DiagInitialise(Path.GetFileName(sourceFile), Achsen, Me.EVO_Einstellungen1.Settings, Me.mProblem)
 
-                'IstWerte in Diagramm einzeichnen
-                Call Me.Hauptdiagramm1.ZeichneIstWerte()
+                    'IstWerte in Diagramm einzeichnen
+                    Call Me.Hauptdiagramm1.ZeichneIstWerte()
 
-                Call My.Application.DoEvents()
+                    Call My.Application.DoEvents()
 
-                'Punkte eintragen
-                '----------------
-                Dim serie As Steema.TeeChart.Styles.Series
-                Dim serie3D As Steema.TeeChart.Styles.Points3D
+                    'Punkte eintragen
+                    '----------------
+                    Dim serie As Steema.TeeChart.Styles.Series
+                    Dim serie3D As Steema.TeeChart.Styles.Points3D
 
-                'Lösungen
-                '========
-                If (importDialog.ComboBox_SekPop.SelectedItem <> "ausschließlich") Then
+                    'Lösungen
+                    '========
+                    If (importDialog.ComboBox_SekPop.SelectedItem <> "ausschließlich") Then
 
-                    For Each ind As Common.Individuum In Sim1.OptResult.Solutions
+                        For Each ind As Common.Individuum In Sim1.OptResult.Solutions
 
-                        If (Me.Hauptdiagramm1.ZielIndexZ = -1 And Me.Hauptdiagramm1.ZielIndexY = -1) Then
-                            '1D
-                            '--
-                            'Constraintverletzung prüfen
-                            If (ind.Is_Feasible) Then
-                                serie = Me.Hauptdiagramm1.getSeriesPoint("Population", "red")
+                            If (Me.Hauptdiagramm1.ZielIndexZ = -1 And Me.Hauptdiagramm1.ZielIndexY = -1) Then
+                                '1D
+                                '--
+                                'Constraintverletzung prüfen
+                                If (ind.Is_Feasible) Then
+                                    serie = Me.Hauptdiagramm1.getSeriesPoint("Population", "red")
+                                Else
+                                    serie = Me.Hauptdiagramm1.getSeriesPoint("Population (ungültig)", "Gray")
+                                End If
+                                'Zeichnen
+                                serie.Add(ind.ID, ind.Features(Me.Hauptdiagramm1.ZielIndexX), ind.ID.ToString())
+                            ElseIf (Me.Hauptdiagramm1.ZielIndexZ = -1) Then
+                                '2D
+                                '--
+                                'Constraintverletzung prüfen
+                                If (ind.Is_Feasible) Then
+                                    serie = Me.Hauptdiagramm1.getSeriesPoint("Population", "Orange")
+                                Else
+                                    serie = Me.Hauptdiagramm1.getSeriesPoint("Population (ungültig)", "Gray")
+                                End If
+                                'Zeichnen
+                                serie.Add(ind.Features(Me.Hauptdiagramm1.ZielIndexX), ind.Features(Me.Hauptdiagramm1.ZielIndexY), ind.ID.ToString())
                             Else
-                                serie = Me.Hauptdiagramm1.getSeriesPoint("Population (ungültig)", "Gray")
+                                '3D
+                                '--
+                                'Constraintverletzung prüfen
+                                If (ind.Is_Feasible) Then
+                                    serie3D = Me.Hauptdiagramm1.getSeries3DPoint("Population", "Orange")
+                                Else
+                                    serie3D = Me.Hauptdiagramm1.getSeries3DPoint("Population (ungültig)", "Gray")
+                                End If
+                                'Zeichnen
+                                serie3D.Add(ind.Features(Me.Hauptdiagramm1.ZielIndexX), ind.Features(Me.Hauptdiagramm1.ZielIndexY), ind.Features(Me.Hauptdiagramm1.ZielIndexZ), ind.ID.ToString())
                             End If
-                            'Zeichnen
-                            serie.Add(ind.ID, ind.Features(Me.Hauptdiagramm1.ZielIndexX), ind.ID.ToString())
-                        ElseIf (Me.Hauptdiagramm1.ZielIndexZ = -1) Then
-                            '2D
-                            '--
-                            'Constraintverletzung prüfen
-                            If (ind.Is_Feasible) Then
-                                serie = Me.Hauptdiagramm1.getSeriesPoint("Population", "Orange")
+
+                        Next
+
+                    End If
+
+                    Call My.Application.DoEvents()
+
+                    'Sekundärpopulation
+                    '==================
+                    If (importDialog.ComboBox_SekPop.SelectedItem <> "keine") Then
+
+                        For Each sekpopind As Common.Individuum In Sim1.OptResult.getSekPop()
+                            If (Me.Hauptdiagramm1.ZielIndexZ = -1) Then
+                                '2D
+                                '--
+                                serie = Me.Hauptdiagramm1.getSeriesPoint("Sekundäre Population", "Green")
+                                serie.Add(sekpopind.Features(Me.Hauptdiagramm1.ZielIndexX), sekpopind.Features(Me.Hauptdiagramm1.ZielIndexY), sekpopind.ID.ToString())
                             Else
-                                serie = Me.Hauptdiagramm1.getSeriesPoint("Population (ungültig)", "Gray")
+                                '3D
+                                '--
+                                serie3D = Me.Hauptdiagramm1.getSeries3DPoint("Sekundäre Population", "Green")
+                                serie3D.Add(sekpopind.Features(Me.Hauptdiagramm1.ZielIndexX), sekpopind.Features(Me.Hauptdiagramm1.ZielIndexY), sekpopind.Features(Me.Hauptdiagramm1.ZielIndexZ), sekpopind.ID.ToString())
                             End If
-                            'Zeichnen
-                            serie.Add(ind.Features(Me.Hauptdiagramm1.ZielIndexX), ind.Features(Me.Hauptdiagramm1.ZielIndexY), ind.ID.ToString())
-                        Else
-                            '3D
-                            '--
-                            'Constraintverletzung prüfen
-                            If (ind.Is_Feasible) Then
-                                serie3D = Me.Hauptdiagramm1.getSeries3DPoint("Population", "Orange")
-                            Else
-                                serie3D = Me.Hauptdiagramm1.getSeries3DPoint("Population (ungültig)", "Gray")
-                            End If
-                            'Zeichnen
-                            serie3D.Add(ind.Features(Me.Hauptdiagramm1.ZielIndexX), ind.Features(Me.Hauptdiagramm1.ZielIndexY), ind.Features(Me.Hauptdiagramm1.ZielIndexZ), ind.ID.ToString())
-                        End If
+                        Next
 
-                    Next
+                    End If
+
+                    Call My.Application.DoEvents()
+
+                    'Hypervolumen
+                    '============
+                    If (importDialog.CheckBox_Hypervol.Checked) Then
+
+                        'Hypervolumen instanzieren
+                        Dim Hypervolume As EVO.MO_Indicators.Indicators
+                        Hypervolume = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(EVO.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, Me.mProblem.NumPenalties)
+                        Dim indicator As Double
+                        Dim nadir() As Double
+
+                        'Alle Generationen durchlaufen
+                        For Each sekpop As EVO.OptResult.OptResult.Struct_SekPop In Sim1.OptResult.SekPops
+
+                            'Hypervolumen berechnen
+                            Call Hypervolume.update_dataset(Sim1.OptResult.getSekPopValues(sekpop.iGen))
+                            indicator = Math.Abs(Hypervolume.calc_indicator())
+                            nadir = Hypervolume.nadir
+
+                            'Hypervolumen zeichnen
+                            Call Me.Hauptdiagramm1.ZeichneNadirpunkt(nadir)
+                            Call Me.Monitor1.ZeichneHyperVolumen(sekpop.iGen, indicator)
+
+                            Call My.Application.DoEvents()
+
+                        Next
+
+                    End If
+
+                    'Ergebnis-Buttons
+                    Me.Button_Scatterplot.Enabled = True
+                    Me.Button_loadRefResult.Enabled = True
+
+                    'Start-Button deaktivieren
+                    Me.Button_Start.Enabled = False
 
                 End If
-
-                Call My.Application.DoEvents()
-
-                'Sekundärpopulation
-                '==================
-                If (importDialog.ComboBox_SekPop.SelectedItem <> "keine") Then
-
-                    For Each sekpopind As Common.Individuum In Sim1.OptResult.getSekPop()
-                        If (Me.Hauptdiagramm1.ZielIndexZ = -1) Then
-                            '2D
-                            '--
-                            serie = Me.Hauptdiagramm1.getSeriesPoint("Sekundäre Population", "Green")
-                            serie.Add(sekpopind.Features(Me.Hauptdiagramm1.ZielIndexX), sekpopind.Features(Me.Hauptdiagramm1.ZielIndexY), sekpopind.ID.ToString())
-                        Else
-                            '3D
-                            '--
-                            serie3D = Me.Hauptdiagramm1.getSeries3DPoint("Sekundäre Population", "Green")
-                            serie3D.Add(sekpopind.Features(Me.Hauptdiagramm1.ZielIndexX), sekpopind.Features(Me.Hauptdiagramm1.ZielIndexY), sekpopind.Features(Me.Hauptdiagramm1.ZielIndexZ), sekpopind.ID.ToString())
-                        End If
-                    Next
-
-                End If
-
-                Call My.Application.DoEvents()
-
-                'Hypervolumen
-                '============
-                If (importDialog.CheckBox_Hypervol.Checked) Then
-
-                    'Hypervolumen instanzieren
-                    Dim Hypervolume As EVO.MO_Indicators.Indicators
-                    Hypervolume = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(EVO.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, Me.mProblem.NumPenalties)
-                    Dim indicator As Double
-                    Dim nadir() As Double
-
-                    'Alle Generationen durchlaufen
-                    For Each sekpop As EVO.OptResult.OptResult.Struct_SekPop In Sim1.OptResult.SekPops
-
-                        'Hypervolumen berechnen
-                        Call Hypervolume.update_dataset(Sim1.OptResult.getSekPopValues(sekpop.iGen))
-                        indicator = Math.Abs(Hypervolume.calc_indicator())
-                        nadir = Hypervolume.nadir
-
-                        'Hypervolumen zeichnen
-                        Call Me.Hauptdiagramm1.ZeichneNadirpunkt(nadir)
-                        Call Me.Monitor1.ZeichneHyperVolumen(sekpop.iGen, indicator)
-
-                        Call My.Application.DoEvents()
-
-                    Next
-                End If
-
-                'Ergebnis-Buttons
-                Me.Button_Scatterplot.Enabled = True
-                Me.Button_loadRefResult.Enabled = True
-
-                'Start-Button deaktivieren
-                Me.Button_Start.Enabled = False
 
                 'Cursor Default
                 Cursor = Cursors.Default
@@ -2766,6 +2777,7 @@ Start_Evolutionsrunden:
 
         Dim diagresult As DialogResult
         Dim sourceFile As String
+        Dim isOK As Boolean
 
         'Datei-öffnen Dialog anzeigen
         Me.OpenFileDialog1.Filter = "Access-Datenbanken (*.mdb)|*.mdb"
@@ -2784,77 +2796,81 @@ Start_Evolutionsrunden:
             'Daten einlesen
             '==============
             Sim1.OptResultRef = New EVO.OptResult.OptResult(Me.Sim1.Datensatz, Me.mProblem, False)
-            Call Sim1.OptResultRef.db_load(sourceFile, True)
+            isOK = Sim1.OptResultRef.db_load(sourceFile)
 
-            'In Diagramm anzeigen
-            '====================
-            Dim serie As Steema.TeeChart.Styles.Points
-            Dim serie3D As Steema.TeeChart.Styles.Points3D
+            If (isOK) Then
 
-            For Each sekpopind As Common.Individuum In Sim1.OptResultRef.getSekPop()
-                If (Me.Hauptdiagramm1.ZielIndexZ = -1) Then
-                    '2D
-                    '--
-                    serie = Me.Hauptdiagramm1.getSeriesPoint("Vergleichsergebnis", "Blue")
-                    serie.Add(sekpopind.Features(Me.Hauptdiagramm1.ZielIndexX), sekpopind.Features(Me.Hauptdiagramm1.ZielIndexY), "Vergleichsergebnis " & sekpopind.ID)
-                Else
-                    '3D
-                    '--
-                    serie3D = Me.Hauptdiagramm1.getSeries3DPoint("Vergleichsergebnis", "Blue")
-                    serie3D.Add(sekpopind.Features(Me.Hauptdiagramm1.ZielIndexX), sekpopind.Features(Me.Hauptdiagramm1.ZielIndexY), sekpopind.Features(Me.Hauptdiagramm1.ZielIndexZ), sekpopind.ID & " (Vergleichsergebnis)")
+                'In Diagramm anzeigen
+                '====================
+                Dim serie As Steema.TeeChart.Styles.Points
+                Dim serie3D As Steema.TeeChart.Styles.Points3D
+
+                For Each sekpopind As Common.Individuum In Sim1.OptResultRef.getSekPop()
+                    If (Me.Hauptdiagramm1.ZielIndexZ = -1) Then
+                        '2D
+                        '--
+                        serie = Me.Hauptdiagramm1.getSeriesPoint("Vergleichsergebnis", "Blue")
+                        serie.Add(sekpopind.Features(Me.Hauptdiagramm1.ZielIndexX), sekpopind.Features(Me.Hauptdiagramm1.ZielIndexY), "Vergleichsergebnis " & sekpopind.ID)
+                    Else
+                        '3D
+                        '--
+                        serie3D = Me.Hauptdiagramm1.getSeries3DPoint("Vergleichsergebnis", "Blue")
+                        serie3D.Add(sekpopind.Features(Me.Hauptdiagramm1.ZielIndexX), sekpopind.Features(Me.Hauptdiagramm1.ZielIndexY), sekpopind.Features(Me.Hauptdiagramm1.ZielIndexZ), sekpopind.ID & " (Vergleichsergebnis)")
+                    End If
+                Next
+
+                'Hypervolumen
+                '============
+                Dim i As Integer
+                Dim sekpopvalues(,), sekpopvaluesRef(,) As Double
+                Dim HypervolumeDiff, HypervolumeRef As EVO.MO_Indicators.Hypervolume
+                Dim nadir() As Double
+                Dim minmax() As Boolean
+                Dim indicatorDiff, indicatorRef As Double
+
+                'Vorbereitungen
+                ReDim nadir(Me.mProblem.NumPenalties - 1)
+                ReDim minmax(Me.mProblem.NumPenalties - 1)
+                For i = 0 To Me.mProblem.NumPenalties - 1
+                    nadir(i) = 0
+                    minmax(i) = False
+                Next
+                sekpopvalues = Sim1.OptResult.getSekPopValues()
+                sekpopvaluesRef = Sim1.OptResultRef.getSekPopValues()
+
+                'Hypervolumendifferenz
+                '---------------------
+                If (sekpopvalues.Length > 0) Then
+
+                    'Instanzierung
+                    HypervolumeDiff = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, minmax, nadir, sekpopvalues, sekpopvaluesRef)
+
+                    'Berechnung
+                    indicatorDiff = -HypervolumeDiff.calc_indicator()
+
+                    'Nadir-Punkt holen (für spätere Verwendung bei Referenz-Hypervolumen)
+                    nadir = HypervolumeDiff.nadir
+
+                    'In Zwischenablage kopieren
+                    Call Clipboard.SetDataObject(indicatorDiff, True)
+
+                    'Anzeige in Messagebox
+                    MsgBox("Hypervolumendifferenz zum Vergleichsergebnis:" & eol _
+                            & indicatorDiff.ToString() & eol _
+                            & "(Wert wurde in die Zwischenablage kopiert)", MsgBoxStyle.Information, "Hypervolumen")
+
                 End If
-            Next
 
-            'Hypervolumen
-            '============
-            Dim i As Integer
-            Dim sekpopvalues(,), sekpopvaluesRef(,) As Double
-            Dim HypervolumeDiff, HypervolumeRef As EVO.MO_Indicators.Hypervolume
-            Dim nadir() As Double
-            Dim minmax() As Boolean
-            Dim indicatorDiff, indicatorRef As Double
-
-            'Vorbereitungen
-            ReDim nadir(Me.mProblem.NumPenalties - 1)
-            ReDim minmax(Me.mProblem.NumPenalties - 1)
-            For i = 0 To Me.mProblem.NumPenalties - 1
-                nadir(i) = 0
-                minmax(i) = False
-            Next
-            sekpopvalues = Sim1.OptResult.getSekPopValues()
-            sekpopvaluesRef = Sim1.OptResultRef.getSekPopValues()
-
-            'Hypervolumendifferenz
-            '---------------------
-            If (sekpopvalues.Length > 0) Then
-
+                'Referenz-Hypervolumen
+                '---------------------
                 'Instanzierung
-                HypervolumeDiff = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, minmax, nadir, sekpopvalues, sekpopvaluesRef)
+                HypervolumeRef = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, minmax, nadir, sekpopvaluesRef)
+                indicatorRef = -HypervolumeRef.calc_indicator()
 
-                'Berechnung
-                indicatorDiff = -HypervolumeDiff.calc_indicator()
-
-                'Nadir-Punkt holen (für spätere Verwendung bei Referenz-Hypervolumen)
-                nadir = HypervolumeDiff.nadir
-
-                'In Zwischenablage kopieren
-                Call Clipboard.SetDataObject(indicatorDiff, True)
-
-                'Anzeige in Messagebox
-                MsgBox("Hypervolumendifferenz zum Vergleichsergebnis:" & eol _
-                        & indicatorDiff.ToString() & eol _
-                        & "(Wert wurde in die Zwischenablage kopiert)", MsgBoxStyle.Information, "Hypervolumen")
+                'Im Monitor anzeigen
+                Call Me.Monitor1.ZeichneReferenzHypervolumen(indicatorRef)
 
             End If
-
-            'Referenz-Hypervolumen
-            '---------------------
-            'Instanzierung
-            HypervolumeRef = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, minmax, nadir, sekpopvaluesRef)
-            indicatorRef = -HypervolumeRef.calc_indicator()
-
-            'Im Monitor anzeigen
-            Call Me.Monitor1.ZeichneReferenzHypervolumen(indicatorRef)
 
             'Cursor Default
             Cursor = Cursors.Default
