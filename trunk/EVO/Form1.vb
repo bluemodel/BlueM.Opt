@@ -1140,7 +1140,7 @@ Partial Class Form1
 
                     'Lösung im TeeChart einzeichnen und mittleres Dn ausgeben
                     '========================================================
-                    Call Me.Hauptdiagramm1.ZeichneIndividuum(CES1.Childs(Child_Ready), 0, 0, i_gen, Child_Ready + 1, ColorManagement(ColorArray, CES1.Childs(Child_Ready)))
+                    Call Me.Hauptdiagramm1.ZeichneIndividuum(CES1.Childs(Child_Ready), 0, 0, i_gen, Child_Ready + 1, EVO.Diagramm.Diagramm.ColorManagement(ColorArray, CES1.Childs(Child_Ready)))
                     Me.Label_Dn_Wert.Text = Math.Round(CES1.Childs(Child_Ready).Get_mean_PES_Dn, 6).ToString
                     If Not CES1.Childs(Child_Ready).Get_mean_PES_Dn = -1 Then
                         Me.Monitor1.Zeichne_Dn(CES1.Childs(Child_Ready).ID, CES1.Childs(Child_Ready).Get_mean_PES_Dn)
@@ -2228,100 +2228,6 @@ Start_Evolutionsrunden:
         Cursor = Cursors.Default
 
     End Sub
-
-    'Speichert die verwendeten Farben für die bisherigen Pfade und generiert neue, falls erforderlich
-    '************************************************************************************************
-    Private Function ColorManagement(ByRef ColorArray(,) As Object, ByVal ind As Common.Individuum_CES) As Color
-        Dim i, j As Integer
-        Dim count As Integer
-        Dim Farbe As Color = Color.White
-
-        'Falls der Pfad schon vorhanden ist wird diese Farbe verwendet
-        For i = 0 To ColorArray.GetUpperBound(1)
-            count = 0
-            For j = 1 To ColorArray.GetUpperBound(0)
-                If ColorArray(j, i) = ind.Path(j - 1) Then
-                    count += 1
-                End If
-            Next
-            If count = ind.Path.GetLength(0) Then
-                Farbe = ColorArray(0, i)
-            End If
-        Next
-
-
-        'Für Farbverläufe __________________________________________________________________________________
-
-        'If ColorAray.GetLength(1) = 0 then
-        '    ReDim Preserve ColorAray(ColorAray.GetUpperBound(0), ColorAray.GetLength(1))
-        '    Farbe = Color.FromArgb(255, 0, 255, 255)
-        'ElseIf Farbe = Color.White Then
-
-        '    Farbe = ColorAray(0, ColorAray.GetUpperBound(1))
-        '    ReDim Preserve ColorAray(ColorAray.GetUpperBound(0), ColorAray.GetLength(1))
-
-        '    Dim R As Integer = Farbe.R
-        '    Dim G As Integer = Farbe.G
-        '    Dim B As Integer = Farbe.B
-
-        '    G = G - 50
-        '    If G < 0 then
-        '        G = 255
-        '        B = B - 50
-        '        If B < 100
-        '            B = 255
-        '            R = R + 50
-        '            If R > 255
-        '                Throw New Exception("Die Anzahl der farben für die verschiedenen Pfade ist erschöpft")
-        '            End If
-        '        End If
-        '    End If
-
-        '    Farbe = color.FromArgb(255, R, G, B)
-        '    ColorAray(0, ColorAray.GetUpperBound(1)) = Farbe
-
-        '    For i = 1 To ColorAray.GetUpperBound(0)
-        '        ColorAray(i, ColorAray.GetUpperBound(1)) = ind.Path(i - 1)
-        '    Next
-
-        'End If
-
-
-        'Für zufällige Farben _________________________________________________________________________________
-
-        If Farbe = Color.White Then
-            ReDim Preserve ColorArray(ColorArray.GetUpperBound(0), ColorArray.GetLength(1))
-            Dim NeueFarbe As Boolean = True
-            Dim CountFarbe As Integer = 0
-            Do
-                Randomize()
-                'Genriert Zahl zwischen
-                Farbe = Drawing.Color.FromArgb(255, CInt(Int((50 * Rnd()) + 1)) * 5, _
-                                                    CInt(Int((50 * Rnd()) + 1)) * 5, _
-                                                    CInt(Int((50 * Rnd()) + 1)) * 5)
-                For i = 0 To ColorArray.GetUpperBound(1)
-                    If Farbe = ColorArray(0, i) Then
-                        NeueFarbe = False
-                    End If
-                Next
-                CountFarbe += 1
-
-                If CountFarbe > 15000 Then
-                    Farbe = Color.White
-                    NeueFarbe = True
-                End If
-                'If CountFarbe > 15000 Then Throw New Exception("Die Anzahl der farben für die verschiedenen Pfade ist erschöpft")
-            Loop Until NeueFarbe = True
-            ColorArray(0, ColorArray.GetUpperBound(1)) = Farbe
-            For i = 1 To ColorArray.GetUpperBound(0)
-                ColorArray(i, ColorArray.GetUpperBound(1)) = ind.Path(i - 1)
-            Next
-        End If
-
-        Return Farbe
-
-    End Function
-
 
 #Region "Lösungsauswahl"
 
