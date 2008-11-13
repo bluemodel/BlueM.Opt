@@ -423,8 +423,10 @@ Public Class EVO_Einstellungen
         With Me.msettings.MetaEvo
 
             .Role = Me.Combo_MetaEvo_Role.SelectedItem
+            .OpMode = Me.Combo_MetaEvo_OpMode.SelectedItem
             .NumberGenerations = Me.Numeric_MetaEvo_Numbergenerations.Value
             .PopulationSize = Me.Numeric_MetaEvo_PopulationSize.Value
+            .HJStepsize = Me.Numeric_MetaEvo_HJStepsize.Value
             .Draw = Me.CheckBox_MetaEvo_Draw.Checked
             .Log = Me.CheckBox_MetaEvo_Log.Checked
             .MySQL_Host = Me.TextBox_MetaEvo_MySQL_Host.Text
@@ -575,8 +577,10 @@ Public Class EVO_Einstellungen
         With Me.msettings.MetaEvo
 
             Me.Combo_MetaEvo_Role.SelectedItem = .Role
+            Me.Combo_MetaEvo_OpMode.SelectedItem = .OpMode
             Me.Numeric_MetaEvo_PopulationSize.Value = .PopulationSize
             Me.Numeric_MetaEvo_Numbergenerations.Value = .NumberGenerations
+            Me.Numeric_MetaEvo_HJStepsize.Value = .HJStepsize
             Me.CheckBox_MetaEvo_Draw.Checked = .Draw
             Me.CheckBox_MetaEvo_Log.Checked = .Log
             Me.TextBox_MetaEvo_MySQL_Host.Text = .MySQL_Host
@@ -725,24 +729,37 @@ Public Class EVO_Einstellungen
     'MetaEvo: Voreinstellungen des Formulars aufgrund der Wahl der Rolle
     Private Sub Combo_Hybrid_Role_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Combo_MetaEvo_Role.SelectedIndexChanged
         If (Me.Combo_MetaEvo_Role.SelectedItem = "Single PC") Then
-            Me.GroupBox_MetaEvo_BasicOptions.Enabled = True
+            Me.Combo_MetaEvo_OpMode.Enabled = True
+            Combo_MetaEvo_OpMode_SelectedIndexChanged(sender, e)
             Me.GroupBox_MetaEvo_PerformanceOptions.Enabled = True
             Me.CheckBox_MetaEvo_Draw.Enabled = True
             Me.GroupBox_MetaEvo_MySQLOptions.Enabled = False
         ElseIf (Me.Combo_MetaEvo_Role.SelectedItem = "Network Client") Then
+            Me.Combo_MetaEvo_OpMode.Enabled = False
             Me.GroupBox_MetaEvo_BasicOptions.Enabled = False
+            Me.GroupBox_MetaEvo_LocalOptions.Enabled = False
             Me.GroupBox_MetaEvo_PerformanceOptions.Enabled = True
             Me.CheckBox_MetaEvo_Draw.Enabled = False
             Me.GroupBox_MetaEvo_MySQLOptions.Enabled = True
         ElseIf (Me.Combo_MetaEvo_Role.SelectedItem = "Network Server") Then
-            Me.GroupBox_MetaEvo_BasicOptions.Enabled = True
+            Me.Combo_MetaEvo_OpMode.Enabled = True
+            Combo_MetaEvo_OpMode_SelectedIndexChanged(sender, e)
             Me.GroupBox_MetaEvo_PerformanceOptions.Enabled = True
             Me.CheckBox_MetaEvo_Draw.Enabled = True
             Me.GroupBox_MetaEvo_MySQLOptions.Enabled = True
         End If
     End Sub
 
-    Private Sub Label10_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
-
+    Private Sub Combo_MetaEvo_OpMode_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Combo_MetaEvo_OpMode.SelectedIndexChanged
+        If (Me.Combo_MetaEvo_OpMode.SelectedItem = "Both") Then
+            Me.GroupBox_MetaEvo_BasicOptions.Enabled = True
+            Me.GroupBox_MetaEvo_LocalOptions.Enabled = True
+        ElseIf (Me.Combo_MetaEvo_OpMode.SelectedItem = "Global Optimizer") Then
+            Me.GroupBox_MetaEvo_BasicOptions.Enabled = True
+            Me.GroupBox_MetaEvo_LocalOptions.Enabled = False
+        ElseIf (Me.Combo_MetaEvo_OpMode.SelectedItem = "Local Optimizer") Then
+            Me.GroupBox_MetaEvo_BasicOptions.Enabled = False
+            Me.GroupBox_MetaEvo_LocalOptions.Enabled = True
+        End If
     End Sub
 End Class

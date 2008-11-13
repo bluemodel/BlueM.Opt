@@ -253,12 +253,16 @@ Public Class EVO_Settings
 
     Public Structure MetaEvo_Settings
 
-        Public Role As String                         'Was stellt dieser PC da: Single PC, Network Server, Network Client
+        Public Role As String                       'Was stellt dieser PC da: Single PC, Network Server, Network Client
+        Public OpMode As String                     'Optimierungen: Local Optimizer, Global Optimizer, Both
 
-        'Einstellungen für einen PC der das Problem berechnet
+        'Einstellungen für einen PC der das Problem berechnet (Global)
         Public PopulationSize As Integer            'Populationsgrösse
         Public NumberGenerations As Integer         'Anzahl der Generationen die berechnet werden
-        
+
+        'Einstellungen für einen PC der das Problem berechnet (Global)
+        Public HJStepsize As Integer                '1/x minimale Schrittweite der Optparas bei Hook&Jeeves 
+
         'Performanceeinstellungen
         Public Draw As Boolean                      'Ob die Berechnung grafisch dargestellt wird
         Public Log As Boolean                       'Ob die Logdaten angezeigt werden sollen
@@ -277,9 +281,12 @@ Public Class EVO_Settings
         '********************
         Public Sub setStandard()
             Me.Role = "Single PC"
+            Me.OpMode = "Both"
 
-            Me.PopulationSize = 5
-            Me.NumberGenerations = 10
+            Me.PopulationSize = 15
+            Me.NumberGenerations = 50
+
+            Me.HJStepsize = 50
 
             Me.Draw = True
             Me.Log = True

@@ -9,20 +9,20 @@ namespace IHWB.EVO.MetaEvo
 {
     class Algomanager
     {
+        EVO.Common.EVO_Settings settings;
         EVO.Common.Individuum_MetaEvo[] genpool;
         EVO.Common.Individuum_MetaEvo[] wastepool;
         EVO.Diagramm.ApplicationLog applog;
         public Algos algos;
         EVO.Diagramm.Hauptdiagramm hauptdiagramm;
-        string modell;
         EVO.MO_Indicators.Solutionvolume solutionvolume;
 
-        public string calculationmode = "global";  //{"global", "local", "hybrid"}
+        //public string calculationmode;  //{"global", "local", "both"}
         int noAdvantage = 0;
 
         public Algomanager(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, int individuumnumber_input, ref EVO.Diagramm.ApplicationLog applog_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input) 
         {
-            modell = settings_input.MetaEvo.Application;
+            settings = settings_input;
             hauptdiagramm = hauptdiagramm_input;
             applog = applog_input;
             //Algoobjekt initialisieren (enthält die algorithmus-Methoden und das Feedback zu jedem Algo)
@@ -53,8 +53,8 @@ namespace IHWB.EVO.MetaEvo
             Random rand = new Random();
             int difference2genpool = 0;
             applog.appendText("Algo Manager: Input: Generated and Simulated Individuums: \r\n" + this.generationinfo(ref new_generation_input));
-                
-            if ((calculationmode == "global") || (calculationmode == "hybrid"))
+
+            if ((settings.MetaEvo.OpMode == "Both") || (settings.MetaEvo.OpMode == "Global Optimizer"))
             {
                 //1.Selektion: 
                 //1.1.Sortieren nach einem zufällig gewählten Kriterium
@@ -88,28 +88,26 @@ namespace IHWB.EVO.MetaEvo
                 applog.appendText("Algo Manager: Result: New Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n"); 
                 
                 //5.Genpool zeichnen:
-                if (modell == "sim") hauptdiagramm.LöscheLetzteGeneration(1);
+                if (settings.MetaEvo.Application == "sim") hauptdiagramm.LöscheLetzteGeneration(1);
                 hauptdiagramm.ZeichneSekPopulation(genpool);
                 System.Windows.Forms.Application.DoEvents();
 
-                //6.Solutionvolume berechnen
-                if ((solutionvolume.calculate_and_decide(ref genpool)) && (calculationmode == "global"))
+                //6.Solutionvolume berechnen (Reihenfolge im IF wichtig, da immer das solutionvolume berechnet werden soll)
+                if ((solutionvolume.calculate_and_decide(ref genpool)) && (settings.MetaEvo.OpMode == "Both"))
                 {
                     set_calculationmode_local(noAdvantage, ref genpool, ref new_generation_input);
                     //MessageBox.Show("Switching to Local Optimization after " + (new_generation_input[new_generation_input.Length - 1].ID) / new_generation_input.Length + " Generations", "Algomanager");
                 }
             }
-            else if (calculationmode == "local")
+            else if (settings.MetaEvo.OpMode == "Local Optimizer")
             {
                 applog.appendText("Algo Manager: Result: New Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n"); 
 
                 //5.Genpool zeichnen:
-                if (modell == "sim") hauptdiagramm.LöscheLetzteGeneration(1);
+                if (settings.MetaEvo.Application == "sim") hauptdiagramm.LöscheLetzteGeneration(1);
                 hauptdiagramm.ZeichneSekPopulation(genpool);
                 System.Windows.Forms.Application.DoEvents();
-            }
-
-              
+            }      
         }
 
         public void new_individuals_build(ref EVO.Common.Individuum_MetaEvo[] new_generation_input)
@@ -512,7 +510,7 @@ namespace IHWB.EVO.MetaEvo
         private void set_calculationmode_local(int noAdvantage, ref EVO.Common.Individuum_MetaEvo[] genpool_input, ref EVO.Common.Individuum_MetaEvo[] new_generation_input)
         {
             applog.appendText("Algo Manager: No Advantages last " + noAdvantage + " Generations - switching to local Algorithms");
-            calculationmode = "local";
+            settings.MetaEvo.OpMode = "Local Optimizer";
 
             for (int i = 0; i < genpool_input.Length; i++)
             {

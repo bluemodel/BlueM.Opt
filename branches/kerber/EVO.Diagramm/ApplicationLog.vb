@@ -3,27 +3,30 @@
 Partial Public Class ApplicationLog
     Inherits System.Windows.Forms.Form
 
+    Dim settings As EVO.Common.EVO_Settings
     Dim starttime As DateTime
-    Public log As Boolean
 
-    Public Sub New()
+    Public Sub New(ByRef settings_input As EVO.Common.EVO_Settings)
         Call InitializeComponent()
         Me.TextBox1.Clear()
         Me.Show()
 
-        Me.log = False                      'Ob Algo-Nachrichten ausgegeben werden
+        settings = settings_input
         Me.starttime = DateTime.Now
     End Sub
 
     Public Sub appendText(ByVal text As String)
-        If Me.log Then
+        If (settings.MetaEvo.Log) Then
+            Me.Show()
             Me.TextBox1.AppendText(Format((DateTime.Now - starttime).TotalSeconds, "###,###,##0.00") + ": " + text + vbCrLf)
             System.Windows.Forms.Application.DoEvents()
+        Else
+            Me.Hide()
         End If
     End Sub
 
     Public Sub savelog()
-        If Me.log Then
+        If (settings.MetaEvo.Log) Then
             Dim sw As StreamWriter
             Dim SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog()
             Dim jetzt = DateTime.Now
@@ -42,6 +45,7 @@ Partial Public Class ApplicationLog
                 sw.Flush()
                 sw.Close()
             End If
+
         End If
     End Sub
 
@@ -53,7 +57,7 @@ Partial Public Class ApplicationLog
         'Dialog verstecken
         Call Me.Hide()
 
-        Me.log = False
+        settings.MetaEvo.Log = False
 
     End Sub
 End Class

@@ -44,9 +44,7 @@ namespace IHWB.EVO.MetaEvo
         //### Konstruktor ###
         public void init(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input, ref EVO.Common.Progress progress1_input)  
         {
-            applog = new IHWB.EVO.Diagramm.ApplicationLog();
-            if (settings_input.MetaEvo.Log) applog.log = true;
-            else applog.Hide();
+            applog = new IHWB.EVO.Diagramm.ApplicationLog(ref settings_input);
 
             //Daten einlesen
             this.prob = prob_input;
@@ -184,12 +182,14 @@ namespace IHWB.EVO.MetaEvo
                     algomanager.set_genpool(ref generation);
                     generation = new EVO.Common.Individuum_MetaEvo[this.settings.MetaEvo.ChildsPerParent*this.settings.MetaEvo.PopulationSize];
 
-                    mePC.status = "perform_global_or_hybrid";
+                    if (settings.MetaEvo.OpMode == "Both") mePC.status = "perform_both";
+                    else if (settings.MetaEvo.OpMode == "Global Optimizer") mePC.status = "perform_global";
+                    else if (settings.MetaEvo.OpMode == "Local Optimizer") mePC.status = "perform_local";
                 }
                 #endregion
                 
-                #region Zustand: perform_global_or_hybrid
-                else if (mePC.status == "perform_global_or_hybrid")
+                #region Zustand: perform_both oder perform global
+                else if ((mePC.status == "perform_both") || (mePC.status == "perform_global"))
                 {
                     //Neue Generation bauen
                     applog.appendText("Controller: ### Building new Individuums for Generation " + generationcounter + " ###");
@@ -232,8 +232,17 @@ namespace IHWB.EVO.MetaEvo
                     //Neue Individuen mit Genpool verrechnen und Genpool zeichnen
                     algomanager.new_individuals_merge_with_genpool(ref generation);
 
-                    if (algomanager.calculationmode == "local") mePC.status = "perform_local";
                     generationcounter++;
+
+                    //Falls beide Berechnungsarten genutzt werden sollen, auf Umschaltpunkt prüfen
+                    if (mePC.status == "perform_both") 
+                    {
+                        if ((settings.MetaEvo.OpMode == "Local Optimizer") || (!(generationcounter <= settings.MetaEvo.NumberGenerations)))
+                        {
+                            mePC.status = "perform_local";
+                            generationcounter--;
+                        }
+                    }
                     progress1.NextGen();
                 }
                 #endregion
@@ -242,11 +251,11 @@ namespace IHWB.EVO.MetaEvo
                 else if (mePC.status == "perform_local")
                 {
                     //Neue Generation bauen
-                    applog.appendText("Controller: ### Building new Individuums for Generation " + generationcounter + " ###");
+                    applog.appendText("Controller: ### Building new Individuums for Hook&Jeeves " + generationcounter + " ###");
                     algomanager.new_individuals_build(ref generation);
 
                     //Neue Generation Simulieren
-                    applog.appendText("Controller: Individuums for Generation " + generationcounter + ": Simulating Individuums...");
+                    applog.appendText("Controller: Individuums for Hook&Jeeves: Simulating Individuums...");
                     for (int i = 0; i < generation.Length; i++)
                     {
                         tmp = "(";
@@ -281,11 +290,14 @@ namespace IHWB.EVO.MetaEvo
                     //Neue Individuen mit Genpool verrechnen und Genpool zeichnen
                     algomanager.new_individuals_merge_with_genpool(ref generation);
 
+                    //Abbruchbedingung für lokale Optimierung
                     if (algomanager.algos.algofeedbackarray[0].number_individuals_for_nextGen == 0) generationcounter = settings.MetaEvo.NumberGenerations + 1;
                 }
                 #endregion
             }
+            progress1.iGen = progress1.NGen;
             applog.appendText("Controller: Calculation Finished");
+            MessageBox.Show("Berechnung beendet", "MetaEvo");
             applog.savelog();
         }
 
@@ -338,8 +350,16 @@ namespace IHWB.EVO.MetaEvo
                     //Von den Clients ausrechnen lassen
                     if (networkmanager.calculate_by_clients(ref generation, ref hauptdiagramm1))
                     {
-                        if (algomanager.calculationmode == "local") meServer.status = "perform_local";
-                        else generationcounter++;
+                        if (settings.MetaEvo.OpMode == "Local Optimizer")
+                        {
+                            //Abbruchbedingung für lokale Optimierung
+                            if (algomanager.algos.algofeedbackarray[0].number_individuals_for_nextGen == 0) generationcounter = settings.MetaEvo.NumberGenerations + 1;
+                        }
+                        else
+                        {
+                            progress1.NextGen();
+                            generationcounter++;
+                        }
                         meServer.set_AlsoInDB("generate Individuums", -1, -1);
                     }
                     else
@@ -348,8 +368,10 @@ namespace IHWB.EVO.MetaEvo
                     }
                 }
             }
+            progress1.iGen = progress1.NGen;
             meServer.set_AlsoInDB("finished", -1, -1);
             applog.appendText("Controller: Calculation Finished");
+            MessageBox.Show("Berechnung beendet", "MetaEvo");
         }
 
         // Network Client
@@ -414,6 +436,7 @@ namespace IHWB.EVO.MetaEvo
                 serverstatus = networkmanager.Network_ReadServer();
             }
             applog.appendText("Controller: Calculation Finished");
+            MessageBox.Show("Berechnung beendet", "MetaEvo");
         }
     }
 }

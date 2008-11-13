@@ -27,6 +27,7 @@ namespace IHWB.EVO.MetaEvo
         int individuum_id;
         int ChildsPerParent;
         int populationsize;
+        int HJ_minimumstepsize;
         EVO.Diagramm.ApplicationLog applog;
 
         public Algos(ref EVO.Common.EVO_Settings settings_input, int individuum_id_input, ref EVO.Diagramm.ApplicationLog applog_input)
@@ -35,6 +36,7 @@ namespace IHWB.EVO.MetaEvo
             applog = applog_input;
             ChildsPerParent = settings_input.MetaEvo.ChildsPerParent;
             populationsize = settings_input.MetaEvo.PopulationSize;
+            HJ_minimumstepsize = settings_input.MetaEvo.HJStepsize;
         }
 
         //Legt fest welche Algorithmen genutzt werden sollen
@@ -491,7 +493,7 @@ namespace IHWB.EVO.MetaEvo
                     {
                         numberindividuums = (int)((double)numberindividuums * ((double)genpool_input.Length / (double)new_generation_input.Length));
                         applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
-                        //Feedbackdate Pro Basis-Individuum: 0:[Gewichtungsparameter für die Zielfunktionen]1:[Tast-Schrittweiten]2:[0:Zustand,1:zu variierender optparameter,2:schon gelaufen]
+                        //Feedbackdate Pro Basis-Individuum: 0:[Gewichtungsparameter für die Zielfunktionen]1:[Tast-Schrittweiten]2:[0:Zustand,1:zu variierender optparameter,2:schon gelaufen,3:Minimumschrittweiten-Mult]
                         //Gewichtungsparameter für die Zielfunktionen [penalties]
                         //Tast-Schrittweiten [optparameter]
                         //Zustand [1]
@@ -763,7 +765,7 @@ namespace IHWB.EVO.MetaEvo
 
                                             for (int j = 0; j < numberoptparas; j++)
                                             {
-                                                if (Math.Abs(genpool_input[i].feedbackdata[1, j]) < Math.Abs(genpool_input[0].OptParameter[j].Max - genpool_input[0].OptParameter[j].Min) / 50) finished++;  
+                                                if (Math.Abs(genpool_input[i].feedbackdata[1, j]) < Math.Abs(genpool_input[0].OptParameter[j].Max - genpool_input[0].OptParameter[j].Min) / HJ_minimumstepsize) finished++;  
                                                 genpool_input[i].feedbackdata[1, j] *= 0.5;
                                                 applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Schrittweite[" + j + "] von " + genpool_input[i].feedbackdata[1, j] * 2 + " auf " + genpool_input[i].feedbackdata[1, j]);
                                             }
