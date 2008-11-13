@@ -63,7 +63,7 @@ Partial Class Form1
 
     'Dialoge
     Private WithEvents solutionDialog As SolutionDialog
-    Private WithEvents scatterplot1 As EVO.Diagramm.Scatterplot
+    Private WithEvents scatterplot1, scatterplot2 As EVO.Diagramm.Scatterplot
 
     'Diagramme
     Private WithEvents Hauptdiagramm1 As IHWB.EVO.Diagramm.Hauptdiagramm
@@ -186,7 +186,8 @@ Partial Class Form1
             'Ergebnis-Buttons
             Me.Button_saveMDB.Enabled = False
             Me.Button_openMDB.Enabled = False
-            Me.Button_Scatterplot.Enabled = False
+            Me.Button_ScatterplotSolutionSpace.Enabled = False
+            Me.Button_ScatterplotParamSpace.Enabled = False
             Me.Button_loadRefResult.Enabled = False
 
             'EVO_Settings zurücksetzen
@@ -481,7 +482,8 @@ Partial Class Form1
             'Ergebnis-Buttons deaktivieren
             Me.Button_saveMDB.Enabled = False
             Me.Button_openMDB.Enabled = False
-            Me.Button_Scatterplot.Enabled = False
+            Me.Button_ScatterplotSolutionSpace.Enabled = False
+            Me.Button_ScatterplotParamSpace.Enabled = False
 
             Select Case Me.mProblem.Method
 
@@ -724,7 +726,8 @@ Partial Class Form1
             Me.Button_openMDB.Enabled = False
             If (Not IsNothing(Sim1)) Then
                 Me.Button_saveMDB.Enabled = True
-                Me.Button_Scatterplot.Enabled = True
+                Me.Button_ScatterplotSolutionSpace.Enabled = True
+                Me.Button_ScatterplotParamSpace.Enabled = True
                 Me.Button_loadRefResult.Enabled = True
             End If
 
@@ -1147,9 +1150,9 @@ Partial Class Form1
                     End If
 
                     System.Windows.Forms.Application.DoEvents()
-                    If (Child_Ready = CES1.mSettings.CES.n_Childs - 1) Then 
-						Ready = True
-					End If
+                    If (Child_Ready = CES1.mSettings.CES.n_Childs - 1) Then
+                        Ready = True
+                    End If
 
                     Child_Ready += 1
 
@@ -2208,9 +2211,10 @@ Start_Evolutionsrunden:
 
     End Sub
 
-    'Scatterplot-Matrix anzeigen
-    '****************************
-    Private Sub showScatterplot(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Scatterplot.Click
+    ''' <summary>
+    ''' Scatterplot-Matrix des Lösungsraums anzeigen
+    ''' </summary>
+    Private Sub showScatterplotSolutionSpace(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_ScatterplotSolutionSpace.Click
 
         Dim Dialog As EVO.Diagramm.ScatterplotDialog
         Dim diagresult As DialogResult
@@ -2238,12 +2242,31 @@ Start_Evolutionsrunden:
         'Scatterplot-Matrix anzeigen
         Cursor = Cursors.WaitCursor
 
-        scatterplot1 = New EVO.Diagramm.Scatterplot(Me.mProblem, Sim1.OptResult, Sim1.OptResultRef, zielauswahl, sekpoponly, showRef)
+        scatterplot1 = New EVO.Diagramm.Scatterplot(Me.mProblem, Sim1.OptResult)
+        Call scatterplot1.ShowSolutionSpace(Sim1.OptResultRef, zielauswahl, sekpoponly, showRef)
         Call scatterplot1.Show()
 
         Cursor = Cursors.Default
 
         Call scatterplot1.BringToFront()
+
+    End Sub
+
+    ''' <summary>
+    ''' Scatterplot-Matrix des Parameter- / Entscheidungsraums anzeigen
+    ''' </summary>
+    Private Sub showScatterplotParamSpace(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_ScatterplotParamSpace.Click
+
+        'Scatterplot-Matrix anzeigen
+        Cursor = Cursors.WaitCursor
+
+        scatterplot2 = New EVO.Diagramm.Scatterplot(Me.mProblem, Sim1.OptResult)
+        Call scatterplot2.ShowParameterSpace()
+        Call scatterplot2.Show()
+
+        Cursor = Cursors.Default
+
+        Call scatterplot2.BringToFront()
 
     End Sub
 
@@ -2377,7 +2400,7 @@ Start_Evolutionsrunden:
 
     'Eine Lösung auswählen
     '*********************
-    Private Sub selectSolution(ByVal ind As Common.Individuum) Handles scatterplot1.pointSelected
+    Private Sub selectSolution(ByVal ind As Common.Individuum) Handles scatterplot1.pointSelected, scatterplot2.pointSelected
 
         Dim isOK As Boolean
 
@@ -2400,11 +2423,13 @@ Start_Evolutionsrunden:
             'Lösung im Hauptdiagramm anzeigen
             Call Me.Hauptdiagramm1.ZeichneAusgewählteLösung(ind)
 
-            'Lösung im Scatterplot anzeigen
+            'Lösung in den Scatterplots anzeigen
             If (Not IsNothing(Me.scatterplot1)) Then
                 Call Me.scatterplot1.showSelectedSolution(ind)
             End If
-
+            If (Not IsNothing(Me.scatterplot2)) Then
+                Call Me.scatterplot2.showSelectedSolution(ind)
+            End If
         End If
 
         'Lösungsdialog nach vorne bringen
@@ -2423,10 +2448,14 @@ Start_Evolutionsrunden:
         '----------------
         Call Me.Hauptdiagramm1.LöscheAusgewählteLösungen()
 
-        'In der Scatterplot-Matrix
-        '-------------------------
+        'In den Scatterplot-Matrizen
+        '---------------------------
         If (Not IsNothing(Me.scatterplot1)) Then
             Call scatterplot1.clearSelection()
+        End If
+
+        If (Not IsNothing(Me.scatterplot2)) Then
+            Call scatterplot2.clearSelection()
         End If
 
         'Auswahl intern zurücksetzen
@@ -2762,7 +2791,8 @@ Start_Evolutionsrunden:
                 End If
 
                 'Ergebnis-Buttons
-                Me.Button_Scatterplot.Enabled = True
+                Me.Button_ScatterplotSolutionSpace.Enabled = True
+                Me.Button_ScatterplotParamSpace.Enabled = True
                 Me.Button_loadRefResult.Enabled = True
 
                 'Start-Button deaktivieren
