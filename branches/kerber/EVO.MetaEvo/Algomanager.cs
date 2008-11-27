@@ -29,7 +29,7 @@ namespace IHWB.EVO.MetaEvo
             algos = new Algos(ref settings_input, individuumnumber_input, ref applog);
             algos.set_algos("Zufällige Einfache Mutation, Feedback Mutation, Ungleichverteilte Mutation, Zufällige Rekombination, Intermediäre Rekombination, Diversität aus Sortierung, Totaler Zufall, Dominanzvektor");
 
-            solutionvolume = new EVO.MO_Indicators.Solutionvolume(5, 0.01, ref applog);
+            solutionvolume = new EVO.MO_Indicators.Solutionvolume(5, 0.05, ref applog);
         }
 
         public void set_genpool(ref EVO.Common.Individuum_MetaEvo[] genpool_input) 
@@ -56,6 +56,9 @@ namespace IHWB.EVO.MetaEvo
 
             if ((settings.MetaEvo.OpMode == "Both") || (settings.MetaEvo.OpMode == "Global Optimizer"))
             {
+                //0. Vorbereitung
+                //0.1. Feasible-Status prüfen
+                set_feasible2false(ref genpool, ref new_generation_input);
                 //1.Selektion: 
                 //1.1.Sortieren nach einem zufällig gewählten Kriterium
                 int kriterium = rand.Next(0, new_generation_input[0].Penalties.Length);
@@ -95,12 +98,32 @@ namespace IHWB.EVO.MetaEvo
                 //6.Solutionvolume berechnen (Reihenfolge im IF wichtig, da immer das solutionvolume berechnet werden soll)
                 if ((solutionvolume.calculate_and_decide(ref genpool)) && (settings.MetaEvo.OpMode == "Both"))
                 {
+                    if (settings.MetaEvo.NumberResults < genpool.Length)
+                    {
+                        applog.appendText("Algo Manager: Reducing Genpool to " + settings.MetaEvo.NumberResults + " Individuums"); 
+                        //Nur noch NumberResults Individuen überleben
+                        crowding_selection((genpool.Length - settings.MetaEvo.NumberResults), ref genpool, ref new_generation_input);
+                        //Lokaler Algo darf nur NumberResults Prozesse Starten
+                        algos.algofeedbackarray[0].number_individuals_for_nextGen = settings.MetaEvo.NumberResults;
+                        //Neuen Genpool und Generation wegen Lösungsreduzierung
+                        EVO.Common.Individuum_MetaEvo[] genpool2 = new IHWB.EVO.Common.Individuum_MetaEvo[settings.MetaEvo.NumberResults];
+                        EVO.Common.Individuum_MetaEvo[] new_generation_input2 = new IHWB.EVO.Common.Individuum_MetaEvo[settings.MetaEvo.NumberResults * settings.MetaEvo.ChildsPerParent];
+                        copy_true_to(ref genpool, ref genpool2);
+                        copy_some_to(ref new_generation_input, ref new_generation_input2);
+                        genpool = genpool2;
+                        new_generation_input = new_generation_input2;
+                        applog.appendText("Algo Manager: Genpool for local Optimization: \r\n" + this.generationinfo(ref genpool) + "\r\n"); 
+                    }
                     set_calculationmode_local(noAdvantage, ref genpool, ref new_generation_input);
                     //MessageBox.Show("Switching to Local Optimization after " + (new_generation_input[new_generation_input.Length - 1].ID) / new_generation_input.Length + " Generations", "Algomanager");
                 }
             }
             else if (settings.MetaEvo.OpMode == "Local Optimizer")
             {
+                //0. Vorbereitung
+                //0.1. Feasible-Status prüfen
+                set_feasible2false(ref genpool, ref new_generation_input);
+
                 applog.appendText("Algo Manager: Result: New Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n"); 
 
                 //5.Genpool zeichnen:
@@ -116,6 +139,20 @@ namespace IHWB.EVO.MetaEvo
             algos.newGeneration(ref genpool, ref new_generation_input, ref wastepool);
         }
 
+        //Wiederbelebte Feasible-Individuen wieder auf false setzen
+        private void set_feasible2false(ref EVO.Common.Individuum_MetaEvo[] input, ref EVO.Common.Individuum_MetaEvo[] input2)
+        {
+            for (int i = 0; i < input.Length; i++)
+            {
+                if (input[i].Is_Feasible) input[i].set_status("true");
+                else input[i].set_status("false#constraints#");
+            }
+            for (int i = 0; i < input2.Length; i++)
+            {
+                if (input2[i].Is_Feasible) input2[i].set_status("true");
+                else input2[i].set_status("false#constraints#");
+            }
+        }
         //Sortieren nach einem gegebenen Penaltie(ok)
         private void quicksort(ref EVO.Common.Individuum_MetaEvo[] input, int kriterium, int low_input, int high_input)
         {
@@ -283,9 +320,6 @@ namespace IHWB.EVO.MetaEvo
             //Individuen mit höchsten Dichten entfernen
             while (killindividuums > 0)
             {
-                //string tmp;
-                //applog.appendText("Work-Array: " + this.generationinfo(ref work));
-                
                 //Dichten bestimmen lassen
                 densities = calcualte_densities(ref work);
 
@@ -379,7 +413,7 @@ namespace IHWB.EVO.MetaEvo
                 int pointer_highest_ranking = 0;
                 for (int i = 1; i < work.Length; i++)
                 {
-                    if (distances[i, 2] > distances[pointer_highest_ranking, 2]) pointer_highest_ranking = i;
+                    if ((distances[i, 2] > distances[pointer_highest_ranking, 2]) && (work[pointer_highest_ranking].get_status_reason() != "constraints")) pointer_highest_ranking = i;
                 }
                 distances[pointer_highest_ranking, 2] = -1;
                 applog.appendText("Algo Manager: Diversity: Individuum " + work[pointer_highest_ranking].ID + " is used again");
@@ -506,10 +540,30 @@ namespace IHWB.EVO.MetaEvo
              applog.appendText("Algo Manager: nemGen_composition: Individuuum-Composition for next Generation:\r\n" + log);
         }
 
+        //Kopiere true-Individuen auf neuen Genpool
+        private void copy_true_to(ref EVO.Common.Individuum_MetaEvo[] genpool_input, ref EVO.Common.Individuum_MetaEvo[] genpool_output)
+        {
+            int index = 0;
+            for (int i = 0; i < genpool_input.Length; i++)
+            {
+                if (genpool_input[i].get_status() == "true")
+                {
+                    genpool_output[index] = genpool_input[i];
+                    index++;
+                }
+            }
+        }
+        //Kopiere true-Individuen auf neuen Genpool
+        private void copy_some_to(ref EVO.Common.Individuum_MetaEvo[] newgen_input, ref EVO.Common.Individuum_MetaEvo[] newgen_output)
+        {
+            for (int i = 0; i < newgen_output.Length; i++)
+            {
+                newgen_output[i] = newgen_input[i];
+            }
+        }
         //Umschalten auf Lokale Algorithmen
         private void set_calculationmode_local(int noAdvantage, ref EVO.Common.Individuum_MetaEvo[] genpool_input, ref EVO.Common.Individuum_MetaEvo[] new_generation_input)
         {
-            applog.appendText("Algo Manager: No Advantages last " + noAdvantage + " Generations - switching to local Algorithms");
             settings.MetaEvo.OpMode = "Local Optimizer";
 
             for (int i = 0; i < genpool_input.Length; i++)
@@ -561,11 +615,11 @@ namespace IHWB.EVO.MetaEvo
             
             for (int i = 0; i < work_input.Length; i++)
             {
-                if (work_input[i].get_status() == "true")
+                if ((work_input[i] != null) && (work_input[i].get_status() == "true"))
                 {
                     for (int j = 0; j < work_input.Length; j++)
                     {
-                        if ((work_input[j].get_status() == "true") && (i != j))
+                        if ((work_input[j] != null) && (work_input[j].get_status() == "true") && (i != j))
                         {
                             tmp = calcualte_distance(work_input[i].Penalties, work_input[j].Penalties);
                             if (tmp == -1) densitys[i]++;

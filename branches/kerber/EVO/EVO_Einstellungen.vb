@@ -426,6 +426,7 @@ Public Class EVO_Einstellungen
             .OpMode = Me.Combo_MetaEvo_OpMode.SelectedItem
             .NumberGenerations = Me.Numeric_MetaEvo_Numbergenerations.Value
             .PopulationSize = Me.Numeric_MetaEvo_PopulationSize.Value
+            .Numberresults = Me.Numeric_MetaEvo_NumberResults.Value
             .HJStepsize = Me.Numeric_MetaEvo_HJStepsize.Value
             .Draw = Me.CheckBox_MetaEvo_Draw.Checked
             .Log = Me.CheckBox_MetaEvo_Log.Checked
@@ -580,6 +581,7 @@ Public Class EVO_Einstellungen
             Me.Combo_MetaEvo_OpMode.SelectedItem = .OpMode
             Me.Numeric_MetaEvo_PopulationSize.Value = .PopulationSize
             Me.Numeric_MetaEvo_Numbergenerations.Value = .NumberGenerations
+            Me.Numeric_MetaEvo_NumberResults.Value = .Numberresults
             Me.Numeric_MetaEvo_HJStepsize.Value = .HJStepsize
             Me.CheckBox_MetaEvo_Draw.Checked = .Draw
             Me.CheckBox_MetaEvo_Log.Checked = .Log

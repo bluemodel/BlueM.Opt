@@ -259,6 +259,7 @@ Public Class EVO_Settings
         'Einstellungen für einen PC der das Problem berechnet (Global)
         Public PopulationSize As Integer            'Populationsgrösse
         Public NumberGenerations As Integer         'Anzahl der Generationen die berechnet werden
+        Public NumberResults As Integer             'Anzahl der Lösungen nach der Globalen Optimierung und am Ende
 
         'Einstellungen für einen PC der das Problem berechnet (Global)
         Public HJStepsize As Integer                '1/x minimale Schrittweite der Optparas bei Hook&Jeeves 
@@ -285,6 +286,7 @@ Public Class EVO_Settings
 
             Me.PopulationSize = 15
             Me.NumberGenerations = 50
+            Me.NumberResults = 10
 
             Me.HJStepsize = 50
 

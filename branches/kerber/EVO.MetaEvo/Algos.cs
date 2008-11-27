@@ -567,7 +567,7 @@ namespace IHWB.EVO.MetaEvo
                                             genpool_input[i].feedbackdata = new double[3, Math.Max(genpool_input[0].Penalties.Length, Math.Max(numberoptparas, 3))];
                                             for (int j = 0; j < numberoptparas; j++)
                                             {
-                                                //Gewichtung berechnen
+                                                //Wichtung berechnen
                                                 genpool_input[i].feedbackdata[0, j] = 0;
                                                 if (j < numberpenalties)
                                                 {
@@ -579,8 +579,8 @@ namespace IHWB.EVO.MetaEvo
                                                     else genpool_input[i].feedbackdata[0, j] = ((weightsinfo[1, j] - genpool_input[i].Penalties[j]) / (weightsinfo[1, j] - weightsinfo[0, j])) / genpool_input[i].feedbackdata[0, j];
                                                     applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Wichtung Penalty[" + j + "]: " + genpool_input[i].feedbackdata[0, j]);
                                                 }
-                                                //Initiale Tastschrittweite
-                                                genpool_input[i].feedbackdata[1, j] = (genpool_input[i].OptParameter[j].Max - genpool_input[i].OptParameter[j].Min) / (double)numberindividuums;
+                                                //Initiale Tastschrittweite 
+                                                genpool_input[i].feedbackdata[1, j] = (genpool_input[i].OptParameter[j].Max - genpool_input[i].OptParameter[j].Min) / (double)(numberindividuums * 2);   
                                             }
                                             genpool_input[i].feedbackdata[2, 0] = 0;//Zustand [1]
                                             genpool_input[i].feedbackdata[2, 1] = 0;//zu variierender optparameter [1]
@@ -678,9 +678,9 @@ namespace IHWB.EVO.MetaEvo
                                         {
                                             if (genpool_input[i].feedbackdata[2, 1] < numberoptparas - 1)
                                             {
+                                                applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Optparameter " + (genpool_input[i].feedbackdata[2, 1]) + " von " + numberoptparas + " mit der vorgegebenen Schrittweite getestet");  
                                                 genpool_input[i].feedbackdata[2, 1]++;
                                                 nextstate = 0;
-                                                applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Optparameter " + (genpool_input[i].feedbackdata[2, 1]) + " von " + numberoptparas + " mit der vorgegebenen Schrittweite getestet");  
                                             }
                                             else
                                             {

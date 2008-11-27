@@ -1,6 +1,12 @@
 ﻿Public Class Individuum_MetaEvo
     Inherits Individuum
 
+    'Optparas: Eingabewerte
+
+    'Penalties: Ergebnisse der zu minimierenden Funktion
+    'Constraints: Ergebnisse der Randbedingungsfunktionen (Negativ = ungültiges Individuum)
+    'Features: Ergebnisse der Eigenschaftsfunktionen (nicht relevant)
+
     Private generator_id As Integer         'von welchem Algorithmus das Individuum gemacht wurde
     Private Client As String                'Welcher Rechner dieses Individuum berechnen soll [ip oder Rechnername]
     Private numberOptparas As Integer       'Anzahl der Optparas des Problems
