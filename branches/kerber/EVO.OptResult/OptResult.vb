@@ -659,39 +659,48 @@ Public Class OptResult
 
     End Sub
 
-    'Optimierungsergebnis aus einer DB lesen
-    '***************************************
-    Public Sub db_load(ByVal sourceFile As String, Optional ByVal QWerteOnly As Boolean = False)
+    ''' <summary>
+    ''' Optimierungsergebnis aus einer DB einlesen
+    ''' </summary>
+    ''' <param name="sourceFile">Pfad zur mdb-Datei</param>
+    ''' <returns>True if successful</returns>
+    ''' <remarks>
+    ''' Das Optimierungsproblem (d.h. Feature Functions, OptParameter, Constraints), 
+    ''' ebenso wie die Methode, müssen mit der DB übereinstimmen!
+    ''' </remarks>
+    Public Function db_load(ByVal sourceFile As String) As Boolean
 
-        '---------------------------------------------------------------------------
-        'Hinweise:
-        'Die EVO-Eingabedateien müssen eingelesen sein und mit der DB übereinstimmen
-        'Die aktuell ausgewählte Methode muss auch mit der DB übereinstimmen
-        '---------------------------------------------------------------------------
+        Try
 
-        'Neuen Dateipfad speichern
-        Me.db_path = sourceFile
+            'Neuen Dateipfad speichern
+            Me.db_path = sourceFile
 
-        Select Case Me.mProblem.Method
-            Case EVO.Common.METH_PES, EVO.Common.METH_HOOKJEEVES, EVO.Common.METH_SENSIPLOT, EVO.Common.METH_MetaEvo
-                Call db_getIndividuen_PES(QWerteOnly)
+            Select Case Me.mProblem.Method
+                Case EVO.Common.METH_PES, EVO.Common.METH_HOOKJEEVES, EVO.Common.METH_SENSIPLOT, EVO.Common.METH_MetaEvo
+                    Call db_getIndividuen_PES()
 
-            Case EVO.Common.METH_CES, EVO.Common.METH_HYBRID
-                Call db_getIndividuen_CES(QWerteOnly)
+                Case EVO.Common.METH_CES, EVO.Common.METH_HYBRID
+                    Call db_getIndividuen_CES()
 
-            Case Else
-                MsgBox("OptResult.dbload() für Methode '" & Me.mProblem.Method & "' noch nicht implementiert!", MsgBoxStyle.Exclamation)
-                Exit Sub
-        End Select
+                Case Else
+                    Throw New Exception("OptResult.db_load() für Methode '" & Me.mProblem.Method & "' noch nicht implementiert!")
+            End Select
 
-        'Sekundärpopulationen laden
-        Call Me.db_loadSekPops()
+            'Sekundärpopulationen laden
+            Call Me.db_loadSekPops()
 
-    End Sub
+            Return True
+
+        Catch ex As Exception
+            MsgBox("Laden des Optimierungsergebnisses fehlgeschlagen!" & EVO.Common.eol & ex.Message, MsgBoxStyle.Critical)
+            Return False
+        End Try
+
+    End Function
 
     'Alle Lösungen aus der DB als PES-Individuen einlesen
     '****************************************************
-    Private Sub db_getIndividuen_PES(Optional ByVal QWerteOnly As Boolean = False)
+    Private Sub db_getIndividuen_PES()
 
         Dim i, j As Integer
         Dim numSolutions As Integer
@@ -727,25 +736,21 @@ Public Class OptResult
                 '--
                 .ID = ds.Tables(0).Rows(i).Item("Sim.ID")
 
-                If (Not QWerteOnly) Then
+                'OptParameter
+                '------------
+                For j = 0 To Me.mProblem.NumParams - 1
+                    .OptParameter(j) = Me.mProblem.List_OptParameter_Save(j).Clone()
+                    .OptParameter(j).RWert = ds.Tables(0).Rows(i).Item(Me.mProblem.List_OptParameter_Save(j).Bezeichnung)
+                Next
 
-                    'OptParameter
-                    '------------
-                    For j = 0 To Me.mProblem.NumParams - 1
-                        .OptParameter(j) = Me.mProblem.List_OptParameter_Save(j).Clone()
-                        .OptParameter(j).RWert = ds.Tables(0).Rows(i).Item(Me.mProblem.List_OptParameter_Save(j).Bezeichnung)
-                    Next
+                'Constraints
+                '-----------
+                For j = 0 To Me.mProblem.NumConstraints - 1
+                    .Constraints(j) = ds.Tables(0).Rows(i).Item(Me.mProblem.List_Constraintfunctions(j).Bezeichnung)
+                Next
 
-                    'Constraints
-                    '-----------
-                    For j = 0 To Me.mProblem.NumConstraints - 1
-                        .Constraints(j) = ds.Tables(0).Rows(i).Item(Me.mProblem.List_Constraintfunctions(j).Bezeichnung)
-                    Next
-
-                End If
-
-                'QWerte
-                '------
+                'Features
+                '--------
                 For j = 0 To Me.mProblem.NumFeatures - 1
                     .Features(j) = ds.Tables(0).Rows(i).Item(Me.mProblem.List_Featurefunctions(j).Bezeichnung)
                 Next
@@ -758,7 +763,7 @@ Public Class OptResult
 
     'Alle Lösungen aus der DB als CES-Individuen einlesen
     '****************************************************
-    Private Sub db_getIndividuen_CES(Optional ByVal QWerteOnly As Boolean = False)
+    Private Sub db_getIndividuen_CES()
 
         Dim i, j As Integer
         Dim numSolutions As Integer
@@ -799,29 +804,25 @@ Public Class OptResult
                 '--
                 .ID = ds.Tables(0).Rows(i).Item("Sim.ID")
 
-                If (Not QWerteOnly) Then
+                'OptParameter
+                '------------
+                'TODO: OptParameter aus DB in Individuum_CES einlesen
 
-                    'OptParameter
-                    '------------
-                    'TODO: OptParameter aus DB in Individuum_CES einlesen
+                'Constraints
+                '-----------
+                For j = 0 To Me.mProblem.NumConstraints - 1
+                    .Constraints(j) = ds.Tables(0).Rows(i).Item(Me.mProblem.List_Constraintfunctions(j).Bezeichnung)
+                Next
 
-                    'Constraints
-                    '-----------
-                    For j = 0 To Me.mProblem.NumConstraints - 1
-                        .Constraints(j) = ds.Tables(0).Rows(i).Item(Me.mProblem.List_Constraintfunctions(j).Bezeichnung)
-                    Next
+                'Pfad
+                '----
+                ReDim .Measures(Me.mProblem.List_Locations.GetUpperBound(0))
+                For j = 0 To Me.mProblem.List_Locations.GetUpperBound(0)
+                    .Measures(j) = ds.Tables(0).Rows(i).Item(Me.mProblem.List_Locations(j).Name)
+                Next
 
-                    'Pfad
-                    '----
-                    ReDim .Measures(Me.mProblem.List_Locations.GetUpperBound(0))
-                    For j = 0 To Me.mProblem.List_Locations.GetUpperBound(0)
-                        .Measures(j) = ds.Tables(0).Rows(i).Item(Me.mProblem.List_Locations(j).Name)
-                    Next
-
-                End If
-
-                'QWerte
-                '------
+                'Features
+                '--------
                 For j = 0 To Me.mProblem.NumFeatures - 1
                     .Features(j) = ds.Tables(0).Rows(i).Item(Me.mProblem.List_Featurefunctions(j).Bezeichnung)
                 Next

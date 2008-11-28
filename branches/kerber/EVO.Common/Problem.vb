@@ -268,10 +268,9 @@ Public Class Problem
         'Optimierungsparameter einlesen
         If (Me.Method <> METH_CES) Then
             Call Me.Read_OPT()
+            'ModellParameter einlesen
+            Call Me.Read_MOD()
         End If
-
-        'ModellParameter einlesen
-        Call Me.Read_MOD()
 
         'Kombinatorik einlesen
         If (Me.Method = METH_HYBRID Or Me.Method = METH_CES) Then

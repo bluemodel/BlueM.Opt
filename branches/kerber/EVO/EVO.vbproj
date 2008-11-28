@@ -102,10 +102,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\EVO.Diagramm\Resources\TeeChart.dll</HintPath>
     </Reference>
-    <ProjectReference Include="..\..\EVO.MO_Indicators\MO_Indicators\EVO.MO_Indicators.csproj">
-      <Project>{A56DFA12-8680-4C7A-B6BB-406D4D3FE156}</Project>
-      <Name>EVO.MO_Indicators</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\IHA.Win\IHA.Win.vbproj">
       <Project>{7A7828C7-812B-45C0-AC5A-AE2DB74B7CD8}</Project>
       <Name>IHA.Win</Name>
@@ -122,10 +118,6 @@
       <Project>{CAA1CE91-0973-4BE7-9BD8-16B5D40BC93C}</Project>
       <Name>EVO.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\EVO.MetaEvo\EVO.MetaEvo.csproj">
-      <Project>{85403900-E545-4122-B1A0-8C30AE0D0F3C}</Project>
-      <Name>EVO.HybridAlgo</Name>
-    </ProjectReference>
     <ProjectReference Include="..\EVO.Diagramm\EVO.Diagramm.vbproj">
       <Project>{4382061B-F0DF-4D7D-9A09-306C940D19A5}</Project>
       <Name>EVO.Diagramm</Name>
@@ -137,6 +129,10 @@
     <ProjectReference Include="..\EVO.MetaEvo\EVO.MetaEvo.csproj">
       <Project>{85403900-E545-4122-B1A0-8C30AE0D0F3C}</Project>
       <Name>EVO.MetaEvo</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EVO.MO_Indicators\MO_Indicators\EVO.MO_Indicators.csproj">
+      <Project>{A56DFA12-8680-4C7A-B6BB-406D4D3FE156}</Project>
+      <Name>EVO.MO_Indicators</Name>
     </ProjectReference>
     <ProjectReference Include="..\EVO.OptResult\EVO.OptResult.vbproj">
       <Project>{A7B7B98D-94BE-47DB-954F-BBA2C1F53663}</Project>

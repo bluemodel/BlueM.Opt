@@ -165,7 +165,7 @@ Partial Class Form1
         Me.Button_Start.Location = New System.Drawing.Point(594, 662)
         Me.Button_Start.Name = "Button_Start"
         Me.Button_Start.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.Button_Start.Size = New System.Drawing.Size(112, 40)
+        Me.Button_Start.Size = New System.Drawing.Size(120, 46)
         Me.Button_Start.TabIndex = 3
         Me.Button_Start.Text = "Run"
         Me.ToolTip1.SetToolTip(Me.Button_Start, "Optimierung starten")
@@ -351,7 +351,7 @@ Partial Class Form1
         Me.GroupBox_ErgebnisDB.Controls.Add(Me.Button_Scatterplot)
         Me.GroupBox_ErgebnisDB.Location = New System.Drawing.Point(390, 658)
         Me.GroupBox_ErgebnisDB.Name = "GroupBox_ErgebnisDB"
-        Me.GroupBox_ErgebnisDB.Size = New System.Drawing.Size(131, 50)
+        Me.GroupBox_ErgebnisDB.Size = New System.Drawing.Size(133, 50)
         Me.GroupBox_ErgebnisDB.TabIndex = 14
         Me.GroupBox_ErgebnisDB.TabStop = False
         Me.GroupBox_ErgebnisDB.Text = "Ergebnis"
@@ -373,7 +373,7 @@ Partial Class Form1
         '
         Me.Info.Controls.Add(Me.Label_Dn_Wert)
         Me.Info.Controls.Add(Me.Label_Dn)
-        Me.Info.Location = New System.Drawing.Point(527, 658)
+        Me.Info.Location = New System.Drawing.Point(529, 658)
         Me.Info.Name = "Info"
         Me.Info.Size = New System.Drawing.Size(59, 50)
         Me.Info.TabIndex = 18
