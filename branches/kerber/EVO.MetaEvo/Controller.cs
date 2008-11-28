@@ -211,7 +211,7 @@ namespace IHWB.EVO.MetaEvo
                             if (this.settings.MetaEvo.Application == "testprobleme") 
                             {
                                 applog.appendText("Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   " + algomanager.algos.algofeedbackarray[generation[i].get_generator()].name); // +": Optparas: " + tmp
-                                testprobleme.Evaluierung_TestProbleme_MetaEvo(ref generation[i], 1, ref hauptdiagramm1);
+                                testprobleme.Evaluierung_TestProbleme_MetaEvo(ref generation[i], 0, ref hauptdiagramm1);
                             }
                             if (this.settings.MetaEvo.Application == "sim")
                             {
@@ -268,7 +268,7 @@ namespace IHWB.EVO.MetaEvo
                             if (this.settings.MetaEvo.Application == "testprobleme")
                             {
                                 applog.appendText("Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   " + algomanager.algos.algofeedbackarray[generation[i].get_generator()].name); // +": Optparas: " + tmp
-                                testprobleme.Evaluierung_TestProbleme_MetaEvo(ref generation[i], 1, ref hauptdiagramm1);
+                                testprobleme.Evaluierung_TestProbleme_MetaEvo(ref generation[i], 0, ref hauptdiagramm1);
                             }
                             if (this.settings.MetaEvo.Application == "sim")
                             {
@@ -398,7 +398,7 @@ namespace IHWB.EVO.MetaEvo
                     applog.appendText("Controller: Individuum " + individuumForClient.ID + " simulating...");
                     if (this.settings.MetaEvo.Application == "testprobleme")
                     {
-                        testprobleme.Evaluierung_TestProbleme_MetaEvo(ref individuumForClient, 1, ref hauptdiagramm1);
+                        testprobleme.Evaluierung_TestProbleme_MetaEvo(ref individuumForClient, 0, ref hauptdiagramm1);
                     }
                     if (this.settings.MetaEvo.Application == "sim") sim.Evaluate_MetaEvo(ref individuumForClient);
 
