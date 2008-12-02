@@ -60,7 +60,7 @@ Public Class BlueM
             exts.AddRange(New String() {"ALL", "SYS", "FKT", "KTR", "EXT", "JGG", "WGG", _
                                         "TGG", "TAL", "HYA", "TRS", "EZG", "EIN", "URB", _
                                         "VER", "RUE", "BEK", "BOA", "BOD", "LNZ", "EFL", _
-                                        "DIF", "ZRE", "BIN"})
+                                        "DIF", "ZRE", "BIN", "FKA"})
 
             Return exts
 
