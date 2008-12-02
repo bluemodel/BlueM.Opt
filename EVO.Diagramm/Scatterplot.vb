@@ -12,6 +12,7 @@
 '*******************************************************************************
 
 Imports System.Windows.Forms
+Imports System.Drawing
 
 ''' <summary>
 ''' Zeigt den Lösungs- oder Entscheidungsraum in Form einer Scatterplot-Matrix an
@@ -130,7 +131,7 @@ Partial Public Class Scatterplot
         Dim min() As Double
         Dim max() As Double
         Dim serie, serie_inv As Steema.TeeChart.Styles.Series
-        Dim colorline1 As Steema.TeeChart.Tools.ColorLine
+        Dim shape1 As Steema.TeeChart.Styles.Shape
 
         'Min und Max für Achsen bestimmen
         '--------------------------------
@@ -187,6 +188,12 @@ Partial Public Class Scatterplot
                     .Header.Visible = False
                     .Aspect.View3D = False
                     .Legend.Visible = False
+                    .BackColor = Color.White
+                    .Panel.Gradient.Visible = False
+                    .Panel.Brush.Color = Color.White
+                    .Walls.Back.Transparent = False
+                    .Walls.Back.Gradient.Visible = False
+                    .Walls.Back.Color = Color.White
 
                     'Achsen
                     '------
@@ -245,8 +252,55 @@ Partial Public Class Scatterplot
                         .Axes.Bottom.Labels.Font.Color = System.Drawing.Color.Empty
                     End If
 
-                    'Punkte eintragen
-                    '================
+                    'IstWerte eintragen
+                    '==================
+                    If (i <> j And _
+                        (Me.mProblem.List_Featurefunctions(Me.Auswahl(i)).hasIstWert Or _
+                        Me.mProblem.List_Featurefunctions(Me.Auswahl(j)).hasIstWert)) Then
+
+                        shape1 = New Steema.TeeChart.Styles.Shape(.Chart)
+                        shape1.Style = Steema.TeeChart.Styles.ShapeStyles.Rectangle
+                        shape1.Title = "Verbesserungsbereich"
+
+                        'Shape formatieren
+                        shape1.Brush.Style = Drawing2D.HatchStyle.DarkUpwardDiagonal
+                        shape1.Brush.Color = Color.Black
+                        shape1.Brush.ForegroundColor = Color.White
+                        shape1.Brush.Transparency = 75
+                        shape1.Pen.Transparency = 0
+                        shape1.Pen.Color = Color.Red
+                        shape1.Pen.Width = 1
+
+                        If (Me.mProblem.List_Featurefunctions(Me.Auswahl(i)).hasIstWert And _
+                             Me.mProblem.List_Featurefunctions(Me.Auswahl(j)).hasIstWert) Then
+                            'X- und Y-Werte:
+                            '---------------
+                            shape1.X0 = min(i) * 0.9 ^ (min(i) / Math.Abs(min(i)))
+                            shape1.X1 = Me.mProblem.List_Featurefunctions(Me.Auswahl(i)).IstWert
+                            shape1.Y0 = min(j) * 0.9 ^ (min(j) / Math.Abs(min(j)))
+                            shape1.Y1 = Me.mProblem.List_Featurefunctions(Me.Auswahl(j)).IstWert
+
+                        ElseIf (Me.mProblem.List_Featurefunctions(Me.Auswahl(i)).hasIstWert) Then
+                            'Nur X-Wert:
+                            '-----------
+                            shape1.X0 = min(i) * 0.9 ^ (min(i) / Math.Abs(min(i)))
+                            shape1.X1 = Me.mProblem.List_Featurefunctions(Me.Auswahl(i)).IstWert
+                            shape1.Y0 = min(j) * 0.9 ^ (min(j) / Math.Abs(min(j)))
+                            shape1.Y1 = max(j) * 1.1 ^ (max(j) / Math.Abs(max(j)))
+
+                        ElseIf (Me.mProblem.List_Featurefunctions(Me.Auswahl(j)).hasIstWert) Then
+                            'Nur Y-Wert:
+                            '-----------
+                            shape1.X0 = min(i) * 0.9 ^ (min(i) / Math.Abs(min(i)))
+                            shape1.X1 = max(i) * 1.1 ^ (max(i) / Math.Abs(max(i)))
+                            shape1.Y0 = min(j) * 0.9 ^ (min(j) / Math.Abs(min(j)))
+                            shape1.Y1 = Me.mProblem.List_Featurefunctions(Me.Auswahl(j)).IstWert
+                        End If
+
+                    End If
+
+                    'Lösungen eintragen
+                    '==================
                     If (Me.ShowSekPopOnly) Then
                         'Nur Sekundäre Population
                         '------------------------
@@ -271,31 +325,6 @@ Partial Public Class Scatterplot
                         Next
                     End If
 
-                    'IstWerte eintragen
-                    '==================
-                    If (Me.mProblem.List_Featurefunctions(Me.Auswahl(i)).hasIstWert) Then
-                        'X-Achse:
-                        '--------
-                        colorline1 = New Steema.TeeChart.Tools.ColorLine(.Chart)
-                        colorline1.Pen.Color = System.Drawing.Color.Red
-                        colorline1.Axis = .Axes.Bottom
-                        colorline1.AllowDrag = False
-                        colorline1.NoLimitDrag = True
-                        colorline1.Value = Me.mProblem.List_Featurefunctions(Me.Auswahl(i)).IstWert
-                    End If
-
-                    If (Me.mProblem.List_Featurefunctions(Me.Auswahl(j)).hasIstWert) Then
-                        'Y-Achse:
-                        '--------
-                        colorline1 = New Steema.TeeChart.Tools.ColorLine(.Chart)
-                        colorline1.Pen.Color = System.Drawing.Color.Red
-                        colorline1.Axis = .Axes.Left
-                        colorline1.AllowDrag = False
-                        colorline1.NoLimitDrag = True
-                        colorline1.Value = Me.mProblem.List_Featurefunctions(Me.Auswahl(j)).IstWert
-
-                    End If
-
                     'Vergleichsergebnis anzeigen
                     '===========================
                     If (Me.ShowRefResult) Then
@@ -305,13 +334,11 @@ Partial Public Class Scatterplot
                         Next
                     End If
 
-
                     'Diagramme auf der Diagonalen ausblenden
                     '=======================================
                     If (i = j) Then
                         'Hintergrund grau anzeigen
-                        .Walls.Back.Transparent = False
-                        .Walls.Back.Gradient.Visible = False
+                        .Walls.Back.Color = Color.LightGray
                         'MarksTips entfernen
                         .Tools.Clear(True)
                         'Serien unsichtbar machen
@@ -369,6 +396,12 @@ Partial Public Class Scatterplot
                     .Header.Visible = False
                     .Aspect.View3D = False
                     .Legend.Visible = False
+                    .BackColor = Color.White
+                    .Panel.Gradient.Visible = False
+                    .Panel.Brush.Color = Color.White
+                    .Walls.Back.Transparent = False
+                    .Walls.Back.Gradient.Visible = False
+                    .Walls.Back.Color = Color.White
 
                     'Achsen
                     '------
@@ -462,12 +495,16 @@ Partial Public Class Scatterplot
                         Next
                     End If
 
+                    'Startwerte der Parameter eintragen
+                    '==================================
+                    serie = .getSeriesPoint("Startwert", "Yellow", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                    serie.Add(Me.mProblem.List_OptParameter(Me.Auswahl(i)).StartWert, Me.mProblem.List_OptParameter(Me.Auswahl(j)).StartWert, "Startwert")
+
                     'Diagramme auf der Diagonalen ausblenden
                     '=======================================
                     If (i = j) Then
                         'Hintergrund grau anzeigen
-                        .Walls.Back.Transparent = False
-                        .Walls.Back.Gradient.Visible = False
+                        .Walls.Back.Color = Color.LightGray
                         'MarksTips entfernen
                         .Tools.Clear(True)
                         'Serien unsichtbar machen
