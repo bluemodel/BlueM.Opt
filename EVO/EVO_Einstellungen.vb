@@ -56,7 +56,6 @@ Public Class EVO_Einstellungen
         Call Me.msettings.PES.setStandard(EVO_MODUS.Single_Objective)
         Call Me.msettings.CES.setStandard(METH_CES)
         Call Me.msettings.HookJeeves.setStandard()
-        Call Me.msettings.DSS.setStandard()
 
     End Sub
 
@@ -110,17 +109,6 @@ Public Class EVO_Einstellungen
 
                 'Standardeinstellungen setzen
                 Call Me.setStandard_HJ()
-
-            Case METH_DSS
-
-                'EVO_Einstellungen aktivieren
-                Me.Enabled = True
-
-                'Tabpage anzeigen
-                Me.TabControl1.TabPages.Add(Me.TabPage_DSS)
-
-                'Standardeinstellungen setzen
-                Call Me.setStandard_DSS()
 
             Case METH_CES
 
@@ -428,14 +416,6 @@ Public Class EVO_Einstellungen
 
         End With
 
-        With Me.msettings.DSS
-
-            .maxiter = Me.Numeric_DSS_maxiter.Value
-            .r_val = Me.Numeric_DSS_r_val.Value
-            .optStartparameter = Me.CheckBox_DSS_ini.Checked
-
-        End With
-
     End Sub
 
     'Setzt/Aktiviert/Deaktiviert die Einstellungen auf den PES Settings
@@ -572,16 +552,6 @@ Public Class EVO_Einstellungen
 
         End With
 
-        'DSS
-        '---------------
-        With Me.msettings.DSS
-
-            Me.Numeric_DSS_maxiter.Value = .maxiter
-            Me.Numeric_DSS_r_val.Value = .r_val
-            Me.CheckBox_DSS_ini.Checked = .optStartparameter
-
-        End With
-
         Call Application.DoEvents()
 
     End Sub
@@ -636,13 +606,6 @@ Public Class EVO_Einstellungen
     '***********************************
     Public Sub setStandard_HJ()
         Call Me.msettings.HookJeeves.setStandard()
-        Call Me.writeForm()
-    End Sub
-
-    'Standardeinstellungen setzen für DSS
-    '***********************************
-    Public Sub setStandard_DSS()
-        Call Me.msettings.DSS.setStandard()
         Call Me.writeForm()
     End Sub
 
