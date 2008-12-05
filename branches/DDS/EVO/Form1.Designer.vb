@@ -86,7 +86,7 @@ Partial Class Form1
         MenuStrip1.Location = New System.Drawing.Point(0, 0)
         MenuStrip1.Name = "MenuStrip1"
         MenuStrip1.RightToLeft = System.Windows.Forms.RightToLeft.No
-        MenuStrip1.Size = New System.Drawing.Size(718, 24)
+        MenuStrip1.Size = New System.Drawing.Size(701, 24)
         MenuStrip1.TabIndex = 15
         MenuStrip1.Text = "MenuStrip1"
         '
@@ -101,18 +101,18 @@ Partial Class Form1
         '
         Me.MenuItem_DatensatzZurücksetzen.Enabled = False
         Me.MenuItem_DatensatzZurücksetzen.Name = "MenuItem_DatensatzZurücksetzen"
-        Me.MenuItem_DatensatzZurücksetzen.Size = New System.Drawing.Size(200, 22)
+        Me.MenuItem_DatensatzZurücksetzen.Size = New System.Drawing.Size(189, 22)
         Me.MenuItem_DatensatzZurücksetzen.Text = "Datensatz zurücksetzen"
         '
         'ToolStripSeparator1
         '
         ToolStripSeparator1.Name = "ToolStripSeparator1"
-        ToolStripSeparator1.Size = New System.Drawing.Size(197, 6)
+        ToolStripSeparator1.Size = New System.Drawing.Size(186, 6)
         '
         'MenuItem_Optionen
         '
         Me.MenuItem_Optionen.Name = "MenuItem_Optionen"
-        Me.MenuItem_Optionen.Size = New System.Drawing.Size(200, 22)
+        Me.MenuItem_Optionen.Size = New System.Drawing.Size(189, 22)
         Me.MenuItem_Optionen.Text = "Optionen..."
         '
         'MenuItem_Ansicht
@@ -128,7 +128,7 @@ Partial Class Form1
         Me.MenuItem_MonitorAnzeigen.CheckOnClick = True
         Me.MenuItem_MonitorAnzeigen.CheckState = System.Windows.Forms.CheckState.Checked
         Me.MenuItem_MonitorAnzeigen.Name = "MenuItem_MonitorAnzeigen"
-        Me.MenuItem_MonitorAnzeigen.Size = New System.Drawing.Size(167, 22)
+        Me.MenuItem_MonitorAnzeigen.Size = New System.Drawing.Size(156, 22)
         Me.MenuItem_MonitorAnzeigen.Text = "Monitor anzeigen"
         '
         'MenuItem_Hilfe
@@ -141,18 +141,18 @@ Partial Class Form1
         'MenuItem_Wiki
         '
         Me.MenuItem_Wiki.Name = "MenuItem_Wiki"
-        Me.MenuItem_Wiki.Size = New System.Drawing.Size(172, 22)
+        Me.MenuItem_Wiki.Size = New System.Drawing.Size(161, 22)
         Me.MenuItem_Wiki.Text = "Wiki"
         '
         'ToolStripSeparator2
         '
         ToolStripSeparator2.Name = "ToolStripSeparator2"
-        ToolStripSeparator2.Size = New System.Drawing.Size(169, 6)
+        ToolStripSeparator2.Size = New System.Drawing.Size(158, 6)
         '
         'MenuItem_About
         '
         Me.MenuItem_About.Name = "MenuItem_About"
-        Me.MenuItem_About.Size = New System.Drawing.Size(172, 22)
+        Me.MenuItem_About.Size = New System.Drawing.Size(161, 22)
         Me.MenuItem_About.Text = "About EVO.NET..."
         '
         'Button_Start
@@ -165,7 +165,7 @@ Partial Class Form1
         Me.Button_Start.Location = New System.Drawing.Point(594, 662)
         Me.Button_Start.Name = "Button_Start"
         Me.Button_Start.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.Button_Start.Size = New System.Drawing.Size(120, 46)
+        Me.Button_Start.Size = New System.Drawing.Size(112, 40)
         Me.Button_Start.TabIndex = 3
         Me.Button_Start.Text = "Run"
         Me.ToolTip1.SetToolTip(Me.Button_Start, "Optimierung starten")
@@ -351,7 +351,7 @@ Partial Class Form1
         Me.GroupBox_ErgebnisDB.Controls.Add(Me.Button_Scatterplot)
         Me.GroupBox_ErgebnisDB.Location = New System.Drawing.Point(390, 658)
         Me.GroupBox_ErgebnisDB.Name = "GroupBox_ErgebnisDB"
-        Me.GroupBox_ErgebnisDB.Size = New System.Drawing.Size(133, 50)
+        Me.GroupBox_ErgebnisDB.Size = New System.Drawing.Size(131, 50)
         Me.GroupBox_ErgebnisDB.TabIndex = 14
         Me.GroupBox_ErgebnisDB.TabStop = False
         Me.GroupBox_ErgebnisDB.Text = "Ergebnis"
@@ -373,7 +373,7 @@ Partial Class Form1
         '
         Me.Info.Controls.Add(Me.Label_Dn_Wert)
         Me.Info.Controls.Add(Me.Label_Dn)
-        Me.Info.Location = New System.Drawing.Point(529, 658)
+        Me.Info.Location = New System.Drawing.Point(527, 658)
         Me.Info.Name = "Info"
         Me.Info.Size = New System.Drawing.Size(59, 50)
         Me.Info.TabIndex = 18
@@ -440,7 +440,7 @@ Partial Class Form1
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.AutoScroll = True
         Me.BackColor = System.Drawing.SystemColors.Control
-        Me.ClientSize = New System.Drawing.Size(718, 792)
+        Me.ClientSize = New System.Drawing.Size(718, 746)
         Me.Controls.Add(Me.Info)
         Me.Controls.Add(Me.Hauptdiagramm1)
         Me.Controls.Add(Me.GroupBox_TChartButtons)

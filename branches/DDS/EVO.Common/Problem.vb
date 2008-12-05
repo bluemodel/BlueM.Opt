@@ -87,33 +87,17 @@ Public Class Problem
     '##########
 
     ''' <summary>
-    ''' Arbeitsverzeichnis
-    ''' </summary>
-    ''' <remarks>nur bei Sim-Anwendungen relevant</remarks>
-    Public Property WorkDir() As String
-        Get
-            Return Me.mWorkDir
-        End Get
-        Set(ByVal value As String)
-            Me.mWorkDir = value
-        End Set
-    End Property
-
-    ''' <summary>
     ''' Name des zu optimierenden Datensatzes
     ''' </summary>
     ''' <remarks>nur bei Sim-Anwendungen relevant</remarks>
-    Public Property Datensatz() As String
+    Public ReadOnly Property Datensatz() As String
         Get
             Return Me.mDatensatz
         End Get
-        Set(ByVal value As String)
-            Me.mDatensatz = value
-        End Set
     End Property
 
     ''' <summary>
-    ''' Name der verwendeten Optimierungsmethode
+    ''' Name der verwendeten Optimieurungsmethode
     ''' </summary>
     Public ReadOnly Property Method() As String
         Get
@@ -232,11 +216,17 @@ Public Class Problem
     ''' <summary>
     ''' Konstruktor
     ''' </summary>
-    ''' <param name="Method">zu verwendende Methode</param>
-    Public Sub New(ByVal Method As String)
+    ''' <param name="method">Zu verwendende Methode</param>
+    ''' <param name="workdir">Pfad zum Datensatz-Verzeichnis</param>
+    ''' <param name="datensatz">Name des Datensatzes</param>
+    Public Sub New(ByVal method As String, ByVal workdir As String, ByVal datensatz As String)
 
         'Methode setzen
-        Me.mMethod = Method
+        Me.mMethod = method
+
+        'Pfad und Datensatz speichern
+        Me.mWorkDir = workdir
+        Me.mDatensatz = datensatz
 
         'Datenstrukturen initialisieren
         ReDim Me.List_Featurefunctions(-1)
@@ -268,9 +258,10 @@ Public Class Problem
         'Optimierungsparameter einlesen
         If (Me.Method <> METH_CES) Then
             Call Me.Read_OPT()
-            'ModellParameter einlesen
-            Call Me.Read_MOD()
         End If
+
+        'ModellParameter einlesen
+        Call Me.Read_MOD()
 
         'Kombinatorik einlesen
         If (Me.Method = METH_HYBRID Or Me.Method = METH_CES) Then

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{2DCFE99E-CBFE-4CCC-93E7-A6D628B16DEC}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -22,7 +22,7 @@
     <DebugType>full</DebugType>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\bin\Debug\</OutputPath>
     <DocumentationFile>EVO.Apps.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
@@ -86,7 +86,7 @@
     <Compile Include="Sim.vb" />
     <Compile Include="SMUSI\Smusi.vb" />
     <Compile Include="SWMM\SWMM.vb" />
-    <Compile Include="SWMM\Swmm_Iface.vb" />
+    <Compile Include="SWMM\SWMMThread.vb" />
     <Compile Include="S_CAN\Scan.vb" />
     <Compile Include="Testprobleme\Testprobleme.vb" />
     <Compile Include="TSP.vb" />
@@ -111,32 +111,29 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="BlueM\BlueM.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
+    <EmbeddedResource Include="BlueM\BlueM.dll" />
+    <EmbeddedResource Include="licenses.licx" />
     <EmbeddedResource Include="SensiPlot.resx">
       <DependentUpon>SensiPlot.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="BlueM\IHWB.BlueM.DllAdapter.dll" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="SMUSI\IHWB.SMUSI.DllAdapter.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="SMUSI\smusi.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="SWMM\SWMM5.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\IHA.Win\IHA.Win.vbproj">
+    <ProjectReference Include="..\..\IHA\IHA.Win.vbproj">
       <Project>{7A7828C7-812B-45C0-AC5A-AE2DB74B7CD8}</Project>
       <Name>IHA.Win</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SWMM.DLLAdapter\IHWB.SWMM.DllAdapter\IHWB.SWMM.DllAdapter.csproj">
+      <Project>{C7F2B930-7743-44B5-B22A-8332DD05ED6B}</Project>
+      <Name>IHWB.SWMM.DllAdapter</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Wave\Wave.vbproj">
       <Project>{BCD1BBE3-5AB2-4C3F-AC12-43EB977C6F6F}</Project>

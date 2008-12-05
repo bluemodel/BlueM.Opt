@@ -7,7 +7,7 @@ Public Module Constants
     '*******************************************************************************
     '**** Modul mit Konstanten                                                  ****
     '****                                                                       ****
-    '**** Autoren: Felix Fröhlich, Christoph Hübner                             ****
+    '**** Autoren: Felix Fröhlich, Christoph Hübner, Dirk Muschalla                            ****
     '****                                                                       ****
     '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
     '**** TU Darmstadt                                                          ****
@@ -24,12 +24,7 @@ Public Module Constants
     Public Const METH_SENSIPLOT As String = "SensiPlot"
     Public Const METH_HOOKJEEVES As String = "Hooke & Jeeves"
     Public Const METH_Hybrid2008 As String = "Hybrid2008"
-
-    'Lösungs- / Entscheidungsraum
-    Public Enum SPACE As Integer
-        DecisionSpace = 0
-        SolutionSpace = 1
-    End Enum
+    Public Const METH_DSS As String = "DSS"
 
     'Option für Startvorgabe für Optimierung
     Public Enum EVO_STARTPARAMETER As Integer
