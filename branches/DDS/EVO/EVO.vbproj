@@ -102,10 +102,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\EVO.Diagramm\Resources\TeeChart.dll</HintPath>
     </Reference>
-    <ProjectReference Include="..\..\DDS\DDS_C_Sharp\DDS_C_Sharp.csproj">
-      <Project>{9FA5A4C7-3AA9-420C-9F01-9F1683E36A79}</Project>
-      <Name>DDS_C_Sharp</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\EVO.MO_Indicators\MO_Indicators\EVO.MO_Indicators.csproj">
       <Project>{A56DFA12-8680-4C7A-B6BB-406D4D3FE156}</Project>
       <Name>EVO.MO_Indicators</Name>
