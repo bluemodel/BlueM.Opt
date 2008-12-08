@@ -61,6 +61,7 @@ Public MustInherit Class Sim
 
     'Ergebnisspeicher
     '----------------
+    Private mStoreIndividuals As Boolean
     Public OptResult As EVO.OptResult.OptResult             'Optimierungsergebnis
     Public OptResultRef As EVO.OptResult.OptResult          'Vergleichsergebnis
 
@@ -69,6 +70,23 @@ Public MustInherit Class Sim
 
 #End Region 'Eigenschaften
 
+#Region "Properties"
+
+    ''' <summary>
+    ''' Gibt an, ob evaluierte Individuen abgespeichert werden sollen
+    ''' </summary>
+    ''' <remarks>standardmässig True</remarks>
+    Public Property StoreIndividuals() As Boolean
+        Get
+            Return Me.mStoreIndividuals
+        End Get
+        Set(ByVal value As Boolean)
+            Me.mStoreIndividuals = value
+        End Set
+    End Property
+
+#End Region 'Properties
+
 #Region "Methoden"
 
     'Methoden
@@ -76,17 +94,23 @@ Public MustInherit Class Sim
 
 #Region "Initialisierung"
 
-    'Konstruktor
-    '***********
+    ''' <summary>
+    ''' Konstruktor
+    ''' </summary>
     Public Sub New()
 
         'Simulationsergebnis instanzieren
         Me.SimErgebnis = New Collection()
 
+        'Standardmässig OptResult verwenden
+        Me.mStoreIndividuals = True
+
     End Sub
 
-    'Pfad zum Datensatz verarbeiten und speichern
-    '********************************************
+    ''' <summary>
+    ''' Pfad zum Datensatz verarbeiten und speichern
+    ''' </summary>
+    ''' <param name="pfad">Der Pfad</param>
     Public Sub setDatensatz(ByVal pfad As String)
 
         If (File.Exists(pfad)) Then
@@ -104,6 +128,10 @@ Public MustInherit Class Sim
 
     End Sub
 
+    ''' <summary>
+    ''' Das Problem übergeben
+    ''' </summary>
+    ''' <param name="prob">Das Problem</param>
     Public Overridable Sub setProblem(ByRef prob As EVO.Common.Problem)
 
         'Problem speichern
@@ -141,12 +169,16 @@ Public MustInherit Class Sim
         Next
 
         'Ergebnisspeicher initialisieren
-        Me.OptResult = New EVO.OptResult.OptResult(Me.Datensatz, Me.mProblem)
+        If (Me.StoreIndividuals) Then
+            Me.OptResult = New EVO.OptResult.OptResult(Me.Datensatz, Me.mProblem)
+        End If
 
     End Sub
 
-    'Einstellungen setzen
-    '********************
+    ''' <summary>
+    ''' Einstellungen setzen
+    ''' </summary>
+    ''' <param name="settings">Die Einstellungen</param>
     Public Sub setSettings(ByRef settings As EVO.Common.EVO_Settings)
 
         'Settings speichern
@@ -427,8 +459,8 @@ Public MustInherit Class Sim
             ind.Constraints(i) = CalculateConstraint(Me.mProblem.List_Constraintfunctions(i))
         Next
 
-        If (storeInDB) Then
-            'Lösung im OptResult abspeichern (und zu DB hinzufügen)
+        'Lösung im OptResult abspeichern (und zu DB hinzufügen)
+        If (Me.StoreIndividuals And storeInDB) Then
             Call Me.OptResult.addSolution(ind)
         End If
 
@@ -530,7 +562,6 @@ Handler:
 
             ElseIf (WertStr.Length < AnzZeichen - 1) Then
                 'Runden auf verfügbare Stellen: Anzahl der Stellen - Anzahl der Vorkommastellen - Komma
-
                 WertStr = Convert.ToString(Math.Round(Me.Akt.ModPara(i), AnzZeichen - WertStr.Length - 1), Common.Provider.FortranProvider)
                 If (Not WertStr.Contains(".")) Then
                     WertStr += "."
@@ -1053,5 +1084,4 @@ Handler:
 #End Region  'Multithreading
 
 #End Region 'Methoden
-
 End Class

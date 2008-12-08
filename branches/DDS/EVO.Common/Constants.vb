@@ -26,6 +26,12 @@ Public Module Constants
     Public Const METH_Hybrid2008 As String = "Hybrid2008"
     Public Const METH_DSS As String = "DSS"
 
+    'Lösungs- / Entscheidungsraum
+    Public Enum SPACE As Integer
+        DecisionSpace = 0
+        SolutionSpace = 1
+    End Enum
+
     'Option für Startvorgabe für Optimierung
     Public Enum EVO_STARTPARAMETER As Integer
         Zufall = 1

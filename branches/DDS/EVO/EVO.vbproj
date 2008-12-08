@@ -114,6 +114,10 @@
       <Project>{BCD1BBE3-5AB2-4C3F-AC12-43EB977C6F6F}</Project>
       <Name>Wave</Name>
     </ProjectReference>
+    <ProjectReference Include="..\EVO.Algos\DDS\DDS_C_Sharp.csproj">
+      <Project>{9FA5A4C7-3AA9-420C-9F01-9F1683E36A79}</Project>
+      <Name>DDS_C_Sharp</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EVO.Apps\EVO.Apps.vbproj">
       <Project>{2DCFE99E-CBFE-4CCC-93E7-A6D628B16DEC}</Project>
       <Name>EVO.Apps</Name>
