@@ -359,7 +359,7 @@ Public MustInherit Class Sim
         '----------------------
         Select Case Me.mProblem.Method
 
-            Case EVO.Common.METH_PES, EVO.Common.METH_SENSIPLOT, EVO.Common.METH_HOOKJEEVES
+            Case EVO.Common.METH_PES, EVO.Common.METH_SENSIPLOT, EVO.Common.METH_HOOKJEEVES, EVO.Common.METH_DSS
 
                 'Bereitet das Sim für PES vor
                 Call Me.PREPARE_Evaluation_PES(ind.OptParameter)
@@ -563,6 +563,11 @@ Handler:
             ElseIf (WertStr.Length < AnzZeichen - 1) Then
                 'Runden auf verfügbare Stellen: Anzahl der Stellen - Anzahl der Vorkommastellen - Komma
                 WertStr = Convert.ToString(Math.Round(Me.Akt.ModPara(i), AnzZeichen - WertStr.Length - 1), Common.Provider.FortranProvider)
+                'TODO: wozu der Punkt im Folgenden?
+				'If (Not WertStr.Contains(".")) Then
+                '    WertStr += "."
+                'End If
+
 
             Else
                 'Ganzzahligen Wert benutzen

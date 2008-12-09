@@ -98,7 +98,7 @@
     <Reference Include="System.Xml">
       <Name>System.XML</Name>
     </Reference>
-    <Reference Include="TeeChart, Version=3.5.3188.18562, Culture=neutral, PublicKeyToken=9c8126276c77bdb7, processorArchitecture=MSIL">
+    <Reference Include="TeeChart, Version=3.5.3146.24806, Culture=neutral, PublicKeyToken=9c8126276c77bdb7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\EVO.Diagramm\Resources\TeeChart.dll</HintPath>
     </Reference>
@@ -109,6 +109,10 @@
     <ProjectReference Include="..\..\Wave\Wave.vbproj">
       <Project>{BCD1BBE3-5AB2-4C3F-AC12-43EB977C6F6F}</Project>
       <Name>Wave</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EVO.Algos\DDS\DDS_C_Sharp.csproj">
+      <Project>{9FA5A4C7-3AA9-420C-9F01-9F1683E36A79}</Project>
+      <Name>DDS_C_Sharp</Name>
     </ProjectReference>
     <ProjectReference Include="..\EVO.Apps\EVO.Apps.vbproj">
       <Project>{2DCFE99E-CBFE-4CCC-93E7-A6D628B16DEC}</Project>
