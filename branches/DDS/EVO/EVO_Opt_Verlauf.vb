@@ -1,88 +1,101 @@
+'*******************************************************************************
+'*******************************************************************************
+'**** Klasse EVO_Opt_Verlauf                                                ****
+'****                                                                       ****
+'**** Autoren: Christoph Hübner, Felix Fröhlich, Dirk Muschalla             ****
+'****                                                                       ****
+'**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
+'**** TU Darmstadt                                                          ****
+'*******************************************************************************
+'*******************************************************************************
+
+''' <summary>
+''' Ein Benutzersteuerelement, dass den in einem Progress-Objekt 
+''' abgebildeten Optimierungsverlauf in GUI-Form wiedergibt
+''' </summary>
 Partial Public Class EVO_Opt_Verlauf
     Inherits System.Windows.Forms.UserControl
 
-    '*******************************************************************************
-    '*******************************************************************************
-    '**** Klasse EVO_Opt_Verlauf                                                ****
-    '****                                                                       ****
-    '**** Autoren: Christoph Hübner, Felix Fröhlich, Dirk Muschalla             ****
-    '****                                                                       ****
-    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
-    '**** TU Darmstadt                                                          ****
-    '****                                                                       ****
-    '**** November 2007                                                         ****
-    '****                                                                       ****
-    '**** Letzte Änderung: November 2007                                        ****
-    '*******************************************************************************
-    '*******************************************************************************
+    Private WithEvents mProgress As EVO.Common.Progress
 
-    Private NRunden As Short
-    Private NPopul As Short
-    Private NGen As Short
-    Private NNachf As Short
+    ''' <summary>
+    ''' EVO_Opt_Verlauf initialisieren
+    ''' </summary>
+    ''' <param name="progress">Übergabe des Progress-Objekts</param>
+    ''' <remarks>Braucht nur ein einziges Mal aufgerufen zu werden</remarks>
+    Public Sub Initialisieren(ByRef progress As EVO.Common.Progress)
 
-    '********************************************************************
-    'Schnittstelle
-    '********************************************************************
+        'Progress-Objekt speichern
+        Me.mProgress = progress
 
-    'Initialisieren
-    '**************
-    Public Sub Initialisieren(ByVal NRunden As Integer, ByVal NPopul As Integer, ByVal NGen As Integer, ByVal NNachf As Integer)
+        'Zurücksetzen
+        Call Me.Reset()
 
-        Me.NRunden = NRunden
-        Me.NPopul = NPopul
-        Me.NGen = NGen
-        Me.NNachf = NNachf
+    End Sub
 
-        LabelAnzRunden.Text = Me.NRunden
-        LabelAnzPop.Text = Me.NPopul
-        LabelAnzGen.Text = Me.NGen
-        LabelAnzNachf.Text = Me.NNachf
+    Private Sub Reset() Handles mProgress.Initialized
+
+        'Anzeige initialisieren
+        LabelAnzRunden.Text = Me.mProgress.NRunden
+        LabelaktRunde.Text = Me.mProgress.iRunde
 
         ProgressBarRunde.Minimum = 0
-        ProgressBarRunde.Maximum = Me.NRunden
-        ProgressBarRunde.Value = 0
+        ProgressBarRunde.Maximum = Me.mProgress.NRunden
+        ProgressBarRunde.Value = Me.mProgress.iRunde
+
+        LabelAnzPop.Text = Me.mProgress.NPopul
+        LabelaktPop.Text = Me.mProgress.iPopul
 
         ProgressBarPop.Minimum = 0
-        ProgressBarPop.Maximum = Me.NPopul
-        ProgressBarPop.Value = 0
+        ProgressBarPop.Maximum = Me.mProgress.NPopul
+        ProgressBarPop.Value = Me.mProgress.iPopul
+
+        LabelAnzGen.Text = Me.mProgress.NGen
+        LabelaktGen.Text = Me.mProgress.iGen
 
         ProgressBarGen.Minimum = 0
-        ProgressBarGen.Maximum = Me.NGen
-        ProgressBarGen.Value = 0
+        ProgressBarGen.Maximum = Me.mProgress.NGen
+        ProgressBarGen.Value = Me.mProgress.iGen
+
+        LabelAnzNachf.Text = Me.mProgress.NNachf
+        LabelaktNachf.Text = Me.mProgress.iNachf
 
         ProgressBarNach.Minimum = 0
-        ProgressBarNach.Maximum = Me.NNachf
-        ProgressBarNach.Value = 0
+        ProgressBarNach.Maximum = Me.mProgress.NNachf
+        ProgressBarNach.Value = Me.mProgress.iNachf
 
     End Sub
 
-    Public Sub Runden(ByVal NRunden As Short)
-        Me.NRunden = NRunden
-        ProgressBarRunde.Value = Me.NRunden
-        LabelaktRunde.Text = Me.NRunden.ToString()
+    Private Sub ShowiRunde() Handles mProgress.iRundeChanged
+
+        ProgressBarRunde.Value = Me.mProgress.iRunde
+        LabelaktRunde.Text = Me.mProgress.iRunde.ToString()
         System.Windows.Forms.Application.DoEvents()
+
     End Sub
 
-    Public Sub Population(ByVal NPopul As Short)
-        Me.NPopul = NPopul
-        ProgressBarPop.Value = Me.NPopul
-        LabelaktPop.Text = Me.NPopul.ToString()
+    Private Sub ShowIPopulation() Handles mProgress.iPopulChanged
+
+        ProgressBarPop.Value = Me.mProgress.iPopul
+        LabelaktPop.Text = Me.mProgress.iPopul.ToString()
         System.Windows.Forms.Application.DoEvents()
+
     End Sub
 
-    Public Sub Generation(ByVal NGen As Short)
-        Me.NGen = NGen
-        ProgressBarGen.Value = Me.NGen
-        LabelaktGen.Text = Me.NGen.ToString()
+    Private Sub ShowIGeneration() Handles mProgress.iGenChanged
+
+        ProgressBarGen.Value = Me.mProgress.iGen
+        LabelaktGen.Text = Me.mProgress.iGen.ToString()
         System.Windows.Forms.Application.DoEvents()
+
     End Sub
 
-    Public Sub Nachfolger(ByVal NNachf As Short)
-        Me.NNachf = NNachf
-        ProgressBarNach.Value = Me.NNachf
-        LabelaktNachf.Text = Me.NNachf.ToString()
+    Private Sub ShowINachfahre() Handles mProgress.iNachfChanged
+
+        ProgressBarNach.Value = Me.mProgress.iNachf
+        LabelaktNachf.Text = Me.mProgress.iNachf.ToString()
         System.Windows.Forms.Application.DoEvents()
+
     End Sub
 
 End Class

@@ -446,7 +446,7 @@ Partial Class Form1
                 Case Else '(Alle Sim-Anwendungen)
 
                     'Datensatz setzen
-                    'Call Sim1.setDatensatz(Me.ComboBox_Datensatz.SelectedItem)
+                    Call Sim1.setDatensatz(Me.ComboBox_Datensatz.SelectedItem)
 
                     'Tooltip anzeigen
                     Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, Me.ComboBox_Datensatz.SelectedItem)
@@ -1457,6 +1457,7 @@ Partial Class Form1
             End If
         Next
     End Sub
+
     Private Sub STARTEN_DSS()
 
         '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -1601,6 +1602,7 @@ Partial Class Form1
         '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     End Sub
+
     'Anwendung des Verfahrens von Hook und Jeeves zur Parameteroptimierung
     '*********************************************************************
     Private Sub STARTEN_HookJeeves()
@@ -2014,7 +2016,10 @@ Start_Evolutionsrunden:
                                 End If
 
                             Loop While Ready = False
+
                         Else
+							'Ohne Multithreading
+							'===================
                             Sim1.WorkDir_Current = Sim1.getThreadWorkDir(0)
                             Dim Child_Run As Integer = 0
                             For i = 0 To EVO_Einstellungen1.Settings.PES.n_Nachf - 1

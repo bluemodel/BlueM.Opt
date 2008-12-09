@@ -1,5 +1,0 @@
-C:\Documents and Settings\dmuschalla\My Documents\ihwb\develop\bin\Debug\DDS_C_Sharp.dll
-C:\Documents and Settings\dmuschalla\My Documents\ihwb\develop\bin\Debug\DDS_C_Sharp.pdb
-C:\Documents and Settings\dmuschalla\My Documents\ihwb\develop\EVO.NET\EVO.Algos\DDS\obj\Debug\ResolveAssemblyReference.cache
-C:\Documents and Settings\dmuschalla\My Documents\ihwb\develop\EVO.NET\EVO.Algos\DDS\obj\Debug\DDS_C_Sharp.dll
-C:\Documents and Settings\dmuschalla\My Documents\ihwb\develop\EVO.NET\EVO.Algos\DDS\obj\Debug\DDS_C_Sharp.pdb

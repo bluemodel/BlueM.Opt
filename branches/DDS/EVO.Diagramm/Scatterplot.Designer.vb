@@ -26,7 +26,6 @@ Partial Public Class Scatterplot
         'matrix
         '
         Me.matrix.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.[Single]
-        Me.matrix.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
         Me.matrix.Location = New System.Drawing.Point(0, 0)
         Me.matrix.Name = "matrix"
         Me.matrix.Size = New System.Drawing.Size(800, 800)
