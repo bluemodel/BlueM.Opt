@@ -17,9 +17,6 @@ namespace IHWB.EVO.MetaEvo
         EVO.Diagramm.Hauptdiagramm hauptdiagramm;
         EVO.MO_Indicators.Solutionvolume solutionvolume;
 
-        //public string calculationmode;  //{"global", "local", "both"}
-        int noAdvantage = 0;
-
         public Algomanager(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, int individuumnumber_input, ref EVO.Diagramm.ApplicationLog applog_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input) 
         {
             settings = settings_input;
@@ -27,7 +24,7 @@ namespace IHWB.EVO.MetaEvo
             applog = applog_input;
             //Algoobjekt initialisieren (enthält die algorithmus-Methoden und das Feedback zu jedem Algo)
             algos = new Algos(ref settings_input, individuumnumber_input, ref applog);
-            algos.set_algos("Zufällige Einfache Mutation, Feedback Mutation, Ungleichverteilte Mutation, Zufällige Rekombination, Intermediäre Rekombination, Diversität aus Sortierung, Totaler Zufall, Dominanzvektor");
+            algos.set_algos("Zufällige Einfache Mutation, Ungleichverteilte Mutation, Zufällige Rekombination, Intermediäre Rekombination, Diversität aus Sortierung, Totaler Zufall, Dominanzvektor");
 
             solutionvolume = new EVO.MO_Indicators.Solutionvolume(5, 0.05, ref applog);
         }
@@ -114,7 +111,7 @@ namespace IHWB.EVO.MetaEvo
                         new_generation_input = new_generation_input2;
                         applog.appendText("Algo Manager: Genpool for local Optimization: \r\n" + this.generationinfo(ref genpool) + "\r\n"); 
                     }
-                    set_calculationmode_local(noAdvantage, ref genpool, ref new_generation_input);
+                    set_calculationmode_local(ref genpool, ref new_generation_input);
                     //MessageBox.Show("Switching to Local Optimization after " + (new_generation_input[new_generation_input.Length - 1].ID) / new_generation_input.Length + " Generations", "Algomanager");
                 }
             }
@@ -510,9 +507,6 @@ namespace IHWB.EVO.MetaEvo
                 }
             }
 
-            //2b. Falls survivingrate = 0, noAdvantage hochzählen
-            if (survivingrate == 0) noAdvantage++;
-            else noAdvantage = 0;
             survivingrate = 0;
 
             //3. Initiative berechnen 
@@ -562,7 +556,7 @@ namespace IHWB.EVO.MetaEvo
             }
         }
         //Umschalten auf Lokale Algorithmen
-        private void set_calculationmode_local(int noAdvantage, ref EVO.Common.Individuum_MetaEvo[] genpool_input, ref EVO.Common.Individuum_MetaEvo[] new_generation_input)
+        private void set_calculationmode_local(ref EVO.Common.Individuum_MetaEvo[] genpool_input, ref EVO.Common.Individuum_MetaEvo[] new_generation_input)
         {
             settings.MetaEvo.OpMode = "Local Optimizer";
 

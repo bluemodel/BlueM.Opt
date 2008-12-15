@@ -165,13 +165,13 @@ namespace IHWB.EVO.MetaEvo
                         }
                         if (!(back))
                         {
-                            //5% Geschwindigkeits-Toleranz des Clients bis neues Scheduling berechnet werden muss
+                            //5% Toleranz für durchschnittliche Geschwindigkeit des Clients bis neues Scheduling berechnet werden muss
                             if (Math.Abs(Clients[number_clients].speed_av - myReader.GetDouble(4)) > Clients[number_clients].speed_av * 0.05) back = true;
                         }
                         if (!(back))
                         {
-                            //120% Berechnungszeit-Toleranz bis neues Scheduling den alive-Status der Individuen prüfen muss (hängt sehr vom Server ab)
-                            if (Clients[number_clients].timestamp.Subtract(DateTime.Now).TotalMilliseconds > 1.2 * Clients[number_clients].speed_av) back = true;
+                            //10% Toleranz für maximale Berechnungsdauer bis neues Scheduling den alive-Status der Individuen prüfen muss (hängt sehr vom Server ab)
+                            if (Clients[number_clients].timestamp.Subtract(DateTime.Now).TotalMilliseconds > 1.2 * Clients[number_clients].speed_low) back = true;
                         }
                         Clients[number_clients].status = myReader.GetString(2);
                         Clients[number_clients].timestamp = new DateTime(myReader.GetMySqlDateTime(3).Year, myReader.GetMySqlDateTime(3).Month, myReader.GetMySqlDateTime(3).Day, myReader.GetMySqlDateTime(3).Hour, myReader.GetMySqlDateTime(3).Minute, myReader.GetMySqlDateTime(3).Second);

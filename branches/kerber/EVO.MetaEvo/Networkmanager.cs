@@ -162,7 +162,7 @@ namespace IHWB.EVO.MetaEvo
             myCommand.Connection.Open();
             myCommand.ExecuteNonQuery();
             myCommand.Connection.Close();
-             applog.appendText("Network Manager: DB-Construction Successfilly");
+            applog.appendText("Network Manager: DB-Construction Successfilly");
         }
 
         //(ok)sich als Client in DB eintragen
@@ -206,7 +206,7 @@ namespace IHWB.EVO.MetaEvo
         //### Methoden ### Working Process -> Individuums 
 
         //(ok)Neue Individuen in die Datenbank einfügen (ID, status, optparas, ipName)
-        public void Individuums_WriteToDB(ref EVO.Common.Individuum_MetaEvo[] generation_input)
+        private void Individuums_WriteToDB(ref EVO.Common.Individuum_MetaEvo[] generation_input)
         {
             //Alte Individuen aus DB löschen
             this.DB_ClearIndividuumsTable();
@@ -244,7 +244,7 @@ namespace IHWB.EVO.MetaEvo
         }
 
         //(ok)Neue Individuen in die Speicher-DB einfügen (ID, status, optparas, features, constraints)
-        public void Individuums_StoreFinalInDB(ref EVO.Common.Individuum_MetaEvo[] generation_input)
+        private void Individuums_StoreFinalInDB(ref EVO.Common.Individuum_MetaEvo[] generation_input)
         {
 
             //Schreiben der Individuen-Daten in die DB (alle gleichzeitig)
@@ -323,7 +323,7 @@ namespace IHWB.EVO.MetaEvo
         }
 
         //(ok)prüfen wie viele Individuen fertig berechnet sind
-        public int Individuums_CountReadyInDB()
+        private int Individuums_CountReadyInDB()
         {
             myCommand.CommandText = "Select status from metaevo_individuums WHERE status = 'true' OR status = 'false'";
             myCommand.Connection.Open();
@@ -339,7 +339,7 @@ namespace IHWB.EVO.MetaEvo
         }
         
         //(ok)alle Individuen aus der DB in der Generation updaten (ID, status, constraints, features, ipName)
-        public void Individuums_UpdateFromDB(ref EVO.Common.Individuum_MetaEvo[] generation_input)
+        private void Individuums_UpdateFromDB(ref EVO.Common.Individuum_MetaEvo[] generation_input)
         {
             myCommand = new MySqlCommand("Select * from metaevo_individuums", mycon);
             mycon.Open();
@@ -525,7 +525,7 @@ namespace IHWB.EVO.MetaEvo
                     }
                     //In der current_calc_time-Eigenschaft Zeiten addieren, Individuum addieren
                     network1.Clients[current_client].numberindividuums++;
-                    //Dem Individuum den Client(=IPWorker) zuweisen
+                    //Dem Individuum den Client(=ipName) zuweisen
                     generation_input[k].set_Client(network1.Clients[current_client].ipName);
                 }
 
@@ -549,7 +549,7 @@ namespace IHWB.EVO.MetaEvo
             //Falls kein Aktiver Client vorhanden ist, 3 Sekunden warten und dann scheduling_new aufrufen
             if (network1.number_clients == 0)
             {
-                 applog.appendText("Scheduling: No Client found registered in DB - waiting...");
+                applog.appendText("Scheduling: No Client found registered in DB - waiting...");
                 System.Threading.Thread.Sleep(3000);
                 scheduling_new(ref generation_input);
             }
@@ -557,7 +557,7 @@ namespace IHWB.EVO.MetaEvo
             //An den Daten der Clients hat sich etwas geändert (Status=ready oder Speed-av hat sich um mehr als 5% geändert)
             else if (scheduling_error)   
             {
-                 applog.appendText("Networkmanager: Adapted Scheduling");
+                applog.appendText("Networkmanager: Adapted Scheduling");
 
                 //DB auf Geschwindigkeitsänderung/Ausfall von Clients untersuchen und entsprechende Individuen demarkieren
                 current_client = 0;
@@ -677,7 +677,7 @@ namespace IHWB.EVO.MetaEvo
                 //Ausgabe der neuen Zuteilung
                 for (int i = 0; i < network1.Clients.Length; i++)
                 {
-                     applog.appendText("Networkmanager: Adapted Scheduling: Client '" + network1.Clients[i].ipName + "' " + network1.Clients[i].numberindividuums + " Individuums");
+                    applog.appendText("Networkmanager: Adapted Scheduling: Client '" + network1.Clients[i].ipName + "' " + network1.Clients[i].numberindividuums + " Individuums");
                 }
             }
         }
