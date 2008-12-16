@@ -341,7 +341,7 @@ Partial Class Form1
                         'nur existierende, zur Anwendung passende Datensätze anzeigen
                         pfad = My.Settings.MRUSimDatensaetze(i)
                         If (File.Exists(pfad) _
-                            And Path.GetExtension(pfad) = Me.Sim1.DatensatzExtension) Then
+                            And Path.GetExtension(pfad).ToUpper() = Me.Sim1.DatensatzExtension) Then
                             Me.ComboBox_Datensatz.Items.Add(My.Settings.MRUSimDatensaetze(i))
                         End If
                     Next
