@@ -39,6 +39,7 @@
   <ItemGroup>
     <Reference Include="IHWB.BlueM.DllAdapter, Version=0.0.1.1, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="IHWB.SMUSI.DllAdapter, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL" />
+    <Reference Include="IHWB.SWMM.DllAdapter, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -129,6 +130,7 @@
     <Content Include="SMUSI\smusi.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="SWMM\IHWB.SWMM.DllAdapter.dll" />
     <Content Include="SWMM\SWMM5.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -137,10 +139,6 @@
     <ProjectReference Include="..\..\IHA.Win\IHA.Win.vbproj">
       <Project>{7A7828C7-812B-45C0-AC5A-AE2DB74B7CD8}</Project>
       <Name>IHA.Win</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\SWMM.DLLAdapter\IHWB.SWMM.DllAdapter\IHWB.SWMM.DllAdapter.csproj">
-      <Project>{C7F2B930-7743-44B5-B22A-8332DD05ED6B}</Project>
-      <Name>IHWB.SWMM.DllAdapter</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Wave\Wave.vbproj">
       <Project>{BCD1BBE3-5AB2-4C3F-AC12-43EB977C6F6F}</Project>
