@@ -295,15 +295,14 @@ Partial Class Form1
 
         'Bei Simulationsanwendungen:
         If (Me.Anwendung <> ANW_TESTPROBLEME) Then
-            'Bug: Funktioniert nicht, wenn die Anwendung wechselt und nicht mehr
-            'die gleichen Dateiendungen verwendet werden
 
-            ''zuletzt benutzten Datensatz setzen
-            'If (My.Settings.MRUSimDatensaetze.Count > 0) Then
-            '    pfad = My.Settings.MRUSimDatensaetze.Item(My.Settings.MRUSimDatensaetze.Count - 1)
-            '    Me.ComboBox_Datensatz.SelectedItem = pfad
-            '    Call Sim1.setDatensatz(pfad)
-            'End If
+            'zuletzt benutzten Datensatz setzen?
+            If (Me.ComboBox_Datensatz.Items.Count > 0) Then
+                'obersten (zuletzt genutzten) Datensatz auswählen
+                pfad = Me.ComboBox_Datensatz.Items(0)
+                Me.ComboBox_Datensatz.SelectedItem = pfad
+                Call Sim1.setDatensatz(pfad)
+            End If
 
             'Browse-Button aktivieren
             Me.Button_BrowseDatensatz.Enabled = True
@@ -316,6 +315,7 @@ Partial Class Form1
     Private Sub Datensatz_populateCombo()
 
         Dim i As Integer
+        Dim pfad As String
 
         'vorherige Einträge löschen
         Me.ComboBox_Datensatz.Items.Clear()
@@ -324,7 +324,7 @@ Partial Class Form1
 
             Case ANW_TESTPROBLEME
 
-                'Mit Tesproblemen füllen
+                'Mit Testproblemen füllen
                 Me.ComboBox_Datensatz.Items.AddRange(Testprobleme1.Testprobleme)
 
             Case Else '(Sim-Anwendungen)
@@ -334,17 +334,13 @@ Partial Class Form1
 
                     'Combobox rückwärts füllen
                     For i = My.Settings.MRUSimDatensaetze.Count - 1 To 0 Step -1
-                        Select Case Me.Anwendung
-                            Case ANW_SWMM
-                                If My.Settings.MRUSimDatensaetze.Item(i).EndsWith(".inp") Then
-                                    Me.ComboBox_Datensatz.Items.Add(My.Settings.MRUSimDatensaetze.Item(i))
-                                End If
-                            Case ANW_BLUEM, ANW_SMUSI
-                                If My.Settings.MRUSimDatensaetze.Item(i).EndsWith(".all") Then
-                                    Me.ComboBox_Datensatz.Items.Add(My.Settings.MRUSimDatensaetze.Item(i))
-                                End If
-                        End Select
-                        Me.ComboBox_Datensatz.Items.Add(My.Settings.MRUSimDatensaetze.Item(i))
+
+                        'nur existierende, zur Anwendung passende Datensätze anzeigen
+                        pfad = My.Settings.MRUSimDatensaetze(i)
+                        If (File.Exists(pfad) _
+                            And Path.GetExtension(pfad) = Me.Sim1.DatensatzExtension) Then
+                            Me.ComboBox_Datensatz.Items.Add(My.Settings.MRUSimDatensaetze(i))
+                        End If
                     Next
 
                 End If
