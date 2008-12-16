@@ -667,11 +667,8 @@ Handler:
                     VolSim += SimReihe.YWerte(i)
                     VolZiel += feature.RefReihe.YWerte(i)
                 Next
-                'HACK: Umrechnen in echtes Volumen (Annahme: Einheit = m3/s)
-                VolSim *= Me.SimDT.TotalSeconds
-                VolZiel *= Me.SimDT.TotalSeconds
-                'Differenz bilden
-                QWert = Math.Abs(VolZiel - VolSim)
+                'Differenz bilden und auf ZielVolumen beziehen
+                QWert = Math.Abs(VolZiel - VolSim) / VolZiel * 100
 
             Case "nUnter"
                 'Relative Anzahl der Zeitschritte mit Unterschreitungen (in Prozent)
@@ -954,11 +951,14 @@ Handler:
 
 #Region "Multithreading"
 
-    'Datensätze für Multithreading kopieren
-    '**************************************
+    ''' <summary>
+    ''' Datensätze für Multithreading kopieren
+    ''' </summary>
+    ''' <param name="n_Threads">Anzahl Threads</param>
+    ''' <remarks>Erstellt im bin-Ordner Verzeichnisse Thread_1 bis Thread_n</remarks>
     Public Sub createThreadWorkDirs(ByVal n_Threads As Integer)
 
-        Dim i As Integer = 1
+        Dim i As Integer
         Dim Source, Dest, relPaths() As String
         Dim binPath As String = System.Windows.Forms.Application.StartupPath()
 
@@ -1066,7 +1066,7 @@ Handler:
     ''' <summary>
     ''' Gibt den Datensatz Ordner eines Threads zurück
     ''' </summary>
-    ''' <param name="Thread_ID"></param>
+    ''' <param name="Thread_ID">Die ID des Threads</param>
     Public Function getThreadWorkDir(ByVal Thread_ID As Integer) As String
 
         Dim dir As String
