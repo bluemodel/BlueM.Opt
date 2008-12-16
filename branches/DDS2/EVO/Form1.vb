@@ -27,6 +27,7 @@ Partial Class Form1
 
     Private IsInitializing As Boolean
 
+    'Optionen
     Private Options As OptionsDialog
 
     'Anwendung
@@ -68,9 +69,6 @@ Partial Class Form1
     'Diagramme
     Private WithEvents Hauptdiagramm1 As IHWB.EVO.Diagramm.Hauptdiagramm
     Private WithEvents Monitor1 As EVO.Diagramm.Monitor
-
-    'MultiThreading Ja oder Nein
-    Private multithreading As Boolean = False
 
 #End Region 'Eigenschaften
 
@@ -116,7 +114,12 @@ Partial Class Form1
 
     'Optionen Dialog anzeigen
     '************************
-    Private Sub showOptionDialog(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem_Optionen.Click
+    Private Sub showOptionsDialog(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem_Optionen.Click
+        If (Me.isrun) Then
+            Call Me.Options.DisableAll()
+        Else
+            Call Me.Options.EnableAll()
+        End If
         Call Me.Options.ShowDialog()
     End Sub
 
@@ -1929,7 +1932,10 @@ Start_Evolutionsrunden:
 
                     'Simulationsanwendungen nachträglich auswerten
                     If Anwendung = ANW_BLUEM Or Anwendung = ANW_SMUSI Or Anwendung = ANW_SCAN Or Anwendung = ANW_SWMM Then
-                        If multithreading Then
+
+                        If (Me.Options.useMultithreading) Then
+                            'Mit Multithreading
+                            '==================
                             Dim Thread_Free As Integer = 0
                             Dim Thread_Ready As Integer = 0
                             Dim Child_Run As Integer = 0
@@ -1940,8 +1946,8 @@ Start_Evolutionsrunden:
                             Do
                                 If Sim1.launchFree(Thread_Free) And Child_Run < EVO_Einstellungen1.Settings.PES.n_Nachf _
                                 And (Child_Ready + n_Threads > Child_Run) And Me.ispause = False Then
-                                'Falls eine Simulation frei und nicht Pause
-                                '------------------------------------------
+                                    'Falls eine Simulation frei und nicht Pause
+                                    '------------------------------------------
 
                                     Sim1.WorkDir_Current = Sim1.getThreadWorkDir(Thread_Free)
 
@@ -1954,8 +1960,8 @@ Start_Evolutionsrunden:
                                     Child_Run += 1
 
                                 ElseIf Sim1.launchReady(Thread_Ready, SIM_Eval_is_OK, Child_Ready) = True And SIM_Eval_is_OK Then
-                                'Falls Simulation fertig und erfolgreich
-                                '---------------------------------------
+                                    'Falls Simulation fertig und erfolgreich
+                                    '---------------------------------------
 
                                     Sim1.WorkDir_Current = Sim1.getThreadWorkDir(Thread_Ready)
                                     Sim1.SIM_Ergebnis_auswerten(ind(Child_Ready))
@@ -1972,18 +1978,18 @@ Start_Evolutionsrunden:
                                     PES1.PES_iAkt.iAktNachf = Child_Ready
                                     Call PES1.EsBest(ind(Child_Ready))
 
-                                If (Child_Ready = EVO_Einstellungen1.Settings.PES.n_Nachf - 1) Then
-                                    Ready = True
-                                End If
+                                    If (Child_Ready = EVO_Einstellungen1.Settings.PES.n_Nachf - 1) Then
+                                        Ready = True
+                                    End If
 
                                     Child_Ready += 1
 
-                                'Verlauf aktualisieren
-                                Me.mProgress.iNachf = Child_Ready
+                                    'Verlauf aktualisieren
+                                    Me.mProgress.iNachf = Child_Ready
 
-                                System.Windows.Forms.Application.DoEvents()
+                                    System.Windows.Forms.Application.DoEvents()
 
-                            ElseIf Sim1.launchReady(Thread_Ready, SIM_Eval_is_OK, Child_Ready) = False And SIM_Eval_is_OK = False Then
+                                ElseIf Sim1.launchReady(Thread_Ready, SIM_Eval_is_OK, Child_Ready) = False And SIM_Eval_is_OK = False Then
                                     'Falls Simulation fertig aber nicht erfolgreich
                                     '----------------------------------------------
 
@@ -1993,7 +1999,7 @@ Start_Evolutionsrunden:
                                     If Child_Ready = EVO_Einstellungen1.Settings.PES.n_Nachf - 1 Then Ready = True
                                     Child_Ready += 1
 
-                            ElseIf Me.ispause = True And Child_Ready = Child_Run Then
+                                ElseIf Me.ispause = True And Child_Ready = Child_Run Then
                                     'Falls Pause und alle simulierten auch verarbeitet
                                     '-------------------------------------------------
 
@@ -2003,7 +2009,7 @@ Start_Evolutionsrunden:
                                         Application.DoEvents()
                                     Loop
 
-                            Else
+                                Else
                                     'Falls total im Stress
                                     '---------------------
                                     System.Threading.Thread.Sleep(400)
@@ -2014,8 +2020,8 @@ Start_Evolutionsrunden:
                             Loop While Ready = False
 
                         Else
-							'Ohne Multithreading
-							'===================
+                            'Ohne Multithreading
+                            '===================
                             Sim1.WorkDir_Current = Sim1.getThreadWorkDir(0)
                             Dim Child_Run As Integer = 0
                             For i = 0 To EVO_Einstellungen1.Settings.PES.n_Nachf - 1
@@ -2045,93 +2051,93 @@ Start_Evolutionsrunden:
 
 
                     End If
-                        'Ende Simulationsschleife
-                        '+++++++++++++++++++++++++++++++++++++++++++++++++
+                    'Ende Simulationsschleife
+                    '+++++++++++++++++++++++++++++++++++++++++++++++++
 
-                        'Do Schleife: Um Modellfehler bzw. Evaluierungsabbrüche abzufangen
-                        If Child_False.GetLength(0) > -1 Then
-                            For i = 0 To Child_False.GetUpperBound(0)
-                                Dim Eval_Count As Integer = 0
-                                Do
-                                    Call PES1.EsReproduktion()
-                                    Call PES1.EsMutation()
+                    'Do Schleife: Um Modellfehler bzw. Evaluierungsabbrüche abzufangen
+                    If Child_False.GetLength(0) > -1 Then
+                        For i = 0 To Child_False.GetUpperBound(0)
+                            Dim Eval_Count As Integer = 0
+                            Do
+                                Call PES1.EsReproduktion()
+                                Call PES1.EsMutation()
 
-                                    'Parameter aus PES ins Individuum kopieren
-                                    ind(Child_False(i)).OptParameter = EVO.Common.OptParameter.Clone_Array(PES1.EsGetParameter())
+                                'Parameter aus PES ins Individuum kopieren
+                                ind(Child_False(i)).OptParameter = EVO.Common.OptParameter.Clone_Array(PES1.EsGetParameter())
 
-                                    Sim1.WorkDir_Current = Sim1.getThreadWorkDir(0)
-                                    Call Sim1.PREPARE_Evaluation_PES(ind(Child_False(i)).OptParameter)
+                                Sim1.WorkDir_Current = Sim1.getThreadWorkDir(0)
+                                Call Sim1.PREPARE_Evaluation_PES(ind(Child_False(i)).OptParameter)
 
-                                    SIM_Eval_is_OK = Sim1.launchSim(0, Child_False(i))
-                                    While Sim1.launchReady(0, SIM_Eval_is_OK, Child_False(i)) = False
-                                        System.Threading.Thread.Sleep(400)
-                                        System.Windows.Forms.Application.DoEvents()
-                                    End While
+                                SIM_Eval_is_OK = Sim1.launchSim(0, Child_False(i))
+                                While Sim1.launchReady(0, SIM_Eval_is_OK, Child_False(i)) = False
+                                    System.Threading.Thread.Sleep(400)
+                                    System.Windows.Forms.Application.DoEvents()
+                                End While
 
-                                    'Lösung auswerten und zeichnen
-                                    If SIM_Eval_is_OK Then
-                                        Call Sim1.SIM_Ergebnis_auswerten(ind(Child_False(i)))
-                                        Call Me.Hauptdiagramm1.ZeichneIndividuum(ind(Child_False(i)), PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, Child_False(i), Color.Orange)
-                                    End If
+                                'Lösung auswerten und zeichnen
+                                If SIM_Eval_is_OK Then
+                                    Call Sim1.SIM_Ergebnis_auswerten(ind(Child_False(i)))
+                                    Call Me.Hauptdiagramm1.ZeichneIndividuum(ind(Child_False(i)), PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, Child_False(i), Color.Orange)
+                                End If
 
-                                    PES1.PES_iAkt.iAktNachf = Child_False(i)
-                                    Call PES1.EsBest(ind(Child_False(i)))
+                                PES1.PES_iAkt.iAktNachf = Child_False(i)
+                                Call PES1.EsBest(ind(Child_False(i)))
 
                                 'Verlauf aktualisieren
                                 Me.mProgress.iNachf = Child_False(i) + 1
 
-                                    System.Windows.Forms.Application.DoEvents()
+                                System.Windows.Forms.Application.DoEvents()
 
-                                    Eval_Count += 1
-                                    If (Eval_Count >= 10) Then
-                                        Throw New Exception("Es konnte kein gültiger Datensatz erzeugt werden!")
-                                    End If
-                                Loop While SIM_Eval_is_OK = False
-                            Next
+                                Eval_Count += 1
+                                If (Eval_Count >= 10) Then
+                                    Throw New Exception("Es konnte kein gültiger Datensatz erzeugt werden!")
+                                End If
+                            Loop While SIM_Eval_is_OK = False
+                        Next
+                    End If
+
+                    'SELEKTIONSPROZESS Schritt 2 für NDSorting sonst Xe = Xb
+                    '#######################################################
+                    'Die neuen Eltern werden generiert
+                    Call PES1.EsEltern()
+
+                    'Sekundäre Population
+                    '====================
+                    If (EVO_Einstellungen1.Settings.PES.OptModus = Common.Constants.EVO_MODUS.Multi_Objective) Then
+
+                        'SekPop abspeichern
+                        '------------------
+                        If (Not IsNothing(Sim1)) Then
+                            Call Sim1.OptResult.setSekPop(PES1.SekundärQb, PES1.PES_iAkt.iAktGen)
                         End If
 
-                        'SELEKTIONSPROZESS Schritt 2 für NDSorting sonst Xe = Xb
-                        '#######################################################
-                        'Die neuen Eltern werden generiert
-                        Call PES1.EsEltern()
-
-                        'Sekundäre Population
-                        '====================
-                        If (EVO_Einstellungen1.Settings.PES.OptModus = Common.Constants.EVO_MODUS.Multi_Objective) Then
-
-                            'SekPop abspeichern
-                            '------------------
-                            If (Not IsNothing(Sim1)) Then
-                                Call Sim1.OptResult.setSekPop(PES1.SekundärQb, PES1.PES_iAkt.iAktGen)
-                            End If
-
-                            'SekPop zeichnen
-                            '---------------
-                            If (Not IsNothing(Sim1)) Then
-                                'BUG 257: Umweg über Sim1.OptResult gehen, weil es im PES keine Individuum-IDs gibt
-                                Call Me.Hauptdiagramm1.ZeichneSekPopulation(Sim1.OptResult.getSekPop())
-                            Else
-                                Call Me.Hauptdiagramm1.ZeichneSekPopulation(PES1.SekundärQb)
-                            End If
-
-                            'Hypervolumen berechnen und Zeichnen
-                            '-----------------------------------
-                            Call Hypervolume.update_dataset(Common.Individuum.Get_All_Penalty_of_Array(PES1.SekundärQb))
-                            Call Me.Hauptdiagramm1.ZeichneNadirpunkt(Hypervolume.nadir)
-                            Call Me.Monitor1.ZeichneHyperVolumen(PES1.PES_iAkt.iAktGen, Math.Abs(Hypervolume.calc_indicator()))
-
+                        'SekPop zeichnen
+                        '---------------
+                        If (Not IsNothing(Sim1)) Then
+                            'BUG 257: Umweg über Sim1.OptResult gehen, weil es im PES keine Individuum-IDs gibt
+                            Call Me.Hauptdiagramm1.ZeichneSekPopulation(Sim1.OptResult.getSekPop())
+                        Else
+                            Call Me.Hauptdiagramm1.ZeichneSekPopulation(PES1.SekundärQb)
                         End If
 
-                        'ggf. alte Generation im Diagramm löschen
-                        If (Me.Options.showOnlyCurrentPop _
-                            And PES1.PES_iAkt.iAktGen < EVO_Einstellungen1.Settings.PES.n_Gen - 1) Then
-                            Call Me.Hauptdiagramm1.LöscheLetzteGeneration(PES1.PES_iAkt.iAktPop)
-                        End If
+                        'Hypervolumen berechnen und Zeichnen
+                        '-----------------------------------
+                        Call Hypervolume.update_dataset(Common.Individuum.Get_All_Penalty_of_Array(PES1.SekundärQb))
+                        Call Me.Hauptdiagramm1.ZeichneNadirpunkt(Hypervolume.nadir)
+                        Call Me.Monitor1.ZeichneHyperVolumen(PES1.PES_iAkt.iAktGen, Math.Abs(Hypervolume.calc_indicator()))
 
-                        'Verlauf aktualisieren
-                        Me.mProgress.iGen = PES1.PES_iAkt.iAktGen + 1
+                    End If
 
-                        System.Windows.Forms.Application.DoEvents()
+                    'ggf. alte Generation im Diagramm löschen
+                    If (Me.Options.drawOnlyCurrentPop _
+                        And PES1.PES_iAkt.iAktGen < EVO_Einstellungen1.Settings.PES.n_Gen - 1) Then
+                        Call Me.Hauptdiagramm1.LöscheLetzteGeneration(PES1.PES_iAkt.iAktPop)
+                    End If
+
+                    'Verlauf aktualisieren
+                    Me.mProgress.iGen = PES1.PES_iAkt.iAktGen + 1
+
+                    System.Windows.Forms.Application.DoEvents()
 
                 Next 'Ende alle Generationen
                 'xxxxxxxxxxxxxxxxxxxxxxxxxxx

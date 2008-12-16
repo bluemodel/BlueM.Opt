@@ -24,15 +24,38 @@ Partial Class OptionsDialog
     Private Sub InitializeComponent()
         Dim GroupBox_Diagramm As System.Windows.Forms.GroupBox
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(OptionsDialog))
+        Me.CheckBox_drawOnlyCurrentPop = New System.Windows.Forms.CheckBox
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel
         Me.OK_Button = New System.Windows.Forms.Button
         Me.Cancel_Button = New System.Windows.Forms.Button
-        Me.Label_showOnlyCurrentPop = New System.Windows.Forms.Label
-        Me.CheckBox_showOnlyCurrentPop = New System.Windows.Forms.CheckBox
+        Me.GroupBox_Sim = New System.Windows.Forms.GroupBox
+        Me.CheckBox_useMultithreading = New System.Windows.Forms.CheckBox
         GroupBox_Diagramm = New System.Windows.Forms.GroupBox
-        Me.TableLayoutPanel1.SuspendLayout()
         GroupBox_Diagramm.SuspendLayout()
+        Me.TableLayoutPanel1.SuspendLayout()
+        Me.GroupBox_Sim.SuspendLayout()
         Me.SuspendLayout()
+        '
+        'GroupBox_Diagramm
+        '
+        GroupBox_Diagramm.Controls.Add(Me.CheckBox_drawOnlyCurrentPop)
+        GroupBox_Diagramm.Location = New System.Drawing.Point(12, 72)
+        GroupBox_Diagramm.Name = "GroupBox_Diagramm"
+        GroupBox_Diagramm.Size = New System.Drawing.Size(180, 62)
+        GroupBox_Diagramm.TabIndex = 1
+        GroupBox_Diagramm.TabStop = False
+        GroupBox_Diagramm.Text = "Diagramm"
+        '
+        'CheckBox_drawOnlyCurrentPop
+        '
+        Me.CheckBox_drawOnlyCurrentPop.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.CheckBox_drawOnlyCurrentPop.Location = New System.Drawing.Point(6, 19)
+        Me.CheckBox_drawOnlyCurrentPop.Name = "CheckBox_drawOnlyCurrentPop"
+        Me.CheckBox_drawOnlyCurrentPop.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.CheckBox_drawOnlyCurrentPop.Size = New System.Drawing.Size(158, 37)
+        Me.CheckBox_drawOnlyCurrentPop.TabIndex = 1
+        Me.CheckBox_drawOnlyCurrentPop.Text = "Nur die aktuelle Population jeder Generation anzeigen:"
+        Me.CheckBox_drawOnlyCurrentPop.UseVisualStyleBackColor = True
         '
         'TableLayoutPanel1
         '
@@ -42,7 +65,7 @@ Partial Class OptionsDialog
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanel1.Controls.Add(Me.OK_Button, 0, 0)
         Me.TableLayoutPanel1.Controls.Add(Me.Cancel_Button, 1, 0)
-        Me.TableLayoutPanel1.Location = New System.Drawing.Point(44, 84)
+        Me.TableLayoutPanel1.Location = New System.Drawing.Point(46, 146)
         Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
         Me.TableLayoutPanel1.RowCount = 1
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
@@ -68,62 +91,57 @@ Partial Class OptionsDialog
         Me.Cancel_Button.TabIndex = 1
         Me.Cancel_Button.Text = "Cancel"
         '
-        'GroupBox_Diagramm
+        'GroupBox_Sim
         '
-        GroupBox_Diagramm.Controls.Add(Me.CheckBox_showOnlyCurrentPop)
-        GroupBox_Diagramm.Controls.Add(Me.Label_showOnlyCurrentPop)
-        GroupBox_Diagramm.Location = New System.Drawing.Point(13, 13)
-        GroupBox_Diagramm.Name = "GroupBox_Diagramm"
-        GroupBox_Diagramm.Size = New System.Drawing.Size(180, 62)
-        GroupBox_Diagramm.TabIndex = 1
-        GroupBox_Diagramm.TabStop = False
-        GroupBox_Diagramm.Text = "Diagramm"
+        Me.GroupBox_Sim.Controls.Add(Me.CheckBox_useMultithreading)
+        Me.GroupBox_Sim.Location = New System.Drawing.Point(12, 13)
+        Me.GroupBox_Sim.Name = "GroupBox_Sim"
+        Me.GroupBox_Sim.Size = New System.Drawing.Size(180, 53)
+        Me.GroupBox_Sim.TabIndex = 2
+        Me.GroupBox_Sim.TabStop = False
+        Me.GroupBox_Sim.Text = "Simulationen"
         '
-        'Label_showOnlyCurrentPop
+        'CheckBox_useMultithreading
         '
-        Me.Label_showOnlyCurrentPop.Location = New System.Drawing.Point(7, 20)
-        Me.Label_showOnlyCurrentPop.Name = "Label_showOnlyCurrentPop"
-        Me.Label_showOnlyCurrentPop.Size = New System.Drawing.Size(141, 33)
-        Me.Label_showOnlyCurrentPop.TabIndex = 0
-        Me.Label_showOnlyCurrentPop.Text = "Nur die aktuelle Population jeder Generation anzeigen:"
+        Me.CheckBox_useMultithreading.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.CheckBox_useMultithreading.Location = New System.Drawing.Point(6, 20)
+        Me.CheckBox_useMultithreading.Name = "CheckBox_useMultithreading"
+        Me.CheckBox_useMultithreading.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.CheckBox_useMultithreading.Size = New System.Drawing.Size(158, 24)
+        Me.CheckBox_useMultithreading.TabIndex = 0
+        Me.CheckBox_useMultithreading.Text = "Multithreading benutzen:"
+        Me.CheckBox_useMultithreading.UseVisualStyleBackColor = True
         '
-        'CheckBox_showOnlyCurrentPop
-        '
-        Me.CheckBox_showOnlyCurrentPop.AutoSize = True
-        Me.CheckBox_showOnlyCurrentPop.Location = New System.Drawing.Point(153, 26)
-        Me.CheckBox_showOnlyCurrentPop.Name = "CheckBox_showOnlyCurrentPop"
-        Me.CheckBox_showOnlyCurrentPop.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.CheckBox_showOnlyCurrentPop.Size = New System.Drawing.Size(15, 14)
-        Me.CheckBox_showOnlyCurrentPop.TabIndex = 1
-        Me.CheckBox_showOnlyCurrentPop.UseVisualStyleBackColor = True
-        '
-        'Options
+        'OptionsDialog
         '
         Me.AcceptButton = Me.OK_Button
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.Cancel_Button
-        Me.ClientSize = New System.Drawing.Size(202, 125)
+        Me.ClientSize = New System.Drawing.Size(202, 187)
+        Me.Controls.Add(Me.GroupBox_Sim)
         Me.Controls.Add(GroupBox_Diagramm)
         Me.Controls.Add(Me.TableLayoutPanel1)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "Options"
+        Me.Name = "OptionsDialog"
         Me.ShowInTaskbar = False
+        Me.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = "Optionen"
-        Me.TableLayoutPanel1.ResumeLayout(False)
         GroupBox_Diagramm.ResumeLayout(False)
-        GroupBox_Diagramm.PerformLayout()
+        Me.TableLayoutPanel1.ResumeLayout(False)
+        Me.GroupBox_Sim.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
-    Friend WithEvents TableLayoutPanel1 As System.Windows.Forms.TableLayoutPanel
-    Friend WithEvents OK_Button As System.Windows.Forms.Button
-    Friend WithEvents Cancel_Button As System.Windows.Forms.Button
-    Friend WithEvents CheckBox_showOnlyCurrentPop As System.Windows.Forms.CheckBox
-    Friend WithEvents Label_showOnlyCurrentPop As System.Windows.Forms.Label
+    Friend WithEvents CheckBox_drawOnlyCurrentPop As System.Windows.Forms.CheckBox
+    Private WithEvents CheckBox_useMultithreading As System.Windows.Forms.CheckBox
+    Private WithEvents GroupBox_Sim As System.Windows.Forms.GroupBox
+    Private WithEvents TableLayoutPanel1 As System.Windows.Forms.TableLayoutPanel
+    Private WithEvents OK_Button As System.Windows.Forms.Button
+    Private WithEvents Cancel_Button As System.Windows.Forms.Button
 
 End Class
