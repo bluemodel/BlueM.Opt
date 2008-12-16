@@ -52,8 +52,8 @@ Public Class SWMMThread
             'Simulationsfehler aufgetreten
             MsgBox(ex.Message, MsgBoxStyle.Exclamation, "SWMM")
 
-            'Simulation abschliessen
-            Call SWMM_dll.Finish()
+            ''Simulation abschliessen
+            'Call SWMM_dll.Finish()
 
             'Simulation nicht erfolgreich
             Me.SimIsOK = False

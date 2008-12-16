@@ -43,7 +43,7 @@ Public Class SWMM
         Get
             Dim exts As Collections.Specialized.StringCollection = New Collections.Specialized.StringCollection()
 
-            exts.AddRange(New String() {"INP", "DAT"})
+            exts.AddRange(New String() {"INP", "DAT", "INI"})
 
             Return exts
 
@@ -67,7 +67,7 @@ Public Class SWMM
         'SWMM DLL instanzieren
         '----------------------
         Dim dll_path As String
-        dll_path = System.Windows.Forms.Application.StartupPath() & "\SWMM5.dll"
+        dll_path = System.Windows.Forms.Application.StartupPath() & "\SWMM\SWMM5.dll"
 
         'BlueM DLL instanzieren je nach Anzahl der Prozessoren
         '-----------------------------------------------------
@@ -142,8 +142,8 @@ Public Class SWMM
         FiStr.Close()
 
         'SimStart und SimEnde in echtes Datum konvertieren
-        Me.SimStart = New DateTime(SimStart_Date_str.Substring(6, 4), SimStart_Date_str.Substring(3, 2), SimStart_Date_str.Substring(0, 2), SimStart_Time_str.Substring(0, 2), SimStart_Time_str.Substring(3, 2), SimStart_Time_str.Substring(6, 2))
-        Me.SimEnde = New DateTime(SimEnde_Date_str.Substring(6, 4), SimEnde_Date_str.Substring(3, 2), SimEnde_Date_str.Substring(0, 2), SimEnde_Time_str.Substring(0, 2), SimEnde_Time_str.Substring(3, 2), SimEnde_Time_str.Substring(6, 2))
+        Me.SimStart = New DateTime(SimStart_Date_str.Substring(6, 4), SimStart_Date_str.Substring(0, 2), SimStart_Date_str.Substring(3, 2), SimStart_Time_str.Substring(0, 2), SimStart_Time_str.Substring(3, 2), SimStart_Time_str.Substring(6, 2))
+        Me.SimEnde = New DateTime(SimEnde_Date_str.Substring(6, 4), SimEnde_Date_str.Substring(0, 2), SimEnde_Date_str.Substring(3, 2), SimEnde_Time_str.Substring(0, 2), SimEnde_Time_str.Substring(3, 2), SimEnde_Time_str.Substring(6, 2))
 
         'Zeitschrittweite ist variable
         Me.SimDT = New TimeSpan(ROUTING_STEP_str.Substring(0, 1), ROUTING_STEP_str.Substring(2, 2), ROUTING_STEP_str.Substring(5, 2))
@@ -168,6 +168,7 @@ Public Class SWMM
         Return launchSim
 
     End Function
+
     'SWMM ohne Thread ausführen (simulieren)
     '****************************
     Public Overrides Function launchSim() As Boolean
@@ -211,6 +212,9 @@ Public Class SWMM
             'StrRead.Close()
             'FiStr.Close()
 
+            'Simulation abschliessen
+            Call swmm_dll(0).Finish()
+
             'Simulation erfolgreich
             simOK = True
 
@@ -218,9 +222,6 @@ Public Class SWMM
 
             'Simulationsfehler aufgetreten
             MsgBox(ex.Message, MsgBoxStyle.Exclamation, "SWMM")
-
-            'Simulation abschliessen
-            Call swmm_dll(0).Finish()
 
             'Simulation nicht erfolgreich
             simOK = False
