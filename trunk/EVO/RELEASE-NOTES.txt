@@ -6,11 +6,14 @@ Autoren: Christoph Hübner, Felix Froehlich, Dirk Muschalla
 Website: http://130.83.196.154/BlueM/wiki/index.php/EVO.NET
 ===============================================================
 
+Version 1.2.3
+-------------
+* NEW: Neue Methode DDS (Dynamically Dimensioned Search)
+
 Version 1.2.2
 -------------
 * NEW: Ein Optimierungsergebnis kann jetzt auch im Entscheidungsraum (als Scatterplot-Matrix) dargestellt werden (Bug 375)
 * FIXED: Fehler im PES Kern bedingt durch die freie Evaluierungsreihenfolge des Multithreadings behoben
-
 
 Version 1.2.1
 -------------
