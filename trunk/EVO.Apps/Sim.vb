@@ -26,10 +26,17 @@ Public MustInherit Class Sim
     ''' <summary>
     ''' Eine StringCollection mit allen Dateiendungen (ohne Punkt), die in einem Datensatz vorkommen können
     ''' </summary>
-    ''' <value></value>
-    ''' <returns></returns>
-    ''' <remarks>Der erste Wert des Arrays wird als Filter für OpenFile-Dialoge verwendet</remarks>
+    ''' <remarks>Die erste Dateiendung in dieser Collection repräsentiert den Datensatz (wird z.B. als Filter für OpenFile-Dialoge verwendet)</remarks>
     Public MustOverride ReadOnly Property DatensatzDateiendungen() As Collections.Specialized.StringCollection
+
+    ''' <summary>
+    ''' Die einen Datensatz repräsentierende Dateiendung (mit Punkt)
+    ''' </summary>
+    Public ReadOnly Property DatensatzExtension() As String
+        Get
+            Return "." & Me.DatensatzDateiendungen(0)
+        End Get
+    End Property
 
     Public Datensatz As String                           'Name des zu simulierenden Datensatzes
 
@@ -359,7 +366,7 @@ Public MustInherit Class Sim
         '----------------------
         Select Case Me.mProblem.Method
 
-            Case EVO.Common.METH_PES, EVO.Common.METH_SENSIPLOT, EVO.Common.METH_HOOKJEEVES
+            Case EVO.Common.METH_PES, EVO.Common.METH_SENSIPLOT, EVO.Common.METH_HOOKJEEVES, EVO.Common.METH_DDS
 
                 'Bereitet das Sim für PES vor
                 Call Me.PREPARE_Evaluation_PES(ind.OptParameter)
@@ -563,6 +570,11 @@ Handler:
             ElseIf (WertStr.Length < AnzZeichen - 1) Then
                 'Runden auf verfügbare Stellen: Anzahl der Stellen - Anzahl der Vorkommastellen - Komma
                 WertStr = Convert.ToString(Math.Round(Me.Akt.ModPara(i), AnzZeichen - WertStr.Length - 1), Common.Provider.FortranProvider)
+                'TODO: wozu der Punkt im Folgenden?
+                'If (Not WertStr.Contains(".")) Then
+                '    WertStr += "."
+                'End If
+
 
             Else
                 'Ganzzahligen Wert benutzen

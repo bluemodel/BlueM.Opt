@@ -45,7 +45,7 @@ Public Class HookeAndJeeves
     End Property
     Public Property MinimaleSchrittweite() As Double
         Get
-
+            Return dblMinimaleSchrittweite
         End Get
         Set(ByVal value As Double)
             If value > 0 Then

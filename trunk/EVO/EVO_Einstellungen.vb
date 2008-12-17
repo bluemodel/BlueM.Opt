@@ -56,6 +56,7 @@ Public Class EVO_Einstellungen
         Call Me.msettings.PES.setStandard(EVO_MODUS.Single_Objective)
         Call Me.msettings.CES.setStandard(METH_CES)
         Call Me.msettings.HookJeeves.setStandard()
+        Call Me.msettings.DDS.setStandard()
 
     End Sub
 
@@ -109,6 +110,17 @@ Public Class EVO_Einstellungen
 
                 'Standardeinstellungen setzen
                 Call Me.setStandard_HJ()
+
+            Case METH_DDS
+
+                'EVO_Einstellungen aktivieren
+                Me.Enabled = True
+
+                'Tabpage anzeigen
+                Me.TabControl1.TabPages.Add(Me.TabPage_DDS)
+
+                'Standardeinstellungen setzen
+                Call Me.setStandard_DDS()
 
             Case METH_CES
 
@@ -416,6 +428,14 @@ Public Class EVO_Einstellungen
 
         End With
 
+        With Me.msettings.DDS
+
+            .maxiter = Me.Numeric_DDS_maxiter.Value
+            .r_val = Me.Numeric_DDS_r_val.Value
+            .optStartparameter = Me.CheckBox_DDS_ini.Checked
+
+        End With
+
     End Sub
 
     'Setzt/Aktiviert/Deaktiviert die Einstellungen auf den PES Settings
@@ -552,6 +572,16 @@ Public Class EVO_Einstellungen
 
         End With
 
+        'DDS
+        '---------------
+        With Me.msettings.DDS
+
+            Me.Numeric_DDS_maxiter.Value = .maxiter
+            Me.Numeric_DDS_r_val.Value = .r_val
+            Me.CheckBox_DDS_ini.Checked = .optStartparameter
+
+        End With
+
         Call Application.DoEvents()
 
     End Sub
@@ -606,6 +636,13 @@ Public Class EVO_Einstellungen
     '***********************************
     Public Sub setStandard_HJ()
         Call Me.msettings.HookJeeves.setStandard()
+        Call Me.writeForm()
+    End Sub
+
+    'Standardeinstellungen setzen für DDS
+    '************************************
+    Public Sub setStandard_DDS()
+        Call Me.msettings.DDS.setStandard()
         Call Me.writeForm()
     End Sub
 
