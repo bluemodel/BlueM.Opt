@@ -71,7 +71,7 @@ namespace IHWB.EVO.MetaEvo
             {
                 mycon.Open();
                 mycon.Close();
-                 applog.appendText("Network Manager: DB-Connection Successfully");
+                applog.appendText("Network Manager: DB-Connection Successfully");
             }
             catch (MySqlException ex)
             {
@@ -181,6 +181,25 @@ namespace IHWB.EVO.MetaEvo
             {
                 MessageBox.Show("Fehler beim Schreiben in die Datenbank", "MetaEvo - Networkmanager");
             } 
+        }
+
+        //(ok)Client in DB updaten
+        public void DB_client_entry_update()
+        {
+            //Eintrag für Client
+            //Um Timestamp richtig zu generieren wird ein Update hinterhergeschickt
+            myCommand.CommandText = "UPDATE `metaevo_network` SET `status`= 'ready' WHERE ipName = '" + Dns.GetHostName() + "';";
+
+            try
+            {
+                myCommand.Connection.Open();
+                myCommand.ExecuteNonQuery();
+                myCommand.Connection.Close();
+            }
+            catch
+            {
+                MessageBox.Show("Fehler beim Schreiben in die Datenbank", "MetaEvo - Networkmanager");
+            }
         }
 
         //(ok)Individuum-Datenbank säubern

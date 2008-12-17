@@ -422,7 +422,7 @@ namespace IHWB.EVO.MetaEvo
                     applog.appendText("Controller: No Individuum found in DB (for this Client) - waiting...");
                     System.Threading.Thread.Sleep(3000);
                     //Prüfen ob Client-Entry noch besteht bzw. neu eintragen
-                    networkmanager.DB_client_entry();
+                    networkmanager.DB_client_entry_update();
                 }
 
                 //Serverstatus neu lesen
