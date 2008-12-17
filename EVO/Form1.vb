@@ -9,7 +9,7 @@
 '****                                                                       ****
 '**** Erstellt: Dezember 2003                                               ****
 '****                                                                       ****
-'**** Letzte Änderung: Juli 2008                                            ****
+'**** Letzte Änderung: Dezember 2008                                        ****
 '*******************************************************************************
 '*******************************************************************************
 
@@ -27,6 +27,7 @@ Partial Class Form1
 
     Private IsInitializing As Boolean
 
+    'Optionen
     Private Options As OptionsDialog
 
     'Anwendung
@@ -90,7 +91,7 @@ Partial Class Form1
         ComboBox_Anwendung.SelectedIndex = 0
 
         'Liste der Methoden in ComboBox schreiben und Anfangseinstellung wählen
-        ComboBox_Methode.Items.AddRange(New Object() {"", METH_PES, METH_CES, METH_HYBRID, METH_SENSIPLOT, METH_HOOKJEEVES})
+        ComboBox_Methode.Items.AddRange(New Object() {"", METH_PES, METH_CES, METH_HYBRID, METH_SENSIPLOT, METH_HOOKJEEVES, METH_DDS})
         ComboBox_Methode.SelectedIndex = 0
 
         'OptionsDialog instanzieren
@@ -113,7 +114,12 @@ Partial Class Form1
 
     'Optionen Dialog anzeigen
     '************************
-    Private Sub showOptionDialog(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem_Optionen.Click
+    Private Sub showOptionsDialog(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem_Optionen.Click
+        If (Me.isrun) Then
+            Call Me.Options.DisableAll()
+        Else
+            Call Me.Options.EnableAll()
+        End If
         Call Me.Options.ShowDialog()
     End Sub
 
@@ -233,7 +239,7 @@ Partial Class Form1
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Objekt der Klasse SWMM initialisieren
-                    Sim1 = New EVO.Apps.SWMM()
+                    Sim1 = New EVO.Apps.SWMM(n_Threads)
 
 
                 Case ANW_TESTPROBLEME 'Anwendung Testprobleme
@@ -293,9 +299,10 @@ Partial Class Form1
         'Bei Simulationsanwendungen:
         If (Me.Anwendung <> ANW_TESTPROBLEME) Then
 
-            'zuletzt benutzten Datensatz setzen
-            If (My.Settings.MRUSimDatensaetze.Count > 0) Then
-                pfad = My.Settings.MRUSimDatensaetze.Item(My.Settings.MRUSimDatensaetze.Count - 1)
+            'zuletzt benutzten Datensatz setzen?
+            If (Me.ComboBox_Datensatz.Items.Count > 0) Then
+                'obersten (zuletzt genutzten) Datensatz auswählen
+                pfad = Me.ComboBox_Datensatz.Items(0)
                 Me.ComboBox_Datensatz.SelectedItem = pfad
                 Call Sim1.setDatensatz(pfad)
             End If
@@ -311,6 +318,7 @@ Partial Class Form1
     Private Sub Datensatz_populateCombo()
 
         Dim i As Integer
+        Dim pfad As String
 
         'vorherige Einträge löschen
         Me.ComboBox_Datensatz.Items.Clear()
@@ -319,7 +327,7 @@ Partial Class Form1
 
             Case ANW_TESTPROBLEME
 
-                'Mit Tesproblemen füllen
+                'Mit Testproblemen füllen
                 Me.ComboBox_Datensatz.Items.AddRange(Testprobleme1.Testprobleme)
 
             Case Else '(Sim-Anwendungen)
@@ -329,7 +337,13 @@ Partial Class Form1
 
                     'Combobox rückwärts füllen
                     For i = My.Settings.MRUSimDatensaetze.Count - 1 To 0 Step -1
-                        Me.ComboBox_Datensatz.Items.Add(My.Settings.MRUSimDatensaetze.Item(i))
+
+                        'nur existierende, zur Anwendung passende Datensätze anzeigen
+                        pfad = My.Settings.MRUSimDatensaetze(i)
+                        If (File.Exists(pfad) _
+                            And Path.GetExtension(pfad).ToUpper() = Me.Sim1.DatensatzExtension) Then
+                            Me.ComboBox_Datensatz.Items.Add(My.Settings.MRUSimDatensaetze(i))
+                        End If
                     Next
 
                 End If
@@ -521,6 +535,19 @@ Partial Class Form1
                     'Kontrolle: Nur SO möglich!
                     If (Me.mProblem.Modus = EVO_MODUS.Multi_Objective) Then
                         Throw New Exception("Methode von Hook und Jeeves erlaubt nur Single-Objective Optimierung!")
+                    End If
+
+                    'Ergebnis-Buttons
+                    Me.Button_openMDB.Enabled = True
+
+                    'TODO: Progress mit Standardwerten initialisieren
+
+                Case METH_DDS
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'Kontrolle: Nur SO möglich!
+                    If (Me.mProblem.Modus = EVO_MODUS.Multi_Objective) Then
+                        Throw New Exception("Methode DDS erlaubt nur Single-Objective Optimierung!")
                     End If
 
                     'Ergebnis-Buttons
@@ -748,6 +775,8 @@ Partial Class Form1
                             Call STARTEN_CES_or_HYBRID()
                         Case METH_HOOKJEEVES
                             Call STARTEN_HookJeeves()
+                        Case METH_DDS
+                            Call STARTEN_DDS()
                     End Select
 
                 Case ANW_TESTPROBLEME
@@ -1428,6 +1457,151 @@ Partial Class Form1
         Next
     End Sub
 
+    Private Sub STARTEN_DDS()
+
+        '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        'Declarations
+        '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+        Dim i, j As Integer
+        Dim run As Integer = 0
+        Dim Ini_Parameter() As Double
+        Dim Current_Parameter(Me.mProblem.NumParams - 1) As Double
+        Dim ind As Common.Individuum_PES
+        Dim DDS As New modelEAU.DDS.DDS()
+
+        'Diagramm vorbereiten und initialisieren
+        Call PrepareDiagramm()
+
+        '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        'Initialize
+        '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+        If Me.mProblem.List_Featurefunctions(0).Richtung = EVO_RICHTUNG.Maximierung Then
+            DDS.to_max = -1.0
+        Else
+            DDS.to_max = 1.0
+        End If
+
+        ReDim Ini_Parameter(Me.mProblem.NumParams - 1)
+        For i = 0 To Me.mProblem.NumParams - 1
+            If (Me.mProblem.List_OptParameter(i).Xn < 0 Or Me.mProblem.List_OptParameter(i).Xn > 1) Then
+                Throw New Exception("Ini parameter " & i & " not between 0 and 1")
+            End If
+            Ini_Parameter(i) = Me.mProblem.List_OptParameter(i).Xn
+        Next
+
+        If EVO_Einstellungen1.Settings.DDS.optStartparameter Then 'Zufällige Startparameter
+            DDS.initialize(EVO_Einstellungen1.Settings.DDS.r_val, EVO_Einstellungen1.Settings.DDS.maxiter, _
+                       Me.mProblem.NumParams)
+        Else 'Vorgegebene Startparameter
+            DDS.initialize(EVO_Einstellungen1.Settings.DDS.r_val, EVO_Einstellungen1.Settings.DDS.maxiter, _
+                       Me.mProblem.NumParams, Ini_Parameter)
+        End If
+
+        '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        'Ini objective function evaluations
+        '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+        For i = 0 To DDS.ini_fevals - 1
+            run += 1
+
+            Current_Parameter = DDS.ini_solution_candidate()
+
+            ind = New Common.Individuum_PES("DDS", run)
+            'OptParameter ins Individuum kopieren
+            '------------------------------------
+            For j = 0 To ind.OptParameter.Length - 1
+                ind.OptParameter(j).Xn = Current_Parameter(j)
+            Next
+
+            'Vorbereiten des Modelldatensatzes
+            '---------------------------------
+            Call Sim1.PREPARE_Evaluation_PES(ind.OptParameter)
+
+            'Evaluierung des Simulationsmodells (ToDo: Validätsprüfung fehlt)
+            '----------------------------------------------------------------
+            SIM_Eval_is_OK = Sim1.launchSim()
+
+            Call My.Application.DoEvents()
+
+            If SIM_Eval_is_OK Then Call Sim1.SIM_Ergebnis_auswerten(ind)
+
+            Call My.Application.DoEvents()
+
+            'Lösung im TeeChart einzeichnen
+            '------------------------------
+            Dim serie As Steema.TeeChart.Styles.Series
+            serie = Me.Hauptdiagramm1.getSeriesPoint("DDS")
+            Call serie.Add(run, ind.Penalties(0), run.ToString())
+
+            Call My.Application.DoEvents()
+
+            'Bestwertspeicher und Searchhistorie aktualisieren
+            '-------------------------------------------------
+            If (run = 1) Then
+                DDS.ini_Fbest(ind.Penalties(0))
+            Else
+                DDS.update_Fbest(ind.Penalties(0))
+            End If
+            DDS.update_search_historie(ind.Penalties(0), run - 1)
+        Next
+        DDS.track_ini()
+
+        '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        'Ende ini objective function evaluations
+        '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        'Code below is now the DDS algorithm as presented in Figure 1 of 
+        'Tolson and Shoemaker (2007) 
+        '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        'start the OUTER DDS ALGORITHM LOOP for remaining allowble function evaluations (ileft)
+        '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+        For i = 1 To DDS.ileft
+            run += 1
+
+            Current_Parameter = DDS.determine_DV(i)
+
+            ind = New Common.Individuum_PES("DDS", run)
+            'OptParameter ins Individuum kopieren
+            '------------------------------------
+            For j = 0 To ind.OptParameter.Length - 1
+                ind.OptParameter(j).Xn = Current_Parameter(j)
+            Next
+
+            'Vorbereiten des Modelldatensatzes
+            '---------------------------------
+            Call Sim1.PREPARE_Evaluation_PES(ind.OptParameter)
+
+            'Evaluierung des Simulationsmodells (ToDo: Validätsprüfung fehlt)
+            '----------------------------------------------------------------
+            SIM_Eval_is_OK = Sim1.launchSim()
+
+            Call My.Application.DoEvents()
+
+            If SIM_Eval_is_OK Then Call Sim1.SIM_Ergebnis_auswerten(ind)
+
+            Call My.Application.DoEvents()
+
+            'Lösung im TeeChart einzeichnen
+            '------------------------------
+            Dim serie As Steema.TeeChart.Styles.Series
+            serie = Me.Hauptdiagramm1.getSeriesPoint("DDS")
+            Call serie.Add(run, ind.Penalties(0), run.ToString())
+
+            Call My.Application.DoEvents()
+
+            DDS.update_Fbest(ind.Penalties(0))
+
+            DDS.update_search_historie(ind.Penalties(0), run)
+        Next
+
+        '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        'ends OUTER DDS ALGORITHM LOOP
+        '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    End Sub
+
     'Anwendung des Verfahrens von Hook und Jeeves zur Parameteroptimierung
     '*********************************************************************
     Private Sub STARTEN_HookJeeves()
@@ -1759,90 +1933,126 @@ Start_Evolutionsrunden:
                     'Simulationsanwendungen nachträglich auswerten
                     If Anwendung = ANW_BLUEM Or Anwendung = ANW_SMUSI Or Anwendung = ANW_SCAN Or Anwendung = ANW_SWMM Then
 
-                        Dim Thread_Free As Integer = 0
-                        Dim Thread_Ready As Integer = 0
-                        Dim Child_Run As Integer = 0
-                        Dim Child_Ready As Integer = 0
-                        Dim Ready As Boolean = False
-                        System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
+                        If (Me.Options.useMultithreading) Then
+                            'Mit Multithreading
+                            '==================
+                            Dim Thread_Free As Integer = 0
+                            Dim Thread_Ready As Integer = 0
+                            Dim Child_Run As Integer = 0
+                            Dim Child_Ready As Integer = 0
+                            Dim Ready As Boolean = False
+                            System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
 
-                        Do
-                            If Sim1.launchFree(Thread_Free) And Child_Run < EVO_Einstellungen1.Settings.PES.n_Nachf _
-                            And (Child_Ready + n_Threads > Child_Run) And Me.ispause = False Then
-                                'Falls eine Simulation frei und nicht Pause
-                                '------------------------------------------
+                            Do
+                                If Sim1.launchFree(Thread_Free) And Child_Run < EVO_Einstellungen1.Settings.PES.n_Nachf _
+                                And (Child_Ready + n_Threads > Child_Run) And Me.ispause = False Then
+                                    'Falls eine Simulation frei und nicht Pause
+                                    '------------------------------------------
 
-                                Sim1.WorkDir_Current = Sim1.getThreadWorkDir(Thread_Free)
+                                    Sim1.WorkDir_Current = Sim1.getThreadWorkDir(Thread_Free)
 
+                                    Call Sim1.PREPARE_Evaluation_PES(ind(Child_Run).OptParameter)
+
+                                    ' Simulation ******************************************
+                                    SIM_Eval_is_OK = Sim1.launchSim(Thread_Free, Child_Run)
+                                    '******************************************************
+
+                                    Child_Run += 1
+
+                                ElseIf Sim1.launchReady(Thread_Ready, SIM_Eval_is_OK, Child_Ready) = True And SIM_Eval_is_OK Then
+                                    'Falls Simulation fertig und erfolgreich
+                                    '---------------------------------------
+
+                                    Sim1.WorkDir_Current = Sim1.getThreadWorkDir(Thread_Ready)
+                                    Sim1.SIM_Ergebnis_auswerten(ind(Child_Ready))
+
+                                    'Lösung zeichnen und Dn ausgeben
+                                    Call Me.Hauptdiagramm1.ZeichneIndividuum(ind(Child_Ready), PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, Child_Ready, Color.Orange)
+                                    Me.Label_Dn_Wert.Text = Math.Round(ind(Child_Ready).OptParameter(0).Dn, 6).ToString
+                                    Me.Monitor1.Zeichne_Dn(PES1.PES_iAkt.iAktGen * EVO_Einstellungen1.Settings.PES.n_Nachf + Child_Ready + 1, ind(Child_Ready).OptParameter(0).Dn)
+
+                                    'SELEKTIONSPROZESS Schritt 1
+                                    '###########################
+                                    'Einordnen der Qualitätsfunktion im Bestwertspeicher bei SO
+                                    'Falls MO Einordnen der Qualitätsfunktion in NDSorting
+                                    PES1.PES_iAkt.iAktNachf = Child_Ready
+                                    Call PES1.EsBest(ind(Child_Ready))
+
+                                    If (Child_Ready = EVO_Einstellungen1.Settings.PES.n_Nachf - 1) Then
+                                        Ready = True
+                                    End If
+
+                                    Child_Ready += 1
+
+                                    'Verlauf aktualisieren
+                                    Me.mProgress.iNachf = Child_Ready
+
+                                    System.Windows.Forms.Application.DoEvents()
+
+                                ElseIf Sim1.launchReady(Thread_Ready, SIM_Eval_is_OK, Child_Ready) = False And SIM_Eval_is_OK = False Then
+                                    'Falls Simulation fertig aber nicht erfolgreich
+                                    '----------------------------------------------
+
+                                    ReDim Preserve Child_False(Child_False.GetLength(0))
+                                    Child_False(Child_False.GetUpperBound(0)) = Child_Ready
+
+                                    If Child_Ready = EVO_Einstellungen1.Settings.PES.n_Nachf - 1 Then Ready = True
+                                    Child_Ready += 1
+
+                                ElseIf Me.ispause = True And Child_Ready = Child_Run Then
+                                    'Falls Pause und alle simulierten auch verarbeitet
+                                    '-------------------------------------------------
+
+                                    Me.Button_Start.Text = "Run"
+                                    Do While (Me.ispause)
+                                        System.Threading.Thread.Sleep(20)
+                                        Application.DoEvents()
+                                    Loop
+
+                                Else
+                                    'Falls total im Stress
+                                    '---------------------
+                                    System.Threading.Thread.Sleep(400)
+                                    Application.DoEvents()
+
+                                End If
+
+                            Loop While Ready = False
+
+                        Else
+                            'Ohne Multithreading
+                            '===================
+                            Sim1.WorkDir_Current = Sim1.getThreadWorkDir(0)
+                            Dim Child_Run As Integer = 0
+                            For i = 0 To EVO_Einstellungen1.Settings.PES.n_Nachf - 1
                                 Call Sim1.PREPARE_Evaluation_PES(ind(Child_Run).OptParameter)
-
                                 ' Simulation ******************************************
-                                SIM_Eval_is_OK = Sim1.launchSim(Thread_Free, Child_Run)
+                                SIM_Eval_is_OK = Sim1.launchSim()
                                 '******************************************************
-
-                                Child_Run += 1
-
-                            ElseIf Sim1.launchReady(Thread_Ready, SIM_Eval_is_OK, Child_Ready) = True And SIM_Eval_is_OK Then
-                                'Falls Simulation fertig und erfolgreich
-                                '---------------------------------------
-
-                                Sim1.WorkDir_Current = Sim1.getThreadWorkDir(Thread_Ready)
-                                Sim1.SIM_Ergebnis_auswerten(ind(Child_Ready))
+                                Sim1.SIM_Ergebnis_auswerten(ind(Child_Run))
 
                                 'Lösung zeichnen und Dn ausgeben
-                                Call Me.Hauptdiagramm1.ZeichneIndividuum(ind(Child_Ready), PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, Child_Ready, Color.Orange)
-                                Me.Label_Dn_Wert.Text = Math.Round(ind(Child_Ready).OptParameter(0).Dn, 6).ToString
-                                Me.Monitor1.Zeichne_Dn(PES1.PES_iAkt.iAktGen * EVO_Einstellungen1.Settings.PES.n_Nachf + Child_Ready + 1, ind(Child_Ready).OptParameter(0).Dn)
+                                Call Me.Hauptdiagramm1.ZeichneIndividuum(ind(Child_Run), PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, Child_Run, Color.Orange)
+                                Me.Label_Dn_Wert.Text = Math.Round(ind(Child_Run).OptParameter(0).Dn, 6).ToString
+                                Me.Monitor1.Zeichne_Dn((PES1.PES_iAkt.iAktGen + 1) * EVO_Einstellungen1.Settings.PES.n_Nachf + Child_Run, ind(Child_Run).OptParameter(0).Dn)
 
                                 'SELEKTIONSPROZESS Schritt 1
                                 '###########################
                                 'Einordnen der Qualitätsfunktion im Bestwertspeicher bei SO
                                 'Falls MO Einordnen der Qualitätsfunktion in NDSorting
-                                PES1.PES_iAkt.iAktNachf = Child_Ready
-                                Call PES1.EsBest(ind(Child_Ready))
-
-                                If (Child_Ready = EVO_Einstellungen1.Settings.PES.n_Nachf - 1) Then
-                                    Ready = True
-                                End If
-
-                                Child_Ready += 1
-
-                                'Verlauf aktualisieren
-                                Me.mProgress.iNachf = Child_Ready
-
+                                PES1.PES_iAkt.iAktNachf = Child_Run
+                                Call PES1.EsBest(ind(Child_Run))
+                                Child_Run += 1
+                                Me.mProgress.iNachf = Child_Run
+                                'Call EVO_Opt_Verlauf1.Nachfolger(Child_Run + 1)
                                 System.Windows.Forms.Application.DoEvents()
+                            Next
+                        End If
 
-                            ElseIf Sim1.launchReady(Thread_Ready, SIM_Eval_is_OK, Child_Ready) = False And SIM_Eval_is_OK = False Then
-                                'Falls Simulation fertig aber nicht erfolgreich
-                                '----------------------------------------------
-
-                                ReDim Preserve Child_False(Child_False.GetLength(0))
-                                Child_False(Child_False.GetUpperBound(0)) = Child_Ready
-
-                                If Child_Ready = EVO_Einstellungen1.Settings.PES.n_Nachf - 1 Then Ready = True
-                                Child_Ready += 1
-
-                            ElseIf Me.ispause = True And Child_Ready = Child_Run Then
-                                'Falls Pause und alle simulierten auch verarbeitet
-                                '-------------------------------------------------
-
-                                Me.Button_Start.Text = "Run"
-                                Do While (Me.ispause)
-                                    System.Threading.Thread.Sleep(20)
-                                    Application.DoEvents()
-                                Loop
-
-                            Else
-                                'Falls total im Stress
-                                '---------------------
-                                System.Threading.Thread.Sleep(400)
-                                Application.DoEvents()
-
-                            End If
-
-                        Loop While Ready = False
 
                     End If
+                    'Ende Simulationsschleife
+                    '+++++++++++++++++++++++++++++++++++++++++++++++++
 
                     'Do Schleife: Um Modellfehler bzw. Evaluierungsabbrüche abzufangen
                     If Child_False.GetLength(0) > -1 Then
@@ -1919,7 +2129,7 @@ Start_Evolutionsrunden:
                     End If
 
                     'ggf. alte Generation im Diagramm löschen
-                    If (Me.Options.showOnlyCurrentPop _
+                    If (Me.Options.drawOnlyCurrentPop _
                         And PES1.PES_iAkt.iAktGen < EVO_Einstellungen1.Settings.PES.n_Gen - 1) Then
                         Call Me.Hauptdiagramm1.LöscheLetzteGeneration(PES1.PES_iAkt.iAktPop)
                     End If
@@ -2109,7 +2319,7 @@ Start_Evolutionsrunden:
                         Call Me.Hauptdiagramm1.DiagInitialise(Anwendung, Achsen, Me.EVO_Einstellungen1.Settings, Me.mProblem)
 
 
-                    Case Else 'PES, CES, CES + PES, HYBRID, HOOK & JEEVES
+                    Case Else 'PES, CES, HYBRID, HOOK & JEEVES, DDS
                         'XXXXXXXXXXXXXXXXXXXXX
 
                         'Achsen:
@@ -2133,6 +2343,10 @@ Start_Evolutionsrunden:
 
                             ElseIf (Me.mProblem.Method = METH_HOOKJEEVES) Then
                                 'Bei Hooke & Jeeves:
+                                Achse.Automatic = True
+
+                            ElseIf (Me.mProblem.Method = METH_DDS) Then
+                                'Bei DDS:
                                 Achse.Automatic = True
 
                             Else

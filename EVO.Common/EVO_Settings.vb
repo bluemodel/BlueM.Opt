@@ -7,14 +7,14 @@ Public Class EVO_Settings
     '**** Klasse EVO_Settings                                                   ****
     '**** zum Speichern aller EVO-Einstellungen aus dem Form                    ****
     '****                                                                       ****
-    '**** Autoren: Christoph Hübner, Felix Fröhlich                             ****
+    '**** Autoren: Christoph Hübner, Felix Fröhlich, Dirk Muschalla             ****
     '****                                                                       ****
     '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
     '**** TU Darmstadt                                                          ****
     '****                                                                       ****
     '**** November 2007                                                         ****
     '****                                                                       ****
-    '**** Letzte Änderung: März 2008                                            ****
+    '**** Letzte Änderung: Dezember 2008                                        ****
     '*******************************************************************************
     '*******************************************************************************
 
@@ -236,6 +236,21 @@ Public Class EVO_Settings
 
     End Structure
 
+    Public Structure DDS_Settings
+        Public maxiter As Integer                  'Number of iterations
+        Public r_val As Double                     'DDS perturbation parameter
+        Public optStartparameter As Boolean
+
+        'Standardwerte setzen
+        '********************
+        Public Sub setStandard()
+            Me.maxiter = 1000
+            Me.r_val = 0.2
+            Me.optStartparameter = True
+        End Sub
+
+    End Structure
+
     Public Structure HookJeeves_Settings
         Public DnStart As Double                   'Startschrittweite
         Public is_DnVektor As Boolean              'Soll ein Schrittweitenvektor benutzt werden
@@ -254,4 +269,5 @@ Public Class EVO_Settings
     Public PES As PES_Settings
     Public CES As CES_Settings
     Public HookJeeves As HookJeeves_Settings
+    Public DDS As DDS_Settings
 End Class
