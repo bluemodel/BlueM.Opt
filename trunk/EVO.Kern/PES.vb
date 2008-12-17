@@ -854,12 +854,10 @@ Public Class PES
         Dim i, v, n As Integer
         Dim DeTemp(,,) As Double      'Temporäre Schrittweiten für Eltern
         Dim XeTemp(,,) As Double      'Temporäre Parameterwerte für Eltern
-        Dim expo As Integer             'Exponent für Schrittweite (+/-1)
+        Dim expo As Integer           'Exponent für Schrittweite (+/-1)
 
         ReDim DeTemp(Me.mProblem.NumParams - 1, mSettings.PES.n_Eltern - 1, mSettings.PES.Pop.n_Popul - 1)
         ReDim XeTemp(Me.mProblem.NumParams - 1, mSettings.PES.n_Eltern - 1, mSettings.PES.Pop.n_Popul - 1)
-
-StartMutation:
 
         'Einheitliche Schrittweite
         '-------------------------
@@ -882,13 +880,15 @@ StartMutation:
             For v = 0 To Me.mProblem.NumParams - 1
                 i = 0
                 Do
-                    i += 1
-                    'Abbruchkriterium
-                    '----------------
+                    'Abbruchkriterium für abhängige Parameter
+                    '----------------------------------------
                     If (i >= 1000) Then
                         'Es konnte kein gültiger Parametersatz generiert werden!
-                        'Wieder von vorne anfangen
-                        GoTo StartMutation
+                        'Vermutlich ist die aktuelle Schrittweite nicht groß genug.
+                        'Elterwert des aktuellen Parameters auf aktuellen Wert 
+                        'des Parameters setzen, von dem der aktuelle Parameter abhängig ist
+                        i = 0
+                        Xe(v, n, PES_iAkt.iAktPop) = XeTemp(v - 1, n, PES_iAkt.iAktPop)
                     End If
 
                     'Schrittweitenvektor
@@ -941,8 +941,6 @@ StartMutation:
         ReDim DnTemp(Me.mProblem.NumParams - 1)
         ReDim XnTemp(Me.mProblem.NumParams - 1)
 
-StartMutation:
-
         'Einheitliche Schrittweite
         '-------------------------
         If (Not mSettings.PES.Schrittweite.is_DnVektor) Then
@@ -979,12 +977,15 @@ StartMutation:
             i = 0
             Do
                 i += 1
-                'Abbruchkriterium
-                '----------------
+                'Abbruchkriterium für abhängige Parameter
+                '----------------------------------------
                 If (i >= 1000) Then
                     'Es konnte kein gültiger Parametersatz generiert werden!
-                    'Wieder von vorne anfangen
-                    GoTo StartMutation
+                    'Vermutlich ist die aktuelle Schrittweite nicht groß genug.
+                    'Elterwert des aktuellen Parameters auf aktuellen Wert 
+                    'des Parameters setzen, von dem der aktuelle Parameter abhängig ist
+                    i = 0
+                    AktPara(v).Xn = XnTemp(v - 1)
                 End If
 
                 'Schrittweitenvektor
