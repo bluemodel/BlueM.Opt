@@ -2559,7 +2559,7 @@ Start_Evolutionsrunden:
         Cursor = Cursors.WaitCursor
 
         'Simulationen in Originalverzeichnis ausführen (ohne Threads),
-        'WorDir_Current aber merken, und am Ende wieder setzen!
+        'WorDir_Current aber merken, und am Ende wieder zurücksetzen!
         WorkDir_Prev = Sim1.WorkDir_Current
         Sim1.WorkDir_Current = Sim1.WorkDir_Original
 
