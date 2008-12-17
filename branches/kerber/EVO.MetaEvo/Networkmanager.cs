@@ -20,7 +20,7 @@ namespace IHWB.EVO.MetaEvo
 
         int number_optparas;     //Anzahl Optimierungsparameter
         int number_constraints;  //Anzahl constraints
-        int number_features;    //Anzahl Featurefunktionswerte (inkl. Penalties)
+        int number_features;    //Anzahl Featurefunktionswerte (inkl. Penalties !!!)
         int populationsize;     //Anzahl Individuen in einer Population
 
         //### Konstruktor ###
@@ -168,19 +168,19 @@ namespace IHWB.EVO.MetaEvo
         //(ok)sich als Client in DB eintragen
         public void DB_client_entry() {
             //Eintrag für Client
-            myCommand.Connection.Open();
+            //Um Timestamp richtig zu generieren wird ein Update hinterhergeschickt
+            myCommand.CommandText = "INSERT INTO `metaevo_network` (`ipName`, `type`, `status`, `timestamp`, `speed_av`, `speed_low`) VALUES ('" + Dns.GetHostName() + "', 'client', 'ready', '', '1000', '1000'); UPDATE `metaevo_network` SET `status`= 'ready' WHERE ipName = '" + Dns.GetHostName() + "';";
+                
             try
             {
-                myCommand.CommandText = "INSERT INTO `metaevo_network` (`ipName`, `type`, `status`, `timestamp`, `speed_av`, `speed_low`) VALUES ('" + Dns.GetHostName() + "', 'client', 'ready', '', '1000', '1000');";
+                myCommand.Connection.Open();
                 myCommand.ExecuteNonQuery();
+                myCommand.Connection.Close();
             }
             catch
             {
-            }
-            //Um Timestamp richtig zu generieren:
-            myCommand.CommandText = "UPDATE `metaevo_network` SET `status`= 'ready' WHERE ipName = '" + Dns.GetHostName() + "';";
-            myCommand.ExecuteNonQuery();
-            myCommand.Connection.Close();
+                MessageBox.Show("Fehler beim Schreiben in die Datenbank", "MetaEvo - Networkmanager");
+            } 
         }
 
         //(ok)Individuum-Datenbank säubern
@@ -238,9 +238,16 @@ namespace IHWB.EVO.MetaEvo
             tmptxt = tmptxt.TrimEnd(':').Replace(",",".").Replace(":", ",") + ";";
 
             myCommand.CommandText = tmptxt;
-            myCommand.Connection.Open();
-            myCommand.ExecuteNonQuery();
-            myCommand.Connection.Close();
+            try
+            {
+                myCommand.Connection.Open();
+                myCommand.ExecuteNonQuery();
+                myCommand.Connection.Close();
+            }
+            catch
+            {
+                MessageBox.Show("Fehler beim Schreiben in die Datenbank", "MetaEvo - Networkmanager");
+            } 
         }
 
         //(ok)Neue Individuen in die Speicher-DB einfügen (ID, status, optparas, features, constraints)
@@ -287,54 +294,82 @@ namespace IHWB.EVO.MetaEvo
             tmptxt = tmptxt.TrimEnd(':').Replace(",", ".").Replace(":", ",") + ";";
 
             myCommand.CommandText = tmptxt;
-            myCommand.Connection.Open();
-            myCommand.ExecuteNonQuery();
-            myCommand.Connection.Close();
+            try
+            {
+                myCommand.Connection.Open();
+                myCommand.ExecuteNonQuery();
+                myCommand.Connection.Close();
+            }
+            catch
+            {
+                MessageBox.Show("Fehler beim Schreiben in die Datenbank", "MetaEvo - Networkmanager");
+            } 
         }
         
         //(ok)nächstes eigenes Individuum aus der DB lesen (ID, optparas)
         public void Individuum_ReadFromDB_Client(ref EVO.Common.Individuum_MetaEvo individuum_input)
         {
             myCommand = new MySqlCommand("Select * from metaevo_individuums WHERE ipName = '" + Dns.GetHostName() + "' AND (status = 'raw' OR status = 'calculate') LIMIT 1", mycon);
-            mycon.Open();
-            myReader = myCommand.ExecuteReader();
-
-            //Aus der DB lesen und in Individuum speichern
-            int ExportPosition = 0;
-
-            double[] optparas = new double[number_optparas];
-
-            while (myReader.Read())
+            try
             {
-                individuum_input.ID = myReader.GetInt32(ExportPosition);
-                ExportPosition += 2; 
+                myCommand.Connection.Open();
+                myReader = myCommand.ExecuteReader();
 
-                for (int k = 0; k < number_optparas; k++)
+                //Aus der DB lesen und in Individuum speichern
+                int ExportPosition = 0;
+
+                double[] optparas = new double[number_optparas];
+
+                while (myReader.Read())
                 {
-                    optparas[k] = myReader.GetDouble(ExportPosition);
-                    ExportPosition++;
-                }
-                individuum_input.set_status("raw");
-            }
-            individuum_input.set_optparas(optparas);
+                    individuum_input.ID = myReader.GetInt32(ExportPosition);
+                    ExportPosition += 2;
 
-            myReader.Close();
-            mycon.Close();
+                    for (int k = 0; k < number_optparas; k++)
+                    {
+                        optparas[k] = myReader.GetDouble(ExportPosition);
+                        ExportPosition++;
+                    }
+                    individuum_input.set_status("raw");
+                }
+                individuum_input.set_optparas(optparas);
+
+
+                myReader.Close();
+                myCommand.Connection.Close();
+            }
+            catch
+            {
+                MessageBox.Show("Fehler beim Lesen der Datenbank", "MetaEvo - Networkmanager");
+            } 
         }
 
         //(ok)prüfen wie viele Individuen fertig berechnet sind
         private int Individuums_CountReadyInDB()
         {
-            myCommand.CommandText = "Select status from metaevo_individuums WHERE status = 'true' OR status = 'false'";
-            myCommand.Connection.Open();
-            myReader = myCommand.ExecuteReader();
-
             int count = 0;
-            while (myReader.Read())
+
+            myCommand.CommandText = "Select status from metaevo_individuums WHERE status = 'true' OR status = 'false'";
+            try
             {
-                count++;
+                myCommand.Connection.Open();
+                myReader = myCommand.ExecuteReader();
+
+                myCommand.Connection.Open();
+                myReader = myCommand.ExecuteReader();
+
+                
+                while (myReader.Read())
+                {
+                    count++;
+                }
+                myReader.Close();
+                myCommand.Connection.Close();  
             }
-            myCommand.Connection.Close();
+            catch
+            {
+                MessageBox.Show("Fehler beim Lesen der Datenbank", "MetaEvo - Networkmanager");
+            }
             return count;
         }
         
@@ -342,54 +377,61 @@ namespace IHWB.EVO.MetaEvo
         private void Individuums_UpdateFromDB(ref EVO.Common.Individuum_MetaEvo[] generation_input)
         {
             myCommand = new MySqlCommand("Select * from metaevo_individuums", mycon);
-            mycon.Open();
-            myReader = myCommand.ExecuteReader();
-
-            int exportPosition;
-            int individuumcounter = 0;
-
-            double[] constraints = new double[number_constraints];
-            double[] features = new double[number_features];
-
-            //Aus der DB lesen und in Individuum speichern
-            while (myReader.Read())
+            try
             {
-                //Passendes Individuum zum DB-Export in der Individuentabelle finden (id-Vergleich)
-                for (int k = 0; k < generation_input.Length; k++)
+                mycon.Open();
+                myReader = myCommand.ExecuteReader();
+
+                int exportPosition;
+                int individuumcounter = 0;
+
+                double[] constraints = new double[number_constraints];
+                double[] features = new double[number_features];
+
+                //Aus der DB lesen und in Individuum speichern
+                while (myReader.Read())
                 {
-                    if (generation_input[k].ID == myReader.GetInt32(0))
+                    //Passendes Individuum zum DB-Export in der Individuentabelle finden (id-Vergleich)
+                    for (int k = 0; k < generation_input.Length; k++)
                     {
-                        individuumcounter = k;
+                        if (generation_input[k].ID == myReader.GetInt32(0))
+                        {
+                            individuumcounter = k;
+                        }
                     }
+
+                    //Status setzen
+                    exportPosition = 1;
+                    generation_input[individuumcounter].set_status(myReader.GetString(exportPosition));
+
+                    //Optparameter überspringen
+                    exportPosition += (this.number_optparas + 1);
+
+                    //Constraints setzen
+                    for (int k = 0; k < number_constraints; k++)
+                    {
+                        generation_input[individuumcounter].Constraints[k] = myReader.GetDouble(exportPosition);
+                        exportPosition++;
+                    }
+
+                    //Features setzen
+                    for (int k = 0; k < number_features; k++)
+                    {
+                        generation_input[individuumcounter].Features[k] = myReader.GetDouble(exportPosition);
+                        exportPosition++;
+                    }
+
+                    //Client setzen
+                    generation_input[individuumcounter].set_Client(myReader.GetString(exportPosition));
                 }
 
-                //Status setzen
-                exportPosition = 1;
-                generation_input[individuumcounter].set_status(myReader.GetString(exportPosition));
-
-                //Optparameter überspringen
-                exportPosition += (this.number_optparas + 1); 
-
-                //Constraints setzen
-                for (int k = 0; k < number_constraints; k++)
-                {
-                    generation_input[individuumcounter].Constraints[k] = myReader.GetDouble(exportPosition);
-                    exportPosition++;
-                }
-
-                //Features setzen
-                for (int k = 0; k < number_features; k++)
-                {
-                    generation_input[individuumcounter].Features[k] = myReader.GetDouble(exportPosition);
-                    exportPosition++;
-                }
-
-                //Client setzen
-                generation_input[individuumcounter].set_Client(myReader.GetString(exportPosition));
+                myReader.Close();
+                mycon.Close();
             }
-
-            myReader.Close();
-            mycon.Close();
+            catch
+            {
+                MessageBox.Show("Fehler beim Lesen der Datenbank", "MetaEvo - Networkmanager");
+            }
         }
 
         //(ok)bekanntes Individuum in DB updaten (abhängig vom Eingabeparameter) //Options: status, opt, feat, const, ipName
@@ -443,7 +485,7 @@ namespace IHWB.EVO.MetaEvo
             }
             catch
             {
-                //Eigene DB löschen um kollisionen zu vermeiden?
+                MessageBox.Show("Fehler beim Schreiben in die Datenbank", "MetaEvo - Networkmanager");
             }
         }
 

@@ -313,7 +313,7 @@ namespace IHWB.EVO.MetaEvo
 
                     //Von den Clients ausrechnen lassen
                     applog.appendText("Controller: Calculate Genpool by Clients");
-                    MessageBox.Show("Wait for Clients to register for calculation. Press ok to start","Networkmanager");
+                    MessageBox.Show("Wait for Clients to register for calculation. Press ok to start","MetaEvo - Networkmanager");
                     if (networkmanager.calculate_by_clients(ref generation, ref hauptdiagramm1))
                     {
                         algomanager.set_genpool(ref generation);
@@ -322,7 +322,7 @@ namespace IHWB.EVO.MetaEvo
                     }
                     else
                     {
-                        MessageBox.Show("Fehler beim Initialisieren des Genpools");
+                        MessageBox.Show("Fehler beim Initialisieren des Genpools", "MetaEvo - Controller");
                     }
                 }
 

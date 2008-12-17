@@ -3,9 +3,9 @@
 
     'Optparas: Eingabewerte
 
-    'Penalties: Ergebnisse der zu minimierenden Funktion
+    'Penalties: Ergebnisse der zu minimierenden Eigenschaftsfunktionen (Teil der Features)
     'Constraints: Ergebnisse der Randbedingungsfunktionen (Negativ = ungültiges Individuum)
-    'Features: Ergebnisse der Eigenschaftsfunktionen (nicht relevant)
+    'Features: Ergebnisse der Eigenschaftsfunktionen 
 
     Private generator_id As Integer         'von welchem Algorithmus das Individuum gemacht wurde
     Private Client As String                'Welcher Rechner dieses Individuum berechnen soll [ip oder Rechnername]

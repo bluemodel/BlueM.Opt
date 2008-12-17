@@ -121,7 +121,7 @@ namespace IHWB.EVO.MetaEvo
                     }
                 #endregion
 
-                //Aktuell nicht genutzt
+                //  Aktuell nicht genutzt
                 #region Feedback Mutation: Mutiert mit bewährtem Mutationsoperator und verbessert diesen
                 case "Feedback Mutation":
                     {
