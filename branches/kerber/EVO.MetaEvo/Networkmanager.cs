@@ -169,7 +169,7 @@ namespace IHWB.EVO.MetaEvo
         public void DB_client_entry() {
             //Eintrag für Client
             //Um Timestamp richtig zu generieren wird ein Update hinterhergeschickt
-            myCommand.CommandText = "INSERT INTO `metaevo_network` (`ipName`, `type`, `status`, `timestamp`, `speed_av`, `speed_low`) VALUES ('" + Dns.GetHostName() + "', 'client', 'ready', '', '1000', '1000'); UPDATE `metaevo_network` SET `status`= 'ready' WHERE ipName = '" + Dns.GetHostName() + "';";
+            myCommand.CommandText = "INSERT INTO `metaevo_network` (`ipName`, `type`, `status`, `speed_av`, `speed_low`) VALUES ('" + Dns.GetHostName() + "', 'client', 'ready', '1000', '1000'); UPDATE `metaevo_network` SET `status`= 'ready' WHERE ipName = '" + Dns.GetHostName() + "';";
                 
             try
             {
