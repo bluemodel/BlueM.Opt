@@ -907,7 +907,7 @@ Public Class PES
                     XeTemp(v, n, PES_iAkt.iAktPop) = Xe(v, n, PES_iAkt.iAktPop) + DeTemp(v, n, PES_iAkt.iAktPop) * Z
 
                     ' Restriktion für die mutierten Werte
-                Loop While (XeTemp(v, n, PES_iAkt.iAktPop) <= 0 Or XeTemp(v, n, PES_iAkt.iAktPop) > 1 Or Not checkBeziehungPop(v, n, XeTemp))
+                Loop While (XeTemp(v, n, PES_iAkt.iAktPop) < 0 Or XeTemp(v, n, PES_iAkt.iAktPop) > 1 Or Not checkBeziehungPop(v, n, XeTemp))
 
             Next v
 
@@ -1022,7 +1022,7 @@ Public Class PES
                 XnTemp(v) = AktPara(v).Xn + DnTemp(v) * Z
 
                 'Restriktion für die mutierten Werte
-            Loop While (XnTemp(v) <= 0 Or XnTemp(v) > 1 Or Not checkBeziehung(v, XnTemp))
+            Loop While (XnTemp(v) < 0 Or XnTemp(v) > 1 Or Not checkBeziehung(v, XnTemp))
 
         Next v
 
@@ -1101,7 +1101,7 @@ Public Class PES
                 XnTemp(v) = AktPara(v).Xn + Dn_CES * Z
 
                 'Restriktion für die mutierten Werte
-            Loop While (XnTemp(v) <= 0 Or XnTemp(v) > 1 Or Not checkBeziehung(v, XnTemp))
+            Loop While (XnTemp(v) < 0 Or XnTemp(v) > 1 Or Not checkBeziehung(v, XnTemp))
 
         Next v
 
