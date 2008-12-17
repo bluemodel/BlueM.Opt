@@ -125,25 +125,25 @@ Partial Class EVO_Einstellungen
         Me.Numeric_HJ_DeltaStart = New System.Windows.Forms.NumericUpDown
         Me.CheckBox_HJ_DNVektor = New System.Windows.Forms.CheckBox
         Me.TabPage_Hybrid2008 = New System.Windows.Forms.TabPage
-        Me.TabPage_DSS = New System.Windows.Forms.TabPage
-        Me.CheckBox_DSS_ini = New System.Windows.Forms.CheckBox
+        Me.TabPage_DDS = New System.Windows.Forms.TabPage
+        Me.CheckBox_DDS_ini = New System.Windows.Forms.CheckBox
         Me.Label11 = New System.Windows.Forms.Label
-        Me.Numeric_DSS_maxiter = New System.Windows.Forms.NumericUpDown
+        Me.Numeric_DDS_maxiter = New System.Windows.Forms.NumericUpDown
         Me.Label10 = New System.Windows.Forms.Label
-        Me.Numeric_DSS_r_val = New System.Windows.Forms.NumericUpDown
+        Me.Numeric_DDS_r_val = New System.Windows.Forms.NumericUpDown
         Me.Label5 = New System.Windows.Forms.Label
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip
         Me.ÖffnenToolStripButton = New System.Windows.Forms.ToolStripButton
         Me.SpeichernToolStripButton = New System.Windows.Forms.ToolStripButton
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox
-        Me.TabPage_DSS = New System.Windows.Forms.TabPage
+        Me.TabPage_DDS = New System.Windows.Forms.TabPage
         Me.Label5 = New System.Windows.Forms.Label
-        Me.Numeric_DSS_r_val = New System.Windows.Forms.NumericUpDown
+        Me.Numeric_DDS_r_val = New System.Windows.Forms.NumericUpDown
         Me.Label10 = New System.Windows.Forms.Label
-        Me.Numeric_DSS_maxiter = New System.Windows.Forms.NumericUpDown
+        Me.Numeric_DDS_maxiter = New System.Windows.Forms.NumericUpDown
         Me.Label11 = New System.Windows.Forms.Label
-        Me.CheckBox_DSS_ini = New System.Windows.Forms.CheckBox
+        Me.CheckBox_DDS_ini = New System.Windows.Forms.CheckBox
         Label_CES_MemSize = New System.Windows.Forms.Label
         Label_CES_NMembers_SecPop_PES = New System.Windows.Forms.Label
         Label_CES_NExchange_secPop_PES = New System.Windows.Forms.Label
@@ -213,14 +213,14 @@ Partial Class EVO_Einstellungen
         Me.TabPage_HookeJeeves.SuspendLayout()
         CType(Me.Numeric_HJ_DeltaFinish, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Numeric_HJ_DeltaStart, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.TabPage_DSS.SuspendLayout()
-        CType(Me.Numeric_DSS_maxiter, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.Numeric_DSS_r_val, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.TabPage_DDS.SuspendLayout()
+        CType(Me.Numeric_DDS_maxiter, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.Numeric_DDS_r_val, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ToolStrip1.SuspendLayout()
         Me.GroupBox_Einstellungen.SuspendLayout()
-        Me.TabPage_DSS.SuspendLayout()
-        CType(Me.Numeric_DSS_r_val, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.Numeric_DSS_maxiter, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.TabPage_DDS.SuspendLayout()
+        CType(Me.Numeric_DDS_r_val, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.Numeric_DDS_maxiter, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'Label_CES_MemSize
@@ -561,7 +561,7 @@ Partial Class EVO_Einstellungen
         Me.TabControl1.Controls.Add(Me.TabPage_CES)
         Me.TabControl1.Controls.Add(Me.TabPage_HookeJeeves)
         Me.TabControl1.Controls.Add(Me.TabPage_Hybrid2008)
-        Me.TabControl1.Controls.Add(Me.TabPage_DSS)
+        Me.TabControl1.Controls.Add(Me.TabPage_DDS)
         Me.TabControl1.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TabControl1.Location = New System.Drawing.Point(1, 41)
         Me.TabControl1.Margin = New System.Windows.Forms.Padding(0)
@@ -1344,32 +1344,32 @@ Partial Class EVO_Einstellungen
         Me.TabPage_Hybrid2008.TabIndex = 3
         Me.TabPage_Hybrid2008.Text = "Hybrid2008"
         '
-        'TabPage_DSS
+        'TabPage_DDS
         '
-        Me.TabPage_DSS.BackColor = System.Drawing.SystemColors.Control
-        Me.TabPage_DSS.Controls.Add(Me.CheckBox_DSS_ini)
-        Me.TabPage_DSS.Controls.Add(Me.Label11)
-        Me.TabPage_DSS.Controls.Add(Me.Numeric_DSS_maxiter)
-        Me.TabPage_DSS.Controls.Add(Me.Label10)
-        Me.TabPage_DSS.Controls.Add(Me.Numeric_DSS_r_val)
-        Me.TabPage_DSS.Controls.Add(Me.Label5)
-        Me.TabPage_DSS.Location = New System.Drawing.Point(4, 22)
-        Me.TabPage_DSS.Name = "TabPage_DSS"
-        Me.TabPage_DSS.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage_DSS.Size = New System.Drawing.Size(222, 630)
-        Me.TabPage_DSS.TabIndex = 4
-        Me.TabPage_DSS.Text = "DSS"
+        Me.TabPage_DDS.BackColor = System.Drawing.SystemColors.Control
+        Me.TabPage_DDS.Controls.Add(Me.CheckBox_DDS_ini)
+        Me.TabPage_DDS.Controls.Add(Me.Label11)
+        Me.TabPage_DDS.Controls.Add(Me.Numeric_DDS_maxiter)
+        Me.TabPage_DDS.Controls.Add(Me.Label10)
+        Me.TabPage_DDS.Controls.Add(Me.Numeric_DDS_r_val)
+        Me.TabPage_DDS.Controls.Add(Me.Label5)
+        Me.TabPage_DDS.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage_DDS.Name = "TabPage_DDS"
+        Me.TabPage_DDS.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage_DDS.Size = New System.Drawing.Size(222, 630)
+        Me.TabPage_DDS.TabIndex = 4
+        Me.TabPage_DDS.Text = "DDS"
         '
-        'CheckBox_DSS_ini
+        'CheckBox_DDS_ini
         '
-        Me.CheckBox_DSS_ini.AutoSize = True
-        Me.CheckBox_DSS_ini.Checked = True
-        Me.CheckBox_DSS_ini.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBox_DSS_ini.Location = New System.Drawing.Point(161, 75)
-        Me.CheckBox_DSS_ini.Name = "CheckBox_DSS_ini"
-        Me.CheckBox_DSS_ini.Size = New System.Drawing.Size(15, 14)
-        Me.CheckBox_DSS_ini.TabIndex = 5
-        Me.CheckBox_DSS_ini.UseVisualStyleBackColor = True
+        Me.CheckBox_DDS_ini.AutoSize = True
+        Me.CheckBox_DDS_ini.Checked = True
+        Me.CheckBox_DDS_ini.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.CheckBox_DDS_ini.Location = New System.Drawing.Point(161, 75)
+        Me.CheckBox_DDS_ini.Name = "CheckBox_DDS_ini"
+        Me.CheckBox_DDS_ini.Size = New System.Drawing.Size(15, 14)
+        Me.CheckBox_DDS_ini.TabIndex = 5
+        Me.CheckBox_DDS_ini.UseVisualStyleBackColor = True
         '
         'Label11
         '
@@ -1381,16 +1381,16 @@ Partial Class EVO_Einstellungen
         Me.Label11.TabIndex = 4
         Me.Label11.Text = "random initial values"
         '
-        'Numeric_DSS_maxiter
+        'Numeric_DDS_maxiter
         '
-        Me.Numeric_DSS_maxiter.Increment = New Decimal(New Integer() {100, 0, 0, 0})
-        Me.Numeric_DSS_maxiter.Location = New System.Drawing.Point(161, 42)
-        Me.Numeric_DSS_maxiter.Maximum = New Decimal(New Integer() {100000, 0, 0, 0})
-        Me.Numeric_DSS_maxiter.Minimum = New Decimal(New Integer() {100, 0, 0, 0})
-        Me.Numeric_DSS_maxiter.Name = "Numeric_DSS_maxiter"
-        Me.Numeric_DSS_maxiter.Size = New System.Drawing.Size(55, 18)
-        Me.Numeric_DSS_maxiter.TabIndex = 3
-        Me.Numeric_DSS_maxiter.Value = New Decimal(New Integer() {100, 0, 0, 0})
+        Me.Numeric_DDS_maxiter.Increment = New Decimal(New Integer() {100, 0, 0, 0})
+        Me.Numeric_DDS_maxiter.Location = New System.Drawing.Point(161, 42)
+        Me.Numeric_DDS_maxiter.Maximum = New Decimal(New Integer() {100000, 0, 0, 0})
+        Me.Numeric_DDS_maxiter.Minimum = New Decimal(New Integer() {100, 0, 0, 0})
+        Me.Numeric_DDS_maxiter.Name = "Numeric_DDS_maxiter"
+        Me.Numeric_DDS_maxiter.Size = New System.Drawing.Size(55, 18)
+        Me.Numeric_DDS_maxiter.TabIndex = 3
+        Me.Numeric_DDS_maxiter.Value = New Decimal(New Integer() {100, 0, 0, 0})
         '
         'Label10
         '
@@ -1402,17 +1402,17 @@ Partial Class EVO_Einstellungen
         Me.Label10.TabIndex = 2
         Me.Label10.Text = "max. iterations"
         '
-        'Numeric_DSS_r_val
+        'Numeric_DDS_r_val
         '
-        Me.Numeric_DSS_r_val.DecimalPlaces = 3
-        Me.Numeric_DSS_r_val.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Numeric_DSS_r_val.Increment = New Decimal(New Integer() {25, 0, 0, 196608})
-        Me.Numeric_DSS_r_val.Location = New System.Drawing.Point(161, 16)
-        Me.Numeric_DSS_r_val.Maximum = New Decimal(New Integer() {10, 0, 0, 65536})
-        Me.Numeric_DSS_r_val.Name = "Numeric_DSS_r_val"
-        Me.Numeric_DSS_r_val.Size = New System.Drawing.Size(55, 20)
-        Me.Numeric_DSS_r_val.TabIndex = 1
-        Me.Numeric_DSS_r_val.Value = New Decimal(New Integer() {2, 0, 0, 65536})
+        Me.Numeric_DDS_r_val.DecimalPlaces = 3
+        Me.Numeric_DDS_r_val.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Numeric_DDS_r_val.Increment = New Decimal(New Integer() {25, 0, 0, 196608})
+        Me.Numeric_DDS_r_val.Location = New System.Drawing.Point(161, 16)
+        Me.Numeric_DDS_r_val.Maximum = New Decimal(New Integer() {10, 0, 0, 65536})
+        Me.Numeric_DDS_r_val.Name = "Numeric_DDS_r_val"
+        Me.Numeric_DDS_r_val.Size = New System.Drawing.Size(55, 20)
+        Me.Numeric_DDS_r_val.TabIndex = 1
+        Me.Numeric_DDS_r_val.Value = New Decimal(New Integer() {2, 0, 0, 65536})
         '
         'Label5
         '
@@ -1465,21 +1465,21 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Einstellungen.TabStop = False
         Me.GroupBox_Einstellungen.Text = "Einstellungen:"
         '
-        'TabPage_DSS
+        'TabPage_DDS
         '
-        Me.TabPage_DSS.Controls.Add(Me.CheckBox_DSS_ini)
-        Me.TabPage_DSS.Controls.Add(Me.Label11)
-        Me.TabPage_DSS.Controls.Add(Me.Numeric_DSS_maxiter)
-        Me.TabPage_DSS.Controls.Add(Me.Label10)
-        Me.TabPage_DSS.Controls.Add(Me.Numeric_DSS_r_val)
-        Me.TabPage_DSS.Controls.Add(Me.Label5)
-        Me.TabPage_DSS.Location = New System.Drawing.Point(4, 22)
-        Me.TabPage_DSS.Name = "TabPage_DSS"
-        Me.TabPage_DSS.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage_DSS.Size = New System.Drawing.Size(222, 630)
-        Me.TabPage_DSS.TabIndex = 4
-        Me.TabPage_DSS.Text = "DSS"
-        Me.TabPage_DSS.UseVisualStyleBackColor = True
+        Me.TabPage_DDS.Controls.Add(Me.CheckBox_DDS_ini)
+        Me.TabPage_DDS.Controls.Add(Me.Label11)
+        Me.TabPage_DDS.Controls.Add(Me.Numeric_DDS_maxiter)
+        Me.TabPage_DDS.Controls.Add(Me.Label10)
+        Me.TabPage_DDS.Controls.Add(Me.Numeric_DDS_r_val)
+        Me.TabPage_DDS.Controls.Add(Me.Label5)
+        Me.TabPage_DDS.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage_DDS.Name = "TabPage_DDS"
+        Me.TabPage_DDS.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage_DDS.Size = New System.Drawing.Size(222, 630)
+        Me.TabPage_DDS.TabIndex = 4
+        Me.TabPage_DDS.Text = "DDS"
+        Me.TabPage_DDS.UseVisualStyleBackColor = True
         '
         'Label5
         '
@@ -1491,17 +1491,17 @@ Partial Class EVO_Einstellungen
         Me.Label5.TabIndex = 0
         Me.Label5.Text = "neighborhood pertubation size"
         '
-        'Numeric_DSS_r_val
+        'Numeric_DDS_r_val
         '
-        Me.Numeric_DSS_r_val.DecimalPlaces = 3
-        Me.Numeric_DSS_r_val.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Numeric_DSS_r_val.Increment = New Decimal(New Integer() {25, 0, 0, 196608})
-        Me.Numeric_DSS_r_val.Location = New System.Drawing.Point(161, 16)
-        Me.Numeric_DSS_r_val.Maximum = New Decimal(New Integer() {10, 0, 0, 65536})
-        Me.Numeric_DSS_r_val.Name = "Numeric_DSS_r_val"
-        Me.Numeric_DSS_r_val.Size = New System.Drawing.Size(55, 20)
-        Me.Numeric_DSS_r_val.TabIndex = 1
-        Me.Numeric_DSS_r_val.Value = New Decimal(New Integer() {2, 0, 0, 65536})
+        Me.Numeric_DDS_r_val.DecimalPlaces = 3
+        Me.Numeric_DDS_r_val.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Numeric_DDS_r_val.Increment = New Decimal(New Integer() {25, 0, 0, 196608})
+        Me.Numeric_DDS_r_val.Location = New System.Drawing.Point(161, 16)
+        Me.Numeric_DDS_r_val.Maximum = New Decimal(New Integer() {10, 0, 0, 65536})
+        Me.Numeric_DDS_r_val.Name = "Numeric_DDS_r_val"
+        Me.Numeric_DDS_r_val.Size = New System.Drawing.Size(55, 20)
+        Me.Numeric_DDS_r_val.TabIndex = 1
+        Me.Numeric_DDS_r_val.Value = New Decimal(New Integer() {2, 0, 0, 65536})
         '
         'Label10
         '
@@ -1513,16 +1513,16 @@ Partial Class EVO_Einstellungen
         Me.Label10.TabIndex = 2
         Me.Label10.Text = "max. iterations"
         '
-        'Numeric_DSS_maxiter
+        'Numeric_DDS_maxiter
         '
-        Me.Numeric_DSS_maxiter.Increment = New Decimal(New Integer() {100, 0, 0, 0})
-        Me.Numeric_DSS_maxiter.Location = New System.Drawing.Point(161, 42)
-        Me.Numeric_DSS_maxiter.Maximum = New Decimal(New Integer() {100000, 0, 0, 0})
-        Me.Numeric_DSS_maxiter.Minimum = New Decimal(New Integer() {100, 0, 0, 0})
-        Me.Numeric_DSS_maxiter.Name = "Numeric_DSS_maxiter"
-        Me.Numeric_DSS_maxiter.Size = New System.Drawing.Size(55, 18)
-        Me.Numeric_DSS_maxiter.TabIndex = 3
-        Me.Numeric_DSS_maxiter.Value = New Decimal(New Integer() {100, 0, 0, 0})
+        Me.Numeric_DDS_maxiter.Increment = New Decimal(New Integer() {100, 0, 0, 0})
+        Me.Numeric_DDS_maxiter.Location = New System.Drawing.Point(161, 42)
+        Me.Numeric_DDS_maxiter.Maximum = New Decimal(New Integer() {100000, 0, 0, 0})
+        Me.Numeric_DDS_maxiter.Minimum = New Decimal(New Integer() {100, 0, 0, 0})
+        Me.Numeric_DDS_maxiter.Name = "Numeric_DDS_maxiter"
+        Me.Numeric_DDS_maxiter.Size = New System.Drawing.Size(55, 18)
+        Me.Numeric_DDS_maxiter.TabIndex = 3
+        Me.Numeric_DDS_maxiter.Value = New Decimal(New Integer() {100, 0, 0, 0})
         '
         'Label11
         '
@@ -1534,16 +1534,16 @@ Partial Class EVO_Einstellungen
         Me.Label11.TabIndex = 4
         Me.Label11.Text = "random initial values"
         '
-        'CheckBox_DSS_ini
+        'CheckBox_DDS_ini
         '
-        Me.CheckBox_DSS_ini.AutoSize = True
-        Me.CheckBox_DSS_ini.Checked = True
-        Me.CheckBox_DSS_ini.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBox_DSS_ini.Location = New System.Drawing.Point(161, 75)
-        Me.CheckBox_DSS_ini.Name = "CheckBox_DSS_ini"
-        Me.CheckBox_DSS_ini.Size = New System.Drawing.Size(15, 14)
-        Me.CheckBox_DSS_ini.TabIndex = 5
-        Me.CheckBox_DSS_ini.UseVisualStyleBackColor = True
+        Me.CheckBox_DDS_ini.AutoSize = True
+        Me.CheckBox_DDS_ini.Checked = True
+        Me.CheckBox_DDS_ini.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.CheckBox_DDS_ini.Location = New System.Drawing.Point(161, 75)
+        Me.CheckBox_DDS_ini.Name = "CheckBox_DDS_ini"
+        Me.CheckBox_DDS_ini.Size = New System.Drawing.Size(15, 14)
+        Me.CheckBox_DDS_ini.TabIndex = 5
+        Me.CheckBox_DDS_ini.UseVisualStyleBackColor = True
         '
         'EVO_Einstellungen
         '
@@ -1592,18 +1592,18 @@ Partial Class EVO_Einstellungen
         Me.TabPage_HookeJeeves.PerformLayout()
         CType(Me.Numeric_HJ_DeltaFinish, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.Numeric_HJ_DeltaStart, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.TabPage_DSS.ResumeLayout(False)
-        Me.TabPage_DSS.PerformLayout()
-        CType(Me.Numeric_DSS_maxiter, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.Numeric_DSS_r_val, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.TabPage_DDS.ResumeLayout(False)
+        Me.TabPage_DDS.PerformLayout()
+        CType(Me.Numeric_DDS_maxiter, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.Numeric_DDS_r_val, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ToolStrip1.ResumeLayout(False)
         Me.ToolStrip1.PerformLayout()
         Me.GroupBox_Einstellungen.ResumeLayout(False)
         Me.GroupBox_Einstellungen.PerformLayout()
-        Me.TabPage_DSS.ResumeLayout(False)
-        Me.TabPage_DSS.PerformLayout()
-        CType(Me.Numeric_DSS_r_val, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.Numeric_DSS_maxiter, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.TabPage_DDS.ResumeLayout(False)
+        Me.TabPage_DDS.PerformLayout()
+        CType(Me.Numeric_DDS_r_val, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.Numeric_DDS_maxiter, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -1680,11 +1680,11 @@ Partial Class EVO_Einstellungen
     Private WithEvents TabPage_CES As System.Windows.Forms.TabPage
     Private WithEvents TabPage_Hybrid2008 As System.Windows.Forms.TabPage
     Private WithEvents TabControl1 As System.Windows.Forms.TabControl
-    Friend WithEvents TabPage_DSS As System.Windows.Forms.TabPage
+    Friend WithEvents TabPage_DDS As System.Windows.Forms.TabPage
     Friend WithEvents Label5 As System.Windows.Forms.Label
     Friend WithEvents Label10 As System.Windows.Forms.Label
-    Friend WithEvents Numeric_DSS_r_val As System.Windows.Forms.NumericUpDown
+    Friend WithEvents Numeric_DDS_r_val As System.Windows.Forms.NumericUpDown
     Friend WithEvents Label11 As System.Windows.Forms.Label
-    Friend WithEvents Numeric_DSS_maxiter As System.Windows.Forms.NumericUpDown
-    Friend WithEvents CheckBox_DSS_ini As System.Windows.Forms.CheckBox
+    Friend WithEvents Numeric_DDS_maxiter As System.Windows.Forms.NumericUpDown
+    Friend WithEvents CheckBox_DDS_ini As System.Windows.Forms.CheckBox
 End Class

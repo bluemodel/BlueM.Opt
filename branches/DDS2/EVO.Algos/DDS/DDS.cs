@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace modelEAU.DDS
@@ -21,7 +20,7 @@ namespace modelEAU.DDS
 //for computationally efficient watershed model calibration, Water Resour. Res., 43, 
 //W01413, doi:10.1029/2005WR004723.
 
-    public class DSS : modelEAU.DDS.IDSS
+    public class DDS : modelEAU.DDS.IDDS
     {
         # region declarations
         
@@ -147,7 +146,7 @@ namespace modelEAU.DDS
         /// <summary>
         /// Standard constructor
         /// </summary>
-        public DSS()
+        public DDS()
         {
             _r_val = 0.2;
             _to_max = 1.0; //minimize
@@ -159,7 +158,7 @@ namespace modelEAU.DDS
 
         #region public methods
         /// <summary>
-        /// see Interface (IDSS)
+        /// see Interface (IDDS)
         /// </summary>
         public void initialize(double r_val_in, int maxiter_in, int num_dec_in,
                                double[] initials_in)
@@ -168,20 +167,20 @@ namespace modelEAU.DDS
             maxiter = maxiter_in;
             num_dec = num_dec_in;
 
-            DSS_allocate();
+            DDS_allocate();
 
             //Check
             if (initials_in.GetUpperBound(0) != _num_dec - 1)
             {CreateAndThrowException("Dimension of initials Array <> num_dec!");}
             initials = (double[])initials_in.Clone();
             ini_fevals_typ = 2;
-            DSS_ini_fevals();
+            DDS_ini_fevals();
 
-            DSS_bounds();
+            DDS_bounds();
         }
 
         /// <summary>
-        /// see Interface (IDSS)
+        /// see Interface (IDDS)
         /// </summary>
         public void initialize(double r_val_in, int maxiter_in, int num_dec_in)
         {
@@ -189,16 +188,16 @@ namespace modelEAU.DDS
             maxiter = maxiter_in;
             num_dec = num_dec_in;
 
-            DSS_allocate();
+            DDS_allocate();
 
             ini_fevals_typ = 1;
-            DSS_ini_fevals();
+            DDS_ini_fevals();
 
-            DSS_bounds();
+            DDS_bounds();
         }
 
         /// <summary>
-        /// see Interface (IDSS)
+        /// see Interface (IDDS)
         /// </summary>
         public double[] ini_solution_candidate()
         {
@@ -213,7 +212,7 @@ namespace modelEAU.DDS
         }
 
         /// <summary>
-        /// see Interface (IDSS)
+        /// see Interface (IDDS)
         /// </summary>
         public void ini_Fbest(double fvalue)
         {
@@ -225,7 +224,7 @@ namespace modelEAU.DDS
         }
 
         /// <summary>
-        /// see Interface (IDSS)
+        /// see Interface (IDDS)
         /// </summary>
         public void update_Fbest(double fvalue)
         {
@@ -240,7 +239,7 @@ namespace modelEAU.DDS
         }
 
         /// <summary>
-        /// see Interface (IDSS)
+        /// see Interface (IDDS)
         /// </summary>
         public void update_search_historie(double fvalue, int index)
         {
@@ -255,7 +254,7 @@ namespace modelEAU.DDS
         }
 
         /// <summary>
-        /// see Interface (IDSS)
+        /// see Interface (IDDS)
         /// </summary>
         public void  track_ini()
         {
@@ -312,7 +311,7 @@ namespace modelEAU.DDS
         /// <summary>
         /// Allocate all DDS array variables
         /// </summary>
-        private void DSS_allocate()
+        private void DDS_allocate()
         {
             s_min = new double[_num_dec];
             s_max = new double[_num_dec];    
@@ -329,7 +328,7 @@ namespace modelEAU.DDS
         /// <summary>
         /// Sets decision variable bounds
         /// </summary>
-        private void DSS_bounds()
+        private void DDS_bounds()
         {
             for (int i = 0; i != _num_dec; i++)
             {
@@ -338,7 +337,7 @@ namespace modelEAU.DDS
             }
         }
 
-        private void DSS_ini_fevals()
+        private void DDS_ini_fevals()
         {
             if (_ini_fevals_typ == 2) 
             {

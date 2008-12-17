@@ -91,7 +91,7 @@ Partial Class Form1
         ComboBox_Anwendung.SelectedIndex = 0
 
         'Liste der Methoden in ComboBox schreiben und Anfangseinstellung wählen
-        ComboBox_Methode.Items.AddRange(New Object() {"", METH_PES, METH_CES, METH_HYBRID, METH_SENSIPLOT, METH_HOOKJEEVES, METH_DSS})
+        ComboBox_Methode.Items.AddRange(New Object() {"", METH_PES, METH_CES, METH_HYBRID, METH_SENSIPLOT, METH_HOOKJEEVES, METH_DDS})
         ComboBox_Methode.SelectedIndex = 0
 
         'OptionsDialog instanzieren
@@ -542,12 +542,12 @@ Partial Class Form1
 
                     'TODO: Progress mit Standardwerten initialisieren
 
-                Case METH_DSS
+                Case METH_DDS
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Kontrolle: Nur SO möglich!
                     If (Me.mProblem.Modus = EVO_MODUS.Multi_Objective) Then
-                        Throw New Exception("Methode DSS erlaubt nur Single-Objective Optimierung!")
+                        Throw New Exception("Methode DDS erlaubt nur Single-Objective Optimierung!")
                     End If
 
                     'Ergebnis-Buttons
@@ -775,8 +775,8 @@ Partial Class Form1
                             Call STARTEN_CES_or_HYBRID()
                         Case METH_HOOKJEEVES
                             Call STARTEN_HookJeeves()
-                        Case METH_DSS
-                            Call STARTEN_DSS()
+                        Case METH_DDS
+                            Call STARTEN_DDS()
                     End Select
 
                 Case ANW_TESTPROBLEME
@@ -1457,7 +1457,7 @@ Partial Class Form1
         Next
     End Sub
 
-    Private Sub STARTEN_DSS()
+    Private Sub STARTEN_DDS()
 
         '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         'Declarations
@@ -1468,7 +1468,7 @@ Partial Class Form1
         Dim Ini_Parameter() As Double
         Dim Current_Parameter(Me.mProblem.NumParams - 1) As Double
         Dim ind As Common.Individuum_PES
-        Dim DSS As modelEAU.DDS.DSS = New modelEAU.DDS.DSS()
+        Dim DDS As New modelEAU.DDS.DDS()
 
         'Diagramm vorbereiten und initialisieren
         Call PrepareDiagramm()
@@ -1478,9 +1478,9 @@ Partial Class Form1
         '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
         If Me.mProblem.List_Featurefunctions(0).Richtung = EVO_RICHTUNG.Maximierung Then
-            DSS.to_max = -1.0
+            DDS.to_max = -1.0
         Else
-            DSS.to_max = 1.0
+            DDS.to_max = 1.0
         End If
 
         ReDim Ini_Parameter(Me.mProblem.NumParams - 1)
@@ -1491,11 +1491,11 @@ Partial Class Form1
             Ini_Parameter(i) = Me.mProblem.List_OptParameter(i).Xn
         Next
 
-        If EVO_Einstellungen1.Settings.DSS.optStartparameter Then 'Zufällige Startparameter
-            DSS.initialize(EVO_Einstellungen1.Settings.DSS.r_val, EVO_Einstellungen1.Settings.DSS.maxiter, _
+        If EVO_Einstellungen1.Settings.DDS.optStartparameter Then 'Zufällige Startparameter
+            DDS.initialize(EVO_Einstellungen1.Settings.DDS.r_val, EVO_Einstellungen1.Settings.DDS.maxiter, _
                        Me.mProblem.NumParams)
         Else 'Vorgegebene Startparameter
-            DSS.initialize(EVO_Einstellungen1.Settings.DSS.r_val, EVO_Einstellungen1.Settings.DSS.maxiter, _
+            DDS.initialize(EVO_Einstellungen1.Settings.DDS.r_val, EVO_Einstellungen1.Settings.DDS.maxiter, _
                        Me.mProblem.NumParams, Ini_Parameter)
         End If
 
@@ -1503,12 +1503,12 @@ Partial Class Form1
         'Ini objective function evaluations
         '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-        For i = 0 To DSS.ini_fevals - 1
+        For i = 0 To DDS.ini_fevals - 1
             run += 1
 
-            Current_Parameter = DSS.ini_solution_candidate()
+            Current_Parameter = DDS.ini_solution_candidate()
 
-            ind = New Common.Individuum_PES("DSS", run)
+            ind = New Common.Individuum_PES("DDS", run)
             'OptParameter ins Individuum kopieren
             '------------------------------------
             For j = 0 To ind.OptParameter.Length - 1
@@ -1532,7 +1532,7 @@ Partial Class Form1
             'Lösung im TeeChart einzeichnen
             '------------------------------
             Dim serie As Steema.TeeChart.Styles.Series
-            serie = Me.Hauptdiagramm1.getSeriesPoint("DSS")
+            serie = Me.Hauptdiagramm1.getSeriesPoint("DDS")
             Call serie.Add(run, ind.Penalties(0), run.ToString())
 
             Call My.Application.DoEvents()
@@ -1540,13 +1540,13 @@ Partial Class Form1
             'Bestwertspeicher und Searchhistorie aktualisieren
             '-------------------------------------------------
             If (run = 1) Then
-                DSS.ini_Fbest(ind.Penalties(0))
+                DDS.ini_Fbest(ind.Penalties(0))
             Else
-                DSS.update_Fbest(ind.Penalties(0))
+                DDS.update_Fbest(ind.Penalties(0))
             End If
-            DSS.update_search_historie(ind.Penalties(0), run - 1)
+            DDS.update_search_historie(ind.Penalties(0), run - 1)
         Next
-        DSS.track_ini()
+        DDS.track_ini()
 
         '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         'Ende ini objective function evaluations
@@ -1557,12 +1557,12 @@ Partial Class Form1
         'start the OUTER DDS ALGORITHM LOOP for remaining allowble function evaluations (ileft)
         '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-        For i = 1 To DSS.ileft
+        For i = 1 To DDS.ileft
             run += 1
 
-            Current_Parameter = DSS.determine_DV(i)
+            Current_Parameter = DDS.determine_DV(i)
 
-            ind = New Common.Individuum_PES("DSS", run)
+            ind = New Common.Individuum_PES("DDS", run)
             'OptParameter ins Individuum kopieren
             '------------------------------------
             For j = 0 To ind.OptParameter.Length - 1
@@ -1586,14 +1586,14 @@ Partial Class Form1
             'Lösung im TeeChart einzeichnen
             '------------------------------
             Dim serie As Steema.TeeChart.Styles.Series
-            serie = Me.Hauptdiagramm1.getSeriesPoint("DSS")
+            serie = Me.Hauptdiagramm1.getSeriesPoint("DDS")
             Call serie.Add(run, ind.Penalties(0), run.ToString())
 
             Call My.Application.DoEvents()
 
-            DSS.update_Fbest(ind.Penalties(0))
+            DDS.update_Fbest(ind.Penalties(0))
 
-            DSS.update_search_historie(ind.Penalties(0), run)
+            DDS.update_search_historie(ind.Penalties(0), run)
         Next
 
         '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -2319,7 +2319,7 @@ Start_Evolutionsrunden:
                         Call Me.Hauptdiagramm1.DiagInitialise(Anwendung, Achsen, Me.EVO_Einstellungen1.Settings, Me.mProblem)
 
 
-                    Case Else 'PES, CES, CES + PES, HYBRID, HOOK & JEEVES, DSS
+                    Case Else 'PES, CES, CES + PES, HYBRID, HOOK & JEEVES, DDS
                         'XXXXXXXXXXXXXXXXXXXXX
 
                         'Achsen:
@@ -2345,8 +2345,8 @@ Start_Evolutionsrunden:
                                 'Bei Hooke & Jeeves:
                                 Achse.Automatic = True
 
-                            ElseIf (Me.mProblem.Method = METH_DSS) Then
-                                'Bei DSS:
+                            ElseIf (Me.mProblem.Method = METH_DDS) Then
+                                'Bei DDS:
                                 Achse.Automatic = True
 
                             Else

@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace modelEAU.DDS
+﻿namespace modelEAU.DDS
 {
     /// <summary>
-    /// Interface of the DSS-class
+    /// Interface of the DDS-class
     /// </summary>
-    public interface IDSS
+    public interface IDDS
     {
         void initialize(double r_val_in, int maxiter_in, int num_dec_in, double[] ini_par);
         void initialize(double r_val_in, int maxiter_in, int num_dec_in);

@@ -236,7 +236,7 @@ Public Class EVO_Settings
 
     End Structure
 
-    Public Structure DSS_Settings
+    Public Structure DDS_Settings
         Public maxiter As Integer                  'Number of iterations
         Public r_val As Double                     'DDS perturbation parameter
         Public optStartparameter As Boolean
@@ -269,5 +269,5 @@ Public Class EVO_Settings
     Public PES As PES_Settings
     Public CES As CES_Settings
     Public HookJeeves As HookJeeves_Settings
-    Public DSS As DSS_Settings
+    Public DDS As DDS_Settings
 End Class
