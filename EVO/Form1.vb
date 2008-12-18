@@ -447,6 +447,9 @@ Partial Class Form1
                     'Datensatz setzen
                     Call Sim1.setDatensatz(Me.ComboBox_Datensatz.SelectedItem)
 
+                    'Datensätze für Multithreading kopieren
+                    Call Sim1.createThreadWorkDirs(n_Threads)
+
                     'Tooltip anzeigen
                     Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, Me.ComboBox_Datensatz.SelectedItem)
 
@@ -1054,11 +1057,6 @@ Partial Class Form1
         Dim Hypervolume As EVO.MO_Indicators.Indicators
         Hypervolume = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(EVO.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, Me.mProblem.NumPenalties)
 
-        'Datensätze für Multithreading kopieren
-        If n_Threads > 1 Then
-            Call Sim1.createThreadWorkDirs(n_Threads)
-        End If
-
         'CES initialisieren
         CES1 = New EVO.ES.CES()
         Call CES1.CESInitialise(Me.EVO_Einstellungen1.Settings, Me.mProblem, Sim1.VerzweigungsDatei.GetLength(0))
@@ -1622,7 +1620,7 @@ Partial Class Form1
         Dim Extrapolationsschritte As Long
         Dim Rueckschritte As Long
 
-        Dim HookJeeves As EVO.ES.HookeAndJeeves = New EVO.ES.HookeAndJeeves(Me.mProblem.NumParams, EVO_Einstellungen1.Settings.HookJeeves.DnStart, EVO_Einstellungen1.Settings.HookJeeves.DnFinish)
+        Dim HookJeeves As New EVO.HookeAndJeeves.HookeAndJeeves(Me.mProblem.NumParams, EVO_Einstellungen1.Settings.HookJeeves.DnStart, EVO_Einstellungen1.Settings.HookJeeves.DnFinish)
 
         ReDim QNBest(Me.mProblem.NumPenalties - 1)
         ReDim QBest(Me.mProblem.NumPenalties - 1)
@@ -1667,7 +1665,7 @@ Partial Class Form1
             Call Sim1.PREPARE_Evaluation_PES(ind.OptParameter)
 
             'Evaluierung des Simulationsmodells (ToDo: Validätsprüfung fehlt)
-            SIM_Eval_is_OK = Sim1.launchSim(0, 0)
+            SIM_Eval_is_OK = Sim1.launchSim()
             If SIM_Eval_is_OK Then Call Sim1.SIM_Ergebnis_auswerten(ind)
 
             'Lösung im TeeChart einzeichnen
@@ -1685,7 +1683,7 @@ Partial Class Form1
             '============
             For j = 0 To HookJeeves.AnzahlParameter - 1
 
-                aktuellePara = HookJeeves.Tastschritt(j, EVO.ES.HookeAndJeeves.TastschrittRichtung.Vorwärts)
+                aktuellePara = HookJeeves.Tastschritt(j, EVO.HookeAndJeeves.HookeAndJeeves.TastschrittRichtung.Vorwärts)
 
                 Tastschritte_aktuell += 1
                 durchlauf += 1
@@ -1703,7 +1701,7 @@ Partial Class Form1
                 Call Sim1.PREPARE_Evaluation_PES(ind.OptParameter)
 
                 'Evaluierung des Simulationsmodells
-                SIM_Eval_is_OK = Sim1.launchSim(0, 0)
+                SIM_Eval_is_OK = Sim1.launchSim()
                 If SIM_Eval_is_OK Then Call Sim1.SIM_Ergebnis_auswerten(ind)
 
                 'Lösung im TeeChart einzeichnen
@@ -1715,7 +1713,7 @@ Partial Class Form1
 
                 If (ind.Penalties(0) >= QNBest(0)) Then
 
-                    aktuellePara = HookJeeves.Tastschritt(j, EVO.ES.HookeAndJeeves.TastschrittRichtung.Rückwärts)
+                    aktuellePara = HookJeeves.Tastschritt(j, EVO.HookeAndJeeves.HookeAndJeeves.TastschrittRichtung.Rückwärts)
 
                     Tastschritte_aktuell += 1
                     durchlauf += 1
@@ -1733,7 +1731,7 @@ Partial Class Form1
                     Call Sim1.PREPARE_Evaluation_PES(ind.OptParameter)
 
                     'Evaluierung des Simulationsmodells
-                    SIM_Eval_is_OK = Sim1.launchSim(0, 0)
+                    SIM_Eval_is_OK = Sim1.launchSim()
                     If SIM_Eval_is_OK Then Call Sim1.SIM_Ergebnis_auswerten(ind)
 
                     'Lösung im TeeChart einzeichnen
@@ -1822,11 +1820,6 @@ Partial Class Form1
         'Hypervolumen instanzieren
         Dim Hypervolume As EVO.MO_Indicators.Indicators
         Hypervolume = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(EVO.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, Me.mProblem.NumPenalties)
-
-        'Datensätze für Multithreading kopieren (nur Sim-Anwendungen)
-        If (Me.Anwendung <> ANW_TESTPROBLEME And n_Threads > 1) Then
-            Call Sim1.createThreadWorkDirs(n_Threads)
-        End If
 
         'Diagramm vorbereiten und initialisieren
         If (Not Me.mProblem.Method = METH_HYBRID And Not Me.EVO_Einstellungen1.Settings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Sequencial_1) Then
