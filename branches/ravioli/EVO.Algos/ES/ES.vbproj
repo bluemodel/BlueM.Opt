@@ -73,6 +73,8 @@
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
@@ -82,6 +84,7 @@
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controller.vb" />
     <Compile Include="Functions.vb" />
     <Compile Include="Hypervolumen.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -91,9 +94,25 @@
     <Compile Include="CES.vb" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\EVO.Apps\EVO.Apps.vbproj">
+      <Project>{2DCFE99E-CBFE-4CCC-93E7-A6D628B16DEC}</Project>
+      <Name>EVO.Apps</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\EVO.Common\EVO.Common.vbproj">
       <Project>{CAA1CE91-0973-4BE7-9BD8-16B5D40BC93C}</Project>
       <Name>EVO.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\EVO.Diagramm\EVO.Diagramm.vbproj">
+      <Project>{4382061B-F0DF-4D7D-9A09-306C940D19A5}</Project>
+      <Name>EVO.Diagramm</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\EVO.MO_Indicators\MO_Indicators\EVO.MO_Indicators.csproj">
+      <Project>{A56DFA12-8680-4C7A-B6BB-406D4D3FE156}</Project>
+      <Name>EVO.MO_Indicators</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\EVO.OptResult\EVO.OptResult.vbproj">
+      <Project>{A7B7B98D-94BE-47DB-954F-BBA2C1F53663}</Project>
+      <Name>EVO.OptResult</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
