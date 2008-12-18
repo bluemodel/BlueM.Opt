@@ -1443,7 +1443,7 @@ Public Class PES
             '3. Der Bestwertspeicher wird entsprechend der Fronten oder der sekundären Population gefüllt
             '4: Sekundäre Population wird bestimmt und gespeichert
             '--------------------------------
-            Dim Func1 As Kern.Functions = New Kern.Functions(Me.mProblem, Me.mSettings.PES.n_Nachf, Me.mSettings.PES.n_Eltern, Me.mSettings.PES.SekPop.is_Begrenzung, Me.mSettings.PES.SekPop.n_MaxMembers, Me.mSettings.PES.SekPop.n_Interact, Me.mSettings.PES.SekPop.is_Interact, PES_iAkt.iAktGen)
+            Dim Func1 As ES.Functions = New ES.Functions(Me.mProblem, Me.mSettings.PES.n_Nachf, Me.mSettings.PES.n_Eltern, Me.mSettings.PES.SekPop.is_Begrenzung, Me.mSettings.PES.SekPop.n_MaxMembers, Me.mSettings.PES.SekPop.n_Interact, Me.mSettings.PES.SekPop.is_Interact, PES_iAkt.iAktGen)
             Call Func1.EsEltern_Pareto(NDSorting, SekundärQb, Best_Indi)
             'Bestimmen der Crowding Distance falls Diversity-Tournament
             '----------------------------------------------------------

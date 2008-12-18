@@ -10,7 +10,7 @@
     </ApplicationIcon>
     <AssemblyKeyContainerName>
     </AssemblyKeyContainerName>
-    <AssemblyName>EVO.Kern</AssemblyName>
+    <AssemblyName>EVO.ES</AssemblyName>
     <AssemblyOriginatorKeyFile>
     </AssemblyOriginatorKeyFile>
     <AssemblyOriginatorKeyMode>None</AssemblyOriginatorKeyMode>
@@ -22,7 +22,7 @@
     <OptionCompare>Binary</OptionCompare>
     <OptionExplicit>On</OptionExplicit>
     <OptionStrict>Off</OptionStrict>
-    <RootNamespace>IHWB.EVO.Kern</RootNamespace>
+    <RootNamespace>IHWB.EVO.ES</RootNamespace>
     <StartupObject>
     </StartupObject>
     <FileUpgradeFlags>
