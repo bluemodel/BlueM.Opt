@@ -23,11 +23,11 @@ Public Class Controller
     Private Sim1 As EVO.Apps.Sim
     Private Testprobleme1 As EVO.Apps.Testprobleme
 
+    Private PES1 As PES
     Private CES1 As CES
 
     '**** Multithreading ****
     Private useMultithreading As Boolean
-    Dim SIM_Eval_is_OK As Boolean
     Dim MI_Thread_OK As Boolean = False
 
     ''' <summary>
@@ -95,6 +95,9 @@ Public Class Controller
     Private Sub STARTEN_CES_or_HYBRID()
 
         Dim durchlauf_all As Integer
+        Dim isOK() As Boolean
+        Dim Time(CES1.mSettings.CES.n_Generations - 1) As TimeSpan
+        Dim Stoppuhr As New Stopwatch()
 
         'Hypervolumen instanzieren
         Dim Hypervolume As EVO.MO_Indicators.Indicators
@@ -145,14 +148,9 @@ Public Class Controller
         'xxxx Optimierung xxxxxx
         'Generationsschleife CES
         'xxxxxxxxxxxxxxxxxxxxxxx
-        Dim Time(CES1.mSettings.CES.n_Generations - 1) As TimeSpan
-        Dim Stoppuhr As New Stopwatch()
-
         durchlauf_all = 0
 
         For i_gen = 0 To CES1.mSettings.CES.n_Generations - 1
-
-            Dim isOK() As Boolean
 
             Stoppuhr.Reset()
             Stoppuhr.Start()
@@ -163,28 +161,32 @@ Public Class Controller
                 ind.ID = durchlauf_all
             Next
 
-            'Individuen evaluieren
+            'Alle Individuen evaluieren
             isOK = Sim1.Evaluate(CES1.Childs, True)
 
             'Evaluierte Individuen verarbeiten
-            For i As Integer = 0 To CES1.Childs.Length - 1
+            For i_Child As Integer = 0 To CES1.Childs.Length - 1
+
+                If (Not isOK(i_Child)) Then
+                    'TODO: Fehlgeschlagene Evaluierungen behandeln
+                End If
 
                 'HYBRID: Speichert die PES Erfahrung diesen Childs im PES Memory
                 '***************************************************************
                 If (Me.myProblem.Method = METH_HYBRID And Me.mySettings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer) Then
-                    Call CES1.Memory_Store(i, i_gen)
+                    Call CES1.Memory_Store(i_Child, i_gen)
                 End If
 
                 'Lösung im TeeChart einzeichnen und mittleres Dn ausgeben
                 '========================================================
-                Call Me.myHauptDiagramm.ZeichneIndividuum(CES1.Childs(i), 0, 0, i_gen, i + 1, EVO.Diagramm.Diagramm.ColorManagement(ColorArray, CES1.Childs(i)))
-                'TODO: Me.Label_Dn_Wert.Text = Math.Round(CES1.Childs(i).Get_mean_PES_Dn, 6).ToString
-                If Not CES1.Childs(i).Get_mean_PES_Dn = -1 Then
-                    Me.myMonitor.Zeichne_Dn(CES1.Childs(i).ID, CES1.Childs(i).Get_mean_PES_Dn)
+                Call Me.myHauptDiagramm.ZeichneIndividuum(CES1.Childs(i_Child), 0, 0, i_gen, i_Child + 1, EVO.Diagramm.Diagramm.ColorManagement(ColorArray, CES1.Childs(i_Child)))
+                'TODO: Me.Label_Dn_Wert.Text = Math.Round(CES1.Childs(i_Child).Get_mean_PES_Dn, 6).ToString
+                If Not CES1.Childs(i_Child).Get_mean_PES_Dn = -1 Then
+                    Me.myMonitor.Zeichne_Dn(CES1.Childs(i_Child).ID, CES1.Childs(i_Child).Get_mean_PES_Dn)
                 End If
 
                 'Verlauf aktualisieren
-                Me.myProgress.iNachf = i + 1
+                Me.myProgress.iNachf = i_Child + 1
 
                 Stoppuhr.Stop()
                 Time(i_gen) = Stoppuhr.Elapsed
@@ -288,7 +290,7 @@ Public Class Controller
 
         System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.BelowNormal
 
-        Dim i_ch, i_loc As Integer
+        Dim i_Child, i_loc As Integer
 
         'Selection oder NDSorting für den PES Memory
         '*******************************************
@@ -305,25 +307,25 @@ Public Class Controller
 
         'pro Child
         'xxxxxxxxx
-        For i_ch = 0 To CES1.Childs.GetUpperBound(0)
+        For i_Child = 0 To CES1.Childs.GetUpperBound(0)
 
             'Das Dn des Child mutieren
             If Me.mySettings.PES.Schrittweite.is_DnVektor = False Then
                 Dim PESX As EVO.ES.PES
                 PESX = New EVO.ES.PES
                 Call PESX.PesInitialise(Me.mySettings, Me.myProblem)
-                CES1.Childs(i_ch).CES_Dn = PESX.CES_Dn_Mutation(CES1.Childs(i_ch).CES_Dn)
+                CES1.Childs(i_Child).CES_Dn = PESX.CES_Dn_Mutation(CES1.Childs(i_Child).CES_Dn)
             End If
 
             'Ermittelt fuer jedes Child den PES Parent Satz (PES_Parents ist das Ergebnis)
-            Call CES1.Memory_Search_per_Child(CES1.Childs(i_ch))
+            Call CES1.Memory_Search_per_Child(CES1.Childs(i_Child))
 
             'und pro Location
             'xxxxxxxxxxxxxxxx
             For i_loc = 0 To CES1.ModSett.n_Locations - 1
 
                 'Die Parameter (falls vorhanden) werden überschrieben
-                If Not CES1.Childs(i_ch).Loc(i_loc).PES_OptPara.GetLength(0) = 0 Then
+                If Not CES1.Childs(i_Child).Loc(i_loc).PES_OptPara.GetLength(0) = 0 Then
 
                     'Ermittelt fuer jede Location den PES Parent Satz (PES_Parents ist das Ergebnis)
                     '*******************************************************************************
@@ -348,12 +350,12 @@ Public Class Controller
                         Case Is = 0
                             'Noch keine Eltern vorhanden (die Child Location bekommt neue - zufällige Werte oder original Parameter)
                             '*******************************************************************************************************
-                            For m = 0 To CES1.Childs(i_ch).Loc(i_loc).PES_OptPara.GetUpperBound(0)
-                                CES1.Childs(i_ch).Loc(i_loc).PES_OptPara(m).Dn = CES1.mSettings.PES.Schrittweite.DnStart
+                            For m = 0 To CES1.Childs(i_Child).Loc(i_loc).PES_OptPara.GetUpperBound(0)
+                                CES1.Childs(i_Child).Loc(i_loc).PES_OptPara(m).Dn = CES1.mSettings.PES.Schrittweite.DnStart
                                 'Falls zufällige Startwerte
                                 If CES1.mSettings.PES.OptStartparameter = Common.Constants.EVO_STARTPARAMETER.Zufall Then
                                     Randomize()
-                                    CES1.Childs(i_ch).Loc(i_loc).PES_OptPara(m).Xn = Rnd()
+                                    CES1.Childs(i_Child).Loc(i_loc).PES_OptPara(m).Xn = Rnd()
                                 End If
                             Next
 
@@ -372,7 +374,7 @@ Public Class Controller
 
                             'Vorbereitung um das PES zu initieren
                             '************************************
-                            Me.myProblem.List_OptParameter = CES1.Childs(i_ch).Loc(i_loc).PES_OptPara
+                            Me.myProblem.List_OptParameter = CES1.Childs(i_Child).Loc(i_loc).PES_OptPara
 
                             'Schritte 1 - 3: PES wird initialisiert (Weiteres siehe dort ;-)
                             '**************************************************************
@@ -384,10 +386,10 @@ Public Class Controller
                             Next
 
                             'Startet die Prozesse evolutionstheoretischen Prozesse nacheinander
-                            Call PES1.EsReproMut(CES1.Childs(i_ch).CES_Dn, Me.mySettings.CES.is_PopMutStart)
+                            Call PES1.EsReproMut(CES1.Childs(i_Child).CES_Dn, Me.mySettings.CES.is_PopMutStart)
 
                             'Auslesen der Variierten Parameter
-                            CES1.Childs(i_ch).Loc(i_loc).PES_OptPara = EVO.Common.OptParameter.Clone_Array(PES1.EsGetParameter())
+                            CES1.Childs(i_Child).Loc(i_loc).PES_OptPara = EVO.Common.OptParameter.Clone_Array(PES1.EsGetParameter())
 
                     End Select
                 End If
@@ -442,10 +444,9 @@ Public Class Controller
     '************************************************************************
     Private Sub STARTEN_PES()
 
-        Dim i, durchlauf As Integer
+        Dim i_Nachf, durchlauf As Integer
         Dim inds() As Common.Individuum_PES
         Dim isOK() As Boolean
-        Dim PES1 As EVO.ES.PES
 
         'Hypervolumen instanzieren
         Dim Hypervolume As EVO.MO_Indicators.Indicators
@@ -498,27 +499,17 @@ Public Class Controller
                     ReDim inds(Me.mySettings.PES.n_Nachf - 1)
                     ReDim isOK(Me.mySettings.PES.n_Nachf - 1)
 
-                    'Über alle Nachkommen
-                    'xxxxxxxxxxxxxxxxxxxxxxxxx
-                    For i = 0 To Me.mySettings.PES.n_Nachf - 1
+                    'Schleife über alle Nachkommen
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                    For i_Nachf = 0 To Me.mySettings.PES.n_Nachf - 1
 
                         durchlauf += 1
 
                         'Neues Individuum instanzieren
-                        inds(i) = New Common.Individuum_PES("PES", durchlauf)
+                        inds(i_Nachf) = New Common.Individuum_PES("PES", durchlauf)
 
-                        'REPRODUKTIONSPROZESS
-                        '####################
-                        'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
-                        Call PES1.EsReproduktion()
-
-                        'MUTATIONSPROZESS
-                        '################
-                        'Mutieren der Ausgangswerte
-                        Call PES1.EsMutation()
-
-                        'Auslesen der variierten Parameter und in Individuum kopieren
-                        inds(i).OptParameter = EVO.Common.OptParameter.Clone_Array(PES1.EsGetParameter())
+                        'Neue Parameter holen
+                        Call PES_getNewParameters(inds(i_Nachf))
 
                         If (myAppType = ApplicationTypes.Testprobleme) Then
 
@@ -526,18 +517,10 @@ Public Class Controller
                             '===================================
 
                             'Lösung evaluieren und zeichnen
-                            Call Testprobleme1.Evaluierung_TestProbleme(inds(i), PES1.PES_iAkt.iAktPop, Me.myHauptDiagramm)
-                            'TODO: Me.Label_Dn_Wert.Text = Math.Round(inds(i).OptParameter(0).Dn, 6).ToString
-                            Me.myMonitor.Zeichne_Dn(durchlauf, inds(i).OptParameter(0).Dn)
+                            Call Testprobleme1.Evaluierung_TestProbleme(inds(i_Nachf), PES1.PES_iAkt.iAktPop, Me.myHauptDiagramm)
 
-                            'Einordnen
-                            PES1.PES_iAkt.iAktNachf = i
-                            Call PES1.EsBest(inds(i))
-
-                            'Verlauf aktualisieren
-                            Me.myProgress.iNachf = PES1.PES_iAkt.iAktNachf + 1
-
-                            System.Windows.Forms.Application.DoEvents()
+                            'Evaluierung verarbeiten
+                            Call PES_processEvaluation(inds(i_Nachf), i_Nachf)
 
                         ElseIf (Not Me.useMultithreading) Then
 
@@ -545,11 +528,11 @@ Public Class Controller
                             'auch sofort auswerten
                             '==========================================
 
-                            isOK(i) = Sim1.Evaluate(inds(i), True)
+                            isOK(i_Nachf) = Sim1.Evaluate(inds(i_Nachf), True)
 
                             'Evaluierungsfehler behandeln
                             '----------------------------
-                            If (Not isOK(i)) Then
+                            If (Not isOK(i_Nachf)) Then
 
                                 Dim n_Tries As Integer = 0
 
@@ -561,41 +544,24 @@ Public Class Controller
                                     End If
 
                                     'Parametersatz erneuern
-                                    Call PES1.EsReproduktion()
-                                    Call PES1.EsMutation()
-
-                                    'Parameter aus PES ins Individuum kopieren
-                                    inds(i).OptParameter = EVO.Common.OptParameter.Clone_Array(PES1.EsGetParameter())
+                                    Call PES_getNewParameters(inds(i_Nachf))
 
                                     'Neu evaluieren
-                                    isOK(i) = Sim1.Evaluate(inds(i), True)
+                                    isOK(i_Nachf) = Sim1.Evaluate(inds(i_Nachf), True)
 
-                                Loop Until (isOK(i) = True)
+                                Loop Until (isOK(i_Nachf) = True)
 
                             End If
 
-                            'Lösung zeichnen und Dn ausgeben
-                            Call Me.myHauptDiagramm.ZeichneIndividuum(inds(i), PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, i + 1, Color.Orange)
-                            'TODO: Me.Label_Dn_Wert.Text = Math.Round(inds(i).OptParameter(0).Dn, 6).ToString
-                            Me.myMonitor.Zeichne_Dn(durchlauf, inds(i).OptParameter(0).Dn)
-
-                            'SELEKTIONSPROZESS Schritt 1
-                            '###########################
-                            'Einordnen der Qualitätsfunktion im Bestwertspeicher bei SO
-                            'Falls MO Einordnen der Qualitätsfunktion in NDSorting
-                            PES1.PES_iAkt.iAktNachf = i
-                            Call PES1.EsBest(inds(i))
-
-                            'Verlauf aktualisieren
-                            Me.myProgress.iNachf = i + 1
-
-                            System.Windows.Forms.Application.DoEvents()
+                            'Evaluierung verarbeiten
+                            Call PES_processEvaluation(inds(i_Nachf), i_Nachf)
 
                         End If
 
-                    Next
+                    Next 'Ende alle Nachkommen (singlethread)
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    If (Me.useMultiThreading) Then
+                    If (Me.useMultithreading) Then
 
                         'Simulationsanwendungen mit Multithreading
                         'nachträglich auswerten
@@ -605,11 +571,11 @@ Public Class Controller
                         isOK = Sim1.Evaluate(inds, True)
 
                         'Alle evaluierten Individuen durchlaufen
-                        For i = 0 To inds.GetUpperBound(0)
+                        For i_Nachf = 0 To inds.GetUpperBound(0)
 
                             'Evaluierungsfehler behandeln
                             '----------------------------
-                            If (Not isOK(i)) Then
+                            If (Not isOK(i_Nachf)) Then
 
                                 Dim n_Tries As Integer = 0
 
@@ -621,44 +587,24 @@ Public Class Controller
                                     End If
 
                                     'Parametersatz erneuern
-                                    Call PES1.EsReproduktion()
-                                    Call PES1.EsMutation()
-
-                                    'Parameter aus PES ins Individuum kopieren
-                                    inds(i).OptParameter = EVO.Common.OptParameter.Clone_Array(PES1.EsGetParameter())
+                                    Call PES_getNewParameters(inds(i_Nachf))
 
                                     'Neu evaluieren (ohne Multithreading)
-                                    isOK(i) = Sim1.Evaluate(inds(i), True)
+                                    isOK(i_Nachf) = Sim1.Evaluate(inds(i_Nachf), True)
 
-                                Loop Until (isOK(i) = True)
+                                Loop Until (isOK(i_Nachf) = True)
 
                             End If
 
-                            'Lösung zeichnen und Dn ausgeben
-                            Call Me.myHauptDiagramm.ZeichneIndividuum(inds(i), PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, i + 1, Color.Orange)
-                            'TODO: Me.Label_Dn_Wert.Text = Math.Round(inds(i).OptParameter(0).Dn, 6).ToString
-                            Me.myMonitor.Zeichne_Dn(PES1.PES_iAkt.iAktGen * Me.mySettings.PES.n_Nachf + i + 1, inds(i).OptParameter(0).Dn)
-
-                            'Verlauf aktualisieren
-                            Me.myProgress.iNachf = i + 1
-
-                            System.Windows.Forms.Application.DoEvents()
-
-                            'SELEKTIONSPROZESS Schritt 1
-                            '###########################
-                            'Einordnen der Qualitätsfunktion im Bestwertspeicher bei SO
-                            'Falls MO Einordnen der Qualitätsfunktion in NDSorting
-                            PES1.PES_iAkt.iAktNachf = i
-                            Call PES1.EsBest(inds(i))
+                            'Evaluierung verarbeiten
+                            Call PES_processEvaluation(inds(i_Nachf), i_Nachf)
 
                         Next
 
-                    End If
-                    'Ende Nachfahren
-                    '+++++++++++++++
+                    End If 'Ende alle Nachfahren (multithread)
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'SELEKTIONSPROZESS Schritt 2 für NDSorting sonst Xe = Xb
-                    '#######################################################
                     'Die neuen Eltern werden generiert
                     Call PES1.EsEltern()
 
@@ -725,6 +671,59 @@ Public Class Controller
 
         Next 'Ende alle Runden
         'xxxxxxxxxxxxxxxxxxxxx
+
+    End Sub
+
+    ''' <summary>
+    ''' Führt Reproduktion und Mutation aus und kopiert die neu gewonnenen Parameter ins Individuum
+    ''' </summary>
+    ''' <param name="ind">Das Individuum, dessen Parameter erneuert werden soll</param>
+    Private Sub PES_getNewParameters(ByRef ind As EVO.Common.Individuum_PES)
+
+        'REPRODUKTIONSPROZESS
+        'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
+        Call PES1.EsReproduktion()
+
+        'MUTATIONSPROZESS
+        'Mutieren der Ausgangswerte
+        Call PES1.EsMutation()
+
+        'Auslesen der variierten Parameter und in Individuum kopieren
+        ind.OptParameter = EVO.Common.OptParameter.Clone_Array(PES1.EsGetParameter())
+
+    End Sub
+
+    ''' <summary>
+    ''' Verarbeitet ein evaluiertes Individuum:
+    ''' Individuum im PES-Bestwertspeicher einordnen
+    ''' Lösung im Hauptdiagramm zeichnen
+    ''' Dn im Monitor zeichnen
+    ''' Verlaufsanzeige aktualisieren
+    ''' </summary>
+    ''' <param name="ind">Das zu verarbeitende Individuum</param>
+    ''' <param name="iNachfahre">Nachfahrens-Nummer des Individuums</param>
+    Private Sub PES_processEvaluation(ByRef ind As Common.Individuum_PES, ByVal iNachfahre As Integer)
+
+        'Lösung im Hauptdiagramm zeichnen (Testprobleme zeichnen sich selber)
+        If (myAppType = ApplicationTypes.Sim) Then
+            Call Me.myHauptDiagramm.ZeichneIndividuum(ind, PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, iNachfahre + 1, Color.Orange)
+        End If
+
+        'TODO: Me.Label_Dn_Wert.Text = Math.Round(inds(i).OptParameter(0).Dn, 6).ToString
+
+        'Dn in Monitor zeichnen
+        Me.myMonitor.Zeichne_Dn((PES1.PES_iAkt.iAktGen + 1) * Me.mySettings.PES.n_Nachf + iNachfahre + 1, ind.OptParameter(0).Dn)
+
+        'SELEKTIONSPROZESS Schritt 1
+        'Einordnen der Qualitätsfunktion im Bestwertspeicher bei SO
+        'Falls MO Einordnen der Qualitätsfunktion in NDSorting
+        PES1.PES_iAkt.iAktNachf = iNachfahre
+        Call PES1.EsBest(ind)
+
+        'Verlauf aktualisieren
+        Me.myProgress.iNachf = iNachfahre + 1
+
+        System.Windows.Forms.Application.DoEvents()
 
     End Sub
 
