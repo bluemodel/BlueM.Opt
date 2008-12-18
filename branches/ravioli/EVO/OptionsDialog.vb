@@ -2,16 +2,26 @@
 
 Public Class OptionsDialog
 
-    Public Sub New()
+    Private _MultithreadingAllowed As Boolean
 
-        ' This call is required by the Windows Form Designer.
-        InitializeComponent()
-
-        'Standardeinstellungen setzen
-        Me.CheckBox_drawOnlyCurrentPop.Checked = False
-        Me.CheckBox_useMultithreading.Checked = True
-
-    End Sub
+    ''' <summary>
+    ''' Ob Multithreading erlaubt ist oder nicht
+    ''' </summary>
+    Public Property MultithreadingAllowed() As Boolean
+        Get
+            Return Me._MultithreadingAllowed
+        End Get
+        Set(ByVal allow As Boolean)
+            Me._MultithreadingAllowed = allow
+            If (allow) Then
+                Me.CheckBox_useMultithreading.Enabled = True
+                Me.CheckBox_useMultithreading.Checked = True
+            Else
+                Me.CheckBox_useMultithreading.Checked = False
+                Me.CheckBox_useMultithreading.Enabled = False
+            End If
+        End Set
+    End Property
 
     ''' <summary>
     ''' Immer nur die aktuelle Population im Diagramm anzeigen
@@ -31,16 +41,26 @@ Public Class OptionsDialog
         End Get
     End Property
 
+    ''' <summary>
+    ''' Alle Kontrollelemente deaktivieren
+    ''' </summary>
     Public Sub DisableAll()
         For Each cntrl As Control In Me.Controls
             cntrl.Enabled = False
         Next
     End Sub
 
+    ''' <summary>
+    ''' Alle Kontrollelemente aktivieren
+    ''' </summary>
     Public Sub EnableAll()
         For Each cntrl As Control In Me.Controls
             cntrl.Enabled = True
         Next
+        'Ausser ggf. CheckBox_useMultithreading
+        If (Not Me.MultithreadingAllowed) Then
+            Me.CheckBox_useMultithreading.Enabled = False
+        End If
     End Sub
 
     Private Sub OK_Button_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OK_Button.Click

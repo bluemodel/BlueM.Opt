@@ -1,5 +1,8 @@
 Imports System.IO
+Imports System.Windows.Forms
 Imports System.Globalization
+Imports System.Threading
+Imports IHWB.EVO.Common.Constants
 
 '*******************************************************************************
 '*******************************************************************************
@@ -74,6 +77,11 @@ Public MustInherit Class Sim
 
     Public VerzweigungsDatei(,) As String                   'Gibt die PathSize an für jede Pfadstelle
 
+    'Multithreading
+    '--------------
+    Public MustOverride ReadOnly Property MultithreadingSupported() As Boolean
+    Protected n_Threads As Integer   'Anzahl Threads
+    Private _isPause As Boolean
 
 #End Region 'Eigenschaften
 
@@ -89,6 +97,18 @@ Public MustInherit Class Sim
         End Get
         Set(ByVal value As Boolean)
             Me.mStoreIndividuals = value
+        End Set
+    End Property
+
+    ''' <summary>
+    ''' Pause
+    ''' </summary>
+    Public Property isPause() As Boolean
+        Get
+            Return Me._isPause
+        End Get
+        Set(ByVal value As Boolean)
+            Me._isPause = value
         End Set
     End Property
 
@@ -115,10 +135,20 @@ Public MustInherit Class Sim
     End Sub
 
     ''' <summary>
+    ''' Die Anwendung auf Multithreading vorbereiten
+    ''' </summary>
+    ''' <param name="input_n_Threads">Anzahl Threads</param>
+    Public Overridable Sub prepareThreads(ByVal input_n_Threads As Integer)
+        'in erbenden Klassen implementieren
+    End Sub
+
+    ''' <summary>
     ''' Pfad zum Datensatz verarbeiten und speichern
     ''' </summary>
     ''' <param name="pfad">Der Pfad</param>
     Public Sub setDatensatz(ByVal pfad As String)
+
+        Dim isOK As Boolean
 
         If (File.Exists(pfad)) Then
             'Datensatzname bestimmen
@@ -132,6 +162,9 @@ Public MustInherit Class Sim
 
         'Simulationsdaten einlesen
         Call Me.Read_SimParameter()
+
+        'Datensätze für Multithreading kopieren
+        isOK = Me.createThreadWorkDirs()
 
     End Sub
 
@@ -298,17 +331,17 @@ Public MustInherit Class Sim
 
     'Bereitet das SimModell für Kombinatorik Optimierung vor
     '*******************************************************
-    Public Sub PREPARE_Evaluation_CES(ByVal Path() As Integer, ByVal Elements() As String)
+    Public Sub PREPARE_Evaluation_CES(ByRef ind As EVO.Common.Individuum_CES)
 
         'Setzt den Aktuellen Pfad
-        Akt.Path = Path
+        Akt.Path = ind.Path
 
         'Aktuelle Parameterlisten neu dimensionieren
         ReDim Me.Akt.OptPara(Me.mProblem.NumParams - 1)
         ReDim Me.Akt.ModPara(Me.mProblem.List_ModellParameter.GetUpperBound(0))
 
         'Die elemente werden an die Kostenkalkulation übergeben
-        CType(Me, BlueM).SKos1.Akt_Elemente = Elements
+        CType(Me, BlueM).SKos1.Akt_Elemente = ind.Get_All_Loc_Elem
 
         'Ermittelt das aktuelle_ON_OFF array
         Call Prepare_Verzweigung_ON_OFF()
@@ -351,7 +384,8 @@ Public MustInherit Class Sim
 #Region "Evaluierung"
 
     ''' <summary>
-    ''' Evaluiert ein Individuum. Durchläuft alle Schritte vom Schreiben der Modellparameter bis zum Berechnen der Features.
+    ''' Evaluiert ein einzelnes Individuum. 
+    ''' Durchläuft alle Schritte vom Schreiben der Modellparameter bis zum Berechnen der Features.
     ''' </summary>
     ''' <param name="ind">das zu evaluierende Individuum</param>
     ''' <param name="storeInDB">Ob das Individuum in OptResult-DB gespeichert werden soll</param>
@@ -366,20 +400,22 @@ Public MustInherit Class Sim
         '----------------------
         Select Case Me.mProblem.Method
 
-            Case EVO.Common.METH_PES, EVO.Common.METH_SENSIPLOT, EVO.Common.METH_HOOKJEEVES, EVO.Common.METH_DDS
+            Case METH_PES, METH_SENSIPLOT, METH_HOOKJEEVES, METH_DDS
 
-                'Bereitet das Sim für PES vor
+                'Bereitet das Sim für Parameteroptimierung vor
                 Call Me.PREPARE_Evaluation_PES(ind.OptParameter)
 
-            Case EVO.Common.METH_CES, EVO.Common.METH_HYBRID
+            Case METH_CES, METH_HYBRID
 
                 'Bereitet das Sim für die Kombinatorik vor
-                Call Me.PREPARE_Evaluation_CES(CType(ind, EVO.Common.Individuum_CES).Path, CType(ind, EVO.Common.Individuum_CES).Get_All_Loc_Elem)
+                Call Me.PREPARE_Evaluation_CES(ind)
 
                 'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
-                If (Me.mProblem.Method = EVO.Common.METH_HYBRID And Me.mSettings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer) Then
-                    Call Me.mProblem.Reduce_OptPara_and_ModPara(CType(ind, EVO.Common.Individuum_CES).Get_All_Loc_Elem)
-                    Call Me.PREPARE_Evaluation_PES(ind.OptParameter)
+                If (Me.mProblem.Method = METH_HYBRID _
+                    And Me.mSettings.CES.ty_Hybrid = HYBRID_TYPE.Mixed_Integer) Then
+                    If (Me.mProblem.Reduce_OptPara_and_ModPara(CType(ind, EVO.Common.Individuum_CES).Get_All_Loc_Elem)) Then
+                        Call Me.PREPARE_Evaluation_PES(ind.OptParameter)
+                    End If
                 End If
 
             Case Else
@@ -403,21 +439,132 @@ Public MustInherit Class Sim
     End Function
 
     ''' <summary>
-    ''' Evaluiert ein Array von Individuen. Durchläuft alle Schritte vom Schreiben der Modellparameter bis zum Berechnen der Features.
+    ''' Evaluiert ein Array von Individuen in multiplen Threads. 
+    ''' Durchläuft alle Schritte vom Schreiben der Modellparameter bis zum Berechnen der Features.
     ''' </summary>
     ''' <param name="inds">Ein Array von zu evaluierenden Individuen</param>
     ''' <param name="storeInDB">Ob das Individuum in OptResult-DB gespeichert werden soll</param>
     ''' <returns>True/False für jedes Individuum</returns>
     Public Overloads Function Evaluate(ByRef inds() As EVO.Common.Individuum, Optional ByVal storeInDB As Boolean = True) As Boolean()
 
-        Dim i As Integer
         Dim isOK() As Boolean
+        Dim tmpind As EVO.Common.Individuum
+        Dim n_individuals As Integer
+        Dim ThreadID_Free As Integer = 0
+        Dim ThreadID_Ready As Integer = 0
+        Dim n_ind_Run As Integer = 0
+        Dim n_ind_Ready As Integer = 0
+        Dim Ready As Boolean = False
+        Dim SIM_Eval_is_OK As Boolean
 
-        ReDim isOK(inds.GetUpperBound(0))
+        'Anzahl Individuen
+        n_individuals = inds.Length
 
-        For i = 0 To inds.GetUpperBound(0)
-            isOK(i) = Me.Evaluate(inds(i), storeInDB)
-        Next
+        ReDim isOK(n_individuals - 1)
+
+        System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
+
+        Do
+            If (Me.launchFree(ThreadID_Free) _
+                And (n_ind_Run < n_individuals) _
+                And (n_ind_Ready + Me.n_Threads > n_ind_Run) _
+                And Me.isPause = False) Then
+                'Falls eine Simulation frei und nicht Pause
+                '------------------------------------------
+
+                Me.WorkDir_Current = Me.getThreadWorkDir(ThreadID_Free)
+
+                'Simulation vorbereiten
+                '----------------------
+                Select Case Me.mProblem.Method
+
+                    Case METH_PES, METH_SENSIPLOT, METH_HOOKJEEVES, METH_DDS
+
+                        'Bereitet das Sim für Parameteroptimierung vor
+                        Call Me.PREPARE_Evaluation_PES(inds(n_ind_Run).OptParameter)
+
+                    Case METH_CES, METH_HYBRID
+
+                        'Bereitet das Sim für die Kombinatorik vor
+                        Call Me.PREPARE_Evaluation_CES(inds(n_ind_Run))
+
+                        'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
+                        If (Me.mProblem.Method = METH_HYBRID _
+                            And Me.mSettings.CES.ty_Hybrid = HYBRID_TYPE.Mixed_Integer) Then
+                            If (Me.mProblem.Reduce_OptPara_and_ModPara(CType(inds(n_ind_Run), EVO.Common.Individuum_CES).Get_All_Loc_Elem)) Then
+                                Call Me.PREPARE_Evaluation_PES(inds(n_ind_Run).OptParameter)
+                            End If
+                        End If
+
+                    Case Else
+
+                        Throw New Exception("Funktion Sim.Evaluate() für Methode '" & Me.mProblem.Method & "' noch nicht implementiert!")
+
+                End Select
+
+                'Simulation ausführen
+                '--------------------
+                SIM_Eval_is_OK = Me.launchSim(ThreadID_Free, n_ind_Run)
+
+                n_ind_Run += 1
+
+            ElseIf (Me.launchReady(ThreadID_Ready, SIM_Eval_is_OK, n_ind_Ready) = True _
+                    And SIM_Eval_is_OK) Then
+                'Falls Simulation fertig und erfolgreich
+                '---------------------------------------
+
+                Me.WorkDir_Current = Me.getThreadWorkDir(ThreadID_Ready)
+
+                'HACK: Individuum für Auswertung temporär klonen um ArrayMismatchException zu umgehen
+                tmpind = inds(n_ind_Ready).Clone()
+
+                'Individuum auswerten
+                '--------------------
+                Me.SIM_Ergebnis_auswerten(tmpind, storeInDB)
+
+                'HACK: zurückkopieren
+                inds(n_ind_Ready) = tmpind.Clone()
+
+                isOK(n_ind_Ready) = True
+
+                If (n_ind_Ready = n_individuals - 1) Then
+                    Ready = True
+                End If
+
+                n_ind_Ready += 1
+
+            ElseIf (Me.launchReady(ThreadID_Ready, SIM_Eval_is_OK, n_ind_Ready) = False _
+                    And SIM_Eval_is_OK = False) Then
+                'Falls Simulation fertig aber nicht erfolgreich
+                '----------------------------------------------
+
+                isOK(n_ind_Ready) = False
+
+                If (n_ind_Ready = n_individuals - 1) Then
+                    Ready = True
+                End If
+
+                n_ind_Ready += 1
+
+            ElseIf (n_ind_Ready = n_ind_Run _
+                    And Me.isPause = True) Then
+                'Falls Pause und alle simulierten auch verarbeitet
+                '-------------------------------------------------
+
+                Do While (Me.isPause)
+                    System.Threading.Thread.Sleep(20)
+                    Application.DoEvents()
+                Loop
+
+            Else
+                'Falls total im Stress
+                '---------------------
+                System.Threading.Thread.Sleep(400)
+                Application.DoEvents()
+
+            End If
+
+        Loop While (Ready = False)
 
         Return isOK
 
@@ -966,11 +1113,12 @@ Handler:
     ''' <summary>
     ''' Datensätze für Multithreading kopieren
     ''' </summary>
-    ''' <param name="n_Threads">Anzahl Threads</param>
+    ''' <returns>True wenn fertig</returns>
     ''' <remarks>Erstellt im bin-Ordner Verzeichnisse Thread_1 bis Thread_n</remarks>
-    Public Sub createThreadWorkDirs(ByVal n_Threads As Integer)
+    Private Function createThreadWorkDirs() As Boolean
 
         Dim i As Integer
+        Dim isOK As Boolean
         Dim Source, Dest, relPaths() As String
         Dim binPath As String = System.Windows.Forms.Application.StartupPath()
 
@@ -978,7 +1126,7 @@ Handler:
         Dest = binPath & "\Thread_0\"
 
         'Alte Thread-Ordner löschen
-        Call Me.deleteThreadWorkDirs()
+        isOK = Me.deleteThreadWorkDirs()
 
         'zu kopierende Dateien bestimmen
         relPaths = Me.getDatensatzFiles(Source)
@@ -991,14 +1139,16 @@ Handler:
         'Für die weiteren Threads den Ordner Thread_0 kopieren
         Source = binPath & "\Thread_0\"
 
-        For i = 1 To n_Threads - 1
+        For i = 1 To Me.n_Threads - 1
 
             Dest = binPath & "\Thread_" & i.ToString() & "\"
             My.Computer.FileSystem.CopyDirectory(Source, Dest, True)
 
         Next
 
-    End Sub
+        Return True
+
+    End Function
 
     ''' <summary>
     ''' Gibt die relativen Pfade aller Datensatz-Dateien zurück
@@ -1057,8 +1207,9 @@ Handler:
     ''' <summary>
     ''' Datensätze für Multithreading löschen
     ''' </summary>
+    ''' <returns>True wenn fertig</returns>
     ''' <remarks>löscht die Ordner Thread_0 bis Thread_9 im bin-Verzeichnis</remarks>
-    Public Sub deleteThreadWorkDirs()
+    Private Function deleteThreadWorkDirs() As Boolean
 
         Dim i As Integer
         Dim dir As String
@@ -1073,13 +1224,15 @@ Handler:
             End If
         Next
 
-    End Sub
+        Return True
+
+    End Function
 
     ''' <summary>
     ''' Gibt den Datensatz Ordner eines Threads zurück
     ''' </summary>
     ''' <param name="Thread_ID">Die ID des Threads</param>
-    Public Function getThreadWorkDir(ByVal Thread_ID As Integer) As String
+    Protected Function getThreadWorkDir(ByVal Thread_ID As Integer) As String
 
         Dim dir As String
 
