@@ -1115,7 +1115,7 @@ Public Class CES
         '3. Der Bestwertspeicher wird entsprechend der Fronten oder der sekundären Population gefüllt
         '4: Sekundäre Population wird bestimmt und gespeichert
         '--------------------------------
-        Dim Func1 As New Kern.Functions(Me.mProblem, mSettings.CES.n_Childs, mSettings.CES.n_Parents, mSettings.CES.is_SecPopRestriction, mSettings.CES.n_MemberSecondPop, mSettings.CES.n_Interact, mSettings.CES.is_SecPop, iAktGen + 1)
+        Dim Func1 As New ES.Functions(Me.mProblem, mSettings.CES.n_Childs, mSettings.CES.n_Parents, mSettings.CES.is_SecPopRestriction, mSettings.CES.n_MemberSecondPop, mSettings.CES.n_Interact, mSettings.CES.is_SecPop, iAktGen + 1)
         Call Func1.EsEltern_Pareto(NDSorting, SekundärQb, IParents)
         '********************************************************************************************
 
@@ -1177,7 +1177,7 @@ Public Class CES
         '! Sekundär_QB wird hier nicht berücksichtigt da die PES Generationen !
         '! wegen der Reduzierung auf Locations entkoppelt                     !
         Dim Fake_SekundärQb(-1) As Individuum
-        Dim Func1 As New Kern.Functions(Me.mProblem, n_PES_Childs, mSettings.PES.n_Eltern, mSettings.PES.SekPop.is_Begrenzung, mSettings.CES.n_PES_MemSecPop, mSettings.CES.n_PES_Interact, False, iAktGen + 1)
+        Dim Func1 As New ES.Functions(Me.mProblem, n_PES_Childs, mSettings.PES.n_Eltern, mSettings.PES.SekPop.is_Begrenzung, mSettings.CES.n_PES_MemSecPop, mSettings.CES.n_PES_Interact, False, iAktGen + 1)
         Call Func1.EsEltern_Pareto(NDSorting, Fake_SekundärQb, IPES_Parents_pLoc)
         '********************************************************************************************
 
@@ -1214,7 +1214,7 @@ Public Class CES
         '4: Sekundäre Population wird bestimmt und gespeichert
         '--------------------------------
         'Sekundär_QB wird hier berücksichtigt!
-        Dim Func1 As New Kern.Functions(Me.mProblem, n_PES_Mem_Childs, mSettings.CES.n_PES_MemSize, mSettings.PES.SekPop.is_Begrenzung, mSettings.PES.SekPop.n_MaxMembers, mSettings.PES.SekPop.n_Interact, mSettings.PES.SekPop.is_Interact, iAktGen + 1)
+        Dim Func1 As New ES.Functions(Me.mProblem, n_PES_Mem_Childs, mSettings.CES.n_PES_MemSize, mSettings.PES.SekPop.is_Begrenzung, mSettings.PES.SekPop.n_MaxMembers, mSettings.PES.SekPop.n_Interact, mSettings.PES.SekPop.is_Interact, iAktGen + 1)
         Call Func1.EsEltern_Pareto(NDSorting, PES_Mem_SekundärQb, IPES_Memory)
         '********************************************************************************************
 

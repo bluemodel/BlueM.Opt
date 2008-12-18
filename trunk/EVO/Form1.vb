@@ -46,7 +46,7 @@ Partial Class Form1
     Private TSP1 As EVO.Apps.TSP
 
     'Methoden
-    Private CES1 As EVO.Kern.CES
+    Private CES1 As EVO.ES.CES
 
     '**** Globale Parameter Parameter Optimierung ****
     'TODO: diese Werte sollten eigentlich nur in CES bzw PES vorgehalten werden
@@ -1060,7 +1060,7 @@ Partial Class Form1
         End If
 
         'CES initialisieren
-        CES1 = New EVO.Kern.CES()
+        CES1 = New EVO.ES.CES()
         Call CES1.CESInitialise(Me.EVO_Einstellungen1.Settings, Me.mProblem, Sim1.VerzweigungsDatei.GetLength(0))
 
         'Progress initialisieren
@@ -1333,8 +1333,8 @@ Partial Class Form1
 
             'Das Dn des Child mutieren
             If EVO_Einstellungen1.Settings.PES.Schrittweite.is_DnVektor = False Then
-                Dim PESX As EVO.Kern.PES
-                PESX = New EVO.Kern.PES
+                Dim PESX As EVO.ES.PES
+                PESX = New EVO.ES.PES
                 Call PESX.PesInitialise(EVO_Einstellungen1.Settings, Me.mProblem)
                 CES1.Childs(i_ch).CES_Dn = PESX.CES_Dn_Mutation(CES1.Childs(i_ch).CES_Dn)
             End If
@@ -1391,8 +1391,8 @@ Partial Class Form1
 
                             'Schritt 0: PES - Objekt der Klasse PES wird erzeugt PES wird erzeugt
                             '*********************************************************************
-                            Dim PES1 As EVO.Kern.PES
-                            PES1 = New EVO.Kern.PES()
+                            Dim PES1 As EVO.ES.PES
+                            PES1 = New EVO.ES.PES()
 
                             'Vorbereitung um das PES zu initieren
                             '************************************
@@ -1622,7 +1622,7 @@ Partial Class Form1
         Dim Extrapolationsschritte As Long
         Dim Rueckschritte As Long
 
-        Dim HookJeeves As EVO.Kern.HookeAndJeeves = New EVO.Kern.HookeAndJeeves(Me.mProblem.NumParams, EVO_Einstellungen1.Settings.HookJeeves.DnStart, EVO_Einstellungen1.Settings.HookJeeves.DnFinish)
+        Dim HookJeeves As EVO.ES.HookeAndJeeves = New EVO.ES.HookeAndJeeves(Me.mProblem.NumParams, EVO_Einstellungen1.Settings.HookJeeves.DnStart, EVO_Einstellungen1.Settings.HookJeeves.DnFinish)
 
         ReDim QNBest(Me.mProblem.NumPenalties - 1)
         ReDim QBest(Me.mProblem.NumPenalties - 1)
@@ -1685,7 +1685,7 @@ Partial Class Form1
             '============
             For j = 0 To HookJeeves.AnzahlParameter - 1
 
-                aktuellePara = HookJeeves.Tastschritt(j, Kern.HookeAndJeeves.TastschrittRichtung.Vorwärts)
+                aktuellePara = HookJeeves.Tastschritt(j, EVO.ES.HookeAndJeeves.TastschrittRichtung.Vorwärts)
 
                 Tastschritte_aktuell += 1
                 durchlauf += 1
@@ -1715,7 +1715,7 @@ Partial Class Form1
 
                 If (ind.Penalties(0) >= QNBest(0)) Then
 
-                    aktuellePara = HookJeeves.Tastschritt(j, Kern.HookeAndJeeves.TastschrittRichtung.Rückwärts)
+                    aktuellePara = HookJeeves.Tastschritt(j, EVO.ES.HookeAndJeeves.TastschrittRichtung.Rückwärts)
 
                     Tastschritte_aktuell += 1
                     durchlauf += 1
@@ -1817,7 +1817,7 @@ Partial Class Form1
 
         Dim durchlauf As Integer
         Dim ind() As Common.Individuum_PES
-        Dim PES1 As EVO.Kern.PES
+        Dim PES1 As EVO.ES.PES
 
         'Hypervolumen instanzieren
         Dim Hypervolume As EVO.MO_Indicators.Indicators
@@ -1835,7 +1835,7 @@ Partial Class Form1
 
         'Schritte 0: Objekt der Klasse PES wird erzeugt
         '**********************************************
-        PES1 = New EVO.Kern.PES()
+        PES1 = New EVO.ES.PES()
 
         'Schritte 1 - 3: ES wird initialisiert (Weiteres siehe dort ;-)
         '**************************************************************
@@ -1933,7 +1933,7 @@ Start_Evolutionsrunden:
                     'Simulationsanwendungen nachträglich auswerten
                     If Anwendung = ANW_BLUEM Or Anwendung = ANW_SMUSI Or Anwendung = ANW_SCAN Or Anwendung = ANW_SWMM Then
 
-                        If (Me.Options.useMultithreading) Then
+                        If (Me.Options.useMultiThreading) Then
                             'Mit Multithreading
                             '==================
                             Dim Thread_Free As Integer = 0

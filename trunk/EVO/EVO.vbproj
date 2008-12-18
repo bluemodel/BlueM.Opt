@@ -114,9 +114,9 @@
       <Project>{9FA5A4C7-3AA9-420C-9F01-9F1683E36A79}</Project>
       <Name>DDS_C_Sharp</Name>
     </ProjectReference>
-    <ProjectReference Include="..\EVO.Algos\ES\EVO.Kern.vbproj">
+    <ProjectReference Include="..\EVO.Algos\ES\ES.vbproj">
       <Project>{58356A07-425E-4C91-ACB8-17B9286C9417}</Project>
-      <Name>EVO.Kern</Name>
+      <Name>ES</Name>
     </ProjectReference>
     <ProjectReference Include="..\EVO.Apps\EVO.Apps.vbproj">
       <Project>{2DCFE99E-CBFE-4CCC-93E7-A6D628B16DEC}</Project>
