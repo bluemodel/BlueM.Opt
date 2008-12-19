@@ -1,22 +1,35 @@
+'*******************************************************************************
+'*******************************************************************************
+'**** Klasse EVO_Settings                                                   ****
+'**** zum Speichern aller EVO-Einstellungen aus dem Form                    ****
+'****                                                                       ****
+'**** Autoren: Christoph Hübner, Felix Fröhlich, Dirk Muschalla             ****
+'****                                                                       ****
+'**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
+'**** TU Darmstadt                                                          ****
+'****                                                                       ****
+'**** November 2007                                                         ****
+'****                                                                       ****
+'**** Letzte Änderung: Dezember 2008                                        ****
+'*******************************************************************************
+'*******************************************************************************
+
 Imports System.Xml.Serialization
 
 Public Class EVO_Settings
 
-    '*******************************************************************************
-    '*******************************************************************************
-    '**** Klasse EVO_Settings                                                   ****
-    '**** zum Speichern aller EVO-Einstellungen aus dem Form                    ****
-    '****                                                                       ****
-    '**** Autoren: Christoph Hübner, Felix Fröhlich, Dirk Muschalla             ****
-    '****                                                                       ****
-    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
-    '**** TU Darmstadt                                                          ****
-    '****                                                                       ****
-    '**** November 2007                                                         ****
-    '****                                                                       ****
-    '**** Letzte Änderung: Dezember 2008                                        ****
-    '*******************************************************************************
-    '*******************************************************************************
+    'Struct für generelle Settings
+    '-----------------------------
+    Public Structure General_Settings
+        <System.ComponentModel.DefaultValueAttribute(True)> _
+        Public useMultithreading As Boolean
+        <System.ComponentModel.DefaultValueAttribute(False)> _
+        Public drawOnlyCurrentGeneration As Boolean
+        Public Sub setStandard()
+            Me.useMultithreading = True
+            Me.drawOnlyCurrentGeneration = True
+        End Sub
+    End Structure
 
     'Struct für die PES_Settings
     '---------------------------
@@ -155,17 +168,17 @@ Public Class EVO_Settings
         Public OptReprodOp As CES_REPRODOP      'Reprofuktionaoperator
         Public OptMutOperator As CES_MUTATION   'Mutationsoperator
         Public pr_MutRate As Integer            'Definiert die Wahrscheinlichkeit der Mutationsrate in %
-        
+
         Public is_SecPop As Boolean             'SekundärePopulation an oder aus
         Public is_SecPopRestriction As Boolean  'Sekundäre Population begrenzen
         Public n_MemberSecondPop As Integer     'Max Anzahl der Mitglieder der Sekundären Population
         Public n_Interact As Integer            'Austausch mit SekPop nach n Generationen
 
         'Hybrid
-        Public is_RealOpt as Boolean            'gibt an ob auch die Real Parameter optimiert werden sollen
-        Public ty_Hybrid as HYBRID_TYPE         'gibt den Hybrid Typ an
-        Public Mem_Strategy as MEMORY_STRATEGY  'Gibt die Memory Strategy an
-        Public n_PES_MemSize as Integer         'Die Größe des PES Memory
+        Public is_RealOpt As Boolean            'gibt an ob auch die Real Parameter optimiert werden sollen
+        Public ty_Hybrid As HYBRID_TYPE         'gibt den Hybrid Typ an
+        Public Mem_Strategy As MEMORY_STRATEGY  'Gibt die Memory Strategy an
+        Public n_PES_MemSize As Integer         'Die Größe des PES Memory
         Public is_PES_SecPop As Boolean         'SekundärePopulation für PES an oder aus
         Public n_PES_MemSecPop As Integer       'Anzahl der Mitglieder der Sekundären Population für PES
         Public n_PES_Interact As Integer        'Austausch mit SekPop für PES nach n Generationen
@@ -266,6 +279,7 @@ Public Class EVO_Settings
 
     End Structure
 
+    Public General As General_Settings
     Public PES As PES_Settings
     Public CES As CES_Settings
     Public HookJeeves As HookJeeves_Settings

@@ -14,7 +14,7 @@
     '*******************************************************************************
     '*******************************************************************************
 
-    'lokale Kopie der EVO_Einstellungen
+    'lokale Referenz auf EVO_Settings
     Private mSettings As EVO.Common.EVO_Settings
 
     'Das Problem
@@ -28,12 +28,9 @@
 
     'Diagramm Initialisierung (Titel und Achsen)
     '*******************************************
-    Public Sub DiagInitialise(ByVal Titel As String, ByVal Achsen As Collection, ByRef settings As EVO.Common.EVO_Settings, ByRef prob As EVO.Common.Problem)
+    Public Sub DiagInitialise(ByVal Titel As String, ByVal Achsen As Collection, ByRef prob As EVO.Common.Problem)
 
         Dim xachse, yachse, zachse As Diagramm.Achse
-
-        'Referenz zu EVO_Einstellungen lokal speichern
-        Me.mSettings = settings
 
         'Problem speichern
         Me.mProblem = prob
@@ -101,6 +98,18 @@
         End With
 
     End Sub
+
+    ''' <summary>
+    ''' Settings setzen
+    ''' </summary>
+    ''' <param name="settings">EVO_Settings</param>
+    Public Sub setSettings(ByRef settings As EVO.Common.EVO_Settings)
+
+        'Settings übergeben
+        Me.mSettings = settings
+
+    End Sub
+
 
 #Region "Zeichenfunktionen"
 

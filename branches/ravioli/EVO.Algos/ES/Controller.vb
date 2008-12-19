@@ -6,6 +6,9 @@ Imports System.ComponentModel
 Imports System.Drawing
 Imports System.Threading
 
+''' <summary>
+''' Kontrolliert den Ablauf der Evolutionsstrategie (PES, CES und HYBRID)
+''' </summary>
 Public Class Controller
 
     Private Enum ApplicationTypes As Integer
@@ -27,11 +30,12 @@ Public Class Controller
     Private CES1 As CES
 
     '**** Multithreading ****
-    Private useMultithreading As Boolean
     Dim MI_Thread_OK As Boolean = False
 
+#Region "Methoden"
+
     ''' <summary>
-    ''' Initialisiert den ES-Controller und übergibt alle erforderlichen Objekte
+    ''' Konstruktor initialisiert den ES-Controller und übergibt alle erforderlichen Objekte
     ''' </summary>
     ''' <param name="inputProblem"></param>
     ''' <param name="inputSettings"></param>
@@ -56,11 +60,9 @@ Public Class Controller
     ''' Initialisiert den Controller für Sim-Anwendungen
     ''' </summary>
     ''' <param name="inputSim">die Simulationsanwendung</param>
-    ''' <param name="input_useMultithreading">Ob Multithreading verwendet werden soll</param>
-    Public Sub InitApp(ByRef inputSim As EVO.Apps.Sim, ByVal input_useMultithreading As Boolean)
+    Public Sub InitApp(ByRef inputSim As EVO.Apps.Sim)
         Me.myAppType = ApplicationTypes.Sim
         Me.Sim1 = inputSim
-        Me.useMultithreading = input_useMultithreading
     End Sub
 
     ''' <summary>
@@ -69,7 +71,6 @@ Public Class Controller
     Public Sub InitApp(ByRef inputTestprobleme As EVO.Apps.Testprobleme)
         Me.myAppType = ApplicationTypes.Testprobleme
         Me.Testprobleme1 = inputTestprobleme
-        Me.useMultithreading = False
     End Sub
 
     ''' <summary>
@@ -90,7 +91,7 @@ Public Class Controller
 
 #Region "CES"
 
-    'Anwendung CES und CES_PES             
+    'Anwendung CES und CES_PES
     '*************************
     Private Sub STARTEN_CES_or_HYBRID()
 
@@ -522,7 +523,7 @@ Public Class Controller
                             'Evaluierung verarbeiten
                             Call PES_processEvaluation(inds(i_Nachf), i_Nachf)
 
-                        ElseIf (Not Me.useMultithreading) Then
+                        ElseIf (Not Me.mySettings.General.useMultithreading) Then
 
                             'Simulationsanwendungen ohne Multithreading
                             'auch sofort auswerten
@@ -558,10 +559,10 @@ Public Class Controller
 
                         End If
 
-                    Next 'Ende alle Nachkommen (singlethread)
+                    Next 'Ende alle Nachfahren (singlethread)
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    If (Me.useMultithreading) Then
+                    If (Me.mySettings.General.useMultithreading) Then
 
                         'Simulationsanwendungen mit Multithreading
                         'nachträglich auswerten
@@ -635,11 +636,11 @@ Public Class Controller
 
                     End If
 
-                    'TODO: ggf. alte Generation im Diagramm löschen
-                    'If (Me.Options.drawOnlyCurrentPop _
-                    '    And PES1.PES_iAkt.iAktGen < Me.mySettings.PES.n_Gen - 1) Then
-                    '    Call Me.myHauptDiagramm.LöscheLetzteGeneration(PES1.PES_iAkt.iAktPop)
-                    'End If
+                    'ggf. alte Generation aus Diagramm löschen
+                    If (Me.mySettings.General.drawOnlyCurrentGeneration _
+                        And PES1.PES_iAkt.iAktGen < Me.mySettings.PES.n_Gen - 1) Then
+                        Call Me.myHauptDiagramm.LöscheLetzteGeneration(PES1.PES_iAkt.iAktPop)
+                    End If
 
                     'Verlauf aktualisieren
                     Me.myProgress.iGen = PES1.PES_iAkt.iAktGen + 1
@@ -728,5 +729,7 @@ Public Class Controller
     End Sub
 
 #End Region 'PES
+
+#End Region 'Methoden
 
 End Class

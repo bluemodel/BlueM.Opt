@@ -1,3 +1,18 @@
+'*******************************************************************************
+'*******************************************************************************
+'**** Klasse EVO_Einstellungen                                              ****
+'****                                                                       ****
+'**** Autoren: Christoph Hübner, Felix Fröhlich, Dirk Muschalla             ****
+'****                                                                       ****
+'**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
+'**** TU Darmstadt                                                          ****
+'****                                                                       ****
+'**** November 2007                                                         ****
+'****                                                                       ****
+'**** Letzte Änderung: November 2007                                        ****
+'*******************************************************************************
+'*******************************************************************************
+
 Imports System.IO
 Imports System.Xml
 Imports System.Xml.Serialization
@@ -6,23 +21,7 @@ Imports IHWB.EVO.Common.Constants
 Public Class EVO_Einstellungen
     Inherits System.Windows.Forms.UserControl
 
-    '*******************************************************************************
-    '*******************************************************************************
-    '**** Klasse EVO_Einstellungen                                              ****
-    '****                                                                       ****
-    '**** Autoren: Christoph Hübner, Felix Fröhlich, Dirk Muschalla             ****
-    '****                                                                       ****
-    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
-    '**** TU Darmstadt                                                          ****
-    '****                                                                       ****
-    '**** November 2007                                                         ****
-    '****                                                                       ****
-    '**** Letzte Änderung: November 2007                                        ****
-    '*******************************************************************************
-    '*******************************************************************************
-
-    'Eigenschaften
-    '#############
+#Region "Eigenschaften"
 
     Private msettings As EVO.Common.EVO_Settings     'Sicherung sämtlicher Einstellungen
     Private mProblem As EVO.Common.Problem           'Das Problem
@@ -30,8 +29,25 @@ Public Class EVO_Einstellungen
     Public isLoad As Boolean = False                 'Flag der anzeigt, ob die Settings aus einer XML Datei gelesen werden
     Private isInitializing As Boolean
 
-    'Methoden
-    '########
+#End Region
+
+#Region "Properties"
+
+    'EVO_Settings Property
+    '*********************
+    Public ReadOnly Property Settings() As EVO.Common.EVO_Settings
+        Get
+            'Wenn Einstellungen noch nicht gespeichert, zuerst aus Form einlesen
+            If (Not Me.isSaved) Then
+                Call Me.readForm()
+            End If
+            Return Me.msettings
+        End Get
+    End Property
+
+#End Region 'Properties
+
+#Region "Methoden"
 
     'Konstruktor
     '***********
@@ -52,7 +68,7 @@ Public Class EVO_Einstellungen
 
         Me.isInitializing = False
 
-       'Standard-Settings setzen
+        'Standard-Settings setzen
         Call Me.msettings.PES.setStandard(EVO_MODUS.Single_Objective)
         Call Me.msettings.CES.setStandard(METH_CES)
         Call Me.msettings.HookJeeves.setStandard()
@@ -593,15 +609,15 @@ Public Class EVO_Einstellungen
         Dim i As Integer
         Dim PathStr As String
 
-        If nChilds = 1 Then
+        If NChilds = 1 Then
             PathStr = "   Path: "
             For i = 0 To Path.GetUpperBound(0)
                 PathStr = PathStr & Path(i) & " "
             Next
-            PathStr = PathStr.Trimend
+            PathStr = PathStr.TrimEnd
         Else
             PathStr = "   n_combi: "
-            PathStr = PathStr & nChilds
+            PathStr = PathStr & NChilds
         End If
 
         Me.Label_CES_OptModus.Text = "Modus: " & Modus.ToString & PathStr
@@ -609,7 +625,7 @@ Public Class EVO_Einstellungen
         Me.Numeric_CES_n_Parents.Minimum = 1
         Me.Numeric_CES_n_Parents.Value = nParents
         Me.Numeric_CES_n_childs.Minimum = 1
-        Me.Numeric_CES_n_childs.Value = nChilds
+        Me.Numeric_CES_n_childs.Value = NChilds
 
     End Sub
 
@@ -646,18 +662,6 @@ Public Class EVO_Einstellungen
         Call Me.writeForm()
     End Sub
 
-    'PES_Settings Property
-    '*********************
-    Public ReadOnly Property Settings() As EVO.Common.EVO_Settings
-        Get
-            'Wenn Einstellungen noch nicht gespeichert, zuerst aus Form einlesen
-            If (Not Me.isSaved) Then
-                Call Me.readForm()
-            End If
-            Return Me.msettings
-        End Get
-    End Property
-
     'Speichern der EVO_Settings in einer XML-Datei
     '*********************************************
     Public Sub saveSettings(ByVal filename As String)
@@ -687,14 +691,16 @@ Public Class EVO_Einstellungen
 
         Try
             'Deserialisieren
+            'TODO: XmlDeserializationEvents ms-help://MS.VSCC.v90/MS.MSDNQTR.v90.en/fxref_system.xml/html/e0657840-5678-bf57-6e7a-1bd93b2b27d1.htm
             Me.msettings = CType(serializer.Deserialize(fs), Common.EVO_Settings)
+
             'Geladene Settings in Form schreiben
             isLoad = True
             Call Me.writeForm()
             isLoad = False
 
         Catch e As Exception
-            MsgBox("Kann die angegebene XML-Datei nicht einlesen!" & eol & e.Message, MsgBoxStyle.Critical, "Fehler")
+            MsgBox("Fehler beim Einlesen der Einstellungen!" & eol & e.Message, MsgBoxStyle.Critical, "Fehler")
 
         Finally
             fs.Close()
@@ -716,5 +722,7 @@ Public Class EVO_Einstellungen
     End Sub
 
 #End Region 'Schnittstelle
+
+#End Region 'Methoden
 
 End Class

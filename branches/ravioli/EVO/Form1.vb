@@ -96,7 +96,7 @@ Partial Class Form1
         ComboBox_Methode.SelectedIndex = 0
 
         'OptionsDialog instanzieren
-        Me.Options = New OptionsDialog()
+        Me.Options = New OptionsDialog(Me.EVO_Einstellungen1.Settings)
 
         'Monitor instanzieren
         Me.Monitor1 = New EVO.Diagramm.Monitor()
@@ -664,9 +664,6 @@ Partial Class Form1
             'Problem an Sim-Objekt übergeben
             Call Me.Sim1.setProblem(Me.mProblem)
 
-            'Settings auch übergeben
-            Call Me.Sim1.setSettings(Me.EVO_Einstellungen1.Settings)
-
         ElseIf (Me.Anwendung = ANW_TESTPROBLEME) Then
 
             'Bei Testproblemen definieren diese das Problem selbst
@@ -701,8 +698,22 @@ Partial Class Form1
 
         'Dialog anzeigen
         If (OpenFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK) Then
+
+            'EVO_Settings aus Datei laden
             Call EVO_Einstellungen1.loadSettings(OpenFileDialog1.FileName)
+
+            'EVO_Settings neu verteilen, 
+            'weil durch Einlesen aus Datei alle Referenzen verloren gehen
+            '------------------------------------------------------------
+
+            'OptionsDialog
+            Call Me.Options.setSettings(Me.EVO_Einstellungen1.Settings)
+            'Hauptdiagramm
+            Call Me.Hauptdiagramm1.setSettings(Me.EVO_Einstellungen1.Settings)
+
+            'Anwendungen, Controller und Algos bekommen die Settings bei Start übergeben
         End If
+
     End Sub
 
     'EVO_Einstellungen speichern
@@ -742,7 +753,7 @@ Partial Class Form1
             Me.Button_Start.Text = "Run"
 
             'Bei Multithreading muss Sim explizit pausiert werden
-            If (Me.Options.useMultiThreading) Then
+            If (Me.EVO_Einstellungen1.Settings.General.useMultithreading) Then
                 Me.Sim1.isPause = True
             End If
 
@@ -758,7 +769,7 @@ Partial Class Form1
             Me.Button_Start.Text = "Pause"
 
             'Bei Multithreading muss Sim explizit wieder gestartet werden
-            If (Me.Options.useMultiThreading) Then
+            If (Me.EVO_Einstellungen1.Settings.General.useMultithreading) Then
                 Me.Sim1.isPause = False
             End If
 
@@ -784,14 +795,20 @@ Partial Class Form1
                 Me.Button_loadRefResult.Enabled = True
             End If
 
-            'EVO_Einstellungen temporär speichern
+            'EVO_Settings in temp-Verzeichnis speichern
             Dim dir As String
             dir = My.Computer.FileSystem.SpecialDirectories.Temp & "\"
             Call Me.EVO_Einstellungen1.saveSettings(dir & "EVO_Settings.xml")
 
+            'EVO_Settings an Hauptdiagramm übergeben
+            Call Me.Hauptdiagramm1.setSettings(Me.EVO_Einstellungen1.Settings)
+
             Select Case Anwendung
 
                 Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM
+
+                    'Settings an Sim1 übergeben
+                    Call Me.Sim1.setSettings(Me.EVO_Einstellungen1.Settings)
 
                     Select Case Me.mProblem.Method
 
@@ -800,7 +817,7 @@ Partial Class Form1
 
                         Case METH_PES, METH_CES, METH_HYBRID
                             Dim controller As New EVO.ES.Controller(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Monitor1, Me.Hauptdiagramm1)
-                            Call controller.InitApp(Me.Sim1, Me.Options.useMultiThreading)
+                            Call controller.InitApp(Me.Sim1)
                             Call controller.Start()
 
                         Case METH_HOOKJEEVES
@@ -1566,7 +1583,7 @@ Partial Class Form1
                         End If
 
                         'Diagramm initialisieren
-                        Call Me.Hauptdiagramm1.DiagInitialise(Anwendung, Achsen, Me.EVO_Einstellungen1.Settings, Me.mProblem)
+                        Call Me.Hauptdiagramm1.DiagInitialise(Anwendung, Achsen, Me.mProblem)
 
 
                     Case Else 'PES, CES, HYBRID, HOOK & JEEVES, DDS
@@ -1659,7 +1676,7 @@ Partial Class Form1
                         End If
 
                         'Diagramm initialisieren
-                        Call Me.Hauptdiagramm1.DiagInitialise(Anwendung, Achsen, Me.EVO_Einstellungen1.Settings, Me.mProblem)
+                        Call Me.Hauptdiagramm1.DiagInitialise(Anwendung, Achsen, Me.mProblem)
 
                         'IstWerte in Diagramm einzeichnen
                         Call Me.Hauptdiagramm1.ZeichneIstWerte()
@@ -2014,7 +2031,7 @@ Partial Class Form1
                     'Diagramm initialisieren
                     '-----------------------
                     Me.Hauptdiagramm1.Clear()
-                    Me.Hauptdiagramm1.DiagInitialise(Path.GetFileName(sourceFile), Achsen, Me.EVO_Einstellungen1.Settings, Me.mProblem)
+                    Me.Hauptdiagramm1.DiagInitialise(Path.GetFileName(sourceFile), Achsen, Me.mProblem)
 
                     'IstWerte in Diagramm einzeichnen
                     Call Me.Hauptdiagramm1.ZeichneIstWerte()
