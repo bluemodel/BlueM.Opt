@@ -75,8 +75,7 @@ namespace IHWB.EVO.MetaEvo
             }
             catch (MySqlException ex)
             {
-                 applog.appendText("Network Manager: DB-Connection Failed");
-                MessageBox.Show(ex.Message,"MySQL Database");
+                MessageBox.Show("Function 'DB_check_connection': \r\nFehler beim Verbinden mit der Datenbank: \r\n" + (ex.Message), "MetaEvo - Networkmanager");
                 return false;
             }
             return true;
@@ -100,7 +99,7 @@ namespace IHWB.EVO.MetaEvo
             myCommand.ExecuteNonQuery();
             myCommand.Connection.Close();
 
-            myCommand.CommandText = "CREATE TABLE IF NOT EXISTS `metaevo_network` (`ipName` varchar(15) NOT NULL,`type` varchar(20) NOT NULL,`status` varchar(20) NOT NULL,`timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,`speed_av` double NOT NULL,`speed_low` double NOT NULL ,PRIMARY KEY  (`ipName`)) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+            myCommand.CommandText = "CREATE TABLE IF NOT EXISTS `metaevo_network` (`ipName` varchar(15) NOT NULL,`type` varchar(20) NOT NULL,`status` varchar(30) NOT NULL,`timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,`speed_av` double NOT NULL,`speed_low` double NOT NULL ,PRIMARY KEY  (`ipName`)) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
             myCommand.Connection.Open();
             myCommand.ExecuteNonQuery();
             myCommand.Connection.Close();
@@ -169,7 +168,7 @@ namespace IHWB.EVO.MetaEvo
         public void DB_client_entry() {
             //Eintrag für Client
             //Um Timestamp richtig zu generieren wird ein Update hinterhergeschickt
-            myCommand.CommandText = "INSERT INTO `metaevo_network` (`ipName`, `type`, `status`, `speed_av`, `speed_low`) VALUES ('" + Dns.GetHostName() + "', 'client', 'ready', '1000', '1000'); UPDATE `metaevo_network` SET `status`= 'ready' WHERE ipName = '" + Dns.GetHostName() + "';";
+            myCommand.CommandText = "INSERT INTO `metaevo_network` (`ipName`, `type`, `status`, `speed_av`, `speed_low`) VALUES ('" + Dns.GetHostName() + "', 'client', 'ready', '1000', '1000');";
                 
             try
             {
@@ -177,28 +176,34 @@ namespace IHWB.EVO.MetaEvo
                 myCommand.ExecuteNonQuery();
                 myCommand.Connection.Close();
             }
-            catch
+            catch (MySqlException ex)
             {
-                MessageBox.Show("Fehler beim Schreiben in die Datenbank", "MetaEvo - Networkmanager");
+                MessageBox.Show("Function 'DB_client_entry': \r\nFehler beim Schreiben in die Datenbank: \r\n" + (ex.Message), "MetaEvo - Networkmanager");
             } 
         }
 
         //(ok)Client in DB updaten
         public void DB_client_entry_update()
         {
+            int affectedrows = 0;
             //Eintrag für Client
-            //Um Timestamp richtig zu generieren wird ein Update hinterhergeschickt
-            myCommand.CommandText = "UPDATE `metaevo_network` SET `status`= 'ready' WHERE ipName = '" + Dns.GetHostName() + "';";
+            //Zur aktualisierung des Timestamp 
+            myCommand.CommandText = "UPDATE `metaevo_network` SET `status`= 'ready2' WHERE ipName = '" + Dns.GetHostName() + "' LIMIT 1; UPDATE `metaevo_network` SET `status`= 'ready' WHERE ipName = '" + Dns.GetHostName() + "' LIMIT 1;";
 
             try
             {
                 myCommand.Connection.Open();
-                myCommand.ExecuteNonQuery();
+                affectedrows = myCommand.ExecuteNonQuery();
                 myCommand.Connection.Close();
             }
-            catch
+            catch (MySqlException ex)
             {
-                MessageBox.Show("Fehler beim Schreiben in die Datenbank", "MetaEvo - Networkmanager");
+                MessageBox.Show("Function 'DB_client_entry_update': \r\nFehler beim Schreiben in die Datenbank: \r\n" + (ex.Message), "MetaEvo - Networkmanager");
+            }
+            if (affectedrows == 0)
+            {
+                applog.appendText("Network Manager: Server-restart detected, creating new entry...");
+                DB_client_entry();
             }
         }
 
@@ -231,12 +236,12 @@ namespace IHWB.EVO.MetaEvo
             this.DB_ClearIndividuumsTable();
 
             //Schreiben der Individuen-Daten in die DB (alle gleichzeitig)
-            string tmptxt = "INSERT INTO `metaevo_individuums` (`id` :`status` :";
+            string tmptxt = "INSERT INTO `metaevo_individuums` (`id` #`status` #";
 
             //Datenmaske
             for (int k = 1; k <= number_optparas; k++)
             {
-                tmptxt = tmptxt + "`opt" + k + "`:";
+                tmptxt = tmptxt + "`opt" + k + "`#";
             }
 
             tmptxt = tmptxt + "`ipName`) VALUES ";
@@ -246,15 +251,16 @@ namespace IHWB.EVO.MetaEvo
             {
                 if (generation_input[j].get_toSimulate())
                 {
-                    tmptxt = tmptxt + "('" + generation_input[j].ID + "':'raw':";
+                    tmptxt = tmptxt + "('" + generation_input[j].ID + "'#'raw'#";
                     for (int k = 0; k < number_optparas; k++)
                     {
-                        tmptxt = tmptxt + "'" + generation_input[j].get_optparas()[k] + "':";
+                        tmptxt = tmptxt + "'" + generation_input[j].get_optparas()[k] + "'#";
                     }
-                    tmptxt = tmptxt + "'" + generation_input[j].get_client() + "'):";
+                    tmptxt = tmptxt + "'" + generation_input[j].get_client() + "')#";
                 }
             }
-            tmptxt = tmptxt.TrimEnd(':').Replace(",",".").Replace(":", ",") + ";";
+            //In der DB müssen Kommawerte mit . angegeben werden
+            tmptxt = tmptxt.Replace(",",".").Replace("#",",").TrimEnd(',') + ";";
 
             myCommand.CommandText = tmptxt;
             try
@@ -263,10 +269,10 @@ namespace IHWB.EVO.MetaEvo
                 myCommand.ExecuteNonQuery();
                 myCommand.Connection.Close();
             }
-            catch
+            catch (MySqlException ex)
             {
-                MessageBox.Show("Fehler beim Schreiben in die Datenbank", "MetaEvo - Networkmanager");
-            } 
+                MessageBox.Show("Function 'Individuums_WriteToDB': \r\nFehler beim Schreiben in die Datenbank: \r\n" + (ex.Message), "MetaEvo - Networkmanager");
+            }
         }
 
         //(ok)Neue Individuen in die Speicher-DB einfügen (ID, status, optparas, features, constraints)
@@ -274,20 +280,20 @@ namespace IHWB.EVO.MetaEvo
         {
 
             //Schreiben der Individuen-Daten in die DB (alle gleichzeitig)
-            string tmptxt = "INSERT INTO `metaevo_final_individuums` (`id` :";
+            string tmptxt = "INSERT INTO `metaevo_final_individuums` (`id` #";
 
             //Datenmaske
             for (int k = 1; k <= number_optparas; k++)
             {
-                tmptxt = tmptxt + "`opt" + k + "`:";
+                tmptxt = tmptxt + "`opt" + k + "`#";
             }
             for (int k = 1; k <= number_features; k++)
             {
-                tmptxt = tmptxt + "`feat" + k + "`:";
+                tmptxt = tmptxt + "`feat" + k + "`#";
             }
             for (int k = 1; k <= number_constraints; k++)
             {
-                tmptxt = tmptxt + "`const" + k + "`:";
+                tmptxt = tmptxt + "`const" + k + "`#";
             }
 
             tmptxt = tmptxt + ") VALUES ";
@@ -295,22 +301,22 @@ namespace IHWB.EVO.MetaEvo
             //Datensätze
             for (int j = 0; j < generation_input.Length; j++)
             {
-                tmptxt = tmptxt + "('" + generation_input[j].ID + "':";
+                tmptxt = tmptxt + "('" + generation_input[j].ID + "'#";
                 for (int k = 0; k < number_optparas; k++)
                 {
-                    tmptxt = tmptxt + "'" + generation_input[j].get_optparas()[k] + "':";
+                    tmptxt = tmptxt + "'" + generation_input[j].get_optparas()[k] + "'#";
                 }
                 for (int k = 0; k < number_features; k++)
                 {
-                    tmptxt = tmptxt + "'" + generation_input[j].Features[k] + "':";
+                    tmptxt = tmptxt + "'" + generation_input[j].Features[k] + "'#";
                 }
                 for (int k = 0; k < number_constraints; k++)
                 {
-                    tmptxt = tmptxt + "'" + generation_input[j].Constraints[k] + "':";
+                    tmptxt = tmptxt + "'" + generation_input[j].Constraints[k] + "'#";
                 }
-                tmptxt = tmptxt + "'" + generation_input[j].get_client() + "'):";
+                tmptxt = tmptxt + ")#";
             }
-            tmptxt = tmptxt.TrimEnd(':').Replace(",", ".").Replace(":", ",") + ";";
+            tmptxt = tmptxt.Replace(",", ".").Replace("#", ",").Replace(",)", ")").TrimEnd(',') + ";";
 
             myCommand.CommandText = tmptxt;
             try
@@ -319,10 +325,10 @@ namespace IHWB.EVO.MetaEvo
                 myCommand.ExecuteNonQuery();
                 myCommand.Connection.Close();
             }
-            catch
+            catch (MySqlException ex)
             {
-                MessageBox.Show("Fehler beim Schreiben in die Datenbank", "MetaEvo - Networkmanager");
-            } 
+                MessageBox.Show("Function 'Individuums_StoreFinalInDB': \r\nFehler beim Schreiben in die Datenbank: \r\n" + (ex.Message), "MetaEvo - Networkmanager");
+            }
         }
         
         //(ok)nächstes eigenes Individuum aus der DB lesen (ID, optparas)
@@ -357,10 +363,10 @@ namespace IHWB.EVO.MetaEvo
                 myReader.Close();
                 myCommand.Connection.Close();
             }
-            catch
+            catch (MySqlException ex)
             {
-                MessageBox.Show("Fehler beim Lesen der Datenbank", "MetaEvo - Networkmanager");
-            } 
+                MessageBox.Show("Function 'Individuum_ReadFromDB_Client': \r\nFehler beim Lesen der Datenbank:\r\n " + (ex.Message), "MetaEvo - Networkmanager");
+            }
         }
 
         //(ok)prüfen wie viele Individuen fertig berechnet sind
@@ -373,10 +379,6 @@ namespace IHWB.EVO.MetaEvo
             {
                 myCommand.Connection.Open();
                 myReader = myCommand.ExecuteReader();
-
-                myCommand.Connection.Open();
-                myReader = myCommand.ExecuteReader();
-
                 
                 while (myReader.Read())
                 {
@@ -385,9 +387,9 @@ namespace IHWB.EVO.MetaEvo
                 myReader.Close();
                 myCommand.Connection.Close();  
             }
-            catch
+            catch (MySqlException ex)
             {
-                MessageBox.Show("Fehler beim Lesen der Datenbank", "MetaEvo - Networkmanager");
+                MessageBox.Show("Function 'Individuums_CountReadyInDB': \r\nFehler beim Lesen der Datenbank: \r\n" + (ex.Message), "MetaEvo - Networkmanager");
             }
             return count;
         }
@@ -447,9 +449,9 @@ namespace IHWB.EVO.MetaEvo
                 myReader.Close();
                 mycon.Close();
             }
-            catch
+            catch (MySqlException ex)
             {
-                MessageBox.Show("Fehler beim Lesen der Datenbank", "MetaEvo - Networkmanager");
+                MessageBox.Show("Function 'Individuums_UpdateFromDB': \r\nFehler beim Lesen der Datenbank: \r\n" + (ex.Message), "MetaEvo - Networkmanager");
             }
         }
 
@@ -502,9 +504,9 @@ namespace IHWB.EVO.MetaEvo
                 myCommand.ExecuteNonQuery();
                 myCommand.Connection.Close();
             }
-            catch
+            catch (MySqlException ex)
             {
-                MessageBox.Show("Fehler beim Schreiben in die Datenbank", "MetaEvo - Networkmanager");
+                MessageBox.Show("Function 'Individuum_UpdateInDB': \r\nFehler beim Schreiben in die Datenbank: \r\n" + (ex.Message), "MetaEvo - Networkmanager");
             }
         }
 
@@ -515,19 +517,25 @@ namespace IHWB.EVO.MetaEvo
         //(ok)Status von Server lesen // Rückgabe stringarray[1][status, timestamp]
         public string[] Network_ReadServer()
         {
-            myCommand = new MySqlCommand("Select status, timestamp from metaevo_network WHERE type = 'server' LIMIT 1", mycon);
-            mycon.Open();
-            myReader = myCommand.ExecuteReader();
-
             string[] back = new string[2];
-
-            while (myReader.Read())
+            myCommand = new MySqlCommand("Select status, timestamp from metaevo_network WHERE type = 'server' LIMIT 1", mycon);
+            try
             {
-                back[0] = myReader.GetString(0);
-                back[1] = myReader.GetString(1);
+                mycon.Open();
+                myReader = myCommand.ExecuteReader();
+
+                while (myReader.Read())
+                {
+                    back[0] = myReader.GetString(0);
+                    back[1] = myReader.GetString(1);
+                }
+                myReader.Close();
+                mycon.Close();
             }
-            myReader.Close();
-            mycon.Close();
+            catch (MySqlException ex)
+            {
+                MessageBox.Show("Function 'Network_ReadServer': \r\nFehler beim Lesen der Datenbank: \r\n" + (ex.Message), "MetaEvo - Networkmanager");
+            }
 
             return back;
         }
@@ -554,17 +562,13 @@ namespace IHWB.EVO.MetaEvo
             //Falls kein Aktiver Client vorhanden ist, 3 Sekunden warten und dann nochmal aufrufen
             if (network1.number_clients == 0)
             {
-                 applog.appendText("Scheduling: No Client found registered in DB - wait...");
+                applog.appendText("Scheduling: No Client found registered in DB - wait...");
                 System.Threading.Thread.Sleep(3000);
                 scheduling_new(ref generation_input);
             }
             else
             {
                  applog.appendText("Networkmanager: New Scheduling");
-
-                //Individuen-Zuweisungen zurücksetzen 
-                network1.erase_current_calc_times();
-
 
                 //Scheduling berechnen
                 //Für jedes Individuum
@@ -578,7 +582,7 @@ namespace IHWB.EVO.MetaEvo
                         if (network1.Clients[j].status != "error")
                         {
                             //Falls Client schneller 
-                            if ((network1.Clients[j].speed_av * network1.Clients[j].numberindividuums + network1.Clients[j].speed_av) < (network1.Clients[current_client].speed_av * network1.Clients[current_client].numberindividuums + network1.Clients[current_client].speed_av))
+                            if ((network1.Clients[j].speed_av * (network1.Clients[j].numberindividuums + 1)) < (network1.Clients[current_client].speed_av * (network1.Clients[current_client].numberindividuums + 1)))
                             {
                                 current_client = j;
                             }
@@ -615,28 +619,39 @@ namespace IHWB.EVO.MetaEvo
                 scheduling_new(ref generation_input);
             }
 
-            //An den Daten der Clients hat sich etwas geändert (Status=ready oder Speed-av hat sich um mehr als 5% geändert)
+            //An den Daten der Clients hat sich etwas geändert (Neues Individuum, Speed-av hat sich um mehr als 5% geändert oder speed-low ist um 20% überschritten)
             else if (scheduling_error)   
             {
-                applog.appendText("Networkmanager: Adapted Scheduling");
+                applog.appendText("Networkmanager: Adapting Scheduling...");
 
                 //DB auf Geschwindigkeitsänderung/Ausfall von Clients untersuchen und entsprechende Individuen demarkieren
                 current_client = 0;
 
-                //Individuums-Informationen aus der DB updaten
+                //Individuum-Informationen aus der DB updaten
                 this.Individuums_UpdateFromDB(ref generation_input);
 
                 //Defekte Clients suchen
                 for (int k = 0; k < network1.number_clients; k++)
                 {
-                    if (network1.Clients[k].status == "calculating")
+                    if (network1.Clients[k].status != "error")
                     {
-                        //Falls ausgefallen die zugehörigen Individuen demarkieren und Client als defekt markieren
-                        if (network1.Clients[k].timestamp.AddMilliseconds(1.2 * network1.Clients[k].speed_low) < DateTime.Now)
+                        scheduling_error = false;
+                        //Falls beim Berechnen ausgefallen, die zugehörigen Individuen demarkieren und Client als defekt markieren
+                        if ((network1.Clients[k].status == "calculating") && (network1.Clients[k].timestamp.AddMilliseconds(1.2 * network1.Clients[k].speed_low) < DateTime.Now))
+                        {
+                            scheduling_error = true;
+                        }
+                        //Falls im Ruhezustand ausgefallen, nach 6 Sekunden auf error 
+                        if ((network1.Clients[k].status == "ready") && (network1.Clients[k].timestamp.AddMilliseconds(6000) < DateTime.Now))
+                        {
+                            scheduling_error = true;
+                        }
+                        if (scheduling_error) 
                         {
                             network1.Clients[k].set_AlsoInDB("error", 0, 0);
+                            network1.Clients[k].numberindividuums = 0;
 
-                            //Evtl vorhandene Individuen des Clients demarkieren
+                            //Evtl vorhandene, noch nicht simulierte Individuen des Clients demarkieren
                             for (int j = 0; j < generation_input.Length; j++)
                             {
                                 if ((generation_input[j].get_client() == network1.Clients[k].ipName) && (generation_input[j].get_status() != "true") && (generation_input[j].get_status() != "false"))
@@ -646,27 +661,28 @@ namespace IHWB.EVO.MetaEvo
                                 }
                             }
                         }
-                    }
+                    } 
                 }
 
-                //Individuenzahlen der Clients neu berechnen und nur benötigte Änderungen in DB umsetzen
-                //  Temporäres CurrentCalctime-Array aufbauen     Client: [aktuelle vergangene Rechenzeit beim aktuellen Individuum][bereits berechnete Individuen]
-                double[,] current_status = new double[network1.Clients.Length, 2]; //{Calctime, Individuums Calculated}
+                //Neue Individuenzahlen der Clients berechnen 
+                //  Temporäres CurrentCalctime-Array aufbauen     
+                //  Client: [Client][0:vergangene Rechenzeit beim aktuellen Individuum + Rechenzeit für neue Individuen, 
+                //                   1:bereits berechnete Individuen + zu berechnende Individuen]
+                double[,] current_status = new double[network1.Clients.Length, 2]; 
                 
-                //      Anzahl der Berechneten Individuen pro Client
+                //      Anzahl der bereits Berechneten Individuen pro Client
                 for (int i = 0; i < generation_input.Length; i++)
                 {
-                    if (generation_input[i].get_status() != "raw")
+                    if ((generation_input[i].get_status() == "true") || (generation_input[i].get_status() == "false"))
                     {
-                        for (int j = 1; j < network1.number_clients; j++)
+                        for (int j = 0; j < network1.number_clients; j++)
                         {
-                            //falls Client funktioniert
                             if (network1.Clients[j].status != "error")
                             {
-                                //Falls Individuum diesem Client zugeordnet ist
+                                //Falls Individuum diesem Client zugeordnet ist (Zuordnung besteht nur noch zu funktionierenden Clients)
                                 if (generation_input[i].get_client() == network1.Clients[j].ipName)
                                 {
-                                    current_status[j, 1]++; 
+                                    current_status[j, 1]++;
                                 }
                             }
                         }
@@ -676,7 +692,10 @@ namespace IHWB.EVO.MetaEvo
                 //      Berechnungszeit des gerade berechneten Individuums pro Client
                 for (int i = 0; i < network1.Clients.Length; i++)
                 {
-                    current_status[i, 0] = (DateTime.Now.Subtract(network1.Clients[i].timestamp)).TotalMilliseconds;
+                    if (network1.Clients[i].status != "error")
+                    {
+                        current_status[i, 0] = (DateTime.Now.Subtract(network1.Clients[i].timestamp)).TotalMilliseconds;
+                    }
                 }
                 
                 //      Individuenverteilung jetzt neu berechnen
@@ -704,18 +723,20 @@ namespace IHWB.EVO.MetaEvo
                     }
                 }
 
-                //Individuen von Clients mit inzwischen geringerem Speed in DB demarkieren
+                //Individuen von Clients mit inzwischen geringerem Speed (error wurde bereits eingangs erledigt) in DB demarkieren
                 for (int i = 0; i < network1.Clients.Length; i++)
                 {
-                    int j = 0;
-                    while (current_status[i, 1] < network1.Clients[i].numberindividuums)
-                    {
-                        if ((generation_input[j].get_status() == "raw") && (generation_input[j].get_client() == network1.Clients[i].ipName))
+                    if (network1.Clients[i].status != "error") {
+                        int j = 0;
+                        while ((current_status[i, 1] < network1.Clients[i].numberindividuums) && (j < generation_input.Length))
                         {
-                            generation_input[j].set_Client("");
-                            network1.Clients[i].numberindividuums--;
-                        }
-                        j++;
+                            if ((generation_input[j].get_status() == "raw") && (generation_input[j].get_client() == network1.Clients[i].ipName))
+                            {
+                                generation_input[j].set_Client("");
+                                network1.Clients[i].numberindividuums--;
+                            }
+                            j++; 
+                        } 
                     }
                 }
 
@@ -751,6 +772,7 @@ namespace IHWB.EVO.MetaEvo
         {
             int individuums_ready = 0;
             int individuums_ready_now = 0;
+            populationsize = generation_input.Length;
 
             //Scheduling initialisieren und ersten Schritt rechnen
             this.scheduling_new(ref generation_input);
@@ -764,7 +786,7 @@ namespace IHWB.EVO.MetaEvo
             applog.appendText("Networkmanager: Waiting for first Results...");
 
             //Prüfen ob alle Individuen fertig berechnet sind
-            while (individuums_ready_now < this.populationsize)
+            while (individuums_ready_now < populationsize)
             {
                 if (individuums_ready < individuums_ready_now) 
                 {
@@ -778,7 +800,7 @@ namespace IHWB.EVO.MetaEvo
                         System.Windows.Forms.Application.DoEvents();
                     }
 
-                    applog.appendText("Networkmanager: " + Math.Round((double)individuums_ready_now / (double)populationsize, 2) * 100 + "%");
+                    applog.appendText("Networkmanager: " + Math.Round((double)individuums_ready_now / ((double)populationsize), 2) * 100 + "%");
 
                     individuums_ready = individuums_ready_now;
                 }

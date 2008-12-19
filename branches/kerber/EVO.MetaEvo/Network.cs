@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows.Forms;
 using System.Net;
 using MySql.Data.MySqlClient;
 
@@ -66,22 +67,37 @@ namespace IHWB.EVO.MetaEvo
             }
             tmptxt = tmptxt.TrimEnd(',', ' ') + " WHERE ipName = '" + this.ipName + "' LIMIT 1;";
             myCommand.CommandText = tmptxt;
-            myCommand.Connection.Open();
-            myCommand.ExecuteNonQuery();
-            myCommand.Connection.Close();
+            try
+            {
+                myCommand.Connection.Open();
+                myCommand.ExecuteNonQuery();
+                myCommand.Connection.Close();
+            }
+            catch (MySqlException ex)
+            {
+                MessageBox.Show("Function 'set_AlsoInDB': \r\nFehler beim Lesen der Datenbank: \r\n" + (ex.Message), "MetaEvo - Network");
+            }
         }
 
         //Von der Datenbank updaten
         public void get_NumberIndividuumsFromDB()
         {
             myCommand.CommandText ="Select * from metaevo_network WHERE ipName = '" + this.ipName + "'";
-            myCommand.Connection.Open();
-            myReader = myCommand.ExecuteReader();
-            while (myReader.Read())
+            try
             {
-                this.numberindividuums = myReader.GetInt32(6);
+                myCommand.Connection.Open();
+                myReader = myCommand.ExecuteReader();
+                while (myReader.Read())
+                {
+                    this.numberindividuums = myReader.GetInt32(6);
+                }
+                myReader.Close();
+                myCommand.Connection.Close();
             }
-            myCommand.Connection.Close();
+            catch (MySqlException ex)
+            {
+                MessageBox.Show("Function 'get_NumberIndividuumsFromDB': \r\nFehler beim Lesen der Datenbank: \r\n" + (ex.Message), "MetaEvo - Network");
+            }
         }
     }
 
@@ -112,7 +128,6 @@ namespace IHWB.EVO.MetaEvo
         //Aktuelle Daten aus der DB holen
         public bool update_From_DB()
         {
-            
             bool back = false; //Ob Scheduling neu berechnet werden muss
 
             //Clients zählen
@@ -143,55 +158,64 @@ namespace IHWB.EVO.MetaEvo
                 DateTime tmp2;
                
                 //Clients einlesen
-                myCommand.CommandText = "Select * from metaevo_network WHERE type = 'client'";
-                myCommand.Connection.Open();
-                myReader = myCommand.ExecuteReader();
-
-                number_clients = 0;
-
-                while (myReader.Read())
+                try
                 {
-                    //Updaten
-                    if (number_clients < number_clients_old)
+                    myCommand.CommandText = "Select * from metaevo_network WHERE type = 'client'";
+                    myCommand.Connection.Open();
+                    myReader = myCommand.ExecuteReader();
+
+                    number_clients = 0;
+
+                    while (myReader.Read())
                     {
-                        //Kopieren der bisherigen Daten des Servers
-                        Clients[number_clients] = tmp[number_clients];
+                        //Updaten
+                        if (number_clients < number_clients_old)
+                        {
+                            //Kopieren der bisherigen Daten des Servers
+                            Clients[number_clients] = tmp[number_clients];
 
-                        //Überprüfungen ob neues Scheduling erforderlich ist
-                        if (!(back))
-                        {
-                            //Falls sich der Status eines Clients in der DB unterscheidet vom gespeicherten Status
-                            if (Clients[number_clients].status != myReader.GetString(2)) back = true;
+                            //Überprüfungen ob neues Scheduling erforderlich ist
+                            if (!(back))
+                            {
+                                //Falls sich der Status eines Clients in der DB unterscheidet vom gespeicherten Status
+                                if (Clients[number_clients].status != myReader.GetString(2)) back = true;
+                            }
+                            if (!(back))
+                            {
+                                //5% Toleranz für durchschnittliche Geschwindigkeit des Clients bis neues Scheduling berechnet werden muss
+                                if (Math.Abs(Clients[number_clients].speed_av - myReader.GetDouble(4)) > Clients[number_clients].speed_av * 0.05) back = true;
+                            }
+                            if (!(back))
+                            {
+                                //20% Toleranz für maximale Berechnungsdauer bis neues Scheduling den alive-Status der Individuen prüfen muss (hängt sehr vom Server ab)
+                                if (Clients[number_clients].timestamp.Subtract(DateTime.Now).TotalMilliseconds > 1.2 * Clients[number_clients].speed_low) back = true;
+                            }
+                            Clients[number_clients].status = myReader.GetString(2);
+                            Clients[number_clients].timestamp = new DateTime(myReader.GetMySqlDateTime(3).Year, myReader.GetMySqlDateTime(3).Month, myReader.GetMySqlDateTime(3).Day, myReader.GetMySqlDateTime(3).Hour, myReader.GetMySqlDateTime(3).Minute, myReader.GetMySqlDateTime(3).Second);
+                            Clients[number_clients].speed_av = myReader.GetDouble(4);
+                            Clients[number_clients].speed_low = myReader.GetDouble(5);
                         }
-                        if (!(back))
+
+                        //oder neu anlegen
+                        else
                         {
-                            //5% Toleranz für durchschnittliche Geschwindigkeit des Clients bis neues Scheduling berechnet werden muss
-                            if (Math.Abs(Clients[number_clients].speed_av - myReader.GetDouble(4)) > Clients[number_clients].speed_av * 0.05) back = true;
+
+                            tmp2 = new DateTime(myReader.GetMySqlDateTime(3).Year, myReader.GetMySqlDateTime(3).Month, myReader.GetMySqlDateTime(3).Day, myReader.GetMySqlDateTime(3).Hour, myReader.GetMySqlDateTime(3).Minute, myReader.GetMySqlDateTime(3).Second);
+                            Clients[number_clients] = new Client(ref mycon, myReader.GetString(0), myReader.GetString(2), tmp2, myReader.GetDouble(4), myReader.GetDouble(5), 0);
+                            back = true;
                         }
-                        if (!(back))
-                        {
-                            //10% Toleranz für maximale Berechnungsdauer bis neues Scheduling den alive-Status der Individuen prüfen muss (hängt sehr vom Server ab)
-                            if (Clients[number_clients].timestamp.Subtract(DateTime.Now).TotalMilliseconds > 1.2 * Clients[number_clients].speed_low) back = true;
-                        }
-                        Clients[number_clients].status = myReader.GetString(2);
-                        Clients[number_clients].timestamp = new DateTime(myReader.GetMySqlDateTime(3).Year, myReader.GetMySqlDateTime(3).Month, myReader.GetMySqlDateTime(3).Day, myReader.GetMySqlDateTime(3).Hour, myReader.GetMySqlDateTime(3).Minute, myReader.GetMySqlDateTime(3).Second);
-                        Clients[number_clients].speed_av = myReader.GetDouble(4);
-                        Clients[number_clients].speed_low = myReader.GetDouble(5);   
+
+                        number_clients++;
                     }
-
-                    //oder neu anlegen
-                    else
-                    {
-                        
-                        tmp2 = new DateTime(myReader.GetMySqlDateTime(3).Year, myReader.GetMySqlDateTime(3).Month, myReader.GetMySqlDateTime(3).Day, myReader.GetMySqlDateTime(3).Hour, myReader.GetMySqlDateTime(3).Minute, myReader.GetMySqlDateTime(3).Second);
-                        Clients[number_clients] = new Client(ref mycon, myReader.GetString(0), myReader.GetString(2), tmp2, myReader.GetDouble(4), myReader.GetDouble(5), 0);
-                        back = true;
-                    }
-
-                    number_clients++;
+                    myReader.Close();
+                    mycon.Close();
                 }
-                myReader.Close();
-                mycon.Close();
+                catch (MySqlException ex)
+                {
+                    MessageBox.Show("Fehler beim Lesen der Datenbank: " + (ex.Message), "MetaEvo - Network");
+                }
+
+                update_numberclients(ref Clients);
             }
             return back;
         }
@@ -202,6 +226,34 @@ namespace IHWB.EVO.MetaEvo
             for (int k = 0; k < Clients.Length; k++)
             {
                 Clients[k].numberindividuums = 0;
+            }
+        }
+
+        //Anzahl der nach scheduling bisher zu berechnenden Individuen updaten
+        private void update_numberclients(ref Client[] Clients)
+        {
+            erase_current_calc_times();
+
+            try
+            {
+                myCommand.CommandText = "Select ipName from metaevo_individuums";
+                myCommand.Connection.Open();
+                myReader = myCommand.ExecuteReader();
+
+                while (myReader.Read())
+                {
+                    for (int j = 0; j < Clients.Length; j++ )
+                    {
+                        if (Clients[j].ipName == myReader.GetString(0)) { Clients[j].numberindividuums++; }
+                    }
+                }
+
+                myReader.Close();
+                mycon.Close();
+            }
+            catch (MySqlException ex)
+            {
+                MessageBox.Show("Fehler beim Lesen der Datenbank: " + (ex.Message), "MetaEvo - Network");
             }
         }
     }

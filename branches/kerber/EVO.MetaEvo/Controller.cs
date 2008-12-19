@@ -317,8 +317,8 @@ namespace IHWB.EVO.MetaEvo
                     if (networkmanager.calculate_by_clients(ref generation, ref hauptdiagramm1))
                     {
                         algomanager.set_genpool(ref generation);
-                        meServer.set_AlsoInDB("generate Individuums", -1, -1);
                         generation = new EVO.Common.Individuum_MetaEvo[this.settings.MetaEvo.ChildsPerParent * this.settings.MetaEvo.PopulationSize];
+                        meServer.set_AlsoInDB("generate Individuums", -1, -1);
                     }
                     else
                     {
@@ -329,9 +329,6 @@ namespace IHWB.EVO.MetaEvo
                 //Individuen erzeugen
                 else if (meServer.status == "generate Individuums")
                 {
-                    //Neue Individuen mit Genpool verrechnen und Genpool zeichnen
-                    algomanager.new_individuals_merge_with_genpool(ref generation);
-
                     //Evolutionsschritte
                     algomanager.new_individuals_build(ref generation);
 
@@ -355,12 +352,22 @@ namespace IHWB.EVO.MetaEvo
                             progress1.NextGen();
                             generationcounter++;
                         }
-                        meServer.set_AlsoInDB("generate Individuums", -1, -1);
+                        meServer.set_AlsoInDB("select Individuums", -1, -1);
                     }
                     else
                     {
                         MessageBox.Show("Fehler beim Ausführen der Kalkulation im Netzwerk");
                     }
+                }
+
+                //Individuen selektieren
+                else if (meServer.status == "select Individuums")
+                {
+                    //Neue Individuen mit Genpool verrechnen und Genpool zeichnen
+                    algomanager.new_individuals_merge_with_genpool(ref generation);
+
+                    //Neuen Serverstatus setzen
+                    meServer.set_AlsoInDB("generate Individuums", -1, -1);
                 }
             }
             progress1.iGen = progress1.NGen;
