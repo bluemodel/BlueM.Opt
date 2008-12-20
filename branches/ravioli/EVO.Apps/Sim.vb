@@ -85,6 +85,18 @@ Public MustInherit Class Sim
 
 #End Region 'Eigenschaften
 
+#Region "Events"
+
+    ''' <summary>
+    ''' Wird ausgelöst, wenn ein Individuum mit Multithreading fertig evaluiert wurde
+    ''' </summary>
+    ''' <param name="ind">das evaluierte Individuum</param>
+    ''' <param name="i_Nachf">0-basierte Nachfahren-Nummer</param>
+    ''' <remarks></remarks>
+    Public Event IndividuumEvaluated(ByRef ind As EVO.Common.Individuum, ByVal i_Nachf As Integer)
+
+#End Region
+
 #Region "Properties"
 
     ''' <summary>
@@ -441,6 +453,7 @@ Public MustInherit Class Sim
     ''' <summary>
     ''' Evaluiert ein Array von Individuen in multiplen Threads. 
     ''' Durchläuft alle Schritte vom Schreiben der Modellparameter bis zum Berechnen der Features.
+    ''' Erfolgreich evaluierte Individuen werden mit dem Event IndividuumEvaluated zurückgegeben.
     ''' </summary>
     ''' <param name="inds">Ein Array von zu evaluierenden Individuen</param>
     ''' <param name="storeInDB">Ob das Individuum in OptResult-DB gespeichert werden soll</param>
@@ -489,6 +502,7 @@ Public MustInherit Class Sim
                         Call Me.PREPARE_Evaluation_CES(inds(n_ind_Run))
 
                         'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
+                        'TODO: Christoph: Dies ist die einzige Stelle im Sim, an der die EVO_Settings benötigt werden. Kann man das nicht umgehen?
                         If (Me.mProblem.Method = METH_HYBRID _
                             And Me.mSettings.CES.ty_Hybrid = HYBRID_TYPE.Mixed_Integer) Then
                             If (Me.mProblem.Reduce_OptPara_and_ModPara(CType(inds(n_ind_Run), EVO.Common.Individuum_CES).Get_All_Loc_Elem)) Then
@@ -515,18 +529,21 @@ Public MustInherit Class Sim
 
                 Me.WorkDir_Current = Me.getThreadWorkDir(ThreadID_Ready)
 
-                'HACK: Individuum für Auswertung temporär klonen um ArrayMismatchException zu umgehen
-                tmpind = inds(n_ind_Ready).Clone()
+                'HACK: Individuum für Auswertung temporär kopieren um ArrayMismatchException zu umgehen
+                tmpind = inds(n_ind_Ready)
 
                 'Individuum auswerten
-                '--------------------
                 Me.SIM_Ergebnis_auswerten(tmpind, storeInDB)
 
-                'HACK: zurückkopieren
-                inds(n_ind_Ready) = tmpind.Clone()
+                'Individuum per Event zurückgeben
+                RaiseEvent IndividuumEvaluated(tmpind, n_ind_Ready)
+
+                'HACK: zurückkopieren (nötig?)
+                inds(n_ind_Ready) = tmpind
 
                 isOK(n_ind_Ready) = True
 
+                'Prüfen, ob alle Individuen fertig
                 If (n_ind_Ready = n_individuals - 1) Then
                     Ready = True
                 End If

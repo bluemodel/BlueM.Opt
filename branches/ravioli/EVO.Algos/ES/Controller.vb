@@ -23,14 +23,16 @@ Public Class Controller
     Private myHauptDiagramm As EVO.Diagramm.Hauptdiagramm
 
     Private myAppType As ApplicationTypes
-    Private Sim1 As EVO.Apps.Sim
+    Private WithEvents Sim1 As EVO.Apps.Sim
     Private Testprobleme1 As EVO.Apps.Testprobleme
 
     Private PES1 As PES
     Private CES1 As CES
 
-    '**** Multithreading ****
-    Dim MI_Thread_OK As Boolean = False
+    '**** CES-spezifische Sachen ****
+    Private CES_i_gen As Integer 'ginge alternativ auch mit Me.myProgress.iGen
+    Private ColorArray As Object(,)
+    Private MI_Thread_OK As Boolean = False
 
 #Region "Methoden"
 
@@ -89,6 +91,27 @@ Public Class Controller
 
     End Sub
 
+    ''' <summary>
+    ''' Verarbeitet ein evaluiertes Individuum
+    ''' </summary>
+    ''' <param name="ind">zu verarbeitendes Individuum</param>
+    ''' <param name="iNachfahre">0-basierte Nachfahre-Nummer</param>
+    ''' <remarks>Fängt auch das Multithreading-Event Sim.IndividuumEvaluated ab</remarks>
+    Private Sub processIndividuum(ByRef ind As Common.Individuum, ByVal iNachfahre As Integer) Handles Sim1.IndividuumEvaluated
+
+        Select Case Me.myProblem.Method
+
+            Case METH_PES
+
+                Call Me.processIndividuum_PES(ind, iNachfahre)
+
+            Case METH_CES, METH_HYBRID
+
+                Call Me.processIndividuum_CES(iNachfahre)
+
+        End Select
+    End Sub
+
 #Region "CES"
 
     'Anwendung CES und CES_PES
@@ -97,7 +120,7 @@ Public Class Controller
 
         Dim durchlauf_all As Integer
         Dim isOK() As Boolean
-        Dim Time(CES1.mSettings.CES.n_Generations - 1) As TimeSpan
+        Dim Time() As TimeSpan
         Dim Stoppuhr As New Stopwatch()
 
         'Hypervolumen instanzieren
@@ -111,10 +134,11 @@ Public Class Controller
         'Progress initialisieren
         Call Me.myProgress.Initialize(1, 1, Me.mySettings.CES.n_Generations, Me.mySettings.CES.n_Childs)
 
-        Dim ColorArray(CES1.ModSett.n_Locations, -1) As Object
+        'ColorArray dimensionieren
+        ReDim Me.ColorArray(CES1.ModSett.n_Locations, -1)
 
         'Laufvariable für die Generationen
-        Dim i_gen, i_ch, i_loc As Integer
+        Dim i_ch, i_loc As Integer
 
         'Zufällige Kinderpfade werden generiert
         '**************************************
@@ -149,9 +173,11 @@ Public Class Controller
         'xxxx Optimierung xxxxxx
         'Generationsschleife CES
         'xxxxxxxxxxxxxxxxxxxxxxx
+        ReDim Time(CES1.mSettings.CES.n_Generations - 1)
+
         durchlauf_all = 0
 
-        For i_gen = 0 To CES1.mSettings.CES.n_Generations - 1
+        For Me.CES_i_gen = 0 To CES1.mSettings.CES.n_Generations - 1
 
             Stoppuhr.Reset()
             Stoppuhr.Start()
@@ -162,7 +188,7 @@ Public Class Controller
                 ind.ID = durchlauf_all
             Next
 
-            'Alle Individuen evaluieren
+            'Individuen mit Multithreading evaluieren
             isOK = Sim1.Evaluate(CES1.Childs, True)
 
             'Evaluierte Individuen verarbeiten
@@ -172,32 +198,17 @@ Public Class Controller
                     'TODO: Fehlgeschlagene Evaluierungen behandeln
                 End If
 
-                'HYBRID: Speichert die PES Erfahrung diesen Childs im PES Memory
-                '***************************************************************
-                If (Me.myProblem.Method = METH_HYBRID And Me.mySettings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer) Then
-                    Call CES1.Memory_Store(i_Child, i_gen)
-                End If
-
-                'Lösung im TeeChart einzeichnen und mittleres Dn ausgeben
-                '========================================================
-                Call Me.myHauptDiagramm.ZeichneIndividuum(CES1.Childs(i_Child), 0, 0, i_gen, i_Child + 1, EVO.Diagramm.Diagramm.ColorManagement(ColorArray, CES1.Childs(i_Child)))
-                'TODO: Me.Label_Dn_Wert.Text = Math.Round(CES1.Childs(i_Child).Get_mean_PES_Dn, 6).ToString
-                If Not CES1.Childs(i_Child).Get_mean_PES_Dn = -1 Then
-                    Me.myMonitor.Zeichne_Dn(CES1.Childs(i_Child).ID, CES1.Childs(i_Child).Get_mean_PES_Dn)
-                End If
-
-                'Verlauf aktualisieren
-                Me.myProgress.iNachf = i_Child + 1
+                'erfolgreich evaluierte Individuen wurden bereits über Event verarbeitet
 
                 Stoppuhr.Stop()
-                Time(i_gen) = Stoppuhr.Elapsed
+                Time(Me.CES_i_gen) = Stoppuhr.Elapsed
 
             Next
             '^ ENDE der Child Schleife
             'xxxxxxxxxxxxxxxxxxxxxxx
 
             'Generation hochzählen
-            Me.myProgress.iGen = i_gen + 1
+            Me.myProgress.iGen = CES_i_gen + 1
 
             'Die Listen müssen nach der letzten Evaluierung wieder zurückgesetzt werden
             'Sicher ob das benötigt wird?
@@ -219,13 +230,13 @@ Public Class Controller
                 'Next
             Else
                 'NDSorting ******************
-                Call CES1.NDSorting_CES_Control(i_gen)
+                Call CES1.NDSorting_CES_Control(CES_i_gen)
 
                 'Sekundäre Population
                 '--------------------
                 If (Not IsNothing(Sim1)) Then
                     'SekPop abspeichern
-                    Call Sim1.OptResult.setSekPop(CES1.SekundärQb, i_gen)
+                    Call Sim1.OptResult.setSekPop(CES1.SekundärQb, CES_i_gen)
                 End If
 
                 'SekPop zeichnen
@@ -235,7 +246,7 @@ Public Class Controller
                 '-----------------------------------
                 Call Hypervolume.update_dataset(Common.Individuum.Get_All_Penalty_of_Array(CES1.SekundärQb))
                 Call Me.myHauptDiagramm.ZeichneNadirpunkt(Hypervolume.nadir)
-                Call Me.myMonitor.ZeichneHyperVolumen(i_gen, Math.Abs(Hypervolume.calc_indicator()))
+                Call Me.myMonitor.ZeichneHyperVolumen(CES_i_gen, Math.Abs(Hypervolume.calc_indicator()))
             End If
             ' ^ ENDE Selectionsprozess
             'xxxxxxxxxxxxxxxxxxxxxxxxx
@@ -266,7 +277,7 @@ Public Class Controller
                 Dim MI_Thread As Thread
                 MI_Thread = New Thread(AddressOf Me.Mixed_Integer_PES)
                 MI_Thread.IsBackground = True
-                MI_Thread.Start(i_gen)
+                MI_Thread.Start(CES_i_gen)
                 While MI_Thread_OK = False
                     Thread.Sleep(100)
                     Application.DoEvents()
@@ -437,6 +448,36 @@ Public Class Controller
         Next
     End Sub
 
+
+    ''' <summary>
+    ''' Verarbeitet ein evaluiertes Individuum für CES:
+    ''' * Individuum im Memory-Store speichern (HYBRID)
+    ''' * Lösung im Hauptdiagramm zeichnen
+    ''' * Dn im Monitor zeichnen
+    ''' * Verlaufsanzeige aktualisieren
+    ''' </summary>
+    ''' <param name="i_Child">0-basierte Nachfahrens-Nummer</param>
+    Private Sub processIndividuum_CES(ByVal i_Child As Integer)
+
+        'HYBRID: Speichert die PES Erfahrung diesen Childs im PES Memory
+        '***************************************************************
+        If (Me.myProblem.Method = METH_HYBRID And Me.mySettings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer) Then
+            Call CES1.Memory_Store(i_Child, Me.CES_i_gen)
+        End If
+
+        'Lösung im TeeChart einzeichnen und mittleres Dn ausgeben
+        '========================================================
+        Call Me.myHauptDiagramm.ZeichneIndividuum(CES1.Childs(i_Child), 0, 0, Me.CES_i_gen, i_Child + 1, EVO.Diagramm.Diagramm.ColorManagement(ColorArray, CES1.Childs(i_Child)))
+        'TODO: Me.Label_Dn_Wert.Text = Math.Round(CES1.Childs(i_Child).Get_mean_PES_Dn, 6).ToString
+        If Not CES1.Childs(i_Child).Get_mean_PES_Dn = -1 Then
+            Me.myMonitor.Zeichne_Dn(CES1.Childs(i_Child).ID, CES1.Childs(i_Child).Get_mean_PES_Dn)
+        End If
+
+        'Verlauf aktualisieren
+        Me.myProgress.iNachf = i_Child + 1
+
+    End Sub
+
 #End Region 'CES
 
 #Region "PES"
@@ -521,7 +562,7 @@ Public Class Controller
                             Call Testprobleme1.Evaluierung_TestProbleme(inds(i_Nachf), PES1.PES_iAkt.iAktPop, Me.myHauptDiagramm)
 
                             'Evaluierung verarbeiten
-                            Call PES_processEvaluation(inds(i_Nachf), i_Nachf)
+                            Call processIndividuum_PES(inds(i_Nachf), i_Nachf)
 
                         ElseIf (Not Me.mySettings.General.useMultithreading) Then
 
@@ -555,7 +596,7 @@ Public Class Controller
                             End If
 
                             'Evaluierung verarbeiten
-                            Call PES_processEvaluation(inds(i_Nachf), i_Nachf)
+                            Call processIndividuum_PES(inds(i_Nachf), i_Nachf)
 
                         End If
 
@@ -595,10 +636,12 @@ Public Class Controller
 
                                 Loop Until (isOK(i_Nachf) = True)
 
+                                'Evaluierung verarbeiten
+                                Call processIndividuum_PES(inds(i_Nachf), i_Nachf)
+
                             End If
 
-                            'Evaluierung verarbeiten
-                            Call PES_processEvaluation(inds(i_Nachf), i_Nachf)
+                            'erfolgreich evaluierte Individuen wurden bereits über Event verarbeitet
 
                         Next
 
@@ -695,15 +738,15 @@ Public Class Controller
     End Sub
 
     ''' <summary>
-    ''' Verarbeitet ein evaluiertes Individuum:
-    ''' Individuum im PES-Bestwertspeicher einordnen
-    ''' Lösung im Hauptdiagramm zeichnen
-    ''' Dn im Monitor zeichnen
-    ''' Verlaufsanzeige aktualisieren
+    ''' Verarbeitet ein evaluiertes Individuum für PES:
+    ''' * Individuum im PES-Bestwertspeicher einordnen
+    ''' * Lösung im Hauptdiagramm zeichnen
+    ''' * Dn im Monitor zeichnen
+    ''' * Verlaufsanzeige aktualisieren
     ''' </summary>
     ''' <param name="ind">Das zu verarbeitende Individuum</param>
-    ''' <param name="iNachfahre">Nachfahrens-Nummer des Individuums</param>
-    Private Sub PES_processEvaluation(ByRef ind As Common.Individuum_PES, ByVal iNachfahre As Integer)
+    ''' <param name="iNachfahre">0-basierte Nachfahrens-Nummer</param>
+    Private Sub processIndividuum_PES(ByRef ind As Common.Individuum_PES, ByVal iNachfahre As Integer)
 
         'Lösung im Hauptdiagramm zeichnen (Testprobleme zeichnen sich selber)
         If (myAppType = ApplicationTypes.Sim) Then
