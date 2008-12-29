@@ -1591,7 +1591,7 @@ Partial Class Form1
 
             DDS.update_Fbest(ind.Penalties(0))
 
-            DDS.update_search_historie(ind.Penalties(0), run)
+            DDS.update_search_historie(ind.Penalties(0), run - 1)
         Next
 
         '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -2542,6 +2542,7 @@ Start_Evolutionsrunden:
 
         Dim isOK As Boolean
         Dim isIHA As Boolean
+        Dim isSWMM As Boolean
         Dim WorkDir_Prev As String
 
         Dim zre As Wave.Zeitreihe
@@ -2589,6 +2590,12 @@ Start_Evolutionsrunden:
             isOK = Sim1.Evaluate(ind, False)
 
             'TODO: Simulationsfehler abfangen!
+
+            'Sonderfall SWMM-Bechnung: keine Ganglinie anzuzeigen
+            If (TypeOf Me.Sim1 Is EVO.Apps.SWMM) Then
+               isSWMM = True
+               Exit Sub
+            End If
 
             'Sonderfall IHA-Berechnung
             If (isIHA) Then
