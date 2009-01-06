@@ -24,7 +24,7 @@ Partial Class OptionsDialog
     Private Sub InitializeComponent()
         Dim GroupBox_Diagramm As System.Windows.Forms.GroupBox
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(OptionsDialog))
-        Me.CheckBox_drawOnlyCurrentPop = New System.Windows.Forms.CheckBox
+        Me.CheckBox_drawOnlyCurrentGen = New System.Windows.Forms.CheckBox
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel
         Me.OK_Button = New System.Windows.Forms.Button
         Me.Cancel_Button = New System.Windows.Forms.Button
@@ -38,7 +38,7 @@ Partial Class OptionsDialog
         '
         'GroupBox_Diagramm
         '
-        GroupBox_Diagramm.Controls.Add(Me.CheckBox_drawOnlyCurrentPop)
+        GroupBox_Diagramm.Controls.Add(Me.CheckBox_drawOnlyCurrentGen)
         GroupBox_Diagramm.Location = New System.Drawing.Point(12, 72)
         GroupBox_Diagramm.Name = "GroupBox_Diagramm"
         GroupBox_Diagramm.Size = New System.Drawing.Size(180, 62)
@@ -46,16 +46,16 @@ Partial Class OptionsDialog
         GroupBox_Diagramm.TabStop = False
         GroupBox_Diagramm.Text = "Diagramm"
         '
-        'CheckBox_drawOnlyCurrentPop
+        'CheckBox_drawOnlyCurrentGen
         '
-        Me.CheckBox_drawOnlyCurrentPop.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.CheckBox_drawOnlyCurrentPop.Location = New System.Drawing.Point(6, 19)
-        Me.CheckBox_drawOnlyCurrentPop.Name = "CheckBox_drawOnlyCurrentPop"
-        Me.CheckBox_drawOnlyCurrentPop.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.CheckBox_drawOnlyCurrentPop.Size = New System.Drawing.Size(158, 37)
-        Me.CheckBox_drawOnlyCurrentPop.TabIndex = 1
-        Me.CheckBox_drawOnlyCurrentPop.Text = "Nur die aktuelle Population jeder Generation anzeigen:"
-        Me.CheckBox_drawOnlyCurrentPop.UseVisualStyleBackColor = True
+        Me.CheckBox_drawOnlyCurrentGen.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.CheckBox_drawOnlyCurrentGen.Location = New System.Drawing.Point(6, 19)
+        Me.CheckBox_drawOnlyCurrentGen.Name = "CheckBox_drawOnlyCurrentGen"
+        Me.CheckBox_drawOnlyCurrentGen.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.CheckBox_drawOnlyCurrentGen.Size = New System.Drawing.Size(158, 37)
+        Me.CheckBox_drawOnlyCurrentGen.TabIndex = 1
+        Me.CheckBox_drawOnlyCurrentGen.Text = "Nur die aktuelle Generation anzeigen:"
+        Me.CheckBox_drawOnlyCurrentGen.UseVisualStyleBackColor = True
         '
         'TableLayoutPanel1
         '
@@ -75,6 +75,7 @@ Partial Class OptionsDialog
         'OK_Button
         '
         Me.OK_Button.Anchor = System.Windows.Forms.AnchorStyles.None
+        Me.OK_Button.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.OK_Button.Location = New System.Drawing.Point(3, 3)
         Me.OK_Button.Name = "OK_Button"
         Me.OK_Button.Size = New System.Drawing.Size(67, 23)
@@ -137,7 +138,7 @@ Partial Class OptionsDialog
         Me.ResumeLayout(False)
 
     End Sub
-    Friend WithEvents CheckBox_drawOnlyCurrentPop As System.Windows.Forms.CheckBox
+    Friend WithEvents CheckBox_drawOnlyCurrentGen As System.Windows.Forms.CheckBox
     Private WithEvents CheckBox_useMultithreading As System.Windows.Forms.CheckBox
     Private WithEvents GroupBox_Sim As System.Windows.Forms.GroupBox
     Private WithEvents TableLayoutPanel1 As System.Windows.Forms.TableLayoutPanel

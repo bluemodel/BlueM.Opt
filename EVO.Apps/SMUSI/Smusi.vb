@@ -50,6 +50,16 @@ Public Class Smusi
         End Get
     End Property
 
+    ''' <summary>
+    ''' Ob die Anwendung Multithreading unterstützt
+    ''' </summary>
+    ''' <returns>False</returns>
+    Public Overrides ReadOnly Property MultithreadingSupported() As Boolean
+        Get
+            Return False
+        End Get
+    End Property
+
 
 #End Region 'Properties
 
