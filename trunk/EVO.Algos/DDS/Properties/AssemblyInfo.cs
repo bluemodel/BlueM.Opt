@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("DDS_C_Sharp")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("DDS")]
+[assembly: AssemblyDescription("DDS (C#)")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Universite Laval")]
-[assembly: AssemblyProduct("DDS_C_Sharp")]
+[assembly: AssemblyProduct("DDS")]
 [assembly: AssemblyCopyright("Copyright © Universite Laval 2008")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
