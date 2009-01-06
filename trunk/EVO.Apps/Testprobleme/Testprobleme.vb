@@ -80,7 +80,6 @@ Public Class Testprobleme
 
     End Sub
 
-
     'Parameterübergabe
     '*****************
     Public Sub getProblem(ByRef prob As EVO.Common.Problem)
@@ -275,7 +274,7 @@ Public Class Testprobleme
         Select Case Me.selectedTestproblem
 
             Case TP_SinusFunktion
-                Call Me.DiagInitialise_SinusFunktion(rSettings, Diag)
+                Call Me.DiagInitialise_SinusFunktion(Diag)
 
             Case TP_BealeProblem 'x1 = [-5;5], x2=[-2;2]
                 Call Me.DiagInitialise_BealeProblem(rSettings, Diag)
@@ -284,13 +283,13 @@ Public Class Testprobleme
                 Call Me.DiagInitialise_SchwefelProblem(rSettings, Diag)
 
             Case TP_Box
-                Call Me.DiagInitialise_3D_Box(rSettings, Diag)
+                Call Me.DiagInitialise_3D_Box(Diag)
 
             Case TP_AbhängigeParameter
-                Call Me.DiagInitialise_AbhParameter(rSettings, Diag)
+                Call Me.DiagInitialise_AbhParameter(Diag)
 
             Case Else
-                Call Me.DiagInitialise_MultiTestProb(rSettings, Diag)
+                Call Me.DiagInitialise_MultiTestProb(Diag)
 
         End Select
 
@@ -298,7 +297,7 @@ Public Class Testprobleme
 
     'Diagramm für Sinus-Funktion initialisieren
     '*******************************************
-    Private Sub DiagInitialise_SinusFunktion(ByRef rSettings As Common.EVO_Settings, ByRef Diag As EVO.Diagramm.Hauptdiagramm)
+    Private Sub DiagInitialise_SinusFunktion(ByRef Diag As EVO.Diagramm.Hauptdiagramm)
 
         Dim array_x() As Double
         Dim array_y() As Double
@@ -330,7 +329,7 @@ Public Class Testprobleme
 
         'Diagramm initialisieren
         '-----------------------
-        Call Diag.DiagInitialise("Sinus Funktion", achsen, rSettings, Me.mProblem)
+        Call Diag.DiagInitialise("Sinus Funktion", achsen, Me.mProblem)
 
         'Sinuslinie zeichnen
         '-------------------
@@ -389,7 +388,7 @@ Public Class Testprobleme
         achse.Maximum = Ausgangswert * 1.3
         Call achsen.Add(achse)
 
-        Call Diag.DiagInitialise("Beale Problem", achsen, rSettings, Me.mProblem)
+        Call Diag.DiagInitialise("Beale Problem", achsen, Me.mProblem)
 
         'Linie für den Ausgangswert berechnen
         ReDim array_y(Anzahl_Kalkulationen - 1)
@@ -453,7 +452,7 @@ Public Class Testprobleme
         achse.Maximum = Ausgangswert * 1.3
         Call achsen.Add(achse)
 
-        Call Diag.DiagInitialise("Schwefel 2.4 Problem", achsen, rSettings, Me.mProblem)
+        Call Diag.DiagInitialise("Schwefel 2.4 Problem", achsen, Me.mProblem)
 
         'Linie für den Ausgangswert berechnen
         ReDim array_y(Anzahl_Kalkulationen - 1)
@@ -471,7 +470,7 @@ Public Class Testprobleme
 
     'Diagramm für MultiObjective-Probleme initialisieren
     '***************************************************
-    Private Sub DiagInitialise_MultiTestProb(ByRef rSettings As Common.EVO_Settings, ByRef Diag As EVO.Diagramm.Hauptdiagramm)
+    Private Sub DiagInitialise_MultiTestProb(ByRef Diag As EVO.Diagramm.Hauptdiagramm)
 
         Dim i, j As Short
         Dim title As String
@@ -553,7 +552,7 @@ Public Class Testprobleme
         Call achsen.Add(yachse)
 
         'Diagramm initialisieren
-        Call Diag.DiagInitialise(title, achsen, rSettings, Me.mProblem)
+        Call Diag.DiagInitialise(title, achsen, Me.mProblem)
 
         'Problemspezifische Serien zeichnen
         '----------------------------------
@@ -699,7 +698,7 @@ Public Class Testprobleme
 
     'Diagramm für Box-Problem (3D) initialisieren
     '********************************************
-    Private Sub DiagInitialise_3D_Box(ByRef rSettings As Common.EVO_Settings, ByRef Diag As EVO.Diagramm.Hauptdiagramm)
+    Private Sub DiagInitialise_3D_Box(ByRef Diag As EVO.Diagramm.Hauptdiagramm)
 
         Dim i, j, n As Integer
         Dim ArrayX() As Double
@@ -737,7 +736,7 @@ Public Class Testprobleme
         Call achsen.Add(achse)
 
         'Diagramm initialisieren
-        Call Diag.DiagInitialise(TP_Box, achsen, rSettings, Me.mProblem)
+        Call Diag.DiagInitialise(TP_Box, achsen, Me.mProblem)
 
         'Serien
         '------
@@ -824,7 +823,7 @@ Public Class Testprobleme
 
     'Diagramm für Abhängige Parameter initialisieren
     '***********************************************
-    Private Sub DiagInitialise_AbhParameter(ByRef rSettings As Common.EVO_Settings, ByRef Diag As EVO.Diagramm.Hauptdiagramm)
+    Private Sub DiagInitialise_AbhParameter(ByRef Diag As EVO.Diagramm.Hauptdiagramm)
 
         Dim i, j, n As Integer
         Dim ArrayX() As Double
@@ -864,7 +863,7 @@ Public Class Testprobleme
         Call achsen.Add(achse)
 
         'Diagramm initialisieren
-        Call Diag.DiagInitialise(TP_AbhängigeParameter, achsen, rSettings, Me.mProblem)
+        Call Diag.DiagInitialise(TP_AbhängigeParameter, achsen, Me.mProblem)
 
         'Serien
         '------

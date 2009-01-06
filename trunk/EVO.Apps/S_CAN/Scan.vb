@@ -22,6 +22,15 @@ Public Class Scan
         End Get
     End Property
 
+    ''' <summary>
+    ''' Ob die Anwendung Multithreading unterstützt
+    ''' </summary>
+    ''' <returns>False</returns>
+    Public Overrides ReadOnly Property MultithreadingSupported() As Boolean
+        Get
+            Return False
+        End Get
+    End Property
 
     'Konstruktor
     '***********

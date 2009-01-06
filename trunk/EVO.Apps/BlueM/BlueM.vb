@@ -25,6 +25,7 @@ Public Class BlueM
 
     'BlueM DLL
     '---------
+    Private dll_path As String
     Private bluem_dll() As BlueM_EngineDotNetAccess
 
     'Misc
@@ -67,6 +68,16 @@ Public Class BlueM
         End Get
     End Property
 
+    ''' <summary>
+    ''' Ob die Anwendung Multithreading unterstützt
+    ''' </summary>
+    ''' <returns>True</returns>
+    Public Overrides ReadOnly Property MultithreadingSupported() As Boolean
+        Get
+            Return True
+        End Get
+    End Property
+
 #End Region 'Properties
 
 #Region "Methoden"
@@ -76,7 +87,7 @@ Public Class BlueM
 
     'Konstruktor
     '***********
-    Public Sub New(ByVal n_Proz As Integer)
+    Public Sub New()
 
         Call MyBase.New()
 
@@ -85,30 +96,40 @@ Public Class BlueM
         Me.useKWL = False
         Me.isIHA = False
 
-        'BlueM_DLL
-        Dim dll_path As String
+        'Pfad zu BlueM.DLL bestimmen
+        '---------------------------
         dll_path = System.Windows.Forms.Application.StartupPath() & "\BlueM\BlueM.dll"
 
-        'BlueM DLL instanzieren je nach Anzahl der Prozessoren
-        '-----------------------------------------------------
-        ReDim bluem_dll(n_Proz - 1)
+        If (Not File.Exists(dll_path)) Then
+            Throw New Exception("BlueM.dll nicht gefunden!")
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' BlueM auf Multithreading vorbereiten
+    ''' </summary>
+    ''' <param name="input_n_Threads">Anzahl Threads</param>
+    Public Overrides Sub prepareThreads(ByVal input_n_Threads As Integer)
+
+        Me.n_Threads = input_n_Threads
+
+        'BlueM DLL instanzieren je nach Anzahl der Threads
+        '-------------------------------------------------
+        ReDim bluem_dll(Me.n_Threads - 1)
         Dim i As Integer
 
-        For i = 0 To n_Proz - 1
-            If (File.Exists(dll_path)) Then
-                bluem_dll(i) = New BlueM_EngineDotNetAccess(dll_path)
-            Else
-                Throw New Exception("BlueM.dll nicht gefunden!")
-            End If
+        For i = 0 To Me.n_Threads - 1
+            bluem_dll(i) = New BlueM_EngineDotNetAccess(dll_path)
         Next
 
-        'Anzahl der Threads
-        ReDim MyBlueMThreads(n_Proz - 1)
-        For i = 0 To n_Proz - 1
+        'Thread-Objekte instanzieren
+        ReDim MyBlueMThreads(Me.n_Threads - 1)
+        For i = 0 To Me.n_Threads - 1
             MyBlueMThreads(i) = New BlueMThread(i, -1, "Folder", Datensatz, bluem_dll(i))
             MyBlueMThreads(i).set_is_OK()
         Next
-        ReDim MyThreads(n_Proz - 1)
+        ReDim MyThreads(Me.n_Threads - 1)
 
     End Sub
 
