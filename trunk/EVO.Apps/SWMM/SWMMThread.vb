@@ -33,6 +33,7 @@ Public Class SWMMThread
         Try
             'Datensatz übergeben und initialisieren
             Call SWMM_dll.Initialize(Me.WorkFolder & Me.DS_Name)
+			Call SWMM_dll.Start(1)
 
             'Simulationszeitraum
             Dim elapsedTime As Double = 0.0
