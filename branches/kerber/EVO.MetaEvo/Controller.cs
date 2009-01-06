@@ -344,17 +344,20 @@ namespace IHWB.EVO.MetaEvo
                 //Individuen berechnen lassen
                 else if (meServer.status == "waiting for client-calculation")
                 {
-                    networkmanager.DB_set_info("Generation", generationcounter + "/" + settings.MetaEvo.NumberGenerations);
                     //Von den Clients ausrechnen lassen
                     if (networkmanager.calculate_by_clients(ref generation, ref hauptdiagramm1))
                     {
                         if (settings.MetaEvo.OpMode == "Local Optimizer")
                         {
+                            networkmanager.DB_set_info("Generation", "--/" + settings.MetaEvo.NumberGenerations);
+
                             //Abbruchbedingung für lokale Optimierung
                             if (algomanager.algos.algofeedbackarray[0].number_individuals_for_nextGen == 0) generationcounter = settings.MetaEvo.NumberGenerations + 1;
                         }
                         else
                         {
+                            networkmanager.DB_set_info("Generation", generationcounter + "/" + settings.MetaEvo.NumberGenerations);
+                            
                             progress1.NextGen();
                             generationcounter++;
                         }
