@@ -27,6 +27,11 @@ namespace IHWB.EVO.MO_Indicators
             applog = applog_input;
         }
 
+        public double get_last_volume() 
+        {
+            return Math.Round(solutionvolume[0],2);
+        }
+
         //Summierte Distanzquadrate der Lösungen zum Nullpunkt
         public double[] calculate(ref EVO.Common.Individuum_MetaEvo[] generation)
         {
