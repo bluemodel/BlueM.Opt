@@ -15,7 +15,7 @@ namespace IHWB.EVO.MetaEvo
         EVO.Diagramm.ApplicationLog applog;
         public Algos algos;
         EVO.Diagramm.Hauptdiagramm hauptdiagramm;
-        EVO.MO_Indicators.Solutionvolume solutionvolume;
+        public EVO.MO_Indicators.Solutionvolume solutionvolume;
 
         public Algomanager(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, int individuumnumber_input, ref EVO.Diagramm.ApplicationLog applog_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input) 
         {
@@ -120,6 +120,8 @@ namespace IHWB.EVO.MetaEvo
                 //0. Vorbereitung
                 //0.1. Feasible-Status prüfen
                 set_feasible2false(ref genpool, ref new_generation_input);
+                //Solutionvolume noch einmal berechnen um Fortschritt der lokalen Optimierung zu zeigen
+                solutionvolume.calculate(ref new_generation_input);
 
                 applog.appendText("Algo Manager: Result: New Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n"); 
 
@@ -293,7 +295,7 @@ namespace IHWB.EVO.MetaEvo
             double[] densities = new double[genpool_input.Length + killindividuums];
             int pointer = 0;
 
-            applog.appendText("Algo Manager: Number of new Individuums has a difference to Genpool-size: " + killindividuums_input + " -> Crowding Selection");
+            applog.appendText("Algo Manager: Number of new Individuums has a difference to Genpool-size: +" + killindividuums_input + " -> Crowding Selection");
 
             //Arbeits-Array erstellen (genau so gross dass alle "true"-Individuen Platz finden)
             EVO.Common.Individuum_MetaEvo[] work = new IHWB.EVO.Common.Individuum_MetaEvo[genpool_input.Length + killindividuums];

@@ -556,7 +556,7 @@ namespace IHWB.EVO.MetaEvo
 
                             while(run)
                             {
-                                applog.appendText("Algos: Hook and Jeeves: BaseIndividuum "+ genpool_input[i].ID + ": state: " + nextstate);
+                                applog.appendText("Algos: Hook and Jeeves: BaseIndividuum "+ genpool_input[i].ID + ": HJ-state: " + nextstate);
                                 switch (nextstate)
                                 {
                                     case (-1): //-1: Schrittweiten definieren
@@ -578,7 +578,7 @@ namespace IHWB.EVO.MetaEvo
                                                     }
                                                     if (genpool_input[i].feedbackdata[0, j] == 0) genpool_input[i].feedbackdata[0, j] = 0.5;
                                                     else genpool_input[i].feedbackdata[0, j] = ((weightsinfo[1, j] - genpool_input[i].Penalties[j]) / (weightsinfo[1, j] - weightsinfo[0, j])) / genpool_input[i].feedbackdata[0, j];
-                                                    applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Wichtung Penalty[" + j + "]: " + genpool_input[i].feedbackdata[0, j]);
+                                                    applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Weight for Penalty[" + j + "]: " + genpool_input[i].feedbackdata[0, j]);
                                                 }
                                                 //Initiale Tastschrittweite 
                                                 genpool_input[i].feedbackdata[1, j] = (genpool_input[i].OptParameter[j].Max - genpool_input[i].OptParameter[j].Min) / (double)(numberindividuums * 2);   
