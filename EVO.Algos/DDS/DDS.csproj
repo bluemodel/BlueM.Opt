@@ -8,8 +8,8 @@
     <ProjectGuid>{9FA5A4C7-3AA9-420C-9F01-9F1683E36A79}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DDS_C_Sharp</RootNamespace>
-    <AssemblyName>DDS_C_Sharp</AssemblyName>
+    <RootNamespace>modelEAU.DDS</RootNamespace>
+    <AssemblyName>DDS</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkSubset>
