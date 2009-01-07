@@ -53,6 +53,8 @@ Partial Public Class EVO_Opt_Verlauf
         '
         'Anzeige_Verlauf
         '
+        Me.Anzeige_Verlauf.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Anzeige_Verlauf.BackColor = System.Drawing.SystemColors.Control
         Me.Anzeige_Verlauf.Controls.Add(Me.ProgressBarRunde)
         Me.Anzeige_Verlauf.Controls.Add(Me.ProgressBarPop)
@@ -74,9 +76,9 @@ Partial Public Class EVO_Opt_Verlauf
         Me.Anzeige_Verlauf.Controls.Add(Me.LabelAnzGen)
         Me.Anzeige_Verlauf.Controls.Add(Me.LabelAnzPop)
         Me.Anzeige_Verlauf.Controls.Add(Me.LabelAnzRunden)
-        Me.Anzeige_Verlauf.Location = New System.Drawing.Point(0, 0)
+        Me.Anzeige_Verlauf.Location = New System.Drawing.Point(0, -4)
         Me.Anzeige_Verlauf.Name = "Anzeige_Verlauf"
-        Me.Anzeige_Verlauf.Size = New System.Drawing.Size(465, 73)
+        Me.Anzeige_Verlauf.Size = New System.Drawing.Size(464, 76)
         Me.Anzeige_Verlauf.TabIndex = 0
         Me.Anzeige_Verlauf.TabStop = False
         Me.Anzeige_Verlauf.Text = "Verlauf der Optimierung"
@@ -97,22 +99,25 @@ Partial Public Class EVO_Opt_Verlauf
         '
         'ProgressBarGen
         '
-        Me.ProgressBarGen.Location = New System.Drawing.Point(382, 24)
+        Me.ProgressBarGen.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.ProgressBarGen.Location = New System.Drawing.Point(381, 24)
         Me.ProgressBarGen.Name = "ProgressBarGen"
         Me.ProgressBarGen.Size = New System.Drawing.Size(73, 17)
         Me.ProgressBarGen.TabIndex = 3
         '
         'ProgressBarNach
         '
-        Me.ProgressBarNach.Location = New System.Drawing.Point(382, 40)
+        Me.ProgressBarNach.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.ProgressBarNach.Location = New System.Drawing.Point(381, 40)
         Me.ProgressBarNach.Name = "ProgressBarNach"
         Me.ProgressBarNach.Size = New System.Drawing.Size(73, 17)
         Me.ProgressBarNach.TabIndex = 4
         '
         'lblNachfolger
         '
+        Me.lblNachfolger.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblNachfolger.AutoSize = True
-        Me.lblNachfolger.Location = New System.Drawing.Point(222, 42)
+        Me.lblNachfolger.Location = New System.Drawing.Point(221, 42)
         Me.lblNachfolger.Name = "lblNachfolger"
         Me.lblNachfolger.Size = New System.Drawing.Size(59, 13)
         Me.lblNachfolger.TabIndex = 20
@@ -120,8 +125,9 @@ Partial Public Class EVO_Opt_Verlauf
         '
         'lblGeneration
         '
+        Me.lblGeneration.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblGeneration.AutoSize = True
-        Me.lblGeneration.Location = New System.Drawing.Point(222, 24)
+        Me.lblGeneration.Location = New System.Drawing.Point(221, 24)
         Me.lblGeneration.Name = "lblGeneration"
         Me.lblGeneration.Size = New System.Drawing.Size(59, 13)
         Me.lblGeneration.TabIndex = 19
@@ -148,8 +154,9 @@ Partial Public Class EVO_Opt_Verlauf
         '
         'lblvon_4
         '
+        Me.lblvon_4.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblvon_4.AutoSize = True
-        Me.lblvon_4.Location = New System.Drawing.Point(317, 42)
+        Me.lblvon_4.Location = New System.Drawing.Point(316, 42)
         Me.lblvon_4.Name = "lblvon_4"
         Me.lblvon_4.Size = New System.Drawing.Size(25, 13)
         Me.lblvon_4.TabIndex = 16
@@ -157,8 +164,9 @@ Partial Public Class EVO_Opt_Verlauf
         '
         'lblvon_3
         '
+        Me.lblvon_3.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblvon_3.AutoSize = True
-        Me.lblvon_3.Location = New System.Drawing.Point(317, 24)
+        Me.lblvon_3.Location = New System.Drawing.Point(316, 24)
         Me.lblvon_3.Name = "lblvon_3"
         Me.lblvon_3.Size = New System.Drawing.Size(25, 13)
         Me.lblvon_3.TabIndex = 15
@@ -184,8 +192,9 @@ Partial Public Class EVO_Opt_Verlauf
         '
         'LabelaktNachf
         '
+        Me.LabelaktNachf.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.LabelaktNachf.ForeColor = System.Drawing.Color.Blue
-        Me.LabelaktNachf.Location = New System.Drawing.Point(278, 42)
+        Me.LabelaktNachf.Location = New System.Drawing.Point(277, 42)
         Me.LabelaktNachf.Name = "LabelaktNachf"
         Me.LabelaktNachf.Size = New System.Drawing.Size(40, 13)
         Me.LabelaktNachf.TabIndex = 12
@@ -194,8 +203,9 @@ Partial Public Class EVO_Opt_Verlauf
         '
         'LabelaktGen
         '
+        Me.LabelaktGen.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.LabelaktGen.ForeColor = System.Drawing.Color.Blue
-        Me.LabelaktGen.Location = New System.Drawing.Point(278, 24)
+        Me.LabelaktGen.Location = New System.Drawing.Point(277, 24)
         Me.LabelaktGen.Name = "LabelaktGen"
         Me.LabelaktGen.Size = New System.Drawing.Size(40, 13)
         Me.LabelaktGen.TabIndex = 11
@@ -224,8 +234,9 @@ Partial Public Class EVO_Opt_Verlauf
         '
         'LabelAnzNachf
         '
+        Me.LabelAnzNachf.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.LabelAnzNachf.ForeColor = System.Drawing.Color.Blue
-        Me.LabelAnzNachf.Location = New System.Drawing.Point(335, 42)
+        Me.LabelAnzNachf.Location = New System.Drawing.Point(334, 42)
         Me.LabelAnzNachf.Name = "LabelAnzNachf"
         Me.LabelAnzNachf.Size = New System.Drawing.Size(44, 15)
         Me.LabelAnzNachf.TabIndex = 8
@@ -234,8 +245,9 @@ Partial Public Class EVO_Opt_Verlauf
         '
         'LabelAnzGen
         '
+        Me.LabelAnzGen.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.LabelAnzGen.ForeColor = System.Drawing.Color.Blue
-        Me.LabelAnzGen.Location = New System.Drawing.Point(338, 24)
+        Me.LabelAnzGen.Location = New System.Drawing.Point(337, 24)
         Me.LabelAnzGen.Name = "LabelAnzGen"
         Me.LabelAnzGen.Size = New System.Drawing.Size(41, 17)
         Me.LabelAnzGen.TabIndex = 7
