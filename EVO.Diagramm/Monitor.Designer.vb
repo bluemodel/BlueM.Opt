@@ -86,7 +86,8 @@ Partial Class Monitor
         Me.Controls.Add(Me.Monitordiagramm)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "Monitor"
-        Me.Text = "EVO.NET Monitor"
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
+        Me.Text = "BlueM.Opt Monitor"
         Me.ResumeLayout(False)
 
     End Sub

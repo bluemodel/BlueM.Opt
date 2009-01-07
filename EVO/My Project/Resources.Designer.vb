@@ -74,6 +74,13 @@ Namespace My.Resources
             End Get
         End Property
         
+        Friend ReadOnly Property database() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("database", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
         Friend ReadOnly Property database_connect() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("database_connect", resourceCulture)
@@ -123,6 +130,13 @@ Namespace My.Resources
             End Get
         End Property
         
+        Friend ReadOnly Property monitor() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("monitor", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
         Friend ReadOnly Property scatterplot() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("scatterplot", resourceCulture)
@@ -133,6 +147,13 @@ Namespace My.Resources
         Friend ReadOnly Property wave() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("wave", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        Friend ReadOnly Property wrench() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("wrench", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property

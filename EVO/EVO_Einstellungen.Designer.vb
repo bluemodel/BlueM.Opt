@@ -137,13 +137,6 @@ Partial Class EVO_Einstellungen
         Me.SpeichernToolStripButton = New System.Windows.Forms.ToolStripButton
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox
-        Me.TabPage_DDS = New System.Windows.Forms.TabPage
-        Me.Label5 = New System.Windows.Forms.Label
-        Me.Numeric_DDS_r_val = New System.Windows.Forms.NumericUpDown
-        Me.Label10 = New System.Windows.Forms.Label
-        Me.Numeric_DDS_maxiter = New System.Windows.Forms.NumericUpDown
-        Me.Label11 = New System.Windows.Forms.Label
-        Me.CheckBox_DDS_ini = New System.Windows.Forms.CheckBox
         Label_CES_MemSize = New System.Windows.Forms.Label
         Label_CES_NMembers_SecPop_PES = New System.Windows.Forms.Label
         Label_CES_NExchange_secPop_PES = New System.Windows.Forms.Label
@@ -218,9 +211,6 @@ Partial Class EVO_Einstellungen
         CType(Me.Numeric_DDS_r_val, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ToolStrip1.SuspendLayout()
         Me.GroupBox_Einstellungen.SuspendLayout()
-        Me.TabPage_DDS.SuspendLayout()
-        CType(Me.Numeric_DDS_r_val, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.Numeric_DDS_maxiter, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'Label_CES_MemSize
@@ -557,18 +547,20 @@ Partial Class EVO_Einstellungen
         '
         'TabControl1
         '
+        Me.TabControl1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.TabControl1.Controls.Add(Me.TabPage_PES)
         Me.TabControl1.Controls.Add(Me.TabPage_CES)
         Me.TabControl1.Controls.Add(Me.TabPage_HookeJeeves)
         Me.TabControl1.Controls.Add(Me.TabPage_Hybrid2008)
         Me.TabControl1.Controls.Add(Me.TabPage_DDS)
         Me.TabControl1.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TabControl1.Location = New System.Drawing.Point(1, 41)
+        Me.TabControl1.Location = New System.Drawing.Point(2, 41)
         Me.TabControl1.Margin = New System.Windows.Forms.Padding(0)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.Padding = New System.Drawing.Point(0, 0)
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(230, 656)
+        Me.TabControl1.Size = New System.Drawing.Size(229, 669)
         Me.TabControl1.TabIndex = 1
         '
         'TabPage_PES
@@ -595,7 +587,7 @@ Partial Class EVO_Einstellungen
         Me.TabPage_PES.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_PES.Margin = New System.Windows.Forms.Padding(0)
         Me.TabPage_PES.Name = "TabPage_PES"
-        Me.TabPage_PES.Size = New System.Drawing.Size(222, 630)
+        Me.TabPage_PES.Size = New System.Drawing.Size(221, 643)
         Me.TabPage_PES.TabIndex = 0
         Me.TabPage_PES.Text = "PES"
         '
@@ -930,7 +922,7 @@ Partial Class EVO_Einstellungen
         Me.TabPage_CES.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_CES.Margin = New System.Windows.Forms.Padding(0)
         Me.TabPage_CES.Name = "TabPage_CES"
-        Me.TabPage_CES.Size = New System.Drawing.Size(222, 630)
+        Me.TabPage_CES.Size = New System.Drawing.Size(220, 643)
         Me.TabPage_CES.TabIndex = 1
         Me.TabPage_CES.Text = "CES"
         '
@@ -1238,7 +1230,7 @@ Partial Class EVO_Einstellungen
         Me.TabPage_HookeJeeves.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_HookeJeeves.Name = "TabPage_HookeJeeves"
         Me.TabPage_HookeJeeves.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage_HookeJeeves.Size = New System.Drawing.Size(222, 630)
+        Me.TabPage_HookeJeeves.Size = New System.Drawing.Size(220, 643)
         Me.TabPage_HookeJeeves.TabIndex = 2
         Me.TabPage_HookeJeeves.Text = "Hooke&Jeeves"
         '
@@ -1340,13 +1332,13 @@ Partial Class EVO_Einstellungen
         Me.TabPage_Hybrid2008.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_Hybrid2008.Name = "TabPage_Hybrid2008"
         Me.TabPage_Hybrid2008.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage_Hybrid2008.Size = New System.Drawing.Size(222, 630)
+        Me.TabPage_Hybrid2008.Size = New System.Drawing.Size(220, 643)
         Me.TabPage_Hybrid2008.TabIndex = 3
         Me.TabPage_Hybrid2008.Text = "Hybrid2008"
         '
         'TabPage_DDS
         '
-        Me.TabPage_DDS.BackColor = System.Drawing.SystemColors.Control
+        Me.TabPage_DDS.BackColor = System.Drawing.Color.Transparent
         Me.TabPage_DDS.Controls.Add(Me.CheckBox_DDS_ini)
         Me.TabPage_DDS.Controls.Add(Me.Label11)
         Me.TabPage_DDS.Controls.Add(Me.Numeric_DDS_maxiter)
@@ -1356,9 +1348,10 @@ Partial Class EVO_Einstellungen
         Me.TabPage_DDS.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_DDS.Name = "TabPage_DDS"
         Me.TabPage_DDS.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage_DDS.Size = New System.Drawing.Size(222, 630)
+        Me.TabPage_DDS.Size = New System.Drawing.Size(220, 643)
         Me.TabPage_DDS.TabIndex = 4
         Me.TabPage_DDS.Text = "DDS"
+        Me.TabPage_DDS.UseVisualStyleBackColor = True
         '
         'CheckBox_DDS_ini
         '
@@ -1431,7 +1424,7 @@ Partial Class EVO_Einstellungen
         Me.ToolStrip1.Location = New System.Drawing.Point(3, 16)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Padding = New System.Windows.Forms.Padding(0)
-        Me.ToolStrip1.Size = New System.Drawing.Size(224, 25)
+        Me.ToolStrip1.Size = New System.Drawing.Size(228, 25)
         Me.ToolStrip1.Stretch = True
         Me.ToolStrip1.TabIndex = 0
         Me.ToolStrip1.Text = "ToolStrip1"
@@ -1456,100 +1449,22 @@ Partial Class EVO_Einstellungen
         '
         'GroupBox_Einstellungen
         '
+        Me.GroupBox_Einstellungen.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.GroupBox_Einstellungen.Controls.Add(Me.ToolStrip1)
         Me.GroupBox_Einstellungen.Controls.Add(Me.TabControl1)
         Me.GroupBox_Einstellungen.Location = New System.Drawing.Point(0, 0)
         Me.GroupBox_Einstellungen.Name = "GroupBox_Einstellungen"
-        Me.GroupBox_Einstellungen.Size = New System.Drawing.Size(230, 700)
+        Me.GroupBox_Einstellungen.Size = New System.Drawing.Size(234, 713)
         Me.GroupBox_Einstellungen.TabIndex = 0
         Me.GroupBox_Einstellungen.TabStop = False
         Me.GroupBox_Einstellungen.Text = "Einstellungen:"
-        '
-        'TabPage_DDS
-        '
-        Me.TabPage_DDS.Controls.Add(Me.CheckBox_DDS_ini)
-        Me.TabPage_DDS.Controls.Add(Me.Label11)
-        Me.TabPage_DDS.Controls.Add(Me.Numeric_DDS_maxiter)
-        Me.TabPage_DDS.Controls.Add(Me.Label10)
-        Me.TabPage_DDS.Controls.Add(Me.Numeric_DDS_r_val)
-        Me.TabPage_DDS.Controls.Add(Me.Label5)
-        Me.TabPage_DDS.Location = New System.Drawing.Point(4, 22)
-        Me.TabPage_DDS.Name = "TabPage_DDS"
-        Me.TabPage_DDS.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage_DDS.Size = New System.Drawing.Size(222, 630)
-        Me.TabPage_DDS.TabIndex = 4
-        Me.TabPage_DDS.Text = "DDS"
-        Me.TabPage_DDS.UseVisualStyleBackColor = True
-        '
-        'Label5
-        '
-        Me.Label5.AutoSize = True
-        Me.Label5.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label5.Location = New System.Drawing.Point(6, 16)
-        Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(149, 13)
-        Me.Label5.TabIndex = 0
-        Me.Label5.Text = "neighborhood pertubation size"
-        '
-        'Numeric_DDS_r_val
-        '
-        Me.Numeric_DDS_r_val.DecimalPlaces = 3
-        Me.Numeric_DDS_r_val.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Numeric_DDS_r_val.Increment = New Decimal(New Integer() {25, 0, 0, 196608})
-        Me.Numeric_DDS_r_val.Location = New System.Drawing.Point(161, 16)
-        Me.Numeric_DDS_r_val.Maximum = New Decimal(New Integer() {10, 0, 0, 65536})
-        Me.Numeric_DDS_r_val.Name = "Numeric_DDS_r_val"
-        Me.Numeric_DDS_r_val.Size = New System.Drawing.Size(55, 20)
-        Me.Numeric_DDS_r_val.TabIndex = 1
-        Me.Numeric_DDS_r_val.Value = New Decimal(New Integer() {2, 0, 0, 65536})
-        '
-        'Label10
-        '
-        Me.Label10.AutoSize = True
-        Me.Label10.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label10.Location = New System.Drawing.Point(6, 44)
-        Me.Label10.Name = "Label10"
-        Me.Label10.Size = New System.Drawing.Size(74, 13)
-        Me.Label10.TabIndex = 2
-        Me.Label10.Text = "max. iterations"
-        '
-        'Numeric_DDS_maxiter
-        '
-        Me.Numeric_DDS_maxiter.Increment = New Decimal(New Integer() {100, 0, 0, 0})
-        Me.Numeric_DDS_maxiter.Location = New System.Drawing.Point(161, 42)
-        Me.Numeric_DDS_maxiter.Maximum = New Decimal(New Integer() {100000, 0, 0, 0})
-        Me.Numeric_DDS_maxiter.Minimum = New Decimal(New Integer() {100, 0, 0, 0})
-        Me.Numeric_DDS_maxiter.Name = "Numeric_DDS_maxiter"
-        Me.Numeric_DDS_maxiter.Size = New System.Drawing.Size(55, 18)
-        Me.Numeric_DDS_maxiter.TabIndex = 3
-        Me.Numeric_DDS_maxiter.Value = New Decimal(New Integer() {100, 0, 0, 0})
-        '
-        'Label11
-        '
-        Me.Label11.AutoSize = True
-        Me.Label11.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label11.Location = New System.Drawing.Point(6, 75)
-        Me.Label11.Name = "Label11"
-        Me.Label11.Size = New System.Drawing.Size(102, 13)
-        Me.Label11.TabIndex = 4
-        Me.Label11.Text = "random initial values"
-        '
-        'CheckBox_DDS_ini
-        '
-        Me.CheckBox_DDS_ini.AutoSize = True
-        Me.CheckBox_DDS_ini.Checked = True
-        Me.CheckBox_DDS_ini.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBox_DDS_ini.Location = New System.Drawing.Point(161, 75)
-        Me.CheckBox_DDS_ini.Name = "CheckBox_DDS_ini"
-        Me.CheckBox_DDS_ini.Size = New System.Drawing.Size(15, 14)
-        Me.CheckBox_DDS_ini.TabIndex = 5
-        Me.CheckBox_DDS_ini.UseVisualStyleBackColor = True
         '
         'EVO_Einstellungen
         '
         Me.Controls.Add(Me.GroupBox_Einstellungen)
         Me.Name = "EVO_Einstellungen"
-        Me.Size = New System.Drawing.Size(240, 740)
+        Me.Size = New System.Drawing.Size(244, 753)
         Me.TabControl1.ResumeLayout(False)
         Me.TabPage_PES.ResumeLayout(False)
         Me.TabPage_PES.PerformLayout()
@@ -1600,10 +1515,6 @@ Partial Class EVO_Einstellungen
         Me.ToolStrip1.PerformLayout()
         Me.GroupBox_Einstellungen.ResumeLayout(False)
         Me.GroupBox_Einstellungen.PerformLayout()
-        Me.TabPage_DDS.ResumeLayout(False)
-        Me.TabPage_DDS.PerformLayout()
-        CType(Me.Numeric_DDS_r_val, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.Numeric_DDS_maxiter, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub

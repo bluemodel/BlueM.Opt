@@ -77,8 +77,8 @@ Partial Class Form1
 
 #Region "UI"
 
-    'Initialisierung von Form1
-    '*************************
+    'Form1 laden
+    '***********
     Private Sub Form1_Load(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles MyBase.Load
 
         'XP-look
@@ -88,12 +88,14 @@ Partial Class Form1
         Me.n_Threads = Me.determineNoOfThreads()
 
         'Liste der Anwendungen in ComboBox schreiben und Anfangseinstellung wählen
-        ComboBox_Anwendung.Items.AddRange(New Object() {"", ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM, ANW_TESTPROBLEME, ANW_TSP})
-        ComboBox_Anwendung.SelectedIndex = 0
+        Me.ComboBox_Anwendung.Items.Clear()
+        Me.ComboBox_Anwendung.Items.AddRange(New Object() {"", ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM, ANW_TESTPROBLEME, ANW_TSP})
+        Me.ComboBox_Anwendung.SelectedIndex = 0
 
         'Liste der Methoden in ComboBox schreiben und Anfangseinstellung wählen
-        ComboBox_Methode.Items.AddRange(New Object() {"", METH_PES, METH_CES, METH_HYBRID, METH_SENSIPLOT, METH_HOOKJEEVES, METH_DDS})
-        ComboBox_Methode.SelectedIndex = 0
+        Me.ComboBox_Methode.Items.Clear()
+        Me.ComboBox_Methode.Items.AddRange(New Object() {"", METH_PES, METH_CES, METH_HYBRID, METH_SENSIPLOT, METH_HOOKJEEVES, METH_DDS})
+        Me.ComboBox_Methode.SelectedIndex = 0
 
         'OptionsDialog instanzieren
         Me.Options = New OptionsDialog(Me.EVO_Einstellungen1.Settings)
@@ -105,17 +107,22 @@ Partial Class Form1
         Me.mProgress = New EVO.Common.Progress()
         Me.EVO_Opt_Verlauf1.Initialisieren(Me.mProgress)
 
+        'Toolbar-Buttons deaktivieren
+        Me.ToolStripSplitButton_Diagramm.Enabled = False
+        Me.ToolStripSplitButton_ErgebnisDB.Enabled = False
+        Me.ToolStripButton_Scatterplot.Enabled = False
+
         'Handler für Klick auf Serien zuweisen
         AddHandler Me.Hauptdiagramm1.ClickSeries, AddressOf seriesClick
 
         'Ende der Initialisierung
-        IsInitializing = False
+        Me.IsInitializing = False
 
     End Sub
 
     'Optionen Dialog anzeigen
     '************************
-    Private Sub showOptionsDialog(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem_Optionen.Click
+    Private Sub showOptionsDialog(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem_Optionen.Click, ToolStripButton_Options.Click
         If (Me.isrun) Then
             Call Me.Options.DisableAll()
         Else
@@ -126,9 +133,9 @@ Partial Class Form1
 
     'Monitor anzeigen
     '****************
-    Private Sub MenuItem_MonitorAnzeigen_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem_MonitorAnzeigen.Click
+    Private Sub ToggleMonitor(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton_Monitor.Click
 
-        If (Me.MenuItem_MonitorAnzeigen.Checked) Then
+        If (Me.ToolStripButton_Monitor.Checked) Then
             Me.Monitor1.Show()
         Else
             Me.Monitor1.Hide()
@@ -136,9 +143,9 @@ Partial Class Form1
 
     End Sub
 
-    'Wenn Monitor geschlossen wird, Menüeintrag aktualisieren
+    'Wenn Monitor geschlossen wird, ButtonState aktualisieren
     Private Sub MonitorClosed() Handles Monitor1.MonitorClosed
-        Me.MenuItem_MonitorAnzeigen.Checked = False
+        Me.ToolStripButton_Monitor.Checked = False
     End Sub
 
     'About Dialog anzeigen
@@ -148,10 +155,10 @@ Partial Class Form1
         Call AboutDialog.ShowDialog()
     End Sub
 
-    'EVO.NET Wiki aufrufen
+    'Wiki aufrufen
     '*********************
     Private Sub MenuItem_Wiki_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem_Wiki.Click
-        Call Process.Start("http://130.83.196.154/BlueM/wiki/index.php/EVO.NET")
+        Call Process.Start("http://130.83.196.154/BlueM/wiki/index.php/BlueM.Opt")
     End Sub
 
 #End Region 'UI
@@ -163,7 +170,7 @@ Partial Class Form1
 
     'Anwendung wurde ausgewählt
     '**************************
-    Friend Sub INI_App(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Anwendung.SelectedIndexChanged
+    Private Sub INI_App(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Anwendung.SelectedIndexChanged
 
         If (Me.IsInitializing = True) Then
 
@@ -172,7 +179,7 @@ Partial Class Form1
         Else
 
             'Diagramm zurücksetzen
-            Me.Hauptdiagramm1.Reset()
+            Call Me.Hauptdiagramm1.Reset()
 
             'Alles deaktivieren, danach je nach Anwendung aktivieren
             '-------------------------------------------------------
@@ -191,10 +198,10 @@ Partial Class Form1
             Me.ComboBox_Methode.Enabled = False
 
             'Ergebnis-Buttons
-            Me.Button_saveMDB.Enabled = False
-            Me.Button_openMDB.Enabled = False
-            Me.Button_Scatterplot.Enabled = False
-            Me.Button_loadRefResult.Enabled = False
+            Me.ToolStripMenuItem_ErgebnisDBSave.Enabled = False
+            Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = False
+            Me.ToolStripButton_Scatterplot.Enabled = False
+            Me.ToolStripMenuItem_ErgebnisDBCompare.Enabled = False
 
             'EVO_Settings zurücksetzen
             Me.EVO_Einstellungen1.Enabled = False
@@ -213,10 +220,7 @@ Partial Class Form1
                 Case "" 'Keine Anwendung ausgewählt
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'Mauszeiger wieder normal
-                    Cursor = Cursors.Default
-                    Exit Sub
-
+                    'nix
 
                 Case ANW_BLUEM 'Anwendung BlueM
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -308,8 +312,21 @@ Partial Class Form1
         'Combo_Datensatz auffüllen
         Call Me.Datensatz_populateCombo()
 
-        'Bei Simulationsanwendungen:
-        If (Me.Anwendung <> ANW_TESTPROBLEME) Then
+        
+        If (Me.Anwendung = ANW_TESTPROBLEME) Then
+
+            'Bei Testproblemen:
+            '------------------
+
+            'Browse-Button deaktivieren
+            Me.Button_BrowseDatensatz.Enabled = False
+
+        Else
+            'Bei Simulationsanwendungen:
+            '---------------------------
+
+            'Browse-Button aktivieren
+            Me.Button_BrowseDatensatz.Enabled = True
 
             'zuletzt benutzten Datensatz setzen?
             If (Me.ComboBox_Datensatz.Items.Count > 0) Then
@@ -322,8 +339,6 @@ Partial Class Form1
                 Cursor = Cursors.Default
             End If
 
-            'Browse-Button aktivieren
-            Me.Button_BrowseDatensatz.Enabled = True
         End If
 
     End Sub
@@ -508,9 +523,9 @@ Partial Class Form1
             Me.Button_Start.Enabled = False
 
             'Ergebnis-Buttons deaktivieren
-            Me.Button_saveMDB.Enabled = False
-            Me.Button_openMDB.Enabled = False
-            Me.Button_Scatterplot.Enabled = False
+            Me.ToolStripMenuItem_ErgebnisDBSave.Enabled = False
+            Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = False
+            Me.ToolStripButton_Scatterplot.Enabled = False
 
             Select Case Me.mProblem.Method
 
@@ -521,7 +536,7 @@ Partial Class Form1
                     SensiPlot1 = New EVO.Apps.SensiPlot(Me.mProblem)
 
                     'Monitor deaktivieren
-                    Me.MenuItem_MonitorAnzeigen.Checked = False
+                    Me.ToolStripButton_Monitor.Checked = False
 
                     'SensiPlot Dialog anzeigen:
                     Dim SensiPlotDiagResult As Windows.Forms.DialogResult
@@ -539,7 +554,7 @@ Partial Class Form1
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Ergebnis-Buttons
-                    Me.Button_openMDB.Enabled = True
+                    Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
 
                     'TODO: Progress mit Standardwerten initialisieren
 
@@ -553,7 +568,7 @@ Partial Class Form1
                     End If
 
                     'Ergebnis-Buttons
-                    Me.Button_openMDB.Enabled = True
+                    Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
 
                     'TODO: Progress mit Standardwerten initialisieren
 
@@ -566,7 +581,7 @@ Partial Class Form1
                     End If
 
                     'Ergebnis-Buttons
-                    Me.Button_openMDB.Enabled = True
+                    Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
 
                     'TODO: Progress mit Standardwerten initialisieren
 
@@ -580,7 +595,7 @@ Partial Class Form1
                     End If
 
                     'Ergebnis-Buttons
-                    Me.Button_openMDB.Enabled = True
+                    Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
 
                     If (Me.mProblem.Method = METH_HYBRID) Then
 
@@ -622,6 +637,10 @@ Partial Class Form1
                     'Call Me.mProgress.Initialize(1, 1, EVO_Einstellungen1.Settings.MetaEvo.NumberGenerations, EVO_Einstellungen1.Settings.MetaEvo.PopulationSize)
 
             End Select
+
+            'Toolbar-Buttons aktivieren
+            Me.ToolStripSplitButton_Diagramm.Enabled = True
+            Me.ToolStripSplitButton_ErgebnisDB.Enabled = True
 
             'IniMethod OK -> Start Button aktivieren
             Me.Button_Start.Enabled = True
@@ -783,16 +802,16 @@ Partial Class Form1
             Call PrepareDiagramm()
 
             'Monitor anzeigen
-            If (Me.MenuItem_MonitorAnzeigen.Checked) Then
+            If (Me.ToolStripButton_Monitor.Checked) Then
                 Call Me.Monitor1.Show()
             End If
 
             'Ergebnis-Buttons
-            Me.Button_openMDB.Enabled = False
+            Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = False
             If (Not IsNothing(Sim1)) Then
-                Me.Button_saveMDB.Enabled = True
-                Me.Button_Scatterplot.Enabled = True
-                Me.Button_loadRefResult.Enabled = True
+                Me.ToolStripMenuItem_ErgebnisDBSave.Enabled = True
+                Me.ToolStripButton_Scatterplot.Enabled = True
+                Me.ToolStripMenuItem_ErgebnisDBCompare.Enabled = True
             End If
 
             'EVO_Settings in temp-Verzeichnis speichern
@@ -1443,13 +1462,13 @@ Partial Class Form1
 
     'Hauptdiagramm bearbeiten
     '************************
-    Private Sub Button_TChartEdit_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_TChartEdit.Click
+    Private Sub TChartEdit(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItem_TChartEdit.Click
         Call Me.Hauptdiagramm1.TChartEdit(sender, e)
     End Sub
 
     'Chart nach Excel exportieren
     '****************************
-    Private Sub TChart2Excel(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_TChart2Excel.Click
+    Private Sub TChart2Excel(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItem_Tchart2CSV.Click
         SaveFileDialog1.DefaultExt = Me.Hauptdiagramm1.Export.Data.Excel.FileExtension
         SaveFileDialog1.FileName = Me.Hauptdiagramm1.Name + "." + SaveFileDialog1.DefaultExt
         SaveFileDialog1.Filter = "Excel-Dateien (*.xls)|*.xls"
@@ -1465,7 +1484,7 @@ Partial Class Form1
 
     'Chart als PNG exportieren
     '*************************
-    Private Sub TChart2PNG(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_TChart2PNG.Click
+    Private Sub TChart2PNG(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItem_TChart2PNG.Click
         SaveFileDialog1.DefaultExt = Me.Hauptdiagramm1.Export.Image.PNG.FileExtension
         SaveFileDialog1.FileName = Me.Hauptdiagramm1.Name + "." + SaveFileDialog1.DefaultExt
         SaveFileDialog1.Filter = "PNG-Dateien (*.png)|*.png"
@@ -1477,7 +1496,7 @@ Partial Class Form1
 
     'Chart in nativem TeeChart-Format abspeichern
     '********************************************
-    Private Sub TChartSave(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_TChartSave.Click
+    Private Sub TChartSave(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItem_TChartSave.Click
         SaveFileDialog1.DefaultExt = Me.Hauptdiagramm1.Export.Template.FileExtension
         SaveFileDialog1.FileName = Me.Hauptdiagramm1.Name + "." + SaveFileDialog1.DefaultExt
         SaveFileDialog1.Filter = "TeeChart-Dateien (*.ten)|*.ten"
@@ -1692,7 +1711,7 @@ Partial Class Form1
     ''' <summary>
     ''' Scatterplot-Matrix anzeigen
     ''' </summary>
-    Private Sub showScatterplot(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Scatterplot.Click
+    Private Sub showScatterplot(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton_Scatterplot.Click
 
         Cursor = Cursors.WaitCursor
 
@@ -1939,7 +1958,7 @@ Partial Class Form1
 
     'Ergebnisdatenbank speichern
     '***************************
-    Private Sub saveMDB(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_saveMDB.Click
+    Private Sub ErgebnisDB_Save(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItem_ErgebnisDBSave.Click
 
         Dim diagresult As DialogResult
 
@@ -1962,7 +1981,7 @@ Partial Class Form1
 
     'Optimierungsergebnis aus einer Datenbank einlesen
     '*************************************************
-    Private Sub loadFromMDB(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_openMDB.Click
+    Private Sub ErgebnisDB_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItem_ErgebnisDBLoad.Click
 
         Dim diagresult As DialogResult
         Dim sourceFile As String
@@ -2148,8 +2167,8 @@ Partial Class Form1
                     End If
 
                     'Ergebnis-Buttons
-                    Me.Button_Scatterplot.Enabled = True
-                    Me.Button_loadRefResult.Enabled = True
+                    Me.ToolStripButton_Scatterplot.Enabled = True
+                    Me.ToolStripMenuItem_ErgebnisDBCompare.Enabled = True
 
                     'Start-Button deaktivieren
                     Me.Button_Start.Enabled = False
@@ -2167,7 +2186,7 @@ Partial Class Form1
 
     'Vergleichsergebnis aus Datenbank laden
     '**************************************
-    Private Sub loadRefFromMDB(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_loadRefResult.Click
+    Private Sub ErgebnisDB_Compare(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItem_ErgebnisDBCompare.Click
 
         Dim diagresult As DialogResult
         Dim sourceFile As String

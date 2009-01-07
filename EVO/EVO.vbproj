@@ -252,6 +252,9 @@
     <Content Include="RELEASE-NOTES.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\wrench.png" />
+    <None Include="Resources\monitor.png" />
+    <None Include="Resources\database.png" />
     <None Include="Resources\chart_curve_edit.png" />
     <None Include="Resources\database_connect.png" />
     <None Include="Resources\database_go.png" />
