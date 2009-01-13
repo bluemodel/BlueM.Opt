@@ -263,6 +263,7 @@ Partial Public Class Scatterplot
                         shape1.Title = "Verbesserungsbereich"
 
                         'Shape formatieren
+                        shape1.Color = Color.Black
                         shape1.Brush.Style = Drawing2D.HatchStyle.DarkUpwardDiagonal
                         shape1.Brush.Color = Color.Black
                         shape1.Brush.ForegroundColor = Color.White
@@ -342,9 +343,10 @@ Partial Public Class Scatterplot
                         'MarksTips entfernen
                         .Tools.Clear(True)
                         'Serien unsichtbar machen
-                        For Each s As Steema.TeeChart.Styles.Series In .Series
-                            s.Cursor = Windows.Forms.Cursors.Default  'Kein Hand-Cursor
-                            s.Color = System.Drawing.Color.Empty      'Punkte unsichtbar
+                        For Each s As Steema.TeeChart.Styles.Points In .Series
+                            s.Cursor = Cursors.Default          'Kein Hand-Cursor
+                            s.Pointer.Color = Color.Empty       'Punkte unsichtbar
+                            s.Pointer.Pen.Color = Color.Empty   'Punkte unsichtbar
                         Next
                     Else
                         'alle anderen kriegen Handler für seriesClick
@@ -508,9 +510,10 @@ Partial Public Class Scatterplot
                         'MarksTips entfernen
                         .Tools.Clear(True)
                         'Serien unsichtbar machen
-                        For Each s As Steema.TeeChart.Styles.Series In .Series
-                            s.Cursor = Windows.Forms.Cursors.Default  'Kein Hand-Cursor
-                            s.Color = System.Drawing.Color.Empty      'Punkte unsichtbar
+                        For Each s As Steema.TeeChart.Styles.Points In .Series
+                            s.Cursor = Cursors.Default          'Kein Hand-Cursor
+                            s.Pointer.Color = Color.Empty       'Punkte unsichtbar
+                            s.Pointer.Pen.Color = Color.Empty   'Punkte unsichtbar
                         Next
                     Else
                         'alle anderen kriegen Handler für seriesClick
