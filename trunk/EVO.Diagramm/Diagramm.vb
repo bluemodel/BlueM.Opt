@@ -69,6 +69,7 @@ Public Class Diagramm
                                       Optional ByVal ColEach As Boolean = False) As Steema.TeeChart.Styles.Points
 
         Dim i As Integer
+        Dim baseColor, borderColor As Color
         Dim serie As Steema.TeeChart.Styles.Points
 
         'Überprüfen, ob Serie bereits existiert
@@ -87,9 +88,13 @@ Public Class Diagramm
         serie.Pointer.VertSize = size
         serie.ColorEach = ColEach
         If (Not colorName = "") Then
-            serie.Color = Drawing.Color.FromName(colorName)
+            baseColor = Color.FromName(colorName)
+            serie.Pointer.Color = baseColor
+            'Border-Color etwas dunkler
+            borderColor = getDarkerColor(baseColor)
+            serie.Pointer.Pen.Color = borderColor
         End If
-
+        
         Call Me.add_MarksTips(serie)
         serie.Cursor = Windows.Forms.Cursors.Hand
 
@@ -137,6 +142,7 @@ Public Class Diagramm
                                       Optional ByVal ColEach As Boolean = False) As Steema.TeeChart.Styles.Points3D
 
         Dim i As Integer
+        Dim baseColor, borderColor As Color
         Dim serie As New Steema.TeeChart.Styles.Points3D
 
         'Überprüfen, ob Serie bereits existiert
@@ -158,7 +164,11 @@ Public Class Diagramm
         serie.LinePen.Visible = False
         serie.ColorEach = ColEach
         If (Not colorName = "") Then
-            serie.Color = Drawing.Color.FromName(colorName)
+            baseColor = Drawing.Color.FromName(colorName)
+            serie.Color = baseColor
+            'Border-Color etwas dunkler
+            borderColor = getDarkerColor(baseColor)
+            serie.Pointer.Pen.Color = borderColor
         End If
 
         'BUG 234: MarksTip funktioniert momentan nur in der XY-Ebene korrekt
@@ -297,6 +307,22 @@ Public Class Diagramm
         End If
 
         Return Farbe
+
+    End Function
+
+    ''' <summary>
+    ''' Erzeugt von einer übergebenen Farbe eine etwas dunklere Farbe
+    ''' </summary>
+    ''' <param name="baseColor">die Basisfarbe</param>
+    ''' <returns>eine etwas dunklere Farbe</returns>
+    Private Shared Function getDarkerColor(ByVal baseColor As Color) As Color
+
+        Const colorshift As Integer = 100
+        Dim newColor As Color
+
+        newColor = Color.FromArgb(baseColor.A, Math.Max(baseColor.R - colorshift, 0), Math.Max(baseColor.G - colorshift, 0), Math.Max(baseColor.B - colorshift, 0))
+
+        Return newColor
 
     End Function
 
