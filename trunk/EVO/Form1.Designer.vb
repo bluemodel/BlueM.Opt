@@ -280,7 +280,7 @@ Partial Class Form1
         '
         'ToolStrip1
         '
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton_Options, ToolStripSeparator5, Me.ToolStripButton_Monitor, ToolStripSeparator6, Me.ToolStripSplitButton_Diagramm, ToolStripSeparator4, Me.ToolStripSplitButton_ErgebnisDB, ToolStripSeparator3, Me.ToolStripButton_Scatterplot, ToolStripSeparator8})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton_Options, ToolStripSeparator5, Me.ToolStripButton_Monitor, ToolStripSeparator6, Me.ToolStripSplitButton_ErgebnisDB, ToolStripSeparator4, Me.ToolStripSplitButton_Diagramm, ToolStripSeparator3, Me.ToolStripButton_Scatterplot, ToolStripSeparator8})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 24)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Size = New System.Drawing.Size(722, 25)
@@ -357,7 +357,7 @@ Partial Class Form1
         Me.ToolStripSplitButton_ErgebnisDB.Name = "ToolStripSplitButton_ErgebnisDB"
         Me.ToolStripSplitButton_ErgebnisDB.Size = New System.Drawing.Size(80, 22)
         Me.ToolStripSplitButton_ErgebnisDB.Text = "Ergebnis"
-        Me.ToolStripSplitButton_ErgebnisDB.ToolTipText = "ErgebnisDB speichern"
+        Me.ToolStripSplitButton_ErgebnisDB.ToolTipText = "Optimierungsergebnis"
         '
         'ToolStripMenuItem_ErgebnisDBSave
         '
