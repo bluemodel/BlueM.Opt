@@ -29,21 +29,6 @@ namespace IHWB.EVO.MetaEvo
             solutionvolume = new EVO.MO_Indicators.Solutionvolume(5, 0.05, ref applog);
         }
 
-        public void set_genpool(ref EVO.Common.Individuum_MetaEvo[] genpool_input) 
-        {
-            this.wastepool = new EVO.Common.Individuum_MetaEvo[genpool_input.Length];
-            this.genpool = new EVO.Common.Individuum_MetaEvo[genpool_input.Length];
-            for (int i = 0; i < genpool_input.Length; i++)
-            {
-                this.genpool[i] = genpool_input[i].Clone_MetaEvo();
-            }
-            applog.appendText("Algo Manager: Genpool: \r\n" + this.generationinfo(ref this.genpool));
-
-            //Genpool zeichnen
-            hauptdiagramm.ZeichneSekPopulation(genpool);
-            System.Windows.Forms.Application.DoEvents();
-        }
-
         //new_generation mit Genpool verarbeiten und neue Individuen in new_generation erzeugen
         public void new_individuals_merge_with_genpool(ref EVO.Common.Individuum_MetaEvo[] new_generation_input)
         {
@@ -113,7 +98,7 @@ namespace IHWB.EVO.MetaEvo
                     }
                     set_calculationmode_local(ref genpool, ref new_generation_input);
                     //MessageBox.Show("Switching to Local Optimization after " + (new_generation_input[new_generation_input.Length - 1].ID) / new_generation_input.Length + " Generations", "Algomanager");
-                }
+                } 
             }
             else if (settings.MetaEvo.OpMode == "Local Optimizer")
             {
@@ -121,7 +106,7 @@ namespace IHWB.EVO.MetaEvo
                 //0.1. Feasible-Status prüfen
                 set_feasible2false(ref genpool, ref new_generation_input);
                 //Solutionvolume noch einmal berechnen um Fortschritt der lokalen Optimierung zu zeigen
-                solutionvolume.calculate(ref new_generation_input);
+                solutionvolume.calculate(ref genpool);
 
                 applog.appendText("Algo Manager: Result: New Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n"); 
 
@@ -129,15 +114,32 @@ namespace IHWB.EVO.MetaEvo
                 if (settings.MetaEvo.Application == "sim") hauptdiagramm.LöscheLetzteGeneration(1);
                 hauptdiagramm.ZeichneSekPopulation(genpool);
                 System.Windows.Forms.Application.DoEvents();
-            }      
+            }
+
+            applog.appendText("Algo Manager: Solutionvolume: Last Volume: " + solutionvolume.get_last_volume());
         }
 
+        //Erzeugt mit Hilfe von Algos die neuen Individuen
         public void new_individuals_build(ref EVO.Common.Individuum_MetaEvo[] new_generation_input)
         {
             //Generierung neuer Individuen (wieder in new_generation_input)
             algos.newGeneration(ref genpool, ref new_generation_input, ref wastepool);
         }
+        //Stezt den Genpool
+        public void set_genpool(ref EVO.Common.Individuum_MetaEvo[] genpool_input)
+        {
+            this.wastepool = new EVO.Common.Individuum_MetaEvo[genpool_input.Length];
+            this.genpool = new EVO.Common.Individuum_MetaEvo[genpool_input.Length];
+            for (int i = 0; i < genpool_input.Length; i++)
+            {
+                this.genpool[i] = genpool_input[i].Clone_MetaEvo();
+            }
+            applog.appendText("Algo Manager: Genpool: \r\n" + this.generationinfo(ref this.genpool));
 
+            //Genpool zeichnen
+            hauptdiagramm.ZeichneSekPopulation(genpool);
+            System.Windows.Forms.Application.DoEvents();
+        }
         //Wiederbelebte Feasible-Individuen wieder auf false setzen
         private void set_feasible2false(ref EVO.Common.Individuum_MetaEvo[] input, ref EVO.Common.Individuum_MetaEvo[] input2)
         {

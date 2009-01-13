@@ -204,19 +204,15 @@ namespace IHWB.EVO.MetaEvo
             return back;
         }
 
-        //Aktuelle Berechnungszeiten löschen (neues Scheduling)
-        public void erase_current_calc_times()
+        //Anzahl der nach scheduling bisher zu berechnenden Individuen updaten
+        private bool individuums2calculate_exist()
         {
+            //Anzahl der Individuen in jedem Client auf 0 setzen
             for (int k = 0; k < Clients.Length; k++)
             {
                 Clients[k].numberindividuums = 0;
             }
-        }
 
-        //Anzahl der nach scheduling bisher zu berechnenden Individuen updaten
-        private bool individuums2calculate_exist()
-        {
-            erase_current_calc_times();
             bool back = false;
 
             try
