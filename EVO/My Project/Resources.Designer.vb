@@ -137,6 +137,20 @@ Namespace My.Resources
             End Get
         End Property
         
+        Friend ReadOnly Property page_white_get() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("page_white_get", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        Friend ReadOnly Property page_white_put() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("page_white_put", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
         Friend ReadOnly Property scatterplot() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("scatterplot", resourceCulture)

@@ -56,7 +56,6 @@ Partial Class EVO_Einstellungen
         Dim Label4 As System.Windows.Forms.Label
         Dim Label3 As System.Windows.Forms.Label
         Dim Label1 As System.Windows.Forms.Label
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(EVO_Einstellungen))
         Me.TabControl1 = New System.Windows.Forms.TabControl
         Me.TabPage_PES = New System.Windows.Forms.TabPage
         Me.Label_OptModusValue = New System.Windows.Forms.Label
@@ -132,9 +131,6 @@ Partial Class EVO_Einstellungen
         Me.Label10 = New System.Windows.Forms.Label
         Me.Numeric_DDS_r_val = New System.Windows.Forms.NumericUpDown
         Me.Label5 = New System.Windows.Forms.Label
-        Me.ToolStrip1 = New System.Windows.Forms.ToolStrip
-        Me.ÖffnenToolStripButton = New System.Windows.Forms.ToolStripButton
-        Me.SpeichernToolStripButton = New System.Windows.Forms.ToolStripButton
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox
         Label_CES_MemSize = New System.Windows.Forms.Label
@@ -209,7 +205,6 @@ Partial Class EVO_Einstellungen
         Me.TabPage_DDS.SuspendLayout()
         CType(Me.Numeric_DDS_maxiter, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Numeric_DDS_r_val, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.ToolStrip1.SuspendLayout()
         Me.GroupBox_Einstellungen.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -555,12 +550,12 @@ Partial Class EVO_Einstellungen
         Me.TabControl1.Controls.Add(Me.TabPage_Hybrid2008)
         Me.TabControl1.Controls.Add(Me.TabPage_DDS)
         Me.TabControl1.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TabControl1.Location = New System.Drawing.Point(2, 41)
+        Me.TabControl1.Location = New System.Drawing.Point(2, 16)
         Me.TabControl1.Margin = New System.Windows.Forms.Padding(0)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.Padding = New System.Drawing.Point(0, 0)
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(229, 669)
+        Me.TabControl1.Size = New System.Drawing.Size(229, 694)
         Me.TabControl1.TabIndex = 1
         '
         'TabPage_PES
@@ -587,7 +582,7 @@ Partial Class EVO_Einstellungen
         Me.TabPage_PES.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_PES.Margin = New System.Windows.Forms.Padding(0)
         Me.TabPage_PES.Name = "TabPage_PES"
-        Me.TabPage_PES.Size = New System.Drawing.Size(221, 643)
+        Me.TabPage_PES.Size = New System.Drawing.Size(221, 668)
         Me.TabPage_PES.TabIndex = 0
         Me.TabPage_PES.Text = "PES"
         '
@@ -922,7 +917,7 @@ Partial Class EVO_Einstellungen
         Me.TabPage_CES.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_CES.Margin = New System.Windows.Forms.Padding(0)
         Me.TabPage_CES.Name = "TabPage_CES"
-        Me.TabPage_CES.Size = New System.Drawing.Size(220, 643)
+        Me.TabPage_CES.Size = New System.Drawing.Size(221, 643)
         Me.TabPage_CES.TabIndex = 1
         Me.TabPage_CES.Text = "CES"
         '
@@ -1230,7 +1225,7 @@ Partial Class EVO_Einstellungen
         Me.TabPage_HookeJeeves.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_HookeJeeves.Name = "TabPage_HookeJeeves"
         Me.TabPage_HookeJeeves.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage_HookeJeeves.Size = New System.Drawing.Size(220, 643)
+        Me.TabPage_HookeJeeves.Size = New System.Drawing.Size(221, 643)
         Me.TabPage_HookeJeeves.TabIndex = 2
         Me.TabPage_HookeJeeves.Text = "Hooke&Jeeves"
         '
@@ -1332,7 +1327,7 @@ Partial Class EVO_Einstellungen
         Me.TabPage_Hybrid2008.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_Hybrid2008.Name = "TabPage_Hybrid2008"
         Me.TabPage_Hybrid2008.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage_Hybrid2008.Size = New System.Drawing.Size(220, 643)
+        Me.TabPage_Hybrid2008.Size = New System.Drawing.Size(221, 643)
         Me.TabPage_Hybrid2008.TabIndex = 3
         Me.TabPage_Hybrid2008.Text = "Hybrid2008"
         '
@@ -1348,7 +1343,7 @@ Partial Class EVO_Einstellungen
         Me.TabPage_DDS.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_DDS.Name = "TabPage_DDS"
         Me.TabPage_DDS.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage_DDS.Size = New System.Drawing.Size(220, 643)
+        Me.TabPage_DDS.Size = New System.Drawing.Size(221, 643)
         Me.TabPage_DDS.TabIndex = 4
         Me.TabPage_DDS.Text = "DDS"
         Me.TabPage_DDS.UseVisualStyleBackColor = True
@@ -1417,41 +1412,10 @@ Partial Class EVO_Einstellungen
         Me.Label5.TabIndex = 0
         Me.Label5.Text = "neighborhood pertubation size"
         '
-        'ToolStrip1
-        '
-        Me.ToolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ÖffnenToolStripButton, Me.SpeichernToolStripButton})
-        Me.ToolStrip1.Location = New System.Drawing.Point(3, 16)
-        Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Padding = New System.Windows.Forms.Padding(0)
-        Me.ToolStrip1.Size = New System.Drawing.Size(228, 25)
-        Me.ToolStrip1.Stretch = True
-        Me.ToolStrip1.TabIndex = 0
-        Me.ToolStrip1.Text = "ToolStrip1"
-        '
-        'ÖffnenToolStripButton
-        '
-        Me.ÖffnenToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ÖffnenToolStripButton.Image = CType(resources.GetObject("ÖffnenToolStripButton.Image"), System.Drawing.Image)
-        Me.ÖffnenToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ÖffnenToolStripButton.Name = "ÖffnenToolStripButton"
-        Me.ÖffnenToolStripButton.Size = New System.Drawing.Size(23, 22)
-        Me.ÖffnenToolStripButton.Text = "Ö&ffnen"
-        '
-        'SpeichernToolStripButton
-        '
-        Me.SpeichernToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.SpeichernToolStripButton.Image = CType(resources.GetObject("SpeichernToolStripButton.Image"), System.Drawing.Image)
-        Me.SpeichernToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.SpeichernToolStripButton.Name = "SpeichernToolStripButton"
-        Me.SpeichernToolStripButton.Size = New System.Drawing.Size(23, 22)
-        Me.SpeichernToolStripButton.Text = "&Speichern"
-        '
         'GroupBox_Einstellungen
         '
         Me.GroupBox_Einstellungen.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.GroupBox_Einstellungen.Controls.Add(Me.ToolStrip1)
         Me.GroupBox_Einstellungen.Controls.Add(Me.TabControl1)
         Me.GroupBox_Einstellungen.Location = New System.Drawing.Point(0, 0)
         Me.GroupBox_Einstellungen.Name = "GroupBox_Einstellungen"
@@ -1511,10 +1475,7 @@ Partial Class EVO_Einstellungen
         Me.TabPage_DDS.PerformLayout()
         CType(Me.Numeric_DDS_maxiter, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.Numeric_DDS_r_val, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.ToolStrip1.ResumeLayout(False)
-        Me.ToolStrip1.PerformLayout()
         Me.GroupBox_Einstellungen.ResumeLayout(False)
-        Me.GroupBox_Einstellungen.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -1543,9 +1504,6 @@ Partial Class EVO_Einstellungen
     Private WithEvents ComboOptPopEltern As System.Windows.Forms.ComboBox
     Private WithEvents ComboOptPopStrategie As System.Windows.Forms.ComboBox
     Private WithEvents ComboOptPopPenalty As System.Windows.Forms.ComboBox
-    Friend WithEvents ÖffnenToolStripButton As System.Windows.Forms.ToolStripButton
-    Friend WithEvents SpeichernToolStripButton As System.Windows.Forms.ToolStripButton
-    Private WithEvents ToolStrip1 As System.Windows.Forms.ToolStrip
     Private WithEvents TabPage_HookeJeeves As System.Windows.Forms.TabPage
     Private WithEvents Numeric_HJ_DeltaFinish As System.Windows.Forms.NumericUpDown
     Private WithEvents Numeric_HJ_DeltaStart As System.Windows.Forms.NumericUpDown

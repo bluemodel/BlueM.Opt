@@ -76,16 +76,8 @@ Public Class EVO_Einstellungen
 
     End Sub
 
-    'Laden des Formulars
-    '*******************
-    Private Sub EVO_Einstellungen_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
-
-        'EventHandler einrichten
-        AddHandler Me.ÖffnenToolStripButton.Click, AddressOf Form1.Load_EVO_Settings
-        AddHandler Me.SpeichernToolStripButton.Click, AddressOf Form1.Save_EVO_Settings
-
-    End Sub
-
+    'Initialisierung
+    '***************
     Public Sub Initialise(ByRef prob As EVO.Common.Problem)
 
         'Problem speichern

@@ -10,7 +10,7 @@ Public Class OptionsDialog
     Private _MultithreadingAllowed As Boolean
 
     ''' <summary>
-    ''' Multithreading erlauben/verbieten und gleichzeitig ein-/ausschalte
+    ''' Multithreading erlauben/verbieten und gleichzeitig ein-/ausschalten
     ''' </summary>
     Public Property MultithreadingAllowed() As Boolean
         Get

@@ -41,7 +41,7 @@ Partial Class OptionsDialog
         GroupBox_Diagramm.Controls.Add(Me.CheckBox_drawOnlyCurrentGen)
         GroupBox_Diagramm.Location = New System.Drawing.Point(12, 72)
         GroupBox_Diagramm.Name = "GroupBox_Diagramm"
-        GroupBox_Diagramm.Size = New System.Drawing.Size(180, 62)
+        GroupBox_Diagramm.Size = New System.Drawing.Size(188, 62)
         GroupBox_Diagramm.TabIndex = 1
         GroupBox_Diagramm.TabStop = False
         GroupBox_Diagramm.Text = "Diagramm"
@@ -65,7 +65,7 @@ Partial Class OptionsDialog
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanel1.Controls.Add(Me.OK_Button, 0, 0)
         Me.TableLayoutPanel1.Controls.Add(Me.Cancel_Button, 1, 0)
-        Me.TableLayoutPanel1.Location = New System.Drawing.Point(46, 146)
+        Me.TableLayoutPanel1.Location = New System.Drawing.Point(54, 146)
         Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
         Me.TableLayoutPanel1.RowCount = 1
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
@@ -97,7 +97,7 @@ Partial Class OptionsDialog
         Me.GroupBox_Sim.Controls.Add(Me.CheckBox_useMultithreading)
         Me.GroupBox_Sim.Location = New System.Drawing.Point(12, 13)
         Me.GroupBox_Sim.Name = "GroupBox_Sim"
-        Me.GroupBox_Sim.Size = New System.Drawing.Size(180, 53)
+        Me.GroupBox_Sim.Size = New System.Drawing.Size(188, 53)
         Me.GroupBox_Sim.TabIndex = 2
         Me.GroupBox_Sim.TabStop = False
         Me.GroupBox_Sim.Text = "Simulationen"
@@ -119,7 +119,7 @@ Partial Class OptionsDialog
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.Cancel_Button
-        Me.ClientSize = New System.Drawing.Size(202, 187)
+        Me.ClientSize = New System.Drawing.Size(210, 187)
         Me.Controls.Add(Me.GroupBox_Sim)
         Me.Controls.Add(GroupBox_Diagramm)
         Me.Controls.Add(Me.TableLayoutPanel1)
@@ -131,7 +131,7 @@ Partial Class OptionsDialog
         Me.ShowInTaskbar = False
         Me.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
-        Me.Text = "Optionen"
+        Me.Text = "Allgemeine Einstellungen"
         GroupBox_Diagramm.ResumeLayout(False)
         Me.TableLayoutPanel1.ResumeLayout(False)
         Me.GroupBox_Sim.ResumeLayout(False)

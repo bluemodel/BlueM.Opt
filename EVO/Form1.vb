@@ -111,6 +111,8 @@ Partial Class Form1
         Me.ToolStripSplitButton_Diagramm.Enabled = False
         Me.ToolStripSplitButton_ErgebnisDB.Enabled = False
         Me.ToolStripButton_Scatterplot.Enabled = False
+        Me.ToolStripMenuItem_SettingsLoad.Enabled = False
+        Me.ToolStripMenuItem_SettingsSave.Enabled = False
 
         'Handler für Klick auf Serien zuweisen
         AddHandler Me.Hauptdiagramm1.ClickSeries, AddressOf seriesClick
@@ -122,7 +124,7 @@ Partial Class Form1
 
     'Optionen Dialog anzeigen
     '************************
-    Private Sub showOptionsDialog(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem_Optionen.Click, ToolStripButton_Options.Click
+    Private Sub showOptionsDialog(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem_Optionen.Click,  ToolStripSplitButton_SettingsGeneral.ButtonClick
         If (Me.isrun) Then
             Call Me.Options.DisableAll()
         Else
@@ -156,9 +158,63 @@ Partial Class Form1
     End Sub
 
     'Wiki aufrufen
-    '*********************
+    '*************
     Private Sub MenuItem_Wiki_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem_Wiki.Click
         Call Process.Start("http://130.83.196.154/BlueM/wiki/index.php/BlueM.Opt")
+    End Sub
+
+    'EVO_Einstellungen laden
+    '***********************
+    Private Sub Einstellungen_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles ToolStripMenuItem_SettingsLoad.Click
+
+        'Dialog einrichten
+        OpenFileDialog1.Filter = "XML-Dateien (*.xml)|*.xml"
+        OpenFileDialog1.FileName = "EVO_Settings.xml"
+        OpenFileDialog1.Title = "Einstellungsdatei auswählen"
+        If (Not IsNothing(Sim1)) Then
+            OpenFileDialog1.InitialDirectory = Sim1.WorkDir_Original
+        Else
+            OpenFileDialog1.InitialDirectory = CurDir()
+        End If
+
+        'Dialog anzeigen
+        If (OpenFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK) Then
+
+            'EVO_Settings aus Datei laden
+            Call EVO_Einstellungen1.loadSettings(OpenFileDialog1.FileName)
+
+            'EVO_Settings neu verteilen, 
+            'weil durch Einlesen aus Datei alle Referenzen verloren gehen
+            '------------------------------------------------------------
+            'OptionsDialog
+            Call Me.Options.setSettings(Me.EVO_Einstellungen1.Settings)
+            'Hauptdiagramm
+            Call Me.Hauptdiagramm1.setSettings(Me.EVO_Einstellungen1.Settings)
+
+            'Anwendungen, Controller und Algos bekommen die Settings bei Start übergeben
+        End If
+
+    End Sub
+
+    'EVO_Einstellungen speichern
+    '***************************
+    Private Sub Einstellungen_Save(ByVal sender As Object, ByVal e As System.EventArgs) Handles ToolStripMenuItem_SettingsSave.Click
+
+        'Dialog einrichten
+        SaveFileDialog1.Filter = "XML-Dateien (*.xml)|*.xml"
+        SaveFileDialog1.FileName = "EVO_Settings.xml"
+        SaveFileDialog1.DefaultExt = "xml"
+        SaveFileDialog1.Title = "Einstellungsdatei speichern"
+        If (Not IsNothing(Sim1)) Then
+            SaveFileDialog1.InitialDirectory = Sim1.WorkDir_Original
+        Else
+            SaveFileDialog1.InitialDirectory = CurDir()
+        End If
+
+        'Dialog anzeigen
+        If (SaveFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK) Then
+            Call EVO_Einstellungen1.saveSettings(SaveFileDialog1.FileName)
+        End If
     End Sub
 
 #End Region 'UI
@@ -197,11 +253,13 @@ Partial Class Form1
             Me.Label_Methode.Enabled = False
             Me.ComboBox_Methode.Enabled = False
 
-            'Ergebnis-Buttons
+            'Toolbar-Buttons
             Me.ToolStripMenuItem_ErgebnisDBSave.Enabled = False
             Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = False
             Me.ToolStripButton_Scatterplot.Enabled = False
             Me.ToolStripMenuItem_ErgebnisDBCompare.Enabled = False
+            Me.ToolStripMenuItem_SettingsLoad.Enabled = False
+            Me.ToolStripMenuItem_SettingsSave.Enabled = False
 
             'EVO_Settings zurücksetzen
             Me.EVO_Einstellungen1.Enabled = False
@@ -522,10 +580,12 @@ Partial Class Form1
             'Start Button deaktivieren
             Me.Button_Start.Enabled = False
 
-            'Ergebnis-Buttons deaktivieren
+            'Toolbar-Buttons deaktivieren
             Me.ToolStripMenuItem_ErgebnisDBSave.Enabled = False
             Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = False
             Me.ToolStripButton_Scatterplot.Enabled = False
+            Me.ToolStripMenuItem_SettingsLoad.Enabled = False
+            Me.ToolStripMenuItem_SettingsSave.Enabled = False
 
             Select Case Me.mProblem.Method
 
@@ -641,6 +701,8 @@ Partial Class Form1
             'Toolbar-Buttons aktivieren
             Me.ToolStripSplitButton_Diagramm.Enabled = True
             Me.ToolStripSplitButton_ErgebnisDB.Enabled = True
+            Me.ToolStripMenuItem_SettingsLoad.Enabled = True
+            Me.ToolStripMenuItem_SettingsSave.Enabled = True
 
             'IniMethod OK -> Start Button aktivieren
             Me.Button_Start.Enabled = True
@@ -699,61 +761,6 @@ Partial Class Form1
         '--------------------------------------------
         Call EVO.Common.Individuum.Initialise(Me.mProblem)
 
-    End Sub
-
-    'EVO_Einstellungen laden
-    '***********************
-    Friend Sub Load_EVO_Settings(ByVal sender As Object, ByVal e As System.EventArgs)
-
-        'Dialog einrichten
-        OpenFileDialog1.Filter = "XML-Dateien (*.xml)|*.xml"
-        OpenFileDialog1.FileName = "EVO_Settings.xml"
-        OpenFileDialog1.Title = "Einstellungsdatei auswählen"
-        If (Not IsNothing(Sim1)) Then
-            OpenFileDialog1.InitialDirectory = Sim1.WorkDir_Original
-        Else
-            OpenFileDialog1.InitialDirectory = CurDir()
-        End If
-
-        'Dialog anzeigen
-        If (OpenFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK) Then
-
-            'EVO_Settings aus Datei laden
-            Call EVO_Einstellungen1.loadSettings(OpenFileDialog1.FileName)
-
-            'EVO_Settings neu verteilen, 
-            'weil durch Einlesen aus Datei alle Referenzen verloren gehen
-            '------------------------------------------------------------
-
-            'OptionsDialog
-            Call Me.Options.setSettings(Me.EVO_Einstellungen1.Settings)
-            'Hauptdiagramm
-            Call Me.Hauptdiagramm1.setSettings(Me.EVO_Einstellungen1.Settings)
-
-            'Anwendungen, Controller und Algos bekommen die Settings bei Start übergeben
-        End If
-
-    End Sub
-
-    'EVO_Einstellungen speichern
-    '***************************
-    Friend Sub Save_EVO_Settings(ByVal sender As Object, ByVal e As System.EventArgs)
-
-        'Dialog einrichten
-        SaveFileDialog1.Filter = "XML-Dateien (*.xml)|*.xml"
-        SaveFileDialog1.FileName = "EVO_Settings.xml"
-        SaveFileDialog1.DefaultExt = "xml"
-        SaveFileDialog1.Title = "Einstellungsdatei speichern"
-        If (Not IsNothing(Sim1)) Then
-            SaveFileDialog1.InitialDirectory = Sim1.WorkDir_Original
-        Else
-            SaveFileDialog1.InitialDirectory = CurDir()
-        End If
-
-        'Dialog anzeigen
-        If (SaveFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK) Then
-            Call EVO_Einstellungen1.saveSettings(SaveFileDialog1.FileName)
-        End If
     End Sub
 
 #End Region 'Initialisierung der Anwendungen
