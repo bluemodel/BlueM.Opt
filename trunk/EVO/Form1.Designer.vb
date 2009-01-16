@@ -53,17 +53,19 @@ Partial Class Form1
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip
-        Me.ToolStripButton_Options = New System.Windows.Forms.ToolStripButton
-        Me.ToolStripButton_Monitor = New System.Windows.Forms.ToolStripButton
+        Me.ToolStripSplitButton_SettingsGeneral = New System.Windows.Forms.ToolStripSplitButton
+        Me.ToolStripMenuItem_SettingsSave = New System.Windows.Forms.ToolStripMenuItem
+        Me.ToolStripMenuItem_SettingsLoad = New System.Windows.Forms.ToolStripMenuItem
+        Me.ToolStripSplitButton_ErgebnisDB = New System.Windows.Forms.ToolStripSplitButton
+        Me.ToolStripMenuItem_ErgebnisDBSave = New System.Windows.Forms.ToolStripMenuItem
+        Me.ToolStripMenuItem_ErgebnisDBLoad = New System.Windows.Forms.ToolStripMenuItem
+        Me.ToolStripMenuItem_ErgebnisDBCompare = New System.Windows.Forms.ToolStripMenuItem
         Me.ToolStripSplitButton_Diagramm = New System.Windows.Forms.ToolStripSplitButton
         Me.ToolStripMenuItem_TChartEdit = New System.Windows.Forms.ToolStripMenuItem
         Me.ToolStripMenuItem_TChartSave = New System.Windows.Forms.ToolStripMenuItem
         Me.ToolStripMenuItem_TChart2PNG = New System.Windows.Forms.ToolStripMenuItem
         Me.ToolStripMenuItem_Tchart2CSV = New System.Windows.Forms.ToolStripMenuItem
-        Me.ToolStripSplitButton_ErgebnisDB = New System.Windows.Forms.ToolStripSplitButton
-        Me.ToolStripMenuItem_ErgebnisDBSave = New System.Windows.Forms.ToolStripMenuItem
-        Me.ToolStripMenuItem_ErgebnisDBLoad = New System.Windows.Forms.ToolStripMenuItem
-        Me.ToolStripMenuItem_ErgebnisDBCompare = New System.Windows.Forms.ToolStripMenuItem
+        Me.ToolStripButton_Monitor = New System.Windows.Forms.ToolStripButton
         Me.ToolStripButton_Scatterplot = New System.Windows.Forms.ToolStripButton
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip
         Me.Hauptdiagramm1 = New IHWB.EVO.Diagramm.Hauptdiagramm
@@ -280,32 +282,70 @@ Partial Class Form1
         '
         'ToolStrip1
         '
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton_Options, ToolStripSeparator5, Me.ToolStripButton_Monitor, ToolStripSeparator6, Me.ToolStripSplitButton_ErgebnisDB, ToolStripSeparator4, Me.ToolStripSplitButton_Diagramm, ToolStripSeparator3, Me.ToolStripButton_Scatterplot, ToolStripSeparator8})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripSplitButton_SettingsGeneral, ToolStripSeparator5, Me.ToolStripSplitButton_ErgebnisDB, ToolStripSeparator4, Me.ToolStripSplitButton_Diagramm, ToolStripSeparator3, Me.ToolStripButton_Monitor, ToolStripSeparator6, Me.ToolStripButton_Scatterplot, ToolStripSeparator8})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 24)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Size = New System.Drawing.Size(722, 25)
         Me.ToolStrip1.TabIndex = 19
         Me.ToolStrip1.Text = "ToolStrip1"
         '
-        'ToolStripButton_Options
+        'ToolStripSplitButton_SettingsGeneral
         '
-        Me.ToolStripButton_Options.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripButton_Options.Image = Global.IHWB.EVO.My.Resources.Resources.wrench
-        Me.ToolStripButton_Options.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton_Options.Name = "ToolStripButton_Options"
-        Me.ToolStripButton_Options.Size = New System.Drawing.Size(23, 22)
-        Me.ToolStripButton_Options.Text = "Optionen"
+        Me.ToolStripSplitButton_SettingsGeneral.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem_SettingsSave, Me.ToolStripMenuItem_SettingsLoad})
+        Me.ToolStripSplitButton_SettingsGeneral.Image = Global.IHWB.EVO.My.Resources.Resources.wrench
+        Me.ToolStripSplitButton_SettingsGeneral.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripSplitButton_SettingsGeneral.Name = "ToolStripSplitButton_SettingsGeneral"
+        Me.ToolStripSplitButton_SettingsGeneral.Size = New System.Drawing.Size(102, 22)
+        Me.ToolStripSplitButton_SettingsGeneral.Text = "Einstellungen"
+        Me.ToolStripSplitButton_SettingsGeneral.ToolTipText = "Allgemeine Einstellungen"
         '
-        'ToolStripButton_Monitor
+        'ToolStripMenuItem_SettingsSave
         '
-        Me.ToolStripButton_Monitor.CheckOnClick = True
-        Me.ToolStripButton_Monitor.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripButton_Monitor.Image = Global.IHWB.EVO.My.Resources.Resources.monitor
-        Me.ToolStripButton_Monitor.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton_Monitor.Name = "ToolStripButton_Monitor"
-        Me.ToolStripButton_Monitor.Size = New System.Drawing.Size(23, 22)
-        Me.ToolStripButton_Monitor.Text = "Monitor anzeigen/ausblenden"
-        Me.ToolStripButton_Monitor.ToolTipText = "Monitor anzeigen/ausblenden"
+        Me.ToolStripMenuItem_SettingsSave.Image = Global.IHWB.EVO.My.Resources.Resources.page_white_put
+        Me.ToolStripMenuItem_SettingsSave.Name = "ToolStripMenuItem_SettingsSave"
+        Me.ToolStripMenuItem_SettingsSave.Size = New System.Drawing.Size(209, 22)
+        Me.ToolStripMenuItem_SettingsSave.Text = "Einstellungen speichern..."
+        '
+        'ToolStripMenuItem_SettingsLoad
+        '
+        Me.ToolStripMenuItem_SettingsLoad.Image = Global.IHWB.EVO.My.Resources.Resources.page_white_get
+        Me.ToolStripMenuItem_SettingsLoad.Name = "ToolStripMenuItem_SettingsLoad"
+        Me.ToolStripMenuItem_SettingsLoad.Size = New System.Drawing.Size(209, 22)
+        Me.ToolStripMenuItem_SettingsLoad.Text = "Einstellungen laden..."
+        '
+        'ToolStripSplitButton_ErgebnisDB
+        '
+        Me.ToolStripSplitButton_ErgebnisDB.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem_ErgebnisDBSave, Me.ToolStripMenuItem_ErgebnisDBLoad, Me.ToolStripMenuItem_ErgebnisDBCompare})
+        Me.ToolStripSplitButton_ErgebnisDB.Image = Global.IHWB.EVO.My.Resources.Resources.database
+        Me.ToolStripSplitButton_ErgebnisDB.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripSplitButton_ErgebnisDB.Name = "ToolStripSplitButton_ErgebnisDB"
+        Me.ToolStripSplitButton_ErgebnisDB.Size = New System.Drawing.Size(80, 22)
+        Me.ToolStripSplitButton_ErgebnisDB.Text = "Ergebnis"
+        Me.ToolStripSplitButton_ErgebnisDB.ToolTipText = "Optimierungsergebnis"
+        '
+        'ToolStripMenuItem_ErgebnisDBSave
+        '
+        Me.ToolStripMenuItem_ErgebnisDBSave.Image = Global.IHWB.EVO.My.Resources.Resources.database_save
+        Me.ToolStripMenuItem_ErgebnisDBSave.Name = "ToolStripMenuItem_ErgebnisDBSave"
+        Me.ToolStripMenuItem_ErgebnisDBSave.Size = New System.Drawing.Size(200, 22)
+        Me.ToolStripMenuItem_ErgebnisDBSave.Text = "ErgebnisDB speichern..."
+        Me.ToolStripMenuItem_ErgebnisDBSave.ToolTipText = "Ergebnisdatenbank speichern..."
+        '
+        'ToolStripMenuItem_ErgebnisDBLoad
+        '
+        Me.ToolStripMenuItem_ErgebnisDBLoad.Image = Global.IHWB.EVO.My.Resources.Resources.database_connect
+        Me.ToolStripMenuItem_ErgebnisDBLoad.Name = "ToolStripMenuItem_ErgebnisDBLoad"
+        Me.ToolStripMenuItem_ErgebnisDBLoad.Size = New System.Drawing.Size(200, 22)
+        Me.ToolStripMenuItem_ErgebnisDBLoad.Text = "ErgebnisDB laden..."
+        Me.ToolStripMenuItem_ErgebnisDBLoad.ToolTipText = "Optimierungsergebnis aus bestehender DB laden"
+        '
+        'ToolStripMenuItem_ErgebnisDBCompare
+        '
+        Me.ToolStripMenuItem_ErgebnisDBCompare.Image = Global.IHWB.EVO.My.Resources.Resources.database_go
+        Me.ToolStripMenuItem_ErgebnisDBCompare.Name = "ToolStripMenuItem_ErgebnisDBCompare"
+        Me.ToolStripMenuItem_ErgebnisDBCompare.Size = New System.Drawing.Size(200, 22)
+        Me.ToolStripMenuItem_ErgebnisDBCompare.Text = "Ergebnis vergleichen..."
+        Me.ToolStripMenuItem_ErgebnisDBCompare.ToolTipText = "mit einem anderen Optimierungsergebnis vergleichen"
         '
         'ToolStripSplitButton_Diagramm
         '
@@ -349,39 +389,16 @@ Partial Class Form1
         Me.ToolStripMenuItem_Tchart2CSV.Text = "CSV speichern..."
         Me.ToolStripMenuItem_Tchart2CSV.ToolTipText = "Diagrammdaten als CSV-Datei speichern"
         '
-        'ToolStripSplitButton_ErgebnisDB
+        'ToolStripButton_Monitor
         '
-        Me.ToolStripSplitButton_ErgebnisDB.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem_ErgebnisDBSave, Me.ToolStripMenuItem_ErgebnisDBLoad, Me.ToolStripMenuItem_ErgebnisDBCompare})
-        Me.ToolStripSplitButton_ErgebnisDB.Image = Global.IHWB.EVO.My.Resources.Resources.database
-        Me.ToolStripSplitButton_ErgebnisDB.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripSplitButton_ErgebnisDB.Name = "ToolStripSplitButton_ErgebnisDB"
-        Me.ToolStripSplitButton_ErgebnisDB.Size = New System.Drawing.Size(80, 22)
-        Me.ToolStripSplitButton_ErgebnisDB.Text = "Ergebnis"
-        Me.ToolStripSplitButton_ErgebnisDB.ToolTipText = "Optimierungsergebnis"
-        '
-        'ToolStripMenuItem_ErgebnisDBSave
-        '
-        Me.ToolStripMenuItem_ErgebnisDBSave.Image = Global.IHWB.EVO.My.Resources.Resources.database_save
-        Me.ToolStripMenuItem_ErgebnisDBSave.Name = "ToolStripMenuItem_ErgebnisDBSave"
-        Me.ToolStripMenuItem_ErgebnisDBSave.Size = New System.Drawing.Size(200, 22)
-        Me.ToolStripMenuItem_ErgebnisDBSave.Text = "ErgebnisDB speichern..."
-        Me.ToolStripMenuItem_ErgebnisDBSave.ToolTipText = "Ergebnisdatenbank speichern..."
-        '
-        'ToolStripMenuItem_ErgebnisDBLoad
-        '
-        Me.ToolStripMenuItem_ErgebnisDBLoad.Image = Global.IHWB.EVO.My.Resources.Resources.database_connect
-        Me.ToolStripMenuItem_ErgebnisDBLoad.Name = "ToolStripMenuItem_ErgebnisDBLoad"
-        Me.ToolStripMenuItem_ErgebnisDBLoad.Size = New System.Drawing.Size(200, 22)
-        Me.ToolStripMenuItem_ErgebnisDBLoad.Text = "ErgebnisDB laden..."
-        Me.ToolStripMenuItem_ErgebnisDBLoad.ToolTipText = "Optimierungsergebnis aus bestehender DB laden"
-        '
-        'ToolStripMenuItem_ErgebnisDBCompare
-        '
-        Me.ToolStripMenuItem_ErgebnisDBCompare.Image = Global.IHWB.EVO.My.Resources.Resources.database_go
-        Me.ToolStripMenuItem_ErgebnisDBCompare.Name = "ToolStripMenuItem_ErgebnisDBCompare"
-        Me.ToolStripMenuItem_ErgebnisDBCompare.Size = New System.Drawing.Size(200, 22)
-        Me.ToolStripMenuItem_ErgebnisDBCompare.Text = "Ergebnis vergleichen..."
-        Me.ToolStripMenuItem_ErgebnisDBCompare.ToolTipText = "mit einem anderen Optimierungsergebnis vergleichen"
+        Me.ToolStripButton_Monitor.CheckOnClick = True
+        Me.ToolStripButton_Monitor.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButton_Monitor.Image = Global.IHWB.EVO.My.Resources.Resources.monitor
+        Me.ToolStripButton_Monitor.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton_Monitor.Name = "ToolStripButton_Monitor"
+        Me.ToolStripButton_Monitor.Size = New System.Drawing.Size(23, 22)
+        Me.ToolStripButton_Monitor.Text = "Monitor anzeigen/ausblenden"
+        Me.ToolStripButton_Monitor.ToolTipText = "Monitor anzeigen/ausblenden"
         '
         'ToolStripButton_Scatterplot
         '
@@ -495,7 +512,6 @@ Partial Class Form1
     Friend WithEvents ToolStrip1 As System.Windows.Forms.ToolStrip
     Friend WithEvents StatusStrip1 As System.Windows.Forms.StatusStrip
     Private WithEvents ToolStripButton_Monitor As System.Windows.Forms.ToolStripButton
-    Private WithEvents ToolStripButton_Options As System.Windows.Forms.ToolStripButton
     Private WithEvents ToolStripSplitButton_Diagramm As System.Windows.Forms.ToolStripSplitButton
     Private WithEvents ToolStripMenuItem_TChartSave As System.Windows.Forms.ToolStripMenuItem
     Private WithEvents ToolStripMenuItem_TChart2PNG As System.Windows.Forms.ToolStripMenuItem
@@ -508,4 +524,7 @@ Partial Class Form1
     Private WithEvents ToolStripButton_Scatterplot As System.Windows.Forms.ToolStripButton
     Private WithEvents Button_Start As System.Windows.Forms.Button
     Private WithEvents EVO_Opt_Verlauf1 As IHWB.EVO.EVO_Opt_Verlauf
+    Friend WithEvents ToolStripMenuItem_SettingsSave As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItem_SettingsLoad As System.Windows.Forms.ToolStripMenuItem
+    Private WithEvents ToolStripSplitButton_SettingsGeneral As System.Windows.Forms.ToolStripSplitButton
 End Class
