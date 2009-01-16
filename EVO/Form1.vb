@@ -1467,6 +1467,12 @@ Partial Class Form1
     'Diagrammfunktionen
     '###################
 
+    'Diagramm-Button hat selbst keine funktionalität -> nur DropDown
+    '***************************************************************
+    Private Sub Button_Diagramm_ButtonClick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripSplitButton_Diagramm.ButtonClick
+        Call Me.ToolStripSplitButton_Diagramm.ShowDropDown()
+    End Sub
+
     'Hauptdiagramm bearbeiten
     '************************
     Private Sub TChartEdit(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItem_TChartEdit.Click
@@ -1962,6 +1968,12 @@ Partial Class Form1
 #End Region 'Diagrammfunktionen
 
 #Region "Ergebnisdatenbank"
+
+    'Ergebnis-Button hat selbst keine funktionalität -> nur DropDown
+    '***************************************************************
+    Private Sub Button_ErgebnisDB_ButtonClick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripSplitButton_ErgebnisDB.ButtonClick
+        Call Me.ToolStripSplitButton_ErgebnisDB.ShowDropDown()
+    End Sub
 
     'Ergebnisdatenbank speichern
     '***************************
