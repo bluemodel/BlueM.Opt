@@ -842,6 +842,7 @@ Partial Class Form1
                             Call STARTEN_SensiPlot()
 
                         Case METH_PES, METH_CES, METH_HYBRID
+                            'ES-Controller initialisieren und starten
                             Dim controller As New EVO.ES.Controller(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Monitor1, Me.Hauptdiagramm1)
                             Call controller.InitApp(Me.Sim1)
                             Call controller.Start()
@@ -850,7 +851,10 @@ Partial Class Form1
                             Call STARTEN_HookJeeves()
 
                         Case METH_DDS
-                            Call STARTEN_DDS()
+                            'DDS-Controller initialisieren und starten
+                            Dim controller As New modelEAU.DDS.Controller(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Monitor1, Me.Hauptdiagramm1)
+                            Call controller.InitApp(Me.Sim1)
+                            Call controller.Start()
 
                     End Select
 
@@ -1109,148 +1113,6 @@ Partial Class Form1
             Call TSP1.Mutation_Control()
 
         Next gen
-
-    End Sub
-
-    Private Sub STARTEN_DDS()
-
-        '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        'Declarations
-        '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-        Dim i, j As Integer
-        Dim run As Integer = 0
-        Dim Ini_Parameter() As Double
-        Dim Current_Parameter(Me.mProblem.NumParams - 1) As Double
-        Dim ind As Common.Individuum_PES
-        Dim DDS As New modelEAU.DDS.DDS()
-
-        '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        'Initialize
-        '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-        If Me.mProblem.List_Featurefunctions(0).Richtung = EVO_RICHTUNG.Maximierung Then
-            DDS.to_max = -1.0
-        Else
-            DDS.to_max = 1.0
-        End If
-
-        ReDim Ini_Parameter(Me.mProblem.NumParams - 1)
-        For i = 0 To Me.mProblem.NumParams - 1
-            If (Me.mProblem.List_OptParameter(i).Xn < 0 Or Me.mProblem.List_OptParameter(i).Xn > 1) Then
-                Throw New Exception("Ini parameter " & i & " not between 0 and 1")
-            End If
-            Ini_Parameter(i) = Me.mProblem.List_OptParameter(i).Xn
-        Next
-
-        If EVO_Einstellungen1.Settings.DDS.optStartparameter Then 'Zufällige Startparameter
-            DDS.initialize(EVO_Einstellungen1.Settings.DDS.r_val, EVO_Einstellungen1.Settings.DDS.maxiter, _
-                       Me.mProblem.NumParams)
-        Else 'Vorgegebene Startparameter
-            DDS.initialize(EVO_Einstellungen1.Settings.DDS.r_val, EVO_Einstellungen1.Settings.DDS.maxiter, _
-                       Me.mProblem.NumParams, Ini_Parameter)
-        End If
-
-        '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        'Ini objective function evaluations
-        '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-        For i = 0 To DDS.ini_fevals - 1
-            run += 1
-
-            Current_Parameter = DDS.ini_solution_candidate()
-
-            ind = New Common.Individuum_PES("DDS", run)
-            'OptParameter ins Individuum kopieren
-            '------------------------------------
-            For j = 0 To ind.OptParameter.Length - 1
-                ind.OptParameter(j).Xn = Current_Parameter(j)
-            Next
-
-            'Vorbereiten des Modelldatensatzes
-            '---------------------------------
-            Call Sim1.PREPARE_Evaluation_PES(ind.OptParameter)
-
-            'Evaluierung des Simulationsmodells (ToDo: Validätsprüfung fehlt)
-            '----------------------------------------------------------------
-            SIM_Eval_is_OK = Sim1.launchSim()
-
-            Call My.Application.DoEvents()
-
-            If SIM_Eval_is_OK Then Call Sim1.SIM_Ergebnis_auswerten(ind)
-
-            Call My.Application.DoEvents()
-
-            'Lösung im TeeChart einzeichnen
-            '------------------------------
-            Dim serie As Steema.TeeChart.Styles.Series
-            serie = Me.Hauptdiagramm1.getSeriesPoint("DDS")
-            Call serie.Add(run, ind.Penalties(0), run.ToString())
-
-            Call My.Application.DoEvents()
-
-            'Bestwertspeicher und Searchhistorie aktualisieren
-            '-------------------------------------------------
-            If (run = 1) Then
-                DDS.ini_Fbest(ind.Penalties(0))
-            Else
-                DDS.update_Fbest(ind.Penalties(0))
-            End If
-            DDS.update_search_historie(ind.Penalties(0), run - 1)
-        Next
-        DDS.track_ini()
-
-        '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        'Ende ini objective function evaluations
-        '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        'Code below is now the DDS algorithm as presented in Figure 1 of 
-        'Tolson and Shoemaker (2007) 
-        '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        'start the OUTER DDS ALGORITHM LOOP for remaining allowble function evaluations (ileft)
-        '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-        For i = 1 To DDS.ileft
-            run += 1
-
-            Current_Parameter = DDS.determine_DV(i)
-
-            ind = New Common.Individuum_PES("DDS", run)
-            'OptParameter ins Individuum kopieren
-            '------------------------------------
-            For j = 0 To ind.OptParameter.Length - 1
-                ind.OptParameter(j).Xn = Current_Parameter(j)
-            Next
-
-            'Vorbereiten des Modelldatensatzes
-            '---------------------------------
-            Call Sim1.PREPARE_Evaluation_PES(ind.OptParameter)
-
-            'Evaluierung des Simulationsmodells (ToDo: Validätsprüfung fehlt)
-            '----------------------------------------------------------------
-            SIM_Eval_is_OK = Sim1.launchSim()
-
-            Call My.Application.DoEvents()
-
-            If SIM_Eval_is_OK Then Call Sim1.SIM_Ergebnis_auswerten(ind)
-
-            Call My.Application.DoEvents()
-
-            'Lösung im TeeChart einzeichnen
-            '------------------------------
-            Dim serie As Steema.TeeChart.Styles.Series
-            serie = Me.Hauptdiagramm1.getSeriesPoint("DDS")
-            Call serie.Add(run, ind.Penalties(0), run.ToString())
-
-            Call My.Application.DoEvents()
-
-            DDS.update_Fbest(ind.Penalties(0))
-
-            DDS.update_search_historie(ind.Penalties(0), run - 1)
-        Next
-
-        '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        'ends OUTER DDS ALGORITHM LOOP
-        '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     End Sub
 

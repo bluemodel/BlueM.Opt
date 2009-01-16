@@ -1,0 +1,201 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace modelEAU.DDS
+{
+    /// <summary>
+    /// Kontrolliert den Ablauf des DDS
+    /// </summary>
+    public class Controller
+    {
+        private IHWB.EVO.Common.Problem mProblem;
+        private IHWB.EVO.Common.EVO_Settings mSettings;
+        private IHWB.EVO.Common.Progress mProgress;
+        private IHWB.EVO.Diagramm.Monitor mMonitor; //z.Zt. nicht benutzt
+        private IHWB.EVO.Diagramm.Hauptdiagramm Hauptdiagramm1;
+        private IHWB.EVO.Apps.Sim Sim1;
+
+        /// <summary>
+        /// Konstruktor
+        /// </summary>
+        /// <param name="inputProblem">das Problem</param>
+        /// <param name="inputSettings">die Einstellungen</param>
+        /// <param name="inputProgress">der Verlauf</param>
+        /// <param name="inputMonitor">der Monitor</param>
+        /// <param name="inputHauptdiagramm">das Hauptdiagramm</param>
+        public Controller(ref IHWB.EVO.Common.Problem inputProblem, ref IHWB.EVO.Common.EVO_Settings inputSettings, ref IHWB.EVO.Common.Progress inputProgress, ref IHWB.EVO.Diagramm.Monitor inputMonitor, ref IHWB.EVO.Diagramm.Hauptdiagramm inputHauptdiagramm)
+        {
+            //Objekte übergeben
+            this.mProblem = inputProblem;
+            this.mSettings = inputSettings;
+            this.mProgress = inputProgress;
+            this.mMonitor = inputMonitor;
+            this.Hauptdiagramm1 = inputHauptdiagramm;
+        }
+
+        /// <summary>
+        /// Initialisiert den Controller für Sim-Anwendungen
+        /// </summary>
+        /// <param name="inputSim">Sim-Objekt</param>
+        public void InitApp(ref IHWB.EVO.Apps.Sim inputSim)
+        {
+            this.Sim1 = inputSim;
+        }
+
+        /// <summary>
+        /// Startet die Optimierung
+        /// </summary>
+        public void Start()
+        {
+
+            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            //Declarations
+            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+            int i, j;
+            int run = 0;
+            double[] Ini_Parameter;
+            double[] Current_Parameter;
+            IHWB.EVO.Common.Individuum ind;
+            modelEAU.DDS.DDS DDS;
+            bool SIM_Eval_is_OK;
+            Steema.TeeChart.Styles.Series serie;
+
+            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            //Initialize
+            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+            Current_Parameter = new double[this.mProblem.NumParams];
+            DDS = new modelEAU.DDS.DDS();
+
+            if (this.mProblem.List_Featurefunctions[0].Richtung == IHWB.EVO.Common.Constants.EVO_RICHTUNG.Maximierung)
+            {
+                DDS.to_max = -1.0;
+            }
+            else
+            {
+                DDS.to_max = 1.0;
+            }
+
+            Ini_Parameter = new double[this.mProblem.NumParams];
+
+            for (i = 0; i < this.mProblem.NumParams; i++)
+            {
+                if (this.mProblem.List_OptParameter[i].Xn < 0 | this.mProblem.List_OptParameter[i].Xn > 1)
+                {
+                    throw new Exception("Ini parameter " + i + " not between 0 and 1");
+                }
+                Ini_Parameter[i] = this.mProblem.List_OptParameter[i].Xn;
+            }
+
+            if (this.mSettings.DDS.optStartparameter)
+            {
+                //Zufällige Startparameter
+                DDS.initialize(this.mSettings.DDS.r_val, this.mSettings.DDS.maxiter, this.mProblem.NumParams);
+            }
+            else
+            {
+                //Vorgegebene Startparameter
+                DDS.initialize(this.mSettings.DDS.r_val, this.mSettings.DDS.maxiter, this.mProblem.NumParams, Ini_Parameter);
+            }
+
+            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            //Ini objective function evaluations
+            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+            for (i = 0; i < DDS.ini_fevals; i++)
+            {
+                run += 1;
+
+                Current_Parameter = DDS.ini_solution_candidate();
+
+                ind = new IHWB.EVO.Common.Individuum_PES("DDS", run);
+                
+                //OptParameter ins Individuum kopieren
+                //------------------------------------
+                for (j = 0; j < ind.OptParameter.Length; j++)
+                {
+                    ind.OptParameter[j].Xn = Current_Parameter[j];
+                }
+
+                //Evaluierung des Simulationsmodells (ToDo: Validätsprüfung fehlt)
+                //----------------------------------------------------------------
+                SIM_Eval_is_OK = this.Sim1.Evaluate(ref ind, true);
+
+                System.Windows.Forms.Application.DoEvents();
+
+                //Lösung im TeeChart einzeichnen
+                //------------------------------
+                serie = this.Hauptdiagramm1.getSeriesPoint("DDS", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 3, false);
+                serie.Add(run, ind.Penalties[0], run.ToString());
+
+                System.Windows.Forms.Application.DoEvents();
+
+                //Bestwertspeicher und Searchhistorie aktualisieren
+                //-------------------------------------------------
+                if (run == 1)
+                {
+                    DDS.ini_Fbest(ind.Penalties[0]);
+                }
+                else
+                {
+                    DDS.update_Fbest(ind.Penalties[0]);
+                }
+                DDS.update_search_historie(ind.Penalties[0], run - 1);
+
+                //TODO: Verlaufsanzeige (this.mProgress)
+            }
+            DDS.track_ini();
+
+            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            //Ende ini objective function evaluations
+            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            //Code below is now the DDS algorithm as presented in Figure 1 of 
+            //Tolson and Shoemaker (2007) 
+            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            //start the OUTER DDS ALGORITHM LOOP for remaining allowble function evaluations (ileft)
+            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+            for (i = 1; i <= DDS.ileft; i++)
+            {
+                run += 1;
+
+                Current_Parameter = DDS.determine_DV(i);
+
+                ind = new IHWB.EVO.Common.Individuum_PES("DDS", run);
+                //OptParameter ins Individuum kopieren
+                //------------------------------------
+                for (j = 0; j < ind.OptParameter.Length; j++)
+                {
+                    ind.OptParameter[j].Xn = Current_Parameter[j];
+                }
+
+                //Evaluierung des Simulationsmodells (ToDo: Validätsprüfung fehlt)
+                //----------------------------------------------------------------
+                SIM_Eval_is_OK = this.Sim1.Evaluate(ref ind, true);
+
+                System.Windows.Forms.Application.DoEvents();
+
+                //Lösung im TeeChart einzeichnen
+                //------------------------------
+                serie = this.Hauptdiagramm1.getSeriesPoint("DDS", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 3, false);
+                serie.Add(run, ind.Penalties[0], run.ToString());
+
+                System.Windows.Forms.Application.DoEvents();
+
+                DDS.update_Fbest(ind.Penalties[0]);
+
+                DDS.update_search_historie(ind.Penalties[0], run - 1);
+
+                //TODO: Verlaufsanzeige (this.mProgress)
+            }
+
+            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            //ends OUTER DDS ALGORITHM LOOP
+            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+        }
+
+    }
+}
