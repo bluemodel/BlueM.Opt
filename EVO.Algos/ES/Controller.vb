@@ -11,18 +11,13 @@ Imports System.Threading
 ''' </summary>
 Public Class Controller
 
-    Private Enum ApplicationTypes As Integer
-        Sim = 1
-        Testprobleme = 2
-    End Enum
-
     Private myProblem As EVO.Common.Problem
     Private mySettings As EVO.Common.EVO_Settings
     Private myProgress As EVO.Common.Progress
     Private myMonitor As EVO.Diagramm.Monitor
     Private myHauptDiagramm As EVO.Diagramm.Hauptdiagramm
 
-    Private myAppType As ApplicationTypes
+    Private myAppType As EVO.Common.ApplicationTypes
     Private WithEvents Sim1 As EVO.Apps.Sim
     Private Testprobleme1 As EVO.Apps.Testprobleme
 
@@ -559,7 +554,7 @@ Public Class Controller
                             '===================================
 
                             'Lösung evaluieren und zeichnen
-                            Call Testprobleme1.Evaluierung_TestProbleme(inds(i_Nachf), PES1.PES_iAkt.iAktPop, Me.myHauptDiagramm)
+                            Call Testprobleme1.Evaluate(inds(i_Nachf), PES1.PES_iAkt.iAktPop, Me.myHauptDiagramm)
 
                             'Evaluierung verarbeiten
                             Call processIndividuum_PES(inds(i_Nachf), i_Nachf)

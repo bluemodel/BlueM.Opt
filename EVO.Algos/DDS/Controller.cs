@@ -15,6 +15,9 @@ namespace modelEAU.DDS
         private IHWB.EVO.Diagramm.Monitor mMonitor; //z.Zt. nicht benutzt
         private IHWB.EVO.Diagramm.Hauptdiagramm Hauptdiagramm1;
         private IHWB.EVO.Apps.Sim Sim1;
+        private IHWB.EVO.Apps.Testprobleme Testproblem;
+
+        private IHWB.EVO.Common.Constants.ApplicationTypes myAppType;
 
         /// <summary>
         /// Konstruktor
@@ -41,6 +44,17 @@ namespace modelEAU.DDS
         public void InitApp(ref IHWB.EVO.Apps.Sim inputSim)
         {
             this.Sim1 = inputSim;
+            this.myAppType = IHWB.EVO.Common.Constants.ApplicationTypes.Sim;
+        }
+
+        /// <summary>
+        /// Initialisiert den Controller für Testprobleme
+        /// </summary>
+        /// <param name="inputTestproblem">Testproblem-Objekt</param>
+        public void InitApp(ref IHWB.EVO.Apps.Testprobleme inputTestproblem)
+        {
+            this.Testproblem = inputTestproblem;
+            this.myAppType = IHWB.EVO.Common.Constants.ApplicationTypes.Testprobleme;
         }
 
         /// <summary>
@@ -119,16 +133,28 @@ namespace modelEAU.DDS
                     ind.OptParameter[j].Xn = Current_Parameter[j];
                 }
 
-                //Evaluierung des Simulationsmodells (ToDo: Validätsprüfung fehlt)
-                //----------------------------------------------------------------
-                SIM_Eval_is_OK = this.Sim1.Evaluate(ref ind, true);
+                //Evaluierung
+                if (this.myAppType == IHWB.EVO.Common.Constants.ApplicationTypes.Sim)
+                {
+                    //Evaluierung des Simulationsmodells
+                    //----------------------------------
+                    SIM_Eval_is_OK = this.Sim1.Evaluate(ref ind, true);
 
-                System.Windows.Forms.Application.DoEvents();
+                    //TODO: Evaluierungsfehler verarbeiten
 
-                //Lösung im TeeChart einzeichnen
-                //------------------------------
-                serie = this.Hauptdiagramm1.getSeriesPoint("DDS", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 3, false);
-                serie.Add(run, ind.Penalties[0], run.ToString());
+                    System.Windows.Forms.Application.DoEvents();
+
+                    //Lösung im TeeChart einzeichnen
+                    //------------------------------
+                    serie = this.Hauptdiagramm1.getSeriesPoint("DDS", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 3, false);
+                    serie.Add(run, ind.Penalties[0], run.ToString());
+                }
+                else
+                {
+                    //Evaluierung des Testproblems
+                    //----------------------------
+                    this.Testproblem.Evaluate(ref ind, 0, ref this.Hauptdiagramm1);
+                }
 
                 System.Windows.Forms.Application.DoEvents();
 
@@ -171,16 +197,28 @@ namespace modelEAU.DDS
                     ind.OptParameter[j].Xn = Current_Parameter[j];
                 }
 
-                //Evaluierung des Simulationsmodells (ToDo: Validätsprüfung fehlt)
-                //----------------------------------------------------------------
-                SIM_Eval_is_OK = this.Sim1.Evaluate(ref ind, true);
+                //Evaluierung
+                if (this.myAppType == IHWB.EVO.Common.Constants.ApplicationTypes.Sim)
+                {
+                    //Evaluierung des Simulationsmodells
+                    //----------------------------------
+                    SIM_Eval_is_OK = this.Sim1.Evaluate(ref ind, true);
 
-                System.Windows.Forms.Application.DoEvents();
+                    //TODO: Evaluierungsfehler verarbeiten
 
-                //Lösung im TeeChart einzeichnen
-                //------------------------------
-                serie = this.Hauptdiagramm1.getSeriesPoint("DDS", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 3, false);
-                serie.Add(run, ind.Penalties[0], run.ToString());
+                    System.Windows.Forms.Application.DoEvents();
+
+                    //Lösung im TeeChart einzeichnen
+                    //------------------------------
+                    serie = this.Hauptdiagramm1.getSeriesPoint("DDS", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 3, false);
+                    serie.Add(run, ind.Penalties[0], run.ToString());
+                }
+                else
+                {
+                    //Evaluierung des Testproblems
+                    //----------------------------
+                    this.Testproblem.Evaluate(ref ind, 0, ref this.Hauptdiagramm1);
+                }
 
                 System.Windows.Forms.Application.DoEvents();
 
