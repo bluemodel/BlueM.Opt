@@ -1095,7 +1095,7 @@ Public Class Problem
             Exit Function
         End If
 
-        Throw New Exception("Fehler bei der angabe des Testmodus")
+        Throw New Exception("Fehler bei der Angabe des Testmodus")
 
     End Function
 
