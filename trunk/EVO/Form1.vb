@@ -314,10 +314,10 @@ Partial Class Form1
                     'Testprobleme instanzieren
                     Testprobleme1 = New EVO.Apps.Testprobleme()
 
-                    'HACK: bei Testproblemen als Methodenauswahl nur PES zulassen!
+                    'HACK: bei Testproblemen als Methodenauswahl nur PES und DDS zulassen!
                     Me.IsInitializing = True
                     Call Me.ComboBox_Methode.Items.Clear()
-                    Call Me.ComboBox_Methode.Items.AddRange(New String() {"", METH_PES})
+                    Call Me.ComboBox_Methode.Items.AddRange(New String() {"", METH_PES, METH_DDS})
                     Me.IsInitializing = False
 
 
@@ -859,10 +859,23 @@ Partial Class Form1
                     End Select
 
                 Case ANW_TESTPROBLEME
-                    'Testprobleme mit PES:
-                    Dim controller As New EVO.ES.Controller(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Monitor1, Me.Hauptdiagramm1)
-                    Call controller.InitApp(Me.Testprobleme1)
-                    Call controller.Start()
+
+                    Select Case Me.mProblem.Method
+                        Case METH_PES
+                            'ES-Controller initialisieren und starten
+                            Dim controller As New EVO.ES.Controller(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Monitor1, Me.Hauptdiagramm1)
+                            Call controller.InitApp(Me.Testprobleme1)
+                            Call controller.Start()
+
+                        Case METH_DDS
+                            'DDS-Controller initialisieren und starten
+                            Dim controller As New modelEAU.DDS.Controller(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Monitor1, Me.Hauptdiagramm1)
+                            Call controller.InitApp(Me.Testprobleme1)
+                            Call controller.Start()
+
+                        Case Else
+                            Throw New Exception("Testprobleme können mit der Methode " & Me.mProblem.Method & " nicht ausgeführt werden!")
+                    End Select
 
                 Case ANW_TSP
                     Call STARTEN_TSP()
@@ -1402,7 +1415,7 @@ Partial Class Form1
             Case ANW_TESTPROBLEME 'Testprobleme
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-                Call Testprobleme1.DiagInitialise(Me.EVO_Einstellungen1.Settings, Me.Hauptdiagramm1)
+                Call Testprobleme1.DiagInitialise(Me.Hauptdiagramm1)
 
             Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX

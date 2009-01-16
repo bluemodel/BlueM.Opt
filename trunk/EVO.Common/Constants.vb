@@ -17,6 +17,12 @@ Public Module Constants
     'Verschiedenes
     Public Const eol As String = Chr(13) & Chr(10)             'Zeilenumbruch
 
+    'ApplicationTypes
+    Public Enum ApplicationTypes As Integer
+        Sim = 1
+        Testprobleme = 2
+    End Enum
+
     'Optimierungsmethoden
     Public Const METH_PES As String = "PES"
     Public Const METH_CES As String = "CES"

@@ -57,8 +57,8 @@ Public Class Testprobleme
         End Get
     End Property
 
-    'gewähltes Testproblem holen/setzen
-    '**********************************
+    'gewähltes Testproblem holen
+    '***************************
     Public ReadOnly Property selectedTestproblem() As String
         Get
             Return mSelectedTestproblem
@@ -269,7 +269,7 @@ Public Class Testprobleme
 
     'Diagramm initialisieren
     '***********************
-    Public Sub DiagInitialise(ByRef rSettings As Common.EVO_Settings, ByRef Diag As EVO.Diagramm.Hauptdiagramm)
+    Public Sub DiagInitialise(ByRef Diag As EVO.Diagramm.Hauptdiagramm)
 
         Select Case Me.selectedTestproblem
 
@@ -277,10 +277,10 @@ Public Class Testprobleme
                 Call Me.DiagInitialise_SinusFunktion(Diag)
 
             Case TP_BealeProblem 'x1 = [-5;5], x2=[-2;2]
-                Call Me.DiagInitialise_BealeProblem(rSettings, Diag)
+                Call Me.DiagInitialise_BealeProblem(Diag)
 
             Case TP_Schwefel24Problem 'xi = [-10,10]
-                Call Me.DiagInitialise_SchwefelProblem(rSettings, Diag)
+                Call Me.DiagInitialise_SchwefelProblem(Diag)
 
             Case TP_Box
                 Call Me.DiagInitialise_3D_Box(Diag)
@@ -350,22 +350,12 @@ Public Class Testprobleme
 
     'Diagramm für Beale-Problem initialisieren
     '*****************************************
-    Private Sub DiagInitialise_BealeProblem(ByRef rSettings As Common.EVO_Settings, ByRef Diag As EVO.Diagramm.Hauptdiagramm)
+    Private Sub DiagInitialise_BealeProblem(ByRef Diag As EVO.Diagramm.Hauptdiagramm)
 
-        Dim array_x() As Double = {}
-        Dim array_y() As Double = {}
         Dim Ausgangswert As Double
-        Dim Anzahl_Kalkulationen As Integer
-        Dim i As Integer
-        Dim serie As Steema.TeeChart.Styles.Series
+        Dim colorline1 As Steema.TeeChart.Tools.ColorLine
         Dim achsen As Collection
         Dim achse As EVO.Diagramm.Diagramm.Achse
-
-        If (rSettings.PES.Pop.is_POPUL) Then
-            Anzahl_Kalkulationen = rSettings.PES.n_Gen * rSettings.PES.n_Nachf * rSettings.PES.Pop.n_Runden + 1
-        Else
-            Anzahl_Kalkulationen = rSettings.PES.n_Gen * rSettings.PES.n_Nachf + 1
-        End If
 
         'Ausgangswert berechnen
         Ausgangswert = (1.5 - 0.5 * (1 - 0.5)) ^ 2 + (2.25 - 0.5 * (1 - 0.5) ^ 2) ^ 2 + (2.625 - 0.5 * (1 - 0.5) ^ 3) ^ 2
@@ -376,9 +366,8 @@ Public Class Testprobleme
 
         'X-Achse
         achse.Title = "Berechnungsschritt"
-        achse.Automatic = False
+        achse.Automatic = True
         achse.Minimum = 0
-        achse.Maximum = Anzahl_Kalkulationen
         Call achsen.Add(achse)
 
         'Y-Achse
@@ -390,39 +379,25 @@ Public Class Testprobleme
 
         Call Diag.DiagInitialise("Beale Problem", achsen, Me.mProblem)
 
-        'Linie für den Ausgangswert berechnen
-        ReDim array_y(Anzahl_Kalkulationen - 1)
-        ReDim array_x(Anzahl_Kalkulationen - 1)
-        For i = 0 To Anzahl_Kalkulationen - 1
-            array_y(i) = Ausgangswert
-            array_x(i) = i + 1
-        Next i
-
-        'Den Ausgangswert zeichnen
-        serie = Diag.getSeriesLine("Ausgangswert", "Green")
-        serie.Add(array_x, array_y)
+        'Linie für den Ausgangswert anzeigen
+        colorline1 = New Steema.TeeChart.Tools.ColorLine(Diag.Chart)
+        colorline1.AllowDrag = False
+        colorline1.Axis = Diag.Axes.Left
+        colorline1.Value = Ausgangswert
+        colorline1.Pen.Color = Drawing.Color.Green
 
     End Sub
 
     'Diagramm für Schwefel-Problem initialisieren
     '********************************************
-    Private Sub DiagInitialise_SchwefelProblem(ByRef rSettings As Common.EVO_Settings, ByRef Diag As EVO.Diagramm.Hauptdiagramm)
+    Private Sub DiagInitialise_SchwefelProblem(ByRef Diag As EVO.Diagramm.Hauptdiagramm)
 
-        Dim array_x() As Double = {}
-        Dim array_y() As Double = {}
         Dim Ausgangswert As Double
-        Dim Anzahl_Kalkulationen As Integer
         Dim i As Integer
         Dim X() As Double
-        Dim serie As Steema.TeeChart.Styles.Series
+        Dim colorline1 As Steema.TeeChart.Tools.ColorLine
         Dim achsen As Collection
         Dim achse As EVO.Diagramm.Diagramm.Achse
-
-        If (rSettings.PES.Pop.is_POPUL) Then
-            Anzahl_Kalkulationen = rSettings.PES.n_Gen * rSettings.PES.n_Nachf * rSettings.PES.Pop.n_Runden + 1
-        Else
-            Anzahl_Kalkulationen = rSettings.PES.n_Gen * rSettings.PES.n_Nachf + 1
-        End If
 
         'Ausgangswert berechnen
         ReDim X(Me.mAnzParameter)
@@ -440,9 +415,8 @@ Public Class Testprobleme
 
         'X-Achse
         achse.Title = "Berechnungsschritt"
-        achse.Automatic = False
+        achse.Automatic = True
         achse.Minimum = 0
-        achse.Maximum = Anzahl_Kalkulationen
         Call achsen.Add(achse)
 
         'Y-Achse
@@ -454,17 +428,12 @@ Public Class Testprobleme
 
         Call Diag.DiagInitialise("Schwefel 2.4 Problem", achsen, Me.mProblem)
 
-        'Linie für den Ausgangswert berechnen
-        ReDim array_y(Anzahl_Kalkulationen - 1)
-        ReDim array_x(Anzahl_Kalkulationen - 1)
-        For i = 0 To Anzahl_Kalkulationen - 1
-            array_y(i) = Ausgangswert
-            array_x(i) = i + 1
-        Next i
-
-        'Ausgangswert zeichnen
-        serie = Diag.getSeriesLine("Ausgangswert", "Red")
-        serie.Add(array_x, array_y)
+        'Linie für den Ausgangswert anzeigen
+        colorline1 = New Steema.TeeChart.Tools.ColorLine(Diag.Chart)
+        colorline1.AllowDrag = False
+        colorline1.Axis = Diag.Axes.Left
+        colorline1.Value = Ausgangswert
+        colorline1.Pen.Color = Drawing.Color.Red
 
     End Sub
 
@@ -905,9 +874,14 @@ Public Class Testprobleme
 
 #Region "Evaluierung"
 
-    'Evaluierung und Zeichnen der Testprobleme
-    '*****************************************
-    Public Sub Evaluierung_TestProbleme(ByRef ind As Common.Individuum, ByVal ipop As Short, ByRef Diag As EVO.Diagramm.Hauptdiagramm)
+    ''' <summary>
+    ''' Evaluiert (und zeichnet!) das Testproblem
+    ''' </summary>
+    ''' <param name="ind">das zu evaluierende Individuum</param>
+    ''' <param name="ipop">Populationsnummer (0-basiert)</param>
+    ''' <param name="Diag">Referenz auf das Hauptdiagramm</param>
+    ''' <remarks></remarks>
+    Public Sub Evaluate(ByRef ind As Common.Individuum, ByVal ipop As Short, ByRef Diag As EVO.Diagramm.Hauptdiagramm)
 
         Dim i As Integer
         Dim Unterteilung_X As Double
