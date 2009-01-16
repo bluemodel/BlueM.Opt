@@ -78,6 +78,7 @@
 
         Dest.feedbackdata = Me.feedbackdata
         Dest.toSimulate = False
+        Dest.generator_id = Me.generator_id
 
         Return Dest
     End Function

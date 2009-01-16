@@ -59,6 +59,8 @@ namespace IHWB.EVO.MO_Indicators
                     solutionvolume[0] += (penalties_input[i]+1) * (penalties_input[i]+1);
                 }
             }
+            solutionvolume[0] = solutionvolume[0] / generation.Length;
+
             return solutionvolume;
         }
 

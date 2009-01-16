@@ -14,6 +14,7 @@ namespace IHWB.EVO.MetaEvo
         EVO.Common.Individuum_MetaEvo[] wastepool;
         EVO.Diagramm.ApplicationLog applog;
         public Algos algos;
+        bool firstrun = true;
         EVO.Diagramm.Hauptdiagramm hauptdiagramm;
         public EVO.MO_Indicators.Solutionvolume solutionvolume;
 
@@ -24,7 +25,14 @@ namespace IHWB.EVO.MetaEvo
             applog = applog_input;
             //Algoobjekt initialisieren (enthält die algorithmus-Methoden und das Feedback zu jedem Algo)
             algos = new Algos(ref settings_input, individuumnumber_input, ref applog);
-            algos.set_algos("Zufällige Einfache Mutation, Ungleichverteilte Mutation, Zufällige Rekombination, Intermediäre Rekombination, Diversität aus Sortierung, Totaler Zufall, Dominanzvektor");
+            if ((settings.MetaEvo.OpMode == "Both") || (settings.MetaEvo.OpMode == "Global Optimizer"))
+            {
+                algos.set_algos("Zufällige Einfache Mutation, Ungleichverteilte Mutation, Zufällige Rekombination, Intermediäre Rekombination, Diversität aus Sortierung, Totaler Zufall, Dominanzvektor");
+            }
+            else if (settings.MetaEvo.OpMode == "Local Optimizer")
+            {
+                algos.set_algos("Hook and Jeeves");
+            }
 
             solutionvolume = new EVO.MO_Indicators.Solutionvolume(5, 0.05, ref applog);
         }
@@ -122,6 +130,17 @@ namespace IHWB.EVO.MetaEvo
         //Erzeugt mit Hilfe von Algos die neuen Individuen
         public void new_individuals_build(ref EVO.Common.Individuum_MetaEvo[] new_generation_input)
         {
+            //Für Initialisierung mit lokaler Optimierung muss die neue generation erst erzeugt werden
+            if (firstrun)
+            {
+                for (int i = 0; i < genpool.Length; i++)
+                {
+                    new_generation_input[i * 3] = genpool[i].Clone_MetaEvo();
+                    new_generation_input[i * 3 + 1] = genpool[i].Clone_MetaEvo();
+                    new_generation_input[i * 3 + 2] = genpool[i].Clone_MetaEvo();
+                }
+                firstrun = false;
+            }
             //Generierung neuer Individuen (wieder in new_generation_input)
             algos.newGeneration(ref genpool, ref new_generation_input, ref wastepool);
         }
@@ -493,12 +512,15 @@ namespace IHWB.EVO.MetaEvo
         {
             double initiativensumme = 0;
             double survivingrate = 0;
-            string log = "";
+            double initproind = 0;
+            int currentalgo = 0;
+            string[] log = new string[algos.algofeedbackarray.Length + 1];
+            log[algos.algofeedbackarray.Length] = "";
 
             //1. Reset der Daten der letzten Generation
             for (int i = 0; i < algos.algofeedbackarray.Length; i++)
             {
-                algos.algofeedbackarray[i].number_individuals_survived = 0;
+                algos.algofeedbackarray[i].number_individuals_survived = 0;    
             }
 
             //2. Neue Überlebens-Zahlen aus der simulierten Generation auslesen
@@ -507,35 +529,61 @@ namespace IHWB.EVO.MetaEvo
                 if (new_generation_input[i].get_status() == "true")
                 {
                     algos.algofeedbackarray[new_generation_input[i].get_generator()].number_individuals_survived++;
-                    survivingrate++;
+                    //survivingrate++;
                 }
             }
 
-            survivingrate = 0;
+            //survivingrate = 0;
 
-            //3. Initiative berechnen 
+            //3. Initiative für im Einsatz befindliche Algorithmen neu berechnen 
             for (int i = 0; i < algos.algofeedbackarray.Length; i++)
             {
-                //Falls der Algo keine Individuen in der letzten Generation erzeugt hat, Initiative leicht erhöhen
-                if (algos.algofeedbackarray[i].number_individuals_for_nextGen == 0) algos.algofeedbackarray[i].initiative += 0.5;
-                //Ansonsten Initiative anpassen
-                else
+                if (algos.algofeedbackarray[i].number_individuals_for_nextGen != 0)
                 {
                     survivingrate = (double)algos.algofeedbackarray[i].number_individuals_survived / (double)algos.algofeedbackarray[i].number_individuals_for_nextGen;
-                    algos.algofeedbackarray[i].initiative = Math.Round(algos.algofeedbackarray[i].initiative*(survivingrate * survivingrate + 0.5 * survivingrate + 0.5),3);
+                    algos.algofeedbackarray[i].initiative = Math.Round(algos.algofeedbackarray[i].initiative * (survivingrate * survivingrate + 0.5 * survivingrate + 0.5), 3);
+                    
                 }
-                initiativensumme += algos.algofeedbackarray[i].initiative;
             }
-             applog.appendText("Algo Manager: nemGen_composition: Initiativ-sum: " + initiativensumme);
 
-            //4. number_individuals_for_nextGen neu setzen
+            //4. Initiative für pausierte Algorithmen leicht erhöhen (um ein halbes Individuum)
             for (int i = 0; i < algos.algofeedbackarray.Length; i++)
             {
-                log = log + "[" + algos.algofeedbackarray[i].name + "]: Survived: " + algos.algofeedbackarray[i].number_individuals_survived + "/" + algos.algofeedbackarray[i].number_individuals_for_nextGen + " Initiative: " + algos.algofeedbackarray[i].initiative + " -> ";
-                algos.algofeedbackarray[i].number_individuals_for_nextGen = (int)Math.Round(((double)algos.algofeedbackarray[i].initiative / (double)initiativensumme) * (double)new_generation_input.Length);
-                log = log + algos.algofeedbackarray[i].number_individuals_for_nextGen + " Individuums for next generation\r\n";
+                if (algos.algofeedbackarray[i].number_individuals_for_nextGen == 0)
+                {
+                    algos.algofeedbackarray[i].initiative += initiativensumme/(2*new_generation_input.Length);
+                }
+                log[i] = "[" + algos.algofeedbackarray[i].name + "]: Survived: " + algos.algofeedbackarray[i].number_individuals_survived + "/" + algos.algofeedbackarray[i].number_individuals_for_nextGen + " -> ";
+                initiativensumme += algos.algofeedbackarray[i].initiative;
+                
+                //Produktionszahlen für nächste generation resetten
+                algos.algofeedbackarray[i].number_individuals_for_nextGen = 0;
             }
-             applog.appendText("Algo Manager: nemGen_composition: Individuuum-Composition for next Generation:\r\n" + log);
+
+            applog.appendText("Algo Manager: nemGen_composition: Initiativ-sum: " + initiativensumme);
+
+            //5. number_individuals_for_nextGen neu setzen
+            initproind = initiativensumme / new_generation_input.Length;
+            for (int j = 0; j < new_generation_input.Length; j++)
+            {
+                currentalgo = 0;
+                for (int i = 1; i < algos.algofeedbackarray.Length; i++)
+                {
+                    //Der Algorithmus simuliert das Individuum wenn er die höchste Restinitiative besitzt
+                    if (algos.algofeedbackarray[i].initiative - ((algos.algofeedbackarray[i].number_individuals_for_nextGen) * initproind) > algos.algofeedbackarray[currentalgo].initiative - ((algos.algofeedbackarray[currentalgo].number_individuals_for_nextGen) * initproind))
+                    {
+                        currentalgo = i;
+                    }
+                }
+                algos.algofeedbackarray[currentalgo].number_individuals_for_nextGen++;
+            }
+
+            //6. Ausgabe zusammenfügen
+            for (int i = 0; i < algos.algofeedbackarray.Length; i++)
+            {   
+                log[algos.algofeedbackarray.Length] = log[algos.algofeedbackarray.Length] + log[i] + " Initiative: " + algos.algofeedbackarray[i].initiative + " = " + algos.algofeedbackarray[i].number_individuals_for_nextGen + " Individuums for next generation\r\n";    
+            }
+            applog.appendText("Algo Manager: nemGen_composition: Individuuum-Composition for next Generation:\r\n" + log[algos.algofeedbackarray.Length]);
         }
 
         //Kopiere true-Individuen auf neuen Genpool

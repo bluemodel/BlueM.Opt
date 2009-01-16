@@ -65,10 +65,16 @@ namespace IHWB.EVO.MetaEvo
             switch (this.role)
             {
                 case "Single PC":
-                     applog.appendText("Controller: MetaEvo started in 'Single PC'-Mode");
+                    applog.appendText("Controller: MetaEvo started in 'Single PC'-Mode");
                     //### Vorbereitung ###
                     //Initialisieren des Individuum-Arrays
+                    if (settings.MetaEvo.OpMode == "Local Optimizer")
+                    {
+                        settings.MetaEvo.PopulationSize = settings.MetaEvo.NumberResults;
+                    }
+
                     generation = new EVO.Common.Individuum_MetaEvo[this.settings.MetaEvo.PopulationSize];
+                    
                     for (int j = 0; j < this.settings.MetaEvo.PopulationSize; j++)
                     {
                         generation[j] = new EVO.Common.Individuum_MetaEvo("MetaEvo", individuumnumber, prob_input.List_OptParameter.Length);
@@ -144,6 +150,7 @@ namespace IHWB.EVO.MetaEvo
                 }
                 generation_input[k].set_optparas(random);
                 generation_input[k].set_status("raw");
+                generation_input[k].set_generator(-1);
             }
             return true;
         }
@@ -172,12 +179,14 @@ namespace IHWB.EVO.MetaEvo
                     applog.appendText("Controller: Genpool: Simulating Individuums...");
                     for (int i = 0; i < generation.Length; i++)
                     {
-                        //Simulieren 
                         if (this.settings.MetaEvo.Application == "testprobleme")
                         {
                             testprobleme.Evaluierung_TestProbleme_MetaEvo(ref generation[i],0,ref hauptdiagramm1);
                         }
-                        if (this.settings.MetaEvo.Application == "sim") sim.Evaluate_MetaEvo(ref generation[i]);
+                        else if (this.settings.MetaEvo.Application == "sim")
+                        {
+                            sim.Evaluate_MetaEvo(ref generation[i]);
+                        }
                         applog.appendText("Controller: Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length),2) * 100 + "%)");
                     }
 
@@ -357,8 +366,12 @@ namespace IHWB.EVO.MetaEvo
                         else
                         {
                             networkmanager.DB_set_info("Generation", generationcounter + "/" + settings.MetaEvo.NumberGenerations);
-                            
-                            progress1.NextGen();
+
+                            try
+                            {
+                                progress1.NextGen();
+                            }
+                            catch { }
                             generationcounter++;
                         }
                         meServer.set_AlsoInDB("select Individuums", -1, -1);
@@ -386,6 +399,7 @@ namespace IHWB.EVO.MetaEvo
             meServer.set_AlsoInDB("finished", -1, -1);
             applog.appendText("Controller: Calculation Finished");
             MessageBox.Show("Berechnung beendet", "MetaEvo");
+            applog.savelog();
         }
 
         // Network Client
