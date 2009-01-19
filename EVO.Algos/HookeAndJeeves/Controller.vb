@@ -115,12 +115,10 @@ Public Class Controller
                 ind.OptParameter(i).Xn = aktuellePara(i)
             Next
 
-            'Vorbereiten des Modelldatensatzes
-            Call Sim1.PREPARE_Evaluation_PES(ind.OptParameter)
+            'Evaluierung
+            SIM_Eval_is_OK = Me.Sim1.Evaluate(ind)
 
-            'Evaluierung des Simulationsmodells (ToDo: Validätsprüfung fehlt)
-            SIM_Eval_is_OK = Sim1.launchSim()
-            If SIM_Eval_is_OK Then Call Sim1.SIM_Ergebnis_auswerten(ind)
+            'TODO: Evaluierungsfehler behandeln
 
             'Lösung im TeeChart einzeichnen
             '------------------------------
@@ -142,8 +140,8 @@ Public Class Controller
                 Tastschritte_aktuell += 1
                 durchlauf += 1
 
-                'TODO: Monitor
-                'Me.EVO_Einstellungen1.Label_HJ_TSaktuelle.Text = Tastschritte_aktuell.ToString
+                'Monitor
+                Call Me.myMonitor.AppendText("Tastschritte aktuell: " & Tastschritte_aktuell.ToString())
 
                 'Individuum instanzieren
                 ind = New Common.Individuum_PES("HJ", durchlauf)
@@ -153,12 +151,10 @@ Public Class Controller
                     ind.OptParameter(i).Xn = aktuellePara(i)
                 Next
 
-                'Vorbereiten des Modelldatensatzes
-                Call Sim1.PREPARE_Evaluation_PES(ind.OptParameter)
+                'Evaluierung
+                SIM_Eval_is_OK = Me.Sim1.Evaluate(ind)
 
-                'Evaluierung des Simulationsmodells
-                SIM_Eval_is_OK = Sim1.launchSim()
-                If SIM_Eval_is_OK Then Call Sim1.SIM_Ergebnis_auswerten(ind)
+                'TODO: Evaluierungsfehler behandeln
 
                 'Lösung im TeeChart einzeichnen
                 '------------------------------
@@ -174,8 +170,8 @@ Public Class Controller
                     Tastschritte_aktuell += 1
                     durchlauf += 1
 
-                    'TODO: Monitor
-                    'Me.EVO_Einstellungen1.Label_HJ_TSaktuelle.Text = Tastschritte_aktuell.ToString
+                    'Monitor
+                    Call Me.myMonitor.AppendText("Tastschritte aktuell: " & Tastschritte_aktuell.ToString())
 
                     'Individuum instanzieren
                     ind = New Common.Individuum_PES("HJ", durchlauf)
@@ -185,12 +181,10 @@ Public Class Controller
                         ind.OptParameter(i).Xn = aktuellePara(i)
                     Next
 
-                    'Vorbereiten des Modelldatensatzes
-                    Call Sim1.PREPARE_Evaluation_PES(ind.OptParameter)
+                    'Evaluierung
+                    SIM_Eval_is_OK = Me.Sim1.Evaluate(ind)
 
-                    'Evaluierung des Simulationsmodells
-                    SIM_Eval_is_OK = Sim1.launchSim()
-                    If SIM_Eval_is_OK Then Call Sim1.SIM_Ergebnis_auswerten(ind)
+                    'TODO: Evaluierungsfehler behandeln
 
                     'Lösung im TeeChart einzeichnen
                     '------------------------------
@@ -212,12 +206,10 @@ Public Class Controller
             Tastschritte_gesamt += Tastschritte_aktuell
             Tastschritte_aktuell = 0
 
-            'TODO: Monitor
-            'Me.EVO_Einstellungen1.Label_HJ_TSgesamt.Text = Tastschritte_gesamt.ToString
-            'Me.EVO_Einstellungen1.Label_HJ_TSaktuelle.Text = Tastschritte_aktuell.ToString
-            'Me.EVO_Einstellungen1.Label_HJ_TSmittel.Text = Math.Round((Tastschritte_gesamt / Iterationen), 2).ToString
-
-            Call System.Windows.Forms.Application.DoEvents()
+            'Monitor
+            Call Me.myMonitor.AppendText("Tastschritte gesamt: " & Tastschritte_gesamt.ToString())
+            Call Me.myMonitor.AppendText("Tastschritte aktuell: " & Tastschritte_aktuell.ToString())
+            Call Me.myMonitor.AppendText("Tastschritte mittel: " & Math.Round((Tastschritte_gesamt / Iterationen), 2).ToString())
 
             'Extrapolationsschritt
             If (QNBest(0) < QBest(0)) Then
@@ -233,9 +225,8 @@ Public Class Controller
                 Call HookJeeves.Extrapolationsschritt()
                 Extrapolationsschritte += 1
 
-                'TODO: Monitor
-                'Me.EVO_Einstellungen1.Label_HJ_ES.Text = Extrapolationsschritte.ToString
-                'Call System.Windows.Forms.Application.DoEvents()
+                'Monitor
+                Call Me.myMonitor.AppendText("Extrapolationsschritte: " & Extrapolationsschritte.ToString())
 
                 k += 1
                 aktuellePara = HookJeeves.getLetzteParameter
@@ -244,9 +235,8 @@ Public Class Controller
                         HookJeeves.Rueckschritt()
                         Rueckschritte += 1
 
-                        'TODO: Monitor
-                        'Me.EVO_Einstellungen1.Label_HJ_RS.Text = Rueckschritte.ToString()
-                        'Call System.Windows.Forms.Application.DoEvents()
+                        'Monitor
+                        Call Me.myMonitor.AppendText("Rückschritte: " & Rueckschritte.ToString())
 
                         k += -1
                         HookJeeves.Schrittweitenhalbierung()
@@ -265,9 +255,8 @@ Public Class Controller
                 If k > 0 Then
                     HookJeeves.Rueckschritt()
 
-                    'TODO: Monitor
-                    'Me.EVO_Einstellungen1.Label_HJ_RS.Text = Rueckschritte.ToString()
-                    'Call System.Windows.Forms.Application.DoEvents()
+                    'Monitor
+                    Call Me.myMonitor.AppendText("Rückschritte: " & Rueckschritte.ToString())
 
                     HookJeeves.Schrittweitenhalbierung()
                     aktuellePara = HookJeeves.getLetzteParameter()

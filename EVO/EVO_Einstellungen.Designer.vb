@@ -49,11 +49,6 @@ Partial Class EVO_Einstellungen
         Dim LabelPopStrategie As System.Windows.Forms.Label
         Dim LabelPopPenalty As System.Windows.Forms.Label
         Dim Label_Line As System.Windows.Forms.Label
-        Dim Label9 As System.Windows.Forms.Label
-        Dim Label8 As System.Windows.Forms.Label
-        Dim Label7 As System.Windows.Forms.Label
-        Dim Label6 As System.Windows.Forms.Label
-        Dim Label4 As System.Windows.Forms.Label
         Dim Label3 As System.Windows.Forms.Label
         Dim Label1 As System.Windows.Forms.Label
         Me.TabControl1 = New System.Windows.Forms.TabControl
@@ -115,11 +110,6 @@ Partial Class EVO_Einstellungen
         Me.Combo_CES_IniValues = New System.Windows.Forms.ComboBox
         Me.Label_CES_OptModus = New System.Windows.Forms.Label
         Me.TabPage_HookeJeeves = New System.Windows.Forms.TabPage
-        Me.Label_HJ_RS = New System.Windows.Forms.Label
-        Me.Label_HJ_ES = New System.Windows.Forms.Label
-        Me.Label_HJ_TSgesamt = New System.Windows.Forms.Label
-        Me.Label_HJ_TSmittel = New System.Windows.Forms.Label
-        Me.Label_HJ_TSaktuelle = New System.Windows.Forms.Label
         Me.Numeric_HJ_DeltaFinish = New System.Windows.Forms.NumericUpDown
         Me.Numeric_HJ_DeltaStart = New System.Windows.Forms.NumericUpDown
         Me.CheckBox_HJ_DNVektor = New System.Windows.Forms.CheckBox
@@ -163,11 +153,6 @@ Partial Class EVO_Einstellungen
         LabelPopStrategie = New System.Windows.Forms.Label
         LabelPopPenalty = New System.Windows.Forms.Label
         Label_Line = New System.Windows.Forms.Label
-        Label9 = New System.Windows.Forms.Label
-        Label8 = New System.Windows.Forms.Label
-        Label7 = New System.Windows.Forms.Label
-        Label6 = New System.Windows.Forms.Label
-        Label4 = New System.Windows.Forms.Label
         Label3 = New System.Windows.Forms.Label
         Label1 = New System.Windows.Forms.Label
         Me.TabControl1.SuspendLayout()
@@ -471,56 +456,6 @@ Partial Class EVO_Einstellungen
         Label_Line.Name = "Label_Line"
         Label_Line.Size = New System.Drawing.Size(165, 1)
         Label_Line.TabIndex = 50
-        '
-        'Label9
-        '
-        Label9.AutoSize = True
-        Label9.ForeColor = System.Drawing.Color.Blue
-        Label9.Location = New System.Drawing.Point(6, 223)
-        Label9.Name = "Label9"
-        Label9.Size = New System.Drawing.Size(67, 13)
-        Label9.TabIndex = 38
-        Label9.Text = "Rückschritte"
-        '
-        'Label8
-        '
-        Label8.AutoSize = True
-        Label8.ForeColor = System.Drawing.Color.Blue
-        Label8.Location = New System.Drawing.Point(6, 199)
-        Label8.Name = "Label8"
-        Label8.Size = New System.Drawing.Size(107, 13)
-        Label8.TabIndex = 37
-        Label8.Text = "Extrapolationsschritte"
-        '
-        'Label7
-        '
-        Label7.AutoSize = True
-        Label7.ForeColor = System.Drawing.Color.Blue
-        Label7.Location = New System.Drawing.Point(6, 175)
-        Label7.Name = "Label7"
-        Label7.Size = New System.Drawing.Size(99, 13)
-        Label7.TabIndex = 36
-        Label7.Text = "Tastschritte gesamt"
-        '
-        'Label6
-        '
-        Label6.AutoSize = True
-        Label6.ForeColor = System.Drawing.Color.Blue
-        Label6.Location = New System.Drawing.Point(6, 151)
-        Label6.Name = "Label6"
-        Label6.Size = New System.Drawing.Size(89, 13)
-        Label6.TabIndex = 35
-        Label6.Text = "Tastschritte mittel"
-        '
-        'Label4
-        '
-        Label4.AutoSize = True
-        Label4.ForeColor = System.Drawing.Color.Blue
-        Label4.Location = New System.Drawing.Point(6, 127)
-        Label4.Name = "Label4"
-        Label4.Size = New System.Drawing.Size(96, 13)
-        Label4.TabIndex = 33
-        Label4.Text = "Tastschritte aktuell"
         '
         'Label3
         '
@@ -917,7 +852,7 @@ Partial Class EVO_Einstellungen
         Me.TabPage_CES.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_CES.Margin = New System.Windows.Forms.Padding(0)
         Me.TabPage_CES.Name = "TabPage_CES"
-        Me.TabPage_CES.Size = New System.Drawing.Size(221, 643)
+        Me.TabPage_CES.Size = New System.Drawing.Size(221, 668)
         Me.TabPage_CES.TabIndex = 1
         Me.TabPage_CES.Text = "CES"
         '
@@ -1206,16 +1141,6 @@ Partial Class EVO_Einstellungen
         'TabPage_HookeJeeves
         '
         Me.TabPage_HookeJeeves.BackColor = System.Drawing.SystemColors.Control
-        Me.TabPage_HookeJeeves.Controls.Add(Me.Label_HJ_RS)
-        Me.TabPage_HookeJeeves.Controls.Add(Me.Label_HJ_ES)
-        Me.TabPage_HookeJeeves.Controls.Add(Me.Label_HJ_TSgesamt)
-        Me.TabPage_HookeJeeves.Controls.Add(Me.Label_HJ_TSmittel)
-        Me.TabPage_HookeJeeves.Controls.Add(Label9)
-        Me.TabPage_HookeJeeves.Controls.Add(Label8)
-        Me.TabPage_HookeJeeves.Controls.Add(Label7)
-        Me.TabPage_HookeJeeves.Controls.Add(Label6)
-        Me.TabPage_HookeJeeves.Controls.Add(Me.Label_HJ_TSaktuelle)
-        Me.TabPage_HookeJeeves.Controls.Add(Label4)
         Me.TabPage_HookeJeeves.Controls.Add(Label3)
         Me.TabPage_HookeJeeves.Controls.Add(Me.Numeric_HJ_DeltaFinish)
         Me.TabPage_HookeJeeves.Controls.Add(Label1)
@@ -1225,64 +1150,9 @@ Partial Class EVO_Einstellungen
         Me.TabPage_HookeJeeves.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_HookeJeeves.Name = "TabPage_HookeJeeves"
         Me.TabPage_HookeJeeves.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage_HookeJeeves.Size = New System.Drawing.Size(221, 643)
+        Me.TabPage_HookeJeeves.Size = New System.Drawing.Size(221, 668)
         Me.TabPage_HookeJeeves.TabIndex = 2
         Me.TabPage_HookeJeeves.Text = "Hooke&Jeeves"
-        '
-        'Label_HJ_RS
-        '
-        Me.Label_HJ_RS.AutoSize = True
-        Me.Label_HJ_RS.ForeColor = System.Drawing.Color.Blue
-        Me.Label_HJ_RS.Location = New System.Drawing.Point(139, 223)
-        Me.Label_HJ_RS.Name = "Label_HJ_RS"
-        Me.Label_HJ_RS.Size = New System.Drawing.Size(13, 13)
-        Me.Label_HJ_RS.TabIndex = 42
-        Me.Label_HJ_RS.Text = "0"
-        Me.Label_HJ_RS.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-        '
-        'Label_HJ_ES
-        '
-        Me.Label_HJ_ES.AutoSize = True
-        Me.Label_HJ_ES.ForeColor = System.Drawing.Color.Blue
-        Me.Label_HJ_ES.Location = New System.Drawing.Point(139, 199)
-        Me.Label_HJ_ES.Name = "Label_HJ_ES"
-        Me.Label_HJ_ES.Size = New System.Drawing.Size(13, 13)
-        Me.Label_HJ_ES.TabIndex = 41
-        Me.Label_HJ_ES.Text = "0"
-        Me.Label_HJ_ES.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-        '
-        'Label_HJ_TSgesamt
-        '
-        Me.Label_HJ_TSgesamt.AutoSize = True
-        Me.Label_HJ_TSgesamt.ForeColor = System.Drawing.Color.Blue
-        Me.Label_HJ_TSgesamt.Location = New System.Drawing.Point(139, 175)
-        Me.Label_HJ_TSgesamt.Name = "Label_HJ_TSgesamt"
-        Me.Label_HJ_TSgesamt.Size = New System.Drawing.Size(13, 13)
-        Me.Label_HJ_TSgesamt.TabIndex = 40
-        Me.Label_HJ_TSgesamt.Text = "0"
-        Me.Label_HJ_TSgesamt.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-        '
-        'Label_HJ_TSmittel
-        '
-        Me.Label_HJ_TSmittel.AutoSize = True
-        Me.Label_HJ_TSmittel.ForeColor = System.Drawing.Color.Blue
-        Me.Label_HJ_TSmittel.Location = New System.Drawing.Point(139, 151)
-        Me.Label_HJ_TSmittel.Name = "Label_HJ_TSmittel"
-        Me.Label_HJ_TSmittel.Size = New System.Drawing.Size(13, 13)
-        Me.Label_HJ_TSmittel.TabIndex = 39
-        Me.Label_HJ_TSmittel.Text = "0"
-        Me.Label_HJ_TSmittel.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-        '
-        'Label_HJ_TSaktuelle
-        '
-        Me.Label_HJ_TSaktuelle.AutoSize = True
-        Me.Label_HJ_TSaktuelle.ForeColor = System.Drawing.Color.Blue
-        Me.Label_HJ_TSaktuelle.Location = New System.Drawing.Point(139, 127)
-        Me.Label_HJ_TSaktuelle.Name = "Label_HJ_TSaktuelle"
-        Me.Label_HJ_TSaktuelle.Size = New System.Drawing.Size(13, 13)
-        Me.Label_HJ_TSaktuelle.TabIndex = 34
-        Me.Label_HJ_TSaktuelle.Text = "0"
-        Me.Label_HJ_TSaktuelle.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'Numeric_HJ_DeltaFinish
         '
@@ -1327,7 +1197,7 @@ Partial Class EVO_Einstellungen
         Me.TabPage_Hybrid2008.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_Hybrid2008.Name = "TabPage_Hybrid2008"
         Me.TabPage_Hybrid2008.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage_Hybrid2008.Size = New System.Drawing.Size(221, 643)
+        Me.TabPage_Hybrid2008.Size = New System.Drawing.Size(221, 668)
         Me.TabPage_Hybrid2008.TabIndex = 3
         Me.TabPage_Hybrid2008.Text = "Hybrid2008"
         '
@@ -1343,7 +1213,7 @@ Partial Class EVO_Einstellungen
         Me.TabPage_DDS.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_DDS.Name = "TabPage_DDS"
         Me.TabPage_DDS.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage_DDS.Size = New System.Drawing.Size(221, 643)
+        Me.TabPage_DDS.Size = New System.Drawing.Size(221, 668)
         Me.TabPage_DDS.TabIndex = 4
         Me.TabPage_DDS.Text = "DDS"
         Me.TabPage_DDS.UseVisualStyleBackColor = True
@@ -1509,11 +1379,6 @@ Partial Class EVO_Einstellungen
     Private WithEvents Numeric_HJ_DeltaStart As System.Windows.Forms.NumericUpDown
     Private WithEvents CheckBox_HJ_DNVektor As System.Windows.Forms.CheckBox
     Private WithEvents TabPage_PES As System.Windows.Forms.TabPage
-    Public WithEvents Label_HJ_TSaktuelle As System.Windows.Forms.Label
-    Public WithEvents Label_HJ_RS As System.Windows.Forms.Label
-    Public WithEvents Label_HJ_ES As System.Windows.Forms.Label
-    Public WithEvents Label_HJ_TSgesamt As System.Windows.Forms.Label
-    Public WithEvents Label_HJ_TSmittel As System.Windows.Forms.Label
     Friend WithEvents CheckisTournamentSelection As System.Windows.Forms.CheckBox
     Friend WithEvents ComboOptDnMutation As System.Windows.Forms.ComboBox
     Friend WithEvents Label_CES_OptModus As System.Windows.Forms.Label
