@@ -119,6 +119,10 @@
       <Project>{23224EFA-343B-4C13-AE6E-5D1D8A03007D}</Project>
       <Name>HookeAndJeeves</Name>
     </ProjectReference>
+    <ProjectReference Include="..\EVO.Algos\IController\IController.vbproj">
+      <Project>{1DBD183A-A900-4841-88FE-6258FD472C60}</Project>
+      <Name>IController</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EVO.Apps\EVO.Apps.vbproj">
       <Project>{2DCFE99E-CBFE-4CCC-93E7-A6D628B16DEC}</Project>
       <Name>EVO.Apps</Name>
