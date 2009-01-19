@@ -145,9 +145,10 @@ Partial Class Form1
 
     End Sub
 
-    'Wenn Monitor geschlossen wird, ButtonState aktualisieren
-    Private Sub MonitorClosed() Handles Monitor1.MonitorClosed
-        Me.ToolStripButton_Monitor.Checked = False
+    'Wenn Monitor geöffnet/geschlossen wird, ButtonState aktualisieren
+    '*****************************************************************
+    Private Sub MonitorOpenClose() Handles Monitor1.MonitorClosed, Monitor1.MonitorOpened
+        Me.ToolStripButton_Monitor.Checked = Me.Monitor1.Visible
     End Sub
 
     'About Dialog anzeigen
@@ -1859,9 +1860,26 @@ Partial Class Form1
                             indicator = Math.Abs(Hypervolume.calc_indicator())
                             nadir = Hypervolume.nadir
 
-                            'Hypervolumen zeichnen
-                            Call Me.Hauptdiagramm1.ZeichneNadirpunkt(nadir)
-                            Call Me.Monitor1.ZeichneHyperVolumen(sekpop.iGen, indicator)
+                            'Nadirpunkt in Hauptdiagramm eintragen
+                            If (Me.mProblem.NumPenalties = 2) Then
+                                '2D
+                                '--
+                                Dim serie2 As Steema.TeeChart.Styles.Points
+                                serie2 = Me.Hauptdiagramm1.getSeriesPoint("Nadirpunkt", "Blue", Steema.TeeChart.Styles.PointerStyles.Diamond)
+                                serie2.Clear()
+                                serie2.Add(nadir(0), nadir(1), "Nadirpunkt")
+                            Else
+                                '3D
+                                '--
+                                Dim serie3 As Steema.TeeChart.Styles.Points3D
+                                serie3 = Me.HauptDiagramm1.getSeries3DPoint("Nadirpunkt", "Blue", Steema.TeeChart.Styles.PointerStyles.Diamond)
+                                serie3.Clear()
+                                serie3.Add(nadir(0), nadir(1), nadir(2), "Nadirpunkt")
+                            End If
+
+                            'Hypervolumen in Monitordiagramm eintragen
+                            serie = Me.Monitor1.Diag.getSeriesLine("Hypervolumen", "Red")
+                            serie.Add(sekpop.iGen, indicator)
 
                             Call My.Application.DoEvents()
 
@@ -1984,7 +2002,12 @@ Partial Class Form1
                 indicatorRef = -HypervolumeRef.calc_indicator()
 
                 'Im Monitor anzeigen
-                Call Me.Monitor1.ZeichneReferenzHypervolumen(indicatorRef)
+                Dim colorline1 As New Steema.TeeChart.Tools.ColorLine(Me.Monitor1.Diag.Chart)
+                colorline1.Pen.Color = System.Drawing.Color.Red
+                colorline1.Pen.Width = 2
+                colorline1.AllowDrag = False
+                colorline1.Axis = Me.Monitor1.Diag.Axes.Right
+                colorline1.Value = indicatorRef
 
             End If
 

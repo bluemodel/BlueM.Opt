@@ -30,6 +30,10 @@ Public Class Controller
     Private ColorArray As Object(,)
     Private MI_Thread_OK As Boolean = False
 
+    'Serien für Monitor
+    Private Line_Dn As Steema.TeeChart.Styles.Line
+    Private Line_Hypervolume As Steema.TeeChart.Styles.Line
+
 #Region "Methoden"
 
     ''' <summary>
@@ -76,6 +80,12 @@ Public Class Controller
     ''' </summary>
     Public Sub Start() Implements IController.Start
 
+        'Monitor initialisieren und anzeigen
+        Call Me.InitMonitor()
+        Call Me.myMonitor.SelectTabDiagramm()
+        Call Me.myMonitor.Show()
+
+        'Je nach Methode Optimierung starten
         Select Case Me.myProblem.Method
 
             Case METH_PES
@@ -241,8 +251,8 @@ Public Class Controller
                 'Hypervolumen berechnen und zeichnen
                 '-----------------------------------
                 Call Hypervolume.update_dataset(Common.Individuum.Get_All_Penalty_of_Array(CES1.SekundärQb))
-                Call Me.myHauptDiagramm.ZeichneNadirpunkt(Hypervolume.nadir)
-                Call Me.myMonitor.ZeichneHyperVolumen(CES_i_gen, Math.Abs(Hypervolume.calc_indicator()))
+                Call Me.ZeichneNadirpunkt(Hypervolume.nadir)
+                Call Me.ZeichneHyperVolumen(CES_i_gen, Math.Abs(Hypervolume.calc_indicator()))
             End If
             ' ^ ENDE Selectionsprozess
             'xxxxxxxxxxxxxxxxxxxxxxxxx
@@ -466,7 +476,7 @@ Public Class Controller
         Call Me.myHauptDiagramm.ZeichneIndividuum(CES1.Childs(i_Child), 0, 0, Me.CES_i_gen, i_Child + 1, EVO.Diagramm.Diagramm.ColorManagement(ColorArray, CES1.Childs(i_Child)))
         'TODO: Me.Label_Dn_Wert.Text = Math.Round(CES1.Childs(i_Child).Get_mean_PES_Dn, 6).ToString
         If Not CES1.Childs(i_Child).Get_mean_PES_Dn = -1 Then
-            Me.myMonitor.Zeichne_Dn(CES1.Childs(i_Child).ID, CES1.Childs(i_Child).Get_mean_PES_Dn)
+            Me.Zeichne_Dn(CES1.Childs(i_Child).ID, CES1.Childs(i_Child).Get_mean_PES_Dn)
         End If
 
         'Verlauf aktualisieren
@@ -670,8 +680,8 @@ Public Class Controller
                         'Hypervolumen berechnen und Zeichnen
                         '-----------------------------------
                         Call Hypervolume.update_dataset(Common.Individuum.Get_All_Penalty_of_Array(PES1.SekundärQb))
-                        Call Me.myHauptDiagramm.ZeichneNadirpunkt(Hypervolume.nadir)
-                        Call Me.myMonitor.ZeichneHyperVolumen(PES1.PES_iAkt.iAktGen, Math.Abs(Hypervolume.calc_indicator()))
+                        Call Me.ZeichneNadirpunkt(Hypervolume.nadir)
+                        Call Me.ZeichneHyperVolumen(PES1.PES_iAkt.iAktGen, Math.Abs(Hypervolume.calc_indicator()))
 
                     End If
 
@@ -749,10 +759,8 @@ Public Class Controller
             Call Me.myHauptDiagramm.ZeichneIndividuum(ind, PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, iNachfahre + 1, Color.Orange)
         End If
 
-        'TODO: Me.Label_Dn_Wert.Text = Math.Round(inds(i).OptParameter(0).Dn, 6).ToString
-
         'Dn in Monitor zeichnen
-        Me.myMonitor.Zeichne_Dn((PES1.PES_iAkt.iAktGen + 1) * Me.mySettings.PES.n_Nachf + iNachfahre + 1, ind.OptParameter(0).Dn)
+        Me.Zeichne_Dn((PES1.PES_iAkt.iAktGen + 1) * Me.mySettings.PES.n_Nachf + iNachfahre + 1, ind.OptParameter(0).Dn)
 
         'SELEKTIONSPROZESS Schritt 1
         'Einordnen der Qualitätsfunktion im Bestwertspeicher bei SO
@@ -768,6 +776,108 @@ Public Class Controller
     End Sub
 
 #End Region 'PES
+
+#Region "Ausgabe"
+
+    ''' <summary>
+    ''' Bereitet das Monitordiagramm vor
+    ''' </summary>
+    Private Sub InitMonitor()
+
+        With Me.myMonitor.Diag
+
+            'Achsen
+            '------
+            'Durchlaufachse
+            .Axes.Bottom.Title.Caption = "Durchlauf"
+
+            'Schrittweitenachse
+            .Axes.Left.Title.Caption = "Schrittweite"
+
+            'Generationsachse (oben)
+            .Axes.Top.Visible = True
+            .Axes.Top.Title.Caption = "Generation"
+            .Axes.Top.Horizontal = True
+            .Axes.Top.Automatic = True
+            .Axes.Top.Grid.Visible = False
+
+            'Hypervolumenachse (rechts)
+            .Axes.Right.Visible = True
+            .Axes.Right.Title.Caption = "Hypervolumen"
+            .Axes.Right.Title.Angle = 90
+            .Axes.Right.Automatic = True
+            .Axes.Right.Grid.Visible = False
+
+        End With
+
+        'Linien/Serien
+        '-------------
+        'Dn Verlauf initialisieren
+        Me.Line_Dn = Me.myMonitor.Diag.getSeriesLine("Schrittweite", "Blue")
+        Me.Line_Dn.Pointer.Visible = True
+        Me.Line_Dn.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+        Me.Line_Dn.Pointer.Brush.Color = System.Drawing.Color.Blue
+        Me.Line_Dn.Pointer.HorizSize = 2
+        Me.Line_Dn.Pointer.VertSize = 2
+        Me.Line_Dn.Pointer.Pen.Visible = False
+
+        'Hypervolume-Linie initialisieren
+        Me.Line_Hypervolume = Me.myMonitor.Diag.getSeriesLine("Hypervolumen", "Red")
+        Me.Line_Hypervolume.CustomHorizAxis = Me.myMonitor.Diag.Axes.Top
+        Me.Line_Hypervolume.CustomVertAxis = Me.myMonitor.Diag.Axes.Right
+        Me.Line_Hypervolume.Color = System.Drawing.Color.Red
+        Me.Line_Hypervolume.Pointer.Visible = True
+        Me.Line_Hypervolume.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+        Me.Line_Hypervolume.Pointer.Brush.Color = System.Drawing.Color.Red
+        Me.Line_Hypervolume.Pointer.HorizSize = 2
+        Me.Line_Hypervolume.Pointer.VertSize = 2
+        Me.Line_Hypervolume.Pointer.Pen.Visible = False
+
+    End Sub
+
+    ''' <summary>
+    ''' Hypervolumenwert in Monitordiagramm eintragen
+    ''' </summary>
+    ''' <param name="gen">Generationsnummer</param>
+    ''' <param name="indicator">Hypervolumenwert</param>
+    Private Sub ZeichneHyperVolumen(ByVal gen As Integer, ByVal indicator As Double)
+        Me.Line_Hypervolume.Add(gen, indicator, gen.ToString())
+    End Sub
+
+    ''' <summary>
+    ''' Schrittweitenwert in Monitordiagramm eintragen
+    ''' </summary>
+    ''' <param name="durchlauf">Durchlaufummer</param>
+    ''' <param name="Dn">Schrittweitenwert</param>
+    Private Sub Zeichne_Dn(ByVal durchlauf As Integer, ByVal Dn As Double)
+        Me.Line_Dn.Add(durchlauf, Dn, durchlauf.ToString())
+    End Sub
+
+    ''' <summary>
+    ''' Nadirpunkt in Hauptdiagramm eintragen
+    ''' </summary>
+    ''' <param name="nadir">Koordinaten des Nadirpunkts</param>
+    Private Sub ZeichneNadirpunkt(ByVal nadir() As Double)
+
+        If (Me.myProblem.NumPenalties = 2) Then
+            '2D
+            '--
+            Dim serie2 As Steema.TeeChart.Styles.Points
+            serie2 = Me.myHauptDiagramm.getSeriesPoint("Nadirpunkt", "Blue", Steema.TeeChart.Styles.PointerStyles.Diamond)
+            serie2.Clear()
+            serie2.Add(nadir(0), nadir(1), "Nadirpunkt")
+        Else
+            '3D
+            '--
+            Dim serie3 As Steema.TeeChart.Styles.Points3D
+            serie3 = Me.myHauptDiagramm.getSeries3DPoint("Nadirpunkt", "Blue", Steema.TeeChart.Styles.PointerStyles.Diamond)
+            serie3.Clear()
+            serie3.Add(nadir(0), nadir(1), nadir(2), "Nadirpunkt")
+        End If
+
+    End Sub
+
+#End Region 'Ausgabe
 
 #End Region 'Methoden
 
