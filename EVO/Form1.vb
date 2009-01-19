@@ -314,10 +314,10 @@ Partial Class Form1
                     'Testprobleme instanzieren
                     Testprobleme1 = New EVO.Apps.Testprobleme()
 
-                    'HACK: bei Testproblemen als Methodenauswahl nur PES und DDS zulassen!
+                    'HACK: bei Testproblemen als Methodenauswahl nur PES, H&J und DDS zulassen!
                     Me.IsInitializing = True
                     Call Me.ComboBox_Methode.Items.Clear()
-                    Call Me.ComboBox_Methode.Items.AddRange(New String() {"", METH_PES, METH_DDS})
+                    Call Me.ComboBox_Methode.Items.AddRange(New String() {"", METH_PES, METH_HOOKJEEVES, METH_DDS})
                     Me.IsInitializing = False
 
 
@@ -871,22 +871,26 @@ Partial Class Form1
 
                     Select Case Me.mProblem.Method
                         Case METH_PES
-                            'ES-Controller initialisieren und starten
+                            'ES-Controller instanzieren
                             controller = New EVO.ES.Controller()
-                            Call controller.Init(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Monitor1, Me.Hauptdiagramm1)
-                            Call controller.InitApp(Me.Testprobleme1)
-                            Call controller.Start()
+
+                        Case METH_HOOKJEEVES
+                            'HJ-Controller instanzieren
+                            controller = New EVO.HookeAndJeeves.Controller()
 
                         Case METH_DDS
-                            'DDS-Controller initialisieren und starten
+                            'DDS-Controller instanzieren
                             controller = New modelEAU.DDS.Controller()
-                            Call controller.Init(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Monitor1, Me.Hauptdiagramm1)
-                            Call controller.InitApp(Me.Testprobleme1)
-                            Call controller.Start()
 
                         Case Else
                             Throw New Exception("Testprobleme können mit der Methode " & Me.mProblem.Method & " nicht ausgeführt werden!")
                     End Select
+
+                    'Controller für Testproblem initialisieren und starten
+                    Call controller.Init(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Monitor1, Me.Hauptdiagramm1)
+                    Call controller.InitApp(Me.Testprobleme1)
+                    Call controller.Start()
+
 
                 Case ANW_TSP
                     Call STARTEN_TSP()
