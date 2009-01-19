@@ -87,13 +87,6 @@
 
     End Sub
 
-    'Form resize
-    '***********
-    Private Sub Monitor_Resize(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Resize
-        Me.Monitordiagramm.Width = Me.ClientSize.Width
-        Me.Monitordiagramm.Height = Me.ClientSize.Height
-    End Sub
-
 #End Region
 
     'Ergebnisse der Hypervolumenberechnung anzeigen
@@ -123,6 +116,16 @@
 
         'Dn-Wert eintragen
         Me.Line_Dn.Add(durchlauf, Dn, durchlauf.ToString())
+
+    End Sub
+
+    ''' <summary>
+    ''' Fügt dem Log einen Text hinzu
+    ''' </summary>
+    ''' <param name="text">der Text</param>
+    Public Sub AppendText(ByVal text As String)
+
+        Call Me.TextBox1.AppendText(text & EVO.Common.Constants.eol)
 
     End Sub
 
