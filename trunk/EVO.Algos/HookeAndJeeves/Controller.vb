@@ -8,7 +8,7 @@ Public Class Controller
 
     Private myProblem As EVO.Common.Problem
     Private mySettings As EVO.Common.EVO_Settings
-    Private myProgress As EVO.Common.Progress
+    Private myProgress As EVO.Common.Progress 'TODO: Verlaufsanzeige für H&J
     Private myMonitor As EVO.Diagramm.Monitor
     Private myHauptDiagramm As EVO.Diagramm.Hauptdiagramm
 
@@ -17,8 +17,6 @@ Public Class Controller
     Private Testprobleme1 As EVO.Apps.Testprobleme
 
 #Region "Methoden"
-
-#End Region
 
     ''' <summary>
     ''' Initialisiert den HJ-Controller und übergibt alle erforderlichen Objekte
@@ -76,6 +74,7 @@ Public Class Controller
         Dim Tastschritte_gesamt As Long
         Dim Extrapolationsschritte As Long
         Dim Rueckschritte As Long
+        Dim serie As Steema.TeeChart.Styles.Series
 
         Dim HookJeeves As New EVO.HookeAndJeeves.HookeAndJeeves(Me.myProblem.NumParams, Me.mySettings.HookJeeves.DnStart, Me.mySettings.HookJeeves.DnFinish)
 
@@ -116,16 +115,22 @@ Public Class Controller
             Next
 
             'Evaluierung
-            SIM_Eval_is_OK = Me.Sim1.Evaluate(ind)
+            '-----------
+            If (Me.myAppType = ApplicationTypes.Sim) Then
 
-            'TODO: Evaluierungsfehler behandeln
+                'Evaluierung Sim
+                SIM_Eval_is_OK = Me.Sim1.Evaluate(ind)
+                'TODO: Evaluierungsfehler behandeln
 
-            'Lösung im TeeChart einzeichnen
-            '------------------------------
-            Dim serie As Steema.TeeChart.Styles.Series
-            serie = Me.myHauptdiagramm.getSeriesPoint("Hook and Jeeves")
-            Call serie.Add(durchlauf, ind.Penalties(0), durchlauf.ToString())
+                'Lösung im TeeChart einzeichnen
+                serie = Me.myHauptDiagramm.getSeriesPoint("Hooke and Jeeves")
+                Call serie.Add(durchlauf, ind.Penalties(0), durchlauf.ToString())
 
+            Else
+                'Evaluierung Testproblem
+                Call Me.Testprobleme1.Evaluate(ind, 0, Me.myHauptDiagramm)
+
+            End If
             Call System.Windows.Forms.Application.DoEvents()
 
             'Penalties in Bestwert kopieren
@@ -152,15 +157,22 @@ Public Class Controller
                 Next
 
                 'Evaluierung
-                SIM_Eval_is_OK = Me.Sim1.Evaluate(ind)
+                '-----------
+                If (Me.myAppType = ApplicationTypes.Sim) Then
 
-                'TODO: Evaluierungsfehler behandeln
+                    'Evaluierung Sim
+                    SIM_Eval_is_OK = Me.Sim1.Evaluate(ind)
+                    'TODO: Evaluierungsfehler behandeln
 
-                'Lösung im TeeChart einzeichnen
-                '------------------------------
-                serie = Me.myHauptdiagramm.getSeriesPoint("Hook and Jeeves")
-                Call serie.Add(durchlauf, ind.Penalties(0), durchlauf.ToString())
+                    'Lösung im TeeChart einzeichnen
+                    serie = Me.myHauptDiagramm.getSeriesPoint("Hooke and Jeeves")
+                    Call serie.Add(durchlauf, ind.Penalties(0), durchlauf.ToString())
 
+                Else
+                    'Evaluierung Testproblem
+                    Call Me.Testprobleme1.Evaluate(ind, 0, Me.myHauptDiagramm)
+
+                End If
                 Call System.Windows.Forms.Application.DoEvents()
 
                 If (ind.Penalties(0) >= QNBest(0)) Then
@@ -182,15 +194,22 @@ Public Class Controller
                     Next
 
                     'Evaluierung
-                    SIM_Eval_is_OK = Me.Sim1.Evaluate(ind)
+                    '-----------
+                    If (Me.myAppType = ApplicationTypes.Sim) Then
 
-                    'TODO: Evaluierungsfehler behandeln
+                        'Evaluierung Sim
+                        SIM_Eval_is_OK = Me.Sim1.Evaluate(ind)
+                        'TODO: Evaluierungsfehler behandeln
 
-                    'Lösung im TeeChart einzeichnen
-                    '------------------------------
-                    serie = Me.myHauptdiagramm.getSeriesPoint("Hook and Jeeves")
-                    Call serie.Add(durchlauf, ind.Penalties(0), durchlauf.ToString())
+                        'Lösung im TeeChart einzeichnen
+                        serie = Me.myHauptDiagramm.getSeriesPoint("Hooke and Jeeves")
+                        Call serie.Add(durchlauf, ind.Penalties(0), durchlauf.ToString())
 
+                    Else
+                        'Evaluierung Testproblem
+                        Call Me.Testprobleme1.Evaluate(ind, 0, Me.myHauptDiagramm)
+
+                    End If
                     Call System.Windows.Forms.Application.DoEvents()
 
                     If (ind.Penalties(0) >= QNBest(0)) Then
@@ -214,9 +233,9 @@ Public Class Controller
             'Extrapolationsschritt
             If (QNBest(0) < QBest(0)) Then
 
-                'Lösung im TeeChart einzeichnen
-                '------------------------------
-                serie = Me.myHauptDiagramm.getSeriesPoint("Hook and Jeeves Best", "Green")
+                'Best-Lösung im TeeChart einzeichnen
+                '-----------------------------------
+                serie = Me.myHauptDiagramm.getSeriesPoint("Hooke and Jeeves Best", "Green")
                 Call serie.Add(durchlauf, ind.Penalties(0), durchlauf.ToString())
 
                 Call System.Windows.Forms.Application.DoEvents()
@@ -266,5 +285,7 @@ Public Class Controller
             End If
         Loop
     End Sub
+
+#End Region 'Methoden
 
 End Class
