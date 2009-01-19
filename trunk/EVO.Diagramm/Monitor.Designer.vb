@@ -23,26 +23,26 @@ Partial Class Monitor
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Monitor))
-        Me.Monitordiagramm = New Steema.TeeChart.TChart
+        Me.Diag = New IHWB.EVO.Diagramm.Diagramm
         Me.TabControl1 = New System.Windows.Forms.TabControl
         Me.TabPage_Diagramm = New System.Windows.Forms.TabPage
         Me.TabPage_Log = New System.Windows.Forms.TabPage
-        Me.TextBox1 = New System.Windows.Forms.TextBox
+        Me.TextBox_Log = New System.Windows.Forms.TextBox
         Me.TabControl1.SuspendLayout()
         Me.TabPage_Diagramm.SuspendLayout()
         Me.TabPage_Log.SuspendLayout()
         Me.SuspendLayout()
         '
-        'Monitordiagramm
+        'Diag
         '
-        Me.Monitordiagramm.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+        Me.Diag.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         '
         '
         '
-        Me.Monitordiagramm.Aspect.View3D = False
-        Me.Monitordiagramm.Aspect.ZOffset = 0
+        Me.Diag.Aspect.View3D = False
+        Me.Diag.Aspect.ZOffset = 0
         '
         '
         '
@@ -52,42 +52,48 @@ Partial Class Monitor
         '
         '
         '
-        Me.Monitordiagramm.Axes.Bottom.Labels.Style = Steema.TeeChart.AxisLabelStyle.Value
-        Me.Monitordiagramm.Axes.Bottom.MaximumOffset = 3
-        Me.Monitordiagramm.Axes.Bottom.MinimumOffset = 3
+        Me.Diag.Axes.Bottom.Labels.Style = Steema.TeeChart.AxisLabelStyle.Value
+        Me.Diag.Axes.Bottom.MaximumOffset = 3
+        Me.Diag.Axes.Bottom.MinimumOffset = 3
         '
         '
         '
-        Me.Monitordiagramm.Axes.Left.MaximumOffset = 3
-        Me.Monitordiagramm.Axes.Left.MinimumOffset = 3
+        Me.Diag.Axes.Left.MaximumOffset = 3
+        Me.Diag.Axes.Left.MinimumOffset = 3
         '
         '
         '
-        Me.Monitordiagramm.Axes.Right.Visible = False
+        Me.Diag.Axes.Right.Visible = False
         '
         '
         '
-        Me.Monitordiagramm.Axes.Top.Visible = False
-        Me.Monitordiagramm.BackColor = System.Drawing.Color.Transparent
-        Me.Monitordiagramm.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Diag.Axes.Top.Visible = False
+        Me.Diag.BackColor = System.Drawing.Color.Transparent
+        Me.Diag.Cursor = System.Windows.Forms.Cursors.Default
         '
         '
         '
-        Me.Monitordiagramm.Header.Visible = False
+        Me.Diag.Header.Visible = False
         '
         '
         '
-        Me.Monitordiagramm.Legend.Alignment = Steema.TeeChart.LegendAlignments.Bottom
-        Me.Monitordiagramm.Legend.CheckBoxes = True
-        Me.Monitordiagramm.Legend.LegendStyle = Steema.TeeChart.LegendStyles.Series
-        Me.Monitordiagramm.Location = New System.Drawing.Point(0, 0)
-        Me.Monitordiagramm.Name = "Monitordiagramm"
+        Me.Diag.Legend.Alignment = Steema.TeeChart.LegendAlignments.Bottom
+        Me.Diag.Legend.LegendStyle = Steema.TeeChart.LegendStyles.Series
+        Me.Diag.Location = New System.Drawing.Point(0, 0)
+        Me.Diag.Name = "Diag"
         '
         '
         '
-        Me.Monitordiagramm.Panning.Allow = Steema.TeeChart.ScrollModes.None
-        Me.Monitordiagramm.Size = New System.Drawing.Size(488, 439)
-        Me.Monitordiagramm.TabIndex = 8
+        '
+        '
+        '
+        Me.Diag.Panel.Brush.Color = System.Drawing.Color.Transparent
+        '
+        '
+        '
+        Me.Diag.Panning.Allow = Steema.TeeChart.ScrollModes.None
+        Me.Diag.Size = New System.Drawing.Size(488, 439)
+        Me.Diag.TabIndex = 8
         '
         'TabControl1
         '
@@ -104,7 +110,7 @@ Partial Class Monitor
         '
         'TabPage_Diagramm
         '
-        Me.TabPage_Diagramm.Controls.Add(Me.Monitordiagramm)
+        Me.TabPage_Diagramm.Controls.Add(Me.Diag)
         Me.TabPage_Diagramm.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_Diagramm.Name = "TabPage_Diagramm"
         Me.TabPage_Diagramm.Padding = New System.Windows.Forms.Padding(3)
@@ -115,7 +121,7 @@ Partial Class Monitor
         '
         'TabPage_Log
         '
-        Me.TabPage_Log.Controls.Add(Me.TextBox1)
+        Me.TabPage_Log.Controls.Add(Me.TextBox_Log)
         Me.TabPage_Log.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_Log.Name = "TabPage_Log"
         Me.TabPage_Log.Padding = New System.Windows.Forms.Padding(3)
@@ -124,18 +130,18 @@ Partial Class Monitor
         Me.TabPage_Log.Text = "Log"
         Me.TabPage_Log.UseVisualStyleBackColor = True
         '
-        'TextBox1
+        'TextBox_Log
         '
-        Me.TextBox1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+        Me.TextBox_Log.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.TextBox1.Location = New System.Drawing.Point(6, 6)
-        Me.TextBox1.Multiline = True
-        Me.TextBox1.Name = "TextBox1"
-        Me.TextBox1.ReadOnly = True
-        Me.TextBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both
-        Me.TextBox1.Size = New System.Drawing.Size(476, 427)
-        Me.TextBox1.TabIndex = 0
+        Me.TextBox_Log.Location = New System.Drawing.Point(6, 6)
+        Me.TextBox_Log.Multiline = True
+        Me.TextBox_Log.Name = "TextBox_Log"
+        Me.TextBox_Log.ReadOnly = True
+        Me.TextBox_Log.ScrollBars = System.Windows.Forms.ScrollBars.Both
+        Me.TextBox_Log.Size = New System.Drawing.Size(476, 427)
+        Me.TextBox_Log.TabIndex = 0
         '
         'Monitor
         '
@@ -157,5 +163,5 @@ Partial Class Monitor
     Private WithEvents TabControl1 As System.Windows.Forms.TabControl
     Private WithEvents TabPage_Diagramm As System.Windows.Forms.TabPage
     Private WithEvents TabPage_Log As System.Windows.Forms.TabPage
-    Private WithEvents TextBox1 As System.Windows.Forms.TextBox
+    Private WithEvents TextBox_Log As System.Windows.Forms.TextBox
 End Class

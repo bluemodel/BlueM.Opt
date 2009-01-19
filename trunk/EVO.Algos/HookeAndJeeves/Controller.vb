@@ -78,6 +78,11 @@ Public Class Controller
 
         Dim HookJeeves As New EVO.HookeAndJeeves.HookeAndJeeves(Me.myProblem.NumParams, Me.mySettings.HookJeeves.DnStart, Me.mySettings.HookJeeves.DnFinish)
 
+        'Monitor anzeigen
+        Call Me.myMonitor.SelectTabLog()
+        Call Me.myMonitor.Show()
+
+        'Los gehts
         ReDim QNBest(Me.myProblem.NumPenalties - 1)
         ReDim QBest(Me.myProblem.NumPenalties - 1)
 
@@ -146,7 +151,7 @@ Public Class Controller
                 durchlauf += 1
 
                 'Monitor
-                Call Me.myMonitor.AppendText("Tastschritte aktuell: " & Tastschritte_aktuell.ToString())
+                Call Me.myMonitor.LogAppend("Tastschritte aktuell: " & Tastschritte_aktuell.ToString())
 
                 'Individuum instanzieren
                 ind = New Common.Individuum_PES("HJ", durchlauf)
@@ -183,7 +188,7 @@ Public Class Controller
                     durchlauf += 1
 
                     'Monitor
-                    Call Me.myMonitor.AppendText("Tastschritte aktuell: " & Tastschritte_aktuell.ToString())
+                    Call Me.myMonitor.LogAppend("Tastschritte aktuell: " & Tastschritte_aktuell.ToString())
 
                     'Individuum instanzieren
                     ind = New Common.Individuum_PES("HJ", durchlauf)
@@ -226,9 +231,9 @@ Public Class Controller
             Tastschritte_aktuell = 0
 
             'Monitor
-            Call Me.myMonitor.AppendText("Tastschritte gesamt: " & Tastschritte_gesamt.ToString())
-            Call Me.myMonitor.AppendText("Tastschritte aktuell: " & Tastschritte_aktuell.ToString())
-            Call Me.myMonitor.AppendText("Tastschritte mittel: " & Math.Round((Tastschritte_gesamt / Iterationen), 2).ToString())
+            Call Me.myMonitor.LogAppend("Tastschritte gesamt: " & Tastschritte_gesamt.ToString())
+            Call Me.myMonitor.LogAppend("Tastschritte aktuell: " & Tastschritte_aktuell.ToString())
+            Call Me.myMonitor.LogAppend("Tastschritte mittel: " & Math.Round((Tastschritte_gesamt / Iterationen), 2).ToString())
 
             'Extrapolationsschritt
             If (QNBest(0) < QBest(0)) Then
@@ -245,7 +250,7 @@ Public Class Controller
                 Extrapolationsschritte += 1
 
                 'Monitor
-                Call Me.myMonitor.AppendText("Extrapolationsschritte: " & Extrapolationsschritte.ToString())
+                Call Me.myMonitor.LogAppend("Extrapolationsschritte: " & Extrapolationsschritte.ToString())
 
                 k += 1
                 aktuellePara = HookJeeves.getLetzteParameter
@@ -255,7 +260,7 @@ Public Class Controller
                         Rueckschritte += 1
 
                         'Monitor
-                        Call Me.myMonitor.AppendText("Rückschritte: " & Rueckschritte.ToString())
+                        Call Me.myMonitor.LogAppend("Rückschritte: " & Rueckschritte.ToString())
 
                         k += -1
                         HookJeeves.Schrittweitenhalbierung()
@@ -275,7 +280,7 @@ Public Class Controller
                     HookJeeves.Rueckschritt()
 
                     'Monitor
-                    Call Me.myMonitor.AppendText("Rückschritte: " & Rueckschritte.ToString())
+                    Call Me.myMonitor.LogAppend("Rückschritte: " & Rueckschritte.ToString())
 
                     HookJeeves.Schrittweitenhalbierung()
                     aktuellePara = HookJeeves.getLetzteParameter()
