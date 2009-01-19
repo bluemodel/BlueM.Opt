@@ -10,6 +10,7 @@ Imports System.Threading
 ''' Kontrolliert den Ablauf der Evolutionsstrategie (PES, CES und HYBRID)
 ''' </summary>
 Public Class Controller
+    Implements IController
 
     Private myProblem As EVO.Common.Problem
     Private mySettings As EVO.Common.EVO_Settings
@@ -32,18 +33,18 @@ Public Class Controller
 #Region "Methoden"
 
     ''' <summary>
-    ''' Konstruktor initialisiert den ES-Controller und übergibt alle erforderlichen Objekte
+    ''' Initialisiert den ES-Controller und übergibt alle erforderlichen Objekte
     ''' </summary>
     ''' <param name="inputProblem"></param>
     ''' <param name="inputSettings"></param>
     ''' <param name="inputProgress"></param>
     ''' <param name="inputMonitor"></param>
     ''' <param name="inputHptDiagramm"></param>
-    Public Sub New(ByRef inputProblem As EVO.Common.Problem, _
-                          ByRef inputSettings As EVO.Common.EVO_Settings, _
-                          ByRef inputProgress As EVO.Common.Progress, _
-                          ByRef inputMonitor As EVO.Diagramm.Monitor, _
-                          ByRef inputHptDiagramm As EVO.Diagramm.Hauptdiagramm)
+    Public Sub Init(ByRef inputProblem As EVO.Common.Problem, _
+                    ByRef inputSettings As EVO.Common.EVO_Settings, _
+                    ByRef inputProgress As EVO.Common.Progress, _
+                    ByRef inputMonitor As EVO.Diagramm.Monitor, _
+                    ByRef inputHptDiagramm As EVO.Diagramm.Hauptdiagramm) Implements IController.Init
 
         Me.myProblem = inputProblem
         Me.mySettings = inputSettings
@@ -57,7 +58,7 @@ Public Class Controller
     ''' Initialisiert den Controller für Sim-Anwendungen
     ''' </summary>
     ''' <param name="inputSim">die Simulationsanwendung</param>
-    Public Sub InitApp(ByRef inputSim As EVO.Apps.Sim)
+    Public Sub InitApp(ByRef inputSim As EVO.Apps.Sim) Implements IController.InitApp
         Me.myAppType = ApplicationTypes.Sim
         Me.Sim1 = inputSim
     End Sub
@@ -65,7 +66,7 @@ Public Class Controller
     ''' <summary>
     ''' Initialisiert den Controller für Testprobleme
     ''' </summary>
-    Public Sub InitApp(ByRef inputTestprobleme As EVO.Apps.Testprobleme)
+    Public Sub InitApp(ByRef inputTestprobleme As EVO.Apps.Testprobleme) Implements IController.InitApp
         Me.myAppType = ApplicationTypes.Testprobleme
         Me.Testprobleme1 = inputTestprobleme
     End Sub
@@ -73,7 +74,7 @@ Public Class Controller
     ''' <summary>
     ''' Optimierung starten
     ''' </summary>
-    Public Sub Start()
+    Public Sub Start() Implements IController.Start
 
         Select Case Me.myProblem.Method
 

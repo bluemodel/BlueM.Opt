@@ -114,6 +114,10 @@
       <Project>{A7B7B98D-94BE-47DB-954F-BBA2C1F53663}</Project>
       <Name>EVO.OptResult</Name>
     </ProjectReference>
+    <ProjectReference Include="..\IController\IController.vbproj">
+      <Project>{1DBD183A-A900-4841-88FE-6258FD472C60}</Project>
+      <Name>IController</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>

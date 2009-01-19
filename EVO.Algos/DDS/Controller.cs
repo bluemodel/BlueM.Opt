@@ -7,7 +7,7 @@ namespace modelEAU.DDS
     /// <summary>
     /// Kontrolliert den Ablauf des DDS
     /// </summary>
-    public class Controller
+    public class Controller : IHWB.EVO.IController
     {
         private IHWB.EVO.Common.Problem mProblem;
         private IHWB.EVO.Common.EVO_Settings mSettings;
@@ -20,14 +20,14 @@ namespace modelEAU.DDS
         private IHWB.EVO.Common.Constants.ApplicationTypes myAppType;
 
         /// <summary>
-        /// Konstruktor
+        /// Initialisiert den DDS-Controller und übergibt alle erforderlichen Objekte
         /// </summary>
         /// <param name="inputProblem">das Problem</param>
         /// <param name="inputSettings">die Einstellungen</param>
         /// <param name="inputProgress">der Verlauf</param>
         /// <param name="inputMonitor">der Monitor</param>
         /// <param name="inputHauptdiagramm">das Hauptdiagramm</param>
-        public Controller(ref IHWB.EVO.Common.Problem inputProblem, ref IHWB.EVO.Common.EVO_Settings inputSettings, ref IHWB.EVO.Common.Progress inputProgress, ref IHWB.EVO.Diagramm.Monitor inputMonitor, ref IHWB.EVO.Diagramm.Hauptdiagramm inputHauptdiagramm)
+        public void Init(ref IHWB.EVO.Common.Problem inputProblem, ref IHWB.EVO.Common.EVO_Settings inputSettings, ref IHWB.EVO.Common.Progress inputProgress, ref IHWB.EVO.Diagramm.Monitor inputMonitor, ref IHWB.EVO.Diagramm.Hauptdiagramm inputHauptdiagramm)
         {
             //Objekte übergeben
             this.mProblem = inputProblem;
@@ -125,7 +125,7 @@ namespace modelEAU.DDS
                 Current_Parameter = DDS.ini_solution_candidate();
 
                 ind = new IHWB.EVO.Common.Individuum_PES("DDS", run);
-                
+
                 //OptParameter ins Individuum kopieren
                 //------------------------------------
                 for (j = 0; j < ind.OptParameter.Length; j++)
@@ -234,6 +234,5 @@ namespace modelEAU.DDS
             //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
         }
-
     }
 }

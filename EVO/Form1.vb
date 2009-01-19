@@ -772,6 +772,9 @@ Partial Class Form1
 
     Private Sub STARTEN_Button_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Button_Start.Click
 
+        'Der Controller
+        Dim controller As EVO.IController
+
         If (Me.isrun And Not Me.ispause) Then
             'Optimierung pausieren
             '---------------------
@@ -843,7 +846,8 @@ Partial Class Form1
 
                         Case METH_PES, METH_CES, METH_HYBRID
                             'ES-Controller initialisieren und starten
-                            Dim controller As New EVO.ES.Controller(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Monitor1, Me.Hauptdiagramm1)
+                            controller = New EVO.ES.Controller()
+                            Call controller.Init(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Monitor1, Me.Hauptdiagramm1)
                             Call controller.InitApp(Me.Sim1)
                             Call controller.Start()
 
@@ -852,7 +856,8 @@ Partial Class Form1
 
                         Case METH_DDS
                             'DDS-Controller initialisieren und starten
-                            Dim controller As New modelEAU.DDS.Controller(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Monitor1, Me.Hauptdiagramm1)
+                            controller = New modelEAU.DDS.Controller()
+                            Call controller.Init(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Monitor1, Me.Hauptdiagramm1)
                             Call controller.InitApp(Me.Sim1)
                             Call controller.Start()
 
@@ -863,13 +868,15 @@ Partial Class Form1
                     Select Case Me.mProblem.Method
                         Case METH_PES
                             'ES-Controller initialisieren und starten
-                            Dim controller As New EVO.ES.Controller(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Monitor1, Me.Hauptdiagramm1)
+                            controller = New EVO.ES.Controller()
+                            Call controller.Init(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Monitor1, Me.Hauptdiagramm1)
                             Call controller.InitApp(Me.Testprobleme1)
                             Call controller.Start()
 
                         Case METH_DDS
                             'DDS-Controller initialisieren und starten
-                            Dim controller As New modelEAU.DDS.Controller(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Monitor1, Me.Hauptdiagramm1)
+                            controller = New modelEAU.DDS.Controller()
+                            Call controller.Init(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Monitor1, Me.Hauptdiagramm1)
                             Call controller.InitApp(Me.Testprobleme1)
                             Call controller.Start()
 
