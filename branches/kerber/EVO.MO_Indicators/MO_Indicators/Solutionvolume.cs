@@ -29,7 +29,7 @@ namespace IHWB.EVO.MO_Indicators
 
         public double get_last_volume() 
         {
-            return Math.Round(solutionvolume[0],2);
+            return Math.Round(solutionvolume[0],3);
         }
 
         //Summierte Distanzquadrate der Lösungen zum Nullpunkt
@@ -80,7 +80,7 @@ namespace IHWB.EVO.MO_Indicators
                 {
                     sum += Math.Max((solutionvolume[i+1]/solutionvolume[i]),(solutionvolume[i]/solutionvolume[i+1])); 
                 }
-                sum = (sum / (historylength - 1)) - 1; //Prozentuale Änderung innerhalb der letzten |historylength| Generationen
+                sum = (sum / (solutionvolume.Length - 1)) - 1; //Prozentuale Änderung innerhalb der letzten |historylength| Generationen
 
                 if (sum < minimumchange)
                 {

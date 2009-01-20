@@ -255,10 +255,12 @@ Public Class EVO_Settings
 
         Public Role As String                       'Was stellt dieser PC da: Single PC, Network Server, Network Client
         Public OpMode As String                     'Optimierungen: Local Optimizer, Global Optimizer, Both
+        Public AlgoMode As String                   'Zustand des Algomanagers
 
         'Einstellungen für einen PC der das Problem berechnet (Global)
         Public PopulationSize As Integer            'Populationsgrösse
         Public NumberGenerations As Integer         'Anzahl der Generationen die berechnet werden
+        Public CurrentGeneration As Integer         'Aktuelle Generationenzahl
         Public NumberResults As Integer             'Anzahl der Lösungen nach der Globalen Optimierung und am Ende
 
         'Einstellungen für einen PC der das Problem berechnet (Global)
@@ -286,6 +288,7 @@ Public Class EVO_Settings
 
             Me.PopulationSize = 15
             Me.NumberGenerations = 50
+            Me.CurrentGeneration = 0
             Me.NumberResults = 10
 
             Me.HJStepsize = 50

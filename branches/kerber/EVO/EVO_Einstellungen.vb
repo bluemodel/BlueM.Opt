@@ -739,6 +739,7 @@ Public Class EVO_Einstellungen
         ElseIf (Me.Combo_MetaEvo_Role.SelectedItem = "Network Client") Then
             Me.Combo_MetaEvo_OpMode.Enabled = False
             Me.GroupBox_MetaEvo_BasicOptions.Enabled = False
+            Me.GroupBox_MetaEvo_TransferOptions.Enabled = False
             Me.GroupBox_MetaEvo_LocalOptions.Enabled = False
             Me.GroupBox_MetaEvo_PerformanceOptions.Enabled = True
             Me.CheckBox_MetaEvo_Draw.Enabled = False
@@ -755,12 +756,15 @@ Public Class EVO_Einstellungen
     Private Sub Combo_MetaEvo_OpMode_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Combo_MetaEvo_OpMode.SelectedIndexChanged
         If (Me.Combo_MetaEvo_OpMode.SelectedItem = "Both") Then
             Me.GroupBox_MetaEvo_BasicOptions.Enabled = True
+            Me.GroupBox_MetaEvo_TransferOptions.Enabled = True
             Me.GroupBox_MetaEvo_LocalOptions.Enabled = True
         ElseIf (Me.Combo_MetaEvo_OpMode.SelectedItem = "Global Optimizer") Then
             Me.GroupBox_MetaEvo_BasicOptions.Enabled = True
+            Me.GroupBox_MetaEvo_TransferOptions.Enabled = True
             Me.GroupBox_MetaEvo_LocalOptions.Enabled = False
         ElseIf (Me.Combo_MetaEvo_OpMode.SelectedItem = "Local Optimizer") Then
             Me.GroupBox_MetaEvo_BasicOptions.Enabled = False
+            Me.GroupBox_MetaEvo_TransferOptions.Enabled = True
             Me.GroupBox_MetaEvo_LocalOptions.Enabled = True
         End If
     End Sub

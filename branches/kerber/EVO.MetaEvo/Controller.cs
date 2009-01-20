@@ -71,6 +71,7 @@ namespace IHWB.EVO.MetaEvo
                     if (settings.MetaEvo.OpMode == "Local Optimizer")
                     {
                         settings.MetaEvo.PopulationSize = settings.MetaEvo.NumberResults;
+                        progress1.Initialize(1, 1, 0, (short)settings.MetaEvo.PopulationSize);
                     }
 
                     generation = new EVO.Common.Individuum_MetaEvo[this.settings.MetaEvo.PopulationSize];
@@ -106,8 +107,9 @@ namespace IHWB.EVO.MetaEvo
                     networkmanager = new Networkmanager(ref this.generation[0], ref this.settings, ref prob, ref applog);
                     //Info-Datenbank füllen
                     networkmanager.DB_set_info("Datensatz", "" + prob.Datensatz);
+                    networkmanager.DB_set_info("Individuen im Genpool", "" + settings.MetaEvo.PopulationSize);
                     networkmanager.DB_set_info("Individuen / Generation", "" + settings.MetaEvo.ChildsPerParent * settings.MetaEvo.PopulationSize);
-                    networkmanager.DB_set_info("Lokale Optimierungen", "" + settings.MetaEvo.NumberResults);
+                    networkmanager.DB_set_info("Anzahl der Ergebnisse", "" + settings.MetaEvo.NumberResults);
                     networkmanager.DB_set_info("Generation", "Initialisierung");
                     start_network_server();
                     break;
@@ -123,7 +125,7 @@ namespace IHWB.EVO.MetaEvo
                     networkmanager = new Networkmanager(ref this.individuumForClient, ref this.settings, ref prob, ref applog);
                     start_network_client();
                     break;
-            }  
+            }
         }
 
 
@@ -163,14 +165,15 @@ namespace IHWB.EVO.MetaEvo
         private void start_single_pc()
         {
             Client mePC = new Client(); 
-            mePC.status = "init";
-            int generationcounter = 1;
-            string tmp = "";
+            mePC.status = "init Genpool";
+            settings.MetaEvo.CurrentGeneration = 1;
 
-            while (generationcounter <= settings.MetaEvo.NumberGenerations)
+            while (mePC.status != "finished")
             {
-                #region Zustand: init
-                if (mePC.status == "init")
+                applog.appendText("Controller: Status: " + mePC.status);
+
+                #region Zustand: init Genpool
+                if (mePC.status == "init Genpool")
                 {
                     //Zufällige Parents setzen
                     set_random_parents(ref generation);
@@ -194,114 +197,110 @@ namespace IHWB.EVO.MetaEvo
                     algomanager.set_genpool(ref generation);
                     generation = new EVO.Common.Individuum_MetaEvo[this.settings.MetaEvo.ChildsPerParent*this.settings.MetaEvo.PopulationSize];
 
-                    if (settings.MetaEvo.OpMode == "Both") mePC.status = "perform_both";
-                    else if (settings.MetaEvo.OpMode == "Global Optimizer") mePC.status = "perform_global";
-                    else if (settings.MetaEvo.OpMode == "Local Optimizer") mePC.status = "perform_local";
+                    mePC.status = "generate Individuums";
                 }
                 #endregion
-                
-                #region Zustand: perform_both oder perform global
-                else if ((mePC.status == "perform_both") || (mePC.status == "perform_global"))
+
+                #region Zustand: generate Individuums
+                else if (mePC.status == "generate Individuums")
                 {
-                    //Neue Generation bauen
-                    applog.appendText("Controller: ### Building new Individuums for Generation " + generationcounter + " ###");
+                    applog.appendText("Controller: ### Building new Individuums for Generation " + settings.MetaEvo.CurrentGeneration + " ###");
                     algomanager.new_individuals_build(ref generation);
-                    
-                    //Neue Generation Simulieren
-                    applog.appendText("Controller: Individuums for Generation " + generationcounter + ": Simulating Individuums...");
+                    mePC.status = "simulate Individuums";
+                }
+                #endregion
+
+                #region Zustand: simulate Individuums
+                else if (mePC.status == "simulate Individuums")
+                {
+                    applog.appendText("Controller: Individuums for Generation " + settings.MetaEvo.CurrentGeneration + ": Simulating Individuums...");
                     progress1.iNachf = 0;
                     for (int i = 0; i < generation.Length; i++)
-                    {
-                        tmp = "(";
-                        for (int j = 0; j < generation[0].get_optparas().Length; j++)
-                        {
-                            tmp = tmp + generation[i].get_optparas()[j] + " / ";
-                        }
-                        tmp = tmp.TrimEnd(' ','/') + ")";
-                        
-
-                        //Simulieren und zeichnen
-                        if (generation[i].get_toSimulate()){
-                            if (this.settings.MetaEvo.Application == "testprobleme") 
-                            {
-                                applog.appendText("Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   " + algomanager.algos.algofeedbackarray[generation[i].get_generator()].name); // +": Optparas: " + tmp
-                                testprobleme.Evaluierung_TestProbleme_MetaEvo(ref generation[i], 0, ref hauptdiagramm1);
-                            }
-                            if (this.settings.MetaEvo.Application == "sim")
-                            {
-                                applog.appendText("Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   " + algomanager.algos.algofeedbackarray[generation[i].get_generator()].name); // +": Optparas: " + tmp
-                                sim.Evaluate_MetaEvo(ref generation[i]);
-                                hauptdiagramm1.ZeichneIndividuum(generation[i], 1, 1, 1, generation[i].ID % generation.Length, System.Drawing.Color.Yellow, true);
-                                System.Windows.Forms.Application.DoEvents();
-                            }
-                        }
-                        //else applog.appendText("Controller: NOT Simulating Individuum " + generation[i].ID);
-                        progress1.NextNachf();
-                    }
-
-                    //Neue Individuen mit Genpool verrechnen und Genpool zeichnen
-                    algomanager.new_individuals_merge_with_genpool(ref generation);
-
-                    generationcounter++;
-
-                    //Falls beide Berechnungsarten genutzt werden sollen, auf Umschaltpunkt prüfen
-                    if (mePC.status == "perform_both") 
-                    {
-                        if ((settings.MetaEvo.OpMode == "Local Optimizer") || (!(generationcounter <= settings.MetaEvo.NumberGenerations)))
-                        {
-                            mePC.status = "perform_local";
-                            generationcounter--;
-                        }
-                    }
-                    progress1.NextGen();
-                }
-                #endregion
-
-                #region Zustand: perform_local
-                else if (mePC.status == "perform_local")
-                {
-                    //Neue Generation bauen
-                    applog.appendText("Controller: ### Building new Individuums for Hook&Jeeves " + generationcounter + " ###");
-                    algomanager.new_individuals_build(ref generation);
-
-                    //Neue Generation Simulieren
-                    applog.appendText("Controller: Individuums for Hook&Jeeves: Simulating Individuums...");
-                    for (int i = 0; i < generation.Length; i++)
-                    {
-                        tmp = "(";
-                        for (int j = 0; j < generation[0].get_optparas().Length; j++)
-                        {
-                            tmp = tmp + generation[i].get_optparas()[j] + " / ";
-                        }
-                        tmp = tmp.TrimEnd(' ', '/') + ")";
-
-
+                    {  
                         //Simulieren und zeichnen
                         if (generation[i].get_toSimulate())
                         {
                             if (this.settings.MetaEvo.Application == "testprobleme")
                             {
-                                applog.appendText("Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   " + algomanager.algos.algofeedbackarray[generation[i].get_generator()].name); // +": Optparas: " + tmp
+                                applog.appendText("Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   " + algomanager.algos.algofeedbackarray[generation[i].get_generator()].name); 
                                 testprobleme.Evaluierung_TestProbleme_MetaEvo(ref generation[i], 0, ref hauptdiagramm1);
                             }
                             if (this.settings.MetaEvo.Application == "sim")
                             {
-                                applog.appendText("Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   " + algomanager.algos.algofeedbackarray[generation[i].get_generator()].name); // +": Optparas: " + tmp
+                                applog.appendText("Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   " + algomanager.algos.algofeedbackarray[generation[i].get_generator()].name); 
                                 sim.Evaluate_MetaEvo(ref generation[i]);
                                 hauptdiagramm1.ZeichneIndividuum(generation[i], 1, 1, 1, generation[i].ID % generation.Length, System.Drawing.Color.Yellow, true);
                                 System.Windows.Forms.Application.DoEvents();
                             }
+                            try
+                            {
+                                progress1.NextNachf();
+                            }
+                            catch { }
                         }
-                        //else applog.appendText("Controller: NOT Simulating Individuum " + generation[i].ID);
                     }
-
-                    //Neue Individuen mit Genpool verrechnen und Genpool zeichnen
-                    algomanager.new_individuals_merge_with_genpool(ref generation);
-
-                    //Abbruchbedingung für lokale Optimierung
-                    if (algomanager.algos.algofeedbackarray[0].number_individuals_for_nextGen == 0) generationcounter = settings.MetaEvo.NumberGenerations + 1;
+                    mePC.status = "select Individuums";
                 }
                 #endregion
+
+                #region Zustand: select Individuums
+                else if (mePC.status == "select Individuums")
+                {
+                    algomanager.new_individuals_merge_with_genpool(ref generation);
+                    settings.MetaEvo.CurrentGeneration++;         
+
+                    //Umschalt- und Abbruchbedingungen prüfen
+                    //  Maximale Anzahl der Generationen erreicht oder Umschaltpunkt erreicht
+                    if ((settings.MetaEvo.CurrentGeneration == settings.MetaEvo.NumberGenerations) || (settings.MetaEvo.AlgoMode == "Global: Finished"))
+                    {
+                        //Umschalten zur lokalen Optimierung
+                        if (settings.MetaEvo.OpMode == "Both")
+                        {
+                            settings.MetaEvo.OpMode = "Local Optimizer";
+
+                            algomanager.set_calculationmode_local(ref generation);
+                            settings.MetaEvo.CurrentGeneration--;
+
+                            progress1.Initialize(1, 1, (short)settings.MetaEvo.NumberGenerations, (short)(settings.MetaEvo.NumberResults));
+                            progress1.iGen = (short)settings.MetaEvo.CurrentGeneration;
+                            mePC.status = "generate Individuums";
+                        }
+
+                        //Reduzierung auf gewünschte Anzahl der Ergebnisse und Ausgabe
+                        else if (settings.MetaEvo.OpMode == "Global Optimizer")
+                        {
+                            algomanager.set_calculationmode_global_finished(ref generation);
+                            mePC.status = "finished";
+                        }
+                    }
+                    //  Abbruchbedingung der lokalen Optimierung  
+                    else if (settings.MetaEvo.AlgoMode == "Local: Finished")
+                    {
+                        mePC.status = "finished";
+                    }
+
+                    else
+                    {
+                        mePC.status = "generate Individuums";                         
+                    }
+
+                    if (settings.MetaEvo.OpMode != "Local Optimizer")
+                    {
+                        try
+                        {
+                            progress1.NextGen();
+                        }
+                        catch { }
+                    }
+                }
+                #endregion     
+            }
+
+            //Zusatzresulte der lokalen Optimierung speichern
+            if (settings.MetaEvo.OpMode == "Local Optimizer")
+            {
+                applog.appendResult(progress1.iGen + 1, 0, algomanager.localausgabe);
+                applog.appendResult(progress1.iGen + 1, algomanager.algos.algofeedbackarray.Length, algomanager.localausgabe2);
             }
             progress1.iGen = progress1.NGen;
             applog.appendText("Controller: Calculation Finished");
@@ -315,11 +314,13 @@ namespace IHWB.EVO.MetaEvo
             Client meServer = new Client(); 
             meServer = networkmanager.Network_Init_Client_Object(Dns.GetHostName());
             meServer.status = "init Genpool";
-            int generationcounter = 0;
+            settings.MetaEvo.CurrentGeneration = 1;
 
-            while (generationcounter <= settings.MetaEvo.NumberGenerations)
+            while (meServer.status != "finished")
             {
-                //Einmaliges Initialisieren des Genpools
+                applog.appendText("Controller: Status: " + meServer.status);
+
+                #region Zustand: init Genpool
                 if (meServer.status == "init Genpool")
                 {
                     //Zufällige Parents setzen und in DB schreiben
@@ -328,7 +329,7 @@ namespace IHWB.EVO.MetaEvo
                     //Von den Clients ausrechnen lassen
                     applog.appendText("Controller: Calculate Genpool by Clients");
                     MessageBox.Show("Wait for Clients to register for calculation. Press ok to start","MetaEvo - Networkmanager");
-                    if (networkmanager.calculate_by_clients(ref generation, ref hauptdiagramm1))
+                    if (networkmanager.calculate_by_clients(ref generation, ref hauptdiagramm1, ref progress1))
                     {
                         algomanager.set_genpool(ref generation);
                         generation = new EVO.Common.Individuum_MetaEvo[this.settings.MetaEvo.ChildsPerParent * this.settings.MetaEvo.PopulationSize];
@@ -339,40 +340,33 @@ namespace IHWB.EVO.MetaEvo
                         MessageBox.Show("Fehler beim Initialisieren des Genpools", "MetaEvo - Controller");
                     }
                 }
+                #endregion
 
-                //Individuen erzeugen
+                #region Zustand: generate Individuums
                 else if (meServer.status == "generate Individuums")
                 {
-                    //Evolutionsschritte
+                    //Neue Individuen
+                    applog.appendText("Controller: ### Building new Individuums for Generation " + settings.MetaEvo.CurrentGeneration + " ###");
                     algomanager.new_individuals_build(ref generation);
 
                     //Neuen Serverstatus setzen
                     meServer.set_AlsoInDB("waiting for client-calculation", -1, -1);
                 }
+                #endregion
 
-                //Individuen berechnen lassen
+                #region Zustand: waiting for client-calculation
                 else if (meServer.status == "waiting for client-calculation")
                 {
                     //Von den Clients ausrechnen lassen
-                    if (networkmanager.calculate_by_clients(ref generation, ref hauptdiagramm1))
+                    if (networkmanager.calculate_by_clients(ref generation, ref hauptdiagramm1, ref progress1))
                     {
                         if (settings.MetaEvo.OpMode == "Local Optimizer")
                         {
                             networkmanager.DB_set_info("Generation", "--/" + settings.MetaEvo.NumberGenerations);
-
-                            //Abbruchbedingung für lokale Optimierung
-                            if (algomanager.algos.algofeedbackarray[0].number_individuals_for_nextGen == 0) generationcounter = settings.MetaEvo.NumberGenerations + 1;
                         }
                         else
                         {
-                            networkmanager.DB_set_info("Generation", generationcounter + "/" + settings.MetaEvo.NumberGenerations);
-
-                            try
-                            {
-                                progress1.NextGen();
-                            }
-                            catch { }
-                            generationcounter++;
+                            networkmanager.DB_set_info("Generation", settings.MetaEvo.CurrentGeneration + "/" + settings.MetaEvo.NumberGenerations);
                         }
                         meServer.set_AlsoInDB("select Individuums", -1, -1);
                     }
@@ -381,22 +375,71 @@ namespace IHWB.EVO.MetaEvo
                         MessageBox.Show("Fehler beim Ausführen der Kalkulation im Netzwerk");
                     }
                 }
+                #endregion
 
-                //Individuen selektieren
+                #region Zustand: select Individuums
                 else if (meServer.status == "select Individuums")
                 {
-                    //Neue Individuen mit Genpool verrechnen und Genpool zeichnen
                     algomanager.new_individuals_merge_with_genpool(ref generation);
-
-                    //Neuen Serverstatus setzen
-                    meServer.set_AlsoInDB("generate Individuums", -1, -1);
-
                     networkmanager.DB_set_info("Berechnungsmodus", "" + settings.MetaEvo.OpMode);
                     networkmanager.DB_set_info("Solutionvolume", "" + algomanager.solutionvolume.get_last_volume());
+                    settings.MetaEvo.CurrentGeneration++;
+
+                    //Umschalt- und Abbruchbedingungen prüfen
+                    //  Maximale Anzahl der Generationen erreicht oder Umschaltpunkt erreicht
+                    if ((settings.MetaEvo.CurrentGeneration == settings.MetaEvo.NumberGenerations) || (settings.MetaEvo.AlgoMode == "Global: Finished"))
+                    {
+                        //Umschalten zur lokalen Optimierung
+                        if (settings.MetaEvo.OpMode == "Both")
+                        {
+                            settings.MetaEvo.OpMode = "Local Optimizer";
+
+                            algomanager.set_calculationmode_local(ref generation);
+                            settings.MetaEvo.CurrentGeneration--;
+
+                            progress1.Initialize(1, 1, (short)settings.MetaEvo.NumberGenerations, (short)(settings.MetaEvo.NumberResults));
+                            progress1.iGen = (short)settings.MetaEvo.CurrentGeneration;
+                            meServer.set_AlsoInDB("generate Individuums", -1, -1);
+                        }
+
+                        //Reduzierung auf gewünschte Anzahl der Ergebnisse und Ausgabe
+                        else if (settings.MetaEvo.OpMode == "Global Optimizer")
+                        {
+                            algomanager.set_calculationmode_global_finished(ref generation);
+                            meServer.set_AlsoInDB("finished", -1, -1);
+                        }
+                    }
+                    //  Abbruchbedingung der lokalen Optimierung  
+                    else if (settings.MetaEvo.AlgoMode == "Local: Finished")
+                    {
+                        meServer.set_AlsoInDB("finished", -1, -1);
+                    }
+
+
+                    else
+                    {
+                        if (settings.MetaEvo.OpMode != "Local Optimizer")
+                        {
+                            try
+                            {
+                                progress1.NextGen();
+                            }
+                            catch { }
+                        }
+                        meServer.set_AlsoInDB("generate Individuums", -1, -1);
+                    }
                 }
+                #endregion  
             }
+
+            //Zusatzresulte der lokalen Optimierung speichern
+            if (settings.MetaEvo.OpMode == "Local Optimizer")
+            {
+                applog.appendResult(progress1.iGen + 1, 0, algomanager.localausgabe);
+                applog.appendResult(progress1.iGen + 1, algomanager.algos.algofeedbackarray.Length, algomanager.localausgabe2);  
+            }
+
             progress1.iGen = progress1.NGen;
-            meServer.set_AlsoInDB("finished", -1, -1);
             applog.appendText("Controller: Calculation Finished");
             MessageBox.Show("Berechnung beendet", "MetaEvo");
             applog.savelog();
@@ -466,6 +509,7 @@ namespace IHWB.EVO.MetaEvo
                 //Serverstatus neu lesen
                 serverstatus = networkmanager.Network_ReadServer();
             }
+            progress1.iGen = progress1.NGen;
             applog.appendText("Controller: Calculation Finished");
             MessageBox.Show("Berechnung beendet", "MetaEvo");
         }

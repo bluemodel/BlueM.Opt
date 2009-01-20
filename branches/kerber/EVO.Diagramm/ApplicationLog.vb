@@ -5,6 +5,7 @@ Partial Public Class ApplicationLog
 
     Dim settings As EVO.Common.EVO_Settings
     Dim starttime As DateTime
+    Dim result As String(,)
 
     Public Sub New(ByRef settings_input As EVO.Common.EVO_Settings)
         Call InitializeComponent()
@@ -13,6 +14,7 @@ Partial Public Class ApplicationLog
 
         settings = settings_input
         Me.starttime = DateTime.Now
+        ReDim Me.result(settings.MetaEvo.NumberGenerations + 1, 8)
     End Sub
 
     Public Sub appendText(ByVal text As String)
@@ -25,15 +27,35 @@ Partial Public Class ApplicationLog
         End If
     End Sub
 
+    Public Sub appendResult(ByVal generation As Integer, ByVal eintrag As Integer, ByVal text As String)
+        If (settings.MetaEvo.Log) Then
+            Me.Show()
+            result(generation, eintrag) = text
+        Else
+            Me.Hide()
+        End If
+    End Sub
+
     Public Sub savelog()
         If (settings.MetaEvo.Log) Then
             Dim sw As StreamWriter
             Dim SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog()
             Dim jetzt = DateTime.Now
+            Dim tmp As String
 
-            'Dialog einrichten
+            'Result anhängen
+            Me.TextBox1.AppendText(vbCrLf + "Result:" + vbCrLf)
+            For i = 0 To 8
+                tmp = ""
+                For j = 0 To settings.MetaEvo.NumberGenerations
+                    tmp = tmp + result(j, i) + vbTab
+                Next
+                Me.TextBox1.AppendText(tmp + vbCrLf)
+            Next
+
+            'Dialog(einrichten)
             SaveFileDialog1.Filter = "Text-Dateien (*.txt)|*.txt"
-            SaveFileDialog1.FileName = "ApplicationLog_" + jetzt.Year.ToString + jetzt.Month.ToString + jetzt.Day.ToString + "_" + jetzt.Hour.ToString + jetzt.Minute.ToString + ".txt"
+            SaveFileDialog1.FileName = "ApplicationLog_" + jetzt.Year.ToString + jetzt.Month.ToString + jetzt.Day.ToString + "_" + jetzt.Hour.ToString + jetzt.Minute.ToString + jetzt.Second.ToString + ".txt"
             SaveFileDialog1.DefaultExt = "txt"
             SaveFileDialog1.Title = "Einstellungsdatei speichern"
             SaveFileDialog1.InitialDirectory = CurDir()

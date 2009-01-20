@@ -29,6 +29,7 @@ namespace IHWB.EVO.MetaEvo
         int populationsize;
         int HJ_minimumstepsize;
         EVO.Diagramm.ApplicationLog applog;
+        EVO.Common.EVO_Settings settings;
 
         public Algos(ref EVO.Common.EVO_Settings settings_input, int individuum_id_input, ref EVO.Diagramm.ApplicationLog applog_input)
         {
@@ -37,21 +38,41 @@ namespace IHWB.EVO.MetaEvo
             ChildsPerParent = settings_input.MetaEvo.ChildsPerParent;
             populationsize = settings_input.MetaEvo.PopulationSize;
             HJ_minimumstepsize = settings_input.MetaEvo.HJStepsize;
+            settings = settings_input;
         }
 
         //Legt fest welche Algorithmen genutzt werden sollen
         public void set_algos(string algos2use_input) 
         {
             string[] tmp;
+            int[] individuumsperalgo;
+            int currentalgo;
 
             tmp = algos2use_input.Split(',', ';');
             algofeedbackarray = new Algofeedback[tmp.Length];
+            individuumsperalgo = new int[tmp.Length];
 
+            //Individuenverteilung für die Initialisierung der Algorithmen berechnen
+            for (int j = 0; j < (populationsize * ChildsPerParent); j++)
+            {
+                currentalgo = 0;
+                for (int i = 1; i < tmp.Length; i++)
+                {
+                    if (individuumsperalgo[i] < individuumsperalgo[currentalgo])
+                    {
+                        currentalgo = i;
+                    }
+                }
+                individuumsperalgo[currentalgo]++;
+            }
+
+            //Initialisierung der Algorithmen
             for (int i = 0; i < tmp.Length; i++)
             {
-                algofeedbackarray[i] = new Algofeedback(tmp[i].Trim(), (populationsize * ChildsPerParent) / algofeedbackarray.Length);
-                
+                applog.appendResult(1, i, "" + individuumsperalgo[i]);
+                algofeedbackarray[i] = new Algofeedback(tmp[i].Trim(), individuumsperalgo[i]);  
             }
+            applog.appendResult(1, tmp.Length, "" + tmp.Length*10);
             applog.appendText("Algos: Using Algos: " + algos2use_input);
         }
 
@@ -79,18 +100,18 @@ namespace IHWB.EVO.MetaEvo
             int new_individuums_counter = 0;
             Random rand = new Random();
 
-            //Sicherung gegen Rundungsfehler bei der Platzvergabe für die Algos
-            if (startindex + numberindividuums >= new_generation_input.Length)
-            {
-                numberindividuums = new_generation_input.Length - startindex;
-                algofeedbackarray[algo_id].number_individuals_for_nextGen = numberindividuums;
-            }
-            //Letzter Algo bekommt automatisch restliche Plätze
-            if (algo_id == algofeedbackarray.Length - 1)
-            {
-                numberindividuums = new_generation_input.Length - startindex;
-                algofeedbackarray[algo_id].number_individuals_for_nextGen = numberindividuums;
-            }
+            ////Sicherung gegen Rundungsfehler bei der Platzvergabe für die Algos
+            //if (startindex + numberindividuums >= new_generation_input.Length)
+            //{
+            //    numberindividuums = new_generation_input.Length - startindex;
+            //    algofeedbackarray[algo_id].number_individuals_for_nextGen = numberindividuums;
+            //}
+            ////Letzter Algo bekommt automatisch restliche Plätze
+            //if (algo_id == algofeedbackarray.Length - 1)
+            //{
+            //    numberindividuums = new_generation_input.Length - startindex;
+            //    algofeedbackarray[algo_id].number_individuals_for_nextGen = numberindividuums;
+            //}
 
             switch (algofeedbackarray[algo_id].name)
             {
@@ -492,7 +513,7 @@ namespace IHWB.EVO.MetaEvo
                 #region Hook and Jeeves: Optparameter werden nacheinander variiert und zwei neue Individuen erzeugt
                 case "Hook and Jeeves":  //VGL: Syrjakow S.95f
                     {
-                        numberindividuums = (int)((double)numberindividuums * ((double)genpool_input.Length / (double)new_generation_input.Length));
+                        numberindividuums = genpool_input.Length;
                         applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
                         //Feedbackdate Pro Basis-Individuum: 0:[Gewichtungsparameter für die Zielfunktionen]1:[Tast-Schrittweiten]2:[0:Zustand,1:zu variierender optparameter,2:schon gelaufen,3:Minimumschrittweiten-Mult]
                         //Gewichtungsparameter für die Zielfunktionen [penalties]
@@ -787,7 +808,7 @@ namespace IHWB.EVO.MetaEvo
                         //Alle Hook and Jeeves Prozesse fertig
                         if (countready == numberindividuums)
                         {
-                            algofeedbackarray[algo_id].number_individuals_for_nextGen = 0;
+                            settings.MetaEvo.AlgoMode = "Local: Finished";
                             run = false;
                         }
                         break;
