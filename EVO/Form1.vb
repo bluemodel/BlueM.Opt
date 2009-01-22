@@ -46,22 +46,12 @@ Partial Class Form1
     Private SensiPlot1 As EVO.Apps.SensiPlot
     Private TSP1 As EVO.Apps.TSP
 
-    'Methoden
-    Private CES1 As EVO.ES.CES
-
-    '**** Globale Parameter Parameter Optimierung ****
-    'TODO: diese Werte sollten eigentlich nur in CES bzw PES vorgehalten werden
-    Dim array_x() As Double
-    Dim array_y() As Double
-
     '**** Verschiedenes ****
     Dim isrun As Boolean = False                        'Optimierung läuft
     Dim ispause As Boolean = False                      'Optimierung ist pausiert
 
     '**** Multithreading ****
-    Dim SIM_Eval_is_OK As Boolean
     Private n_Threads As Integer                        'Anzahl der Threads
-    Dim MI_Thread_OK As Boolean = False
 
     'Dialoge
     Private WithEvents solutionDialog As SolutionDialog
