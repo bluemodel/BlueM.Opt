@@ -533,7 +533,7 @@ Public Class Problem
                             .RefReihe = ASC.getReihe(.RefGr)
                         Case ".ZRE"
                             Dim ZRE As New Wave.ZRE(Me.mWorkDir & .RefReiheDatei)
-                            .RefReihe = ZRE.Zeitreihen(0)
+                            .RefReihe = ZRE.getReihe(0)
                             'Case ".PRB"
                             'BUG 183: geht nicht mehr, weil PRB-Dateien keine Zeitreihen sind!
                             'IsOK = Read_PRB(Me.WorkDir & .RefReiheDatei, .RefGr, .RefReihe)
@@ -654,7 +654,7 @@ Public Class Problem
                                 .GrenzReihe = WEL.getReihe(.GrenzGr)
                             Case ".ZRE"
                                 Dim ZRE As New Wave.ZRE(Me.mWorkDir & .GrenzReiheDatei)
-                                .GrenzReihe = ZRE.Zeitreihen(0)
+                                .GrenzReihe = ZRE.getReihe(0)
                             Case Else
                                 Throw New Exception("Das Format der Grenzwertreihe '" & .GrenzReiheDatei & "' wurde nicht erkannt!")
                         End Select

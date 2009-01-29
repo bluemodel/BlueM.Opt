@@ -188,7 +188,7 @@ Public Class BlueM
             Dim reffile As String = Me.WorkDir_Original & Me.Datensatz & ".rva"
             If (File.Exists(reffile)) Then
 
-                Dim RVABase As New Wave.RVA(reffile)
+                Dim RVABase As New Wave.RVA(reffile, True)
 
                 'Vergleichsmodus aktivieren
                 Call Me.IHAProc.setComparisonMode(RVABase.RVAValues)
