@@ -63,6 +63,8 @@ Public Class Progress
             Return m_iRunde
         End Get
         Set(ByVal value As Short)
+            'MaxWert abfangen
+            value = Math.Min(value, Me.NRunden - 1)
             m_iRunde = value
             RaiseEvent iRundeChanged()
         End Set
@@ -77,6 +79,8 @@ Public Class Progress
             Return m_iPopul
         End Get
         Set(ByVal value As Short)
+            'MaxWert abfangen
+            value = Math.Min(value, Me.NPopul - 1)
             m_iPopul = value
             RaiseEvent iPopulChanged()
         End Set
@@ -91,6 +95,8 @@ Public Class Progress
             Return m_iGen
         End Get
         Set(ByVal value As Short)
+            'MaxWert abfangen
+            value = Math.Min(value, Me.NGen - 1)
             m_iGen = value
             RaiseEvent iGenChanged()
         End Set
@@ -105,6 +111,8 @@ Public Class Progress
             Return m_iNachf
         End Get
         Set(ByVal value As Short)
+            'MaxWert abfangen
+            value = Math.Min(value, Me.NNachf - 1)
             m_iNachf = value
             RaiseEvent iNachfChanged()
         End Set
