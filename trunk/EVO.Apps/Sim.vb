@@ -906,6 +906,31 @@ Handler:
                 'abgeänderte Nash-Sutcliffe Formel: 0 als Zielwert (1- weggelassen)
                 QWert = zaehler / nenner
 
+            Case "Korr"
+                'Korrelationskoeffizient (lineare Regression)
+                'Es wird das Bestimmtheitsmaß r^2 zurückgegeben [0-1]
+                '----------------------------------------------------
+                Dim kovar, var_x, var_y, avg_x, avg_y As Double
+                'Mittelwerte
+                avg_x = SimReihe.getWert("Average")
+                avg_y = feature.RefReihe.getWert("Average")
+                'r^2 = sxy^2 / (sx^2 * sy^2)
+                'Standardabweichung: var_x = sx^2 = 1 / (n-1) * SUMME[(x_i - x_avg)^2]
+                'Kovarianz: kovar= sxy = 1 / (n-1) * SUMME[(x_i - x_avg) * (y_i - y_avg)]
+                kovar = 0
+                var_x = 0
+                var_y = 0
+                For i = 0 To SimReihe.Length - 1
+                    kovar += (SimReihe.YWerte(i) - avg_x) * (feature.RefReihe.YWerte(i) - avg_y)
+                    var_x += (SimReihe.YWerte(i) - avg_x) ^ 2
+                    var_y += (feature.RefReihe.YWerte(i) - avg_y) ^ 2
+                Next
+                var_x = 1 / (SimReihe.Length - 1) * var_x
+                var_y = 1 / (SimReihe.Length - 1) * var_y
+                kovar = 1 / (SimReihe.Length - 1) * kovar
+                'Bestimmtheitsmaß = Korrelationskoeffizient^2
+                QWert = kovar ^ 2 / (var_x * var_y)
+
             Case Else
                 Throw New Exception("Die Zielfunktion '" & feature.Funktion & "' wird nicht unterstützt!")
 
