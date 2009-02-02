@@ -879,10 +879,13 @@ namespace IHWB.EVO.MetaEvo
                     this.Individuums_UpdateFromDB(ref generation_input);
 
                     //Neue fertige Individuen zeichnen
-                    for (int i = individuums_ready; i < individuums_ready_now; i++)
+                    for (int i = 0; i < generation_input.Length; i++)
                     {
-                        hauptdiagramm_input.ZeichneIndividuum(generation_input[i], 1, 1, 1, generation_input[i].ID % generation_input.Length, System.Drawing.Color.Yellow, true);
-                        System.Windows.Forms.Application.DoEvents();
+                        if ((generation_input[i].get_status() == "true") || (generation_input[i].get_status() == "false"))
+                        {
+                            hauptdiagramm_input.ZeichneIndividuum(generation_input[i], 1, 1, 1, generation_input[i].ID % generation_input.Length, System.Drawing.Color.Yellow, true);
+                            System.Windows.Forms.Application.DoEvents();
+                        }
                     }
 
                     applog.appendText("Networkmanager: " + Math.Round((double)individuums_ready_now / ((double)number_tosimulate), 2) * 100 + "%");
