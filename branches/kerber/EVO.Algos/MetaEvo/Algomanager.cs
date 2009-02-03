@@ -12,7 +12,7 @@ namespace IHWB.EVO.MetaEvo
         EVO.Common.EVO_Settings settings;
         public EVO.Common.Individuum_MetaEvo[] genpool;
         EVO.Common.Individuum_MetaEvo[] wastepool;
-        EVO.Diagramm.ApplicationLog applog;
+        EVO.Diagramm.Monitor monitor1;
         public Algos algos;
         bool firstrun = true;
         EVO.Diagramm.Hauptdiagramm hauptdiagramm;
@@ -22,18 +22,18 @@ namespace IHWB.EVO.MetaEvo
         int localcounter;
         int localcounter2;
 
-        public Algomanager(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, int individuumnumber_input, ref EVO.Diagramm.ApplicationLog applog_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input) 
+        public Algomanager(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, int individuumnumber_input, ref EVO.Diagramm.Monitor monitor_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input) 
         {
             settings = settings_input;
             hauptdiagramm = hauptdiagramm_input;
-            applog = applog_input;
+            monitor1 = monitor_input;
             localausgabe = "";
             localausgabe2 = "";
             localcounter = settings.MetaEvo.NumberResults;
             localcounter2 = 0;
 
             //Algoobjekt initialisieren (enthält die algorithmus-Methoden und das Feedback zu jedem Algo)
-            algos = new Algos(ref settings_input, individuumnumber_input, ref applog);
+            algos = new Algos(ref settings_input, individuumnumber_input, ref monitor1);
             if ((settings.MetaEvo.OpMode == "Both") || (settings.MetaEvo.OpMode == "Global Optimizer"))
             {
                 algos.set_algos("Zufällige Einfache Mutation, Ungleichverteilte Mutation, Zufällige Rekombination, Intermediäre Rekombination, Diversität aus Sortierung, Totaler Zufall, Dominanzvektor");
@@ -45,7 +45,7 @@ namespace IHWB.EVO.MetaEvo
                 settings.MetaEvo.AlgoMode = "Local: Calculating";
             }
 
-            solutionvolume = new EVO.MO_Indicators.Solutionvolume(5, 0.05, ref applog);
+            solutionvolume = new EVO.MO_Indicators.Solutionvolume(5, 0.05, ref monitor1);
         }
 
         //new_generation mit Genpool verarbeiten und neue Individuen in new_generation erzeugen
@@ -53,7 +53,7 @@ namespace IHWB.EVO.MetaEvo
         {
             Random rand = new Random();
             int difference2genpool = 0;
-            applog.appendText("Algo Manager: Input: Generated and Simulated Individuums: \r\n" + this.generationinfo(ref new_generation_input));
+            this.monitor1.LogAppend("Algo Manager: Input: Generated and Simulated Individuums: \r\n" + this.generationinfo(ref new_generation_input));
 
             if (settings.MetaEvo.OpMode == "Local Optimizer")
             {
@@ -76,7 +76,7 @@ namespace IHWB.EVO.MetaEvo
                     localcounter2 = 0;
                     localcounter = difference2genpool;
                 }
-                applog.appendText("Algo Manager: Result: New Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n"); 
+                this.monitor1.LogAppend("Algo Manager: Result: New Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n"); 
             }
             
             else if ((settings.MetaEvo.OpMode == "Both") || (settings.MetaEvo.OpMode == "Global Optimizer"))
@@ -113,7 +113,7 @@ namespace IHWB.EVO.MetaEvo
                 //4.3.Sortieren
                 //quicksort(ref wastepool, kriterium, 0, wastepool.Length - 1); //Nötig??
                 quicksort(ref genpool, kriterium, 0, genpool.Length - 1);
-                applog.appendText("Algo Manager: Result: New Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n"); 
+                this.monitor1.LogAppend("Algo Manager: Result: New Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n"); 
                 
                 //5.Solutionvolume berechnen (Reihenfolge im IF wichtig, da immer das solutionvolume berechnet werden soll)
                 if ((solutionvolume.calculate_and_decide(ref genpool)) && (settings.MetaEvo.OpMode == "Both"))
@@ -121,7 +121,7 @@ namespace IHWB.EVO.MetaEvo
                     //Solutionvolume entscheidet auf Umschaltung zur lokalen Optimierung
                     settings.MetaEvo.AlgoMode = "Global: Finished";
                 }
-                applog.appendResult(settings.MetaEvo.CurrentGeneration, 8, "" + solutionvolume.get_last_volume());
+                //monitor1.appendResult(settings.MetaEvo.CurrentGeneration, 8, "" + solutionvolume.get_last_volume());
             }
 
             //Genpool zeichnen:
@@ -129,7 +129,7 @@ namespace IHWB.EVO.MetaEvo
             hauptdiagramm.ZeichneSekPopulation(genpool);
             System.Windows.Forms.Application.DoEvents();
 
-            applog.appendText("Algo Manager: Solutionvolume: Last Volume: " + solutionvolume.get_last_volume());
+            this.monitor1.LogAppend("Algo Manager: Solutionvolume: Last Volume: " + solutionvolume.get_last_volume());
         }
 
         //Erzeugt mit Hilfe von Algos die neuen Individuen
@@ -159,7 +159,7 @@ namespace IHWB.EVO.MetaEvo
             {
                 this.genpool[i] = genpool_input[i].Clone_MetaEvo();
             }
-            applog.appendText("Algo Manager: Genpool: \r\n" + this.generationinfo(ref this.genpool));
+            this.monitor1.LogAppend("Algo Manager: Genpool: \r\n" + this.generationinfo(ref this.genpool));
 
             //Genpool zeichnen
             hauptdiagramm.ZeichneSekPopulation(genpool);
@@ -242,7 +242,7 @@ namespace IHWB.EVO.MetaEvo
                                 if (dominator > -1)
                                 {
                                     genpool_input[k].set_status("false#dominated#" + genpool_input[dominator].ID);
-                                    applog.appendText("Algo Manager: Domination: Individuum " + genpool_input[k].ID + " is dominated (by Individuum " + genpool_input[dominator].ID + ")");
+                                    this.monitor1.LogAppend("Algo Manager: Domination: Individuum " + genpool_input[k].ID + " is dominated (by Individuum " + genpool_input[dominator].ID + ")");
                                     dominator = -1;
                                 }
                             }
@@ -289,17 +289,17 @@ namespace IHWB.EVO.MetaEvo
                                 {
                                     case -1:
                                         input2[pointer_newgen].set_status("false#dominated#" + genpool_input[pointer_genpool].ID);
-                                        applog.appendText("Algo Manager: Domination: Individuum " + input2[pointer_newgen].ID + " is dominated (by Individuum " + genpool_input[pointer_genpool].ID + ")");
+                                        this.monitor1.LogAppend("Algo Manager: Domination: Individuum " + input2[pointer_newgen].ID + " is dominated (by Individuum " + genpool_input[pointer_genpool].ID + ")");
                                         break;
 
                                     case 1:
                                         genpool_input[pointer_genpool].set_status("false#dominated#" + input2[pointer_newgen].ID);
-                                        applog.appendText("Algo Manager: Domination: Individuum " + genpool_input[pointer_genpool].ID + " is dominated (by Individuum " + input2[pointer_newgen].ID + ")");
+                                        this.monitor1.LogAppend("Algo Manager: Domination: Individuum " + genpool_input[pointer_genpool].ID + " is dominated (by Individuum " + input2[pointer_newgen].ID + ")");
                                         break;
 
                                     case 0:
                                         genpool_input[pointer_genpool].set_status("false#equal#" + input2[pointer_newgen].ID);
-                                        applog.appendText("Algo Manager: Domination: Individuum " + genpool_input[pointer_genpool].ID + " equals Individuum " + input2[pointer_newgen].ID);
+                                        this.monitor1.LogAppend("Algo Manager: Domination: Individuum " + genpool_input[pointer_genpool].ID + " equals Individuum " + input2[pointer_newgen].ID);
                                         break;
 
                                     case 10:
@@ -322,7 +322,7 @@ namespace IHWB.EVO.MetaEvo
             double[] densities = new double[genpool_input.Length + killindividuums];
             int pointer = 0;
 
-            applog.appendText("Algo Manager: Number of new Individuums has a difference to Genpool-size: +" + killindividuums_input + " -> Crowding Selection");
+            this.monitor1.LogAppend("Algo Manager: Number of new Individuums has a difference to Genpool-size: +" + killindividuums_input + " -> Crowding Selection");
 
             //Arbeits-Array erstellen (genau so gross dass alle "true"-Individuen Platz finden)
             EVO.Common.Individuum_MetaEvo[] work = new IHWB.EVO.Common.Individuum_MetaEvo[genpool_input.Length + killindividuums];
@@ -356,10 +356,10 @@ namespace IHWB.EVO.MetaEvo
                     if (densities[i] > densities[pointer]) pointer = i;
                     //tmp = tmp + " ["+i+"]:" + densities[i]+ " ";
                 }
-                //applog.appendText("Algo Manager: Crowding: Densities: " + tmp);
+                //this.monitor1.LogAppend("Algo Manager: Crowding: Densities: " + tmp);
 
                 densities[pointer] = 0;
-                applog.appendText("Algo Manager: Crowding: Individuum " + work[pointer].ID + " is not used anymore");
+                this.monitor1.LogAppend("Algo Manager: Crowding: Individuum " + work[pointer].ID + " is not used anymore");
                 work[pointer].set_status("false#crowding#0");
 
                 killindividuums--;
@@ -375,7 +375,7 @@ namespace IHWB.EVO.MetaEvo
             int pointer = 0;
             double distance = -1;
 
-            applog.appendText("Algo Manager: Number of new Individuums has a difference to Genpool-size: " + numberawake_input + " -> Revive");
+            this.monitor1.LogAppend("Algo Manager: Number of new Individuums has a difference to Genpool-size: " + numberawake_input + " -> Revive");
 
             //Arbeits-Array erstellen 
             EVO.Common.Individuum_MetaEvo[] work = new IHWB.EVO.Common.Individuum_MetaEvo[genpool_input.Length + input2.Length];
@@ -442,7 +442,7 @@ namespace IHWB.EVO.MetaEvo
                     if ((distances[i, 2] > distances[pointer_highest_ranking, 2]) && (work[pointer_highest_ranking].get_status_reason() != "constraints")) pointer_highest_ranking = i;
                 }
                 distances[pointer_highest_ranking, 2] = -1;
-                applog.appendText("Algo Manager: Diversity: Individuum " + work[pointer_highest_ranking].ID + " is used again");
+                this.monitor1.LogAppend("Algo Manager: Diversity: Individuum " + work[pointer_highest_ranking].ID + " is used again");
                 work[pointer_highest_ranking].set_status("true");
 
                 numberawake_input++;
@@ -566,7 +566,7 @@ namespace IHWB.EVO.MetaEvo
                 algos.algofeedbackarray[i].number_individuals_for_nextGen = 0;
             }
 
-            applog.appendText("Algo Manager: nemGen_composition: Initiativ-sum: " + initiativensumme);
+            this.monitor1.LogAppend("Algo Manager: nemGen_composition: Initiativ-sum: " + initiativensumme);
 
             //5. number_individuals_for_nextGen neu setzen
             initproind = initiativensumme / new_generation_input.Length;
@@ -587,17 +587,17 @@ namespace IHWB.EVO.MetaEvo
             //6. Ausgabe zusammenfügen
             for (int i = 0; i < algos.algofeedbackarray.Length; i++)
             {
-                applog.appendResult(settings.MetaEvo.CurrentGeneration + 1, i, "" + algos.algofeedbackarray[i].number_individuals_for_nextGen);
+                //monitor1.appendResult(settings.MetaEvo.CurrentGeneration + 1, i, "" + algos.algofeedbackarray[i].number_individuals_for_nextGen);
                 log[algos.algofeedbackarray.Length] = log[algos.algofeedbackarray.Length] + log[i] + " Initiative: " + algos.algofeedbackarray[i].initiative + " = " + algos.algofeedbackarray[i].number_individuals_for_nextGen + " Individuums for next generation\r\n";    
             }
-            applog.appendResult(settings.MetaEvo.CurrentGeneration + 1, 7, "" + initiativensumme);
-            applog.appendText("Algo Manager: nemGen_composition: Individuuum-Composition for next Generation:\r\n" + log[algos.algofeedbackarray.Length]);
+            //monitor1.appendResult(settings.MetaEvo.CurrentGeneration + 1, 7, "" + initiativensumme);
+            this.monitor1.LogAppend("Algo Manager: nemGen_composition: Individuuum-Composition for next Generation:\r\n" + log[algos.algofeedbackarray.Length]);
 
 
             //7. Initiative bei Bedarf erhöhen (Falls zur Berechnung zu klein)
             if (initiativensumme < 1.00)
             {
-                applog.appendText("Algo Manager: nemGen_composition: Initiative will be increased to the sum of 1(was too low for good calculation)");
+                this.monitor1.LogAppend("Algo Manager: nemGen_composition: Initiative will be increased to the sum of 1(was too low for good calculation)");
                 double tmp = 1 / initiativensumme;
                 for (int i = 0; i < algos.algofeedbackarray.Length; i++)
                 {
@@ -634,7 +634,7 @@ namespace IHWB.EVO.MetaEvo
 
             if (settings.MetaEvo.NumberResults < genpool.Length)
             {
-                applog.appendText("Algo Manager: Reducing Genpool to " + settings.MetaEvo.NumberResults + " Individuums");
+                this.monitor1.LogAppend("Algo Manager: Reducing Genpool to " + settings.MetaEvo.NumberResults + " Individuums");
                 //Nur noch NumberResults Individuen überleben
                 crowding_selection((genpool.Length - settings.MetaEvo.NumberResults), ref genpool, ref new_generation_input);
                 //Lokaler Algo darf nur NumberResults Prozesse Starten
@@ -646,7 +646,7 @@ namespace IHWB.EVO.MetaEvo
                 copy_some_to(ref new_generation_input, ref new_generation_input2);
                 genpool = genpool2;
                 new_generation_input = new_generation_input2;
-                applog.appendText("Algo Manager: Genpool for local Optimization: \r\n" + this.generationinfo(ref genpool) + "\r\n"); 
+                this.monitor1.LogAppend("Algo Manager: Genpool for local Optimization: \r\n" + this.generationinfo(ref genpool) + "\r\n"); 
                     
             }
             
@@ -667,14 +667,14 @@ namespace IHWB.EVO.MetaEvo
         {
             if (settings.MetaEvo.NumberResults < genpool.Length)
             {
-                applog.appendText("Algo Manager: Reducing Genpool to " + settings.MetaEvo.NumberResults + " Individuums");
+                this.monitor1.LogAppend("Algo Manager: Reducing Genpool to " + settings.MetaEvo.NumberResults + " Individuums");
                 //Nur noch NumberResults Individuen überleben
                 crowding_selection((genpool.Length - settings.MetaEvo.NumberResults), ref genpool, ref new_generation_input);
                 //Neuen Genpool und Generation wegen Lösungsreduzierung
                 EVO.Common.Individuum_MetaEvo[] genpool2 = new IHWB.EVO.Common.Individuum_MetaEvo[settings.MetaEvo.NumberResults];
                 copy_true_to(ref genpool, ref genpool2);
                 genpool = genpool2;
-                applog.appendText("Algo Manager: Final Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n");
+                this.monitor1.LogAppend("Algo Manager: Final Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n");
             }
         }
         //Mengendifferenz zwischen Genpoolgrösse und überlebenden Individuen

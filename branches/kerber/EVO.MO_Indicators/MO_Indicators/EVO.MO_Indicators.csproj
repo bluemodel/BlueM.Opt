@@ -47,9 +47,6 @@
     <Compile Include="Solutionvolume.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ClassDiagram1.cd" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\EVO.Common\EVO.Common.vbproj">
       <Project>{CAA1CE91-0973-4BE7-9BD8-16B5D40BC93C}</Project>
       <Name>EVO.Common</Name>

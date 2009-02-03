@@ -52,12 +52,6 @@
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ApplicationLog.Designer.vb">
-      <DependentUpon>ApplicationLog.vb</DependentUpon>
-    </Compile>
-    <Compile Include="ApplicationLog.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Diagramm.vb">
       <SubType>Component</SubType>
     </Compile>
@@ -99,9 +93,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="ApplicationLog.resx">
-      <DependentUpon>ApplicationLog.vb</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Monitor.resx">
       <DependentUpon>Monitor.vb</DependentUpon>
       <SubType>Designer</SubType>
@@ -123,7 +114,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ClassDiagram2.cd" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>

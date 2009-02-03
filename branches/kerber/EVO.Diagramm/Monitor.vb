@@ -1,8 +1,13 @@
-﻿''' <summary>
+﻿Imports System.IO
+
+''' <summary>
 ''' Der Monitor stellt ein Diagramm und ein Textfeld (Log) zur Verfügung
 ''' </summary>
 Partial Public Class Monitor
     Inherits System.Windows.Forms.Form
+
+    Private starttime As DateTime
+    Private result As String(,)
 
     Public Event MonitorClosed()
     Public Event MonitorOpened()
@@ -10,11 +15,12 @@ Partial Public Class Monitor
     ''' <summary>
     ''' Das Monitordiagramm
     ''' </summary>
-    ''' <remarks></remarks>
     Public WithEvents Diag As Diagramm
 
+#Region "Properties"
+
     ''' <summary>
-    ''' Der Log
+    ''' Der Log-Text
     ''' </summary>
     Public Property LogText() As String
         Get
@@ -25,14 +31,29 @@ Partial Public Class Monitor
         End Set
     End Property
 
+#End Region 'Properties
+
+#Region "Methoden"
+
+    ''' <summary>
+    ''' Konstruktor
+    ''' </summary>
+    Public Sub New()
+
+        ' This call is required by the Windows Form Designer.
+        InitializeComponent()
+
+        ' Add any initialization after the InitializeComponent() call.
+        Me.starttime = DateTime.Now
+
+    End Sub
+
     ''' <summary>
     ''' Fügt dem Log einen Text hinzu
     ''' </summary>
     ''' <param name="text">der Text</param>
     Public Sub LogAppend(ByVal text As String)
-
-        Call Me.TextBox_Log.AppendText(text & EVO.Common.Constants.eol)
-
+        Call Me.TextBox_Log.AppendText(Format((DateTime.Now - starttime).TotalSeconds, "###,###,##0.00") & ": " & text & EVO.Common.Constants.eol)
     End Sub
 
     ''' <summary>
@@ -54,6 +75,55 @@ Partial Public Class Monitor
     ''' </summary>
     Public Sub SelectTabLog()
         Me.TabControl1.SelectedTab = Me.TabPage_Log
+    End Sub
+
+    ''' <summary>
+    ''' Fügt ein Ergebnis hinzu
+    ''' </summary>
+    ''' <param name="generation"></param>
+    ''' <param name="eintrag"></param>
+    ''' <param name="text"></param>
+    ''' <remarks>FUNZT NICHT!</remarks>
+    Public Sub appendResult(ByVal generation As Integer, ByVal eintrag As Integer, ByVal text As String)
+        'TODO: das geht so nicht! Alle Aufrufe von appendResult auskommentiert (betrifft nur MetaEVO)
+        ReDim Preserve Me.result(generation, eintrag)
+        Me.result(generation, eintrag) = text
+    End Sub
+
+    ''' <summary>
+    ''' Ruft den Speichern-Dialog um den Log-Inhalt als Textdatei abzuspeichern
+    ''' </summary>
+    Public Sub savelog()
+
+        Dim sw As StreamWriter
+        Dim SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog()
+        Dim jetzt = DateTime.Now
+        Dim tmp As String
+
+        'Result anhängen
+        Me.TextBox_Log.AppendText(EVO.Common.Constants.eol + "Result:" + EVO.Common.Constants.eol)
+        For i = 0 To 8
+            tmp = ""
+            For j = 0 To Me.result.GetUpperBound(0)
+                tmp = tmp + result(j, i) + vbTab
+            Next
+            Me.TextBox_Log.AppendText(tmp + EVO.Common.Constants.eol)
+        Next
+
+        'Dialog(einrichten)
+        SaveFileDialog1.Filter = "Text-Dateien (*.txt)|*.txt"
+        SaveFileDialog1.FileName = "ApplicationLog_" + jetzt.Year.ToString + jetzt.Month.ToString + jetzt.Day.ToString + "_" + jetzt.Hour.ToString + jetzt.Minute.ToString + jetzt.Second.ToString + ".txt"
+        SaveFileDialog1.DefaultExt = "txt"
+        SaveFileDialog1.Title = "Log speichern"
+        SaveFileDialog1.InitialDirectory = CurDir()
+
+        'Dialog anzeigen
+        If (SaveFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK) Then
+            sw = File.CreateText(SaveFileDialog1.FileName)
+            sw.Write(Me.TextBox_Log.Text)
+            sw.Flush()
+            sw.Close()
+        End If
     End Sub
 
 #Region "UI"
@@ -88,6 +158,8 @@ Partial Public Class Monitor
 
     End Sub
 
-#End Region
+#End Region 'UI
+
+#End Region 'Methoden
 
 End Class

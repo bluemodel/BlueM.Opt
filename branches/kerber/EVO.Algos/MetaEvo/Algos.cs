@@ -28,13 +28,13 @@ namespace IHWB.EVO.MetaEvo
         int ChildsPerParent;
         int populationsize;
         int HJ_minimumstepsize;
-        EVO.Diagramm.ApplicationLog applog;
+        EVO.Diagramm.Monitor monitor1;
         EVO.Common.EVO_Settings settings;
 
-        public Algos(ref EVO.Common.EVO_Settings settings_input, int individuum_id_input, ref EVO.Diagramm.ApplicationLog applog_input)
+        public Algos(ref EVO.Common.EVO_Settings settings_input, int individuum_id_input, ref EVO.Diagramm.Monitor monitor_input)
         {
             individuum_id = individuum_id_input;
-            applog = applog_input;
+            monitor1 = monitor_input;
             ChildsPerParent = settings_input.MetaEvo.ChildsPerParent;
             populationsize = settings_input.MetaEvo.PopulationSize;
             HJ_minimumstepsize = settings_input.MetaEvo.HJStepsize;
@@ -69,11 +69,11 @@ namespace IHWB.EVO.MetaEvo
             //Initialisierung der Algorithmen
             for (int i = 0; i < tmp.Length; i++)
             {
-                applog.appendResult(1, i, "" + individuumsperalgo[i]);
+                //monitor1.appendResult(1, i, "" + individuumsperalgo[i]);
                 algofeedbackarray[i] = new Algofeedback(tmp[i].Trim(), individuumsperalgo[i]);  
             }
-            applog.appendResult(1, tmp.Length, "" + tmp.Length*10);
-            applog.appendText("Algos: Using Algos: " + algos2use_input);
+            //monitor1.appendResult(1, tmp.Length, "" + tmp.Length*10);
+            this.monitor1.LogAppend("Algos: Using Algos: " + algos2use_input);
         }
 
         //Neue Generation erzeugen
@@ -119,7 +119,7 @@ namespace IHWB.EVO.MetaEvo
                 #region Zufällige Einfache Mutation: Mutiert an einer zufälligen Stelle innerhalb der Grenzen von Min und Max
                 case "Zufällige Einfache Mutation":
                     {
-                        applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
+                        this.monitor1.LogAppend("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
 
                         double[] mutated_optparas = new double[numberoptparas];
                         int selecteditem;
@@ -149,7 +149,7 @@ namespace IHWB.EVO.MetaEvo
                         //Feedbackdata: Pro Individuum: [[Mutationsparameter]] 
                         //Ein Mutationsparameter kann pro runde maximal um 10% verändert werden
 
-                        applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
+                        this.monitor1.LogAppend("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
 
                         double[] fmutated_optparas = new double[numberoptparas];
                         int pointer_parent2 = 0;
@@ -257,7 +257,7 @@ namespace IHWB.EVO.MetaEvo
                 #region Ungleichverteilte Mutation: Mutiert an einer zufälligen Stelle (grössere Mutationen sind unwahrscheinlicher)
                 case "Ungleichverteilte Mutation":
                     {
-                        applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
+                        this.monitor1.LogAppend("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
 
                         double[] mutated_optparas2 = new double[numberoptparas];
                         int selecteditem2;
@@ -288,7 +288,7 @@ namespace IHWB.EVO.MetaEvo
                 #region Zufällige Rekombination: Die Werte zweier zufälliger Eltern werden zufällig rekombiniert
                 case "Zufällige Rekombination":
                     {
-                        applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
+                        this.monitor1.LogAppend("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
 
                         int selectedind;
                         int selectedind2;
@@ -324,7 +324,7 @@ namespace IHWB.EVO.MetaEvo
                 #region Intermediäre Rekombination: zwei Parents rekombinieren sich im Verhältnis eines Parameters
                 case "Intermediäre Rekombination":
                     {
-                        applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
+                        this.monitor1.LogAppend("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
 
                         int selectedind;
                         int selectedind2;
@@ -363,7 +363,7 @@ namespace IHWB.EVO.MetaEvo
                 #region Diversität aus Sortierung: Differenzvektorbestimmung und Addierung am Rande der nach zufälligem Kriterium sortierten Generation
                 case "Diversität aus Sortierung":
                     {
-                        applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
+                        this.monitor1.LogAppend("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
 
                         double[] diversity_optparas = new double[numberoptparas];
                         double mult1 = 1;
@@ -415,7 +415,7 @@ namespace IHWB.EVO.MetaEvo
                 #region Totaler Zufall: Alle Optparameter entstehen durch zufällige Wahl
                 case "Totaler Zufall":
                     {
-                        applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
+                        this.monitor1.LogAppend("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
 
                         double[] random_array;
 
@@ -444,7 +444,7 @@ namespace IHWB.EVO.MetaEvo
                 #region Dominanzvektor: Differenzvektor eines dominierten und eines dominanten Individuums auf ein dominantes Individuum addieren
                 case "Dominanzvektor":
                     {
-                        applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
+                        this.monitor1.LogAppend("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
 
                         double[] dominanz = new double[numberoptparas];
                         int dominator = -1;
@@ -514,7 +514,7 @@ namespace IHWB.EVO.MetaEvo
                 case "Hook and Jeeves":  //VGL: Syrjakow S.95f
                     {
                         numberindividuums = genpool_input.Length;
-                        applog.appendText("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
+                        this.monitor1.LogAppend("Algos: Buliding " + numberindividuums + " Individuums with " + algo_id + ":'" + algofeedbackarray[algo_id].name + "'...done");
                         //Feedbackdate Pro Basis-Individuum: 0:[Gewichtungsparameter für die Zielfunktionen]1:[Tast-Schrittweiten]2:[0:Zustand,1:zu variierender optparameter,2:schon gelaufen,3:Minimumschrittweiten-Mult]
                         //Gewichtungsparameter für die Zielfunktionen [penalties]
                         //Tast-Schrittweiten [optparameter]
@@ -532,7 +532,7 @@ namespace IHWB.EVO.MetaEvo
                         if (firstrun)
                         {
                             //Vorbereitung für Wichtungsberechnung der einzelnen Funktionen 
-                            applog.appendText("Algos: Hook and Jeeves: Starting precalculation of weights");
+                            this.monitor1.LogAppend("Algos: Hook and Jeeves: Starting precalculation of weights");
                             for (int i = 0; i < numberpenalties; i++) //Min,Max vorbelegen
                             {
                                 weightsinfo[0, i] = genpool_input[0].Penalties[i];
@@ -550,7 +550,7 @@ namespace IHWB.EVO.MetaEvo
                             firstrun = false;
                         }
 
-                        applog.appendText("Algos: Hook and Jeeves: Starting Calculation of " + numberindividuums + " Processes");
+                        this.monitor1.LogAppend("Algos: Hook and Jeeves: Starting Calculation of " + numberindividuums + " Processes");
                         for (int i = 0; i < numberindividuums; i++)
                         {
                             //Standardmässig nicht simulieren
@@ -577,7 +577,7 @@ namespace IHWB.EVO.MetaEvo
 
                             while(run)
                             {
-                                applog.appendText("Algos: Hook and Jeeves: BaseIndividuum "+ genpool_input[i].ID + ": HJ-state: " + nextstate);
+                                this.monitor1.LogAppend("Algos: Hook and Jeeves: BaseIndividuum "+ genpool_input[i].ID + ": HJ-state: " + nextstate);
                                 switch (nextstate)
                                 {
                                     case (-1): //-1: Schrittweiten definieren
@@ -599,7 +599,7 @@ namespace IHWB.EVO.MetaEvo
                                                     }
                                                     if (genpool_input[i].feedbackdata[0, j] == 0) genpool_input[i].feedbackdata[0, j] = 0.5;
                                                     else genpool_input[i].feedbackdata[0, j] = ((weightsinfo[1, j] - genpool_input[i].Penalties[j]) / (weightsinfo[1, j] - weightsinfo[0, j])) / genpool_input[i].feedbackdata[0, j];
-                                                    applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Weight for Penalty[" + j + "]: " + genpool_input[i].feedbackdata[0, j]);
+                                                    this.monitor1.LogAppend("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Weight for Penalty[" + j + "]: " + genpool_input[i].feedbackdata[0, j]);
                                                 }
                                                 //Initiale Tastschrittweite 
                                                 genpool_input[i].feedbackdata[1, j] = (genpool_input[i].OptParameter[j].Max - genpool_input[i].OptParameter[j].Min) / (double)(numberindividuums * 2);   
@@ -624,7 +624,7 @@ namespace IHWB.EVO.MetaEvo
                                             new_generation_input[i * 3 + 1].set_status("raw");
                                             new_generation_input[i * 3 + 1].set_generator(algo_id);
                                             individuum_id++;
-                                            applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": BestIndividuum " + new_generation_input[i * 3].ID + " -> " + new_generation_input[i * 3 + 1].ID + " Mutate optparas[" + (int)genpool_input[i].feedbackdata[2, 1] + "] from " + new_generation_input[i * 3].get_optparas()[(int)genpool_input[i].feedbackdata[2, 1]] + " to " + mutated_optparas[(int)genpool_input[i].feedbackdata[2, 1]] + " (- Stepsize: " + genpool_input[i].feedbackdata[1, (int)genpool_input[i].feedbackdata[2, 1]] + ")");
+                                            this.monitor1.LogAppend("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": BestIndividuum " + new_generation_input[i * 3].ID + " -> " + new_generation_input[i * 3 + 1].ID + " Mutate optparas[" + (int)genpool_input[i].feedbackdata[2, 1] + "] from " + new_generation_input[i * 3].get_optparas()[(int)genpool_input[i].feedbackdata[2, 1]] + " to " + mutated_optparas[(int)genpool_input[i].feedbackdata[2, 1]] + " (- Stepsize: " + genpool_input[i].feedbackdata[1, (int)genpool_input[i].feedbackdata[2, 1]] + ")");
                                             run = false;
                                             nextstate = 1;
                                             break;
@@ -643,7 +643,7 @@ namespace IHWB.EVO.MetaEvo
                                                     weighted_penaltie_new += new_penalties[j] * genpool_input[i].feedbackdata[0, j];
                                                     weighted_penaltie_new2 += new2_penalties[j] * genpool_input[i].feedbackdata[0, j];
                                                 }
-                                                applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": WightedPenalties: BestIndividuum " + new_generation_input[i * 3].ID + " = " + weighted_penaltie_new + " / NewIndividuum " + new_generation_input[i * 3 + 1].ID + " = " + weighted_penaltie_new2);
+                                                this.monitor1.LogAppend("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": WightedPenalties: BestIndividuum " + new_generation_input[i * 3].ID + " = " + weighted_penaltie_new + " / NewIndividuum " + new_generation_input[i * 3 + 1].ID + " = " + weighted_penaltie_new2);
                                                 if (weighted_penaltie_new2 < weighted_penaltie_new) { nextstate = 4; break; }
                                             }
                                             nextstate = 2;
@@ -662,7 +662,7 @@ namespace IHWB.EVO.MetaEvo
                                             new_generation_input[i * 3 + 1].set_status("raw");
                                             new_generation_input[i * 3 + 1].set_generator(algo_id);
                                             individuum_id++;
-                                            applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": BestIndividuum " + new_generation_input[i * 3].ID + " Mutate optparas[" + (int)genpool_input[i].feedbackdata[2, 1] + "] from " + new_generation_input[i * 3].get_optparas()[(int)genpool_input[i].feedbackdata[2, 1]] + " to " + mutated_optparas[(int)genpool_input[i].feedbackdata[2, 1]] + " (+ Stepsize: " + genpool_input[i].feedbackdata[1, (int)genpool_input[i].feedbackdata[2, 1]] + ")");
+                                            this.monitor1.LogAppend("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": BestIndividuum " + new_generation_input[i * 3].ID + " Mutate optparas[" + (int)genpool_input[i].feedbackdata[2, 1] + "] from " + new_generation_input[i * 3].get_optparas()[(int)genpool_input[i].feedbackdata[2, 1]] + " to " + mutated_optparas[(int)genpool_input[i].feedbackdata[2, 1]] + " (+ Stepsize: " + genpool_input[i].feedbackdata[1, (int)genpool_input[i].feedbackdata[2, 1]] + ")");
                                             run = false;
                                             genpool_input[i].feedbackdata[1,(int)genpool_input[i].feedbackdata[2, 1]] *= -1; //Schrittweite negieren
                                             nextstate = 3;
@@ -682,7 +682,7 @@ namespace IHWB.EVO.MetaEvo
                                                     weighted_penaltie_new += new_penalties[j] * genpool_input[i].feedbackdata[0, j];
                                                     weighted_penaltie_new2 += new2_penalties[j] * genpool_input[i].feedbackdata[0, j];
                                                 }
-                                                applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": WightedPenalties: BestIndividuum " + new_generation_input[i * 3].ID + " = " + weighted_penaltie_new + " / NewIndividuum " + new_generation_input[i * 3 + 1].ID + " = " + weighted_penaltie_new2);
+                                                this.monitor1.LogAppend("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": WightedPenalties: BestIndividuum " + new_generation_input[i * 3].ID + " = " + weighted_penaltie_new + " / NewIndividuum " + new_generation_input[i * 3 + 1].ID + " = " + weighted_penaltie_new2);
                                                 if (weighted_penaltie_new2 < weighted_penaltie_new) { nextstate = 4; break; }
                                             }
                                             nextstate = 5;
@@ -692,7 +692,7 @@ namespace IHWB.EVO.MetaEvo
                                         { 
                                             new_generation_input[i * 3] = new_generation_input[i * 3 + 1].Clone_MetaEvo();
                                             new_generation_input[i * 3].set_toSimulate(false);
-                                            applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Neues BestIndividuum: " + new_generation_input[i * 3].ID);
+                                            this.monitor1.LogAppend("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Neues BestIndividuum: " + new_generation_input[i * 3].ID);
                                             nextstate = 5;
                                             break;
                                         }
@@ -700,13 +700,13 @@ namespace IHWB.EVO.MetaEvo
                                         {
                                             if (genpool_input[i].feedbackdata[2, 1] < numberoptparas - 1)
                                             {
-                                                applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Optparameter " + (genpool_input[i].feedbackdata[2, 1]) + " von " + numberoptparas + " mit der vorgegebenen Schrittweite getestet");  
+                                                this.monitor1.LogAppend("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Optparameter " + (genpool_input[i].feedbackdata[2, 1]) + " von " + numberoptparas + " mit der vorgegebenen Schrittweite getestet");  
                                                 genpool_input[i].feedbackdata[2, 1]++;
                                                 nextstate = 0;
                                             }
                                             else
                                             {
-                                                applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Optparameter " + numberoptparas + " von " + numberoptparas + " mit der vorgegebenen Schrittweite getestet");  
+                                                this.monitor1.LogAppend("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Optparameter " + numberoptparas + " von " + numberoptparas + " mit der vorgegebenen Schrittweite getestet");  
                                                 genpool_input[i].feedbackdata[2, 1] = 0;//zu variierender optparameter [1]
                                                 nextstate = 10;
                                             }
@@ -726,12 +726,12 @@ namespace IHWB.EVO.MetaEvo
                                             }
                                             if (weighted_penaltie_new < weighted_penaltie_gen)
                                             {
-                                                applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Neues BestIndividuum " + new_generation_input[i * 3].ID + " Penaltie: " + weighted_penaltie_new + " ist besser als Basisindividuum " + genpool_input[i].ID + " Penaltie: " + weighted_penaltie_gen);
+                                                this.monitor1.LogAppend("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Neues BestIndividuum " + new_generation_input[i * 3].ID + " Penaltie: " + weighted_penaltie_new + " ist besser als Basisindividuum " + genpool_input[i].ID + " Penaltie: " + weighted_penaltie_gen);
                                                 nextstate = 20;
                                             }
                                             else
                                             {
-                                                applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Neues BestIndividuum " + new_generation_input[i * 3].ID + " Penaltie: " + weighted_penaltie_new + " ist NICHT besser als Basisindividuum " + genpool_input[i].ID + " Penaltie: " + weighted_penaltie_gen);
+                                                this.monitor1.LogAppend("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Neues BestIndividuum " + new_generation_input[i * 3].ID + " Penaltie: " + weighted_penaltie_new + " ist NICHT besser als Basisindividuum " + genpool_input[i].ID + " Penaltie: " + weighted_penaltie_gen);
                                                 nextstate = 30;
                                             }
                                             break;
@@ -751,7 +751,7 @@ namespace IHWB.EVO.MetaEvo
                                                 if (extrapolation[j] > genpool_input[0].OptParameter[j].Max) extrapolation[j] = genpool_input[0].OptParameter[j].Max;
                                                 tmp = tmp + " " + extrapolation[j] + "/";
                                             }
-                                            applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Neues BestIndividuum "+individuum_id+" mit Extrapolationsschritt auf " + tmp + ")");
+                                            this.monitor1.LogAppend("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Neues BestIndividuum "+individuum_id+" mit Extrapolationsschritt auf " + tmp + ")");
                                             //Kopieren des Individuums in den Genpool
                                             feedbackdata_tmp = genpool_input[i].feedbackdata;
                                             genpool_input[i] = new_generation_input[i * 3].Clone_MetaEvo();
@@ -771,7 +771,7 @@ namespace IHWB.EVO.MetaEvo
                                         {
                                             if (genpool_input[i].feedbackdata[2, 2] == 1)
                                             {
-                                                applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Extrapolation zurückgehen");
+                                                this.monitor1.LogAppend("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Extrapolation zurückgehen");
                                                 new_generation_input[i * 3] = genpool_input[i].Clone_MetaEvo();
                                                 new_generation_input[i * 3].ID = individuum_id;
                                                 individuum_id++;
@@ -789,7 +789,7 @@ namespace IHWB.EVO.MetaEvo
                                             {
                                                 if (Math.Abs(genpool_input[i].feedbackdata[1, j]) < Math.Abs(genpool_input[0].OptParameter[j].Max - genpool_input[0].OptParameter[j].Min) / HJ_minimumstepsize) finished++;  
                                                 genpool_input[i].feedbackdata[1, j] *= 0.5;
-                                                applog.appendText("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Schrittweite[" + j + "] von " + genpool_input[i].feedbackdata[1, j] * 2 + " auf " + genpool_input[i].feedbackdata[1, j]);
+                                                this.monitor1.LogAppend("Algos: Hook and Jeeves: BaseIndividuum " + genpool_input[i].ID + ": Schrittweite[" + j + "] von " + genpool_input[i].feedbackdata[1, j] * 2 + " auf " + genpool_input[i].feedbackdata[1, j]);
                                             }
                                             if (finished == numberoptparas) nextstate = 50;
                                             else nextstate = 0;

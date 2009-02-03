@@ -11,7 +11,7 @@ namespace IHWB.EVO.MO_Indicators
         int historylength;    //Anzahl der Generationen die zum Vergleich herangenommen werden
         double[] basepoint;   //Basiswert von dem aus die Distanzquadrate berechnet werden
         double minimumchange = -1;  //Minimaler Änderungswert über |historylength| generationen
-        EVO.Diagramm.ApplicationLog applog;
+        EVO.Diagramm.Monitor monitor1;
 
         public Solutionvolume(int historylength_input)
         {
@@ -19,12 +19,12 @@ namespace IHWB.EVO.MO_Indicators
             solutionvolume = new double[historylength];
         }
 
-        public Solutionvolume(int historylength_input, double minimumchange_input, ref EVO.Diagramm.ApplicationLog applog_input)
+        public Solutionvolume(int historylength_input, double minimumchange_input, ref EVO.Diagramm.Monitor monitor_input)
         {
             historylength = historylength_input;
             solutionvolume = new double[historylength];
             minimumchange = minimumchange_input;
-            applog = applog_input;
+            monitor1 = monitor_input;
         }
 
         public double get_last_volume() 
@@ -74,7 +74,7 @@ namespace IHWB.EVO.MO_Indicators
             //die gegebene Anzahl an zu vergleichenden solutionvolumes schon einmal berechnet wurden
             if ((minimumchange != -1) && (solutionvolume[historylength-1] != 0))
             {
-                applog.appendText("Algo Manager: Solutionvolume: Actual change: " + Math.Round(((solutionvolume[1] / solutionvolume[0])-1) * 100, 2) + "% during last generation"); 
+                monitor1.LogAppend("Algo Manager: Solutionvolume: Actual change: " + Math.Round(((solutionvolume[1] / solutionvolume[0]) - 1) * 100, 2) + "% during last generation"); 
 
                 for (int i = 0; i < solutionvolume.Length - 1; i++)
                 {
@@ -84,8 +84,8 @@ namespace IHWB.EVO.MO_Indicators
 
                 if (sum < minimumchange)
                 {
-                    applog.appendText("Algo Manager: Solutionvolume: Less than " + Math.Round(minimumchange * 100, 2) + "% (" + Math.Round(sum, 2) + "%) change during last " + historylength + " generations");
-                    applog.appendText("Algo Manager: Solutionvolume: [0]:"+ solutionvolume[0] +" [1]:"+ solutionvolume[1] +" [2]:"+ solutionvolume[2] + "[3]:"+ solutionvolume[3] +" [4]:"+ solutionvolume[4]); 
+                    monitor1.LogAppend("Algo Manager: Solutionvolume: Less than " + Math.Round(minimumchange * 100, 2) + "% (" + Math.Round(sum, 2) + "%) change during last " + historylength + " generations");
+                    monitor1.LogAppend("Algo Manager: Solutionvolume: [0]:" + solutionvolume[0] + " [1]:" + solutionvolume[1] + " [2]:" + solutionvolume[2] + "[3]:" + solutionvolume[3] + " [4]:" + solutionvolume[4]); 
                     return true;
                 }
             }
