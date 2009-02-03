@@ -854,12 +854,10 @@ Public Class PES
         Dim i, v, n As Integer
         Dim DeTemp(,,) As Double      'Temporäre Schrittweiten für Eltern
         Dim XeTemp(,,) As Double      'Temporäre Parameterwerte für Eltern
-        Dim expo As Integer             'Exponent für Schrittweite (+/-1)
+        Dim expo As Integer           'Exponent für Schrittweite (+/-1)
 
         ReDim DeTemp(Me.mProblem.NumParams - 1, mSettings.PES.n_Eltern - 1, mSettings.PES.Pop.n_Popul - 1)
         ReDim XeTemp(Me.mProblem.NumParams - 1, mSettings.PES.n_Eltern - 1, mSettings.PES.Pop.n_Popul - 1)
-
-StartMutation:
 
         'Einheitliche Schrittweite
         '-------------------------
@@ -882,13 +880,15 @@ StartMutation:
             For v = 0 To Me.mProblem.NumParams - 1
                 i = 0
                 Do
-                    i += 1
-                    'Abbruchkriterium
-                    '----------------
+                    'Abbruchkriterium für abhängige Parameter
+                    '----------------------------------------
                     If (i >= 1000) Then
                         'Es konnte kein gültiger Parametersatz generiert werden!
-                        'Wieder von vorne anfangen
-                        GoTo StartMutation
+                        'Vermutlich ist die aktuelle Schrittweite nicht groß genug.
+                        'Elterwert des aktuellen Parameters auf aktuellen Wert 
+                        'des Parameters setzen, von dem der aktuelle Parameter abhängig ist
+                        i = 0
+                        Xe(v, n, PES_iAkt.iAktPop) = XeTemp(v - 1, n, PES_iAkt.iAktPop)
                     End If
 
                     'Schrittweitenvektor
@@ -907,7 +907,7 @@ StartMutation:
                     XeTemp(v, n, PES_iAkt.iAktPop) = Xe(v, n, PES_iAkt.iAktPop) + DeTemp(v, n, PES_iAkt.iAktPop) * Z
 
                     ' Restriktion für die mutierten Werte
-                Loop While (XeTemp(v, n, PES_iAkt.iAktPop) <= 0 Or XeTemp(v, n, PES_iAkt.iAktPop) > 1 Or Not checkBeziehungPop(v, n, XeTemp))
+                Loop While (XeTemp(v, n, PES_iAkt.iAktPop) < 0 Or XeTemp(v, n, PES_iAkt.iAktPop) > 1 Or Not checkBeziehungPop(v, n, XeTemp))
 
             Next v
 
@@ -940,8 +940,6 @@ StartMutation:
 
         ReDim DnTemp(Me.mProblem.NumParams - 1)
         ReDim XnTemp(Me.mProblem.NumParams - 1)
-
-StartMutation:
 
         'Einheitliche Schrittweite
         '-------------------------
@@ -979,12 +977,15 @@ StartMutation:
             i = 0
             Do
                 i += 1
-                'Abbruchkriterium
-                '----------------
+                'Abbruchkriterium für abhängige Parameter
+                '----------------------------------------
                 If (i >= 1000) Then
                     'Es konnte kein gültiger Parametersatz generiert werden!
-                    'Wieder von vorne anfangen
-                    GoTo StartMutation
+                    'Vermutlich ist die aktuelle Schrittweite nicht groß genug.
+                    'Elterwert des aktuellen Parameters auf aktuellen Wert 
+                    'des Parameters setzen, von dem der aktuelle Parameter abhängig ist
+                    i = 0
+                    AktPara(v).Xn = XnTemp(v - 1)
                 End If
 
                 'Schrittweitenvektor
@@ -1021,7 +1022,7 @@ StartMutation:
                 XnTemp(v) = AktPara(v).Xn + DnTemp(v) * Z
 
                 'Restriktion für die mutierten Werte
-            Loop While (XnTemp(v) <= 0 Or XnTemp(v) > 1 Or Not checkBeziehung(v, XnTemp))
+            Loop While (XnTemp(v) < 0 Or XnTemp(v) > 1 Or Not checkBeziehung(v, XnTemp))
 
         Next v
 
@@ -1100,7 +1101,7 @@ StartMutation:
                 XnTemp(v) = AktPara(v).Xn + Dn_CES * Z
 
                 'Restriktion für die mutierten Werte
-            Loop While (XnTemp(v) <= 0 Or XnTemp(v) > 1 Or Not checkBeziehung(v, XnTemp))
+            Loop While (XnTemp(v) < 0 Or XnTemp(v) > 1 Or Not checkBeziehung(v, XnTemp))
 
         Next v
 
@@ -1442,7 +1443,7 @@ StartMutation:
             '3. Der Bestwertspeicher wird entsprechend der Fronten oder der sekundären Population gefüllt
             '4: Sekundäre Population wird bestimmt und gespeichert
             '--------------------------------
-            Dim Func1 As Kern.Functions = New Kern.Functions(Me.mProblem, Me.mSettings.PES.n_Nachf, Me.mSettings.PES.n_Eltern, Me.mSettings.PES.SekPop.is_Begrenzung, Me.mSettings.PES.SekPop.n_MaxMembers, Me.mSettings.PES.SekPop.n_Interact, Me.mSettings.PES.SekPop.is_Interact, PES_iAkt.iAktGen)
+            Dim Func1 As ES.Functions = New ES.Functions(Me.mProblem, Me.mSettings.PES.n_Nachf, Me.mSettings.PES.n_Eltern, Me.mSettings.PES.SekPop.is_Begrenzung, Me.mSettings.PES.SekPop.n_MaxMembers, Me.mSettings.PES.SekPop.n_Interact, Me.mSettings.PES.SekPop.is_Interact, PES_iAkt.iAktGen)
             Call Func1.EsEltern_Pareto(NDSorting, SekundärQb, Best_Indi)
             'Bestimmen der Crowding Distance falls Diversity-Tournament
             '----------------------------------------------------------

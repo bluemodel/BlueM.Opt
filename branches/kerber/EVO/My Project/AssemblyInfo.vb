@@ -7,11 +7,11 @@ Imports System.Runtime.InteropServices
 ' Assemblyinformationen zu ändern
 
 
-<Assembly: AssemblyTitle("EVO.NET")> 
-<Assembly: AssemblyDescription("Multikriterielle Evolutionsstrategie")> 
+<Assembly: AssemblyTitle("BlueM.Opt")> 
+<Assembly: AssemblyDescription("Optimierungsframework" & vbCrLf & vbCrLf & "Icons provided by famfamfam.com")> 
 <Assembly: AssemblyCompany("IHWB - TU Darmstadt")> 
-<Assembly: AssemblyProduct("EVO.NET")> 
-<Assembly: AssemblyCopyright("Copyright © IHWB 2008")> 
+<Assembly: AssemblyProduct("BlueM.Opt")> 
+<Assembly: AssemblyCopyright("Copyright © IHWB 2009")> 
 <Assembly: AssemblyTrademark("")>
 <Assembly: AssemblyCulture("")>
 
@@ -26,6 +26,6 @@ Imports System.Runtime.InteropServices
 ' mit '*' verwenden. Siehe unten
 
 
-<Assembly: AssemblyVersion("1.2.2.*")> 
+<Assembly: AssemblyVersion("1.2.4.*")> 
 
 

@@ -1,16 +1,25 @@
 ﻿===============================================================
-EVO.NET Release Notes
+BlueM.Opt Release Notes
 ===============================================================
 Autoren: Christoph Hübner, Felix Froehlich, Dirk Muschalla
 (c) IHWB TU-Darmstadt
-Website: http://130.83.196.154/BlueM/wiki/index.php/EVO.NET
+Website: http://130.83.196.154/BlueM/wiki/index.php/BlueM.Opt
 ===============================================================
+
+Version 1.2.4
+-------------
+* UPDATE: Multithreading wird zentral verwaltet und kann von allen Applikationen genutzt werden. Multithreading kann im Optionsdialog ausgeschaltet werden. (Bug 345)
+* CHANGED: UI Redesign
+
+Version 1.2.3
+-------------
+* NEW: Neue Methode DDS (Dynamically Dimensioned Search)
+* UPDATE: SWMM-Anbindung verbessert - Multithreading möglich
 
 Version 1.2.2
 -------------
 * NEW: Ein Optimierungsergebnis kann jetzt auch im Entscheidungsraum (als Scatterplot-Matrix) dargestellt werden (Bug 375)
 * FIXED: Fehler im PES Kern bedingt durch die freie Evaluierungsreihenfolge des Multithreadings behoben
-
 
 Version 1.2.1
 -------------

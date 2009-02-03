@@ -39,6 +39,7 @@
   <ItemGroup>
     <Reference Include="IHWB.BlueM.DllAdapter, Version=0.0.1.1, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="IHWB.SMUSI.DllAdapter, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL" />
+    <Reference Include="IHWB.SWMM.DllAdapter, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -86,7 +87,7 @@
     <Compile Include="Sim.vb" />
     <Compile Include="SMUSI\Smusi.vb" />
     <Compile Include="SWMM\SWMM.vb" />
-    <Compile Include="SWMM\Swmm_Iface.vb" />
+    <Compile Include="SWMM\SWMMThread.vb" />
     <Compile Include="S_CAN\Scan.vb" />
     <Compile Include="Testprobleme\Testprobleme.vb" />
     <Compile Include="TSP.vb" />
@@ -129,6 +130,7 @@
     <Content Include="SMUSI\smusi.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="SWMM\IHWB.SWMM.DllAdapter.dll" />
     <Content Include="SWMM\SWMM5.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

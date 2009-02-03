@@ -135,6 +135,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\monitor.ico" />
     <Content Include="Resources\TeeChart.dll" />
   </ItemGroup>
   <ItemGroup>

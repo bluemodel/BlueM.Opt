@@ -1,3 +1,18 @@
+'*******************************************************************************
+'*******************************************************************************
+'**** Klasse EVO_Einstellungen                                              ****
+'****                                                                       ****
+'**** Autoren: Christoph Hübner, Felix Fröhlich, Dirk Muschalla             ****
+'****                                                                       ****
+'**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
+'**** TU Darmstadt                                                          ****
+'****                                                                       ****
+'**** November 2007                                                         ****
+'****                                                                       ****
+'**** Letzte Änderung: November 2007                                        ****
+'*******************************************************************************
+'*******************************************************************************
+
 Imports System.IO
 Imports System.Xml
 Imports System.Xml.Serialization
@@ -6,23 +21,7 @@ Imports IHWB.EVO.Common.Constants
 Public Class EVO_Einstellungen
     Inherits System.Windows.Forms.UserControl
 
-    '*******************************************************************************
-    '*******************************************************************************
-    '**** Klasse EVO_Einstellungen                                              ****
-    '****                                                                       ****
-    '**** Autoren: Christoph Hübner, Felix Fröhlich, Dirk Muschalla             ****
-    '****                                                                       ****
-    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
-    '**** TU Darmstadt                                                          ****
-    '****                                                                       ****
-    '**** November 2007                                                         ****
-    '****                                                                       ****
-    '**** Letzte Änderung: November 2007                                        ****
-    '*******************************************************************************
-    '*******************************************************************************
-
-    'Eigenschaften
-    '#############
+#Region "Eigenschaften"
 
     Private msettings As EVO.Common.EVO_Settings     'Sicherung sämtlicher Einstellungen
     Private mProblem As EVO.Common.Problem           'Das Problem
@@ -30,8 +29,25 @@ Public Class EVO_Einstellungen
     Public isLoad As Boolean = False                 'Flag der anzeigt, ob die Settings aus einer XML Datei gelesen werden
     Private isInitializing As Boolean
 
-    'Methoden
-    '########
+#End Region
+
+#Region "Properties"
+
+    'EVO_Settings Property
+    '*********************
+    Public ReadOnly Property Settings() As EVO.Common.EVO_Settings
+        Get
+            'Wenn Einstellungen noch nicht gespeichert, zuerst aus Form einlesen
+            If (Not Me.isSaved) Then
+                Call Me.readForm()
+            End If
+            Return Me.msettings
+        End Get
+    End Property
+
+#End Region 'Properties
+
+#Region "Methoden"
 
     'Konstruktor
     '***********
@@ -52,24 +68,17 @@ Public Class EVO_Einstellungen
 
         Me.isInitializing = False
 
-       'Standard-Settings setzen
+        'Standard-Settings setzen
         Call Me.msettings.PES.setStandard(EVO_MODUS.Single_Objective)
         Call Me.msettings.CES.setStandard(METH_CES)
         Call Me.msettings.HookJeeves.setStandard()
         Call Me.msettings.MetaEvo.setStandard()
+        Call Me.msettings.DDS.setStandard()
 
     End Sub
 
-    'Laden des Formulars
-    '*******************
-    Private Sub EVO_Einstellungen_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
-
-        'EventHandler einrichten
-        AddHandler Me.ÖffnenToolStripButton.Click, AddressOf Form1.Load_EVO_Settings
-        AddHandler Me.SpeichernToolStripButton.Click, AddressOf Form1.Save_EVO_Settings
-
-    End Sub
-
+    'Initialisierung
+    '***************
     Public Sub Initialise(ByRef prob As EVO.Common.Problem)
 
         'Problem speichern
@@ -110,6 +119,17 @@ Public Class EVO_Einstellungen
 
                 'Standardeinstellungen setzen
                 Call Me.setStandard_HJ()
+
+            Case METH_DDS
+
+                'EVO_Einstellungen aktivieren
+                Me.Enabled = True
+
+                'Tabpage anzeigen
+                Me.TabControl1.TabPages.Add(Me.TabPage_DDS)
+
+                'Standardeinstellungen setzen
+                Call Me.setStandard_DDS()
 
             Case METH_CES
 
@@ -437,6 +457,14 @@ Public Class EVO_Einstellungen
 
         End With
 
+        With Me.msettings.DDS
+
+            .maxiter = Me.Numeric_DDS_maxiter.Value
+            .r_val = Me.Numeric_DDS_r_val.Value
+            .optStartparameter = Me.CheckBox_DDS_ini.Checked
+
+        End With
+
     End Sub
 
     'Setzt/Aktiviert/Deaktiviert die Einstellungen auf den PES Settings
@@ -592,6 +620,16 @@ Public Class EVO_Einstellungen
 
         End With
 
+        'DDS
+        '---------------
+        With Me.msettings.DDS
+
+            Me.Numeric_DDS_maxiter.Value = .maxiter
+            Me.Numeric_DDS_r_val.Value = .r_val
+            Me.CheckBox_DDS_ini.Checked = .optStartparameter
+
+        End With
+
         Call Application.DoEvents()
 
     End Sub
@@ -649,24 +687,19 @@ Public Class EVO_Einstellungen
         Call Me.writeForm()
     End Sub
 
-    'Standardeinstellungen setzen für Hy2008
-    '***********************************
+    'Standardeinstellungen setzen für MetaEVO
+    '****************************************
     Public Sub setStandard_MetaEvo()
         Call Me.msettings.MetaEvo.setStandard()
         Call Me.writeForm()
     End Sub
 
-    'PES_Settings Property
-    '*********************
-    Public ReadOnly Property Settings() As EVO.Common.EVO_Settings
-        Get
-            'Wenn Einstellungen noch nicht gespeichert, zuerst aus Form einlesen
-            If (Not Me.isSaved) Then
-                Call Me.readForm()
-            End If
-            Return Me.msettings
-        End Get
-    End Property
+    'Standardeinstellungen setzen für DDS
+    '************************************
+    Public Sub setStandard_DDS()
+        Call Me.msettings.DDS.setStandard()
+        Call Me.writeForm()
+    End Sub
 
     'Speichern der EVO_Settings in einer XML-Datei
     '*********************************************
@@ -697,14 +730,16 @@ Public Class EVO_Einstellungen
 
         Try
             'Deserialisieren
+            'TODO: XmlDeserializationEvents ms-help://MS.VSCC.v90/MS.MSDNQTR.v90.en/fxref_system.xml/html/e0657840-5678-bf57-6e7a-1bd93b2b27d1.htm
             Me.msettings = CType(serializer.Deserialize(fs), Common.EVO_Settings)
+
             'Geladene Settings in Form schreiben
             isLoad = True
             Call Me.writeForm()
             isLoad = False
 
         Catch e As Exception
-            MsgBox("Kann die angegebene XML-Datei nicht einlesen!" & eol & e.Message, MsgBoxStyle.Critical, "Fehler")
+            MsgBox("Fehler beim Einlesen der Einstellungen!" & eol & e.Message, MsgBoxStyle.Critical, "Fehler")
 
         Finally
             fs.Close()
@@ -768,4 +803,6 @@ Public Class EVO_Einstellungen
             Me.GroupBox_MetaEvo_LocalOptions.Enabled = True
         End If
     End Sub
+#End Region 'Methoden
+
 End Class

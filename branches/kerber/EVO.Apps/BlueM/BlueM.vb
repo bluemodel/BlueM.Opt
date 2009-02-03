@@ -25,6 +25,7 @@ Public Class BlueM
 
     'BlueM DLL
     '---------
+    Private dll_path As String
     Private bluem_dll() As BlueM_EngineDotNetAccess
 
     'Misc
@@ -52,7 +53,7 @@ Public Class BlueM
     ''' <summary>
     ''' Alle Dateiendungen (ohne Punkt), die in einem Datensatz vorkommen können
     ''' </summary>
-    ''' <remarks>Der erste Wert des Arrays wird als Filter für OpenFile-Dialoge verwendet</remarks>
+    ''' <remarks>Die erste Dateiendung in dieser Collection repräsentiert den Datensatz (wird z.B. als Filter für OpenFile-Dialoge verwendet)</remarks>
     Public Overrides ReadOnly Property DatensatzDateiendungen() As Collections.Specialized.StringCollection
         Get
             Dim exts As Collections.Specialized.StringCollection = New Collections.Specialized.StringCollection()
@@ -60,10 +61,20 @@ Public Class BlueM
             exts.AddRange(New String() {"ALL", "SYS", "FKT", "KTR", "EXT", "JGG", "WGG", _
                                         "TGG", "TAL", "HYA", "TRS", "EZG", "EIN", "URB", _
                                         "VER", "RUE", "BEK", "BOA", "BOD", "LNZ", "EFL", _
-                                        "DIF", "ZRE", "BIN"})
+                                        "DIF", "ZRE", "BIN", "FKA"})
 
             Return exts
 
+        End Get
+    End Property
+
+    ''' <summary>
+    ''' Ob die Anwendung Multithreading unterstützt
+    ''' </summary>
+    ''' <returns>True</returns>
+    Public Overrides ReadOnly Property MultithreadingSupported() As Boolean
+        Get
+            Return True
         End Get
     End Property
 
@@ -76,7 +87,7 @@ Public Class BlueM
 
     'Konstruktor
     '***********
-    Public Sub New(ByVal n_Proz As Integer)
+    Public Sub New()
 
         Call MyBase.New()
 
@@ -85,30 +96,40 @@ Public Class BlueM
         Me.useKWL = False
         Me.isIHA = False
 
-        'BlueM_DLL
-        Dim dll_path As String
+        'Pfad zu BlueM.DLL bestimmen
+        '---------------------------
         dll_path = System.Windows.Forms.Application.StartupPath() & "\BlueM\BlueM.dll"
 
-        'BlueM DLL instanzieren je nach Anzahl der Prozessoren
-        '-----------------------------------------------------
-        ReDim bluem_dll(n_Proz - 1)
+        If (Not File.Exists(dll_path)) Then
+            Throw New Exception("BlueM.dll nicht gefunden!")
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' BlueM auf Multithreading vorbereiten
+    ''' </summary>
+    ''' <param name="input_n_Threads">Anzahl Threads</param>
+    Public Overrides Sub prepareThreads(ByVal input_n_Threads As Integer)
+
+        Me.n_Threads = input_n_Threads
+
+        'BlueM DLL instanzieren je nach Anzahl der Threads
+        '-------------------------------------------------
+        ReDim bluem_dll(Me.n_Threads - 1)
         Dim i As Integer
 
-        For i = 0 To n_Proz - 1
-            If (File.Exists(dll_path)) Then
-                bluem_dll(i) = New BlueM_EngineDotNetAccess(dll_path)
-            Else
-                Throw New Exception("BlueM.dll nicht gefunden!")
-            End If
+        For i = 0 To Me.n_Threads - 1
+            bluem_dll(i) = New BlueM_EngineDotNetAccess(dll_path)
         Next
 
-        'Anzahl der Threads
-        ReDim MyBlueMThreads(n_Proz - 1)
-        For i = 0 To n_Proz - 1
+        'Thread-Objekte instanzieren
+        ReDim MyBlueMThreads(Me.n_Threads - 1)
+        For i = 0 To Me.n_Threads - 1
             MyBlueMThreads(i) = New BlueMThread(i, -1, "Folder", Datensatz, bluem_dll(i))
             MyBlueMThreads(i).set_is_OK()
         Next
-        ReDim MyThreads(n_Proz - 1)
+        ReDim MyThreads(Me.n_Threads - 1)
 
     End Sub
 
@@ -167,7 +188,7 @@ Public Class BlueM
             Dim reffile As String = Me.WorkDir_Original & Me.Datensatz & ".rva"
             If (File.Exists(reffile)) Then
 
-                Dim RVABase As New Wave.RVA(reffile)
+                Dim RVABase As New Wave.RVA(reffile, True)
 
                 'Vergleichsmodus aktivieren
                 Call Me.IHAProc.setComparisonMode(RVABase.RVAValues)

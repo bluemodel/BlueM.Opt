@@ -8,7 +8,7 @@ Public Class Scan
     ''' <summary>
     ''' Alle Dateiendungen (ohne Punkt), die in einem Datensatz vorkommen können
     ''' </summary>
-    ''' <remarks>Der erste Wert des Arrays wird als Filter für OpenFile-Dialoge verwendet</remarks>
+    ''' <remarks>Die erste Dateiendung in dieser Collection repräsentiert den Datensatz (wird z.B. als Filter für OpenFile-Dialoge verwendet)</remarks>
     Public Overrides ReadOnly Property DatensatzDateiendungen() As Collections.Specialized.StringCollection
         Get
             Dim exts As Collections.Specialized.StringCollection = New Collections.Specialized.StringCollection()
@@ -22,6 +22,15 @@ Public Class Scan
         End Get
     End Property
 
+    ''' <summary>
+    ''' Ob die Anwendung Multithreading unterstützt
+    ''' </summary>
+    ''' <returns>False</returns>
+    Public Overrides ReadOnly Property MultithreadingSupported() As Boolean
+        Get
+            Return False
+        End Get
+    End Property
 
     'Konstruktor
     '***********
@@ -94,7 +103,6 @@ Public Class Scan
         For k = 1 To stoffe.GetUpperBound(0)
 
             Dim zre As New Wave.Zeitreihe(stoffe(k))
-            zre.Length = input.Zeitreihen(0).Length
 
             Dim tmpWert As Double
 
@@ -109,8 +117,7 @@ Public Class Scan
 
                 tmpWert += Parameter("Konst")(stoffe(k))
 
-                zre.XWerte(i) = input.Zeitreihen(0).XWerte(i)
-                zre.YWerte(i) = tmpWert
+                zre.AddNode(input.Zeitreihen(0).XWerte(i), tmpWert)
 
             Next
 
@@ -158,8 +165,8 @@ Public Class Scan
         inputdatei = Me.WorkDir_Current & Me.Datensatz & "_input.WEL"
         Me.input = New Wave.WEL(inputdatei, True)
 
-        Me.SimStart = Me.input.Zeitreihen(0).XWerte(0)
-        Me.SimEnde = Me.input.Zeitreihen(0).XWerte(Me.input.Zeitreihen(0).XWerte.GetUpperBound(0))
+        Me.SimStart = Me.input.Zeitreihen(0).Anfangsdatum
+        Me.SimEnde = Me.input.Zeitreihen(0).Enddatum
         'Me.SimDT
     End Sub
 

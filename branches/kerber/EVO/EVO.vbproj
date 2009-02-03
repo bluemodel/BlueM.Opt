@@ -86,9 +86,6 @@
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
-    <Reference Include="System.Data">
-      <Name>System.Data</Name>
-    </Reference>
     <Reference Include="System.Drawing">
       <Name>System.Drawing</Name>
     </Reference>
@@ -110,6 +107,22 @@
       <Project>{BCD1BBE3-5AB2-4C3F-AC12-43EB977C6F6F}</Project>
       <Name>Wave</Name>
     </ProjectReference>
+    <ProjectReference Include="..\EVO.Algos\DDS\DDS.csproj">
+      <Project>{9FA5A4C7-3AA9-420C-9F01-9F1683E36A79}</Project>
+      <Name>DDS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EVO.Algos\ES\ES.vbproj">
+      <Project>{58356A07-425E-4C91-ACB8-17B9286C9417}</Project>
+      <Name>ES</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EVO.Algos\HookeAndJeeves\HookeAndJeeves.vbproj">
+      <Project>{23224EFA-343B-4C13-AE6E-5D1D8A03007D}</Project>
+      <Name>HookeAndJeeves</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EVO.Algos\IController\IController.vbproj">
+      <Project>{1DBD183A-A900-4841-88FE-6258FD472C60}</Project>
+      <Name>IController</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EVO.Apps\EVO.Apps.vbproj">
       <Project>{2DCFE99E-CBFE-4CCC-93E7-A6D628B16DEC}</Project>
       <Name>EVO.Apps</Name>
@@ -121,10 +134,6 @@
     <ProjectReference Include="..\EVO.Diagramm\EVO.Diagramm.vbproj">
       <Project>{4382061B-F0DF-4D7D-9A09-306C940D19A5}</Project>
       <Name>EVO.Diagramm</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\EVO.Kern\EVO.Kern.vbproj">
-      <Project>{58356A07-425E-4C91-ACB8-17B9286C9417}</Project>
-      <Name>EVO.Kern</Name>
     </ProjectReference>
     <ProjectReference Include="..\EVO.MetaEvo\EVO.MetaEvo.csproj">
       <Project>{85403900-E545-4122-B1A0-8C30AE0D0F3C}</Project>
@@ -143,7 +152,6 @@
     <Import Include="Microsoft.VisualBasic" />
     <Import Include="System" />
     <Import Include="System.Collections" />
-    <Import Include="System.Data" />
     <Import Include="System.Diagnostics" />
     <Import Include="System.Drawing" />
     <Import Include="System.Windows.Forms" />
@@ -253,6 +261,11 @@
     <Content Include="RELEASE-NOTES.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\page_white_put.png" />
+    <None Include="Resources\page_white_get.png" />
+    <None Include="Resources\wrench.png" />
+    <None Include="Resources\monitor.png" />
+    <None Include="Resources\database.png" />
     <None Include="Resources\chart_curve_edit.png" />
     <None Include="Resources\database_connect.png" />
     <None Include="Resources\database_go.png" />

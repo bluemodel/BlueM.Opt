@@ -8,10 +8,10 @@ Imports System.Runtime.InteropServices
 
 ' Die Werte der Assemblyattribute überprüfen
 
-<Assembly: AssemblyTitle("EVO.Kern")> 
+<Assembly: AssemblyTitle("EVO.ES")> 
 <Assembly: AssemblyDescription("")> 
 <Assembly: AssemblyCompany("IHWB - TU Darmstadt")> 
-<Assembly: AssemblyProduct("EVO.Kern")> 
+<Assembly: AssemblyProduct("EVO.ES")> 
 <Assembly: AssemblyCopyright("Copyright © IHWB 2008")> 
 <Assembly: AssemblyTrademark("")> 
 

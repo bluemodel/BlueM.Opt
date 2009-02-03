@@ -14,7 +14,7 @@
     '*******************************************************************************
     '*******************************************************************************
 
-    'lokale Kopie der EVO_Einstellungen
+    'lokale Referenz auf EVO_Settings
     Private mSettings As EVO.Common.EVO_Settings
 
     'Das Problem
@@ -28,12 +28,9 @@
 
     'Diagramm Initialisierung (Titel und Achsen)
     '*******************************************
-    Public Sub DiagInitialise(ByVal Titel As String, ByVal Achsen As Collection, ByRef settings As EVO.Common.EVO_Settings, ByRef prob As EVO.Common.Problem)
+    Public Sub DiagInitialise(ByVal Titel As String, ByVal Achsen As Collection, ByRef prob As EVO.Common.Problem)
 
         Dim xachse, yachse, zachse As Diagramm.Achse
-
-        'Referenz zu EVO_Einstellungen lokal speichern
-        Me.mSettings = settings
 
         'Problem speichern
         Me.mProblem = prob
@@ -101,6 +98,18 @@
         End With
 
     End Sub
+
+    ''' <summary>
+    ''' Settings setzen
+    ''' </summary>
+    ''' <param name="settings">EVO_Settings</param>
+    Public Sub setSettings(ByRef settings As EVO.Common.EVO_Settings)
+
+        'Settings übergeben
+        Me.mSettings = settings
+
+    End Sub
+
 
 #Region "Zeichenfunktionen"
 
@@ -277,28 +286,6 @@
                 'colorline1.Axis = Me.Axes.Depth
                 'colorline1.Value = Me.mProblem.List_Featurefunctions(Me.ZielIndexZ).IstWert
             End If
-        End If
-
-    End Sub
-
-    'Nadirpunkt einzeichnen
-    '**********************
-    Public Sub ZeichneNadirpunkt(ByVal nadir() As Double)
-
-        If (Me.mProblem.NumPenalties = 2) Then
-            '2D
-            '--
-            Dim serie2 As Steema.TeeChart.Styles.Points
-            serie2 = Me.getSeriesPoint("Nadirpunkt", "Blue", Steema.TeeChart.Styles.PointerStyles.Diamond)
-            serie2.Clear()
-            serie2.Add(nadir(0), nadir(1), "Nadirpunkt")
-        Else
-            '3D
-            '--
-            Dim serie3 As Steema.TeeChart.Styles.Points3D
-            serie3 = Me.getSeries3DPoint("Nadirpunkt", "Blue", Steema.TeeChart.Styles.PointerStyles.Diamond)
-            serie3.Clear()
-            serie3.Add(nadir(0), nadir(1), nadir(2), "Nadirpunkt")
         End If
 
     End Sub

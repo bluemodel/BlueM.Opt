@@ -1,50 +1,73 @@
-Imports System.IO
+ï»¿Imports System.IO
+Imports IHWB.SWMM.DllAdapter
+Imports System.Threading
 
-
 '*******************************************************************************
 '*******************************************************************************
-'**** Klasse SWMM5                                                          ****
+'**** Klasse SWMM                                                           ****
 '****                                                                       ****
-'**** Funktionen zur Kontrolle von SWMM5                                    ****
+'**** Funktionen zur Kontrolle von EPA SWMM5                                ****
 '****                                                                       ****
-'**** Steffen Heusch                                                        ****
+'**** Autoren: Dirk Muschalla                                               ****
 '****                                                                       ****
-'**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
-'**** TU Darmstadt                                                          ****
-'****                                                                       ****
-'**** Erstellt: November 2007                                               ****
-'****                                                                       ****
-'**** Letzte Änderung: November 2007                                        ****
+'**** modelEAU                                                              ****
+'**** UniversitÃ© Laval                                                      ****
 '*******************************************************************************
 '*******************************************************************************
-
 
 Public Class SWMM
     Inherits Sim
 
+#Region "Eigenschaften"
+
+    'Eigenschaften
+    '#############
+
+    'SWMM DLL
+    '---------
+    Private dll_path As String
+    Private swmm_dll() As SWMM_EngineDotNetAccess
+
+    'Multithreading
+    '--------------
+    Dim MySWMMThreads() As SWMMThread
+    Dim MyThreads() As Thread
+
+#End Region 'Eigenschaften
+
 #Region "Properties"
 
     ''' <summary>
-    ''' Alle Dateiendungen (ohne Punkt), die in einem Datensatz vorkommen können
+    ''' Alle Dateiendungen (ohne Punkt), die in einem Datensatz vorkommen kÃ¶nnen
     ''' </summary>
-    ''' <remarks>Der erste Wert des Arrays wird als Filter für OpenFile-Dialoge verwendet</remarks>
+    ''' <remarks>Die erste Dateiendung in dieser Collection reprÃ¤sentiert den Datensatz (wird z.B. als Filter fÃ¼r OpenFile-Dialoge verwendet)</remarks>
     Public Overrides ReadOnly Property DatensatzDateiendungen() As Collections.Specialized.StringCollection
         Get
             Dim exts As Collections.Specialized.StringCollection = New Collections.Specialized.StringCollection()
 
-            exts.AddRange(New String() {"INP"})
-
-            'TODO: Dateiendungen für SWMM-Datensatz
+            exts.AddRange(New String() {"INP", "DAT", "INI"})
 
             Return exts
 
         End Get
     End Property
 
+    ''' <summary>
+    ''' Ob die Anwendung Multithreading unterstÃ¼tzt
+    ''' </summary>
+    ''' <returns>True</returns>
+    Public Overrides ReadOnly Property MultithreadingSupported() As Boolean
+        Get
+            Return True
+        End Get
+    End Property
+
 #End Region 'Properties
 
-
 #Region "Methoden"
+
+    'Methoden
+    '########
 
     'Konstruktor
     '***********
@@ -52,136 +75,231 @@ Public Class SWMM
 
         Call MyBase.New()
 
+        'Pfad zu SWMM5.DLL bestimmen
+        '---------------------------
+        dll_path = System.Windows.Forms.Application.StartupPath() & "\SWMM\SWMM5.dll"
+
+        If (Not File.Exists(dll_path)) Then
+            Throw New Exception("SWMM.dll nicht gefunden!")
+        End If
+
     End Sub
 
-    
-    Public Overrides Function launchSim() As Boolean
+    ''' <summary>
+    ''' SWMM auf Multithreading vorbereiten
+    ''' </summary>
+    ''' <param name="input_n_Threads">Anzahl Threads</param>
+    Public Overrides Sub prepareThreads(ByVal input_n_Threads As Integer)
 
-        'Aktuelles Verzeichnis bestimmen
-        Dim currentDir As String = CurDir()
-        Dim InpDatei As String, RptDatei As String, DatDatei As String
-        'zum Arbeitsverzeichnis wechseln
-        ChDrive(Me.WorkDir_Current)
-        ChDir(Me.WorkDir_Current)
-        'dll aufrufen
-        InpDatei = Me.WorkDir_Current & Me.Datensatz & ".inp"
-        RptDatei = Me.WorkDir_Current & Me.Datensatz & ".rpt"
-        DatDatei = Me.WorkDir_Current & Me.Datensatz & ".dat"
-        RunSwmmDll(InpDatei, RptDatei, DatDatei)
-        'zurück ins Ausgangsverzeichnis wechseln
-        ChDrive(currentDir)
-        ChDir(currentDir)
+        'SWMM DLL instanzieren je nach Anzahl der Threads
+        '------------------------------------------------
+        Me.n_Threads = input_n_Threads
+        ReDim swmm_dll(Me.n_Threads - 1)
+        Dim i As Integer
 
-        'überprüfen, ob Simulation erfolgreich
-        '-------------------------------------
-        'rpt-Datei öffnen
-        Dim FiStr As FileStream = New FileStream(RptDatei, FileMode.Open, IO.FileAccess.ReadWrite)
+        For i = 0 To Me.n_Threads - 1
+            swmm_dll(i) = New SWMM_EngineDotNetAccess(dll_path)
+        Next
+
+        'Thread-Objekte instanzieren
+        ReDim MySWMMThreads(Me.n_Threads - 1)
+        For i = 0 To Me.n_Threads - 1
+            MySWMMThreads(i) = New SWMMThread(i, -1, "Folder", Datensatz, swmm_dll(i))
+            MySWMMThreads(i).set_is_OK()
+        Next
+        ReDim MyThreads(Me.n_Threads - 1)
+
+    End Sub
+
+    'Simulationsparameter einlesen
+    '*****************************
+    Protected Overrides Sub Read_SimParameter()
+
+        Dim SimStart_Date_str As String = ""
+        Dim SimEnde_Date_str As String = ""
+        Dim SimStart_Time_str As String = ""
+        Dim SimEnde_Time_str As String = ""
+        Dim ROUTING_STEP_str As String = ""
+
+        'INP-Datei Ã¶ffnen
+        '----------------
+        Dim Datei As String = Me.WorkDir_Original & Me.Datensatz & ".inp"
+
+        Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Dim StrReadSync As TextReader = TextReader.Synchronized(StrRead)
 
         'Alle Zeilen durchlaufen
         Dim Zeile As String
-        launchSim = False
+        Dim readok As Integer = 0
         Do
             Zeile = StrRead.ReadLine.ToString()
-            If (Zeile.StartsWith("  Runoff Quantity Continuity")) Then
-                launchSim = True
-                Exit Do
-            End If
+            'Simulationszeitraum auslesen
 
+            If Zeile.StartsWith("START_DATE") Then
+                SimStart_Date_str = Zeile.Substring(21, 10)
+                readok += 1
+            ElseIf Zeile.StartsWith("START_TIME") Then
+                SimStart_Time_str = Zeile.Substring(21, 8)
+                readok += 1
+            ElseIf Zeile.StartsWith("END_DATE") Then
+                SimEnde_Date_str = Zeile.Substring(21, 10)
+                readok += 1
+            ElseIf Zeile.StartsWith("END_TIME") Then
+                SimEnde_Time_str = Zeile.Substring(21, 8)
+                readok += 1
+            ElseIf Zeile.StartsWith("ROUTING_STEP") Then
+                ROUTING_STEP_str = Zeile.Substring(21, 7)
+            End If
+            If readok > 4 Then Exit Do 'Sobald alle Bestandteile des Datum
+            'und des Zeitschrittes gefunden wurde,
+            'kann die Schleife verlassen werden
         Loop Until StrRead.Peek() = -1
 
+        'SchlieÃŸen der INP-Datei
+        StrReadSync.Close()
         StrRead.Close()
         FiStr.Close()
 
-    End Function
+        'SimStart und SimEnde in echtes Datum konvertieren
+        Me.SimStart = New DateTime(SimStart_Date_str.Substring(6, 4), SimStart_Date_str.Substring(0, 2), SimStart_Date_str.Substring(3, 2), SimStart_Time_str.Substring(0, 2), SimStart_Time_str.Substring(3, 2), SimStart_Time_str.Substring(6, 2))
+        Me.SimEnde = New DateTime(SimEnde_Date_str.Substring(6, 4), SimEnde_Date_str.Substring(0, 2), SimEnde_Date_str.Substring(3, 2), SimEnde_Time_str.Substring(0, 2), SimEnde_Time_str.Substring(3, 2), SimEnde_Time_str.Substring(6, 2))
 
+        'Zeitschrittweite ist variable
+        Me.SimDT = New TimeSpan(ROUTING_STEP_str.Substring(0, 1), ROUTING_STEP_str.Substring(2, 2), ROUTING_STEP_str.Substring(5, 2))
+
+    End Sub
+
+    'BlauesModell ausfÃ¼hren (simulieren)
+    'Startet einen neuen Thread und Ã¼bergibt ihm die Child ID
+    '********************************************************
     Public Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
 
-        Return Me.launchSim()
+        launchSim = False
+        Dim Folder As String
+
+        Folder = getThreadWorkDir(Thread_ID)
+        MySWMMThreads(Thread_ID) = New SWMMThread(Thread_ID, Child_ID, Folder, Datensatz, swmm_dll(Thread_ID))
+        MyThreads(Thread_ID) = New Thread(AddressOf MySWMMThreads(Thread_ID).launchSim)
+        MyThreads(Thread_ID).IsBackground = True
+        MyThreads(Thread_ID).Start()
+        launchSim = True
+
+        Return launchSim
 
     End Function
 
+    'SWMM ohne Thread ausfÃ¼hren (simulieren)
+    '****************************
+    Public Overrides Function launchSim() As Boolean
+
+        Dim simOK As Boolean
+
+        Try
+
+            Call swmm_dll(0).Initialize(Me.WorkDir_Current & Me.Datensatz)
+            Call swmm_dll(0).Start(1)
+
+            Dim elapsedTime As Double = 0.0
+
+            Do
+                Call swmm_dll(0).PerformTimeStep(elapsedTime)
+            Loop While (elapsedTime > 0.0)
+
+            'Simulation abschliessen
+            Call swmm_dll(0).Finish()
+
+            ''Ã¼berprÃ¼fen, ob Simulation erfolgreich
+            ''-------------------------------------
+            ''rpt-Datei Ã¶ffnen
+            'Dim FiStr As FileStream = New FileStream(Me.WorkDir_Current & Me.Datensatz & ".rpt", FileMode.Open, IO.FileAccess.ReadWrite)
+            'Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+            'Dim StrReadSync As TextReader = TextReader.Synchronized(StrRead)
+
+            ''Alle Zeilen durchlaufen
+            'Dim Zeile As String
+            'simOK = False
+            'Do
+            '    Zeile = StrRead.ReadLine.ToString()
+            '    If (Zeile.StartsWith("  Runoff Quantity Continuity")) Then
+            '        simOK = True
+            '        Exit Do
+            '    End If
+
+            'Loop Until StrRead.Peek() = -1
+
+            'StrReadSync.Close()
+            'StrRead.Close()
+            'FiStr.Close()
+
+            'Simulation abschliessen
+            Call swmm_dll(0).Finish()
+
+            'Simulation erfolgreich
+            simOK = True
+
+        Catch ex As Exception
+
+            'Simulationsfehler aufgetreten
+            MsgBox(ex.Message, MsgBoxStyle.Exclamation, "SWMM")
+
+            'Simulation nicht erfolgreich
+            simOK = False
+
+        Finally
+
+            'Ressourcen deallokieren
+            Call swmm_dll(0).Dispose()
+
+        End Try
+
+        Return simOK
+
+    End Function
+
+    'Gibt zurÃ¼ck ob ein beliebiger Thread beendet ist und ibt die ID diesen freien Threads zurÃ¼ck
+    '********************************************************************************************
     Public Overrides Function launchFree(ByRef Thread_ID As Integer) As Boolean
+        launchFree = False
+
+        For Each Thr_C As SWMMThread In MySWMMThreads
+            If Thr_C.Sim_Is_OK = True And Thr_C.get_Child_ID = -1 Then
+                launchFree = True
+                Thread_ID = Thr_C.get_Thread_ID
+                Exit For
+            End If
+        Next
 
     End Function
+
+    'PrÃ¼ft ob des aktuelle Child mit der ID die oben Ã¼bergeben wurde fertig ist
+    'Gibt die Thread ID zurÃ¼ck um zum auswerten in das Arbeitsverzeichnis zu wechseln
+    '********************************************************************************
     Public Overrides Function launchReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
+        launchReady = False
+
+        For Each Thr_C As SWMMThread In MySWMMThreads
+            If Thr_C.launch_Ready = True And Thr_C.get_Child_ID = Child_ID Then
+                launchReady = True
+                SimIsOK = Thr_C.Sim_Is_OK
+                Thread_ID = Thr_C.get_Thread_ID
+                MyThreads(Thread_ID).Join()
+                MySWMMThreads(Thread_ID) = New SWMMThread(Thread_ID, -1, "Folder", Datensatz, swmm_dll(Thread_ID))
+                MySWMMThreads(Thread_ID).set_is_OK()
+            End If
+        Next
 
     End Function
 
+    'Simulationsergebnis verarbeiten
+    '-------------------------------
     'Simulationsergebnis verarbeiten
     '-------------------------------
     Protected Overrides Sub SIM_Ergebnis_Lesen()
 
     End Sub
 
-    Protected Overrides Sub Read_SimParameter()
-
-        Dim SimStartDay_str As String = ""
-        Dim SimStartHour_str As String = ""
-        Dim SimEndeDay_str As String = ""
-        Dim SimEndeHour_str As String = ""
-
-        'INP-Datei öffnen
-        '----------------
-        Dim Datei As String = Me.WorkDir_Current & Me.Datensatz & ".INP"
-
-        Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
-        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-        'Verhindert parallelisierung, d.h. Einlesen wird erst abgeschlossen
-        Dim StrReadSync As TextReader = TextReader.Synchronized(StrRead)
-
-        'Alle Zeilen durchlaufen
-        Dim Zeile As String
-        Do
-            Zeile = StrReadSync.ReadLine.ToString()
-
-            'Simulationszeitraum auslesen
-            If (Zeile.StartsWith("START_DATE")) Then
-                SimStartDay_str = Zeile.Substring(21, 10)
-            End If
-
-            If (Zeile.StartsWith("START_TIME")) Then
-                SimStartHour_str = Zeile.Substring(21, 5)
-            End If
-
-            If (Zeile.StartsWith("END_DATE")) Then
-                SimEndeDay_str = Zeile.Substring(21, 10)
-            End If
-
-            If (Zeile.StartsWith("END_TIME")) Then
-                SimEndeHour_str = Zeile.Substring(21, 5)
-            End If
-
-        Loop Until StrReadSync.Peek() = -1
-
-        'SimStart und SimEnde in echtes Datum konvertieren
-        Me.SimStart = New DateTime(SimStartDay_str.Substring(6, 4), SimStartDay_str.Substring(0, 2), SimStartDay_str.Substring(3, 2), SimStartHour_str.Substring(0, 2), SimStartHour_str.Substring(3, 2), 0)
-        Me.SimEnde = New DateTime(SimEndeDay_str.Substring(6, 4), SimEndeDay_str.Substring(0, 2), SimEndeDay_str.Substring(3, 2), SimEndeHour_str.Substring(0, 2), SimEndeHour_str.Substring(3, 2), 0)
-
-        'Zeitschrittweite ist immer 1 Minute
-        Me.SimDT = New TimeSpan(0, 1, 0)
-
-        StrReadSync.Close()
-        StrRead.Close()
-        FiStr.Close()
-
-    End Sub
-
-
-
-    Protected Overrides Sub Read_Verzweigungen()
-
-    End Sub
-
-    Protected Overrides Sub Write_Verzweigungen()
-
-    End Sub
-
-    'In der ersten Version wurden die Optimierungsparameter in einer eigenen Datei vorgehalten
-    'Später wurde auf das bereits bestehende System mit drei Dateien umgestellt
-
-
-    'Berechnung des Qualitätswerts (Zielwert)
+    'Berechnung des QualitÃ¤tswerts (Zielwert)
     '****************************************
     Public Overrides Function CalculateFeature(ByVal feature As Common.Featurefunction) As Double
 
@@ -198,7 +316,7 @@ Public Class SWMM
                 CalculateFeature = CalculateFeature_RPT(feature)
 
             Case Else
-                'es wurde eine nicht unterstützte Ergebnisdatei angegeben
+                'es wurde eine nicht unterstÃ¼tzte Ergebnisdatei angegeben
                 IsOK = False
 
         End Select
@@ -207,7 +325,7 @@ Public Class SWMM
             'TODO: Fehlerbehandlung
         End If
 
-        'Zielrichtung berücksichtigen
+        'Zielrichtung berÃ¼cksichtigen
         CalculateFeature *= feature.Richtung
 
     End Function
@@ -222,7 +340,7 @@ Public Class SWMM
 
         DateiPfad = WorkDir_Current & Datensatz & ".RPT"
 
-        'RPT-Datei öffnen
+        'RPT-Datei Ã¶ffnen
         Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.Read)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
@@ -254,11 +372,27 @@ Public Class SWMM
         Return QWert
 
     End Function
+#Region "Kombinatorik"
 
-#End Region
+    'Kombinatorik
+    '############
 
-    Protected Overrides Sub Finalize()
-        MyBase.Finalize()
+    'Liest die Verzweigungen aus SMUSI in ein Array ein
+    'Und Dimensioniert das Verzweigungsarray
+    '*******************************************************
+    Protected Overrides Sub Read_Verzweigungen()
+
     End Sub
 
+    'Schreibt die neuen Verzweigungen
+    '********************************
+    Protected Overrides Sub Write_Verzweigungen()
+
+    End Sub
+
+#End Region 'Kombinatorik
+
+#End Region 'Methoden
+
 End Class
+

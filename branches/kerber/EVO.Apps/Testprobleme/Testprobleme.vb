@@ -57,8 +57,8 @@ Public Class Testprobleme
         End Get
     End Property
 
-    'gewähltes Testproblem holen/setzen
-    '**********************************
+    'gewähltes Testproblem holen
+    '***************************
     Public ReadOnly Property selectedTestproblem() As String
         Get
             Return mSelectedTestproblem
@@ -79,7 +79,6 @@ Public Class Testprobleme
         Me.mSelectedTestproblem = name
 
     End Sub
-
 
     'Parameterübergabe
     '*****************
@@ -270,27 +269,27 @@ Public Class Testprobleme
 
     'Diagramm initialisieren
     '***********************
-    Public Sub DiagInitialise(ByRef rSettings As Common.EVO_Settings, ByRef Diag As EVO.Diagramm.Hauptdiagramm)
+    Public Sub DiagInitialise(ByRef Diag As EVO.Diagramm.Hauptdiagramm)
 
         Select Case Me.selectedTestproblem
 
             Case TP_SinusFunktion
-                Call Me.DiagInitialise_SinusFunktion(rSettings, Diag)
+                Call Me.DiagInitialise_SinusFunktion(Diag)
 
             Case TP_BealeProblem 'x1 = [-5;5], x2=[-2;2]
-                Call Me.DiagInitialise_BealeProblem(rSettings, Diag)
+                Call Me.DiagInitialise_BealeProblem(Diag)
 
             Case TP_Schwefel24Problem 'xi = [-10,10]
-                Call Me.DiagInitialise_SchwefelProblem(rSettings, Diag)
+                Call Me.DiagInitialise_SchwefelProblem(Diag)
 
             Case TP_Box
-                Call Me.DiagInitialise_3D_Box(rSettings, Diag)
+                Call Me.DiagInitialise_3D_Box(Diag)
 
             Case TP_AbhängigeParameter
-                Call Me.DiagInitialise_AbhParameter(rSettings, Diag)
+                Call Me.DiagInitialise_AbhParameter(Diag)
 
             Case Else
-                Call Me.DiagInitialise_MultiTestProb(rSettings, Diag)
+                Call Me.DiagInitialise_MultiTestProb(Diag)
 
         End Select
 
@@ -298,7 +297,7 @@ Public Class Testprobleme
 
     'Diagramm für Sinus-Funktion initialisieren
     '*******************************************
-    Private Sub DiagInitialise_SinusFunktion(ByRef rSettings As Common.EVO_Settings, ByRef Diag As EVO.Diagramm.Hauptdiagramm)
+    Private Sub DiagInitialise_SinusFunktion(ByRef Diag As EVO.Diagramm.Hauptdiagramm)
 
         Dim array_x() As Double
         Dim array_y() As Double
@@ -330,7 +329,7 @@ Public Class Testprobleme
 
         'Diagramm initialisieren
         '-----------------------
-        Call Diag.DiagInitialise("Sinus Funktion", achsen, rSettings, Me.mProblem)
+        Call Diag.DiagInitialise("Sinus Funktion", achsen, Me.mProblem)
 
         'Sinuslinie zeichnen
         '-------------------
@@ -351,27 +350,12 @@ Public Class Testprobleme
 
     'Diagramm für Beale-Problem initialisieren
     '*****************************************
-    Private Sub DiagInitialise_BealeProblem(ByRef rSettings As Common.EVO_Settings, ByRef Diag As EVO.Diagramm.Hauptdiagramm)
+    Private Sub DiagInitialise_BealeProblem(ByRef Diag As EVO.Diagramm.Hauptdiagramm)
 
-        Dim array_x() As Double = {}
-        Dim array_y() As Double = {}
         Dim Ausgangswert As Double
-        Dim Anzahl_Kalkulationen As Integer
-        Dim i As Integer
-        Dim serie As Steema.TeeChart.Styles.Series
+        Dim colorline1 As Steema.TeeChart.Tools.ColorLine
         Dim achsen As Collection
         Dim achse As EVO.Diagramm.Diagramm.Achse
-
-        Select Case Me.mProblem.Method
-            Case METH_PES
-                If (rSettings.PES.Pop.is_POPUL) Then
-                    Anzahl_Kalkulationen = rSettings.PES.n_Gen * rSettings.PES.n_Nachf * rSettings.PES.Pop.n_Runden + 1
-                Else
-                    Anzahl_Kalkulationen = rSettings.PES.n_Gen * rSettings.PES.n_Nachf + 1
-                End If
-            Case METH_MetaEvo
-                Anzahl_Kalkulationen = rSettings.MetaEvo.NumberGenerations * rSettings.MetaEvo.ChildsPerParent * rSettings.MetaEvo.PopulationSize
-        End Select
 
         'Ausgangswert berechnen
         Ausgangswert = (1.5 - 0.5 * (1 - 0.5)) ^ 2 + (2.25 - 0.5 * (1 - 0.5) ^ 2) ^ 2 + (2.625 - 0.5 * (1 - 0.5) ^ 3) ^ 2
@@ -382,9 +366,8 @@ Public Class Testprobleme
 
         'X-Achse
         achse.Title = "Berechnungsschritt"
-        achse.Automatic = False
+        achse.Automatic = True
         achse.Minimum = 0
-        achse.Maximum = Anzahl_Kalkulationen
         Call achsen.Add(achse)
 
         'Y-Achse
@@ -394,46 +377,27 @@ Public Class Testprobleme
         achse.Maximum = Ausgangswert * 1.3
         Call achsen.Add(achse)
 
-        Call Diag.DiagInitialise("Beale Problem", achsen, rSettings, Me.mProblem)
+        Call Diag.DiagInitialise("Beale Problem", achsen, Me.mProblem)
 
-        'Linie für den Ausgangswert berechnen
-        ReDim array_y(Anzahl_Kalkulationen - 1)
-        ReDim array_x(Anzahl_Kalkulationen - 1)
-        For i = 0 To Anzahl_Kalkulationen - 1
-            array_y(i) = Ausgangswert
-            array_x(i) = i + 1
-        Next i
-
-        'Den Ausgangswert zeichnen
-        serie = Diag.getSeriesLine("Ausgangswert", "Green")
-        serie.Add(array_x, array_y)
+        'Linie für den Ausgangswert anzeigen
+        colorline1 = New Steema.TeeChart.Tools.ColorLine(Diag.Chart)
+        colorline1.AllowDrag = False
+        colorline1.Axis = Diag.Axes.Left
+        colorline1.Value = Ausgangswert
+        colorline1.Pen.Color = Drawing.Color.Green
 
     End Sub
 
     'Diagramm für Schwefel-Problem initialisieren
     '********************************************
-    Private Sub DiagInitialise_SchwefelProblem(ByRef rSettings As Common.EVO_Settings, ByRef Diag As EVO.Diagramm.Hauptdiagramm)
+    Private Sub DiagInitialise_SchwefelProblem(ByRef Diag As EVO.Diagramm.Hauptdiagramm)
 
-        Dim array_x() As Double = {}
-        Dim array_y() As Double = {}
         Dim Ausgangswert As Double
-        Dim Anzahl_Kalkulationen As Integer
         Dim i As Integer
         Dim X() As Double
-        Dim serie As Steema.TeeChart.Styles.Series
+        Dim colorline1 As Steema.TeeChart.Tools.ColorLine
         Dim achsen As Collection
         Dim achse As EVO.Diagramm.Diagramm.Achse
-
-        Select Case Me.mProblem.Method
-            Case METH_PES
-                If (rSettings.PES.Pop.is_POPUL) Then
-                    Anzahl_Kalkulationen = rSettings.PES.n_Gen * rSettings.PES.n_Nachf * rSettings.PES.Pop.n_Runden + 1
-                Else
-                    Anzahl_Kalkulationen = rSettings.PES.n_Gen * rSettings.PES.n_Nachf + 1
-                End If
-            Case METH_MetaEvo
-                Anzahl_Kalkulationen = rSettings.MetaEvo.NumberGenerations * rSettings.MetaEvo.ChildsPerParent * rSettings.MetaEvo.PopulationSize
-        End Select
 
         'Ausgangswert berechnen
         ReDim X(Me.mAnzParameter)
@@ -451,9 +415,8 @@ Public Class Testprobleme
 
         'X-Achse
         achse.Title = "Berechnungsschritt"
-        achse.Automatic = False
+        achse.Automatic = True
         achse.Minimum = 0
-        achse.Maximum = Anzahl_Kalkulationen
         Call achsen.Add(achse)
 
         'Y-Achse
@@ -463,25 +426,20 @@ Public Class Testprobleme
         achse.Maximum = Ausgangswert * 1.3
         Call achsen.Add(achse)
 
-        Call Diag.DiagInitialise("Schwefel 2.4 Problem", achsen, rSettings, Me.mProblem)
+        Call Diag.DiagInitialise("Schwefel 2.4 Problem", achsen, Me.mProblem)
 
-        'Linie für den Ausgangswert berechnen
-        ReDim array_y(Anzahl_Kalkulationen - 1)
-        ReDim array_x(Anzahl_Kalkulationen - 1)
-        For i = 0 To Anzahl_Kalkulationen - 1
-            array_y(i) = Ausgangswert
-            array_x(i) = i + 1
-        Next i
-
-        'Ausgangswert zeichnen
-        serie = Diag.getSeriesLine("Ausgangswert", "Red")
-        serie.Add(array_x, array_y)
+        'Linie für den Ausgangswert anzeigen
+        colorline1 = New Steema.TeeChart.Tools.ColorLine(Diag.Chart)
+        colorline1.AllowDrag = False
+        colorline1.Axis = Diag.Axes.Left
+        colorline1.Value = Ausgangswert
+        colorline1.Pen.Color = Drawing.Color.Red
 
     End Sub
 
     'Diagramm für MultiObjective-Probleme initialisieren
     '***************************************************
-    Private Sub DiagInitialise_MultiTestProb(ByRef rSettings As Common.EVO_Settings, ByRef Diag As EVO.Diagramm.Hauptdiagramm)
+    Private Sub DiagInitialise_MultiTestProb(ByRef Diag As EVO.Diagramm.Hauptdiagramm)
 
         Dim i, j As Short
         Dim title As String
@@ -563,7 +521,7 @@ Public Class Testprobleme
         Call achsen.Add(yachse)
 
         'Diagramm initialisieren
-        Call Diag.DiagInitialise(title, achsen, rSettings, Me.mProblem)
+        Call Diag.DiagInitialise(title, achsen, Me.mProblem)
 
         'Problemspezifische Serien zeichnen
         '----------------------------------
@@ -709,7 +667,7 @@ Public Class Testprobleme
 
     'Diagramm für Box-Problem (3D) initialisieren
     '********************************************
-    Private Sub DiagInitialise_3D_Box(ByRef rSettings As Common.EVO_Settings, ByRef Diag As EVO.Diagramm.Hauptdiagramm)
+    Private Sub DiagInitialise_3D_Box(ByRef Diag As EVO.Diagramm.Hauptdiagramm)
 
         Dim i, j, n As Integer
         Dim ArrayX() As Double
@@ -747,7 +705,7 @@ Public Class Testprobleme
         Call achsen.Add(achse)
 
         'Diagramm initialisieren
-        Call Diag.DiagInitialise(TP_Box, achsen, rSettings, Me.mProblem)
+        Call Diag.DiagInitialise(TP_Box, achsen, Me.mProblem)
 
         'Serien
         '------
@@ -834,7 +792,7 @@ Public Class Testprobleme
 
     'Diagramm für Abhängige Parameter initialisieren
     '***********************************************
-    Private Sub DiagInitialise_AbhParameter(ByRef rSettings As Common.EVO_Settings, ByRef Diag As EVO.Diagramm.Hauptdiagramm)
+    Private Sub DiagInitialise_AbhParameter(ByRef Diag As EVO.Diagramm.Hauptdiagramm)
 
         Dim i, j, n As Integer
         Dim ArrayX() As Double
@@ -874,7 +832,7 @@ Public Class Testprobleme
         Call achsen.Add(achse)
 
         'Diagramm initialisieren
-        Call Diag.DiagInitialise(TP_AbhängigeParameter, achsen, rSettings, Me.mProblem)
+        Call Diag.DiagInitialise(TP_AbhängigeParameter, achsen, Me.mProblem)
 
         'Serien
         '------
@@ -924,14 +882,21 @@ Public Class Testprobleme
         ind = New Common.Individuum_PES("MetaEvo", ind_input.ID)
         ind.OptParameter = ind_input.get_mOptparas
 
-        Evaluierung_TestProbleme(ind, ipop, Diag)
+        Evaluate(ind, ipop, Diag)
 
         ind_input.Features = ind.Features
         ind_input.Constraints = ind.Constraints
         If (ind.Dominated = "true") Then ind_input.set_status("false")
     End Sub
 
-    Public Sub Evaluierung_TestProbleme(ByRef ind As Common.Individuum, ByVal ipop As Short, ByRef Diag As EVO.Diagramm.Hauptdiagramm)
+    ''' <summary>
+    ''' Evaluiert (und zeichnet!) das Testproblem
+    ''' </summary>
+    ''' <param name="ind">das zu evaluierende Individuum</param>
+    ''' <param name="ipop">Populationsnummer (0-basiert)</param>
+    ''' <param name="Diag">Referenz auf das Hauptdiagramm</param>
+    ''' <remarks></remarks>
+    Public Sub Evaluate(ByRef ind As Common.Individuum, ByVal ipop As Short, ByRef Diag As EVO.Diagramm.Hauptdiagramm)
 
         Dim i As Integer
         Dim Unterteilung_X As Double
