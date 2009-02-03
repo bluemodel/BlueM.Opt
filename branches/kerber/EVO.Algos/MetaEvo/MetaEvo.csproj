@@ -72,15 +72,15 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\EVO.Apps\EVO.Apps.vbproj">
+    <ProjectReference Include="..\..\EVO.Apps\EVO.Apps.vbproj">
       <Project>{2DCFE99E-CBFE-4CCC-93E7-A6D628B16DEC}</Project>
       <Name>EVO.Apps</Name>
     </ProjectReference>
-    <ProjectReference Include="..\EVO.Common\EVO.Common.vbproj">
+    <ProjectReference Include="..\..\EVO.Common\EVO.Common.vbproj">
       <Project>{CAA1CE91-0973-4BE7-9BD8-16B5D40BC93C}</Project>
       <Name>EVO.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\EVO.MO_Indicators\MO_Indicators\EVO.MO_Indicators.csproj">
+    <ProjectReference Include="..\..\EVO.MO_Indicators\MO_Indicators\EVO.MO_Indicators.csproj">
       <Project>{A56DFA12-8680-4C7A-B6BB-406D4D3FE156}</Project>
       <Name>EVO.MO_Indicators</Name>
     </ProjectReference>

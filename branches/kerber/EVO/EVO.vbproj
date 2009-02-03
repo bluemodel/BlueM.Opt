@@ -123,6 +123,10 @@
       <Project>{1DBD183A-A900-4841-88FE-6258FD472C60}</Project>
       <Name>IController</Name>
     </ProjectReference>
+    <ProjectReference Include="..\EVO.Algos\MetaEvo\MetaEvo.csproj">
+      <Project>{85403900-E545-4122-B1A0-8C30AE0D0F3C}</Project>
+      <Name>MetaEvo</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EVO.Apps\EVO.Apps.vbproj">
       <Project>{2DCFE99E-CBFE-4CCC-93E7-A6D628B16DEC}</Project>
       <Name>EVO.Apps</Name>
@@ -134,10 +138,6 @@
     <ProjectReference Include="..\EVO.Diagramm\EVO.Diagramm.vbproj">
       <Project>{4382061B-F0DF-4D7D-9A09-306C940D19A5}</Project>
       <Name>EVO.Diagramm</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\EVO.MetaEvo\EVO.MetaEvo.csproj">
-      <Project>{85403900-E545-4122-B1A0-8C30AE0D0F3C}</Project>
-      <Name>EVO.MetaEvo</Name>
     </ProjectReference>
     <ProjectReference Include="..\EVO.MO_Indicators\MO_Indicators\EVO.MO_Indicators.csproj">
       <Project>{A56DFA12-8680-4C7A-B6BB-406D4D3FE156}</Project>
