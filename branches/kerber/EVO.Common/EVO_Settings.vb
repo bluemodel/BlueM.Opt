@@ -306,7 +306,6 @@ Public Class EVO_Settings
 
         'Versteckte Optionen
         Public ChildsPerParent As Integer
-        Public Application As String
 
         'Standardwerte setzen
         '********************

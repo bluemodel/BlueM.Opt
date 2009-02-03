@@ -12,6 +12,8 @@ namespace IHWB.EVO.MetaEvo
         EVO.Apps.Sim sim;
         EVO.Apps.Testprobleme testprobleme;
 
+        EVO.Common.Constants.ApplicationTypes apptype;
+
         EVO.Common.Problem prob; 
         EVO.Common.EVO_Settings settings;
         EVO.Common.Individuum_MetaEvo individuumForClient;
@@ -52,7 +54,7 @@ namespace IHWB.EVO.MetaEvo
         /// <param name="sim_input">Sim-Objekt</param>
         public void InitApp(ref IHWB.EVO.Apps.Sim sim_input)
         {
-            this.settings.MetaEvo.Application = "sim";
+            this.apptype = IHWB.EVO.Common.Constants.ApplicationTypes.Sim;
             this.sim = sim_input;
         }
 
@@ -62,7 +64,7 @@ namespace IHWB.EVO.MetaEvo
         /// <param name="inputTestproblem">Testproblem-Objekt</param>
         public void InitApp(ref IHWB.EVO.Apps.Testprobleme testprobleme_input)
         {
-            this.settings.MetaEvo.Application = "testprobleme";
+            this.apptype = IHWB.EVO.Common.Constants.ApplicationTypes.Testprobleme;
             this.testprobleme = testprobleme_input;
         }
 
@@ -140,8 +142,11 @@ namespace IHWB.EVO.MetaEvo
                     this.monitor1.LogAppend("Controller: MetaEvo started in 'Network Client'-Mode");
                     //### Vorbereitung ###
                     individuumForClient = new EVO.Common.Individuum_MetaEvo("MetaEvo", 0, this.prob.List_OptParameter.Length);
-                    //Microsoft SQL-DB des Clients ausschalten
-                    if (this.settings.MetaEvo.Application == "sim") { sim.StoreIndividuals = false; }
+                    //Individuum-Speicher des Clients ausschalten
+                    if (this.apptype == IHWB.EVO.Common.Constants.ApplicationTypes.Sim)
+                    {
+                        sim.StoreIndividuals = false; 
+                    }
 
                     //### Hauptprogramm ###
                     networkmanager = new Networkmanager(ref this.individuumForClient, ref this.settings, ref prob, ref monitor1);
@@ -204,18 +209,20 @@ namespace IHWB.EVO.MetaEvo
                     this.monitor1.LogAppend("Controller: Genpool: Simulating Individuums...");
                     for (int i = 0; i < generation.Length; i++)
                     {
-                        if (this.settings.MetaEvo.Application == "testprobleme")
+                        if (this.apptype == IHWB.EVO.Common.Constants.ApplicationTypes.Testprobleme)
                         {
                             testprobleme.Evaluierung_TestProbleme_MetaEvo(ref generation[i],0,ref hauptdiagramm1);
                         }
-                        else if (this.settings.MetaEvo.Application == "sim")
+                        else if (this.apptype == IHWB.EVO.Common.Constants.ApplicationTypes.Sim)
                         {
                             sim.Evaluate_MetaEvo(ref generation[i]);
+                            hauptdiagramm1.ZeichneIndividuum(generation[i], 1, 1, 1, generation[i].ID % generation.Length, System.Drawing.Color.Orange, false);
                         }
                         this.monitor1.LogAppend("Controller: Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length),2) * 100 + "%)");
+                        System.Windows.Forms.Application.DoEvents();
                     }
 
-                    //Genpool speichern und zeichnen
+                    //Genpool speichern
                     algomanager.set_genpool(ref generation);
                     generation = new EVO.Common.Individuum_MetaEvo[this.settings.MetaEvo.ChildsPerParent*this.settings.MetaEvo.PopulationSize];
 
@@ -242,23 +249,20 @@ namespace IHWB.EVO.MetaEvo
                         //Simulieren und zeichnen
                         if (generation[i].get_toSimulate())
                         {
-                            if (this.settings.MetaEvo.Application == "testprobleme")
+                            if (this.apptype == IHWB.EVO.Common.Constants.ApplicationTypes.Testprobleme)
                             {
                                 this.monitor1.LogAppend("Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   " + algomanager.algos.algofeedbackarray[generation[i].get_generator()].name); 
                                 testprobleme.Evaluierung_TestProbleme_MetaEvo(ref generation[i], 0, ref hauptdiagramm1);
                             }
-                            if (this.settings.MetaEvo.Application == "sim")
+                            else if (this.apptype == IHWB.EVO.Common.Constants.ApplicationTypes.Sim)
                             {
                                 this.monitor1.LogAppend("Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   " + algomanager.algos.algofeedbackarray[generation[i].get_generator()].name); 
                                 sim.Evaluate_MetaEvo(ref generation[i]);
-                                hauptdiagramm1.ZeichneIndividuum(generation[i], 1, 1, 1, generation[i].ID % generation.Length, System.Drawing.Color.Yellow, true);
-                                System.Windows.Forms.Application.DoEvents();
+                                hauptdiagramm1.ZeichneIndividuum(generation[i], 1, 1, 1, generation[i].ID % generation.Length, System.Drawing.Color.Orange, false);
                             }
-                            try
-                            {
-                                progress1.NextNachf();
-                            }
-                            catch { }
+                            System.Windows.Forms.Application.DoEvents();
+                            
+                            progress1.NextNachf();
                         }
                     }
                     mePC.status = "select Individuums";
@@ -496,11 +500,16 @@ namespace IHWB.EVO.MetaEvo
 
                     //Simulieren
                     this.monitor1.LogAppend("Controller: Individuum " + individuumForClient.ID + " simulating...");
-                    if (this.settings.MetaEvo.Application == "testprobleme")
+                    if (this.apptype == IHWB.EVO.Common.Constants.ApplicationTypes.Testprobleme)
                     {
                         testprobleme.Evaluierung_TestProbleme_MetaEvo(ref individuumForClient, 0, ref hauptdiagramm1);
                     }
-                    if (this.settings.MetaEvo.Application == "sim") sim.Evaluate_MetaEvo(ref individuumForClient);
+                    else if (this.apptype == IHWB.EVO.Common.Constants.ApplicationTypes.Sim)
+                    {
+                        sim.Evaluate_MetaEvo(ref individuumForClient);
+                        //Beim Client nicht zeichnen
+                    }
+                    System.Windows.Forms.Application.DoEvents();
 
                     //Individuum in DB Updaten
                     networkmanager.Individuum_UpdateInDB(ref individuumForClient, "status feat const", individuumForClient.get_status());

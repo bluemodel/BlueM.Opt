@@ -883,7 +883,7 @@ namespace IHWB.EVO.MetaEvo
                     {
                         if ((generation_input[i].get_status() == "true") || (generation_input[i].get_status() == "false"))
                         {
-                            hauptdiagramm_input.ZeichneIndividuum(generation_input[i], 1, 1, 1, generation_input[i].ID % generation_input.Length, System.Drawing.Color.Yellow, true);
+                            hauptdiagramm_input.ZeichneIndividuum(generation_input[i], 1, 1, 1, generation_input[i].ID % generation_input.Length, System.Drawing.Color.Orange, false);
                             System.Windows.Forms.Application.DoEvents();
                         }
                     }

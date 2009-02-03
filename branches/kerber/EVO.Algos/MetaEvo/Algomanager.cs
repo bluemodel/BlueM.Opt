@@ -125,7 +125,6 @@ namespace IHWB.EVO.MetaEvo
             }
 
             //Genpool zeichnen:
-            if (settings.MetaEvo.Application == "sim") hauptdiagramm.LöscheLetzteGeneration(1);
             hauptdiagramm.ZeichneSekPopulation(genpool);
             System.Windows.Forms.Application.DoEvents();
 
