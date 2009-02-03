@@ -84,6 +84,10 @@
       <Project>{A56DFA12-8680-4C7A-B6BB-406D4D3FE156}</Project>
       <Name>EVO.MO_Indicators</Name>
     </ProjectReference>
+    <ProjectReference Include="..\IController\IController.vbproj">
+      <Project>{1DBD183A-A900-4841-88FE-6258FD472C60}</Project>
+      <Name>IController</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram1.cd" />

@@ -46,8 +46,6 @@ Partial Class Form1
     Private SensiPlot1 As EVO.Apps.SensiPlot
     Private TSP1 As EVO.Apps.TSP
 
-    Private MetaEvoController As EVO.MetaEvo.Controller
-
     '**** Verschiedenes ****
     Dim isrun As Boolean = False                        'Optimierung läuft
     Dim ispause As Boolean = False                      'Optimierung ist pausiert
@@ -832,7 +830,12 @@ Partial Class Form1
                             Call controller.Start()
 
                         Case METH_MetaEvo
-                            MetaEvoController = New EVO.MetaEvo.Controller(Me.mProblem, EVO_Einstellungen1.Settings, Me.Hauptdiagramm1, Me.mProgress, Me.Sim1)
+                            'MetaEVO-Controller initialisieren und starten
+                            controller = New EVO.MetaEvo.Controller()
+                            Call controller.Init(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Monitor1, Me.Hauptdiagramm1)
+                            Call controller.InitApp(Me.Sim1)
+                            Call controller.Start()
+
 
                         Case METH_HOOKJEEVES
                             'HJ-Controller initialisieren und starten
@@ -866,7 +869,8 @@ Partial Class Form1
                             controller = New modelEAU.DDS.Controller()
 
                         Case METH_MetaEvo
-                            MetaEvoController = New EVO.MetaEvo.Controller(Me.mProblem, EVO_Einstellungen1.Settings, Me.Hauptdiagramm1, Me.mProgress, Me.Testprobleme1)                        
+                            'MetaEVO-Controller instanzieren
+                            controller = New EVO.MetaEvo.Controller()
 
                         Case Else
                             Throw New Exception("Testprobleme können mit der Methode " & Me.mProblem.Method & " nicht ausgeführt werden!")

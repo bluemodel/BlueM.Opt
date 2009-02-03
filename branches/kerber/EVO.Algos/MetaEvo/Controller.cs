@@ -6,7 +6,7 @@ using System.Net;
 
 namespace IHWB.EVO.MetaEvo
 {
-    public class Controller
+    public class Controller : IHWB.EVO.IController
     {
         //### Variablen ###
         EVO.Apps.Sim sim;
@@ -18,6 +18,7 @@ namespace IHWB.EVO.MetaEvo
         EVO.Common.Individuum_MetaEvo[] generation;
         EVO.Common.Progress progress1;
 
+        EVO.Diagramm.Monitor monitor1;
         EVO.Diagramm.Hauptdiagramm hauptdiagramm1;
         EVO.Diagramm.ApplicationLog applog;
 
@@ -27,22 +28,15 @@ namespace IHWB.EVO.MetaEvo
         int individuumnumber;
         string role;
 
-        //### Konstruktor ###  
-        public Controller(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input, ref EVO.Common.Progress progress1, ref EVO.Apps.Testprobleme testprobleme_input)
-        {
-            settings_input.MetaEvo.Application = "testprobleme";
-            this.testprobleme = testprobleme_input;
-            init(ref prob_input, ref settings_input, ref hauptdiagramm_input, ref progress1);
-        }
-        public Controller(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input, ref EVO.Common.Progress progress1, ref EVO.Apps.Sim sim_input)
-        {
-            settings_input.MetaEvo.Application = "sim";
-            this.sim = sim_input;
-            init(ref prob_input, ref settings_input, ref hauptdiagramm_input, ref progress1);
-        }
-
-        //### Konstruktor ###
-        public void init(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input, ref EVO.Common.Progress progress1_input)  
+        /// <summary>
+        /// Initialisiert den MetaEVO-Controller und übergibt alle erforderlichen Objekte
+        /// </summary>
+        /// <param name="prob_input">das Problem</param>
+        /// <param name="settings_input">die Einstellungen</param>
+        /// <param name="progress1_input">der Verlauf</param>
+        /// <param name="monitor_input">der Monitor</param>
+        /// <param name="hauptdiagramm_input">das Hauptdiagramm</param>
+        public void Init(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, ref EVO.Common.Progress progress1_input, ref EVO.Diagramm.Monitor monitor_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input)  
         {
             applog = new IHWB.EVO.Diagramm.ApplicationLog(ref settings_input);
 
@@ -50,12 +44,40 @@ namespace IHWB.EVO.MetaEvo
             this.prob = prob_input;
             this.settings = settings_input;
             this.progress1 = progress1_input;
+            this.monitor1 = monitor_input;
             this.hauptdiagramm1 = hauptdiagramm_input;
 
+        }
+
+        /// <summary>
+        /// Initialisiert den Controller für Sim-Anwendungen
+        /// </summary>
+        /// <param name="sim_input">Sim-Objekt</param>
+        public void InitApp(ref IHWB.EVO.Apps.Sim sim_input)
+        {
+            this.settings.MetaEvo.Application = "sim";
+            this.sim = sim_input;
+        }
+
+        /// <summary>
+        /// Initialisiert den Controller für Testprobleme
+        /// </summary>
+        /// <param name="inputTestproblem">Testproblem-Objekt</param>
+        public void InitApp(ref IHWB.EVO.Apps.Testprobleme testprobleme_input)
+        {
+            this.settings.MetaEvo.Application = "testprobleme";
+            this.testprobleme = testprobleme_input;
+        }
+
+        /// <summary>
+        /// Startet die Optimierung
+        /// </summary>
+        public void Start()
+        {
             this.role = this.settings.MetaEvo.Role;
 
             //Setzen des Problems zum Design des Individuums
-            EVO.Common.Individuum_MetaEvo.Initialise(ref prob_input);
+            EVO.Common.Individuum_MetaEvo.Initialise(ref this.prob);
             individuumnumber = 1;
             applog.appendText("Controller: Task: " + prob.Datensatz);
 
@@ -75,10 +97,10 @@ namespace IHWB.EVO.MetaEvo
                     }
 
                     generation = new EVO.Common.Individuum_MetaEvo[this.settings.MetaEvo.PopulationSize];
-                    
+
                     for (int j = 0; j < this.settings.MetaEvo.PopulationSize; j++)
                     {
-                        generation[j] = new EVO.Common.Individuum_MetaEvo("MetaEvo", individuumnumber, prob_input.List_OptParameter.Length);
+                        generation[j] = new EVO.Common.Individuum_MetaEvo("MetaEvo", individuumnumber, this.prob.List_OptParameter.Length);
                         individuumnumber++;
                     }
 
@@ -90,13 +112,13 @@ namespace IHWB.EVO.MetaEvo
                     break;
 
                 case "Network Server":
-                     applog.appendText("Controller: MetaEvo started in 'Network Server'-Mode");
+                    applog.appendText("Controller: MetaEvo started in 'Network Server'-Mode");
                     //### Vorbereitung ###
                     //Initialisieren des Individuum-Arrays
                     generation = new EVO.Common.Individuum_MetaEvo[this.settings.MetaEvo.PopulationSize];
                     for (int j = 0; j < this.settings.MetaEvo.PopulationSize; j++)
                     {
-                        generation[j] = new IHWB.EVO.Common.Individuum_MetaEvo("MetaEvo", individuumnumber, prob_input.List_OptParameter.Length);
+                        generation[j] = new IHWB.EVO.Common.Individuum_MetaEvo("MetaEvo", individuumnumber, this.prob.List_OptParameter.Length);
                         individuumnumber++;
                     }
 
@@ -115,9 +137,9 @@ namespace IHWB.EVO.MetaEvo
                     break;
 
                 case "Network Client":
-                     applog.appendText("Controller: MetaEvo started in 'Network Client'-Mode");
+                    applog.appendText("Controller: MetaEvo started in 'Network Client'-Mode");
                     //### Vorbereitung ###
-                    individuumForClient = new EVO.Common.Individuum_MetaEvo("MetaEvo", 0, prob_input.List_OptParameter.Length);
+                    individuumForClient = new EVO.Common.Individuum_MetaEvo("MetaEvo", 0, this.prob.List_OptParameter.Length);
                     //Microsoft SQL-DB des Clients ausschalten
                     if (this.settings.MetaEvo.Application == "sim") { sim.StoreIndividuals = false; }
 
@@ -165,15 +187,15 @@ namespace IHWB.EVO.MetaEvo
         private void start_single_pc()
         {
             Client mePC = new Client(); 
-            mePC.status = "init Genpool";
+            mePC.status = "Init Genpool";
             settings.MetaEvo.CurrentGeneration = 1;
 
             while (mePC.status != "finished")
             {
                 applog.appendText("Controller: Status: " + mePC.status);
 
-                #region Zustand: init Genpool
-                if (mePC.status == "init Genpool")
+                #region Zustand: Init Genpool
+                if (mePC.status == "Init Genpool")
                 {
                     //Zufällige Parents setzen
                     set_random_parents(ref generation);
@@ -313,15 +335,15 @@ namespace IHWB.EVO.MetaEvo
         {
             Client meServer = new Client(); 
             meServer = networkmanager.Network_Init_Client_Object(Dns.GetHostName());
-            meServer.status = "init Genpool";
+            meServer.status = "Init Genpool";
             settings.MetaEvo.CurrentGeneration = 1;
 
             while (meServer.status != "finished")
             {
                 applog.appendText("Controller: Status: " + meServer.status);
 
-                #region Zustand: init Genpool
-                if (meServer.status == "init Genpool")
+                #region Zustand: Init Genpool
+                if (meServer.status == "Init Genpool")
                 {
                     //Zufällige Parents setzen und in DB schreiben
                     set_random_parents(ref generation);
