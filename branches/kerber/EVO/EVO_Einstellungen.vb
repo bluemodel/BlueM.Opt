@@ -448,8 +448,6 @@ Public Class EVO_Einstellungen
             .PopulationSize = Me.Numeric_MetaEvo_PopulationSize.Value
             .Numberresults = Me.Numeric_MetaEvo_NumberResults.Value
             .HJStepsize = Me.Numeric_MetaEvo_HJStepsize.Value
-            .Draw = Me.CheckBox_MetaEvo_Draw.Checked
-            .Log = Me.CheckBox_MetaEvo_Log.Checked
             .MySQL_Host = Me.TextBox_MetaEvo_MySQL_Host.Text
             .MySQL_Database = Me.TextBox_MetaEvo_MySQL_DB.Text
             .MySQL_User = Me.TextBox_MetaEvo_MySQL_User.Text
@@ -611,8 +609,6 @@ Public Class EVO_Einstellungen
             Me.Numeric_MetaEvo_Numbergenerations.Value = .NumberGenerations
             Me.Numeric_MetaEvo_NumberResults.Value = .Numberresults
             Me.Numeric_MetaEvo_HJStepsize.Value = .HJStepsize
-            Me.CheckBox_MetaEvo_Draw.Checked = .Draw
-            Me.CheckBox_MetaEvo_Log.Checked = .Log
             Me.TextBox_MetaEvo_MySQL_Host.Text = .MySQL_Host
             Me.TextBox_MetaEvo_MySQL_DB.Text = .MySQL_Database
             Me.TextBox_MetaEvo_MySQL_User.Text = .MySQL_User
@@ -768,22 +764,16 @@ Public Class EVO_Einstellungen
         If (Me.Combo_MetaEvo_Role.SelectedItem = "Single PC") Then
             Me.Combo_MetaEvo_OpMode.Enabled = True
             Combo_MetaEvo_OpMode_SelectedIndexChanged(sender, e)
-            Me.GroupBox_MetaEvo_PerformanceOptions.Enabled = True
-            Me.CheckBox_MetaEvo_Draw.Enabled = True
             Me.GroupBox_MetaEvo_MySQLOptions.Enabled = False
         ElseIf (Me.Combo_MetaEvo_Role.SelectedItem = "Network Client") Then
             Me.Combo_MetaEvo_OpMode.Enabled = False
             Me.GroupBox_MetaEvo_BasicOptions.Enabled = False
             Me.GroupBox_MetaEvo_TransferOptions.Enabled = False
             Me.GroupBox_MetaEvo_LocalOptions.Enabled = False
-            Me.GroupBox_MetaEvo_PerformanceOptions.Enabled = True
-            Me.CheckBox_MetaEvo_Draw.Enabled = False
             Me.GroupBox_MetaEvo_MySQLOptions.Enabled = True
         ElseIf (Me.Combo_MetaEvo_Role.SelectedItem = "Network Server") Then
             Me.Combo_MetaEvo_OpMode.Enabled = True
             Combo_MetaEvo_OpMode_SelectedIndexChanged(sender, e)
-            Me.GroupBox_MetaEvo_PerformanceOptions.Enabled = True
-            Me.CheckBox_MetaEvo_Draw.Enabled = True
             Me.GroupBox_MetaEvo_MySQLOptions.Enabled = True
         End If
     End Sub

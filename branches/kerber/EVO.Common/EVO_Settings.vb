@@ -294,10 +294,6 @@ Public Class EVO_Settings
         'Einstellungen für einen PC der das Problem berechnet (Global)
         Public HJStepsize As Integer                '1/x minimale Schrittweite der Optparas bei Hook&Jeeves 
 
-        'Performanceeinstellungen
-        Public Draw As Boolean                      'Ob die Berechnung grafisch dargestellt wird
-        Public Log As Boolean                       'Ob die Logdaten angezeigt werden sollen
-
         'Datenbank-Connection
         Public MySQL_Host As String
         Public MySQL_Database As String
@@ -320,12 +316,9 @@ Public Class EVO_Settings
 
             Me.HJStepsize = 50
 
-            Me.Draw = True
-            Me.Log = True
-
             Me.MySQL_Host = "localhost"
-            Me.MySQL_Database = "MetaEvo_db"
-            Me.MySQL_User = "remote_user"
+            Me.MySQL_Database = "metaevo_db"
+            Me.MySQL_User = "metaevo"
             Me.MySQL_Password = ""
 
             Me.ChildsPerParent = 3
