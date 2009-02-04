@@ -100,15 +100,15 @@ Partial Public Class Monitor
         Dim jetzt = DateTime.Now
         Dim tmp As String
 
-        'Result anhängen
-        Me.TextBox_Log.AppendText(EVO.Common.Constants.eol + "Result:" + EVO.Common.Constants.eol)
-        For i = 0 To 8
-            tmp = ""
-            For j = 0 To Me.result.GetUpperBound(0)
-                tmp = tmp + result(j, i) + vbTab
-            Next
-            Me.TextBox_Log.AppendText(tmp + EVO.Common.Constants.eol)
-        Next
+        ''Result anhängen
+        'Me.TextBox_Log.AppendText(EVO.Common.Constants.eol + "Result:" + EVO.Common.Constants.eol)
+        'For i = 0 To 8
+        '    tmp = ""
+        '    For j = 0 To Me.result.GetUpperBound(0)
+        '        tmp = tmp + result(j, i) + vbTab
+        '    Next
+        '    Me.TextBox_Log.AppendText(tmp + EVO.Common.Constants.eol)
+        'Next
 
         'Dialog(einrichten)
         SaveFileDialog1.Filter = "Text-Dateien (*.txt)|*.txt"
