@@ -49,14 +49,15 @@
         Next
 
     End Sub
+
     '### Überschriebene Methoden
 
     Public Overrides Function Clone() As Individuum
-        Dim Dest As New Individuum_MetaEvo(Me.mType, Me.ID, Me.numberOptparas)
-        Return Dest
+        Return Me.Clone_MetaEvo()
     End Function
 
     Public Function Clone_MetaEvo() As Individuum_MetaEvo
+
         Dim Dest As New Individuum_MetaEvo(Me.mType, Me.ID, Me.numberOptparas)
         Dim i As Integer
 
@@ -81,10 +82,11 @@
         Dest.generator_id = Me.generator_id
 
         Return Dest
+
     End Function
 
     Public Overrides Function Create(Optional ByVal type As String = "tmp", Optional ByVal id As Integer = 0) As Individuum
-        Dim ind As New Individuum_CES(type, id)
+        Dim ind As New Individuum_MetaEVO(type, id, Me.numberOptparas)
         Return ind
     End Function
 
