@@ -874,21 +874,6 @@ Public Class Testprobleme
 
 #Region "Evaluierung"
 
-    'Evaluierung und Zeichnen der Testprobleme
-    '*****************************************
-    Public Sub Evaluierung_TestProbleme_MetaEvo(ByRef ind_input As Common.Individuum_MetaEvo, ByVal ipop As Short, ByRef Diag As EVO.Diagramm.Hauptdiagramm)
-        'Umbauen
-        Dim ind As Common.Individuum_PES
-        ind = New Common.Individuum_PES("MetaEvo", ind_input.ID)
-        ind.OptParameter = ind_input.get_mOptparas
-
-        Evaluate(ind, ipop, Diag)
-
-        ind_input.Features = ind.Features
-        ind_input.Constraints = ind.Constraints
-        If (ind.Dominated = "true") Then ind_input.set_status("false")
-    End Sub
-
     ''' <summary>
     ''' Evaluiert (und zeichnet!) das Testproblem
     ''' </summary>

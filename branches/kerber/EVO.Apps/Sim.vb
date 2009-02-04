@@ -587,22 +587,6 @@ Public MustInherit Class Sim
 
     End Function
 
-    ''' <summary>
-    ''' Evaluiert ein MetaEvo-Individuum
-    ''' </summary>
-    ''' <param name="ind">MetaEvo Individuum</param>
-    ''' <returns>True wenn erfolgreich, False wenn fehlgeschlagen</returns>
-    Public Overloads Function Evaluate_MetaEvo(ByRef ind As EVO.Common.Individuum_MetaEvo)
-        ind.set_toSimulate(False)
-        If (Me.Evaluate(ind) And ind.Is_Feasible) Then
-            ind.set_status("true")
-            Return True
-        Else
-            ind.set_status("false")
-            Return False
-        End If
-    End Function
-
     'Evaluierung des SimModells für ParameterOptimierung - Steuerungseinheit
     '***********************************************************************
     Public Sub PREPARE_Evaluation_PES(ByVal OptParams() As EVO.Common.OptParameter)

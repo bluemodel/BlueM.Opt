@@ -209,15 +209,7 @@ namespace IHWB.EVO.MetaEvo
                     this.monitor1.LogAppend("Controller: Genpool: Simulating Individuums...");
                     for (int i = 0; i < generation.Length; i++)
                     {
-                        if (this.apptype == IHWB.EVO.Common.Constants.ApplicationTypes.Testprobleme)
-                        {
-                            testprobleme.Evaluierung_TestProbleme_MetaEvo(ref generation[i],0,ref hauptdiagramm1);
-                        }
-                        else if (this.apptype == IHWB.EVO.Common.Constants.ApplicationTypes.Sim)
-                        {
-                            sim.Evaluate_MetaEvo(ref generation[i]);
-                            hauptdiagramm1.ZeichneIndividuum(generation[i], 1, 1, 1, generation[i].ID % generation.Length, System.Drawing.Color.Orange, false);
-                        }
+                        evaluate(ref generation[i], i, true);
                         this.monitor1.LogAppend("Controller: Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length),2) * 100 + "%)");
                         System.Windows.Forms.Application.DoEvents();
                     }
@@ -249,17 +241,8 @@ namespace IHWB.EVO.MetaEvo
                         //Simulieren und zeichnen
                         if (generation[i].get_toSimulate())
                         {
-                            if (this.apptype == IHWB.EVO.Common.Constants.ApplicationTypes.Testprobleme)
-                            {
-                                this.monitor1.LogAppend("Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   " + algomanager.algos.algofeedbackarray[generation[i].get_generator()].name); 
-                                testprobleme.Evaluierung_TestProbleme_MetaEvo(ref generation[i], 0, ref hauptdiagramm1);
-                            }
-                            else if (this.apptype == IHWB.EVO.Common.Constants.ApplicationTypes.Sim)
-                            {
-                                this.monitor1.LogAppend("Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   " + algomanager.algos.algofeedbackarray[generation[i].get_generator()].name); 
-                                sim.Evaluate_MetaEvo(ref generation[i]);
-                                hauptdiagramm1.ZeichneIndividuum(generation[i], 1, 1, 1, generation[i].ID % generation.Length, System.Drawing.Color.Orange, false);
-                            }
+                            this.monitor1.LogAppend("Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   " + algomanager.algos.algofeedbackarray[generation[i].get_generator()].name);
+                            evaluate(ref generation[i], i, true);
                             System.Windows.Forms.Application.DoEvents();
                             
                             progress1.NextNachf();
@@ -500,15 +483,7 @@ namespace IHWB.EVO.MetaEvo
 
                     //Simulieren
                     this.monitor1.LogAppend("Controller: Individuum " + individuumForClient.ID + " simulating...");
-                    if (this.apptype == IHWB.EVO.Common.Constants.ApplicationTypes.Testprobleme)
-                    {
-                        testprobleme.Evaluierung_TestProbleme_MetaEvo(ref individuumForClient, 0, ref hauptdiagramm1);
-                    }
-                    else if (this.apptype == IHWB.EVO.Common.Constants.ApplicationTypes.Sim)
-                    {
-                        sim.Evaluate_MetaEvo(ref individuumForClient);
-                        //Beim Client nicht zeichnen
-                    }
+                    evaluate(ref individuumForClient, individuumForClient.ID, false);
                     System.Windows.Forms.Application.DoEvents();
 
                     //Individuum in DB Updaten
@@ -544,5 +519,58 @@ namespace IHWB.EVO.MetaEvo
             this.monitor1.LogAppend("Controller: Calculation Finished");
             MessageBox.Show("Berechnung beendet", "MetaEvo");
         }
+
+        /// <summary>
+        /// Evaluiert ein Meta-Individuum
+        /// </summary>
+        /// <param name="ind_meta">das Individuum</param>
+        /// <param name="iNachf">Nachfahrennummer</param>
+        /// <param name="storeInDB">in DB speichern</param>
+        private void evaluate(ref EVO.Common.Individuum_MetaEvo ind_meta, int iNachf, bool storeInDB)
+        {
+            EVO.Common.Individuum ind;
+            ind = ind_meta; //referenz
+
+            //in ErgebnisDB speichern?
+            storeInDB = (this.role == "Network Client") ? false : true;
+
+            //Testproblem
+            if (this.apptype == IHWB.EVO.Common.Constants.ApplicationTypes.Testprobleme)
+            {
+                //Evaluieren und zeichnen
+                this.testprobleme.Evaluate(ref ind, 0, ref this.hauptdiagramm1);
+            }
+
+            //Simulation
+            else if (this.apptype == IHWB.EVO.Common.Constants.ApplicationTypes.Sim)
+            {
+                ind_meta.set_toSimulate(false);
+
+                //simulieren
+                if (!this.sim.Evaluate(ref ind, storeInDB))
+                {
+                    //TODO: Simulationsfehler abfangen (evtl. nochmal mit neuen Parametern simulieren)
+                }
+                else
+                {
+                    //Zeichnen
+                    //TODO: Generationsnummer übergeben
+                    this.hauptdiagramm1.ZeichneIndividuum(ind, 1, 1, 1, iNachf, System.Drawing.Color.Orange, false);
+                }
+            }
+
+            //post-processing
+            if (!ind.Is_Feasible)
+            {
+                ind_meta.set_status("false#constraints#"); 
+            }
+            else
+            {
+                ind_meta.set_status("true");
+            }
+
+        }
+
     }
+
 }
