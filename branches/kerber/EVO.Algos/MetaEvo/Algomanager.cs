@@ -15,7 +15,6 @@ namespace IHWB.EVO.MetaEvo
         EVO.Diagramm.Monitor monitor1;
         public Algos algos;
         bool firstrun = true;
-        EVO.Diagramm.Hauptdiagramm hauptdiagramm;
         public EVO.MO_Indicators.Solutionvolume solutionvolume;
         public string localausgabe;
         public string localausgabe2;
@@ -23,10 +22,9 @@ namespace IHWB.EVO.MetaEvo
         int localcounter2;
         string[,] result;
 
-        public Algomanager(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, int individuumnumber_input, ref EVO.Diagramm.Monitor monitor_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input, ref string[,] result_input) 
+        public Algomanager(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, int individuumnumber_input, ref EVO.Diagramm.Monitor monitor_input, ref string[,] result_input) 
         {
             settings = settings_input;
-            hauptdiagramm = hauptdiagramm_input;
             monitor1 = monitor_input;
             localausgabe = "";
             localausgabe2 = "";
@@ -127,10 +125,6 @@ namespace IHWB.EVO.MetaEvo
                 this.result[settings.MetaEvo.CurrentGeneration, 8] = solutionvolume.get_last_volume().ToString();
             }
 
-            //Genpool zeichnen:
-            hauptdiagramm.ZeichneSekPopulation(genpool);
-            System.Windows.Forms.Application.DoEvents();
-
             this.monitor1.LogAppend("Algo Manager: Solutionvolume: Last Volume: " + solutionvolume.get_last_volume());
         }
 
@@ -162,11 +156,8 @@ namespace IHWB.EVO.MetaEvo
                 this.genpool[i] = genpool_input[i].Clone_MetaEvo();
             }
             this.monitor1.LogAppend("Algo Manager: Genpool: \r\n" + this.generationinfo(ref this.genpool));
-
-            //Genpool zeichnen
-            hauptdiagramm.ZeichneSekPopulation(genpool);
-            System.Windows.Forms.Application.DoEvents();
         }
+
         //Wiederbelebte Feasible-Individuen wieder auf false setzen
         private void set_feasible2false(ref EVO.Common.Individuum_MetaEvo[] input, ref EVO.Common.Individuum_MetaEvo[] input2)
         {

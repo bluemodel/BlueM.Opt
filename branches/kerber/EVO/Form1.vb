@@ -669,10 +669,11 @@ Partial Class Form1
                 Case METH_MetaEvo
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
+                    'Ergebnis-Buttons
+                    Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
+
                     'Progress mit Standardwerten initialisieren
                     Call Me.mProgress.Initialize(1, 1, EVO_Einstellungen1.Settings.MetaEvo.NumberGenerations, EVO_Einstellungen1.Settings.MetaEvo.PopulationSize)
-
-
 
             End Select
 

@@ -111,7 +111,7 @@ namespace IHWB.EVO.MetaEvo
                     }
 
                     //Algomanager starten
-                    algomanager = new Algomanager(ref prob, ref settings, individuumnumber, ref monitor1, ref hauptdiagramm1, ref this.result);
+                    algomanager = new Algomanager(ref prob, ref settings, individuumnumber, ref monitor1, ref this.result);
 
                     //### Hauptprogramm ###
                     start_single_pc();
@@ -129,7 +129,7 @@ namespace IHWB.EVO.MetaEvo
                     }
 
                     //Algomanager starten
-                    algomanager = new Algomanager(ref prob, ref settings, individuumnumber, ref monitor1, ref hauptdiagramm1, ref this.result);
+                    algomanager = new Algomanager(ref prob, ref settings, individuumnumber, ref monitor1, ref this.result);
 
                     //### Hauptprogramm ###
                     networkmanager = new Networkmanager(ref this.generation[0], ref this.settings, ref prob, ref monitor1);
@@ -213,14 +213,15 @@ namespace IHWB.EVO.MetaEvo
                     this.monitor1.LogAppend("Controller: Genpool: Simulating Individuums...");
                     for (int i = 0; i < generation.Length; i++)
                     {
-                        evaluate(ref generation[i], i, true);
+                        evaluate(ref generation[i], i);
                         this.monitor1.LogAppend("Controller: Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length),2) * 100 + "%)");
                         System.Windows.Forms.Application.DoEvents();
                     }
 
                     //Genpool speichern
                     algomanager.set_genpool(ref generation);
-                    generation = new EVO.Common.Individuum_MetaEvo[this.settings.MetaEvo.ChildsPerParent*this.settings.MetaEvo.PopulationSize];
+
+                    generation = new EVO.Common.Individuum_MetaEvo[this.settings.MetaEvo.ChildsPerParent * this.settings.MetaEvo.PopulationSize];
 
                     mePC.status = "generate Individuums";
                 }
@@ -246,7 +247,7 @@ namespace IHWB.EVO.MetaEvo
                         if (generation[i].get_toSimulate())
                         {
                             this.monitor1.LogAppend("Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   " + algomanager.algos.algofeedbackarray[generation[i].get_generator()].name);
-                            evaluate(ref generation[i], i, true);
+                            evaluate(ref generation[i], i);
                             System.Windows.Forms.Application.DoEvents();
                             
                             progress1.NextNachf();
@@ -260,7 +261,11 @@ namespace IHWB.EVO.MetaEvo
                 else if (mePC.status == "select Individuums")
                 {
                     algomanager.new_individuals_merge_with_genpool(ref generation);
-                    settings.MetaEvo.CurrentGeneration++;         
+
+                    //Sekpop zeichnen und ggf. speichern
+                    this.draw_and_store_sekpop(ref algomanager.genpool);
+
+                    settings.MetaEvo.CurrentGeneration++;
 
                     //Umschalt- und Abbruchbedingungen prüfen
                     //  Maximale Anzahl der Generationen erreicht oder Umschaltpunkt erreicht
@@ -345,6 +350,7 @@ namespace IHWB.EVO.MetaEvo
                     if (networkmanager.calculate_by_clients(ref generation, ref hauptdiagramm1, ref progress1))
                     {
                         algomanager.set_genpool(ref generation);
+
                         generation = new EVO.Common.Individuum_MetaEvo[this.settings.MetaEvo.ChildsPerParent * this.settings.MetaEvo.PopulationSize];
                         meServer.set_AlsoInDB("generate Individuums", -1, -1);
                     }
@@ -394,6 +400,10 @@ namespace IHWB.EVO.MetaEvo
                 else if (meServer.status == "select Individuums")
                 {
                     algomanager.new_individuals_merge_with_genpool(ref generation);
+
+                    //Sekpop zeichnen und ggf. speichern
+                    this.draw_and_store_sekpop(ref algomanager.genpool);
+
                     networkmanager.DB_set_info("Berechnungsmodus", "" + settings.MetaEvo.OpMode);
                     networkmanager.DB_set_info("Solutionvolume", "" + algomanager.solutionvolume.get_last_volume());
                     settings.MetaEvo.CurrentGeneration++;
@@ -487,7 +497,7 @@ namespace IHWB.EVO.MetaEvo
 
                     //Simulieren
                     this.monitor1.LogAppend("Controller: Individuum " + individuumForClient.ID + " simulating...");
-                    evaluate(ref individuumForClient, individuumForClient.ID, false);
+                    evaluate(ref individuumForClient, individuumForClient.ID);
                     System.Windows.Forms.Application.DoEvents();
 
                     //Individuum in DB Updaten
@@ -529,14 +539,14 @@ namespace IHWB.EVO.MetaEvo
         /// </summary>
         /// <param name="ind_meta">das Individuum</param>
         /// <param name="iNachf">Nachfahrennummer</param>
-        /// <param name="storeInDB">in DB speichern</param>
-        private void evaluate(ref EVO.Common.Individuum_MetaEvo ind_meta, int iNachf, bool storeInDB)
+        private void evaluate(ref EVO.Common.Individuum_MetaEvo ind_meta, int iNachf)
         {
+            bool storeInDB;
             EVO.Common.Individuum ind;
             ind = ind_meta; //referenz
 
             //in ErgebnisDB speichern?
-            storeInDB = (this.role == "Network Client") ? false : true;
+            storeInDB = (this.role == "Single PC") ? true : false;
 
             //Testproblem
             if (this.apptype == IHWB.EVO.Common.Constants.ApplicationTypes.Testprobleme)
@@ -573,6 +583,42 @@ namespace IHWB.EVO.MetaEvo
                 ind_meta.set_status("true");
             }
 
+        }
+
+        /// <summary>
+        /// Zeichnet (und speichert ggf. im OptResult) die Sekundäre Population (aktuelle Front)
+        /// </summary>
+        /// <param name="genpool">der Genpool</param>
+        /// <remarks>Es werden nur Individuen mit Status "true" verwendet!</remarks>
+        private void draw_and_store_sekpop(ref EVO.Common.Individuum_MetaEvo[] genpool)
+        {
+            int i, j;
+            EVO.Common.Individuum[] sekpop;
+
+            sekpop = new IHWB.EVO.Common.Individuum[0];
+
+            //alle nicht-dominierten Lösungen herausfiltern
+            j = 0;
+            for (i = 0; i < genpool.Length; i++)
+            {
+                if (genpool[i].get_status() == "true")
+                {
+                    Array.Resize<EVO.Common.Individuum>(ref sekpop, j + 1);
+                    sekpop[j] = genpool[i].Clone();
+                    j++;
+                }
+            }
+
+            //SekPop in DB speichern (nur bei Sim und "Single PC")
+            if (this.apptype == IHWB.EVO.Common.Constants.ApplicationTypes.Sim
+                && this.role == "Single PC")
+            {
+                this.sim.OptResult.setSekPop(sekpop, settings.MetaEvo.CurrentGeneration - 1);
+            }
+
+            //SekPop zeichnen
+            this.hauptdiagramm1.ZeichneSekPopulation(sekpop);
+            System.Windows.Forms.Application.DoEvents();
         }
 
         /// <summary>

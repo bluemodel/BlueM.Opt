@@ -61,6 +61,7 @@
         Dim Dest As New Individuum_MetaEvo(Me.mType, Me.ID, Me.numberOptparas)
         Dim i As Integer
 
+        Dest.ID = Me.ID
         Dest.Client = Me.Client
         Dest.status = Me.status
         Dest.statusreason = Me.statusreason
