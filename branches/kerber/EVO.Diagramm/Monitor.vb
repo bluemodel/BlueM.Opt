@@ -7,7 +7,6 @@ Partial Public Class Monitor
     Inherits System.Windows.Forms.Form
 
     Private starttime As DateTime
-    Private result As String(,)
 
     Public Event MonitorClosed()
     Public Event MonitorOpened()
@@ -78,19 +77,6 @@ Partial Public Class Monitor
     End Sub
 
     ''' <summary>
-    ''' Fügt ein Ergebnis hinzu
-    ''' </summary>
-    ''' <param name="generation"></param>
-    ''' <param name="eintrag"></param>
-    ''' <param name="text"></param>
-    ''' <remarks>FUNZT NICHT!</remarks>
-    Public Sub appendResult(ByVal generation As Integer, ByVal eintrag As Integer, ByVal text As String)
-        'TODO: das geht so nicht! Alle Aufrufe von appendResult auskommentiert (betrifft nur MetaEVO)
-        ReDim Preserve Me.result(generation, eintrag)
-        Me.result(generation, eintrag) = text
-    End Sub
-
-    ''' <summary>
     ''' Ruft den Speichern-Dialog um den Log-Inhalt als Textdatei abzuspeichern
     ''' </summary>
     Public Sub savelog()
@@ -98,17 +84,6 @@ Partial Public Class Monitor
         Dim sw As StreamWriter
         Dim SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog()
         Dim jetzt = DateTime.Now
-        Dim tmp As String
-
-        ''Result anhängen
-        'Me.TextBox_Log.AppendText(EVO.Common.Constants.eol + "Result:" + EVO.Common.Constants.eol)
-        'For i = 0 To 8
-        '    tmp = ""
-        '    For j = 0 To Me.result.GetUpperBound(0)
-        '        tmp = tmp + result(j, i) + vbTab
-        '    Next
-        '    Me.TextBox_Log.AppendText(tmp + EVO.Common.Constants.eol)
-        'Next
 
         'Dialog(einrichten)
         SaveFileDialog1.Filter = "Text-Dateien (*.txt)|*.txt"

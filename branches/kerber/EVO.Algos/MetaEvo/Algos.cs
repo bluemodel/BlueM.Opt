@@ -31,7 +31,9 @@ namespace IHWB.EVO.MetaEvo
         EVO.Diagramm.Monitor monitor1;
         EVO.Common.EVO_Settings settings;
 
-        public Algos(ref EVO.Common.EVO_Settings settings_input, int individuum_id_input, ref EVO.Diagramm.Monitor monitor_input)
+        string[,] result;
+
+        public Algos(ref EVO.Common.EVO_Settings settings_input, int individuum_id_input, ref EVO.Diagramm.Monitor monitor_input, ref string[,] result_input)
         {
             individuum_id = individuum_id_input;
             monitor1 = monitor_input;
@@ -39,6 +41,8 @@ namespace IHWB.EVO.MetaEvo
             populationsize = settings_input.MetaEvo.PopulationSize;
             HJ_minimumstepsize = settings_input.MetaEvo.HJStepsize;
             settings = settings_input;
+
+            this.result = result_input;
         }
 
         //Legt fest welche Algorithmen genutzt werden sollen
@@ -69,10 +73,10 @@ namespace IHWB.EVO.MetaEvo
             //Initialisierung der Algorithmen
             for (int i = 0; i < tmp.Length; i++)
             {
-                //monitor1.appendResult(1, i, "" + individuumsperalgo[i]);
+                this.result[1, i] = individuumsperalgo[i].ToString();
                 algofeedbackarray[i] = new Algofeedback(tmp[i].Trim(), individuumsperalgo[i]);  
             }
-            //monitor1.appendResult(1, tmp.Length, "" + tmp.Length*10);
+            this.result[1, tmp.Length] = (tmp.Length * 10).ToString();
             this.monitor1.LogAppend("Algos: Using Algos: " + algos2use_input);
         }
 

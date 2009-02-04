@@ -21,8 +21,9 @@ namespace IHWB.EVO.MetaEvo
         public string localausgabe2;
         int localcounter;
         int localcounter2;
+        string[,] result;
 
-        public Algomanager(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, int individuumnumber_input, ref EVO.Diagramm.Monitor monitor_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input) 
+        public Algomanager(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, int individuumnumber_input, ref EVO.Diagramm.Monitor monitor_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input, ref string[,] result_input) 
         {
             settings = settings_input;
             hauptdiagramm = hauptdiagramm_input;
@@ -32,8 +33,10 @@ namespace IHWB.EVO.MetaEvo
             localcounter = settings.MetaEvo.NumberResults;
             localcounter2 = 0;
 
+            this.result = result_input;
+
             //Algoobjekt initialisieren (enthält die algorithmus-Methoden und das Feedback zu jedem Algo)
-            algos = new Algos(ref settings_input, individuumnumber_input, ref monitor1);
+            algos = new Algos(ref settings_input, individuumnumber_input, ref monitor1, ref this.result);
             if ((settings.MetaEvo.OpMode == "Both") || (settings.MetaEvo.OpMode == "Global Optimizer"))
             {
                 algos.set_algos("Zufällige Einfache Mutation, Ungleichverteilte Mutation, Zufällige Rekombination, Intermediäre Rekombination, Diversität aus Sortierung, Totaler Zufall, Dominanzvektor");
@@ -121,7 +124,7 @@ namespace IHWB.EVO.MetaEvo
                     //Solutionvolume entscheidet auf Umschaltung zur lokalen Optimierung
                     settings.MetaEvo.AlgoMode = "Global: Finished";
                 }
-                //monitor1.appendResult(settings.MetaEvo.CurrentGeneration, 8, "" + solutionvolume.get_last_volume());
+                this.result[settings.MetaEvo.CurrentGeneration, 8] = solutionvolume.get_last_volume().ToString();
             }
 
             //Genpool zeichnen:
@@ -586,10 +589,10 @@ namespace IHWB.EVO.MetaEvo
             //6. Ausgabe zusammenfügen
             for (int i = 0; i < algos.algofeedbackarray.Length; i++)
             {
-                //monitor1.appendResult(settings.MetaEvo.CurrentGeneration + 1, i, "" + algos.algofeedbackarray[i].number_individuals_for_nextGen);
+                this.result[settings.MetaEvo.CurrentGeneration + 1, i] = algos.algofeedbackarray[i].number_individuals_for_nextGen.ToString();
                 log[algos.algofeedbackarray.Length] = log[algos.algofeedbackarray.Length] + log[i] + " Initiative: " + algos.algofeedbackarray[i].initiative + " = " + algos.algofeedbackarray[i].number_individuals_for_nextGen + " Individuums for next generation\r\n";    
             }
-            //monitor1.appendResult(settings.MetaEvo.CurrentGeneration + 1, 7, "" + initiativensumme);
+            this.result[settings.MetaEvo.CurrentGeneration + 1, 7] = initiativensumme.ToString();
             this.monitor1.LogAppend("Algo Manager: nemGen_composition: Individuuum-Composition for next Generation:\r\n" + log[algos.algofeedbackarray.Length]);
 
 
