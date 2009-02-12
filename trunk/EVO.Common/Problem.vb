@@ -439,7 +439,7 @@ Public Class Problem
         '*|     |             |   |         |       |          |         | Start | Ende | WertTyp | RefWert | RefGröße | Datei   |         |
         '*|-----|-------------|---|---------|-------|----------|---------|-------|------|---------|---------|----------|---------|---------|
 
-        Const AnzSpalten As Integer = 14                       'Anzahl Spalten in der ZIE-Datei
+        Const AnzSpalten As Integer = 16                       'Anzahl Spalten in der ZIE-Datei
         Dim i As Integer
         Dim Zeile As String
         Dim WerteArray() As String
@@ -466,40 +466,50 @@ Public Class Problem
                 Me.List_ObjectiveFunctions(i) = New Common.Objectivefunktion()
                 'Werte einlesen
                 With Me.List_ObjectiveFunctions(i)
-                    If (WerteArray(1).Trim().ToUpper() = "J") Then
+                    If (WerteArray(1).Trim().ToUpper() = "P") Then
                         .isPrimObjective = True
                     Else
                         .isPrimObjective = False
                     End If
                     .Bezeichnung = WerteArray(2).Trim()
-                    If (WerteArray(3).Trim() = "+") Then
+                    .Gruppe =  WerteArray(3).Trim()
+                    If (WerteArray(4).Trim() = "+") Then
                         .Richtung = Common.EVO_RICHTUNG.Maximierung
                     Else
                         .Richtung = Common.EVO_RICHTUNG.Minimierung
                     End If
-                    .Typ = WerteArray(4).Trim()
-                    .Datei = WerteArray(5).Trim()
-                    .SimGr = WerteArray(6).Trim()
-                    .Funktion = WerteArray(7).Trim()
-                    If (WerteArray(8).Trim() <> "") Then
-                        .EvalStart = WerteArray(8).Trim()
+
+                    If (WerteArray(5).Trim() = "+") Then
+                        .OpFact = 1
+                    ElseIf (WerteArray(5).Trim() = "-") Then
+                        .OpFact = -1
+                    ElseIf Not (WerteArray(5).Trim() = "") Then
+                        .OpFact = Convert.ToDouble(WerteArray(5).Trim())
+                    End If
+
+                    .Typ = WerteArray(6).Trim()
+                    .Datei = WerteArray(7).Trim()
+                    .SimGr = WerteArray(8).Trim()
+                    .Funktion = WerteArray(9).Trim()
+                    If (WerteArray(10).Trim() <> "") Then
+                        .EvalStart = WerteArray(10).Trim()
                     Else
                         .EvalStart = SimStart
                     End If
-                    If WerteArray(9).Trim() <> "" Then
-                        .EvalEnde = WerteArray(9).Trim()
+                    If WerteArray(11).Trim() <> "" Then
+                        .EvalEnde = WerteArray(11).Trim()
                     Else
                         .EvalEnde = SimEnde
                     End If
-                    .WertFunktion = WerteArray(10).Trim()
-                    If (WerteArray(11).Trim() <> "") Then
-                        .RefWert = Convert.ToDouble(WerteArray(11).Trim(), Common.Provider.FortranProvider)
+                    .WertFunktion = WerteArray(12).Trim()
+                    If (WerteArray(13).Trim() <> "") Then
+                        .RefWert = Convert.ToDouble(WerteArray(13).Trim(), Common.Provider.FortranProvider)
                     End If
-                    .RefGr = WerteArray(12).Trim()
-                    .RefReiheDatei = WerteArray(13).Trim()
-                    If (WerteArray(14).Trim() <> "") Then
+                    .RefGr = WerteArray(14).Trim()
+                    .RefReiheDatei = WerteArray(15).Trim()
+                    If (WerteArray(16).Trim() <> "") Then
                         .hasIstWert = True
-                        .IstWert = Convert.ToDouble(WerteArray(14).Trim(), Common.Provider.FortranProvider)
+                        .IstWert = Convert.ToDouble(WerteArray(16).Trim(), Common.Provider.FortranProvider)
                     Else
                         .hasIstWert = False
                     End If
@@ -564,6 +574,8 @@ Public Class Problem
                 End If
             End With
         Next
+
+        'Call Validate_Objectives()
 
     End Sub
 
@@ -815,6 +827,34 @@ Public Class Problem
             End If
         Next
     End Sub
+
+    '''' <summary>
+    '''' Validierungsfunktion der Ziele Datei (Objectives), prüft ob die Gruppenzuordnung passt
+    '''' </summary>
+
+    'Public Sub Validate_Objectives()
+
+    '    Dim i As Integer = 0
+    '    Dim j As Integer = 1
+    '    Dim Group As Boolean = False
+    '    Dim nMembers As Integer = 0
+
+    '    For i = 0 To List_ObjectiveFunctions.GetUpperBound(0)
+
+    '        If List_ObjectiveFunctions(i).isGroupLeader Then
+    '            Group = True
+    '            nMembers = 0
+    '            Do While List_ObjectiveFunctions(i).Bezeichnung = List_ObjectiveFunctions(i + 1 + nMembers).Gruppe
+    '                nMembers += 1
+    '            Loop
+    '            If nMembers = 0 Then
+    '                Throw New Exception("Dieser GroupLeader hat keine Mitglieder")
+    '            End If
+    '            i += nMembers
+    '        End If
+
+    '    Next
+    'End Sub
 
     ''' <summary>
     ''' Validierungsfunktion der Kombinatorik Prüft ob Verbraucher an zwei Standorten doppelt vorhanden sind

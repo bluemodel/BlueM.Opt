@@ -615,14 +615,31 @@ Public MustInherit Class Sim
     ''' <remarks>Die Simulation muss bereits erfolgt sein</remarks>
     Public Sub SIM_Ergebnis_auswerten(ByRef ind As Common.Individuum, Optional ByVal storeInDB As Boolean = True)
 
-        Dim i As Short
+        Dim i, j As Short
 
         'Lesen der Relevanten Parameter aus der wel Datei
         Call SIM_Ergebnis_Lesen()
 
         'Qualitätswerte berechnen
         For i = 0 To Me.mProblem.NumObjectives - 1
-            ind.Objectives(i) = CalculateObjective(Me.mProblem.List_ObjectiveFunctions(i))
+            'Falls GruppenLeader erst auf Null setzen
+            If Me.mProblem.List_ObjectiveFunctions(i).isGroupLeader Then
+                ind.Objectives(i) = 0
+            End If
+
+            'Auswerten wenn keine Gruppenführer
+            If Not Me.mProblem.List_ObjectiveFunctions(i).isGroupLeader Then
+                ind.Objectives(i) = CalculateObjective(Me.mProblem.List_ObjectiveFunctions(i))
+            End If
+
+            'Gruppen angehörige verwursten
+            If Not Me.mProblem.List_ObjectiveFunctions(i).isPrimObjective Then
+                Do
+                    If Me.mProblem.List_ObjectiveFunctions(i).Gruppe = Me.mProblem.List_ObjectiveFunctions(j).Bezeichnung Then
+                        ind.Objectives(j) = ind.Objectives(j) + ind.Objectives(i) * Me.mProblem.List_ObjectiveFunctions(i).OpFact
+                    End If
+                Loop Until Me.mProblem.List_ObjectiveFunctions(i).Gruppe = Me.mProblem.List_ObjectiveFunctions(j).Bezeichnung
+            End If
         Next
 
         'Constraints berechnen
