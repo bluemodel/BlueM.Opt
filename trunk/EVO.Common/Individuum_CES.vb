@@ -240,8 +240,8 @@
         'Dn Wert
         Dest.CES_Dn = Me.CES_Dn
 
-        'Feature-Werte
-        Call Array.Copy(Me.Features, Dest.Features, Me.Features.Length)
+        'Objective-Werte
+        Call Array.Copy(Me.Objectives, Dest.Objectives, Me.Objectives.Length)
 
         'Constraint-Werte
         If (Not Me.Constraints.GetLength(0) = -1) Then

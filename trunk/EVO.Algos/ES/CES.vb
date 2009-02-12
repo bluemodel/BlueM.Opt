@@ -354,16 +354,16 @@ Public Class CES
             For i = 0 To mSettings.CES.n_Childs - 1
                 'Des schlechteste Elter wird bestimmt
                 Dim bad_no As Integer = 0
-                Dim bad_penalty As Double = Parents(0).Penalties(0)
+                Dim bad_penalty As Double = Parents(0).PrimObjectives(0)
                 For j = 1 To mSettings.CES.n_Parents - 1
-                    If bad_penalty < Parents(j).Penalties(0) Then
+                    If bad_penalty < Parents(j).PrimObjectives(0) Then
                         bad_no = j
-                        bad_penalty = Parents(j).Penalties(0)
+                        bad_penalty = Parents(j).PrimObjectives(0)
                     End If
                 Next
 
                 'Falls der schlechteste Parent schlechter als der Child ist wird er durch den Child ersetzt
-                If Parents(bad_no).Penalties(0) > Childs(i).Penalties(0) Then
+                If Parents(bad_no).PrimObjectives(0) > Childs(i).PrimObjectives(0) Then
                     Parents(bad_no) = Childs(i).Clone()
                 End If
             Next
@@ -973,7 +973,7 @@ Public Class CES
 
         For i = 0 To IndividuumList.GetUpperBound(0)
             For j = 0 To IndividuumList.GetUpperBound(0)
-                If IndividuumList(i).Penalties(0) < IndividuumList(j).Penalties(0) Then
+                If IndividuumList(i).PrimObjectives(0) < IndividuumList(j).PrimObjectives(0) Then
                     swap = IndividuumList(i)
                     IndividuumList(i) = IndividuumList(j)
                     IndividuumList(j) = swap

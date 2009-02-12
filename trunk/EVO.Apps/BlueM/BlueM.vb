@@ -142,12 +142,12 @@ Public Class BlueM
 
         'BlueM-spezifische Weiterverarbeitung von ZielReihen:
         '====================================================
-        Dim feature As Common.Featurefunction
+        Dim objective As Common.Objectivefunktion
 
         'KWL: Feststellen, ob irgendeine Zielfunktion die KWL-Datei benutzt
         '------------------------------------------------------------------
-        For Each feature In Me.mProblem.List_Featurefunctions
-            If (feature.Datei = "KWL") Then
+        For Each objective In Me.mProblem.List_ObjectiveFunctions
+            If (objective.Datei = "KWL") Then
                 Me.useKWL = True
                 Exit For
             End If
@@ -163,13 +163,13 @@ Public Class BlueM
         'Gibt es eine IHA-Zielfunktion?
         'HACK: es wird immer nur das erste IHA-Ziel verwendet!
         '------------------------------
-        For Each feature In Me.mProblem.List_Featurefunctions
-            If (feature.Typ = "IHA") Then
+        For Each objective In Me.mProblem.List_ObjectiveFunctions
+            If (objective.Typ = "IHA") Then
                 'IHA-Berechnung einschalten
                 Me.isIHA = True
-                IHAZielReihe = feature.RefReihe
-                IHAStart = feature.EvalStart
-                IHAEnde = feature.EvalEnde
+                IHAZielReihe = objective.RefReihe
+                IHAStart = objective.EvalStart
+                IHAEnde = objective.EvalEnde
                 Exit For
             End If
         Next
@@ -454,9 +454,9 @@ Public Class BlueM
         If (Me.isIHA) Then
             'IHA-Ziel raussuchen und Simulationsreihe übergeben
             'HACK: es wird immer das erste IHA-Ziel verwendet!
-            For Each feature As Common.Featurefunction In Me.mProblem.List_Featurefunctions
-                If (feature.Typ = "IHA") Then
-                    Call Me.IHASys.calculate_IHA(Me.SimErgebnis(feature.SimGr))
+            For Each objective As Common.Objectivefunktion In Me.mProblem.List_ObjectiveFunctions
+                If (objective.Typ = "IHA") Then
+                    Call Me.IHASys.calculate_IHA(Me.SimErgebnis(objective.SimGr))
                     Exit For
                 End If
             Next
@@ -470,69 +470,69 @@ Public Class BlueM
 
     'Berechnung des Qualitätswerts (Zielwert)
     '****************************************
-    Public Overrides Function CalculateFeature(ByVal feature As Common.Featurefunction) As Double
+    Public Overrides Function CalculateObjective(ByVal objective As Common.Objectivefunktion) As Double
 
-        CalculateFeature = 0
+        CalculateObjective = 0
 
         'Fallunterscheidung Ergebnisdatei
         '--------------------------------
-        Select Case feature.Datei
+        Select Case objective.Datei
 
             Case "WEL", "KWL"
                 'QWert aus WEL- oder KWL-Datei
-                CalculateFeature = CalculateFeature_WEL(feature)
+                CalculateObjective = CalculateObjective_WEL(objective)
 
             Case "PRB"
                 'QWert aus PRB-Datei
                 'BUG 220: PRB geht nicht, weil keine Zeitreihe
                 Throw New Exception("PRB als OptZiel geht z.Zt. nicht (siehe Bug 138)")
-                'CalculateFeature = CalculateFeature_PRB(OptZiel)
+                'CalculateObjective = CalculateObjective_PRB(OptZiel)
 
             Case Else
-                Throw New Exception("Der Wert '" & feature.Datei & "' für die Datei wird bei Optimierungszielen für BlueM nicht unterstützt!")
+                Throw New Exception("Der Wert '" & objective.Datei & "' für die Datei wird bei Optimierungszielen für BlueM nicht unterstützt!")
 
         End Select
 
         'Zielrichtung berücksichtigen
-        CalculateFeature *= feature.Richtung
+        CalculateObjective *= objective.Richtung
 
     End Function
 
     'Qualitätswert aus WEL-Datei
     '***************************
-    Private Function CalculateFeature_WEL(ByVal feature As Common.Featurefunction) As Double
+    Private Function CalculateObjective_WEL(ByVal objective As Common.Objectivefunktion) As Double
 
-        Dim featurevalue As Double
+        Dim objectivevalue As Double
         Dim SimReihe As Wave.Zeitreihe
 
         'Simulationsergebnis auslesen
-        SimReihe = Me.SimErgebnis(feature.SimGr).Clone()
+        SimReihe = Me.SimErgebnis(objective.SimGr).Clone()
 
         'Fallunterscheidung Zieltyp
         '--------------------------
-        Select Case feature.Typ
+        Select Case objective.Typ
 
             Case "Wert"
-                featurevalue = MyBase.CalculateFeature_Wert(feature, SimReihe)
+                objectivevalue = MyBase.CalculateObjective_Wert(objective, SimReihe)
 
             Case "Reihe"
-                featurevalue = MyBase.CalculateFeature_Reihe(feature, SimReihe)
+                objectivevalue = MyBase.CalculateObjective_Reihe(objective, SimReihe)
 
             Case "Kosten"
-                featurevalue = Me.SKos1.Calculate_Costs(Me.WorkDir_Current)
+                objectivevalue = Me.SKos1.Calculate_Costs(Me.WorkDir_Current)
 
             Case "IHA"
-                featurevalue = Me.IHAProc.CalculateFeature_IHA(feature, Me.IHASys.RVAResult)
+                objectivevalue = Me.IHAProc.CalculateObjective_IHA(objective, Me.IHASys.RVAResult)
 
         End Select
 
-        Return featurevalue
+        Return objectivevalue
 
     End Function
 
     'Qualitätswert aus PRB-Datei
     '***************************
-    Private Function CalculateFeature_PRB(ByVal feature As Common.Featurefunction) As Double
+    Private Function CalculateObjective_PRB(ByVal objective As Common.Objectivefunktion) As Double
 
         'BUG 220: PRB geht nicht, weil keine Zeitreihe
         'Dim i As Integer

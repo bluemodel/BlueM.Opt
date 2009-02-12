@@ -47,8 +47,8 @@
 
         Clone = New Individuum_PES(Me.mType, Me.mID)
 
-        'Feature-Werte
-        Call Array.Copy(Me.Features, Clone.Features, Me.Features.Length)
+        'Objective-Werte
+        Call Array.Copy(Me.Objectives, Clone.Objectives, Me.Objectives.Length)
 
         'Constraint-Werte
         If (Not Me.Constraints.GetLength(0) = -1) Then

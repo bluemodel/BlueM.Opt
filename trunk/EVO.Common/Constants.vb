@@ -96,7 +96,7 @@ Public Module Constants
     End Enum
 
     'Option zur Ermittlung der Populationsqualität
-    Public Enum EVO_POP_PENALTY As Integer
+    Public Enum EVO_POP_PRIMOBJECTIVE As Integer
         Mittelwert = 1                          'SingleObjective
         Schlechtester = 2                       'SingleObjective
         Crowding = 3                            'MultiObjective

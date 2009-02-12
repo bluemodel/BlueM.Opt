@@ -216,7 +216,7 @@ Public Class PES
         'Überprüfung der Eingabeparameter (es muss mindestens ein Parameter variiert und eine
         'Penaltyfunktion ausgewertet werden)
 
-        If (Me.mProblem.NumParams <= 0 Or Me.mProblem.NumPenalties <= 0) Then
+        If (Me.mProblem.NumParams <= 0 Or Me.mProblem.NumPrimObjective <= 0) Then
             Throw New Exception("Es muss mindestens ein Parameter variiert und eine Penaltyfunktion ausgewertet werden")
         End If
 
@@ -226,7 +226,7 @@ Public Class PES
         'Parametervektoren initialisieren
         ReDim Dp(Me.mProblem.NumParams - 1, mSettings.PES.n_Eltern - 1, mSettings.PES.Pop.n_PopEltern - 1)
         ReDim Xp(Me.mProblem.NumParams - 1, mSettings.PES.n_Eltern - 1, mSettings.PES.Pop.n_PopEltern - 1)
-        ReDim Qbpop(mSettings.PES.Pop.n_Popul - 1, Me.mProblem.NumPenalties - 1)
+        ReDim Qbpop(mSettings.PES.Pop.n_Popul - 1, Me.mProblem.NumPrimObjective - 1)
         ReDim Dbpop(Me.mProblem.NumParams - 1, mSettings.PES.n_Eltern - 1, mSettings.PES.Pop.n_Popul - 1)
         ReDim Xbpop(Me.mProblem.NumParams - 1, mSettings.PES.n_Eltern - 1, mSettings.PES.Pop.n_Popul - 1)
         '---------------------
@@ -237,7 +237,7 @@ Public Class PES
         '---------------------
         ReDim Best.Db(Me.mProblem.NumParams - 1, mSettings.PES.n_Eltern - 1, mSettings.PES.Pop.n_Popul - 1)
         ReDim Best.Xb(Me.mProblem.NumParams - 1, mSettings.PES.n_Eltern - 1, mSettings.PES.Pop.n_Popul - 1)
-        ReDim Best.Qb(mSettings.PES.n_Eltern - 1, mSettings.PES.Pop.n_Popul - 1, Me.mProblem.NumPenalties - 1)
+        ReDim Best.Qb(mSettings.PES.n_Eltern - 1, mSettings.PES.Pop.n_Popul - 1, Me.mProblem.NumPrimObjective - 1)
         ReDim Best.Rb(mSettings.PES.n_Eltern - 1, mSettings.PES.Pop.n_Popul - 1, Me.mProblem.NumConstraints - 1)
         ReDim Best.Div(mSettings.PES.n_Eltern - 1, mSettings.PES.Pop.n_Popul - 1)
         ReDim Best.Front(mSettings.PES.n_Eltern - 1, mSettings.PES.Pop.n_Popul - 1)
@@ -253,7 +253,7 @@ Public Class PES
 
         For n = 0 To mSettings.PES.n_Eltern - 1
             For m = 0 To mSettings.PES.Pop.n_Popul - 1
-                For l = 0 To Me.mProblem.NumPenalties - 1
+                For l = 0 To Me.mProblem.NumPrimObjective - 1
                     'Qualität der Eltern (Anzahl = parents) wird auf sehr großen Wert gesetzt
                     Best.Qb(n, m, l) = 1.0E+300
                 Next l
@@ -269,14 +269,14 @@ Public Class PES
         'Falls NDSorting Crowding Distance wird initialisiert
         If (mSettings.PES.OptModus = EVO_MODUS.Multi_Objective) Then
             For n = 0 To mSettings.PES.Pop.n_Popul - 1
-                For m = 0 To Me.mProblem.NumPenalties - 1
-                    Select Case mSettings.PES.Pop.OptPopPenalty
+                For m = 0 To Me.mProblem.NumPrimObjective - 1
+                    Select Case mSettings.PES.Pop.OptPopPrimObjective
 
-                        Case EVO_POP_PENALTY.Crowding
+                        Case EVO_POP_PRIMOBJECTIVE.Crowding
                             'Qualität der Populationseltern wird auf sehr großen Wert gesetzt
                             Qbpop(n, m) = 1.0E+300
 
-                        Case EVO_POP_PENALTY.Spannweite
+                        Case EVO_POP_PRIMOBJECTIVE.Spannweite
                             'Qualität der Populationseltern wird auf 0 gesetzt
                             Qbpop(n, m) = 0
                     End Select
@@ -284,7 +284,7 @@ Public Class PES
             Next n
         Else
             For n = 0 To mSettings.PES.Pop.n_Popul - 1
-                For m = 0 To Me.mProblem.NumPenalties - 1
+                For m = 0 To Me.mProblem.NumPrimObjective - 1
                     'Qualität der Populationseltern wird auf sehr großen Wert gesetzt
                     Qbpop(n, m) = 1.0E+300
                 Next m
@@ -404,9 +404,9 @@ Public Class PES
         Dim i, j As Integer
         Dim Bestwert(,) As Double
 
-        ReDim Bestwert(mSettings.PES.n_Eltern - 1, Me.mProblem.NumPenalties - 1)
+        ReDim Bestwert(mSettings.PES.n_Eltern - 1, Me.mProblem.NumPrimObjective - 1)
 
-        For i = 0 To Me.mProblem.NumPenalties - 1
+        For i = 0 To Me.mProblem.NumPrimObjective - 1
             For j = 0 To mSettings.PES.n_Eltern - 1
                 Bestwert(j, i) = Best.Qb(j, PES_iAkt.iAktPop, i)
             Next j
@@ -1150,15 +1150,15 @@ Public Class PES
                     i = m
                 End If
             Else
-                Select Case mSettings.PES.Pop.OptPopPenalty
+                Select Case mSettings.PES.Pop.OptPopPrimObjective
 
-                    Case EVO_POP_PENALTY.Crowding
+                    Case EVO_POP_PRIMOBJECTIVE.Crowding
                         If Qbpop(m, 0) > h1 Then
                             h1 = Qbpop(m, 0)
                             i = m
                         End If
 
-                    Case EVO_POP_PENALTY.Spannweite
+                    Case EVO_POP_PRIMOBJECTIVE.Spannweite
                         If Qbpop(m, 0) < h1 Then
                             h2 = Qbpop(m, 1)
                             i = m
@@ -1206,9 +1206,9 @@ Public Class PES
                 Next m
             End If
         Else
-            Select Case mSettings.PES.Pop.OptPopPenalty
+            Select Case mSettings.PES.Pop.OptPopPrimObjective
 
-                Case EVO_POP_PENALTY.Crowding
+                Case EVO_POP_PRIMOBJECTIVE.Crowding
                     If h1 < Qbpop(i, 0) Then
                         Qbpop(i, 0) = h1
                         For m = 0 To Me.mProblem.NumParams - 1
@@ -1221,7 +1221,7 @@ Public Class PES
                         Next m
                     End If
 
-                Case EVO_POP_PENALTY.Spannweite
+                Case EVO_POP_PRIMOBJECTIVE.Spannweite
                     If h2 > Qbpop(j, 1) Then
                         Qbpop(j, 1) = h2
                         For m = 0 To Me.mProblem.NumParams - 1
@@ -1262,8 +1262,8 @@ Public Class PES
 
             'Falls die Qualität des aktuellen Nachkommen besser ist (Penaltyfunktion geringer)
             'als die schlechteste im Bestwertspeicher, wird dieser ersetzt
-            If ind.Penalties(0) < Best.Qb(j, PES_iAkt.iAktPop, 0) Then
-                Best.Qb(j, PES_iAkt.iAktPop, 0) = ind.Penalties(0)
+            If ind.PrimObjectives(0) < Best.Qb(j, PES_iAkt.iAktPop, 0) Then
+                Best.Qb(j, PES_iAkt.iAktPop, 0) = ind.PrimObjectives(0)
                 For v = 0 To Me.mProblem.NumParams - 1
                     'Die Schrittweite wird ebenfalls übernommen
                     Best.Db(v, j, PES_iAkt.iAktPop) = Ind.OptParameter(v).Dn
@@ -1291,7 +1291,7 @@ Public Class PES
 
         If (mSettings.PES.OptStrategie = EVO_STRATEGIE.Komma_Strategie) Then
             For n = 0 To mSettings.PES.n_Eltern - 1
-                For i = 0 To Me.mProblem.NumPenalties - 1
+                For i = 0 To Me.mProblem.NumPrimObjective - 1
                     Best.Qb(n, PES_iAkt.iAktPop, i) = 1.0E+300
                 Next i
             Next n
@@ -1307,7 +1307,7 @@ Public Class PES
 
         If (mSettings.PES.Pop.OptPopStrategie = EVO_STRATEGIE.Komma_Strategie) Then
             For n = 0 To mSettings.PES.Pop.n_Popul - 1
-                For i = 0 To Me.mProblem.NumPenalties - 1
+                For i = 0 To Me.mProblem.NumPrimObjective - 1
                     Qbpop(n, i) = 1.0E+300
                 Next i
             Next n
@@ -1324,10 +1324,10 @@ Public Class PES
         Dim Realisierungsspeicher(,) As Double
         Dim Z As Integer
 
-        Select Case mSettings.PES.Pop.OptPopPenalty
-            Case EVO_POP_PENALTY.Crowding
+        Select Case mSettings.PES.Pop.OptPopPrimObjective
+            Case EVO_POP_PRIMOBJECTIVE.Crowding
                 Z = 0
-            Case EVO_POP_PENALTY.Spannweite
+            Case EVO_POP_PRIMOBJECTIVE.Spannweite
                 Z = 1
         End Select
 
@@ -1358,9 +1358,9 @@ Public Class PES
         Else
             'Multi-Objective mit Paretofront
             '-------------------------------
-            Select Case mSettings.PES.Pop.OptPopPenalty
+            Select Case mSettings.PES.Pop.OptPopPrimObjective
 
-                Case EVO_POP_PENALTY.Crowding
+                Case EVO_POP_PRIMOBJECTIVE.Crowding
                     For m = 0 To mSettings.PES.Pop.n_Popul - 1
                         For n = m To mSettings.PES.Pop.n_Popul - 1
                             If Realisierungsspeicher(m, 0) > Realisierungsspeicher(n, 0) Then
@@ -1374,7 +1374,7 @@ Public Class PES
                         Next
                     Next
 
-                Case EVO_POP_PENALTY.Spannweite
+                Case EVO_POP_PRIMOBJECTIVE.Spannweite
                     For m = 0 To mSettings.PES.Pop.n_Popul - 1
                         For n = m To mSettings.PES.Pop.n_Popul - 1
                             If Realisierungsspeicher(m, 0) < Realisierungsspeicher(n, 0) Then
@@ -1487,8 +1487,8 @@ Public Class PES
     Public Sub Copy_Individuum_to_Bestwert(ByVal i As Integer, ByVal Individ() As Individuum)
         Dim j, v As Integer
 
-        For j = 0 To Me.mProblem.NumPenalties - 1
-            Best.Qb(i, PES_iAkt.iAktPop, j) = Individ(i).Penalties(j)
+        For j = 0 To Me.mProblem.NumPrimObjective - 1
+            Best.Qb(i, PES_iAkt.iAktPop, j) = Individ(i).PrimObjectives(j)
         Next j
 
         If (Me.mProblem.NumConstraints > 0) Then
@@ -1516,10 +1516,10 @@ Public Class PES
         Dim i, j, v As Integer
 
         j = 0
-        For i = 0 To Me.mProblem.NumFeatures - 1
+        For i = 0 To Me.mProblem.NumObjectives - 1
             'HACK: Nur Penalties werden kopiert!
-            If (Me.mProblem.List_Featurefunctions(i).isPenalty) Then
-                Individ(i_indi).Features(i) = Best.Qb(i_best, PES_iAkt.iAktPop, j)
+            If (Me.mProblem.List_ObjectiveFunctions(i).isPrimObjective) Then
+                Individ(i_indi).Objectives(i) = Best.Qb(i_best, PES_iAkt.iAktPop, j)
                 j += 1
             End If
         Next i
@@ -1556,7 +1556,7 @@ Public Class PES
         Dim d() As Double
         Dim d_mean As Double
 
-        ReDim TempDistance(Me.mProblem.NumPenalties - 1)
+        ReDim TempDistance(Me.mProblem.NumPrimObjective - 1)
         ReDim PenaltyDistance(mSettings.PES.n_Eltern - 1, mSettings.PES.n_Eltern - 1)
         ReDim d(mSettings.PES.n_Eltern - 1)
 
@@ -1565,7 +1565,7 @@ Public Class PES
             PenaltyDistance(i, i) = 0
             For j = i + 1 To mSettings.PES.n_Eltern - 1
                 PenaltyDistance(i, j) = 0
-                For k = 0 To Me.mProblem.NumPenalties - 1
+                For k = 0 To Me.mProblem.NumPrimObjective - 1
                     TempDistance(k) = Best.Qb(i, PES_iAkt.iAktPop, k) - Best.Qb(j, PES_iAkt.iAktPop, k)
                     TempDistance(k) = TempDistance(k) * TempDistance(k)
                     PenaltyDistance(i, j) += TempDistance(k)
@@ -1620,8 +1620,8 @@ Public Class PES
         Dim TempDistance() As Double
 
         'Bestimmen des Normierungsfaktors für jede Dimension des Lösungsraums (MinMax)
-        ReDim MinMax(Me.mProblem.NumPenalties - 1)
-        For k = 0 To Me.mProblem.NumPenalties - 1
+        ReDim MinMax(Me.mProblem.NumPrimObjective - 1)
+        For k = 0 To Me.mProblem.NumPrimObjective - 1
             MinMax(k) = 0
             Min = Best.Qb(0, PES_iAkt.iAktPop, k)
             Max = Best.Qb(0, PES_iAkt.iAktPop, k)
@@ -1633,13 +1633,13 @@ Public Class PES
         Next k
 
         'Bestimmen der normierten Raumabstände zwischen allen Elternindividuen
-        ReDim TempDistance(Me.mProblem.NumPenalties)
+        ReDim TempDistance(Me.mProblem.NumPrimObjective)
 
         For i = 0 To mSettings.PES.n_Eltern - 1
             PenaltyDistance(i, i) = 0
             For j = i + 1 To mSettings.PES.n_Eltern - 1
                 PenaltyDistance(i, j) = 0
-                For k = 0 To Me.mProblem.NumPenalties - 1
+                For k = 0 To Me.mProblem.NumPrimObjective - 1
                     TempDistance(k) = Best.Qb(i, PES_iAkt.iAktPop, k) - Best.Qb(j, PES_iAkt.iAktPop, k)
                     TempDistance(k) = TempDistance(k) '/ MinMax(k)
                     TempDistance(k) = TempDistance(k) * TempDistance(k)
@@ -1703,14 +1703,14 @@ Public Class PES
         Dim swap As Double
         Dim fmin, fmax As Double
 
-        ReDim QbTemp(mSettings.PES.n_Eltern - 1, mSettings.PES.Pop.n_Popul - 1, Me.mProblem.NumPenalties - 1)
+        ReDim QbTemp(mSettings.PES.n_Eltern - 1, mSettings.PES.Pop.n_Popul - 1, Me.mProblem.NumPrimObjective - 1)
 
         Array.Copy(Best.Qb, QbTemp, Best.Qb.GetLength(0))
         For i = 0 To mSettings.PES.n_Eltern - 1
             Distanceb(i) = 0
         Next i
 
-        For k = 0 To Me.mProblem.NumPenalties - 1
+        For k = 0 To Me.mProblem.NumPrimObjective - 1
             For i = 0 To mSettings.PES.n_Eltern - 1
                 For j = 0 To mSettings.PES.n_Eltern - 1
                     If (QbTemp(i, PES_iAkt.iAktPop, k) < QbTemp(j, PES_iAkt.iAktPop, k)) Then

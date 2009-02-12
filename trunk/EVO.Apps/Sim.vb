@@ -397,7 +397,7 @@ Public MustInherit Class Sim
 
     ''' <summary>
     ''' Evaluiert ein einzelnes Individuum. 
-    ''' Durchläuft alle Schritte vom Schreiben der Modellparameter bis zum Berechnen der Features.
+    ''' Durchläuft alle Schritte vom Schreiben der Modellparameter bis zum Berechnen der Objectives.
     ''' </summary>
     ''' <param name="ind">das zu evaluierende Individuum</param>
     ''' <param name="storeInDB">Ob das Individuum in OptResult-DB gespeichert werden soll</param>
@@ -452,7 +452,7 @@ Public MustInherit Class Sim
 
     ''' <summary>
     ''' Evaluiert ein Array von Individuen in multiplen Threads. 
-    ''' Durchläuft alle Schritte vom Schreiben der Modellparameter bis zum Berechnen der Features.
+    ''' Durchläuft alle Schritte vom Schreiben der Modellparameter bis zum Berechnen der Objectives.
     ''' Erfolgreich evaluierte Individuen werden mit dem Event IndividuumEvaluated zurückgegeben.
     ''' </summary>
     ''' <param name="inds">Ein Array von zu evaluierenden Individuen</param>
@@ -482,8 +482,8 @@ Public MustInherit Class Sim
                 And (n_ind_Run < n_individuals) _
                 And (n_ind_Ready + Me.n_Threads > n_ind_Run) _
                 And Me.isPause = False) Then
-                'Falls eine Simulation frei und nicht Pause
-                '------------------------------------------
+                'Falls eine Simulation frei, verarbeitet und nicht Pause
+                '-------------------------------------------------------
 
                 Me.WorkDir_Current = Me.getThreadWorkDir(ThreadID_Free)
 
@@ -608,7 +608,7 @@ Public MustInherit Class Sim
     End Sub
 
     ''' <summary>
-    ''' Evaluiert ein Individuum mit Hilfe des Simulationsmodells. Es werden alle im Problem definierten Feature- und Constraint-Werte berechnet und im Individuum gespeichert.
+    ''' Evaluiert ein Individuum mit Hilfe des Simulationsmodells. Es werden alle im Problem definierten Objective- und Constraint-Werte berechnet und im Individuum gespeichert.
     ''' </summary>
     ''' <param name="ind">das zu evaluierende Individuum</param>
     ''' <param name="storeInDB">Ob das Individuum in OptResult-DB gespeichert werden soll</param>
@@ -621,8 +621,8 @@ Public MustInherit Class Sim
         Call SIM_Ergebnis_Lesen()
 
         'Qualitätswerte berechnen
-        For i = 0 To Me.mProblem.NumFeatures - 1
-            ind.Features(i) = CalculateFeature(Me.mProblem.List_Featurefunctions(i))
+        For i = 0 To Me.mProblem.NumObjectives - 1
+            ind.Objectives(i) = CalculateObjective(Me.mProblem.List_ObjectiveFunctions(i))
         Next
 
         'Constraints berechnen
@@ -794,36 +794,36 @@ Handler:
     'Phänotypberechnung
     '##################
 
-    'Berechnung der Feature Funktionen
-    '*********************************
-    Public MustOverride Function CalculateFeature(ByVal feature As Common.Featurefunction) As Double
+    'Berechnung der Objective Funktionen
+    '***********************************
+    Public MustOverride Function CalculateObjective(ByVal objective As Common.Objectivefunktion) As Double
 
-    'Featurewert berechnen: Feature Typ = Reihe
+    'Objectivewert berechnen: Feature Typ = Reihe
     '******************************************
     'BUG 218: Konstante und gleiche Zeitschrittweiten vorausgesetzt!
-    Protected Function CalculateFeature_Reihe(ByVal feature As Common.Featurefunction, ByVal SimReihe As Wave.Zeitreihe) As Double
+    Protected Function CalculateObjective_Reihe(ByVal objective As Common.Objectivefunktion, ByVal SimReihe As Wave.Zeitreihe) As Double
 
         Dim QWert As Double
         Dim i As Integer
 
         'Simulationszeitreihe auf Evaluierungszeitraum zuschneiden
-        Call SimReihe.Cut(feature.EvalStart, feature.EvalEnde)
+        Call SimReihe.Cut(objective.EvalStart, objective.EvalEnde)
 
         'BUG 218: Kontrolle
-        If (feature.RefReihe.Length <> SimReihe.Length) Then
-            Throw New Exception("Ziel '" & feature.Bezeichnung & "': Simulations- und Referenzzeitreihe sind nicht kompatibel! (Länge/Zeitschritt?) Siehe Bug 218")
+        If (objective.RefReihe.Length <> SimReihe.Length) Then
+            Throw New Exception("Ziel '" & objective.Bezeichnung & "': Simulations- und Referenzzeitreihe sind nicht kompatibel! (Länge/Zeitschritt?) Siehe Bug 218")
         End If
 
         'Fallunterscheidung Zielfunktion
         '-------------------------------
-        Select Case feature.Funktion
+        Select Case objective.Funktion
 
             Case "AbQuad"
                 'Summe der Fehlerquadrate
                 '------------------------
                 QWert = 0
                 For i = 0 To SimReihe.Length - 1
-                    QWert += (feature.RefReihe.YWerte(i) - SimReihe.YWerte(i)) * (feature.RefReihe.YWerte(i) - SimReihe.YWerte(i))
+                    QWert += (objective.RefReihe.YWerte(i) - SimReihe.YWerte(i)) * (objective.RefReihe.YWerte(i) - SimReihe.YWerte(i))
                 Next
 
             Case "Diff"
@@ -831,7 +831,7 @@ Handler:
                 '----------------
                 QWert = 0
                 For i = 0 To SimReihe.Length - 1
-                    QWert += Math.Abs(feature.RefReihe.YWerte(i) - SimReihe.YWerte(i))
+                    QWert += Math.Abs(objective.RefReihe.YWerte(i) - SimReihe.YWerte(i))
                 Next
 
             Case "Volf"
@@ -841,7 +841,7 @@ Handler:
                 Dim VolZiel As Double = 0
                 For i = 0 To SimReihe.Length - 1
                     VolSim += SimReihe.YWerte(i)
-                    VolZiel += feature.RefReihe.YWerte(i)
+                    VolZiel += objective.RefReihe.YWerte(i)
                 Next
                 'Differenz bilden und auf ZielVolumen beziehen
                 QWert = Math.Abs(VolZiel - VolSim) / VolZiel * 100
@@ -851,7 +851,7 @@ Handler:
                 '-------------------------------------------------------------------
                 Dim nUnter As Integer = 0
                 For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) < feature.RefReihe.YWerte(i)) Then
+                    If (SimReihe.YWerte(i) < objective.RefReihe.YWerte(i)) Then
                         nUnter += 1
                     End If
                 Next
@@ -862,8 +862,8 @@ Handler:
                 '---------------------------
                 Dim sUnter As Double = 0
                 For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) < feature.RefReihe.YWerte(i)) Then
-                        sUnter += feature.RefReihe.YWerte(i) - SimReihe.YWerte(i)
+                    If (SimReihe.YWerte(i) < objective.RefReihe.YWerte(i)) Then
+                        sUnter += objective.RefReihe.YWerte(i) - SimReihe.YWerte(i)
                     End If
                 Next
                 QWert = sUnter
@@ -873,7 +873,7 @@ Handler:
                 '------------------------------------------------------------------
                 Dim nUeber As Integer = 0
                 For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) > feature.RefReihe.YWerte(i)) Then
+                    If (SimReihe.YWerte(i) > objective.RefReihe.YWerte(i)) Then
                         nUeber += 1
                     End If
                 Next
@@ -884,8 +884,8 @@ Handler:
                 '--------------------------
                 Dim sUeber As Double = 0
                 For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) > feature.RefReihe.YWerte(i)) Then
-                        sUeber += SimReihe.YWerte(i) - feature.RefReihe.YWerte(i)
+                    If (SimReihe.YWerte(i) > objective.RefReihe.YWerte(i)) Then
+                        sUeber += SimReihe.YWerte(i) - objective.RefReihe.YWerte(i)
                     End If
                 Next
                 QWert = sUeber
@@ -896,12 +896,12 @@ Handler:
                 'Mittelwert bilden
                 Dim Qobs_quer, zaehler, nenner As Double
                 For i = 0 To SimReihe.Length - 1
-                    Qobs_quer += feature.RefReihe.YWerte(i)
+                    Qobs_quer += objective.RefReihe.YWerte(i)
                 Next
                 Qobs_quer = Qobs_quer / (SimReihe.Length)
                 For i = 0 To SimReihe.Length - 1
-                    zaehler += (feature.RefReihe.YWerte(i) - SimReihe.YWerte(i)) * (feature.RefReihe.YWerte(i) - SimReihe.YWerte(i))
-                    nenner += (feature.RefReihe.YWerte(i) - Qobs_quer) * (feature.RefReihe.YWerte(i) - Qobs_quer)
+                    zaehler += (objective.RefReihe.YWerte(i) - SimReihe.YWerte(i)) * (objective.RefReihe.YWerte(i) - SimReihe.YWerte(i))
+                    nenner += (objective.RefReihe.YWerte(i) - Qobs_quer) * (objective.RefReihe.YWerte(i) - Qobs_quer)
                 Next
                 'abgeänderte Nash-Sutcliffe Formel: 0 als Zielwert (1- weggelassen)
                 QWert = zaehler / nenner
@@ -913,7 +913,7 @@ Handler:
                 Dim kovar, var_x, var_y, avg_x, avg_y As Double
                 'Mittelwerte
                 avg_x = SimReihe.getWert("Average")
-                avg_y = feature.RefReihe.getWert("Average")
+                avg_y = objective.RefReihe.getWert("Average")
                 'r^2 = sxy^2 / (sx^2 * sy^2)
                 'Standardabweichung: var_x = sx^2 = 1 / (n-1) * SUMME[(x_i - x_avg)^2]
                 'Kovarianz: kovar= sxy = 1 / (n-1) * SUMME[(x_i - x_avg) * (y_i - y_avg)]
@@ -921,9 +921,9 @@ Handler:
                 var_x = 0
                 var_y = 0
                 For i = 0 To SimReihe.Length - 1
-                    kovar += (SimReihe.YWerte(i) - avg_x) * (feature.RefReihe.YWerte(i) - avg_y)
+                    kovar += (SimReihe.YWerte(i) - avg_x) * (objective.RefReihe.YWerte(i) - avg_y)
                     var_x += (SimReihe.YWerte(i) - avg_x) ^ 2
-                    var_y += (feature.RefReihe.YWerte(i) - avg_y) ^ 2
+                    var_y += (objective.RefReihe.YWerte(i) - avg_y) ^ 2
                 Next
                 var_x = 1 / (SimReihe.Length - 1) * var_x
                 var_y = 1 / (SimReihe.Length - 1) * var_y
@@ -932,7 +932,7 @@ Handler:
                 QWert = kovar ^ 2 / (var_x * var_y)
 
             Case Else
-                Throw New Exception("Die Zielfunktion '" & feature.Funktion & "' wird nicht unterstützt!")
+                Throw New Exception("Die Zielfunktion '" & objective.Funktion & "' wird nicht unterstützt!")
 
         End Select
 
@@ -940,41 +940,41 @@ Handler:
 
     End Function
 
-    'Qualitätswert berechnen: Feature Typ = Wert
-    '*******************************************
-    Protected Function CalculateFeature_Wert(ByVal feature As Common.Featurefunction, ByVal SimReihe As Wave.Zeitreihe) As Double
+    'Qualitätswert berechnen: Objective Typ = Wert
+    '*********************************************
+    Protected Function CalculateObjective_Wert(ByVal objective As Common.Objectivefunktion, ByVal SimReihe As Wave.Zeitreihe) As Double
 
         Dim QWert As Double
         Dim i As Integer
 
         'Simulationsreihe auf Evaluierungszeitraum kürzen
-        Call SimReihe.Cut(feature.EvalStart, feature.EvalEnde)
+        Call SimReihe.Cut(objective.EvalStart, objective.EvalEnde)
 
         'Simulationswert aus Simulationsergebnis berechnen
         Dim SimWert As Double
-        SimWert = SimReihe.getWert(feature.WertFunktion)
+        SimWert = SimReihe.getWert(objective.WertFunktion)
 
         'QWert berechnen
         '---------------
         'Fallunterscheidung Zielfunktion
-        Select Case feature.Funktion
+        Select Case objective.Funktion
 
             Case "AbQuad"
                 'Summe der Fehlerquadrate
                 '------------------------
-                QWert = (feature.RefWert - SimWert) * (feature.RefWert - SimWert)
+                QWert = (objective.RefWert - SimWert) * (objective.RefWert - SimWert)
 
             Case "Diff"
                 'Summe der Fehler
                 '----------------
-                QWert = Math.Abs(feature.RefWert - SimWert)
+                QWert = Math.Abs(objective.RefWert - SimWert)
 
             Case "nUnter"
                 'Relative Anzahl der Zeitschritte mit Unterschreitungen (in Prozent)
                 '-------------------------------------------------------------------
                 Dim nUnter As Integer = 0
                 For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) < feature.RefWert) Then
+                    If (SimReihe.YWerte(i) < objective.RefWert) Then
                         nUnter += 1
                     End If
                 Next
@@ -985,7 +985,7 @@ Handler:
                 '------------------------------------------------------------------
                 Dim nUeber As Integer = 0
                 For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) > feature.RefWert) Then
+                    If (SimReihe.YWerte(i) > objective.RefWert) Then
                         nUeber += 1
                     End If
                 Next
@@ -996,8 +996,8 @@ Handler:
                 '---------------------------
                 Dim sUnter As Integer = 0
                 For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) < feature.RefWert) Then
-                        sUnter += feature.RefWert - SimReihe.YWerte(i)
+                    If (SimReihe.YWerte(i) < objective.RefWert) Then
+                        sUnter += objective.RefWert - SimReihe.YWerte(i)
                     End If
                 Next
                 QWert = sUnter
@@ -1007,14 +1007,14 @@ Handler:
                 '--------------------------
                 Dim sUeber As Integer = 0
                 For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) > feature.RefWert) Then
-                        sUeber += SimReihe.YWerte(i) - feature.RefWert
+                    If (SimReihe.YWerte(i) > objective.RefWert) Then
+                        sUeber += SimReihe.YWerte(i) - objective.RefWert
                     End If
                 Next
                 QWert = sUeber
 
             Case Else
-                Throw New Exception("Die Zielfunktion '" & feature.Funktion & "' wird für Werte nicht unterstützt!")
+                Throw New Exception("Die Zielfunktion '" & objective.Funktion & "' wird für Werte nicht unterstützt!")
 
         End Select
 
