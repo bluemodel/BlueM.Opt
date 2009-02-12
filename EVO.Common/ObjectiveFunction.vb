@@ -14,9 +14,19 @@ Public Class Objectivefunktion
     Public Bezeichnung As String
 
     ''' <summary>
-    ''' Richtung der Objectivefunction (d.h. zu maximieren oder zu minimieren)
+    ''' Gruppe
+    ''' </summary>
+    Public Gruppe As String
+
+    ''' <summary>
+    ''' Richtung der ObjectiveFunction (d.h. zu maximieren oder zu minimieren)
     ''' </summary>
     Public Richtung As Constants.EVO_RICHTUNG
+
+    ''' <summary>
+    ''' Operator bzw Faktor
+    ''' </summary>
+    Public OpFact As Double
 
     ''' <summary>
     ''' Gibt an ob es sich um einen Wert oder um eine Reihe handelt
@@ -95,8 +105,23 @@ Public Class Objectivefunktion
     ''' Gibt die Bezeichnung zurück
     ''' </summary>
     ''' <returns>Bezeichnung</returns>
+    ''' 
     Public Overrides Function ToString() As String
         Return Me.Bezeichnung
     End Function
+
+    ''' <summary>
+    ''' Gibt an ob es ein GruppenLeader ist
+    ''' </summary>
+    ''' <returns>GroupLeader</returns>
+
+    Public ReadOnly Property isGroupLeader()
+        Get
+            If Me.Bezeichnung = Me.Gruppe Then
+                Return True
+            End If
+            Return False
+        End Get
+    End Property
 
 End Class
