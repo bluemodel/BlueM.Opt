@@ -83,7 +83,7 @@ namespace modelEAU.DDS
             Current_Parameter = new double[this.mProblem.NumParams];
             DDS = new modelEAU.DDS.DDS();
 
-            if (this.mProblem.List_Featurefunctions[0].Richtung == IHWB.EVO.Common.Constants.EVO_RICHTUNG.Maximierung)
+            if (this.mProblem.List_ObjectiveFunctions[0].Richtung == IHWB.EVO.Common.Constants.EVO_RICHTUNG.Maximierung)
             {
                 DDS.to_max = -1.0;
             }
@@ -147,7 +147,7 @@ namespace modelEAU.DDS
                     //Lösung im TeeChart einzeichnen
                     //------------------------------
                     serie = this.Hauptdiagramm1.getSeriesPoint("DDS", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 3, false);
-                    serie.Add(run, ind.Penalties[0], run.ToString());
+                    serie.Add(run, ind.PrimObjectives[0], run.ToString());
                 }
                 else
                 {
@@ -162,13 +162,13 @@ namespace modelEAU.DDS
                 //-------------------------------------------------
                 if (run == 1)
                 {
-                    DDS.ini_Fbest(ind.Penalties[0]);
+                    DDS.ini_Fbest(ind.PrimObjectives[0]);
                 }
                 else
                 {
-                    DDS.update_Fbest(ind.Penalties[0]);
+                    DDS.update_Fbest(ind.PrimObjectives[0]);
                 }
-                DDS.update_search_historie(ind.Penalties[0], run - 1);
+                DDS.update_search_historie(ind.PrimObjectives[0], run - 1);
 
                 //TODO: Verlaufsanzeige (this.mProgress)
             }
@@ -211,7 +211,7 @@ namespace modelEAU.DDS
                     //Lösung im TeeChart einzeichnen
                     //------------------------------
                     serie = this.Hauptdiagramm1.getSeriesPoint("DDS", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 3, false);
-                    serie.Add(run, ind.Penalties[0], run.ToString());
+                    serie.Add(run, ind.PrimObjectives[0], run.ToString());
                 }
                 else
                 {
@@ -222,9 +222,9 @@ namespace modelEAU.DDS
 
                 System.Windows.Forms.Application.DoEvents();
 
-                DDS.update_Fbest(ind.Penalties[0]);
+                DDS.update_Fbest(ind.PrimObjectives[0]);
 
-                DDS.update_search_historie(ind.Penalties[0], run - 1);
+                DDS.update_search_historie(ind.PrimObjectives[0], run - 1);
 
                 //TODO: Verlaufsanzeige (this.mProgress)
             }
