@@ -194,12 +194,12 @@ Public Class Functions
                         '------------
                         isDominated = False
 
-                        For k = 0 To Me.mProblem.NumPenalties - 1
-                            isDominated = isDominated Or (NDSorting(i).Penalties(k) < NDSorting(j).Penalties(k))
+                        For k = 0 To Me.mProblem.NumPrimObjective - 1
+                            isDominated = isDominated Or (NDSorting(i).PrimObjectives(k) < NDSorting(j).PrimObjectives(k))
                         Next k
 
-                        For k = 0 To Me.mProblem.NumPenalties - 1
-                            isDominated = isDominated And (NDSorting(i).Penalties(k) <= NDSorting(j).Penalties(k))
+                        For k = 0 To Me.mProblem.NumPrimObjective - 1
+                            isDominated = isDominated And (NDSorting(i).PrimObjectives(k) <= NDSorting(j).PrimObjectives(k))
                         Next k
 
                         If (isDominated) Then
@@ -218,12 +218,12 @@ Public Class Functions
 
                     isDominated = False
 
-                    For k = 0 To Me.mProblem.NumPenalties - 1
-                        isDominated = isDominated Or (NDSorting(i).Penalties(k) < NDSorting(j).Penalties(k))
+                    For k = 0 To Me.mProblem.NumPrimObjective - 1
+                        isDominated = isDominated Or (NDSorting(i).PrimObjectives(k) < NDSorting(j).PrimObjectives(k))
                     Next k
 
-                    For k = 0 To Me.mProblem.NumPenalties - 1
-                        isDominated = isDominated And (NDSorting(i).Penalties(k) <= NDSorting(j).Penalties(k))
+                    For k = 0 To Me.mProblem.NumPrimObjective - 1
+                        isDominated = isDominated And (NDSorting(i).PrimObjectives(k) <= NDSorting(j).PrimObjectives(k))
                     Next k
 
                     If (isDominated) Then
@@ -335,10 +335,10 @@ Public Class Functions
 
         swap = _Individ(0).Create("swap", 0)
 
-        For k = 0 To Me.mProblem.NumPenalties - 1
+        For k = 0 To Me.mProblem.NumPrimObjective - 1
             For i = StartIndex To EndIndex
                 For j = StartIndex To EndIndex
-                    If (_Individ(i).Penalties(k) < _Individ(j).Penalties(k)) Then
+                    If (_Individ(i).PrimObjectives(k) < _Individ(j).PrimObjectives(k)) Then
                         swap = _Individ(i).Clone()
                         _Individ(i) = _Individ(j).Clone()
                         _Individ(j) = swap.Clone()
@@ -346,14 +346,14 @@ Public Class Functions
                 Next j
             Next i
 
-            fmin = _Individ(StartIndex).Penalties(k)
-            fmax = _Individ(EndIndex).Penalties(k)
+            fmin = _Individ(StartIndex).PrimObjectives(k)
+            fmax = _Individ(EndIndex).PrimObjectives(k)
 
             _Individ(StartIndex).Distance = 1.0E+300
             _Individ(EndIndex).Distance = 1.0E+300
 
             For i = StartIndex + 1 To EndIndex - 1
-                _Individ(i).Distance = _Individ(i).Distance + (_Individ(i + 1).Penalties(k) - _Individ(i - 1).Penalties(k)) / (fmax - fmin)
+                _Individ(i).Distance = _Individ(i).Distance + (_Individ(i + 1).PrimObjectives(k) - _Individ(i - 1).PrimObjectives(k)) / (fmax - fmin)
             Next i
         Next k
 
@@ -389,10 +389,10 @@ Public Class Functions
             _Individ(i).Distance = 0.0
         Next i
 
-        For k = 0 To Me.mProblem.NumPenalties - 1
+        For k = 0 To Me.mProblem.NumPrimObjective - 1
             For i = StartIndex To EndIndex
                 For j = StartIndex To EndIndex
-                    If (_Individ(i).Penalties(k) < _Individ(j).Penalties(k)) Then
+                    If (_Individ(i).PrimObjectives(k) < _Individ(j).PrimObjectives(k)) Then
                         swap = _Individ(i).Clone()
                         _Individ(i) = _Individ(j).Clone()
                         _Individ(j) = swap.Clone()
@@ -400,15 +400,15 @@ Public Class Functions
                 Next j
             Next i
 
-            fmin = _Individ(StartIndex).Penalties(k)
-            fmax = _Individ(EndIndex).Penalties(k)
+            fmin = _Individ(StartIndex).PrimObjectives(k)
+            fmax = _Individ(EndIndex).PrimObjectives(k)
 
             _Individ(StartIndex).Distance = 1.0E+300
             _Individ(EndIndex).Distance = 1.0E+300
 
             For i = StartIndex + 1 To EndIndex - 1
                 If Not _Individ(i).Distance = 1.0E+300 Then
-                    _Individ(i).Distance = _Individ(i).Distance + (_Individ(i + 1).Penalties(k) - _Individ(i - 1).Penalties(k)) / (fmax - fmin)
+                    _Individ(i).Distance = _Individ(i).Distance + (_Individ(i + 1).PrimObjectives(k) - _Individ(i - 1).PrimObjectives(k)) / (fmax - fmin)
                 End If
             Next i
         Next k
@@ -460,8 +460,8 @@ Public Class Functions
         For i = 0 To SekundärQb.GetUpperBound(0) - 1
             For j = i + 1 To SekundärQb.GetUpperBound(0)
                 Logical = True
-                For k = 0 To Me.mProblem.NumPenalties - 1
-                    Logical = Logical And (SekundärQb(i).Penalties(k) = SekundärQb(j).Penalties(k))
+                For k = 0 To Me.mProblem.NumPrimObjective - 1
+                    Logical = Logical And (SekundärQb(i).PrimObjectives(k) = SekundärQb(j).PrimObjectives(k))
                 Next k
                 If (Logical) Then
                     'Duplikat gefunden: als dominiert markieren

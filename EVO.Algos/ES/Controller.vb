@@ -131,7 +131,7 @@ Public Class Controller
 
         'Hypervolumen instanzieren
         Dim Hypervolume As EVO.MO_Indicators.Indicators
-        Hypervolume = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(EVO.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, Me.myProblem.NumPenalties)
+        Hypervolume = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(EVO.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, Me.myProblem.NumPrimObjective)
 
         'CES initialisieren
         CES1 = New EVO.ES.CES()
@@ -223,7 +223,7 @@ Public Class Controller
             'MO oder SO SELEKTIONSPROZESS oder NDSorting SELEKTION
             'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
             'BUG 259: CES: Punkt-Labels der Sekundärpopulation fehlen noch!
-            If (Me.myProblem.NumPenalties = 1) Then
+            If (Me.myProblem.NumPrimObjective = 1) Then
                 'Sortieren der Kinden anhand der Qualität
                 Call CES1.Sort_Individuum(CES1.Childs)
                 'Selectionsprozess je nach "plus" oder "minus" Strategie
@@ -313,7 +313,7 @@ Public Class Controller
         'Selection oder NDSorting für den PES Memory
         '*******************************************
         If CES1.PES_Memory.GetLength(0) > CES1.mSettings.CES.n_PES_MemSize Then
-            If (Me.myProblem.NumPenalties = 1) Then
+            If (Me.myProblem.NumPrimObjective = 1) Then
                 'Sortieren des PES_Memory anhande der Qualität
                 Call CES1.Sort_Individuum(CES1.PES_Memory)
                 'Kürzen des PES_Memory
@@ -352,7 +352,7 @@ Public Class Controller
                     'Führt das Sortieren oder NDSorting für diesen Satz durch
                     '********************************************************
                     If CES1.PES_Parents_pLoc.GetLength(0) > CES1.mSettings.PES.n_Eltern Then
-                        If (Me.myProblem.NumPenalties = 1) Then
+                        If (Me.myProblem.NumPrimObjective = 1) Then
                             'Sortieren der Parents anhand der Qualität
                             Call CES1.Sort_Individuum(CES1.PES_Parents_pLoc)
                             'Kürzen der Parents
@@ -498,7 +498,7 @@ Public Class Controller
 
         'Hypervolumen instanzieren
         Dim Hypervolume As EVO.MO_Indicators.Indicators
-        Hypervolume = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(EVO.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, Me.myProblem.NumPenalties)
+        Hypervolume = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(EVO.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, Me.myProblem.NumPrimObjective)
 
         'Diagramm vorbereiten und initialisieren
         'TODO: If (Not Me.myProblem.Method = METH_HYBRID And Not Me.mySettings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Sequencial_1) Then
@@ -859,7 +859,7 @@ Public Class Controller
     ''' <param name="nadir">Koordinaten des Nadirpunkts</param>
     Private Sub ZeichneNadirpunkt(ByVal nadir() As Double)
 
-        If (Me.myProblem.NumPenalties = 2) Then
+        If (Me.myProblem.NumPrimObjective = 2) Then
             '2D
             '--
             Dim serie2 As Steema.TeeChart.Styles.Points

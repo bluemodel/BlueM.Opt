@@ -222,11 +222,11 @@ Public Class OptResult
 
         inds = Me.getSekPop(igen)
 
-        ReDim values(inds.GetUpperBound(0), Me.mProblem.NumPenalties - 1)
+        ReDim values(inds.GetUpperBound(0), Me.mProblem.NumPrimObjective - 1)
 
         For i = 0 To inds.GetUpperBound(0)
-            For j = 0 To Me.mProblem.NumPenalties - 1
-                values(i, j) = inds(i).Penalties(j)
+            For j = 0 To Me.mProblem.NumPrimObjective - 1
+                values(i, j) = inds(i).PrimObjectives(j)
             Next
         Next
 
@@ -307,11 +307,11 @@ Public Class OptResult
         '----------------
         'Spalten festlegen:
         Dim fieldnames As String = ""
-        For i = 0 To Me.mProblem.NumFeatures - 1
+        For i = 0 To Me.mProblem.NumObjectives - 1
             If (i > 0) Then
                 fieldnames &= ", "
             End If
-            fieldnames &= "[" & Me.mProblem.List_Featurefunctions(i).Bezeichnung & "] DOUBLE"
+            fieldnames &= "[" & Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung & "] DOUBLE"
         Next
         'Tabelle anpassen
         command.CommandText = "ALTER TABLE QWerte ADD COLUMN " & fieldnames
@@ -432,9 +432,9 @@ Public Class OptResult
         '----------------
         Dim fieldnames As String = ""
         Dim fieldvalues As String = ""
-        For i = 0 To Me.mProblem.NumFeatures - 1
-            fieldnames &= ", [" & Me.mProblem.List_Featurefunctions(i).Bezeichnung & "]"
-            fieldvalues &= ", " & ind.Features(i).ToString(Common.Provider.FortranProvider)
+        For i = 0 To Me.mProblem.NumObjectives - 1
+            fieldnames &= ", [" & Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung & "]"
+            fieldvalues &= ", " & ind.Objectives(i).ToString(Common.Provider.FortranProvider)
         Next
         command.CommandText = "INSERT INTO QWerte (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
         command.ExecuteNonQuery()
@@ -486,9 +486,9 @@ Public Class OptResult
         '----------------
         Dim fieldnames As String = ""
         Dim fieldvalues As String = ""
-        For i = 0 To Me.mProblem.NumFeatures - 1
-            fieldnames &= ", [" & Me.mProblem.List_Featurefunctions(i).Bezeichnung & "]"
-            fieldvalues &= ", " & ind.Features(i).ToString(Common.Provider.FortranProvider)
+        For i = 0 To Me.mProblem.NumObjectives - 1
+            fieldnames &= ", [" & Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung & "]"
+            fieldvalues &= ", " & ind.Objectives(i).ToString(Common.Provider.FortranProvider)
         Next
         command.CommandText = "INSERT INTO QWerte (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
         command.ExecuteNonQuery()
@@ -569,8 +569,8 @@ Public Class OptResult
 
             'zugehörige Sim_ID bestimmen
             bedingung = ""
-            For j = 0 To Me.mProblem.NumPenalties - 1
-                bedingung &= " AND QWerte.[" & Me.mProblem.List_Penaltyfunctions(j).Bezeichnung & "] = " & SekPop(i, j).ToString(Common.Provider.FortranProvider)
+            For j = 0 To Me.mProblem.NumPrimObjective - 1
+                bedingung &= " AND QWerte.[" & Me.mProblem.List_PrimObjectiveFunctions(j).Bezeichnung & "] = " & SekPop(i, j).ToString(Common.Provider.FortranProvider)
             Next
             command.CommandText = "SELECT Sim.ID FROM Sim INNER JOIN QWerte ON Sim.ID = QWerte.Sim_ID WHERE (1=1" & bedingung & ")"
             Sim_ID = command.ExecuteScalar()
@@ -755,8 +755,8 @@ Public Class OptResult
 
                 'Features
                 '--------
-                For j = 0 To Me.mProblem.NumFeatures - 1
-                    .Features(j) = ds.Tables(0).Rows(i).Item(Me.mProblem.List_Featurefunctions(j).Bezeichnung)
+                For j = 0 To Me.mProblem.NumObjectives - 1
+                    .Objectives(j) = ds.Tables(0).Rows(i).Item(Me.mProblem.List_ObjectiveFunctions(j).Bezeichnung)
                 Next
 
             End With
@@ -827,8 +827,8 @@ Public Class OptResult
 
                 'Features
                 '--------
-                For j = 0 To Me.mProblem.NumFeatures - 1
-                    .Features(j) = ds.Tables(0).Rows(i).Item(Me.mProblem.List_Featurefunctions(j).Bezeichnung)
+                For j = 0 To Me.mProblem.NumObjectives - 1
+                    .Objectives(j) = ds.Tables(0).Rows(i).Item(Me.mProblem.List_ObjectiveFunctions(j).Bezeichnung)
                 Next
 
             End With

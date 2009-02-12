@@ -258,7 +258,7 @@ Public Class Smusi
         Dim elemente As New Collection()
 
         'Einzulesende Dateien zusammenstellen
-        For Each feature As Common.Featurefunction In Me.mProblem.List_Featurefunctions
+        For Each feature As Common.Objectivefunktion In Me.mProblem.List_ObjectiveFunctions
             element = feature.SimGr.Substring(0, 4)
             If (Not elemente.Contains(element)) Then
                 elemente.Add(element, element)
@@ -285,9 +285,9 @@ Public Class Smusi
 
     'Berechnung des Qualitätswerts (Zielwert)
     '****************************************
-    Public Overrides Function CalculateFeature(ByVal feature As Common.Featurefunction) As Double
+    Public Overrides Function CalculateObjective(ByVal feature As Common.Objectivefunktion) As Double
 
-        CalculateFeature = 0
+        CalculateObjective = 0
 
         'Fallunterscheidung Ergebnisdatei
         '--------------------------------
@@ -295,7 +295,7 @@ Public Class Smusi
 
             Case "ASC"
                 'QWert aus ASC-Datei
-                CalculateFeature = QWert_ASC(feature)
+                CalculateObjective = QWert_ASC(feature)
 
             Case Else
                 Throw New Exception("Der Wert '" & feature.Datei & "' für die Datei wird bei Optimierungszielen für SMUSI nicht akzeptiert!")
@@ -303,13 +303,13 @@ Public Class Smusi
         End Select
 
         'Zielrichtung berücksichtigen
-        CalculateFeature *= feature.Richtung
+        CalculateObjective *= feature.Richtung
 
     End Function
 
     'Qualitätswert aus ASC-Datei
     '***************************
-    Private Function QWert_ASC(ByVal feature As Common.Featurefunction) As Double
+    Private Function QWert_ASC(ByVal feature As Common.Objectivefunktion) As Double
 
         Dim QWert As Double
         Dim SimReihe As Wave.Zeitreihe
@@ -322,10 +322,10 @@ Public Class Smusi
         Select Case feature.Typ
 
             Case "Wert"
-                QWert = MyBase.CalculateFeature_Wert(feature, SimReihe)
+                QWert = MyBase.CalculateObjective_Wert(feature, SimReihe)
 
             Case "Reihe"
-                QWert = MyBase.CalculateFeature_Reihe(feature, SimReihe)
+                QWert = MyBase.CalculateObjective_Reihe(feature, SimReihe)
 
         End Select
 

@@ -62,9 +62,9 @@ Partial Public Class SolutionDialog
 
         'Ziele
         '--------
-        For Each feature As Common.Featurefunction In Me.mProblem.List_Featurefunctions
+        For Each feature As Common.Objectivefunktion In Me.mProblem.List_ObjectiveFunctions
             column = New DataGridViewTextBoxColumn()
-            If (feature.isPenalty) Then
+            If (feature.isPrimObjective) Then
                 cellstyle.BackColor = Color.LightGreen
                 column.HeaderText = feature.Bezeichnung & " (*)"
                 column.HeaderCell.ToolTipText = "OptZiel"
@@ -162,7 +162,7 @@ Partial Public Class SolutionDialog
         i = 1
 
         'Ziele
-        For Each featurevalue As Double In ind.Features
+        For Each featurevalue As Double In ind.Objectives
             cellvalues(i) = featurevalue
             i += 1
         Next
@@ -209,7 +209,7 @@ Partial Public Class SolutionDialog
         i = 1
 
         'Ziele
-        For Each featurevalue As Double In ind.Features
+        For Each featurevalue As Double In ind.Objectives
             cellvalues(i) = featurevalue
             i += 1
         Next

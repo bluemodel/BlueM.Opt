@@ -1047,17 +1047,17 @@ Partial Class Form1
                     If (Anz_SensiPara = 1) Then
                         '1 Parameter
                         serie = Me.Hauptdiagramm1.getSeriesPoint("SensiPlot", "Orange")
-                        serie.Add(ind.Penalties(SensiPlot1.Selected_Penaltyfunction), ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(0)), n.ToString())
+                        serie.Add(ind.PrimObjectives(SensiPlot1.Selected_Penaltyfunction), ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(0)), n.ToString())
                     Else
                         '2 Parameter
-                        surface.Add(ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(0)), ind.Penalties(SensiPlot1.Selected_Penaltyfunction), ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(1)), n.ToString())
-                        serie3D.Add(ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(0)), ind.Penalties(SensiPlot1.Selected_Penaltyfunction), ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(1)), n.ToString())
+                        surface.Add(ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(0)), ind.PrimObjectives(SensiPlot1.Selected_Penaltyfunction), ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(1)), n.ToString())
+                        serie3D.Add(ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(0)), ind.PrimObjectives(SensiPlot1.Selected_Penaltyfunction), ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(1)), n.ToString())
                     End If
 
                     'Simulationsergebnis in Wave laden
                     If (SensiPlot1.show_Wave) Then
                         'SimReihe auslesen
-                        SimReihe = Sim1.SimErgebnis(Me.mProblem.List_Penaltyfunctions(SensiPlot1.Selected_Penaltyfunction).SimGr)
+                        SimReihe = Sim1.SimErgebnis(Me.mProblem.List_PrimObjectiveFunctions(SensiPlot1.Selected_Penaltyfunction).SimGr)
                         'Lösungs-ID an Titel anhängen
                         SimReihe.Title += " (Lösung " & n.ToString() & ")"
                         'SimReihe zu Collection hinzufügen
@@ -1233,7 +1233,7 @@ Partial Class Form1
                             'Achsen:
                             '-------
                             'X-Achse = QWert
-                            Achse.Title = Me.mProblem.List_Penaltyfunctions(SensiPlot1.Selected_Penaltyfunction).Bezeichnung
+                            Achse.Title = Me.mProblem.List_PrimObjectiveFunctions(SensiPlot1.Selected_Penaltyfunction).Bezeichnung
                             Achse.Automatic = True
                             Achse.Maximum = 0
                             Achsen.Add(Achse)
@@ -1245,8 +1245,8 @@ Partial Class Form1
 
                             'Achsenzuordnung
                             'BUG 327!
-                            For i = 0 To Me.mProblem.NumFeatures - 1
-                                If (Me.mProblem.List_Featurefunctions(i).Bezeichnung = Me.mProblem.List_Penaltyfunctions(SensiPlot1.Selected_Penaltyfunction).Bezeichnung) Then
+                            For i = 0 To Me.mProblem.NumObjectives - 1
+                                If (Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung = Me.mProblem.List_PrimObjectiveFunctions(SensiPlot1.Selected_Penaltyfunction).Bezeichnung) Then
                                     Me.Hauptdiagramm1.ZielIndexX = i
                                     Exit For 'Abbruch
                                 End If
@@ -1266,7 +1266,7 @@ Partial Class Form1
                             Achse.Maximum = 0
                             Achsen.Add(Achse)
                             'Y-Achse = QWert
-                            Achse.Title = Me.mProblem.List_Penaltyfunctions(SensiPlot1.Selected_Penaltyfunction).Bezeichnung
+                            Achse.Title = Me.mProblem.List_PrimObjectiveFunctions(SensiPlot1.Selected_Penaltyfunction).Bezeichnung
                             Achse.Automatic = True
                             Achse.Maximum = 0
                             Achsen.Add(Achse)
@@ -1279,8 +1279,8 @@ Partial Class Form1
                             'Achsenzuordnung
                             'BUG 327!
                             Me.Hauptdiagramm1.ZielIndexX = -1
-                            For i = 0 To Me.mProblem.NumFeatures - 1
-                                If (Me.mProblem.List_Featurefunctions(i).Bezeichnung = Me.mProblem.List_Penaltyfunctions(SensiPlot1.Selected_Penaltyfunction).Bezeichnung) Then
+                            For i = 0 To Me.mProblem.NumObjectives - 1
+                                If (Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung = Me.mProblem.List_PrimObjectiveFunctions(SensiPlot1.Selected_Penaltyfunction).Bezeichnung) Then
                                     Me.Hauptdiagramm1.ZielIndexY = i
                                     Exit For 'Abbruch
                                 End If
@@ -1298,7 +1298,7 @@ Partial Class Form1
 
                         'Achsen:
                         '-------
-                        If (Me.mProblem.NumPenalties = 1) Then
+                        If (Me.mProblem.NumPrimObjective = 1) Then
 
                             'Single-Objective
                             '================
@@ -1332,9 +1332,9 @@ Partial Class Form1
 
                             'Y-Achse: erste (und einzige) Zielfunktion
                             '-----------------------------------------
-                            For i = 0 To Me.mProblem.NumFeatures - 1
-                                If (Me.mProblem.List_Featurefunctions(i).isPenalty) Then
-                                    Achse.Title = Me.mProblem.List_Featurefunctions(i).Bezeichnung
+                            For i = 0 To Me.mProblem.NumObjectives - 1
+                                If (Me.mProblem.List_ObjectiveFunctions(i).isPrimObjective) Then
+                                    Achse.Title = Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung
                                     Achse.Automatic = True
                                     Achse.Maximum = 0
                                     Exit For 'Abbruch nach erstem OptZiel
@@ -1356,9 +1356,9 @@ Partial Class Form1
 
                             'für jedes OptZiel eine Achse hinzufügen
                             j = 0
-                            For i = 0 To Me.mProblem.NumFeatures - 1
-                                If (Me.mProblem.List_Featurefunctions(i).isPenalty) Then
-                                    Achse.Title = Me.mProblem.List_Featurefunctions(i).Bezeichnung
+                            For i = 0 To Me.mProblem.NumObjectives - 1
+                                If (Me.mProblem.List_ObjectiveFunctions(i).isPrimObjective) Then
+                                    Achse.Title = Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung
                                     Achse.Automatic = True
                                     Achse.Maximum = 0
                                     Achsen.Add(Achse)
@@ -1375,7 +1375,7 @@ Partial Class Form1
                             Me.Hauptdiagramm1.ZielIndexZ = tmpZielindex(2)
 
                             'Warnung bei mehr als 3 OptZielen
-                            If (Me.mProblem.NumPenalties > 3) Then
+                            If (Me.mProblem.NumPrimObjective > 3) Then
                                 MsgBox("Die Anzahl der Penalty-Funktionen beträgt mehr als 3!" & eol _
                                         & "Es werden nur die ersten drei Penalty-Funktionen im Hauptdiagramm angezeigt!", MsgBoxStyle.Information)
                             End If
@@ -1574,8 +1574,8 @@ Partial Class Form1
 
             'Sonderfall SWMM-Bechnung: keine Ganglinie anzuzeigen
             If (TypeOf Me.Sim1 Is EVO.Apps.SWMM) Then
-               isSWMM = True
-               Exit Sub
+                isSWMM = True
+                Exit Sub
             End If
 
             'Sonderfall IHA-Berechnung
@@ -1593,7 +1593,7 @@ Partial Class Form1
 
             'zu zeichnenden Reihen aus Liste der Ziele raussuchen
             '----------------------------------------------------
-            For Each feature As Common.Featurefunction In Me.mProblem.List_Featurefunctions
+            For Each feature As Common.Objectivefunktion In Me.mProblem.List_ObjectiveFunctions
 
                 With feature
 
@@ -1730,20 +1730,20 @@ Partial Class Form1
                         tmpAchse.Title = "Simulation"
                         Achsen.Add(tmpAchse)
                         'Y-Achse
-                        tmpAchse.Title = Me.mProblem.List_Featurefunctions(Me.Hauptdiagramm1.ZielIndexX).Bezeichnung
+                        tmpAchse.Title = Me.mProblem.List_ObjectiveFunctions(Me.Hauptdiagramm1.ZielIndexX).Bezeichnung
                         Achsen.Add(tmpAchse)
                     Else
                         'Multi-objective
                         '---------------
                         'X-Achse
-                        tmpAchse.Title = Me.mProblem.List_Featurefunctions(Me.Hauptdiagramm1.ZielIndexX).Bezeichnung
+                        tmpAchse.Title = Me.mProblem.List_ObjectiveFunctions(Me.Hauptdiagramm1.ZielIndexX).Bezeichnung
                         Achsen.Add(tmpAchse)
                         'Y-Achse
-                        tmpAchse.Title = Me.mProblem.List_Featurefunctions(Me.Hauptdiagramm1.ZielIndexY).Bezeichnung
+                        tmpAchse.Title = Me.mProblem.List_ObjectiveFunctions(Me.Hauptdiagramm1.ZielIndexY).Bezeichnung
                         Achsen.Add(tmpAchse)
                         If (Not Me.Hauptdiagramm1.ZielIndexZ = -1) Then
                             'Z-Achse
-                            tmpAchse.Title = Me.mProblem.List_Featurefunctions(Me.Hauptdiagramm1.ZielIndexZ).Bezeichnung
+                            tmpAchse.Title = Me.mProblem.List_ObjectiveFunctions(Me.Hauptdiagramm1.ZielIndexZ).Bezeichnung
                             Achsen.Add(tmpAchse)
                         End If
                     End If
@@ -1779,7 +1779,7 @@ Partial Class Form1
                                     serie = Me.Hauptdiagramm1.getSeriesPoint("Population (ungültig)", "Gray")
                                 End If
                                 'Zeichnen
-                                serie.Add(ind.ID, ind.Features(Me.Hauptdiagramm1.ZielIndexX), ind.ID.ToString())
+                                serie.Add(ind.ID, ind.Objectives(Me.Hauptdiagramm1.ZielIndexX), ind.ID.ToString())
                             ElseIf (Me.Hauptdiagramm1.ZielIndexZ = -1) Then
                                 '2D
                                 '--
@@ -1790,7 +1790,7 @@ Partial Class Form1
                                     serie = Me.Hauptdiagramm1.getSeriesPoint("Population (ungültig)", "Gray")
                                 End If
                                 'Zeichnen
-                                serie.Add(ind.Features(Me.Hauptdiagramm1.ZielIndexX), ind.Features(Me.Hauptdiagramm1.ZielIndexY), ind.ID.ToString())
+                                serie.Add(ind.Objectives(Me.Hauptdiagramm1.ZielIndexX), ind.Objectives(Me.Hauptdiagramm1.ZielIndexY), ind.ID.ToString())
                             Else
                                 '3D
                                 '--
@@ -1801,7 +1801,7 @@ Partial Class Form1
                                     serie3D = Me.Hauptdiagramm1.getSeries3DPoint("Population (ungültig)", "Gray")
                                 End If
                                 'Zeichnen
-                                serie3D.Add(ind.Features(Me.Hauptdiagramm1.ZielIndexX), ind.Features(Me.Hauptdiagramm1.ZielIndexY), ind.Features(Me.Hauptdiagramm1.ZielIndexZ), ind.ID.ToString())
+                                serie3D.Add(ind.Objectives(Me.Hauptdiagramm1.ZielIndexX), ind.Objectives(Me.Hauptdiagramm1.ZielIndexY), ind.Objectives(Me.Hauptdiagramm1.ZielIndexZ), ind.ID.ToString())
                             End If
 
                         Next
@@ -1819,12 +1819,12 @@ Partial Class Form1
                                 '2D
                                 '--
                                 serie = Me.Hauptdiagramm1.getSeriesPoint("Sekundäre Population", "Green")
-                                serie.Add(sekpopind.Features(Me.Hauptdiagramm1.ZielIndexX), sekpopind.Features(Me.Hauptdiagramm1.ZielIndexY), sekpopind.ID.ToString())
+                                serie.Add(sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexX), sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexY), sekpopind.ID.ToString())
                             Else
                                 '3D
                                 '--
                                 serie3D = Me.Hauptdiagramm1.getSeries3DPoint("Sekundäre Population", "Green")
-                                serie3D.Add(sekpopind.Features(Me.Hauptdiagramm1.ZielIndexX), sekpopind.Features(Me.Hauptdiagramm1.ZielIndexY), sekpopind.Features(Me.Hauptdiagramm1.ZielIndexZ), sekpopind.ID.ToString())
+                                serie3D.Add(sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexX), sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexY), sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexZ), sekpopind.ID.ToString())
                             End If
                         Next
 
@@ -1838,7 +1838,7 @@ Partial Class Form1
 
                         'Hypervolumen instanzieren
                         Dim Hypervolume As EVO.MO_Indicators.Indicators
-                        Hypervolume = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(EVO.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, Me.mProblem.NumPenalties)
+                        Hypervolume = EVO.MO_Indicators.MO_IndicatorFabrik.GetInstance(EVO.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, Me.mProblem.NumPrimObjective)
                         Dim indicator As Double
                         Dim nadir() As Double
 
@@ -1851,7 +1851,7 @@ Partial Class Form1
                             nadir = Hypervolume.nadir
 
                             'Nadirpunkt in Hauptdiagramm eintragen
-                            If (Me.mProblem.NumPenalties = 2) Then
+                            If (Me.mProblem.NumPrimObjective = 2) Then
                                 '2D
                                 '--
                                 Dim serie2 As Steema.TeeChart.Styles.Points
@@ -1934,12 +1934,12 @@ Partial Class Form1
                         '2D
                         '--
                         serie = Me.Hauptdiagramm1.getSeriesPoint("Vergleichsergebnis", "Blue")
-                        serie.Add(sekpopind.Features(Me.Hauptdiagramm1.ZielIndexX), sekpopind.Features(Me.Hauptdiagramm1.ZielIndexY), "Vergleichsergebnis " & sekpopind.ID)
+                        serie.Add(sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexX), sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexY), "Vergleichsergebnis " & sekpopind.ID)
                     Else
                         '3D
                         '--
                         serie3D = Me.Hauptdiagramm1.getSeries3DPoint("Vergleichsergebnis", "Blue")
-                        serie3D.Add(sekpopind.Features(Me.Hauptdiagramm1.ZielIndexX), sekpopind.Features(Me.Hauptdiagramm1.ZielIndexY), sekpopind.Features(Me.Hauptdiagramm1.ZielIndexZ), sekpopind.ID & " (Vergleichsergebnis)")
+                        serie3D.Add(sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexX), sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexY), sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexZ), sekpopind.ID & " (Vergleichsergebnis)")
                     End If
                 Next
 
@@ -1953,9 +1953,9 @@ Partial Class Form1
                 Dim indicatorDiff, indicatorRef As Double
 
                 'Vorbereitungen
-                ReDim nadir(Me.mProblem.NumPenalties - 1)
-                ReDim minmax(Me.mProblem.NumPenalties - 1)
-                For i = 0 To Me.mProblem.NumPenalties - 1
+                ReDim nadir(Me.mProblem.NumPrimObjective - 1)
+                ReDim minmax(Me.mProblem.NumPrimObjective - 1)
+                For i = 0 To Me.mProblem.NumPrimObjective - 1
                     nadir(i) = 0
                     minmax(i) = False
                 Next

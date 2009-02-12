@@ -40,17 +40,17 @@ Partial Public Class SensiPlot
         For i = 0 To Me.mProblem.List_OptParameter.GetUpperBound(0)
             Call Me.ListBox_OptParameter_add(Me.mProblem.List_OptParameter(i))
         Next
-        For Each penaltyfunction As Common.Featurefunction In Me.mProblem.List_Penaltyfunctions
+        For Each penaltyfunction As Common.Objectivefunktion In Me.mProblem.List_PrimObjectiveFunctions
             Call Me.ListBox_OptZiele_add(penaltyfunction)
         Next
 
-   End Sub
+    End Sub
 
     Private Sub ListBox_OptParameter_add(ByVal OptParameter As EVO.Common.OptParameter)
         ListBox_OptParameter.Items.Add(OptParameter)
     End Sub
 
-    Private Sub ListBox_OptZiele_add(ByVal penaltyfunction As Common.Featurefunction)
+    Private Sub ListBox_OptZiele_add(ByVal penaltyfunction As Common.Objectivefunktion)
         ListBox_Penaltyfunctions.Items.Add(penaltyfunction)
     End Sub
 

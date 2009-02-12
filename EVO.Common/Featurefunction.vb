@@ -1,12 +1,12 @@
 ''' <summary>
-''' Klasse für die Definition von Feature Funktionen
+''' Klasse für die Definition von Objective Funktionen
 ''' </summary>
-Public Class Featurefunction
+Public Class Objectivefunktion
 
     ''' <summary>
-    ''' Gibt an ob es sich um eine Penalty Function handelt
+    ''' Gibt an ob es sich um eine PrimaryObjective Function handelt
     ''' </summary>
-    Public isPenalty As Boolean
+    Public isPrimObjective As Boolean
 
     ''' <summary>
     ''' Bezeichnung
@@ -14,7 +14,7 @@ Public Class Featurefunction
     Public Bezeichnung As String
 
     ''' <summary>
-    ''' Richtung der Featurefunction (d.h. zu maximieren oder zu minimieren)
+    ''' Richtung der Objectivefunction (d.h. zu maximieren oder zu minimieren)
     ''' </summary>
     Public Richtung As Constants.EVO_RICHTUNG
 
@@ -31,12 +31,12 @@ Public Class Featurefunction
     Public Datei As String
 
     ''' <summary>
-    ''' Die Simulationsgröße, auf dessen Basis der Featurewert berechnet werden soll
+    ''' Die Simulationsgröße, auf dessen Basis der Objectivewert berechnet werden soll
     ''' </summary>
     Public SimGr As String
 
     ''' <summary>
-    ''' Name der Funktion, mit der der Featurewert berechnet werden soll
+    ''' Name der Funktion, mit der der Objectivewert berechnet werden soll
     ''' </summary>
     ''' <remarks>Erlaubte Werte: "AbQuad", "Diff", "nÜber", "sÜber", "nUnter", "sUnter", "Volf", "IHA". Siehe auch Wiki</remarks>
     Public Funktion As String
@@ -82,12 +82,12 @@ Public Class Featurefunction
     Public EvalEnde As DateTime
 
     ''' <summary>
-    ''' Gibt an, ob die Feature Function einen IstWert besitzt
+    ''' Gibt an, ob die Objective Function einen IstWert besitzt
     ''' </summary>
     Public hasIstWert As Boolean
 
     ''' <summary>
-    ''' Feature Wert im Istzustand
+    ''' Objective Wert im Istzustand
     ''' </summary>
     Public IstWert As Double
 

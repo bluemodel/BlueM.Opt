@@ -301,9 +301,9 @@ Public Class SWMM
 
     'Berechnung des Qualitätswerts (Zielwert)
     '****************************************
-    Public Overrides Function CalculateFeature(ByVal feature As Common.Featurefunction) As Double
+    Public Overrides Function CalculateObjective(ByVal feature As Common.Objectivefunktion) As Double
 
-        CalculateFeature = 0
+        CalculateObjective = 0
 
         Dim IsOK As Boolean
 
@@ -313,7 +313,7 @@ Public Class SWMM
 
             Case "RPT"
                 'SWMM-Ergebnisse aus RPT-Datei auslesen
-                CalculateFeature = CalculateFeature_RPT(feature)
+                CalculateObjective = CalculateFeature_RPT(feature)
 
             Case Else
                 'es wurde eine nicht unterstützte Ergebnisdatei angegeben
@@ -326,11 +326,11 @@ Public Class SWMM
         End If
 
         'Zielrichtung berücksichtigen
-        CalculateFeature *= feature.Richtung
+        CalculateObjective *= feature.Richtung
 
     End Function
 
-    Public Function CalculateFeature_RPT(ByVal feature As Common.Featurefunction) As Double
+    Public Function CalculateFeature_RPT(ByVal feature As Common.Objectivefunktion) As Double
 
         Dim QWert As Double
         Dim FFreqEast As Double, FFreqGath As Double, FFreqWest As Double

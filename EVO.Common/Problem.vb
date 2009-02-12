@@ -64,10 +64,10 @@ Public Class Problem
     ''' </summary>
     Public List_OptParameter_Save() As OptParameter
     ''' <summary>
-    ''' Liste der Feature Functions
+    ''' Liste der Objective Functions
     ''' </summary>
-    ''' <remarks>Enthält sowohl Feature Functions als auch Penalty Functions</remarks>
-    Public List_Featurefunctions() As Featurefunction
+    ''' <remarks>Enthält sowohl Objective Functions als auch PrimaryObjectiveFunctions</remarks>
+    Public List_ObjectiveFunctions() As Objectivefunktion
     ''' <summary>
     ''' Liste der Constraint Functions
     ''' </summary>
@@ -131,12 +131,12 @@ Public Class Problem
     End Property
 
     ''' <summary>
-    ''' Anzahl Feature Functions
+    ''' Anzahl Objective Functions
     ''' </summary>
-    ''' <remarks>Inklusive Penalty Functions!</remarks>
-    Public ReadOnly Property NumFeatures() As Integer
+    ''' <remarks>Inklusive PrimaryObjective Functions!</remarks>
+    Public ReadOnly Property NumObjectives() As Integer
         Get
-            Return Me.List_Featurefunctions.Length
+            Return Me.List_ObjectiveFunctions.Length
         End Get
     End Property
 
@@ -146,27 +146,27 @@ Public Class Problem
     ''' <returns>Single-Objective oder Multi-Objective</returns>
     Public ReadOnly Property Modus() As EVO.Common.Constants.EVO_MODUS
         Get
-            Select Case Me.NumPenalties
+            Select Case Me.NumPrimObjective
                 Case 1
                     Return EVO_MODUS.Single_Objective
                 Case Is > 1
                     Return EVO_MODUS.Multi_Objective
                 Case Else
-                    Throw New Exception("Es sind keine Penalty-Functions definiert!")
+                    Throw New Exception("Es sind keine PrimaryObjective-Functions definiert!")
             End Select
         End Get
     End Property
 
     ''' <summary>
-    ''' Anzahl Penalty Functions
+    ''' Anzahl PrimaryObjective Functions
     ''' </summary>
-    Public ReadOnly Property NumPenalties() As Integer
+    Public ReadOnly Property NumPrimObjective() As Integer
         Get
             Dim n As Integer
 
             n = 0
-            For Each feature As Featurefunction In Me.List_Featurefunctions
-                If (feature.isPenalty) Then n += 1
+            For Each objective As Objectivefunktion In Me.List_ObjectiveFunctions
+                If (objective.isPrimObjective) Then n += 1
             Next
 
             Return n
@@ -174,20 +174,20 @@ Public Class Problem
     End Property
 
     ''' <summary>
-    ''' Liste der Penalty Functions
+    ''' Liste der PrimaryObjective Functions
     ''' </summary>
-    ''' <remarks>ReadOnly! Zum Setzen von Werten die List_Featurefunctions verwenden!</remarks>
-    Public ReadOnly Property List_Penaltyfunctions() As Featurefunction()
+    ''' <remarks>ReadOnly! Zum Setzen von Werten die List_Objectivefunctions verwenden!</remarks>
+    Public ReadOnly Property List_PrimObjectiveFunctions() As Objectivefunktion()
         Get
             Dim i As Integer
-            Dim array() As Featurefunction
+            Dim array() As Objectivefunktion
 
-            ReDim array(Me.NumPenalties - 1)
+            ReDim array(Me.NumPrimObjective - 1)
 
             i = 0
-            For Each feature As Featurefunction In Me.List_Featurefunctions
-                If (feature.isPenalty) Then
-                    array(i) = feature
+            For Each objective As Objectivefunktion In Me.List_ObjectiveFunctions
+                If (objective.isPrimObjective) Then
+                    array(i) = objective
                     i += 1
                 End If
             Next
@@ -239,7 +239,7 @@ Public Class Problem
         Me.mMethod = Method
 
         'Datenstrukturen initialisieren
-        ReDim Me.List_Featurefunctions(-1)
+        ReDim Me.List_ObjectiveFunctions(-1)
         ReDim Me.List_Constraintfunctions(-1)
         ReDim Me.List_OptParameter(-1)
         ReDim Me.List_OptParameter_Save(-1)
@@ -444,7 +444,7 @@ Public Class Problem
         Dim Zeile As String
         Dim WerteArray() As String
 
-        ReDim Me.List_Featurefunctions(-1)
+        ReDim Me.List_ObjectiveFunctions(-1)
 
         'Einlesen aller Ziele und Speichern im Manager
         '#############################################
@@ -462,14 +462,14 @@ Public Class Problem
                     Throw New Exception("Die ZIE-Datei hat die falsche Anzahl Spalten!")
                 End If
                 'Neue Feature-Function anlegen
-                ReDim Preserve Me.List_Featurefunctions(i)
-                Me.List_Featurefunctions(i) = New Common.Featurefunction()
+                ReDim Preserve Me.List_ObjectiveFunctions(i)
+                Me.List_ObjectiveFunctions(i) = New Common.Objectivefunktion()
                 'Werte einlesen
-                With Me.List_Featurefunctions(i)
+                With Me.List_ObjectiveFunctions(i)
                     If (WerteArray(1).Trim().ToUpper() = "J") Then
-                        .isPenalty = True
+                        .isPrimObjective = True
                     Else
-                        .isPenalty = False
+                        .isPrimObjective = False
                     End If
                     .Bezeichnung = WerteArray(2).Trim()
                     If (WerteArray(3).Trim() = "+") Then
@@ -517,8 +517,8 @@ Public Class Problem
         Dim ZielEnde As Date
         Dim ext As String
 
-        For i = 0 To Me.List_Featurefunctions.GetUpperBound(0)
-            With Me.List_Featurefunctions(i)
+        For i = 0 To Me.List_ObjectiveFunctions.GetUpperBound(0)
+            With Me.List_ObjectiveFunctions(i)
                 If (.Typ = "Reihe" Or .Typ = "IHA") Then
 
                     'Dateiendung der Referenzreihendatei bestimmen und Reihe einlesen

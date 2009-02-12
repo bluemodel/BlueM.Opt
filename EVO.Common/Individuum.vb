@@ -31,7 +31,7 @@ Public MustInherit Class Individuum
     Protected mType As String               'Typ des Individuums
     Protected mID As Integer                'ID des Individuums
 
-    Protected mFeatures() As Double         'Array aller Featurefunktionswerte (inkl. Penalties)
+    Protected mAllObjectives() As Double    'Array aller Objectivefunktionswerte (inkl. PrimaryObjectives)
     Protected mConstraints() As Double      'Werte der Randbedingungen (Wenn negativ dann ungültig)
 
     'Für ND Sorting -------------------------------------------------
@@ -134,33 +134,33 @@ Public MustInherit Class Individuum
     End Property
 
     ''' <summary>
-    ''' Werte der Feature Funktionen
+    ''' Werte der Objective Funktionen
     ''' </summary>
-    ''' <remarks>Featurefunktionen beinhalten auch die Penaltyfunktionen</remarks>
-    Public Property Features() As Double()
+    ''' <remarks>Objectivefunktionen beinhalten auch die PrimaryObjectiveFunktionen</remarks>
+    Public Property Objectives() As Double()
         Get
-            Return Me.mFeatures
+            Return Me.mAllObjectives
         End Get
         Set(ByVal value As Double())
-            Me.mFeatures = value
+            Me.mAllObjectives = value
         End Set
     End Property
 
     ''' <summary>
-    ''' Werte der Penalty-Funktionen
+    ''' Werte der PrimaryObjective-Funktionen
     ''' </summary>
-    Public ReadOnly Property Penalties() As Double()
+    Public ReadOnly Property PrimObjectives() As Double()
         Get
             Dim i, j As Integer
             Dim Array() As Double
 
-            ReDim Array(Individuum.mProblem.NumPenalties - 1)
+            ReDim Array(Individuum.mProblem.NumPrimObjective - 1)
 
             j = 0
-            For i = 0 To Individuum.mProblem.NumFeatures - 1
-                'Nur die Feature-Werte von Penalty-Funktionen zurückgeben!
-                If (Individuum.mProblem.List_Featurefunctions(i).isPenalty) Then
-                    Array(j) = Me.Features(i)
+            For i = 0 To Individuum.mProblem.NumObjectives - 1
+                'Nur die Objective-Werte von PrimaryObjective-Funktionen zurückgeben!
+                If (Individuum.mProblem.List_ObjectiveFunctions(i).isPrimObjective) Then
+                    Array(j) = Me.Objectives(i)
                     j += 1
                 End If
             Next
@@ -269,9 +269,9 @@ Public MustInherit Class Individuum
         Me.mID = id
 
         'Feature-Werte
-        ReDim Me.Features(Individuum.mProblem.NumFeatures - 1)
-        For i = 0 To Individuum.mProblem.NumFeatures - 1
-            Me.Features(i) = Double.MaxValue           'mit maximalem Double-Wert initialisieren
+        ReDim Me.Objectives(Individuum.mProblem.NumObjectives - 1)
+        For i = 0 To Individuum.mProblem.NumObjectives - 1
+            Me.Objectives(i) = Double.MaxValue           'mit maximalem Double-Wert initialisieren
         Next
 
         'Contraint-Werte
@@ -361,11 +361,11 @@ Public MustInherit Class Individuum
         Dim j, i As Integer
         Dim Array(,) As Double
 
-        ReDim Array(Indi_Array.GetUpperBound(0), Individuum.mProblem.NumPenalties - 1)
+        ReDim Array(Indi_Array.GetUpperBound(0), Individuum.mProblem.NumPrimObjective - 1)
 
         For i = 0 To Indi_Array.GetUpperBound(0)
-            For j = 0 To Individuum.mProblem.NumPenalties - 1
-                Array(i, j) = Indi_Array(i).Penalties(j)
+            For j = 0 To Individuum.mProblem.NumPrimObjective - 1
+                Array(i, j) = Indi_Array(i).PrimObjectives(j)
             Next j
         Next i
         Return Array

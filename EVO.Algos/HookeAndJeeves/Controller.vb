@@ -83,8 +83,8 @@ Public Class Controller
         Call Me.myMonitor.Show()
 
         'Los gehts
-        ReDim QNBest(Me.myProblem.NumPenalties - 1)
-        ReDim QBest(Me.myProblem.NumPenalties - 1)
+        ReDim QNBest(Me.myProblem.NumPrimObjective - 1)
+        ReDim QBest(Me.myProblem.NumPrimObjective - 1)
 
         durchlauf = 0
         Tastschritte_aktuell = 0
@@ -129,7 +129,7 @@ Public Class Controller
 
                 'Lösung im TeeChart einzeichnen
                 serie = Me.myHauptDiagramm.getSeriesPoint("Hooke and Jeeves")
-                Call serie.Add(durchlauf, ind.Penalties(0), durchlauf.ToString())
+                Call serie.Add(durchlauf, ind.PrimObjectives(0), durchlauf.ToString())
 
             Else
                 'Evaluierung Testproblem
@@ -139,7 +139,7 @@ Public Class Controller
             Call System.Windows.Forms.Application.DoEvents()
 
             'Penalties in Bestwert kopieren
-            Call ind.Penalties.CopyTo(QNBest, 0)
+            Call ind.PrimObjectives.CopyTo(QNBest, 0)
 
             'Tastschritte
             '============
@@ -171,7 +171,7 @@ Public Class Controller
 
                     'Lösung im TeeChart einzeichnen
                     serie = Me.myHauptDiagramm.getSeriesPoint("Hooke and Jeeves")
-                    Call serie.Add(durchlauf, ind.Penalties(0), durchlauf.ToString())
+                    Call serie.Add(durchlauf, ind.PrimObjectives(0), durchlauf.ToString())
 
                 Else
                     'Evaluierung Testproblem
@@ -180,7 +180,7 @@ Public Class Controller
                 End If
                 Call System.Windows.Forms.Application.DoEvents()
 
-                If (ind.Penalties(0) >= QNBest(0)) Then
+                If (ind.PrimObjectives(0) >= QNBest(0)) Then
 
                     aktuellePara = HookJeeves.Tastschritt(j, EVO.HookeAndJeeves.HookeAndJeeves.TastschrittRichtung.Rückwärts)
 
@@ -208,7 +208,7 @@ Public Class Controller
 
                         'Lösung im TeeChart einzeichnen
                         serie = Me.myHauptDiagramm.getSeriesPoint("Hooke and Jeeves")
-                        Call serie.Add(durchlauf, ind.Penalties(0), durchlauf.ToString())
+                        Call serie.Add(durchlauf, ind.PrimObjectives(0), durchlauf.ToString())
 
                     Else
                         'Evaluierung Testproblem
@@ -217,13 +217,13 @@ Public Class Controller
                     End If
                     Call System.Windows.Forms.Application.DoEvents()
 
-                    If (ind.Penalties(0) >= QNBest(0)) Then
+                    If (ind.PrimObjectives(0) >= QNBest(0)) Then
                         aktuellePara = HookJeeves.TastschrittResetParameter(j)
                     Else
-                        Call ind.Penalties.CopyTo(QNBest, 0)
+                        Call ind.PrimObjectives.CopyTo(QNBest, 0)
                     End If
                 Else
-                    Call ind.Penalties.CopyTo(QNBest, 0)
+                    Call ind.PrimObjectives.CopyTo(QNBest, 0)
                 End If
             Next
 
@@ -241,7 +241,7 @@ Public Class Controller
                 'Best-Lösung im TeeChart einzeichnen
                 '-----------------------------------
                 serie = Me.myHauptDiagramm.getSeriesPoint("Hooke and Jeeves Best", "Green")
-                Call serie.Add(durchlauf, ind.Penalties(0), durchlauf.ToString())
+                Call serie.Add(durchlauf, ind.PrimObjectives(0), durchlauf.ToString())
 
                 Call System.Windows.Forms.Application.DoEvents()
 

@@ -149,12 +149,12 @@ Public Class Scan
 
     End Sub
 
-    Public Overrides Function CalculateFeature(ByVal feature As Common.Featurefunction) As Double
+    Public Overrides Function CalculateObjective(ByVal feature As Common.Objectivefunktion) As Double
 
-        CalculateFeature = CalculateFeature_Reihe(feature, Me.SimErgebnis(feature.SimGr))
+        CalculateObjective = CalculateObjective_Reihe(feature, Me.SimErgebnis(feature.SimGr))
 
         'Zielrichtung berücksichtigen
-        CalculateFeature *= feature.Richtung
+        CalculateObjective *= feature.Richtung
 
     End Function
 

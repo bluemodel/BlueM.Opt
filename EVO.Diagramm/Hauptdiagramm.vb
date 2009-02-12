@@ -125,7 +125,7 @@
             Farbe = System.Drawing.Color.Gray
         End If
 
-        If (Me.mProblem.NumPenalties = 1) Then
+        If (Me.mProblem.NumPrimObjective = 1) Then
             'SingleObjective
             'xxxxxxxxxxxxxxx
             If (Not ind.Is_Feasible) Then
@@ -135,16 +135,16 @@
             End If
             Select Case Me.mProblem.Method
                 Case EVO.Common.METH_PES
-                    Call serie.Add(runde * Me.mSettings.PES.n_Gen * Me.mSettings.PES.n_Nachf + gen * Me.mSettings.PES.n_Nachf + nachf, ind.Penalties(0), ind.ID.ToString(), Farbe)
+                    Call serie.Add(runde * Me.mSettings.PES.n_Gen * Me.mSettings.PES.n_Nachf + gen * Me.mSettings.PES.n_Nachf + nachf, ind.PrimObjectives(0), ind.ID.ToString(), Farbe)
                 Case EVO.Common.METH_HYBRID, EVO.Common.METH_CES
-                    Call serie.Add(runde * Me.mSettings.CES.n_Generations * Me.mSettings.CES.n_Childs + gen * Me.mSettings.CES.n_Childs + nachf, ind.Penalties(0), ind.ID.ToString(), Farbe)
+                    Call serie.Add(runde * Me.mSettings.CES.n_Generations * Me.mSettings.CES.n_Childs + gen * Me.mSettings.CES.n_Childs + nachf, ind.PrimObjectives(0), ind.ID.ToString(), Farbe)
                 Case Else
                     Throw New Exception("Für diese Methode Single Objective zeichnen nicht definiert")
             End Select
         Else
             'MultiObjective
             'xxxxxxxxxxxxxx
-            If (Me.mProblem.NumPenalties = 2) Then
+            If (Me.mProblem.NumPrimObjective = 2) Then
                 '2D-Diagramm
                 '------------------------------------------------------------------------
                 If (Not ind.Is_Feasible) Then
@@ -152,7 +152,7 @@
                 Else
                     serie = Me.getSeriesPoint("Population", "Orange", , , ColEach)
                 End If
-                Call serie.Add(ind.Penalties(0), ind.Penalties(1), ind.ID.ToString(), Farbe)
+                Call serie.Add(ind.PrimObjectives(0), ind.PrimObjectives(1), ind.ID.ToString(), Farbe)
 
             Else
                 '3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
@@ -163,7 +163,7 @@
                 Else
                     serie3D = Me.getSeries3DPoint("Population", "Orange", , , ColEach)
                 End If
-                Call serie3D.Add(ind.Penalties(0), ind.Penalties(1), ind.Penalties(2), ind.ID.ToString(), Farbe)
+                Call serie3D.Add(ind.PrimObjectives(0), ind.PrimObjectives(1), ind.PrimObjectives(2), ind.ID.ToString(), Farbe)
             End If
         End If
     End Sub
@@ -180,7 +180,7 @@
         'Population in Array von Penalties transformieren
         values = Common.Individuum.Get_All_Penalty_of_Array(pop)
 
-        If (Me.mProblem.NumPenalties = 2) Then
+        If (Me.mProblem.NumPrimObjective = 2) Then
             '2 Zielfunktionen
             '----------------------------------------------------------------
             serie = Me.getSeriesPoint("Sekundäre Population", "Green")
@@ -189,7 +189,7 @@
                 serie.Add(values(i, 0), values(i, 1), pop(i).ID.ToString())
             Next i
 
-        ElseIf (Me.mProblem.NumPenalties >= 3) Then
+        ElseIf (Me.mProblem.NumPrimObjective >= 3) Then
             '3 oder mehr Zielfunktionen (es werden die ersten drei angezeigt)
             '----------------------------------------------------------------
             serie3D = Me.getSeries3DPoint("Sekundäre Population", "Green")
@@ -207,7 +207,7 @@
 
         Dim serie As Steema.TeeChart.Styles.Series
 
-        If (Me.mProblem.NumPenalties = 1) Then
+        If (Me.mProblem.NumPrimObjective = 1) Then
             'SingleObjective
             'xxxxxxxxxxxxxxx
             serie = Me.getSeriesPoint("Population " & (pop + 1).ToString() & " (ungültig)", "Gray")
@@ -217,7 +217,7 @@
         Else
             'MultiObjective
             'xxxxxxxxxxxxxx
-            If (Me.mProblem.NumPenalties = 2) Then
+            If (Me.mProblem.NumPrimObjective = 2) Then
                 '2D-Diagramm
                 '------------------------------------------------------------------------
                 serie = Me.getSeriesPoint("Population (ungültig)", "Gray")
@@ -250,33 +250,33 @@
 
         'X-Achse:
         If (Me.ZielIndexX <> -1) Then
-            If (Me.mProblem.List_Featurefunctions(Me.ZielIndexX).hasIstWert) Then
+            If (Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexX).hasIstWert) Then
                 colorline1 = New Steema.TeeChart.Tools.ColorLine(Me.Chart)
                 colorline1.Pen.Color = System.Drawing.Color.Red
                 colorline1.AllowDrag = False
                 colorline1.Draw3D = True
                 colorline1.Axis = Me.Axes.Bottom
-                colorline1.Value = Me.mProblem.List_Featurefunctions(Me.ZielIndexX).IstWert
+                colorline1.Value = Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexX).IstWert
             End If
         End If
 
         'Y-Achse:
         If (Me.ZielIndexY <> -1) Then
-            If (Me.mProblem.List_Featurefunctions(Me.ZielIndexY).hasIstWert) Then
+            If (Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexY).hasIstWert) Then
                 colorline1 = New Steema.TeeChart.Tools.ColorLine(Me.Chart)
                 colorline1.Pen.Color = System.Drawing.Color.Red
                 colorline1.AllowDrag = False
                 colorline1.Draw3D = True
                 colorline1.Axis = Me.Axes.Left
-                colorline1.Value = Me.mProblem.List_Featurefunctions(Me.ZielIndexY).IstWert
+                colorline1.Value = Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexY).IstWert
             End If
         End If
 
         'Z-Achse:
         If (Me.ZielIndexZ <> -1) Then
-            If (Me.mProblem.List_Featurefunctions(Me.ZielIndexZ).hasIstWert) Then
+            If (Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexZ).hasIstWert) Then
                 'BUG 317: ColorLine auf Depth-Axis geht nicht!
-                MsgBox("Der IstWert auf der Z-Achse (" & Me.mProblem.List_Featurefunctions(Me.ZielIndexZ).Bezeichnung & ") kann leider nicht angezeigt werden (Bug 317)", MsgBoxStyle.Information)
+                MsgBox("Der IstWert auf der Z-Achse (" & Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexZ).Bezeichnung & ") kann leider nicht angezeigt werden (Bug 317)", MsgBoxStyle.Information)
                 'colorline1 = New Steema.TeeChart.Tools.ColorLine(Me.Chart)
                 'colorline1.Pen.Color = System.Drawing.Color.Red
                 'colorline1.AllowDrag = False
@@ -315,10 +315,10 @@
             serie.Marks.ArrowLength = 10
             If (Me.ZielIndexX = -1) Then
                 'X-Achse ist Simulations-ID (Single-Objective)
-                serie.Add(ind.ID, ind.Features(Me.ZielIndexY), ind.ID.ToString())
+                serie.Add(ind.ID, ind.Objectives(Me.ZielIndexY), ind.ID.ToString())
             Else
                 'X- und Y-Achsen sind beides Zielwerte
-                serie.Add(ind.Features(Me.ZielIndexX), ind.Features(Me.ZielIndexY), ind.ID.ToString())
+                serie.Add(ind.Objectives(Me.ZielIndexX), ind.Objectives(Me.ZielIndexY), ind.ID.ToString())
             End If
 
         Else
@@ -326,7 +326,7 @@
             '-----------
             Dim serie3D As Steema.TeeChart.Styles.Points3D
             serie3D = Me.getSeries3DPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
-            serie3D.Add(ind.Features(Me.ZielIndexX), ind.Features(Me.ZielIndexY), ind.Features(Me.ZielIndexZ), ind.ID.ToString())
+            serie3D.Add(ind.Objectives(Me.ZielIndexX), ind.Objectives(Me.ZielIndexY), ind.Objectives(Me.ZielIndexZ), ind.ID.ToString())
             serie3D.Marks.Visible = True
             serie3D.Marks.Style = Steema.TeeChart.Styles.MarksStyles.Label
             serie3D.Marks.Transparency = 50
