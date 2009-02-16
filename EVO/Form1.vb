@@ -1593,34 +1593,35 @@ Partial Class Form1
 
             'zu zeichnenden Reihen aus Liste der Ziele raussuchen
             '----------------------------------------------------
-            For Each feature As Common.Objectivefunktion In Me.mProblem.List_ObjectiveFunctions
+            For Each objective As Common.Objectivefunktion In Me.mProblem.List_ObjectiveFunctions
+                If Not objective.isGroupLeader Then
+                    With objective
 
-                With feature
-
-                    'Referenzreihe in Wave laden
-                    '---------------------------
-                    If (.Typ = "Reihe" Or .Typ = "IHA") Then
-                        'Referenzreihen nur jeweils ein Mal zeichnen
-                        If (Not RefSeries.Contains(.RefReiheDatei & .RefGr)) Then
-                            RefSeries.Add(.RefGr, .RefReiheDatei & .RefGr)
-                            'Referenzreihe in Wave laden
-                            Wave1.Display_Series(.RefReihe)
+                        'Referenzreihe in Wave laden
+                        '---------------------------
+                        If (.Typ = "Reihe" Or .Typ = "IHA") Then
+                            'Referenzreihen nur jeweils ein Mal zeichnen
+                            If (Not RefSeries.Contains(.RefReiheDatei & .RefGr)) Then
+                                RefSeries.Add(.RefGr, .RefReiheDatei & .RefGr)
+                                'Referenzreihe in Wave laden
+                                Wave1.Display_Series(.RefReihe)
+                            End If
                         End If
-                    End If
 
-                    'Simulationsergebnis in Wave laden
-                    '---------------------------------
-                    'Simulationsreihen nur jeweils ein Mal zeichnen
-                    If (Not SimSeries.Contains(.SimGr)) Then
-                        Call SimSeries.Add(.SimGr, .SimGr)
-                        zre = Sim1.SimErgebnis(.SimGr).Clone()
-                        'Lösungsnummer an Titel anhängen
-                        zre.Title &= " (Lösung " & ind.ID.ToString() & ")"
-                        'Simreihe in Wave laden
-                        Call Wave1.Display_Series(zre)
-                    End If
+                        'Simulationsergebnis in Wave laden
+                        '---------------------------------
+                        'Simulationsreihen nur jeweils ein Mal zeichnen
+                        If (Not SimSeries.Contains(.SimGr)) Then
+                            Call SimSeries.Add(.SimGr, .SimGr)
+                            zre = Sim1.SimErgebnis(.SimGr).Clone()
+                            'Lösungsnummer an Titel anhängen
+                            zre.Title &= " (Lösung " & ind.ID.ToString() & ")"
+                            'Simreihe in Wave laden
+                            Call Wave1.Display_Series(zre)
+                        End If
 
-                End With
+                    End With
+                End If
             Next
 
         Next ind
