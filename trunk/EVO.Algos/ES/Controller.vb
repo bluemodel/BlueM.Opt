@@ -148,9 +148,10 @@ Public Class Controller
 
         'Zufällige Kinderpfade werden generiert
         '**************************************
-        Call CES1.Generate_Random_Path()
-        'Falls TESTMODUS werden sie überschrieben
-        If (Not Me.myProblem.CES_T_Modus = Common.Constants.CES_T_MODUS.No_Test) Then
+        If Me.myProblem.CES_T_Modus = Common.Constants.CES_T_MODUS.No_Test Then
+            Call CES1.Generate_Random_Path()
+        ElseIf (Not Me.myProblem.CES_T_Modus = Common.Constants.CES_T_MODUS.No_Test) Then
+            'Falls TESTMODUS werden sie überschrieben
             Call CES1.Generate_Paths_for_Tests(Sim1.TestPath, Me.myProblem.CES_T_Modus)
         End If
         '**************************************
