@@ -6,6 +6,10 @@ Autoren: Christoph Hübner, Felix Froehlich, Dirk Muschalla
 Website: http://130.83.196.154/BlueM/wiki/index.php/BlueM.Opt
 ===============================================================
 
+Version 1.3
+-----------
+* NEW: Zielfunktionen unterstützen jetzt Zielgruppen
+
 Version 1.2.4
 -------------
 * UPDATE: Multithreading wird zentral verwaltet und kann von allen Applikationen genutzt werden. Multithreading kann im Optionsdialog ausgeschaltet werden. (Bug 345)
