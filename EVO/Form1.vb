@@ -84,7 +84,7 @@ Partial Class Form1
 
         'Liste der Methoden in ComboBox schreiben und Anfangseinstellung wählen
         Me.ComboBox_Methode.Items.Clear()
-        Me.ComboBox_Methode.Items.AddRange(New Object() {"", METH_PES, METH_CES, METH_HYBRID, METH_SENSIPLOT, METH_HOOKJEEVES, METH_DDS})
+        Me.ComboBox_Methode.Items.AddRange(New Object() {"", METH_PES, METH_CES, METH_HYBRID, METH_MetaEvo, METH_SENSIPLOT, METH_HOOKJEEVES, METH_DDS})
         Me.ComboBox_Methode.SelectedIndex = 0
 
         'OptionsDialog instanzieren
@@ -305,10 +305,10 @@ Partial Class Form1
                     'Testprobleme instanzieren
                     Testprobleme1 = New EVO.Apps.Testprobleme()
 
-                    'HACK: bei Testproblemen als Methodenauswahl nur PES, H&J und DDS zulassen!
+                    'HACK: bei Testproblemen als Methodenauswahl nur PES, H&J, MetaEVO und DDS zulassen!
                     Me.IsInitializing = True
                     Call Me.ComboBox_Methode.Items.Clear()
-                    Call Me.ComboBox_Methode.Items.AddRange(New String() {"", METH_PES, METH_HOOKJEEVES, METH_DDS})
+                    Call Me.ComboBox_Methode.Items.AddRange(New String() {"", METH_PES, METH_MetaEvo, METH_HOOKJEEVES, METH_DDS})
                     Me.IsInitializing = False
 
 
@@ -430,7 +430,6 @@ Partial Class Form1
         End Select
 
     End Sub
-
 
     'Arbeitsverzeichnis/Datensatz auswählen (nur Sim-Anwendungen)
     '************************************************************
@@ -667,25 +666,14 @@ Partial Class Form1
 
                     'TODO: Progress mit Standardwerten initialisieren
 
-
-                Case METH_Hybrid2008
+                Case METH_MetaEvo
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    If (Me.Anwendung = ANW_TESTPROBLEME) Then
-                        'Testprobleme mit Hybrid2008 Verfahren berechnen
-                        MsgBox("Berechnung der Testprobleme mit Hybrid2008", MsgBoxStyle.Information, "Info")
-
-                    Else
-                        'Modelle mit Hybrid2008 berechnen
-                        MsgBox("Berechnung der Modelle mit Hybrid2008", MsgBoxStyle.Information, "Info")
-
-                    End If
-
                     'Ergebnis-Buttons
-                    'Me.Button_openMDB.Enabled = True
+                    Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
 
                     'Progress mit Standardwerten initialisieren
-                    'Call Me.mProgress.Initialize(1, 1, EVO_Einstellungen1.Settings.MetaEvo.NumberGenerations, EVO_Einstellungen1.Settings.MetaEvo.PopulationSize)
+                    Call Me.mProgress.Initialize(1, 1, EVO_Einstellungen1.Settings.MetaEvo.NumberGenerations, EVO_Einstellungen1.Settings.MetaEvo.PopulationSize)
 
             End Select
 
@@ -842,6 +830,14 @@ Partial Class Form1
                             Call controller.InitApp(Me.Sim1)
                             Call controller.Start()
 
+                        Case METH_MetaEvo
+                            'MetaEVO-Controller initialisieren und starten
+                            controller = New EVO.MetaEvo.Controller()
+                            Call controller.Init(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Monitor1, Me.Hauptdiagramm1)
+                            Call controller.InitApp(Me.Sim1)
+                            Call controller.Start()
+
+
                         Case METH_HOOKJEEVES
                             'HJ-Controller initialisieren und starten
                             controller = New EVO.HookeAndJeeves.Controller()
@@ -872,6 +868,10 @@ Partial Class Form1
                         Case METH_DDS
                             'DDS-Controller instanzieren
                             controller = New modelEAU.DDS.Controller()
+
+                        Case METH_MetaEvo
+                            'MetaEVO-Controller instanzieren
+                            controller = New EVO.MetaEvo.Controller()
 
                         Case Else
                             Throw New Exception("Testprobleme können mit der Methode " & Me.mProblem.Method & " nicht ausgeführt werden!")
@@ -1314,6 +1314,10 @@ Partial Class Form1
                                 Else
                                     Achse.Maximum = EVO_Einstellungen1.Settings.PES.n_Gen * EVO_Einstellungen1.Settings.PES.n_Nachf + 1
                                 End If
+
+                            ElseIf (Me.mProblem.Method = METH_MetaEvo) Then
+                                'Bei MetaEvo:
+                                Achse.Maximum = EVO_Einstellungen1.Settings.MetaEvo.NumberGenerations * EVO_Einstellungen1.Settings.MetaEvo.ChildsPerParent * EVO_Einstellungen1.Settings.MetaEvo.PopulationSize
 
                             ElseIf (Me.mProblem.Method = METH_HOOKJEEVES) Then
                                 'Bei Hooke & Jeeves:

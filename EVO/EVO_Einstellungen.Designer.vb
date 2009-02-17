@@ -51,6 +51,19 @@ Partial Class EVO_Einstellungen
         Dim Label_Line As System.Windows.Forms.Label
         Dim Label3 As System.Windows.Forms.Label
         Dim Label1 As System.Windows.Forms.Label
+        Dim Label11 As System.Windows.Forms.Label
+        Dim Label5 As System.Windows.Forms.Label
+        Dim Label10 As System.Windows.Forms.Label
+        Dim Label13 As System.Windows.Forms.Label
+        Dim Label14 As System.Windows.Forms.Label
+        Dim Label15 As System.Windows.Forms.Label
+        Dim Label16 As System.Windows.Forms.Label
+        Dim Label18 As System.Windows.Forms.Label
+        Dim Label20 As System.Windows.Forms.Label
+        Dim Label19 As System.Windows.Forms.Label
+        Dim Label_Meta11 As System.Windows.Forms.Label
+        Dim Label_Meta5 As System.Windows.Forms.Label
+        Dim Label_Meta10 As System.Windows.Forms.Label
         Me.TabControl1 = New System.Windows.Forms.TabControl
         Me.TabPage_PES = New System.Windows.Forms.TabPage
         Me.Label_OptModusValue = New System.Windows.Forms.Label
@@ -113,14 +126,25 @@ Partial Class EVO_Einstellungen
         Me.Numeric_HJ_DeltaFinish = New System.Windows.Forms.NumericUpDown
         Me.Numeric_HJ_DeltaStart = New System.Windows.Forms.NumericUpDown
         Me.CheckBox_HJ_DNVektor = New System.Windows.Forms.CheckBox
-        Me.TabPage_Hybrid2008 = New System.Windows.Forms.TabPage
+        Me.TabPage_MetaEvo = New System.Windows.Forms.TabPage
+        Me.GroupBox_MetaEvo_TransferOptions = New System.Windows.Forms.GroupBox
+        Me.Numeric_MetaEvo_NumberResults = New System.Windows.Forms.NumericUpDown
+        Me.GroupBox_MetaEvo_LocalOptions = New System.Windows.Forms.GroupBox
+        Me.Numeric_MetaEvo_HJStepsize = New System.Windows.Forms.NumericUpDown
+        Me.Combo_MetaEvo_OpMode = New System.Windows.Forms.ComboBox
+        Me.GroupBox_MetaEvo_MySQLOptions = New System.Windows.Forms.GroupBox
+        Me.TextBox_MetaEvo_MySQL_DB = New System.Windows.Forms.TextBox
+        Me.TextBox_MetaEvo_MySQL_Password = New System.Windows.Forms.TextBox
+        Me.TextBox_MetaEvo_MySQL_User = New System.Windows.Forms.TextBox
+        Me.TextBox_MetaEvo_MySQL_Host = New System.Windows.Forms.TextBox
+        Me.GroupBox_MetaEvo_BasicOptions = New System.Windows.Forms.GroupBox
+        Me.Numeric_MetaEvo_PopulationSize = New System.Windows.Forms.NumericUpDown
+        Me.Numeric_MetaEvo_Numbergenerations = New System.Windows.Forms.NumericUpDown
+        Me.Combo_MetaEvo_Role = New System.Windows.Forms.ComboBox
         Me.TabPage_DDS = New System.Windows.Forms.TabPage
         Me.CheckBox_DDS_ini = New System.Windows.Forms.CheckBox
-        Me.Label11 = New System.Windows.Forms.Label
         Me.Numeric_DDS_maxiter = New System.Windows.Forms.NumericUpDown
-        Me.Label10 = New System.Windows.Forms.Label
         Me.Numeric_DDS_r_val = New System.Windows.Forms.NumericUpDown
-        Me.Label5 = New System.Windows.Forms.Label
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox
         Label_CES_MemSize = New System.Windows.Forms.Label
@@ -155,6 +179,19 @@ Partial Class EVO_Einstellungen
         Label_Line = New System.Windows.Forms.Label
         Label3 = New System.Windows.Forms.Label
         Label1 = New System.Windows.Forms.Label
+        Label11 = New System.Windows.Forms.Label
+        Label5 = New System.Windows.Forms.Label
+        Label10 = New System.Windows.Forms.Label
+        Label13 = New System.Windows.Forms.Label
+        Label14 = New System.Windows.Forms.Label
+        Label15 = New System.Windows.Forms.Label
+        Label16 = New System.Windows.Forms.Label
+        Label18 = New System.Windows.Forms.Label
+        Label20 = New System.Windows.Forms.Label
+        Label19 = New System.Windows.Forms.Label
+        Label_Meta11 = New System.Windows.Forms.Label
+        Label_Meta5 = New System.Windows.Forms.Label
+        Label_Meta10 = New System.Windows.Forms.Label
         Me.TabControl1.SuspendLayout()
         Me.TabPage_PES.SuspendLayout()
         CType(Me.TextDeltaStart, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -187,6 +224,15 @@ Partial Class EVO_Einstellungen
         Me.TabPage_HookeJeeves.SuspendLayout()
         CType(Me.Numeric_HJ_DeltaFinish, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Numeric_HJ_DeltaStart, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.TabPage_MetaEvo.SuspendLayout()
+        Me.GroupBox_MetaEvo_TransferOptions.SuspendLayout()
+        CType(Me.Numeric_MetaEvo_NumberResults, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.GroupBox_MetaEvo_LocalOptions.SuspendLayout()
+        CType(Me.Numeric_MetaEvo_HJStepsize, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.GroupBox_MetaEvo_MySQLOptions.SuspendLayout()
+        Me.GroupBox_MetaEvo_BasicOptions.SuspendLayout()
+        CType(Me.Numeric_MetaEvo_PopulationSize, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.Numeric_MetaEvo_Numbergenerations, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabPage_DDS.SuspendLayout()
         CType(Me.Numeric_DDS_maxiter, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Numeric_DDS_r_val, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -475,6 +521,126 @@ Partial Class EVO_Einstellungen
         Label1.TabIndex = 30
         Label1.Text = "Start-Schrittweite:"
         '
+        'Label11
+        '
+        Label11.AutoSize = True
+        Label11.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Label11.Location = New System.Drawing.Point(6, 66)
+        Label11.Name = "Label11"
+        Label11.Size = New System.Drawing.Size(110, 13)
+        Label11.TabIndex = 4
+        Label11.Text = "Random initial values:"
+        '
+        'Label5
+        '
+        Label5.AutoSize = True
+        Label5.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Label5.Location = New System.Drawing.Point(6, 18)
+        Label5.Name = "Label5"
+        Label5.Size = New System.Drawing.Size(154, 13)
+        Label5.TabIndex = 0
+        Label5.Text = "Neighborhood pertubation size:"
+        '
+        'Label10
+        '
+        Label10.AutoSize = True
+        Label10.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Label10.Location = New System.Drawing.Point(6, 44)
+        Label10.Name = "Label10"
+        Label10.Size = New System.Drawing.Size(78, 13)
+        Label10.TabIndex = 2
+        Label10.Text = "Max. iterations:"
+        '
+        'Label13
+        '
+        Label13.AutoSize = True
+        Label13.Location = New System.Drawing.Point(4, 22)
+        Label13.Name = "Label13"
+        Label13.Size = New System.Drawing.Size(32, 13)
+        Label13.TabIndex = 51
+        Label13.Text = "Host:"
+        '
+        'Label14
+        '
+        Label14.AutoSize = True
+        Label14.Location = New System.Drawing.Point(4, 74)
+        Label14.Name = "Label14"
+        Label14.Size = New System.Drawing.Size(30, 13)
+        Label14.TabIndex = 35
+        Label14.Text = "user:"
+        '
+        'Label15
+        '
+        Label15.AutoSize = True
+        Label15.Location = New System.Drawing.Point(4, 100)
+        Label15.Name = "Label15"
+        Label15.Size = New System.Drawing.Size(55, 13)
+        Label15.TabIndex = 48
+        Label15.Text = "password:"
+        '
+        'Label16
+        '
+        Label16.AutoSize = True
+        Label16.Location = New System.Drawing.Point(4, 48)
+        Label16.Name = "Label16"
+        Label16.Size = New System.Drawing.Size(54, 13)
+        Label16.TabIndex = 55
+        Label16.Text = "DB-name:"
+        '
+        'Label18
+        '
+        Label18.AutoSize = True
+        Label18.Location = New System.Drawing.Point(15, 46)
+        Label18.Name = "Label18"
+        Label18.Size = New System.Drawing.Size(86, 13)
+        Label18.TabIndex = 54
+        Label18.Text = "Operation Mode:"
+        '
+        'Label20
+        '
+        Label20.AutoSize = True
+        Label20.Location = New System.Drawing.Point(4, 16)
+        Label20.Name = "Label20"
+        Label20.Size = New System.Drawing.Size(135, 13)
+        Label20.TabIndex = 51
+        Label20.Text = "HJ minimum Stepsize:     1/"
+        '
+        'Label19
+        '
+        Label19.AutoSize = True
+        Label19.Location = New System.Drawing.Point(4, 16)
+        Label19.Name = "Label19"
+        Label19.Size = New System.Drawing.Size(115, 26)
+        Label19.TabIndex = 57
+        Label19.Text = "Number of results:" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "(<= Number of parents)"
+        '
+        'Label_Meta11
+        '
+        Label_Meta11.AutoSize = True
+        Label_Meta11.Location = New System.Drawing.Point(4, 57)
+        Label_Meta11.Name = "Label_Meta11"
+        Label_Meta11.Size = New System.Drawing.Size(117, 13)
+        Label_Meta11.TabIndex = 35
+        Label_Meta11.Text = "Number of generations:"
+        '
+        'Label_Meta5
+        '
+        Label_Meta5.AutoSize = True
+        Label_Meta5.Location = New System.Drawing.Point(15, 19)
+        Label_Meta5.Name = "Label_Meta5"
+        Label_Meta5.Size = New System.Drawing.Size(49, 13)
+        Label_Meta5.TabIndex = 51
+        Label_Meta5.Text = "PC Role:"
+        '
+        'Label_Meta10
+        '
+        Label_Meta10.AutoSize = True
+        Label_Meta10.Location = New System.Drawing.Point(4, 22)
+        Label_Meta10.Name = "Label_Meta10"
+        Label_Meta10.Size = New System.Drawing.Size(97, 26)
+        Label_Meta10.TabIndex = 51
+        Label_Meta10.Text = "Number of parents:" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "(1:3 Children)"
+        '
         'TabControl1
         '
         Me.TabControl1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
@@ -482,7 +648,7 @@ Partial Class EVO_Einstellungen
         Me.TabControl1.Controls.Add(Me.TabPage_PES)
         Me.TabControl1.Controls.Add(Me.TabPage_CES)
         Me.TabControl1.Controls.Add(Me.TabPage_HookeJeeves)
-        Me.TabControl1.Controls.Add(Me.TabPage_Hybrid2008)
+        Me.TabControl1.Controls.Add(Me.TabPage_MetaEvo)
         Me.TabControl1.Controls.Add(Me.TabPage_DDS)
         Me.TabControl1.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TabControl1.Location = New System.Drawing.Point(2, 16)
@@ -1190,54 +1356,199 @@ Partial Class EVO_Einstellungen
         Me.CheckBox_HJ_DNVektor.TabIndex = 2
         Me.CheckBox_HJ_DNVektor.Text = "mit Schrittweitenvektor"
         '
-        'TabPage_Hybrid2008
+        'TabPage_MetaEvo
         '
-        Me.TabPage_Hybrid2008.BackColor = System.Drawing.SystemColors.Control
-        Me.TabPage_Hybrid2008.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TabPage_Hybrid2008.Location = New System.Drawing.Point(4, 22)
-        Me.TabPage_Hybrid2008.Name = "TabPage_Hybrid2008"
-        Me.TabPage_Hybrid2008.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage_Hybrid2008.Size = New System.Drawing.Size(221, 668)
-        Me.TabPage_Hybrid2008.TabIndex = 3
-        Me.TabPage_Hybrid2008.Text = "Hybrid2008"
+        Me.TabPage_MetaEvo.BackColor = System.Drawing.SystemColors.Control
+        Me.TabPage_MetaEvo.Controls.Add(Me.GroupBox_MetaEvo_TransferOptions)
+        Me.TabPage_MetaEvo.Controls.Add(Me.GroupBox_MetaEvo_LocalOptions)
+        Me.TabPage_MetaEvo.Controls.Add(Label18)
+        Me.TabPage_MetaEvo.Controls.Add(Me.Combo_MetaEvo_OpMode)
+        Me.TabPage_MetaEvo.Controls.Add(Me.GroupBox_MetaEvo_MySQLOptions)
+        Me.TabPage_MetaEvo.Controls.Add(Label_Meta5)
+        Me.TabPage_MetaEvo.Controls.Add(Me.GroupBox_MetaEvo_BasicOptions)
+        Me.TabPage_MetaEvo.Controls.Add(Me.Combo_MetaEvo_Role)
+        Me.TabPage_MetaEvo.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.TabPage_MetaEvo.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage_MetaEvo.Name = "TabPage_MetaEvo"
+        Me.TabPage_MetaEvo.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage_MetaEvo.Size = New System.Drawing.Size(221, 668)
+        Me.TabPage_MetaEvo.TabIndex = 3
+        Me.TabPage_MetaEvo.Text = "MetaEvo"
+        '
+        'GroupBox_MetaEvo_TransferOptions
+        '
+        Me.GroupBox_MetaEvo_TransferOptions.Controls.Add(Label19)
+        Me.GroupBox_MetaEvo_TransferOptions.Controls.Add(Me.Numeric_MetaEvo_NumberResults)
+        Me.GroupBox_MetaEvo_TransferOptions.Location = New System.Drawing.Point(6, 159)
+        Me.GroupBox_MetaEvo_TransferOptions.Name = "GroupBox_MetaEvo_TransferOptions"
+        Me.GroupBox_MetaEvo_TransferOptions.Size = New System.Drawing.Size(200, 48)
+        Me.GroupBox_MetaEvo_TransferOptions.TabIndex = 54
+        Me.GroupBox_MetaEvo_TransferOptions.TabStop = False
+        Me.GroupBox_MetaEvo_TransferOptions.Text = "Transfer Options"
+        '
+        'Numeric_MetaEvo_NumberResults
+        '
+        Me.Numeric_MetaEvo_NumberResults.Location = New System.Drawing.Point(139, 14)
+        Me.Numeric_MetaEvo_NumberResults.Maximum = New Decimal(New Integer() {5000, 0, 0, 0})
+        Me.Numeric_MetaEvo_NumberResults.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.Numeric_MetaEvo_NumberResults.Name = "Numeric_MetaEvo_NumberResults"
+        Me.Numeric_MetaEvo_NumberResults.Size = New System.Drawing.Size(53, 20)
+        Me.Numeric_MetaEvo_NumberResults.TabIndex = 56
+        Me.Numeric_MetaEvo_NumberResults.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_MetaEvo_NumberResults.Value = New Decimal(New Integer() {1, 0, 0, 0})
+        '
+        'GroupBox_MetaEvo_LocalOptions
+        '
+        Me.GroupBox_MetaEvo_LocalOptions.Controls.Add(Label20)
+        Me.GroupBox_MetaEvo_LocalOptions.Controls.Add(Me.Numeric_MetaEvo_HJStepsize)
+        Me.GroupBox_MetaEvo_LocalOptions.Enabled = False
+        Me.GroupBox_MetaEvo_LocalOptions.Location = New System.Drawing.Point(6, 213)
+        Me.GroupBox_MetaEvo_LocalOptions.Name = "GroupBox_MetaEvo_LocalOptions"
+        Me.GroupBox_MetaEvo_LocalOptions.Size = New System.Drawing.Size(200, 40)
+        Me.GroupBox_MetaEvo_LocalOptions.TabIndex = 53
+        Me.GroupBox_MetaEvo_LocalOptions.TabStop = False
+        Me.GroupBox_MetaEvo_LocalOptions.Text = "Local Options"
+        '
+        'Numeric_MetaEvo_HJStepsize
+        '
+        Me.Numeric_MetaEvo_HJStepsize.Location = New System.Drawing.Point(139, 13)
+        Me.Numeric_MetaEvo_HJStepsize.Maximum = New Decimal(New Integer() {5000, 0, 0, 0})
+        Me.Numeric_MetaEvo_HJStepsize.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.Numeric_MetaEvo_HJStepsize.Name = "Numeric_MetaEvo_HJStepsize"
+        Me.Numeric_MetaEvo_HJStepsize.Size = New System.Drawing.Size(53, 20)
+        Me.Numeric_MetaEvo_HJStepsize.TabIndex = 50
+        Me.Numeric_MetaEvo_HJStepsize.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_MetaEvo_HJStepsize.Value = New Decimal(New Integer() {1, 0, 0, 0})
+        '
+        'Combo_MetaEvo_OpMode
+        '
+        Me.Combo_MetaEvo_OpMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.Combo_MetaEvo_OpMode.FormattingEnabled = True
+        Me.Combo_MetaEvo_OpMode.Items.AddRange(New Object() {"Local Optimizer", "Global Optimizer", "Both"})
+        Me.Combo_MetaEvo_OpMode.Location = New System.Drawing.Point(103, 43)
+        Me.Combo_MetaEvo_OpMode.Name = "Combo_MetaEvo_OpMode"
+        Me.Combo_MetaEvo_OpMode.Size = New System.Drawing.Size(100, 21)
+        Me.Combo_MetaEvo_OpMode.TabIndex = 53
+        '
+        'GroupBox_MetaEvo_MySQLOptions
+        '
+        Me.GroupBox_MetaEvo_MySQLOptions.Controls.Add(Me.TextBox_MetaEvo_MySQL_DB)
+        Me.GroupBox_MetaEvo_MySQLOptions.Controls.Add(Label16)
+        Me.GroupBox_MetaEvo_MySQLOptions.Controls.Add(Me.TextBox_MetaEvo_MySQL_Password)
+        Me.GroupBox_MetaEvo_MySQLOptions.Controls.Add(Me.TextBox_MetaEvo_MySQL_User)
+        Me.GroupBox_MetaEvo_MySQLOptions.Controls.Add(Me.TextBox_MetaEvo_MySQL_Host)
+        Me.GroupBox_MetaEvo_MySQLOptions.Controls.Add(Label13)
+        Me.GroupBox_MetaEvo_MySQLOptions.Controls.Add(Label14)
+        Me.GroupBox_MetaEvo_MySQLOptions.Controls.Add(Label15)
+        Me.GroupBox_MetaEvo_MySQLOptions.Enabled = False
+        Me.GroupBox_MetaEvo_MySQLOptions.Location = New System.Drawing.Point(6, 259)
+        Me.GroupBox_MetaEvo_MySQLOptions.Name = "GroupBox_MetaEvo_MySQLOptions"
+        Me.GroupBox_MetaEvo_MySQLOptions.Size = New System.Drawing.Size(200, 125)
+        Me.GroupBox_MetaEvo_MySQLOptions.TabIndex = 52
+        Me.GroupBox_MetaEvo_MySQLOptions.TabStop = False
+        Me.GroupBox_MetaEvo_MySQLOptions.Text = "MySQL Options"
+        '
+        'TextBox_MetaEvo_MySQL_DB
+        '
+        Me.TextBox_MetaEvo_MySQL_DB.Location = New System.Drawing.Point(92, 45)
+        Me.TextBox_MetaEvo_MySQL_DB.Name = "TextBox_MetaEvo_MySQL_DB"
+        Me.TextBox_MetaEvo_MySQL_DB.Size = New System.Drawing.Size(100, 20)
+        Me.TextBox_MetaEvo_MySQL_DB.TabIndex = 56
+        '
+        'TextBox_MetaEvo_MySQL_Password
+        '
+        Me.TextBox_MetaEvo_MySQL_Password.Location = New System.Drawing.Point(92, 97)
+        Me.TextBox_MetaEvo_MySQL_Password.Name = "TextBox_MetaEvo_MySQL_Password"
+        Me.TextBox_MetaEvo_MySQL_Password.Size = New System.Drawing.Size(100, 20)
+        Me.TextBox_MetaEvo_MySQL_Password.TabIndex = 54
+        Me.TextBox_MetaEvo_MySQL_Password.UseSystemPasswordChar = True
+        '
+        'TextBox_MetaEvo_MySQL_User
+        '
+        Me.TextBox_MetaEvo_MySQL_User.Location = New System.Drawing.Point(92, 71)
+        Me.TextBox_MetaEvo_MySQL_User.Name = "TextBox_MetaEvo_MySQL_User"
+        Me.TextBox_MetaEvo_MySQL_User.Size = New System.Drawing.Size(100, 20)
+        Me.TextBox_MetaEvo_MySQL_User.TabIndex = 53
+        '
+        'TextBox_MetaEvo_MySQL_Host
+        '
+        Me.TextBox_MetaEvo_MySQL_Host.Location = New System.Drawing.Point(92, 19)
+        Me.TextBox_MetaEvo_MySQL_Host.Name = "TextBox_MetaEvo_MySQL_Host"
+        Me.TextBox_MetaEvo_MySQL_Host.Size = New System.Drawing.Size(100, 20)
+        Me.TextBox_MetaEvo_MySQL_Host.TabIndex = 52
+        '
+        'GroupBox_MetaEvo_BasicOptions
+        '
+        Me.GroupBox_MetaEvo_BasicOptions.Controls.Add(Label_Meta10)
+        Me.GroupBox_MetaEvo_BasicOptions.Controls.Add(Me.Numeric_MetaEvo_PopulationSize)
+        Me.GroupBox_MetaEvo_BasicOptions.Controls.Add(Label_Meta11)
+        Me.GroupBox_MetaEvo_BasicOptions.Controls.Add(Me.Numeric_MetaEvo_Numbergenerations)
+        Me.GroupBox_MetaEvo_BasicOptions.Enabled = False
+        Me.GroupBox_MetaEvo_BasicOptions.Location = New System.Drawing.Point(6, 70)
+        Me.GroupBox_MetaEvo_BasicOptions.Name = "GroupBox_MetaEvo_BasicOptions"
+        Me.GroupBox_MetaEvo_BasicOptions.Size = New System.Drawing.Size(200, 83)
+        Me.GroupBox_MetaEvo_BasicOptions.TabIndex = 36
+        Me.GroupBox_MetaEvo_BasicOptions.TabStop = False
+        Me.GroupBox_MetaEvo_BasicOptions.Text = "Global Options"
+        '
+        'Numeric_MetaEvo_PopulationSize
+        '
+        Me.Numeric_MetaEvo_PopulationSize.Location = New System.Drawing.Point(139, 19)
+        Me.Numeric_MetaEvo_PopulationSize.Maximum = New Decimal(New Integer() {5000, 0, 0, 0})
+        Me.Numeric_MetaEvo_PopulationSize.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.Numeric_MetaEvo_PopulationSize.Name = "Numeric_MetaEvo_PopulationSize"
+        Me.Numeric_MetaEvo_PopulationSize.Size = New System.Drawing.Size(53, 20)
+        Me.Numeric_MetaEvo_PopulationSize.TabIndex = 50
+        Me.Numeric_MetaEvo_PopulationSize.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_MetaEvo_PopulationSize.Value = New Decimal(New Integer() {1, 0, 0, 0})
+        '
+        'Numeric_MetaEvo_Numbergenerations
+        '
+        Me.Numeric_MetaEvo_Numbergenerations.Location = New System.Drawing.Point(139, 54)
+        Me.Numeric_MetaEvo_Numbergenerations.Maximum = New Decimal(New Integer() {5000, 0, 0, 0})
+        Me.Numeric_MetaEvo_Numbergenerations.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.Numeric_MetaEvo_Numbergenerations.Name = "Numeric_MetaEvo_Numbergenerations"
+        Me.Numeric_MetaEvo_Numbergenerations.Size = New System.Drawing.Size(53, 20)
+        Me.Numeric_MetaEvo_Numbergenerations.TabIndex = 34
+        Me.Numeric_MetaEvo_Numbergenerations.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_MetaEvo_Numbergenerations.Value = New Decimal(New Integer() {1, 0, 0, 0})
+        '
+        'Combo_MetaEvo_Role
+        '
+        Me.Combo_MetaEvo_Role.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.Combo_MetaEvo_Role.FormattingEnabled = True
+        Me.Combo_MetaEvo_Role.Items.AddRange(New Object() {"Single PC", "Network Server", "Network Client"})
+        Me.Combo_MetaEvo_Role.Location = New System.Drawing.Point(103, 16)
+        Me.Combo_MetaEvo_Role.Name = "Combo_MetaEvo_Role"
+        Me.Combo_MetaEvo_Role.Size = New System.Drawing.Size(100, 21)
+        Me.Combo_MetaEvo_Role.TabIndex = 0
         '
         'TabPage_DDS
         '
-        Me.TabPage_DDS.BackColor = System.Drawing.Color.Transparent
+        Me.TabPage_DDS.BackColor = System.Drawing.SystemColors.Control
         Me.TabPage_DDS.Controls.Add(Me.CheckBox_DDS_ini)
-        Me.TabPage_DDS.Controls.Add(Me.Label11)
+        Me.TabPage_DDS.Controls.Add(Label11)
         Me.TabPage_DDS.Controls.Add(Me.Numeric_DDS_maxiter)
-        Me.TabPage_DDS.Controls.Add(Me.Label10)
+        Me.TabPage_DDS.Controls.Add(Label10)
         Me.TabPage_DDS.Controls.Add(Me.Numeric_DDS_r_val)
-        Me.TabPage_DDS.Controls.Add(Me.Label5)
+        Me.TabPage_DDS.Controls.Add(Label5)
         Me.TabPage_DDS.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_DDS.Name = "TabPage_DDS"
         Me.TabPage_DDS.Padding = New System.Windows.Forms.Padding(3)
         Me.TabPage_DDS.Size = New System.Drawing.Size(221, 668)
         Me.TabPage_DDS.TabIndex = 4
         Me.TabPage_DDS.Text = "DDS"
-        Me.TabPage_DDS.UseVisualStyleBackColor = True
         '
         'CheckBox_DDS_ini
         '
         Me.CheckBox_DDS_ini.AutoSize = True
         Me.CheckBox_DDS_ini.Checked = True
         Me.CheckBox_DDS_ini.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBox_DDS_ini.Location = New System.Drawing.Point(161, 75)
+        Me.CheckBox_DDS_ini.Location = New System.Drawing.Point(161, 66)
         Me.CheckBox_DDS_ini.Name = "CheckBox_DDS_ini"
         Me.CheckBox_DDS_ini.Size = New System.Drawing.Size(15, 14)
         Me.CheckBox_DDS_ini.TabIndex = 5
         Me.CheckBox_DDS_ini.UseVisualStyleBackColor = True
-        '
-        'Label11
-        '
-        Me.Label11.AutoSize = True
-        Me.Label11.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label11.Location = New System.Drawing.Point(6, 75)
-        Me.Label11.Name = "Label11"
-        Me.Label11.Size = New System.Drawing.Size(102, 13)
-        Me.Label11.TabIndex = 4
-        Me.Label11.Text = "random initial values"
         '
         'Numeric_DDS_maxiter
         '
@@ -1250,16 +1561,6 @@ Partial Class EVO_Einstellungen
         Me.Numeric_DDS_maxiter.TabIndex = 3
         Me.Numeric_DDS_maxiter.Value = New Decimal(New Integer() {100, 0, 0, 0})
         '
-        'Label10
-        '
-        Me.Label10.AutoSize = True
-        Me.Label10.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label10.Location = New System.Drawing.Point(6, 44)
-        Me.Label10.Name = "Label10"
-        Me.Label10.Size = New System.Drawing.Size(74, 13)
-        Me.Label10.TabIndex = 2
-        Me.Label10.Text = "max. iterations"
-        '
         'Numeric_DDS_r_val
         '
         Me.Numeric_DDS_r_val.DecimalPlaces = 3
@@ -1271,16 +1572,6 @@ Partial Class EVO_Einstellungen
         Me.Numeric_DDS_r_val.Size = New System.Drawing.Size(55, 20)
         Me.Numeric_DDS_r_val.TabIndex = 1
         Me.Numeric_DDS_r_val.Value = New Decimal(New Integer() {2, 0, 0, 65536})
-        '
-        'Label5
-        '
-        Me.Label5.AutoSize = True
-        Me.Label5.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label5.Location = New System.Drawing.Point(6, 16)
-        Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(149, 13)
-        Me.Label5.TabIndex = 0
-        Me.Label5.Text = "neighborhood pertubation size"
         '
         'GroupBox_Einstellungen
         '
@@ -1341,6 +1632,20 @@ Partial Class EVO_Einstellungen
         Me.TabPage_HookeJeeves.PerformLayout()
         CType(Me.Numeric_HJ_DeltaFinish, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.Numeric_HJ_DeltaStart, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.TabPage_MetaEvo.ResumeLayout(False)
+        Me.TabPage_MetaEvo.PerformLayout()
+        Me.GroupBox_MetaEvo_TransferOptions.ResumeLayout(False)
+        Me.GroupBox_MetaEvo_TransferOptions.PerformLayout()
+        CType(Me.Numeric_MetaEvo_NumberResults, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.GroupBox_MetaEvo_LocalOptions.ResumeLayout(False)
+        Me.GroupBox_MetaEvo_LocalOptions.PerformLayout()
+        CType(Me.Numeric_MetaEvo_HJStepsize, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.GroupBox_MetaEvo_MySQLOptions.ResumeLayout(False)
+        Me.GroupBox_MetaEvo_MySQLOptions.PerformLayout()
+        Me.GroupBox_MetaEvo_BasicOptions.ResumeLayout(False)
+        Me.GroupBox_MetaEvo_BasicOptions.PerformLayout()
+        CType(Me.Numeric_MetaEvo_PopulationSize, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.Numeric_MetaEvo_Numbergenerations, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabPage_DDS.ResumeLayout(False)
         Me.TabPage_DDS.PerformLayout()
         CType(Me.Numeric_DDS_maxiter, System.ComponentModel.ISupportInitialize).EndInit()
@@ -1374,51 +1679,62 @@ Partial Class EVO_Einstellungen
     Private WithEvents ComboOptPopEltern As System.Windows.Forms.ComboBox
     Private WithEvents ComboOptPopStrategie As System.Windows.Forms.ComboBox
     Private WithEvents ComboOptPopPenalty As System.Windows.Forms.ComboBox
+    Private WithEvents GroupBox_Einstellungen As System.Windows.Forms.GroupBox
     Private WithEvents TabPage_HookeJeeves As System.Windows.Forms.TabPage
     Private WithEvents Numeric_HJ_DeltaFinish As System.Windows.Forms.NumericUpDown
     Private WithEvents Numeric_HJ_DeltaStart As System.Windows.Forms.NumericUpDown
     Private WithEvents CheckBox_HJ_DNVektor As System.Windows.Forms.CheckBox
     Private WithEvents TabPage_PES As System.Windows.Forms.TabPage
-    Friend WithEvents CheckisTournamentSelection As System.Windows.Forms.CheckBox
-    Friend WithEvents ComboOptDnMutation As System.Windows.Forms.ComboBox
-    Friend WithEvents Label_CES_OptModus As System.Windows.Forms.Label
-    Friend WithEvents Combo_CES_Selection As System.Windows.Forms.ComboBox
-    Friend WithEvents Combo_CES_IniValues As System.Windows.Forms.ComboBox
-    Friend WithEvents Combo_CES_Reproduction As System.Windows.Forms.ComboBox
-    Friend WithEvents Combo_CES_Mutation As System.Windows.Forms.ComboBox
-    Friend WithEvents GroupBoxCES As System.Windows.Forms.GroupBox
-    Friend WithEvents Numeric_CES_n_childs As System.Windows.Forms.NumericUpDown
-    Friend WithEvents Numeric_CES_n_Parents As System.Windows.Forms.NumericUpDown
-    Friend WithEvents Numeric_CES_n_Generations As System.Windows.Forms.NumericUpDown
+    Private WithEvents CheckisTournamentSelection As System.Windows.Forms.CheckBox
+    Private WithEvents ComboOptDnMutation As System.Windows.Forms.ComboBox
+    Private WithEvents Label_CES_OptModus As System.Windows.Forms.Label
+    Private WithEvents Combo_CES_Selection As System.Windows.Forms.ComboBox
+    Private WithEvents Combo_CES_IniValues As System.Windows.Forms.ComboBox
+    Private WithEvents Combo_CES_Reproduction As System.Windows.Forms.ComboBox
+    Private WithEvents Combo_CES_Mutation As System.Windows.Forms.ComboBox
+    Private WithEvents GroupBoxCES As System.Windows.Forms.GroupBox
+    Private WithEvents Numeric_CES_n_childs As System.Windows.Forms.NumericUpDown
+    Private WithEvents Numeric_CES_n_Parents As System.Windows.Forms.NumericUpDown
+    Private WithEvents Numeric_CES_n_Generations As System.Windows.Forms.NumericUpDown
     Private WithEvents Numeric_CES_n_member_SecPop As System.Windows.Forms.NumericUpDown
     Private WithEvents Numeric_CES_n_exchange_SecPop As System.Windows.Forms.NumericUpDown
     Private WithEvents Label_CES_NMembersSecPop As System.Windows.Forms.Label
-    Friend WithEvents GroupBox_CES_Hybrid As System.Windows.Forms.GroupBox
+    Private WithEvents GroupBox_CES_Hybrid As System.Windows.Forms.GroupBox
     Private WithEvents Numeric_CES_MutRate As System.Windows.Forms.NumericUpDown
-    Friend WithEvents Combo_CES_HybridType As System.Windows.Forms.ComboBox
+    Private WithEvents Combo_CES_HybridType As System.Windows.Forms.ComboBox
     Private WithEvents Numeric_CES_n_member_SecPop_PES As System.Windows.Forms.NumericUpDown
     Private WithEvents Numeric_CES_NExchange_SecPop_PES As System.Windows.Forms.NumericUpDown
-    Friend WithEvents CheckBox_CES_UseSecPop_PES As System.Windows.Forms.CheckBox
-    Friend WithEvents CheckBox_CES_UseSecPop_CES As System.Windows.Forms.CheckBox
-    Friend WithEvents Combo_CES_MemStrategy As System.Windows.Forms.ComboBox
+    Private WithEvents CheckBox_CES_UseSecPop_PES As System.Windows.Forms.CheckBox
+    Private WithEvents CheckBox_CES_UseSecPop_CES As System.Windows.Forms.CheckBox
+    Private WithEvents TabPage_CES As System.Windows.Forms.TabPage
+    Private WithEvents Combo_CES_MemStrategy As System.Windows.Forms.ComboBox
     Private WithEvents Numeric_CES_n_MemSize As System.Windows.Forms.NumericUpDown
     Private WithEvents GroupBox_SekPop As System.Windows.Forms.GroupBox
     Private WithEvents GroupBox_Eltern As System.Windows.Forms.GroupBox
     Private WithEvents CheckBox_isSekPopBegrenzung As System.Windows.Forms.CheckBox
     Private WithEvents CheckBox_CES_isSecPopRestriction As System.Windows.Forms.CheckBox
-    Friend WithEvents GroupBox_CES_SecPop As System.Windows.Forms.GroupBox
+    Private WithEvents GroupBox_CES_SecPop As System.Windows.Forms.GroupBox
     Private WithEvents CheckBox_CES_RealOptimisation As System.Windows.Forms.CheckBox
     Private WithEvents LabelAnzEltern As System.Windows.Forms.Label
     Private WithEvents CheckBox_CES_StartPESPop As System.Windows.Forms.CheckBox
-    Private WithEvents GroupBox_Einstellungen As System.Windows.Forms.GroupBox
-    Private WithEvents TabPage_CES As System.Windows.Forms.TabPage
-    Private WithEvents TabPage_Hybrid2008 As System.Windows.Forms.TabPage
-    Private WithEvents TabControl1 As System.Windows.Forms.TabControl
-    Friend WithEvents TabPage_DDS As System.Windows.Forms.TabPage
-    Friend WithEvents Label5 As System.Windows.Forms.Label
-    Friend WithEvents Label10 As System.Windows.Forms.Label
-    Friend WithEvents Numeric_DDS_r_val As System.Windows.Forms.NumericUpDown
-    Friend WithEvents Label11 As System.Windows.Forms.Label
-    Friend WithEvents Numeric_DDS_maxiter As System.Windows.Forms.NumericUpDown
-    Friend WithEvents CheckBox_DDS_ini As System.Windows.Forms.CheckBox
+    Public WithEvents TabControl1 As System.Windows.Forms.TabControl
+    Private WithEvents Combo_MetaEvo_Role As System.Windows.Forms.ComboBox
+    Private WithEvents Numeric_MetaEvo_Numbergenerations As System.Windows.Forms.NumericUpDown
+    Private WithEvents GroupBox_MetaEvo_BasicOptions As System.Windows.Forms.GroupBox
+    Private WithEvents Numeric_MetaEvo_PopulationSize As System.Windows.Forms.NumericUpDown
+    Private WithEvents GroupBox_MetaEvo_MySQLOptions As System.Windows.Forms.GroupBox
+    Private WithEvents TextBox_MetaEvo_MySQL_Password As System.Windows.Forms.TextBox
+    Private WithEvents TextBox_MetaEvo_MySQL_User As System.Windows.Forms.TextBox
+    Private WithEvents TextBox_MetaEvo_MySQL_Host As System.Windows.Forms.TextBox
+    Private WithEvents TextBox_MetaEvo_MySQL_DB As System.Windows.Forms.TextBox
+    Private WithEvents TabPage_MetaEvo As System.Windows.Forms.TabPage
+    Private WithEvents Combo_MetaEvo_OpMode As System.Windows.Forms.ComboBox
+    Private WithEvents GroupBox_MetaEvo_LocalOptions As System.Windows.Forms.GroupBox
+    Private WithEvents Numeric_MetaEvo_HJStepsize As System.Windows.Forms.NumericUpDown
+    Private WithEvents GroupBox_MetaEvo_TransferOptions As System.Windows.Forms.GroupBox
+    Private WithEvents Numeric_MetaEvo_NumberResults As System.Windows.Forms.NumericUpDown
+    Private WithEvents TabPage_DDS As System.Windows.Forms.TabPage
+    Private WithEvents Numeric_DDS_r_val As System.Windows.Forms.NumericUpDown
+    Private WithEvents Numeric_DDS_maxiter As System.Windows.Forms.NumericUpDown
+    Private WithEvents CheckBox_DDS_ini As System.Windows.Forms.CheckBox
 End Class

@@ -37,8 +37,10 @@ Partial Public Class SolutionDialog
     Public Event ClearClicked()
 
 
-    'Konstruktor
-    '***********
+    ''' <summary>
+    ''' Konstruktor
+    ''' </summary>
+    ''' <param name="prob">Das Problem</param>
     Public Sub New(ByRef prob As EVO.Common.Problem)
 
         ' Dieser Aufruf ist für den Windows Form-Designer erforderlich.
@@ -128,26 +130,17 @@ Partial Public Class SolutionDialog
 
     End Sub
 
-    'Ein Individuum als Lösung hinzufügen
-    '************************************
-    Public Overloads Sub addSolution(ByVal ind As Common.Individuum)
+    ''' <summary>
+    ''' Ein Individuum zur Lösungsauswahl hinzufügen
+    ''' </summary>
+    ''' <param name="ind">das ausgewählte Individuum</param>
+    Public Sub addSolution(ByVal ind As Common.Individuum)
 
-        'Fallunterscheidung je nach Individuumstyp
-        If (TypeOf (ind) Is Common.Individuum_PES) Then
-            Call Me.addSolution(CType(ind, Common.Individuum_PES))
-
-        ElseIf (TypeOf (ind) Is Common.Individuum_CES) Then
-            Call Me.addSolution(CType(ind, Common.Individuum_CES))
-
-        Else
-            MsgBox("SolutionDialog.addSolution():" & EVO.Common.eol & "Für Individuum vom Typ '" & ind.GetType.ToString() & "' nicht implementiert!", MsgBoxStyle.Critical)
+        'Sonderfall CES-Individuum
+        If (TypeOf ind Is EVO.Common.Individuum_CES) Then
+            Call Me.addSolution_CES(CType(ind, EVO.Common.Individuum_CES))
+            Exit Sub
         End If
-
-    End Sub
-
-    'Ein PES-Individuum als Lösung hinzufügen
-    '****************************************
-    Private Overloads Sub addSolution(ByVal ind As Common.Individuum_PES)
 
         Dim i As Integer
         Dim cellvalues() As Object
@@ -192,9 +185,11 @@ Partial Public Class SolutionDialog
 
     End Sub
 
-    'Ein CES-Individuum als Lösung hinzufügen
-    '****************************************
-    Private Overloads Sub addSolution(ByVal ind As Common.Individuum_CES)
+    ''' <summary>
+    ''' Ein CES-Individuum zur Lösungsauswahl hinzufügen
+    ''' </summary>
+    ''' <param name="ind">das ausgewählte CES-Individuum</param>
+    Private Sub addSolution_CES(ByVal ind As Common.Individuum_CES)
 
         Dim i As Integer
         Dim cellvalues() As Object

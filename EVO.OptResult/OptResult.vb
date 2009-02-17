@@ -113,15 +113,11 @@ Public Class OptResult
         Me.Solutions(Me.Solutions.GetUpperBound(0)) = Ind.Clone()
 
         'In DB speichern:
-        'Fallunterscheidung je nach Individuumstyp
-        If (TypeOf (Ind) Is Common.Individuum_PES) Then
-            Call Me.db_insert(CType(Ind, Common.Individuum_PES))
-
-        ElseIf (TypeOf (Ind) Is Common.Individuum_CES) Then
+        'Sonderfall für Individuum_CES:
+        If (TypeOf (Ind) Is Common.Individuum_CES) Then
             Call Me.db_insert(CType(Ind, Common.Individuum_CES))
-
         Else
-            MsgBox("OptResult.db_insert():" & EVO.Common.eol & "Für Individuum vom Typ '" & Ind.GetType.ToString() & "' nicht implementiert!", MsgBoxStyle.Critical)
+            Call Me.db_insert(Ind)
         End If
 
     End Sub
@@ -281,7 +277,7 @@ Public Class OptResult
         Call Me.db_prepare()
         'Methodenspezifische Anpassungen
         Select Case Me.mProblem.Method
-            Case EVO.Common.METH_PES, EVO.Common.METH_SENSIPLOT, EVO.Common.METH_HOOKJEEVES, EVO.Common.METH_DDS
+            Case EVO.Common.METH_PES, EVO.Common.METH_MetaEvo, EVO.Common.METH_SENSIPLOT, EVO.Common.METH_HOOKJEEVES, EVO.Common.METH_DDS
                 Call Me.db_prepare_PES()
             Case EVO.Common.METH_CES
                 Call Me.db_prepare_CES()
@@ -415,7 +411,7 @@ Public Class OptResult
 
     'Eine PES-Lösung in die ErgebnisDB schreiben
     '*******************************************
-    Private Overloads Function db_insert(ByVal ind As Common.Individuum_PES) As Boolean
+    Private Overloads Function db_insert(ByVal ind As Common.Individuum) As Boolean
 
         Call db_connect()
 
@@ -680,7 +676,7 @@ Public Class OptResult
             Me.db_path = sourceFile
 
             Select Case Me.mProblem.Method
-                Case EVO.Common.METH_PES, EVO.Common.METH_HOOKJEEVES, EVO.Common.METH_SENSIPLOT
+                Case EVO.Common.METH_PES, EVO.Common.METH_HOOKJEEVES, EVO.Common.METH_SENSIPLOT, EVO.Common.METH_MetaEvo
                     Call db_getIndividuen_PES()
 
                 Case EVO.Common.METH_CES, EVO.Common.METH_HYBRID

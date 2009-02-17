@@ -123,6 +123,10 @@
       <Project>{1DBD183A-A900-4841-88FE-6258FD472C60}</Project>
       <Name>IController</Name>
     </ProjectReference>
+    <ProjectReference Include="..\EVO.Algos\MetaEvo\MetaEvo.csproj">
+      <Project>{85403900-E545-4122-B1A0-8C30AE0D0F3C}</Project>
+      <Name>MetaEvo</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EVO.Apps\EVO.Apps.vbproj">
       <Project>{2DCFE99E-CBFE-4CCC-93E7-A6D628B16DEC}</Project>
       <Name>EVO.Apps</Name>
@@ -218,6 +222,7 @@
       <DependentUpon>Form1.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="My Project\licenses.licx" />
     <EmbeddedResource Include="My Project\Resources.resx">
       <SubType>Designer</SubType>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
