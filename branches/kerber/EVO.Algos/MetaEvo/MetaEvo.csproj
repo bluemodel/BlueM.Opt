@@ -96,6 +96,17 @@
     <None Include="MySql.Data.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="viewer\index.php" />
+    <None Include="viewer\library\dbconnect.php" />
+    <None Include="viewer\library\dbwork.php" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="viewer\css\style.css" />
+    <Content Include="viewer\pictures\calculate.jpg" />
+    <Content Include="viewer\pictures\false.jpg" />
+    <Content Include="viewer\pictures\raw.jpg" />
+    <Content Include="viewer\pictures\true.jpg" />
+    <Content Include="viewer\README.TXT" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
