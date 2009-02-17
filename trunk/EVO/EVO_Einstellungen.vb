@@ -72,6 +72,7 @@ Public Class EVO_Einstellungen
         Call Me.msettings.PES.setStandard(EVO_MODUS.Single_Objective)
         Call Me.msettings.CES.setStandard(METH_CES)
         Call Me.msettings.HookJeeves.setStandard()
+        Call Me.msettings.MetaEvo.setStandard()
         Call Me.msettings.DDS.setStandard()
 
     End Sub
@@ -154,15 +155,16 @@ Public Class EVO_Einstellungen
                 Call Me.setStandard_CES()
                 Call Me.setStandard_PES(Me.mProblem.Modus)
 
-            Case METH_Hybrid2008
+            Case METH_MetaEvo
 
                 'EVO_Einstellungen aktivieren
                 Me.Enabled = True
 
                 'Tabpage anzeigen
-                Me.TabControl1.TabPages.Add(Me.TabPage_Hybrid2008)
+                Me.TabControl1.TabPages.Add(Me.TabPage_MetaEvo)
 
-                'TODO: Standardwerte für METH_Hybrid2008 setzen
+                'Standardeinstellungen setzen
+                Call Me.setStandard_MetaEvo()
 
             Case Else
 
@@ -436,6 +438,23 @@ Public Class EVO_Einstellungen
 
         End With
 
+        'MetaEvo
+        '----------------
+        With Me.msettings.MetaEvo
+
+            .Role = Me.Combo_MetaEvo_Role.SelectedItem
+            .OpMode = Me.Combo_MetaEvo_OpMode.SelectedItem
+            .NumberGenerations = Me.Numeric_MetaEvo_Numbergenerations.Value
+            .PopulationSize = Me.Numeric_MetaEvo_PopulationSize.Value
+            .Numberresults = Me.Numeric_MetaEvo_NumberResults.Value
+            .HJStepsize = Me.Numeric_MetaEvo_HJStepsize.Value
+            .MySQL_Host = Me.TextBox_MetaEvo_MySQL_Host.Text
+            .MySQL_Database = Me.TextBox_MetaEvo_MySQL_DB.Text
+            .MySQL_User = Me.TextBox_MetaEvo_MySQL_User.Text
+            .MySQL_Password = Me.TextBox_MetaEvo_MySQL_Password.Text
+
+        End With
+
         With Me.msettings.DDS
 
             .maxiter = Me.Numeric_DDS_maxiter.Value
@@ -580,6 +599,23 @@ Public Class EVO_Einstellungen
 
         End With
 
+        'MetaEvo
+        '---------------
+        With Me.msettings.MetaEvo
+
+            Me.Combo_MetaEvo_Role.SelectedItem = .Role
+            Me.Combo_MetaEvo_OpMode.SelectedItem = .OpMode
+            Me.Numeric_MetaEvo_PopulationSize.Value = .PopulationSize
+            Me.Numeric_MetaEvo_Numbergenerations.Value = .NumberGenerations
+            Me.Numeric_MetaEvo_NumberResults.Value = .Numberresults
+            Me.Numeric_MetaEvo_HJStepsize.Value = .HJStepsize
+            Me.TextBox_MetaEvo_MySQL_Host.Text = .MySQL_Host
+            Me.TextBox_MetaEvo_MySQL_DB.Text = .MySQL_Database
+            Me.TextBox_MetaEvo_MySQL_User.Text = .MySQL_User
+            Me.TextBox_MetaEvo_MySQL_Password.Text = .MySQL_Password
+
+        End With
+
         'DDS
         '---------------
         With Me.msettings.DDS
@@ -644,6 +680,13 @@ Public Class EVO_Einstellungen
     '***********************************
     Public Sub setStandard_HJ()
         Call Me.msettings.HookJeeves.setStandard()
+        Call Me.writeForm()
+    End Sub
+
+    'Standardeinstellungen setzen für MetaEVO
+    '****************************************
+    Public Sub setStandard_MetaEvo()
+        Call Me.msettings.MetaEvo.setStandard()
         Call Me.writeForm()
     End Sub
 
@@ -715,6 +758,41 @@ Public Class EVO_Einstellungen
 
 #End Region 'Schnittstelle
 
+
+    'MetaEvo: Voreinstellungen des Formulars aufgrund der Wahl der Rolle
+    Private Sub Combo_Hybrid_Role_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Combo_MetaEvo_Role.SelectedIndexChanged
+        If (Me.Combo_MetaEvo_Role.SelectedItem = "Single PC") Then
+            Me.Combo_MetaEvo_OpMode.Enabled = True
+            Combo_MetaEvo_OpMode_SelectedIndexChanged(sender, e)
+            Me.GroupBox_MetaEvo_MySQLOptions.Enabled = False
+        ElseIf (Me.Combo_MetaEvo_Role.SelectedItem = "Network Client") Then
+            Me.Combo_MetaEvo_OpMode.Enabled = False
+            Me.GroupBox_MetaEvo_BasicOptions.Enabled = False
+            Me.GroupBox_MetaEvo_TransferOptions.Enabled = False
+            Me.GroupBox_MetaEvo_LocalOptions.Enabled = False
+            Me.GroupBox_MetaEvo_MySQLOptions.Enabled = True
+        ElseIf (Me.Combo_MetaEvo_Role.SelectedItem = "Network Server") Then
+            Me.Combo_MetaEvo_OpMode.Enabled = True
+            Combo_MetaEvo_OpMode_SelectedIndexChanged(sender, e)
+            Me.GroupBox_MetaEvo_MySQLOptions.Enabled = True
+        End If
+    End Sub
+
+    Private Sub Combo_MetaEvo_OpMode_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Combo_MetaEvo_OpMode.SelectedIndexChanged
+        If (Me.Combo_MetaEvo_OpMode.SelectedItem = "Both") Then
+            Me.GroupBox_MetaEvo_BasicOptions.Enabled = True
+            Me.GroupBox_MetaEvo_TransferOptions.Enabled = True
+            Me.GroupBox_MetaEvo_LocalOptions.Enabled = True
+        ElseIf (Me.Combo_MetaEvo_OpMode.SelectedItem = "Global Optimizer") Then
+            Me.GroupBox_MetaEvo_BasicOptions.Enabled = True
+            Me.GroupBox_MetaEvo_TransferOptions.Enabled = True
+            Me.GroupBox_MetaEvo_LocalOptions.Enabled = False
+        ElseIf (Me.Combo_MetaEvo_OpMode.SelectedItem = "Local Optimizer") Then
+            Me.GroupBox_MetaEvo_BasicOptions.Enabled = False
+            Me.GroupBox_MetaEvo_TransferOptions.Enabled = True
+            Me.GroupBox_MetaEvo_LocalOptions.Enabled = True
+        End If
+    End Sub
 #End Region 'Methoden
 
 End Class
