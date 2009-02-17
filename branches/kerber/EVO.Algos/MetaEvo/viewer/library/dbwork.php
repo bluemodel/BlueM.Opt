@@ -43,7 +43,7 @@ function dbdelete($table,$vergleich,$debug) {
 
 function dbgetselected($table, $vergleich, $dbkey, $debug) {
 	$ask= "SELECT * FROM ".$table." WHERE ".$vergleich;
-	$content[info][eintrage] = 0;
+	$content['info']['eintrage'] = 0;
 	
 	$do = mysql_query($ask);
 	$index = 0;
@@ -53,7 +53,7 @@ function dbgetselected($table, $vergleich, $dbkey, $debug) {
 			else $content[$row->$dbkey][$key] = $value;	
 		}
 		$index++;
-		$content[info][eintrage]++;
+		$content['info']['eintrage']++;
 	}
 	if ($debug) {
 		echo"<br /><br />Das bekommt dbgetselected: ".$ask;

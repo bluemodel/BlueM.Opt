@@ -23,11 +23,11 @@ echo"
     <th scope=\"col\">Eigenschaft</th>
     <th scope=\"col\">Wert</th>
   </tr>";
-  for ($tmp = 0; $tmp < $infos[info][eintrage]+1; $tmp++) {
+  for ($tmp = 0; $tmp < $infos['info']['eintrage']+1; $tmp++) {
 	  echo"
 	  <tr>
-		<td scope=\"col\">".$infos[$tmp][bezeichnung]."</td>
-		<td scope=\"col\">".$infos[$tmp][wert]."</td>
+		<td scope=\"col\">".$infos[$tmp]['bezeichnung']."</td>
+		<td scope=\"col\">".$infos[$tmp]['wert']."</td>
 	  </tr>";
   }
   echo"
@@ -44,9 +44,9 @@ echo"
     <th scope=\"col\">Timestamp</th>
   </tr>
   <tr>
-    <td scope=\"col\">".$network[0][ipName]."</td>
-    <td scope=\"col\">".$network[0][status]."</td>
-    <td scope=\"col\">".$network[0][timestamp]."</td>
+    <td scope=\"col\">".$network[0]['ipName']."</td>
+    <td scope=\"col\">".$network[0]['status']."</td>
+    <td scope=\"col\">".$network[0]['timestamp']."</td>
   </tr>
 </table><br />";
 
@@ -54,8 +54,8 @@ $network = dbgetselected("metaevo_network", "type = 'client' ORDER BY ipName", "
 
 //Individuen zählen und durchsuchen
 $individuums = dbgetselected("metaevo_individuums", "true = true", "", false);
-for ($tmp = 0; $tmp < $individuums[info][eintrage]; $tmp++) {
-	$pictures[$individuums[$tmp][ipName]] .= "<img src=\"pictures/".$individuums[$tmp][status].".jpg\" width=\"20\" height=\"20\" />";
+for ($tmp = 0; $tmp < $individuums['info']['eintrage']; $tmp++) {
+	$pictures[$individuums[$tmp]['ipName]'] .= "<img src=\"pictures/".$individuums[$tmp]['status'].".jpg\" width=\"20\" height=\"20\" />";
 }
 
 echo"
@@ -71,16 +71,16 @@ echo"
 	<th width=\"600\" scope=\"col\"></th>
   </tr>";
   
-  for ($tmp = 0; $tmp < $network[info][eintrage]; $tmp++) {
+  for ($tmp = 0; $tmp < $network['info']['eintrage']; $tmp++) {
 	  echo"
 	  <tr>
-		<td scope=\"col\">".$network[$tmp][ipName]."</td>
-		<td scope=\"col\">".$network[$tmp][status]."</td>
-		<td scope=\"col\">".$network[$tmp][timestamp]."</td>
-		<td scope=\"col\">".$network[$tmp][speed_av]."</td>
-		<td scope=\"col\">".$network[$tmp][speed_low]."</td>
-		<td scope=\"col\">".(substr_count($pictures[$network[$tmp][ipName]],"true")+(substr_count($pictures[$network[$tmp][ipName]],"false")))." / ".substr_count($pictures[$network[$tmp][ipName]],"<img")." / ".$individuums[info][eintrage]."</td>
-		<td scope=\"col\">".$pictures[$network[$tmp][ipName]]."</td>
+		<td scope=\"col\">".$network[$tmp]['ipName']."</td>
+		<td scope=\"col\">".$network[$tmp]['status']."</td>
+		<td scope=\"col\">".$network[$tmp]['timestamp']."</td>
+		<td scope=\"col\">".$network[$tmp]['speed_av']."</td>
+		<td scope=\"col\">".$network[$tmp]['speed_low']."</td>
+		<td scope=\"col\">".(substr_count($pictures[$network[$tmp]['ipName']],"true")+(substr_count($pictures[$network[$tmp]['ipName']],"false")))." / ".substr_count($pictures[$network[$tmp]['ipName']],"<img")." / ".$individuums['info']['eintrage']."</td>
+		<td scope=\"col\">".$pictures[$network[$tmp]['ipName']]."</td>
 	  </tr>";
   }
   
