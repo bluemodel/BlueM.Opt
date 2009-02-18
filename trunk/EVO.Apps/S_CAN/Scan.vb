@@ -135,11 +135,11 @@ Public Class Scan
 
     End Function
 
-    Public Overrides Function launchFree(ByRef Thread_ID As Integer) As Boolean
+    Public Overrides Function ThreadFree(ByRef Thread_ID As Integer) As Boolean
 
     End Function
 
-    Public Overrides Function launchReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
+    Public Overrides Function ThreadReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
 
     End Function
 

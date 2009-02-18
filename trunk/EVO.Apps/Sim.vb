@@ -478,7 +478,7 @@ Public MustInherit Class Sim
         System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
 
         Do
-            If (Me.launchFree(ThreadID_Free) _
+            If (Me.ThreadFree(ThreadID_Free) _
                 And (n_ind_Run < n_individuals) _
                 And (n_ind_Ready + Me.n_Threads > n_ind_Run) _
                 And Me.isPause = False) Then
@@ -522,7 +522,7 @@ Public MustInherit Class Sim
 
                 n_ind_Run += 1
 
-            ElseIf (Me.launchReady(ThreadID_Ready, SIM_Eval_is_OK, n_ind_Ready) = True _
+            ElseIf (Me.ThreadReady(ThreadID_Ready, SIM_Eval_is_OK, n_ind_Ready) = True _
                     And SIM_Eval_is_OK) Then
                 'Falls Simulation fertig und erfolgreich
                 '---------------------------------------
@@ -550,7 +550,7 @@ Public MustInherit Class Sim
 
                 n_ind_Ready += 1
 
-            ElseIf (Me.launchReady(ThreadID_Ready, SIM_Eval_is_OK, n_ind_Ready) = False _
+            ElseIf (Me.ThreadReady(ThreadID_Ready, SIM_Eval_is_OK, n_ind_Ready) = False _
                     And SIM_Eval_is_OK = False) Then
                 'Falls Simulation fertig aber nicht erfolgreich
                 '----------------------------------------------
@@ -796,8 +796,8 @@ Handler:
     Public MustOverride Overloads Function launchSim() As Boolean
     'mit Threads:
     Public MustOverride Overloads Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
-    Public MustOverride Function launchFree(ByRef Thread_ID As Integer) As Boolean
-    Public MustOverride Function launchReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
+    Public MustOverride Function ThreadFree(ByRef Thread_ID As Integer) As Boolean
+    Public MustOverride Function ThreadReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
 
 
     'Simulationsergebnis einlesen
