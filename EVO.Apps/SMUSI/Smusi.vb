@@ -241,11 +241,11 @@ Public Class Smusi
         Return Me.launchSim()
     End Function
 
-    Public Overrides Function launchFree(ByRef Thread_ID As Integer) As Boolean
+    Public Overrides Function ThreadFree(ByRef Thread_ID As Integer) As Boolean
         Return True
     End Function
 
-    Public Overrides Function launchReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
+    Public Overrides Function ThreadReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
         Return True
     End Function
 

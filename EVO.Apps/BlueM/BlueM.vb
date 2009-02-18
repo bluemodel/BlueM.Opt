@@ -321,12 +321,12 @@ Public Class BlueM
 
     'Gibt zurück ob ein beliebiger Thread beendet ist und ibt die ID diesen freien Threads zurück
     '********************************************************************************************
-    Public Overrides Function launchFree(ByRef Thread_ID As Integer) As Boolean
-        launchFree = False
+    Public Overrides Function ThreadFree(ByRef Thread_ID As Integer) As Boolean
+        ThreadFree = False
 
         For Each Thr_C As BlueMThread In MyBlueMThreads
             If Thr_C.Sim_Is_OK = True And Thr_C.get_Child_ID = -1 Then
-                launchFree = True
+                ThreadFree = True
                 Thread_ID = Thr_C.get_Thread_ID
                 Exit For
             End If
@@ -402,12 +402,12 @@ Public Class BlueM
     'Prüft ob des aktuelle Child mit der ID die oben übergeben wurde fertig ist
     'Gibt die Thread ID zurück um zum auswerten in das Arbeitsverzeichnis zu wechseln
     '********************************************************************************
-    Public Overrides Function launchReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
-        launchReady = False
+    Public Overrides Function ThreadReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
+        ThreadReady = False
 
         For Each Thr_C As BlueMThread In MyBlueMThreads
             If Thr_C.launch_Ready = True And Thr_C.get_Child_ID = Child_ID Then
-                launchReady = True
+                ThreadReady = True
                 SimIsOK = Thr_C.Sim_Is_OK
                 Thread_ID = Thr_C.get_Thread_ID
                 MyThreads(Thread_ID).Join()
