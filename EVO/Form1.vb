@@ -741,7 +741,7 @@ Partial Class Form1
 
     Private Sub STARTEN_Button_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Button_Start.Click
 
-        If (Me.isrun And Not Me.ispause) Then
+        'Stoppuhr        Dim OptTime As New Stopwatch        OptTime.Start()        'Der Controller        Dim controller As EVO.IController        If (Me.isrun And Not Me.ispause) Then
             'Optimierung pausieren
             '---------------------
             Me.ispause = True
@@ -881,6 +881,10 @@ Partial Class Form1
             Me.Button_Start.Enabled = False
 
         End If
+
+        OptTime.Stop()
+
+        MessageBox.Show("Die Optimierung dauerte:   " & OptTime.Elapsed.Hours & "h  " & OptTime.Elapsed.Minutes & "m  " & OptTime.Elapsed.Seconds & "s     " & OptTime.Elapsed.Seconds & "ms")
 
     End Sub
 
@@ -1826,11 +1830,11 @@ Partial Class Form1
         LogCPU = Environment.ProcessorCount
 
         If LogCPU = 1 Then
-            n_Threads = 3
-        ElseIf LogCPU = 2 Then
             n_Threads = 4
+        ElseIf LogCPU = 2 Then
+            n_Threads = 5
         ElseIf LogCPU = 4 Then
-            n_Threads = 7
+            n_Threads = 9
         End If
 
         Return n_Threads

@@ -28,15 +28,15 @@ Public Structure Struct_ModellParameter
     ''' <summary>
     ''' Zeile, in der sich der Modellparameter befindet (gezählt vom Dateianfang der Eingabedatei) 
     ''' </summary>
-    Public ZeileNr As Short
+    Public ZeileNr As Integer
     ''' <summary>
     ''' Spalte, ab der der Modellparameter in der Eingabedatei definiert ist
     ''' </summary>
-    Public SpVon As Short
+    Public SpVon As Integer
     ''' <summary>
     ''' Spalte, bis zu welcher der Modellparameter in der Eingabedatei definiert ist
     ''' </summary>
-    Public SpBis As Short
+    Public SpBis As Integer
     ''' <summary>
     ''' Faktor fuer das Umrechnen zwischen OptParameter und ModellParameter
     ''' </summary>

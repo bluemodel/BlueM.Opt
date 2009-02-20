@@ -270,13 +270,13 @@ Public Class PES
         If (mSettings.PES.OptModus = EVO_MODUS.Multi_Objective) Then
             For n = 0 To mSettings.PES.Pop.n_Popul - 1
                 For m = 0 To Me.mProblem.NumPrimObjective - 1
-                    Select Case mSettings.PES.Pop.OptPopPrimObjective
+                    Select Case mSettings.PES.Pop.OptPopPenalty
 
-                        Case EVO_POP_PRIMOBJECTIVE.Crowding
+                        Case EVO_POP_PENALTY.Crowding
                             'Qualität der Populationseltern wird auf sehr großen Wert gesetzt
                             Qbpop(n, m) = 1.0E+300
 
-                        Case EVO_POP_PRIMOBJECTIVE.Spannweite
+                        Case EVO_POP_PENALTY.Spannweite
                             'Qualität der Populationseltern wird auf 0 gesetzt
                             Qbpop(n, m) = 0
                     End Select
@@ -1150,15 +1150,15 @@ Public Class PES
                     i = m
                 End If
             Else
-                Select Case mSettings.PES.Pop.OptPopPrimObjective
+                Select Case mSettings.PES.Pop.OptPopPenalty
 
-                    Case EVO_POP_PRIMOBJECTIVE.Crowding
+                    Case EVO_POP_PENALTY.Crowding
                         If Qbpop(m, 0) > h1 Then
                             h1 = Qbpop(m, 0)
                             i = m
                         End If
 
-                    Case EVO_POP_PRIMOBJECTIVE.Spannweite
+                    Case EVO_POP_PENALTY.Spannweite
                         If Qbpop(m, 0) < h1 Then
                             h2 = Qbpop(m, 1)
                             i = m
@@ -1206,9 +1206,9 @@ Public Class PES
                 Next m
             End If
         Else
-            Select Case mSettings.PES.Pop.OptPopPrimObjective
+            Select Case mSettings.PES.Pop.OptPopPenalty
 
-                Case EVO_POP_PRIMOBJECTIVE.Crowding
+                Case EVO_POP_PENALTY.Crowding
                     If h1 < Qbpop(i, 0) Then
                         Qbpop(i, 0) = h1
                         For m = 0 To Me.mProblem.NumParams - 1
@@ -1221,7 +1221,7 @@ Public Class PES
                         Next m
                     End If
 
-                Case EVO_POP_PRIMOBJECTIVE.Spannweite
+                Case EVO_POP_PENALTY.Spannweite
                     If h2 > Qbpop(j, 1) Then
                         Qbpop(j, 1) = h2
                         For m = 0 To Me.mProblem.NumParams - 1
@@ -1324,10 +1324,10 @@ Public Class PES
         Dim Realisierungsspeicher(,) As Double
         Dim Z As Integer
 
-        Select Case mSettings.PES.Pop.OptPopPrimObjective
-            Case EVO_POP_PRIMOBJECTIVE.Crowding
+        Select Case mSettings.PES.Pop.OptPopPenalty
+            Case EVO_POP_PENALTY.Crowding
                 Z = 0
-            Case EVO_POP_PRIMOBJECTIVE.Spannweite
+            Case EVO_POP_PENALTY.Spannweite
                 Z = 1
         End Select
 
@@ -1358,9 +1358,9 @@ Public Class PES
         Else
             'Multi-Objective mit Paretofront
             '-------------------------------
-            Select Case mSettings.PES.Pop.OptPopPrimObjective
+            Select Case mSettings.PES.Pop.OptPopPenalty
 
-                Case EVO_POP_PRIMOBJECTIVE.Crowding
+                Case EVO_POP_PENALTY.Crowding
                     For m = 0 To mSettings.PES.Pop.n_Popul - 1
                         For n = m To mSettings.PES.Pop.n_Popul - 1
                             If Realisierungsspeicher(m, 0) > Realisierungsspeicher(n, 0) Then
@@ -1374,7 +1374,7 @@ Public Class PES
                         Next
                     Next
 
-                Case EVO_POP_PRIMOBJECTIVE.Spannweite
+                Case EVO_POP_PENALTY.Spannweite
                     For m = 0 To mSettings.PES.Pop.n_Popul - 1
                         For n = m To mSettings.PES.Pop.n_Popul - 1
                             If Realisierungsspeicher(m, 0) < Realisierungsspeicher(n, 0) Then

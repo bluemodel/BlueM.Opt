@@ -76,7 +76,7 @@ Public Class EVO_Settings
             Public n_PopEltern As Integer               'Anzahl Populationseltern
             Public OptPopEltern As EVO_POP_ELTERN       'Ermittlung der Populationseltern
             Public OptPopStrategie As EVO_STRATEGIE     'Typ der Evolutionsstrategie (+ oder ,) auf Populationsebene
-            Public OptPopPrimObjective As EVO_POP_PRIMOBJECTIVE     'Art der Beurteilung der Populationsgüte (Multiobjective)
+            Public OptPopPenalty As EVO_POP_PENALTY     'Art der Beurteilung der Populationsgüte (Multiobjective)
         End Structure
 
         'Standardwerte setzen
@@ -116,7 +116,7 @@ Public Class EVO_Settings
                     Me.Pop.n_PopEltern = 2
                     Me.Pop.OptPopEltern = EVO_POP_ELTERN.Rekombination
                     Me.Pop.OptPopStrategie = EVO_STRATEGIE.Plus_Strategie
-                    Me.Pop.OptPopPrimObjective = EVO_POP_PRIMOBJECTIVE.Mittelwert
+                    Me.Pop.OptPopPenalty = EVO_POP_PENALTY.Mittelwert
 
 
                 Case EVO_MODUS.Multi_Objective
@@ -149,7 +149,7 @@ Public Class EVO_Settings
                     Me.Pop.n_PopEltern = 1
                     Me.Pop.OptPopEltern = EVO_POP_ELTERN.Rekombination
                     Me.Pop.OptPopStrategie = EVO_STRATEGIE.Plus_Strategie
-                    Me.Pop.OptPopPrimObjective = EVO_POP_PRIMOBJECTIVE.Mittelwert
+                    Me.Pop.OptPopPenalty = EVO_POP_PENALTY.Mittelwert
 
             End Select
         End Sub
