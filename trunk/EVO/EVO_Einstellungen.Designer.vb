@@ -145,6 +145,17 @@ Partial Class EVO_Einstellungen
         Me.CheckBox_DDS_ini = New System.Windows.Forms.CheckBox
         Me.Numeric_DDS_maxiter = New System.Windows.Forms.NumericUpDown
         Me.Numeric_DDS_r_val = New System.Windows.Forms.NumericUpDown
+        Me.TabPage_SensiPlot = New System.Windows.Forms.TabPage
+        Me.SensiPlot_CheckBox_wave = New System.Windows.Forms.CheckBox
+        Me.SensiPlot_Label_NumSteps = New System.Windows.Forms.Label
+        Me.SensiPlot_NumericUpDown_NumSteps = New System.Windows.Forms.NumericUpDown
+        Me.SensiPlot_GroupBox_Modus = New System.Windows.Forms.GroupBox
+        Me.SensiPlot_RadioButton_Discrete = New System.Windows.Forms.RadioButton
+        Me.SensiPlot_RadioButton_NormalDistribution = New System.Windows.Forms.RadioButton
+        Me.SensiPlot_Label_Objectives = New System.Windows.Forms.Label
+        Me.SensiPlot_ListBox_Objectives = New System.Windows.Forms.ListBox
+        Me.SensiPlot_Label_OptParameter = New System.Windows.Forms.Label
+        Me.SensiPlot_ListBox_OptParameter = New System.Windows.Forms.ListBox
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox
         Label_CES_MemSize = New System.Windows.Forms.Label
@@ -236,6 +247,9 @@ Partial Class EVO_Einstellungen
         Me.TabPage_DDS.SuspendLayout()
         CType(Me.Numeric_DDS_maxiter, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Numeric_DDS_r_val, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.TabPage_SensiPlot.SuspendLayout()
+        CType(Me.SensiPlot_NumericUpDown_NumSteps, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.SensiPlot_GroupBox_Modus.SuspendLayout()
         Me.GroupBox_Einstellungen.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -650,7 +664,7 @@ Partial Class EVO_Einstellungen
         Me.TabControl1.Controls.Add(Me.TabPage_HookeJeeves)
         Me.TabControl1.Controls.Add(Me.TabPage_MetaEvo)
         Me.TabControl1.Controls.Add(Me.TabPage_DDS)
-        Me.TabControl1.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.TabControl1.Controls.Add(Me.TabPage_SensiPlot)
         Me.TabControl1.Location = New System.Drawing.Point(2, 16)
         Me.TabControl1.Margin = New System.Windows.Forms.Padding(0)
         Me.TabControl1.Name = "TabControl1"
@@ -662,7 +676,7 @@ Partial Class EVO_Einstellungen
         'TabPage_PES
         '
         Me.TabPage_PES.AutoScroll = True
-        Me.TabPage_PES.BackColor = System.Drawing.SystemColors.Control
+        Me.TabPage_PES.BackColor = System.Drawing.Color.Transparent
         Me.TabPage_PES.Controls.Add(Label_OptModus)
         Me.TabPage_PES.Controls.Add(Me.Label_OptModusValue)
         Me.TabPage_PES.Controls.Add(LabelStrategie)
@@ -686,6 +700,7 @@ Partial Class EVO_Einstellungen
         Me.TabPage_PES.Size = New System.Drawing.Size(221, 668)
         Me.TabPage_PES.TabIndex = 0
         Me.TabPage_PES.Text = "PES"
+        Me.TabPage_PES.UseVisualStyleBackColor = True
         '
         'Label_OptModusValue
         '
@@ -1005,7 +1020,7 @@ Partial Class EVO_Einstellungen
         'TabPage_CES
         '
         Me.TabPage_CES.AutoScroll = True
-        Me.TabPage_CES.BackColor = System.Drawing.SystemColors.Control
+        Me.TabPage_CES.BackColor = System.Drawing.Color.Transparent
         Me.TabPage_CES.Controls.Add(Me.CheckBox_CES_UseSecPop_CES)
         Me.TabPage_CES.Controls.Add(Me.GroupBox_CES_SecPop)
         Me.TabPage_CES.Controls.Add(Me.GroupBox_CES_Hybrid)
@@ -1021,6 +1036,7 @@ Partial Class EVO_Einstellungen
         Me.TabPage_CES.Size = New System.Drawing.Size(221, 668)
         Me.TabPage_CES.TabIndex = 1
         Me.TabPage_CES.Text = "CES"
+        Me.TabPage_CES.UseVisualStyleBackColor = True
         '
         'CheckBox_CES_UseSecPop_CES
         '
@@ -1306,7 +1322,7 @@ Partial Class EVO_Einstellungen
         '
         'TabPage_HookeJeeves
         '
-        Me.TabPage_HookeJeeves.BackColor = System.Drawing.SystemColors.Control
+        Me.TabPage_HookeJeeves.BackColor = System.Drawing.Color.Transparent
         Me.TabPage_HookeJeeves.Controls.Add(Label3)
         Me.TabPage_HookeJeeves.Controls.Add(Me.Numeric_HJ_DeltaFinish)
         Me.TabPage_HookeJeeves.Controls.Add(Label1)
@@ -1319,6 +1335,7 @@ Partial Class EVO_Einstellungen
         Me.TabPage_HookeJeeves.Size = New System.Drawing.Size(221, 668)
         Me.TabPage_HookeJeeves.TabIndex = 2
         Me.TabPage_HookeJeeves.Text = "Hooke&Jeeves"
+        Me.TabPage_HookeJeeves.UseVisualStyleBackColor = True
         '
         'Numeric_HJ_DeltaFinish
         '
@@ -1358,7 +1375,7 @@ Partial Class EVO_Einstellungen
         '
         'TabPage_MetaEvo
         '
-        Me.TabPage_MetaEvo.BackColor = System.Drawing.SystemColors.Control
+        Me.TabPage_MetaEvo.BackColor = System.Drawing.Color.Transparent
         Me.TabPage_MetaEvo.Controls.Add(Me.GroupBox_MetaEvo_TransferOptions)
         Me.TabPage_MetaEvo.Controls.Add(Me.GroupBox_MetaEvo_LocalOptions)
         Me.TabPage_MetaEvo.Controls.Add(Label18)
@@ -1374,6 +1391,7 @@ Partial Class EVO_Einstellungen
         Me.TabPage_MetaEvo.Size = New System.Drawing.Size(221, 668)
         Me.TabPage_MetaEvo.TabIndex = 3
         Me.TabPage_MetaEvo.Text = "MetaEvo"
+        Me.TabPage_MetaEvo.UseVisualStyleBackColor = True
         '
         'GroupBox_MetaEvo_TransferOptions
         '
@@ -1525,7 +1543,6 @@ Partial Class EVO_Einstellungen
         '
         'TabPage_DDS
         '
-        Me.TabPage_DDS.BackColor = System.Drawing.SystemColors.Control
         Me.TabPage_DDS.Controls.Add(Me.CheckBox_DDS_ini)
         Me.TabPage_DDS.Controls.Add(Label11)
         Me.TabPage_DDS.Controls.Add(Me.Numeric_DDS_maxiter)
@@ -1538,6 +1555,7 @@ Partial Class EVO_Einstellungen
         Me.TabPage_DDS.Size = New System.Drawing.Size(221, 668)
         Me.TabPage_DDS.TabIndex = 4
         Me.TabPage_DDS.Text = "DDS"
+        Me.TabPage_DDS.UseVisualStyleBackColor = True
         '
         'CheckBox_DDS_ini
         '
@@ -1557,7 +1575,7 @@ Partial Class EVO_Einstellungen
         Me.Numeric_DDS_maxiter.Maximum = New Decimal(New Integer() {100000, 0, 0, 0})
         Me.Numeric_DDS_maxiter.Minimum = New Decimal(New Integer() {100, 0, 0, 0})
         Me.Numeric_DDS_maxiter.Name = "Numeric_DDS_maxiter"
-        Me.Numeric_DDS_maxiter.Size = New System.Drawing.Size(55, 18)
+        Me.Numeric_DDS_maxiter.Size = New System.Drawing.Size(55, 20)
         Me.Numeric_DDS_maxiter.TabIndex = 3
         Me.Numeric_DDS_maxiter.Value = New Decimal(New Integer() {100, 0, 0, 0})
         '
@@ -1572,6 +1590,120 @@ Partial Class EVO_Einstellungen
         Me.Numeric_DDS_r_val.Size = New System.Drawing.Size(55, 20)
         Me.Numeric_DDS_r_val.TabIndex = 1
         Me.Numeric_DDS_r_val.Value = New Decimal(New Integer() {2, 0, 0, 65536})
+        '
+        'TabPage_SensiPlot
+        '
+        Me.TabPage_SensiPlot.Controls.Add(Me.SensiPlot_CheckBox_wave)
+        Me.TabPage_SensiPlot.Controls.Add(Me.SensiPlot_Label_NumSteps)
+        Me.TabPage_SensiPlot.Controls.Add(Me.SensiPlot_NumericUpDown_NumSteps)
+        Me.TabPage_SensiPlot.Controls.Add(Me.SensiPlot_GroupBox_Modus)
+        Me.TabPage_SensiPlot.Controls.Add(Me.SensiPlot_Label_Objectives)
+        Me.TabPage_SensiPlot.Controls.Add(Me.SensiPlot_ListBox_Objectives)
+        Me.TabPage_SensiPlot.Controls.Add(Me.SensiPlot_Label_OptParameter)
+        Me.TabPage_SensiPlot.Controls.Add(Me.SensiPlot_ListBox_OptParameter)
+        Me.TabPage_SensiPlot.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage_SensiPlot.Name = "TabPage_SensiPlot"
+        Me.TabPage_SensiPlot.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage_SensiPlot.Size = New System.Drawing.Size(221, 668)
+        Me.TabPage_SensiPlot.TabIndex = 5
+        Me.TabPage_SensiPlot.Text = "SensiPlot"
+        Me.TabPage_SensiPlot.UseVisualStyleBackColor = True
+        '
+        'SensiPlot_CheckBox_wave
+        '
+        Me.SensiPlot_CheckBox_wave.AutoSize = True
+        Me.SensiPlot_CheckBox_wave.Location = New System.Drawing.Point(9, 495)
+        Me.SensiPlot_CheckBox_wave.Name = "SensiPlot_CheckBox_wave"
+        Me.SensiPlot_CheckBox_wave.Size = New System.Drawing.Size(101, 17)
+        Me.SensiPlot_CheckBox_wave.TabIndex = 15
+        Me.SensiPlot_CheckBox_wave.Text = "Wave anzeigen"
+        Me.ToolTip1.SetToolTip(Me.SensiPlot_CheckBox_wave, "Im Anschluss an die Sensitivitätsanalyse die Ganglinien aller Simulationen in Wav" & _
+                "e anzeigen")
+        Me.SensiPlot_CheckBox_wave.UseVisualStyleBackColor = True
+        '
+        'SensiPlot_Label_NumSteps
+        '
+        Me.SensiPlot_Label_NumSteps.AutoSize = True
+        Me.SensiPlot_Label_NumSteps.Location = New System.Drawing.Point(6, 462)
+        Me.SensiPlot_Label_NumSteps.Name = "SensiPlot_Label_NumSteps"
+        Me.SensiPlot_Label_NumSteps.Size = New System.Drawing.Size(81, 13)
+        Me.SensiPlot_Label_NumSteps.TabIndex = 14
+        Me.SensiPlot_Label_NumSteps.Text = "Anzahl Schritte:"
+        '
+        'SensiPlot_NumericUpDown_NumSteps
+        '
+        Me.SensiPlot_NumericUpDown_NumSteps.Location = New System.Drawing.Point(93, 459)
+        Me.SensiPlot_NumericUpDown_NumSteps.Name = "SensiPlot_NumericUpDown_NumSteps"
+        Me.SensiPlot_NumericUpDown_NumSteps.Size = New System.Drawing.Size(56, 20)
+        Me.SensiPlot_NumericUpDown_NumSteps.TabIndex = 13
+        Me.SensiPlot_NumericUpDown_NumSteps.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'SensiPlot_GroupBox_Modus
+        '
+        Me.SensiPlot_GroupBox_Modus.Controls.Add(Me.SensiPlot_RadioButton_Discrete)
+        Me.SensiPlot_GroupBox_Modus.Controls.Add(Me.SensiPlot_RadioButton_NormalDistribution)
+        Me.SensiPlot_GroupBox_Modus.Location = New System.Drawing.Point(6, 380)
+        Me.SensiPlot_GroupBox_Modus.Name = "SensiPlot_GroupBox_Modus"
+        Me.SensiPlot_GroupBox_Modus.Size = New System.Drawing.Size(209, 70)
+        Me.SensiPlot_GroupBox_Modus.TabIndex = 12
+        Me.SensiPlot_GroupBox_Modus.TabStop = False
+        Me.SensiPlot_GroupBox_Modus.Text = "Modus"
+        '
+        'SensiPlot_RadioButton_Discrete
+        '
+        Me.SensiPlot_RadioButton_Discrete.AutoSize = True
+        Me.SensiPlot_RadioButton_Discrete.Checked = True
+        Me.SensiPlot_RadioButton_Discrete.Location = New System.Drawing.Point(9, 42)
+        Me.SensiPlot_RadioButton_Discrete.Name = "SensiPlot_RadioButton_Discrete"
+        Me.SensiPlot_RadioButton_Discrete.Size = New System.Drawing.Size(58, 17)
+        Me.SensiPlot_RadioButton_Discrete.TabIndex = 10
+        Me.SensiPlot_RadioButton_Discrete.TabStop = True
+        Me.SensiPlot_RadioButton_Discrete.Text = "Diskret"
+        Me.SensiPlot_RadioButton_Discrete.UseVisualStyleBackColor = True
+        '
+        'SensiPlot_RadioButton_NormalDistribution
+        '
+        Me.SensiPlot_RadioButton_NormalDistribution.AutoSize = True
+        Me.SensiPlot_RadioButton_NormalDistribution.Location = New System.Drawing.Point(9, 19)
+        Me.SensiPlot_RadioButton_NormalDistribution.Name = "SensiPlot_RadioButton_NormalDistribution"
+        Me.SensiPlot_RadioButton_NormalDistribution.Size = New System.Drawing.Size(86, 17)
+        Me.SensiPlot_RadioButton_NormalDistribution.TabIndex = 9
+        Me.SensiPlot_RadioButton_NormalDistribution.Text = "Gleichverteilt"
+        Me.SensiPlot_RadioButton_NormalDistribution.UseVisualStyleBackColor = True
+        '
+        'SensiPlot_Label_Objectives
+        '
+        Me.SensiPlot_Label_Objectives.AutoSize = True
+        Me.SensiPlot_Label_Objectives.Location = New System.Drawing.Point(6, 198)
+        Me.SensiPlot_Label_Objectives.Name = "SensiPlot_Label_Objectives"
+        Me.SensiPlot_Label_Objectives.Size = New System.Drawing.Size(116, 13)
+        Me.SensiPlot_Label_Objectives.TabIndex = 6
+        Me.SensiPlot_Label_Objectives.Text = "Objective functions: (1)"
+        '
+        'SensiPlot_ListBox_Objectives
+        '
+        Me.SensiPlot_ListBox_Objectives.FormattingEnabled = True
+        Me.SensiPlot_ListBox_Objectives.Location = New System.Drawing.Point(6, 214)
+        Me.SensiPlot_ListBox_Objectives.Name = "SensiPlot_ListBox_Objectives"
+        Me.SensiPlot_ListBox_Objectives.Size = New System.Drawing.Size(209, 160)
+        Me.SensiPlot_ListBox_Objectives.TabIndex = 5
+        '
+        'SensiPlot_Label_OptParameter
+        '
+        Me.SensiPlot_Label_OptParameter.AutoSize = True
+        Me.SensiPlot_Label_OptParameter.Location = New System.Drawing.Point(6, 3)
+        Me.SensiPlot_Label_OptParameter.Name = "SensiPlot_Label_OptParameter"
+        Me.SensiPlot_Label_OptParameter.Size = New System.Drawing.Size(115, 13)
+        Me.SensiPlot_Label_OptParameter.TabIndex = 4
+        Me.SensiPlot_Label_OptParameter.Text = "OptParameter: (1 bis 2)"
+        '
+        'SensiPlot_ListBox_OptParameter
+        '
+        Me.SensiPlot_ListBox_OptParameter.Location = New System.Drawing.Point(6, 22)
+        Me.SensiPlot_ListBox_OptParameter.Name = "SensiPlot_ListBox_OptParameter"
+        Me.SensiPlot_ListBox_OptParameter.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended
+        Me.SensiPlot_ListBox_OptParameter.Size = New System.Drawing.Size(209, 173)
+        Me.SensiPlot_ListBox_OptParameter.TabIndex = 3
         '
         'GroupBox_Einstellungen
         '
@@ -1650,6 +1782,11 @@ Partial Class EVO_Einstellungen
         Me.TabPage_DDS.PerformLayout()
         CType(Me.Numeric_DDS_maxiter, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.Numeric_DDS_r_val, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.TabPage_SensiPlot.ResumeLayout(False)
+        Me.TabPage_SensiPlot.PerformLayout()
+        CType(Me.SensiPlot_NumericUpDown_NumSteps, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.SensiPlot_GroupBox_Modus.ResumeLayout(False)
+        Me.SensiPlot_GroupBox_Modus.PerformLayout()
         Me.GroupBox_Einstellungen.ResumeLayout(False)
         Me.ResumeLayout(False)
 
@@ -1717,7 +1854,6 @@ Partial Class EVO_Einstellungen
     Private WithEvents CheckBox_CES_RealOptimisation As System.Windows.Forms.CheckBox
     Private WithEvents LabelAnzEltern As System.Windows.Forms.Label
     Private WithEvents CheckBox_CES_StartPESPop As System.Windows.Forms.CheckBox
-    Public WithEvents TabControl1 As System.Windows.Forms.TabControl
     Private WithEvents Combo_MetaEvo_Role As System.Windows.Forms.ComboBox
     Private WithEvents Numeric_MetaEvo_Numbergenerations As System.Windows.Forms.NumericUpDown
     Private WithEvents GroupBox_MetaEvo_BasicOptions As System.Windows.Forms.GroupBox
@@ -1737,4 +1873,16 @@ Partial Class EVO_Einstellungen
     Private WithEvents Numeric_DDS_r_val As System.Windows.Forms.NumericUpDown
     Private WithEvents Numeric_DDS_maxiter As System.Windows.Forms.NumericUpDown
     Private WithEvents CheckBox_DDS_ini As System.Windows.Forms.CheckBox
+    Private WithEvents TabPage_SensiPlot As System.Windows.Forms.TabPage
+    Private WithEvents SensiPlot_Label_OptParameter As System.Windows.Forms.Label
+    Private WithEvents SensiPlot_ListBox_OptParameter As System.Windows.Forms.ListBox
+    Private WithEvents SensiPlot_ListBox_Objectives As System.Windows.Forms.ListBox
+    Private WithEvents SensiPlot_RadioButton_Discrete As System.Windows.Forms.RadioButton
+    Private WithEvents SensiPlot_RadioButton_NormalDistribution As System.Windows.Forms.RadioButton
+    Private WithEvents SensiPlot_Label_NumSteps As System.Windows.Forms.Label
+    Private WithEvents SensiPlot_NumericUpDown_NumSteps As System.Windows.Forms.NumericUpDown
+    Private WithEvents SensiPlot_Label_Objectives As System.Windows.Forms.Label
+    Private WithEvents SensiPlot_GroupBox_Modus As System.Windows.Forms.GroupBox
+    Private WithEvents SensiPlot_CheckBox_wave As System.Windows.Forms.CheckBox
+    Private WithEvents TabControl1 As System.Windows.Forms.TabControl
 End Class

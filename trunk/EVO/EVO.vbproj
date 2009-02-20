@@ -127,6 +127,10 @@
       <Project>{85403900-E545-4122-B1A0-8C30AE0D0F3C}</Project>
       <Name>MetaEvo</Name>
     </ProjectReference>
+    <ProjectReference Include="..\EVO.Algos\SensiPlot\SensiPlot.vbproj">
+      <Project>{A9272445-616D-4B4F-ACFF-DE6F5591AF63}</Project>
+      <Name>SensiPlot</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EVO.Apps\EVO.Apps.vbproj">
       <Project>{2DCFE99E-CBFE-4CCC-93E7-A6D628B16DEC}</Project>
       <Name>EVO.Apps</Name>

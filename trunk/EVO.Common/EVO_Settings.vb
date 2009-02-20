@@ -326,10 +326,36 @@ Public Class EVO_Settings
 
     End Structure
 
+    Public Structure SensiPlot_Settings
+
+        Public Enum SensiType As Integer
+            discrete = 1
+            normaldistribution = 2
+        End Enum
+
+        Public Selected_OptParameters() As Integer
+        Public Selected_Objective As Integer
+        Public Selected_SensiType As SensiType
+        Public Num_Steps As Integer
+        Public show_Wave As Boolean
+
+        Public Sub setStandard()
+            ReDim Me.Selected_OptParameters(0)
+            Me.Selected_OptParameters(0) = 0
+            Me.Selected_Objective = 0
+            Me.Selected_SensiType = SensiType.discrete
+            Me.Num_Steps = 10
+            Me.show_Wave = False
+        End Sub
+
+    End Structure
+
     Public General As General_Settings
     Public PES As PES_Settings
     Public CES As CES_Settings
     Public HookJeeves As HookJeeves_Settings
     Public MetaEvo As MetaEvo_Settings
     Public DDS As DDS_Settings
+    Public SensiPlot As SensiPlot_Settings
+
 End Class
