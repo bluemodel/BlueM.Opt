@@ -741,7 +741,14 @@ Partial Class Form1
 
     Private Sub STARTEN_Button_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Button_Start.Click
 
-        'Stoppuhr        Dim OptTime As New Stopwatch        OptTime.Start()        'Der Controller        Dim controller As EVO.IController        If (Me.isrun And Not Me.ispause) Then
+        'Stoppuhr
+        Dim OptTime As New Stopwatch
+        OptTime.Start()
+
+        'Der Controller
+        Dim controller As EVO.IController
+
+        If (Me.isrun And Not Me.ispause) Then
             'Optimierung pausieren
             '---------------------
             Me.ispause = True
