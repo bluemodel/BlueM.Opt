@@ -485,7 +485,11 @@ Public Class Controller
 
         'Lösung im TeeChart einzeichnen und mittleres Dn ausgeben
         '========================================================
-        Call Me.myHauptDiagramm.ZeichneIndividuum(CES1.Childs(i_Child), 0, 0, Me.CES_i_gen, i_Child + 1, EVO.Diagramm.Diagramm.ColorManagement(ColorArray, CES1.Childs(i_Child)))
+        If myProblem.CES_T_Modus = CES_T_MODUS.No_Test Then
+            Call Me.myHauptDiagramm.ZeichneIndividuum(CES1.Childs(i_Child), 0, 0, Me.CES_i_gen, i_Child + 1, EVO.Diagramm.Diagramm.ColorManagement(ColorArray, CES1.Childs(i_Child)))
+        Else
+            Call Me.myHauptDiagramm.ZeichneIndividuum(CES1.Childs(i_Child), 0, 0, Me.CES_i_gen, i_Child + 1, Color.Orange)
+        End If
         'TODO: Me.Label_Dn_Wert.Text = Math.Round(CES1.Childs(i_Child).Get_mean_PES_Dn, 6).ToString
         If Not CES1.Childs(i_Child).Get_mean_PES_Dn = -1 Then
             Me.Zeichne_Dn(CES1.Childs(i_Child).ID, CES1.Childs(i_Child).Get_mean_PES_Dn)

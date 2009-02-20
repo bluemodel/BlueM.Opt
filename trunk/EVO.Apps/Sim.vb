@@ -367,7 +367,7 @@ Public MustInherit Class Sim
     '****************************************
     Private Sub Prepare_Verzweigung_ON_OFF()
         Dim j, x, y, z As Integer
-        Dim No As Short
+        Dim No As Integer
 
         'Schreibt alle Bezeichnungen der Verzweigungen ins Array
         For j = 0 To Akt.VER_ONOFF.GetUpperBound(0)

@@ -1083,7 +1083,7 @@ Public Class CES
     'Steuerung des NDSorting (Ursprünglich aus ES Eltern)
     '****************************************************
     Public Sub NDSorting_CES_Control(ByVal iAktGen As Integer)
-        Dim i As Short
+        Dim i As Integer
 
         Dim NDSorting() As Individuum_CES
         NDSorting = Individuum.New_Indi_Array(Individuum.Individuumsklassen.Individuum_CES, mSettings.CES.n_Childs + mSettings.CES.n_Parents, "NDSorting")
@@ -1147,7 +1147,7 @@ Public Class CES
     '***********************************************************************************
     Sub NDSorting_PES_Parents_per_Loc(ByVal iAktGen As Integer)
 
-        Dim i As Short
+        Dim i As Integer
 
         Dim NDSorting() As Individuum_CES
         NDSorting = Individuum.New_Indi_Array(Individuum.Individuumsklassen.Individuum_CES, PES_Parents_pLoc.GetLength(0), "NDSorting")
@@ -1187,7 +1187,7 @@ Public Class CES
     '*************************************************************
     Sub NDSorting_Memory(ByVal iAktGen As Integer)
 
-        Dim i As Short
+        Dim i As Integer
 
         Dim NDSorting() As Individuum_CES
         NDSorting = Individuum.New_Indi_Array(Individuum.Individuumsklassen.Individuum_CES, PES_Memory.GetLength(0), "NDSorting")

@@ -200,7 +200,7 @@ Public Class EVO_Einstellungen
                 'Populationen
                 CheckisPopul.Enabled = True
                 'Neuen Standardwert für PopPenalty setzen
-                Me.msettings.PES.Pop.OptPopPrimObjective = EVO_POP_PRIMOBJECTIVE.Mittelwert
+                Me.msettings.PES.Pop.OptPopPenalty = EVO_POP_PENALTY.Mittelwert
 
             Case EVO_MODUS.Multi_Objective
                 'Vorgaben und Anzeige
@@ -214,7 +214,7 @@ Public Class EVO_Einstellungen
                 CheckisPopul.Checked = False
                 GroupBox_Populationen.Enabled = False
                 'Neuen Standardwert für PopPenalty setzen
-                Me.msettings.PES.Pop.OptPopPrimObjective = EVO_POP_PRIMOBJECTIVE.Crowding
+                Me.msettings.PES.Pop.OptPopPenalty = EVO_POP_PENALTY.Crowding
 
         End Select
 
@@ -344,13 +344,13 @@ Public Class EVO_Einstellungen
         Select Case Me.msettings.PES.OptModus
 
             Case EVO_MODUS.Single_Objective
-                Cntrl.Items.Add(EVO_POP_PRIMOBJECTIVE.Mittelwert)
-                Cntrl.Items.Add(EVO_POP_PRIMOBJECTIVE.Schlechtester)
+                Cntrl.Items.Add(EVO_POP_PENALTY.Mittelwert)
+                Cntrl.Items.Add(EVO_POP_PENALTY.Schlechtester)
 
             Case EVO_MODUS.Multi_Objective
                 'BUG 264: Popgüte bei MultiObjective überflüssig?
-                Cntrl.Items.Add(EVO_POP_PRIMOBJECTIVE.Crowding)
-                Cntrl.Items.Add(EVO_POP_PRIMOBJECTIVE.Spannweite)
+                Cntrl.Items.Add(EVO_POP_PENALTY.Crowding)
+                Cntrl.Items.Add(EVO_POP_PENALTY.Spannweite)
         End Select
 
         Cntrl.SelectedIndex = 0
@@ -392,7 +392,7 @@ Public Class EVO_Einstellungen
             'Populationen
             .Pop.is_POPUL = CheckisPopul.Checked
             .Pop.OptPopStrategie = ComboOptPopStrategie.SelectedItem
-            .Pop.OptPopPrimObjective = ComboOptPopPenalty.SelectedItem
+            .Pop.OptPopPenalty = ComboOptPopPenalty.SelectedItem
             .Pop.OptPopEltern = ComboOptPopEltern.SelectedItem
             If (.Pop.is_POPUL) Then
                 .Pop.n_Runden = TextAnzRunden.Value
@@ -587,7 +587,7 @@ Public Class EVO_Einstellungen
             'Populationen
             Me.CheckisPopul.Checked = .Pop.is_POPUL
             Me.ComboOptPopStrategie.SelectedItem = .Pop.OptPopStrategie
-            Me.ComboOptPopPenalty.SelectedItem = .Pop.OptPopPrimObjective
+            Me.ComboOptPopPenalty.SelectedItem = .Pop.OptPopPenalty
             Me.ComboOptPopEltern.SelectedItem = .Pop.OptPopEltern
             Me.TextAnzRunden.Value = .Pop.n_Runden
             Me.TextAnzPop.Value = .Pop.n_Popul

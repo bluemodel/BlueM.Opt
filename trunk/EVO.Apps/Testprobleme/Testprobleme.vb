@@ -441,7 +441,7 @@ Public Class Testprobleme
     '***************************************************
     Private Sub DiagInitialise_MultiTestProb(ByRef Diag As EVO.Diagramm.Hauptdiagramm)
 
-        Dim i, j As Short
+        Dim i, j As Integer
         Dim title As String
         Dim serie As Steema.TeeChart.Styles.Series
         Dim achsen As Collection

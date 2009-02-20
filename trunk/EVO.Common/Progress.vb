@@ -40,15 +40,15 @@ Public Class Progress
 
 #Region "Eigenschaften"
 
-    Private m_NRunden As Short
-    Private m_NPopul As Short
-    Private m_NGen As Short
-    Private m_NNachf As Short
+    Private m_NRunden As Integer
+    Private m_NPopul As Integer
+    Private m_NGen As Integer
+    Private m_NNachf As Integer
 
-    Private m_iRunde As Short
-    Private m_iPopul As Short
-    Private m_iGen As Short
-    Private m_iNachf As Short
+    Private m_iRunde As Integer
+    Private m_iPopul As Integer
+    Private m_iGen As Integer
+    Private m_iNachf As Integer
 
 #End Region 'Eigenschaften
 
@@ -58,11 +58,11 @@ Public Class Progress
     ''' aktuelle Runde
     ''' </summary>
     ''' <remarks>0-basiert</remarks>
-    Public Property iRunde() As Short
+    Public Property iRunde() As Integer
         Get
             Return m_iRunde
         End Get
-        Set(ByVal value As Short)
+        Set(ByVal value As Integer)
             'MaxWert abfangen
             value = Math.Min(value, Me.NRunden - 1)
             m_iRunde = value
@@ -74,11 +74,11 @@ Public Class Progress
     ''' aktuelle Population
     ''' </summary>
     ''' <remarks>0-basiert</remarks>
-    Public Property iPopul() As Short
+    Public Property iPopul() As Integer
         Get
             Return m_iPopul
         End Get
-        Set(ByVal value As Short)
+        Set(ByVal value As Integer)
             'MaxWert abfangen
             value = Math.Min(value, Me.NPopul - 1)
             m_iPopul = value
@@ -90,11 +90,11 @@ Public Class Progress
     ''' aktuelle Generation
     ''' </summary>
     ''' <remarks>0-basiert</remarks>
-    Public Property iGen() As Short
+    Public Property iGen() As Integer
         Get
             Return m_iGen
         End Get
-        Set(ByVal value As Short)
+        Set(ByVal value As Integer)
             'MaxWert abfangen
             value = Math.Min(value, Me.NGen - 1)
             m_iGen = value
@@ -106,11 +106,11 @@ Public Class Progress
     ''' aktueller Nachfahre
     ''' </summary>
     ''' <remarks>0-basiert</remarks>
-    Public Property iNachf() As Short
+    Public Property iNachf() As Integer
         Get
             Return m_iNachf
         End Get
-        Set(ByVal value As Short)
+        Set(ByVal value As Integer)
             'MaxWert abfangen
             value = Math.Min(value, Me.NNachf - 1)
             m_iNachf = value
@@ -121,7 +121,7 @@ Public Class Progress
     ''' <summary>
     ''' Gesamtanzahl Runden
     ''' </summary>
-    Public ReadOnly Property NRunden() As Short
+    Public ReadOnly Property NRunden() As Integer
         Get
             Return m_NRunden
         End Get
@@ -130,7 +130,7 @@ Public Class Progress
     ''' <summary>
     ''' Gesamtanzahl Populationen
     ''' </summary>
-    Public ReadOnly Property NPopul() As Short
+    Public ReadOnly Property NPopul() As Integer
         Get
             Return m_NPopul
         End Get
@@ -139,7 +139,7 @@ Public Class Progress
     ''' <summary>
     ''' Gesamtanzahl Generationen
     ''' </summary>
-    Public ReadOnly Property NGen() As Short
+    Public ReadOnly Property NGen() As Integer
         Get
             Return m_NGen
         End Get
@@ -148,7 +148,7 @@ Public Class Progress
     ''' <summary>
     ''' Gesamtanzahl Nachfahren
     ''' </summary>
-    Public ReadOnly Property NNachf() As Short
+    Public ReadOnly Property NNachf() As Integer
         Get
             Return m_NNachf
         End Get
@@ -183,7 +183,7 @@ Public Class Progress
     ''' <param name="NGen">Gesamtanzahl Generationen (pro Population)</param>
     ''' <param name="NNachf">Gesamtanzahl Nachfahren (pro Generation)</param>
     ''' <remarks>alle Zähler werden auf 0 gesetzt</remarks>
-    Public Overloads Sub Initialize(ByVal NRunden As Short, ByVal NPopul As Short, ByVal NGen As Short, ByVal NNachf As Short)
+    Public Overloads Sub Initialize(ByVal NRunden As Integer, ByVal NPopul As Integer, ByVal NGen As Integer, ByVal NNachf As Integer)
 
         Me.m_NRunden = NRunden
         Me.m_NPopul = NPopul
