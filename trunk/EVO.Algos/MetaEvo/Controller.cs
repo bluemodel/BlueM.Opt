@@ -31,6 +31,8 @@ namespace IHWB.EVO.MetaEvo
 
         private string[,] result;
 
+        private bool stopped; //TODO: an entsprechenden Stellen prüfen und abbrechen, wenn true
+
         /// <summary>
         /// Initialisiert den MetaEVO-Controller und übergibt alle erforderlichen Objekte
         /// </summary>
@@ -77,6 +79,8 @@ namespace IHWB.EVO.MetaEvo
         /// </summary>
         public void Start()
         {
+            this.stopped = false;
+
             this.role = this.settings.MetaEvo.Role;
 
             //Setzen des Problems zum Design des Individuums
@@ -159,6 +163,11 @@ namespace IHWB.EVO.MetaEvo
             }
         }
 
+        public void Stoppen()
+        {
+            this.stopped = true;
+            //TODO: hat bisher keine Auswirkung!
+        }
 
 
         //### Methoden ###

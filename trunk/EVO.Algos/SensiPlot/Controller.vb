@@ -12,6 +12,8 @@ Public Class Controller
     Private myAppType As EVO.Common.ApplicationTypes
     Private WithEvents Sim1 As EVO.Apps.Sim
 
+    Private stopped As Boolean
+
     Public Sub Init(ByRef inputProblem As Common.Problem, ByRef inputSettings As Common.EVO_Settings, ByRef inputProgress As Common.Progress, ByRef inputMonitor As Diagramm.Monitor, ByRef inputHptDiagramm As Diagramm.Hauptdiagramm) Implements IController.Init
         Me.myProblem = inputProblem
         Me.mySettings = inputSettings
@@ -111,6 +113,9 @@ Public Class Controller
             '---------------------------------
             For j = 0 To Me.mySettings.SensiPlot.Num_Steps - 1
 
+                'Stop?
+                If (Me.stopped) Then Exit Sub
+
                 '1. OptParameterwert variieren
                 Select Case Me.mySettings.SensiPlot.Selected_SensiType
                     Case Common.EVO_Settings.SensiPlot_Settings.SensiType.normaldistribution
@@ -205,6 +210,10 @@ Public Class Controller
             Next
             Call Wave1.Show()
         End If
+    End Sub
+
+    Public Sub Stoppen() Implements IController.Stoppen
+        Me.stopped = True
     End Sub
 
 End Class

@@ -19,6 +19,8 @@ namespace modelEAU.DDS
 
         private IHWB.EVO.Common.Constants.ApplicationTypes myAppType;
 
+        private bool stopped;
+
         /// <summary>
         /// Initialisiert den DDS-Controller und übergibt alle erforderlichen Objekte
         /// </summary>
@@ -62,6 +64,7 @@ namespace modelEAU.DDS
         /// </summary>
         public void Start()
         {
+            this.stopped = false;
 
             //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             //Declarations
@@ -120,6 +123,9 @@ namespace modelEAU.DDS
 
             for (i = 0; i < DDS.ini_fevals; i++)
             {
+                //Stop?
+                if (this.stopped) return;
+
                 run += 1;
 
                 Current_Parameter = DDS.ini_solution_candidate();
@@ -185,6 +191,9 @@ namespace modelEAU.DDS
 
             for (i = 1; i <= DDS.ileft; i++)
             {
+                //Stop?
+                if (this.stopped) return;
+
                 run += 1;
 
                 Current_Parameter = DDS.determine_DV(i);
@@ -233,6 +242,11 @@ namespace modelEAU.DDS
             //ends OUTER DDS ALGORITHM LOOP
             //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+        }
+
+        public void Stoppen()
+        {
+            this.stopped = true;
         }
     }
 }
