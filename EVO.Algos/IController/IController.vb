@@ -4,7 +4,7 @@
 Public Interface IController
 
     ''' <summary>
-    ''' Initialisiert den Controller und übergib alle erforderlichen Objekte
+    ''' Initialisiert den Controller und übergibt alle erforderlichen Objekte
     ''' </summary>
     ''' <param name="inputProblem">die Problemdefinition</param>
     ''' <param name="inputSettings">die Einstellungen</param>
@@ -33,5 +33,11 @@ Public Interface IController
     ''' Optimierung starten
     ''' </summary>
     Sub Start()
+
+    ''' <summary>
+    ''' Optimierung stoppen
+    ''' </summary>
+    Sub Stoppen()
+
 
 End Interface

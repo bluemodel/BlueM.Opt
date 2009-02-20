@@ -25,6 +25,8 @@ Public Class Controller
     Private PES1 As PES
     Private CES1 As CES
 
+    Private stopped as Boolean
+
     '**** CES-spezifische Sachen ****
     Private CES_i_gen As Integer 'ginge alternativ auch mit Me.myProgress.iGen
     Private ColorArray As Object(,)
@@ -80,6 +82,8 @@ Public Class Controller
     ''' </summary>
     Public Sub Start() Implements IController.Start
 
+        Me.stopped = False
+
         'Monitor initialisieren und anzeigen
         Call Me.InitMonitor()
         Call Me.myMonitor.SelectTabDiagramm()
@@ -95,6 +99,10 @@ Public Class Controller
                 Call Me.STARTEN_CES_or_HYBRID()
         End Select
 
+    End Sub
+
+    Public Sub Stoppen() Implements IController.Stoppen
+        Me.stopped = True
     End Sub
 
     ''' <summary>
@@ -185,6 +193,9 @@ Public Class Controller
         durchlauf_all = 0
 
         For Me.CES_i_gen = 0 To CES1.mSettings.CES.n_Generations - 1
+
+            'Stop?
+            If (Me.stopped) Then Exit Sub
 
             Stoppuhr.Reset()
             Stoppuhr.Start()
@@ -551,6 +562,9 @@ Public Class Controller
                     'Schleife über alle Nachkommen
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
                     For i_Nachf = 0 To Me.mySettings.PES.n_Nachf - 1
+
+                        'Stop?
+                        If (Me.stopped) Then Exit Sub
 
                         durchlauf += 1
 

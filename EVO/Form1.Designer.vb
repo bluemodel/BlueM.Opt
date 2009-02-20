@@ -71,6 +71,7 @@ Partial Class Form1
         Me.Hauptdiagramm1 = New IHWB.EVO.Diagramm.Hauptdiagramm
         Me.EVO_Opt_Verlauf1 = New IHWB.EVO.EVO_Opt_Verlauf
         Me.EVO_Einstellungen1 = New IHWB.EVO.EVO_Einstellungen
+        Me.Button_Stop = New System.Windows.Forms.Button
         MenuStrip1 = New System.Windows.Forms.MenuStrip
         MenuItem_Tools = New System.Windows.Forms.ToolStripMenuItem
         ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator
@@ -173,11 +174,9 @@ Partial Class Form1
         'Button_Start
         '
         Me.Button_Start.BackColor = System.Drawing.SystemColors.Control
-        Me.Button_Start.Cursor = System.Windows.Forms.Cursors.Default
         Me.Button_Start.Enabled = False
         Me.Button_Start.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Button_Start.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.Button_Start.Location = New System.Drawing.Point(40, 104)
+        Me.Button_Start.Location = New System.Drawing.Point(4, 106)
         Me.Button_Start.Name = "Button_Start"
         Me.Button_Start.Size = New System.Drawing.Size(165, 38)
         Me.Button_Start.TabIndex = 3
@@ -462,6 +461,18 @@ Partial Class Form1
         Me.EVO_Einstellungen1.Size = New System.Drawing.Size(244, 707)
         Me.EVO_Einstellungen1.TabIndex = 2
         '
+        'Button_Stop
+        '
+        Me.Button_Stop.Enabled = False
+        Me.Button_Stop.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Button_Stop.Location = New System.Drawing.Point(176, 106)
+        Me.Button_Stop.Name = "Button_Stop"
+        Me.Button_Stop.Size = New System.Drawing.Size(59, 38)
+        Me.Button_Stop.TabIndex = 21
+        Me.Button_Stop.Text = "Stop"
+        Me.ToolTip1.SetToolTip(Me.Button_Stop, "Optimierung abbrechen")
+        Me.Button_Stop.UseVisualStyleBackColor = True
+        '
         'Form1
         '
         Me.AcceptButton = Me.Button_Start
@@ -469,6 +480,7 @@ Partial Class Form1
         Me.AutoScroll = True
         Me.BackColor = System.Drawing.SystemColors.Control
         Me.ClientSize = New System.Drawing.Size(722, 841)
+        Me.Controls.Add(Me.Button_Stop)
         Me.Controls.Add(Me.GroupBox_Anwendung)
         Me.Controls.Add(Me.StatusStrip1)
         Me.Controls.Add(Me.Button_Start)
@@ -527,4 +539,5 @@ Partial Class Form1
     Friend WithEvents ToolStripMenuItem_SettingsSave As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripMenuItem_SettingsLoad As System.Windows.Forms.ToolStripMenuItem
     Private WithEvents ToolStripSplitButton_SettingsGeneral As System.Windows.Forms.ToolStripSplitButton
+    Private WithEvents Button_Stop As System.Windows.Forms.Button
 End Class

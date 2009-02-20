@@ -773,6 +773,7 @@ Partial Class Form1
             '-------------------
             Me.isrun = True
             Me.Button_Start.Text = "Pause"
+            Me.Button_Stop.Enabled = True
 
             'Diagramm vorbereiten und initialisieren
             Call PrepareDiagramm()
@@ -1837,5 +1838,20 @@ Partial Class Form1
     End Function
 
 #End Region 'Methoden
+
+    ''' <summary>
+    ''' Stop-Button wurde geklickt
+    ''' </summary>
+    Private Sub Button_Stop_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Stop.Click
+
+        Dim res As MsgBoxResult
+
+        res = MsgBox("Optimierung wirklich abbrechen?", MsgBoxStyle.YesNo)
+
+        If (res = MsgBoxResult.Yes) Then
+            Call Me.controller.Stoppen()
+            Me.Button_Stop.Enabled = False
+        End If
+    End Sub
 
 End Class

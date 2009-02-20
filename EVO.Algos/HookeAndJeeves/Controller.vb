@@ -16,6 +16,8 @@ Public Class Controller
     Private WithEvents Sim1 As EVO.Apps.Sim
     Private Testprobleme1 As EVO.Apps.Testprobleme
 
+    Private stopped As Boolean
+
 #Region "Methoden"
 
     ''' <summary>
@@ -78,6 +80,8 @@ Public Class Controller
 
         Dim HookJeeves As New EVO.HookeAndJeeves.HookeAndJeeves(Me.myProblem.NumParams, Me.mySettings.HookJeeves.DnStart, Me.mySettings.HookJeeves.DnFinish)
 
+        Me.stopped = False
+
         'Monitor anzeigen
         Call Me.myMonitor.SelectTabLog()
         Call Me.myMonitor.Show()
@@ -105,6 +109,9 @@ Public Class Controller
         k = 0
 
         Do While (HookJeeves.AktuelleSchrittweite > HookJeeves.MinimaleSchrittweite)
+
+            'Stop?
+            If (Me.stopped) Then Exit Sub
 
             Iterationen += 1
             durchlauf += 1
@@ -144,6 +151,9 @@ Public Class Controller
             'Tastschritte
             '============
             For j = 0 To HookJeeves.AnzahlParameter - 1
+
+                'Stop?
+                If (Me.stopped) Then Exit Sub
 
                 aktuellePara = HookJeeves.Tastschritt(j, EVO.HookeAndJeeves.HookeAndJeeves.TastschrittRichtung.Vorwärts)
 
@@ -289,6 +299,10 @@ Public Class Controller
                 End If
             End If
         Loop
+    End Sub
+
+    Public Sub Stoppen() Implements IController.Stoppen
+        Me.stopped = True
     End Sub
 
 #End Region 'Methoden
