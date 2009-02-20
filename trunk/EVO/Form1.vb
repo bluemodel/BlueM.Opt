@@ -1837,8 +1837,6 @@ Partial Class Form1
 
     End Function
 
-#End Region 'Methoden
-
     ''' <summary>
     ''' Stop-Button wurde geklickt
     ''' </summary>
@@ -1852,6 +1850,16 @@ Partial Class Form1
             Call Me.controller.Stoppen()
             Me.Button_Stop.Enabled = False
         End If
+
     End Sub
+
+    ''' <summary>
+    ''' Das Form wird geschlossen
+    ''' </summary>
+    Private Sub Form1_FormClosing(ByVal sender As System.Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles MyBase.FormClosing
+        Call Me.controller.Stoppen()
+    End Sub
+
+#End Region 'Methoden
 
 End Class

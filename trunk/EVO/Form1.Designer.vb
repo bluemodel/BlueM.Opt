@@ -69,9 +69,9 @@ Partial Class Form1
         Me.ToolStripButton_Scatterplot = New System.Windows.Forms.ToolStripButton
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip
         Me.Hauptdiagramm1 = New IHWB.EVO.Diagramm.Hauptdiagramm
+        Me.Button_Stop = New System.Windows.Forms.Button
         Me.EVO_Opt_Verlauf1 = New IHWB.EVO.EVO_Opt_Verlauf
         Me.EVO_Einstellungen1 = New IHWB.EVO.EVO_Einstellungen
-        Me.Button_Stop = New System.Windows.Forms.Button
         MenuStrip1 = New System.Windows.Forms.MenuStrip
         MenuItem_Tools = New System.Windows.Forms.ToolStripMenuItem
         ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator
@@ -441,6 +441,18 @@ Partial Class Form1
         '
         Me.Hauptdiagramm1.Walls.View3D = False
         '
+        'Button_Stop
+        '
+        Me.Button_Stop.Enabled = False
+        Me.Button_Stop.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Button_Stop.Location = New System.Drawing.Point(176, 106)
+        Me.Button_Stop.Name = "Button_Stop"
+        Me.Button_Stop.Size = New System.Drawing.Size(59, 38)
+        Me.Button_Stop.TabIndex = 21
+        Me.Button_Stop.Text = "Stop"
+        Me.ToolTip1.SetToolTip(Me.Button_Stop, "Optimierung abbrechen")
+        Me.Button_Stop.UseVisualStyleBackColor = True
+        '
         'EVO_Opt_Verlauf1
         '
         Me.EVO_Opt_Verlauf1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
@@ -460,18 +472,6 @@ Partial Class Form1
         Me.EVO_Einstellungen1.Name = "EVO_Einstellungen1"
         Me.EVO_Einstellungen1.Size = New System.Drawing.Size(244, 707)
         Me.EVO_Einstellungen1.TabIndex = 2
-        '
-        'Button_Stop
-        '
-        Me.Button_Stop.Enabled = False
-        Me.Button_Stop.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Button_Stop.Location = New System.Drawing.Point(176, 106)
-        Me.Button_Stop.Name = "Button_Stop"
-        Me.Button_Stop.Size = New System.Drawing.Size(59, 38)
-        Me.Button_Stop.TabIndex = 21
-        Me.Button_Stop.Text = "Stop"
-        Me.ToolTip1.SetToolTip(Me.Button_Stop, "Optimierung abbrechen")
-        Me.Button_Stop.UseVisualStyleBackColor = True
         '
         'Form1
         '
