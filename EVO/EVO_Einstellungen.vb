@@ -66,17 +66,29 @@ Public Class EVO_Einstellungen
         'Comboboxen füllen
         Call Me.InitComboboxes()
 
-        'Standard-Settings setzen
+        Call Me.setStandard_All()
+
+        Me.isInitializing = False
+
+    End Sub
+
+    ''' <summary>
+    ''' Alle Standard-Settings setzen
+    ''' </summary>
+    Public Sub setStandard_All()
+
+        Me.isInitializing = True
         Call Me.msettings.PES.setStandard(EVO_MODUS.Single_Objective)
         Call Me.msettings.CES.setStandard(METH_CES)
         Call Me.msettings.HookJeeves.setStandard()
         Call Me.msettings.MetaEvo.setStandard()
         Call Me.msettings.DDS.setStandard()
         Call Me.msettings.SensiPlot.setStandard()
-
+        'Call Me.writeForm()
         Me.isInitializing = False
 
     End Sub
+
 
     'Initialisierung
     '***************
@@ -173,6 +185,7 @@ Public Class EVO_Einstellungen
 
                 'Standardeinstellungen setzen
                 Call Me.setStandard_SensiPlot()
+
             Case Else
 
                 Me.Enabled = False
@@ -742,42 +755,42 @@ Public Class EVO_Einstellungen
 
     'Standardeinstellungen setzen (PES)
     '**********************************
-    Public Sub setStandard_PES(ByVal modus As EVO_MODUS)
+    Private Sub setStandard_PES(ByVal modus As EVO_MODUS)
         Call Me.msettings.PES.setStandard(modus)
         Call Me.writeForm()
     End Sub
 
     'Standardeinstellungen setzen (CES)
     '**********************************
-    Public Sub setStandard_CES()
+    Private Sub setStandard_CES()
         Call Me.msettings.CES.setStandard(Me.mProblem.Method)
         Call Me.writeForm()
     End Sub
 
     'Standardeinstellungen setzen für HJ
     '***********************************
-    Public Sub setStandard_HJ()
+    Private Sub setStandard_HJ()
         Call Me.msettings.HookJeeves.setStandard()
         Call Me.writeForm()
     End Sub
 
     'Standardeinstellungen setzen für MetaEVO
     '****************************************
-    Public Sub setStandard_MetaEvo()
+    Private Sub setStandard_MetaEvo()
         Call Me.msettings.MetaEvo.setStandard()
         Call Me.writeForm()
     End Sub
 
     'Standardeinstellungen setzen für DDS
     '************************************
-    Public Sub setStandard_DDS()
+    Private Sub setStandard_DDS()
         Call Me.msettings.DDS.setStandard()
         Call Me.writeForm()
     End Sub
 
     'Standardeinstellungen setzen für SensiPlot
     '******************************************
-    Public Sub setStandard_SensiPlot()
+    Private Sub setStandard_SensiPlot()
         Call Me.msettings.SensiPlot.setStandard()
         Call Me.writeForm()
     End Sub

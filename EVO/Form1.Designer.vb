@@ -35,6 +35,7 @@ Partial Class Form1
         Dim ToolStripSeparator5 As System.Windows.Forms.ToolStripSeparator
         Dim ToolStripSeparator6 As System.Windows.Forms.ToolStripSeparator
         Dim ToolStripSeparator8 As System.Windows.Forms.ToolStripSeparator
+        Dim ToolStripSeparator7 As System.Windows.Forms.ToolStripSeparator
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
         Me.MenuItem_DatensatzZurücksetzen = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuItem_Optionen = New System.Windows.Forms.ToolStripMenuItem
@@ -42,6 +43,7 @@ Partial Class Form1
         Me.MenuItem_About = New System.Windows.Forms.ToolStripMenuItem
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.Button_Start = New System.Windows.Forms.Button
+        Me.Button_Stop = New System.Windows.Forms.Button
         Me.GroupBox_Anwendung = New System.Windows.Forms.GroupBox
         Me.Button_BrowseDatensatz = New System.Windows.Forms.Button
         Me.ComboBox_Datensatz = New System.Windows.Forms.ComboBox
@@ -53,6 +55,7 @@ Partial Class Form1
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip
+        Me.ToolStripButton_New = New System.Windows.Forms.ToolStripButton
         Me.ToolStripSplitButton_SettingsGeneral = New System.Windows.Forms.ToolStripSplitButton
         Me.ToolStripMenuItem_SettingsSave = New System.Windows.Forms.ToolStripMenuItem
         Me.ToolStripMenuItem_SettingsLoad = New System.Windows.Forms.ToolStripMenuItem
@@ -69,7 +72,6 @@ Partial Class Form1
         Me.ToolStripButton_Scatterplot = New System.Windows.Forms.ToolStripButton
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip
         Me.Hauptdiagramm1 = New IHWB.EVO.Diagramm.Hauptdiagramm
-        Me.Button_Stop = New System.Windows.Forms.Button
         Me.EVO_Opt_Verlauf1 = New IHWB.EVO.EVO_Opt_Verlauf
         Me.EVO_Einstellungen1 = New IHWB.EVO.EVO_Einstellungen
         MenuStrip1 = New System.Windows.Forms.MenuStrip
@@ -82,6 +84,7 @@ Partial Class Form1
         ToolStripSeparator5 = New System.Windows.Forms.ToolStripSeparator
         ToolStripSeparator6 = New System.Windows.Forms.ToolStripSeparator
         ToolStripSeparator8 = New System.Windows.Forms.ToolStripSeparator
+        ToolStripSeparator7 = New System.Windows.Forms.ToolStripSeparator
         MenuStrip1.SuspendLayout()
         Me.GroupBox_Anwendung.SuspendLayout()
         Me.ToolStrip1.SuspendLayout()
@@ -171,10 +174,14 @@ Partial Class Form1
         ToolStripSeparator8.Name = "ToolStripSeparator8"
         ToolStripSeparator8.Size = New System.Drawing.Size(6, 25)
         '
+        'ToolStripSeparator7
+        '
+        ToolStripSeparator7.Name = "ToolStripSeparator7"
+        ToolStripSeparator7.Size = New System.Drawing.Size(6, 25)
+        '
         'Button_Start
         '
         Me.Button_Start.BackColor = System.Drawing.SystemColors.Control
-        Me.Button_Start.Enabled = False
         Me.Button_Start.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Button_Start.Location = New System.Drawing.Point(4, 106)
         Me.Button_Start.Name = "Button_Start"
@@ -183,6 +190,18 @@ Partial Class Form1
         Me.Button_Start.Text = "Run"
         Me.ToolTip1.SetToolTip(Me.Button_Start, "Optimierung starten")
         Me.Button_Start.UseVisualStyleBackColor = True
+        '
+        'Button_Stop
+        '
+        Me.Button_Stop.Enabled = False
+        Me.Button_Stop.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Button_Stop.Location = New System.Drawing.Point(176, 106)
+        Me.Button_Stop.Name = "Button_Stop"
+        Me.Button_Stop.Size = New System.Drawing.Size(59, 38)
+        Me.Button_Stop.TabIndex = 21
+        Me.Button_Stop.Text = "Stop"
+        Me.ToolTip1.SetToolTip(Me.Button_Stop, "Optimierung abbrechen")
+        Me.Button_Stop.UseVisualStyleBackColor = True
         '
         'GroupBox_Anwendung
         '
@@ -207,7 +226,6 @@ Partial Class Form1
         'Button_BrowseDatensatz
         '
         Me.Button_BrowseDatensatz.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Button_BrowseDatensatz.Enabled = False
         Me.Button_BrowseDatensatz.Location = New System.Drawing.Point(520, 17)
         Me.Button_BrowseDatensatz.Name = "Button_BrowseDatensatz"
         Me.Button_BrowseDatensatz.Size = New System.Drawing.Size(24, 23)
@@ -220,7 +238,6 @@ Partial Class Form1
         Me.ComboBox_Datensatz.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox_Datensatz.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboBox_Datensatz.Enabled = False
         Me.ComboBox_Datensatz.FormattingEnabled = True
         Me.ComboBox_Datensatz.Location = New System.Drawing.Point(206, 18)
         Me.ComboBox_Datensatz.Name = "ComboBox_Datensatz"
@@ -251,7 +268,6 @@ Partial Class Form1
         '
         Me.Label_Methode.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Label_Methode.AutoSize = True
-        Me.Label_Methode.Enabled = False
         Me.Label_Methode.Location = New System.Drawing.Point(555, 22)
         Me.Label_Methode.Name = "Label_Methode"
         Me.Label_Methode.Size = New System.Drawing.Size(52, 13)
@@ -262,7 +278,6 @@ Partial Class Form1
         '
         Me.ComboBox_Methode.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox_Methode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboBox_Methode.Enabled = False
         Me.ComboBox_Methode.FormattingEnabled = True
         Me.ComboBox_Methode.Location = New System.Drawing.Point(608, 18)
         Me.ComboBox_Methode.Name = "ComboBox_Methode"
@@ -272,7 +287,6 @@ Partial Class Form1
         'Label_Datensatz
         '
         Me.Label_Datensatz.AutoSize = True
-        Me.Label_Datensatz.Enabled = False
         Me.Label_Datensatz.Location = New System.Drawing.Point(147, 22)
         Me.Label_Datensatz.Name = "Label_Datensatz"
         Me.Label_Datensatz.Size = New System.Drawing.Size(58, 13)
@@ -281,12 +295,22 @@ Partial Class Form1
         '
         'ToolStrip1
         '
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripSplitButton_SettingsGeneral, ToolStripSeparator5, Me.ToolStripSplitButton_ErgebnisDB, ToolStripSeparator4, Me.ToolStripSplitButton_Diagramm, ToolStripSeparator3, Me.ToolStripButton_Monitor, ToolStripSeparator6, Me.ToolStripButton_Scatterplot, ToolStripSeparator8})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton_New, ToolStripSeparator7, Me.ToolStripSplitButton_SettingsGeneral, ToolStripSeparator5, Me.ToolStripSplitButton_ErgebnisDB, ToolStripSeparator4, Me.ToolStripSplitButton_Diagramm, ToolStripSeparator3, Me.ToolStripButton_Monitor, ToolStripSeparator6, Me.ToolStripButton_Scatterplot, ToolStripSeparator8})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 24)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Size = New System.Drawing.Size(722, 25)
         Me.ToolStrip1.TabIndex = 19
         Me.ToolStrip1.Text = "ToolStrip1"
+        '
+        'ToolStripButton_New
+        '
+        Me.ToolStripButton_New.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButton_New.Image = Global.IHWB.EVO.My.Resources.Resources.page_white
+        Me.ToolStripButton_New.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton_New.Name = "ToolStripButton_New"
+        Me.ToolStripButton_New.Size = New System.Drawing.Size(23, 22)
+        Me.ToolStripButton_New.Text = "Neu"
+        Me.ToolStripButton_New.ToolTipText = "Eine neue Optimierung starten"
         '
         'ToolStripSplitButton_SettingsGeneral
         '
@@ -441,18 +465,6 @@ Partial Class Form1
         '
         Me.Hauptdiagramm1.Walls.View3D = False
         '
-        'Button_Stop
-        '
-        Me.Button_Stop.Enabled = False
-        Me.Button_Stop.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Button_Stop.Location = New System.Drawing.Point(176, 106)
-        Me.Button_Stop.Name = "Button_Stop"
-        Me.Button_Stop.Size = New System.Drawing.Size(59, 38)
-        Me.Button_Stop.TabIndex = 21
-        Me.Button_Stop.Text = "Stop"
-        Me.ToolTip1.SetToolTip(Me.Button_Stop, "Optimierung abbrechen")
-        Me.Button_Stop.UseVisualStyleBackColor = True
-        '
         'EVO_Opt_Verlauf1
         '
         Me.EVO_Opt_Verlauf1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
@@ -467,7 +479,6 @@ Partial Class Form1
         '
         Me.EVO_Einstellungen1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.EVO_Einstellungen1.Enabled = False
         Me.EVO_Einstellungen1.Location = New System.Drawing.Point(4, 148)
         Me.EVO_Einstellungen1.Name = "EVO_Einstellungen1"
         Me.EVO_Einstellungen1.Size = New System.Drawing.Size(244, 707)
@@ -540,4 +551,5 @@ Partial Class Form1
     Friend WithEvents ToolStripMenuItem_SettingsLoad As System.Windows.Forms.ToolStripMenuItem
     Private WithEvents ToolStripSplitButton_SettingsGeneral As System.Windows.Forms.ToolStripSplitButton
     Private WithEvents Button_Stop As System.Windows.Forms.Button
+    Private WithEvents ToolStripButton_New As System.Windows.Forms.ToolStripButton
 End Class
