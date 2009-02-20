@@ -745,9 +745,6 @@ Partial Class Form1
         Dim OptTime As New Stopwatch
         OptTime.Start()
 
-        'Der Controller
-        Dim controller As EVO.IController
-
         If (Me.isrun And Not Me.ispause) Then
             'Optimierung pausieren
             '---------------------
