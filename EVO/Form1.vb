@@ -42,9 +42,11 @@ Partial Class Form1
 
     'Apps
     Private Testprobleme1 As EVO.Apps.Testprobleme
-    Friend WithEvents Sim1 As EVO.Apps.Sim
-    Private SensiPlot1 As EVO.Apps.SensiPlot
+    Private WithEvents Sim1 As EVO.Apps.Sim
     Private TSP1 As EVO.Apps.TSP
+
+    'Controller
+    Private controller As EVO.IController
 
     '**** Verschiedenes ****
     Dim isrun As Boolean = False                        'Optimierung läuft
@@ -582,20 +584,8 @@ Partial Class Form1
                 Case METH_SENSIPLOT 'Methode SensiPlot
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'SensiPlot instanzieren
-                    SensiPlot1 = New EVO.Apps.SensiPlot(Me.mProblem)
-
                     'Monitor deaktivieren
                     Me.ToolStripButton_Monitor.Checked = False
-
-                    'SensiPlot Dialog anzeigen:
-                    Dim SensiPlotDiagResult As Windows.Forms.DialogResult
-                    SensiPlotDiagResult = SensiPlot1.ShowDialog()
-                    If (Not SensiPlotDiagResult = Windows.Forms.DialogResult.OK) Then
-                        'Mauszeiger wieder normal
-                        Cursor = Cursors.Default
-                        Exit Sub
-                    End If
 
                     'TODO: Progress initialisieren
 
@@ -751,9 +741,6 @@ Partial Class Form1
 
     Private Sub STARTEN_Button_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Button_Start.Click
 
-        'Der Controller
-        Dim controller As EVO.IController
-
         If (Me.isrun And Not Me.ispause) Then
             'Optimierung pausieren
             '---------------------
@@ -821,38 +808,31 @@ Partial Class Form1
                     Select Case Me.mProblem.Method
 
                         Case METH_SENSIPLOT
-                            Call STARTEN_SensiPlot()
+                            'SensiPlot-Controller initialisieren und starten
+                            controller = New EVO.SensiPlot.Controller()
 
                         Case METH_PES, METH_CES, METH_HYBRID
                             'ES-Controller initialisieren und starten
                             controller = New EVO.ES.Controller()
-                            Call controller.Init(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Monitor1, Me.Hauptdiagramm1)
-                            Call controller.InitApp(Me.Sim1)
-                            Call controller.Start()
 
                         Case METH_MetaEvo
                             'MetaEVO-Controller initialisieren und starten
                             controller = New EVO.MetaEvo.Controller()
-                            Call controller.Init(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Monitor1, Me.Hauptdiagramm1)
-                            Call controller.InitApp(Me.Sim1)
-                            Call controller.Start()
-
 
                         Case METH_HOOKJEEVES
                             'HJ-Controller initialisieren und starten
                             controller = New EVO.HookeAndJeeves.Controller()
-                            Call controller.Init(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Monitor1, Me.Hauptdiagramm1)
-                            Call controller.InitApp(Me.Sim1)
-                            Call controller.Start()
 
                         Case METH_DDS
                             'DDS-Controller initialisieren und starten
                             controller = New modelEAU.DDS.Controller()
-                            Call controller.Init(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Monitor1, Me.Hauptdiagramm1)
-                            Call controller.InitApp(Me.Sim1)
-                            Call controller.Start()
 
                     End Select
+
+                    'Controller für Sim initialisieren und starten
+                    Call controller.Init(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Monitor1, Me.Hauptdiagramm1)
+                    Call controller.InitApp(Me.Sim1)
+                    Call controller.Start()
 
                 Case ANW_TESTPROBLEME
 
@@ -902,187 +882,6 @@ Partial Class Form1
         End If
 
     End Sub
-
-    'Anwendung SensiPlot - START; läuft ohne Evolutionsstrategie             
-    '***********************************************************
-    Private Sub STARTEN_SensiPlot()
-
-        'Hinweis:
-        '------------------------------------------------------------------------
-        'Die Modellparameter werden auch für die nicht ausgewählten OptParameter 
-        'geschrieben, und zwar mit den in der OPT-Datei angegebenen Startwerten
-        '------------------------------------------------------------------------
-
-        Dim i, j, n, Anz_SensiPara, Anz_Sim As Integer
-        Dim isOK As Boolean
-        Dim ind As Common.Individuum_PES
-        Dim serie As Steema.TeeChart.Styles.Points
-        Dim serie3D As New Steema.TeeChart.Styles.Points3D
-        Dim surface As New Steema.TeeChart.Styles.Surface
-        Dim SimReihe As Wave.Zeitreihe
-        Dim SimReihen As Collection
-        Dim Wave1 As Wave.Wave
-
-        'Simulationen in Originalverzeichnis ausführen (keine Threads)
-        Sim1.WorkDir_Current = Sim1.WorkDir_Original
-
-        'Instanzieren
-        SimReihen = New Collection()
-
-        'Parameter
-        Anz_SensiPara = SensiPlot1.Selected_OptParameter.GetLength(0)
-
-        'Anzahl Simulationen
-        If (Anz_SensiPara = 1) Then
-            '1 Parameter
-            Anz_Sim = SensiPlot1.Anz_Steps
-        Else
-            '2 Parameter
-            Anz_Sim = SensiPlot1.Anz_Steps ^ 2
-        End If
-
-        'Progress initialisieren
-        Call Me.mProgress.Initialize(0, 0, 0, Anz_Sim)
-
-        'Bei 2 OptParametern 3D-Diagramm vorbereiten
-        If (Anz_SensiPara > 1) Then
-            'Oberfläche
-            surface = New Steema.TeeChart.Styles.Surface(Me.Hauptdiagramm1.Chart)
-            surface.IrregularGrid = True
-            surface.NumXValues = SensiPlot1.Anz_Steps
-            surface.NumZValues = SensiPlot1.Anz_Steps
-            '3D-Punkte
-            serie3D = Me.Hauptdiagramm1.getSeries3DPoint("Sensiplot", "Orange")
-            'Diagramm drehen (rechter Mausbutton)
-            Dim rotate1 As New Steema.TeeChart.Tools.Rotate
-            rotate1.Button = Windows.Forms.MouseButtons.Right
-            Me.Hauptdiagramm1.Tools.Add(rotate1)
-            'MarksTips
-            Me.Hauptdiagramm1.add_MarksTips(serie3D, Steema.TeeChart.Styles.MarksStyles.Label)
-            surface.Title = "SensiPlot"
-            surface.Cursor = Cursors.Hand
-        End If
-
-        'Simulationsschleife
-        '-------------------
-        Randomize()
-
-        n = 0
-
-        'Äussere Schleife (2. OptParameter)
-        '----------------------------------
-        For i = 0 To ((SensiPlot1.Anz_Steps - 1) * (Anz_SensiPara - 1))
-
-            '2. OptParameterwert variieren
-            If (Anz_SensiPara > 1) Then
-                Select Case SensiPlot1.Selected_SensiType
-                    Case "Gleichverteilt"
-                        Me.mProblem.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Xn = Rnd()
-                    Case "Diskret"
-                        Me.mProblem.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Xn = i / (SensiPlot1.Anz_Steps - 1)
-                End Select
-            End If
-
-            'Innere Schleife (1. OptParameter)
-            '---------------------------------
-            For j = 0 To SensiPlot1.Anz_Steps - 1
-
-                '1. OptParameterwert variieren
-                Select Case SensiPlot1.Selected_SensiType
-                    Case "Gleichverteilt"
-                        Me.mProblem.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Xn = Rnd()
-                    Case "Diskret"
-                        Me.mProblem.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Xn = j / (SensiPlot1.Anz_Steps - 1)
-                End Select
-
-                n += 1
-
-                'Verlaufsanzeige aktualisieren
-                Me.mProgress.iNachf = n
-
-                'Einhaltung von OptParameter-Beziehung überprüfen
-                isOK = True
-                If (Anz_SensiPara > 1) Then
-                    'Es muss nur der zweite Parameter auf eine Beziehung geprüft werden
-                    If (Me.mProblem.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Beziehung <> Beziehung.keine) Then
-                        'Beziehung bezieht sich immer auf den in der Liste vorherigen Parameter
-                        If (SensiPlot1.Selected_OptParameter(0) = SensiPlot1.Selected_OptParameter(1) - 1) Then
-
-                            isOK = False
-
-                            Dim ref As Double = Me.mProblem.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).RWert
-                            Dim wert As Double = Me.mProblem.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).RWert
-
-                            Select Case Me.mProblem.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Beziehung
-                                Case Beziehung.kleiner
-                                    If (wert < ref) Then isOK = True
-                                Case Beziehung.kleinergleich
-                                    If (wert <= ref) Then isOK = True
-                                Case Beziehung.groesser
-                                    If (wert > ref) Then isOK = True
-                                Case Beziehung.groessergleich
-                                    If (wert >= ref) Then isOK = True
-                            End Select
-
-                        End If
-                    End If
-                End If
-
-                'Evaluierung nur bei isOK
-                If (isOK) Then
-
-                    'Individuum instanzieren
-                    ind = New Common.Individuum_PES("SensiPlot", n)
-
-                    'OptParameter ins Individuum kopieren
-                    ind.OptParameter = Me.mProblem.List_OptParameter
-
-                    'Individuum in Sim evaluieren
-                    isOK = Sim1.Evaluate(ind)
-                    'TODO: Fehlerbehandlung bei Simulationsfehler
-
-                    'BUG 253: Verletzte Constraints bei SensiPlot kenntlich machen?
-
-                    'Diagramm aktualisieren
-                    If (Anz_SensiPara = 1) Then
-                        '1 Parameter
-                        serie = Me.Hauptdiagramm1.getSeriesPoint("SensiPlot", "Orange")
-                        serie.Add(ind.PrimObjectives(SensiPlot1.Selected_Penaltyfunction), ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(0)), n.ToString())
-                    Else
-                        '2 Parameter
-                        surface.Add(ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(0)), ind.PrimObjectives(SensiPlot1.Selected_Penaltyfunction), ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(1)), n.ToString())
-                        serie3D.Add(ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(0)), ind.PrimObjectives(SensiPlot1.Selected_Penaltyfunction), ind.OptParameter_RWerte(SensiPlot1.Selected_OptParameter(1)), n.ToString())
-                    End If
-
-                    'Simulationsergebnis in Wave laden
-                    If (SensiPlot1.show_Wave) Then
-                        'SimReihe auslesen
-                        SimReihe = Sim1.SimErgebnis(Me.mProblem.List_PrimObjectiveFunctions(SensiPlot1.Selected_Penaltyfunction).SimGr)
-                        'Lösungs-ID an Titel anhängen
-                        SimReihe.Title += " (Lösung " & n.ToString() & ")"
-                        'SimReihe zu Collection hinzufügen
-                        SimReihen.Add(SimReihe)
-                    End If
-
-                End If
-
-                System.Windows.Forms.Application.DoEvents()
-
-            Next
-        Next
-
-        'Wave Diagramm anzeigen:
-        '-----------------------
-        If (SensiPlot1.show_Wave) Then
-            Wave1 = New Wave.Wave()
-            For Each zre As Wave.Zeitreihe In SimReihen
-                Wave1.Display_Series(zre)
-            Next
-            Call Wave1.Show()
-        End If
-
-    End Sub
-
 
     'Anwendung Traveling Salesman - Start                         
     '************************************
@@ -1225,7 +1024,7 @@ Partial Class Form1
                     Case METH_SENSIPLOT 'SensiPlot
                         'XXXXXXXXXXXXXXXXXXXXXXXXX
 
-                        If (SensiPlot1.Selected_OptParameter.GetLength(0) = 1) Then
+                        If (Me.EVO_Einstellungen1.Settings.SensiPlot.Selected_OptParameters.GetLength(0) = 1) Then
 
                             '1 OptParameter:
                             '---------------
@@ -1233,12 +1032,12 @@ Partial Class Form1
                             'Achsen:
                             '-------
                             'X-Achse = QWert
-                            Achse.Title = Me.mProblem.List_PrimObjectiveFunctions(SensiPlot1.Selected_Penaltyfunction).Bezeichnung
+                            Achse.Title = Me.mProblem.List_ObjectiveFunctions(Me.EVO_Einstellungen1.Settings.SensiPlot.Selected_Objective).Bezeichnung
                             Achse.Automatic = True
                             Achse.Maximum = 0
                             Achsen.Add(Achse)
                             'Y-Achse = OptParameter
-                            Achse.Title = Me.mProblem.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Bezeichnung
+                            Achse.Title = Me.mProblem.List_OptParameter(Me.EVO_Einstellungen1.Settings.SensiPlot.Selected_OptParameters(0)).Bezeichnung
                             Achse.Automatic = True
                             Achse.Maximum = 0
                             Achsen.Add(Achse)
@@ -1246,7 +1045,7 @@ Partial Class Form1
                             'Achsenzuordnung
                             'BUG 327!
                             For i = 0 To Me.mProblem.NumObjectives - 1
-                                If (Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung = Me.mProblem.List_PrimObjectiveFunctions(SensiPlot1.Selected_Penaltyfunction).Bezeichnung) Then
+                                If (Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung = Me.mProblem.List_ObjectiveFunctions(Me.EVO_Einstellungen1.Settings.SensiPlot.Selected_Objective).Bezeichnung) Then
                                     Me.Hauptdiagramm1.ZielIndexX = i
                                     Exit For 'Abbruch
                                 End If
@@ -1261,17 +1060,17 @@ Partial Class Form1
                             'Achsen:
                             '-------
                             'X-Achse = OptParameter1
-                            Achse.Title = Me.mProblem.List_OptParameter(SensiPlot1.Selected_OptParameter(0)).Bezeichnung
+                            Achse.Title = Me.mProblem.List_OptParameter(Me.EVO_Einstellungen1.Settings.SensiPlot.Selected_OptParameters(0)).Bezeichnung
                             Achse.Automatic = True
                             Achse.Maximum = 0
                             Achsen.Add(Achse)
-                            'Y-Achse = QWert
-                            Achse.Title = Me.mProblem.List_PrimObjectiveFunctions(SensiPlot1.Selected_Penaltyfunction).Bezeichnung
+                            'Y-Achse = Objective
+                            Achse.Title = Me.mProblem.List_ObjectiveFunctions(Me.EVO_Einstellungen1.Settings.SensiPlot.Selected_Objective).Bezeichnung
                             Achse.Automatic = True
                             Achse.Maximum = 0
                             Achsen.Add(Achse)
                             'Z-Achse = OptParameter2
-                            Achse.Title = Me.mProblem.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Bezeichnung
+                            Achse.Title = Me.mProblem.List_OptParameter(Me.EVO_Einstellungen1.Settings.SensiPlot.Selected_OptParameters(1)).Bezeichnung
                             Achse.Automatic = True
                             Achse.Maximum = 0
                             Achsen.Add(Achse)
@@ -1280,7 +1079,7 @@ Partial Class Form1
                             'BUG 327!
                             Me.Hauptdiagramm1.ZielIndexX = -1
                             For i = 0 To Me.mProblem.NumObjectives - 1
-                                If (Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung = Me.mProblem.List_PrimObjectiveFunctions(SensiPlot1.Selected_Penaltyfunction).Bezeichnung) Then
+                                If (Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung = Me.mProblem.List_ObjectiveFunctions(Me.EVO_Einstellungen1.Settings.SensiPlot.Selected_Objective).Bezeichnung) Then
                                     Me.Hauptdiagramm1.ZielIndexY = i
                                     Exit For 'Abbruch
                                 End If

@@ -66,14 +66,15 @@ Public Class EVO_Einstellungen
         'Comboboxen füllen
         Call Me.InitComboboxes()
 
-        Me.isInitializing = False
-
         'Standard-Settings setzen
         Call Me.msettings.PES.setStandard(EVO_MODUS.Single_Objective)
         Call Me.msettings.CES.setStandard(METH_CES)
         Call Me.msettings.HookJeeves.setStandard()
         Call Me.msettings.MetaEvo.setStandard()
         Call Me.msettings.DDS.setStandard()
+        Call Me.msettings.SensiPlot.setStandard()
+
+        Me.isInitializing = False
 
     End Sub
 
@@ -93,10 +94,6 @@ Public Class EVO_Einstellungen
 
         'Anzeige je nach Methode anpassen
         Select Case Me.mProblem.Method
-
-            Case METH_SENSIPLOT
-
-                Me.Enabled = False
 
             Case METH_PES
 
@@ -166,6 +163,16 @@ Public Class EVO_Einstellungen
                 'Standardeinstellungen setzen
                 Call Me.setStandard_MetaEvo()
 
+            Case METH_SENSIPLOT
+
+                'EVO_Einstellungen aktivieren
+                Me.Enabled = True
+
+                'Tabpage anzeigen
+                Me.TabControl1.TabPages.Add(Me.TabPage_SensiPlot)
+
+                'Standardeinstellungen setzen
+                Call Me.setStandard_SensiPlot()
             Case Else
 
                 Me.Enabled = False
@@ -455,11 +462,41 @@ Public Class EVO_Einstellungen
 
         End With
 
+        'DDS
+        '-----------------
         With Me.msettings.DDS
 
             .maxiter = Me.Numeric_DDS_maxiter.Value
             .r_val = Me.Numeric_DDS_r_val.Value
             .optStartparameter = Me.CheckBox_DDS_ini.Checked
+
+        End With
+
+        'SensiPlot
+        '--------------
+        With Me.msettings.SensiPlot
+
+            'OptParameter
+            ReDim .Selected_OptParameters(Me.SensiPlot_ListBox_OptParameter.SelectedIndices.Count - 1)
+            For i As Integer = 0 To Me.SensiPlot_ListBox_OptParameter.SelectedIndices.Count - 1
+                .Selected_OptParameters(i) = Me.SensiPlot_ListBox_OptParameter.SelectedIndices(i)
+            Next
+
+            'Objective
+            .Selected_Objective = Me.SensiPlot_ListBox_Objectives.SelectedIndex
+
+            'Modus
+            If (Me.SensiPlot_RadioButton_Discrete.Checked) Then
+                .Selected_SensiType = Common.EVO_Settings.SensiPlot_Settings.SensiType.discrete
+            Else
+                .Selected_SensiType = Common.EVO_Settings.SensiPlot_Settings.SensiType.normaldistribution
+            End If
+
+            'Anzahl Schritte
+            .Num_Steps = Me.SensiPlot_NumericUpDown_NumSteps.Value
+
+            'Wave anzeigen
+            .show_Wave = Me.SensiPlot_CheckBox_wave.Checked
 
         End With
 
@@ -626,6 +663,47 @@ Public Class EVO_Einstellungen
 
         End With
 
+        'SensiPlot
+        '--------------
+        With Me.msettings.SensiPlot
+
+            'Listboxen zurücksetzen
+            Call Me.SensiPlot_ListBox_OptParameter.Items.Clear()
+            Call Me.SensiPlot_ListBox_Objectives.Items.Clear()
+
+            'Listboxen füllen
+            For Each optpara As Common.OptParameter In Me.mProblem.List_OptParameter
+                Call Me.SensiPlot_ListBox_OptParameter.Items.Add(optpara)
+            Next
+            For Each objective As Common.Objectivefunktion In Me.mProblem.List_ObjectiveFunctions
+                Call Me.SensiPlot_ListBox_Objectives.Items.Add(objective)
+            Next
+
+            'OptParameter
+            For Each selectedIndex As Integer In .Selected_OptParameters
+                Me.SensiPlot_ListBox_OptParameter.SetSelected(selectedIndex, True)
+            Next
+
+            'Objective
+            If (.Selected_Objective <> -1) Then
+                Me.SensiPlot_ListBox_Objectives.SetSelected(.Selected_Objective, True)
+            End If
+
+            'Modus
+            If (.Selected_SensiType = Common.EVO_Settings.SensiPlot_Settings.SensiType.discrete) Then
+                Me.SensiPlot_RadioButton_Discrete.Checked = True
+            Else
+                Me.SensiPlot_RadioButton_NormalDistribution.Checked = True
+            End If
+
+            'Anzahl Schritte
+            Me.SensiPlot_NumericUpDown_NumSteps.Value = .Num_Steps
+
+            'Wave anzeigen
+            Me.SensiPlot_CheckBox_wave.Checked = .show_Wave
+
+        End With
+
         Call Application.DoEvents()
 
     End Sub
@@ -697,6 +775,13 @@ Public Class EVO_Einstellungen
         Call Me.writeForm()
     End Sub
 
+    'Standardeinstellungen setzen für SensiPlot
+    '******************************************
+    Public Sub setStandard_SensiPlot()
+        Call Me.msettings.SensiPlot.setStandard()
+        Call Me.writeForm()
+    End Sub
+
     'Speichern der EVO_Settings in einer XML-Datei
     '*********************************************
     Public Sub saveSettings(ByVal filename As String)
@@ -735,7 +820,7 @@ Public Class EVO_Einstellungen
             isLoad = False
 
         Catch e As Exception
-            MsgBox("Fehler beim Einlesen der Einstellungen!" & eol & e.Message, MsgBoxStyle.Critical, "Fehler")
+            MsgBox("Fehler beim Einlesen der Einstellungen!" & eol & e.Message, MsgBoxStyle.Exclamation)
 
         Finally
             fs.Close()
@@ -748,12 +833,12 @@ Public Class EVO_Einstellungen
     '*******************************
     Private Sub serializerUnknownElement(ByVal sender As Object, ByVal e As XmlElementEventArgs)
         MsgBox("Fehler beim Einlesen der Einstellungen:" & eol _
-            & "Das Element '" & e.Element.Name & "' ist unbekannt!", MsgBoxStyle.Critical, "Fehler")
+            & "Das Element '" & e.Element.Name & "' ist unbekannt!", MsgBoxStyle.Exclamation)
     End Sub
 
     Private Sub serializerUnknownAttribute(ByVal sender As Object, ByVal e As XmlAttributeEventArgs)
         MsgBox("Fehler beim Einlesen der Einstellungen:" & eol _
-            & "Das Attribut '" & e.Attr.Name & "' ist unbekannt!", MsgBoxStyle.Critical, "Fehler")
+            & "Das Attribut '" & e.Attr.Name & "' ist unbekannt!", MsgBoxStyle.Exclamation)
     End Sub
 
 #End Region 'Schnittstelle
@@ -793,6 +878,35 @@ Public Class EVO_Einstellungen
             Me.GroupBox_MetaEvo_LocalOptions.Enabled = True
         End If
     End Sub
+
+    Private Sub SensiPlot_CheckForm() Handles SensiPlot_ListBox_OptParameter.SelectedIndexChanged, SensiPlot_RadioButton_Discrete.CheckedChanged
+
+        If (Me.isInitializing) Then Exit Sub
+
+        'Entweder 1 oder 2 OptParameter
+        If (Me.SensiPlot_ListBox_OptParameter.SelectedIndices.Count = 0 _
+            Or Me.SensiPlot_ListBox_OptParameter.SelectedIndices.Count > 2) Then
+            MsgBox("Bitte zwischen 1 und 2 OptParameter auswählen!", MsgBoxStyle.Exclamation, "SensiPlot")
+            'Auswahl zurücksetzen
+            Me.isInitializing = True
+            For i As Integer = 0 To Me.SensiPlot_ListBox_OptParameter.Items.Count - 1
+                Call Me.SensiPlot_ListBox_OptParameter.SetSelected(i, False)
+            Next
+            Me.SensiPlot_ListBox_OptParameter.SetSelected(0, True)
+            Me.isInitializing = False
+            Exit Sub
+        End If
+
+        'bei 2 OptParametern geht nur diskret!
+        If (Me.SensiPlot_ListBox_OptParameter.SelectedIndices.Count = 2 And _
+            Me.SensiPlot_RadioButton_NormalDistribution.Checked) Then
+            MsgBox("Bei mehr als einem OptParameter muss 'Diskret' als Modus ausgewählt sein!", MsgBoxStyle.Exclamation, "SensiPlot")
+            Me.SensiPlot_RadioButton_Discrete.Checked = True
+            Exit Sub
+        End If
+
+    End Sub
+
 #End Region 'Methoden
 
 End Class
