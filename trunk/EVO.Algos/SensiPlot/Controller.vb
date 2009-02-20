@@ -11,7 +11,6 @@ Public Class Controller
 
     Private myAppType As EVO.Common.ApplicationTypes
     Private WithEvents Sim1 As EVO.Apps.Sim
-    Private Testprobleme1 As EVO.Apps.Testprobleme
 
     Public Sub Init(ByRef inputProblem As Common.Problem, ByRef inputSettings As Common.EVO_Settings, ByRef inputProgress As Common.Progress, ByRef inputMonitor As Diagramm.Monitor, ByRef inputHptDiagramm As Diagramm.Hauptdiagramm) Implements IController.Init
         Me.myProblem = inputProblem
@@ -27,8 +26,7 @@ Public Class Controller
     End Sub
 
     Public Sub InitApp(ByRef inputTestprobleme As Apps.Testprobleme) Implements IController.InitApp
-        Me.myAppType = ApplicationTypes.Testprobleme
-        Me.Testprobleme1 = inputTestprobleme
+        Throw New Exception("SensiPlot kann keine Testprobleme berechnen!")
     End Sub
 
     Public Sub Start() Implements IController.Start
