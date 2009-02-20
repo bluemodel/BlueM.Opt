@@ -79,15 +79,50 @@ Partial Class Form1
         'Anzahl der möglichen Threads wird ermittelt
         Me.n_Threads = Me.determineNoOfThreads()
 
+        'Formular initialisieren
+        Call Me.INI()
+
+        'Handler für Klick auf Serien zuweisen
+        AddHandler Me.Hauptdiagramm1.ClickSeries, AddressOf seriesClick
+
+        'Ende der Initialisierung
+        Me.IsInitializing = False
+
+    End Sub
+
+    ''' <summary>
+    ''' Formular zurücksetzen
+    ''' </summary>
+    Private Sub INI()
+
+        Me.IsInitializing = True
+
+        'Anwendung
+        '---------
         'Liste der Anwendungen in ComboBox schreiben und Anfangseinstellung wählen
         Me.ComboBox_Anwendung.Items.Clear()
         Me.ComboBox_Anwendung.Items.AddRange(New Object() {"", ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM, ANW_TESTPROBLEME, ANW_TSP})
         Me.ComboBox_Anwendung.SelectedIndex = 0
 
+        'Datensatz
+        '---------
+        Me.Label_Datensatz.Enabled = False
+        Me.ComboBox_Datensatz.Enabled = False
+        Me.Button_BrowseDatensatz.Enabled = False
+
+        'Methode
+        '-------
+        Me.Label_Methode.Enabled = False
+        Me.ComboBox_Methode.Enabled = False
+
         'Liste der Methoden in ComboBox schreiben und Anfangseinstellung wählen
         Me.ComboBox_Methode.Items.Clear()
         Me.ComboBox_Methode.Items.AddRange(New Object() {"", METH_PES, METH_CES, METH_HYBRID, METH_MetaEvo, METH_SENSIPLOT, METH_HOOKJEEVES, METH_DDS})
         Me.ComboBox_Methode.SelectedIndex = 0
+
+        'Einstellungen
+        Me.EVO_Einstellungen1.setStandard_All()
+        Me.EVO_Einstellungen1.Enabled = False
 
         'OptionsDialog instanzieren
         Me.Options = New OptionsDialog(Me.EVO_Einstellungen1.Settings)
@@ -106,17 +141,31 @@ Partial Class Form1
         Me.ToolStripMenuItem_SettingsLoad.Enabled = False
         Me.ToolStripMenuItem_SettingsSave.Enabled = False
 
-        'Handler für Klick auf Serien zuweisen
-        AddHandler Me.Hauptdiagramm1.ClickSeries, AddressOf seriesClick
+        'Weitere Buttons
+        Me.Button_Start.Enabled = False
+        Me.Button_Stop.Enabled = False
 
-        'Ende der Initialisierung
+        'Diagramm
+        Call Me.Hauptdiagramm1.Reset()
+
         Me.IsInitializing = False
 
     End Sub
 
+    ''' <summary>
+    ''' Button New geklickt
+    ''' </summary>
+    Private Sub Button_New_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton_New.Click
+        'Controller stoppen
+        If (Me.StopController()) Then
+            'Formular zurücksetzen
+            Call Me.INI()
+        End If
+    End Sub
+
     'Optionen Dialog anzeigen
     '************************
-    Private Sub showOptionsDialog(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem_Optionen.Click,  ToolStripSplitButton_SettingsGeneral.ButtonClick
+    Private Sub Button_Options_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem_Optionen.Click, ToolStripSplitButton_SettingsGeneral.ButtonClick
         If (Me.isrun) Then
             Call Me.Options.DisableAll()
         Else
@@ -127,7 +176,7 @@ Partial Class Form1
 
     'Monitor anzeigen
     '****************
-    Private Sub ToggleMonitor(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton_Monitor.Click
+    Private Sub Button_Monitor_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton_Monitor.Click
 
         If (Me.ToolStripButton_Monitor.Checked) Then
             Me.Monitor1.Show()
@@ -1846,16 +1895,35 @@ Partial Class Form1
     End Function
 
     ''' <summary>
+    ''' Den Controller stoppen
+    ''' </summary>
+    ''' <returns>True wenn gestoppt</returns>
+    Private Function StopController() As Boolean
+
+        Dim res As MsgBoxResult
+        If (Not IsNothing(Me.controller)) Then
+
+            res = MsgBox("Optimierung wirklich abbrechen?", MsgBoxStyle.YesNo)
+
+            If (res = MsgBoxResult.Yes) Then
+                Call Me.controller.Stoppen()
+                Me.controller = Nothing
+            Else
+                Return False
+            End If
+
+        End If
+        Return True
+
+    End Function
+
+    ''' <summary>
     ''' Stop-Button wurde geklickt
     ''' </summary>
     Private Sub Button_Stop_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Stop.Click
 
-        Dim res As MsgBoxResult
-
-        res = MsgBox("Optimierung wirklich abbrechen?", MsgBoxStyle.YesNo)
-
-        If (res = MsgBoxResult.Yes) Then
-            Call Me.controller.Stoppen()
+        'Controller stoppen
+        If (Me.StopController()) Then
             Me.Button_Stop.Enabled = False
         End If
 
@@ -1865,7 +1933,14 @@ Partial Class Form1
     ''' Das Form wird geschlossen
     ''' </summary>
     Private Sub Form1_FormClosing(ByVal sender As System.Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles MyBase.FormClosing
-        Call Me.controller.Stoppen()
+        'Controller stoppen
+        If (Me.StopController()) Then
+            'Pause ausschalten, sonst läuft die weiter, auch wenn das Form geschlossen ist
+            Me.ispause = False
+        Else
+            'FormClosing abbrechen
+            e.Cancel = True
+        End If
     End Sub
 
 #End Region 'Methoden
