@@ -851,7 +851,7 @@ namespace IHWB.EVO.MetaEvo
 
         //### Hauptprogramm ### Berechnet eine Generation im Netzwerk
 
-        public bool calculate_by_clients(ref EVO.Common.Individuum_MetaEvo[] generation_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input, ref EVO.Common.Progress progress_input)
+        public bool calculate_by_clients(ref EVO.Common.Individuum_MetaEvo[] generation_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input, ref EVO.Common.Progress progress_input, ref bool stopped)
         {
             int individuums_ready = 0;
             int individuums_ready_now = 0;
@@ -871,6 +871,8 @@ namespace IHWB.EVO.MetaEvo
             //Prüfen ob alle Individuen fertig berechnet sind
             while (individuums_ready_now < number_tosimulate)
             {
+                if (stopped) break;
+
                 if (individuums_ready < individuums_ready_now) 
                 {
                     progress_input.iNachf = (short)individuums_ready_now;
