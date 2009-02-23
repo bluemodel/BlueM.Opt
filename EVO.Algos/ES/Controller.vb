@@ -194,9 +194,6 @@ Public Class Controller
 
         For Me.CES_i_gen = 0 To CES1.mSettings.CES.n_Generations - 1
 
-            'Stop?
-            If (Me.stopped) Then Exit Sub
-
             Stoppuhr.Reset()
             Stoppuhr.Start()
 
@@ -208,6 +205,9 @@ Public Class Controller
 
             'Individuen mit Multithreading evaluieren
             isOK = Sim1.Evaluate(CES1.Childs, True)
+
+            'Stop?
+            If (Me.stopped) Then Exit Sub
 
             'Evaluierte Individuen verarbeiten
             For i_Child As Integer = 0 To CES1.Childs.Length - 1
@@ -597,6 +597,9 @@ Public Class Controller
 
                             isOK(i_Nachf) = Sim1.Evaluate(inds(i_Nachf), True)
 
+                            'Stop?
+                            If (Me.stopped) Then Exit Sub
+
                             'Evaluierungsfehler behandeln
                             '----------------------------
                             If (Not isOK(i_Nachf)) Then
@@ -636,6 +639,9 @@ Public Class Controller
 
                         'Alle Individuen evaluieren
                         isOK = Sim1.Evaluate(inds, True)
+
+                        'Stop?
+                        If (Me.stopped) Then Exit Sub
 
                         'Alle evaluierten Individuen durchlaufen
                         For i_Nachf = 0 To inds.GetUpperBound(0)
