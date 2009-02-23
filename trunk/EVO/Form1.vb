@@ -157,7 +157,7 @@ Partial Class Form1
     ''' </summary>
     Private Sub Button_New_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton_New.Click
         'Controller stoppen
-        If (Me.StopController()) Then
+        If (Me.StopOptimization()) Then
             'Formular zurücksetzen
             Call Me.INI()
         End If
@@ -412,7 +412,7 @@ Partial Class Form1
         'Combo_Datensatz auffüllen
         Call Me.Datensatz_populateCombo()
 
-        
+
         If (Me.Anwendung = ANW_TESTPROBLEME) Then
 
             'Bei Testproblemen:
@@ -798,7 +798,7 @@ Partial Class Form1
             'Optimierung pausieren
             '---------------------
             Me.ispause = True
-            Me.Button_Start.Text = "Run"
+            Me.Button_Start.Text = "Continue"
 
             'Bei Multithreading muss Sim explizit pausiert werden
             If (Me.EVO_Einstellungen1.Settings.General.useMultithreading) Then
@@ -930,14 +930,14 @@ Partial Class Form1
             'Optimierung beendet
             '-------------------
             Me.isrun = False
-            Me.Button_Start.Text = "Run"
+            Me.Button_Start.Text = "Start"
             Me.Button_Start.Enabled = False
 
+            'Ausgabe der Optimierungszeit
+            OptTime.Stop()
+            MsgBox("Die Optimierung dauerte:   " & OptTime.Elapsed.Hours & "h  " & OptTime.Elapsed.Minutes & "m  " & OptTime.Elapsed.Seconds & "s     " & OptTime.Elapsed.Seconds & "ms", MsgBoxStyle.Information)
+
         End If
-
-        OptTime.Stop()
-
-        MessageBox.Show("Die Optimierung dauerte:   " & OptTime.Elapsed.Hours & "h  " & OptTime.Elapsed.Minutes & "m  " & OptTime.Elapsed.Seconds & "s     " & OptTime.Elapsed.Seconds & "ms")
 
     End Sub
 
@@ -1895,10 +1895,10 @@ Partial Class Form1
     End Function
 
     ''' <summary>
-    ''' Den Controller stoppen
+    ''' Die Optimierung stoppen
     ''' </summary>
     ''' <returns>True wenn gestoppt</returns>
-    Private Function StopController() As Boolean
+    Private Function StopOptimization() As Boolean
 
         Dim res As MsgBoxResult
         If (Not IsNothing(Me.controller)) Then
@@ -1906,9 +1906,17 @@ Partial Class Form1
             res = MsgBox("Optimierung wirklich abbrechen?", MsgBoxStyle.YesNo)
 
             If (res = MsgBoxResult.Yes) Then
+                'Pause ausschalten, sonst läuft die immer weiter
+                Me.ispause = False
+                'Controller stoppen
                 Call Me.controller.Stoppen()
                 Me.controller = Nothing
+                'bei Multithreading Sim explizit stoppen
+                If (Me.EVO_Einstellungen1.Settings.General.useMultithreading) Then
+                    Me.Sim1.isStopped = True
+                End If
             Else
+                'doch nicht stoppen
                 Return False
             End If
 
@@ -1922,9 +1930,10 @@ Partial Class Form1
     ''' </summary>
     Private Sub Button_Stop_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Stop.Click
 
-        'Controller stoppen
-        If (Me.StopController()) Then
+        'Optimierung stoppen
+        If (Me.StopOptimization()) Then
             Me.Button_Stop.Enabled = False
+            Me.Button_Start.Text = "Start"
         End If
 
     End Sub
@@ -1933,11 +1942,8 @@ Partial Class Form1
     ''' Das Form wird geschlossen
     ''' </summary>
     Private Sub Form1_FormClosing(ByVal sender As System.Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles MyBase.FormClosing
-        'Controller stoppen
-        If (Me.StopController()) Then
-            'Pause ausschalten, sonst läuft die weiter, auch wenn das Form geschlossen ist
-            Me.ispause = False
-        Else
+        'Optimierung stoppen
+        If (Not Me.StopOptimization()) Then
             'FormClosing abbrechen
             e.Cancel = True
         End If

@@ -81,7 +81,8 @@ Public MustInherit Class Sim
     '--------------
     Public MustOverride ReadOnly Property MultithreadingSupported() As Boolean
     Protected n_Threads As Integer   'Anzahl Threads
-    Private _isPause As Boolean
+    Private _isPaused As Boolean
+    Private _isStopped As Boolean
 
 #End Region 'Eigenschaften
 
@@ -117,12 +118,25 @@ Public MustInherit Class Sim
     ''' </summary>
     Public Property isPause() As Boolean
         Get
-            Return Me._isPause
+            Return Me._isPaused
         End Get
         Set(ByVal value As Boolean)
-            Me._isPause = value
+            Me._isPaused = value
         End Set
     End Property
+
+    ''' <summary>
+    ''' Stop
+    ''' </summary>
+    Public Property isStopped() As Boolean
+        Get
+            Return Me._isStopped
+        End Get
+        Set(ByVal value As Boolean)
+            Me._isStopped = value
+        End Set
+    End Property
+
 
 #End Region 'Properties
 
@@ -143,6 +157,9 @@ Public MustInherit Class Sim
 
         'Standardmässig OptResult verwenden
         Me.mStoreIndividuals = True
+
+        Me.isPause = False
+        Me.isStopped = False
 
     End Sub
 
@@ -478,6 +495,9 @@ Public MustInherit Class Sim
         System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
 
         Do
+            'Stoppen?
+            If (Me.isStopped) Then Return isOK
+
             If (Me.ThreadFree(ThreadID_Free) _
                 And (n_ind_Run < n_individuals) _
                 And (n_ind_Ready + Me.n_Threads > n_ind_Run) _

@@ -187,7 +187,7 @@ Partial Class Form1
         Me.Button_Start.Name = "Button_Start"
         Me.Button_Start.Size = New System.Drawing.Size(165, 38)
         Me.Button_Start.TabIndex = 3
-        Me.Button_Start.Text = "Run"
+        Me.Button_Start.Text = "Start"
         Me.ToolTip1.SetToolTip(Me.Button_Start, "Optimierung starten")
         Me.Button_Start.UseVisualStyleBackColor = True
         '
