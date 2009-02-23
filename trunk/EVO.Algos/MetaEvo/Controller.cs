@@ -202,7 +202,7 @@ namespace IHWB.EVO.MetaEvo
         //### Methoden ### Hauptprogramm
 
         // Single PC
-        private void start_single_pc()
+        private bool start_single_pc()
         {
             Client mePC = new Client(); 
             mePC.status = "Init Genpool";
@@ -211,6 +211,8 @@ namespace IHWB.EVO.MetaEvo
             while (mePC.status != "finished")
             {
                 this.monitor1.LogAppend("Controller: Status: " + mePC.status);
+
+                if (this.stopped) return false;
 
                 #region Zustand: Init Genpool
                 if (mePC.status == "Init Genpool")
@@ -260,6 +262,7 @@ namespace IHWB.EVO.MetaEvo
                             System.Windows.Forms.Application.DoEvents();
                             
                             progress1.NextNachf();
+                            if (this.stopped) return false;
                         }
                     }
                     mePC.status = "select Individuums";
@@ -333,10 +336,11 @@ namespace IHWB.EVO.MetaEvo
             this.monitor1.LogAppend("Controller: Calculation Finished");
             this.appendResultToLog();
             this.monitor1.savelog();
+            return true;
         }
 
         // Network Server
-        private void start_network_server()
+        private bool start_network_server()
         {
             Client meServer = new Client(); 
             meServer = networkmanager.Network_Init_Client_Object(Dns.GetHostName());
@@ -347,6 +351,8 @@ namespace IHWB.EVO.MetaEvo
             {
                 this.monitor1.LogAppend("Controller: Status: " + meServer.status);
 
+                if (this.stopped) return false;
+
                 #region Zustand: Init Genpool
                 if (meServer.status == "Init Genpool")
                 {
@@ -356,7 +362,7 @@ namespace IHWB.EVO.MetaEvo
                     //Von den Clients ausrechnen lassen
                     this.monitor1.LogAppend("Controller: Calculate Genpool by Clients");
                     MessageBox.Show("Wait for Clients to register for calculation. Press ok to start","MetaEvo - Networkmanager");
-                    if (networkmanager.calculate_by_clients(ref generation, ref hauptdiagramm1, ref progress1))
+                    if (networkmanager.calculate_by_clients(ref generation, ref hauptdiagramm1, ref progress1, ref this.stopped))
                     {
                         algomanager.set_genpool(ref generation);
 
@@ -386,7 +392,7 @@ namespace IHWB.EVO.MetaEvo
                 else if (meServer.status == "waiting for client-calculation")
                 {
                     //Von den Clients ausrechnen lassen
-                    if (networkmanager.calculate_by_clients(ref generation, ref hauptdiagramm1, ref progress1))
+                    if (networkmanager.calculate_by_clients(ref generation, ref hauptdiagramm1, ref progress1, ref this.stopped))
                     {
                         if (settings.MetaEvo.OpMode == "Local Optimizer")
                         {
@@ -475,10 +481,11 @@ namespace IHWB.EVO.MetaEvo
             this.monitor1.LogAppend("Controller: Calculation Finished");
             this.appendResultToLog();
             this.monitor1.savelog();
+            return true;
         }
 
         // Network Client
-        private void start_network_client()
+        private bool start_network_client()
         {
             Client meClient = new Client();
             meClient.numberindividuums = 0;
@@ -489,6 +496,8 @@ namespace IHWB.EVO.MetaEvo
             
             //Solange der Server noch nicht fertig ist
             while (serverstatus[0] != "finished") {
+
+                if (this.stopped) return true;
 
                 networkmanager.Individuum_ReadFromDB_Client(ref individuumForClient);
 
@@ -540,7 +549,7 @@ namespace IHWB.EVO.MetaEvo
             }
             progress1.iGen = progress1.NGen;
             this.monitor1.LogAppend("Controller: Calculation Finished");
-            MessageBox.Show("Berechnung beendet", "MetaEvo");
+            return true;
         }
 
         /// <summary>
