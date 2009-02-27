@@ -262,7 +262,7 @@
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
     </Content>
-    <Content Include="RELEASE-NOTES.txt">
+    <Content Include="BLUEM.OPT_RELEASE-NOTES.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\page_white.png" />
