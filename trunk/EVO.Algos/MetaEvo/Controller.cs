@@ -31,7 +31,7 @@ namespace IHWB.EVO.MetaEvo
 
         private string[,] result;
 
-        private bool stopped; //TODO: an entsprechenden Stellen prüfen und abbrechen, wenn true
+        private bool stopped; 
 
         /// <summary>
         /// Initialisiert den MetaEVO-Controller und übergibt alle erforderlichen Objekte
@@ -222,12 +222,7 @@ namespace IHWB.EVO.MetaEvo
 
                     //Genpool simulieren
                     this.monitor1.LogAppend("Controller: Genpool: Simulating Individuums...");
-                    for (int i = 0; i < generation.Length; i++)
-                    {
-                        evaluate(ref generation[i], i);
-                        this.monitor1.LogAppend("Controller: Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length),2) * 100 + "%)");
-                        System.Windows.Forms.Application.DoEvents();
-                    }
+                    evaluate_multi(ref generation);
 
                     //Genpool speichern
                     algomanager.set_genpool(ref generation);
@@ -252,19 +247,42 @@ namespace IHWB.EVO.MetaEvo
                 {
                     this.monitor1.LogAppend("Controller: Individuums for Generation " + settings.MetaEvo.CurrentGeneration + ": Simulating Individuums...");
                     progress1.iNachf = 0;
-                    for (int i = 0; i < generation.Length; i++)
-                    {  
-                        //Simulieren und zeichnen
-                        if (generation[i].get_toSimulate())
+                    //Simulieren
+                    
+                    if (this.apptype == IHWB.EVO.Common.Constants.ApplicationTypes.Testprobleme)
+                    {
+                        for (int i = 0; i < generation.Length; i++)
                         {
-                            this.monitor1.LogAppend("Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   " + algomanager.algos.algofeedbackarray[generation[i].get_generator()].name);
-                            evaluate(ref generation[i], i);
-                            System.Windows.Forms.Application.DoEvents();
-                            
-                            progress1.NextNachf();
-                            if (this.stopped) return false;
+                            if (generation[i].get_toSimulate())
+                            {
+                                this.monitor1.LogAppend("Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   " + algomanager.algos.algofeedbackarray[generation[i].get_generator()].name);
+                                evaluate(ref generation[i], i);
+                                System.Windows.Forms.Application.DoEvents();
+
+                                progress1.NextNachf();
+                                if (this.stopped) return false;
+                            }
                         }
                     }
+                    else
+                    {
+                        int j = 0;
+                        EVO.Common.Individuum_MetaEvo[] generation_tmp;
+
+                        for (int i = 0; i < generation.Length; i++)
+                        {
+                            if (generation[i].get_toSimulate()) j++;
+                        }
+                        generation_tmp = new EVO.Common.Individuum_MetaEvo[j];
+                        for (int i = 0; i < generation.Length; i++)
+                        {
+                            if (generation[i].get_toSimulate()) generation_tmp[j-1] = generation[i];
+                            j--;
+                        }
+
+                        evaluate_multi(ref generation_tmp);
+                    }
+
                     mePC.status = "select Individuums";
                 }
                 #endregion
@@ -326,7 +344,7 @@ namespace IHWB.EVO.MetaEvo
                 #endregion     
             }
 
-            //Zusatzresulte der lokalen Optimierung speichern
+            //Zusatzergebnisse der lokalen Optimierung speichern
             if (settings.MetaEvo.OpMode == "Local Optimizer")
             {
                 this.result[progress1.iGen + 1, 0] = algomanager.localausgabe;
@@ -581,7 +599,7 @@ namespace IHWB.EVO.MetaEvo
                 //simulieren
                 if (!this.sim.Evaluate(ref ind, storeInDB))
                 {
-                    //TODO: Simulationsfehler abfangen (evtl. nochmal mit neuen Parametern simulieren)
+                    ind_meta.set_status("false");
                 }
                 else
                 {
@@ -601,6 +619,68 @@ namespace IHWB.EVO.MetaEvo
                 ind_meta.set_status("true");
             }
 
+        }
+
+        /// <summary>
+        /// Evaluiert Meta-Individuen mit Multithreadding (nicht bei Testproblemen)
+        /// </summary>
+        /// <param name="ind_meta">das Individuum</param>
+        /// <param name="iNachf">Nachfahrennummer</param>
+        private void evaluate_multi(ref EVO.Common.Individuum_MetaEvo[] ind_meta)
+        {
+            bool storeInDB;
+            bool[] evaluate_success;
+            EVO.Common.Individuum[] ind = new EVO.Common.Individuum[ind_meta.Length];
+
+            //Funktion für Event registrieren
+            sim.IndividuumEvaluated += new IHWB.EVO.Apps.Sim.IndividuumEvaluatedEventHandler(this.evaluate_multi_postEvent);
+
+            //in ErgebnisDB speichern?
+            storeInDB = (this.role == "Single PC") ? true : false;
+
+            for (int i = 0; i < ind_meta.Length; i++ )
+            {
+                ind_meta[i].set_toSimulate(false);
+                //Als Referenz gesetzt
+                ind[i] = (EVO.Common.Individuum)ind_meta[i];
+            }
+
+            //Simulation mit Events starten
+            evaluate_success = sim.Evaluate(ref ind, storeInDB);
+
+            for (int i = 0; i < ind_meta.Length; i++ )
+            {
+                if (!(evaluate_success[i])) ind_meta[i].set_status("false");
+                if (ind_meta[i].Is_Feasible) ind_meta[i].set_status("false#constraints#");
+                else
+                {
+                    ind_meta[i].set_status("true");   
+                }
+            }
+
+            //Regsitrierung der Funktion für das Event zurücknehmen
+            sim.IndividuumEvaluated -= new IHWB.EVO.Apps.Sim.IndividuumEvaluatedEventHandler(this.evaluate_multi_postEvent);
+        }
+
+        /// <summary>
+        /// Vom Event getriggerte Methode zur Weiterverarbeitung bei laufendem Multithreadding
+        /// </summary>
+        /// <param name="ind">ein Individuum</param>
+        /// <param name="zahl">Nummer des Individuums in der Generation</param>
+        /// <remarks>Es werden nur Individuen mit Status "true" verwendet!</remarks>
+        public void evaluate_multi_postEvent(ref EVO.Common.Individuum ind, int zahl)
+        {
+            this.monitor1.LogAppend("Controller: Simulating Individuum " + ind.ID + "   (" + Math.Round(((double)(progress1.iNachf + 1) / (double)generation.Length), 2) * 100 + "%)...)");
+            System.Windows.Forms.Application.DoEvents();
+
+            progress1.NextNachf();
+
+            if (this.stopped)
+            {
+                sim.isStopped = true;
+            }
+
+            this.hauptdiagramm1.ZeichneIndividuum(ind, 1, 1, 1, this.individuumnumber % generation.Length, System.Drawing.Color.Orange, false);
         }
 
         /// <summary>
@@ -659,9 +739,5 @@ namespace IHWB.EVO.MetaEvo
             //Result an Log anhängen
             this.monitor1.LogAppend("Result:" + EVO.Common.Constants.eol + tmp);
         }
-
-
-
     }
-
 }

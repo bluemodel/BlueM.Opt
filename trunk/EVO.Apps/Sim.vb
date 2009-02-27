@@ -212,7 +212,7 @@ Public MustInherit Class Sim
         'Je nach Problem weitere Vorbereitungen treffen
         Select Case Me.mProblem.Method
 
-            Case Common.METH_PES, Common.METH_SENSIPLOT
+            Case Common.METH_PES, Common.METH_MetaEvo, Common.METH_SENSIPLOT
                 'nix
 
             Case Common.METH_CES, Common.METH_HYBRID
@@ -429,7 +429,7 @@ Public MustInherit Class Sim
         '----------------------
         Select Case Me.mProblem.Method
 
-            Case METH_PES, METH_MetaEvo, METH_SENSIPLOT, METH_HOOKJEEVES, METH_DDS
+            Case METH_PES, METH_MetaEvo, METH_HOOKJEEVES, METH_DDS
 
                 'Bereitet das Sim für Parameteroptimierung vor
                 Call Me.PREPARE_Evaluation_PES(ind.OptParameter)
@@ -511,7 +511,7 @@ Public MustInherit Class Sim
                 '----------------------
                 Select Case Me.mProblem.Method
 
-                    Case METH_PES, METH_SENSIPLOT, METH_HOOKJEEVES, METH_DDS
+                    Case METH_PES, METH_MetaEvo, METH_SENSIPLOT, METH_HOOKJEEVES, METH_DDS
 
                         'Bereitet das Sim für Parameteroptimierung vor
                         Call Me.PREPARE_Evaluation_PES(inds(n_ind_Run).OptParameter)
