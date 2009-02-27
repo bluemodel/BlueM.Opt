@@ -60,7 +60,7 @@ namespace IHWB.EVO.MetaEvo
             {
                 //0. Vorbereitung
                 //0.1. Feasible-Status prüfen
-                set_feasible2false(ref genpool, ref new_generation_input);
+                set_notfeasible2false(ref genpool, ref new_generation_input);
                 //Solutionvolume noch einmal berechnen um Fortschritt der lokalen Optimierung zu zeigen
                 solutionvolume.calculate(ref genpool);
 
@@ -84,7 +84,7 @@ namespace IHWB.EVO.MetaEvo
             {
                 //0. Vorbereitung
                 //0.1. Feasible-Status prüfen
-                set_feasible2false(ref genpool, ref new_generation_input);
+                set_notfeasible2false(ref genpool, ref new_generation_input);
                 //1.Selektion: 
                 //1.1.Sortieren nach einem zufällig gewählten Kriterium
                 int kriterium = rand.Next(0, new_generation_input[0].PrimObjectives.Length);
@@ -159,7 +159,7 @@ namespace IHWB.EVO.MetaEvo
         }
 
         //Wiederbelebte Feasible-Individuen wieder auf false setzen
-        private void set_feasible2false(ref EVO.Common.Individuum_MetaEvo[] input, ref EVO.Common.Individuum_MetaEvo[] input2)
+        private void set_notfeasible2false(ref EVO.Common.Individuum_MetaEvo[] input, ref EVO.Common.Individuum_MetaEvo[] input2)
         {
             for (int i = 0; i < input.Length; i++)
             {

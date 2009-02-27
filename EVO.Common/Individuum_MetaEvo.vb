@@ -88,7 +88,7 @@
     End Function
 
     Public Overrides Function Create(Optional ByVal type As String = "tmp", Optional ByVal id As Integer = 0) As Individuum
-        Dim ind As New Individuum_MetaEVO(type, id, Me.numberOptparas)
+        Dim ind As New Individuum_MetaEvo(type, id, Me.numberOptparas)
         Return ind
     End Function
 
