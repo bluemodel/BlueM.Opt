@@ -8,8 +8,10 @@ Website: http://130.83.196.154/BlueM/wiki/index.php/BlueM.Opt
 
 Version 1.3
 -----------
-* NEW: Zielfunktionen unterstützen jetzt Zielgruppen
-* NEW: Neue Methode MetaEvo
+NEW: 
+* Vor der Optimierung werden die Startwerte der Optparameter evaluiert (Bug 147)
+* Zielfunktionen unterstützen jetzt Zielgruppen (Bug 256)
+* Neue Methode MetaEvo
 
 Version 1.2.4
 -------------
