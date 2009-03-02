@@ -71,7 +71,7 @@ namespace modelEAU.DDS
             //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
             int i, j;
-            int run = 0;
+            int run = 1;
             double[] Ini_Parameter;
             double[] Current_Parameter;
             IHWB.EVO.Common.Individuum ind;

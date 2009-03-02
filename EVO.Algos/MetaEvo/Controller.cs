@@ -85,7 +85,7 @@ namespace IHWB.EVO.MetaEvo
 
             //Setzen des Problems zum Design des Individuums
             EVO.Common.Individuum_MetaEvo.Initialise(ref this.prob);
-            individuumnumber = 1;
+            individuumnumber = 2;
 
             this.monitor1.Show();
             this.monitor1.SelectTabLog();

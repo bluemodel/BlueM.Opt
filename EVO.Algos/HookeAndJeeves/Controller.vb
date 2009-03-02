@@ -90,7 +90,7 @@ Public Class Controller
         ReDim QNBest(Me.myProblem.NumPrimObjective - 1)
         ReDim QBest(Me.myProblem.NumPrimObjective - 1)
 
-        durchlauf = 0
+        durchlauf = 1
         Tastschritte_aktuell = 0
         Tastschritte_gesamt = 0
         Extrapolationsschritte = 0

@@ -529,10 +529,10 @@ Public Class Controller
         '**************************************************************
         Call PES1.PesInitialise(Me.mySettings, Me.myProblem)
 
-        'Startwerte werden der Verlaufsanzeige zugewiesen
+        'Verlaufsanzeige initialisieren
         Call Me.myProgress.Initialize(Me.mySettings.PES.Pop.n_Runden, Me.mySettings.PES.Pop.n_Popul, Me.mySettings.PES.n_Gen, Me.mySettings.PES.n_Nachf)
 
-        durchlauf = 0
+        durchlauf = 1
 
         'Über alle Runden
         'xxxxxxxxxxxxxxxx

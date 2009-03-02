@@ -93,7 +93,7 @@ Public Class Controller
         '-------------------
         Randomize()
 
-        n = 0
+        n = 1
 
         'Äussere Schleife (2. OptParameter)
         '----------------------------------
@@ -127,7 +127,7 @@ Public Class Controller
                 n += 1
 
                 'Verlaufsanzeige aktualisieren
-                Me.myProgress.iNachf = n
+                Call Me.myProgress.NextNachf()
 
                 'Einhaltung von OptParameter-Beziehung überprüfen
                 isOK = True
