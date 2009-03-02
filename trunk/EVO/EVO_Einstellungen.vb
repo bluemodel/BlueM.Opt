@@ -27,6 +27,7 @@ Public Class EVO_Einstellungen
     Private mProblem As EVO.Common.Problem           'Das Problem
     Public isSaved As Boolean = False                'Flag der anzeigt, ob die Einstellungen bereits gesichert wurden
     Public isLoad As Boolean = False                 'Flag der anzeigt, ob die Settings aus einer XML Datei gelesen werden
+    Private _MultithreadingAllowed As Boolean
     Private isInitializing As Boolean
 
 #End Region
@@ -89,6 +90,30 @@ Public Class EVO_Einstellungen
 
     End Sub
 
+    ''' <summary>
+    ''' UI zurücksetzen
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub ResetUI()
+
+        'Alle TabPages entfernen
+        Call Me.TabControl1.TabPages.Clear()
+
+        'Nur "General" anzeigen
+        Me.TabPage_General.Enabled = True
+        Me.TabControl1.TabPages.Add(Me.TabPage_General)
+
+    End Sub
+
+    ''' <summary>
+    ''' Deaktiviert alle angezeigten TabPages
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub freeze()
+        For Each page As TabPage In Me.TabControl1.TabPages
+            page.Enabled = False
+        Next
+    End Sub
 
     'Initialisierung
     '***************
@@ -100,17 +125,10 @@ Public Class EVO_Einstellungen
         'EVO_Einstellungen zurücksetzen
         Me.isSaved = False
 
-        'Zunächst alle TabPages entfernen, 
-        'dann je nach Bedarf wieder hinzufügen
-        Call Me.TabControl1.TabPages.Clear()
-
         'Anzeige je nach Methode anpassen
         Select Case Me.mProblem.Method
 
             Case METH_PES
-
-                'EVO_Einstellungen aktivieren
-                Me.Enabled = True
 
                 'Tabpage anzeigen
                 Me.TabControl1.TabPages.Add(Me.TabPage_PES)
@@ -120,9 +138,6 @@ Public Class EVO_Einstellungen
 
             Case METH_HOOKJEEVES
 
-                'EVO_Einstellungen aktivieren
-                Me.Enabled = True
-
                 'Tabpage anzeigen
                 Me.TabControl1.TabPages.Add(Me.TabPage_HookeJeeves)
 
@@ -130,9 +145,6 @@ Public Class EVO_Einstellungen
                 Call Me.setStandard_HJ()
 
             Case METH_DDS
-
-                'EVO_Einstellungen aktivieren
-                Me.Enabled = True
 
                 'Tabpage anzeigen
                 Me.TabControl1.TabPages.Add(Me.TabPage_DDS)
@@ -153,9 +165,6 @@ Public Class EVO_Einstellungen
 
             Case METH_HYBRID
 
-                'EVO_Einstellungen aktivieren
-                Me.Enabled = True
-
                 'Tabpage anzeigen
                 Me.TabControl1.TabPages.Add(Me.TabPage_PES)
                 Me.TabControl1.TabPages.Add(Me.TabPage_CES)
@@ -166,9 +175,6 @@ Public Class EVO_Einstellungen
 
             Case METH_MetaEvo
 
-                'EVO_Einstellungen aktivieren
-                Me.Enabled = True
-
                 'Tabpage anzeigen
                 Me.TabControl1.TabPages.Add(Me.TabPage_MetaEvo)
 
@@ -177,20 +183,21 @@ Public Class EVO_Einstellungen
 
             Case METH_SENSIPLOT
 
-                'EVO_Einstellungen aktivieren
-                Me.Enabled = True
-
                 'Tabpage anzeigen
                 Me.TabControl1.TabPages.Add(Me.TabPage_SensiPlot)
 
                 'Standardeinstellungen setzen
                 Call Me.setStandard_SensiPlot()
 
-            Case Else
-
-                Me.Enabled = False
-
         End Select
+
+        'Alle TabPages aktivieren
+        For Each page As TabPage In Me.TabControl1.TabPages
+            page.Enabled = True
+        Next
+
+        'Letztes TabPage nach vorne holen
+        Call Me.TabControl1.SelectTab(Me.TabControl1.TabPages.Count - 1)
 
     End Sub
 
@@ -374,6 +381,13 @@ Public Class EVO_Einstellungen
     '*******************************
     Private Sub readForm()
 
+        'General
+        '-------
+        With Me.msettings.General
+            .useMultithreading = Me.CheckBox_useMultithreading.Checked
+            .drawOnlyCurrentGeneration = Me.CheckBox_drawOnlyCurrentGen.Checked
+        End With
+
         'PES
         '---
         With Me.msettings.PES
@@ -466,7 +480,7 @@ Public Class EVO_Einstellungen
             .OpMode = Me.Combo_MetaEvo_OpMode.SelectedItem
             .NumberGenerations = Me.Numeric_MetaEvo_Numbergenerations.Value
             .PopulationSize = Me.Numeric_MetaEvo_PopulationSize.Value
-            .Numberresults = Me.Numeric_MetaEvo_NumberResults.Value
+            .NumberResults = Me.Numeric_MetaEvo_NumberResults.Value
             .HJStepsize = Me.Numeric_MetaEvo_HJStepsize.Value
             .MySQL_Host = Me.TextBox_MetaEvo_MySQL_Host.Text
             .MySQL_Database = Me.TextBox_MetaEvo_MySQL_DB.Text
@@ -569,6 +583,12 @@ Public Class EVO_Einstellungen
     '*******************************
     Private Sub writeForm()
 
+        'General
+        With Me.msettings.General
+            Me.CheckBox_useMultithreading.Checked = .useMultithreading
+            Me.CheckBox_drawOnlyCurrentGen.Checked = .drawOnlyCurrentGeneration
+        End With
+
         'PES
         '---
         With Me.msettings.PES
@@ -657,7 +677,7 @@ Public Class EVO_Einstellungen
             Me.Combo_MetaEvo_OpMode.SelectedItem = .OpMode
             Me.Numeric_MetaEvo_PopulationSize.Value = .PopulationSize
             Me.Numeric_MetaEvo_Numbergenerations.Value = .NumberGenerations
-            Me.Numeric_MetaEvo_NumberResults.Value = .Numberresults
+            Me.Numeric_MetaEvo_NumberResults.Value = .NumberResults
             Me.Numeric_MetaEvo_HJStepsize.Value = .HJStepsize
             Me.TextBox_MetaEvo_MySQL_Host.Text = .MySQL_Host
             Me.TextBox_MetaEvo_MySQL_DB.Text = .MySQL_Database
@@ -919,6 +939,27 @@ Public Class EVO_Einstellungen
         End If
 
     End Sub
+
+    ''' <summary>
+    ''' Multithreading erlauben/verbieten und gleichzeitig ein-/ausschalten
+    ''' </summary>
+    Public Property MultithreadingAllowed() As Boolean
+        Get
+            Return Me._MultithreadingAllowed
+        End Get
+        Set(ByVal allow As Boolean)
+            Me._MultithreadingAllowed = allow
+            If (allow) Then
+                Me.CheckBox_useMultithreading.Enabled = True
+                Me.CheckBox_useMultithreading.Checked = True
+                Me.mSettings.General.useMultithreading = True
+            Else
+                Me.CheckBox_useMultithreading.Checked = False
+                Me.CheckBox_useMultithreading.Enabled = False
+                Me.mSettings.General.useMultithreading = False
+            End If
+        End Set
+    End Property
 
 #End Region 'Methoden
 

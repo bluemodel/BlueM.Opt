@@ -27,7 +27,6 @@ Partial Class Form1
         Me.components = New System.ComponentModel.Container
         Dim MenuStrip1 As System.Windows.Forms.MenuStrip
         Dim MenuItem_Tools As System.Windows.Forms.ToolStripMenuItem
-        Dim ToolStripSeparator1 As System.Windows.Forms.ToolStripSeparator
         Dim MenuItem_Hilfe As System.Windows.Forms.ToolStripMenuItem
         Dim ToolStripSeparator2 As System.Windows.Forms.ToolStripSeparator
         Dim ToolStripSeparator4 As System.Windows.Forms.ToolStripSeparator
@@ -38,7 +37,6 @@ Partial Class Form1
         Dim ToolStripSeparator7 As System.Windows.Forms.ToolStripSeparator
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
         Me.MenuItem_DatensatzZurücksetzen = New System.Windows.Forms.ToolStripMenuItem
-        Me.MenuItem_Optionen = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuItem_Wiki = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuItem_About = New System.Windows.Forms.ToolStripMenuItem
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
@@ -56,7 +54,7 @@ Partial Class Form1
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip
         Me.ToolStripButton_New = New System.Windows.Forms.ToolStripButton
-        Me.ToolStripSplitButton_SettingsGeneral = New System.Windows.Forms.ToolStripSplitButton
+        Me.ToolStripSplitButton_Settings = New System.Windows.Forms.ToolStripSplitButton
         Me.ToolStripMenuItem_SettingsSave = New System.Windows.Forms.ToolStripMenuItem
         Me.ToolStripMenuItem_SettingsLoad = New System.Windows.Forms.ToolStripMenuItem
         Me.ToolStripSplitButton_ErgebnisDB = New System.Windows.Forms.ToolStripSplitButton
@@ -76,7 +74,6 @@ Partial Class Form1
         Me.EVO_Einstellungen1 = New IHWB.EVO.EVO_Einstellungen
         MenuStrip1 = New System.Windows.Forms.MenuStrip
         MenuItem_Tools = New System.Windows.Forms.ToolStripMenuItem
-        ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator
         MenuItem_Hilfe = New System.Windows.Forms.ToolStripMenuItem
         ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator
         ToolStripSeparator4 = New System.Windows.Forms.ToolStripSeparator
@@ -102,7 +99,7 @@ Partial Class Form1
         '
         'MenuItem_Tools
         '
-        MenuItem_Tools.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItem_DatensatzZurücksetzen, ToolStripSeparator1, Me.MenuItem_Optionen})
+        MenuItem_Tools.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItem_DatensatzZurücksetzen})
         MenuItem_Tools.Name = "MenuItem_Tools"
         MenuItem_Tools.Size = New System.Drawing.Size(44, 20)
         MenuItem_Tools.Text = "Tools"
@@ -113,17 +110,6 @@ Partial Class Form1
         Me.MenuItem_DatensatzZurücksetzen.Name = "MenuItem_DatensatzZurücksetzen"
         Me.MenuItem_DatensatzZurücksetzen.Size = New System.Drawing.Size(200, 22)
         Me.MenuItem_DatensatzZurücksetzen.Text = "Datensatz zurücksetzen"
-        '
-        'ToolStripSeparator1
-        '
-        ToolStripSeparator1.Name = "ToolStripSeparator1"
-        ToolStripSeparator1.Size = New System.Drawing.Size(197, 6)
-        '
-        'MenuItem_Optionen
-        '
-        Me.MenuItem_Optionen.Name = "MenuItem_Optionen"
-        Me.MenuItem_Optionen.Size = New System.Drawing.Size(200, 22)
-        Me.MenuItem_Optionen.Text = "Optionen..."
         '
         'MenuItem_Hilfe
         '
@@ -295,7 +281,7 @@ Partial Class Form1
         '
         'ToolStrip1
         '
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton_New, ToolStripSeparator7, Me.ToolStripSplitButton_SettingsGeneral, ToolStripSeparator5, Me.ToolStripSplitButton_ErgebnisDB, ToolStripSeparator4, Me.ToolStripSplitButton_Diagramm, ToolStripSeparator3, Me.ToolStripButton_Monitor, ToolStripSeparator6, Me.ToolStripButton_Scatterplot, ToolStripSeparator8})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton_New, ToolStripSeparator7, Me.ToolStripSplitButton_Settings, ToolStripSeparator5, Me.ToolStripSplitButton_ErgebnisDB, ToolStripSeparator4, Me.ToolStripSplitButton_Diagramm, ToolStripSeparator3, Me.ToolStripButton_Monitor, ToolStripSeparator6, Me.ToolStripButton_Scatterplot, ToolStripSeparator8})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 24)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Size = New System.Drawing.Size(722, 25)
@@ -312,15 +298,15 @@ Partial Class Form1
         Me.ToolStripButton_New.Text = "Neu"
         Me.ToolStripButton_New.ToolTipText = "Eine neue Optimierung starten"
         '
-        'ToolStripSplitButton_SettingsGeneral
+        'ToolStripSplitButton_Settings
         '
-        Me.ToolStripSplitButton_SettingsGeneral.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem_SettingsSave, Me.ToolStripMenuItem_SettingsLoad})
-        Me.ToolStripSplitButton_SettingsGeneral.Image = Global.IHWB.EVO.My.Resources.Resources.wrench
-        Me.ToolStripSplitButton_SettingsGeneral.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripSplitButton_SettingsGeneral.Name = "ToolStripSplitButton_SettingsGeneral"
-        Me.ToolStripSplitButton_SettingsGeneral.Size = New System.Drawing.Size(102, 22)
-        Me.ToolStripSplitButton_SettingsGeneral.Text = "Einstellungen"
-        Me.ToolStripSplitButton_SettingsGeneral.ToolTipText = "Allgemeine Einstellungen"
+        Me.ToolStripSplitButton_Settings.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem_SettingsSave, Me.ToolStripMenuItem_SettingsLoad})
+        Me.ToolStripSplitButton_Settings.Image = Global.IHWB.EVO.My.Resources.Resources.wrench
+        Me.ToolStripSplitButton_Settings.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripSplitButton_Settings.Name = "ToolStripSplitButton_Settings"
+        Me.ToolStripSplitButton_Settings.Size = New System.Drawing.Size(102, 22)
+        Me.ToolStripSplitButton_Settings.Text = "Einstellungen"
+        Me.ToolStripSplitButton_Settings.ToolTipText = "Allgemeine Einstellungen"
         '
         'ToolStripMenuItem_SettingsSave
         '
@@ -480,6 +466,7 @@ Partial Class Form1
         Me.EVO_Einstellungen1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.EVO_Einstellungen1.Location = New System.Drawing.Point(4, 148)
+        Me.EVO_Einstellungen1.MultithreadingAllowed = False
         Me.EVO_Einstellungen1.Name = "EVO_Einstellungen1"
         Me.EVO_Einstellungen1.Size = New System.Drawing.Size(244, 707)
         Me.EVO_Einstellungen1.TabIndex = 2
@@ -529,12 +516,10 @@ Partial Class Form1
     Friend WithEvents Button_BrowseDatensatz As System.Windows.Forms.Button
     Friend WithEvents ComboBox_Datensatz As System.Windows.Forms.ComboBox
     Private WithEvents MenuItem_DatensatzZurücksetzen As System.Windows.Forms.ToolStripMenuItem
-    Private WithEvents MenuItem_Optionen As System.Windows.Forms.ToolStripMenuItem
     Private WithEvents MenuItem_About As System.Windows.Forms.ToolStripMenuItem
     Private WithEvents MenuItem_Wiki As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStrip1 As System.Windows.Forms.ToolStrip
     Friend WithEvents StatusStrip1 As System.Windows.Forms.StatusStrip
-    Private WithEvents ToolStripButton_Monitor As System.Windows.Forms.ToolStripButton
     Private WithEvents ToolStripSplitButton_Diagramm As System.Windows.Forms.ToolStripSplitButton
     Private WithEvents ToolStripMenuItem_TChartSave As System.Windows.Forms.ToolStripMenuItem
     Private WithEvents ToolStripMenuItem_TChart2PNG As System.Windows.Forms.ToolStripMenuItem
@@ -547,9 +532,10 @@ Partial Class Form1
     Private WithEvents ToolStripButton_Scatterplot As System.Windows.Forms.ToolStripButton
     Private WithEvents Button_Start As System.Windows.Forms.Button
     Private WithEvents EVO_Opt_Verlauf1 As IHWB.EVO.EVO_Opt_Verlauf
-    Friend WithEvents ToolStripMenuItem_SettingsSave As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents ToolStripMenuItem_SettingsLoad As System.Windows.Forms.ToolStripMenuItem
-    Private WithEvents ToolStripSplitButton_SettingsGeneral As System.Windows.Forms.ToolStripSplitButton
+    Private WithEvents ToolStripSplitButton_Settings As System.Windows.Forms.ToolStripSplitButton
     Private WithEvents Button_Stop As System.Windows.Forms.Button
     Private WithEvents ToolStripButton_New As System.Windows.Forms.ToolStripButton
+    Private WithEvents ToolStripButton_Monitor As System.Windows.Forms.ToolStripButton
+    Private WithEvents ToolStripMenuItem_SettingsSave As System.Windows.Forms.ToolStripMenuItem
+    Private WithEvents ToolStripMenuItem_SettingsLoad As System.Windows.Forms.ToolStripMenuItem
 End Class

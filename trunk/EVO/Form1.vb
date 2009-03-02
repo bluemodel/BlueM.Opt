@@ -28,9 +28,6 @@ Partial Class Form1
 
     Private IsInitializing As Boolean
 
-    'Optionen
-    Private Options As OptionsDialog
-
     'Anwendung
     Private Anwendung As String
 
@@ -97,6 +94,9 @@ Partial Class Form1
 
         Me.IsInitializing = True
 
+        'Anwendungs-Groupbox aktivieren
+        Me.GroupBox_Anwendung.Enabled = True
+
         'Anwendung
         '---------
         'Liste der Anwendungen in ComboBox schreiben und Anfangseinstellung wählen
@@ -122,10 +122,7 @@ Partial Class Form1
 
         'Einstellungen
         Me.EVO_Einstellungen1.setStandard_All()
-        Me.EVO_Einstellungen1.Enabled = False
-
-        'OptionsDialog instanzieren
-        Me.Options = New OptionsDialog(Me.EVO_Einstellungen1.Settings)
+        Me.EVO_Einstellungen1.ResetUI()
 
         'Monitor instanzieren
         Me.Monitor1 = New EVO.Diagramm.Monitor()
@@ -138,8 +135,8 @@ Partial Class Form1
         Me.ToolStripSplitButton_Diagramm.Enabled = False
         Me.ToolStripSplitButton_ErgebnisDB.Enabled = False
         Me.ToolStripButton_Scatterplot.Enabled = False
-        Me.ToolStripMenuItem_SettingsLoad.Enabled = False
-        Me.ToolStripMenuItem_SettingsSave.Enabled = False
+        Me.ToolStripSplitButton_Settings.Enabled = False
+        Me.ToolStripMenuItem_SettingsLoad.Enabled = True 'weil bei vorherigem Start deaktiviert
 
         'Weitere Buttons
         Me.Button_Start.Enabled = False
@@ -161,17 +158,6 @@ Partial Class Form1
             'Formular zurücksetzen
             Call Me.INI()
         End If
-    End Sub
-
-    'Optionen Dialog anzeigen
-    '************************
-    Private Sub Button_Options_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem_Optionen.Click, ToolStripSplitButton_SettingsGeneral.ButtonClick
-        If (Me.isrun) Then
-            Call Me.Options.DisableAll()
-        Else
-            Call Me.Options.EnableAll()
-        End If
-        Call Me.Options.ShowDialog()
     End Sub
 
     'Monitor anzeigen
@@ -205,6 +191,12 @@ Partial Class Form1
         Call Process.Start("http://130.83.196.154/BlueM/wiki/index.php/BlueM.Opt")
     End Sub
 
+    'Einstellungen-Button hat selbst keine funktionalität -> nur DropDown
+    '********************************************************************
+    Private Sub Button_Einstellungen_ButtonClick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripSplitButton_Settings.ButtonClick
+        Call Me.ToolStripSplitButton_Settings.ShowDropDown()
+    End Sub
+
     'EVO_Einstellungen laden
     '***********************
     Private Sub Einstellungen_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles ToolStripMenuItem_SettingsLoad.Click
@@ -225,15 +217,6 @@ Partial Class Form1
             'EVO_Settings aus Datei laden
             Call EVO_Einstellungen1.loadSettings(OpenFileDialog1.FileName)
 
-            'EVO_Settings neu verteilen, 
-            'weil durch Einlesen aus Datei alle Referenzen verloren gehen
-            '------------------------------------------------------------
-            'OptionsDialog
-            Call Me.Options.setSettings(Me.EVO_Einstellungen1.Settings)
-            'Hauptdiagramm
-            Call Me.Hauptdiagramm1.setSettings(Me.EVO_Einstellungen1.Settings)
-
-            'Anwendungen, Controller und Algos bekommen die Settings bei Start übergeben
         End If
 
     End Sub
@@ -300,15 +283,12 @@ Partial Class Form1
             Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = False
             Me.ToolStripButton_Scatterplot.Enabled = False
             Me.ToolStripMenuItem_ErgebnisDBCompare.Enabled = False
-            Me.ToolStripMenuItem_SettingsLoad.Enabled = False
-            Me.ToolStripMenuItem_SettingsSave.Enabled = False
 
             'EVO_Settings zurücksetzen
-            Me.EVO_Einstellungen1.Enabled = False
             Me.EVO_Einstellungen1.isSaved = False
 
-            'Multithreading verbieten
-            Me.Options.MultithreadingAllowed = False
+            'Multithreading standardmäßig verbieten
+            Me.EVO_Einstellungen1.MultithreadingAllowed = False
 
             'Mauszeiger busy
             Cursor = Cursors.WaitCursor
@@ -378,7 +358,7 @@ Partial Class Form1
             'Bei Sim-Anwendungen Multithreading vorbereiten
             If (Not IsNothing(Me.Sim1)) Then
                 If (Me.Sim1.MultithreadingSupported) Then
-                    Me.Options.MultithreadingAllowed = True
+                    Me.EVO_Einstellungen1.MultithreadingAllowed = True
                     Call Me.Sim1.prepareThreads(Me.n_Threads)
                 End If
             End If
@@ -625,8 +605,6 @@ Partial Class Form1
             Me.ToolStripMenuItem_ErgebnisDBSave.Enabled = False
             Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = False
             Me.ToolStripButton_Scatterplot.Enabled = False
-            Me.ToolStripMenuItem_SettingsLoad.Enabled = False
-            Me.ToolStripMenuItem_SettingsSave.Enabled = False
 
             Select Case Me.mProblem.Method
 
@@ -719,8 +697,7 @@ Partial Class Form1
             'Toolbar-Buttons aktivieren
             Me.ToolStripSplitButton_Diagramm.Enabled = True
             Me.ToolStripSplitButton_ErgebnisDB.Enabled = True
-            Me.ToolStripMenuItem_SettingsLoad.Enabled = True
-            Me.ToolStripMenuItem_SettingsSave.Enabled = True
+            Me.ToolStripSplitButton_Settings.Enabled = True
 
             'IniMethod OK -> Start Button aktivieren
             Me.Button_Start.Enabled = True
@@ -828,9 +805,6 @@ Partial Class Form1
             Me.Button_Start.Text = "Pause"
             Me.Button_Stop.Enabled = True
 
-            'Diagramm vorbereiten und initialisieren
-            Call PrepareDiagramm()
-
             'Monitor anzeigen
             If (Me.ToolStripButton_Monitor.Checked) Then
                 Call Me.Monitor1.Show()
@@ -844,13 +818,25 @@ Partial Class Form1
                 Me.ToolStripMenuItem_ErgebnisDBCompare.Enabled = True
             End If
 
+            'Einstellungen-Buttons
+            Me.ToolStripMenuItem_SettingsLoad.Enabled = False
+
+            'Anwendungs-Groupbox deaktivieren
+            Me.GroupBox_Anwendung.Enabled = False
+
             'EVO_Settings in temp-Verzeichnis speichern
             Dim dir As String
             dir = My.Computer.FileSystem.SpecialDirectories.Temp & "\"
             Call Me.EVO_Einstellungen1.saveSettings(dir & "EVO_Settings.xml")
 
+            'EVO_Settings deaktivieren
+            Call Me.EVO_Einstellungen1.freeze()
+
             'EVO_Settings an Hauptdiagramm übergeben
             Call Me.Hauptdiagramm1.setSettings(Me.EVO_Einstellungen1.Settings)
+
+            'Diagramm vorbereiten und initialisieren
+            Call Me.PrepareDiagramm()
 
             Select Case Anwendung
 
