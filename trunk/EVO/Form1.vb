@@ -935,6 +935,7 @@ Partial Class Form1
             Me.isrun = False
             Me.Button_Start.Text = "Start"
             Me.Button_Start.Enabled = False
+            Me.Button_Stop.Enabled = False
 
             'Ausgabe der Optimierungszeit
             OptTime.Stop()
@@ -1923,7 +1924,7 @@ Partial Class Form1
     Private Function StopOptimization() As Boolean
 
         Dim res As MsgBoxResult
-        If (Not IsNothing(Me.controller)) Then
+        If (Me.isrun And Not IsNothing(Me.controller)) Then
 
             res = MsgBox("Optimierung wirklich abbrechen?", MsgBoxStyle.YesNo)
 
