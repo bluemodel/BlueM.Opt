@@ -207,12 +207,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="OptionsDialog.Designer.vb">
-      <DependentUpon>OptionsDialog.vb</DependentUpon>
-    </Compile>
-    <Compile Include="OptionsDialog.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Application\Settings.vb" />
     <EmbeddedResource Include="EVO_Einstellungen.resX">
       <DependentUpon>EVO_Einstellungen.vb</DependentUpon>
@@ -252,10 +246,6 @@
     <EmbeddedResource Include="My Project\licenses.licx" />
     <EmbeddedResource Include="SolutionDialog.resx">
       <DependentUpon>SolutionDialog.vb</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="OptionsDialog.resx">
-      <DependentUpon>OptionsDialog.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <Content Include="My Project\Application.myapp">

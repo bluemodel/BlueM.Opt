@@ -64,6 +64,7 @@ Partial Class EVO_Einstellungen
         Dim Label_Meta11 As System.Windows.Forms.Label
         Dim Label_Meta5 As System.Windows.Forms.Label
         Dim Label_Meta10 As System.Windows.Forms.Label
+        Dim GroupBox_Diagramm As System.Windows.Forms.GroupBox
         Me.TabControl1 = New System.Windows.Forms.TabControl
         Me.TabPage_PES = New System.Windows.Forms.TabPage
         Me.Label_OptModusValue = New System.Windows.Forms.Label
@@ -158,6 +159,10 @@ Partial Class EVO_Einstellungen
         Me.SensiPlot_ListBox_OptParameter = New System.Windows.Forms.ListBox
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox
+        Me.TabPage_General = New System.Windows.Forms.TabPage
+        Me.GroupBox_Sim = New System.Windows.Forms.GroupBox
+        Me.CheckBox_useMultithreading = New System.Windows.Forms.CheckBox
+        Me.CheckBox_drawOnlyCurrentGen = New System.Windows.Forms.CheckBox
         Label_CES_MemSize = New System.Windows.Forms.Label
         Label_CES_NMembers_SecPop_PES = New System.Windows.Forms.Label
         Label_CES_NExchange_secPop_PES = New System.Windows.Forms.Label
@@ -203,6 +208,7 @@ Partial Class EVO_Einstellungen
         Label_Meta11 = New System.Windows.Forms.Label
         Label_Meta5 = New System.Windows.Forms.Label
         Label_Meta10 = New System.Windows.Forms.Label
+        GroupBox_Diagramm = New System.Windows.Forms.GroupBox
         Me.TabControl1.SuspendLayout()
         Me.TabPage_PES.SuspendLayout()
         CType(Me.TextDeltaStart, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -251,6 +257,9 @@ Partial Class EVO_Einstellungen
         CType(Me.SensiPlot_NumericUpDown_NumSteps, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SensiPlot_GroupBox_Modus.SuspendLayout()
         Me.GroupBox_Einstellungen.SuspendLayout()
+        Me.TabPage_General.SuspendLayout()
+        Me.GroupBox_Sim.SuspendLayout()
+        GroupBox_Diagramm.SuspendLayout()
         Me.SuspendLayout()
         '
         'Label_CES_MemSize
@@ -659,6 +668,7 @@ Partial Class EVO_Einstellungen
         '
         Me.TabControl1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.TabControl1.Controls.Add(Me.TabPage_General)
         Me.TabControl1.Controls.Add(Me.TabPage_PES)
         Me.TabControl1.Controls.Add(Me.TabPage_CES)
         Me.TabControl1.Controls.Add(Me.TabPage_HookeJeeves)
@@ -1717,6 +1727,60 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Einstellungen.TabStop = False
         Me.GroupBox_Einstellungen.Text = "Einstellungen:"
         '
+        'TabPage_General
+        '
+        Me.TabPage_General.Controls.Add(GroupBox_Diagramm)
+        Me.TabPage_General.Controls.Add(Me.GroupBox_Sim)
+        Me.TabPage_General.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage_General.Name = "TabPage_General"
+        Me.TabPage_General.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage_General.Size = New System.Drawing.Size(221, 668)
+        Me.TabPage_General.TabIndex = 6
+        Me.TabPage_General.Text = "General"
+        Me.TabPage_General.UseVisualStyleBackColor = True
+        '
+        'GroupBox_Sim
+        '
+        Me.GroupBox_Sim.Controls.Add(Me.CheckBox_useMultithreading)
+        Me.GroupBox_Sim.Location = New System.Drawing.Point(6, 6)
+        Me.GroupBox_Sim.Name = "GroupBox_Sim"
+        Me.GroupBox_Sim.Size = New System.Drawing.Size(209, 53)
+        Me.GroupBox_Sim.TabIndex = 3
+        Me.GroupBox_Sim.TabStop = False
+        Me.GroupBox_Sim.Text = "Simulationen"
+        '
+        'CheckBox_useMultithreading
+        '
+        Me.CheckBox_useMultithreading.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.CheckBox_useMultithreading.Location = New System.Drawing.Point(6, 20)
+        Me.CheckBox_useMultithreading.Name = "CheckBox_useMultithreading"
+        Me.CheckBox_useMultithreading.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.CheckBox_useMultithreading.Size = New System.Drawing.Size(197, 24)
+        Me.CheckBox_useMultithreading.TabIndex = 0
+        Me.CheckBox_useMultithreading.Text = "Multithreading benutzen:"
+        Me.CheckBox_useMultithreading.UseVisualStyleBackColor = True
+        '
+        'GroupBox_Diagramm
+        '
+        GroupBox_Diagramm.Controls.Add(Me.CheckBox_drawOnlyCurrentGen)
+        GroupBox_Diagramm.Location = New System.Drawing.Point(6, 65)
+        GroupBox_Diagramm.Name = "GroupBox_Diagramm"
+        GroupBox_Diagramm.Size = New System.Drawing.Size(209, 62)
+        GroupBox_Diagramm.TabIndex = 4
+        GroupBox_Diagramm.TabStop = False
+        GroupBox_Diagramm.Text = "Diagramm"
+        '
+        'CheckBox_drawOnlyCurrentGen
+        '
+        Me.CheckBox_drawOnlyCurrentGen.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.CheckBox_drawOnlyCurrentGen.Location = New System.Drawing.Point(6, 19)
+        Me.CheckBox_drawOnlyCurrentGen.Name = "CheckBox_drawOnlyCurrentGen"
+        Me.CheckBox_drawOnlyCurrentGen.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.CheckBox_drawOnlyCurrentGen.Size = New System.Drawing.Size(197, 37)
+        Me.CheckBox_drawOnlyCurrentGen.TabIndex = 1
+        Me.CheckBox_drawOnlyCurrentGen.Text = "Nur die aktuelle Generation anzeigen:"
+        Me.CheckBox_drawOnlyCurrentGen.UseVisualStyleBackColor = True
+        '
         'EVO_Einstellungen
         '
         Me.Controls.Add(Me.GroupBox_Einstellungen)
@@ -1788,6 +1852,9 @@ Partial Class EVO_Einstellungen
         Me.SensiPlot_GroupBox_Modus.ResumeLayout(False)
         Me.SensiPlot_GroupBox_Modus.PerformLayout()
         Me.GroupBox_Einstellungen.ResumeLayout(False)
+        Me.TabPage_General.ResumeLayout(False)
+        Me.GroupBox_Sim.ResumeLayout(False)
+        GroupBox_Diagramm.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
@@ -1885,4 +1952,8 @@ Partial Class EVO_Einstellungen
     Private WithEvents SensiPlot_GroupBox_Modus As System.Windows.Forms.GroupBox
     Private WithEvents SensiPlot_CheckBox_wave As System.Windows.Forms.CheckBox
     Private WithEvents TabControl1 As System.Windows.Forms.TabControl
+    Private WithEvents GroupBox_Sim As System.Windows.Forms.GroupBox
+    Private WithEvents CheckBox_useMultithreading As System.Windows.Forms.CheckBox
+    Private WithEvents TabPage_General As System.Windows.Forms.TabPage
+    Private WithEvents CheckBox_drawOnlyCurrentGen As System.Windows.Forms.CheckBox
 End Class
