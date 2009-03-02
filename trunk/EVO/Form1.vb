@@ -859,6 +859,9 @@ Partial Class Form1
                     'Settings an Sim1 übergeben
                     Call Me.Sim1.setSettings(Me.EVO_Einstellungen1.Settings)
 
+                    'Startwert evaluieren
+                    Call Me.evaluateStartwerte()
+
                     Select Case Me.mProblem.Method
 
                         Case METH_SENSIPLOT
@@ -937,6 +940,25 @@ Partial Class Form1
             OptTime.Stop()
             MsgBox("Die Optimierung dauerte:   " & OptTime.Elapsed.Hours & "h  " & OptTime.Elapsed.Minutes & "m  " & OptTime.Elapsed.Seconds & "s     " & OptTime.Elapsed.Seconds & "ms", MsgBoxStyle.Information)
 
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' Die Startwerte der Optparameter evaluieren
+    ''' </summary>
+    ''' <remarks>nur für Sim-Anwendungen!</remarks>
+    Private Sub evaluateStartwerte()
+
+        Dim isOK As Boolean
+        Dim startind As EVO.Common.Individuum
+
+        startind = Me.mProblem.getIndividuumStart()
+
+        isOK = Sim1.Evaluate(startind) 'hier ohne multithreading
+        If (isOK) Then
+            Call Me.Hauptdiagramm1.ZeichneStartWert(startind)
+            My.Application.DoEvents()
         End If
 
     End Sub
@@ -1724,7 +1746,7 @@ Partial Class Form1
                                 '3D
                                 '--
                                 Dim serie3 As Steema.TeeChart.Styles.Points3D
-                                serie3 = Me.HauptDiagramm1.getSeries3DPoint("Nadirpunkt", "Blue", Steema.TeeChart.Styles.PointerStyles.Diamond)
+                                serie3 = Me.Hauptdiagramm1.getSeries3DPoint("Nadirpunkt", "Blue", Steema.TeeChart.Styles.PointerStyles.Diamond)
                                 serie3.Clear()
                                 serie3.Add(nadir(0), nadir(1), nadir(2), "Nadirpunkt")
                             End If

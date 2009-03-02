@@ -170,6 +170,47 @@
         End If
     End Sub
 
+    ''' <summary>
+    ''' Start-Individuum zeichnen
+    ''' </summary>
+    ''' <param name="ind">das Individuum, das mit den Startwerten evaluiert wurde</param>
+    Public Sub ZeichneStartWert(ByVal ind As Common.Individuum)
+
+        Dim farbe As String
+        Dim serie As Steema.TeeChart.Styles.Series
+
+        'Ungültige Individuen immer Grau anzeigen!
+        If (Not ind.Is_Feasible) Then
+            farbe = "Gray"
+        Else
+            'ansonsten Gelb
+            farbe = "Yellow"
+        End If
+
+        If (Me.mProblem.NumPrimObjective = 1) Then
+            'SingleObjective
+            'xxxxxxxxxxxxxxx
+            serie = Me.getSeriesPoint("Startwert", farbe)
+            Call serie.Add(1, ind.PrimObjectives(0), ind.ID.ToString())
+        Else
+            'MultiObjective
+            'xxxxxxxxxxxxxx
+            If (Me.mProblem.NumPrimObjective = 2) Then
+                '2D-Diagramm
+                '------------------------------------------------------------------------
+                serie = Me.getSeriesPoint("Startwert", farbe)
+                Call serie.Add(ind.PrimObjectives(0), ind.PrimObjectives(1), ind.ID.ToString())
+
+            Else
+                '3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
+                '------------------------------------------------------------------------
+                Dim serie3D As Steema.TeeChart.Styles.Points3D
+                serie3D = Me.getSeries3DPoint("Startwert", farbe)
+                Call serie3D.Add(ind.PrimObjectives(0), ind.PrimObjectives(1), ind.PrimObjectives(2), ind.ID.ToString())
+            End If
+        End If
+    End Sub
+
     'Population zeichnen
     '*******************
     Public Sub ZeichneSekPopulation(ByVal pop() As Common.Individuum)

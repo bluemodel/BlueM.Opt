@@ -1139,6 +1139,32 @@ Public Class Problem
 
     End Function
 
+    ''' <summary>
+    ''' Gibt ein neues Individuum zurück, dessen Optparameter alle auf die Startwerte gesetzt sind
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks>Das Individuum erhält die ID 1</remarks>
+    Public Function getIndividuumStart() As EVO.Common.Individuum
+
+        Dim startind As EVO.Common.Individuum
+
+        Select Case Me.Method
+            Case METH_CES
+                startind = New EVO.Common.Individuum_CES("start", 1)
+                'TODO: Start-Pfad setzen
+            Case Else
+                startind = New EVO.Common.Individuum_PES("start", 1)
+                'Startwerte der OptParameter setzen
+                For i As Integer = 0 To Me.NumParams - 1
+                    startind.OptParameter(i) = Me.List_OptParameter(i).Clone()
+                    startind.OptParameter(i).RWert = Me.List_OptParameter(i).StartWert
+                Next
+        End Select
+
+        Return startind
+
+    End Function
+
 #End Region 'Methoden
 
 End Class
