@@ -124,4 +124,13 @@ Public Class Objectivefunktion
         End Get
     End Property
 
+    Public ReadOnly Property isGroupMember()
+        Get
+            If Me.Gruppe = "" Then
+                Return False
+            End If
+            Return True
+        End Get
+    End Property
+
 End Class
