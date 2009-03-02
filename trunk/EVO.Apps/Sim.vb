@@ -642,24 +642,27 @@ Public MustInherit Class Sim
 
         'Qualitätswerte berechnen
         For i = 0 To Me.mProblem.NumObjectives - 1
-            'Falls GruppenLeader erst auf Null setzen
-            If Me.mProblem.List_ObjectiveFunctions(i).isGroupLeader Then
+
+            'Es wird immer evaluiert außer bei GroupLeadern
+            If Not Me.mProblem.List_ObjectiveFunctions(i).isPrimObjective Or Not Me.mProblem.List_ObjectiveFunctions(i).isGroupLeader Then
+                ind.Objectives(i) = CalculateObjective(Me.mProblem.List_ObjectiveFunctions(i))
+            Else
+                'Bei GroupLeadern wird der ZielfunktionswertWert auf Null gesetzt
                 ind.Objectives(i) = 0
             End If
 
-            'Auswerten wenn keine Gruppenführer
-            If Not Me.mProblem.List_ObjectiveFunctions(i).isGroupLeader Then
+            'Falls es GroupMember gibt werden sie zum GruppLeader agregiert
+            If Not Me.mProblem.List_ObjectiveFunctions(i).isPrimObjective And Me.mProblem.List_ObjectiveFunctions(i).isGroupMember Then
                 ind.Objectives(i) = CalculateObjective(Me.mProblem.List_ObjectiveFunctions(i))
-            End If
-
-            'Gruppen angehörige verwursten
-            If Not Me.mProblem.List_ObjectiveFunctions(i).isPrimObjective Then
+                j = -1
                 Do
+                    j += 1
                     If Me.mProblem.List_ObjectiveFunctions(i).Gruppe = Me.mProblem.List_ObjectiveFunctions(j).Bezeichnung Then
                         ind.Objectives(j) = ind.Objectives(j) + ind.Objectives(i) * Me.mProblem.List_ObjectiveFunctions(i).OpFact
                     End If
-                Loop Until Me.mProblem.List_ObjectiveFunctions(i).Gruppe = Me.mProblem.List_ObjectiveFunctions(j).Bezeichnung
+                Loop Until (Me.mProblem.List_ObjectiveFunctions(i).Gruppe = Me.mProblem.List_ObjectiveFunctions(j).Bezeichnung)
             End If
+
         Next
 
         'Constraints berechnen
