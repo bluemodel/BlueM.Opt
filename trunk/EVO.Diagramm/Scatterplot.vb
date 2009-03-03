@@ -130,6 +130,7 @@ Partial Public Class Scatterplot
         Dim xAchse, yAchse As String
         Dim min() As Double
         Dim max() As Double
+        Dim ind As EVO.Common.Individuum
         Dim serie, serie_inv As Steema.TeeChart.Styles.Series
         Dim shape1 As Steema.TeeChart.Styles.Shape
 
@@ -142,13 +143,13 @@ Partial Public Class Scatterplot
             max(i) = Double.MinValue
             If (Me.ShowSekPopOnly) Then
                 'Nur Sekundäre Population
-                For Each ind As Common.Individuum In Me.OptResult.getSekPop()
+                For Each ind In Me.OptResult.getSekPop()
                     min(i) = Math.Min(ind.Objectives(Me.Auswahl(i)), min(i))
                     max(i) = Math.Max(ind.Objectives(Me.Auswahl(i)), max(i))
                 Next
             Else
                 'Alle Lösungen
-                For Each ind As Common.Individuum In Me.OptResult.Solutions
+                For Each ind In Me.OptResult.Solutions
                     min(i) = Math.Min(ind.Objectives(Me.Auswahl(i)), min(i))
                     max(i) = Math.Max(ind.Objectives(Me.Auswahl(i)), max(i))
                 Next
@@ -160,7 +161,7 @@ Partial Public Class Scatterplot
             End If
             'Vergleichsergebnis
             If (Me.ShowRefResult) Then
-                For Each ind As Common.Individuum In Me.OptResultRef.getSekPop()
+                For Each ind In Me.OptResultRef.getSekPop()
                     min(i) = Math.Min(ind.Objectives(Me.Auswahl(i)), min(i))
                     max(i) = Math.Max(ind.Objectives(Me.Auswahl(i)), max(i))
                 Next
@@ -306,7 +307,7 @@ Partial Public Class Scatterplot
                         'Nur Sekundäre Population
                         '------------------------
                         serie = .getSeriesPoint(xAchse & ", " & yAchse, "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                        For Each ind As Common.Individuum In Me.OptResult.getSekPop()
+                        For Each ind In Me.OptResult.getSekPop()
                             serie.Add(ind.Objectives(Me.Auswahl(i)), ind.Objectives(Me.Auswahl(j)), ind.ID.ToString())
                         Next
                     Else
@@ -314,7 +315,7 @@ Partial Public Class Scatterplot
                         '-------------
                         serie = .getSeriesPoint(xAchse & ", " & yAchse, "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         serie_inv = .getSeriesPoint(xAchse & ", " & yAchse & " (ungültig)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                        For Each ind As Common.Individuum In Me.OptResult.Solutions
+                        For Each ind In Me.OptResult.Solutions
                             'Constraintverletzung prüfen
                             If (ind.Is_Feasible) Then
                                 'gültige Lösung Zeichnen
@@ -326,11 +327,18 @@ Partial Public Class Scatterplot
                         Next
                     End If
 
+                    'Startwert
+                    '=========
+                    serie = .getSeriesPoint("Startwert", "Yellow", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                    ind = Me.OptResult.getSolution(1)
+                    serie.Add(ind.Objectives(Me.Auswahl(i)), ind.Objectives(Me.Auswahl(j)), ind.ID.ToString())
+
+
                     'Vergleichsergebnis anzeigen
                     '===========================
                     If (Me.ShowRefResult) Then
                         serie = .getSeriesPoint(xAchse & ", " & yAchse & " (Vergleichsergebnis)", "Blue", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                        For Each ind As Common.Individuum In Me.OptResultRef.getSekPop()
+                        For Each ind In Me.OptResultRef.getSekPop()
                             serie.Add(ind.Objectives(Me.Auswahl(i)), ind.Objectives(Me.Auswahl(j)), ind.ID & " (Vergleichsergebnis)")
                         Next
                     End If
