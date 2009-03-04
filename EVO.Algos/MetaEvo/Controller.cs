@@ -31,7 +31,12 @@ namespace IHWB.EVO.MetaEvo
 
         private string[,] result;
 
-        private bool stopped; 
+        private bool stopped;
+
+        //Objekte für den Client (Ursache: Multithreading)
+        Client meClient = new Client();
+        DateTime Berechnungsstart;
+        double[] clienttmp;
 
         /// <summary>
         /// Initialisiert den MetaEVO-Controller und übergibt alle erforderlichen Objekte
@@ -158,7 +163,13 @@ namespace IHWB.EVO.MetaEvo
 
                     //### Hauptprogramm ###
                     networkmanager = new Networkmanager(ref this.individuumForClient, ref this.settings, ref prob, ref monitor1);
-                    start_network_client();
+
+                    //Initialisierung einiger Variablen
+                    meClient.numberindividuums = 0;
+                    meClient = networkmanager.Network_Init_Client_Object(Dns.GetHostName());
+                    clienttmp = new double[5];
+
+                    start_network_client2();
                     break;
             }
         }
@@ -222,7 +233,7 @@ namespace IHWB.EVO.MetaEvo
 
                     //Genpool simulieren
                     this.monitor1.LogAppend("Controller: Genpool: Simulating Individuums...");
-                    evaluate_multi(ref generation);
+                    evaluate_multi_4single(ref generation);
 
                     //Genpool speichern
                     algomanager.set_genpool(ref generation);
@@ -256,7 +267,7 @@ namespace IHWB.EVO.MetaEvo
                             if (generation[i].get_toSimulate())
                             {
                                 this.monitor1.LogAppend("Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   " + algomanager.algos.algofeedbackarray[generation[i].get_generator()].name);
-                                evaluate(ref generation[i], i);
+                                evaluate_multi_4single(ref generation);
                                 System.Windows.Forms.Application.DoEvents();
 
                                 progress1.NextNachf();
@@ -280,7 +291,7 @@ namespace IHWB.EVO.MetaEvo
                             j--;
                         }
 
-                        evaluate_multi(ref generation_tmp);
+                        evaluate_multi_4single(ref generation_tmp);
                     }
 
                     mePC.status = "select Individuums";
@@ -570,6 +581,118 @@ namespace IHWB.EVO.MetaEvo
             return true;
         }
 
+        // Network Client2
+        private bool start_network_client2()
+        {
+            IHWB.EVO.Common.Individuum[] generation_tmp;
+
+            string[] serverstatus = networkmanager.Network_ReadServer();
+            bool[] evaluate_success;
+            
+            //clienttmp[]: [0:Menge der zugeordneten Individuen, 1:Laufnummer in der Serie, 2: Berechnungsdauer
+
+            //Solange der Server noch nicht fertig ist
+            while (serverstatus[0] != "finished")
+            {
+                if (this.stopped) return true;
+                clienttmp[0] = networkmanager.Individuums_CountMineInDB();
+                clienttmp[1] = 0;
+
+                //Falls neues Individuum in DB existiert, berechnen
+                if (clienttmp[0] != 0)
+                {
+                    Berechnungsstart = DateTime.Now;
+
+                    generation = new IHWB.EVO.Common.Individuum_MetaEvo[(int)clienttmp[0]];
+                    generation_tmp = new IHWB.EVO.Common.Individuum[(int)clienttmp[0]];
+
+                    //Zugeordnete Individuen aus der DB holen
+                    for (int i = 0; i < (int)clienttmp[0]; i++)
+                    {
+                        generation[i] = new IHWB.EVO.Common.Individuum_MetaEvo("MetaEvo", 0, this.prob.List_OptParameter.Length);
+                        networkmanager.Individuum_ReadFromDB_Client(ref generation[i]);
+
+                        //Individuum in DB als "calculate" markieren
+                        networkmanager.Individuum_UpdateInDB(ref generation[i], "status", "calculate");
+                        generation_tmp[i] = (EVO.Common.Individuum)generation[i];
+                    }
+                    this.monitor1.LogAppend("Controller: Read " + (int)clienttmp[0] + " Individuums from DB, starting Simulation...");
+
+                    //Status zuweisen
+                    meClient.set_AlsoInDB("calculating", -1, -1);
+
+                    //für Event Registrieren und Simulieren
+                    sim.IndividuumEvaluated += new IHWB.EVO.Apps.Sim.IndividuumEvaluatedEventHandler(this.evaluate_multi_4client_Event);
+                    if (generation_tmp[0].OptParameter_RWerte[0] == 0) MessageBox.Show("Optparameter ungültig!"); 
+                    evaluate_success = sim.Evaluate(ref generation_tmp, false);
+                    sim.IndividuumEvaluated -= new IHWB.EVO.Apps.Sim.IndividuumEvaluatedEventHandler(this.evaluate_multi_4client_Event);
+
+                    for (int i = 0; i < (int)clienttmp[0]; i++)
+                    {
+                        //ToDo: Was wird von sim.Evaluate für die verbliebenen Individuen zurückgegeben falls es abgebrochen wird?
+                        if (!evaluate_success[i]) generation[i].set_status("false");
+                        if (!generation[i].Is_Feasible) generation[i].set_status("false#constraints#");
+                        else
+                        {
+                            generation[i].set_status("true");
+                        }
+                        networkmanager.Individuum_UpdateInDB(ref generation[i], "status", generation[i].get_status());
+                    }
+                }
+
+                // Wenn kein Individuum mehr da ist, warten
+                else
+                {
+                    //Status zuweisen
+                    meClient.set_AlsoInDB("ready", -1, -1);
+
+                    this.monitor1.LogAppend("Controller: No Individuum found in DB (for this Client) - waiting...");
+                    System.Threading.Thread.Sleep(3000);
+                    //Prüfen ob Client-Entry noch besteht bzw. neu eintragen
+                    networkmanager.DB_client_entry_update(ref prob);
+                }
+
+                //Serverstatus neu lesen
+                serverstatus = networkmanager.Network_ReadServer();
+            }
+            progress1.iGen = progress1.NGen;
+            this.monitor1.LogAppend("Controller: Calculation Finished");
+            return true;
+        }
+
+        private void evaluate_multi_4client_Event(ref EVO.Common.Individuum ind, int zahl)
+        {
+            this.monitor1.LogAppend("Controller: Individuum " + ind.ID + " simulated");
+            //Im der DB updaten
+            for (int i = 0; i < generation.Length; i++)
+            {
+                if (ind.ID == generation[i].ID)
+                {
+                    generation[i].set_status("finished");
+                    networkmanager.Individuum_UpdateInDB(ref generation[i], "status feat const", generation[i].get_status());
+                    break;
+                }
+            }
+            System.Windows.Forms.Application.DoEvents();
+            clienttmp[1]++;
+
+            if ((networkmanager.Individuums_CountMineInDB() != clienttmp[0]) || (this.stopped))
+            {
+                sim.isStopped = true;
+                
+                //Neuen Speed-Daten berechnen
+                clienttmp[2] = Math.Round((DateTime.Now.Subtract(Berechnungsstart)).TotalMilliseconds, 0);
+                if (clienttmp[1] == 1) meClient.speed_av = clienttmp[2];
+                //Je mehr Individuen eine Serie enthält, desto ausschlaggebender ist ihre Berechnungsgeschwindigkeit (1/20 bis 1/10) 
+                else meClient.speed_av += Math.Round((clienttmp[2] / clienttmp[1] - meClient.speed_av) / Math.Max(20 - clienttmp[1], 10), 0);
+                if (clienttmp[2] > meClient.speed_low) meClient.speed_low = clienttmp[2];
+                this.monitor1.LogAppend("Controller: Average Speed is set to " + meClient.speed_av + " Milliseconds, Lowest Speed is set to " + meClient.speed_low + " Milliseconds");
+
+                //Clientdaten in DB Updaten
+                meClient.set_AlsoInDB("", meClient.speed_av, meClient.speed_low);
+            }
+        }
+
         /// <summary>
         /// Evaluiert ein Meta-Individuum
         /// </summary>
@@ -626,17 +749,14 @@ namespace IHWB.EVO.MetaEvo
         /// </summary>
         /// <param name="ind_meta">das Individuum</param>
         /// <param name="iNachf">Nachfahrennummer</param>
-        private void evaluate_multi(ref EVO.Common.Individuum_MetaEvo[] ind_meta)
+        private void evaluate_multi_4single(ref EVO.Common.Individuum_MetaEvo[] ind_meta)
         {
-            bool storeInDB;
             bool[] evaluate_success;
             EVO.Common.Individuum[] ind = new EVO.Common.Individuum[ind_meta.Length];
 
             //Funktion für Event registrieren
-            sim.IndividuumEvaluated += new IHWB.EVO.Apps.Sim.IndividuumEvaluatedEventHandler(this.evaluate_multi_postEvent);
+            sim.IndividuumEvaluated += new IHWB.EVO.Apps.Sim.IndividuumEvaluatedEventHandler(this.evaluate_multi_4single_Event);
 
-            //in ErgebnisDB speichern?
-            storeInDB = (this.role == "Single PC") ? true : false;
 
             for (int i = 0; i < ind_meta.Length; i++ )
             {
@@ -646,12 +766,12 @@ namespace IHWB.EVO.MetaEvo
             }
 
             //Simulation mit Events starten
-            evaluate_success = sim.Evaluate(ref ind, storeInDB);
+            evaluate_success = sim.Evaluate(ref ind, true);
 
             for (int i = 0; i < ind_meta.Length; i++ )
             {
-                if (!(evaluate_success[i])) ind_meta[i].set_status("false");
-                if (ind_meta[i].Is_Feasible) ind_meta[i].set_status("false#constraints#");
+                if (!evaluate_success[i]) ind_meta[i].set_status("false");
+                if (!ind_meta[i].Is_Feasible) ind_meta[i].set_status("false#constraints#");
                 else
                 {
                     ind_meta[i].set_status("true");   
@@ -659,7 +779,7 @@ namespace IHWB.EVO.MetaEvo
             }
 
             //Regsitrierung der Funktion für das Event zurücknehmen
-            sim.IndividuumEvaluated -= new IHWB.EVO.Apps.Sim.IndividuumEvaluatedEventHandler(this.evaluate_multi_postEvent);
+            sim.IndividuumEvaluated -= new IHWB.EVO.Apps.Sim.IndividuumEvaluatedEventHandler(this.evaluate_multi_4single_Event);
         }
 
         /// <summary>
@@ -668,9 +788,9 @@ namespace IHWB.EVO.MetaEvo
         /// <param name="ind">ein Individuum</param>
         /// <param name="zahl">Nummer des Individuums in der Generation</param>
         /// <remarks>Es werden nur Individuen mit Status "true" verwendet!</remarks>
-        public void evaluate_multi_postEvent(ref EVO.Common.Individuum ind, int zahl)
+        public void evaluate_multi_4single_Event(ref EVO.Common.Individuum ind, int zahl)
         {
-            this.monitor1.LogAppend("Controller: Simulating Individuum " + ind.ID + "   (" + Math.Round(((double)(progress1.iNachf + 1) / (double)generation.Length), 2) * 100 + "%)...)");
+            this.monitor1.LogAppend("Controller: Simulating Individuum " + ind.ID + "   (" + Math.Round(((double)(progress1.iNachf + 1) / (double)generation.Length), 2) * 100 + "%)...");
             System.Windows.Forms.Application.DoEvents();
 
             progress1.NextNachf();

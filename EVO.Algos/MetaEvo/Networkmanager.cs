@@ -73,7 +73,7 @@ namespace IHWB.EVO.MetaEvo
             }
             catch (MySqlException ex)
             {
-                MessageBox.Show("Function 'DB_check_connection': \r\nFehler beim Verbinden mit der Datenbank: \r\n" + (ex.Message), "MetaEvo - Networkmanager");
+                MessageBox.Show("Function 'DB_check_connection': \r\nFehler beim Verbinden mit der Datenbank: \r\n" + (ex.Message) + "\r\n Connection String: " + mycon.ConnectionString, "MetaEvo - Networkmanager");
                 return false;
             }
             return true;
@@ -423,7 +423,7 @@ namespace IHWB.EVO.MetaEvo
         //(ok)nächstes eigenes Individuum aus der DB lesen (ID, optparas)
         public void Individuum_ReadFromDB_Client(ref EVO.Common.Individuum_MetaEvo individuum_input)
         {
-            myCommand.CommandText = "Select * from metaevo_individuums WHERE ipName = '" + Dns.GetHostName() + "' AND (status = 'raw' OR status = 'calculate') LIMIT 1";
+            myCommand.CommandText = "Select * from metaevo_individuums WHERE ipName = '" + Dns.GetHostName() + "' AND status = 'raw' LIMIT 1";
             try
             {
                 myCommand.Connection.Open();
@@ -475,6 +475,31 @@ namespace IHWB.EVO.MetaEvo
                 }
                 myReader.Close();
                 myCommand.Connection.Close();  
+            }
+            catch (MySqlException ex)
+            {
+                MessageBox.Show("Function 'Individuums_CountReadyInDB': \r\nFehler beim Lesen der Datenbank: \r\n" + (ex.Message), "MetaEvo - Networkmanager");
+            }
+            return count;
+        }
+
+        //prüfen wie viele Individuen dem Client zugeordnet sind
+        public int Individuums_CountMineInDB()
+        {
+            int count = 0;
+
+            myCommand.CommandText = "Select status from metaevo_individuums WHERE ipName = '" + Dns.GetHostName() + "'";
+            try
+            {
+                myCommand.Connection.Open();
+                myReader = myCommand.ExecuteReader();
+
+                while (myReader.Read())
+                {
+                    count++;
+                }
+                myReader.Close();
+                myCommand.Connection.Close();
             }
             catch (MySqlException ex)
             {

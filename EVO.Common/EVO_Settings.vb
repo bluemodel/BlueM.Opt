@@ -318,7 +318,7 @@ Public Class EVO_Settings
 
             Me.MySQL_Host = "localhost"
             Me.MySQL_Database = "metaevo_db"
-            Me.MySQL_User = "metaevo"
+            Me.MySQL_User = "remoteuser"
             Me.MySQL_Password = ""
 
             Me.ChildsPerParent = 3
