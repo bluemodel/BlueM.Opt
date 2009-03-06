@@ -429,12 +429,9 @@ Public MustInherit Class Sim
         '----------------------
         Select Case Me.mProblem.Method
 
-            Case METH_PES, METH_MetaEvo, METH_HOOKJEEVES, METH_DDS
-
-                'Bereitet das Sim für Parameteroptimierung vor
-                Call Me.PREPARE_Evaluation_PES(ind.OptParameter)
-
             Case METH_CES, METH_HYBRID
+                'Methoden CES und HYBRID
+                '-----------------------
 
                 'Bereitet das Sim für die Kombinatorik vor
                 Call Me.PREPARE_Evaluation_CES(ind)
@@ -448,8 +445,11 @@ Public MustInherit Class Sim
                 End If
 
             Case Else
+                'Alle andere Methoden
+                '--------------------
 
-                Throw New Exception("Funktion Sim.Evaluate() für Methode '" & Me.mProblem.Method & "' noch nicht implementiert!")
+                'Bereitet das Sim für Parameteroptimierung vor
+                Call Me.PREPARE_Evaluation_PES(ind.OptParameter)
 
         End Select
 
@@ -511,12 +511,9 @@ Public MustInherit Class Sim
                 '----------------------
                 Select Case Me.mProblem.Method
 
-                    Case METH_PES, METH_MetaEvo, METH_SENSIPLOT, METH_HOOKJEEVES, METH_DDS
-
-                        'Bereitet das Sim für Parameteroptimierung vor
-                        Call Me.PREPARE_Evaluation_PES(inds(n_ind_Run).OptParameter)
-
                     Case METH_CES, METH_HYBRID
+                        'Methoden CES und HYBRID
+                        '-----------------------
 
                         'Bereitet das Sim für die Kombinatorik vor
                         Call Me.PREPARE_Evaluation_CES(inds(n_ind_Run))
@@ -531,8 +528,12 @@ Public MustInherit Class Sim
                         End If
 
                     Case Else
+                        'Alle anderen Methoden
+                        '---------------------
 
-                        Throw New Exception("Funktion Sim.Evaluate() für Methode '" & Me.mProblem.Method & "' noch nicht implementiert!")
+                        'Bereitet das Sim für Parameteroptimierung vor
+                        Call Me.PREPARE_Evaluation_PES(inds(n_ind_Run).OptParameter)
+
 
                 End Select
 
