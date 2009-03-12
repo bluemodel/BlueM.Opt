@@ -105,11 +105,8 @@
     '### Neue Methoden
     'Gene setzen
     Public Function set_optparas(ByVal optparas_input As Double())
-        Dim i As Integer
 
-        For i = 0 To numberOptparas - 1
-            Me.OptParameter_RWerte(i) = optparas_input(i)
-        Next
+        Me.OptParameter_RWerte = optparas_input
 
         Me.toSimulate = True
         Return True
@@ -152,8 +149,8 @@
         If (status_input.Contains("false")) Then
             'Dim stringarray As String(3)
             Me.status = "false"
-            Me.statusreason = status_input.Split("#")(1)
             Try
+                Me.statusreason = status_input.Split("#")(1)
                 Me.statusopponent = CInt(status_input.Split("#")(2))
             Catch ex As Exception
 
