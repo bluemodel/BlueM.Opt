@@ -484,11 +484,11 @@ namespace IHWB.EVO.MetaEvo
         }
 
         //prüfen wie viele Individuen dem Client zugeordnet sind
-        public int Individuums_CountMineInDB()
+        public int Individuums_CountMineRawInDB()
         {
             int count = 0;
 
-            myCommand.CommandText = "Select status from metaevo_individuums WHERE ipName = '" + Dns.GetHostName() + "'";
+            myCommand.CommandText = "Select status from metaevo_individuums WHERE ipName = '" + Dns.GetHostName() + "' and status = 'raw'";
             try
             {
                 myCommand.Connection.Open();

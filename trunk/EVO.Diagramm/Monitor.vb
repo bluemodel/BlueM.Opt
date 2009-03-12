@@ -53,6 +53,7 @@ Partial Public Class Monitor
     ''' <param name="text">der Text</param>
     Public Sub LogAppend(ByVal text As String)
         Call Me.TextBox_Log.AppendText(Format((DateTime.Now - starttime).TotalSeconds, "###,###,##0.00") & ": " & text & EVO.Common.Constants.eol)
+        System.Windows.Forms.Application.DoEvents()
     End Sub
 
     ''' <summary>

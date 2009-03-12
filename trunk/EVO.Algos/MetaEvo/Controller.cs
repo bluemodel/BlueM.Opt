@@ -590,12 +590,13 @@ namespace IHWB.EVO.MetaEvo
             bool[] evaluate_success;
             
             //clienttmp[]: [0:Menge der zugeordneten Individuen, 1:Laufnummer in der Serie, 2: Berechnungsdauer
+            //ToDo: 3: Anzahl Individuen für die Berechnungsdauer (wird zur Zuordnung genutzt wenn meClient.speed_av = 1000 ist)
 
             //Solange der Server noch nicht fertig ist
             while (serverstatus[0] != "finished")
             {
                 if (this.stopped) return true;
-                clienttmp[0] = networkmanager.Individuums_CountMineInDB();
+                clienttmp[0] = networkmanager.Individuums_CountMineRawInDB();
                 clienttmp[1] = 0;
 
                 //Falls neues Individuum in DB existiert, berechnen
@@ -623,7 +624,6 @@ namespace IHWB.EVO.MetaEvo
 
                     //für Event Registrieren und Simulieren
                     sim.IndividuumEvaluated += new IHWB.EVO.Apps.Sim.IndividuumEvaluatedEventHandler(this.evaluate_multi_4client_Event);
-                    if (generation_tmp[0].OptParameter_RWerte[0] == 0) MessageBox.Show("Optparameter ungültig!"); 
                     evaluate_success = sim.Evaluate(ref generation_tmp, false);
                     sim.IndividuumEvaluated -= new IHWB.EVO.Apps.Sim.IndividuumEvaluatedEventHandler(this.evaluate_multi_4client_Event);
 
@@ -673,10 +673,9 @@ namespace IHWB.EVO.MetaEvo
                     break;
                 }
             }
-            System.Windows.Forms.Application.DoEvents();
             clienttmp[1]++;
 
-            if ((networkmanager.Individuums_CountMineInDB() != clienttmp[0]) || (this.stopped))
+            if ((networkmanager.Individuums_CountMineRawInDB() != clienttmp[0]) || (this.stopped))
             {
                 sim.isStopped = true;
                 
