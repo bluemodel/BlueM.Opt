@@ -350,19 +350,17 @@ Public Class SWMM
             If (Zeile.StartsWith("  Outfall Loading Summary")) Then
                 Do
                     Zeile = StrRead.ReadLine.ToString
-                    If (Zeile.StartsWith("  EastOut")) Then
+                    If (Zeile.StartsWith("  S112")) Then
                         FFreqEast = Trim(Zeile.Substring(24, 5))
                         AvgFEast = Trim(Zeile.Substring(33, 6))
                         Zeile = StrRead.ReadLine.ToString
-                        FFreqGath = Trim(Zeile.Substring(24, 5))
-                        AvgFGath = Trim(Zeile.Substring(33, 6))
                         Zeile = StrRead.ReadLine.ToString
                         FFreqWest = Trim(Zeile.Substring(24, 5))
                         AvgFWest = Trim(Zeile.Substring(33, 6))
                         Exit Do
                     End If
                 Loop Until StrRead.Peek() = -1
-                QWert = (FFreqEast * AvgFEast) + (FFreqGath * AvgFGath) + (FFreqWest * AvgFWest)
+                QWert = (FFreqEast * AvgFEast) + (FFreqWest * AvgFWest)
                 Exit Do
             End If
         Loop Until StrRead.Peek() = -1
